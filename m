@@ -1,134 +1,134 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [RFC PATCH v2 19/19] KVM: arm/arm64: Rework kvm_timer_should_fire
-Date: Mon, 17 Jul 2017 16:27:18 +0200
-Message-ID: <20170717142718.13853-20-cdall@linaro.org>
+Subject: [RFC PATCH v2 14/19] KVM: arm/arm64: Support EL1 phys timer register access in set/get reg
+Date: Mon, 17 Jul 2017 16:27:13 +0200
+Message-ID: <20170717142718.13853-15-cdall@linaro.org>
 References: <20170717142718.13853-1-cdall@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 56FCD412C2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 10:27:02 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3rzS7LFmjV9x for <kvmarm@lists.cs.columbia.edu>;
- Mon, 17 Jul 2017 10:27:01 -0400 (EDT)
-Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B9C3E49C4C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 10:26:57 -0400 (EDT)
-Received: by mail-wm0-f42.google.com with SMTP id w126so77801826wme.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 07:27:44 -0700 (PDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20170717142718.13853-1-cdall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-kvm_timer_should_fire() can be called in two different situations from
-the kvm_vcpu_block().
+Add suport for the physical timer registers in kvm_arm_timer_set_reg and
+kvm_arm_timer_get_reg so that these functions can be reused to interact
+with the rest of the system.
 
-The first case is before calling kvm_timer_schedule(), used for wait
-polling, and in this case the VCPU thread is running and the timer state
-is loaded onto the hardware so all we have to do is check if the virtual
-interrupt lines are asserted, becasue the timer interrupt handler
-functions will raise those lines as appropriate.
-
-The second case is inside the wait loop of kvm_vcpu_block(), where we
-have already called kvm_timer_schedule() and therefore the hardware will
-be disabled and the software view of the timer state is up to date
-(timer->loaded is false), and so we can simply check if the timer should
-fire by looking at the software state.
+Note that this paves part of the way for the physical timer state
+save/restore, but we still need to add those registers to
+KVM_GET_REG_LIST before we support migrating the physical timer state.
 
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- include/kvm/arm_arch_timer.h |  3 ++-
- virt/kvm/arm/arch_timer.c    | 22 +++++++++++++++++++++-
- virt/kvm/arm/arm.c           |  3 +--
- 3 files changed, 24 insertions(+), 4 deletions(-)
+ arch/arm/include/uapi/asm/kvm.h   |  6 ++++++
+ arch/arm64/include/uapi/asm/kvm.h |  6 ++++++
+ virt/kvm/arm/arch_timer.c         | 33 +++++++++++++++++++++++++++++++--
+ 3 files changed, 43 insertions(+), 2 deletions(-)
 
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index af29563..250db34 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -73,7 +73,8 @@ int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
- int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
- int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+index 5db2d4c..665c454 100644
+--- a/arch/arm/include/uapi/asm/kvm.h
++++ b/arch/arm/include/uapi/asm/kvm.h
+@@ -151,6 +151,12 @@ struct kvm_arch_memory_slot {
+ 	(__ARM_CP15_REG(op1, 0, crm, 0) | KVM_REG_SIZE_U64)
+ #define ARM_CP15_REG64(...) __ARM_CP15_REG64(__VA_ARGS__)
  
--bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx);
-+bool kvm_timer_is_pending(struct kvm_vcpu *vcpu);
++/* PL1 Physical Timer Registers */
++#define KVM_REG_ARM_PTIMER_CTL		ARM_CP15_REG32(0, 14, 2, 1)
++#define KVM_REG_ARM_PTIMER_CNT		ARM_CP15_REG64(0, 14)
++#define KVM_REG_ARM_PTIMER_CVAL		ARM_CP15_REG64(2, 14)
 +
- void kvm_timer_schedule(struct kvm_vcpu *vcpu);
- void kvm_timer_unschedule(struct kvm_vcpu *vcpu);
++/* Virtual Timer Registers */
+ #define KVM_REG_ARM_TIMER_CTL		ARM_CP15_REG32(0, 14, 3, 1)
+ #define KVM_REG_ARM_TIMER_CNT		ARM_CP15_REG64(1, 14)
+ #define KVM_REG_ARM_TIMER_CVAL		ARM_CP15_REG64(3, 14)
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index 9f3ca24..07be6e2 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -195,6 +195,12 @@ struct kvm_arch_memory_slot {
  
+ #define ARM64_SYS_REG(...) (__ARM64_SYS_REG(__VA_ARGS__) | KVM_REG_SIZE_U64)
+ 
++/* EL1 Physical Timer Registers */
++#define KVM_REG_ARM_PTIMER_CTL		ARM64_SYS_REG(3, 3, 14, 2, 1)
++#define KVM_REG_ARM_PTIMER_CVAL		ARM64_SYS_REG(3, 3, 14, 2, 2)
++#define KVM_REG_ARM_PTIMER_CNT		ARM64_SYS_REG(3, 3, 14, 0, 1)
++
++/* EL0 Virtual Timer Registers */
+ #define KVM_REG_ARM_TIMER_CTL		ARM64_SYS_REG(3, 3, 14, 3, 1)
+ #define KVM_REG_ARM_TIMER_CNT		ARM64_SYS_REG(3, 3, 14, 3, 2)
+ #define KVM_REG_ARM_TIMER_CVAL		ARM64_SYS_REG(3, 3, 14, 0, 2)
 diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index f92459a..1d0cd3a 100644
+index 70110ea..d5b632d 100644
 --- a/virt/kvm/arm/arch_timer.c
 +++ b/virt/kvm/arm/arch_timer.c
-@@ -49,6 +49,7 @@ static const struct kvm_irq_level default_vtimer_irq = {
- static bool kvm_timer_irq_can_fire(struct arch_timer_context *timer_ctx);
- static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
- 				 struct arch_timer_context *timer_ctx);
-+static bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx);
- 
- u64 kvm_phys_timer_read(void)
+@@ -626,10 +626,11 @@ static void kvm_timer_init_interrupt(void *info)
+ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
  {
-@@ -223,7 +224,7 @@ static enum hrtimer_restart kvm_phys_timer_expire(struct hrtimer *hrt)
- 	return HRTIMER_NORESTART;
- }
- 
--bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
-+static bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
- {
- 	u64 cval, now;
- 
-@@ -236,6 +237,25 @@ bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
- 	return cval <= now;
- }
- 
-+bool kvm_timer_is_pending(struct kvm_vcpu *vcpu)
-+{
-+	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+ 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
 +	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+ 
+ 	switch (regid) {
+ 	case KVM_REG_ARM_TIMER_CTL:
+-		vtimer->cnt_ctl = value;
++		vtimer->cnt_ctl = value & ~ARCH_TIMER_CTRL_IT_STAT;
+ 		break;
+ 	case KVM_REG_ARM_TIMER_CNT:
+ 		update_vtimer_cntvoff(vcpu, kvm_phys_timer_read() - value);
+@@ -637,6 +638,13 @@ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
+ 	case KVM_REG_ARM_TIMER_CVAL:
+ 		vtimer->cnt_cval = value;
+ 		break;
++	case KVM_REG_ARM_PTIMER_CTL:
++		ptimer->cnt_ctl = value & ~ARCH_TIMER_CTRL_IT_STAT;
++		break;
++	case KVM_REG_ARM_PTIMER_CVAL:
++		ptimer->cnt_cval = value;
++		break;
 +
-+	if (vtimer->irq.level || ptimer->irq.level)
-+		return true;
-+
+ 	default:
+ 		return -1;
+ 	}
+@@ -645,17 +653,38 @@ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
+ 	return 0;
+ }
+ 
++static u64 read_timer_ctl(struct arch_timer_context *timer)
++{
 +	/*
-+	 * When this is called from withing the wait loop of kvm_vcpu_block(),
-+	 * the software view of the timer state is up to date (timer->loaded
-+	 * is false), and so we can simply check if the timer should fire now.
++	 * Set ISTATUS bit if it's expired.
++	 * Note that according to ARMv8 ARM Issue A.k, ISTATUS bit is
++	 * UNKNOWN when ENABLE bit is 0, so we chose to set ISTATUS bit
++	 * regardless of ENABLE bit for our implementation convenience.
 +	 */
-+	if (!vtimer->loaded && kvm_timer_should_fire(vtimer))
-+		return true;
-+
-+	return kvm_timer_should_fire(ptimer);
++	if (!kvm_timer_compute_delta(timer))
++		return timer->cnt_ctl | ARCH_TIMER_CTRL_IT_STAT;
++	else
++		return timer->cnt_ctl;
 +}
 +
- /*
-  * Reflect the timer output level into the kvm_run structure
-  */
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 6322605..1ea9980 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -307,8 +307,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
- 
- int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
+ u64 kvm_arm_timer_get_reg(struct kvm_vcpu *vcpu, u64 regid)
  {
--	return kvm_timer_should_fire(vcpu_vtimer(vcpu)) ||
--	       kvm_timer_should_fire(vcpu_ptimer(vcpu));
-+	return kvm_timer_is_pending(vcpu);
- }
++	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+ 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
  
- void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
+ 	switch (regid) {
+ 	case KVM_REG_ARM_TIMER_CTL:
+-		return vtimer->cnt_ctl;
++		return read_timer_ctl(vtimer);
+ 	case KVM_REG_ARM_TIMER_CNT:
+ 		return kvm_phys_timer_read() - vtimer->cntvoff;
+ 	case KVM_REG_ARM_TIMER_CVAL:
+ 		return vtimer->cnt_cval;
++	case KVM_REG_ARM_PTIMER_CTL:
++		return read_timer_ctl(ptimer);
++	case KVM_REG_ARM_PTIMER_CVAL:
++		return ptimer->cnt_cval;
++	case KVM_REG_ARM_PTIMER_CNT:
++		return kvm_phys_timer_read();
+ 	}
+ 	return (u64)-1;
+ }
 -- 
 2.9.0
