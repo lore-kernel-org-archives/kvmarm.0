@@ -1,25 +1,24 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [RFC PATCH v2 18/19] KVM: arm/arm64: Get rid of
- kvm_timer_flush_hwstate
-Date: Mon, 17 Jul 2017 16:27:17 +0200
-Message-ID: <20170717142718.13853-19-cdall@linaro.org>
+Subject: [RFC PATCH v2 16/19] KVM: arm/arm64: Move phys_timer_emulate function
+Date: Mon, 17 Jul 2017 16:27:15 +0200
+Message-ID: <20170717142718.13853-17-cdall@linaro.org>
 References: <20170717142718.13853-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5806049C0C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 10:27:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EBE949C30
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 10:27:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uG3JrnU84h8U for <kvmarm@lists.cs.columbia.edu>;
- Mon, 17 Jul 2017 10:27:01 -0400 (EDT)
-Received: from mail-wm0-f54.google.com (mail-wm0-f54.google.com [74.125.82.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A637449C01
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 10:26:56 -0400 (EDT)
-Received: by mail-wm0-f54.google.com with SMTP id w126so77801436wme.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 07:27:43 -0700 (PDT)
+ with ESMTP id jPUL-dC3j9Me for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 17 Jul 2017 10:26:56 -0400 (EDT)
+Received: from mail-wm0-f46.google.com (mail-wm0-f46.google.com [74.125.82.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E72F249C18
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 10:26:54 -0400 (EDT)
+Received: by mail-wm0-f46.google.com with SMTP id f67so85841701wmh.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 07:27:41 -0700 (PDT)
 In-Reply-To: <20170717142718.13853-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,84 +33,67 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now when both the vtimer and the ptimer when using both the in-kernel
-vgic emulation and a userspace IRQ chip are driven by the timer signals
-and at the vcpu load/put boundaries, instead of recomputing the timer
-state at every entry/exit to/from the guest, we can get entirely rid of
-the flush hwstate function.
+We are about to call phys_timer_emulate() from kvm_timer_update_state()
+and modify phys_timer_emulate() at the same time.  Moving the function
+and modifying it in a single patch makes the diff hard to read, so do
+this separately first.
+
+No functional change.
 
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- include/kvm/arm_arch_timer.h |  1 -
- virt/kvm/arm/arch_timer.c    | 24 ------------------------
- virt/kvm/arm/arm.c           |  1 -
- 3 files changed, 26 deletions(-)
+ virt/kvm/arm/arch_timer.c | 32 ++++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index 8e5ed54..af29563 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -61,7 +61,6 @@ int kvm_timer_hyp_init(void);
- int kvm_timer_enable(struct kvm_vcpu *vcpu);
- int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu);
- void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu);
--void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu);
- void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu);
- bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu);
- void kvm_timer_update_run(struct kvm_vcpu *vcpu);
 diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index aa18a5d..f92459a 100644
+index d5b632d..1f82c21 100644
 --- a/virt/kvm/arm/arch_timer.c
 +++ b/virt/kvm/arm/arch_timer.c
-@@ -302,12 +302,6 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
- 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
- 
--	/*
--	 * If userspace modified the timer registers via SET_ONE_REG before
--	 * the vgic was initialized, we mustn't set the vtimer->irq.level value
--	 * because the guest would never see the interrupt.  Instead wait
--	 * until we call this function from kvm_timer_flush_hwstate.
--	 */
- 	if (unlikely(!timer->enabled))
- 		return;
- 
-@@ -493,24 +487,6 @@ bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu)
- 	       ptimer->irq.level != plevel;
+@@ -252,6 +252,22 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+ 	}
  }
  
--/**
-- * kvm_timer_flush_hwstate - prepare timers before running the vcpu
-- * @vcpu: The vcpu pointer
-- *
-- * Check if the virtual timer has expired while we were running in the host,
-- * and inject an interrupt if that was the case, making sure the timer is
-- * masked or disabled on the host so that we keep executing.  Also schedule a
-- * software timer for the physical timer if it is enabled.
-- */
--void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
++/* Schedule the background timer for the emulated timer. */
++static void phys_timer_emulate(struct kvm_vcpu *vcpu,
++			      struct arch_timer_context *timer_ctx)
++{
++	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
++
++	if (kvm_timer_should_fire(timer_ctx))
++		return;
++
++	if (!kvm_timer_irq_can_fire(timer_ctx))
++		return;
++
++	/*  The timer has not yet expired, schedule a background timer */
++	soft_timer_start(&timer->phys_timer, kvm_timer_compute_delta(timer_ctx));
++}
++
+ /*
+  * Check if there was a change in the timer state (should we raise or lower
+  * the line level to the GIC).
+@@ -278,22 +294,6 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
+ 		kvm_timer_update_irq(vcpu, !ptimer->irq.level, ptimer);
+ }
+ 
+-/* Schedule the background timer for the emulated timer. */
+-static void phys_timer_emulate(struct kvm_vcpu *vcpu,
+-			      struct arch_timer_context *timer_ctx)
 -{
 -	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
--	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
 -
--	if (unlikely(!timer->enabled))
+-	if (kvm_timer_should_fire(timer_ctx))
 -		return;
+-
+-	if (!kvm_timer_irq_can_fire(timer_ctx))
+-		return;
+-
+-	/*  The timer has not yet expired, schedule a background timer */
+-	soft_timer_start(&timer->phys_timer, kvm_timer_compute_delta(timer_ctx));
 -}
 -
- void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
+ static void vtimer_save_state(struct kvm_vcpu *vcpu)
  {
  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index aed3e5c..6322605 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -651,7 +651,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 
- 		local_irq_disable();
- 
--		kvm_timer_flush_hwstate(vcpu);
- 		kvm_vgic_flush_hwstate(vcpu);
- 
- 		/*
 -- 
 2.9.0
