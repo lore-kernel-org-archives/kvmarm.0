@@ -1,25 +1,24 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [RFC PATCH v2 11/19] genirq: Document vcpu_info usage for per-CPU
- interrupts
-Date: Mon, 17 Jul 2017 16:27:10 +0200
-Message-ID: <20170717142718.13853-12-cdall@linaro.org>
+Subject: [RFC PATCH v2 07/19] KVM: arm/arm64: Rename soft timer to bg_timer
+Date: Mon, 17 Jul 2017 16:27:06 +0200
+Message-ID: <20170717142718.13853-8-cdall@linaro.org>
 References: <20170717142718.13853-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E126349C0C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 10:26:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D40A40FB0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 10:26:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LvTivUMA+ykk for <kvmarm@lists.cs.columbia.edu>;
- Mon, 17 Jul 2017 10:26:54 -0400 (EDT)
-Received: from mail-wm0-f47.google.com (mail-wm0-f47.google.com [74.125.82.47])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6F67E49C26
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 10:26:50 -0400 (EDT)
-Received: by mail-wm0-f47.google.com with SMTP id b134so49978706wma.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 07:27:36 -0700 (PDT)
+ with ESMTP id JDD6E-6FteWf for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 17 Jul 2017 10:26:46 -0400 (EDT)
+Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 87783410B5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 10:26:46 -0400 (EDT)
+Received: by mail-wm0-f44.google.com with SMTP id b134so49976657wma.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 07:27:33 -0700 (PDT)
 In-Reply-To: <20170717142718.13853-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,49 +30,125 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@linaro.org>, Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-It is currently unclear how to set the VCPU affinity for an interrupt
-which is of the per-CPU kind, since the Linux irq_data structure
-describes the state for multiple interrupts when the interrupt is a
-per-CPU interrupt, one for each physical CPU on the system.  Since each
-such interrupt can be associated with different VCPUs or none at all,
-associating a single VCPU state with such an interrupt does not capture
-the necessary semantics.
+As we are about to introduce a separate hrtimer for the physical timer,
+call this timer bg_timer, because we refer to this timer as the
+background timer in the code and comments elsewhere.
 
-The implementers of irq_set_affinity are the Intel and AMD IOMMUs, and
-the ARM GIC irqchip.  The Intel and AMD callers do not appear to use
-per-CPU interrupts, and the ARM GIC implementation only checks the
-pointer against NULL vs. non-NULL.
-
-Therefore, simply update the function documentation to explain the
-expected use in the context of per-CPU interrupts, allowing future
-changes or additions to irqchip implementers to do the right thing.
-
-This allows us to set the VCPU affinity for the virtual timer interrupt
-in KVM/ARM, which is a per-CPU (PPI) interrupt.
-
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- kernel/irq/manage.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ include/kvm/arm_arch_timer.h |  3 +--
+ virt/kvm/arm/arch_timer.c    | 22 +++++++++++-----------
+ 2 files changed, 12 insertions(+), 13 deletions(-)
 
-diff --git a/kernel/irq/manage.c b/kernel/irq/manage.c
-index 5624b2d..050b9f6 100644
---- a/kernel/irq/manage.c
-+++ b/kernel/irq/manage.c
-@@ -381,7 +381,8 @@ int irq_select_affinity_usr(unsigned int irq)
- /**
-  *	irq_set_vcpu_affinity - Set vcpu affinity for the interrupt
-  *	@irq: interrupt number to set affinity
-- *	@vcpu_info: vCPU specific data
-+ *	@vcpu_info: vCPU specific data or pointer to a percpu array of vCPU
-+ *	            specific data for per-CPU interrupts
-  *
-  *	This function uses the vCPU specific data to set the vCPU
-  *	affinity for an irq. The vCPU specific data is passed from
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index f0053f8..dcbb2e1 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -43,8 +43,7 @@ struct arch_timer_cpu {
+ 	struct arch_timer_context	ptimer;
+ 
+ 	/* Background timer used when the guest is not running */
+-	struct hrtimer			timer;
+-
++	struct hrtimer			bg_timer;
+ 	/* Work queued with the above timer expires */
+ 	struct work_struct		expired;
+ 
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index 871d8ae..c2e8326 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -56,7 +56,7 @@ u64 kvm_phys_timer_read(void)
+ 	return timecounter->cc->read(timecounter->cc);
+ }
+ 
+-static bool soft_timer_is_armed(struct arch_timer_cpu *timer)
++static bool bg_timer_is_armed(struct arch_timer_cpu *timer)
+ {
+ 	return timer->armed;
+ }
+@@ -154,13 +154,13 @@ static u64 kvm_timer_earliest_exp(struct kvm_vcpu *vcpu)
+ 	return min(min_virt, min_phys);
+ }
+ 
+-static enum hrtimer_restart kvm_timer_expire(struct hrtimer *hrt)
++static enum hrtimer_restart kvm_bg_timer_expire(struct hrtimer *hrt)
+ {
+ 	struct arch_timer_cpu *timer;
+ 	struct kvm_vcpu *vcpu;
+ 	u64 ns;
+ 
+-	timer = container_of(hrt, struct arch_timer_cpu, timer);
++	timer = container_of(hrt, struct arch_timer_cpu, bg_timer);
+ 	vcpu = container_of(timer, struct kvm_vcpu, arch.timer_cpu);
+ 
+ 	/*
+@@ -267,7 +267,7 @@ static void kvm_timer_emulate(struct kvm_vcpu *vcpu,
+ 		return;
+ 
+ 	/*  The timer has not yet expired, schedule a background timer */
+-	soft_timer_start(&timer->timer, kvm_timer_compute_delta(timer_ctx));
++	soft_timer_start(&timer->bg_timer, kvm_timer_compute_delta(timer_ctx));
+ }
+ 
+ /*
+@@ -281,7 +281,7 @@ void kvm_timer_schedule(struct kvm_vcpu *vcpu)
+ 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+ 	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+ 
+-	BUG_ON(soft_timer_is_armed(timer));
++	BUG_ON(bg_timer_is_armed(timer));
+ 
+ 	/*
+ 	 * No need to schedule a background timer if any guest timer has
+@@ -303,14 +303,14 @@ void kvm_timer_schedule(struct kvm_vcpu *vcpu)
+ 	 * Set the earliest expiration time among the guest timers.
+ 	 */
+ 	timer->armed = true;
+-	soft_timer_start(&timer->timer, kvm_timer_earliest_exp(vcpu));
++	soft_timer_start(&timer->bg_timer, kvm_timer_earliest_exp(vcpu));
+ }
+ 
+ void kvm_timer_unschedule(struct kvm_vcpu *vcpu)
+ {
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+ 
+-	soft_timer_cancel(&timer->timer, &timer->expired);
++	soft_timer_cancel(&timer->bg_timer, &timer->expired);
+ 	timer->armed = false;
+ }
+ 
+@@ -447,7 +447,7 @@ void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
+ 	 * This is to cancel the background timer for the physical timer
+ 	 * emulation if it is set.
+ 	 */
+-	soft_timer_cancel(&timer->timer, &timer->expired);
++	soft_timer_cancel(&timer->bg_timer, &timer->expired);
+ 
+ 	/*
+ 	 * The guest could have modified the timer registers or the timer
+@@ -504,8 +504,8 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+ 	vcpu_ptimer(vcpu)->cntvoff = 0;
+ 
+ 	INIT_WORK(&timer->expired, kvm_timer_inject_irq_work);
+-	hrtimer_init(&timer->timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
+-	timer->timer.function = kvm_timer_expire;
++	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
++	timer->bg_timer.function = kvm_bg_timer_expire;
+ 
+ 	vtimer->irq.irq = default_vtimer_irq.irq;
+ 	ptimer->irq.irq = default_ptimer_irq.irq;
+@@ -614,7 +614,7 @@ void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu)
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+ 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+ 
+-	soft_timer_cancel(&timer->timer, &timer->expired);
++	soft_timer_cancel(&timer->bg_timer, &timer->expired);
+ 	kvm_vgic_unmap_phys_irq(vcpu, vtimer->irq.irq);
+ }
+ 
 -- 
 2.9.0
