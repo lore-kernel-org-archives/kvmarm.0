@@ -1,164 +1,120 @@
 From: Jintack Lim <jintack.lim@linaro.org>
-Subject: [RFC PATCH v2 28/38] KVM: arm64: Emulate EL12 register accesses from the virtual EL2
-Date: Tue, 18 Jul 2017 11:58:54 -0500
-Message-ID: <1500397144-16232-29-git-send-email-jintack.lim@linaro.org>
+Subject: [RFC PATCH v2 33/38] KVM: arm64: Emulate appropriate VM control
+ system registers
+Date: Tue, 18 Jul 2017 11:58:59 -0500
+Message-ID: <1500397144-16232-34-git-send-email-jintack.lim@linaro.org>
 References: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4710049C01
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 12:59:47 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id G-YfiVZIlVK8 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 18 Jul 2017 12:59:46 -0400 (EDT)
+Received: from mail-it0-f51.google.com (mail-it0-f51.google.com
+ [209.85.214.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6B15340CE9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 12:59:46 -0400 (EDT)
+Received: by mail-it0-f51.google.com with SMTP id v205so2303665itf.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 10:00:35 -0700 (PDT)
 In-Reply-To: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
-Cc: corbet@lwn.net, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, akpm@linux-foundation.org, mchehab@kernel.org, cov@codeaurora.org, daniel.lezcano@linaro.org, david.daney@cavium.com, mark.rutland@arm.com, suzuki.poulose@arm.com, stefan@hello-penguin.com, andy.gross@linaro.org, wcohen@redhat.com, ard.biesheuvel@linaro.org, shankerd@codeaurora.org, vladimir.murzin@arm.com, james.morse@arm.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Jintack Lim <jintack.lim@linaro.org>
+Cc: kvm@vger.kernel.org, david.daney@cavium.com, catalin.marinas@arm.com, will.deacon@arm.com, stefan@hello-penguin.com, corbet@lwn.net, daniel.lezcano@linaro.org, linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, andy.gross@linaro.org, cov@codeaurora.org, wcohen@redhat.com, mchehab@kernel.org, ard.biesheuvel@linaro.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, akpm@linux-foundation.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-With HCR_EL2.NV bit set, accesses to EL12 registers in the virtual EL2
-trap to EL2. Handle those traps just like we do for EL1 registers.
-
-One exception is CNTKCTL_EL12. We don't trap on CNTKCTL_EL1 for non-VHE
-virtual EL2 because we don't have to. However, accessing CNTKCTL_EL12
-will trap since it's one of the EL12 registers controlled by HCR_EL2.NV
-bit.  Therefore, add a handler for it and don't treat it as a
-non-trap-registers when preparing a shadow context.
-
-Move EL12 system register macros to a common place to reuse them.
+Now that the virtual EL2 can access EL2 register states via EL1
+registers, we need to consider it when selecting the register to
+emulate.
 
 Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 ---
- arch/arm64/include/asm/kvm_hyp.h | 24 ------------------------
- arch/arm64/include/asm/sysreg.h  | 24 ++++++++++++++++++++++++
- arch/arm64/kvm/context.c         |  7 +++++++
- arch/arm64/kvm/sys_regs.c        | 25 +++++++++++++++++++++++++
- 4 files changed, 56 insertions(+), 24 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 46 ++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 44 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index 4572a9b..353b895 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -73,30 +73,6 @@
- #define read_sysreg_el1(r)	read_sysreg_elx(r, _EL1, _EL12)
- #define write_sysreg_el1(v,r)	write_sysreg_elx(v, r, _EL1, _EL12)
- 
--/* The VHE specific system registers and their encoding */
--#define sctlr_EL12              sys_reg(3, 5, 1, 0, 0)
--#define cpacr_EL12              sys_reg(3, 5, 1, 0, 2)
--#define ttbr0_EL12              sys_reg(3, 5, 2, 0, 0)
--#define ttbr1_EL12              sys_reg(3, 5, 2, 0, 1)
--#define tcr_EL12                sys_reg(3, 5, 2, 0, 2)
--#define afsr0_EL12              sys_reg(3, 5, 5, 1, 0)
--#define afsr1_EL12              sys_reg(3, 5, 5, 1, 1)
--#define esr_EL12                sys_reg(3, 5, 5, 2, 0)
--#define far_EL12                sys_reg(3, 5, 6, 0, 0)
--#define mair_EL12               sys_reg(3, 5, 10, 2, 0)
--#define amair_EL12              sys_reg(3, 5, 10, 3, 0)
--#define vbar_EL12               sys_reg(3, 5, 12, 0, 0)
--#define contextidr_EL12         sys_reg(3, 5, 13, 0, 1)
--#define cntkctl_EL12            sys_reg(3, 5, 14, 1, 0)
--#define cntp_tval_EL02          sys_reg(3, 5, 14, 2, 0)
--#define cntp_ctl_EL02           sys_reg(3, 5, 14, 2, 1)
--#define cntp_cval_EL02          sys_reg(3, 5, 14, 2, 2)
--#define cntv_tval_EL02          sys_reg(3, 5, 14, 3, 0)
--#define cntv_ctl_EL02           sys_reg(3, 5, 14, 3, 1)
--#define cntv_cval_EL02          sys_reg(3, 5, 14, 3, 2)
--#define spsr_EL12               sys_reg(3, 5, 4, 0, 0)
--#define elr_EL12                sys_reg(3, 5, 4, 0, 1)
--
- /**
-  * hyp_alternate_select - Generates patchable code sequences that are
-  * used to switch between two implementations of a function, depending
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index b01c608..b8d4d0c 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -338,6 +338,30 @@
- #define SYS_CNTVOFF_EL2			sys_reg(3, 4, 14, 0, 3)
- #define SYS_CNTHCTL_EL2			sys_reg(3, 4, 14, 1, 0)
- 
-+/* The VHE specific system registers and their encoding */
-+#define sctlr_EL12              sys_reg(3, 5, 1, 0, 0)
-+#define cpacr_EL12              sys_reg(3, 5, 1, 0, 2)
-+#define ttbr0_EL12              sys_reg(3, 5, 2, 0, 0)
-+#define ttbr1_EL12              sys_reg(3, 5, 2, 0, 1)
-+#define tcr_EL12                sys_reg(3, 5, 2, 0, 2)
-+#define afsr0_EL12              sys_reg(3, 5, 5, 1, 0)
-+#define afsr1_EL12              sys_reg(3, 5, 5, 1, 1)
-+#define esr_EL12                sys_reg(3, 5, 5, 2, 0)
-+#define far_EL12                sys_reg(3, 5, 6, 0, 0)
-+#define mair_EL12               sys_reg(3, 5, 10, 2, 0)
-+#define amair_EL12              sys_reg(3, 5, 10, 3, 0)
-+#define vbar_EL12               sys_reg(3, 5, 12, 0, 0)
-+#define contextidr_EL12         sys_reg(3, 5, 13, 0, 1)
-+#define cntkctl_EL12            sys_reg(3, 5, 14, 1, 0)
-+#define cntp_tval_EL02          sys_reg(3, 5, 14, 2, 0)
-+#define cntp_ctl_EL02           sys_reg(3, 5, 14, 2, 1)
-+#define cntp_cval_EL02          sys_reg(3, 5, 14, 2, 2)
-+#define cntv_tval_EL02          sys_reg(3, 5, 14, 3, 0)
-+#define cntv_ctl_EL02           sys_reg(3, 5, 14, 3, 1)
-+#define cntv_cval_EL02          sys_reg(3, 5, 14, 3, 2)
-+#define spsr_EL12               sys_reg(3, 5, 4, 0, 0)
-+#define elr_EL12                sys_reg(3, 5, 4, 0, 1)
-+
- #define SYS_SP_EL2			sys_reg(3, 6, 4, 1, 0)
- 
- /* Common SCTLR_ELx flags. */
-diff --git a/arch/arm64/kvm/context.c b/arch/arm64/kvm/context.c
-index e1bc753..f3d3398 100644
---- a/arch/arm64/kvm/context.c
-+++ b/arch/arm64/kvm/context.c
-@@ -121,6 +121,13 @@ static void copy_shadow_non_trap_el1_state(struct kvm_vcpu *vcpu, bool setup)
- 	for (i = 0; i < ARRAY_SIZE(el1_non_trap_regs); i++) {
- 		const int sr = el1_non_trap_regs[i];
- 
-+		/*
-+		 * We trap on cntkctl_el12 accesses from virtual EL2 as suppose
-+		 * to not trapping on cntlctl_el1 accesses.
-+		 */
-+		if (vcpu_el2_e2h_is_set(vcpu) && sr == CNTKCTL_EL1)
-+			continue;
-+
- 		if (setup)
- 			s_sys_regs[sr] = vcpu_sys_reg(vcpu, sr);
- 		else
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index b3e0cb8..2aa922c 100644
+index 79980be..910b50d 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -905,6 +905,14 @@ static inline void access_rw(struct sys_reg_params *p, u64 *sysreg)
- 		*sysreg = p->regval;
+@@ -110,6 +110,31 @@ static bool access_dcsw(struct kvm_vcpu *vcpu,
+ 	return true;
  }
  
-+static bool access_cntkctl_el12(struct kvm_vcpu *vcpu,
-+			 struct sys_reg_params *p,
-+			 const struct sys_reg_desc *r)
++struct el1_el2_map {
++	int	el1;
++	int	el2;
++};
++
++static const struct el1_el2_map vm_map[] = {
++	{SCTLR_EL1, SCTLR_EL2},
++	{TTBR0_EL1, TTBR0_EL2},
++	{TTBR1_EL1, TTBR1_EL2},
++	{TCR_EL1, TCR_EL2},
++	{ESR_EL1, ESR_EL2},
++	{FAR_EL1, FAR_EL2},
++	{AFSR0_EL1, AFSR0_EL2},
++	{AFSR1_EL1, AFSR1_EL2},
++	{MAIR_EL1, MAIR_EL2},
++	{AMAIR_EL1, AMAIR_EL2},
++	{CONTEXTIDR_EL1, CONTEXTIDR_EL2},
++};
++
++static inline bool el12_reg(struct sys_reg_params *p)
 +{
-+	access_rw(p, &vcpu_sys_reg(vcpu, r->reg));
-+	return true;
++	/* All *_EL12 registers have Op1=5. */
++	return (p->Op1 == 5);
 +}
 +
- static u64 *get_special_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *p)
+ /*
+  * Generic accessor for VM registers. Only called as long as HCR_TVM
+  * is set. If the guest enables the MMU, we stop trapping the VM
+@@ -120,16 +145,33 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
+ 			  const struct sys_reg_desc *r)
  {
- 	u64 reg = sys_reg(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
-@@ -1201,6 +1209,23 @@ static bool access_cpacr(struct kvm_vcpu *vcpu,
- 	{ SYS_DESC(SYS_CNTVOFF_EL2), trap_el2_regs, reset_val, CNTVOFF_EL2, 0 },
- 	{ SYS_DESC(SYS_CNTHCTL_EL2), trap_el2_regs, reset_val, CNTHCTL_EL2, 0 },
- 
-+	{ SYS_DESC(sctlr_EL12), access_vm_reg, reset_val, SCTLR_EL1, 0x00C50078 },
-+	{ SYS_DESC(cpacr_EL12), access_cpacr, reset_val, CPACR_EL1, 0 },
-+	{ SYS_DESC(ttbr0_EL12), access_vm_reg, reset_unknown, TTBR0_EL1 },
-+	{ SYS_DESC(ttbr1_EL12), access_vm_reg, reset_unknown, TTBR1_EL1 },
-+	{ SYS_DESC(tcr_EL12), access_vm_reg, reset_val, TCR_EL1, 0 },
-+	{ SYS_DESC(spsr_EL12), access_spsr},
-+	{ SYS_DESC(elr_EL12), access_elr},
-+	{ SYS_DESC(afsr0_EL12), access_vm_reg, reset_unknown, AFSR0_EL1 },
-+	{ SYS_DESC(afsr1_EL12), access_vm_reg, reset_unknown, AFSR1_EL1 },
-+	{ SYS_DESC(esr_EL12), access_vm_reg, reset_unknown, ESR_EL1 },
-+	{ SYS_DESC(far_EL12), access_vm_reg, reset_unknown, FAR_EL1 },
-+	{ SYS_DESC(mair_EL12), access_vm_reg, reset_unknown, MAIR_EL1 },
-+	{ SYS_DESC(amair_EL12), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
-+	{ SYS_DESC(vbar_EL12), access_vbar, reset_val, VBAR_EL1, 0 },
-+	{ SYS_DESC(contextidr_EL12), access_vm_reg, reset_val, CONTEXTIDR_EL1, 0 },
-+	{ SYS_DESC(cntkctl_EL12), access_cntkctl_el12, reset_val, CNTKCTL_EL1, 0 },
+ 	bool was_enabled = vcpu_has_cache_enabled(vcpu);
++	u64 *sysreg = &vcpu_sys_reg(vcpu, r->reg);
++	int i;
++	const struct el1_el2_map *map;
 +
- 	{ SYS_DESC(SYS_SP_EL2), NULL, reset_special, SP_EL2, 0},
- };
++	/*
++	 * Redirect EL1 register accesses to the corresponding EL2 registers if
++	 * they are meant to access EL2 registers.
++	 */
++	if (vcpu_el2_e2h_is_set(vcpu) && !el12_reg(p)) {
++		for (i = 0; i < ARRAY_SIZE(vm_map); i++) {
++			map = &vm_map[i];
++			if (map->el1 == r->reg) {
++				sysreg = &vcpu_sys_reg(vcpu, map->el2);
++				break;
++			}
++		}
++	}
  
+ 	BUG_ON(!vcpu_mode_el2(vcpu) && !p->is_write);
+ 
+ 	if (!p->is_write) {
+-		p->regval = vcpu_sys_reg(vcpu, r->reg);
++		p->regval = *sysreg;
+ 		return true;
+ 	}
+ 
+ 	if (!p->is_aarch32) {
+-		vcpu_sys_reg(vcpu, r->reg) = p->regval;
++		*sysreg = p->regval;
+ 	} else {
+ 		if (!p->is_32bit)
+ 			vcpu_cp15_64_high(vcpu, r->reg) = upper_32_bits(p->regval);
 -- 
 1.9.1
