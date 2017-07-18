@@ -1,26 +1,26 @@
 From: Jintack Lim <jintack.lim@linaro.org>
-Subject: [RFC PATCH v2 06/38] KVM: arm64: Add vcpu_mode_el2 primitive to
- support nesting
-Date: Tue, 18 Jul 2017 11:58:32 -0500
-Message-ID: <1500397144-16232-7-git-send-email-jintack.lim@linaro.org>
+Subject: [RFC PATCH v2 15/38] KVM: arm64: Move exception macros and enums to a
+ common file
+Date: Tue, 18 Jul 2017 11:58:41 -0500
+Message-ID: <1500397144-16232-16-git-send-email-jintack.lim@linaro.org>
 References: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2059649C00
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 12:58:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ADEFB49C30
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 12:59:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id i7KoUv98NXSL for <kvmarm@lists.cs.columbia.edu>;
- Tue, 18 Jul 2017 12:58:56 -0400 (EDT)
-Received: from mail-io0-f182.google.com (mail-io0-f182.google.com
- [209.85.223.182])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5320C40D44
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 12:58:56 -0400 (EDT)
-Received: by mail-io0-f182.google.com with SMTP id z62so17065584ioi.3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 09:59:44 -0700 (PDT)
+ with ESMTP id f3i2N+R1Pq5J for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 18 Jul 2017 12:59:12 -0400 (EDT)
+Received: from mail-it0-f49.google.com (mail-it0-f49.google.com
+ [209.85.214.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5472A49C26
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 12:59:12 -0400 (EDT)
+Received: by mail-it0-f49.google.com with SMTP id a62so23794520itd.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 10:00:00 -0700 (PDT)
 In-Reply-To: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,57 +35,67 @@ To: kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.
 Cc: kvm@vger.kernel.org, david.daney@cavium.com, catalin.marinas@arm.com, will.deacon@arm.com, stefan@hello-penguin.com, corbet@lwn.net, daniel.lezcano@linaro.org, linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, andy.gross@linaro.org, cov@codeaurora.org, wcohen@redhat.com, mchehab@kernel.org, ard.biesheuvel@linaro.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, akpm@linux-foundation.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+These macros and enums can be reused to inject exceptions
+for nested virtualization.
 
-When running a nested hypervisor we occasionally have to figure out if
-the mode we are switching into is the virtual EL2 mode or a regular
-EL0/1 mode.
-
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 ---
- arch/arm/include/asm/kvm_emulate.h   |  6 ++++++
  arch/arm64/include/asm/kvm_emulate.h | 12 ++++++++++++
- 2 files changed, 18 insertions(+)
+ arch/arm64/kvm/inject_fault.c        | 12 ------------
+ 2 files changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
-index 9a8a45a..399cd75e 100644
---- a/arch/arm/include/asm/kvm_emulate.h
-+++ b/arch/arm/include/asm/kvm_emulate.h
-@@ -77,6 +77,12 @@ static inline bool vcpu_mode_is_32bit(const struct kvm_vcpu *vcpu)
- 	return 1;
- }
- 
-+/* We don't support nesting on arm */
-+static inline bool vcpu_mode_el2(const struct kvm_vcpu *vcpu)
-+{
-+	return false;
-+}
-+
- static inline unsigned long *vcpu_pc(struct kvm_vcpu *vcpu)
- {
- 	return &vcpu->arch.ctxt.gp_regs.usr_regs.ARM_pc;
 diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index fe39e68..5d6f3d0 100644
+index 14c4ce9..94f98cc 100644
 --- a/arch/arm64/include/asm/kvm_emulate.h
 +++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -143,6 +143,18 @@ static inline bool vcpu_mode_priv(const struct kvm_vcpu *vcpu)
- 	return mode != PSR_MODE_EL0t;
+@@ -31,6 +31,18 @@
+ #include <asm/cputype.h>
+ #include <asm/virt.h>
+ 
++#define CURRENT_EL_SP_EL0_VECTOR	0x0
++#define CURRENT_EL_SP_ELx_VECTOR	0x200
++#define LOWER_EL_AArch64_VECTOR		0x400
++#define LOWER_EL_AArch32_VECTOR		0x600
++
++enum exception_type {
++	except_type_sync	= 0,
++	except_type_irq		= 0x80,
++	except_type_fiq		= 0x100,
++	except_type_serror	= 0x180,
++};
++
+ unsigned long *vcpu_reg32(const struct kvm_vcpu *vcpu, u8 reg_num);
+ unsigned long *vcpu_spsr32(const struct kvm_vcpu *vcpu);
+ 
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index da6a8cf..94679fb 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -28,11 +28,6 @@
+ #define PSTATE_FAULT_BITS_64 	(PSR_MODE_EL1h | PSR_A_BIT | PSR_F_BIT | \
+ 				 PSR_I_BIT | PSR_D_BIT)
+ 
+-#define CURRENT_EL_SP_EL0_VECTOR	0x0
+-#define CURRENT_EL_SP_ELx_VECTOR	0x200
+-#define LOWER_EL_AArch64_VECTOR		0x400
+-#define LOWER_EL_AArch32_VECTOR		0x600
+-
+ static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+ {
+ 	unsigned long cpsr;
+@@ -101,13 +96,6 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
+ 		*fsr = 0x14;
  }
  
-+static inline bool vcpu_mode_el2(const struct kvm_vcpu *vcpu)
-+{
-+	u32 mode;
-+
-+	if (vcpu_mode_is_32bit(vcpu))
-+		return false;
-+
-+	mode = *vcpu_cpsr(vcpu) & PSR_MODE_MASK;
-+
-+	return mode == PSR_MODE_EL2h || mode == PSR_MODE_EL2t;
-+}
-+
- static inline u32 kvm_vcpu_get_hsr(const struct kvm_vcpu *vcpu)
+-enum exception_type {
+-	except_type_sync	= 0,
+-	except_type_irq		= 0x80,
+-	except_type_fiq		= 0x100,
+-	except_type_serror	= 0x180,
+-};
+-
+ static u64 get_except_vector(struct kvm_vcpu *vcpu, enum exception_type type)
  {
- 	return vcpu->arch.fault.esr_el2;
+ 	u64 exc_offset;
 -- 
 1.9.1
