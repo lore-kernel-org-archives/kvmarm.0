@@ -1,21 +1,30 @@
-From: James Morse <james.morse@arm.com>
-Subject: [PATCH] KVM: arm/arm64: Fix guest external abort matching
-Date: Tue, 18 Jul 2017 13:37:41 +0100
-Message-ID: <20170718123741.11537-1-james.morse@arm.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH kvm-unit-tests 3/3] arm64: timer: Add support for phys
+ timer testing
+Date: Tue, 18 Jul 2017 15:01:53 +0200
+Message-ID: <20170718130153.GD14069@cbox>
+References: <20170713192009.10069-1-cdall@linaro.org>
+ <20170713192009.10069-4-cdall@linaro.org>
+ <20170718120957.uvxb546eqpj5oxbp@kamzik.brq.redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B375940D14
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 08:38:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E8F2440D1D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 09:01:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3fonAr-w2p1A for <kvmarm@lists.cs.columbia.edu>;
- Tue, 18 Jul 2017 08:38:11 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AD4340C5A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 08:38:10 -0400 (EDT)
+ with ESMTP id 45XvpMO2FfJs for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 18 Jul 2017 09:01:09 -0400 (EDT)
+Received: from mail-lf0-f43.google.com (mail-lf0-f43.google.com
+ [209.85.215.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B5D3540D14
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 09:01:09 -0400 (EDT)
+Received: by mail-lf0-f43.google.com with SMTP id w198so12831325lff.2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 06:01:57 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <20170718120957.uvxb546eqpj5oxbp@kamzik.brq.redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -25,211 +34,181 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, linux-arm-kernel@lists.infradead.org
+To: Andrew Jones <drjones@redhat.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The ARM-ARM has two bits in the ESR/HSR relevant to external aborts.
-A range of {I,D}FSC values (of which bit 5 is always set) and bit 9 'EA'
-which provides:
-> an IMPLEMENTATION DEFINED classification of External Aborts.
+On Tue, Jul 18, 2017 at 02:09:57PM +0200, Andrew Jones wrote:
+> On Thu, Jul 13, 2017 at 09:20:09PM +0200, Christoffer Dall wrote:
+> > Rearrange the code to be able to reuse as much as posible and add
+> > support for testing the physical timer as well.
+> > 
+> > Also change the default unittests configuration to run a separate vtimer
+> > and ptimer test so that older kernels without ptimer support just show a
+> > failure.
+> 
+> We could run tests for both the ptimer and vtimer in a single execution,
+> rather than splitting them and requiring the input, because the read of
+> cntp_ctl_el0 will predictably cause an UNKNOWN exception. Also, by
+> applying the errata framework we can ensure that if we expect the read
+> to work, i.e. the host kernel is recent enough, then, if we still get
+> an UNKNOWN exception, we can report FAIL instead of SKIP. Below is an
+> add on patch that makes the conversion. Let me know what you think.
 
-This bit is in addition to the {I,D}FSC range, and has an implementation
-defined meaning. KVM should always ignore this bit when handling external
-aborts from a guest.
+The problem with this patch, is that we then report SKIP instead of
+FAIL, when we regress the kernel and actually break physical counter
+access (which I did while developing my series).
 
-Remove the ESR_ELx_EA definition and rewrite its helper
-kvm_vcpu_dabt_isextabt() to check the {I,D}FSC range. This merges
-kvm_vcpu_dabt_isextabt() and the recently added is_abort_sea() helper.
+I think something like this should be discovered by way of capabilities
+or hardcoding a kernel version.
 
-Reported-by: gengdongjiu <gengdj.1984@gmail.com>
-Signed-off-by: James Morse <james.morse@arm.com>
-CC: gengdongjiu <gengdj.1984@gmail.com>
-CC: Tyler Baicar <tbaicar@codeaurora.org>
+Does kvm-unit-tests generally care about not reporting FAIL with earlier
+kernel versions?
 
----
-Keep the name kvm_vcpu_dabt_isextabt() instead of is_abort_sea() as
-this is the least noisy option.
-The function definition needs moving down in kvm_emulate.h to make
-use of kvm_vcpu_trap_get_fault_type(). This has to stay in the headers
-as arm64 uses the helper from EL2.
+Thanks,
+-Christoffer
 
- arch/arm/include/asm/kvm_arm.h       |  1 -
- arch/arm/include/asm/kvm_emulate.h   | 24 +++++++++++++++++-----
- arch/arm64/include/asm/esr.h         |  1 -
- arch/arm64/include/asm/kvm_emulate.h | 24 +++++++++++++++++-----
- virt/kvm/arm/mmu.c                   | 40 ++++++++++--------------------------
- 5 files changed, 49 insertions(+), 41 deletions(-)
-
-diff --git a/arch/arm/include/asm/kvm_arm.h b/arch/arm/include/asm/kvm_arm.h
-index ebf020b02bc8..c8781450905b 100644
---- a/arch/arm/include/asm/kvm_arm.h
-+++ b/arch/arm/include/asm/kvm_arm.h
-@@ -227,7 +227,6 @@
- 
- #define HSR_DABT_S1PTW		(_AC(1, UL) << 7)
- #define HSR_DABT_CM		(_AC(1, UL) << 8)
--#define HSR_DABT_EA		(_AC(1, UL) << 9)
- 
- #define kvm_arm_exception_type	\
- 	{0, "RESET" }, 		\
-diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
-index 9a8a45aaf19a..98089ffd91bb 100644
---- a/arch/arm/include/asm/kvm_emulate.h
-+++ b/arch/arm/include/asm/kvm_emulate.h
-@@ -149,11 +149,6 @@ static inline int kvm_vcpu_dabt_get_rd(struct kvm_vcpu *vcpu)
- 	return (kvm_vcpu_get_hsr(vcpu) & HSR_SRT_MASK) >> HSR_SRT_SHIFT;
- }
- 
--static inline bool kvm_vcpu_dabt_isextabt(struct kvm_vcpu *vcpu)
--{
--	return kvm_vcpu_get_hsr(vcpu) & HSR_DABT_EA;
--}
--
- static inline bool kvm_vcpu_dabt_iss1tw(struct kvm_vcpu *vcpu)
- {
- 	return kvm_vcpu_get_hsr(vcpu) & HSR_DABT_S1PTW;
-@@ -206,6 +201,25 @@ static inline u8 kvm_vcpu_trap_get_fault_type(struct kvm_vcpu *vcpu)
- 	return kvm_vcpu_get_hsr(vcpu) & HSR_FSC_TYPE;
- }
- 
-+static inline bool kvm_vcpu_dabt_isextabt(struct kvm_vcpu *vcpu)
-+{
-+	switch (kvm_vcpu_trap_get_fault_type(vcpu)) {
-+	case FSC_SEA:
-+	case FSC_SEA_TTW0:
-+	case FSC_SEA_TTW1:
-+	case FSC_SEA_TTW2:
-+	case FSC_SEA_TTW3:
-+	case FSC_SECC:
-+	case FSC_SECC_TTW0:
-+	case FSC_SECC_TTW1:
-+	case FSC_SECC_TTW2:
-+	case FSC_SECC_TTW3:
-+		return true;
-+	default:
-+		return false;
-+	}
-+}
-+
- static inline u32 kvm_vcpu_hvc_get_imm(struct kvm_vcpu *vcpu)
- {
- 	return kvm_vcpu_get_hsr(vcpu) & HSR_HVC_IMM_MASK;
-diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-index 8cabd57b6348..f569c88ceed4 100644
---- a/arch/arm64/include/asm/esr.h
-+++ b/arch/arm64/include/asm/esr.h
-@@ -85,7 +85,6 @@
- 
- /* Shared ISS field definitions for Data/Instruction aborts */
- #define ESR_ELx_FnV		(UL(1) << 10)
--#define ESR_ELx_EA		(UL(1) << 9)
- #define ESR_ELx_S1PTW		(UL(1) << 7)
- 
- /* Shared ISS fault status code(IFSC/DFSC) for Data/Instruction aborts */
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index fe39e6841326..e5df3fce0008 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -188,11 +188,6 @@ static inline int kvm_vcpu_dabt_get_rd(const struct kvm_vcpu *vcpu)
- 	return (kvm_vcpu_get_hsr(vcpu) & ESR_ELx_SRT_MASK) >> ESR_ELx_SRT_SHIFT;
- }
- 
--static inline bool kvm_vcpu_dabt_isextabt(const struct kvm_vcpu *vcpu)
--{
--	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_EA);
--}
--
- static inline bool kvm_vcpu_dabt_iss1tw(const struct kvm_vcpu *vcpu)
- {
- 	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_S1PTW);
-@@ -240,6 +235,25 @@ static inline u8 kvm_vcpu_trap_get_fault_type(const struct kvm_vcpu *vcpu)
- 	return kvm_vcpu_get_hsr(vcpu) & ESR_ELx_FSC_TYPE;
- }
- 
-+static inline bool kvm_vcpu_dabt_isextabt(const struct kvm_vcpu *vcpu)
-+{
-+	switch (kvm_vcpu_trap_get_fault_type(vcpu)) {
-+	case FSC_SEA:
-+	case FSC_SEA_TTW0:
-+	case FSC_SEA_TTW1:
-+	case FSC_SEA_TTW2:
-+	case FSC_SEA_TTW3:
-+	case FSC_SECC:
-+	case FSC_SECC_TTW0:
-+	case FSC_SECC_TTW1:
-+	case FSC_SECC_TTW2:
-+	case FSC_SECC_TTW3:
-+		return true;
-+	default:
-+		return false;
-+	}
-+}
-+
- static inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
- {
- 	u32 esr = kvm_vcpu_get_hsr(vcpu);
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 0e1fc75f3585..6838ddede162 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -1454,25 +1454,6 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
- 		kvm_set_pfn_accessed(pfn);
- }
- 
--static bool is_abort_sea(unsigned long fault_status)
--{
--	switch (fault_status) {
--	case FSC_SEA:
--	case FSC_SEA_TTW0:
--	case FSC_SEA_TTW1:
--	case FSC_SEA_TTW2:
--	case FSC_SEA_TTW3:
--	case FSC_SECC:
--	case FSC_SECC_TTW0:
--	case FSC_SECC_TTW1:
--	case FSC_SECC_TTW2:
--	case FSC_SECC_TTW3:
--		return true;
--	default:
--		return false;
--	}
--}
--
- /**
-  * kvm_handle_guest_abort - handles all 2nd stage aborts
-  * @vcpu:	the VCPU pointer
-@@ -1498,20 +1479,21 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
- 
- 	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
-+	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
- 
--	/*
--	 * The host kernel will handle the synchronous external abort. There
--	 * is no need to pass the error into the guest.
--	 */
--	if (is_abort_sea(fault_status)) {
-+	/* Synchronous External Abort? */
-+	if (kvm_vcpu_dabt_isextabt(vcpu)) {
-+		/*
-+		 * For RAS the host kernel may handle this abort.
-+		 * There is no need to pass the error into the guest.
-+		 */
- 		if (!handle_guest_sea(fault_ipa, kvm_vcpu_get_hsr(vcpu)))
- 			return 1;
--	}
- 
--	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
--	if (unlikely(!is_iabt && kvm_vcpu_dabt_isextabt(vcpu))) {
--		kvm_inject_vabt(vcpu);
--		return 1;
-+		if (unlikely(!is_iabt)) {
-+			kvm_inject_vabt(vcpu);
-+			return 1;
-+		}
- 	}
- 
- 	trace_kvm_guest_fault(*vcpu_pc(vcpu), kvm_vcpu_get_hsr(vcpu),
--- 
-2.13.2
+> 
+> diff --git a/arm/timer.c b/arm/timer.c
+> index 33dfc6facc190..d0ba1e9a3bafa 100644
+> --- a/arm/timer.c
+> +++ b/arm/timer.c
+> @@ -7,6 +7,7 @@
+>   */
+>  #include <libcflat.h>
+>  #include <devicetree.h>
+> +#include <errata.h>
+>  #include <asm/processor.h>
+>  #include <asm/gic.h>
+>  #include <asm/io.h>
+> @@ -16,6 +17,27 @@
+>  #define ARCH_TIMER_CTL_ISTATUS (1 << 2)
+>  
+>  static void *gic_ispendr;
+> +static bool ptimer_unsupported;
+> +
+> +static void ptimer_unsupported_handler(struct pt_regs *regs, unsigned int esr)
+> +{
+> +	ptimer_unsupported = true;
+> +	regs->pc += 4;
+> +}
+> +
+> +static void set_ptimer_unsupported(void)
+> +{
+> +	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_UNKNOWN, ptimer_unsupported_handler);
+> +	read_sysreg(cntp_ctl_el0);
+> +	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_UNKNOWN, NULL);
+> +
+> +	if (ptimer_unsupported && !ERRATA(7b6b46311a85)) {
+> +		report_skip("Skipping ptimer tests. Set ERRATA_7b6b46311a85=y to enable.");
+> +	} else if (ptimer_unsupported) {
+> +		report("ptimer: read CNTP_CTL_EL0", false);
+> +		report_info("ptimer: skipping remaining tests");
+> +	}
+> +}
+>  
+>  static u64 read_vtimer_counter(void)
+>  {
+> @@ -159,7 +181,6 @@ static void test_timer(struct timer_info *info)
+>  	u64 time_10s = read_sysreg(cntfrq_el0) * 10;
+>  	u64 later = now + time_10s;
+>  
+> -
+>  	/* Enable the timer, but schedule it for much later*/
+>  	info->write_cval(later);
+>  	isb();
+> @@ -182,6 +203,9 @@ static void test_vtimer(void)
+>  
+>  static void test_ptimer(void)
+>  {
+> +	if (ptimer_unsupported)
+> +		return;
+> +
+>  	report_prefix_push("ptimer-busy-loop");
+>  	test_timer(&ptimer_info);
+>  	report_prefix_pop();
+> @@ -226,52 +250,27 @@ static void test_init(void)
+>  	local_irq_enable();
+>  }
+>  
+> -static void print_vtimer_info(void)
+> +static void print_timer_info(void)
+>  {
+>  	printf("CNTFRQ_EL0   : 0x%016lx\n", read_sysreg(cntfrq_el0));
+> +
+> +	if (!ptimer_unsupported) {
+> +		printf("CNTPCT_EL0   : 0x%016lx\n", read_sysreg(cntpct_el0));
+> +		printf("CNTP_CTL_EL0 : 0x%016lx\n", read_sysreg(cntp_ctl_el0));
+> +		printf("CNTP_CVAL_EL0: 0x%016lx\n", read_sysreg(cntp_cval_el0));
+> +	}
+> +
+>  	printf("CNTVCT_EL0   : 0x%016lx\n", read_sysreg(cntvct_el0));
+>  	printf("CNTV_CTL_EL0 : 0x%016lx\n", read_sysreg(cntv_ctl_el0));
+>  	printf("CNTV_CVAL_EL0: 0x%016lx\n", read_sysreg(cntv_cval_el0));
+>  }
+>  
+> -static void print_ptimer_info(void)
+> -{
+> -	printf("CNTPCT_EL0   : 0x%016lx\n", read_sysreg(cntpct_el0));
+> -	printf("CNTP_CTL_EL0 : 0x%016lx\n", read_sysreg(cntp_ctl_el0));
+> -	printf("CNTP_CVAL_EL0: 0x%016lx\n", read_sysreg(cntp_cval_el0));
+> -}
+> -
+> -
+>  int main(int argc, char **argv)
+>  {
+> -	bool run_ptimer_test = false;
+> -	bool run_vtimer_test = false;
+> -
+> -	/* Check if we should also check the physical timer */
+> -	if (argc > 1) {
+> -		if (strcmp(argv[1], "vtimer") == 0) {
+> -			run_vtimer_test = true;
+> -		} else if (strcmp(argv[1], "ptimer") == 0) {
+> -			run_ptimer_test = true;
+> -		} else {
+> -			report_abort("Unknown option '%s'", argv[1]);
+> -		}
+> -	} else {
+> -		run_vtimer_test = true;
+> -	}
+> -
+> -	if (run_vtimer_test)
+> -		print_vtimer_info();
+> -	else if (run_ptimer_test)
+> -		print_ptimer_info();
+> -
+> +	set_ptimer_unsupported();
+> +	print_timer_info();
+>  	test_init();
+> -
+> -	if (run_vtimer_test)
+> -		test_vtimer();
+> -	else if (run_ptimer_test)
+> -		test_ptimer();
+> -
+> -
+> +	test_ptimer();
+> +	test_vtimer();
+>  	return report_summary();
+>  }
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index d55e52e1a4c4f..bdfedf86b01cb 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -111,14 +111,7 @@ smp = $MAX_SMP
+>  groups = psci
+>  
+>  # Timer tests
+> -[vtimer]
+> +[timer]
+>  file = timer.flat
+> -extra_params = -append 'vtimer'
+> -groups = timer
+> -timeout = 2s
+> -
+> -[ptimer]
+> -file = timer.flat
+> -extra_params = -append 'ptimer'
+>  groups = timer
+>  timeout = 2s
