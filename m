@@ -1,26 +1,26 @@
 From: Jintack Lim <jintack.lim@linaro.org>
-Subject: [RFC PATCH v2 18/38] KVM: arm64: Trap SPSR_EL1,
- ELR_EL1 and VBAR_EL1 from virtual EL2
-Date: Tue, 18 Jul 2017 11:58:44 -0500
-Message-ID: <1500397144-16232-19-git-send-email-jintack.lim@linaro.org>
+Subject: [RFC PATCH v2 17/38] KVM: arm64: Trap EL1 VM register accesses in
+ virtual EL2
+Date: Tue, 18 Jul 2017 11:58:43 -0500
+Message-ID: <1500397144-16232-18-git-send-email-jintack.lim@linaro.org>
 References: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 88CE140FA7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 12:59:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B210F40D29
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 12:59:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uK6qx9E4YgLJ for <kvmarm@lists.cs.columbia.edu>;
- Tue, 18 Jul 2017 12:59:20 -0400 (EDT)
-Received: from mail-it0-f41.google.com (mail-it0-f41.google.com
- [209.85.214.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5FFEE40CE4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 12:59:18 -0400 (EDT)
-Received: by mail-it0-f41.google.com with SMTP id a62so23796109itd.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 10:00:06 -0700 (PDT)
+ with ESMTP id hfzjQQjVaZo5 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 18 Jul 2017 12:59:16 -0400 (EDT)
+Received: from mail-io0-f177.google.com (mail-io0-f177.google.com
+ [209.85.223.177])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E6F8C49C26
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 12:59:15 -0400 (EDT)
+Received: by mail-io0-f177.google.com with SMTP id z62so17070816ioi.3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 10:00:04 -0700 (PDT)
 In-Reply-To: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,84 +35,55 @@ To: kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.
 Cc: kvm@vger.kernel.org, david.daney@cavium.com, catalin.marinas@arm.com, will.deacon@arm.com, stefan@hello-penguin.com, corbet@lwn.net, daniel.lezcano@linaro.org, linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, andy.gross@linaro.org, cov@codeaurora.org, wcohen@redhat.com, mchehab@kernel.org, ard.biesheuvel@linaro.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, akpm@linux-foundation.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-For the same reason we trap virtual memory register accesses at virtual
-EL2, we need to trap SPSR_EL1, ELR_EL1 and VBAR_EL1 accesses. ARM v8.3
-introduces the HCR_EL2.NV1 bit to be able to trap on those register
-accesses in EL1. Do not set this bit until the whole nesting support is
-completed.
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
-Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+When running in virtual EL2 mode, we actually run the hardware in EL1
+and therefore have to use the EL1 registers to ensure correct operation.
+
+By setting the HCR.TVM and HCR.TVRM we ensure that the virtual EL2 mode
+doesn't shoot itself in the foot when setting up what it believes to be
+a different mode's system register state (for example when preparing to
+switch to a VM).
+
+We can leverage the existing sysregs infrastructure to support trapped
+accesses to these registers.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/include/asm/sysreg.h |  2 ++
- arch/arm64/kvm/sys_regs.c       | 29 ++++++++++++++++++++++++++++-
- 2 files changed, 30 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/switch.c | 2 ++
+ arch/arm64/kvm/sys_regs.c   | 7 ++++++-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 98c32ef..6373d3d 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -164,6 +164,8 @@
- #define SYS_TTBR1_EL1			sys_reg(3, 0, 2, 0, 1)
- #define SYS_TCR_EL1			sys_reg(3, 0, 2, 0, 2)
- 
-+#define	SYS_SPSR_EL1			sys_reg(3, 0, 4, 0, 0)
-+#define	SYS_ELR_EL1			sys_reg(3, 0, 4, 0, 1)
- #define SYS_ICC_PMR_EL1			sys_reg(3, 0, 4, 6, 0)
- 
- #define SYS_AFSR0_EL1			sys_reg(3, 0, 5, 1, 0)
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 945e79c..ec91cd08 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -85,6 +85,8 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+ 		write_sysreg(1 << 30, fpexc32_el2);
+ 		isb();
+ 	}
++	if (vcpu_mode_el2(vcpu))
++		val |= HCR_TVM | HCR_TRVM;
+ 	write_sysreg(val, hcr_el2);
+ 	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
+ 	write_sysreg(1 << 15, hstr_el2);
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index d8b1d4b..b83fef2 100644
+index 2b3ed70..d8b1d4b 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -936,6 +936,30 @@ static bool trap_el2_regs(struct kvm_vcpu *vcpu,
- 	return true;
- }
+@@ -121,7 +121,12 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
+ {
+ 	bool was_enabled = vcpu_has_cache_enabled(vcpu);
  
-+static bool access_elr(struct kvm_vcpu *vcpu,
-+		struct sys_reg_params *p,
-+		const struct sys_reg_desc *r)
-+{
-+	access_rw(p, &vcpu->arch.ctxt.gp_regs.elr_el1);
-+	return true;
-+}
+-	BUG_ON(!p->is_write);
++	BUG_ON(!vcpu_mode_el2(vcpu) && !p->is_write);
 +
-+static bool access_spsr(struct kvm_vcpu *vcpu,
-+		struct sys_reg_params *p,
-+		const struct sys_reg_desc *r)
-+{
-+	access_rw(p, &vcpu->arch.ctxt.gp_regs.spsr[KVM_SPSR_EL1]);
-+	return true;
-+}
-+
-+static bool access_vbar(struct kvm_vcpu *vcpu,
-+		struct sys_reg_params *p,
-+		const struct sys_reg_desc *r)
-+{
-+	access_rw(p, &vcpu_sys_reg(vcpu, r->reg));
-+	return true;
-+}
-+
- /*
-  * Architected system registers.
-  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-@@ -994,6 +1018,9 @@ static bool trap_el2_regs(struct kvm_vcpu *vcpu,
- 	{ SYS_DESC(SYS_TTBR1_EL1), access_vm_reg, reset_unknown, TTBR1_EL1 },
- 	{ SYS_DESC(SYS_TCR_EL1), access_vm_reg, reset_val, TCR_EL1, 0 },
++	if (!p->is_write) {
++		p->regval = vcpu_sys_reg(vcpu, r->reg);
++		return true;
++	}
  
-+	{ SYS_DESC(SYS_SPSR_EL1), access_spsr},
-+	{ SYS_DESC(SYS_ELR_EL1), access_elr},
-+
- 	{ SYS_DESC(SYS_AFSR0_EL1), access_vm_reg, reset_unknown, AFSR0_EL1 },
- 	{ SYS_DESC(SYS_AFSR1_EL1), access_vm_reg, reset_unknown, AFSR1_EL1 },
- 	{ SYS_DESC(SYS_ESR_EL1), access_vm_reg, reset_unknown, ESR_EL1 },
-@@ -1006,7 +1033,7 @@ static bool trap_el2_regs(struct kvm_vcpu *vcpu,
- 	{ SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 },
- 	{ SYS_DESC(SYS_AMAIR_EL1), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
- 
--	{ SYS_DESC(SYS_VBAR_EL1), NULL, reset_val, VBAR_EL1, 0 },
-+	{ SYS_DESC(SYS_VBAR_EL1), access_vbar, reset_val, VBAR_EL1, 0 },
- 
- 	{ SYS_DESC(SYS_ICC_IAR0_EL1), write_to_read_only },
- 	{ SYS_DESC(SYS_ICC_EOIR0_EL1), read_from_write_only },
+ 	if (!p->is_aarch32) {
+ 		vcpu_sys_reg(vcpu, r->reg) = p->regval;
 -- 
 1.9.1
