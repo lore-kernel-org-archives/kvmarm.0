@@ -1,25 +1,26 @@
 From: Jintack Lim <jintack.lim@linaro.org>
-Subject: [RFC PATCH v2 24/38] KVM: arm64: Respect virtual HCR_EL2.TWX setting
-Date: Tue, 18 Jul 2017 11:58:50 -0500
-Message-ID: <1500397144-16232-25-git-send-email-jintack.lim@linaro.org>
+Subject: [RFC PATCH v2 35/38] KVM: arm64: Respect the virtual HCR_EL2.NV bit
+ setting for EL12 register traps
+Date: Tue, 18 Jul 2017 11:59:01 -0500
+Message-ID: <1500397144-16232-36-git-send-email-jintack.lim@linaro.org>
 References: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9998049BFD
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 12:59:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F3C4B49C23
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 12:59:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PYQofd7QT914 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 18 Jul 2017 12:59:30 -0400 (EDT)
-Received: from mail-io0-f172.google.com (mail-io0-f172.google.com
- [209.85.223.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9784C4104E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 12:59:29 -0400 (EDT)
-Received: by mail-io0-f172.google.com with SMTP id 5so16506961iow.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 10:00:18 -0700 (PDT)
+ with ESMTP id mU5N2oV-N+79 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 18 Jul 2017 12:59:51 -0400 (EDT)
+Received: from mail-it0-f44.google.com (mail-it0-f44.google.com
+ [209.85.214.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 789FA49C83
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 12:59:49 -0400 (EDT)
+Received: by mail-it0-f44.google.com with SMTP id v127so6953480itd.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 10:00:38 -0700 (PDT)
 In-Reply-To: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,85 +35,81 @@ To: kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.
 Cc: kvm@vger.kernel.org, david.daney@cavium.com, catalin.marinas@arm.com, will.deacon@arm.com, stefan@hello-penguin.com, corbet@lwn.net, daniel.lezcano@linaro.org, linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, andy.gross@linaro.org, cov@codeaurora.org, wcohen@redhat.com, mchehab@kernel.org, ard.biesheuvel@linaro.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, akpm@linux-foundation.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Forward exceptions due to WFI or WFE instructions to the virtual EL2 if
-they are not coming from the virtual EL2 and virtual HCR_EL2.TWX is set.
+In addition to EL2 register accesses, setting NV bit will also make EL12
+register accesses trap to EL2. To emulate this for the virtual EL2,
+forword traps due to EL12 register accessses to the virtual EL2 if the
+virtual HCR_EL2.NV bit is set.
+
+This is for recursive nested virtualization.
 
 Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 ---
- arch/arm64/include/asm/kvm_host.h |  1 +
- arch/arm64/kvm/handle_exit.c      | 13 ++++++++++++-
- arch/arm64/kvm/nested.c           | 20 ++++++++++++++++++++
- 3 files changed, 33 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/sys_regs.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 46880c3..53b0b33 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -442,5 +442,6 @@ static inline void __cpu_init_stage2(void)
- int __init kvmarm_nested_cfg(char *buf);
- int init_nested_virt(void);
- bool nested_virt_in_use(struct kvm_vcpu *vcpu);
-+int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 4fd7090..3559cf7 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -149,6 +149,9 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
+ 	int i;
+ 	const struct el1_el2_map *map;
  
- #endif /* __ARM64_KVM_HOST_H__ */
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 8b398b2..25ec824 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -107,7 +107,18 @@ static int handle_no_fpsimd(struct kvm_vcpu *vcpu, struct kvm_run *run)
-  */
- static int kvm_handle_wfx(struct kvm_vcpu *vcpu, struct kvm_run *run)
- {
--	if (kvm_vcpu_get_hsr(vcpu) & ESR_ELx_WFx_ISS_WFE) {
-+	bool is_wfe = !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_WFx_ISS_WFE);
-+
-+	if (nested_virt_in_use(vcpu)) {
-+		int ret = handle_wfx_nested(vcpu, is_wfe);
-+
-+		if (ret < 0 && ret != -EINVAL)
-+			return ret;
-+		else if (ret >= 0)
-+			return ret;
-+	}
-+
-+	if (is_wfe) {
- 		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), true);
- 		vcpu->stat.wfe_exit_stat++;
- 		kvm_vcpu_on_spin(vcpu);
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 9a05c76..042d304 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -18,6 +18,8 @@
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
- 
-+#include <asm/kvm_emulate.h>
-+
- static bool nested_param;
- 
- int __init kvmarm_nested_cfg(char *buf)
-@@ -41,3 +43,21 @@ bool nested_virt_in_use(struct kvm_vcpu *vcpu)
- 
- 	return false;
- }
-+
-+/*
-+ * Inject wfx to the virtual EL2 if this is not from the virtual EL2 and
-+ * the virtual HCR_EL2.TWX is set. Otherwise, let the host hypervisor
-+ * handle this.
-+ */
-+int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe)
-+{
-+	u64 hcr_el2 = vcpu_sys_reg(vcpu, HCR_EL2);
-+
-+	if (vcpu_mode_el2(vcpu))
-+		return -EINVAL;
-+
-+	if ((is_wfe && (hcr_el2 & HCR_TWE)) || (!is_wfe && (hcr_el2 & HCR_TWI)))
++	if (el12_reg(p) && forward_nv_traps(vcpu))
 +		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
 +
-+	return -EINVAL;
-+}
+ 	/*
+ 	 * Redirect EL1 register accesses to the corresponding EL2 registers if
+ 	 * they are meant to access EL2 registers.
+@@ -959,6 +962,9 @@ static bool access_cntkctl_el12(struct kvm_vcpu *vcpu,
+ 			 struct sys_reg_params *p,
+ 			 const struct sys_reg_desc *r)
+ {
++	if (forward_nv_traps(vcpu))
++		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
++
+ 	access_rw(p, &vcpu_sys_reg(vcpu, r->reg));
+ 	return true;
+ }
+@@ -1005,6 +1011,9 @@ static bool access_elr(struct kvm_vcpu *vcpu,
+ 		struct sys_reg_params *p,
+ 		const struct sys_reg_desc *r)
+ {
++	if (el12_reg(p) && forward_nv_traps(vcpu))
++		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
++
+ 	access_rw(p, &vcpu->arch.ctxt.gp_regs.elr_el1);
+ 	return true;
+ }
+@@ -1013,6 +1022,9 @@ static bool access_spsr(struct kvm_vcpu *vcpu,
+ 		struct sys_reg_params *p,
+ 		const struct sys_reg_desc *r)
+ {
++	if (el12_reg(p) && forward_nv_traps(vcpu))
++		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
++
+ 	access_rw(p, &vcpu->arch.ctxt.gp_regs.spsr[KVM_SPSR_EL1]);
+ 	return true;
+ }
+@@ -1021,6 +1033,9 @@ static bool access_vbar(struct kvm_vcpu *vcpu,
+ 		struct sys_reg_params *p,
+ 		const struct sys_reg_desc *r)
+ {
++	if (el12_reg(p) && forward_nv_traps(vcpu))
++		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
++
+ 	access_rw(p, &vcpu_sys_reg(vcpu, r->reg));
+ 	return true;
+ }
+@@ -1031,6 +1046,9 @@ static bool access_cpacr(struct kvm_vcpu *vcpu,
+ {
+ 	u64 reg = sys_reg(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
+ 
++	if (el12_reg(p) && forward_nv_traps(vcpu))
++		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
++
+ 	/*
+ 	 * When the virtual HCR_EL2.E2H == 1, an access to CPACR_EL1
+ 	 * in the virtual EL2 is to access CPTR_EL2.
 -- 
 1.9.1
