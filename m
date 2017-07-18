@@ -1,130 +1,92 @@
 From: Jintack Lim <jintack.lim@linaro.org>
-Subject: [RFC PATCH v2 20/38] KVM: arm64: Handle eret instruction traps
-Date: Tue, 18 Jul 2017 11:58:46 -0500
-Message-ID: <1500397144-16232-21-git-send-email-jintack.lim@linaro.org>
+Subject: [RFC PATCH v2 19/38] KVM: arm64: Trap CPACR_EL1 access in virtual EL2
+Date: Tue, 18 Jul 2017 11:58:45 -0500
+Message-ID: <1500397144-16232-20-git-send-email-jintack.lim@linaro.org>
 References: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2939140A80
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 12:59:27 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4g9DWR1Ki+OT for <kvmarm@lists.cs.columbia.edu>;
- Tue, 18 Jul 2017 12:59:21 -0400 (EDT)
-Received: from mail-it0-f49.google.com (mail-it0-f49.google.com
- [209.85.214.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2B03249C54
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 12:59:21 -0400 (EDT)
-Received: by mail-it0-f49.google.com with SMTP id h199so16524517ith.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 10:00:10 -0700 (PDT)
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: linux-kernel-owner@vger.kernel.org
 To: kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
-Cc: kvm@vger.kernel.org, david.daney@cavium.com, catalin.marinas@arm.com, will.deacon@arm.com, stefan@hello-penguin.com, corbet@lwn.net, daniel.lezcano@linaro.org, linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, andy.gross@linaro.org, cov@codeaurora.org, wcohen@redhat.com, mchehab@kernel.org, ard.biesheuvel@linaro.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, akpm@linux-foundation.org
+Cc: corbet@lwn.net, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, akpm@linux-foundation.org, mchehab@kernel.org, cov@codeaurora.org, daniel.lezcano@linaro.org, david.daney@cavium.com, mark.rutland@arm.com, suzuki.poulose@arm.com, stefan@hello-penguin.com, andy.gross@linaro.org, wcohen@redhat.com, ard.biesheuvel@linaro.org, shankerd@codeaurora.org, vladimir.murzin@arm.com, james.morse@arm.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Jintack Lim <jintack.lim@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When HCR.NV bit is set, eret instructions trap to EL2 with EC code 0x1A.
-Emulate eret instructions by setting pc and pstate.
-
-Note that the current exception level is always the virtual EL2, since
-we set HCR_EL2.NV bit only when entering the virtual EL2. So, we take
-spsr and elr states from the virtual _EL2 registers.
+For the same reason we trap virtual memory register accesses in virtual
+EL2, we trap CPACR_EL1 access too; We allow the virtual EL2 mode to
+access EL1 system register state instead of the virtual EL2 one.
 
 Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 ---
- arch/arm64/include/asm/esr.h |  1 +
- arch/arm64/kvm/handle_exit.c | 16 ++++++++++++++++
- arch/arm64/kvm/trace.h       | 21 +++++++++++++++++++++
- 3 files changed, 38 insertions(+)
+ arch/arm64/kvm/hyp/switch.c | 10 +++++++---
+ arch/arm64/kvm/sys_regs.c   | 10 +++++++++-
+ 2 files changed, 16 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-index e7d8e28..210fde6 100644
---- a/arch/arm64/include/asm/esr.h
-+++ b/arch/arm64/include/asm/esr.h
-@@ -43,6 +43,7 @@
- #define ESR_ELx_EC_HVC64	(0x16)
- #define ESR_ELx_EC_SMC64	(0x17)
- #define ESR_ELx_EC_SYS64	(0x18)
-+#define ESR_ELx_EC_ERET		(0x1A)
- /* Unallocated EC: 0x19 - 0x1E */
- #define ESR_ELx_EC_IMP_DEF	(0x1f)
- #define ESR_ELx_EC_IABT_LOW	(0x20)
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 17d8a16..9259881 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -147,6 +147,21 @@ static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	return 1;
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index ec91cd08..d513da9 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -42,7 +42,8 @@ bool __hyp_text __fpsimd_enabled(void)
+ 	return __fpsimd_is_enabled()();
  }
  
-+static int kvm_handle_eret(struct kvm_vcpu *vcpu, struct kvm_run *run)
+-static void __hyp_text __activate_traps_vhe(void)
++static void __hyp_text __activate_traps_vhe(struct kvm_vcpu *vcpu)
++
+ {
+ 	u64 val;
+ 
+@@ -54,12 +55,15 @@ static void __hyp_text __activate_traps_vhe(void)
+ 	write_sysreg(__kvm_hyp_vector, vbar_el1);
+ }
+ 
+-static void __hyp_text __activate_traps_nvhe(void)
++static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
++
+ {
+ 	u64 val;
+ 
+ 	val = CPTR_EL2_DEFAULT;
+ 	val |= CPTR_EL2_TTA | CPTR_EL2_TFP;
++	if (vcpu_mode_el2(vcpu))
++		val |= CPTR_EL2_TCPAC;
+ 	write_sysreg(val, cptr_el2);
+ }
+ 
+@@ -99,7 +103,7 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+ 	write_sysreg(0, pmselr_el0);
+ 	write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
+ 	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+-	__activate_traps_arch()();
++	__activate_traps_arch()(vcpu);
+ }
+ 
+ static void __hyp_text __deactivate_traps_vhe(void)
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index b83fef2..7062645 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -960,6 +960,14 @@ static bool access_vbar(struct kvm_vcpu *vcpu,
+ 	return true;
+ }
+ 
++static bool access_cpacr(struct kvm_vcpu *vcpu,
++		struct sys_reg_params *p,
++		const struct sys_reg_desc *r)
 +{
-+	trace_kvm_nested_eret(vcpu, vcpu_el2_sreg(vcpu, ELR_EL2),
-+			      vcpu_el2_sreg(vcpu, SPSR_EL2));
-+
-+	/*
-+	 * Note that the current exception level is always the virtual EL2,
-+	 * since we set HCR_EL2.NV bit only when entering the virtual EL2.
-+	 */
-+	*vcpu_pc(vcpu) = vcpu_el2_sreg(vcpu, ELR_EL2);
-+	*vcpu_cpsr(vcpu) = vcpu_el2_sreg(vcpu, SPSR_EL2);
-+
-+	return 1;
++	access_rw(p, &vcpu_sys_reg(vcpu, r->reg));
++	return true;
 +}
 +
- static exit_handle_fn arm_exit_handlers[] = {
- 	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
- 	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
-@@ -160,6 +175,7 @@ static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	[ESR_ELx_EC_HVC64]	= handle_hvc,
- 	[ESR_ELx_EC_SMC64]	= handle_smc,
- 	[ESR_ELx_EC_SYS64]	= kvm_handle_sys_reg,
-+	[ESR_ELx_EC_ERET]	= kvm_handle_eret,
- 	[ESR_ELx_EC_IABT_LOW]	= kvm_handle_guest_abort,
- 	[ESR_ELx_EC_DABT_LOW]	= kvm_handle_guest_abort,
- 	[ESR_ELx_EC_SOFTSTP_LOW]= kvm_handle_guest_debug,
-diff --git a/arch/arm64/kvm/trace.h b/arch/arm64/kvm/trace.h
-index 7c86cfb..5f40987 100644
---- a/arch/arm64/kvm/trace.h
-+++ b/arch/arm64/kvm/trace.h
-@@ -187,6 +187,27 @@
- 	TP_printk("vcpu: %p, inject exception to vEL2: ESR_EL2 0x%lx, vector: 0x%016lx",
- 		  __entry->vcpu, __entry->esr_el2, __entry->pc)
- );
-+
-+TRACE_EVENT(kvm_nested_eret,
-+	TP_PROTO(struct kvm_vcpu *vcpu, unsigned long elr_el2,
-+		 unsigned long spsr_el2),
-+	TP_ARGS(vcpu, elr_el2, spsr_el2),
-+
-+	TP_STRUCT__entry(
-+		__field(struct kvm_vcpu *,	vcpu)
-+		__field(unsigned long,		elr_el2)
-+		__field(unsigned long,		spsr_el2)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->vcpu = vcpu;
-+		__entry->elr_el2 = elr_el2;
-+		__entry->spsr_el2 = spsr_el2;
-+	),
-+
-+	TP_printk("vcpu: %p, eret to elr_el2: 0x%016lx, with spsr_el2: 0x%08lx",
-+		  __entry->vcpu, __entry->elr_el2, __entry->spsr_el2)
-+);
- #endif /* _TRACE_ARM64_KVM_H */
+ /*
+  * Architected system registers.
+  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+@@ -1013,7 +1021,7 @@ static bool access_vbar(struct kvm_vcpu *vcpu,
  
- #undef TRACE_INCLUDE_PATH
+ 	{ SYS_DESC(SYS_MPIDR_EL1), NULL, reset_mpidr, MPIDR_EL1 },
+ 	{ SYS_DESC(SYS_SCTLR_EL1), access_vm_reg, reset_val, SCTLR_EL1, 0x00C50078 },
+-	{ SYS_DESC(SYS_CPACR_EL1), NULL, reset_val, CPACR_EL1, 0 },
++	{ SYS_DESC(SYS_CPACR_EL1), access_cpacr, reset_val, CPACR_EL1, 0 },
+ 	{ SYS_DESC(SYS_TTBR0_EL1), access_vm_reg, reset_unknown, TTBR0_EL1 },
+ 	{ SYS_DESC(SYS_TTBR1_EL1), access_vm_reg, reset_unknown, TTBR1_EL1 },
+ 	{ SYS_DESC(SYS_TCR_EL1), access_vm_reg, reset_val, TCR_EL1, 0 },
 -- 
 1.9.1
