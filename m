@@ -1,26 +1,26 @@
 From: Jintack Lim <jintack.lim@linaro.org>
-Subject: [RFC PATCH v2 11/38] KVM: arm64: Set vcpu context depending on the
- guest exception level
-Date: Tue, 18 Jul 2017 11:58:37 -0500
-Message-ID: <1500397144-16232-12-git-send-email-jintack.lim@linaro.org>
+Subject: [RFC PATCH v2 18/38] KVM: arm64: Trap SPSR_EL1,
+ ELR_EL1 and VBAR_EL1 from virtual EL2
+Date: Tue, 18 Jul 2017 11:58:44 -0500
+Message-ID: <1500397144-16232-19-git-send-email-jintack.lim@linaro.org>
 References: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2537149C10
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 12:59:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 88CE140FA7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 12:59:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Pv5JWj7gSP6u for <kvmarm@lists.cs.columbia.edu>;
- Tue, 18 Jul 2017 12:59:06 -0400 (EDT)
-Received: from mail-io0-f176.google.com (mail-io0-f176.google.com
- [209.85.223.176])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2B8AD49BFC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 12:59:04 -0400 (EDT)
-Received: by mail-io0-f176.google.com with SMTP id l7so10049787iof.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 09:59:53 -0700 (PDT)
+ with ESMTP id uK6qx9E4YgLJ for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 18 Jul 2017 12:59:20 -0400 (EDT)
+Received: from mail-it0-f41.google.com (mail-it0-f41.google.com
+ [209.85.214.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5FFEE40CE4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 12:59:18 -0400 (EDT)
+Received: by mail-it0-f41.google.com with SMTP id a62so23796109itd.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 10:00:06 -0700 (PDT)
 In-Reply-To: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,115 +35,84 @@ To: kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.
 Cc: kvm@vger.kernel.org, david.daney@cavium.com, catalin.marinas@arm.com, will.deacon@arm.com, stefan@hello-penguin.com, corbet@lwn.net, daniel.lezcano@linaro.org, linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, andy.gross@linaro.org, cov@codeaurora.org, wcohen@redhat.com, mchehab@kernel.org, ard.biesheuvel@linaro.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, akpm@linux-foundation.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-If the guest exception level is EL2, then set up the shadow context of
-the virtual EL2 to hardware. Otherwise, set the regular EL0/EL1 context.
-
-Note that the shadow context content will be prepared in subsequent
-patches.
+For the same reason we trap virtual memory register accesses at virtual
+EL2, we need to trap SPSR_EL1, ELR_EL1 and VBAR_EL1 accesses. ARM v8.3
+introduces the HCR_EL2.NV1 bit to be able to trap on those register
+accesses in EL1. Do not set this bit until the whole nesting support is
+completed.
 
 Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 ---
- arch/arm64/kvm/context.c | 74 +++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 64 insertions(+), 10 deletions(-)
+ arch/arm64/include/asm/sysreg.h |  2 ++
+ arch/arm64/kvm/sys_regs.c       | 29 ++++++++++++++++++++++++++++-
+ 2 files changed, 30 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/context.c b/arch/arm64/kvm/context.c
-index bc43e66..2645787 100644
---- a/arch/arm64/kvm/context.c
-+++ b/arch/arm64/kvm/context.c
-@@ -18,11 +18,29 @@
- #include <linux/kvm_host.h>
- #include <asm/kvm_emulate.h>
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 98c32ef..6373d3d 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -164,6 +164,8 @@
+ #define SYS_TTBR1_EL1			sys_reg(3, 0, 2, 0, 1)
+ #define SYS_TCR_EL1			sys_reg(3, 0, 2, 0, 2)
  
--/**
-- * kvm_arm_setup_shadow_state -- prepare shadow state based on emulated mode
-- * @vcpu: The VCPU pointer
-- */
--void kvm_arm_setup_shadow_state(struct kvm_vcpu *vcpu)
-+static void flush_shadow_special_regs(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
-+
-+	ctxt->hw_pstate = *vcpu_cpsr(vcpu) & ~PSR_MODE_MASK;
-+	/*
-+	 * We can emulate the guest's configuration of which
-+	 * stack pointer to use when executing in virtual EL2 by
-+	 * using the equivalent feature in EL1 to point to
-+	 * either the EL1 or EL0 stack pointer.
-+	 */
-+	if ((*vcpu_cpsr(vcpu) & PSR_MODE_MASK) == PSR_MODE_EL2h)
-+		ctxt->hw_pstate |= PSR_MODE_EL1h;
-+	else
-+		ctxt->hw_pstate |= PSR_MODE_EL1t;
-+
-+	ctxt->hw_sys_regs = ctxt->shadow_sys_regs;
-+	ctxt->hw_sp_el1 = vcpu_el2_sreg(vcpu, SP_EL2);
-+	ctxt->hw_elr_el1 = vcpu_el2_sreg(vcpu, ELR_EL2);
-+	ctxt->hw_spsr_el1 = vcpu_el2_sreg(vcpu, SPSR_EL2);
-+}
-+
-+static void flush_special_regs(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
++#define	SYS_SPSR_EL1			sys_reg(3, 0, 4, 0, 0)
++#define	SYS_ELR_EL1			sys_reg(3, 0, 4, 0, 1)
+ #define SYS_ICC_PMR_EL1			sys_reg(3, 0, 4, 6, 0)
  
-@@ -33,11 +51,18 @@ void kvm_arm_setup_shadow_state(struct kvm_vcpu *vcpu)
- 	ctxt->hw_spsr_el1 = ctxt->gp_regs.spsr[KVM_SPSR_EL1];
+ #define SYS_AFSR0_EL1			sys_reg(3, 0, 5, 1, 0)
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index d8b1d4b..b83fef2 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -936,6 +936,30 @@ static bool trap_el2_regs(struct kvm_vcpu *vcpu,
+ 	return true;
  }
  
--/**
-- * kvm_arm_restore_shadow_state -- write back shadow state from guest
-- * @vcpu: The VCPU pointer
-- */
--void kvm_arm_restore_shadow_state(struct kvm_vcpu *vcpu)
-+static void sync_shadow_special_regs(struct kvm_vcpu *vcpu)
++static bool access_elr(struct kvm_vcpu *vcpu,
++		struct sys_reg_params *p,
++		const struct sys_reg_desc *r)
 +{
-+	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
-+
-+	*vcpu_cpsr(vcpu) &= PSR_MODE_MASK;
-+	*vcpu_cpsr(vcpu) |= ctxt->hw_pstate & ~PSR_MODE_MASK;
-+	vcpu_el2_sreg(vcpu, SP_EL2) = ctxt->hw_sp_el1;
-+	vcpu_el2_sreg(vcpu, ELR_EL2) = ctxt->hw_elr_el1;
-+	vcpu_el2_sreg(vcpu, SPSR_EL2) = ctxt->hw_spsr_el1;
++	access_rw(p, &vcpu->arch.ctxt.gp_regs.elr_el1);
++	return true;
 +}
 +
-+static void sync_special_regs(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
++static bool access_spsr(struct kvm_vcpu *vcpu,
++		struct sys_reg_params *p,
++		const struct sys_reg_desc *r)
++{
++	access_rw(p, &vcpu->arch.ctxt.gp_regs.spsr[KVM_SPSR_EL1]);
++	return true;
++}
++
++static bool access_vbar(struct kvm_vcpu *vcpu,
++		struct sys_reg_params *p,
++		const struct sys_reg_desc *r)
++{
++	access_rw(p, &vcpu_sys_reg(vcpu, r->reg));
++	return true;
++}
++
+ /*
+  * Architected system registers.
+  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+@@ -994,6 +1018,9 @@ static bool trap_el2_regs(struct kvm_vcpu *vcpu,
+ 	{ SYS_DESC(SYS_TTBR1_EL1), access_vm_reg, reset_unknown, TTBR1_EL1 },
+ 	{ SYS_DESC(SYS_TCR_EL1), access_vm_reg, reset_val, TCR_EL1, 0 },
  
-@@ -47,6 +72,35 @@ void kvm_arm_restore_shadow_state(struct kvm_vcpu *vcpu)
- 	ctxt->gp_regs.spsr[KVM_SPSR_EL1] = ctxt->hw_spsr_el1;
- }
++	{ SYS_DESC(SYS_SPSR_EL1), access_spsr},
++	{ SYS_DESC(SYS_ELR_EL1), access_elr},
++
+ 	{ SYS_DESC(SYS_AFSR0_EL1), access_vm_reg, reset_unknown, AFSR0_EL1 },
+ 	{ SYS_DESC(SYS_AFSR1_EL1), access_vm_reg, reset_unknown, AFSR1_EL1 },
+ 	{ SYS_DESC(SYS_ESR_EL1), access_vm_reg, reset_unknown, ESR_EL1 },
+@@ -1006,7 +1033,7 @@ static bool trap_el2_regs(struct kvm_vcpu *vcpu,
+ 	{ SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 },
+ 	{ SYS_DESC(SYS_AMAIR_EL1), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
  
-+/**
-+ * kvm_arm_setup_shadow_state -- prepare shadow state based on emulated mode
-+ * @vcpu: The VCPU pointer
-+ */
-+void kvm_arm_setup_shadow_state(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
-+
-+	if (unlikely(vcpu_mode_el2(vcpu))) {
-+		flush_shadow_special_regs(vcpu);
-+		ctxt->hw_sys_regs = ctxt->shadow_sys_regs;
-+	} else {
-+		flush_special_regs(vcpu);
-+		ctxt->hw_sys_regs = ctxt->sys_regs;
-+	}
-+}
-+
-+/**
-+ * kvm_arm_restore_shadow_state -- write back shadow state from guest
-+ * @vcpu: The VCPU pointer
-+ */
-+void kvm_arm_restore_shadow_state(struct kvm_vcpu *vcpu)
-+{
-+	if (unlikely(vcpu_mode_el2(vcpu)))
-+		sync_shadow_special_regs(vcpu);
-+	else
-+		sync_special_regs(vcpu);
-+}
-+
- void kvm_arm_init_cpu_context(kvm_cpu_context_t *cpu_ctxt)
- {
- 	/* This is to set hw_sys_regs of host_cpu_context */
+-	{ SYS_DESC(SYS_VBAR_EL1), NULL, reset_val, VBAR_EL1, 0 },
++	{ SYS_DESC(SYS_VBAR_EL1), access_vbar, reset_val, VBAR_EL1, 0 },
+ 
+ 	{ SYS_DESC(SYS_ICC_IAR0_EL1), write_to_read_only },
+ 	{ SYS_DESC(SYS_ICC_EOIR0_EL1), read_from_write_only },
 -- 
 1.9.1
