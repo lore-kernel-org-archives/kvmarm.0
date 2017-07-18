@@ -1,179 +1,76 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH kvm-unit-tests 3/3] arm64: timer: Add support for phys
- timer testing
-Date: Tue, 18 Jul 2017 14:09:57 +0200
-Message-ID: <20170718120957.uvxb546eqpj5oxbp@kamzik.brq.redhat.com>
+Subject: Re: [PATCH kvm-unit-tests 2/3] arm64: timer: Fix test on APM X-Gene
+Date: Tue, 18 Jul 2017 14:15:27 +0200
+Message-ID: <20170718121527.ptemrr6mbhfwwbwe@kamzik.brq.redhat.com>
 References: <20170713192009.10069-1-cdall@linaro.org>
- <20170713192009.10069-4-cdall@linaro.org>
+ <20170713192009.10069-3-cdall@linaro.org>
+ <a58bfe11-19a0-aa92-5166-2c33e4cb8981@arm.com>
+ <20170714154512.GC1535@lvm>
+ <20170718100503.crn2dgqlalrirzqw@kamzik.brq.redhat.com>
+ <20170718103512.GB14069@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20170713192009.10069-4-cdall@linaro.org>
+In-Reply-To: <20170718103512.GB14069@cbox>
 Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <cdall@linaro.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>, Marc Zyngier <marc.zyngier@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jul 13, 2017 at 09:20:09PM +0200, Christoffer Dall wrote:
-> Rearrange the code to be able to reuse as much as posible and add
-> support for testing the physical timer as well.
+On Tue, Jul 18, 2017 at 12:35:12PM +0200, Christoffer Dall wrote:
+> On Tue, Jul 18, 2017 at 12:05:03PM +0200, Andrew Jones wrote:
+> > On Fri, Jul 14, 2017 at 08:45:12AM -0700, Christoffer Dall wrote:
+> > > On Fri, Jul 14, 2017 at 09:04:10AM +0100, Marc Zyngier wrote:
+> > > > On 13/07/17 20:20, Christoffer Dall wrote:
+> > > > > When running the vtimer test on an APM X-Gene, setting the timer value
+> > > > > to (2^64 - 1) apparently results in the timer always firing, even
+> > > > > thought the counter is mich lower than the cval.
+> > > > 
+> > > > Note that the system counter is only guaranteed to be at least 56 bit
+> > > > wide (see DDI0487B.a G5.1.2), and I seem to remember that X-Gene only
+> > > > has the minimum. This could explain why setting the comparator to a
+> > > > value greater than (2^56 - 1) leads to a firing timer (the comparator
+> > > > appears to be in the past).
+> > 
+> > Ah, that explains why when I tried setting it to ~0 on my mustang, and
+> > then reading it back, it was always 2^56 - 1 instead. However my mustang
+> > still also requires me to clear bit 31, otherwise the vcpu hangs.
+> > 
+> > > 
+> > > Thanks for pointing that out, that makes good sense.  So then we should
+> > > definitely fix the test.
+> > > 
+> > > We could either set it to 2^56 - 1 instead, or just keep the 10s as used
+> > > in this patch, because the whole test times out after 2s anyway.
+> > 
+> > With the 10s version the test runs and passes on my mustang, so on one
+> > hand I prefer it. OTOH, testing to the spec, by using 2^56 - 1, seems
+> > more correct and allows one to find issues like the one I have on my
+> > mustang, i.e. a vcpu hang when bit 31 isn't clear.
+> > 
+> > I guess I lean more towards testings to the spec, but not enough to
+> > ask for a v2 of the patch. It's up to you.
 > 
-> Also change the default unittests configuration to run a separate vtimer
-> and ptimer test so that older kernels without ptimer support just show a
-> failure.
+> I think we should have something that tests KVM on the platforms we have
+> and that are available for people's use.  I don't think we should verify
+> the architecture as much.  People use the m400 (basically
+> Mustang) in CloudLab, for example, which is we I keep caring about that.
+> 
+> I think this test was designed to test "if I program a timer to some
+> time in the future it shouldn't fire right away", which is still what
+> we test with this patch.
+> 
+> If we want to add a "the platform provides a timer with 56 valid bits in
+> the counter and compare register", then I think it should be a separate
+> test, and the the user can see that "basic stuff works", "architecture
+> compliance not so much" and shrug accordingly.
 
-We could run tests for both the ptimer and vtimer in a single execution,
-rather than splitting them and requiring the input, because the read of
-cntp_ctl_el0 will predictably cause an UNKNOWN exception. Also, by
-applying the errata framework we can ensure that if we expect the read
-to work, i.e. the host kernel is recent enough, then, if we still get
-an UNKNOWN exception, we can report FAIL instead of SKIP. Below is an
-add on patch that makes the conversion. Let me know what you think.
+Two separate tests sounds good to me. Although, if the value of 'now' is
+large enough that now + 10s will set bit 31, then a mustang run (at least
+mine) will fail - and most likely cause a lot of confusion, since it
+normally does not. We should probably attempt to address that known issue
+in some way as well.
 
 Thanks,
 drew
-
-diff --git a/arm/timer.c b/arm/timer.c
-index 33dfc6facc190..d0ba1e9a3bafa 100644
---- a/arm/timer.c
-+++ b/arm/timer.c
-@@ -7,6 +7,7 @@
-  */
- #include <libcflat.h>
- #include <devicetree.h>
-+#include <errata.h>
- #include <asm/processor.h>
- #include <asm/gic.h>
- #include <asm/io.h>
-@@ -16,6 +17,27 @@
- #define ARCH_TIMER_CTL_ISTATUS (1 << 2)
- 
- static void *gic_ispendr;
-+static bool ptimer_unsupported;
-+
-+static void ptimer_unsupported_handler(struct pt_regs *regs, unsigned int esr)
-+{
-+	ptimer_unsupported = true;
-+	regs->pc += 4;
-+}
-+
-+static void set_ptimer_unsupported(void)
-+{
-+	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_UNKNOWN, ptimer_unsupported_handler);
-+	read_sysreg(cntp_ctl_el0);
-+	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_UNKNOWN, NULL);
-+
-+	if (ptimer_unsupported && !ERRATA(7b6b46311a85)) {
-+		report_skip("Skipping ptimer tests. Set ERRATA_7b6b46311a85=y to enable.");
-+	} else if (ptimer_unsupported) {
-+		report("ptimer: read CNTP_CTL_EL0", false);
-+		report_info("ptimer: skipping remaining tests");
-+	}
-+}
- 
- static u64 read_vtimer_counter(void)
- {
-@@ -159,7 +181,6 @@ static void test_timer(struct timer_info *info)
- 	u64 time_10s = read_sysreg(cntfrq_el0) * 10;
- 	u64 later = now + time_10s;
- 
--
- 	/* Enable the timer, but schedule it for much later*/
- 	info->write_cval(later);
- 	isb();
-@@ -182,6 +203,9 @@ static void test_vtimer(void)
- 
- static void test_ptimer(void)
- {
-+	if (ptimer_unsupported)
-+		return;
-+
- 	report_prefix_push("ptimer-busy-loop");
- 	test_timer(&ptimer_info);
- 	report_prefix_pop();
-@@ -226,52 +250,27 @@ static void test_init(void)
- 	local_irq_enable();
- }
- 
--static void print_vtimer_info(void)
-+static void print_timer_info(void)
- {
- 	printf("CNTFRQ_EL0   : 0x%016lx\n", read_sysreg(cntfrq_el0));
-+
-+	if (!ptimer_unsupported) {
-+		printf("CNTPCT_EL0   : 0x%016lx\n", read_sysreg(cntpct_el0));
-+		printf("CNTP_CTL_EL0 : 0x%016lx\n", read_sysreg(cntp_ctl_el0));
-+		printf("CNTP_CVAL_EL0: 0x%016lx\n", read_sysreg(cntp_cval_el0));
-+	}
-+
- 	printf("CNTVCT_EL0   : 0x%016lx\n", read_sysreg(cntvct_el0));
- 	printf("CNTV_CTL_EL0 : 0x%016lx\n", read_sysreg(cntv_ctl_el0));
- 	printf("CNTV_CVAL_EL0: 0x%016lx\n", read_sysreg(cntv_cval_el0));
- }
- 
--static void print_ptimer_info(void)
--{
--	printf("CNTPCT_EL0   : 0x%016lx\n", read_sysreg(cntpct_el0));
--	printf("CNTP_CTL_EL0 : 0x%016lx\n", read_sysreg(cntp_ctl_el0));
--	printf("CNTP_CVAL_EL0: 0x%016lx\n", read_sysreg(cntp_cval_el0));
--}
--
--
- int main(int argc, char **argv)
- {
--	bool run_ptimer_test = false;
--	bool run_vtimer_test = false;
--
--	/* Check if we should also check the physical timer */
--	if (argc > 1) {
--		if (strcmp(argv[1], "vtimer") == 0) {
--			run_vtimer_test = true;
--		} else if (strcmp(argv[1], "ptimer") == 0) {
--			run_ptimer_test = true;
--		} else {
--			report_abort("Unknown option '%s'", argv[1]);
--		}
--	} else {
--		run_vtimer_test = true;
--	}
--
--	if (run_vtimer_test)
--		print_vtimer_info();
--	else if (run_ptimer_test)
--		print_ptimer_info();
--
-+	set_ptimer_unsupported();
-+	print_timer_info();
- 	test_init();
--
--	if (run_vtimer_test)
--		test_vtimer();
--	else if (run_ptimer_test)
--		test_ptimer();
--
--
-+	test_ptimer();
-+	test_vtimer();
- 	return report_summary();
- }
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index d55e52e1a4c4f..bdfedf86b01cb 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -111,14 +111,7 @@ smp = $MAX_SMP
- groups = psci
- 
- # Timer tests
--[vtimer]
-+[timer]
- file = timer.flat
--extra_params = -append 'vtimer'
--groups = timer
--timeout = 2s
--
--[ptimer]
--file = timer.flat
--extra_params = -append 'ptimer'
- groups = timer
- timeout = 2s
