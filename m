@@ -1,25 +1,25 @@
 From: Jintack Lim <jintack.lim@linaro.org>
-Subject: [RFC PATCH v2 12/38] arm64: Add missing TCR hw defines
-Date: Tue, 18 Jul 2017 11:58:38 -0500
-Message-ID: <1500397144-16232-13-git-send-email-jintack.lim@linaro.org>
+Subject: [RFC PATCH v2 20/38] KVM: arm64: Handle eret instruction traps
+Date: Tue, 18 Jul 2017 11:58:46 -0500
+Message-ID: <1500397144-16232-21-git-send-email-jintack.lim@linaro.org>
 References: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 170A149BFE
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 12:59:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2939140A80
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 12:59:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FYEtv-WsZz3Z for <kvmarm@lists.cs.columbia.edu>;
- Tue, 18 Jul 2017 12:59:07 -0400 (EDT)
-Received: from mail-io0-f169.google.com (mail-io0-f169.google.com
- [209.85.223.169])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4DC5749C10
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 12:59:06 -0400 (EDT)
-Received: by mail-io0-f169.google.com with SMTP id z62so17068397ioi.3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 09:59:55 -0700 (PDT)
+ with ESMTP id 4g9DWR1Ki+OT for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 18 Jul 2017 12:59:21 -0400 (EDT)
+Received: from mail-it0-f49.google.com (mail-it0-f49.google.com
+ [209.85.214.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2B03249C54
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 12:59:21 -0400 (EDT)
+Received: by mail-it0-f49.google.com with SMTP id h199so16524517ith.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 10:00:10 -0700 (PDT)
 In-Reply-To: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,35 +34,97 @@ To: kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.
 Cc: kvm@vger.kernel.org, david.daney@cavium.com, catalin.marinas@arm.com, will.deacon@arm.com, stefan@hello-penguin.com, corbet@lwn.net, daniel.lezcano@linaro.org, linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, andy.gross@linaro.org, cov@codeaurora.org, wcohen@redhat.com, mchehab@kernel.org, ard.biesheuvel@linaro.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, akpm@linux-foundation.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+When HCR.NV bit is set, eret instructions trap to EL2 with EC code 0x1A.
+Emulate eret instructions by setting pc and pstate.
 
-Some bits of the TCR weren't defined and since we're about to use these
-in KVM, add these defines.
+Note that the current exception level is always the virtual EL2, since
+we set HCR_EL2.NV bit only when entering the virtual EL2. So, we take
+spsr and elr states from the virtual _EL2 registers.
 
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 ---
- arch/arm64/include/asm/pgtable-hwdef.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+ arch/arm64/include/asm/esr.h |  1 +
+ arch/arm64/kvm/handle_exit.c | 16 ++++++++++++++++
+ arch/arm64/kvm/trace.h       | 21 +++++++++++++++++++++
+ 3 files changed, 38 insertions(+)
 
-diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-index eb0c2bd..d26cab7 100644
---- a/arch/arm64/include/asm/pgtable-hwdef.h
-+++ b/arch/arm64/include/asm/pgtable-hwdef.h
-@@ -272,9 +272,15 @@
- #define TCR_TG1_4K		(UL(2) << TCR_TG1_SHIFT)
- #define TCR_TG1_64K		(UL(3) << TCR_TG1_SHIFT)
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index e7d8e28..210fde6 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -43,6 +43,7 @@
+ #define ESR_ELx_EC_HVC64	(0x16)
+ #define ESR_ELx_EC_SMC64	(0x17)
+ #define ESR_ELx_EC_SYS64	(0x18)
++#define ESR_ELx_EC_ERET		(0x1A)
+ /* Unallocated EC: 0x19 - 0x1E */
+ #define ESR_ELx_EC_IMP_DEF	(0x1f)
+ #define ESR_ELx_EC_IABT_LOW	(0x20)
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 17d8a16..9259881 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -147,6 +147,21 @@ static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	return 1;
+ }
  
-+#define TCR_IPS_SHIFT		32
-+#define TCR_IPS_MASK		(UL(7) << TCR_IPS_SHIFT)
++static int kvm_handle_eret(struct kvm_vcpu *vcpu, struct kvm_run *run)
++{
++	trace_kvm_nested_eret(vcpu, vcpu_el2_sreg(vcpu, ELR_EL2),
++			      vcpu_el2_sreg(vcpu, SPSR_EL2));
 +
- #define TCR_ASID16		(UL(1) << 36)
- #define TCR_TBI0		(UL(1) << 37)
- #define TCR_HA			(UL(1) << 39)
- #define TCR_HD			(UL(1) << 40)
++	/*
++	 * Note that the current exception level is always the virtual EL2,
++	 * since we set HCR_EL2.NV bit only when entering the virtual EL2.
++	 */
++	*vcpu_pc(vcpu) = vcpu_el2_sreg(vcpu, ELR_EL2);
++	*vcpu_cpsr(vcpu) = vcpu_el2_sreg(vcpu, SPSR_EL2);
++
++	return 1;
++}
++
+ static exit_handle_fn arm_exit_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
+ 	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
+@@ -160,6 +175,7 @@ static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	[ESR_ELx_EC_HVC64]	= handle_hvc,
+ 	[ESR_ELx_EC_SMC64]	= handle_smc,
+ 	[ESR_ELx_EC_SYS64]	= kvm_handle_sys_reg,
++	[ESR_ELx_EC_ERET]	= kvm_handle_eret,
+ 	[ESR_ELx_EC_IABT_LOW]	= kvm_handle_guest_abort,
+ 	[ESR_ELx_EC_DABT_LOW]	= kvm_handle_guest_abort,
+ 	[ESR_ELx_EC_SOFTSTP_LOW]= kvm_handle_guest_debug,
+diff --git a/arch/arm64/kvm/trace.h b/arch/arm64/kvm/trace.h
+index 7c86cfb..5f40987 100644
+--- a/arch/arm64/kvm/trace.h
++++ b/arch/arm64/kvm/trace.h
+@@ -187,6 +187,27 @@
+ 	TP_printk("vcpu: %p, inject exception to vEL2: ESR_EL2 0x%lx, vector: 0x%016lx",
+ 		  __entry->vcpu, __entry->esr_el2, __entry->pc)
+ );
++
++TRACE_EVENT(kvm_nested_eret,
++	TP_PROTO(struct kvm_vcpu *vcpu, unsigned long elr_el2,
++		 unsigned long spsr_el2),
++	TP_ARGS(vcpu, elr_el2, spsr_el2),
++
++	TP_STRUCT__entry(
++		__field(struct kvm_vcpu *,	vcpu)
++		__field(unsigned long,		elr_el2)
++		__field(unsigned long,		spsr_el2)
++	),
++
++	TP_fast_assign(
++		__entry->vcpu = vcpu;
++		__entry->elr_el2 = elr_el2;
++		__entry->spsr_el2 = spsr_el2;
++	),
++
++	TP_printk("vcpu: %p, eret to elr_el2: 0x%016lx, with spsr_el2: 0x%08lx",
++		  __entry->vcpu, __entry->elr_el2, __entry->spsr_el2)
++);
+ #endif /* _TRACE_ARM64_KVM_H */
  
-+#define TCR_EPD1		(UL(1) << 23)
-+#define TCR_EPD0		(UL(1) << 7)
-+
- #endif
+ #undef TRACE_INCLUDE_PATH
 -- 
 1.9.1
