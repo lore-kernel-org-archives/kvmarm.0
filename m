@@ -1,50 +1,27 @@
-From: Jintack Lim <jintack@cs.columbia.edu>
-Subject: Re: [RFC PATCH v2 37/38] KVM: arm64: Respect the virtual HCR_EL2.NV1
- bit setting
-Date: Tue, 18 Jul 2017 22:24:37 -0400
-Message-ID: <CAHyh4xhj0tqMMFz8N1Xrx9Z=Ltwh4DKB_ARnsSfc=iP7=R9grQ@mail.gmail.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [RFC PATCH v2 00/38] Nested Virtualization on KVM/ARM
+Date: Wed, 19 Jul 2017 10:49:38 +0200
+Message-ID: <20170719084938.GA11435@cbox>
 References: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
- <1500397144-16232-38-git-send-email-jintack.lim@linaro.org>
+ <CAHyh4xjkT+JNJL0kxmEjz4qU8kD2-ZwYgVB8VgwsSYjpjTc3LA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0116340FB0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 22:23:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 699BC40D68
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Jul 2017 04:48:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8oBdEkWwNHgf for <kvmarm@lists.cs.columbia.edu>;
- Tue, 18 Jul 2017 22:23:52 -0400 (EDT)
-Received: from outprodmail02.cc.columbia.edu (outprodmail02.cc.columbia.edu
- [128.59.72.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E79F740FAE
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 22:23:51 -0400 (EDT)
-Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
- by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v6J2K5np013195
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 22:24:41 -0400
-Received: from hazelnut (localhost.localdomain [127.0.0.1])
- by hazelnut (Postfix) with ESMTP id 11A647E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 22:24:41 -0400 (EDT)
-Received: from sendprodmail03.cc.columbia.edu (sendprodmail03.cc.columbia.edu
- [128.59.72.15]) by hazelnut (Postfix) with ESMTP id D983D83
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 22:24:40 -0400 (EDT)
-Received: from mail-oi0-f70.google.com (mail-oi0-f70.google.com
- [209.85.218.70])
- by sendprodmail03.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v6J2OeaQ016052
- (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 22:24:40 -0400
-Received: by mail-oi0-f70.google.com with SMTP id v68so2649982oia.14
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 19:24:40 -0700 (PDT)
-Received: from mail-oi0-f46.google.com (mail-oi0-f46.google.com.
- [209.85.218.46])
- by smtp.gmail.com with ESMTPSA id g3sm4938547oif.21.2017.07.18.19.24.38
- for <kvmarm@lists.cs.columbia.edu>
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 18 Jul 2017 19:24:38 -0700 (PDT)
-Received: by mail-oi0-f46.google.com with SMTP id p188so32760655oia.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jul 2017 19:24:38 -0700 (PDT)
-In-Reply-To: <1500397144-16232-38-git-send-email-jintack.lim@linaro.org>
+ with ESMTP id PuHbGQdwoRqY for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 Jul 2017 04:48:51 -0400 (EDT)
+Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2FF2740C5A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Jul 2017 04:48:50 -0400 (EDT)
+Received: by mail-wm0-f45.google.com with SMTP id t70so34995344wmt.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Jul 2017 01:49:40 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <CAHyh4xjkT+JNJL0kxmEjz4qU8kD2-ZwYgVB8VgwsSYjpjTc3LA@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -54,87 +31,82 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
-Cc: KVM General <kvm@vger.kernel.org>, david.daney@cavium.com, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, stefan@hello-penguin.com, corbet@lwn.net, daniel.lezcano@linaro.org, linux@armlinux.org.uk, arm-mail-list <linux-arm-kernel@lists.infradead.org>, andy.gross@linaro.org, cov@codeaurora.org, wcohen@redhat.com, mchehab@kernel.org, ard.biesheuvel@linaro.org, linux-doc@vger.kernel.org, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, akpm@linux-foundation.org
+To: Jintack Lim <jintack.lim@linaro.org>
+Cc: KVM General <kvm@vger.kernel.org>, david.daney@cavium.com, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, stefan@hello-penguin.com, corbet@lwn.net, daniel.lezcano@linaro.org, linux@armlinux.org.uk, arm-mail-list <linux-arm-kernel@lists.infradead.org>, andy.gross@linaro.org, Marc Zyngier <marc.zyngier@arm.com>, Bandan Das <bsd@redhat.com>, cov@codeaurora.org, wcohen@redhat.com, mchehab@kernel.org, ard.biesheuvel@linaro.org, linux-doc@vger.kernel.org, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, akpm@linux-foundation.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Jul 18, 2017 at 12:59 PM, Jintack Lim <jintack.lim@linaro.org> wrote:
-> Forward ELR_EL1, SPSR_EL1 and VBAR_EL1 traps to the virtual EL2 if the
-> virtual HCR_EL2.NV bit is set.
->
-> This is for recursive nested virtualization.
->
-> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
-
-This should be linaro e-mail address. Will fix it.
-
-> ---
->  arch/arm64/include/asm/kvm_arm.h |  1 +
->  arch/arm64/kvm/sys_regs.c        | 18 ++++++++++++++++++
->  2 files changed, 19 insertions(+)
->
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index aeaac4e..a1274b7 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -23,6 +23,7 @@
->  #include <asm/types.h>
->
->  /* Hyp Configuration Register (HCR) bits */
-> +#define HCR_NV1                (UL(1) << 43)
->  #define HCR_NV         (UL(1) << 42)
->  #define HCR_E2H                (UL(1) << 34)
->  #define HCR_ID         (UL(1) << 33)
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 3e4ec5e..6f67666 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1031,6 +1031,15 @@ static bool trap_el2_regs(struct kvm_vcpu *vcpu,
->         return true;
->  }
->
-> +/* This function is to support the recursive nested virtualization */
-> +static bool forward_nv1_traps(struct kvm_vcpu *vcpu, struct sys_reg_params *p)
-> +{
-> +       if (!vcpu_mode_el2(vcpu) && (vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV1))
-> +               return true;
-> +
-> +       return false;
-> +}
-> +
->  static bool access_elr(struct kvm_vcpu *vcpu,
->                 struct sys_reg_params *p,
->                 const struct sys_reg_desc *r)
-> @@ -1038,6 +1047,9 @@ static bool access_elr(struct kvm_vcpu *vcpu,
->         if (el12_reg(p) && forward_nv_traps(vcpu))
->                 return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
->
-> +       if (!el12_reg(p) && forward_nv1_traps(vcpu, p))
-> +               return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
-> +
->         access_rw(p, &vcpu->arch.ctxt.gp_regs.elr_el1);
->         return true;
->  }
-> @@ -1049,6 +1061,9 @@ static bool access_spsr(struct kvm_vcpu *vcpu,
->         if (el12_reg(p) && forward_nv_traps(vcpu))
->                 return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
->
-> +       if (!el12_reg(p) && forward_nv1_traps(vcpu, p))
-> +               return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
-> +
->         access_rw(p, &vcpu->arch.ctxt.gp_regs.spsr[KVM_SPSR_EL1]);
->         return true;
->  }
-> @@ -1060,6 +1075,9 @@ static bool access_vbar(struct kvm_vcpu *vcpu,
->         if (el12_reg(p) && forward_nv_traps(vcpu))
->                 return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
->
-> +       if (!el12_reg(p) && forward_nv1_traps(vcpu, p))
-> +               return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
-> +
->         access_rw(p, &vcpu_sys_reg(vcpu, r->reg));
->         return true;
->  }
-> --
-> 1.9.1
->
+SGkgSmludGFjaywKCk9uIFR1ZSwgSnVsIDE4LCAyMDE3IGF0IDEwOjIzOjA1UE0gLTA0MDAsIEpp
+bnRhY2sgTGltIHdyb3RlOgo+IE9uIFR1ZSwgSnVsIDE4LCAyMDE3IGF0IDEyOjU4IFBNLCBKaW50
+YWNrIExpbSA8amludGFjay5saW1AbGluYXJvLm9yZz4gd3JvdGU6Cj4gPiBOZXN0ZWQgdmlydHVh
+bGl6YXRpb24gaXMgdGhlIGFiaWxpdHkgdG8gcnVuIGEgdmlydHVhbCBtYWNoaW5lIGluc2lkZSBh
+bm90aGVyCj4gPiB2aXJ0dWFsIG1hY2hpbmUuIEluIG90aGVyIHdvcmRzLCBpdOKAmXMgYWJvdXQg
+cnVubmluZyBhIGh5cGVydmlzb3IgKHRoZSBndWVzdAo+ID4gaHlwZXJ2aXNvcikgb24gdG9wIG9m
+IGFub3RoZXIgaHlwZXJ2aXNvciAodGhlIGhvc3QgaHlwZXJ2aXNvcikuCj4gPgo+ID4gU3VwcG9y
+dGluZyBuZXN0ZWQgdmlydHVhbGl6YXRpb24gb24gQVJNIG1lYW5zIHRoYXQgdGhlIGh5cGVydmlz
+b3IgcHJvdmlkZXMgbm90Cj4gPiBvbmx5IEVMMC9FTDEgZXhlY3V0aW9uIGVudmlyb25tZW50IHRv
+IFZNcyBhcyBpdCB1c3VhbGx5IGRvZXMgYnV0IGFsc28gdGhlCj4gPiB2aXJ0dWFsaXphdGlvbiBl
+eHRlbnNpb25zIGluY2x1ZGluZyBFTDIgZXhlY3V0aW9uIGVudmlyb25tZW50LiBPbmNlIHRoZSBo
+b3N0Cj4gPiBoeXBlcnZpc29yIHByb3ZpZGVzIHRob3NlIGV4ZWN1dGlvbiBlbnZpcm9ubWVudHMg
+dG8gdGhlIFZNcywgdGhlbiB0aGUgZ3Vlc3QKPiA+IGh5cGVydmlzb3IgY2FuIHJ1biBpdHMgb3du
+IFZNcyAobmVzdGVkIFZNcykgbmF0dXJhbGx5Lgo+ID4KPiA+IFRoaXMgc2VyaWVzIHN1cHBvcnRz
+IG5lc3RlZCB2aXJ0dWFsaXphdGlvbiBvbiBhcm02NC4gQVJNIHJlY2VudGx5IGFubm91bmNlZCBh
+bgo+ID4gZXh0ZW5zaW9uIChBUk12OC4zKSB3aGljaCBoYXMgc3VwcG9ydCBmb3IgbmVzdGVkIHZp
+cnR1YWxpemF0aW9uWzFdLiBUaGlzIHBhdGNoCj4gPiBzZXQgaXMgYmFzZWQgb24gdGhlIEFSTXY4
+LjMgc3BlY2lmaWNhdGlvbiBhbmQgdGVzdGVkIG9uIHRoZSBGYXN0TW9kZWwgd2l0aAo+ID4gQVJN
+djguMyBleHRlbnNpb24uCj4gPgo+ID4gVGhlIHdob2xlIHBhdGNoIHNldCB0byBzdXBwb3J0IG5l
+c3RlZCB2aXJ0dWFsaXphdGlvbiBpcyBodWdlIG92ZXIgNzAKPiA+IHBhdGNoZXMsIHNvIEkgY2F0
+ZWdvcml6ZWQgdGhlbSBpbnRvIGZvdXIgcGFydHM6IENQVSwgbWVtb3J5LCBWR0lDLCBhbmQgdGlt
+ZXIKPiA+IHZpcnR1YWxpemF0aW9uLiBUaGlzIHBhdGNoIHNlcmllcyBpcyB0aGUgZmlyc3QgcGFy
+dC4KPiA+Cj4gPiBDUFUgdmlydHVhbGl6YXRpb24gcGF0Y2ggc2VyaWVzIHByb3ZpZGVzIGJhc2lj
+IG5lc3RlZCB2aXJ0dWFsaXphdGlvbiBmcmFtZXdvcmsKPiA+IGFuZCBpbnN0cnVjdGlvbiBlbXVs
+YXRpb25zIGluY2x1ZGluZyB2OC4xIFZIRSBmZWF0dXJlIGFuZCB2OC4zIG5lc3RlZAo+ID4gdmly
+dHVhbGl6YXRpb24gZmVhdHVyZSBmb3IgVk1zLgo+ID4KPiA+IFRoaXMgcGF0Y2ggc2VyaWVzIGFn
+YWluIGNhbiBiZSBkaXZpZGVkIGludG8gZm91ciBwYXJ0cy4gUGF0Y2ggMSB0byA1IGludHJvZHVj
+ZXMKPiA+IG5lc3RlZCB2aXJ0dWFsaXphdGlvbiBieSBkaXNjb3ZlcmluZyBoYXJkd2FyZSBmZWF0
+dXJlLCBhZGRpbmcgYSBrZXJuZWwKPiA+IHBhcmFtZXRlciBhbmQgYWxsb3dpbmcgdGhlIHVzZXJz
+cGFjZSB0byBzZXQgdGhlIGluaXRpYWwgQ1BVIG1vZGUgdG8gRUwyLgo+ID4KPiA+IFBhdGNoIDYg
+dG8gMjUgYXJlIHRvIHN1cHBvcnQgdGhlIEVMMiBleGVjdXRpb24gZW52aXJvbm1lbnQsIHRoZSB2
+aXJ0dWFsIEVMMiwgdG8KPiA+IGEgVk0gb24gdjguMCBhcmNoaXRlY3R1cmUuIFdlIGRlLXByaXZp
+bGVnZSB0aGUgZ3Vlc3QgaHlwZXJ2aXNvciBhbmQgZW11bGF0ZSB0aGUKPiA+IHZpcnR1YWwgRUwy
+IG1vZGUgaW4gRUwxIHVzaW5nIHRoZSBoYXJkd2FyZSBmZWF0dXJlcyBwcm92aWRlZCBieSBBUk12
+OC4zOyBUaGUKPiA+IGhvc3QgaHlwZXJ2aXNvciBtYW5hZ2VzIHZpcnR1YWwgRUwyIHJlZ2lzdGVy
+IHN0YXRlIGZvciB0aGUgZ3Vlc3QgaHlwZXJ2aXNvcgo+ID4gYW5kIHNoYWRvdyBFTDEgcmVnaXN0
+ZXIgc3RhdGUgdGhhdCByZWZsZWN0cyB0aGUgdmlydHVhbCBFTDIgcmVnaXN0ZXIgc3RhdGUgdG8K
+PiA+IHJ1biB0aGUgZ3Vlc3QgaHlwZXJ2aXNvciBpbiBFTDEuCj4gPgo+ID4gUGF0Y2ggMjYgdG8g
+MzMgYWRkIHN1cHBvcnQgZm9yIHRoZSB2aXJ0dWFsIEVMMiB3aXRoIFZpcnR1YWxpemF0aW9uIEhv
+c3QKPiA+IEV4dGVuc2lvbnMuIFRoZXNlIHBhdGNoZXMgZW11bGF0ZSBuZXdseSBkZWZpbmVkIHJl
+Z2lzdGVycyBhbmQgYml0cyBpbiB2OC4xIGFuZAo+ID4gYWxsb3cgdGhlIHZpcnR1YWwgRUwyIHRv
+IGFjY2VzcyBFTDIgcmVnaXN0ZXIgc3RhdGVzIHZpYSBFTDEgcmVnaXN0ZXIgYWNjZXNzZXMKPiA+
+IGFzIGluIHRoZSByZWFsIEVMMi4KPiA+Cj4gPiBQYXRjaCAzNCB0byAzOCBhcmUgdG8gc3VwcG9y
+dCBmb3IgdGhlIHZpcnR1YWwgRUwyIHdpdGggbmVzdGVkIHZpcnR1YWxpemF0aW9uLgo+ID4gVGhl
+c2UgZW5hYmxlIHJlY3Vyc2l2ZSBuZXN0ZWQgdmlydHVhbGl6YXRpb24uCj4gPgo+ID4gVGhpcyBw
+YXRjaCBzZXQgaXMgdGVzdGVkIG9uIHRoZSBGYXN0TW9kZWwgd2l0aCB0aGUgdjguMyBleHRlbnNp
+b24gZm9yIGFybTY0IGFuZAo+ID4gYSBjdWJpZXRydWNrIGZvciBhcm0zMi4gT24gdGhlIEZhc3RN
+b2RlbCwgdGhlIGhvc3QgYW5kIHRoZSBndWVzdCBrZXJuZWxzIGFyZQo+ID4gY29tcGlsZWQgd2l0
+aCBhbmQgd2l0aG91dCBWSEUsIHNvIHRoZXJlIGFyZSBmb3VyIGNvbWJpbmF0aW9ucy4gSSB3YXMg
+YWJsZSB0bwo+ID4gYm9vdCBTTVAgTGludXggaW4gdGhlIG5lc3RlZCBWTSBvbiBhbGwgZm91ciBj
+b25maWd1cmF0aW9ucyBhbmQgYWJsZSB0byBydW4KPiA+IGhhY2tiZW5jaC4gSSBhbHNvIGNoZWNr
+ZWQgdGhhdCByZWd1bGFyIFZNcyBjb3VsZCBib290IHdoZW4gdGhlIG5lc3RlZAo+ID4gdmlydHVh
+bGl6YXRpb24ga2VybmVsIHBhcmFtZXRlciB3YXMgbm90IHNldC4gT24gdGhlIGN1YmlldHJ1Y2ss
+IEkgYWxzbyB2ZXJpZmllZAo+ID4gdGhhdCByZWd1bGFyIFZNcyBjb3VsZCBib290IGFzIHdlbGwu
+Cj4gPgo+ID4gSSdsbCBzaGFyZSBteSBleHBlcmltZW50IHNldHVwIHNob3J0bHkuCj4gCj4gSSBz
+dW1tYXJpemVkIG15IGV4cGVyaW1lbnQgc2V0dXAgaGVyZS4KPiAKPiBodHRwczovL2dpdGh1Yi5j
+b20vY29sdW1iaWEvbmVzdGluZy1wdWIvd2lraS9OZXN0ZWQtdmlydHVhbGl6YXRpb24tb24tQVJN
+LXNldHVwCj4gCgpUaGFua3MgZm9yIHNoYXJpbmcgdGhpcy4KCj4gPgo+ID4gRXZlbiB0aG91Z2gg
+dGhpcyB3b3JrIGhhcyBzb21lIGxpbWl0YXRpb25zIGFuZCBUT0RPcywgSSdkIGFwcHJlY2lhdGUg
+ZWFybHkKPiA+IGZlZWRiYWNrIG9uIHRoaXMgUkZDLiBTcGVjaWZpY2FsbHksIEknbSBpbnRlcmVz
+dGVkIGluOgo+ID4KPiA+IC0gT3ZlcmFsbCBkZXNpZ24gdG8gbWFuYWdlIHZjcHUgY29udGV4dCBm
+b3IgdGhlIHZpcnR1YWwgRUwyCj4gPiAtIFZlcmlmeWluZyBjb3JyZWN0IEVMMiByZWdpc3RlciBj
+b25maWd1cmF0aW9ucyBzdWNoIGFzIEhDUl9FTDIsIENQVFJfRUwyCj4gPiAgIChQYXRjaCAzMCBh
+bmQgMzIpCj4gPiAtIFBhdGNoIG9yZ2FuaXphdGlvbiBhbmQgY29kaW5nIHN0eWxlCj4gCj4gSSBh
+bHNvIHdvbmRlciBpZiB0aGUgaGFyZHdhcmUgYW5kL29yIEtWTSBkbyBub3Qgc3VwcG9ydCBuZXN0
+ZWQKPiB2aXJ0dWFsaXphdGlvbiBidXQgdGhlIHVzZXJzcGFjZSB1c2VzIG5lc3RlZCB2aXJ0dWFs
+aXphdGlvbiBvcHRpb24sCj4gd2hpY2ggb25lIGlzIGJldHRlcjogZ2l2aW5nIGFuIGVycm9yIG9y
+IGxhdW5jaGluZyBhIHJlZ3VsYXIgVk0KPiBzaWxlbnRseS4KPiAKCkkgdGhpbmsgS1ZNIHNob3Vs
+ZCBjb21wbGFpbiB0byB1c2Vyc3BhY2UgaWYgdXNlcnNwYWNlIHRyaWVzIHRvIHNldCBhCmZlYXR1
+cmUgaXQgZG9lcyBub3Qgc3VwcG9ydCwgYW5kIEkgdGhpbmsgdXNlcnNwYWNlIHNob3VsZCBnaXZl
+IGFzCm1lYW5pbmdmdWwgYW4gZXJyb3IgbWVzc2FnZSBhcyBwb3NzaWJsZSB0byB0aGUgdXNlciB3
+aGVuIHRoYXQgaGFwcGVucy4KClRoYW5rcywKLUNocmlzdG9mZmVyCl9fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJt
+QGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWls
+bWFuL2xpc3RpbmZvL2t2bWFybQo=
