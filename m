@@ -1,27 +1,26 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [RFC PATCH v2 00/38] Nested Virtualization on KVM/ARM
-Date: Wed, 19 Jul 2017 10:49:38 +0200
-Message-ID: <20170719084938.GA11435@cbox>
-References: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
- <CAHyh4xjkT+JNJL0kxmEjz4qU8kD2-ZwYgVB8VgwsSYjpjTc3LA@mail.gmail.com>
+Subject: Re: [PATCH] arm64: kvm: reuse existing cache type/info related macros
+Date: Wed, 19 Jul 2017 11:01:59 +0200
+Message-ID: <20170719090159.GC11435@cbox>
+References: <1498759604-7564-1-git-send-email-sudeep.holla@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 699BC40D68
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Jul 2017 04:48:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B56740D17
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Jul 2017 05:01:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PuHbGQdwoRqY for <kvmarm@lists.cs.columbia.edu>;
- Wed, 19 Jul 2017 04:48:51 -0400 (EDT)
-Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2FF2740C5A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Jul 2017 04:48:50 -0400 (EDT)
-Received: by mail-wm0-f45.google.com with SMTP id t70so34995344wmt.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Jul 2017 01:49:40 -0700 (PDT)
+ with ESMTP id L1a-j-Ms9q48 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 Jul 2017 05:01:12 -0400 (EDT)
+Received: from mail-wm0-f54.google.com (mail-wm0-f54.google.com [74.125.82.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 33F4B40D14
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Jul 2017 05:01:11 -0400 (EDT)
+Received: by mail-wm0-f54.google.com with SMTP id t70so35302654wmt.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Jul 2017 02:02:01 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <CAHyh4xjkT+JNJL0kxmEjz4qU8kD2-ZwYgVB8VgwsSYjpjTc3LA@mail.gmail.com>
+In-Reply-To: <1498759604-7564-1-git-send-email-sudeep.holla@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,82 +30,157 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Jintack Lim <jintack.lim@linaro.org>
-Cc: KVM General <kvm@vger.kernel.org>, david.daney@cavium.com, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, stefan@hello-penguin.com, corbet@lwn.net, daniel.lezcano@linaro.org, linux@armlinux.org.uk, arm-mail-list <linux-arm-kernel@lists.infradead.org>, andy.gross@linaro.org, Marc Zyngier <marc.zyngier@arm.com>, Bandan Das <bsd@redhat.com>, cov@codeaurora.org, wcohen@redhat.com, mchehab@kernel.org, ard.biesheuvel@linaro.org, linux-doc@vger.kernel.org, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, akpm@linux-foundation.org
+To: Sudeep Holla <sudeep.holla@arm.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGkgSmludGFjaywKCk9uIFR1ZSwgSnVsIDE4LCAyMDE3IGF0IDEwOjIzOjA1UE0gLTA0MDAsIEpp
-bnRhY2sgTGltIHdyb3RlOgo+IE9uIFR1ZSwgSnVsIDE4LCAyMDE3IGF0IDEyOjU4IFBNLCBKaW50
-YWNrIExpbSA8amludGFjay5saW1AbGluYXJvLm9yZz4gd3JvdGU6Cj4gPiBOZXN0ZWQgdmlydHVh
-bGl6YXRpb24gaXMgdGhlIGFiaWxpdHkgdG8gcnVuIGEgdmlydHVhbCBtYWNoaW5lIGluc2lkZSBh
-bm90aGVyCj4gPiB2aXJ0dWFsIG1hY2hpbmUuIEluIG90aGVyIHdvcmRzLCBpdOKAmXMgYWJvdXQg
-cnVubmluZyBhIGh5cGVydmlzb3IgKHRoZSBndWVzdAo+ID4gaHlwZXJ2aXNvcikgb24gdG9wIG9m
-IGFub3RoZXIgaHlwZXJ2aXNvciAodGhlIGhvc3QgaHlwZXJ2aXNvcikuCj4gPgo+ID4gU3VwcG9y
-dGluZyBuZXN0ZWQgdmlydHVhbGl6YXRpb24gb24gQVJNIG1lYW5zIHRoYXQgdGhlIGh5cGVydmlz
-b3IgcHJvdmlkZXMgbm90Cj4gPiBvbmx5IEVMMC9FTDEgZXhlY3V0aW9uIGVudmlyb25tZW50IHRv
-IFZNcyBhcyBpdCB1c3VhbGx5IGRvZXMgYnV0IGFsc28gdGhlCj4gPiB2aXJ0dWFsaXphdGlvbiBl
-eHRlbnNpb25zIGluY2x1ZGluZyBFTDIgZXhlY3V0aW9uIGVudmlyb25tZW50LiBPbmNlIHRoZSBo
-b3N0Cj4gPiBoeXBlcnZpc29yIHByb3ZpZGVzIHRob3NlIGV4ZWN1dGlvbiBlbnZpcm9ubWVudHMg
-dG8gdGhlIFZNcywgdGhlbiB0aGUgZ3Vlc3QKPiA+IGh5cGVydmlzb3IgY2FuIHJ1biBpdHMgb3du
-IFZNcyAobmVzdGVkIFZNcykgbmF0dXJhbGx5Lgo+ID4KPiA+IFRoaXMgc2VyaWVzIHN1cHBvcnRz
-IG5lc3RlZCB2aXJ0dWFsaXphdGlvbiBvbiBhcm02NC4gQVJNIHJlY2VudGx5IGFubm91bmNlZCBh
-bgo+ID4gZXh0ZW5zaW9uIChBUk12OC4zKSB3aGljaCBoYXMgc3VwcG9ydCBmb3IgbmVzdGVkIHZp
-cnR1YWxpemF0aW9uWzFdLiBUaGlzIHBhdGNoCj4gPiBzZXQgaXMgYmFzZWQgb24gdGhlIEFSTXY4
-LjMgc3BlY2lmaWNhdGlvbiBhbmQgdGVzdGVkIG9uIHRoZSBGYXN0TW9kZWwgd2l0aAo+ID4gQVJN
-djguMyBleHRlbnNpb24uCj4gPgo+ID4gVGhlIHdob2xlIHBhdGNoIHNldCB0byBzdXBwb3J0IG5l
-c3RlZCB2aXJ0dWFsaXphdGlvbiBpcyBodWdlIG92ZXIgNzAKPiA+IHBhdGNoZXMsIHNvIEkgY2F0
-ZWdvcml6ZWQgdGhlbSBpbnRvIGZvdXIgcGFydHM6IENQVSwgbWVtb3J5LCBWR0lDLCBhbmQgdGlt
-ZXIKPiA+IHZpcnR1YWxpemF0aW9uLiBUaGlzIHBhdGNoIHNlcmllcyBpcyB0aGUgZmlyc3QgcGFy
-dC4KPiA+Cj4gPiBDUFUgdmlydHVhbGl6YXRpb24gcGF0Y2ggc2VyaWVzIHByb3ZpZGVzIGJhc2lj
-IG5lc3RlZCB2aXJ0dWFsaXphdGlvbiBmcmFtZXdvcmsKPiA+IGFuZCBpbnN0cnVjdGlvbiBlbXVs
-YXRpb25zIGluY2x1ZGluZyB2OC4xIFZIRSBmZWF0dXJlIGFuZCB2OC4zIG5lc3RlZAo+ID4gdmly
-dHVhbGl6YXRpb24gZmVhdHVyZSBmb3IgVk1zLgo+ID4KPiA+IFRoaXMgcGF0Y2ggc2VyaWVzIGFn
-YWluIGNhbiBiZSBkaXZpZGVkIGludG8gZm91ciBwYXJ0cy4gUGF0Y2ggMSB0byA1IGludHJvZHVj
-ZXMKPiA+IG5lc3RlZCB2aXJ0dWFsaXphdGlvbiBieSBkaXNjb3ZlcmluZyBoYXJkd2FyZSBmZWF0
-dXJlLCBhZGRpbmcgYSBrZXJuZWwKPiA+IHBhcmFtZXRlciBhbmQgYWxsb3dpbmcgdGhlIHVzZXJz
-cGFjZSB0byBzZXQgdGhlIGluaXRpYWwgQ1BVIG1vZGUgdG8gRUwyLgo+ID4KPiA+IFBhdGNoIDYg
-dG8gMjUgYXJlIHRvIHN1cHBvcnQgdGhlIEVMMiBleGVjdXRpb24gZW52aXJvbm1lbnQsIHRoZSB2
-aXJ0dWFsIEVMMiwgdG8KPiA+IGEgVk0gb24gdjguMCBhcmNoaXRlY3R1cmUuIFdlIGRlLXByaXZp
-bGVnZSB0aGUgZ3Vlc3QgaHlwZXJ2aXNvciBhbmQgZW11bGF0ZSB0aGUKPiA+IHZpcnR1YWwgRUwy
-IG1vZGUgaW4gRUwxIHVzaW5nIHRoZSBoYXJkd2FyZSBmZWF0dXJlcyBwcm92aWRlZCBieSBBUk12
-OC4zOyBUaGUKPiA+IGhvc3QgaHlwZXJ2aXNvciBtYW5hZ2VzIHZpcnR1YWwgRUwyIHJlZ2lzdGVy
-IHN0YXRlIGZvciB0aGUgZ3Vlc3QgaHlwZXJ2aXNvcgo+ID4gYW5kIHNoYWRvdyBFTDEgcmVnaXN0
-ZXIgc3RhdGUgdGhhdCByZWZsZWN0cyB0aGUgdmlydHVhbCBFTDIgcmVnaXN0ZXIgc3RhdGUgdG8K
-PiA+IHJ1biB0aGUgZ3Vlc3QgaHlwZXJ2aXNvciBpbiBFTDEuCj4gPgo+ID4gUGF0Y2ggMjYgdG8g
-MzMgYWRkIHN1cHBvcnQgZm9yIHRoZSB2aXJ0dWFsIEVMMiB3aXRoIFZpcnR1YWxpemF0aW9uIEhv
-c3QKPiA+IEV4dGVuc2lvbnMuIFRoZXNlIHBhdGNoZXMgZW11bGF0ZSBuZXdseSBkZWZpbmVkIHJl
-Z2lzdGVycyBhbmQgYml0cyBpbiB2OC4xIGFuZAo+ID4gYWxsb3cgdGhlIHZpcnR1YWwgRUwyIHRv
-IGFjY2VzcyBFTDIgcmVnaXN0ZXIgc3RhdGVzIHZpYSBFTDEgcmVnaXN0ZXIgYWNjZXNzZXMKPiA+
-IGFzIGluIHRoZSByZWFsIEVMMi4KPiA+Cj4gPiBQYXRjaCAzNCB0byAzOCBhcmUgdG8gc3VwcG9y
-dCBmb3IgdGhlIHZpcnR1YWwgRUwyIHdpdGggbmVzdGVkIHZpcnR1YWxpemF0aW9uLgo+ID4gVGhl
-c2UgZW5hYmxlIHJlY3Vyc2l2ZSBuZXN0ZWQgdmlydHVhbGl6YXRpb24uCj4gPgo+ID4gVGhpcyBw
-YXRjaCBzZXQgaXMgdGVzdGVkIG9uIHRoZSBGYXN0TW9kZWwgd2l0aCB0aGUgdjguMyBleHRlbnNp
-b24gZm9yIGFybTY0IGFuZAo+ID4gYSBjdWJpZXRydWNrIGZvciBhcm0zMi4gT24gdGhlIEZhc3RN
-b2RlbCwgdGhlIGhvc3QgYW5kIHRoZSBndWVzdCBrZXJuZWxzIGFyZQo+ID4gY29tcGlsZWQgd2l0
-aCBhbmQgd2l0aG91dCBWSEUsIHNvIHRoZXJlIGFyZSBmb3VyIGNvbWJpbmF0aW9ucy4gSSB3YXMg
-YWJsZSB0bwo+ID4gYm9vdCBTTVAgTGludXggaW4gdGhlIG5lc3RlZCBWTSBvbiBhbGwgZm91ciBj
-b25maWd1cmF0aW9ucyBhbmQgYWJsZSB0byBydW4KPiA+IGhhY2tiZW5jaC4gSSBhbHNvIGNoZWNr
-ZWQgdGhhdCByZWd1bGFyIFZNcyBjb3VsZCBib290IHdoZW4gdGhlIG5lc3RlZAo+ID4gdmlydHVh
-bGl6YXRpb24ga2VybmVsIHBhcmFtZXRlciB3YXMgbm90IHNldC4gT24gdGhlIGN1YmlldHJ1Y2ss
-IEkgYWxzbyB2ZXJpZmllZAo+ID4gdGhhdCByZWd1bGFyIFZNcyBjb3VsZCBib290IGFzIHdlbGwu
-Cj4gPgo+ID4gSSdsbCBzaGFyZSBteSBleHBlcmltZW50IHNldHVwIHNob3J0bHkuCj4gCj4gSSBz
-dW1tYXJpemVkIG15IGV4cGVyaW1lbnQgc2V0dXAgaGVyZS4KPiAKPiBodHRwczovL2dpdGh1Yi5j
-b20vY29sdW1iaWEvbmVzdGluZy1wdWIvd2lraS9OZXN0ZWQtdmlydHVhbGl6YXRpb24tb24tQVJN
-LXNldHVwCj4gCgpUaGFua3MgZm9yIHNoYXJpbmcgdGhpcy4KCj4gPgo+ID4gRXZlbiB0aG91Z2gg
-dGhpcyB3b3JrIGhhcyBzb21lIGxpbWl0YXRpb25zIGFuZCBUT0RPcywgSSdkIGFwcHJlY2lhdGUg
-ZWFybHkKPiA+IGZlZWRiYWNrIG9uIHRoaXMgUkZDLiBTcGVjaWZpY2FsbHksIEknbSBpbnRlcmVz
-dGVkIGluOgo+ID4KPiA+IC0gT3ZlcmFsbCBkZXNpZ24gdG8gbWFuYWdlIHZjcHUgY29udGV4dCBm
-b3IgdGhlIHZpcnR1YWwgRUwyCj4gPiAtIFZlcmlmeWluZyBjb3JyZWN0IEVMMiByZWdpc3RlciBj
-b25maWd1cmF0aW9ucyBzdWNoIGFzIEhDUl9FTDIsIENQVFJfRUwyCj4gPiAgIChQYXRjaCAzMCBh
-bmQgMzIpCj4gPiAtIFBhdGNoIG9yZ2FuaXphdGlvbiBhbmQgY29kaW5nIHN0eWxlCj4gCj4gSSBh
-bHNvIHdvbmRlciBpZiB0aGUgaGFyZHdhcmUgYW5kL29yIEtWTSBkbyBub3Qgc3VwcG9ydCBuZXN0
-ZWQKPiB2aXJ0dWFsaXphdGlvbiBidXQgdGhlIHVzZXJzcGFjZSB1c2VzIG5lc3RlZCB2aXJ0dWFs
-aXphdGlvbiBvcHRpb24sCj4gd2hpY2ggb25lIGlzIGJldHRlcjogZ2l2aW5nIGFuIGVycm9yIG9y
-IGxhdW5jaGluZyBhIHJlZ3VsYXIgVk0KPiBzaWxlbnRseS4KPiAKCkkgdGhpbmsgS1ZNIHNob3Vs
-ZCBjb21wbGFpbiB0byB1c2Vyc3BhY2UgaWYgdXNlcnNwYWNlIHRyaWVzIHRvIHNldCBhCmZlYXR1
-cmUgaXQgZG9lcyBub3Qgc3VwcG9ydCwgYW5kIEkgdGhpbmsgdXNlcnNwYWNlIHNob3VsZCBnaXZl
-IGFzCm1lYW5pbmdmdWwgYW4gZXJyb3IgbWVzc2FnZSBhcyBwb3NzaWJsZSB0byB0aGUgdXNlciB3
-aGVuIHRoYXQgaGFwcGVucy4KClRoYW5rcywKLUNocmlzdG9mZmVyCl9fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJt
-QGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWls
-bWFuL2xpc3RpbmZvL2t2bWFybQo=
+On Thu, Jun 29, 2017 at 07:06:44PM +0100, Sudeep Holla wrote:
+> We already have various macros related to cache type and bitfields in
+> CLIDR system register. We can replace some of the hardcoded values
+> here using those existing macros.
+> 
+> This patch reuses those existing cache type/info related macros and
+> replaces the hardcorded values. It also removes some of the comments
+> that become trivial with the macro names.
+> 
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will.deacon@arm.com>
+> Cc: Christoffer Dall <christoffer.dall@linaro.org>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+> ---
+>  arch/arm64/include/asm/cache.h |  7 +++++++
+>  arch/arm64/kernel/cacheinfo.c  |  7 -------
+>  arch/arm64/kvm/sys_regs.c      | 29 +++++++++++++++--------------
+>  3 files changed, 22 insertions(+), 21 deletions(-)
+> 
+> Hi,
+> 
+> I dropped the support for 64bit format CCSIDR after Will's commit a8d4636f96ad
+> ("arm64: cacheinfo: Remove CCSIDR-based cache information probing"). However
+> I forgot to follow up on this patch which can be still applied. So just
+> reposting it.
+> 
+> Regards,
+> Sudeep
+> 
+> diff --git a/arch/arm64/include/asm/cache.h b/arch/arm64/include/asm/cache.h
+> index ea9bb4e0e9bb..70fd4357ed38 100644
+> --- a/arch/arm64/include/asm/cache.h
+> +++ b/arch/arm64/include/asm/cache.h
+> @@ -49,6 +49,13 @@
+>  #define ICACHEF_VPIPT		1
+>  extern unsigned long __icache_flags;
+>  
+> +#define MAX_CACHE_LEVEL			7	/* Max 7 level supported */
+> +/* Ctypen, bits[3(n - 1) + 2 : 3(n - 1)], for n = 1 to 7 */
+> +#define CLIDR_CTYPE_SHIFT(level)	(3 * (level - 1))
+> +#define CLIDR_CTYPE_MASK(level)		(7 << CLIDR_CTYPE_SHIFT(level))
+> +#define CLIDR_CTYPE(clidr, level)	\
+> +	(((clidr) & CLIDR_CTYPE_MASK(level)) >> CLIDR_CTYPE_SHIFT(level))
+> +
+>  /*
+>   * Whilst the D-side always behaves as PIPT on AArch64, aliasing is
+>   * permitted in the I-cache.
+> diff --git a/arch/arm64/kernel/cacheinfo.c b/arch/arm64/kernel/cacheinfo.c
+> index 380f2e2fbed5..4798aa4bc17b 100644
+> --- a/arch/arm64/kernel/cacheinfo.c
+> +++ b/arch/arm64/kernel/cacheinfo.c
+> @@ -20,13 +20,6 @@
+>  #include <linux/cacheinfo.h>
+>  #include <linux/of.h>
+>  
+> -#define MAX_CACHE_LEVEL			7	/* Max 7 level supported */
+> -/* Ctypen, bits[3(n - 1) + 2 : 3(n - 1)], for n = 1 to 7 */
+> -#define CLIDR_CTYPE_SHIFT(level)	(3 * (level - 1))
+> -#define CLIDR_CTYPE_MASK(level)		(7 << CLIDR_CTYPE_SHIFT(level))
+> -#define CLIDR_CTYPE(clidr, level)	\
+> -	(((clidr) & CLIDR_CTYPE_MASK(level)) >> CLIDR_CTYPE_SHIFT(level))
+> -
+>  static inline enum cache_type get_cache_type(int level)
+>  {
+>  	u64 clidr;
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 0fe27024a2e1..e4107047f405 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -21,11 +21,13 @@
+>   */
+>  
+>  #include <linux/bsearch.h>
+> +#include <linux/cacheinfo.h>
+>  #include <linux/kvm_host.h>
+>  #include <linux/mm.h>
+>  #include <linux/uaccess.h>
+>  
+>  #include <asm/cacheflush.h>
+> +#include <asm/cache.h>
+>  #include <asm/cputype.h>
+>  #include <asm/debug-monitors.h>
+>  #include <asm/esr.h>
+> @@ -68,7 +70,7 @@ static bool read_from_write_only(struct kvm_vcpu *vcpu,
+>  static u32 cache_levels;
+>  
+>  /* CSSELR values; used to index KVM_REG_ARM_DEMUX_ID_CCSIDR */
+> -#define CSSELR_MAX 12
+> +#define CSSELR_MAX 	((MAX_CACHE_LEVEL - 1) << 1)
+>  
+>  /* Which cache CCSIDR represents depends on CSSELR value. */
+>  static u32 get_ccsidr(u32 csselr)
+> @@ -1894,19 +1896,18 @@ static bool is_valid_cache(u32 val)
+>  		return false;
+>  
+>  	/* Bottom bit is Instruction or Data bit.  Next 3 bits are level. */
+> -	level = (val >> 1);
+> -	ctype = (cache_levels >> (level * 3)) & 7;
+> +	level = (val >> 1) + 1;
+> +	ctype = CLIDR_CTYPE(cache_levels, level);
+>  
+>  	switch (ctype) {
+> -	case 0: /* No cache */
+> -		return false;
+> -	case 1: /* Instruction cache only */
+> -		return (val & 1);
+> -	case 2: /* Data cache only */
+> -	case 4: /* Unified cache */
+> -		return !(val & 1);
+> -	case 3: /* Separate instruction and data caches */
+> +	case CACHE_TYPE_INST:
+> +		return (val & CACHE_TYPE_INST);
+> +	case CACHE_TYPE_DATA:
+> +	case CACHE_TYPE_UNIFIED:
+> +		return !(val & CACHE_TYPE_INST);
+> +	case CACHE_TYPE_SEPARATE:
+>  		return true;
+> +	case CACHE_TYPE_NOCACHE:
+>  	default: /* Reserved: we can't know instruction or data. */
+>  		return false;
+>  	}
+
+These defines seem to be arch-generic concepts defined in
+include/linux/cacheinfo.h.  Are they guaranteed to not change and
+therefore always match the format of ARM registers?
+
+Otherwise, this looks good to me.
+
+Thanks,
+-Christoffer
+
+> @@ -2173,11 +2174,11 @@ void kvm_sys_reg_table_init(void)
+>  	 */
+>  	get_clidr_el1(NULL, &clidr); /* Ugly... */
+>  	cache_levels = clidr.val;
+> -	for (i = 0; i < 7; i++)
+> -		if (((cache_levels >> (i*3)) & 7) == 0)
+> +	for (i = 1; i <= MAX_CACHE_LEVEL; i++)
+> +		if (CLIDR_CTYPE(cache_levels, i) == CACHE_TYPE_NOCACHE)
+>  			break;
+>  	/* Clear all higher bits. */
+> -	cache_levels &= (1 << (i*3))-1;
+> +	cache_levels &= (1 << CLIDR_CTYPE_SHIFT(i)) - 1;
+>  }
+>  
+>  /**
+> -- 
+> 2.7.4
+> 
