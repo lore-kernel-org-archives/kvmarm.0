@@ -1,306 +1,197 @@
 From: Mark Rutland <mark.rutland@arm.com>
-Subject: [PATCH 07/11] arm64: add basic pointer authentication support
-Date: Wed, 19 Jul 2017 17:01:28 +0100
-Message-ID: <1500480092-28480-8-git-send-email-mark.rutland@arm.com>
+Subject: [PATCH 08/11] arm64: expose user PAC bit positions via ptrace
+Date: Wed, 19 Jul 2017 17:01:29 +0100
+Message-ID: <1500480092-28480-9-git-send-email-mark.rutland@arm.com>
 References: <1500480092-28480-1-git-send-email-mark.rutland@arm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 775AA40CE0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Jul 2017 12:02:24 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id VhI3yV+lOk+r for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 Jul 2017 12:02:23 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E7CD1412C2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Jul 2017 12:02:22 -0400 (EDT)
 In-Reply-To: <1500480092-28480-1-git-send-email-mark.rutland@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org
-Cc: arnd@arndb.de, catalin.marinas@arm.com, christoffer.dall@linaro.org, Dave.Martin@arm.com, jiong.wang@arm.com, kvmarm@lists.cs.columbia.edu, linux-arch@vger.kernel.org, marc.zyngier@arm.com, mark.rutland@arm.com, suzuki.poulose@arm.com, will.deacon@arm.com, yao.qi@arm.com, linux-kernel@vger.kernel.org, kernel-hardening@lists.openwall.com
+Cc: linux-arch@vger.kernel.org, arnd@arndb.de, jiong.wang@arm.com, marc.zyngier@arm.com, catalin.marinas@arm.com, yao.qi@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, Dave.Martin@arm.com, kernel-hardening@lists.openwall.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch adds basic support for pointer authentication, allowing
-userspace to make use of APIAKey. The kernel maintains an APIAKey value
-for each process (shared by all threads within), which is initialised to
-a random value at exec() time.
+When pointer authentication is in use, data/instruction pointers have a
+number of PAC bits inserted into them. The number and position of these
+bits depends on the configured TCR_ELx.TxSZ and whether tagging is
+enabled. ARMv8.3 allows tagging to differ for instruction and data
+pointers.
 
-Instructions using other keys (APIBKey, APDAKey, APDBKey) are disabled,
-and will behave as NOPs. These may be made use of in future patches.
+For userspace debuggers to unwind the stack and/or to follow pointer
+chains, they need to be able to remove the PAC bits before attempting to
+use a pointer.
 
-No support is added for the generic key (APGAKey), though this cannot be
-trapped or made to behave as a NOP. Its presence is not advertised with
-a hwcap.
+This patch adds a new structure with masks describing the location of
+the PAC bits in userspace instruction and data pointers (i.e. those
+addressable via TTBR0), which userspace can query via PTRACE_GETREGSET.
+By clearing these bits from pointers, userspace can acquire the PAC-less
+versions.
+
+This new regset is exposed when the kernel is built with (user) pointer
+authentication support, and the feature is enabled. Otherwise, it is
+hidden.
 
 Signed-off-by: Mark Rutland <mark.rutland@arm.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Jiong Wang <jiong.wang@arm.com>
 Cc: Will Deacon <will.deacon@arm.com>
+Cc: Yao Qi <yao.qi@arm.com>
 ---
- arch/arm64/Kconfig                    | 23 +++++++++
- arch/arm64/include/asm/mmu.h          |  5 ++
- arch/arm64/include/asm/mmu_context.h  | 25 +++++++++-
- arch/arm64/include/asm/pointer_auth.h | 89 +++++++++++++++++++++++++++++++++++
- arch/arm64/include/uapi/asm/hwcap.h   |  1 +
- arch/arm64/kernel/cpufeature.c        | 11 +++++
- arch/arm64/kernel/cpuinfo.c           |  1 +
- 7 files changed, 153 insertions(+), 2 deletions(-)
- create mode 100644 arch/arm64/include/asm/pointer_auth.h
+ arch/arm64/include/asm/pointer_auth.h |  8 +++++++
+ arch/arm64/include/uapi/asm/ptrace.h  |  5 +++++
+ arch/arm64/kernel/ptrace.c            | 39 +++++++++++++++++++++++++++++++++++
+ include/uapi/linux/elf.h              |  1 +
+ 4 files changed, 53 insertions(+)
 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index dfd9086..15a9931 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -962,6 +962,29 @@ config ARM64_UAO
- 
- endmenu
- 
-+menu "ARMv8.3 architectural features"
-+
-+config ARM64_POINTER_AUTHENTICATION
-+	bool "Enable support for pointer authentication"
-+	default y
-+	help
-+	  Pointer authentication (part of the ARMv8.3 Extensions) provides
-+	  instructions for signing and authenticating pointers against secret
-+	  keys, which can be used to mitigate Return Oriented Programming (ROP)
-+	  and other attacks.
-+
-+	  This option enables these instructions at EL0 (i.e. for userspace).
-+
-+	  Choosing this option will cause the kernel to initialise secret keys
-+	  for each process at exec() time, with these keys being
-+	  context-switched along with the process.
-+
-+	  The feature is detected at runtime. If the feature is not present in
-+	  hardware it will not be advertised to userspace nor will it be
-+	  enabled.
-+
-+endmenu
-+
- config ARM64_MODULE_CMODEL_LARGE
- 	bool
- 
-diff --git a/arch/arm64/include/asm/mmu.h b/arch/arm64/include/asm/mmu.h
-index 5468c83..6a848f3 100644
---- a/arch/arm64/include/asm/mmu.h
-+++ b/arch/arm64/include/asm/mmu.h
-@@ -16,10 +16,15 @@
- #ifndef __ASM_MMU_H
- #define __ASM_MMU_H
- 
-+#include <asm/pointer_auth.h>
-+
- typedef struct {
- 	atomic64_t	id;
- 	void		*vdso;
- 	unsigned long	flags;
-+#ifdef CONFIG_ARM64_POINTER_AUTHENTICATION
-+	struct ptrauth_keys	ptrauth_keys;
-+#endif
- } mm_context_t;
- 
- /*
-diff --git a/arch/arm64/include/asm/mmu_context.h b/arch/arm64/include/asm/mmu_context.h
-index 3257895a..06757a5 100644
---- a/arch/arm64/include/asm/mmu_context.h
-+++ b/arch/arm64/include/asm/mmu_context.h
-@@ -31,7 +31,6 @@
- #include <asm/cacheflush.h>
- #include <asm/cpufeature.h>
- #include <asm/proc-fns.h>
--#include <asm-generic/mm_hooks.h>
- #include <asm/cputype.h>
- #include <asm/pgtable.h>
- #include <asm/sysreg.h>
-@@ -154,7 +153,14 @@ static inline void cpu_replace_ttbr1(pgd_t *pgd)
- #define destroy_context(mm)		do { } while(0)
- void check_and_switch_context(struct mm_struct *mm, unsigned int cpu);
- 
--#define init_new_context(tsk,mm)	({ atomic64_set(&(mm)->context.id, 0); 0; })
-+static inline int init_new_context(struct task_struct *tsk,
-+			struct mm_struct *mm)
-+{
-+	atomic64_set(&mm->context.id, 0);
-+	mm_ctx_ptrauth_init(&mm->context);
-+
-+	return 0;
-+}
- 
- /*
-  * This is called when "tsk" is about to enter lazy TLB mode.
-@@ -200,6 +206,8 @@ static inline void __switch_mm(struct mm_struct *next)
- 		return;
- 	}
- 
-+	mm_ctx_ptrauth_switch(&next->context);
-+
- 	check_and_switch_context(next, cpu);
- }
- 
-@@ -226,6 +234,19 @@ static inline void __switch_mm(struct mm_struct *next)
- 
- void verify_cpu_asid_bits(void);
- 
-+static inline void arch_dup_mmap(struct mm_struct *oldmm,
-+				 struct mm_struct *mm)
-+{
-+	mm_ctx_ptrauth_dup(&oldmm->context, &mm->context);
-+}
-+#define arch_dup_mmap arch_dup_mmap
-+
-+/*
-+ * We need to override arch_dup_mmap before including the generic hooks, which
-+ * are otherwise sufficient for us.
-+ */
-+#include <asm-generic/mm_hooks.h>
-+
- #endif /* !__ASSEMBLY__ */
- 
- #endif /* !__ASM_MMU_CONTEXT_H */
 diff --git a/arch/arm64/include/asm/pointer_auth.h b/arch/arm64/include/asm/pointer_auth.h
-new file mode 100644
-index 0000000..964da0c
---- /dev/null
+index 964da0c..ae72c7c 100644
+--- a/arch/arm64/include/asm/pointer_auth.h
 +++ b/arch/arm64/include/asm/pointer_auth.h
-@@ -0,0 +1,89 @@
-+/*
-+ * Copyright (C) 2016 ARM Ltd.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+#ifndef __ASM_POINTER_AUTH_H
-+#define __ASM_POINTER_AUTH_H
-+
-+#include <linux/random.h>
-+
-+#include <asm/cpufeature.h>
-+#include <asm/sysreg.h>
-+
-+#ifdef CONFIG_ARM64_POINTER_AUTHENTICATION
-+/*
-+ * Each key is a 128-bit quantity which is split accross a pair of 64-bit
-+ * registers (Lo and Hi).
-+ */
-+struct ptrauth_key {
-+	unsigned long lo, hi;
-+};
-+
-+/*
-+ * We give each process its own instruction A key (APIAKey), which is shared by
-+ * all threads. This is inherited upon fork(), and reinitialised upon exec*().
-+ * All other keys are currently unused, with APIBKey, APDAKey, and APBAKey
-+ * instructions behaving as NOPs.
-+ */
-+struct ptrauth_keys {
-+	struct ptrauth_key apia;
-+};
-+
-+static inline void ptrauth_keys_init(struct ptrauth_keys *keys)
-+{
-+	if (!cpus_have_const_cap(ARM64_HAS_ADDRESS_AUTH))
-+		return;
-+
-+	get_random_bytes(keys, sizeof(*keys));
-+}
-+
-+#define __ptrauth_key_install(k, v)			\
-+do {							\
-+	write_sysreg_s(v.lo, SYS_ ## k ## KEYLO_EL1);	\
-+	write_sysreg_s(v.hi, SYS_ ## k ## KEYHI_EL1);	\
-+} while (0)
-+
-+static inline void ptrauth_keys_switch(struct ptrauth_keys *keys)
-+{
-+	if (!cpus_have_const_cap(ARM64_HAS_ADDRESS_AUTH))
-+		return;
-+
-+	__ptrauth_key_install(APIA, keys->apia);
-+}
-+
-+static inline void ptrauth_keys_dup(struct ptrauth_keys *old,
-+				    struct ptrauth_keys *new)
-+{
-+	if (!cpus_have_const_cap(ARM64_HAS_ADDRESS_AUTH))
-+		return;
-+
-+	*new = *old;
-+}
-+
-+#define mm_ctx_ptrauth_init(ctx) \
-+	ptrauth_keys_init(&(ctx)->ptrauth_keys)
-+
-+#define mm_ctx_ptrauth_switch(ctx) \
-+	ptrauth_keys_switch(&(ctx)->ptrauth_keys)
-+
-+#define mm_ctx_ptrauth_dup(oldctx, newctx) \
-+	ptrauth_keys_dup(&(oldctx)->ptrauth_keys, &(newctx)->ptrauth_keys)
-+
-+#else
-+#define mm_ctx_ptrauth_init(ctx)
-+#define mm_ctx_ptrauth_switch(ctx)
-+#define mm_ctx_ptrauth_dup(oldctx, newctx)
-+#endif
-+
-+#endif /* __ASM_POINTER_AUTH_H */
-diff --git a/arch/arm64/include/uapi/asm/hwcap.h b/arch/arm64/include/uapi/asm/hwcap.h
-index 4e187ce..0481c73 100644
---- a/arch/arm64/include/uapi/asm/hwcap.h
-+++ b/arch/arm64/include/uapi/asm/hwcap.h
-@@ -35,5 +35,6 @@
- #define HWCAP_JSCVT		(1 << 13)
- #define HWCAP_FCMA		(1 << 14)
- #define HWCAP_LRCPC		(1 << 15)
-+#define HWCAP_APIA		(1 << 16)
+@@ -16,9 +16,11 @@
+ #ifndef __ASM_POINTER_AUTH_H
+ #define __ASM_POINTER_AUTH_H
  
- #endif /* _UAPI__ASM_HWCAP_H */
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 4016b1e7..7e2885e 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -778,6 +778,15 @@ static bool runs_at_el2(const struct arm64_cpu_capabilities *entry, int __unused
- 	return is_kernel_in_hyp_mode();
++#include <linux/bitops.h>
+ #include <linux/random.h>
+ 
+ #include <asm/cpufeature.h>
++#include <asm/memory.h>
+ #include <asm/sysreg.h>
+ 
+ #ifdef CONFIG_ARM64_POINTER_AUTHENTICATION
+@@ -71,6 +73,12 @@ static inline void ptrauth_keys_dup(struct ptrauth_keys *old,
+ 	*new = *old;
+ }
+ 
++/*
++ * The pointer bits used by a pointer authentication code.
++ * If we were to use tagged pointers, bits 63:56 would also apply.
++ */
++#define ptrauth_pac_mask() 	GENMASK(54, VA_BITS)
++
+ #define mm_ctx_ptrauth_init(ctx) \
+ 	ptrauth_keys_init(&(ctx)->ptrauth_keys)
+ 
+diff --git a/arch/arm64/include/uapi/asm/ptrace.h b/arch/arm64/include/uapi/asm/ptrace.h
+index d1ff83d..5092fbf 100644
+--- a/arch/arm64/include/uapi/asm/ptrace.h
++++ b/arch/arm64/include/uapi/asm/ptrace.h
+@@ -90,6 +90,11 @@ struct user_hwdebug_state {
+ 	}		dbg_regs[16];
+ };
+ 
++struct user_pac_mask {
++	__u64		data_mask;
++	__u64		insn_mask;
++};
++
+ #endif /* __ASSEMBLY__ */
+ 
+ #endif /* _UAPI__ASM_PTRACE_H */
+diff --git a/arch/arm64/kernel/ptrace.c b/arch/arm64/kernel/ptrace.c
+index 1b38c01..fae9d50 100644
+--- a/arch/arm64/kernel/ptrace.c
++++ b/arch/arm64/kernel/ptrace.c
+@@ -40,8 +40,10 @@
+ #include <linux/elf.h>
+ 
+ #include <asm/compat.h>
++#include <asm/cpufeature.h>
+ #include <asm/debug-monitors.h>
+ #include <asm/pgtable.h>
++#include <asm/pointer_auth.h>
+ #include <asm/syscall.h>
+ #include <asm/traps.h>
+ #include <asm/system_misc.h>
+@@ -701,6 +703,30 @@ static int system_call_set(struct task_struct *target,
+ 	return ret;
  }
  
 +#ifdef CONFIG_ARM64_POINTER_AUTHENTICATION
-+static int cpu_enable_address_auth(void *__unused)
++static int pac_mask_get(struct task_struct *target,
++			const struct user_regset *regset,
++			unsigned int pos, unsigned int count,
++			void *kbuf, void __user *ubuf)
 +{
-+	config_sctlr_el1(0, SCTLR_ELx_ENIA);
++	/*
++	 * The PAC bits can differ across data and instruction pointers
++	 * depending on TCR_EL1.TBID*, which we may make use of in future, so
++	 * we expose separate masks.
++	 */
++	unsigned long mask = ptrauth_pac_mask();
++	struct user_pac_mask uregs = {
++		.data_mask = mask,
++		.insn_mask = mask,
++	};
 +
-+	return 0;
++	if (!cpus_have_cap(ARM64_HAS_ADDRESS_AUTH))
++		return -EINVAL;
++
++	return user_regset_copyout(&pos, &count, &kbuf, &ubuf, &uregs, 0, -1);
 +}
-+#endif /* CONFIG_ARM64_POINTER_AUTHENTICATION */
++#endif
 +
- static bool hyp_offset_low(const struct arm64_cpu_capabilities *entry,
- 			   int __unused)
- {
-@@ -902,6 +911,7 @@ static bool has_no_fpsimd(const struct arm64_cpu_capabilities *entry, int __unus
- 		.field_pos = ID_AA64ISAR1_APA_SHIFT,
- 		.min_field_value = ID_AA64ISAR1_APA_ARCHITECTED,
- 		.matches = has_cpuid_feature,
-+		.enable = cpu_enable_address_auth,
+ enum aarch64_regset {
+ 	REGSET_GPR,
+ 	REGSET_FPR,
+@@ -710,6 +736,9 @@ enum aarch64_regset {
+ 	REGSET_HW_WATCH,
+ #endif
+ 	REGSET_SYSTEM_CALL,
++#ifdef CONFIG_ARM64_POINTER_AUTHENTICATION
++	REGSET_PAC_MASK,
++#endif
+ };
+ 
+ static const struct user_regset aarch64_regsets[] = {
+@@ -767,6 +796,16 @@ enum aarch64_regset {
+ 		.get = system_call_get,
+ 		.set = system_call_set,
  	},
- 	{
- 		.desc = "Generic authentication (architected algorithm)",
-@@ -945,6 +955,7 @@ static bool has_no_fpsimd(const struct arm64_cpu_capabilities *entry, int __unus
- 	HWCAP_CAP(SYS_ID_AA64ISAR1_EL1, ID_AA64ISAR1_JSCVT_SHIFT, FTR_UNSIGNED, 1, CAP_HWCAP, HWCAP_JSCVT),
- 	HWCAP_CAP(SYS_ID_AA64ISAR1_EL1, ID_AA64ISAR1_FCMA_SHIFT, FTR_UNSIGNED, 1, CAP_HWCAP, HWCAP_FCMA),
- 	HWCAP_CAP(SYS_ID_AA64ISAR1_EL1, ID_AA64ISAR1_LRCPC_SHIFT, FTR_UNSIGNED, 1, CAP_HWCAP, HWCAP_LRCPC),
-+	HWCAP_CAP(SYS_ID_AA64ISAR1_EL1, ID_AA64ISAR1_APA_SHIFT, FTR_UNSIGNED, 1, CAP_HWCAP, HWCAP_APIA),
- 	{},
++#ifdef CONFIG_ARM64_POINTER_AUTHENTICATION
++	[REGSET_PAC_MASK] = {
++		.core_note_type = NT_ARM_PAC_MASK,
++		.n = sizeof(struct user_pac_mask) / sizeof(u64),
++		.size = sizeof(u64),
++		.align = sizeof(u64),
++		.get = pac_mask_get,
++		/* this cannot be set dynamically */
++	},
++#endif
  };
  
-diff --git a/arch/arm64/kernel/cpuinfo.c b/arch/arm64/kernel/cpuinfo.c
-index f495ee5..b5bd2d3 100644
---- a/arch/arm64/kernel/cpuinfo.c
-+++ b/arch/arm64/kernel/cpuinfo.c
-@@ -68,6 +68,7 @@
- 	"jscvt",
- 	"fcma",
- 	"lrcpc",
-+	"apia",
- 	NULL
- };
- 
+ static const struct user_regset_view user_aarch64_view = {
+diff --git a/include/uapi/linux/elf.h b/include/uapi/linux/elf.h
+index b5280db..60652f1 100644
+--- a/include/uapi/linux/elf.h
++++ b/include/uapi/linux/elf.h
+@@ -416,6 +416,7 @@
+ #define NT_ARM_HW_BREAK	0x402		/* ARM hardware breakpoint registers */
+ #define NT_ARM_HW_WATCH	0x403		/* ARM hardware watchpoint registers */
+ #define NT_ARM_SYSTEM_CALL	0x404	/* ARM system call number */
++#define NT_ARM_PAC_MASK		0x406	/* ARM pointer authentication code masks */
+ #define NT_METAG_CBUF	0x500		/* Metag catch buffer registers */
+ #define NT_METAG_RPIPE	0x501		/* Metag read pipeline state */
+ #define NT_METAG_TLS	0x502		/* Metag TLS pointer */
 -- 
 1.9.1
