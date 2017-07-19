@@ -1,36 +1,23 @@
-From: Jintack Lim <jintack.lim@linaro.org>
-Subject: Re: [RFC PATCH v2 00/38] Nested Virtualization on KVM/ARM
-Date: Wed, 19 Jul 2017 10:35:30 -0400
-Message-ID: <CAHyh4xjNMqzQpEQKfN7uKTsW-rDB5X6jjdFH3xW_Hee4NPfybg@mail.gmail.com>
-References: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
- <CAHyh4xjkT+JNJL0kxmEjz4qU8kD2-ZwYgVB8VgwsSYjpjTc3LA@mail.gmail.com>
- <20170719084938.GA11435@cbox>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: [PATCH 01/11] arm64: docs: describe ELF hwcaps
+Date: Wed, 19 Jul 2017 17:01:22 +0100
+Message-ID: <1500480092-28480-2-git-send-email-mark.rutland@arm.com>
+References: <1500480092-28480-1-git-send-email-mark.rutland@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7722540D16
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Jul 2017 10:34:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B34F540FE9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Jul 2017 12:01:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gGK5cqo8k5RU for <kvmarm@lists.cs.columbia.edu>;
- Wed, 19 Jul 2017 10:34:44 -0400 (EDT)
-Received: from mail-vk0-f53.google.com (mail-vk0-f53.google.com
- [209.85.213.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 414AB40D14
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Jul 2017 10:34:44 -0400 (EDT)
-Received: by mail-vk0-f53.google.com with SMTP id i187so1071896vke.4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Jul 2017 07:35:34 -0700 (PDT)
-Received: from mail-vk0-f45.google.com (mail-vk0-f45.google.com.
- [209.85.213.45])
- by smtp.gmail.com with ESMTPSA id p18sm39744vkp.26.2017.07.19.07.35.31
- for <kvmarm@lists.cs.columbia.edu>
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 19 Jul 2017 07:35:31 -0700 (PDT)
-Received: by mail-vk0-f45.google.com with SMTP id p193so1130132vkd.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Jul 2017 07:35:31 -0700 (PDT)
-In-Reply-To: <20170719084938.GA11435@cbox>
+ with ESMTP id RbX4BC6edZ3O for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 Jul 2017 12:01:49 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DB7E40D43
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Jul 2017 12:01:49 -0400 (EDT)
+In-Reply-To: <1500480092-28480-1-git-send-email-mark.rutland@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -40,85 +27,168 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>
-Cc: KVM General <kvm@vger.kernel.org>, david.daney@cavium.com, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, stefan@hello-penguin.com, corbet@lwn.net, daniel.lezcano@linaro.org, linux@armlinux.org.uk, arm-mail-list <linux-arm-kernel@lists.infradead.org>, andy.gross@linaro.org, Marc Zyngier <marc.zyngier@arm.com>, Bandan Das <bsd@redhat.com>, cov@codeaurora.org, wcohen@redhat.com, mchehab@kernel.org, ard.biesheuvel@linaro.org, linux-doc@vger.kernel.org, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, akpm@linux-foundation.org
+To: linux-arm-kernel@lists.infradead.org
+Cc: linux-arch@vger.kernel.org, arnd@arndb.de, jiong.wang@arm.com, marc.zyngier@arm.com, catalin.marinas@arm.com, yao.qi@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, Dave.Martin@arm.com, kernel-hardening@lists.openwall.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gV2VkLCBKdWwgMTksIDIwMTcgYXQgNDo0OSBBTSwgQ2hyaXN0b2ZmZXIgRGFsbCA8Y2RhbGxA
-bGluYXJvLm9yZz4gd3JvdGU6Cj4gSGkgSmludGFjaywKPgo+IE9uIFR1ZSwgSnVsIDE4LCAyMDE3
-IGF0IDEwOjIzOjA1UE0gLTA0MDAsIEppbnRhY2sgTGltIHdyb3RlOgo+PiBPbiBUdWUsIEp1bCAx
-OCwgMjAxNyBhdCAxMjo1OCBQTSwgSmludGFjayBMaW0gPGppbnRhY2subGltQGxpbmFyby5vcmc+
-IHdyb3RlOgo+PiA+IE5lc3RlZCB2aXJ0dWFsaXphdGlvbiBpcyB0aGUgYWJpbGl0eSB0byBydW4g
-YSB2aXJ0dWFsIG1hY2hpbmUgaW5zaWRlIGFub3RoZXIKPj4gPiB2aXJ0dWFsIG1hY2hpbmUuIElu
-IG90aGVyIHdvcmRzLCBpdOKAmXMgYWJvdXQgcnVubmluZyBhIGh5cGVydmlzb3IgKHRoZSBndWVz
-dAo+PiA+IGh5cGVydmlzb3IpIG9uIHRvcCBvZiBhbm90aGVyIGh5cGVydmlzb3IgKHRoZSBob3N0
-IGh5cGVydmlzb3IpLgo+PiA+Cj4+ID4gU3VwcG9ydGluZyBuZXN0ZWQgdmlydHVhbGl6YXRpb24g
-b24gQVJNIG1lYW5zIHRoYXQgdGhlIGh5cGVydmlzb3IgcHJvdmlkZXMgbm90Cj4+ID4gb25seSBF
-TDAvRUwxIGV4ZWN1dGlvbiBlbnZpcm9ubWVudCB0byBWTXMgYXMgaXQgdXN1YWxseSBkb2VzIGJ1
-dCBhbHNvIHRoZQo+PiA+IHZpcnR1YWxpemF0aW9uIGV4dGVuc2lvbnMgaW5jbHVkaW5nIEVMMiBl
-eGVjdXRpb24gZW52aXJvbm1lbnQuIE9uY2UgdGhlIGhvc3QKPj4gPiBoeXBlcnZpc29yIHByb3Zp
-ZGVzIHRob3NlIGV4ZWN1dGlvbiBlbnZpcm9ubWVudHMgdG8gdGhlIFZNcywgdGhlbiB0aGUgZ3Vl
-c3QKPj4gPiBoeXBlcnZpc29yIGNhbiBydW4gaXRzIG93biBWTXMgKG5lc3RlZCBWTXMpIG5hdHVy
-YWxseS4KPj4gPgo+PiA+IFRoaXMgc2VyaWVzIHN1cHBvcnRzIG5lc3RlZCB2aXJ0dWFsaXphdGlv
-biBvbiBhcm02NC4gQVJNIHJlY2VudGx5IGFubm91bmNlZCBhbgo+PiA+IGV4dGVuc2lvbiAoQVJN
-djguMykgd2hpY2ggaGFzIHN1cHBvcnQgZm9yIG5lc3RlZCB2aXJ0dWFsaXphdGlvblsxXS4gVGhp
-cyBwYXRjaAo+PiA+IHNldCBpcyBiYXNlZCBvbiB0aGUgQVJNdjguMyBzcGVjaWZpY2F0aW9uIGFu
-ZCB0ZXN0ZWQgb24gdGhlIEZhc3RNb2RlbCB3aXRoCj4+ID4gQVJNdjguMyBleHRlbnNpb24uCj4+
-ID4KPj4gPiBUaGUgd2hvbGUgcGF0Y2ggc2V0IHRvIHN1cHBvcnQgbmVzdGVkIHZpcnR1YWxpemF0
-aW9uIGlzIGh1Z2Ugb3ZlciA3MAo+PiA+IHBhdGNoZXMsIHNvIEkgY2F0ZWdvcml6ZWQgdGhlbSBp
-bnRvIGZvdXIgcGFydHM6IENQVSwgbWVtb3J5LCBWR0lDLCBhbmQgdGltZXIKPj4gPiB2aXJ0dWFs
-aXphdGlvbi4gVGhpcyBwYXRjaCBzZXJpZXMgaXMgdGhlIGZpcnN0IHBhcnQuCj4+ID4KPj4gPiBD
-UFUgdmlydHVhbGl6YXRpb24gcGF0Y2ggc2VyaWVzIHByb3ZpZGVzIGJhc2ljIG5lc3RlZCB2aXJ0
-dWFsaXphdGlvbiBmcmFtZXdvcmsKPj4gPiBhbmQgaW5zdHJ1Y3Rpb24gZW11bGF0aW9ucyBpbmNs
-dWRpbmcgdjguMSBWSEUgZmVhdHVyZSBhbmQgdjguMyBuZXN0ZWQKPj4gPiB2aXJ0dWFsaXphdGlv
-biBmZWF0dXJlIGZvciBWTXMuCj4+ID4KPj4gPiBUaGlzIHBhdGNoIHNlcmllcyBhZ2FpbiBjYW4g
-YmUgZGl2aWRlZCBpbnRvIGZvdXIgcGFydHMuIFBhdGNoIDEgdG8gNSBpbnRyb2R1Y2VzCj4+ID4g
-bmVzdGVkIHZpcnR1YWxpemF0aW9uIGJ5IGRpc2NvdmVyaW5nIGhhcmR3YXJlIGZlYXR1cmUsIGFk
-ZGluZyBhIGtlcm5lbAo+PiA+IHBhcmFtZXRlciBhbmQgYWxsb3dpbmcgdGhlIHVzZXJzcGFjZSB0
-byBzZXQgdGhlIGluaXRpYWwgQ1BVIG1vZGUgdG8gRUwyLgo+PiA+Cj4+ID4gUGF0Y2ggNiB0byAy
-NSBhcmUgdG8gc3VwcG9ydCB0aGUgRUwyIGV4ZWN1dGlvbiBlbnZpcm9ubWVudCwgdGhlIHZpcnR1
-YWwgRUwyLCB0bwo+PiA+IGEgVk0gb24gdjguMCBhcmNoaXRlY3R1cmUuIFdlIGRlLXByaXZpbGVn
-ZSB0aGUgZ3Vlc3QgaHlwZXJ2aXNvciBhbmQgZW11bGF0ZSB0aGUKPj4gPiB2aXJ0dWFsIEVMMiBt
-b2RlIGluIEVMMSB1c2luZyB0aGUgaGFyZHdhcmUgZmVhdHVyZXMgcHJvdmlkZWQgYnkgQVJNdjgu
-MzsgVGhlCj4+ID4gaG9zdCBoeXBlcnZpc29yIG1hbmFnZXMgdmlydHVhbCBFTDIgcmVnaXN0ZXIg
-c3RhdGUgZm9yIHRoZSBndWVzdCBoeXBlcnZpc29yCj4+ID4gYW5kIHNoYWRvdyBFTDEgcmVnaXN0
-ZXIgc3RhdGUgdGhhdCByZWZsZWN0cyB0aGUgdmlydHVhbCBFTDIgcmVnaXN0ZXIgc3RhdGUgdG8K
-Pj4gPiBydW4gdGhlIGd1ZXN0IGh5cGVydmlzb3IgaW4gRUwxLgo+PiA+Cj4+ID4gUGF0Y2ggMjYg
-dG8gMzMgYWRkIHN1cHBvcnQgZm9yIHRoZSB2aXJ0dWFsIEVMMiB3aXRoIFZpcnR1YWxpemF0aW9u
-IEhvc3QKPj4gPiBFeHRlbnNpb25zLiBUaGVzZSBwYXRjaGVzIGVtdWxhdGUgbmV3bHkgZGVmaW5l
-ZCByZWdpc3RlcnMgYW5kIGJpdHMgaW4gdjguMSBhbmQKPj4gPiBhbGxvdyB0aGUgdmlydHVhbCBF
-TDIgdG8gYWNjZXNzIEVMMiByZWdpc3RlciBzdGF0ZXMgdmlhIEVMMSByZWdpc3RlciBhY2Nlc3Nl
-cwo+PiA+IGFzIGluIHRoZSByZWFsIEVMMi4KPj4gPgo+PiA+IFBhdGNoIDM0IHRvIDM4IGFyZSB0
-byBzdXBwb3J0IGZvciB0aGUgdmlydHVhbCBFTDIgd2l0aCBuZXN0ZWQgdmlydHVhbGl6YXRpb24u
-Cj4+ID4gVGhlc2UgZW5hYmxlIHJlY3Vyc2l2ZSBuZXN0ZWQgdmlydHVhbGl6YXRpb24uCj4+ID4K
-Pj4gPiBUaGlzIHBhdGNoIHNldCBpcyB0ZXN0ZWQgb24gdGhlIEZhc3RNb2RlbCB3aXRoIHRoZSB2
-OC4zIGV4dGVuc2lvbiBmb3IgYXJtNjQgYW5kCj4+ID4gYSBjdWJpZXRydWNrIGZvciBhcm0zMi4g
-T24gdGhlIEZhc3RNb2RlbCwgdGhlIGhvc3QgYW5kIHRoZSBndWVzdCBrZXJuZWxzIGFyZQo+PiA+
-IGNvbXBpbGVkIHdpdGggYW5kIHdpdGhvdXQgVkhFLCBzbyB0aGVyZSBhcmUgZm91ciBjb21iaW5h
-dGlvbnMuIEkgd2FzIGFibGUgdG8KPj4gPiBib290IFNNUCBMaW51eCBpbiB0aGUgbmVzdGVkIFZN
-IG9uIGFsbCBmb3VyIGNvbmZpZ3VyYXRpb25zIGFuZCBhYmxlIHRvIHJ1bgo+PiA+IGhhY2tiZW5j
-aC4gSSBhbHNvIGNoZWNrZWQgdGhhdCByZWd1bGFyIFZNcyBjb3VsZCBib290IHdoZW4gdGhlIG5l
-c3RlZAo+PiA+IHZpcnR1YWxpemF0aW9uIGtlcm5lbCBwYXJhbWV0ZXIgd2FzIG5vdCBzZXQuIE9u
-IHRoZSBjdWJpZXRydWNrLCBJIGFsc28gdmVyaWZpZWQKPj4gPiB0aGF0IHJlZ3VsYXIgVk1zIGNv
-dWxkIGJvb3QgYXMgd2VsbC4KPj4gPgo+PiA+IEknbGwgc2hhcmUgbXkgZXhwZXJpbWVudCBzZXR1
-cCBzaG9ydGx5Lgo+Pgo+PiBJIHN1bW1hcml6ZWQgbXkgZXhwZXJpbWVudCBzZXR1cCBoZXJlLgo+
-Pgo+PiBodHRwczovL2dpdGh1Yi5jb20vY29sdW1iaWEvbmVzdGluZy1wdWIvd2lraS9OZXN0ZWQt
-dmlydHVhbGl6YXRpb24tb24tQVJNLXNldHVwCj4+Cj4KPiBUaGFua3MgZm9yIHNoYXJpbmcgdGhp
-cy4KPgo+PiA+Cj4+ID4gRXZlbiB0aG91Z2ggdGhpcyB3b3JrIGhhcyBzb21lIGxpbWl0YXRpb25z
-IGFuZCBUT0RPcywgSSdkIGFwcHJlY2lhdGUgZWFybHkKPj4gPiBmZWVkYmFjayBvbiB0aGlzIFJG
-Qy4gU3BlY2lmaWNhbGx5LCBJJ20gaW50ZXJlc3RlZCBpbjoKPj4gPgo+PiA+IC0gT3ZlcmFsbCBk
-ZXNpZ24gdG8gbWFuYWdlIHZjcHUgY29udGV4dCBmb3IgdGhlIHZpcnR1YWwgRUwyCj4+ID4gLSBW
-ZXJpZnlpbmcgY29ycmVjdCBFTDIgcmVnaXN0ZXIgY29uZmlndXJhdGlvbnMgc3VjaCBhcyBIQ1Jf
-RUwyLCBDUFRSX0VMMgo+PiA+ICAgKFBhdGNoIDMwIGFuZCAzMikKPj4gPiAtIFBhdGNoIG9yZ2Fu
-aXphdGlvbiBhbmQgY29kaW5nIHN0eWxlCj4+Cj4+IEkgYWxzbyB3b25kZXIgaWYgdGhlIGhhcmR3
-YXJlIGFuZC9vciBLVk0gZG8gbm90IHN1cHBvcnQgbmVzdGVkCj4+IHZpcnR1YWxpemF0aW9uIGJ1
-dCB0aGUgdXNlcnNwYWNlIHVzZXMgbmVzdGVkIHZpcnR1YWxpemF0aW9uIG9wdGlvbiwKPj4gd2hp
-Y2ggb25lIGlzIGJldHRlcjogZ2l2aW5nIGFuIGVycm9yIG9yIGxhdW5jaGluZyBhIHJlZ3VsYXIg
-Vk0KPj4gc2lsZW50bHkuCj4+Cj4KPiBJIHRoaW5rIEtWTSBzaG91bGQgY29tcGxhaW4gdG8gdXNl
-cnNwYWNlIGlmIHVzZXJzcGFjZSB0cmllcyB0byBzZXQgYQo+IGZlYXR1cmUgaXQgZG9lcyBub3Qg
-c3VwcG9ydCwgYW5kIEkgdGhpbmsgdXNlcnNwYWNlIHNob3VsZCBnaXZlIGFzCj4gbWVhbmluZ2Z1
-bCBhbiBlcnJvciBtZXNzYWdlIGFzIHBvc3NpYmxlIHRvIHRoZSB1c2VyIHdoZW4gdGhhdCBoYXBw
-ZW5zLgo+CgpPaywgdGhhbmtzLiBJJ2xsIHdvcmsgdGhpcyBvdXQuCgo+IFRoYW5rcywKPiAtQ2hy
-aXN0b2ZmZXIKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18K
-a3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8v
-bGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+We don't document our ELF hwcaps, leaving developers to interpret them
+according to hearsay, guesswork, or (in exceptional cases) inspection of
+the current kernel code.
+
+This is less than optimal, and it would be far better if we had some
+definitive description of each of the ELF hwcaps that developers could
+refer to.
+
+This patch adds a document describing the (native) arm64 ELF hwcaps.
+
+Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Dave Martin <Dave.Martin@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
+---
+ Documentation/arm64/elf_hwcaps.txt | 133 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 133 insertions(+)
+ create mode 100644 Documentation/arm64/elf_hwcaps.txt
+
+diff --git a/Documentation/arm64/elf_hwcaps.txt b/Documentation/arm64/elf_hwcaps.txt
+new file mode 100644
+index 0000000..7bc2921
+--- /dev/null
++++ b/Documentation/arm64/elf_hwcaps.txt
+@@ -0,0 +1,133 @@
++ARM64 ELF hwcaps
++================
++
++This document describes the usage and semantics of the arm64 ELF hwcaps.
++
++
++1. Introduction
++---------------
++
++Some hardware or software features are only available on some CPU
++implementations, and/or with certain kernel configurations, but have no
++architected discovery mechanism available to userspace code at EL0. The
++kernel exposes the presence of these features to userspace through a set
++of flags called hwcaps, exposed in the auxilliary vector.
++
++Userspace software can test for features by acquiring the AT_HWCAP entry
++of the auxilliary vector, and testing whether the relevant flags are
++set, e.g.
++
++bool floating_point_is_present(void)
++{
++	unsigned long hwcaps = getauxval(AT_HWCAP);
++	if (hwcaps & HWCAP_FP)
++		return true;
++
++	return false;
++}
++
++Where software relies on a feature described by a hwcap, it should check
++the relevant hwcap flag to verify that the feature is present before
++attempting to make use of the feature.
++
++Features cannot be probed reliably through other means. When a feature
++is not available, attempting to use it may result in unpredictable
++behaviour, and is not guaranteed to result in any reliable indication
++that the feature is unavailable, such as a SIGILL.
++
++
++2. Interpretation of hwcaps
++---------------------------
++
++The majority of hwcaps are intended to indicate the presence of features
++which are described by architected ID registers inaccessible to
++userspace code at EL0. These hwcaps are defined in terms of ID register
++fields, and should be interpreted with reference to the definition of
++these fields in the ARM Architecture Reference Manual (ARM ARM).
++
++Such hwcaps are described below in the form:
++
++    Functionality implied by idreg.field == val.
++
++Such hwcaps indicate the availability of functionality that the ARM ARM
++defines as being present when idreg.field has value val, but do not
++indicate that idreg.field is precisely equal to val, nor do they
++indicate the absence of functionality implied by other values of
++idreg.field.
++
++Other hwcaps may indicate the presence of features which cannot be
++described by ID registers alone. These may be described without
++reference to ID registers, and may refer to other documentation.
++
++
++3. The hwcaps exposed in AT_HWCAP
++---------------------------------
++
++HWCAP_FP
++
++    Functionality implied by ID_AA64PFR0_EL1.FP == 0b0000.
++
++HWCAP_ASIMD
++
++    Functionality implied by ID_AA64PFR0_EL1.AdvSIMD == 0b0000.
++
++HWCAP_EVTSTRM
++
++    The generic timer is configured to generate events at a frequency of
++    approximately 100KHz.
++
++HWCAP_AES
++
++    Functionality implied by ID_AA64ISAR1_EL1.AES == 0b0001.
++
++HWCAP_PMULL
++
++    Functionality implied by ID_AA64ISAR1_EL1.AES == 0b0010.
++
++HWCAP_SHA1
++
++    Functionality implied by ID_AA64ISAR0_EL1.SHA1 == 0b0001.
++
++HWCAP_SHA2
++
++    Functionality implied by ID_AA64ISAR0_EL1.SHA2 == 0b0001.
++
++HWCAP_CRC32
++
++    Functionality implied by ID_AA64ISAR0_EL1.CRC32 == 0b0001.
++
++HWCAP_ATOMICS
++
++    Functionality implied by ID_AA64ISAR0_EL1.Atomic == 0b0010.
++
++HWCAP_FPHP
++
++    Functionality implied by ID_AA64PFR0_EL1.FP == 0b0001.
++
++HWCAP_ASIMDHP
++
++    Functionality implied by ID_AA64PFR0_EL1.AdvSIMD == 0b0001.
++
++HWCAP_CPUID
++
++    EL0 access to certain ID registers is available, to the extent
++    described by Documentation/arm64/cpu-feature-registers.txt.
++
++    These ID registers may imply the availability of features.
++
++HWCAP_ASIMDRDM
++
++    Functionality implied by ID_AA64ISAR0_EL1.RDM == 0b0001.
++
++HWCAP_JSCVT
++
++    Functionality implied by ID_AA64ISAR1_EL1.JSCVT == 0b0001.
++
++HWCAP_FCMA
++
++    Functionality implied by ID_AA64ISAR1_EL1.FCMA == 0b0001.
++
++HWCAP_LRCPC
++
++    Functionality implied by ID_AA64ISAR1_EL1.LRCPC == 0b0001.
++
+-- 
+1.9.1
