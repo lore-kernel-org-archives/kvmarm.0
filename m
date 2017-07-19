@@ -1,73 +1,84 @@
 From: Mark Rutland <mark.rutland@arm.com>
-Subject: [PATCH 04/11] arm64/cpufeature: add ARMv8.3 id_aa64isar1 bits
-Date: Wed, 19 Jul 2017 17:01:25 +0100
-Message-ID: <1500480092-28480-5-git-send-email-mark.rutland@arm.com>
+Subject: [PATCH 06/11] arm64: Don't trap host pointer auth use to EL2
+Date: Wed, 19 Jul 2017 17:01:27 +0100
+Message-ID: <1500480092-28480-7-git-send-email-mark.rutland@arm.com>
 References: <1500480092-28480-1-git-send-email-mark.rutland@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 59E0D41260
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Jul 2017 12:02:06 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id M4THyDyUvx18 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 19 Jul 2017 12:02:05 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 421744104E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Jul 2017 12:02:05 -0400 (EDT)
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1500480092-28480-1-git-send-email-mark.rutland@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: linux-kernel-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org
-Cc: linux-arch@vger.kernel.org, arnd@arndb.de, jiong.wang@arm.com, marc.zyngier@arm.com, catalin.marinas@arm.com, yao.qi@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, Dave.Martin@arm.com, kernel-hardening@lists.openwall.com, kvmarm@lists.cs.columbia.edu
+Cc: arnd@arndb.de, catalin.marinas@arm.com, christoffer.dall@linaro.org, Dave.Martin@arm.com, jiong.wang@arm.com, kvmarm@lists.cs.columbia.edu, linux-arch@vger.kernel.org, marc.zyngier@arm.com, mark.rutland@arm.com, suzuki.poulose@arm.com, will.deacon@arm.com, yao.qi@arm.com, linux-kernel@vger.kernel.org, kernel-hardening@lists.openwall.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
->From ARMv8.3 onwards, ID_AA64ISAR1 is no longer entirely RES0, and now
-has four fields describing the presence of pointer authentication
-functionality:
+To allow EL0 (and/or EL1) to use pointer authentication functionality,
+we must ensure that pointer authentication instructions and accesses to
+pointer authentication keys are not trapped to EL2 (where we will not be
+able to handle them).
 
-* APA - address authentication present, using an architected algorithm
-* API - address authentication present, using an IMP DEF algorithm
-* GPA - generic authentication present, using an architected algorithm
-* GPI - generic authentication present, using an IMP DEF algoithm
+This patch ensures that HCR_EL2 is configured appropriately when the
+kernel is booted at EL2. For non-VHE kernels we set HCR_EL2.{API,APK},
+ensuring that EL1 can access keys and permit EL0 use of instructions.
+For VHE kernels, EL2 access is controlled by EL3, and we need not set
+anything.
 
-This patch adds the requisite definitions so that we can identify the
-presence of this functionality. For the timebeing, the features are
-hidden from userspace.
+This does not enable support for KVM guests, since KVM manages HCR_EL2
+itself.
 
 Signed-off-by: Mark Rutland <mark.rutland@arm.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Will Deacon <will.deacon@arm.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu
 ---
- arch/arm64/kernel/cpufeature.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_arm.h |  2 ++
+ arch/arm64/kernel/head.S         | 19 +++++++++++++++++--
+ 2 files changed, 19 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 9f9e0064..b23ad83 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -120,7 +120,11 @@ static int __init register_cpu_hwcaps_dumper(void)
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_EXACT, ID_AA64ISAR1_LRCPC_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_EXACT, ID_AA64ISAR1_FCMA_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_EXACT, ID_AA64ISAR1_JSCVT_SHIFT, 4, 0),
--	ARM64_FTR_END,
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_EXACT, ID_AA64ISAR1_GPI_SHIFT, 4, 0),
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_EXACT, ID_AA64ISAR1_GPA_SHIFT, 4, 0),
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_EXACT, ID_AA64ISAR1_API_SHIFT, 4, 0),
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_EXACT, ID_AA64ISAR1_APA_SHIFT, 4, 0),
-+	ARM64_FTR_END
- };
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 61d694c..c1267e8 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -23,6 +23,8 @@
+ #include <asm/types.h>
  
- static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
+ /* Hyp Configuration Register (HCR) bits */
++#define HCR_API		(UL(1) << 41)
++#define HCR_APK		(UL(1) << 40)
+ #define HCR_E2H		(UL(1) << 34)
+ #define HCR_ID		(UL(1) << 33)
+ #define HCR_CD		(UL(1) << 32)
+diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+index 973df7d..8b8e8d7 100644
+--- a/arch/arm64/kernel/head.S
++++ b/arch/arm64/kernel/head.S
+@@ -412,10 +412,25 @@ CPU_LE(	bic	x0, x0, #(1 << 25)	)	// Clear the EE bit for EL2
+ 
+ 	/* Hyp configuration. */
+ 	mov	x0, #HCR_RW			// 64-bit EL1
+-	cbz	x2, set_hcr
++	cbz	x2, 1f
+ 	orr	x0, x0, #HCR_TGE		// Enable Host Extensions
+ 	orr	x0, x0, #HCR_E2H
+-set_hcr:
++1:
++#ifdef CONFIG_ARM64_POINTER_AUTHENTICATION
++	/*
++	 * Disable pointer authentication traps to EL2. The HCR_EL2.{APK,API}
++	 * bits exist iff at least one authentication mechanism is implemented.
++	 */
++	mrs	x1, id_aa64isar1_el1
++	mov_q	x3, ((0xf << ID_AA64ISAR1_GPI_SHIFT) | \
++		     (0xf << ID_AA64ISAR1_GPA_SHIFT) | \
++		     (0xf << ID_AA64ISAR1_API_SHIFT) | \
++		     (0xf << ID_AA64ISAR1_APA_SHIFT))
++	and	x1, x1, x3
++	cbz	x1, 1f
++	orr	x0, x0, #(HCR_APK | HCR_API)
++1:
++#endif
+ 	msr	hcr_el2, x0
+ 	isb
+ 
 -- 
 1.9.1
