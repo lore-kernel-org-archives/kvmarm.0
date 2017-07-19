@@ -1,90 +1,80 @@
-From: Sudeep Holla <sudeep.holla@arm.com>
-Subject: Re: [PATCH] arm64: kvm: reuse existing cache type/info related macros
-Date: Wed, 19 Jul 2017 10:13:17 +0100
-Message-ID: <f934c7d0-5568-f018-f2f8-978686d5b076@arm.com>
-References: <1498759604-7564-1-git-send-email-sudeep.holla@arm.com>
- <20170719090159.GC11435@cbox>
+From: Dave Martin <Dave.Martin-5wv7dgnIgG8@public.gmane.org>
+Subject: Re: [PATCH 07/11] firmware: arm_sdei: Add driver for Software
+ Delegated Exceptions
+Date: Wed, 19 Jul 2017 14:52:31 +0100
+Message-ID: <20170719135213.GA1538@e103592.cambridge.arm.com>
+References: <20170515174400.29735-1-james.morse@arm.com>
+ <20170515174400.29735-8-james.morse@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170719090159.GC11435@cbox>
-Content-Language: en-US
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <cdall@linaro.org>
-Cc: Sudeep Holla <sudeep.holla@arm.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20170515174400.29735-8-james.morse-5wv7dgnIgG8@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+Cc: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 19/07/17 10:01, Christoffer Dall wrote:
-> On Thu, Jun 29, 2017 at 07:06:44PM +0100, Sudeep Holla wrote:
->> We already have various macros related to cache type and bitfields in
->> CLIDR system register. We can replace some of the hardcoded values
->> here using those existing macros.
->>
->> This patch reuses those existing cache type/info related macros and
->> replaces the hardcorded values. It also removes some of the comments
->> that become trivial with the macro names.
->>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: Will Deacon <will.deacon@arm.com>
->> Cc: Christoffer Dall <christoffer.dall@linaro.org>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
->> ---
->>  arch/arm64/include/asm/cache.h |  7 +++++++
->>  arch/arm64/kernel/cacheinfo.c  |  7 -------
->>  arch/arm64/kvm/sys_regs.c      | 29 +++++++++++++++--------------
->>  3 files changed, 22 insertions(+), 21 deletions(-)
->>
+On Mon, May 15, 2017 at 06:43:55PM +0100, James Morse wrote:
+> The Software Delegated Exception Interface (SDEI) is an ARM standard
+> for registering callbacks from the platform firmware into the OS.
+> This is typically used to implement RAS notifications.
+> 
+> Add the code for detecting the SDEI version and the framework for
+> registering and unregistering events. Subsequent patches will add the
+> arch-specific backend code and the necessary power management hooks.
+> 
+> Currently only shared events are supported.
+> 
+> Signed-off-by: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+> ---
+>  drivers/firmware/Kconfig    |   7 +
+>  drivers/firmware/Makefile   |   1 +
+>  drivers/firmware/arm_sdei.c | 606 ++++++++++++++++++++++++++++++++++++++++++++
+>  include/linux/sdei.h        |  98 +++++++
+>  include/uapi/linux/sdei.h   |  91 +++++++
+>  5 files changed, 803 insertions(+)
+>  create mode 100644 drivers/firmware/arm_sdei.c
+>  create mode 100644 include/linux/sdei.h
+>  create mode 100644 include/uapi/linux/sdei.h
 
 [...]
->>  /* Which cache CCSIDR represents depends on CSSELR value. */
->>  static u32 get_ccsidr(u32 csselr)
->> @@ -1894,19 +1896,18 @@ static bool is_valid_cache(u32 val)
->>  		return false;
->>  
->>  	/* Bottom bit is Instruction or Data bit.  Next 3 bits are level. */
->> -	level = (val >> 1);
->> -	ctype = (cache_levels >> (level * 3)) & 7;
->> +	level = (val >> 1) + 1;
->> +	ctype = CLIDR_CTYPE(cache_levels, level);
->>  
->>  	switch (ctype) {
->> -	case 0: /* No cache */
->> -		return false;
->> -	case 1: /* Instruction cache only */
->> -		return (val & 1);
->> -	case 2: /* Data cache only */
->> -	case 4: /* Unified cache */
->> -		return !(val & 1);
->> -	case 3: /* Separate instruction and data caches */
->> +	case CACHE_TYPE_INST:
->> +		return (val & CACHE_TYPE_INST);
->> +	case CACHE_TYPE_DATA:
->> +	case CACHE_TYPE_UNIFIED:
->> +		return !(val & CACHE_TYPE_INST);
->> +	case CACHE_TYPE_SEPARATE:
->>  		return true;
->> +	case CACHE_TYPE_NOCACHE:
->>  	default: /* Reserved: we can't know instruction or data. */
->>  		return false;
->>  	}
-> 
-> These defines seem to be arch-generic concepts defined in
-> include/linux/cacheinfo.h.  Are they guaranteed to not change and
-> therefore always match the format of ARM registers?
-> 
 
-Indeed, I have added the mapping code for other architectures which
-doesn't match. We can do the same when ARM deviates :)
+> diff --git a/drivers/firmware/arm_sdei.c b/drivers/firmware/arm_sdei.c
+> new file mode 100644
+> index 000000000000..d22dda5e0fed
+> --- /dev/null
+> +++ b/drivers/firmware/arm_sdei.c
+> @@ -0,0 +1,606 @@
 
-> Otherwise, this looks good to me.
->
+[...]
 
-Thanks, Will/Marc had requested to repost after -rc1, will do that ASAP.
+> +int sdei_mask_local_cpu(unsigned int cpu)
+> +{
+> +	int err;
+> +	struct arm_smccc_res res;
+> +
+> +	WARN_ON(preemptible());
+> +	err = invoke_sdei_fn(&res, SDEI_1_0_FN_SDEI_PE_MASK, 0, 0, 0, 0, 0);
 
--- 
-Regards,
-Sudeep
+Randomly responding to an old patch here...
+
+
+It seems awkward to have to declare res repeatedly when it's basically
+unused.  Several callsites seem to do this.  Out of context, this looks
+bug-like (though it's not a bug).
+
+Could we make it explicit that the results other than x0 are unwanted by
+passing NULL instead?
+
+invoke_sdei_fn (or some downstream function) could declare its own res
+for this case, but at least we'd only have to do that in one place.
+arm_smccc_smc() and friends (at least the C interface in the headers)
+could do something similar.
+
+Cheers
+---Dave
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
