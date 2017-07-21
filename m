@@ -1,167 +1,182 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v2 6/8] KVM: arm/arm64: vgic: Implement forwarding setting
-Date: Fri, 21 Jul 2017 15:13:46 +0200
-Message-ID: <20170721131346.GH16350@cbox>
+Subject: Re: [PATCH v2 8/8] KVM: arm/arm64: register DEOI irq bypass consumer
+ on ARM/ARM64
+Date: Fri, 21 Jul 2017 15:25:06 +0200
+Message-ID: <20170721132506.GI16350@cbox>
 References: <1497531160-29162-1-git-send-email-eric.auger@redhat.com>
- <1497531160-29162-7-git-send-email-eric.auger@redhat.com>
+ <1497531160-29162-9-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F13240FAE
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Jul 2017 09:24:15 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id c4X18FOnTYUt for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 21 Jul 2017 09:24:14 -0400 (EDT)
+Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 13FE840D1A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Jul 2017 09:24:13 -0400 (EDT)
+Received: by mail-wm0-f49.google.com with SMTP id v139so3678960wmv.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Jul 2017 06:25:08 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1497531160-29162-7-git-send-email-eric.auger@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <1497531160-29162-9-git-send-email-eric.auger@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, alex.williamson@redhat.com, b.reynal@virtualopensystems.com, pbonzini@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, drjones@redhat.com, wei@redhat.com
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, alex.williamson@redhat.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jun 15, 2017 at 02:52:38PM +0200, Eric Auger wrote:
-> Implements kvm_vgic_[set|unset]_forwarding.
+On Thu, Jun 15, 2017 at 02:52:40PM +0200, Eric Auger wrote:
+> This patch selects IRQ_BYPASS_MANAGER and HAVE_KVM_IRQ_BYPASS
+> configs for ARM/ARM64.
 > 
-> Handle low-level VGIC programming and consistent irqchip
-> programming.
+> kvm_arch_has_irq_bypass() now is implemented and returns true.
+> As a consequence the irq bypass consumer will be registered for
+> ARM/ARM64 with Direct EOI/IRQ forwarding callbacks:
+> 
+> - stop/start: halt/resume guest execution
+> - add/del_producer: set/unset forwarding/DEOI at vgic/irqchip level
+> 
+> The consumer currently only works with a VFIO_PLATFORM producer.
+> In other cases, start/stop do nothing and return without error
+> to avoid outputting a spurious warning.
 > 
 > Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > 
 > ---
 > 
 > v1 -> v2:
-> - change the parameter names used in the declaration
-> - use kvm_vgic_map/unmap_phys_irq and handle their returned value
+> - check the type of the producer to avoid attachement with VFIO-PCI
+>   dummy MSI producer
 > ---
->  include/kvm/arm_vgic.h   |  5 +++
->  virt/kvm/arm/vgic/vgic.c | 88 ++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 93 insertions(+)
+>  arch/arm/kvm/Kconfig   |  3 +++
+>  arch/arm64/kvm/Kconfig |  3 +++
+>  virt/kvm/arm/arm.c     | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 54 insertions(+)
 > 
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index cceb31d..5064a57 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -343,4 +343,9 @@ int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi);
->   */
->  int kvm_vgic_setup_default_irq_routing(struct kvm *kvm);
+> diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
+> index 90d0176..4e2b192 100644
+> --- a/arch/arm/kvm/Kconfig
+> +++ b/arch/arm/kvm/Kconfig
+> @@ -3,6 +3,7 @@
+>  #
 >  
-> +int kvm_vgic_set_forwarding(struct kvm *kvm, unsigned int host_irq,
-> +			    unsigned int vintid);
-> +void kvm_vgic_unset_forwarding(struct kvm *kvm, unsigned int host_irq,
-> +			       unsigned int vintid);
-> +
->  #endif /* __KVM_ARM_VGIC_H */
-> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> index 2e35ac7..9ee3e77 100644
-> --- a/virt/kvm/arm/vgic/vgic.c
-> +++ b/virt/kvm/arm/vgic/vgic.c
-> @@ -781,3 +781,91 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int vintid)
->  	return map_is_active;
+>  source "virt/kvm/Kconfig"
+> +source "virt/lib/Kconfig"
+>  
+>  menuconfig VIRTUALIZATION
+>  	bool "Virtualization"
+> @@ -35,6 +36,8 @@ config KVM
+>  	select HAVE_KVM_IRQCHIP
+>  	select HAVE_KVM_IRQ_ROUTING
+>  	select HAVE_KVM_MSI
+> +	select IRQ_BYPASS_MANAGER
+> +	select HAVE_KVM_IRQ_BYPASS
+>  	depends on ARM_VIRT_EXT && ARM_LPAE && ARM_ARCH_TIMER
+>  	---help---
+>  	  Support hosting virtualized guest machines.
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index 52cb7ad..7e0d6e6 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -3,6 +3,7 @@
+>  #
+>  
+>  source "virt/kvm/Kconfig"
+> +source "virt/lib/Kconfig"
+>  
+>  menuconfig VIRTUALIZATION
+>  	bool "Virtualization"
+> @@ -35,6 +36,8 @@ config KVM
+>  	select HAVE_KVM_MSI
+>  	select HAVE_KVM_IRQCHIP
+>  	select HAVE_KVM_IRQ_ROUTING
+> +	select IRQ_BYPASS_MANAGER
+> +	select HAVE_KVM_IRQ_BYPASS
+>  	---help---
+>  	  Support hosting virtualized guest machines.
+>  	  We don't support KVM with 16K page tables yet, due to the multiple
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index 3417e18..58871f8 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -27,6 +27,8 @@
+>  #include <linux/mman.h>
+>  #include <linux/sched.h>
+>  #include <linux/kvm.h>
+> +#include <linux/kvm_irqfd.h>
+> +#include <linux/irqbypass.h>
+>  #include <trace/events/kvm.h>
+>  #include <kvm/arm_pmu.h>
+>  
+> @@ -1420,6 +1422,52 @@ struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr)
+>  	return NULL;
 >  }
 >  
-> +/**
-> + * kvm_vgic_set_forwarding - Set IRQ forwarding
-> + *
-> + * @kvm: kvm handle
-> + * @host_irq: the host linux IRQ
-> + * @vintid: the virtual INTID
-> + *
-> + * This function must be called when the IRQ is not active:
-> + * ie. not active at GIC level and not currently under injection
-> + * into the guest using the unforwarded mode. The physical IRQ must
-> + * be disabled and all vCPUs must have been exited and prevented
-> + * from being re-entered.
-> + */
-> +int kvm_vgic_set_forwarding(struct kvm *kvm, unsigned int host_irq,
-> +			    unsigned int vintid)
+> +bool kvm_arch_has_irq_bypass(void)
 > +{
-> +	struct kvm_vcpu *vcpu;
-> +	struct vgic_irq *irq;
-> +	int ret;
-> +
-> +	kvm_debug("%s host_irq=%d vintid=%d\n", __func__, host_irq, vintid);
-
-do you need to check if the vgic is initialized etc. here?
-
-> +
-> +	if (!vgic_valid_spi(kvm, vintid))
-> +		return -EINVAL;
-> +
-> +	irq = vgic_get_irq(kvm, NULL, vintid);
-> +	spin_lock(&irq->irq_lock);
-> +
-> +	if (irq->hw) {
-> +		ret = -EINVAL;
-
-is this because it's already forwarded?  How about EBUSY or EEXIST
-instead then?
-
-> +		goto unlock;
-> +	}
-> +	vcpu = irq->target_vcpu;
-> +	if (!vcpu) {
-> +		ret = -EAGAIN;
-
-what is this case exactly?
-
-> +		goto unlock;
-> +	}
-> +	
-> +	ret = kvm_vgic_map_irq(vcpu, irq, host_irq);
-> +	if (!ret)
-> +		irq_set_vcpu_affinity(host_irq, vcpu);
-
-so this is essentially map + set_vcpu_affinity.  Why do we want the GIC
-to do this in one go as opposed to leaving it up to the caller?
-
-> +unlock:
-> +	spin_unlock(&irq->irq_lock);
-> +	vgic_put_irq(kvm, irq);
-> +	return ret;
+> +	return true;
 > +}
 > +
-> +/**
-> + * kvm_vgic_unset_forwarding - Unset IRQ forwarding
-> + *
-> + * @kvm: KVM handle
-> + * @host_irq: the host Linux IRQ number
-> + * @vintid: virtual INTID
-> + *
-> + * This function must be called when the host irq is disabled and
-> + * all vCPUs have been exited and prevented from being re-entered.
-> + */
-> +void kvm_vgic_unset_forwarding(struct kvm *kvm,
-> +			       unsigned int host_irq,
-> +			       unsigned int vintid)
+> +int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
+> +				      struct irq_bypass_producer *prod)
 > +{
-> +	struct vgic_irq *irq;
-> +	bool active;
+> +	struct kvm_kernel_irqfd *irqfd =
+> +		container_of(cons, struct kvm_kernel_irqfd, consumer);
 > +
-> +	kvm_debug("%s host_irq=%d vintid=%d\n", __func__, host_irq, vintid);
-
-do you need to check if the vgic is initialized etc. here?
-
+> +	if (prod->type != IRQ_BYPASS_VFIO_PLATFORM)
+> +		return 0;
 > +
-> +	if (!vgic_valid_spi(kvm, vintid))
+> +	return kvm_vgic_set_forwarding(irqfd->kvm, prod->irq,
+> +				       irqfd->gsi + VGIC_NR_PRIVATE_IRQS);
+> +}
+> +void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
+> +				      struct irq_bypass_producer *prod)
+> +{
+> +	struct kvm_kernel_irqfd *irqfd =
+> +		container_of(cons, struct kvm_kernel_irqfd, consumer);
+> +
+> +	if (prod->type != IRQ_BYPASS_VFIO_PLATFORM)
 > +		return;
 > +
-> +	irq = vgic_get_irq(kvm, NULL, vintid);
-> +	spin_lock(&irq->irq_lock);
-> +
-> +	if (!irq->hw)
-> +		goto unlock;
-> +
-> +	WARN_ON(irq_get_irqchip_state(host_irq, IRQCHIP_STATE_ACTIVE, &active));
-> +
-> +	if (active)
-> +		irq_set_irqchip_state(host_irq, IRQCHIP_STATE_ACTIVE, false);
-> +
-> +	kvm_vgic_unmap_irq(irq);
-> +	irq_set_vcpu_affinity(host_irq, NULL);
-> +
-> +unlock:
-> +	spin_unlock(&irq->irq_lock);
-> +	vgic_put_irq(kvm, irq);
+> +	kvm_vgic_unset_forwarding(irqfd->kvm, prod->irq,
+> +				  irqfd->gsi + VGIC_NR_PRIVATE_IRQS);
 > +}
 > +
+> +void kvm_arch_irq_bypass_stop(struct irq_bypass_consumer *cons)
+> +{
+> +	struct kvm_kernel_irqfd *irqfd =
+> +		container_of(cons, struct kvm_kernel_irqfd, consumer);
+> +
+> +	kvm_arm_halt_guest(irqfd->kvm);
+> +}
+> +
+> +void kvm_arch_irq_bypass_start(struct irq_bypass_consumer *cons)
+> +{
+> +	struct kvm_kernel_irqfd *irqfd =
+> +		container_of(cons, struct kvm_kernel_irqfd, consumer);
+> +
+> +	kvm_arm_resume_guest(irqfd->kvm);
+> +}
+> +
+>  /**
+>   * Initialize Hyp-mode and memory mappings on all CPUs.
+>   */
 > -- 
 > 2.5.5
-> 
+
+Nit: I'm wondering if this should go in a different file, like
+virt/kvm/arm/irqbypass.c, or virt/kvm/arm/vgic/vgic-irqbypass.c ?
 
 Thanks,
 -Christoffer
