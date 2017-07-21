@@ -1,173 +1,220 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: [PATCH 11/11] arm64: docs: document pointer authentication
-Date: Wed, 19 Jul 2017 17:01:32 +0100
-Message-ID: <1500480092-28480-12-git-send-email-mark.rutland@arm.com>
-References: <1500480092-28480-1-git-send-email-mark.rutland@arm.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH v2 4/8] KVM: arm/arm64: vgic: restructure
+ kvm_vgic_(un)map_phys_irq
+Date: Fri, 21 Jul 2017 13:44:39 +0200
+Message-ID: <20170721114439.GE16350@cbox>
+References: <1497531160-29162-1-git-send-email-eric.auger@redhat.com>
+ <1497531160-29162-5-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F2CF49C03
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Jul 2017 12:02:34 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id M9Hj3M4DWiKa for <kvmarm@lists.cs.columbia.edu>;
- Wed, 19 Jul 2017 12:02:32 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A66C49C19
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Jul 2017 12:02:32 -0400 (EDT)
-In-Reply-To: <1500480092-28480-1-git-send-email-mark.rutland@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org
-Cc: linux-arch@vger.kernel.org, arnd@arndb.de, jiong.wang@arm.com, marc.zyngier@arm.com, catalin.marinas@arm.com, yao.qi@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, Dave.Martin@arm.com, kernel-hardening@lists.openwall.com, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1497531160-29162-5-git-send-email-eric.auger@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, alex.williamson@redhat.com, b.reynal@virtualopensystems.com, pbonzini@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now that we've added code to support pointer authentication, add some
-documentation so that people can figure out if/how to use it.
+On Thu, Jun 15, 2017 at 02:52:36PM +0200, Eric Auger wrote:
+> We want to reuse the core of the map/unmap functions for IRQ
+> forwarding. Let's move the computation of the hwirq in
+> kvm_vgic_map_phys_irq and pass the linux IRQ as parameter.
+> the host_irq is added to struct vgic_irq.
+> 
+> We introduce kvm_vgic_map/unmap_irq which take a struct vgic_irq
+> handle as a parameter.
 
-Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Jiong Wang <jiong.wang@arm.com>
-Cc: Will Deacon <will.deacon@arm.com>
-Cc: Yao Qi <yao.qi@arm.com>
----
- Documentation/arm64/booting.txt                |  8 +++
- Documentation/arm64/elf_hwcaps.txt             |  5 ++
- Documentation/arm64/pointer-authentication.txt | 85 ++++++++++++++++++++++++++
- 3 files changed, 98 insertions(+)
- create mode 100644 Documentation/arm64/pointer-authentication.txt
+So this is to avoid the linux-to-hardware irq number translation in
+other callers?
 
-diff --git a/Documentation/arm64/booting.txt b/Documentation/arm64/booting.txt
-index 8d0df62..8df9f46 100644
---- a/Documentation/arm64/booting.txt
-+++ b/Documentation/arm64/booting.txt
-@@ -205,6 +205,14 @@ Before jumping into the kernel, the following conditions must be met:
-     ICC_SRE_EL2.SRE (bit 0) must be initialised to 0b0.
-   - The DT or ACPI tables must describe a GICv2 interrupt controller.
- 
-+  For CPUs with pointer authentication functionality:
-+  - If EL3 is present:
-+    SCR_EL3.APK (bit 16) must be initialised to 0b1
-+    SCR_EL3.API (bit 17) must be initialised to 0b1
-+  - If the kernel is entered at EL1:
-+    HCR_EL2.APK (bit 40) must be initialised to 0b1
-+    HCR_EL2.API (bit 41) must be initialised to 0b1
-+
- The requirements described above for CPU mode, caches, MMUs, architected
- timers, coherency and system registers apply to all CPUs.  All CPUs must
- enter the kernel in the same exception level.
-diff --git a/Documentation/arm64/elf_hwcaps.txt b/Documentation/arm64/elf_hwcaps.txt
-index 7bc2921..91c4441 100644
---- a/Documentation/arm64/elf_hwcaps.txt
-+++ b/Documentation/arm64/elf_hwcaps.txt
-@@ -131,3 +131,8 @@ HWCAP_LRCPC
- 
-     Functionality implied by ID_AA64ISAR1_EL1.LRCPC == 0b0001.
- 
-+HWCAP_APIA
-+
-+    EL0 AddPac and Auth functionality using APIAKey_EL1 is enabled, as
-+    described by Documentation/arm64/pointer-authentication.txt.
-+
-diff --git a/Documentation/arm64/pointer-authentication.txt b/Documentation/arm64/pointer-authentication.txt
-new file mode 100644
-index 0000000..e9b5c6b
---- /dev/null
-+++ b/Documentation/arm64/pointer-authentication.txt
-@@ -0,0 +1,85 @@
-+Pointer authentication in AArch64 Linux
-+=======================================
-+
-+Author: Mark Rutland <mark.rutland@arm.com>
-+Date: 2017-07-19
-+
-+This document briefly describes the provision of pointer authentication
-+functionality in AArch64 Linux.
-+
-+
-+Architecture overview
-+---------------------
-+
-+The ARMv8.3 Pointer Authentication extension adds primitives that can be
-+used to mitigate certain classes of attack where an attacker can corrupt
-+the contents of some memory (e.g. the stack).
-+
-+The extension uses a Pointer Authentication Code (PAC) to determine
-+whether pointers have been modified unexpectedly. A PAC is derived from
-+a pointer, another value (such as the stack pointer), and a secret key
-+held in system registers.
-+
-+The extension adds instructions to insert a valid PAC into a pointer,
-+and to verify/remove the PAC from a pointer. The PAC occupies a number
-+of high-order bits of the pointer, which varies dependent on the
-+configured virtual address size and whether pointer tagging is in use.
-+
-+A subset of these instructions have been allocated from the HINT
-+encoding space. In the absence of the extension (or when disabled),
-+these instructions behave as NOPs. Applications and libraries using
-+these instructions operate correctly regardless of the presence of the
-+extension.
-+
-+
-+Basic support
-+-------------
-+
-+When CONFIG_ARM64_POINTER_AUTHENTICATION is selected, and relevant HW
-+support is present, the kernel will assign a random APIAKey value to
-+each process at exec*() time. This key is shared by all threads within
-+the process, and the key is preserved across fork(). Presence of
-+functionality using APIAKey is advertised via HWCAP_APIA.
-+
-+Recent versions of GCC can compile code with APIAKey-based return
-+address protection when passed the -msign-return-address option. This
-+uses instructions in the HINT space, and such code can run on systems
-+without the pointer authentication extension.
-+
-+The remaining instruction and data keys (APIBKey, APDAKey, APDBKey) are
-+reserved for future use, and instructions using these keys must not be
-+used by software until a purpose and scope for their use has been
-+decided. To enable future software using these keys to function on
-+contemporary kernels, where possible, instructions using these keys are
-+made to behave as NOPs.
-+
-+The generic key (APGAKey) is currently unsupported. Instructions using
-+the generic key must not be used by software.
-+
-+
-+Debugging
-+---------
-+
-+When CONFIG_ARM64_POINTER_AUTHENTICATION is selected, and relevant HW
-+support is present, the kernel will expose the position of TTBR0 PAC
-+bits in the NT_ARM_PAC_MASK regset (struct user_pac_mask), which
-+userspace can acqure via PTRACE_GETREGSET.
-+
-+Separate masks are exposed for data pointers and instruction pointers,
-+as the set of PAC bits can vary between the two. Debuggers should not
-+expect that HWCAP_APIA implies the presence (or non-presence) of this
-+regset -- in future the kernel may support the use of APIBKey, APDAKey,
-+and/or APBAKey, even in the absence of APIAKey.
-+
-+Note that the masks apply to TTBR0 addresses, and are not valid to apply
-+to TTBR1 addresses (e.g. kernel pointers).
-+
-+
-+Virtualization
-+--------------
-+
-+When CONFIG_ARM64_POINTER_AUTHENTICATION is selected, and uniform HW
-+support is present, KVM will context switch all keys used by vCPUs.
-+Otherwise, the feature is disabled. When disabled, accesses to keys, or
-+use of instructions enabled within the guest will trap to EL2, and an
-+UNDEFINED exception will be injected into the guest.
--- 
-1.9.1
+I am sort of guessing that we need to store the host_irq number so that
+we can probe into the physical GIC in later patches?  That may be good
+to note in this commit message if you respin.
+
+Thanks,
+-Christoffer
+
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  include/kvm/arm_vgic.h    |  8 ++++---
+>  virt/kvm/arm/arch_timer.c | 24 +------------------
+>  virt/kvm/arm/vgic/vgic.c  | 60 +++++++++++++++++++++++++++++++++++------------
+>  3 files changed, 51 insertions(+), 41 deletions(-)
+> 
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index ef71858..cceb31d 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -112,6 +112,7 @@ struct vgic_irq {
+>  	bool hw;			/* Tied to HW IRQ */
+>  	struct kref refcount;		/* Used for LPIs */
+>  	u32 hwintid;			/* HW INTID number */
+> +	unsigned int host_irq;		/* linux irq corresponding to hwintid */
+>  	union {
+>  		u8 targets;			/* GICv2 target VCPUs mask */
+>  		u32 mpidr;			/* GICv3 target VCPU */
+> @@ -301,9 +302,10 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+>  			bool level);
+>  int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+>  			       bool level);
+> -int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, u32 virt_irq, u32 phys_irq);
+> -int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq);
+> -bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq);
+> +int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
+> +			  u32 vintid);
+> +int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid);
+> +bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int vintid);
+>  
+>  int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
+>  
+> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> index 5976609..57a30ab 100644
+> --- a/virt/kvm/arm/arch_timer.c
+> +++ b/virt/kvm/arm/arch_timer.c
+> @@ -617,9 +617,6 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+>  {
+>  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+>  	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+> -	struct irq_desc *desc;
+> -	struct irq_data *data;
+> -	int phys_irq;
+>  	int ret;
+>  
+>  	if (timer->enabled)
+> @@ -632,26 +629,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+>  	if (!vgic_initialized(vcpu->kvm))
+>  		return -ENODEV;
+>  
+> -	/*
+> -	 * Find the physical IRQ number corresponding to the host_vtimer_irq
+> -	 */
+> -	desc = irq_to_desc(host_vtimer_irq);
+> -	if (!desc) {
+> -		kvm_err("%s: no interrupt descriptor\n", __func__);
+> -		return -EINVAL;
+> -	}
+> -
+> -	data = irq_desc_get_irq_data(desc);
+> -	while (data->parent_data)
+> -		data = data->parent_data;
+> -
+> -	phys_irq = data->hwirq;
+> -
+> -	/*
+> -	 * Tell the VGIC that the virtual interrupt is tied to a
+> -	 * physical interrupt. We do that once per VCPU.
+> -	 */
+> -	ret = kvm_vgic_map_phys_irq(vcpu, vtimer->irq.irq, phys_irq);
+> +	ret = kvm_vgic_map_phys_irq(vcpu, host_vtimer_irq, vtimer->irq.irq);
+>  	if (ret)
+>  		return ret;
+>  
+> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> index 83b24d2..075f073 100644
+> --- a/virt/kvm/arm/vgic/vgic.c
+> +++ b/virt/kvm/arm/vgic/vgic.c
+> @@ -17,6 +17,8 @@
+>  #include <linux/kvm.h>
+>  #include <linux/kvm_host.h>
+>  #include <linux/list_sort.h>
+> +#include <linux/interrupt.h>
+> +#include <linux/irq.h>
+>  
+>  #include "vgic.h"
+>  
+> @@ -392,38 +394,66 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+>  	return 0;
+>  }
+>  
+> -int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, u32 virt_irq, u32 phys_irq)
+> +/* @irq->irq_lock must be held */
+> +static int kvm_vgic_map_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+> +			    unsigned int host_irq)
+>  {
+> -	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
+> +	struct irq_desc *desc;
+> +	struct irq_data *data;
+>  
+> -	BUG_ON(!irq);
+> -
+> -	spin_lock(&irq->irq_lock);
+> +	/*
+> +	 * Find the physical IRQ number corresponding to @host_irq
+> +	 */
+> +	desc = irq_to_desc(host_irq);
+> +	if (!desc) {
+> +		kvm_err("%s: no interrupt descriptor\n", __func__);
+> +		return -EINVAL;
+> +	}
+> +	data = irq_desc_get_irq_data(desc);
+> +	while (data->parent_data)
+> +		data = data->parent_data;
+>  
+>  	irq->hw = true;
+> -	irq->hwintid = phys_irq;
+> +	irq->host_irq = host_irq;
+> +	irq->hwintid = data->hwirq;
+> +	return 0;
+> +}
+> +
+> +/* @irq->irq_lock must be held */
+> +static inline void kvm_vgic_unmap_irq(struct vgic_irq *irq)
+> +{
+> +	irq->hw = false;
+> +	irq->hwintid = 0;
+> +}
+> +
+> +int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
+> +			  u32 vintid)
+> +{
+> +	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
+> +	int ret;
+>  
+> +	BUG_ON(!irq);
+> +
+> +	spin_lock(&irq->irq_lock);
+> +	ret = kvm_vgic_map_irq(vcpu, irq, host_irq);
+>  	spin_unlock(&irq->irq_lock);
+>  	vgic_put_irq(vcpu->kvm, irq);
+>  
+> -	return 0;
+> +	return ret;
+>  }
+>  
+> -int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq)
+> +int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid)
+>  {
+>  	struct vgic_irq *irq;
+>  
+>  	if (!vgic_initialized(vcpu->kvm))
+>  		return -EAGAIN;
+>  
+> -	irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
+> +	irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
+>  	BUG_ON(!irq);
+>  
+>  	spin_lock(&irq->irq_lock);
+> -
+> -	irq->hw = false;
+> -	irq->hwintid = 0;
+> -
+> +	kvm_vgic_unmap_irq(irq);
+>  	spin_unlock(&irq->irq_lock);
+>  	vgic_put_irq(vcpu->kvm, irq);
+>  
+> @@ -726,9 +756,9 @@ void vgic_kick_vcpus(struct kvm *kvm)
+>  	}
+>  }
+>  
+> -bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq)
+> +bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int vintid)
+>  {
+> -	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
+> +	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
+>  	bool map_is_active;
+>  
+>  	spin_lock(&irq->irq_lock);
+> -- 
+> 2.5.5
+> 
