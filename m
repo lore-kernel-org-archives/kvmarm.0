@@ -1,59 +1,39 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCH 04/11] arm64/cpufeature: add ARMv8.3 id_aa64isar1 bits
-Date: Mon, 24 Jul 2017 11:54:58 +0100
-Message-ID: <915a28c3-ec4d-2c19-17d1-ed47a6396ff9@arm.com>
+From: Yao Qi <yao.qi@arm.com>
+Subject: Re: [PATCH 00/11] ARMv8.3 pointer authentication userspace support
+Date: Mon, 24 Jul 2017 12:52:12 +0100
+Message-ID: <46daaf0b-6b90-61cc-a25f-4177641d1613@arm.com>
 References: <1500480092-28480-1-git-send-email-mark.rutland@arm.com>
- <1500480092-28480-5-git-send-email-mark.rutland@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Return-path: <linux-arch-owner@vger.kernel.org>
-In-Reply-To: <1500480092-28480-5-git-send-email-mark.rutland@arm.com>
+In-Reply-To: <1500480092-28480-1-git-send-email-mark.rutland@arm.com>
 Sender: linux-arch-owner@vger.kernel.org
 To: Mark Rutland <mark.rutland@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: arnd@arndb.de, catalin.marinas@arm.com, christoffer.dall@linaro.org, Dave.Martin@arm.com, jiong.wang@arm.com, kvmarm@lists.cs.columbia.edu, linux-arch@vger.kernel.org, marc.zyngier@arm.com, will.deacon@arm.com, yao.qi@arm.com, linux-kernel@vger.kernel.org, kernel-hardening@lists.openwall.com
+Cc: arnd@arndb.de, catalin.marinas@arm.com, christoffer.dall@linaro.org, Dave.Martin@arm.com, jiong.wang@arm.com, kvmarm@lists.cs.columbia.edu, linux-arch@vger.kernel.org, marc.zyngier@arm.com, suzuki.poulose@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kernel-hardening@lists.openwall.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On 19/07/17 17:01, Mark Rutland wrote:
-> From ARMv8.3 onwards, ID_AA64ISAR1 is no longer entirely RES0, and now
-> has four fields describing the presence of pointer authentication
-> functionality:
+> * Should the kernel remove PACs when unwinding user stacks?
 >
-> * APA - address authentication present, using an architected algorithm
-> * API - address authentication present, using an IMP DEF algorithm
-> * GPA - generic authentication present, using an architected algorithm
-> * GPI - generic authentication present, using an IMP DEF algoithm
->
-> This patch adds the requisite definitions so that we can identify the
-> presence of this functionality. For the timebeing, the features are
-> hidden from userspace.
->
-> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will.deacon@arm.com>
-> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
->  arch/arm64/kernel/cpufeature.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 9f9e0064..b23ad83 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -120,7 +120,11 @@ static int __init register_cpu_hwcaps_dumper(void)
->  	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_EXACT, ID_AA64ISAR1_LRCPC_SHIFT, 4, 0),
->  	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_EXACT, ID_AA64ISAR1_FCMA_SHIFT, 4, 0),
->  	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_EXACT, ID_AA64ISAR1_JSCVT_SHIFT, 4, 0),
-> -	ARM64_FTR_END,
-> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_EXACT, ID_AA64ISAR1_GPI_SHIFT, 4, 0),
-> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_EXACT, ID_AA64ISAR1_GPA_SHIFT, 4, 0),
-> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_EXACT, ID_AA64ISAR1_API_SHIFT, 4, 0),
-> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_EXACT, ID_AA64ISAR1_APA_SHIFT, 4, 0),
-> +	ARM64_FTR_END
->  };
+>   This is simple to do, but it's arguably placing a policy in the kernel =
+as to
+>   what we expect user stacks to look like. Regardless, userspace will hav=
+e to
+>   perform this when unwinding with DWARF.
 
-minor nit: Could we keep the fields in the order of their positions in the register ?
+I am not sure what do you mean.  Do you mean stripping a PAC from a
+pointer during unwinding, so that user space can unwind the program
+without being aware of PAC?  Can kernel remove PAC from all instruction
+pointers?  Note that user space debugger may try to unwind in coredump,
+so if the contents dumped into coredump including PAC bits, debuggers
+still have to be aware of PAC (unless kernel can remove all PAC bits
+during coredump too).
 
-With that,
-
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+IMO, kernel needs to tell the truth to reflect the process/task state
+to the user space, and leave the user space to consume.
+IMPORTANT NOTICE: The contents of this email and any attachments are confid=
+ential and may also be privileged. If you are not the intended recipient, p=
+lease notify the sender immediately and do not disclose the contents to any=
+ other person, use it for any purpose, or store or copy the information in =
+any medium. Thank you.
