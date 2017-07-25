@@ -1,153 +1,125 @@
-From: Li Kun <hw.likun@huawei.com>
-Subject: Re: [kernel-hardening] [PATCH 00/11] ARMv8.3 pointer authentication
- userspace support
-Date: Tue, 25 Jul 2017 22:12:24 +0800
-Message-ID: <b28dcd14-7b4c-b4f3-830b-dbd436200df9@huawei.com>
-References: <1500480092-28480-1-git-send-email-mark.rutland@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [RFC PATCH v2 02/19] arm64: Use the physical counter when
+ available for read_cycles
+Date: Tue, 25 Jul 2017 07:36:47 -0700
+Message-ID: <20170725143647.GC1588@lvm>
+References: <20170717142718.13853-1-cdall@linaro.org>
+ <20170717142718.13853-3-cdall@linaro.org>
+ <20170725094308.GC23359@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
-Content-Transfer-Encoding: base64
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1500480092-28480-1-git-send-email-mark.rutland@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: linux-arch@vger.kernel.org, arnd@arndb.de, jiong.wang@arm.com, marc.zyngier@arm.com, catalin.marinas@arm.com, yao.qi@arm.com, suzuki.poulose@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kernel-hardening@lists.openwall.com, Dave.Martin@arm.com, christoffer.dall@linaro.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E37C740CE9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jul 2017 10:35:51 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id VwVlQTQ-XqCh for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 25 Jul 2017 10:35:50 -0400 (EDT)
+Received: from mail-lf0-f46.google.com (mail-lf0-f46.google.com
+ [209.85.215.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 65AF240CE4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jul 2017 10:35:50 -0400 (EDT)
+Received: by mail-lf0-f46.google.com with SMTP id d78so57292551lfg.3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jul 2017 07:36:52 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <20170725094308.GC23359@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Will Deacon <will.deacon@arm.com>
+Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGkgTWFyaywKCkNvdWxkIHlvdSBwbGVhc2UgZ2l2ZSB1cyBzb21lIGluZm9ybWF0aW9uIGFib3V0
-IHRoZSBpbXBhY3QgdG8gCnBlcmZvcm1hbmNlIHRvIGhlbHAgdXMgZXZhbHVhdGluZwoKdGhlIGlu
-Zmx1ZW5jZSB0byB0aGUgc3lzdGVtPwoKVGhhbmtzIGEgbG90LgoKCkJlc3QgUmVnYXJkcwoKCuWc
-qCAyMDE3LzcvMjAgMDowMSwgTWFyayBSdXRsYW5kIOWGmemBkzoKPiBUaGlzIHNlcmllcyBhZGRz
-IHN1cHBvcnQgZm9yIHRoZSBBUk12OC4zIHBvaW50ZXIgYXV0aGVudGljYXRpb24gZXh0ZW5zaW9u
-Lgo+Cj4gU2luY2UgUkZDIFsxXToKPiAqIE1ha2UgdGhlIEtWTSBjb250ZXh0IHN3aXRjaCAoc2Vt
-aS1sYXp5KQo+ICogUmViYXNlIHRvIHY0LjEzLXJjMQo+ICogSW1wcm92ZSBwb2ludGVyIGF1dGhl
-bnRpY2F0aW9uIGRvY3VtZW50YXRpb24KPiAqIEFkZCBod2NhcCBkb2N1bWVudGF0aW9uCj4gKiBW
-YXJpb3VzIG1pbm9yIGNsZWFudXBzCj4KPiBJJ3ZlIHB1c2hlZCB0aGUgc2VyaWVzIHRvIHRoZSBh
-cm02NC9wb2ludGVyLWF1dGggYnJhbmNoIFsyXSBvZiBteSBsaW51eCB0cmVlLgo+IEkndmUgYWxz
-byBwdXNoZWQgb3V0IGEgbmVjZXNzYXJ5IGJvb3R3cmFwcGVyIHBhdGNoIHRvIHRoZSBwb2ludGVy
-LWF1dGggYnJhbmNoCj4gWzNdIG9mIG15IGJvb3R3cmFwcGVyIHJlcG8uCj4KPgo+IEV4dGVuc2lv
-biBPdmVydmlldwo+ID09PT09PT09PT09PT09PT09PQo+Cj4gVGhlIEFSTXY4LjMgcG9pbnRlciBh
-dXRoZW50aWNhdGlvbiBleHRlbnNpb24gYWRkcyBmdW5jdGlvbmFsaXR5IHRvIGRldGVjdAo+IG1v
-ZGlmaWNhdGlvbiBvZiBwb2ludGVyIHZhbHVlcywgbWl0aWdhdGluZyBjZXJ0YWluIGNsYXNzZXMg
-b2YgYXR0YWNrIHN1Y2ggYXMKPiBzdGFjayBzbWFzaGluZywgYW5kIG1ha2luZyByZXR1cm4gb3Jp
-ZW50ZWQgcHJvZ3JhbW1pbmcgYXR0YWNrcyBoYXJkZXIKPgo+IFRoZSBleHRlbnNpb24gaW50cm9k
-dWNlcyB0aGUgY29uY2VwdCBvZiBhIHBvaW50ZXIgYXV0aGVudGljYXRpb24gY29kZSAoUEFDKSwK
-PiB3aGljaCBpcyBzdG9yZWQgaW4gc29tZSB1cHBlciBiaXRzIG9mIHBvaW50ZXJzLiBFYWNoIFBB
-QyBpcyBkZXJpdmVkIGZyb20gdGhlCj4gb3JpZ2luYWwgcG9pbnRlciwgYW5vdGhlciA2NC1iaXQg
-dmFsdWUgKGUuZy4gdGhlIHN0YWNrIHBvaW50ZXIpLCBhbmQgYSBzZWNyZXQKPiAxMjgtYml0IGtl
-eS4KPgo+IE5ldyBpbnN0cnVjdGlvbnMgYXJlIGFkZGVkIHdoaWNoIGNhbiBiZSB1c2VkIHRvOgo+
-Cj4gKiBJbnNlcnQgYSBQQUMgaW50byBhIHBvaW50ZXIKPiAqIFN0cmlwIGEgUEFDIGZyb20gYSBw
-b2ludGVyCj4gKiBBdXRoZW50aWNhdGUgc3RyaXAgYSBQQUMgZnJvbSBhIHBvaW50ZXIKPgo+IElm
-IGF1dGhlbnRpY2F0aW9uIHN1Y2NlZWRzLCB0aGUgY29kZSBpcyByZW1vdmVkLCB5aWVsZGluZyB0
-aGUgb3JpZ2luYWwgcG9pbnRlci4KPiBJZiBhdXRoZW50aWNhdGlvbiBmYWlscywgYml0cyBhcmUg
-c2V0IGluIHRoZSBwb2ludGVyIHN1Y2ggdGhhdCBpdCBpcyBndWFyYW50ZWVkCj4gdG8gY2F1c2Ug
-YSBmYXVsdCBpZiB1c2VkLgo+Cj4gVGhlc2UgaW5zdHJ1Y3Rpb25zIGNhbiBtYWtlIHVzZSBvZiBm
-b3VyIGtleXM6Cj4KPiAqIEFQSUFLZXkgKEEuSy5BLiBJbnN0cnVjdGlvbiBBIGtleSkKPiAqIEFQ
-SUJLZXkgKEEuSy5BLiBJbnN0cnVjdGlvbiBCIGtleSkKPiAqIEFQREFLZXkgKEEuSy5BLiBEYXRh
-IEEga2V5KQo+ICogQVBEQktleSAoQS5LLkEuIERhdGEgQiBLZXkpCj4KPiBBIHN1YnNldCBvZiB0
-aGVzZSBpbnN0cnVjdGlvbiBlbmNvZGluZ3MgaGF2ZSBiZWVuIGFsbG9jYXRlZCBmcm9tIHRoZSBI
-SU5UCj4gc3BhY2UsIGFuZCB3aWxsIG9wZXJhdGUgYXMgTk9QcyBvbiBhbnkgQVJNdjggcGFydHMg
-d2hpY2ggZG8gbm90IGZlYXR1cmUgdGhlCj4gZXh0ZW5zaW9uIChvciBpZiBwdXJwb3NlZnVsbHkg
-ZGlzYWJsZWQgYnkgdGhlIGtlcm5lbCkuIFNvZnR3YXJlIHVzaW5nIG9ubHkgdGhpcwo+IHN1YnNl
-dCBvZiB0aGUgaW5zdHJ1Y3Rpb25zIHNob3VsZCBmdW5jdGlvbiBjb3JyZWN0bHkgb24gYWxsIEFS
-TXY4LUEgcGFydHMuCj4KPiBBZGRpdGlvbmFsbHksIGluc3RydWN0aW9ucyBhcmUgYWRkZWQgdG8g
-YXV0aGVudGljYXRlIHNtYWxsIGJsb2NrcyBvZiBtZW1vcnkgaW4KPiBzaW1pbGFyIGZhc2hpb24s
-IHVzaW5nIEFQR0FLZXkgKEEuSy5BLiBHZW5lcmljIGtleSkuCj4KPgo+IFRoaXMgU2VyaWVzCj4g
-PT09PT09PT09PT0KPgo+IFRoaXMgc2VyaWVzIGVuYWJsZXMgdGhlIHVzZSBvZiBpbnN0cnVjdGlv
-bnMgdXNpbmcgQVBJQUtleSwgd2hpY2ggaXMgaW5pdGlhbGlzZWQKPiBhbmQgbWFpbnRhaW5lZCBw
-ZXItcHJvY2VzcyAoc2hhcmVkIGJ5IGFsbCB0aHJlYWRzKS4gVGhpcyBzZXJpZXMgZG9lcyBub3Qg
-YWRkCj4gc3VwcG9ydCBmb3IgQVBJQktleSwgQVBEQUtleSwgQVBEQktleSwgbm9yIEFQR0FLZXku
-IFRoZSBzZXJpZXMgb25seSBzdXBwb3J0cwo+IHRoZSB1c2Ugb2YgYW4gYXJjaGl0ZWN0ZWQgYWxn
-b3JpdGhtLgo+Cj4gSSd2ZSBnaXZlbiB0aGlzIHNvbWUgYmFzaWMgdGVzdGluZyB3aXRoIGEgaG9t
-ZWJyZXcgdGVzdCBzdWl0ZS4gTW9yZSBpZGVhbGx5LAo+IHdlJ2QgYWRkIHNvbWUgdGVzdHMgdG8g
-dGhlIGtlcm5lbCBzb3VyY2UgdHJlZS4KPgo+IEkndmUgYWRkZWQgc29tZSBiYXNpYyBLVk0gc3Vw
-cG9ydCwgYnV0IHRoaXMgZG9lc24ndCBjYXRlciBmb3Igc3lzdGVtcyB3aXRoCj4gbWlzbWF0Y2hl
-ZCBzdXBwb3J0LiBMb29raW5nIGZvcndhcmQsIHdlJ2xsIG5lZWQgSUQgcmVnaXN0ZXIgZW11bGF0
-aW9uIGluIEtWTSBzbwo+IHRoYXQgd2UgY2FuIGhpZGUgZmVhdHVyZXMgZnJvbSBndWVzdHMgdG8g
-Y2F0ZXIgZm9yIHN1Y2ggY2FzZXMuCj4KPgo+IE9wZW4gcXVlc3Rpb25zCj4gPT09PT09PT09PT09
-PT0KPgo+ICogU2hvdWxkIGtleXMgYmUgcGVyLXRocmVhZCByYXRoZXIgdGhhbiBwZXItcHJvY2Vz
-cz8KPgo+ICAgIE15IHVuZGVyc3RhbmRpbmcgaXMgdGhhdCBnbGliYyBjYW4ndCAoY3VycmVudGx5
-KSBoYW5kbGUgdGhyZWFkcyBoYXZpbmcKPiAgICBkaWZmZXJlbnQga2V5cywgYnV0IGl0IG1pZ2h0
-IGJlIHRoYXQgYW5vdGhlciBsaWJjIHdvdWxkIHByZWZlciBwZXItdGhyZWFkCj4gICAga2V5cy4g
-SWYgZGVzaXJlZCwgd2UgY291bGQgYWRkIGEgbWVjaGFuaXNtIGZvciBhIHRocmVhZCB0byByZS1p
-bml0aWFsaXplIGl0cwo+ICAgIGtleXMgd2l0aG91dCBhbiBleGVjKigpLgo+Cj4gKiBEbyB3ZSBu
-ZWVkIGEgc2VwYXJhdGUgaHdjYXAgZm9yIFhQQUMqIGluc3RydWN0aW9ucz8KPgo+ICAgIExpYnJh
-cnkgY29kZSBwZXJmb3JtaW5nIHN0YWNrIHVud2luZGluZyBtYXkgbmVlZCB0byBpbnRlcm9wZXJh
-dGUgd2l0aCBvdGhlcgo+ICAgIGNvZGUgd2hpY2ggbWF5IG9yIG1heSBub3QgYmUgdXNpbmcgcG9p
-bnRlciBhdXRoZW50aWNhdGlvbi4gSXQgbWF5IGJlCj4gICAgZGVzaXJhYmxlIHRvIHVzZSBYUEFD
-KiByYXRoZXIgdGhhbiBhdHRlbXB0aW5nIGF1dGhlbnRpY2F0aW9uIGFuZC9vciBhY3F1aXJpbmcK
-PiAgICB0aGUgUEFDIG1hc2tzIHZpYSBwdHJhY2UuCj4KPiAgICBBcyB3ZSBtYXkgZXhwb3NlIEFQ
-SUJLZXkgKHBvdGVudGlhbGx5IHNlcGFyYXRlbHkgZnJvbSBBUElBS2V5KSBpbiBmdXR1cmUsCj4g
-ICAgSFdDQVBfQVBJQSBjYW5ub3QgYmUgdXNlZCB0byBkZXRlcm1pbmUgd2hlbiB0aGVzZSBpbnN0
-cnVjdGlvbiBjYW4vc2hvdWxkIGJlCj4gICAgdXNlZC4KPgo+ICogU2hvdWxkIHdlIGV4cG9zZSBh
-IHBlci1wcm9jZXNzIGRhdGEga2V5IG5vdywgdG8gZ28gd2l0aCB0aGUgaW5zbiBrZXk/Cj4KPiAg
-ICBJIGRvbid0IGN1cnJlbnRseSBoYXZlIGEgdXNlLWNhc2UgZm9yIHRoaXMuCj4KPiAqIFNob3Vs
-ZCB3ZSBleHBvc2UgZ2VuZXJpYyBhdXRoZW50aWNhdGlvbiAoaS5lLiBBUEdBS2V5KT8KPgo+ICAg
-IEkgZG9uJ3QgY3VycmVudGx5IGhhdmUgYSB1c2UtY2FzZSBmb3IgdGhpcy4KPgo+ICogU2hvdWxk
-IHRoZSBrZXJuZWwgcmVtb3ZlIFBBQ3Mgd2hlbiB1bndpbmRpbmcgdXNlciBzdGFja3M/Cj4KPiAg
-ICBUaGlzIGlzIHNpbXBsZSB0byBkbywgYnV0IGl0J3MgYXJndWFibHkgcGxhY2luZyBhIHBvbGlj
-eSBpbiB0aGUga2VybmVsIGFzIHRvCj4gICAgd2hhdCB3ZSBleHBlY3QgdXNlciBzdGFja3MgdG8g
-bG9vayBsaWtlLiBSZWdhcmRsZXNzLCB1c2Vyc3BhY2Ugd2lsbCBoYXZlIHRvCj4gICAgcGVyZm9y
-bSB0aGlzIHdoZW4gdW53aW5kaW5nIHdpdGggRFdBUkYuCj4KPiBUaGFua3MsCj4gTWFyay4KPgo+
-IFsxXSBodHRwOi8vbGlzdHMuaW5mcmFkZWFkLm9yZy9waXBlcm1haWwvbGludXgtYXJtLWtlcm5l
-bC8yMDE3LUFwcmlsLzQ5ODk0MS5odG1sCj4gWzJdIGdpdDovL2dpdC5rZXJuZWwub3JnL3B1Yi9z
-Y20vbGludXgva2VybmVsL2dpdC9tYXJrL2xpbnV4LmdpdCBhcm02NC9wb2ludGVyLWF1dGgKPiBb
-M10gZ2l0Oi8vZ2l0Lmtlcm5lbC5vcmcvcHViL3NjbS9saW51eC9rZXJuZWwvZ2l0L21hcmsvYm9v
-dC13cmFwcGVyLWFhcmNoNjQuZ2l0IHBvaW50ZXItYXV0aAo+Cj4gTWFyayBSdXRsYW5kICgxMSk6
-Cj4gICAgYXJtNjQ6IGRvY3M6IGRlc2NyaWJlIEVMRiBod2NhcHMKPiAgICBhc20tZ2VuZXJpYzog
-bW1faG9va3M6IGFsbG93IGhvb2tzIHRvIGJlIG92ZXJyaWRkZW4gaW5kaXZpZHVhbGx5Cj4gICAg
-YXJtNjQ6IGFkZCBwb2ludGVyIGF1dGhlbnRpY2F0aW9uIHJlZ2lzdGVyIGJpdHMKPiAgICBhcm02
-NC9jcHVmZWF0dXJlOiBhZGQgQVJNdjguMyBpZF9hYTY0aXNhcjEgYml0cwo+ICAgIGFybTY0L2Nw
-dWZlYXR1cmU6IGRldGVjdCBwb2ludGVyIGF1dGhlbnRpY2F0aW9uCj4gICAgYXJtNjQ6IERvbid0
-IHRyYXAgaG9zdCBwb2ludGVyIGF1dGggdXNlIHRvIEVMMgo+ICAgIGFybTY0OiBhZGQgYmFzaWMg
-cG9pbnRlciBhdXRoZW50aWNhdGlvbiBzdXBwb3J0Cj4gICAgYXJtNjQ6IGV4cG9zZSB1c2VyIFBB
-QyBiaXQgcG9zaXRpb25zIHZpYSBwdHJhY2UKPiAgICBhcm02NC9rdm06IHByZXNlcnZlIGhvc3Qg
-SENSX0VMMiB2YWx1ZQo+ICAgIGFybTY0L2t2bTogY29udGV4dC1zd2l0Y2ggcHRyYXV0aCByZWdp
-c3RlcnMKPiAgICBhcm02NDogZG9jczogZG9jdW1lbnQgcG9pbnRlciBhdXRoZW50aWNhdGlvbgo+
-Cj4gICBEb2N1bWVudGF0aW9uL2FybTY0L2Jvb3RpbmcudHh0ICAgICAgICAgICAgICAgIHwgICA4
-ICsrCj4gICBEb2N1bWVudGF0aW9uL2FybTY0L2VsZl9od2NhcHMudHh0ICAgICAgICAgICAgIHwg
-MTM4ICsrKysrKysrKysrKysrKysrKysrKysrKysKPiAgIERvY3VtZW50YXRpb24vYXJtNjQvcG9p
-bnRlci1hdXRoZW50aWNhdGlvbi50eHQgfCAgODUgKysrKysrKysrKysrKysrCj4gICBhcmNoL2Fy
-bTY0L0tjb25maWcgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDIzICsrKysrCj4gICBh
-cmNoL2FybTY0L2luY2x1ZGUvYXNtL2NwdWNhcHMuaCAgICAgICAgICAgICAgIHwgICA0ICstCj4g
-ICBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2Vzci5oICAgICAgICAgICAgICAgICAgIHwgICAzICst
-Cj4gICBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9hcm0uaCAgICAgICAgICAgICAgIHwgICAz
-ICstCj4gICBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggICAgICAgICAgICAgIHwg
-IDI4ICsrKystCj4gICBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9oeXAuaCAgICAgICAgICAg
-ICAgIHwgICA3ICsrCj4gICBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL21tdS5oICAgICAgICAgICAg
-ICAgICAgIHwgICA1ICsKPiAgIGFyY2gvYXJtNjQvaW5jbHVkZS9hc20vbW11X2NvbnRleHQuaCAg
-ICAgICAgICAgfCAgMjUgKysrKy0KPiAgIGFyY2gvYXJtNjQvaW5jbHVkZS9hc20vcG9pbnRlcl9h
-dXRoLmggICAgICAgICAgfCAgOTcgKysrKysrKysrKysrKysrKysKPiAgIGFyY2gvYXJtNjQvaW5j
-bHVkZS9hc20vc3lzcmVnLmggICAgICAgICAgICAgICAgfCAgMzAgKysrKysrCj4gICBhcmNoL2Fy
-bTY0L2luY2x1ZGUvdWFwaS9hc20vaHdjYXAuaCAgICAgICAgICAgIHwgICAxICsKPiAgIGFyY2gv
-YXJtNjQvaW5jbHVkZS91YXBpL2FzbS9wdHJhY2UuaCAgICAgICAgICAgfCAgIDUgKwo+ICAgYXJj
-aC9hcm02NC9rZXJuZWwvY3B1ZmVhdHVyZS5jICAgICAgICAgICAgICAgICB8ICAzOSArKysrKyst
-Cj4gICBhcmNoL2FybTY0L2tlcm5lbC9jcHVpbmZvLmMgICAgICAgICAgICAgICAgICAgIHwgICAx
-ICsKPiAgIGFyY2gvYXJtNjQva2VybmVsL2hlYWQuUyAgICAgICAgICAgICAgICAgICAgICAgfCAg
-MTkgKysrLQo+ICAgYXJjaC9hcm02NC9rZXJuZWwvcHRyYWNlLmMgICAgICAgICAgICAgICAgICAg
-ICB8ICAzOSArKysrKysrCj4gICBhcmNoL2FybTY0L2t2bS9oYW5kbGVfZXhpdC5jICAgICAgICAg
-ICAgICAgICAgIHwgIDIxICsrKysKPiAgIGFyY2gvYXJtNjQva3ZtL2h5cC9NYWtlZmlsZSAgICAg
-ICAgICAgICAgICAgICAgfCAgIDEgKwo+ICAgYXJjaC9hcm02NC9rdm0vaHlwL3B0cmF1dGgtc3Iu
-YyAgICAgICAgICAgICAgICB8ICA5MSArKysrKysrKysrKysrKysrCj4gICBhcmNoL2FybTY0L2t2
-bS9oeXAvc3dpdGNoLmMgICAgICAgICAgICAgICAgICAgIHwgICA5ICstCj4gICBhcmNoL2FybTY0
-L2t2bS9oeXAvdGxiLmMgICAgICAgICAgICAgICAgICAgICAgIHwgICA2ICstCj4gICBhcmNoL2Fy
-bTY0L2t2bS9zeXNfcmVncy5jICAgICAgICAgICAgICAgICAgICAgIHwgIDMyICsrKysrKwo+ICAg
-aW5jbHVkZS9hc20tZ2VuZXJpYy9tbV9ob29rcy5oICAgICAgICAgICAgICAgICB8ICAxMSArKwo+
-ICAgaW5jbHVkZS91YXBpL2xpbnV4L2VsZi5oICAgICAgICAgICAgICAgICAgICAgICB8ICAgMSAr
-Cj4gICAyNyBmaWxlcyBjaGFuZ2VkLCA3MTkgaW5zZXJ0aW9ucygrKSwgMTMgZGVsZXRpb25zKC0p
-Cj4gICBjcmVhdGUgbW9kZSAxMDA2NDQgRG9jdW1lbnRhdGlvbi9hcm02NC9lbGZfaHdjYXBzLnR4
-dAo+ICAgY3JlYXRlIG1vZGUgMTAwNjQ0IERvY3VtZW50YXRpb24vYXJtNjQvcG9pbnRlci1hdXRo
-ZW50aWNhdGlvbi50eHQKPiAgIGNyZWF0ZSBtb2RlIDEwMDY0NCBhcmNoL2FybTY0L2luY2x1ZGUv
-YXNtL3BvaW50ZXJfYXV0aC5oCj4gICBjcmVhdGUgbW9kZSAxMDA2NDQgYXJjaC9hcm02NC9rdm0v
-aHlwL3B0cmF1dGgtc3IuYwo+CgotLSAKQmVzdCBSZWdhcmRzCkxpIEt1bgoKCl9fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmxpbnV4LWFybS1rZXJuZWwgbWFp
-bGluZyBsaXN0CmxpbnV4LWFybS1rZXJuZWxAbGlzdHMuaW5mcmFkZWFkLm9yZwpodHRwOi8vbGlz
-dHMuaW5mcmFkZWFkLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2xpbnV4LWFybS1rZXJuZWwK
+On Tue, Jul 25, 2017 at 10:43:08AM +0100, Will Deacon wrote:
+> Hi Christoffer,
+> 
+> On Mon, Jul 17, 2017 at 04:27:01PM +0200, Christoffer Dall wrote:
+> > Currently get_cycles() is hardwired to arch_counter_get_cntvct() on
+> > arm64, but as we move to using the physical timer for the in-kernel
+> > time-keeping, we need to make that more flexible.
+> > 
+> > First, we need to make sure the physical counter can be read on equal
+> > terms to the virtual counter, which includes adding physical counter
+> > read functions for timers that require errata.
+> > 
+> > Second, we need to make a choice between reading the physical vs virtual
+> > counter, depending on which timer is used for time keeping in the kernel
+> > otherwise.  We can do this using a static key to avoid a performance
+> > penalty during runtime when reading the counter.
+> > 
+> > Cc: Catalin Marinas <catalin.marinas@arm.com>
+> > Cc: Will Deacon <will.deacon@arm.com>
+> > Cc: Mark Rutland <mark.rutland@arm.com>
+> > Cc: Marc Zyngier <marc.zyngier@arm.com>
+> > Signed-off-by: Christoffer Dall <cdall@linaro.org>
+> > ---
+> >  arch/arm64/include/asm/arch_timer.h  | 18 ++++++++++++------
+> >  arch/arm64/include/asm/timex.h       |  2 +-
+> >  drivers/clocksource/arm_arch_timer.c | 32 ++++++++++++++++++++++++++++++--
+> >  3 files changed, 43 insertions(+), 9 deletions(-)
+> 
+> [...]
+> 
+> > @@ -886,10 +912,12 @@ static void __init arch_counter_register(unsigned type)
+> >  
+> >  	/* Register the CP15 based counter if we have one */
+> >  	if (type & ARCH_TIMER_TYPE_CP15) {
+> > -		if (arch_timer_uses_ppi == ARCH_TIMER_VIRT_PPI)
+> > +		if (arch_timer_uses_ppi == ARCH_TIMER_VIRT_PPI) {
+> >  			arch_timer_read_counter = arch_counter_get_cntvct;
+> > -		else
+> > +		} else {
+> >  			arch_timer_read_counter = arch_counter_get_cntpct;
+> > +			static_branch_enable(&arch_timer_phys_counter_available);
+> > +		}
+> 
+> I'm a bit worried about this change, although I can't put my finger on
+> exactly the problematic scenario. My concern is that if we have a system
+> where the host kernel is entered at NS-EL1 (because, e.g. EL2 is used for
+> something else or the bootloader just didn't load us there) then the booting
+> protocol doesn't mandate a zero-initialised CNTVOFF value. If we can
+> subsequently end up using the physical counter in the kernel and the virtual
+> counter in userspace, the vDSO will get confused because the datapage values
+> will not correspond to the values it actually ends up reading. 
+
+Just so I'm sure I'm understanding correctly, vDSO always reads the
+virtual counter?
+
+> There's also
+> the likelihood that existing EL2 init code simply isn't setting up
+> CNTHCTL_EL2 and CNTVOFF correctly, so we probably need a way to force
+> virtual counter on the cmdline.
+
+My understanding was that we only ever use the physical counter when we
+boot at EL2 and therefore the kernel is in control of CNTVOFF and can
+set that to 0.  Is this not the case, or are you asking for a way to
+mandate this relationship or make it abundantly clear?
+
+Also, are you fine with arch_timer_read_counter changing to using the
+physical counter on arm64, but you're merely worried about
+read_cycles()?
+
+Does it make sense to have read_cycles() still read the virtual counter
+whereas arch timers (timers, not counters) use the physical counter?  I
+somewhat convinced myself that this doesn't work though.
+
+> 
+> In practice it looks like we always end up with ARCH_TIMER_VIRT_PPI out of
+> arch_timer_select_ppi, but that's not guaranteed and I haven't thought at
+> all about the 32-bit case, which has other quirks/complexities.
+> 
+
+How does this change affect the 32-bit side?  All this should do is
+enable a static branch which is unused on the 32-bit side; what am I
+missing?
+
+Thanks,
+-Christoffer
