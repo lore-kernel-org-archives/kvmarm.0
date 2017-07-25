@@ -1,295 +1,193 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH 07/11] arm64: add basic pointer authentication support
-Date: Tue, 25 Jul 2017 16:26:50 +0100
-Message-ID: <20170725152649.GE6321@e103592.cambridge.arm.com>
-References: <1500480092-28480-1-git-send-email-mark.rutland@arm.com>
- <1500480092-28480-8-git-send-email-mark.rutland@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v2 5/8] KVM: arm/arm64: vgic: Handle mapped level
+ sensitive SPIs
+Date: Tue, 25 Jul 2017 16:41:52 +0100
+Message-ID: <c2b481d0-3094-8a19-6257-da4927af014e@arm.com>
+References: <1497531160-29162-1-git-send-email-eric.auger@redhat.com>
+ <1497531160-29162-6-git-send-email-eric.auger@redhat.com>
+ <f21e17b7-9437-ca96-6847-91e7ecee3af4@arm.com>
+ <6a177b08-1871-c5b1-6ece-404017dfd23c@redhat.com>
+ <20170721130331.GG16350@cbox> <b396c691-13d6-d17f-570e-7787970e759f@arm.com>
+ <20170725144835.GD1588@lvm>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F45540D44
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jul 2017 11:25:55 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UaRxq1s51tZj for <kvmarm@lists.cs.columbia.edu>;
- Tue, 25 Jul 2017 11:25:53 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D82140D25
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jul 2017 11:25:53 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <1500480092-28480-8-git-send-email-mark.rutland@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: linux-arch@vger.kernel.org, arnd@arndb.de, jiong.wang@arm.com, marc.zyngier@arm.com, catalin.marinas@arm.com, yao.qi@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kernel-hardening@lists.openwall.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170725144835.GD1588@lvm>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Christoffer Dall <cdall@linaro.org>, Auger Eric <eric.auger@redhat.com>, eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, alex.williamson@redhat.com, b.reynal@virtualopensystems.com, pbonzini@redhat.com, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jul 19, 2017 at 05:01:28PM +0100, Mark Rutland wrote:
-> This patch adds basic support for pointer authentication, allowing
-> userspace to make use of APIAKey. The kernel maintains an APIAKey value
-> for each process (shared by all threads within), which is initialised to
-> a random value at exec() time.
+On 25/07/17 15:48, Christoffer Dall wrote:
+> On Tue, Jul 25, 2017 at 02:47:55PM +0100, Marc Zyngier wrote:
+>> On 21/07/17 14:03, Christoffer Dall wrote:
+>>> On Fri, Jul 07, 2017 at 09:41:42AM +0200, Auger Eric wrote:
+>>>> Hi Marc,
+>>>>
+>>>> On 04/07/2017 14:15, Marc Zyngier wrote:
+>>>>> Hi Eric,
+>>>>>
+>>>>> On 15/06/17 13:52, Eric Auger wrote:
+>>>>>> Currently, the line level of unmapped level sensitive SPIs is
+>>>>>> toggled down by the maintenance IRQ handler/resamplefd mechanism.
+>>>>>>
+>>>>>> As mapped SPI completion is not trapped, we cannot rely on this
+>>>>>> mechanism and the line level needs to be observed at distributor
+>>>>>> level instead.
+>>>>>>
+>>>>>> This patch handles the physical IRQ case in vgic_validate_injection
+>>>>>> and get the line level of a mapped SPI at distributor level.
+>>>>>>
+>>>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>>>>
+>>>>>> ---
+>>>>>>
+>>>>>> v1 -> v2:
+>>>>>> - renamed is_unshared_mapped into is_mapped_spi
+>>>>>> - changes to kvm_vgic_map_phys_irq moved in the previous patch
+>>>>>> - make vgic_validate_injection more readable
+>>>>>> - reword the commit message
+>>>>>> ---
+>>>>>>  virt/kvm/arm/vgic/vgic.c | 16 ++++++++++++++--
+>>>>>>  virt/kvm/arm/vgic/vgic.h |  7 ++++++-
+>>>>>>  2 files changed, 20 insertions(+), 3 deletions(-)
+>>>>>>
+>>>>>> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+>>>>>> index 075f073..2e35ac7 100644
+>>>>>> --- a/virt/kvm/arm/vgic/vgic.c
+>>>>>> +++ b/virt/kvm/arm/vgic/vgic.c
+>>>>>> @@ -139,6 +139,17 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
+>>>>>>  	kfree(irq);
+>>>>>>  }
+>>>>>>  
+>>>>>> +bool irq_line_level(struct vgic_irq *irq)
+>>>>>> +{
+>>>>>> +	bool line_level = irq->line_level;
+>>>>>> +
+>>>>>> +	if (unlikely(is_mapped_spi(irq)))
+>>>>>> +		WARN_ON(irq_get_irqchip_state(irq->host_irq,
+>>>>>> +					      IRQCHIP_STATE_PENDING,
+>>>>>> +					      &line_level));
+>>>>>> +	return line_level;
+>>>>>> +}
+>>>>>> +
+>>>>>>  /**
+>>>>>>   * kvm_vgic_target_oracle - compute the target vcpu for an irq
+>>>>>>   *
+>>>>>> @@ -236,13 +247,14 @@ static void vgic_sort_ap_list(struct kvm_vcpu *vcpu)
+>>>>>>  
+>>>>>>  /*
+>>>>>>   * Only valid injection if changing level for level-triggered IRQs or for a
+>>>>>> - * rising edge.
+>>>>>> + * rising edge. Injection of virtual interrupts associated to physical
+>>>>>> + * interrupts always is valid.
+>>>>>>   */
+>>>>>>  static bool vgic_validate_injection(struct vgic_irq *irq, bool level)
+>>>>>>  {
+>>>>>>  	switch (irq->config) {
+>>>>>>  	case VGIC_CONFIG_LEVEL:
+>>>>>> -		return irq->line_level != level;
+>>>>>> +		return (irq->line_level != level || unlikely(is_mapped_spi(irq)));
+>>>>>>  	case VGIC_CONFIG_EDGE:
+>>>>>>  		return level;
+>>>>>>  	}
+>>>>>> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+>>>>>> index bba7fa2..da254ae 100644
+>>>>>> --- a/virt/kvm/arm/vgic/vgic.h
+>>>>>> +++ b/virt/kvm/arm/vgic/vgic.h
+>>>>>> @@ -96,14 +96,19 @@
+>>>>>>  /* we only support 64 kB translation table page size */
+>>>>>>  #define KVM_ITS_L1E_ADDR_MASK		GENMASK_ULL(51, 16)
+>>>>>>  
+>>>>>> +bool irq_line_level(struct vgic_irq *irq);
+>>>>>> +
+>>>>>>  static inline bool irq_is_pending(struct vgic_irq *irq)
+>>>>>>  {
+>>>>>>  	if (irq->config == VGIC_CONFIG_EDGE)
+>>>>>>  		return irq->pending_latch;
+>>>>>>  	else
+>>>>>> -		return irq->pending_latch || irq->line_level;
+>>>>>> +		return irq->pending_latch || irq_line_level(irq);
+>>>>>
+>>>>> I'm a bit concerned that an edge interrupt doesn't take the distributor
+>>>>> state into account here. Why is that so? Once an SPI is forwarded to a
+>>>>> guest, a large part of the edge vs level differences move into the HW,
+>>>>> and are not that different anymore from a SW PoV.
+>>>>
+>>>> As pointed out by Christoffer in https://lkml.org/lkml/2017/6/8/322,
+>>>> isn't it a bit risky in general to poke the physical state instead of
+>>>> the virtual state. For level sensitive, to me we don't really have many
+>>>> other alternatives. For edge, we are not obliged to.
+>>>
+>>> I think we need to be clear on the fundamental question of whether or
+>>> not we consider pending_latch and/or line_level for mapped interrupts.
+>>>
+>>> I can definitely see the argument that the pending state is kept in
+>>> hardware, so if you want to know that for a mapped interrupt, ask the
+>>> hardware.
+>>>
+>>> The upside of this appraoch is a clean separation of state and we avoid
+>>> any logic to synchronize a virtual state with the physical state.
+>>>
+>>> The downside is that it's slower to peek into the physical GIC than to
+>>> read a variable from memory, and we need to special case the validate
+>>> path (which I now understand).
+>>>
+>>> If we move to keeping the state in HW, how do we deal with GICD_SPENDR ?
+>>> Does that mean we will forward a from the VM handled by the VGIC to the
+>>> physical GIC?
+>>
+>> Sounds like it to me. Otherwise, we start loosing some state. 
 > 
-> Instructions using other keys (APIBKey, APDAKey, APDBKey) are disabled,
-> and will behave as NOPs. These may be made use of in future patches.
+> How do we loose state?  Is it not more a question of complexity to make
+> sure the 'cached' vgic state is up to date with the real state?  (like
+> what we currently do for the timer mapped interrupt).
+
+Sorry, I was very imprecise here. It is not so much that we'd loose
+state, but that we'd have some state at the wrong location. If we have a
+guest playing with the pending state, we need to make sure the physical
+side is up to date. Otherwise, we can end-up in situations where we'd
+inject an interrupt for the guest based on a pending state that only
+exists in the virtual distributor, and yet the virtual CPUIF is going to
+try and deactivate it in the physical side on EOI.
+
+> On GICv2 this is likely going to make injecting timer interrupts slower,
+> because we'll check the pending state of whatever's in the AP list on
+> entry to the guest and peek into the physical GIC again.
+
+That's a very valid concern. Though there is a slight distinction with
+the timer, in that we entirely control the injection of the interrupt,
+while an SPI can fire an any particular moment.
+
 > 
-> No support is added for the generic key (APGAKey), though this cannot be
-> trapped or made to behave as a NOP. Its presence is not advertised with
-> a hwcap.
-> 
-> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Cc: Will Deacon <will.deacon@arm.com>
-> ---
->  arch/arm64/Kconfig                    | 23 +++++++++
->  arch/arm64/include/asm/mmu.h          |  5 ++
->  arch/arm64/include/asm/mmu_context.h  | 25 +++++++++-
->  arch/arm64/include/asm/pointer_auth.h | 89 +++++++++++++++++++++++++++++++++++
->  arch/arm64/include/uapi/asm/hwcap.h   |  1 +
->  arch/arm64/kernel/cpufeature.c        | 11 +++++
->  arch/arm64/kernel/cpuinfo.c           |  1 +
->  7 files changed, 153 insertions(+), 2 deletions(-)
->  create mode 100644 arch/arm64/include/asm/pointer_auth.h
-> 
-> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> index dfd9086..15a9931 100644
-> --- a/arch/arm64/Kconfig
-> +++ b/arch/arm64/Kconfig
-> @@ -962,6 +962,29 @@ config ARM64_UAO
->  
->  endmenu
->  
-> +menu "ARMv8.3 architectural features"
-> +
-> +config ARM64_POINTER_AUTHENTICATION
-> +	bool "Enable support for pointer authentication"
-> +	default y
-> +	help
-> +	  Pointer authentication (part of the ARMv8.3 Extensions) provides
-> +	  instructions for signing and authenticating pointers against secret
-> +	  keys, which can be used to mitigate Return Oriented Programming (ROP)
-> +	  and other attacks.
-> +
-> +	  This option enables these instructions at EL0 (i.e. for userspace).
-> +
-> +	  Choosing this option will cause the kernel to initialise secret keys
-> +	  for each process at exec() time, with these keys being
-> +	  context-switched along with the process.
-> +
-> +	  The feature is detected at runtime. If the feature is not present in
-> +	  hardware it will not be advertised to userspace nor will it be
-> +	  enabled.
+>> Note that
+>> this is what my GICv4 patches are also doing, by forwarding the INT and
+>> CLEAR commands to the physical ITS.
+>>
+>>>> Don't we have situations, due to the lazy disable approach, where the
+>>>> physical IRQ hits, enters the genirq handler and the actual handler is
+>>>> not called, ie. the virtual IRQ is not injected?
+>>>>
+>>>
+>>> I'm not sure I remember what these situations were, specifically, but
+>>> certainly if we ever have a situation where a mapped irq's pending state
+>>> should be different from that of the physical one, then it doesn't work.
+>>
+>> There is a very simple way around the issue Eric mentions, which is to
+>> use the "IRQ_DISABLE_UNLAZY" flag, which disable the lazy disabling of
+>> interrupts.  That's also something the GICv4 patches use, as when we
+>> mask an interrupt, we want to be sure that it is immediately done (the
+>> host side will never see the interrupt firing, and thus can never
+>> disabled it).
+>>
+> If we don't care about the potential performance hit mentioned above, it
+> sounds like a good solution to me.
 
-Should we describe which keys are supported here, or will this option
-always turn on all the keys/instructions that the kernel implements to
-date?
+I think we need to measure the damage this would cause.
 
-> +
-> +endmenu
-> +
->  config ARM64_MODULE_CMODEL_LARGE
->  	bool
->  
-> diff --git a/arch/arm64/include/asm/mmu.h b/arch/arm64/include/asm/mmu.h
-> index 5468c83..6a848f3 100644
-> --- a/arch/arm64/include/asm/mmu.h
-> +++ b/arch/arm64/include/asm/mmu.h
-> @@ -16,10 +16,15 @@
->  #ifndef __ASM_MMU_H
->  #define __ASM_MMU_H
->  
-> +#include <asm/pointer_auth.h>
-> +
->  typedef struct {
->  	atomic64_t	id;
->  	void		*vdso;
->  	unsigned long	flags;
-> +#ifdef CONFIG_ARM64_POINTER_AUTHENTICATION
-> +	struct ptrauth_keys	ptrauth_keys;
-> +#endif
->  } mm_context_t;
->  
->  /*
-> diff --git a/arch/arm64/include/asm/mmu_context.h b/arch/arm64/include/asm/mmu_context.h
-> index 3257895a..06757a5 100644
-> --- a/arch/arm64/include/asm/mmu_context.h
-> +++ b/arch/arm64/include/asm/mmu_context.h
-> @@ -31,7 +31,6 @@
->  #include <asm/cacheflush.h>
->  #include <asm/cpufeature.h>
->  #include <asm/proc-fns.h>
-> -#include <asm-generic/mm_hooks.h>
->  #include <asm/cputype.h>
->  #include <asm/pgtable.h>
->  #include <asm/sysreg.h>
-> @@ -154,7 +153,14 @@ static inline void cpu_replace_ttbr1(pgd_t *pgd)
->  #define destroy_context(mm)		do { } while(0)
->  void check_and_switch_context(struct mm_struct *mm, unsigned int cpu);
->  
-> -#define init_new_context(tsk,mm)	({ atomic64_set(&(mm)->context.id, 0); 0; })
-> +static inline int init_new_context(struct task_struct *tsk,
-> +			struct mm_struct *mm)
-> +{
-> +	atomic64_set(&mm->context.id, 0);
-> +	mm_ctx_ptrauth_init(&mm->context);
+Thanks,
 
-For this stuff in general, I wonder whether we should move this code
-away from mm and to thread_strct and the process/thread paths, otherwise
-we'll just have to move it all around later if ptrauth is ever to be
-supported per-thread.
-
-This would also remove the need to have individually overridable arch
-mm hooks.
-
-Adding an extra 16 bytes to thread_struct is probably not the end of the
-world.  thread_struct is already well over half a K.  We could de-dupe
-by refcounting or similar, but it may not be worth the complexity.
-
-> +
-> +	return 0;
-> +}
->  
->  /*
->   * This is called when "tsk" is about to enter lazy TLB mode.
-> @@ -200,6 +206,8 @@ static inline void __switch_mm(struct mm_struct *next)
->  		return;
->  	}
->  
-> +	mm_ctx_ptrauth_switch(&next->context);
-> +
->  	check_and_switch_context(next, cpu);
->  }
->  
-> @@ -226,6 +234,19 @@ static inline void __switch_mm(struct mm_struct *next)
->  
->  void verify_cpu_asid_bits(void);
->  
-> +static inline void arch_dup_mmap(struct mm_struct *oldmm,
-> +				 struct mm_struct *mm)
-> +{
-> +	mm_ctx_ptrauth_dup(&oldmm->context, &mm->context);
-> +}
-> +#define arch_dup_mmap arch_dup_mmap
-> +
-> +/*
-> + * We need to override arch_dup_mmap before including the generic hooks, which
-> + * are otherwise sufficient for us.
-> + */
-> +#include <asm-generic/mm_hooks.h>
-> +
->  #endif /* !__ASSEMBLY__ */
->  
->  #endif /* !__ASM_MMU_CONTEXT_H */
-> diff --git a/arch/arm64/include/asm/pointer_auth.h b/arch/arm64/include/asm/pointer_auth.h
-> new file mode 100644
-> index 0000000..964da0c
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/pointer_auth.h
-> @@ -0,0 +1,89 @@
-> +/*
-> + * Copyright (C) 2016 ARM Ltd.
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 as
-> + * published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +#ifndef __ASM_POINTER_AUTH_H
-> +#define __ASM_POINTER_AUTH_H
-> +
-> +#include <linux/random.h>
-> +
-> +#include <asm/cpufeature.h>
-> +#include <asm/sysreg.h>
-> +
-> +#ifdef CONFIG_ARM64_POINTER_AUTHENTICATION
-> +/*
-> + * Each key is a 128-bit quantity which is split accross a pair of 64-bit
-> + * registers (Lo and Hi).
-> + */
-> +struct ptrauth_key {
-> +	unsigned long lo, hi;
-> +};
-> +
-> +/*
-> + * We give each process its own instruction A key (APIAKey), which is shared by
-> + * all threads. This is inherited upon fork(), and reinitialised upon exec*().
-> + * All other keys are currently unused, with APIBKey, APDAKey, and APBAKey
-> + * instructions behaving as NOPs.
-> + */
-> +struct ptrauth_keys {
-> +	struct ptrauth_key apia;
-> +};
-> +
-> +static inline void ptrauth_keys_init(struct ptrauth_keys *keys)
-> +{
-> +	if (!cpus_have_const_cap(ARM64_HAS_ADDRESS_AUTH))
-> +		return;
-> +
-> +	get_random_bytes(keys, sizeof(*keys));
-> +}
-> +
-> +#define __ptrauth_key_install(k, v)			\
-> +do {							\
-> +	write_sysreg_s(v.lo, SYS_ ## k ## KEYLO_EL1);	\
-> +	write_sysreg_s(v.hi, SYS_ ## k ## KEYHI_EL1);	\
-
-(v)
-
-though moderately crazy usage would be required in order for this to go
-wrong.
-
-> +} while (0)
-> +
-> +static inline void ptrauth_keys_switch(struct ptrauth_keys *keys)
-> +{
-> +	if (!cpus_have_const_cap(ARM64_HAS_ADDRESS_AUTH))
-> +		return;
-> +
-> +	__ptrauth_key_install(APIA, keys->apia);
-> +}
-> +
-> +static inline void ptrauth_keys_dup(struct ptrauth_keys *old,
-> +				    struct ptrauth_keys *new)
-> +{
-> +	if (!cpus_have_const_cap(ARM64_HAS_ADDRESS_AUTH))
-> +		return;
-> +
-> +	*new = *old;
-
-This seems an odd thing to do.  Surely, by design we never want two
-processes to share the same keys?  Don't we always proceed to nuke
-the keys via mm_ctx_ptrauth_init() anyway?
-
-> +}
-> +
-> +#define mm_ctx_ptrauth_init(ctx) \
-> +	ptrauth_keys_init(&(ctx)->ptrauth_keys)
-> +
-> +#define mm_ctx_ptrauth_switch(ctx) \
-> +	ptrauth_keys_switch(&(ctx)->ptrauth_keys)
-> +
-> +#define mm_ctx_ptrauth_dup(oldctx, newctx) \
-> +	ptrauth_keys_dup(&(oldctx)->ptrauth_keys, &(newctx)->ptrauth_keys)
-
-[...]
-
-Cheers
----Dave
+	M.
+-- 
+Jazz is not dead. It just smells funny...
