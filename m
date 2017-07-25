@@ -1,162 +1,91 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 5/8] KVM: arm/arm64: vgic: Handle mapped level
- sensitive SPIs
-Date: Tue, 25 Jul 2017 14:47:55 +0100
-Message-ID: <b396c691-13d6-d17f-570e-7787970e759f@arm.com>
-References: <1497531160-29162-1-git-send-email-eric.auger@redhat.com>
- <1497531160-29162-6-git-send-email-eric.auger@redhat.com>
- <f21e17b7-9437-ca96-6847-91e7ecee3af4@arm.com>
- <6a177b08-1871-c5b1-6ece-404017dfd23c@redhat.com>
- <20170721130331.GG16350@cbox>
+From: Jiong Wang <Jiong.Wang@arm.com>
+Subject: Re: [PATCH 00/11] ARMv8.3 pointer authentication userspace support
+Date: Tue, 25 Jul 2017 14:00:56 +0000
+Message-ID: <DB6PR0802MB2405BBA6E6D545F35F0154A39FB80@DB6PR0802MB2405.eurprd08.prod.outlook.com>
+References: <1500480092-28480-1-git-send-email-mark.rutland@arm.com>
+ <20170721170509.GC1538@e103592.cambridge.arm.com>,<20170725120630.GA8116@leverpostej>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170721130331.GG16350@cbox>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Christoffer Dall <cdall@linaro.org>, Auger Eric <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, alex.williamson@redhat.com, b.reynal@virtualopensystems.com, pbonzini@redhat.com, christoffer.dall@linaro.org, drjones@redhat.com, wei@redhat.com
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Return-path: <linux-arch-owner@vger.kernel.org>
+In-Reply-To: <20170725120630.GA8116@leverpostej>
+Content-Language: en-GB
+Sender: linux-arch-owner@vger.kernel.org
+To: Dave P Martin <Dave.Martin@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, "arnd@arndb.de" <arnd@arndb.de>, Marc Zyngier <Marc.Zyngier@arm.com>, Catalin Marinas <Catalin.Marinas@arm.com>, Yao Qi <Yao.Qi@arm.com>, Suzuki Poulose <Suzuki.Poulose@arm.com>, Will Deacon <Will.Deacon@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, Mark Rutland <Mark.Rutland@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 21/07/17 14:03, Christoffer Dall wrote:
-> On Fri, Jul 07, 2017 at 09:41:42AM +0200, Auger Eric wrote:
->> Hi Marc,
+> > * Should the kernel remove PACs when unwinding user stacks?
+> >
+> >   This is simple to do, but it's arguably placing a policy in the kerne=
+l as to
+> >   what we expect user stacks to look like. Regardless, userspace will h=
+ave to
+> >   perform this when unwinding with DWARF.
 >>
->> On 04/07/2017 14:15, Marc Zyngier wrote:
->>> Hi Eric,
->>>
->>> On 15/06/17 13:52, Eric Auger wrote:
->>>> Currently, the line level of unmapped level sensitive SPIs is
->>>> toggled down by the maintenance IRQ handler/resamplefd mechanism.
->>>>
->>>> As mapped SPI completion is not trapped, we cannot rely on this
->>>> mechanism and the line level needs to be observed at distributor
->>>> level instead.
->>>>
->>>> This patch handles the physical IRQ case in vgic_validate_injection
->>>> and get the line level of a mapped SPI at distributor level.
->>>>
->>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>>
->>>> ---
->>>>
->>>> v1 -> v2:
->>>> - renamed is_unshared_mapped into is_mapped_spi
->>>> - changes to kvm_vgic_map_phys_irq moved in the previous patch
->>>> - make vgic_validate_injection more readable
->>>> - reword the commit message
->>>> ---
->>>>  virt/kvm/arm/vgic/vgic.c | 16 ++++++++++++++--
->>>>  virt/kvm/arm/vgic/vgic.h |  7 ++++++-
->>>>  2 files changed, 20 insertions(+), 3 deletions(-)
->>>>
->>>> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
->>>> index 075f073..2e35ac7 100644
->>>> --- a/virt/kvm/arm/vgic/vgic.c
->>>> +++ b/virt/kvm/arm/vgic/vgic.c
->>>> @@ -139,6 +139,17 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
->>>>  	kfree(irq);
->>>>  }
->>>>  
->>>> +bool irq_line_level(struct vgic_irq *irq)
->>>> +{
->>>> +	bool line_level = irq->line_level;
->>>> +
->>>> +	if (unlikely(is_mapped_spi(irq)))
->>>> +		WARN_ON(irq_get_irqchip_state(irq->host_irq,
->>>> +					      IRQCHIP_STATE_PENDING,
->>>> +					      &line_level));
->>>> +	return line_level;
->>>> +}
->>>> +
->>>>  /**
->>>>   * kvm_vgic_target_oracle - compute the target vcpu for an irq
->>>>   *
->>>> @@ -236,13 +247,14 @@ static void vgic_sort_ap_list(struct kvm_vcpu *vcpu)
->>>>  
->>>>  /*
->>>>   * Only valid injection if changing level for level-triggered IRQs or for a
->>>> - * rising edge.
->>>> + * rising edge. Injection of virtual interrupts associated to physical
->>>> + * interrupts always is valid.
->>>>   */
->>>>  static bool vgic_validate_injection(struct vgic_irq *irq, bool level)
->>>>  {
->>>>  	switch (irq->config) {
->>>>  	case VGIC_CONFIG_LEVEL:
->>>> -		return irq->line_level != level;
->>>> +		return (irq->line_level != level || unlikely(is_mapped_spi(irq)));
->>>>  	case VGIC_CONFIG_EDGE:
->>>>  		return level;
->>>>  	}
->>>> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
->>>> index bba7fa2..da254ae 100644
->>>> --- a/virt/kvm/arm/vgic/vgic.h
->>>> +++ b/virt/kvm/arm/vgic/vgic.h
->>>> @@ -96,14 +96,19 @@
->>>>  /* we only support 64 kB translation table page size */
->>>>  #define KVM_ITS_L1E_ADDR_MASK		GENMASK_ULL(51, 16)
->>>>  
->>>> +bool irq_line_level(struct vgic_irq *irq);
->>>> +
->>>>  static inline bool irq_is_pending(struct vgic_irq *irq)
->>>>  {
->>>>  	if (irq->config == VGIC_CONFIG_EDGE)
->>>>  		return irq->pending_latch;
->>>>  	else
->>>> -		return irq->pending_latch || irq->line_level;
->>>> +		return irq->pending_latch || irq_line_level(irq);
->>>
->>> I'm a bit concerned that an edge interrupt doesn't take the distributor
->>> state into account here. Why is that so? Once an SPI is forwarded to a
->>> guest, a large part of the edge vs level differences move into the HW,
->>> and are not that different anymore from a SW PoV.
+>> Not sure.  This is arguably not more gross than related things the
+>> kernel already does, and may be inefficient for userspace to do e.g.,
+>> when capturing perf backtraces.  Still gross though.
 >>
->> As pointed out by Christoffer in https://lkml.org/lkml/2017/6/8/322,
->> isn't it a bit risky in general to poke the physical state instead of
->> the virtual state. For level sensitive, to me we don't really have many
->> other alternatives. For edge, we are not obliged to.
-> 
-> I think we need to be clear on the fundamental question of whether or
-> not we consider pending_latch and/or line_level for mapped interrupts.
-> 
-> I can definitely see the argument that the pending state is kept in
-> hardware, so if you want to know that for a mapped interrupt, ask the
-> hardware.
-> 
-> The upside of this appraoch is a clean separation of state and we avoid
-> any logic to synchronize a virtual state with the physical state.
-> 
-> The downside is that it's slower to peek into the physical GIC than to
-> read a variable from memory, and we need to special case the validate
-> path (which I now understand).
-> 
-> If we move to keeping the state in HW, how do we deal with GICD_SPENDR ?
-> Does that mean we will forward a from the VM handled by the VGIC to the
-> physical GIC?
+>> Side question: do you know whether there will be DWARF / ELF annotations
+>> for this?  Since ptr auth is a compile-time option, it is plausible that
+>> an attribute could be added to indicate that an image uses it.
 
-Sounds like it to me. Otherwise, we start loosing some state. Note that
-this is what my GICv4 patches are also doing, by forwarding the INT and
-CLEAR commands to the physical ITS.
+> Jiong, Yao, can you answer this?
+>
+> I think that there's DWARF metadata for unwinding, but I'm not sure
+> there's an ELF annotation on an image.
+>
+> Note that you may link with libraries which may or may not use pointer
+> auth, so a single process can have a mixture of code using pointer auth,
+> and code which does not.
 
->> Don't we have situations, due to the lazy disable approach, where the
->> physical IRQ hits, enters the genirq handler and the actual handler is
->> not called, ie. the virtual IRQ is not injected?
->>
-> 
-> I'm not sure I remember what these situations were, specifically, but
-> certainly if we ever have a situation where a mapped irq's pending state
-> should be different from that of the physical one, then it doesn't work.
+Yes, there is new DWARF frame information for pointer authentication to des=
+cribe
+the signing status at instruction level.  There is no ELF annotation on an =
+image.
 
-There is a very simple way around the issue Eric mentions, which is to
-use the "IRQ_DISABLE_UNLAZY" flag, which disable the lazy disabling of
-interrupts.  That's also something the GICv4 patches use, as when we
-mask an interrupt, we want to be sure that it is immediately done (the
-host side will never see the interrupt firing, and thus can never
-disabled it).
+As the use cases of pointer authentication extension in GCC are about retur=
+n
+address signing.  The DWARF extension is mostly around describing signed LR=
+ so
+the unwinder could have a way to figure out the original value of it to con=
+tinue
+unwinding.
 
-Thanks,
+In general, whenever return address, i.e. LR register, is mangled or restor=
+ed by
+hardware instruction, compiler (or assembly writer) is expected to generate=
+ a
+DW_CFA_AARCH64_negate_ra_state CFA instruction.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+For DWARF unwinder, during unwinding, whenever a DW_CFA_AARCH64_negate_ra_s=
+tate
+is hit, the unwinder toggle the LR signing status and kept it in bit zero (=
+lsb)
+of a new DWARF register AARCH64_DWARF_PAUTH_RA_STATE whose value must be ho=
+nored
+later when unwinding the value of LR. If the lsb of AARCH64_DWARF_PAUTH_RA_=
+STATE
+is set, it means the return address is mangled, then the unwinder needs to
+restore LR by either masking off the signature (userspace unwinders need pt=
+race
+interface to get this) or executing signature strip instruction (can only b=
+e
+done by native unwinder) or executing authentication instruction (can only =
+be
+done by native unwinder).
+
+Please see the following links for more details:
+  https://gcc.gnu.org/ml/gcc-patches/2017-01/msg00376.html
+  https://gcc.gnu.org/ml/gcc-patches/2016-11/msg03010.html
+
+
+Regards,
+Jiong
+
+IMPORTANT NOTICE: The contents of this email and any attachments are confid=
+ential and may also be privileged. If you are not the intended recipient, p=
+lease notify the sender immediately and do not disclose the contents to any=
+ other person, use it for any purpose, or store or copy the information in =
+any medium. Thank you.
