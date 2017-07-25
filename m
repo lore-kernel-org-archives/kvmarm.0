@@ -1,94 +1,95 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH 00/11] ARMv8.3 pointer authentication userspace support
-Date: Tue, 25 Jul 2017 13:06:43 +0100
-Message-ID: <20170725120630.GA8116@leverpostej>
-References: <1500480092-28480-1-git-send-email-mark.rutland@arm.com>
- <20170721170509.GC1538@e103592.cambridge.arm.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [RFC 7/9] arm64: expose PAC bit positions via ptrace
+Date: Tue, 25 Jul 2017 13:11:48 +0100
+Message-ID: <20170725121145.GB6321@e103592.cambridge.arm.com>
+References: <1491232765-32501-1-git-send-email-mark.rutland@arm.com>
+ <1491232765-32501-8-git-send-email-mark.rutland@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-arch-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20170721170509.GC1538@e103592.cambridge.arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, arnd@arndb.de, jiong.wang@arm.com, marc.zyngier@arm.com, catalin.marinas@arm.com, yao.qi@arm.com, suzuki.poulose@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kernel-hardening@lists.openwall.com, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
+In-Reply-To: <1491232765-32501-8-git-send-email-mark.rutland@arm.com>
+Sender: linux-arch-owner@vger.kernel.org
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, arnd@arndb.de, jiong.wang@arm.com, marc.zyngier@arm.com, catalin.marinas@arm.com, suzuki.poulose@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jul 21, 2017 at 06:05:09PM +0100, Dave Martin wrote:
-> On Wed, Jul 19, 2017 at 05:01:21PM +0100, Mark Rutland wrote:
-> > This series adds support for the ARMv8.3 pointer authentication extension.
-
-> > Open questions
-> > ==============
-> > 
-> > * Should keys be per-thread rather than per-process?
-> > 
-> >   My understanding is that glibc can't (currently) handle threads having
-> >   different keys, but it might be that another libc would prefer per-thread
+On Mon, Apr 03, 2017 at 04:19:23PM +0100, Mark Rutland wrote:
+> When pointer authentication is in use, data/instruction pointers have a
+> number of PAC bits inserted into them. The number and position of these
+> bits depends on the configured TCR_ELx.TxSZ and whether tagging is
+> enabled. ARMv8.3 allows tagging to differ for instruction and data
+> pointers.
 > 
-> Can you elaborate?
+> For userspace debuggers to unwind the stack and/or to follow pointer
+> chains, they need to be able to remove the PAC bits before attempting to
+> use a pointer.
 > 
-> It's not valid to do a function return from one thread to another.
-
-Regardless of whether it's valid per the C spec or POSIX, some people
-use {set,get}context and {set,long}jmp in this manner (IIRC, QEMU does
-this), and my understanding is that similar tricks are in use in the
-bowels of glibc.
-
-Otherwise, my preference would be to have per-thread keys from day one.
-
-> >   keys. If desired, we could add a mechanism for a thread to re-initialize its
-> >   keys without an exec*().
+> This patch adds a new structure with masks describing the location of
+> PAC bits in instruction and data pointers, which userspace can query via
+> PTRACE_GETREGSET. By clearing these bits from pointers, userspace can
+> acquire the PAC-less versions.
 > 
-> Switching from per-process to per-thread keys would be an ABI break
-> unless it's opt-in.
-
-Indeed, which is why I suggested an opt-in mechanism.
-
-> > * Do we need a separate hwcap for XPAC* instructions?
-> > 
-> >   Library code performing stack unwinding may need to interoperate with other
-> >   code which may or may not be using pointer authentication. It may be
-> >   desirable to use XPAC* rather than attempting authentication and/or acquiring
-> >   the PAC masks via ptrace.
-> > 
-> >   As we may expose APIBKey (potentially separately from APIAKey) in future,
-> >   HWCAP_APIA cannot be used to determine when these instruction can/should be
-> >   used.
+> This new regset is exposed when the kernel is built with (user) pointer
+> authentication support, and the feature is enabled.  Otherwise, it is
+> hidden.
 > 
-> Can the availability of XPAC* be determined from the feature regs, or
-> is that insufficient?
+> Note that even if the feature is available and enabled, we cannot
+> determine whether userspace is making use of the feature, so debuggers
+> need to cope with this case regardless.
+> 
+> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Jiong Wang <jiong.wang@arm.com>
+> Cc: Will Deacon <will.deacon@arm.com>
+> ---
+>  arch/arm64/include/asm/pointer_auth.h |  8 +++++++
+>  arch/arm64/include/uapi/asm/ptrace.h  |  5 +++++
+>  arch/arm64/kernel/ptrace.c            | 39 +++++++++++++++++++++++++++++++++++
+>  include/uapi/linux/elf.h              |  1 +
+>  4 files changed, 53 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/pointer_auth.h b/arch/arm64/include/asm/pointer_auth.h
+> index 345df24..ed505fe 100644
+> --- a/arch/arm64/include/asm/pointer_auth.h
+> +++ b/arch/arm64/include/asm/pointer_auth.h
+> @@ -16,9 +16,11 @@
+>  #ifndef __ASM_POINTER_AUTH_H
+>  #define __ASM_POINTER_AUTH_H
+>  
+> +#include <linux/bitops.h>
+>  #include <linux/random.h>
+>  
+>  #include <asm/cpufeature.h>
+> +#include <asm/memory.h>
+>  #include <asm/sysreg.h>
+>  
+>  #ifdef CONFIG_ARM64_POINTER_AUTHENTICATION
+> @@ -70,6 +72,12 @@ static inline void ptrauth_keys_dup(struct ptrauth_keys *old,
+>  	*new = *old;
+>  }
+>  
+> +/*
+> + * The pointer bits used by a pointer authentication code.
+> + * If we were to use tagged pointers, bits 63:56 would also apply.
+> + */
+> +#define ptrauth_pac_mask() 	GENMASK(54, VA_BITS)
 
-I'd forgotten to fix up the id reg emulation to enable this, but this
-should be sufficient when wired up.
-
-The painful part is that there are several fields which can imply XPAC*
-are present, so userspace has to remember to check all of those fields.
+Tagged pointers _are_ enabled for userspace by default, no?
 
 [...]
 
-> > * Should the kernel remove PACs when unwinding user stacks?
-> > 
-> >   This is simple to do, but it's arguably placing a policy in the kernel as to
-> >   what we expect user stacks to look like. Regardless, userspace will have to
-> >   perform this when unwinding with DWARF.
-> 
-> Not sure.  This is arguably not more gross than related things the
-> kernel already does, and may be inefficient for userspace to do e.g.,
-> when capturing perf backtraces.  Still gross though.
-> 
-> Side question: do you know whether there will be DWARF / ELF annotations
-> for this?  Since ptr auth is a compile-time option, it is plausible that
-> an attribute could be added to indicate that an image uses it.
+> diff --git a/include/uapi/linux/elf.h b/include/uapi/linux/elf.h
+> index b59ee07..cae3d1e 100644
+> --- a/include/uapi/linux/elf.h
+> +++ b/include/uapi/linux/elf.h
+> @@ -414,6 +414,7 @@
+>  #define NT_ARM_HW_BREAK	0x402		/* ARM hardware breakpoint registers */
+>  #define NT_ARM_HW_WATCH	0x403		/* ARM hardware watchpoint registers */
+>  #define NT_ARM_SYSTEM_CALL	0x404	/* ARM system call number */
+> +#define NT_ARM_PAC_MASK		0x405	/* ARM pointer authentication code masks */
 
-Jiong, Yao, can you answer this?
+The is the value tentatively assigned to NT_ARM_SVE.
 
-I think that there's DWARF metadata for unwinding, but I'm not sure
-there's an ELF annotation on an image.
-
-Note that you may link with libraries which may or may not use pointer
-auth, so a single process can have a mixture of code using pointer auth,
-and code which does not.
-
-Thanks,
-Mark.
+Cheers
+---Dave
