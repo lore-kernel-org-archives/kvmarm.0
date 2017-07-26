@@ -1,35 +1,23 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH kvm-unit-tests 2/3] arm64: timer: Fix test on APM X-Gene
-Date: Wed, 26 Jul 2017 04:38:41 -0700
-Message-ID: <20170726113841.GF1588@lvm>
-References: <20170713192009.10069-1-cdall@linaro.org>
- <20170713192009.10069-3-cdall@linaro.org>
- <a58bfe11-19a0-aa92-5166-2c33e4cb8981@arm.com>
- <20170714154512.GC1535@lvm>
- <20170718100503.crn2dgqlalrirzqw@kamzik.brq.redhat.com>
- <20170718103512.GB14069@cbox>
- <20170718121527.ptemrr6mbhfwwbwe@kamzik.brq.redhat.com>
- <b7900fdf-bcc0-00af-bf5d-940eca09e4ae@redhat.com>
- <CAMJs5B-CbRdDPO31XaWuDp0=um5KpePZGBVEw+mU9EnZkZFKwg@mail.gmail.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: [PATCH kvm-unit-tests] arm64: timer: Avoid IRQ race in timer test
+Date: Wed, 26 Jul 2017 13:42:49 +0200
+Message-ID: <20170726114249.17774-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EA5740D44
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jul 2017 07:37:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D73E940D11
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jul 2017 07:41:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VUC+9ytZXu-Y for <kvmarm@lists.cs.columbia.edu>;
- Wed, 26 Jul 2017 07:37:42 -0400 (EDT)
-Received: from mail-lf0-f47.google.com (mail-lf0-f47.google.com
- [209.85.215.47])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EF44E40960
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jul 2017 07:37:41 -0400 (EDT)
-Received: by mail-lf0-f47.google.com with SMTP id y15so67111699lfd.5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jul 2017 04:38:45 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <CAMJs5B-CbRdDPO31XaWuDp0=um5KpePZGBVEw+mU9EnZkZFKwg@mail.gmail.com>
+ with ESMTP id kDZ+hJt6c3VC for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 26 Jul 2017 07:41:50 -0400 (EDT)
+Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E123240960
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jul 2017 07:41:49 -0400 (EDT)
+Received: by mail-wm0-f44.google.com with SMTP id m85so65060272wma.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jul 2017 04:42:53 -0700 (PDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -39,57 +27,104 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: Christoffer Dall <cdall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jul 24, 2017 at 11:25:50PM +0200, Christoffer Dall wrote:
-> On Mon, Jul 24, 2017 at 7:13 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > On 18/07/2017 14:15, Andrew Jones wrote:
-> >>>
-> >>> If we want to add a "the platform provides a timer with 56 valid bits in
-> >>> the counter and compare register", then I think it should be a separate
-> >>> test, and the the user can see that "basic stuff works", "architecture
-> >>> compliance not so much" and shrug accordingly.
-> >> Two separate tests sounds good to me. Although, if the value of 'now' is
-> >> large enough that now + 10s will set bit 31, then a mustang run (at least
-> >> mine) will fail - and most likely cause a lot of confusion, since it
-> >> normally does not. We should probably attempt to address that known issue
-> >> in some way as well.
-> >
-> > Is the value relative to vm startup or host startup?
-> >
-> For the virtual timer, KVM currently resets the counter to zero (so VM
-> startup) and for the physical timer it's since host startup.
-> 
-> I confirmed the behavior Drew reported on my mustang too, but it only
-> appears to apply for the vtimer when writing cval with bit 31 set, not
-> for the ptimer.  I was thinking that this may be a problem with KVM,
-> some sort of signed bit extension problem, but since the problem
-> doesn't show up on other platforms, it may just be a problem there.
+The current timer test relies on testing the pending state of the timer
+before the interrupt handler has run which could lower the pending
+signal again (because it masks the timer output signal).
 
-ok, so I did some digging here.  The problem doesn't seem to be with bit
-31 specifically, but rather that the Mustang cannot handle a larger
-difference between cval and cnt, than (1 << 31) - 1.
+What we really want is to make sure the output signal from the timer as
+perceived by the virtual interrupt controller is low when the timer is
+programmed some time far in the future.  The proper way to do that is to
+disable the timer interrupt on the distributor and then reading its
+pending state.
 
-I verified this by writing to tval instead and increasing its value more
-and more.
+Signed-off-by: Christoffer Dall <cdall@linaro.org>
+---
+ arm/timer.c | 41 ++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 34 insertions(+), 7 deletions(-)
 
-Furthermore, I also added a delay loop, that waits until the counter
-reaches 0xffffffff and then program cval with something later, which
-works just fine.
-
-I also looked at the hardware registers and observe things like:
-
-cval: 0x100000000 cnt_ctl: 0x5 cnt: 0x225a6e
-
-Which means that the timer sets ISTATUS even though it clearly shouldn't
-fire.
-
-The explanation why Linux always (seems to) work on the platform is
-likely that Linux never programs a timer further out than ~80 seconds.
-
-Broken hardware, oh well.
-
-Thanks,
--Christoffer
+diff --git a/arm/timer.c b/arm/timer.c
+index 33dfc6f..e824338 100644
+--- a/arm/timer.c
++++ b/arm/timer.c
+@@ -96,6 +96,23 @@ static struct timer_info ptimer_info = {
+ 	.write_ctl = write_ptimer_ctl,
+ };
+ 
++static void set_timer_irq_enabled(struct timer_info *info, bool enabled)
++{
++	u32 val = 0;
++
++	if (enabled)
++		val = 1 << PPI(info->irq);
++
++	switch (gic_version()) {
++	case 2:
++		writel(val, gicv2_dist_base() + GICD_ISENABLER + 0);
++		break;
++	case 3:
++		writel(val, gicv3_sgi_base() + GICR_ISENABLER0);
++		break;
++	}
++}
++
+ static void irq_handler(struct pt_regs *regs)
+ {
+ 	struct timer_info *info;
+@@ -133,6 +150,8 @@ static bool test_cval_10msec(struct timer_info *info)
+ 	/* Program timer to fire in 10 ms */
+ 	before_timer = info->read_counter();
+ 	info->write_cval(before_timer + time_10ms);
++	info->write_ctl(ARCH_TIMER_CTL_ENABLE);
++	isb();
+ 
+ 	/* Wait for the timer to fire */
+ 	while (!(info->read_ctl() & ARCH_TIMER_CTL_ISTATUS))
+@@ -159,13 +178,25 @@ static void test_timer(struct timer_info *info)
+ 	u64 time_10s = read_sysreg(cntfrq_el0) * 10;
+ 	u64 later = now + time_10s;
+ 
++	/* We don't want the irq handler to fire because that will change the
++	 * timer state and we want to test the timer output signal.  We can
++	 * still read the pending state even if it's disabled. */
++	set_timer_irq_enabled(info, false);
+ 
+-	/* Enable the timer, but schedule it for much later*/
++	/* Enable the timer, but schedule it for much later */
+ 	info->write_cval(later);
+-	isb();
+ 	info->write_ctl(ARCH_TIMER_CTL_ENABLE);
+-
++	isb();
+ 	report("not pending before", !gic_timer_pending(info));
++
++	info->write_cval(now - 1);
++	isb();
++	report("interrupt signal pending", gic_timer_pending(info));
++
++	/* Disable the timer again and prepare to take interrupts */
++	info->write_ctl(0);
++	set_timer_irq_enabled(info, true);
++
+ 	report("latency within 10 ms", test_cval_10msec(info));
+ 	report("interrupt received", info->irq_received);
+ 
+@@ -211,13 +242,9 @@ static void test_init(void)
+ 
+ 	switch (gic_version()) {
+ 	case 2:
+-		writel(1 << PPI(vtimer_info.irq), gicv2_dist_base() + GICD_ISENABLER + 0);
+-		writel(1 << PPI(ptimer_info.irq), gicv2_dist_base() + GICD_ISENABLER + 0);
+ 		gic_ispendr = gicv2_dist_base() + GICD_ISPENDR;
+ 		break;
+ 	case 3:
+-		writel(1 << PPI(vtimer_info.irq), gicv3_sgi_base() + GICR_ISENABLER0);
+-		writel(1 << PPI(ptimer_info.irq), gicv3_sgi_base() + GICR_ISENABLER0);
+ 		gic_ispendr = gicv3_sgi_base() + GICD_ISPENDR;
+ 		break;
+ 	}
+-- 
+2.9.0
