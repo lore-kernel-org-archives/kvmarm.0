@@ -1,127 +1,136 @@
-From: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
-Subject: Re: [PATCH 11/11] KVM: arm64: Delegate support for SDEI to userspace
-Date: Wed, 26 Jul 2017 18:00:03 +0100
-Message-ID: <5978CA93.5090600@arm.com>
-References: <20170515174400.29735-1-james.morse@arm.com> <20170515174400.29735-12-james.morse@arm.com> <20170606195835.GL9464@cbox>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [RFC PATCH v2 02/19] arm64: Use the physical counter when
+ available for read_cycles
+Date: Wed, 26 Jul 2017 18:17:29 +0100
+Message-ID: <20170726171728.GB18154@arm.com>
+References: <20170717142718.13853-1-cdall@linaro.org>
+ <20170717142718.13853-3-cdall@linaro.org>
+ <20170725094308.GC23359@arm.com> <20170725143647.GC1588@lvm>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170606195835.GL9464@cbox>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Christoffer Dall <cdall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Cc: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B69D40D16
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jul 2017 13:16:20 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 0FnUQjqb+73b for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 26 Jul 2017 13:16:18 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9781D40CE0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jul 2017 13:16:18 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <20170725143647.GC1588@lvm>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
-
-(looks like I forgot to send this ...)
-
-On 06/06/17 20:58, Christoffer Dall wrote:
-> On Mon, May 15, 2017 at 06:43:59PM +0100, James Morse wrote:
->> The Software Delegated Exception Interface allows firmware to notify
->> the OS of system events by returning into registered handlers, even
->> if the OS has interrupts masked.
->>
->> While we could support this in KVM, we would need to expose an API for
->> the user space hypervisor to inject events, (and decide what to do it
+On Tue, Jul 25, 2017 at 07:36:47AM -0700, Christoffer Dall wrote:
+> On Tue, Jul 25, 2017 at 10:43:08AM +0100, Will Deacon wrote:
+> > On Mon, Jul 17, 2017 at 04:27:01PM +0200, Christoffer Dall wrote:
+> > > Currently get_cycles() is hardwired to arch_counter_get_cntvct() on
+> > > arm64, but as we move to using the physical timer for the in-kernel
+> > > time-keeping, we need to make that more flexible.
+> > > 
+> > > First, we need to make sure the physical counter can be read on equal
+> > > terms to the virtual counter, which includes adding physical counter
+> > > read functions for timers that require errata.
+> > > 
+> > > Second, we need to make a choice between reading the physical vs virtual
+> > > counter, depending on which timer is used for time keeping in the kernel
+> > > otherwise.  We can do this using a static key to avoid a performance
+> > > penalty during runtime when reading the counter.
+> > > 
+> > > Cc: Catalin Marinas <catalin.marinas@arm.com>
+> > > Cc: Will Deacon <will.deacon@arm.com>
+> > > Cc: Mark Rutland <mark.rutland@arm.com>
+> > > Cc: Marc Zyngier <marc.zyngier@arm.com>
+> > > Signed-off-by: Christoffer Dall <cdall@linaro.org>
+> > > ---
+> > >  arch/arm64/include/asm/arch_timer.h  | 18 ++++++++++++------
+> > >  arch/arm64/include/asm/timex.h       |  2 +-
+> > >  drivers/clocksource/arm_arch_timer.c | 32 ++++++++++++++++++++++++++++++--
+> > >  3 files changed, 43 insertions(+), 9 deletions(-)
+> > 
+> > [...]
+> > 
+> > > @@ -886,10 +912,12 @@ static void __init arch_counter_register(unsigned type)
+> > >  
+> > >  	/* Register the CP15 based counter if we have one */
+> > >  	if (type & ARCH_TIMER_TYPE_CP15) {
+> > > -		if (arch_timer_uses_ppi == ARCH_TIMER_VIRT_PPI)
+> > > +		if (arch_timer_uses_ppi == ARCH_TIMER_VIRT_PPI) {
+> > >  			arch_timer_read_counter = arch_counter_get_cntvct;
+> > > -		else
+> > > +		} else {
+> > >  			arch_timer_read_counter = arch_counter_get_cntpct;
+> > > +			static_branch_enable(&arch_timer_phys_counter_available);
+> > > +		}
+> > 
+> > I'm a bit worried about this change, although I can't put my finger on
+> > exactly the problematic scenario. My concern is that if we have a system
+> > where the host kernel is entered at NS-EL1 (because, e.g. EL2 is used for
+> > something else or the bootloader just didn't load us there) then the booting
+> > protocol doesn't mandate a zero-initialised CNTVOFF value. If we can
+> > subsequently end up using the physical counter in the kernel and the virtual
+> > counter in userspace, the vDSO will get confused because the datapage values
+> > will not correspond to the values it actually ends up reading. 
 > 
-> 'the user space hypervisor' ?
+> Just so I'm sure I'm understanding correctly, vDSO always reads the
+> virtual counter?
 
-Qemu or kvmtool. I never know what generic term to use for these.
-virtual-machine-monitor?
+Yes, that's right.
 
-
-> s/it/if/
+> > There's also
+> > the likelihood that existing EL2 init code simply isn't setting up
+> > CNTHCTL_EL2 and CNTVOFF correctly, so we probably need a way to force
+> > virtual counter on the cmdline.
 > 
->> the event isn't registered or all the CPUs have SDE events masked). We
->> already have an API for guest 'hypercalls', so use this to push the
->> problem onto userspace.
->>
->> Advertise a new capability 'KVM_CAP_ARM_SDEI_1_0' and when any SDEI
->> call comes in, exit to userspace with exit_reason = KVM_EXIT_HYPERCALL.
+> My understanding was that we only ever use the physical counter when we
+> boot at EL2 and therefore the kernel is in control of CNTVOFF and can
+> set that to 0.  Is this not the case, or are you asking for a way to
+> mandate this relationship or make it abundantly clear?
 
-> Documentation/virtual/kvm/api.txt says this is unused.
+AFAICT, arch_timer_ppi_nr could return ARCH_TIMER_PHYS_NONSECURE_PPI
+or ARCH_TIMER_PHYS_SECURE_PPI when we're not running at EL2, which would
+cause us to use the physical counter with your patch applied.
+
+> Also, are you fine with arch_timer_read_counter changing to using the
+> physical counter on arm64, but you're merely worried about
+> read_cycles()?
+
+Assuming you mean get_cycles(), then no, I'm not worried about that because
+it's just used for things like small delta calculations and entropy. I'm
+worried about the timekeeper (which I think uses arch_timer_read_counter)
+being based on the physical counter and the vDSO being based on the virtual
+counter and CNTVOFF != 0.
+
+> Does it make sense to have read_cycles() still read the virtual counter
+> whereas arch timers (timers, not counters) use the physical counter?  I
+> somewhat convinced myself that this doesn't work though.
+
+I don't think that solves the problem :(
+
+> > In practice it looks like we always end up with ARCH_TIMER_VIRT_PPI out of
+> > arch_timer_select_ppi, but that's not guaranteed and I haven't thought at
+> > all about the 32-bit case, which has other quirks/complexities.
+> > 
 > 
-> We should add something there to say that this is now used for arm64,
-> and the api doc also suggests that the hypercall struct in kvm_run has
-> some meaningful data for this exit.
+> How does this change affect the 32-bit side?  All this should do is
+> enable a static branch which is unused on the 32-bit side; what am I
+> missing?
 
-Yes, good point.
+The PPI selection is more complicated for 32-bit, because of the
+"arm,cpu-registers-not-fw-configured" quirk.
 
-I was expecting this patch to provoke some wider discussion on how to delegate
-SMCCC/HVC calls to user space. Do we want per-API KVM_CAP's, or one that dumps
-the whole range on user-space when enabled. It came up (as a tangent) on another
-thread:
-
-Marc Zyngier wrote[0]:
-> Eventually, we want to be able to handle the full spectrum of the SMCCC
-> and forward things to an actual TEE if available. There is no real
-> reason why PSCI shouldn't be handled in userspace the same way (and we
-> already offload reset and halt to QEMU).
-
-
-> Have we checked that the guest can't provoke QEMU to do something weird
-> by causing this exit on arm64 currently (given that we always enable
-> this handling of SDEI calls)?
-
-Qemu 2.2.0 in ubuntu 15.04 ignores the 'sdei_version' hvc/hypercall-exit and
-re-enters the guest with the registers unmodified. I think this is 'weird', I
-assumed it would exit.
-
-
->> N.B. There is no enable/feature bit for SDEI exits as telling the guest
->> the interface exists via DT/ACPI should be sufficient.
-
-I'm probably being too trusting here. Today an unknown HVC will cause KVM to
-inject an undef, whereas with this change it might get handled by user-space if
-the kernel recognises the range, and user-space might just skip the HVC and
-carry on...
-
-I will change this to support KVM_CAP_ENABLE_CAP_VM to enable the SDEI CAP and
-pass that HVC range through to user-space using KVM_EXIT_HYPERCALL and
-populating as much of that structure as makes sense...
-
-
->> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
->> index 3a776ec99181..0bf2d923483c 100644
->> --- a/virt/kvm/arm/arm.c
->> +++ b/virt/kvm/arm/arm.c
->> @@ -206,8 +206,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->>  	case KVM_CAP_READONLY_MEM:
->>  	case KVM_CAP_MP_STATE:
->>  	case KVM_CAP_IMMEDIATE_EXIT:
->> -		r = 1;
->> -		break;
->> +#ifdef CONFIG_ARM_SDE_INTERFACE
->> +	case KVM_CAP_ARM_SDEI_1_0:
->> +#endif
-> 
-> What's the point of conditionally supporting this based on the config
-> option when the rest of the KVM functionality does not depend on the
-> CONFIG_ARM_SDE_INTERFACE functionality?
-
-You're right it doesn't depend on anything in KVM, but adding it unconditionally
-here will enable it on 32bit too, and the spec says this is aarch64 only. So
-#ifdef ARM64 would have been better.
-
-
-> Could a user want to play with SDEI calls in a VM without the host
-> having the proper support, or is that never relevant?
-
-That works fine (its how it was developed!).
-
-'Virtual machine monitors' should be able to pick a RAS notification method for
-guests independently of what the host is using (if anything). If this doesn't
-work it means we've accidentally created some ABI.
-
-
-Thanks,
-
-James
-
-[0] http://lists.infradead.org/pipermail/linux-arm-kernel/2017-March/495861.html
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Will
