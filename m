@@ -1,22 +1,23 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH v2 15/16] KVM: arm64: Save ESR_EL2 on guest SError
-Date: Fri, 28 Jul 2017 15:10:18 +0100
-Message-ID: <20170728141019.9084-16-james.morse@arm.com>
+Subject: [PATCH v2 14/16] KVM: arm64: Take pending SErrors on entry to the
+ guest
+Date: Fri, 28 Jul 2017 15:10:17 +0100
+Message-ID: <20170728141019.9084-15-james.morse@arm.com>
 References: <20170728141019.9084-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D652340D1D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jul 2017 10:11:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DE56749C2D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jul 2017 10:11:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hYwOQScplgnp for <kvmarm@lists.cs.columbia.edu>;
- Fri, 28 Jul 2017 10:11:07 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D89D449C24
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jul 2017 10:11:07 -0400 (EDT)
+ with ESMTP id vYiNTs3QhvbH for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 28 Jul 2017 10:11:05 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 58A8D40A86
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jul 2017 10:11:05 -0400 (EDT)
 In-Reply-To: <20170728141019.9084-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,54 +32,91 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Wang Xiongfeng <wangxiongfeng2@huawei.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When we exit a guest due to an SError the vcpu fault info isn't updated
-with the ESR. Today this is only done for traps.
+SErrors due to RAS are either taken as an SError, or deferred because
+of an Error Synchronization Barrier (ESB). Systems that support the RAS
+extensions are very likely to have firmware-first handling of these
+errors, taking all SErrors to EL3.
 
-The v8.2 RAS Extensions define ISS values for SError. Update the vcpu's
-fault_info with the ESR on SError so that handle_exit() can determine
-if this was a RAS SError and decode its severity.
+Add {I,}ESB support to KVM and be prepared to handle any resulting SError
+if we are notified directly. (i.e. no firmware-first handling). Do this
+for the cases where we can take the SError instead of deferring it.
+
+With VHE KVM is covered by the host's setting of SCTLR_EL1.IESB: unmask
+SError when entering a guest. This will hyp-panic if there was an SError
+pending during world switch (and we don't have firmware first). Make
+sure this only happens when its KVM's 'fault' by adding an ESB to
+__kvm_call_hyp().
+
+On systems without the RAS extensions a pending SError triggered by KVM's
+world switch will no longer be blamed on the guest, causing a panic
+instead.
 
 Signed-off-by: James Morse <james.morse@arm.com>
 ---
- arch/arm64/kvm/hyp/switch.c | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/assembler.h |  1 +
+ arch/arm64/kvm/hyp.S               |  1 +
+ arch/arm64/kvm/hyp/entry.S         | 18 ++++++++++++++++++
+ 3 files changed, 20 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 945e79c641c4..c6f17c7675ad 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -226,13 +226,20 @@ static bool __hyp_text __translate_far_to_hpfar(u64 far, u64 *hpfar)
- 	return true;
- }
+diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
+index e2bb551f59f7..e440fba6d0fe 100644
+--- a/arch/arm64/include/asm/assembler.h
++++ b/arch/arm64/include/asm/assembler.h
+@@ -29,6 +29,7 @@
+ #include <asm/page.h>
+ #include <asm/pgtable-hwdef.h>
+ #include <asm/ptrace.h>
++#include <asm/sysreg.h>
+ #include <asm/thread_info.h>
  
-+static void __hyp_text __populate_fault_info_esr(struct kvm_vcpu *vcpu)
-+{
-+	vcpu->arch.fault.esr_el2 = read_sysreg_el2(esr);
-+}
+ 	.macro save_and_disable_daif, flags
+diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
+index 952f6cb9cf72..e96a5f6afecd 100644
+--- a/arch/arm64/kvm/hyp.S
++++ b/arch/arm64/kvm/hyp.S
+@@ -40,6 +40,7 @@
+  * arch/arm64/kernel/hyp_stub.S.
+  */
+ ENTRY(__kvm_call_hyp)
++	esb
+ alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
+ 	hvc	#0
+ 	ret
+diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+index 12ee62d6d410..cec18df5a324 100644
+--- a/arch/arm64/kvm/hyp/entry.S
++++ b/arch/arm64/kvm/hyp/entry.S
+@@ -49,6 +49,21 @@
+ 	ldp	x29, lr,  [\ctxt, #CPU_XREG_OFFSET(29)]
+ .endm
+ 
++/* We have an implicit esb if we have VHE and IESB. */
++.macro kvm_explicit_esb
++	alternative_if_not ARM64_HAS_RAS_EXTN
++	b	998f
++	alternative_else_nop_endif
++	alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
++	esb
++	b	998f
++	alternative_else_nop_endif
++	alternative_if_not ARM64_HAS_IESB
++	esb
++	alternative_else_nop_endif
++998:
++.endm
 +
- static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
- {
--	u64 esr = read_sysreg_el2(esr);
--	u8 ec = ESR_ELx_EC(esr);
-+	u8 ec;
-+	u64 esr;
- 	u64 hpfar, far;
+ /*
+  * u64 __guest_enter(struct kvm_vcpu *vcpu,
+  *		     struct kvm_cpu_context *host_ctxt);
+@@ -85,6 +100,9 @@ ENTRY(__guest_enter)
+ 	ldr	x18,      [x18, #CPU_XREG_OFFSET(18)]
  
--	vcpu->arch.fault.esr_el2 = esr;
-+	__populate_fault_info_esr(vcpu);
-+	esr = vcpu->arch.fault.esr_el2;
-+	ec = ESR_ELx_EC(esr);
+ 	// Do not touch any register after this!
++
++	enable_serror		// Don't defer an IESB SError
++	kvm_explicit_esb
+ 	eret
+ ENDPROC(__guest_enter)
  
- 	if (ec != ESR_ELx_EC_DABT_LOW && ec != ESR_ELx_EC_IABT_LOW)
- 		return true;
-@@ -321,6 +328,8 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	 */
- 	if (exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
- 		goto again;
-+	else if (ARM_EXCEPTION_CODE(exit_code) == ARM_EXCEPTION_EL1_SERROR)
-+		__populate_fault_info_esr(vcpu);
- 
- 	if (static_branch_unlikely(&vgic_v2_cpuif_trap) &&
- 	    exit_code == ARM_EXCEPTION_TRAP) {
 -- 
 2.13.2
