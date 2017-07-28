@@ -1,242 +1,163 @@
-From: James Morse <james.morse@arm.com>
-Subject: [PATCH v2 16/16] KVM: arm64: Handle deferred SErrors consumed on
- guest exit
-Date: Fri, 28 Jul 2017 15:10:19 +0100
-Message-ID: <20170728141019.9084-17-james.morse@arm.com>
-References: <20170728141019.9084-1-james.morse@arm.com>
+From: Bandan Das <bsd@redhat.com>
+Subject: Re: [RFC PATCH v2 00/38] Nested Virtualization on KVM/ARM
+Date: Fri, 28 Jul 2017 16:13:04 -0400
+Message-ID: <jpgshhg7227.fsf@linux.bootlegged.copy>
+References: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
+        <CAHyh4xjkT+JNJL0kxmEjz4qU8kD2-ZwYgVB8VgwsSYjpjTc3LA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A04A949C2D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jul 2017 10:11:12 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id G96NjzmwFcOF for <kvmarm@lists.cs.columbia.edu>;
- Fri, 28 Jul 2017 10:11:11 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AB6649C3D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jul 2017 10:11:10 -0400 (EDT)
-In-Reply-To: <20170728141019.9084-1-james.morse@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Wang Xiongfeng <wangxiongfeng2@huawei.com>, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Jintack Lim <jintack.lim@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, corbet@lwn.net, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, linux@armlinux.org.uk, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, akpm@linux-foundation.org, mchehab@kernel.org, cov@codeaurora.org, daniel.lezcano@linaro.org, david.daney@cavium.com, mark.rutland@arm.com, Suzuki K Poulose <suzuki.poulose@arm.com>, stefan@hello-penguin.com, andy.gross@linaro.org, wcohen@redhat.com, ard.biesheuvel@linaro.org, shankerd@codeaurora.org, vladimir.murzin@arm.com, james.morse@arm.com, linux-doc@vger.kernel.org, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, KVM General <kvm@vg>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On systems with VHE, the RAS extensions and IESB support, KVM gets an
-implicit ESB whenever it enters/exits a guest, because the host sets
-SCTLR_EL1.IESB.
+Jintack Lim <jintack.lim@linaro.org> writes:
+...
+>>
+>> I'll share my experiment setup shortly.
+>
+> I summarized my experiment setup here.
+>
+> https://github.com/columbia/nesting-pub/wiki/Nested-virtualization-on-ARM-setup
 
-To prevent errors being lost, add code to __guest_exit() to read DISR_EL1,
-and save it in the kvm_vcpu_fault_info. Add code to handle_exit() to
-process this deferred SError. This data is in addition to the reason the
-guest exitted.
+Thanks Jintack! I was able to test L2 boot up with these instructions.
 
-Future patches may add a firmware-first callout from
-kvm_handle_deferred_serror() to decode CPER records populated by firmware,
-or call some arm64 arch code to process the RAS 'ERR' registers for
-kernel-first handling. Without either of these, we just make a judgement
-on the severity: corrected and restartable errors are ignored, all others
-result it an SError being given to the guest.
+Next, I will try to run some simple tests. Any suggestions on reducing the L2 bootup
+time in my test setup ? I think I will try to make the L2 kernel print
+less messages; and maybe just get rid of some of the userspace services.
+I also applied the patch to reduce the timer frequency btw.
 
-On systems with EL2 but where VHE has been disabled in the build config,
-add an explicit ESB in the __guest_exit() path. This lets us skip the
-SError VAXorcism on all systems with the RAS extensions.
+Bandan
 
-Signed-off-by: James Morse <james.morse@arm.com>
----
- arch/arm64/include/asm/kvm_emulate.h |  5 +++
- arch/arm64/include/asm/kvm_host.h    |  1 +
- arch/arm64/kernel/asm-offsets.c      |  1 +
- arch/arm64/kvm/handle_exit.c         | 84 +++++++++++++++++++++++++++++-------
- arch/arm64/kvm/hyp/entry.S           |  9 ++++
- 5 files changed, 85 insertions(+), 15 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index fe39e6841326..9bec1e572bee 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -168,6 +168,11 @@ static inline phys_addr_t kvm_vcpu_get_fault_ipa(const struct kvm_vcpu *vcpu)
- 	return ((phys_addr_t)vcpu->arch.fault.hpfar_el2 & HPFAR_MASK) << 8;
- }
- 
-+static inline u64 kvm_vcpu_get_disr(const struct kvm_vcpu *vcpu)
-+{
-+	return vcpu->arch.fault.disr_el1;
-+}
-+
- static inline u32 kvm_vcpu_hvc_get_imm(const struct kvm_vcpu *vcpu)
- {
- 	return kvm_vcpu_get_hsr(vcpu) & ESR_ELx_xVC_IMM_MASK;
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index d68630007b14..f65cc6d497e6 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -88,6 +88,7 @@ struct kvm_vcpu_fault_info {
- 	u32 esr_el2;		/* Hyp Syndrom Register */
- 	u64 far_el2;		/* Hyp Fault Address Register */
- 	u64 hpfar_el2;		/* Hyp IPA Fault Address Register */
-+	u64 disr_el1;		/* Deferred [SError] Status Register */
- };
- 
- /*
-diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
-index b3bb7ef97bc8..331cccbd38cf 100644
---- a/arch/arm64/kernel/asm-offsets.c
-+++ b/arch/arm64/kernel/asm-offsets.c
-@@ -129,6 +129,7 @@ int main(void)
-   BLANK();
- #ifdef CONFIG_KVM_ARM_HOST
-   DEFINE(VCPU_CONTEXT,		offsetof(struct kvm_vcpu, arch.ctxt));
-+  DEFINE(VCPU_FAULT_DISR,	offsetof(struct kvm_vcpu, arch.fault.disr_el1));
-   DEFINE(CPU_GP_REGS,		offsetof(struct kvm_cpu_context, gp_regs));
-   DEFINE(CPU_USER_PT_REGS,	offsetof(struct kvm_regs, regs));
-   DEFINE(CPU_FP_REGS,		offsetof(struct kvm_regs, fp_regs));
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 17d8a1677a0b..b8e2477853eb 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -23,6 +23,7 @@
- #include <linux/kvm_host.h>
- 
- #include <asm/esr.h>
-+#include <asm/exception.h>
- #include <asm/kvm_asm.h>
- #include <asm/kvm_coproc.h>
- #include <asm/kvm_emulate.h>
-@@ -67,6 +68,67 @@ static int handle_no_fpsimd(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	return 1;
- }
- 
-+static void kvm_inject_serror(struct kvm_vcpu *vcpu)
-+{
-+	u8 hsr_ec = ESR_ELx_EC(kvm_vcpu_get_hsr(vcpu));
-+
-+	/*
-+	 * HVC/SMC already have an adjusted PC, which we need
-+	 * to correct in order to return to after having
-+	 * injected the SError.
-+	 */
-+	if (hsr_ec == ESR_ELx_EC_HVC32 || hsr_ec == ESR_ELx_EC_HVC64 ||
-+	    hsr_ec == ESR_ELx_EC_SMC32 || hsr_ec == ESR_ELx_EC_SMC64) {
-+		u32 adj =  kvm_vcpu_trap_il_is32bit(vcpu) ? 4 : 2;
-+		*vcpu_pc(vcpu) -= adj;
-+	}
-+
-+	kvm_inject_vabt(vcpu);
-+}
-+
-+/**
-+ * kvm_handle_guest_serror
-+ *
-+ * @vcpu:	the vcpu pointer
-+ * @esr:	the esr_el2 value read at guest exit for an SError, or
-+ * 		disr_el1 for a deferred SError.
-+ *
-+ * Either the guest took an SError, or we found one pending while handling
-+ * __guest_exit() at EL2. With the v8.2 RAS extensions SErrors are either
-+ * 'impementation defined' or categorised as a RAS exception.
-+ * Without any further information we ignore SErrors categorised as
-+ * 'corrected' or 'restartable' by RAS, and hand the guest an SError in
-+ * all other cases.
-+ */
-+static int kvm_handle_guest_serror(struct kvm_vcpu *vcpu, u32 esr)
-+{
-+	bool impdef_syndrome = esr & ESR_ELx_ISV;	/* aka IDS */
-+	unsigned int aet = esr & ESR_ELx_AET;
-+
-+	if (!cpus_have_const_cap(ARM64_HAS_RAS_EXTN) || impdef_syndrome) {
-+		kvm_inject_serror(vcpu);
-+		return 1;
-+	}
-+
-+	/*
-+	 * AET is RES0 if 'the value returned in the DFSC field is not
-+	 * [ESR_ELx_FSC_SERROR]'
-+	 */
-+	if ((esr & ESR_ELx_FSC) != ESR_ELx_FSC_SERROR) {
-+		kvm_inject_serror(vcpu);
-+		return 1;
-+	}
-+
-+	switch (aet) {
-+	case ESR_ELx_AET_CE:	/* corrected error */
-+	case ESR_ELx_AET_UEO:	/* restartable error, not yet consumed */
-+		return 0;	/* continue processing the guest exit */
-+	default:
-+		kvm_inject_serror(vcpu);
-+		return 1;
-+	}
-+}
-+
- /**
-  * kvm_handle_wfx - handle a wait-for-interrupts or wait-for-event
-  *		    instruction executed by a guest
-@@ -187,21 +249,13 @@ int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
- {
- 	exit_handle_fn exit_handler;
- 
--	if (ARM_SERROR_PENDING(exception_index)) {
--		u8 hsr_ec = ESR_ELx_EC(kvm_vcpu_get_hsr(vcpu));
--
--		/*
--		 * HVC/SMC already have an adjusted PC, which we need
--		 * to correct in order to return to after having
--		 * injected the SError.
--		 */
--		if (hsr_ec == ESR_ELx_EC_HVC32 || hsr_ec == ESR_ELx_EC_HVC64 ||
--		    hsr_ec == ESR_ELx_EC_SMC32 || hsr_ec == ESR_ELx_EC_SMC64) {
--			u32 adj =  kvm_vcpu_trap_il_is32bit(vcpu) ? 4 : 2;
--			*vcpu_pc(vcpu) -= adj;
--		}
-+	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN)) {
-+		u64 disr = kvm_vcpu_get_disr(vcpu);
- 
--		kvm_inject_vabt(vcpu);
-+		if (disr)
-+			kvm_handle_guest_serror(vcpu, disr_to_esr(disr));
-+	} else if (ARM_SERROR_PENDING(exception_index)) {
-+		kvm_inject_serror(vcpu);
- 		return 1;
- 	}
- 
-@@ -211,7 +265,7 @@ int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 	case ARM_EXCEPTION_IRQ:
- 		return 1;
- 	case ARM_EXCEPTION_EL1_SERROR:
--		kvm_inject_vabt(vcpu);
-+		kvm_handle_guest_serror(vcpu, kvm_vcpu_get_hsr(vcpu));
- 		return 1;
- 	case ARM_EXCEPTION_TRAP:
- 		/*
-diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-index cec18df5a324..f1baaffa6922 100644
---- a/arch/arm64/kvm/hyp/entry.S
-+++ b/arch/arm64/kvm/hyp/entry.S
-@@ -142,6 +142,15 @@ ENTRY(__guest_exit)
- 	// Now restore the host regs
- 	restore_callee_saved_regs x2
- 
-+	kvm_explicit_esb
-+	disr_read	reg=x2
-+alternative_if ARM64_HAS_RAS_EXTN
-+	str	x2, [x1, #(VCPU_FAULT_DISR - VCPU_CONTEXT)]
-+	cbz	x2, 1f
-+	orr	x0, x0, #(1<<ARM_EXIT_WITH_SERROR_BIT)
-+1:	ret
-+alternative_else_nop_endif
-+
- 	// If we have a pending asynchronous abort, now is the
- 	// time to find out. From your VAXorcist book, page 666:
- 	// "Threaten me not, oh Evil one!  For I speak with
--- 
-2.13.2
+>>
+>> Even though this work has some limitations and TODOs, I'd appreciate early
+>> feedback on this RFC. Specifically, I'm interested in:
+>>
+>> - Overall design to manage vcpu context for the virtual EL2
+>> - Verifying correct EL2 register configurations such as HCR_EL2, CPTR_EL2
+>>   (Patch 30 and 32)
+>> - Patch organization and coding style
+>
+> I also wonder if the hardware and/or KVM do not support nested
+> virtualization but the userspace uses nested virtualization option,
+> which one is better: giving an error or launching a regular VM
+> silently.
+>
+>>
+>> This patch series is based on kvm/next d38338e.
+>> The whole patch series including memory, VGIC, and timer patches is available
+>> here:
+>>
+>> git@github.com:columbia/nesting-pub.git rfc-v2
+>>
+>> Limitations:
+>> - There are some cases that the target exception level of a VM is ambiguous when
+>>   emulating eret instruction. I'm discussing this issue with Christoffer and
+>>   Marc. Meanwhile, I added a temporary patch (not included in this
+>>   series. f1beaba in the repo) and used 4.10.0 kernel when testing the guest
+>>   hypervisor with VHE.
+>> - Recursive nested virtualization is not tested yet.
+>> - Other hypervisors (such as Xen) on KVM are not tested.
+>>
+>> TODO:
+>> - Submit memory, VGIC, and timer patches
+>> - Evaluate regular VM performance to see if there's a negative impact.
+>> - Test other hypervisors such as Xen on KVM
+>> - Test recursive nested virtualization
+>>
+>> v1-->v2:
+>> - Added support for the virtual EL2 with VHE
+>> - Rewrote commit messages and comments from the perspective of supporting
+>>   execution environments to VMs, rather than from the perspective of the guest
+>>   hypervisor running in them.
+>> - Fixed a few bugs to make it run on the FastModel.
+>> - Tested on ARMv8.3 with four configurations. (host/guest. with/without VHE.)
+>> - Rebased to kvm/next
+>>
+>> [1] https://www.community.arm.com/processors/b/blog/posts/armv8-a-architecture-2016-additions
+>>
+>> Christoffer Dall (7):
+>>   KVM: arm64: Add KVM nesting feature
+>>   KVM: arm64: Allow userspace to set PSR_MODE_EL2x
+>>   KVM: arm64: Add vcpu_mode_el2 primitive to support nesting
+>>   KVM: arm/arm64: Add a framework to prepare virtual EL2 execution
+>>   arm64: Add missing TCR hw defines
+>>   KVM: arm64: Create shadow EL1 registers
+>>   KVM: arm64: Trap EL1 VM register accesses in virtual EL2
+>>
+>> Jintack Lim (31):
+>>   arm64: Add ARM64_HAS_NESTED_VIRT feature
+>>   KVM: arm/arm64: Enable nested virtualization via command-line
+>>   KVM: arm/arm64: Check if nested virtualization is in use
+>>   KVM: arm64: Add EL2 system registers to vcpu context
+>>   KVM: arm64: Add EL2 special registers to vcpu context
+>>   KVM: arm64: Add the shadow context for virtual EL2 execution
+>>   KVM: arm64: Set vcpu context depending on the guest exception level
+>>   KVM: arm64: Synchronize EL1 system registers on virtual EL2 entry and
+>>     exit
+>>   KVM: arm64: Move exception macros and enums to a common file
+>>   KVM: arm64: Support to inject exceptions to the virtual EL2
+>>   KVM: arm64: Trap SPSR_EL1, ELR_EL1 and VBAR_EL1 from virtual EL2
+>>   KVM: arm64: Trap CPACR_EL1 access in virtual EL2
+>>   KVM: arm64: Handle eret instruction traps
+>>   KVM: arm64: Set a handler for the system instruction traps
+>>   KVM: arm64: Handle PSCI call via smc from the guest
+>>   KVM: arm64: Inject HVC exceptions to the virtual EL2
+>>   KVM: arm64: Respect virtual HCR_EL2.TWX setting
+>>   KVM: arm64: Respect virtual CPTR_EL2.TFP setting
+>>   KVM: arm64: Add macros to support the virtual EL2 with VHE
+>>   KVM: arm64: Add EL2 registers defined in ARMv8.1 to vcpu context
+>>   KVM: arm64: Emulate EL12 register accesses from the virtual EL2
+>>   KVM: arm64: Support a VM with VHE considering EL0 of the VHE host
+>>   KVM: arm64: Allow the virtual EL2 to access EL2 states without trap
+>>   KVM: arm64: Manage the shadow states when virtual E2H bit enabled
+>>   KVM: arm64: Trap and emulate CPTR_EL2 accesses via CPACR_EL1 from the
+>>     virtual EL2 with VHE
+>>   KVM: arm64: Emulate appropriate VM control system registers
+>>   KVM: arm64: Respect the virtual HCR_EL2.NV bit setting
+>>   KVM: arm64: Respect the virtual HCR_EL2.NV bit setting for EL12
+>>     register traps
+>>   KVM: arm64: Respect virtual HCR_EL2.TVM and TRVM settings
+>>   KVM: arm64: Respect the virtual HCR_EL2.NV1 bit setting
+>>   KVM: arm64: Respect the virtual CPTR_EL2.TCPAC setting
+>>
+>>  Documentation/admin-guide/kernel-parameters.txt |   4 +
+>>  arch/arm/include/asm/kvm_emulate.h              |  17 ++
+>>  arch/arm/include/asm/kvm_host.h                 |  15 +
+>>  arch/arm64/include/asm/cpucaps.h                |   3 +-
+>>  arch/arm64/include/asm/esr.h                    |   1 +
+>>  arch/arm64/include/asm/kvm_arm.h                |   2 +
+>>  arch/arm64/include/asm/kvm_coproc.h             |   3 +-
+>>  arch/arm64/include/asm/kvm_emulate.h            |  56 ++++
+>>  arch/arm64/include/asm/kvm_host.h               |  64 ++++-
+>>  arch/arm64/include/asm/kvm_hyp.h                |  24 --
+>>  arch/arm64/include/asm/pgtable-hwdef.h          |   6 +
+>>  arch/arm64/include/asm/sysreg.h                 |  70 +++++
+>>  arch/arm64/include/uapi/asm/kvm.h               |   1 +
+>>  arch/arm64/kernel/asm-offsets.c                 |   1 +
+>>  arch/arm64/kernel/cpufeature.c                  |  11 +
+>>  arch/arm64/kvm/Makefile                         |   5 +-
+>>  arch/arm64/kvm/context.c                        | 346 +++++++++++++++++++++++
+>>  arch/arm64/kvm/emulate-nested.c                 |  83 ++++++
+>>  arch/arm64/kvm/guest.c                          |   2 +
+>>  arch/arm64/kvm/handle_exit.c                    |  89 +++++-
+>>  arch/arm64/kvm/hyp/entry.S                      |  13 +
+>>  arch/arm64/kvm/hyp/hyp-entry.S                  |   2 +-
+>>  arch/arm64/kvm/hyp/switch.c                     |  33 ++-
+>>  arch/arm64/kvm/hyp/sysreg-sr.c                  | 117 ++++----
+>>  arch/arm64/kvm/inject_fault.c                   |  12 -
+>>  arch/arm64/kvm/nested.c                         |  63 +++++
+>>  arch/arm64/kvm/reset.c                          |   8 +
+>>  arch/arm64/kvm/sys_regs.c                       | 359 +++++++++++++++++++++++-
+>>  arch/arm64/kvm/sys_regs.h                       |   8 +
+>>  arch/arm64/kvm/trace.h                          |  43 ++-
+>>  virt/kvm/arm/arm.c                              |  20 ++
+>>  31 files changed, 1363 insertions(+), 118 deletions(-)
+>>  create mode 100644 arch/arm64/kvm/context.c
+>>  create mode 100644 arch/arm64/kvm/emulate-nested.c
+>>  create mode 100644 arch/arm64/kvm/nested.c
+>>
+>> --
+>> 1.9.1
+>>
