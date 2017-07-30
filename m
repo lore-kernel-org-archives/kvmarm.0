@@ -1,28 +1,28 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [RFC PATCH v2 08/38] KVM: arm64: Add EL2 special registers to
- vcpu context
-Date: Sun, 30 Jul 2017 21:59:55 +0200
-Message-ID: <20170730195955.GG5176@cbox>
+Subject: Re: [RFC PATCH v2 14/38] KVM: arm64: Synchronize EL1 system
+ registers on virtual EL2 entry and exit
+Date: Sun, 30 Jul 2017 22:00:00 +0200
+Message-ID: <20170730200000.GH5176@cbox>
 References: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
- <1500397144-16232-9-git-send-email-jintack.lim@linaro.org>
+ <1500397144-16232-15-git-send-email-jintack.lim@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2795040D16
- for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Jul 2017 15:58:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C4B6640CE9
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Jul 2017 15:58:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id t8bD3rhHL9Yn for <kvmarm@lists.cs.columbia.edu>;
- Sun, 30 Jul 2017 15:58:45 -0400 (EDT)
-Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com [74.125.82.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0733340FB0
- for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Jul 2017 15:58:44 -0400 (EDT)
-Received: by mail-wm0-f50.google.com with SMTP id k20so10539316wmg.0
- for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Jul 2017 12:59:57 -0700 (PDT)
+ with ESMTP id M7MUoFO9oedv for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 30 Jul 2017 15:58:49 -0400 (EDT)
+Received: from mail-wm0-f48.google.com (mail-wm0-f48.google.com [74.125.82.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BA81940D16
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Jul 2017 15:58:49 -0400 (EDT)
+Received: by mail-wm0-f48.google.com with SMTP id m85so59624651wma.0
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Jul 2017 13:00:02 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1500397144-16232-9-git-send-email-jintack.lim@linaro.org>
+In-Reply-To: <1500397144-16232-15-git-send-email-jintack.lim@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,188 +36,141 @@ To: Jintack Lim <jintack.lim@linaro.org>
 Cc: kvm@vger.kernel.org, david.daney@cavium.com, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, stefan@hello-penguin.com, corbet@lwn.net, daniel.lezcano@linaro.org, linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, andy.gross@linaro.org, marc.zyngier@arm.com, cov@codeaurora.org, wcohen@redhat.com, mchehab@kernel.org, ard.biesheuvel@linaro.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, akpm@linux-foundation.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Jul 18, 2017 at 11:58:34AM -0500, Jintack Lim wrote:
-> To support the virtual EL2 execution, we need to maintain the EL2
-> special registers such as SPSR_EL2, ELR_EL2 and SP_EL2 in vcpu context.
+On Tue, Jul 18, 2017 at 11:58:40AM -0500, Jintack Lim wrote:
+> When running in virtual EL2 we use the shadow EL1 systerm register array
+> for the save/restore process, so that hardware and especially the memory
+> subsystem behaves as code written for EL2 expects while really running
+> in EL1.
 > 
-> Note that SP_EL2 is not accessible in EL2, so we don't need a trap
-> handler for this register.
-
-Actually, it's not accessible *in the MRS/MSR instruction* but it is of
-course accessible as the current stack pointer (which is why you need
-the state, but not the trap handler).
-
-Otherwise, the patch looks good.
-
-Thanks,
--Christoffer
-
+> This works great for EL1 system register accesses that we trap, because
+> these accesses will be written into the virtual state for the EL1 system
+> registers used when eventually switching the VCPU mode to EL1.
 > 
+> However, there was a collection of EL1 system registers which we do not
+> trap, and as a consequence all save/restore operations of these
+> registers were happening locally in the shadow array, with no benefit to
+> software actually running in virtual EL1 at all.
+> 
+> To fix this, simply synchronize the shadow and real EL1 state for these
+> registers on entry/exit to/from virtual EL2 state.
+> 
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 > Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 > ---
->  arch/arm64/include/asm/kvm_host.h | 12 ++++++++++++
->  arch/arm64/include/asm/sysreg.h   |  4 ++++
->  arch/arm64/kvm/sys_regs.c         | 38 +++++++++++++++++++++++++++++++++-----
->  arch/arm64/kvm/sys_regs.h         |  8 ++++++++
->  4 files changed, 57 insertions(+), 5 deletions(-)
+>  arch/arm64/kvm/context.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 56 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 1dc4ed6..57dccde 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -171,6 +171,15 @@ enum vcpu_sysreg {
->  	NR_SYS_REGS	/* Nothing after this line! */
->  };
+> diff --git a/arch/arm64/kvm/context.c b/arch/arm64/kvm/context.c
+> index e965049..e1bc753 100644
+> --- a/arch/arm64/kvm/context.c
+> +++ b/arch/arm64/kvm/context.c
+> @@ -86,6 +86,58 @@ static void flush_shadow_el1_sysregs(struct kvm_vcpu *vcpu)
+>  	s_sys_regs[CPACR_EL1] = cptr_to_cpacr(vcpu_sys_reg(vcpu, CPTR_EL2));
+>  }
 >  
-> +enum el2_special_regs {
-> +	__INVALID_EL2_SPECIAL_REG__,
-> +	SPSR_EL2,	/* Saved Program Status Register (EL2) */
-> +	ELR_EL2,	/* Exception Link Register (EL2) */
-> +	SP_EL2,		/* Stack Pointer (EL2) */
 > +
-> +	NR_EL2_SPECIAL_REGS
+> +/*
+> + * List of EL0 and EL1 registers which we allow the virtual EL2 mode to access
+> + * directly without trapping. This is possible because the impact of
+> + * accessing those registers are the same regardless of the exception
+> + * levels that are allowed.
+
+I don't understand this last sentence...
+
+> + */
+> +static const int el1_non_trap_regs[] = {
+> +	CNTKCTL_EL1,
+> +	CSSELR_EL1,
+> +	PAR_EL1,
+> +	TPIDR_EL0,
+> +	TPIDR_EL1,
+> +	TPIDRRO_EL0
 > +};
 > +
->  /* 32bit mapping */
->  #define c0_MPIDR	(MPIDR_EL1 * 2)	/* MultiProcessor ID Register */
->  #define c0_CSSELR	(CSSELR_EL1 * 2)/* Cache Size Selection Register */
-> @@ -218,6 +227,8 @@ struct kvm_cpu_context {
->  		u64 sys_regs[NR_SYS_REGS];
->  		u32 copro[NR_COPRO_REGS];
->  	};
-> +
-> +	u64 el2_special_regs[NR_EL2_SPECIAL_REGS];
->  };
->  
->  typedef struct kvm_cpu_context kvm_cpu_context_t;
-> @@ -307,6 +318,7 @@ struct kvm_vcpu_arch {
->  
->  #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.gp_regs)
->  #define vcpu_sys_reg(v,r)	((v)->arch.ctxt.sys_regs[(r)])
-> +#define vcpu_el2_sreg(v,r)	((v)->arch.ctxt.el2_special_regs[(r)])
->  /*
->   * CP14 and CP15 live in the same array, as they are backed by the
->   * same system registers.
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index 9277c4a..98c32ef 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -268,6 +268,8 @@
->  
->  #define SYS_DACR32_EL2			sys_reg(3, 4, 3, 0, 0)
->  
-> +#define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
-> +#define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
->  #define SYS_SP_EL1			sys_reg(3, 4, 4, 1, 0)
->  
->  #define SYS_IFSR32_EL2			sys_reg(3, 4, 5, 0, 1)
-> @@ -332,6 +334,8 @@
->  #define SYS_CNTVOFF_EL2			sys_reg(3, 4, 14, 0, 3)
->  #define SYS_CNTHCTL_EL2			sys_reg(3, 4, 14, 1, 0)
->  
-> +#define SYS_SP_EL2			sys_reg(3, 6, 4, 1, 0)
-> +
->  /* Common SCTLR_ELx flags. */
->  #define SCTLR_ELx_EE    (1 << 25)
->  #define SCTLR_ELx_I	(1 << 12)
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 1568f8b..2b3ed70 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -900,15 +900,33 @@ static inline void access_rw(struct sys_reg_params *p, u64 *sysreg)
->  		*sysreg = p->regval;
->  }
->  
-> +static u64 *get_special_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *p)
+> +/**
+> + * copy_shadow_non_trap_el1_state
+> + * @vcpu:      The VCPU pointer
+> + * @setup:     True, if on the way to the guest (called from setup)
+
+should setup be called flush?
+
+then we could do
+
+	if (flush) {
+		...
+	} else { /* sync */
+		...
+	}
+
+> + *             False, if returning form the guet (calld from restore)
+
+called
+
+> + *
+> + * Some EL1 registers are accessed directly by the virtual EL2 mode because
+> + * they in no way affect execution state in virtual EL2.   However, we must
+> + * still ensure that virtual EL2 observes the same state of the EL1 registers
+> + * as the normal VM's EL1 mode, so copy this state as needed on setup/restore.
+> + */
+
+Perhaps this could be written more clearly as:
+
+/*
+ * Synchronize the state of EL1 registers directly accessible by virtual
+ * EL2 between the shadow sys_regs array and the VCPU's EL1 state
+ * before/after the world switch code copies the shadow state to/from
+ * hardware registers.
+ */
+
+> +static void copy_shadow_non_trap_el1_state(struct kvm_vcpu *vcpu, bool setup)
 > +{
-> +	u64 reg = sys_reg(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
+> +	u64 *s_sys_regs = vcpu->arch.ctxt.shadow_sys_regs;
+> +	int i;
 > +
-> +	switch (reg) {
-> +	case SYS_SP_EL1:
-> +		return &vcpu->arch.ctxt.gp_regs.sp_el1;
-> +	case SYS_ELR_EL2:
-> +		return &vcpu_el2_sreg(vcpu, ELR_EL2);
-> +	case SYS_SPSR_EL2:
-> +		return &vcpu_el2_sreg(vcpu, SPSR_EL2);
-> +	default:
-> +		return NULL;
-> +	};
+> +	for (i = 0; i < ARRAY_SIZE(el1_non_trap_regs); i++) {
+> +		const int sr = el1_non_trap_regs[i];
+> +
+> +		if (setup)
+> +			s_sys_regs[sr] = vcpu_sys_reg(vcpu, sr);
+> +		else
+> +			vcpu_sys_reg(vcpu, sr) = s_sys_regs[sr];
+> +	}
 > +}
 > +
->  static bool trap_el2_regs(struct kvm_vcpu *vcpu,
->  			 struct sys_reg_params *p,
->  			 const struct sys_reg_desc *r)
+> +static void sync_shadow_non_trap_el1_state(struct kvm_vcpu *vcpu)
+> +{
+> +	copy_shadow_non_trap_el1_state(vcpu, false);
+> +}
+> +
+> +static void flush_shadow_non_trap_el1_state(struct kvm_vcpu *vcpu)
+> +{
+> +	copy_shadow_non_trap_el1_state(vcpu, true);
+> +}
+> +
+>  static void flush_shadow_special_regs(struct kvm_vcpu *vcpu)
 >  {
-> -	/* SP_EL1 is NOT maintained in sys_regs array */
-> -	if (sys_reg(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2) == SYS_SP_EL1)
-> -		access_rw(p, &vcpu->arch.ctxt.gp_regs.sp_el1);
+>  	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
+> @@ -162,6 +214,7 @@ void kvm_arm_setup_shadow_state(struct kvm_vcpu *vcpu)
+>  	if (unlikely(vcpu_mode_el2(vcpu))) {
+>  		flush_shadow_special_regs(vcpu);
+>  		flush_shadow_el1_sysregs(vcpu);
+> +		flush_shadow_non_trap_el1_state(vcpu);
+>  		ctxt->hw_sys_regs = ctxt->shadow_sys_regs;
+>  	} else {
+>  		flush_special_regs(vcpu);
+> @@ -176,9 +229,10 @@ void kvm_arm_setup_shadow_state(struct kvm_vcpu *vcpu)
+>   */
+>  void kvm_arm_restore_shadow_state(struct kvm_vcpu *vcpu)
+>  {
+> -	if (unlikely(vcpu_mode_el2(vcpu)))
+> +	if (unlikely(vcpu_mode_el2(vcpu))) {
+>  		sync_shadow_special_regs(vcpu);
 > -	else
-> -		access_rw(p, &vcpu_sys_reg(vcpu, r->reg));
-> +	u64 *sys_reg;
-> +
-> +	sys_reg = get_special_reg(vcpu, p);
-> +	if (!sys_reg)
-> +		sys_reg = &vcpu_sys_reg(vcpu, r->reg);
-> +
-> +	access_rw(p, sys_reg);
->  
->  	return true;
->  }
-> @@ -1116,6 +1134,8 @@ static bool trap_el2_regs(struct kvm_vcpu *vcpu,
->  
->  	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
->  
-> +	{ SYS_DESC(SYS_SPSR_EL2), trap_el2_regs, reset_special, SPSR_EL2, 0 },
-> +	{ SYS_DESC(SYS_ELR_EL2), trap_el2_regs, reset_special, ELR_EL2, 0 },
->  	{ SYS_DESC(SYS_SP_EL1), trap_el2_regs },
->  
->  	{ SYS_DESC(SYS_IFSR32_EL2), NULL, reset_unknown, IFSR32_EL2 },
-> @@ -1138,6 +1158,8 @@ static bool trap_el2_regs(struct kvm_vcpu *vcpu,
->  
->  	{ SYS_DESC(SYS_CNTVOFF_EL2), trap_el2_regs, reset_val, CNTVOFF_EL2, 0 },
->  	{ SYS_DESC(SYS_CNTHCTL_EL2), trap_el2_regs, reset_val, CNTHCTL_EL2, 0 },
-> +
-> +	{ SYS_DESC(SYS_SP_EL2), NULL, reset_special, SP_EL2, 0},
->  };
->  
->  static bool trap_dbgidr(struct kvm_vcpu *vcpu,
-> @@ -2271,6 +2293,8 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
->  
->  	/* Catch someone adding a register without putting in reset entry. */
->  	memset(&vcpu->arch.ctxt.sys_regs, 0x42, sizeof(vcpu->arch.ctxt.sys_regs));
-> +	memset(&vcpu->arch.ctxt.el2_special_regs, 0x42,
-> +	       sizeof(vcpu->arch.ctxt.el2_special_regs));
->  
->  	/* Generic chip reset first (so target could override). */
->  	reset_sys_reg_descs(vcpu, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
-> @@ -2281,4 +2305,8 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
->  	for (num = 1; num < NR_SYS_REGS; num++)
->  		if (vcpu_sys_reg(vcpu, num) == 0x4242424242424242)
->  			panic("Didn't reset vcpu_sys_reg(%zi)", num);
-> +
-> +	for (num = 1; num < NR_EL2_SPECIAL_REGS; num++)
-> +		if (vcpu_el2_sreg(vcpu, num) == 0x4242424242424242)
-> +			panic("Didn't reset vcpu_el2_sreg(%zi)", num);
->  }
-> diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-> index 060f534..827717b 100644
-> --- a/arch/arm64/kvm/sys_regs.h
-> +++ b/arch/arm64/kvm/sys_regs.h
-> @@ -99,6 +99,14 @@ static inline void reset_val(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r
->  	vcpu_sys_reg(vcpu, r->reg) = r->val;
+> +		sync_shadow_non_trap_el1_state(vcpu);
+> +	} else
+>  		sync_special_regs(vcpu);
 >  }
 >  
-> +static inline void reset_special(struct kvm_vcpu *vcpu,
-> +				 const struct sys_reg_desc *r)
-> +{
-> +	BUG_ON(!r->reg);
-> +	BUG_ON(r->reg >= NR_EL2_SPECIAL_REGS);
-> +	vcpu_el2_sreg(vcpu, r->reg) = r->val;
-> +}
-> +
->  static inline int cmp_sys_reg(const struct sys_reg_desc *i1,
->  			      const struct sys_reg_desc *i2)
->  {
 > -- 
 > 1.9.1
 > 
