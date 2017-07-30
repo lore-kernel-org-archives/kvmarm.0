@@ -1,178 +1,364 @@
-From: Jintack Lim <jintack.lim@linaro.org>
-Subject: Re: [RFC PATCH v2 00/38] Nested Virtualization on KVM/ARM
-Date: Fri, 28 Jul 2017 17:45:01 -0400
-Message-ID: <CAHyh4xjhJ+uXSek3cayf9E-xjCYY2vt1L+KH2yWAoj469sXaXA@mail.gmail.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [RFC PATCH v2 10/38] KVM: arm/arm64: Add a framework to prepare
+ virtual EL2 execution
+Date: Sun, 30 Jul 2017 14:02:37 +0200
+Message-ID: <20170730120237.GA5176@cbox>
 References: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
- <CAHyh4xjkT+JNJL0kxmEjz4qU8kD2-ZwYgVB8VgwsSYjpjTc3LA@mail.gmail.com> <jpgshhg7227.fsf@linux.bootlegged.copy>
+ <1500397144-16232-11-git-send-email-jintack.lim@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
 Return-path: <linux-doc-owner@vger.kernel.org>
-In-Reply-To: <jpgshhg7227.fsf@linux.bootlegged.copy>
+Content-Disposition: inline
+In-Reply-To: <1500397144-16232-11-git-send-email-jintack.lim@linaro.org>
 Sender: linux-doc-owner@vger.kernel.org
-To: Bandan Das <bsd@redhat.com>
-Cc: kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Jonathan Corbet <corbet@lwn.net>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, linux@armlinux.org.uk, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, akpm@linux-foundation.org, mchehab@kernel.org, cov@codeaurora.org, Daniel Lezcano <daniel.lezcano@linaro.org>, david.daney@cavium.com, mark.rutland@arm.com, Suzuki K Poulose <suzuki.poulose@arm.com>, stefan@hello-penguin.com, Andy Gross <andy.gross@linaro.org>, wcohen@redhat.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>, shankerd@codeaurora.org, vladimir.murzin@arm.com, james.morse@arm.com, linux-doc@vger.kernel.org, lkm
+To: Jintack Lim <jintack.lim@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, corbet@lwn.net, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, akpm@linux-foundation.org, mchehab@kernel.org, cov@codeaurora.org, daniel.lezcano@linaro.org, david.daney@cavium.com, mark.rutland@arm.com, suzuki.poulose@arm.com, stefan@hello-penguin.com, andy.gross@linaro.org, wcohen@redhat.com, ard.biesheuvel@linaro.org, shankerd@codeaurora.org, vladimir.murzin@arm.com, james.morse@arm.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jul 28, 2017 at 4:13 PM, Bandan Das <bsd@redhat.com> wrote:
-> Jintack Lim <jintack.lim@linaro.org> writes:
-> ...
->>>
->>> I'll share my experiment setup shortly.
->>
->> I summarized my experiment setup here.
->>
->> https://github.com/columbia/nesting-pub/wiki/Nested-virtualization-on-ARM-setup
->
-> Thanks Jintack! I was able to test L2 boot up with these instructions.
+On Tue, Jul 18, 2017 at 11:58:36AM -0500, Jintack Lim wrote:
+> From: Christoffer Dall <christoffer.dall@linaro.org>
+> 
+> Add functions setting up and restoring the guest's context on each entry
+> and exit. These functions will come in handy when we want to use
+> different context for normal EL0/EL1 and virtual EL2 execution.
+> 
+> No functional change yet.
+> 
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> ---
+>  arch/arm/include/asm/kvm_emulate.h   |   4 ++
+>  arch/arm64/include/asm/kvm_emulate.h |   4 ++
+>  arch/arm64/kvm/Makefile              |   2 +-
+>  arch/arm64/kvm/context.c             |  54 ++++++++++++++++
+>  arch/arm64/kvm/hyp/sysreg-sr.c       | 117 +++++++++++++++++++----------------
+>  virt/kvm/arm/arm.c                   |  14 +++++
+>  6 files changed, 140 insertions(+), 55 deletions(-)
+>  create mode 100644 arch/arm64/kvm/context.c
+> 
+> diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
+> index 399cd75e..0a03b7d 100644
+> --- a/arch/arm/include/asm/kvm_emulate.h
+> +++ b/arch/arm/include/asm/kvm_emulate.h
+> @@ -47,6 +47,10 @@ static inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
+>  void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
+>  void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
+>  
+> +static inline void kvm_arm_setup_shadow_state(struct kvm_vcpu *vcpu) { };
+> +static inline void kvm_arm_restore_shadow_state(struct kvm_vcpu *vcpu) { };
+> +static inline void kvm_arm_init_cpu_context(kvm_cpu_context_t *cpu_ctxt) { };
+> +
+>  static inline bool kvm_condition_valid(const struct kvm_vcpu *vcpu)
+>  {
+>  	return kvm_condition_valid32(vcpu);
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 5d6f3d0..14c4ce9 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -42,6 +42,10 @@
+>  void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
+>  void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
+>  
+> +void kvm_arm_setup_shadow_state(struct kvm_vcpu *vcpu);
+> +void kvm_arm_restore_shadow_state(struct kvm_vcpu *vcpu);
+> +void kvm_arm_init_cpu_context(kvm_cpu_context_t *cpu_ctxt);
+> +
+>  static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+>  {
+>  	vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS;
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index f513047..5762337 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -15,7 +15,7 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/e
+>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arm.o $(KVM)/arm/mmu.o $(KVM)/arm/mmio.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/psci.o $(KVM)/arm/perf.o
+>  
+> -kvm-$(CONFIG_KVM_ARM_HOST) += inject_fault.o regmap.o
+> +kvm-$(CONFIG_KVM_ARM_HOST) += inject_fault.o regmap.o context.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += hyp.o hyp-init.o handle_exit.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += guest.o debug.o reset.o sys_regs.o sys_regs_generic_v8.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += vgic-sys-reg-v3.o
+> diff --git a/arch/arm64/kvm/context.c b/arch/arm64/kvm/context.c
+> new file mode 100644
+> index 0000000..bc43e66
+> --- /dev/null
+> +++ b/arch/arm64/kvm/context.c
+> @@ -0,0 +1,54 @@
+> +/*
+> + * Copyright (C) 2016 - Linaro Ltd.
+> + * Author: Christoffer Dall <christoffer.dall@linaro.org>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include <linux/kvm_host.h>
+> +#include <asm/kvm_emulate.h>
+> +
+> +/**
+> + * kvm_arm_setup_shadow_state -- prepare shadow state based on emulated mode
+> + * @vcpu: The VCPU pointer
+> + */
+> +void kvm_arm_setup_shadow_state(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
+> +
+> +	ctxt->hw_pstate = *vcpu_cpsr(vcpu);
+> +	ctxt->hw_sys_regs = ctxt->sys_regs;
+> +	ctxt->hw_sp_el1 = ctxt->gp_regs.sp_el1;
+> +	ctxt->hw_elr_el1 = ctxt->gp_regs.elr_el1;
+> +	ctxt->hw_spsr_el1 = ctxt->gp_regs.spsr[KVM_SPSR_EL1];
+> +}
+> +
+> +/**
+> + * kvm_arm_restore_shadow_state -- write back shadow state from guest
+> + * @vcpu: The VCPU pointer
+> + */
+> +void kvm_arm_restore_shadow_state(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
+> +
+> +	*vcpu_cpsr(vcpu) = ctxt->hw_pstate;
+> +	ctxt->gp_regs.sp_el1 = ctxt->hw_sp_el1;
+> +	ctxt->gp_regs.elr_el1 = ctxt->hw_elr_el1;
+> +	ctxt->gp_regs.spsr[KVM_SPSR_EL1] = ctxt->hw_spsr_el1;
+> +}
+> +
+> +void kvm_arm_init_cpu_context(kvm_cpu_context_t *cpu_ctxt)
+> +{
+> +	/* This is to set hw_sys_regs of host_cpu_context */
+> +	cpu_ctxt->hw_sys_regs = cpu_ctxt->sys_regs;
+> +}
+> diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+> index 9341376..b7a67b1 100644
+> --- a/arch/arm64/kvm/hyp/sysreg-sr.c
+> +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+> @@ -19,6 +19,7 @@
+>  #include <linux/kvm_host.h>
+>  
+>  #include <asm/kvm_asm.h>
+> +#include <asm/kvm_emulate.h>
+>  #include <asm/kvm_hyp.h>
+>  
+>  /* Yes, this does nothing, on purpose */
+> @@ -33,39 +34,43 @@ static void __hyp_text __sysreg_do_nothing(struct kvm_cpu_context *ctxt) { }
+>  
+>  static void __hyp_text __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
+>  {
+> -	ctxt->sys_regs[ACTLR_EL1]	= read_sysreg(actlr_el1);
+> -	ctxt->sys_regs[TPIDR_EL0]	= read_sysreg(tpidr_el0);
+> -	ctxt->sys_regs[TPIDRRO_EL0]	= read_sysreg(tpidrro_el0);
+> -	ctxt->sys_regs[TPIDR_EL1]	= read_sysreg(tpidr_el1);
+> -	ctxt->sys_regs[MDSCR_EL1]	= read_sysreg(mdscr_el1);
+> +	u64 *sys_regs = kern_hyp_va(ctxt->hw_sys_regs);
+> +
+> +	sys_regs[ACTLR_EL1]	= read_sysreg(actlr_el1);
+> +	sys_regs[TPIDR_EL0]	= read_sysreg(tpidr_el0);
+> +	sys_regs[TPIDRRO_EL0]	= read_sysreg(tpidrro_el0);
+> +	sys_regs[TPIDR_EL1]	= read_sysreg(tpidr_el1);
+> +	sys_regs[MDSCR_EL1]	= read_sysreg(mdscr_el1);
+>  	ctxt->gp_regs.regs.sp		= read_sysreg(sp_el0);
+>  	ctxt->gp_regs.regs.pc		= read_sysreg_el2(elr);
+> -	ctxt->gp_regs.regs.pstate	= read_sysreg_el2(spsr);
+> +	ctxt->hw_pstate			= read_sysreg_el2(spsr);
+>  }
+>  
+>  static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
+>  {
+> -	ctxt->sys_regs[MPIDR_EL1]	= read_sysreg(vmpidr_el2);
+> -	ctxt->sys_regs[CSSELR_EL1]	= read_sysreg(csselr_el1);
+> -	ctxt->sys_regs[SCTLR_EL1]	= read_sysreg_el1(sctlr);
+> -	ctxt->sys_regs[CPACR_EL1]	= read_sysreg_el1(cpacr);
+> -	ctxt->sys_regs[TTBR0_EL1]	= read_sysreg_el1(ttbr0);
+> -	ctxt->sys_regs[TTBR1_EL1]	= read_sysreg_el1(ttbr1);
+> -	ctxt->sys_regs[TCR_EL1]		= read_sysreg_el1(tcr);
+> -	ctxt->sys_regs[ESR_EL1]		= read_sysreg_el1(esr);
+> -	ctxt->sys_regs[AFSR0_EL1]	= read_sysreg_el1(afsr0);
+> -	ctxt->sys_regs[AFSR1_EL1]	= read_sysreg_el1(afsr1);
+> -	ctxt->sys_regs[FAR_EL1]		= read_sysreg_el1(far);
+> -	ctxt->sys_regs[MAIR_EL1]	= read_sysreg_el1(mair);
+> -	ctxt->sys_regs[VBAR_EL1]	= read_sysreg_el1(vbar);
+> -	ctxt->sys_regs[CONTEXTIDR_EL1]	= read_sysreg_el1(contextidr);
+> -	ctxt->sys_regs[AMAIR_EL1]	= read_sysreg_el1(amair);
+> -	ctxt->sys_regs[CNTKCTL_EL1]	= read_sysreg_el1(cntkctl);
+> -	ctxt->sys_regs[PAR_EL1]		= read_sysreg(par_el1);
+> -
+> -	ctxt->gp_regs.sp_el1		= read_sysreg(sp_el1);
+> -	ctxt->gp_regs.elr_el1		= read_sysreg_el1(elr);
+> -	ctxt->gp_regs.spsr[KVM_SPSR_EL1]= read_sysreg_el1(spsr);
+> +	u64 *sys_regs = kern_hyp_va(ctxt->hw_sys_regs);
+> +
+> +	sys_regs[MPIDR_EL1]	= read_sysreg(vmpidr_el2);
+> +	sys_regs[CSSELR_EL1]	= read_sysreg(csselr_el1);
+> +	sys_regs[SCTLR_EL1]	= read_sysreg_el1(sctlr);
+> +	sys_regs[CPACR_EL1]	= read_sysreg_el1(cpacr);
+> +	sys_regs[TTBR0_EL1]	= read_sysreg_el1(ttbr0);
+> +	sys_regs[TTBR1_EL1]	= read_sysreg_el1(ttbr1);
+> +	sys_regs[TCR_EL1]	= read_sysreg_el1(tcr);
+> +	sys_regs[ESR_EL1]	= read_sysreg_el1(esr);
+> +	sys_regs[AFSR0_EL1]	= read_sysreg_el1(afsr0);
+> +	sys_regs[AFSR1_EL1]	= read_sysreg_el1(afsr1);
+> +	sys_regs[FAR_EL1]	= read_sysreg_el1(far);
+> +	sys_regs[MAIR_EL1]	= read_sysreg_el1(mair);
+> +	sys_regs[VBAR_EL1]	= read_sysreg_el1(vbar);
+> +	sys_regs[CONTEXTIDR_EL1]	= read_sysreg_el1(contextidr);
+> +	sys_regs[AMAIR_EL1]	= read_sysreg_el1(amair);
+> +	sys_regs[CNTKCTL_EL1]	= read_sysreg_el1(cntkctl);
+> +	sys_regs[PAR_EL1]		= read_sysreg(par_el1);
+> +
+> +	ctxt->hw_sp_el1			= read_sysreg(sp_el1);
+> +	ctxt->hw_elr_el1		= read_sysreg_el1(elr);
+> +	ctxt->hw_spsr_el1		= read_sysreg_el1(spsr);
+>  }
+>  
+>  static hyp_alternate_select(__sysreg_call_save_host_state,
+> @@ -86,39 +91,43 @@ void __hyp_text __sysreg_save_guest_state(struct kvm_cpu_context *ctxt)
+>  
+>  static void __hyp_text __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
+>  {
+> -	write_sysreg(ctxt->sys_regs[ACTLR_EL1],	  actlr_el1);
+> -	write_sysreg(ctxt->sys_regs[TPIDR_EL0],	  tpidr_el0);
+> -	write_sysreg(ctxt->sys_regs[TPIDRRO_EL0], tpidrro_el0);
+> -	write_sysreg(ctxt->sys_regs[TPIDR_EL1],	  tpidr_el1);
+> -	write_sysreg(ctxt->sys_regs[MDSCR_EL1],	  mdscr_el1);
+> +	u64 *sys_regs = kern_hyp_va(ctxt->hw_sys_regs);
+> +
+> +	write_sysreg(sys_regs[ACTLR_EL1],	  actlr_el1);
+> +	write_sysreg(sys_regs[TPIDR_EL0],	  tpidr_el0);
+> +	write_sysreg(sys_regs[TPIDRRO_EL0],	tpidrro_el0);
+> +	write_sysreg(sys_regs[TPIDR_EL1],	  tpidr_el1);
+> +	write_sysreg(sys_regs[MDSCR_EL1],	  mdscr_el1);
+>  	write_sysreg(ctxt->gp_regs.regs.sp,	  sp_el0);
+>  	write_sysreg_el2(ctxt->gp_regs.regs.pc,	  elr);
+> -	write_sysreg_el2(ctxt->gp_regs.regs.pstate, spsr);
+> +	write_sysreg_el2(ctxt->hw_pstate,	  spsr);
+>  }
+>  
+>  static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
+>  {
+> -	write_sysreg(ctxt->sys_regs[MPIDR_EL1],		vmpidr_el2);
+> -	write_sysreg(ctxt->sys_regs[CSSELR_EL1],	csselr_el1);
+> -	write_sysreg_el1(ctxt->sys_regs[SCTLR_EL1],	sctlr);
+> -	write_sysreg_el1(ctxt->sys_regs[CPACR_EL1],	cpacr);
+> -	write_sysreg_el1(ctxt->sys_regs[TTBR0_EL1],	ttbr0);
+> -	write_sysreg_el1(ctxt->sys_regs[TTBR1_EL1],	ttbr1);
+> -	write_sysreg_el1(ctxt->sys_regs[TCR_EL1],	tcr);
+> -	write_sysreg_el1(ctxt->sys_regs[ESR_EL1],	esr);
+> -	write_sysreg_el1(ctxt->sys_regs[AFSR0_EL1],	afsr0);
+> -	write_sysreg_el1(ctxt->sys_regs[AFSR1_EL1],	afsr1);
+> -	write_sysreg_el1(ctxt->sys_regs[FAR_EL1],	far);
+> -	write_sysreg_el1(ctxt->sys_regs[MAIR_EL1],	mair);
+> -	write_sysreg_el1(ctxt->sys_regs[VBAR_EL1],	vbar);
+> -	write_sysreg_el1(ctxt->sys_regs[CONTEXTIDR_EL1],contextidr);
+> -	write_sysreg_el1(ctxt->sys_regs[AMAIR_EL1],	amair);
+> -	write_sysreg_el1(ctxt->sys_regs[CNTKCTL_EL1], 	cntkctl);
+> -	write_sysreg(ctxt->sys_regs[PAR_EL1],		par_el1);
+> -
+> -	write_sysreg(ctxt->gp_regs.sp_el1,		sp_el1);
+> -	write_sysreg_el1(ctxt->gp_regs.elr_el1,		elr);
+> -	write_sysreg_el1(ctxt->gp_regs.spsr[KVM_SPSR_EL1],spsr);
+> +	u64 *sys_regs = kern_hyp_va(ctxt->hw_sys_regs);
+> +
+> +	write_sysreg(sys_regs[MPIDR_EL1],	vmpidr_el2);
+> +	write_sysreg(sys_regs[CSSELR_EL1],	csselr_el1);
+> +	write_sysreg_el1(sys_regs[SCTLR_EL1],	sctlr);
+> +	write_sysreg_el1(sys_regs[CPACR_EL1],	cpacr);
+> +	write_sysreg_el1(sys_regs[TTBR0_EL1],	ttbr0);
+> +	write_sysreg_el1(sys_regs[TTBR1_EL1],	ttbr1);
+> +	write_sysreg_el1(sys_regs[TCR_EL1],	tcr);
+> +	write_sysreg_el1(sys_regs[ESR_EL1],	esr);
+> +	write_sysreg_el1(sys_regs[AFSR0_EL1],	afsr0);
+> +	write_sysreg_el1(sys_regs[AFSR1_EL1],	afsr1);
+> +	write_sysreg_el1(sys_regs[FAR_EL1],	far);
+> +	write_sysreg_el1(sys_regs[MAIR_EL1],	mair);
+> +	write_sysreg_el1(sys_regs[VBAR_EL1],	vbar);
+> +	write_sysreg_el1(sys_regs[CONTEXTIDR_EL1], contextidr);
+> +	write_sysreg_el1(sys_regs[AMAIR_EL1],	amair);
+> +	write_sysreg_el1(sys_regs[CNTKCTL_EL1], cntkctl);
+> +	write_sysreg(sys_regs[PAR_EL1],		par_el1);
+> +
+> +	write_sysreg(ctxt->hw_sp_el1,			sp_el1);
+> +	write_sysreg_el1(ctxt->hw_elr_el1,		elr);
+> +	write_sysreg_el1(ctxt->hw_spsr_el1,		spsr);
+>  }
+>  
+>  static hyp_alternate_select(__sysreg_call_restore_host_state,
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index 36aae3a..0ff2997 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -689,6 +689,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  		}
+>  
+>  		kvm_arm_setup_debug(vcpu);
+> +		kvm_arm_setup_shadow_state(vcpu);
+>  
+>  		/**************************************************************
+>  		 * Enter the guest
+> @@ -704,6 +705,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  		 * Back from guest
+>  		 *************************************************************/
+>  
+> +		kvm_arm_restore_shadow_state(vcpu);
 
-Thanks for the confirmation!
+If we want to optimize this a bit, we could consider making these calls
+static inlines, which either do nothing (nesting not enabled via
+cmdline) or call the shadow state functions, selected using a static
+key.
 
->
-> Next, I will try to run some simple tests. Any suggestions on reducing the L2 bootup
-> time in my test setup ? I think I will try to make the L2 kernel print
-> less messages; and maybe just get rid of some of the userspace services.
-> I also applied the patch to reduce the timer frequency btw.
+Of course, for that to work, the hw_ register value should be changed to
+pointers (in the hyp VA space) so that the save restore code
+reads/writes directly to the correct backing store and no extra work has
+to be done in the save/restore path when not using nesting.
 
-I think you can try to use those kernel parameters: "loglevel=1", with
-which the kernel print (almost) nothing during the boot process but
-the init process will print something,  or "console=none", with which
-you don't see anything but the login message.  I didn't used them
-because I wanted to see the L2 boot message as soon as possible :)
+That would actually also optimize the common case even when nesting is
+enabled via the cmdline, because we would only have to change the hw
+pointers when emulating an exception to vEL2 and when trapping ERET from
+virtual EL2, and the rest of the time wouldn't need to do any extra
+work, at least with the sysregs and special regs.
 
 Thanks,
-Jintack
+-Christoffer
 
->
-> Bandan
->
->>>
->>> Even though this work has some limitations and TODOs, I'd appreciate early
->>> feedback on this RFC. Specifically, I'm interested in:
->>>
->>> - Overall design to manage vcpu context for the virtual EL2
->>> - Verifying correct EL2 register configurations such as HCR_EL2, CPTR_EL2
->>>   (Patch 30 and 32)
->>> - Patch organization and coding style
->>
->> I also wonder if the hardware and/or KVM do not support nested
->> virtualization but the userspace uses nested virtualization option,
->> which one is better: giving an error or launching a regular VM
->> silently.
->>
->>>
->>> This patch series is based on kvm/next d38338e.
->>> The whole patch series including memory, VGIC, and timer patches is available
->>> here:
->>>
->>> git@github.com:columbia/nesting-pub.git rfc-v2
->>>
->>> Limitations:
->>> - There are some cases that the target exception level of a VM is ambiguous when
->>>   emulating eret instruction. I'm discussing this issue with Christoffer and
->>>   Marc. Meanwhile, I added a temporary patch (not included in this
->>>   series. f1beaba in the repo) and used 4.10.0 kernel when testing the guest
->>>   hypervisor with VHE.
->>> - Recursive nested virtualization is not tested yet.
->>> - Other hypervisors (such as Xen) on KVM are not tested.
->>>
->>> TODO:
->>> - Submit memory, VGIC, and timer patches
->>> - Evaluate regular VM performance to see if there's a negative impact.
->>> - Test other hypervisors such as Xen on KVM
->>> - Test recursive nested virtualization
->>>
->>> v1-->v2:
->>> - Added support for the virtual EL2 with VHE
->>> - Rewrote commit messages and comments from the perspective of supporting
->>>   execution environments to VMs, rather than from the perspective of the guest
->>>   hypervisor running in them.
->>> - Fixed a few bugs to make it run on the FastModel.
->>> - Tested on ARMv8.3 with four configurations. (host/guest. with/without VHE.)
->>> - Rebased to kvm/next
->>>
->>> [1] https://www.community.arm.com/processors/b/blog/posts/armv8-a-architecture-2016-additions
->>>
->>> Christoffer Dall (7):
->>>   KVM: arm64: Add KVM nesting feature
->>>   KVM: arm64: Allow userspace to set PSR_MODE_EL2x
->>>   KVM: arm64: Add vcpu_mode_el2 primitive to support nesting
->>>   KVM: arm/arm64: Add a framework to prepare virtual EL2 execution
->>>   arm64: Add missing TCR hw defines
->>>   KVM: arm64: Create shadow EL1 registers
->>>   KVM: arm64: Trap EL1 VM register accesses in virtual EL2
->>>
->>> Jintack Lim (31):
->>>   arm64: Add ARM64_HAS_NESTED_VIRT feature
->>>   KVM: arm/arm64: Enable nested virtualization via command-line
->>>   KVM: arm/arm64: Check if nested virtualization is in use
->>>   KVM: arm64: Add EL2 system registers to vcpu context
->>>   KVM: arm64: Add EL2 special registers to vcpu context
->>>   KVM: arm64: Add the shadow context for virtual EL2 execution
->>>   KVM: arm64: Set vcpu context depending on the guest exception level
->>>   KVM: arm64: Synchronize EL1 system registers on virtual EL2 entry and
->>>     exit
->>>   KVM: arm64: Move exception macros and enums to a common file
->>>   KVM: arm64: Support to inject exceptions to the virtual EL2
->>>   KVM: arm64: Trap SPSR_EL1, ELR_EL1 and VBAR_EL1 from virtual EL2
->>>   KVM: arm64: Trap CPACR_EL1 access in virtual EL2
->>>   KVM: arm64: Handle eret instruction traps
->>>   KVM: arm64: Set a handler for the system instruction traps
->>>   KVM: arm64: Handle PSCI call via smc from the guest
->>>   KVM: arm64: Inject HVC exceptions to the virtual EL2
->>>   KVM: arm64: Respect virtual HCR_EL2.TWX setting
->>>   KVM: arm64: Respect virtual CPTR_EL2.TFP setting
->>>   KVM: arm64: Add macros to support the virtual EL2 with VHE
->>>   KVM: arm64: Add EL2 registers defined in ARMv8.1 to vcpu context
->>>   KVM: arm64: Emulate EL12 register accesses from the virtual EL2
->>>   KVM: arm64: Support a VM with VHE considering EL0 of the VHE host
->>>   KVM: arm64: Allow the virtual EL2 to access EL2 states without trap
->>>   KVM: arm64: Manage the shadow states when virtual E2H bit enabled
->>>   KVM: arm64: Trap and emulate CPTR_EL2 accesses via CPACR_EL1 from the
->>>     virtual EL2 with VHE
->>>   KVM: arm64: Emulate appropriate VM control system registers
->>>   KVM: arm64: Respect the virtual HCR_EL2.NV bit setting
->>>   KVM: arm64: Respect the virtual HCR_EL2.NV bit setting for EL12
->>>     register traps
->>>   KVM: arm64: Respect virtual HCR_EL2.TVM and TRVM settings
->>>   KVM: arm64: Respect the virtual HCR_EL2.NV1 bit setting
->>>   KVM: arm64: Respect the virtual CPTR_EL2.TCPAC setting
->>>
->>>  Documentation/admin-guide/kernel-parameters.txt |   4 +
->>>  arch/arm/include/asm/kvm_emulate.h              |  17 ++
->>>  arch/arm/include/asm/kvm_host.h                 |  15 +
->>>  arch/arm64/include/asm/cpucaps.h                |   3 +-
->>>  arch/arm64/include/asm/esr.h                    |   1 +
->>>  arch/arm64/include/asm/kvm_arm.h                |   2 +
->>>  arch/arm64/include/asm/kvm_coproc.h             |   3 +-
->>>  arch/arm64/include/asm/kvm_emulate.h            |  56 ++++
->>>  arch/arm64/include/asm/kvm_host.h               |  64 ++++-
->>>  arch/arm64/include/asm/kvm_hyp.h                |  24 --
->>>  arch/arm64/include/asm/pgtable-hwdef.h          |   6 +
->>>  arch/arm64/include/asm/sysreg.h                 |  70 +++++
->>>  arch/arm64/include/uapi/asm/kvm.h               |   1 +
->>>  arch/arm64/kernel/asm-offsets.c                 |   1 +
->>>  arch/arm64/kernel/cpufeature.c                  |  11 +
->>>  arch/arm64/kvm/Makefile                         |   5 +-
->>>  arch/arm64/kvm/context.c                        | 346 +++++++++++++++++++++++
->>>  arch/arm64/kvm/emulate-nested.c                 |  83 ++++++
->>>  arch/arm64/kvm/guest.c                          |   2 +
->>>  arch/arm64/kvm/handle_exit.c                    |  89 +++++-
->>>  arch/arm64/kvm/hyp/entry.S                      |  13 +
->>>  arch/arm64/kvm/hyp/hyp-entry.S                  |   2 +-
->>>  arch/arm64/kvm/hyp/switch.c                     |  33 ++-
->>>  arch/arm64/kvm/hyp/sysreg-sr.c                  | 117 ++++----
->>>  arch/arm64/kvm/inject_fault.c                   |  12 -
->>>  arch/arm64/kvm/nested.c                         |  63 +++++
->>>  arch/arm64/kvm/reset.c                          |   8 +
->>>  arch/arm64/kvm/sys_regs.c                       | 359 +++++++++++++++++++++++-
->>>  arch/arm64/kvm/sys_regs.h                       |   8 +
->>>  arch/arm64/kvm/trace.h                          |  43 ++-
->>>  virt/kvm/arm/arm.c                              |  20 ++
->>>  31 files changed, 1363 insertions(+), 118 deletions(-)
->>>  create mode 100644 arch/arm64/kvm/context.c
->>>  create mode 100644 arch/arm64/kvm/emulate-nested.c
->>>  create mode 100644 arch/arm64/kvm/nested.c
->>>
->>> --
->>> 1.9.1
->>>
+>  		kvm_arm_clear_debug(vcpu);
+>  
+>  		/*
+> @@ -1334,6 +1336,16 @@ static void teardown_hyp_mode(void)
+>  
+>  static int init_vhe_mode(void)
+>  {
+> +	int cpu;
+> +
+> +	for_each_possible_cpu(cpu) {
+> +		kvm_cpu_context_t *cpu_ctxt;
+> +
+> +		cpu_ctxt = per_cpu_ptr(kvm_host_cpu_state, cpu);
+> +
+> +		kvm_arm_init_cpu_context(cpu_ctxt);
+> +	}
+> +
+>  	kvm_info("VHE mode initialized successfully\n");
+>  	return 0;
+>  }
+> @@ -1416,6 +1428,8 @@ static int init_hyp_mode(void)
+>  			kvm_err("Cannot map host CPU state: %d\n", err);
+>  			goto out_err;
+>  		}
+> +
+> +		kvm_arm_init_cpu_context(cpu_ctxt);
+>  	}
+>  
+>  	kvm_info("Hyp mode initialized successfully\n");
+> -- 
+> 1.9.1
+> 
