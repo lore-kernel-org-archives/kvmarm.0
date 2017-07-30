@@ -1,110 +1,118 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [RFC PATCH v2 22/38] KVM: arm64: Handle PSCI call via smc from
- the guest
-Date: Sun, 30 Jul 2017 22:00:20 +0200
-Message-ID: <20170730200020.GL5176@cbox>
+Subject: Re: [RFC PATCH v2 24/38] KVM: arm64: Respect virtual HCR_EL2.TWX
+ setting
+Date: Sun, 30 Jul 2017 22:00:25 +0200
+Message-ID: <20170730200025.GM5176@cbox>
 References: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
- <1500397144-16232-23-git-send-email-jintack.lim@linaro.org>
+ <1500397144-16232-25-git-send-email-jintack.lim@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D158340D16
- for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Jul 2017 15:59:10 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IyvDwDpDd45E for <kvmarm@lists.cs.columbia.edu>;
- Sun, 30 Jul 2017 15:59:09 -0400 (EDT)
-Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CAD2D49C14
- for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Jul 2017 15:59:09 -0400 (EDT)
-Received: by mail-wm0-f49.google.com with SMTP id m85so154174347wma.1
- for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Jul 2017 13:00:22 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1500397144-16232-23-git-send-email-jintack.lim@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+In-Reply-To: <1500397144-16232-25-git-send-email-jintack.lim@linaro.org>
+Sender: kvm-owner@vger.kernel.org
 To: Jintack Lim <jintack.lim@linaro.org>
-Cc: kvm@vger.kernel.org, david.daney@cavium.com, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, stefan@hello-penguin.com, corbet@lwn.net, daniel.lezcano@linaro.org, linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, andy.gross@linaro.org, marc.zyngier@arm.com, cov@codeaurora.org, wcohen@redhat.com, mchehab@kernel.org, ard.biesheuvel@linaro.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, akpm@linux-foundation.org
+Cc: kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, corbet@lwn.net, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, akpm@linux-foundation.org, mchehab@kernel.org, cov@codeaurora.org, daniel.lezcano@linaro.org, david.daney@cavium.com, mark.rutland@arm.com, suzuki.poulose@arm.com, stefan@hello-penguin.com, andy.gross@linaro.org, wcohen@redhat.com, ard.biesheuvel@linaro.org, shankerd@codeaurora.org, vladimir.murzin@arm.com, james.morse@arm.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Jul 18, 2017 at 11:58:48AM -0500, Jintack Lim wrote:
-> VMs used to execute hvc #0 for the psci call if EL3 is not implemented.
-> However, when we come to provide the virtual EL2 mode to the VM, the
-> host OS inside the VM calls kvm_call_hyp() which is also hvc #0. So,
-> it's hard to differentiate between them from the host hypervisor's point
-> of view.
-
-This is a bit confusing.  I think you should just refer to the fact that
-the architecture requires HVC calls to be handled at EL2, and when
-emulating EL2 inside the VM, HVC calls from the VM are handled by the VM
-itself, and therefore we add the support for SMC as the conduit for PSCI
-calls.
-
-> 
-> So, let the VM execute smc instruction for the psci call. On ARMv8.3,
-> even if EL3 is not implemented, a smc instruction executed at non-secure
-> EL1 is trapped to EL2 if HCR_EL2.TSC==1, rather than being treated as
-> UNDEFINED. So, the host hypervisor can handle this psci call without any
-> confusion.
+On Tue, Jul 18, 2017 at 11:58:50AM -0500, Jintack Lim wrote:
+> Forward exceptions due to WFI or WFE instructions to the virtual EL2 if
+> they are not coming from the virtual EL2 and virtual HCR_EL2.TWX is set.
 > 
 > Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 > ---
->  arch/arm64/kvm/handle_exit.c | 24 ++++++++++++++++++++++--
->  1 file changed, 22 insertions(+), 2 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h |  1 +
+>  arch/arm64/kvm/handle_exit.c      | 13 ++++++++++++-
+>  arch/arm64/kvm/nested.c           | 20 ++++++++++++++++++++
+>  3 files changed, 33 insertions(+), 1 deletion(-)
 > 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 46880c3..53b0b33 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -442,5 +442,6 @@ static inline void __cpu_init_stage2(void)
+>  int __init kvmarm_nested_cfg(char *buf);
+>  int init_nested_virt(void);
+>  bool nested_virt_in_use(struct kvm_vcpu *vcpu);
+> +int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
+>  
+>  #endif /* __ARM64_KVM_HOST_H__ */
 > diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index d19e253..6cf6b93 100644
+> index 8b398b2..25ec824 100644
 > --- a/arch/arm64/kvm/handle_exit.c
 > +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -53,8 +53,28 @@ static int handle_hvc(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  
->  static int handle_smc(struct kvm_vcpu *vcpu, struct kvm_run *run)
+> @@ -107,7 +107,18 @@ static int handle_no_fpsimd(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>   */
+>  static int kvm_handle_wfx(struct kvm_vcpu *vcpu, struct kvm_run *run)
 >  {
-> -	kvm_inject_undefined(vcpu);
-> -	return 1;
-> +	int ret;
+> -	if (kvm_vcpu_get_hsr(vcpu) & ESR_ELx_WFx_ISS_WFE) {
+> +	bool is_wfe = !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_WFx_ISS_WFE);
 > +
-> +	/* If imm is non-zero, it's not defined */
-> +	if (kvm_vcpu_hvc_get_imm(vcpu)) {
-> +		kvm_inject_undefined(vcpu);
-> +		return 1;
+> +	if (nested_virt_in_use(vcpu)) {
+> +		int ret = handle_wfx_nested(vcpu, is_wfe);
+> +
+> +		if (ret < 0 && ret != -EINVAL)
+> +			return ret;
+> +		else if (ret >= 0)
+> +			return ret;
+
+This is very complicated and you're not documenting the return value of
+handle_wfx_nested.
+
+If you get rid of the defensive statement in kvm_inject_nested, you can
+turn that one into a void, and handle_wfx_nested can become a bool, and
+then this becomes:
+
+		if (ret)
+			return 1;
+
+If for some reason you don't like that, you can still just do:
+
+		if (ret == 1)
+			return 1;
+
+
 > +	}
 > +
-> +	/*
-> +	 * If imm is zero, it's a psci call.
-
-That's only a necessary, but not sufficient requirement.  So we should
-say, it may be a PSCI call or we check if it's a PSCI call...
-
-
-
-> +	 * Note that on ARMv8.3, even if EL3 is not implemented, SMC executed
-> +	 * at Non-secure EL1 is trapped to EL2 if HCR_EL2.TSC==1, rather than
-> +	 * being treated as UNDEFINED.
-> +	 */
-> +	ret = kvm_psci_call(vcpu);
-> +	if (ret < 0) {
-> +		kvm_inject_undefined(vcpu);
-> +		return 1;
-> +	}
-> +	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-> +
-> +	return ret;
->  }
+> +	if (is_wfe) {
+>  		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), true);
+>  		vcpu->stat.wfe_exit_stat++;
+>  		kvm_vcpu_on_spin(vcpu);
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 9a05c76..042d304 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -18,6 +18,8 @@
+>  #include <linux/kvm.h>
+>  #include <linux/kvm_host.h>
 >  
->  /*
+> +#include <asm/kvm_emulate.h>
+> +
+>  static bool nested_param;
+>  
+>  int __init kvmarm_nested_cfg(char *buf)
+> @@ -41,3 +43,21 @@ bool nested_virt_in_use(struct kvm_vcpu *vcpu)
+>  
+>  	return false;
+>  }
+> +
+> +/*
+> + * Inject wfx to the virtual EL2 if this is not from the virtual EL2 and
+> + * the virtual HCR_EL2.TWX is set. Otherwise, let the host hypervisor
+> + * handle this.
+> + */
+> +int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe)
+> +{
+> +	u64 hcr_el2 = vcpu_sys_reg(vcpu, HCR_EL2);
+> +
+> +	if (vcpu_mode_el2(vcpu))
+> +		return -EINVAL;
+> +
+> +	if ((is_wfe && (hcr_el2 & HCR_TWE)) || (!is_wfe && (hcr_el2 & HCR_TWI)))
+> +		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
+> +
+> +	return -EINVAL;
+> +}
 > -- 
 > 1.9.1
 > 
-
-Thanks,
--Christoffer
