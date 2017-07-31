@@ -1,79 +1,101 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 12/59] irqchip/gic-v3-its: Generalize device table allocation
-Date: Mon, 31 Jul 2017 18:25:50 +0100
-Message-ID: <20170731172637.29355-13-marc.zyngier@arm.com>
+Subject: [PATCH v3 13/59] irqchip/gic-v3-its: Generalize LPI configuration
+Date: Mon, 31 Jul 2017 18:25:51 +0100
+Message-ID: <20170731172637.29355-14-marc.zyngier@arm.com>
 References: <20170731172637.29355-1-marc.zyngier@arm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F38549C3C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:26:00 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id I9++bdpNsM4Q for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 31 Jul 2017 13:25:59 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E733C40D25
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:25:58 -0400 (EDT)
 In-Reply-To: <20170731172637.29355-1-marc.zyngier@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>, Eric Auger <eric.auger@redhat.com>, Shanker Donthineni <shankerd@codeaurora.org>, Mark Rutland <mark.rutland@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As we want to use 2-level tables for VCPUs, let's hack the device
-table allocator in order to make it slightly more generic. It
-will get reused in subsequent patches.
+We're are going to need to change a bit more than just the enable
+bit in the LPI property table in the future. So let's change the
+LPI configuration funtion to take a set of bits to be cleared,
+and a set of bits to be set.
 
-Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
+This way, we'll be able to use it when a guest updates an LPI
+property (priority, for example).
+
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 26 ++++++++++++++++----------
- 1 file changed, 16 insertions(+), 10 deletions(-)
+ drivers/irqchip/irq-gic-v3-its.c | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 1298a9bca56a..1c2d6bdf85cb 100644
+index 1c2d6bdf85cb..7ef448a963c1 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -1386,26 +1386,19 @@ static struct its_baser *its_get_baser(struct its_node *its, u32 type)
- 	return NULL;
+@@ -678,17 +678,18 @@ static inline u32 its_get_event_id(struct irq_data *d)
+ 	return d->hwirq - its_dev->event_map.lpi_base;
  }
  
--static bool its_alloc_device_table(struct its_node *its, u32 dev_id)
-+static bool its_alloc_table_entry(struct its_baser *baser, u32 id)
+-static void lpi_set_config(struct irq_data *d, bool enable)
++static void lpi_update_config(struct irq_data *d, u8 clr, u8 set)
  {
--	struct its_baser *baser;
- 	struct page *page;
- 	u32 esz, idx;
- 	__le64 *table;
+ 	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
+ 	irq_hw_number_t hwirq = d->hwirq;
+-	u32 id = its_get_event_id(d);
+-	u8 *cfg = page_address(gic_rdists->prop_page) + hwirq - 8192;
++	struct page *prop_page;
++	u8 *cfg;
  
--	baser = its_get_baser(its, GITS_BASER_TYPE_DEVICE);
--
--	/* Don't allow device id that exceeds ITS hardware limit */
--	if (!baser)
--		return (ilog2(dev_id) < its->device_ids);
--
- 	/* Don't allow device id that exceeds single, flat table limit */
- 	esz = GITS_BASER_ENTRY_SIZE(baser->val);
- 	if (!(baser->val & GITS_BASER_INDIRECT))
--		return (dev_id < (PAGE_ORDER_TO_SIZE(baser->order) / esz));
-+		return (id < (PAGE_ORDER_TO_SIZE(baser->order) / esz));
+-	if (enable)
+-		*cfg |= LPI_PROP_ENABLED;
+-	else
+-		*cfg &= ~LPI_PROP_ENABLED;
++	prop_page = gic_rdists->prop_page;
++
++	cfg = page_address(prop_page) + hwirq - 8192;
++	*cfg &= ~clr;
++	*cfg |= set;
  
- 	/* Compute 1st level table index & check if that exceeds table limit */
--	idx = dev_id >> ilog2(baser->psz / esz);
-+	idx = id >> ilog2(baser->psz / esz);
- 	if (idx >= (PAGE_ORDER_TO_SIZE(baser->order) / GITS_LVL1_ENTRY_SIZE))
- 		return false;
- 
-@@ -1434,6 +1427,19 @@ static bool its_alloc_device_table(struct its_node *its, u32 dev_id)
- 	return true;
+ 	/*
+ 	 * Make the above write visible to the redistributors.
+@@ -699,17 +700,17 @@ static void lpi_set_config(struct irq_data *d, bool enable)
+ 		gic_flush_dcache_to_poc(cfg, sizeof(*cfg));
+ 	else
+ 		dsb(ishst);
+-	its_send_inv(its_dev, id);
++	its_send_inv(its_dev, its_get_event_id(d));
  }
  
-+static bool its_alloc_device_table(struct its_node *its, u32 dev_id)
-+{
-+	struct its_baser *baser;
-+
-+	baser = its_get_baser(its, GITS_BASER_TYPE_DEVICE);
-+
-+	/* Don't allow device id that exceeds ITS hardware limit */
-+	if (!baser)
-+		return (ilog2(dev_id) < its->device_ids);
-+
-+	return its_alloc_table_entry(baser, dev_id);
-+}
-+
- static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
- 					    int nvecs)
+ static void its_mask_irq(struct irq_data *d)
  {
+-	lpi_set_config(d, false);
++	lpi_update_config(d, LPI_PROP_ENABLED, 0);
+ }
+ 
+ static void its_unmask_irq(struct irq_data *d)
+ {
+-	lpi_set_config(d, true);
++	lpi_update_config(d, 0, LPI_PROP_ENABLED);
+ }
+ 
+ static int its_set_affinity(struct irq_data *d, const struct cpumask *mask_val,
 -- 
 2.11.0
