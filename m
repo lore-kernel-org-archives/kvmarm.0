@@ -1,23 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 56/59] KVM: arm/arm64: GICv4: Prevent heterogenous systems
- from using GICv4
-Date: Mon, 31 Jul 2017 18:26:34 +0100
-Message-ID: <20170731172637.29355-57-marc.zyngier@arm.com>
+Subject: [PATCH v3 59/59] irqchip/gic-v3-its: Workaround Huawei D05
+ redistributor addressing
+Date: Mon, 31 Jul 2017 18:26:37 +0100
+Message-ID: <20170731172637.29355-60-marc.zyngier@arm.com>
 References: <20170731172637.29355-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 697E249C2A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:27:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B5F449CBF
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:27:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0Z4KPbXNGg7M for <kvmarm@lists.cs.columbia.edu>;
- Mon, 31 Jul 2017 13:27:37 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D1EB49CB1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:27:37 -0400 (EDT)
+ with ESMTP id j-QS-vOkC+1f for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 31 Jul 2017 13:27:44 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 079BF49C59
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:27:44 -0400 (EDT)
 In-Reply-To: <20170731172637.29355-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,73 +32,93 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The GICv4 architecture doesn't prevent CPUs implementing GICv4 to
-cohabit with CPUs limited to GICv3 in the same system.
+The ITSes on the Huawei D05 are broken when it comes to addressing
+the redistributors, and need to be explicitely told to address
+the VLPI page instead of the redistributor base address.
 
-This is mad (the sheduler would have to be made aware of the v4
-capability), and we're certainly not going to support this any
-time soon. So let's check that all online CPUs are GICv4 capable,
-and disable the functionnality if not.
+So let's add yet another quirk, fixing up the target address
+in the command stream.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- include/linux/irqchip/arm-gic-v3.h |  2 ++
- virt/kvm/arm/vgic/vgic-v3.c        | 22 +++++++++++++++++++++-
- 2 files changed, 23 insertions(+), 1 deletion(-)
+ drivers/irqchip/irq-gic-v3-its.c | 27 +++++++++++++++++++++++++--
+ 1 file changed, 25 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index 1ea576c8126f..dfa4a51643d6 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -532,6 +532,8 @@
- #define ICH_VTR_SEIS_MASK		(1 << ICH_VTR_SEIS_SHIFT)
- #define ICH_VTR_A3V_SHIFT		21
- #define ICH_VTR_A3V_MASK		(1 << ICH_VTR_A3V_SHIFT)
-+#define ICH_VTR_nV4_SHIFT		20
-+#define ICH_VTR_nV4_MASK		(1 << ICH_VTR_nV4_SHIFT)
+diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+index e22c8746ce89..32d8697bcb15 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -103,6 +103,7 @@ struct its_node {
+ 	u32			device_ids;
+ 	int			numa_node;
+ 	bool			is_v4;
++	int			vlpi_redist_offset;
+ };
  
- #define ICC_IAR1_EL1_SPURIOUS		0x3ff
+ #define ITS_ITT_ALIGN		SZ_256
+@@ -548,13 +549,15 @@ static struct its_vpe *its_build_vmapp_cmd(struct its_node *its,
+ 					   struct its_cmd_desc *desc)
+ {
+ 	unsigned long vpt_addr;
++	u64 target;
  
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index 405733678c2f..252268e83ade 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -466,6 +466,18 @@ static int __init early_gicv4_enable(char *buf)
+ 	vpt_addr = virt_to_phys(page_address(desc->its_vmapp_cmd.vpe->vpt_page));
++	target = desc->its_vmapp_cmd.col->target_address + its->vlpi_redist_offset;
+ 
+ 	its_encode_cmd(cmd, GITS_CMD_VMAPP);
+ 	its_encode_vpeid(cmd, desc->its_vmapp_cmd.vpe->vpe_id);
+ 	its_encode_valid(cmd, desc->its_vmapp_cmd.valid);
+-	its_encode_target(cmd, desc->its_vmapp_cmd.col->target_address);
++	its_encode_target(cmd, target);
+ 	its_encode_vpt_addr(cmd, vpt_addr);
+ 	its_encode_vpt_size(cmd, LPI_NRBITS - 1);
+ 
+@@ -613,11 +616,14 @@ static struct its_vpe *its_build_vmovp_cmd(struct its_node *its,
+ 					   struct its_cmd_block *cmd,
+ 					   struct its_cmd_desc *desc)
+ {
++	u64 target;
++
++	target = desc->its_vmapp_cmd.col->target_address + its->vlpi_redist_offset;
+ 	its_encode_cmd(cmd, GITS_CMD_VMOVP);
+ 	its_encode_seq_num(cmd, desc->its_vmovp_cmd.seq_num);
+ 	its_encode_its_list(cmd, desc->its_vmovp_cmd.its_list);
+ 	its_encode_vpeid(cmd, desc->its_vmovp_cmd.vpe->vpe_id);
+-	its_encode_target(cmd, desc->its_vmovp_cmd.col->target_address);
++	its_encode_target(cmd, target);
+ 
+ 	its_fixup_cmd(cmd);
+ 
+@@ -2668,6 +2674,17 @@ static void __maybe_unused its_enable_quirk_qdf2400_e0065(void *data)
+ 	its->ite_size = 16;
  }
- early_param("kvm-arm.vgic_v4_enable", early_gicv4_enable);
  
-+static void vgic_check_v4_cpuif(void *param)
++static void __maybe_unused its_enable_quirk_d05_vlpi_offset(void *data)
 +{
-+	u32 ich_vtr_el2 = kvm_call_hyp(__vgic_v3_get_ich_vtr_el2);
-+	bool *v4 = param, this_cpu_is_v4;
++	struct its_node *its = data;
 +
-+	this_cpu_is_v4 = !(ich_vtr_el2 & ICH_VTR_nV4_MASK);
-+	if (!this_cpu_is_v4)
-+		kvm_info("CPU%d is not GICv4 capable\n", smp_processor_id());
-+
-+	*v4 &= this_cpu_is_v4;
++	/*
++	 * D05 insists on using the wrong address for the VLPI
++	 * page. Trick it into doing the right thing...
++	 */
++	its->vlpi_redist_offset = SZ_128K;
 +}
 +
- /**
-  * vgic_v3_probe - probe for a GICv3 compatible interrupt controller in DT
-  * @node:	pointer to the DT node
-@@ -485,8 +497,16 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
- 	kvm_vgic_global_state.can_emulate_gicv2 = false;
- 	kvm_vgic_global_state.ich_vtr_el2 = ich_vtr_el2;
+ static const struct gic_quirk its_quirks[] = {
+ #ifdef CONFIG_CAVIUM_ERRATUM_22375
+ 	{
+@@ -2694,6 +2711,12 @@ static const struct gic_quirk its_quirks[] = {
+ 	},
+ #endif
+ 	{
++		.desc	= "ITS: D05 128kB VLPI offset",
++		.iidr	= 0x00000004,
++		.mask	= 0xffffffff,
++		.init	= its_enable_quirk_d05_vlpi_offset,
++	},
++	{
+ 	}
+ };
  
--	/* GICv4 support? */
-+	/*
-+	 * GICv4 support? We need to check on all CPUs in case of some
-+	 * extremely creative form of big-little brain damage...
-+	 */
- 	if (info->has_v4) {
-+		int cpu;
-+
-+		for_each_online_cpu(cpu)
-+			smp_call_function_single(cpu, vgic_check_v4_cpuif,
-+						 &gicv4_enable, 1);
- 		kvm_vgic_global_state.has_gicv4 = gicv4_enable;
- 		kvm_info("GICv4 support %sabled\n",
- 			 gicv4_enable ? "en" : "dis");
 -- 
 2.11.0
