@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 13/59] irqchip/gic-v3-its: Generalize LPI configuration
-Date: Mon, 31 Jul 2017 18:25:51 +0100
-Message-ID: <20170731172637.29355-14-marc.zyngier@arm.com>
+Subject: [PATCH v3 14/59] irqchip/gic-v4: Add management structure definitions
+Date: Mon, 31 Jul 2017 18:25:52 +0100
+Message-ID: <20170731172637.29355-15-marc.zyngier@arm.com>
 References: <20170731172637.29355-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F38549C3C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:26:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 085CD40D17
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:26:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id I9++bdpNsM4Q for <kvmarm@lists.cs.columbia.edu>;
- Mon, 31 Jul 2017 13:25:59 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E733C40D25
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:25:58 -0400 (EDT)
+ with ESMTP id Gl+5ax-ywNuZ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 31 Jul 2017 13:26:02 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3717240FB0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:26:01 -0400 (EDT)
 In-Reply-To: <20170731172637.29355-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,71 +31,113 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We're are going to need to change a bit more than just the enable
-bit in the LPI property table in the future. So let's change the
-LPI configuration funtion to take a set of bits to be cleared,
-and a set of bits to be set.
+Add a bunch of GICv4-specific data structures that will get used in
+subsequent patches.
 
-This way, we'll be able to use it when a guest updates an LPI
-property (priority, for example).
-
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 21 +++++++++++----------
- 1 file changed, 11 insertions(+), 10 deletions(-)
+ include/linux/irqchip/arm-gic-v4.h | 92 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 92 insertions(+)
+ create mode 100644 include/linux/irqchip/arm-gic-v4.h
 
-diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 1c2d6bdf85cb..7ef448a963c1 100644
---- a/drivers/irqchip/irq-gic-v3-its.c
-+++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -678,17 +678,18 @@ static inline u32 its_get_event_id(struct irq_data *d)
- 	return d->hwirq - its_dev->event_map.lpi_base;
- }
- 
--static void lpi_set_config(struct irq_data *d, bool enable)
-+static void lpi_update_config(struct irq_data *d, u8 clr, u8 set)
- {
- 	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
- 	irq_hw_number_t hwirq = d->hwirq;
--	u32 id = its_get_event_id(d);
--	u8 *cfg = page_address(gic_rdists->prop_page) + hwirq - 8192;
-+	struct page *prop_page;
-+	u8 *cfg;
- 
--	if (enable)
--		*cfg |= LPI_PROP_ENABLED;
--	else
--		*cfg &= ~LPI_PROP_ENABLED;
-+	prop_page = gic_rdists->prop_page;
+diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
+new file mode 100644
+index 000000000000..5ba0fb6b094d
+--- /dev/null
++++ b/include/linux/irqchip/arm-gic-v4.h
+@@ -0,0 +1,92 @@
++/*
++ * Copyright (C) 2016,2017 ARM Limited, All Rights Reserved.
++ * Author: Marc Zyngier <marc.zyngier@arm.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
 +
-+	cfg = page_address(prop_page) + hwirq - 8192;
-+	*cfg &= ~clr;
-+	*cfg |= set;
- 
- 	/*
- 	 * Make the above write visible to the redistributors.
-@@ -699,17 +700,17 @@ static void lpi_set_config(struct irq_data *d, bool enable)
- 		gic_flush_dcache_to_poc(cfg, sizeof(*cfg));
- 	else
- 		dsb(ishst);
--	its_send_inv(its_dev, id);
-+	its_send_inv(its_dev, its_get_event_id(d));
- }
- 
- static void its_mask_irq(struct irq_data *d)
- {
--	lpi_set_config(d, false);
-+	lpi_update_config(d, LPI_PROP_ENABLED, 0);
- }
- 
- static void its_unmask_irq(struct irq_data *d)
- {
--	lpi_set_config(d, true);
-+	lpi_update_config(d, 0, LPI_PROP_ENABLED);
- }
- 
- static int its_set_affinity(struct irq_data *d, const struct cpumask *mask_val,
++#ifndef __LINUX_IRQCHIP_ARM_GIC_V4_H
++#define __LINUX_IRQCHIP_ARM_GIC_V4_H
++
++struct its_vpe;
++
++/* Embedded in kvm.arch */
++struct its_vm {
++	struct fwnode_handle	*fwnode;
++	struct irq_domain	*domain;
++	struct page		*vprop_page;
++	struct its_vpe		**vpes;
++	int			nr_vpes;
++	irq_hw_number_t		db_lpi_base;
++	unsigned long		*db_bitmap;
++	int			nr_db_lpis;
++};
++
++/* Embedded in kvm_vcpu.arch */
++struct its_vpe {
++	struct page 		*vpt_page;
++	struct its_vm		*its_vm;
++	/* Doorbell interrupt */
++	int			irq;
++	irq_hw_number_t		vpe_db_lpi;
++	/*
++	 * This collection ID is used to indirect the target
++	 * redistributor for this VPE. The ID itself isn't involved in
++	 * programming of the ITS.
++	 */
++	u16			col_idx;
++	/* Unique (system-wide) VPE identifier */
++	u16			vpe_id;
++	/* Implementation Defined Area Invalid */
++	bool			idai;
++	/* Pending VLPIs on schedule out? */
++	bool			pending_last;
++};
++
++/*
++ * struct its_vlpi_map: structure describing the mapping of a
++ * VLPI. Only to be interpreted in the context of a physical interrupt
++ * it complements.  To be used as the vcpu_info passed to
++ * irq_set_vcpu_affinity().
++ *
++ * @vm:		Pointer to the GICv4 notion of a VM
++ * @vintid:	Virtual LPI number
++ * @db_enabled:	Is the VPE doorbell to be generated?
++ * @vpe_idx:	Index (0-based) of the VPE in this VM. Not the vpe_id!
++ */
++struct its_vlpi_map {
++	struct its_vm		*vm;
++	u32			vintid;
++	bool			db_enabled;
++	u16			vpe_idx;
++};
++
++enum its_vcpu_info_cmd_type {
++	MAP_VLPI,
++	GET_VLPI,
++	PROP_UPDATE_VLPI,
++	PROP_UPDATE_AND_INV_VLPI,
++	SCHEDULE_VPE,
++	DESCHEDULE_VPE,
++	INVALL_VPE,
++};
++
++struct its_cmd_info {
++	enum its_vcpu_info_cmd_type	cmd_type;
++	union {
++		struct its_vlpi_map	*map;
++		u8			config;
++	};
++};
++
++#endif
 -- 
 2.11.0
