@@ -1,28 +1,28 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [RFC PATCH v2 25/38] KVM: arm64: Respect virtual CPTR_EL2.TFP
- setting
-Date: Sun, 30 Jul 2017 22:00:29 +0200
-Message-ID: <20170730200029.GN5176@cbox>
+Subject: Re: [RFC PATCH v2 28/38] KVM: arm64: Emulate EL12 register accesses
+ from the virtual EL2
+Date: Mon, 31 Jul 2017 10:44:11 +0200
+Message-ID: <20170731084411.GO5176@cbox>
 References: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
- <1500397144-16232-26-git-send-email-jintack.lim@linaro.org>
+ <1500397144-16232-29-git-send-email-jintack.lim@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F076D49C12
- for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Jul 2017 15:59:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 98E4F4104E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 04:43:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Fc0fFu0CL75A for <kvmarm@lists.cs.columbia.edu>;
- Sun, 30 Jul 2017 15:59:20 -0400 (EDT)
-Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E706840D44
- for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Jul 2017 15:59:19 -0400 (EDT)
-Received: by mail-wm0-f44.google.com with SMTP id m85so154176273wma.1
- for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Jul 2017 13:00:32 -0700 (PDT)
+ with ESMTP id VsYueybaP50E for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 31 Jul 2017 04:43:02 -0400 (EDT)
+Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4DBF540FAE
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 04:43:02 -0400 (EDT)
+Received: by mail-wm0-f49.google.com with SMTP id m85so69023546wma.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 01:44:15 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1500397144-16232-26-git-send-email-jintack.lim@linaro.org>
+In-Reply-To: <1500397144-16232-29-git-send-email-jintack.lim@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,115 +36,177 @@ To: Jintack Lim <jintack.lim@linaro.org>
 Cc: kvm@vger.kernel.org, david.daney@cavium.com, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, stefan@hello-penguin.com, corbet@lwn.net, daniel.lezcano@linaro.org, linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, andy.gross@linaro.org, marc.zyngier@arm.com, cov@codeaurora.org, wcohen@redhat.com, mchehab@kernel.org, ard.biesheuvel@linaro.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, akpm@linux-foundation.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Jul 18, 2017 at 11:58:51AM -0500, Jintack Lim wrote:
-> Forward traps due to FP/ASIMD register accesses to the virtual EL2 if
-> virtual CPTR_EL2.TFP is set. Note that if TFP bit is set, then even
-> accesses to FP/ASIMD register from EL2 as well as NS EL0/1 will trap to
-> EL2. So, we don't check the VM's exception level.
+On Tue, Jul 18, 2017 at 11:58:54AM -0500, Jintack Lim wrote:
+> With HCR_EL2.NV bit set, accesses to EL12 registers in the virtual EL2
+> trap to EL2. Handle those traps just like we do for EL1 registers.
+> 
+> One exception is CNTKCTL_EL12. We don't trap on CNTKCTL_EL1 for non-VHE
+> virtual EL2 because we don't have to. However, accessing CNTKCTL_EL12
+> will trap since it's one of the EL12 registers controlled by HCR_EL2.NV
+> bit.  Therefore, add a handler for it and don't treat it as a
+> non-trap-registers when preparing a shadow context.
+
+I'm sorry, I don't remember the details, and I don't understand from
+this paragraph what the difference between CNTKCTL_EL12 and the other
+EL12 registers is?
+
+> 
+> Move EL12 system register macros to a common place to reuse them.
 > 
 > Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 > ---
->  arch/arm64/kernel/asm-offsets.c |  1 +
->  arch/arm64/kvm/handle_exit.c    | 15 +++++++++++----
->  arch/arm64/kvm/hyp/entry.S      | 13 +++++++++++++
->  arch/arm64/kvm/hyp/hyp-entry.S  |  2 +-
->  4 files changed, 26 insertions(+), 5 deletions(-)
+>  arch/arm64/include/asm/kvm_hyp.h | 24 ------------------------
+>  arch/arm64/include/asm/sysreg.h  | 24 ++++++++++++++++++++++++
+>  arch/arm64/kvm/context.c         |  7 +++++++
+>  arch/arm64/kvm/sys_regs.c        | 25 +++++++++++++++++++++++++
+>  4 files changed, 56 insertions(+), 24 deletions(-)
 > 
-> diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
-> index b3bb7ef..f5117a3 100644
-> --- a/arch/arm64/kernel/asm-offsets.c
-> +++ b/arch/arm64/kernel/asm-offsets.c
-> @@ -134,6 +134,7 @@ int main(void)
->    DEFINE(CPU_FP_REGS,		offsetof(struct kvm_regs, fp_regs));
->    DEFINE(VCPU_FPEXC32_EL2,	offsetof(struct kvm_vcpu, arch.ctxt.sys_regs[FPEXC32_EL2]));
->    DEFINE(VCPU_HOST_CONTEXT,	offsetof(struct kvm_vcpu, arch.host_cpu_context));
-> +  DEFINE(VIRTUAL_CPTR_EL2,	offsetof(struct kvm_vcpu, arch.ctxt.sys_regs[CPTR_EL2]));
->  #endif
->  #ifdef CONFIG_CPU_PM
->    DEFINE(CPU_SUSPEND_SZ,	sizeof(struct cpu_suspend_ctx));
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index 25ec824..d4e7b2b 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -84,11 +84,18 @@ static int handle_smc(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  }
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index 4572a9b..353b895 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -73,30 +73,6 @@
+>  #define read_sysreg_el1(r)	read_sysreg_elx(r, _EL1, _EL12)
+>  #define write_sysreg_el1(v,r)	write_sysreg_elx(v, r, _EL1, _EL12)
 >  
->  /*
-> - * Guest access to FP/ASIMD registers are routed to this handler only
-> - * when the system doesn't support FP/ASIMD.
-> + * When the system supports FP/ASMID and we are NOT running nested
-> + * virtualization, FP/ASMID traps are handled in EL2 directly.
-> + * This handler handles the cases those are not belong to the above case.
-
-The parser parses the cases where the sentence are not belong to the
-above sentence, and then my head exploted ;)
-
->   */
-> -static int handle_no_fpsimd(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> +static int kvm_handle_fpasimd(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  {
+> -/* The VHE specific system registers and their encoding */
+> -#define sctlr_EL12              sys_reg(3, 5, 1, 0, 0)
+> -#define cpacr_EL12              sys_reg(3, 5, 1, 0, 2)
+> -#define ttbr0_EL12              sys_reg(3, 5, 2, 0, 0)
+> -#define ttbr1_EL12              sys_reg(3, 5, 2, 0, 1)
+> -#define tcr_EL12                sys_reg(3, 5, 2, 0, 2)
+> -#define afsr0_EL12              sys_reg(3, 5, 5, 1, 0)
+> -#define afsr1_EL12              sys_reg(3, 5, 5, 1, 1)
+> -#define esr_EL12                sys_reg(3, 5, 5, 2, 0)
+> -#define far_EL12                sys_reg(3, 5, 6, 0, 0)
+> -#define mair_EL12               sys_reg(3, 5, 10, 2, 0)
+> -#define amair_EL12              sys_reg(3, 5, 10, 3, 0)
+> -#define vbar_EL12               sys_reg(3, 5, 12, 0, 0)
+> -#define contextidr_EL12         sys_reg(3, 5, 13, 0, 1)
+> -#define cntkctl_EL12            sys_reg(3, 5, 14, 1, 0)
+> -#define cntp_tval_EL02          sys_reg(3, 5, 14, 2, 0)
+> -#define cntp_ctl_EL02           sys_reg(3, 5, 14, 2, 1)
+> -#define cntp_cval_EL02          sys_reg(3, 5, 14, 2, 2)
+> -#define cntv_tval_EL02          sys_reg(3, 5, 14, 3, 0)
+> -#define cntv_ctl_EL02           sys_reg(3, 5, 14, 3, 1)
+> -#define cntv_cval_EL02          sys_reg(3, 5, 14, 3, 2)
+> -#define spsr_EL12               sys_reg(3, 5, 4, 0, 0)
+> -#define elr_EL12                sys_reg(3, 5, 4, 0, 1)
+> -
+>  /**
+>   * hyp_alternate_select - Generates patchable code sequences that are
+>   * used to switch between two implementations of a function, depending
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index b01c608..b8d4d0c 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -338,6 +338,30 @@
+>  #define SYS_CNTVOFF_EL2			sys_reg(3, 4, 14, 0, 3)
+>  #define SYS_CNTHCTL_EL2			sys_reg(3, 4, 14, 1, 0)
+>  
+> +/* The VHE specific system registers and their encoding */
+> +#define sctlr_EL12              sys_reg(3, 5, 1, 0, 0)
+> +#define cpacr_EL12              sys_reg(3, 5, 1, 0, 2)
+> +#define ttbr0_EL12              sys_reg(3, 5, 2, 0, 0)
+> +#define ttbr1_EL12              sys_reg(3, 5, 2, 0, 1)
+> +#define tcr_EL12                sys_reg(3, 5, 2, 0, 2)
+> +#define afsr0_EL12              sys_reg(3, 5, 5, 1, 0)
+> +#define afsr1_EL12              sys_reg(3, 5, 5, 1, 1)
+> +#define esr_EL12                sys_reg(3, 5, 5, 2, 0)
+> +#define far_EL12                sys_reg(3, 5, 6, 0, 0)
+> +#define mair_EL12               sys_reg(3, 5, 10, 2, 0)
+> +#define amair_EL12              sys_reg(3, 5, 10, 3, 0)
+> +#define vbar_EL12               sys_reg(3, 5, 12, 0, 0)
+> +#define contextidr_EL12         sys_reg(3, 5, 13, 0, 1)
+> +#define cntkctl_EL12            sys_reg(3, 5, 14, 1, 0)
+> +#define cntp_tval_EL02          sys_reg(3, 5, 14, 2, 0)
+> +#define cntp_ctl_EL02           sys_reg(3, 5, 14, 2, 1)
+> +#define cntp_cval_EL02          sys_reg(3, 5, 14, 2, 2)
+> +#define cntv_tval_EL02          sys_reg(3, 5, 14, 3, 0)
+> +#define cntv_ctl_EL02           sys_reg(3, 5, 14, 3, 1)
+> +#define cntv_cval_EL02          sys_reg(3, 5, 14, 3, 2)
+> +#define spsr_EL12               sys_reg(3, 5, 4, 0, 0)
+> +#define elr_EL12                sys_reg(3, 5, 4, 0, 1)
 > +
-> +	/* This is for nested virtualization */
-> +	if (vcpu_sys_reg(vcpu, CPTR_EL2) & CPTR_EL2_TFP)
-> +		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
-> +
-> +	/* This is the case when the system doesn't support FP/ASIMD. */
->  	kvm_inject_undefined(vcpu);
->  	return 1;
->  }
-> @@ -220,7 +227,7 @@ static int kvm_handle_eret(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  	[ESR_ELx_EC_BREAKPT_LOW]= kvm_handle_guest_debug,
->  	[ESR_ELx_EC_BKPT32]	= kvm_handle_guest_debug,
->  	[ESR_ELx_EC_BRK64]	= kvm_handle_guest_debug,
-> -	[ESR_ELx_EC_FP_ASIMD]	= handle_no_fpsimd,
-> +	[ESR_ELx_EC_FP_ASIMD]	= kvm_handle_fpasimd,
->  };
+>  #define SYS_SP_EL2			sys_reg(3, 6, 4, 1, 0)
 >  
->  static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
-> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-> index 12ee62d..95af673 100644
-> --- a/arch/arm64/kvm/hyp/entry.S
-> +++ b/arch/arm64/kvm/hyp/entry.S
-> @@ -158,6 +158,19 @@ abort_guest_exit_end:
->  1:	ret
->  ENDPROC(__guest_exit)
+>  /* Common SCTLR_ELx flags. */
+> diff --git a/arch/arm64/kvm/context.c b/arch/arm64/kvm/context.c
+> index e1bc753..f3d3398 100644
+> --- a/arch/arm64/kvm/context.c
+> +++ b/arch/arm64/kvm/context.c
+> @@ -121,6 +121,13 @@ static void copy_shadow_non_trap_el1_state(struct kvm_vcpu *vcpu, bool setup)
+>  	for (i = 0; i < ARRAY_SIZE(el1_non_trap_regs); i++) {
+>  		const int sr = el1_non_trap_regs[i];
 >  
-> +ENTRY(__fpsimd_guest_trap)
-> +	// If virtual CPTR_EL2.TFP is set, then forward the trap to the
-> +	// virtual EL2. For the non-nested case, this bit is always 0.
-> +	mrs	x1, tpidr_el2
-> +	ldr	x0, [x1, #VIRTUAL_CPTR_EL2]
-> +	and 	x0, x0, #CPTR_EL2_TFP
-> +	cbnz	x0, 1f
-> +	b	__fpsimd_guest_restore
-> +1:
-> +	mov	x0, #ARM_EXCEPTION_TRAP
-> +	b	__guest_exit
-> +ENDPROC(__fpsimd_guest_trap)
-> +
->  ENTRY(__fpsimd_guest_restore)
->  	stp	x2, x3, [sp, #-16]!
->  	stp	x4, lr, [sp, #-16]!
-> diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-> index 5170ce1..ab169fd 100644
-> --- a/arch/arm64/kvm/hyp/hyp-entry.S
-> +++ b/arch/arm64/kvm/hyp/hyp-entry.S
-> @@ -113,7 +113,7 @@ el1_trap:
->  	 */
->  alternative_if_not ARM64_HAS_NO_FPSIMD
->  	cmp	x0, #ESR_ELx_EC_FP_ASIMD
-> -	b.eq	__fpsimd_guest_restore
-> +	b.eq	__fpsimd_guest_trap
->  alternative_else_nop_endif
->  
->  	mrs	x1, tpidr_el2
-> -- 
-> 1.9.1
-> 
-Otherwise, I think this is correct.
+> +		/*
+> +		 * We trap on cntkctl_el12 accesses from virtual EL2 as suppose
 
-Have you subjected your L1 and L2 VMs to a nice round of paranoia FP
-testing?
+as opposed to ?
+
+> +		 * to not trapping on cntlctl_el1 accesses.
+> +		 */
+> +		if (vcpu_el2_e2h_is_set(vcpu) && sr == CNTKCTL_EL1)
+> +			continue;
+> +
+
+If the guest can still access CNTHCTL_EL2 via the CNTKCTL_EL1 system
+regsiter access encoding without trapping, why is the don't we need to
+copy this here?
+
+Is the point that for a VHE guest, we don't copy vcpu_sys_reg(vcpu,
+CNTKCTL_EL1) to the hardware CNTKCTL_EL1, but we copy vcpu_sys_reg(vcpu,
+CNTHCTL_EL2) into CNTKCTL_EL1 during the world switch instead?
 
 Thanks,
 -Christoffer
+
+>  		if (setup)
+>  			s_sys_regs[sr] = vcpu_sys_reg(vcpu, sr);
+>  		else
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index b3e0cb8..2aa922c 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -905,6 +905,14 @@ static inline void access_rw(struct sys_reg_params *p, u64 *sysreg)
+>  		*sysreg = p->regval;
+>  }
+>  
+> +static bool access_cntkctl_el12(struct kvm_vcpu *vcpu,
+> +			 struct sys_reg_params *p,
+> +			 const struct sys_reg_desc *r)
+> +{
+> +	access_rw(p, &vcpu_sys_reg(vcpu, r->reg));
+> +	return true;
+> +}
+> +
+>  static u64 *get_special_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *p)
+>  {
+>  	u64 reg = sys_reg(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
+> @@ -1201,6 +1209,23 @@ static bool access_cpacr(struct kvm_vcpu *vcpu,
+>  	{ SYS_DESC(SYS_CNTVOFF_EL2), trap_el2_regs, reset_val, CNTVOFF_EL2, 0 },
+>  	{ SYS_DESC(SYS_CNTHCTL_EL2), trap_el2_regs, reset_val, CNTHCTL_EL2, 0 },
+>  
+> +	{ SYS_DESC(sctlr_EL12), access_vm_reg, reset_val, SCTLR_EL1, 0x00C50078 },
+> +	{ SYS_DESC(cpacr_EL12), access_cpacr, reset_val, CPACR_EL1, 0 },
+> +	{ SYS_DESC(ttbr0_EL12), access_vm_reg, reset_unknown, TTBR0_EL1 },
+> +	{ SYS_DESC(ttbr1_EL12), access_vm_reg, reset_unknown, TTBR1_EL1 },
+> +	{ SYS_DESC(tcr_EL12), access_vm_reg, reset_val, TCR_EL1, 0 },
+> +	{ SYS_DESC(spsr_EL12), access_spsr},
+> +	{ SYS_DESC(elr_EL12), access_elr},
+> +	{ SYS_DESC(afsr0_EL12), access_vm_reg, reset_unknown, AFSR0_EL1 },
+> +	{ SYS_DESC(afsr1_EL12), access_vm_reg, reset_unknown, AFSR1_EL1 },
+> +	{ SYS_DESC(esr_EL12), access_vm_reg, reset_unknown, ESR_EL1 },
+> +	{ SYS_DESC(far_EL12), access_vm_reg, reset_unknown, FAR_EL1 },
+> +	{ SYS_DESC(mair_EL12), access_vm_reg, reset_unknown, MAIR_EL1 },
+> +	{ SYS_DESC(amair_EL12), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
+> +	{ SYS_DESC(vbar_EL12), access_vbar, reset_val, VBAR_EL1, 0 },
+> +	{ SYS_DESC(contextidr_EL12), access_vm_reg, reset_val, CONTEXTIDR_EL1, 0 },
+> +	{ SYS_DESC(cntkctl_EL12), access_cntkctl_el12, reset_val, CNTKCTL_EL1, 0 },
+> +
+>  	{ SYS_DESC(SYS_SP_EL2), NULL, reset_special, SP_EL2, 0},
+>  };
+>  
+> -- 
+> 1.9.1
+> 
