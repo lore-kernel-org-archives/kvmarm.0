@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 52/59] KVM: arm/arm64: GICv4: Use the doorbell interrupt as
- an unblocking source
-Date: Mon, 31 Jul 2017 18:26:30 +0100
-Message-ID: <20170731172637.29355-53-marc.zyngier@arm.com>
+Subject: [PATCH v3 55/59] KVM: arm/arm64: GICv4: Enable VLPI support
+Date: Mon, 31 Jul 2017 18:26:33 +0100
+Message-ID: <20170731172637.29355-56-marc.zyngier@arm.com>
 References: <20170731172637.29355-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 46A6149C4F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:27:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EF8A49C67
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:27:36 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3Fmntk0a4Gpg for <kvmarm@lists.cs.columbia.edu>;
- Mon, 31 Jul 2017 13:27:28 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E2CD49C5D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:27:28 -0400 (EDT)
+ with ESMTP id SNtqS6zp8RyT for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 31 Jul 2017 13:27:34 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DC8FB49C7C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:27:34 -0400 (EDT)
 In-Reply-To: <20170731172637.29355-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,111 +31,69 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The doorbell interrupt is only useful if the vcpu is blocked on WFI.
-In all other cases, recieving a doorbell interrupt is just a waste
-of cycles.
-
-So let's only enable the doorbell if a vcpu is getting blocked,
-and disable it when it is unblocked. This is very similar to
-what we're doing for the background timer.
+All it takes is the has_v4 flag to be set in gic_kvm_info
+as well as "kvm-arm.vgic_v4_enable=1" being passed on the
+command line for GICv4 to be enabled in KVM.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- include/kvm/arm_vgic.h      |  3 +++
- virt/kvm/arm/arm.c          |  2 ++
- virt/kvm/arm/vgic/vgic-v4.c | 32 +++++++++++++++++++++++++++++++-
- 3 files changed, 36 insertions(+), 1 deletion(-)
+ Documentation/admin-guide/kernel-parameters.txt |  4 ++++
+ virt/kvm/arm/vgic/vgic-v3.c                     | 14 ++++++++++++++
+ 2 files changed, 18 insertions(+)
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 050f78d4fb42..7b1cc7ff5b42 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -375,4 +375,7 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int irq,
- int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int irq,
- 				 struct kvm_kernel_irq_routing_entry *irq_entry);
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index d9c171ce4190..d2927d01d8b2 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -1874,6 +1874,10 @@
+ 			[KVM,ARM] Trap guest accesses to GICv3 common
+ 			system registers
  
-+void kvm_vgic_v4_enable_doorbell(struct kvm_vcpu *vcpu);
-+void kvm_vgic_v4_disable_doorbell(struct kvm_vcpu *vcpu);
++	kvm-arm.vgic_v4_enable=
++			[KVM,ARM] Allow use of GICv4 for direct injection of
++			LPIs.
 +
- #endif /* __KVM_ARM_VGIC_H */
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 6803ea27c47d..5dbc8dc8fbf4 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -316,11 +316,13 @@ int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
- void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
+ 	kvm-intel.ept=	[KVM,Intel] Disable extended page tables
+ 			(virtualized MMU) support on capable Intel chips.
+ 			Default is 1 (enabled)
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index 96ea597db0e7..405733678c2f 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -24,6 +24,7 @@
+ static bool group0_trap;
+ static bool group1_trap;
+ static bool common_trap;
++static bool gicv4_enable;
+ 
+ void vgic_v3_set_underflow(struct kvm_vcpu *vcpu)
  {
- 	kvm_timer_schedule(vcpu);
-+	kvm_vgic_v4_enable_doorbell(vcpu);
+@@ -459,6 +460,12 @@ static int __init early_common_trap_cfg(char *buf)
  }
+ early_param("kvm-arm.vgic_v3_common_trap", early_common_trap_cfg);
  
- void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
- {
- 	kvm_timer_unschedule(vcpu);
-+	kvm_vgic_v4_disable_doorbell(vcpu);
- }
- 
- int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
-diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
-index 6af3cde6d7d4..50721c4e3da5 100644
---- a/virt/kvm/arm/vgic/vgic-v4.c
-+++ b/virt/kvm/arm/vgic/vgic-v4.c
-@@ -16,6 +16,7 @@
-  */
- 
- #include <linux/interrupt.h>
-+#include <linux/irq.h>
- #include <linux/irqdomain.h>
- #include <linux/kvm_host.h>
- 
-@@ -73,6 +74,14 @@ int vgic_v4_init(struct kvm *kvm)
- 	kvm_for_each_vcpu(i, vcpu, kvm) {
- 		int irq = dist->its_vm.vpes[i]->irq;
- 
-+		/*
-+		 * Don't automatically enable the doorbell, as we're
-+		 * flipping it back and forth when the vcpu gets
-+		 * blocked. Also disable the lazy disabling, as the
-+		 * doorbell could kick us out of the guest too
-+		 * early...
-+		 */
-+		irq_set_status_flags(irq, IRQ_NOAUTOEN | IRQ_DISABLE_UNLAZY);
- 		ret = request_irq(irq, vgic_v4_doorbell_handler,
- 				  0, "vcpu", vcpu);
- 		if (ret) {
-@@ -98,7 +107,10 @@ void vgic_v4_teardown(struct kvm *kvm)
- 
- 	for (i = 0; i < its_vm->nr_vpes; i++) {
- 		struct kvm_vcpu *vcpu = kvm_get_vcpu(kvm, i);
--		free_irq(its_vm->vpes[i]->irq, vcpu);
-+		int irq = its_vm->vpes[i]->irq;
-+
-+		irq_clear_status_flags(irq, IRQ_NOAUTOEN | IRQ_DISABLE_UNLAZY);
-+		free_irq(irq, vcpu);
- 	}
- 
- 	its_free_vcpu_irqs(its_vm);
-@@ -211,3 +223,21 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int virq,
- 	mutex_unlock(&its->its_lock);
- 	return ret;
- }
-+
-+void kvm_vgic_v4_enable_doorbell(struct kvm_vcpu *vcpu)
++static int __init early_gicv4_enable(char *buf)
 +{
-+	if (vgic_is_v4_capable(vcpu->kvm)) {
-+		int irq = vcpu->arch.vgic_cpu.vgic_v3.its_vpe.irq;
-+		if (irq)
-+			enable_irq(irq);
-+	}
++	return strtobool(buf, &gicv4_enable);
 +}
++early_param("kvm-arm.vgic_v4_enable", early_gicv4_enable);
 +
-+void kvm_vgic_v4_disable_doorbell(struct kvm_vcpu *vcpu)
-+{
-+	if (vgic_is_v4_capable(vcpu->kvm)) {
-+		int irq = vcpu->arch.vgic_cpu.vgic_v3.its_vpe.irq;
-+		if (irq)
-+			disable_irq(irq);
+ /**
+  * vgic_v3_probe - probe for a GICv3 compatible interrupt controller in DT
+  * @node:	pointer to the DT node
+@@ -478,6 +485,13 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
+ 	kvm_vgic_global_state.can_emulate_gicv2 = false;
+ 	kvm_vgic_global_state.ich_vtr_el2 = ich_vtr_el2;
+ 
++	/* GICv4 support? */
++	if (info->has_v4) {
++		kvm_vgic_global_state.has_gicv4 = gicv4_enable;
++		kvm_info("GICv4 support %sabled\n",
++			 gicv4_enable ? "en" : "dis");
 +	}
-+}
++
+ 	if (!info->vcpu.start) {
+ 		kvm_info("GICv3: no GICV resource entry\n");
+ 		kvm_vgic_global_state.vcpu_base = 0;
 -- 
 2.11.0
