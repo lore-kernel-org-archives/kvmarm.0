@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 19/59] irqchip/gic-v3-its: Add VPE domain infrastructure
-Date: Mon, 31 Jul 2017 18:25:57 +0100
-Message-ID: <20170731172637.29355-20-marc.zyngier@arm.com>
+Subject: [PATCH v3 17/59] irqchip/gic-v3-its: Add VLPI map/unmap operations
+Date: Mon, 31 Jul 2017 18:25:55 +0100
+Message-ID: <20170731172637.29355-18-marc.zyngier@arm.com>
 References: <20170731172637.29355-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A555449C23
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:26:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B63B140FB0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:26:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qL8NU5wMa4R0 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 31 Jul 2017 13:26:15 -0400 (EDT)
+ with ESMTP id 5A0GFY9eNOSe for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 31 Jul 2017 13:26:09 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BF62E4104E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:26:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 362D549C4F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:26:08 -0400 (EDT)
 In-Reply-To: <20170731172637.29355-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,78 +31,351 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add the basic GICv4 VPE (vcpu in GICv4 parlance) infrastructure
-(irqchip, irq domain) that is going to be populated in the following
-patches.
+In order to let a VLPI being injected into a guest, the VLPI must
+be mapped using the VMAPTI command. When moved to a different vcpu,
+it must be moved with the VMOVI command.
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+These commands are issued via the irq_set_vcpu_affinity method,
+making sure we unmap the corresponding host LPI first.
+
+The reverse is also done when the VLPI is unmapped from the guest.
+
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 33 ++++++++++++++++++++++++++++++++-
- 1 file changed, 32 insertions(+), 1 deletion(-)
+ drivers/irqchip/irq-gic-v3-its.c | 250 ++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 247 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index b618c259be8b..1fa345d53088 100644
+index 9ef4f161690a..ef31c3e58c01 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -2026,6 +2026,13 @@ static const struct irq_domain_ops its_domain_ops = {
- 	.deactivate		= its_irq_domain_deactivate,
+@@ -115,11 +115,17 @@ struct event_lpi_map {
+ 	u16			*col_map;
+ 	irq_hw_number_t		lpi_base;
+ 	int			nr_lpis;
++	struct mutex		vlpi_lock;
++	struct its_vm		*vm;
++	struct its_vlpi_map	*vlpi_maps;
++	int			nr_vlpis;
  };
  
-+static struct irq_chip its_vpe_irq_chip = {
-+	.name			= "GICv4-vpe",
-+};
+ /*
+- * The ITS view of a device - belongs to an ITS, a collection, owns an
+- * interrupt translation table, and a list of interrupts.
++ * The ITS view of a device - belongs to an ITS, owns an interrupt
++ * translation table, and a list of interrupts.  If it some of its
++ * LPIs are injected into a guest (GICv4), the event_map.vm field
++ * indicates which one.
+  */
+ struct its_device {
+ 	struct list_head	entry;
+@@ -205,6 +211,21 @@ struct its_cmd_desc {
+ 		struct {
+ 			struct its_collection *col;
+ 		} its_invall_cmd;
 +
-+static const struct irq_domain_ops its_vpe_domain_ops = {
-+};
++		struct {
++			struct its_vpe *vpe;
++			struct its_device *dev;
++			u32 virt_id;
++			u32 event_id;
++			bool db_enabled;
++		} its_vmapti_cmd;
 +
- static int its_force_quiescent(void __iomem *base)
++		struct {
++			struct its_vpe *vpe;
++			struct its_device *dev;
++			u32 event_id;
++			bool db_enabled;
++		} its_vmovi_cmd;
+ 	};
+ };
+ 
+@@ -221,6 +242,9 @@ struct its_cmd_block {
+ typedef struct its_collection *(*its_cmd_builder_t)(struct its_cmd_block *,
+ 						    struct its_cmd_desc *);
+ 
++typedef struct its_vpe *(*its_cmd_vbuilder_t)(struct its_cmd_block *,
++					      struct its_cmd_desc *);
++
+ static void its_mask_encode(u64 *raw_cmd, u64 val, int h, int l)
  {
- 	u32 count = 1000000;	/* 1s */
-@@ -2142,6 +2149,11 @@ static int its_init_domain(struct fwnode_handle *handle, struct its_node *its)
+ 	u64 mask = GENMASK_ULL(h, l);
+@@ -273,6 +297,26 @@ static void its_encode_collection(struct its_cmd_block *cmd, u16 col)
+ 	its_mask_encode(&cmd->raw_cmd[2], col, 15, 0);
+ }
+ 
++static void its_encode_vpeid(struct its_cmd_block *cmd, u16 vpeid)
++{
++	its_mask_encode(&cmd->raw_cmd[1], vpeid, 47, 32);
++}
++
++static void its_encode_virt_id(struct its_cmd_block *cmd, u32 virt_id)
++{
++	its_mask_encode(&cmd->raw_cmd[2], virt_id, 31, 0);
++}
++
++static void its_encode_db_phys_id(struct its_cmd_block *cmd, u32 db_phys_id)
++{
++	its_mask_encode(&cmd->raw_cmd[2], db_phys_id, 63, 32);
++}
++
++static void its_encode_db_valid(struct its_cmd_block *cmd, bool db_valid)
++{
++	its_mask_encode(&cmd->raw_cmd[2], db_valid, 0, 0);
++}
++
+ static inline void its_fixup_cmd(struct its_cmd_block *cmd)
+ {
+ 	/* Let's fixup BE commands */
+@@ -431,6 +475,50 @@ static struct its_collection *its_build_invall_cmd(struct its_cmd_block *cmd,
+ 	return NULL;
+ }
+ 
++static struct its_vpe *its_build_vmapti_cmd(struct its_cmd_block *cmd,
++					    struct its_cmd_desc *desc)
++{
++	u32 db;
++
++	if (desc->its_vmapti_cmd.db_enabled)
++		db = desc->its_vmapti_cmd.vpe->vpe_db_lpi;
++	else
++		db = 1023;
++
++	its_encode_cmd(cmd, GITS_CMD_VMAPTI);
++	its_encode_devid(cmd, desc->its_vmapti_cmd.dev->device_id);
++	its_encode_vpeid(cmd, desc->its_vmapti_cmd.vpe->vpe_id);
++	its_encode_event_id(cmd, desc->its_vmapti_cmd.event_id);
++	its_encode_db_phys_id(cmd, db);
++	its_encode_virt_id(cmd, desc->its_vmapti_cmd.virt_id);
++
++	its_fixup_cmd(cmd);
++
++	return desc->its_vmapti_cmd.vpe;
++}
++
++static struct its_vpe *its_build_vmovi_cmd(struct its_cmd_block *cmd,
++					   struct its_cmd_desc *desc)
++{
++	u32 db;
++
++	if (desc->its_vmovi_cmd.db_enabled)
++		db = desc->its_vmovi_cmd.vpe->vpe_db_lpi;
++	else
++		db = 1023;
++
++	its_encode_cmd(cmd, GITS_CMD_VMOVI);
++	its_encode_devid(cmd, desc->its_vmovi_cmd.dev->device_id);
++	its_encode_vpeid(cmd, desc->its_vmovi_cmd.vpe->vpe_id);
++	its_encode_event_id(cmd, desc->its_vmovi_cmd.event_id);
++	its_encode_db_phys_id(cmd, db);
++	its_encode_db_valid(cmd, true);
++
++	its_fixup_cmd(cmd);
++
++	return desc->its_vmovi_cmd.vpe;
++}
++
+ static u64 its_cmd_ptr_to_offset(struct its_node *its,
+ 				 struct its_cmd_block *ptr)
+ {
+@@ -576,6 +664,18 @@ static void its_build_sync_cmd(struct its_cmd_block *sync_cmd,
+ static BUILD_SINGLE_CMD_FUNC(its_send_single_command, its_cmd_builder_t,
+ 			     struct its_collection, its_build_sync_cmd)
+ 
++static void its_build_vsync_cmd(struct its_cmd_block *sync_cmd,
++				struct its_vpe *sync_vpe)
++{
++	its_encode_cmd(sync_cmd, GITS_CMD_VSYNC);
++	its_encode_vpeid(sync_cmd, sync_vpe->vpe_id);
++
++	its_fixup_cmd(sync_cmd);
++}
++
++static BUILD_SINGLE_CMD_FUNC(its_send_single_vcommand, its_cmd_vbuilder_t,
++			     struct its_vpe, its_build_vsync_cmd)
++
+ static void its_send_int(struct its_device *dev, u32 event_id)
+ {
+ 	struct its_cmd_desc desc;
+@@ -669,6 +769,33 @@ static void its_send_invall(struct its_node *its, struct its_collection *col)
+ 	its_send_single_command(its, its_build_invall_cmd, &desc);
+ }
+ 
++static void its_send_vmapti(struct its_device *dev, u32 id)
++{
++	struct its_vlpi_map *map = &dev->event_map.vlpi_maps[id];
++	struct its_cmd_desc desc;
++
++	desc.its_vmapti_cmd.vpe = map->vm->vpes[map->vpe_idx];
++	desc.its_vmapti_cmd.dev = dev;
++	desc.its_vmapti_cmd.virt_id = map->vintid;
++	desc.its_vmapti_cmd.event_id = id;
++	desc.its_vmapti_cmd.db_enabled = map->db_enabled;
++
++	its_send_single_vcommand(dev->its, its_build_vmapti_cmd, &desc);
++}
++
++static void its_send_vmovi(struct its_device *dev, u32 id)
++{
++	struct its_vlpi_map *map = &dev->event_map.vlpi_maps[id];
++	struct its_cmd_desc desc;
++
++	desc.its_vmovi_cmd.vpe = map->vm->vpes[map->vpe_idx];
++	desc.its_vmovi_cmd.dev = dev;
++	desc.its_vmovi_cmd.event_id = id;
++	desc.its_vmovi_cmd.db_enabled = map->db_enabled;
++
++	its_send_single_vcommand(dev->its, its_build_vmovi_cmd, &desc);
++}
++
+ /*
+  * irqchip functions - assumes MSI, mostly.
+  */
+@@ -781,19 +908,135 @@ static int its_irq_set_irqchip_state(struct irq_data *d,
  	return 0;
  }
  
-+static int its_init_vpe_domain(void)
++static int its_vlpi_map(struct irq_data *d, struct its_cmd_info *info)
 +{
-+	return 0;
-+}
++	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
++	u32 event = its_get_event_id(d);
++	int ret = 0;
 +
- static int __init its_compute_its_list_map(struct resource *res,
- 					   void __iomem *its_base)
- {
-@@ -2484,6 +2496,9 @@ int __init its_init(struct fwnode_handle *handle, struct rdists *rdists,
- 		    struct irq_domain *parent_domain)
- {
- 	struct device_node *of_node;
-+	struct its_node *its;
-+	bool has_v4 = false;
-+	int err;
- 
- 	its_parent = parent_domain;
- 	of_node = to_of_node(handle);
-@@ -2498,5 +2513,21 @@ int __init its_init(struct fwnode_handle *handle, struct rdists *rdists,
- 	}
- 
- 	gic_rdists = rdists;
--	return its_alloc_lpi_tables();
-+	err = its_alloc_lpi_tables();
-+	if (err)
-+		return err;
++	if (!info->map)
++		return -EINVAL;
 +
-+	its_lpi_init(rdists->id_bits);
++	mutex_lock(&its_dev->event_map.vlpi_lock);
 +
-+	list_for_each_entry(its, &its_nodes, entry)
-+		has_v4 |= its->is_v4;
++	if (!its_dev->event_map.vm) {
++		struct its_vlpi_map *maps;
 +
-+	if (has_v4 & rdists->has_vlpis) {
-+		if (its_init_vpe_domain()) {
-+			rdists->has_vlpis = false;
-+			pr_err("ITS: Disabling GICv4 support\n");
++		maps = kzalloc(sizeof(*maps) * its_dev->event_map.nr_lpis,
++			       GFP_KERNEL);
++		if (!maps) {
++			ret = -ENOMEM;
++			goto out;
 +		}
++
++		its_dev->event_map.vm = info->map->vm;
++		its_dev->event_map.vlpi_maps = maps;
++	} else if (its_dev->event_map.vm != info->map->vm) {
++		ret = -EINVAL;
++		goto out;
 +	}
 +
-+	return 0;
- }
++	/* Get our private copy of the mapping information */
++	its_dev->event_map.vlpi_maps[event] = *info->map;
++
++	if (irqd_is_forwarded_to_vcpu(d)) {
++		/* Already mapped, move it around */
++		its_send_vmovi(its_dev, event);
++	} else {
++		/* Drop the physical mapping */
++		its_send_discard(its_dev, event);
++
++		/* and install the virtual one */
++		its_send_vmapti(its_dev, event);
++		irqd_set_forwarded_to_vcpu(d);
++
++		/* Increment the number of VLPIs */
++		its_dev->event_map.nr_vlpis++;
++	}
++
++out:
++	mutex_unlock(&its_dev->event_map.vlpi_lock);
++	return ret;
++}
++
++static int its_vlpi_get(struct irq_data *d, struct its_cmd_info *info)
++{
++	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
++	u32 event = its_get_event_id(d);
++	int ret = 0;
++
++	mutex_lock(&its_dev->event_map.vlpi_lock);
++
++	if (!its_dev->event_map.vm ||
++	    !its_dev->event_map.vlpi_maps[event].vm) {
++		ret = -EINVAL;
++		goto out;
++	}
++
++	/* Copy our mapping information to the incoming request */
++	*info->map = its_dev->event_map.vlpi_maps[event];
++
++out:
++	mutex_unlock(&its_dev->event_map.vlpi_lock);
++	return ret;
++}
++
++static int its_vlpi_unmap(struct irq_data *d)
++{
++	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
++	u32 event = its_get_event_id(d);
++	int ret = 0;
++
++	mutex_lock(&its_dev->event_map.vlpi_lock);
++
++	if (!its_dev->event_map.vm || !irqd_is_forwarded_to_vcpu(d)) {
++		ret = -EINVAL;
++		goto out;
++	}
++
++	/* Drop the virtual mapping */
++	its_send_discard(its_dev, event);
++
++	/* and restore the physical one */
++	irqd_clr_forwarded_to_vcpu(d);
++	its_send_mapti(its_dev, d->hwirq, event);
++	lpi_update_config(d, 0xff, (LPI_PROP_DEFAULT_PRIO |
++				    LPI_PROP_ENABLED |
++				    LPI_PROP_GROUP1));
++
++	/*
++	 * Drop the refcount and make the device available again if
++	 * this was the last VLPI.
++	 */
++	if (!--its_dev->event_map.nr_vlpis) {
++		its_dev->event_map.vm = NULL;
++		kfree(its_dev->event_map.vlpi_maps);
++	}
++
++out:
++	mutex_unlock(&its_dev->event_map.vlpi_lock);
++	return ret;
++}
++
+ static int its_irq_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
+ {
+ 	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
+ 	struct its_cmd_info *info = vcpu_info;
+ 
+ 	/* Need a v4 ITS */
+-	if (!its_dev->its->is_v4 || !info)
++	if (!its_dev->its->is_v4)
+ 		return -EINVAL;
+ 
++	/* Unmap request? */
++	if (!info)
++		return its_vlpi_unmap(d);
++
+ 	switch (info->cmd_type) {
+ 	case MAP_VLPI:
++		return its_vlpi_map(d, info);
+ 
+ 	case GET_VLPI:
++		return its_vlpi_get(d, info);
+ 
+ 	case PROP_UPDATE_VLPI:
+ 	case PROP_UPDATE_AND_INV_VLPI:
+@@ -1512,6 +1755,7 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
+ 	dev->event_map.col_map = col_map;
+ 	dev->event_map.lpi_base = lpi_base;
+ 	dev->event_map.nr_lpis = nr_lpis;
++	mutex_init(&dev->event_map.vlpi_lock);
+ 	dev->device_id = dev_id;
+ 	INIT_LIST_HEAD(&dev->entry);
+ 
 -- 
 2.11.0
