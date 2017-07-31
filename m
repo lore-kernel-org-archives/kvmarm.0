@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 03/59] irqchip/gic-v3: Add VLPI/DirectLPI discovery
-Date: Mon, 31 Jul 2017 18:25:41 +0100
-Message-ID: <20170731172637.29355-4-marc.zyngier@arm.com>
+Subject: [PATCH v3 08/59] irqchip/gic-v3-its: Split out property table
+ allocation
+Date: Mon, 31 Jul 2017 18:25:46 +0100
+Message-ID: <20170731172637.29355-9-marc.zyngier@arm.com>
 References: <20170731172637.29355-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6469249C35
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:25:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9476749C2D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:25:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CwJDrgXUZu7y for <kvmarm@lists.cs.columbia.edu>;
- Mon, 31 Jul 2017 13:25:36 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 22F4B49C19
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:25:36 -0400 (EDT)
+ with ESMTP id eK5Brya+-Wzb for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 31 Jul 2017 13:25:47 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 84AF449C36
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:25:47 -0400 (EDT)
 In-Reply-To: <20170731172637.29355-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,90 +32,70 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add helper functions that probe for VLPI and DirectLPI properties.
+Move the LPI property table allocation into its own function, as
+this is going to be required for those associated with VMs in
+the future.
 
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/irqchip/irq-gic-v3.c       | 24 +++++++++++++++++++++++-
- include/linux/irqchip/arm-gic-v3.h |  3 +++
- 2 files changed, 26 insertions(+), 1 deletion(-)
+ drivers/irqchip/irq-gic-v3-its.c | 31 +++++++++++++++++++++----------
+ 1 file changed, 21 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
-index 640f621c7f75..17f0ad41864f 100644
---- a/drivers/irqchip/irq-gic-v3.c
-+++ b/drivers/irqchip/irq-gic-v3.c
-@@ -1,5 +1,5 @@
- /*
-- * Copyright (C) 2013, 2014 ARM Limited, All Rights Reserved.
-+ * Copyright (C) 2013-2017 ARM Limited, All Rights Reserved.
-  * Author: Marc Zyngier <marc.zyngier@arm.com>
-  *
-  * This program is free software; you can redistribute it and/or modify
-@@ -504,6 +504,24 @@ static int gic_populate_rdist(void)
- 	return -ENODEV;
+diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+index 3e4ac8c13e21..039626d21a73 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -899,13 +899,32 @@ static void its_lpi_free(struct event_lpi_map *map)
+ 	kfree(map->col_map);
  }
  
-+static int __gic_update_vlpi_properties(struct redist_region *region,
-+					void __iomem *ptr)
++static struct page *its_allocate_prop_table(gfp_t gfp_flags)
 +{
-+	u64 typer = gic_read_typer(ptr + GICR_TYPER);
-+	gic_data.rdists.has_vlpis &= !!(typer & GICR_TYPER_VLPIS);
-+	gic_data.rdists.has_direct_lpi &= !!(typer & GICR_TYPER_DirectLPIS);
++	struct page *prop_page;
 +
-+	return 1;
++	prop_page = alloc_pages(gfp_flags, get_order(LPI_PROPBASE_SZ));
++	if (!prop_page)
++		return NULL;
++
++	/* Priority 0xa0, Group-1, disabled */
++	memset(page_address(prop_page),
++	       LPI_PROP_DEFAULT_PRIO | LPI_PROP_GROUP1,
++	       LPI_PROPBASE_SZ);
++
++	/* Make sure the GIC will observe the written configuration */
++	gic_flush_dcache_to_poc(page_address(prop_page), LPI_PROPBASE_SZ);
++
++	return prop_page;
 +}
 +
-+static void gic_update_vlpi_properties(void)
-+{
-+	gic_iterate_rdists(__gic_update_vlpi_properties);
-+	pr_info("%sVLPI support, %sdirect LPI support\n",
-+		!gic_data.rdists.has_vlpis ? "no " : "",
-+		!gic_data.rdists.has_direct_lpi ? "no " : "");
-+}
 +
- static void gic_cpu_sys_reg_init(void)
+ static int __init its_alloc_lpi_tables(void)
  {
- 	/*
-@@ -968,6 +986,8 @@ static int __init gic_init_bases(void __iomem *dist_base,
- 	gic_data.domain = irq_domain_create_tree(handle, &gic_irq_domain_ops,
- 						 &gic_data);
- 	gic_data.rdists.rdist = alloc_percpu(typeof(*gic_data.rdists.rdist));
-+	gic_data.rdists.has_vlpis = true;
-+	gic_data.rdists.has_direct_lpi = true;
+ 	phys_addr_t paddr;
  
- 	if (WARN_ON(!gic_data.domain) || WARN_ON(!gic_data.rdists.rdist)) {
- 		err = -ENOMEM;
-@@ -976,6 +996,8 @@ static int __init gic_init_bases(void __iomem *dist_base,
+ 	lpi_id_bits = min_t(u32, gic_rdists->id_bits, ITS_MAX_LPI_NRBITS);
+-	gic_rdists->prop_page = alloc_pages(GFP_NOWAIT,
+-					   get_order(LPI_PROPBASE_SZ));
++	gic_rdists->prop_page = its_allocate_prop_table(GFP_NOWAIT);
+ 	if (!gic_rdists->prop_page) {
+ 		pr_err("Failed to allocate PROPBASE\n");
+ 		return -ENOMEM;
+@@ -914,14 +933,6 @@ static int __init its_alloc_lpi_tables(void)
+ 	paddr = page_to_phys(gic_rdists->prop_page);
+ 	pr_info("GIC: using LPI property table @%pa\n", &paddr);
  
- 	set_handle_irq(gic_handle_irq);
+-	/* Priority 0xa0, Group-1, disabled */
+-	memset(page_address(gic_rdists->prop_page),
+-	       LPI_PROP_DEFAULT_PRIO | LPI_PROP_GROUP1,
+-	       LPI_PROPBASE_SZ);
+-
+-	/* Make sure the GIC will observe the written configuration */
+-	gic_flush_dcache_to_poc(page_address(gic_rdists->prop_page), LPI_PROPBASE_SZ);
+-
+ 	return its_lpi_init(lpi_id_bits);
+ }
  
-+	gic_update_vlpi_properties();
-+
- 	if (IS_ENABLED(CONFIG_ARM_GIC_V3_ITS) && gic_dist_supports_lpis())
- 		its_init(handle, &gic_data.rdists, gic_data.domain);
- 
-diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index 6a1f87ff94e2..20a553423ac7 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -204,6 +204,7 @@
- 
- #define GICR_TYPER_PLPIS		(1U << 0)
- #define GICR_TYPER_VLPIS		(1U << 1)
-+#define GICR_TYPER_DirectLPIS		(1U << 3)
- #define GICR_TYPER_LAST			(1U << 4)
- 
- #define GIC_V3_REDIST_SIZE		0x20000
-@@ -487,6 +488,8 @@ struct rdists {
- 	struct page		*prop_page;
- 	int			id_bits;
- 	u64			flags;
-+	bool			has_vlpis;
-+	bool			has_direct_lpi;
- };
- 
- struct irq_domain;
 -- 
 2.11.0
