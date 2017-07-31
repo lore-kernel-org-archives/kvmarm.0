@@ -1,90 +1,79 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 11/59] irqchip/gic-v3-its: Rework LPI freeing
-Date: Mon, 31 Jul 2017 18:25:49 +0100
-Message-ID: <20170731172637.29355-12-marc.zyngier@arm.com>
+Subject: [PATCH v3 12/59] irqchip/gic-v3-its: Generalize device table allocation
+Date: Mon, 31 Jul 2017 18:25:50 +0100
+Message-ID: <20170731172637.29355-13-marc.zyngier@arm.com>
 References: <20170731172637.29355-1-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 825F849C2C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:25:55 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vNtEDVMar0at for <kvmarm@lists.cs.columbia.edu>;
- Mon, 31 Jul 2017 13:25:54 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D5E549C19
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:25:54 -0400 (EDT)
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20170731172637.29355-1-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: linux-kernel-owner@vger.kernel.org
 To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>, Eric Auger <eric.auger@redhat.com>, Shanker Donthineni <shankerd@codeaurora.org>, Mark Rutland <mark.rutland@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Rework LPI deallocation so that it can be reused by the v4 support
-code.
+As we want to use 2-level tables for VCPUs, let's hack the device
+table allocator in order to make it slightly more generic. It
+will get reused in subsequent patches.
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ drivers/irqchip/irq-gic-v3-its.c | 26 ++++++++++++++++----------
+ 1 file changed, 16 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index ebdb1603b95d..1298a9bca56a 100644
+index 1298a9bca56a..1c2d6bdf85cb 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -875,16 +875,15 @@ static unsigned long *its_lpi_alloc_chunks(int nr_irqs, int *base, int *nr_ids)
- 	return bitmap;
+@@ -1386,26 +1386,19 @@ static struct its_baser *its_get_baser(struct its_node *its, u32 type)
+ 	return NULL;
  }
  
--static void its_lpi_free(struct event_lpi_map *map)
-+static void its_lpi_free_chunks(unsigned long *bitmap, int base, int nr_ids)
+-static bool its_alloc_device_table(struct its_node *its, u32 dev_id)
++static bool its_alloc_table_entry(struct its_baser *baser, u32 id)
  {
--	int base = map->lpi_base;
--	int nr_ids = map->nr_lpis;
- 	int lpi;
+-	struct its_baser *baser;
+ 	struct page *page;
+ 	u32 esz, idx;
+ 	__le64 *table;
  
- 	spin_lock(&lpi_lock);
+-	baser = its_get_baser(its, GITS_BASER_TYPE_DEVICE);
+-
+-	/* Don't allow device id that exceeds ITS hardware limit */
+-	if (!baser)
+-		return (ilog2(dev_id) < its->device_ids);
+-
+ 	/* Don't allow device id that exceeds single, flat table limit */
+ 	esz = GITS_BASER_ENTRY_SIZE(baser->val);
+ 	if (!(baser->val & GITS_BASER_INDIRECT))
+-		return (dev_id < (PAGE_ORDER_TO_SIZE(baser->order) / esz));
++		return (id < (PAGE_ORDER_TO_SIZE(baser->order) / esz));
  
- 	for (lpi = base; lpi < (base + nr_ids); lpi += IRQS_PER_CHUNK) {
- 		int chunk = its_lpi_to_chunk(lpi);
-+
- 		BUG_ON(chunk > lpi_chunks);
- 		if (test_bit(chunk, lpi_bitmap)) {
- 			clear_bit(chunk, lpi_bitmap);
-@@ -895,8 +894,7 @@ static void its_lpi_free(struct event_lpi_map *map)
+ 	/* Compute 1st level table index & check if that exceeds table limit */
+-	idx = dev_id >> ilog2(baser->psz / esz);
++	idx = id >> ilog2(baser->psz / esz);
+ 	if (idx >= (PAGE_ORDER_TO_SIZE(baser->order) / GITS_LVL1_ENTRY_SIZE))
+ 		return false;
  
- 	spin_unlock(&lpi_lock);
- 
--	kfree(map->lpi_map);
--	kfree(map->col_map);
-+	kfree(bitmap);
+@@ -1434,6 +1427,19 @@ static bool its_alloc_device_table(struct its_node *its, u32 dev_id)
+ 	return true;
  }
  
- static struct page *its_allocate_prop_table(gfp_t gfp_flags)
-@@ -1668,7 +1666,10 @@ static void its_irq_domain_free(struct irq_domain *domain, unsigned int virq,
- 	/* If all interrupts have been freed, start mopping the floor */
- 	if (bitmap_empty(its_dev->event_map.lpi_map,
- 			 its_dev->event_map.nr_lpis)) {
--		its_lpi_free(&its_dev->event_map);
-+		its_lpi_free_chunks(its_dev->event_map.lpi_map,
-+				    its_dev->event_map.lpi_base,
-+				    its_dev->event_map.nr_lpis);
-+		kfree(its_dev->event_map.col_map);
- 
- 		/* Unmap device/itt */
- 		its_send_mapd(its_dev, 0);
++static bool its_alloc_device_table(struct its_node *its, u32 dev_id)
++{
++	struct its_baser *baser;
++
++	baser = its_get_baser(its, GITS_BASER_TYPE_DEVICE);
++
++	/* Don't allow device id that exceeds ITS hardware limit */
++	if (!baser)
++		return (ilog2(dev_id) < its->device_ids);
++
++	return its_alloc_table_entry(baser, dev_id);
++}
++
+ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
+ 					    int nvecs)
+ {
 -- 
 2.11.0
