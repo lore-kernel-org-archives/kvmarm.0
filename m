@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 34/59] irqchip/gic-v4: Enable low-level GICv4 operations
-Date: Mon, 31 Jul 2017 18:26:12 +0100
-Message-ID: <20170731172637.29355-35-marc.zyngier@arm.com>
+Subject: [PATCH v3 33/59] irqchip/gic-v4: Add some basic documentation
+Date: Mon, 31 Jul 2017 18:26:11 +0100
+Message-ID: <20170731172637.29355-34-marc.zyngier@arm.com>
 References: <20170731172637.29355-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 17EB749C3E
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4580249C3E
  for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:26:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qpj0xG98sD0b for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id Ie5oWhcjF7UB for <kvmarm@lists.cs.columbia.edu>;
  Mon, 31 Jul 2017 13:26:47 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F37AB40D17
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:26:46 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B821E49C7C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:26:44 -0400 (EDT)
 In-Reply-To: <20170731172637.29355-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,75 +31,96 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Get the show on the road...
+Do a braindump of the way things are supposed to work.
 
 Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/irqchip/Makefile           |  2 +-
- drivers/irqchip/irq-gic-v3-its.c   |  3 ++-
- drivers/irqchip/irq-gic-v4.c       | 13 +++++++++++++
- include/linux/irqchip/arm-gic-v4.h |  2 ++
- 4 files changed, 18 insertions(+), 2 deletions(-)
+ drivers/irqchip/irq-gic-v4.c | 71 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 71 insertions(+)
 
-diff --git a/drivers/irqchip/Makefile b/drivers/irqchip/Makefile
-index e88d856cc09c..7dd05ad6bcfb 100644
---- a/drivers/irqchip/Makefile
-+++ b/drivers/irqchip/Makefile
-@@ -28,7 +28,7 @@ obj-$(CONFIG_ARM_GIC_PM)		+= irq-gic-pm.o
- obj-$(CONFIG_ARCH_REALVIEW)		+= irq-gic-realview.o
- obj-$(CONFIG_ARM_GIC_V2M)		+= irq-gic-v2m.o
- obj-$(CONFIG_ARM_GIC_V3)		+= irq-gic-v3.o irq-gic-common.o
--obj-$(CONFIG_ARM_GIC_V3_ITS)		+= irq-gic-v3-its.o irq-gic-v3-its-pci-msi.o irq-gic-v3-its-platform-msi.o
-+obj-$(CONFIG_ARM_GIC_V3_ITS)		+= irq-gic-v3-its.o irq-gic-v3-its-pci-msi.o irq-gic-v3-its-platform-msi.o irq-gic-v4.o
- obj-$(CONFIG_PARTITION_PERCPU)		+= irq-partition-percpu.o
- obj-$(CONFIG_HISILICON_IRQ_MBIGEN)	+= irq-mbigen.o
- obj-$(CONFIG_ARM_NVIC)			+= irq-nvic.o
-diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index a5b1317d89eb..9f32cd42238f 100644
---- a/drivers/irqchip/irq-gic-v3-its.c
-+++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -3109,7 +3109,8 @@ int __init its_init(struct fwnode_handle *handle, struct rdists *rdists,
- 		has_v4 |= its->is_v4;
- 
- 	if (has_v4 & rdists->has_vlpis) {
--		if (its_init_vpe_domain()) {
-+		if (its_init_vpe_domain() ||
-+		    its_init_v4(parent_domain, &its_vpe_domain_ops)) {
- 			rdists->has_vlpis = false;
- 			pr_err("ITS: Disabling GICv4 support\n");
- 		}
 diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
-index d10d73477d01..400d9bbb0e56 100644
+index 6fe2e09172ed..d10d73477d01 100644
 --- a/drivers/irqchip/irq-gic-v4.c
 +++ b/drivers/irqchip/irq-gic-v4.c
-@@ -209,3 +209,16 @@ int its_prop_update_vlpi(int irq, u8 config, bool inv)
+@@ -22,6 +22,77 @@
  
- 	return irq_set_vcpu_affinity(irq, &info);
- }
-+
-+int its_init_v4(struct irq_domain *domain, const struct irq_domain_ops *ops)
-+{
-+	if (domain) {
-+		pr_info("ITS: Enabling GICv4 support\n");
-+		gic_domain = domain;
-+		vpe_domain_ops = ops;
-+		return 0;
-+	}
-+
-+	pr_err("ITS: No GICv4 VPE domain allocated\n");
-+	return -ENODEV;
-+}
-diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
-index f495d4d1f7d7..3cf72af2c796 100644
---- a/include/linux/irqchip/arm-gic-v4.h
-+++ b/include/linux/irqchip/arm-gic-v4.h
-@@ -98,4 +98,6 @@ int its_get_vlpi(int irq, struct its_vlpi_map *map);
- int its_unmap_vlpi(int irq);
- int its_prop_update_vlpi(int irq, u8 config, bool inv);
+ #include <linux/irqchip/arm-gic-v4.h>
  
-+int its_init_v4(struct irq_domain *domain, const struct irq_domain_ops *ops);
++/*
++ * WARNING: The blurb below assumes that you understand the
++ * intricacies of GICv3, GICv4, and how a guest's view of a GICv3 gets
++ * translated into GICv4 commands. So it effectively targets at most
++ * two individuals. You know who you are.
++ *
++ * The core GICv4 code is designed to *avoid* exposing too much of the
++ * core GIC code (that would in turn leak into the hypervisor code),
++ * and instead provide a hypervisor agnostic interface to the HW (of
++ * course, the astute reader will quickly realize that hypervisor
++ * agnostic actually means KVM-specific - what were you thinking?).
++ *
++ * In order to achieve a modicum of isolation, we try to hide most of
++ * the GICv4 "stuff" behind normal irqchip operations:
++ *
++ * - Any guest-visible VLPI is backed by a Linux interrupt (and a
++ *   physical LPI which gets unmapped when the guest maps the
++ *   VLPI). This allows the same DevID/EventID pair to be either
++ *   mapped to the LPI (host) or the VLPI (guest). Note that this is
++ *   exclusive, and you cannot have both.
++ *
++ * - Enabling/disabling a VLPI is done by issuing mask/unmask calls.
++ *
++ * - Guest INT/CLEAR commands are implemented through
++ *   irq_set_irqchip_state().
++ *
++ * - The *bizarre* stuff (mapping/unmapping an interrupt to a VLPI, or
++ *   issuing an INV after changing a priority) gets shoved into the
++ *   irq_set_vcpu_affinity() method. While this is quite horrible
++ *   (let's face it, this is the irqchip version of an ioctl), it
++ *   confines the crap to a single location. And map/unmap really is
++ *   about setting the affinity of a VLPI to a vcpu, so only INV is
++ *   majorly out of place. So there.
++ *
++ * A number of commands are simply not provided by this interface, as
++ * they do not make direct sense. For example, MAPD is purely local to
++ * the virtual ITS (because it references a virtual device, and the
++ * physical ITS is still very much in charge of the physical
++ * device). Same goes for things like MAPC (the physical ITS deals
++ * with the actual vPE affinity, and not the braindead concept of
++ * collection). SYNC is not provided either, as each and every command
++ * is followed by a VSYNC. This could be relaxed in the future, should
++ * this be seen as a bottleneck (yes, this means *never*).
++ *
++ * But handling VLPIs is only one side of the job of the GICv4
++ * code. The other (darker) side is to take care of the doorbell
++ * interrupts which are delivered when a VLPI targeting a non-running
++ * vcpu is being made pending.
++ *
++ * The choice made here is that each vcpu (VPE in old northern GICv4
++ * dialect) gets a single doorbell LPI, no matter how many interrupts
++ * are targeting it. This has a nice property, which is that the
++ * interrupt becomes a handle for the VPE, and that the hypervisor
++ * code can manipulate it through the normal interrupt API:
++ *
++ * - VMs (or rather the VM abstraction that matters to the GIC)
++ *   contain an irq domain where each interrupt maps to a VPE. In
++ *   turn, this domain sits on top of the normal LPI allocator, and a
++ *   specially crafted irq_chip implementation.
++ *
++ * - mask/unmask do what is expected on the doorbell interrupt.
++ *
++ * - irq_set_affinity is used to move a VPE from one redistributor to
++ *   another.
++ *
++ * - irq_set_vcpu_affinity once again gets hijacked for the purpose of
++ *   creating a new sub-API, namely scheduling/descheduling a VPE
++ *   (which involves programming GICR_V{PROP,PEND}BASER) and
++ *   performing INVALL operations.
++ */
 +
- #endif
+ static struct irq_domain *gic_domain;
+ static const struct irq_domain_ops *vpe_domain_ops;
+ 
 -- 
 2.11.0
