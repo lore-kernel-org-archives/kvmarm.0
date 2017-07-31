@@ -1,146 +1,159 @@
-From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: =?utf-8?B?562U5aSNOiBbUEFUQ0ggdjQgMy8zXSBhcm02NDoga3ZtOiBpbmplY3QgU0Vy?=
- =?utf-8?Q?ror_with_user_space_specified_syndrome?=
-Date: Mon, 31 Jul 2017 16:03:32 +0000
-Message-ID: <0184EA26B2509940AA629AE1405DD7F201548107@DGGEMA503-MBS.china.huawei.com>
-References: <0184EA26B2509940AA629AE1405DD7F2015239D8@DGGEMA503-MBS.china.huawei.com>
- <597B527E.5040805@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3341F40FB0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 12:02:39 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aGpYxYYDUvls for <kvmarm@lists.cs.columbia.edu>;
- Mon, 31 Jul 2017 12:02:38 -0400 (EDT)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F063D40D25
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 12:02:36 -0400 (EDT)
-In-Reply-To: <597B527E.5040805@arm.com>
-Content-Language: zh-CN
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>
-Cc: Wuquanming <wuquanming@huawei.com>, Huangshaoyu <huangshaoyu@huawei.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH v3 00/59] irqchip: KVM: Add support for GICv4
+Date: Mon, 31 Jul 2017 18:25:38 +0100
+Message-ID: <20170731172637.29355-1-marc.zyngier@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>, Eric Auger <eric.auger@redhat.com>, Shanker Donthineni <shankerd@codeaurora.org>, Mark Rutland <mark.rutland@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGkgSmFtZXMuDQogICBZb3UgYXJlIHJpZ2h0LiBGb3IgdGhlIFNFSSBjYXNlLCB0aGUgRVNSX0VM
-MSBtYXkgbm90IG5lZWQgdG8gcmVmZXIgdG8gRVNSX0VMMidzIHZhbHVlLiANCiAgIEJ1dCBmb3Ig
-dGhlIFNFQSBjYXNlLCB0aGUgRVNSX0VMMSBtYXkgbmVlZCB0byByZWZlciB0byBFU1JfRUwyJ3Mg
-dmFsdWUuDQogICBGb3IgZXhhbXBsZSwgdGhlIDE2Yml0LzMyYml0IGluc3RydWN0aW9uLWxlbmd0
-aCwgaXQgbWF5IG5lZWRzIHRvIGNoZWNrIHRoZSBFU1JfRUwyJ3MgYml0IDI1Lg0KICAgQmVjYXVz
-ZSB3aGVuIGhhcHBlbiBTRUEsIGl0IGp1bXAgdG8gU0VBIHZlY3RvciB0YWJsZSBlbnRyeSBieSBz
-b2Z0d2FyZSggYWZ0ZXIgc2V0dGluZyB0aGUgZWxyX2VsMiBhbmQgZXNyX2VsMiwgYW5kIHVzZSBl
-cmV0IGluc3RydWN0aW9uIHRvIGp1bXAgdG8gdGhlIFNFQSB2ZWN0b3IgdGFibGUgKSwgbm90IGJ5
-IGhhcmR3YXJlKHN1Y2ggYXMgdmlydHVhbCBTRUkpIA0KDQo+IA0KPiBIaSBnZW5nZG9uZ2ppdSwN
-Cj4gDQo+IE9uIDI0LzA3LzE3IDE2OjI0LCBnZW5nZG9uZ2ppdSB3cm90ZToNCj4gPiBGcm9tIGFi
-b3ZlIGRlc2NyaXB0aW9uLCBpbiB0aGUgZmlybXdhcmUtZmlyc3QgUkFTIHNvbHV0aW9uLCBVRUZJ
-IGNvcHkNCj4gPiB0aGUNCj4gPiBFU1JfRUwzIHRvIHRoZSBFU1JfRUwyLA0KPiANCj4gVUVGSSBh
-dCBFTDM/IERvIHlvdSBtZWFuIEFURj8gb3Igc29tZSBjb21wb25lbnQgb2YgVUVGSSB0aGF0IGdv
-dCBsb2FkZWQgaW50byBzZWN1cmUtd29ybGQgdG8gZG8gdGhlIENQRVIgcmVjb3JkIGdlbmVyYXRp
-b24/DQpVRUZJIGlzIGZpcm13YXJlLiBXaGljaCBpcyBhdCBFTDMuIFllcywgaXQgaXMgQVRGLg0K
-DQo+IA0KPiANCj4gPiBkbyB5b3UgYWdyZWUgRUwyIHJlZmVyIHRvIHRoZSBFU1JfRUwyIHZhbHVl
-IHRvIHNldCB0aGUgRVNSX0VMMSB2YWx1ZQ0KPiA+IHdoZW4gaW5qZWN0IHRoZSBhYm9ydD8NCj4g
-DQo+IFJlZmVyLXRvOiB5ZXMuIEl0IG5lZWRzIHRvIGhvbm91ciBhbnkgYml0cyB0aGF0IGFyZSBw
-YXJ0IG9mIHRoZSBndWVzdCBzdGF0ZSB0aGF0IG1heSBiZSByZXByZXNlbnRlZCBpbiB0aGUgRVNS
-Lg0KPiANCj4gVGhpcyBpcyB3aGF0IHlvdXIgS1ZNIGV4YW1wbGUgaXMgZG9pbmcsIGJ1dCB0aGlz
-IGlzIGEgcHJldHR5IGFyY2FuZSBwYXRoOiBJZiBvbiB0aGUgMzJiaXQga2VybmVsLCB3ZSByZWFk
-L3dyaXRlIG9yIGV4ZWN1dGUgZnJvbSBhbiBhZGRyZXNzDQo+IHdob3NlIHN0YWdlIDEgcGFnZS10
-YWJsZS13YWxrIHdhbGtzIHRocm91Z2ggYSBzdGFnZSAyIG1hcHBpbmcgdGhhdCBpcyBtYXJrZWQg
-YXMgZGV2aWNlIG1lbW9yeSwgdGhlbiB3ZSByZXBvcnQgdGhpcyBhcyBhbg0KPiBpbnN0cnVjdGlv
-bi9kYXRhIGFib3J0IHRvIHRoZSBndWVzdCwgaW5zdGVhZCBvZiByZXNvbHZpbmcgdGhlIHN0YWdl
-MiBtYXBwaW5nLg0KWWVzLCBvbmx5IHJlcG9ydCB0aGUgaW5zdHJ1Y3Rpb24vZGF0YSBhYm9ydCB0
-byB0aGUgZ3Vlc3QgY2FuIGJlIGVub3VnaC4NCg0KDQo+IA0KPiBJbiB0aGlzIGNhc2Ugd2UgcHJl
-c2VydmUgdGhlIDE2Yml0LzMyYml0IGluc3RydWN0aW9uLWxlbmd0aCB2YWx1ZSByZXBvcnRlZCBp
-biB0aGUgRVNSIGFzIGl0cyBwYXJ0IG9mIHRoZSBndWVzdCBzdGF0ZSB0aGF0IHdvdWxkIGhhdmUg
-YmVlbg0KPiByZXBvcnRlZCBpZiB0aGUNCj4gc3RhZ2UxIGZhdWx0IHdlcmUgZGVsaXZlcmVkIGRp
-cmVjdGx5Lg0KDQpGb3IgdGhlIFNFSSBjYXNlLCB0aGUgMTZiaXQvMzJiaXQgaW5zdHJ1Y3Rpb24t
-bGVuZ3RoIGRvZXMgbm90IG5lZWQgdG8gcGFzc2VkLg0KQnV0IGZvciB0aGUgU0VBLCB0aGUgMTZi
-aXQvMzJiaXQgaW5zdHJ1Y3Rpb24tbGVuZ3RoIHZhbHVlIG1heSBiZSBuZWVkIHRvIHBhc3MsIGFz
-IHlvdSBzZWUgYmVsb3cuIEl0IGNoZWNrKGlmIChrdm1fdmNwdV90cmFwX2lsX2lzMzJiaXQodmNw
-dSkpICkgYW5kIHBhc3MgdGhlIEVTUl9FTHhfSUwNCg0KDQpzdGF0aWMgdm9pZCBpbmplY3RfYWJ0
-NjQoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBib29sIGlzX2lhYnQsIHVuc2lnbmVkIGxvbmcgYWRk
-cikNCnsNCgl1bnNpZ25lZCBsb25nIGNwc3IgPSAqdmNwdV9jcHNyKHZjcHUpOw0KCWJvb2wgaXNf
-YWFyY2gzMiA9IHZjcHVfbW9kZV9pc18zMmJpdCh2Y3B1KTsNCgl1MzIgZXNyID0gMDsNCg0KCSp2
-Y3B1X2Vscl9lbDEodmNwdSkgPSAqdmNwdV9wYyh2Y3B1KTsNCgkqdmNwdV9wYyh2Y3B1KSA9IGdl
-dF9leGNlcHRfdmVjdG9yKHZjcHUsIGV4Y2VwdF90eXBlX3N5bmMpOw0KDQoJKnZjcHVfY3Bzcih2
-Y3B1KSA9IFBTVEFURV9GQVVMVF9CSVRTXzY0Ow0KCSp2Y3B1X3Nwc3IodmNwdSkgPSBjcHNyOw0K
-DQoJdmNwdV9zeXNfcmVnKHZjcHUsIEZBUl9FTDEpID0gYWRkcjsNCg0KCS8qDQoJICogQnVpbGQg
-YW4ge2ksZH1hYm9ydCwgZGVwZW5kaW5nIG9uIHRoZSBsZXZlbCBhbmQgdGhlDQoJICogaW5zdHJ1
-Y3Rpb24gc2V0LiBSZXBvcnQgYW4gZXh0ZXJuYWwgc3luY2hyb25vdXMgYWJvcnQuDQoJICovDQoJ
-aWYgKGt2bV92Y3B1X3RyYXBfaWxfaXMzMmJpdCh2Y3B1KSkNCgkJZXNyIHw9IEVTUl9FTHhfSUw7
-DQoNCgkuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4u
-Li4uLi4uLi4uLi4uLi4uLi4uLg0KfQ0KDQo+IA0KPiANCj4gSXMgaXQgdmFsaWQgdG8gcGFzcyB2
-YWx1ZXMgZnJvbSBhIGhvc3QgU0Vycm9yIGludG8gYSBndWVzdD8NCkRvIHlvdSBtZWFuIHBhc3Mg
-dGhlIEVTUiB2YWx1ZSBmcm9tIGhvc3QgdG8gZ3Vlc3Q/DQpBbmQgZG8geW91IG1lYW4gd2Ugc2hv
-dWxkIG5vdCBwYXNzIEVTUiB2YWx1ZSB3aGVuIGluamVjdCB0aGUgU0VJPw0KDQo+IEZvciBSQVMg
-b24gTGludXgrS1ZNLCBJIGRvbid0IHRoaW5rIHRoaXMgaXMgdGhlIHJpZ2h0IHRoaW5nIHRvIGRv
-LiBJZiB3ZSByZWNlaXZlIGEgUkFTIGV2ZW50LCB0aGUgaG9zdCBtdXN0IGNvbXBsZXRlbHkgcHJv
-Y2VzcyB0aGUgZXJyb3IgYW5kDQo+IG5vdGlmeSBhbnkgaW4ta2VybmVsIHVzZXJzIGFuZCB1c2Vy
-c3BhY2UuDQpJIGFncmVlLCBzbyBkZWxpdmVyIHNpZ25hbCB0byB1c2VyIHNwYWNlIHN1Y2ggYXMg
-UUVNVSBpcyB0aHJvdWdoIG1lbW9yeSBmYWlsdXJlIGZvciBTRUk/IE1heSBiZSB0aGlzIGNhbiBh
-bHNvIHN1aXRhYmxlIHRvIG5vLUtWTSBjYXNlLg0KDQoNCj4gS1ZNIHNob3VsZG4ndCBhc3N1bWUg
-YW4gU0Vycm9yIGlzIGEgZmlybXdhcmUtZmlyc3Qgbm90aWZpY2F0aW9uIGFuZCB0aGF0IGl0IHNo
-b3VsZCBwYXNzIHRoZSBzYW1lIG5vdGlmaWNhdGlvbiBpbnRvIHRoZSBndWVzdC4NCiJpdCBzaG91
-bGQgcGFzcyB0aGUgc2FtZSBub3RpZmljYXRpb24gaW50byB0aGUgZ3Vlc3QiLS0tLS0tLXdoYXQg
-aXMgdGhlIG1lYW4gb2YgdGhlIG5vdGlmaWNhdGlvbj8NCg0KPiANCj4gV2UgbmVlZCB0byB0aGlu
-ayBvZiBTRXJyb3IgKHdoaWNoIG1heSBiZSB0aGUgdW4tc3luY2hyb25pemFibGUga2luZCBmcm9t
-IGEgZGV2aWNlKSwgc2VwYXJhdGVseSBmcm9tIFNFSSBhcyBhIEFQRUkgbm90aWZpY2F0aW9uLiBF
-dmVuIGZvcg0KPiBkZXZpY2UgcGFzcy10aHJvdWdoIGZpcm13YXJlLWZpcnN0IGVycm9ycyBtYXkg
-YmUgcmVwb3J0ZWQgYnkgYW5vdGhlciBub3RpZmljYXRpb24gbWV0aG9kLiBXZSBzaG91bGRuJ3Qg
-ZHVwbGljYXRlIG9yIGJyZWFrIHRoZQ0KPiBmdW5jdGlvbmFsaXR5IGJlY2F1c2UgdGhlIGVycm9y
-IHdhc24ndCByZXBvcnRlZCBieSBTRUkuDQoNCj4gDQo+IEkgYWdyZWUgZGV2aWNlIHBhc3MtdGhy
-b3VnaCBpcyBhIHNwZWNpYWwgY2FzZSB3aGVyZSBLVk0gaXMgbW9yZSBsaWtlIGFuIGluLWtlcm5l
-bCB1c2VyIG9mIHRoZSBkZXZpY2UuIEluIHRoaXMgY2FzZSBJIHRoaW5rIHdlIG5lZWQgdGhlIGhv
-c3Qncw0KPiBkZXZpY2UgZHJpdmVyLCAodGhlcmUgbXVzdCBiZSBvbmUsIHRvIGF0IGxlYXN0IHJl
-c2V0IHRoZSBkZXZpY2UpIHRvIGNoZWNrIHRoYXQgdGhpcyBSQVMgZXZlbnQgaGFzbid0IGJyb2tl
-biB0aGUgZGV2aWNlJ3MgaXNvbGF0aW9uLiBJcyBpdCBzdGlsbA0KPiBzYWZlIGZvciB0aGUgZ3Vl
-c3QgdG8gYWNjZXNzPw0KPiBlLmcuIFdpdGggUENJZSBhIFZpcnR1YWwtRnVuY3Rpb24gdXNpbmcg
-U1ItSU9WIG1heSBoYXZlIGhhZCBpdHMgQkFScyBjb3JydXB0ZWQuDQo+IEFsbG93aW5nIGEgZ3Vl
-c3QgdG8gdG91Y2ggdGhpcyBkZXZpY2UgY291bGQgY29tcHJvbWlzZSBhbm90aGVyIGd1ZXN0LCBv
-ciB0aGUgaG9zdC4NCj4gDQo+IFRoZSBTRXJyb3IgRVNSIGNvbnRhaW5zIGltcGxlbWVudGF0aW9u
-LWRlZmluZWQgYml0cy4gSSdtIGFnYWluc3QgZ2l2aW5nIHRoZXNlIGJpdHMgdG8gdXNlci1zcGFj
-ZSBhcyB3ZSBkb24ndCBrbm93IHdoYXQgdGhleSBtZWFuLiBLVk0NCj4gd2FudHMgdG8gcHJvdmlk
-ZSBhbiBhYnN0cmFjdCBtYWNoaW5lLCB3aGljaCB3ZSBjYW4gbWlncmF0ZWQgYmV0d2VlbiBob3N0
-cyBydW5uaW5nIG9uIGRpZmZlcmVudCB2ZW5kb3JzIHBsYXRmb3Jtcy4gV2l0aCB2OC4yIFNFcnJv
-cnMgYXJlDQo+IGVpdGhlciB0aGUgdmFuaWxsYSBkZXZpY2Uga2luZCwgdGhlc2Ugb25seSBoYXZl
-IGFuIGltcGxlbWVudGF0aW9uLWRlZmluZWQgRVNSLCB3ZSBzaG91bGRuJ3QgZ2l2ZSB0aGlzIHRv
-IHVzZXIgc3BhY2UsIG9yIFJBUyBlcnJvcnMsIHdlDQo+IHNob3VsZG4ndCBnaXZlIHRoZXNlIHRv
-IHVzZXIgc3BhY2UgZWl0aGVyIGFzIGNvZGUgdXNpbmcgdGhpcyB2YWx1ZSB3b24ndCB3b3JrIGlm
-IHRoZSBBUEVJIG5vdGlmaWNhdGlvbiBtZXRob2QgaXNuJ3QgU0VJLg0KDQoNClNFQSBFU1LvvJow
-eDkyMDAwNDEwDQpTRUkgRVNS77yaIDB4YmYwMDAwMDYNCkFzIHNob3duIGFib3ZlLCBGb3IgZXhh
-bXBsZSwgd2hlbiBoYXBwZW4gU0VBLCB0aGUgRVNSIHZhbHVlIGlzIDB4OTIwMDA0MTA7ICB3aGVu
-IGhhcHBlbiBTRUksIHRoZSBFU1IgdmFsdWUgaXMgMHhiZjAwMDAwNi4NClNvIGZvciBhYm92ZSB0
-d28gY2FzZXMsIEkgd2FudCB0byBjb25zdWx0IHdpdGggeW91IHdoYXQgaXMgdGhlIEVTUiB2YWx1
-ZSBkbyB5b3Ugc3VnZ2VzdGVkIHRvIHBhc3NlZCB0byB0aGUgZ3Vlc3QgT1MgZm9yIGFib3ZlIFNF
-QSBhbmQgU0VJID8NCg0KDQo+IA0KPiANCj4gVGhlIHZlcnNpb24gb2YgdGhlIFJBUyBzcGVjIHlv
-dSByZWZlciB0byBoZXJlIGlzIGZvciBwYXJ0bmVycyBpbXBsZW1lbnRpbmcgQ1BVcywgaXQgZGVz
-Y3JpYmVzIHdoYXQgc29mdHdhcmUgbWlnaHQgZG8sIHNvIHRoYXQgdGhlIENQVQ0KPiB3b3JrcyB3
-ZWxsIGZvciBkaWZmZXJlbnQgY3VycmVudCAoYW5kIGZ1dHVyZSkgb3BlcmF0aW5nIHN5c3RlbXMu
-IEl0IGlzbid0IGEgZ3VpZGUgdG8gd2hhdCBhbGwgc29mdHdhcmUgc2hvdWxkIGRvLg0KPiANCj4g
-Pj4gVmFyaWFudDogYXN5bmNocm9ub3VzIEV4dGVybmFsIEFib3J0IHdpdGggZGVsZWdhdGVkIGV4
-Y2VwdGlvbg0KPiA+PiBoYW5kbGluZyBUaGUgZXhhbXBsZSBhYm92ZSByZXF1aXJlcyB0aGUgaHlw
-ZXJ2aXNvciB0byBrbm93IHRoYXQgaXQgY2FuIGRlbGVnYXRlIHRoZSBlcnJvciBleGNlcHRpb24g
-dG8gdGhlIE9TIHVzaW5nIGEgdmlydHVhbCBlcnJvcg0KPiBpbnRlcnJ1cHQuDQo+IA0KPiBXZSBk
-b24ndCBoYXZlIGRlbGVnYXRlZCBleGNlcHRpb24gaGFuZGxpbmcuIFRoZSBob3N0IG1heS1vci1t
-YXktbm90IGhhdmUgYW4gU0VBL1NFSSBHSEVTIG5vdGlmaWNhdGlvbiwgdGhlIGd1ZXN0IG1heS1v
-ci1tYXktbm90IGhhdmUgYQ0KPiBTRUEvU0VJIEdIRVMgbm90aWZpY2F0aW9uLg0KPiANCj4gDQo+
-IA0KPiBUaGFua3MsDQo+IA0KPiBKYW1lcw0KPiBJTVBPUlRBTlQgTk9USUNFOiBUaGUgY29udGVu
-dHMgb2YgdGhpcyBlbWFpbCBhbmQgYW55IGF0dGFjaG1lbnRzIGFyZSBjb25maWRlbnRpYWwgYW5k
-IG1heSBhbHNvIGJlIHByaXZpbGVnZWQuIElmIHlvdSBhcmUgbm90IHRoZQ0KPiBpbnRlbmRlZCBy
-ZWNpcGllbnQsIHBsZWFzZSBub3RpZnkgdGhlIHNlbmRlciBpbW1lZGlhdGVseSBhbmQgZG8gbm90
-IGRpc2Nsb3NlIHRoZSBjb250ZW50cyB0byBhbnkgb3RoZXIgcGVyc29uLCB1c2UgaXQgZm9yIGFu
-eSBwdXJwb3NlLCBvcg0KPiBzdG9yZSBvciBjb3B5IHRoZSBpbmZvcm1hdGlvbiBpbiBhbnkgbWVk
-aXVtLiBUaGFuayB5b3UuDQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUK
-aHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+This (monster of a) series implements full support for GICv4, bringing
+direct injection of MSIs to KVM on arm and arm64, assuming you have
+the right hardware (which is quite unlikely).
+
+To get an idea of the design, I'd recommend you start with patches #33
+and #57, which try to shed some light on the approach that I've
+taken. And before that, please digest some of the GICv3/GICv4
+architecture documentation[1] (less than 800 pages!). Once you feel
+reasonably insane, you'll be in the right mood to read the code.
+
+The structure of the series is fairly simple. The initial 35 patches
+add some generic support for GICv4, while the rest of the code plugs
+KVM into it. This series relies on Eric Auger's irq-bypass series[2],
+which is a prerequisite for this work, as well as a KVM fix by
+Shanker. The last two patches add a quirk for the Huawei D05 box on
+which I tested this code, and which is added here for completeness and
+for people to test.
+
+The stack has been *very lightly* tested on an arm64 model, with a PCI
+virtio block device passed from the host to a guest (using kvmtool and
+Jean-Philippe Brucker's excellent VFIO support patches[3]), as well as
+the Huawei D05 box I mentionend above using an Intel I350 Ethernet
+card and passing a VF into the guest. I expect things to be (not so)
+subtly broken, so go forward and test if you can, though I'm mostly
+interested in people reviewing the code at the moment.
+
+I've pushed out a branch based on 4.13-rc3 containing the dependencies:
+
+git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git kvm-arm64/gicv4-kvm
+
+* From v2:
+
+  - Lots of fixes all over the map (the doorbell code was amazingly
+    wrong, both at the GICv4 level and in KVM)
+  - KVM GICv4 enablement is now gated by a command-line option and
+    defaults to off
+  - Now properly deals with ordering of vITS creation
+  - Some debugging features
+  - More documentation so that I can forget what this is all about
+  - Huawei D05 quirks
+
+* From v1:
+  - The bulk of the 30-something initial patches have seen countless
+    bugs being fixed, and some key data structures have been subtly
+    tweaked (or killed altogether). They are still quite similar to
+    what I had in v1 though.
+  - The whole KVM code is brand new and as I said above, only lightly
+    tested.
+  - Collected a bunch a R-bs from Thomas and Eric (many thanks, guys).
+
+[1] https://static.docs.arm.com/ihi0069/c/IHI0069C_gic_architecture_specification.pfd
+[2] http://www.spinics.net/lists/kvm/msg151463.html
+[3] http://www.spinics.net/lists/kvm/msg151823.html
+
+Marc Zyngier (59):
+  genirq: Let irq_set_vcpu_affinity() iterate over hierarchy
+  irqchip/gic-v3: Add redistributor iterator
+  irqchip/gic-v3: Add VLPI/DirectLPI discovery
+  irqchip/gic-v3-its: Move LPI definitions around
+  irqchip/gic-v3-its: Add probing for VLPI properties
+  irqchip/gic-v3-its: Macro-ize its_send_single_command
+  irqchip/gic-v3-its: Implement irq_set_irqchip_state for pending state
+  irqchip/gic-v3-its: Split out property table allocation
+  irqchip/gic-v3-its: Allow use of indirect VCPU tables
+  irqchip/gic-v3-its: Split out pending table allocation
+  irqchip/gic-v3-its: Rework LPI freeing
+  irqchip/gic-v3-its: Generalize device table allocation
+  irqchip/gic-v3-its: Generalize LPI configuration
+  irqchip/gic-v4: Add management structure definitions
+  irqchip/gic-v3-its: Add GICv4 ITS command definitions
+  irqchip/gic-v3-its: Add VLPI configuration hook
+  irqchip/gic-v3-its: Add VLPI map/unmap operations
+  irqchip/gic-v3-its: Add VLPI configuration handling
+  irqchip/gic-v3-its: Add VPE domain infrastructure
+  irqchip/gic-v3-its: Add VPE irq domain allocation/teardown
+  irqchip/gic-v3-its: Add VPE irq domain [de]activation
+  irqchip/gic-v3-its: Add VPENDBASER/VPROPBASER accessors
+  irqchip/gic-v3-its: Add VPE scheduling
+  irqchip/gic-v3-its: Add VPE invalidation hook
+  irqchip/gic-v3-its: Add VPE affinity changes
+  irqchip/gic-v3-its: Add VPE interrupt masking
+  irqchip/gic-v3-its: Support VPE doorbell invalidation even when
+    !DirectLPI
+  irqchip/gic-v3-its: Allow doorbell interrupts to be injected/cleared
+  irqchip/gic-v3-its: Set implementation defined bit to enable VLPIs
+  irqchip/gic-v4: Add per-VM VPE domain creation
+  irqchip/gic-v4: Add VPE command interface
+  irqchip/gic-v4: Add VLPI configuration interface
+  irqchip/gic-v4: Add some basic documentation
+  irqchip/gic-v4: Enable low-level GICv4 operations
+  irqchip/gic-v3: Advertise GICv4 support to KVM
+  KVM: arm: Select ARM_GIC_V3 and ARM_GIC_V3_ITS
+  KVM: arm/arm64: vgic: Move kvm_vgic_destroy call around
+  KVM: arm/arm64: vITS: Add MSI translation helpers
+  KVM: arm/arm64: GICv4: Add property field and per-VM predicate
+  KVM: arm/arm64: GICv4: Add init/teardown of the per-VM vPE irq domain
+  KVM: arm/arm64: GICv4: Wire mapping/unmapping of VLPIs in VFIO irq
+    bypass
+  KVM: arm/arm64: GICv4: Handle INT command applied to a VLPI
+  KVM: arm/arm64: GICv4: Unmap VLPI when freeing an LPI
+  KVM: arm/arm64: GICv4: Handle MOVI applied to a VLPI
+  KVM: arm/arm64: GICv4: Handle CLEAR applied to a VLPI
+  KVM: arm/arm64: GICv4: Handle MOVALL applied to a vPE
+  KVM: arm/arm64: GICv4: Propagate property updates to VLPIs
+  KVM: arm/arm64: GICv4: Handle INVALL applied to a vPE
+  KVM: arm/arm64: GICv4: Propagate VLPI properties at map time
+  KVM: arm/arm64: GICv4: Use pending_last as a scheduling hint
+  KVM: arm/arm64: GICv4: Add doorbell interrupt handling
+  KVM: arm/arm64: GICv4: Use the doorbell interrupt as an unblocking
+    source
+  KVM: arm/arm64: GICv4: Hook vPE scheduling into vgic flush/sync
+  KVM: arm/arm64: GICv4: Enable virtual cpuif if VLPIs can be delivered
+  KVM: arm/arm64: GICv4: Enable VLPI support
+  KVM: arm/arm64: GICv4: Prevent heterogenous systems from using GICv4
+  KVM: arm/arm64: GICv4: Theory of operations
+  irqchip/gic-v3-its: Pass its_node pointer to each command bulder
+  irqchip/gic-v3-its: Workaround Huawei D05 redistributor addressing
+
+ Documentation/admin-guide/kernel-parameters.txt |    4 +
+ arch/arm/include/asm/arch_gicv3.h               |   33 +
+ arch/arm/kvm/Kconfig                            |    2 +
+ arch/arm/kvm/Makefile                           |    1 +
+ arch/arm64/include/asm/arch_gicv3.h             |    6 +
+ arch/arm64/kvm/Makefile                         |    1 +
+ drivers/irqchip/Makefile                        |    2 +-
+ drivers/irqchip/irq-gic-v3-its.c                | 1421 +++++++++++++++++++++--
+ drivers/irqchip/irq-gic-v3.c                    |   95 +-
+ drivers/irqchip/irq-gic-v4.c                    |  224 ++++
+ include/kvm/arm_vgic.h                          |   22 +
+ include/linux/irqchip/arm-gic-common.h          |    2 +
+ include/linux/irqchip/arm-gic-v3.h              |   86 ++
+ include/linux/irqchip/arm-gic-v4.h              |  103 ++
+ kernel/irq/manage.c                             |   14 +-
+ virt/kvm/arm/arm.c                              |   33 +-
+ virt/kvm/arm/hyp/vgic-v3-sr.c                   |    9 +-
+ virt/kvm/arm/vgic/vgic-init.c                   |    9 +
+ virt/kvm/arm/vgic/vgic-its.c                    |  173 ++-
+ virt/kvm/arm/vgic/vgic-mmio-v3.c                |    5 +
+ virt/kvm/arm/vgic/vgic-v3.c                     |   34 +
+ virt/kvm/arm/vgic/vgic-v4.c                     |  335 ++++++
+ virt/kvm/arm/vgic/vgic.c                        |    7 +
+ virt/kvm/arm/vgic/vgic.h                        |   11 +
+ 24 files changed, 2419 insertions(+), 213 deletions(-)
+ create mode 100644 drivers/irqchip/irq-gic-v4.c
+ create mode 100644 include/linux/irqchip/arm-gic-v4.h
+ create mode 100644 virt/kvm/arm/vgic/vgic-v4.c
+
+-- 
+2.11.0
