@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 09/59] irqchip/gic-v3-its: Allow use of indirect VCPU tables
-Date: Mon, 31 Jul 2017 18:25:47 +0100
-Message-ID: <20170731172637.29355-10-marc.zyngier@arm.com>
+Subject: [PATCH v3 11/59] irqchip/gic-v3-its: Rework LPI freeing
+Date: Mon, 31 Jul 2017 18:25:49 +0100
+Message-ID: <20170731172637.29355-12-marc.zyngier@arm.com>
 References: <20170731172637.29355-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D1A3640D1A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:25:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 825F849C2C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:25:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WS065IJzdFJh for <kvmarm@lists.cs.columbia.edu>;
- Mon, 31 Jul 2017 13:25:49 -0400 (EDT)
+ with ESMTP id vNtEDVMar0at for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 31 Jul 2017 13:25:54 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CAA7749C25
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:25:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D5E549C19
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:25:54 -0400 (EDT)
 In-Reply-To: <20170731172637.29355-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,68 +31,60 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The VCPU tables can be quite sparse as well, and it makes sense
-to use indirect tables as well if possible.
+Rework LPI deallocation so that it can be reused by the v4 support
+code.
 
-Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 25 +++++++++++++++++--------
- 1 file changed, 17 insertions(+), 8 deletions(-)
+ drivers/irqchip/irq-gic-v3-its.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 039626d21a73..9a317934455c 100644
+index ebdb1603b95d..1298a9bca56a 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -1071,10 +1071,13 @@ static int its_setup_baser(struct its_node *its, struct its_baser *baser,
- 	return 0;
+@@ -875,16 +875,15 @@ static unsigned long *its_lpi_alloc_chunks(int nr_irqs, int *base, int *nr_ids)
+ 	return bitmap;
  }
  
--static bool its_parse_baser_device(struct its_node *its, struct its_baser *baser,
--				   u32 psz, u32 *order)
-+static bool its_parse_indirect_baser(struct its_node *its,
-+				     struct its_baser *baser,
-+				     u32 psz, u32 *order)
+-static void its_lpi_free(struct event_lpi_map *map)
++static void its_lpi_free_chunks(unsigned long *bitmap, int base, int nr_ids)
  {
--	u64 esz = GITS_BASER_ENTRY_SIZE(its_read_baser(its, baser));
-+	u64 tmp = its_read_baser(its, baser);
-+	u64 type = GITS_BASER_TYPE(tmp);
-+	u64 esz = GITS_BASER_ENTRY_SIZE(tmp);
- 	u64 val = GITS_BASER_InnerShareable | GITS_BASER_RaWaWb;
- 	u32 ids = its->device_ids;
- 	u32 new_order = *order;
-@@ -1113,8 +1116,9 @@ static bool its_parse_baser_device(struct its_node *its, struct its_baser *baser
- 	if (new_order >= MAX_ORDER) {
- 		new_order = MAX_ORDER - 1;
- 		ids = ilog2(PAGE_ORDER_TO_SIZE(new_order) / (int)esz);
--		pr_warn("ITS@%pa: Device Table too large, reduce ids %u->%u\n",
--			&its->phys_base, its->device_ids, ids);
-+		pr_warn("ITS@%pa: %s Table too large, reduce ids %u->%u\n",
-+			&its->phys_base, its_base_type_string[type],
-+			its->device_ids, ids);
- 	}
+-	int base = map->lpi_base;
+-	int nr_ids = map->nr_lpis;
+ 	int lpi;
  
- 	*order = new_order;
-@@ -1162,11 +1166,16 @@ static int its_alloc_tables(struct its_node *its)
- 		u32 order = get_order(psz);
- 		bool indirect = false;
+ 	spin_lock(&lpi_lock);
  
--		if (type == GITS_BASER_TYPE_NONE)
-+		switch (type) {
-+		case GITS_BASER_TYPE_NONE:
- 			continue;
+ 	for (lpi = base; lpi < (base + nr_ids); lpi += IRQS_PER_CHUNK) {
+ 		int chunk = its_lpi_to_chunk(lpi);
++
+ 		BUG_ON(chunk > lpi_chunks);
+ 		if (test_bit(chunk, lpi_bitmap)) {
+ 			clear_bit(chunk, lpi_bitmap);
+@@ -895,8 +894,7 @@ static void its_lpi_free(struct event_lpi_map *map)
  
--		if (type == GITS_BASER_TYPE_DEVICE)
--			indirect = its_parse_baser_device(its, baser, psz, &order);
-+		case GITS_BASER_TYPE_DEVICE:
-+		case GITS_BASER_TYPE_VCPU:
-+			indirect = its_parse_indirect_baser(its, baser,
-+							    psz, &order);
-+			break;
-+		}
+ 	spin_unlock(&lpi_lock);
  
- 		err = its_setup_baser(its, baser, cache, shr, psz, order, indirect);
- 		if (err < 0) {
+-	kfree(map->lpi_map);
+-	kfree(map->col_map);
++	kfree(bitmap);
+ }
+ 
+ static struct page *its_allocate_prop_table(gfp_t gfp_flags)
+@@ -1668,7 +1666,10 @@ static void its_irq_domain_free(struct irq_domain *domain, unsigned int virq,
+ 	/* If all interrupts have been freed, start mopping the floor */
+ 	if (bitmap_empty(its_dev->event_map.lpi_map,
+ 			 its_dev->event_map.nr_lpis)) {
+-		its_lpi_free(&its_dev->event_map);
++		its_lpi_free_chunks(its_dev->event_map.lpi_map,
++				    its_dev->event_map.lpi_base,
++				    its_dev->event_map.nr_lpis);
++		kfree(its_dev->event_map.col_map);
+ 
+ 		/* Unmap device/itt */
+ 		its_send_mapd(its_dev, 0);
 -- 
 2.11.0
