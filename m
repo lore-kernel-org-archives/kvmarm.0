@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 43/59] KVM: arm/arm64: GICv4: Unmap VLPI when freeing an LPI
-Date: Mon, 31 Jul 2017 18:26:21 +0100
-Message-ID: <20170731172637.29355-44-marc.zyngier@arm.com>
+Subject: [PATCH v3 42/59] KVM: arm/arm64: GICv4: Handle INT command applied to
+ a VLPI
+Date: Mon, 31 Jul 2017 18:26:20 +0100
+Message-ID: <20170731172637.29355-43-marc.zyngier@arm.com>
 References: <20170731172637.29355-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8137D49C67
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:27:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4661240D44
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:27:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8VRA8eb1mE9l for <kvmarm@lists.cs.columbia.edu>;
- Mon, 31 Jul 2017 13:27:07 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8155349C9B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:27:07 -0400 (EDT)
+ with ESMTP id m8BdEojHWsM8 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 31 Jul 2017 13:27:05 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D3BB49C3A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:27:05 -0400 (EDT)
 In-Reply-To: <20170731172637.29355-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,31 +32,32 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When freeing an LPI (on a DISCARD command, for example), we need
-to unmap the VLPI down to the physical ITS level.
+If the guest issues an INT command targetting a VLPI, let's
+call into the irq_set_irqchip_state() helper to make it pending
+on the physical side.
+
+This works just as well if userspace decides to inject an interrupt
+using the normal userspace API...
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-its.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ virt/kvm/arm/vgic/vgic-its.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 40aeadef33fe..79bac93d3e7d 100644
+index a2217f53bbe5..40aeadef33fe 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -623,8 +623,12 @@ static void its_free_ite(struct kvm *kvm, struct its_ite *ite)
- 	list_del(&ite->ite_list);
+@@ -573,6 +573,10 @@ static int vgic_its_trigger_msi(struct kvm *kvm, struct vgic_its *its,
+ 	if (err)
+ 		return err;
  
- 	/* This put matches the get in vgic_add_lpi. */
--	if (ite->irq)
-+	if (ite->irq) {
-+		if (ite->irq->hw)
-+			its_unmap_vlpi(ite->irq->host_irq);
++	if (irq->hw)
++		return irq_set_irqchip_state(irq->host_irq,
++					     IRQCHIP_STATE_PENDING, true);
 +
- 		vgic_put_irq(kvm, ite->irq);
-+	}
- 
- 	kfree(ite);
- }
+ 	spin_lock(&irq->irq_lock);
+ 	irq->pending_latch = true;
+ 	vgic_queue_irq_unlock(kvm, irq);
 -- 
 2.11.0
