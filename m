@@ -1,212 +1,144 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [RFC PATCH v2 28/38] KVM: arm64: Emulate EL12 register accesses
- from the virtual EL2
-Date: Mon, 31 Jul 2017 10:44:11 +0200
-Message-ID: <20170731084411.GO5176@cbox>
+Subject: Re: [RFC PATCH v2 29/38] KVM: arm64: Support a VM with VHE
+ considering EL0 of the VHE host
+Date: Mon, 31 Jul 2017 11:01:10 +0200
+Message-ID: <20170731090110.GP5176@cbox>
 References: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
- <1500397144-16232-29-git-send-email-jintack.lim@linaro.org>
+ <1500397144-16232-30-git-send-email-jintack.lim@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 98E4F4104E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 04:43:03 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VsYueybaP50E for <kvmarm@lists.cs.columbia.edu>;
- Mon, 31 Jul 2017 04:43:02 -0400 (EDT)
-Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4DBF540FAE
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 04:43:02 -0400 (EDT)
-Received: by mail-wm0-f49.google.com with SMTP id m85so69023546wma.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 01:44:15 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-doc-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1500397144-16232-29-git-send-email-jintack.lim@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+In-Reply-To: <1500397144-16232-30-git-send-email-jintack.lim@linaro.org>
+Sender: linux-doc-owner@vger.kernel.org
 To: Jintack Lim <jintack.lim@linaro.org>
-Cc: kvm@vger.kernel.org, david.daney@cavium.com, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, stefan@hello-penguin.com, corbet@lwn.net, daniel.lezcano@linaro.org, linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, andy.gross@linaro.org, marc.zyngier@arm.com, cov@codeaurora.org, wcohen@redhat.com, mchehab@kernel.org, ard.biesheuvel@linaro.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, akpm@linux-foundation.org
+Cc: kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, corbet@lwn.net, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, akpm@linux-foundation.org, mchehab@kernel.org, cov@codeaurora.org, daniel.lezcano@linaro.org, david.daney@cavium.com, mark.rutland@arm.com, suzuki.poulose@arm.com, stefan@hello-penguin.com, andy.gross@linaro.org, wcohen@redhat.com, ard.biesheuvel@linaro.org, shankerd@codeaurora.org, vladimir.murzin@arm.com, james.morse@arm.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Jul 18, 2017 at 11:58:54AM -0500, Jintack Lim wrote:
-> With HCR_EL2.NV bit set, accesses to EL12 registers in the virtual EL2
-> trap to EL2. Handle those traps just like we do for EL1 registers.
-> 
-> One exception is CNTKCTL_EL12. We don't trap on CNTKCTL_EL1 for non-VHE
-> virtual EL2 because we don't have to. However, accessing CNTKCTL_EL12
-> will trap since it's one of the EL12 registers controlled by HCR_EL2.NV
-> bit.  Therefore, add a handler for it and don't treat it as a
-> non-trap-registers when preparing a shadow context.
+On Tue, Jul 18, 2017 at 11:58:55AM -0500, Jintack Lim wrote:
 
-I'm sorry, I don't remember the details, and I don't understand from
-this paragraph what the difference between CNTKCTL_EL12 and the other
-EL12 registers is?
+nit: The subject is a little hard to understand.
+
+> On VHE systems, EL0 of the host kernel is considered as a part of 'VHE
+> host'; The execution of EL0 is affected by system registers set by the
+> VHE kernel including the hypervisor. To emulate this for a VM, we use
+> the same set of system registers (i.e. shadow registers) for the virtual
+> EL2 and EL0 execution.
+
+when the VM sets HCR_EL2.TGE and HCR_EL2.E2H.
 
 > 
-> Move EL12 system register macros to a common place to reuse them.
+> Note that the assumption so far is that a hypervisor in a VM always runs
+> in the virtual EL2, and the exception level change from/to the virtual
+> EL2 always goes through the host hypervisor. With VHE support for a VM,
+> however, the exception level can be changed from EL0 to virtual EL2
+> without trapping to the host hypervisor. So, when returning from the VHE
+> host mode, set the vcpu mode depending on the physical exception level.
+
+I think there are two changes in this patch which aren't described
+properly in the commit message.
+
+First, on entry to a VM that runs in hypervisor context, virtual EL2 or
+EL0 with virtual TGE+E2H, we have to either set the physical CPU mode
+to EL1 or EL0, for the two cases respectively, where before we would
+only ever run in virtual EL2 and would always choose EL1.
+
+Second, on exit from a VM that runs in hypervisor context, virtual EL2 or
+EL0 with virtual TGE+E2H, we can no longer assume that we run in virtual
+El2, but must consider the hardware state to understand if the exception
+from the VM happened from virtual EL2 or from EL0 in the guest
+hypervisor's context.
+
+Maybe that helps.
+
 > 
 > Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 > ---
->  arch/arm64/include/asm/kvm_hyp.h | 24 ------------------------
->  arch/arm64/include/asm/sysreg.h  | 24 ++++++++++++++++++++++++
->  arch/arm64/kvm/context.c         |  7 +++++++
->  arch/arm64/kvm/sys_regs.c        | 25 +++++++++++++++++++++++++
->  4 files changed, 56 insertions(+), 24 deletions(-)
+>  arch/arm64/kvm/context.c | 36 ++++++++++++++++++++++--------------
+>  1 file changed, 22 insertions(+), 14 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index 4572a9b..353b895 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -73,30 +73,6 @@
->  #define read_sysreg_el1(r)	read_sysreg_elx(r, _EL1, _EL12)
->  #define write_sysreg_el1(v,r)	write_sysreg_elx(v, r, _EL1, _EL12)
->  
-> -/* The VHE specific system registers and their encoding */
-> -#define sctlr_EL12              sys_reg(3, 5, 1, 0, 0)
-> -#define cpacr_EL12              sys_reg(3, 5, 1, 0, 2)
-> -#define ttbr0_EL12              sys_reg(3, 5, 2, 0, 0)
-> -#define ttbr1_EL12              sys_reg(3, 5, 2, 0, 1)
-> -#define tcr_EL12                sys_reg(3, 5, 2, 0, 2)
-> -#define afsr0_EL12              sys_reg(3, 5, 5, 1, 0)
-> -#define afsr1_EL12              sys_reg(3, 5, 5, 1, 1)
-> -#define esr_EL12                sys_reg(3, 5, 5, 2, 0)
-> -#define far_EL12                sys_reg(3, 5, 6, 0, 0)
-> -#define mair_EL12               sys_reg(3, 5, 10, 2, 0)
-> -#define amair_EL12              sys_reg(3, 5, 10, 3, 0)
-> -#define vbar_EL12               sys_reg(3, 5, 12, 0, 0)
-> -#define contextidr_EL12         sys_reg(3, 5, 13, 0, 1)
-> -#define cntkctl_EL12            sys_reg(3, 5, 14, 1, 0)
-> -#define cntp_tval_EL02          sys_reg(3, 5, 14, 2, 0)
-> -#define cntp_ctl_EL02           sys_reg(3, 5, 14, 2, 1)
-> -#define cntp_cval_EL02          sys_reg(3, 5, 14, 2, 2)
-> -#define cntv_tval_EL02          sys_reg(3, 5, 14, 3, 0)
-> -#define cntv_ctl_EL02           sys_reg(3, 5, 14, 3, 1)
-> -#define cntv_cval_EL02          sys_reg(3, 5, 14, 3, 2)
-> -#define spsr_EL12               sys_reg(3, 5, 4, 0, 0)
-> -#define elr_EL12                sys_reg(3, 5, 4, 0, 1)
-> -
->  /**
->   * hyp_alternate_select - Generates patchable code sequences that are
->   * used to switch between two implementations of a function, depending
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index b01c608..b8d4d0c 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -338,6 +338,30 @@
->  #define SYS_CNTVOFF_EL2			sys_reg(3, 4, 14, 0, 3)
->  #define SYS_CNTHCTL_EL2			sys_reg(3, 4, 14, 1, 0)
->  
-> +/* The VHE specific system registers and their encoding */
-> +#define sctlr_EL12              sys_reg(3, 5, 1, 0, 0)
-> +#define cpacr_EL12              sys_reg(3, 5, 1, 0, 2)
-> +#define ttbr0_EL12              sys_reg(3, 5, 2, 0, 0)
-> +#define ttbr1_EL12              sys_reg(3, 5, 2, 0, 1)
-> +#define tcr_EL12                sys_reg(3, 5, 2, 0, 2)
-> +#define afsr0_EL12              sys_reg(3, 5, 5, 1, 0)
-> +#define afsr1_EL12              sys_reg(3, 5, 5, 1, 1)
-> +#define esr_EL12                sys_reg(3, 5, 5, 2, 0)
-> +#define far_EL12                sys_reg(3, 5, 6, 0, 0)
-> +#define mair_EL12               sys_reg(3, 5, 10, 2, 0)
-> +#define amair_EL12              sys_reg(3, 5, 10, 3, 0)
-> +#define vbar_EL12               sys_reg(3, 5, 12, 0, 0)
-> +#define contextidr_EL12         sys_reg(3, 5, 13, 0, 1)
-> +#define cntkctl_EL12            sys_reg(3, 5, 14, 1, 0)
-> +#define cntp_tval_EL02          sys_reg(3, 5, 14, 2, 0)
-> +#define cntp_ctl_EL02           sys_reg(3, 5, 14, 2, 1)
-> +#define cntp_cval_EL02          sys_reg(3, 5, 14, 2, 2)
-> +#define cntv_tval_EL02          sys_reg(3, 5, 14, 3, 0)
-> +#define cntv_ctl_EL02           sys_reg(3, 5, 14, 3, 1)
-> +#define cntv_cval_EL02          sys_reg(3, 5, 14, 3, 2)
-> +#define spsr_EL12               sys_reg(3, 5, 4, 0, 0)
-> +#define elr_EL12                sys_reg(3, 5, 4, 0, 1)
-> +
->  #define SYS_SP_EL2			sys_reg(3, 6, 4, 1, 0)
->  
->  /* Common SCTLR_ELx flags. */
 > diff --git a/arch/arm64/kvm/context.c b/arch/arm64/kvm/context.c
-> index e1bc753..f3d3398 100644
+> index f3d3398..39bd92d 100644
 > --- a/arch/arm64/kvm/context.c
 > +++ b/arch/arm64/kvm/context.c
-> @@ -121,6 +121,13 @@ static void copy_shadow_non_trap_el1_state(struct kvm_vcpu *vcpu, bool setup)
->  	for (i = 0; i < ARRAY_SIZE(el1_non_trap_regs); i++) {
->  		const int sr = el1_non_trap_regs[i];
+> @@ -150,16 +150,18 @@ static void flush_shadow_special_regs(struct kvm_vcpu *vcpu)
+>  	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
 >  
+>  	ctxt->hw_pstate = *vcpu_cpsr(vcpu) & ~PSR_MODE_MASK;
+> -	/*
+> -	 * We can emulate the guest's configuration of which
+> -	 * stack pointer to use when executing in virtual EL2 by
+> -	 * using the equivalent feature in EL1 to point to
+> -	 * either the EL1 or EL0 stack pointer.
+> -	 */
+> -	if ((*vcpu_cpsr(vcpu) & PSR_MODE_MASK) == PSR_MODE_EL2h)
+> -		ctxt->hw_pstate |= PSR_MODE_EL1h;
+> -	else
+> -		ctxt->hw_pstate |= PSR_MODE_EL1t;
+> +	if (vcpu_mode_el2(vcpu)) {
 > +		/*
-> +		 * We trap on cntkctl_el12 accesses from virtual EL2 as suppose
-
-as opposed to ?
-
-> +		 * to not trapping on cntlctl_el1 accesses.
+> +		 * We can emulate the guest's configuration of which
+> +		 * stack pointer to use when executing in virtual EL2 by
+> +		 * using the equivalent feature in EL1 to point to
+> +		 * either the EL1 or EL0 stack pointer.
 > +		 */
-> +		if (vcpu_el2_e2h_is_set(vcpu) && sr == CNTKCTL_EL1)
-> +			continue;
-> +
+> +		if ((*vcpu_cpsr(vcpu) & PSR_MODE_MASK) == PSR_MODE_EL2h)
+> +			ctxt->hw_pstate |= PSR_MODE_EL1h;
+> +		else
+> +			ctxt->hw_pstate |= PSR_MODE_EL1t;
+> +	}
 
-If the guest can still access CNTHCTL_EL2 via the CNTKCTL_EL1 system
-regsiter access encoding without trapping, why is the don't we need to
-copy this here?
+This looks funny, because now you don't set a mode unless
+vcpu_mode_el2(vcpu) is true, which happens to work because the only
+other choice is PSR_MODE_EL0t which happens to be 0.
 
-Is the point that for a VHE guest, we don't copy vcpu_sys_reg(vcpu,
-CNTKCTL_EL1) to the hardware CNTKCTL_EL1, but we copy vcpu_sys_reg(vcpu,
-CNTHCTL_EL2) into CNTKCTL_EL1 during the world switch instead?
-
-Thanks,
--Christoffer
-
->  		if (setup)
->  			s_sys_regs[sr] = vcpu_sys_reg(vcpu, sr);
->  		else
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index b3e0cb8..2aa922c 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -905,6 +905,14 @@ static inline void access_rw(struct sys_reg_params *p, u64 *sysreg)
->  		*sysreg = p->regval;
->  }
 >  
-> +static bool access_cntkctl_el12(struct kvm_vcpu *vcpu,
-> +			 struct sys_reg_params *p,
-> +			 const struct sys_reg_desc *r)
-> +{
-> +	access_rw(p, &vcpu_sys_reg(vcpu, r->reg));
-> +	return true;
-> +}
-> +
->  static u64 *get_special_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *p)
+>  	ctxt->hw_sys_regs = ctxt->shadow_sys_regs;
+>  	ctxt->hw_sp_el1 = vcpu_el2_sreg(vcpu, SP_EL2);
+> @@ -182,8 +184,14 @@ static void sync_shadow_special_regs(struct kvm_vcpu *vcpu)
 >  {
->  	u64 reg = sys_reg(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
-> @@ -1201,6 +1209,23 @@ static bool access_cpacr(struct kvm_vcpu *vcpu,
->  	{ SYS_DESC(SYS_CNTVOFF_EL2), trap_el2_regs, reset_val, CNTVOFF_EL2, 0 },
->  	{ SYS_DESC(SYS_CNTHCTL_EL2), trap_el2_regs, reset_val, CNTHCTL_EL2, 0 },
+>  	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
 >  
-> +	{ SYS_DESC(sctlr_EL12), access_vm_reg, reset_val, SCTLR_EL1, 0x00C50078 },
-> +	{ SYS_DESC(cpacr_EL12), access_cpacr, reset_val, CPACR_EL1, 0 },
-> +	{ SYS_DESC(ttbr0_EL12), access_vm_reg, reset_unknown, TTBR0_EL1 },
-> +	{ SYS_DESC(ttbr1_EL12), access_vm_reg, reset_unknown, TTBR1_EL1 },
-> +	{ SYS_DESC(tcr_EL12), access_vm_reg, reset_val, TCR_EL1, 0 },
-> +	{ SYS_DESC(spsr_EL12), access_spsr},
-> +	{ SYS_DESC(elr_EL12), access_elr},
-> +	{ SYS_DESC(afsr0_EL12), access_vm_reg, reset_unknown, AFSR0_EL1 },
-> +	{ SYS_DESC(afsr1_EL12), access_vm_reg, reset_unknown, AFSR1_EL1 },
-> +	{ SYS_DESC(esr_EL12), access_vm_reg, reset_unknown, ESR_EL1 },
-> +	{ SYS_DESC(far_EL12), access_vm_reg, reset_unknown, FAR_EL1 },
-> +	{ SYS_DESC(mair_EL12), access_vm_reg, reset_unknown, MAIR_EL1 },
-> +	{ SYS_DESC(amair_EL12), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
-> +	{ SYS_DESC(vbar_EL12), access_vbar, reset_val, VBAR_EL1, 0 },
-> +	{ SYS_DESC(contextidr_EL12), access_vm_reg, reset_val, CONTEXTIDR_EL1, 0 },
-> +	{ SYS_DESC(cntkctl_EL12), access_cntkctl_el12, reset_val, CNTKCTL_EL1, 0 },
+> -	*vcpu_cpsr(vcpu) &= PSR_MODE_MASK;
+> -	*vcpu_cpsr(vcpu) |= ctxt->hw_pstate & ~PSR_MODE_MASK;
+> +	*vcpu_cpsr(vcpu) = ctxt->hw_pstate;
+> +	*vcpu_cpsr(vcpu) &= ~PSR_MODE_MASK;
+> +	/* Set vcpu exception level depending on the physical EL */
+> +	if ((ctxt->hw_pstate & PSR_MODE_MASK) == PSR_MODE_EL0t)
+> +		*vcpu_cpsr(vcpu) |= PSR_MODE_EL0t;
+> +	else
+> +		*vcpu_cpsr(vcpu) |= PSR_MODE_EL2h;
 > +
->  	{ SYS_DESC(SYS_SP_EL2), NULL, reset_special, SP_EL2, 0},
->  };
+
+don't you need to distinguish between PSR_MODE_EL2h and PSR_MODE_EL2t
+here?
+
+
+
+>  	vcpu_el2_sreg(vcpu, SP_EL2) = ctxt->hw_sp_el1;
+>  	vcpu_el2_sreg(vcpu, ELR_EL2) = ctxt->hw_elr_el1;
+>  	vcpu_el2_sreg(vcpu, SPSR_EL2) = ctxt->hw_spsr_el1;
+> @@ -218,7 +226,7 @@ void kvm_arm_setup_shadow_state(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
 >  
+> -	if (unlikely(vcpu_mode_el2(vcpu))) {
+> +	if (unlikely(is_hyp_ctxt(vcpu))) {
+>  		flush_shadow_special_regs(vcpu);
+>  		flush_shadow_el1_sysregs(vcpu);
+>  		flush_shadow_non_trap_el1_state(vcpu);
+> @@ -236,7 +244,7 @@ void kvm_arm_setup_shadow_state(struct kvm_vcpu *vcpu)
+>   */
+>  void kvm_arm_restore_shadow_state(struct kvm_vcpu *vcpu)
+>  {
+> -	if (unlikely(vcpu_mode_el2(vcpu))) {
+> +	if (unlikely(is_hyp_ctxt(vcpu))) {
+>  		sync_shadow_special_regs(vcpu);
+>  		sync_shadow_non_trap_el1_state(vcpu);
+>  	} else
 > -- 
 > 1.9.1
 > 
+
+Thanks,
+-Christoffer
