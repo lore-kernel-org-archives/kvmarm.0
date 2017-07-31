@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 02/59] irqchip/gic-v3: Add redistributor iterator
-Date: Mon, 31 Jul 2017 18:25:40 +0100
-Message-ID: <20170731172637.29355-3-marc.zyngier@arm.com>
+Subject: [PATCH v3 07/59] irqchip/gic-v3-its: Implement irq_set_irqchip_state
+ for pending state
+Date: Mon, 31 Jul 2017 18:25:45 +0100
+Message-ID: <20170731172637.29355-8-marc.zyngier@arm.com>
 References: <20170731172637.29355-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2723940D25
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:25:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8669349C32
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:25:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id is55hHeYc3qX for <kvmarm@lists.cs.columbia.edu>;
- Mon, 31 Jul 2017 13:25:34 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D278440D43
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:25:33 -0400 (EDT)
+ with ESMTP id QAERpHNfOjtL for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 31 Jul 2017 13:25:45 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 42D5D49C2A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:25:45 -0400 (EDT)
 In-Reply-To: <20170731172637.29355-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,117 +32,132 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In order to discover the VLPI properties, we need to iterate over
-the redistributor regions. As we already have code that does this,
-let's factor it out and make it slightly more generic.
+Allow the pending state of an LPI to be set or cleared via
+irq_set_irqchip_state.
 
 Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/irqchip/irq-gic-v3.c | 69 ++++++++++++++++++++++++++++++--------------
- 1 file changed, 47 insertions(+), 22 deletions(-)
+ drivers/irqchip/irq-gic-v3-its.c | 78 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 78 insertions(+)
 
-diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
-index dbffb7ab6203..640f621c7f75 100644
---- a/drivers/irqchip/irq-gic-v3.c
-+++ b/drivers/irqchip/irq-gic-v3.c
-@@ -421,24 +421,14 @@ static void __init gic_dist_init(void)
- 		gic_write_irouter(affinity, base + GICD_IROUTER + i * 8);
+diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+index 0f345c0fa700..3e4ac8c13e21 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -167,6 +167,11 @@ struct its_cmd_desc {
+ 		struct {
+ 			struct its_device *dev;
+ 			u32 event_id;
++		} its_clear_cmd;
++
++		struct {
++			struct its_device *dev;
++			u32 event_id;
+ 		} its_int_cmd;
+ 
+ 		struct {
+@@ -380,6 +385,40 @@ static struct its_collection *its_build_inv_cmd(struct its_cmd_block *cmd,
+ 	return col;
  }
  
--static int gic_populate_rdist(void)
-+static int gic_iterate_rdists(int (*fn)(struct redist_region *, void __iomem *))
++static struct its_collection *its_build_int_cmd(struct its_cmd_block *cmd,
++						struct its_cmd_desc *desc)
++{
++	struct its_collection *col;
++
++	col = dev_event_to_col(desc->its_int_cmd.dev,
++			       desc->its_int_cmd.event_id);
++
++	its_encode_cmd(cmd, GITS_CMD_INT);
++	its_encode_devid(cmd, desc->its_int_cmd.dev->device_id);
++	its_encode_event_id(cmd, desc->its_int_cmd.event_id);
++
++	its_fixup_cmd(cmd);
++
++	return col;
++}
++
++static struct its_collection *its_build_clear_cmd(struct its_cmd_block *cmd,
++						  struct its_cmd_desc *desc)
++{
++	struct its_collection *col;
++
++	col = dev_event_to_col(desc->its_clear_cmd.dev,
++			       desc->its_clear_cmd.event_id);
++
++	its_encode_cmd(cmd, GITS_CMD_CLEAR);
++	its_encode_devid(cmd, desc->its_clear_cmd.dev->device_id);
++	its_encode_event_id(cmd, desc->its_clear_cmd.event_id);
++
++	its_fixup_cmd(cmd);
++
++	return col;
++}
++
+ static struct its_collection *its_build_invall_cmd(struct its_cmd_block *cmd,
+ 						   struct its_cmd_desc *desc)
  {
--	unsigned long mpidr = cpu_logical_map(smp_processor_id());
--	u64 typer;
--	u32 aff;
-+	int ret = -ENODEV;
- 	int i;
+@@ -536,6 +575,26 @@ static void its_build_sync_cmd(struct its_cmd_block *sync_cmd,
+ static BUILD_SINGLE_CMD_FUNC(its_send_single_command, its_cmd_builder_t,
+ 			     struct its_collection, its_build_sync_cmd)
  
--	/*
--	 * Convert affinity to a 32bit value that can be matched to
--	 * GICR_TYPER bits [63:32].
--	 */
--	aff = (MPIDR_AFFINITY_LEVEL(mpidr, 3) << 24 |
--	       MPIDR_AFFINITY_LEVEL(mpidr, 2) << 16 |
--	       MPIDR_AFFINITY_LEVEL(mpidr, 1) << 8 |
--	       MPIDR_AFFINITY_LEVEL(mpidr, 0));
--
- 	for (i = 0; i < gic_data.nr_redist_regions; i++) {
- 		void __iomem *ptr = gic_data.redist_regions[i].redist_base;
-+		u64 typer;
- 		u32 reg;
- 
- 		reg = readl_relaxed(ptr + GICR_PIDR2) & GIC_PIDR2_ARCH_MASK;
-@@ -450,15 +440,9 @@ static int gic_populate_rdist(void)
- 
- 		do {
- 			typer = gic_read_typer(ptr + GICR_TYPER);
--			if ((typer >> 32) == aff) {
--				u64 offset = ptr - gic_data.redist_regions[i].redist_base;
--				gic_data_rdist_rd_base() = ptr;
--				gic_data_rdist()->phys_base = gic_data.redist_regions[i].phys_base + offset;
--				pr_info("CPU%d: found redistributor %lx region %d:%pa\n",
--					smp_processor_id(), mpidr, i,
--					&gic_data_rdist()->phys_base);
-+			ret = fn(gic_data.redist_regions + i, ptr);
-+			if (!ret)
- 				return 0;
--			}
- 
- 			if (gic_data.redist_regions[i].single_redist)
- 				break;
-@@ -473,9 +457,50 @@ static int gic_populate_rdist(void)
- 		} while (!(typer & GICR_TYPER_LAST));
- 	}
- 
-+	return ret ? -ENODEV : 0;
++static void its_send_int(struct its_device *dev, u32 event_id)
++{
++	struct its_cmd_desc desc;
++
++	desc.its_int_cmd.dev = dev;
++	desc.its_int_cmd.event_id = event_id;
++
++	its_send_single_command(dev->its, its_build_int_cmd, &desc);
 +}
 +
-+static int __gic_populate_rdist(struct redist_region *region, void __iomem *ptr)
++static void its_send_clear(struct its_device *dev, u32 event_id)
 +{
-+	unsigned long mpidr = cpu_logical_map(smp_processor_id());
-+	u64 typer;
-+	u32 aff;
++	struct its_cmd_desc desc;
 +
-+	/*
-+	 * Convert affinity to a 32bit value that can be matched to
-+	 * GICR_TYPER bits [63:32].
-+	 */
-+	aff = (MPIDR_AFFINITY_LEVEL(mpidr, 3) << 24 |
-+	       MPIDR_AFFINITY_LEVEL(mpidr, 2) << 16 |
-+	       MPIDR_AFFINITY_LEVEL(mpidr, 1) << 8 |
-+	       MPIDR_AFFINITY_LEVEL(mpidr, 0));
++	desc.its_clear_cmd.dev = dev;
++	desc.its_clear_cmd.event_id = event_id;
 +
-+	typer = gic_read_typer(ptr + GICR_TYPER);
-+	if ((typer >> 32) == aff) {
-+		u64 offset = ptr - region->redist_base;
-+		gic_data_rdist_rd_base() = ptr;
-+		gic_data_rdist()->phys_base = region->phys_base + offset;
-+
-+		pr_info("CPU%d: found redistributor %lx region %d:%pa\n",
-+			smp_processor_id(), mpidr,
-+			(int)(region - gic_data.redist_regions),
-+			&gic_data_rdist()->phys_base);
-+		return 0;
-+	}
-+
-+	/* Try next one */
-+	return 1;
++	its_send_single_command(dev->its, its_build_clear_cmd, &desc);
 +}
 +
-+static int gic_populate_rdist(void)
-+{
-+	if (gic_iterate_rdists(__gic_populate_rdist) == 0)
-+		return 0;
-+
- 	/* We couldn't even deal with ourselves... */
- 	WARN(true, "CPU%d: mpidr %lx has no re-distributor!\n",
--	     smp_processor_id(), mpidr);
-+	     smp_processor_id(),
-+	     (unsigned long)cpu_logical_map(smp_processor_id()));
- 	return -ENODEV;
+ static void its_send_inv(struct its_device *dev, u32 event_id)
+ {
+ 	struct its_cmd_desc desc;
+@@ -702,6 +761,24 @@ static void its_irq_compose_msi_msg(struct irq_data *d, struct msi_msg *msg)
+ 	iommu_dma_map_msi_msg(d->irq, msg);
  }
  
++static int its_irq_set_irqchip_state(struct irq_data *d,
++				     enum irqchip_irq_state which,
++				     bool state)
++{
++	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
++	u32 event = its_get_event_id(d);
++
++	if (which != IRQCHIP_STATE_PENDING)
++		return -EINVAL;
++
++	if (state)
++		its_send_int(its_dev, event);
++	else
++		its_send_clear(its_dev, event);
++
++	return 0;
++}
++
+ static struct irq_chip its_irq_chip = {
+ 	.name			= "ITS",
+ 	.irq_mask		= its_mask_irq,
+@@ -709,6 +786,7 @@ static struct irq_chip its_irq_chip = {
+ 	.irq_eoi		= irq_chip_eoi_parent,
+ 	.irq_set_affinity	= its_set_affinity,
+ 	.irq_compose_msi_msg	= its_irq_compose_msi_msg,
++	.irq_set_irqchip_state	= its_irq_set_irqchip_state,
+ };
+ 
+ /*
 -- 
 2.11.0
