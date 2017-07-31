@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 59/59] irqchip/gic-v3-its: Workaround Huawei D05
- redistributor addressing
-Date: Mon, 31 Jul 2017 18:26:37 +0100
-Message-ID: <20170731172637.29355-60-marc.zyngier@arm.com>
+Subject: [PATCH v3 57/59] KVM: arm/arm64: GICv4: Theory of operations
+Date: Mon, 31 Jul 2017 18:26:35 +0100
+Message-ID: <20170731172637.29355-58-marc.zyngier@arm.com>
 References: <20170731172637.29355-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B5F449CBF
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:27:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A26149C3B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:27:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id j-QS-vOkC+1f for <kvmarm@lists.cs.columbia.edu>;
- Mon, 31 Jul 2017 13:27:44 -0400 (EDT)
+ with ESMTP id 8bEgBvwDCK6p for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 31 Jul 2017 13:27:40 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 079BF49C59
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:27:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7199E49C3C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:27:39 -0400 (EDT)
 In-Reply-To: <20170731172637.29355-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,93 +31,91 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The ITSes on the Huawei D05 are broken when it comes to addressing
-the redistributors, and need to be explicitely told to address
-the VLPI page instead of the redistributor base address.
-
-So let's add yet another quirk, fixing up the target address
-in the command stream.
+Yet another braindump so I can free some cells...
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 27 +++++++++++++++++++++++++--
- 1 file changed, 25 insertions(+), 2 deletions(-)
+ virt/kvm/arm/vgic/vgic-v4.c | 68 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 68 insertions(+)
 
-diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index e22c8746ce89..32d8697bcb15 100644
---- a/drivers/irqchip/irq-gic-v3-its.c
-+++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -103,6 +103,7 @@ struct its_node {
- 	u32			device_ids;
- 	int			numa_node;
- 	bool			is_v4;
-+	int			vlpi_redist_offset;
- };
+diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
+index 0a8deefbcf1c..0c002d2be620 100644
+--- a/virt/kvm/arm/vgic/vgic-v4.c
++++ b/virt/kvm/arm/vgic/vgic-v4.c
+@@ -22,6 +22,74 @@
  
- #define ITS_ITT_ALIGN		SZ_256
-@@ -548,13 +549,15 @@ static struct its_vpe *its_build_vmapp_cmd(struct its_node *its,
- 					   struct its_cmd_desc *desc)
+ #include "vgic.h"
+ 
++/*
++ * How KVM uses GICv4 (insert rude comments here):
++ *
++ * The vgic-v4 layer acts as a bridge between several entities:
++ * - The GICv4 ITS representation offered by the ITS driver
++ * - VFIO, which is in charge of the PCI endpoint
++ * - The virtual ITS, which is the only thing the guest sees
++ *
++ * The configuration of VLPIs is triggered by a callback from VFIO,
++ * instructing KVM that a PCI device has been configured to deliver
++ * MSIs to a vITS.
++ *
++ * kvm_vgic_v4_set_forwarding() is thus called with the routing entry,
++ * and this is used to find the corresponding vITS data structures
++ * (ITS instance, device, event and irq) using a process that is
++ * extremely similar to the injection of an MSI.
++ *
++ * At this stage, we can link the guest's view of an LPI (uniquely
++ * identified by the routing entry) and the host irq, using the GICv4
++ * driver mapping operation. Should the mapping succeed, we've then
++ * successfully upgraded the guest's LPI to a VLPI. We can then start
++ * with updating GICv4's view of the property table and generating an
++ * INValidation in order to kickstart the delivery of this VLPI to the
++ * guest directly, without software intervention. Well, almost.
++ *
++ * When the PCI endpoint is deconfigured, this operation is reversed
++ * with VFIO calling kvm_vgic_v4_unset_forwarding().
++ *
++ * Once the VLPI has been mapped, it needs to follow any change the
++ * guest performs on its LPI through the vITS. For that, a number of
++ * command handlers have hooks to communicate these changes to the HW:
++ * - Any invalidation triggers a call to its_prop_update_vlpi()
++ * - The INT command results in a irq_set_irqchip_state(), which
++ *   generates an INT on the corresponding VLPI.
++ * - The CLEAR command results in a irq_set_irqchip_state(), which
++ *   generates an CLEAR on the corresponding VLPI.
++ * - DISCARD translates into an unmap, similar to a call to
++ *   kvm_vgic_v4_unset_forwarding().
++ * - MOVI is translated by an update of the existing mapping, changing
++ *   the target vcpu, resulting in a VMOVI being generated.
++ * - MOVALL is translated by a string of mapping updates (similar to
++ *   the handling of MOVI). MOVALL is horrible.
++ *
++ * Note that a DISCARD/MAPTI sequence emitted from the guest without
++ * reprogramming the PCI endpoint after MAPTI does not result in a
++ * VLPI being mapped, as there is no callback from VFIO (the guest
++ * will get the interrupt via the normal SW injection). Fixing this is
++ * not trivial, and requires some horrible messing with the VFIO
++ * internals. Not fun. Don't do that.
++ *
++ * Then there is the scheduling. Each time a vcpu is about to run on a
++ * physical CPU, KVM must tell the corresponding redistributor about
++ * it. And if we've migrated our vcpu from one CPU to another, we must
++ * tell the ITS (so that the messages reach the right redistributor).
++ * This is done in two steps: first issue a irq_set_affinity() on the
++ * irq corresponding to the vcpu, then call its_schedule_vpe(). You
++ * must be in a non-preemptible context. On exit, another call to
++ * its_schedule_vpe() tells the redistributor that we're done with the
++ * vcpu.
++ *
++ * Finally, the doorbell handling: Each vcpu is allocated an interrupt
++ * which will fire each time a VLPI is made pending whilst the vcpu is
++ * not running. Each time the vcpu gets blocked, the doorbell
++ * interrupt gets enabled. When the vcpu is unblocked (for whatever
++ * reason), the doorbell interrupt is disabled. This behaviour is
++ * pretty similar to that of the backgroud timer.
++ */
++
+ static irqreturn_t vgic_v4_doorbell_handler(int irq, void *info)
  {
- 	unsigned long vpt_addr;
-+	u64 target;
- 
- 	vpt_addr = virt_to_phys(page_address(desc->its_vmapp_cmd.vpe->vpt_page));
-+	target = desc->its_vmapp_cmd.col->target_address + its->vlpi_redist_offset;
- 
- 	its_encode_cmd(cmd, GITS_CMD_VMAPP);
- 	its_encode_vpeid(cmd, desc->its_vmapp_cmd.vpe->vpe_id);
- 	its_encode_valid(cmd, desc->its_vmapp_cmd.valid);
--	its_encode_target(cmd, desc->its_vmapp_cmd.col->target_address);
-+	its_encode_target(cmd, target);
- 	its_encode_vpt_addr(cmd, vpt_addr);
- 	its_encode_vpt_size(cmd, LPI_NRBITS - 1);
- 
-@@ -613,11 +616,14 @@ static struct its_vpe *its_build_vmovp_cmd(struct its_node *its,
- 					   struct its_cmd_block *cmd,
- 					   struct its_cmd_desc *desc)
- {
-+	u64 target;
-+
-+	target = desc->its_vmapp_cmd.col->target_address + its->vlpi_redist_offset;
- 	its_encode_cmd(cmd, GITS_CMD_VMOVP);
- 	its_encode_seq_num(cmd, desc->its_vmovp_cmd.seq_num);
- 	its_encode_its_list(cmd, desc->its_vmovp_cmd.its_list);
- 	its_encode_vpeid(cmd, desc->its_vmovp_cmd.vpe->vpe_id);
--	its_encode_target(cmd, desc->its_vmovp_cmd.col->target_address);
-+	its_encode_target(cmd, target);
- 
- 	its_fixup_cmd(cmd);
- 
-@@ -2668,6 +2674,17 @@ static void __maybe_unused its_enable_quirk_qdf2400_e0065(void *data)
- 	its->ite_size = 16;
- }
- 
-+static void __maybe_unused its_enable_quirk_d05_vlpi_offset(void *data)
-+{
-+	struct its_node *its = data;
-+
-+	/*
-+	 * D05 insists on using the wrong address for the VLPI
-+	 * page. Trick it into doing the right thing...
-+	 */
-+	its->vlpi_redist_offset = SZ_128K;
-+}
-+
- static const struct gic_quirk its_quirks[] = {
- #ifdef CONFIG_CAVIUM_ERRATUM_22375
- 	{
-@@ -2694,6 +2711,12 @@ static const struct gic_quirk its_quirks[] = {
- 	},
- #endif
- 	{
-+		.desc	= "ITS: D05 128kB VLPI offset",
-+		.iidr	= 0x00000004,
-+		.mask	= 0xffffffff,
-+		.init	= its_enable_quirk_d05_vlpi_offset,
-+	},
-+	{
- 	}
- };
- 
+ 	struct kvm_vcpu *vcpu = info;
 -- 
 2.11.0
