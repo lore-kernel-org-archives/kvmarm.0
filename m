@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 18/59] irqchip/gic-v3-its: Add VLPI configuration handling
-Date: Mon, 31 Jul 2017 18:25:56 +0100
-Message-ID: <20170731172637.29355-19-marc.zyngier@arm.com>
+Subject: [PATCH v3 21/59] irqchip/gic-v3-its: Add VPE irq domain [de]activation
+Date: Mon, 31 Jul 2017 18:25:59 +0100
+Message-ID: <20170731172637.29355-22-marc.zyngier@arm.com>
 References: <20170731172637.29355-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CF48F40D1A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:26:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A767749C2B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:26:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Fxw2Jsn5uv4G for <kvmarm@lists.cs.columbia.edu>;
- Mon, 31 Jul 2017 13:26:10 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A8CF4104E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:26:10 -0400 (EDT)
+ with ESMTP id Xi1CdwxCkLOX for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 31 Jul 2017 13:26:17 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 545DB4104E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:26:17 -0400 (EDT)
 In-Reply-To: <20170731172637.29355-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,150 +31,159 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When a VLPI is reconfigured (enabled, disabled, change in priority),
-the full configuration byte must be written, and the caches invalidated.
-
-Also, when using the irq_mask/irq_unmask methods, it is necessary
-to disable the doorbell for that particular interrupt (by mapping it
-to 1023) on top of clearing the Enable bit.
+On activation, a VPE is mapped using the VMAPP command, followed
+by a VINVALL for a good measure. On deactivation, the VPE is
+simply unmapped.
 
 Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 75 +++++++++++++++++++++++++++++++++++++---
- 1 file changed, 70 insertions(+), 5 deletions(-)
+ drivers/irqchip/irq-gic-v3-its.c | 102 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 102 insertions(+)
 
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index ef31c3e58c01..b618c259be8b 100644
+index 0f9a487448b9..5ca1e571c1b4 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -806,18 +806,26 @@ static inline u32 its_get_event_id(struct irq_data *d)
- 	return d->hwirq - its_dev->event_map.lpi_base;
+@@ -215,6 +215,16 @@ struct its_cmd_desc {
+ 
+ 		struct {
+ 			struct its_vpe *vpe;
++		} its_vinvall_cmd;
++
++		struct {
++			struct its_vpe *vpe;
++			struct its_collection *col;
++			bool valid;
++		} its_vmapp_cmd;
++
++		struct {
++			struct its_vpe *vpe;
+ 			struct its_device *dev;
+ 			u32 virt_id;
+ 			u32 event_id;
+@@ -318,6 +328,16 @@ static void its_encode_db_valid(struct its_cmd_block *cmd, bool db_valid)
+ 	its_mask_encode(&cmd->raw_cmd[2], db_valid, 0, 0);
  }
  
--static void lpi_update_config(struct irq_data *d, u8 clr, u8 set)
-+static void lpi_write_config(struct irq_data *d, u8 clr, u8 set)
- {
--	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
--	irq_hw_number_t hwirq = d->hwirq;
-+	irq_hw_number_t hwirq;
- 	struct page *prop_page;
- 	u8 *cfg;
- 
--	prop_page = gic_rdists->prop_page;
-+	if (irqd_is_forwarded_to_vcpu(d)) {
-+		struct its_device *its_dev = irq_data_get_irq_chip_data(d);
-+		u32 event = its_get_event_id(d);
++static void its_encode_vpt_addr(struct its_cmd_block *cmd, u64 vpt_pa)
++{
++	its_mask_encode(&cmd->raw_cmd[3], vpt_pa >> 16, 50, 16);
++}
 +
-+		prop_page = its_dev->event_map.vm->vprop_page;
-+		hwirq = its_dev->event_map.vlpi_maps[event].vintid;
-+	} else {
-+		prop_page = gic_rdists->prop_page;
-+		hwirq = d->hwirq;
++static void its_encode_vpt_size(struct its_cmd_block *cmd, u8 vpt_size)
++{
++	its_mask_encode(&cmd->raw_cmd[3], vpt_size, 4, 0);
++}
++
+ static inline void its_fixup_cmd(struct its_cmd_block *cmd)
+ {
+ 	/* Let's fixup BE commands */
+@@ -476,6 +496,36 @@ static struct its_collection *its_build_invall_cmd(struct its_cmd_block *cmd,
+ 	return NULL;
+ }
+ 
++static struct its_vpe *its_build_vinvall_cmd(struct its_cmd_block *cmd,
++					     struct its_cmd_desc *desc)
++{
++	its_encode_cmd(cmd, GITS_CMD_VINVALL);
++	its_encode_vpeid(cmd, desc->its_vinvall_cmd.vpe->vpe_id);
++
++	its_fixup_cmd(cmd);
++
++	return desc->its_vinvall_cmd.vpe;
++}
++
++static struct its_vpe *its_build_vmapp_cmd(struct its_cmd_block *cmd,
++					   struct its_cmd_desc *desc)
++{
++	unsigned long vpt_addr;
++
++	vpt_addr = virt_to_phys(page_address(desc->its_vmapp_cmd.vpe->vpt_page));
++
++	its_encode_cmd(cmd, GITS_CMD_VMAPP);
++	its_encode_vpeid(cmd, desc->its_vmapp_cmd.vpe->vpe_id);
++	its_encode_valid(cmd, desc->its_vmapp_cmd.valid);
++	its_encode_target(cmd, desc->its_vmapp_cmd.col->target_address);
++	its_encode_vpt_addr(cmd, vpt_addr);
++	its_encode_vpt_size(cmd, LPI_NRBITS - 1);
++
++	its_fixup_cmd(cmd);
++
++	return desc->its_vmapp_cmd.vpe;
++}
++
+ static struct its_vpe *its_build_vmapti_cmd(struct its_cmd_block *cmd,
+ 					    struct its_cmd_desc *desc)
+ {
+@@ -797,6 +847,37 @@ static void its_send_vmovi(struct its_device *dev, u32 id)
+ 	its_send_single_vcommand(dev->its, its_build_vmovi_cmd, &desc);
+ }
+ 
++static void its_send_vmapp(struct its_vpe *vpe, bool valid)
++{
++	struct its_cmd_desc desc;
++	struct its_node *its;
++
++	desc.its_vmapp_cmd.vpe = vpe;
++	desc.its_vmapp_cmd.valid = valid;
++
++	list_for_each_entry(its, &its_nodes, entry) {
++		if (!its->is_v4)
++			continue;
++
++		desc.its_vmapp_cmd.col = &its->collections[vpe->col_idx];
++		its_send_single_vcommand(its, its_build_vmapp_cmd, &desc);
 +	}
- 
- 	cfg = page_address(prop_page) + hwirq - 8192;
- 	*cfg &= ~clr;
--	*cfg |= set;
-+	*cfg |= set | LPI_PROP_GROUP1;
- 
- 	/*
- 	 * Make the above write visible to the redistributors.
-@@ -828,16 +836,52 @@ static void lpi_update_config(struct irq_data *d, u8 clr, u8 set)
- 		gic_flush_dcache_to_poc(cfg, sizeof(*cfg));
- 	else
- 		dsb(ishst);
 +}
 +
-+static void lpi_update_config(struct irq_data *d, u8 clr, u8 set)
++static void its_send_vinvall(struct its_vpe *vpe)
 +{
-+	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
++	struct its_cmd_desc desc;
++	struct its_node *its;
 +
-+	lpi_write_config(d, clr, set);
- 	its_send_inv(its_dev, its_get_event_id(d));
- }
- 
-+static void its_vlpi_set_doorbell(struct irq_data *d, bool enable)
-+{
-+	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
-+	u32 event = its_get_event_id(d);
++	desc.its_vinvall_cmd.vpe = vpe;
 +
-+	if (its_dev->event_map.vlpi_maps[event].db_enabled == enable)
-+		return;
-+
-+	its_dev->event_map.vlpi_maps[event].db_enabled = enable;
-+
-+	/*
-+	 * More fun with the architecture:
-+	 *
-+	 * Ideally, we'd issue a VMAPTI to set the doorbell to its LPI
-+	 * value or to 1023, depending on the enable bit. But that
-+	 * would be issueing a mapping for an /existing/ DevID+EventID
-+	 * pair, which is UNPREDICTABLE. Instead, let's issue a VMOVI
-+	 * to the /same/ vPE, using this opportunity to adjust the
-+	 * doorbell. Mouahahahaha. We loves it, Precious.
-+	 */
-+	its_send_vmovi(its_dev, event);
++	list_for_each_entry(its, &its_nodes, entry) {
++		if (!its->is_v4)
++			continue;
++		its_send_single_vcommand(its, its_build_vinvall_cmd, &desc);
++	}
 +}
 +
- static void its_mask_irq(struct irq_data *d)
- {
-+	if (irqd_is_forwarded_to_vcpu(d))
-+		its_vlpi_set_doorbell(d, false);
-+
- 	lpi_update_config(d, LPI_PROP_ENABLED, 0);
+ /*
+  * irqchip functions - assumes MSI, mostly.
+  */
+@@ -2197,9 +2278,30 @@ static int its_vpe_irq_domain_alloc(struct irq_domain *domain, unsigned int virq
+ 	return err;
  }
  
- static void its_unmask_irq(struct irq_data *d)
- {
-+	if (irqd_is_forwarded_to_vcpu(d))
-+		its_vlpi_set_doorbell(d, true);
-+
- 	lpi_update_config(d, 0, LPI_PROP_ENABLED);
- }
- 
-@@ -850,6 +894,10 @@ static int its_set_affinity(struct irq_data *d, const struct cpumask *mask_val,
- 	struct its_collection *target_col;
- 	u32 id = its_get_event_id(d);
- 
-+	/* A forwarded interrupt should use irq_set_vcpu_affinity */
-+	if (irqd_is_forwarded_to_vcpu(d))
-+		return -EINVAL;
-+
-        /* lpi cannot be routed to a redistributor that is on a foreign node */
- 	if (its_dev->its->flags & ITS_FLAGS_WORKAROUND_CAVIUM_23144) {
- 		if (its_dev->its->numa_node >= 0) {
-@@ -1018,6 +1066,22 @@ static int its_vlpi_unmap(struct irq_data *d)
- 	return ret;
- }
- 
-+static int its_vlpi_prop_update(struct irq_data *d, struct its_cmd_info *info)
++static void its_vpe_irq_domain_activate(struct irq_domain *domain,
++					struct irq_data *d)
 +{
-+	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
++	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
 +
-+	if (!its_dev->event_map.vm || !irqd_is_forwarded_to_vcpu(d))
-+		return -EINVAL;
-+
-+	if (info->cmd_type == PROP_UPDATE_AND_INV_VLPI)
-+		lpi_update_config(d, 0xff, info->config);
-+	else
-+		lpi_write_config(d, 0xff, info->config);
-+	its_vlpi_set_doorbell(d, !!(info->config & LPI_PROP_ENABLED));
-+
-+	return 0;
++	/* Map the VPE to the first possible CPU */
++	vpe->col_idx = cpumask_first(cpu_online_mask);
++	its_send_vmapp(vpe, true);
++	its_send_vinvall(vpe);
 +}
 +
- static int its_irq_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
- {
- 	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
-@@ -1040,6 +1104,7 @@ static int its_irq_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
++static void its_vpe_irq_domain_deactivate(struct irq_domain *domain,
++					  struct irq_data *d)
++{
++	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
++
++	its_send_vmapp(vpe, false);
++}
++
+ static const struct irq_domain_ops its_vpe_domain_ops = {
+ 	.alloc			= its_vpe_irq_domain_alloc,
+ 	.free			= its_vpe_irq_domain_free,
++	.activate		= its_vpe_irq_domain_activate,
++	.deactivate		= its_vpe_irq_domain_deactivate,
+ };
  
- 	case PROP_UPDATE_VLPI:
- 	case PROP_UPDATE_AND_INV_VLPI:
-+		return its_vlpi_prop_update(d, info);
- 
- 	default:
- 		return -EINVAL;
+ static int its_force_quiescent(void __iomem *base)
 -- 
 2.11.0
