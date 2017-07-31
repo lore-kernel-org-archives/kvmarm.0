@@ -1,220 +1,104 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 58/59] irqchip/gic-v3-its: Pass its_node pointer to each command bulder
-Date: Mon, 31 Jul 2017 18:26:36 +0100
-Message-ID: <20170731172637.29355-59-marc.zyngier@arm.com>
+Subject: [PATCH v3 56/59] KVM: arm/arm64: GICv4: Prevent heterogenous systems
+ from using GICv4
+Date: Mon, 31 Jul 2017 18:26:34 +0100
+Message-ID: <20170731172637.29355-57-marc.zyngier@arm.com>
 References: <20170731172637.29355-1-marc.zyngier@arm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 697E249C2A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:27:38 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 0Z4KPbXNGg7M for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 31 Jul 2017 13:27:37 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D1EB49CB1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:27:37 -0400 (EDT)
 In-Reply-To: <20170731172637.29355-1-marc.zyngier@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>, Eric Auger <eric.auger@redhat.com>, Shanker Donthineni <shankerd@codeaurora.org>, Mark Rutland <mark.rutland@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In order to be able to issue command variants depending on
-how broken an ITS is, let's pass the its pointer to all
-command building primitives.
+The GICv4 architecture doesn't prevent CPUs implementing GICv4 to
+cohabit with CPUs limited to GICv3 in the same system.
+
+This is mad (the sheduler would have to be made aware of the v4
+capability), and we're certainly not going to support this any
+time soon. So let's check that all online CPUs are GICv4 capable,
+and disable the functionnality if not.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 58 ++++++++++++++++++++++++++--------------
- 1 file changed, 38 insertions(+), 20 deletions(-)
+ include/linux/irqchip/arm-gic-v3.h |  2 ++
+ virt/kvm/arm/vgic/vgic-v3.c        | 22 +++++++++++++++++++++-
+ 2 files changed, 23 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 9f32cd42238f..e22c8746ce89 100644
---- a/drivers/irqchip/irq-gic-v3-its.c
-+++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -264,10 +264,12 @@ struct its_cmd_block {
- #define ITS_CMD_QUEUE_SZ		SZ_64K
- #define ITS_CMD_QUEUE_NR_ENTRIES	(ITS_CMD_QUEUE_SZ / sizeof(struct its_cmd_block))
+diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+index 1ea576c8126f..dfa4a51643d6 100644
+--- a/include/linux/irqchip/arm-gic-v3.h
++++ b/include/linux/irqchip/arm-gic-v3.h
+@@ -532,6 +532,8 @@
+ #define ICH_VTR_SEIS_MASK		(1 << ICH_VTR_SEIS_SHIFT)
+ #define ICH_VTR_A3V_SHIFT		21
+ #define ICH_VTR_A3V_MASK		(1 << ICH_VTR_A3V_SHIFT)
++#define ICH_VTR_nV4_SHIFT		20
++#define ICH_VTR_nV4_MASK		(1 << ICH_VTR_nV4_SHIFT)
  
--typedef struct its_collection *(*its_cmd_builder_t)(struct its_cmd_block *,
-+typedef struct its_collection *(*its_cmd_builder_t)(struct its_node *,
-+						    struct its_cmd_block *,
- 						    struct its_cmd_desc *);
+ #define ICC_IAR1_EL1_SPURIOUS		0x3ff
  
--typedef struct its_vpe *(*its_cmd_vbuilder_t)(struct its_cmd_block *,
-+typedef struct its_vpe *(*its_cmd_vbuilder_t)(struct its_node *,
-+					      struct its_cmd_block *,
- 					      struct its_cmd_desc *);
- 
- static void its_mask_encode(u64 *raw_cmd, u64 val, int h, int l)
-@@ -371,7 +373,8 @@ static inline void its_fixup_cmd(struct its_cmd_block *cmd)
- 	cmd->raw_cmd[3] = cpu_to_le64(cmd->raw_cmd[3]);
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index 405733678c2f..252268e83ade 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -466,6 +466,18 @@ static int __init early_gicv4_enable(char *buf)
  }
+ early_param("kvm-arm.vgic_v4_enable", early_gicv4_enable);
  
--static struct its_collection *its_build_mapd_cmd(struct its_cmd_block *cmd,
-+static struct its_collection *its_build_mapd_cmd(struct its_node *its,
-+						 struct its_cmd_block *cmd,
- 						 struct its_cmd_desc *desc)
- {
- 	unsigned long itt_addr;
-@@ -391,7 +394,8 @@ static struct its_collection *its_build_mapd_cmd(struct its_cmd_block *cmd,
- 	return NULL;
- }
++static void vgic_check_v4_cpuif(void *param)
++{
++	u32 ich_vtr_el2 = kvm_call_hyp(__vgic_v3_get_ich_vtr_el2);
++	bool *v4 = param, this_cpu_is_v4;
++
++	this_cpu_is_v4 = !(ich_vtr_el2 & ICH_VTR_nV4_MASK);
++	if (!this_cpu_is_v4)
++		kvm_info("CPU%d is not GICv4 capable\n", smp_processor_id());
++
++	*v4 &= this_cpu_is_v4;
++}
++
+ /**
+  * vgic_v3_probe - probe for a GICv3 compatible interrupt controller in DT
+  * @node:	pointer to the DT node
+@@ -485,8 +497,16 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
+ 	kvm_vgic_global_state.can_emulate_gicv2 = false;
+ 	kvm_vgic_global_state.ich_vtr_el2 = ich_vtr_el2;
  
--static struct its_collection *its_build_mapc_cmd(struct its_cmd_block *cmd,
-+static struct its_collection *its_build_mapc_cmd(struct its_node *its,
-+						 struct its_cmd_block *cmd,
- 						 struct its_cmd_desc *desc)
- {
- 	its_encode_cmd(cmd, GITS_CMD_MAPC);
-@@ -404,7 +408,8 @@ static struct its_collection *its_build_mapc_cmd(struct its_cmd_block *cmd,
- 	return desc->its_mapc_cmd.col;
- }
- 
--static struct its_collection *its_build_mapti_cmd(struct its_cmd_block *cmd,
-+static struct its_collection *its_build_mapti_cmd(struct its_node *its,
-+						  struct its_cmd_block *cmd,
- 						  struct its_cmd_desc *desc)
- {
- 	struct its_collection *col;
-@@ -423,7 +428,8 @@ static struct its_collection *its_build_mapti_cmd(struct its_cmd_block *cmd,
- 	return col;
- }
- 
--static struct its_collection *its_build_movi_cmd(struct its_cmd_block *cmd,
-+static struct its_collection *its_build_movi_cmd(struct its_node *its,
-+						 struct its_cmd_block *cmd,
- 						 struct its_cmd_desc *desc)
- {
- 	struct its_collection *col;
-@@ -441,7 +447,8 @@ static struct its_collection *its_build_movi_cmd(struct its_cmd_block *cmd,
- 	return col;
- }
- 
--static struct its_collection *its_build_discard_cmd(struct its_cmd_block *cmd,
-+static struct its_collection *its_build_discard_cmd(struct its_node *its,
-+						    struct its_cmd_block *cmd,
- 						    struct its_cmd_desc *desc)
- {
- 	struct its_collection *col;
-@@ -458,7 +465,8 @@ static struct its_collection *its_build_discard_cmd(struct its_cmd_block *cmd,
- 	return col;
- }
- 
--static struct its_collection *its_build_inv_cmd(struct its_cmd_block *cmd,
-+static struct its_collection *its_build_inv_cmd(struct its_node *its,
-+						struct its_cmd_block *cmd,
- 						struct its_cmd_desc *desc)
- {
- 	struct its_collection *col;
-@@ -475,7 +483,8 @@ static struct its_collection *its_build_inv_cmd(struct its_cmd_block *cmd,
- 	return col;
- }
- 
--static struct its_collection *its_build_int_cmd(struct its_cmd_block *cmd,
-+static struct its_collection *its_build_int_cmd(struct its_node *its,
-+						struct its_cmd_block *cmd,
- 						struct its_cmd_desc *desc)
- {
- 	struct its_collection *col;
-@@ -492,7 +501,8 @@ static struct its_collection *its_build_int_cmd(struct its_cmd_block *cmd,
- 	return col;
- }
- 
--static struct its_collection *its_build_clear_cmd(struct its_cmd_block *cmd,
-+static struct its_collection *its_build_clear_cmd(struct its_node *its,
-+						  struct its_cmd_block *cmd,
- 						  struct its_cmd_desc *desc)
- {
- 	struct its_collection *col;
-@@ -509,7 +519,8 @@ static struct its_collection *its_build_clear_cmd(struct its_cmd_block *cmd,
- 	return col;
- }
- 
--static struct its_collection *its_build_invall_cmd(struct its_cmd_block *cmd,
-+static struct its_collection *its_build_invall_cmd(struct its_node *its,
-+						   struct its_cmd_block *cmd,
- 						   struct its_cmd_desc *desc)
- {
- 	its_encode_cmd(cmd, GITS_CMD_INVALL);
-@@ -520,7 +531,8 @@ static struct its_collection *its_build_invall_cmd(struct its_cmd_block *cmd,
- 	return NULL;
- }
- 
--static struct its_vpe *its_build_vinvall_cmd(struct its_cmd_block *cmd,
-+static struct its_vpe *its_build_vinvall_cmd(struct its_node *its,
-+					     struct its_cmd_block *cmd,
- 					     struct its_cmd_desc *desc)
- {
- 	its_encode_cmd(cmd, GITS_CMD_VINVALL);
-@@ -531,7 +543,8 @@ static struct its_vpe *its_build_vinvall_cmd(struct its_cmd_block *cmd,
- 	return desc->its_vinvall_cmd.vpe;
- }
- 
--static struct its_vpe *its_build_vmapp_cmd(struct its_cmd_block *cmd,
-+static struct its_vpe *its_build_vmapp_cmd(struct its_node *its,
-+					   struct its_cmd_block *cmd,
- 					   struct its_cmd_desc *desc)
- {
- 	unsigned long vpt_addr;
-@@ -550,7 +563,8 @@ static struct its_vpe *its_build_vmapp_cmd(struct its_cmd_block *cmd,
- 	return desc->its_vmapp_cmd.vpe;
- }
- 
--static struct its_vpe *its_build_vmapti_cmd(struct its_cmd_block *cmd,
-+static struct its_vpe *its_build_vmapti_cmd(struct its_node *its,
-+					    struct its_cmd_block *cmd,
- 					    struct its_cmd_desc *desc)
- {
- 	u32 db;
-@@ -572,7 +586,8 @@ static struct its_vpe *its_build_vmapti_cmd(struct its_cmd_block *cmd,
- 	return desc->its_vmapti_cmd.vpe;
- }
- 
--static struct its_vpe *its_build_vmovi_cmd(struct its_cmd_block *cmd,
-+static struct its_vpe *its_build_vmovi_cmd(struct its_node *its,
-+					   struct its_cmd_block *cmd,
- 					   struct its_cmd_desc *desc)
- {
- 	u32 db;
-@@ -594,7 +609,8 @@ static struct its_vpe *its_build_vmovi_cmd(struct its_cmd_block *cmd,
- 	return desc->its_vmovi_cmd.vpe;
- }
- 
--static struct its_vpe *its_build_vmovp_cmd(struct its_cmd_block *cmd,
-+static struct its_vpe *its_build_vmovp_cmd(struct its_node *its,
-+					   struct its_cmd_block *cmd,
- 					   struct its_cmd_desc *desc)
- {
- 	its_encode_cmd(cmd, GITS_CMD_VMOVP);
-@@ -722,7 +738,7 @@ void name(struct its_node *its,						\
- 		raw_spin_unlock_irqrestore(&its->lock, flags);		\
- 		return;							\
- 	}								\
--	sync_obj = builder(cmd, desc);					\
-+	sync_obj = builder(its, cmd, desc);				\
- 	its_flush_cmd(its, cmd);					\
- 									\
- 	if (sync_obj) {							\
-@@ -730,7 +746,7 @@ void name(struct its_node *its,						\
- 		if (!sync_cmd)						\
- 			goto post;					\
- 									\
--		buildfn(sync_cmd, sync_obj);				\
-+		buildfn(its, sync_cmd, sync_obj);			\
- 		its_flush_cmd(its, sync_cmd);				\
- 	}								\
- 									\
-@@ -741,7 +757,8 @@ post:									\
- 	its_wait_for_range_completion(its, cmd, next_cmd);		\
- }
- 
--static void its_build_sync_cmd(struct its_cmd_block *sync_cmd,
-+static void its_build_sync_cmd(struct its_node *its,
-+			       struct its_cmd_block *sync_cmd,
- 			       struct its_collection *sync_col)
- {
- 	its_encode_cmd(sync_cmd, GITS_CMD_SYNC);
-@@ -753,7 +770,8 @@ static void its_build_sync_cmd(struct its_cmd_block *sync_cmd,
- static BUILD_SINGLE_CMD_FUNC(its_send_single_command, its_cmd_builder_t,
- 			     struct its_collection, its_build_sync_cmd)
- 
--static void its_build_vsync_cmd(struct its_cmd_block *sync_cmd,
-+static void its_build_vsync_cmd(struct its_node *its,
-+				struct its_cmd_block *sync_cmd,
- 				struct its_vpe *sync_vpe)
- {
- 	its_encode_cmd(sync_cmd, GITS_CMD_VSYNC);
+-	/* GICv4 support? */
++	/*
++	 * GICv4 support? We need to check on all CPUs in case of some
++	 * extremely creative form of big-little brain damage...
++	 */
+ 	if (info->has_v4) {
++		int cpu;
++
++		for_each_online_cpu(cpu)
++			smp_call_function_single(cpu, vgic_check_v4_cpuif,
++						 &gicv4_enable, 1);
+ 		kvm_vgic_global_state.has_gicv4 = gicv4_enable;
+ 		kvm_info("GICv4 support %sabled\n",
+ 			 gicv4_enable ? "en" : "dis");
 -- 
 2.11.0
