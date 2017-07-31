@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 17/59] irqchip/gic-v3-its: Add VLPI map/unmap operations
-Date: Mon, 31 Jul 2017 18:25:55 +0100
-Message-ID: <20170731172637.29355-18-marc.zyngier@arm.com>
+Subject: [PATCH v3 23/59] irqchip/gic-v3-its: Add VPE scheduling
+Date: Mon, 31 Jul 2017 18:26:01 +0100
+Message-ID: <20170731172637.29355-24-marc.zyngier@arm.com>
 References: <20170731172637.29355-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B63B140FB0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:26:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7BF1149C25
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:26:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5A0GFY9eNOSe for <kvmarm@lists.cs.columbia.edu>;
- Mon, 31 Jul 2017 13:26:09 -0400 (EDT)
+ with ESMTP id 5HT5JFXUou-0 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 31 Jul 2017 13:26:22 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 362D549C4F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:26:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DC6FB40D16
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:26:21 -0400 (EDT)
 In-Reply-To: <20170731172637.29355-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,351 +31,194 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In order to let a VLPI being injected into a guest, the VLPI must
-be mapped using the VMAPTI command. When moved to a different vcpu,
-it must be moved with the VMOVI command.
+When a VPE is scheduled to run, the corresponding redistributor must
+be told so, by setting VPROPBASER to the VM's property table, and
+VPENDBASER to the vcpu's pending table.
 
-These commands are issued via the irq_set_vcpu_affinity method,
-making sure we unmap the corresponding host LPI first.
+When scheduled out, we preserve the IDAI and PendingLast bits. The
+latter is specially important, as it tells the hypervisor that
+there are pending interrupts for this vcpu.
 
-The reverse is also done when the VLPI is unmapped from the guest.
-
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 250 ++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 247 insertions(+), 3 deletions(-)
+ drivers/irqchip/irq-gic-v3-its.c   | 85 ++++++++++++++++++++++++++++++++++++++
+ include/linux/irqchip/arm-gic-v3.h | 58 ++++++++++++++++++++++++++
+ 2 files changed, 143 insertions(+)
 
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 9ef4f161690a..ef31c3e58c01 100644
+index 5ca1e571c1b4..d94a51489f6c 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -115,11 +115,17 @@ struct event_lpi_map {
- 	u16			*col_map;
- 	irq_hw_number_t		lpi_base;
- 	int			nr_lpis;
-+	struct mutex		vlpi_lock;
-+	struct its_vm		*vm;
-+	struct its_vlpi_map	*vlpi_maps;
-+	int			nr_vlpis;
+@@ -152,6 +152,7 @@ static DEFINE_IDA(its_vpeid_ida);
+ 
+ #define gic_data_rdist()		(raw_cpu_ptr(gic_rdists->rdist))
+ #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
++#define gic_data_rdist_vlpi_base()	(gic_data_rdist_rd_base() + SZ_128K)
+ 
+ static struct its_collection *dev_event_to_col(struct its_device *its_dev,
+ 					       u32 event)
+@@ -2147,8 +2148,92 @@ static const struct irq_domain_ops its_domain_ops = {
+ 	.deactivate		= its_irq_domain_deactivate,
  };
  
- /*
-- * The ITS view of a device - belongs to an ITS, a collection, owns an
-- * interrupt translation table, and a list of interrupts.
-+ * The ITS view of a device - belongs to an ITS, owns an interrupt
-+ * translation table, and a list of interrupts.  If it some of its
-+ * LPIs are injected into a guest (GICv4), the event_map.vm field
-+ * indicates which one.
-  */
- struct its_device {
- 	struct list_head	entry;
-@@ -205,6 +211,21 @@ struct its_cmd_desc {
- 		struct {
- 			struct its_collection *col;
- 		} its_invall_cmd;
-+
-+		struct {
-+			struct its_vpe *vpe;
-+			struct its_device *dev;
-+			u32 virt_id;
-+			u32 event_id;
-+			bool db_enabled;
-+		} its_vmapti_cmd;
-+
-+		struct {
-+			struct its_vpe *vpe;
-+			struct its_device *dev;
-+			u32 event_id;
-+			bool db_enabled;
-+		} its_vmovi_cmd;
- 	};
- };
- 
-@@ -221,6 +242,9 @@ struct its_cmd_block {
- typedef struct its_collection *(*its_cmd_builder_t)(struct its_cmd_block *,
- 						    struct its_cmd_desc *);
- 
-+typedef struct its_vpe *(*its_cmd_vbuilder_t)(struct its_cmd_block *,
-+					      struct its_cmd_desc *);
-+
- static void its_mask_encode(u64 *raw_cmd, u64 val, int h, int l)
- {
- 	u64 mask = GENMASK_ULL(h, l);
-@@ -273,6 +297,26 @@ static void its_encode_collection(struct its_cmd_block *cmd, u16 col)
- 	its_mask_encode(&cmd->raw_cmd[2], col, 15, 0);
- }
- 
-+static void its_encode_vpeid(struct its_cmd_block *cmd, u16 vpeid)
++static void its_vpe_schedule(struct its_vpe *vpe)
 +{
-+	its_mask_encode(&cmd->raw_cmd[1], vpeid, 47, 32);
-+}
++	void * __iomem vlpi_base = gic_data_rdist_vlpi_base();
++	u64 val;
 +
-+static void its_encode_virt_id(struct its_cmd_block *cmd, u32 virt_id)
-+{
-+	its_mask_encode(&cmd->raw_cmd[2], virt_id, 31, 0);
-+}
++	/* Schedule the VPE */
++	val  = virt_to_phys(page_address(vpe->its_vm->vprop_page)) &
++		GENMASK_ULL(51, 12);
++	val |= (LPI_NRBITS - 1) & GICR_VPROPBASER_IDBITS_MASK;
++	val |= GICR_VPROPBASER_RaWb;
++	val |= GICR_VPROPBASER_InnerShareable;
++	gits_write_vpropbaser(val, vlpi_base + GICR_VPROPBASER);
 +
-+static void its_encode_db_phys_id(struct its_cmd_block *cmd, u32 db_phys_id)
-+{
-+	its_mask_encode(&cmd->raw_cmd[2], db_phys_id, 63, 32);
-+}
-+
-+static void its_encode_db_valid(struct its_cmd_block *cmd, bool db_valid)
-+{
-+	its_mask_encode(&cmd->raw_cmd[2], db_valid, 0, 0);
-+}
-+
- static inline void its_fixup_cmd(struct its_cmd_block *cmd)
- {
- 	/* Let's fixup BE commands */
-@@ -431,6 +475,50 @@ static struct its_collection *its_build_invall_cmd(struct its_cmd_block *cmd,
- 	return NULL;
- }
- 
-+static struct its_vpe *its_build_vmapti_cmd(struct its_cmd_block *cmd,
-+					    struct its_cmd_desc *desc)
-+{
-+	u32 db;
-+
-+	if (desc->its_vmapti_cmd.db_enabled)
-+		db = desc->its_vmapti_cmd.vpe->vpe_db_lpi;
-+	else
-+		db = 1023;
-+
-+	its_encode_cmd(cmd, GITS_CMD_VMAPTI);
-+	its_encode_devid(cmd, desc->its_vmapti_cmd.dev->device_id);
-+	its_encode_vpeid(cmd, desc->its_vmapti_cmd.vpe->vpe_id);
-+	its_encode_event_id(cmd, desc->its_vmapti_cmd.event_id);
-+	its_encode_db_phys_id(cmd, db);
-+	its_encode_virt_id(cmd, desc->its_vmapti_cmd.virt_id);
-+
-+	its_fixup_cmd(cmd);
-+
-+	return desc->its_vmapti_cmd.vpe;
-+}
-+
-+static struct its_vpe *its_build_vmovi_cmd(struct its_cmd_block *cmd,
-+					   struct its_cmd_desc *desc)
-+{
-+	u32 db;
-+
-+	if (desc->its_vmovi_cmd.db_enabled)
-+		db = desc->its_vmovi_cmd.vpe->vpe_db_lpi;
-+	else
-+		db = 1023;
-+
-+	its_encode_cmd(cmd, GITS_CMD_VMOVI);
-+	its_encode_devid(cmd, desc->its_vmovi_cmd.dev->device_id);
-+	its_encode_vpeid(cmd, desc->its_vmovi_cmd.vpe->vpe_id);
-+	its_encode_event_id(cmd, desc->its_vmovi_cmd.event_id);
-+	its_encode_db_phys_id(cmd, db);
-+	its_encode_db_valid(cmd, true);
-+
-+	its_fixup_cmd(cmd);
-+
-+	return desc->its_vmovi_cmd.vpe;
-+}
-+
- static u64 its_cmd_ptr_to_offset(struct its_node *its,
- 				 struct its_cmd_block *ptr)
- {
-@@ -576,6 +664,18 @@ static void its_build_sync_cmd(struct its_cmd_block *sync_cmd,
- static BUILD_SINGLE_CMD_FUNC(its_send_single_command, its_cmd_builder_t,
- 			     struct its_collection, its_build_sync_cmd)
- 
-+static void its_build_vsync_cmd(struct its_cmd_block *sync_cmd,
-+				struct its_vpe *sync_vpe)
-+{
-+	its_encode_cmd(sync_cmd, GITS_CMD_VSYNC);
-+	its_encode_vpeid(sync_cmd, sync_vpe->vpe_id);
-+
-+	its_fixup_cmd(sync_cmd);
-+}
-+
-+static BUILD_SINGLE_CMD_FUNC(its_send_single_vcommand, its_cmd_vbuilder_t,
-+			     struct its_vpe, its_build_vsync_cmd)
-+
- static void its_send_int(struct its_device *dev, u32 event_id)
- {
- 	struct its_cmd_desc desc;
-@@ -669,6 +769,33 @@ static void its_send_invall(struct its_node *its, struct its_collection *col)
- 	its_send_single_command(its, its_build_invall_cmd, &desc);
- }
- 
-+static void its_send_vmapti(struct its_device *dev, u32 id)
-+{
-+	struct its_vlpi_map *map = &dev->event_map.vlpi_maps[id];
-+	struct its_cmd_desc desc;
-+
-+	desc.its_vmapti_cmd.vpe = map->vm->vpes[map->vpe_idx];
-+	desc.its_vmapti_cmd.dev = dev;
-+	desc.its_vmapti_cmd.virt_id = map->vintid;
-+	desc.its_vmapti_cmd.event_id = id;
-+	desc.its_vmapti_cmd.db_enabled = map->db_enabled;
-+
-+	its_send_single_vcommand(dev->its, its_build_vmapti_cmd, &desc);
-+}
-+
-+static void its_send_vmovi(struct its_device *dev, u32 id)
-+{
-+	struct its_vlpi_map *map = &dev->event_map.vlpi_maps[id];
-+	struct its_cmd_desc desc;
-+
-+	desc.its_vmovi_cmd.vpe = map->vm->vpes[map->vpe_idx];
-+	desc.its_vmovi_cmd.dev = dev;
-+	desc.its_vmovi_cmd.event_id = id;
-+	desc.its_vmovi_cmd.db_enabled = map->db_enabled;
-+
-+	its_send_single_vcommand(dev->its, its_build_vmovi_cmd, &desc);
-+}
-+
- /*
-  * irqchip functions - assumes MSI, mostly.
-  */
-@@ -781,19 +908,135 @@ static int its_irq_set_irqchip_state(struct irq_data *d,
- 	return 0;
- }
- 
-+static int its_vlpi_map(struct irq_data *d, struct its_cmd_info *info)
-+{
-+	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
-+	u32 event = its_get_event_id(d);
-+	int ret = 0;
-+
-+	if (!info->map)
-+		return -EINVAL;
-+
-+	mutex_lock(&its_dev->event_map.vlpi_lock);
-+
-+	if (!its_dev->event_map.vm) {
-+		struct its_vlpi_map *maps;
-+
-+		maps = kzalloc(sizeof(*maps) * its_dev->event_map.nr_lpis,
-+			       GFP_KERNEL);
-+		if (!maps) {
-+			ret = -ENOMEM;
-+			goto out;
-+		}
-+
-+		its_dev->event_map.vm = info->map->vm;
-+		its_dev->event_map.vlpi_maps = maps;
-+	} else if (its_dev->event_map.vm != info->map->vm) {
-+		ret = -EINVAL;
-+		goto out;
-+	}
-+
-+	/* Get our private copy of the mapping information */
-+	its_dev->event_map.vlpi_maps[event] = *info->map;
-+
-+	if (irqd_is_forwarded_to_vcpu(d)) {
-+		/* Already mapped, move it around */
-+		its_send_vmovi(its_dev, event);
-+	} else {
-+		/* Drop the physical mapping */
-+		its_send_discard(its_dev, event);
-+
-+		/* and install the virtual one */
-+		its_send_vmapti(its_dev, event);
-+		irqd_set_forwarded_to_vcpu(d);
-+
-+		/* Increment the number of VLPIs */
-+		its_dev->event_map.nr_vlpis++;
-+	}
-+
-+out:
-+	mutex_unlock(&its_dev->event_map.vlpi_lock);
-+	return ret;
-+}
-+
-+static int its_vlpi_get(struct irq_data *d, struct its_cmd_info *info)
-+{
-+	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
-+	u32 event = its_get_event_id(d);
-+	int ret = 0;
-+
-+	mutex_lock(&its_dev->event_map.vlpi_lock);
-+
-+	if (!its_dev->event_map.vm ||
-+	    !its_dev->event_map.vlpi_maps[event].vm) {
-+		ret = -EINVAL;
-+		goto out;
-+	}
-+
-+	/* Copy our mapping information to the incoming request */
-+	*info->map = its_dev->event_map.vlpi_maps[event];
-+
-+out:
-+	mutex_unlock(&its_dev->event_map.vlpi_lock);
-+	return ret;
-+}
-+
-+static int its_vlpi_unmap(struct irq_data *d)
-+{
-+	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
-+	u32 event = its_get_event_id(d);
-+	int ret = 0;
-+
-+	mutex_lock(&its_dev->event_map.vlpi_lock);
-+
-+	if (!its_dev->event_map.vm || !irqd_is_forwarded_to_vcpu(d)) {
-+		ret = -EINVAL;
-+		goto out;
-+	}
-+
-+	/* Drop the virtual mapping */
-+	its_send_discard(its_dev, event);
-+
-+	/* and restore the physical one */
-+	irqd_clr_forwarded_to_vcpu(d);
-+	its_send_mapti(its_dev, d->hwirq, event);
-+	lpi_update_config(d, 0xff, (LPI_PROP_DEFAULT_PRIO |
-+				    LPI_PROP_ENABLED |
-+				    LPI_PROP_GROUP1));
-+
++	val  = virt_to_phys(page_address(vpe->vpt_page)) &
++		GENMASK_ULL(51, 16);
++	val |= GICR_VPENDBASER_RaWaWb;
++	val |= GICR_VPENDBASER_NonShareable;
 +	/*
-+	 * Drop the refcount and make the device available again if
-+	 * this was the last VLPI.
++	 * There is no good way of finding out if the pending table is
++	 * empty as we can race against the doorbell interrupt very
++	 * easily. So in the end, vpe->pending_last is only an
++	 * indication that the vcpu has something pending, not one
++	 * that the pending table is empty. A good implementation
++	 * would be able to read its coarse map pretty quickly anyway,
++	 * making this a tolerable issue.
 +	 */
-+	if (!--its_dev->event_map.nr_vlpis) {
-+		its_dev->event_map.vm = NULL;
-+		kfree(its_dev->event_map.vlpi_maps);
-+	}
-+
-+out:
-+	mutex_unlock(&its_dev->event_map.vlpi_lock);
-+	return ret;
++	val |= GICR_VPENDBASER_PendingLast;
++	val |= vpe->idai ? GICR_VPENDBASER_IDAI : 0;
++	val |= GICR_VPENDBASER_Valid;
++	gits_write_vpendbaser(val, vlpi_base + GICR_VPENDBASER);
 +}
 +
- static int its_irq_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
- {
- 	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
- 	struct its_cmd_info *info = vcpu_info;
- 
- 	/* Need a v4 ITS */
--	if (!its_dev->its->is_v4 || !info)
-+	if (!its_dev->its->is_v4)
- 		return -EINVAL;
- 
-+	/* Unmap request? */
-+	if (!info)
-+		return its_vlpi_unmap(d);
++static void its_vpe_deschedule(struct its_vpe *vpe)
++{
++	void * __iomem vlpi_base = gic_data_rdist_vlpi_base();
++	u32 count = 1000000;	/* 1s! */
++	bool clean;
++	u64 val;
 +
- 	switch (info->cmd_type) {
- 	case MAP_VLPI:
-+		return its_vlpi_map(d, info);
++	/* We're being scheduled out */
++	val = gits_read_vpendbaser(vlpi_base + GICR_VPENDBASER);
++	val &= ~GICR_VPENDBASER_Valid;
++	gits_write_vpendbaser(val, vlpi_base + GICR_VPENDBASER);
++
++	do {
++		val = gits_read_vpendbaser(vlpi_base + GICR_VPENDBASER);
++		clean = !(val & GICR_VPENDBASER_Dirty);
++		if (!clean) {
++			count--;
++			cpu_relax();
++			udelay(1);
++		}
++	} while (!clean && count);
++
++	if (unlikely(!clean && !count)) {
++		pr_err_ratelimited("ITS virtual pending table not cleaning\n");
++		vpe->idai = false;
++		vpe->pending_last = true;
++	} else {
++		vpe->idai = !!(val & GICR_VPENDBASER_IDAI);
++		vpe->pending_last = !!(val & GICR_VPENDBASER_PendingLast);
++	}
++}
++
++static int its_vpe_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
++{
++	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
++	struct its_cmd_info *info = vcpu_info;
++
++	switch (info->cmd_type) {
++	case SCHEDULE_VPE:
++		its_vpe_schedule(vpe);
++		return 0;
++
++	case DESCHEDULE_VPE:
++		its_vpe_deschedule(vpe);
++		return 0;
++
++	default:
++		return -EINVAL;
++	}
++}
++
+ static struct irq_chip its_vpe_irq_chip = {
+ 	.name			= "GICv4-vpe",
++	.irq_set_vcpu_affinity	= its_vpe_set_vcpu_affinity,
+ };
  
- 	case GET_VLPI:
-+		return its_vlpi_get(d, info);
+ static int its_vpe_id_alloc(void)
+diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+index 17ba0d732f12..6bc142cfa616 100644
+--- a/include/linux/irqchip/arm-gic-v3.h
++++ b/include/linux/irqchip/arm-gic-v3.h
+@@ -212,6 +212,64 @@
+ #define LPI_PROP_GROUP1			(1 << 1)
+ #define LPI_PROP_ENABLED		(1 << 0)
  
- 	case PROP_UPDATE_VLPI:
- 	case PROP_UPDATE_AND_INV_VLPI:
-@@ -1512,6 +1755,7 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
- 	dev->event_map.col_map = col_map;
- 	dev->event_map.lpi_base = lpi_base;
- 	dev->event_map.nr_lpis = nr_lpis;
-+	mutex_init(&dev->event_map.vlpi_lock);
- 	dev->device_id = dev_id;
- 	INIT_LIST_HEAD(&dev->entry);
- 
++/*
++ * Re-Distributor registers, offsets from VLPI_base
++ */
++#define GICR_VPROPBASER			0x0070
++
++#define GICR_VPROPBASER_IDBITS_MASK	0x1f
++
++#define GICR_VPROPBASER_SHAREABILITY_SHIFT		(10)
++#define GICR_VPROPBASER_INNER_CACHEABILITY_SHIFT	(7)
++#define GICR_VPROPBASER_OUTER_CACHEABILITY_SHIFT	(56)
++
++#define GICR_VPROPBASER_SHAREABILITY_MASK				\
++	GIC_BASER_SHAREABILITY(GICR_VPROPBASER, SHAREABILITY_MASK)
++#define GICR_VPROPBASER_INNER_CACHEABILITY_MASK				\
++	GIC_BASER_CACHEABILITY(GICR_VPROPBASER, INNER, MASK)
++#define GICR_VPROPBASER_OUTER_CACHEABILITY_MASK				\
++	GIC_BASER_CACHEABILITY(GICR_VPROPBASER, OUTER, MASK)
++#define GICR_VPROPBASER_CACHEABILITY_MASK				\
++	GICR_VPROPBASER_INNER_CACHEABILITY_MASK
++
++#define GICR_VPROPBASER_InnerShareable					\
++	GIC_BASER_SHAREABILITY(GICR_VPROPBASER, InnerShareable)
++
++#define GICR_VPROPBASER_nCnB	GIC_BASER_CACHEABILITY(GICR_VPROPBASER, INNER, nCnB)
++#define GICR_VPROPBASER_nC 	GIC_BASER_CACHEABILITY(GICR_VPROPBASER, INNER, nC)
++#define GICR_VPROPBASER_RaWt	GIC_BASER_CACHEABILITY(GICR_VPROPBASER, INNER, RaWt)
++#define GICR_VPROPBASER_RaWb	GIC_BASER_CACHEABILITY(GICR_VPROPBASER, INNER, RaWt)
++#define GICR_VPROPBASER_WaWt	GIC_BASER_CACHEABILITY(GICR_VPROPBASER, INNER, WaWt)
++#define GICR_VPROPBASER_WaWb	GIC_BASER_CACHEABILITY(GICR_VPROPBASER, INNER, WaWb)
++#define GICR_VPROPBASER_RaWaWt	GIC_BASER_CACHEABILITY(GICR_VPROPBASER, INNER, RaWaWt)
++#define GICR_VPROPBASER_RaWaWb	GIC_BASER_CACHEABILITY(GICR_VPROPBASER, INNER, RaWaWb)
++
++#define GICR_VPENDBASER			0x0078
++
++#define GICR_VPENDBASER_SHAREABILITY_SHIFT		(10)
++#define GICR_VPENDBASER_INNER_CACHEABILITY_SHIFT	(7)
++#define GICR_VPENDBASER_OUTER_CACHEABILITY_SHIFT	(56)
++#define GICR_VPENDBASER_SHAREABILITY_MASK				\
++	GIC_BASER_SHAREABILITY(GICR_VPENDBASER, SHAREABILITY_MASK)
++#define GICR_VPENDBASER_INNER_CACHEABILITY_MASK				\
++	GIC_BASER_CACHEABILITY(GICR_VPENDBASER, INNER, MASK)
++#define GICR_VPENDBASER_OUTER_CACHEABILITY_MASK				\
++	GIC_BASER_CACHEABILITY(GICR_VPENDBASER, OUTER, MASK)
++#define GICR_VPENDBASER_CACHEABILITY_MASK				\
++	GICR_VPENDBASER_INNER_CACHEABILITY_MASK
++
++#define GICR_VPENDBASER_NonShareable					\
++	GIC_BASER_SHAREABILITY(GICR_VPENDBASER, NonShareable)
++
++#define GICR_VPENDBASER_nCnB	GIC_BASER_CACHEABILITY(GICR_VPENDBASER, INNER, nCnB)
++#define GICR_VPENDBASER_nC 	GIC_BASER_CACHEABILITY(GICR_VPENDBASER, INNER, nC)
++#define GICR_VPENDBASER_RaWt	GIC_BASER_CACHEABILITY(GICR_VPENDBASER, INNER, RaWt)
++#define GICR_VPENDBASER_RaWb	GIC_BASER_CACHEABILITY(GICR_VPENDBASER, INNER, RaWt)
++#define GICR_VPENDBASER_WaWt	GIC_BASER_CACHEABILITY(GICR_VPENDBASER, INNER, WaWt)
++#define GICR_VPENDBASER_WaWb	GIC_BASER_CACHEABILITY(GICR_VPENDBASER, INNER, WaWb)
++#define GICR_VPENDBASER_RaWaWt	GIC_BASER_CACHEABILITY(GICR_VPENDBASER, INNER, RaWaWt)
++#define GICR_VPENDBASER_RaWaWb	GIC_BASER_CACHEABILITY(GICR_VPENDBASER, INNER, RaWaWb)
++
+ #define GICR_VPENDBASER_Dirty		(1ULL << 60)
+ #define GICR_VPENDBASER_PendingLast	(1ULL << 61)
+ #define GICR_VPENDBASER_IDAI		(1ULL << 62)
 -- 
 2.11.0
