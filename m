@@ -1,108 +1,95 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 51/59] KVM: arm/arm64: GICv4: Add doorbell interrupt
- handling
-Date: Mon, 31 Jul 2017 18:26:29 +0100
-Message-ID: <20170731172637.29355-52-marc.zyngier@arm.com>
+Subject: [PATCH v3 53/59] KVM: arm/arm64: GICv4: Hook vPE scheduling into vgic flush/sync
+Date: Mon, 31 Jul 2017 18:26:31 +0100
+Message-ID: <20170731172637.29355-54-marc.zyngier@arm.com>
 References: <20170731172637.29355-1-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FD8D49C55
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:27:30 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7F9KbMHm4uCv for <kvmarm@lists.cs.columbia.edu>;
- Mon, 31 Jul 2017 13:27:25 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BD9C440D1A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:27:25 -0400 (EDT)
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20170731172637.29355-1-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: linux-kernel-owner@vger.kernel.org
 To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>, Eric Auger <eric.auger@redhat.com>, Shanker Donthineni <shankerd@codeaurora.org>, Mark Rutland <mark.rutland@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When a vPE is not running, a VLPI being made pending results in a
-doorbell interrupt being delivered. Let's handle this interrupt
-and update the pending_last flag that indicates that VLPIs are
-pending. The corresponding vcpu is also kicked into action.
+The redistributor needs to be told which vPE is about to be run,
+and tells us whether there is any pending VLPI on exit.
+
+Let's add the scheduling calls to the vgic flush/sync functions,
+allowing the VLPIs to be delivered to the guest.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-v4.c | 34 ++++++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+ virt/kvm/arm/vgic/vgic-v4.c | 24 ++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic.c    |  4 ++++
+ virt/kvm/arm/vgic/vgic.h    |  1 +
+ 3 files changed, 29 insertions(+)
 
 diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
-index 534d3051a078..6af3cde6d7d4 100644
+index 50721c4e3da5..0a8deefbcf1c 100644
 --- a/virt/kvm/arm/vgic/vgic-v4.c
 +++ b/virt/kvm/arm/vgic/vgic-v4.c
-@@ -21,6 +21,19 @@
+@@ -119,6 +119,30 @@ void vgic_v4_teardown(struct kvm *kvm)
+ 	its_vm->vpes = NULL;
+ }
  
- #include "vgic.h"
- 
-+static irqreturn_t vgic_v4_doorbell_handler(int irq, void *info)
++int vgic_v4_schedule(struct kvm_vcpu *vcpu, bool on)
 +{
-+	struct kvm_vcpu *vcpu = info;
++	int irq = vcpu->arch.vgic_cpu.vgic_v3.its_vpe.irq;
 +
-+	if (!kvm_vgic_vcpu_pending_irq(vcpu)) {
-+		vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last = true;
-+		kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
-+		kvm_vcpu_kick(vcpu);
-+	}
++	if (!vgic_is_v4_capable(vcpu->kvm) || !irq)
++		return 0;
 +
-+	return IRQ_HANDLED;
-+}
++	/*
++	 * Before making the VPE resident, make sure the redistributor
++	 * expects us here.
++	 */
++	if (on) {
++		int err;
 +
- int vgic_v4_init(struct kvm *kvm)
- {
- 	struct vgic_dist *dist = &kvm->arch.vgic;
-@@ -57,16 +70,37 @@ int vgic_v4_init(struct kvm *kvm)
- 		return ret;
- 	}
- 
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		int irq = dist->its_vm.vpes[i]->irq;
-+
-+		ret = request_irq(irq, vgic_v4_doorbell_handler,
-+				  0, "vcpu", vcpu);
-+		if (ret) {
-+			kvm_err("failed to allocate vcpu IRQ%d\n", irq);
-+			dist->its_vm.nr_vpes = i;
-+			break;
++		err = irq_set_affinity(irq, cpumask_of(smp_processor_id()));
++		if (err) {
++			kvm_err("failed irq_set_affinity IRQ%d (%d)\n", irq, err);
++			return err;
 +		}
 +	}
 +
-+	if (ret)
-+		vgic_v4_teardown(kvm);
++	return its_schedule_vpe(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe, on);
++}
 +
- 	return ret;
- }
- 
- void vgic_v4_teardown(struct kvm *kvm)
+ static struct vgic_its *vgic_get_its(struct kvm *kvm,
+ 				     struct kvm_kernel_irq_routing_entry *irq_entry)
  {
- 	struct its_vm *its_vm = &kvm->arch.vgic.its_vm;
-+	int i;
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index dfac894f6f03..9ab52108989d 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -721,6 +721,8 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
  
- 	if (!its_vm->vpes)
- 		return;
- 
-+	for (i = 0; i < its_vm->nr_vpes; i++) {
-+		struct kvm_vcpu *vcpu = kvm_get_vcpu(kvm, i);
-+		free_irq(its_vm->vpes[i]->irq, vcpu);
-+	}
++	WARN_ON(vgic_v4_schedule(vcpu, false));
 +
- 	its_free_vcpu_irqs(its_vm);
- 	kfree(its_vm->vpes);
- 	its_vm->nr_vpes = 0;
+ 	/* An empty ap_list_head implies used_lrs == 0 */
+ 	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
+ 		return;
+@@ -733,6 +735,8 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+ /* Flush our emulation state into the GIC hardware before entering the guest. */
+ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+ {
++	WARN_ON(vgic_v4_schedule(vcpu, true));
++
+ 	/*
+ 	 * If there are no virtual interrupts active or pending for this
+ 	 * VCPU, then there is no work to do and we can bail out without
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index 1210bf4681dc..693b654acf4d 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -234,5 +234,6 @@ int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
+ bool vgic_is_v4_capable(struct kvm *kvm);
+ int vgic_v4_init(struct kvm *kvm);
+ void vgic_v4_teardown(struct kvm *kvm);
++int vgic_v4_schedule(struct kvm_vcpu *vcpu, bool on);
+ 
+ #endif
 -- 
 2.11.0
