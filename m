@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 07/59] irqchip/gic-v3-its: Implement irq_set_irqchip_state
- for pending state
-Date: Mon, 31 Jul 2017 18:25:45 +0100
-Message-ID: <20170731172637.29355-8-marc.zyngier@arm.com>
+Subject: [PATCH v3 05/59] irqchip/gic-v3-its: Add probing for VLPI properties
+Date: Mon, 31 Jul 2017 18:25:43 +0100
+Message-ID: <20170731172637.29355-6-marc.zyngier@arm.com>
 References: <20170731172637.29355-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8669349C32
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:25:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B8D440D16
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:25:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QAERpHNfOjtL for <kvmarm@lists.cs.columbia.edu>;
- Mon, 31 Jul 2017 13:25:45 -0400 (EDT)
+ with ESMTP id HXn714OQxG37 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 31 Jul 2017 13:25:41 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 42D5D49C2A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:25:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AD02B49C33
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:25:40 -0400 (EDT)
 In-Reply-To: <20170731172637.29355-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,132 +31,158 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Allow the pending state of an LPI to be set or cleared via
-irq_set_irqchip_state.
+Add the probing code for the ITS VLPI support. This includes
+configuring the ITS number if not supporting the single VMOVP
+command feature.
 
-Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 78 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 78 insertions(+)
+ drivers/irqchip/irq-gic-v3-its.c   | 71 +++++++++++++++++++++++++++++++++++---
+ include/linux/irqchip/arm-gic-v3.h |  5 +++
+ 2 files changed, 72 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 0f345c0fa700..3e4ac8c13e21 100644
+index ae6b2cee09fa..e7a7dc9ad585 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -167,6 +167,11 @@ struct its_cmd_desc {
- 		struct {
- 			struct its_device *dev;
- 			u32 event_id;
-+		} its_clear_cmd;
-+
-+		struct {
-+			struct its_device *dev;
-+			u32 event_id;
- 		} its_int_cmd;
- 
- 		struct {
-@@ -380,6 +385,40 @@ static struct its_collection *its_build_inv_cmd(struct its_cmd_block *cmd,
- 	return col;
- }
- 
-+static struct its_collection *its_build_int_cmd(struct its_cmd_block *cmd,
-+						struct its_cmd_desc *desc)
-+{
-+	struct its_collection *col;
-+
-+	col = dev_event_to_col(desc->its_int_cmd.dev,
-+			       desc->its_int_cmd.event_id);
-+
-+	its_encode_cmd(cmd, GITS_CMD_INT);
-+	its_encode_devid(cmd, desc->its_int_cmd.dev->device_id);
-+	its_encode_event_id(cmd, desc->its_int_cmd.event_id);
-+
-+	its_fixup_cmd(cmd);
-+
-+	return col;
-+}
-+
-+static struct its_collection *its_build_clear_cmd(struct its_cmd_block *cmd,
-+						  struct its_cmd_desc *desc)
-+{
-+	struct its_collection *col;
-+
-+	col = dev_event_to_col(desc->its_clear_cmd.dev,
-+			       desc->its_clear_cmd.event_id);
-+
-+	its_encode_cmd(cmd, GITS_CMD_CLEAR);
-+	its_encode_devid(cmd, desc->its_clear_cmd.dev->device_id);
-+	its_encode_event_id(cmd, desc->its_clear_cmd.event_id);
-+
-+	its_fixup_cmd(cmd);
-+
-+	return col;
-+}
-+
- static struct its_collection *its_build_invall_cmd(struct its_cmd_block *cmd,
- 						   struct its_cmd_desc *desc)
- {
-@@ -536,6 +575,26 @@ static void its_build_sync_cmd(struct its_cmd_block *sync_cmd,
- static BUILD_SINGLE_CMD_FUNC(its_send_single_command, its_cmd_builder_t,
- 			     struct its_collection, its_build_sync_cmd)
- 
-+static void its_send_int(struct its_device *dev, u32 event_id)
-+{
-+	struct its_cmd_desc desc;
-+
-+	desc.its_int_cmd.dev = dev;
-+	desc.its_int_cmd.event_id = event_id;
-+
-+	its_send_single_command(dev->its, its_build_int_cmd, &desc);
-+}
-+
-+static void its_send_clear(struct its_device *dev, u32 event_id)
-+{
-+	struct its_cmd_desc desc;
-+
-+	desc.its_clear_cmd.dev = dev;
-+	desc.its_clear_cmd.event_id = event_id;
-+
-+	its_send_single_command(dev->its, its_build_clear_cmd, &desc);
-+}
-+
- static void its_send_inv(struct its_device *dev, u32 event_id)
- {
- 	struct its_cmd_desc desc;
-@@ -702,6 +761,24 @@ static void its_irq_compose_msi_msg(struct irq_data *d, struct msi_msg *msg)
- 	iommu_dma_map_msi_msg(d->irq, msg);
- }
- 
-+static int its_irq_set_irqchip_state(struct irq_data *d,
-+				     enum irqchip_irq_state which,
-+				     bool state)
-+{
-+	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
-+	u32 event = its_get_event_id(d);
-+
-+	if (which != IRQCHIP_STATE_PENDING)
-+		return -EINVAL;
-+
-+	if (state)
-+		its_send_int(its_dev, event);
-+	else
-+		its_send_clear(its_dev, event);
-+
-+	return 0;
-+}
-+
- static struct irq_chip its_irq_chip = {
- 	.name			= "ITS",
- 	.irq_mask		= its_mask_irq,
-@@ -709,6 +786,7 @@ static struct irq_chip its_irq_chip = {
- 	.irq_eoi		= irq_chip_eoi_parent,
- 	.irq_set_affinity	= its_set_affinity,
- 	.irq_compose_msi_msg	= its_irq_compose_msi_msg,
-+	.irq_set_irqchip_state	= its_irq_set_irqchip_state,
+@@ -101,6 +101,7 @@ struct its_node {
+ 	u32			ite_size;
+ 	u32			device_ids;
+ 	int			numa_node;
++	bool			is_v4;
  };
  
- /*
+ #define ITS_ITT_ALIGN		SZ_256
+@@ -133,6 +134,14 @@ static DEFINE_SPINLOCK(its_lock);
+ static struct rdists *gic_rdists;
+ static struct irq_domain *its_parent;
+ 
++/*
++ * We have a maximum number of 16 ITSs in the whole system if we're
++ * using the ITSList mechanism
++ */
++#define ITS_LIST_MAX		16
++
++static unsigned long its_list_map;
++
+ #define gic_data_rdist()		(raw_cpu_ptr(gic_rdists->rdist))
+ #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
+ 
+@@ -1673,13 +1682,51 @@ static int its_init_domain(struct fwnode_handle *handle, struct its_node *its)
+ 	return 0;
+ }
+ 
++static int __init its_compute_its_list_map(struct resource *res,
++					   void __iomem *its_base)
++{
++	int its_number;
++	u32 ctlr;
++
++	/*
++	 * This is assumed to be done early enough that we're
++	 * guaranteed to be single-threaded, hence no
++	 * locking. Should this change, we should address
++	 * this.
++	 */
++	its_number = find_first_zero_bit(&its_list_map, ITS_LIST_MAX);
++	if (its_number >= ITS_LIST_MAX) {
++		pr_err("ITS@%pa: No ITSList entry available!\n",
++		       &res->start);
++		return -EINVAL;
++	}
++
++	ctlr = readl_relaxed(its_base + GITS_CTLR);
++	ctlr &= ~GITS_CTLR_ITS_NUMBER;
++	ctlr |= its_number << GITS_CTLR_ITS_NUMBER_SHIFT;
++	writel_relaxed(ctlr, its_base + GITS_CTLR);
++	ctlr = readl_relaxed(its_base + GITS_CTLR);
++	if ((ctlr & GITS_CTLR_ITS_NUMBER) != (its_number << GITS_CTLR_ITS_NUMBER_SHIFT)) {
++		its_number = ctlr & GITS_CTLR_ITS_NUMBER;
++		its_number >>= GITS_CTLR_ITS_NUMBER_SHIFT;
++	}
++
++	if (test_and_set_bit(its_number, &its_list_map)) {
++		pr_err("ITS@%pa: Duplicate ITSList entry %d\n",
++		       &res->start, its_number);
++		return -EINVAL;
++	}
++
++	return its_number;
++}
++
+ static int __init its_probe_one(struct resource *res,
+ 				struct fwnode_handle *handle, int numa_node)
+ {
+ 	struct its_node *its;
+ 	void __iomem *its_base;
+-	u32 val;
+-	u64 baser, tmp;
++	u32 val, ctlr;
++	u64 baser, tmp, typer;
+ 	int err;
+ 
+ 	its_base = ioremap(res->start, resource_size(res));
+@@ -1712,9 +1759,24 @@ static int __init its_probe_one(struct resource *res,
+ 	raw_spin_lock_init(&its->lock);
+ 	INIT_LIST_HEAD(&its->entry);
+ 	INIT_LIST_HEAD(&its->its_device_list);
++	typer = gic_read_typer(its_base + GITS_TYPER);
+ 	its->base = its_base;
+ 	its->phys_base = res->start;
+-	its->ite_size = ((gic_read_typer(its_base + GITS_TYPER) >> 4) & 0xf) + 1;
++	its->ite_size = GITS_TYPER_ITT_ENTRY_SIZE(typer);
++	its->is_v4 = !!(typer & GITS_TYPER_VLPIS);
++	if (its->is_v4) {
++		if (!(typer & GITS_TYPER_VMOVP)) {
++			err = its_compute_its_list_map(res, its_base);
++			if (err < 0)
++				goto out_free_its;
++
++			pr_info("ITS@%pa: Using ITS number %d\n",
++				&res->start, err);
++		} else {
++			pr_info("ITS@%pa: Single VMOVP capable\n", &res->start);
++		}
++	}
++
+ 	its->numa_node = numa_node;
+ 
+ 	its->cmd_base = (void *)__get_free_pages(GFP_KERNEL | __GFP_ZERO,
+@@ -1761,7 +1823,8 @@ static int __init its_probe_one(struct resource *res,
+ 	}
+ 
+ 	gits_write_cwriter(0, its->base + GITS_CWRITER);
+-	writel_relaxed(GITS_CTLR_ENABLE, its->base + GITS_CTLR);
++	ctlr = readl_relaxed(its->base + GITS_CTLR);
++	writel_relaxed(ctlr | GITS_CTLR_ENABLE, its->base + GITS_CTLR);
+ 
+ 	err = its_init_domain(handle, its);
+ 	if (err)
+diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+index 20a553423ac7..af8c55105fc2 100644
+--- a/include/linux/irqchip/arm-gic-v3.h
++++ b/include/linux/irqchip/arm-gic-v3.h
+@@ -235,15 +235,20 @@
+ #define GITS_TRANSLATER			0x10040
+ 
+ #define GITS_CTLR_ENABLE		(1U << 0)
++#define	GITS_CTLR_ITS_NUMBER_SHIFT	4
++#define	GITS_CTLR_ITS_NUMBER		(0xFU << GITS_CTLR_ITS_NUMBER_SHIFT)
+ #define GITS_CTLR_QUIESCENT		(1U << 31)
+ 
+ #define GITS_TYPER_PLPIS		(1UL << 0)
++#define GITS_TYPER_VLPIS		(1UL << 1)
+ #define GITS_TYPER_ITT_ENTRY_SIZE_SHIFT	4
++#define GITS_TYPER_ITT_ENTRY_SIZE(r)	((((r) >> GITS_TYPER_ITT_ENTRY_SIZE_SHIFT) & 0x1f) + 1)
+ #define GITS_TYPER_IDBITS_SHIFT		8
+ #define GITS_TYPER_DEVBITS_SHIFT	13
+ #define GITS_TYPER_DEVBITS(r)		((((r) >> GITS_TYPER_DEVBITS_SHIFT) & 0x1f) + 1)
+ #define GITS_TYPER_PTA			(1UL << 19)
+ #define GITS_TYPER_HWCOLLCNT_SHIFT	24
++#define GITS_TYPER_VMOVP		(1ULL << 37)
+ 
+ #define GITS_IIDR_REV_SHIFT		12
+ #define GITS_IIDR_REV_MASK		(0xf << GITS_IIDR_REV_SHIFT)
 -- 
 2.11.0
