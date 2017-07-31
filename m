@@ -1,204 +1,146 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [RFC PATCH v2 00/38] Nested Virtualization on KVM/ARM
-Date: Mon, 31 Jul 2017 15:00:54 +0200
-Message-ID: <20170731130054.GY5176@cbox>
-References: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Subject: =?utf-8?B?562U5aSNOiBbUEFUQ0ggdjQgMy8zXSBhcm02NDoga3ZtOiBpbmplY3QgU0Vy?=
+ =?utf-8?Q?ror_with_user_space_specified_syndrome?=
+Date: Mon, 31 Jul 2017 16:03:32 +0000
+Message-ID: <0184EA26B2509940AA629AE1405DD7F201548107@DGGEMA503-MBS.china.huawei.com>
+References: <0184EA26B2509940AA629AE1405DD7F2015239D8@DGGEMA503-MBS.china.huawei.com>
+ <597B527E.5040805@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Jintack Lim <jintack.lim@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, corbet@lwn.net, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, akpm@linux-foundation.org, mchehab@kernel.org, cov@codeaurora.org, daniel.lezcano@linaro.org, david.daney@cavium.com, mark.rutland@arm.com, suzuki.poulose@arm.com, stefan@hello-penguin.com, andy.gross@linaro.org, wcohen@redhat.com, ard.biesheuvel@linaro.org, shankerd@codeaurora.org, vladimir.murzin@arm.com, james.morse@arm.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3341F40FB0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 12:02:39 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id aGpYxYYDUvls for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 31 Jul 2017 12:02:38 -0400 (EDT)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F063D40D25
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 12:02:36 -0400 (EDT)
+In-Reply-To: <597B527E.5040805@arm.com>
+Content-Language: zh-CN
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: James Morse <james.morse@arm.com>
+Cc: Wuquanming <wuquanming@huawei.com>, Huangshaoyu <huangshaoyu@huawei.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Jintack,
-
-On Tue, Jul 18, 2017 at 11:58:26AM -0500, Jintack Lim wrote:
-> Nested virtualization is the ability to run a virtual machine inside another
-> virtual machine. In other words, it’s about running a hypervisor (the guest
-> hypervisor) on top of another hypervisor (the host hypervisor).
-> 
-> Supporting nested virtualization on ARM means that the hypervisor provides not
-> only EL0/EL1 execution environment to VMs as it usually does but also the
-> virtualization extensions including EL2 execution environment. Once the host
-> hypervisor provides those execution environments to the VMs, then the guest
-> hypervisor can run its own VMs (nested VMs) naturally.
-> 
-> This series supports nested virtualization on arm64. ARM recently announced an
-> extension (ARMv8.3) which has support for nested virtualization[1]. This patch
-> set is based on the ARMv8.3 specification and tested on the FastModel with
-> ARMv8.3 extension.
-> 
-> The whole patch set to support nested virtualization is huge over 70
-> patches, so I categorized them into four parts: CPU, memory, VGIC, and timer
-> virtualization. This patch series is the first part.
->  
-> CPU virtualization patch series provides basic nested virtualization framework
-> and instruction emulations including v8.1 VHE feature and v8.3 nested
-> virtualization feature for VMs.
-> 
-> This patch series again can be divided into four parts. Patch 1 to 5 introduces
-> nested virtualization by discovering hardware feature, adding a kernel
-> parameter and allowing the userspace to set the initial CPU mode to EL2.
-> 
-> Patch 6 to 25 are to support the EL2 execution environment, the virtual EL2, to
-> a VM on v8.0 architecture. We de-privilege the guest hypervisor and emulate the
-> virtual EL2 mode in EL1 using the hardware features provided by ARMv8.3; The
-> host hypervisor manages virtual EL2 register state for the guest hypervisor
-> and shadow EL1 register state that reflects the virtual EL2 register state to
-> run the guest hypervisor in EL1. 
-> 
-> Patch 26 to 33 add support for the virtual EL2 with Virtualization Host
-> Extensions. These patches emulate newly defined registers and bits in v8.1 and
-> allow the virtual EL2 to access EL2 register states via EL1 register accesses
-> as in the real EL2.
-> 
-> Patch 34 to 38 are to support for the virtual EL2 with nested virtualization.
-> These enable recursive nested virtualization.
-> 
-> This patch set is tested on the FastModel with the v8.3 extension for arm64 and
-> a cubietruck for arm32. On the FastModel, the host and the guest kernels are
-> compiled with and without VHE, so there are four combinations. I was able to
-> boot SMP Linux in the nested VM on all four configurations and able to run
-> hackbench. I also checked that regular VMs could boot when the nested
-> virtualization kernel parameter was not set. On the cubietruck, I also verified
-> that regular VMs could boot as well.
-> 
-> I'll share my experiment setup shortly.
-> 
-> Even though this work has some limitations and TODOs, I'd appreciate early
-> feedback on this RFC. Specifically, I'm interested in:
-> 
-> - Overall design to manage vcpu context for the virtual EL2
-> - Verifying correct EL2 register configurations such as HCR_EL2, CPTR_EL2
->   (Patch 30 and 32)
-> - Patch organization and coding style
-> 
-> This patch series is based on kvm/next d38338e.
-> The whole patch series including memory, VGIC, and timer patches is available
-> here:
-> 
-> git@github.com:columbia/nesting-pub.git rfc-v2
-> 
-> Limitations:
-> - There are some cases that the target exception level of a VM is ambiguous when
->   emulating eret instruction. I'm discussing this issue with Christoffer and
->   Marc. Meanwhile, I added a temporary patch (not included in this
->   series. f1beaba in the repo) and used 4.10.0 kernel when testing the guest
->   hypervisor with VHE.
-> - Recursive nested virtualization is not tested yet.
-> - Other hypervisors (such as Xen) on KVM are not tested.
-> 
-> TODO:
-> - Submit memory, VGIC, and timer patches
-> - Evaluate regular VM performance to see if there's a negative impact.
-> - Test other hypervisors such as Xen on KVM
-> - Test recursive nested virtualization
-> 
-
-I think this overall looks pretty good, and I think you can drop the RFC
-tag from the next revision, assuming the remaining patch sets for
-memory, vgic, and timers don't require some major controversial rework
-of these patches.
-
-Thanks,
--Christoffer
-
-> v1-->v2:
-> - Added support for the virtual EL2 with VHE
-> - Rewrote commit messages and comments from the perspective of supporting
->   execution environments to VMs, rather than from the perspective of the guest
->   hypervisor running in them.
-> - Fixed a few bugs to make it run on the FastModel.
-> - Tested on ARMv8.3 with four configurations. (host/guest. with/without VHE.)
-> - Rebased to kvm/next
-> 
-> [1] https://www.community.arm.com/processors/b/blog/posts/armv8-a-architecture-2016-additions
-> 
-> Christoffer Dall (7):
->   KVM: arm64: Add KVM nesting feature
->   KVM: arm64: Allow userspace to set PSR_MODE_EL2x
->   KVM: arm64: Add vcpu_mode_el2 primitive to support nesting
->   KVM: arm/arm64: Add a framework to prepare virtual EL2 execution
->   arm64: Add missing TCR hw defines
->   KVM: arm64: Create shadow EL1 registers
->   KVM: arm64: Trap EL1 VM register accesses in virtual EL2
-> 
-> Jintack Lim (31):
->   arm64: Add ARM64_HAS_NESTED_VIRT feature
->   KVM: arm/arm64: Enable nested virtualization via command-line
->   KVM: arm/arm64: Check if nested virtualization is in use
->   KVM: arm64: Add EL2 system registers to vcpu context
->   KVM: arm64: Add EL2 special registers to vcpu context
->   KVM: arm64: Add the shadow context for virtual EL2 execution
->   KVM: arm64: Set vcpu context depending on the guest exception level
->   KVM: arm64: Synchronize EL1 system registers on virtual EL2 entry and
->     exit
->   KVM: arm64: Move exception macros and enums to a common file
->   KVM: arm64: Support to inject exceptions to the virtual EL2
->   KVM: arm64: Trap SPSR_EL1, ELR_EL1 and VBAR_EL1 from virtual EL2
->   KVM: arm64: Trap CPACR_EL1 access in virtual EL2
->   KVM: arm64: Handle eret instruction traps
->   KVM: arm64: Set a handler for the system instruction traps
->   KVM: arm64: Handle PSCI call via smc from the guest
->   KVM: arm64: Inject HVC exceptions to the virtual EL2
->   KVM: arm64: Respect virtual HCR_EL2.TWX setting
->   KVM: arm64: Respect virtual CPTR_EL2.TFP setting
->   KVM: arm64: Add macros to support the virtual EL2 with VHE
->   KVM: arm64: Add EL2 registers defined in ARMv8.1 to vcpu context
->   KVM: arm64: Emulate EL12 register accesses from the virtual EL2
->   KVM: arm64: Support a VM with VHE considering EL0 of the VHE host
->   KVM: arm64: Allow the virtual EL2 to access EL2 states without trap
->   KVM: arm64: Manage the shadow states when virtual E2H bit enabled
->   KVM: arm64: Trap and emulate CPTR_EL2 accesses via CPACR_EL1 from the
->     virtual EL2 with VHE
->   KVM: arm64: Emulate appropriate VM control system registers
->   KVM: arm64: Respect the virtual HCR_EL2.NV bit setting
->   KVM: arm64: Respect the virtual HCR_EL2.NV bit setting for EL12
->     register traps
->   KVM: arm64: Respect virtual HCR_EL2.TVM and TRVM settings
->   KVM: arm64: Respect the virtual HCR_EL2.NV1 bit setting
->   KVM: arm64: Respect the virtual CPTR_EL2.TCPAC setting
-> 
->  Documentation/admin-guide/kernel-parameters.txt |   4 +
->  arch/arm/include/asm/kvm_emulate.h              |  17 ++
->  arch/arm/include/asm/kvm_host.h                 |  15 +
->  arch/arm64/include/asm/cpucaps.h                |   3 +-
->  arch/arm64/include/asm/esr.h                    |   1 +
->  arch/arm64/include/asm/kvm_arm.h                |   2 +
->  arch/arm64/include/asm/kvm_coproc.h             |   3 +-
->  arch/arm64/include/asm/kvm_emulate.h            |  56 ++++
->  arch/arm64/include/asm/kvm_host.h               |  64 ++++-
->  arch/arm64/include/asm/kvm_hyp.h                |  24 --
->  arch/arm64/include/asm/pgtable-hwdef.h          |   6 +
->  arch/arm64/include/asm/sysreg.h                 |  70 +++++
->  arch/arm64/include/uapi/asm/kvm.h               |   1 +
->  arch/arm64/kernel/asm-offsets.c                 |   1 +
->  arch/arm64/kernel/cpufeature.c                  |  11 +
->  arch/arm64/kvm/Makefile                         |   5 +-
->  arch/arm64/kvm/context.c                        | 346 +++++++++++++++++++++++
->  arch/arm64/kvm/emulate-nested.c                 |  83 ++++++
->  arch/arm64/kvm/guest.c                          |   2 +
->  arch/arm64/kvm/handle_exit.c                    |  89 +++++-
->  arch/arm64/kvm/hyp/entry.S                      |  13 +
->  arch/arm64/kvm/hyp/hyp-entry.S                  |   2 +-
->  arch/arm64/kvm/hyp/switch.c                     |  33 ++-
->  arch/arm64/kvm/hyp/sysreg-sr.c                  | 117 ++++----
->  arch/arm64/kvm/inject_fault.c                   |  12 -
->  arch/arm64/kvm/nested.c                         |  63 +++++
->  arch/arm64/kvm/reset.c                          |   8 +
->  arch/arm64/kvm/sys_regs.c                       | 359 +++++++++++++++++++++++-
->  arch/arm64/kvm/sys_regs.h                       |   8 +
->  arch/arm64/kvm/trace.h                          |  43 ++-
->  virt/kvm/arm/arm.c                              |  20 ++
->  31 files changed, 1363 insertions(+), 118 deletions(-)
->  create mode 100644 arch/arm64/kvm/context.c
->  create mode 100644 arch/arm64/kvm/emulate-nested.c
->  create mode 100644 arch/arm64/kvm/nested.c
-> 
-> -- 
-> 1.9.1
-> 
+SGkgSmFtZXMuDQogICBZb3UgYXJlIHJpZ2h0LiBGb3IgdGhlIFNFSSBjYXNlLCB0aGUgRVNSX0VM
+MSBtYXkgbm90IG5lZWQgdG8gcmVmZXIgdG8gRVNSX0VMMidzIHZhbHVlLiANCiAgIEJ1dCBmb3Ig
+dGhlIFNFQSBjYXNlLCB0aGUgRVNSX0VMMSBtYXkgbmVlZCB0byByZWZlciB0byBFU1JfRUwyJ3Mg
+dmFsdWUuDQogICBGb3IgZXhhbXBsZSwgdGhlIDE2Yml0LzMyYml0IGluc3RydWN0aW9uLWxlbmd0
+aCwgaXQgbWF5IG5lZWRzIHRvIGNoZWNrIHRoZSBFU1JfRUwyJ3MgYml0IDI1Lg0KICAgQmVjYXVz
+ZSB3aGVuIGhhcHBlbiBTRUEsIGl0IGp1bXAgdG8gU0VBIHZlY3RvciB0YWJsZSBlbnRyeSBieSBz
+b2Z0d2FyZSggYWZ0ZXIgc2V0dGluZyB0aGUgZWxyX2VsMiBhbmQgZXNyX2VsMiwgYW5kIHVzZSBl
+cmV0IGluc3RydWN0aW9uIHRvIGp1bXAgdG8gdGhlIFNFQSB2ZWN0b3IgdGFibGUgKSwgbm90IGJ5
+IGhhcmR3YXJlKHN1Y2ggYXMgdmlydHVhbCBTRUkpIA0KDQo+IA0KPiBIaSBnZW5nZG9uZ2ppdSwN
+Cj4gDQo+IE9uIDI0LzA3LzE3IDE2OjI0LCBnZW5nZG9uZ2ppdSB3cm90ZToNCj4gPiBGcm9tIGFi
+b3ZlIGRlc2NyaXB0aW9uLCBpbiB0aGUgZmlybXdhcmUtZmlyc3QgUkFTIHNvbHV0aW9uLCBVRUZJ
+IGNvcHkNCj4gPiB0aGUNCj4gPiBFU1JfRUwzIHRvIHRoZSBFU1JfRUwyLA0KPiANCj4gVUVGSSBh
+dCBFTDM/IERvIHlvdSBtZWFuIEFURj8gb3Igc29tZSBjb21wb25lbnQgb2YgVUVGSSB0aGF0IGdv
+dCBsb2FkZWQgaW50byBzZWN1cmUtd29ybGQgdG8gZG8gdGhlIENQRVIgcmVjb3JkIGdlbmVyYXRp
+b24/DQpVRUZJIGlzIGZpcm13YXJlLiBXaGljaCBpcyBhdCBFTDMuIFllcywgaXQgaXMgQVRGLg0K
+DQo+IA0KPiANCj4gPiBkbyB5b3UgYWdyZWUgRUwyIHJlZmVyIHRvIHRoZSBFU1JfRUwyIHZhbHVl
+IHRvIHNldCB0aGUgRVNSX0VMMSB2YWx1ZQ0KPiA+IHdoZW4gaW5qZWN0IHRoZSBhYm9ydD8NCj4g
+DQo+IFJlZmVyLXRvOiB5ZXMuIEl0IG5lZWRzIHRvIGhvbm91ciBhbnkgYml0cyB0aGF0IGFyZSBw
+YXJ0IG9mIHRoZSBndWVzdCBzdGF0ZSB0aGF0IG1heSBiZSByZXByZXNlbnRlZCBpbiB0aGUgRVNS
+Lg0KPiANCj4gVGhpcyBpcyB3aGF0IHlvdXIgS1ZNIGV4YW1wbGUgaXMgZG9pbmcsIGJ1dCB0aGlz
+IGlzIGEgcHJldHR5IGFyY2FuZSBwYXRoOiBJZiBvbiB0aGUgMzJiaXQga2VybmVsLCB3ZSByZWFk
+L3dyaXRlIG9yIGV4ZWN1dGUgZnJvbSBhbiBhZGRyZXNzDQo+IHdob3NlIHN0YWdlIDEgcGFnZS10
+YWJsZS13YWxrIHdhbGtzIHRocm91Z2ggYSBzdGFnZSAyIG1hcHBpbmcgdGhhdCBpcyBtYXJrZWQg
+YXMgZGV2aWNlIG1lbW9yeSwgdGhlbiB3ZSByZXBvcnQgdGhpcyBhcyBhbg0KPiBpbnN0cnVjdGlv
+bi9kYXRhIGFib3J0IHRvIHRoZSBndWVzdCwgaW5zdGVhZCBvZiByZXNvbHZpbmcgdGhlIHN0YWdl
+MiBtYXBwaW5nLg0KWWVzLCBvbmx5IHJlcG9ydCB0aGUgaW5zdHJ1Y3Rpb24vZGF0YSBhYm9ydCB0
+byB0aGUgZ3Vlc3QgY2FuIGJlIGVub3VnaC4NCg0KDQo+IA0KPiBJbiB0aGlzIGNhc2Ugd2UgcHJl
+c2VydmUgdGhlIDE2Yml0LzMyYml0IGluc3RydWN0aW9uLWxlbmd0aCB2YWx1ZSByZXBvcnRlZCBp
+biB0aGUgRVNSIGFzIGl0cyBwYXJ0IG9mIHRoZSBndWVzdCBzdGF0ZSB0aGF0IHdvdWxkIGhhdmUg
+YmVlbg0KPiByZXBvcnRlZCBpZiB0aGUNCj4gc3RhZ2UxIGZhdWx0IHdlcmUgZGVsaXZlcmVkIGRp
+cmVjdGx5Lg0KDQpGb3IgdGhlIFNFSSBjYXNlLCB0aGUgMTZiaXQvMzJiaXQgaW5zdHJ1Y3Rpb24t
+bGVuZ3RoIGRvZXMgbm90IG5lZWQgdG8gcGFzc2VkLg0KQnV0IGZvciB0aGUgU0VBLCB0aGUgMTZi
+aXQvMzJiaXQgaW5zdHJ1Y3Rpb24tbGVuZ3RoIHZhbHVlIG1heSBiZSBuZWVkIHRvIHBhc3MsIGFz
+IHlvdSBzZWUgYmVsb3cuIEl0IGNoZWNrKGlmIChrdm1fdmNwdV90cmFwX2lsX2lzMzJiaXQodmNw
+dSkpICkgYW5kIHBhc3MgdGhlIEVTUl9FTHhfSUwNCg0KDQpzdGF0aWMgdm9pZCBpbmplY3RfYWJ0
+NjQoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBib29sIGlzX2lhYnQsIHVuc2lnbmVkIGxvbmcgYWRk
+cikNCnsNCgl1bnNpZ25lZCBsb25nIGNwc3IgPSAqdmNwdV9jcHNyKHZjcHUpOw0KCWJvb2wgaXNf
+YWFyY2gzMiA9IHZjcHVfbW9kZV9pc18zMmJpdCh2Y3B1KTsNCgl1MzIgZXNyID0gMDsNCg0KCSp2
+Y3B1X2Vscl9lbDEodmNwdSkgPSAqdmNwdV9wYyh2Y3B1KTsNCgkqdmNwdV9wYyh2Y3B1KSA9IGdl
+dF9leGNlcHRfdmVjdG9yKHZjcHUsIGV4Y2VwdF90eXBlX3N5bmMpOw0KDQoJKnZjcHVfY3Bzcih2
+Y3B1KSA9IFBTVEFURV9GQVVMVF9CSVRTXzY0Ow0KCSp2Y3B1X3Nwc3IodmNwdSkgPSBjcHNyOw0K
+DQoJdmNwdV9zeXNfcmVnKHZjcHUsIEZBUl9FTDEpID0gYWRkcjsNCg0KCS8qDQoJICogQnVpbGQg
+YW4ge2ksZH1hYm9ydCwgZGVwZW5kaW5nIG9uIHRoZSBsZXZlbCBhbmQgdGhlDQoJICogaW5zdHJ1
+Y3Rpb24gc2V0LiBSZXBvcnQgYW4gZXh0ZXJuYWwgc3luY2hyb25vdXMgYWJvcnQuDQoJICovDQoJ
+aWYgKGt2bV92Y3B1X3RyYXBfaWxfaXMzMmJpdCh2Y3B1KSkNCgkJZXNyIHw9IEVTUl9FTHhfSUw7
+DQoNCgkuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4u
+Li4uLi4uLi4uLi4uLi4uLi4uLg0KfQ0KDQo+IA0KPiANCj4gSXMgaXQgdmFsaWQgdG8gcGFzcyB2
+YWx1ZXMgZnJvbSBhIGhvc3QgU0Vycm9yIGludG8gYSBndWVzdD8NCkRvIHlvdSBtZWFuIHBhc3Mg
+dGhlIEVTUiB2YWx1ZSBmcm9tIGhvc3QgdG8gZ3Vlc3Q/DQpBbmQgZG8geW91IG1lYW4gd2Ugc2hv
+dWxkIG5vdCBwYXNzIEVTUiB2YWx1ZSB3aGVuIGluamVjdCB0aGUgU0VJPw0KDQo+IEZvciBSQVMg
+b24gTGludXgrS1ZNLCBJIGRvbid0IHRoaW5rIHRoaXMgaXMgdGhlIHJpZ2h0IHRoaW5nIHRvIGRv
+LiBJZiB3ZSByZWNlaXZlIGEgUkFTIGV2ZW50LCB0aGUgaG9zdCBtdXN0IGNvbXBsZXRlbHkgcHJv
+Y2VzcyB0aGUgZXJyb3IgYW5kDQo+IG5vdGlmeSBhbnkgaW4ta2VybmVsIHVzZXJzIGFuZCB1c2Vy
+c3BhY2UuDQpJIGFncmVlLCBzbyBkZWxpdmVyIHNpZ25hbCB0byB1c2VyIHNwYWNlIHN1Y2ggYXMg
+UUVNVSBpcyB0aHJvdWdoIG1lbW9yeSBmYWlsdXJlIGZvciBTRUk/IE1heSBiZSB0aGlzIGNhbiBh
+bHNvIHN1aXRhYmxlIHRvIG5vLUtWTSBjYXNlLg0KDQoNCj4gS1ZNIHNob3VsZG4ndCBhc3N1bWUg
+YW4gU0Vycm9yIGlzIGEgZmlybXdhcmUtZmlyc3Qgbm90aWZpY2F0aW9uIGFuZCB0aGF0IGl0IHNo
+b3VsZCBwYXNzIHRoZSBzYW1lIG5vdGlmaWNhdGlvbiBpbnRvIHRoZSBndWVzdC4NCiJpdCBzaG91
+bGQgcGFzcyB0aGUgc2FtZSBub3RpZmljYXRpb24gaW50byB0aGUgZ3Vlc3QiLS0tLS0tLXdoYXQg
+aXMgdGhlIG1lYW4gb2YgdGhlIG5vdGlmaWNhdGlvbj8NCg0KPiANCj4gV2UgbmVlZCB0byB0aGlu
+ayBvZiBTRXJyb3IgKHdoaWNoIG1heSBiZSB0aGUgdW4tc3luY2hyb25pemFibGUga2luZCBmcm9t
+IGEgZGV2aWNlKSwgc2VwYXJhdGVseSBmcm9tIFNFSSBhcyBhIEFQRUkgbm90aWZpY2F0aW9uLiBF
+dmVuIGZvcg0KPiBkZXZpY2UgcGFzcy10aHJvdWdoIGZpcm13YXJlLWZpcnN0IGVycm9ycyBtYXkg
+YmUgcmVwb3J0ZWQgYnkgYW5vdGhlciBub3RpZmljYXRpb24gbWV0aG9kLiBXZSBzaG91bGRuJ3Qg
+ZHVwbGljYXRlIG9yIGJyZWFrIHRoZQ0KPiBmdW5jdGlvbmFsaXR5IGJlY2F1c2UgdGhlIGVycm9y
+IHdhc24ndCByZXBvcnRlZCBieSBTRUkuDQoNCj4gDQo+IEkgYWdyZWUgZGV2aWNlIHBhc3MtdGhy
+b3VnaCBpcyBhIHNwZWNpYWwgY2FzZSB3aGVyZSBLVk0gaXMgbW9yZSBsaWtlIGFuIGluLWtlcm5l
+bCB1c2VyIG9mIHRoZSBkZXZpY2UuIEluIHRoaXMgY2FzZSBJIHRoaW5rIHdlIG5lZWQgdGhlIGhv
+c3Qncw0KPiBkZXZpY2UgZHJpdmVyLCAodGhlcmUgbXVzdCBiZSBvbmUsIHRvIGF0IGxlYXN0IHJl
+c2V0IHRoZSBkZXZpY2UpIHRvIGNoZWNrIHRoYXQgdGhpcyBSQVMgZXZlbnQgaGFzbid0IGJyb2tl
+biB0aGUgZGV2aWNlJ3MgaXNvbGF0aW9uLiBJcyBpdCBzdGlsbA0KPiBzYWZlIGZvciB0aGUgZ3Vl
+c3QgdG8gYWNjZXNzPw0KPiBlLmcuIFdpdGggUENJZSBhIFZpcnR1YWwtRnVuY3Rpb24gdXNpbmcg
+U1ItSU9WIG1heSBoYXZlIGhhZCBpdHMgQkFScyBjb3JydXB0ZWQuDQo+IEFsbG93aW5nIGEgZ3Vl
+c3QgdG8gdG91Y2ggdGhpcyBkZXZpY2UgY291bGQgY29tcHJvbWlzZSBhbm90aGVyIGd1ZXN0LCBv
+ciB0aGUgaG9zdC4NCj4gDQo+IFRoZSBTRXJyb3IgRVNSIGNvbnRhaW5zIGltcGxlbWVudGF0aW9u
+LWRlZmluZWQgYml0cy4gSSdtIGFnYWluc3QgZ2l2aW5nIHRoZXNlIGJpdHMgdG8gdXNlci1zcGFj
+ZSBhcyB3ZSBkb24ndCBrbm93IHdoYXQgdGhleSBtZWFuLiBLVk0NCj4gd2FudHMgdG8gcHJvdmlk
+ZSBhbiBhYnN0cmFjdCBtYWNoaW5lLCB3aGljaCB3ZSBjYW4gbWlncmF0ZWQgYmV0d2VlbiBob3N0
+cyBydW5uaW5nIG9uIGRpZmZlcmVudCB2ZW5kb3JzIHBsYXRmb3Jtcy4gV2l0aCB2OC4yIFNFcnJv
+cnMgYXJlDQo+IGVpdGhlciB0aGUgdmFuaWxsYSBkZXZpY2Uga2luZCwgdGhlc2Ugb25seSBoYXZl
+IGFuIGltcGxlbWVudGF0aW9uLWRlZmluZWQgRVNSLCB3ZSBzaG91bGRuJ3QgZ2l2ZSB0aGlzIHRv
+IHVzZXIgc3BhY2UsIG9yIFJBUyBlcnJvcnMsIHdlDQo+IHNob3VsZG4ndCBnaXZlIHRoZXNlIHRv
+IHVzZXIgc3BhY2UgZWl0aGVyIGFzIGNvZGUgdXNpbmcgdGhpcyB2YWx1ZSB3b24ndCB3b3JrIGlm
+IHRoZSBBUEVJIG5vdGlmaWNhdGlvbiBtZXRob2QgaXNuJ3QgU0VJLg0KDQoNClNFQSBFU1LvvJow
+eDkyMDAwNDEwDQpTRUkgRVNS77yaIDB4YmYwMDAwMDYNCkFzIHNob3duIGFib3ZlLCBGb3IgZXhh
+bXBsZSwgd2hlbiBoYXBwZW4gU0VBLCB0aGUgRVNSIHZhbHVlIGlzIDB4OTIwMDA0MTA7ICB3aGVu
+IGhhcHBlbiBTRUksIHRoZSBFU1IgdmFsdWUgaXMgMHhiZjAwMDAwNi4NClNvIGZvciBhYm92ZSB0
+d28gY2FzZXMsIEkgd2FudCB0byBjb25zdWx0IHdpdGggeW91IHdoYXQgaXMgdGhlIEVTUiB2YWx1
+ZSBkbyB5b3Ugc3VnZ2VzdGVkIHRvIHBhc3NlZCB0byB0aGUgZ3Vlc3QgT1MgZm9yIGFib3ZlIFNF
+QSBhbmQgU0VJID8NCg0KDQo+IA0KPiANCj4gVGhlIHZlcnNpb24gb2YgdGhlIFJBUyBzcGVjIHlv
+dSByZWZlciB0byBoZXJlIGlzIGZvciBwYXJ0bmVycyBpbXBsZW1lbnRpbmcgQ1BVcywgaXQgZGVz
+Y3JpYmVzIHdoYXQgc29mdHdhcmUgbWlnaHQgZG8sIHNvIHRoYXQgdGhlIENQVQ0KPiB3b3JrcyB3
+ZWxsIGZvciBkaWZmZXJlbnQgY3VycmVudCAoYW5kIGZ1dHVyZSkgb3BlcmF0aW5nIHN5c3RlbXMu
+IEl0IGlzbid0IGEgZ3VpZGUgdG8gd2hhdCBhbGwgc29mdHdhcmUgc2hvdWxkIGRvLg0KPiANCj4g
+Pj4gVmFyaWFudDogYXN5bmNocm9ub3VzIEV4dGVybmFsIEFib3J0IHdpdGggZGVsZWdhdGVkIGV4
+Y2VwdGlvbg0KPiA+PiBoYW5kbGluZyBUaGUgZXhhbXBsZSBhYm92ZSByZXF1aXJlcyB0aGUgaHlw
+ZXJ2aXNvciB0byBrbm93IHRoYXQgaXQgY2FuIGRlbGVnYXRlIHRoZSBlcnJvciBleGNlcHRpb24g
+dG8gdGhlIE9TIHVzaW5nIGEgdmlydHVhbCBlcnJvcg0KPiBpbnRlcnJ1cHQuDQo+IA0KPiBXZSBk
+b24ndCBoYXZlIGRlbGVnYXRlZCBleGNlcHRpb24gaGFuZGxpbmcuIFRoZSBob3N0IG1heS1vci1t
+YXktbm90IGhhdmUgYW4gU0VBL1NFSSBHSEVTIG5vdGlmaWNhdGlvbiwgdGhlIGd1ZXN0IG1heS1v
+ci1tYXktbm90IGhhdmUgYQ0KPiBTRUEvU0VJIEdIRVMgbm90aWZpY2F0aW9uLg0KPiANCj4gDQo+
+IA0KPiBUaGFua3MsDQo+IA0KPiBKYW1lcw0KPiBJTVBPUlRBTlQgTk9USUNFOiBUaGUgY29udGVu
+dHMgb2YgdGhpcyBlbWFpbCBhbmQgYW55IGF0dGFjaG1lbnRzIGFyZSBjb25maWRlbnRpYWwgYW5k
+IG1heSBhbHNvIGJlIHByaXZpbGVnZWQuIElmIHlvdSBhcmUgbm90IHRoZQ0KPiBpbnRlbmRlZCBy
+ZWNpcGllbnQsIHBsZWFzZSBub3RpZnkgdGhlIHNlbmRlciBpbW1lZGlhdGVseSBhbmQgZG8gbm90
+IGRpc2Nsb3NlIHRoZSBjb250ZW50cyB0byBhbnkgb3RoZXIgcGVyc29uLCB1c2UgaXQgZm9yIGFu
+eSBwdXJwb3NlLCBvcg0KPiBzdG9yZSBvciBjb3B5IHRoZSBpbmZvcm1hdGlvbiBpbiBhbnkgbWVk
+aXVtLiBUaGFuayB5b3UuDQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUK
+aHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
