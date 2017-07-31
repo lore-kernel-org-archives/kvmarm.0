@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 04/59] irqchip/gic-v3-its: Move LPI definitions around
-Date: Mon, 31 Jul 2017 18:25:42 +0100
-Message-ID: <20170731172637.29355-5-marc.zyngier@arm.com>
+Subject: [PATCH v3 02/59] irqchip/gic-v3: Add redistributor iterator
+Date: Mon, 31 Jul 2017 18:25:40 +0100
+Message-ID: <20170731172637.29355-3-marc.zyngier@arm.com>
 References: <20170731172637.29355-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CD4449C32
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:25:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2723940D25
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:25:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xszM7fctTu5V for <kvmarm@lists.cs.columbia.edu>;
- Mon, 31 Jul 2017 13:25:39 -0400 (EDT)
+ with ESMTP id is55hHeYc3qX for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 31 Jul 2017 13:25:34 -0400 (EDT)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6850849C3E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:25:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D278440D43
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:25:33 -0400 (EDT)
 In-Reply-To: <20170731172637.29355-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,66 +31,117 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The various LPI definitions are in the middle of the code, and
-would be better placed at the beginning, given that we're going
-to use some of them much earlier.
+In order to discover the VLPI properties, we need to iterate over
+the redistributor regions. As we already have code that does this,
+let's factor it out and make it slightly more generic.
 
 Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 25 +++++++++++++------------
- 1 file changed, 13 insertions(+), 12 deletions(-)
+ drivers/irqchip/irq-gic-v3.c | 69 ++++++++++++++++++++++++++++++--------------
+ 1 file changed, 47 insertions(+), 22 deletions(-)
 
-diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 68932873eebc..ae6b2cee09fa 100644
---- a/drivers/irqchip/irq-gic-v3-its.c
-+++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -48,6 +48,19 @@
- 
- #define RDIST_FLAGS_PROPBASE_NEEDS_FLUSHING	(1 << 0)
- 
-+static u32 lpi_id_bits;
-+
-+/*
-+ * We allocate memory for PROPBASE to cover 2 ^ lpi_id_bits LPIs to
-+ * deal with (one configuration byte per interrupt). PENDBASE has to
-+ * be 64kB aligned (one bit per LPI, plus 8192 bits for SPI/PPI/SGI).
-+ */
-+#define LPI_NRBITS		lpi_id_bits
-+#define LPI_PROPBASE_SZ		ALIGN(BIT(LPI_NRBITS), SZ_64K)
-+#define LPI_PENDBASE_SZ		ALIGN(BIT(LPI_NRBITS) / 8, SZ_64K)
-+
-+#define LPI_PROP_DEFAULT_PRIO	0xa0
-+
- /*
-  * Collection structure - just an ID, and a redistributor address to
-  * ping. We use one per CPU as a bag of interrupts assigned to this
-@@ -695,7 +708,6 @@ static struct irq_chip its_irq_chip = {
- 
- static unsigned long *lpi_bitmap;
- static u32 lpi_chunks;
--static u32 lpi_id_bits;
- static DEFINE_SPINLOCK(lpi_lock);
- 
- static int its_lpi_to_chunk(int lpi)
-@@ -790,17 +802,6 @@ static void its_lpi_free(struct event_lpi_map *map)
- 	kfree(map->col_map);
+diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+index dbffb7ab6203..640f621c7f75 100644
+--- a/drivers/irqchip/irq-gic-v3.c
++++ b/drivers/irqchip/irq-gic-v3.c
+@@ -421,24 +421,14 @@ static void __init gic_dist_init(void)
+ 		gic_write_irouter(affinity, base + GICD_IROUTER + i * 8);
  }
  
--/*
-- * We allocate memory for PROPBASE to cover 2 ^ lpi_id_bits LPIs to
-- * deal with (one configuration byte per interrupt). PENDBASE has to
-- * be 64kB aligned (one bit per LPI, plus 8192 bits for SPI/PPI/SGI).
-- */
--#define LPI_NRBITS		lpi_id_bits
--#define LPI_PROPBASE_SZ		ALIGN(BIT(LPI_NRBITS), SZ_64K)
--#define LPI_PENDBASE_SZ		ALIGN(BIT(LPI_NRBITS) / 8, SZ_64K)
--
--#define LPI_PROP_DEFAULT_PRIO	0xa0
--
- static int __init its_alloc_lpi_tables(void)
+-static int gic_populate_rdist(void)
++static int gic_iterate_rdists(int (*fn)(struct redist_region *, void __iomem *))
  {
- 	phys_addr_t paddr;
+-	unsigned long mpidr = cpu_logical_map(smp_processor_id());
+-	u64 typer;
+-	u32 aff;
++	int ret = -ENODEV;
+ 	int i;
+ 
+-	/*
+-	 * Convert affinity to a 32bit value that can be matched to
+-	 * GICR_TYPER bits [63:32].
+-	 */
+-	aff = (MPIDR_AFFINITY_LEVEL(mpidr, 3) << 24 |
+-	       MPIDR_AFFINITY_LEVEL(mpidr, 2) << 16 |
+-	       MPIDR_AFFINITY_LEVEL(mpidr, 1) << 8 |
+-	       MPIDR_AFFINITY_LEVEL(mpidr, 0));
+-
+ 	for (i = 0; i < gic_data.nr_redist_regions; i++) {
+ 		void __iomem *ptr = gic_data.redist_regions[i].redist_base;
++		u64 typer;
+ 		u32 reg;
+ 
+ 		reg = readl_relaxed(ptr + GICR_PIDR2) & GIC_PIDR2_ARCH_MASK;
+@@ -450,15 +440,9 @@ static int gic_populate_rdist(void)
+ 
+ 		do {
+ 			typer = gic_read_typer(ptr + GICR_TYPER);
+-			if ((typer >> 32) == aff) {
+-				u64 offset = ptr - gic_data.redist_regions[i].redist_base;
+-				gic_data_rdist_rd_base() = ptr;
+-				gic_data_rdist()->phys_base = gic_data.redist_regions[i].phys_base + offset;
+-				pr_info("CPU%d: found redistributor %lx region %d:%pa\n",
+-					smp_processor_id(), mpidr, i,
+-					&gic_data_rdist()->phys_base);
++			ret = fn(gic_data.redist_regions + i, ptr);
++			if (!ret)
+ 				return 0;
+-			}
+ 
+ 			if (gic_data.redist_regions[i].single_redist)
+ 				break;
+@@ -473,9 +457,50 @@ static int gic_populate_rdist(void)
+ 		} while (!(typer & GICR_TYPER_LAST));
+ 	}
+ 
++	return ret ? -ENODEV : 0;
++}
++
++static int __gic_populate_rdist(struct redist_region *region, void __iomem *ptr)
++{
++	unsigned long mpidr = cpu_logical_map(smp_processor_id());
++	u64 typer;
++	u32 aff;
++
++	/*
++	 * Convert affinity to a 32bit value that can be matched to
++	 * GICR_TYPER bits [63:32].
++	 */
++	aff = (MPIDR_AFFINITY_LEVEL(mpidr, 3) << 24 |
++	       MPIDR_AFFINITY_LEVEL(mpidr, 2) << 16 |
++	       MPIDR_AFFINITY_LEVEL(mpidr, 1) << 8 |
++	       MPIDR_AFFINITY_LEVEL(mpidr, 0));
++
++	typer = gic_read_typer(ptr + GICR_TYPER);
++	if ((typer >> 32) == aff) {
++		u64 offset = ptr - region->redist_base;
++		gic_data_rdist_rd_base() = ptr;
++		gic_data_rdist()->phys_base = region->phys_base + offset;
++
++		pr_info("CPU%d: found redistributor %lx region %d:%pa\n",
++			smp_processor_id(), mpidr,
++			(int)(region - gic_data.redist_regions),
++			&gic_data_rdist()->phys_base);
++		return 0;
++	}
++
++	/* Try next one */
++	return 1;
++}
++
++static int gic_populate_rdist(void)
++{
++	if (gic_iterate_rdists(__gic_populate_rdist) == 0)
++		return 0;
++
+ 	/* We couldn't even deal with ourselves... */
+ 	WARN(true, "CPU%d: mpidr %lx has no re-distributor!\n",
+-	     smp_processor_id(), mpidr);
++	     smp_processor_id(),
++	     (unsigned long)cpu_logical_map(smp_processor_id()));
+ 	return -ENODEV;
+ }
+ 
 -- 
 2.11.0
