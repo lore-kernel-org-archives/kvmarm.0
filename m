@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 05/59] irqchip/gic-v3-its: Add probing for VLPI properties
-Date: Mon, 31 Jul 2017 18:25:43 +0100
-Message-ID: <20170731172637.29355-6-marc.zyngier@arm.com>
+Subject: [PATCH v3 06/59] irqchip/gic-v3-its: Macro-ize its_send_single_command
+Date: Mon, 31 Jul 2017 18:25:44 +0100
+Message-ID: <20170731172637.29355-7-marc.zyngier@arm.com>
 References: <20170731172637.29355-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B8D440D16
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:25:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5919E40D1A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:25:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HXn714OQxG37 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 31 Jul 2017 13:25:41 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AD02B49C33
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:25:40 -0400 (EDT)
+ with ESMTP id YDEBFVT52mmq for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 31 Jul 2017 13:25:43 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EF6DD49C2C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Jul 2017 13:25:42 -0400 (EDT)
 In-Reply-To: <20170731172637.29355-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,158 +31,121 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add the probing code for the ITS VLPI support. This includes
-configuring the ITS number if not supporting the single VMOVP
-command feature.
+Most ITS commands do operate on a collection object, and require
+a SYNC command to be performed on that collection in order to
+guarantee the execution of the first command.
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+With GICv4 ITS, another set of commands perform similar operations
+on a VPE object, and a VSYNC operations must be executed to guarantee
+their execution.
+
+Given the similarities (post a command, perform a synchronization
+operation on a sync object), it makes sense to reuse the same
+mechanism for both class of commands.
+
+Let's start with turning its_send_single_command into a huge macro
+that performs the bulk of the work, and a set of helpers that
+make this macro usable for the GICv3 ITS commands.
+
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/irqchip/irq-gic-v3-its.c   | 71 +++++++++++++++++++++++++++++++++++---
- include/linux/irqchip/arm-gic-v3.h |  5 +++
- 2 files changed, 72 insertions(+), 4 deletions(-)
+ drivers/irqchip/irq-gic-v3-its.c | 84 ++++++++++++++++++++++------------------
+ 1 file changed, 47 insertions(+), 37 deletions(-)
 
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index ae6b2cee09fa..e7a7dc9ad585 100644
+index e7a7dc9ad585..0f345c0fa700 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -101,6 +101,7 @@ struct its_node {
- 	u32			ite_size;
- 	u32			device_ids;
- 	int			numa_node;
-+	bool			is_v4;
- };
- 
- #define ITS_ITT_ALIGN		SZ_256
-@@ -133,6 +134,14 @@ static DEFINE_SPINLOCK(its_lock);
- static struct rdists *gic_rdists;
- static struct irq_domain *its_parent;
- 
-+/*
-+ * We have a maximum number of 16 ITSs in the whole system if we're
-+ * using the ITSList mechanism
-+ */
-+#define ITS_LIST_MAX		16
-+
-+static unsigned long its_list_map;
-+
- #define gic_data_rdist()		(raw_cpu_ptr(gic_rdists->rdist))
- #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
- 
-@@ -1673,13 +1682,51 @@ static int its_init_domain(struct fwnode_handle *handle, struct its_node *its)
- 	return 0;
+@@ -488,43 +488,53 @@ static void its_wait_for_range_completion(struct its_node *its,
+ 	}
  }
  
-+static int __init its_compute_its_list_map(struct resource *res,
-+					   void __iomem *its_base)
-+{
-+	int its_number;
-+	u32 ctlr;
-+
-+	/*
-+	 * This is assumed to be done early enough that we're
-+	 * guaranteed to be single-threaded, hence no
-+	 * locking. Should this change, we should address
-+	 * this.
-+	 */
-+	its_number = find_first_zero_bit(&its_list_map, ITS_LIST_MAX);
-+	if (its_number >= ITS_LIST_MAX) {
-+		pr_err("ITS@%pa: No ITSList entry available!\n",
-+		       &res->start);
-+		return -EINVAL;
-+	}
-+
-+	ctlr = readl_relaxed(its_base + GITS_CTLR);
-+	ctlr &= ~GITS_CTLR_ITS_NUMBER;
-+	ctlr |= its_number << GITS_CTLR_ITS_NUMBER_SHIFT;
-+	writel_relaxed(ctlr, its_base + GITS_CTLR);
-+	ctlr = readl_relaxed(its_base + GITS_CTLR);
-+	if ((ctlr & GITS_CTLR_ITS_NUMBER) != (its_number << GITS_CTLR_ITS_NUMBER_SHIFT)) {
-+		its_number = ctlr & GITS_CTLR_ITS_NUMBER;
-+		its_number >>= GITS_CTLR_ITS_NUMBER_SHIFT;
-+	}
-+
-+	if (test_and_set_bit(its_number, &its_list_map)) {
-+		pr_err("ITS@%pa: Duplicate ITSList entry %d\n",
-+		       &res->start, its_number);
-+		return -EINVAL;
-+	}
-+
-+	return its_number;
+-static void its_send_single_command(struct its_node *its,
+-				    its_cmd_builder_t builder,
+-				    struct its_cmd_desc *desc)
+-{
+-	struct its_cmd_block *cmd, *sync_cmd, *next_cmd;
+-	struct its_collection *sync_col;
+-	unsigned long flags;
+-
+-	raw_spin_lock_irqsave(&its->lock, flags);
+-
+-	cmd = its_allocate_entry(its);
+-	if (!cmd) {		/* We're soooooo screewed... */
+-		pr_err_ratelimited("ITS can't allocate, dropping command\n");
+-		raw_spin_unlock_irqrestore(&its->lock, flags);
+-		return;
+-	}
+-	sync_col = builder(cmd, desc);
+-	its_flush_cmd(its, cmd);
+-
+-	if (sync_col) {
+-		sync_cmd = its_allocate_entry(its);
+-		if (!sync_cmd) {
+-			pr_err_ratelimited("ITS can't SYNC, skipping\n");
+-			goto post;
+-		}
+-		its_encode_cmd(sync_cmd, GITS_CMD_SYNC);
+-		its_encode_target(sync_cmd, sync_col->target_address);
+-		its_fixup_cmd(sync_cmd);
+-		its_flush_cmd(its, sync_cmd);
+-	}
+-
+-post:
+-	next_cmd = its_post_commands(its);
+-	raw_spin_unlock_irqrestore(&its->lock, flags);
+-
+-	its_wait_for_range_completion(its, cmd, next_cmd);
+-}
++/* Warning, macro hell follows */
++#define BUILD_SINGLE_CMD_FUNC(name, buildtype, synctype, buildfn)	\
++void name(struct its_node *its,						\
++	  buildtype builder,						\
++	  struct its_cmd_desc *desc)					\
++{									\
++	struct its_cmd_block *cmd, *sync_cmd, *next_cmd;		\
++	synctype *sync_obj;						\
++	unsigned long flags;						\
++									\
++	raw_spin_lock_irqsave(&its->lock, flags);			\
++									\
++	cmd = its_allocate_entry(its);					\
++	if (!cmd) {		/* We're soooooo screewed... */		\
++		raw_spin_unlock_irqrestore(&its->lock, flags);		\
++		return;							\
++	}								\
++	sync_obj = builder(cmd, desc);					\
++	its_flush_cmd(its, cmd);					\
++									\
++	if (sync_obj) {							\
++		sync_cmd = its_allocate_entry(its);			\
++		if (!sync_cmd)						\
++			goto post;					\
++									\
++		buildfn(sync_cmd, sync_obj);				\
++		its_flush_cmd(its, sync_cmd);				\
++	}								\
++									\
++post:									\
++	next_cmd = its_post_commands(its);				\
++	raw_spin_unlock_irqrestore(&its->lock, flags);			\
++									\
++	its_wait_for_range_completion(its, cmd, next_cmd);		\
 +}
 +
- static int __init its_probe_one(struct resource *res,
- 				struct fwnode_handle *handle, int numa_node)
++static void its_build_sync_cmd(struct its_cmd_block *sync_cmd,
++			       struct its_collection *sync_col)
++{
++	its_encode_cmd(sync_cmd, GITS_CMD_SYNC);
++	its_encode_target(sync_cmd, sync_col->target_address);
++
++	its_fixup_cmd(sync_cmd);
++}
++
++static BUILD_SINGLE_CMD_FUNC(its_send_single_command, its_cmd_builder_t,
++			     struct its_collection, its_build_sync_cmd)
+ 
+ static void its_send_inv(struct its_device *dev, u32 event_id)
  {
- 	struct its_node *its;
- 	void __iomem *its_base;
--	u32 val;
--	u64 baser, tmp;
-+	u32 val, ctlr;
-+	u64 baser, tmp, typer;
- 	int err;
- 
- 	its_base = ioremap(res->start, resource_size(res));
-@@ -1712,9 +1759,24 @@ static int __init its_probe_one(struct resource *res,
- 	raw_spin_lock_init(&its->lock);
- 	INIT_LIST_HEAD(&its->entry);
- 	INIT_LIST_HEAD(&its->its_device_list);
-+	typer = gic_read_typer(its_base + GITS_TYPER);
- 	its->base = its_base;
- 	its->phys_base = res->start;
--	its->ite_size = ((gic_read_typer(its_base + GITS_TYPER) >> 4) & 0xf) + 1;
-+	its->ite_size = GITS_TYPER_ITT_ENTRY_SIZE(typer);
-+	its->is_v4 = !!(typer & GITS_TYPER_VLPIS);
-+	if (its->is_v4) {
-+		if (!(typer & GITS_TYPER_VMOVP)) {
-+			err = its_compute_its_list_map(res, its_base);
-+			if (err < 0)
-+				goto out_free_its;
-+
-+			pr_info("ITS@%pa: Using ITS number %d\n",
-+				&res->start, err);
-+		} else {
-+			pr_info("ITS@%pa: Single VMOVP capable\n", &res->start);
-+		}
-+	}
-+
- 	its->numa_node = numa_node;
- 
- 	its->cmd_base = (void *)__get_free_pages(GFP_KERNEL | __GFP_ZERO,
-@@ -1761,7 +1823,8 @@ static int __init its_probe_one(struct resource *res,
- 	}
- 
- 	gits_write_cwriter(0, its->base + GITS_CWRITER);
--	writel_relaxed(GITS_CTLR_ENABLE, its->base + GITS_CTLR);
-+	ctlr = readl_relaxed(its->base + GITS_CTLR);
-+	writel_relaxed(ctlr | GITS_CTLR_ENABLE, its->base + GITS_CTLR);
- 
- 	err = its_init_domain(handle, its);
- 	if (err)
-diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index 20a553423ac7..af8c55105fc2 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -235,15 +235,20 @@
- #define GITS_TRANSLATER			0x10040
- 
- #define GITS_CTLR_ENABLE		(1U << 0)
-+#define	GITS_CTLR_ITS_NUMBER_SHIFT	4
-+#define	GITS_CTLR_ITS_NUMBER		(0xFU << GITS_CTLR_ITS_NUMBER_SHIFT)
- #define GITS_CTLR_QUIESCENT		(1U << 31)
- 
- #define GITS_TYPER_PLPIS		(1UL << 0)
-+#define GITS_TYPER_VLPIS		(1UL << 1)
- #define GITS_TYPER_ITT_ENTRY_SIZE_SHIFT	4
-+#define GITS_TYPER_ITT_ENTRY_SIZE(r)	((((r) >> GITS_TYPER_ITT_ENTRY_SIZE_SHIFT) & 0x1f) + 1)
- #define GITS_TYPER_IDBITS_SHIFT		8
- #define GITS_TYPER_DEVBITS_SHIFT	13
- #define GITS_TYPER_DEVBITS(r)		((((r) >> GITS_TYPER_DEVBITS_SHIFT) & 0x1f) + 1)
- #define GITS_TYPER_PTA			(1UL << 19)
- #define GITS_TYPER_HWCOLLCNT_SHIFT	24
-+#define GITS_TYPER_VMOVP		(1ULL << 37)
- 
- #define GITS_IIDR_REV_SHIFT		12
- #define GITS_IIDR_REV_MASK		(0xf << GITS_IIDR_REV_SHIFT)
 -- 
 2.11.0
