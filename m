@@ -1,83 +1,121 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [RFC PATCH v2 38/38] KVM: arm64: Respect the virtual
- CPTR_EL2.TCPAC setting
-Date: Tue, 1 Aug 2017 13:20:29 +0200
-Message-ID: <20170801112029.GD5176@cbox>
-References: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
- <1500397144-16232-39-git-send-email-jintack.lim@linaro.org>
- <20170731125920.GX5176@cbox>
- <CAHyh4xj8p0dCxv72jxYnTpmV8Ydhz2yvOLqpBHgDiyUcd6FUgg@mail.gmail.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [RFC PATCH v2 05/19] KVM: arm/arm64: Check that system supports
+ split eoi/deactivate
+Date: Tue, 1 Aug 2017 12:35:23 +0100
+Message-ID: <3ca8bc15-b5e7-abf7-78cc-9bbc5332c267@arm.com>
+References: <20170717142718.13853-1-cdall@linaro.org>
+ <20170717142718.13853-6-cdall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-doc-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAHyh4xj8p0dCxv72jxYnTpmV8Ydhz2yvOLqpBHgDiyUcd6FUgg@mail.gmail.com>
-Sender: linux-doc-owner@vger.kernel.org
-To: Jintack Lim <jintack.lim@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Jonathan Corbet <corbet@lwn.net>, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, linux@armlinux.org.uk, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, akpm@linux-foundation.org, mchehab@kernel.org, cov@codeaurora.org, Daniel Lezcano <daniel.lezcano@linaro.org>, david.daney@cavium.com, mark.rutland@arm.com, Suzuki K Poulose <suzuki.poulose@arm.com>, stefan@hello-penguin.com, Andy Gross <andy.gross@linaro.org>, wcohen@redhat.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>, shankerd@codeaurora.org, vladimir.murzin@arm.com, james.morse@arm.com, linux-doc@vger.kernel.org, lkml
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3609049C3F
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Aug 2017 07:34:12 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id JGnCHcyTuRbH for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  1 Aug 2017 07:34:10 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DA12349C3B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Aug 2017 07:34:10 -0400 (EDT)
+In-Reply-To: <20170717142718.13853-6-cdall@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Aug 01, 2017 at 07:03:35AM -0400, Jintack Lim wrote:
-> Hi Christoffer,
+On 17/07/17 15:27, Christoffer Dall wrote:
+> Some systems without proper firmware and/or hardware description data
+> don't support the split EOI and deactivate operation.
 > 
-> On Mon, Jul 31, 2017 at 8:59 AM, Christoffer Dall <cdall@linaro.org> wrote:
-> > On Tue, Jul 18, 2017 at 11:59:04AM -0500, Jintack Lim wrote:
-> >> Forward CPACR_EL1 traps to the virtual EL2 if virtual CPTR_EL2 is
-> >> configured to trap CPACR_EL1 accesses from EL1.
-> >>
-> >> This is for recursive nested virtualization.
-> >>
-> >> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-> >> ---
-> >>  arch/arm64/kvm/sys_regs.c | 5 +++++
-> >>  1 file changed, 5 insertions(+)
-> >>
-> >> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> >> index 6f67666..ba2966d 100644
-> >> --- a/arch/arm64/kvm/sys_regs.c
-> >> +++ b/arch/arm64/kvm/sys_regs.c
-> >> @@ -1091,6 +1091,11 @@ static bool access_cpacr(struct kvm_vcpu *vcpu,
-> >>       if (el12_reg(p) && forward_nv_traps(vcpu))
-> >>               return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
-> >>
-> >> +     /* Forward this trap to the virtual EL2 if CPTR_EL2.TCPAC is set*/
-> >> +     if (!el12_reg(p) && !vcpu_mode_el2(vcpu) &&
-> >> +         (vcpu_sys_reg(vcpu, CPTR_EL2) & CPTR_EL2_TCPAC))
-> >> +             return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
-> >> +
-> >
-> > I'm trying to understand what should happen if the VM is in EL1 and
-> > accesses CPACR_EL12, but the guest hypervisor did not set
-> > CPTR_EL2.TCPAC, why would we get here, and if there's a good reason why
+> On such systems, we cannot leave the physical interrupt active after the
+> timer handler on the host has run, so we cannot support KVM with an
+> in-kernel GIC with the timer changes we about to introduce.
 > 
-> I guess what you meant is HCR_EL2.NV bit?
+> This patch makes sure that trying to initialize the KVM GIC code will
+> fail on such systems.
+> 
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Signed-off-by: Christoffer Dall <cdall@linaro.org>
+> ---
+>  drivers/irqchip/irq-gic.c | 12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
+> index 090991f..b7e4fed 100644
+> --- a/drivers/irqchip/irq-gic.c
+> +++ b/drivers/irqchip/irq-gic.c
+> @@ -1391,7 +1391,8 @@ int gic_of_init_child(struct device *dev, struct gic_chip_data **gic, int irq)
+>  	return 0;
+>  }
+>  
+> -static void __init gic_of_setup_kvm_info(struct device_node *node)
+> +static void __init gic_of_setup_kvm_info(struct device_node *node,
+> +					 bool supports_deactivate)
+
+Ouch, nasty. This shadows the static key which is also called
+supports_deactivate...
+
+>  {
+>  	int ret;
+>  	struct resource *vctrl_res = &gic_v2_kvm_info.vctrl;
+> @@ -1411,6 +1412,9 @@ static void __init gic_of_setup_kvm_info(struct device_node *node)
+>  	if (ret)
+>  		return;
+>  
+> +	if (!supports_deactivate)
+> +		return;
+> +
+>  	gic_set_kvm_info(&gic_v2_kvm_info);
+
+Speaking of which, the static key should already be initialized, so this
+could actually read:
+
+	if (static_key_true(&supports_deactivate))
+		gic_set_kvm_info(&gic_v2_kvm_info);
+
+>  }
+>  
+> @@ -1419,6 +1423,7 @@ gic_of_init(struct device_node *node, struct device_node *parent)
+>  {
+>  	struct gic_chip_data *gic;
+>  	int irq, ret;
+> +	bool has_eoimode;
+>  
+>  	if (WARN_ON(!node))
+>  		return -ENODEV;
+> @@ -1436,7 +1441,8 @@ gic_of_init(struct device_node *node, struct device_node *parent)
+>  	 * Disable split EOI/Deactivate if either HYP is not available
+>  	 * or the CPU interface is too small.
+>  	 */
+> -	if (gic_cnt == 0 && !gic_check_eoimode(node, &gic->raw_cpu_base))
+> +	has_eoimode = gic_check_eoimode(node, &gic->raw_cpu_base);
+> +	if (gic_cnt == 0 && !has_eoimode)
+>  		static_key_slow_dec(&supports_deactivate);
+>  
+>  	ret = __gic_init_bases(gic, -1, &node->fwnode);
+> @@ -1447,7 +1453,7 @@ gic_of_init(struct device_node *node, struct device_node *parent)
+>  
+>  	if (!gic_cnt) {
+>  		gic_init_physaddr(node);
+> -		gic_of_setup_kvm_info(node);
+> +		gic_of_setup_kvm_info(node, has_eoimode);
+>  	}
+>  
+>  	if (parent) {
 > 
 
-No, HCR_EL2.NV is set, then we obviously get here, due to traps on _EL12
-registers.
+and we shouldn't need any of this. What do you think?
 
-But if that wasn't the case (that's the time you'd be avaluating this
-if-statement), then you're checking as part of the if-statement if the
-virtual CPTR_EL2.TCPAC is set.  My question is, if the virtual
-CPTR_EL2.TCPAC is not set, why would the physical one be set, which must
-be the case if we're running this code, right?
-
-> > we god here, is the EL12 access not supposed to undef at EL1 as opposed
-
-I obviously meant *got* here.
-
-> > to actually work, like it seems your code does when it doesn't take the
-> > branch?
-> 
-> IIUC, we need to have this logic
-> 
-> if (el12_reg() && virtual HCR_EL2.NV == 0)
->    inject_undef();
-> 
-> This is a good point, and should be applied for all traps controlled by NV bit.
-> 
-
-Yes, but can this ever happen?
-
-Thanks,
--Christoffer
+	M.
+-- 
+Jazz is not dead. It just smells funny...
