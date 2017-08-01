@@ -1,126 +1,273 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [RFC PATCH v2 05/19] KVM: arm/arm64: Check that system supports
- split eoi/deactivate
-Date: Tue, 1 Aug 2017 14:54:16 +0200
-Message-ID: <20170801125416.GG5176@cbox>
-References: <20170717142718.13853-1-cdall@linaro.org>
- <20170717142718.13853-6-cdall@linaro.org>
- <3ca8bc15-b5e7-abf7-78cc-9bbc5332c267@arm.com>
- <20170801122611.GE5176@cbox>
- <c243d2bc-6fc5-5195-4bc1-c7cd284d0311@arm.com>
+Subject: Re: [PATCH v2 16/16] KVM: arm64: Handle deferred SErrors consumed on
+ guest exit
+Date: Tue, 1 Aug 2017 15:18:55 +0200
+Message-ID: <20170801131855.GH5176@cbox>
+References: <20170728141019.9084-1-james.morse@arm.com>
+ <20170728141019.9084-17-james.morse@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B6C0649C34
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Aug 2017 09:17:45 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id v+wHPevASGfq for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  1 Aug 2017 09:17:44 -0400 (EDT)
+Received: from mail-wm0-f53.google.com (mail-wm0-f53.google.com [74.125.82.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2BC4C40FAE
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Aug 2017 09:17:43 -0400 (EDT)
+Received: by mail-wm0-f53.google.com with SMTP id t201so14522877wmt.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 01 Aug 2017 06:18:59 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <c243d2bc-6fc5-5195-4bc1-c7cd284d0311@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+In-Reply-To: <20170728141019.9084-17-james.morse@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: James Morse <james.morse@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Wang Xiongfeng <wangxiongfeng2@huawei.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Aug 01, 2017 at 01:37:14PM +0100, Marc Zyngier wrote:
-> On 01/08/17 13:26, Christoffer Dall wrote:
-> > On Tue, Aug 01, 2017 at 12:35:23PM +0100, Marc Zyngier wrote:
-> >> On 17/07/17 15:27, Christoffer Dall wrote:
-> >>> Some systems without proper firmware and/or hardware description data
-> >>> don't support the split EOI and deactivate operation.
-> >>>
-> >>> On such systems, we cannot leave the physical interrupt active after the
-> >>> timer handler on the host has run, so we cannot support KVM with an
-> >>> in-kernel GIC with the timer changes we about to introduce.
-> >>>
-> >>> This patch makes sure that trying to initialize the KVM GIC code will
-> >>> fail on such systems.
-> >>>
-> >>> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> >>> Signed-off-by: Christoffer Dall <cdall@linaro.org>
-> >>> ---
-> >>>  drivers/irqchip/irq-gic.c | 12 +++++++++---
-> >>>  1 file changed, 9 insertions(+), 3 deletions(-)
-> >>>
-> >>> diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
-> >>> index 090991f..b7e4fed 100644
-> >>> --- a/drivers/irqchip/irq-gic.c
-> >>> +++ b/drivers/irqchip/irq-gic.c
-> >>> @@ -1391,7 +1391,8 @@ int gic_of_init_child(struct device *dev, struct gic_chip_data **gic, int irq)
-> >>>  	return 0;
-> >>>  }
-> >>>  
-> >>> -static void __init gic_of_setup_kvm_info(struct device_node *node)
-> >>> +static void __init gic_of_setup_kvm_info(struct device_node *node,
-> >>> +					 bool supports_deactivate)
-> >>
-> >> Ouch, nasty. This shadows the static key which is also called
-> >> supports_deactivate...
-> >>
-> > 
-> > oh, yeah, that's a trap waiting to happen.
-> > 
-> >>>  {
-> >>>  	int ret;
-> >>>  	struct resource *vctrl_res = &gic_v2_kvm_info.vctrl;
-> >>> @@ -1411,6 +1412,9 @@ static void __init gic_of_setup_kvm_info(struct device_node *node)
-> >>>  	if (ret)
-> >>>  		return;
-> >>>  
-> >>> +	if (!supports_deactivate)
-> >>> +		return;
-> >>> +
-> >>>  	gic_set_kvm_info(&gic_v2_kvm_info);
-> >>
-> >> Speaking of which, the static key should already be initialized, so this
-> >> could actually read:
-> >>
-> >> 	if (static_key_true(&supports_deactivate))
-> >> 		gic_set_kvm_info(&gic_v2_kvm_info);
-> >>
-> >>>  }
-> >>>  
-> >>> @@ -1419,6 +1423,7 @@ gic_of_init(struct device_node *node, struct device_node *parent)
-> >>>  {
-> >>>  	struct gic_chip_data *gic;
-> >>>  	int irq, ret;
-> >>> +	bool has_eoimode;
-> >>>  
-> >>>  	if (WARN_ON(!node))
-> >>>  		return -ENODEV;
-> >>> @@ -1436,7 +1441,8 @@ gic_of_init(struct device_node *node, struct device_node *parent)
-> >>>  	 * Disable split EOI/Deactivate if either HYP is not available
-> >>>  	 * or the CPU interface is too small.
-> >>>  	 */
-> >>> -	if (gic_cnt == 0 && !gic_check_eoimode(node, &gic->raw_cpu_base))
-> >>> +	has_eoimode = gic_check_eoimode(node, &gic->raw_cpu_base);
-> >>> +	if (gic_cnt == 0 && !has_eoimode)
-> >>>  		static_key_slow_dec(&supports_deactivate);
-> >>>  
-> >>>  	ret = __gic_init_bases(gic, -1, &node->fwnode);
-> >>> @@ -1447,7 +1453,7 @@ gic_of_init(struct device_node *node, struct device_node *parent)
-> >>>  
-> >>>  	if (!gic_cnt) {
-> >>>  		gic_init_physaddr(node);
-> >>> -		gic_of_setup_kvm_info(node);
-> >>> +		gic_of_setup_kvm_info(node, has_eoimode);
-> >>>  	}
-> >>>  
-> >>>  	if (parent) {
-> >>>
-> >>
-> >> and we shouldn't need any of this. What do you think?
-> >>
-> > 
-> > I wasn't exactly sure if gic_cnt > 0 && !gic_check_eiomode() could then
-> > end up registering the KVM info when we shouldn't.
-> > 
-> > If that's not a concern, I'm happy to rework this.
+On Fri, Jul 28, 2017 at 03:10:19PM +0100, James Morse wrote:
+> On systems with VHE, the RAS extensions and IESB support, KVM gets an
+> implicit ESB whenever it enters/exits a guest, because the host sets
+> SCTLR_EL1.IESB.
 > 
-> I think it should be fine. gic_cnt is incremented each time we find a
-> GIC, and we'll only register the KVM info when we discover the first one
-> (while gic_cnt is still zero).
+> To prevent errors being lost, add code to __guest_exit() to read DISR_EL1,
+> and save it in the kvm_vcpu_fault_info. Add code to handle_exit() to
+> process this deferred SError. This data is in addition to the reason the
+> guest exitted.
+
+Two questions:
+
+First, am I reading the spec incorrectly when it says "The implicit form
+of Error Synchronization Barrier: [...] Has no effect on DISR_EL1 or
+VDISR_EL2" and I understand this as we wouldn't actually read anything
+from DISR_EL1 if we rely on the IESB?
+
+Second, what if we have several SErrors, and one happens upon entering
+the guest and another one happens when returning from the guest - do we
+end up overwriting the DISR_EL1 by only looking at it during exit and
+potentially miss errors?
+
 > 
-> Also, nobody is mad enough to have multiple GICs these days (cough...).
+> Future patches may add a firmware-first callout from
+> kvm_handle_deferred_serror() to decode CPER records populated by firmware,
+> or call some arm64 arch code to process the RAS 'ERR' registers for
+> kernel-first handling. Without either of these, we just make a judgement
+> on the severity: corrected and restartable errors are ignored, all others
+> result it an SError being given to the guest.
+
+*in an* ?
+
+Why do we give the remaining types of SErrors to the guest?  What would
+the kernel normally do for any other workload than running a VM when
+discovering this type of error?
+
+> 
+> On systems with EL2 but where VHE has been disabled in the build config,
+> add an explicit ESB in the __guest_exit() path. This lets us skip the
+> SError VAXorcism on all systems with the RAS extensions.
+> 
+> Signed-off-by: James Morse <james.morse@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h |  5 +++
+>  arch/arm64/include/asm/kvm_host.h    |  1 +
+>  arch/arm64/kernel/asm-offsets.c      |  1 +
+>  arch/arm64/kvm/handle_exit.c         | 84 +++++++++++++++++++++++++++++-------
+>  arch/arm64/kvm/hyp/entry.S           |  9 ++++
+>  5 files changed, 85 insertions(+), 15 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index fe39e6841326..9bec1e572bee 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -168,6 +168,11 @@ static inline phys_addr_t kvm_vcpu_get_fault_ipa(const struct kvm_vcpu *vcpu)
+>  	return ((phys_addr_t)vcpu->arch.fault.hpfar_el2 & HPFAR_MASK) << 8;
+>  }
+>  
+> +static inline u64 kvm_vcpu_get_disr(const struct kvm_vcpu *vcpu)
+> +{
+> +	return vcpu->arch.fault.disr_el1;
+> +}
+> +
+>  static inline u32 kvm_vcpu_hvc_get_imm(const struct kvm_vcpu *vcpu)
+>  {
+>  	return kvm_vcpu_get_hsr(vcpu) & ESR_ELx_xVC_IMM_MASK;
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index d68630007b14..f65cc6d497e6 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -88,6 +88,7 @@ struct kvm_vcpu_fault_info {
+>  	u32 esr_el2;		/* Hyp Syndrom Register */
+>  	u64 far_el2;		/* Hyp Fault Address Register */
+>  	u64 hpfar_el2;		/* Hyp IPA Fault Address Register */
+> +	u64 disr_el1;		/* Deferred [SError] Status Register */
+>  };
+>  
+>  /*
+> diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
+> index b3bb7ef97bc8..331cccbd38cf 100644
+> --- a/arch/arm64/kernel/asm-offsets.c
+> +++ b/arch/arm64/kernel/asm-offsets.c
+> @@ -129,6 +129,7 @@ int main(void)
+>    BLANK();
+>  #ifdef CONFIG_KVM_ARM_HOST
+>    DEFINE(VCPU_CONTEXT,		offsetof(struct kvm_vcpu, arch.ctxt));
+> +  DEFINE(VCPU_FAULT_DISR,	offsetof(struct kvm_vcpu, arch.fault.disr_el1));
+>    DEFINE(CPU_GP_REGS,		offsetof(struct kvm_cpu_context, gp_regs));
+>    DEFINE(CPU_USER_PT_REGS,	offsetof(struct kvm_regs, regs));
+>    DEFINE(CPU_FP_REGS,		offsetof(struct kvm_regs, fp_regs));
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index 17d8a1677a0b..b8e2477853eb 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -23,6 +23,7 @@
+>  #include <linux/kvm_host.h>
+>  
+>  #include <asm/esr.h>
+> +#include <asm/exception.h>
+>  #include <asm/kvm_asm.h>
+>  #include <asm/kvm_coproc.h>
+>  #include <asm/kvm_emulate.h>
+> @@ -67,6 +68,67 @@ static int handle_no_fpsimd(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  	return 1;
+>  }
+>  
+> +static void kvm_inject_serror(struct kvm_vcpu *vcpu)
+> +{
+> +	u8 hsr_ec = ESR_ELx_EC(kvm_vcpu_get_hsr(vcpu));
+> +
+> +	/*
+> +	 * HVC/SMC already have an adjusted PC, which we need
+> +	 * to correct in order to return to after having
+> +	 * injected the SError.
+> +	 */
+> +	if (hsr_ec == ESR_ELx_EC_HVC32 || hsr_ec == ESR_ELx_EC_HVC64 ||
+> +	    hsr_ec == ESR_ELx_EC_SMC32 || hsr_ec == ESR_ELx_EC_SMC64) {
+> +		u32 adj =  kvm_vcpu_trap_il_is32bit(vcpu) ? 4 : 2;
+> +		*vcpu_pc(vcpu) -= adj;
+> +	}
+> +
+> +	kvm_inject_vabt(vcpu);
+> +}
+> +
+> +/**
+> + * kvm_handle_guest_serror
+> + *
+> + * @vcpu:	the vcpu pointer
+> + * @esr:	the esr_el2 value read at guest exit for an SError, or
+> + * 		disr_el1 for a deferred SError.
+> + *
+> + * Either the guest took an SError, or we found one pending while handling
+> + * __guest_exit() at EL2. With the v8.2 RAS extensions SErrors are either
+> + * 'impementation defined' or categorised as a RAS exception.
+> + * Without any further information we ignore SErrors categorised as
+> + * 'corrected' or 'restartable' by RAS, and hand the guest an SError in
+> + * all other cases.
+> + */
+> +static int kvm_handle_guest_serror(struct kvm_vcpu *vcpu, u32 esr)
+> +{
+> +	bool impdef_syndrome = esr & ESR_ELx_ISV;	/* aka IDS */
+> +	unsigned int aet = esr & ESR_ELx_AET;
+> +
+> +	if (!cpus_have_const_cap(ARM64_HAS_RAS_EXTN) || impdef_syndrome) {
+> +		kvm_inject_serror(vcpu);
+> +		return 1;
+> +	}
+> +
+> +	/*
+> +	 * AET is RES0 if 'the value returned in the DFSC field is not
+> +	 * [ESR_ELx_FSC_SERROR]'
+> +	 */
+> +	if ((esr & ESR_ELx_FSC) != ESR_ELx_FSC_SERROR) {
+> +		kvm_inject_serror(vcpu);
+> +		return 1;
+> +	}
+> +
+> +	switch (aet) {
+> +	case ESR_ELx_AET_CE:	/* corrected error */
+> +	case ESR_ELx_AET_UEO:	/* restartable error, not yet consumed */
+> +		return 0;	/* continue processing the guest exit */
+> +	default:
+> +		kvm_inject_serror(vcpu);
+> +		return 1;
+> +	}
+> +}
+> +
+>  /**
+>   * kvm_handle_wfx - handle a wait-for-interrupts or wait-for-event
+>   *		    instruction executed by a guest
+> @@ -187,21 +249,13 @@ int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
+>  {
+>  	exit_handle_fn exit_handler;
+>  
+> -	if (ARM_SERROR_PENDING(exception_index)) {
+> -		u8 hsr_ec = ESR_ELx_EC(kvm_vcpu_get_hsr(vcpu));
+> -
+> -		/*
+> -		 * HVC/SMC already have an adjusted PC, which we need
+> -		 * to correct in order to return to after having
+> -		 * injected the SError.
+> -		 */
+> -		if (hsr_ec == ESR_ELx_EC_HVC32 || hsr_ec == ESR_ELx_EC_HVC64 ||
+> -		    hsr_ec == ESR_ELx_EC_SMC32 || hsr_ec == ESR_ELx_EC_SMC64) {
+> -			u32 adj =  kvm_vcpu_trap_il_is32bit(vcpu) ? 4 : 2;
+> -			*vcpu_pc(vcpu) -= adj;
+> -		}
+> +	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN)) {
+> +		u64 disr = kvm_vcpu_get_disr(vcpu);
+>  
+> -		kvm_inject_vabt(vcpu);
+> +		if (disr)
+> +			kvm_handle_guest_serror(vcpu, disr_to_esr(disr));
+> +	} else if (ARM_SERROR_PENDING(exception_index)) {
+> +		kvm_inject_serror(vcpu);
+>  		return 1;
+>  	}
+>  
+> @@ -211,7 +265,7 @@ int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
+>  	case ARM_EXCEPTION_IRQ:
+>  		return 1;
+>  	case ARM_EXCEPTION_EL1_SERROR:
+> -		kvm_inject_vabt(vcpu);
+> +		kvm_handle_guest_serror(vcpu, kvm_vcpu_get_hsr(vcpu));
+>  		return 1;
+>  	case ARM_EXCEPTION_TRAP:
+>  		/*
+> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+> index cec18df5a324..f1baaffa6922 100644
+> --- a/arch/arm64/kvm/hyp/entry.S
+> +++ b/arch/arm64/kvm/hyp/entry.S
+> @@ -142,6 +142,15 @@ ENTRY(__guest_exit)
+>  	// Now restore the host regs
+>  	restore_callee_saved_regs x2
+>  
+> +	kvm_explicit_esb
+> +	disr_read	reg=x2
+> +alternative_if ARM64_HAS_RAS_EXTN
+> +	str	x2, [x1, #(VCPU_FAULT_DISR - VCPU_CONTEXT)]
+> +	cbz	x2, 1f
+> +	orr	x0, x0, #(1<<ARM_EXIT_WITH_SERROR_BIT)
+> +1:	ret
+> +alternative_else_nop_endif
+> +
+>  	// If we have a pending asynchronous abort, now is the
+>  	// time to find out. From your VAXorcist book, page 666:
+>  	// "Threaten me not, oh Evil one!  For I speak with
+> -- 
+> 2.13.2
 > 
 
-ok, I'll rework it then.
+Otherwise this patch looks good to me.
 
 Thanks,
 -Christoffer
