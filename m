@@ -1,157 +1,183 @@
-From: Jintack Lim <jintack.lim@linaro.org>
-Subject: Re: [RFC PATCH v2 20/38] KVM: arm64: Handle eret instruction traps
-Date: Tue, 1 Aug 2017 10:11:15 -0400
-Message-ID: <CAHyh4xiKR+qHHCfDwm_aZGcj4VzfXvNuSebAG7=rT2PKw4NDNw@mail.gmail.com>
-References: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
- <1500397144-16232-21-git-send-email-jintack.lim@linaro.org>
- <20170730200010.GJ5176@cbox>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH 10/11] arm64/kvm: context-switch ptrauth registers
+Date: Tue, 1 Aug 2017 15:26:07 +0100
+Message-ID: <20170801142603.GE9347@leverpostej>
+References: <1500480092-28480-1-git-send-email-mark.rutland@arm.com>
+ <1500480092-28480-11-git-send-email-mark.rutland@arm.com>
+ <20170801110014.GA5176@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6641849C30
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Aug 2017 10:10:04 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pL4mwGPEcXbF for <kvmarm@lists.cs.columbia.edu>;
- Tue,  1 Aug 2017 10:10:03 -0400 (EDT)
-Received: from mail-oi0-f43.google.com (mail-oi0-f43.google.com
- [209.85.218.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6ED8549C2C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Aug 2017 10:10:03 -0400 (EDT)
-Received: by mail-oi0-f43.google.com with SMTP id d71so11371234oih.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 01 Aug 2017 07:11:19 -0700 (PDT)
-Received: from mail-oi0-f42.google.com (mail-oi0-f42.google.com.
- [209.85.218.42])
- by smtp.gmail.com with ESMTPSA id e204sm27220663oia.45.2017.08.01.07.11.16
- for <kvmarm@lists.cs.columbia.edu>
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 01 Aug 2017 07:11:17 -0700 (PDT)
-Received: by mail-oi0-f42.google.com with SMTP id x3so16323786oia.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 01 Aug 2017 07:11:16 -0700 (PDT)
-In-Reply-To: <20170730200010.GJ5176@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-arch-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20170801110014.GA5176@cbox>
+Sender: linux-arch-owner@vger.kernel.org
 To: Christoffer Dall <cdall@linaro.org>
-Cc: KVM General <kvm@vger.kernel.org>, david.daney@cavium.com, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, stefan@hello-penguin.com, Jonathan Corbet <corbet@lwn.net>, Daniel Lezcano <daniel.lezcano@linaro.org>, linux@armlinux.org.uk, arm-mail-list <linux-arm-kernel@lists.infradead.org>, Andy Gross <andy.gross@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, cov@codeaurora.org, wcohen@redhat.com, mchehab@kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, linux-doc@vger.kernel.org, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, akpm@linux-foundation.org
+Cc: linux-arm-kernel@lists.infradead.org, arnd@arndb.de, catalin.marinas@arm.com, christoffer.dall@linaro.org, Dave.Martin@arm.com, jiong.wang@arm.com, kvmarm@lists.cs.columbia.edu, linux-arch@vger.kernel.org, marc.zyngier@arm.com, suzuki.poulose@arm.com, will.deacon@arm.com, yao.qi@arm.com, linux-kernel@vger.kernel.org, kernel-hardening@lists.openwall.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sun, Jul 30, 2017 at 4:00 PM, Christoffer Dall <cdall@linaro.org> wrote:
-> On Tue, Jul 18, 2017 at 11:58:46AM -0500, Jintack Lim wrote:
->> When HCR.NV bit is set, eret instructions trap to EL2 with EC code 0x1A.
->> Emulate eret instructions by setting pc and pstate.
->
-> It may be worth noting in the commit message that this is all we have to
-> do, because the rest of the logic will then discover that the mode could
-> change from virtual EL2 to EL1 and will setup the hw registers etc. when
-> changing modes.
+On Tue, Aug 01, 2017 at 01:00:14PM +0200, Christoffer Dall wrote:
+> On Wed, Jul 19, 2017 at 05:01:31PM +0100, Mark Rutland wrote:
+> > When pointer authentication is supported, a guest may wish to use it.
+> > This patch adds the necessary KVM infrastructure for this to work, with
+> > a semi-lazy context switch of the pointer auth state.
+> > 
+> > When we schedule a vcpu, we disable guest usage of pointer
+> > authentication instructions and accesses to the keys. While these are
+> > disabled, we avoid context-switching the keys. When we trap the guest
+> > trying to use pointer authentication functionality, we change to eagerly
+> > context-switching the keys, and enable the feature. The next time the
+> > vcpu is scheduled out/in, we start again.
+> > 
+> > This is sufficient for systems with uniform pointer authentication
+> > support. For systems with mismatched support, it will be necessary to
+> 
+> What is mismatched support?  You mean systems where one CPU has ptrauth
+> and another one doesn't (or if they both have it but in different ways)?
 
-Makes sense. I'll write it up in the commit message.
+Both! Any case where the support is not uniform across all CPUs.
 
->
->>
->> Note that the current exception level is always the virtual EL2, since
->> we set HCR_EL2.NV bit only when entering the virtual EL2. So, we take
->> spsr and elr states from the virtual _EL2 registers.
->>
->> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
->> ---
->>  arch/arm64/include/asm/esr.h |  1 +
->>  arch/arm64/kvm/handle_exit.c | 16 ++++++++++++++++
->>  arch/arm64/kvm/trace.h       | 21 +++++++++++++++++++++
->>  3 files changed, 38 insertions(+)
->>
->> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
->> index e7d8e28..210fde6 100644
->> --- a/arch/arm64/include/asm/esr.h
->> +++ b/arch/arm64/include/asm/esr.h
->> @@ -43,6 +43,7 @@
->>  #define ESR_ELx_EC_HVC64     (0x16)
->>  #define ESR_ELx_EC_SMC64     (0x17)
->>  #define ESR_ELx_EC_SYS64     (0x18)
->> +#define ESR_ELx_EC_ERET              (0x1A)
->>  /* Unallocated EC: 0x19 - 0x1E */
->>  #define ESR_ELx_EC_IMP_DEF   (0x1f)
->>  #define ESR_ELx_EC_IABT_LOW  (0x20)
->> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
->> index 17d8a16..9259881 100644
->> --- a/arch/arm64/kvm/handle_exit.c
->> +++ b/arch/arm64/kvm/handle_exit.c
->> @@ -147,6 +147,21 @@ static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu, struct kvm_run *run)
->>       return 1;
->>  }
->>
->> +static int kvm_handle_eret(struct kvm_vcpu *vcpu, struct kvm_run *run)
->> +{
->> +     trace_kvm_nested_eret(vcpu, vcpu_el2_sreg(vcpu, ELR_EL2),
->> +                           vcpu_el2_sreg(vcpu, SPSR_EL2));
->> +
->> +     /*
->> +      * Note that the current exception level is always the virtual EL2,
->> +      * since we set HCR_EL2.NV bit only when entering the virtual EL2.
->> +      */
->> +     *vcpu_pc(vcpu) = vcpu_el2_sreg(vcpu, ELR_EL2);
->> +     *vcpu_cpsr(vcpu) = vcpu_el2_sreg(vcpu, SPSR_EL2);
->> +
->> +     return 1;
->> +}
->> +
->>  static exit_handle_fn arm_exit_handlers[] = {
->>       [0 ... ESR_ELx_EC_MAX]  = kvm_handle_unknown_ec,
->>       [ESR_ELx_EC_WFx]        = kvm_handle_wfx,
->> @@ -160,6 +175,7 @@ static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu, struct kvm_run *run)
->>       [ESR_ELx_EC_HVC64]      = handle_hvc,
->>       [ESR_ELx_EC_SMC64]      = handle_smc,
->>       [ESR_ELx_EC_SYS64]      = kvm_handle_sys_reg,
->> +     [ESR_ELx_EC_ERET]       = kvm_handle_eret,
->>       [ESR_ELx_EC_IABT_LOW]   = kvm_handle_guest_abort,
->>       [ESR_ELx_EC_DABT_LOW]   = kvm_handle_guest_abort,
->>       [ESR_ELx_EC_SOFTSTP_LOW]= kvm_handle_guest_debug,
->> diff --git a/arch/arm64/kvm/trace.h b/arch/arm64/kvm/trace.h
->> index 7c86cfb..5f40987 100644
->> --- a/arch/arm64/kvm/trace.h
->> +++ b/arch/arm64/kvm/trace.h
->> @@ -187,6 +187,27 @@
->>       TP_printk("vcpu: %p, inject exception to vEL2: ESR_EL2 0x%lx, vector: 0x%016lx",
->>                 __entry->vcpu, __entry->esr_el2, __entry->pc)
->>  );
->> +
->> +TRACE_EVENT(kvm_nested_eret,
->> +     TP_PROTO(struct kvm_vcpu *vcpu, unsigned long elr_el2,
->> +              unsigned long spsr_el2),
->> +     TP_ARGS(vcpu, elr_el2, spsr_el2),
->> +
->> +     TP_STRUCT__entry(
->> +             __field(struct kvm_vcpu *,      vcpu)
->> +             __field(unsigned long,          elr_el2)
->> +             __field(unsigned long,          spsr_el2)
->> +     ),
->> +
->> +     TP_fast_assign(
->> +             __entry->vcpu = vcpu;
->> +             __entry->elr_el2 = elr_el2;
->> +             __entry->spsr_el2 = spsr_el2;
->> +     ),
->> +
->> +     TP_printk("vcpu: %p, eret to elr_el2: 0x%016lx, with spsr_el2: 0x%08lx",
->> +               __entry->vcpu, __entry->elr_el2, __entry->spsr_el2)
->> +);
->>  #endif /* _TRACE_ARM64_KVM_H */
->>
->>  #undef TRACE_INCLUDE_PATH
->> --
->> 1.9.1
->>
->
-> Otherwise this patch looks good.
->
-> Thanks,
-> -Christoffer
+A CPU can implement address auth and/or generic auth, and either may use
+an architected algorithm or an IMP DEF algorithm.
+
+Even if all CPUs report an IMP DEF algorithm, the particular algorithm
+may differ across CPUs.
+
+> > hide the feature from the guest's view of the ID registers.
+> 
+> I think the work Drew is pondering to allow userspace more control of
+> what we emulate to the guest can semi-automatically take care of this as
+> well.
+
+I'll take a look.
+
+[...]
+
+> > +static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu)
+> > +{
+> > +	kvm_arm_vcpu_ptrauth_disable(vcpu);
+> > +}
+> > +
+> 
+> why sched_in and not vcpu_load?  (vcpu_load happens whenever you're
+> returning from userspace for example, and not only when you've been
+> scheduled away and are coming back).
+
+I think this is the result of going searching for similar lazy context
+switching, and stumbling on some (fairly different) code on x86.
+
+It looks like I can use vcpu_load() instead, so I'll give that a shot
+for v2.
+
+> And why do we want to 'reset' the behavior of KVM when the host
+> schedules a VCPU thread?
+> 
+> If I understand the logic correctly, what you're establishing with the
+> appraoch of initially trapping use of ptrauth is to avoid
+> saving/restoring the state if the guest dosn't use ptrauth, but then if
+> the guest starts using it, it's likely to keep using it, and therefore
+> we start saving/restoring the registers.
+
+Yes.
+
+> Why is the host's decision to schedule something else on this physical
+> CPU a good indication that we should no longer save/restore these
+> registers for the VCPU?
+
+I guess it's not.
+
+Initially, I was followed the same approach we take for fpsimd, leaving
+the feature trapped until we take a shallow trap to hyp. Handing all the
+sysreg traps in hyp was unwieldy, so I moved that down to the kernel
+proper. That meant I couldn't enable the trap when switching from host
+to guest, and doing so in the regular context switch seemed like the
+next best option.
+
+> Wouldn't it make more sense to have a flag on the VCPU, and
+> potentially a counter, so that if you switch X times without ever
+> touching the registers again, you can stop saving/restoring the state,
+> if that's even something we care about?
+
+Something like that could make more sense. It should be fairly simple to
+implement a decaying counter to determine when to trap.
+
+I'd steered clear of optimising the lazy heuristic as I'm testing with
+models, and I don't have numbers that would be representative of real
+HW.
+
+> Another thing that comes to mind; does the kernel running a KVM's VCPU
+> thread (and handling softirqs, ISRs, etc.) ever use the ptrauth system,
+> or does that only happen when we go to userspace? 
+
+Today, only userspace uses pointer auth, and the kernel does not.
+However, in-kernel usage is on the cards.
+
+> If the latter, we could handle the save/restore entirely in
+> vcpu_put/vcpu_load instead. I don't mind picking up that bit as part
+> of my ongoing optimization work later though, if you're eager to get
+> these patches merged.
+
+I'd avoided that so far, since it would be undone when in-kernel usage
+is implemented. If you prefer, I can implement that for now.
+
+[...]
+
+> > +/*
+> > + * Handle the guest trying to use a ptrauth instruction, or trying to access a
+> > + * ptrauth register.
+> > + */
+> > +void kvm_arm_vcpu_ptrauth_trap(struct kvm_vcpu *vcpu)
+> > +{
+> > +	if (cpus_have_const_cap(ARM64_HAS_ADDRESS_AUTH) &&
+> > +	    cpus_have_const_cap(ARM64_HAS_GENERIC_AUTH)) {
+> > +		kvm_arm_vcpu_ptrauth_enable(vcpu);
+> > +	} else {
+> > +		kvm_inject_undefined(vcpu);
+> 
+> How can we trap here without having ARM64_HAS_[ADDRESS,GENERIC]_AUTH ?
+
+We'll trap if the current CPU supports one of the two (with an
+architected algorithm), but some other CPU does not (or uses an IMP DEF
+algorithm). Note that we're checking that all CPUs have the feature.
+
+> If this to cover the case if we only have one of the two or is there a
+> case where we trap ptrauth registers/instructions even though the CPU
+> doesn't have the support?
+
+It's there to cater for the case that some CPUs lack a feature that
+others have, so that we expose a uniform view to guests.
+
+There's a single control to trap both address/generic authentication, so
+it has to check that support is uniform for both. 
+
+I'd meant to fix this up to not be so pessimistic -- we could support
+one without that other, so long as it is uniformly absent. e.g. if all
+CPUs support address auth and all CPUs have no support for generic auth.
+
+I'll need to add negative cpucaps to detect that. I'll try to sort that
+out for v2.
+
+[...]
+
+> > +static void __hyp_text __ptrauth_save_state(struct kvm_cpu_context *ctxt)
+> > +{
+> > +	if (cpus_have_const_cap(ARM64_HAS_ADDRESS_AUTH)) {
+> > +		__ptrauth_save_key(ctxt->sys_regs, APIA);
+> > +		__ptrauth_save_key(ctxt->sys_regs, APIB);
+> > +		__ptrauth_save_key(ctxt->sys_regs, APDA);
+> > +		__ptrauth_save_key(ctxt->sys_regs, APDB);
+> > +	}
+> > +
+> > +	if (cpus_have_const_cap(ARM64_HAS_GENERIC_AUTH)) {
+> > +		__ptrauth_save_key(ctxt->sys_regs, APGA);
+> > +	}
+> 
+> Aren't we ever only enabling the save/restore if we have both caps, so
+> why are we checking it here again?
+
+Sorry; I'd meant to fix things up so that we could support one without
+the other. Likewise for __ptrauth_restore_state().
+
+I'll try to fix this up for v2.
+
+Thanks,
+Mark.
