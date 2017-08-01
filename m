@@ -1,27 +1,37 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH 09/11] arm64/kvm: preserve host HCR_EL2 value
-Date: Tue, 1 Aug 2017 13:00:21 +0200
-Message-ID: <20170801110021.GB5176@cbox>
-References: <1500480092-28480-1-git-send-email-mark.rutland@arm.com>
- <1500480092-28480-10-git-send-email-mark.rutland@arm.com>
+From: Jintack Lim <jintack.lim@linaro.org>
+Subject: Re: [RFC PATCH v2 38/38] KVM: arm64: Respect the virtual
+ CPTR_EL2.TCPAC setting
+Date: Tue, 1 Aug 2017 07:03:35 -0400
+Message-ID: <CAHyh4xj8p0dCxv72jxYnTpmV8Ydhz2yvOLqpBHgDiyUcd6FUgg@mail.gmail.com>
+References: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
+ <1500397144-16232-39-git-send-email-jintack.lim@linaro.org>
+ <20170731125920.GX5176@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BEA7749C4C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Aug 2017 06:59:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A55C49C31
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Aug 2017 07:02:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uxCU4pEG3uME for <kvmarm@lists.cs.columbia.edu>;
- Tue,  1 Aug 2017 06:59:10 -0400 (EDT)
-Received: from mail-wm0-f48.google.com (mail-wm0-f48.google.com [74.125.82.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9B15849C31
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Aug 2017 06:59:10 -0400 (EDT)
-Received: by mail-wm0-f48.google.com with SMTP id t201so11271829wmt.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 01 Aug 2017 04:00:26 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <1500480092-28480-10-git-send-email-mark.rutland@arm.com>
+ with ESMTP id Ajk3wBFAg3lg for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  1 Aug 2017 07:02:23 -0400 (EDT)
+Received: from mail-oi0-f54.google.com (mail-oi0-f54.google.com
+ [209.85.218.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7F9AC40FB0
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Aug 2017 07:02:22 -0400 (EDT)
+Received: by mail-oi0-f54.google.com with SMTP id e124so11755260oig.2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 01 Aug 2017 04:03:38 -0700 (PDT)
+Received: from mail-oi0-f41.google.com (mail-oi0-f41.google.com.
+ [209.85.218.41])
+ by smtp.gmail.com with ESMTPSA id s129sm29176762oif.41.2017.08.01.04.03.36
+ for <kvmarm@lists.cs.columbia.edu>
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 01 Aug 2017 04:03:36 -0700 (PDT)
+Received: by mail-oi0-f41.google.com with SMTP id e124so11754408oig.2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 01 Aug 2017 04:03:36 -0700 (PDT)
+In-Reply-To: <20170731125920.GX5176@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,135 +41,62 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: linux-arch@vger.kernel.org, arnd@arndb.de, jiong.wang@arm.com, marc.zyngier@arm.com, catalin.marinas@arm.com, yao.qi@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kernel-hardening@lists.openwall.com, Dave.Martin@arm.com
+To: Christoffer Dall <cdall@linaro.org>
+Cc: KVM General <kvm@vger.kernel.org>, david.daney@cavium.com, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, stefan@hello-penguin.com, Jonathan Corbet <corbet@lwn.net>, Daniel Lezcano <daniel.lezcano@linaro.org>, linux@armlinux.org.uk, arm-mail-list <linux-arm-kernel@lists.infradead.org>, Andy Gross <andy.gross@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, cov@codeaurora.org, wcohen@redhat.com, mchehab@kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, linux-doc@vger.kernel.org, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, akpm@linux-foundation.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jul 19, 2017 at 05:01:30PM +0100, Mark Rutland wrote:
-> When restoring HCR_EL2 for the host, KVM uses HCR_HOST_VHE_FLAGS, which
-> is a constant value. This works today, as the host HCR_EL2 value is
-> always the same, but this will get in the way of supporting extensions
-> that require HCR_EL2 bits to be set conditionally for the host.
-> 
-> To allow such features to work without KVM having to explicitly handle
-> every possible host feature combination, this patch has KVM save/restore
-> the host HCR when switching to/from a guest HCR.
-> 
-> For __{activate,deactivate}_traps(), the HCR save/restore is made common
-> across the !VHE and VHE paths. As the host and guest HCR values must
-> have E2H set when VHE is in use, register redirection should always be
-> in effect at EL2, and this change should not adversely affect the VHE
-> code.
-> 
-> For the hyp TLB maintenance code, __tlb_switch_to_host_vhe() is updated
-> to toggle the TGE bit with a RMW sequence, as we already do in
-> __tlb_switch_to_guest_vhe().
-> 
-> The now unused HCR_HOST_VHE_FLAGS definition is removed.
-> 
-> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-> Cc: Christoffer Dall <christoffer.dall@linaro.org>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: kvmarm@lists.cs.columbia.edu
-> ---
->  arch/arm64/include/asm/kvm_arm.h  | 1 -
->  arch/arm64/include/asm/kvm_host.h | 5 ++++-
->  arch/arm64/kvm/hyp/switch.c       | 5 +++--
->  arch/arm64/kvm/hyp/tlb.c          | 6 +++++-
->  4 files changed, 12 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index c1267e8..7b9c898 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -84,7 +84,6 @@
->  			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW)
->  #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
->  #define HCR_INT_OVERRIDE   (HCR_FMO | HCR_IMO)
-> -#define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
->  
->  /* TCR_EL2 Registers bits */
->  #define TCR_EL2_RES1		((1 << 31) | (1 << 23))
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index d686300..0d7c3dd 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -198,10 +198,13 @@ struct kvm_cpu_context {
->  struct kvm_vcpu_arch {
->  	struct kvm_cpu_context ctxt;
->  
-> -	/* HYP configuration */
-> +	/* Guest HYP configuration */
->  	u64 hcr_el2;
->  	u32 mdcr_el2;
->  
-> +	/* Host HYP configuration */
-> +	u64 host_hcr_el2;
-> +
->  	/* Exception Information */
->  	struct kvm_vcpu_fault_info fault;
->  
-> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> index 945e79c..6108813 100644
-> --- a/arch/arm64/kvm/hyp/switch.c
-> +++ b/arch/arm64/kvm/hyp/switch.c
-> @@ -71,6 +71,8 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
->  {
->  	u64 val;
->  
-> +	vcpu->arch.host_hcr_el2 = read_sysreg(hcr_el2);
-> +
->  	/*
->  	 * We are about to set CPTR_EL2.TFP to trap all floating point
->  	 * register accesses to EL2, however, the ARM ARM clearly states that
-> @@ -110,7 +112,6 @@ static void __hyp_text __deactivate_traps_vhe(void)
->  		    MDCR_EL2_TPMS;
->  
->  	write_sysreg(mdcr_el2, mdcr_el2);
-> -	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
->  	write_sysreg(CPACR_EL1_FPEN, cpacr_el1);
->  	write_sysreg(vectors, vbar_el1);
->  }
-> @@ -123,7 +124,6 @@ static void __hyp_text __deactivate_traps_nvhe(void)
->  	mdcr_el2 |= MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT;
->  
->  	write_sysreg(mdcr_el2, mdcr_el2);
-> -	write_sysreg(HCR_RW, hcr_el2);
->  	write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
->  }
->  
-> @@ -145,6 +145,7 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
->  	__deactivate_traps_arch()();
->  	write_sysreg(0, hstr_el2);
->  	write_sysreg(0, pmuserenr_el0);
-> +	write_sysreg(vcpu->arch.host_hcr_el2, hcr_el2);
->  }
->  
->  static void __hyp_text __activate_vm(struct kvm_vcpu *vcpu)
-> diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
-> index 73464a9..c2b0680 100644
-> --- a/arch/arm64/kvm/hyp/tlb.c
-> +++ b/arch/arm64/kvm/hyp/tlb.c
-> @@ -49,12 +49,16 @@ static hyp_alternate_select(__tlb_switch_to_guest,
->  
->  static void __hyp_text __tlb_switch_to_host_vhe(struct kvm *kvm)
->  {
-> +	u64 val;
-> +
->  	/*
->  	 * We're done with the TLB operation, let's restore the host's
->  	 * view of HCR_EL2.
->  	 */
->  	write_sysreg(0, vttbr_el2);
-> -	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
-> +	val = read_sysreg(hcr_el2);
-> +	val |= HCR_TGE;
-> +	write_sysreg(val, hcr_el2);
->  }
->  
->  static void __hyp_text __tlb_switch_to_host_nvhe(struct kvm *kvm)
-> -- 
-> 1.9.1
-> 
+Hi Christoffer,
 
-Reviewed-by: Christoffer Dall <cdall@linaro.org>
+On Mon, Jul 31, 2017 at 8:59 AM, Christoffer Dall <cdall@linaro.org> wrote:
+> On Tue, Jul 18, 2017 at 11:59:04AM -0500, Jintack Lim wrote:
+>> Forward CPACR_EL1 traps to the virtual EL2 if virtual CPTR_EL2 is
+>> configured to trap CPACR_EL1 accesses from EL1.
+>>
+>> This is for recursive nested virtualization.
+>>
+>> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+>> ---
+>>  arch/arm64/kvm/sys_regs.c | 5 +++++
+>>  1 file changed, 5 insertions(+)
+>>
+>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>> index 6f67666..ba2966d 100644
+>> --- a/arch/arm64/kvm/sys_regs.c
+>> +++ b/arch/arm64/kvm/sys_regs.c
+>> @@ -1091,6 +1091,11 @@ static bool access_cpacr(struct kvm_vcpu *vcpu,
+>>       if (el12_reg(p) && forward_nv_traps(vcpu))
+>>               return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
+>>
+>> +     /* Forward this trap to the virtual EL2 if CPTR_EL2.TCPAC is set*/
+>> +     if (!el12_reg(p) && !vcpu_mode_el2(vcpu) &&
+>> +         (vcpu_sys_reg(vcpu, CPTR_EL2) & CPTR_EL2_TCPAC))
+>> +             return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
+>> +
+>
+> I'm trying to understand what should happen if the VM is in EL1 and
+> accesses CPACR_EL12, but the guest hypervisor did not set
+> CPTR_EL2.TCPAC, why would we get here, and if there's a good reason why
+
+I guess what you meant is HCR_EL2.NV bit?
+
+> we god here, is the EL12 access not supposed to undef at EL1 as opposed
+> to actually work, like it seems your code does when it doesn't take the
+> branch?
+
+IIUC, we need to have this logic
+
+if (el12_reg() && virtual HCR_EL2.NV == 0)
+   inject_undef();
+
+This is a good point, and should be applied for all traps controlled by NV bit.
+
+>
+>>       /*
+>>        * When the virtual HCR_EL2.E2H == 1, an access to CPACR_EL1
+>>        * in the virtual EL2 is to access CPTR_EL2.
+>> --
+>> 1.9.1
+>>
+>
+> Thanks,
+> -Christoffer
