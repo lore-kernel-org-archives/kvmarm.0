@@ -1,250 +1,406 @@
-From: Jintack Lim <jintack.lim@linaro.org>
-Subject: Re: [RFC PATCH v2 00/38] Nested Virtualization on KVM/ARM
-Date: Tue, 1 Aug 2017 06:48:57 -0400
-Message-ID: <CAHyh4xjKc43BQEsxvzaRWj0KzYqKh=CYa1C8Gf=7Zr2==4O4Nw@mail.gmail.com>
-References: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org> <20170731130054.GY5176@cbox>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH 10/11] arm64/kvm: context-switch ptrauth registers
+Date: Tue, 1 Aug 2017 13:00:14 +0200
+Message-ID: <20170801110014.GA5176@cbox>
+References: <1500480092-28480-1-git-send-email-mark.rutland@arm.com>
+ <1500480092-28480-11-git-send-email-mark.rutland@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170731130054.GY5176@cbox>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Christoffer Dall <cdall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Jonathan Corbet <corbet@lwn.net>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, linux@armlinux.org.uk, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, akpm@linux-foundation.org, mchehab@kernel.org, cov@codeaurora.org, Daniel Lezcano <daniel.lezcano@linaro.org>, david.daney@cavium.com, mark.rutland@arm.com, Suzuki K Poulose <suzuki.poulose@arm.com>, stefan@hello-penguin.com, Andy Gross <andy.gross@linaro.org>, wcohen@redhat.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>, shankerd@codeaurora.org, vladimir.murzin@arm.com, james.morse@arm.com, linux-doc@vger.kernel.org, lkm
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 25E4E49C40
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Aug 2017 06:59:15 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id PGH4B7Nt0-BZ for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  1 Aug 2017 06:59:04 -0400 (EDT)
+Received: from mail-wm0-f52.google.com (mail-wm0-f52.google.com [74.125.82.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9AF3740FB0
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Aug 2017 06:59:04 -0400 (EDT)
+Received: by mail-wm0-f52.google.com with SMTP id m85so11207075wma.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 01 Aug 2017 04:00:20 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1500480092-28480-11-git-send-email-mark.rutland@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: linux-arch@vger.kernel.org, arnd@arndb.de, jiong.wang@arm.com, marc.zyngier@arm.com, catalin.marinas@arm.com, yao.qi@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kernel-hardening@lists.openwall.com, Dave.Martin@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
+On Wed, Jul 19, 2017 at 05:01:31PM +0100, Mark Rutland wrote:
+> When pointer authentication is supported, a guest may wish to use it.
+> This patch adds the necessary KVM infrastructure for this to work, with
+> a semi-lazy context switch of the pointer auth state.
+> 
+> When we schedule a vcpu, we disable guest usage of pointer
+> authentication instructions and accesses to the keys. While these are
+> disabled, we avoid context-switching the keys. When we trap the guest
+> trying to use pointer authentication functionality, we change to eagerly
+> context-switching the keys, and enable the feature. The next time the
+> vcpu is scheduled out/in, we start again.
+> 
+> This is sufficient for systems with uniform pointer authentication
+> support. For systems with mismatched support, it will be necessary to
 
-On Mon, Jul 31, 2017 at 9:00 AM, Christoffer Dall <cdall@linaro.org> wrote:
-> Hi Jintack,
->
-> On Tue, Jul 18, 2017 at 11:58:26AM -0500, Jintack Lim wrote:
->> Nested virtualization is the ability to run a virtual machine inside ano=
-ther
->> virtual machine. In other words, it=E2=80=99s about running a hypervisor=
- (the guest
->> hypervisor) on top of another hypervisor (the host hypervisor).
->>
->> Supporting nested virtualization on ARM means that the hypervisor provid=
-es not
->> only EL0/EL1 execution environment to VMs as it usually does but also th=
-e
->> virtualization extensions including EL2 execution environment. Once the =
-host
->> hypervisor provides those execution environments to the VMs, then the gu=
-est
->> hypervisor can run its own VMs (nested VMs) naturally.
->>
->> This series supports nested virtualization on arm64. ARM recently announ=
-ced an
->> extension (ARMv8.3) which has support for nested virtualization[1]. This=
- patch
->> set is based on the ARMv8.3 specification and tested on the FastModel wi=
-th
->> ARMv8.3 extension.
->>
->> The whole patch set to support nested virtualization is huge over 70
->> patches, so I categorized them into four parts: CPU, memory, VGIC, and t=
-imer
->> virtualization. This patch series is the first part.
->>
->> CPU virtualization patch series provides basic nested virtualization fra=
-mework
->> and instruction emulations including v8.1 VHE feature and v8.3 nested
->> virtualization feature for VMs.
->>
->> This patch series again can be divided into four parts. Patch 1 to 5 int=
-roduces
->> nested virtualization by discovering hardware feature, adding a kernel
->> parameter and allowing the userspace to set the initial CPU mode to EL2.
->>
->> Patch 6 to 25 are to support the EL2 execution environment, the virtual =
-EL2, to
->> a VM on v8.0 architecture. We de-privilege the guest hypervisor and emul=
-ate the
->> virtual EL2 mode in EL1 using the hardware features provided by ARMv8.3;=
- The
->> host hypervisor manages virtual EL2 register state for the guest hypervi=
-sor
->> and shadow EL1 register state that reflects the virtual EL2 register sta=
-te to
->> run the guest hypervisor in EL1.
->>
->> Patch 26 to 33 add support for the virtual EL2 with Virtualization Host
->> Extensions. These patches emulate newly defined registers and bits in v8=
-.1 and
->> allow the virtual EL2 to access EL2 register states via EL1 register acc=
-esses
->> as in the real EL2.
->>
->> Patch 34 to 38 are to support for the virtual EL2 with nested virtualiza=
-tion.
->> These enable recursive nested virtualization.
->>
->> This patch set is tested on the FastModel with the v8.3 extension for ar=
-m64 and
->> a cubietruck for arm32. On the FastModel, the host and the guest kernels=
- are
->> compiled with and without VHE, so there are four combinations. I was abl=
-e to
->> boot SMP Linux in the nested VM on all four configurations and able to r=
-un
->> hackbench. I also checked that regular VMs could boot when the nested
->> virtualization kernel parameter was not set. On the cubietruck, I also v=
-erified
->> that regular VMs could boot as well.
->>
->> I'll share my experiment setup shortly.
->>
->> Even though this work has some limitations and TODOs, I'd appreciate ear=
-ly
->> feedback on this RFC. Specifically, I'm interested in:
->>
->> - Overall design to manage vcpu context for the virtual EL2
->> - Verifying correct EL2 register configurations such as HCR_EL2, CPTR_EL=
-2
->>   (Patch 30 and 32)
->> - Patch organization and coding style
->>
->> This patch series is based on kvm/next d38338e.
->> The whole patch series including memory, VGIC, and timer patches is avai=
-lable
->> here:
->>
->> git@github.com:columbia/nesting-pub.git rfc-v2
->>
->> Limitations:
->> - There are some cases that the target exception level of a VM is ambigu=
-ous when
->>   emulating eret instruction. I'm discussing this issue with Christoffer=
- and
->>   Marc. Meanwhile, I added a temporary patch (not included in this
->>   series. f1beaba in the repo) and used 4.10.0 kernel when testing the g=
-uest
->>   hypervisor with VHE.
->> - Recursive nested virtualization is not tested yet.
->> - Other hypervisors (such as Xen) on KVM are not tested.
->>
->> TODO:
->> - Submit memory, VGIC, and timer patches
->> - Evaluate regular VM performance to see if there's a negative impact.
->> - Test other hypervisors such as Xen on KVM
->> - Test recursive nested virtualization
->>
->
-> I think this overall looks pretty good, and I think you can drop the RFC
-> tag from the next revision, assuming the remaining patch sets for
-> memory, vgic, and timers don't require some major controversial rework
-> of these patches.
+What is mismatched support?  You mean systems where one CPU has ptrauth
+and another one doesn't (or if they both have it but in different ways)?
 
-Thank you for your thorough review. I'm happy that we can drop the RFC tag =
-:).
+> hide the feature from the guest's view of the ID registers.
 
+I think the work Drew is pondering to allow userspace more control of
+what we emulate to the guest can semi-automatically take care of this as
+well.
+
+> 
+> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+> Cc: Christoffer Dall <christoffer.dall@linaro.org>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: kvmarm@lists.cs.columbia.edu
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 23 +++++++++-
+>  arch/arm64/include/asm/kvm_hyp.h  |  7 +++
+>  arch/arm64/kvm/handle_exit.c      | 21 +++++++++
+>  arch/arm64/kvm/hyp/Makefile       |  1 +
+>  arch/arm64/kvm/hyp/ptrauth-sr.c   | 91 +++++++++++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/hyp/switch.c       |  4 ++
+>  arch/arm64/kvm/sys_regs.c         | 32 ++++++++++++++
+>  7 files changed, 178 insertions(+), 1 deletion(-)
+>  create mode 100644 arch/arm64/kvm/hyp/ptrauth-sr.c
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 0d7c3dd..f97defa 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -135,6 +135,18 @@ enum vcpu_sysreg {
+>  	PMSWINC_EL0,	/* Software Increment Register */
+>  	PMUSERENR_EL0,	/* User Enable Register */
+>  
+> +	/* Pointer Authentication Registers */
+> +	APIAKEYLO_EL1,
+> +	APIAKEYHI_EL1,
+> +	APIBKEYLO_EL1,
+> +	APIBKEYHI_EL1,
+> +	APDAKEYLO_EL1,
+> +	APDAKEYHI_EL1,
+> +	APDBKEYLO_EL1,
+> +	APDBKEYHI_EL1,
+> +	APGAKEYLO_EL1,
+> +	APGAKEYHI_EL1,
+> +
+>  	/* 32bit specific registers. Keep them at the end of the range */
+>  	DACR32_EL2,	/* Domain Access Control Register */
+>  	IFSR32_EL2,	/* Instruction Fault Status Register */
+> @@ -368,10 +380,19 @@ static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr,
+>  	__kvm_call_hyp((void *)pgd_ptr, hyp_stack_ptr, vector_ptr);
+>  }
+>  
+> +void kvm_arm_vcpu_ptrauth_enable(struct kvm_vcpu *vcpu);
+> +void kvm_arm_vcpu_ptrauth_disable(struct kvm_vcpu *vcpu);
+> +void kvm_arm_vcpu_ptrauth_trap(struct kvm_vcpu *vcpu);
+> +
+>  static inline void kvm_arch_hardware_unsetup(void) {}
+>  static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+>  static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
+> -static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
+> +
+> +static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu)
+> +{
+> +	kvm_arm_vcpu_ptrauth_disable(vcpu);
+> +}
+> +
+
+why sched_in and not vcpu_load?  (vcpu_load happens whenever you're
+returning from userspace for example, and not only when you've been
+scheduled away and are coming back).
+
+And why do we want to 'reset' the behavior of KVM when the host
+schedules a VCPU thread?
+
+If I understand the logic correctly, what you're establishing with the
+appraoch of initially trapping use of ptrauth is to avoid
+saving/restoring the state if the guest dosn't use ptrauth, but then if
+the guest starts using it, it's likely to keep using it, and therefore
+we start saving/restoring the registers.
+
+Why is the host's decision to schedule something else on this physical
+CPU a good indication that we should no longer save/restore these
+registers for the VCPU?  Wouldn't it make more sense to have a flag on
+the VCPU, and potentially a counter, so that if you switch X times
+without ever touching the registers again, you can stop saving/restoring
+the state, if that's even something we care about?
+
+Another thing that comes to mind; does the kernel running a KVM's VCPU
+thread (and handling softirqs, ISRs, etc.) ever use the ptrauth system,
+or does that only happen when we go to userspace?  If the latter, we
+could handle the save/restore entirely in vcpu_put/vcpu_load instead. I
+don't mind picking up that bit as part of my ongoing optimization work
+later though, if you're eager to get these patches merged.
+
+>  static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
+>  
+>  void kvm_arm_init_debug(void);
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index 4572a9b..3093f35 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -152,6 +152,13 @@ void __debug_restore_state(struct kvm_vcpu *vcpu,
+>  void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
+>  bool __fpsimd_enabled(void);
+>  
+> +void __ptrauth_switch_to_guest(struct kvm_vcpu *vcpu,
+> +			       struct kvm_cpu_context *host_ctxt,
+> +			       struct kvm_cpu_context *guest_ctxt);
+> +void __ptrauth_switch_to_host(struct kvm_vcpu *vcpu,
+> +			      struct kvm_cpu_context *host_ctxt,
+> +			      struct kvm_cpu_context *guest_ctxt);
+> +
+>  u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
+>  void __noreturn __hyp_do_panic(unsigned long, ...);
+>  
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index 17d8a16..9fc561f 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -136,6 +136,26 @@ static int kvm_handle_guest_debug(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  	return ret;
+>  }
+>  
+> +/*
+> + * Handle the guest trying to use a ptrauth instruction, or trying to access a
+> + * ptrauth register.
+> + */
+> +void kvm_arm_vcpu_ptrauth_trap(struct kvm_vcpu *vcpu)
+> +{
+> +	if (cpus_have_const_cap(ARM64_HAS_ADDRESS_AUTH) &&
+> +	    cpus_have_const_cap(ARM64_HAS_GENERIC_AUTH)) {
+> +		kvm_arm_vcpu_ptrauth_enable(vcpu);
+> +	} else {
+> +		kvm_inject_undefined(vcpu);
+
+How can we trap here without having ARM64_HAS_[ADDRESS,GENERIC]_AUTH ?
+
+If this to cover the case if we only have one of the two or is there a
+case where we trap ptrauth registers/instructions even though the CPU
+doesn't have the support?
+
+> +	}
+> +}
+> +
+> +static int kvm_handle_ptrauth(struct kvm_vcpu *vcpu, struct kvm_run *run)
+> +{
+> +	kvm_arm_vcpu_ptrauth_trap(vcpu);
+> +	return 1;
+> +}
+> +
+>  static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  {
+>  	u32 hsr = kvm_vcpu_get_hsr(vcpu);
+> @@ -168,6 +188,7 @@ static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  	[ESR_ELx_EC_BKPT32]	= kvm_handle_guest_debug,
+>  	[ESR_ELx_EC_BRK64]	= kvm_handle_guest_debug,
+>  	[ESR_ELx_EC_FP_ASIMD]	= handle_no_fpsimd,
+> +	[ESR_ELx_EC_PAC]	= kvm_handle_ptrauth,
+>  };
+>  
+>  static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
+> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+> index 14c4e3b..91f2100 100644
+> --- a/arch/arm64/kvm/hyp/Makefile
+> +++ b/arch/arm64/kvm/hyp/Makefile
+> @@ -18,6 +18,7 @@ obj-$(CONFIG_KVM_ARM_HOST) += fpsimd.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += tlb.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += hyp-entry.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += s2-setup.o
+> +obj-$(CONFIG_KVM_ARM_HOST) += ptrauth-sr.o
+>  
+>  # KVM code is run at a different exception code with a different map, so
+>  # compiler instrumentation that inserts callbacks or checks into the code may
+> diff --git a/arch/arm64/kvm/hyp/ptrauth-sr.c b/arch/arm64/kvm/hyp/ptrauth-sr.c
+> new file mode 100644
+> index 0000000..2784fb3
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/ptrauth-sr.c
+> @@ -0,0 +1,91 @@
+> +/*
+> + * Copyright (C) 2017 ARM Ltd
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include <linux/compiler.h>
+> +#include <linux/kvm_host.h>
+> +
+> +#include <asm/cpucaps.h>
+> +#include <asm/cpufeature.h>
+> +#include <asm/kvm_asm.h>
+> +#include <asm/kvm_hyp.h>
+> +
+> +static bool __hyp_text __ptrauth_is_enabled(struct kvm_vcpu *vcpu)
+> +{
+> +	return vcpu->arch.hcr_el2 & (HCR_API | HCR_APK);
+> +}
+> +
+> +#define __ptrauth_save_key(regs, key)						\
+> +({										\
+> +	regs[key ## KEYLO_EL1] = read_sysreg_s(SYS_ ## key ## KEYLO_EL1);	\
+> +	regs[key ## KEYHI_EL1] = read_sysreg_s(SYS_ ## key ## KEYHI_EL1);	\
+> +})
+> +
+> +static void __hyp_text __ptrauth_save_state(struct kvm_cpu_context *ctxt)
+> +{
+> +	if (cpus_have_const_cap(ARM64_HAS_ADDRESS_AUTH)) {
+> +		__ptrauth_save_key(ctxt->sys_regs, APIA);
+> +		__ptrauth_save_key(ctxt->sys_regs, APIB);
+> +		__ptrauth_save_key(ctxt->sys_regs, APDA);
+> +		__ptrauth_save_key(ctxt->sys_regs, APDB);
+> +	}
+> +
+> +	if (cpus_have_const_cap(ARM64_HAS_GENERIC_AUTH)) {
+> +		__ptrauth_save_key(ctxt->sys_regs, APGA);
+> +	}
+
+Aren't we ever only enabling the save/restore if we have both caps, so
+why are we checking it here again?
+
+> +}
+> +
+> +#define __ptrauth_restore_key(regs, key) 					\
+> +({										\
+> +	write_sysreg_s(regs[key ## KEYLO_EL1], SYS_ ## key ## KEYLO_EL1);	\
+> +	write_sysreg_s(regs[key ## KEYHI_EL1], SYS_ ## key ## KEYHI_EL1);	\
+> +})
+> +
+> +static void __hyp_text __ptrauth_restore_state(struct kvm_cpu_context *ctxt)
+> +{
+> +
+> +	if (cpus_have_const_cap(ARM64_HAS_ADDRESS_AUTH)) {
+> +		__ptrauth_restore_key(ctxt->sys_regs, APIA);
+> +		__ptrauth_restore_key(ctxt->sys_regs, APIB);
+> +		__ptrauth_restore_key(ctxt->sys_regs, APDA);
+> +		__ptrauth_restore_key(ctxt->sys_regs, APDB);
+> +	}
+> +
+> +	if (cpus_have_const_cap(ARM64_HAS_GENERIC_AUTH)) {
+> +		__ptrauth_restore_key(ctxt->sys_regs, APGA);
+> +	}
+
+same question
+
+> +}
+> +
+> +void __hyp_text __ptrauth_switch_to_guest(struct kvm_vcpu *vcpu,
+> +					  struct kvm_cpu_context *host_ctxt,
+> +					  struct kvm_cpu_context *guest_ctxt)
+> +{
+> +	if (!__ptrauth_is_enabled(vcpu))
+> +		return;
+> +
+> +	__ptrauth_save_state(host_ctxt);
+> +	__ptrauth_restore_state(guest_ctxt);
+> +}
+> +
+> +void __hyp_text __ptrauth_switch_to_host(struct kvm_vcpu *vcpu,
+> +					 struct kvm_cpu_context *host_ctxt,
+> +					 struct kvm_cpu_context *guest_ctxt)
+> +{
+> +	if (!__ptrauth_is_enabled(vcpu))
+> +		return;
+> +
+> +	__ptrauth_save_state(guest_ctxt);
+> +	__ptrauth_restore_state(host_ctxt);
+> +}
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index 6108813..df609d9 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -309,6 +309,8 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  	__sysreg_restore_guest_state(guest_ctxt);
+>  	__debug_restore_state(vcpu, kern_hyp_va(vcpu->arch.debug_ptr), guest_ctxt);
+>  
+> +	__ptrauth_switch_to_guest(vcpu, host_ctxt, guest_ctxt);
+> +
+>  	/* Jump in the fire! */
+>  again:
+>  	exit_code = __guest_enter(vcpu, host_ctxt);
+> @@ -367,6 +369,8 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  
+>  	fp_enabled = __fpsimd_enabled();
+>  
+> +	__ptrauth_switch_to_host(vcpu, host_ctxt, guest_ctxt);
+> +
+>  	__sysreg_save_guest_state(guest_ctxt);
+>  	__sysreg32_save_state(vcpu);
+>  	__timer_save_state(vcpu);
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 7786288..0f7d9ae 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -837,6 +837,32 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  	{ SYS_DESC(SYS_PMEVTYPERn_EL0(n)),					\
+>  	  access_pmu_evtyper, reset_unknown, (PMEVTYPER0_EL0 + n), }
+>  
+> +
+> +void kvm_arm_vcpu_ptrauth_enable(struct kvm_vcpu *vcpu)
+> +{
+> +	vcpu->arch.hcr_el2 |= (HCR_API | HCR_APK);
+> +}
+> +
+> +void kvm_arm_vcpu_ptrauth_disable(struct kvm_vcpu *vcpu)
+> +{
+> +	vcpu->arch.hcr_el2 &= ~(HCR_API | HCR_APK);
+> +}
+> +
+> +static bool trap_ptrauth(struct kvm_vcpu *vcpu,
+> +			 struct sys_reg_params *p,
+> +			 const struct sys_reg_desc *rd)
+> +{
+> +	kvm_arm_vcpu_ptrauth_trap(vcpu);
+> +	return false;
+> +}
+> +
+> +#define __PTRAUTH_KEY(k)						\
+> +	{ SYS_DESC(SYS_## k), trap_ptrauth, reset_unknown, k }
+> +
+> +#define PTRAUTH_KEY(k)							\
+> +	__PTRAUTH_KEY(k ## KEYLO_EL1),					\
+> +	__PTRAUTH_KEY(k ## KEYHI_EL1)
+> +
+>  static bool access_cntp_tval(struct kvm_vcpu *vcpu,
+>  		struct sys_reg_params *p,
+>  		const struct sys_reg_desc *r)
+> @@ -950,6 +976,12 @@ static bool access_cntp_cval(struct kvm_vcpu *vcpu,
+>  	{ SYS_DESC(SYS_TTBR1_EL1), access_vm_reg, reset_unknown, TTBR1_EL1 },
+>  	{ SYS_DESC(SYS_TCR_EL1), access_vm_reg, reset_val, TCR_EL1, 0 },
+>  
+> +	PTRAUTH_KEY(APIA),
+> +	PTRAUTH_KEY(APIB),
+> +	PTRAUTH_KEY(APDA),
+> +	PTRAUTH_KEY(APDB),
+> +	PTRAUTH_KEY(APGA),
+> +
+>  	{ SYS_DESC(SYS_AFSR0_EL1), access_vm_reg, reset_unknown, AFSR0_EL1 },
+>  	{ SYS_DESC(SYS_AFSR1_EL1), access_vm_reg, reset_unknown, AFSR1_EL1 },
+>  	{ SYS_DESC(SYS_ESR_EL1), access_vm_reg, reset_unknown, ESR_EL1 },
+> -- 
+> 1.9.1
+> 
 Thanks,
-Jintack
-
->
-> Thanks,
-> -Christoffer
->
->> v1-->v2:
->> - Added support for the virtual EL2 with VHE
->> - Rewrote commit messages and comments from the perspective of supportin=
-g
->>   execution environments to VMs, rather than from the perspective of the=
- guest
->>   hypervisor running in them.
->> - Fixed a few bugs to make it run on the FastModel.
->> - Tested on ARMv8.3 with four configurations. (host/guest. with/without =
-VHE.)
->> - Rebased to kvm/next
->>
->> [1] https://www.community.arm.com/processors/b/blog/posts/armv8-a-archit=
-ecture-2016-additions
->>
->> Christoffer Dall (7):
->>   KVM: arm64: Add KVM nesting feature
->>   KVM: arm64: Allow userspace to set PSR_MODE_EL2x
->>   KVM: arm64: Add vcpu_mode_el2 primitive to support nesting
->>   KVM: arm/arm64: Add a framework to prepare virtual EL2 execution
->>   arm64: Add missing TCR hw defines
->>   KVM: arm64: Create shadow EL1 registers
->>   KVM: arm64: Trap EL1 VM register accesses in virtual EL2
->>
->> Jintack Lim (31):
->>   arm64: Add ARM64_HAS_NESTED_VIRT feature
->>   KVM: arm/arm64: Enable nested virtualization via command-line
->>   KVM: arm/arm64: Check if nested virtualization is in use
->>   KVM: arm64: Add EL2 system registers to vcpu context
->>   KVM: arm64: Add EL2 special registers to vcpu context
->>   KVM: arm64: Add the shadow context for virtual EL2 execution
->>   KVM: arm64: Set vcpu context depending on the guest exception level
->>   KVM: arm64: Synchronize EL1 system registers on virtual EL2 entry and
->>     exit
->>   KVM: arm64: Move exception macros and enums to a common file
->>   KVM: arm64: Support to inject exceptions to the virtual EL2
->>   KVM: arm64: Trap SPSR_EL1, ELR_EL1 and VBAR_EL1 from virtual EL2
->>   KVM: arm64: Trap CPACR_EL1 access in virtual EL2
->>   KVM: arm64: Handle eret instruction traps
->>   KVM: arm64: Set a handler for the system instruction traps
->>   KVM: arm64: Handle PSCI call via smc from the guest
->>   KVM: arm64: Inject HVC exceptions to the virtual EL2
->>   KVM: arm64: Respect virtual HCR_EL2.TWX setting
->>   KVM: arm64: Respect virtual CPTR_EL2.TFP setting
->>   KVM: arm64: Add macros to support the virtual EL2 with VHE
->>   KVM: arm64: Add EL2 registers defined in ARMv8.1 to vcpu context
->>   KVM: arm64: Emulate EL12 register accesses from the virtual EL2
->>   KVM: arm64: Support a VM with VHE considering EL0 of the VHE host
->>   KVM: arm64: Allow the virtual EL2 to access EL2 states without trap
->>   KVM: arm64: Manage the shadow states when virtual E2H bit enabled
->>   KVM: arm64: Trap and emulate CPTR_EL2 accesses via CPACR_EL1 from the
->>     virtual EL2 with VHE
->>   KVM: arm64: Emulate appropriate VM control system registers
->>   KVM: arm64: Respect the virtual HCR_EL2.NV bit setting
->>   KVM: arm64: Respect the virtual HCR_EL2.NV bit setting for EL12
->>     register traps
->>   KVM: arm64: Respect virtual HCR_EL2.TVM and TRVM settings
->>   KVM: arm64: Respect the virtual HCR_EL2.NV1 bit setting
->>   KVM: arm64: Respect the virtual CPTR_EL2.TCPAC setting
->>
->>  Documentation/admin-guide/kernel-parameters.txt |   4 +
->>  arch/arm/include/asm/kvm_emulate.h              |  17 ++
->>  arch/arm/include/asm/kvm_host.h                 |  15 +
->>  arch/arm64/include/asm/cpucaps.h                |   3 +-
->>  arch/arm64/include/asm/esr.h                    |   1 +
->>  arch/arm64/include/asm/kvm_arm.h                |   2 +
->>  arch/arm64/include/asm/kvm_coproc.h             |   3 +-
->>  arch/arm64/include/asm/kvm_emulate.h            |  56 ++++
->>  arch/arm64/include/asm/kvm_host.h               |  64 ++++-
->>  arch/arm64/include/asm/kvm_hyp.h                |  24 --
->>  arch/arm64/include/asm/pgtable-hwdef.h          |   6 +
->>  arch/arm64/include/asm/sysreg.h                 |  70 +++++
->>  arch/arm64/include/uapi/asm/kvm.h               |   1 +
->>  arch/arm64/kernel/asm-offsets.c                 |   1 +
->>  arch/arm64/kernel/cpufeature.c                  |  11 +
->>  arch/arm64/kvm/Makefile                         |   5 +-
->>  arch/arm64/kvm/context.c                        | 346 +++++++++++++++++=
-++++++
->>  arch/arm64/kvm/emulate-nested.c                 |  83 ++++++
->>  arch/arm64/kvm/guest.c                          |   2 +
->>  arch/arm64/kvm/handle_exit.c                    |  89 +++++-
->>  arch/arm64/kvm/hyp/entry.S                      |  13 +
->>  arch/arm64/kvm/hyp/hyp-entry.S                  |   2 +-
->>  arch/arm64/kvm/hyp/switch.c                     |  33 ++-
->>  arch/arm64/kvm/hyp/sysreg-sr.c                  | 117 ++++----
->>  arch/arm64/kvm/inject_fault.c                   |  12 -
->>  arch/arm64/kvm/nested.c                         |  63 +++++
->>  arch/arm64/kvm/reset.c                          |   8 +
->>  arch/arm64/kvm/sys_regs.c                       | 359 +++++++++++++++++=
-++++++-
->>  arch/arm64/kvm/sys_regs.h                       |   8 +
->>  arch/arm64/kvm/trace.h                          |  43 ++-
->>  virt/kvm/arm/arm.c                              |  20 ++
->>  31 files changed, 1363 insertions(+), 118 deletions(-)
->>  create mode 100644 arch/arm64/kvm/context.c
->>  create mode 100644 arch/arm64/kvm/emulate-nested.c
->>  create mode 100644 arch/arm64/kvm/nested.c
->>
->> --
->> 1.9.1
->>
+-Christoffer
