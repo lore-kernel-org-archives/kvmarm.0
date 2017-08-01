@@ -1,48 +1,17 @@
 From: Jintack Lim <jintack.lim@linaro.org>
 Subject: Re: [RFC PATCH v2 04/38] KVM: arm/arm64: Check if nested
  virtualization is in use
-Date: Tue, 1 Aug 2017 09:59:53 -0400
-Message-ID: <CAHyh4xhgLxh9qnH0Bi2qpP1hTCmnKiLqz=JZP_9wY46kscigFQ@mail.gmail.com>
+Date: Tue, 1 Aug 2017 10:07:40 -0400
+Message-ID: <CAHyh4xi0hQE2kxOY78_25GwRsCCjMwOt0Lj=Jv1Vs1LdTUO+pQ@mail.gmail.com>
 References: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
- <1500397144-16232-5-git-send-email-jintack.lim@linaro.org>
- <20170730195938.GD5176@cbox>
+ <1500397144-16232-5-git-send-email-jintack.lim@linaro.org> <20170730195949.GF5176@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F62149C49
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Aug 2017 09:58:42 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id k1-tGm2LnG7l for <kvmarm@lists.cs.columbia.edu>;
- Tue,  1 Aug 2017 09:58:41 -0400 (EDT)
-Received: from mail-oi0-f53.google.com (mail-oi0-f53.google.com
- [209.85.218.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 36C0549C48
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Aug 2017 09:58:40 -0400 (EDT)
-Received: by mail-oi0-f53.google.com with SMTP id x3so15971696oia.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 01 Aug 2017 06:59:56 -0700 (PDT)
-Received: from mail-oi0-f43.google.com (mail-oi0-f43.google.com.
- [209.85.218.43])
- by smtp.gmail.com with ESMTPSA id q64sm12683422oih.13.2017.08.01.06.59.54
- for <kvmarm@lists.cs.columbia.edu>
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 01 Aug 2017 06:59:54 -0700 (PDT)
-Received: by mail-oi0-f43.google.com with SMTP id x3so15970519oia.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 01 Aug 2017 06:59:54 -0700 (PDT)
-In-Reply-To: <20170730195938.GD5176@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Content-Type: text/plain; charset="UTF-8"
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170730195949.GF5176@cbox>
+Sender: linux-kernel-owner@vger.kernel.org
 To: Christoffer Dall <cdall@linaro.org>
-Cc: KVM General <kvm@vger.kernel.org>, david.daney@cavium.com, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, stefan@hello-penguin.com, Jonathan Corbet <corbet@lwn.net>, Daniel Lezcano <daniel.lezcano@linaro.org>, linux@armlinux.org.uk, arm-mail-list <linux-arm-kernel@lists.infradead.org>, Andy Gross <andy.gross@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, cov@codeaurora.org, wcohen@redhat.com, mchehab@kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, linux-doc@vger.kernel.org, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, akpm@linux-foundation.org
+Cc: kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Jonathan Corbet <corbet@lwn.net>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, linux@armlinux.org.uk, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, akpm@linux-foundation.org, mchehab@kernel.org, cov@codeaurora.org, Daniel Lezcano <daniel.lezcano@linaro.org>, david.daney@cavium.com, mark.rutland@arm.com, Suzuki K Poulose <suzuki.poulose@arm.com>, stefan@hello-penguin.com, Andy Gross <andy.gross@linaro.org>, wcohen@redhat.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>, shankerd@codeaurora.org, vladimir.murzin@arm.com, james.morse@arm.com, linux-doc@vger.kernel.org, lkm
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On Sun, Jul 30, 2017 at 3:59 PM, Christoffer Dall <cdall@linaro.org> wrote:
@@ -114,17 +83,20 @@ On Sun, Jul 30, 2017 at 3:59 PM, Christoffer Dall <cdall@linaro.org> wrote:
 >> +     if (nested_param && cpus_have_const_cap(ARM64_HAS_NESTED_VIRT)
 >> +         && test_bit(KVM_ARM_VCPU_NESTED_VIRT, vcpu->arch.features))
 >> +             return true;
+>
+> you could initialize a bool in init_nested_virt which you then check
+> here to avoid duplicating the logic.
+
+I can make a bool to check the kernel param and the capability. The
+third one is per VM given by the userspace, so we don't know it when
+we initialize the host hypervisor. We can potentially have a bool in
+kvm_vcpu_arch or kvm_arch to cache the whole three conditions, if that
+sounds ok.
+
+>
 >> +
 >> +     return false;
 >> +}
->
-> after reading through a lot of your patches, I feel like vm_has_el2()
-> would be a more elegant name, but it's not a strict requirement to
-> change it.
-
-I think it's a nice name. Let me think about it :)
-
->
 >> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
 >> index 1c1c772..36aae3a 100644
 >> --- a/virt/kvm/arm/arm.c
@@ -143,6 +115,3 @@ I think it's a nice name. Let me think about it :)
 >> --
 >> 1.9.1
 >>
->
-> Thanks,
-> -Christoffer
