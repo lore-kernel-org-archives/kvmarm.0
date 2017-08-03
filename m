@@ -1,53 +1,126 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 3/4] KVM: arm/arm64: Handle hva aging while destroying the vm
-Date: Thu,  3 Aug 2017 16:28:56 +0100
-Message-ID: <20170803152857.32055-4-marc.zyngier@arm.com>
-References: <20170803152857.32055-1-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170803152857.32055-1-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Alex Graf <agraf@suse.de>, Andrew Jones <drjones@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <cdall@linaro.org>, Shanker Donthineni <shankerd@codeaurora.org>, Suzuki K Poulose <suzuki.poulose@arm.com>, Suzuki K Poulose <Suzuki.Poulose@arm.com>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v2 16/16] KVM: arm64: Handle deferred SErrors consumed
+ on guest exit
+Date: Thu, 03 Aug 2017 18:03:33 +0100
+Message-ID: <59835765.7020604@arm.com>
+References: <20170728141019.9084-1-james.morse@arm.com>
+ <20170728141019.9084-17-james.morse@arm.com> <20170801131855.GH5176@cbox>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C24AA49C19
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Aug 2017 13:03:25 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 9HRWQOiy5D5t for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Aug 2017 13:03:24 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 63AB740D1D
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Aug 2017 13:03:24 -0400 (EDT)
+In-Reply-To: <20170801131855.GH5176@cbox>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <cdall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Wang Xiongfeng <wangxiongfeng2@huawei.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Hi Christoffer,
 
-The mmu_notifier_release() callback of KVM triggers cleaning up
-the stage2 page table on kvm-arm. However there could be other
-notifier callbacks in parallel with the mmu_notifier_release(),
-which could cause the call backs ending up in an empty stage2
-page table. Make sure we check it for all the notifier callbacks.
+On 01/08/17 14:18, Christoffer Dall wrote:
+> On Fri, Jul 28, 2017 at 03:10:19PM +0100, James Morse wrote:
+>> On systems with VHE, the RAS extensions and IESB support, KVM gets an
+>> implicit ESB whenever it enters/exits a guest, because the host sets
+>> SCTLR_EL1.IESB.
+>>
+>> To prevent errors being lost, add code to __guest_exit() to read DISR_EL1,
+>> and save it in the kvm_vcpu_fault_info. Add code to handle_exit() to
+>> process this deferred SError. This data is in addition to the reason the
+>> guest exitted.
+> 
+> Two questions:
+> 
+> First, am I reading the spec incorrectly when it says "The implicit form
+> of Error Synchronization Barrier: [...] Has no effect on DISR_EL1 or
+> VDISR_EL2" and I understand this as we wouldn't actually read anything
+> from DISR_EL1 if we rely on the IESB?
 
-Cc: stable@vger.kernel.org
-Fixes: commit 293f29363 ("kvm-arm: Unmap shadow pagetables properly")
-Reported-by: Alex Graf <agraf@suse.de>
-Reviewed-by: Christoffer Dall <cdall@linaro.org>
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- virt/kvm/arm/mmu.c | 4 ++++
- 1 file changed, 4 insertions(+)
+(This is from section 2.4.5 Extension for barrier at exception entry and exit of
+DDI 0587A.)
 
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 0e1fc75f3585..2ea21dac0b44 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -1718,12 +1718,16 @@ static int kvm_test_age_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *
- 
- int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end)
- {
-+	if (!kvm->arch.pgd)
-+		return 0;
- 	trace_kvm_age_hva(start, end);
- 	return handle_hva_to_gpa(kvm, start, end, kvm_age_hva_handler, NULL);
- }
- 
- int kvm_test_age_hva(struct kvm *kvm, unsigned long hva)
- {
-+	if (!kvm->arch.pgd)
-+		return 0;
- 	trace_kvm_test_age_hva(hva);
- 	return handle_hva_to_gpa(kvm, hva, hva, kvm_test_age_hva_handler, NULL);
- }
--- 
-2.11.0
+Well spotted ... that's embarrassing!
+
+The DISR write is in the pseudocode's ESBOperation() which is not the same as
+ErrorSynchronizationBarrier(). Running an 'ESB' does both, but an IESB only does
+ErrorSynchronizationBarrier().
+
+I think this distinction is because the CPU may know about RAS errors it hasn't
+yet made pending SErrors. (they must have to have a severity for the ESR by this
+point).
+
+So IESB makes hidden RAS errors pending SErrors, it doesn't do what ESB does.
+
+Yes, this means the DISR_EL1 check on kernel-entry and guest exit is useless.
+Given this the host kernel entry/exit can be simplified, probably getting rid of
+the SError over eret horror. I will need to re-think the KVM changes, (we may
+just need the ESR from the existing vaxorcism code).
+
+
+> Second, what if we have several SErrors, and one happens upon entering
+> the guest and another one happens when returning from the guest - do we
+> end up overwriting the DISR_EL1 by only looking at it during exit and
+> potentially miss errors?
+
+There can only be one pending SError at a time, but if we have PSTATE.A set, a
+pending SError and a hidden RAS error, then ESB must have to pick one to defer,
+and IESB must have to discard one. I suspect the answer is 'implementation
+defined', but I will ask!
+
+
+>> Future patches may add a firmware-first callout from
+>> kvm_handle_deferred_serror() to decode CPER records populated by firmware,
+>> or call some arm64 arch code to process the RAS 'ERR' registers for
+>> kernel-first handling. Without either of these, we just make a judgement
+>> on the severity: corrected and restartable errors are ignored, all others
+>> result it an SError being given to the guest.
+> 
+> *in an* ?
+
+
+> Why do we give the remaining types of SErrors to the guest?
+
+Just because that is what KVM does today.
+
+> What would the kernel normally do for any other workload than running a VM when
+> discovering this type of error?
+
+I'm trying to make that clearer! Today we 'kill the running task', if its the
+kernel, we would panic(). But because the CPU masks SError on exception entry,
+and we never touch PSTATE.A, its always masked in the kernel, so we take the
+SError and kill the next user space task that gets run.
+
+We should panic() like we do in the early boot code if an SError was pending
+from firmware.
+
+
+Should the host panic because of an SError taken during a guest?, not
+necessarily. All the system registers are save/restored by world-switch, and the
+host doesn't depend on anything in guest memory. The host should be immune to
+any corruption that occurs while a guest was running.
+Gengdongjiu's example of device pass-through is the exception to this reasoning,
+I think we need a way for the host to contain/reset pass-through devices that
+trigger an SError.
+
+
+
+Thanks!
+
+James
