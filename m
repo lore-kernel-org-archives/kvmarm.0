@@ -1,43 +1,45 @@
-From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Subject: Re: [PATCH 0/4] KVM/ARM fixes for 4.13-rc4
-Date: Thu, 3 Aug 2017 19:44:28 +0200
-Message-ID: <20170803174427.GD1015@flask>
-References: <20170803152857.32055-1-marc.zyngier@arm.com>
+From: Kees Cook <keescook@chromium.org>
+Subject: Re: [PATCH 01/11] arm64: docs: describe ELF hwcaps
+Date: Thu, 3 Aug 2017 10:57:08 -0700
+Message-ID: <CAGXu5jJnhy5F698QFmXrMb3szmtXnfzqc+=QsukG4+p2k9xEdg@mail.gmail.com>
+References: <1500480092-28480-1-git-send-email-mark.rutland@arm.com> <1500480092-28480-2-git-send-email-mark.rutland@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E513E49C28
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Aug 2017 13:43:15 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OWQy2I8EYQ+y for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Aug 2017 13:43:15 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 51B7440D8B
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Aug 2017 13:43:15 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20170803152857.32055-1-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Return-path: <linux-doc-owner@vger.kernel.org>
+In-Reply-To: <1500480092-28480-2-git-send-email-mark.rutland@arm.com>
+Sender: linux-doc-owner@vger.kernel.org
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Arnd Bergmann <arnd@arndb.de>, Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Dave Martin <Dave.Martin@arm.com>, jiong.wang@arm.com, kvmarm@lists.cs.columbia.edu, linux-arch <linux-arch@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, "Suzuki K. Poulose" <suzuki.poulose@arm.com>, Will Deacon <will.deacon@arm.com>, yao.qi@arm.com, LKML <linux-kernel@vger.kernel.org>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-2017-08-03 16:28+0100, Marc Zyngier:
-> Paolo, Radim,
-> 
-> Here's a pull request for a few KVM/ARM updates. Nothing major except
-> for a VM destruction race (Suzuki has a knack for finding those...).
-> 
-> Please pull.
+On Wed, Jul 19, 2017 at 9:01 AM, Mark Rutland <mark.rutland@arm.com> wrote:
+> We don't document our ELF hwcaps, leaving developers to interpret them
+> according to hearsay, guesswork, or (in exceptional cases) inspection of
+> the current kernel code.
+>
+> This is less than optimal, and it would be far better if we had some
+> definitive description of each of the ELF hwcaps that developers could
+> refer to.
+>
+> This patch adds a document describing the (native) arm64 ELF hwcaps.
+>
+> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Dave Martin <Dave.Martin@arm.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: Will Deacon <will.deacon@arm.com>
+> ---
+>  Documentation/arm64/elf_hwcaps.txt | 133 +++++++++++++++++++++++++++++++++++++
 
-Pulled, thanks.
+With the kernel docs moving to ReST markup[1], perhaps reformat this
+to a .rst file and link to it from somewhere sensible in the ReST
+tree, perhaps the userspace API section in
+Documentation/userspace-api/index.rst?
+
+-Kees
+
+[1] https://www.kernel.org/doc/html/latest/doc-guide/sphinx.html
+
+-- 
+Kees Cook
+Pixel Security
