@@ -1,158 +1,81 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 2/4] KVM: arm/arm64: PMU: Fix overflow interrupt injection
-Date: Thu,  3 Aug 2017 16:28:55 +0100
-Message-ID: <20170803152857.32055-3-marc.zyngier@arm.com>
+Subject: [PATCH 1/4] KVM: arm/arm64: Fix bug in advertising KVM_CAP_MSI_DEVID
+ capability
+Date: Thu,  3 Aug 2017 16:28:54 +0100
+Message-ID: <20170803152857.32055-2-marc.zyngier@arm.com>
 References: <20170803152857.32055-1-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EB91849C2D
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Aug 2017 11:27:56 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id UGFB8EkXh3Ab for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Aug 2017 11:27:55 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BEFD249C27
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Aug 2017 11:27:55 -0400 (EDT)
 In-Reply-To: <20170803152857.32055-1-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Alex Graf <agraf@suse.de>, Andrew Jones <drjones@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <cdall@linaro.org>, Shanker Donthineni <shankerd@codeaurora.org>, Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Andrew Jones <drjones@redhat.com>
+From: Shanker Donthineni <shankerd@codeaurora.org>
 
-kvm_pmu_overflow_set() is called from perf's interrupt handler,
-making the call of kvm_vgic_inject_irq() from it introduced with
-"KVM: arm/arm64: PMU: remove request-less vcpu kick" a really bad
-idea, as it's quite easy to try and retake a lock that the
-interrupted context is already holding. The fix is to use a vcpu
-kick, leaving the interrupt injection to kvm_pmu_sync_hwstate(),
-like it was doing before the refactoring. We don't just revert,
-though, because before the kick was request-less, leaving the vcpu
-exposed to the request-less vcpu kick race, and also because the
-kick was used unnecessarily from register access handlers.
+Commit 0e4e82f154e3 ("KVM: arm64: vgic-its: Enable ITS emulation as
+a virtual MSI controller") tried to advertise KVM_CAP_MSI_DEVID, but
+the code logic was not updating the dist->msis_require_devid field
+correctly. If hypervisor tool creates the ITS device after VGIC
+initialization then we don't advertise KVM_CAP_MSI_DEVID capability.
 
-Reviewed-by: Christoffer Dall <cdall@linaro.org>
-Signed-off-by: Andrew Jones <drjones@redhat.com>
+Update the field msis_require_devid to true inside vgic_its_create()
+to fix the issue.
+
+Fixes: 0e4e82f154e3 ("vgic-its: Enable ITS emulation as a virtual MSI controller")
+Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/sys_regs.c |  2 +-
- include/kvm/arm_pmu.h     |  2 --
- virt/kvm/arm/pmu.c        | 43 +++++++++++++++----------------------------
- 3 files changed, 16 insertions(+), 31 deletions(-)
+ virt/kvm/arm/vgic/vgic-init.c | 3 ---
+ virt/kvm/arm/vgic/vgic-its.c  | 1 +
+ 2 files changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 77862881ae86..2e070d3baf9f 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -764,7 +764,7 @@ static bool access_pmovs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	if (p->is_write) {
- 		if (r->CRm & 0x2)
- 			/* accessing PMOVSSET_EL0 */
--			kvm_pmu_overflow_set(vcpu, p->regval & mask);
-+			vcpu_sys_reg(vcpu, PMOVSSET_EL0) |= (p->regval & mask);
- 		else
- 			/* accessing PMOVSCLR_EL0 */
- 			vcpu_sys_reg(vcpu, PMOVSSET_EL0) &= ~(p->regval & mask);
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index f6e030617467..f87fe20fcb05 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -48,7 +48,6 @@ void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu);
- void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu);
- void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val);
- void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val);
--void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val);
- void kvm_pmu_flush_hwstate(struct kvm_vcpu *vcpu);
- void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu);
- bool kvm_pmu_should_notify_user(struct kvm_vcpu *vcpu);
-@@ -86,7 +85,6 @@ static inline void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu) {}
- static inline void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu) {}
- static inline void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val) {}
- static inline void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val) {}
--static inline void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val) {}
- static inline void kvm_pmu_flush_hwstate(struct kvm_vcpu *vcpu) {}
- static inline void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu) {}
- static inline bool kvm_pmu_should_notify_user(struct kvm_vcpu *vcpu)
-diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index fc8a723ff387..8a9c42366db7 100644
---- a/virt/kvm/arm/pmu.c
-+++ b/virt/kvm/arm/pmu.c
-@@ -203,11 +203,15 @@ static u64 kvm_pmu_overflow_status(struct kvm_vcpu *vcpu)
- 	return reg;
- }
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index 3a0b8999f011..5801261f3add 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -285,9 +285,6 @@ int vgic_init(struct kvm *kvm)
+ 	if (ret)
+ 		goto out;
  
--static void kvm_pmu_check_overflow(struct kvm_vcpu *vcpu)
-+static void kvm_pmu_update_state(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_pmu *pmu = &vcpu->arch.pmu;
--	bool overflow = !!kvm_pmu_overflow_status(vcpu);
-+	bool overflow;
-+
-+	if (!kvm_arm_pmu_v3_ready(vcpu))
-+		return;
- 
-+	overflow = !!kvm_pmu_overflow_status(vcpu);
- 	if (pmu->irq_level == overflow)
- 		return;
- 
-@@ -215,33 +219,11 @@ static void kvm_pmu_check_overflow(struct kvm_vcpu *vcpu)
- 
- 	if (likely(irqchip_in_kernel(vcpu->kvm))) {
- 		int ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
--					      pmu->irq_num, overflow,
--					      &vcpu->arch.pmu);
-+					      pmu->irq_num, overflow, pmu);
- 		WARN_ON(ret);
- 	}
- }
- 
--/**
-- * kvm_pmu_overflow_set - set PMU overflow interrupt
-- * @vcpu: The vcpu pointer
-- * @val: the value guest writes to PMOVSSET register
-- */
--void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val)
--{
--	if (val == 0)
--		return;
+-	if (vgic_has_its(kvm))
+-		dist->msis_require_devid = true;
 -
--	vcpu_sys_reg(vcpu, PMOVSSET_EL0) |= val;
--	kvm_pmu_check_overflow(vcpu);
--}
--
--static void kvm_pmu_update_state(struct kvm_vcpu *vcpu)
--{
--	if (!kvm_arm_pmu_v3_ready(vcpu))
--		return;
--	kvm_pmu_check_overflow(vcpu);
--}
--
- bool kvm_pmu_should_notify_user(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-@@ -303,7 +285,7 @@ static inline struct kvm_vcpu *kvm_pmc_to_vcpu(struct kvm_pmc *pmc)
- }
+ 	kvm_for_each_vcpu(i, vcpu, kvm)
+ 		kvm_vgic_vcpu_enable(vcpu);
  
- /**
-- * When perf event overflows, call kvm_pmu_overflow_set to set overflow status.
-+ * When the perf event overflows, set the overflow status and inform the vcpu.
-  */
- static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
- 				  struct perf_sample_data *data,
-@@ -313,7 +295,12 @@ static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
- 	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
- 	int idx = pmc->idx;
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index 2dff288b3a66..aa6b68db80b4 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -1598,6 +1598,7 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
+ 	INIT_LIST_HEAD(&its->device_list);
+ 	INIT_LIST_HEAD(&its->collection_list);
  
--	kvm_pmu_overflow_set(vcpu, BIT(idx));
-+	vcpu_sys_reg(vcpu, PMOVSSET_EL0) |= BIT(idx);
-+
-+	if (kvm_pmu_overflow_status(vcpu)) {
-+		kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
-+		kvm_vcpu_kick(vcpu);
-+	}
- }
- 
- /**
-@@ -341,7 +328,7 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val)
- 			reg = lower_32_bits(reg);
- 			vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) = reg;
- 			if (!reg)
--				kvm_pmu_overflow_set(vcpu, BIT(i));
-+				vcpu_sys_reg(vcpu, PMOVSSET_EL0) |= BIT(i);
- 		}
- 	}
- }
++	dev->kvm->arch.vgic.msis_require_devid = true;
+ 	dev->kvm->arch.vgic.has_its = true;
+ 	its->enabled = false;
+ 	its->dev = dev;
 -- 
 2.11.0
