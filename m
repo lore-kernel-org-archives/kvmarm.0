@@ -1,26 +1,38 @@
-From: Sudeep Holla <sudeep.holla@arm.com>
-Subject: Re: [PATCH][RESEND] arm64: kvm: reuse existing cache type/info
- related macros
-Date: Fri, 4 Aug 2017 14:18:01 +0100
-Message-ID: <5267f4a8-7c0d-a37f-5823-ce3385b629b8@arm.com>
-References: <1501851237-13017-1-git-send-email-sudeep.holla@arm.com>
- <20170804130854.GB27784@cbox>
+From: Jintack Lim <jintack.lim@linaro.org>
+Subject: Re: [RFC PATCH v2 00/38] Nested Virtualization on KVM/ARM
+Date: Fri, 4 Aug 2017 09:59:33 -0400
+Message-ID: <CAHyh4xivtGecGaXf7+VVnusoWd--xiWfG=tBLcy3zALCfvKiMw@mail.gmail.com>
+References: <1500397144-16232-1-git-send-email-jintack.lim@linaro.org>
+ <CAHyh4xjkT+JNJL0kxmEjz4qU8kD2-ZwYgVB8VgwsSYjpjTc3LA@mail.gmail.com>
+ <jpgshhg7227.fsf@linux.bootlegged.copy>
+ <CAHyh4xjhJ+uXSek3cayf9E-xjCYY2vt1L+KH2yWAoj469sXaXA@mail.gmail.com>
+ <20170803174157.7sw4fcqr4o3imxry@kamzik.brq.redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 779A749C2A
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Aug 2017 09:16:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4757249C31
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Aug 2017 09:58:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yh8gau6PHPsh for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Aug 2017 09:16:38 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 75EC749C28
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Aug 2017 09:16:38 -0400 (EDT)
-In-Reply-To: <20170804130854.GB27784@cbox>
-Content-Language: en-US
+ with ESMTP id EdwZ+z3Cym7s for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Aug 2017 09:58:15 -0400 (EDT)
+Received: from mail-oi0-f48.google.com (mail-oi0-f48.google.com
+ [209.85.218.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 12D7449C28
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Aug 2017 09:58:14 -0400 (EDT)
+Received: by mail-oi0-f48.google.com with SMTP id g131so15414813oic.3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Aug 2017 06:59:36 -0700 (PDT)
+Received: from mail-oi0-f44.google.com (mail-oi0-f44.google.com.
+ [209.85.218.44])
+ by smtp.gmail.com with ESMTPSA id l206sm631899oia.46.2017.08.04.06.59.34
+ for <kvmarm@lists.cs.columbia.edu>
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Fri, 04 Aug 2017 06:59:34 -0700 (PDT)
+Received: by mail-oi0-f44.google.com with SMTP id x3so15673003oia.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Aug 2017 06:59:34 -0700 (PDT)
+In-Reply-To: <20170803174157.7sw4fcqr4o3imxry@kamzik.brq.redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,49 +42,92 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, Sudeep Holla <sudeep.holla@arm.com>, kvmarm@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Bandan Das <bsd@redhat.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
+Hi Andrew,
 
-On 04/08/17 14:08, Christoffer Dall wrote:
-> Hi Sudeep,
-> 
-> On Fri, Aug 04, 2017 at 01:53:57PM +0100, Sudeep Holla wrote:
->> We already have various macros related to cache type and bitfields in
->> CLIDR system register. We can replace some of the hardcoded values
->> here using those existing macros.
+On Thu, Aug 3, 2017 at 1:41 PM, Andrew Jones <drjones@redhat.com> wrote:
+> (I trimmed the long CC list)
+>
+> On Fri, Jul 28, 2017 at 05:45:01PM -0400, Jintack Lim wrote:
+>> On Fri, Jul 28, 2017 at 4:13 PM, Bandan Das <bsd@redhat.com> wrote:
+>> > Jintack Lim <jintack.lim@linaro.org> writes:
+>> > ...
+>> >>>
+>> >>> I'll share my experiment setup shortly.
+>> >>
+>> >> I summarized my experiment setup here.
+>> >>
+>> >> https://github.com/columbia/nesting-pub/wiki/Nested-virtualization-on-ARM-setup
+>> >
+>> > Thanks Jintack! I was able to test L2 boot up with these instructions.
 >>
->> This patch reuses those existing cache type/info related macros and
->> replaces the hardcorded values. It also removes some of the comments
->> that become trivial with the macro names.
+>> Thanks for the confirmation!
 >>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: Will Deacon <will.deacon@arm.com>
->> Cc: Christoffer Dall <christoffer.dall@linaro.org>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
->> ---
->>  arch/arm64/include/asm/cache.h |  7 +++++++
->>  arch/arm64/kernel/cacheinfo.c  |  7 -------
->>  arch/arm64/kvm/sys_regs.c      | 29 +++++++++++++++--------------
->>  3 files changed, 22 insertions(+), 21 deletions(-)
+>> >
+>> > Next, I will try to run some simple tests. Any suggestions on reducing the L2 bootup
+>> > time in my test setup ? I think I will try to make the L2 kernel print
+>> > less messages; and maybe just get rid of some of the userspace services.
+>> > I also applied the patch to reduce the timer frequency btw.
 >>
->> Hi,
+>> I think you can try to use those kernel parameters: "loglevel=1", with
+>> which the kernel print (almost) nothing during the boot process but
+>> the init process will print something,  or "console=none", with which
+>> you don't see anything but the login message.  I didn't used them
+>> because I wanted to see the L2 boot message as soon as possible :)
 >>
->> I dropped the support for 64bit format CCSIDR after Will's commit a8d4636f96ad
->> ("arm64: cacheinfo: Remove CCSIDR-based cache information probing"). However
->> I forgot to follow up on this patch which can be still applied. So just
->> reposting again rebasing on v4.13-rc3 as mentioned by Will as it was too
->> late for last cycle. Christoffer was fine with the changes but has not
->> given an official ACK.
->>
-> 
-> Reviewed-by: Christoffer Dall <cdall@linaro.org>
-> 
-Thanks for the quick response and review tag.
+>
+> For some quick testing, kvm-unit-tests can be used as an L2 guest. Just
+> copy the repository with compiled unit tests to the L1 disk image and
+> then run
+>
+>  $ ./run_tests.sh
 
--- 
-Regards,
-Sudeep
+Right. I used to run kvm-unit-tests in L1. I will mention that in the
+next cover letter. Thanks!
+
+>
+> Also, I've just added some support to it, available on this branch
+>
+>  https://github.com/rhdrjones/kvm-unit-tests/commits/arm64/hyp-mode
+>
+> that may make it somewhat useful for L1 guest testing too. I've only
+> tested on TCG (which supports starting CPUs in EL2 by setting the virt
+> model's virtualization property)
+>
+> To use it for L1 guest testing, copy the repository with compiled unit
+> tests to the L0 disk image and run
+>
+>  $ QEMU=/path/to/nested-qemu ./run_tests -- -cpu host,nested=true
+>
+> I've also added tests that are specifically for L1 guest testing. Below
+> is the output of running them on TCG
+>
+>  $ ./run_tests.sh -g hyp -- -machine virtualization=on
+>  PASS hyp (4 tests)
+>  $ cat logs/hyp.log
+>  timeout -k 1s --foreground 90s /home/drjones/code/rhdrjones/build/q/aarch64-softmmu/qemu-system-aarch64 -nodefaults -machine virt,accel=tcg -cpu cortex-a57 -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/hyp.flat -smp 4 -machine virtualization=on # -initrd /tmp/tmp.hDF1mV9Ck8
+>  INFO: hyp: NR_CPUS=4
+>  PASS: hyp: started EL2
+>  PASS: hyp: el2: hvc
+>  PASS: hyp: eret to EL1
+>  PASS: hyp: el1: hvc
+>  PASS: hyp: reset: started EL2
+>  PASS: hyp: reset: el2: hvc
+>  PASS: hyp: reset: eret to EL1
+>  PASS: hyp: reset: el1: hvc
+>  SUMMARY: 4 tests
+>
+> s/-machine virtualization=on/-cpu host,nested=true/ for the FastModel
+> environment. Maybe it'll work...
+
+This is cool! I'll test it in my environment!
+
+Thanks,
+Jintack
+
+>
+> Thanks,
+> drew
