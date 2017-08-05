@@ -1,25 +1,25 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 01/15] ARM: assembler: introduce adr_l, ldr_l and str_l macros
-Date: Sat,  5 Aug 2017 21:52:08 +0100
-Message-ID: <20170805205222.19868-2-ard.biesheuvel@linaro.org>
+Subject: [PATCH 02/15] ARM: head-common.S: use PC-relative insn sequence for
+ __proc_info
+Date: Sat,  5 Aug 2017 21:52:09 +0100
+Message-ID: <20170805205222.19868-3-ard.biesheuvel@linaro.org>
 References: <20170805205222.19868-1-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A48E449C34
- for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Aug 2017 16:51:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 688F049C29
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Aug 2017 16:51:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id p3Pifh7Obi+Y for <kvmarm@lists.cs.columbia.edu>;
- Sat,  5 Aug 2017 16:51:47 -0400 (EDT)
-Received: from mail-wr0-f172.google.com (mail-wr0-f172.google.com
- [209.85.128.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EF63849C19
- for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Aug 2017 16:51:46 -0400 (EDT)
-Received: by mail-wr0-f172.google.com with SMTP id 33so27138451wrz.4
- for <kvmarm@lists.cs.columbia.edu>; Sat, 05 Aug 2017 13:53:11 -0700 (PDT)
+ with ESMTP id e32vKQlUlva2 for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  5 Aug 2017 16:51:51 -0400 (EDT)
+Received: from mail-wm0-f53.google.com (mail-wm0-f53.google.com [74.125.82.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 11D7249C51
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Aug 2017 16:51:50 -0400 (EDT)
+Received: by mail-wm0-f53.google.com with SMTP id t201so42445965wmt.1
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 05 Aug 2017 13:53:15 -0700 (PDT)
 In-Reply-To: <20170805205222.19868-1-ard.biesheuvel@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,133 +34,53 @@ To: linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org, lin
 Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Like arm64, ARM supports position independent code sequences that
-produce symbol references with a greater reach than the ordinary
-adr/ldr instructions.
-
-Currently, we use open coded instruction sequences involving literals
-and arithmetic operations. Instead, we can use movw/movt pairs on v7
-CPUs, circumventing the D-cache entirely. For older CPUs, we can emit
-the literal into a subsection, allowing it to be emitted out of line
-while retaining the ability to perform arithmetic on label offsets.
-
-E.g., on pre-v7 CPUs, we can emit a PC-relative reference as follows:
-
-       ldr          <reg>, 222f
-  111: add          <reg>, <reg>, pc
-       .subsection  1
-  222: .long        <sym> - (111b + 8)
-       .previous
-
-This is allowed by the assembler because, unlike ordinary sections,
-subsections are combined into a single section into the object file,
-and so the label references are not true cross-section references that
-are visible as relocations. Note that we could even do something like
-
-       add          <reg>, pc, #(222f - 111f) & ~0xfff
-       ldr          <reg>, [<reg>, #(222f - 111f) & 0xfff]
-  111: add          <reg>, <reg>, pc
-       .subsection  1
-  222: .long        <sym> - (111b + 8)
-       .previous
-
-if it turns out that the 4 KB range of the ldr instruction is insufficient
-to reach the literal in the subsection, although this is currently not a
-problem (of the 98 objects built from .S files in a multi_v7_defconfig
-build, only 11 have .text sections that are over 1 KB, and the largest one
-[entry-armv.o] is 3308 bytes)
-
-Subsections have been available in binutils since 2004 at least, so
-they should not cause any issues with older toolchains.
-
-So use the above to implement the macros mov_l, adr_l, adrm_l (using ldm
-to load multiple literals at once), ldr_l and str_l, all of which will
-use movw/movt pairs on v7 and later CPUs, and use PC-relative literals
-otherwise.
+Replace the open coded PC relative offset calculations with a pair
+of adr_l invocations.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm/include/asm/assembler.h | 70 ++++++++++++++++++++
- 1 file changed, 70 insertions(+)
+ arch/arm/kernel/head-common.S | 22 ++++++--------------
+ 1 file changed, 6 insertions(+), 16 deletions(-)
 
-diff --git a/arch/arm/include/asm/assembler.h b/arch/arm/include/asm/assembler.h
-index ad301f107dd2..cedf59a7f853 100644
---- a/arch/arm/include/asm/assembler.h
-+++ b/arch/arm/include/asm/assembler.h
-@@ -518,4 +518,74 @@ THUMB(	orr	\reg , \reg , #PSR_T_BIT	)
- #endif
- 	.endm
+diff --git a/arch/arm/kernel/head-common.S b/arch/arm/kernel/head-common.S
+index 8733012d231f..06035488130c 100644
+--- a/arch/arm/kernel/head-common.S
++++ b/arch/arm/kernel/head-common.S
+@@ -150,11 +150,12 @@ ENDPROC(lookup_processor_type)
+  *	r9 = cpuid (preserved)
+  */
+ __lookup_processor_type:
+-	adr	r3, __lookup_processor_type_data
+-	ldmia	r3, {r4 - r6}
+-	sub	r3, r3, r4			@ get offset between virt&phys
+-	add	r5, r5, r3			@ convert virt addresses to
+-	add	r6, r6, r3			@ physical address space
++	/*
++	 * Look in <asm/procinfo.h> for information about the __proc_info
++	 * structure.
++	 */
++	adr_l	r5, __proc_info_begin
++	adr_l	r6, __proc_info_end
+ 1:	ldmia	r5, {r3, r4}			@ value, mask
+ 	and	r4, r4, r9			@ mask wanted bits
+ 	teq	r3, r4
+@@ -166,17 +167,6 @@ __lookup_processor_type:
+ 2:	ret	lr
+ ENDPROC(__lookup_processor_type)
  
-+#ifdef CONFIG_THUMB2_KERNEL
-+#define	ARM_PC_BIAS		4
-+#else
-+#define	ARM_PC_BIAS		8
-+#endif
-+
-+	.macro		__adldst_l, op, reg, sym, tmp
-+	.if		__LINUX_ARM_ARCH__ < 7
-+	ldr		\tmp, 111f
-+	.subsection	1
-+	.align		2
-+111:	.long		\sym - (222f + ARM_PC_BIAS)
-+	.previous
-+	.else
-+	movw		\tmp, #:lower16:\sym - (222f + ARM_PC_BIAS)
-+	movt		\tmp, #:upper16:\sym - (222f + ARM_PC_BIAS)
-+	.endif
-+222:;	.ifc		\op, add
-+	add		\reg, \tmp, pc
-+	.elseif		CONFIG_THUMB2_KERNEL == 1
-+	add		\tmp, \tmp, pc
-+	\op		\reg, [\tmp]
-+	.else
-+	\op		\reg, [pc, \tmp]
-+	.endif
-+	.endm
-+
-+	/*
-+	 * mov_l - move a constant value or [relocated] address into a register
-+	 */
-+	.macro		mov_l, dst:req, imm:req
-+	.if		__LINUX_ARM_ARCH__ < 7
-+	ldr		\dst, =\imm
-+	.else
-+	movw		\dst, #:lower16:\imm
-+	movt		\dst, #:upper16:\imm
-+	.endif
-+	.endm
-+
-+	/*
-+	 * adr_l - adr pseudo-op with unlimited range
-+	 *
-+	 * @dst: destination register
-+	 * @sym: name of the symbol
-+	 */
-+	.macro		adr_l, dst:req, sym:req
-+	__adldst_l	add, \dst, \sym, \dst
-+	.endm
-+
-+	/*
-+	 * ldr_l - ldr <literal> pseudo-op with unlimited range
-+	 *
-+	 * @dst: destination register
-+	 * @sym: name of the symbol
-+	 */
-+	.macro		ldr_l, dst:req, sym:req
-+	__adldst_l	ldr, \dst, \sym, \dst
-+	.endm
-+
-+	/*
-+	 * str_l - str <literal> pseudo-op with unlimited range
-+	 *
-+	 * @src: source register
-+	 * @sym: name of the symbol
-+	 * @tmp: mandatory scratch register
-+	 */
-+	.macro		str_l, src:req, sym:req, tmp:req
-+	__adldst_l	str, \src, \sym, \tmp
-+	.endm
-+
- #endif /* __ASM_ASSEMBLER_H__ */
+-/*
+- * Look in <asm/procinfo.h> for information about the __proc_info structure.
+- */
+-	.align	2
+-	.type	__lookup_processor_type_data, %object
+-__lookup_processor_type_data:
+-	.long	.
+-	.long	__proc_info_begin
+-	.long	__proc_info_end
+-	.size	__lookup_processor_type_data, . - __lookup_processor_type_data
+-
+ __error_lpae:
+ #ifdef CONFIG_DEBUG_LL
+ 	adr	r0, str_lpae
 -- 
 2.11.0
