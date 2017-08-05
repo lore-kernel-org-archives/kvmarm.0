@@ -1,25 +1,26 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 02/15] ARM: head-common.S: use PC-relative insn sequence for
- __proc_info
-Date: Sat,  5 Aug 2017 21:52:09 +0100
-Message-ID: <20170805205222.19868-3-ard.biesheuvel@linaro.org>
+Subject: [PATCH 03/15] ARM: head-common.S: use PC-relative insn sequence for
+ __turn_mmu_on
+Date: Sat,  5 Aug 2017 21:52:10 +0100
+Message-ID: <20170805205222.19868-4-ard.biesheuvel@linaro.org>
 References: <20170805205222.19868-1-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 688F049C29
- for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Aug 2017 16:51:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E237E49C2F
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Aug 2017 16:51:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id e32vKQlUlva2 for <kvmarm@lists.cs.columbia.edu>;
- Sat,  5 Aug 2017 16:51:51 -0400 (EDT)
-Received: from mail-wm0-f53.google.com (mail-wm0-f53.google.com [74.125.82.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 11D7249C51
- for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Aug 2017 16:51:50 -0400 (EDT)
-Received: by mail-wm0-f53.google.com with SMTP id t201so42445965wmt.1
- for <kvmarm@lists.cs.columbia.edu>; Sat, 05 Aug 2017 13:53:15 -0700 (PDT)
+ with ESMTP id z7+ixEMl1GUZ for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  5 Aug 2017 16:51:54 -0400 (EDT)
+Received: from mail-wr0-f178.google.com (mail-wr0-f178.google.com
+ [209.85.128.178])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7E33E49C51
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Aug 2017 16:51:53 -0400 (EDT)
+Received: by mail-wr0-f178.google.com with SMTP id 33so27138899wrz.4
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 05 Aug 2017 13:53:17 -0700 (PDT)
 In-Reply-To: <20170805205222.19868-1-ard.biesheuvel@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -39,48 +40,38 @@ of adr_l invocations.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm/kernel/head-common.S | 22 ++++++--------------
- 1 file changed, 6 insertions(+), 16 deletions(-)
+ arch/arm/kernel/head.S | 12 ++----------
+ 1 file changed, 2 insertions(+), 10 deletions(-)
 
-diff --git a/arch/arm/kernel/head-common.S b/arch/arm/kernel/head-common.S
-index 8733012d231f..06035488130c 100644
---- a/arch/arm/kernel/head-common.S
-+++ b/arch/arm/kernel/head-common.S
-@@ -150,11 +150,12 @@ ENDPROC(lookup_processor_type)
-  *	r9 = cpuid (preserved)
-  */
- __lookup_processor_type:
--	adr	r3, __lookup_processor_type_data
--	ldmia	r3, {r4 - r6}
--	sub	r3, r3, r4			@ get offset between virt&phys
--	add	r5, r5, r3			@ convert virt addresses to
--	add	r6, r6, r3			@ physical address space
-+	/*
-+	 * Look in <asm/procinfo.h> for information about the __proc_info
-+	 * structure.
-+	 */
-+	adr_l	r5, __proc_info_begin
-+	adr_l	r6, __proc_info_end
- 1:	ldmia	r5, {r3, r4}			@ value, mask
- 	and	r4, r4, r9			@ mask wanted bits
- 	teq	r3, r4
-@@ -166,17 +167,6 @@ __lookup_processor_type:
- 2:	ret	lr
- ENDPROC(__lookup_processor_type)
+diff --git a/arch/arm/kernel/head.S b/arch/arm/kernel/head.S
+index 04286fd9e09c..0a98aec0e39d 100644
+--- a/arch/arm/kernel/head.S
++++ b/arch/arm/kernel/head.S
+@@ -227,11 +227,8 @@ __create_page_tables:
+ 	 * Create identity mapping to cater for __enable_mmu.
+ 	 * This identity mapping will be removed by paging_init().
+ 	 */
+-	adr	r0, __turn_mmu_on_loc
+-	ldmia	r0, {r3, r5, r6}
+-	sub	r0, r0, r3			@ virt->phys offset
+-	add	r5, r5, r0			@ phys __turn_mmu_on
+-	add	r6, r6, r0			@ phys __turn_mmu_on_end
++	adr_l	r5, __turn_mmu_on		@ _pa(__turn_mmu_on)
++	adr_l	r6, __turn_mmu_on_end		@ _pa(__turn_mmu_on_end)
+ 	mov	r5, r5, lsr #SECTION_SHIFT
+ 	mov	r6, r6, lsr #SECTION_SHIFT
  
--/*
-- * Look in <asm/procinfo.h> for information about the __proc_info structure.
-- */
--	.align	2
--	.type	__lookup_processor_type_data, %object
--__lookup_processor_type_data:
+@@ -354,11 +351,6 @@ __create_page_tables:
+ 	ret	lr
+ ENDPROC(__create_page_tables)
+ 	.ltorg
+-	.align
+-__turn_mmu_on_loc:
 -	.long	.
--	.long	__proc_info_begin
--	.long	__proc_info_end
--	.size	__lookup_processor_type_data, . - __lookup_processor_type_data
--
- __error_lpae:
- #ifdef CONFIG_DEBUG_LL
- 	adr	r0, str_lpae
+-	.long	__turn_mmu_on
+-	.long	__turn_mmu_on_end
+ 
+ #if defined(CONFIG_SMP)
+ 	.text
 -- 
 2.11.0
