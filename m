@@ -1,78 +1,64 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 14/15] arm-soc: shmobile: replace open coded VA->PA calculation
-Date: Sat,  5 Aug 2017 21:52:21 +0100
-Message-ID: <20170805205222.19868-15-ard.biesheuvel@linaro.org>
-References: <20170805205222.19868-1-ard.biesheuvel@linaro.org>
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+Subject: [PATCH] KVM: arm64: add esr_el2 and far_el2 to sysreg
+Date: Tue, 8 Aug 2017 00:08:37 +0800
+Message-ID: <1502122117-6276-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1818849C27
- for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Aug 2017 16:52:33 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vgtw6vMYMmrh for <kvmarm@lists.cs.columbia.edu>;
- Sat,  5 Aug 2017 16:52:32 -0400 (EDT)
-Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com [74.125.82.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2891D49C54
- for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Aug 2017 16:52:32 -0400 (EDT)
-Received: by mail-wm0-f50.google.com with SMTP id m85so42574147wma.1
- for <kvmarm@lists.cs.columbia.edu>; Sat, 05 Aug 2017 13:53:56 -0700 (PDT)
-In-Reply-To: <20170805205222.19868-1-ard.biesheuvel@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org, linux@armlinux.org.uk, linux-omap@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, krzk@kernel.org, jason@lakedaemon.net, arm@kernel.org, andrew@lunn.ch, gregory.clement@free-electrons.com, sebastian.hesselbarth@gmail.com, tony@atomide.com, baohua@kernel.org, horms@verge.net.au, magnus.damm@gmail.com, vireshk@kernel.org, shiraz.linux.kernel@gmail.com, patrice.chotard@st.com, nico@linaro.org, dave.martin@arm.com, marc.zyngier@arm.com
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Content-Type: text/plain
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, gengdongjiu@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This replaces a couple of open coded calculations to obtain the
-physical address of a far symbol with calls to the new adr_l etc
-macros.
+For the firmware-first RAS solution, SEA and SEI is injected
+by the user space, user space needs to know the esr_el2 and
+far_el2's value, so add them to sysreg. user space uses
+the IOCTL KVM_GET_ONE_REG can get their value.
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+Signed-off-by: Quanming Wu <wuquanming@huawei.com>
 ---
- arch/arm/mach-shmobile/headsmp.S | 14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
+ arch/arm64/include/asm/kvm_host.h | 6 ++++--
+ arch/arm64/kvm/sys_regs.c         | 6 ++++++
+ 2 files changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm/mach-shmobile/headsmp.S b/arch/arm/mach-shmobile/headsmp.S
-index 32e0bf6e3ccb..f5e0d7c93cda 100644
---- a/arch/arm/mach-shmobile/headsmp.S
-+++ b/arch/arm/mach-shmobile/headsmp.S
-@@ -46,11 +46,10 @@ ENTRY(shmobile_smp_boot)
- 	and	r0, r1, #0xffffff		@ MPIDR_HWID_BITMASK
- 						@ r0 = cpu_logical_map() value
- 	mov	r1, #0				@ r1 = CPU index
--	adr	r2, 1f
--	ldmia	r2, {r5, r6, r7}
--	add	r5, r5, r2			@ array of per-cpu mpidr values
--	add	r6, r6, r2			@ array of per-cpu functions
--	add	r7, r7, r2			@ array of per-cpu arguments
-+
-+	adr_l	r5, shmobile_smp_mpidr		@ array of per-cpu mpidr values
-+	adr_l	r6, shmobile_smp_fn		@ array of per-cpu functions
-+	adr_l	r7, shmobile_smp_arg		@ array of per-cpu arguments
- 
- shmobile_smp_boot_find_mpidr:
- 	ldr	r8, [r5, r1, lsl #2]
-@@ -78,11 +77,6 @@ ENTRY(shmobile_smp_sleep)
- 	b	shmobile_smp_boot
- ENDPROC(shmobile_smp_sleep)
- 
--	.align	2
--1:	.long	shmobile_smp_mpidr - .
--	.long	shmobile_smp_fn - 1b
--	.long	shmobile_smp_arg - 1b
--
- 	.bss
- 	.globl	shmobile_smp_mpidr
- shmobile_smp_mpidr:
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index b6242fb..6063eec 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -103,10 +103,12 @@ enum vcpu_sysreg {
+ 	TTBR0_EL1,	/* Translation Table Base Register 0 */
+ 	TTBR1_EL1,	/* Translation Table Base Register 1 */
+ 	TCR_EL1,	/* Translation Control Register */
+-	ESR_EL1,	/* Exception Syndrome Register */
++	ESR_EL1,	/* Exception Syndrome Register for EL1 */
++	ESR_EL2,	/* Exception Syndrome Register for EL2 */
+ 	AFSR0_EL1,	/* Auxiliary Fault Status Register 0 */
+ 	AFSR1_EL1,	/* Auxiliary Fault Status Register 1 */
+-	FAR_EL1,	/* Fault Address Register */
++	FAR_EL1,	/* Fault Address Register for EL1 */
++	FAR_EL2,	/* Fault Address Register for EL2 */
+ 	MAIR_EL1,	/* Memory Attribute Indirection Register */
+ 	VBAR_EL1,	/* Vector Base Address Register */
+ 	CONTEXTIDR_EL1,	/* Context ID Register */
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 0e26f8c..0c286bf 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -987,9 +987,15 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	/* ESR_EL1 */
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0101), CRm(0b0010), Op2(0b000),
+ 	  access_vm_reg, reset_unknown, ESR_EL1 },
++	/* ESR_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b0101), CRm(0b0010), Op2(0b000),
++	  access_vm_reg, reset_unknown, ESR_EL2 },
+ 	/* FAR_EL1 */
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0110), CRm(0b0000), Op2(0b000),
+ 	  access_vm_reg, reset_unknown, FAR_EL1 },
++	/* FAR_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b0110), CRm(0b0000), Op2(0b000),
++	  access_vm_reg, reset_unknown, FAR_EL2 },
+ 	/* PAR_EL1 */
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0111), CRm(0b0100), Op2(0b000),
+ 	  NULL, reset_unknown, PAR_EL1 },
 -- 
-2.11.0
+2.10.1
