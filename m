@@ -1,93 +1,125 @@
-From: Dongjiu Geng <gengdongjiu@huawei.com>
-Subject: [PATCH v2] KVM: arm64: pass vcpu esr_el2 and far_el2 sysre to user space
-Date: Tue, 8 Aug 2017 03:17:34 +0800
-Message-ID: <1502133454-5905-1-git-send-email-gengdongjiu@huawei.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Subject: Re: [PATCH] KVM: arm64: add esr_el2 and far_el2 to sysreg
+Date: Tue, 8 Aug 2017 02:59:44 +0800
+Message-ID: <085aaa48-3d8d-5af4-0329-6db8175f7032@huawei.com>
+References: <1502122117-6276-1-git-send-email-gengdongjiu@huawei.com>
+ <9fe6aa3a-98f9-6cae-6932-054858b54744@arm.com>
+ <b834276b-b47d-51fb-7661-3eb5a2f6a68d@huawei.com>
+ <fd96cc97-95b9-846e-0b31-ddfceb738a89@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <fd96cc97-95b9-846e-0b31-ddfceb738a89@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, catalin.marinas@arm.com, will.deacon@arm.com, james.morse@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, gengdongjiu@huawei.com
+To: Marc Zyngier <marc.zyngier@arm.com>, christoffer.dall@linaro.org, pbonzini@redhat.com, rkrcmar@redhat.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, James Morse <James.Morse@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-For the firmware-first RAS solution, SEA and SEI is injected
-by the user space, user space needs to know the vcpu's esr_el2 and
-far_el2 value, so add them to sysreg. user space uses
-the IOCTL KVM_GET_ONE_REG can get their value.
+Marc,
 
-Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
----
- arch/arm64/include/asm/kvm_host.h | 6 ++++--
- arch/arm64/include/asm/sysreg.h   | 2 ++
- arch/arm64/kvm/hyp/switch.c       | 2 ++
- arch/arm64/kvm/sys_regs.c         | 2 ++
- 4 files changed, 10 insertions(+), 2 deletions(-)
+On 2017/8/8 0:56, Marc Zyngier wrote:
+> On 07/08/17 17:23, gengdongjiu wrote:
+>> Hi Marc,
+>>   As James's suggestion, I move injection SEA Error logic to the user space(Qemu), Qemu sets the related guest OS esr/elr/pstate/spsr
+>> through IOCTL KVM_SET_ONE_REG. For the SEA, when Qemu sets the esr_el1.IL bit, it needs to refer to esr_el2.IL, else Qemu does not know the trapped
+>> instruction was a 16-bit or a 32-bit instruction, also it needs to set far_el1 using far_el2, because this is synchronization abort.
+> 
+> Usespace may need some fault information, but certainly not the full set
+> of FAR_EL2/ESR_EL2. What it needs is a very small set of well defined
+> information, properly abstracted, and not data that is completely
+> private to the hypervisor.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index d68630007b14..075ff9fba0af 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -104,10 +104,12 @@ enum vcpu_sysreg {
- 	TTBR0_EL1,	/* Translation Table Base Register 0 */
- 	TTBR1_EL1,	/* Translation Table Base Register 1 */
- 	TCR_EL1,	/* Translation Control Register */
--	ESR_EL1,	/* Exception Syndrome Register */
-+	ESR_EL1,	/* Exception Syndrome Register for EL1 */
-+	ESR_EL2,        /* Exception Syndrome Register for EL2 */
- 	AFSR0_EL1,	/* Auxiliary Fault Status Register 0 */
- 	AFSR1_EL1,	/* Auxiliary Fault Status Register 1 */
--	FAR_EL1,	/* Fault Address Register */
-+	FAR_EL1,	/* Fault Address Register for EL1 */
-+	FAR_EL2,        /* Fault Address Register for EL2 */
- 	MAIR_EL1,	/* Memory Attribute Indirection Register */
- 	VBAR_EL1,	/* Vector Base Address Register */
- 	CONTEXTIDR_EL1,	/* Context ID Register */
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 248339e4aaf5..b019141a8c29 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -252,7 +252,9 @@
- 
- #define SYS_DACR32_EL2			sys_reg(3, 4, 3, 0, 0)
- #define SYS_IFSR32_EL2			sys_reg(3, 4, 5, 0, 1)
-+#define SYS_ESR_EL2			sys_reg(3, 4, 5, 2, 0)
- #define SYS_FPEXC32_EL2			sys_reg(3, 4, 5, 3, 0)
-+#define SYS_FAR_EL2			sys_reg(3, 4, 6, 0, 0)
- 
- #define __SYS__AP0Rx_EL2(x)		sys_reg(3, 4, 12, 8, x)
- #define SYS_ICH_AP0R0_EL2		__SYS__AP0Rx_EL2(0)
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index c6f17c7675ad..6ec9ecd68d20 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -229,6 +229,7 @@ static bool __hyp_text __translate_far_to_hpfar(u64 far, u64 *hpfar)
- static void __hyp_text __populate_fault_info_esr(struct kvm_vcpu *vcpu)
- {
- 	vcpu->arch.fault.esr_el2 = read_sysreg_el2(esr);
-+	vcpu_sys_reg(vcpu,ESR_EL2) = read_sysreg_el2(esr);
- }
- 
- static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
-@@ -267,6 +268,7 @@ static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
- 
- 	vcpu->arch.fault.far_el2 = far;
- 	vcpu->arch.fault.hpfar_el2 = hpfar;
-+	vcpu_sys_reg(vcpu,FAR_EL2) = far;
- 	return true;
- }
- 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 2e070d3baf9f..c730d593efbb 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1079,7 +1079,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 
- 	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
- 	{ SYS_DESC(SYS_IFSR32_EL2), NULL, reset_unknown, IFSR32_EL2 },
-+	{ SYS_DESC(SYS_ESR_EL2), access_vm_reg, reset_unknown, ESR_EL2 },
- 	{ SYS_DESC(SYS_FPEXC32_EL2), NULL, reset_val, FPEXC32_EL2, 0x70 },
-+	{ SYS_DESC(SYS_FAR_EL2), access_vm_reg, reset_unknown, FAR_EL2 },
- };
- 
- static bool trap_dbgidr(struct kvm_vcpu *vcpu,
--- 
-2.13.4
+Marc, just now I update the patch, may be use the vcpu->arch.fault.esr_el2 and vcpu->arch.fault.far_el2 to set the vcpu_sys_reg(vcpu,FAR_EL2)/vcpu_sys_reg(vcpu,ESR_EL2) can be better.
+Now the user space can not directly get the vcpu->arch.faul.xxxx value, so need use vcpu_sys_reg to pass.
+
+
+
+> 
+> Thanks,
+> 
+> 	M.
+>>
+>>
+>>
+>>
+>> On 2017/8/7 23:57, Marc Zyngier wrote:
+>>> +James, since he deals with all things RAS. Please keep him on CC at all
+>>> times.
+>>>
+>>> On 07/08/17 17:08, Dongjiu Geng wrote:
+>>>> For the firmware-first RAS solution, SEA and SEI is injected
+>>>> by the user space, user space needs to know the esr_el2 and
+>>>> far_el2's value, so add them to sysreg. user space uses
+>>>> the IOCTL KVM_GET_ONE_REG can get their value.
+>>>
+>>> No.
+>>>
+>>> This has zero purpose being exposed to userspace. Userspace sees a VM
+>>> that runs at EL1, and nothing else, so exposing EL2 registers doesn't
+>>> make *any* sense.
+>>>
+>>> If you want something to be exposed to userspace, it has to be properly
+>>> abstracted and describe something that is relevant to the VM. An EL2
+>>> register satisfies none of these conditions.
+>>>
+>>>>
+>>>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+>>>> Signed-off-by: Quanming Wu <wuquanming@huawei.com>
+>>>> ---
+>>>>  arch/arm64/include/asm/kvm_host.h | 6 ++++--
+>>>>  arch/arm64/kvm/sys_regs.c         | 6 ++++++
+>>>>  2 files changed, 10 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>>>> index b6242fb..6063eec 100644
+>>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>>> @@ -103,10 +103,12 @@ enum vcpu_sysreg {
+>>>>  	TTBR0_EL1,	/* Translation Table Base Register 0 */
+>>>>  	TTBR1_EL1,	/* Translation Table Base Register 1 */
+>>>>  	TCR_EL1,	/* Translation Control Register */
+>>>> -	ESR_EL1,	/* Exception Syndrome Register */
+>>>> +	ESR_EL1,	/* Exception Syndrome Register for EL1 */
+>>>> +	ESR_EL2,	/* Exception Syndrome Register for EL2 */
+>>>>  	AFSR0_EL1,	/* Auxiliary Fault Status Register 0 */
+>>>>  	AFSR1_EL1,	/* Auxiliary Fault Status Register 1 */
+>>>> -	FAR_EL1,	/* Fault Address Register */
+>>>> +	FAR_EL1,	/* Fault Address Register for EL1 */
+>>>> +	FAR_EL2,	/* Fault Address Register for EL2 */
+>>>>  	MAIR_EL1,	/* Memory Attribute Indirection Register */
+>>>>  	VBAR_EL1,	/* Vector Base Address Register */
+>>>>  	CONTEXTIDR_EL1,	/* Context ID Register */
+>>>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>>>> index 0e26f8c..0c286bf 100644
+>>>> --- a/arch/arm64/kvm/sys_regs.c
+>>>> +++ b/arch/arm64/kvm/sys_regs.c
+>>>> @@ -987,9 +987,15 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>>>>  	/* ESR_EL1 */
+>>>>  	{ Op0(0b11), Op1(0b000), CRn(0b0101), CRm(0b0010), Op2(0b000),
+>>>>  	  access_vm_reg, reset_unknown, ESR_EL1 },
+>>>> +	/* ESR_EL2 */
+>>>> +	{ Op0(0b11), Op1(0b100), CRn(0b0101), CRm(0b0010), Op2(0b000),
+>>>> +	  access_vm_reg, reset_unknown, ESR_EL2 },
+>>>>  	/* FAR_EL1 */
+>>>>  	{ Op0(0b11), Op1(0b000), CRn(0b0110), CRm(0b0000), Op2(0b000),
+>>>>  	  access_vm_reg, reset_unknown, FAR_EL1 },
+>>>> +	/* FAR_EL2 */
+>>>> +	{ Op0(0b11), Op1(0b100), CRn(0b0110), CRm(0b0000), Op2(0b000),
+>>>> +	  access_vm_reg, reset_unknown, FAR_EL2 },
+>>>>  	/* PAR_EL1 */
+>>>>  	{ Op0(0b11), Op1(0b000), CRn(0b0111), CRm(0b0100), Op2(0b000),
+>>>>  	  NULL, reset_unknown, PAR_EL1 },
+>>>>
+>>>
+>>> Also, what do you return here? All you're doing to return to userspace
+>>> is 0x1de7ec7edbadc0deULL (which perfectly matches this patch).
+>>>
+>>> So for all intents and purposes, this patch is pretty useless.
+>>>
+>>> Thanks,
+>>>
+>>> 	M.
+>>>
+>>
+> 
+> 
