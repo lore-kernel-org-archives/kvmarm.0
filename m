@@ -1,56 +1,93 @@
-From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: add esr_el2 and far_el2 to sysreg
-Date: Tue, 8 Aug 2017 01:43:04 +0800
-Message-ID: <7569b9a7-ce5f-8cb2-2997-a2818ac7d854@huawei.com>
-References: <1502122117-6276-1-git-send-email-gengdongjiu@huawei.com>
- <9fe6aa3a-98f9-6cae-6932-054858b54744@arm.com>
- <b834276b-b47d-51fb-7661-3eb5a2f6a68d@huawei.com> <59889C59.80207@arm.com>
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+Subject: [PATCH v2] KVM: arm64: pass vcpu esr_el2 and far_el2 sysre to user space
+Date: Tue, 8 Aug 2017 03:17:34 +0800
+Message-ID: <1502133454-5905-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <59889C59.80207@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: James Morse <james.morse@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, christoffer.dall@linaro.org, pbonzini@redhat.com, rkrcmar@redhat.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+To: christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, catalin.marinas@arm.com, will.deacon@arm.com, james.morse@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, gengdongjiu@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Ok, thanks for James's confirmation.
+For the firmware-first RAS solution, SEA and SEI is injected
+by the user space, user space needs to know the vcpu's esr_el2 and
+far_el2 value, so add them to sysreg. user space uses
+the IOCTL KVM_GET_ONE_REG can get their value.
 
-Another question, For the SEI, I want to also use SIGBUS both for the KVM user and non-kvm user, if SEA and SEI Error all use the SIGBUS to notify user space(Qemu),
-the user space(Qemu) will be confused, and do not know whether this is SEA or SEI error. so here I pass the sysreg ESR_EL2(vcpu->arch.fault.esr_el2) to the user space, let user space judges the (vcpu->arch.fault.esr_el2)'s value
-to know this is a SEA or SEI Error. do you agree my solution for the SEI? thanks.
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+---
+ arch/arm64/include/asm/kvm_host.h | 6 ++++--
+ arch/arm64/include/asm/sysreg.h   | 2 ++
+ arch/arm64/kvm/hyp/switch.c       | 2 ++
+ arch/arm64/kvm/sys_regs.c         | 2 ++
+ 4 files changed, 10 insertions(+), 2 deletions(-)
 
-because the vcpu->arch.fault.esr_el2 can not directly passed to userspace, so I defined the vcpu->arch.fault.esr_el2 to sysreg ESR_EL2/FAR_EL2, sysreg register can pass to user space.
-
-
-+		vcpu_sys_reg(vcpu,ESR_EL2) = kvm_vcpu_get_hsr(vcpu);
-+		vcpu_sys_reg(vcpu,FAR_EL2) = kvm_vcpu_get_hfar(vcpu);
-
-
-
-On 2017/8/8 0:59, James Morse wrote:
-> Hi gengdongjiu,
-> 
-> On 07/08/17 17:23, gengdongjiu wrote:
->>   As James's suggestion, I move injection SEA Error logic to the user space(Qemu), Qemu sets the related guest OS esr/elr/pstate/spsr
-> 
-> (because for firmware-first its the CPER records that matter, and only QEMU
-> knows where it reserved the memory for these, and what it told the guest it
-> would use as the notification method).
-> 
->> through IOCTL KVM_SET_ONE_REG. For the SEA, when Qemu sets the esr_el1.IL bit, it needs to refer to esr_el2.IL, else Qemu does not know the trapped
->> instruction was a 16-bit or a 32-bit instruction, also it needs to set far_el1 using far_el2, because this is synchronization abort.
-> 
-> The 32bit kernel doesn't support ACPI firmware first, and aarch64 doesn't
-> support 16-bit instructions.
- thanks, so how about the SEA's error FAR_EL1's value? may be FAR_EL1's value get from FAR_EL2's value.
-
-> 
-> 
-> James
-> 
-> 
-> 
-> .
-> 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index d68630007b14..075ff9fba0af 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -104,10 +104,12 @@ enum vcpu_sysreg {
+ 	TTBR0_EL1,	/* Translation Table Base Register 0 */
+ 	TTBR1_EL1,	/* Translation Table Base Register 1 */
+ 	TCR_EL1,	/* Translation Control Register */
+-	ESR_EL1,	/* Exception Syndrome Register */
++	ESR_EL1,	/* Exception Syndrome Register for EL1 */
++	ESR_EL2,        /* Exception Syndrome Register for EL2 */
+ 	AFSR0_EL1,	/* Auxiliary Fault Status Register 0 */
+ 	AFSR1_EL1,	/* Auxiliary Fault Status Register 1 */
+-	FAR_EL1,	/* Fault Address Register */
++	FAR_EL1,	/* Fault Address Register for EL1 */
++	FAR_EL2,        /* Fault Address Register for EL2 */
+ 	MAIR_EL1,	/* Memory Attribute Indirection Register */
+ 	VBAR_EL1,	/* Vector Base Address Register */
+ 	CONTEXTIDR_EL1,	/* Context ID Register */
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 248339e4aaf5..b019141a8c29 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -252,7 +252,9 @@
+ 
+ #define SYS_DACR32_EL2			sys_reg(3, 4, 3, 0, 0)
+ #define SYS_IFSR32_EL2			sys_reg(3, 4, 5, 0, 1)
++#define SYS_ESR_EL2			sys_reg(3, 4, 5, 2, 0)
+ #define SYS_FPEXC32_EL2			sys_reg(3, 4, 5, 3, 0)
++#define SYS_FAR_EL2			sys_reg(3, 4, 6, 0, 0)
+ 
+ #define __SYS__AP0Rx_EL2(x)		sys_reg(3, 4, 12, 8, x)
+ #define SYS_ICH_AP0R0_EL2		__SYS__AP0Rx_EL2(0)
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index c6f17c7675ad..6ec9ecd68d20 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -229,6 +229,7 @@ static bool __hyp_text __translate_far_to_hpfar(u64 far, u64 *hpfar)
+ static void __hyp_text __populate_fault_info_esr(struct kvm_vcpu *vcpu)
+ {
+ 	vcpu->arch.fault.esr_el2 = read_sysreg_el2(esr);
++	vcpu_sys_reg(vcpu,ESR_EL2) = read_sysreg_el2(esr);
+ }
+ 
+ static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
+@@ -267,6 +268,7 @@ static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
+ 
+ 	vcpu->arch.fault.far_el2 = far;
+ 	vcpu->arch.fault.hpfar_el2 = hpfar;
++	vcpu_sys_reg(vcpu,FAR_EL2) = far;
+ 	return true;
+ }
+ 
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 2e070d3baf9f..c730d593efbb 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1079,7 +1079,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 
+ 	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
+ 	{ SYS_DESC(SYS_IFSR32_EL2), NULL, reset_unknown, IFSR32_EL2 },
++	{ SYS_DESC(SYS_ESR_EL2), access_vm_reg, reset_unknown, ESR_EL2 },
+ 	{ SYS_DESC(SYS_FPEXC32_EL2), NULL, reset_val, FPEXC32_EL2, 0x70 },
++	{ SYS_DESC(SYS_FAR_EL2), access_vm_reg, reset_unknown, FAR_EL2 },
+ };
+ 
+ static bool trap_dbgidr(struct kvm_vcpu *vcpu,
+-- 
+2.13.4
