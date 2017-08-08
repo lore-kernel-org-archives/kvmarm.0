@@ -1,72 +1,80 @@
-From: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
-Subject: Re: [PATCH 07/11] firmware: arm_sdei: Add driver for Software Delegated
- Exceptions
-Date: Tue, 08 Aug 2017 17:48:01 +0100
-Message-ID: <5989EB41.10909@arm.com>
-References: <20170515174400.29735-1-james.morse@arm.com> <20170515174400.29735-8-james.morse@arm.com> <20170719135213.GA1538@e103592.cambridge.arm.com>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH 01/11] KVM: arm64: Store vcpu on the stack during
+ __guest_enter()
+Date: Tue, 08 Aug 2017 17:48:29 +0100
+Message-ID: <5989EB5D.6@arm.com>
+References: <20170515174400.29735-1-james.morse@arm.com>
+ <20170515174400.29735-2-james.morse@arm.com> <20170606195951.GN9464@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170719135213.GA1538-M5GwZQ6tE7x5pKCnmE3YQBJ8xKzm50AiAL8bYrjMMd8@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Dave Martin <Dave.Martin-5wv7dgnIgG8@public.gmane.org>
-Cc: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8650940CE0
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Aug 2017 12:48:12 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id egmgctB-yg8L for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Aug 2017 12:48:11 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CEB140C5A
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Aug 2017 12:48:11 -0400 (EDT)
+In-Reply-To: <20170606195951.GN9464@cbox>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <cdall@linaro.org>
+Cc: devicetree@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Rob Herring <robh+dt@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Dave,
+Hi Christoffer,
 
-On 19/07/17 14:52, Dave Martin wrote:
-> On Mon, May 15, 2017 at 06:43:55PM +0100, James Morse wrote:
->> The Software Delegated Exception Interface (SDEI) is an ARM standard
->> for registering callbacks from the platform firmware into the OS.
->> This is typically used to implement RAS notifications.
+On 06/06/17 20:59, Christoffer Dall wrote:
+> On Mon, May 15, 2017 at 06:43:49PM +0100, James Morse wrote:
+>> KVM uses tpidr_el2 as its private vcpu register, which makes sense for
+>> non-vhe world switch as only KVM can access this register. This means
+>> vhe Linux has to use tpidr_el1, which KVM has to save/restore as part
+>> of the host context.
 >>
->> Add the code for detecting the SDEI version and the framework for
->> registering and unregistering events. Subsequent patches will add the
->> arch-specific backend code and the necessary power management hooks.
->>
->> Currently only shared events are supported.
+>> __guest_enter() stores the host_ctxt on the stack, do the same with
+>> the vcpu.
 
->> diff --git a/drivers/firmware/arm_sdei.c b/drivers/firmware/arm_sdei.c
->> new file mode 100644
->> index 000000000000..d22dda5e0fed
->> --- /dev/null
->> +++ b/drivers/firmware/arm_sdei.c
->> +int sdei_mask_local_cpu(unsigned int cpu)
->> +{
->> +	int err;
->> +	struct arm_smccc_res res;
+>> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+>> index 12ee62d6d410..113735df7d01 100644
+>> --- a/arch/arm64/kvm/hyp/entry.S
+>> +++ b/arch/arm64/kvm/hyp/entry.S
+>> @@ -159,9 +159,15 @@ abort_guest_exit_end:
+>>  ENDPROC(__guest_exit)
+>>  
+>>  ENTRY(__fpsimd_guest_restore)
+>> +	// x0: esr
+>> +	// x1: vcpu
+>> +	// x2-x29,lr: vcpu regs
+>> +	// vcpu x0-x1 on the stack
+>>  	stp	x2, x3, [sp, #-16]!
+>>  	stp	x4, lr, [sp, #-16]!
+>>  
+>> +	mov	x3, x1
 >> +
->> +	WARN_ON(preemptible());
->> +	err = invoke_sdei_fn(&res, SDEI_1_0_FN_SDEI_PE_MASK, 0, 0, 0, 0, 0);
+> 
+> nit: can you avoid this by using x1 for the vcpu pointer in this routine
+> instead?
 
-> It seems awkward to have to declare res repeatedly when it's basically
-> unused.  Several callsites seem to do this.  Out of context, this looks
-> bug-like (though it's not a bug).
+Unfortunately x1 is clobbered by the __fpsimd_{save,restore}_state() macros that
+are called further down this function.
 
-After a quick trawl, only the 'qcom' and 'optee' callers use regs other than x0.
+(its a bit obscure:
+> fpsimd_save	x0, 1
+that '1' is used to generate 'x1' or 'w1' in includes/asm/fpsimdmacros.h)
 
-
-> Could we make it explicit that the results other than x0 are unwanted by
-> passing NULL instead?
-
-Looks straightforward, the quirk buffer has the same behaviour. I will put
-something together.
-
-
-> invoke_sdei_fn (or some downstream function) could declare its own res
-> for this case, but at least we'd only have to do that in one place.
-> arm_smccc_smc() and friends (at least the C interface in the headers)
-> could do something similar.
-
-Yes, for SDEI I can reduce this weirdness by moving smccc_res up a level.
 
 
 Thanks,
 
 James
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
