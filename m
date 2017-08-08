@@ -1,111 +1,164 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] arm64: KVM: Reject non-compliant HVC calls from guest
- kernel
-Date: Tue, 8 Aug 2017 08:52:52 +0100
-Message-ID: <bf7e83f1-c58e-8d65-edd0-d08f27b8b766@arm.com>
-References: <1502132608-26077-1-git-send-email-shankerd@codeaurora.org>
- <20170808073622.GA26652@cbox>
+From: wanghaibin <wanghaibin.wang@huawei.com>
+Subject: Re: [PATCH v2 3/4] kvm: arm/arm64: vgic-v3: add ICH_AP[01]Rn accessors
+ for GICv3
+Date: Tue, 8 Aug 2017 21:01:54 +0800
+Message-ID: <5989B642.2030004@huawei.com>
+References: <1500287012-16996-1-git-send-email-wanghaibin.wang@huawei.com>
+ <1500287012-16996-4-git-send-email-wanghaibin.wang@huawei.com>
+ <877eywbvwb.fsf@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170808073622.GA26652@cbox>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Christoffer Dall <cdall@linaro.org>, Shanker Donthineni <shankerd@codeaurora.org>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, linux-kernel <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, kvmarm <kvmarm@lists.cs.columbia.edu>, kvm <kvm@vger.kernel.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B20F840C5A
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Aug 2017 09:02:33 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id aE5xyhd56h27 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Aug 2017 09:02:28 -0400 (EDT)
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D7BEA40017
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Aug 2017 09:02:27 -0400 (EDT)
+In-Reply-To: <877eywbvwb.fsf@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: cdall@linaro.org, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 08/08/17 08:36, Christoffer Dall wrote:
-> Hi Shanker,
-> 
-> On Mon, Aug 07, 2017 at 02:03:28PM -0500, Shanker Donthineni wrote:
->> The SMC/HVC instructions with an immediate value non-zero are not compliant
->> according to 'SMC calling convention system software document'. Add a
->> validation check in handle_hvc() to avoid malicious HVC calls from VM, and
-> 
-> 
-> Why do the HVC calls become malicious if they have non-zero immediate
-> values --- can it actually break something today?
+On 2017/7/25 19:25, Marc Zyngier wrote:
 
-More importantly, the *architecture* allows non-zero values. The SMCCC
-is a *convention*, and not part of the architecture (which is what KVM
-is concerned about).
-
-> 
-> 
->> inject an undefined instruction for those calls.
+> On Mon, Jul 17 2017 at  6:23:31 pm BST, wanghaibin <wanghaibin.wang@huawei.com> wrote:
+>> This patch is used for GICv2 on GICv3.
 >>
->> http://infocenter.arm.com/help/topic/com.arm.doc.den0028b/ARM_DEN0028B_SMC_Calling_Convention.pdf
+>> About GICV_APRn hardware register access,the SPEC says:
+>> When System register access is enabled for EL2, these registers access
+>> ICH_AP1Rn_EL2, and all active priorities for virtual machines are held
+>> in ICH_AP1Rn_EL2 regardless of interrupt group.
 >>
->> Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
+>> For GICv3 hardware, we access the active priorities from ICH_AP1Rn_EL2
+>> in this scene.
+>>
+>> Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
 >> ---
->>  arch/arm64/include/asm/esr.h |  4 ++++
->>  arch/arm64/kvm/handle_exit.c | 12 +++++++-----
->>  2 files changed, 11 insertions(+), 5 deletions(-)
+>>  virt/kvm/arm/vgic/vgic-mmio.c | 12 ++++++++++++
+>>  virt/kvm/arm/vgic/vgic-v3.c   | 20 ++++++++++++++++++++
+>>  virt/kvm/arm/vgic/vgic.h      |  2 ++
+>>  3 files changed, 34 insertions(+)
 >>
->> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
->> index 8cabd57..fa988e5 100644
->> --- a/arch/arm64/include/asm/esr.h
->> +++ b/arch/arm64/include/asm/esr.h
->> @@ -107,6 +107,9 @@
->>  #define ESR_ELx_AR 		(UL(1) << 14)
->>  #define ESR_ELx_CM 		(UL(1) << 8)
+>> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+>> index f6f3681..3b648a7 100644
+>> --- a/virt/kvm/arm/vgic/vgic-mmio.c
+>> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+>> @@ -456,14 +456,26 @@ static int match_region(const void *key, const void *elt)
 >>  
->> +/* ISS field definitions for HVC/SVC instruction execution traps */
->> +#define ESR_HVC_IMMEDIATE(esr)	((esr) & 0xFFFF)
+>>  void vgic_set_apr(struct kvm_vcpu *vcpu, u32 idx, u32 val)
+>>  {
+>> +	u32 vgic_model = vcpu->kvm->arch.vgic.vgic_model;
 >> +
->>  /* ISS field definitions for exceptions taken in to Hyp */
->>  #define ESR_ELx_CV		(UL(1) << 24)
->>  #define ESR_ELx_COND_SHIFT	(20)
->> @@ -114,6 +117,7 @@
->>  #define ESR_ELx_WFx_ISS_WFE	(UL(1) << 0)
->>  #define ESR_ELx_xVC_IMM_MASK	((1UL << 16) - 1)
+>>  	if (kvm_vgic_global_state.type == VGIC_V2)
+>>  		vgic_v2_set_apr(vcpu, idx, val);
+>> +	else {
+> 
+> Coding style.
+
+
+Will fix.
+
+Thanks
+
+> 
+>> +		if (vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2)
+>> +			vgic_v3_set_apr(vcpu, 1, idx, val);
+>> +	}
+>>  }
 >>  
+>>  u32 vgic_get_apr(struct kvm_vcpu *vcpu, u32 idx)
+>>  {
+>> +	u32 vgic_model = vcpu->kvm->arch.vgic.vgic_model;
 >> +
->>  /* ESR value templates for specific events */
+>>  	if (kvm_vgic_global_state.type == VGIC_V2)
+>>  		return vgic_v2_get_apr(vcpu, idx);
+>> +	else {
+> 
+> Same here.
+> 
+>> +		if (vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2)
+>> +			return vgic_v3_get_apr(vcpu, 1, idx);
+>> +	}
 >>  
->>  /* BRK instruction trap from AArch64 state */
->> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
->> index 17d8a16..a900dcd 100644
->> --- a/arch/arm64/kvm/handle_exit.c
->> +++ b/arch/arm64/kvm/handle_exit.c
->> @@ -42,13 +42,15 @@ static int handle_hvc(struct kvm_vcpu *vcpu, struct kvm_run *run)
->>  			    kvm_vcpu_hvc_get_imm(vcpu));
->>  	vcpu->stat.hvc_exit_stat++;
+>>  	return 0;
+>>  }
+>> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+>> index 030248e..da40681 100644
+>> --- a/virt/kvm/arm/vgic/vgic-v3.c
+>> +++ b/virt/kvm/arm/vgic/vgic-v3.c
+>> @@ -156,6 +156,26 @@ void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr)
+>>  	vcpu->arch.vgic_cpu.vgic_v3.vgic_lr[lr] = 0;
+>>  }
 >>  
->> -	ret = kvm_psci_call(vcpu);
->> -	if (ret < 0) {
->> -		kvm_inject_undefined(vcpu);
->> -		return 1;
->> +	/* HVC immediate value must be zero for all compliant calls */
->> +	if (!ESR_HVC_IMMEDIATE(kvm_vcpu_get_hsr(vcpu))) {
->> +		ret = kvm_psci_call(vcpu);
->> +		if (ret >= 0)
->> +			return ret;
+>> +void vgic_v3_set_apr(struct kvm_vcpu *vcpu, u8 group, u32 idx, u32 val)
+>> +{
+>> +	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+>> +
+>> +	if (group)
+>> +		cpu_if->vgic_ap1r[idx] = val;
+>> +	else
+>> +		cpu_if->vgic_ap0r[idx] = val;
+>> +}
+>> +
+>> +u32 vgic_v3_get_apr(struct kvm_vcpu *vcpu, u8 group, u32 idx)
+>> +{
+>> +	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+>> +
+>> +	if (group)
+>> +		return cpu_if->vgic_ap1r[idx];
+>> +	else
+>> +		return cpu_if->vgic_ap0r[idx];
+>> +}
+>> +
 > 
-> Out of curiosity, have you seen guests or any bad behavior with a
-> non-zero PSCI value, or are we just making sure we only support callers
-> that follow the SMC calling convention?
+> How do we ensure that these APRs are even valid? We can have anything
+> from 5 to 7 bits of preemption, and thus 1 to 4 APRs. The rest is
+> UNDEFined.
+
+
+Sorry, Marc, I can't follow you.
+
+Do you suspect that an undefined APR register(implemented by ICH_VTR_EL2.PRIbits) will be accessed here?
+
+This code just access the soft vgic_ap[0,1]r structure, and I notice that, this structure saved the hardware
+APRn info under the constraint of ICH_VTR_EL2.PREbits implemented when save the vcpu content. the soft vgic_ap[0,1]r
+structure will keep 0 value when the hw APRn UNDEFined.
+
+Thanks.
+
 > 
-> I hope we don't break any existing guests out there with this change,
-> including UEFI, old versions of Linux, etc.
+>>  void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+>>  {
+>>  	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+>> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+>> index 441ded7..19b0f8b 100644
+>> --- a/virt/kvm/arm/vgic/vgic.h
+>> +++ b/virt/kvm/arm/vgic/vgic.h
+>> @@ -181,6 +181,8 @@ static inline void vgic_get_irq_kref(struct vgic_irq *irq)
+>>  void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
+>>  void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr);
+>>  void vgic_v3_set_underflow(struct kvm_vcpu *vcpu);
+>> +void vgic_v3_set_apr(struct kvm_vcpu *vcpu, u8 group, u32 idx, u32 val);
+>> +u32 vgic_v3_get_apr(struct kvm_vcpu *vcpu, u8 group, u32 idx);
+>>  void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+>>  void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+>>  void vgic_v3_enable(struct kvm_vcpu *vcpu);
 > 
-> (I do have this feeling that this check should be inside kvm_psci_call
-> instead, but it really doesn't matter at this point and we can always
-> move things around later if we start using other types of hypercalls
-> for anything.)
-
-Exactly. PSCI doesn't rely on SMCCC (the initial version pre-dates it),
-though it mandates the HVC immediate to be zero. So let's check it
-there, and not as a blanket statement forbidding a reasonable use of the
-architecture.
-
-Eventually, I'd like to be able to forward such HVC/SMC calls to
-userspace (and ultimately deprecate PSCI in the kernel), so that it can
-apply whatever policy it decides.
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+> Thanks,
+> 
+> 	M.
