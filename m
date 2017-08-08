@@ -1,157 +1,162 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 3/4] kvm: arm/arm64: vgic-v3: add ICH_AP[01]Rn
- accessors for GICv3
-Date: Tue, 8 Aug 2017 14:10:39 +0100
-Message-ID: <64cf86c6-ef43-df08-dddc-fd815251b48a@arm.com>
-References: <1500287012-16996-1-git-send-email-wanghaibin.wang@huawei.com>
- <1500287012-16996-4-git-send-email-wanghaibin.wang@huawei.com>
- <877eywbvwb.fsf@arm.com> <5989B642.2030004@huawei.com>
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Subject: Re: [PATCH 01/15] ARM: assembler: introduce adr_l, ldr_l and str_l
+ macros
+Date: Tue, 8 Aug 2017 11:10:50 -0400 (EDT)
+Message-ID: <alpine.LFD.2.20.1708081030030.8927@knanqh.ubzr>
+References: <20170805205222.19868-1-ard.biesheuvel@linaro.org> <20170805205222.19868-2-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A5E5440CE9
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Aug 2017 09:09:18 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6OhnzD6fkPeB for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Aug 2017 09:09:13 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EED149C28
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Aug 2017 09:09:12 -0400 (EDT)
-In-Reply-To: <5989B642.2030004@huawei.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: wanghaibin <wanghaibin.wang@huawei.com>
-Cc: cdall@linaro.org, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com
+Content-Type: text/plain; charset=US-ASCII
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20170805205222.19868-2-ard.biesheuvel@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org, Russell King - ARM Linux <linux@armlinux.org.uk>, linux-omap@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, krzk@kernel.org, jason@lakedaemon.net, arm@kernel.org, andrew@lunn.ch, gregory.clement@free-electrons.com, sebastian.hesselbarth@gmail.com, tony@atomide.com, baohua@kernel.org, horms@verge.net.au, magnus.damm@gmail.com, vireshk@kernel.org, shiraz.linux.kernel@gmail.com, patrice.chotard@st.com, Dave Martin <dave.martin@arm.com>, marc.zyngier@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 08/08/17 14:01, wanghaibin wrote:
-> On 2017/7/25 19:25, Marc Zyngier wrote:
-> 
->> On Mon, Jul 17 2017 at  6:23:31 pm BST, wanghaibin <wanghaibin.wang@huawei.com> wrote:
->>> This patch is used for GICv2 on GICv3.
->>>
->>> About GICV_APRn hardware register access,the SPEC says:
->>> When System register access is enabled for EL2, these registers access
->>> ICH_AP1Rn_EL2, and all active priorities for virtual machines are held
->>> in ICH_AP1Rn_EL2 regardless of interrupt group.
->>>
->>> For GICv3 hardware, we access the active priorities from ICH_AP1Rn_EL2
->>> in this scene.
->>>
->>> Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
->>> ---
->>>  virt/kvm/arm/vgic/vgic-mmio.c | 12 ++++++++++++
->>>  virt/kvm/arm/vgic/vgic-v3.c   | 20 ++++++++++++++++++++
->>>  virt/kvm/arm/vgic/vgic.h      |  2 ++
->>>  3 files changed, 34 insertions(+)
->>>
->>> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
->>> index f6f3681..3b648a7 100644
->>> --- a/virt/kvm/arm/vgic/vgic-mmio.c
->>> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
->>> @@ -456,14 +456,26 @@ static int match_region(const void *key, const void *elt)
->>>  
->>>  void vgic_set_apr(struct kvm_vcpu *vcpu, u32 idx, u32 val)
->>>  {
->>> +	u32 vgic_model = vcpu->kvm->arch.vgic.vgic_model;
->>> +
->>>  	if (kvm_vgic_global_state.type == VGIC_V2)
->>>  		vgic_v2_set_apr(vcpu, idx, val);
->>> +	else {
->>
->> Coding style.
-> 
-> 
-> Will fix.
-> 
-> Thanks
-> 
->>
->>> +		if (vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2)
->>> +			vgic_v3_set_apr(vcpu, 1, idx, val);
->>> +	}
->>>  }
->>>  
->>>  u32 vgic_get_apr(struct kvm_vcpu *vcpu, u32 idx)
->>>  {
->>> +	u32 vgic_model = vcpu->kvm->arch.vgic.vgic_model;
->>> +
->>>  	if (kvm_vgic_global_state.type == VGIC_V2)
->>>  		return vgic_v2_get_apr(vcpu, idx);
->>> +	else {
->>
->> Same here.
->>
->>> +		if (vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2)
->>> +			return vgic_v3_get_apr(vcpu, 1, idx);
->>> +	}
->>>  
->>>  	return 0;
->>>  }
->>> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
->>> index 030248e..da40681 100644
->>> --- a/virt/kvm/arm/vgic/vgic-v3.c
->>> +++ b/virt/kvm/arm/vgic/vgic-v3.c
->>> @@ -156,6 +156,26 @@ void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr)
->>>  	vcpu->arch.vgic_cpu.vgic_v3.vgic_lr[lr] = 0;
->>>  }
->>>  
->>> +void vgic_v3_set_apr(struct kvm_vcpu *vcpu, u8 group, u32 idx, u32 val)
->>> +{
->>> +	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
->>> +
->>> +	if (group)
->>> +		cpu_if->vgic_ap1r[idx] = val;
->>> +	else
->>> +		cpu_if->vgic_ap0r[idx] = val;
->>> +}
->>> +
->>> +u32 vgic_v3_get_apr(struct kvm_vcpu *vcpu, u8 group, u32 idx)
->>> +{
->>> +	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
->>> +
->>> +	if (group)
->>> +		return cpu_if->vgic_ap1r[idx];
->>> +	else
->>> +		return cpu_if->vgic_ap0r[idx];
->>> +}
->>> +
->>
->> How do we ensure that these APRs are even valid? We can have anything
->> from 5 to 7 bits of preemption, and thus 1 to 4 APRs. The rest is
->> UNDEFined.
-> 
-> 
-> Sorry, Marc, I can't follow you.
-> 
-> Do you suspect that an undefined APR register(implemented by ICH_VTR_EL2.PRIbits) will be accessed here?
+On Sat, 5 Aug 2017, Ard Biesheuvel wrote:
 
-Two implementations may not implement the same number of PRIbits. But
-you seem to allow userspace to save/restore them, even if that doesn't
-make sense.
+> Like arm64, ARM supports position independent code sequences that
+> produce symbol references with a greater reach than the ordinary
+> adr/ldr instructions.
+> 
+> Currently, we use open coded instruction sequences involving literals
+> and arithmetic operations. Instead, we can use movw/movt pairs on v7
+> CPUs, circumventing the D-cache entirely. For older CPUs, we can emit
+> the literal into a subsection, allowing it to be emitted out of line
+> while retaining the ability to perform arithmetic on label offsets.
+> 
+> E.g., on pre-v7 CPUs, we can emit a PC-relative reference as follows:
+> 
+>        ldr          <reg>, 222f
+>   111: add          <reg>, <reg>, pc
+>        .subsection  1
+>   222: .long        <sym> - (111b + 8)
+>        .previous
+> 
+> This is allowed by the assembler because, unlike ordinary sections,
+> subsections are combined into a single section into the object file,
+> and so the label references are not true cross-section references that
+> are visible as relocations. Note that we could even do something like
+> 
+>        add          <reg>, pc, #(222f - 111f) & ~0xfff
+>        ldr          <reg>, [<reg>, #(222f - 111f) & 0xfff]
+>   111: add          <reg>, <reg>, pc
+>        .subsection  1
+>   222: .long        <sym> - (111b + 8)
+>        .previous
+> 
+> if it turns out that the 4 KB range of the ldr instruction is insufficient
+> to reach the literal in the subsection, although this is currently not a
+> problem (of the 98 objects built from .S files in a multi_v7_defconfig
+> build, only 11 have .text sections that are over 1 KB, and the largest one
+> [entry-armv.o] is 3308 bytes)
+> 
+> Subsections have been available in binutils since 2004 at least, so
+> they should not cause any issues with older toolchains.
+> 
+> So use the above to implement the macros mov_l, adr_l, adrm_l (using ldm
+> to load multiple literals at once), ldr_l and str_l, all of which will
+> use movw/movt pairs on v7 and later CPUs, and use PC-relative literals
+> otherwise.
 
-> This code just access the soft vgic_ap[0,1]r structure, and I notice that, this structure saved the hardware
-> APRn info under the constraint of ICH_VTR_EL2.PREbits implemented when save the vcpu content. the soft vgic_ap[0,1]r
-> structure will keep 0 value when the hw APRn UNDEFined.
+There is no adrm_l definition in this patch.
 
-Yes, but userspace should be aware of this constraint, and access
-register that cannot be used on this implementation.
+Also, might it be better to change mov_l to movl? Tthis looks similar to 
+the ARM64 movl pseudo-instruction, and unlike all the other _l variants, 
+this is not producing a pc relative result.
 
-To summarize, you need to be consistent. Something that cannot be used
-for the guest shouldn't be available to userspace either.
+Talking about the _l suffix: I wonder if this could be more meaningful, 
+like _rel maybe? At least in the adr_l case, this could easily be 
+confused with adrl.
 
-Thanks,
+Otherwise I like it pretty much.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
+>  arch/arm/include/asm/assembler.h | 70 ++++++++++++++++++++
+>  1 file changed, 70 insertions(+)
+> 
+> diff --git a/arch/arm/include/asm/assembler.h b/arch/arm/include/asm/assembler.h
+> index ad301f107dd2..cedf59a7f853 100644
+> --- a/arch/arm/include/asm/assembler.h
+> +++ b/arch/arm/include/asm/assembler.h
+> @@ -518,4 +518,74 @@ THUMB(	orr	\reg , \reg , #PSR_T_BIT	)
+>  #endif
+>  	.endm
+>  
+> +#ifdef CONFIG_THUMB2_KERNEL
+> +#define	ARM_PC_BIAS		4
+> +#else
+> +#define	ARM_PC_BIAS		8
+> +#endif
+> +
+> +	.macro		__adldst_l, op, reg, sym, tmp
+> +	.if		__LINUX_ARM_ARCH__ < 7
+> +	ldr		\tmp, 111f
+> +	.subsection	1
+> +	.align		2
+> +111:	.long		\sym - (222f + ARM_PC_BIAS)
+> +	.previous
+> +	.else
+> +	movw		\tmp, #:lower16:\sym - (222f + ARM_PC_BIAS)
+> +	movt		\tmp, #:upper16:\sym - (222f + ARM_PC_BIAS)
+> +	.endif
+> +222:;	.ifc		\op, add
+> +	add		\reg, \tmp, pc
+> +	.elseif		CONFIG_THUMB2_KERNEL == 1
+> +	add		\tmp, \tmp, pc
+> +	\op		\reg, [\tmp]
+> +	.else
+> +	\op		\reg, [pc, \tmp]
+> +	.endif
+> +	.endm
+> +
+> +	/*
+> +	 * mov_l - move a constant value or [relocated] address into a register
+> +	 */
+> +	.macro		mov_l, dst:req, imm:req
+> +	.if		__LINUX_ARM_ARCH__ < 7
+> +	ldr		\dst, =\imm
+> +	.else
+> +	movw		\dst, #:lower16:\imm
+> +	movt		\dst, #:upper16:\imm
+> +	.endif
+> +	.endm
+> +
+> +	/*
+> +	 * adr_l - adr pseudo-op with unlimited range
+> +	 *
+> +	 * @dst: destination register
+> +	 * @sym: name of the symbol
+> +	 */
+> +	.macro		adr_l, dst:req, sym:req
+> +	__adldst_l	add, \dst, \sym, \dst
+> +	.endm
+> +
+> +	/*
+> +	 * ldr_l - ldr <literal> pseudo-op with unlimited range
+> +	 *
+> +	 * @dst: destination register
+> +	 * @sym: name of the symbol
+> +	 */
+> +	.macro		ldr_l, dst:req, sym:req
+> +	__adldst_l	ldr, \dst, \sym, \dst
+> +	.endm
+> +
+> +	/*
+> +	 * str_l - str <literal> pseudo-op with unlimited range
+> +	 *
+> +	 * @src: source register
+> +	 * @sym: name of the symbol
+> +	 * @tmp: mandatory scratch register
+> +	 */
+> +	.macro		str_l, src:req, sym:req, tmp:req
+> +	__adldst_l	str, \src, \sym, \tmp
+> +	.endm
+> +
+>  #endif /* __ASM_ASSEMBLER_H__ */
+> -- 
+> 2.11.0
+> 
+> 
