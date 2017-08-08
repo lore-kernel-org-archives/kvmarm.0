@@ -1,137 +1,81 @@
-From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: Re: [PATCH 01/15] ARM: assembler: introduce adr_l, ldr_l and str_l
- macros
-Date: Tue, 8 Aug 2017 11:39:19 -0400 (EDT)
-Message-ID: <alpine.LFD.2.20.1708081131340.8927@knanqh.ubzr>
-References: <20170805205222.19868-1-ard.biesheuvel@linaro.org>
- <20170805205222.19868-2-ard.biesheuvel@linaro.org>
- <alpine.LFD.2.20.1708081030030.8927@knanqh.ubzr>
- <CAKv+Gu8W68ruOsD9Fit0MrJ=JVDO3xF-SmQ-8qcpBSQm0si-UA@mail.gmail.com>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH] KVM: arm64: add esr_el2 and far_el2 to sysreg
+Date: Tue, 08 Aug 2017 17:27:01 +0100
+Message-ID: <5989E655.2070905@arm.com>
+References: <1502122117-6276-1-git-send-email-gengdongjiu@huawei.com> <9fe6aa3a-98f9-6cae-6932-054858b54744@arm.com> <b834276b-b47d-51fb-7661-3eb5a2f6a68d@huawei.com> <59889C59.80207@arm.com> <7569b9a7-ce5f-8cb2-2997-a2818ac7d854@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BE3549C0F
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Aug 2017 11:37:55 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pIPF7w8RQ9Y4 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Aug 2017 11:37:53 -0400 (EDT)
-Received: from mail-it0-f50.google.com (mail-it0-f50.google.com
- [209.85.214.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EBF1740FA2
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Aug 2017 11:37:52 -0400 (EDT)
-Received: by mail-it0-f50.google.com with SMTP id 77so6116944itj.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 08 Aug 2017 08:39:22 -0700 (PDT)
-In-Reply-To: <CAKv+Gu8W68ruOsD9Fit0MrJ=JVDO3xF-SmQ-8qcpBSQm0si-UA@mail.gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, baohua@kernel.org, Dave Martin <dave.martin@arm.com>, Jason Cooper <jason@lakedaemon.net>, KVM devel mailing list <kvm@vger.kernel.org>, Tony Lindgren <tony@atomide.com>, Simon Horman <horms@verge.net.au>, Magnus Damm <magnus.damm@gmail.com>, Russell King - ARM Linux <linux@armlinux.org.uk>, Krzysztof Kozlowski <krzk@kernel.org>, Patrice CHOTARD <patrice.chotard@st.com>, linux-renesas-soc@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, arm@kernel.org, vireshk@kernel.org, Gregory CLEMENT <gregory.clement@free-electrons.com>, "linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>, Shiraz Hashim <shiraz.linux.kernel@gmail.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <7569b9a7-ce5f-8cb2-2997-a2818ac7d854@huawei.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: gengdongjiu <gengdongjiu@huawei.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, christoffer.dall@linaro.org, pbonzini@redhat.com, rkrcmar@redhat.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, 8 Aug 2017, Ard Biesheuvel wrote:
+Hi gengdongjiu,
 
-> On 8 August 2017 at 16:10, Nicolas Pitre <nicolas.pitre@linaro.org> wrote:
-> > On Sat, 5 Aug 2017, Ard Biesheuvel wrote:
-> >
-> >> Like arm64, ARM supports position independent code sequences that
-> >> produce symbol references with a greater reach than the ordinary
-> >> adr/ldr instructions.
-> >>
-> >> Currently, we use open coded instruction sequences involving literals
-> >> and arithmetic operations. Instead, we can use movw/movt pairs on v7
-> >> CPUs, circumventing the D-cache entirely. For older CPUs, we can emit
-> >> the literal into a subsection, allowing it to be emitted out of line
-> >> while retaining the ability to perform arithmetic on label offsets.
-> >>
-> >> E.g., on pre-v7 CPUs, we can emit a PC-relative reference as follows:
-> >>
-> >>        ldr          <reg>, 222f
-> >>   111: add          <reg>, <reg>, pc
-> >>        .subsection  1
-> >>   222: .long        <sym> - (111b + 8)
-> >>        .previous
-> >>
-> >> This is allowed by the assembler because, unlike ordinary sections,
-> >> subsections are combined into a single section into the object file,
-> >> and so the label references are not true cross-section references that
-> >> are visible as relocations. Note that we could even do something like
-> >>
-> >>        add          <reg>, pc, #(222f - 111f) & ~0xfff
-> >>        ldr          <reg>, [<reg>, #(222f - 111f) & 0xfff]
-> >>   111: add          <reg>, <reg>, pc
-> >>        .subsection  1
-> >>   222: .long        <sym> - (111b + 8)
-> >>        .previous
-> >>
-> >> if it turns out that the 4 KB range of the ldr instruction is insufficient
-> >> to reach the literal in the subsection, although this is currently not a
-> >> problem (of the 98 objects built from .S files in a multi_v7_defconfig
-> >> build, only 11 have .text sections that are over 1 KB, and the largest one
-> >> [entry-armv.o] is 3308 bytes)
-> >>
-> >> Subsections have been available in binutils since 2004 at least, so
-> >> they should not cause any issues with older toolchains.
-> >>
-> >> So use the above to implement the macros mov_l, adr_l, adrm_l (using ldm
-> >> to load multiple literals at once), ldr_l and str_l, all of which will
-> >> use movw/movt pairs on v7 and later CPUs, and use PC-relative literals
-> >> otherwise.
-> >
-> > There is no adrm_l definition in this patch.
-> >
-> 
-> Ah yes, I played around with it but it becomes a bit clunky so I removed it:
-> 
->         adrl         <reg1>, 222f
->         ldm          <reg1>, {<reg1>, <reg2>}
->    111: add          <reg1>, <reg1>, pc
->         add          <reg2>, <reg2>, pc
->         .subsection  1
->    222: .long        <sym1> - (111b + 8)
->         .long        <sym2> - (111b + 12)
->         .previous
-> 
-> The adrl pseudo op always assembles to two instructions, so you need 5
-> instructions while using adr_l twice uses only 4. I am not sure if
-> eliminating one of the loads would make a huge difference, given that
-> there are no use cases for adrm_l on hot paths, at least not in this
-> series.
+On 07/08/17 18:43, gengdongjiu wrote:
+> Another question, For the SEI, I want to also use SIGBUS both for the KVM user and non-kvm user,
+> if SEA and SEI Error all use the SIGBUS to notify user space(Qemu),
 
-I'd suggest you keep it to a minimum.  Using adr_l twice is clear and 
-obvious.
+User-space shouldn't necessarily be notified about Synchronous External Aborts
+or SError Interrupts. You're really asking about RAS firmware-first
+notifications that use these as the notification mechanism.
 
-> > Also, might it be better to change mov_l to movl? Tthis looks similar to
-> > the ARM64 movl pseudo-instruction, and unlike all the other _l variants,
-> > this is not producing a pc relative result.
-> >
-> 
-> On arm64, we have mov_q for a 64-bit absolute load, and I thought
-> mov_l was less confusing than mov_w. In general, I like the underscore
-> in the middle because on the one hand, it looks like a ordinary
-> mnemonic but on the other hand, it is obvious that it is not a true
-> instruction. mov_abs perhaps?
-> 
-> > Talking about the _l suffix: I wonder if this could be more meaningful,
-> > like _rel maybe? At least in the adr_l case, this could easily be
-> > confused with adrl.
-> >
-> 
-> On arm64, we have ldr_l, str_l and adr_l as well, and I usually try to
-> align between ARM and arm64 if I can.
+We should not notify user-space that the guest happened to be interrupted by a
+RAS firmware-first notification. It may not be relevant, and we can't know until
+we parse the CPER records. The notification mechanism is between firmware and
+the host kernel, we should never expose anything about it to user space or a guest.
 
-OK. I'm much less versed into ARM64 assembly so I'll defer to your 
-judgment.  It's good if this mnemonic scheme already exists there with 
-a similar meaning.
+Linux should act on the CPER records first to determine if the host kernel can
+keep running. Once it has done this it can deliver signals to affected
+processes, but which signal and its properties depends on the CPER records.
+
+The example here is BUS_MCEERR_AO and BUS_MCEERR_AR. These notify userspace that
+si_addr_lsb bits of memory are corrupt at si_addr, this is either
+Action-Optional or Action-Required.
+
+For arm64 we just needed to turn this code on, it already presents the minimum
+necessary information to user-space in an architecture-agnostic way. We didn't
+need to do anything to this code to support NOTIFY_SEA, the notification
+mechanism is irrelevant, this is all driven by the CPER records.
+
+If you have a class of error that isn't covered by the memory-failure code, then
+we need to add something similar. This should be based on the CPER records, and
+should work in exactly the same way for all processes on all ACPI platforms.
 
 
-Nicolas
+> do you agree my solution for the SEI? thanks.
+
+No, you are trying to notify userspace that firmware notified the host. This
+creates an ABI between EL3 firmware and EL0 user space that we can't possibly
+support.
+
+I think you've come to this because you are merging two steps together:
+1. The OS uses the v8.2 RAS extensions to isolate errors and notify firmware.
+2. If firmware has to tell the OS about the error, firmware generates CPER records.
+3. Firmware triggers the GHES notification mechanism for this error source.
+4. Linux receives the notification and calls ghes_proc(), (if KVM gets the
+notification because a guest happened to be running, it should switch back to
+the host and arrange for ghes_proc() to be called).
+5. ghes_proc() parses the CPER records and calls other kernel helpers to handle
+the specific type of error, e.g. memory_failure().
+6. If the helper knows the kernel can keep running, the error is visible to
+user-space and user space could do further processing to correct the error, an
+error-specific signal is sent.
+7. User-space reloads the webpage, notifies the guest or whatever is appropriate.
+
+You are merging steps 3 and 7.
+
+The notification method is an abstraction that only matters to steps 3&4, this
+lets us add more without rewriting the world.
+User-space signals are an abstraction between steps 6&7, this works across
+architectures, even those not using APEI firmware first.
+There are no shortcuts here. Doing anything else creates more work for user
+space, another platform or another architecture.
+
+
+Thanks,
+
+James
