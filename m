@@ -1,483 +1,187 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH 25/27] arm64/sve: Add documentation
-Date: Wed,  9 Aug 2017 13:05:31 +0100
-Message-ID: <1502280338-23002-26-git-send-email-Dave.Martin@arm.com>
+Subject: [RFC PATCH 26/27] arm64: signal: Report signal frame size to userspace via auxv
+Date: Wed,  9 Aug 2017 13:05:32 +0100
+Message-ID: <1502280338-23002-27-git-send-email-Dave.Martin@arm.com>
 References: <1502280338-23002-1-git-send-email-Dave.Martin@arm.com>
 Return-path: <linux-arch-owner@vger.kernel.org>
 In-Reply-To: <1502280338-23002-1-git-send-email-Dave.Martin@arm.com>
 Sender: linux-arch-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org, Michael Ellerman <mpe@ellerman.id.au>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch adds basic documentation of the user/kernel interface
-provided by the for SVE.
+Stateful CPU architecture extensions may require the signal frame
+to grow to a size that exceeds the arch's MINSIGSTKSZ #define.
+However, changing this #define is an ABI break.
+
+To allow userspace the option of determining the signal frame size
+in a more forwards-compatible way, this patch adds a new auxv entry
+tagged with AT_MINSIGSTKSZ, which provides the maximum signal frame
+size that the process can observe during its lifetime.
+
+If AT_MINSIGSTKSZ is absent from the aux vector, the caller can
+assume that the MINSIGSTKSZ #define is sufficient.  This allows for
+a consistent interface with older kernels that do not provide
+AT_MINSIGSTKSZ.
+
+The idea is that libc could expose this via sysconf() or some
+similar mechanism.
+
+There is deliberately no AT_SIGSTKSZ.  The kernel knows nothing
+about userspace's own stack overheads and should not pretend to
+know.
+
+For arm64:
+
+The primary motivation for this interface is the Scalable Vector
+Extension, which can require at least 4KB or so of extra space
+in the signal frame for the largest hardware implementations.
+
+To determine the correct value, a "Christmas tree" mode (via the
+add_all argument) is added to setup_sigframe_layout(), to simulate
+addition of all possible records to the signal frame at maximum
+possible size.
+
+If this procedure goes wrong somehow, resulting in a stupidly large
+frame layout and hence failure of sigframe_alloc() to allocate a
+record to the frame, then this is indicative of a kernel bug: the
+kernel's internal SIGFRAME_MAXSZ is supposed to sanity-check
+against generting frames that we consider _impossibly_ large.  In
+this case, SIGSTKSZ is returned as a "reasonable guess that is at
+least bigger than MINSIGSTKSZ" and we WARN().
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 ---
- Documentation/arm64/sve.txt | 454 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 454 insertions(+)
- create mode 100644 Documentation/arm64/sve.txt
+ arch/arm64/include/asm/elf.h         |  5 +++++
+ arch/arm64/include/asm/processor.h   |  3 +++
+ arch/arm64/include/uapi/asm/auxvec.h |  3 ++-
+ arch/arm64/kernel/signal.c           | 38 +++++++++++++++++++++++++++++++-----
+ 4 files changed, 43 insertions(+), 6 deletions(-)
 
-diff --git a/Documentation/arm64/sve.txt b/Documentation/arm64/sve.txt
-new file mode 100644
-index 0000000..df25abf0
---- /dev/null
-+++ b/Documentation/arm64/sve.txt
-@@ -0,0 +1,454 @@
-+            Scalable Vector Extension support for AArch64 Linux
-+            ===================================================
-+
-+Author: Dave Martin <Dave.Martin@arm.com>
-+Date:   4 August 2017
-+
-+This document outlines briefly the interface provided to userspace by Linux in
-+order to support use of the ARM Scalable Vector Extension (SVE).
-+
-+This is an outline of the most important features and issues only and not
-+intended to be exhaustive.
-+
-+This document does not aim to describe the SVE architecture or programmer's
-+model.  To aid understanding, a minimal description of relevant programmer's
-+model features for SVE is included in Appendix A.
-+
-+
-+1.  General
-+-----------
-+
-+* SVE registers Z0..Z31, P0..P15 and FFR and the current vector length VL, are
-+  tracked per-thread.
-+
-+* The presence of SVE is reported to userspace via HWCAP_SVE in the aux vector
-+  AT_HWCAP entry.  SVE is reported in /proc/cpuinfo as "sve".
-+
-+
-+2.  Vector length terminology
-+-----------------------------
-+
-+The size of an SVE vector (Z) register is referred to as the "vector length".
-+
-+To avoid confusion about the units used to express vector length, the kernel
-+adopts the following conventions:
-+
-+* Vector length (VL) = size of a Z-register in bytes
-+
-+* Vector quadwords (VQ) = size of a Z-register in units of 128 bits
-+
-+(So, VL = 16 * VQ.)
-+
-+The VQ convention is used where the underlying granularity is important, such
-+as in data structure definitions.  In most other situations, the VL convention
-+is used.  This is consistent with the meaning of the "VL" pseudo-register in
-+the SVE instruction set architecture.
-+
-+
-+3.  System call behaviour
-+-------------------------
-+
-+* On syscall, V0..V31 are preserved (as without SVE).  Thus, bits [127:0] of
-+  Z0..Z31 are preserved.  All other bits of Z0..Z31, and all of P0..P15 and FFR
-+  become unspecified on return from a syscall.
-+
-+* The SVE registers are not used to pass arguments to or receive results from
-+  any syscall.
-+
-+* In practice the affected registers/bits will be preserved or will be replaced
-+  with zeros on return from a syscall, but userspace should not make
-+  assumptions about this.  The kernel behaviour may vary on a case-by-case
-+  basis.
-+
-+
-+4.  Signal handling
-+-------------------
-+
-+* A new signal frame record sve_context encodes the SVE registers on signal
-+  delivery. [1]
-+
-+* This record is supplementary to fpsimd_context.  The FPSR and FPCR registers
-+  are only present in fpsimd_context.  For convenience, the content of V0..V31
-+  is duplicated between sve_context and fpsimd_context.
-+
-+* The signal frame record for SVE always contains basic metadata, in particular
-+  the thread's vector length (in sve_context.vl).
-+
-+* The SVE registers may or may not be included in the record, depending on
-+  whether the registers are live for the thread.  The registers are present if
-+  and only if:
-+  sve_context.head.size >= SVE_SIG_CONTEXT_SIZE(sve_vq_from_vl(sve_context.vl)).
-+
-+* If the registers are present, the remainder of the record has a vl-dependent
-+  size and layout.  Macros SIG_SVE_* are defined [1] to facilitate access to
-+  the members.
-+
-+* If the SVE context is too big to fit in sigcontext.__reserved[], then extra
-+  space is allocated on the stack, an extra_context record is written in
-+  __reserved[] referencing this space.  sve_context is then written in the
-+  extra space.  Refer to [1] for further details about this mechanism.
-+
-+
-+5.  Signal return
-+-----------------
-+
-+When returning from a signal handler:
-+
-+* If there is no sve_context record in the signal frame, or if the record is
-+  present but contains no register data as desribed in the previous section,
-+  then the SVE registers/bits become non-live and take unspecified values.
-+
-+* If sve_context is present in the signal frame and contains full register
-+  data, the SVE registers become live and are populated with the specified
-+  data.  However, for backward compatibility reasons, bits [127:0] of Z0..Z31
-+  are always restored from the corresponding members of fpsimd_context.vregs[]
-+  and not from sve_context.  The remaining bits are restored from sve_context.
-+
-+* Inclusion of fpsimd_context in the signal frame remains mandatory,
-+  irrespective of whether sve_context is present or not.
-+
-+* The vector length cannot be changed via signal return.  If sve_context.vl in
-+  the signal frame does not match the current vector length, the signal return
-+  attempt is treated as illegal, resulting in a forced SIGSEGV.
-+
-+
-+6.  prctl extensions
-+--------------------
-+
-+Some new prctl() calls are added to allow programs to manage the SVE vector
-+length:
-+
-+prctl(PR_SVE_SET_VL, unsigned long arg)
-+
-+    Sets the vector length of the calling thread and related flags, where
-+    arg == vl | flags.
-+
-+    vl is the desired vector length, where sve_vl_valid(vl) must be true.
-+
-+    flags:
-+
-+	PR_SVE_SET_VL_INHERIT
-+
-+	    Inherit the current vector length across execve().  Otherwise, the
-+	    vector length is reset to the system default at execve().  (See
-+	    Section 9.)
-+
-+	PR_SVE_SET_VL_ONEXEC
-+
-+	    Defer the requested vector length change until the next execve().
-+	    This allows launching of a new program with a different vector
-+	    length, while avoiding runtime side effects in the caller.
-+
-+	    This also overrides the effect of PR_SVE_SET_VL_INHERIT for the
-+	    first execve().
-+
-+	    Without PR_SVE_SET_VL_ONEXEC, any outstanding deferred vector
-+	    length change is cancelled.
-+
-+    Return value: a nonnegative on success, or a negative value on error:
-+	EINVAL: SVE not supported, invalid vector length requested, or
-+	    invalid flags.
-+
-+    On success, the calling thread's vector length is changed to the largest
-+    value supported by the system that is less than or equal to vl.
-+    If vl == SVE_VL_MAX, the calling thread's vector length is changed to the
-+    largest value supported by the system.
-+
-+    The returned value describes the resulting configuration, encoded as for
-+    PR_SVE_GET_VL.
-+
-+    Changing the vector length causes all of P0..P15, FFR and all bits of
-+    Z0..V31 except for Z0 bits [127:0] .. Z31 bits [127:0] to become
-+    unspecified.  Calling PR_SVE_SET_VL with vl equal to the thread's current
-+    vector length does not constitute a change to the vector length for this
-+    purpose.
-+
-+
-+prctl(PR_SVE_GET_VL)
-+
-+    Gets the vector length of the calling thread.
-+
-+    The following flag may be OR-ed into the result:
-+
-+	PR_SVE_SET_VL_INHERIT
-+
-+	    Vector length will be inherited across execve().
-+
-+    There is no way to determine whether there is an outstanding deferred
-+    vector length change (which would only normally be the case between a
-+    fork() or vfork() and the corresponding execve() in typical use).
-+
-+    To extract the vector length from the result, and it with
-+    PR_SVE_VL_LEN_MASK.
-+
-+    Return value: a nonnegative value on success, or a negative value on error:
-+	EINVAL: SVE not supported.
-+
-+
-+7.  ptrace extensions
-+---------------------
-+
-+* A new regset NT_ARM_SVE is defined for use with PTRACE_GETREGSET and
-+  PTRACE_SETREGSET.
-+
-+  Refer to [2] for definitions.
-+
-+The regset data starts with struct user_sve_header, containing:
-+
-+    size
-+
-+	Size of the complete regset, in bytes.
-+	This depends on vl and possibly on other things in the future.
-+
-+	If a call to PTRACE_GETREGSET requests less data than the value of
-+	size, the caller can allocate a larger buffer and retry in order to
-+	read the complete regset.
-+
-+    max_size
-+
-+	Maximum size in bytes that the regset can grow to for the target
-+	thread.  The regset won't grow bigger than this even if the target
-+	thread changes its vector length etc.
-+
-+    vl
-+
-+	Target thread's current vector length, in bytes.
-+
-+    max_vl
-+
-+	Maximum possible vector length for the target thread.
-+
-+    flags
-+
-+	either
-+
-+	    SVE_PT_REGS_FPSIMD
-+
-+		SVE registers are not live (GETREGSET) or are to be made
-+		non-live (SETREGSET).
-+
-+		The payload is of type struct user_fpsimd_state, with the same
-+		meaning as for NT_PRFPREG, starting at offset
-+		SVE_PT_FPSIMD_OFFSET from the start of user_sve_header.
-+
-+		Extra data might be appended in the future: the size of the
-+		payload should be obtained using SVE_PT_FPSIMD_SIZE(vq, flags).
-+
-+		vq should be obtained using sve_vq_from_vl(vl).
-+
-+		or
-+
-+	    SVE_PT_REGS_SVE
-+
-+		SVE registers are live (GETREGSET) or are to be made live
-+		(SETREGSET).
-+
-+		The payload contains the SVE register data, starting at offset
-+		SVE_PT_SVE_OFFSET from the start of user_sve_header, and with
-+		size SVE_PT_SVE_SIZE(vq, flags);
-+
-+	... OR-ed with zero or more of the following flags, which have the same
-+	meaning and behaviour as the corresponding PR_SET_VL_* flags:
-+
-+	    SVE_PT_VL_INHERIT
-+
-+	    SVE_PT_VL_ONEXEC (SETREGSET only).
-+
-+* The effects of changing the vector length and/or flags are equivalent to
-+  those documented for PR_SVE_SET_VL.
-+
-+* In the SVE_PT_REGS_SVE case, the size and layout of the payload depends on
-+  the header fields.  The SVE_PT_SVE_*() macros are provided to facilitate
-+  access to the members.
-+
-+* In either case, for SETREGSET it is permissible to omit the payload, in which
-+  case only the vector length and flags are changed (along with any
-+  consequences of those changes).
-+
-+  The effect of writing a partial, incomplete payload is unspecified.
-+
-+
-+8.  ELF coredump extensions
-+---------------------------
-+
-+* A NT_ARM_SVE note will be added to each coredump for each thread of the
-+  dumped process.  The contents will be equivalent to the data that would have
-+  been read if a PTRACE_GETREGSET of NT_ARM_SVE were executed for each thread
-+  when the coredump was generated.
-+
-+  Each of these notes may be padded up to a larger size: if so, the surplus
-+  data should be ignored when parsing the coredump.
-+
-+
-+9.  System runtime configuration
-+--------------------------------
-+
-+* To mitigate the ABI impact of expansion of the signal frame, a policy
-+  mechanism is provided for administrators, distro maintainers and developers
-+  to set the default vector length for userspace processes:
-+
-+/proc/cpu/sve_default_vector_length
-+
-+    Writing the text representation of an integer to this file sets the system
-+    default vector length to the specified value, unless the value is greater
-+    than the maximum vector length supported by the system in which case the
-+    default vector length is set to that maximum.
-+
-+    The result can be determined by reopening the file and reading its
-+    contents.
-+
-+    At boot, the default vector length is initially set to 64 or the maximum
-+    supported vector length, whichever is smaller.  This determines the initial
-+    vector length of the init process (PID 1).
-+
-+    Reading this file returns the current system default vector length.
-+
-+* At every execve() call, the new vector length of the new process is set to
-+  the system default vector length, unless
-+
-+    * PR_SVE_SET_VL_INHERIT (or equivalently SVE_PT_VL_INHERIT) is set for the
-+      calling thread, or
-+
-+    * a deferred vector length change is pending, established via the
-+      PR_SVE_SET_VL_ONEXEC flag (or SVE_PT_VL_ONEXEC).
-+
-+* Modifying the system default vector length does not affect the vector length
-+  of any existing process or thread that does not make an execve() call.
-+
-+
-+Appendix A.  SVE programmer's model (informative)
-+=================================================
-+
-+This section provides a minimal description of the additions made by SVE to the
-+ARMv8-A programmer's model that are relevant to this document.
-+
-+Note: This section is for information only and not intended to be complete or
-+to replace any architectural specification.
-+
-+A.1.  Registers
-+---------------
-+
-+In A64 state, SVE adds the following:
-+
-+* 32 8VL-bit vector registers Z0..Z31
-+  For each Zn, Zn bits [127:0] alias the ARMv8-A vector register Vn.
-+
-+  A register write using a Vn register name zeros all bits of the corresponding
-+  Zn except for bits [127:0].
-+
-+* 16 VL-bit predicate registers P0..P15
-+
-+* 1 VL-bit special-purpose predicate register FFR (the "first-fault register")
-+
-+* a VL "pseudo-register" that determines the size of each vector register
-+
-+  The SVE instruction set architecture provides no way to write VL directly.
-+  Instead, it can be modified only by EL1 and above, by writing appropriate
-+  system registers.
-+
-+* The value of VL can be configured at runtime by EL1 and above:
-+  16 <= VL <= VLmax, where VL must be a multiple of 16.
-+
-+* The maximum vector length is determined by the hardware:
-+  16 <= VLmax <= 256.
-+
-+  (The SVE architecture specifies 256, but permits future architecture
-+  revisions to raise this limit.)
-+
-+* FPSR and FPCR are retained from ARMv8-A, and interact with SVE floating-point
-+  operations in a similar way to the way in which they interact with ARMv8
-+  floating-point operations.
-+
-+         8VL-1                       128               0  bit index
-+        +----          ////            -----------------+
-+     Z0 |                               :       V0      |
-+      :                                          :
-+     Z7 |                               :       V7      |
-+     Z8 |                               :     * V8      |
-+      :                                       :  :
-+    Z15 |                               :     *V15      |
-+    Z16 |                               :      V16      |
-+      :                                          :
-+    Z31 |                               :      V31      |
-+        +----          ////            -----------------+
-+                                                 31    0
-+         VL-1                  0                +-------+
-+        +----       ////      --+          FPSR |       |
-+     P0 |                       |               +-------+
-+      : |                       |         *FPCR |       |
-+    P15 |                       |               +-------+
-+        +----       ////      --+
-+    FFR |                       |               +-----+
-+        +----       ////      --+            VL |     |
-+                                                +-----+
-+
-+(*) callee-save:
-+    This only applies to bits [63:0] of Z-/V-registers.
-+    FPCR contains callee-save and caller-save bits.  See [3] for details.
-+
-+
-+A.2.  Procedure call standard
-+-----------------------------
-+
-+The ARMv8-A base procedure call standard is extended as follows with respect to
-+the additional SVE register state:
-+
-+* All SVE register bits that are not shared with FP/SIMD are caller-save.
-+
-+* Z8 bits [63:0] .. Z15 bits [63:0] are callee-save.
-+
-+  This follows from the way these bits are mapped to V8..V15, which are caller-
-+  save in the base procedure call standard.
-+
-+
-+Appendix B.  ARMv8-A FP/SIMD programmer's model
-+===============================================
-+
-+Note: This section is for information only and not intended to be complete or
-+to replace any architectural specification.
-+
-+Refer to [3] for for more information.
-+
-+ARMv8-A defines the following floating-point / SIMD register state:
-+
-+* 32 128-bit vector registers V0..V31
-+* 2 32-bit status/control registers FPSR, FPCR
-+
-+         127           0  bit index
-+        +---------------+
-+     V0 |               |
-+      : :               :
-+     V7 |               |
-+   * V8 |               |
-+   :  : :               :
-+   *V15 |               |
-+    V16 |               |
-+      : :               :
-+    V31 |               |
-+        +---------------+
-+
-+                 31    0
-+                +-------+
-+           FPSR |       |
-+                +-------+
-+          *FPCR |       |
-+                +-------+
-+
-+(*) callee-save:
-+    This only applies to bits [63:0] of V-registers.
-+    FPCR contains a mixture of callee-save and caller-save bits.
-+
-+
-+References
-+==========
-+
-+[1] arch/arm64/include/uapi/asm/sigcontext.h
-+    AArch64 Linux signal ABI definitions
-+
-+[2] arch/arm64/include/uapi/asm/ptrace.h
-+    AArch64 Linux ptrace ABI definitions
-+
-+[3] ARM IHI0055C
-+    http://infocenter.arm.com/help/topic/com.arm.doc.ihi0055c/IHI0055C_beta_aapcs64.pdf
-+    http://infocenter.arm.com/help/topic/com.arm.doc.subset.swdev.abi/index.html
-+    Procedure Call Standard for the ARM 64-bit Architecture (AArch64)
+diff --git a/arch/arm64/include/asm/elf.h b/arch/arm64/include/asm/elf.h
+index acae781..7cee254 100644
+--- a/arch/arm64/include/asm/elf.h
++++ b/arch/arm64/include/asm/elf.h
+@@ -24,6 +24,10 @@
+ #include <asm/ptrace.h>
+ #include <asm/user.h>
+ 
++#ifndef __ASSEMBLY__
++#include <asm/processor.h> /* for get_minsigstksz(), used by ARCH_DLINFO */
++#endif
++
+ /*
+  * AArch64 static relocation types.
+  */
+@@ -149,6 +153,7 @@ typedef struct user_fpsimd_state elf_fpregset_t;
+ do {									\
+ 	NEW_AUX_ENT(AT_SYSINFO_EHDR,					\
+ 		    (elf_addr_t)current->mm->context.vdso);		\
++	NEW_AUX_ENT(AT_MINSIGSTKSZ, get_minsigstksz());			\
+ } while (0)
+ 
+ #define ARCH_HAS_SETUP_ADDITIONAL_PAGES
+diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
+index 70b03b4..121d011 100644
+--- a/arch/arm64/include/asm/processor.h
++++ b/arch/arm64/include/asm/processor.h
+@@ -197,6 +197,9 @@ static inline void spin_lock_prefetch(const void *ptr)
+ int cpu_enable_pan(void *__unused);
+ int cpu_enable_cache_maint_trap(void *__unused);
+ 
++/* User signal frame size discovery: */
++int get_minsigstksz(void);
++
+ /* Userspace interface for PR_SVE_{SET,GET}_VL prctl()s: */
+ #define SVE_SET_VL(arg)	sve_set_current_vl(arg)
+ #define SVE_GET_VL()	sve_get_current_vl()
+diff --git a/arch/arm64/include/uapi/asm/auxvec.h b/arch/arm64/include/uapi/asm/auxvec.h
+index 4cf0c17..1d45b28 100644
+--- a/arch/arm64/include/uapi/asm/auxvec.h
++++ b/arch/arm64/include/uapi/asm/auxvec.h
+@@ -18,7 +18,8 @@
+ 
+ /* vDSO location */
+ #define AT_SYSINFO_EHDR	33
++#define AT_MINSIGSTKSZ	34	/* stack needed for signal delivery */
+ 
+-#define AT_VECTOR_SIZE_ARCH 1 /* entries in ARCH_DLINFO */
++#define AT_VECTOR_SIZE_ARCH 2 /* entries in ARCH_DLINFO */
+ 
+ #endif
+diff --git a/arch/arm64/kernel/signal.c b/arch/arm64/kernel/signal.c
+index 2694143..221bcf2 100644
+--- a/arch/arm64/kernel/signal.c
++++ b/arch/arm64/kernel/signal.c
+@@ -560,8 +560,15 @@ asmlinkage long sys_rt_sigreturn(struct pt_regs *regs)
+ 	return 0;
+ }
+ 
+-/* Determine the layout of optional records in the signal frame */
+-static int setup_sigframe_layout(struct rt_sigframe_user_layout *user)
++/*
++ * Determine the layout of optional records in the signal frame
++ *
++ * add_all: if true, lays out the biggest possible signal frame for
++ *	this task; otherwise, generates a layout for the current state
++ *	of the task.
++ */
++static int setup_sigframe_layout(struct rt_sigframe_user_layout *user,
++				 bool add_all)
+ {
+ 	int err;
+ 
+@@ -571,7 +578,7 @@ static int setup_sigframe_layout(struct rt_sigframe_user_layout *user)
+ 		return err;
+ 
+ 	/* fault information, if valid */
+-	if (current->thread.fault_code) {
++	if (add_all || current->thread.fault_code) {
+ 		err = sigframe_alloc(user, &user->esr_offset,
+ 				     sizeof(struct esr_context));
+ 		if (err)
+@@ -595,7 +602,6 @@ static int setup_sigframe_layout(struct rt_sigframe_user_layout *user)
+ 	return sigframe_alloc_end(user);
+ }
+ 
+-
+ static int setup_sigframe(struct rt_sigframe_user_layout *user,
+ 			  struct pt_regs *regs, sigset_t *set)
+ {
+@@ -693,7 +699,7 @@ static int get_sigframe(struct rt_sigframe_user_layout *user,
+ 	int err;
+ 
+ 	init_user_layout(user);
+-	err = setup_sigframe_layout(user);
++	err = setup_sigframe_layout(user, false);
+ 	if (err)
+ 		return err;
+ 
+@@ -927,3 +933,25 @@ asmlinkage void do_notify_resume(struct pt_regs *regs,
+ 		thread_flags = READ_ONCE(current_thread_info()->flags);
+ 	} while (thread_flags & _TIF_WORK_MASK);
+ }
++
++/*
++ * Determine the stack space required for guaranteed signal devliery.
++ * This function is used to populate AT_MINSIGSTKSZ at process startup.
++ */
++int get_minsigstksz(void)
++{
++	struct rt_sigframe_user_layout user;
++	int err;
++
++	init_user_layout(&user);
++	err = setup_sigframe_layout(&user, true);
++
++	if (err) {
++		WARN_ON(1);
++
++		return SIGSTKSZ;
++	} else
++		return sigframe_size(&user) +
++			round_up(sizeof(struct frame_record), 16) +
++			16; /* max alignment padding */
++}
 -- 
 2.1.4
