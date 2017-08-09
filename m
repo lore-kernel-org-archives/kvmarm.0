@@ -1,37 +1,54 @@
-From: Tony Lindgren <tony@atomide.com>
-Subject: Re: [PATCH 12/15] arm-soc: omap: replace open coded VA->PA
- calculations
-Date: Wed, 9 Aug 2017 14:05:17 -0700
-Message-ID: <20170809210517.GE3934@atomide.com>
-References: <20170805205222.19868-1-ard.biesheuvel@linaro.org>
- <20170805205222.19868-13-ard.biesheuvel@linaro.org>
- <20170809190556.GD3934@atomide.com>
- <CAKv+Gu-kdjN8nXVNL2frsegu-z7HVnG8qcXpQbvM-oBbxKjUGA@mail.gmail.com>
+From: "Kalra, Ashish" <Ashish.Kalra@cavium.com>
+Subject: kvm-unit-tests arm ptimer test
+Date: Thu, 10 Aug 2017 03:01:06 +0530
+Message-ID: <7676eb49-144d-9592-e320-cd31793d1913@cavium.com>
+References: <b1a2b7f6-565b-0702-b038-02e7400d30c7@cavium.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAKv+Gu-kdjN8nXVNL2frsegu-z7HVnG8qcXpQbvM-oBbxKjUGA@mail.gmail.com>
-Sender: kvm-owner@vger.kernel.org
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, linux-renesas-soc@vger.kernel.org, Russell King <linux@armlinux.org.uk>, "linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>, KVM devel mailing list <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Krzysztof Kozlowski <krzk@kernel.org>, Jason Cooper <jason@lakedaemon.net>, arm@kernel.org, Andrew Lunn <andrew@lunn.ch>, Gregory CLEMENT <gregory.clement@free-electrons.com>, Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, baohua@kernel.org, Simon Horman <horms@verge.net.au>, Magnus Damm <magnus.damm@gmail.com>, vireshk@kernel.org, Shiraz Hashim <shiraz.linux.kernel@gmail.com>, Patrice CHOTARD <patrice.chotard@st.com>, nico@linaro.o
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DD63440FAF
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Aug 2017 17:29:50 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id h-IP9-PsG+iM for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Aug 2017 17:29:49 -0400 (EDT)
+Received: from NAM01-SN1-obe.outbound.protection.outlook.com
+ (mail-sn1nam01on0044.outbound.protection.outlook.com [104.47.32.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id ADEB240C5A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Aug 2017 17:29:49 -0400 (EDT)
+In-Reply-To: <b1a2b7f6-565b-0702-b038-02e7400d30c7@cavium.com>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-* Ard Biesheuvel <ard.biesheuvel@linaro.org> [170809 12:24]:
-> On 9 August 2017 at 20:05, Tony Lindgren <tony@atomide.com> wrote:
-> > * Ard Biesheuvel <ard.biesheuvel@linaro.org> [170805 13:54]:
-> >> This replaces a couple of open coded calculations to obtain the
-> >> physical address of a far symbol with calls to the new adr_l etc
-> >> macros.
-> >
-> > I gave this series a quick test and omap3 no longer boots it seems.
-> >
-> 
-> Thanks Tony. I will investigate
+Hello,
 
-Thanks. Looks like omap4 still boots with all your patches, but
-omap3 won't boot even with patch 12 left out.
+I have a general question on the ptimer test for KVM unit tests for the 
+ARM/ARM64 platform, as the guest is only allowed to access to the 
+physical counter and access to the physical timer is not allowed for the 
+guest (CNTHCTL.EL1PCTEN is set and CNTHCTL.EL1PCEN is clear), so how is 
+this ptimer test supposed to pass :
 
-Regards,
+For example, in this test, reading CNTP_{CTL/CVAL}_EL0 will always cause 
+exceptions while running in guest in the following function :
 
-Tony
+static void print_ptimer_info(void)
+{
+	printf("CNTPCT_EL0   : 0x%016lx\n", read_sysreg(cntpct_el0));
+	printf("CNTP_CTL_EL0 : 0x%016lx\n", read_sysreg(cntp_ctl_el0));
+	printf("CNTP_CVAL_EL0: 0x%016lx\n", read_sysreg(cntp_cval_el0));
+}
+
+Thanks,
+Ashish
