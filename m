@@ -1,124 +1,99 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH 20/27] arm64/sve: Add sysctl to set the default vector length for new processes
-Date: Wed,  9 Aug 2017 13:05:26 +0100
-Message-ID: <1502280338-23002-21-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH 21/27] arm64/sve: KVM: Prevent guests from using SVE
+Date: Wed,  9 Aug 2017 13:05:27 +0100
+Message-ID: <1502280338-23002-22-git-send-email-Dave.Martin@arm.com>
 References: <1502280338-23002-1-git-send-email-Dave.Martin@arm.com>
-Return-path: <linux-arch-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7102449C48
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Aug 2017 08:06:43 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id tBi5K1h019rP for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Aug 2017 08:06:42 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 70EE449C40
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Aug 2017 08:06:42 -0400 (EDT)
 In-Reply-To: <1502280338-23002-1-git-send-email-Dave.Martin@arm.com>
-Sender: linux-arch-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org
+Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Because of the effect of SVE on the size of the signal frame, the
-default vector length used for new processes involves a tradeoff
-between performance of SVE-enabled software on the one hand, and
-reliability of non-SVE-aware software on the other hand.
+Until KVM has full SVE support, guests must not be allowed to
+execute SVE instructions.
 
-For this reason, the best choice depends on the repertoire of
-userspace software in use and is thus best left up to distro
-maintainers, sysadmins and developers.
-
-If CONFIG_SYSCTL is enabled, this patch exposes the default vector
-length in /proc/sys/abi/sve_default_vector_length, where boot
-scripts or the adventurous can poke it.
-
-In common with other arm64 ABI sysctls, this control is currently
-global: setting it requires CAP_SYS_ADMIN in the root user
-namespace, but the value set is effective for subsequent execs in
-all namespaces.  The control only affects _new_ processes, however:
-changing it does not affect the vector length of any existing
-process.
-
-The intended usage model is that if userspace is known to be fully
-SVE-tolerant (or a developer is curious to find out) then init
-scripts can crank this up during startup.
+This patch enables the necessary traps, and also ensures that the
+traps are disabled again on exit from the guest so that the host
+can still use SVE if it wants to.
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 ---
- arch/arm64/kernel/fpsimd.c | 57 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 56 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_arm.h | 3 ++-
+ arch/arm64/kvm/hyp/switch.c      | 6 +++---
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index 4fe1675..d45fcfb 100644
---- a/arch/arm64/kernel/fpsimd.c
-+++ b/arch/arm64/kernel/fpsimd.c
-@@ -31,6 +31,7 @@
- #include <linux/sched/signal.h>
- #include <linux/signal.h>
- #include <linux/slab.h>
-+#include <linux/sysctl.h>
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index dbf0537..8a19651 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -186,7 +186,7 @@
+ #define CPTR_EL2_TTA	(1 << 20)
+ #define CPTR_EL2_TFP	(1 << CPTR_EL2_TFP_SHIFT)
+ #define CPTR_EL2_TZ	(1 << 8)
+-#define CPTR_EL2_DEFAULT	0x000033ff
++#define CPTR_EL2_DEFAULT	(0x000033ff & ~CPTR_EL2_TZ)
  
- #include <asm/fpsimd.h>
- #include <asm/cputype.h>
-@@ -200,6 +201,60 @@ static unsigned int find_supported_vector_length(unsigned int vl)
- 	return 16 * bit_to_vq(bit);
+ /* Hyp Debug Configuration Register bits */
+ #define MDCR_EL2_TPMS		(1 << 14)
+@@ -237,5 +237,6 @@
+ 
+ #define CPACR_EL1_FPEN		(3 << 20)
+ #define CPACR_EL1_TTA		(1 << 28)
++#define CPACR_EL1_DEFAULT	(CPACR_EL1_FPEN | CPACR_EL1_ZEN_EL1EN)
+ 
+ #endif /* __ARM64_KVM_ARM_H__ */
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 35a90b8..951f3eb 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -48,7 +48,7 @@ static void __hyp_text __activate_traps_vhe(void)
+ 
+ 	val = read_sysreg(cpacr_el1);
+ 	val |= CPACR_EL1_TTA;
+-	val &= ~CPACR_EL1_FPEN;
++	val &= ~(CPACR_EL1_FPEN | CPACR_EL1_ZEN);
+ 	write_sysreg(val, cpacr_el1);
+ 
+ 	write_sysreg(__kvm_hyp_vector, vbar_el1);
+@@ -59,7 +59,7 @@ static void __hyp_text __activate_traps_nvhe(void)
+ 	u64 val;
+ 
+ 	val = CPTR_EL2_DEFAULT;
+-	val |= CPTR_EL2_TTA | CPTR_EL2_TFP;
++	val |= CPTR_EL2_TTA | CPTR_EL2_TFP | CPTR_EL2_TZ;
+ 	write_sysreg(val, cptr_el2);
  }
  
-+#ifdef CONFIG_SYSCTL
-+
-+static int sve_proc_do_default_vl(struct ctl_table *table, int write,
-+				  void __user *buffer, size_t *lenp,
-+				  loff_t *ppos)
-+{
-+	int ret;
-+	int vl = sve_default_vl;
-+	struct ctl_table tmp_table = {
-+		.data = &vl,
-+		.maxlen = sizeof(vl),
-+	};
-+
-+	ret = proc_dointvec(&tmp_table, write, buffer, lenp, ppos);
-+	if (ret || !write)
-+		return ret;
-+
-+	/* Writing -1 has the special meaning "set to max": */
-+	if (vl == -1) {
-+		BUG_ON(find_supported_vector_length(sve_max_vl) != sve_max_vl);
-+		sve_default_vl = sve_max_vl;
-+
-+		return 0;
-+	}
-+
-+	if (!sve_vl_valid(vl))
-+		return -EINVAL;
-+
-+	sve_default_vl = find_supported_vector_length(vl);
-+	return 0;
-+}
-+
-+static struct ctl_table sve_default_vl_table[] = {
-+	{
-+		.procname	= "sve_default_vector_length",
-+		.mode		= 0644,
-+		.proc_handler	= sve_proc_do_default_vl,
-+	},
-+	{ }
-+};
-+
-+static int __init sve_sysctl_init(void)
-+{
-+	if (system_supports_sve())
-+		if (!register_sysctl("abi", sve_default_vl_table))
-+			return -EINVAL;
-+
-+	return 0;
-+}
-+
-+#else /* ! CONFIG_SYSCTL */
-+static int __init sve_sysctl_init(void) { return 0; }
-+#endif /* ! CONFIG_SYSCTL */
-+
- #define ZREG(sve_state, vq, n) ((char *)(sve_state) +		\
- 	(SVE_SIG_ZREG_OFFSET(vq, n) - SVE_SIG_REGS_OFFSET))
+@@ -117,7 +117,7 @@ static void __hyp_text __deactivate_traps_vhe(void)
  
-@@ -1037,6 +1092,6 @@ static int __init fpsimd_init(void)
- 	if (!(elf_hwcap & HWCAP_ASIMD))
- 		pr_notice("Advanced SIMD is not implemented\n");
- 
--	return 0;
-+	return sve_sysctl_init();
+ 	write_sysreg(mdcr_el2, mdcr_el2);
+ 	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
+-	write_sysreg(CPACR_EL1_FPEN, cpacr_el1);
++	write_sysreg(CPACR_EL1_DEFAULT, cpacr_el1);
+ 	write_sysreg(vectors, vbar_el1);
  }
- late_initcall(fpsimd_init);
+ 
 -- 
 2.1.4
