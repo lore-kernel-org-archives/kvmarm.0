@@ -1,112 +1,112 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH 05/15] ARM: head: use PC-relative insn sequence for __smp_alt
-Date: Mon, 14 Aug 2017 17:20:55 +0100
-Message-ID: <CAKv+Gu8FtmOSd3OPvN-p0WyVnAmJeyteDP9ey5XhF6fvmazA9g@mail.gmail.com>
-References: <20170805205222.19868-1-ard.biesheuvel@linaro.org>
- <20170805205222.19868-6-ard.biesheuvel@linaro.org> <20170811151346.GR8569@atomide.com>
- <CAKv+Gu8d8BxRTy6-h5BHTyPvtJrrQraMaMJP+EG2RRRo-Wvv0Q@mail.gmail.com> <20170814161909.GV8569@atomide.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 21/27] arm64/sve: KVM: Prevent guests from using SVE
+Date: Tue, 15 Aug 2017 17:33:15 +0100
+Message-ID: <0f5b14a8-4d04-61e4-05e8-92cd55c8bee9@arm.com>
+References: <1502280338-23002-1-git-send-email-Dave.Martin@arm.com>
+ <1502280338-23002-22-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Return-path: <linux-renesas-soc-owner@vger.kernel.org>
-In-Reply-To: <20170814161909.GV8569@atomide.com>
-Sender: linux-renesas-soc-owner@vger.kernel.org
-To: Tony Lindgren <tony@atomide.com>
-Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, linux-renesas-soc@vger.kernel.org, Russell King <linux@armlinux.org.uk>, "linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>, KVM devel mailing list <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Krzysztof Kozlowski <krzk@kernel.org>, Jason Cooper <jason@lakedaemon.net>, arm@kernel.org, Andrew Lunn <andrew@lunn.ch>, Gregory CLEMENT <gregory.clement@free-electrons.com>, Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, baohua@kernel.org, Simon Horman <horms@verge.net.au>, Magnus Damm <magnus.damm@gmail.com>, vireshk@kernel.org, Shiraz Hashim <shiraz.linux.kernel@gmail.com>, Patrice CHOTARD <patrice.chotard@st.com>, nico@linaro.o
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5033D40D17
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Aug 2017 12:31:37 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id x9auXmR19-Yy for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Aug 2017 12:31:36 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 197B249C35
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Aug 2017 12:31:36 -0400 (EDT)
+In-Reply-To: <1502280338-23002-22-git-send-email-Dave.Martin@arm.com>
+Content-Language: en-GB
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 14 August 2017 at 17:19, Tony Lindgren <tony@atomide.com> wrote:
-> * Ard Biesheuvel <ard.biesheuvel@linaro.org> [170811 12:37]:
->> On 11 August 2017 at 16:13, Tony Lindgren <tony@atomide.com> wrote:
->> > * Ard Biesheuvel <ard.biesheuvel@linaro.org> [170805 13:54]:
->> >> Replace the open coded PC relative offset calculations with a pair
->> >> of adr_l invocations.
->> >>
->> >> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
->> >> ---
->> >>  arch/arm/kernel/head.S | 12 ++----------
->> >>  1 file changed, 2 insertions(+), 10 deletions(-)
->> >>
->> >> diff --git a/arch/arm/kernel/head.S b/arch/arm/kernel/head.S
->> >> index 6e9df3663a57..aed341e0f530 100644
->> >> --- a/arch/arm/kernel/head.S
->> >> +++ b/arch/arm/kernel/head.S
->> >> @@ -523,19 +523,11 @@ ARM_BE8(rev     r0, r0)                 @ byteswap if big endian
->> >>       retne   lr
->> >>
->> >>  __fixup_smp_on_up:
->> >> -     adr     r0, 1f
->> >> -     ldmia   r0, {r3 - r5}
->> >> -     sub     r3, r0, r3
->> >> -     add     r4, r4, r3
->> >> -     add     r5, r5, r3
->> >> +     adr_l   r4, __smpalt_begin
->> >> +     adr_l   r5, __smpalt_end
->> >>       b       __do_fixup_smp_on_up
->> >>  ENDPROC(__fixup_smp)
->> >>
->> >> -     .align
->> >> -1:   .word   .
->> >> -     .word   __smpalt_begin
->> >> -     .word   __smpalt_end
->> >> -
->> >>       .pushsection .data
->> >>       .globl  smp_on_up
->> >>  smp_on_up:
->> >
->> > Ard, it's this one that cause boot to fail on omap3.
->> > The rest of your set works for me with just this one
->> > left out.
->> >
->>
->> I'm completely puzzled. The change is so simple that it is difficult
->> to reduce it in parts, but if you still have the time to spare, mind
->> trying the diff below?
->>
->>
->> diff --git a/arch/arm/kernel/head.S b/arch/arm/kernel/head.S
->> index 6e9df3663a57..c0361e608210 100644
->> --- a/arch/arm/kernel/head.S
->> +++ b/arch/arm/kernel/head.S
->> @@ -524,17 +524,15 @@ ARM_BE8(rev       r0, r0)                 @
->> byteswap if big endian
->>
->>  __fixup_smp_on_up:
->>         adr     r0, 1f
->> -       ldmia   r0, {r3 - r5}
->> -       sub     r3, r0, r3
->> -       add     r4, r4, r3
->> -       add     r5, r5, r3
->> +       ldmia   r0, {r4 - r5}
->> +       add     r4, r4, r0
->> +       add     r5, r5, r0
->>         b       __do_fixup_smp_on_up
->>  ENDPROC(__fixup_smp)
->>
->>         .align
->> -1:     .word   .
->> -       .word   __smpalt_begin
->> -       .word   __smpalt_end
->> +1:     .word   __smpalt_begin - 1b
->> +       .word   __smpalt_end - 1b
->>
->>         .pushsection .data
->>         .globl  smp_on_up
->>
->> The main point of these changes is to eliminate absolute references,
->> not to use the new macros, so if this does work, I will go with this
->> instead.
->
-> For reference, I manually did this changes as it did not apply
-> after reverting your earlier version of this patch. No luck with
-> this change, so I'll test again when you you have updated patches
-> available.
->
+On 09/08/17 13:05, Dave Martin wrote:
+> Until KVM has full SVE support, guests must not be allowed to
+> execute SVE instructions.
+> 
+> This patch enables the necessary traps, and also ensures that the
+> traps are disabled again on exit from the guest so that the host
+> can still use SVE if it wants to.
+> 
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_arm.h | 3 ++-
+>  arch/arm64/kvm/hyp/switch.c      | 6 +++---
+>  2 files changed, 5 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index dbf0537..8a19651 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -186,7 +186,7 @@
+>  #define CPTR_EL2_TTA	(1 << 20)
+>  #define CPTR_EL2_TFP	(1 << CPTR_EL2_TFP_SHIFT)
+>  #define CPTR_EL2_TZ	(1 << 8)
+> -#define CPTR_EL2_DEFAULT	0x000033ff
+> +#define CPTR_EL2_DEFAULT	(0x000033ff & ~CPTR_EL2_TZ)
 
-Thanks Tony,
+I must say I'm not overly fond of this construct. I'd rather introduce a
+RES1 field that matches the v8.2 description, instead of this ugly
+constant and something that clears it.
 
-But Nico already found the issue: I was looking at the code with
-another patch on top, which removed the reference to r3 in the
-followup code.
+>  
+>  /* Hyp Debug Configuration Register bits */
+>  #define MDCR_EL2_TPMS		(1 << 14)
+> @@ -237,5 +237,6 @@
+>  
+>  #define CPACR_EL1_FPEN		(3 << 20)
+>  #define CPACR_EL1_TTA		(1 << 28)
+> +#define CPACR_EL1_DEFAULT	(CPACR_EL1_FPEN | CPACR_EL1_ZEN_EL1EN)
+>  
+>  #endif /* __ARM64_KVM_ARM_H__ */
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index 35a90b8..951f3eb 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -48,7 +48,7 @@ static void __hyp_text __activate_traps_vhe(void)
+>  
+>  	val = read_sysreg(cpacr_el1);
+>  	val |= CPACR_EL1_TTA;
+> -	val &= ~CPACR_EL1_FPEN;
+> +	val &= ~(CPACR_EL1_FPEN | CPACR_EL1_ZEN);
+>  	write_sysreg(val, cpacr_el1);
+>  
+>  	write_sysreg(__kvm_hyp_vector, vbar_el1);
+> @@ -59,7 +59,7 @@ static void __hyp_text __activate_traps_nvhe(void)
+>  	u64 val;
+>  
+>  	val = CPTR_EL2_DEFAULT;
+> -	val |= CPTR_EL2_TTA | CPTR_EL2_TFP;
+> +	val |= CPTR_EL2_TTA | CPTR_EL2_TFP | CPTR_EL2_TZ;
+>  	write_sysreg(val, cptr_el2);
+>  }
+>  
+> @@ -117,7 +117,7 @@ static void __hyp_text __deactivate_traps_vhe(void)
+>  
+>  	write_sysreg(mdcr_el2, mdcr_el2);
+>  	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
+> -	write_sysreg(CPACR_EL1_FPEN, cpacr_el1);
+> +	write_sysreg(CPACR_EL1_DEFAULT, cpacr_el1);
+>  	write_sysreg(vectors, vbar_el1);
+>  }
+>  
+> 
 
-In the KASLR series I just posted, I reordered that patch with this
-one, so everything should be good.
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
