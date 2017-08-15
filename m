@@ -1,108 +1,79 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 21/27] arm64/sve: KVM: Prevent guests from using SVE
-Date: Tue, 15 Aug 2017 17:33:15 +0100
-Message-ID: <0f5b14a8-4d04-61e4-05e8-92cd55c8bee9@arm.com>
+Subject: Re: [PATCH 23/27] arm64/sve: KVM: Hide SVE from CPU features exposed
+ to guests
+Date: Tue, 15 Aug 2017 17:37:55 +0100
+Message-ID: <39b6ee07-1258-e733-3495-38b0d31ab800@arm.com>
 References: <1502280338-23002-1-git-send-email-Dave.Martin@arm.com>
- <1502280338-23002-22-git-send-email-Dave.Martin@arm.com>
+ <1502280338-23002-24-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5033D40D17
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Aug 2017 12:31:37 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id x9auXmR19-Yy for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Aug 2017 12:31:36 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 197B249C35
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Aug 2017 12:31:36 -0400 (EDT)
-In-Reply-To: <1502280338-23002-22-git-send-email-Dave.Martin@arm.com>
+Return-path: <linux-arch-owner@vger.kernel.org>
+In-Reply-To: <1502280338-23002-24-git-send-email-Dave.Martin@arm.com>
 Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: linux-arch-owner@vger.kernel.org
 To: Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On 09/08/17 13:05, Dave Martin wrote:
-> Until KVM has full SVE support, guests must not be allowed to
-> execute SVE instructions.
+> KVM guests cannot currently use SVE, because SVE is always
+> configured to trap to EL2.
 > 
-> This patch enables the necessary traps, and also ensures that the
-> traps are disabled again on exit from the guest so that the host
-> can still use SVE if it wants to.
+> However, a guest that sees SVE reported as present in
+> ID_AA64PFR0_EL1 may legitimately expect that SVE works and try to
+> use it.  Instead of working, the guest will receive an injected
+> undef exception, which may cause the guest to oops or go into a
+> spin.
+> 
+> To avoid misleading the guest into believing that SVE will work,
+> this patch masks out the SVE field from ID_AA64PFR0_EL1 when a
+> guest attempts to read this register.  No support is explicitly
+> added for ID_AA64ZFR0_EL1 either, so that is still emulated as
+> reading as zero, which is consistent with SVE not being
+> implemented.
+> 
+> This is a temporary measure, and will be removed in a later series
+> when full KVM support for SVE is implemented.
 > 
 > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 > ---
->  arch/arm64/include/asm/kvm_arm.h | 3 ++-
->  arch/arm64/kvm/hyp/switch.c      | 6 +++---
->  2 files changed, 5 insertions(+), 4 deletions(-)
+>  arch/arm64/kvm/sys_regs.c | 14 +++++++++++++-
+>  1 file changed, 13 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index dbf0537..8a19651 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -186,7 +186,7 @@
->  #define CPTR_EL2_TTA	(1 << 20)
->  #define CPTR_EL2_TFP	(1 << CPTR_EL2_TFP_SHIFT)
->  #define CPTR_EL2_TZ	(1 << 8)
-> -#define CPTR_EL2_DEFAULT	0x000033ff
-> +#define CPTR_EL2_DEFAULT	(0x000033ff & ~CPTR_EL2_TZ)
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 6583dd7..9e8c54e 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -897,8 +897,20 @@ static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
+>  {
+>  	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
+>  			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
+> +	u64 val = raz ? 0 : read_sanitised_ftr_reg(id);
+>  
+> -	return raz ? 0 : read_sanitised_ftr_reg(id);
+> +	if (id == SYS_ID_AA64PFR0_EL1) {
+> +		static bool printed;
+> +
+> +		if ((val & (0xfUL << ID_AA64PFR0_SVE_SHIFT)) && !printed) {
+> +			kvm_info("SVE unsupported for guests, suppressing\n");
+> +			printed = true;
+> +		}
 
-I must say I'm not overly fond of this construct. I'd rather introduce a
-RES1 field that matches the v8.2 description, instead of this ugly
-constant and something that clears it.
+Ideally, this should be a vcpu_unimpl_once(). But:
+- it doesn't exist
+- vcpu_unimpl looks hopelessly x86 specific
 
->  
->  /* Hyp Debug Configuration Register bits */
->  #define MDCR_EL2_TPMS		(1 << 14)
-> @@ -237,5 +237,6 @@
->  
->  #define CPACR_EL1_FPEN		(3 << 20)
->  #define CPACR_EL1_TTA		(1 << 28)
-> +#define CPACR_EL1_DEFAULT	(CPACR_EL1_FPEN | CPACR_EL1_ZEN_EL1EN)
->  
->  #endif /* __ARM64_KVM_ARM_H__ */
-> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> index 35a90b8..951f3eb 100644
-> --- a/arch/arm64/kvm/hyp/switch.c
-> +++ b/arch/arm64/kvm/hyp/switch.c
-> @@ -48,7 +48,7 @@ static void __hyp_text __activate_traps_vhe(void)
->  
->  	val = read_sysreg(cpacr_el1);
->  	val |= CPACR_EL1_TTA;
-> -	val &= ~CPACR_EL1_FPEN;
-> +	val &= ~(CPACR_EL1_FPEN | CPACR_EL1_ZEN);
->  	write_sysreg(val, cpacr_el1);
->  
->  	write_sysreg(__kvm_hyp_vector, vbar_el1);
-> @@ -59,7 +59,7 @@ static void __hyp_text __activate_traps_nvhe(void)
->  	u64 val;
->  
->  	val = CPTR_EL2_DEFAULT;
-> -	val |= CPTR_EL2_TTA | CPTR_EL2_TFP;
-> +	val |= CPTR_EL2_TTA | CPTR_EL2_TFP | CPTR_EL2_TZ;
->  	write_sysreg(val, cptr_el2);
+How about turning it into a pr_err_once() instead?
+
+> +
+> +		val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
+> +	}
+> +
+> +	return val;
 >  }
 >  
-> @@ -117,7 +117,7 @@ static void __hyp_text __deactivate_traps_vhe(void)
->  
->  	write_sysreg(mdcr_el2, mdcr_el2);
->  	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
-> -	write_sysreg(CPACR_EL1_FPEN, cpacr_el1);
-> +	write_sysreg(CPACR_EL1_DEFAULT, cpacr_el1);
->  	write_sysreg(vectors, vbar_el1);
->  }
->  
+>  /* cpufeature ID register access trap handlers */
 > 
 
 Thanks,
