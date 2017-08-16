@@ -1,83 +1,74 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH 21/27] arm64/sve: KVM: Prevent guests from using SVE
-Date: Wed, 16 Aug 2017 12:35:19 +0100
-Message-ID: <20170816113519.GE6321@e103592.cambridge.arm.com>
+From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Subject: Re: [PATCH 15/27] arm64/sve: Probe SVE capabilities and usable vector
+ lengths
+Date: Wed, 16 Aug 2017 18:48:01 +0100
+Message-ID: <07268b07-c5f4-38d6-257d-5864cb6752c1@arm.com>
 References: <1502280338-23002-1-git-send-email-Dave.Martin@arm.com>
- <1502280338-23002-22-git-send-email-Dave.Martin@arm.com>
- <0f5b14a8-4d04-61e4-05e8-92cd55c8bee9@arm.com>
- <20170816105013.GZ6321@e103592.cambridge.arm.com>
- <3cb51836-9677-5eb5-cc07-361eee674806@arm.com>
+ <1502280338-23002-16-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Transfer-Encoding: 7bit
 Return-path: <linux-arch-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <3cb51836-9677-5eb5-cc07-361eee674806@arm.com>
+In-Reply-To: <1502280338-23002-16-git-send-email-Dave.Martin@arm.com>
 Sender: linux-arch-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Aug 16, 2017 at 12:20:41PM +0100, Marc Zyngier wrote:
-> On 16/08/17 11:50, Dave Martin wrote:
-> > On Tue, Aug 15, 2017 at 05:33:15PM +0100, Marc Zyngier wrote:
-> >> On 09/08/17 13:05, Dave Martin wrote:
-> >>> Until KVM has full SVE support, guests must not be allowed to
-> >>> execute SVE instructions.
-> >>>
-> >>> This patch enables the necessary traps, and also ensures that the
-> >>> traps are disabled again on exit from the guest so that the host
-> >>> can still use SVE if it wants to.
-> >>>
-> >>> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> >>> ---
-> >>>  arch/arm64/include/asm/kvm_arm.h | 3 ++-
-> >>>  arch/arm64/kvm/hyp/switch.c      | 6 +++---
-> >>>  2 files changed, 5 insertions(+), 4 deletions(-)
-> >>>
-> >>> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> >>> index dbf0537..8a19651 100644
-> >>> --- a/arch/arm64/include/asm/kvm_arm.h
-> >>> +++ b/arch/arm64/include/asm/kvm_arm.h
-> >>> @@ -186,7 +186,7 @@
-> >>>  #define CPTR_EL2_TTA	(1 << 20)
-> >>>  #define CPTR_EL2_TFP	(1 << CPTR_EL2_TFP_SHIFT)
-> >>>  #define CPTR_EL2_TZ	(1 << 8)
-> >>> -#define CPTR_EL2_DEFAULT	0x000033ff
-> >>> +#define CPTR_EL2_DEFAULT	(0x000033ff & ~CPTR_EL2_TZ)
-> >>
-> >> I must say I'm not overly fond of this construct. I'd rather introduce a
-> >> RES1 field that matches the v8.2 description, instead of this ugly
-> >> constant and something that clears it.
-> > 
-> > Sorry, I don't get your meaning here.  v8.2 neither immediately predates
-> > or postdates SVE.  
-> 
-> The ARMv8 ARM (DDI406B_a, D7.2.19) says otherwise. This bit is only
-> defined as having a possibility of being 0 on an v8.2 implementation if
-> SVE is implemented.
+On 09/08/17 13:05, Dave Martin wrote:
+> [This sender failed our fraud detection checks and may not be who they appear to be. Learn about spoofing at http://aka.ms/LearnAboutSpoofing]
+>
+> This patch uses the cpufeatures framework to determine common SVE
+> capabilities and vector lengths, and configures the runtime SVE
+> support code appropriately.
+>
+> ZCR_ELx is not really a feature register, but it is convenient to
+> use it as a template for recording the maximum vector length
+> supported by a CPU, using the LEN field.  This field is similar to
+> a feature field in that it is a contiguous bitfield for which we
+> want to determine the minimum system-wide value.  This patch adds
+> ZCR as a pseudo-register in cpuinfo/cpufeatures, with appropriate
+> custom code to populate it.  Finding the minimum supported value of
+> the LEN field is left to the cpufeatures framework in the usual
+> way.
+>
+> The meaning of ID_AA64ZFR0_EL1 is not architecturally defined yet,
+> so for now we just require it to be zero.
+>
+> Note that much of this code is dormant and SVE still won't be used
+> yet, since system_supports_sve() remains hardwired to false.
+>
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 
-Right.  I was confused by the v8.2 reference, since if this weren't true
-for v8.0 of the architecture, we couldn't simply change a compile time
-constant here.  In fact, there's a compatible retroactive change to all
-arch versions >= v8.0.
+Dave,
 
-> > What are you propsing?
-> 
-> What I'm proposing is:
-> 
-> #define CPTR_EL2_RES1		0x32ff
-> #define CPTR_EL2_DEFAULT	CPTR_EL2_RES1
-> 
-> and none of that pointless constant clearing.
-> 
-> > I guess we could just write 0x000032ff now that the only meaning the
-> > architecture can ever assign to bit 8 is known.
-> Exactly.
+The cpufeature bits look good to me, with one minor comment.
 
-OK, good -- I'll change that.
 
-I was trying to avoid magic numberness, but it's a bit futile when
-talking about RESx bits.
+> diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+> index bce95de..955c873 100644
+> --- a/arch/arm64/kernel/fpsimd.c
+> +++ b/arch/arm64/kernel/fpsimd.c
 
-Cheers
----Dave
+...
+
+> +void __init sve_setup(void)
+> +{
+> +       u64 zcr;
+> +       unsigned int max_vl;
+> +
+> +       if (!system_supports_sve())
+> +               return;
+> +
+> +       /*
+> +        * The architecture mandates 128-bit vectors be supported, and
+> +        * the code assumes elsewhere that sve_vq_map is non-empty:
+> +        */
+> +       BUG_ON(!test_bit(vq_to_bit(1), sve_vq_map));
+> +
+> +       sve_vq_map_finalised = true;
+
+We have something local in cpufeature.c, sys_caps_initialised. May be we could
+reuse it here ? With or without that change, FWIW.
+
+Acked-by: Suzuki K Poulose <suzuki.poulose@arm.com>
