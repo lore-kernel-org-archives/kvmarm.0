@@ -1,79 +1,41 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCH 15/27] arm64/sve: Probe SVE capabilities and usable vector
- lengths
-Date: Thu, 17 Aug 2017 11:46:12 +0100
-Message-ID: <5cd3b5c8-acea-044e-c503-a7e8ad0180f8@arm.com>
-References: <1502280338-23002-1-git-send-email-Dave.Martin@arm.com>
- <1502280338-23002-16-git-send-email-Dave.Martin@arm.com>
- <07268b07-c5f4-38d6-257d-5864cb6752c1@arm.com>
- <20170817100424.GI6321@e103592.cambridge.arm.com>
+From: Rob Herring <robh-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Subject: Re: [PATCH v2 06/11] Docs: dt: add devicetree binding for describing
+ arm64 SDEI firmware
+Date: Thu, 17 Aug 2017 10:09:48 -0500
+Message-ID: <20170817150948.x4ebg54ak7pzfley@rob-hp-laptop>
+References: <20170808164616.25949-1-james.morse@arm.com>
+ <20170808164616.25949-7-james.morse@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E848149C4C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Aug 2017 06:44:30 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3YAJhCo78nEe for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Aug 2017 06:44:29 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AEFC449C44
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Aug 2017 06:44:29 -0400 (EDT)
-In-Reply-To: <20170817100424.GI6321@e103592.cambridge.arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20170808164616.25949-7-james.morse-5wv7dgnIgG8@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+Cc: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, Loc Ho <lho-qTEPVZfXA3Y@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 17/08/17 11:04, Dave Martin wrote:
-> On Wed, Aug 16, 2017 at 06:48:01PM +0100, Suzuki K Poulose wrote:
->> On 09/08/17 13:05, Dave Martin wrote:
->>> [This sender failed our fraud detection checks and may not be who they appear to be. Learn about spoofing at http://aka.ms/LearnAboutSpoofing]
->
-> Any idea what this is ^ ?  I don't know if this is caused by me or you,
-> but I only seem to see it on subthreads you've replied to.
->
+On Tue, Aug 08, 2017 at 05:46:11PM +0100, James Morse wrote:
+> The Software Delegated Exception Interface (SDEI) is an ARM standard
+> for registering callbacks from the platform firmware into the OS.
+> This is typically used to implement RAS notifications, or from an
+> IRQ that has been promoted to a firmware-assisted NMI.
+> 
+> Add a new devicetree binding to describe the SDE firmware interface.
+> 
+> Signed-off-by: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+> ---
+> Changes since v1:
+> * Added bound IRQ description for binding,
+> * Reference SMC-CC, not 'AAPCS like'
+> * Move sdei node under firmware node (and the file path)
+> 
+>  .../devicetree/bindings/arm/firmware/sdei.txt      | 42 ++++++++++++++++++++++
+>  1 file changed, 42 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/arm/firmware/sdei.txt
 
-Dave,
-
-Sorry about that, should have trimmed that. It looks like the mail server is unhappy
-about email received via kvmarm list and I don't know why.
-
->>
->>> +void __init sve_setup(void)
->>> +{
->>> +       u64 zcr;
->>> +       unsigned int max_vl;
->>> +
->>> +       if (!system_supports_sve())
->>> +               return;
->>> +
->>> +       /*
->>> +        * The architecture mandates 128-bit vectors be supported, and
->>> +        * the code assumes elsewhere that sve_vq_map is non-empty:
->>> +        */
->>> +       BUG_ON(!test_bit(vq_to_bit(1), sve_vq_map));
->>> +
->>> +       sve_vq_map_finalised = true;
->>
->> We have something local in cpufeature.c, sys_caps_initialised. May be we could
->> reuse it here ? With or without that change, FWIW.
->
-> I'll take a look at that.  Inventing that here seemed a little ugly, and
-> this is all driven from the cpufreatures code anyway now which ensures a
-> certain ordering.
->
-> If I can reuse sys_caps_initialised for this, I will -- seems pointless
-> to reinvent it.
-
-Suzuki
+Acked-by: Rob Herring <robh-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
