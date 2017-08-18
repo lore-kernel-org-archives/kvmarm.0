@@ -1,22 +1,22 @@
 From: Dongjiu Geng <gengdongjiu@huawei.com>
-Subject: [PATCH v5 1/7] arm64: cpufeature: Detect CPU RAS Extentions
-Date: Fri, 18 Aug 2017 22:11:51 +0800
-Message-ID: <1503065517-7920-2-git-send-email-gengdongjiu@huawei.com>
+Subject: [PATCH v5 3/7] acpi: apei: Add SEI notification type support for ARMv8
+Date: Fri, 18 Aug 2017 22:11:53 +0800
+Message-ID: <1503065517-7920-4-git-send-email-gengdongjiu@huawei.com>
 References: <1503065517-7920-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 93BAB49CBC
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Aug 2017 09:48:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EB6B49C96
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Aug 2017 09:47:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 89CH2F66SM5t for <kvmarm@lists.cs.columbia.edu>;
- Fri, 18 Aug 2017 09:48:00 -0400 (EDT)
+ with ESMTP id 1j-Ihto5a+y6 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 18 Aug 2017 09:47:55 -0400 (EDT)
 Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 754CF49CB8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Aug 2017 09:47:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 08ED849C80
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Aug 2017 09:47:53 -0400 (EDT)
 In-Reply-To: <1503065517-7920-1-git-send-email-gengdongjiu@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,148 +31,228 @@ To: christoffer.dall@linaro.org, marc.zyngier@arm.com, rkrcmar@redhat.com, linux
 Cc: zhengqiang10@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com, linuxarm@huawei.com, gengdongjiu@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Xie XiuQi <xiexiuqi@huawei.com>
+ARMV8.2 requires implementation of the RAS extension, in
+this extension it adds SEI(SError Interrupt) notification
+type, this patch addes a new GHES error source handling
+function for SEI. Because this error source parse and handling
+method are similar with the SEA. so use one function to handle
+them.
 
-ARM's v8.2 Extentions add support for Reliability, Availability and
-Serviceability (RAS). On CPUs with these extensions system software
-can use additional barriers to isolate errors and determine if faults
-are pending.
+In current code logic, The two functions ghes_sea_add() and
+ghes_sea_remove() are only called when CONFIG_ACPI_APEI_SEA
+and CONFIG_ACPI_APEI_SEI are defined. If not, it will return
+errors in the ghes_probe() and do not continue, so remove the
+useless code that handling CONFIG_ACPI_APEI_SEA and
+CONFIG_ACPI_APEI_SEI do not defined.
 
-Add cpufeature detection and a barrier in the context-switch code.
-There is no need to use alternatives for this as CPUs that don't
-support this feature will treat the instruction as a nop.
+Expose one API ghes_notify_sex() to external, external modules
+can call this exposed APIs to parse and handling the SEA/SEI.
 
-Platform level RAS support may require additional firmware support.
-
-Signed-off-by: Xie XiuQi <xiexiuqi@huawei.com>
-[Rebased, added esb and config option, reworded commit message]
-Signed-off-by: James Morse <james.morse@arm.com>
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 ---
- arch/arm64/Kconfig               | 16 ++++++++++++++++
- arch/arm64/include/asm/barrier.h |  1 +
- arch/arm64/include/asm/cpucaps.h |  3 ++-
- arch/arm64/include/asm/sysreg.h  |  2 ++
- arch/arm64/kernel/cpufeature.c   | 13 +++++++++++++
- arch/arm64/kernel/process.c      |  3 +++
- 6 files changed, 37 insertions(+), 1 deletion(-)
+ arch/arm64/mm/fault.c     | 21 +++++++++++++++--
+ drivers/acpi/apei/Kconfig | 15 ++++++++++++
+ drivers/acpi/apei/ghes.c  | 60 ++++++++++++++++++++++++++++++-----------------
+ include/acpi/ghes.h       |  2 +-
+ 4 files changed, 74 insertions(+), 24 deletions(-)
 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index dfd908630631..4d87aa963d83 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -960,6 +960,22 @@ config ARM64_UAO
- 	  regular load/store instructions if the cpu does not implement the
- 	  feature.
+diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+index 2509e4fe6992..0aa92a69c280 100644
+--- a/arch/arm64/mm/fault.c
++++ b/arch/arm64/mm/fault.c
+@@ -585,7 +585,7 @@ static int do_sea(unsigned long addr, unsigned int esr, struct pt_regs *regs)
+ 		if (interrupts_enabled(regs))
+ 			nmi_enter();
  
-+config ARM64_RAS_EXTN
-+	bool "Enable support for RAS CPU Extensions"
+-		ret = ghes_notify_sea();
++		ret = ghes_notify_sex(ACPI_HEST_NOTIFY_SEA);
+ 
+ 		if (interrupts_enabled(regs))
+ 			nmi_exit();
+@@ -682,7 +682,24 @@ int handle_guest_sea(phys_addr_t addr, unsigned int esr)
+ 	int ret = -ENOENT;
+ 
+ 	if (IS_ENABLED(CONFIG_ACPI_APEI_SEA))
+-		ret = ghes_notify_sea();
++		ret = ghes_notify_sex(ACPI_HEST_NOTIFY_SEA);
++
++	return ret;
++}
++
++/*
++ * Handle SError interrupt that occur in a guest kernel.
++ *
++ * The return value will be zero if the SEI was successfully handled
++ * and non-zero if there was an error processing the error or there was
++ * no error to process.
++ */
++int handle_guest_sei(phys_addr_t addr, unsigned int esr)
++{
++	int ret = -ENOENT;
++
++	if (IS_ENABLED(CONFIG_ACPI_APEI_SEI))
++		ret = ghes_notify_sex(ACPI_HEST_NOTIFY_SEI);
+ 
+ 	return ret;
+ }
+diff --git a/drivers/acpi/apei/Kconfig b/drivers/acpi/apei/Kconfig
+index de14d49a5c90..556370c763ec 100644
+--- a/drivers/acpi/apei/Kconfig
++++ b/drivers/acpi/apei/Kconfig
+@@ -54,6 +54,21 @@ config ACPI_APEI_SEA
+ 	  option allows the OS to look for such hardware error record, and
+ 	  take appropriate action.
+ 
++config ACPI_APEI_SEI
++	bool "APEI Asynchronous SError Interrupt logging/recovering support"
++	depends on ARM64 && ACPI_APEI_GHES
 +	default y
 +	help
-+	  CPUs that support the Reliability, Availability and Serviceability
-+	  (RAS) Extensions, part of ARMv8.2 are able to track faults and
-+	  errors, classify them and report them to software.
++	  This option should be enabled if the system supports
++	  firmware first handling of SEI (asynchronous SError interrupt).
 +
-+	  On CPUs with these extensions system software can use additional
-+	  barriers to determine if faults are pending and read the
-+	  classification from a new set of registers.
++	  SEI happens with invalid instruction access or asynchronous exceptions
++	  on ARMv8 systems. If a system supports firmware first handling of SEI,
++	  the platform analyzes and handles hardware error notifications from
++	  SEI, and it may then form a HW error record for the OS to parse and
++	  handle. This option allows the OS to look for such hardware error
++	  record, and take appropriate action.
 +
-+	  Selecting this feature will allow the kernel to use these barriers
-+	  and access the new registers if the system supports the extension.
-+	  Platform RAS features may additionally depend on firmware support.
-+
- endmenu
- 
- config ARM64_MODULE_CMODEL_LARGE
-diff --git a/arch/arm64/include/asm/barrier.h b/arch/arm64/include/asm/barrier.h
-index 0fe7e43b7fbc..8b0a0eb67625 100644
---- a/arch/arm64/include/asm/barrier.h
-+++ b/arch/arm64/include/asm/barrier.h
-@@ -30,6 +30,7 @@
- #define isb()		asm volatile("isb" : : : "memory")
- #define dmb(opt)	asm volatile("dmb " #opt : : : "memory")
- #define dsb(opt)	asm volatile("dsb " #opt : : : "memory")
-+#define esb()		asm volatile("hint #16"  : : : "memory")
- 
- #define mb()		dsb(sy)
- #define rmb()		dsb(ld)
-diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-index 8d2272c6822c..f93bf77f1f74 100644
---- a/arch/arm64/include/asm/cpucaps.h
-+++ b/arch/arm64/include/asm/cpucaps.h
-@@ -39,7 +39,8 @@
- #define ARM64_WORKAROUND_QCOM_FALKOR_E1003	18
- #define ARM64_WORKAROUND_858921			19
- #define ARM64_WORKAROUND_CAVIUM_30115		20
-+#define ARM64_HAS_RAS_EXTN			21
- 
--#define ARM64_NCAPS				21
-+#define ARM64_NCAPS				22
- 
- #endif /* __ASM_CPUCAPS_H */
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 248339e4aaf5..35b786b43ee4 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -331,6 +331,7 @@
- #define ID_AA64ISAR1_JSCVT_SHIFT	12
- 
- /* id_aa64pfr0 */
-+#define ID_AA64PFR0_RAS_SHIFT		28
- #define ID_AA64PFR0_GIC_SHIFT		24
- #define ID_AA64PFR0_ASIMD_SHIFT		20
- #define ID_AA64PFR0_FP_SHIFT		16
-@@ -339,6 +340,7 @@
- #define ID_AA64PFR0_EL1_SHIFT		4
- #define ID_AA64PFR0_EL0_SHIFT		0
- 
-+#define ID_AA64PFR0_RAS_V1		0x1
- #define ID_AA64PFR0_FP_NI		0xf
- #define ID_AA64PFR0_FP_SUPPORTED	0x0
- #define ID_AA64PFR0_ASIMD_NI		0xf
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 9f9e0064c8c1..a807ab55ee10 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -124,6 +124,7 @@ static const struct arm64_ftr_bits ftr_id_aa64isar1[] = {
+ config ACPI_APEI_MEMORY_FAILURE
+ 	bool "APEI memory error recovering support"
+ 	depends on ACPI_APEI && MEMORY_FAILURE
+diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+index d661d452b238..705738aa48b8 100644
+--- a/drivers/acpi/apei/ghes.c
++++ b/drivers/acpi/apei/ghes.c
+@@ -813,20 +813,21 @@ static struct notifier_block ghes_notifier_hed = {
+ 	.notifier_call = ghes_notify_hed,
  };
  
- static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_EXACT, ID_AA64PFR0_RAS_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_EXACT, ID_AA64PFR0_GIC_SHIFT, 4, 0),
- 	S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_ASIMD_SHIFT, 4, ID_AA64PFR0_ASIMD_NI),
- 	S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_FP_SHIFT, 4, ID_AA64PFR0_FP_NI),
-@@ -888,6 +889,18 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.min_field_value = 0,
- 		.matches = has_no_fpsimd,
- 	},
-+#ifdef CONFIG_ARM64_RAS_EXTN
-+	{
-+		.desc = "RAS Extension Support",
-+		.capability = ARM64_HAS_RAS_EXTN,
-+		.def_scope = SCOPE_SYSTEM,
-+		.matches = has_cpuid_feature,
-+		.sys_reg = SYS_ID_AA64PFR0_EL1,
-+		.sign = FTR_UNSIGNED,
-+		.field_pos = ID_AA64PFR0_RAS_SHIFT,
-+		.min_field_value = ID_AA64PFR0_RAS_V1,
-+	},
-+#endif /* CONFIG_ARM64_RAS_EXTN */
- 	{},
- };
+-#ifdef CONFIG_ACPI_APEI_SEA
+ static LIST_HEAD(ghes_sea);
++static LIST_HEAD(ghes_sei);
  
-diff --git a/arch/arm64/kernel/process.c b/arch/arm64/kernel/process.c
-index 659ae8094ed5..2def5ce75867 100644
---- a/arch/arm64/kernel/process.c
-+++ b/arch/arm64/kernel/process.c
-@@ -363,6 +363,9 @@ __notrace_funcgraph struct task_struct *__switch_to(struct task_struct *prev,
- 	 */
- 	dsb(ish);
- 
-+	/* Deliver any pending SError from prev */
-+	esb();
+ /*
+  * Return 0 only if one of the SEA error sources successfully reported an error
+  * record sent from the firmware.
+  */
+-int ghes_notify_sea(void)
 +
- 	/* the actual thread switch */
- 	last = cpu_switch_to(prev, next);
++int ghes_handle_sex(struct list_head *head)
+ {
+ 	struct ghes *ghes;
+ 	int ret = -ENOENT;
  
+ 	rcu_read_lock();
+-	list_for_each_entry_rcu(ghes, &ghes_sea, list) {
++	list_for_each_entry_rcu(ghes, head, list) {
+ 		if (!ghes_proc(ghes))
+ 			ret = 0;
+ 	}
+@@ -834,33 +835,41 @@ int ghes_notify_sea(void)
+ 	return ret;
+ }
+ 
+-static void ghes_sea_add(struct ghes *ghes)
++int ghes_notify_sex(u8 type)
++{
++	if (type == ACPI_HEST_NOTIFY_SEA)
++		return ghes_handle_sex(&ghes_sea);
++	else if (type == ACPI_HEST_NOTIFY_SEI)
++		return ghes_handle_sex(&ghes_sei);
++
++	return -ENOENT;
++}
++
++/*
++ * This function is only called when the CONFIG_HAVE_ACPI_APEI_SEA or
++ * CONFIG_HAVE_ACPI_APEI_SEA is enabled. when disabled, it will return
++ * error in the ghes_probe
++ */
++static void ghes_sex_add(struct ghes *ghes)
+ {
++	u8 notify_type = ghes->generic->notify.type;
++
+ 	mutex_lock(&ghes_list_mutex);
+-	list_add_rcu(&ghes->list, &ghes_sea);
++	if (notify_type == ACPI_HEST_NOTIFY_SEA)
++		list_add_rcu(&ghes->list, &ghes_sea);
++	else if (notify_type == ACPI_HEST_NOTIFY_SEI)
++		list_add_rcu(&ghes->list, &ghes_sei);
++
+ 	mutex_unlock(&ghes_list_mutex);
+ }
+ 
+-static void ghes_sea_remove(struct ghes *ghes)
++static void ghes_sex_remove(struct ghes *ghes)
+ {
+ 	mutex_lock(&ghes_list_mutex);
+ 	list_del_rcu(&ghes->list);
+ 	mutex_unlock(&ghes_list_mutex);
+ 	synchronize_rcu();
+ }
+-#else /* CONFIG_ACPI_APEI_SEA */
+-static inline void ghes_sea_add(struct ghes *ghes)
+-{
+-	pr_err(GHES_PFX "ID: %d, trying to add SEA notification which is not supported\n",
+-	       ghes->generic->header.source_id);
+-}
+-
+-static inline void ghes_sea_remove(struct ghes *ghes)
+-{
+-	pr_err(GHES_PFX "ID: %d, trying to remove SEA notification which is not supported\n",
+-	       ghes->generic->header.source_id);
+-}
+-#endif /* CONFIG_ACPI_APEI_SEA */
+ 
+ #ifdef CONFIG_HAVE_ACPI_APEI_NMI
+ /*
+@@ -1107,6 +1116,13 @@ static int ghes_probe(struct platform_device *ghes_dev)
+ 			goto err;
+ 		}
+ 		break;
++	case ACPI_HEST_NOTIFY_SEI:
++		if (!IS_ENABLED(CONFIG_ACPI_APEI_SEI)) {
++			pr_warn(GHES_PFX "Generic hardware error source: %d notified via SEI is not supported!\n",
++				generic->header.source_id);
++		goto err;
++	}
++	break;
+ 	case ACPI_HEST_NOTIFY_NMI:
+ 		if (!IS_ENABLED(CONFIG_HAVE_ACPI_APEI_NMI)) {
+ 			pr_warn(GHES_PFX "Generic hardware error source: %d notified via NMI interrupt is not supported!\n",
+@@ -1176,7 +1192,8 @@ static int ghes_probe(struct platform_device *ghes_dev)
+ 		break;
+ 
+ 	case ACPI_HEST_NOTIFY_SEA:
+-		ghes_sea_add(ghes);
++	case ACPI_HEST_NOTIFY_SEI:
++		ghes_sex_add(ghes);
+ 		break;
+ 	case ACPI_HEST_NOTIFY_NMI:
+ 		ghes_nmi_add(ghes);
+@@ -1229,7 +1246,8 @@ static int ghes_remove(struct platform_device *ghes_dev)
+ 		break;
+ 
+ 	case ACPI_HEST_NOTIFY_SEA:
+-		ghes_sea_remove(ghes);
++	case ACPI_HEST_NOTIFY_SEI:
++		ghes_sex_remove(ghes);
+ 		break;
+ 	case ACPI_HEST_NOTIFY_NMI:
+ 		ghes_nmi_remove(ghes);
+diff --git a/include/acpi/ghes.h b/include/acpi/ghes.h
+index 9061c5c743b3..41cbce1bc926 100644
+--- a/include/acpi/ghes.h
++++ b/include/acpi/ghes.h
+@@ -118,6 +118,6 @@ static inline void *acpi_hest_get_next(struct acpi_hest_generic_data *gdata)
+ 	     (void *)section - (void *)(estatus + 1) < estatus->data_length; \
+ 	     section = acpi_hest_get_next(section))
+ 
+-int ghes_notify_sea(void);
++int ghes_notify_sex(u8 type);
+ 
+ #endif /* GHES_H */
 -- 
 2.14.0
