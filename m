@@ -1,89 +1,97 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH 06/27] arm64/sve: System register and exception syndrome definitions
-Date: Mon, 21 Aug 2017 15:36:37 +0100
-Message-ID: <87378l56oa.fsf@linaro.org>
-References: <1502280338-23002-1-git-send-email-Dave.Martin@arm.com> <1502280338-23002-7-git-send-email-Dave.Martin@arm.com> <87a82t5kos.fsf@linaro.org> <20170821135654.GP6321@e103592.cambridge.arm.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH 07/27] arm64/sve: Low-level SVE architectural state
+ manipulation functions
+Date: Mon, 21 Aug 2017 15:38:18 +0100
+Message-ID: <20170821143818.GR6321@e103592.cambridge.arm.com>
+References: <1502280338-23002-1-git-send-email-Dave.Martin@arm.com>
+ <1502280338-23002-8-git-send-email-Dave.Martin@arm.com>
+ <878tid5ixn.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-arch-owner@vger.kernel.org>
-In-reply-to: <20170821135654.GP6321@e103592.cambridge.arm.com>
-Sender: linux-arch-owner@vger.kernel.org
-To: Dave Martin <Dave.Martin@arm.com>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D59EB49C2F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Aug 2017 10:36:30 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id OgIT87C+LRTe for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 21 Aug 2017 10:36:28 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8919549C2A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Aug 2017 10:36:28 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <878tid5ixn.fsf@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On Mon, Aug 21, 2017 at 11:11:48AM +0100, Alex Benn=E9e wrote:
+> =
 
-Dave Martin <Dave.Martin@arm.com> writes:
+> Dave Martin <Dave.Martin@arm.com> writes:
+> =
 
-> On Mon, Aug 21, 2017 at 10:33:55AM +0100, Alex Bennée wrote:
->>
->> Dave Martin <Dave.Martin@arm.com> writes:
->>
->> > The SVE architecture adds some system registers, ID register fields
->> > and a dedicated ESR exception class.
->> >
->> > This patch adds the appropriate definitions that will be needed by
->> > the kernel.
->> >
->> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
->> > ---
->> >  arch/arm64/include/asm/esr.h     |  3 ++-
->> >  arch/arm64/include/asm/kvm_arm.h |  1 +
->> >  arch/arm64/include/asm/sysreg.h  | 16 ++++++++++++++++
->> >  arch/arm64/kernel/traps.c        |  1 +
->> >  4 files changed, 20 insertions(+), 1 deletion(-)
->
-> [...]
->
->> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
->> > index 248339e..2d259e8 100644
->> > --- a/arch/arm64/include/asm/sysreg.h
->> > +++ b/arch/arm64/include/asm/sysreg.h
->
-> [...]
->
->> > +#define SYS_ZCR_EL1			sys_reg(3, 0, 1, 2, 0)
->> > +
->>
->> I'll have to take these on trust. They are mentioned in both the ARM ARM
->> and the SVE supplement but I can't see any actual definitions of them.
->
-> [I note from subsequent replies you've now found this in the
-> accompanying HTML]
->
-> [...]
->
->> > +#define CPACR_EL1_ZEN_EL1EN	(1 << 16)
->> > +#define CPACR_EL1_ZEN_EL0EN	(1 << 17)
->> > +#define CPACR_EL1_ZEN		(CPACR_EL1_ZEN_EL1EN |
->> > CPACR_EL1_ZEN_EL0EN)
->>
->> This is a little weird as it is a 2 bit field in which 00 and 11 are not
->> simply the sum of their bits. If the code wrote CPACR_EL1_ZEN_EL0EN |
->> CPACR_EL1_ZEN_EL1EN to the CPACR_EL1 you wouldn't get the expected behaviour.
->
-> This seemed natural-ish if you believe that disabling at EL1 implies
-> disabling at EL0.  This is consistent with the way the traps at EL2/3
-> work, and lack of this property would be a sort of privilege inversion.
->
-> The meanings of the bits are not orthogonal, but it's still useful to be
-> able to twiddle EL0EN by itself when EL1EN is set (since we wan't to
-> control access for EL0 but leave EL1 access enabled).
->
-> Maybe comments would be sufficient:
->
-> #define CPACR_EL1_ZEN_EL1EN ... /* enable EL1 access */
-> #define CPACR_EL1_ZEN_EL0EN ... /* enable EL0 access, if EL1EN is also
-> set */
+> > Manipulating the SVE architectural state, including the vector and
+> > predicate registers, first-fault register and the vector length,
+> > requires the use of dedicated instructions added by SVE.
+> >
+> > This patch adds suitable assembly functions for saving and
+> > restoring the SVE registers and querying the vector length.
+> > Setting of the vector length is done as part of register restore.
+> >
+> > Since people building kernels may not all get an SVE-enabled
+> > toolchain for a while, this patch uses macros that generate
+> > explicit opcodes in place of assembler mnemonics.
+> >
+> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> > ---
+> >  arch/arm64/include/asm/fpsimd.h       |   5 ++
+> >  arch/arm64/include/asm/fpsimdmacros.h | 137 ++++++++++++++++++++++++++=
+++++++++
+> >  arch/arm64/kernel/entry-fpsimd.S      |  17 +++++
+> >  3 files changed, 159 insertions(+)
 
-Certainly it would help. I'll see as I go through the rest of the code
-but it looks like a potential bear trap we should at least mitigate.
+[...]
 
->
-> I'm not sure how to make the names both reasonably terse and self-
-> escribing, but I'm open to ideas.
+> > diff --git a/arch/arm64/include/asm/fpsimdmacros.h b/arch/arm64/include=
+/asm/fpsimdmacros.h
+> > index 0f5fdd3..5023064 100644
+> > --- a/arch/arm64/include/asm/fpsimdmacros.h
+> > +++ b/arch/arm64/include/asm/fpsimdmacros.h
 
-Sorry no decent ideas. Naming things is hard as they say.
+[...]
 
-BTW see the follow-up mail for the other things I found....
+> > +.macro _sve_str_v nz, nxbase, offset=3D0
+> > +	_sve_check_zreg \nz
+> > +	_check_general_reg \nxbase
+> > +	_check_num (\offset), -0x100, 0xff
+> > +	.inst	0xe5804000			\
+> > +		| (\nz)				\
+> > +		| ((\nxbase) << 5)		\
+> > +		| (((\offset) & 7) << 10)	\
+> > +		| (((\offset) & 0x1f8) << 13)
+> > +.endm
+> =
+
+> Can we have references to the ARM ARM titles (the section numbers keep
+> changing) for each hand-hacked instruction please. Otherwise it is
+> impossible to verify each one.
+
+That's fair -- will do.
+
+The supplement didn't exist at the time I first wrote this code...
+
+[...]
+
+Cheers
+---Dave
