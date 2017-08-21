@@ -1,151 +1,148 @@
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH 06/27] arm64/sve: System register and exception syndrome definitions
-Date: Mon, 21 Aug 2017 10:33:55 +0100
-Message-ID: <87a82t5kos.fsf@linaro.org>
-References: <1502280338-23002-1-git-send-email-Dave.Martin@arm.com> <1502280338-23002-7-git-send-email-Dave.Martin@arm.com>
+Subject: Re: [PATCH 07/27] arm64/sve: Low-level SVE architectural state
+ manipulation functions
+Date: Mon, 21 Aug 2017 11:11:48 +0100
+Message-ID: <878tid5ixn.fsf@linaro.org>
+References: <1502280338-23002-1-git-send-email-Dave.Martin@arm.com>
+ <1502280338-23002-8-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Return-path: <libc-alpha-return-83536-glibc-alpha=m.gmane.org@sourceware.org>
-List-Unsubscribe: <mailto:libc-alpha-unsubscribe-glibc-alpha=m.gmane.org@sourceware.org>
-List-Subscribe: <mailto:libc-alpha-subscribe@sourceware.org>
-List-Archive: <http://sourceware.org/ml/libc-alpha/>
-List-Post: <mailto:libc-alpha@sourceware.org>
-List-Help: <mailto:libc-alpha-help@sourceware.org>, <http://sourceware.org/ml/#faqs>
-Sender: libc-alpha-owner@sourceware.org
-In-reply-to: <1502280338-23002-7-git-send-email-Dave.Martin@arm.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B739B49C3F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Aug 2017 06:09:58 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id uTQQBHH5EkU1 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 21 Aug 2017 06:09:57 -0400 (EDT)
+Received: from mail-wr0-f180.google.com (mail-wr0-f180.google.com
+ [209.85.128.180])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 207FA49C23
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Aug 2017 06:09:57 -0400 (EDT)
+Received: by mail-wr0-f180.google.com with SMTP id p14so25946446wrg.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Aug 2017 03:11:51 -0700 (PDT)
+In-reply-to: <1502280338-23002-8-git-send-email-Dave.Martin@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Dave Martin <Dave.Martin@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-Dave Martin <Dave.Martin@arm.com> writes:
-
-> The SVE architecture adds some system registers, ID register fields
-> and a dedicated ESR exception class.
->
-> This patch adds the appropriate definitions that will be needed by
-> the kernel.
->
-> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> ---
->  arch/arm64/include/asm/esr.h     |  3 ++-
->  arch/arm64/include/asm/kvm_arm.h |  1 +
->  arch/arm64/include/asm/sysreg.h  | 16 ++++++++++++++++
->  arch/arm64/kernel/traps.c        |  1 +
->  4 files changed, 20 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-> index 8cabd57..813629e 100644
-> --- a/arch/arm64/include/asm/esr.h
-> +++ b/arch/arm64/include/asm/esr.h
-> @@ -43,7 +43,8 @@
->  #define ESR_ELx_EC_HVC64	(0x16)
->  #define ESR_ELx_EC_SMC64	(0x17)
->  #define ESR_ELx_EC_SYS64	(0x18)
-> -/* Unallocated EC: 0x19 - 0x1E */
-> +#define ESR_ELx_EC_SVE		(0x19)
-> +/* Unallocated EC: 0x1A - 0x1E */
->  #define ESR_ELx_EC_IMP_DEF	(0x1f)
->  #define ESR_ELx_EC_IABT_LOW	(0x20)
->  #define ESR_ELx_EC_IABT_CUR	(0x21)
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index 61d694c..dbf0537 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -185,6 +185,7 @@
->  #define CPTR_EL2_TCPAC	(1 << 31)
->  #define CPTR_EL2_TTA	(1 << 20)
->  #define CPTR_EL2_TFP	(1 << CPTR_EL2_TFP_SHIFT)
-> +#define CPTR_EL2_TZ	(1 << 8)
->  #define CPTR_EL2_DEFAULT	0x000033ff
->
->  /* Hyp Debug Configuration Register bits */
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index 248339e..2d259e8 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -145,6 +145,7 @@
->
->  #define SYS_ID_AA64PFR0_EL1		sys_reg(3, 0, 0, 4, 0)
->  #define SYS_ID_AA64PFR1_EL1		sys_reg(3, 0, 0, 4, 1)
-> +#define SYS_ID_AA64ZFR0_EL1		sys_reg(3, 0, 0, 4, 4)
->
->  #define SYS_ID_AA64DFR0_EL1		sys_reg(3, 0, 0, 5, 0)
->  #define SYS_ID_AA64DFR1_EL1		sys_reg(3, 0, 0, 5, 1)
-> @@ -160,6 +161,8 @@
->  #define SYS_ACTLR_EL1			sys_reg(3, 0, 1, 0, 1)
->  #define SYS_CPACR_EL1			sys_reg(3, 0, 1, 0, 2)
->
-> +#define SYS_ZCR_EL1			sys_reg(3, 0, 1, 2, 0)
-> +
-
-I'll have to take these on trust. They are mentioned in both the ARM ARM
-and the SVE supplement but I can't see any actual definitions of them.
-
->  #define SYS_TTBR0_EL1			sys_reg(3, 0, 2, 0, 0)
->  #define SYS_TTBR1_EL1			sys_reg(3, 0, 2, 0, 1)
->  #define SYS_TCR_EL1			sys_reg(3, 0, 2, 0, 2)
-> @@ -250,6 +253,8 @@
->
->  #define SYS_PMCCFILTR_EL0		sys_reg (3, 3, 14, 15, 7)
->
-> +#define SYS_ZCR_EL2			sys_reg(3, 4, 1, 2, 0)
-> +
->  #define SYS_DACR32_EL2			sys_reg(3, 4, 3, 0, 0)
->  #define SYS_IFSR32_EL2			sys_reg(3, 4, 5, 0, 1)
->  #define SYS_FPEXC32_EL2			sys_reg(3, 4, 5, 3, 0)
-> @@ -331,6 +336,7 @@
->  #define ID_AA64ISAR1_JSCVT_SHIFT	12
->
->  /* id_aa64pfr0 */
-> +#define ID_AA64PFR0_SVE_SHIFT		32
->  #define ID_AA64PFR0_GIC_SHIFT		24
->  #define ID_AA64PFR0_ASIMD_SHIFT		20
->  #define ID_AA64PFR0_FP_SHIFT		16
-> @@ -339,6 +345,7 @@
->  #define ID_AA64PFR0_EL1_SHIFT		4
->  #define ID_AA64PFR0_EL0_SHIFT		0
->
-> +#define ID_AA64PFR0_SVE			0x1
->  #define ID_AA64PFR0_FP_NI		0xf
->  #define ID_AA64PFR0_FP_SUPPORTED	0x0
->  #define ID_AA64PFR0_ASIMD_NI		0xf
-> @@ -440,6 +447,15 @@
->  #endif
->
->
-> +#define ZCR_ELx_LEN_SHIFT	0
-> +#define ZCR_ELx_LEN_SIZE	9
-> +#define ZCR_ELx_LEN_MASK	0x1ff
-> +
-> +#define CPACR_EL1_ZEN_EL1EN	(1 << 16)
-> +#define CPACR_EL1_ZEN_EL0EN	(1 << 17)
-> +#define CPACR_EL1_ZEN		(CPACR_EL1_ZEN_EL1EN |
-> CPACR_EL1_ZEN_EL0EN)
-
-This is a little weird as it is a 2 bit field in which 00 and 11 are not
-simply the sum of their bits. If the code wrote CPACR_EL1_ZEN_EL0EN |
-CPACR_EL1_ZEN_EL1EN to the CPACR_EL1 you wouldn't get the expected behaviour.
-
-> +
-> +
->  /* Safe value for MPIDR_EL1: Bit31:RES1, Bit30:U:0, Bit24:MT:0 */
->  #define SYS_MPIDR_SAFE_VAL		(1UL << 31)
->
-> diff --git a/arch/arm64/kernel/traps.c b/arch/arm64/kernel/traps.c
-> index 0f047e9..8964795 100644
-> --- a/arch/arm64/kernel/traps.c
-> +++ b/arch/arm64/kernel/traps.c
-> @@ -621,6 +621,7 @@ static const char *esr_class_str[] = {
->  	[ESR_ELx_EC_HVC64]		= "HVC (AArch64)",
->  	[ESR_ELx_EC_SMC64]		= "SMC (AArch64)",
->  	[ESR_ELx_EC_SYS64]		= "MSR/MRS (AArch64)",
-> +	[ESR_ELx_EC_SVE]		= "SVE",
->  	[ESR_ELx_EC_IMP_DEF]		= "EL3 IMP DEF",
->  	[ESR_ELx_EC_IABT_LOW]		= "IABT (lower EL)",
->  	[ESR_ELx_EC_IABT_CUR]		= "IABT (current EL)",
-
-
---
-Alex Bennée
+CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo+IE1hbmlwdWxhdGlu
+ZyB0aGUgU1ZFIGFyY2hpdGVjdHVyYWwgc3RhdGUsIGluY2x1ZGluZyB0aGUgdmVjdG9yIGFuZAo+
+IHByZWRpY2F0ZSByZWdpc3RlcnMsIGZpcnN0LWZhdWx0IHJlZ2lzdGVyIGFuZCB0aGUgdmVjdG9y
+IGxlbmd0aCwKPiByZXF1aXJlcyB0aGUgdXNlIG9mIGRlZGljYXRlZCBpbnN0cnVjdGlvbnMgYWRk
+ZWQgYnkgU1ZFLgo+Cj4gVGhpcyBwYXRjaCBhZGRzIHN1aXRhYmxlIGFzc2VtYmx5IGZ1bmN0aW9u
+cyBmb3Igc2F2aW5nIGFuZAo+IHJlc3RvcmluZyB0aGUgU1ZFIHJlZ2lzdGVycyBhbmQgcXVlcnlp
+bmcgdGhlIHZlY3RvciBsZW5ndGguCj4gU2V0dGluZyBvZiB0aGUgdmVjdG9yIGxlbmd0aCBpcyBk
+b25lIGFzIHBhcnQgb2YgcmVnaXN0ZXIgcmVzdG9yZS4KPgo+IFNpbmNlIHBlb3BsZSBidWlsZGlu
+ZyBrZXJuZWxzIG1heSBub3QgYWxsIGdldCBhbiBTVkUtZW5hYmxlZAo+IHRvb2xjaGFpbiBmb3Ig
+YSB3aGlsZSwgdGhpcyBwYXRjaCB1c2VzIG1hY3JvcyB0aGF0IGdlbmVyYXRlCj4gZXhwbGljaXQg
+b3Bjb2RlcyBpbiBwbGFjZSBvZiBhc3NlbWJsZXIgbW5lbW9uaWNzLgo+Cj4gU2lnbmVkLW9mZi1i
+eTogRGF2ZSBNYXJ0aW4gPERhdmUuTWFydGluQGFybS5jb20+Cj4gLS0tCj4gIGFyY2gvYXJtNjQv
+aW5jbHVkZS9hc20vZnBzaW1kLmggICAgICAgfCAgIDUgKysKPiAgYXJjaC9hcm02NC9pbmNsdWRl
+L2FzbS9mcHNpbWRtYWNyb3MuaCB8IDEzNyArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrCj4gIGFyY2gvYXJtNjQva2VybmVsL2VudHJ5LWZwc2ltZC5TICAgICAgfCAgMTcgKysrKysK
+PiAgMyBmaWxlcyBjaGFuZ2VkLCAxNTkgaW5zZXJ0aW9ucygrKQo+Cj4gZGlmZiAtLWdpdCBhL2Fy
+Y2gvYXJtNjQvaW5jbHVkZS9hc20vZnBzaW1kLmggYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2Zw
+c2ltZC5oCj4gaW5kZXggNDEwYzQ4MS4uMDI2YTdjNyAxMDA2NDQKPiAtLS0gYS9hcmNoL2FybTY0
+L2luY2x1ZGUvYXNtL2Zwc2ltZC5oCj4gKysrIGIvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9mcHNp
+bWQuaAo+IEBAIC02Nyw2ICs2NywxMSBAQCBleHRlcm4gdm9pZCBmcHNpbWRfdXBkYXRlX2N1cnJl
+bnRfc3RhdGUoc3RydWN0IGZwc2ltZF9zdGF0ZSAqc3RhdGUpOwo+Cj4gIGV4dGVybiB2b2lkIGZw
+c2ltZF9mbHVzaF90YXNrX3N0YXRlKHN0cnVjdCB0YXNrX3N0cnVjdCAqdGFyZ2V0KTsKPgo+ICtl
+eHRlcm4gdm9pZCBzdmVfc2F2ZV9zdGF0ZSh2b2lkICpzdGF0ZSwgdTMyICpwZnBzcik7Cj4gK2V4
+dGVybiB2b2lkIHN2ZV9sb2FkX3N0YXRlKHZvaWQgY29uc3QgKnN0YXRlLCB1MzIgY29uc3QgKnBm
+cHNyLAo+ICsJCQkgICB1bnNpZ25lZCBsb25nIHZxX21pbnVzXzEpOwo+ICtleHRlcm4gdW5zaWdu
+ZWQgaW50IHN2ZV9nZXRfdmwodm9pZCk7Cj4gKwo+ICAvKiBGb3IgdXNlIGJ5IEVGSSBydW50aW1l
+IHNlcnZpY2VzIGNhbGxzIG9ubHkgKi8KPiAgZXh0ZXJuIHZvaWQgX19lZmlfZnBzaW1kX2JlZ2lu
+KHZvaWQpOwo+ICBleHRlcm4gdm9pZCBfX2VmaV9mcHNpbWRfZW5kKHZvaWQpOwo+IGRpZmYgLS1n
+aXQgYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2Zwc2ltZG1hY3Jvcy5oIGIvYXJjaC9hcm02NC9p
+bmNsdWRlL2FzbS9mcHNpbWRtYWNyb3MuaAo+IGluZGV4IDBmNWZkZDMuLjUwMjMwNjQgMTAwNjQ0
+Cj4gLS0tIGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9mcHNpbWRtYWNyb3MuaAo+ICsrKyBiL2Fy
+Y2gvYXJtNjQvaW5jbHVkZS9hc20vZnBzaW1kbWFjcm9zLmgKPiBAQCAtNzUsMyArNzUsMTQwIEBA
+Cj4gIAlsZHIJd1x0bXBuciwgW1xzdGF0ZSwgIzE2ICogMiArIDRdCj4gIAlmcHNpbWRfcmVzdG9y
+ZV9mcGNyIHhcdG1wbnIsIFxzdGF0ZQo+ICAuZW5kbQo+ICsKPiArLm1hY3JvIF9jaGVja19nZW5l
+cmFsX3JlZyBucgo+ICsJLmlmIChcbnIpIDwgMCB8fCAoXG5yKSA+IDMwCj4gKwkJLmVycm9yICJC
+YWQgcmVnaXN0ZXIgbnVtYmVyIFxuci4iCj4gKwkuZW5kaWYKPiArLmVuZG0KPiArCj4gKy5tYWNy
+byBfc3ZlX2NoZWNrX3pyZWcgem5yCj4gKwkuaWYgKFx6bnIpIDwgMCB8fCAoXHpucikgPiAzMQo+
+ICsJCS5lcnJvciAiQmFkIFNjYWxhYmxlIFZlY3RvciBFeHRlbnNpb24gdmVjdG9yIHJlZ2lzdGVy
+IG51bWJlciBcem5yLiIKPiArCS5lbmRpZgo+ICsuZW5kbQo+ICsKPiArLm1hY3JvIF9zdmVfY2hl
+Y2tfcHJlZyBwbnIKPiArCS5pZiAoXHBucikgPCAwIHx8IChccG5yKSA+IDE1Cj4gKwkJLmVycm9y
+ICJCYWQgU2NhbGFibGUgVmVjdG9yIEV4dGVuc2lvbiBwcmVkaWNhdGUgcmVnaXN0ZXIgbnVtYmVy
+IFxwbnIuIgo+ICsJLmVuZGlmCj4gKy5lbmRtCj4gKwo+ICsubWFjcm8gX2NoZWNrX251bSBuLCBt
+aW4sIG1heAo+ICsJLmlmIChcbikgPCAoXG1pbikgfHwgKFxuKSA+IChcbWF4KQo+ICsJCS5lcnJv
+ciAiTnVtYmVyIFxuIG91dCBvZiByYW5nZSBbXG1pbixcbWF4XSIKPiArCS5lbmRpZgo+ICsuZW5k
+bQo+ICsKPiArLm1hY3JvIF9zdmVfc3RyX3YgbnosIG54YmFzZSwgb2Zmc2V0PTAKPiArCV9zdmVf
+Y2hlY2tfenJlZyBcbnoKPiArCV9jaGVja19nZW5lcmFsX3JlZyBcbnhiYXNlCj4gKwlfY2hlY2tf
+bnVtIChcb2Zmc2V0KSwgLTB4MTAwLCAweGZmCj4gKwkuaW5zdAkweGU1ODA0MDAwCQkJXAo+ICsJ
+CXwgKFxueikJCQkJXAo+ICsJCXwgKChcbnhiYXNlKSA8PCA1KQkJXAo+ICsJCXwgKCgoXG9mZnNl
+dCkgJiA3KSA8PCAxMCkJXAo+ICsJCXwgKCgoXG9mZnNldCkgJiAweDFmOCkgPDwgMTMpCj4gKy5l
+bmRtCgpDYW4gd2UgaGF2ZSByZWZlcmVuY2VzIHRvIHRoZSBBUk0gQVJNIHRpdGxlcyAodGhlIHNl
+Y3Rpb24gbnVtYmVycyBrZWVwCmNoYW5naW5nKSBmb3IgZWFjaCBoYW5kLWhhY2tlZCBpbnN0cnVj
+dGlvbiBwbGVhc2UuIE90aGVyd2lzZSBpdCBpcwppbXBvc3NpYmxlIHRvIHZlcmlmeSBlYWNoIG9u
+ZS4KCj4gKwo+ICsubWFjcm8gX3N2ZV9sZHJfdiBueiwgbnhiYXNlLCBvZmZzZXQ9MAo+ICsJX3N2
+ZV9jaGVja196cmVnIFxuego+ICsJX2NoZWNrX2dlbmVyYWxfcmVnIFxueGJhc2UKPiArCV9jaGVj
+a19udW0gKFxvZmZzZXQpLCAtMHgxMDAsIDB4ZmYKPiArCS5pbnN0CTB4ODU4MDQwMDAJCQlcCj4g
+KwkJfCAoXG56KQkJCQlcCj4gKwkJfCAoKFxueGJhc2UpIDw8IDUpCQlcCj4gKwkJfCAoKChcb2Zm
+c2V0KSAmIDcpIDw8IDEwKQlcCj4gKwkJfCAoKChcb2Zmc2V0KSAmIDB4MWY4KSA8PCAxMykKPiAr
+LmVuZG0KPiArCj4gKy5tYWNybyBfc3ZlX3N0cl9wIG5wLCBueGJhc2UsIG9mZnNldD0wCj4gKwlf
+c3ZlX2NoZWNrX3ByZWcgXG5wCj4gKwlfY2hlY2tfZ2VuZXJhbF9yZWcgXG54YmFzZQo+ICsJX2No
+ZWNrX251bSAoXG9mZnNldCksIC0weDEwMCwgMHhmZgo+ICsJLmluc3QJMHhlNTgwMDAwMAkJCVwK
+PiArCQl8IChcbnApCQkJCVwKPiArCQl8ICgoXG54YmFzZSkgPDwgNSkJCVwKPiArCQl8ICgoKFxv
+ZmZzZXQpICYgNykgPDwgMTApCVwKPiArCQl8ICgoKFxvZmZzZXQpICYgMHgxZjgpIDw8IDEzKQo+
+ICsuZW5kbQo+ICsKPiArLm1hY3JvIF9zdmVfbGRyX3AgbnAsIG54YmFzZSwgb2Zmc2V0PTAKPiAr
+CV9zdmVfY2hlY2tfcHJlZyBcbnAKPiArCV9jaGVja19nZW5lcmFsX3JlZyBcbnhiYXNlCj4gKwlf
+Y2hlY2tfbnVtIChcb2Zmc2V0KSwgLTB4MTAwLCAweGZmCj4gKwkuaW5zdAkweDg1ODAwMDAwCQkJ
+XAo+ICsJCXwgKFxucCkJCQkJXAo+ICsJCXwgKChcbnhiYXNlKSA8PCA1KQkJXAo+ICsJCXwgKCgo
+XG9mZnNldCkgJiA3KSA8PCAxMCkJXAo+ICsJCXwgKCgoXG9mZnNldCkgJiAweDFmOCkgPDwgMTMp
+Cj4gKy5lbmRtCj4gKwo+ICsubWFjcm8gX3N2ZV9yZHZsIG54LCBpbW0KPiArCV9jaGVja19nZW5l
+cmFsX3JlZyBcbngKPiArCV9jaGVja19udW0gKFxpbW0pLCAtMHgyMCwgMHgxZgo+ICsJLmluc3QJ
+MHgwNGJmNTAwMAkJCVwKPiArCQl8IChcbngpCQkJCVwKPiArCQl8ICgoKFxpbW0pICYgMHgzZikg
+PDwgNSkKPiArLmVuZG0KPiArCj4gKy5tYWNybyBfc3ZlX3JkZmZyIG5wCj4gKwlfc3ZlX2NoZWNr
+X3ByZWcgXG5wCj4gKwkuaW5zdAkweDI1MTlmMDAwCQkJXAo+ICsJCXwgKFxucCkKPiArLmVuZG0K
+PiArCj4gKy5tYWNybyBfc3ZlX3dyZmZyIG5wCj4gKwlfc3ZlX2NoZWNrX3ByZWcgXG5wCj4gKwku
+aW5zdAkweDI1Mjg5MDAwCQkJXAo+ICsJCXwgKChcbnApIDw8IDUpCj4gKy5lbmRtCj4gKwo+ICsu
+bWFjcm8gX19mb3IgZnJvbTpyZXEsIHRvOnJlcQo+ICsJLmlmIChcZnJvbSkgPT0gKFx0bykKPiAr
+CQlfZm9yX19ib2R5IFxmcm9tCj4gKwkuZWxzZQo+ICsJCV9fZm9yIFxmcm9tLCAoXGZyb20pICsg
+KChcdG8pIC0gKFxmcm9tKSkgLyAyCj4gKwkJX19mb3IgKFxmcm9tKSArICgoXHRvKSAtIChcZnJv
+bSkpIC8gMiArIDEsIFx0bwo+ICsJLmVuZGlmCj4gKy5lbmRtCj4gKwo+ICsubWFjcm8gX2ZvciB2
+YXI6cmVxLCBmcm9tOnJlcSwgdG86cmVxLCBpbnNuOnZhcmFyZwo+ICsJLm1hY3JvIF9mb3JfX2Jv
+ZHkgXHZhcjpyZXEKPiArCQlcaW5zbgo+ICsJLmVuZG0KPiArCj4gKwlfX2ZvciBcZnJvbSwgXHRv
+Cj4gKwo+ICsJLnB1cmdlbSBfZm9yX19ib2R5Cj4gKy5lbmRtCj4gKwo+ICsubWFjcm8gc3ZlX3Nh
+dmUgbnhiYXNlLCB4cGZwc3IsIG54dG1wCj4gKyBfZm9yIG4sIDAsIDMxLAlfc3ZlX3N0cl92CVxu
+LCBcbnhiYXNlLCBcbiAtIDM0Cj4gKyBfZm9yIG4sIDAsIDE1LAlfc3ZlX3N0cl9wCVxuLCBcbnhi
+YXNlLCBcbiAtIDE2Cj4gKwkJX3N2ZV9yZGZmcgkwCj4gKwkJX3N2ZV9zdHJfcAkwLCBcbnhiYXNl
+Cj4gKwkJX3N2ZV9sZHJfcAkwLCBcbnhiYXNlLCAtMTYKPiArCj4gKwkJbXJzCQl4XG54dG1wLCBm
+cHNyCj4gKwkJc3RyCQl3XG54dG1wLCBbXHhwZnBzcl0KPiArCQltcnMJCXhcbnh0bXAsIGZwY3IK
+PiArCQlzdHIJCXdcbnh0bXAsIFtceHBmcHNyLCAjNF0KPiArLmVuZG0KPiArCj4gKy5tYWNybyBz
+dmVfbG9hZCBueGJhc2UsIHhwZnBzciwgeHZxbWludXMxLCBueHRtcAo+ICsJCW1yc19zCQl4XG54
+dG1wLCBTWVNfWkNSX0VMMQo+ICsJCWJpYwkJeFxueHRtcCwgeFxueHRtcCwgWkNSX0VMeF9MRU5f
+TUFTSwo+ICsJCW9ycgkJeFxueHRtcCwgeFxueHRtcCwgXHh2cW1pbnVzMQo+ICsJCW1zcl9zCQlT
+WVNfWkNSX0VMMSwgeFxueHRtcAkvLyBzZWxmLXN5bmNocm9uaXNpbmcKPiArCj4gKyBfZm9yIG4s
+IDAsIDMxLAlfc3ZlX2xkcl92CVxuLCBcbnhiYXNlLCBcbiAtIDM0Cj4gKwkJX3N2ZV9sZHJfcAkw
+LCBcbnhiYXNlCj4gKwkJX3N2ZV93cmZmcgkwCj4gKyBfZm9yIG4sIDAsIDE1LAlfc3ZlX2xkcl9w
+CVxuLCBcbnhiYXNlLCBcbiAtIDE2Cj4gKwo+ICsJCWxkcgkJd1xueHRtcCwgW1x4cGZwc3JdCj4g
+KwkJbXNyCQlmcHNyLCB4XG54dG1wCj4gKwkJbGRyCQl3XG54dG1wLCBbXHhwZnBzciwgIzRdCj4g
+KwkJbXNyCQlmcGNyLCB4XG54dG1wCj4gKy5lbmRtCj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQv
+a2VybmVsL2VudHJ5LWZwc2ltZC5TIGIvYXJjaC9hcm02NC9rZXJuZWwvZW50cnktZnBzaW1kLlMK
+PiBpbmRleCA2YTI3Y2Q2Li43M2YxN2JmIDEwMDY0NAo+IC0tLSBhL2FyY2gvYXJtNjQva2VybmVs
+L2VudHJ5LWZwc2ltZC5TCj4gKysrIGIvYXJjaC9hcm02NC9rZXJuZWwvZW50cnktZnBzaW1kLlMK
+PiBAQCAtNDEsMyArNDEsMjAgQEAgRU5UUlkoZnBzaW1kX2xvYWRfc3RhdGUpCj4gIAlmcHNpbWRf
+cmVzdG9yZSB4MCwgOAo+ICAJcmV0Cj4gIEVORFBST0MoZnBzaW1kX2xvYWRfc3RhdGUpCj4gKwo+
+ICsjaWZkZWYgQ09ORklHX0FSTTY0X1NWRQo+ICtFTlRSWShzdmVfc2F2ZV9zdGF0ZSkKPiArCXN2
+ZV9zYXZlIDAsIHgxLCAyCj4gKwlyZXQKPiArRU5EUFJPQyhzdmVfc2F2ZV9zdGF0ZSkKPiArCj4g
+K0VOVFJZKHN2ZV9sb2FkX3N0YXRlKQo+ICsJc3ZlX2xvYWQgMCwgeDEsIHgyLCAzCj4gKwlyZXQK
+PiArRU5EUFJPQyhzdmVfbG9hZF9zdGF0ZSkKPiArCj4gK0VOVFJZKHN2ZV9nZXRfdmwpCj4gKwlf
+c3ZlX3JkdmwJMCwgMQo+ICsJcmV0Cj4gK0VORFBST0Moc3ZlX2dldF92bCkKPiArI2VuZGlmIC8q
+IENPTkZJR19BUk02NF9TVkUgKi8KCgotLQpBbGV4IEJlbm7DqWUKX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1A
+bGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxt
+YW4vbGlzdGluZm8va3ZtYXJtCg==
