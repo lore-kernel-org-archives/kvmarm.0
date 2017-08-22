@@ -1,134 +1,105 @@
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH 09/27] arm64/sve: Signal frame and context structure definition
-Date: Tue, 22 Aug 2017 16:03:20 +0100
-Message-ID: <87shgj4pc7.fsf@linaro.org>
-References: <1502280338-23002-1-git-send-email-Dave.Martin@arm.com> <1502280338-23002-10-git-send-email-Dave.Martin@arm.com> <87y3qb52ez.fsf@linaro.org> <20170822111705.GT6321@e103592.cambridge.arm.com> <87tw0z4sk2.fsf@linaro.org> <20170822142135.GU6321@e103592.cambridge.arm.com>
+Subject: Re: [PATCH 10/27] arm64/sve: Low-level CPU setup
+Date: Tue, 22 Aug 2017 16:04:28 +0100
+Message-ID: <87r2w34pab.fsf@linaro.org>
+References: <1502280338-23002-1-git-send-email-Dave.Martin@arm.com> <1502280338-23002-11-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Return-path: <linux-arch-owner@vger.kernel.org>
-In-reply-to: <20170822142135.GU6321@e103592.cambridge.arm.com>
+In-reply-to: <1502280338-23002-11-git-send-email-Dave.Martin@arm.com>
 Sender: linux-arch-owner@vger.kernel.org
 To: Dave Martin <Dave.Martin@arm.com>
-Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, gdb@sourceware.org, Yao Qi <Yao.Qi@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Alan Hayward <alan.hayward@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
 
 Dave Martin <Dave.Martin@arm.com> writes:
 
-> On Tue, Aug 22, 2017 at 02:53:49PM +0100, Alex Bennée wrote:
->>
->> Dave Martin <Dave.Martin@arm.com> writes:
->>
->> > On Tue, Aug 22, 2017 at 11:22:44AM +0100, Alex Bennée wrote:
->> >>
->> >> Dave Martin <Dave.Martin@arm.com> writes:
+> To enable the kernel to use SVE, all SVE traps from EL1 must be
+> disabled.  To take maximum advantage of the hardware, the full
+> available vector length also needs to be enabled for EL1 by
+> programming ZCR_EL2.LEN.  (The kernel will program ZCR_EL1.LEN as
+> required, but this cannot override the limit set by ZCR_EL2.)
 >
-> [...]
+> In advance of full SVE support being implemented for userspace, it
+> also necessary to ensure that SVE traps from EL0 are enabled.
 >
->> >> > +/*
->> >> > + * The SVE architecture leaves space for future expansion of the
->> >> > + * vector length beyond its initial architectural limit of 2048 bits
->> >> > + * (16 quadwords).
->> >> > + */
->> >> > +#define SVE_VQ_MIN		1
->> >> > +#define SVE_VQ_MAX		0x200
->> >> > +
->> >> > +#define SVE_VL_MIN		(SVE_VQ_MIN * 0x10)
->> >> > +#define SVE_VL_MAX		(SVE_VQ_MAX * 0x10)
->> >> > +
->> >> > +#define SVE_NUM_ZREGS		32
->> >> > +#define SVE_NUM_PREGS		16
->> >> > +
->> >> > +#define sve_vl_valid(vl) \
->> >> > +	((vl) % 0x10 == 0 && (vl) >= SVE_VL_MIN && (vl) <= SVE_VL_MAX)
->> >> > +#define sve_vq_from_vl(vl)	((vl) / 0x10)
->> >> > +#define sve_vl_from_vq(vq)	((vq) * 0x10)
->> >>
->> >> I got a little confused first time through over what VQ and VL where.
->> >> Maybe it would make sense to expand a little more from first principles?
->> >>
->> >>   /*
->> >>    * The SVE architecture defines vector registers as a multiple of 128
->> >>    * bit quadwords. The current architectural limit is 2048 bits (16
->> >>    * quadwords) but there is room for future expansion beyond that.
->> >>     */
->> >
->> > This comes up in several places and so I didn't want to comment it
->> > repeatedly everywhere.
->> >
->> > Instead, I wrote up something in section 2 (Vector length terminology)
->> > of Documentation/arm64/sve.txt -- see patch 25.  Can you take a look and
->> > see whether that's adequate?
->>
->> Ahh, I hadn't got to that yet. I'm unsure to the order the kernel likes
->> to put things but I like to put design documents at the front of the
+> This patch makes the appropriate changes to the primary and
+> secondary CPU initialisation code.
 >
-> I don't have a strong opinion on that -- I had preferred not to add a
-> document describing stuff that doesn't exist at the time of commit.
-> I could commit a stub document at the start of the series, and then
-> commit the real document later.
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> ---
+>  arch/arm64/kernel/head.S | 13 ++++++++++++-
+>  arch/arm64/mm/proc.S     | 14 ++++++++++++--
+>  2 files changed, 24 insertions(+), 3 deletions(-)
 >
-> Either way, it seemed overkill.
+> diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+> index 973df7d..0ae1713 100644
+> --- a/arch/arm64/kernel/head.S
+> +++ b/arch/arm64/kernel/head.S
+> @@ -514,8 +514,19 @@ CPU_LE(	movk	x0, #0x30d0, lsl #16	)	// Clear EE and E0E on LE systems
+>  	mov	x0, #0x33ff
+>  	msr	cptr_el2, x0			// Disable copro. traps to EL2
 >
-> Perhaps I should have drawn more attention to the documentation in the
-> cover letter, and encouraged reviewers to look at it first.  My
-> experience is that people don't often read cover letters...
->
-> Now the series is posted, I'm minded to keep the order as-is, unless you
-> think it's a big issue.
->
-> Adding a reference to the document seems a reasonable thing to do,
-> so I could add that.
->
->> patch queue as they are useful primers and saves you having to patch a:
->>
->> modified   arch/arm64/include/uapi/asm/sigcontext.h
->> @@ -132,19 +132,24 @@ struct sve_context {
->>  /*
->>   * The SVE architecture leaves space for future expansion of the
->>   * vector length beyond its initial architectural limit of 2048 bits
->> - * (16 quadwords).
->> + * (16 quadwords). See Documentation/arm64/sve.txt for a summary of
->> + * the terminology of Vector Quads (VQ) and Vector Lengths (VL).
->>   */
->> +
->> +#define SVE_VQ_BITS             128      /* 128 bits in one quadword */
->> +#define SVE_VQ_BYTES            (SVE_VQ_BITS / 8)
->> +
->
-> I was trying to keep extraneous #defines to a minimum, since this is a
-> uapi header, and people may depend on anything defined here.
->
-> I think SVE_VQ_BYTES is reasonable to have, and this allows us to
-> rewrite a few hard-coded 0x10s and 16s symbolically which is probably a
-> good idea -- I'll add this.
->
-> SVE_VQ_BITS looks redundant to me though.  It wouldn't be used for any
-> purpose other than defining SVE_VQ_BYTES.
+> +	/* SVE register access */
+> +	mrs	x1, id_aa64pfr0_el1
+> +	ubfx	x1, x1, #ID_AA64PFR0_SVE_SHIFT, #4
+> +	cbz	x1, 7f
+> +
+> +	bic	x0, x0, #CPTR_EL2_TZ		// Also disable SVE traps
+> +	msr	cptr_el2, x0			// Disable copro. traps
+> to EL2
 
-Yeah I was more concerned with getting rid of the magic 0x10's than
-showing exactly how many bits something is.
+It seems a shame to write to cptr_el2 twice rather than compute and
+write.
 
+> +	isb
+
+Especially as the second one needs an isb :-/
+
+But I don't see a much neater way of doing it so:
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+
+> +	mov	x1, #ZCR_ELx_LEN_MASK		// SVE: Enable full vector
+> +	msr_s	SYS_ZCR_EL2, x1			// length for EL1.
+> +
+>  	/* Hypervisor stub */
+> -	adr_l	x0, __hyp_stub_vectors
+> +7:	adr_l	x0, __hyp_stub_vectors
+>  	msr	vbar_el2, x0
 >
->>  #define SVE_VQ_MIN		1
->>  #define SVE_VQ_MAX		0x200
->>
->> -#define SVE_VL_MIN		(SVE_VQ_MIN * 0x10)
->> -#define SVE_VL_MAX		(SVE_VQ_MAX * 0x10)
->> +#define SVE_VL_MIN		(SVE_VQ_MIN * SVE_VQ_BYTES)
->> +#define SVE_VL_MAX		(SVE_VQ_MAX * SVE_VQ_BYTES)
->>
->>  #define SVE_NUM_ZREGS		32
->>  #define SVE_NUM_PREGS		16
->>
->>  #define sve_vl_valid(vl) \
->> -	((vl) % 0x10 == 0 && (vl) >= SVE_VL_MIN && (vl) <= SVE_VL_MAX)
->> +	((vl) % SVE_VQ_BYTES == 0 && (vl) >= SVE_VL_MIN && (vl) <= SVE_VL_MAX)
->>  #define sve_vq_from_vl(vl)	((vl) / 0x10)
->>  #define sve_vl_from_vq(vq)	((vq) * 0x10)
+>  	/* spsr */
+> diff --git a/arch/arm64/mm/proc.S b/arch/arm64/mm/proc.S
+> index 877d42f..dd22ef2 100644
+> --- a/arch/arm64/mm/proc.S
+> +++ b/arch/arm64/mm/proc.S
+> @@ -27,6 +27,7 @@
+>  #include <asm/pgtable-hwdef.h>
+>  #include <asm/cpufeature.h>
+>  #include <asm/alternative.h>
+> +#include <asm/sysreg.h>
 >
-> [...]
+>  #ifdef CONFIG_ARM64_64K_PAGES
+>  #define TCR_TG_FLAGS	TCR_TG0_64K | TCR_TG1_64K
+> @@ -186,8 +187,17 @@ ENTRY(__cpu_setup)
+>  	tlbi	vmalle1				// Invalidate local TLB
+>  	dsb	nsh
 >
-> Cheers
-> ---Dave
+> -	mov	x0, #3 << 20
+> -	msr	cpacr_el1, x0			// Enable FP/ASIMD
+> +	mov	x0, #3 << 20			// FEN
+> +
+> +	/* SVE */
+> +	mrs	x5, id_aa64pfr0_el1
+> +	ubfx	x5, x5, #ID_AA64PFR0_SVE_SHIFT, #4
+> +	cbz	x5, 1f
+> +
+> +	bic	x0, x0, #CPACR_EL1_ZEN
+> +	orr	x0, x0, #CPACR_EL1_ZEN_EL1EN	// SVE: trap for EL0, not EL1
+> +1:	msr	cpacr_el1, x0			// Enable FP/ASIMD
+> +
+>  	mov	x0, #1 << 12			// Reset mdscr_el1 and disable
+>  	msr	mdscr_el1, x0			// access to the DCC from EL0
+>  	isb					// Unmask debug exceptions now,
