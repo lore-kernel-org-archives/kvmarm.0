@@ -1,118 +1,126 @@
-From: Dave Martin <Dave.Martin@arm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 Subject: Re: [PATCH 09/27] arm64/sve: Signal frame and context structure
  definition
-Date: Tue, 22 Aug 2017 12:17:06 +0100
-Message-ID: <20170822111705.GT6321@e103592.cambridge.arm.com>
+Date: Tue, 22 Aug 2017 14:53:49 +0100
+Message-ID: <87tw0z4sk2.fsf@linaro.org>
 References: <1502280338-23002-1-git-send-email-Dave.Martin@arm.com>
  <1502280338-23002-10-git-send-email-Dave.Martin@arm.com>
- <87y3qb52ez.fsf@linaro.org>
+ <87y3qb52ez.fsf@linaro.org> <20170822111705.GT6321@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-arch-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <87y3qb52ez.fsf@linaro.org>
-Sender: linux-arch-owner@vger.kernel.org
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, gdb@sourceware.org, Yao Qi <Yao.Qi@arm.com>, Alan Hayward <alan.hayward@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A6F8E49C1C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Aug 2017 09:51:57 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id rBjD3DwZ1vF8 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Aug 2017 09:51:56 -0400 (EDT)
+Received: from mail-wr0-f174.google.com (mail-wr0-f174.google.com
+ [209.85.128.174])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1C4AC49C19
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Aug 2017 09:51:56 -0400 (EDT)
+Received: by mail-wr0-f174.google.com with SMTP id a47so12035162wra.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Aug 2017 06:53:52 -0700 (PDT)
+In-reply-to: <20170822111705.GT6321@e103592.cambridge.arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, gdb@sourceware.org, Yao Qi <Yao.Qi@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Alan Hayward <alan.hayward@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Aug 22, 2017 at 11:22:44AM +0100, Alex Bennée wrote:
-> 
-> Dave Martin <Dave.Martin@arm.com> writes:
-> 
-> > This patch defines the representation that will be used for the SVE
-> > register state in the signal frame, and implements support for
-> > saving and restoring the SVE registers around signals.
-> >
-> > The same layout will also be used for the in-kernel task state.
-> >
-> > Due to the variability of the SVE vector length, it is not possible
-> > to define a fixed C struct to describe all the registers.  Instead,
-> > Macros are defined in sigcontext.h to facilitate access to the
-> > parts of the structure.
-> >
-> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> > ---
-> >  arch/arm64/include/uapi/asm/sigcontext.h | 113 ++++++++++++++++++++++++++++++-
-> >  1 file changed, 112 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/arch/arm64/include/uapi/asm/sigcontext.h b/arch/arm64/include/uapi/asm/sigcontext.h
-> > index f0a76b9..0533bdf 100644
-> > --- a/arch/arm64/include/uapi/asm/sigcontext.h
-> > +++ b/arch/arm64/include/uapi/asm/sigcontext.h
-> > @@ -16,6 +16,8 @@
-> >  #ifndef _UAPI__ASM_SIGCONTEXT_H
-> >  #define _UAPI__ASM_SIGCONTEXT_H
-> >
-> > +#ifndef __ASSEMBLY__
-> > +
-> >  #include <linux/types.h>
-> >
-> >  /*
-> > @@ -41,10 +43,11 @@ struct sigcontext {
-> >   *
-> >   *	0x210		fpsimd_context
-> >   *	 0x10		esr_context
-> > + *	0x8a0		sve_context (vl <= 64) (optional)
-> >   *	 0x20		extra_context (optional)
-> >   *	 0x10		terminator (null _aarch64_ctx)
-> >   *
-> > - *	0xdb0		(reserved for future allocation)
-> > + *	0x510		(reserved for future allocation)
-> >   *
-> >   * New records that can exceed this space need to be opt-in for userspace, so
-> >   * that an expanded signal frame is not generated unexpectedly.  The mechanism
-> > @@ -116,4 +119,112 @@ struct extra_context {
-> >  	__u32 __reserved[3];
-> >  };
-> >
-> > +#define SVE_MAGIC	0x53564501
-> > +
-> > +struct sve_context {
-> > +	struct _aarch64_ctx head;
-> > +	__u16 vl;
-> > +	__u16 __reserved[3];
-> > +};
-> > +
-> > +#endif /* !__ASSEMBLY__ */
-> > +
-> > +/*
-> > + * The SVE architecture leaves space for future expansion of the
-> > + * vector length beyond its initial architectural limit of 2048 bits
-> > + * (16 quadwords).
-> > + */
-> > +#define SVE_VQ_MIN		1
-> > +#define SVE_VQ_MAX		0x200
-> > +
-> > +#define SVE_VL_MIN		(SVE_VQ_MIN * 0x10)
-> > +#define SVE_VL_MAX		(SVE_VQ_MAX * 0x10)
-> > +
-> > +#define SVE_NUM_ZREGS		32
-> > +#define SVE_NUM_PREGS		16
-> > +
-> > +#define sve_vl_valid(vl) \
-> > +	((vl) % 0x10 == 0 && (vl) >= SVE_VL_MIN && (vl) <= SVE_VL_MAX)
-> > +#define sve_vq_from_vl(vl)	((vl) / 0x10)
-> > +#define sve_vl_from_vq(vq)	((vq) * 0x10)
-> 
-> I got a little confused first time through over what VQ and VL where.
-> Maybe it would make sense to expand a little more from first principles?
-> 
->   /*
->    * The SVE architecture defines vector registers as a multiple of 128
->    * bit quadwords. The current architectural limit is 2048 bits (16
->    * quadwords) but there is room for future expansion beyond that.
->     */
-
-This comes up in several places and so I didn't want to comment it
-repeatedly everywhere.
-
-Instead, I wrote up something in section 2 (Vector length terminology)
-of Documentation/arm64/sve.txt -- see patch 25.  Can you take a look and
-see whether that's adequate?
-
-[...]
-
-Cheers
----Dave
+CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo+IE9uIFR1ZSwgQXVn
+IDIyLCAyMDE3IGF0IDExOjIyOjQ0QU0gKzAxMDAsIEFsZXggQmVubsOpZSB3cm90ZToKPj4KPj4g
+RGF2ZSBNYXJ0aW4gPERhdmUuTWFydGluQGFybS5jb20+IHdyaXRlczoKPj4KPj4gPiBUaGlzIHBh
+dGNoIGRlZmluZXMgdGhlIHJlcHJlc2VudGF0aW9uIHRoYXQgd2lsbCBiZSB1c2VkIGZvciB0aGUg
+U1ZFCj4+ID4gcmVnaXN0ZXIgc3RhdGUgaW4gdGhlIHNpZ25hbCBmcmFtZSwgYW5kIGltcGxlbWVu
+dHMgc3VwcG9ydCBmb3IKPj4gPiBzYXZpbmcgYW5kIHJlc3RvcmluZyB0aGUgU1ZFIHJlZ2lzdGVy
+cyBhcm91bmQgc2lnbmFscy4KPj4gPgo+PiA+IFRoZSBzYW1lIGxheW91dCB3aWxsIGFsc28gYmUg
+dXNlZCBmb3IgdGhlIGluLWtlcm5lbCB0YXNrIHN0YXRlLgo+PiA+Cj4+ID4gRHVlIHRvIHRoZSB2
+YXJpYWJpbGl0eSBvZiB0aGUgU1ZFIHZlY3RvciBsZW5ndGgsIGl0IGlzIG5vdCBwb3NzaWJsZQo+
+PiA+IHRvIGRlZmluZSBhIGZpeGVkIEMgc3RydWN0IHRvIGRlc2NyaWJlIGFsbCB0aGUgcmVnaXN0
+ZXJzLiAgSW5zdGVhZCwKPj4gPiBNYWNyb3MgYXJlIGRlZmluZWQgaW4gc2lnY29udGV4dC5oIHRv
+IGZhY2lsaXRhdGUgYWNjZXNzIHRvIHRoZQo+PiA+IHBhcnRzIG9mIHRoZSBzdHJ1Y3R1cmUuCj4+
+ID4KPj4gPiBTaWduZWQtb2ZmLWJ5OiBEYXZlIE1hcnRpbiA8RGF2ZS5NYXJ0aW5AYXJtLmNvbT4K
+Pj4gPiAtLS0KPj4gPiAgYXJjaC9hcm02NC9pbmNsdWRlL3VhcGkvYXNtL3NpZ2NvbnRleHQuaCB8
+IDExMyArKysrKysrKysrKysrKysrKysrKysrKysrKysrKystCj4+ID4gIDEgZmlsZSBjaGFuZ2Vk
+LCAxMTIgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQo+PiA+Cj4+ID4gZGlmZiAtLWdpdCBh
+L2FyY2gvYXJtNjQvaW5jbHVkZS91YXBpL2FzbS9zaWdjb250ZXh0LmggYi9hcmNoL2FybTY0L2lu
+Y2x1ZGUvdWFwaS9hc20vc2lnY29udGV4dC5oCj4+ID4gaW5kZXggZjBhNzZiOS4uMDUzM2JkZiAx
+MDA2NDQKPj4gPiAtLS0gYS9hcmNoL2FybTY0L2luY2x1ZGUvdWFwaS9hc20vc2lnY29udGV4dC5o
+Cj4+ID4gKysrIGIvYXJjaC9hcm02NC9pbmNsdWRlL3VhcGkvYXNtL3NpZ2NvbnRleHQuaAo+PiA+
+IEBAIC0xNiw2ICsxNiw4IEBACj4+ID4gICNpZm5kZWYgX1VBUElfX0FTTV9TSUdDT05URVhUX0gK
+Pj4gPiAgI2RlZmluZSBfVUFQSV9fQVNNX1NJR0NPTlRFWFRfSAo+PiA+Cj4+ID4gKyNpZm5kZWYg
+X19BU1NFTUJMWV9fCj4+ID4gKwo+PiA+ICAjaW5jbHVkZSA8bGludXgvdHlwZXMuaD4KPj4gPgo+
+PiA+ICAvKgo+PiA+IEBAIC00MSwxMCArNDMsMTEgQEAgc3RydWN0IHNpZ2NvbnRleHQgewo+PiA+
+ICAgKgo+PiA+ICAgKgkweDIxMAkJZnBzaW1kX2NvbnRleHQKPj4gPiAgICoJIDB4MTAJCWVzcl9j
+b250ZXh0Cj4+ID4gKyAqCTB4OGEwCQlzdmVfY29udGV4dCAodmwgPD0gNjQpIChvcHRpb25hbCkK
+Pj4gPiAgICoJIDB4MjAJCWV4dHJhX2NvbnRleHQgKG9wdGlvbmFsKQo+PiA+ICAgKgkgMHgxMAkJ
+dGVybWluYXRvciAobnVsbCBfYWFyY2g2NF9jdHgpCj4+ID4gICAqCj4+ID4gLSAqCTB4ZGIwCQko
+cmVzZXJ2ZWQgZm9yIGZ1dHVyZSBhbGxvY2F0aW9uKQo+PiA+ICsgKgkweDUxMAkJKHJlc2VydmVk
+IGZvciBmdXR1cmUgYWxsb2NhdGlvbikKPj4gPiAgICoKPj4gPiAgICogTmV3IHJlY29yZHMgdGhh
+dCBjYW4gZXhjZWVkIHRoaXMgc3BhY2UgbmVlZCB0byBiZSBvcHQtaW4gZm9yIHVzZXJzcGFjZSwg
+c28KPj4gPiAgICogdGhhdCBhbiBleHBhbmRlZCBzaWduYWwgZnJhbWUgaXMgbm90IGdlbmVyYXRl
+ZCB1bmV4cGVjdGVkbHkuICBUaGUgbWVjaGFuaXNtCj4+ID4gQEAgLTExNiw0ICsxMTksMTEyIEBA
+IHN0cnVjdCBleHRyYV9jb250ZXh0IHsKPj4gPiAgCV9fdTMyIF9fcmVzZXJ2ZWRbM107Cj4+ID4g
+IH07Cj4+ID4KPj4gPiArI2RlZmluZSBTVkVfTUFHSUMJMHg1MzU2NDUwMQo+PiA+ICsKPj4gPiAr
+c3RydWN0IHN2ZV9jb250ZXh0IHsKPj4gPiArCXN0cnVjdCBfYWFyY2g2NF9jdHggaGVhZDsKPj4g
+PiArCV9fdTE2IHZsOwo+PiA+ICsJX191MTYgX19yZXNlcnZlZFszXTsKPj4gPiArfTsKPj4gPiAr
+Cj4+ID4gKyNlbmRpZiAvKiAhX19BU1NFTUJMWV9fICovCj4+ID4gKwo+PiA+ICsvKgo+PiA+ICsg
+KiBUaGUgU1ZFIGFyY2hpdGVjdHVyZSBsZWF2ZXMgc3BhY2UgZm9yIGZ1dHVyZSBleHBhbnNpb24g
+b2YgdGhlCj4+ID4gKyAqIHZlY3RvciBsZW5ndGggYmV5b25kIGl0cyBpbml0aWFsIGFyY2hpdGVj
+dHVyYWwgbGltaXQgb2YgMjA0OCBiaXRzCj4+ID4gKyAqICgxNiBxdWFkd29yZHMpLgo+PiA+ICsg
+Ki8KPj4gPiArI2RlZmluZSBTVkVfVlFfTUlOCQkxCj4+ID4gKyNkZWZpbmUgU1ZFX1ZRX01BWAkJ
+MHgyMDAKPj4gPiArCj4+ID4gKyNkZWZpbmUgU1ZFX1ZMX01JTgkJKFNWRV9WUV9NSU4gKiAweDEw
+KQo+PiA+ICsjZGVmaW5lIFNWRV9WTF9NQVgJCShTVkVfVlFfTUFYICogMHgxMCkKPj4gPiArCj4+
+ID4gKyNkZWZpbmUgU1ZFX05VTV9aUkVHUwkJMzIKPj4gPiArI2RlZmluZSBTVkVfTlVNX1BSRUdT
+CQkxNgo+PiA+ICsKPj4gPiArI2RlZmluZSBzdmVfdmxfdmFsaWQodmwpIFwKPj4gPiArCSgodmwp
+ICUgMHgxMCA9PSAwICYmICh2bCkgPj0gU1ZFX1ZMX01JTiAmJiAodmwpIDw9IFNWRV9WTF9NQVgp
+Cj4+ID4gKyNkZWZpbmUgc3ZlX3ZxX2Zyb21fdmwodmwpCSgodmwpIC8gMHgxMCkKPj4gPiArI2Rl
+ZmluZSBzdmVfdmxfZnJvbV92cSh2cSkJKCh2cSkgKiAweDEwKQo+Pgo+PiBJIGdvdCBhIGxpdHRs
+ZSBjb25mdXNlZCBmaXJzdCB0aW1lIHRocm91Z2ggb3ZlciB3aGF0IFZRIGFuZCBWTCB3aGVyZS4K
+Pj4gTWF5YmUgaXQgd291bGQgbWFrZSBzZW5zZSB0byBleHBhbmQgYSBsaXR0bGUgbW9yZSBmcm9t
+IGZpcnN0IHByaW5jaXBsZXM/Cj4+Cj4+ICAgLyoKPj4gICAgKiBUaGUgU1ZFIGFyY2hpdGVjdHVy
+ZSBkZWZpbmVzIHZlY3RvciByZWdpc3RlcnMgYXMgYSBtdWx0aXBsZSBvZiAxMjgKPj4gICAgKiBi
+aXQgcXVhZHdvcmRzLiBUaGUgY3VycmVudCBhcmNoaXRlY3R1cmFsIGxpbWl0IGlzIDIwNDggYml0
+cyAoMTYKPj4gICAgKiBxdWFkd29yZHMpIGJ1dCB0aGVyZSBpcyByb29tIGZvciBmdXR1cmUgZXhw
+YW5zaW9uIGJleW9uZCB0aGF0Lgo+PiAgICAgKi8KPgo+IFRoaXMgY29tZXMgdXAgaW4gc2V2ZXJh
+bCBwbGFjZXMgYW5kIHNvIEkgZGlkbid0IHdhbnQgdG8gY29tbWVudCBpdAo+IHJlcGVhdGVkbHkg
+ZXZlcnl3aGVyZS4KPgo+IEluc3RlYWQsIEkgd3JvdGUgdXAgc29tZXRoaW5nIGluIHNlY3Rpb24g
+MiAoVmVjdG9yIGxlbmd0aCB0ZXJtaW5vbG9neSkKPiBvZiBEb2N1bWVudGF0aW9uL2FybTY0L3N2
+ZS50eHQgLS0gc2VlIHBhdGNoIDI1LiAgQ2FuIHlvdSB0YWtlIGEgbG9vayBhbmQKPiBzZWUgd2hl
+dGhlciB0aGF0J3MgYWRlcXVhdGU/CgpBaGgsIEkgaGFkbid0IGdvdCB0byB0aGF0IHlldC4gSSdt
+IHVuc3VyZSB0byB0aGUgb3JkZXIgdGhlIGtlcm5lbCBsaWtlcwp0byBwdXQgdGhpbmdzIGJ1dCBJ
+IGxpa2UgdG8gcHV0IGRlc2lnbiBkb2N1bWVudHMgYXQgdGhlIGZyb250IG9mIHRoZQpwYXRjaCBx
+dWV1ZSBhcyB0aGV5IGFyZSB1c2VmdWwgcHJpbWVycyBhbmQgc2F2ZXMgeW91IGhhdmluZyB0byBw
+YXRjaCBhOgoKbW9kaWZpZWQgICBhcmNoL2FybTY0L2luY2x1ZGUvdWFwaS9hc20vc2lnY29udGV4
+dC5oCkBAIC0xMzIsMTkgKzEzMiwyNCBAQCBzdHJ1Y3Qgc3ZlX2NvbnRleHQgewogLyoKICAqIFRo
+ZSBTVkUgYXJjaGl0ZWN0dXJlIGxlYXZlcyBzcGFjZSBmb3IgZnV0dXJlIGV4cGFuc2lvbiBvZiB0
+aGUKICAqIHZlY3RvciBsZW5ndGggYmV5b25kIGl0cyBpbml0aWFsIGFyY2hpdGVjdHVyYWwgbGlt
+aXQgb2YgMjA0OCBiaXRzCi0gKiAoMTYgcXVhZHdvcmRzKS4KKyAqICgxNiBxdWFkd29yZHMpLiBT
+ZWUgRG9jdW1lbnRhdGlvbi9hcm02NC9zdmUudHh0IGZvciBhIHN1bW1hcnkgb2YKKyAqIHRoZSB0
+ZXJtaW5vbG9neSBvZiBWZWN0b3IgUXVhZHMgKFZRKSBhbmQgVmVjdG9yIExlbmd0aHMgKFZMKS4K
+ICAqLworCisjZGVmaW5lIFNWRV9WUV9CSVRTICAgICAgICAgICAgIDEyOCAgICAgIC8qIDEyOCBi
+aXRzIGluIG9uZSBxdWFkd29yZCAqLworI2RlZmluZSBTVkVfVlFfQllURVMgICAgICAgICAgICAo
+U1ZFX1ZRX0JJVFMgLyA4KQorCiAjZGVmaW5lIFNWRV9WUV9NSU4JCTEKICNkZWZpbmUgU1ZFX1ZR
+X01BWAkJMHgyMDAKCi0jZGVmaW5lIFNWRV9WTF9NSU4JCShTVkVfVlFfTUlOICogMHgxMCkKLSNk
+ZWZpbmUgU1ZFX1ZMX01BWAkJKFNWRV9WUV9NQVggKiAweDEwKQorI2RlZmluZSBTVkVfVkxfTUlO
+CQkoU1ZFX1ZRX01JTiAqIFNWRV9WUV9CWVRFUykKKyNkZWZpbmUgU1ZFX1ZMX01BWAkJKFNWRV9W
+UV9NQVggKiBTVkVfVlFfQllURVMpCgogI2RlZmluZSBTVkVfTlVNX1pSRUdTCQkzMgogI2RlZmlu
+ZSBTVkVfTlVNX1BSRUdTCQkxNgoKICNkZWZpbmUgc3ZlX3ZsX3ZhbGlkKHZsKSBcCi0JKCh2bCkg
+JSAweDEwID09IDAgJiYgKHZsKSA+PSBTVkVfVkxfTUlOICYmICh2bCkgPD0gU1ZFX1ZMX01BWCkK
+KwkoKHZsKSAlIFNWRV9WUV9CWVRFUyA9PSAwICYmICh2bCkgPj0gU1ZFX1ZMX01JTiAmJiAodmwp
+IDw9IFNWRV9WTF9NQVgpCiAjZGVmaW5lIHN2ZV92cV9mcm9tX3ZsKHZsKQkoKHZsKSAvIDB4MTAp
+CiAjZGVmaW5lIHN2ZV92bF9mcm9tX3ZxKHZxKQkoKHZxKSAqIDB4MTApCgoKPgo+IFsuLi5dCj4K
+PiBDaGVlcnMKPiAtLS1EYXZlCgoKLS0KQWxleCBCZW5uw6llCl9fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxp
+c3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFu
+L2xpc3RpbmZvL2t2bWFybQo=
