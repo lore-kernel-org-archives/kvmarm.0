@@ -1,213 +1,134 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v2 5/8] KVM: arm/arm64: vgic: Handle mapped level
- sensitive SPIs
-Date: Tue, 22 Aug 2017 16:35:26 +0200
-Message-ID: <ea3d3821-a3ec-dae4-9633-0cbf65afe057@redhat.com>
-References: <1497531160-29162-1-git-send-email-eric.auger@redhat.com>
- <1497531160-29162-6-git-send-email-eric.auger@redhat.com>
- <f21e17b7-9437-ca96-6847-91e7ecee3af4@arm.com>
- <6a177b08-1871-c5b1-6ece-404017dfd23c@redhat.com>
- <20170721130331.GG16350@cbox> <b396c691-13d6-d17f-570e-7787970e759f@arm.com>
- <20170725144835.GD1588@lvm> <c2b481d0-3094-8a19-6257-da4927af014e@arm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH 09/27] arm64/sve: Signal frame and context structure definition
+Date: Tue, 22 Aug 2017 16:03:20 +0100
+Message-ID: <87shgj4pc7.fsf@linaro.org>
+References: <1502280338-23002-1-git-send-email-Dave.Martin@arm.com> <1502280338-23002-10-git-send-email-Dave.Martin@arm.com> <87y3qb52ez.fsf@linaro.org> <20170822111705.GT6321@e103592.cambridge.arm.com> <87tw0z4sk2.fsf@linaro.org> <20170822142135.GU6321@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <c2b481d0-3094-8a19-6257-da4927af014e@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Christoffer Dall <cdall@linaro.org>, eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, alex.williamson@redhat.com, b.reynal@virtualopensystems.com, pbonzini@redhat.com, drjones@redhat.com, wei@redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-arch-owner@vger.kernel.org>
+In-reply-to: <20170822142135.GU6321@e103592.cambridge.arm.com>
+Sender: linux-arch-owner@vger.kernel.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, gdb@sourceware.org, Yao Qi <Yao.Qi@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Alan Hayward <alan.hayward@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
 
-On 25/07/2017 17:41, Marc Zyngier wrote:
-> On 25/07/17 15:48, Christoffer Dall wrote:
->> On Tue, Jul 25, 2017 at 02:47:55PM +0100, Marc Zyngier wrote:
->>> On 21/07/17 14:03, Christoffer Dall wrote:
->>>> On Fri, Jul 07, 2017 at 09:41:42AM +0200, Auger Eric wrote:
->>>>> Hi Marc,
->>>>>
->>>>> On 04/07/2017 14:15, Marc Zyngier wrote:
->>>>>> Hi Eric,
->>>>>>
->>>>>> On 15/06/17 13:52, Eric Auger wrote:
->>>>>>> Currently, the line level of unmapped level sensitive SPIs is
->>>>>>> toggled down by the maintenance IRQ handler/resamplefd mechanism.
->>>>>>>
->>>>>>> As mapped SPI completion is not trapped, we cannot rely on this
->>>>>>> mechanism and the line level needs to be observed at distributor
->>>>>>> level instead.
->>>>>>>
->>>>>>> This patch handles the physical IRQ case in vgic_validate_injection
->>>>>>> and get the line level of a mapped SPI at distributor level.
->>>>>>>
->>>>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>>>>>
->>>>>>> ---
->>>>>>>
->>>>>>> v1 -> v2:
->>>>>>> - renamed is_unshared_mapped into is_mapped_spi
->>>>>>> - changes to kvm_vgic_map_phys_irq moved in the previous patch
->>>>>>> - make vgic_validate_injection more readable
->>>>>>> - reword the commit message
->>>>>>> ---
->>>>>>>  virt/kvm/arm/vgic/vgic.c | 16 ++++++++++++++--
->>>>>>>  virt/kvm/arm/vgic/vgic.h |  7 ++++++-
->>>>>>>  2 files changed, 20 insertions(+), 3 deletions(-)
->>>>>>>
->>>>>>> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
->>>>>>> index 075f073..2e35ac7 100644
->>>>>>> --- a/virt/kvm/arm/vgic/vgic.c
->>>>>>> +++ b/virt/kvm/arm/vgic/vgic.c
->>>>>>> @@ -139,6 +139,17 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
->>>>>>>  	kfree(irq);
->>>>>>>  }
->>>>>>>  
->>>>>>> +bool irq_line_level(struct vgic_irq *irq)
->>>>>>> +{
->>>>>>> +	bool line_level = irq->line_level;
->>>>>>> +
->>>>>>> +	if (unlikely(is_mapped_spi(irq)))
->>>>>>> +		WARN_ON(irq_get_irqchip_state(irq->host_irq,
->>>>>>> +					      IRQCHIP_STATE_PENDING,
->>>>>>> +					      &line_level));
->>>>>>> +	return line_level;
->>>>>>> +}
->>>>>>> +
->>>>>>>  /**
->>>>>>>   * kvm_vgic_target_oracle - compute the target vcpu for an irq
->>>>>>>   *
->>>>>>> @@ -236,13 +247,14 @@ static void vgic_sort_ap_list(struct kvm_vcpu *vcpu)
->>>>>>>  
->>>>>>>  /*
->>>>>>>   * Only valid injection if changing level for level-triggered IRQs or for a
->>>>>>> - * rising edge.
->>>>>>> + * rising edge. Injection of virtual interrupts associated to physical
->>>>>>> + * interrupts always is valid.
->>>>>>>   */
->>>>>>>  static bool vgic_validate_injection(struct vgic_irq *irq, bool level)
->>>>>>>  {
->>>>>>>  	switch (irq->config) {
->>>>>>>  	case VGIC_CONFIG_LEVEL:
->>>>>>> -		return irq->line_level != level;
->>>>>>> +		return (irq->line_level != level || unlikely(is_mapped_spi(irq)));
->>>>>>>  	case VGIC_CONFIG_EDGE:
->>>>>>>  		return level;
->>>>>>>  	}
->>>>>>> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
->>>>>>> index bba7fa2..da254ae 100644
->>>>>>> --- a/virt/kvm/arm/vgic/vgic.h
->>>>>>> +++ b/virt/kvm/arm/vgic/vgic.h
->>>>>>> @@ -96,14 +96,19 @@
->>>>>>>  /* we only support 64 kB translation table page size */
->>>>>>>  #define KVM_ITS_L1E_ADDR_MASK		GENMASK_ULL(51, 16)
->>>>>>>  
->>>>>>> +bool irq_line_level(struct vgic_irq *irq);
->>>>>>> +
->>>>>>>  static inline bool irq_is_pending(struct vgic_irq *irq)
->>>>>>>  {
->>>>>>>  	if (irq->config == VGIC_CONFIG_EDGE)
->>>>>>>  		return irq->pending_latch;
->>>>>>>  	else
->>>>>>> -		return irq->pending_latch || irq->line_level;
->>>>>>> +		return irq->pending_latch || irq_line_level(irq);
->>>>>>
->>>>>> I'm a bit concerned that an edge interrupt doesn't take the distributor
->>>>>> state into account here. Why is that so? Once an SPI is forwarded to a
->>>>>> guest, a large part of the edge vs level differences move into the HW,
->>>>>> and are not that different anymore from a SW PoV.
->>>>>
->>>>> As pointed out by Christoffer in https://lkml.org/lkml/2017/6/8/322,
->>>>> isn't it a bit risky in general to poke the physical state instead of
->>>>> the virtual state. For level sensitive, to me we don't really have many
->>>>> other alternatives. For edge, we are not obliged to.
->>>>
->>>> I think we need to be clear on the fundamental question of whether or
->>>> not we consider pending_latch and/or line_level for mapped interrupts.
->>>>
->>>> I can definitely see the argument that the pending state is kept in
->>>> hardware, so if you want to know that for a mapped interrupt, ask the
->>>> hardware.
->>>>
->>>> The upside of this appraoch is a clean separation of state and we avoid
->>>> any logic to synchronize a virtual state with the physical state.
->>>>
->>>> The downside is that it's slower to peek into the physical GIC than to
->>>> read a variable from memory, and we need to special case the validate
->>>> path (which I now understand).
->>>>
->>>> If we move to keeping the state in HW, how do we deal with GICD_SPENDR ?
->>>> Does that mean we will forward a from the VM handled by the VGIC to the
->>>> physical GIC?
->>>
->>> Sounds like it to me. Otherwise, we start loosing some state. 
+Dave Martin <Dave.Martin@arm.com> writes:
+
+> On Tue, Aug 22, 2017 at 02:53:49PM +0100, Alex Bennée wrote:
 >>
->> How do we loose state?  Is it not more a question of complexity to make
->> sure the 'cached' vgic state is up to date with the real state?  (like
->> what we currently do for the timer mapped interrupt).
-> 
-> Sorry, I was very imprecise here. It is not so much that we'd loose
-> state, but that we'd have some state at the wrong location. If we have a
-> guest playing with the pending state, we need to make sure the physical
-> side is up to date. Otherwise, we can end-up in situations where we'd
-> inject an interrupt for the guest based on a pending state that only
-> exists in the virtual distributor, and yet the virtual CPUIF is going to
-> try and deactivate it in the physical side on EOI.
-
-At the moment the write to GICD_ISPENDR (vgic_mmio_write_spending) sets
-the pending_latch virtual state.
-
-and the read uses irq_is_pending() new wrapper which looks at both the
-physical state and the pending_latch virtual state in case of physically
-mapped irq (irq_is_pending).
-
-But As Marc mentioned, as I don't propagate the pending_latch to the
-physical distributor, effectively we can have a guest "DIR" that tries
-to complete a physical IRQ that is not active and that's wrong.
-
-> 
->> On GICv2 this is likely going to make injecting timer interrupts slower,
->> because we'll check the pending state of whatever's in the AP list on
->> entry to the guest and peek into the physical GIC again.
-aren't timer interrupts PPIs? My series only affect the state machine
-for physically mapped SPIs so this shouldn't have any impact, no?
-
-Thanks
-
-Eric
-> 
-> That's a very valid concern. Though there is a slight distinction with
-> the timer, in that we entirely control the injection of the interrupt,
-> while an SPI can fire an any particular moment.
-> 
+>> Dave Martin <Dave.Martin@arm.com> writes:
 >>
->>> Note that
->>> this is what my GICv4 patches are also doing, by forwarding the INT and
->>> CLEAR commands to the physical ITS.
->>>
->>>>> Don't we have situations, due to the lazy disable approach, where the
->>>>> physical IRQ hits, enters the genirq handler and the actual handler is
->>>>> not called, ie. the virtual IRQ is not injected?
->>>>>
->>>>
->>>> I'm not sure I remember what these situations were, specifically, but
->>>> certainly if we ever have a situation where a mapped irq's pending state
->>>> should be different from that of the physical one, then it doesn't work.
->>>
->>> There is a very simple way around the issue Eric mentions, which is to
->>> use the "IRQ_DISABLE_UNLAZY" flag, which disable the lazy disabling of
->>> interrupts.  That's also something the GICv4 patches use, as when we
->>> mask an interrupt, we want to be sure that it is immediately done (the
->>> host side will never see the interrupt firing, and thus can never
->>> disabled it).
->>>
->> If we don't care about the potential performance hit mentioned above, it
->> sounds like a good solution to me.
-> 
-> I think we need to measure the damage this would cause.
-> 
-> Thanks,
-> 
-> 	M.
-> 
+>> > On Tue, Aug 22, 2017 at 11:22:44AM +0100, Alex Bennée wrote:
+>> >>
+>> >> Dave Martin <Dave.Martin@arm.com> writes:
+>
+> [...]
+>
+>> >> > +/*
+>> >> > + * The SVE architecture leaves space for future expansion of the
+>> >> > + * vector length beyond its initial architectural limit of 2048 bits
+>> >> > + * (16 quadwords).
+>> >> > + */
+>> >> > +#define SVE_VQ_MIN		1
+>> >> > +#define SVE_VQ_MAX		0x200
+>> >> > +
+>> >> > +#define SVE_VL_MIN		(SVE_VQ_MIN * 0x10)
+>> >> > +#define SVE_VL_MAX		(SVE_VQ_MAX * 0x10)
+>> >> > +
+>> >> > +#define SVE_NUM_ZREGS		32
+>> >> > +#define SVE_NUM_PREGS		16
+>> >> > +
+>> >> > +#define sve_vl_valid(vl) \
+>> >> > +	((vl) % 0x10 == 0 && (vl) >= SVE_VL_MIN && (vl) <= SVE_VL_MAX)
+>> >> > +#define sve_vq_from_vl(vl)	((vl) / 0x10)
+>> >> > +#define sve_vl_from_vq(vq)	((vq) * 0x10)
+>> >>
+>> >> I got a little confused first time through over what VQ and VL where.
+>> >> Maybe it would make sense to expand a little more from first principles?
+>> >>
+>> >>   /*
+>> >>    * The SVE architecture defines vector registers as a multiple of 128
+>> >>    * bit quadwords. The current architectural limit is 2048 bits (16
+>> >>    * quadwords) but there is room for future expansion beyond that.
+>> >>     */
+>> >
+>> > This comes up in several places and so I didn't want to comment it
+>> > repeatedly everywhere.
+>> >
+>> > Instead, I wrote up something in section 2 (Vector length terminology)
+>> > of Documentation/arm64/sve.txt -- see patch 25.  Can you take a look and
+>> > see whether that's adequate?
+>>
+>> Ahh, I hadn't got to that yet. I'm unsure to the order the kernel likes
+>> to put things but I like to put design documents at the front of the
+>
+> I don't have a strong opinion on that -- I had preferred not to add a
+> document describing stuff that doesn't exist at the time of commit.
+> I could commit a stub document at the start of the series, and then
+> commit the real document later.
+>
+> Either way, it seemed overkill.
+>
+> Perhaps I should have drawn more attention to the documentation in the
+> cover letter, and encouraged reviewers to look at it first.  My
+> experience is that people don't often read cover letters...
+>
+> Now the series is posted, I'm minded to keep the order as-is, unless you
+> think it's a big issue.
+>
+> Adding a reference to the document seems a reasonable thing to do,
+> so I could add that.
+>
+>> patch queue as they are useful primers and saves you having to patch a:
+>>
+>> modified   arch/arm64/include/uapi/asm/sigcontext.h
+>> @@ -132,19 +132,24 @@ struct sve_context {
+>>  /*
+>>   * The SVE architecture leaves space for future expansion of the
+>>   * vector length beyond its initial architectural limit of 2048 bits
+>> - * (16 quadwords).
+>> + * (16 quadwords). See Documentation/arm64/sve.txt for a summary of
+>> + * the terminology of Vector Quads (VQ) and Vector Lengths (VL).
+>>   */
+>> +
+>> +#define SVE_VQ_BITS             128      /* 128 bits in one quadword */
+>> +#define SVE_VQ_BYTES            (SVE_VQ_BITS / 8)
+>> +
+>
+> I was trying to keep extraneous #defines to a minimum, since this is a
+> uapi header, and people may depend on anything defined here.
+>
+> I think SVE_VQ_BYTES is reasonable to have, and this allows us to
+> rewrite a few hard-coded 0x10s and 16s symbolically which is probably a
+> good idea -- I'll add this.
+>
+> SVE_VQ_BITS looks redundant to me though.  It wouldn't be used for any
+> purpose other than defining SVE_VQ_BYTES.
+
+Yeah I was more concerned with getting rid of the magic 0x10's than
+showing exactly how many bits something is.
+
+>
+>>  #define SVE_VQ_MIN		1
+>>  #define SVE_VQ_MAX		0x200
+>>
+>> -#define SVE_VL_MIN		(SVE_VQ_MIN * 0x10)
+>> -#define SVE_VL_MAX		(SVE_VQ_MAX * 0x10)
+>> +#define SVE_VL_MIN		(SVE_VQ_MIN * SVE_VQ_BYTES)
+>> +#define SVE_VL_MAX		(SVE_VQ_MAX * SVE_VQ_BYTES)
+>>
+>>  #define SVE_NUM_ZREGS		32
+>>  #define SVE_NUM_PREGS		16
+>>
+>>  #define sve_vl_valid(vl) \
+>> -	((vl) % 0x10 == 0 && (vl) >= SVE_VL_MIN && (vl) <= SVE_VL_MAX)
+>> +	((vl) % SVE_VQ_BYTES == 0 && (vl) >= SVE_VL_MIN && (vl) <= SVE_VL_MAX)
+>>  #define sve_vq_from_vl(vl)	((vl) / 0x10)
+>>  #define sve_vl_from_vq(vq)	((vq) * 0x10)
+>
+> [...]
+>
+> Cheers
+> ---Dave
