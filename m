@@ -1,231 +1,213 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v2 4/8] KVM: arm/arm64: vgic: restructure
- kvm_vgic_(un)map_phys_irq
-Date: Tue, 22 Aug 2017 16:33:53 +0200
-Message-ID: <95d92957-4a09-b833-8a5c-c653582bf0cd@redhat.com>
+Subject: Re: [PATCH v2 5/8] KVM: arm/arm64: vgic: Handle mapped level
+ sensitive SPIs
+Date: Tue, 22 Aug 2017 16:35:26 +0200
+Message-ID: <ea3d3821-a3ec-dae4-9633-0cbf65afe057@redhat.com>
 References: <1497531160-29162-1-git-send-email-eric.auger@redhat.com>
- <1497531160-29162-5-git-send-email-eric.auger@redhat.com>
- <20170721114439.GE16350@cbox>
+ <1497531160-29162-6-git-send-email-eric.auger@redhat.com>
+ <f21e17b7-9437-ca96-6847-91e7ecee3af4@arm.com>
+ <6a177b08-1871-c5b1-6ece-404017dfd23c@redhat.com>
+ <20170721130331.GG16350@cbox> <b396c691-13d6-d17f-570e-7787970e759f@arm.com>
+ <20170725144835.GD1588@lvm> <c2b481d0-3094-8a19-6257-da4927af014e@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170721114439.GE16350@cbox>
+In-Reply-To: <c2b481d0-3094-8a19-6257-da4927af014e@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Christoffer Dall <cdall@linaro.org>
-Cc: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, alex.williamson@redhat.com, b.reynal@virtualopensystems.com, pbonzini@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, drjones@redhat.com, wei@redhat.com
+To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Christoffer Dall <cdall@linaro.org>, eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, alex.williamson@redhat.com, b.reynal@virtualopensystems.com, pbonzini@redhat.com, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
+Hi,
 
-On 21/07/2017 13:44, Christoffer Dall wrote:
-> On Thu, Jun 15, 2017 at 02:52:36PM +0200, Eric Auger wrote:
->> We want to reuse the core of the map/unmap functions for IRQ
->> forwarding. Let's move the computation of the hwirq in
->> kvm_vgic_map_phys_irq and pass the linux IRQ as parameter.
->> the host_irq is added to struct vgic_irq.
+On 25/07/2017 17:41, Marc Zyngier wrote:
+> On 25/07/17 15:48, Christoffer Dall wrote:
+>> On Tue, Jul 25, 2017 at 02:47:55PM +0100, Marc Zyngier wrote:
+>>> On 21/07/17 14:03, Christoffer Dall wrote:
+>>>> On Fri, Jul 07, 2017 at 09:41:42AM +0200, Auger Eric wrote:
+>>>>> Hi Marc,
+>>>>>
+>>>>> On 04/07/2017 14:15, Marc Zyngier wrote:
+>>>>>> Hi Eric,
+>>>>>>
+>>>>>> On 15/06/17 13:52, Eric Auger wrote:
+>>>>>>> Currently, the line level of unmapped level sensitive SPIs is
+>>>>>>> toggled down by the maintenance IRQ handler/resamplefd mechanism.
+>>>>>>>
+>>>>>>> As mapped SPI completion is not trapped, we cannot rely on this
+>>>>>>> mechanism and the line level needs to be observed at distributor
+>>>>>>> level instead.
+>>>>>>>
+>>>>>>> This patch handles the physical IRQ case in vgic_validate_injection
+>>>>>>> and get the line level of a mapped SPI at distributor level.
+>>>>>>>
+>>>>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>>>>>
+>>>>>>> ---
+>>>>>>>
+>>>>>>> v1 -> v2:
+>>>>>>> - renamed is_unshared_mapped into is_mapped_spi
+>>>>>>> - changes to kvm_vgic_map_phys_irq moved in the previous patch
+>>>>>>> - make vgic_validate_injection more readable
+>>>>>>> - reword the commit message
+>>>>>>> ---
+>>>>>>>  virt/kvm/arm/vgic/vgic.c | 16 ++++++++++++++--
+>>>>>>>  virt/kvm/arm/vgic/vgic.h |  7 ++++++-
+>>>>>>>  2 files changed, 20 insertions(+), 3 deletions(-)
+>>>>>>>
+>>>>>>> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+>>>>>>> index 075f073..2e35ac7 100644
+>>>>>>> --- a/virt/kvm/arm/vgic/vgic.c
+>>>>>>> +++ b/virt/kvm/arm/vgic/vgic.c
+>>>>>>> @@ -139,6 +139,17 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
+>>>>>>>  	kfree(irq);
+>>>>>>>  }
+>>>>>>>  
+>>>>>>> +bool irq_line_level(struct vgic_irq *irq)
+>>>>>>> +{
+>>>>>>> +	bool line_level = irq->line_level;
+>>>>>>> +
+>>>>>>> +	if (unlikely(is_mapped_spi(irq)))
+>>>>>>> +		WARN_ON(irq_get_irqchip_state(irq->host_irq,
+>>>>>>> +					      IRQCHIP_STATE_PENDING,
+>>>>>>> +					      &line_level));
+>>>>>>> +	return line_level;
+>>>>>>> +}
+>>>>>>> +
+>>>>>>>  /**
+>>>>>>>   * kvm_vgic_target_oracle - compute the target vcpu for an irq
+>>>>>>>   *
+>>>>>>> @@ -236,13 +247,14 @@ static void vgic_sort_ap_list(struct kvm_vcpu *vcpu)
+>>>>>>>  
+>>>>>>>  /*
+>>>>>>>   * Only valid injection if changing level for level-triggered IRQs or for a
+>>>>>>> - * rising edge.
+>>>>>>> + * rising edge. Injection of virtual interrupts associated to physical
+>>>>>>> + * interrupts always is valid.
+>>>>>>>   */
+>>>>>>>  static bool vgic_validate_injection(struct vgic_irq *irq, bool level)
+>>>>>>>  {
+>>>>>>>  	switch (irq->config) {
+>>>>>>>  	case VGIC_CONFIG_LEVEL:
+>>>>>>> -		return irq->line_level != level;
+>>>>>>> +		return (irq->line_level != level || unlikely(is_mapped_spi(irq)));
+>>>>>>>  	case VGIC_CONFIG_EDGE:
+>>>>>>>  		return level;
+>>>>>>>  	}
+>>>>>>> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+>>>>>>> index bba7fa2..da254ae 100644
+>>>>>>> --- a/virt/kvm/arm/vgic/vgic.h
+>>>>>>> +++ b/virt/kvm/arm/vgic/vgic.h
+>>>>>>> @@ -96,14 +96,19 @@
+>>>>>>>  /* we only support 64 kB translation table page size */
+>>>>>>>  #define KVM_ITS_L1E_ADDR_MASK		GENMASK_ULL(51, 16)
+>>>>>>>  
+>>>>>>> +bool irq_line_level(struct vgic_irq *irq);
+>>>>>>> +
+>>>>>>>  static inline bool irq_is_pending(struct vgic_irq *irq)
+>>>>>>>  {
+>>>>>>>  	if (irq->config == VGIC_CONFIG_EDGE)
+>>>>>>>  		return irq->pending_latch;
+>>>>>>>  	else
+>>>>>>> -		return irq->pending_latch || irq->line_level;
+>>>>>>> +		return irq->pending_latch || irq_line_level(irq);
+>>>>>>
+>>>>>> I'm a bit concerned that an edge interrupt doesn't take the distributor
+>>>>>> state into account here. Why is that so? Once an SPI is forwarded to a
+>>>>>> guest, a large part of the edge vs level differences move into the HW,
+>>>>>> and are not that different anymore from a SW PoV.
+>>>>>
+>>>>> As pointed out by Christoffer in https://lkml.org/lkml/2017/6/8/322,
+>>>>> isn't it a bit risky in general to poke the physical state instead of
+>>>>> the virtual state. For level sensitive, to me we don't really have many
+>>>>> other alternatives. For edge, we are not obliged to.
+>>>>
+>>>> I think we need to be clear on the fundamental question of whether or
+>>>> not we consider pending_latch and/or line_level for mapped interrupts.
+>>>>
+>>>> I can definitely see the argument that the pending state is kept in
+>>>> hardware, so if you want to know that for a mapped interrupt, ask the
+>>>> hardware.
+>>>>
+>>>> The upside of this appraoch is a clean separation of state and we avoid
+>>>> any logic to synchronize a virtual state with the physical state.
+>>>>
+>>>> The downside is that it's slower to peek into the physical GIC than to
+>>>> read a variable from memory, and we need to special case the validate
+>>>> path (which I now understand).
+>>>>
+>>>> If we move to keeping the state in HW, how do we deal with GICD_SPENDR ?
+>>>> Does that mean we will forward a from the VM handled by the VGIC to the
+>>>> physical GIC?
+>>>
+>>> Sounds like it to me. Otherwise, we start loosing some state. 
 >>
->> We introduce kvm_vgic_map/unmap_irq which take a struct vgic_irq
->> handle as a parameter.
+>> How do we loose state?  Is it not more a question of complexity to make
+>> sure the 'cached' vgic state is up to date with the real state?  (like
+>> what we currently do for the timer mapped interrupt).
 > 
-> So this is to avoid the linux-to-hardware irq number translation in
-> other callers?
-Yes that's correct. Also forwarding code caller needs to hold the lock,
-reason why I pass a vgic_irq as a param.
+> Sorry, I was very imprecise here. It is not so much that we'd loose
+> state, but that we'd have some state at the wrong location. If we have a
+> guest playing with the pending state, we need to make sure the physical
+> side is up to date. Otherwise, we can end-up in situations where we'd
+> inject an interrupt for the guest based on a pending state that only
+> exists in the virtual distributor, and yet the virtual CPUIF is going to
+> try and deactivate it in the physical side on EOI.
+
+At the moment the write to GICD_ISPENDR (vgic_mmio_write_spending) sets
+the pending_latch virtual state.
+
+and the read uses irq_is_pending() new wrapper which looks at both the
+physical state and the pending_latch virtual state in case of physically
+mapped irq (irq_is_pending).
+
+But As Marc mentioned, as I don't propagate the pending_latch to the
+physical distributor, effectively we can have a guest "DIR" that tries
+to complete a physical IRQ that is not active and that's wrong.
+
 > 
-> I am sort of guessing that we need to store the host_irq number so that
-> we can probe into the physical GIC in later patches?  That may be good
-> to note in this commit message if you respin.
-done
+>> On GICv2 this is likely going to make injecting timer interrupts slower,
+>> because we'll check the pending state of whatever's in the AP list on
+>> entry to the guest and peek into the physical GIC again.
+aren't timer interrupts PPIs? My series only affect the state machine
+for physically mapped SPIs so this shouldn't have any impact, no?
 
 Thanks
 
 Eric
 > 
-> Thanks,
-> -Christoffer
+> That's a very valid concern. Though there is a slight distinction with
+> the timer, in that we entirely control the injection of the interrupt,
+> while an SPI can fire an any particular moment.
 > 
 >>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->>  include/kvm/arm_vgic.h    |  8 ++++---
->>  virt/kvm/arm/arch_timer.c | 24 +------------------
->>  virt/kvm/arm/vgic/vgic.c  | 60 +++++++++++++++++++++++++++++++++++------------
->>  3 files changed, 51 insertions(+), 41 deletions(-)
->>
->> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
->> index ef71858..cceb31d 100644
->> --- a/include/kvm/arm_vgic.h
->> +++ b/include/kvm/arm_vgic.h
->> @@ -112,6 +112,7 @@ struct vgic_irq {
->>  	bool hw;			/* Tied to HW IRQ */
->>  	struct kref refcount;		/* Used for LPIs */
->>  	u32 hwintid;			/* HW INTID number */
->> +	unsigned int host_irq;		/* linux irq corresponding to hwintid */
->>  	union {
->>  		u8 targets;			/* GICv2 target VCPUs mask */
->>  		u32 mpidr;			/* GICv3 target VCPU */
->> @@ -301,9 +302,10 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
->>  			bool level);
->>  int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid, unsigned int intid,
->>  			       bool level);
->> -int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, u32 virt_irq, u32 phys_irq);
->> -int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq);
->> -bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq);
->> +int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
->> +			  u32 vintid);
->> +int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid);
->> +bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int vintid);
->>  
->>  int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
->>  
->> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
->> index 5976609..57a30ab 100644
->> --- a/virt/kvm/arm/arch_timer.c
->> +++ b/virt/kvm/arm/arch_timer.c
->> @@ -617,9 +617,6 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
->>  {
->>  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
->>  	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
->> -	struct irq_desc *desc;
->> -	struct irq_data *data;
->> -	int phys_irq;
->>  	int ret;
->>  
->>  	if (timer->enabled)
->> @@ -632,26 +629,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
->>  	if (!vgic_initialized(vcpu->kvm))
->>  		return -ENODEV;
->>  
->> -	/*
->> -	 * Find the physical IRQ number corresponding to the host_vtimer_irq
->> -	 */
->> -	desc = irq_to_desc(host_vtimer_irq);
->> -	if (!desc) {
->> -		kvm_err("%s: no interrupt descriptor\n", __func__);
->> -		return -EINVAL;
->> -	}
->> -
->> -	data = irq_desc_get_irq_data(desc);
->> -	while (data->parent_data)
->> -		data = data->parent_data;
->> -
->> -	phys_irq = data->hwirq;
->> -
->> -	/*
->> -	 * Tell the VGIC that the virtual interrupt is tied to a
->> -	 * physical interrupt. We do that once per VCPU.
->> -	 */
->> -	ret = kvm_vgic_map_phys_irq(vcpu, vtimer->irq.irq, phys_irq);
->> +	ret = kvm_vgic_map_phys_irq(vcpu, host_vtimer_irq, vtimer->irq.irq);
->>  	if (ret)
->>  		return ret;
->>  
->> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
->> index 83b24d2..075f073 100644
->> --- a/virt/kvm/arm/vgic/vgic.c
->> +++ b/virt/kvm/arm/vgic/vgic.c
->> @@ -17,6 +17,8 @@
->>  #include <linux/kvm.h>
->>  #include <linux/kvm_host.h>
->>  #include <linux/list_sort.h>
->> +#include <linux/interrupt.h>
->> +#include <linux/irq.h>
->>  
->>  #include "vgic.h"
->>  
->> @@ -392,38 +394,66 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
->>  	return 0;
->>  }
->>  
->> -int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, u32 virt_irq, u32 phys_irq)
->> +/* @irq->irq_lock must be held */
->> +static int kvm_vgic_map_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
->> +			    unsigned int host_irq)
->>  {
->> -	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
->> +	struct irq_desc *desc;
->> +	struct irq_data *data;
->>  
->> -	BUG_ON(!irq);
->> -
->> -	spin_lock(&irq->irq_lock);
->> +	/*
->> +	 * Find the physical IRQ number corresponding to @host_irq
->> +	 */
->> +	desc = irq_to_desc(host_irq);
->> +	if (!desc) {
->> +		kvm_err("%s: no interrupt descriptor\n", __func__);
->> +		return -EINVAL;
->> +	}
->> +	data = irq_desc_get_irq_data(desc);
->> +	while (data->parent_data)
->> +		data = data->parent_data;
->>  
->>  	irq->hw = true;
->> -	irq->hwintid = phys_irq;
->> +	irq->host_irq = host_irq;
->> +	irq->hwintid = data->hwirq;
->> +	return 0;
->> +}
->> +
->> +/* @irq->irq_lock must be held */
->> +static inline void kvm_vgic_unmap_irq(struct vgic_irq *irq)
->> +{
->> +	irq->hw = false;
->> +	irq->hwintid = 0;
->> +}
->> +
->> +int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
->> +			  u32 vintid)
->> +{
->> +	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
->> +	int ret;
->>  
->> +	BUG_ON(!irq);
->> +
->> +	spin_lock(&irq->irq_lock);
->> +	ret = kvm_vgic_map_irq(vcpu, irq, host_irq);
->>  	spin_unlock(&irq->irq_lock);
->>  	vgic_put_irq(vcpu->kvm, irq);
->>  
->> -	return 0;
->> +	return ret;
->>  }
->>  
->> -int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq)
->> +int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid)
->>  {
->>  	struct vgic_irq *irq;
->>  
->>  	if (!vgic_initialized(vcpu->kvm))
->>  		return -EAGAIN;
->>  
->> -	irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
->> +	irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
->>  	BUG_ON(!irq);
->>  
->>  	spin_lock(&irq->irq_lock);
->> -
->> -	irq->hw = false;
->> -	irq->hwintid = 0;
->> -
->> +	kvm_vgic_unmap_irq(irq);
->>  	spin_unlock(&irq->irq_lock);
->>  	vgic_put_irq(vcpu->kvm, irq);
->>  
->> @@ -726,9 +756,9 @@ void vgic_kick_vcpus(struct kvm *kvm)
->>  	}
->>  }
->>  
->> -bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq)
->> +bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int vintid)
->>  {
->> -	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
->> +	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
->>  	bool map_is_active;
->>  
->>  	spin_lock(&irq->irq_lock);
->> -- 
->> 2.5.5
->>
+>>> Note that
+>>> this is what my GICv4 patches are also doing, by forwarding the INT and
+>>> CLEAR commands to the physical ITS.
+>>>
+>>>>> Don't we have situations, due to the lazy disable approach, where the
+>>>>> physical IRQ hits, enters the genirq handler and the actual handler is
+>>>>> not called, ie. the virtual IRQ is not injected?
+>>>>>
+>>>>
+>>>> I'm not sure I remember what these situations were, specifically, but
+>>>> certainly if we ever have a situation where a mapped irq's pending state
+>>>> should be different from that of the physical one, then it doesn't work.
+>>>
+>>> There is a very simple way around the issue Eric mentions, which is to
+>>> use the "IRQ_DISABLE_UNLAZY" flag, which disable the lazy disabling of
+>>> interrupts.  That's also something the GICv4 patches use, as when we
+>>> mask an interrupt, we want to be sure that it is immediately done (the
+>>> host side will never see the interrupt firing, and thus can never
+>>> disabled it).
+>>>
+>> If we don't care about the potential performance hit mentioned above, it
+>> sounds like a good solution to me.
+> 
+> I think we need to measure the damage this would cause.
+> 
+> Thanks,
+> 
+> 	M.
+> 
