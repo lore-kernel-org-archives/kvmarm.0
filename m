@@ -1,165 +1,75 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+From: Dave Martin <Dave.Martin@arm.com>
 Subject: Re: [PATCH 14/27] arm64/sve: Backend logic for setting the vector
  length
-Date: Wed, 23 Aug 2017 16:33:18 +0100
-Message-ID: <87shgi9u4h.fsf@linaro.org>
+Date: Wed, 23 Aug 2017 18:29:52 +0100
+Message-ID: <20170823172952.GB6321@e103592.cambridge.arm.com>
 References: <1502280338-23002-1-git-send-email-Dave.Martin@arm.com>
  <1502280338-23002-15-git-send-email-Dave.Martin@arm.com>
+ <87shgi9u4h.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A802349C2E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Aug 2017 11:31:23 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UsNHEewVJ2pb for <kvmarm@lists.cs.columbia.edu>;
- Wed, 23 Aug 2017 11:31:22 -0400 (EDT)
-Received: from mail-wr0-f177.google.com (mail-wr0-f177.google.com
- [209.85.128.177])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0D26340D17
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Aug 2017 11:31:22 -0400 (EDT)
-Received: by mail-wr0-f177.google.com with SMTP id p8so1477463wrf.5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Aug 2017 08:33:20 -0700 (PDT)
-In-reply-to: <1502280338-23002-15-git-send-email-Dave.Martin@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-arch-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <87shgi9u4h.fsf@linaro.org>
+Sender: linux-arch-owner@vger.kernel.org
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, gdb@sourceware.org, Yao Qi <Yao.Qi@arm.com>, Alan Hayward <alan.hayward@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo+IFRoaXMgcGF0Y2gg
-aW1wbGVtZW50cyB0aGUgY29yZSBsb2dpYyBmb3IgY2hhbmdpbmcgYSB0YXNrJ3MgdmVjdG9yCj4g
-bGVuZ3RoIG9uIHJlcXVlc3QgZnJvbSB1c2Vyc3BhY2UuICBUaGlzIHdpbGwgYmUgdXNlZCBieSB0
-aGUgcHRyYWNlCj4gYW5kIHByY3RsIGZyb250ZW5kcyB0aGF0IGFyZSBpbXBsZW1lbnRlZCBpbiBs
-YXRlciBwYXRjaGVzLgo+Cj4gVGhlIFNWRSBhcmNoaXRlY3R1cmUgcGVybWl0cywgYnV0IGRvZXMg
-bm90IHJlcXVpcmUsIGltcGxlbWVudGF0aW9ucwo+IHRvIHN1cHBvcnQgdmVjdG9yIGxlbmd0aHMg
-dGhhdCBhcmUgbm90IGEgcG93ZXIgb2YgdHdvLiAgVG8gaGFuZGxlCj4gdGhpcywgbG9naWMgaXMg
-YWRkZWQgdG8gY2hlY2sgYSByZXF1ZXN0ZWQgdmVjdG9yIGxlbmd0aCBhZ2FpbnN0IGEKPiBwb3Nz
-aWJseSBzcGFyc2UgYml0bWFwIG9mIGF2YWlsYWJsZSB2ZWN0b3IgbGVuZ3RocyBhdCBydW50aW1l
-LCBzbwo+IHRoYXQgdGhlIGJlc3Qgc3VwcG9ydGVkIHZhbHVlIGNhbiBiZSBjaG9zZW4uCj4KPiBT
-aWduZWQtb2ZmLWJ5OiBEYXZlIE1hcnRpbiA8RGF2ZS5NYXJ0aW5AYXJtLmNvbT4KPiAtLS0KPiAg
-YXJjaC9hcm02NC9pbmNsdWRlL2FzbS9mcHNpbWQuaCB8ICAgNiArKysKPiAgYXJjaC9hcm02NC9r
-ZXJuZWwvZnBzaW1kLmMgICAgICB8IDExNiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrCj4gIGluY2x1ZGUvdWFwaS9saW51eC9wcmN0bC5oICAgICAgfCAgIDUgKysKPiAg
-MyBmaWxlcyBjaGFuZ2VkLCAxMjcgaW5zZXJ0aW9ucygrKQo+Cj4gZGlmZiAtLWdpdCBhL2FyY2gv
-YXJtNjQvaW5jbHVkZS9hc20vZnBzaW1kLmggYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2Zwc2lt
-ZC5oCj4gaW5kZXggN2VmZDA0ZS4uMzliMjZkMiAxMDA2NDQKPiAtLS0gYS9hcmNoL2FybTY0L2lu
-Y2x1ZGUvYXNtL2Zwc2ltZC5oCj4gKysrIGIvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9mcHNpbWQu
-aAo+IEBAIC03MCwxMSArNzAsMTUgQEAgZXh0ZXJuIHZvaWQgZnBzaW1kX3VwZGF0ZV9jdXJyZW50
-X3N0YXRlKHN0cnVjdCBmcHNpbWRfc3RhdGUgKnN0YXRlKTsKPgo+ICBleHRlcm4gdm9pZCBmcHNp
-bWRfZmx1c2hfdGFza19zdGF0ZShzdHJ1Y3QgdGFza19zdHJ1Y3QgKnRhcmdldCk7Cj4KPiArI2Rl
-ZmluZSBTVkVfVkxfQVJDSF9NQVggMHgxMDAKPiArCgpIbW0gdGhpcyBpc24ndCB0aGUgc2FtZSBh
-cyBTVkVfVkxfTUFYLiBXaHkgYXJlbid0IHdlIHVzaW5nIHRoYXQ/Cgo+ICBleHRlcm4gdm9pZCBz
-dmVfc2F2ZV9zdGF0ZSh2b2lkICpzdGF0ZSwgdTMyICpwZnBzcik7Cj4gIGV4dGVybiB2b2lkIHN2
-ZV9sb2FkX3N0YXRlKHZvaWQgY29uc3QgKnN0YXRlLCB1MzIgY29uc3QgKnBmcHNyLAo+ICAJCQkg
-ICB1bnNpZ25lZCBsb25nIHZxX21pbnVzXzEpOwo+ICBleHRlcm4gdW5zaWduZWQgaW50IHN2ZV9n
-ZXRfdmwodm9pZCk7Cj4KPiArZXh0ZXJuIGludCBzdmVfbWF4X3ZsOwo+ICsKPiAgI2lmZGVmIENP
-TkZJR19BUk02NF9TVkUKPgo+ICBleHRlcm4gc2l6ZV90IHN2ZV9zdGF0ZV9zaXplKHN0cnVjdCB0
-YXNrX3N0cnVjdCBjb25zdCAqdGFzayk7Cj4gQEAgLTgzLDYgKzg3LDggQEAgZXh0ZXJuIHZvaWQg
-c3ZlX2FsbG9jKHN0cnVjdCB0YXNrX3N0cnVjdCAqdGFzayk7Cj4gIGV4dGVybiB2b2lkIGZwc2lt
-ZF9yZWxlYXNlX3RocmVhZChzdHJ1Y3QgdGFza19zdHJ1Y3QgKnRhc2spOwo+ICBleHRlcm4gdm9p
-ZCBmcHNpbWRfZHVwX3N2ZShzdHJ1Y3QgdGFza19zdHJ1Y3QgKmRzdCwKPiAgCQkJICAgc3RydWN0
-IHRhc2tfc3RydWN0IGNvbnN0ICpzcmMpOwo+ICtleHRlcm4gaW50IHN2ZV9zZXRfdmVjdG9yX2xl
-bmd0aChzdHJ1Y3QgdGFza19zdHJ1Y3QgKnRhc2ssCj4gKwkJCQkgdW5zaWduZWQgbG9uZyB2bCwg
-dW5zaWduZWQgbG9uZyBmbGFncyk7Cj4KPiAgI2Vsc2UgLyogISBDT05GSUdfQVJNNjRfU1ZFICov
-Cj4KPiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rZXJuZWwvZnBzaW1kLmMgYi9hcmNoL2FybTY0
-L2tlcm5lbC9mcHNpbWQuYwo+IGluZGV4IGU4Njc0ZjYuLmJjZTk1ZGUgMTAwNjQ0Cj4gLS0tIGEv
-YXJjaC9hcm02NC9rZXJuZWwvZnBzaW1kLmMKPiArKysgYi9hcmNoL2FybTY0L2tlcm5lbC9mcHNp
-bWQuYwo+IEBAIC0xOCwxMiArMTgsMTQgQEAKPiAgICovCj4KPiAgI2luY2x1ZGUgPGxpbnV4L2Jv
-dHRvbV9oYWxmLmg+Cj4gKyNpbmNsdWRlIDxsaW51eC9iaXRtYXAuaD4KPiAgI2luY2x1ZGUgPGxp
-bnV4L2NwdS5oPgo+ICAjaW5jbHVkZSA8bGludXgvY3B1X3BtLmg+Cj4gICNpbmNsdWRlIDxsaW51
-eC9rZXJuZWwuaD4KPiAgI2luY2x1ZGUgPGxpbnV4L2luaXQuaD4KPiAgI2luY2x1ZGUgPGxpbnV4
-L3BlcmNwdS5oPgo+ICAjaW5jbHVkZSA8bGludXgvcHJlZW1wdC5oPgo+ICsjaW5jbHVkZSA8bGlu
-dXgvcHJjdGwuaD4KPiAgI2luY2x1ZGUgPGxpbnV4L3B0cmFjZS5oPgo+ICAjaW5jbHVkZSA8bGlu
-dXgvc2NoZWQvc2lnbmFsLmg+Cj4gICNpbmNsdWRlIDxsaW51eC9zaWduYWwuaD4KPiBAQCAtMTEx
-LDYgKzExMywyMCBAQCBzdGF0aWMgREVGSU5FX1BFUl9DUFUoc3RydWN0IGZwc2ltZF9zdGF0ZSAq
-LCBmcHNpbWRfbGFzdF9zdGF0ZSk7Cj4gIC8qIERlZmF1bHQgVkwgZm9yIHRhc2tzIHRoYXQgZG9u
-J3Qgc2V0IGl0IGV4cGxpY2l0bHk6ICovCj4gIHN0YXRpYyBpbnQgc3ZlX2RlZmF1bHRfdmwgPSAt
-MTsKPgo+ICsjaWZkZWYgQ09ORklHX0FSTTY0X1NWRQo+ICsKPiArLyogTWF4aW11bSBzdXBwb3J0
-ZWQgdmVjdG9yIGxlbmd0aCBhY3Jvc3MgYWxsIENQVXMgKGluaXRpYWxseSBwb2lzb25lZCkgKi8K
-PiAraW50IHN2ZV9tYXhfdmwgPSAtMTsKPiArLyogU2V0IG9mIGF2YWlsYWJsZSB2ZWN0b3IgbGVu
-Z3RocywgYXMgdnFfdG9fYml0KHZxKTogKi8KPiArc3RhdGljIERFQ0xBUkVfQklUTUFQKHN2ZV92
-cV9tYXAsIFNWRV9WUV9NQVgpOwo+ICsKPiArI2Vsc2UgLyogISBDT05GSUdfQVJNNjRfU1ZFICov
-Cj4gKwo+ICsvKiBEdW1teSBkZWNsYXJhdGlvbiBmb3IgY29kZSB0aGF0IHdpbGwgYmUgb3B0aW1p
-c2VkIG91dDogKi8KPiArZXh0ZXJuIERFQ0xBUkVfQklUTUFQKHN2ZV92cV9tYXAsIFNWRV9WUV9N
-QVgpOwo+ICsKPiArI2VuZGlmIC8qICEgQ09ORklHX0FSTTY0X1NWRSAqLwo+ICsKPiAgc3RhdGlj
-IHZvaWQgc3ZlX2ZyZWUoc3RydWN0IHRhc2tfc3RydWN0ICp0YXNrKQo+ICB7Cj4gIAlrZnJlZSh0
-YXNrLT50aHJlYWQuc3ZlX3N0YXRlKTsKPiBAQCAtMTQ4LDYgKzE2NCwzNyBAQCBzdGF0aWMgdm9p
-ZCBjaGFuZ2VfY3BhY3IodTY0IG9sZCwgdTY0IG5ldykKPiAgCQl3cml0ZV9zeXNyZWcobmV3LCBD
-UEFDUl9FTDEpOwo+ICB9Cj4KPiArc3RhdGljIHVuc2lnbmVkIGludCB2cV90b19iaXQodW5zaWdu
-ZWQgaW50IHZxKQo+ICt7Cj4gKwlCVUlMRF9CVUdfT04odnEgPCAxIHx8IHZxID4gU1ZFX1ZRX01B
-WCk7Cj4gKwo+ICsJcmV0dXJuIFNWRV9WUV9NQVggLSB2cTsKPiArfQo+ICsKPiArc3RhdGljIHVu
-c2lnbmVkIGludCBiaXRfdG9fdnEodW5zaWduZWQgaW50IGJpdCkKPiArewo+ICsJQlVJTERfQlVH
-X09OKGJpdCA+PSBTVkVfVlFfTUFYKTsKPiArCj4gKwlyZXR1cm4gU1ZFX1ZRX01BWCAtIGJpdDsK
-PiArfQo+ICsKPiArc3RhdGljIHVuc2lnbmVkIGludCBmaW5kX3N1cHBvcnRlZF92ZWN0b3JfbGVu
-Z3RoKHVuc2lnbmVkIGludCB2bCkKPiArewo+ICsJaW50IGJpdDsKPiArCj4gKwlCVUdfT04oIXN2
-ZV92bF92YWxpZCh2bCkpOwo+ICsKPiArCUJVR19PTighc3ZlX3ZsX3ZhbGlkKHN2ZV9tYXhfdmwp
-KTsKPiArCWlmICh2bCA+IHN2ZV9tYXhfdmwpCj4gKwkJdmwgPSBzdmVfbWF4X3ZsOwo+ICsKPiAr
-CWJpdCA9IGZpbmRfbmV4dF9iaXQoc3ZlX3ZxX21hcCwgU1ZFX1ZRX01BWCwKPiArCQkJICAgIHZx
-X3RvX2JpdChzdmVfdnFfZnJvbV92bCh2bCkpKTsKPiArCUJVR19PTihiaXQgPCAwIHx8IGJpdCA+
-PSBTVkVfVlFfTUFYKTsKPiArCj4gKwlyZXR1cm4gMTYgKiBiaXRfdG9fdnEoYml0KTsKPiArfQo+
-ICsKPiAgI2RlZmluZSBaUkVHKHN2ZV9zdGF0ZSwgdnEsIG4pICgoY2hhciAqKShzdmVfc3RhdGUp
-ICsJCVwKPiAgCShTVkVfU0lHX1pSRUdfT0ZGU0VUKHZxLCBuKSAtIFNWRV9TSUdfUkVHU19PRkZT
-RVQpKQo+Cj4gQEAgLTIzNSw2ICsyODIsNzMgQEAgdm9pZCBmcHNpbWRfZHVwX3N2ZShzdHJ1Y3Qg
-dGFza19zdHJ1Y3QgKmRzdCwgc3RydWN0IHRhc2tfc3RydWN0IGNvbnN0ICpzcmMpCj4gIAl9Cj4g
-IH0KPgo+ICtpbnQgc3ZlX3NldF92ZWN0b3JfbGVuZ3RoKHN0cnVjdCB0YXNrX3N0cnVjdCAqdGFz
-aywKPiArCQkJICB1bnNpZ25lZCBsb25nIHZsLCB1bnNpZ25lZCBsb25nIGZsYWdzKQo+ICt7Cj4g
-KwlCVUdfT04odGFzayA9PSBjdXJyZW50ICYmIHByZWVtcHRpYmxlKCkpOwo+ICsKPiArCWlmIChm
-bGFncyAmIH4odW5zaWduZWQgbG9uZykoUFJfU1ZFX1ZMX0lOSEVSSVQgfAo+ICsJCQkJICAgICBQ
-Ul9TVkVfU0VUX1ZMX09ORVhFQykpCj4gKwkJcmV0dXJuIC1FSU5WQUw7Cj4gKwo+ICsJaWYgKCFz
-dmVfdmxfdmFsaWQodmwpKQo+ICsJCXJldHVybiAtRUlOVkFMOwo+ICsKPiArCS8qCj4gKwkgKiBD
-bGFtcCB0byB0aGUgbWF4aW11bSB2ZWN0b3IgbGVuZ3RoIHRoYXQgVkwtYWdub3N0aWMgU1ZFIGNv
-ZGUgY2FuCj4gKwkgKiB3b3JrIHdpdGguICBBIGZsYWcgbWF5IGJlIGFzc2lnbmVkIGluIHRoZSBm
-dXR1cmUgdG8gYWxsb3cgc2V0dGluZwo+ICsJICogb2YgbGFyZ2VyIHZlY3RvciBsZW5ndGhzIHdp
-dGhvdXQgY29uZnVzaW5nIG9sZGVyIHNvZnR3YXJlLgo+ICsJICovCj4gKwlpZiAodmwgPiBTVkVf
-VkxfQVJDSF9NQVgpCj4gKwkJdmwgPSBTVkVfVkxfQVJDSF9NQVg7Cj4gKwo+ICsJdmwgPSBmaW5k
-X3N1cHBvcnRlZF92ZWN0b3JfbGVuZ3RoKHZsKTsKPiArCj4gKwlpZiAoZmxhZ3MgJiAoUFJfU1ZF
-X1ZMX0lOSEVSSVQgfAo+ICsJCSAgICAgUFJfU1ZFX1NFVF9WTF9PTkVYRUMpKQo+ICsJCXRhc2st
-PnRocmVhZC5zdmVfdmxfb25leGVjID0gdmw7Cj4gKwllbHNlCj4gKwkJLyogUmVzZXQgVkwgdG8g
-c3lzdGVtIGRlZmF1bHQgb24gbmV4dCBleGVjOiAqLwo+ICsJCXRhc2stPnRocmVhZC5zdmVfdmxf
-b25leGVjID0gMDsKPiArCj4gKwkvKiBPbmx5IGFjdHVhbGx5IHNldCB0aGUgVkwgaWYgbm90IGRl
-ZmVycmVkOiAqLwo+ICsJaWYgKGZsYWdzICYgUFJfU1ZFX1NFVF9WTF9PTkVYRUMpCj4gKwkJZ290
-byBvdXQ7Cj4gKwo+ICsJLyoKPiArCSAqIFRvIGVuc3VyZSB0aGUgRlBTSU1EIGJpdHMgb2YgdGhl
-IFNWRSB2ZWN0b3IgcmVnaXN0ZXJzIGFyZSBwcmVzZXJ2ZWQsCj4gKwkgKiB3cml0ZSBhbnkgbGl2
-ZSByZWdpc3RlciBzdGF0ZSBiYWNrIHRvIHRhc2tfc3RydWN0LCBhbmQgY29udmVydCB0byBhCj4g
-KwkgKiBub24tU1ZFIHRocmVhZC4KPiArCSAqLwo+ICsJaWYgKHZsICE9IHRhc2stPnRocmVhZC5z
-dmVfdmwpIHsKPiArCQlpZiAodGFzayA9PSBjdXJyZW50KSB7Cj4gKwkJCXRhc2tfZnBzaW1kX3Nh
-dmUoKTsKPiArCQkJc2V0X3RocmVhZF9mbGFnKFRJRl9GT1JFSUdOX0ZQU1RBVEUpOwo+ICsJCX0K
-PiArCj4gKwkJaWYgKHRlc3RfYW5kX2NsZWFyX3Rza190aHJlYWRfZmxhZyh0YXNrLCBUSUZfU1ZF
-KSkKPiArCQkJc3ZlX3RvX2Zwc2ltZCh0YXNrKTsKPiArCj4gKwkJLyoKPiArCQkgKiBGb3JjZSBy
-ZWFsbG9jYXRpb24gb2YgdGFzayBTVkUgc3RhdGUgdG8gdGhlIGNvcnJlY3Qgc2l6ZQo+ICsJCSAq
-IG9uIG5leHQgdXNlOgo+ICsJCSAqLwo+ICsJCXN2ZV9mcmVlKHRhc2spOwo+ICsJfQo+ICsKPiAr
-CXRhc2stPnRocmVhZC5zdmVfdmwgPSB2bDsKPiArCj4gKwlmcHNpbWRfZmx1c2hfdGFza19zdGF0
-ZSh0YXNrKTsKPiArCj4gK291dDoKPiArCWlmIChmbGFncyAmIFBSX1NWRV9WTF9JTkhFUklUKQo+
-ICsJCXNldF90aHJlYWRfZmxhZyhUSUZfU1ZFX1ZMX0lOSEVSSVQpOwo+ICsJZWxzZQo+ICsJCWNs
-ZWFyX3RocmVhZF9mbGFnKFRJRl9TVkVfVkxfSU5IRVJJVCk7Cj4gKwo+ICsJcmV0dXJuIDA7Cj4g
-K30KPiArCj4gIHZvaWQgZnBzaW1kX3JlbGVhc2VfdGhyZWFkKHN0cnVjdCB0YXNrX3N0cnVjdCAq
-ZGVhZF90YXNrKQo+ICB7Cj4gIAlzdmVfZnJlZShkZWFkX3Rhc2spOwo+IEBAIC00MDcsNiArNTIx
-LDggQEAgdm9pZCBmcHNpbWRfZmx1c2hfdGhyZWFkKHZvaWQpCj4gIAkJICogSWYgbm90LCBzb21l
-dGhpbmcgd2VudCBiYWRseSB3cm9uZy4KPiAgCQkgKi8KPiAgCQlCVUdfT04oIXN2ZV92bF92YWxp
-ZChjdXJyZW50LT50aHJlYWQuc3ZlX3ZsKSk7Cj4gKwkJQlVHX09OKGZpbmRfc3VwcG9ydGVkX3Zl
-Y3Rvcl9sZW5ndGgoY3VycmVudC0+dGhyZWFkLnN2ZV92bCkgIT0KPiArCQkgICAgICAgY3VycmVu
-dC0+dGhyZWFkLnN2ZV92bCk7Cj4KPiAgCQkvKgo+ICAJCSAqIElmIHRoZSB0YXNrIGlzIG5vdCBz
-ZXQgdG8gaW5oZXJpdCwgZW5zdXJlIHRoYXQgdGhlIHZlY3Rvcgo+IGRpZmYgLS1naXQgYS9pbmNs
-dWRlL3VhcGkvbGludXgvcHJjdGwuaCBiL2luY2x1ZGUvdWFwaS9saW51eC9wcmN0bC5oCj4gaW5k
-ZXggYThkMDc1OS4uMWI2NDkwMSAxMDA2NDQKPiAtLS0gYS9pbmNsdWRlL3VhcGkvbGludXgvcHJj
-dGwuaAo+ICsrKyBiL2luY2x1ZGUvdWFwaS9saW51eC9wcmN0bC5oCj4gQEAgLTE5Nyw0ICsxOTcs
-OSBAQCBzdHJ1Y3QgcHJjdGxfbW1fbWFwIHsKPiAgIyBkZWZpbmUgUFJfQ0FQX0FNQklFTlRfTE9X
-RVIJCTMKPiAgIyBkZWZpbmUgUFJfQ0FQX0FNQklFTlRfQ0xFQVJfQUxMCTQKPgo+ICsvKiBhcm02
-NCBTY2FsYWJsZSBWZWN0b3IgRXh0ZW5zaW9uIGNvbnRyb2xzICovCj4gKyMgZGVmaW5lIFBSX1NW
-RV9TRVRfVkxfT05FWEVDCQkoMSA8PCAxOCkgLyogZGVmZXIgZWZmZWN0IHVudGlsIGV4ZWMgKi8K
-PiArIyBkZWZpbmUgUFJfU1ZFX1ZMX0xFTl9NQVNLCQkweGZmZmYKPiArIyBkZWZpbmUgUFJfU1ZF
-X1ZMX0lOSEVSSVQJCSgxIDw8IDE3KSAvKiBpbmhlcml0IGFjcm9zcyBleGVjICovCj4gKwo+ICAj
-ZW5kaWYgLyogX0xJTlVYX1BSQ1RMX0ggKi8KCgotLQpBbGV4IEJlbm7DqWUKX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdApr
-dm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1
-L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+On Wed, Aug 23, 2017 at 04:33:18PM +0100, Alex Bennée wrote:
+> 
+> Dave Martin <Dave.Martin@arm.com> writes:
+> 
+> > This patch implements the core logic for changing a task's vector
+> > length on request from userspace.  This will be used by the ptrace
+> > and prctl frontends that are implemented in later patches.
+> >
+> > The SVE architecture permits, but does not require, implementations
+> > to support vector lengths that are not a power of two.  To handle
+> > this, logic is added to check a requested vector length against a
+> > possibly sparse bitmap of available vector lengths at runtime, so
+> > that the best supported value can be chosen.
+> >
+> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> > ---
+> >  arch/arm64/include/asm/fpsimd.h |   6 +++
+> >  arch/arm64/kernel/fpsimd.c      | 116 ++++++++++++++++++++++++++++++++++++++++
+> >  include/uapi/linux/prctl.h      |   5 ++
+> >  3 files changed, 127 insertions(+)
+> >
+> > diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
+> > index 7efd04e..39b26d2 100644
+> > --- a/arch/arm64/include/asm/fpsimd.h
+> > +++ b/arch/arm64/include/asm/fpsimd.h
+> > @@ -70,11 +70,15 @@ extern void fpsimd_update_current_state(struct fpsimd_state *state);
+> >
+> >  extern void fpsimd_flush_task_state(struct task_struct *target);
+> >
+> > +#define SVE_VL_ARCH_MAX 0x100
+> > +
+> 
+> Hmm this isn't the same as SVE_VL_MAX. Why aren't we using that?
+
+There should probably be a comment on this.
+
+SVE vector-length agnostic software needs to be able to assume that
+VL <= 256 (the SVE maximum), because some instructions won't work as
+expected if this is not the case, particularly TBL, where in a larger
+vector there's no guarantee that a vector index (which might be as small
+as a byte) can index a vector element (of which there could be >256).
+
+I really don't want to expose SVE_VL_ARCH_MAX to userspace, so that
+people are not tempted to design data structures and protocols that
+can't handle up to SVE_VL_MAX.  Exposing both together seemed to carry
+a high risk of confusion and misuse.
+
+Instead, I silently clamp to an SVE-compatible length (i.e.,
+SVE_VL_ARCH_MAX) in sve_set_vector_length().  If future architecture
+revisions support larger vectors later on, my plan is to require an
+extra "force flag" to be passed to override the clamp.
+
+[...]
+
+Cheers
+---Dave
