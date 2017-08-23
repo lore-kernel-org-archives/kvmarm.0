@@ -1,136 +1,191 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v2 5/8] KVM: arm/arm64: vgic: Handle mapped level
- sensitive SPIs
-Date: Wed, 23 Aug 2017 09:25:01 +0200
-Message-ID: <48c358da-45fe-5348-28a9-41107409345c@redhat.com>
+Subject: Re: [PATCH v2 6/8] KVM: arm/arm64: vgic: Implement forwarding setting
+Date: Wed, 23 Aug 2017 10:58:38 +0200
+Message-ID: <04c0ed5f-40b3-b0bf-cdf3-8bccbe2430d0@redhat.com>
 References: <1497531160-29162-1-git-send-email-eric.auger@redhat.com>
- <1497531160-29162-6-git-send-email-eric.auger@redhat.com>
- <f21e17b7-9437-ca96-6847-91e7ecee3af4@arm.com>
+ <1497531160-29162-7-git-send-email-eric.auger@redhat.com>
+ <20170721131346.GH16350@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <f21e17b7-9437-ca96-6847-91e7ecee3af4@arm.com>
+In-Reply-To: <20170721131346.GH16350@cbox>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, alex.williamson@redhat.com, b.reynal@virtualopensystems.com, pbonzini@redhat.com, christoffer.dall@linaro.org
-Cc: drjones@redhat.com, wei@redhat.com
+To: Christoffer Dall <cdall@linaro.org>
+Cc: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, alex.williamson@redhat.com, b.reynal@virtualopensystems.com, pbonzini@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
+Hi Christoffer,
 
-On 04/07/2017 14:15, Marc Zyngier wrote:
-> Hi Eric,
-> 
-> On 15/06/17 13:52, Eric Auger wrote:
->> Currently, the line level of unmapped level sensitive SPIs is
->> toggled down by the maintenance IRQ handler/resamplefd mechanism.
+On 21/07/2017 15:13, Christoffer Dall wrote:
+> On Thu, Jun 15, 2017 at 02:52:38PM +0200, Eric Auger wrote:
+>> Implements kvm_vgic_[set|unset]_forwarding.
 >>
->> As mapped SPI completion is not trapped, we cannot rely on this
->> mechanism and the line level needs to be observed at distributor
->> level instead.
->>
->> This patch handles the physical IRQ case in vgic_validate_injection
->> and get the line level of a mapped SPI at distributor level.
+>> Handle low-level VGIC programming and consistent irqchip
+>> programming.
 >>
 >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 >>
 >> ---
 >>
 >> v1 -> v2:
->> - renamed is_unshared_mapped into is_mapped_spi
->> - changes to kvm_vgic_map_phys_irq moved in the previous patch
->> - make vgic_validate_injection more readable
->> - reword the commit message
+>> - change the parameter names used in the declaration
+>> - use kvm_vgic_map/unmap_phys_irq and handle their returned value
 >> ---
->>  virt/kvm/arm/vgic/vgic.c | 16 ++++++++++++++--
->>  virt/kvm/arm/vgic/vgic.h |  7 ++++++-
->>  2 files changed, 20 insertions(+), 3 deletions(-)
+>>  include/kvm/arm_vgic.h   |  5 +++
+>>  virt/kvm/arm/vgic/vgic.c | 88 ++++++++++++++++++++++++++++++++++++++++++++++++
+>>  2 files changed, 93 insertions(+)
 >>
+>> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+>> index cceb31d..5064a57 100644
+>> --- a/include/kvm/arm_vgic.h
+>> +++ b/include/kvm/arm_vgic.h
+>> @@ -343,4 +343,9 @@ int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi);
+>>   */
+>>  int kvm_vgic_setup_default_irq_routing(struct kvm *kvm);
+>>  
+>> +int kvm_vgic_set_forwarding(struct kvm *kvm, unsigned int host_irq,
+>> +			    unsigned int vintid);
+>> +void kvm_vgic_unset_forwarding(struct kvm *kvm, unsigned int host_irq,
+>> +			       unsigned int vintid);
+>> +
+>>  #endif /* __KVM_ARM_VGIC_H */
 >> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
->> index 075f073..2e35ac7 100644
+>> index 2e35ac7..9ee3e77 100644
 >> --- a/virt/kvm/arm/vgic/vgic.c
 >> +++ b/virt/kvm/arm/vgic/vgic.c
->> @@ -139,6 +139,17 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
->>  	kfree(irq);
+>> @@ -781,3 +781,91 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int vintid)
+>>  	return map_is_active;
 >>  }
 >>  
->> +bool irq_line_level(struct vgic_irq *irq)
+>> +/**
+>> + * kvm_vgic_set_forwarding - Set IRQ forwarding
+>> + *
+>> + * @kvm: kvm handle
+>> + * @host_irq: the host linux IRQ
+>> + * @vintid: the virtual INTID
+>> + *
+>> + * This function must be called when the IRQ is not active:
+>> + * ie. not active at GIC level and not currently under injection
+>> + * into the guest using the unforwarded mode. The physical IRQ must
+>> + * be disabled and all vCPUs must have been exited and prevented
+>> + * from being re-entered.
+>> + */
+>> +int kvm_vgic_set_forwarding(struct kvm *kvm, unsigned int host_irq,
+>> +			    unsigned int vintid)
 >> +{
->> +	bool line_level = irq->line_level;
+>> +	struct kvm_vcpu *vcpu;
+>> +	struct vgic_irq *irq;
+>> +	int ret;
 >> +
->> +	if (unlikely(is_mapped_spi(irq)))
->> +		WARN_ON(irq_get_irqchip_state(irq->host_irq,
->> +					      IRQCHIP_STATE_PENDING,
->> +					      &line_level));
->> +	return line_level;
->> +}
->> +
->>  /**
->>   * kvm_vgic_target_oracle - compute the target vcpu for an irq
->>   *
->> @@ -236,13 +247,14 @@ static void vgic_sort_ap_list(struct kvm_vcpu *vcpu)
->>  
->>  /*
->>   * Only valid injection if changing level for level-triggered IRQs or for a
->> - * rising edge.
->> + * rising edge. Injection of virtual interrupts associated to physical
->> + * interrupts always is valid.
->>   */
->>  static bool vgic_validate_injection(struct vgic_irq *irq, bool level)
->>  {
->>  	switch (irq->config) {
->>  	case VGIC_CONFIG_LEVEL:
->> -		return irq->line_level != level;
->> +		return (irq->line_level != level || unlikely(is_mapped_spi(irq)));
->>  	case VGIC_CONFIG_EDGE:
->>  		return level;
->>  	}
->> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
->> index bba7fa2..da254ae 100644
->> --- a/virt/kvm/arm/vgic/vgic.h
->> +++ b/virt/kvm/arm/vgic/vgic.h
->> @@ -96,14 +96,19 @@
->>  /* we only support 64 kB translation table page size */
->>  #define KVM_ITS_L1E_ADDR_MASK		GENMASK_ULL(51, 16)
->>  
->> +bool irq_line_level(struct vgic_irq *irq);
->> +
->>  static inline bool irq_is_pending(struct vgic_irq *irq)
->>  {
->>  	if (irq->config == VGIC_CONFIG_EDGE)
->>  		return irq->pending_latch;
->>  	else
->> -		return irq->pending_latch || irq->line_level;
->> +		return irq->pending_latch || irq_line_level(irq);
+>> +	kvm_debug("%s host_irq=%d vintid=%d\n", __func__, host_irq, vintid);
 > 
-> I'm a bit concerned that an edge interrupt doesn't take the distributor
-> state into account here. Why is that so? Once an SPI is forwarded to a
-> guest, a large part of the edge vs level differences move into the HW,
-> and are not that different anymore from a SW PoV.
+> do you need to check if the vgic is initialized etc. here?
+yes
+> 
+>> +
+>> +	if (!vgic_valid_spi(kvm, vintid))
+>> +		return -EINVAL;
+>> +
+>> +	irq = vgic_get_irq(kvm, NULL, vintid);
+>> +	spin_lock(&irq->irq_lock);
+>> +
+>> +	if (irq->hw) {
+>> +		ret = -EINVAL;
+> 
+> is this because it's already forwarded?  How about EBUSY or EEXIST
+> instead then?
+OK
+> 
+>> +		goto unlock;
+>> +	}
+>> +	vcpu = irq->target_vcpu;
+>> +	if (!vcpu) {
+>> +		ret = -EAGAIN;
+> 
+> what is this case exactly?
+This was discussed previously with Marc
+(https://patchwork.kernel.org/patch/9746841/). In GICv3 case the vcpu
+parameter is not used in irq_set_vcpu_affinity. What this function does
+is tell the GIC not to DIR the physical IRQ.
 
-As mentioned by Christoffer, When a physically mapped edge sensitive
-vSPI is pending (irq->pending_latch set), the physical state can be
-active or pending & active and maybe pending? (if the guest has
-completed the vSPI and we have not folded the LR and a new pSPI
-triggered). That's a real mess. Assuming I propagate the pending latch
-to the pDIST do we really have an issue with state inconsistency?
-
-
-So I would tend to think:
-- I need to fix the issue of ISPENDRn/ICPENDRn and propagate the pending
-state to the pDIST on those guest writes.
-- Then raises the question of the save/restore (uaccess) of a physically
-mapped SPI. I guess we should never try to save/restore state of a
-physically mapped SPI?
-- I need to prevent the lazy disable approach
-
-Thoughts?
+So in my case I just need a non NULL vcpu passed as parameter of
+irq_set_vcpu_affinity. kvm_vgic_map_irq is not using it because we are
+handling SPIs. But in GICv4 the actual target vpcu will be needed so I
+decided to use this latter and return an error in case it is not known.
+> 
+>> +		goto unlock;
+>> +	}
+>> +	
+>> +	ret = kvm_vgic_map_irq(vcpu, irq, host_irq);
+>> +	if (!ret)
+>> +		irq_set_vcpu_affinity(host_irq, vcpu);
+> 
+> so this is essentially map + set_vcpu_affinity.  Why do we want the GIC
+> to do this in one go as opposed to leaving it up to the caller?
+The VGIC code already use some genirq functions like
+irq_set/get_irqchip_state. Using the irq->lock prevents the 2 actions
+from being raced with an kvm_vgic_unset_forwarding(). Both the GIC and
+VGIC programming must be consistent.
 
 Thanks
 
 Eric
 > 
-> Thanks,
+>> +unlock:
+>> +	spin_unlock(&irq->irq_lock);
+>> +	vgic_put_irq(kvm, irq);
+>> +	return ret;
+>> +}
+>> +
+>> +/**
+>> + * kvm_vgic_unset_forwarding - Unset IRQ forwarding
+>> + *
+>> + * @kvm: KVM handle
+>> + * @host_irq: the host Linux IRQ number
+>> + * @vintid: virtual INTID
+>> + *
+>> + * This function must be called when the host irq is disabled and
+>> + * all vCPUs have been exited and prevented from being re-entered.
+>> + */
+>> +void kvm_vgic_unset_forwarding(struct kvm *kvm,
+>> +			       unsigned int host_irq,
+>> +			       unsigned int vintid)
+>> +{
+>> +	struct vgic_irq *irq;
+>> +	bool active;
+>> +
+>> +	kvm_debug("%s host_irq=%d vintid=%d\n", __func__, host_irq, vintid);
 > 
-> 	M.
+> do you need to check if the vgic is initialized etc. here?
+> 
+>> +
+>> +	if (!vgic_valid_spi(kvm, vintid))
+>> +		return;
+>> +
+>> +	irq = vgic_get_irq(kvm, NULL, vintid);
+>> +	spin_lock(&irq->irq_lock);
+>> +
+>> +	if (!irq->hw)
+>> +		goto unlock;
+>> +
+>> +	WARN_ON(irq_get_irqchip_state(host_irq, IRQCHIP_STATE_ACTIVE, &active));
+>> +
+>> +	if (active)
+>> +		irq_set_irqchip_state(host_irq, IRQCHIP_STATE_ACTIVE, false);
+>> +
+>> +	kvm_vgic_unmap_irq(irq);
+>> +	irq_set_vcpu_affinity(host_irq, NULL);
+>> +
+>> +unlock:
+>> +	spin_unlock(&irq->irq_lock);
+>> +	vgic_put_irq(kvm, irq);
+>> +}
+>> +
+>> -- 
+>> 2.5.5
+>>
+> 
+> Thanks,
+> -Christoffer
 > 
