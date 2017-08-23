@@ -1,288 +1,165 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH 13/27] arm64/sve: Signal handling support
-Date: Wed, 23 Aug 2017 12:30:26 +0100
-Message-ID: <20170823113025.GA6321@e103592.cambridge.arm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH 14/27] arm64/sve: Backend logic for setting the vector
+ length
+Date: Wed, 23 Aug 2017 16:33:18 +0100
+Message-ID: <87shgi9u4h.fsf@linaro.org>
 References: <1502280338-23002-1-git-send-email-Dave.Martin@arm.com>
- <1502280338-23002-14-git-send-email-Dave.Martin@arm.com>
- <87y3qaaaj8.fsf@linaro.org>
+ <1502280338-23002-15-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-arch-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <87y3qaaaj8.fsf@linaro.org>
-Sender: linux-arch-owner@vger.kernel.org
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A802349C2E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Aug 2017 11:31:23 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id UsNHEewVJ2pb for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 23 Aug 2017 11:31:22 -0400 (EDT)
+Received: from mail-wr0-f177.google.com (mail-wr0-f177.google.com
+ [209.85.128.177])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0D26340D17
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Aug 2017 11:31:22 -0400 (EDT)
+Received: by mail-wr0-f177.google.com with SMTP id p8so1477463wrf.5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Aug 2017 08:33:20 -0700 (PDT)
+In-reply-to: <1502280338-23002-15-git-send-email-Dave.Martin@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, gdb@sourceware.org, Yao Qi <Yao.Qi@arm.com>, Alan Hayward <alan.hayward@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Aug 23, 2017 at 10:38:51AM +0100, Alex Bennée wrote:
-> 
-> Dave Martin <Dave.Martin@arm.com> writes:
-> 
-> > This patch implements support for saving and restoring the SVE
-> > registers around signals.
-> >
-> > A fixed-size header struct sve_context is always included in the
-> > signal frame encoding the thread's vector length at the time of
-> > signal delivery, optionally followed by a variable-layout structure
-> > encoding the SVE registers.
-> >
-> > Because of the need to preserve backwards compatibility, the FPSIMD
-> > view of the SVE registers is always dumped as a struct
-> > fpsimd_context in the usual way, in addition to any sve_context.
-> >
-> > The SVE vector registers are dumped in full, including bits 127:0
-> > of each register which alias the corresponding FPSIMD vector
-> > registers in the hardware.  To avoid any ambiguity about which
-> > alias to restore during sigreturn, the kernel always restores bits
-> > 127:0 of each SVE vector register from the fpsimd_context in the
-> > signal frame (which must be present): userspace needs to take this
-> > into account if it wants to modify the SVE vector register contents
-> > on return from a signal.
-> >
-> > FPSR and FPCR, which are used by both FPSIMD and SVE, are not
-> > included in sve_context because they are always present in
-> > fpsimd_context anyway.
-> >
-> > For signal delivery, a new helper
-> > fpsimd_signal_preserve_current_state() is added to update _both_
-> > the FPSIMD and SVE views in the task struct, to make it easier to
-> > populate this information into the signal frame.  Because of the
-> > redundancy between the two views of the state, only one is updated
-> > otherwise.  In order to avoid racing with a pending discard of the
-> > SVE state, this flush is hoisted before the sigframe layout phase,
-> > so that the layout and population phases see a consistent view of
-> > the thread.
-> >
-> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> > ---
-
-[...]
-
-> > diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-> > index 80ecb2d..e8674f6 100644
-> > --- a/arch/arm64/kernel/fpsimd.c
-> > +++ b/arch/arm64/kernel/fpsimd.c
-> > @@ -148,8 +148,6 @@ static void change_cpacr(u64 old, u64 new)
-> >  		write_sysreg(new, CPACR_EL1);
-> >  }
-> >
-> > -#ifdef CONFIG_ARM64_SVE
-> > -
-> >  #define ZREG(sve_state, vq, n) ((char *)(sve_state) +		\
-> >  	(SVE_SIG_ZREG_OFFSET(vq, n) - SVE_SIG_REGS_OFFSET))
-> >
-> > @@ -191,6 +189,8 @@ static void fpsimd_to_sve(struct task_struct *task)
-> >  		       sizeof(fst->vregs[i]));
-> >  }
-> >
-> > +#ifdef CONFIG_ARM64_SVE
-> > +
-> 
-> Hmm have sve_to_fpsimd and fpsimd_to_sve only just started being used by
-> the generic code here?
-
-Yes, the signal code now makes use of these via
-fpsimd_signal_preserve_current_state() and
-fpsimd_update_current_state(), with this patch.
-
-[...]
-
-> > diff --git a/arch/arm64/kernel/signal.c b/arch/arm64/kernel/signal.c
-> > index 4991e87..2694143 100644
-> > --- a/arch/arm64/kernel/signal.c
-> > +++ b/arch/arm64/kernel/signal.c
-
-[...]
-
-> > +#ifdef CONFIG_ARM64_SVE
-> > +
-> > +static int preserve_sve_context(struct sve_context __user *ctx)
-> > +{
-> > +	int err = 0;
-> > +	u16 reserved[ARRAY_SIZE(ctx->__reserved)];
-> > +	unsigned int vl = current->thread.sve_vl;
-> > +	unsigned int vq = 0;
-> > +
-> > +	BUG_ON(!sve_vl_valid(vl));
-> > +	if (test_thread_flag(TIF_SVE))
-> > +		vq = sve_vq_from_vl(vl);
-> > +
-> > +	memset(reserved, 0, sizeof(reserved));
-> > +
-> > +	__put_user_error(SVE_MAGIC, &ctx->head.magic, err);
-> > +	__put_user_error(round_up(SVE_SIG_CONTEXT_SIZE(vq), 16),
-> > +			 &ctx->head.size, err);
-> > +	__put_user_error(vl, &ctx->vl, err);
-> > +	BUILD_BUG_ON(sizeof(ctx->__reserved) != sizeof(reserved));
-> > +	err |= copy_to_user(&ctx->__reserved, reserved, sizeof(reserved));
-> > +
-> > +	if (vq) {
-> > +		/*
-> > +		 * This assumes that the SVE state has already been saved to
-> > +		 * the task struct by calling preserve_fpsimd_context().
-> > +		 */
-> > +		BUG_ON(SVE_SIG_REGS_SIZE(vq) !=
-> > sve_state_size(current));
-> 
-> I think others have mentioned the excessive BUG_ON()s here but I think
-> you are planning on cleaning some up on the next version. Assuming
-> sve_vq_from_vl() can't give you an invalid answer from a
-> sve_vl_valid(vl) then I wouldn't expect this test to add much.
-
-Agreed.  Some BUG_ON()s test for things that are now obviously true
-by construction, which was not initially the case during development.
-This one can go away.
-
-I'm very interested in any BUG_ON() that you think can actually fire.
-There _shouldn't_ be any of those, but the reasons are non-trivial in
-some cases.
-
-> > +		err |= copy_to_user((char __user *)ctx + SVE_SIG_REGS_OFFSET,
-> > +				    current->thread.sve_state,
-> > +				    SVE_SIG_REGS_SIZE(vq));
-> > +	}
-> > +
-> > +	return err ? -EFAULT : 0;
-> > +}
-> > +
-> > +static int restore_sve_fpsimd_context(struct user_ctxs *user)
-> > +{
-> > +	int err;
-> > +	unsigned int vq;
-> > +	struct fpsimd_state fpsimd;
-> > +	struct sve_context sve;
-> > +
-> > +	if (__copy_from_user(&sve, user->sve, sizeof(sve)))
-> > +		return -EFAULT;
-> > +
-> > +	if (sve.vl != current->thread.sve_vl)
-> > +		return -EINVAL;
-> > +
-> > +	if (sve.head.size <= sizeof(*user->sve)) {
-> > +		clear_thread_flag(TIF_SVE);
-> > +		goto fpsimd_only;
-> > +	}
-> > +
-> > +	BUG_ON(!sve_vl_valid(sve.vl));
-> > +	vq = sve_vq_from_vl(sve.vl);
-> > +
-> > +	if (sve.head.size < SVE_SIG_CONTEXT_SIZE(vq))
-> > +		return -EINVAL;
-> > +
-> > +	fpsimd_flush_task_state(current);
-> > +	barrier();
-> > +	set_thread_flag(TIF_FOREIGN_FPSTATE);
-> > +	barrier();
-> 
-> What are you trying to achieve with barriers here? Is there a potential
-> interaction between flushing the state and setting the flag that the
-> compiler can't see? A comment should be added at least.
-
-This is a tricky one -- I suppose I should definitely add comments,
-since it took me 2-3 weeks to debug this and get it right the first time
-around...
-
-I'm trying to protect against a context switch during the copy_from_user
-rewriting stale register data over the data we're copying from the user
-signal frame.
-
-In most places, I now disable preemption when writing into thread_struct,
-to keep this can of worms firmly closed.
-
-Here though, the code writes directly into thread_struct with
-preemption enabled: in this one case the copy is a copy_from_user(),
-and we can't disable preemption for that.  Other than this, the reasons
-for this code being the way it is derive from Ard's deferred fpsimd
-reload machinery (the TIF_FOREIGN_FPSTATE stuff), which is described in
-more detail in fpsimd.c.
-
-
-The reason for the difference from the old fpsimd code here is that the
-SVE state may be unreasonably large to bounce via a buffer on the stack,
-and the copy-in occurs while the thread is running.  In the ptrace case
-(later on) the thread is guaranteed stopped, whereas for fpsimd the
-state is small enough that we _can_ bounce it via the stack.
-
-TIF_FOREIGN_FPSTATE may be cleared by the context switch code, but only
-if fpsimd_flush_task_state() wasn't called since the last kernel entry
-for current.  (See fpsimd_thread_switch().)
-
-The context switch code may write the CPU registers over thread_struct,
-but only if TIF_FOREIGN_FPSTATE is not set at sched-out time.
-(fpsimd_thread_switch() again).
-
-These dependencies are strictly intra-thread, since context-switch is
-part of the same thread, so
-
-	fpsimd_flush_task_state();
-	barrier();
-	set_thread_flag(TIF_FOREIGN_FPSTATE);
-	barrier();
-	copy_from_user(current->thread.sve_state, ...);
-
-should be sufficient.
-
-I prefer to avoid spuriously saving the SVE regs into thread_struct
-when they may not already be live, so I don't set TIF_SVE until after
-TIF_FOREIGN_FPSTATE is set.  (This is a cost saving rather than a
-security issue -- only current's state can be in the registers, but the
-extra SVE bits are definitely not worth saving.  In any case, it only
-makes a difference to context switches in this narrow window.)
-
-> > +
-> > +	sve_alloc(current);
-> > +	BUG_ON(SVE_SIG_REGS_SIZE(vq) != sve_state_size(current));
-> > +	err = __copy_from_user(current->thread.sve_state,
-> > +			       (char __user const *)user->sve +
-> > +					SVE_SIG_REGS_OFFSET,
-> > +			       SVE_SIG_REGS_SIZE(vq));
-> > +	if (err)
-> > +		return err;
-> > +
-> > +	barrier();
-> > +	set_thread_flag(TIF_SVE);
-> 
-> Hmm and again. If this is about visibility of context when the thread
-> flag is read by other CPUs a barrier() on it's own is not enough as it
-> only stop local code re-organisation - do you actually mean smp_mb()?
-> 
-> Either way you need to document the potential race in a comment so the
-> reason can be understood.
-
-The final barrier() isn't really needed, and the ordering of TIF_SVE
-with the copy_from_user is unimportant unless I've missed something ...
-so I may get rid of that.  TIF_SVE would affect context switch, but
-only if TIF_FOREIGN_FPSTATE is clear or a ret_to_user occurs, neither
-of which is possible after the second barrier().
-
-
-Re smp_mb(), the only cross-thread ordering guarantees needed are for
-ptrace (later in the series), since that runs in some thread operating
-on a stopped thread that may have last run on some other CPU.  But this
-is a general ptrace issue, not specifically related to SVE.  IIRC some
-interaction between the ptrace core code and the scheduler's
-manipulation of the task state and runqueue locks ensures safety in
-that case without need for extra smp_mb() all over the place.
-
-> > +
-> > +fpsimd_only:
-> > +	/* copy the FP and status/control registers */
-> > +	/* restore_sigframe() already checked that user->fpsimd != NULL. */
-> > +	err = __copy_from_user(fpsimd.vregs, user->fpsimd->vregs,
-> > +			       sizeof(fpsimd.vregs));
-> > +	__get_user_error(fpsimd.fpsr, &user->fpsimd->fpsr, err);
-> > +	__get_user_error(fpsimd.fpcr, &user->fpsimd->fpcr, err);
-> > +
-> > +	/* load the hardware registers from the fpsimd_state structure */
-> > +	if (!err)
-> > +		fpsimd_update_current_state(&fpsimd);
-> > +
-> > +	return err;
-> > +}
-
-[...]
-
-Cheers
----Dave
+CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo+IFRoaXMgcGF0Y2gg
+aW1wbGVtZW50cyB0aGUgY29yZSBsb2dpYyBmb3IgY2hhbmdpbmcgYSB0YXNrJ3MgdmVjdG9yCj4g
+bGVuZ3RoIG9uIHJlcXVlc3QgZnJvbSB1c2Vyc3BhY2UuICBUaGlzIHdpbGwgYmUgdXNlZCBieSB0
+aGUgcHRyYWNlCj4gYW5kIHByY3RsIGZyb250ZW5kcyB0aGF0IGFyZSBpbXBsZW1lbnRlZCBpbiBs
+YXRlciBwYXRjaGVzLgo+Cj4gVGhlIFNWRSBhcmNoaXRlY3R1cmUgcGVybWl0cywgYnV0IGRvZXMg
+bm90IHJlcXVpcmUsIGltcGxlbWVudGF0aW9ucwo+IHRvIHN1cHBvcnQgdmVjdG9yIGxlbmd0aHMg
+dGhhdCBhcmUgbm90IGEgcG93ZXIgb2YgdHdvLiAgVG8gaGFuZGxlCj4gdGhpcywgbG9naWMgaXMg
+YWRkZWQgdG8gY2hlY2sgYSByZXF1ZXN0ZWQgdmVjdG9yIGxlbmd0aCBhZ2FpbnN0IGEKPiBwb3Nz
+aWJseSBzcGFyc2UgYml0bWFwIG9mIGF2YWlsYWJsZSB2ZWN0b3IgbGVuZ3RocyBhdCBydW50aW1l
+LCBzbwo+IHRoYXQgdGhlIGJlc3Qgc3VwcG9ydGVkIHZhbHVlIGNhbiBiZSBjaG9zZW4uCj4KPiBT
+aWduZWQtb2ZmLWJ5OiBEYXZlIE1hcnRpbiA8RGF2ZS5NYXJ0aW5AYXJtLmNvbT4KPiAtLS0KPiAg
+YXJjaC9hcm02NC9pbmNsdWRlL2FzbS9mcHNpbWQuaCB8ICAgNiArKysKPiAgYXJjaC9hcm02NC9r
+ZXJuZWwvZnBzaW1kLmMgICAgICB8IDExNiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrCj4gIGluY2x1ZGUvdWFwaS9saW51eC9wcmN0bC5oICAgICAgfCAgIDUgKysKPiAg
+MyBmaWxlcyBjaGFuZ2VkLCAxMjcgaW5zZXJ0aW9ucygrKQo+Cj4gZGlmZiAtLWdpdCBhL2FyY2gv
+YXJtNjQvaW5jbHVkZS9hc20vZnBzaW1kLmggYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2Zwc2lt
+ZC5oCj4gaW5kZXggN2VmZDA0ZS4uMzliMjZkMiAxMDA2NDQKPiAtLS0gYS9hcmNoL2FybTY0L2lu
+Y2x1ZGUvYXNtL2Zwc2ltZC5oCj4gKysrIGIvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9mcHNpbWQu
+aAo+IEBAIC03MCwxMSArNzAsMTUgQEAgZXh0ZXJuIHZvaWQgZnBzaW1kX3VwZGF0ZV9jdXJyZW50
+X3N0YXRlKHN0cnVjdCBmcHNpbWRfc3RhdGUgKnN0YXRlKTsKPgo+ICBleHRlcm4gdm9pZCBmcHNp
+bWRfZmx1c2hfdGFza19zdGF0ZShzdHJ1Y3QgdGFza19zdHJ1Y3QgKnRhcmdldCk7Cj4KPiArI2Rl
+ZmluZSBTVkVfVkxfQVJDSF9NQVggMHgxMDAKPiArCgpIbW0gdGhpcyBpc24ndCB0aGUgc2FtZSBh
+cyBTVkVfVkxfTUFYLiBXaHkgYXJlbid0IHdlIHVzaW5nIHRoYXQ/Cgo+ICBleHRlcm4gdm9pZCBz
+dmVfc2F2ZV9zdGF0ZSh2b2lkICpzdGF0ZSwgdTMyICpwZnBzcik7Cj4gIGV4dGVybiB2b2lkIHN2
+ZV9sb2FkX3N0YXRlKHZvaWQgY29uc3QgKnN0YXRlLCB1MzIgY29uc3QgKnBmcHNyLAo+ICAJCQkg
+ICB1bnNpZ25lZCBsb25nIHZxX21pbnVzXzEpOwo+ICBleHRlcm4gdW5zaWduZWQgaW50IHN2ZV9n
+ZXRfdmwodm9pZCk7Cj4KPiArZXh0ZXJuIGludCBzdmVfbWF4X3ZsOwo+ICsKPiAgI2lmZGVmIENP
+TkZJR19BUk02NF9TVkUKPgo+ICBleHRlcm4gc2l6ZV90IHN2ZV9zdGF0ZV9zaXplKHN0cnVjdCB0
+YXNrX3N0cnVjdCBjb25zdCAqdGFzayk7Cj4gQEAgLTgzLDYgKzg3LDggQEAgZXh0ZXJuIHZvaWQg
+c3ZlX2FsbG9jKHN0cnVjdCB0YXNrX3N0cnVjdCAqdGFzayk7Cj4gIGV4dGVybiB2b2lkIGZwc2lt
+ZF9yZWxlYXNlX3RocmVhZChzdHJ1Y3QgdGFza19zdHJ1Y3QgKnRhc2spOwo+ICBleHRlcm4gdm9p
+ZCBmcHNpbWRfZHVwX3N2ZShzdHJ1Y3QgdGFza19zdHJ1Y3QgKmRzdCwKPiAgCQkJICAgc3RydWN0
+IHRhc2tfc3RydWN0IGNvbnN0ICpzcmMpOwo+ICtleHRlcm4gaW50IHN2ZV9zZXRfdmVjdG9yX2xl
+bmd0aChzdHJ1Y3QgdGFza19zdHJ1Y3QgKnRhc2ssCj4gKwkJCQkgdW5zaWduZWQgbG9uZyB2bCwg
+dW5zaWduZWQgbG9uZyBmbGFncyk7Cj4KPiAgI2Vsc2UgLyogISBDT05GSUdfQVJNNjRfU1ZFICov
+Cj4KPiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rZXJuZWwvZnBzaW1kLmMgYi9hcmNoL2FybTY0
+L2tlcm5lbC9mcHNpbWQuYwo+IGluZGV4IGU4Njc0ZjYuLmJjZTk1ZGUgMTAwNjQ0Cj4gLS0tIGEv
+YXJjaC9hcm02NC9rZXJuZWwvZnBzaW1kLmMKPiArKysgYi9hcmNoL2FybTY0L2tlcm5lbC9mcHNp
+bWQuYwo+IEBAIC0xOCwxMiArMTgsMTQgQEAKPiAgICovCj4KPiAgI2luY2x1ZGUgPGxpbnV4L2Jv
+dHRvbV9oYWxmLmg+Cj4gKyNpbmNsdWRlIDxsaW51eC9iaXRtYXAuaD4KPiAgI2luY2x1ZGUgPGxp
+bnV4L2NwdS5oPgo+ICAjaW5jbHVkZSA8bGludXgvY3B1X3BtLmg+Cj4gICNpbmNsdWRlIDxsaW51
+eC9rZXJuZWwuaD4KPiAgI2luY2x1ZGUgPGxpbnV4L2luaXQuaD4KPiAgI2luY2x1ZGUgPGxpbnV4
+L3BlcmNwdS5oPgo+ICAjaW5jbHVkZSA8bGludXgvcHJlZW1wdC5oPgo+ICsjaW5jbHVkZSA8bGlu
+dXgvcHJjdGwuaD4KPiAgI2luY2x1ZGUgPGxpbnV4L3B0cmFjZS5oPgo+ICAjaW5jbHVkZSA8bGlu
+dXgvc2NoZWQvc2lnbmFsLmg+Cj4gICNpbmNsdWRlIDxsaW51eC9zaWduYWwuaD4KPiBAQCAtMTEx
+LDYgKzExMywyMCBAQCBzdGF0aWMgREVGSU5FX1BFUl9DUFUoc3RydWN0IGZwc2ltZF9zdGF0ZSAq
+LCBmcHNpbWRfbGFzdF9zdGF0ZSk7Cj4gIC8qIERlZmF1bHQgVkwgZm9yIHRhc2tzIHRoYXQgZG9u
+J3Qgc2V0IGl0IGV4cGxpY2l0bHk6ICovCj4gIHN0YXRpYyBpbnQgc3ZlX2RlZmF1bHRfdmwgPSAt
+MTsKPgo+ICsjaWZkZWYgQ09ORklHX0FSTTY0X1NWRQo+ICsKPiArLyogTWF4aW11bSBzdXBwb3J0
+ZWQgdmVjdG9yIGxlbmd0aCBhY3Jvc3MgYWxsIENQVXMgKGluaXRpYWxseSBwb2lzb25lZCkgKi8K
+PiAraW50IHN2ZV9tYXhfdmwgPSAtMTsKPiArLyogU2V0IG9mIGF2YWlsYWJsZSB2ZWN0b3IgbGVu
+Z3RocywgYXMgdnFfdG9fYml0KHZxKTogKi8KPiArc3RhdGljIERFQ0xBUkVfQklUTUFQKHN2ZV92
+cV9tYXAsIFNWRV9WUV9NQVgpOwo+ICsKPiArI2Vsc2UgLyogISBDT05GSUdfQVJNNjRfU1ZFICov
+Cj4gKwo+ICsvKiBEdW1teSBkZWNsYXJhdGlvbiBmb3IgY29kZSB0aGF0IHdpbGwgYmUgb3B0aW1p
+c2VkIG91dDogKi8KPiArZXh0ZXJuIERFQ0xBUkVfQklUTUFQKHN2ZV92cV9tYXAsIFNWRV9WUV9N
+QVgpOwo+ICsKPiArI2VuZGlmIC8qICEgQ09ORklHX0FSTTY0X1NWRSAqLwo+ICsKPiAgc3RhdGlj
+IHZvaWQgc3ZlX2ZyZWUoc3RydWN0IHRhc2tfc3RydWN0ICp0YXNrKQo+ICB7Cj4gIAlrZnJlZSh0
+YXNrLT50aHJlYWQuc3ZlX3N0YXRlKTsKPiBAQCAtMTQ4LDYgKzE2NCwzNyBAQCBzdGF0aWMgdm9p
+ZCBjaGFuZ2VfY3BhY3IodTY0IG9sZCwgdTY0IG5ldykKPiAgCQl3cml0ZV9zeXNyZWcobmV3LCBD
+UEFDUl9FTDEpOwo+ICB9Cj4KPiArc3RhdGljIHVuc2lnbmVkIGludCB2cV90b19iaXQodW5zaWdu
+ZWQgaW50IHZxKQo+ICt7Cj4gKwlCVUlMRF9CVUdfT04odnEgPCAxIHx8IHZxID4gU1ZFX1ZRX01B
+WCk7Cj4gKwo+ICsJcmV0dXJuIFNWRV9WUV9NQVggLSB2cTsKPiArfQo+ICsKPiArc3RhdGljIHVu
+c2lnbmVkIGludCBiaXRfdG9fdnEodW5zaWduZWQgaW50IGJpdCkKPiArewo+ICsJQlVJTERfQlVH
+X09OKGJpdCA+PSBTVkVfVlFfTUFYKTsKPiArCj4gKwlyZXR1cm4gU1ZFX1ZRX01BWCAtIGJpdDsK
+PiArfQo+ICsKPiArc3RhdGljIHVuc2lnbmVkIGludCBmaW5kX3N1cHBvcnRlZF92ZWN0b3JfbGVu
+Z3RoKHVuc2lnbmVkIGludCB2bCkKPiArewo+ICsJaW50IGJpdDsKPiArCj4gKwlCVUdfT04oIXN2
+ZV92bF92YWxpZCh2bCkpOwo+ICsKPiArCUJVR19PTighc3ZlX3ZsX3ZhbGlkKHN2ZV9tYXhfdmwp
+KTsKPiArCWlmICh2bCA+IHN2ZV9tYXhfdmwpCj4gKwkJdmwgPSBzdmVfbWF4X3ZsOwo+ICsKPiAr
+CWJpdCA9IGZpbmRfbmV4dF9iaXQoc3ZlX3ZxX21hcCwgU1ZFX1ZRX01BWCwKPiArCQkJICAgIHZx
+X3RvX2JpdChzdmVfdnFfZnJvbV92bCh2bCkpKTsKPiArCUJVR19PTihiaXQgPCAwIHx8IGJpdCA+
+PSBTVkVfVlFfTUFYKTsKPiArCj4gKwlyZXR1cm4gMTYgKiBiaXRfdG9fdnEoYml0KTsKPiArfQo+
+ICsKPiAgI2RlZmluZSBaUkVHKHN2ZV9zdGF0ZSwgdnEsIG4pICgoY2hhciAqKShzdmVfc3RhdGUp
+ICsJCVwKPiAgCShTVkVfU0lHX1pSRUdfT0ZGU0VUKHZxLCBuKSAtIFNWRV9TSUdfUkVHU19PRkZT
+RVQpKQo+Cj4gQEAgLTIzNSw2ICsyODIsNzMgQEAgdm9pZCBmcHNpbWRfZHVwX3N2ZShzdHJ1Y3Qg
+dGFza19zdHJ1Y3QgKmRzdCwgc3RydWN0IHRhc2tfc3RydWN0IGNvbnN0ICpzcmMpCj4gIAl9Cj4g
+IH0KPgo+ICtpbnQgc3ZlX3NldF92ZWN0b3JfbGVuZ3RoKHN0cnVjdCB0YXNrX3N0cnVjdCAqdGFz
+aywKPiArCQkJICB1bnNpZ25lZCBsb25nIHZsLCB1bnNpZ25lZCBsb25nIGZsYWdzKQo+ICt7Cj4g
+KwlCVUdfT04odGFzayA9PSBjdXJyZW50ICYmIHByZWVtcHRpYmxlKCkpOwo+ICsKPiArCWlmIChm
+bGFncyAmIH4odW5zaWduZWQgbG9uZykoUFJfU1ZFX1ZMX0lOSEVSSVQgfAo+ICsJCQkJICAgICBQ
+Ul9TVkVfU0VUX1ZMX09ORVhFQykpCj4gKwkJcmV0dXJuIC1FSU5WQUw7Cj4gKwo+ICsJaWYgKCFz
+dmVfdmxfdmFsaWQodmwpKQo+ICsJCXJldHVybiAtRUlOVkFMOwo+ICsKPiArCS8qCj4gKwkgKiBD
+bGFtcCB0byB0aGUgbWF4aW11bSB2ZWN0b3IgbGVuZ3RoIHRoYXQgVkwtYWdub3N0aWMgU1ZFIGNv
+ZGUgY2FuCj4gKwkgKiB3b3JrIHdpdGguICBBIGZsYWcgbWF5IGJlIGFzc2lnbmVkIGluIHRoZSBm
+dXR1cmUgdG8gYWxsb3cgc2V0dGluZwo+ICsJICogb2YgbGFyZ2VyIHZlY3RvciBsZW5ndGhzIHdp
+dGhvdXQgY29uZnVzaW5nIG9sZGVyIHNvZnR3YXJlLgo+ICsJICovCj4gKwlpZiAodmwgPiBTVkVf
+VkxfQVJDSF9NQVgpCj4gKwkJdmwgPSBTVkVfVkxfQVJDSF9NQVg7Cj4gKwo+ICsJdmwgPSBmaW5k
+X3N1cHBvcnRlZF92ZWN0b3JfbGVuZ3RoKHZsKTsKPiArCj4gKwlpZiAoZmxhZ3MgJiAoUFJfU1ZF
+X1ZMX0lOSEVSSVQgfAo+ICsJCSAgICAgUFJfU1ZFX1NFVF9WTF9PTkVYRUMpKQo+ICsJCXRhc2st
+PnRocmVhZC5zdmVfdmxfb25leGVjID0gdmw7Cj4gKwllbHNlCj4gKwkJLyogUmVzZXQgVkwgdG8g
+c3lzdGVtIGRlZmF1bHQgb24gbmV4dCBleGVjOiAqLwo+ICsJCXRhc2stPnRocmVhZC5zdmVfdmxf
+b25leGVjID0gMDsKPiArCj4gKwkvKiBPbmx5IGFjdHVhbGx5IHNldCB0aGUgVkwgaWYgbm90IGRl
+ZmVycmVkOiAqLwo+ICsJaWYgKGZsYWdzICYgUFJfU1ZFX1NFVF9WTF9PTkVYRUMpCj4gKwkJZ290
+byBvdXQ7Cj4gKwo+ICsJLyoKPiArCSAqIFRvIGVuc3VyZSB0aGUgRlBTSU1EIGJpdHMgb2YgdGhl
+IFNWRSB2ZWN0b3IgcmVnaXN0ZXJzIGFyZSBwcmVzZXJ2ZWQsCj4gKwkgKiB3cml0ZSBhbnkgbGl2
+ZSByZWdpc3RlciBzdGF0ZSBiYWNrIHRvIHRhc2tfc3RydWN0LCBhbmQgY29udmVydCB0byBhCj4g
+KwkgKiBub24tU1ZFIHRocmVhZC4KPiArCSAqLwo+ICsJaWYgKHZsICE9IHRhc2stPnRocmVhZC5z
+dmVfdmwpIHsKPiArCQlpZiAodGFzayA9PSBjdXJyZW50KSB7Cj4gKwkJCXRhc2tfZnBzaW1kX3Nh
+dmUoKTsKPiArCQkJc2V0X3RocmVhZF9mbGFnKFRJRl9GT1JFSUdOX0ZQU1RBVEUpOwo+ICsJCX0K
+PiArCj4gKwkJaWYgKHRlc3RfYW5kX2NsZWFyX3Rza190aHJlYWRfZmxhZyh0YXNrLCBUSUZfU1ZF
+KSkKPiArCQkJc3ZlX3RvX2Zwc2ltZCh0YXNrKTsKPiArCj4gKwkJLyoKPiArCQkgKiBGb3JjZSBy
+ZWFsbG9jYXRpb24gb2YgdGFzayBTVkUgc3RhdGUgdG8gdGhlIGNvcnJlY3Qgc2l6ZQo+ICsJCSAq
+IG9uIG5leHQgdXNlOgo+ICsJCSAqLwo+ICsJCXN2ZV9mcmVlKHRhc2spOwo+ICsJfQo+ICsKPiAr
+CXRhc2stPnRocmVhZC5zdmVfdmwgPSB2bDsKPiArCj4gKwlmcHNpbWRfZmx1c2hfdGFza19zdGF0
+ZSh0YXNrKTsKPiArCj4gK291dDoKPiArCWlmIChmbGFncyAmIFBSX1NWRV9WTF9JTkhFUklUKQo+
+ICsJCXNldF90aHJlYWRfZmxhZyhUSUZfU1ZFX1ZMX0lOSEVSSVQpOwo+ICsJZWxzZQo+ICsJCWNs
+ZWFyX3RocmVhZF9mbGFnKFRJRl9TVkVfVkxfSU5IRVJJVCk7Cj4gKwo+ICsJcmV0dXJuIDA7Cj4g
+K30KPiArCj4gIHZvaWQgZnBzaW1kX3JlbGVhc2VfdGhyZWFkKHN0cnVjdCB0YXNrX3N0cnVjdCAq
+ZGVhZF90YXNrKQo+ICB7Cj4gIAlzdmVfZnJlZShkZWFkX3Rhc2spOwo+IEBAIC00MDcsNiArNTIx
+LDggQEAgdm9pZCBmcHNpbWRfZmx1c2hfdGhyZWFkKHZvaWQpCj4gIAkJICogSWYgbm90LCBzb21l
+dGhpbmcgd2VudCBiYWRseSB3cm9uZy4KPiAgCQkgKi8KPiAgCQlCVUdfT04oIXN2ZV92bF92YWxp
+ZChjdXJyZW50LT50aHJlYWQuc3ZlX3ZsKSk7Cj4gKwkJQlVHX09OKGZpbmRfc3VwcG9ydGVkX3Zl
+Y3Rvcl9sZW5ndGgoY3VycmVudC0+dGhyZWFkLnN2ZV92bCkgIT0KPiArCQkgICAgICAgY3VycmVu
+dC0+dGhyZWFkLnN2ZV92bCk7Cj4KPiAgCQkvKgo+ICAJCSAqIElmIHRoZSB0YXNrIGlzIG5vdCBz
+ZXQgdG8gaW5oZXJpdCwgZW5zdXJlIHRoYXQgdGhlIHZlY3Rvcgo+IGRpZmYgLS1naXQgYS9pbmNs
+dWRlL3VhcGkvbGludXgvcHJjdGwuaCBiL2luY2x1ZGUvdWFwaS9saW51eC9wcmN0bC5oCj4gaW5k
+ZXggYThkMDc1OS4uMWI2NDkwMSAxMDA2NDQKPiAtLS0gYS9pbmNsdWRlL3VhcGkvbGludXgvcHJj
+dGwuaAo+ICsrKyBiL2luY2x1ZGUvdWFwaS9saW51eC9wcmN0bC5oCj4gQEAgLTE5Nyw0ICsxOTcs
+OSBAQCBzdHJ1Y3QgcHJjdGxfbW1fbWFwIHsKPiAgIyBkZWZpbmUgUFJfQ0FQX0FNQklFTlRfTE9X
+RVIJCTMKPiAgIyBkZWZpbmUgUFJfQ0FQX0FNQklFTlRfQ0xFQVJfQUxMCTQKPgo+ICsvKiBhcm02
+NCBTY2FsYWJsZSBWZWN0b3IgRXh0ZW5zaW9uIGNvbnRyb2xzICovCj4gKyMgZGVmaW5lIFBSX1NW
+RV9TRVRfVkxfT05FWEVDCQkoMSA8PCAxOCkgLyogZGVmZXIgZWZmZWN0IHVudGlsIGV4ZWMgKi8K
+PiArIyBkZWZpbmUgUFJfU1ZFX1ZMX0xFTl9NQVNLCQkweGZmZmYKPiArIyBkZWZpbmUgUFJfU1ZF
+X1ZMX0lOSEVSSVQJCSgxIDw8IDE3KSAvKiBpbmhlcml0IGFjcm9zcyBleGVjICovCj4gKwo+ICAj
+ZW5kaWYgLyogX0xJTlVYX1BSQ1RMX0ggKi8KCgotLQpBbGV4IEJlbm7DqWUKX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdApr
+dm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1
+L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
