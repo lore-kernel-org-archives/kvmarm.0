@@ -1,79 +1,124 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH 11/27] arm64/sve: Core task context handling
-Date: Tue, 22 Aug 2017 19:39:48 +0100
-Message-ID: <87ziara1l7.fsf@linaro.org>
-References: <1502280338-23002-1-git-send-email-Dave.Martin@arm.com> <1502280338-23002-12-git-send-email-Dave.Martin@arm.com> <87378jbmkg.fsf@linaro.org> <20170822171959.GX6321@e103592.cambridge.arm.com>
+From: wanghaibin <wanghaibin.wang@huawei.com>
+Subject: [PATCH v3 1/4] kvm: arm/arm64: vgic: Implement the vGICv2 GICC_APRn
+ uaccess interface.
+Date: Wed, 23 Aug 2017 09:05:23 +0800
+Message-ID: <1503450326-10624-2-git-send-email-wanghaibin.wang@huawei.com>
+References: <1503450326-10624-1-git-send-email-wanghaibin.wang@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-arch-owner@vger.kernel.org>
-In-reply-to: <20170822171959.GX6321@e103592.cambridge.arm.com>
-Sender: linux-arch-owner@vger.kernel.org
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B10A140D6B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Aug 2017 21:03:47 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id z8vS6N+9noAn for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Aug 2017 21:03:46 -0400 (EDT)
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EFE1740C5A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Aug 2017 21:03:45 -0400 (EDT)
+In-Reply-To: <1503450326-10624-1-git-send-email-wanghaibin.wang@huawei.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: cdall@linaro.org, marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu
+Cc: wu.wubin@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
+The SPEC defined GICC_APR<n> (n = 0-3, 32-bit per register) to provide
+information about interrupt active priorities for GICv2, and the user
+access will traverse all of these registers no matter how many
+priority levels we supported.
 
-Dave Martin <Dave.Martin@arm.com> writes:
+So we have to implement the uaccess interface cover all of these registers.
 
-> On Tue, Aug 22, 2017 at 05:21:19PM +0100, Alex Bennée wrote:
->>
->> Dave Martin <Dave.Martin@arm.com> writes:
->
-> [...]
->
->> > --- a/arch/arm64/include/asm/processor.h
->> > +++ b/arch/arm64/include/asm/processor.h
->> > @@ -85,6 +85,8 @@ struct thread_struct {
->> >  	unsigned long		tp2_value;
->> >  #endif
->> >  	struct fpsimd_state	fpsimd_state;
->> > +	void			*sve_state;	/* SVE registers, if any */
->> > +	u16			sve_vl;		/* SVE vector length */
->>
->> sve_vl is implicitly cast to unsigned int bellow - it should be
->> consistent.
->
-> Agreed -- I think this can just be unsigned int here, which is the type
-> I use everywhere except when encoding the vector length in the signal
-> frame and ptrace data.
->
-> During development, there was an additional flags field here (now
-> merged into the thread_info flags).  u16 was big enough for the largest
-> architectural vector length, so it seemed "tidy" to make both u16s.
-> Elsewhere, this created a risk of overflow if you try to compute say
-> the size of the whole register file from a u16, so I generally used
-> unsigned int for local variables in functions that handle the vl.
->
->> Given the allocation functions rely on sve_vl being valid it might be
->> worth noting where this is set/live from?
->
-> Agreed, I need to look more closely at exactly how to justify the
-> soundness of this in order to thin out BUG_ONs.
->
-> If you need any pointers, please ping me.  In the meantime, I would
-> rather not colour your judgement by infecting you with my assumptions ;)
->
->> >  	unsigned long		fault_address;	/* fault info */
->> >  	unsigned long		fault_code;	/* ESR_EL1 value */
->> >  	struct debug_info	debug;		/* debugging */
->> > diff --git a/arch/arm64/include/asm/thread_info.h b/arch/arm64/include/asm/thread_info.h
->> > index 46c3b93..1a4b30b 100644
->> > --- a/arch/arm64/include/asm/thread_info.h
->> > +++ b/arch/arm64/include/asm/thread_info.h
->> <snip>
->>
->> And I see there are other comments from Ard.
->
-> Yup, I've already picked those up.
->
-> I'll be posting a v2 with feedback applied once I've reviewed the
-> existing BUG_ON()s -- should happen sometime this week.
+Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
+---
+ virt/kvm/arm/vgic/vgic-mmio-v2.c | 22 ++++++++++++++++++++--
+ virt/kvm/arm/vgic/vgic-mmio.c    |  9 +++++++++
+ virt/kvm/arm/vgic/vgic.h         |  3 +++
+ 3 files changed, 32 insertions(+), 2 deletions(-)
 
-We shall see how far I get tomorrow - you won't get any more from me
-after that until I get back from holiday so don't delay v2 on my account
-;-)
-
->
-> Cheers
-> ---Dave
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+index 37522e6..2c1297c 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+@@ -303,6 +303,23 @@ static void vgic_mmio_write_vcpuif(struct kvm_vcpu *vcpu,
+ 	vgic_set_vmcr(vcpu, &vmcr);
+ }
+ 
++static unsigned long vgic_v2_uaccess_read_activeprio(struct kvm_vcpu *vcpu,
++						     gpa_t addr, unsigned int len)
++{
++	u32 idx = (addr & 0x0c) / sizeof(u32);
++
++	return vgic_get_apr(vcpu, idx);
++}
++
++static void vgic_v2_uaccess_write_activeprio(struct kvm_vcpu *vcpu,
++					     gpa_t addr, unsigned int len,
++					     unsigned long val)
++{
++       u32 idx = (addr & 0x0c) / sizeof(u32);
++
++       return vgic_set_apr(vcpu, idx, val);
++}
++
+ static const struct vgic_register_region vgic_v2_dist_registers[] = {
+ 	REGISTER_DESC_WITH_LENGTH(GIC_DIST_CTRL,
+ 		vgic_mmio_read_v2_misc, vgic_mmio_write_v2_misc, 12,
+@@ -363,8 +380,9 @@ static void vgic_mmio_write_vcpuif(struct kvm_vcpu *vcpu,
+ 	REGISTER_DESC_WITH_LENGTH(GIC_CPU_ALIAS_BINPOINT,
+ 		vgic_mmio_read_vcpuif, vgic_mmio_write_vcpuif, 4,
+ 		VGIC_ACCESS_32bit),
+-	REGISTER_DESC_WITH_LENGTH(GIC_CPU_ACTIVEPRIO,
+-		vgic_mmio_read_raz, vgic_mmio_write_wi, 16,
++	REGISTER_DESC_WITH_LENGTH_UACCESS(GIC_CPU_ACTIVEPRIO,
++		vgic_mmio_read_raz, vgic_mmio_write_wi,
++		vgic_v2_uaccess_read_activeprio, vgic_v2_uaccess_write_activeprio, 16,
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_LENGTH(GIC_CPU_IDENT,
+ 		vgic_mmio_read_vcpuif, vgic_mmio_write_vcpuif, 4,
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+index c1e4bdd..fdf9804 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.c
++++ b/virt/kvm/arm/vgic/vgic-mmio.c
+@@ -492,6 +492,15 @@ static int match_region(const void *key, const void *elt)
+ 		       sizeof(regions[0]), match_region);
+ }
+ 
++void vgic_set_apr(struct kvm_vcpu *vcpu, u32 idx, u32 val)
++{
++}
++
++u32 vgic_get_apr(struct kvm_vcpu *vcpu, u32 idx)
++{
++	return 0;
++}
++
+ void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
+ {
+ 	if (kvm_vgic_global_state.type == VGIC_V2)
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index bba7fa2..c2be5b7 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -209,6 +209,9 @@ int vgic_v3_has_cpu_sysregs_attr(struct kvm_vcpu *vcpu, bool is_write, u64 id,
+ int vgic_v3_line_level_info_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+ 				    u32 intid, u64 *val);
+ int kvm_register_vgic_device(unsigned long type);
++
++void vgic_set_apr(struct kvm_vcpu *vcpu, u32 idx, u32 val);
++u32 vgic_get_apr(struct kvm_vcpu *vcpu, u32 idx);
+ void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+ void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+ int vgic_lazy_init(struct kvm *kvm);
+-- 
+1.8.3.1
