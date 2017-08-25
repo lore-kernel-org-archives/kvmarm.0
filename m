@@ -1,76 +1,93 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] KVM: arm/arm64: vgic: constify seq_operations and
- file_operations
-Date: Thu, 24 Aug 2017 09:20:34 -0700
-Message-ID: <20170824162034.GC2150@lvm>
-References: <de67d01fab53d5b7874cda1ac2c269887c673450.1503471217.git.arvind.yadav.cs@gmail.com>
+From: Florent Revest <florent.revest-5wv7dgnIgG8@public.gmane.org>
+Subject: [RFC 00/11] KVM, EFI, arm64: EFI Runtime Services Sandboxing
+Date: Fri, 25 Aug 2017 09:31:30 +0100
+Message-ID: <1503649901-5834-1-git-send-email-florent.revest@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 87ECB49C2B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Aug 2017 12:18:38 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YQz0fu3Udeys for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Aug 2017 12:18:37 -0400 (EDT)
-Received: from mail-wr0-f182.google.com (mail-wr0-f182.google.com
- [209.85.128.182])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 41B4740D25
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Aug 2017 12:18:37 -0400 (EDT)
-Received: by mail-wr0-f182.google.com with SMTP id i33so4085920wri.3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Aug 2017 09:20:38 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <de67d01fab53d5b7874cda1ac2c269887c673450.1503471217.git.arvind.yadav.cs@gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Arvind Yadav <arvind.yadav.cs@gmail.com>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+Cc: matt-mF/unelCI9GS6iBeEJttW/XRex20P6io@public.gmane.org, ard.biesheuvel-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, rkrcmar-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, catalin.marinas-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, leif.lindholm-5wv7dgnIgG8@public.gmane.org, revestflo-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, Florent Revest <florent.revest-5wv7dgnIgG8@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Aug 23, 2017 at 12:25:36PM +0530, Arvind Yadav wrote:
-> vgic_debug_seq_ops and file_operations are not supposed to change
-> at runtime and none of the structures is modified.
-> 
-> Signed-off-by: Arvind Yadav <arvind.yadav.cs@gmail.com>
+Hi,
 
-Applied, thanks.
--Christoffer
+This series implements a mechanism to sandbox EFI Runtime Services on arm64=
+.
+It can be enabled with CONFIG_EFI_SANDBOX. At boot it spawns an internal KV=
+M
+virtual machine that is ran everytime an EFI Runtime Service is called. Thi=
+s
+limits the possible security and stability impact of EFI runtime on the ker=
+nel.
 
-> ---
->  virt/kvm/arm/vgic/vgic-debug.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-debug.c b/virt/kvm/arm/vgic/vgic-debug.c
-> index 7072ab7..10b3817 100644
-> --- a/virt/kvm/arm/vgic/vgic-debug.c
-> +++ b/virt/kvm/arm/vgic/vgic-debug.c
-> @@ -234,7 +234,7 @@ static int vgic_debug_show(struct seq_file *s, void *v)
->  	return 0;
->  }
->  
-> -static struct seq_operations vgic_debug_seq_ops = {
-> +static const struct seq_operations vgic_debug_seq_ops = {
->  	.start = vgic_debug_start,
->  	.next  = vgic_debug_next,
->  	.stop  = vgic_debug_stop,
-> @@ -255,7 +255,7 @@ static int debug_open(struct inode *inode, struct file *file)
->  	return ret;
->  };
->  
-> -static struct file_operations vgic_debug_fops = {
-> +static const struct file_operations vgic_debug_fops = {
->  	.owner   = THIS_MODULE,
->  	.open    = debug_open,
->  	.read    = seq_read,
-> -- 
-> 1.9.1
-> 
+The patch set is split as follow:
+ - Patches 1 and 2: Give more control over HVC handling to KVM
+ - Patches 3 to 6: Introduce the concept of KVM "internal VMs"
+ - Patches 7 to 9: Reorder KVM and EFI initialization on ARM
+ - Patch 10: Introduces the EFI sandboxing VM and wrappers
+ - Patch 11: Workarounds some EFI Runtime Services relying on EL3
+
+The sandboxing has been tested to work reliably (rtc and efivars) on a
+SoftIron OverDrive 1000 box and on a ARMv8.3 model with VHE enabled. Normal
+userspace KVM instance have also been tested to still work correctly.
+
+Those patches apply cleanly on the Linus' v4.13-rc6 tag and have no other
+dependencies.
+
+Florent Revest (11):
+  arm64: Add an SMCCC function IDs header
+  KVM: arm64: Return an Unknown ID on unhandled HVC
+  KVM: Allow VM lifecycle management without userspace
+  KVM, arm, arm64: Offer PAs to IPAs idmapping to internal VMs
+  KVM: Expose VM/VCPU creation functions
+  KVM, arm64: Expose a VCPU initialization function
+  KVM: Allow initialization before the module target
+  KVM, arm, arm64: Initialize KVM's core earlier
+  EFI, arm, arm64: Enable EFI Runtime Services later
+  efi, arm64: Sandbox Runtime Services in a VM
+  KVM, arm64: Don't trap internal VMs SMC calls
+
+ arch/arm/include/asm/efi.h                 |   7 +
+ arch/arm/include/asm/kvm_coproc.h          |   3 +
+ arch/arm/include/asm/kvm_host.h            |   1 +
+ arch/arm/include/asm/kvm_psci.h            |   1 +
+ arch/arm/kvm/coproc.c                      |   6 +
+ arch/arm/kvm/coproc_a15.c                  |   3 +-
+ arch/arm/kvm/coproc_a7.c                   |   3 +-
+ arch/arm64/include/asm/efi.h               |  71 ++++
+ arch/arm64/include/asm/kvm_emulate.h       |   3 +
+ arch/arm64/include/asm/kvm_host.h          |   4 +
+ arch/arm64/include/asm/kvm_psci.h          |   1 +
+ arch/arm64/kernel/asm-offsets.c            |   3 +
+ arch/arm64/kvm/handle_exit.c               |  27 +-
+ arch/arm64/kvm/sys_regs_generic_v8.c       |   8 +-
+ arch/x86/include/asm/efi.h                 |   2 +
+ drivers/firmware/efi/Kconfig               |  10 +
+ drivers/firmware/efi/Makefile              |   1 +
+ drivers/firmware/efi/arm-runtime.c         |   5 +-
+ drivers/firmware/efi/arm-sandbox-payload.S |  96 +++++
+ drivers/firmware/efi/arm-sandbox.c         | 569 +++++++++++++++++++++++++=
+++++
+ drivers/firmware/efi/efi.c                 |   3 +
+ include/linux/kvm_host.h                   |   4 +
+ include/linux/smccc_fn.h                   |  53 +++
+ include/uapi/linux/psci.h                  |   2 +
+ virt/kvm/arm/arm.c                         |  18 +-
+ virt/kvm/arm/mmu.c                         |  76 +++-
+ virt/kvm/arm/psci.c                        |  21 ++
+ virt/kvm/kvm_main.c                        | 102 ++++--
+ 28 files changed, 1050 insertions(+), 53 deletions(-)
+ create mode 100644 drivers/firmware/efi/arm-sandbox-payload.S
+ create mode 100644 drivers/firmware/efi/arm-sandbox.c
+ create mode 100644 include/linux/smccc_fn.h
+
+--
+1.9.1
+
+IMPORTANT NOTICE: The contents of this email and any attachments are confid=
+ential and may also be privileged. If you are not the intended recipient, p=
+lease notify the sender immediately and do not disclose the contents to any=
+ other person, use it for any purpose, or store or copy the information in =
+any medium. Thank you.
