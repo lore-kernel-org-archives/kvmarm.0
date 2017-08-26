@@ -1,61 +1,54 @@
-From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: Re: [PATCH v11 3/6] ACPI: build and enable APEI GHES in the Makefile
- and configuration
-Date: Fri, 25 Aug 2017 19:20:57 +0800
-Message-ID: <6afc4dfa-5ad1-8df1-7dce-4704a796d8aa@huawei.com>
-References: <1503066227-18251-1-git-send-email-gengdongjiu@huawei.com>
- <1503066227-18251-4-git-send-email-gengdongjiu@huawei.com>
- <599ECEF3.80001@huawei.com>
+From: Shannon Zhao <zhaoshenglong@huawei.com>
+Subject: Re: [PATCH v11 1/6] ACPI: add APEI/HEST/CPER structures and macros
+Date: Sat, 26 Aug 2017 09:00:03 +0800
+Message-ID: <59A0C813.2060201@huawei.com>
+References: <1503066227-18251-1-git-send-email-gengdongjiu@huawei.com> <1503066227-18251-2-git-send-email-gengdongjiu@huawei.com> <599EC7AB.3080604@huawei.com> <69090a96-ce90-4b2b-a419-c8d847d56093@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <599ECEF3.80001@huawei.com>
-Sender: kvm-owner@vger.kernel.org
-To: Shannon Zhao <zhaoshenglong@huawei.com>, lersek@redhat.com, mst@redhat.com, imammedo@redhat.com, peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvm@vger.kernel.org, edk2-devel@lists.01.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, will.deacon@arm.com, james.morse@arm.com, tbaicar@codeaurora.org, ard.biesheuvel@linaro.org, mingo@kernel.org, bp@suse.de, shiju.jose@huawei.com, zjzhang@codeaurora.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, devel@acpica.org, john.garry@huawei.com, jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com, huangdaode@hisilicon.com, wangzhou1@hi
+Return-path: <linux-acpi-owner@vger.kernel.org>
+In-Reply-To: <69090a96-ce90-4b2b-a419-c8d847d56093@huawei.com>
+Sender: linux-acpi-owner@vger.kernel.org
+To: gengdongjiu <gengdongjiu@huawei.com>, lersek@redhat.com, mst@redhat.com, imammedo@redhat.com, peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvm@vger.kernel.org, edk2-devel@lists.01.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, will.deacon@arm.com, james.morse@arm.com, tbaicar@codeaurora.org, ard.biesheuvel@linaro.org, mingo@kernel.org, bp@suse.de, shiju.jose@huawei.com, zjzhang@codeaurora.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, devel@acpica.org, john.garry@huawei.com, jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com, huangdaode@hisilicon.com, wangzhou1@hisil
 Cc: huangshaoyu@huawei.com, wuquanming@huawei.com, linuxarm@huawei.com, zhengqiang10@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
 
 
-On 2017/8/24 21:04, Shannon Zhao wrote:
-> 
-> 
-> On 2017/8/18 22:23, Dongjiu Geng wrote:
->> Add CONFIG_ACPI_APEI configuration in the Makefile and
->> enable it in the arm-softmmu.mak
->>
->> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
->> ---
->>  default-configs/arm-softmmu.mak | 1 +
->>  hw/acpi/Makefile.objs           | 1 +
->>  2 files changed, 2 insertions(+)
->>
->> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
->> index bbdd3c1..c362113 100644
->> --- a/default-configs/arm-softmmu.mak
->> +++ b/default-configs/arm-softmmu.mak
->> @@ -129,3 +129,4 @@ CONFIG_ACPI=y
->>  CONFIG_SMBIOS=y
->>  CONFIG_ASPEED_SOC=y
->>  CONFIG_GPIO_KEY=y
->> +CONFIG_ACPI_APEI=y
->> diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
->> index 11c35bc..bafb148 100644
->> --- a/hw/acpi/Makefile.objs
->> +++ b/hw/acpi/Makefile.objs
->> @@ -6,6 +6,7 @@ common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
->>  common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
->>  common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
->>  common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
->> +common-obj-$(CONFIG_ACPI_APEI) += hest_ghes.o
->>  common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
->>  
->>  common-obj-y += acpi_interface.o
->>
-> Fold this patch into previous one.
-Ok, thanks
+On 2017/8/25 18:37, gengdongjiu wrote:
+>>> +
+>>> >> +/* From the ACPI 6.1 spec, "18.3.2.9 Hardware Error Notification" */
+>>> >> +
+>> > It's better to refer to the first spec version of this structure and
+>> > same with others you define.
+>  do you mean which spec version? the definition is aligned with the linux kernel.
+What I mean here is that it's better to refer to the ACPI spec version
+which introduces Hardware Error Notification first time.
 
+>> > 
+>>> >> +enum AcpiHestNotifyType {
+>>> >> +    ACPI_HEST_NOTIFY_POLLED = 0,
+>>> >> +    ACPI_HEST_NOTIFY_EXTERNAL = 1,
+>>> >> +    ACPI_HEST_NOTIFY_LOCAL = 2,
+>>> >> +    ACPI_HEST_NOTIFY_SCI = 3,
+>>> >> +    ACPI_HEST_NOTIFY_NMI = 4,
+>>> >> +    ACPI_HEST_NOTIFY_CMCI = 5,  /* ACPI 5.0 */
+>>> >> +    ACPI_HEST_NOTIFY_MCE = 6,   /* ACPI 5.0 */
+>>> >> +    ACPI_HEST_NOTIFY_GPIO = 7,  /* ACPI 6.0 */
+>>> >> +    ACPI_HEST_NOTIFY_SEA = 8,   /* ACPI 6.1 */
+>>> >> +    ACPI_HEST_NOTIFY_SEI = 9,   /* ACPI 6.1 */
+>>> >> +    ACPI_HEST_NOTIFY_GSIV = 10, /* ACPI 6.1 */
+>>> >> +    ACPI_HEST_NOTIFY_RESERVED = 11  /* 11 and greater are reserved */
+>> > In ACPI 6.2, 11 is for Software Delegated Exception, is this useful for
+>> > your patchset?
+>   it is usefull, for all the error source, I reserved the space for them.
+> Because the space is allocated one time, is not dynamically allocated.
+> so I use the ACPI_HEST_NOTIFY_RESERVED to specify that there is 11 error source.
 > 
-> Thanks,
-> 
+I mean whether the new type Software Delegated Exception is useful for
+RAS. If so, we could add this new type here.
+
+Thanks,
+-- 
+Shannon
+
