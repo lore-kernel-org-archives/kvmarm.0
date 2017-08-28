@@ -1,14 +1,12 @@
 From: Dongjiu Geng <gengdongjiu@huawei.com>
-Subject: [PATCH v6 6/7] KVM: arm64: allow get exception information from
- userspace
-Date: Mon, 28 Aug 2017 18:38:20 +0800
-Message-ID: <1503916701-13516-7-git-send-email-gengdongjiu@huawei.com>
-References: <1503916701-13516-1-git-send-email-gengdongjiu@huawei.com>
+Subject: [PATCH v6 0/7] Add RAS virtualization support for SEA/SEI
+ notification type in KVM
+Date: Mon, 28 Aug 2017 18:38:14 +0800
+Message-ID: <1503916701-13516-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1503916701-13516-1-git-send-email-gengdongjiu@huawei.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -22,96 +20,75 @@ To: christoffer.dall@linaro.org, marc.zyngier@arm.com, rkrcmar@redhat.com, linux
 Cc: zhengqiang10@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com, linuxarm@huawei.com, gengdongjiu@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-when userspace gets SIGBUS signal, it does not know whether
-this is a synchronous external abort or SError, so needs
-to get the exception syndrome. This patch allows userspace
-can get this values. For syndrome, only give userspace
-syndrome EC and ISS.
+In the firmware-first RAS solution, corrupt data is detected in a
+memory location when guest OS application software executing at EL0
+or guest OS kernel El1 software are reading from the memory. The
+memory node records errors in an error record accessible using
+system registers.
 
-Now we move the synchronous external abort injection logic to
-userspace, when userspace injects the SEA exception to guest
-OS, it needs to specify the far_el1 value, so this patch gives
-the exception virtual address to userspace.
+Because SCR_EL3.EA is 1, then CPU will trap to El3 firmware, EL3
+firmware records the error to APEI table through reading system
+register.
 
-change since v5:
-1. modify some patch description
+Because the error was taken from a lower Exception level, if the
+exception is SEA/SEI and HCR_EL2.TEA/HCR_EL2.AMO is 1, firmware
+sets ESR_EL2/FAR_EL2 to fake a exception trap to EL2, then
+transfers to hypervisor.
 
-Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-Signed-off-by: Quanming Wu <wuquanming@huawei.com>
----
- arch/arm64/include/uapi/asm/kvm.h |  5 +++++
- arch/arm64/kvm/guest.c            | 36 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 41 insertions(+)
+For the synchronous external abort(SEA), Hypervisor calls the
+ghes_handle_memory_failure() to deal with this error,
+ghes_handle_memory_failure() function reads the APEI table and 
+callls memory_failure() to decide whether it needs to deliver
+SIGBUS signal to user space, the advantage of using SIGBUS signal
+to notify user space is that it can be compatible with Non-Kvm users.
 
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 9f3ca24bbcc6..514261f682b8 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -181,6 +181,11 @@ struct kvm_arch_memory_slot {
- #define KVM_REG_ARM64_SYSREG_OP2_MASK	0x0000000000000007
- #define KVM_REG_ARM64_SYSREG_OP2_SHIFT	0
- 
-+/* AArch64 fault registers */
-+#define KVM_REG_ARM64_FAULT		(0x0014 << KVM_REG_ARM_COPROC_SHIFT)
-+#define KVM_REG_ARM64_FAULT_ESR_EC_ISS	(0)
-+#define KVM_REG_ARM64_FAULT_FAR		(1)
-+
- #define ARM64_SYS_REG_SHIFT_MASK(x,n) \
- 	(((x) << KVM_REG_ARM64_SYSREG_ ## n ## _SHIFT) & \
- 	KVM_REG_ARM64_SYSREG_ ## n ## _MASK)
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 5c7f657dd207..020a644b20d7 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -128,6 +128,39 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- out:
- 	return err;
- }
-+static int get_fault_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-+{
-+	void __user *uaddr = (void __user *)(unsigned long)reg->addr;
-+	u32 value;
-+	u32 id = reg->id & ~(KVM_REG_ARCH_MASK |
-+			KVM_REG_SIZE_MASK | KVM_REG_ARM64_FAULT);
-+
-+	switch (id) {
-+	case KVM_REG_ARM64_FAULT_ESR_EC_ISS:
-+		/*
-+		 * The user space may need to know the fault exception class
-+		 * ESR_ELx.EC and instruction specific syndrome ESR_ELx.ISS
-+		 */
-+		value = kvm_vcpu_get_hsr(vcpu) & (ESR_ELx_EC_MASK | ESR_ELx_ISS_MASK);
-+		if (copy_to_user(uaddr, &value, KVM_REG_SIZE(reg->id)) != 0)
-+			return -EFAULT;
-+		break;
-+	case KVM_REG_ARM64_FAULT_FAR:
-+		/*
-+		 * When user space injects synchronized abort, it needs
-+		 * to inject the faulting virtual address to guest OS, so
-+		 * needs to get it from kvm.
-+		 */
-+		if (copy_to_user(uaddr, &(vcpu->arch.fault.far_el2),
-+				KVM_REG_SIZE(reg->id)) != 0)
-+			return -EFAULT;
-+		break;
-+	default:
-+		return -ENOENT;
-+	}
-+	return 0;
-+}
-+
- 
- int kvm_arch_vcpu_ioctl_get_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
- {
-@@ -243,6 +276,9 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_CORE)
- 		return get_core_reg(vcpu, reg);
- 
-+	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM64_FAULT)
-+		return get_fault_reg(vcpu, reg);
-+
- 	if (is_timer_reg(reg->id))
- 		return get_timer_reg(vcpu, reg);
- 
+For the SError Interrupt(SEI),KVM firstly classified the error.
+Not call memory_failure() to handle it. Because the error address recorded
+by APEI is not accurated, so can not identify the address to hwpoison
+memory. If the SError error comes from guest user mode and is not propagated,
+then signal user space to handle it, otherwise, directly injects virtual
+SError, or panic if the error is fatal. when user space handles the error,
+it will specify syndrome for the injected virtual SError. This syndrome value
+is set to the VSESR_EL2. VSESR_EL2 is a new ARMv8.2 RAS extensions register
+which provides the syndrome value reported to software on taking a virtual
+SError interrupt exception.
+
+Dongjiu Geng (5):
+  acpi: apei: remove the unused code
+  arm64: kvm: support user space to query RAS extension feature
+  arm64: kvm: route synchronous external abort exceptions to el2
+  KVM: arm64: allow get exception information from userspace
+  arm64: kvm: handle SEI notification and pass the virtual syndrome
+
+James Morse (1):
+  KVM: arm64: Save ESR_EL2 on guest SError
+
+Xie XiuQi (1):
+  arm64: cpufeature: Detect CPU RAS Extentions
+
+ arch/arm/include/asm/kvm_host.h      |  2 ++
+ arch/arm/kvm/guest.c                 |  9 ++++++
+ arch/arm64/Kconfig                   | 16 +++++++++++
+ arch/arm64/include/asm/barrier.h     |  1 +
+ arch/arm64/include/asm/cpucaps.h     |  3 +-
+ arch/arm64/include/asm/esr.h         | 11 +++++++
+ arch/arm64/include/asm/kvm_arm.h     |  2 ++
+ arch/arm64/include/asm/kvm_emulate.h | 17 +++++++++++
+ arch/arm64/include/asm/kvm_host.h    |  2 ++
+ arch/arm64/include/asm/sysreg.h      |  5 ++++
+ arch/arm64/include/asm/system_misc.h |  1 +
+ arch/arm64/include/uapi/asm/kvm.h    |  5 ++++
+ arch/arm64/kernel/cpufeature.c       | 13 +++++++++
+ arch/arm64/kernel/process.c          |  3 ++
+ arch/arm64/kvm/guest.c               | 50 ++++++++++++++++++++++++++++++++
+ arch/arm64/kvm/handle_exit.c         | 56 ++++++++++++++++++++++++++++++++----
+ arch/arm64/kvm/hyp/switch.c          | 29 +++++++++++++++++--
+ arch/arm64/kvm/reset.c               |  3 ++
+ arch/arm64/mm/fault.c                | 34 ++++++++++++++++++++++
+ drivers/acpi/apei/ghes.c             | 14 ---------
+ include/uapi/linux/kvm.h             |  3 ++
+ virt/kvm/arm/arm.c                   |  7 +++++
+ 22 files changed, 263 insertions(+), 23 deletions(-)
+
 -- 
 2.14.1
