@@ -1,12 +1,13 @@
 From: Dongjiu Geng <gengdongjiu@huawei.com>
-Subject: [PATCH v6 0/7] Add RAS virtualization support for SEA/SEI
- notification type in KVM
-Date: Mon, 28 Aug 2017 18:38:14 +0800
-Message-ID: <1503916701-13516-1-git-send-email-gengdongjiu@huawei.com>
+Subject: [PATCH v6 3/7] acpi: apei: remove the unused code
+Date: Mon, 28 Aug 2017 18:38:17 +0800
+Message-ID: <1503916701-13516-4-git-send-email-gengdongjiu@huawei.com>
+References: <1503916701-13516-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <1503916701-13516-1-git-send-email-gengdongjiu@huawei.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -20,75 +21,53 @@ To: christoffer.dall@linaro.org, marc.zyngier@arm.com, rkrcmar@redhat.com, linux
 Cc: zhengqiang10@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com, linuxarm@huawei.com, gengdongjiu@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In the firmware-first RAS solution, corrupt data is detected in a
-memory location when guest OS application software executing at EL0
-or guest OS kernel El1 software are reading from the memory. The
-memory node records errors in an error record accessible using
-system registers.
+In current code logic, the two functions ghes_sea_add() and
+ghes_sea_remove() are only called when CONFIG_ACPI_APEI_SEA
+is defined. If not, it will return errors in the ghes_probe()
+and not contiue. Hence, remove the unnecessary handling when
+CONFIG_ACPI_APEI_SEI is not defined.
 
-Because SCR_EL3.EA is 1, then CPU will trap to El3 firmware, EL3
-firmware records the error to APEI table through reading system
-register.
+change since v5:
+1. remove the SEI notification type handling, because the SEI is
+   asynchronous exception and the address is not accurate. so
+   not call memory_failure() to handle it.
 
-Because the error was taken from a lower Exception level, if the
-exception is SEA/SEI and HCR_EL2.TEA/HCR_EL2.AMO is 1, firmware
-sets ESR_EL2/FAR_EL2 to fake a exception trap to EL2, then
-transfers to hypervisor.
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+---
+ drivers/acpi/apei/ghes.c | 14 --------------
+ 1 file changed, 14 deletions(-)
 
-For the synchronous external abort(SEA), Hypervisor calls the
-ghes_handle_memory_failure() to deal with this error,
-ghes_handle_memory_failure() function reads the APEI table and 
-callls memory_failure() to decide whether it needs to deliver
-SIGBUS signal to user space, the advantage of using SIGBUS signal
-to notify user space is that it can be compatible with Non-Kvm users.
-
-For the SError Interrupt(SEI),KVM firstly classified the error.
-Not call memory_failure() to handle it. Because the error address recorded
-by APEI is not accurated, so can not identify the address to hwpoison
-memory. If the SError error comes from guest user mode and is not propagated,
-then signal user space to handle it, otherwise, directly injects virtual
-SError, or panic if the error is fatal. when user space handles the error,
-it will specify syndrome for the injected virtual SError. This syndrome value
-is set to the VSESR_EL2. VSESR_EL2 is a new ARMv8.2 RAS extensions register
-which provides the syndrome value reported to software on taking a virtual
-SError interrupt exception.
-
-Dongjiu Geng (5):
-  acpi: apei: remove the unused code
-  arm64: kvm: support user space to query RAS extension feature
-  arm64: kvm: route synchronous external abort exceptions to el2
-  KVM: arm64: allow get exception information from userspace
-  arm64: kvm: handle SEI notification and pass the virtual syndrome
-
-James Morse (1):
-  KVM: arm64: Save ESR_EL2 on guest SError
-
-Xie XiuQi (1):
-  arm64: cpufeature: Detect CPU RAS Extentions
-
- arch/arm/include/asm/kvm_host.h      |  2 ++
- arch/arm/kvm/guest.c                 |  9 ++++++
- arch/arm64/Kconfig                   | 16 +++++++++++
- arch/arm64/include/asm/barrier.h     |  1 +
- arch/arm64/include/asm/cpucaps.h     |  3 +-
- arch/arm64/include/asm/esr.h         | 11 +++++++
- arch/arm64/include/asm/kvm_arm.h     |  2 ++
- arch/arm64/include/asm/kvm_emulate.h | 17 +++++++++++
- arch/arm64/include/asm/kvm_host.h    |  2 ++
- arch/arm64/include/asm/sysreg.h      |  5 ++++
- arch/arm64/include/asm/system_misc.h |  1 +
- arch/arm64/include/uapi/asm/kvm.h    |  5 ++++
- arch/arm64/kernel/cpufeature.c       | 13 +++++++++
- arch/arm64/kernel/process.c          |  3 ++
- arch/arm64/kvm/guest.c               | 50 ++++++++++++++++++++++++++++++++
- arch/arm64/kvm/handle_exit.c         | 56 ++++++++++++++++++++++++++++++++----
- arch/arm64/kvm/hyp/switch.c          | 29 +++++++++++++++++--
- arch/arm64/kvm/reset.c               |  3 ++
- arch/arm64/mm/fault.c                | 34 ++++++++++++++++++++++
- drivers/acpi/apei/ghes.c             | 14 ---------
- include/uapi/linux/kvm.h             |  3 ++
- virt/kvm/arm/arm.c                   |  7 +++++
- 22 files changed, 263 insertions(+), 23 deletions(-)
-
+diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+index d661d452b238..c15a08db2c7c 100644
+--- a/drivers/acpi/apei/ghes.c
++++ b/drivers/acpi/apei/ghes.c
+@@ -813,7 +813,6 @@ static struct notifier_block ghes_notifier_hed = {
+ 	.notifier_call = ghes_notify_hed,
+ };
+ 
+-#ifdef CONFIG_ACPI_APEI_SEA
+ static LIST_HEAD(ghes_sea);
+ 
+ /*
+@@ -848,19 +847,6 @@ static void ghes_sea_remove(struct ghes *ghes)
+ 	mutex_unlock(&ghes_list_mutex);
+ 	synchronize_rcu();
+ }
+-#else /* CONFIG_ACPI_APEI_SEA */
+-static inline void ghes_sea_add(struct ghes *ghes)
+-{
+-	pr_err(GHES_PFX "ID: %d, trying to add SEA notification which is not supported\n",
+-	       ghes->generic->header.source_id);
+-}
+-
+-static inline void ghes_sea_remove(struct ghes *ghes)
+-{
+-	pr_err(GHES_PFX "ID: %d, trying to remove SEA notification which is not supported\n",
+-	       ghes->generic->header.source_id);
+-}
+-#endif /* CONFIG_ACPI_APEI_SEA */
+ 
+ #ifdef CONFIG_HAVE_ACPI_APEI_NMI
+ /*
 -- 
 2.14.1
