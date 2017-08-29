@@ -1,144 +1,132 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v2 6/8] KVM: arm/arm64: vgic: Implement forwarding setting
-Date: Tue, 29 Aug 2017 09:08:11 +0200
-Message-ID: <20170829070811.GS24649@cbox>
-References: <1497531160-29162-1-git-send-email-eric.auger@redhat.com>
- <1497531160-29162-7-git-send-email-eric.auger@redhat.com>
- <20170721131346.GH16350@cbox>
- <04c0ed5f-40b3-b0bf-cdf3-8bccbe2430d0@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <04c0ed5f-40b3-b0bf-cdf3-8bccbe2430d0@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Auger Eric <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, alex.williamson@redhat.com, b.reynal@virtualopensystems.com, pbonzini@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, drjones@redhat.com, wei@redhat.com
+Subject: [RFC PATCH 4/4] KVM: arm/arm64: Provide a vgic interrupt line level sample function
+Date: Tue, 29 Aug 2017 11:39:02 +0200
+Message-ID: <20170829093902.15379-5-cdall@linaro.org>
+References: <20170829093902.15379-1-cdall@linaro.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20170829093902.15379-1-cdall@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu, Eric Auger <eric.auger@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>
+Cc: Andre Przywara <andre.przywara@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Aug 23, 2017 at 10:58:38AM +0200, Auger Eric wrote:
-> Hi Christoffer,
-> 
-> On 21/07/2017 15:13, Christoffer Dall wrote:
-> > On Thu, Jun 15, 2017 at 02:52:38PM +0200, Eric Auger wrote:
-> >> Implements kvm_vgic_[set|unset]_forwarding.
-> >>
-> >> Handle low-level VGIC programming and consistent irqchip
-> >> programming.
-> >>
-> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> >>
-> >> ---
-> >>
-> >> v1 -> v2:
-> >> - change the parameter names used in the declaration
-> >> - use kvm_vgic_map/unmap_phys_irq and handle their returned value
-> >> ---
-> >>  include/kvm/arm_vgic.h   |  5 +++
-> >>  virt/kvm/arm/vgic/vgic.c | 88 ++++++++++++++++++++++++++++++++++++++++++++++++
-> >>  2 files changed, 93 insertions(+)
-> >>
-> >> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> >> index cceb31d..5064a57 100644
-> >> --- a/include/kvm/arm_vgic.h
-> >> +++ b/include/kvm/arm_vgic.h
-> >> @@ -343,4 +343,9 @@ int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi);
-> >>   */
-> >>  int kvm_vgic_setup_default_irq_routing(struct kvm *kvm);
-> >>  
-> >> +int kvm_vgic_set_forwarding(struct kvm *kvm, unsigned int host_irq,
-> >> +			    unsigned int vintid);
-> >> +void kvm_vgic_unset_forwarding(struct kvm *kvm, unsigned int host_irq,
-> >> +			       unsigned int vintid);
-> >> +
-> >>  #endif /* __KVM_ARM_VGIC_H */
-> >> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> >> index 2e35ac7..9ee3e77 100644
-> >> --- a/virt/kvm/arm/vgic/vgic.c
-> >> +++ b/virt/kvm/arm/vgic/vgic.c
-> >> @@ -781,3 +781,91 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int vintid)
-> >>  	return map_is_active;
-> >>  }
-> >>  
-> >> +/**
-> >> + * kvm_vgic_set_forwarding - Set IRQ forwarding
-> >> + *
-> >> + * @kvm: kvm handle
-> >> + * @host_irq: the host linux IRQ
-> >> + * @vintid: the virtual INTID
-> >> + *
-> >> + * This function must be called when the IRQ is not active:
-> >> + * ie. not active at GIC level and not currently under injection
-> >> + * into the guest using the unforwarded mode. The physical IRQ must
-> >> + * be disabled and all vCPUs must have been exited and prevented
-> >> + * from being re-entered.
-> >> + */
-> >> +int kvm_vgic_set_forwarding(struct kvm *kvm, unsigned int host_irq,
-> >> +			    unsigned int vintid)
-> >> +{
-> >> +	struct kvm_vcpu *vcpu;
-> >> +	struct vgic_irq *irq;
-> >> +	int ret;
-> >> +
-> >> +	kvm_debug("%s host_irq=%d vintid=%d\n", __func__, host_irq, vintid);
-> > 
-> > do you need to check if the vgic is initialized etc. here?
-> yes
-> > 
-> >> +
-> >> +	if (!vgic_valid_spi(kvm, vintid))
-> >> +		return -EINVAL;
-> >> +
-> >> +	irq = vgic_get_irq(kvm, NULL, vintid);
-> >> +	spin_lock(&irq->irq_lock);
-> >> +
-> >> +	if (irq->hw) {
-> >> +		ret = -EINVAL;
-> > 
-> > is this because it's already forwarded?  How about EBUSY or EEXIST
-> > instead then?
-> OK
-> > 
-> >> +		goto unlock;
-> >> +	}
-> >> +	vcpu = irq->target_vcpu;
-> >> +	if (!vcpu) {
-> >> +		ret = -EAGAIN;
-> > 
-> > what is this case exactly?
-> This was discussed previously with Marc
-> (https://patchwork.kernel.org/patch/9746841/). In GICv3 case the vcpu
-> parameter is not used in irq_set_vcpu_affinity. What this function does
-> is tell the GIC not to DIR the physical IRQ.
-> 
-> So in my case I just need a non NULL vcpu passed as parameter of
-> irq_set_vcpu_affinity. kvm_vgic_map_irq is not using it because we are
-> handling SPIs. But in GICv4 the actual target vpcu will be needed so I
-> decided to use this latter and return an error in case it is not known.
+The GIC sometimes need to sample the physical line of a mapped
+interrupt.  As we know this to be notoriously slow, provide a callback
+function for devices (such as the timer) which can do this much faster
+than talking to the distributor, for example by comparing a few
+in-memory values.  Fall back to the good old method of poking the
+physical GIC if no callback is provided.
 
-Right, but my comment was to the fact that I don't think
-irq->target_vcpu could ever be NULL, and I think if you want to simply
-assert this, you should instead do:
+Signed-off-by: Christoffer Dall <cdall@linaro.org>
+---
+ include/kvm/arm_vgic.h    | 13 ++++++++++++-
+ virt/kvm/arm/arch_timer.c | 16 +++++++++++++++-
+ virt/kvm/arm/vgic/vgic.c  |  7 ++++++-
+ 3 files changed, 33 insertions(+), 3 deletions(-)
 
-BUG_ON(!vcpu);
-
-> > 
-> >> +		goto unlock;
-> >> +	}
-> >> +	
-> >> +	ret = kvm_vgic_map_irq(vcpu, irq, host_irq);
-> >> +	if (!ret)
-> >> +		irq_set_vcpu_affinity(host_irq, vcpu);
-> > 
-> > so this is essentially map + set_vcpu_affinity.  Why do we want the GIC
-> > to do this in one go as opposed to leaving it up to the caller?
-> The VGIC code already use some genirq functions like
-> irq_set/get_irqchip_state. Using the irq->lock prevents the 2 actions
-> from being raced with an kvm_vgic_unset_forwarding(). Both the GIC and
-> VGIC programming must be consistent.
-> 
-
-ok, I guess this makes sense.
-
-Thanks,
--Christoffer
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 53f631b..a52990b 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -125,6 +125,17 @@ struct vgic_irq {
+ 	u8 priority;
+ 	enum vgic_irq_config config;	/* Level or edge */
+ 
++	/*
++	 * Callback function pointer to in-kernel devices that can tell us the
++	 * state of the input level of mapped level-triggered IRQ faster than
++	 * peaking into the physical GIC.
++	 *
++	 * Always called in non-preemptible section and the functions can use
++	 * kvm_arm_get_running_vcpu() to get the vcpu pointer for private
++	 * IRQs.
++	 */
++	bool (*get_input_level)(int vintid);
++
+ 	void *owner;			/* Opaque pointer to reserve an interrupt
+ 					   for in-kernel devices. */
+ };
+@@ -309,7 +320,7 @@ void kvm_vgic_init_cpu_hardware(void);
+ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+ 			bool level, void *owner);
+ int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
+-			  u32 vintid);
++			  u32 vintid, bool (*callback)(int vindid));
+ int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid);
+ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int vintid);
+ 
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index b24e2f7..82169ef 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -643,6 +643,19 @@ static bool timer_irqs_are_valid(struct kvm_vcpu *vcpu)
+ 	return true;
+ }
+ 
++static bool timer_get_input_level(int vintid)
++{
++	struct kvm_vcpu *vcpu = kvm_arm_get_running_vcpu();
++	struct arch_timer_context *timer;
++
++	if (vintid == vcpu_vtimer(vcpu)->irq.irq)
++		timer = vcpu_vtimer(vcpu);
++	else
++		BUG(); /* We only map the vtimer so far */
++
++	return kvm_timer_should_fire(timer);
++}
++
+ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+ {
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+@@ -664,7 +677,8 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+ 		return -EINVAL;
+ 	}
+ 
+-	ret = kvm_vgic_map_phys_irq(vcpu, host_vtimer_irq, vtimer->irq.irq);
++	ret = kvm_vgic_map_phys_irq(vcpu, host_vtimer_irq, vtimer->irq.irq,
++				    &timer_get_input_level);
+ 	if (ret)
+ 		return ret;
+ 
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index e3ce2fa..0466c10 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -147,6 +147,9 @@ bool vgic_irq_line_level(struct vgic_irq *irq)
+ 
+ 	BUG_ON(!irq->hw);
+ 
++	if (irq->get_input_level)
++		return irq->get_input_level(irq->intid);
++
+ 	WARN_ON(irq_get_irqchip_state(irq->host_irq,
+ 				      IRQCHIP_STATE_PENDING,
+ 				      &line_level));
+@@ -429,7 +432,7 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+ }
+ 
+ int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
+-			  u32 vintid)
++			  u32 vintid, bool (*callback)(int vindid))
+ {
+ 	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
+ 	struct irq_desc *desc;
+@@ -456,6 +459,7 @@ int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
+ 	irq->hw = true;
+ 	irq->host_irq = host_irq;
+ 	irq->hwintid = data->hwirq;
++	irq->get_input_level = callback;
+ 
+ out:
+ 	spin_unlock(&irq->irq_lock);
+@@ -476,6 +480,7 @@ int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid)
+ 	spin_lock(&irq->irq_lock);
+ 	irq->hw = false;
+ 	irq->hwintid = 0;
++	irq->get_input_level = NULL;
+ 	spin_unlock(&irq->irq_lock);
+ 	vgic_put_irq(vcpu->kvm, irq);
+ 
+-- 
+2.9.0
