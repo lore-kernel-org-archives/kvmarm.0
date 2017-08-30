@@ -1,93 +1,105 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v3 44/59] KVM: arm/arm64: GICv4: Handle MOVI applied to a
- VLPI
-Date: Wed, 30 Aug 2017 22:04:58 +0200
-Message-ID: <20170830200458.GK24522@cbox>
+Subject: Re: [PATCH v3 46/59] KVM: arm/arm64: GICv4: Handle MOVALL applied to
+ a vPE
+Date: Wed, 30 Aug 2017 22:10:36 +0200
+Message-ID: <20170830201036.GL24522@cbox>
 References: <20170731172637.29355-1-marc.zyngier@arm.com>
- <20170731172637.29355-45-marc.zyngier@arm.com>
- <20170828181817.GE24649@cbox>
- <954a7441-c91e-5d1b-98b7-2978291c5259@arm.com>
+ <20170731172637.29355-47-marc.zyngier@arm.com>
+ <20170828181827.GG24649@cbox>
+ <e4c02bf0-3852-2e3d-25a1-0fbac11f966a@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EE0C649C25
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Aug 2017 16:02:48 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SyKvsmUiA7EG for <kvmarm@lists.cs.columbia.edu>;
- Wed, 30 Aug 2017 16:02:47 -0400 (EDT)
-Received: from mail-wm0-f48.google.com (mail-wm0-f48.google.com [74.125.82.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B1D6440A86
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Aug 2017 16:02:47 -0400 (EDT)
-Received: by mail-wm0-f48.google.com with SMTP id a80so16589306wma.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Aug 2017 13:05:00 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <954a7441-c91e-5d1b-98b7-2978291c5259@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+In-Reply-To: <e4c02bf0-3852-2e3d-25a1-0fbac11f966a@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Jason Cooper <jason@lakedaemon.net>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Thomas Gleixner <tglx@linutronix.de>, kvmarm@lists.cs.columbia.edu
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>, Eric Auger <eric.auger@redhat.com>, Shanker Donthineni <shankerd@codeaurora.org>, Mark Rutland <mark.rutland@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Aug 30, 2017 at 03:08:01PM +0100, Marc Zyngier wrote:
+On Wed, Aug 30, 2017 at 03:46:12PM +0100, Marc Zyngier wrote:
 > On 28/08/17 19:18, Christoffer Dall wrote:
-> > On Mon, Jul 31, 2017 at 06:26:22PM +0100, Marc Zyngier wrote:
-> >> When the guest issues a MOVI, we need to tell the physical ITS
-> >> that we're now targetting a new vcpu. This is done by extracting
-> >> the current mapping, updating the target, and reapplying the
-> >> mapping. The core ITS code should do the right thing.
+> > On Mon, Jul 31, 2017 at 06:26:24PM +0100, Marc Zyngier wrote:
+> >> The current implementation of MOVALL doesn't allow us to call
+> >> into the core ITS code as we hold a number of spinlocks.
+> >>
+> >> Let's try a method used in other parts of the code, were we copy
+> >> the intids of the candicate interrupts, and then do whatever
+> >> we need to do with them outside of the critical section.
+> >>
+> >> This allows us to move the interrupts one by one, at the expense
+> >> of a bit of CPU time. Who cares? MOVALL is such a stupid command
+> >> anyway...
 > >>
 > >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > >> ---
-> >>  virt/kvm/arm/vgic/vgic-its.c | 13 +++++++++++++
-> >>  1 file changed, 13 insertions(+)
+> >>  virt/kvm/arm/vgic/vgic-its.c | 27 ++++++++++++++++++++-------
+> >>  1 file changed, 20 insertions(+), 7 deletions(-)
 > >>
 > >> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> >> index 79bac93d3e7d..aaad577ce328 100644
+> >> index 2c065c970ba0..65cc77fde609 100644
 > >> --- a/virt/kvm/arm/vgic/vgic-its.c
 > >> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> >> @@ -706,6 +706,19 @@ static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
-> >>  	ite->irq->target_vcpu = vcpu;
-> >>  	spin_unlock(&ite->irq->irq_lock);
+> >> @@ -1147,11 +1147,12 @@ static int vgic_its_cmd_handle_invall(struct kvm *kvm, struct vgic_its *its,
+> >>  static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
+> >>  				      u64 *its_cmd)
+> >>  {
+> >> -	struct vgic_dist *dist = &kvm->arch.vgic;
+> >>  	u32 target1_addr = its_cmd_get_target_addr(its_cmd);
+> >>  	u32 target2_addr = its_cmd_mask_field(its_cmd, 3, 16, 32);
+> >>  	struct kvm_vcpu *vcpu1, *vcpu2;
+> >>  	struct vgic_irq *irq;
+> >> +	u32 *intids;
+> >> +	int irq_count, i;
 > >>  
-> >> +	if (ite->irq->hw) {
-> >> +		struct its_vlpi_map map;
-> >> +		int ret;
-> >> +
-> >> +		ret = its_get_vlpi(ite->irq->host_irq, &map);
-> >> +		if (ret)
-> >> +			return ret;
-> >> +
-> >> +		map.vpe_idx = vcpu->vcpu_id;
-> >> +
-> >> +		return its_map_vlpi(ite->irq->host_irq, &map);
+> >>  	if (target1_addr >= atomic_read(&kvm->online_vcpus) ||
+> >>  	    target2_addr >= atomic_read(&kvm->online_vcpus))
+> >> @@ -1163,19 +1164,31 @@ static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
+> >>  	vcpu1 = kvm_get_vcpu(kvm, target1_addr);
+> >>  	vcpu2 = kvm_get_vcpu(kvm, target2_addr);
+> >>  
+> >> -	spin_lock(&dist->lpi_list_lock);
+> >> +	irq_count = vgic_copy_lpi_list(vcpu1, &intids);
+> >> +	if (irq_count < 0)
+> >> +		return irq_count;
+> >>  
+> >> -	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
+> >> -		spin_lock(&irq->irq_lock);
+> >> +	for (i = 0; i < irq_count; i++) {
+> >> +		irq = vgic_get_irq(kvm, NULL, intids[i]);
+> >> +		if (!irq)
+> >> +			continue;
 > > 
-> > Since you're not holding the irq_lock across these two calls, would it
-> > be possible that the forwarding was removed through some other call path
-> > here, and could you end up passing an invalid host_irq to its_map_vlpi?
-> I believe we should be OK here, as we hold the ITS mutex during any
-> command processing, and both the forward/unforward paths take that same
-> mutex.
-
-ok, yes, as long as the only other modifirs are the forward/unforward
-paths and they hold the mutex, we should be fine.
-
+> > Getting irq == NULL means that we've removed this LPI since
+> > vgic_copy_lpi_list, right?  Can this really happen while we hold the its
+> > mutex?
 > 
-> On a slightly different note, it looks like the MOVI code could benefit
-> from using vgic_its_resolve_lpi(), which has been introduce earlier in
-> this series.
+> A disappearing LPI can only be the result of a DISCARD, which cannot
+> happen, as we indeed hold the ITS lock.
+> 
+> > Also, we don't check this in its_sync_lpi_pending_table which would
+> > indicate that we either have a bug there or are being overly careful
+> > here (or should change the continue to BUG).
+> 
+> Let's aim for consistency. I'll drop this test.
+> 
+> > 
+> > 
+> >>  
+> >>  		if (irq->target_vcpu == vcpu1)
+> >>  			irq->target_vcpu = vcpu2;
+> >>  
+> >> -		spin_unlock(&irq->irq_lock);
+> > 
+> > Is it safe to modify target_vcpu without holding the irq_lock?
+> 
+> Unintentional regression. I'll fix that. But I wonder if there is an
+> actual point in testing testing the target_vcpu here. Since we hold the
+> ITS lock, we're damn sure that the affinity can't be changed, right?
+> 
 
-Only problem is you'd need to get a handle to the ite as well to change
-the collection pointer.  I suppose you could add another pointer
-pointer.
+Ah, yes, because you filtered the list on the source VCPU already you
+should be able to let go of this check.
 
+Thanks,
 -Christoffer
