@@ -1,208 +1,271 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH] KVM: arm64: stop propagating DAIF flags between kernel
- and VHE's world switch
-Date: Wed, 30 Aug 2017 10:33:17 +0200
-Message-ID: <20170830083317.GB24522@cbox>
-References: <20170810113021.1110-1-james.morse@arm.com>
- <20170824152304.GB2150@lvm> <59A5A021.1090102@arm.com>
+Subject: Re: [RFC PATCH 2/4] KVM: arm/arm64: vgic: Support level-triggered
+ mapped interrupts
+Date: Wed, 30 Aug 2017 11:20:26 +0200
+Message-ID: <20170830092026.GC24522@cbox>
+References: <20170829093902.15379-1-cdall@linaro.org>
+ <20170829093902.15379-3-cdall@linaro.org>
+ <428bb30a-4d3d-d983-e1d1-8f160da846c5@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C7FB40FAE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Aug 2017 04:31:09 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id boIj9KtRMxcp for <kvmarm@lists.cs.columbia.edu>;
- Wed, 30 Aug 2017 04:31:07 -0400 (EDT)
-Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com [74.125.82.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B204C40A80
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Aug 2017 04:31:07 -0400 (EDT)
-Received: by mail-wm0-f50.google.com with SMTP id a80so5309914wma.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Aug 2017 01:33:19 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <59A5A021.1090102@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <428bb30a-4d3d-d983-e1d1-8f160da846c5@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Auger Eric <eric.auger@redhat.com>
+Cc: kvmarm@lists.cs.columbia.edu, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Aug 29, 2017 at 06:10:57PM +0100, James Morse wrote:
+On Wed, Aug 30, 2017 at 10:19:38AM +0200, Auger Eric wrote:
 > Hi Christoffer,
 > 
-> 
-> (I suspect I'm using some term differently here ...)
-> 
-> On 24/08/17 16:23, Christoffer Dall wrote:
-> > On Thu, Aug 10, 2017 at 12:30:21PM +0100, James Morse wrote:
-> >> KVM calls __kvm_vcpu_run() in a loop with interrupts masked for the
-> >> duration of the call. On a non-vhe system we HVC to EL2 and the
-> >> host DAIF flags are save/restored via the SPSR.
-> >>
-> >> On a system with vhe, we branch to the EL2 code because the kernel
-> >> also runs at EL2. This means the other kernel DAIF flags propagate into
-> >> KVMs EL2 code.
-> >>
-> >> The same happens in reverse, we take an exception to exit the guest
-> >> and all the flags are masked. __guest_exit() unmasks SError, and we
-> >> return with these flags through world switch and back into the host
-> >> kernel. KVM unmasks interrupts as part of its __kvm_vcpu_run(), but
+> On 29/08/2017 11:39, Christoffer Dall wrote:
+> > Level-triggered mapped IRQs are special because we only observe rising
+> > edges as input to the VGIC, and we don't set the EOI flag and therefore
+> > are not told when the level goes down, so that we can re-queue a new
+> > interrupt when the level goes up.
 > > 
-> > when does KVM unmask interrupts as part of the __kvm_vcpu_run()?  Do you
-> > mean kvm_arch_vcpu_ioctl_run() ?
+> > One way to solve this problem is to side-step the logic of the VGIC and
+> > special case the validation in the injection path, but it has the
+> > unfortunate drawback of having to peak into the physical GIC state
+> > whenever we want to know if the interrupt is pending on the virtual
+> > distributor.
+> > 
+> > Instead, we can maintain the current semantics of a level triggered
+> > interrupt by sort of treating it as an edge-triggered interrupt,
+> > following from the fact that we only observe an asserting edge.  This
+> > requires us to be a bit careful when populating the LRs and when folding
+> > the state back in though:
+> > 
+> >  * We lower the line level when populating the LR, so that when
+> >    subsequently observing an asserting edge, the VGIC will do the right
+> >    thing.
+> > 
+> >  * If the guest never acked the interrupt while running (for example if
+> >    it had masked interrupts at the CPU level while running), we have
+> >    to preserve the pending state of the LR and move it back to the
+> >    line_level field of the struct irq when folding LR state.
+> > 
+> >    If the guest never acked the interrupt while running, but changed the
+> >    device state and lowered the line (again with interrupts masked) then
+> >    we need to observe this change in the line_level.
+> > 
+> >    Both of the above situations are solved by sampling the physical line
+> >    and set the line level when folding the LR back.
+> > 
+> >  * Finally, if the guest never acked the interrupt while running and
+> >    sampling the line reveals that the device state has changed and the
+> >    line has been lowered, we must clear the physical active state, since
+> >    we will otherwise never be told when the interrupt becomes asserted
+> >    again.
+> > 
+> > This has the added benefit of making the timer optimization patches
+> > (https://lists.cs.columbia.edu/pipermail/kvmarm/2017-July/026343.html) a
+> > bit simpler, because the timer code doesn't have to clear the active
+> > state on the sync anymore.  It also potentially improves the performance
+> > of the timer implementation because the GIC knows the state or the LR
+> > and only needs to clear the
+> > active state when the pending bit in the LR is still set, where the
+> > timer has to always clear it when returning from running the guest with
+> > an injected timer interrupt.
+> > 
+> > Signed-off-by: Christoffer Dall <cdall@linaro.org>
+> > ---
+> >  virt/kvm/arm/vgic/vgic-v2.c | 29 +++++++++++++++++++++++++++++
+> >  virt/kvm/arm/vgic/vgic-v3.c | 29 +++++++++++++++++++++++++++++
+> >  virt/kvm/arm/vgic/vgic.c    | 23 +++++++++++++++++++++++
+> >  virt/kvm/arm/vgic/vgic.h    |  7 +++++++
+> >  4 files changed, 88 insertions(+)
+> > 
+> > diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+> > index e4187e5..f7c5cb5 100644
+> > --- a/virt/kvm/arm/vgic/vgic-v2.c
+> > +++ b/virt/kvm/arm/vgic/vgic-v2.c
+> > @@ -104,6 +104,26 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+> >  				irq->pending_latch = false;
+> >  		}
+> >  
+> > +		/*
+> > +		 * Level-triggered mapped IRQs are special because we only
+> > +		 * observe rising edges as input to the VGIC.
+> > +		 *
+> > +		 * If the guest never acked the interrupt we have to sample
+> > +		 * the physical line and set the line level, because the
+> > +		 * device state could have changed or we simply need to
+> > +		 * process the still pending interrupt later.
+> > +		 *
+> > +		 * If this causes us to lower the level, we have to also clear
+> > +		 * the physical active state, since we will otherwise never be
+> > +		 * told when the interrupt becomes asserted again.
+> > +		 */
+> > +		if (vgic_irq_is_mapped_level(irq) && (val & GICH_LR_PENDING_BIT)) {
+> > +			irq->line_level = vgic_irq_line_level(irq);
+> > +
+> > +			if (!irq->line_level)
+> > +				vgic_irq_clear_phys_active(irq);
+> > +		}
+> > +
+> >  		spin_unlock(&irq->irq_lock);
+> >  		vgic_put_irq(vcpu->kvm, irq);
+> >  	}
+> > @@ -161,6 +181,15 @@ void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
+> >  			val |= GICH_LR_EOI;
+> >  	}
+> >  
+> > +	/*
+> > +	 * Level-triggered mapped IRQs are special because we only observe
+> > +	 * rising edges as input to the VGIC.  We therefore lower the line
+> > +	 * level here, so that we can take new virtual IRQs.  See
+> > +	 * vgic_v2_fold_lr_state for more info.
+> > +	 */
+> > +	if (vgic_irq_is_mapped_level(irq) && (val & GICH_LR_PENDING_BIT))
+> > +		irq->line_level = false;
+> > +
+> >  	/* The GICv2 LR only holds five bits of priority. */
+> >  	val |= (irq->priority >> 3) << GICH_LR_PRIORITY_SHIFT;
+> >  
+> > diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+> > index 96ea597..e377036 100644
+> > --- a/virt/kvm/arm/vgic/vgic-v3.c
+> > +++ b/virt/kvm/arm/vgic/vgic-v3.c
+> > @@ -94,6 +94,26 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+> >  				irq->pending_latch = false;
+> >  		}
+> >  
+> > +		/*
+> > +		 * Level-triggered mapped IRQs are special because we only
+> > +		 * observe rising edges as input to the VGIC.
+> > +		 *
+> > +		 * If the guest never acked the interrupt we have to sample
+> > +		 * the physical line and set the line level, because the
+> > +		 * device state could have changed or we simply need to
+> > +		 * process the still pending interrupt later.
+> > +		 *
+> > +		 * If this causes us to lower the level, we have to also clear
+> > +		 * the physical active state, since we will otherwise never be
+> > +		 * told when the interrupt becomes asserted again.
+> > +		 */
+> > +		if (vgic_irq_is_mapped_level(irq) && (val & ICH_LR_PENDING_BIT)) {
+> > +			irq->line_level = vgic_irq_line_level(irq);
 > 
-> Oops, yes, I meant kvm_arch_vcpu_ioctl_run().
-> 
-> 
-> >> debug exceptions remain disabled due to the guest exit exception,
-> >> (as does SError: today this is the only time SError is unmasked in the
-> >> kernel). The flags stay in this state until we return to userspace.
-> >>
-> >> We have a __vhe_hyp_call() function that does the isb that we implicitly
-> >> have on non-vhe systems, add the DAIF save/restore here, instead of in
-> >> __sysreg_{save,restore}_host_state() which would require an extra isb()
-> >> between the hosts VBAR_EL1 being restored and DAIF being restored.
-> 
-> > This also means that anyone else calling kvm_call_hyp(), which we are
-> > beginning to do more often, would also do this save/restore which
-> > shouldn't really be necessary, doesn't it?
-> 
-> I think it is, its done implicitly via SPSR_EL2 by the HVC/ERET on non-VHE.
-> Does the HYP code on the other end of kvm_call_hyp() expect to be called with
-> DAIF masked? What about the other way, if the HYP code modifies the DAIF flags
-> should that spread back into the kernel?
+> I don't see anything related to the GICD_ISPENDING/ICPENDING.
 
-Well, for VHE I don't think this is any different than any other
-function.  There really is no concept of 'hyp code' --- or we should aim
-for there not to be --- with VHE, so if some code expects interrupts
-disabled or other changes to the DAIF flags, that code should really do
-that for VHE.
+vgic_irq_line_level() reads GICD_ISPEND.  Not sure what you mean?
 
-The rationale being that in the long run we want to keep "jumping to
-hyp" the oddball legacy case, where everything else is just the
-kernel/hypervisor functionality.
+> In the
+> last thread, we said we were obliged to set the pending bit on the
+> physical distributor to avoid the guest deactivating a non active
+> physical IRQ.
 
-> 
-> Today this behaviour differs depending on whether we have VHE.
-> 
-> I think KVM expects its HYP code to be called with DAIF masked, (e.g. there is
-> no explicit mask of debug before save/restoring MDSCR_EL1).
+Did we?  I don't remember this, and this doesn't make sense to me.  The
+only constraint I think we have is that when setting the HW bit in the
+LR, the interrupt must be active on the physical side, so that a
+deactivate by the guest is also a deactivate on the physical side.
 
-I think this is different for the world-switch code and the hyp code.  I
-think we need a VHE-only call that masks debug exceptions before messing
-with the execution context.
+> If we still intend to do so, with that addition, aren't we
+> likely to deactivate the physical IRQ before the guest?
 
-> 
-> I'll argue all kvm_call_hyp() users expect the code be called at HYP with DAIF
-> masked, as if we just took an HVC. On return the flags should be restored as
-> they would with an ERET.
+Do you mean if it's pending+active in the LR?  That can never happen for
+a mapped (HW bit set) interrupt.
 
-We could make that call, and say that kvm_call_hyp() semantically means
-either "jump to special EL2 mode with the CPU configued as done when
-taking an exception" or "change the current CPU mode to something that
-looks like having just taken an exception and run code".  I think the
-latter is a bit contrived, and we will quickly have some hidden
-assumptions in our code.
+So this particular code sequence means that
+    (val & ICH_LR_STATE) == ICH_LR_PENDING_BIT
 
-I think if we have something like this:
+and we never clear the physical active state while the virtual interrupt
+is active.
 
-    invalidate_vm_tlb_vhe()
-    {
-        local_irq_disable();
-	mask_debug();
-	asm("..."); /* flush stuff */
-        unmask_debug();
-	local_irq_enable();
-    }
+There is an interesting point in terms of handling guest accesses to the
+virtual distributor GICD_ISPENDR, GICD_ICPENDR, GICD_ISACTIVER, and
+GICD_ICACTIVER where we must also propogate those changes to the
+physical side.
 
-    invalidate_vm_tlb_nvhe()
-    {
-        kvm_call_hyp(__hyp_flush_stuff);
-    }
-
-    if (has_vhe())
-        invalidate_vm_tlb_vhe();
-    else 
-    	invalidate_vm_tlb_nvhe();
-
-
-It becomes more clear what our expectations are.  If we really wanted,
-and we have the need to mask a certain set of exceptions, then we could
-create a wrapper for that in the VHE case.
-
-Have we actually looked at the places where we call kvm_call_hyp() and
-do they require a different setting of the DAIF flags from other kernel
-code running at EL2 with VHE ?
-
-
-> 
-> On VHE we are already at EL2 so we don't have HVC's DAIF-masking behaviour.
-> 
-> 
-> > Also, I can't really see why we need to save/restore this.  We are
-> > 'entering the kernel' similarly to entering the kernel from user space.
-> 
-> (I'm lost here, entering KVM's HYP code from a guest, or returning to the kernel
-> from KVM?)
-> 
-> 
-
-My thinking was that I don't think the kernel in general (outside of
-KVM) saves the kernel's DAIF flags before doing an eret to user space
-and then restores them when taking an exception back into the kernel,
-does it?
-
-If it doesn't, it must mean that the kernel knows what the DAIF flags
-should be when entering from a lower exception level, and I don't
-immediately understand why KVM is any different?
-
-Is there some condition that's true when running a VM from KVM which is
-not true as we are about to return from user space, for example related
-to how debug is configured?
-
-> > Does the kernel/userspace boundry preserve kernel state or can we simply
-> > set what the wanted state of the flags should be upon having entered the
-> > kernel from EL2?
-> 
-> Entering KVM's HYP code from a guest is an exception so the CPU masks DAIF, KVM
-> unmasks SError, world-switches back to the host and on VHE: 'ret's to the kernel.
-> 
-> On VHE before kvm_call_hyp() SError was masked and Debug was enabled, on return
-> SError is unmasked and Debug disabled. We can then re-schedule to some other
-> task with Debug disabled.
-
-I understand that the behavior is currently different, but what I'm
-asking is, instead of having to save and restore anything to the stack,
-can you simply do:
-
-     __kvm_vcpu_run(struct kvm_vcpu *vcpu)
-     {
-         if (has_vhe())
-             asm("msr     daifset, #0xf");
-
-	...
-        exit_code = __guest_enter(vcpu, host_ctxt);
-	...
-
-	if (has_vhe())
-             asm("msr     daifclr, #0xd");
-     }
-
-(not sure about the FIQ flag - does the kernel usually 
-
-The overall point being that we avoid a potentially unnecessary
-save/restore on the stack in the critical path and we avoid potentially
-unnecessary work and hidden assumptions for non-world-switch uses of
-kvm_call_hyp.
+Was this what you meant?
 
 Thanks,
 -Christoffer
+
+
+> > +
+> > +			if (!irq->line_level)
+> > +				vgic_irq_clear_phys_active(irq);
+> > +		}
+> > +
+> >  		spin_unlock(&irq->irq_lock);
+> >  		vgic_put_irq(vcpu->kvm, irq);
+> >  	}
+> > @@ -144,6 +164,15 @@ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
+> >  	}
+> >  
+> >  	/*
+> > +	 * Level-triggered mapped IRQs are special because we only observe
+> > +	 * rising edges as input to the VGIC.  We therefore lower the line
+> > +	 * level here, so that we can take new virtual IRQs.  See
+> > +	 * vgic_v3_fold_lr_state for more info.
+> > +	 */
+> > +	if (vgic_irq_is_mapped_level(irq) && (val & ICH_LR_PENDING_BIT))
+> > +		irq->line_level = false;
+> > +
+> > +	/*
+> >  	 * We currently only support Group1 interrupts, which is a
+> >  	 * known defect. This needs to be addressed at some point.
+> >  	 */
+> > diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> > index 9d557efd..2691a0a 100644
+> > --- a/virt/kvm/arm/vgic/vgic.c
+> > +++ b/virt/kvm/arm/vgic/vgic.c
+> > @@ -140,6 +140,29 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
+> >  	kfree(irq);
+> >  }
+> >  
+> > +/* Get the input level of a mapped IRQ directly from the physical GIC */
+> > +bool vgic_irq_line_level(struct vgic_irq *irq)
+> > +{
+> > +	bool line_level;
+> > +
+> > +	BUG_ON(!irq->hw);
+> > +
+> > +	WARN_ON(irq_get_irqchip_state(irq->host_irq,
+> > +				      IRQCHIP_STATE_PENDING,
+> > +				      &line_level));
+> > +	return line_level;
+> > +}
+> > +
+> > +/* Clear the physical active state */
+> > +void vgic_irq_clear_phys_active(struct vgic_irq *irq)
+> > +{
+> > +
+> > +	BUG_ON(!irq->hw);
+> > +	WARN_ON(irq_set_irqchip_state(irq->host_irq,
+> > +				      IRQCHIP_STATE_ACTIVE,
+> > +				      false));
+> > +}
+> > +
+> >  /**
+> >   * kvm_vgic_target_oracle - compute the target vcpu for an irq
+> >   *
+> > diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+> > index bba7fa2..22f106d 100644
+> > --- a/virt/kvm/arm/vgic/vgic.h
+> > +++ b/virt/kvm/arm/vgic/vgic.h
+> > @@ -104,6 +104,11 @@ static inline bool irq_is_pending(struct vgic_irq *irq)
+> >  		return irq->pending_latch || irq->line_level;
+> >  }
+> >  
+> > +static inline bool vgic_irq_is_mapped_level(struct vgic_irq *irq)
+> > +{
+> > +	return irq->config == VGIC_CONFIG_LEVEL && irq->hw;
+> > +}
+> > +
+> >  /*
+> >   * This struct provides an intermediate representation of the fields contained
+> >   * in the GICH_VMCR and ICH_VMCR registers, such that code exporting the GIC
+> > @@ -140,6 +145,8 @@ vgic_get_mmio_region(struct kvm_vcpu *vcpu, struct vgic_io_device *iodev,
+> >  struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
+> >  			      u32 intid);
+> >  void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq);
+> > +bool vgic_irq_line_level(struct vgic_irq *irq);
+> > +void vgic_irq_clear_phys_active(struct vgic_irq *irq);
+> >  bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq);
+> >  void vgic_kick_vcpus(struct kvm *kvm);
+> >  
+> > 
