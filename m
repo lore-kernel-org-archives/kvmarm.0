@@ -1,120 +1,245 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH] [stable] kvm: arm/arm64: Fix race in resetting stage2 PGD
-Date: Wed, 30 Aug 2017 12:30:52 +0100
-Message-ID: <1504092652-13443-1-git-send-email-suzuki.poulose@arm.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH v3 41/59] KVM: arm/arm64: GICv4: Wire mapping/unmapping
+ of VLPIs in VFIO irq bypass
+Date: Wed, 30 Aug 2017 13:46:46 +0200
+Message-ID: <20170830114646.GD24522@cbox>
+References: <20170731172637.29355-1-marc.zyngier@arm.com>
+ <20170731172637.29355-42-marc.zyngier@arm.com>
+ <20170826194850.GB11074@cbox>
+ <06930ddb-6c40-ff74-0062-cec236ce2455@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <06930ddb-6c40-ff74-0062-cec236ce2455@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: stable@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org, pbonzini@redhat.com, agraf@suse.de, suzuki.poulose@arm.com, mark.rutland@arm.com, rkrcmar@redhat.com
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>, Eric Auger <eric.auger@redhat.com>, Shanker Donthineni <shankerd@codeaurora.org>, Mark Rutland <mark.rutland@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-commit 6c0d706b563af732adb094c5bf807437e8963e84 upstream.
+On Wed, Aug 30, 2017 at 11:28:08AM +0100, Marc Zyngier wrote:
+> On 26/08/17 20:48, Christoffer Dall wrote:
+> > On Mon, Jul 31, 2017 at 06:26:19PM +0100, Marc Zyngier wrote:
+> >> Let's use the irq bypass mechanism introduced for platform device
+> >> interrupts to intercept the virtual PCIe endpoint configuration
+> >> and establish our LPI->VLPI mapping.
+> >>
+> >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> >> ---
+> >>  include/kvm/arm_vgic.h      |   8 ++++
+> >>  virt/kvm/arm/arm.c          |  27 ++++++++----
+> >>  virt/kvm/arm/vgic/vgic-v4.c | 103 ++++++++++++++++++++++++++++++++++++++++++++
+> >>  3 files changed, 130 insertions(+), 8 deletions(-)
+> >>
+> >> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> >> index 359eeffe9857..050f78d4fb42 100644
+> >> --- a/include/kvm/arm_vgic.h
+> >> +++ b/include/kvm/arm_vgic.h
+> >> @@ -367,4 +367,12 @@ int kvm_vgic_set_forwarding(struct kvm *kvm, unsigned int host_irq,
+> >>  void kvm_vgic_unset_forwarding(struct kvm *kvm, unsigned int host_irq,
+> >>  			       unsigned int vintid);
+> >>  
+> >> +struct kvm_kernel_irq_routing_entry;
+> >> +
+> >> +int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int irq,
+> >> +			       struct kvm_kernel_irq_routing_entry *irq_entry);
+> >> +
+> >> +int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int irq,
+> >> +				 struct kvm_kernel_irq_routing_entry *irq_entry);
+> >> +
+> >>  #endif /* __KVM_ARM_VGIC_H */
+> >> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> >> index ebab6c29e3be..6803ea27c47d 100644
+> >> --- a/virt/kvm/arm/arm.c
+> >> +++ b/virt/kvm/arm/arm.c
+> >> @@ -1457,11 +1457,16 @@ int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
+> >>  	struct kvm_kernel_irqfd *irqfd =
+> >>  		container_of(cons, struct kvm_kernel_irqfd, consumer);
+> >>  
+> >> -	if (prod->type != IRQ_BYPASS_VFIO_PLATFORM)
+> >> +	switch (prod->type) {
+> >> +	case IRQ_BYPASS_VFIO_PLATFORM:
+> >> +		return kvm_vgic_set_forwarding(irqfd->kvm, prod->irq,
+> >> +					       irqfd->gsi + VGIC_NR_PRIVATE_IRQS);
+> >> +	case IRQ_BYPASS_VFIO_PCI_MSI:
+> >> +		return kvm_vgic_v4_set_forwarding(irqfd->kvm, prod->irq,
+> >> +						  &irqfd->irq_entry);
+> >> +	default:
+> >>  		return 0;
+> >> -
+> >> -	return kvm_vgic_set_forwarding(irqfd->kvm, prod->irq,
+> >> -				       irqfd->gsi + VGIC_NR_PRIVATE_IRQS);
+> >> +	}
+> >>  }
+> >>  void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
+> >>  				      struct irq_bypass_producer *prod)
+> >> @@ -1469,11 +1474,17 @@ void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
+> >>  	struct kvm_kernel_irqfd *irqfd =
+> >>  		container_of(cons, struct kvm_kernel_irqfd, consumer);
+> >>  
+> >> -	if (prod->type != IRQ_BYPASS_VFIO_PLATFORM)
+> >> -		return;
+> >> +	switch (prod->type) {
+> >> +	case IRQ_BYPASS_VFIO_PLATFORM:
+> >> +		kvm_vgic_unset_forwarding(irqfd->kvm, prod->irq,
+> >> +					  irqfd->gsi + VGIC_NR_PRIVATE_IRQS);
+> >> +		break;
+> >>  
+> >> -	kvm_vgic_unset_forwarding(irqfd->kvm, prod->irq,
+> >> -				  irqfd->gsi + VGIC_NR_PRIVATE_IRQS);
+> >> +	case IRQ_BYPASS_VFIO_PCI_MSI:
+> >> +		kvm_vgic_v4_unset_forwarding(irqfd->kvm, prod->irq,
+> >> +					     &irqfd->irq_entry);
+> >> +		break;
+> >> +	}
+> >>  }
+> >>  
+> >>  void kvm_arch_irq_bypass_stop(struct irq_bypass_consumer *cons)
+> >> diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
+> >> index 207e1fda0dcd..338c86c5159f 100644
+> >> --- a/virt/kvm/arm/vgic/vgic-v4.c
+> >> +++ b/virt/kvm/arm/vgic/vgic-v4.c
+> >> @@ -72,3 +72,106 @@ void vgic_v4_teardown(struct kvm *kvm)
+> >>  	its_vm->nr_vpes = 0;
+> >>  	its_vm->vpes = NULL;
+> >>  }
+> >> +
+> >> +static struct vgic_its *vgic_get_its(struct kvm *kvm,
+> >> +				     struct kvm_kernel_irq_routing_entry *irq_entry)
+> >> +{
+> >> +	struct kvm_msi msi  = (struct kvm_msi) {
+> >> +		.address_lo	= irq_entry->msi.address_lo,
+> >> +		.address_hi	= irq_entry->msi.address_hi,
+> >> +		.data		= irq_entry->msi.data,
+> >> +		.flags		= irq_entry->msi.flags,
+> >> +		.devid		= irq_entry->msi.devid,
+> >> +	};
+> >> +
+> >> +	/*
+> >> +	 * Get a reference on the LPI. If NULL, this is not a valid
+> >> +	 * translation for any of our vITSs.
+> >> +	 */
+> >> +	return vgic_msi_to_its(kvm, &msi);
+> >> +}
+> >> +
+> >> +int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
+> >> +			       struct kvm_kernel_irq_routing_entry *irq_entry)
+> >> +{
+> >> +	struct vgic_its *its;
+> >> +	struct vgic_irq *irq;
+> >> +	struct its_vlpi_map map;
+> >> +	int ret;
+> >> +
+> >> +	if (!vgic_is_v4_capable(kvm))
+> >> +		return 0;
+> >> +
+> >> +	/*
+> >> +	 * Get the ITS, and escape early on error (not a valid
+> >> +	 * doorbell for any of our vITSs).
+> >> +	 */
+> >> +	its = vgic_get_its(kvm, irq_entry);
+> >> +	if (IS_ERR(its))
+> >> +		return 0;
+> >> +
+> >> +	mutex_lock(&its->its_lock);
+> >> +
+> >> +	/* Perform then actual DevID/EventID -> LPI translation. */
+> >> +	ret = vgic_its_resolve_lpi(kvm, its, irq_entry->msi.devid,
+> >> +				   irq_entry->msi.data, &irq);
+> >> +	if (ret)
+> >> +		goto out;
+> >> +
+> >> +	/*
+> >> +	 * Emit the mapping request. If it fails, the ITS probably
+> >> +	 * isn't v4 compatible, so let's silently bail out. Holding
+> >> +	 * the ITS lock should ensure that nothing can modify the
+> >> +	 * target vcpu.
+> >> +	 */
+> >> +	map = (struct its_vlpi_map) {
+> >> +		.vm		= &kvm->arch.vgic.its_vm,
+> >> +		.vintid		= irq->intid,
+> >> +		.db_enabled	= true,
+> >> +		.vpe_idx	= irq->target_vcpu->vcpu_id,
+> 
+> This is just wrong. We cannot assume that the vcpu_id has anything to do
+> with the vpe_idx. It happens to be the same thing now, but the two things
+> should be clearly disconnected.
+> 
+> I suggest the following (untested):
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
+> index cf5d6e2de6b8..0146e004401a 100644
+> --- a/virt/kvm/arm/vgic/vgic-v4.c
+> +++ b/virt/kvm/arm/vgic/vgic-v4.c
+> @@ -251,13 +251,27 @@ static void dump_routing(int virq, struct kvm_kernel_irq_routing_entry *irq_entr
+>  
+>  }
+>  
+> +static int vgic_v4_vcpu_to_index(struct its_vm *its_vm, struct kvm_vcpu *vcpu)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < its_vm->nr_vpes; i++) {
+> +		struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
+> +
+> +		if (its_vm->vpes[i] == vpe)
+> +			return i;
+> +	}
+> +
+> +	return -ENODEV;
+> +}
+> +
 
-In kvm_free_stage2_pgd() we check the stage2 PGD before holding
-the lock and proceed to take the lock if it is valid. And we unmap
-the page tables, followed by releasing the lock. We reset the PGD
-only after dropping this lock, which could cause a race condition
-where another thread waiting on or even holding the lock, could
-potentially see that the PGD is still valid and proceed to perform
-a stage2 operation and later encounter a NULL PGD.
+Stupid question: Can we change the struct its_vlpi_map to contain a
+vpe pointer or in stead of or in addition to the index?
 
-[223090.242280] Unable to handle kernel NULL pointer dereference at
-virtual address 00000040
-[223090.262330] PC is at unmap_stage2_range+0x8c/0x428
-[223090.262332] LR is at kvm_unmap_hva_handler+0x2c/0x3c
-[223090.262531] Call trace:
-[223090.262533] [<ffff0000080adb78>] unmap_stage2_range+0x8c/0x428
-[223090.262535] [<ffff0000080adf40>] kvm_unmap_hva_handler+0x2c/0x3c
-[223090.262537] [<ffff0000080ace2c>] handle_hva_to_gpa+0xb0/0x104
-[223090.262539] [<ffff0000080af988>] kvm_unmap_hva+0x5c/0xbc
-[223090.262543] [<ffff0000080a2478>] kvm_mmu_notifier_invalidate_page+0x50/0x8c
-[223090.262547] [<ffff0000082274f8>] __mmu_notifier_invalidate_page+0x5c/0x84
-[223090.262551] [<ffff00000820b700>] try_to_unmap_one+0x1d0/0x4a0
-[223090.262553] [<ffff00000820c5c8>] rmap_walk+0x1cc/0x2e0
-[223090.262555] [<ffff00000820c90c>] try_to_unmap+0x74/0xa4
-[223090.262557] [<ffff000008230ce4>] migrate_pages+0x31c/0x5ac
-[223090.262561] [<ffff0000081f869c>] compact_zone+0x3fc/0x7ac
-[223090.262563] [<ffff0000081f8ae0>] compact_zone_order+0x94/0xb0
-[223090.262564] [<ffff0000081f91c0>] try_to_compact_pages+0x108/0x290
-[223090.262569] [<ffff0000081d5108>] __alloc_pages_direct_compact+0x70/0x1ac
-[223090.262571] [<ffff0000081d64a0>] __alloc_pages_nodemask+0x434/0x9f4
-[223090.262572] [<ffff0000082256f0>] alloc_pages_vma+0x230/0x254
-[223090.262574] [<ffff000008235e5c>] do_huge_pmd_anonymous_page+0x114/0x538
-[223090.262576] [<ffff000008201bec>] handle_mm_fault+0xd40/0x17a4
-[223090.262577] [<ffff0000081fb324>] __get_user_pages+0x12c/0x36c
-[223090.262578] [<ffff0000081fb804>] get_user_pages_unlocked+0xa4/0x1b8
-[223090.262579] [<ffff0000080a3ce8>] __gfn_to_pfn_memslot+0x280/0x31c
-[223090.262580] [<ffff0000080a3dd0>] gfn_to_pfn_prot+0x4c/0x5c
-[223090.262582] [<ffff0000080af3f8>] kvm_handle_guest_abort+0x240/0x774
-[223090.262584] [<ffff0000080b2bac>] handle_exit+0x11c/0x1ac
-[223090.262586] [<ffff0000080ab99c>] kvm_arch_vcpu_ioctl_run+0x31c/0x648
-[223090.262587] [<ffff0000080a1d78>] kvm_vcpu_ioctl+0x378/0x768
-[223090.262590] [<ffff00000825df5c>] do_vfs_ioctl+0x324/0x5a4
-[223090.262591] [<ffff00000825e26c>] SyS_ioctl+0x90/0xa4
-[223090.262595] [<ffff000008085d84>] el0_svc_naked+0x38/0x3c
+Alternatively, can you look it up using
+vcpu->arch.vgic_cpu.vgic_v3.its_vpe.irq() and another 'ioctl' in
+irq_set_vcpu_affinity() somehow instead of looping around and testing?
 
-This patch moves the stage2 PGD manipulation under the lock.
+>  int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
+>  			       struct kvm_kernel_irq_routing_entry *irq_entry)
+>  {
+>  	struct vgic_its *its;
+>  	struct vgic_irq *irq;
+>  	struct its_vlpi_map map;
+> -	int ret;
+> +	int ret, idx;
+>  
+>  	dump_routing(virq, irq_entry, true);
+>  
+> @@ -280,6 +294,11 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
+>  	if (ret)
+>  		goto out;
+>  
+> +	idx = vgic_v4_vcpu_to_index(&kvm->arch.vgic.its_vm,
+> +				    irq->target_vcpu);
+> +	if (idx < 0)
+> +		goto out;
+> +
+>  	/*
+>  	 * Emit the mapping request. If it fails, the ITS probably
+>  	 * isn't v4 compatible, so let's silently bail out. Holding
+> @@ -290,7 +309,7 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
+>  		.vm		= &kvm->arch.vgic.its_vm,
+>  		.vintid		= irq->intid,
+>  		.db_enabled	= true,
+> -		.vpe_idx	= irq->target_vcpu->vcpu_id,
+> +		.vpe_idx	= idx,
+>  	};
+>  
+>  	if (its_map_vlpi(virq, &map))
+> 
+> Another option would be to just pass the pointer to the vpe instead,
+> and let the irq code to figure out the index, which can easily be
+> derived the doorbells (vpe->vpe_db_lpi - vpe->its_vm->db_lpi_base).
+> 
+> I'll work something out for the next version.
 
-Reported-by: Alexander Graf <agraf@suse.de>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
-Cc: stable@vger.kernel.org # 4.10.x and earlier
-Reviewed-by: Christoffer Dall <cdall@linaro.org>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Signed-off-by: Christoffer Dall <cdall@linaro.org>
+Ah, yeah, so I guess that is an option.
 
----
+It should be pretty quick to loop over even hundreds of vcpus, but that
+kind of thing just always seems wrong, somehow.
 
-Hi,
-
-Looks like we missed sending this to stable. Please apply for 4.10.x and
-earlier. 4.11.y and later versions have it already.
-
-Suzuki
----
- arch/arm/kvm/mmu.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index 2fd5c13..3526f30 100644
---- a/arch/arm/kvm/mmu.c
-+++ b/arch/arm/kvm/mmu.c
-@@ -829,22 +829,22 @@ void stage2_unmap_vm(struct kvm *kvm)
-  * Walks the level-1 page table pointed to by kvm->arch.pgd and frees all
-  * underlying level-2 and level-3 tables before freeing the actual level-1 table
-  * and setting the struct pointer to NULL.
-- *
-- * Note we don't need locking here as this is only called when the VM is
-- * destroyed, which can only be done once.
-  */
- void kvm_free_stage2_pgd(struct kvm *kvm)
- {
--	if (kvm->arch.pgd == NULL)
--		return;
-+	void *pgd = NULL;
- 
- 	spin_lock(&kvm->mmu_lock);
--	unmap_stage2_range(kvm, 0, KVM_PHYS_SIZE);
-+	if (kvm->arch.pgd) {
-+		unmap_stage2_range(kvm, 0, KVM_PHYS_SIZE);
-+		pgd = kvm->arch.pgd;
-+		kvm->arch.pgd = NULL;
-+	}
- 	spin_unlock(&kvm->mmu_lock);
- 
- 	/* Free the HW pgd, one page at a time */
--	free_pages_exact(kvm->arch.pgd, S2_PGD_SIZE);
--	kvm->arch.pgd = NULL;
-+	if (pgd)
-+		free_pages_exact(pgd, S2_PGD_SIZE);
- }
- 
- static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
--- 
-2.7.5
+Thanks,
+-Christoffer
