@@ -1,228 +1,222 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [RFC PATCH 2/4] KVM: arm/arm64: vgic: Support level-triggered
- mapped interrupts
-Date: Wed, 30 Aug 2017 14:03:02 +0200
-Message-ID: <20170830120302.GH24522@cbox>
-References: <20170829093902.15379-1-cdall@linaro.org>
- <20170829093902.15379-3-cdall@linaro.org>
- <428bb30a-4d3d-d983-e1d1-8f160da846c5@redhat.com>
- <20170830092026.GC24522@cbox>
- <c1a89a51-2869-5f16-a971-071146fa2c18@redhat.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH v3 51/59] KVM: arm/arm64: GICv4: Add doorbell interrupt
+ handling
+Date: Wed, 30 Aug 2017 14:28:30 +0200
+Message-ID: <20170830122830.qfa4gbooguee6v5r@kamzik.brq.redhat.com>
+References: <20170731172637.29355-1-marc.zyngier@arm.com>
+ <20170731172637.29355-52-marc.zyngier@arm.com>
+ <8a35ee18-85a5-168b-b3d2-b9f51390b475@arm.com>
+ <20170828181850.GL24649@cbox>
+ <20170830103141.jarquijxzntv2feo@kamzik.brq.redhat.com>
+ <20170830115510.GE24522@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <c1a89a51-2869-5f16-a971-071146fa2c18@redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: Auger Eric <eric.auger@redhat.com>
-Cc: kvmarm@lists.cs.columbia.edu, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+In-Reply-To: <20170830115510.GE24522@cbox>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Christoffer Dall <cdall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>, Eric Auger <eric.auger@redhat.com>, Shanker Donthineni <shankerd@codeaurora.org>, Mark Rutland <mark.rutland@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Aug 30, 2017 at 12:13:32PM +0200, Auger Eric wrote:
-> Hi Christoffer,
-> 
-> On 30/08/2017 11:20, Christoffer Dall wrote:
-> > On Wed, Aug 30, 2017 at 10:19:38AM +0200, Auger Eric wrote:
-> >> Hi Christoffer,
-> >>
-> >> On 29/08/2017 11:39, Christoffer Dall wrote:
-> >>> Level-triggered mapped IRQs are special because we only observe rising
-> >>> edges as input to the VGIC, and we don't set the EOI flag and therefore
-> >>> are not told when the level goes down, so that we can re-queue a new
-> >>> interrupt when the level goes up.
-> >>>
-> >>> One way to solve this problem is to side-step the logic of the VGIC and
-> >>> special case the validation in the injection path, but it has the
-> >>> unfortunate drawback of having to peak into the physical GIC state
-> >>> whenever we want to know if the interrupt is pending on the virtual
-> >>> distributor.
-> >>>
-> >>> Instead, we can maintain the current semantics of a level triggered
-> >>> interrupt by sort of treating it as an edge-triggered interrupt,
-> >>> following from the fact that we only observe an asserting edge.  This
-> >>> requires us to be a bit careful when populating the LRs and when folding
-> >>> the state back in though:
-> >>>
-> >>>  * We lower the line level when populating the LR, so that when
-> >>>    subsequently observing an asserting edge, the VGIC will do the right
-> >>>    thing.
-> >>>
-> >>>  * If the guest never acked the interrupt while running (for example if
-> >>>    it had masked interrupts at the CPU level while running), we have
-> >>>    to preserve the pending state of the LR and move it back to the
-> >>>    line_level field of the struct irq when folding LR state.
-> >>>
-> >>>    If the guest never acked the interrupt while running, but changed the
-> >>>    device state and lowered the line (again with interrupts masked) then
-> >>>    we need to observe this change in the line_level.
-> >>>
-> >>>    Both of the above situations are solved by sampling the physical line
-> >>>    and set the line level when folding the LR back.
-> >>>
-> >>>  * Finally, if the guest never acked the interrupt while running and
-> >>>    sampling the line reveals that the device state has changed and the
-> >>>    line has been lowered, we must clear the physical active state, since
-> >>>    we will otherwise never be told when the interrupt becomes asserted
-> >>>    again.
-> >>>
-> >>> This has the added benefit of making the timer optimization patches
-> >>> (https://lists.cs.columbia.edu/pipermail/kvmarm/2017-July/026343.html) a
-> >>> bit simpler, because the timer code doesn't have to clear the active
-> >>> state on the sync anymore.  It also potentially improves the performance
-> >>> of the timer implementation because the GIC knows the state or the LR
-> >>> and only needs to clear the
-> >>> active state when the pending bit in the LR is still set, where the
-> >>> timer has to always clear it when returning from running the guest with
-> >>> an injected timer interrupt.
-> >>>
-> >>> Signed-off-by: Christoffer Dall <cdall@linaro.org>
-> >>> ---
-> >>>  virt/kvm/arm/vgic/vgic-v2.c | 29 +++++++++++++++++++++++++++++
-> >>>  virt/kvm/arm/vgic/vgic-v3.c | 29 +++++++++++++++++++++++++++++
-> >>>  virt/kvm/arm/vgic/vgic.c    | 23 +++++++++++++++++++++++
-> >>>  virt/kvm/arm/vgic/vgic.h    |  7 +++++++
-> >>>  4 files changed, 88 insertions(+)
-> >>>
-> >>> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-> >>> index e4187e5..f7c5cb5 100644
-> >>> --- a/virt/kvm/arm/vgic/vgic-v2.c
-> >>> +++ b/virt/kvm/arm/vgic/vgic-v2.c
-> >>> @@ -104,6 +104,26 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
-> >>>  				irq->pending_latch = false;
-> >>>  		}
-> >>>  
-> >>> +		/*
-> >>> +		 * Level-triggered mapped IRQs are special because we only
-> >>> +		 * observe rising edges as input to the VGIC.
-> >>> +		 *
-> >>> +		 * If the guest never acked the interrupt we have to sample
-> >>> +		 * the physical line and set the line level, because the
-> >>> +		 * device state could have changed or we simply need to
-> >>> +		 * process the still pending interrupt later.
-> >>> +		 *
-> >>> +		 * If this causes us to lower the level, we have to also clear
-> >>> +		 * the physical active state, since we will otherwise never be
-> >>> +		 * told when the interrupt becomes asserted again.
-> >>> +		 */
-> >>> +		if (vgic_irq_is_mapped_level(irq) && (val & GICH_LR_PENDING_BIT)) {
-> >>> +			irq->line_level = vgic_irq_line_level(irq);
-> >>> +
-> >>> +			if (!irq->line_level)
-> >>> +				vgic_irq_clear_phys_active(irq);
-> >>> +		}
-> >>> +
-> >>>  		spin_unlock(&irq->irq_lock);
-> >>>  		vgic_put_irq(vcpu->kvm, irq);
-> >>>  	}
-> >>> @@ -161,6 +181,15 @@ void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
-> >>>  			val |= GICH_LR_EOI;
-> >>>  	}
-> >>>  
-> >>> +	/*
-> >>> +	 * Level-triggered mapped IRQs are special because we only observe
-> >>> +	 * rising edges as input to the VGIC.  We therefore lower the line
-> >>> +	 * level here, so that we can take new virtual IRQs.  See
-> >>> +	 * vgic_v2_fold_lr_state for more info.
-> >>> +	 */
-> >>> +	if (vgic_irq_is_mapped_level(irq) && (val & GICH_LR_PENDING_BIT))
-> >>> +		irq->line_level = false;
-> >>> +
-> >>>  	/* The GICv2 LR only holds five bits of priority. */
-> >>>  	val |= (irq->priority >> 3) << GICH_LR_PRIORITY_SHIFT;
-> >>>  
-> >>> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> >>> index 96ea597..e377036 100644
-> >>> --- a/virt/kvm/arm/vgic/vgic-v3.c
-> >>> +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> >>> @@ -94,6 +94,26 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
-> >>>  				irq->pending_latch = false;
-> >>>  		}
-> >>>  
-> >>> +		/*
-> >>> +		 * Level-triggered mapped IRQs are special because we only
-> >>> +		 * observe rising edges as input to the VGIC.
-> >>> +		 *
-> >>> +		 * If the guest never acked the interrupt we have to sample
-> >>> +		 * the physical line and set the line level, because the
-> >>> +		 * device state could have changed or we simply need to
-> >>> +		 * process the still pending interrupt later.
-> >>> +		 *
-> >>> +		 * If this causes us to lower the level, we have to also clear
-> >>> +		 * the physical active state, since we will otherwise never be
-> >>> +		 * told when the interrupt becomes asserted again.
-> >>> +		 */
-> >>> +		if (vgic_irq_is_mapped_level(irq) && (val & ICH_LR_PENDING_BIT)) {
-> >>> +			irq->line_level = vgic_irq_line_level(irq);
-> >>
-> >> I don't see anything related to the GICD_ISPENDING/ICPENDING.
+On Wed, Aug 30, 2017 at 01:55:10PM +0200, Christoffer Dall wrote:
+> On Wed, Aug 30, 2017 at 12:31:41PM +0200, Andrew Jones wrote:
+> > On Mon, Aug 28, 2017 at 08:18:50PM +0200, Christoffer Dall wrote:
+> > > On Fri, Aug 04, 2017 at 08:44:04AM +0100, Marc Zyngier wrote:
+> > > > On 31/07/17 18:26, Marc Zyngier wrote:
+> > > > > When a vPE is not running, a VLPI being made pending results in a
+> > > > > doorbell interrupt being delivered. Let's handle this interrupt
+> > > > > and update the pending_last flag that indicates that VLPIs are
+> > > > > pending. The corresponding vcpu is also kicked into action.
+> > > > > 
+> > > > > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> > > > > ---
+> > > > >  virt/kvm/arm/vgic/vgic-v4.c | 34 ++++++++++++++++++++++++++++++++++
+> > > > >  1 file changed, 34 insertions(+)
+> > > > > 
+> > > > > diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
+> > > > > index 534d3051a078..6af3cde6d7d4 100644
+> > > > > --- a/virt/kvm/arm/vgic/vgic-v4.c
+> > > > > +++ b/virt/kvm/arm/vgic/vgic-v4.c
+> > > > > @@ -21,6 +21,19 @@
+> > > > >  
+> > > > >  #include "vgic.h"
+> > > > >  
+> > > > > +static irqreturn_t vgic_v4_doorbell_handler(int irq, void *info)
+> > > > > +{
+> > > > > +	struct kvm_vcpu *vcpu = info;
+> > > > > +
+> > > > > +	if (!kvm_vgic_vcpu_pending_irq(vcpu)) {
+> > > > > +		vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last = true;
+> > > > > +		kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+> > > > > +		kvm_vcpu_kick(vcpu);
+> > > > > +	}
+> > > > 
+> > > > This code is so obviously broken that I completely overlooked it.
+> > > > 
+> > > > If we have take a doorbell interrupt, then it means nothing was
+> > > > otherwise pending (because we'd have been kicked out of the blocking
+> > > > state, and will have masked the doorbell). So checking for pending
+> > > > interrupts is pointless.
+> > > > 
+> > > > Furthermore, calling kvm_vgic_vcpu_pending_irq() takes the ap_list
+> > > > lock. If we take a doorbell interrupt while injecting a virtual
+> > > > interrupt (from userspace, for example) on the same CPU, we end-up
+> > > > in deadlock land. This would be solved by Christoffer's latest
+> > > > crop of timer patches, but there is no point getting there the first
+> > > > place.
+> > > > 
+> > > > The patchlet below solves it:
+> > > > 
+> > > > diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
+> > > > index 15feb1151797..48e4d6ebeaa8 100644
+> > > > --- a/virt/kvm/arm/vgic/vgic-v4.c
+> > > > +++ b/virt/kvm/arm/vgic/vgic-v4.c
+> > > > @@ -94,11 +94,9 @@ static irqreturn_t vgic_v4_doorbell_handler(int irq, void *info)
+> > > >  {
+> > > >  	struct kvm_vcpu *vcpu = info;
+> > > >  
+> > > > -	if (!kvm_vgic_vcpu_pending_irq(vcpu)) {
+> > > > -		vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last = true;
+> > > > -		kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+> > > > -		kvm_vcpu_kick(vcpu);
+> > > > -	}
+> > > > +	vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last = true;
+> > > > +	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+> > > > +	kvm_vcpu_kick(vcpu);
+> > > 
+> > > I don't think you need the request and kick, because if you're getting
+> > > this doorbell, doesn't that also mean that the VCPU is not running in
+> > > the guest and you simply need to make sure the VCPU thread gets
+> > > scheduled again, so you could call kvm_vcpu_wake_up() instead.
 > > 
-> > vgic_irq_line_level() reads GICD_ISPEND.  Not sure what you mean?
+> > While we do that in kvm_timer_inject_irq_work(), which is scheduled from
+> > the same function that vgic_v4_doorbell_handler() would be enabled from
+> > (kvm_vcpu_block->kvm_arch_vcpu_blocking), just a wake up isn't sufficient
+> > in this case.
 > > 
-> >> In the
-> >> last thread, we said we were obliged to set the pending bit on the
-> >> physical distributor to avoid the guest deactivating a non active
-> >> physical IRQ.
+> > > 
+> > > Unless the request is there to ensure proper memory barriers around
+> > > setting pending_last?
 > > 
-> > Did we?  I don't remember this, and this doesn't make sense to me.  The
-> > only constraint I think we have is that when setting the HW bit in the
-> > LR, the interrupt must be active on the physical side, so that a
-> > deactivate by the guest is also a deactivate on the physical side.
+> > Right, unlike pending timers, we need the barriers in this handler.
+> > Pending timers are safe because their pending test compares state set by
+> > the VCPU thread itself to state acquired by the VCPU thread reading a host
+> > sysreg itself. IOW, handlers making "set vcpu timer pending requests"
+> > don't need to do anything but wake up the VCPU. Handlers that set some
+> > sort of irq pending state, like vgic_v4_doorbell_handler(), do need to
+> > worry about the visibility of that state though.
+> > 
+> > > 
+> > > In that case, is the read barrier taken care of by prepare_to_swait in
+> > > kvm_vcpu_block()?
+> > 
+> > Thanks for the bug report :-)
+> > 
+> > There's a barrier, but it's not properly paired. Currently we have
+> > 
+> >  VCPU                                        handler
+> >  ----                                        -------
+> >  for (;;) {
+> >    WRITE_ONCE(task->state, INTERRUPTIBLE);   pending=true;
+> >    smp_mb();                                 smp_wmb(); // kvm_make_request()
+> >    if (pending) {                            WRITE_ONCE(vcpu->state, NORMAL);
+> >      ... stop waiting ...
+> >    }
+> >    schedule();
+> >  }
+> > 
+> > Proper barrier use with swait/swake should instead look like this
+> > 
+> >  VCPU                                        handler
+> >  ----                                        -------
+> >  for (;;) {
+> >    WRITE_ONCE(task->state, INTERRUPTIBLE);
+> >    smp_mb();
+> >    if (READ_ONCE(task->state) == NORMAL) {   pending=true;
+> >      smp_rmb();                              smp_wmb();
+> >      if (pending)                            WRITE_ONCE(vcpu->state, NORMAL);
+> >        ... stop waiting ...
+> >      else
+> >        continue;
+> >    }
+> >    schedule();
+> >  }
+> > 
+> > But checking task state adds complexity and would only cover a small
+> > window anyway (the window between prepare_to_swait() and
+> > kvm_vcpu_check_block()). We need to cover a larger window, for this
+> > particular case it's from kvm_arch_vcpu_blocking() to
+> > kvm_vcpu_check_block(). Better use of VCPU requests is the answer:
+> > 
+> >  VCPU                                        handler
+> >  ----                                        -------
+> >  kvm_arch_vcpu_blocking();
+> >  for (;;) {
+> >    prepare_to_swait(); 
+> >    if (test_bit(IRQ_PENDING)) {              pending=true;
+> >      smp_rmb();                              smp_wmb();
+> >      if (pending)                            set_bit(IRQ_PENDING);
+> >        ... stop waiting ...
+> >      else
+> >        continue;
+> >    }
+> >    schedule();
+> >  }
+> > 
+> > The handler side is covered by kvm_make_request() and the vcpu kick, so
+> > this patch looks good. However we need a patch to kvm_arch_vcpu_runnable()
+> > to fix the VCPU side.
+> > 
+> >  int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
+> >  {
+> > -       return ((!!v->arch.irq_lines || kvm_vgic_vcpu_pending_irq(v))
+> > -               && !v->arch.power_off && !v->arch.pause);
+> > +       if (v->arch.power_off || v->arch.pause)
+> > +               return false;
 > 
-> That what I understood from this thread:
-> https://lkml.org/lkml/2017/7/25/534
+> Why don't we need to ensure reads of these flags are observable when
+> waking up, if the thread waking us up had se the variables prior to
+> issuing the wake up call?
 
-Right, but that was specific to how we handle the guest writing to
-PEND/ACT on the virtual distributor.
-
-> 
-> At the moment the LR HW bit is set whatever the source of the IRQ I
-> think, HW driven or ISPENDRn driven (we only test irq->hw)
-> 
-
-Ah, I didn't actually consider that we could special-case the
-pending_latch for a HW interrupt.  I suppose we should actually consider
-that if someone tries to map an edge-triggered SPI.  Let me have a look
-at that.
+They're "special". I analyzed the cases for them and I *think* they're
+all safe. I can do another round, or perhaps better would be to replace
+them in some way with VCPU requests to make the analysis consistent.
 
 > 
-> > 
-> >> If we still intend to do so, with that addition, aren't we
-> >> likely to deactivate the physical IRQ before the guest?
-> > 
-> > Do you mean if it's pending+active in the LR?  That can never happen for
-> > a mapped (HW bit set) interrupt.
-> > 
-> > So this particular code sequence means that
-> >     (val & ICH_LR_STATE) == ICH_LR_PENDING_BIT
-> > 
-> > and we never clear the physical active state while the virtual interrupt
-> > is active.
+> > +
+> > +       if (kvm_test_request(KVM_REQ_IRQ_PENDING, vcpu)) {
+> > +               smp_rmb();
 > 
-> No my scenario was:
-> IRQ originates from a ISPENDRn.
+> This looks wrong.  What does this barrier ensure exactly?  Some kind of
+> read following whoever called this function?
 
-virtual IRQ from a write to the VGIC ISPENDRn, correct?
+Yes, it's similar to how kvm_check_request() is written. Actually, I
+should probably just copy that more completely, i.e.
 
-> I Thought we set the physical
-> distributor state accordingly. pIRQ is active. vIRQ is pending. On fold
-> we detect the line is low and we deactivate the pIRQ. pending_latch is
-> still true. The vIRQ will be processed but its physical IRQ has been
-> deactivated.
+ if (kvm_test_request(KVM_REQ_IRQ_PENDING, vcpu)) {
+    /*
+     * Ensure the rest of the request is visible to the caller.
+     * Pairs with the smp_wmb in kvm_make_request.
+     */
+     smp_mb__after_atomic();
+     return true;
+ }
+
 > 
-
-As long as we properly handle pending_latch and guest writes to the VGIC
-PEND/ACT registers, I don't see a problem with this code.
-
-> > There is an interesting point in terms of handling guest accesses to the
-> > virtual distributor GICD_ISPENDR, GICD_ICPENDR, GICD_ISACTIVER, and
-> > GICD_ICACTIVER where we must also propogate those changes to the
-> > physical side.
+> > +               return true;
+> > +       }
+> >  }
 > > 
-> > Was this what you meant?
-> yes I think we also need to address this to get the whole picture.
+> > We can keep the kvm_vgic_vcpu_pending_irq() check, after the IRQ_PENDING
+> > check, if there are cases where IRQ_PENDING wouldn't be set, but
+> > kvm_vgic_vcpu_pending_irq() would return true. Either way we also get a
+> > bit of an optimization with this fix.
+> > 
+> > I'll think/test some more, and then send a patch.
+> > 
 > 
-
-Yes, I'll respin.
+> I'll review it more thoroughly then.
 
 Thanks,
--Christoffer
+drew
