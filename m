@@ -1,151 +1,120 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 57/59] KVM: arm/arm64: GICv4: Theory of operations
-Date: Wed, 30 Aug 2017 12:30:02 +0100
-Message-ID: <d11d78be-409a-f015-b610-626fc7dccb02@arm.com>
-References: <20170731172637.29355-1-marc.zyngier@arm.com>
- <20170731172637.29355-58-marc.zyngier@arm.com> <20170828181813.GD24649@cbox>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: [PATCH] [stable] kvm: arm/arm64: Fix race in resetting stage2 PGD
+Date: Wed, 30 Aug 2017 12:30:52 +0100
+Message-ID: <1504092652-13443-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170828181813.GD24649@cbox>
-Content-Language: en-GB
 Sender: linux-kernel-owner@vger.kernel.org
-To: Christoffer Dall <cdall@linaro.org>
-Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>, Eric Auger <eric.auger@redhat.com>, Shanker Donthineni <shankerd@codeaurora.org>, Mark Rutland <mark.rutland@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: stable@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org, pbonzini@redhat.com, agraf@suse.de, suzuki.poulose@arm.com, mark.rutland@arm.com, rkrcmar@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 28/08/17 19:18, Christoffer Dall wrote:
-> On Mon, Jul 31, 2017 at 06:26:35PM +0100, Marc Zyngier wrote:
->> Yet another braindump so I can free some cells...
->>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  virt/kvm/arm/vgic/vgic-v4.c | 68 +++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 68 insertions(+)
->>
->> diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
->> index 0a8deefbcf1c..0c002d2be620 100644
->> --- a/virt/kvm/arm/vgic/vgic-v4.c
->> +++ b/virt/kvm/arm/vgic/vgic-v4.c
->> @@ -22,6 +22,74 @@
->>  
->>  #include "vgic.h"
->>  
->> +/*
->> + * How KVM uses GICv4 (insert rude comments here):
->> + *
->> + * The vgic-v4 layer acts as a bridge between several entities:
->> + * - The GICv4 ITS representation offered by the ITS driver
->> + * - VFIO, which is in charge of the PCI endpoint
->> + * - The virtual ITS, which is the only thing the guest sees
->> + *
->> + * The configuration of VLPIs is triggered by a callback from VFIO,
->> + * instructing KVM that a PCI device has been configured to deliver
->> + * MSIs to a vITS.
->> + *
->> + * kvm_vgic_v4_set_forwarding() is thus called with the routing entry,
->> + * and this is used to find the corresponding vITS data structures
->> + * (ITS instance, device, event and irq) using a process that is
->> + * extremely similar to the injection of an MSI.
->> + *
->> + * At this stage, we can link the guest's view of an LPI (uniquely
->> + * identified by the routing entry) and the host irq, using the GICv4
->> + * driver mapping operation. Should the mapping succeed, we've then
->> + * successfully upgraded the guest's LPI to a VLPI. We can then start
->> + * with updating GICv4's view of the property table and generating an
->> + * INValidation in order to kickstart the delivery of this VLPI to the
->> + * guest directly, without software intervention. Well, almost.
->> + *
->> + * When the PCI endpoint is deconfigured, this operation is reversed
->> + * with VFIO calling kvm_vgic_v4_unset_forwarding().
->> + *
->> + * Once the VLPI has been mapped, it needs to follow any change the
->> + * guest performs on its LPI through the vITS. For that, a number of
->> + * command handlers have hooks to communicate these changes to the HW:
->> + * - Any invalidation triggers a call to its_prop_update_vlpi()
->> + * - The INT command results in a irq_set_irqchip_state(), which
->> + *   generates an INT on the corresponding VLPI.
->> + * - The CLEAR command results in a irq_set_irqchip_state(), which
->> + *   generates an CLEAR on the corresponding VLPI.
->> + * - DISCARD translates into an unmap, similar to a call to
->> + *   kvm_vgic_v4_unset_forwarding().
-> 
-> So is VFIO notified of this or does it still think the IRQ is
-> forwarded?  Or does it not care, and it's state maintained by the irq
-> subsystem?
+commit 6c0d706b563af732adb094c5bf807437e8963e84 upstream.
 
-VFIO shouldn't care. The whole forward/bypass looks pretty stateless,
-and VFIO will happily inject the interrupt if it gets remapped, as its
-own interrupt handlers are still live.
+In kvm_free_stage2_pgd() we check the stage2 PGD before holding
+the lock and proceed to take the lock if it is valid. And we unmap
+the page tables, followed by releasing the lock. We reset the PGD
+only after dropping this lock, which could cause a race condition
+where another thread waiting on or even holding the lock, could
+potentially see that the PGD is still valid and proceed to perform
+a stage2 operation and later encounter a NULL PGD.
 
->> + * - MOVI is translated by an update of the existing mapping, changing
->> + *   the target vcpu, resulting in a VMOVI being generated.
->> + * - MOVALL is translated by a string of mapping updates (similar to
->> + *   the handling of MOVI). MOVALL is horrible.
->> + *
->> + * Note that a DISCARD/MAPTI sequence emitted from the guest without
->> + * reprogramming the PCI endpoint after MAPTI does not result in a
->> + * VLPI being mapped, as there is no callback from VFIO (the guest
->> + * will get the interrupt via the normal SW injection). Fixing this is
->> + * not trivial, and requires some horrible messing with the VFIO
->> + * internals. Not fun. Don't do that.
-> 
-> Is there not a quick way to check with VFIO or the irq subsystem if this
-> interrupt can be forwarded and attempt that when handling the MAPTI in
-> the vTIS, or does this break in horrible ways?
+[223090.242280] Unable to handle kernel NULL pointer dereference at
+virtual address 00000040
+[223090.262330] PC is at unmap_stage2_range+0x8c/0x428
+[223090.262332] LR is at kvm_unmap_hva_handler+0x2c/0x3c
+[223090.262531] Call trace:
+[223090.262533] [<ffff0000080adb78>] unmap_stage2_range+0x8c/0x428
+[223090.262535] [<ffff0000080adf40>] kvm_unmap_hva_handler+0x2c/0x3c
+[223090.262537] [<ffff0000080ace2c>] handle_hva_to_gpa+0xb0/0x104
+[223090.262539] [<ffff0000080af988>] kvm_unmap_hva+0x5c/0xbc
+[223090.262543] [<ffff0000080a2478>] kvm_mmu_notifier_invalidate_page+0x50/0x8c
+[223090.262547] [<ffff0000082274f8>] __mmu_notifier_invalidate_page+0x5c/0x84
+[223090.262551] [<ffff00000820b700>] try_to_unmap_one+0x1d0/0x4a0
+[223090.262553] [<ffff00000820c5c8>] rmap_walk+0x1cc/0x2e0
+[223090.262555] [<ffff00000820c90c>] try_to_unmap+0x74/0xa4
+[223090.262557] [<ffff000008230ce4>] migrate_pages+0x31c/0x5ac
+[223090.262561] [<ffff0000081f869c>] compact_zone+0x3fc/0x7ac
+[223090.262563] [<ffff0000081f8ae0>] compact_zone_order+0x94/0xb0
+[223090.262564] [<ffff0000081f91c0>] try_to_compact_pages+0x108/0x290
+[223090.262569] [<ffff0000081d5108>] __alloc_pages_direct_compact+0x70/0x1ac
+[223090.262571] [<ffff0000081d64a0>] __alloc_pages_nodemask+0x434/0x9f4
+[223090.262572] [<ffff0000082256f0>] alloc_pages_vma+0x230/0x254
+[223090.262574] [<ffff000008235e5c>] do_huge_pmd_anonymous_page+0x114/0x538
+[223090.262576] [<ffff000008201bec>] handle_mm_fault+0xd40/0x17a4
+[223090.262577] [<ffff0000081fb324>] __get_user_pages+0x12c/0x36c
+[223090.262578] [<ffff0000081fb804>] get_user_pages_unlocked+0xa4/0x1b8
+[223090.262579] [<ffff0000080a3ce8>] __gfn_to_pfn_memslot+0x280/0x31c
+[223090.262580] [<ffff0000080a3dd0>] gfn_to_pfn_prot+0x4c/0x5c
+[223090.262582] [<ffff0000080af3f8>] kvm_handle_guest_abort+0x240/0x774
+[223090.262584] [<ffff0000080b2bac>] handle_exit+0x11c/0x1ac
+[223090.262586] [<ffff0000080ab99c>] kvm_arch_vcpu_ioctl_run+0x31c/0x648
+[223090.262587] [<ffff0000080a1d78>] kvm_vcpu_ioctl+0x378/0x768
+[223090.262590] [<ffff00000825df5c>] do_vfs_ioctl+0x324/0x5a4
+[223090.262591] [<ffff00000825e26c>] SyS_ioctl+0x90/0xa4
+[223090.262595] [<ffff000008085d84>] el0_svc_naked+0x38/0x3c
 
-The problem we have here is that we need to map a purely virtual
-interrupt to a Linux IRQ. VFIO does that job by using the offset of the
-guest write into the MSI-X table and finding which MSI descriptor is
-associated with this entry, giving us the corresponding interrupt.
+This patch moves the stage2 PGD manipulation under the lock.
 
-We could keep track of the previous mappings we've been given, use that
-as a hint for the new mapping, and be able to revert it should the guest
-update the MSI on the endpoint. It feels pretty involved for something
-that is pretty theoretical right now, but I'm happy to try it...
+Reported-by: Alexander Graf <agraf@suse.de>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Radim Krčmář <rkrcmar@redhat.com>
+Cc: stable@vger.kernel.org # 4.10.x and earlier
+Reviewed-by: Christoffer Dall <cdall@linaro.org>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Signed-off-by: Christoffer Dall <cdall@linaro.org>
 
->> + *
->> + * Then there is the scheduling. Each time a vcpu is about to run on a
->> + * physical CPU, KVM must tell the corresponding redistributor about
->> + * it. And if we've migrated our vcpu from one CPU to another, we must
->> + * tell the ITS (so that the messages reach the right redistributor).
->> + * This is done in two steps: first issue a irq_set_affinity() on the
->> + * irq corresponding to the vcpu, then call its_schedule_vpe(). You
->> + * must be in a non-preemptible context. On exit, another call to
->> + * its_schedule_vpe() tells the redistributor that we're done with the
->> + * vcpu.
->> + *
->> + * Finally, the doorbell handling: Each vcpu is allocated an interrupt
->> + * which will fire each time a VLPI is made pending whilst the vcpu is
->> + * not running. Each time the vcpu gets blocked, the doorbell
->> + * interrupt gets enabled. When the vcpu is unblocked (for whatever
->> + * reason), the doorbell interrupt is disabled. This behaviour is
->> + * pretty similar to that of the backgroud timer.
-> 
-> *background
-> 
-> However, I think you can probably drop the last sentence in interest of
-> clarity.
+---
 
-Fair enough.
+Hi,
 
-> 
->> + */
->> +
->>  static irqreturn_t vgic_v4_doorbell_handler(int irq, void *info)
->>  {
->>  	struct kvm_vcpu *vcpu = info;
->> -- 
->> 2.11.0
->>
-> 
-> Thanks for an otherwise excellent (and of course entertaining) writeup!
-> -Christoffer
-> 
+Looks like we missed sending this to stable. Please apply for 4.10.x and
+earlier. 4.11.y and later versions have it already.
 
-Thanks!
+Suzuki
+---
+ arch/arm/kvm/mmu.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-	M.
+diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+index 2fd5c13..3526f30 100644
+--- a/arch/arm/kvm/mmu.c
++++ b/arch/arm/kvm/mmu.c
+@@ -829,22 +829,22 @@ void stage2_unmap_vm(struct kvm *kvm)
+  * Walks the level-1 page table pointed to by kvm->arch.pgd and frees all
+  * underlying level-2 and level-3 tables before freeing the actual level-1 table
+  * and setting the struct pointer to NULL.
+- *
+- * Note we don't need locking here as this is only called when the VM is
+- * destroyed, which can only be done once.
+  */
+ void kvm_free_stage2_pgd(struct kvm *kvm)
+ {
+-	if (kvm->arch.pgd == NULL)
+-		return;
++	void *pgd = NULL;
+ 
+ 	spin_lock(&kvm->mmu_lock);
+-	unmap_stage2_range(kvm, 0, KVM_PHYS_SIZE);
++	if (kvm->arch.pgd) {
++		unmap_stage2_range(kvm, 0, KVM_PHYS_SIZE);
++		pgd = kvm->arch.pgd;
++		kvm->arch.pgd = NULL;
++	}
+ 	spin_unlock(&kvm->mmu_lock);
+ 
+ 	/* Free the HW pgd, one page at a time */
+-	free_pages_exact(kvm->arch.pgd, S2_PGD_SIZE);
+-	kvm->arch.pgd = NULL;
++	if (pgd)
++		free_pages_exact(pgd, S2_PGD_SIZE);
+ }
+ 
+ static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
 -- 
-Jazz is not dead. It just smells funny...
+2.7.5
