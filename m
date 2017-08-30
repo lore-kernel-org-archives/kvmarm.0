@@ -1,245 +1,202 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v3 41/59] KVM: arm/arm64: GICv4: Wire mapping/unmapping
- of VLPIs in VFIO irq bypass
-Date: Wed, 30 Aug 2017 13:46:46 +0200
-Message-ID: <20170830114646.GD24522@cbox>
+Subject: Re: [PATCH v3 51/59] KVM: arm/arm64: GICv4: Add doorbell interrupt
+ handling
+Date: Wed, 30 Aug 2017 13:55:10 +0200
+Message-ID: <20170830115510.GE24522@cbox>
 References: <20170731172637.29355-1-marc.zyngier@arm.com>
- <20170731172637.29355-42-marc.zyngier@arm.com>
- <20170826194850.GB11074@cbox>
- <06930ddb-6c40-ff74-0062-cec236ce2455@arm.com>
+ <20170731172637.29355-52-marc.zyngier@arm.com>
+ <8a35ee18-85a5-168b-b3d2-b9f51390b475@arm.com>
+ <20170828181850.GL24649@cbox>
+ <20170830103141.jarquijxzntv2feo@kamzik.brq.redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <06930ddb-6c40-ff74-0062-cec236ce2455@arm.com>
+In-Reply-To: <20170830103141.jarquijxzntv2feo@kamzik.brq.redhat.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>, Eric Auger <eric.auger@redhat.com>, Shanker Donthineni <shankerd@codeaurora.org>, Mark Rutland <mark.rutland@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: Andrew Jones <drjones@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>, Eric Auger <eric.auger@redhat.com>, Shanker Donthineni <shankerd@codeaurora.org>, Mark Rutland <mark.rutland@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Aug 30, 2017 at 11:28:08AM +0100, Marc Zyngier wrote:
-> On 26/08/17 20:48, Christoffer Dall wrote:
-> > On Mon, Jul 31, 2017 at 06:26:19PM +0100, Marc Zyngier wrote:
-> >> Let's use the irq bypass mechanism introduced for platform device
-> >> interrupts to intercept the virtual PCIe endpoint configuration
-> >> and establish our LPI->VLPI mapping.
-> >>
-> >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> >> ---
-> >>  include/kvm/arm_vgic.h      |   8 ++++
-> >>  virt/kvm/arm/arm.c          |  27 ++++++++----
-> >>  virt/kvm/arm/vgic/vgic-v4.c | 103 ++++++++++++++++++++++++++++++++++++++++++++
-> >>  3 files changed, 130 insertions(+), 8 deletions(-)
-> >>
-> >> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> >> index 359eeffe9857..050f78d4fb42 100644
-> >> --- a/include/kvm/arm_vgic.h
-> >> +++ b/include/kvm/arm_vgic.h
-> >> @@ -367,4 +367,12 @@ int kvm_vgic_set_forwarding(struct kvm *kvm, unsigned int host_irq,
-> >>  void kvm_vgic_unset_forwarding(struct kvm *kvm, unsigned int host_irq,
-> >>  			       unsigned int vintid);
-> >>  
-> >> +struct kvm_kernel_irq_routing_entry;
-> >> +
-> >> +int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int irq,
-> >> +			       struct kvm_kernel_irq_routing_entry *irq_entry);
-> >> +
-> >> +int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int irq,
-> >> +				 struct kvm_kernel_irq_routing_entry *irq_entry);
-> >> +
-> >>  #endif /* __KVM_ARM_VGIC_H */
-> >> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> >> index ebab6c29e3be..6803ea27c47d 100644
-> >> --- a/virt/kvm/arm/arm.c
-> >> +++ b/virt/kvm/arm/arm.c
-> >> @@ -1457,11 +1457,16 @@ int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
-> >>  	struct kvm_kernel_irqfd *irqfd =
-> >>  		container_of(cons, struct kvm_kernel_irqfd, consumer);
-> >>  
-> >> -	if (prod->type != IRQ_BYPASS_VFIO_PLATFORM)
-> >> +	switch (prod->type) {
-> >> +	case IRQ_BYPASS_VFIO_PLATFORM:
-> >> +		return kvm_vgic_set_forwarding(irqfd->kvm, prod->irq,
-> >> +					       irqfd->gsi + VGIC_NR_PRIVATE_IRQS);
-> >> +	case IRQ_BYPASS_VFIO_PCI_MSI:
-> >> +		return kvm_vgic_v4_set_forwarding(irqfd->kvm, prod->irq,
-> >> +						  &irqfd->irq_entry);
-> >> +	default:
-> >>  		return 0;
-> >> -
-> >> -	return kvm_vgic_set_forwarding(irqfd->kvm, prod->irq,
-> >> -				       irqfd->gsi + VGIC_NR_PRIVATE_IRQS);
-> >> +	}
-> >>  }
-> >>  void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
-> >>  				      struct irq_bypass_producer *prod)
-> >> @@ -1469,11 +1474,17 @@ void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
-> >>  	struct kvm_kernel_irqfd *irqfd =
-> >>  		container_of(cons, struct kvm_kernel_irqfd, consumer);
-> >>  
-> >> -	if (prod->type != IRQ_BYPASS_VFIO_PLATFORM)
-> >> -		return;
-> >> +	switch (prod->type) {
-> >> +	case IRQ_BYPASS_VFIO_PLATFORM:
-> >> +		kvm_vgic_unset_forwarding(irqfd->kvm, prod->irq,
-> >> +					  irqfd->gsi + VGIC_NR_PRIVATE_IRQS);
-> >> +		break;
-> >>  
-> >> -	kvm_vgic_unset_forwarding(irqfd->kvm, prod->irq,
-> >> -				  irqfd->gsi + VGIC_NR_PRIVATE_IRQS);
-> >> +	case IRQ_BYPASS_VFIO_PCI_MSI:
-> >> +		kvm_vgic_v4_unset_forwarding(irqfd->kvm, prod->irq,
-> >> +					     &irqfd->irq_entry);
-> >> +		break;
-> >> +	}
-> >>  }
-> >>  
-> >>  void kvm_arch_irq_bypass_stop(struct irq_bypass_consumer *cons)
-> >> diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
-> >> index 207e1fda0dcd..338c86c5159f 100644
-> >> --- a/virt/kvm/arm/vgic/vgic-v4.c
-> >> +++ b/virt/kvm/arm/vgic/vgic-v4.c
-> >> @@ -72,3 +72,106 @@ void vgic_v4_teardown(struct kvm *kvm)
-> >>  	its_vm->nr_vpes = 0;
-> >>  	its_vm->vpes = NULL;
-> >>  }
-> >> +
-> >> +static struct vgic_its *vgic_get_its(struct kvm *kvm,
-> >> +				     struct kvm_kernel_irq_routing_entry *irq_entry)
-> >> +{
-> >> +	struct kvm_msi msi  = (struct kvm_msi) {
-> >> +		.address_lo	= irq_entry->msi.address_lo,
-> >> +		.address_hi	= irq_entry->msi.address_hi,
-> >> +		.data		= irq_entry->msi.data,
-> >> +		.flags		= irq_entry->msi.flags,
-> >> +		.devid		= irq_entry->msi.devid,
-> >> +	};
-> >> +
-> >> +	/*
-> >> +	 * Get a reference on the LPI. If NULL, this is not a valid
-> >> +	 * translation for any of our vITSs.
-> >> +	 */
-> >> +	return vgic_msi_to_its(kvm, &msi);
-> >> +}
-> >> +
-> >> +int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
-> >> +			       struct kvm_kernel_irq_routing_entry *irq_entry)
-> >> +{
-> >> +	struct vgic_its *its;
-> >> +	struct vgic_irq *irq;
-> >> +	struct its_vlpi_map map;
-> >> +	int ret;
-> >> +
-> >> +	if (!vgic_is_v4_capable(kvm))
-> >> +		return 0;
-> >> +
-> >> +	/*
-> >> +	 * Get the ITS, and escape early on error (not a valid
-> >> +	 * doorbell for any of our vITSs).
-> >> +	 */
-> >> +	its = vgic_get_its(kvm, irq_entry);
-> >> +	if (IS_ERR(its))
-> >> +		return 0;
-> >> +
-> >> +	mutex_lock(&its->its_lock);
-> >> +
-> >> +	/* Perform then actual DevID/EventID -> LPI translation. */
-> >> +	ret = vgic_its_resolve_lpi(kvm, its, irq_entry->msi.devid,
-> >> +				   irq_entry->msi.data, &irq);
-> >> +	if (ret)
-> >> +		goto out;
-> >> +
-> >> +	/*
-> >> +	 * Emit the mapping request. If it fails, the ITS probably
-> >> +	 * isn't v4 compatible, so let's silently bail out. Holding
-> >> +	 * the ITS lock should ensure that nothing can modify the
-> >> +	 * target vcpu.
-> >> +	 */
-> >> +	map = (struct its_vlpi_map) {
-> >> +		.vm		= &kvm->arch.vgic.its_vm,
-> >> +		.vintid		= irq->intid,
-> >> +		.db_enabled	= true,
-> >> +		.vpe_idx	= irq->target_vcpu->vcpu_id,
+On Wed, Aug 30, 2017 at 12:31:41PM +0200, Andrew Jones wrote:
+> On Mon, Aug 28, 2017 at 08:18:50PM +0200, Christoffer Dall wrote:
+> > On Fri, Aug 04, 2017 at 08:44:04AM +0100, Marc Zyngier wrote:
+> > > On 31/07/17 18:26, Marc Zyngier wrote:
+> > > > When a vPE is not running, a VLPI being made pending results in a
+> > > > doorbell interrupt being delivered. Let's handle this interrupt
+> > > > and update the pending_last flag that indicates that VLPIs are
+> > > > pending. The corresponding vcpu is also kicked into action.
+> > > > 
+> > > > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> > > > ---
+> > > >  virt/kvm/arm/vgic/vgic-v4.c | 34 ++++++++++++++++++++++++++++++++++
+> > > >  1 file changed, 34 insertions(+)
+> > > > 
+> > > > diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
+> > > > index 534d3051a078..6af3cde6d7d4 100644
+> > > > --- a/virt/kvm/arm/vgic/vgic-v4.c
+> > > > +++ b/virt/kvm/arm/vgic/vgic-v4.c
+> > > > @@ -21,6 +21,19 @@
+> > > >  
+> > > >  #include "vgic.h"
+> > > >  
+> > > > +static irqreturn_t vgic_v4_doorbell_handler(int irq, void *info)
+> > > > +{
+> > > > +	struct kvm_vcpu *vcpu = info;
+> > > > +
+> > > > +	if (!kvm_vgic_vcpu_pending_irq(vcpu)) {
+> > > > +		vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last = true;
+> > > > +		kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+> > > > +		kvm_vcpu_kick(vcpu);
+> > > > +	}
+> > > 
+> > > This code is so obviously broken that I completely overlooked it.
+> > > 
+> > > If we have take a doorbell interrupt, then it means nothing was
+> > > otherwise pending (because we'd have been kicked out of the blocking
+> > > state, and will have masked the doorbell). So checking for pending
+> > > interrupts is pointless.
+> > > 
+> > > Furthermore, calling kvm_vgic_vcpu_pending_irq() takes the ap_list
+> > > lock. If we take a doorbell interrupt while injecting a virtual
+> > > interrupt (from userspace, for example) on the same CPU, we end-up
+> > > in deadlock land. This would be solved by Christoffer's latest
+> > > crop of timer patches, but there is no point getting there the first
+> > > place.
+> > > 
+> > > The patchlet below solves it:
+> > > 
+> > > diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
+> > > index 15feb1151797..48e4d6ebeaa8 100644
+> > > --- a/virt/kvm/arm/vgic/vgic-v4.c
+> > > +++ b/virt/kvm/arm/vgic/vgic-v4.c
+> > > @@ -94,11 +94,9 @@ static irqreturn_t vgic_v4_doorbell_handler(int irq, void *info)
+> > >  {
+> > >  	struct kvm_vcpu *vcpu = info;
+> > >  
+> > > -	if (!kvm_vgic_vcpu_pending_irq(vcpu)) {
+> > > -		vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last = true;
+> > > -		kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+> > > -		kvm_vcpu_kick(vcpu);
+> > > -	}
+> > > +	vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last = true;
+> > > +	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+> > > +	kvm_vcpu_kick(vcpu);
+> > 
+> > I don't think you need the request and kick, because if you're getting
+> > this doorbell, doesn't that also mean that the VCPU is not running in
+> > the guest and you simply need to make sure the VCPU thread gets
+> > scheduled again, so you could call kvm_vcpu_wake_up() instead.
 > 
-> This is just wrong. We cannot assume that the vcpu_id has anything to do
-> with the vpe_idx. It happens to be the same thing now, but the two things
-> should be clearly disconnected.
+> While we do that in kvm_timer_inject_irq_work(), which is scheduled from
+> the same function that vgic_v4_doorbell_handler() would be enabled from
+> (kvm_vcpu_block->kvm_arch_vcpu_blocking), just a wake up isn't sufficient
+> in this case.
 > 
-> I suggest the following (untested):
+> > 
+> > Unless the request is there to ensure proper memory barriers around
+> > setting pending_last?
 > 
-> diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
-> index cf5d6e2de6b8..0146e004401a 100644
-> --- a/virt/kvm/arm/vgic/vgic-v4.c
-> +++ b/virt/kvm/arm/vgic/vgic-v4.c
-> @@ -251,13 +251,27 @@ static void dump_routing(int virq, struct kvm_kernel_irq_routing_entry *irq_entr
->  
+> Right, unlike pending timers, we need the barriers in this handler.
+> Pending timers are safe because their pending test compares state set by
+> the VCPU thread itself to state acquired by the VCPU thread reading a host
+> sysreg itself. IOW, handlers making "set vcpu timer pending requests"
+> don't need to do anything but wake up the VCPU. Handlers that set some
+> sort of irq pending state, like vgic_v4_doorbell_handler(), do need to
+> worry about the visibility of that state though.
+> 
+> > 
+> > In that case, is the read barrier taken care of by prepare_to_swait in
+> > kvm_vcpu_block()?
+> 
+> Thanks for the bug report :-)
+> 
+> There's a barrier, but it's not properly paired. Currently we have
+> 
+>  VCPU                                        handler
+>  ----                                        -------
+>  for (;;) {
+>    WRITE_ONCE(task->state, INTERRUPTIBLE);   pending=true;
+>    smp_mb();                                 smp_wmb(); // kvm_make_request()
+>    if (pending) {                            WRITE_ONCE(vcpu->state, NORMAL);
+>      ... stop waiting ...
+>    }
+>    schedule();
 >  }
->  
-> +static int vgic_v4_vcpu_to_index(struct its_vm *its_vm, struct kvm_vcpu *vcpu)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < its_vm->nr_vpes; i++) {
-> +		struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
-> +
-> +		if (its_vm->vpes[i] == vpe)
-> +			return i;
-> +	}
-> +
-> +	return -ENODEV;
-> +}
-> +
-
-Stupid question: Can we change the struct its_vlpi_map to contain a
-vpe pointer or in stead of or in addition to the index?
-
-Alternatively, can you look it up using
-vcpu->arch.vgic_cpu.vgic_v3.its_vpe.irq() and another 'ioctl' in
-irq_set_vcpu_affinity() somehow instead of looping around and testing?
-
->  int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
->  			       struct kvm_kernel_irq_routing_entry *irq_entry)
+> 
+> Proper barrier use with swait/swake should instead look like this
+> 
+>  VCPU                                        handler
+>  ----                                        -------
+>  for (;;) {
+>    WRITE_ONCE(task->state, INTERRUPTIBLE);
+>    smp_mb();
+>    if (READ_ONCE(task->state) == NORMAL) {   pending=true;
+>      smp_rmb();                              smp_wmb();
+>      if (pending)                            WRITE_ONCE(vcpu->state, NORMAL);
+>        ... stop waiting ...
+>      else
+>        continue;
+>    }
+>    schedule();
+>  }
+> 
+> But checking task state adds complexity and would only cover a small
+> window anyway (the window between prepare_to_swait() and
+> kvm_vcpu_check_block()). We need to cover a larger window, for this
+> particular case it's from kvm_arch_vcpu_blocking() to
+> kvm_vcpu_check_block(). Better use of VCPU requests is the answer:
+> 
+>  VCPU                                        handler
+>  ----                                        -------
+>  kvm_arch_vcpu_blocking();
+>  for (;;) {
+>    prepare_to_swait(); 
+>    if (test_bit(IRQ_PENDING)) {              pending=true;
+>      smp_rmb();                              smp_wmb();
+>      if (pending)                            set_bit(IRQ_PENDING);
+>        ... stop waiting ...
+>      else
+>        continue;
+>    }
+>    schedule();
+>  }
+> 
+> The handler side is covered by kvm_make_request() and the vcpu kick, so
+> this patch looks good. However we need a patch to kvm_arch_vcpu_runnable()
+> to fix the VCPU side.
+> 
+>  int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
 >  {
->  	struct vgic_its *its;
->  	struct vgic_irq *irq;
->  	struct its_vlpi_map map;
-> -	int ret;
-> +	int ret, idx;
->  
->  	dump_routing(virq, irq_entry, true);
->  
-> @@ -280,6 +294,11 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
->  	if (ret)
->  		goto out;
->  
-> +	idx = vgic_v4_vcpu_to_index(&kvm->arch.vgic.its_vm,
-> +				    irq->target_vcpu);
-> +	if (idx < 0)
-> +		goto out;
+> -       return ((!!v->arch.irq_lines || kvm_vgic_vcpu_pending_irq(v))
+> -               && !v->arch.power_off && !v->arch.pause);
+> +       if (v->arch.power_off || v->arch.pause)
+> +               return false;
+
+Why don't we need to ensure reads of these flags are observable when
+waking up, if the thread waking us up had se the variables prior to
+issuing the wake up call?
+
 > +
->  	/*
->  	 * Emit the mapping request. If it fails, the ITS probably
->  	 * isn't v4 compatible, so let's silently bail out. Holding
-> @@ -290,7 +309,7 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
->  		.vm		= &kvm->arch.vgic.its_vm,
->  		.vintid		= irq->intid,
->  		.db_enabled	= true,
-> -		.vpe_idx	= irq->target_vcpu->vcpu_id,
-> +		.vpe_idx	= idx,
->  	};
->  
->  	if (its_map_vlpi(virq, &map))
-> 
-> Another option would be to just pass the pointer to the vpe instead,
-> and let the irq code to figure out the index, which can easily be
-> derived the doorbells (vpe->vpe_db_lpi - vpe->its_vm->db_lpi_base).
-> 
-> I'll work something out for the next version.
+> +       if (kvm_test_request(KVM_REQ_IRQ_PENDING, vcpu)) {
+> +               smp_rmb();
 
-Ah, yeah, so I guess that is an option.
+This looks wrong.  What does this barrier ensure exactly?  Some kind of
+read following whoever called this function?
 
-It should be pretty quick to loop over even hundreds of vcpus, but that
-kind of thing just always seems wrong, somehow.
+> +               return true;
+> +       }
+>  }
+> 
+> We can keep the kvm_vgic_vcpu_pending_irq() check, after the IRQ_PENDING
+> check, if there are cases where IRQ_PENDING wouldn't be set, but
+> kvm_vgic_vcpu_pending_irq() would return true. Either way we also get a
+> bit of an optimization with this fix.
+> 
+> I'll think/test some more, and then send a patch.
+> 
+
+I'll review it more thoroughly then.
 
 Thanks,
 -Christoffer
