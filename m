@@ -1,134 +1,130 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 56/59] KVM: arm/arm64: GICv4: Prevent heterogenous
- systems from using GICv4
-Date: Wed, 30 Aug 2017 17:03:51 +0100
-Message-ID: <bcd17108-b035-a95f-67a4-4433e2be20ae@arm.com>
-References: <20170731172637.29355-1-marc.zyngier@arm.com>
- <20170731172637.29355-57-marc.zyngier@arm.com> <20170828183550.GQ24649@cbox>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH] KVM: arm64: stop propagating DAIF flags between kernel
+ and VHE's world switch
+Date: Wed, 30 Aug 2017 19:01:39 +0100
+Message-ID: <59A6FD83.2090904@arm.com>
+References: <20170810113021.1110-1-james.morse@arm.com>
+ <20170824152304.GB2150@lvm> <59A5A021.1090102@arm.com>
+ <20170830083317.GB24522@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170828183550.GQ24649@cbox>
-Content-Language: en-GB
-Sender: kvm-owner@vger.kernel.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 85BA240C5A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Aug 2017 14:00:49 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id eW1eJFA+kU8W for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 30 Aug 2017 14:00:48 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BDE140017
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Aug 2017 14:00:48 -0400 (EDT)
+In-Reply-To: <20170830083317.GB24522@cbox>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <cdall@linaro.org>
-Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>, Eric Auger <eric.auger@redhat.com>, Shanker Donthineni <shankerd@codeaurora.org>, Mark Rutland <mark.rutland@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 28/08/17 19:35, Christoffer Dall wrote:
-> On Mon, Jul 31, 2017 at 06:26:34PM +0100, Marc Zyngier wrote:
->> The GICv4 architecture doesn't prevent CPUs implementing GICv4 to
->> cohabit with CPUs limited to GICv3 in the same system.
+Hi Christoffer,
+
+On 30/08/17 09:33, Christoffer Dall wrote:
+> On Tue, Aug 29, 2017 at 06:10:57PM +0100, James Morse wrote:
+>> On 24/08/17 16:23, Christoffer Dall wrote:
+>>> On Thu, Aug 10, 2017 at 12:30:21PM +0100, James Morse wrote:
+>>>> debug exceptions remain disabled due to the guest exit exception,
+>>>> (as does SError: today this is the only time SError is unmasked in the
+>>>> kernel). The flags stay in this state until we return to userspace.
+>>>>
+>>>> We have a __vhe_hyp_call() function that does the isb that we implicitly
+>>>> have on non-vhe systems, add the DAIF save/restore here, instead of in
+>>>> __sysreg_{save,restore}_host_state() which would require an extra isb()
+>>>> between the hosts VBAR_EL1 being restored and DAIF being restored.
 >>
->> This is mad (the sheduler would have to be made aware of the v4
-> 
-> *scheduler
-> 
->> capability), and we're certainly not going to support this any
->> time soon. So let's check that all online CPUs are GICv4 capable,
->> and disable the functionnality if not.
-> 
-> *functionality
-> 
+>>> This also means that anyone else calling kvm_call_hyp(), which we are
+>>> beginning to do more often, would also do this save/restore which
+>>> shouldn't really be necessary, doesn't it?
 >>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  include/linux/irqchip/arm-gic-v3.h |  2 ++
->>  virt/kvm/arm/vgic/vgic-v3.c        | 22 +++++++++++++++++++++-
->>  2 files changed, 23 insertions(+), 1 deletion(-)
->>
->> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
->> index 1ea576c8126f..dfa4a51643d6 100644
->> --- a/include/linux/irqchip/arm-gic-v3.h
->> +++ b/include/linux/irqchip/arm-gic-v3.h
->> @@ -532,6 +532,8 @@
->>  #define ICH_VTR_SEIS_MASK		(1 << ICH_VTR_SEIS_SHIFT)
->>  #define ICH_VTR_A3V_SHIFT		21
->>  #define ICH_VTR_A3V_MASK		(1 << ICH_VTR_A3V_SHIFT)
->> +#define ICH_VTR_nV4_SHIFT		20
->> +#define ICH_VTR_nV4_MASK		(1 << ICH_VTR_nV4_SHIFT)
->>  
->>  #define ICC_IAR1_EL1_SPURIOUS		0x3ff
->>  
->> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
->> index 405733678c2f..252268e83ade 100644
->> --- a/virt/kvm/arm/vgic/vgic-v3.c
->> +++ b/virt/kvm/arm/vgic/vgic-v3.c
->> @@ -466,6 +466,18 @@ static int __init early_gicv4_enable(char *buf)
->>  }
->>  early_param("kvm-arm.vgic_v4_enable", early_gicv4_enable);
->>  
->> +static void vgic_check_v4_cpuif(void *param)
->> +{
->> +	u32 ich_vtr_el2 = kvm_call_hyp(__vgic_v3_get_ich_vtr_el2);
->> +	bool *v4 = param, this_cpu_is_v4;
->> +
->> +	this_cpu_is_v4 = !(ich_vtr_el2 & ICH_VTR_nV4_MASK);
->> +	if (!this_cpu_is_v4)
->> +		kvm_info("CPU%d is not GICv4 capable\n", smp_processor_id());
->> +
->> +	*v4 &= this_cpu_is_v4;
+>> I think it is, its done implicitly via SPSR_EL2 by the HVC/ERET on non-VHE.
+>> Does the HYP code on the other end of kvm_call_hyp() expect to be called with
+>> DAIF masked? What about the other way, if the HYP code modifies the DAIF flags
+>> should that spread back into the kernel?
 > 
-> nit: You could make this function look slightly less scary by declaring
-> this_cpu_is_v4 on a separate line and not use a bitwise operator on a
-> boolean type.  Actually, having a function called 'check' with a side
-> effect is not the nicest thing either, so why not just return what this
-> particular CPU does and do the comparison in the calling loop.
+> Well, for VHE I don't think this is any different than any other
+> function.  There really is no concept of 'hyp code' --- or we should aim
+> for there not to be --- with VHE, so if some code expects interrupts
+> disabled or other changes to the DAIF flags, that code should really do
+> that for VHE.
 
-Fair enough.
+Aha, this is where I see the world differently.
+/me adjusts world-view,
 
-> #bikeshedding
+I will scrap this patch and re-do it along these lines.
 
-How about this on top:
 
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index 01eaf4ee2f63..e471750dc0a1 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -469,18 +469,16 @@ early_param("kvm-arm.vgic_v4_enable", early_gicv4_enable);
- static void vgic_check_v4_cpuif(void *param)
- {
- 	u32 ich_vtr_el2 = kvm_call_hyp(__vgic_v3_get_ich_vtr_el2);
--	bool *v4 = param, this_cpu_is_v4;
-+	bool *v4 = param;
- 
--	this_cpu_is_v4 = !(ich_vtr_el2 & ICH_VTR_nV4_MASK);
--	if (!this_cpu_is_v4)
-+	*v4 = !(ich_vtr_el2 & ICH_VTR_nV4_MASK);
-+	if (!*v4)
- 		kvm_info("CPU%d is not GICv4 capable\n", smp_processor_id());
--
--	*v4 &= this_cpu_is_v4;
- }
- 
- /**
-  * vgic_v3_probe - probe for a GICv3 compatible interrupt controller in DT
-- * @node:	pointer to the DT node
-+ * @info:	pointer to the firmware-agnostic GIC information
-  *
-  * Returns 0 if a GICv3 has been found, returns an error code otherwise
-  */
-@@ -504,9 +502,14 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
- 	if (info->has_v4) {
- 		int cpu;
- 
--		for_each_online_cpu(cpu)
-+		for_each_online_cpu(cpu) {
-+			bool enable;
-+
- 			smp_call_function_single(cpu, vgic_check_v4_cpuif,
--						 &gicv4_enable, 1);
-+						 &enable, 1);
-+			gicv4_enable = gicv4_enable && enable;
-+		}
-+
- 		kvm_vgic_global_state.has_gicv4 = gicv4_enable;
- 		kvm_info("GICv4 support %sabled\n",
- 			 gicv4_enable ? "en" : "dis");
+> The rationale being that in the long run we want to keep "jumping to
+> hyp" the oddball legacy case, where everything else is just the
+> kernel/hypervisor functionality.
+
+This makes sense.
+
+
+[ ... trims your excellent argument ... ]
+
+
+> Have we actually looked at the places where we call kvm_call_hyp() and
+> do they require a different setting of the DAIF flags from other kernel
+> code running at EL2 with VHE ?
+
+I can go through them, but I think its just world-switch as it modifies
+debug-registers, vbar_el1 and enters/exits the guest.
+
+
+> I understand that the behavior is currently different, but what I'm
+> asking is, instead of having to save and restore anything to the stack,
+> can you simply do:
+> 
+>      __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>      {
+>          if (has_vhe())
+>              asm("msr     daifset, #0xf");
+> 
+> 	...
+>         exit_code = __guest_enter(vcpu, host_ctxt);
+> 	...
+> 
+> 	if (has_vhe())
+>              asm("msr     daifclr, #0xd");
+>      }
+
+Sure, this can be done as late as setting vbar_el1 for VHE, at which point the
+reason for masking these is clear. Before this point the hosts vectors will
+happily handle debug/fiq/serror.
+
+Your right KVM can 'just know' the values to set so the noise around
+
+
+> (not sure about the FIQ flag - does the kernel usually 
+
+This is some of the stuff we need to clear up. Today we never expect SError or
+FIQ and should panic() if we get one. But these flags are largely ignored so
+when the CPU masks them on exception we leave them like that.
+After the SError rework process-context should have everything unmasked, today
+its just debug+irqs unmasked.
+
+
+Sorry if this email exchange has been frustrating, I didn't have your view of
+where all this should end up.
+
 
 Thanks,
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+James
