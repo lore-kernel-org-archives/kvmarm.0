@@ -1,7 +1,7 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v2 03/28] arm64: efi: Add missing Kconfig dependency on KERNEL_MODE_NEON
-Date: Thu, 31 Aug 2017 18:00:35 +0100
-Message-ID: <1504198860-12951-4-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v2 05/28] arm64: fpsimd: Simplify uses of {set,clear}_ti_thread_flag()
+Date: Thu, 31 Aug 2017 18:00:37 +0100
+Message-ID: <1504198860-12951-6-git-send-email-Dave.Martin@arm.com>
 References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -13,35 +13,38 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The EFI runtime services ABI permits calls to EFI to clobber
-certain FPSIMD/NEON registers, as per the AArch64 procedure call
-standard.
+The existing FPSIMD context switch code contains a couple of
+instances of {set,clear}_ti_thread(task_thread_info(task)).  Since
+there are thread flag manipulators that operate directly on
+task_struct, this verbosity isn't strictly needed.
 
-Saving/restoring the clobbered registers around such calls needs
-KERNEL_MODE_NEON, but the dependency is missing from Kconfig.
-
-This patch adds the missing dependency.
-
-This will aid bisection of the patches implementing support for the
-ARM Scalable Vector Extension (SVE).
+For consistency, this patch simplifies the affected calls.  This
+should have no impact on behaviour.
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/kernel/fpsimd.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 0df64a6..ca711ac 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -1063,6 +1063,7 @@ config EFI_STUB
- config EFI
- 	bool "UEFI runtime support"
- 	depends on OF && !CPU_BIG_ENDIAN
-+	depends on KERNEL_MODE_NEON
- 	select LIBFDT
- 	select UCS2_STRING
- 	select EFI_PARAMS_FROM_FDT
+diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+index 3a68cf3..9d762dd 100644
+--- a/arch/arm64/kernel/fpsimd.c
++++ b/arch/arm64/kernel/fpsimd.c
+@@ -159,11 +159,9 @@ void fpsimd_thread_switch(struct task_struct *next)
+ 
+ 		if (__this_cpu_read(fpsimd_last_state) == st
+ 		    && st->cpu == smp_processor_id())
+-			clear_ti_thread_flag(task_thread_info(next),
+-					     TIF_FOREIGN_FPSTATE);
++			clear_tsk_thread_flag(next, TIF_FOREIGN_FPSTATE);
+ 		else
+-			set_ti_thread_flag(task_thread_info(next),
+-					   TIF_FOREIGN_FPSTATE);
++			set_tsk_thread_flag(next, TIF_FOREIGN_FPSTATE);
+ 	}
+ }
+ 
 -- 
 2.1.4
