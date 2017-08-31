@@ -1,88 +1,95 @@
-From: Greg KH <greg@kroah.com>
-Subject: Re: [PATCH] kvm: arm/arm64: Fix race in resetting stage2 PGD
-Date: Thu, 31 Aug 2017 06:59:57 +0200
-Message-ID: <20170831045957.GB8356@kroah.com>
-References: <1504092652-13443-1-git-send-email-suzuki.poulose@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v3 51/59] KVM: arm/arm64: GICv4: Add doorbell interrupt
+ handling
+Date: Thu, 31 Aug 2017 09:19:15 +0100
+Message-ID: <8b7c5a40-96b5-591f-a31f-b96fb03f507f@arm.com>
+References: <20170731172637.29355-1-marc.zyngier@arm.com>
+ <20170731172637.29355-52-marc.zyngier@arm.com> <20170828181855.GM24649@cbox>
+ <6d825d0f-eb99-8c9f-77f7-ab313e17a2cd@arm.com> <20170830205828.GN24522@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Return-path: <stable-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1504092652-13443-1-git-send-email-suzuki.poulose@arm.com>
-Sender: stable-owner@vger.kernel.org
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: stable@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org, pbonzini@redhat.com, agraf@suse.de, mark.rutland@arm.com, rkrcmar@redhat.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D231440CE9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Aug 2017 04:17:09 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id OJqnOt44dEJc for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 31 Aug 2017 04:17:08 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FF0F40C5A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Aug 2017 04:17:08 -0400 (EDT)
+In-Reply-To: <20170830205828.GN24522@cbox>
+Content-Language: en-GB
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <cdall@linaro.org>
+Cc: Jason Cooper <jason@lakedaemon.net>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Thomas Gleixner <tglx@linutronix.de>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Aug 30, 2017 at 12:30:52PM +0100, Suzuki K Poulose wrote:
-> commit 6c0d706b563af732adb094c5bf807437e8963e84 upstream.
+On 30/08/17 21:58, Christoffer Dall wrote:
+> On Wed, Aug 30, 2017 at 04:36:06PM +0100, Marc Zyngier wrote:
+>> On 28/08/17 19:18, Christoffer Dall wrote:
+>>> On Mon, Jul 31, 2017 at 06:26:29PM +0100, Marc Zyngier wrote:
+>>>> When a vPE is not running, a VLPI being made pending results in a
+>>>> doorbell interrupt being delivered. Let's handle this interrupt
+>>>> and update the pending_last flag that indicates that VLPIs are
+>>>> pending. The corresponding vcpu is also kicked into action.
+>>>>
+>>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>>>> ---
+>>>>  virt/kvm/arm/vgic/vgic-v4.c | 34 ++++++++++++++++++++++++++++++++++
+>>>>  1 file changed, 34 insertions(+)
+>>>>
+>>>> diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
+>>>> index 534d3051a078..6af3cde6d7d4 100644
+>>>> --- a/virt/kvm/arm/vgic/vgic-v4.c
+>>>> +++ b/virt/kvm/arm/vgic/vgic-v4.c
+>>>> @@ -21,6 +21,19 @@
+>>>>  
+>>>>  #include "vgic.h"
+>>>>  
+>>>> +static irqreturn_t vgic_v4_doorbell_handler(int irq, void *info)
+>>>> +{
+>>>> +	struct kvm_vcpu *vcpu = info;
+>>>> +
+>>>> +	if (!kvm_vgic_vcpu_pending_irq(vcpu)) {
+>>>> +		vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last = true;
+>>>> +		kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+>>>> +		kvm_vcpu_kick(vcpu);
+>>>> +	}
+>>>
+>>> Can this ever fire while vgic_v4_init() is running and before te rest of
+>>> the system has been properly initialized with some entertaining results
+>>> to follow?  (I'm not sure if spurious doorbell non-resident vPE
+>>> interrupts is a thing or not).
+>>
+>> It could if you only had this patch. The following patch makes sure that
+>> the interrupt does not get enabled at request time, meaning it will only
+>> get enabled when the vcpu will eventually block.
+>>
+>> And yes, spurious doorbells are a real thing. And they suck.
+>>
 > 
-> In kvm_free_stage2_pgd() we check the stage2 PGD before holding
-> the lock and proceed to take the lock if it is valid. And we unmap
-> the page tables, followed by releasing the lock. We reset the PGD
-> only after dropping this lock, which could cause a race condition
-> where another thread waiting on or even holding the lock, could
-> potentially see that the PGD is still valid and proceed to perform
-> a stage2 operation and later encounter a NULL PGD.
-> 
-> [223090.242280] Unable to handle kernel NULL pointer dereference at
-> virtual address 00000040
-> [223090.262330] PC is at unmap_stage2_range+0x8c/0x428
-> [223090.262332] LR is at kvm_unmap_hva_handler+0x2c/0x3c
-> [223090.262531] Call trace:
-> [223090.262533] [<ffff0000080adb78>] unmap_stage2_range+0x8c/0x428
-> [223090.262535] [<ffff0000080adf40>] kvm_unmap_hva_handler+0x2c/0x3c
-> [223090.262537] [<ffff0000080ace2c>] handle_hva_to_gpa+0xb0/0x104
-> [223090.262539] [<ffff0000080af988>] kvm_unmap_hva+0x5c/0xbc
-> [223090.262543] [<ffff0000080a2478>] kvm_mmu_notifier_invalidate_page+0x50/0x8c
-> [223090.262547] [<ffff0000082274f8>] __mmu_notifier_invalidate_page+0x5c/0x84
-> [223090.262551] [<ffff00000820b700>] try_to_unmap_one+0x1d0/0x4a0
-> [223090.262553] [<ffff00000820c5c8>] rmap_walk+0x1cc/0x2e0
-> [223090.262555] [<ffff00000820c90c>] try_to_unmap+0x74/0xa4
-> [223090.262557] [<ffff000008230ce4>] migrate_pages+0x31c/0x5ac
-> [223090.262561] [<ffff0000081f869c>] compact_zone+0x3fc/0x7ac
-> [223090.262563] [<ffff0000081f8ae0>] compact_zone_order+0x94/0xb0
-> [223090.262564] [<ffff0000081f91c0>] try_to_compact_pages+0x108/0x290
-> [223090.262569] [<ffff0000081d5108>] __alloc_pages_direct_compact+0x70/0x1ac
-> [223090.262571] [<ffff0000081d64a0>] __alloc_pages_nodemask+0x434/0x9f4
-> [223090.262572] [<ffff0000082256f0>] alloc_pages_vma+0x230/0x254
-> [223090.262574] [<ffff000008235e5c>] do_huge_pmd_anonymous_page+0x114/0x538
-> [223090.262576] [<ffff000008201bec>] handle_mm_fault+0xd40/0x17a4
-> [223090.262577] [<ffff0000081fb324>] __get_user_pages+0x12c/0x36c
-> [223090.262578] [<ffff0000081fb804>] get_user_pages_unlocked+0xa4/0x1b8
-> [223090.262579] [<ffff0000080a3ce8>] __gfn_to_pfn_memslot+0x280/0x31c
-> [223090.262580] [<ffff0000080a3dd0>] gfn_to_pfn_prot+0x4c/0x5c
-> [223090.262582] [<ffff0000080af3f8>] kvm_handle_guest_abort+0x240/0x774
-> [223090.262584] [<ffff0000080b2bac>] handle_exit+0x11c/0x1ac
-> [223090.262586] [<ffff0000080ab99c>] kvm_arch_vcpu_ioctl_run+0x31c/0x648
-> [223090.262587] [<ffff0000080a1d78>] kvm_vcpu_ioctl+0x378/0x768
-> [223090.262590] [<ffff00000825df5c>] do_vfs_ioctl+0x324/0x5a4
-> [223090.262591] [<ffff00000825e26c>] SyS_ioctl+0x90/0xa4
-> [223090.262595] [<ffff000008085d84>] el0_svc_naked+0x38/0x3c
-> 
-> This patch moves the stage2 PGD manipulation under the lock.
-> 
-> Reported-by: Alexander Graf <agraf@suse.de>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Radim Krčmář <rkrcmar@redhat.com>
-> Cc: stable@vger.kernel.org # 4.10.x and earlier
-> Reviewed-by: Christoffer Dall <cdall@linaro.org>
-> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Christoffer Dall <cdall@linaro.org>
-> 
-> ---
-> 
-> Hi,
-> 
-> Looks like we missed sending this to stable. Please apply for 4.10.x and
-> earlier. 4.11.y and later versions have it already.
+> Ah, my abilities to forward read on a patch series are quite poor.
+Not quite. It indicates that the patch split is a bit wrong, and that
 
-Only applied to 4.9-stable, can you please provide a backport for 4.4
-and 3.18 if you want it there?
+	irq_set_status_flags(irq, IRQ_NOAUTOEN | IRQ_DISABLE_UNLAZY);
 
-thanks,
+should really be in this patch and not the following one.
 
-greg k-h
+I'll fix that as I rebase the whole thing.
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
