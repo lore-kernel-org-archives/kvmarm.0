@@ -1,251 +1,179 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v2 00/28] ARM Scalable Vector Extension (SVE)
-Date: Thu, 31 Aug 2017 18:00:32 +0100
-Message-ID: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v2 01/28] regset: Add support for dynamically sized regsets
+Date: Thu, 31 Aug 2017 18:00:33 +0100
+Message-ID: <1504198860-12951-2-git-send-email-Dave.Martin@arm.com>
+References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Return-path: <linux-arch-owner@vger.kernel.org>
+In-Reply-To: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com>
 Sender: linux-arch-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org, Oleg Nesterov <oleg@redhat.com>, Alexander Viro <viro@zeniv.linux.org.uk>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This series implements Linux kernel support for the ARM Scalable Vector
-Extension (SVE). [1]  It supersedes the previous v1: see [3] for link.
-See the individual patches for details of changes.
+Currently the regset API doesn't allow for the possibility that
+regsets (or at least, the amount of meaningful data in a regset)
+may change in size.
 
-The patches apply on v4.13-rc7 + linux-arm64/for-next/core.
-For convenience, a git tree is available. [4]
+In particular, this results in useless padding being added to
+coredumps in a regset's current size is smaller than its
+theoretical maximum size.
 
+This patch adds a get_size() function to struct user_regset.
+Individual regset implementations can implement this function to
+return the current size of the regset data.  A regset_size()
+function is added to provide callers with an abstract interface for
+determining the size of a regset without needing to know whether
+the regset is dynamically sized or not.
 
-To reduce spam, some people may not been copied on the entire series.
-For those who did not receive the whole series, it can be found in the
-linux-arm-kernel archive. [2]
+The only affected user of this interface is the ELF coredump code:
+This patch ports ELF coredump to dump regsets with their actual
+size in the coredump.  This has no effect except for new regsets
+that are dynamically sized and provide a get_size() implementation.
 
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ fs/binfmt_elf.c        |  6 ++---
+ include/linux/regset.h | 67 ++++++++++++++++++++++++++++++++++++++++++++------
+ 2 files changed, 63 insertions(+), 10 deletions(-)
 
-*Note* The final two patches (27-28) of the series are still RFC --
-before committing to this ABI it would be good to get feedback on
-whether the approach makes sense and whether it suitable for other
-architectures.  These two patches are not required by the rest of the
-series and can be revised or merged later.
-
-
-Support for use of SVE by KVM guests is not currently included.
-Instead, such use will be trapped and reflected to the guest as
-undefined instruction execution.  SVE is hidden from the view of the
-CPU feature registers visible to guests, so that guests will not
-expect it to work.
-
-
-This series has been build- and boot-tested on Juno r0 and the ARM FVP
-Base model with SVE plugin.  Because there is no hardware with SVE
-support yet, testing of the SVE functionality has only been performed on
-the model.
-
-Regression testing of v1 using LTP showed no regressions on the kernel
-tests.
-
-Regression testing of v2 is under way.
-
-
-Series summary:
-
- * Patches 1-5 contain some individual bits of preparatory spadework,
-   which are indirectly related to SVE.
-
-Dave Martin (5):
-  regset: Add support for dynamically sized regsets
-  arm64: KVM: Hide unsupported AArch64 CPU features from guests
-  arm64: efi: Add missing Kconfig dependency on KERNEL_MODE_NEON
-  arm64: Port deprecated instruction emulation to new sysctl interface
-  arm64: fpsimd: Simplify uses of {set,clear}_ti_thread_flag()
-
-   Non-trivial changes among these are:
-
-   * Patch 1: updates the regset core code to handle regsets whose size
-     is not fixed at compile time.  This avoids bloating coredumps even
-     though the maximum theoretical SVE regset size is large.
-
-   * Patch 2: extends KVM to modify the ARM architectural ID registers
-     seen by guests, by trapping and emulating certain registers.  For
-     SVE this is a temporary measure, but it may be useful for other
-     architecture extensions.  This patch may also be built on in the
-     future, since the only registers currently emulated are those
-     required for hiding SVE.
-
- * Patches 6-10 add SVE-specific system register and structure layout
-   definitions, and the low-level boot code and accessors needed for
-   making use of SVE.
-
-Dave Martin (5):
-  arm64/sve: System register and exception syndrome definitions
-  arm64/sve: Low-level SVE architectural state manipulation functions
-  arm64/sve: Kconfig update and conditional compilation support
-  arm64/sve: Signal frame and context structure definition
-  arm64/sve: Low-level CPU setup
-
- * Patches 11-13 implement the core context management facilities to
-   provide each user task with its own SVE register context, signal
-   handling facilities, and sane programmer's model interoperation
-   between SVE and FPSIMD.
-
-Dave Martin (3):
-  arm64/sve: Core task context handling
-  arm64/sve: Support vector length resetting for new processes
-  arm64/sve: Signal handling support
-
- * Patches 14 and 16 provide backend logic for detecting and making use
-   of the different SVE vector lengths supported by the hardware.
-
- * Patch 15 moves around code in cpufeatures.c to fit.
-
-Dave Martin (3):
-  arm64/sve: Backend logic for setting the vector length
-  arm64: cpufeature: Move sys_caps_initialised declarations
-  arm64/sve: Probe SVE capabilities and usable vector lengths
-
- * Patches 17-18 update the kernel-mode NEON / EFI FPSIMD frameworks to
-   interoperate correctly with SVE.
-
-Dave Martin (2):
-  arm64/sve: Preserve SVE registers around kernel-mode NEON use
-  arm64/sve: Preserve SVE registers around EFI runtime service calls
-
- * Patches 19-21 implement the userspace frontend for managing SVE,
-   comprising ptrace, some new arch-specific prctl() calls, and a new
-   sysctl for init-time setup.
-
-Dave Martin (3):
-  arm64/sve: ptrace and ELF coredump support
-  arm64/sve: Add prctl controls for userspace vector length management
-  arm64/sve: Add sysctl to set the default vector length for new
-    processes
-
- * Patches 22-24 provide stub KVM extensions for using KVM only on the
-   host, while denying guest access.  (A future series will extend this
-   with full support for SVE in guests.)
-
-Dave Martin (3):
-  arm64/sve: KVM: Prevent guests from using SVE
-  arm64/sve: KVM: Treat guest SVE use as undefined instruction
-    execution
-  arm64/sve: KVM: Hide SVE from CPU features exposed to guests
-
-And finally:
-
- * Patch 25 disengages the safety catch, enabling the kernel SVE runtime
-   support and allowing userspace to use SVE.
-
-Dave Martin (1):
-  arm64/sve: Detect SVE and activate runtime support
-
- * Patch 26 adds some basic documentation.
-
-Dave Martin (1):
-  arm64/sve: Add documentation
-
- * Patches 27-28 (which may be considered RFC) propose a mechanism to
-   report the maximum runtime signal frame size to userspace.
-
-Dave Martin (2):
-  arm64: signal: Report signal frame size to userspace via auxv
-  arm64/sve: signal: Include SVE when computing AT_MINSIGSTKSZ
-
-
-References:
-
-[1] ARM Scalable Vector Extension
-https://community.arm.com/groups/processors/blog/2016/08/22/technology-update-the-scalable-vector-extension-sve-for-the-armv8-a-architecture
-
-[2] linux-arm-kernel August 2017 Archives by thread
-http://lists.infradead.org/pipermail/linux-arm-kernel/2017-August/thread.html
-
-[3] [PATCH 00/27] ARM Scalable Vector Extension (SVE)
-http://lists.infradead.org/pipermail/linux-arm-kernel/2017-August/524691.html
-
-[4] http://linux-arm.org/git?p=linux-dm.git;a=shortlog;h=refs/heads/sve/v2
-    git://linux-arm.org/linux-dm.git sve/v2
-
-
-Full series and diffstat:
-
-Dave Martin (28):
-  regset: Add support for dynamically sized regsets
-  arm64: KVM: Hide unsupported AArch64 CPU features from guests
-  arm64: efi: Add missing Kconfig dependency on KERNEL_MODE_NEON
-  arm64: Port deprecated instruction emulation to new sysctl interface
-  arm64: fpsimd: Simplify uses of {set,clear}_ti_thread_flag()
-  arm64/sve: System register and exception syndrome definitions
-  arm64/sve: Low-level SVE architectural state manipulation functions
-  arm64/sve: Kconfig update and conditional compilation support
-  arm64/sve: Signal frame and context structure definition
-  arm64/sve: Low-level CPU setup
-  arm64/sve: Core task context handling
-  arm64/sve: Support vector length resetting for new processes
-  arm64/sve: Signal handling support
-  arm64/sve: Backend logic for setting the vector length
-  arm64: cpufeature: Move sys_caps_initialised declarations
-  arm64/sve: Probe SVE capabilities and usable vector lengths
-  arm64/sve: Preserve SVE registers around kernel-mode NEON use
-  arm64/sve: Preserve SVE registers around EFI runtime service calls
-  arm64/sve: ptrace and ELF coredump support
-  arm64/sve: Add prctl controls for userspace vector length management
-  arm64/sve: Add sysctl to set the default vector length for new
-    processes
-  arm64/sve: KVM: Prevent guests from using SVE
-  arm64/sve: KVM: Treat guest SVE use as undefined instruction execution
-  arm64/sve: KVM: Hide SVE from CPU features exposed to guests
-  arm64/sve: Detect SVE and activate runtime support
-  arm64/sve: Add documentation
-  arm64: signal: Report signal frame size to userspace via auxv
-  arm64/sve: signal: Include SVE when computing AT_MINSIGSTKSZ
-
- Documentation/arm64/cpu-feature-registers.txt |   6 +-
- Documentation/arm64/sve.txt                   | 477 +++++++++++++++++
- arch/arm/include/asm/kvm_host.h               |   3 +
- arch/arm64/Kconfig                            |  12 +
- arch/arm64/include/asm/cpu.h                  |   4 +
- arch/arm64/include/asm/cpucaps.h              |   3 +-
- arch/arm64/include/asm/cpufeature.h           |  35 ++
- arch/arm64/include/asm/elf.h                  |   5 +
- arch/arm64/include/asm/esr.h                  |   3 +-
- arch/arm64/include/asm/fpsimd.h               |  71 ++-
- arch/arm64/include/asm/fpsimdmacros.h         | 148 ++++++
- arch/arm64/include/asm/kvm_arm.h              |   5 +-
- arch/arm64/include/asm/kvm_host.h             |  11 +
- arch/arm64/include/asm/processor.h            |  10 +
- arch/arm64/include/asm/sysreg.h               |  24 +
- arch/arm64/include/asm/thread_info.h          |   2 +
- arch/arm64/include/asm/traps.h                |   2 +
- arch/arm64/include/uapi/asm/auxvec.h          |   3 +-
- arch/arm64/include/uapi/asm/hwcap.h           |   1 +
- arch/arm64/include/uapi/asm/ptrace.h          | 135 +++++
- arch/arm64/include/uapi/asm/sigcontext.h      | 120 ++++-
- arch/arm64/kernel/armv8_deprecated.c          |  15 +-
- arch/arm64/kernel/cpufeature.c                |  96 +++-
- arch/arm64/kernel/cpuinfo.c                   |   7 +
- arch/arm64/kernel/entry-fpsimd.S              |  17 +
- arch/arm64/kernel/entry.S                     |  14 +-
- arch/arm64/kernel/fpsimd.c                    | 729 +++++++++++++++++++++++++-
- arch/arm64/kernel/head.S                      |  13 +-
- arch/arm64/kernel/process.c                   |   4 +
- arch/arm64/kernel/ptrace.c                    | 270 +++++++++-
- arch/arm64/kernel/signal.c                    | 222 +++++++-
- arch/arm64/kernel/signal32.c                  |   2 +-
- arch/arm64/kernel/traps.c                     |   5 +-
- arch/arm64/kvm/handle_exit.c                  |   8 +
- arch/arm64/kvm/hyp/switch.c                   |  12 +-
- arch/arm64/kvm/sys_regs.c                     | 292 +++++++++--
- arch/arm64/mm/proc.S                          |  14 +-
- fs/binfmt_elf.c                               |   6 +-
- include/linux/regset.h                        |  67 ++-
- include/uapi/linux/elf.h                      |   1 +
- include/uapi/linux/prctl.h                    |   9 +
- kernel/sys.c                                  |  12 +
- virt/kvm/arm/arm.c                            |   3 +
- 43 files changed, 2753 insertions(+), 145 deletions(-)
- create mode 100644 Documentation/arm64/sve.txt
-
+diff --git a/fs/binfmt_elf.c b/fs/binfmt_elf.c
+index 6466153..94ca285 100644
+--- a/fs/binfmt_elf.c
++++ b/fs/binfmt_elf.c
+@@ -1696,7 +1696,7 @@ static int fill_thread_core_info(struct elf_thread_core_info *t,
+ 				 long signr, size_t *total)
+ {
+ 	unsigned int i;
+-	unsigned int regset_size = view->regsets[0].n * view->regsets[0].size;
++	unsigned int size = regset_size(t->task, &view->regsets[0]);
+ 
+ 	/*
+ 	 * NT_PRSTATUS is the one special case, because the regset data
+@@ -1705,7 +1705,7 @@ static int fill_thread_core_info(struct elf_thread_core_info *t,
+ 	 * We assume that regset 0 is NT_PRSTATUS.
+ 	 */
+ 	fill_prstatus(&t->prstatus, t->task, signr);
+-	(void) view->regsets[0].get(t->task, &view->regsets[0], 0, regset_size,
++	(void) view->regsets[0].get(t->task, &view->regsets[0], 0, size,
+ 				    &t->prstatus.pr_reg, NULL);
+ 
+ 	fill_note(&t->notes[0], "CORE", NT_PRSTATUS,
+@@ -1725,7 +1725,7 @@ static int fill_thread_core_info(struct elf_thread_core_info *t,
+ 		if (regset->core_note_type && regset->get &&
+ 		    (!regset->active || regset->active(t->task, regset))) {
+ 			int ret;
+-			size_t size = regset->n * regset->size;
++			size_t size = regset_size(t->task, regset);
+ 			void *data = kmalloc(size, GFP_KERNEL);
+ 			if (unlikely(!data))
+ 				return 0;
+diff --git a/include/linux/regset.h b/include/linux/regset.h
+index 8e0c9fe..494ceda 100644
+--- a/include/linux/regset.h
++++ b/include/linux/regset.h
+@@ -107,6 +107,28 @@ typedef int user_regset_writeback_fn(struct task_struct *target,
+ 				     int immediate);
+ 
+ /**
++ * user_regset_get_size_fn - type of @get_size function in &struct user_regset
++ * @target:	thread being examined
++ * @regset:	regset being examined
++ *
++ * This call is optional; usually the pointer is %NULL.
++ *
++ * When provided, this function must return the current size of regset
++ * data, as observed by the @get function in &struct user_regset.  The
++ * value returned must be a multiple of @size.  The returned size is
++ * required to be valid only until the next time (if any) @regset is
++ * modified for @target.
++ *
++ * This function is intended for dynamically sized regsets.  A regset
++ * that is statically sized does not need to implement it.
++ *
++ * This function should not be called directly: instead, callers should
++ * call regset_size() to determine the current size of a regset.
++ */
++typedef unsigned int user_regset_get_size_fn(struct task_struct *target,
++					     const struct user_regset *regset);
++
++/**
+  * struct user_regset - accessible thread CPU state
+  * @n:			Number of slots (registers).
+  * @size:		Size in bytes of a slot (register).
+@@ -117,19 +139,33 @@ typedef int user_regset_writeback_fn(struct task_struct *target,
+  * @set:		Function to store values.
+  * @active:		Function to report if regset is active, or %NULL.
+  * @writeback:		Function to write data back to user memory, or %NULL.
++ * @get_size:		Function to return the regset's size, or %NULL.
+  *
+  * This data structure describes a machine resource we call a register set.
+  * This is part of the state of an individual thread, not necessarily
+  * actual CPU registers per se.  A register set consists of a number of
+  * similar slots, given by @n.  Each slot is @size bytes, and aligned to
+- * @align bytes (which is at least @size).
++ * @align bytes (which is at least @size).  For dynamically-sized
++ * regsets, @n must contain the maximum possible number of slots for the
++ * regset, and @get_size must point to a function that returns the
++ * current regset size.
+  *
+- * These functions must be called only on the current thread or on a
+- * thread that is in %TASK_STOPPED or %TASK_TRACED state, that we are
+- * guaranteed will not be woken up and return to user mode, and that we
+- * have called wait_task_inactive() on.  (The target thread always might
+- * wake up for SIGKILL while these functions are working, in which case
+- * that thread's user_regset state might be scrambled.)
++ * Callers that need to know only the current size of the regset and do
++ * not care about its internal structure should call regset_size()
++ * instead of inspecting @n or calling @get_size.
++ *
++ * For backward compatibility, the @get and @set methods must pad to, or
++ * accept, @n * @size bytes, even if the current regset size is smaller.
++ * The precise semantics of these operations depend on the regset being
++ * accessed.
++ *
++ * The functions to which &struct user_regset members point must be
++ * called only on the current thread or on a thread that is in
++ * %TASK_STOPPED or %TASK_TRACED state, that we are guaranteed will not
++ * be woken up and return to user mode, and that we have called
++ * wait_task_inactive() on.  (The target thread always might wake up for
++ * SIGKILL while these functions are working, in which case that
++ * thread's user_regset state might be scrambled.)
+  *
+  * The @pos argument must be aligned according to @align; the @count
+  * argument must be a multiple of @size.  These functions are not
+@@ -156,6 +192,7 @@ struct user_regset {
+ 	user_regset_set_fn		*set;
+ 	user_regset_active_fn		*active;
+ 	user_regset_writeback_fn	*writeback;
++	user_regset_get_size_fn		*get_size;
+ 	unsigned int			n;
+ 	unsigned int 			size;
+ 	unsigned int 			align;
+@@ -371,5 +408,21 @@ static inline int copy_regset_from_user(struct task_struct *target,
+ 	return regset->set(target, regset, offset, size, NULL, data);
+ }
+ 
++/**
++ * regset_size - determine the current size of a regset
++ * @target:	thread to be examined
++ * @regset:	regset to be examined
++ *
++ * Note that the returned size is valid only until the next time
++ * (if any) @regset is modified for @target.
++ */
++static inline unsigned int regset_size(struct task_struct *target,
++				       const struct user_regset *regset)
++{
++	if (!regset->get_size)
++		return regset->n * regset->size;
++	else
++		return regset->get_size(target, regset);
++}
+ 
+ #endif	/* <linux/regset.h> */
 -- 
 2.1.4
