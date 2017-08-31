@@ -1,251 +1,158 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v2 22/28] arm64/sve: KVM: Prevent guests from using SVE
-Date: Thu, 31 Aug 2017 18:00:54 +0100
-Message-ID: <1504198860-12951-23-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v2 25/28] arm64/sve: Detect SVE and activate runtime support
+Date: Thu, 31 Aug 2017 18:00:57 +0100
+Message-ID: <1504198860-12951-26-git-send-email-Dave.Martin@arm.com>
 References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com>
 Return-path: <linux-arch-owner@vger.kernel.org>
 In-Reply-To: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com>
 Sender: linux-arch-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Until KVM has full SVE support, guests must not be allowed to
-execute SVE instructions.
+This patch enables detection of hardware SVE support via the
+cpufeatures framework, and reports its presence to the kernel and
+userspace via the new ARM64_SVE cpucap and HWCAP_SVE hwcap
+respectively.
 
-This patch enables the necessary traps, and also ensures that the
-traps are disabled again on exit from the guest so that the host
-can still use SVE if it wants to.
+Userspace can also detect SVE using ID_AA64PFR0_EL1, using the
+cpufeatures MRS emulation.
 
-This patch introduces another instance of
-__this_cpu_write(fpsimd_last_state, NULL), so this flush operation
-is abstracted out as a separate helper fpsimd_flush_cpu_state().
-Other instances are ported appropriately.
-
-As a side effect of this refactoring, a this_cpu_write() in
-fpsimd_cpu_pm_notifier() is changed to __this_cpu_write().  This
-should be fine, since cpu_pm_enter() is supposed to be called only
-with interrupts disabled.
+When running on hardware that supports SVE, this enables runtime
+kernel support for SVE, and allows user tasks to execute SVE
+instructions and make of the of the SVE-specific user/kernel
+interface extensions implemented by this series.
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 
 ---
 
 Changes since v1
 ----------------
 
-Requested by Marc Zyngier:
+Requested by Suzuki Poulose:
 
-* Avoid the verbose arithmetic for CPTR_EL2_DEFAULT, and just
-describe it in terms of the set of bits known to be RES1 in
-CPTR_EL2.
+* Update CPUID documentation to document exposure of SVE field.
 
-Other:
-
-* Fixup to drop task SVE state cached in the CPU registers across
-guest entry/exit.
-
-Without this, we may enter an EL0 process with wrong data in the
-extended SVE bits and/or wrong trap configuration.
-
-This is not a problem for the FPSIMD part of the state because KVM
-explicitly restores the host FPSIMD state on guest exit; but this
-restore is sufficient to corrupt the extra SVE bits even if nothing
-else does.
-
-* The fpsimd_flush_cpu_state() function, which was supposed to abstract
-the underlying flush operation, wasn't used. [sparse]
-
-This patch is now ported to use it.  Other users of the same idiom are
-ported too (which was the original intention).
-
-fpsimd_flush_cpu_state() is marked inline, since all users are
-ifdef'd and the function may be unused.  Plus, it's trivially
-suitable for inlining.
+* Applied deferred Reviewed-by dependent on the above change.
 ---
- arch/arm/include/asm/kvm_host.h   |  3 +++
- arch/arm64/include/asm/fpsimd.h   |  1 +
- arch/arm64/include/asm/kvm_arm.h  |  4 +++-
- arch/arm64/include/asm/kvm_host.h | 11 +++++++++++
- arch/arm64/kernel/fpsimd.c        | 31 +++++++++++++++++++++++++++++--
- arch/arm64/kvm/hyp/switch.c       |  6 +++---
- virt/kvm/arm/arm.c                |  3 +++
- 7 files changed, 53 insertions(+), 6 deletions(-)
+ Documentation/arm64/cpu-feature-registers.txt |  6 +++++-
+ arch/arm64/include/asm/cpucaps.h              |  3 ++-
+ arch/arm64/include/asm/cpufeature.h           |  3 ++-
+ arch/arm64/include/uapi/asm/hwcap.h           |  1 +
+ arch/arm64/kernel/cpufeature.c                | 16 ++++++++++++++++
+ arch/arm64/kernel/cpuinfo.c                   |  1 +
+ 6 files changed, 27 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 127e2dd..fa4a442 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -299,4 +299,7 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
- int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
- 			       struct kvm_device_attr *attr);
+diff --git a/Documentation/arm64/cpu-feature-registers.txt b/Documentation/arm64/cpu-feature-registers.txt
+index dad411d..d65504c 100644
+--- a/Documentation/arm64/cpu-feature-registers.txt
++++ b/Documentation/arm64/cpu-feature-registers.txt
+@@ -132,7 +132,11 @@ infrastructure:
+      x--------------------------------------------------x
+      | Name                         |  bits   | visible |
+      |--------------------------------------------------|
+-     | RES0                         | [63-28] |    n    |
++     | RES0                         | [63-36] |    n    |
++     |--------------------------------------------------|
++     | SVE                          | [35-32] |    y    |
++     |--------------------------------------------------|
++     | RES0                         | [31-28] |    n    |
+      |--------------------------------------------------|
+      | GIC                          | [27-24] |    n    |
+      |--------------------------------------------------|
+diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+index 8da6216..2ff7c5e 100644
+--- a/arch/arm64/include/asm/cpucaps.h
++++ b/arch/arm64/include/asm/cpucaps.h
+@@ -40,7 +40,8 @@
+ #define ARM64_WORKAROUND_858921			19
+ #define ARM64_WORKAROUND_CAVIUM_30115		20
+ #define ARM64_HAS_DCPOP				21
++#define ARM64_SVE				22
  
-+/* All host FP/SIMD state is restored on guest exit, so nothing to save: */
-+static inline void kvm_fpsimd_flush_cpu_state(void) {}
-+
- #endif /* __ARM_KVM_HOST_H__ */
-diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
-index d084968..5605fc1 100644
---- a/arch/arm64/include/asm/fpsimd.h
-+++ b/arch/arm64/include/asm/fpsimd.h
-@@ -74,6 +74,7 @@ extern void fpsimd_restore_current_state(void);
- extern void fpsimd_update_current_state(struct fpsimd_state *state);
+-#define ARM64_NCAPS				22
++#define ARM64_NCAPS				23
  
- extern void fpsimd_flush_task_state(struct task_struct *target);
-+extern void sve_flush_cpu_state(void);
+ #endif /* __ASM_CPUCAPS_H */
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index d98e7ba..bc987eb 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -273,7 +273,8 @@ static inline bool system_uses_ttbr0_pan(void)
  
- /* Maximum VL that SVE VL-agnostic software can transparently support */
- #define SVE_VL_ARCH_MAX 0x100
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index dbf0537..7f069ff 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -186,7 +186,8 @@
- #define CPTR_EL2_TTA	(1 << 20)
- #define CPTR_EL2_TFP	(1 << CPTR_EL2_TFP_SHIFT)
- #define CPTR_EL2_TZ	(1 << 8)
--#define CPTR_EL2_DEFAULT	0x000033ff
-+#define CPTR_EL2_RES1	0x000032ff /* known RES1 bits in CPTR_EL2 */
-+#define CPTR_EL2_DEFAULT	CPTR_EL2_RES1
- 
- /* Hyp Debug Configuration Register bits */
- #define MDCR_EL2_TPMS		(1 << 14)
-@@ -237,5 +238,6 @@
- 
- #define CPACR_EL1_FPEN		(3 << 20)
- #define CPACR_EL1_TTA		(1 << 28)
-+#define CPACR_EL1_DEFAULT	(CPACR_EL1_FPEN | CPACR_EL1_ZEN_EL1EN)
- 
- #endif /* __ARM64_KVM_ARM_H__ */
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index d686300..05d8373 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -25,6 +25,7 @@
- #include <linux/types.h>
- #include <linux/kvm_types.h>
- #include <asm/cpufeature.h>
-+#include <asm/fpsimd.h>
- #include <asm/kvm.h>
- #include <asm/kvm_asm.h>
- #include <asm/kvm_mmio.h>
-@@ -390,4 +391,14 @@ static inline void __cpu_init_stage2(void)
- 		  "PARange is %d bits, unsupported configuration!", parange);
+ static inline bool system_supports_sve(void)
+ {
+-	return false;
++	return IS_ENABLED(CONFIG_ARM64_SVE) &&
++		cpus_have_const_cap(ARM64_SVE);
  }
  
-+/*
-+ * All host FP/SIMD state is restored on guest exit, so nothing needs
-+ * doing here except in the SVE case:
-+*/
-+static inline void kvm_fpsimd_flush_cpu_state(void)
-+{
-+	if (system_supports_sve())
-+		sve_flush_cpu_state();
-+}
-+
- #endif /* __ARM64_KVM_HOST_H__ */
-diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index b430ee0..7837ced 100644
---- a/arch/arm64/kernel/fpsimd.c
-+++ b/arch/arm64/kernel/fpsimd.c
-@@ -875,6 +875,33 @@ void fpsimd_flush_task_state(struct task_struct *t)
- 	t->thread.fpsimd_state.cpu = NR_CPUS;
- }
+ /*
+diff --git a/arch/arm64/include/uapi/asm/hwcap.h b/arch/arm64/include/uapi/asm/hwcap.h
+index 4b9344c..c6e1e45 100644
+--- a/arch/arm64/include/uapi/asm/hwcap.h
++++ b/arch/arm64/include/uapi/asm/hwcap.h
+@@ -36,5 +36,6 @@
+ #define HWCAP_FCMA		(1 << 14)
+ #define HWCAP_LRCPC		(1 << 15)
+ #define HWCAP_DCPOP		(1 << 16)
++#define HWCAP_SVE		(1 << 17)
  
-+static inline void fpsimd_flush_cpu_state(void)
-+{
-+	__this_cpu_write(fpsimd_last_state, NULL);
-+}
-+
-+/*
-+ * Invalidate any task SVE state currently held in this CPU's regs.
-+ *
-+ * This is used to prevent the kernel from trying to reuse SVE register data
-+ * that is detroyed by KVM guest enter/exit.  This function should go away when
-+ * KVM SVE support is implemented.  Don't use it for anything else.
-+ */
+ #endif /* _UAPI__ASM_HWCAP_H */
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index c30bb6b..3e74d93 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -141,6 +141,7 @@ static const struct arm64_ftr_bits ftr_id_aa64isar1[] = {
+ };
+ 
+ static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
++	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_SVE_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_EXACT, ID_AA64PFR0_GIC_SHIFT, 4, 0),
+ 	S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_ASIMD_SHIFT, 4, ID_AA64PFR0_ASIMD_NI),
+ 	S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_FP_SHIFT, 4, ID_AA64PFR0_FP_NI),
+@@ -942,6 +943,18 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.min_field_value = 1,
+ 	},
+ #endif
 +#ifdef CONFIG_ARM64_SVE
-+void sve_flush_cpu_state(void)
-+{
-+	struct fpsimd_state *const fpstate = __this_cpu_read(fpsimd_last_state);
-+	struct task_struct *tsk;
-+
-+	if (!fpstate)
-+		return;
-+
-+	tsk = container_of(fpstate, struct task_struct, thread.fpsimd_state);
-+	if (test_tsk_thread_flag(tsk, TIF_SVE))
-+		fpsimd_flush_cpu_state();
-+}
++	{
++		.desc = "Scalable Vector Extension",
++		.capability = ARM64_SVE,
++		.def_scope = SCOPE_SYSTEM,
++		.sys_reg = SYS_ID_AA64PFR0_EL1,
++		.sign = FTR_UNSIGNED,
++		.field_pos = ID_AA64PFR0_SVE_SHIFT,
++		.min_field_value = ID_AA64PFR0_SVE,
++		.matches = has_cpuid_feature,
++	},
 +#endif /* CONFIG_ARM64_SVE */
-+
- #ifdef CONFIG_KERNEL_MODE_NEON
+ 	{},
+ };
  
- DEFINE_PER_CPU(bool, kernel_neon_busy);
-@@ -915,7 +942,7 @@ void kernel_neon_begin(void)
- 	}
+@@ -974,6 +987,9 @@ static const struct arm64_cpu_capabilities arm64_elf_hwcaps[] = {
+ 	HWCAP_CAP(SYS_ID_AA64ISAR1_EL1, ID_AA64ISAR1_JSCVT_SHIFT, FTR_UNSIGNED, 1, CAP_HWCAP, HWCAP_JSCVT),
+ 	HWCAP_CAP(SYS_ID_AA64ISAR1_EL1, ID_AA64ISAR1_FCMA_SHIFT, FTR_UNSIGNED, 1, CAP_HWCAP, HWCAP_FCMA),
+ 	HWCAP_CAP(SYS_ID_AA64ISAR1_EL1, ID_AA64ISAR1_LRCPC_SHIFT, FTR_UNSIGNED, 1, CAP_HWCAP, HWCAP_LRCPC),
++#ifdef CONFIG_ARM64_SVE
++	HWCAP_CAP(SYS_ID_AA64PFR0_EL1, ID_AA64PFR0_SVE_SHIFT, FTR_UNSIGNED, ID_AA64PFR0_SVE, CAP_HWCAP, HWCAP_SVE),
++#endif
+ 	{},
+ };
  
- 	/* Invalidate any task state remaining in the fpsimd regs: */
--	__this_cpu_write(fpsimd_last_state, NULL);
-+	fpsimd_flush_cpu_state();
+diff --git a/arch/arm64/kernel/cpuinfo.c b/arch/arm64/kernel/cpuinfo.c
+index be260e8..9559dde 100644
+--- a/arch/arm64/kernel/cpuinfo.c
++++ b/arch/arm64/kernel/cpuinfo.c
+@@ -70,6 +70,7 @@ static const char *const hwcap_str[] = {
+ 	"fcma",
+ 	"lrcpc",
+ 	"dcpop",
++	"sve",
+ 	NULL
+ };
  
- 	preempt_disable();
- 
-@@ -1032,7 +1059,7 @@ static int fpsimd_cpu_pm_notifier(struct notifier_block *self,
- 	case CPU_PM_ENTER:
- 		if (current->mm)
- 			task_fpsimd_save();
--		this_cpu_write(fpsimd_last_state, NULL);
-+		fpsimd_flush_cpu_state();
- 		break;
- 	case CPU_PM_EXIT:
- 		if (current->mm)
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 35a90b8..951f3eb 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -48,7 +48,7 @@ static void __hyp_text __activate_traps_vhe(void)
- 
- 	val = read_sysreg(cpacr_el1);
- 	val |= CPACR_EL1_TTA;
--	val &= ~CPACR_EL1_FPEN;
-+	val &= ~(CPACR_EL1_FPEN | CPACR_EL1_ZEN);
- 	write_sysreg(val, cpacr_el1);
- 
- 	write_sysreg(__kvm_hyp_vector, vbar_el1);
-@@ -59,7 +59,7 @@ static void __hyp_text __activate_traps_nvhe(void)
- 	u64 val;
- 
- 	val = CPTR_EL2_DEFAULT;
--	val |= CPTR_EL2_TTA | CPTR_EL2_TFP;
-+	val |= CPTR_EL2_TTA | CPTR_EL2_TFP | CPTR_EL2_TZ;
- 	write_sysreg(val, cptr_el2);
- }
- 
-@@ -117,7 +117,7 @@ static void __hyp_text __deactivate_traps_vhe(void)
- 
- 	write_sysreg(mdcr_el2, mdcr_el2);
- 	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
--	write_sysreg(CPACR_EL1_FPEN, cpacr_el1);
-+	write_sysreg(CPACR_EL1_DEFAULT, cpacr_el1);
- 	write_sysreg(vectors, vbar_el1);
- }
- 
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index a39a1e1..af9f5da 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -647,6 +647,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		 */
- 		preempt_disable();
- 
-+		/* Flush FP/SIMD state that can't survive guest entry/exit */
-+		kvm_fpsimd_flush_cpu_state();
-+
- 		kvm_pmu_flush_hwstate(vcpu);
- 
- 		kvm_timer_flush_hwstate(vcpu);
 -- 
 2.1.4
