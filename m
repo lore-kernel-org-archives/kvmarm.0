@@ -1,74 +1,129 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [RFC PATCH v2 28/28] arm64/sve: signal: Include SVE when computing AT_MINSIGSTKSZ
-Date: Thu, 31 Aug 2017 18:01:00 +0100
-Message-ID: <1504198860-12951-29-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v2 18/28] arm64/sve: Preserve SVE registers around EFI runtime
+ service calls
+Date: Thu, 31 Aug 2017 18:00:50 +0100
+Message-ID: <1504198860-12951-19-git-send-email-Dave.Martin@arm.com>
 References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-arch-owner@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BB4149C5A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Aug 2017 12:59:42 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id B0nRLJmiNT+D for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 31 Aug 2017 12:59:40 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A7EF49C49
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Aug 2017 12:59:36 -0400 (EDT)
 In-Reply-To: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com>
-Sender: linux-arch-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org, Michael Ellerman <mpe@ellerman.id.au>
+Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The SVE context block in the signal frame needs to be considered
-too when computing the maximum possible signal frame size.
-
-Because the size of this block depends on the vector length, this
-patch computes the size based not on the thread's current vector
-length but instead on the maximum possible vector length: this
-determines the maximum size of SVE context block that can be
-observed in any signal frame for the lifetime of the process.
-
-Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Alex Bennée <alex.bennee@linaro.org>
-
----
-
-Changes since v1
-----------------
-
-Changes related to Ard Biesheuvel's comments:
-
-* Fix unbalanced ifelse bracing to conform to the kernel coding style.
-
-Requested by Alex Bennée:
-
-* Thin out BUG_ON()s:
-Redundant BUG_ON()s and ones that just check invariants are removed.
-Important sanity-checks are migrated to WARN_ON()s, with some
-minimal best-effort patch-up code.
----
- arch/arm64/kernel/signal.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
-
-diff --git a/arch/arm64/kernel/signal.c b/arch/arm64/kernel/signal.c
-index 7a3d6d2..c5ae575 100644
---- a/arch/arm64/kernel/signal.c
-+++ b/arch/arm64/kernel/signal.c
-@@ -594,8 +594,18 @@ static int setup_sigframe_layout(struct rt_sigframe_user_layout *user,
- 	if (system_supports_sve()) {
- 		unsigned int vq = 0;
- 
--		if (test_thread_flag(TIF_SVE))
--			vq = sve_vq_from_vl(current->thread.sve_vl);
-+		if (add_all || test_thread_flag(TIF_SVE)) {
-+			int vl = sve_max_vl;
-+
-+			if (!add_all)
-+				vl = current->thread.sve_vl;
-+
-+			/* Fail safe if something wasn't initialised */
-+			if (WARN_ON(!sve_vl_valid(vl)))
-+				vl = SVE_VL_MIN;
-+
-+			vq = sve_vq_from_vl(vl);
-+		}
- 
- 		err = sigframe_alloc(user, &user->sve_offset,
- 				     SVE_SIG_CONTEXT_SIZE(vq));
--- 
-2.1.4
+VGhlIEVGSSBydW50aW1lIHNlcnZpY2VzIEFCSSBhbGxvd3MgRUZJIHRvIG1ha2UgZnJlZSB1c2Ug
+b2YgdGhlCkZQU0lNRCByZWdpc3RlcnMgZHVyaW5nIEVGSSBydW50aW1lIHNlcnZpY2UgY2FsbHMs
+IHN1YmplY3QgdG8gdGhlCmNhbGxlZS1zYXZlIHJlcXVpcmVtZW50cyBvZiB0aGUgQUFyY2g2NCBw
+cm9jZWR1cmUgY2FsbCBzdGFuZGFyZC4KCkhvd2V2ZXIsIHRoZSBTVkUgYXJjaGl0ZWN0dXJlIGFs
+bG93cyB1cHBlciBiaXRzIG9mIHRoZSBTVkUgdmVjdG9yCnJlZ2lzdGVycyB0byBiZSB6ZXJvZWQg
+YXMgYSBzaWRlLWVmZmVjdCBvZiBGUFNJTUQgVi1yZWdpc3Rlcgp3cml0ZXMuICBUaGlzIG1lYW5z
+IHRoYXQgdGhlIFNWRSB2ZWN0b3IgcmVnaXN0ZXJzIG11c3QgYmUgc2F2ZWQgaW4KdGhlaXIgZW50
+aXJldHkgaW4gb3JkZXIgdG8gYXZvaWQgZGF0YSBsb3NzOiBub24tU1ZFLWF3YXJlIEVGSQppbXBs
+ZW1lbnRhdGlvbnMgY2Fubm90IHJlc3RvcmUgdGhlbSBjb3JyZWN0bHkuCgpUaGUgbm9uLUlSUSBj
+YXNlIGlzIGFscmVhZHkgaGFuZGxlZCBncmFjZWZ1bGx5IGJ5Cmtlcm5lbF9uZW9uX2JlZ2luKCku
+ICBGb3IgdGhlIElSUSBjYXNlLCB0aGlzIHBhdGNoIGFsbG9jYXRlcyBhCnN1aXRhYmxlIHBlci1D
+UFUgc3Rhc2ggYnVmZmVyIGZvciB0aGUgZnVsbCBTVkUgcmVnaXN0ZXIgc3RhdGUgYW5kCnVzZXMg
+aXQgdG8gcHJlc2VydmUgdGhlIGFmZmVjdGVkIHJlZ2lzdGVycyBhcm91bmQgRUZJIGNhbGxzLiAg
+SXQgaXMKY3VycmVudGx5IHVuY2xlYXIgaG93IHRoZSBFRkkgcnVudGltZSBzZXJ2aWNlcyBBQkkg
+d2lsbCBiZQpjbGFyaWZpZWQgd2l0aCByZXNwZWN0IHRvIFNWRSwgc28gaXQgc2FmZXN0IHRvIGFz
+c3VtZSB0aGF0IHRoZQpwcmVkaWNhdGUgcmVnaXN0ZXJzIGFuZCBGRlIgbXVzdCBiZSBzYXZlZCBh
+bmQgcmVzdG9yZWQgdG9vLgoKTm8gYXR0ZW1wdCBpcyBtYWRlIHRvIHJlc3RvcmUgdGhlIHJlc3Rv
+cmUgdGhlIHZlY3RvciBsZW5ndGggYWZ0ZXIKYSBjYWxsLCBmb3Igbm93LiAgSXQgaXMgZGVlbWVk
+IHJhdGhlciBpbnNhbmUgZm9yIEVGSSB0byBjaGFuZ2UgaXQsCmFuZCBjb250ZW1wb3JhcnkgRUZJ
+IGltcGxlbWVudGF0aW9ucyBjZXJ0YWlubHkgd29uJ3QuCgpTaWduZWQtb2ZmLWJ5OiBEYXZlIE1h
+cnRpbiA8RGF2ZS5NYXJ0aW5AYXJtLmNvbT4KQ2M6IEFyZCBCaWVzaGV1dmVsIDxhcmQuYmllc2hl
+dXZlbEBsaW5hcm8ub3JnPgoKLS0tCgpDaGFuZ2VzIHNpbmNlIHYxCi0tLS0tLS0tLS0tLS0tLS0K
+ClJlcXVlc3RlZCBieSBBcmQgQmllc2hldXZlbDoKCiogRml4IHVuYmFsYW5jZWQgaWZlbHNlIGJy
+YWNpbmcgdG8gY29uZm9ybSB0byB0aGUga2VybmVsIGNvZGluZyBzdHlsZS4KCiogTWFrZSBlZmlf
+c3ZlX3N0YXRlX3VzZWQgc3RhdGljLgoKQ2hhbmdlcyByZWxhdGVkIHRvIEFsZXggQmVubsOpZSdz
+IGNvbW1lbnRzOgoKKiBNaWdyYXRlIGF3YXkgZnJvbSBtYWdpYyBudW1iZXJzIGZvciBTVkVfVlFf
+QllURVMuCgpPdGhlcjoKCiogUmVuYW1lIHN2ZV9rZXJuZWxfbW9kZV9uZW9uX3NldHVwKCkgdG8g
+c3ZlX2VmaV9zZXR1cCgpLgpUaGUgRUZJIEZQU0lNRCBjb2RlIGlzIHNvbWV0aGluZyBzZW1pLWlu
+ZGVwZW5kZW50IGZyb20ga2VybmVsLW1vZGUgTkVPTgpub3csIHNvIHRoZSAibmVvbiIgaW4gdGhl
+IG5hbWVzIG5vIGxvbmdlciByZWFsbHkgbWFrZXMgc2Vuc2UuCgoqIE1ha2UgdGhlIEVGSSBGUFNJ
+TUQgc2V0dXAgY29kZSBkZXBlbmRlbnQgb24gQ09ORklHX0VGSSAoaXQncyBub3QKc3VwcG9zZWQg
+dG8gd29yayB3aXRoIENPTkZJR19FRkk9biBhbnl3YXkpLgotLS0KIGFyY2gvYXJtNjQva2VybmVs
+L2Zwc2ltZC5jIHwgNjAgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKyst
+LS0tLQogMSBmaWxlIGNoYW5nZWQsIDU0IGluc2VydGlvbnMoKyksIDYgZGVsZXRpb25zKC0pCgpk
+aWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rZXJuZWwvZnBzaW1kLmMgYi9hcmNoL2FybTY0L2tlcm5l
+bC9mcHNpbWQuYwppbmRleCBkZDg5YWNmLi5mZmY5ZmNmIDEwMDY0NAotLS0gYS9hcmNoL2FybTY0
+L2tlcm5lbC9mcHNpbWQuYworKysgYi9hcmNoL2FybTY0L2tlcm5lbC9mcHNpbWQuYwpAQCAtMTE4
+LDExICsxMTgsMTMgQEAgc3RhdGljIGludCBzdmVfZGVmYXVsdF92bCA9IC0xOwogaW50IF9fcm9f
+YWZ0ZXJfaW5pdCBzdmVfbWF4X3ZsID0gLTE7CiAvKiBTZXQgb2YgYXZhaWxhYmxlIHZlY3RvciBs
+ZW5ndGhzLCBhcyB2cV90b19iaXQodnEpOiAqLwogc3RhdGljIF9fcm9fYWZ0ZXJfaW5pdCBERUNM
+QVJFX0JJVE1BUChzdmVfdnFfbWFwLCBTVkVfVlFfTUFYKTsKK3N0YXRpYyB2b2lkIF9fcGVyY3B1
+ICplZmlfc3ZlX3N0YXRlOwogCiAjZWxzZSAvKiAhIENPTkZJR19BUk02NF9TVkUgKi8KIAogLyog
+RHVtbXkgZGVjbGFyYXRpb24gZm9yIGNvZGUgdGhhdCB3aWxsIGJlIG9wdGltaXNlZCBvdXQ6ICov
+CiBleHRlcm4gX19yb19hZnRlcl9pbml0IERFQ0xBUkVfQklUTUFQKHN2ZV92cV9tYXAsIFNWRV9W
+UV9NQVgpOworZXh0ZXJuIHZvaWQgX19wZXJjcHUgKmVmaV9zdmVfc3RhdGU7CiAKICNlbmRpZiAv
+KiAhIENPTkZJR19BUk02NF9TVkUgKi8KIApAQCAtNDQ3LDYgKzQ0OSwyMyBAQCBpbnQgc3ZlX3Zl
+cmlmeV92cV9tYXAodm9pZCkKIAlyZXR1cm4gcmV0OwogfQogCitzdGF0aWMgdm9pZCBfX2luaXQg
+c3ZlX2VmaV9zZXR1cCh2b2lkKQoreworCWlmICghSVNfRU5BQkxFRChDT05GSUdfRUZJKSkKKwkJ
+cmV0dXJuOworCisJLyoKKwkgKiBhbGxvY19wZXJjcHUoKSB3YXJucyBhbmQgcHJpbnRzIGEgYmFj
+a3RyYWNlIGlmIHRoaXMgZ29lcyB3cm9uZy4KKwkgKiBUaGlzIGlzIGV2aWRlbmNlIG9mIGEgY3Jp
+cHBsZWQgc3lzdGVtIGFuZCB3ZSBhcmUgcmV0dXJuaW5nIHZvaWQsCisJICogc28gbm8gYXR0ZW1w
+dCBpcyBtYWRlIHRvIGhhbmRsZSB0aGlzIHNpdHVhdGlvbiBoZXJlLgorCSAqLworCUJVR19PTigh
+c3ZlX3ZsX3ZhbGlkKHN2ZV9tYXhfdmwpKTsKKwllZmlfc3ZlX3N0YXRlID0gX19hbGxvY19wZXJj
+cHUoCisJCVNWRV9TSUdfUkVHU19TSVpFKHN2ZV92cV9mcm9tX3ZsKHN2ZV9tYXhfdmwpKSwgU1ZF
+X1ZRX0JZVEVTKTsKKwlpZiAoIWVmaV9zdmVfc3RhdGUpCisJCXBhbmljKCJDYW5ub3QgYWxsb2Nh
+dGUgcGVyY3B1IG1lbW9yeSBmb3IgRUZJIFNWRSBzYXZlL3Jlc3RvcmUiKTsKK30KKwogdm9pZCBf
+X2luaXQgc3ZlX3NldHVwKHZvaWQpCiB7CiAJdTY0IHpjcjsKQEAgLTQ4Miw2ICs1MDEsOCBAQCB2
+b2lkIF9faW5pdCBzdmVfc2V0dXAodm9pZCkKIAkJc3ZlX21heF92bCk7CiAJcHJfaW5mbygiU1ZF
+OiBkZWZhdWx0IHZlY3RvciBsZW5ndGggJXUgYnl0ZXMgcGVyIHZlY3RvclxuIiwKIAkJc3ZlX2Rl
+ZmF1bHRfdmwpOworCisJc3ZlX2VmaV9zZXR1cCgpOwogfQogCiB2b2lkIGZwc2ltZF9yZWxlYXNl
+X3RocmVhZChzdHJ1Y3QgdGFza19zdHJ1Y3QgKmRlYWRfdGFzaykKQEAgLTc4Myw2ICs4MDQsNyBA
+QCBFWFBPUlRfU1lNQk9MKGtlcm5lbF9uZW9uX2VuZCk7CiAKIHN0YXRpYyBERUZJTkVfUEVSX0NQ
+VShzdHJ1Y3QgZnBzaW1kX3N0YXRlLCBlZmlfZnBzaW1kX3N0YXRlKTsKIHN0YXRpYyBERUZJTkVf
+UEVSX0NQVShib29sLCBlZmlfZnBzaW1kX3N0YXRlX3VzZWQpOworc3RhdGljIERFRklORV9QRVJf
+Q1BVKGJvb2wsIGVmaV9zdmVfc3RhdGVfdXNlZCk7CiAKIC8qCiAgKiBFRkkgcnVudGltZSBzZXJ2
+aWNlcyBzdXBwb3J0IGZ1bmN0aW9ucwpAQCAtODA4LDEwICs4MzAsMjQgQEAgdm9pZCBfX2VmaV9m
+cHNpbWRfYmVnaW4odm9pZCkKIAogCVdBUk5fT04ocHJlZW1wdGlibGUoKSk7CiAKLQlpZiAobWF5
+X3VzZV9zaW1kKCkpCisJaWYgKG1heV91c2Vfc2ltZCgpKSB7CiAJCWtlcm5lbF9uZW9uX2JlZ2lu
+KCk7Ci0JZWxzZSB7Ci0JCWZwc2ltZF9zYXZlX3N0YXRlKHRoaXNfY3B1X3B0cigmZWZpX2Zwc2lt
+ZF9zdGF0ZSkpOworCX0gZWxzZSB7CisJCS8qCisJCSAqIElmICFlZmlfc3ZlX3N0YXRlLCBTVkUg
+Y2FuJ3QgYmUgaW4gdXNlIHlldCBhbmQgZG9lc24ndCBuZWVkCisJCSAqIHByZXNlcnZpbmc6CisJ
+CSAqLworCQlpZiAoc3lzdGVtX3N1cHBvcnRzX3N2ZSgpICYmIGxpa2VseShlZmlfc3ZlX3N0YXRl
+KSkgeworCQkJY2hhciAqc3ZlX3N0YXRlID0gdGhpc19jcHVfcHRyKGVmaV9zdmVfc3RhdGUpOwor
+CisJCQlfX3RoaXNfY3B1X3dyaXRlKGVmaV9zdmVfc3RhdGVfdXNlZCwgdHJ1ZSk7CisKKwkJCXN2
+ZV9zYXZlX3N0YXRlKHN2ZV9zdGF0ZSArIHN2ZV9mZnJfb2Zmc2V0KHN2ZV9tYXhfdmwpLAorCQkJ
+CSAgICAgICAmdGhpc19jcHVfcHRyKCZlZmlfZnBzaW1kX3N0YXRlKS0+ZnBzcik7CisJCX0gZWxz
+ZSB7CisJCQlmcHNpbWRfc2F2ZV9zdGF0ZSh0aGlzX2NwdV9wdHIoJmVmaV9mcHNpbWRfc3RhdGUp
+KTsKKwkJfQorCiAJCV9fdGhpc19jcHVfd3JpdGUoZWZpX2Zwc2ltZF9zdGF0ZV91c2VkLCB0cnVl
+KTsKIAl9CiB9CkBAIC04MjQsMTAgKzg2MCwyMiBAQCB2b2lkIF9fZWZpX2Zwc2ltZF9lbmQodm9p
+ZCkKIAlpZiAoIXN5c3RlbV9zdXBwb3J0c19mcHNpbWQoKSkKIAkJcmV0dXJuOwogCi0JaWYgKF9f
+dGhpc19jcHVfeGNoZyhlZmlfZnBzaW1kX3N0YXRlX3VzZWQsIGZhbHNlKSkKLQkJZnBzaW1kX2xv
+YWRfc3RhdGUodGhpc19jcHVfcHRyKCZlZmlfZnBzaW1kX3N0YXRlKSk7Ci0JZWxzZQorCWlmICgh
+X190aGlzX2NwdV94Y2hnKGVmaV9mcHNpbWRfc3RhdGVfdXNlZCwgZmFsc2UpKSB7CiAJCWtlcm5l
+bF9uZW9uX2VuZCgpOworCX0gZWxzZSB7CisJCWlmIChzeXN0ZW1fc3VwcG9ydHNfc3ZlKCkgJiYK
+KwkJICAgIGxpa2VseShfX3RoaXNfY3B1X3JlYWQoZWZpX3N2ZV9zdGF0ZV91c2VkKSkpIHsKKwkJ
+CWNoYXIgY29uc3QgKnN2ZV9zdGF0ZSA9IHRoaXNfY3B1X3B0cihlZmlfc3ZlX3N0YXRlKTsKKwor
+CQkJc3ZlX2xvYWRfc3RhdGUoc3ZlX3N0YXRlICsgc3ZlX2Zmcl9vZmZzZXQoc3ZlX21heF92bCks
+CisJCQkJICAgICAgICZ0aGlzX2NwdV9wdHIoJmVmaV9mcHNpbWRfc3RhdGUpLT5mcHNyLAorCQkJ
+CSAgICAgICBzdmVfdnFfZnJvbV92bChzdmVfZ2V0X3ZsKCkpIC0gMSk7CisKKwkJCV9fdGhpc19j
+cHVfd3JpdGUoZWZpX3N2ZV9zdGF0ZV91c2VkLCBmYWxzZSk7CisJCX0gZWxzZSB7CisJCQlmcHNp
+bWRfbG9hZF9zdGF0ZSh0aGlzX2NwdV9wdHIoJmVmaV9mcHNpbWRfc3RhdGUpKTsKKwkJfQorCX0K
+IH0KIAogI2VuZGlmIC8qIENPTkZJR19LRVJORUxfTU9ERV9ORU9OICovCi0tIAoyLjEuNAoKX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxp
+bmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29s
+dW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
