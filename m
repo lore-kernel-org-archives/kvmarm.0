@@ -1,7 +1,7 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v2 05/28] arm64: fpsimd: Simplify uses of {set,clear}_ti_thread_flag()
-Date: Thu, 31 Aug 2017 18:00:37 +0100
-Message-ID: <1504198860-12951-6-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v2 04/28] arm64: Port deprecated instruction emulation to new sysctl interface
+Date: Thu, 31 Aug 2017 18:00:36 +0100
+Message-ID: <1504198860-12951-5-git-send-email-Dave.Martin@arm.com>
 References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -13,38 +13,69 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The existing FPSIMD context switch code contains a couple of
-instances of {set,clear}_ti_thread(task_thread_info(task)).  Since
-there are thread flag manipulators that operate directly on
-task_struct, this verbosity isn't strictly needed.
+Currently, armv8_deprected.c takes charge of the "abi" sysctl
+directory, which makes life difficult for other code that wants to
+register sysctls in the same directory.
 
-For consistency, this patch simplifies the affected calls.  This
-should have no impact on behaviour.
+There is a "new" [1] sysctl registration interface that removes the
+need to define ctl_tables for parent directories explicitly, which
+is ideal here.
+
+This patch ports register_insn_emulation_sysctl() over to the
+register_sysctl() interface and removes the redundant ctl_table for
+"abi".
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- arch/arm64/kernel/fpsimd.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index 3a68cf3..9d762dd 100644
---- a/arch/arm64/kernel/fpsimd.c
-+++ b/arch/arm64/kernel/fpsimd.c
-@@ -159,11 +159,9 @@ void fpsimd_thread_switch(struct task_struct *next)
- 
- 		if (__this_cpu_read(fpsimd_last_state) == st
- 		    && st->cpu == smp_processor_id())
--			clear_ti_thread_flag(task_thread_info(next),
--					     TIF_FOREIGN_FPSTATE);
-+			clear_tsk_thread_flag(next, TIF_FOREIGN_FPSTATE);
- 		else
--			set_ti_thread_flag(task_thread_info(next),
--					   TIF_FOREIGN_FPSTATE);
-+			set_tsk_thread_flag(next, TIF_FOREIGN_FPSTATE);
- 	}
+[1] fea478d4101a (sysctl: Add register_sysctl for normal sysctl
+users)
+The commit message notes an intent to port users of the
+pre-existing interfaces over to register_sysctl(), though the
+number of users of the new interface currently appears negligible.
+---
+ arch/arm64/kernel/armv8_deprecated.c | 15 +++------------
+ 1 file changed, 3 insertions(+), 12 deletions(-)
+
+diff --git a/arch/arm64/kernel/armv8_deprecated.c b/arch/arm64/kernel/armv8_deprecated.c
+index f0e6d71..e15eb2d 100644
+--- a/arch/arm64/kernel/armv8_deprecated.c
++++ b/arch/arm64/kernel/armv8_deprecated.c
+@@ -228,15 +228,7 @@ static int emulation_proc_handler(struct ctl_table *table, int write,
+ 	return ret;
  }
  
+-static struct ctl_table ctl_abi[] = {
+-	{
+-		.procname = "abi",
+-		.mode = 0555,
+-	},
+-	{ }
+-};
+-
+-static void __init register_insn_emulation_sysctl(struct ctl_table *table)
++static void __init register_insn_emulation_sysctl(void)
+ {
+ 	unsigned long flags;
+ 	int i = 0;
+@@ -262,8 +254,7 @@ static void __init register_insn_emulation_sysctl(struct ctl_table *table)
+ 	}
+ 	raw_spin_unlock_irqrestore(&insn_emulation_lock, flags);
+ 
+-	table->child = insns_sysctl;
+-	register_sysctl_table(table);
++	register_sysctl("abi", insns_sysctl);
+ }
+ 
+ /*
+@@ -644,7 +635,7 @@ static int __init armv8_deprecated_init(void)
+ 	cpuhp_setup_state_nocalls(CPUHP_AP_ARM64_ISNDEP_STARTING,
+ 				  "arm64/isndep:starting",
+ 				  run_all_insn_set_hw_mode, NULL);
+-	register_insn_emulation_sysctl(ctl_abi);
++	register_insn_emulation_sysctl();
+ 
+ 	return 0;
+ }
 -- 
 2.1.4
