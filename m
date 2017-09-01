@@ -1,367 +1,329 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v3 0/4] kvm: arm/arm64: vgic: APRn uaccess support.
-Date: Fri, 1 Sep 2017 11:44:38 +0200
-Message-ID: <20170901094438.GF13572@cbox>
-References: <1503450326-10624-1-git-send-email-wanghaibin.wang@huawei.com>
- <20170831203356.GE13572@cbox> <59A8DDD3.1000204@huawei.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v11 2/6] ACPI: Add APEI GHES Table Generation
+ support
+Date: Fri, 1 Sep 2017 17:58:55 +0800
+Message-ID: <dfaeb539-8006-85d6-35b2-0af31f5a0675@huawei.com>
+References: <1503066227-18251-1-git-send-email-gengdongjiu@huawei.com>
+ <1503066227-18251-3-git-send-email-gengdongjiu@huawei.com>
+ <20170829122053.36cf550c@nial.brq.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AD7B840FAE
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Sep 2017 05:42:28 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zifjwddT6GlG for <kvmarm@lists.cs.columbia.edu>;
- Fri,  1 Sep 2017 05:42:26 -0400 (EDT)
-Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 82B6440D8B
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Sep 2017 05:42:26 -0400 (EDT)
-Received: by mail-wm0-f42.google.com with SMTP id u26so486408wma.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 01 Sep 2017 02:44:42 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <59A8DDD3.1000204@huawei.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: wanghaibin <wanghaibin.wang@huawei.com>
-Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com
+Return-path: <linux-acpi-owner@vger.kernel.org>
+In-Reply-To: <20170829122053.36cf550c@nial.brq.redhat.com>
+Sender: linux-acpi-owner@vger.kernel.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: mst@redhat.com, zhaoshenglong@huawei.com, lersek@redhat.com, peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvm@vger.kernel.org, edk2-devel@lists.01.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, will.deacon@arm.com, james.morse@arm.com, ard.biesheuvel@linaro.org, mingo@kernel.org, bp@suse.de, shiju.jose@huawei.com, zjzhang@codeaurora.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, devel@acpica.org, john.garry@huawei.com, jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com, huangdaode@hisilicon.com, wangzhou1@hisilicon.com, zhengqiang10@huawei.com, wuquanming@huawei.co
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Sep 01, 2017 at 12:10:59PM +0800, wanghaibin wrote:
-> On 2017/9/1 4:33, Christoffer Dall wrote:
-> 
-> > Hi Wanghaibin,
-> > 
-> > On Wed, Aug 23, 2017 at 09:05:22AM +0800, wanghaibin wrote:
-> >> v3: Coding style fix.
-> >>     Add the valid APRn access check which Marc proposed. 
-> >>
-> >> v2: Split the patch again to make it easier for review
-> >>     some fixes were proposed by Marc
-> > 
-> > Usually we put the changelog at the end of the description, before the
-> > diff state.  I suggest you have a look at other patch series on the
-> > kvmarm list or on the ARM linux mailing list and see how most people do
-> > it.
-> 
-> 
-> OK, Pay attention next time.
-> 
-> Thanks.
-> 
-> > 
-> >>
-> >> v1: the problem describe:
-> >> In the case (GICv2 on GICv3 migration), I did the test on my board as follow:
-> >> vm boot => migrate to destination => shutdown at destination => start at destination 
-> >> => migrate back to source ... go round and begin again;
-> >>
-> >> I tested many times, but unlucky, there maybe failed by accident when shutdown the vm 
-> >> at destination. (GICv3 on GICv3 migration, 1000+ times, That's OK).
-> >> while failed,  we can watch the interrupts in the vm, some vcpus of the vm can not 
-> >> receive the virt timer interrupt. And, these vcpus will 100% with top tool at host.
-> >>
-> >> vgic_state debug file at destination shows(a active virt timer interrupt) that:
-> >> VCPU 0 TYP   ID TGT_ID PLAEHC     HWID   TARGET SRC PRI VCPU_ID
-> >> ---------------------------------------------------------------
-> >>             ....................
-> >>        PPI   25      0 000001        0        1   0 160      -1
-> >>        PPI   26      0 000001        0        1   0 160      -1
-> >>        PPI   27      0 011111       27        1   0 160       0
-> >>
-> >>
-> >> I added log to print ICH* registers for VCPU0 at destination:
-> >> **HCR:0x1, VMCR:0xf0ec0001,SRE:0x0, ELRSR:0xe**
-> >> -----AP0R:0: 0x0------
-> >> -----AP0R:1: 0x0------
-> >> -----AP0R:2: 0x0------
-> >> -----AP0R:3: 0x0------
-> >> -----AP1R:0: 0x0------
-> >> -----AP1R:1: 0x0------
-> >> -----AP1R:2: 0x0------
-> >> -----AP1R:3: 0x0------
-> >> -----LR:0: 0xa0a0001b0000001b------
-> >> -----LR:1: 0x0------
-> >> -----LR:2: 0x0------
-> >> -----LR:3: 0x0------
-> >>
-> >> and the ICH_AP1R0 value is 0x10000 at source.
-> >>
-> >> At present, QEMU have supproted GICC_APRn put/set interface for emulated GICv2,
-> >> and kvm does not support the uaccess interface. This patchset try to support this.
-> >>
-> > 
-> > So I feel like this series is horribly complicated for what it does, and
-> > does things in the reverse order.  If you really want to take your
-> > appraoch, it would be much nicer if you first changed existing functions
-> > and added infrastructure, and then in the end wired it up to the user
-> > space ABI.  In other words, reverse your patches.
-> 
-> 
-> No problem. The patch order can be adjusted if you feel necessary (this
-> depends on the results of the simpler patch discussion).
-> 
-> > 
-> > However, I think I have a simpler approach to solving this.  Please have
-> > a look at this:
-> > 
-> > commit 1d49c5ef047a2218379aa170d9a3bdd39cd70e3a (HEAD -> gicv2-apr-uaccess)
-> > Author: Christoffer Dall <cdall@linaro.org>
-> > Date:   Thu Aug 31 22:24:25 2017 +0200
-> > 
-> >     KVM: arm/arm64: Support uaccess of GICC_APRn
-> >     
-> >     When migrating guests around we need to know the active priorities to
-> >     ensure functional virtual interrupt prioritization by the GIC.
-> >     
-> >     This commit clarifies the API and how active priorities of interrupts in
-> >     different groups are represented, and implements the accessor functions
-> >     for the uaccess register range.
-> >     
-> >     We live with a slight layering violation in accessing GICv3 data
-> >     structures from vgic-mmio-v2.c, because anything else just adds too much
-> >     complexity for us to deal with (it's not like there's a benefit
-> >     elsewhere in the code of an intermediate representation as is the case
-> >     with the VMCR).  We accept this, because while doing v3 processing from
-> >     a file named something-v2.c can look strange at first, this really is
-> >     specific to dealing with the user space interface for something that
-> >     looks like a GICv2.
-> >
-> 
-> 
-> I have different opinions here.
-> 
-> Form Marc's proposed, I guess we take the vgic-v2.c/ vgic-v3.c as the hardware abstraction
-> layer for GICH_* / ICH_* registers. These files provide a series of methods to interactive with
-> registers (not only vgic_vmcr, such as vgic_hcr, vgic_elrsr, vgic_lr), these registers only can
-> be changed by the provided methods (eq: vgic_v2/v3_fold/populate_lr_state,  vgic_v2/v3_set_underflow)
-> and finally, these methods are invoking by the uniform interface (vgic_set_underflow,
-> vgic_populate/fold_lr, these uniform interfaces invoked the corresponding method through HW probed info)
-> 
-> In a word, I think we should design the high cohesion and low coupling code, and we've been doing this too.
-> We should strictly restrict other modules or files to know or access the vgic_v2/v3_cpu_if or
-> its registers (Unfortunately, vgic_sre and vgic_aprn are breaking the rules currently, the patch 4 fix
-> vgicv3 sys access, and this patchset design followed this rule).
-> 
-> My understanding is as mentioned above, maybe not correct.
-> 
+Hi Igor,
 
-There are no strict layering definitions, exported ABIs or even APIs
-here.  We split things into multiple files to make the code readable and
-easy to maintain and understand.
-
-Comparing the diff state (6 files, 126 inserts, 22 deletes in your
-version, 2 files, 45 inserts, 1 delete in my version) speaks to some of
-the completexity of the two approaches.
-
-The biggest problem is that it takes me hours to understand your patch
-series, which indicates that it's over-designed or fails to convery the
-necessity of the complication.
-
->      
+On 2017/8/29 18:20, Igor Mammedov wrote:
+> On Fri, 18 Aug 2017 22:23:43 +0800
+> Dongjiu Geng <gengdongjiu@huawei.com> wrote:
 > 
+>> This implements APEI GHES Table by passing the error CPER info
+>> to the guest via a fw_cfg_blob. After a CPER info is recorded, an
+>> SEA(Synchronous External Abort)/SEI(SError Interrupt) exception
+>> will be injected into the guest OS.
 > 
-> Put aside the discussion of the abstract layer,  same to Marc's proposed:
-> Avoid to allow userspace to save/restore undefined APR register,  that doesn't
-> make sense.
+> it's a bit complex patch/functionality so I've just mosty skimmed and
+> commented only on structure of the patch and changes I'd like to see
+> so it would be more structured and review-able.
+
+I will make it more structured and review-able, so that it is easily readable.
+
 > 
+> I'd suggest to add doc patch first which will describe how it's
+> supposed to work between QEMU/firmware/guest OS with expected
+> flows.
+It is sure, I will add a doc patch.
 
-I don't see it as a big problem; they will have RAZ/WI semantics towards
-the VM, similar to hardware.  The only downside is that you can write
-something into registers that are not used to the VM and read back that
-value, when accessing from userspace.  However, if we really want to do
-this, I'd argue this is much simpler:
+>  
+>> Below is the table layout, the max number of error soure is 11,
+>> which is classified by notification type.
+>>
+>>      etc/acpi/tables                               etc/hardware_errors
+>>     ====================                    ==========================================
+>> + +--------------------------+            +------------------+
+>> | | HEST                     |            |    address       |              +--------------+
+>> | +--------------------------+            |    registers     |              | Error Status |
+>> | | GHES0                    |            | +----------------+              | Data Block 0 |
+>> | +--------------------------+ +--------->| |status_address0 |------------->| +------------+
+>> | | .................        | |          | +----------------+              | |  CPER      |
+>> | | error_status_address-----+-+ +------->| |status_address1 |----------+   | |  CPER      |
+>> | | .................        |   |        | +----------------+          |   | |  ....      |
+>> | | read_ack_register--------+-+ |        |  .............   |          |   | |  CPER      |
+>> | | read_ack_preserve        | | |        +------------------+          |   | +-+------------+
+>> | | read_ack_write           | | | +----->| |status_address10|--------+ |   | Error Status |
+>> + +--------------------------+ | | |      | +----------------+        | |   | Data Block 1 |
+>> | | GHES1                    | +-+-+----->| | ack_value0     |        | +-->| +------------+
+>> + +--------------------------+   | |      | +----------------+        |     | |  CPER      |
+>> | | .................        |   | | +--->| | ack_value1     |        |     | |  CPER      |
+>> | | error_status_address-----+---+ | |    | +----------------+        |     | |  ....      |
+>> | | .................        |     | |    | |  ............. |        |     | |  CPER      |
+>> | | read_ack_register--------+-----+-+    | +----------------+        |     +-+------------+
+>> | | read_ack_preserve        |     |   +->| | ack_value10    |        |     | |..........  |
+>> | | read_ack_write           |     |   |  | +----------------+        |     | +------------+
+>> + +--------------------------|     |   |                              |     | Error Status |
+>> | | ...............          |     |   |                              |     | Data Block 10|
+>> + +--------------------------+     |   |                              +---->| +------------+
+>> | | GHES10                   |     |   |                                    | |  CPER      |
+>> + +--------------------------+     |   |                                    | |  CPER      |
+>> | | .................        |     |   |                                    | |  ....      |
+>> | | error_status_address-----+-----+   |                                    | |  CPER      |
+>> | | .................        |         |                                    +-+------------+
+>> | | read_ack_register--------+---------+
+>> | | read_ack_preserve        |
+>> | | read_ack_write           |
+>> + +--------------------------+
+> these diagram shows relations between tables which not necessarily bad
+> but as layout it's useless.
+Maybe not yet. it shows how the table is generated and how the CPER is recorded through fw_cfg blob
+between Qemu and guest firmware. for example: etc/acpi/tables and etc/hardware_errors
+anyway I will move it to the spec/doc.
 
-commit 5cd35287d086c99859900a3d7630a12c9d549fad
-Author: Christoffer Dall <cdall@linaro.org>
-Date:   Fri Sep 1 11:41:52 2017 +0200
+>  * Probably there is not much sense to have HEST table here, it's described
+>    well enough in spec. You might just put reference here.
+>  * these diagrams should go into doc/spec patch
+I will move these diagrams to doc/spec patch
 
-    KVM: arm/arm64: Extract GICv3 max APRn index calculation
-    
-    As we are about to access the APRs from the GICv2 uaccess interface,
-    make this logic generally available.
-    
-    Signed-off-by: Christoffer Dall <cdall@linaro.org>
+>  * when you describe layout you need to show what and at what offsets
+>    in which order in which blob/file is located. See ACPI spec for example
+>    and/or docs/specs/acpi_nvdimm.txt docs/specs/acpi_mem_hotplug.txt for inspiration.
+Ok, thanks for the suggestion.
 
-diff --git a/arch/arm64/kvm/vgic-sys-reg-v3.c b/arch/arm64/kvm/vgic-sys-reg-v3.c
-index 116786d..c77d508 100644
---- a/arch/arm64/kvm/vgic-sys-reg-v3.c
-+++ b/arch/arm64/kvm/vgic-sys-reg-v3.c
-@@ -208,29 +208,12 @@ static void vgic_v3_access_apr_reg(struct kvm_vcpu *vcpu,
- static bool access_gic_aprn(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 			    const struct sys_reg_desc *r, u8 apr)
- {
--	struct vgic_cpu *vgic_v3_cpu = &vcpu->arch.vgic_cpu;
- 	u8 idx = r->Op2 & 3;
- 
--	/*
--	 * num_pri_bits are initialized with HW supported values.
--	 * We can rely safely on num_pri_bits even if VM has not
--	 * restored ICC_CTLR_EL1 before restoring APnR registers.
--	 */
--	switch (vgic_v3_cpu->num_pri_bits) {
--	case 7:
--		vgic_v3_access_apr_reg(vcpu, p, apr, idx);
--		break;
--	case 6:
--		if (idx > 1)
--			goto err;
--		vgic_v3_access_apr_reg(vcpu, p, apr, idx);
--		break;
--	default:
--		if (idx > 0)
--			goto err;
--		vgic_v3_access_apr_reg(vcpu, p, apr, idx);
--	}
-+	if (idx > vgic_v3_max_apr_idx(vcpu))
-+		goto err;
- 
-+	vgic_v3_access_apr_reg(vcpu, p, apr, idx);
- 	return true;
- err:
- 	if (!p->is_write)
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index bba7fa2..bf9ceab 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -220,4 +220,20 @@ int vgic_debug_destroy(struct kvm *kvm);
- bool lock_all_vcpus(struct kvm *kvm);
- void unlock_all_vcpus(struct kvm *kvm);
- 
-+static inline int vgic_v3_max_apr_idx(struct kvm_vcpu *vcpu)
-+{
-+	struct vgic_cpu *cpu_if = &vcpu->arch.vgic_cpu;
-+
-+	/*
-+	 * num_pri_bits are initialized with HW supported values.
-+	 * We can rely safely on num_pri_bits even if VM has not
-+	 * restored ICC_CTLR_EL1 before restoring APnR registers.
-+	 */
-+	switch (cpu_if->num_pri_bits) {
-+	case 7: return 3;
-+	case 6: return 1;
-+	default: return 0;
-+	}
-+}
-+
- #endif
+> 
+>> For GHESv2 error source, the OSPM must acknowledges the error via Read Ack register.
+>> so user space must check the ack value to avoid read-write race condition.
+>>
+>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+>> ---
 
+cut----
 
+>> +    /* Write back the Generic Error Status Block to guest memory */
+>> +    cpu_physical_memory_write(error_block_address, &block,
+>> +        sizeof(AcpiGenericErrorStatus));
+>> +
+>> +    /* Fill in Generic Error Data Entry */
+>> +    buffer = g_malloc0(sizeof(AcpiGenericErrorData) +
+>> +                       sizeof(UefiCperSecMemErr));
+>> +
+>> +
+>> +    memset(buffer, 0, sizeof(AcpiGenericErrorData) + sizeof(UefiCperSecMemErr));
+> looks redundant, g_malloc0 does it for you
+   I will remove it.
 
-commit 660efe48259ebe83e6f93cba0a184327cebf8e82 (HEAD -> gicv2-apr-uaccess)
-Author: Christoffer Dall <cdall@linaro.org>
-Date:   Thu Aug 31 22:24:25 2017 +0200
+> 
+>> +    gdata = (AcpiGenericErrorData *)buffer;
+>> +
+>> +    /* Memory section */
+>> +    memcpy(&(gdata->section_type_le), &mem_section_id_le,
+>> +            sizeof(mem_section_id_le));
+>> +
+>> +    /* error severity is recoverable */
+>> +    gdata->error_severity = ACPI_CPER_SEV_RECOVERABLE;
+>> +    gdata->revision = 0x300; /* the revision number is 0x300 */
+>> +    gdata->error_data_length = cpu_to_le32(sizeof(UefiCperSecMemErr));
+>> +
+>> +    mem_err = (UefiCperSecMemErr *) (gdata + 1);
+>> +
+>> +    /* User space only handle the memory section CPER */
+>> +
+>> +    /* Hard code to Multi-bit ECC error */
+>> +    mem_err->validation_bits |= cpu_to_le32(UEFI_CPER_MEM_VALID_ERROR_TYPE);
+>> +    mem_err->error_type = cpu_to_le32(UEFI_CPER_MEM_ERROR_TYPE_MULTI_ECC);
+>> +
+>> +    /* Record the physical address at which the memory error occurred */
+>> +    mem_err->validation_bits |= cpu_to_le32(UEFI_CPER_MEM_VALID_PA);
+>> +    mem_err->physical_addr = cpu_to_le32(error_physical_addr);
+> 
+> I'd prefer for you to use build_append_int_noprefix() API to compose
+> whole error status block
+  I will use build_append_int_noprefix() API to compose the block status
 
-    KVM: arm/arm64: Support uaccess of GICC_APRn
-    
-    When migrating guests around we need to know the active priorities to
-    ensure functional virtual interrupt prioritization by the GIC.
-    
-    This commit clarifies the API and how active priorities of interrupts in
-    different groups are represented, and implements the accessor functions
-    for the uaccess register range.
-    
-    We live with a slight layering violation in accessing GICv3 data
-    structures from vgic-mmio-v2.c, because anything else just adds too much
-    complexity for us to deal with (it's not like there's a benefit
-    elsewhere in the code of an intermediate representation as is the case
-    with the VMCR).  We accept this, because while doing v3 processing from
-    a file named something-v2.c can look strange at first, this really is
-    specific to dealing with the user space interface for something that
-    looks like a GICv2.
-    
-    Signed-off-by: Christoffer Dall <cdall@linaro.org>
+> 
+> and try to get rid of most structures you introduce in patch 1/6,
+> as they will be left unused after that.
+I will clear the structures and remove the unused structures that this patch does not used.
 
-diff --git a/Documentation/virtual/kvm/devices/arm-vgic.txt b/Documentation/virtual/kvm/devices/arm-vgic.txt
-index b2f60ca..b3ce126 100644
---- a/Documentation/virtual/kvm/devices/arm-vgic.txt
-+++ b/Documentation/virtual/kvm/devices/arm-vgic.txt
-@@ -83,6 +83,11 @@ Groups:
- 
-     Bits for undefined preemption levels are RAZ/WI.
- 
-+    Note that this differs from a CPU's view of the APRs on hardware in which
-+    a GIC without the security extensions expose group 0 and group 1 active
-+    priorities in separate register groups, whereas we show a combined view
-+    similar to GICv2's GICH_APR.
-+
-     For historical reasons and to provide ABI compatibility with userspace we
-     export the GICC_PMR register in the format of the GICH_VMCR.VMPriMask
-     field in the lower 5 bits of a word, meaning that userspace must always
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-index 37522e6..b3d4a10 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -303,6 +303,51 @@ static void vgic_mmio_write_vcpuif(struct kvm_vcpu *vcpu,
- 	vgic_set_vmcr(vcpu, &vmcr);
- }
- 
-+static unsigned long vgic_mmio_read_apr(struct kvm_vcpu *vcpu,
-+					gpa_t addr, unsigned int len)
-+{
-+	int n; /* which APRn is this */
-+
-+	n = (addr >> 2) & 0x3;
-+
-+	if (kvm_vgic_global_state.type == VGIC_V2) {
-+		/* GICv2 hardware systems support max. 32 groups */
-+		if (n != 0)
-+			return 0;
-+		return vcpu->arch.vgic_cpu.vgic_v2.vgic_apr;
-+	} else {
-+		struct vgic_v3_cpu_if *vgicv3 = &vcpu->arch.vgic_cpu.vgic_v3;
-+
-+		if (n > vgic_v3_max_apr_idx(vcpu))
-+			return 0;
-+		/* GICv3 only uses ICH_AP1Rn for memory mapped (GICv2) guests */
-+		return vgicv3->vgic_ap1r[n];
-+	}
-+}
-+
-+static void vgic_mmio_write_apr(struct kvm_vcpu *vcpu,
-+				gpa_t addr, unsigned int len,
-+				unsigned long val)
-+{
-+	int n; /* which APRn is this */
-+
-+	n = (addr >> 2) & 0x3;
-+
-+	if (kvm_vgic_global_state.type == VGIC_V2) {
-+		/* GICv2 hardware systems support max. 32 groups */
-+		if (n != 0)
-+			return;
-+		vcpu->arch.vgic_cpu.vgic_v2.vgic_apr = val;
-+	} else {
-+		struct vgic_v3_cpu_if *vgicv3 = &vcpu->arch.vgic_cpu.vgic_v3;
-+
-+		if (n > vgic_v3_max_apr_idx(vcpu))
-+			return;
-+		/* GICv3 only uses ICH_AP1Rn for memory mapped (GICv2) guests */
-+		vgicv3->vgic_ap1r[n] = val;
-+	}
-+}
-+
- static const struct vgic_register_region vgic_v2_dist_registers[] = {
- 	REGISTER_DESC_WITH_LENGTH(GIC_DIST_CTRL,
- 		vgic_mmio_read_v2_misc, vgic_mmio_write_v2_misc, 12,
-@@ -364,7 +409,7 @@ static const struct vgic_register_region vgic_v2_cpu_registers[] = {
- 		vgic_mmio_read_vcpuif, vgic_mmio_write_vcpuif, 4,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_LENGTH(GIC_CPU_ACTIVEPRIO,
--		vgic_mmio_read_raz, vgic_mmio_write_wi, 16,
-+		vgic_mmio_read_apr, vgic_mmio_write_apr, 16,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_LENGTH(GIC_CPU_IDENT,
- 		vgic_mmio_read_vcpuif, vgic_mmio_write_vcpuif, 4,
+> 
+>> +
+>> +    /* Write back the Generic Error Data Entry to guest memory */
+>> +    cpu_physical_memory_write(error_block_address + current_block_length,
+>> +        buffer, sizeof(AcpiGenericErrorData) + sizeof(UefiCperSecMemErr));
+>> +
+>> +    g_free(buffer);
+>> +    return GHES_CPER_OK;
+>> +}
+>> +
+>> +static void
+>> +build_address(GArray *table_data, BIOSLinker *linker,
+>> +    uint32_t dst_patched_offset, uint32_t src_offset,
+>> +    uint8_t address_space_id , uint8_t  register_bit_width,
+>> +    uint8_t register_bit_offset, uint8_t access_size)
+>> +{
+>> +    uint32_t address_size = sizeof(struct AcpiGenericAddress) -
+>> +        offsetof(struct AcpiGenericAddress, address);
+>> +
+>> +    /* Address space */
+>> +    build_append_int_noprefix(table_data, address_space_id, 1);
+>> +    /* register bit width */
+>> +    build_append_int_noprefix(table_data, register_bit_width, 1);
+>> +    /* register bit offset */
+>> +    build_append_int_noprefix(table_data, register_bit_offset, 1);
+>> +    /* access size */
+>> +    build_append_int_noprefix(table_data, access_size, 1);
+>> +    acpi_data_push(table_data, address_size);
+>> +
+>> +    /* Patch address of ERRORS fw_cfg blob into the TABLE fw_cfg blob so OSPM
+>> +     * can retrieve and read it. the address size is 64 bits.
+>> +     */
+>> +    bios_linker_loader_add_pointer(linker,
+>> +        ACPI_BUILD_TABLE_FILE, dst_patched_offset, sizeof(uint64_t),
+>> +        GHES_ERRORS_FW_CFG_FILE, src_offset);
+>> +}
+> It's mostly generic GAS structure with linker addition.
+> I'd suggest to reuse something like
+>  https://github.com/imammedo/qemu/commit/3d2fd6d13a3ea298d2ee814835495ce6241d085c
+> to build GAS and use bios_linker_loader_add_pointer() directly in ghes_build_acpi().
+thanks, OK.
 
+> 
+>> +void ghes_build_acpi(GArray *table_data, GArray *hardware_error,
+>> +                                            BIOSLinker *linker)
+>> +{
+>> +    uint32_t ghes_start = table_data->len;
+>> +    uint32_t address_size, error_status_address_offset;
+>> +    uint32_t read_ack_register_offset, i;
+>> +
+>> +    address_size = sizeof(struct AcpiGenericAddress) -
+>> +        offsetof(struct AcpiGenericAddress, address);
+> it's confusing name for var,
+> AcpiGenericAddress::address is fixed unsigned 64 bit integer per spec
+> also, I'm not sure why it's needed at all.
+ it is because other people have concern about where does the "unsigned 64 bit integer"
+ come from, they are confused about the "unsigned 64 bit integer"
+ so they suggested use sizeof. anyway I will directly use unsigned 64 bit integer.
 
-Thanks,
--Christoffer
+> 
+>> +
+>> +    error_status_address_offset = ghes_start +
+>> +        sizeof(AcpiHardwareErrorSourceTable) +
+>> +        offsetof(AcpiGenericHardwareErrorSourceV2, error_status_address) +
+>> +        offsetof(struct AcpiGenericAddress, address);
+>> +
+>> +    read_ack_register_offset = ghes_start +
+>> +        sizeof(AcpiHardwareErrorSourceTable) +
+>> +        offsetof(AcpiGenericHardwareErrorSourceV2, read_ack_register) +
+>> +        offsetof(struct AcpiGenericAddress, address);
+> it's really hard to get why you use offsetof() so much in this function,
+> to me above code totally unreadable.
+I will find method to make it easily readable.
+
+> 
+>> +    acpi_data_push(hardware_error,
+>> +        offsetof(struct hardware_errors_buffer, ack_value));
+> it looks like you are trying to build several tables within one function,
+> so it's hard to get what's going on.
+> I'd suggest to build separate table independently where it's possible.
+> 
+> i.e. build independent tables first
+> and only then build dependent tables passing to it pointers
+> to previously build table if necessary.
+thanks for the suggestion, I will make the table independently as far as possible
+
+> 
+>> +    for (i = 0; i < GHES_ACPI_HEST_NOTIFY_RESERVED; i++)
+>> +        /* Initialize read ack register */
+>> +        build_append_int_noprefix((void *)hardware_error, 1, 8);
+>> +
+>> +    /* Reserved the total size for ERRORS fw_cfg blob
+>> +     */
+>> +    acpi_data_push(hardware_error, sizeof(struct hardware_errors_buffer));
+>> +
+>> +    /* Allocate guest memory for the Data fw_cfg blob */
+>> +    bios_linker_loader_alloc(linker, GHES_ERRORS_FW_CFG_FILE, hardware_error,
+>> +                            1, false);
+>> +    /* Reserve table header size */
+>> +    acpi_data_push(table_data, sizeof(AcpiTableHeader));
+>> +
+>> +    build_append_int_noprefix(table_data, GHES_ACPI_HEST_NOTIFY_RESERVED, 4);
+> GHES_ACPI_HEST_NOTIFY_RESERVED - name doesn't actually tell what it is
+> I'd suggest to use spec field name wit table prefix, ex:
+> ACPI_HEST_ERROR_SOURCE_COUNT
+thanks for the suggestion, I will use your suggested name.
+
+> 
+> also, beside build_append_int_noprefix() you need to at least
+> add comment that exactly matches field from spec.
+> 
+> the same applies to other fields you are adding in this patch
+  OK, will add it.
+
+> 
+>> +
+>> +    for (i = 0; i < GHES_ACPI_HEST_NOTIFY_RESERVED; i++) {
+>> +        build_append_int_noprefix(table_data,
+>> +            ACPI_HEST_SOURCE_GENERIC_ERROR_V2, 2); /* type */
+>> +        /* source id */
+>> +        build_append_int_noprefix(table_data, cpu_to_le16(i), 2);
+>> +        /* related source id */
+>> +        build_append_int_noprefix(table_data, 0xffff, 2);
+>> +        build_append_int_noprefix(table_data, 0, 1); /* flags */
+>> +
+>> +        /* Currently only enable SEA notification type to avoid the kernel
+>> +         * warning, reserve the space for other notification error source
+>> +         */
+>> +        if (i == ACPI_HEST_NOTIFY_SEA) {
+>> +            build_append_int_noprefix(table_data, 1, 1); /* enabled */
+>> +        } else {
+>> +            build_append_int_noprefix(table_data, 0, 1); /* enabled */
+>> +        }
+>> +
+>> +        /* The number of error status block per generic hardware error source */
+>> +        build_append_int_noprefix(table_data, 1, 4);
+>> +        /* Max sections per record */
+>> +        build_append_int_noprefix(table_data, 1, 4);
+>> +        /* Max raw data length */
+>> +        build_append_int_noprefix(table_data, GHES_MAX_RAW_DATA_LENGTH, 4);
+>> +
+>> +        /* Build error status address*/
+>> +        build_address(table_data, linker, error_status_address_offset + i *
+>> +            sizeof(AcpiGenericHardwareErrorSourceV2), i * address_size,
+>> +            AML_SYSTEM_MEMORY, 0x40, 0, 4 /* QWord access */);
+> just do something like this instead of build_address():
+> build_append_gas()
+> bios_linker_loader_add_pointer()
+Thanks for the suggestion.
+
+> 
+> also register width 0x40 looks suspicious, where does it come from?
+> While at it do you have a real hardware which has HEST table that you re trying to model after?
+> I'd like to see HEST and other related tables from it.
+
+Igor, what is your suspicious point? The register width 0x40 come from our host BIOS record to the System Memory space.
+
+For the SEA/SEI, the Qemu(user space) only handle the memory section hardware error, not include processor error. so it may not
+involve other Address Space, such as System I/O space
+
+it is sure we have hardware. I share our BIOS code that generate HEST and other related table here.
+https://github.com/hisilicon/uefi.git
+Now we have also submitted the host BIOS code to open source for review, this code generated the HEST and other related table
+thanks.
+
+> 
+>> +
+>> +        /* Hardware error notification structure */
+>> +        build_append_int_noprefix(table_data, i, 1); /* type */
+>> +        /* length */
+>> +        build_append_int_noprefix(table_data, sizeof(AcpiHestNotify), 1);
+>> +        build_append_int_noprefix(table_data, 0, 26);
+>> +
+>> +        /* Error Status Block Length */
+>> +        build_append_int_noprefix(table_data,
+>> +            cpu_to_le32(GHES_MAX_RAW_DATA_LENGTH), 4);
+>> +
+cut -----
+
