@@ -1,152 +1,89 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [RFC PATCH 4/4] KVM: arm/arm64: Provide a vgic interrupt line
- level sample function
-Date: Sat, 2 Sep 2017 22:41:52 +0200
-Message-ID: <20170902204152.GI13572@cbox>
-References: <20170829093902.15379-1-cdall@linaro.org>
- <20170829093902.15379-5-cdall@linaro.org>
- <86tw0ltkhp.fsf@arm.com>
+Subject: Re: [PATCH] KVM: arm/arm64: vITS: Drop its_ite->lpi field
+Date: Mon, 4 Sep 2017 10:55:51 +0200
+Message-ID: <20170904085551.GJ13572@cbox>
+References: <20170901165156.30775-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <86tw0ltkhp.fsf@arm.com>
+In-Reply-To: <20170901165156.30775-1-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, Eric Auger <eric.auger@redhat.com>, Andre Przywara <andre.przywara@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>, Andre Przywara <Andre.Przywara@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sat, Sep 02, 2017 at 12:20:34PM +0100, Marc Zyngier wrote:
-> On Tue, Aug 29 2017 at 11:39:02 am BST, Christoffer Dall <cdall@linaro.org> wrote:
-> > The GIC sometimes need to sample the physical line of a mapped
-> > interrupt.  As we know this to be notoriously slow, provide a callback
-> > function for devices (such as the timer) which can do this much faster
-> > than talking to the distributor, for example by comparing a few
-> > in-memory values.  Fall back to the good old method of poking the
-> > physical GIC if no callback is provided.
-> >
-> > Signed-off-by: Christoffer Dall <cdall@linaro.org>
-> > ---
-> >  include/kvm/arm_vgic.h    | 13 ++++++++++++-
-> >  virt/kvm/arm/arch_timer.c | 16 +++++++++++++++-
-> >  virt/kvm/arm/vgic/vgic.c  |  7 ++++++-
-> >  3 files changed, 33 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> > index 53f631b..a52990b 100644
-> > --- a/include/kvm/arm_vgic.h
-> > +++ b/include/kvm/arm_vgic.h
-> > @@ -125,6 +125,17 @@ struct vgic_irq {
-> >  	u8 priority;
-> >  	enum vgic_irq_config config;	/* Level or edge */
-> >  
-> > +	/*
-> > +	 * Callback function pointer to in-kernel devices that can tell us the
-> > +	 * state of the input level of mapped level-triggered IRQ faster than
-> > +	 * peaking into the physical GIC.
-> > +	 *
-> > +	 * Always called in non-preemptible section and the functions can use
-> > +	 * kvm_arm_get_running_vcpu() to get the vcpu pointer for private
-> > +	 * IRQs.
-> > +	 */
-> > +	bool (*get_input_level)(int vintid);
-> > +
-> >  	void *owner;			/* Opaque pointer to reserve an interrupt
-> >  					   for in-kernel devices. */
-> >  };
-> > @@ -309,7 +320,7 @@ void kvm_vgic_init_cpu_hardware(void);
-> >  int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
-> >  			bool level, void *owner);
-> >  int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
-> > -			  u32 vintid);
-> > +			  u32 vintid, bool (*callback)(int vindid));
-> >  int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid);
-> >  bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int vintid);
-> >  
-> > diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-> > index b24e2f7..82169ef 100644
-> > --- a/virt/kvm/arm/arch_timer.c
-> > +++ b/virt/kvm/arm/arch_timer.c
-> > @@ -643,6 +643,19 @@ static bool timer_irqs_are_valid(struct kvm_vcpu *vcpu)
-> >  	return true;
-> >  }
-> >  
-> > +static bool timer_get_input_level(int vintid)
-> > +{
-> > +	struct kvm_vcpu *vcpu = kvm_arm_get_running_vcpu();
-> > +	struct arch_timer_context *timer;
-> > +
-> > +	if (vintid == vcpu_vtimer(vcpu)->irq.irq)
-> > +		timer = vcpu_vtimer(vcpu);
-> > +	else
-> > +		BUG(); /* We only map the vtimer so far */
-> > +
-> > +	return kvm_timer_should_fire(timer);
-> > +}
-> > +
-> >  int kvm_timer_enable(struct kvm_vcpu *vcpu)
-> >  {
-> >  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-> > @@ -664,7 +677,8 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
-> >  		return -EINVAL;
-> >  	}
-> >  
-> > -	ret = kvm_vgic_map_phys_irq(vcpu, host_vtimer_irq, vtimer->irq.irq);
-> > +	ret = kvm_vgic_map_phys_irq(vcpu, host_vtimer_irq, vtimer->irq.irq,
-> > +				    &timer_get_input_level);
+On Fri, Sep 01, 2017 at 05:51:56PM +0100, Marc Zyngier wrote:
+> For unknown reasons, the its_ite data structure carries an "lpi" field
+> which contains the intid of the LPI. This is an obvious duplication
+> of the vgic_irq->intid field, so let's fix the only user and remove
+> the now useless field.
 > 
-> nit: no need for a & here.
-> 
-> >  	if (ret)
-> >  		return ret;
-> >  
-> > diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> > index e3ce2fa..0466c10 100644
-> > --- a/virt/kvm/arm/vgic/vgic.c
-> > +++ b/virt/kvm/arm/vgic/vgic.c
-> > @@ -147,6 +147,9 @@ bool vgic_irq_line_level(struct vgic_irq *irq)
-> >  
-> >  	BUG_ON(!irq->hw);
-> >  
-> > +	if (irq->get_input_level)
-> > +		return irq->get_input_level(irq->intid);
-> > +
-> >  	WARN_ON(irq_get_irqchip_state(irq->host_irq,
-> >  				      IRQCHIP_STATE_PENDING,
-> >  				      &line_level));
-> > @@ -429,7 +432,7 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
-> >  }
-> >  
-> >  int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
-> > -			  u32 vintid)
-> > +			  u32 vintid, bool (*callback)(int vindid))
-> 
-> nit #2: "callback" is a very non-descriptive name for a callback... ;-)
-> How about calling it "get_input_level", matching the vgic_irq field?
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 
-Yeah, totally.
-
-> 
-> >  {
-> >  	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
-> >  	struct irq_desc *desc;
-> > @@ -456,6 +459,7 @@ int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
-> >  	irq->hw = true;
-> >  	irq->host_irq = host_irq;
-> >  	irq->hwintid = data->hwirq;
-> > +	irq->get_input_level = callback;
-> >  
-> >  out:
-> >  	spin_unlock(&irq->irq_lock);
-> > @@ -476,6 +480,7 @@ int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid)
-> >  	spin_lock(&irq->irq_lock);
-> >  	irq->hw = false;
-> >  	irq->hwintid = 0;
-> > +	irq->get_input_level = NULL;
-> >  	spin_unlock(&irq->irq_lock);
-> >  	vgic_put_irq(vcpu->kvm, irq);
-> 
-> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-> 
-Thanks!
+Applied, thanks.
 -Christoffer
+
+> ---
+>  virt/kvm/arm/vgic/vgic-its.c | 10 ++++------
+>  1 file changed, 4 insertions(+), 6 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> index dd85817a9b29..01aa4d9d405e 100644
+> --- a/virt/kvm/arm/vgic/vgic-its.c
+> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> @@ -142,7 +142,6 @@ struct its_ite {
+>  
+>  	struct vgic_irq *irq;
+>  	struct its_collection *collection;
+> -	u32 lpi;
+>  	u32 event_id;
+>  };
+>  
+> @@ -851,7 +850,7 @@ static void vgic_its_free_collection(struct vgic_its *its, u32 coll_id)
+>  /* Must be called with its_lock mutex held */
+>  static struct its_ite *vgic_its_alloc_ite(struct its_device *device,
+>  					  struct its_collection *collection,
+> -					  u32 lpi_id, u32 event_id)
+> +					  u32 event_id)
+>  {
+>  	struct its_ite *ite;
+>  
+> @@ -861,7 +860,6 @@ static struct its_ite *vgic_its_alloc_ite(struct its_device *device,
+>  
+>  	ite->event_id	= event_id;
+>  	ite->collection = collection;
+> -	ite->lpi = lpi_id;
+>  
+>  	list_add_tail(&ite->ite_list, &device->itt_head);
+>  	return ite;
+> @@ -911,7 +909,7 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
+>  		new_coll = collection;
+>  	}
+>  
+> -	ite = vgic_its_alloc_ite(device, collection, lpi_nr, event_id);
+> +	ite = vgic_its_alloc_ite(device, collection, event_id);
+>  	if (IS_ERR(ite)) {
+>  		if (new_coll)
+>  			vgic_its_free_collection(its, coll_id);
+> @@ -1902,7 +1900,7 @@ static int vgic_its_save_ite(struct vgic_its *its, struct its_device *dev,
+>  
+>  	next_offset = compute_next_eventid_offset(&dev->itt_head, ite);
+>  	val = ((u64)next_offset << KVM_ITS_ITE_NEXT_SHIFT) |
+> -	       ((u64)ite->lpi << KVM_ITS_ITE_PINTID_SHIFT) |
+> +	       ((u64)ite->irq->intid << KVM_ITS_ITE_PINTID_SHIFT) |
+>  		ite->collection->collection_id;
+>  	val = cpu_to_le64(val);
+>  	return kvm_write_guest(kvm, gpa, &val, ite_esz);
+> @@ -1949,7 +1947,7 @@ static int vgic_its_restore_ite(struct vgic_its *its, u32 event_id,
+>  	if (!collection)
+>  		return -EINVAL;
+>  
+> -	ite = vgic_its_alloc_ite(dev, collection, lpi_id, event_id);
+> +	ite = vgic_its_alloc_ite(dev, collection, event_id);
+>  	if (IS_ERR(ite))
+>  		return PTR_ERR(ite);
+>  
+> -- 
+> 2.11.0
+> 
