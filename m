@@ -1,144 +1,247 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v11 6/6] target-arm: kvm64: Handle SError interrupt for
- the guest OS
-Date: Tue, 5 Sep 2017 18:50:36 +0100
-Message-ID: <CAFEAcA9TsQg4EXr4MAM2VbrzB9v5UA1F4o9tOCka=3e4wjbBGQ@mail.gmail.com>
-References: <1503066227-18251-1-git-send-email-gengdongjiu@huawei.com> <1503066227-18251-7-git-send-email-gengdongjiu@huawei.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Subject: [PATCH] arm64: KVM: VHE: save and restore some PSTATE bits
+Date: Tue, 5 Sep 2017 18:58:42 +0000
+Message-ID: <0184EA26B2509940AA629AE1405DD7F2015DF717@DGGEMA503-MBX.china.huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Return-path: <linux-acpi-owner@vger.kernel.org>
-In-Reply-To: <1503066227-18251-7-git-send-email-gengdongjiu@huawei.com>
-Sender: linux-acpi-owner@vger.kernel.org
-To: Dongjiu Geng <gengdongjiu@huawei.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, "edk2-devel@lists.01.org" <edk2-devel@lists.01.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Ingo Molnar <mingo@kernel.org>, bp@suse.de, shiju.jose@huawei.com, zjzhang@codeaurora.org, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>l
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Language: zh-CN
+Sender: linux-kernel-owner@vger.kernel.org
+To: "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "vladimir.murzin@arm.com" <vladimir.murzin@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 18 August 2017 at 15:23, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
-> When guest OS happens SError interrupt(SEI), it will trap to host.
-> Host firstly calls memory failure to deal with this error and decide
-> whether it needs to deliver SIGBUS signal to userspace. The advantage
-> that using signal to notify is that it can make the notification method
-> is general, non-KVM user can also use it. when userspace gets this
-> signal and knows this is SError interrupt, it will translate the
-> delivered host VA to PA and record this PA to GHES.
->
-> Because ARMv8.2 adds an extension to RAS to allow system software insert
-> implicit Error Synchronization Barrier operations to isolate the error and
-> allow passes specified syndrome to guest OS, so after record the CPER, user
-> space calls IOCTL to pass a specified syndrome to KVM, then switch to guest
-> OS, guest OS can use the recorded CPER record and syndrome information to
-> do the recovery.
->
-> The steps are shown below:
-> 1. translate the host VA to guest OS PA and record this error PA to HEST table.
-> 2. set specified virtual SError syndrome and pass the value to KVM.
->
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> Signed-off-by: Quanming Wu <wuquanming@huawei.com>
-> ---
->  linux-headers/linux/kvm.h |  1 +
->  target/arm/internals.h    |  1 +
->  target/arm/kvm64.c        | 28 ++++++++++++++++++++++++++++
->  3 files changed, 30 insertions(+)
->
-> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-> index 2aa176e..10dfcab 100644
-> --- a/linux-headers/linux/kvm.h
-> +++ b/linux-headers/linux/kvm.h
-> @@ -1356,6 +1356,7 @@ struct kvm_s390_ucas_mapping {
->  /* Available with KVM_CAP_S390_CMMA_MIGRATION */
->  #define KVM_S390_GET_CMMA_BITS      _IOWR(KVMIO, 0xb8, struct kvm_s390_cmma_log)
->  #define KVM_S390_SET_CMMA_BITS      _IOW(KVMIO, 0xb9, struct kvm_s390_cmma_log)
-> +#define KVM_ARM_SEI                 _IO(KVMIO,   0xb10)
->
->  #define KVM_DEV_ASSIGN_ENABLE_IOMMU    (1 << 0)
->  #define KVM_DEV_ASSIGN_PCI_2_3         (1 << 1)
-> diff --git a/target/arm/internals.h b/target/arm/internals.h
-> index fc0ad6d..18b1cbc 100644
-> --- a/target/arm/internals.h
-> +++ b/target/arm/internals.h
-> @@ -237,6 +237,7 @@ enum arm_exception_class {
->  #define ARM_EL_ISV (1 << ARM_EL_ISV_SHIFT)
->  #define ARM_EL_EC_MASK  ((0x3F) << ARM_EL_EC_SHIFT)
->  #define ARM_EL_FSC_TYPE (0x3C)
-> +#define ARM_EL_ISS_MASK ((1 << ARM_EL_IL_SHIFT) - 1)
->
->  #define FSC_SEA         (0x10)
->  #define FSC_SEA_TTW0    (0x14)
-> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-> index d3bdab2..b84cb49 100644
-> --- a/target/arm/kvm64.c
-> +++ b/target/arm/kvm64.c
-> @@ -616,6 +616,22 @@ static int kvm_arm_cpreg_value(ARMCPU *cpu, ptrdiff_t fieldoffset)
->      return -EINVAL;
->  }
->
-> +static int kvm_inject_arm_sei(CPUState *cs)
-> +{
-> +    ARMCPU *cpu = ARM_CPU(cs);
-> +    CPUARMState *env = &cpu->env;
-> +
-> +    unsigned long syndrome = env->exception.vaddress;
-> +    /* set virtual SError syndrome */
-> +    if (arm_feature(env, ARM_FEATURE_RAS_EXTENSION)) {
-> +        syndrome = syndrome & ARM_EL_ISS_MASK;
-> +    } else {
-> +        syndrome = 0;
-> +    }
-> +
-> +    return  kvm_vcpu_ioctl(CPU(cpu), KVM_ARM_SEI, &syndrome);
+when exit from guest, some host PSTATE bits may be lost, such as
+PSTATE.PAN or PSTATE.UAO. It is because host and hypervisor all run
+in the EL2, host PSTATE value cannot be saved and restored via
+SPSR_EL2. So if guest has changed the PSTATE, host continues with
+a wrong value guest has set.
 
-This looks odd. If we don't have the RAS extension why do
-we need to do anything at all here ?
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+Signed-off-by: Haibin Zhang <zhanghaibin7@huawei.com>
+---
+ arch/arm64/include/asm/kvm_host.h |  8 +++++++
+ arch/arm64/include/asm/kvm_hyp.h  |  2 ++
+ arch/arm64/include/asm/sysreg.h   | 23 +++++++++++++++++++
+ arch/arm64/kvm/hyp/entry.S        |  2 --
+ arch/arm64/kvm/hyp/switch.c       | 24 ++++++++++++++++++--
+ arch/arm64/kvm/hyp/sysreg-sr.c    | 48 ++++++++++++++++++++++++++++++++++++---
+ 6 files changed, 100 insertions(+), 7 deletions(-)
 
-> +}
-> +
->  /* Inject synchronous external abort */
->  static int kvm_inject_arm_sea(CPUState *c)
->  {
-> @@ -1007,6 +1023,15 @@ static bool is_abort_sea(unsigned long syndrome)
->      }
->  }
->
-> +static bool is_abort_sei(unsigned long syndrome)
-> +{
-> +    uint8_t ec = ((syndrome & ARM_EL_EC_MASK) >> ARM_EL_EC_SHIFT);
-
-You don't need to bother masking here -- in other places in
-QEMU we assume that the EC field is at the top of the word,
-so just "syndrome >> ARM_EL_EC_SHIFT" is sufficient.
-
-> +    if ((ec != EC_SERROR))
-> +        return false;
-> +    else
-> +        return true;
-
-scripts/checkpatch.pl should tell you that this if needs braces
-(it's good to get in the habit of running it on all patches; it
-is not always correct, so judgement is required, but it will flag
-up some common mistakes).
-
-In this particular case, you should just
-   return ec == EC_SERROR;
-though.
-
-> +}
-> +
->  void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
->  {
->      ram_addr_t ram_addr;
-> @@ -1024,6 +1049,9 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
->              if (is_abort_sea(env->exception.syndrome)) {
->                  ghes_update_guest(ACPI_HEST_NOTIFY_SEA, paddr);
->                  kvm_inject_arm_sea(c);
-> +            } else if (is_abort_sei(env->exception.syndrome)) {
-> +                ghes_update_guest(ACPI_HEST_NOTIFY_SEI, paddr);
-> +                kvm_inject_arm_sei(c);
->              }
->              return;
->          }
-> --
-> 1.8.3.1
-
-thanks
--- PMM
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index e923b58..cba7d3e 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -193,6 +193,12 @@ struct kvm_cpu_context {
+ 	};
+ };
+ 
++struct kvm_cpu_host_pstate {
++	u64 daif;
++	u64 uao;
++	u64 pan;
++};
++
+ typedef struct kvm_cpu_context kvm_cpu_context_t;
+ 
+ struct kvm_vcpu_arch {
+@@ -227,6 +233,8 @@ struct kvm_vcpu_arch {
+ 
+ 	/* Pointer to host CPU context */
+ 	kvm_cpu_context_t *host_cpu_context;
++	/* Host PSTATE value */
++	struct kvm_cpu_host_pstate host_pstate;
+ 	struct {
+ 		/* {Break,watch}point registers */
+ 		struct kvm_guest_debug_arch regs;
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index 4572a9b..a75587a 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -134,6 +134,8 @@
+ 
+ void __sysreg_save_host_state(struct kvm_cpu_context *ctxt);
+ void __sysreg_restore_host_state(struct kvm_cpu_context *ctxt);
++void __sysreg_save_host_pstate(struct kvm_vcpu *vcpu);
++void __sysreg_restore_host_pstate(struct kvm_vcpu *vcpu);
+ void __sysreg_save_guest_state(struct kvm_cpu_context *ctxt);
+ void __sysreg_restore_guest_state(struct kvm_cpu_context *ctxt);
+ void __sysreg32_save_state(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 248339e..efdcf40 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -295,6 +295,29 @@
+ #define SYS_ICH_LR14_EL2		__SYS__LR8_EL2(6)
+ #define SYS_ICH_LR15_EL2		__SYS__LR8_EL2(7)
+ 
++#define REG_PSTATE_PAN			sys_reg(3, 0, 4, 2, 3)
++#define REG_PSTATE_UAO			sys_reg(3, 0, 4, 2, 4)
++
++#define GET_PSTATE_PAN					\
++	({						\
++		u64 reg;				\
++		asm volatile(ALTERNATIVE("mov %0, #0",	\
++				"mrs_s %0, " __stringify(REG_PSTATE_PAN),\
++				ARM64_HAS_PAN)\
++				: "=r" (reg));\
++		reg;				\
++	})
++
++#define GET_PSTATE_UAO					\
++	({						\
++		u64 reg;					\
++		asm volatile(ALTERNATIVE("mov %0, #0",\
++				"mrs_s %0, " __stringify(REG_PSTATE_UAO),\
++				ARM64_HAS_UAO)\
++				: "=r" (reg));\
++		reg;			\
++	})
++
+ /* Common SCTLR_ELx flags. */
+ #define SCTLR_ELx_EE    (1 << 25)
+ #define SCTLR_ELx_I	(1 << 12)
+diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+index 12ee62d..7662ef5 100644
+--- a/arch/arm64/kvm/hyp/entry.S
++++ b/arch/arm64/kvm/hyp/entry.S
+@@ -96,8 +96,6 @@ ENTRY(__guest_exit)
+ 
+ 	add	x1, x1, #VCPU_CONTEXT
+ 
+-	ALTERNATIVE(nop, SET_PSTATE_PAN(1), ARM64_HAS_PAN, CONFIG_ARM64_PAN)
+-
+ 	// Store the guest regs x2 and x3
+ 	stp	x2, x3,   [x1, #CPU_XREG_OFFSET(2)]
+ 
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 945e79c..9b380a1 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -278,6 +278,26 @@ static void __hyp_text __skip_instr(struct kvm_vcpu *vcpu)
+ 	write_sysreg_el2(*vcpu_pc(vcpu), elr);
+ }
+ 
++static void __hyp_text __save_host_state(struct kvm_vcpu *vcpu)
++{
++	struct kvm_cpu_context *host_ctxt;
++
++	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
++
++	__sysreg_save_host_state(host_ctxt);
++	__sysreg_save_host_pstate(vcpu);
++}
++
++static void __hyp_text __restore_host_state(struct kvm_vcpu *vcpu)
++{
++	struct kvm_cpu_context *host_ctxt;
++
++	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
++
++	__sysreg_restore_host_state(host_ctxt);
++	__sysreg_restore_host_pstate(vcpu);
++}
++
+ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_cpu_context *host_ctxt;
+@@ -291,7 +311,7 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+ 	guest_ctxt = &vcpu->arch.ctxt;
+ 
+-	__sysreg_save_host_state(host_ctxt);
++	__save_host_state(vcpu);
+ 	__debug_cond_save_host_state(vcpu);
+ 
+ 	__activate_traps(vcpu);
+@@ -374,7 +394,7 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 	__deactivate_traps(vcpu);
+ 	__deactivate_vm(vcpu);
+ 
+-	__sysreg_restore_host_state(host_ctxt);
++	__restore_host_state(vcpu);
+ 
+ 	if (fp_enabled) {
+ 		__fpsimd_save_state(&guest_ctxt->gp_regs.fp_regs);
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index 9341376..ea8f437 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -22,7 +22,11 @@
+ #include <asm/kvm_hyp.h>
+ 
+ /* Yes, this does nothing, on purpose */
+-static void __hyp_text __sysreg_do_nothing(struct kvm_cpu_context *ctxt) { }
++static void __hyp_text __sysreg_do_nothing_state(struct kvm_cpu_context *ctxt)
++{ }
++static void __hyp_text __sysreg_do_nothing_pstate(struct kvm_vcpu *vcpu)
++{ }
++
+ 
+ /*
+  * Non-VHE: Both host and guest must save everything.
+@@ -69,7 +73,7 @@ static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
+ }
+ 
+ static hyp_alternate_select(__sysreg_call_save_host_state,
+-			    __sysreg_save_state, __sysreg_do_nothing,
++			    __sysreg_save_state, __sysreg_do_nothing_state,
+ 			    ARM64_HAS_VIRT_HOST_EXTN);
+ 
+ void __hyp_text __sysreg_save_host_state(struct kvm_cpu_context *ctxt)
+@@ -122,7 +126,7 @@ static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
+ }
+ 
+ static hyp_alternate_select(__sysreg_call_restore_host_state,
+-			    __sysreg_restore_state, __sysreg_do_nothing,
++			    __sysreg_restore_state, __sysreg_do_nothing_state,
+ 			    ARM64_HAS_VIRT_HOST_EXTN);
+ 
+ void __hyp_text __sysreg_restore_host_state(struct kvm_cpu_context *ctxt)
+@@ -137,6 +141,44 @@ void __hyp_text __sysreg_restore_guest_state(struct kvm_cpu_context *ctxt)
+ 	__sysreg_restore_common_state(ctxt);
+ }
+ 
++static void __hyp_text __sysreg_save_pstate(struct kvm_vcpu *vcpu)
++{
++	vcpu->arch.host_pstate.daif = read_sysreg(daif);
++	vcpu->arch.host_pstate.pan = GET_PSTATE_PAN;
++	vcpu->arch.host_pstate.uao = GET_PSTATE_UAO;
++}
++
++static hyp_alternate_select(__sysreg_call_save_host_pstate,
++			    __sysreg_save_pstate, __sysreg_do_nothing_pstate,
++			    ARM64_HAS_VIRT_HOST_EXTN);
++
++void __hyp_text __sysreg_save_host_pstate(struct kvm_vcpu *vcpu)
++{
++	__sysreg_call_save_host_pstate()(vcpu);
++}
++
++static void __hyp_text __sysreg_restore_pstate(struct kvm_vcpu *vcpu)
++{
++	u8 value = !!(vcpu->arch.host_pstate.pan);
++
++	write_sysreg(vcpu->arch.host_pstate.daif, daif);
++	asm(ALTERNATIVE("nop", SET_PSTATE_PAN(value), ARM64_HAS_PAN,
++			CONFIG_ARM64_PAN));
++
++	value = !!(vcpu->arch.host_pstate.uao);
++	asm(ALTERNATIVE("nop", SET_PSTATE_UAO(value), ARM64_HAS_UAO,
++			CONFIG_ARM64_UAO));
++}
++
++static hyp_alternate_select(__sysreg_call_restore_host_pstate,
++			    __sysreg_restore_pstate, __sysreg_do_nothing_pstate,
++			    ARM64_HAS_VIRT_HOST_EXTN);
++
++void __hyp_text __sysreg_restore_host_pstate(struct kvm_vcpu *vcpu)
++{
++	__sysreg_call_restore_host_pstate()(vcpu);
++}
++
+ void __hyp_text __sysreg32_save_state(struct kvm_vcpu *vcpu)
+ {
+ 	u64 *spsr, *sysreg;
+-- 
+1.9.1
