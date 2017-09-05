@@ -1,132 +1,60 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v2 5/6] KVM: arm/arm64: Rearrange kvm_vgic_[un]map_phys
- code in vgic.c
-Date: Tue, 5 Sep 2017 16:49:26 +0200
-Message-ID: <2e5123d1-2440-45a1-651c-2813ffce42fd@redhat.com>
-References: <20170904102456.9025-1-cdall@linaro.org>
- <20170904102456.9025-6-cdall@linaro.org>
- <56431c9d-3f7e-f8b2-2d31-6baec4e294da@redhat.com>
- <20170905140024.GP13572@cbox>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170905140024.GP13572@cbox>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <cdall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+From: Christoffer Dall <cdall@linaro.org>
+Subject: [PULL 1/8] KVM: arm/arm64: Fix bug in advertising KVM_CAP_MSI_DEVID capability
+Date: Tue,  5 Sep 2017 16:52:00 +0200
+Message-ID: <20170905145207.18447-2-cdall@linaro.org>
+References: <20170905145207.18447-1-cdall@linaro.org>
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <20170905145207.18447-1-cdall@linaro.org>
+Sender: stable-owner@vger.kernel.org
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Shanker Donthineni <shankerd@codeaurora.org>, stable@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
-On 05/09/2017 16:00, Christoffer Dall wrote:
-> On Tue, Sep 05, 2017 at 12:26:14PM +0200, Auger Eric wrote:
->> Hi Christoffer,
->> On 04/09/2017 12:24, Christoffer Dall wrote:
->>> The small indirection of a static function made the locking very obvious
->>> but becomes pretty ugly as we start passing function pointer around.
->>> Let's inline these two functions first to make the following patch more
->>> readable.
->>>
->>> Signed-off-by: Christoffer Dall <cdall@linaro.org>
->>> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
->>> ---
->>>  virt/kvm/arm/vgic/vgic.c | 38 +++++++++++++-------------------------
->>>  1 file changed, 13 insertions(+), 25 deletions(-)
->>>
->>> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
->>> index 7aec730..b704ff5 100644
->>> --- a/virt/kvm/arm/vgic/vgic.c
->>> +++ b/virt/kvm/arm/vgic/vgic.c
->>> @@ -435,12 +435,17 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
->>>  	return 0;
->>>  }
->>>  
->>> -/* @irq->irq_lock must be held */
->> I chose to hold the lock outside of kvm_vgic_map/unmap_irq because in
->> kvm_vgic_set_forwarding(see https://lkml.org/lkml/2017/6/15/278) I was
->> also testing hw and target_vcpu fields. As you pointed out maybe I am
->> not obliged to check them but that was the rationale.
->>
-> 
-> Ah ok, I see, you want to reuse this bit of code and the caller will
-> already be holding the spin-lock?
-> 
-> I can rework it then to pass the callback in kvm_vgic_map_irq.  Would
-> that fit better with your subsequent patches?
-Yes it would.
+From: Shanker Donthineni <shankerd@codeaurora.org>
 
-Thanks
+Commit 0e4e82f154e3 ("KVM: arm64: vgic-its: Enable ITS emulation as
+a virtual MSI controller") tried to advertise KVM_CAP_MSI_DEVID, but
+the code logic was not updating the dist->msis_require_devid field
+correctly. If hypervisor tool creates the ITS device after VGIC
+initialization then we don't advertise KVM_CAP_MSI_DEVID capability.
 
-Eric
-> 
-> Thanks,
-> -Christoffer
-> 
->>> -static int kvm_vgic_map_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
->>> -			    unsigned int host_irq)
->>> +int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
->>> +			  u32 vintid)
->>>  {
->>> +	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
->>>  	struct irq_desc *desc;
->>>  	struct irq_data *data;
->>> +	int ret = 0;
->>> +
->>> +	BUG_ON(!irq);
->>> +
->>> +	spin_lock(&irq->irq_lock);
->>>  
->>>  	/*
->>>  	 * Find the physical IRQ number corresponding to @host_irq
->>> @@ -448,7 +453,8 @@ static int kvm_vgic_map_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
->>>  	desc = irq_to_desc(host_irq);
->>>  	if (!desc) {
->>>  		kvm_err("%s: no interrupt descriptor\n", __func__);
->>> -		return -EINVAL;
->>> +		ret = -EINVAL;
->>> +		goto out;
->>>  	}
->>>  	data = irq_desc_get_irq_data(desc);
->>>  	while (data->parent_data)
->>> @@ -457,29 +463,10 @@ static int kvm_vgic_map_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
->>>  	irq->hw = true;
->>>  	irq->host_irq = host_irq;
->>>  	irq->hwintid = data->hwirq;
->>> -	return 0;
->>> -}
->>> -
->>> -/* @irq->irq_lock must be held */
->>> -static inline void kvm_vgic_unmap_irq(struct vgic_irq *irq)
->>> -{
->>> -	irq->hw = false;
->>> -	irq->hwintid = 0;
->>> -}
->>> -
->>> -int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
->>> -			  u32 vintid)
->>> -{
->>> -	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
->>> -	int ret;
->>>  
->>> -	BUG_ON(!irq);
->>> -
->>> -	spin_lock(&irq->irq_lock);
->>> -	ret = kvm_vgic_map_irq(vcpu, irq, host_irq);
->>> +out:
->>>  	spin_unlock(&irq->irq_lock);
->>>  	vgic_put_irq(vcpu->kvm, irq);
->>> -
->>>  	return ret;
->>>  }
->>>  
->>> @@ -494,7 +481,8 @@ int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid)
->>>  	BUG_ON(!irq);
->>>  
->>>  	spin_lock(&irq->irq_lock);
->>> -	kvm_vgic_unmap_irq(irq);
->>> +	irq->hw = false;
->>> +	irq->hwintid = 0;
->>>  	spin_unlock(&irq->irq_lock);
->>>  	vgic_put_irq(vcpu->kvm, irq);
->>>  
->>>
+Update the field msis_require_devid to true inside vgic_its_create()
+to fix the issue.
+
+Cc: stable@vger.kernel.org
+Fixes: 0e4e82f154e3 ("vgic-its: Enable ITS emulation as a virtual MSI controller")
+Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ virt/kvm/arm/vgic/vgic-init.c | 3 ---
+ virt/kvm/arm/vgic/vgic-its.c  | 1 +
+ 2 files changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index 3a0b899..5801261 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -285,9 +285,6 @@ int vgic_init(struct kvm *kvm)
+ 	if (ret)
+ 		goto out;
+ 
+-	if (vgic_has_its(kvm))
+-		dist->msis_require_devid = true;
+-
+ 	kvm_for_each_vcpu(i, vcpu, kvm)
+ 		kvm_vgic_vcpu_enable(vcpu);
+ 
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index 2dff288..aa6b68d 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -1598,6 +1598,7 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
+ 	INIT_LIST_HEAD(&its->device_list);
+ 	INIT_LIST_HEAD(&its->collection_list);
+ 
++	dev->kvm->arch.vgic.msis_require_devid = true;
+ 	dev->kvm->arch.vgic.has_its = true;
+ 	its->enabled = false;
+ 	its->dev = dev;
+-- 
+2.9.0
