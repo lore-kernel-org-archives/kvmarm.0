@@ -1,118 +1,99 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: [PULL v2 5/5] KVM: arm/arm64: Support uaccess of GICC_APRn
-Date: Tue,  5 Sep 2017 17:41:06 +0200
-Message-ID: <20170905154106.2945-6-cdall@linaro.org>
-References: <20170905154106.2945-1-cdall@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v11 4/6] target-arm: kvm64: detect guest RAS EXTENSION feature
+Date: Tue, 5 Sep 2017 18:26:41 +0100
+Message-ID: <CAFEAcA9oecuzXXrdo3zZHxF3AgrDUh_NHxz-znto4GU+OoxVFw@mail.gmail.com>
+References: <1503066227-18251-1-git-send-email-gengdongjiu@huawei.com> <1503066227-18251-5-git-send-email-gengdongjiu@huawei.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170905154106.2945-1-cdall@linaro.org>
+In-Reply-To: <1503066227-18251-5-git-send-email-gengdongjiu@huawei.com>
 Sender: kvm-owner@vger.kernel.org
-To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Christoffer Dall <cdall@linaro.org>
+To: Dongjiu Geng <gengdongjiu@huawei.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, "edk2-devel@lists.01.org" <edk2-devel@lists.01.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Ingo Molnar <mingo@kernel.org>, bp@suse.de, shiju.jose@huawei.com, zjzhang@codeaurora.org, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>l
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When migrating guests around we need to know the active priorities to
-ensure functional virtual interrupt prioritization by the GIC.
+On 18 August 2017 at 15:23, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+> check if kvm supports guest RAS EXTENSION. if so, set
+> corresponding feature bit for vcpu.
+>
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> ---
+>  linux-headers/linux/kvm.h | 1 +
+>  target/arm/cpu.h          | 3 +++
+>  target/arm/kvm64.c        | 8 ++++++++
+>  3 files changed, 12 insertions(+)
+>
+> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+> index 7971a4f..2aa176e 100644
+> --- a/linux-headers/linux/kvm.h
+> +++ b/linux-headers/linux/kvm.h
+> @@ -929,6 +929,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_PPC_SMT_POSSIBLE 147
+>  #define KVM_CAP_HYPERV_SYNIC2 148
+>  #define KVM_CAP_HYPERV_VP_INDEX 149
+> +#define KVM_CAP_ARM_RAS_EXTENSION 150
+>
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>
 
-This commit clarifies the API and how active priorities of interrupts in
-different groups are represented, and implements the accessor functions
-for the uaccess register range.
+Hi. Changes to linux-headers need to be done as a patch of their
+own created using scripts/update-linux-headers.sh run against a
+mainline kernel tree (and with a commit message that quotes the
+kernel commit hash used). This ensures that we have a consistent
+set of headers that don't diverge from the kernel copy.
 
-We live with a slight layering violation in accessing GICv3 data
-structures from vgic-mmio-v2.c, because anything else just adds too much
-complexity for us to deal with (it's not like there's a benefit
-elsewhere in the code of an intermediate representation as is the case
-with the VMCR).  We accept this, because while doing v3 processing from
-a file named something-v2.c can look strange at first, this really is
-specific to dealing with the user space interface for something that
-looks like a GICv2.
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index b39d64a..6b0961b 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -611,6 +611,8 @@ struct ARMCPU {
+>
+>      /* CPU has memory protection unit */
+>      bool has_mpu;
+> +    /* CPU has ras extension unit */
+> +    bool has_ras_extension;
+>      /* PMSAv7 MPU number of supported regions */
+>      uint32_t pmsav7_dregion;
+>
+> @@ -1229,6 +1231,7 @@ enum arm_features {
+>      ARM_FEATURE_THUMB_DSP, /* DSP insns supported in the Thumb encodings */
+>      ARM_FEATURE_PMU, /* has PMU support */
+>      ARM_FEATURE_VBAR, /* has cp15 VBAR */
+> +    ARM_FEATURE_RAS_EXTENSION, /*has RAS extension support */
 
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Christoffer Dall <cdall@linaro.org>
----
- Documentation/virtual/kvm/devices/arm-vgic.txt |  5 +++
- virt/kvm/arm/vgic/vgic-mmio-v2.c               | 47 +++++++++++++++++++++++++-
- 2 files changed, 51 insertions(+), 1 deletion(-)
+Missing space after '/*' ?
 
-diff --git a/Documentation/virtual/kvm/devices/arm-vgic.txt b/Documentation/virtual/kvm/devices/arm-vgic.txt
-index b2f60ca..b3ce126 100644
---- a/Documentation/virtual/kvm/devices/arm-vgic.txt
-+++ b/Documentation/virtual/kvm/devices/arm-vgic.txt
-@@ -83,6 +83,11 @@ Groups:
- 
-     Bits for undefined preemption levels are RAZ/WI.
- 
-+    Note that this differs from a CPU's view of the APRs on hardware in which
-+    a GIC without the security extensions expose group 0 and group 1 active
-+    priorities in separate register groups, whereas we show a combined view
-+    similar to GICv2's GICH_APR.
-+
-     For historical reasons and to provide ABI compatibility with userspace we
-     export the GICC_PMR register in the format of the GICH_VMCR.VMPriMask
-     field in the lower 5 bits of a word, meaning that userspace must always
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-index 37522e6..b3d4a10 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -303,6 +303,51 @@ static void vgic_mmio_write_vcpuif(struct kvm_vcpu *vcpu,
- 	vgic_set_vmcr(vcpu, &vmcr);
- }
- 
-+static unsigned long vgic_mmio_read_apr(struct kvm_vcpu *vcpu,
-+					gpa_t addr, unsigned int len)
-+{
-+	int n; /* which APRn is this */
-+
-+	n = (addr >> 2) & 0x3;
-+
-+	if (kvm_vgic_global_state.type == VGIC_V2) {
-+		/* GICv2 hardware systems support max. 32 groups */
-+		if (n != 0)
-+			return 0;
-+		return vcpu->arch.vgic_cpu.vgic_v2.vgic_apr;
-+	} else {
-+		struct vgic_v3_cpu_if *vgicv3 = &vcpu->arch.vgic_cpu.vgic_v3;
-+
-+		if (n > vgic_v3_max_apr_idx(vcpu))
-+			return 0;
-+		/* GICv3 only uses ICH_AP1Rn for memory mapped (GICv2) guests */
-+		return vgicv3->vgic_ap1r[n];
-+	}
-+}
-+
-+static void vgic_mmio_write_apr(struct kvm_vcpu *vcpu,
-+				gpa_t addr, unsigned int len,
-+				unsigned long val)
-+{
-+	int n; /* which APRn is this */
-+
-+	n = (addr >> 2) & 0x3;
-+
-+	if (kvm_vgic_global_state.type == VGIC_V2) {
-+		/* GICv2 hardware systems support max. 32 groups */
-+		if (n != 0)
-+			return;
-+		vcpu->arch.vgic_cpu.vgic_v2.vgic_apr = val;
-+	} else {
-+		struct vgic_v3_cpu_if *vgicv3 = &vcpu->arch.vgic_cpu.vgic_v3;
-+
-+		if (n > vgic_v3_max_apr_idx(vcpu))
-+			return;
-+		/* GICv3 only uses ICH_AP1Rn for memory mapped (GICv2) guests */
-+		vgicv3->vgic_ap1r[n] = val;
-+	}
-+}
-+
- static const struct vgic_register_region vgic_v2_dist_registers[] = {
- 	REGISTER_DESC_WITH_LENGTH(GIC_DIST_CTRL,
- 		vgic_mmio_read_v2_misc, vgic_mmio_write_v2_misc, 12,
-@@ -364,7 +409,7 @@ static const struct vgic_register_region vgic_v2_cpu_registers[] = {
- 		vgic_mmio_read_vcpuif, vgic_mmio_write_vcpuif, 4,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_LENGTH(GIC_CPU_ACTIVEPRIO,
--		vgic_mmio_read_raz, vgic_mmio_write_wi, 16,
-+		vgic_mmio_read_apr, vgic_mmio_write_apr, 16,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_LENGTH(GIC_CPU_IDENT,
- 		vgic_mmio_read_vcpuif, vgic_mmio_write_vcpuif, 4,
--- 
-2.9.0
+>  };
+>
+>  static inline int arm_feature(CPUARMState *env, int feature)
+> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+> index a16abc8..0781367 100644
+> --- a/target/arm/kvm64.c
+> +++ b/target/arm/kvm64.c
+> @@ -518,6 +518,14 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>          unset_feature(&env->features, ARM_FEATURE_PMU);
+>      }
+>
+> +    if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_RAS_EXTENSION)) {
+> +        cpu->has_ras_extension = true;
+> +        set_feature(&env->features, ARM_FEATURE_RAS_EXTENSION);
+> +    } else {
+> +        cpu->has_ras_extension = false;
+> +        unset_feature(&env->features, ARM_FEATURE_RAS_EXTENSION);
+> +    }
+> +
+
+Shouldn't we need to also tell the kernel that we actually want
+it to expose RAS to the guest? Compare the PMU code in this
+function, where we set a kvm_init_features bit to do this.
+(This suggests that your ABI for the kernel part of this feature
+may not be correct?)
+
+You should also not be calling set_feature() here -- if the
+CPU features bit doesn't say "this CPU should have the RAS
+extensions" we shouldn't create a CPU with them. Instead
+you should set it in kvm_arm_get_host_cpu_features() (again,
+compare the PMU code).
+
+thanks
+-- PMM
