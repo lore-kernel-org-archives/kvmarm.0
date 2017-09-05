@@ -1,67 +1,199 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PULL 0/8] KVM/ARM Changes for v4.14
-Date: Tue, 5 Sep 2017 17:07:01 +0200
-Message-ID: <CAMJs5B_jCsWupkGZOeRz-H4jApfDojV4V_52Q9ccjE1OyCT1qA@mail.gmail.com>
-References: <20170905145207.18447-1-cdall@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E0DC49C1C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Sep 2017 11:04:48 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DLPbFy8US7xj for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 Sep 2017 11:04:39 -0400 (EDT)
-Received: from mail-pg0-f51.google.com (mail-pg0-f51.google.com [74.125.83.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E2CBC40A86
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Sep 2017 11:04:38 -0400 (EDT)
-Received: by mail-pg0-f51.google.com with SMTP id 188so6699204pgb.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 05 Sep 2017 08:07:03 -0700 (PDT)
-In-Reply-To: <20170905145207.18447-1-cdall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Subject: [PULL v2 1/5] KVM: arm/arm64: Fix guest external abort matching
+Date: Tue,  5 Sep 2017 17:41:02 +0200
+Message-ID: <20170905154106.2945-2-cdall@linaro.org>
+References: <20170905154106.2945-1-cdall@linaro.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20170905154106.2945-1-cdall@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, James Morse <james.morse@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Sep 5, 2017 at 4:51 PM, Christoffer Dall <cdall@linaro.org> wrote:
-> Hi Paolo and Radim,
->
-> Here are the changes for KVM/ARM for v4.14.
->
-> The changes are mostly bug fixes which are cc'ed stable.
->
-> We also have some minor cleanups and improvements, including added
-> support for migrating the active priority of interrupts when running a
-> GICv2 guest on a GICv3 host.
->
-> Sorry about arriving with these rather late.
->
-> The following changes since commit 5771a8c08880cdca3bfb4a3fc6d309d6bba20877:
->
->   Linux v4.13-rc1 (2017-07-15 15:22:10 -0700)
->
-> are available in the git repository at:
->
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-v4.14
->
-> for you to fetch changes up to f3470ce68ee2917ea17d27521b379af117b48c02:
->
->   KVM: arm/arm64: Support uaccess of GICC_APRn (2017-09-05 16:46:30 +0200)
->
->
+From: James Morse <james.morse@arm.com>
 
-Whoops, it would appear that Marc already sent you the first two.
-Please ignore this request, I'll send another.
+The ARM-ARM has two bits in the ESR/HSR relevant to external aborts.
+A range of {I,D}FSC values (of which bit 5 is always set) and bit 9 'EA'
+which provides:
+> an IMPLEMENTATION DEFINED classification of External Aborts.
 
-Thanks,
--Christoffer
+This bit is in addition to the {I,D}FSC range, and has an implementation
+defined meaning. KVM should always ignore this bit when handling external
+aborts from a guest.
+
+Remove the ESR_ELx_EA definition and rewrite its helper
+kvm_vcpu_dabt_isextabt() to check the {I,D}FSC range. This merges
+kvm_vcpu_dabt_isextabt() and the recently added is_abort_sea() helper.
+
+CC: Tyler Baicar <tbaicar@codeaurora.org>
+Reported-by: gengdongjiu <gengdj.1984@gmail.com>
+Signed-off-by: James Morse <james.morse@arm.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Christoffer Dall <cdall@linaro.org>
+---
+ arch/arm/include/asm/kvm_arm.h       |  1 -
+ arch/arm/include/asm/kvm_emulate.h   | 24 +++++++++++++++++-----
+ arch/arm64/include/asm/kvm_emulate.h | 24 +++++++++++++++++-----
+ virt/kvm/arm/mmu.c                   | 40 ++++++++++--------------------------
+ 4 files changed, 49 insertions(+), 40 deletions(-)
+
+diff --git a/arch/arm/include/asm/kvm_arm.h b/arch/arm/include/asm/kvm_arm.h
+index ebf020b..c878145 100644
+--- a/arch/arm/include/asm/kvm_arm.h
++++ b/arch/arm/include/asm/kvm_arm.h
+@@ -227,7 +227,6 @@
+ 
+ #define HSR_DABT_S1PTW		(_AC(1, UL) << 7)
+ #define HSR_DABT_CM		(_AC(1, UL) << 8)
+-#define HSR_DABT_EA		(_AC(1, UL) << 9)
+ 
+ #define kvm_arm_exception_type	\
+ 	{0, "RESET" }, 		\
+diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
+index 9a8a45a..98089ff 100644
+--- a/arch/arm/include/asm/kvm_emulate.h
++++ b/arch/arm/include/asm/kvm_emulate.h
+@@ -149,11 +149,6 @@ static inline int kvm_vcpu_dabt_get_rd(struct kvm_vcpu *vcpu)
+ 	return (kvm_vcpu_get_hsr(vcpu) & HSR_SRT_MASK) >> HSR_SRT_SHIFT;
+ }
+ 
+-static inline bool kvm_vcpu_dabt_isextabt(struct kvm_vcpu *vcpu)
+-{
+-	return kvm_vcpu_get_hsr(vcpu) & HSR_DABT_EA;
+-}
+-
+ static inline bool kvm_vcpu_dabt_iss1tw(struct kvm_vcpu *vcpu)
+ {
+ 	return kvm_vcpu_get_hsr(vcpu) & HSR_DABT_S1PTW;
+@@ -206,6 +201,25 @@ static inline u8 kvm_vcpu_trap_get_fault_type(struct kvm_vcpu *vcpu)
+ 	return kvm_vcpu_get_hsr(vcpu) & HSR_FSC_TYPE;
+ }
+ 
++static inline bool kvm_vcpu_dabt_isextabt(struct kvm_vcpu *vcpu)
++{
++	switch (kvm_vcpu_trap_get_fault_type(vcpu)) {
++	case FSC_SEA:
++	case FSC_SEA_TTW0:
++	case FSC_SEA_TTW1:
++	case FSC_SEA_TTW2:
++	case FSC_SEA_TTW3:
++	case FSC_SECC:
++	case FSC_SECC_TTW0:
++	case FSC_SECC_TTW1:
++	case FSC_SECC_TTW2:
++	case FSC_SECC_TTW3:
++		return true;
++	default:
++		return false;
++	}
++}
++
+ static inline u32 kvm_vcpu_hvc_get_imm(struct kvm_vcpu *vcpu)
+ {
+ 	return kvm_vcpu_get_hsr(vcpu) & HSR_HVC_IMM_MASK;
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index fe39e68..e5df3fc 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -188,11 +188,6 @@ static inline int kvm_vcpu_dabt_get_rd(const struct kvm_vcpu *vcpu)
+ 	return (kvm_vcpu_get_hsr(vcpu) & ESR_ELx_SRT_MASK) >> ESR_ELx_SRT_SHIFT;
+ }
+ 
+-static inline bool kvm_vcpu_dabt_isextabt(const struct kvm_vcpu *vcpu)
+-{
+-	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_EA);
+-}
+-
+ static inline bool kvm_vcpu_dabt_iss1tw(const struct kvm_vcpu *vcpu)
+ {
+ 	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_S1PTW);
+@@ -240,6 +235,25 @@ static inline u8 kvm_vcpu_trap_get_fault_type(const struct kvm_vcpu *vcpu)
+ 	return kvm_vcpu_get_hsr(vcpu) & ESR_ELx_FSC_TYPE;
+ }
+ 
++static inline bool kvm_vcpu_dabt_isextabt(const struct kvm_vcpu *vcpu)
++{
++	switch (kvm_vcpu_trap_get_fault_type(vcpu)) {
++	case FSC_SEA:
++	case FSC_SEA_TTW0:
++	case FSC_SEA_TTW1:
++	case FSC_SEA_TTW2:
++	case FSC_SEA_TTW3:
++	case FSC_SECC:
++	case FSC_SECC_TTW0:
++	case FSC_SECC_TTW1:
++	case FSC_SECC_TTW2:
++	case FSC_SECC_TTW3:
++		return true;
++	default:
++		return false;
++	}
++}
++
+ static inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
+ {
+ 	u32 esr = kvm_vcpu_get_hsr(vcpu);
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 2ea21da..b36945d 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -1454,25 +1454,6 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+ 		kvm_set_pfn_accessed(pfn);
+ }
+ 
+-static bool is_abort_sea(unsigned long fault_status)
+-{
+-	switch (fault_status) {
+-	case FSC_SEA:
+-	case FSC_SEA_TTW0:
+-	case FSC_SEA_TTW1:
+-	case FSC_SEA_TTW2:
+-	case FSC_SEA_TTW3:
+-	case FSC_SECC:
+-	case FSC_SECC_TTW0:
+-	case FSC_SECC_TTW1:
+-	case FSC_SECC_TTW2:
+-	case FSC_SECC_TTW3:
+-		return true;
+-	default:
+-		return false;
+-	}
+-}
+-
+ /**
+  * kvm_handle_guest_abort - handles all 2nd stage aborts
+  * @vcpu:	the VCPU pointer
+@@ -1498,20 +1479,21 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
+ 
+ 	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
++	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
+ 
+-	/*
+-	 * The host kernel will handle the synchronous external abort. There
+-	 * is no need to pass the error into the guest.
+-	 */
+-	if (is_abort_sea(fault_status)) {
++	/* Synchronous External Abort? */
++	if (kvm_vcpu_dabt_isextabt(vcpu)) {
++		/*
++		 * For RAS the host kernel may handle this abort.
++		 * There is no need to pass the error into the guest.
++		 */
+ 		if (!handle_guest_sea(fault_ipa, kvm_vcpu_get_hsr(vcpu)))
+ 			return 1;
+-	}
+ 
+-	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
+-	if (unlikely(!is_iabt && kvm_vcpu_dabt_isextabt(vcpu))) {
+-		kvm_inject_vabt(vcpu);
+-		return 1;
++		if (unlikely(!is_iabt)) {
++			kvm_inject_vabt(vcpu);
++			return 1;
++		}
+ 	}
+ 
+ 	trace_kvm_guest_fault(*vcpu_pc(vcpu), kvm_vcpu_get_hsr(vcpu),
+-- 
+2.9.0
