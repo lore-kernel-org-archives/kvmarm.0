@@ -1,84 +1,61 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PULL v2 3/5] KVM: arm/arm64: vITS: Drop its_ite->lpi field
-Date: Tue,  5 Sep 2017 17:41:04 +0200
-Message-ID: <20170905154106.2945-4-cdall@linaro.org>
-References: <20170905154106.2945-1-cdall@linaro.org>
+Subject: [PULL v2 0/5] KVM/ARM Changes for v4.14
+Date: Tue,  5 Sep 2017 17:41:01 +0200
+Message-ID: <20170905154106.2945-1-cdall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170905154106.2945-1-cdall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
 Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Marc Zyngier <marc.zyngier@arm.com>
+Hi Paolo and Radim,
 
-For unknown reasons, the its_ite data structure carries an "lpi" field
-which contains the intid of the LPI. This is an obvious duplication
-of the vgic_irq->intid field, so let's fix the only user and remove
-the now useless field.
+Here is v2 of the changes for kvm/arm for v4.14.  Hopefully I got it
+right this time.
 
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-Signed-off-by: Christoffer Dall <cdall@linaro.org>
----
- virt/kvm/arm/vgic/vgic-its.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+Two minor cleanups and improvements, a fix for decoding external abort
+types from guests, and added support for migrating the active priority
+of interrupts when running a GICv2 guest on a GICv3 host.
 
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index aa6b68d..f51c1e1 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -144,7 +144,6 @@ struct its_ite {
- 
- 	struct vgic_irq *irq;
- 	struct its_collection *collection;
--	u32 lpi;
- 	u32 event_id;
- };
- 
-@@ -813,7 +812,7 @@ static void vgic_its_free_collection(struct vgic_its *its, u32 coll_id)
- /* Must be called with its_lock mutex held */
- static struct its_ite *vgic_its_alloc_ite(struct its_device *device,
- 					  struct its_collection *collection,
--					  u32 lpi_id, u32 event_id)
-+					  u32 event_id)
- {
- 	struct its_ite *ite;
- 
-@@ -823,7 +822,6 @@ static struct its_ite *vgic_its_alloc_ite(struct its_device *device,
- 
- 	ite->event_id	= event_id;
- 	ite->collection = collection;
--	ite->lpi = lpi_id;
- 
- 	list_add_tail(&ite->ite_list, &device->itt_head);
- 	return ite;
-@@ -873,7 +871,7 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
- 		new_coll = collection;
- 	}
- 
--	ite = vgic_its_alloc_ite(device, collection, lpi_nr, event_id);
-+	ite = vgic_its_alloc_ite(device, collection, event_id);
- 	if (IS_ERR(ite)) {
- 		if (new_coll)
- 			vgic_its_free_collection(its, coll_id);
-@@ -1848,7 +1846,7 @@ static int vgic_its_save_ite(struct vgic_its *its, struct its_device *dev,
- 
- 	next_offset = compute_next_eventid_offset(&dev->itt_head, ite);
- 	val = ((u64)next_offset << KVM_ITS_ITE_NEXT_SHIFT) |
--	       ((u64)ite->lpi << KVM_ITS_ITE_PINTID_SHIFT) |
-+	       ((u64)ite->irq->intid << KVM_ITS_ITE_PINTID_SHIFT) |
- 		ite->collection->collection_id;
- 	val = cpu_to_le64(val);
- 	return kvm_write_guest(kvm, gpa, &val, ite_esz);
-@@ -1895,7 +1893,7 @@ static int vgic_its_restore_ite(struct vgic_its *its, u32 event_id,
- 	if (!collection)
- 		return -EINVAL;
- 
--	ite = vgic_its_alloc_ite(dev, collection, lpi_id, event_id);
-+	ite = vgic_its_alloc_ite(dev, collection, event_id);
- 	if (IS_ERR(ite))
- 		return PTR_ERR(ite);
- 
+The following changes since commit 712b12d72451411c40e39d25e2140fb8c7fd0e49:
+
+  kvm: nVMX: Validate the virtual-APIC address on nested VM-entry (2017-08-25 12:34:16 +0200)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-v4.14
+
+for you to fetch changes up to 9b87e7a8bfb5098129836757608b3cbbdc11245a:
+
+  KVM: arm/arm64: Support uaccess of GICC_APRn (2017-09-05 17:33:39 +0200)
+
+
+Thanks,
+-Christoffer
+
+Arvind Yadav (1):
+  KVM: arm/arm64: vgic: constify seq_operations and file_operations
+
+Christoffer Dall (2):
+  KVM: arm/arm64: Extract GICv3 max APRn index calculation
+  KVM: arm/arm64: Support uaccess of GICC_APRn
+
+James Morse (1):
+  KVM: arm/arm64: Fix guest external abort matching
+
+Marc Zyngier (1):
+  KVM: arm/arm64: vITS: Drop its_ite->lpi field
+
+ Documentation/virtual/kvm/devices/arm-vgic.txt |  5 +++
+ arch/arm/include/asm/kvm_arm.h                 |  1 -
+ arch/arm/include/asm/kvm_emulate.h             | 24 ++++++++++---
+ arch/arm64/include/asm/kvm_emulate.h           | 24 ++++++++++---
+ arch/arm64/kvm/vgic-sys-reg-v3.c               | 23 ++-----------
+ virt/kvm/arm/mmu.c                             | 40 ++++++----------------
+ virt/kvm/arm/vgic/vgic-debug.c                 |  4 +--
+ virt/kvm/arm/vgic/vgic-its.c                   | 10 +++---
+ virt/kvm/arm/vgic/vgic-mmio-v2.c               | 47 +++++++++++++++++++++++++-
+ virt/kvm/arm/vgic/vgic.h                       | 16 +++++++++
+ 10 files changed, 125 insertions(+), 69 deletions(-)
+
 -- 
-2.9.0
