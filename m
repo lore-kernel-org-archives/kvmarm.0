@@ -1,99 +1,388 @@
 From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v11 4/6] target-arm: kvm64: detect guest RAS EXTENSION feature
-Date: Tue, 5 Sep 2017 18:26:41 +0100
-Message-ID: <CAFEAcA9oecuzXXrdo3zZHxF3AgrDUh_NHxz-znto4GU+OoxVFw@mail.gmail.com>
-References: <1503066227-18251-1-git-send-email-gengdongjiu@huawei.com> <1503066227-18251-5-git-send-email-gengdongjiu@huawei.com>
+Subject: Re: [PATCH v11 5/6] target-arm: kvm64: handle SIGBUS signal for
+ synchronous External Abort
+Date: Tue, 5 Sep 2017 18:46:17 +0100
+Message-ID: <CAFEAcA_Wfo_TjA+CcQ3MQwNscTqqb_q8baJgC6a+Bv_+dgix5g@mail.gmail.com>
+References: <1503066227-18251-1-git-send-email-gengdongjiu@huawei.com> <1503066227-18251-6-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1503066227-18251-5-git-send-email-gengdongjiu@huawei.com>
-Sender: kvm-owner@vger.kernel.org
+Return-path: <linux-acpi-owner@vger.kernel.org>
+In-Reply-To: <1503066227-18251-6-git-send-email-gengdongjiu@huawei.com>
+Sender: linux-acpi-owner@vger.kernel.org
 To: Dongjiu Geng <gengdongjiu@huawei.com>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, "edk2-devel@lists.01.org" <edk2-devel@lists.01.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Ingo Molnar <mingo@kernel.org>, bp@suse.de, shiju.jose@huawei.com, zjzhang@codeaurora.org, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>l
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On 18 August 2017 at 15:23, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
-> check if kvm supports guest RAS EXTENSION. if so, set
-> corresponding feature bit for vcpu.
+> Add SIGBUS signal handler. In this handler, it checks
+> the exception type, translates the host VA which is
+> delivered by host or KVM to guest PA, then fills this
+> PA to CPER, finally injects a Error to guest OS through
+> KVM.
+>
+> Add synchronous external abort injection logic, setup
+> spsr_elx, esr_elx, PSTATE, far_elx, elr_elx etc, when
+> switch to guest OS, it will jump to the synchronous
+> external abort vector table entry.
 >
 > Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> Signed-off-by: Quanming Wu <wuquanming@huawei.com>
 > ---
->  linux-headers/linux/kvm.h | 1 +
->  target/arm/cpu.h          | 3 +++
->  target/arm/kvm64.c        | 8 ++++++++
->  3 files changed, 12 insertions(+)
->
-> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-> index 7971a4f..2aa176e 100644
-> --- a/linux-headers/linux/kvm.h
-> +++ b/linux-headers/linux/kvm.h
-> @@ -929,6 +929,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_PPC_SMT_POSSIBLE 147
->  #define KVM_CAP_HYPERV_SYNIC2 148
->  #define KVM_CAP_HYPERV_VP_INDEX 149
-> +#define KVM_CAP_ARM_RAS_EXTENSION 150
->
->  #ifdef KVM_CAP_IRQ_ROUTING
->
+>  include/sysemu/kvm.h          |   2 +-
+>  linux-headers/asm-arm64/kvm.h |   5 ++
+>  target/arm/internals.h        |  13 ++++
+>  target/arm/kvm.c              |  34 ++++++++++
+>  target/arm/kvm64.c            | 150 ++++++++++++++++++++++++++++++++++++++++++
+>  target/arm/kvm_arm.h          |   1 +
+>  6 files changed, 204 insertions(+), 1 deletion(-)
 
-Hi. Changes to linux-headers need to be done as a patch of their
-own created using scripts/update-linux-headers.sh run against a
-mainline kernel tree (and with a commit message that quotes the
-kernel commit hash used). This ensures that we have a consistent
-set of headers that don't diverge from the kernel copy.
+Have you tested whether this patchset builds OK on aarch32 ?
 
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index b39d64a..6b0961b 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -611,6 +611,8 @@ struct ARMCPU {
+> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+> index 3a458f5..90c1605 100644
+> --- a/include/sysemu/kvm.h
+> +++ b/include/sysemu/kvm.h
+> @@ -361,7 +361,7 @@ bool kvm_vcpu_id_is_valid(int vcpu_id);
+>  /* Returns VCPU ID to be used on KVM_CREATE_VCPU ioctl() */
+>  unsigned long kvm_arch_vcpu_id(CPUState *cpu);
 >
->      /* CPU has memory protection unit */
->      bool has_mpu;
-> +    /* CPU has ras extension unit */
-> +    bool has_ras_extension;
->      /* PMSAv7 MPU number of supported regions */
->      uint32_t pmsav7_dregion;
+> -#ifdef TARGET_I386
+> +#if defined(TARGET_I386) || defined(TARGET_AARCH64)
+>  #define KVM_HAVE_MCE_INJECTION 1
+>  void kvm_arch_on_sigbus_vcpu(CPUState *cpu, int code, void *addr);
+>  #endif
+> diff --git a/linux-headers/asm-arm64/kvm.h b/linux-headers/asm-arm64/kvm.h
+> index d254700..5909c30 100644
+> --- a/linux-headers/asm-arm64/kvm.h
+> +++ b/linux-headers/asm-arm64/kvm.h
+> @@ -181,6 +181,11 @@ struct kvm_arch_memory_slot {
+>  #define KVM_REG_ARM64_SYSREG_OP2_MASK  0x0000000000000007
+>  #define KVM_REG_ARM64_SYSREG_OP2_SHIFT 0
 >
-> @@ -1229,6 +1231,7 @@ enum arm_features {
->      ARM_FEATURE_THUMB_DSP, /* DSP insns supported in the Thumb encodings */
->      ARM_FEATURE_PMU, /* has PMU support */
->      ARM_FEATURE_VBAR, /* has cp15 VBAR */
-> +    ARM_FEATURE_RAS_EXTENSION, /*has RAS extension support */
+> +/* AArch64 fault registers */
+> +#define KVM_REG_ARM64_FAULT             (0x0014 << KVM_REG_ARM_COPROC_SHIFT)
+> +#define KVM_REG_ARM64_FAULT_ESR_EC      (0)
+> +#define KVM_REG_ARM64_FAULT_FAR         (1)
+> +
+>  #define ARM64_SYS_REG_SHIFT_MASK(x,n) \
+>         (((x) << KVM_REG_ARM64_SYSREG_ ## n ## _SHIFT) & \
+>         KVM_REG_ARM64_SYSREG_ ## n ## _MASK)
 
-Missing space after '/*' ?
+Again, linux-headers changes need to go in their own header sync patch.
 
->  };
+> diff --git a/target/arm/internals.h b/target/arm/internals.h
+> index 1f6efef..fc0ad6d 100644
+> --- a/target/arm/internals.h
+> +++ b/target/arm/internals.h
+> @@ -235,6 +235,19 @@ enum arm_exception_class {
+>  #define ARM_EL_ISV_SHIFT 24
+>  #define ARM_EL_IL (1 << ARM_EL_IL_SHIFT)
+>  #define ARM_EL_ISV (1 << ARM_EL_ISV_SHIFT)
+> +#define ARM_EL_EC_MASK  ((0x3F) << ARM_EL_EC_SHIFT)
+> +#define ARM_EL_FSC_TYPE (0x3C)
+> +
+> +#define FSC_SEA         (0x10)
+> +#define FSC_SEA_TTW0    (0x14)
+> +#define FSC_SEA_TTW1    (0x15)
+> +#define FSC_SEA_TTW2    (0x16)
+> +#define FSC_SEA_TTW3    (0x17)
+> +#define FSC_SECC        (0x18)
+> +#define FSC_SECC_TTW0   (0x1c)
+> +#define FSC_SECC_TTW1   (0x1d)
+> +#define FSC_SECC_TTW2   (0x1e)
+> +#define FSC_SECC_TTW3   (0x1f)
 >
->  static inline int arm_feature(CPUARMState *env, int feature)
+>  /* Utility functions for constructing various kinds of syndrome value.
+>   * Note that in general we follow the AArch64 syndrome values; in a
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index 7c17f0d..2e1716a 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -129,6 +129,39 @@ void kvm_arm_destroy_scratch_host_vcpu(int *fdarray)
+>      }
+>  }
+>
+> +typedef struct HWPoisonPage {
+> +    ram_addr_t ram_addr;
+> +    QLIST_ENTRY(HWPoisonPage) list;
+> +} HWPoisonPage;
+> +
+> +static QLIST_HEAD(, HWPoisonPage) hwpoison_page_list =
+> +    QLIST_HEAD_INITIALIZER(hwpoison_page_list);
+> +
+> +static void kvm_unpoison_all(void *param)
+> +{
+> +    HWPoisonPage *page, *next_page;
+> +
+> +    QLIST_FOREACH_SAFE(page, &hwpoison_page_list, list, next_page) {
+> +        QLIST_REMOVE(page, list);
+> +        qemu_ram_remap(page->ram_addr, TARGET_PAGE_SIZE);
+> +        g_free(page);
+> +    }
+> +}
+> +
+> +void kvm_hwpoison_page_add(ram_addr_t ram_addr)
+> +{
+> +    HWPoisonPage *page;
+> +
+> +    QLIST_FOREACH(page, &hwpoison_page_list, list) {
+> +        if (page->ram_addr == ram_addr) {
+> +            return;
+> +        }
+> +    }
+> +    page = g_new(HWPoisonPage, 1);
+> +    page->ram_addr = ram_addr;
+> +    QLIST_INSERT_HEAD(&hwpoison_page_list, page, list);
+> +}
+
+This code has all just been copied-and-pasted from target/i386/kvm.c.
+Please instead abstract it out properly into a cpu-independent
+source file.
+
+>  static void kvm_arm_host_cpu_class_init(ObjectClass *oc, void *data)
+>  {
+>      ARMHostCPUClass *ahcc = ARM_HOST_CPU_CLASS(oc);
+> @@ -182,6 +215,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>
+>      cap_has_mp_state = kvm_check_extension(s, KVM_CAP_MP_STATE);
+>
+> +    qemu_register_reset(kvm_unpoison_all, NULL);
+>      type_register_static(&host_arm_cpu_type_info);
+>
+>      return 0;
 > diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-> index a16abc8..0781367 100644
+> index 0781367..d3bdab2 100644
 > --- a/target/arm/kvm64.c
 > +++ b/target/arm/kvm64.c
-> @@ -518,6 +518,14 @@ int kvm_arch_init_vcpu(CPUState *cs)
->          unset_feature(&env->features, ARM_FEATURE_PMU);
->      }
+> @@ -27,6 +27,8 @@
+>  #include "kvm_arm.h"
+>  #include "internals.h"
+>  #include "hw/arm/arm.h"
+> +#include "hw/acpi/acpi-defs.h"
+> +#include "hw/acpi/hest_ghes.h"
 >
-> +    if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_RAS_EXTENSION)) {
-> +        cpu->has_ras_extension = true;
-> +        set_feature(&env->features, ARM_FEATURE_RAS_EXTENSION);
+>  static bool have_guest_debug;
+>
+> @@ -590,6 +592,79 @@ int kvm_arm_cpreg_level(uint64_t regidx)
+>      return KVM_PUT_RUNTIME_STATE;
+>  }
+>
+> +static int kvm_arm_cpreg_value(ARMCPU *cpu, ptrdiff_t fieldoffset)
+> +{
+> +    int i;
+> +
+> +    for (i = 0; i < cpu->cpreg_array_len; i++) {
+> +        uint32_t regidx = kvm_to_cpreg_id(cpu->cpreg_indexes[i]);
+> +        const ARMCPRegInfo *ri;
+> +        ri = get_arm_cp_reginfo(cpu->cp_regs, regidx);
+> +        if (!ri) {
+> +            continue;
+> +        }
+> +
+> +        if (ri->type & ARM_CP_NO_RAW) {
+> +            continue;
+> +        }
+> +
+> +        if (ri->fieldoffset == fieldoffset) {
+> +            cpu->cpreg_values[i] = read_raw_cp_reg(&cpu->env, ri);
+> +            return 0;
+> +        }
+> +    }
+> +    return -EINVAL;
+
+What is this ??? You should never need to look up things in
+the cpreg arrays by fieldoffset.
+
+The code for handling debug exits (software step, watchpoint, etc)
+is probably a good place to look for how to deal with register state.
+
+> +}
+> +
+> +/* Inject synchronous external abort */
+> +static int kvm_inject_arm_sea(CPUState *c)
+> +{
+> +    ARMCPU *cpu = ARM_CPU(c);
+> +    CPUARMState *env = &cpu->env;
+> +    unsigned long cpsr = pstate_read(env);
+> +    uint32_t esr = 0;
+> +    int ret;
+> +
+> +    c->exception_index = EXCP_DATA_ABORT;
+> +    /* Inject the exception to El1 */
+> +    env->exception.target_el = 1;
+> +    CPUClass *cc = CPU_GET_CLASS(c);
+> +
+> +    esr |= (EC_DATAABORT << ARM_EL_EC_SHIFT);
+
+We have functions in internals.h for constructing ESR values,
+please use them.
+
+> +    /* This exception syndrome includes {I,D}FSC in the bits [5:0]
+> +     */
+> +    esr |= (env->exception.syndrome & 0x3f);
+> +
+> +    /* This exception is EL0 or EL1 fault. */
+> +    if ((cpsr & 0xf) == PSTATE_MODE_EL0t) {
+> +        esr |= (EC_INSNABORT << ARM_EL_EC_SHIFT);
 > +    } else {
-> +        cpu->has_ras_extension = false;
-> +        unset_feature(&env->features, ARM_FEATURE_RAS_EXTENSION);
+> +        esr |= (EC_INSNABORT_SAME_EL << ARM_EL_EC_SHIFT);
 > +    }
 > +
+> +    /* In the aarch64, there is only 32-bit instruction*/
+> +    esr |= ARM_EL_IL;
+> +    env->exception.syndrome = esr;
+> +    cc->do_interrupt(c);
+> +
+> +    /* set ESR_EL1 */
+> +    ret = kvm_arm_cpreg_value(cpu, offsetof(CPUARMState, cp15.esr_el[1]));
+> +
+> +    if (ret) {
+> +        fprintf(stderr, "<%s> failed to set esr_el1\n", __func__);
+> +        abort();
+> +    }
+> +
+> +    /* set FAR_EL1 */
+> +    ret = kvm_arm_cpreg_value(cpu, offsetof(CPUARMState, cp15.far_el[1]));
+> +    if (ret) {
+> +        fprintf(stderr, "<%s> failed to set far_el1\n", __func__);
+> +        abort();
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+>  #define AARCH64_CORE_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
+>                   KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
+>
+> @@ -599,6 +674,9 @@ int kvm_arm_cpreg_level(uint64_t regidx)
+>  #define AARCH64_SIMD_CTRL_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U32 | \
+>                   KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
+>
+> +#define AARCH64_FAULT_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
+> +                 KVM_REG_ARM64_FAULT | (x))
+> +
+>  int kvm_arch_put_registers(CPUState *cs, int level)
+>  {
+>      struct kvm_one_reg reg;
+> @@ -873,6 +951,22 @@ int kvm_arch_get_registers(CPUState *cs)
+>      }
+>      vfp_set_fpcr(env, fpr);
+>
+> +    if (is_a64(env)) {
+> +        reg.id = AARCH64_FAULT_REG(KVM_REG_ARM64_FAULT_ESR_EC);
+> +        reg.addr = (uintptr_t)(&env->exception.syndrome);
+> +        ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+> +        if (ret) {
+> +            return ret;
+> +        }
+> +
+> +        reg.id = AARCH64_FAULT_REG(KVM_REG_ARM64_FAULT_FAR);
+> +        reg.addr = (uintptr_t)(&env->exception.vaddress);
+> +        ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
 
-Shouldn't we need to also tell the kernel that we actually want
-it to expose RAS to the guest? Compare the PMU code in this
-function, where we set a kvm_init_features bit to do this.
-(This suggests that your ABI for the kernel part of this feature
-may not be correct?)
+This looks dubious. exception.syndrome and exception.vaddress
+are just internal information QEMU uses, not guest visible things.
+And only synchronizing them if the CPU happens to be in AArch64
+at the point when this function is called is also odd.
 
-You should also not be calling set_feature() here -- if the
-CPU features bit doesn't say "this CPU should have the RAS
-extensions" we shouldn't create a CPU with them. Instead
-you should set it in kvm_arm_get_host_cpu_features() (again,
-compare the PMU code).
+> +        if (ret) {
+> +            return ret;
+> +        }
+> +    }
+> +
+>      if (!write_kvmstate_to_list(cpu)) {
+>          return EINVAL;
+>      }
+> @@ -887,6 +981,62 @@ int kvm_arch_get_registers(CPUState *cs)
+>      return ret;
+>  }
+>
+> +static bool is_abort_sea(unsigned long syndrome)
+> +{
+> +    unsigned long fault_status;
+
+Don't use "unsigned long" when you really mean uint32_t.
+
+> +    uint8_t ec = ((syndrome & ARM_EL_EC_MASK) >> ARM_EL_EC_SHIFT);
+> +    if ((ec != EC_INSNABORT) && (ec != EC_DATAABORT)) {
+> +        return false;
+> +    }
+> +
+> +    fault_status = syndrome & ARM_EL_FSC_TYPE;
+> +    switch (fault_status) {
+> +    case FSC_SEA:
+> +    case FSC_SEA_TTW0:
+> +    case FSC_SEA_TTW1:
+> +    case FSC_SEA_TTW2:
+> +    case FSC_SEA_TTW3:
+> +    case FSC_SECC:
+> +    case FSC_SECC_TTW0:
+> +    case FSC_SECC_TTW1:
+> +    case FSC_SECC_TTW2:
+> +    case FSC_SECC_TTW3:
+> +        return true;
+> +    default:
+> +        return false;
+> +    }
+> +}
+> +
+> +void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
+> +{
+> +    ram_addr_t ram_addr;
+> +    hwaddr paddr;
+> +
+> +    ARMCPU *cpu = ARM_CPU(c);
+> +    CPUARMState *env = &cpu->env;
+> +    assert(code == BUS_MCEERR_AR || code == BUS_MCEERR_AO);
+> +    if (addr) {
+> +        ram_addr = qemu_ram_addr_from_host(addr);
+> +        if (ram_addr != RAM_ADDR_INVALID &&
+> +            kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
+> +            kvm_cpu_synchronize_state(c);
+> +            kvm_hwpoison_page_add(ram_addr);
+> +            if (is_abort_sea(env->exception.syndrome)) {
+> +                ghes_update_guest(ACPI_HEST_NOTIFY_SEA, paddr);
+> +                kvm_inject_arm_sea(c);
+> +            }
+
+This looks a bit odd. There are cases where we hwpoison the page
+but don't tell the guest about it? When would we get this kind
+of sigbus when the exception syndrome wasn't the right kind ?
+
+Are we guaranteed not to get this kind of signal if we told
+the kernel not to expose RAS to the guest ?
+
+> +            return;
+> +        }
+> +        fprintf(stderr, "Hardware memory error for memory used by "
+> +                "QEMU itself instead of guest system!\n");
+> +    }
+> +
+> +    if (code == BUS_MCEERR_AR) {
+> +        fprintf(stderr, "Hardware memory error!\n");
+> +        exit(1);
+> +    }
+> +}
+> +
+>  /* C6.6.29 BRK instruction */
+>  static const uint32_t brk_insn = 0xd4200000;
+>
+> diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
+> index 633d088..7cdde97 100644
+> --- a/target/arm/kvm_arm.h
+> +++ b/target/arm/kvm_arm.h
+> @@ -288,4 +288,5 @@ static inline const char *its_class_name(void)
+>      }
+>  }
+>
+> +void kvm_hwpoison_page_add(ram_addr_t ram_addr);
+
+Any new globally-visible function prototype in a header should
+have a doc-comment formatted documentation comment, please.
+
+>  #endif
+> --
+> 1.8.3.1
 
 thanks
 -- PMM
