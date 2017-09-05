@@ -1,7 +1,7 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PULL v2 4/5] KVM: arm/arm64: Extract GICv3 max APRn index calculation
-Date: Tue,  5 Sep 2017 17:41:05 +0200
-Message-ID: <20170905154106.2945-5-cdall@linaro.org>
+Subject: [PULL v2 5/5] KVM: arm/arm64: Support uaccess of GICC_APRn
+Date: Tue,  5 Sep 2017 17:41:06 +0200
+Message-ID: <20170905154106.2945-6-cdall@linaro.org>
 References: <20170905154106.2945-1-cdall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20170905154106.2945-1-cdall@linaro.org>
@@ -10,77 +10,109 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As we are about to access the APRs from the GICv2 uaccess interface,
-make this logic generally available.
+When migrating guests around we need to know the active priorities to
+ensure functional virtual interrupt prioritization by the GIC.
+
+This commit clarifies the API and how active priorities of interrupts in
+different groups are represented, and implements the accessor functions
+for the uaccess register range.
+
+We live with a slight layering violation in accessing GICv3 data
+structures from vgic-mmio-v2.c, because anything else just adds too much
+complexity for us to deal with (it's not like there's a benefit
+elsewhere in the code of an intermediate representation as is the case
+with the VMCR).  We accept this, because while doing v3 processing from
+a file named something-v2.c can look strange at first, this really is
+specific to dealing with the user space interface for something that
+looks like a GICv2.
 
 Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- arch/arm64/kvm/vgic-sys-reg-v3.c | 23 +++--------------------
- virt/kvm/arm/vgic/vgic.h         | 16 ++++++++++++++++
- 2 files changed, 19 insertions(+), 20 deletions(-)
+ Documentation/virtual/kvm/devices/arm-vgic.txt |  5 +++
+ virt/kvm/arm/vgic/vgic-mmio-v2.c               | 47 +++++++++++++++++++++++++-
+ 2 files changed, 51 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/vgic-sys-reg-v3.c b/arch/arm64/kvm/vgic-sys-reg-v3.c
-index 116786d..c77d508 100644
---- a/arch/arm64/kvm/vgic-sys-reg-v3.c
-+++ b/arch/arm64/kvm/vgic-sys-reg-v3.c
-@@ -208,29 +208,12 @@ static void vgic_v3_access_apr_reg(struct kvm_vcpu *vcpu,
- static bool access_gic_aprn(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 			    const struct sys_reg_desc *r, u8 apr)
- {
--	struct vgic_cpu *vgic_v3_cpu = &vcpu->arch.vgic_cpu;
- 	u8 idx = r->Op2 & 3;
+diff --git a/Documentation/virtual/kvm/devices/arm-vgic.txt b/Documentation/virtual/kvm/devices/arm-vgic.txt
+index b2f60ca..b3ce126 100644
+--- a/Documentation/virtual/kvm/devices/arm-vgic.txt
++++ b/Documentation/virtual/kvm/devices/arm-vgic.txt
+@@ -83,6 +83,11 @@ Groups:
  
--	/*
--	 * num_pri_bits are initialized with HW supported values.
--	 * We can rely safely on num_pri_bits even if VM has not
--	 * restored ICC_CTLR_EL1 before restoring APnR registers.
--	 */
--	switch (vgic_v3_cpu->num_pri_bits) {
--	case 7:
--		vgic_v3_access_apr_reg(vcpu, p, apr, idx);
--		break;
--	case 6:
--		if (idx > 1)
--			goto err;
--		vgic_v3_access_apr_reg(vcpu, p, apr, idx);
--		break;
--	default:
--		if (idx > 0)
--			goto err;
--		vgic_v3_access_apr_reg(vcpu, p, apr, idx);
--	}
-+	if (idx > vgic_v3_max_apr_idx(vcpu))
-+		goto err;
+     Bits for undefined preemption levels are RAZ/WI.
  
-+	vgic_v3_access_apr_reg(vcpu, p, apr, idx);
- 	return true;
- err:
- 	if (!p->is_write)
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index bba7fa2..bf9ceab 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -220,4 +220,20 @@ int vgic_debug_destroy(struct kvm *kvm);
- bool lock_all_vcpus(struct kvm *kvm);
- void unlock_all_vcpus(struct kvm *kvm);
- 
-+static inline int vgic_v3_max_apr_idx(struct kvm_vcpu *vcpu)
-+{
-+	struct vgic_cpu *cpu_if = &vcpu->arch.vgic_cpu;
++    Note that this differs from a CPU's view of the APRs on hardware in which
++    a GIC without the security extensions expose group 0 and group 1 active
++    priorities in separate register groups, whereas we show a combined view
++    similar to GICv2's GICH_APR.
 +
-+	/*
-+	 * num_pri_bits are initialized with HW supported values.
-+	 * We can rely safely on num_pri_bits even if VM has not
-+	 * restored ICC_CTLR_EL1 before restoring APnR registers.
-+	 */
-+	switch (cpu_if->num_pri_bits) {
-+	case 7: return 3;
-+	case 6: return 1;
-+	default: return 0;
+     For historical reasons and to provide ABI compatibility with userspace we
+     export the GICC_PMR register in the format of the GICH_VMCR.VMPriMask
+     field in the lower 5 bits of a word, meaning that userspace must always
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+index 37522e6..b3d4a10 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+@@ -303,6 +303,51 @@ static void vgic_mmio_write_vcpuif(struct kvm_vcpu *vcpu,
+ 	vgic_set_vmcr(vcpu, &vmcr);
+ }
+ 
++static unsigned long vgic_mmio_read_apr(struct kvm_vcpu *vcpu,
++					gpa_t addr, unsigned int len)
++{
++	int n; /* which APRn is this */
++
++	n = (addr >> 2) & 0x3;
++
++	if (kvm_vgic_global_state.type == VGIC_V2) {
++		/* GICv2 hardware systems support max. 32 groups */
++		if (n != 0)
++			return 0;
++		return vcpu->arch.vgic_cpu.vgic_v2.vgic_apr;
++	} else {
++		struct vgic_v3_cpu_if *vgicv3 = &vcpu->arch.vgic_cpu.vgic_v3;
++
++		if (n > vgic_v3_max_apr_idx(vcpu))
++			return 0;
++		/* GICv3 only uses ICH_AP1Rn for memory mapped (GICv2) guests */
++		return vgicv3->vgic_ap1r[n];
 +	}
 +}
 +
- #endif
++static void vgic_mmio_write_apr(struct kvm_vcpu *vcpu,
++				gpa_t addr, unsigned int len,
++				unsigned long val)
++{
++	int n; /* which APRn is this */
++
++	n = (addr >> 2) & 0x3;
++
++	if (kvm_vgic_global_state.type == VGIC_V2) {
++		/* GICv2 hardware systems support max. 32 groups */
++		if (n != 0)
++			return;
++		vcpu->arch.vgic_cpu.vgic_v2.vgic_apr = val;
++	} else {
++		struct vgic_v3_cpu_if *vgicv3 = &vcpu->arch.vgic_cpu.vgic_v3;
++
++		if (n > vgic_v3_max_apr_idx(vcpu))
++			return;
++		/* GICv3 only uses ICH_AP1Rn for memory mapped (GICv2) guests */
++		vgicv3->vgic_ap1r[n] = val;
++	}
++}
++
+ static const struct vgic_register_region vgic_v2_dist_registers[] = {
+ 	REGISTER_DESC_WITH_LENGTH(GIC_DIST_CTRL,
+ 		vgic_mmio_read_v2_misc, vgic_mmio_write_v2_misc, 12,
+@@ -364,7 +409,7 @@ static const struct vgic_register_region vgic_v2_cpu_registers[] = {
+ 		vgic_mmio_read_vcpuif, vgic_mmio_write_vcpuif, 4,
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_LENGTH(GIC_CPU_ACTIVEPRIO,
+-		vgic_mmio_read_raz, vgic_mmio_write_wi, 16,
++		vgic_mmio_read_apr, vgic_mmio_write_apr, 16,
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_LENGTH(GIC_CPU_IDENT,
+ 		vgic_mmio_read_vcpuif, vgic_mmio_write_vcpuif, 4,
 -- 
 2.9.0
