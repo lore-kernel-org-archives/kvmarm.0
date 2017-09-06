@@ -1,34 +1,32 @@
-From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: Re: [PATCH] arm64: KVM: VHE: save and restore some PSTATE bits
-Date: Wed, 6 Sep 2017 18:35:52 +0800
-Message-ID: <62860a85-c29c-87bb-24b7-c6e5ac6065f9@huawei.com>
-References: <0184EA26B2509940AA629AE1405DD7F2015DF717@DGGEMA503-MBX.china.huawei.com>
- <2a5d4299-2523-aef5-7db1-f351ca66b562@arm.com>
- <e47a9304-b429-b2bd-f151-d65f1c32044c@huawei.com>
- <981d7334-8841-d3e3-0833-1aa061bf97a2@arm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v6 0/7] Add RAS virtualization support for SEA/SEI
+ notification type in KVM
+Date: Wed, 6 Sep 2017 12:19:21 +0100
+Message-ID: <CAFEAcA9=Ct6ucd8kPWyi3vSzahEQpOqLEakD36vxWmw=JcppFQ@mail.gmail.com>
+References: <1503916701-13516-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <981d7334-8841-d3e3-0833-1aa061bf97a2@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Vladimir Murzin <vladimir.murzin@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, mark.rutland@arm.com, catalin.marinas@arm.com
-Cc: Huangshaoyu <huangshaoyu@huawei.com>, James Morse <James.Morse@arm.com>, zhanghaibin7@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1503916701-13516-1-git-send-email-gengdongjiu@huawei.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Dongjiu Geng <gengdongjiu@huawei.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, linux@armlinux.org.uk, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, lenb@kernel.org, robert.moore@intel.com, lv.zheng@intel.com, Mark Rutland <mark.rutland@arm.com>, James Morse <james.morse@arm.com>, xiexiuqi@huawei.com, Christopher Covington <cov@codeaurora.org>, David Daney <david.daney@cavium.com>, "Suzuki K. Poulose" <suzuki.poulose@arm.com>, stefan@hello-penguin.com, Dave P Martin <Dave.Martin@arm.com>, kristina.martsenko@arm.com, wangkefeng.wang@huawei.com, Tyler Baicar <tbaicar@codeaurora.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Ingo Molnar <mingo@kernel.org>, bp@suse.de
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Vladimir,
+On 28 August 2017 at 11:38, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+> In the firmware-first RAS solution, corrupt data is detected in a
+> memory location when guest OS application software executing at EL0
+> or guest OS kernel El1 software are reading from the memory. The
+> memory node records errors in an error record accessible using
+> system registers.
 
-On 2017/9/6 17:41, Vladimir Murzin wrote:
-> Can you please elaborate on cases where PAN is not enabled?
+Hi Dongjiu -- it looks like this patch set is extending
+the API KVM provides to userspace, but it doesn't update
+the documentation in Documentation/virtual/kvm/api.txt.
+I appreciate the API is still somewhat under discussion,
+but if you can include the docs updates it's helpful to
+me for reviewing whether the API makes sense from the
+userspace consumer end of it.
 
-I mean the informal private usage, For example, he disabled the PAN dynamically to let kernel space to access the user space.
-After he dynamic disabled the PAN, then switched to guest OS. after return to host. he found the PAN stage is modified.
-Of cause this is not a formal usage, in our host kernel, it is always enabled, no dynamic change, but I means it may exist such cases.
+thanks
+-- PMM
