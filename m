@@ -1,24 +1,24 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH] KVM: arm64: vgic-its: Fix wrong return value check in
- vgic_its_restore_device_tables
-Date: Wed, 6 Sep 2017 09:22:41 +0200
-Message-ID: <65a66715-4f22-07d4-879a-1181c8dad889@redhat.com>
-References: <1504675565-13641-1-git-send-email-vkilari@codeaurora.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH] arm64: KVM: VHE: save and restore some PSTATE bits
+Date: Wed, 6 Sep 2017 09:17:41 +0100
+Message-ID: <2a5d4299-2523-aef5-7db1-f351ca66b562@arm.com>
+References: <0184EA26B2509940AA629AE1405DD7F2015DF717@DGGEMA503-MBX.china.huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 34F1749C2A
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Sep 2017 03:20:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 987AA49C24
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Sep 2017 04:15:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id T4APpkabbZh5 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 Sep 2017 03:20:20 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4F30440A86
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Sep 2017 03:20:20 -0400 (EDT)
-In-Reply-To: <1504675565-13641-1-git-send-email-vkilari@codeaurora.org>
+ with ESMTP id Svcmw3gtT-Mv for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Sep 2017 04:15:20 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4644B40A86
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Sep 2017 04:15:20 -0400 (EDT)
+In-Reply-To: <0184EA26B2509940AA629AE1405DD7F2015DF717@DGGEMA503-MBX.china.huawei.com>
+Content-Language: en-GB
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,50 +28,52 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Vijaya Kumar K <vkilari@codeaurora.org>, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, cdall@linaro.org, andre.przywara@arm.com
-Cc: vvenkat@codeaurora.org, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: gengdongjiu <gengdongjiu@huawei.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "vladimir.murzin@arm.com" <vladimir.murzin@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Vijaya,
-
-On 06/09/2017 07:26, Vijaya Kumar K wrote:
-> scan_its_table() return 1 on success.
-
-As mentioned in the kernel-doc comment of scan_its_table, this latter
-returns 1 if the last element is not found. Than can happen while
-scanning an L2 table but shouldn't happen if we scan an L1 table.
-
- * Return: < 0 on error, 0 if last element was identified, 1 otherwise
- * (the last element may not be found on second level tables)
-
-
- In the function vgic_its_restore_device_tables()
-> the return value of scan_its_table() is checked against success value
-> and returns -EINVAL. Hence migration fails for VM with ITS.
+On 05/09/17 19:58, gengdongjiu wrote:
+> when exit from guest, some host PSTATE bits may be lost, such as
+> PSTATE.PAN or PSTATE.UAO. It is because host and hypervisor all run
+> in the EL2, host PSTATE value cannot be saved and restored via
+> SPSR_EL2. So if guest has changed the PSTATE, host continues with
+> a wrong value guest has set.
 > 
-> With this patch the failure return value is checked while returning
-> -EINVAL.
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> Signed-off-by: Haibin Zhang <zhanghaibin7@huawei.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  8 +++++++
+>  arch/arm64/include/asm/kvm_hyp.h  |  2 ++
+>  arch/arm64/include/asm/sysreg.h   | 23 +++++++++++++++++++
+>  arch/arm64/kvm/hyp/entry.S        |  2 --
+>  arch/arm64/kvm/hyp/switch.c       | 24 ++++++++++++++++++--
+>  arch/arm64/kvm/hyp/sysreg-sr.c    | 48 ++++++++++++++++++++++++++++++++++++---
+>  6 files changed, 100 insertions(+), 7 deletions(-)
 > 
-> Signed-off-by: Vijaya Kumar K <vkilari@codeaurora.org>
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index aa6b68d..63f8ac3 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -2142,7 +2142,7 @@ static int vgic_its_restore_device_tables(struct vgic_its *its)
->  				     vgic_its_restore_dte, NULL);
->  	}
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index e923b58..cba7d3e 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -193,6 +193,12 @@ struct kvm_cpu_context {
+>  	};
+>  };
 >  
-> -	if (ret > 0)
-> +	if (ret <= 0)
->  		ret = -EINVAL;
-your modification would return -EINVAL for whatever error encountered
-during the scan table or if last element is found. I don't think this is
-what we want.
+> +struct kvm_cpu_host_pstate {
+> +	u64 daif;
+> +	u64 uao;
+> +	u64 pan;
+> +};
 
-Thanks
+I love it. This is the most expensive way of saving/restoring a single
+32bit value.
 
-Eric
->  
->  	return ret;
-> 
+More seriously, please see the discussion between James and Christoffer
+there[1]. I expect James to address the PAN/UAO states together with the
+debug state in the next iteration of his patch.
+
+Thanks,
+
+	M.
+
+[1] https://www.spinics.net/lists/arm-kernel/msg599798.html
+-- 
+Jazz is not dead. It just smells funny...
