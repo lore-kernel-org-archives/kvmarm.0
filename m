@@ -1,23 +1,23 @@
 From: wanghaibin <wanghaibin.wang@huawei.com>
-Subject: [RFC PATCH 1/3] kvm: arm/arm64: vgic-vits: separate
- vgic_its_free_list() function
-Date: Wed, 6 Sep 2017 21:05:08 +0800
-Message-ID: <1504703110-10744-2-git-send-email-wanghaibin.wang@huawei.com>
+Subject: [RFC PATCH 2/3] kvm: arm/arm64: vgic-vits: free its resource when vm
+ reboot/reset
+Date: Wed, 6 Sep 2017 21:05:09 +0800
+Message-ID: <1504703110-10744-3-git-send-email-wanghaibin.wang@huawei.com>
 References: <1504703110-10744-1-git-send-email-wanghaibin.wang@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AECCD49C42
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Sep 2017 09:04:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B29249C2C
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Sep 2017 09:04:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mHGysc34YPcU for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 Sep 2017 09:04:26 -0400 (EDT)
+ with ESMTP id jojDTc4DA1mt for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Sep 2017 09:04:14 -0400 (EDT)
 Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 17BEB49C46
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Sep 2017 09:04:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A3B2840C5A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Sep 2017 09:04:09 -0400 (EDT)
 In-Reply-To: <1504703110-10744-1-git-send-email-wanghaibin.wang@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,49 +32,77 @@ To: marc.zyngier@arm.com, cdall@linaro.org, kvmarm@lists.cs.columbia.edu, andre.
 Cc: wu.wubin@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We slightly refactor vgic_its_destroy, separate vgic_its_free_list()
-function for later patch invoke.
+This patch fix the migrate save tables failure.
 
-The patch also take a functional change. If the its->device_list.next
-is NULL, we still should free the its.
-Honestly, I can't understand How does the its->device_list.next is NULL
-happened at this moment.
+When the virtual machine is in booting and the devices haven't initialized,
+the all virtual dte/ite may be invalid. If migrate at this moment, the save
+tables interface traversal device list, and check the dte is valid or not.
+if not, it will return the -EINVAL.
+
+This patch try to free the its list resource when vm reboot or reset to avoid this.
 
 Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
 ---
- virt/kvm/arm/vgic/vgic-its.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ virt/kvm/arm/arm.c           |  5 ++++-
+ virt/kvm/arm/vgic/vgic-its.c | 10 ++++++++++
+ virt/kvm/arm/vgic/vgic.h     |  1 +
+ 3 files changed, 15 insertions(+), 1 deletion(-)
 
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index a39a1e1..db7632d 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -46,6 +46,7 @@
+ #include <asm/kvm_coproc.h>
+ #include <asm/kvm_psci.h>
+ #include <asm/sections.h>
++#include "vgic.h"
+ 
+ #ifdef REQUIRES_VIRT
+ __asm__(".arch_extension	virt");
+@@ -901,8 +902,10 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+ 	 * Ensure a rebooted VM will fault in RAM pages and detect if the
+ 	 * guest MMU is turned off and flush the caches as needed.
+ 	 */
+-	if (vcpu->arch.has_run_once)
++	if (vcpu->arch.has_run_once) {
+ 		stage2_unmap_vm(vcpu->kvm);
++		vgic_its_free_resource(vcpu->kvm);
++	}
+ 
+ 	vcpu_reset_hcr(vcpu);
+ 
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index aa6b68d..25d614f 100644
+index 25d614f..5c20352 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -1624,10 +1624,8 @@ static void vgic_its_free_device(struct kvm *kvm, struct its_device *dev)
- 	kfree(dev);
- }
+@@ -2467,6 +2467,16 @@ static int vgic_its_get_attr(struct kvm_device *dev,
+ 	.has_attr = vgic_its_has_attr,
+ };
  
--static void vgic_its_destroy(struct kvm_device *kvm_dev)
-+static void vgic_its_free_list(struct kvm *kvm, struct vgic_its *its)
- {
--	struct kvm *kvm = kvm_dev->kvm;
--	struct vgic_its *its = kvm_dev->private;
- 	struct list_head *cur, *temp;
- 
- 	/*
-@@ -1653,7 +1651,14 @@ static void vgic_its_destroy(struct kvm_device *kvm_dev)
- 		kfree(coll);
- 	}
- 	mutex_unlock(&its->its_lock);
++void vgic_its_free_resource(struct kvm *kvm)
++{
++	struct kvm_device *dev, *tmp;
++
++	list_for_each_entry_safe(dev, tmp, &kvm->devices, vm_node) {
++		if(dev->ops == &kvm_arm_vgic_its_ops)
++			vgic_its_free_list(kvm, dev->private);
++	}
 +}
 +
-+static void vgic_its_destroy(struct kvm_device *kvm_dev)
-+{
-+	struct kvm *kvm = kvm_dev->kvm;
-+	struct vgic_its *its = kvm_dev->private;
+ int kvm_vgic_register_its_device(void)
+ {
+ 	return kvm_register_device_ops(&kvm_arm_vgic_its_ops,
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index c2be5b7..fbcbdfd 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -222,5 +222,6 @@ int vgic_v3_line_level_info_uaccess(struct kvm_vcpu *vcpu, bool is_write,
  
-+	vgic_its_free_list(kvm, its);
- 	kfree(its);
- }
+ bool lock_all_vcpus(struct kvm *kvm);
+ void unlock_all_vcpus(struct kvm *kvm);
++void vgic_its_free_resource(struct kvm *kvm);
  
+ #endif
 -- 
 1.8.3.1
