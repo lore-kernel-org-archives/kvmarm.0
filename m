@@ -1,28 +1,25 @@
-From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: Re: [PATCH] arm64: KVM: VHE: save and restore some PSTATE bits
-Date: Wed, 6 Sep 2017 20:14:20 +0800
-Message-ID: <57ba125f-9c3c-3504-35a6-9800a47450cf@huawei.com>
-References: <0184EA26B2509940AA629AE1405DD7F2015DF717@DGGEMA503-MBX.china.huawei.com>
- <2a5d4299-2523-aef5-7db1-f351ca66b562@arm.com>
- <e47a9304-b429-b2bd-f151-d65f1c32044c@huawei.com>
- <981d7334-8841-d3e3-0833-1aa061bf97a2@arm.com>
- <62860a85-c29c-87bb-24b7-c6e5ac6065f9@huawei.com>
- <31b18967-c32a-1761-7e60-15c0de28203c@arm.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: [PATCH v3 1/5] KVM: arm/arm64: Don't cache the timer IRQ level
+Date: Wed,  6 Sep 2017 14:26:08 +0200
+Message-ID: <20170906122612.18050-2-cdall@linaro.org>
+References: <20170906122612.18050-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D8A5649C19
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Sep 2017 08:13:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 22D7749C2D
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Sep 2017 08:23:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lpSYdZGZpCAj for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 Sep 2017 08:12:59 -0400 (EDT)
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5A2F940A86
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Sep 2017 08:12:58 -0400 (EDT)
-In-Reply-To: <31b18967-c32a-1761-7e60-15c0de28203c@arm.com>
+ with ESMTP id lvMqFYp-ewJr for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Sep 2017 08:23:58 -0400 (EDT)
+Received: from mail-wm0-f46.google.com (mail-wm0-f46.google.com [74.125.82.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1133649C27
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Sep 2017 08:23:58 -0400 (EDT)
+Received: by mail-wm0-f46.google.com with SMTP id i145so28891123wmf.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 06 Sep 2017 05:26:23 -0700 (PDT)
+In-Reply-To: <20170906122612.18050-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,34 +29,80 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Vladimir Murzin <vladimir.murzin@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, mark.rutland@arm.com, catalin.marinas@arm.com
-Cc: Huangshaoyu <huangshaoyu@huawei.com>, zhanghaibin7@huawei.com
+To: kvmarm@lists.cs.columbia.edu, Eric Auger <eric.auger@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>
+Cc: Andre Przywara <andre.przywara@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+The timer was modeled after a strict idea of modelling an interrupt line
+level in software, meaning that only transitions in the level needed to
+be reported to the VGIC.  This works well for the timer, because the
+arch timer code is in complete control of the device and can track the
+transitions of the line.
 
+However, as we are about to support using the HW bit in the VGIC not
+just for the timer, but also for VFIO which cannot track transitions of
+the interrupt line, we have to decide on an interface for level
+triggered mapped interrupts to the GIC, which both the timer and VFIO
+can use.
 
-On 2017/9/6 20:00, Vladimir Murzin wrote:
-> On 06/09/17 11:35, gengdongjiu wrote:
->> Vladimir,
->>
->> On 2017/9/6 17:41, Vladimir Murzin wrote:
->>> Can you please elaborate on cases where PAN is not enabled?
->>
->> I mean the informal private usage, For example, he disabled the PAN dynamically to let kernel space to access the user space.
->> After he dynamic disabled the PAN, then switched to guest OS. after return to host. he found the PAN stage is modified.
->> Of cause this is not a formal usage, in our host kernel, it is always enabled, no dynamic change, but I means it may exist such cases.
->>
->>
-> 
-> So, in short, there is no real issue with PAN, right? What about UAO?
-For the PAN, if host OS dynamically enable/disable PAN should have issue.
-Do you think that is not a issue as above description?
+VFIO only sees an asserting transition of the physical interrupt line,
+and tells the VGIC when that happens.  That means that part of the
+interrupt flow is offloaded to the hardware.
 
-"host OS dynamically disable the PAN, but after go back from the guest OS, The PAN is unexpectedly enabled"
+To use the same interface for VFIO devices and the timer, we therefore
+have to change the timer (we cannot change VFIO because it doesn't know
+the details of the device it is assigning to a VM).
 
-> 
-> Cheers
-> Vladimir
-> 
-> .
-> 
+Luckily, changing the timer is simple, we just need to stop 'caching'
+the line level, but instead let the VGIC know the state of the timer on
+every entry to the guest, and the VGIC can ignore notifications using
+its validate mechanism.
+
+Signed-off-by: Christoffer Dall <cdall@linaro.org>
+---
+ virt/kvm/arm/arch_timer.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index 8e89d63..2a5f877 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -219,9 +219,10 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+ 	int ret;
+ 
+ 	timer_ctx->active_cleared_last = false;
++	if (timer_ctx->irq.level != new_level)
++		trace_kvm_timer_update_irq(vcpu->vcpu_id, timer_ctx->irq.irq,
++					   new_level);
+ 	timer_ctx->irq.level = new_level;
+-	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer_ctx->irq.irq,
+-				   timer_ctx->irq.level);
+ 
+ 	if (likely(irqchip_in_kernel(vcpu->kvm))) {
+ 		ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
+@@ -241,6 +242,7 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+ 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+ 	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
++	bool level;
+ 
+ 	/*
+ 	 * If userspace modified the timer registers via SET_ONE_REG before
+@@ -251,11 +253,11 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
+ 	if (unlikely(!timer->enabled))
+ 		return;
+ 
+-	if (kvm_timer_should_fire(vtimer) != vtimer->irq.level)
+-		kvm_timer_update_irq(vcpu, !vtimer->irq.level, vtimer);
++	level = kvm_timer_should_fire(vtimer);
++	kvm_timer_update_irq(vcpu, level, vtimer);
+ 
+-	if (kvm_timer_should_fire(ptimer) != ptimer->irq.level)
+-		kvm_timer_update_irq(vcpu, !ptimer->irq.level, ptimer);
++	level = kvm_timer_should_fire(ptimer);
++	kvm_timer_update_irq(vcpu, level, ptimer);
+ }
+ 
+ /* Schedule the background timer for the emulated timer. */
+-- 
+2.9.0
