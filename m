@@ -1,25 +1,22 @@
-From: wanghaibin <wanghaibin.wang@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: vgic-its: Fix wrong return value check in
- vgic_its_restore_device_tables
-Date: Wed, 6 Sep 2017 21:13:57 +0800
-Message-ID: <59AFF495.4050604@huawei.com>
-References: <1504675565-13641-1-git-send-email-vkilari@codeaurora.org>
- <65a66715-4f22-07d4-879a-1181c8dad889@redhat.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Subject: Re: [PATCH] arm64: KVM: VHE: save and restore some PSTATE bits
+Date: Wed, 6 Sep 2017 14:10:11 +0000
+Message-ID: <0184EA26B2509940AA629AE1405DD7F2015EA4DE@DGGEMA503-MBX.china.huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DB68D49C27
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Sep 2017 09:14:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E46440C5A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Sep 2017 10:12:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id j-iOi-0j5qQL for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 Sep 2017 09:14:13 -0400 (EDT)
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D207940C5A
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Sep 2017 09:14:11 -0400 (EDT)
-In-Reply-To: <65a66715-4f22-07d4-879a-1181c8dad889@redhat.com>
+ with ESMTP id V-v+GPHEcQix for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Sep 2017 10:12:09 -0400 (EDT)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 00D2B49C2E
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Sep 2017 10:12:08 -0400 (EDT)
+Content-Language: zh-CN
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,70 +26,79 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
+To: Vladimir Murzin <vladimir.murzin@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "mark.rutland@arm.com" <mark.rutland@arm.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>
+Cc: Huangshaoyu <huangshaoyu@huawei.com>, "Zhanghaibin (Euler)" <zhanghaibin7@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 2017/9/6 15:22, Auger Eric wrote:
+Hi, Vladimir
 
-> Hi Vijaya,
+> >> Do you see effect of "PAN is unexpectedly enabled"?
+> > In fact I did not encounter this case, but I think it can exist.
+> > I think if host OS dynamically disable PAN, it wants the host kernel access the user space address space not through copy_to/from_user
+> API.
+> > Now if it is unexpectedly enabled, when host kernel still accesses the user space address,  it will happen MMU fault exception.
 > 
-> On 06/09/2017 07:26, Vijaya Kumar K wrote:
->> scan_its_table() return 1 on success.
+> And this is expected! The only allowed channel for kernel <-> user is uaccess API.
 > 
-> As mentioned in the kernel-doc comment of scan_its_table, this latter
-> returns 1 if the last element is not found. Than can happen while
-> scanning an L2 table but shouldn't happen if we scan an L1 table.
-> 
->  * Return: < 0 on error, 0 if last element was identified, 1 otherwise
->  * (the last element may not be found on second level tables)
-> 
-
-I think there maybe something wrong.
-A weeks ago, I met the migrate failed both the save interface and restore interface.
-The restore failed reason is that vm is in booting, and haven't to probe pci devs at that moment.
-and all dtes is invalid at that moment.
-
-In this case, the interface will return -EINVAL. I think we should take this as success.
-
-Not only for dtes, but the ites.
-
-Thanks.
+> I guess that you have test (and that great!) which violates that rule (for testing purpose, why not?) and now you are trying to fit kernel into
+> it...
 
 
+If you think that makes sense for it, we do not consider the paste.PAN in the world-switch.
+For the pstate.UAO issue, do you agree my fixing or you have other suggestion?  Also to other reviewer. Thanks.
+
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index 9341376..c3dd761 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -21,6 +21,8 @@
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_hyp.h>
+
++#include <asm/exec.h>
+
+ /* Yes, this does nothing, on purpose */
+ static void __hyp_text __sysreg_do_nothing(struct kvm_cpu_context *ctxt) { }
+
+@@ -121,8 +123,13 @@ static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
+        write_sysreg_el1(ctxt->gp_regs.spsr[KVM_SPSR_EL1],spsr);
+ }
+
++static void __hyp_text __sysreg_restore_state_vhe(struct kvm_cpu_context *ctxt)
++{
++    uao_thread_switch(current);
++}
++
+ static hyp_alternate_select(__sysreg_call_restore_host_state,
+-                           __sysreg_restore_state, __sysreg_do_nothing,
++                           __sysreg_restore_state, __sysreg_restore_state_vhe,
+                            ARM64_HAS_VIRT_HOST_EXTN);
+
+ void __hyp_text __sysreg_restore_host_state(struct kvm_cpu_context *ctxt)
+
+
 > 
->  In the function vgic_its_restore_device_tables()
->> the return value of scan_its_table() is checked against success value
->> and returns -EINVAL. Hence migration fails for VM with ITS.
->>
->> With this patch the failure return value is checked while returning
->> -EINVAL.
->>
->> Signed-off-by: Vijaya Kumar K <vkilari@codeaurora.org>
->>
->> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->> index aa6b68d..63f8ac3 100644
->> --- a/virt/kvm/arm/vgic/vgic-its.c
->> +++ b/virt/kvm/arm/vgic/vgic-its.c
->> @@ -2142,7 +2142,7 @@ static int vgic_its_restore_device_tables(struct vgic_its *its)
->>  				     vgic_its_restore_dte, NULL);
->>  	}
->>  
->> -	if (ret > 0)
->> +	if (ret <= 0)
->>  		ret = -EINVAL;
-> your modification would return -EINVAL for whatever error encountered
-> during the scan table or if last element is found. I don't think this is
-> what we want.
+> Cheers
+> Vladimir
 > 
-> Thanks
-> 
-> Eric
->>  
->>  	return ret;
->>
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-> 
-> 
+> >
+> >
+> >>
+> >> Cheers
+> >> Vladimir
+> >>
+> >>>
+> >>>>
+> >>>> Cheers
+> >>>> Vladimir
+> >>>>
+> >>>> .
+> >>>>
+> >>>
+> >>>
+> >>
+> >>
+> >> .
+> >>
+> >
+> >
