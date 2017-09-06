@@ -1,22 +1,25 @@
-From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: =?utf-8?B?562U5aSNOnJlOiBbUEFUQ0hdIGFybTY0OiBLVk06IFZIRTogc2F2ZSBhbmQg?=
- =?utf-8?Q?restore_some_PSTATE_bits?=
-Date: Wed, 6 Sep 2017 15:15:56 +0000
-Message-ID: <etPan.59b0112b.2513650f.4a29@localhost>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [RFC PATCH 3/3] kvm: arm/arm64: vgic-its: fix return value for
+ restore
+Date: Wed, 6 Sep 2017 17:18:35 +0200
+Message-ID: <fd0534b6-7e95-45cd-f90d-188c93a98f4a@redhat.com>
+References: <1504703110-10744-1-git-send-email-wanghaibin.wang@huawei.com>
+ <1504703110-10744-4-git-send-email-wanghaibin.wang@huawei.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============7025384881236466683=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 290D740C5A
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Sep 2017 11:14:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A33740CE9
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Sep 2017 11:16:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id R90Ib6DWHVP5 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 Sep 2017 11:14:41 -0400 (EDT)
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C73A040CE9
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Sep 2017 11:14:39 -0400 (EDT)
-Content-Language: zh-CN
+ with ESMTP id ag0K6r90zfRP for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Sep 2017 11:16:13 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 35BB840C5A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Sep 2017 11:16:13 -0400 (EDT)
+In-Reply-To: <1504703110-10744-4-git-send-email-wanghaibin.wang@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -26,207 +29,68 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: "vladimir.murzin" <vladimir.murzin@arm.com>, "marc.zyngier" <marc.zyngier@arm.com>, "christoffer.dall" <christoffer.dall@linaro.org>, pbonzini <pbonzini@redhat.com>, rkrcmar <rkrcmar@redhat.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, kvmarm <kvmarm@lists.cs.columbia.edu>, kvm <kvm@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>, "suzuki.poulose" <suzuki.poulose@arm.com>, "mark.rutland" <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>
-Cc: Huangshaoyu <huangshaoyu@huawei.com>, "Zhanghaibin (Euler)" <zhanghaibin7@huawei.com>
+To: wanghaibin <wanghaibin.wang@huawei.com>, marc.zyngier@arm.com, cdall@linaro.org, kvmarm@lists.cs.columbia.edu, andre.przywara@arm.com
+Cc: wu.wubin@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
---===============7025384881236466683==
-Content-Language: zh-CN
-Content-Type: multipart/alternative;
-	boundary="_000_etPan59b0112b2513650f4a29localhost_"
+Hi Wanghaibin,
 
---_000_etPan59b0112b2513650f4a29localhost_
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+On 06/09/2017 15:05, wanghaibin wrote:
+> This patch fix the migrate restore tables failure.
+> 
+> The same scene, at the destination, the restore tables interface traversal guest
+> memory, and check the dte/ite is valid or not.
+> If all dtes/ites are invalid, we will do try next one, and the last it will take
+> the 1 return value, but currently, it be treated as error. That's not correct.
+There's indeed a bug here! In case all entries are invalid we shouldn't
+return an error.
 
-DQpGaXggYSB0eXBvLg0KDQpJdCBpcyBzaW1pbGFyIHdpdGggdGhlIFBBTu+8jHdoZW4gdGhlIGd1
-ZXN0IHRyYXBzIHRvIGVsMu+8jGl0IHdpbGwgcmVzZXQgdGhlIHBzdGF0ZS48aHR0cDovL3BzdGF0
-ZS5QQU4+VUFPIHRvIDAsIGFuZCBjb250aW51ZSBydW7jgIJJbiBmYWN0IHRoZSBob3N0IHBzdGF0
-ZS5VQU88aHR0cDovL3BzdGF0ZS5VQU8+IGNhbiBiZSAxLCBidXQgZ3Vlc3QgY2hhbmdlIGl0IHRv
-IDAgd2hlbiB0cmFwIHRvIEVMMiwgc28gYWZ0ZXIgc3dpY2ggdG8gaG9zdO+8jG5lZWQgdG8gY2hl
-Y2sgd2hldGhlciBzZXQgcHN0YXRlLlVBTzxodHRwOi8vcHN0YXRlLlVBTz4gYWdhaW7jgIINCg0K
-5Y+R5Lu25Lq677yaVmxhZGltaXIgTXVyemluDQrmlLbku7bkurrvvJrogL/kuJzkuYUsbWFyYy56
-eW5naWVyLGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZyxwYm9uemluaUByZWRoYXQuY29tLHJr
-cmNtYXJAcmVkaGF0LmNvbSxsaW51eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5vcmcsa3Zt
-YXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdSxrdm1Admdlci5rZXJuZWwub3JnLGxpbnV4LWtlcm5l
-bCxzdXp1a2kucG91bG9zZUBhcm0uY29tLG1hcmsucnV0bGFuZEBhcm0uY29tLENhdGFsaW4gTWFy
-aW5hcw0K5oqE6YCB77yaSmFtZXMgTW9yc2Us5byg5rW35paMLOm7hOmftuWuhw0K5pe26Ze077ya
-MjAxNy0wOS0wNiAyMjo0MTowOQ0K5Li76aKYOlJlOiBbUEFUQ0hdIGFybTY0OiBLVk06IFZIRTog
-c2F2ZSBhbmQgcmVzdG9yZSBzb21lIFBTVEFURSBiaXRzDQoNCk9uIDA2LzA5LzE3IDE1OjEwLCBn
-ZW5nZG9uZ2ppdSB3cm90ZToNCj4gSGksIFZsYWRpbWlyDQo+DQo+Pj4+IERvIHlvdSBzZWUgZWZm
-ZWN0IG9mICJQQU4gaXMgdW5leHBlY3RlZGx5IGVuYWJsZWQiPw0KPj4+IEluIGZhY3QgSSBkaWQg
-bm90IGVuY291bnRlciB0aGlzIGNhc2UsIGJ1dCBJIHRoaW5rIGl0IGNhbiBleGlzdC4NCj4+PiBJ
-IHRoaW5rIGlmIGhvc3QgT1MgZHluYW1pY2FsbHkgZGlzYWJsZSBQQU4sIGl0IHdhbnRzIHRoZSBo
-b3N0IGtlcm5lbCBhY2Nlc3MgdGhlIHVzZXIgc3BhY2UgYWRkcmVzcyBzcGFjZSBub3QgdGhyb3Vn
-aCBjb3B5X3RvL2Zyb21fdXNlcg0KPj4gQVBJLg0KPj4+IE5vdyBpZiBpdCBpcyB1bmV4cGVjdGVk
-bHkgZW5hYmxlZCwgd2hlbiBob3N0IGtlcm5lbCBzdGlsbCBhY2Nlc3NlcyB0aGUgdXNlciBzcGFj
-ZSBhZGRyZXNzLCAgaXQgd2lsbCBoYXBwZW4gTU1VIGZhdWx0IGV4Y2VwdGlvbi4NCj4+DQo+PiBB
-bmQgdGhpcyBpcyBleHBlY3RlZCEgVGhlIG9ubHkgYWxsb3dlZCBjaGFubmVsIGZvciBrZXJuZWwg
-PC0+IHVzZXIgaXMgdWFjY2VzcyBBUEkuDQo+Pg0KPj4gSSBndWVzcyB0aGF0IHlvdSBoYXZlIHRl
-c3QgKGFuZCB0aGF0IGdyZWF0ISkgd2hpY2ggdmlvbGF0ZXMgdGhhdCBydWxlIChmb3IgdGVzdGlu
-ZyBwdXJwb3NlLCB3aHkgbm90PykgYW5kIG5vdyB5b3UgYXJlIHRyeWluZyB0byBmaXQga2VybmVs
-IGludG8NCj4+IGl0Li4uDQo+DQo+DQo+IElmIHlvdSB0aGluayB0aGF0IG1ha2VzIHNlbnNlIGZv
-ciBpdCwgd2UgZG8gbm90IGNvbnNpZGVyIHRoZSBwYXN0ZS5QQU4gaW4gdGhlIHdvcmxkLXN3aXRj
-aC4NCj4gRm9yIHRoZSBwc3RhdGUuVUFPIGlzc3VlLCBkbyB5b3UgYWdyZWUgbXkgZml4aW5nIG9y
-IHlvdSBoYXZlIG90aGVyIHN1Z2dlc3Rpb24/ICBBbHNvIHRvIG90aGVyIHJldmlld2VyLiBUaGFu
-a3MuDQoNCkl0IHdvdWxkIGhlbHAgaWYgeW91IGdpdmUgcHJlY2lzZSBkZXNjcmlwdGlvbiBvbiAi
-cHN0YXRlLlVBTyBpc3N1ZSIuDQoNClRoYW5rcw0KVmxhZGltaXINCg0KPg0KPiBkaWZmIC0tZ2l0
-IGEvYXJjaC9hcm02NC9rdm0vaHlwL3N5c3JlZy1zci5jIGIvYXJjaC9hcm02NC9rdm0vaHlwL3N5
-c3JlZy1zci5jDQo+IGluZGV4IDkzNDEzNzYuLmMzZGQ3NjEgMTAwNjQ0DQo+IC0tLSBhL2FyY2gv
-YXJtNjQva3ZtL2h5cC9zeXNyZWctc3IuYw0KPiArKysgYi9hcmNoL2FybTY0L2t2bS9oeXAvc3lz
-cmVnLXNyLmMNCj4gQEAgLTIxLDYgKzIxLDggQEANCj4gICNpbmNsdWRlIDxhc20va3ZtX2FzbS5o
-Pg0KPiAgI2luY2x1ZGUgPGFzbS9rdm1faHlwLmg+DQo+DQo+ICsjaW5jbHVkZSA8YXNtL2V4ZWMu
-aD4NCj4NCj4gIC8qIFllcywgdGhpcyBkb2VzIG5vdGhpbmcsIG9uIHB1cnBvc2UgKi8NCj4gIHN0
-YXRpYyB2b2lkIF9faHlwX3RleHQgX19zeXNyZWdfZG9fbm90aGluZyhzdHJ1Y3Qga3ZtX2NwdV9j
-b250ZXh0ICpjdHh0KSB7IH0NCj4NCj4gQEAgLTEyMSw4ICsxMjMsMTMgQEAgc3RhdGljIHZvaWQg
-X19oeXBfdGV4dCBfX3N5c3JlZ19yZXN0b3JlX3N0YXRlKHN0cnVjdCBrdm1fY3B1X2NvbnRleHQg
-KmN0eHQpDQo+ICAgICAgICAgd3JpdGVfc3lzcmVnX2VsMShjdHh0LT5ncF9yZWdzLnNwc3JbS1ZN
-X1NQU1JfRUwxXSxzcHNyKTsNCj4gIH0NCj4NCj4gK3N0YXRpYyB2b2lkIF9faHlwX3RleHQgX19z
-eXNyZWdfcmVzdG9yZV9zdGF0ZV92aGUoc3RydWN0IGt2bV9jcHVfY29udGV4dCAqY3R4dCkNCj4g
-K3sNCj4gKyAgICB1YW9fdGhyZWFkX3N3aXRjaChjdXJyZW50KTsNCj4gK30NCj4gKw0KPiAgc3Rh
-dGljIGh5cF9hbHRlcm5hdGVfc2VsZWN0KF9fc3lzcmVnX2NhbGxfcmVzdG9yZV9ob3N0X3N0YXRl
-LA0KPiAtICAgICAgICAgICAgICAgICAgICAgICAgICAgX19zeXNyZWdfcmVzdG9yZV9zdGF0ZSwg
-X19zeXNyZWdfZG9fbm90aGluZywNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgIF9fc3lz
-cmVnX3Jlc3RvcmVfc3RhdGUsIF9fc3lzcmVnX3Jlc3RvcmVfc3RhdGVfdmhlLA0KPiAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgQVJNNjRfSEFTX1ZJUlRfSE9TVF9FWFROKTsNCj4NCj4gIHZv
-aWQgX19oeXBfdGV4dCBfX3N5c3JlZ19yZXN0b3JlX2hvc3Rfc3RhdGUoc3RydWN0IGt2bV9jcHVf
-Y29udGV4dCAqY3R4dCkNCj4NCj4NCj4+DQo+PiBDaGVlcnMNCj4+IFZsYWRpbWlyDQo+Pg0KPj4+
-DQo+Pj4NCj4+Pj4NCj4+Pj4gQ2hlZXJzDQo+Pj4+IFZsYWRpbWlyDQo+Pj4+DQo+Pj4+Pg0KPj4+
-Pj4+DQo+Pj4+Pj4gQ2hlZXJzDQo+Pj4+Pj4gVmxhZGltaXINCj4+Pj4+Pg0KPj4+Pj4+IC4NCj4+
-Pj4+Pg0KPj4+Pj4NCj4+Pj4+DQo+Pj4+DQo+Pj4+DQo+Pj4+IC4NCj4+Pj4NCj4+Pg0KPj4+DQo+
-DQoNCg==
+One solution could be to relax the error checking in scan_its_table()
+and do not return 1 when the whole length has been scanned. This would
+fix your issue.
 
---_000_etPan59b0112b2513650f4a29localhost_
-Content-Type: text/html; charset="utf-8"
-Content-ID: <55C430E1628F394BA99DA537162C38DE@huawei.com>
-Content-Transfer-Encoding: base64
+drawback of that change:
+at the moment we check the consistency of the entry data (next offset
+field). At the moment if the next_offset points to an entry outside of
+the table scope we are able to return an error (for top level tables).
 
-PGh0bWw+DQo8aGVhZD4NCjxtZXRhIGh0dHAtZXF1aXY9IkNvbnRlbnQtVHlwZSIgY29udGVudD0i
-dGV4dC9odG1sOyBjaGFyc2V0PXV0Zi04Ij4NCjwvaGVhZD4NCjxib2R5Pg0KPGRpdj48YnI+DQo8
-L2Rpdj4NCjxkaXYgbmFtZT0iQW55T2ZmaWNlLUJhY2tncm91bmQtSW1hZ2UiIHN0eWxlPSJib3Jk
-ZXItdG9wOjFweCBzb2xpZCAjQjVDNERGO2ZvbnQtc2l6ZToxNHB4O2xpbmUtaGVpZ2h0OjIwcHg7
-cGFkZGluZzo4cHg7IGJhY2tncm91bmQtaW1hZ2U6dXJsKGRhdGE6aW1hZ2UvcG5nO2Jhc2U2NCxp
-VkJPUncwS0dnb0FBQUFOU1VoRVVnQUFBQUVBQUFCQkNBWUFBQUFRVGM3bEFBQUFDWEJJV1hNQUFB
-c1RBQUFMRXdFQW1wd1lBQUFBQkdkQlRVRUFBTEdPZlB0Umt3QUFBQ0JqU0ZKTkFBQjZKUUFBZ0lN
-QUFQbi9BQUNBNlFBQWRUQUFBT3BnQUFBNm1BQUFGMiYjNDM7U1g4VkdBQUFBTjBsRVFWUjQybUo0
-OHU3UGZ5WUdCb1ovY09Jdktnc2I4UWVWaFovNGpZWDdHd3NYcHhoJiM0MztnZ2hUY0xvRko0SG1T
-MndFVWxnQkJnQWpQa05SUWxHUGZBQUFBQUJKUlU1RXJrSmdnZz09KTsgYmFja2dyb3VuZC1yZXBl
-YXQ6IHJlcGVhdC14OyI+DQo8ZGl2IHN0eWxlPSJ3b3JkLWJyZWFrOmJyZWFrLWFsbDsiPjxiPkZp
-eCBhIHR5cG8uPC9iPjwvZGl2Pg0KPGRpdj48YnI+DQo8L2Rpdj4NCjwvZGl2Pg0KPGRpdiBuYW1l
-PSJjb250ZW50IiBzdHlsZT0id29yZC13cmFwOmJyZWFrLXdvcmQ7Ij48c3R5bGU+CjwhLS0KLkVt
-YWlsUXVvdGUKCXttYXJnaW4tbGVmdDoxcHQ7CglwYWRkaW5nLWxlZnQ6NHB0OwoJYm9yZGVyLWxl
-ZnQ6IzgwMDAwMCAycHggc29saWR9Ci0tPgo8L3N0eWxlPg0KPGRpdj4NCjxkaXY+SXQgaXMgc2lt
-aWxhciB3aXRoIHRoZSBQQU7vvIx3aGVuIHRoZSBndWVzdCB0cmFwcyB0byBlbDLvvIxpdCB3aWxs
-IHJlc2V0IHRoZSA8YSBocmVmPSJodHRwOi8vcHN0YXRlLlBBTiIgdGFyZ2V0PSJfQkxBTksiPg0K
-cHN0YXRlLjwvYT5VQU8mbmJzcDt0byAwLCBhbmQgY29udGludWUgcnVu44CCSW4gZmFjdCB0aGUg
-aG9zdCA8YSBocmVmPSJodHRwOi8vcHN0YXRlLlVBTyIgdGFyZ2V0PSJfQkxBTksiPg0KcHN0YXRl
-LlVBTzwvYT4gY2FuIGJlIDEsIGJ1dCBndWVzdCBjaGFuZ2UgaXQgdG8gMCB3aGVuIHRyYXAgdG8g
-RUwyLCBzbyBhZnRlciBzd2ljaCB0byBob3N077yMbmVlZCB0byBjaGVjayB3aGV0aGVyIHNldA0K
-PGEgaHJlZj0iaHR0cDovL3BzdGF0ZS5VQU8iIHRhcmdldD0iX0JMQU5LIj5wc3RhdGUuVUFPPC9h
-PiBhZ2FpbuOAgjxicj4NCjwvZGl2Pg0KPGRpdj48YnI+DQo8L2Rpdj4NCjxkaXYgbmFtZT0iQW55
-T2ZmaWNlLUJhY2tncm91bmQtSW1hZ2UiIHN0eWxlPSJib3JkZXItdG9wOiAxcHggc29saWQgI0I1
-QzRERjtmb250LXNpemU6IDE0cHg7bGluZS1oZWlnaHQ6IDIwcHg7cGFkZGluZzogOHB4OyBiYWNr
-Z3JvdW5kLWltYWdlOnVybCgmcXVvdDtkYXRhOmltYWdlL3BuZztiYXNlNjQsaVZCT1J3MEtHZ29B
-QUFBTlNVaEVVZ0FBQUFFQUFBQkJDQVlBQUFBUVRjN2xBQUFBQ1hCSVdYTUFBQXNUQUFBTEV3RUFt
-cHdZQUFBQUJHZEJUVUVBQUxHT2ZQdFJrd0FBQUNCalNGSk5BQUI2SlFBQWdJTUFBUG4vQUFDQTZR
-QUFkVEFBQU9wZ0FBQTZtQUFBRjImIzQzO1NYOFZHQUFBQU4wbEVRVlI0Mm1KNDh1N1BmeVlHQm9a
-L2NPSXZLZ3NiOFFlVmhaLzRqWVg3R3dzWHB4aCYjNDM7Z2doVGNMb0ZKNEhtUzJ3RVVsZ0JCZ0Fq
-UGtOUlFsR1BmQUFBQUFCSlJVNUVya0pnZ2c9PSZxdW90Oyk7YmFja2dyb3VuZC1yZXBlYXQ6cmVw
-ZWF0LXg7Ij4NCjxkaXYgc3R5bGU9IndvcmQtYnJlYWs6YnJlYWstYWxsIj48Yj7lj5Hku7bkurrv
-vJo8L2I+VmxhZGltaXIgTXVyemluPC9kaXY+DQo8ZGl2IHN0eWxlPSJ3b3JkLWJyZWFrOmJyZWFr
-LWFsbCI+PGI+5pS25Lu25Lq677yaPC9iPuiAv+S4nOS5hSxtYXJjLnp5bmdpZXIsY2hyaXN0b2Zm
-ZXIuZGFsbEBsaW5hcm8ub3JnLHBib256aW5pQHJlZGhhdC5jb20scmtyY21hckByZWRoYXQuY29t
-LGxpbnV4LWFybS1rZXJuZWxAbGlzdHMuaW5mcmFkZWFkLm9yZyxrdm1hcm1AbGlzdHMuY3MuY29s
-dW1iaWEuZWR1LGt2bUB2Z2VyLmtlcm5lbC5vcmcsbGludXgta2VybmVsLHN1enVraS5wb3Vsb3Nl
-QGFybS5jb20sbWFyay5ydXRsYW5kQGFybS5jb20sQ2F0YWxpbg0KIE1hcmluYXM8L2Rpdj4NCjxk
-aXYgc3R5bGU9IndvcmQtYnJlYWs6YnJlYWstYWxsIj48Yj7mioTpgIHvvJo8L2I+SmFtZXMgTW9y
-c2Us5byg5rW35paMLOm7hOmftuWuhzwvZGl2Pg0KPGRpdiBzdHlsZT0id29yZC1icmVhazpicmVh
-ay1hbGwiPjxiPuaXtumXtO+8mjwvYj4yMDE3LTA5LTA2IDIyOjQxOjA5PC9kaXY+DQo8ZGl2IHN0
-eWxlPSJ3b3JkLWJyZWFrOmJyZWFrLWFsbCI+PGI+5Li76aKYOjwvYj5SZTogW1BBVENIXSBhcm02
-NDogS1ZNOiBWSEU6IHNhdmUgYW5kIHJlc3RvcmUgc29tZSBQU1RBVEUgYml0czwvZGl2Pg0KPGRp
-dj48YnI+DQo8L2Rpdj4NCjwvZGl2Pg0KPC9kaXY+DQo8Zm9udCBzaXplPSIyIj48c3BhbiBzdHls
-ZT0iZm9udC1zaXplOjEwcHQiPg0KPGRpdiBjbGFzcz0iUGxhaW5UZXh0Ij5PbiAwNi8wOS8xNyAx
-NToxMCwgZ2VuZ2RvbmdqaXUgd3JvdGU6PGJyPg0KJmd0OyBIaSwgVmxhZGltaXI8YnI+DQomZ3Q7
-IDxicj4NCiZndDsmZ3Q7Jmd0OyZndDsgRG8geW91IHNlZSBlZmZlY3Qgb2YgJnF1b3Q7UEFOIGlz
-IHVuZXhwZWN0ZWRseSBlbmFibGVkJnF1b3Q7Pzxicj4NCiZndDsmZ3Q7Jmd0OyBJbiBmYWN0IEkg
-ZGlkIG5vdCBlbmNvdW50ZXIgdGhpcyBjYXNlLCBidXQgSSB0aGluayBpdCBjYW4gZXhpc3QuPGJy
-Pg0KJmd0OyZndDsmZ3Q7IEkgdGhpbmsgaWYgaG9zdCBPUyBkeW5hbWljYWxseSBkaXNhYmxlIFBB
-TiwgaXQgd2FudHMgdGhlIGhvc3Qga2VybmVsIGFjY2VzcyB0aGUgdXNlciBzcGFjZSBhZGRyZXNz
-IHNwYWNlIG5vdCB0aHJvdWdoIGNvcHlfdG8vZnJvbV91c2VyPGJyPg0KJmd0OyZndDsgQVBJLjxi
-cj4NCiZndDsmZ3Q7Jmd0OyBOb3cgaWYgaXQgaXMgdW5leHBlY3RlZGx5IGVuYWJsZWQsIHdoZW4g
-aG9zdCBrZXJuZWwgc3RpbGwgYWNjZXNzZXMgdGhlIHVzZXIgc3BhY2UgYWRkcmVzcywmbmJzcDsg
-aXQgd2lsbCBoYXBwZW4gTU1VIGZhdWx0IGV4Y2VwdGlvbi48YnI+DQomZ3Q7Jmd0Ozxicj4NCiZn
-dDsmZ3Q7IEFuZCB0aGlzIGlzIGV4cGVjdGVkISBUaGUgb25seSBhbGxvd2VkIGNoYW5uZWwgZm9y
-IGtlcm5lbCAmbHQ7LSZndDsgdXNlciBpcyB1YWNjZXNzIEFQSS48YnI+DQomZ3Q7Jmd0Ozxicj4N
-CiZndDsmZ3Q7IEkgZ3Vlc3MgdGhhdCB5b3UgaGF2ZSB0ZXN0IChhbmQgdGhhdCBncmVhdCEpIHdo
-aWNoIHZpb2xhdGVzIHRoYXQgcnVsZSAoZm9yIHRlc3RpbmcgcHVycG9zZSwgd2h5IG5vdD8pIGFu
-ZCBub3cgeW91IGFyZSB0cnlpbmcgdG8gZml0IGtlcm5lbCBpbnRvPGJyPg0KJmd0OyZndDsgaXQu
-Li48YnI+DQomZ3Q7IDxicj4NCiZndDsgPGJyPg0KJmd0OyBJZiB5b3UgdGhpbmsgdGhhdCBtYWtl
-cyBzZW5zZSBmb3IgaXQsIHdlIGRvIG5vdCBjb25zaWRlciB0aGUgcGFzdGUuUEFOIGluIHRoZSB3
-b3JsZC1zd2l0Y2guPGJyPg0KJmd0OyBGb3IgdGhlIHBzdGF0ZS5VQU8gaXNzdWUsIGRvIHlvdSBh
-Z3JlZSBteSBmaXhpbmcgb3IgeW91IGhhdmUgb3RoZXIgc3VnZ2VzdGlvbj8mbmJzcDsgQWxzbyB0
-byBvdGhlciByZXZpZXdlci4gVGhhbmtzLjxicj4NCjxicj4NCkl0IHdvdWxkIGhlbHAgaWYgeW91
-IGdpdmUgcHJlY2lzZSBkZXNjcmlwdGlvbiBvbiAmcXVvdDtwc3RhdGUuVUFPIGlzc3VlJnF1b3Q7
-Ljxicj4NCjxicj4NClRoYW5rczxicj4NClZsYWRpbWlyPGJyPg0KPGJyPg0KJmd0OyA8YnI+DQom
-Z3Q7IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS9oeXAvc3lzcmVnLXNyLmMgYi9hcmNoL2Fy
-bTY0L2t2bS9oeXAvc3lzcmVnLXNyLmM8YnI+DQomZ3Q7IGluZGV4IDkzNDEzNzYuLmMzZGQ3NjEg
-MTAwNjQ0PGJyPg0KJmd0OyAtLS0gYS9hcmNoL2FybTY0L2t2bS9oeXAvc3lzcmVnLXNyLmM8YnI+
-DQomZ3Q7ICYjNDM7JiM0MzsmIzQzOyBiL2FyY2gvYXJtNjQva3ZtL2h5cC9zeXNyZWctc3IuYzxi
-cj4NCiZndDsgQEAgLTIxLDYgJiM0MzsyMSw4IEBAPGJyPg0KJmd0OyZuYnNwOyAjaW5jbHVkZSAm
-bHQ7YXNtL2t2bV9hc20uaCZndDs8YnI+DQomZ3Q7Jm5ic3A7ICNpbmNsdWRlICZsdDthc20va3Zt
-X2h5cC5oJmd0Ozxicj4NCiZndDsgPGJyPg0KJmd0OyAmIzQzOyNpbmNsdWRlICZsdDthc20vZXhl
-Yy5oJmd0Ozxicj4NCiZndDsgPGJyPg0KJmd0OyZuYnNwOyAvKiBZZXMsIHRoaXMgZG9lcyBub3Ro
-aW5nLCBvbiBwdXJwb3NlICovPGJyPg0KJmd0OyZuYnNwOyBzdGF0aWMgdm9pZCBfX2h5cF90ZXh0
-IF9fc3lzcmVnX2RvX25vdGhpbmcoc3RydWN0IGt2bV9jcHVfY29udGV4dCAqY3R4dCkgeyB9PGJy
-Pg0KJmd0OyA8YnI+DQomZ3Q7IEBAIC0xMjEsOCAmIzQzOzEyMywxMyBAQCBzdGF0aWMgdm9pZCBf
-X2h5cF90ZXh0IF9fc3lzcmVnX3Jlc3RvcmVfc3RhdGUoc3RydWN0IGt2bV9jcHVfY29udGV4dCAq
-Y3R4dCk8YnI+DQomZ3Q7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7IHdyaXRlX3N5c3JlZ19lbDEoY3R4dC0mZ3Q7Z3BfcmVncy5zcHNyW0tWTV9TUFNSX0VM
-MV0sc3Bzcik7PGJyPg0KJmd0OyZuYnNwOyB9PGJyPg0KJmd0OyA8YnI+DQomZ3Q7ICYjNDM7c3Rh
-dGljIHZvaWQgX19oeXBfdGV4dCBfX3N5c3JlZ19yZXN0b3JlX3N0YXRlX3ZoZShzdHJ1Y3Qga3Zt
-X2NwdV9jb250ZXh0ICpjdHh0KTxicj4NCiZndDsgJiM0Mzt7PGJyPg0KJmd0OyAmIzQzOyZuYnNw
-OyZuYnNwOyZuYnNwOyB1YW9fdGhyZWFkX3N3aXRjaChjdXJyZW50KTs8YnI+DQomZ3Q7ICYjNDM7
-fTxicj4NCiZndDsgJiM0Mzs8YnI+DQomZ3Q7Jm5ic3A7IHN0YXRpYyBoeXBfYWx0ZXJuYXRlX3Nl
-bGVjdChfX3N5c3JlZ19jYWxsX3Jlc3RvcmVfaG9zdF9zdGF0ZSw8YnI+DQomZ3Q7IC0mbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgX19zeXNyZWdfcmVzdG9yZV9zdGF0
-ZSwgX19zeXNyZWdfZG9fbm90aGluZyw8YnI+DQomZ3Q7ICYjNDM7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IF9fc3lzcmVnX3Jlc3RvcmVfc3RhdGUsIF9fc3lzcmVn
-X3Jlc3RvcmVfc3RhdGVfdmhlLDxicj4NCiZndDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgQVJNNjRfSEFTX1ZJUlRfSE9TVF9FWFROKTs8YnI+
-DQomZ3Q7IDxicj4NCiZndDsmbmJzcDsgdm9pZCBfX2h5cF90ZXh0IF9fc3lzcmVnX3Jlc3RvcmVf
-aG9zdF9zdGF0ZShzdHJ1Y3Qga3ZtX2NwdV9jb250ZXh0ICpjdHh0KTxicj4NCiZndDsgPGJyPg0K
-Jmd0OyA8YnI+DQomZ3Q7Jmd0Ozxicj4NCiZndDsmZ3Q7IENoZWVyczxicj4NCiZndDsmZ3Q7IFZs
-YWRpbWlyPGJyPg0KJmd0OyZndDs8YnI+DQomZ3Q7Jmd0OyZndDs8YnI+DQomZ3Q7Jmd0OyZndDs8
-YnI+DQomZ3Q7Jmd0OyZndDsmZ3Q7PGJyPg0KJmd0OyZndDsmZ3Q7Jmd0OyBDaGVlcnM8YnI+DQom
-Z3Q7Jmd0OyZndDsmZ3Q7IFZsYWRpbWlyPGJyPg0KJmd0OyZndDsmZ3Q7Jmd0Ozxicj4NCiZndDsm
-Z3Q7Jmd0OyZndDsmZ3Q7PGJyPg0KJmd0OyZndDsmZ3Q7Jmd0OyZndDsmZ3Q7PGJyPg0KJmd0OyZn
-dDsmZ3Q7Jmd0OyZndDsmZ3Q7IENoZWVyczxicj4NCiZndDsmZ3Q7Jmd0OyZndDsmZ3Q7Jmd0OyBW
-bGFkaW1pcjxicj4NCiZndDsmZ3Q7Jmd0OyZndDsmZ3Q7Jmd0Ozxicj4NCiZndDsmZ3Q7Jmd0OyZn
-dDsmZ3Q7Jmd0OyAuPGJyPg0KJmd0OyZndDsmZ3Q7Jmd0OyZndDsmZ3Q7PGJyPg0KJmd0OyZndDsm
-Z3Q7Jmd0OyZndDs8YnI+DQomZ3Q7Jmd0OyZndDsmZ3Q7Jmd0Ozxicj4NCiZndDsmZ3Q7Jmd0OyZn
-dDs8YnI+DQomZ3Q7Jmd0OyZndDsmZ3Q7PGJyPg0KJmd0OyZndDsmZ3Q7Jmd0OyAuPGJyPg0KJmd0
-OyZndDsmZ3Q7Jmd0Ozxicj4NCiZndDsmZ3Q7Jmd0Ozxicj4NCiZndDsmZ3Q7Jmd0Ozxicj4NCiZn
-dDsgPGJyPg0KPGJyPg0KPC9kaXY+DQo8L3NwYW4+PC9mb250PjwvZGl2Pg0KPC9ib2R5Pg0KPC9o
-dG1sPg0K
+Otherwise, if we want to keep that check, I think we would need to add a
+bool *valid parameter to entry_fn_t. in scan_its_table() we would return
+1 only if last fn() call returns valid and len <= 0.
 
---_000_etPan59b0112b2513650f4a29localhost_--
+Thanks
 
+Eric
 
---===============7025384881236466683==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============7025384881236466683==--
+> 
+> This patch try to fix this problem.
+> 
+> Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
+> ---
+>  virt/kvm/arm/vgic/vgic-its.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> index 5c20352..2c69aeb 100644
+> --- a/virt/kvm/arm/vgic/vgic-its.c
+> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> @@ -2025,7 +2025,7 @@ static int vgic_its_restore_dte(struct vgic_its *its, u32 id,
+>  		return PTR_ERR(dev);
+>  
+>  	ret = vgic_its_restore_itt(its, dev);
+> -	if (ret) {
+> +	if (ret < 0) {
+>  		vgic_its_free_device(its->dev->kvm, dev);
+>  		return ret;
+>  	}
+> @@ -2147,9 +2147,6 @@ static int vgic_its_restore_device_tables(struct vgic_its *its)
+>  				     vgic_its_restore_dte, NULL);
+>  	}
+>  
+> -	if (ret > 0)
+> -		ret = -EINVAL;
+> -
+>  	return ret;
+>  }
+>  
+> 
