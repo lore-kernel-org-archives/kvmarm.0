@@ -1,24 +1,25 @@
 From: wanghaibin <wanghaibin.wang@huawei.com>
-Subject: [RFC PATCH 2/3] kvm: arm/arm64: vgic-vits: free its resource when vm
- reboot/reset
-Date: Wed, 6 Sep 2017 21:05:09 +0800
-Message-ID: <1504703110-10744-3-git-send-email-wanghaibin.wang@huawei.com>
-References: <1504703110-10744-1-git-send-email-wanghaibin.wang@huawei.com>
+Subject: Re: [PATCH] KVM: arm64: vgic-its: Fix wrong return value check in
+ vgic_its_restore_device_tables
+Date: Wed, 6 Sep 2017 21:13:57 +0800
+Message-ID: <59AFF495.4050604@huawei.com>
+References: <1504675565-13641-1-git-send-email-vkilari@codeaurora.org>
+ <65a66715-4f22-07d4-879a-1181c8dad889@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B29249C2C
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Sep 2017 09:04:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DB68D49C27
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Sep 2017 09:14:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jojDTc4DA1mt for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 Sep 2017 09:04:14 -0400 (EDT)
+ with ESMTP id j-iOi-0j5qQL for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Sep 2017 09:14:13 -0400 (EDT)
 Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A3B2840C5A
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Sep 2017 09:04:09 -0400 (EDT)
-In-Reply-To: <1504703110-10744-1-git-send-email-wanghaibin.wang@huawei.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D207940C5A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Sep 2017 09:14:11 -0400 (EDT)
+In-Reply-To: <65a66715-4f22-07d4-879a-1181c8dad889@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,81 +29,70 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: marc.zyngier@arm.com, cdall@linaro.org, kvmarm@lists.cs.columbia.edu, andre.przywara@arm.com
-Cc: wu.wubin@huawei.com
+To: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch fix the migrate save tables failure.
+On 2017/9/6 15:22, Auger Eric wrote:
 
-When the virtual machine is in booting and the devices haven't initialized,
-the all virtual dte/ite may be invalid. If migrate at this moment, the save
-tables interface traversal device list, and check the dte is valid or not.
-if not, it will return the -EINVAL.
+> Hi Vijaya,
+> 
+> On 06/09/2017 07:26, Vijaya Kumar K wrote:
+>> scan_its_table() return 1 on success.
+> 
+> As mentioned in the kernel-doc comment of scan_its_table, this latter
+> returns 1 if the last element is not found. Than can happen while
+> scanning an L2 table but shouldn't happen if we scan an L1 table.
+> 
+>  * Return: < 0 on error, 0 if last element was identified, 1 otherwise
+>  * (the last element may not be found on second level tables)
+> 
 
-This patch try to free the its list resource when vm reboot or reset to avoid this.
+I think there maybe something wrong.
+A weeks ago, I met the migrate failed both the save interface and restore interface.
+The restore failed reason is that vm is in booting, and haven't to probe pci devs at that moment.
+and all dtes is invalid at that moment.
 
-Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
----
- virt/kvm/arm/arm.c           |  5 ++++-
- virt/kvm/arm/vgic/vgic-its.c | 10 ++++++++++
- virt/kvm/arm/vgic/vgic.h     |  1 +
- 3 files changed, 15 insertions(+), 1 deletion(-)
+In this case, the interface will return -EINVAL. I think we should take this as success.
 
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index a39a1e1..db7632d 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -46,6 +46,7 @@
- #include <asm/kvm_coproc.h>
- #include <asm/kvm_psci.h>
- #include <asm/sections.h>
-+#include "vgic.h"
- 
- #ifdef REQUIRES_VIRT
- __asm__(".arch_extension	virt");
-@@ -901,8 +902,10 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
- 	 * Ensure a rebooted VM will fault in RAM pages and detect if the
- 	 * guest MMU is turned off and flush the caches as needed.
- 	 */
--	if (vcpu->arch.has_run_once)
-+	if (vcpu->arch.has_run_once) {
- 		stage2_unmap_vm(vcpu->kvm);
-+		vgic_its_free_resource(vcpu->kvm);
-+	}
- 
- 	vcpu_reset_hcr(vcpu);
- 
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 25d614f..5c20352 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -2467,6 +2467,16 @@ static int vgic_its_get_attr(struct kvm_device *dev,
- 	.has_attr = vgic_its_has_attr,
- };
- 
-+void vgic_its_free_resource(struct kvm *kvm)
-+{
-+	struct kvm_device *dev, *tmp;
-+
-+	list_for_each_entry_safe(dev, tmp, &kvm->devices, vm_node) {
-+		if(dev->ops == &kvm_arm_vgic_its_ops)
-+			vgic_its_free_list(kvm, dev->private);
-+	}
-+}
-+
- int kvm_vgic_register_its_device(void)
- {
- 	return kvm_register_device_ops(&kvm_arm_vgic_its_ops,
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index c2be5b7..fbcbdfd 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -222,5 +222,6 @@ int vgic_v3_line_level_info_uaccess(struct kvm_vcpu *vcpu, bool is_write,
- 
- bool lock_all_vcpus(struct kvm *kvm);
- void unlock_all_vcpus(struct kvm *kvm);
-+void vgic_its_free_resource(struct kvm *kvm);
- 
- #endif
--- 
-1.8.3.1
+Not only for dtes, but the ites.
+
+Thanks.
+
+
+> 
+>  In the function vgic_its_restore_device_tables()
+>> the return value of scan_its_table() is checked against success value
+>> and returns -EINVAL. Hence migration fails for VM with ITS.
+>>
+>> With this patch the failure return value is checked while returning
+>> -EINVAL.
+>>
+>> Signed-off-by: Vijaya Kumar K <vkilari@codeaurora.org>
+>>
+>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+>> index aa6b68d..63f8ac3 100644
+>> --- a/virt/kvm/arm/vgic/vgic-its.c
+>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+>> @@ -2142,7 +2142,7 @@ static int vgic_its_restore_device_tables(struct vgic_its *its)
+>>  				     vgic_its_restore_dte, NULL);
+>>  	}
+>>  
+>> -	if (ret > 0)
+>> +	if (ret <= 0)
+>>  		ret = -EINVAL;
+> your modification would return -EINVAL for whatever error encountered
+> during the scan table or if last element is found. I don't think this is
+> what we want.
+> 
+> Thanks
+> 
+> Eric
+>>  
+>>  	return ret;
+>>
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> 
+> 
