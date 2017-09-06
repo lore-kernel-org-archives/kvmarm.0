@@ -1,7 +1,7 @@
-From: Vladimir Murzin <vladimir.murzin@arm.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
 Subject: Re: [PATCH] arm64: KVM: VHE: save and restore some PSTATE bits
-Date: Wed, 6 Sep 2017 10:41:58 +0100
-Message-ID: <981d7334-8841-d3e3-0833-1aa061bf97a2@arm.com>
+Date: Wed, 6 Sep 2017 17:49:56 +0800
+Message-ID: <9396c8ff-98e3-af57-742a-bbe2ac54ad34@huawei.com>
 References: <0184EA26B2509940AA629AE1405DD7F2015DF717@DGGEMA503-MBX.china.huawei.com>
  <2a5d4299-2523-aef5-7db1-f351ca66b562@arm.com>
  <e47a9304-b429-b2bd-f151-d65f1c32044c@huawei.com>
@@ -10,15 +10,15 @@ Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E235940C5A
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Sep 2017 05:39:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 00B2D40C5A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Sep 2017 05:48:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rXR3x8PKSH6I for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 Sep 2017 05:39:44 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 64A5D40A86
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Sep 2017 05:39:44 -0400 (EDT)
+ with ESMTP id YHu0tmNLlKXb for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Sep 2017 05:48:29 -0400 (EDT)
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0268A40A86
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Sep 2017 05:48:28 -0400 (EDT)
 In-Reply-To: <e47a9304-b429-b2bd-f151-d65f1c32044c@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -29,11 +29,44 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: gengdongjiu <gengdongjiu@huawei.com>, Marc Zyngier <marc.zyngier@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, mark.rutland@arm.com, catalin.marinas@arm.com
+To: Marc Zyngier <marc.zyngier@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "vladimir.murzin@arm.com" <vladimir.murzin@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, mark.rutland@arm.com, catalin.marinas@arm.com
 Cc: Huangshaoyu <huangshaoyu@huawei.com>, zhanghaibin7@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 06/09/17 10:32, gengdongjiu wrote:
+For UAO, if not save/restore PSTATE.UAO, we can use below fixing.
+
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index 9341376..c3dd761 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -21,6 +21,8 @@
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_hyp.h>
+
++#include <asm/exec.h>
++
+ /* Yes, this does nothing, on purpose */
+ static void __hyp_text __sysreg_do_nothing(struct kvm_cpu_context *ctxt) { }
+
+@@ -121,8 +123,13 @@ static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
+ 	write_sysreg_el1(ctxt->gp_regs.spsr[KVM_SPSR_EL1],spsr);
+ }
+
++static void __hyp_text __sysreg_restore_state_vhe(struct kvm_cpu_context *ctxt)
++{
++    uao_thread_switch(current);
++}
++
+ static hyp_alternate_select(__sysreg_call_restore_host_state,
+-			    __sysreg_restore_state, __sysreg_do_nothing,
++			    __sysreg_restore_state, __sysreg_restore_state_vhe,
+ 			    ARM64_HAS_VIRT_HOST_EXTN);
+
+ void __hyp_text __sysreg_restore_host_state(struct kvm_cpu_context *ctxt)
+
+
+
+On 2017/9/6 17:32, gengdongjiu wrote:
 > Hi Marc,
 > 
 > On 2017/9/6 16:17, Marc Zyngier wrote:
@@ -95,12 +128,6 @@ On 06/09/17 10:32, gengdongjiu wrote:
 > 
 > If not save/restore them, the KVM will set them according to the CPU capability. For example below fixing, it will check CPU capability, If CPU supports PAN,
 > the kvm will always enable the PAN for the host. But in fact, the host may be not enable the PAN.
-
-Can you please elaborate on cases where PAN is not enabled?
-
-Thanks
-Vladimir
-
 > Of course for the UAO, we can use the similar fixing if Marc or Christoffer is agreed. but seems not make sense.
 > 
 > commit cb96408da4e11698674abd04aeac941c1bed2038
@@ -146,5 +173,3 @@ Vladimir
 >>
 >> [1] https://www.spinics.net/lists/arm-kernel/msg599798.html
 >>
-> 
-> 
