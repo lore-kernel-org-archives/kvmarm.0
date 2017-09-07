@@ -1,127 +1,76 @@
-From: "Okamoto, Takayuki" <tokamoto@jp.fujitsu.com>
-Subject: RE: [PATCH v2 19/28] arm64/sve: ptrace and ELF coredump support
-Date: Thu, 7 Sep 2017 05:11:45 +0000
-Message-ID: <5FA513F682BE7F4EAAB8EE035D5B08E44109EBDF@G01JPEXMBKW02>
-References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com>
- <1504198860-12951-20-git-send-email-Dave.Martin@arm.com>
- <5FA513F682BE7F4EAAB8EE035D5B08E44109DFE8@G01JPEXMBKW02>
- <20170906181634.GF6321@e103592.cambridge.arm.com>
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+Subject: [PATCH] arm64: KVM: VHE: reset PSTATE.UAO when switch to host
+Date: Thu, 7 Sep 2017 13:54:44 +0800
+Message-ID: <1504763684-30128-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C4E7F49C30
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Sep 2017 01:09:34 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wRStQ9re6jwG for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 Sep 2017 01:09:29 -0400 (EDT)
-Received: from mgwkm02.jp.fujitsu.com (mgwkm02.jp.fujitsu.com [202.219.69.169])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C73BA40CE9
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Sep 2017 01:09:28 -0400 (EDT)
-Received: from g01jpfmpwkw02.exch.g01.fujitsu.local
- (g01jpfmpwkw02.exch.g01.fujitsu.local [10.0.193.56])
- by kw-mxoi1.gw.nic.fujitsu.com (Postfix) with ESMTP id 3E6D3AC0092
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Sep 2017 14:11:48 +0900 (JST)
-In-Reply-To: <20170906181634.GF6321@e103592.cambridge.arm.com>
-Content-Language: ja-JP
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: 'Dave Martin' <Dave.Martin@arm.com>
-Cc: "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, "libc-alpha@sourceware.org" <libc-alpha@sourceware.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, "gdb@sourceware.org" <gdb@sourceware.org>, Yao Qi <Yao.Qi@arm.com>, Will Deacon <will.deacon@arm.com>, Oleg Nesterov <oleg@redhat.com>, Richard Sandiford <richard.sandiford@arm.com>, Alexander Viro <viro@zeniv.linux.org.uk>, Alan Hayward <alan.hayward@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: christoffer.dall@linaro.org, marc.zyngier@arm.com, vladimir.murzin@arm.com, rkrcmar@redhat.com, catalin.marinas@arm.com, james.morse@arm.com, shankerd@codeaurora.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, zhanghaibin7@huawei.com, huangshaoyu@huawei.com, gengdongjiu@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGkgRGF2ZSwNCg0KVGhhbmsgeW91IGZvciB5b3VyIHJlcGx5Lg0KDQo+IFlvdXIgZml4IGxvb2tz
-IGNvcnJlY3QgYW5kIHNlZW1zIHRvIHdvcmsuICBGb3Igc3R5bGlzdGljIHJlYXNvbnMsIEkgbWF5
-DQo+IHdyaXRlIGl0IGxpa2UgdGhpcyBpbnN0ZWFkLCBidXQgdGhlIGVmZmVjdCBzaG91bGQgYmUg
-dGhlIHNhbWU6DQo+IA0KPiAJaGVhZGVyLT5tYXhfdmwgPSBzdmVfbWF4X3ZsOw0KPiAJaWYgKFdB
-Uk5fT04oIXN2ZV92bF92YWxpZChzdmVfbWF4X3ZsKSkNCj4gCQloZWFkZXItPm1heF92bCA9IGhl
-YWRlci0+dmw7DQoNCkl0IGlzIGJldHRlciB0aGFuIG15IGZpeC4NClBsZWFzZSwgYXBwbHkgaXQg
-YXQgbmV4dCB2ZXJzaW9uLg0KDQpCZXN0IHJlZ2FyZHMsDQpUYWtheXVraSBPa2Ftb3RvDQoNCj4g
-LS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogbGludXgtYXJtLWtlcm5lbA0KPiBb
-bWFpbHRvOmxpbnV4LWFybS1rZXJuZWwtYm91bmNlc0BsaXN0cy5pbmZyYWRlYWQub3JnXSBPbiBC
-ZWhhbGYgT2YgRGF2ZQ0KPiBNYXJ0aW4NCj4gU2VudDogVGh1cnNkYXksIFNlcHRlbWJlciA3LCAy
-MDE3IDM6MTcgQU0NCj4gVG86IE9rYW1vdG8sIFRha2F5dWtpIDx0b2thbW90b0BqcC5mdWppdHN1
-LmNvbT4NCj4gQ2M6IGxpbnV4LWFyY2hAdmdlci5rZXJuZWwub3JnOyBsaWJjLWFscGhhQHNvdXJj
-ZXdhcmUub3JnOyBBcmQNCj4gQmllc2hldXZlbCA8YXJkLmJpZXNoZXV2ZWxAbGluYXJvLm9yZz47
-IFN6YWJvbGNzIE5hZ3kNCj4gPHN6YWJvbGNzLm5hZ3lAYXJtLmNvbT47IGdkYkBzb3VyY2V3YXJl
-Lm9yZzsgWWFvIFFpIDxZYW8uUWlAYXJtLmNvbT47DQo+IEFsYW4gSGF5d2FyZCA8YWxhbi5oYXl3
-YXJkQGFybS5jb20+OyBXaWxsIERlYWNvbiA8d2lsbC5kZWFjb25AYXJtLmNvbT47DQo+IE9sZWcg
-TmVzdGVyb3YgPG9sZWdAcmVkaGF0LmNvbT47IFJpY2hhcmQgU2FuZGlmb3JkDQo+IDxyaWNoYXJk
-LnNhbmRpZm9yZEBhcm0uY29tPjsgQWxleGFuZGVyIFZpcm8gPHZpcm9AemVuaXYubGludXgub3Jn
-LnVrPjsNCj4gQ2F0YWxpbiBNYXJpbmFzIDxjYXRhbGluLm1hcmluYXNAYXJtLmNvbT47IEFsZXgg
-QmVubqimZQ0KPiA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz47IGt2bWFybUBsaXN0cy5jcy5jb2x1
-bWJpYS5lZHU7DQo+IGxpbnV4LWFybS1rZXJuZWxAbGlzdHMuaW5mcmFkZWFkLm9yZw0KPiBTdWJq
-ZWN0OiBSZTogW1BBVENIIHYyIDE5LzI4XSBhcm02NC9zdmU6IHB0cmFjZSBhbmQgRUxGIGNvcmVk
-dW1wIHN1cHBvcnQNCj4gDQo+IE9uIFdlZCwgU2VwIDA2LCAyMDE3IGF0IDA0OjIxOjUwUE0gKzAw
-MDAsIE9rYW1vdG8sIFRha2F5dWtpIHdyb3RlOg0KPiA+IEhpIERhdmUsDQo+ID4NCj4gPiBJIGFt
-IGFuIGVuZ2luZWVyIG9mIHRoZSBwb3N0SyBjb21wdXRlciBmcm9tIEZ1aml0c3UuDQo+ID4NCj4g
-PiBXaGVuIEkgdHJpZWQgdG8gcmVhZCAibWF4X3ZsIiBieSBwdHJhY2Ugd2l0aCB0aGlzIHBhdGNo
-IG9uIG91ciBsb2NhbCBTVkUNCj4gPiBzaW11bGF0b3IsIGl0IHdhcyByZWFkIGFzIHplcm8uDQo+
-ID4gSSB0aGluayB0aGUgY2F1c2Ugb2YgdGhpcyBpbmNpZGVudCBpcyB0aGF0ICJtYXhfdmwiIGlz
-IHNldCBhcyAiaGVhZGVyLT52bCINCj4gPiBvbmx5IG9uIHdhcm5pbmcgY2FzZSBpbiBzdmVfaW5p
-dF9oZWFkZXJfZnJvbV90YXNrKCkuDQo+ID4gIm1heF92bCIgc2hvdWxkIGJlIHNldCB1cCBhbHNv
-IG9uIG5vcm1hbCBjYXNlLCBsaWtlIHRoZSBmb2xsb3dpbmcgcGF0Y2guDQo+ID4NCj4gPg0KPiA+
-IC0tLSBhL2FyY2gvYXJtNjQva2VybmVsL3B0cmFjZS5jDQo+ID4gKysrIGIvYXJjaC9hcm02NC9r
-ZXJuZWwvcHRyYWNlLmMNCj4gPiBAQCAtNzU1LDYgKzc1NSw4IEBAIHN0YXRpYyB2b2lkIHN2ZV9p
-bml0X2hlYWRlcl9mcm9tX3Rhc2soc3RydWN0DQo+IHVzZXJfc3ZlX2hlYWRlciAqaGVhZGVyLA0K
-PiA+DQo+ID4gICAgICAgICBpZiAoV0FSTl9PTighc3ZlX3ZsX3ZhbGlkKHN2ZV9tYXhfdmwpKSkN
-Cj4gPiAgICAgICAgICAgICAgICAgaGVhZGVyLT5tYXhfdmwgPSBoZWFkZXItPnZsOw0KPiA+ICsg
-ICAgICAgZWxzZQ0KPiA+ICsgICAgICAgICAgICAgICBoZWFkZXItPm1heF92bCA9IHN2ZV9tYXhf
-dmw7DQo+ID4NCj4gPiAgICAgICAgIGhlYWRlci0+c2l6ZSA9IFNWRV9QVF9TSVpFKHZxLCBoZWFk
-ZXItPmZsYWdzKTsNCj4gPiAgICAgICAgIGhlYWRlci0+bWF4X3NpemUgPQ0KPiBTVkVfUFRfU0la
-RShzdmVfdnFfZnJvbV92bChoZWFkZXItPm1heF92bCksDQo+IA0KPiBIaSwgdGhhbmtzIGZvciBy
-ZXBvcnRpbmcgdGhpcy4NCj4gDQo+IEl0IGxvb2tzIGxpa2UgYSByZWZhY3RvcmluZyBtaXN0YWtl
-IEkgbWFkZSB3aGlsZSByZW1vdmluZyBCVUdfT04oKXMsDQo+IHdoaWNoIEkgbWlzc2VkIGluIG15
-IHRlc3RpbmcuDQo+IA0KPiBZb3VyIGZpeCBsb29rcyBjb3JyZWN0IGFuZCBzZWVtcyB0byB3b3Jr
-LiAgRm9yIHN0eWxpc3RpYyByZWFzb25zLCBJIG1heQ0KPiB3cml0ZSBpdCBsaWtlIHRoaXMgaW5z
-dGVhZCwgYnV0IHRoZSBlZmZlY3Qgc2hvdWxkIGJlIHRoZSBzYW1lOg0KPiANCj4gCWhlYWRlci0+
-bWF4X3ZsID0gc3ZlX21heF92bDsNCj4gCWlmIChXQVJOX09OKCFzdmVfdmxfdmFsaWQoc3ZlX21h
-eF92bCkpDQo+IAkJaGVhZGVyLT5tYXhfdmwgPSBoZWFkZXItPnZsOw0KPiANCj4gQ2hlZXJzDQo+
-IC0tLURhdmUNCj4gDQo+ID4NCj4gPg0KPiA+IEJlc3QgcmVnYXJkcywNCj4gPiBUYWtheXVraSBP
-a2Ftb3RvDQo+ID4NCj4gPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+IEZyb206IGdk
-Yi1vd25lckBzb3VyY2V3YXJlLm9yZyBbbWFpbHRvOmdkYi1vd25lckBzb3VyY2V3YXJlLm9yZ10g
-T24NCj4gQmVoYWxmIE9mIERhdmUgTWFydGluDQo+ID4gU2VudDogRnJpZGF5LCBTZXB0ZW1iZXIg
-MSwgMjAxNyAyOjAxIEFNDQo+ID4gVG86IGxpbnV4LWFybS1rZXJuZWxAbGlzdHMuaW5mcmFkZWFk
-Lm9yZw0KPiA+IENjOiBDYXRhbGluIE1hcmluYXMgPGNhdGFsaW4ubWFyaW5hc0Bhcm0uY29tPjsg
-V2lsbCBEZWFjb24NCj4gPHdpbGwuZGVhY29uQGFybS5jb20+OyBBcmQgQmllc2hldXZlbCA8YXJk
-LmJpZXNoZXV2ZWxAbGluYXJvLm9yZz47IEFsZXgNCj4gQmVubqimZSA8YWxleC5iZW5uZWVAbGlu
-YXJvLm9yZz47IFN6YWJvbGNzIE5hZ3kgPHN6YWJvbGNzLm5hZ3lAYXJtLmNvbT47DQo+IFJpY2hh
-cmQgU2FuZGlmb3JkIDxyaWNoYXJkLnNhbmRpZm9yZEBhcm0uY29tPjsNCj4ga3ZtYXJtQGxpc3Rz
-LmNzLmNvbHVtYmlhLmVkdTsgbGliYy1hbHBoYUBzb3VyY2V3YXJlLm9yZzsNCj4gbGludXgtYXJj
-aEB2Z2VyLmtlcm5lbC5vcmc7IGdkYkBzb3VyY2V3YXJlLm9yZzsgQWxhbiBIYXl3YXJkDQo+IDxh
-bGFuLmhheXdhcmRAYXJtLmNvbT47IFlhbyBRaSA8WWFvLlFpQGFybS5jb20+OyBPbGVnIE5lc3Rl
-cm92DQo+IDxvbGVnQHJlZGhhdC5jb20+OyBBbGV4YW5kZXIgVmlybyA8dmlyb0B6ZW5pdi5saW51
-eC5vcmcudWs+DQo+ID4gU3ViamVjdDogW1BBVENIIHYyIDE5LzI4XSBhcm02NC9zdmU6IHB0cmFj
-ZSBhbmQgRUxGIGNvcmVkdW1wIHN1cHBvcnQNCj4gPg0KPiANCj4gWy4uLl0NCj4gDQo+ID4gQEAg
-LTcwMiw2ICs3MzcsMjEwIEBAIHN0YXRpYyBpbnQgc3lzdGVtX2NhbGxfc2V0KHN0cnVjdCB0YXNr
-X3N0cnVjdA0KPiAqdGFyZ2V0LA0KPiA+ICAJcmV0dXJuIHJldDsNCj4gPiAgfQ0KPiA+DQo+ID4g
-KyNpZmRlZiBDT05GSUdfQVJNNjRfU1ZFDQo+ID4gKw0KPiA+ICtzdGF0aWMgdm9pZCBzdmVfaW5p
-dF9oZWFkZXJfZnJvbV90YXNrKHN0cnVjdCB1c2VyX3N2ZV9oZWFkZXIgKmhlYWRlciwNCj4gPiAr
-CQkJCSAgICAgIHN0cnVjdCB0YXNrX3N0cnVjdCAqdGFyZ2V0KQ0KPiA+ICt7DQo+ID4gKwl1bnNp
-Z25lZCBpbnQgdnE7DQo+ID4gKw0KPiA+ICsJbWVtc2V0KGhlYWRlciwgMCwgc2l6ZW9mKCpoZWFk
-ZXIpKTsNCj4gPiArDQo+ID4gKwloZWFkZXItPmZsYWdzID0gdGVzdF90c2tfdGhyZWFkX2ZsYWco
-dGFyZ2V0LCBUSUZfU1ZFKSA/DQo+ID4gKwkJU1ZFX1BUX1JFR1NfU1ZFIDogU1ZFX1BUX1JFR1Nf
-RlBTSU1EOw0KPiA+ICsJaWYgKHRlc3RfdHNrX3RocmVhZF9mbGFnKHRhcmdldCwgVElGX1NWRV9W
-TF9JTkhFUklUKSkNCj4gPiArCQloZWFkZXItPmZsYWdzIHw9IFNWRV9QVF9WTF9JTkhFUklUOw0K
-PiA+ICsNCj4gPiArCWhlYWRlci0+dmwgPSB0YXJnZXQtPnRocmVhZC5zdmVfdmw7DQo+ID4gKwl2
-cSA9IHN2ZV92cV9mcm9tX3ZsKGhlYWRlci0+dmwpOw0KPiA+ICsNCj4gPiArCWlmIChXQVJOX09O
-KCFzdmVfdmxfdmFsaWQoc3ZlX21heF92bCkpKQ0KPiA+ICsJCWhlYWRlci0+bWF4X3ZsID0gaGVh
-ZGVyLT52bDsNCj4gPiArDQo+ID4gKwloZWFkZXItPnNpemUgPSBTVkVfUFRfU0laRSh2cSwgaGVh
-ZGVyLT5mbGFncyk7DQo+ID4gKwloZWFkZXItPm1heF9zaXplID0gU1ZFX1BUX1NJWkUoc3ZlX3Zx
-X2Zyb21fdmwoaGVhZGVyLT5tYXhfdmwpLA0KPiA+ICsJCQkJICAgICAgU1ZFX1BUX1JFR1NfU1ZF
-KTsNCj4gPiArfQ0KPiANCj4gWy4uLl0NCj4gDQo+IF9fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fDQo+IGxpbnV4LWFybS1rZXJuZWwgbWFpbGluZyBsaXN0DQo+
-IGxpbnV4LWFybS1rZXJuZWxAbGlzdHMuaW5mcmFkZWFkLm9yZw0KPiBodHRwOi8vbGlzdHMuaW5m
-cmFkZWFkLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2xpbnV4LWFybS1rZXJuZWwNCg0KX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlz
-dAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEu
-ZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+In VHE mode, host kernel runs in the EL2 and can enable
+'User Access Override' when fs==KERNEL_DS so that it can
+access kernel memory. However, PSTATE.UAO is set to 0 on
+an exception taken from EL1 to EL2. Thus when VHE is used
+and exception taken from a guest UAO will be disabled and
+host will use the incorrect PSTATE.UAO. So check and reset
+the PSTATE.UAO when switching to host.
+
+Move the reset PSTATE.PAN on entry to EL2 together with
+PSTATE.UAO reset.
+
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+Signed-off-by: Haibin Zhang <zhanghaibin7@huawei.com>
+Tested-by: Dongjiu Geng <gengdongjiu@huawei.com>
+---
+ arch/arm64/kvm/hyp/entry.S  |  2 --
+ arch/arm64/kvm/hyp/switch.c | 12 ++++++++++++
+ 2 files changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+index 12ee62d..7662ef5 100644
+--- a/arch/arm64/kvm/hyp/entry.S
++++ b/arch/arm64/kvm/hyp/entry.S
+@@ -96,8 +96,6 @@ ENTRY(__guest_exit)
+ 
+ 	add	x1, x1, #VCPU_CONTEXT
+ 
+-	ALTERNATIVE(nop, SET_PSTATE_PAN(1), ARM64_HAS_PAN, CONFIG_ARM64_PAN)
+-
+ 	// Store the guest regs x2 and x3
+ 	stp	x2, x3,   [x1, #CPU_XREG_OFFSET(2)]
+ 
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index a733461..715b3941 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -22,6 +22,7 @@
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_hyp.h>
+ #include <asm/fpsimd.h>
++#include <asm/exec.h>
+ 
+ static bool __hyp_text __fpsimd_enabled_nvhe(void)
+ {
+@@ -399,6 +400,17 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 
+ 	__sysreg_restore_host_state(host_ctxt);
+ 
++	if (has_vhe()) {
++		/*
++		 * PSTATE was not saved over guest enter/exit, re-enable
++		 * any detecte features that might not have been set
++		 * correctly.
++		 */
++		uao_thread_switch(current);
++		asm(ALTERNATIVE("nop", SET_PSTATE_PAN(1),
++			ARM64_HAS_PAN, CONFIG_ARM64_PAN));
++	}
++
+ 	if (fp_enabled) {
+ 		__fpsimd_save_state(&guest_ctxt->gp_regs.fp_regs);
+ 		__fpsimd_restore_state(&host_ctxt->gp_regs.fp_regs);
+-- 
+1.8.3.1
