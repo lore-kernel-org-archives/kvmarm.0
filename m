@@ -1,79 +1,66 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] arm64: KVM: VHE: reset PSTATE.UAO when switch to host
-Date: Thu, 7 Sep 2017 16:23:30 +0100
-Message-ID: <d01b49a2-e204-73af-23e3-5fd7f7202859@arm.com>
-References: <0184EA26B2509940AA629AE1405DD7F2015EF473@DGGEMA503-MBX.china.huawei.com>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v6 6/7] KVM: arm64: allow get exception information from
+ userspace
+Date: Thu, 07 Sep 2017 17:30:48 +0100
+Message-ID: <59B17438.5070501@arm.com>
+References: <1503916701-13516-1-git-send-email-gengdongjiu@huawei.com> <1503916701-13516-7-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <0184EA26B2509940AA629AE1405DD7F2015EF473@DGGEMA503-MBX.china.huawei.com>
-Content-Language: en-GB
-Sender: linux-kernel-owner@vger.kernel.org
-To: gengdongjiu <gengdongjiu@huawei.com>, James Morse <james.morse@arm.com>
-Cc: "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "vladimir.murzin@arm.com" <vladimir.murzin@arm.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "shankerd@codeaurora.org" <shankerd@codeaurora.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Zhanghaibin (Euler)" <zhanghaibin7@huawei.com>, Huangshaoyu <huangshaoyu@huawei.com>
+Return-path: <linux-acpi-owner@vger.kernel.org>
+In-Reply-To: <1503916701-13516-7-git-send-email-gengdongjiu@huawei.com>
+Sender: linux-acpi-owner@vger.kernel.org
+To: Dongjiu Geng <gengdongjiu@huawei.com>
+Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, lenb@kernel.org, robert.moore@intel.com, lv.zheng@intel.com, mark.rutland@arm.com, xiexiuqi@huawei.com, cov@codeaurora.org, david.daney@cavium.com, suzuki.poulose@arm.com, stefan@hello-penguin.com, Dave.Martin@arm.com, kristina.martsenko@arm.com, wangkefeng.wang@huawei.com, tbaicar@codeaurora.org, ard.biesheuvel@linaro.org, mingo@kernel.org, bp@suse.de, shiju.jose@huawei.com, zjzhang@codeaurora.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, devel@acpica.org, mst@redhat.com, john.garry@huawei.com, jonathan.cameron@huawei.com, shameerali.kolot
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 07/09/17 16:03, gengdongjiu wrote:
->> On 07/09/17 12:49, gengdongjiu wrote:
->>>
->>>
->>> On 2017/9/7 18:13, Marc Zyngier wrote:
->>>> On 07/09/17 11:05, gengdongjiu wrote:
->>>>> Hi James,
->>>>>
->>>>> On 2017/9/7 17:20, James Morse wrote:
->>>>>> Hi Dongjiu Geng,
->>>>>>
->>>>>> On 07/09/17 06:54, Dongjiu Geng wrote:
->>>>>>> In VHE mode, host kernel runs in the EL2 and can enable 'User
->>>>>>> Access Override' when fs==KERNEL_DS so that it can access kernel
->>>>>>> memory. However, PSTATE.UAO is set to 0 on an exception taken from
->>>>>>> EL1 to EL2. Thus when VHE is used and exception taken from a guest
->>>>>>> UAO will be disabled and host will use the incorrect PSTATE.UAO.
->>>>>>> So check and reset the PSTATE.UAO when switching to host.
->>>>>>
->>>>>> This would only be a problem if KVM were calling into world-switch
->>>>>> with fs==KERNEL_DS. I can't see where this happens.
->>>>>  Not only KVM, may also kernel sets the fs == KERNEL_DS before
->>>>> calling into world-switch
->>>>
->>>> How? Please describe the exact sequence of event that lead to this
->>>> situation with the current code base.
->>>
->>> Hi Marc,
->>>
->>>    Different tasks have different fs, such as USER_DS or KERNEL_DS. In
->>> the context switch, it will restore the task's fs. Thus, that depends
->>> on task itself, as shown below code. UAO is different with PAN, PAN will be always enabled if hardware CPU supports PAN feature, but
->> UAO is dynamical change.
->>
->> You haven't answered my question: There is exactly one point where we enter the world-switch. Show me that, at this point, PSTATE.UAO
->> *before* the call is different from PSTATE.UAO after the call. Give me the exact sequence of event that leads to this situation. Show me a
->> stack trace.
-> 
-> Hi Marc,
-> 
-> If using current mainline KVM code + Qemu and modify nothing, may not
-> exist broken issue,  because the Qemu progress FS should be USER_DS.
+Hi Dongjiu Geng,
 
-Thanks. You've just been wasting everybody's time for two days. In case
-you haven't noticed, mainline KVM code is the *ONLY* thing we care about.
+On 28/08/17 11:38, Dongjiu Geng wrote:
+> when userspace gets SIGBUS signal, it does not know whether
+> this is a synchronous external abort or SError,
 
-> But if I make a modification for user space( Qemu or KVM tools) to
-> change its FS property to KERNEL_DS or use third party application
-> with KERNEL_DS FS to run the guest, it will have problem(the
-> KERNEL_DS is cleared). If you think my case is reasonable and should
-> support, I can show you the calling stack trace. If you think, my
-> case is not reasonable and KVM should not support the application
-> with KERNEL_DS fs to run guest. You can ignore this patch, thanks.
+Why would Qemu/kvmtool need to know if the original notification (if there was
+one) was synchronous or asynchronous? This is between firmware and the kernel.
 
-I really cannot think of a good reason why we'd want to do that. Playing
-with set_fs() is almost universally wrong, and I'm certainly going to
-oppose to any change in that area unless the code that calls set_fs()
-has been made public and properly reviewed. Until then, UAO/PAN will
-stay as they are unless you prove that our current code is wrong.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+I think I can see why you need this: to choose whether to emulate SEA or SEI,
+but what if the guest wasn't running? Or the guest was running, but it wasn't
+guest-memory that is affected.
+
+What happens if the dram-scrub hardware spots an error in guest memory, but the
+guest wasn't running? KVM won't have a relevant ESR value to give you.
+
+What happens if we start swapping a page of guest memory to disk, and discover
+the memory is corrupt. This is synchronous, but it wasn't the guest, and KVM
+still can't give you an ESR.
+
+What about CPER records discovered through the polled interface? What happens if
+I write a PFN into the corrupt-pfn sysfs interface?
+
+
+I think what you need is some way of knowing if the BUS_MCEERR_A* was directly
+caused by a user-space (or guest) access, and if so was it a data or instruction
+fetch. These can become SEA notifications.
+
+KVM's user-space shouldn't be a special-case where the kernel behaves
+differently: if we tinker with this it needs to make sense for all user space
+processes and mean something on all architectures.
+
+I think this information could be useful to other users of these signals, e.g. a
+JVM could silently regenerate/reload code/data for a non-direct-access fault
+instead of exit-ing (or throwing an exception) for a direct access.
+
+For BUS_MCEERR_A* from memory_failure() we can't know if they are caused by an
+access or not. When the mm code gets -EHWPOISON when trying to resolve a
+user-space fault we know it was due to a direct-access. (I don't know if/how x86
+can know if it was code or data). Faulting guest accesses through KVM are just a
+special version of this where KVM fixes-up stage2.
+
+... but for any of this to work we need the address of the corrupt memory.
+(-> cover letter)
+
+
+Thanks,
+
+James
