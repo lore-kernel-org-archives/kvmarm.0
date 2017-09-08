@@ -1,58 +1,129 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: =?UTF-8?Q?Re=3A_=E7=AD=94=E5=A4=8D=3A_=5BPATCH_v6_4=2F7=5D_arm64=3A_kvm=3A_support_user_?=
- =?UTF-8?Q?space_to_query_RAS_extension_feature?=
-Date: Fri, 8 Sep 2017 16:03:21 +0100
-Message-ID: <CAFEAcA8tXV31RTa+RCkkNFyR2t1dTwR5kYXUmBXMj9wkeLWCpg@mail.gmail.com>
-References: <1503916701-13516-1-git-send-email-gengdongjiu@huawei.com>
- <1503916701-13516-5-git-send-email-gengdongjiu@huawei.com>
- <59A84F9D.8030309@arm.com> <29951852-8d91-7c33-c68b-ad8b4bbdea54@huawei.com>
- <59B1747A.5030909@arm.com>
- <0184EA26B2509940AA629AE1405DD7F2015F5A1C@DGGEMA503-MBX.china.huawei.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH v3 4/5] KVM: arm/arm64: Support VGIC dist pend/active
+ changes for mapped IRQs
+Date: Fri, 8 Sep 2017 18:05:58 +0200
+Message-ID: <CAMJs5B89AsrDMhuNjC7La2ZP+ndiAWhY=7nqTbq1v6mp7=BDqA@mail.gmail.com>
+References: <20170906122612.18050-1-cdall@linaro.org> <20170906122612.18050-5-cdall@linaro.org>
+ <d51a40df-92f9-eeff-0d16-ea12fd451dea@redhat.com> <2e1352d7-fb64-907d-7726-4d53d7af5768@arm.com>
+ <5579210b-9b62-b33d-ac36-df3cb835c1e7@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7618749C61
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Sep 2017 11:01:19 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GasSz2IfavaC for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Sep 2017 11:01:13 -0400 (EDT)
-Received: from mail-wm0-f46.google.com (mail-wm0-f46.google.com [74.125.82.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6F8BD49C41
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Sep 2017 11:01:13 -0400 (EDT)
-Received: by mail-wm0-f46.google.com with SMTP id 137so6751300wmj.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Sep 2017 08:03:43 -0700 (PDT)
-In-Reply-To: <0184EA26B2509940AA629AE1405DD7F2015F5A1C@DGGEMA503-MBX.china.huawei.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: gengdongjiu <gengdongjiu@huawei.com>
-Cc: "Wangkefeng (Kevin)" <wangkefeng.wang@huawei.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "david.daney@cavium.com" <david.daney@cavium.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "tbaicar@codeaurora.org" <tbaicar@codeaurora.org>, "will.deacon@arm.com" <will.deacon@arm.com>, Linuxarm <linuxarm@huawei.com>, "robert.moore@intel.com" <robert.moore@intel.com>, "lv.zheng@intel.com" <lv.zheng@intel.com>, "zjzhang@codeaurora.org" <zjzhang@codeaurora.org>, "mingo@kernel.org" <mingo@kernel.org>, "stefan@hello-penguin.com" <stefan@hello-penguin.com>, "mst@redhat.com" <mst@redhat.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>, Huangshaoyu <huangshaoyu@huawei.com>, huangdaode <huangdaode@hisilicon.com>, "bp@suse.de" <bp@suse.de>
+Content-Type: text/plain; charset="UTF-8"
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <5579210b-9b62-b33d-ac36-df3cb835c1e7@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Andre Przywara <andre.przywara@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 8 September 2017 at 15:34, gengdongjiu <gengdongjiu@huawei.com> wrote:
-> Hi Peter/ shenglong,
->    What is your idea about it? We may need to consult with you about it.
+On Fri, Sep 8, 2017 at 4:27 PM, Auger Eric <eric.auger@redhat.com> wrote:
+> Hi Marc,
+>
+> On 08/09/2017 15:32, Marc Zyngier wrote:
+>> On 08/09/17 14:04, Auger Eric wrote:
+>>> Hi Christoffer,
+>>>
+>>> On 06/09/2017 14:26, Christoffer Dall wrote:
+>>>> For mapped IRQs (with the HW bit set in the LR) we have to follow some
+>>>> rules of the architecture.  One of these rules is that VM must not be
+>>>> allowed to deactivate a virtual interrupt with the HW bit set unless the
+>>>> physical interrupt is also active.
+>>>>
+>>>> This works fine when injecting mapped interrupts, because we leave it up
+>>>> to the injector to either set EOImode==1 or manually set the active
+>>>> state of the physical interrupt.
+>>>>
+>>>> However, the guest can set virtual interrupt to be pending or active by
+>>>> writing to the virtual distributor, which could lead to deactivating a
+>>>> virtual interrupt with the HW bit set without the physical interrupt
+>>>> being active.
+>>>>
+>>>> We could set the physical interrupt to active whenever we are about to
+>>>> enter the VM with a HW interrupt either pending or active, but that
+>>>> would be really slow, especially on GICv2.  So we take the long way
+>>>> around and do the hard work when needed, which is expected to be
+>>>> extremely rare.
+>>>>
+>>>> When the VM sets the pending state for a HW interrupt on the virtual
+>>>> distributor we set the active state on the physical distributor, because
+>>>> the virtual interrupt can become active and then the guest can
+>>>> deactivate it.
+>>>>
+>>>> When the VM clears the pending state we also clear it on the physical
+>>>> side, because the injector might otherwise raise the interrupt.
+>>>>
+>>>> Signed-off-by: Christoffer Dall <cdall@linaro.org>
+>>>> ---
+>>>>  virt/kvm/arm/vgic/vgic-mmio.c | 33 +++++++++++++++++++++++++++++++++
+>>>>  virt/kvm/arm/vgic/vgic.c      |  7 +++++++
+>>>>  virt/kvm/arm/vgic/vgic.h      |  1 +
+>>>>  3 files changed, 41 insertions(+)
+>>>>
+>>>> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+>>>> index c1e4bdd..00003ae 100644
+>>>> --- a/virt/kvm/arm/vgic/vgic-mmio.c
+>>>> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+>>>> @@ -131,6 +131,9 @@ void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
+>>>>             struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+>>>>
+>>>>             spin_lock(&irq->irq_lock);
+>>>> +           if (irq->hw)
+>>>> +                   vgic_irq_set_phys_active(irq, true);
+>>>> +
+>>>>             irq->pending_latch = true;
+>>>>
+>>>>             vgic_queue_irq_unlock(vcpu->kvm, irq);
+>>>> @@ -149,6 +152,20 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
+>>>>             struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+>>>>
+>>>>             spin_lock(&irq->irq_lock);
+>>>> +           /*
+>>>> +            * We don't want the guest to effectively mask the physical
+>>>> +            * interrupt by doing a write to SPENDR followed by a write to
+>>>> +            * CPENDR for HW interrupts, so we clear the active state on
+>>>> +            * the physical side here.  This may lead to taking an
+>>>> +            * additional interrupt on the host, but that should not be a
+>>>> +            * problem as the worst that can happen is an additional vgic
+>>>> +            * injection.  We also clear the pending state to maintain
+>>>> +            * proper semantics for edge HW interrupts.
+>>>> +            */
+>>>> +           if (irq->hw) {
+>>>> +                   vgic_irq_set_phys_pending(irq, false);
+>>>> +                   vgic_irq_set_phys_active(irq, false);
+>>> I fail in understanding why the active state is reset here. Can you
+>>> provide an example?
+>>
+>>
+>> If we're clearing the pending state on the virtual side, we need to be
+>> able to let an incoming physical interrupt fire so that it can be made
+>> pending again. We may have to check that the virtual active state is
+>> clear though.
+>>
+>>> If the physical dist has an active state can't the virtual IRQ be in
+>>> active state, in which case you may later on deactivate a phys IRQ which
+>>> is not active?
+>>
+>>
+>> Well, I think we must be able to handle both cases:
+>>
+>> - CPENDR write:
+>>       clear physical pending
+>>       if (virtual active clear)
+>>               clear physical active
+>>
+>> - CACTIVER write:
+>>       clear physical active
+>>
+>> Does this work for you?
+>
+> yes it does with that change!
+>
+I agree, I should fix that.
 
-I agree with what I take to be James' general point that we
-should be careful to distinguish "KVM supports API A to
-do a particular operation on the guest" and "KVM supports API
-B to tell QEMU about certain events" and so on, and not just
-lump these all together under "host CPU supports RAS and
-so we turn all these on together and expose RAS to the guest
-regardless". I don't know enough about the details of RAS
-to be more specific than that general point of view.
+But then I wondered, are we properly handling PPIs for
+setting/clearing the pending state?  Don't we actually need to do
+something similar like the active cpu where we check the requester CPU
+and make sure we're not fiddling with some random hardware state when
+accessed by userspace?
 
-PS: your mail client doesn't seem to be doing the right
-thing with wrapping long lines :-(
-
-thanks
--- PMM
+Thanks,
+-Christoffer
