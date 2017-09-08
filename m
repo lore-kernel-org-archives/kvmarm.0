@@ -1,42 +1,147 @@
-From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: Re: [PATCH] arm64: KVM: VHE: reset PSTATE.UAO when switch to host
-Date: Fri, 8 Sep 2017 13:33:06 +0000
-Message-ID: <0184EA26B2509940AA629AE1405DD7F2015F55E9@DGGEMA503-MBX.china.huawei.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v3 4/5] KVM: arm/arm64: Support VGIC dist pend/active
+ changes for mapped IRQs
+Date: Fri, 8 Sep 2017 16:27:47 +0200
+Message-ID: <5579210b-9b62-b33d-ac36-df3cb835c1e7@redhat.com>
+References: <20170906122612.18050-1-cdall@linaro.org>
+ <20170906122612.18050-5-cdall@linaro.org>
+ <d51a40df-92f9-eeff-0d16-ea12fd451dea@redhat.com>
+ <2e1352d7-fb64-907d-7726-4d53d7af5768@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Language: zh-CN
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: James Morse <james.morse@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "vladimir.murzin@arm.com" <vladimir.murzin@arm.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "shankerd@codeaurora.org" <shankerd@codeaurora.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Zhanghaibin (Euler)" <zhanghaibin7@huawei.com>, Huangshaoyu <huangshaoyu@huawei.com>
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 888AA49C5E
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Sep 2017 10:25:28 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id I8e9g0rjsYrI for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Sep 2017 10:25:22 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7ADA249C2B
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Sep 2017 10:25:22 -0400 (EDT)
+In-Reply-To: <2e1352d7-fb64-907d-7726-4d53d7af5768@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu
+Cc: Andre Przywara <andre.przywara@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi Marc,
 
+On 08/09/2017 15:32, Marc Zyngier wrote:
+> On 08/09/17 14:04, Auger Eric wrote:
+>> Hi Christoffer,
+>>
+>> On 06/09/2017 14:26, Christoffer Dall wrote:
+>>> For mapped IRQs (with the HW bit set in the LR) we have to follow some
+>>> rules of the architecture.  One of these rules is that VM must not be
+>>> allowed to deactivate a virtual interrupt with the HW bit set unless the
+>>> physical interrupt is also active.
+>>>
+>>> This works fine when injecting mapped interrupts, because we leave it up
+>>> to the injector to either set EOImode==1 or manually set the active
+>>> state of the physical interrupt.
+>>>
+>>> However, the guest can set virtual interrupt to be pending or active by
+>>> writing to the virtual distributor, which could lead to deactivating a
+>>> virtual interrupt with the HW bit set without the physical interrupt
+>>> being active.
+>>>
+>>> We could set the physical interrupt to active whenever we are about to
+>>> enter the VM with a HW interrupt either pending or active, but that
+>>> would be really slow, especially on GICv2.  So we take the long way
+>>> around and do the hard work when needed, which is expected to be
+>>> extremely rare.
+>>>
+>>> When the VM sets the pending state for a HW interrupt on the virtual
+>>> distributor we set the active state on the physical distributor, because
+>>> the virtual interrupt can become active and then the guest can
+>>> deactivate it.
+>>>
+>>> When the VM clears the pending state we also clear it on the physical
+>>> side, because the injector might otherwise raise the interrupt.
+>>>
+>>> Signed-off-by: Christoffer Dall <cdall@linaro.org>
+>>> ---
+>>>  virt/kvm/arm/vgic/vgic-mmio.c | 33 +++++++++++++++++++++++++++++++++
+>>>  virt/kvm/arm/vgic/vgic.c      |  7 +++++++
+>>>  virt/kvm/arm/vgic/vgic.h      |  1 +
+>>>  3 files changed, 41 insertions(+)
+>>>
+>>> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+>>> index c1e4bdd..00003ae 100644
+>>> --- a/virt/kvm/arm/vgic/vgic-mmio.c
+>>> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+>>> @@ -131,6 +131,9 @@ void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
+>>>  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+>>>  
+>>>  		spin_lock(&irq->irq_lock);
+>>> +		if (irq->hw)
+>>> +			vgic_irq_set_phys_active(irq, true);
+>>> +
+>>>  		irq->pending_latch = true;
+>>>  
+>>>  		vgic_queue_irq_unlock(vcpu->kvm, irq);
+>>> @@ -149,6 +152,20 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
+>>>  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+>>>  
+>>>  		spin_lock(&irq->irq_lock);
+>>> +		/*
+>>> +		 * We don't want the guest to effectively mask the physical
+>>> +		 * interrupt by doing a write to SPENDR followed by a write to
+>>> +		 * CPENDR for HW interrupts, so we clear the active state on
+>>> +		 * the physical side here.  This may lead to taking an
+>>> +		 * additional interrupt on the host, but that should not be a
+>>> +		 * problem as the worst that can happen is an additional vgic
+>>> +		 * injection.  We also clear the pending state to maintain
+>>> +		 * proper semantics for edge HW interrupts.
+>>> +		 */
+>>> +		if (irq->hw) {
+>>> +			vgic_irq_set_phys_pending(irq, false);
+>>> +			vgic_irq_set_phys_active(irq, false);
+>> I fail in understanding why the active state is reset here. Can you
+>> provide an example?
 > 
-> On 08/09/17 10:05, gengdongjiu wrote:
-> > Marc,
-> >    Thanks for reply.
-> >
-> > On 2017/9/8 16:21, Marc Zyngier wrote:
-> >>> Marc,
-> >>>
-> >>> sorry I have another question for the PAN.
-[...]
-> There cannot be any userspace mapping at EL2 when non-VHE, so there cannot be any valid PAN setting. I repeat: there is not such thing as
-> PAN at EL2 when HCR_EL2.E2H==0. This bit *has no effect*. Just read the documentation (ARM DDI 0487B.a, D4.4.2).
+> 
+> If we're clearing the pending state on the virtual side, we need to be
+> able to let an incoming physical interrupt fire so that it can be made
+> pending again. We may have to check that the virtual active state is
+> clear though.
+> 
+>> If the physical dist has an active state can't the virtual IRQ be in
+>> active state, in which case you may later on deactivate a phys IRQ which
+>> is not active?
+> 
+> 
+> Well, I think we must be able to handle both cases:
+> 
+> - CPENDR write:
+> 	clear physical pending
+> 	if (virtual active clear)
+> 		clear physical active
+> 
+> - CACTIVER write:
+> 	clear physical active
+> 
+> Does this work for you?
 
-Thanks Marc's comments, I completely agree with you, I understand the architecture, in non-VHE, user space mapping only exists at EL1 and pointed by the ttbr0_el1.
-In the EL1, it uses ttbr0_el1 to point userspace page table, uses ttbr1_el1 to point kernel mapping.
-In the EL2, it uses ttbr0_el2 or vttbr_el2 for address translation, cannot use the ttbr0_el1. 
+yes it does with that change!
+
+Thanks
+
+Eric
 
 > 
-> If you're going to change this kind of code, please start by understanding the architecture.
-
-OK, so I plant to remove the PAN setting at EL2 in non-VHE.
-
+> Thanks,
 > 
 > 	M.
-> --
-> Jazz is not dead. It just smells funny...
+> 
