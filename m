@@ -1,76 +1,154 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] arm64: KVM: VHE: reset PSTATE.UAO when switch to host
-Date: Fri, 8 Sep 2017 13:10:36 +0100
-Message-ID: <17a7c202-fd18-a74f-b20d-d6e65af00025@arm.com>
-References: <1504763684-30128-1-git-send-email-gengdongjiu@huawei.com>
- <1bcd0c1e-c3b5-aac4-bb4f-83ee14b1d1ab@huawei.com>
- <20170908092155.4d90862b@why.wild-wind.fr.eu.org>
- <8331df16-869c-9599-f559-fd284e571d9d@huawei.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v3 4/5] KVM: arm/arm64: Support VGIC dist pend/active
+ changes for mapped IRQs
+Date: Fri, 8 Sep 2017 15:04:33 +0200
+Message-ID: <d51a40df-92f9-eeff-0d16-ea12fd451dea@redhat.com>
+References: <20170906122612.18050-1-cdall@linaro.org>
+ <20170906122612.18050-5-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <8331df16-869c-9599-f559-fd284e571d9d@huawei.com>
-Content-Language: en-GB
+In-Reply-To: <20170906122612.18050-5-cdall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
-To: gengdongjiu <gengdongjiu@huawei.com>
-Cc: James Morse <james.morse@arm.com>, christoffer.dall@linaro.org, vladimir.murzin@arm.com, rkrcmar@redhat.com, catalin.marinas@arm.com, shankerd@codeaurora.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, zhanghaibin7@huawei.com, huangshaoyu@huawei.com
+To: Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, Marc Zyngier <marc.zyngier@arm.com>
+Cc: Andre Przywara <andre.przywara@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 08/09/17 10:05, gengdongjiu wrote:
-> Marc,
->    Thanks for reply.
-> 
-> On 2017/9/8 16:21, Marc Zyngier wrote:
->>> Marc,
->>>
->>> sorry I have another question for the PAN.
->>>
->>> In the non-VHE mode, The host kernel is running in the EL1. Before
->>> host kernel enter guest, host OS will call 'HVC' instruction to do
->>> the world-switch, and the pstate.PAN will be saved into the SPSR_EL2.
->>> When world-switch back to host kernel from EL2, it will call 'eret'
->>> instruction to EL1 host, this 'eret' instruction will restore the
->>> SPSR_EL2 to the PSTATE. so the PSTATE.PAN will be restored.
->>>
->>> For the Non-VHE mode, in the EL2 where mainly have word-switch code,
->>> do you think it needs to reset the PSTATE.PAN? From the spec, it does
->>> not provide SCTLR_EL2.SPAN bit for non-VHE mode, so reset the
->>> PSTATE.PAN does not sure whether it is needed or whether affects the
->>> performance. If you think it is needed for El2 in Non-VHE mode,
->>> moving the reset PSTATE.PAN to the exception entry to EL2 may be
->>> better, such as "el1_sync", because host can also call 'hvc'
->>> instruction without guest running.
->> So let's see if I correctly understand your question:
->>
->> You're worried that we don't set/reset PSTATE.PAN at EL2 in non-VHE?
->> In non-VHE, there is no user-space mapping that is present at the
->> same time as the hypervisor mappings. Actually, we hardly have any
->> mapping other than the HYP text/data and the vcpu/vm structures.
-> 
-> Not that meaning.
-> there are two meanings:
-> 
-> In short, we should not set PAN for El2 in non-VHE; If you think we should, current code does not cover all scenarios.
-> 
-> 
-> 1. In the current mainline code it sets the PSTATE.PAN at EL2 in non-VHE. As you said,
-> in non-VHE, there is no user-space mapping that is present at the same time as the
-> hypervisor mappings, so I think it may not need to set both for EL1 and El2 in non-VHE,
-> but current code sets it. As you see[1], the code does not check VHE.
-> 
-> 2. Conversely, in non-VHE, if you think we should set PAN in the EL2,
+Hi Christoffer,
 
-It is not about what I think. It is about what the architecture gives you.
+On 06/09/2017 14:26, Christoffer Dall wrote:
+> For mapped IRQs (with the HW bit set in the LR) we have to follow some
+> rules of the architecture.  One of these rules is that VM must not be
+> allowed to deactivate a virtual interrupt with the HW bit set unless the
+> physical interrupt is also active.
+> 
+> This works fine when injecting mapped interrupts, because we leave it up
+> to the injector to either set EOImode==1 or manually set the active
+> state of the physical interrupt.
+> 
+> However, the guest can set virtual interrupt to be pending or active by
+> writing to the virtual distributor, which could lead to deactivating a
+> virtual interrupt with the HW bit set without the physical interrupt
+> being active.
+> 
+> We could set the physical interrupt to active whenever we are about to
+> enter the VM with a HW interrupt either pending or active, but that
+> would be really slow, especially on GICv2.  So we take the long way
+> around and do the hard work when needed, which is expected to be
+> extremely rare.
+> 
+> When the VM sets the pending state for a HW interrupt on the virtual
+> distributor we set the active state on the physical distributor, because
+> the virtual interrupt can become active and then the guest can
+> deactivate it.
+> 
+> When the VM clears the pending state we also clear it on the physical
+> side, because the injector might otherwise raise the interrupt.
+> 
+> Signed-off-by: Christoffer Dall <cdall@linaro.org>
+> ---
+>  virt/kvm/arm/vgic/vgic-mmio.c | 33 +++++++++++++++++++++++++++++++++
+>  virt/kvm/arm/vgic/vgic.c      |  7 +++++++
+>  virt/kvm/arm/vgic/vgic.h      |  1 +
+>  3 files changed, 41 insertions(+)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+> index c1e4bdd..00003ae 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+> @@ -131,6 +131,9 @@ void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
+>  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+>  
+>  		spin_lock(&irq->irq_lock);
+> +		if (irq->hw)
+> +			vgic_irq_set_phys_active(irq, true);
+> +
+>  		irq->pending_latch = true;
+>  
+>  		vgic_queue_irq_unlock(vcpu->kvm, irq);
+> @@ -149,6 +152,20 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
+>  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+>  
+>  		spin_lock(&irq->irq_lock);
+> +		/*
+> +		 * We don't want the guest to effectively mask the physical
+> +		 * interrupt by doing a write to SPENDR followed by a write to
+> +		 * CPENDR for HW interrupts, so we clear the active state on
+> +		 * the physical side here.  This may lead to taking an
+> +		 * additional interrupt on the host, but that should not be a
+> +		 * problem as the worst that can happen is an additional vgic
+> +		 * injection.  We also clear the pending state to maintain
+> +		 * proper semantics for edge HW interrupts.
+> +		 */
+> +		if (irq->hw) {
+> +			vgic_irq_set_phys_pending(irq, false);
+> +			vgic_irq_set_phys_active(irq, false);
+I fail in understanding why the active state is reset here. Can you
+provide an example?
 
-There cannot be any userspace mapping at EL2 when non-VHE, so there
-cannot be any valid PAN setting. I repeat: there is not such thing as
-PAN at EL2 when HCR_EL2.E2H==0. This bit *has no effect*. Just read the
-documentation (ARM DDI 0487B.a, D4.4.2).
+If the physical dist has an active state can't the virtual IRQ be in
+active state, in which case you may later on deactivate a phys IRQ which
+is not active?
 
-If you're going to change this kind of code, please start by
-understanding the architecture.
+Thanks
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Eric
+> +		}
+>  
+>  		irq->pending_latch = false;
+>  
+> @@ -214,6 +231,22 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+>  	       irq->vcpu->cpu != -1) /* VCPU thread is running */
+>  		cond_resched_lock(&irq->irq_lock);
+>  
+> +	if (irq->hw) {
+> +		/*
+> +		 * We cannot support setting the physical active state for
+> +		 * private interrupts from another CPU than the one running
+> +		 * the VCPU which identifies which private interrupt it is
+> +		 * trying to modify.
+> +		 */
+> +		if (irq->intid < VGIC_NR_PRIVATE_IRQS &&
+> +		    irq->target_vcpu != requester_vcpu) {
+> +			spin_unlock(&irq->irq_lock);
+> +			return;
+> +		}
+> +
+> +		vgic_irq_set_phys_active(irq, new_active_state);
+> +	}
+> +
+>  	irq->active = new_active_state;
+>  	if (new_active_state)
+>  		vgic_queue_irq_unlock(vcpu->kvm, irq);
+> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> index 8072969..7aec730 100644
+> --- a/virt/kvm/arm/vgic/vgic.c
+> +++ b/virt/kvm/arm/vgic/vgic.c
+> @@ -140,6 +140,13 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
+>  	kfree(irq);
+>  }
+>  
+> +void vgic_irq_set_phys_pending(struct vgic_irq *irq, bool pending)
+> +{
+> +	WARN_ON(irq_set_irqchip_state(irq->host_irq,
+> +				      IRQCHIP_STATE_PENDING,
+> +				      pending));
+> +}
+> +
+>  /* Get the input level of a mapped IRQ directly from the physical GIC */
+>  bool vgic_get_phys_line_level(struct vgic_irq *irq)
+>  {
+> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+> index 7bdcda2..498ee05 100644
+> --- a/virt/kvm/arm/vgic/vgic.h
+> +++ b/virt/kvm/arm/vgic/vgic.h
+> @@ -146,6 +146,7 @@ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
+>  			      u32 intid);
+>  void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq);
+>  bool vgic_get_phys_line_level(struct vgic_irq *irq);
+> +void vgic_irq_set_phys_pending(struct vgic_irq *irq, bool pending);
+>  void vgic_irq_set_phys_active(struct vgic_irq *irq, bool active);
+>  bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq);
+>  void vgic_kick_vcpus(struct kvm *kvm);
+> 
