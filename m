@@ -1,154 +1,43 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v3 4/5] KVM: arm/arm64: Support VGIC dist pend/active
- changes for mapped IRQs
-Date: Fri, 8 Sep 2017 15:04:33 +0200
-Message-ID: <d51a40df-92f9-eeff-0d16-ea12fd451dea@redhat.com>
-References: <20170906122612.18050-1-cdall@linaro.org>
- <20170906122612.18050-5-cdall@linaro.org>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH v2 19/28] arm64/sve: ptrace and ELF coredump support
+Date: Fri, 8 Sep 2017 14:11:40 +0100
+Message-ID: <20170908131136.GG6321@e103592.cambridge.arm.com>
+References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com>
+ <1504198860-12951-20-git-send-email-Dave.Martin@arm.com>
+ <5FA513F682BE7F4EAAB8EE035D5B08E44109DFE8@G01JPEXMBKW02>
+ <20170906181634.GF6321@e103592.cambridge.arm.com>
+ <5FA513F682BE7F4EAAB8EE035D5B08E44109EBDF@G01JPEXMBKW02>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170906122612.18050-5-cdall@linaro.org>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, Marc Zyngier <marc.zyngier@arm.com>
-Cc: Andre Przywara <andre.przywara@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-arch-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <5FA513F682BE7F4EAAB8EE035D5B08E44109EBDF@G01JPEXMBKW02>
+Sender: linux-arch-owner@vger.kernel.org
+To: "Okamoto, Takayuki" <tokamoto@jp.fujitsu.com>
+Cc: "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, "libc-alpha@sourceware.org" <libc-alpha@sourceware.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, "gdb@sourceware.org" <gdb@sourceware.org>, Yao Qi <Yao.Qi@arm.com>, Will Deacon <will.deacon@arm.com>, Oleg Nesterov <oleg@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Richard Sandiford <richard.sandiford@arm.com>, Alexander Viro <viro@zeniv.linux.org.uk>, Alan Hayward <alan.hayward@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
+On Thu, Sep 07, 2017 at 05:11:45AM +0000, Okamoto, Takayuki wrote:
+> Hi Dave,
+> 
+> Thank you for your reply.
+> 
+> > Your fix looks correct and seems to work.  For stylistic reasons, I may
+> > write it like this instead, but the effect should be the same:
+> > 
+> > 	header->max_vl = sve_max_vl;
+> > 	if (WARN_ON(!sve_vl_valid(sve_max_vl))
+> > 		header->max_vl = header->vl;
+> 
+> It is better than my fix.
+> Please, apply it at next version.
 
-On 06/09/2017 14:26, Christoffer Dall wrote:
-> For mapped IRQs (with the HW bit set in the LR) we have to follow some
-> rules of the architecture.  One of these rules is that VM must not be
-> allowed to deactivate a virtual interrupt with the HW bit set unless the
-> physical interrupt is also active.
-> 
-> This works fine when injecting mapped interrupts, because we leave it up
-> to the injector to either set EOImode==1 or manually set the active
-> state of the physical interrupt.
-> 
-> However, the guest can set virtual interrupt to be pending or active by
-> writing to the virtual distributor, which could lead to deactivating a
-> virtual interrupt with the HW bit set without the physical interrupt
-> being active.
-> 
-> We could set the physical interrupt to active whenever we are about to
-> enter the VM with a HW interrupt either pending or active, but that
-> would be really slow, especially on GICv2.  So we take the long way
-> around and do the hard work when needed, which is expected to be
-> extremely rare.
-> 
-> When the VM sets the pending state for a HW interrupt on the virtual
-> distributor we set the active state on the physical distributor, because
-> the virtual interrupt can become active and then the guest can
-> deactivate it.
-> 
-> When the VM clears the pending state we also clear it on the physical
-> side, because the injector might otherwise raise the interrupt.
-> 
-> Signed-off-by: Christoffer Dall <cdall@linaro.org>
-> ---
->  virt/kvm/arm/vgic/vgic-mmio.c | 33 +++++++++++++++++++++++++++++++++
->  virt/kvm/arm/vgic/vgic.c      |  7 +++++++
->  virt/kvm/arm/vgic/vgic.h      |  1 +
->  3 files changed, 41 insertions(+)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-> index c1e4bdd..00003ae 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
-> @@ -131,6 +131,9 @@ void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
->  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
->  
->  		spin_lock(&irq->irq_lock);
-> +		if (irq->hw)
-> +			vgic_irq_set_phys_active(irq, true);
-> +
->  		irq->pending_latch = true;
->  
->  		vgic_queue_irq_unlock(vcpu->kvm, irq);
-> @@ -149,6 +152,20 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
->  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
->  
->  		spin_lock(&irq->irq_lock);
-> +		/*
-> +		 * We don't want the guest to effectively mask the physical
-> +		 * interrupt by doing a write to SPENDR followed by a write to
-> +		 * CPENDR for HW interrupts, so we clear the active state on
-> +		 * the physical side here.  This may lead to taking an
-> +		 * additional interrupt on the host, but that should not be a
-> +		 * problem as the worst that can happen is an additional vgic
-> +		 * injection.  We also clear the pending state to maintain
-> +		 * proper semantics for edge HW interrupts.
-> +		 */
-> +		if (irq->hw) {
-> +			vgic_irq_set_phys_pending(irq, false);
-> +			vgic_irq_set_phys_active(irq, false);
-I fail in understanding why the active state is reset here. Can you
-provide an example?
+I've rebased to v4.13 and pushed a branch to track fixes against v2,
+here:
 
-If the physical dist has an active state can't the virtual IRQ be in
-active state, in which case you may later on deactivate a phys IRQ which
-is not active?
+ * http://linux-arm.org/git?p=linux-dm.git;a=shortlog;h=refs/heads/sve/v2%2Bfixes
 
-Thanks
+ * git://linux-arm.org/linux-dm.git sve/v2+fixes
 
-Eric
-> +		}
->  
->  		irq->pending_latch = false;
->  
-> @@ -214,6 +231,22 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
->  	       irq->vcpu->cpu != -1) /* VCPU thread is running */
->  		cond_resched_lock(&irq->irq_lock);
->  
-> +	if (irq->hw) {
-> +		/*
-> +		 * We cannot support setting the physical active state for
-> +		 * private interrupts from another CPU than the one running
-> +		 * the VCPU which identifies which private interrupt it is
-> +		 * trying to modify.
-> +		 */
-> +		if (irq->intid < VGIC_NR_PRIVATE_IRQS &&
-> +		    irq->target_vcpu != requester_vcpu) {
-> +			spin_unlock(&irq->irq_lock);
-> +			return;
-> +		}
-> +
-> +		vgic_irq_set_phys_active(irq, new_active_state);
-> +	}
-> +
->  	irq->active = new_active_state;
->  	if (new_active_state)
->  		vgic_queue_irq_unlock(vcpu->kvm, irq);
-> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> index 8072969..7aec730 100644
-> --- a/virt/kvm/arm/vgic/vgic.c
-> +++ b/virt/kvm/arm/vgic/vgic.c
-> @@ -140,6 +140,13 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
->  	kfree(irq);
->  }
->  
-> +void vgic_irq_set_phys_pending(struct vgic_irq *irq, bool pending)
-> +{
-> +	WARN_ON(irq_set_irqchip_state(irq->host_irq,
-> +				      IRQCHIP_STATE_PENDING,
-> +				      pending));
-> +}
-> +
->  /* Get the input level of a mapped IRQ directly from the physical GIC */
->  bool vgic_get_phys_line_level(struct vgic_irq *irq)
->  {
-> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-> index 7bdcda2..498ee05 100644
-> --- a/virt/kvm/arm/vgic/vgic.h
-> +++ b/virt/kvm/arm/vgic/vgic.h
-> @@ -146,6 +146,7 @@ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
->  			      u32 intid);
->  void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq);
->  bool vgic_get_phys_line_level(struct vgic_irq *irq);
-> +void vgic_irq_set_phys_pending(struct vgic_irq *irq, bool pending);
->  void vgic_irq_set_phys_active(struct vgic_irq *irq, bool active);
->  bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq);
->  void vgic_kick_vcpus(struct kvm *kvm);
-> 
+Cheers
+---Dave
