@@ -1,95 +1,59 @@
-From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: =?gb2312?B?tPC4tDogW1BBVENIIHY2IDQvN10gYXJtNjQ6IGt2bTogc3VwcG9ydCB1c2Vy?=
- =?gb2312?Q?_space_to_query_RAS_extension_feature?=
-Date: Fri, 8 Sep 2017 14:34:27 +0000
-Message-ID: <0184EA26B2509940AA629AE1405DD7F2015F5A1C@DGGEMA503-MBX.china.huawei.com>
-References: <1503916701-13516-1-git-send-email-gengdongjiu@huawei.com>
- <1503916701-13516-5-git-send-email-gengdongjiu@huawei.com>
- <59A84F9D.8030309@arm.com> <29951852-8d91-7c33-c68b-ad8b4bbdea54@huawei.com>
- <59B1747A.5030909@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: [PATCH 0/2] Fix preemption issues with kvm_arm_get_running_vcpu
+Date: Fri,  8 Sep 2017 07:52:17 -0700
+Message-ID: <1504882339-42520-1-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <59B1747A.5030909@arm.com>
-Content-Language: zh-CN
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: James Morse <james.morse@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Zhaoshenglong <zhaoshenglong@huawei.com>
-Cc: "mark.rutland@arm.com" <mark.rutland@arm.com>, "Wangkefeng
- (Kevin)" <wangkefeng.wang@huawei.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "david.daney@cavium.com" <david.daney@cavium.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "tbaicar@codeaurora.org" <tbaicar@codeaurora.org>, "will.deacon@arm.com" <will.deacon@arm.com>, Linuxarm <linuxarm@huawei.com>, "robert.moore@intel.com" <robert.moore@intel.com>, "lv.zheng@intel.com" <lv.zheng@intel.com>, "zjzhang@codeaurora.org" <zjzhang@codeaurora.org>, "mingo@kernel.org" <mingo@kernel.org>, "stefan@hello-penguin.com" <stefan@hello-penguin.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>, Huangshaoyu <huangshaoyu@huawei.com>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 67ABC49C6A
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Sep 2017 10:50:28 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id EGCMoxnjP+UZ for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Sep 2017 10:50:27 -0400 (EDT)
+Received: from mail-pf0-f180.google.com (mail-pf0-f180.google.com
+ [209.85.192.180])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 30B5249C5E
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Sep 2017 10:50:26 -0400 (EDT)
+Received: by mail-pf0-f180.google.com with SMTP id e199so4879706pfh.3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Sep 2017 07:52:56 -0700 (PDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@linaro.org>, hemk976@gmail.com, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi James,
-  Thanks a lot for your detailed comments.
+From: Christoffer Dall <cdall@linaro.org>
 
-CC Peter.
+These two patches slightly improves our preemption configuration when
+accessing the per-CPU variables holding the currently running VCPU by
+removing a redundant check and rearranging calling code from
+non-preemptible context on RT systems.
 
-Peter is Qemu expert. Let us see his suggestion.
+I'm not entirely sure if we fix issues only affecting PREEMPT_RT in mainline
+and also cc these to stable.  Looking at the git log there seems to be some
+precedence for this.  If not, I'm happy to remove the cc tag and/or drop the
+second patch.
 
-> 
-> Hi gengdongjiu,
-> 
-> On 05/09/17 08:18, gengdongjiu wrote:
-> > On 2017/9/1 2:04, James Morse wrote:
-> >> On 28/08/17 11:38, Dongjiu Geng wrote:
-> >>> Userspace will want to check if the CPU has the RAS extension.
-> >>
-> >> ... but user-space wants to know if it can inject SErrors with a specified ESR.
-> >>
-> >> What if we gain another way of doing this that isn't via the
-> >> RAS-extensions, now user-space has to check for two capabilities.
-> >>
-> >>
-> >>> If it has, it wil specify the virtual SError syndrome value,
-> >>> otherwise it will not be set. This patch adds support for querying
-> >>> the availability of this extension.
-> >>
-> >> I'm against telling user-space what features the CPU has unless it
-> >> can use them directly. In this case we are talking about a KVM API,
-> >> so we should describe the API not the CPU.
-> >
-> > shenglong (zhaoshenglong@huawei.com) who is Qemu maintainer suggested
-> > checking the CPU RAS-extensions to decide whether generate the APEI table and record CPER for the guest OS in the user space.
-> > he means if the host does not support RAS, user space may also not support RAS.
-> 
-> The code to signal memory-failure to user-space doesn't depend on the CPU's RAS-extensions.
-> 
-> If Qemu supports notifying the guest about RAS errors using CPER records, it should generate a HEST describing firmware first. It can then
-> choose the notification methods, some of which may require optional KVM APIs to support.
-> 
-> Seattle has a HEST, it doesn't support the CPU RAS-extensions. The kernel can notify user-space about memory_failure() on this machine. I
-> would expect Qemu to be able to receive signals and describe memory errors to a guest (1).
-> 
-> The question should be: 'How can Qemu know it can use SEI as a firmware-first notification?' It needs a KVM API to trigger an SError in the
-> guest with a specified ESR. The name of the KVM CAP needs to reflect the API (2).
-> 
-> Just because this is the first KVM API that needs the CPU to have the RAS extensions doesn't mean we should call it 'has RAS' and be done
-> with it.
-> 
-> We will eventually need another KVM API to configure trapping and emulating values in the RAS ERR registers so that Qemu can emulate a
-> machine without firmware-first. (This is likely to be a page of memory that backs the registers, there will need to be another KVM CAP to
-> describe this support (3)).
-> 
-> 
-> Exposing the CPUs support for RAS-extensions to support (2) means having per-platform support for (1). This is either creating extra work,
-> or not supporting as many platforms as we could. Both are bad.
-> Once we have (3) as well, any developer needs to know that 'has RAS' just meant the first API KVM implemented using RAS, and doesn't
-> mean later APIs also using RAS are supported by the kernel.
+Thanks,
+-Christoffer
 
+Christoffer Dall (2):
+  KVM: arm/arm64: Remove redundant preemptible checks
+  KVM: arm/arm64: Fix vgic_mmio_change_active with PREEMPT_RT
 
-Hi Peter/ shenglong,
-   What is your idea about it? We may need to consult with you about it.
+ virt/kvm/arm/arm.c            |  2 --
+ virt/kvm/arm/vgic/vgic-mmio.c | 12 +++++++++++-
+ 2 files changed, 11 insertions(+), 3 deletions(-)
 
-> 
-> 
-> Thanks,
-> 
-> James
+-- 
+2.7.4
