@@ -1,147 +1,88 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v3 4/5] KVM: arm/arm64: Support VGIC dist pend/active
- changes for mapped IRQs
-Date: Fri, 8 Sep 2017 16:27:47 +0200
-Message-ID: <5579210b-9b62-b33d-ac36-df3cb835c1e7@redhat.com>
-References: <20170906122612.18050-1-cdall@linaro.org>
- <20170906122612.18050-5-cdall@linaro.org>
- <d51a40df-92f9-eeff-0d16-ea12fd451dea@redhat.com>
- <2e1352d7-fb64-907d-7726-4d53d7af5768@arm.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Subject: Re: [PATCH v11 4/6] target-arm: kvm64: detect guest RAS EXTENSION
+ feature
+Date: Fri, 8 Sep 2017 14:26:59 +0000
+Message-ID: <0184EA26B2509940AA629AE1405DD7F2015F5973@DGGEMA503-MBX.china.huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 888AA49C5E
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Sep 2017 10:25:28 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id I8e9g0rjsYrI for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Sep 2017 10:25:22 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7ADA249C2B
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Sep 2017 10:25:22 -0400 (EDT)
-In-Reply-To: <2e1352d7-fb64-907d-7726-4d53d7af5768@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu
-Cc: Andre Przywara <andre.przywara@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <linux-acpi-owner@vger.kernel.org>
+Content-Language: zh-CN
+Sender: linux-acpi-owner@vger.kernel.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Zhaoshenglong <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, "edk2-devel@lists.01.org" <edk2-devel@lists.01.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Ingo Molnar <mingo@kernel.org>, "bp@suse.de" <bp@suse.de>, Shiju Jose <shiju.jose@huawei.com>, "zjzhang@codeaurora.org" <zjzhang@codeaurora.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>k
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
-
-On 08/09/2017 15:32, Marc Zyngier wrote:
-> On 08/09/17 14:04, Auger Eric wrote:
->> Hi Christoffer,
->>
->> On 06/09/2017 14:26, Christoffer Dall wrote:
->>> For mapped IRQs (with the HW bit set in the LR) we have to follow some
->>> rules of the architecture.  One of these rules is that VM must not be
->>> allowed to deactivate a virtual interrupt with the HW bit set unless the
->>> physical interrupt is also active.
->>>
->>> This works fine when injecting mapped interrupts, because we leave it up
->>> to the injector to either set EOImode==1 or manually set the active
->>> state of the physical interrupt.
->>>
->>> However, the guest can set virtual interrupt to be pending or active by
->>> writing to the virtual distributor, which could lead to deactivating a
->>> virtual interrupt with the HW bit set without the physical interrupt
->>> being active.
->>>
->>> We could set the physical interrupt to active whenever we are about to
->>> enter the VM with a HW interrupt either pending or active, but that
->>> would be really slow, especially on GICv2.  So we take the long way
->>> around and do the hard work when needed, which is expected to be
->>> extremely rare.
->>>
->>> When the VM sets the pending state for a HW interrupt on the virtual
->>> distributor we set the active state on the physical distributor, because
->>> the virtual interrupt can become active and then the guest can
->>> deactivate it.
->>>
->>> When the VM clears the pending state we also clear it on the physical
->>> side, because the injector might otherwise raise the interrupt.
->>>
->>> Signed-off-by: Christoffer Dall <cdall@linaro.org>
->>> ---
->>>  virt/kvm/arm/vgic/vgic-mmio.c | 33 +++++++++++++++++++++++++++++++++
->>>  virt/kvm/arm/vgic/vgic.c      |  7 +++++++
->>>  virt/kvm/arm/vgic/vgic.h      |  1 +
->>>  3 files changed, 41 insertions(+)
->>>
->>> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
->>> index c1e4bdd..00003ae 100644
->>> --- a/virt/kvm/arm/vgic/vgic-mmio.c
->>> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
->>> @@ -131,6 +131,9 @@ void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
->>>  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
->>>  
->>>  		spin_lock(&irq->irq_lock);
->>> +		if (irq->hw)
->>> +			vgic_irq_set_phys_active(irq, true);
->>> +
->>>  		irq->pending_latch = true;
->>>  
->>>  		vgic_queue_irq_unlock(vcpu->kvm, irq);
->>> @@ -149,6 +152,20 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
->>>  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
->>>  
->>>  		spin_lock(&irq->irq_lock);
->>> +		/*
->>> +		 * We don't want the guest to effectively mask the physical
->>> +		 * interrupt by doing a write to SPENDR followed by a write to
->>> +		 * CPENDR for HW interrupts, so we clear the active state on
->>> +		 * the physical side here.  This may lead to taking an
->>> +		 * additional interrupt on the host, but that should not be a
->>> +		 * problem as the worst that can happen is an additional vgic
->>> +		 * injection.  We also clear the pending state to maintain
->>> +		 * proper semantics for edge HW interrupts.
->>> +		 */
->>> +		if (irq->hw) {
->>> +			vgic_irq_set_phys_pending(irq, false);
->>> +			vgic_irq_set_phys_active(irq, false);
->> I fail in understanding why the active state is reset here. Can you
->> provide an example?
-> 
-> 
-> If we're clearing the pending state on the virtual side, we need to be
-> able to let an incoming physical interrupt fire so that it can be made
-> pending again. We may have to check that the virtual active state is
-> clear though.
-> 
->> If the physical dist has an active state can't the virtual IRQ be in
->> active state, in which case you may later on deactivate a phys IRQ which
->> is not active?
-> 
-> 
-> Well, I think we must be able to handle both cases:
-> 
-> - CPENDR write:
-> 	clear physical pending
-> 	if (virtual active clear)
-> 		clear physical active
-> 
-> - CACTIVER write:
-> 	clear physical active
-> 
-> Does this work for you?
-
-yes it does with that change!
-
-Thanks
-
-Eric
-
-> 
-> Thanks,
-> 
-> 	M.
-> 
+SGkgUGV0ZXIsDQogIFNvcnJ5IGZvciBteSBsYXRlIHJlc3BvbnNlLg0KDQo+IA0KPiBPbiAxOCBB
+dWd1c3QgMjAxNyBhdCAxNToyMywgRG9uZ2ppdSBHZW5nIDxnZW5nZG9uZ2ppdUBodWF3ZWkuY29t
+PiB3cm90ZToNCj4gPiBjaGVjayBpZiBrdm0gc3VwcG9ydHMgZ3Vlc3QgUkFTIEVYVEVOU0lPTi4g
+aWYgc28sIHNldCBjb3JyZXNwb25kaW5nDQo+ID4gZmVhdHVyZSBiaXQgZm9yIHZjcHUuDQo+ID4N
+Cj4gPiBTaWduZWQtb2ZmLWJ5OiBEb25naml1IEdlbmcgPGdlbmdkb25naml1QGh1YXdlaS5jb20+
+DQo+ID4gLS0tDQo+ID4gIGxpbnV4LWhlYWRlcnMvbGludXgva3ZtLmggfCAxICsNCj4gPiAgdGFy
+Z2V0L2FybS9jcHUuaCAgICAgICAgICB8IDMgKysrDQo+ID4gIHRhcmdldC9hcm0va3ZtNjQuYyAg
+ICAgICAgfCA4ICsrKysrKysrDQo+ID4gIDMgZmlsZXMgY2hhbmdlZCwgMTIgaW5zZXJ0aW9ucygr
+KQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2xpbnV4LWhlYWRlcnMvbGludXgva3ZtLmggYi9saW51
+eC1oZWFkZXJzL2xpbnV4L2t2bS5oDQo+ID4gaW5kZXggNzk3MWE0Zi4uMmFhMTc2ZSAxMDA2NDQN
+Cj4gPiAtLS0gYS9saW51eC1oZWFkZXJzL2xpbnV4L2t2bS5oDQo+ID4gKysrIGIvbGludXgtaGVh
+ZGVycy9saW51eC9rdm0uaA0KPiA+IEBAIC05MjksNiArOTI5LDcgQEAgc3RydWN0IGt2bV9wcGNf
+cmVzaXplX2hwdCB7ICAjZGVmaW5lDQo+ID4gS1ZNX0NBUF9QUENfU01UX1BPU1NJQkxFIDE0NyAg
+I2RlZmluZSBLVk1fQ0FQX0hZUEVSVl9TWU5JQzIgMTQ4DQo+ID4gI2RlZmluZSBLVk1fQ0FQX0hZ
+UEVSVl9WUF9JTkRFWCAxNDkNCj4gPiArI2RlZmluZSBLVk1fQ0FQX0FSTV9SQVNfRVhURU5TSU9O
+IDE1MA0KPiA+DQo+ID4gICNpZmRlZiBLVk1fQ0FQX0lSUV9ST1VUSU5HDQo+ID4NCj4gDQo+IEhp
+LiBDaGFuZ2VzIHRvIGxpbnV4LWhlYWRlcnMgbmVlZCB0byBiZSBkb25lIGFzIGEgcGF0Y2ggb2Yg
+dGhlaXIgb3duIGNyZWF0ZWQgdXNpbmcgc2NyaXB0cy91cGRhdGUtbGludXgtaGVhZGVycy5zaCBy
+dW4gYWdhaW5zdCBhIG1haW5saW5lDQo+IGtlcm5lbCB0cmVlIChhbmQgd2l0aCBhIGNvbW1pdCBt
+ZXNzYWdlIHRoYXQgcXVvdGVzIHRoZSBrZXJuZWwgY29tbWl0IGhhc2ggdXNlZCkuIFRoaXMgZW5z
+dXJlcyB0aGF0IHdlIGhhdmUgYSBjb25zaXN0ZW50IHNldCBvZiBoZWFkZXJzDQo+IHRoYXQgZG9u
+J3QgZGl2ZXJnZSBmcm9tIHRoZSBrZXJuZWwgY29weS4NClN1cmUsIEkgd2lsbCwgdGhhbmtzIGEg
+bG90IGZvciB5b3VyIHJlbWluZGVyLg0KDQo+IA0KPiA+IGRpZmYgLS1naXQgYS90YXJnZXQvYXJt
+L2NwdS5oIGIvdGFyZ2V0L2FybS9jcHUuaCBpbmRleA0KPiA+IGIzOWQ2NGEuLjZiMDk2MWIgMTAw
+NjQ0DQo+ID4gLS0tIGEvdGFyZ2V0L2FybS9jcHUuaA0KPiA+ICsrKyBiL3RhcmdldC9hcm0vY3B1
+LmgNCj4gPiBAQCAtNjExLDYgKzYxMSw4IEBAIHN0cnVjdCBBUk1DUFUgew0KPiA+DQo+ID4gICAg
+ICAvKiBDUFUgaGFzIG1lbW9yeSBwcm90ZWN0aW9uIHVuaXQgKi8NCj4gPiAgICAgIGJvb2wgaGFz
+X21wdTsNCj4gPiArICAgIC8qIENQVSBoYXMgcmFzIGV4dGVuc2lvbiB1bml0ICovDQo+ID4gKyAg
+ICBib29sIGhhc19yYXNfZXh0ZW5zaW9uOw0KPiA+ICAgICAgLyogUE1TQXY3IE1QVSBudW1iZXIg
+b2Ygc3VwcG9ydGVkIHJlZ2lvbnMgKi8NCj4gPiAgICAgIHVpbnQzMl90IHBtc2F2N19kcmVnaW9u
+Ow0KPiA+DQo+ID4gQEAgLTEyMjksNiArMTIzMSw3IEBAIGVudW0gYXJtX2ZlYXR1cmVzIHsNCj4g
+PiAgICAgIEFSTV9GRUFUVVJFX1RIVU1CX0RTUCwgLyogRFNQIGluc25zIHN1cHBvcnRlZCBpbiB0
+aGUgVGh1bWIgZW5jb2RpbmdzICovDQo+ID4gICAgICBBUk1fRkVBVFVSRV9QTVUsIC8qIGhhcyBQ
+TVUgc3VwcG9ydCAqLw0KPiA+ICAgICAgQVJNX0ZFQVRVUkVfVkJBUiwgLyogaGFzIGNwMTUgVkJB
+UiAqLw0KPiA+ICsgICAgQVJNX0ZFQVRVUkVfUkFTX0VYVEVOU0lPTiwgLypoYXMgUkFTIGV4dGVu
+c2lvbiBzdXBwb3J0ICovDQo+IA0KPiBNaXNzaW5nIHNwYWNlIGFmdGVyICcvKicgPw0KWWVzLCB0
+aGFua3MgZm9yIHRoZSBwb2ludGluZyBvdXQuDQoNCj4gDQo+ID4gIH07DQo+ID4NCj4gPiAgc3Rh
+dGljIGlubGluZSBpbnQgYXJtX2ZlYXR1cmUoQ1BVQVJNU3RhdGUgKmVudiwgaW50IGZlYXR1cmUp
+IGRpZmYNCj4gPiAtLWdpdCBhL3RhcmdldC9hcm0va3ZtNjQuYyBiL3RhcmdldC9hcm0va3ZtNjQu
+YyBpbmRleCBhMTZhYmM4Li4wNzgxMzY3DQo+ID4gMTAwNjQ0DQo+ID4gLS0tIGEvdGFyZ2V0L2Fy
+bS9rdm02NC5jDQo+ID4gKysrIGIvdGFyZ2V0L2FybS9rdm02NC5jDQo+ID4gQEAgLTUxOCw2ICs1
+MTgsMTQgQEAgaW50IGt2bV9hcmNoX2luaXRfdmNwdShDUFVTdGF0ZSAqY3MpDQo+ID4gICAgICAg
+ICAgdW5zZXRfZmVhdHVyZSgmZW52LT5mZWF0dXJlcywgQVJNX0ZFQVRVUkVfUE1VKTsNCj4gPiAg
+ICAgIH0NCj4gPg0KPiA+ICsgICAgaWYgKGt2bV9jaGVja19leHRlbnNpb24oY3MtPmt2bV9zdGF0
+ZSwgS1ZNX0NBUF9BUk1fUkFTX0VYVEVOU0lPTikpIHsNCj4gPiArICAgICAgICBjcHUtPmhhc19y
+YXNfZXh0ZW5zaW9uID0gdHJ1ZTsNCj4gPiArICAgICAgICBzZXRfZmVhdHVyZSgmZW52LT5mZWF0
+dXJlcywgQVJNX0ZFQVRVUkVfUkFTX0VYVEVOU0lPTik7DQo+ID4gKyAgICB9IGVsc2Ugew0KPiA+
+ICsgICAgICAgIGNwdS0+aGFzX3Jhc19leHRlbnNpb24gPSBmYWxzZTsNCj4gPiArICAgICAgICB1
+bnNldF9mZWF0dXJlKCZlbnYtPmZlYXR1cmVzLCBBUk1fRkVBVFVSRV9SQVNfRVhURU5TSU9OKTsN
+Cj4gPiArICAgIH0NCj4gPiArDQo+IA0KPiBTaG91bGRuJ3Qgd2UgbmVlZCB0byBhbHNvIHRlbGwg
+dGhlIGtlcm5lbCB0aGF0IHdlIGFjdHVhbGx5IHdhbnQgaXQgdG8gZXhwb3NlIFJBUyB0byB0aGUg
+Z3Vlc3Q/IENvbXBhcmUgdGhlIFBNVSBjb2RlIGluIHRoaXMgZnVuY3Rpb24sDQo+IHdoZXJlIHdl
+IHNldCBhIGt2bV9pbml0X2ZlYXR1cmVzIGJpdCB0byBkbyB0aGlzLg0KPiAoVGhpcyBzdWdnZXN0
+cyB0aGF0IHlvdXIgQUJJIGZvciB0aGUga2VybmVsIHBhcnQgb2YgdGhpcyBmZWF0dXJlIG1heSBu
+b3QgYmUgY29ycmVjdD8pDQoNCkluIHRoZSBQTVUgY29kZSwgaXQgaW5kZWVkIHNldHMgYSBrdm1f
+aW5pdF9mZWF0dXJlcyBiaXQuIEhlcmUgQVJNIEphbWVzIGhhcyBhIGNvbmNlcm4gdGhhdCB3ZSBh
+cmUgZGVwZW5kIG9uIHRoZSBob3N0IENQVSBSQVMgZXh0ZW5zaW9uLA0KSGUgbWVhbnMgdGhhdCBp
+ZiB1c2Vyc3BhY2UgcmVjZWl2ZXMgdGhlIFNJR0JVUyBkZWxpdmVyZWQgYnkgaG9zdCBtZW1vcnlf
+ZmFpbHVyZSgpLCB1c2VyIHNwYWNlIHNob3VsZCByZWNvcmQgdGhlIENQRVIgZm9yIGd1ZXN0DQph
+bmQgaGFuZGxpbmcgdGhlIGVycm9yIHJlZ2FyZGxlc3Mgd2hldGhlciBob3N0IENQVSBzdXBwb3J0
+cyBSQVMgZXh0ZW5zaW9uLiBCdXQgSSB0aGluayBpZiB1c2VyIHNwYWNlIHJlY2VpdmVzIHRoZSBT
+SUdCVVMgc2lnbmFsLCB0aGF0IG1lYW5zDQpob3N0IENQVSBSQVMgbW9kdWxlIGRldGVjdHMgdGhl
+IGVycm9yIG9yIENQVSBjb25zdW1lcyB0aGUgcG9pc29uIGRhdGEsIHRodXMgd2Ugc2hvdWxkIGNo
+ZWNrIHdoZXRoZXIgcGh5c2ljYWwgQ1BVIHN1cHBvcnQgUkFTIGV4dGVuc2lvbi4gDQoNCj4gDQo+
+IFlvdSBzaG91bGQgYWxzbyBub3QgYmUgY2FsbGluZyBzZXRfZmVhdHVyZSgpIGhlcmUgLS0gaWYg
+dGhlIENQVSBmZWF0dXJlcyBiaXQgZG9lc24ndCBzYXkgInRoaXMgQ1BVIHNob3VsZCBoYXZlIHRo
+ZSBSQVMgZXh0ZW5zaW9ucyIgd2UNCj4gc2hvdWxkbid0IGNyZWF0ZSBhIENQVSB3aXRoIHRoZW0u
+IEluc3RlYWQgeW91IHNob3VsZCBzZXQgaXQgaW4ga3ZtX2FybV9nZXRfaG9zdF9jcHVfZmVhdHVy
+ZXMoKSAoYWdhaW4sIGNvbXBhcmUgdGhlIFBNVSBjb2RlKS4NCg0KVW5kZXJzdGFuZCwgSSB3aWxs
+IGxvb3AgeW91IHRvIGFub3RoZXIgbWFpbCB0aHJlYWQgdG8gY29uc3VsdCB3aXRoIHlvdSB0aGF0
+IHdoZXRoZXIgdXNlcnNwYWNlIHNob3VsZCBkZXRlY3QgQ1BVIFJBUyBleHRlbnNpb24uDQpJZiBh
+bGwgYWdyZWUgdG8gZGV0ZWN0IENQVSBSQVMgZmVhdHVyZSwgSSB3aWxsIGZpeCB0aGUgaXNzdWUg
+dGhhdCB5b3UgcG9pbnRpbmcgb3V0Lg0KDQo+IA0KPiB0aGFua3MNCj4gLS0gUE1NDQo=
