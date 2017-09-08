@@ -1,54 +1,104 @@
-From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: =?gb2312?B?tPC4tDogW1BBVENIIHY2IDQvN10gYXJtNjQ6IGt2bTogc3VwcG9ydCB1c2Vy?=
- =?gb2312?Q?_space_to_query_RAS_extension_feature?=
-Date: Fri, 8 Sep 2017 17:36:04 +0000
-Message-ID: <0184EA26B2509940AA629AE1405DD7F2015F61EA@DGGEMA503-MBX.china.huawei.com>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v6 3/7] acpi: apei: remove the unused code
+Date: Fri, 08 Sep 2017 19:17:30 +0100
+Message-ID: <59B2DEBA.6030608@arm.com>
 References: <1503916701-13516-1-git-send-email-gengdongjiu@huawei.com>
- <1503916701-13516-5-git-send-email-gengdongjiu@huawei.com>
- <59A84F9D.8030309@arm.com> <29951852-8d91-7c33-c68b-ad8b4bbdea54@huawei.com>
- <59B1747A.5030909@arm.com>
+ <1503916701-13516-4-git-send-email-gengdongjiu@huawei.com>
+ <59A84C51.3000506@arm.com> <45c69f99-61dd-e847-368b-20acb61b4d50@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <59B1747A.5030909@arm.com>
-Content-Language: zh-CN
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: James Morse <james.morse@arm.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: "mark.rutland@arm.com" <mark.rutland@arm.com>, "Wangkefeng
- (Kevin)" <wangkefeng.wang@huawei.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "david.daney@cavium.com" <david.daney@cavium.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "tbaicar@codeaurora.org" <tbaicar@codeaurora.org>, "will.deacon@arm.com" <will.deacon@arm.com>, Linuxarm <linuxarm@huawei.com>, "robert.moore@intel.com" <robert.moore@intel.com>, "lv.zheng@intel.com" <lv.zheng@intel.com>, "zjzhang@codeaurora.org" <zjzhang@codeaurora.org>, "mingo@kernel.org" <mingo@kernel.org>, "stefan@hello-penguin.com" <stefan@hello-penguin.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>, Huangshaoyu <huangshaoyu@huawei.com>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C9EEB49C65
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Sep 2017 14:16:35 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 3C31lJCgppR5 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Sep 2017 14:16:34 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7524A49C5D
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Sep 2017 14:16:34 -0400 (EDT)
+In-Reply-To: <45c69f99-61dd-e847-368b-20acb61b4d50@huawei.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: gengdongjiu <gengdongjiu@huawei.com>
+Cc: wangkefeng.wang@huawei.com, kvm@vger.kernel.org, david.daney@cavium.com, catalin.marinas@arm.com, tbaicar@codeaurora.org, will.deacon@arm.com, linuxarm@huawei.com, robert.moore@intel.com, lv.zheng@intel.com, zjzhang@codeaurora.org, mingo@kernel.org, stefan@hello-penguin.com, linux@armlinux.org.uk, kvmarm@lists.cs.columbia.edu, linux-acpi@vger.kernel.org, huangshaoyu@huawei.com, huangdaode@hisilicon.com, bp@suse.de, Dave.Martin@arm.com, lenb@kernel.org, wuquanming@huawei.com, marc.zyngier@arm.com, john.garry@huawei.com, kristina.martsenko@arm.com, cov@codeaurora.org, jonathan.cameron@huawei.com, zhengqiang10@huawei.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, ard.biesheuvel@linaro.org, linux-kernel@vger.kernel.org, wangzhou1@hisilicon.com, mst@redhat.com, shiju.jose@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-HI James,
+Hi gengdongjiu,
 
-[...]
+On 04/09/17 12:43, gengdongjiu wrote:
+> On 2017/9/1 1:50, James Morse wrote:
+>> On 28/08/17 11:38, Dongjiu Geng wrote:
+>>> In current code logic, the two functions ghes_sea_add() and
+>>> ghes_sea_remove() are only called when CONFIG_ACPI_APEI_SEA
+>>> is defined. If not, it will return errors in the ghes_probe()
+>>> and not contiue. Hence, remove the unnecessary handling when
+>>> CONFIG_ACPI_APEI_SEI is not defined.
+>>
+>> This doesn't match what the patch does. I get this feeling this is needed for
+>> some future patch you haven't included.
 > 
-> The code to signal memory-failure to user-space doesn't depend on the CPU's RAS-extensions.
-I roughly check your answer and agree with your general idea.
-late I will check it in detail.
+> James, let check the code, when the ghes_probe, if the CONFIG_ACPI_APEI_SEA is not defined.
+> it will return -ENOTSUPP and goto error, and the ghes_sea_add has no chance to execute.
+> similar, if the probe is failed, it should not have chance to execute ghes_sea_remove.
 
-I have a question, do you sure that if CPU does not support RAS-extensions kernel can still call memory-failure() to send signal to qemu?
+It's the 'unnecessary handling when CONFIG_ACPI_APEI_SEI' in the commit message
+that confuses me: this patch doesn't reference that Kconfig symbol. I guess that
+sentence needs removing for this v6?
 
-After my checking the code, the general flow is RAS module detects the error or CPU consumes the hardware poison data, happen exception, then EL3 firmware records the address to APEI table and send
-notification to kernel. Kernel parses the APEI table to get address and call memory_failure() to identify the page to poison. That is to say, usually, after RAS detect the error, it call memory_failure(),
-otherwise, it does not know whether this address is poison.
-I am worried about one thing, if hardware does not has RAS, OS cannot know which address is poison, so it cannot identify the address , then the address that is delivered to Qemu(user space) may not right.
+Re-reading without that part of the commit-message:
 
-As you said, kernel can also call memory_failure() even without RAS support. in this without RAS case, how it consider the address is poison and needs to send SIGBUS to QEMU?
+You're relying on the compiler's dead-code elimination to spot unused static
+functions and silently drop them. Great!
+(there is the small risk that gcc 3.2[0] can't do this, x86 still has to support
+this gcc version)
 
-> 
-> If Qemu supports notifying the guest about RAS errors using CPER records, it should generate a HEST describing firmware first. It can then
-> choose the notification methods, some of which may require optional KVM APIs to support.
-> 
-> Seattle has a HEST, it doesn't support the CPU RAS-extensions. The kernel can notify user-space about memory_failure() on this machine. I
-> would expect Qemu to be able to receive signals and describe memory errors to a guest (1).
+As this is just clean-up patch can you break it out of this series, it isn't
+needed to add support for SEI.
 
-Usually we consider the address got from APEI table is poison. If so, I want to know, without RAS and APEI table, how it identify the address to hwpoison?
+(This series adds support for what should be an APEI notification, but the only
+code that touches APEI removes some code from a different notification method.)
+
+
+>> Setting NOTIFY_SEI as the GHES entry's notification type means the OS should
+>> check the GHES->ErrorStatusAddress for CPER records when it receives an
+>> SError-Interrupt, as it may be a notification of an error from this error source.
+
+> previously I added the NOTIFY_SEI support,
+
+(Yes, I saw that in v5 and expected this series to add some APEI support code )
+
+
+> but consider the error address in CPER is not accurate and calling memory_failure() may not make sense.
+> so I remove it.
+
+'not accurate'... this is going to be a problem, but lets keep that discussion
+on the cover-letter.
+
+
+>> If you aren't handling the notification, why is this is in the HEST at all?
+>> (and if its not: its not firmware-first)
+
+> For the SEI notification, may be we can parse and handle the CPER record other than the Error physical address
+
+Sure, but I only see this cleanup patch in this series, where does APEI learn
+about NOTIFY_SEI? As this is nothing will ever touch those CPER records, if
+you're using GHESv2 firmware will be prevented from delivering subsequent
+notifications.
+
+
+Thanks,
+
+James
+
+[0]
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/admin-guide/README.rst#n251
