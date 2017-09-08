@@ -1,88 +1,95 @@
 From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: Re: [PATCH v11 4/6] target-arm: kvm64: detect guest RAS EXTENSION
- feature
-Date: Fri, 8 Sep 2017 14:26:59 +0000
-Message-ID: <0184EA26B2509940AA629AE1405DD7F2015F5973@DGGEMA503-MBX.china.huawei.com>
+Subject: =?gb2312?B?tPC4tDogW1BBVENIIHY2IDQvN10gYXJtNjQ6IGt2bTogc3VwcG9ydCB1c2Vy?=
+ =?gb2312?Q?_space_to_query_RAS_extension_feature?=
+Date: Fri, 8 Sep 2017 14:34:27 +0000
+Message-ID: <0184EA26B2509940AA629AE1405DD7F2015F5A1C@DGGEMA503-MBX.china.huawei.com>
+References: <1503916701-13516-1-git-send-email-gengdongjiu@huawei.com>
+ <1503916701-13516-5-git-send-email-gengdongjiu@huawei.com>
+ <59A84F9D.8030309@arm.com> <29951852-8d91-7c33-c68b-ad8b4bbdea54@huawei.com>
+ <59B1747A.5030909@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <linux-acpi-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <59B1747A.5030909@arm.com>
 Content-Language: zh-CN
-Sender: linux-acpi-owner@vger.kernel.org
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Zhaoshenglong <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, "edk2-devel@lists.01.org" <edk2-devel@lists.01.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Ingo Molnar <mingo@kernel.org>, "bp@suse.de" <bp@suse.de>, Shiju Jose <shiju.jose@huawei.com>, "zjzhang@codeaurora.org" <zjzhang@codeaurora.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>k
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: James Morse <james.morse@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Zhaoshenglong <zhaoshenglong@huawei.com>
+Cc: "mark.rutland@arm.com" <mark.rutland@arm.com>, "Wangkefeng
+ (Kevin)" <wangkefeng.wang@huawei.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "david.daney@cavium.com" <david.daney@cavium.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "tbaicar@codeaurora.org" <tbaicar@codeaurora.org>, "will.deacon@arm.com" <will.deacon@arm.com>, Linuxarm <linuxarm@huawei.com>, "robert.moore@intel.com" <robert.moore@intel.com>, "lv.zheng@intel.com" <lv.zheng@intel.com>, "zjzhang@codeaurora.org" <zjzhang@codeaurora.org>, "mingo@kernel.org" <mingo@kernel.org>, "stefan@hello-penguin.com" <stefan@hello-penguin.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>, Huangshaoyu <huangshaoyu@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGkgUGV0ZXIsDQogIFNvcnJ5IGZvciBteSBsYXRlIHJlc3BvbnNlLg0KDQo+IA0KPiBPbiAxOCBB
-dWd1c3QgMjAxNyBhdCAxNToyMywgRG9uZ2ppdSBHZW5nIDxnZW5nZG9uZ2ppdUBodWF3ZWkuY29t
-PiB3cm90ZToNCj4gPiBjaGVjayBpZiBrdm0gc3VwcG9ydHMgZ3Vlc3QgUkFTIEVYVEVOU0lPTi4g
-aWYgc28sIHNldCBjb3JyZXNwb25kaW5nDQo+ID4gZmVhdHVyZSBiaXQgZm9yIHZjcHUuDQo+ID4N
-Cj4gPiBTaWduZWQtb2ZmLWJ5OiBEb25naml1IEdlbmcgPGdlbmdkb25naml1QGh1YXdlaS5jb20+
-DQo+ID4gLS0tDQo+ID4gIGxpbnV4LWhlYWRlcnMvbGludXgva3ZtLmggfCAxICsNCj4gPiAgdGFy
-Z2V0L2FybS9jcHUuaCAgICAgICAgICB8IDMgKysrDQo+ID4gIHRhcmdldC9hcm0va3ZtNjQuYyAg
-ICAgICAgfCA4ICsrKysrKysrDQo+ID4gIDMgZmlsZXMgY2hhbmdlZCwgMTIgaW5zZXJ0aW9ucygr
-KQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2xpbnV4LWhlYWRlcnMvbGludXgva3ZtLmggYi9saW51
-eC1oZWFkZXJzL2xpbnV4L2t2bS5oDQo+ID4gaW5kZXggNzk3MWE0Zi4uMmFhMTc2ZSAxMDA2NDQN
-Cj4gPiAtLS0gYS9saW51eC1oZWFkZXJzL2xpbnV4L2t2bS5oDQo+ID4gKysrIGIvbGludXgtaGVh
-ZGVycy9saW51eC9rdm0uaA0KPiA+IEBAIC05MjksNiArOTI5LDcgQEAgc3RydWN0IGt2bV9wcGNf
-cmVzaXplX2hwdCB7ICAjZGVmaW5lDQo+ID4gS1ZNX0NBUF9QUENfU01UX1BPU1NJQkxFIDE0NyAg
-I2RlZmluZSBLVk1fQ0FQX0hZUEVSVl9TWU5JQzIgMTQ4DQo+ID4gI2RlZmluZSBLVk1fQ0FQX0hZ
-UEVSVl9WUF9JTkRFWCAxNDkNCj4gPiArI2RlZmluZSBLVk1fQ0FQX0FSTV9SQVNfRVhURU5TSU9O
-IDE1MA0KPiA+DQo+ID4gICNpZmRlZiBLVk1fQ0FQX0lSUV9ST1VUSU5HDQo+ID4NCj4gDQo+IEhp
-LiBDaGFuZ2VzIHRvIGxpbnV4LWhlYWRlcnMgbmVlZCB0byBiZSBkb25lIGFzIGEgcGF0Y2ggb2Yg
-dGhlaXIgb3duIGNyZWF0ZWQgdXNpbmcgc2NyaXB0cy91cGRhdGUtbGludXgtaGVhZGVycy5zaCBy
-dW4gYWdhaW5zdCBhIG1haW5saW5lDQo+IGtlcm5lbCB0cmVlIChhbmQgd2l0aCBhIGNvbW1pdCBt
-ZXNzYWdlIHRoYXQgcXVvdGVzIHRoZSBrZXJuZWwgY29tbWl0IGhhc2ggdXNlZCkuIFRoaXMgZW5z
-dXJlcyB0aGF0IHdlIGhhdmUgYSBjb25zaXN0ZW50IHNldCBvZiBoZWFkZXJzDQo+IHRoYXQgZG9u
-J3QgZGl2ZXJnZSBmcm9tIHRoZSBrZXJuZWwgY29weS4NClN1cmUsIEkgd2lsbCwgdGhhbmtzIGEg
-bG90IGZvciB5b3VyIHJlbWluZGVyLg0KDQo+IA0KPiA+IGRpZmYgLS1naXQgYS90YXJnZXQvYXJt
-L2NwdS5oIGIvdGFyZ2V0L2FybS9jcHUuaCBpbmRleA0KPiA+IGIzOWQ2NGEuLjZiMDk2MWIgMTAw
-NjQ0DQo+ID4gLS0tIGEvdGFyZ2V0L2FybS9jcHUuaA0KPiA+ICsrKyBiL3RhcmdldC9hcm0vY3B1
-LmgNCj4gPiBAQCAtNjExLDYgKzYxMSw4IEBAIHN0cnVjdCBBUk1DUFUgew0KPiA+DQo+ID4gICAg
-ICAvKiBDUFUgaGFzIG1lbW9yeSBwcm90ZWN0aW9uIHVuaXQgKi8NCj4gPiAgICAgIGJvb2wgaGFz
-X21wdTsNCj4gPiArICAgIC8qIENQVSBoYXMgcmFzIGV4dGVuc2lvbiB1bml0ICovDQo+ID4gKyAg
-ICBib29sIGhhc19yYXNfZXh0ZW5zaW9uOw0KPiA+ICAgICAgLyogUE1TQXY3IE1QVSBudW1iZXIg
-b2Ygc3VwcG9ydGVkIHJlZ2lvbnMgKi8NCj4gPiAgICAgIHVpbnQzMl90IHBtc2F2N19kcmVnaW9u
-Ow0KPiA+DQo+ID4gQEAgLTEyMjksNiArMTIzMSw3IEBAIGVudW0gYXJtX2ZlYXR1cmVzIHsNCj4g
-PiAgICAgIEFSTV9GRUFUVVJFX1RIVU1CX0RTUCwgLyogRFNQIGluc25zIHN1cHBvcnRlZCBpbiB0
-aGUgVGh1bWIgZW5jb2RpbmdzICovDQo+ID4gICAgICBBUk1fRkVBVFVSRV9QTVUsIC8qIGhhcyBQ
-TVUgc3VwcG9ydCAqLw0KPiA+ICAgICAgQVJNX0ZFQVRVUkVfVkJBUiwgLyogaGFzIGNwMTUgVkJB
-UiAqLw0KPiA+ICsgICAgQVJNX0ZFQVRVUkVfUkFTX0VYVEVOU0lPTiwgLypoYXMgUkFTIGV4dGVu
-c2lvbiBzdXBwb3J0ICovDQo+IA0KPiBNaXNzaW5nIHNwYWNlIGFmdGVyICcvKicgPw0KWWVzLCB0
-aGFua3MgZm9yIHRoZSBwb2ludGluZyBvdXQuDQoNCj4gDQo+ID4gIH07DQo+ID4NCj4gPiAgc3Rh
-dGljIGlubGluZSBpbnQgYXJtX2ZlYXR1cmUoQ1BVQVJNU3RhdGUgKmVudiwgaW50IGZlYXR1cmUp
-IGRpZmYNCj4gPiAtLWdpdCBhL3RhcmdldC9hcm0va3ZtNjQuYyBiL3RhcmdldC9hcm0va3ZtNjQu
-YyBpbmRleCBhMTZhYmM4Li4wNzgxMzY3DQo+ID4gMTAwNjQ0DQo+ID4gLS0tIGEvdGFyZ2V0L2Fy
-bS9rdm02NC5jDQo+ID4gKysrIGIvdGFyZ2V0L2FybS9rdm02NC5jDQo+ID4gQEAgLTUxOCw2ICs1
-MTgsMTQgQEAgaW50IGt2bV9hcmNoX2luaXRfdmNwdShDUFVTdGF0ZSAqY3MpDQo+ID4gICAgICAg
-ICAgdW5zZXRfZmVhdHVyZSgmZW52LT5mZWF0dXJlcywgQVJNX0ZFQVRVUkVfUE1VKTsNCj4gPiAg
-ICAgIH0NCj4gPg0KPiA+ICsgICAgaWYgKGt2bV9jaGVja19leHRlbnNpb24oY3MtPmt2bV9zdGF0
-ZSwgS1ZNX0NBUF9BUk1fUkFTX0VYVEVOU0lPTikpIHsNCj4gPiArICAgICAgICBjcHUtPmhhc19y
-YXNfZXh0ZW5zaW9uID0gdHJ1ZTsNCj4gPiArICAgICAgICBzZXRfZmVhdHVyZSgmZW52LT5mZWF0
-dXJlcywgQVJNX0ZFQVRVUkVfUkFTX0VYVEVOU0lPTik7DQo+ID4gKyAgICB9IGVsc2Ugew0KPiA+
-ICsgICAgICAgIGNwdS0+aGFzX3Jhc19leHRlbnNpb24gPSBmYWxzZTsNCj4gPiArICAgICAgICB1
-bnNldF9mZWF0dXJlKCZlbnYtPmZlYXR1cmVzLCBBUk1fRkVBVFVSRV9SQVNfRVhURU5TSU9OKTsN
-Cj4gPiArICAgIH0NCj4gPiArDQo+IA0KPiBTaG91bGRuJ3Qgd2UgbmVlZCB0byBhbHNvIHRlbGwg
-dGhlIGtlcm5lbCB0aGF0IHdlIGFjdHVhbGx5IHdhbnQgaXQgdG8gZXhwb3NlIFJBUyB0byB0aGUg
-Z3Vlc3Q/IENvbXBhcmUgdGhlIFBNVSBjb2RlIGluIHRoaXMgZnVuY3Rpb24sDQo+IHdoZXJlIHdl
-IHNldCBhIGt2bV9pbml0X2ZlYXR1cmVzIGJpdCB0byBkbyB0aGlzLg0KPiAoVGhpcyBzdWdnZXN0
-cyB0aGF0IHlvdXIgQUJJIGZvciB0aGUga2VybmVsIHBhcnQgb2YgdGhpcyBmZWF0dXJlIG1heSBu
-b3QgYmUgY29ycmVjdD8pDQoNCkluIHRoZSBQTVUgY29kZSwgaXQgaW5kZWVkIHNldHMgYSBrdm1f
-aW5pdF9mZWF0dXJlcyBiaXQuIEhlcmUgQVJNIEphbWVzIGhhcyBhIGNvbmNlcm4gdGhhdCB3ZSBh
-cmUgZGVwZW5kIG9uIHRoZSBob3N0IENQVSBSQVMgZXh0ZW5zaW9uLA0KSGUgbWVhbnMgdGhhdCBp
-ZiB1c2Vyc3BhY2UgcmVjZWl2ZXMgdGhlIFNJR0JVUyBkZWxpdmVyZWQgYnkgaG9zdCBtZW1vcnlf
-ZmFpbHVyZSgpLCB1c2VyIHNwYWNlIHNob3VsZCByZWNvcmQgdGhlIENQRVIgZm9yIGd1ZXN0DQph
-bmQgaGFuZGxpbmcgdGhlIGVycm9yIHJlZ2FyZGxlc3Mgd2hldGhlciBob3N0IENQVSBzdXBwb3J0
-cyBSQVMgZXh0ZW5zaW9uLiBCdXQgSSB0aGluayBpZiB1c2VyIHNwYWNlIHJlY2VpdmVzIHRoZSBT
-SUdCVVMgc2lnbmFsLCB0aGF0IG1lYW5zDQpob3N0IENQVSBSQVMgbW9kdWxlIGRldGVjdHMgdGhl
-IGVycm9yIG9yIENQVSBjb25zdW1lcyB0aGUgcG9pc29uIGRhdGEsIHRodXMgd2Ugc2hvdWxkIGNo
-ZWNrIHdoZXRoZXIgcGh5c2ljYWwgQ1BVIHN1cHBvcnQgUkFTIGV4dGVuc2lvbi4gDQoNCj4gDQo+
-IFlvdSBzaG91bGQgYWxzbyBub3QgYmUgY2FsbGluZyBzZXRfZmVhdHVyZSgpIGhlcmUgLS0gaWYg
-dGhlIENQVSBmZWF0dXJlcyBiaXQgZG9lc24ndCBzYXkgInRoaXMgQ1BVIHNob3VsZCBoYXZlIHRo
-ZSBSQVMgZXh0ZW5zaW9ucyIgd2UNCj4gc2hvdWxkbid0IGNyZWF0ZSBhIENQVSB3aXRoIHRoZW0u
-IEluc3RlYWQgeW91IHNob3VsZCBzZXQgaXQgaW4ga3ZtX2FybV9nZXRfaG9zdF9jcHVfZmVhdHVy
-ZXMoKSAoYWdhaW4sIGNvbXBhcmUgdGhlIFBNVSBjb2RlKS4NCg0KVW5kZXJzdGFuZCwgSSB3aWxs
-IGxvb3AgeW91IHRvIGFub3RoZXIgbWFpbCB0aHJlYWQgdG8gY29uc3VsdCB3aXRoIHlvdSB0aGF0
-IHdoZXRoZXIgdXNlcnNwYWNlIHNob3VsZCBkZXRlY3QgQ1BVIFJBUyBleHRlbnNpb24uDQpJZiBh
-bGwgYWdyZWUgdG8gZGV0ZWN0IENQVSBSQVMgZmVhdHVyZSwgSSB3aWxsIGZpeCB0aGUgaXNzdWUg
-dGhhdCB5b3UgcG9pbnRpbmcgb3V0Lg0KDQo+IA0KPiB0aGFua3MNCj4gLS0gUE1NDQo=
+Hi James,
+  Thanks a lot for your detailed comments.
+
+CC Peter.
+
+Peter is Qemu expert. Let us see his suggestion.
+
+> 
+> Hi gengdongjiu,
+> 
+> On 05/09/17 08:18, gengdongjiu wrote:
+> > On 2017/9/1 2:04, James Morse wrote:
+> >> On 28/08/17 11:38, Dongjiu Geng wrote:
+> >>> Userspace will want to check if the CPU has the RAS extension.
+> >>
+> >> ... but user-space wants to know if it can inject SErrors with a specified ESR.
+> >>
+> >> What if we gain another way of doing this that isn't via the
+> >> RAS-extensions, now user-space has to check for two capabilities.
+> >>
+> >>
+> >>> If it has, it wil specify the virtual SError syndrome value,
+> >>> otherwise it will not be set. This patch adds support for querying
+> >>> the availability of this extension.
+> >>
+> >> I'm against telling user-space what features the CPU has unless it
+> >> can use them directly. In this case we are talking about a KVM API,
+> >> so we should describe the API not the CPU.
+> >
+> > shenglong (zhaoshenglong@huawei.com) who is Qemu maintainer suggested
+> > checking the CPU RAS-extensions to decide whether generate the APEI table and record CPER for the guest OS in the user space.
+> > he means if the host does not support RAS, user space may also not support RAS.
+> 
+> The code to signal memory-failure to user-space doesn't depend on the CPU's RAS-extensions.
+> 
+> If Qemu supports notifying the guest about RAS errors using CPER records, it should generate a HEST describing firmware first. It can then
+> choose the notification methods, some of which may require optional KVM APIs to support.
+> 
+> Seattle has a HEST, it doesn't support the CPU RAS-extensions. The kernel can notify user-space about memory_failure() on this machine. I
+> would expect Qemu to be able to receive signals and describe memory errors to a guest (1).
+> 
+> The question should be: 'How can Qemu know it can use SEI as a firmware-first notification?' It needs a KVM API to trigger an SError in the
+> guest with a specified ESR. The name of the KVM CAP needs to reflect the API (2).
+> 
+> Just because this is the first KVM API that needs the CPU to have the RAS extensions doesn't mean we should call it 'has RAS' and be done
+> with it.
+> 
+> We will eventually need another KVM API to configure trapping and emulating values in the RAS ERR registers so that Qemu can emulate a
+> machine without firmware-first. (This is likely to be a page of memory that backs the registers, there will need to be another KVM CAP to
+> describe this support (3)).
+> 
+> 
+> Exposing the CPUs support for RAS-extensions to support (2) means having per-platform support for (1). This is either creating extra work,
+> or not supporting as many platforms as we could. Both are bad.
+> Once we have (3) as well, any developer needs to know that 'has RAS' just meant the first API KVM implemented using RAS, and doesn't
+> mean later APIs also using RAS are supported by the kernel.
+
+
+Hi Peter/ shenglong,
+   What is your idea about it? We may need to consult with you about it.
+
+> 
+> 
+> Thanks,
+> 
+> James
