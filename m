@@ -1,159 +1,26 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 4/5] KVM: arm/arm64: Support VGIC dist pend/active
- changes for mapped IRQs
-Date: Fri, 8 Sep 2017 17:30:54 +0100
-Message-ID: <b8a20b6a-3fb7-5e36-cfc8-5a90383e2e99@arm.com>
-References: <20170906122612.18050-1-cdall@linaro.org>
- <20170906122612.18050-5-cdall@linaro.org>
- <d51a40df-92f9-eeff-0d16-ea12fd451dea@redhat.com>
- <2e1352d7-fb64-907d-7726-4d53d7af5768@arm.com>
- <5579210b-9b62-b33d-ac36-df3cb835c1e7@redhat.com>
- <CAMJs5B89AsrDMhuNjC7La2ZP+ndiAWhY=7nqTbq1v6mp7=BDqA@mail.gmail.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Subject: =?utf-8?B?562U5aSNOiBbUEFUQ0ggdjExIDUvNl0gdGFyZ2V0LWFybToga3ZtNjQ6IGhh?=
+ =?utf-8?B?bmRsZSBTSUdCVVMgc2lnbmFsIGZvciBzeW5jaHJvbm91cyBFeHRlcm5hbCBB?=
+ =?utf-8?Q?bort?=
+Date: Fri, 8 Sep 2017 16:40:51 +0000
+Message-ID: <0184EA26B2509940AA629AE1405DD7F2015F5FE7@DGGEMA503-MBX.china.huawei.com>
+References: <0184EA26B2509940AA629AE1405DD7F2015F5F11@DGGEMA503-MBX.china.huawei.com>
+ <CAFEAcA8HPhHeeXEDtxnewJ7mAJ-gYzR96pC06qA+Xx95LHu2DA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1855A49C5A
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Sep 2017 12:28:29 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9C6gjJE8ppYC for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Sep 2017 12:28:27 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A2ACE49C53
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Sep 2017 12:28:27 -0400 (EDT)
-In-Reply-To: <CAMJs5B89AsrDMhuNjC7La2ZP+ndiAWhY=7nqTbq1v6mp7=BDqA@mail.gmail.com>
-Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>, Auger Eric <eric.auger@redhat.com>
-Cc: Andre Przywara <andre.przywara@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <linux-acpi-owner@vger.kernel.org>
+In-Reply-To: <CAFEAcA8HPhHeeXEDtxnewJ7mAJ-gYzR96pC06qA+Xx95LHu2DA@mail.gmail.com>
+Content-Language: zh-CN
+Sender: linux-acpi-owner@vger.kernel.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Zhaoshenglong <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, "edk2-devel@lists.01.org" <edk2-devel@lists.01.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Ingo Molnar <mingo@kernel.org>, "bp@suse.de" <bp@suse.de>, Shiju Jose <shiju.jose@huawei.com>, "zjzhang@codeaurora.org" <zjzhang@codeaurora.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>k
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 08/09/17 17:05, Christoffer Dall wrote:
-> On Fri, Sep 8, 2017 at 4:27 PM, Auger Eric <eric.auger@redhat.com> wrote:
->> Hi Marc,
->>
->> On 08/09/2017 15:32, Marc Zyngier wrote:
->>> On 08/09/17 14:04, Auger Eric wrote:
->>>> Hi Christoffer,
->>>>
->>>> On 06/09/2017 14:26, Christoffer Dall wrote:
->>>>> For mapped IRQs (with the HW bit set in the LR) we have to follow some
->>>>> rules of the architecture.  One of these rules is that VM must not be
->>>>> allowed to deactivate a virtual interrupt with the HW bit set unless the
->>>>> physical interrupt is also active.
->>>>>
->>>>> This works fine when injecting mapped interrupts, because we leave it up
->>>>> to the injector to either set EOImode==1 or manually set the active
->>>>> state of the physical interrupt.
->>>>>
->>>>> However, the guest can set virtual interrupt to be pending or active by
->>>>> writing to the virtual distributor, which could lead to deactivating a
->>>>> virtual interrupt with the HW bit set without the physical interrupt
->>>>> being active.
->>>>>
->>>>> We could set the physical interrupt to active whenever we are about to
->>>>> enter the VM with a HW interrupt either pending or active, but that
->>>>> would be really slow, especially on GICv2.  So we take the long way
->>>>> around and do the hard work when needed, which is expected to be
->>>>> extremely rare.
->>>>>
->>>>> When the VM sets the pending state for a HW interrupt on the virtual
->>>>> distributor we set the active state on the physical distributor, because
->>>>> the virtual interrupt can become active and then the guest can
->>>>> deactivate it.
->>>>>
->>>>> When the VM clears the pending state we also clear it on the physical
->>>>> side, because the injector might otherwise raise the interrupt.
->>>>>
->>>>> Signed-off-by: Christoffer Dall <cdall@linaro.org>
->>>>> ---
->>>>>  virt/kvm/arm/vgic/vgic-mmio.c | 33 +++++++++++++++++++++++++++++++++
->>>>>  virt/kvm/arm/vgic/vgic.c      |  7 +++++++
->>>>>  virt/kvm/arm/vgic/vgic.h      |  1 +
->>>>>  3 files changed, 41 insertions(+)
->>>>>
->>>>> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
->>>>> index c1e4bdd..00003ae 100644
->>>>> --- a/virt/kvm/arm/vgic/vgic-mmio.c
->>>>> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
->>>>> @@ -131,6 +131,9 @@ void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
->>>>>             struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
->>>>>
->>>>>             spin_lock(&irq->irq_lock);
->>>>> +           if (irq->hw)
->>>>> +                   vgic_irq_set_phys_active(irq, true);
->>>>> +
->>>>>             irq->pending_latch = true;
->>>>>
->>>>>             vgic_queue_irq_unlock(vcpu->kvm, irq);
->>>>> @@ -149,6 +152,20 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
->>>>>             struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
->>>>>
->>>>>             spin_lock(&irq->irq_lock);
->>>>> +           /*
->>>>> +            * We don't want the guest to effectively mask the physical
->>>>> +            * interrupt by doing a write to SPENDR followed by a write to
->>>>> +            * CPENDR for HW interrupts, so we clear the active state on
->>>>> +            * the physical side here.  This may lead to taking an
->>>>> +            * additional interrupt on the host, but that should not be a
->>>>> +            * problem as the worst that can happen is an additional vgic
->>>>> +            * injection.  We also clear the pending state to maintain
->>>>> +            * proper semantics for edge HW interrupts.
->>>>> +            */
->>>>> +           if (irq->hw) {
->>>>> +                   vgic_irq_set_phys_pending(irq, false);
->>>>> +                   vgic_irq_set_phys_active(irq, false);
->>>> I fail in understanding why the active state is reset here. Can you
->>>> provide an example?
->>>
->>>
->>> If we're clearing the pending state on the virtual side, we need to be
->>> able to let an incoming physical interrupt fire so that it can be made
->>> pending again. We may have to check that the virtual active state is
->>> clear though.
->>>
->>>> If the physical dist has an active state can't the virtual IRQ be in
->>>> active state, in which case you may later on deactivate a phys IRQ which
->>>> is not active?
->>>
->>>
->>> Well, I think we must be able to handle both cases:
->>>
->>> - CPENDR write:
->>>       clear physical pending
->>>       if (virtual active clear)
->>>               clear physical active
->>>
->>> - CACTIVER write:
->>>       clear physical active
->>>
->>> Does this work for you?
->>
->> yes it does with that change!
->>
-> I agree, I should fix that.
-> 
-> But then I wondered, are we properly handling PPIs for
-> setting/clearing the pending state?  Don't we actually need to do
-> something similar like the active cpu where we check the requester CPU
-> and make sure we're not fiddling with some random hardware state when
-> accessed by userspace?
-Hmmm. Yeah, that's another can of worm. We should certainly make sure
-that whatever userspace does is not directly impacting the HW state (and
-only the guest does).
-
-I think. I'm not quite sure...
-
-	M. (GIC-ed, again).
--- 
-Jazz is not dead. It just smells funny...
+Wy4uLl0NCj4gPg0KPiA+IC8qDQo+ID4gICogeHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4
+eHh4eA0KPiA+ICAqLw0KPiA+IHZvaWQga3ZtX2h3cG9pc29uX3BhZ2VfYWRkKHJhbV9hZGRyX3Qg
+cmFtX2FkZHIpOw0KPiANCj4gSXQgc2hvdWxkIGJlIGluIHRoZSBkb2MtY29tbWVudCBmb3JtYXQs
+IHdoaWNoIGJlZ2lucyAiLyoqIiBhbmQgaGFzIHNvbWUgc3R5bGl6YXRpb24gb2YgaG93IHlvdSBs
+aXN0IHBhcmFtZXRlcnMgYW5kIHNvIG9uLiBMb3RzIG9mDQo+IGV4YW1wbGVzIGluIHRoZSBleGlz
+dGluZyBoZWFkZXJzLg0KDQp1bmRlcnN0YW5kLCB0aGFua3MgZm9yIHRoZSBleHBsYW5hdGlvbi4N
+Cg0KPiANCj4gdGhhbmtzDQo+IC0tIFBNTQ0K
