@@ -1,59 +1,47 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH 0/2] Fix preemption issues with kvm_arm_get_running_vcpu
-Date: Fri,  8 Sep 2017 07:52:17 -0700
-Message-ID: <1504882339-42520-1-git-send-email-christoffer.dall@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 67ABC49C6A
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Sep 2017 10:50:28 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EGCMoxnjP+UZ for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Sep 2017 10:50:27 -0400 (EDT)
-Received: from mail-pf0-f180.google.com (mail-pf0-f180.google.com
- [209.85.192.180])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 30B5249C5E
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Sep 2017 10:50:26 -0400 (EDT)
-Received: by mail-pf0-f180.google.com with SMTP id e199so4879706pfh.3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Sep 2017 07:52:56 -0700 (PDT)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Subject: [PATCH 1/2] KVM: arm/arm64: Remove redundant preemptible checks
+Date: Fri,  8 Sep 2017 07:52:18 -0700
+Message-ID: <1504882339-42520-2-git-send-email-christoffer.dall@linaro.org>
+References: <1504882339-42520-1-git-send-email-christoffer.dall@linaro.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1504882339-42520-1-git-send-email-christoffer.dall@linaro.org>
+Sender: kvm-owner@vger.kernel.org
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@linaro.org>, hemk976@gmail.com, kvm@vger.kernel.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, hemk976@gmail.com, Jintack Lim <jintack@cs.columbia.edu>, kvm@vger.kernel.org, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Christoffer Dall <cdall@linaro.org>
 
-These two patches slightly improves our preemption configuration when
-accessing the per-CPU variables holding the currently running VCPU by
-removing a redundant check and rearranging calling code from
-non-preemptible context on RT systems.
+The __this_cpu_read() and __this_cpu_write() functions already implement
+checks for the required preemption levels when using
+CONFIG_DEBUG_PREEMPT which gives you nice error messages and such.
+Therefore there is no need to explicitly check this using a BUG_ON() in
+the code (which we don't do for other uses of per cpu variables either).
 
-I'm not entirely sure if we fix issues only affecting PREEMPT_RT in mainline
-and also cc these to stable.  Looking at the git log there seems to be some
-precedence for this.  If not, I'm happy to remove the cc tag and/or drop the
-second patch.
+Signed-off-by: Christoffer Dall <cdall@linaro.org>
+---
+ virt/kvm/arm/arm.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-Thanks,
--Christoffer
-
-Christoffer Dall (2):
-  KVM: arm/arm64: Remove redundant preemptible checks
-  KVM: arm/arm64: Fix vgic_mmio_change_active with PREEMPT_RT
-
- virt/kvm/arm/arm.c            |  2 --
- virt/kvm/arm/vgic/vgic-mmio.c | 12 +++++++++++-
- 2 files changed, 11 insertions(+), 3 deletions(-)
-
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index a39a1e1..04313a2 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -69,7 +69,6 @@ static DEFINE_PER_CPU(unsigned char, kvm_arm_hardware_enabled);
+ 
+ static void kvm_arm_set_running_vcpu(struct kvm_vcpu *vcpu)
+ {
+-	BUG_ON(preemptible());
+ 	__this_cpu_write(kvm_arm_running_vcpu, vcpu);
+ }
+ 
+@@ -79,7 +78,6 @@ static void kvm_arm_set_running_vcpu(struct kvm_vcpu *vcpu)
+  */
+ struct kvm_vcpu *kvm_arm_get_running_vcpu(void)
+ {
+-	BUG_ON(preemptible());
+ 	return __this_cpu_read(kvm_arm_running_vcpu);
+ }
+ 
 -- 
 2.7.4
