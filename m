@@ -1,253 +1,203 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH v2 07/28] arm64/sve: Low-level SVE architectural state manipulation functions
-Date: Wed, 13 Sep 2017 16:39:40 +0100
-Message-ID: <87mv5ya9qb.fsf@linaro.org>
-References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com> <1504198860-12951-8-git-send-email-Dave.Martin@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [RFC PATCH 2/3] kvm: arm/arm64: vgic-vits: free its resource when
+ vm reboot/reset
+Date: Sun, 10 Sep 2017 20:46:33 +0200
+Message-ID: <fbf06eb5-f894-1719-616c-79ccf3322c1f@redhat.com>
+References: <1504703110-10744-1-git-send-email-wanghaibin.wang@huawei.com>
+ <1504703110-10744-3-git-send-email-wanghaibin.wang@huawei.com>
+ <77e9976a-c263-90d5-973d-b0ef9153de82@redhat.com>
+ <59B0A19A.9040407@huawei.com>
+ <f89f4475-d7ed-d4d4-6ac4-d2150169f140@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-arch-owner@vger.kernel.org>
-In-reply-to: <1504198860-12951-8-git-send-email-Dave.Martin@arm.com>
-Sender: linux-arch-owner@vger.kernel.org
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E00449C2C
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 10 Sep 2017 14:44:17 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id hwxS1kRT6CFL for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 10 Sep 2017 14:44:04 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5D0D749C2B
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 10 Sep 2017 14:44:04 -0400 (EDT)
+In-Reply-To: <f89f4475-d7ed-d4d4-6ac4-d2150169f140@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: wanghaibin <wanghaibin.wang@huawei.com>
+Cc: marc.zyngier@arm.com, cdall@linaro.org, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com, andre.przywara@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
+Hi Wanghaibin,
 
-Dave Martin <Dave.Martin@arm.com> writes:
+On 07/09/2017 13:28, Auger Eric wrote:
+> Hi Wanghaibin,
+> 
+> On 07/09/2017 03:32, wanghaibin wrote:
+>> On 2017/9/7 0:20, Auger Eric wrote:
+>>
+>>> Hi,
+>>>
+>>> On 06/09/2017 15:05, wanghaibin wrote:
+>>>> This patch fix the migrate save tables failure.
+>>>>
+>>>> When the virtual machine is in booting and the devices haven't initialized,
+>>>> the all virtual dte/ite may be invalid. If migrate at this moment, the save
+>>>> tables interface traversal device list, and check the dte is valid or not.
+>>>> if not, it will return the -EINVAL.
+>>>
+>>> The issue on save is less clear to me. We are not checking the "dte" are
+>>> valid as it is said above. We are scrolling the ITS lists - which may be
+>>> empty - and dump them in guest memory.
+>>>
+>>> On save() there are quite few checks that can cause a failure.
+>>> vgic_its_check_id() can be among them. This typically requires the
+>>> GITS_BASER to have been properly set. Failing on save looks OK to me in
+>>> such situation.
+>>>
+>>> Sorry but I don't get the purpose of this patch. Does it fix a save failure?
+>>
+>>
+>> Yes, for save, vgic_its_check_id() func will check the L1 DTE valid or not through
+>> the code like :
+>>
+>> 	/* Each 1st level entry is represented by a 64-bit value. */
+>> 	if (kvm_read_guest(its->dev->kvm,
+>> 			   BASER_ADDRESS(baser) + index * sizeof(indirect_ptr),
+>> 			   &indirect_ptr, sizeof(indirect_ptr)))
+>> 		return false;
+>>
+>> 	indirect_ptr = le64_to_cpu(indirect_ptr);
+>>
+>> 	/* check the valid bit of the first level entry */
+>> 	if (!(indirect_ptr & BIT_ULL(63)))
+>> 		return false;
+>>
+>> If invalid , the save will return -EINVAL caused by the vgic_its_check_id() with return the false value.
+>>
+>> And form the cover letter, the problem happened when no one pci dev has been probed( guest driver haven't any
+>> mapd, mapti), So the L1 DTEs are all invalid currently. Just like you said, at this moment migrate, we are scrolling
+>> the ITS lists, next time check_id failed and save interface failed.
+>>
+>> I think the final reason is the device list free problem, at the reset/reboot, ITS dev/clo/itt lists are not be free
+>> and set NULL. So that, the save interface failed.
+>> This patch try to free the resource when vm reboot/reset.
+> OK understood. Indeed none of the device/collection lists should be non
+> empty at that stage, ie. when GITS_BASERn have not be written yet and
+> are marked invalid.
+> 
+> For solving the specific save() issue here, I think the best is to check
+> the validity bit of the GITS_BASER (col, device) and if invalid do nothing.
 
-> Manipulating the SVE architectural state, including the vector and
-> predicate registers, first-fault register and the vector length,
-> requires the use of dedicated instructions added by SVE.
->
-> This patch adds suitable assembly functions for saving and
-> restoring the SVE registers and querying the vector length.
-> Setting of the vector length is done as part of register restore.
->
-> Since people building kernels may not all get an SVE-enabled
-> toolchain for a while, this patch uses macros that generate
-> explicit opcodes in place of assembler mnemonics.
->
-> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> Cc: Alex Bennée <alex.bennee@linaro.org>
+Actually the above proposal does not work as GITS_BASERn is not properly
+reset. Maybe the best way is to introduce an ITS KVM device reset IOTCL
+in the control group. Upon this command we could properly reset the
+requested registers and the lists.
 
-It took me a while to find a way to properly dissemble the resulting
-binaries, in the end needing to run a native objdump in Stretch. I'd
-hopped my gdb-multiarch was bleeding edge enough but no ;-)
+Thanks
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-
->
-> ---
->
-> Changes since v1
-> ----------------
->
-> Requested by Alex Bennée:
->
-> * Annotate instruction generation macros with the canonical
-> architectural syntax so that people can cross-reference more easily
-> against the architectural documentation.
-> ---
->  arch/arm64/include/asm/fpsimd.h       |   5 ++
->  arch/arm64/include/asm/fpsimdmacros.h | 148 ++++++++++++++++++++++++++++++++++
->  arch/arm64/kernel/entry-fpsimd.S      |  17 ++++
->  3 files changed, 170 insertions(+)
->
-> diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
-> index 410c481..026a7c7 100644
-> --- a/arch/arm64/include/asm/fpsimd.h
-> +++ b/arch/arm64/include/asm/fpsimd.h
-> @@ -67,6 +67,11 @@ extern void fpsimd_update_current_state(struct fpsimd_state *state);
->
->  extern void fpsimd_flush_task_state(struct task_struct *target);
->
-> +extern void sve_save_state(void *state, u32 *pfpsr);
-> +extern void sve_load_state(void const *state, u32 const *pfpsr,
-> +			   unsigned long vq_minus_1);
-> +extern unsigned int sve_get_vl(void);
-> +
->  /* For use by EFI runtime services calls only */
->  extern void __efi_fpsimd_begin(void);
->  extern void __efi_fpsimd_end(void);
-> diff --git a/arch/arm64/include/asm/fpsimdmacros.h b/arch/arm64/include/asm/fpsimdmacros.h
-> index 0f5fdd3..e050d76 100644
-> --- a/arch/arm64/include/asm/fpsimdmacros.h
-> +++ b/arch/arm64/include/asm/fpsimdmacros.h
-> @@ -75,3 +75,151 @@
->  	ldr	w\tmpnr, [\state, #16 * 2 + 4]
->  	fpsimd_restore_fpcr x\tmpnr, \state
->  .endm
-> +
-> +/* Sanity-check macros to help avoid encoding garbage instructions */
-> +
-> +.macro _check_general_reg nr
-> +	.if (\nr) < 0 || (\nr) > 30
-> +		.error "Bad register number \nr."
-> +	.endif
-> +.endm
-> +
-> +.macro _sve_check_zreg znr
-> +	.if (\znr) < 0 || (\znr) > 31
-> +		.error "Bad Scalable Vector Extension vector register number \znr."
-> +	.endif
-> +.endm
-> +
-> +.macro _sve_check_preg pnr
-> +	.if (\pnr) < 0 || (\pnr) > 15
-> +		.error "Bad Scalable Vector Extension predicate register number \pnr."
-> +	.endif
-> +.endm
-> +
-> +.macro _check_num n, min, max
-> +	.if (\n) < (\min) || (\n) > (\max)
-> +		.error "Number \n out of range [\min,\max]"
-> +	.endif
-> +.endm
-> +
-> +/* SVE instruction encodings for non-SVE-capable assemblers */
-> +
-> +/* STR (vector): STR Z\nz, [X\nxbase, #\offset, MUL VL] */
-> +.macro _sve_str_v nz, nxbase, offset=0
-> +	_sve_check_zreg \nz
-> +	_check_general_reg \nxbase
-> +	_check_num (\offset), -0x100, 0xff
-> +	.inst	0xe5804000			\
-> +		| (\nz)				\
-> +		| ((\nxbase) << 5)		\
-> +		| (((\offset) & 7) << 10)	\
-> +		| (((\offset) & 0x1f8) << 13)
-> +.endm
-> +
-> +/* LDR (vector): LDR Z\nz, [X\nxbase, #\offset, MUL VL] */
-> +.macro _sve_ldr_v nz, nxbase, offset=0
-> +	_sve_check_zreg \nz
-> +	_check_general_reg \nxbase
-> +	_check_num (\offset), -0x100, 0xff
-> +	.inst	0x85804000			\
-> +		| (\nz)				\
-> +		| ((\nxbase) << 5)		\
-> +		| (((\offset) & 7) << 10)	\
-> +		| (((\offset) & 0x1f8) << 13)
-> +.endm
-> +
-> +/* STR (predicate): STR P\np, [X\nxbase, #\offset, MUL VL] */
-> +.macro _sve_str_p np, nxbase, offset=0
-> +	_sve_check_preg \np
-> +	_check_general_reg \nxbase
-> +	_check_num (\offset), -0x100, 0xff
-> +	.inst	0xe5800000			\
-> +		| (\np)				\
-> +		| ((\nxbase) << 5)		\
-> +		| (((\offset) & 7) << 10)	\
-> +		| (((\offset) & 0x1f8) << 13)
-> +.endm
-> +
-> +/* LDR (predicate): LDR P\np, [X\nxbase, #\offset, MUL VL] */
-> +.macro _sve_ldr_p np, nxbase, offset=0
-> +	_sve_check_preg \np
-> +	_check_general_reg \nxbase
-> +	_check_num (\offset), -0x100, 0xff
-> +	.inst	0x85800000			\
-> +		| (\np)				\
-> +		| ((\nxbase) << 5)		\
-> +		| (((\offset) & 7) << 10)	\
-> +		| (((\offset) & 0x1f8) << 13)
-> +.endm
-> +
-> +/* RDVL X\nx, #\imm */
-> +.macro _sve_rdvl nx, imm
-> +	_check_general_reg \nx
-> +	_check_num (\imm), -0x20, 0x1f
-> +	.inst	0x04bf5000			\
-> +		| (\nx)				\
-> +		| (((\imm) & 0x3f) << 5)
-> +.endm
-> +
-> +/* RDFFR (unpredicated): RDFFR P\np.B */
-> +.macro _sve_rdffr np
-> +	_sve_check_preg \np
-> +	.inst	0x2519f000			\
-> +		| (\np)
-> +.endm
-> +
-> +/* WRFFR P\np.B */
-> +.macro _sve_wrffr np
-> +	_sve_check_preg \np
-> +	.inst	0x25289000			\
-> +		| ((\np) << 5)
-> +.endm
-> +
-> +.macro __for from:req, to:req
-> +	.if (\from) == (\to)
-> +		_for__body \from
-> +	.else
-> +		__for \from, (\from) + ((\to) - (\from)) / 2
-> +		__for (\from) + ((\to) - (\from)) / 2 + 1, \to
-> +	.endif
-> +.endm
-> +
-> +.macro _for var:req, from:req, to:req, insn:vararg
-> +	.macro _for__body \var:req
-> +		\insn
-> +	.endm
-> +
-> +	__for \from, \to
-> +
-> +	.purgem _for__body
-> +.endm
-> +
-> +.macro sve_save nxbase, xpfpsr, nxtmp
-> + _for n, 0, 31,	_sve_str_v	\n, \nxbase, \n - 34
-> + _for n, 0, 15,	_sve_str_p	\n, \nxbase, \n - 16
-> +		_sve_rdffr	0
-> +		_sve_str_p	0, \nxbase
-> +		_sve_ldr_p	0, \nxbase, -16
-> +
-> +		mrs		x\nxtmp, fpsr
-> +		str		w\nxtmp, [\xpfpsr]
-> +		mrs		x\nxtmp, fpcr
-> +		str		w\nxtmp, [\xpfpsr, #4]
-> +.endm
-> +
-> +.macro sve_load nxbase, xpfpsr, xvqminus1, nxtmp
-> +		mrs_s		x\nxtmp, SYS_ZCR_EL1
-> +		bic		x\nxtmp, x\nxtmp, ZCR_ELx_LEN_MASK
-> +		orr		x\nxtmp, x\nxtmp, \xvqminus1
-> +		msr_s		SYS_ZCR_EL1, x\nxtmp	// self-synchronising
-> +
-> + _for n, 0, 31,	_sve_ldr_v	\n, \nxbase, \n - 34
-> +		_sve_ldr_p	0, \nxbase
-> +		_sve_wrffr	0
-> + _for n, 0, 15,	_sve_ldr_p	\n, \nxbase, \n - 16
-> +
-> +		ldr		w\nxtmp, [\xpfpsr]
-> +		msr		fpsr, x\nxtmp
-> +		ldr		w\nxtmp, [\xpfpsr, #4]
-> +		msr		fpcr, x\nxtmp
-> +.endm
-> diff --git a/arch/arm64/kernel/entry-fpsimd.S b/arch/arm64/kernel/entry-fpsimd.S
-> index 6a27cd6..73f17bf 100644
-> --- a/arch/arm64/kernel/entry-fpsimd.S
-> +++ b/arch/arm64/kernel/entry-fpsimd.S
-> @@ -41,3 +41,20 @@ ENTRY(fpsimd_load_state)
->  	fpsimd_restore x0, 8
->  	ret
->  ENDPROC(fpsimd_load_state)
-> +
-> +#ifdef CONFIG_ARM64_SVE
-> +ENTRY(sve_save_state)
-> +	sve_save 0, x1, 2
-> +	ret
-> +ENDPROC(sve_save_state)
-> +
-> +ENTRY(sve_load_state)
-> +	sve_load 0, x1, x2, 3
-> +	ret
-> +ENDPROC(sve_load_state)
-> +
-> +ENTRY(sve_get_vl)
-> +	_sve_rdvl	0, 1
-> +	ret
-> +ENDPROC(sve_get_vl)
-> +#endif /* CONFIG_ARM64_SVE */
+Eric
+> 
+> Then we need to have a more global discussion about whether, when and
+> where the device and collection lists need to be freed.
+> 
+> If you want I can respin with above suggestion and add the valid pointer
+> to the entry_fn_t to handle the restore path. Up to you.
+> 
+> Thanks
+> 
+> Eric
+> 
+> 
+>> BTW: these lists will re-bulid when the reboot vm run the probe pci device step.
+> 
+>>
+>> Thanks
+>>
+>>>
+>>> Thanks
+>>>
+>>> Eric
+>>>
+>>>
+>>>>
+>>>> This patch try to free the its list resource when vm reboot or reset to avoid this.
+>>>>
+>>>> Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
+>>>> ---
+>>>>  virt/kvm/arm/arm.c           |  5 ++++-
+>>>>  virt/kvm/arm/vgic/vgic-its.c | 10 ++++++++++
+>>>>  virt/kvm/arm/vgic/vgic.h     |  1 +
+>>>>  3 files changed, 15 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+>>>> index a39a1e1..db7632d 100644
+>>>> --- a/virt/kvm/arm/arm.c
+>>>> +++ b/virt/kvm/arm/arm.c
+>>>> @@ -46,6 +46,7 @@
+>>>>  #include <asm/kvm_coproc.h>
+>>>>  #include <asm/kvm_psci.h>
+>>>>  #include <asm/sections.h>
+>>>> +#include "vgic.h"
+>>>>  
+>>>>  #ifdef REQUIRES_VIRT
+>>>>  __asm__(".arch_extension	virt");
+>>>> @@ -901,8 +902,10 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+>>>>  	 * Ensure a rebooted VM will fault in RAM pages and detect if the
+>>>>  	 * guest MMU is turned off and flush the caches as needed.
+>>>>  	 */
+>>>> -	if (vcpu->arch.has_run_once)
+>>>> +	if (vcpu->arch.has_run_once) {
+>>>>  		stage2_unmap_vm(vcpu->kvm);
+>>>> +		vgic_its_free_resource(vcpu->kvm);
+>>>> +	}
+>>>>  
+>>>>  	vcpu_reset_hcr(vcpu);
+>>>>  
+>>>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+>>>> index 25d614f..5c20352 100644
+>>>> --- a/virt/kvm/arm/vgic/vgic-its.c
+>>>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+>>>> @@ -2467,6 +2467,16 @@ static int vgic_its_get_attr(struct kvm_device *dev,
+>>>>  	.has_attr = vgic_its_has_attr,
+>>>>  };
+>>>>  
+>>>> +void vgic_its_free_resource(struct kvm *kvm)
+>>>> +{
+>>>> +	struct kvm_device *dev, *tmp;
+>>>> +
+>>>> +	list_for_each_entry_safe(dev, tmp, &kvm->devices, vm_node) {
+>>>> +		if(dev->ops == &kvm_arm_vgic_its_ops)
+>>>> +			vgic_its_free_list(kvm, dev->private);
+>>>> +	}
+>>>> +}
+>>>> +
+>>>>  int kvm_vgic_register_its_device(void)
+>>>>  {
+>>>>  	return kvm_register_device_ops(&kvm_arm_vgic_its_ops,
+>>>> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+>>>> index c2be5b7..fbcbdfd 100644
+>>>> --- a/virt/kvm/arm/vgic/vgic.h
+>>>> +++ b/virt/kvm/arm/vgic/vgic.h
+>>>> @@ -222,5 +222,6 @@ int vgic_v3_line_level_info_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+>>>>  
+>>>>  bool lock_all_vcpus(struct kvm *kvm);
+>>>>  void unlock_all_vcpus(struct kvm *kvm);
+>>>> +void vgic_its_free_resource(struct kvm *kvm);
+>>>>  
+>>>>  #endif
+>>>>
+>>>
+>>> .
+>>>
+>>
+>>
+>>
