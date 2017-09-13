@@ -1,118 +1,44 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [RFC PATCH 3/3] kvm: arm/arm64: vgic-its: fix return value for
- restore
-Date: Wed, 13 Sep 2017 23:25:01 +0200
-Message-ID: <6246fa89-50cb-488a-008c-1290ced290e7@redhat.com>
-References: <1504703110-10744-1-git-send-email-wanghaibin.wang@huawei.com>
- <1504703110-10744-4-git-send-email-wanghaibin.wang@huawei.com>
- <fd0534b6-7e95-45cd-f90d-188c93a98f4a@redhat.com> <20170913200248.GK1631@lvm>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH v2 09/28] arm64/sve: Signal frame and context structure
+ definition
+Date: Wed, 13 Sep 2017 22:33:08 +0100
+Message-ID: <20170913213307.GF23415@e103592.cambridge.arm.com>
+References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com>
+ <1504198860-12951-10-git-send-email-Dave.Martin@arm.com>
+ <20170913133618.lclorawve7364xxi@localhost>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CCD5049C19
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Sep 2017 17:22:27 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oI+la-r8O+i3 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 13 Sep 2017 17:22:27 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D891C40FAE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Sep 2017 17:22:26 -0400 (EDT)
-In-Reply-To: <20170913200248.GK1631@lvm>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>
-Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com, andre.przywara@arm.com
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-arch-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20170913133618.lclorawve7364xxi@localhost>
+Sender: linux-arch-owner@vger.kernel.org
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, gdb@sourceware.org, Yao Qi <Yao.Qi@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Alan Hayward <alan.hayward@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+On Wed, Sep 13, 2017 at 06:36:18AM -0700, Catalin Marinas wrote:
+> On Thu, Aug 31, 2017 at 06:00:41PM +0100, Dave P Martin wrote:
+> > +/*
+> > + * The SVE architecture leaves space for future expansion of the
+> > + * vector length beyond its initial architectural limit of 2048 bits
+> > + * (16 quadwords).
+> > + */
+> > +#define SVE_VQ_BYTES		0x10	/* number of bytes per quadword */
+> > +
+> > +#define SVE_VQ_MIN		1
+> > +#define SVE_VQ_MAX		0x200
+> 
+> Just a nitpick (up to you): could you use 16 and 512 here instead of
+> hex? I usually associate hex numbers with some bit fields.
 
-On 13/09/2017 22:02, Christoffer Dall wrote:
-> Hi Eric,
-> 
-> On Wed, Sep 06, 2017 at 05:18:35PM +0200, Auger Eric wrote:
->> Hi Wanghaibin,
->>
->> On 06/09/2017 15:05, wanghaibin wrote:
->>> This patch fix the migrate restore tables failure.
->>>
->>> The same scene, at the destination, the restore tables interface traversal guest
->>> memory, and check the dte/ite is valid or not.
->>> If all dtes/ites are invalid, we will do try next one, and the last it will take
->>> the 1 return value, but currently, it be treated as error. That's not correct.
->> There's indeed a bug here! In case all entries are invalid we shouldn't
->> return an error.
->>
->> One solution could be to relax the error checking in scan_its_table()
->> and do not return 1 when the whole length has been scanned. This would
->> fix your issue.
-If you do not return 1 in scan_its_table if the whole size has been
-scanned, you achieve the same thing as in this patch and you simplify
-the error handling.
->>
->> drawback of that change:
->> at the moment we check the consistency of the entry data (next offset
->> field). At the moment if the next_offset points to an entry outside of
->> the table scope we are able to return an error (for top level tables).
->>
->> Otherwise, if we want to keep that check, I think we would need to add a
->> bool *valid parameter to entry_fn_t. in scan_its_table() we would return
->> 1 only if last fn() call returns valid and len <= 0.
->>
-> 
-> I don't really understand what you're proposing.
-The above method or Wanghaibin's patch removes a consistency check on
-the entry next offset field. But maybe this is better to drop it and
-have a code that gains in readability.
+I have no strong opinion other than a desire to make these constants
+typo-proof.
 
-Thanks
+There's no particular reason why these shouldn't be in decimal, so I can
+change them if you like, provided you promise to notice if I misspell
+512 as 521...
 
-Eric
-> 
-> I think Wanghaibin's patch actually looks correct.  Is there any problem
-> with it that you see?
-> 
-> Thanks,
-> -Christoffer
-> 
->>>
->>> This patch try to fix this problem.
->>>
->>> Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
->>> ---
->>>  virt/kvm/arm/vgic/vgic-its.c | 5 +----
->>>  1 file changed, 1 insertion(+), 4 deletions(-)
->>>
->>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->>> index 5c20352..2c69aeb 100644
->>> --- a/virt/kvm/arm/vgic/vgic-its.c
->>> +++ b/virt/kvm/arm/vgic/vgic-its.c
->>> @@ -2025,7 +2025,7 @@ static int vgic_its_restore_dte(struct vgic_its *its, u32 id,
->>>  		return PTR_ERR(dev);
->>>  
->>>  	ret = vgic_its_restore_itt(its, dev);
->>> -	if (ret) {
->>> +	if (ret < 0) {
->>>  		vgic_its_free_device(its->dev->kvm, dev);
->>>  		return ret;
->>>  	}
->>> @@ -2147,9 +2147,6 @@ static int vgic_its_restore_device_tables(struct vgic_its *its)
->>>  				     vgic_its_restore_dte, NULL);
->>>  	}
->>>  
->>> -	if (ret > 0)
->>> -		ret = -EINVAL;
->>> -
->>>  	return ret;
->>>  }
->>>  
->>>
+(git grep 131027)
+
+Cheers
+---Dave
