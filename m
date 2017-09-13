@@ -1,247 +1,64 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [RFC PATCH 2/3] kvm: arm/arm64: vgic-vits: free its resource when
- vm reboot/reset
-Date: Wed, 13 Sep 2017 10:49:31 +0200
-Message-ID: <eade42e1-8fb6-22f3-50c9-09d23d62bd7e@redhat.com>
-References: <1504703110-10744-1-git-send-email-wanghaibin.wang@huawei.com>
- <1504703110-10744-3-git-send-email-wanghaibin.wang@huawei.com>
- <77e9976a-c263-90d5-973d-b0ef9153de82@redhat.com>
- <59B0A19A.9040407@huawei.com>
- <f89f4475-d7ed-d4d4-6ac4-d2150169f140@redhat.com>
- <fbf06eb5-f894-1719-616c-79ccf3322c1f@redhat.com>
- <59B7C1E0.1080109@huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v11 6/6] target-arm: kvm64: Handle SError interrupt for
+ the guest OS
+Date: Wed, 13 Sep 2017 11:52:34 +0100
+Message-ID: <CAFEAcA_zO_-kDYb0MkW=p5oY6tQPk4PpCqZoG0_01pn=sa3upw@mail.gmail.com>
+References: <0184EA26B2509940AA629AE1405DD7F2015FE17F@DGGEMA503-MBX.china.huawei.com>
+ <CAFEAcA8J5wZ23kQypzcbUScUResjWnN6rDG0b0idD1rv7F5Fsw@mail.gmail.com> <5552cf68-b998-686b-8e7e-710399c2b014@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A9C9649C36
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Sep 2017 04:46:58 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id URLf4jRXCTWa for <kvmarm@lists.cs.columbia.edu>;
- Wed, 13 Sep 2017 04:46:56 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BD30B49C2F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Sep 2017 04:46:56 -0400 (EDT)
-In-Reply-To: <59B7C1E0.1080109@huawei.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: wanghaibin <wanghaibin.wang@huawei.com>
-Cc: marc.zyngier@arm.com, cdall@linaro.org, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com, andre.przywara@arm.com
+Content-Type: text/plain; charset="UTF-8"
+Return-path: <linux-acpi-owner@vger.kernel.org>
+In-Reply-To: <5552cf68-b998-686b-8e7e-710399c2b014@huawei.com>
+Sender: linux-acpi-owner@vger.kernel.org
+To: gengdongjiu <gengdongjiu@huawei.com>
+Cc: James Morse <james.morse@arm.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Zhaoshenglong <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, "edk2-devel@lists.01.org" <edk2-devel@lists.01.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Ingo Molnar <mingo@kernel.org>, "bp@suse.de" <bp@suse.de>, Shiju Jose <shiju.jose@huawei.com>, "zjzhang@codeaurora.org" <zjzhang@codeaurora.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, kvmarm@
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Wanghaibin,
+On 13 September 2017 at 08:52, gengdongjiu <gengdongjiu@huawei.com> wrote:
+>
+>
+> On 2017/9/12 0:39, Peter Maydell wrote:
+>>>>> +    return  kvm_vcpu_ioctl(CPU(cpu), KVM_ARM_SEI, &syndrome);
+>>>> This looks odd. If we don't have the RAS extension why do we need to do anything at all here ?
+>>> This is because Qemu may need to support non-RAS extension as discussed with ARM James before.
+>>> That is to say host hardware CPU does not support RAS, but guest supports.
+>>> That is under discussion.
+>>> When host hardware supports RAS, specify the syndrome to a valid value, otherwise, set it to 0.
+>> If the guest CPU doesn't support the RAS extension then we have
+>> no mechanism for delivering it a notification about the
+>> memory problem at all, so setting the syndrome to anything
+>> doesn't make sense.
+>>
+>> I'm not sure what you should do in the case of "host
+>> supports telling us about a memory problem and has
+>> done so, but guest does not support being told about it",
+>> but I'm pretty sure it shouldn't be this.
 
-On 12/09/2017 13:15, wanghaibin wrote:
-> On 2017/9/11 2:46, Auger Eric wrote:
-> 
->> Hi Wanghaibin,
->>
->> On 07/09/2017 13:28, Auger Eric wrote:
->>> Hi Wanghaibin,
->>>
->>> On 07/09/2017 03:32, wanghaibin wrote:
->>>> On 2017/9/7 0:20, Auger Eric wrote:
->>>>
->>>>> Hi,
->>>>>
->>>>> On 06/09/2017 15:05, wanghaibin wrote:
->>>>>> This patch fix the migrate save tables failure.
->>>>>>
->>>>>> When the virtual machine is in booting and the devices haven't initialized,
->>>>>> the all virtual dte/ite may be invalid. If migrate at this moment, the save
->>>>>> tables interface traversal device list, and check the dte is valid or not.
->>>>>> if not, it will return the -EINVAL.
->>>>>
->>>>> The issue on save is less clear to me. We are not checking the "dte" are
->>>>> valid as it is said above. We are scrolling the ITS lists - which may be
->>>>> empty - and dump them in guest memory.
->>>>>
->>>>> On save() there are quite few checks that can cause a failure.
->>>>> vgic_its_check_id() can be among them. This typically requires the
->>>>> GITS_BASER to have been properly set. Failing on save looks OK to me in
->>>>> such situation.
->>>>>
->>>>> Sorry but I don't get the purpose of this patch. Does it fix a save failure?
->>>>
->>>>
->>>> Yes, for save, vgic_its_check_id() func will check the L1 DTE valid or not through
->>>> the code like :
->>>>
->>>> 	/* Each 1st level entry is represented by a 64-bit value. */
->>>> 	if (kvm_read_guest(its->dev->kvm,
->>>> 			   BASER_ADDRESS(baser) + index * sizeof(indirect_ptr),
->>>> 			   &indirect_ptr, sizeof(indirect_ptr)))
->>>> 		return false;
->>>>
->>>> 	indirect_ptr = le64_to_cpu(indirect_ptr);
->>>>
->>>> 	/* check the valid bit of the first level entry */
->>>> 	if (!(indirect_ptr & BIT_ULL(63)))
->>>> 		return false;
->>>>
->>>> If invalid , the save will return -EINVAL caused by the vgic_its_check_id() with return the false value.
->>>>
->>>> And form the cover letter, the problem happened when no one pci dev has been probed( guest driver haven't any
->>>> mapd, mapti), So the L1 DTEs are all invalid currently. Just like you said, at this moment migrate, we are scrolling
->>>> the ITS lists, next time check_id failed and save interface failed.
->>>>
->>>> I think the final reason is the device list free problem, at the reset/reboot, ITS dev/clo/itt lists are not be free
->>>> and set NULL. So that, the save interface failed.
->>>> This patch try to free the resource when vm reboot/reset.
->>> OK understood. Indeed none of the device/collection lists should be non
->>> empty at that stage, ie. when GITS_BASERn have not be written yet and
->>> are marked invalid.
->>>
->>> For solving the specific save() issue here, I think the best is to check
->>> the validity bit of the GITS_BASER (col, device) and if invalid do nothing.
->>
->> Actually the above proposal does not work as GITS_BASERn is not properly
->> reset. Maybe the best way is to introduce an ITS KVM device reset IOTCL
->> in the control group. Upon this command we could properly reset the
->> requested registers and the lists.
-> 
-> 
-> Yes, It should free these lists when vits reset.
-> 
-> This patch according the has_run_once and vcpu_init to mark the vcpu reset happened,
-> and scrolling all kvm devices to find the vits device to free the lists.
-> I think it's a little odd too.
-> 
-> If we can add the reset IOCTL, I think it must be the best way.
+>    in short, if the hardware CPU does not support RAS extension, do you think whether the Qemu or guest OS
+> needs to support RAS(generate APEI table / record CPER / Error recovery).
 
-I looked at the qemu reset of the GICv3 and my understanding is the QEMU
-reset function sends reset values for each individual register. So my
-understanding is I should align QEMU ITS reset code. Then, we should
-free internal lists in the relevant register write when detecting the
-valid bit is not set.
-> 
-> Thanks.
-> 
->>
->> Thanks
->>
->> Eric
->>>
->>> Then we need to have a more global discussion about whether, when and
->>> where the device and collection lists need to be freed.
->>>
->>> If you want I can respin with above suggestion and add the valid pointer
->>> to the entry_fn_t to handle the restore path. Up to you.
-> 
-> 
-> All along, I want to contribute code to the community, so far, It has not been achieved.
-> So I would like to collect the solutions for this problem and try to fix it first, can I?
-OK sure. So I will send a QEMU patch today and I will review your kernel
-fixes then.
+This question seems to be not really related to the review
+comment that it is responding to.
 
-Thanks
+(1) If the host does not support notifying us about
+errors, then there is clearly nothing to do in this
+code, because we will never get a notification.
 
-Eric
-> 
-> Thanks.
-> 
->>>
->>> Thanks
->>>
->>> Eric
->>>
->>>
->>>> BTW: these lists will re-bulid when the reboot vm run the probe pci device step.
->>>
->>>>
->>>> Thanks
->>>>
->>>>>
->>>>> Thanks
->>>>>
->>>>> Eric
->>>>>
->>>>>
->>>>>>
->>>>>> This patch try to free the its list resource when vm reboot or reset to avoid this.
->>>>>>
->>>>>> Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
->>>>>> ---
->>>>>>  virt/kvm/arm/arm.c           |  5 ++++-
->>>>>>  virt/kvm/arm/vgic/vgic-its.c | 10 ++++++++++
->>>>>>  virt/kvm/arm/vgic/vgic.h     |  1 +
->>>>>>  3 files changed, 15 insertions(+), 1 deletion(-)
->>>>>>
->>>>>> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
->>>>>> index a39a1e1..db7632d 100644
->>>>>> --- a/virt/kvm/arm/arm.c
->>>>>> +++ b/virt/kvm/arm/arm.c
->>>>>> @@ -46,6 +46,7 @@
->>>>>>  #include <asm/kvm_coproc.h>
->>>>>>  #include <asm/kvm_psci.h>
->>>>>>  #include <asm/sections.h>
->>>>>> +#include "vgic.h"
->>>>>>  
->>>>>>  #ifdef REQUIRES_VIRT
->>>>>>  __asm__(".arch_extension	virt");
->>>>>> @@ -901,8 +902,10 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
->>>>>>  	 * Ensure a rebooted VM will fault in RAM pages and detect if the
->>>>>>  	 * guest MMU is turned off and flush the caches as needed.
->>>>>>  	 */
->>>>>> -	if (vcpu->arch.has_run_once)
->>>>>> +	if (vcpu->arch.has_run_once) {
->>>>>>  		stage2_unmap_vm(vcpu->kvm);
->>>>>> +		vgic_its_free_resource(vcpu->kvm);
->>>>>> +	}
->>>>>>  
->>>>>>  	vcpu_reset_hcr(vcpu);
->>>>>>  
->>>>>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->>>>>> index 25d614f..5c20352 100644
->>>>>> --- a/virt/kvm/arm/vgic/vgic-its.c
->>>>>> +++ b/virt/kvm/arm/vgic/vgic-its.c
->>>>>> @@ -2467,6 +2467,16 @@ static int vgic_its_get_attr(struct kvm_device *dev,
->>>>>>  	.has_attr = vgic_its_has_attr,
->>>>>>  };
->>>>>>  
->>>>>> +void vgic_its_free_resource(struct kvm *kvm)
->>>>>> +{
->>>>>> +	struct kvm_device *dev, *tmp;
->>>>>> +
->>>>>> +	list_for_each_entry_safe(dev, tmp, &kvm->devices, vm_node) {
->>>>>> +		if(dev->ops == &kvm_arm_vgic_its_ops)
->>>>>> +			vgic_its_free_list(kvm, dev->private);
->>>>>> +	}
->>>>>> +}
->>>>>> +
->>>>>>  int kvm_vgic_register_its_device(void)
->>>>>>  {
->>>>>>  	return kvm_register_device_ops(&kvm_arm_vgic_its_ops,
->>>>>> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
->>>>>> index c2be5b7..fbcbdfd 100644
->>>>>> --- a/virt/kvm/arm/vgic/vgic.h
->>>>>> +++ b/virt/kvm/arm/vgic/vgic.h
->>>>>> @@ -222,5 +222,6 @@ int vgic_v3_line_level_info_uaccess(struct kvm_vcpu *vcpu, bool is_write,
->>>>>>  
->>>>>>  bool lock_all_vcpus(struct kvm *kvm);
->>>>>>  void unlock_all_vcpus(struct kvm *kvm);
->>>>>> +void vgic_its_free_resource(struct kvm *kvm);
->>>>>>  
->>>>>>  #endif
->>>>>>
->>>>>
->>>>> .
->>>>>
->>>>
->>>>
->>>>
->>
->> .
->>
-> 
-> 
-> 
+(2) If the host does support notifying us about errors,
+but we choose not to expose RAS to the guest, then
+there's not much to do either. We probably just want
+to take whatever the default behaviour is for any
+application when it touches memory that's bad.
+We definitely don't want to tell the guest anything.
+
+(3) If the host supports notification, and we choose
+to expose RAS to the guest, then we need to do
+whatever we have to do to notify the guest.
+
+If we're in this signal handler and also
+arm_feature(env, ARM_FEATURE_RAS) is false then that
+is case (2), and my point is that doing anything with
+the guest 'syndrome' value looks like the wrong thing.
+
+thanks
+-- PMM
