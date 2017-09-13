@@ -1,29 +1,30 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [RFC PATCH 2/3] kvm: arm/arm64: vgic-vits: free its resource
- when vm reboot/reset
-Date: Wed, 13 Sep 2017 12:34:45 -0700
-Message-ID: <20170913193445.GJ1631@lvm>
+Subject: Re: [RFC PATCH 3/3] kvm: arm/arm64: vgic-its: fix return value for
+ restore
+Date: Wed, 13 Sep 2017 13:02:48 -0700
+Message-ID: <20170913200248.GK1631@lvm>
 References: <1504703110-10744-1-git-send-email-wanghaibin.wang@huawei.com>
- <1504703110-10744-3-git-send-email-wanghaibin.wang@huawei.com>
+ <1504703110-10744-4-git-send-email-wanghaibin.wang@huawei.com>
+ <fd0534b6-7e95-45cd-f90d-188c93a98f4a@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A599340FB0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Sep 2017 15:32:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 86B5340FA5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Sep 2017 16:00:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lRJRIEurZGlT for <kvmarm@lists.cs.columbia.edu>;
- Wed, 13 Sep 2017 15:32:07 -0400 (EDT)
-Received: from mail-pf0-f175.google.com (mail-pf0-f175.google.com
- [209.85.192.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 79B4240A86
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Sep 2017 15:32:07 -0400 (EDT)
-Received: by mail-pf0-f175.google.com with SMTP id q76so1715524pfq.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Sep 2017 12:34:47 -0700 (PDT)
+ with ESMTP id yHHjxrNKJpY6 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 13 Sep 2017 16:00:14 -0400 (EDT)
+Received: from mail-pf0-f179.google.com (mail-pf0-f179.google.com
+ [209.85.192.179])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 97ABF40A86
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Sep 2017 16:00:14 -0400 (EDT)
+Received: by mail-pf0-f179.google.com with SMTP id e1so1820890pfk.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Sep 2017 13:02:54 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1504703110-10744-3-git-send-email-wanghaibin.wang@huawei.com>
+In-Reply-To: <fd0534b6-7e95-45cd-f90d-188c93a98f4a@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,107 +34,76 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: wanghaibin <wanghaibin.wang@huawei.com>
-Cc: marc.zyngier@arm.com, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com
+To: Auger Eric <eric.auger@redhat.com>
+Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com, andre.przywara@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Wanghaibin,
+Hi Eric,
 
-On Wed, Sep 06, 2017 at 09:05:09PM +0800, wanghaibin wrote:
-> This patch fix the migrate save tables failure.
+On Wed, Sep 06, 2017 at 05:18:35PM +0200, Auger Eric wrote:
+> Hi Wanghaibin,
 > 
-> When the virtual machine is in booting and the devices haven't initialized,
-> the all virtual dte/ite may be invalid. If migrate at this moment, the save
-> tables interface traversal device list, and check the dte is valid or not.
-> if not, it will return the -EINVAL.
+> On 06/09/2017 15:05, wanghaibin wrote:
+> > This patch fix the migrate restore tables failure.
+> > 
+> > The same scene, at the destination, the restore tables interface traversal guest
+> > memory, and check the dte/ite is valid or not.
+> > If all dtes/ites are invalid, we will do try next one, and the last it will take
+> > the 1 return value, but currently, it be treated as error. That's not correct.
+> There's indeed a bug here! In case all entries are invalid we shouldn't
+> return an error.
 > 
-> This patch try to free the its list resource when vm reboot or reset to avoid this.
+> One solution could be to relax the error checking in scan_its_table()
+> and do not return 1 when the whole length has been scanned. This would
+> fix your issue.
+> 
+> drawback of that change:
+> at the moment we check the consistency of the entry data (next offset
+> field). At the moment if the next_offset points to an entry outside of
+> the table scope we are able to return an error (for top level tables).
+> 
+> Otherwise, if we want to keep that check, I think we would need to add a
+> bool *valid parameter to entry_fn_t. in scan_its_table() we would return
+> 1 only if last fn() call returns valid and len <= 0.
+> 
 
-I think the problem should be described the following way (feel free to
-use this in a commit message).
+I don't really understand what you're proposing.
 
-When rebooting a VM, we currently don't have a way to reset the ITS.
-This results in the booting a VM with a pre-programmed ITS with existing
-cached state.  This can lead to all sorts of interesting problems.
+I think Wanghaibin's patch actually looks correct.  Is there any problem
+with it that you see?
 
-One such problem is that if trying to migrate the VM after rebooting the
-VM, we try to traverse the device tables in guest memory.  When using
-indirect tables, and the guest has re-initialized the ITS device table
-base register pointing to cleared memory, this results in trying to
-access address 0 in the guest physical address space, which in turn
-causes the ITS saving code to return an error to user space.
-
-The correct fix is to introduce a reset function as a device attribute
-for the ITS.
-
-Hope this helps,
+Thanks,
 -Christoffer
 
-> 
-> Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
-> ---
->  virt/kvm/arm/arm.c           |  5 ++++-
->  virt/kvm/arm/vgic/vgic-its.c | 10 ++++++++++
->  virt/kvm/arm/vgic/vgic.h     |  1 +
->  3 files changed, 15 insertions(+), 1 deletion(-)
-> 
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index a39a1e1..db7632d 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -46,6 +46,7 @@
->  #include <asm/kvm_coproc.h>
->  #include <asm/kvm_psci.h>
->  #include <asm/sections.h>
-> +#include "vgic.h"
->  
->  #ifdef REQUIRES_VIRT
->  __asm__(".arch_extension	virt");
-> @@ -901,8 +902,10 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
->  	 * Ensure a rebooted VM will fault in RAM pages and detect if the
->  	 * guest MMU is turned off and flush the caches as needed.
->  	 */
-> -	if (vcpu->arch.has_run_once)
-> +	if (vcpu->arch.has_run_once) {
->  		stage2_unmap_vm(vcpu->kvm);
-> +		vgic_its_free_resource(vcpu->kvm);
-> +	}
->  
->  	vcpu_reset_hcr(vcpu);
->  
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index 25d614f..5c20352 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -2467,6 +2467,16 @@ static int vgic_its_get_attr(struct kvm_device *dev,
->  	.has_attr = vgic_its_has_attr,
->  };
->  
-> +void vgic_its_free_resource(struct kvm *kvm)
-> +{
-> +	struct kvm_device *dev, *tmp;
-> +
-> +	list_for_each_entry_safe(dev, tmp, &kvm->devices, vm_node) {
-> +		if(dev->ops == &kvm_arm_vgic_its_ops)
-> +			vgic_its_free_list(kvm, dev->private);
-> +	}
-> +}
-> +
->  int kvm_vgic_register_its_device(void)
->  {
->  	return kvm_register_device_ops(&kvm_arm_vgic_its_ops,
-> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-> index c2be5b7..fbcbdfd 100644
-> --- a/virt/kvm/arm/vgic/vgic.h
-> +++ b/virt/kvm/arm/vgic/vgic.h
-> @@ -222,5 +222,6 @@ int vgic_v3_line_level_info_uaccess(struct kvm_vcpu *vcpu, bool is_write,
->  
->  bool lock_all_vcpus(struct kvm *kvm);
->  void unlock_all_vcpus(struct kvm *kvm);
-> +void vgic_its_free_resource(struct kvm *kvm);
->  
->  #endif
-> -- 
-> 1.8.3.1
-> 
-> 
+> > 
+> > This patch try to fix this problem.
+> > 
+> > Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
+> > ---
+> >  virt/kvm/arm/vgic/vgic-its.c | 5 +----
+> >  1 file changed, 1 insertion(+), 4 deletions(-)
+> > 
+> > diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> > index 5c20352..2c69aeb 100644
+> > --- a/virt/kvm/arm/vgic/vgic-its.c
+> > +++ b/virt/kvm/arm/vgic/vgic-its.c
+> > @@ -2025,7 +2025,7 @@ static int vgic_its_restore_dte(struct vgic_its *its, u32 id,
+> >  		return PTR_ERR(dev);
+> >  
+> >  	ret = vgic_its_restore_itt(its, dev);
+> > -	if (ret) {
+> > +	if (ret < 0) {
+> >  		vgic_its_free_device(its->dev->kvm, dev);
+> >  		return ret;
+> >  	}
+> > @@ -2147,9 +2147,6 @@ static int vgic_its_restore_device_tables(struct vgic_its *its)
+> >  				     vgic_its_restore_dte, NULL);
+> >  	}
+> >  
+> > -	if (ret > 0)
+> > -		ret = -EINVAL;
+> > -
+> >  	return ret;
+> >  }
+> >  
+> > 
