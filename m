@@ -1,228 +1,219 @@
-From: wanghaibin <wanghaibin.wang@huawei.com>
-Subject: Re: [RFC PATCH 2/3] kvm: arm/arm64: vgic-vits: free its resource
- when vm reboot/reset
-Date: Tue, 12 Sep 2017 19:15:44 +0800
-Message-ID: <59B7C1E0.1080109@huawei.com>
-References: <1504703110-10744-1-git-send-email-wanghaibin.wang@huawei.com>
- <1504703110-10744-3-git-send-email-wanghaibin.wang@huawei.com>
- <77e9976a-c263-90d5-973d-b0ef9153de82@redhat.com>
- <59B0A19A.9040407@huawei.com>
- <f89f4475-d7ed-d4d4-6ac4-d2150169f140@redhat.com>
- <fbf06eb5-f894-1719-616c-79ccf3322c1f@redhat.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Subject: Re: [PATCH v6 6/7] KVM: arm64: allow get exception information from
+ userspace
+Date: Wed, 13 Sep 2017 15:32:10 +0800
+Message-ID: <2a42d1ea-3456-2873-c9ea-d8a027b59789@huawei.com>
+References: <1503916701-13516-1-git-send-email-gengdongjiu@huawei.com>
+ <1503916701-13516-7-git-send-email-gengdongjiu@huawei.com>
+ <59B17438.5070501@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1711B49C1C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Sep 2017 07:13:55 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4VxxhQtlhAxg for <kvmarm@lists.cs.columbia.edu>;
- Tue, 12 Sep 2017 07:13:54 -0400 (EDT)
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E3ED940FA7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Sep 2017 07:13:52 -0400 (EDT)
-In-Reply-To: <fbf06eb5-f894-1719-616c-79ccf3322c1f@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Auger Eric <eric.auger@redhat.com>
-Cc: marc.zyngier@arm.com, cdall@linaro.org, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com, andre.przywara@arm.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <59B17438.5070501@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: James Morse <james.morse@arm.com>, peter.maydell@linaro.org
+Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, lenb@kernel.org, robert.moore@intel.com, lv.zheng@intel.com, mark.rutland@arm.com, xiexiuqi@huawei.com, cov@codeaurora.org, david.daney@cavium.com, suzuki.poulose@arm.com, stefan@hello-penguin.com, Dave.Martin@arm.com, kristina.martsenko@arm.com, wangkefeng.wang@huawei.com, tbaicar@codeaurora.org, ard.biesheuvel@linaro.org, mingo@kernel.org, bp@suse.de, shiju.jose@huawei.com, zjzhang@codeaurora.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, devel@acpica.org, mst@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 2017/9/11 2:46, Auger Eric wrote:
+Hi James,
 
-> Hi Wanghaibin,
+
+On 2017/9/8 0:30, James Morse wrote:
+> Hi Dongjiu Geng,
 > 
-> On 07/09/2017 13:28, Auger Eric wrote:
->> Hi Wanghaibin,
->>
->> On 07/09/2017 03:32, wanghaibin wrote:
->>> On 2017/9/7 0:20, Auger Eric wrote:
->>>
->>>> Hi,
->>>>
->>>> On 06/09/2017 15:05, wanghaibin wrote:
->>>>> This patch fix the migrate save tables failure.
->>>>>
->>>>> When the virtual machine is in booting and the devices haven't initialized,
->>>>> the all virtual dte/ite may be invalid. If migrate at this moment, the save
->>>>> tables interface traversal device list, and check the dte is valid or not.
->>>>> if not, it will return the -EINVAL.
->>>>
->>>> The issue on save is less clear to me. We are not checking the "dte" are
->>>> valid as it is said above. We are scrolling the ITS lists - which may be
->>>> empty - and dump them in guest memory.
->>>>
->>>> On save() there are quite few checks that can cause a failure.
->>>> vgic_its_check_id() can be among them. This typically requires the
->>>> GITS_BASER to have been properly set. Failing on save looks OK to me in
->>>> such situation.
->>>>
->>>> Sorry but I don't get the purpose of this patch. Does it fix a save failure?
->>>
->>>
->>> Yes, for save, vgic_its_check_id() func will check the L1 DTE valid or not through
->>> the code like :
->>>
->>> 	/* Each 1st level entry is represented by a 64-bit value. */
->>> 	if (kvm_read_guest(its->dev->kvm,
->>> 			   BASER_ADDRESS(baser) + index * sizeof(indirect_ptr),
->>> 			   &indirect_ptr, sizeof(indirect_ptr)))
->>> 		return false;
->>>
->>> 	indirect_ptr = le64_to_cpu(indirect_ptr);
->>>
->>> 	/* check the valid bit of the first level entry */
->>> 	if (!(indirect_ptr & BIT_ULL(63)))
->>> 		return false;
->>>
->>> If invalid , the save will return -EINVAL caused by the vgic_its_check_id() with return the false value.
->>>
->>> And form the cover letter, the problem happened when no one pci dev has been probed( guest driver haven't any
->>> mapd, mapti), So the L1 DTEs are all invalid currently. Just like you said, at this moment migrate, we are scrolling
->>> the ITS lists, next time check_id failed and save interface failed.
->>>
->>> I think the final reason is the device list free problem, at the reset/reboot, ITS dev/clo/itt lists are not be free
->>> and set NULL. So that, the save interface failed.
->>> This patch try to free the resource when vm reboot/reset.
->> OK understood. Indeed none of the device/collection lists should be non
->> empty at that stage, ie. when GITS_BASERn have not be written yet and
->> are marked invalid.
->>
->> For solving the specific save() issue here, I think the best is to check
->> the validity bit of the GITS_BASER (col, device) and if invalid do nothing.
+> On 28/08/17 11:38, Dongjiu Geng wrote:
+>> when userspace gets SIGBUS signal, it does not know whether
+>> this is a synchronous external abort or SError,
 > 
-> Actually the above proposal does not work as GITS_BASERn is not properly
-> reset. Maybe the best way is to introduce an ITS KVM device reset IOTCL
-> in the control group. Upon this command we could properly reset the
-> requested registers and the lists.
+> Why would Qemu/kvmtool need to know if the original notification (if there was
+> one) was synchronous or asynchronous? This is between firmware and the kernel.
+there are two reasons:
+
+1. Let us firstly discuss the SEA and SEI, there are different workflow for the two different Errors.
+2. when record the CPER in the user space, it needs to know the error type, because SEA and SEI are different Error source,
+   so they have different offset in the APEI table, that is to say they will be recorded to different place of the APEI table.
 
 
-Yes, It should free these lists when vits reset.
-
-This patch according the has_run_once and vcpu_init to mark the vcpu reset happened,
-and scrolling all kvm devices to find the vits device to free the lists.
-I think it's a little odd too.
-
-If we can add the reset IOCTL, I think it must be the best way.
-
-Thanks.
+         etc/acpi/tables                               etc/hardware_errors
+        ====================                    ==========================================
+    + +--------------------------+            +------------------+
+    | | HEST                     |            |    address       |              +--------------+
+    | +--------------------------+            |    registers     |              | Error Status |
+    | | GHES0                    |            | +----------------+              | Data Block 0 |
+    | +--------------------------+ +--------->| |status_address0 |------------->| +------------+
+    | | .................        | |          | +----------------+              | |  CPER      |
+    | | error_status_address-----+-+ +------->| |status_address1 |----------+   | |  CPER      |
+    | | .................        |   |        | +----------------+          |   | |  ....      |
+    | | read_ack_register--------+-+ |        |  .............   |          |   | |  CPER      |
+    | | read_ack_preserve        | | |        +------------------+          |   | +-+------------+
+    | | read_ack_write           | | | +----->| |status_address10|--------+ |   | Error Status |
+    + +--------------------------+ | | |      | +----------------+        | |   | Data Block 1 |
+    | | GHES1                    | +-+-+----->| | ack_value0     |        | +-->| +------------+
+    + +--------------------------+   | |      | +----------------+        |     | |  CPER      |
+    | | .................        |   | | +--->| | ack_value1     |        |     | |  CPER      |
+    | | error_status_address-----+---+ | |    | +----------------+        |     | |  ....      |
+    | | .................        |     | |    | |  ............. |        |     | |  CPER      |
+    | | read_ack_register--------+-----+-+    | +----------------+        |     +-+------------+
+    | | read_ack_preserve        |     |   +->| | ack_value10    |        |     | |..........  |
+    | | read_ack_write           |     |   |  | +----------------+        |     | +------------+
+    + +--------------------------|     |   |                              |     | Error Status |
+    | | ...............          |     |   |                              |     | Data Block 10|
+    + +--------------------------+     |   |                              +---->| +------------+
+    | | GHES10                   |     |   |                                    | |  CPER      |
+    + +--------------------------+     |   |                                    | |  CPER      |
+    | | .................        |     |   |                                    | |  ....      |
+    | | error_status_address-----+-----+   |                                    | |  CPER      |
+    | | .................        |         |                                    +-+------------+
+    | | read_ack_register--------+---------+
+    | | read_ack_preserve        |
+    | | read_ack_write           |
+    + +--------------------------+
 
 > 
-> Thanks
 > 
-> Eric
->>
->> Then we need to have a more global discussion about whether, when and
->> where the device and collection lists need to be freed.
->>
->> If you want I can respin with above suggestion and add the valid pointer
->> to the entry_fn_t to handle the restore path. Up to you.
+> I think I can see why you need this: to choose whether to emulate SEA or SEI,
+emulating SEA or SEI is one reason, another reason is that the CPER will be recorded to different place of APEI.
 
 
-All along, I want to contribute code to the community, so far, It has not been achieved.
-So I would like to collect the solutions for this problem and try to fix it first, can I?
+> but what if the guest wasn't running? Or the guest was running, but it wasn't
+> guest-memory that is affected.
+If the guest was not running, host firmware will directly notify EL1 host kernel to handle the error, not notify hypervisor
+only if the guest was running host firmware can notify the Error to hypervisor.
 
-Thanks.
+If the user space is Qemu, and the error is from Qemu, and guest-memory is not involve.
+I will not handle it, please see the code for arm64.
 
->>
->> Thanks
->>
->> Eric
->>
->>
->>> BTW: these lists will re-bulid when the reboot vm run the probe pci device step.
->>
->>>
->>> Thanks
->>>
->>>>
->>>> Thanks
->>>>
->>>> Eric
->>>>
->>>>
->>>>>
->>>>> This patch try to free the its list resource when vm reboot or reset to avoid this.
->>>>>
->>>>> Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
->>>>> ---
->>>>>  virt/kvm/arm/arm.c           |  5 ++++-
->>>>>  virt/kvm/arm/vgic/vgic-its.c | 10 ++++++++++
->>>>>  virt/kvm/arm/vgic/vgic.h     |  1 +
->>>>>  3 files changed, 15 insertions(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
->>>>> index a39a1e1..db7632d 100644
->>>>> --- a/virt/kvm/arm/arm.c
->>>>> +++ b/virt/kvm/arm/arm.c
->>>>> @@ -46,6 +46,7 @@
->>>>>  #include <asm/kvm_coproc.h>
->>>>>  #include <asm/kvm_psci.h>
->>>>>  #include <asm/sections.h>
->>>>> +#include "vgic.h"
->>>>>  
->>>>>  #ifdef REQUIRES_VIRT
->>>>>  __asm__(".arch_extension	virt");
->>>>> @@ -901,8 +902,10 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
->>>>>  	 * Ensure a rebooted VM will fault in RAM pages and detect if the
->>>>>  	 * guest MMU is turned off and flush the caches as needed.
->>>>>  	 */
->>>>> -	if (vcpu->arch.has_run_once)
->>>>> +	if (vcpu->arch.has_run_once) {
->>>>>  		stage2_unmap_vm(vcpu->kvm);
->>>>> +		vgic_its_free_resource(vcpu->kvm);
->>>>> +	}
->>>>>  
->>>>>  	vcpu_reset_hcr(vcpu);
->>>>>  
->>>>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->>>>> index 25d614f..5c20352 100644
->>>>> --- a/virt/kvm/arm/vgic/vgic-its.c
->>>>> +++ b/virt/kvm/arm/vgic/vgic-its.c
->>>>> @@ -2467,6 +2467,16 @@ static int vgic_its_get_attr(struct kvm_device *dev,
->>>>>  	.has_attr = vgic_its_has_attr,
->>>>>  };
->>>>>  
->>>>> +void vgic_its_free_resource(struct kvm *kvm)
->>>>> +{
->>>>> +	struct kvm_device *dev, *tmp;
->>>>> +
->>>>> +	list_for_each_entry_safe(dev, tmp, &kvm->devices, vm_node) {
->>>>> +		if(dev->ops == &kvm_arm_vgic_its_ops)
->>>>> +			vgic_its_free_list(kvm, dev->private);
->>>>> +	}
->>>>> +}
->>>>> +
->>>>>  int kvm_vgic_register_its_device(void)
->>>>>  {
->>>>>  	return kvm_register_device_ops(&kvm_arm_vgic_its_ops,
->>>>> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
->>>>> index c2be5b7..fbcbdfd 100644
->>>>> --- a/virt/kvm/arm/vgic/vgic.h
->>>>> +++ b/virt/kvm/arm/vgic/vgic.h
->>>>> @@ -222,5 +222,6 @@ int vgic_v3_line_level_info_uaccess(struct kvm_vcpu *vcpu, bool is_write,
->>>>>  
->>>>>  bool lock_all_vcpus(struct kvm *kvm);
->>>>>  void unlock_all_vcpus(struct kvm *kvm);
->>>>> +void vgic_its_free_resource(struct kvm *kvm);
->>>>>  
->>>>>  #endif
->>>>>
->>>>
->>>> .
->>>>
->>>
->>>
->>>
+void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
+{
+    ram_addr_t ram_addr;
+    hwaddr paddr;
+
+    ARMCPU *cpu = ARM_CPU(c);
+    CPUARMState *env = &cpu->env;
+    assert(code == BUS_MCEERR_AR || code == BUS_MCEERR_AO);
+    if (addr) {
+        ram_addr = qemu_ram_addr_from_host(addr);
+        if (ram_addr != RAM_ADDR_INVALID &&
+            kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
+            kvm_cpu_synchronize_state(c);
+            kvm_hwpoison_page_add(ram_addr);
+            if (is_abort_sea(env->exception.syndrome)) {
+                ghes_update_guest(ACPI_HEST_NOTIFY_SEA, paddr);
+                kvm_inject_arm_sea(c);
+            } else if (is_abort_sei(env->exception.syndrome)) {
+                ghes_update_guest(ACPI_HEST_NOTIFY_SEI, paddr);
+                kvm_inject_arm_sei(c);
+            }
+            return;
+        }
+        fprintf(stderr, "Hardware memory error for memory used by "
+                "QEMU itself instead of guest system!\n");
+    }
+
+    if (code == BUS_MCEERR_AR) {
+        fprintf(stderr, "Hardware memory error!\n");
+        exit(1);
+    }
+}
+
+
+For the x86, it also does not handle it, it only print "Hardware memory error for memory used by QEMU itself instead of guest system!"
+
+void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
+{
+    X86CPU *cpu = X86_CPU(c);
+    CPUX86State *env = &cpu->env;
+    ram_addr_t ram_addr;
+    hwaddr paddr;
+
+    /* If we get an action required MCE, it has been injected by KVM
+     * while the VM was running.  An action optional MCE instead should
+     * be coming from the main thread, which qemu_init_sigbus identifies
+     * as the "early kill" thread.
+     */
+    assert(code == BUS_MCEERR_AR || code == BUS_MCEERR_AO);
+
+    if ((env->mcg_cap & MCG_SER_P) && addr) {
+        ram_addr = qemu_ram_addr_from_host(addr);
+        if (ram_addr != RAM_ADDR_INVALID &&
+            kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
+            kvm_hwpoison_page_add(ram_addr);
+            kvm_mce_inject(cpu, paddr, code);
+            return;
+        }
+
+        fprintf(stderr, "Hardware memory error for memory used by "
+                "QEMU itself instead of guest system!\n");
+    }
+
+    if (code == BUS_MCEERR_AR) {
+        hardware_memory_error();
+    }
+
+    /* Hope we are lucky for AO MCE */
+}
+
+
+> 
+> What happens if the dram-scrub hardware spots an error in guest memory, but the
+> guest wasn't running? KVM won't have a relevant ESR value to give you.
+if the dram-scrub hardware spots an error in guest memory, it will generate
+IRQ in DDR controller, not SEA or SEI exception. I still do not consider the GSIV.
+For GSIV, may be we can only handle it in the host OS.
+
+
+> 
+> What happens if we start swapping a page of guest memory to disk, and discover
+> the memory is corrupt. This is synchronous, but it wasn't the guest, and KVM
+> still can't give you an ESR.
+I think this Error is reported by IRQ(GSIV), GSIV is not SEA/SEI, we should not give the ESR to them.
+
+
+> 
+> What about CPER records discovered through the polled interface? What happens if
+> I write a PFN into the corrupt-pfn sysfs interface?
+I do not understand this question.
+I think in the process it should report SEA notification when CPU consume the error page.
+
+
+> 
+> 
+> I think what you need is some way of knowing if the BUS_MCEERR_A* was directly
+> caused by a user-space (or guest) access, and if so was it a data or instruction
+when user space received the signal, it will judge whether the memory address is user-space (or guest) address
+
+
+> fetch. These can become SEA notifications.
+In fact, it can be SEI, not always SEA, why it will always SEA notifications?
+If the memory properties of data is device type, it may become SEI notification.
+
+
+> 
+> KVM's user-space shouldn't be a special-case where the kernel behaves
+> differently: if we tinker with this it needs to make sense for all user space
+> processes and mean something on all architectures.
+> 
+> I think this information could be useful to other users of these signals, e.g. a
+> JVM could silently regenerate/reload code/data for a non-direct-access fault
+> instead of exit-ing (or throwing an exception) for a direct access.
+> 
+> For BUS_MCEERR_A* from memory_failure() we can't know if they are caused by an
+> access or not. When the mm code gets -EHWPOISON when trying to resolve a
+
+Because of that, so I allow  userspace getting exception information
+
+> user-space fault we know it was due to a direct-access. (I don't know if/how x86
+> can know if it was code or data). Faulting guest accesses through KVM are just a
+> special version of this where KVM fixes-up stage2.
+> 
+> ... but for any of this to work we need the address of the corrupt memory.
+> (-> cover letter)
+> 
+> 
+> Thanks,
+> 
+> James
 > 
 > .
 > 
