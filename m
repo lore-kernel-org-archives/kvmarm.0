@@ -1,94 +1,89 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [RFC PATCH 1/3] kvm: arm/arm64: vgic-vits: separate
- vgic_its_free_list() function
-Date: Wed, 13 Sep 2017 12:14:05 -0700
-Message-ID: <20170913191405.GH1631@lvm>
-References: <1504703110-10744-1-git-send-email-wanghaibin.wang@huawei.com>
- <1504703110-10744-2-git-send-email-wanghaibin.wang@huawei.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH v2 11/28] arm64/sve: Core task context handling
+Date: Wed, 13 Sep 2017 20:17:07 +0100
+Message-ID: <20170913191707.GD23415@e103592.cambridge.arm.com>
+References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com>
+ <1504198860-12951-12-git-send-email-Dave.Martin@arm.com>
+ <20170913172605.hjrwjf34kyy7coh4@localhost>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B345349C2E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Sep 2017 15:11:28 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cOVLi5vU3Ayw for <kvmarm@lists.cs.columbia.edu>;
- Wed, 13 Sep 2017 15:11:27 -0400 (EDT)
-Received: from mail-pf0-f172.google.com (mail-pf0-f172.google.com
- [209.85.192.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C725640D25
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Sep 2017 15:11:27 -0400 (EDT)
-Received: by mail-pf0-f172.google.com with SMTP id q76so1647021pfq.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Sep 2017 12:14:07 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-arch-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1504703110-10744-2-git-send-email-wanghaibin.wang@huawei.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: wanghaibin <wanghaibin.wang@huawei.com>
-Cc: marc.zyngier@arm.com, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com
+In-Reply-To: <20170913172605.hjrwjf34kyy7coh4@localhost>
+Sender: linux-arch-owner@vger.kernel.org
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Will Deacon <will.deacon@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Sep 06, 2017 at 09:05:08PM +0800, wanghaibin wrote:
-> We slightly refactor vgic_its_destroy, separate vgic_its_free_list()
-> function for later patch invoke.
+On Wed, Sep 13, 2017 at 10:26:05AM -0700, Catalin Marinas wrote:
+> On Thu, Aug 31, 2017 at 06:00:43PM +0100, Dave P Martin wrote:
+> > +el0_sve_acc:
+> > +	/*
+> > +	 * Scalable Vector Extension access
+> > +	 */
+> > +	enable_dbg
+> > +	ct_user_exit
+> > +	mov	x0, x25
+> > +	mov	x1, sp
+> > +	bl	do_sve_acc
+> > +	b	ret_to_user
 > 
-> The patch also take a functional change. If the its->device_list.next
+> I think do_sve_acc() runs with interrupts disabled. We may have some
+> high latency for large SVE states.
 
-I don't see a functional change in this patch?
+Historically I wanted to play safe.
 
-Thanks,
--Christoffer
+I meant to change this to enable_dbg_and_irq now, but it looks like I
+forgot to do it.
 
-> is NULL, we still should free the its.
-> Honestly, I can't understand How does the its->device_list.next is NULL
-> happened at this moment.
+I'll double-check that do_sve_acc() does nothing that makes it unsafe to
+enable irqs, but it should be OK.  It's certainly _intended_ to be
+irq-safe.
+
+> > +/*
+> > + * Trapped SVE access
+> > + */
+> > +void do_sve_acc(unsigned int esr, struct pt_regs *regs)
+> > +{
+> > +	/* Even if we chose not to use SVE, the hardware could still trap: */
+> > +	if (unlikely(!system_supports_sve()) || WARN_ON(is_compat_task())) {
+> > +		force_signal_inject(SIGILL, ILL_ILLOPC, regs, 0);
+> > +		return;
+> > +	}
+> > +
+> > +	task_fpsimd_save();
+> > +
+> > +	sve_alloc(current);
+> > +	fpsimd_to_sve(current);
+> > +	if (test_and_set_thread_flag(TIF_SVE))
+> > +		WARN_ON(1); /* SVE access shouldn't have trapped */
+> > +
+> > +	task_fpsimd_load();
+> > +}
 > 
-> Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
-> ---
->  virt/kvm/arm/vgic/vgic-its.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index aa6b68d..25d614f 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -1624,10 +1624,8 @@ static void vgic_its_free_device(struct kvm *kvm, struct its_device *dev)
->  	kfree(dev);
->  }
->  
-> -static void vgic_its_destroy(struct kvm_device *kvm_dev)
-> +static void vgic_its_free_list(struct kvm *kvm, struct vgic_its *its)
->  {
-> -	struct kvm *kvm = kvm_dev->kvm;
-> -	struct vgic_its *its = kvm_dev->private;
->  	struct list_head *cur, *temp;
->  
->  	/*
-> @@ -1653,7 +1651,14 @@ static void vgic_its_destroy(struct kvm_device *kvm_dev)
->  		kfree(coll);
->  	}
->  	mutex_unlock(&its->its_lock);
-> +}
-> +
-> +static void vgic_its_destroy(struct kvm_device *kvm_dev)
-> +{
-> +	struct kvm *kvm = kvm_dev->kvm;
-> +	struct vgic_its *its = kvm_dev->private;
->  
-> +	vgic_its_free_list(kvm, its);
->  	kfree(its);
->  }
->  
-> -- 
-> 1.8.3.1
-> 
-> 
+> When this function is entered, do we expect TIF_SVE to always be
+> cleared? It's worth adding a comment on the expected conditions. If
+
+Yes, and this is required for correctness, as you observe.
+
+I had a BUG_ON() here which I removed, but it makes sense to add a
+comment to capture the precondition here, and how it is satisfied.
+
+> that's the case, task_fpsimd_save() would only save the FPSIMD state
+> which is fine. However, you subsequently transfer the FPSIMD state to
+> SVE, set TIF_SVE and restore the full SVE state. If we don't care about
+> the SVE state here, can we call task_fpsimd_load() *before* setting
+> TIF_SVE?
+
+There should be no way to reach this code with TIF_SVE set, unless
+task_fpsimd_load() sets the CPACR trap bit wrongly, or the hardware is
+broken -- either of which is a bug.
+
+> I may as well have confused myself with the state bouncing between
+> FPSIMD and SVE (more reasons to document the data flow better ;)).
+
+Agreed, I think this does need more explanation...  I'm currently
+trying to figure out the best way to describe it.
+
+Cheers
+---Dave
