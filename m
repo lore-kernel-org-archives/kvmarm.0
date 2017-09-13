@@ -1,47 +1,52 @@
-From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: Re: [PATCH v11 6/6] target-arm: kvm64: Handle SError interrupt for
- the guest OS
-Date: Wed, 13 Sep 2017 19:51:56 +0800
-Message-ID: <c105c670-6aec-32cd-d32b-30642819323e@huawei.com>
-References: <0184EA26B2509940AA629AE1405DD7F2015FE17F@DGGEMA503-MBX.china.huawei.com>
- <CAFEAcA8J5wZ23kQypzcbUScUResjWnN6rDG0b0idD1rv7F5Fsw@mail.gmail.com>
- <5552cf68-b998-686b-8e7e-710399c2b014@huawei.com>
- <CAFEAcA_zO_-kDYb0MkW=p5oY6tQPk4PpCqZoG0_01pn=sa3upw@mail.gmail.com>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v2 10/28] arm64/sve: Low-level CPU setup
+Date: Wed, 13 Sep 2017 06:32:06 -0700
+Message-ID: <20170913133206.rwobtu7ft5nrsh4p@localhost>
+References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com>
+ <1504198860-12951-11-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAFEAcA_zO_-kDYb0MkW=p5oY6tQPk4PpCqZoG0_01pn=sa3upw@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: James Morse <james.morse@arm.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Zhaoshenglong <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, "edk2-devel@lists.01.org" <edk2-devel@lists.01.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Ingo Molnar <mingo@kernel.org>, "bp@suse.de" <bp@suse.de>, Shiju Jose <shiju.jose@huawei.com>, "zjzhang@codeaurora.org" <zjzhang@codeaurora.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>kvm
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-arch-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1504198860-12951-11-git-send-email-Dave.Martin@arm.com>
+Sender: linux-arch-owner@vger.kernel.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On Thu, Aug 31, 2017 at 06:00:42PM +0100, Dave P Martin wrote:
+> diff --git a/arch/arm64/mm/proc.S b/arch/arm64/mm/proc.S
+> index 877d42f..dd22ef2 100644
+> --- a/arch/arm64/mm/proc.S
+> +++ b/arch/arm64/mm/proc.S
+> @@ -27,6 +27,7 @@
+>  #include <asm/pgtable-hwdef.h>
+>  #include <asm/cpufeature.h>
+>  #include <asm/alternative.h>
+> +#include <asm/sysreg.h>
+>  
+>  #ifdef CONFIG_ARM64_64K_PAGES
+>  #define TCR_TG_FLAGS	TCR_TG0_64K | TCR_TG1_64K
+> @@ -186,8 +187,17 @@ ENTRY(__cpu_setup)
+>  	tlbi	vmalle1				// Invalidate local TLB
+>  	dsb	nsh
+>  
+> -	mov	x0, #3 << 20
+> -	msr	cpacr_el1, x0			// Enable FP/ASIMD
+> +	mov	x0, #3 << 20			// FEN
+> +
+> +	/* SVE */
+> +	mrs	x5, id_aa64pfr0_el1
+> +	ubfx	x5, x5, #ID_AA64PFR0_SVE_SHIFT, #4
+> +	cbz	x5, 1f
+> +
+> +	bic	x0, x0, #CPACR_EL1_ZEN
+> +	orr	x0, x0, #CPACR_EL1_ZEN_EL1EN	// SVE: trap for EL0, not EL1
+> +1:	msr	cpacr_el1, x0			// Enable FP/ASIMD
 
+For EL1, I wonder whether we could move this later to cpufeature.c. IIRC
+I tried to do the same with FPSIMD but hit an issue with EFI run-time
+services (I may be wrong though).
 
-On 2017/9/13 18:52, Peter Maydell wrote:
-> This question seems to be not really related to the review
-> comment that it is responding to.
-> 
-> (1) If the host does not support notifying us about
-> errors, then there is clearly nothing to do in this
-> code, because we will never get a notification.
-> 
-> (2) If the host does support notifying us about errors,
-> but we choose not to expose RAS to the guest, then
-> there's not much to do either. We probably just want
-> to take whatever the default behaviour is for any
-> application when it touches memory that's bad.
-> We definitely don't want to tell the guest anything.
-> 
-> (3) If the host supports notification, and we choose
-> to expose RAS to the guest, then we need to do
-> whatever we have to do to notify the guest.
-> 
-> If we're in this signal handler and also
-> arm_feature(env, ARM_FEATURE_RAS) is false then that
-> is case (2), and my point is that doing anything with
-> the guest 'syndrome' value looks like the wrong thing.
-
-Peter,
-  your explanation is clear. OK, understand, thanks.
+-- 
+Catalin
