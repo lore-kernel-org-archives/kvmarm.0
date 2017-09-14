@@ -1,89 +1,112 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [RFC PATCH 3/3] kvm: arm/arm64: vgic-its: fix return value for
- restore
-Date: Thu, 14 Sep 2017 10:30:44 +0200
-Message-ID: <d9245b77-40d7-836d-b2c7-82f8f419b62a@redhat.com>
-References: <1504703110-10744-1-git-send-email-wanghaibin.wang@huawei.com>
- <1504703110-10744-4-git-send-email-wanghaibin.wang@huawei.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v2 12/28] arm64/sve: Support vector length resetting for new processes
+Date: Thu, 14 Sep 2017 09:47:05 +0100
+Message-ID: <87k211acqe.fsf@linaro.org>
+References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com> <1504198860-12951-13-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D379549C28
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Sep 2017 04:28:12 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dhQsgONzbqGE for <kvmarm@lists.cs.columbia.edu>;
- Thu, 14 Sep 2017 04:28:07 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 23F1E40D25
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Sep 2017 04:28:07 -0400 (EDT)
-In-Reply-To: <1504703110-10744-4-git-send-email-wanghaibin.wang@huawei.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: wanghaibin <wanghaibin.wang@huawei.com>, marc.zyngier@arm.com, cdall@linaro.org, kvmarm@lists.cs.columbia.edu, andre.przywara@arm.com
-Cc: wu.wubin@huawei.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-arch-owner@vger.kernel.org>
+In-reply-to: <1504198860-12951-13-git-send-email-Dave.Martin@arm.com>
+Sender: linux-arch-owner@vger.kernel.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Wanghaibin,
 
-On 06/09/2017 15:05, wanghaibin wrote:
-> This patch fix the migrate restore tables failure.
-> 
-> The same scene, at the destination, the restore tables interface traversal guest
-> memory, and check the dte/ite is valid or not.
-> If all dtes/ites are invalid, we will do try next one, and the last it will take
-> the 1 return value, but currently, it be treated as error. That's not correct.
-> 
-> This patch try to fix this problem.
-> 
-> Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
+Dave Martin <Dave.Martin@arm.com> writes:
+
+> It's desirable to be able to reset the vector length to some sane
+> default for new processes, since the new binary and its libraries
+> processes may or may not be SVE-aware.
+>
+> This patch tracks the desired post-exec vector length (if any) in a
+> new thread member sve_vl_onexec, and adds a new thread flag
+> TIF_SVE_VL_INHERIT to control whether to inherit or reset the
+> vector length.  Currently these are inactive.  Subsequent patches
+> will provide the capability to configure them.
+>
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> Cc: Alex Bennée <alex.bennee@linaro.org>
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+
+>
 > ---
->  virt/kvm/arm/vgic/vgic-its.c | 5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index 5c20352..2c69aeb 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -2025,7 +2025,7 @@ static int vgic_its_restore_dte(struct vgic_its *its, u32 id,
->  		return PTR_ERR(dev);
->  
->  	ret = vgic_its_restore_itt(its, dev);
-> -	if (ret) {
-> +	if (ret < 0) {
->  		vgic_its_free_device(its->dev->kvm, dev);
->  		return ret;
->  	}
-> @@ -2147,9 +2147,6 @@ static int vgic_its_restore_device_tables(struct vgic_its *its)
->  				     vgic_its_restore_dte, NULL);
->  	}
->  
-> -	if (ret > 0)
-> -		ret = -EINVAL;
-Reworking error handling in scan_its_table as I previously proposed
-indeed don't work for L2 tables, as pointed out by Christoffer. As such
-I eventually think your approach is the best.
-
-The only remark I have left is restore table IOCTL is likely to return 1
-with your change. 1 is not documented in the API as a returned value. I
-think we should return 0 in this case. We are lucky because QEMU
-kvm_device_access does not interpret positive values as errors.
-
-Thanks
-
-Eric
-
+>
+> Changes since v1
+> ----------------
+>
+> Requested by Alex Bennée:
+>
+> * Make sve_vl_onexec an unsigned int: that's the type used virtually
+> everywhere else, and the memory saving is too minor to be interesting.
+> ---
+>  arch/arm64/include/asm/processor.h   |  1 +
+>  arch/arm64/include/asm/thread_info.h |  1 +
+>  arch/arm64/kernel/fpsimd.c           | 16 ++++++++++++----
+>  3 files changed, 14 insertions(+), 4 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
+> index 4831d28..3faceac 100644
+> --- a/arch/arm64/include/asm/processor.h
+> +++ b/arch/arm64/include/asm/processor.h
+> @@ -87,6 +87,7 @@ struct thread_struct {
+>  	struct fpsimd_state	fpsimd_state;
+>  	void			*sve_state;	/* SVE registers, if any */
+>  	unsigned int		sve_vl;		/* SVE vector length */
+> +	unsigned int		sve_vl_onexec;	/* SVE vl after next exec */
+>  	unsigned long		fault_address;	/* fault info */
+>  	unsigned long		fault_code;	/* ESR_EL1 value */
+>  	struct debug_info	debug;		/* debugging */
+> diff --git a/arch/arm64/include/asm/thread_info.h b/arch/arm64/include/asm/thread_info.h
+> index f0880fc..d3568ab 100644
+> --- a/arch/arm64/include/asm/thread_info.h
+> +++ b/arch/arm64/include/asm/thread_info.h
+> @@ -92,6 +92,7 @@ void arch_setup_new_exec(void);
+>  #define TIF_SINGLESTEP		21
+>  #define TIF_32BIT		22	/* 32bit process */
+>  #define TIF_SVE			23	/* Scalable Vector Extension in use */
+> +#define TIF_SVE_VL_INHERIT	24	/* Inherit sve_vl_onexec across exec */
+>
+>  #define _TIF_SIGPENDING		(1 << TIF_SIGPENDING)
+>  #define _TIF_NEED_RESCHED	(1 << TIF_NEED_RESCHED)
+> diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+> index 9b1ebd7..e20b44d 100644
+> --- a/arch/arm64/kernel/fpsimd.c
+> +++ b/arch/arm64/kernel/fpsimd.c
+> @@ -106,6 +106,9 @@
+>   */
+>  static DEFINE_PER_CPU(struct fpsimd_state *, fpsimd_last_state);
+>
+> +/* Default VL for tasks that don't set it explicitly: */
+> +static int sve_default_vl = SVE_VL_MIN;
+> +
+>  static void sve_free(struct task_struct *task)
+>  {
+>  	kfree(task->thread.sve_state);
+> @@ -380,15 +383,20 @@ void fpsimd_flush_thread(void)
+>  		 * If a bug causes this to go wrong, we make some noise and
+>  		 * try to fudge thread.sve_vl to a safe value here.
+>  		 */
+> -		vl = current->thread.sve_vl;
 > -
->  	return ret;
->  }
->  
-> 
+> -		if (vl == 0)
+> -			vl = SVE_VL_MIN;
+> +		vl = current->thread.sve_vl_onexec ?
+> +			current->thread.sve_vl_onexec : sve_default_vl;
+>
+>  		if (WARN_ON(!sve_vl_valid(vl)))
+>  			vl = SVE_VL_MIN;
+>
+>  		current->thread.sve_vl = vl;
+> +
+> +		/*
+> +		 * If the task is not set to inherit, ensure that the vector
+> +		 * length will be reset by a subsequent exec:
+> +		 */
+> +		if (!test_thread_flag(TIF_SVE_VL_INHERIT))
+> +			current->thread.sve_vl_onexec = 0;
+>  	}
+>
+>  	set_thread_flag(TIF_FOREIGN_FPSTATE);
