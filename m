@@ -1,197 +1,207 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v6 6/7] KVM: arm64: allow get exception information from
- userspace
-Date: Thu, 14 Sep 2017 14:00:34 +0100
-Message-ID: <59BA7D72.4090403@arm.com>
-References: <1503916701-13516-1-git-send-email-gengdongjiu@huawei.com> <1503916701-13516-7-git-send-email-gengdongjiu@huawei.com> <59B17438.5070501@arm.com> <2a42d1ea-3456-2873-c9ea-d8a027b59789@huawei.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v2 20/28] arm64/sve: Add prctl controls for userspace vector length management
+Date: Thu, 14 Sep 2017 14:02:50 +0100
+Message-ID: <87a81xa0w5.fsf@linaro.org>
+References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com> <1504198860-12951-21-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-acpi-owner@vger.kernel.org>
-In-Reply-To: <2a42d1ea-3456-2873-c9ea-d8a027b59789@huawei.com>
-Sender: linux-acpi-owner@vger.kernel.org
-To: gengdongjiu <gengdongjiu@huawei.com>
-Cc: peter.maydell@linaro.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, lenb@kernel.org, robert.moore@intel.com, lv.zheng@intel.com, mark.rutland@arm.com, xiexiuqi@huawei.com, cov@codeaurora.org, david.daney@cavium.com, suzuki.poulose@arm.com, stefan@hello-penguin.com, Dave.Martin@arm.com, kristina.martsenko@arm.com, wangkefeng.wang@huawei.com, tbaicar@codeaurora.org, ard.biesheuvel@linaro.org, mingo@kernel.org, bp@suse.de, shiju.jose@huawei.com, zjzhang@codeaurora.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, devel@acpica.org, mst@redhat.com, john.garry@huawei.com, jonathan.cameron@hu
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-arch-owner@vger.kernel.org>
+In-reply-to: <1504198860-12951-21-git-send-email-Dave.Martin@arm.com>
+Sender: linux-arch-owner@vger.kernel.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi gengdongjiu,
 
-(re-ordered hunks)
+Dave Martin <Dave.Martin@arm.com> writes:
 
-On 13/09/17 08:32, gengdongjiu wrote:
-> On 2017/9/8 0:30, James Morse wrote:
->> On 28/08/17 11:38, Dongjiu Geng wrote:
->> For BUS_MCEERR_A* from memory_failure() we can't know if they are caused by
->> an access or not.
-
-Actually it looks like we can: I thought 'BUS_MCEERR_AR' could be triggered via
-some CPER flags, but its not. The only code that flags MF_ACTION_REQUIRED is
-x86's kernel-first handling, which nicely matches this 'direct access' problem.
-BUS_MCEERR_AR also come from KVM stage2 faults (and the x86 equivalent). Powerpc
-also triggers these directly, both from what look to be synchronous paths, so I
-think its fair to equate BUS_MCEERR_AR to a synchronous access and BUS_MCEERR_AO
-to something_else.
-
-I don't think we need anything else.
-
-
->> When the mm code gets -EHWPOISON when trying to resolve a
+> This patch adds two arm64-specific prctls, to permit userspace to
+> control its vector length:
 >
-> Because of that, so I allow  userspace getting exception information
+>  * PR_SVE_SET_VL: set the thread's SVE vector length and vector
+>    length inheritance mode.
+>
+>  * PR_SVE_GET_VL: get the same information.
+>
+> Although these calls shadow instruction set features in the SVE
+> architecture, these prctls provide additional control: the vector
+> length inheritance mode is Linux-specific and nothing to do with
+> the architecture, and the architecture does not permit EL0 to set
+> its own vector length directly.  Both can be used in portable tools
+> without requiring the use of SVE instructions.
+>
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 
-... and there are cases where you can't get the exception information, and other
-cases where it wasn't an exception at all.
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 
-[...]
-
-
->> What happens if the dram-scrub hardware spots an error in guest memory, but
->> the guest wasn't running? KVM won't have a relevant ESR value to give you.
-
-> if the dram-scrub hardware spots an error in guest memory, it will generate
-> IRQ in DDR controller, not SEA or SEI exception. I still do not consider the
-> GSIV. For GSIV, may be we can only handle it in the host OS.
-
-Great example: this IRQ pulls us out of a guest, we tromp through APEI and then
-memory_failure(), the memory happened to belong to the same guest
-(coincidence!), we send it some signal and now its user-space's problem.
-
-Your KVM_REG_ARM64_FAULT mechanism is going to return stale data, even though
-the notification interrupted the guest, and it was guest memory that was
-affected. KVM doesn't have a relevant ESR.
-
-
-I'm strongly against exposing 'which notification type' this error originally
-came from because:
-* it doesn't matter once we've got the CPER records,
-* there isn't always an answer (there are/will-be other ways of tripping
-  memory_failure())
-* it creates ABI between firwmare, host userspace and guest userspace.
-  Firmware's choice of notification type shouldn't affect anything other than
-  the host kernel.
-
-
-On 13/09/17 08:32, gengdongjiu wrote:
-> On 2017/9/8 0:30, James Morse wrote:
->> On 28/08/17 11:38, Dongjiu Geng wrote:
->>> when userspace gets SIGBUS signal, it does not know whether
->>> this is a synchronous external abort or SError,
->>
->> Why would Qemu/kvmtool need to know if the original notification (if there was
->> one) was synchronous or asynchronous? This is between firmware and the kernel.
-
-> there are two reasons:
-> 
-> 1. Let us firstly discuss the SEA and SEI, there are different workflow for the two different Errors.
-> 2. when record the CPER in the user space, it needs to know the error type, because SEA and SEI are different Error source,
->    so they have different offset in the APEI table, that is to say they will be recorded to different place of the APEI table.
-
-user-space can choose whether to use SEA or SEI, it doesn't have to choose the
-same notification type that firmware used, which in turn doesn't have to be the
-same as that used by the CPU to notify firmware.
-
-The choice only matters because these notifications hang on an existing pieces
-of the Arm-architecture, so the notification can only add to the architecturally
-defined meaning. (i.e. You can only send an SEA for something that can already
-be described as a synchronous external abort).
-
-Once we get to user-space, for memory_failure() notifications, (which so far is
-all we are talking about here), the only thing that could matter is whether the
-guest hit a PG_hwpoison page as a stage2 fault. These can be described as
-Synchronous-External-Abort.
-
-The Synchronous-External-Abort/SError-Interrupt distinction matters for the CPU
-because it can't always make an error synchronous. For memory_failure()
-notifications to a KVM guest we really can do this, and we already have this
-behaviour for free. An example:
-
-A guest touches some hardware:poisoned memory, for whatever reason the CPU can't
-put the world back together to make this a synchronous exception, so it reports
-it to firmware as an SError-interrupt.
-Linux gets an APEI notification and memory_failure() causes the affected page to
-be unmapped from the guest's stage2, and SIGBUS_MCEERR_AO sent to user-space.
-
-Qemu/kvmtool can now notify the guest with an IRQ or POLLed notification. AO->
-action optional, probably asynchronous.
-
-But in our example it wasn't really asynchronous, that was just a property of
-the original CPU->firmware notification. What happens? The guest vcpu is re-run,
-it re-runs the same instructions (this was a contained error so KVM's ELR points
-at/before the instruction that steps in the problem). This time KVM takes a
-stage2 fault, which the mm code will refuse to fixup because the relevant page
-was marked as PG_hwpoision by memory_failure(). KVM signals Qemu/kvmtool with
-SIGBUS_MCEERR_AR. Now Qemu/kvmtool can notify the guest using SEA.
-
-
-
-
->          etc/acpi/tables                               etc/hardware_errors
->         ====================                    ==========================================
->     + +--------------------------+            +------------------+
->     | | HEST                     |            |    address       |              +--------------+
->     | +--------------------------+            |    registers     |              | Error Status |
->     | | GHES0                    |            | +----------------+              | Data Block 0 |
->     | +--------------------------+ +--------->| |status_address0 |------------->| +------------+
->     | | .................        | |          | +----------------+              | |  CPER      |
->     | | error_status_address-----+-+ +------->| |status_address1 |----------+   | |  CPER      |
->     | | .................        |   |        | +----------------+          |   | |  ....      |
->     | | read_ack_register--------+-+ |        |  .............   |          |   | |  CPER      |
->     | | read_ack_preserve        | | |        +------------------+          |   | +-+------------+
->     | | read_ack_write           | | | +----->| |status_address10|--------+ |   | Error Status |
->     + +--------------------------+ | | |      | +----------------+        | |   | Data Block 1 |
->     | | GHES1                    | +-+-+----->| | ack_value0     |        | +-->| +------------+
->     + +--------------------------+   | |      | +----------------+        |     | |  CPER      |
->     | | .................        |   | | +--->| | ack_value1     |        |     | |  CPER      |
->     | | error_status_address-----+---+ | |    | +----------------+        |     | |  ....      |
->     | | .................        |     | |    | |  ............. |        |     | |  CPER      |
->     | | read_ack_register--------+-----+-+    | +----------------+        |     +-+------------+
->     | | read_ack_preserve        |     |   +->| | ack_value10    |        |     | |..........  |
->     | | read_ack_write           |     |   |  | +----------------+        |     | +------------+
->     + +--------------------------|     |   |                              |     | Error Status |
->     | | ...............          |     |   |                              |     | Data Block 10|
->     + +--------------------------+     |   |                              +---->| +------------+
->     | | GHES10                   |     |   |                                    | |  CPER      |
->     + +--------------------------+     |   |                                    | |  CPER      |
->     | | .................        |     |   |                                    | |  ....      |
->     | | error_status_address-----+-----+   |                                    | |  CPER      |
->     | | .................        |         |                                    +-+------------+
->     | | read_ack_register--------+---------+
->     | | read_ack_preserve        |
->     | | read_ack_write           |
->     + +--------------------------+
-> 
-
-(nice ascii art!)
-
->> I think I can see why you need this: to choose whether to emulate SEA or SEI,
-
-> emulating SEA or SEI is one reason, another reason is that the CPER will be recorded to different place of APEI.
-
-(This doesn't matter: Generate the CPER records after you've chosen the
-notification and this isn't a problem. Or map your 'Error Status Data Blocks'
-to status_address* depending on usage not in a fixed 1:1 way)
-
-
->> I think what you need is some way of knowing if the BUS_MCEERR_A* was directly
->> caused by a user-space (or guest) access, and if so was it a data or instruction
-
-> when user space received the signal, it will judge whether the memory address is user-space (or guest) address
-
->> fetch. These can become SEA notifications.
-
-> In fact, it can be SEI, not always SEA, why it will always SEA notifications?
-> If the memory properties of data is device type, it may become SEI notification.
-
-Let's take a step back: in what scenario should we use an emulated-SEA instead
-of an emulated-SEI? (forget what the CPU and firmware did, this is up to Qemu to
-decide).
-
-It can use SEA if this is a valid Synchronous-external-abort. Stage 2 faults are
-synchronous exceptions, if you hit a PG_hwpoision page on this path you can
-report this back to the guest as a Synchronous-external-abort/SEA.
-How do you know? You get SIGBUS_MCEERR_AR from KVM.
-
-
-Thanks,
-
-James
+> ---
+>  arch/arm64/include/asm/fpsimd.h    | 14 ++++++++++++
+>  arch/arm64/include/asm/processor.h |  4 ++++
+>  arch/arm64/kernel/fpsimd.c         | 46 ++++++++++++++++++++++++++++++++++++++
+>  include/uapi/linux/prctl.h         |  4 ++++
+>  kernel/sys.c                       | 12 ++++++++++
+>  5 files changed, 80 insertions(+)
+>
+> diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
+> index 2723cca..d084968 100644
+> --- a/arch/arm64/include/asm/fpsimd.h
+> +++ b/arch/arm64/include/asm/fpsimd.h
+> @@ -17,6 +17,7 @@
+>  #define __ASM_FP_H
+>
+>  #include <asm/ptrace.h>
+> +#include <asm/errno.h>
+>
+>  #ifndef __ASSEMBLY__
+>
+> @@ -99,6 +100,9 @@ extern void sve_sync_from_fpsimd_zeropad(struct task_struct *task);
+>  extern int sve_set_vector_length(struct task_struct *task,
+>  				 unsigned long vl, unsigned long flags);
+>
+> +extern int sve_set_current_vl(unsigned long arg);
+> +extern int sve_get_current_vl(void);
+> +
+>  extern void __init sve_init_vq_map(void);
+>  extern void sve_update_vq_map(void);
+>  extern int sve_verify_vq_map(void);
+> @@ -114,6 +118,16 @@ static void __maybe_unused sve_sync_to_fpsimd(struct task_struct *task) { }
+>  static void __maybe_unused sve_sync_from_fpsimd_zeropad(
+>  	struct task_struct *task) { }
+>
+> +static int __maybe_unused sve_set_current_vl(unsigned long arg)
+> +{
+> +	return -EINVAL;
+> +}
+> +
+> +static int __maybe_unused sve_get_current_vl(void)
+> +{
+> +	return -EINVAL;
+> +}
+> +
+>  static void __maybe_unused sve_init_vq_map(void) { }
+>  static void __maybe_unused sve_update_vq_map(void) { }
+>  static int __maybe_unused sve_verify_vq_map(void) { return 0; }
+> diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
+> index 3faceac..df66452 100644
+> --- a/arch/arm64/include/asm/processor.h
+> +++ b/arch/arm64/include/asm/processor.h
+> @@ -197,4 +197,8 @@ static inline void spin_lock_prefetch(const void *ptr)
+>  int cpu_enable_pan(void *__unused);
+>  int cpu_enable_cache_maint_trap(void *__unused);
+>
+> +/* Userspace interface for PR_SVE_{SET,GET}_VL prctl()s: */
+> +#define SVE_SET_VL(arg)	sve_set_current_vl(arg)
+> +#define SVE_GET_VL()	sve_get_current_vl()
+> +
+>  #endif /* __ASM_PROCESSOR_H */
+> diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+> index 361c019..42e8331 100644
+> --- a/arch/arm64/kernel/fpsimd.c
+> +++ b/arch/arm64/kernel/fpsimd.c
+> @@ -27,6 +27,7 @@
+>  #include <linux/kernel.h>
+>  #include <linux/init.h>
+>  #include <linux/percpu.h>
+> +#include <linux/prctl.h>
+>  #include <linux/preempt.h>
+>  #include <linux/prctl.h>
+>  #include <linux/ptrace.h>
+> @@ -420,6 +421,51 @@ int sve_set_vector_length(struct task_struct *task,
+>  	return 0;
+>  }
+>
+> +/*
+> + * Encode the current vector length and flags for return.
+> + * This is only required for prctl(): ptrace has separate fields
+> + */
+> +static int sve_prctl_status(void)
+> +{
+> +	int ret = current->thread.sve_vl;
+> +
+> +	if (test_thread_flag(TIF_SVE_VL_INHERIT))
+> +		ret |= PR_SVE_VL_INHERIT;
+> +
+> +	return ret;
+> +}
+> +
+> +/* PR_SVE_SET_VL */
+> +int sve_set_current_vl(unsigned long arg)
+> +{
+> +	unsigned long vl, flags;
+> +	int ret;
+> +
+> +	vl = arg & PR_SVE_VL_LEN_MASK;
+> +	flags = arg & ~vl;
+> +
+> +	if (!system_supports_sve())
+> +		return -EINVAL;
+> +
+> +	preempt_disable();
+> +	ret = sve_set_vector_length(current, vl, flags);
+> +	preempt_enable();
+> +
+> +	if (ret)
+> +		return ret;
+> +
+> +	return sve_prctl_status();
+> +}
+> +
+> +/* PR_SVE_GET_VL */
+> +int sve_get_current_vl(void)
+> +{
+> +	if (!system_supports_sve())
+> +		return -EINVAL;
+> +
+> +	return sve_prctl_status();
+> +}
+> +
+>  static unsigned long *sve_alloc_vq_map(void)
+>  {
+>  	return kzalloc(BITS_TO_LONGS(SVE_VQ_MAX) * sizeof(unsigned long),
+> diff --git a/include/uapi/linux/prctl.h b/include/uapi/linux/prctl.h
+> index 1b64901..1ef9370 100644
+> --- a/include/uapi/linux/prctl.h
+> +++ b/include/uapi/linux/prctl.h
+> @@ -198,7 +198,11 @@ struct prctl_mm_map {
+>  # define PR_CAP_AMBIENT_CLEAR_ALL	4
+>
+>  /* arm64 Scalable Vector Extension controls */
+> +/* Flag values must be kept in sync with ptrace NT_ARM_SVE interface */
+> +#define PR_SVE_SET_VL			48	/* set task vector length */
+>  # define PR_SVE_SET_VL_ONEXEC		(1 << 18) /* defer effect until exec */
+> +#define PR_SVE_GET_VL			49	/* get task vector length */
+> +/* Bits common to PR_SVE_SET_VL and PR_SVE_GET_VL */
+>  # define PR_SVE_VL_LEN_MASK		0xffff
+>  # define PR_SVE_VL_INHERIT		(1 << 17) /* inherit across exec */
+>
+> diff --git a/kernel/sys.c b/kernel/sys.c
+> index 2855ee7..f8215a6 100644
+> --- a/kernel/sys.c
+> +++ b/kernel/sys.c
+> @@ -110,6 +110,12 @@
+>  #ifndef SET_FP_MODE
+>  # define SET_FP_MODE(a,b)	(-EINVAL)
+>  #endif
+> +#ifndef SVE_SET_VL
+> +# define SVE_SET_VL(a)		(-EINVAL)
+> +#endif
+> +#ifndef SVE_GET_VL
+> +# define SVE_GET_VL()		(-EINVAL)
+> +#endif
+>
+>  /*
+>   * this is where the system-wide overflow UID and GID are defined, for
+> @@ -2389,6 +2395,12 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
+>  	case PR_GET_FP_MODE:
+>  		error = GET_FP_MODE(me);
+>  		break;
+> +	case PR_SVE_SET_VL:
+> +		error = SVE_SET_VL(arg2);
+> +		break;
+> +	case PR_SVE_GET_VL:
+> +		error = SVE_GET_VL();
+> +		break;
+>  	default:
+>  		error = -EINVAL;
+>  		break;
