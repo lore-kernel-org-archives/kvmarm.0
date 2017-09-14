@@ -1,74 +1,59 @@
 From: James Morse <james.morse@arm.com>
-Subject: Re: =?UTF-8?B?562U5aSNOiBbUEFUQ0ggdjYgNC83XSBhcm02NDoga3ZtOiBzdXA=?=
- =?UTF-8?B?cG9ydCB1c2VyIHNwYWNlIHRvIHF1ZXJ5IFJBUyBleHRlbnNpb24gZmVhdHVyZQ==?=
-Date: Thu, 14 Sep 2017 13:34:31 +0100
-Message-ID: <59BA7757.3020804@arm.com>
-References: <1503916701-13516-1-git-send-email-gengdongjiu@huawei.com>
- <1503916701-13516-5-git-send-email-gengdongjiu@huawei.com>
- <59A84F9D.8030309@arm.com> <29951852-8d91-7c33-c68b-ad8b4bbdea54@huawei.com>
- <59B1747A.5030909@arm.com>
- <0184EA26B2509940AA629AE1405DD7F2015F5A1C@DGGEMA503-MBX.china.huawei.com>
- <CAFEAcA8tXV31RTa+RCkkNFyR2t1dTwR5kYXUmBXMj9wkeLWCpg@mail.gmail.com>
+Subject: Re: [PATCH v6 3/7] acpi: apei: remove the unused code
+Date: Thu, 14 Sep 2017 13:35:26 +0100
+Message-ID: <59BA778E.5000804@arm.com>
+References: <1503916701-13516-1-git-send-email-gengdongjiu@huawei.com> <1503916701-13516-4-git-send-email-gengdongjiu@huawei.com> <59A84C51.3000506@arm.com> <45c69f99-61dd-e847-368b-20acb61b4d50@huawei.com> <59B2DEBA.6030608@arm.com> <b06c680c-93a3-7e20-1118-c6a9a24704df@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BC9549C19
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Sep 2017 08:33:25 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cxPKErK-rDCm for <kvmarm@lists.cs.columbia.edu>;
- Thu, 14 Sep 2017 08:33:24 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EABC40FAE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Sep 2017 08:33:24 -0400 (EDT)
-In-Reply-To: <CAFEAcA8tXV31RTa+RCkkNFyR2t1dTwR5kYXUmBXMj9wkeLWCpg@mail.gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Peter Maydell <peter.maydell@linaro.org>, gengdongjiu <gengdongjiu@huawei.com>
-Cc: "Wangkefeng (Kevin)" <wangkefeng.wang@huawei.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "david.daney@cavium.com" <david.daney@cavium.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "tbaicar@codeaurora.org" <tbaicar@codeaurora.org>, "will.deacon@arm.com" <will.deacon@arm.com>, Linuxarm <linuxarm@huawei.com>, "robert.moore@intel.com" <robert.moore@intel.com>, "lv.zheng@intel.com" <lv.zheng@intel.com>, "zjzhang@codeaurora.org" <zjzhang@codeaurora.org>, "mingo@kernel.org" <mingo@kernel.org>, "stefan@hello-penguin.com" <stefan@hello-penguin.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>, Huangshaoyu <huangshaoyu@huawei.com>, huangdaode <huangdaode@hisilicon.com>, "bp@suse.de" <bp@suse.de>, "Dave.Martin@arm.com" <Dave.Martin@ar>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <b06c680c-93a3-7e20-1118-c6a9a24704df@huawei.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: gengdongjiu <gengdongjiu@huawei.com>
+Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, lenb@kernel.org, robert.moore@intel.com, lv.zheng@intel.com, mark.rutland@arm.com, xiexiuqi@huawei.com, cov@codeaurora.org, david.daney@cavium.com, suzuki.poulose@arm.com, stefan@hello-penguin.com, Dave.Martin@arm.com, kristina.martsenko@arm.com, wangkefeng.wang@huawei.com, tbaicar@codeaurora.org, ard.biesheuvel@linaro.org, mingo@kernel.org, bp@suse.de, shiju.jose@huawei.com, zjzhang@codeaurora.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, devel@acpica.org, mst@redhat.com, john.garry@huawei.com, jonathan.cameron@huawei.com, shameerali.kolot
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Peter,
+Hi gengdongjiu,
 
-On 08/09/17 16:03, Peter Maydell wrote:
-> On 8 September 2017 at 15:34, gengdongjiu <gengdongjiu@huawei.com> wrote:
->> Hi Peter/ shenglong,
->>    What is your idea about it? We may need to consult with you about it.
-> 
-> I agree with what I take to be James' general point that we
-> should be careful to distinguish "KVM supports API A to
-> do a particular operation on the guest" and "KVM supports API
-> B to tell QEMU about certain events" and so on, and not just
-> lump these all together under "host CPU supports RAS and
-> so we turn all these on together and expose RAS to the guest
-> regardless". I don't know enough about the details of RAS
-> to be more specific than that general point of view.
+On 11/09/17 13:04, gengdongjiu wrote:
+> On 2017/9/9 2:17, James Morse wrote:
+>> On 04/09/17 12:43, gengdongjiu wrote:
+>>> On 2017/9/1 1:50, James Morse wrote:
+>>>> On 28/08/17 11:38, Dongjiu Geng wrote:
+>>>> If you aren't handling the notification, why is this is in the HEST at all?
+>>>> (and if its not: its not firmware-first)
+>>
+>>> For the SEI notification, may be we can parse and handle the CPER record other than the Error physical address
+>>
+>> Sure, but I only see this cleanup patch in this series, where does APEI learn
+>> about NOTIFY_SEI? As this is nothing will ever touch those CPER records, if
+>> you're using GHESv2 firmware will be prevented from delivering subsequent
+>> notifications.
 
-I think the question is 'when should qemu/kvmtool generate a HEST'.
+> James, whether it is possible you can review the previous v5 patch which adds the support for
 
-The answer certainly doesn't depend on the CPU RAS extensions, with firmware
-first these are just one mechanism to kicking RAS-errors up into firmware.
-Firmware may have other ways of doing this, and other non-CPU components that
-can generate errors.
+Spreading 'current discussion' over two versions is a problem for anyone trying
+to follow this series.
 
-User-space can generate a HEST for the guest whenever it thinks it might have to
-describe an error to a guest, either totally emulated, or because it can handle
-memory-failure notification.
+If you post a newer version its normal for people to delete the older versions.
+When you post a new version you should be happy that its the latest and greatest.
 
 
-The real question is 'which APEI GHES notification methods you can support for
-this guest'. So far x86's NMI, and arm64's SEI or SDEI mechanisms require help
-from KVM. But without any of these the Polled and (numerous) IRQ notifications
-will still work.
+> NOTIFY_SEI? thanks in advancecIn that patch, I share the SEI notification
+handling with the SEA
+> notification handling to avoid duplicated code.
+
+You may be able to share some of the code, but I don't think you should share
+the list of GHES between notification methods.
+This leads to races between the firmware and OS: If CPU-A has received an SEI
+firmware would have to avoid generating an SEA on CPU-B as the SEI-handler
+running on CPU-A may find and process the second set of CPER records. CPU-B then
+gets a spurious notification.
+
+Why is this a problem? KVM needs to know if APEI handled the error, or whether
+the Synchronous-External-Abort/SError-Interrupt was due to something else, in
+which case we invoke todays default behaviour, which isn't appropriate for a RAS
+event.
 
 
 Thanks,
