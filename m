@@ -1,21 +1,21 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH v2 15/28] arm64: cpufeature: Move sys_caps_initialised declarations
-Date: Thu, 14 Sep 2017 10:33:34 +0100
-Message-ID: <87h8w5aakx.fsf@linaro.org>
-References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com> <1504198860-12951-16-git-send-email-Dave.Martin@arm.com>
+From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Subject: Re: [PATCH v2 15/28] arm64: cpufeature: Move sys_caps_initialised
+ declarations
+Date: Thu, 14 Sep 2017 10:35:28 +0100
+Message-ID: <b963c108-ed26-3459-0ce1-ccf885050aff@arm.com>
+References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com>
+ <1504198860-12951-16-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Transfer-Encoding: 7bit
 Return-path: <linux-arch-owner@vger.kernel.org>
-In-reply-to: <1504198860-12951-16-git-send-email-Dave.Martin@arm.com>
+In-Reply-To: <1504198860-12951-16-git-send-email-Dave.Martin@arm.com>
 Sender: linux-arch-owner@vger.kernel.org
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org, Suzuki K Poulose <Suzuki.Poulose@arm.com>
+To: Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-Dave Martin <Dave.Martin@arm.com> writes:
-
+On 31/08/17 18:00, Dave Martin wrote:
 > update_cpu_features() currently cannot tell whether it is being
 > called during early or late secondary boot.  This doesn't
 > desperately matter for anything it currently does.
@@ -30,9 +30,6 @@ Dave Martin <Dave.Martin@arm.com> writes:
 >
 > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 > Cc: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-
 > ---
 >  arch/arm64/kernel/cpufeature.c | 30 +++++++++++++++---------------
 >  1 file changed, 15 insertions(+), 15 deletions(-)
@@ -80,8 +77,5 @@ Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 > -{
 > -	sys_caps_initialised = true;
 > -}
-> -
-> -/*
->   * Check for CPU features that are used in early boot
->   * based on the Boot CPU value.
->   */
+
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
