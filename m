@@ -1,7 +1,7 @@
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 Subject: Re: [PATCH v2 23/28] arm64/sve: KVM: Treat guest SVE use as undefined instruction execution
-Date: Thu, 14 Sep 2017 14:30:03 +0100
-Message-ID: <8760cl9zms.fsf@linaro.org>
+Date: Thu, 14 Sep 2017 14:31:13 +0100
+Message-ID: <874ls59zku.fsf@linaro.org>
 References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com> <1504198860-12951-24-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
@@ -21,11 +21,12 @@ Dave Martin <Dave.Martin@arm.com> writes:
 >
 > This patch injects an undefined instruction exception into the
 > guest in response to such an exception.
+
+I do wonder if this should be merged with the previous trap enabling
+patch though?
+
 >
 > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-
 > ---
 >  arch/arm64/kvm/handle_exit.c | 8 ++++++++
 >  1 file changed, 8 insertions(+)
