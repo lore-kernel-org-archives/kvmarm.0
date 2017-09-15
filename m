@@ -1,94 +1,96 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v2 11/28] arm64/sve: Core task context handling
-Date: Thu, 14 Sep 2017 20:55:56 +0100
-Message-ID: <20170914195555.GB24231@e103592.cambridge.arm.com>
+Subject: Re: [PATCH v2 02/28] arm64: KVM: Hide unsupported AArch64 CPU
+ features from guests
+Date: Fri, 15 Sep 2017 01:04:24 +0100
+Message-ID: <20170915000424.GD24231@e103592.cambridge.arm.com>
 References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com>
- <1504198860-12951-12-git-send-email-Dave.Martin@arm.com>
- <20170913143325.hi4cfcajbts3bbao@localhost>
+ <1504198860-12951-3-git-send-email-Dave.Martin@arm.com>
+ <87r2vaacll.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 Return-path: <linux-arch-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20170913143325.hi4cfcajbts3bbao@localhost>
+In-Reply-To: <87r2vaacll.fsf@linaro.org>
 Sender: linux-arch-owner@vger.kernel.org
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Will Deacon <will.deacon@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Sep 13, 2017 at 07:33:25AM -0700, Catalin Marinas wrote:
-> On Thu, Aug 31, 2017 at 06:00:43PM +0100, Dave P Martin wrote:
-> > +/*
-> > + * Handle SVE state across fork():
-> > + *
-> > + * dst and src must not end up with aliases of the same sve_state.
-> > + * Because a task cannot fork except in a syscall, we can discard SVE
-> > + * state for dst here, so long as we take care to retain the FPSIMD
-> > + * subset of the state if SVE is in use.  Reallocation of the SVE state
-> > + * will be deferred until dst tries to use SVE.
-> > + */
-> > +void fpsimd_dup_sve(struct task_struct *dst, struct task_struct const *src)
-> > +{
-> > +	if (test_and_clear_tsk_thread_flag(dst, TIF_SVE)) {
-> > +		WARN_ON(dst->mm && !in_syscall(task_pt_regs(dst)));
-> > +		sve_to_fpsimd(dst);
-> > +	}
-> > +
-> > +	dst->thread.sve_state = NULL;
-> > +}
+On Wed, Sep 13, 2017 at 03:37:42PM +0100, Alex Bennée wrote:
 > 
-> I first thought the thread flags are not visible in dst yet since
-> dup_task_struct() calls arch_dup_task_struct() before
-> setup_thread_stack(). However, at the end of the last year we enabled
-> CONFIG_THREAD_INFO_IN_TASK_STRUCT. But I don't particularly like relying
-> on this.
+> Dave Martin <Dave.Martin@arm.com> writes:
 
-Hmmm, I see your point, but there are some sequencing issues here.
+[...]
 
-> Anyway, IIUC we don't need sve_to_fpsimd() here. The
-> arch_dup_task_struct() already called fpsimd_preserve_current_state()
-
-I consider SVE discard as an optional side effect of task_fpsimd_save(),
-not something that is guaranteed to happen -- the decision about whether
-to do so may become more intelligent later on.  So, for src, we may
-discard SVE (because syscall), but for dst we must NULL .sve_state (and
-therefore clear TIF_SVE) simply to avoid aliasing of src->sve_state and
-dst->sve_state.
-
-The latter requires operating on the thread_flags of dst.  I'll need to
-check whether there's another suitable hook for updating the thread flags
-of dst, if we aren't confident that they will always have been
-initialised by the time arch_dup_task_struct() is called.
-
-
-Either way, there would be an intra-thread ordering requirement between
-the task_struct and thread_info updates here, _if_ dst were schedulable:
-dst:TIF_SVE must be cleared before dst->sve_state is NULLed.
-
-dst is not schedulable until fork is done though, so maybe this doesn't
-really matter...
-
-> for src, so the FPSIMD state (which we care about) is transferred during
-> the *dst = *src assignment. So you'd only need the last statement,
-> possibly with a different function name like fpsimd_erase_sve (and maybe
-> make the function static inline in the header).
-
-Not quite: TIF_SVE must be cleared so that a context switch or
-kernel_neon_begin() after dst is scheduled doesn't try to save state in
-the (NULL) dst->sve_state.
-
+> > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> > index 945e79c..35a90b8 100644
+> > --- a/arch/arm64/kvm/hyp/switch.c
+> > +++ b/arch/arm64/kvm/hyp/switch.c
+> > @@ -81,11 +81,17 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+> >  	 * it will cause an exception.
+> >  	 */
+> >  	val = vcpu->arch.hcr_el2;
+> > +
+> >  	if (!(val & HCR_RW) && system_supports_fpsimd()) {
+> >  		write_sysreg(1 << 30, fpexc32_el2);
+> >  		isb();
+> >  	}
+> > +
+> > +	if (val & HCR_RW) /* for AArch64 only: */
+> > +		val |= HCR_TID3; /* TID3: trap feature register accesses */
+> > +
 > 
-> [...]
-> >  int arch_dup_task_struct(struct task_struct *dst, struct task_struct *src)
-> > @@ -246,6 +247,9 @@ int arch_dup_task_struct(struct task_struct *dst, struct task_struct *src)
-> >  	if (current->mm)
-> >  		fpsimd_preserve_current_state();
-> >  	*dst = *src;
-> > +
-> > +	fpsimd_dup_sve(dst, src);
-> > +
-> >  	return 0;
-> >  }
+> I wondered as this is the hyp switch can we make use of testing val &
+> HCR_RW for both this and above. But it seems minimal in the generated
+> code so probably not.
 
+I figured that the code was cleaner ths way, since they're independent
+bits of code that both happen to be applicable only to AArch64 guests.
+
+[...]
+
+> > +
+> > +	/*
+> > +	 * ID regs: all ID_SANITISED() entries here must have corresponding
+> > +	 * entries in arm64_ftr_regs[].
+> > +	 */
+> 
+> arm64_ftr_regs isn't updated in this commit. Does this break bisection?
+
+This commit only adds ID_SANITISED() entries for regs that are already
+present in arm64_ftr_regs[].  (If you spot any that are missing, give me
+a shout...)
+
+SVE only adds one new ID register, ID_AA64ZFR0_EL1 -- but SVE defines no
+fields in there yet, so I just leave it ID_UNALLOCATED() which will
+cause it to read as zero for the guest.
+
+> > +
+> > +	/* AArch64 mappings of the AArch32 ID registers */
+> > +	/* CRm=1 */
+> > +	ID_SANITISED(ID_PFR0_EL1),
+> > +	ID_SANITISED(ID_PFR1_EL1),
+
+[...]
+
+> > +	/* CRm=7 */
+> > +	ID_SANITISED(ID_AA64MMFR0_EL1),
+> > +	ID_SANITISED(ID_AA64MMFR1_EL1),
+> > +	ID_SANITISED(ID_AA64MMFR2_EL1),
+> > +	ID_UNALLOCATED(7,3),
+> > +	ID_UNALLOCATED(7,4),
+> > +	ID_UNALLOCATED(7,5),
+> > +	ID_UNALLOCATED(7,6),
+> > +	ID_UNALLOCATED(7,7),
+> > +
+> 
+> I think it might be worthwhile adding a test to kvm-unit-tests to walk
+> all the ID registers to check this.
+
+Sounds sensible, I'll take a look at that.
+
+[...]
 
 Cheers
 ---Dave
