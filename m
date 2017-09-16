@@ -1,26 +1,26 @@
 From: wanghaibin <wanghaibin.wang@huawei.com>
-Subject: Re: [RFC PATCH 1/3] kvm: arm/arm64: vgic-vits: separate
- vgic_its_free_list() function
-Date: Sat, 16 Sep 2017 09:59:21 +0800
-Message-ID: <59BC8579.5030700@huawei.com>
+Subject: Re: [RFC PATCH 3/3] kvm: arm/arm64: vgic-its: fix return value for
+ restore
+Date: Sat, 16 Sep 2017 10:02:37 +0800
+Message-ID: <59BC863D.5070108@huawei.com>
 References: <1504703110-10744-1-git-send-email-wanghaibin.wang@huawei.com>
- <1504703110-10744-2-git-send-email-wanghaibin.wang@huawei.com>
- <20170913191405.GH1631@lvm>
+ <1504703110-10744-4-git-send-email-wanghaibin.wang@huawei.com>
+ <d9245b77-40d7-836d-b2c7-82f8f419b62a@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B31949C27
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Sep 2017 21:57:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B05E649C27
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Sep 2017 22:00:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kwae-s0pwJ72 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Sep 2017 21:57:13 -0400 (EDT)
+ with ESMTP id UX2wqeeod5lf for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Sep 2017 22:00:34 -0400 (EDT)
 Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A396C40FB0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Sep 2017 21:57:12 -0400 (EDT)
-In-Reply-To: <20170913191405.GH1631@lvm>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 72B1940FB0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Sep 2017 22:00:33 -0400 (EDT)
+In-Reply-To: <d9245b77-40d7-836d-b2c7-82f8f419b62a@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,73 +30,70 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>
-Cc: marc.zyngier@arm.com, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com
+To: Auger Eric <eric.auger@redhat.com>
+Cc: marc.zyngier@arm.com, cdall@linaro.org, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com, andre.przywara@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 2017/9/14 3:14, Christoffer Dall wrote:
+On 2017/9/14 16:30, Auger Eric wrote:
 
-> On Wed, Sep 06, 2017 at 09:05:08PM +0800, wanghaibin wrote:
->> We slightly refactor vgic_its_destroy, separate vgic_its_free_list()
->> function for later patch invoke.
+> Hi Wanghaibin,
+> 
+> On 06/09/2017 15:05, wanghaibin wrote:
+>> This patch fix the migrate restore tables failure.
 >>
->> The patch also take a functional change. If the its->device_list.next
-> 
-> I don't see a functional change in this patch?
-
-
-I mean, if this check can its->device_list.next happened, this patch will
-free the its structure compared with the original implementation.
-
-Thanks
-
-> 
-> Thanks,
-> -Christoffer
-> 
->> is NULL, we still should free the its.
->> Honestly, I can't understand How does the its->device_list.next is NULL
->> happened at this moment.
+>> The same scene, at the destination, the restore tables interface traversal guest
+>> memory, and check the dte/ite is valid or not.
+>> If all dtes/ites are invalid, we will do try next one, and the last it will take
+>> the 1 return value, but currently, it be treated as error. That's not correct.
+>>
+>> This patch try to fix this problem.
 >>
 >> Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
 >> ---
->>  virt/kvm/arm/vgic/vgic-its.c | 11 ++++++++---
->>  1 file changed, 8 insertions(+), 3 deletions(-)
+>>  virt/kvm/arm/vgic/vgic-its.c | 5 +----
+>>  1 file changed, 1 insertion(+), 4 deletions(-)
 >>
 >> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->> index aa6b68d..25d614f 100644
+>> index 5c20352..2c69aeb 100644
 >> --- a/virt/kvm/arm/vgic/vgic-its.c
 >> +++ b/virt/kvm/arm/vgic/vgic-its.c
->> @@ -1624,10 +1624,8 @@ static void vgic_its_free_device(struct kvm *kvm, struct its_device *dev)
->>  	kfree(dev);
->>  }
+>> @@ -2025,7 +2025,7 @@ static int vgic_its_restore_dte(struct vgic_its *its, u32 id,
+>>  		return PTR_ERR(dev);
 >>  
->> -static void vgic_its_destroy(struct kvm_device *kvm_dev)
->> +static void vgic_its_free_list(struct kvm *kvm, struct vgic_its *its)
->>  {
->> -	struct kvm *kvm = kvm_dev->kvm;
->> -	struct vgic_its *its = kvm_dev->private;
->>  	struct list_head *cur, *temp;
->>  
->>  	/*
->> @@ -1653,7 +1651,14 @@ static void vgic_its_destroy(struct kvm_device *kvm_dev)
->>  		kfree(coll);
+>>  	ret = vgic_its_restore_itt(its, dev);
+>> -	if (ret) {
+>> +	if (ret < 0) {
+>>  		vgic_its_free_device(its->dev->kvm, dev);
+>>  		return ret;
 >>  	}
->>  	mutex_unlock(&its->its_lock);
->> +}
->> +
->> +static void vgic_its_destroy(struct kvm_device *kvm_dev)
->> +{
->> +	struct kvm *kvm = kvm_dev->kvm;
->> +	struct vgic_its *its = kvm_dev->private;
+>> @@ -2147,9 +2147,6 @@ static int vgic_its_restore_device_tables(struct vgic_its *its)
+>>  				     vgic_its_restore_dte, NULL);
+>>  	}
 >>  
->> +	vgic_its_free_list(kvm, its);
->>  	kfree(its);
+>> -	if (ret > 0)
+>> -		ret = -EINVAL;
+> Reworking error handling in scan_its_table as I previously proposed
+> indeed don't work for L2 tables, as pointed out by Christoffer. As such
+> I eventually think your approach is the best.
+> 
+> The only remark I have left is restore table IOCTL is likely to return 1
+> with your change. 1 is not documented in the API as a returned value. I
+> think we should return 0 in this case. We are lucky because QEMU
+> kvm_device_access does not interpret positive values as errors.
+
+
+Will fix it.
+Thanks.
+
+> 
+> Thanks
+> 
+> Eric
+> 
+>> -
+>>  	return ret;
 >>  }
 >>  
->> -- 
->> 1.8.3.1
->>
 >>
 > 
 > .
