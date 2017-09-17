@@ -1,106 +1,195 @@
-From: <vkilari@codeaurora.org>
-Subject: RE: [PATCH] KVM: arm64: vgic-its: Fix wrong return value check in
- vgic_its_restore_device_tables
-Date: Sun, 17 Sep 2017 13:40:56 +0530
-Message-ID: <000401d32f8c$828f4270$87adc750$@codeaurora.org>
-References: <1504675565-13641-1-git-send-email-vkilari@codeaurora.org>
- <65a66715-4f22-07d4-879a-1181c8dad889@redhat.com>
+From: Christoffer Dall <cdall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Subject: Re: [PATCH v2 03/11] KVM: arm64: Change hyp_panic()s dependency on
+ tpidr_el2
+Date: Sun, 17 Sep 2017 07:43:14 -0700
+Message-ID: <20170917144314.GA99021@lvm>
+References: <20170808164616.25949-1-james.morse@arm.com>
+ <20170808164616.25949-4-james.morse@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D9BB449C3A
- for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Sep 2017 04:08:20 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6J90wcsM3myd for <kvmarm@lists.cs.columbia.edu>;
- Sun, 17 Sep 2017 04:08:20 -0400 (EDT)
-Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DC79D49C33
- for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Sep 2017 04:08:19 -0400 (EDT)
-In-Reply-To: <65a66715-4f22-07d4-879a-1181c8dad889@redhat.com>
-Content-Language: en-us
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: 'Auger Eric' <eric.auger@redhat.com>, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, cdall@linaro.org, andre.przywara@arm.com
-Cc: vvenkat@codeaurora.org, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20170808164616.25949-4-james.morse-5wv7dgnIgG8@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+Cc: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Loc Ho <lho-qTEPVZfXA3Y@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Eric,
-
- Sorry for delayed reply.
-
-> -----Original Message-----
-> From: Auger Eric [mailto:eric.auger@redhat.com]
-> Sent: Wednesday, September 6, 2017 12:53 PM
-> To: Vijaya Kumar K <vkilari@codeaurora.org>;
-> kvmarm@lists.cs.columbia.edu; marc.zyngier@arm.com; cdall@linaro.org;
-> andre.przywara@arm.com
-> Cc: vvenkat@codeaurora.org; shankerd@codeaurora.org;
-> kvm@vger.kernel.org; linux-arm-kernel@lists.infradead.org
-> Subject: Re: [PATCH] KVM: arm64: vgic-its: Fix wrong return value check in
-> vgic_its_restore_device_tables
+On Tue, Aug 08, 2017 at 05:46:08PM +0100, James Morse wrote:
+> Make tpidr_el2 a cpu-offset for per-cpu variables in the same way the
+> host uses tpidr_el1. This lets tpidr_el{1,2} have the same value, and
+> on VHE they can be the same register.
 > 
-> Hi Vijaya,
+> KVM calls hyp_panic() when anything unexpected happens. This may occur
+> while a guest owns the EL1 registers. KVM stashes the vcpu pointer in
+> tpidr_el2, which it uses to find the host context in order to restore
+> the host EL1 registers before parachuting into the host's panic().
 > 
-> On 06/09/2017 07:26, Vijaya Kumar K wrote:
-> > scan_its_table() return 1 on success.
+> The host context is a struct kvm_cpu_context allocated in the per-cpu
+> area, and mapped to hyp. Given the per-cpu offset for this CPU, this is
+> easy to find. Change hyp_panic() to take a pointer to the
+> struct kvm_cpu_context. Wrap these calls with an asm function that
+> retrieves the struct kvm_cpu_context from the host's per-cpu area.
 > 
-> As mentioned in the kernel-doc comment of scan_its_table, this latter
-> returns 1 if the last element is not found. Than can happen while scanning
-an
-> L2 table but shouldn't happen if we scan an L1 table.
+> Copy the per-cpu offset from the hosts tpidr_el1 into tpidr_el2 during
+> kvm init. (Later patches will make this unnecessary for VHE hosts)
 > 
->  * Return: < 0 on error, 0 if last element was identified, 1 otherwise
->  * (the last element may not be found on second level tables)
-
-OK. I will  fix this comment
-
+> We print out the vcpu pointer as part of the panic message. Add a back
+> reference to the 'running vcpu' in the host cpu context to preserve this.
 > 
+> Signed-off-by: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+> ---
+> Changes since v1:
+>  * Added a comment explaining how =kvm_host_cpu_state gets from a host-va
+>    to a hyp va.
+>  * Added the first paragraph to the commit message.
 > 
->  In the function vgic_its_restore_device_tables()
-> > the return value of scan_its_table() is checked against success value
-> > and returns -EINVAL. Hence migration fails for VM with ITS.
-> >
-> > With this patch the failure return value is checked while returning
-> > -EINVAL.
-> >
-> > Signed-off-by: Vijaya Kumar K <vkilari@codeaurora.org>
-> >
-> > diff --git a/virt/kvm/arm/vgic/vgic-its.c
-> > b/virt/kvm/arm/vgic/vgic-its.c index aa6b68d..63f8ac3 100644
-> > --- a/virt/kvm/arm/vgic/vgic-its.c
-> > +++ b/virt/kvm/arm/vgic/vgic-its.c
-> > @@ -2142,7 +2142,7 @@ static int vgic_its_restore_device_tables(struct
-> vgic_its *its)
-> >  				     vgic_its_restore_dte, NULL);
-> >  	}
-> >
-> > -	if (ret > 0)
-> > +	if (ret <= 0)
-> >  		ret = -EINVAL;
-> your modification would return -EINVAL for whatever error encountered
-> during the scan table or if last element is found. I don't think this is
-what we
-> want.
+>  arch/arm64/include/asm/kvm_host.h |  2 ++
+>  arch/arm64/kvm/hyp/hyp-entry.S    | 12 ++++++++++++
+>  arch/arm64/kvm/hyp/s2-setup.c     |  3 +++
+>  arch/arm64/kvm/hyp/switch.c       | 25 +++++++++++++------------
+>  4 files changed, 30 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index d68630007b14..7733492d9a35 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -191,6 +191,8 @@ struct kvm_cpu_context {
+>  		u64 sys_regs[NR_SYS_REGS];
+>  		u32 copro[NR_COPRO_REGS];
+>  	};
+> +
+> +	struct kvm_vcpu *__hyp_running_vcpu;
+>  };
+>  
+>  typedef struct kvm_cpu_context kvm_cpu_context_t;
+> diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+> index fce7cc507e0a..e4f37b9dd47c 100644
+> --- a/arch/arm64/kvm/hyp/hyp-entry.S
+> +++ b/arch/arm64/kvm/hyp/hyp-entry.S
+> @@ -163,6 +163,18 @@ ENTRY(__hyp_do_panic)
+>  	eret
+>  ENDPROC(__hyp_do_panic)
+>  
+> +ENTRY(__hyp_panic)
+> +	/*
+> +	 * '=kvm_host_cpu_state' is a host VA from the constant pool, it may
+> +	 * not be accessible by this address from EL2, hyp_panic() converts
+> +	 * it with kern_hyp_va() before use.
+> +	 */
+> +	ldr	x0, =kvm_host_cpu_state
+> +	mrs	x1, tpidr_el2
+> +	add	x0, x0, x1
+> +	b	hyp_panic
+> +ENDPROC(__hyp_panic)
+> +
+>  .macro invalid_vector	label, target = __hyp_panic
+>  	.align	2
+>  \label:
+> diff --git a/arch/arm64/kvm/hyp/s2-setup.c b/arch/arm64/kvm/hyp/s2-setup.c
+> index b81f4091c909..eb401dbb285e 100644
+> --- a/arch/arm64/kvm/hyp/s2-setup.c
+> +++ b/arch/arm64/kvm/hyp/s2-setup.c
+> @@ -84,5 +84,8 @@ u32 __hyp_text __init_stage2_translation(void)
+>  
+>  	write_sysreg(val, vtcr_el2);
+>  
+> +	/* copy tpidr_el1 into tpidr_el2 for use by HYP */
+> +	write_sysreg(read_sysreg(tpidr_el1), tpidr_el2);
+> +
+>  	return parange;
+>  }
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index 945e79c641c4..235d615cee30 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -286,9 +286,9 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  	u64 exit_code;
+>  
+>  	vcpu = kern_hyp_va(vcpu);
+> -	write_sysreg(vcpu, tpidr_el2);
+>  
+>  	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> +	host_ctxt->__hyp_running_vcpu = vcpu;
 
-IIUC, ret 0 indicates last entry of the table. So in this case return value
-0 is also success.
-with the assumption that table might be smaller than size.
+I'm fine with this for now, but eventually when we optimize KVM further
+we may want to avoid doing this in every world-switch.  One option is to
+just set this pointer in vcpu_get and vcpu_load, but would it also be
+possible to use the kvm_arm_running_vcpu per-cpu array directly?
 
-So only check for < 0 and return -EINVAL. For all other return values 0 and
-> 0  return 0.
-as below. Please correct me if I wrong.
+>  	guest_ctxt = &vcpu->arch.ctxt;
+>  
+>  	__sysreg_save_host_state(host_ctxt);
+> @@ -393,7 +393,8 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  
+>  static const char __hyp_panic_string[] = "HYP panic:\nPS:%08llx PC:%016llx ESR:%08llx\nFAR:%016llx HPFAR:%016llx PAR:%016llx\nVCPU:%p\n";
+>  
+> -static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par)
+> +static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par,
+> +					     struct kvm_vcpu *vcpu)
+>  {
+>  	unsigned long str_va;
+>  
+> @@ -407,35 +408,35 @@ static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par)
+>  	__hyp_do_panic(str_va,
+>  		       spsr,  elr,
+>  		       read_sysreg(esr_el2),   read_sysreg_el2(far),
+> -		       read_sysreg(hpfar_el2), par,
+> -		       (void *)read_sysreg(tpidr_el2));
+> +		       read_sysreg(hpfar_el2), par, vcpu);
+>  }
+>  
+> -static void __hyp_text __hyp_call_panic_vhe(u64 spsr, u64 elr, u64 par)
+> +static void __hyp_text __hyp_call_panic_vhe(u64 spsr, u64 elr, u64 par,
+> +					    struct kvm_vcpu *vcpu)
+>  {
+>  	panic(__hyp_panic_string,
+>  	      spsr,  elr,
+>  	      read_sysreg_el2(esr),   read_sysreg_el2(far),
+> -	      read_sysreg(hpfar_el2), par,
+> -	      (void *)read_sysreg(tpidr_el2));
+> +	      read_sysreg(hpfar_el2), par, vcpu);
+>  }
+>  
+>  static hyp_alternate_select(__hyp_call_panic,
+>  			    __hyp_call_panic_nvhe, __hyp_call_panic_vhe,
+>  			    ARM64_HAS_VIRT_HOST_EXTN);
+>  
+> -void __hyp_text __noreturn __hyp_panic(void)
+> +void __hyp_text __noreturn hyp_panic(struct kvm_cpu_context *__host_ctxt)
+>  {
+> +	struct kvm_vcpu *vcpu = NULL;
+> +
+>  	u64 spsr = read_sysreg_el2(spsr);
+>  	u64 elr = read_sysreg_el2(elr);
+>  	u64 par = read_sysreg(par_el1);
+>  
+>  	if (read_sysreg(vttbr_el2)) {
+> -		struct kvm_vcpu *vcpu;
+>  		struct kvm_cpu_context *host_ctxt;
+>  
+> -		vcpu = (struct kvm_vcpu *)read_sysreg(tpidr_el2);
+> -		host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> +		host_ctxt = kern_hyp_va(__host_ctxt);
+> +		vcpu = host_ctxt->__hyp_running_vcpu;
+>  		__timer_save_state(vcpu);
+>  		__deactivate_traps(vcpu);
+>  		__deactivate_vm(vcpu);
+> @@ -443,7 +444,7 @@ void __hyp_text __noreturn __hyp_panic(void)
+>  	}
+>  
+>  	/* Call panic for real */
+> -	__hyp_call_panic()(spsr, elr, par);
+> +	__hyp_call_panic()(spsr, elr, par, vcpu);
+>  
+>  	unreachable();
+>  }
+> -- 
+> 2.13.3
+> 
 
-           If (ret < 0)
-                          ret = -EINVAL;
-           else
-                          ret = 0;
+Reviewed-by: Christoffer Dall <cdall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
