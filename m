@@ -1,256 +1,178 @@
-From: Christoffer Dall <cdall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Subject: Re: [PATCH v2 11/11] KVM: arm64: Allow user-space to claim guest
- SMC-CC ranges for SDEI
-Date: Sun, 17 Sep 2017 07:43:42 -0700
-Message-ID: <20170917144342.GC99021@lvm>
-References: <20170808164616.25949-1-james.morse@arm.com>
- <20170808164616.25949-12-james.morse@arm.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: An ode to kvm_arch_vcpu_runnable()
+Date: Sun, 17 Sep 2017 18:32:10 +0200
+Message-ID: <20170917163210.3m7solx3oqiu6fwf@kamzik.brq.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C96D649C2B
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Sep 2017 12:29:29 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id DAg4vop14fSb for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 17 Sep 2017 12:29:28 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 67A2B49C29
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Sep 2017 12:29:28 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <20170808164616.25949-12-james.morse-5wv7dgnIgG8@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
-Cc: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Loc Ho <lho-qTEPVZfXA3Y@public.gmane.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
+Cc: marc.zyngier@arm.com, cdall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Aug 08, 2017 at 05:46:16PM +0100, James Morse wrote:
-> Instead of supporting SDEI in KVM, and providing a new API to
-> control and configure the in-kernel support, allow user-space to
-> request particular SMC-CC ranges from guest HVC calls to be handled
-> by user-space.
-> 
-> This requires two KVM capabilities, KVM_CAP_ARM_SDEI_1_0 advertises
-> that KVM knows how match SDEI SMC-CC calls from a guest. To pass these
-> calls to user-space requires this cap to be enabled using
-> KVM_CAP_ENABLE_CAP_VM.
-> 
-> Calls are passed with exit_reason = KVM_EXIT_HYPERCALL, the kvm_run
-> structure has copies of the first 6 registers and the guest pstate.
-> 
-> Signed-off-by: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
-> ---
-> While I'm in here, remove KVM_CAP_ARM_SET_DEVICE_ADDR's extra entry
-> for r=1;break?
-> 
-> Changes from v1:
->  * all of it
-> 
->  Documentation/virtual/kvm/api.txt | 12 +++++++++---
->  arch/arm64/include/asm/kvm_host.h |  6 ++++++
->  arch/arm64/kvm/handle_exit.c      | 28 +++++++++++++++++++++++++++-
->  include/uapi/linux/kvm.h          |  1 +
->  virt/kvm/arm/arm.c                | 29 +++++++++++++++++++++++++++--
->  5 files changed, 70 insertions(+), 6 deletions(-)
-> 
-> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-> index e63a35fafef0..740288d6e894 100644
-> --- a/Documentation/virtual/kvm/api.txt
-> +++ b/Documentation/virtual/kvm/api.txt
-> @@ -1012,7 +1012,7 @@ documentation when it pops into existence).
->  4.37 KVM_ENABLE_CAP
->  
->  Capability: KVM_CAP_ENABLE_CAP, KVM_CAP_ENABLE_CAP_VM
-> -Architectures: x86 (only KVM_CAP_ENABLE_CAP_VM),
-> +Architectures: x86, arm, arm64 (only KVM_CAP_ENABLE_CAP_VM),
->  	       mips (only KVM_CAP_ENABLE_CAP), ppc, s390
->  Type: vcpu ioctl, vm ioctl (with KVM_CAP_ENABLE_CAP_VM)
->  Parameters: struct kvm_enable_cap (in)
-> @@ -3540,10 +3540,16 @@ pending operations.
->  			__u32 pad;
->  		} hypercall;
->  
-> -Unused.  This was once used for 'hypercall to userspace'.  To implement
-> -such functionality, use KVM_EXIT_IO (x86) or KVM_EXIT_MMIO (all except s390).
-> +This was once used for 'hypercall to userspace'.  To implement such
-> +functionality, use KVM_EXIT_IO (x86) or KVM_EXIT_MMIO (all except s390).
+Oh, kvm_arch_vcpu_runnable(), how I love thee. Let me count the ways:
 
-I suggest you add 'for x86' to these two sentences, otherwise the
-following paragraph seems contradicting.
+ 1) We must confirm the observability of the loads of 'power_off',
+    'pause', and 'irq_lines', as they are used in the condition to stop
+    waiting.
 
->  Note KVM_EXIT_IO is significantly faster than KVM_EXIT_MMIO.
->  
-> +On arm64 this is used to complete guest hypercalls (HVC) in user space.
-> +e.g. Configuring SDEI or communicating with an emulated TEE.
+    They're OK, because the check is done after prepare_to_swait(), which
+    calls set_current_state(), and all wakers do swake_up(). swake_up()
+    results in a try_to_wake_up(), which is designed to pair with
+    set_current_state(). Actually, the smp_mb() in kvm_psci_vcpu_on()
+    is not even necessary. Note, 'irq_lines' is awaken through a VCPU
+    kick, which calls kvm_vcpu_wake_up(). kvm_vcpu_wake_up() uses barriers
+    correctly since 5e0018b3e39e "kvm: Serialize wq active checks in
+    kvm_vcpu_wake_up()".
 
-s/e.g./For example,/
+ 2) We should consider replacing the check of 'irq_lines' with a check of
+    the VCPU request, IRQ_PENDING.
 
-> +The required HVC ranges must first be enabled by KVM_CAP_ENABLE_CAP_VM.
-> +The 'args' array contains a copy of r0-r5 and 'longmode' contains a copy
-> +of the CPSR/PSTATE.
-> +
+    VCPU request IRQ_PENDING and 'irq_lines' are not equivalent. While
+    IRQ_PENDING is always set when 'irq_lines' changes, runnable() only
+    checks if 'irq_lines' is nonzero, meaning a change from nonzero to
+    zero will not awaken a VCPU. This makes sense, because 'level=1' for
+    KVM_IRQ_LINE always means the IRQ is asserted, and 'level=0' always
+    means deasserted.
 
-I'm not entirely sure what this means by just looking at this text.  Do
-you mean that some HVC (and SMC?) calls can still be handled by the
-kernel directly (PSCI), and some can be configured to be handled by the
-kernel?  Where does it specify how these 'ranges' are defined?
+    If we intend to check IRQ_PENDING in runnable() at all, then we need
+    to stop making the IRQ_PENDING request when KVM_IRQ_LINE is used to
+    deassert an IRQ. If we stop making the request on deassert, and start
+    checking IRQ_PENDING in runnable(), then the 'irq_lines' check may be
+    removed.
 
-What about the immediate field, could userspace not also need to know
-this?
+ 3) We should consider replacing the call of kvm_vgic_vcpu_pending_irq()
+    with a check of the VCPU request, IRQ_PENDING.
 
->  		/* KVM_EXIT_TPR_ACCESS */
->  		struct {
->  			__u64 rip;
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 7733492d9a35..77b8436e745e 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -71,8 +71,14 @@ struct kvm_arch {
->  
->  	/* Interrupt controller */
->  	struct vgic_dist	vgic;
-> +
-> +	/* SMC-CC/HVC ranges user space has requested */
-> +	u32	hvc_passthrough_ranges;
->  };
->  
-> +/* SMC-CC/HVC ranges that can be passed to user space */
-> +#define	KVM_HVC_RANGE_SDEI	1
+    kvm_vgic_vcpu_pending_irq() iterates the VCPU's "Active or Pending
+    IRQ" list, looking for any pending and enabled IRQ, returning true
+    if it finds one. So, the questions are if every time there is at least
+    one pending and enabled IRQ on the VCPU's list, the VCPU will also
+    have its IRQ_PENDING request bit set, and, conversely, if IRQ_PENDING
+    will ever be set even when there are no pending and enabled IRQs.
 
-Oh, I see you want the kernel to know what constitutes a range for some
-functionality and set things up that way.
+    It appears IRQ_PENDING will be set every time an IRQ is added to
+    the list, thanks to vgic_queue_irq_unlock(), however, while IRQs may
+    be dropped or migrated from the VCPU's list, the IRQ_PENDING request
+    would remain. That said, it's of little consequence for the VCPU to
+    wake up due to an IRQ_PENDING request when there are no longer pending
+    IRQs. Indeed, the same race of a pending IRQ being dropped/migrated
+    immediately prior to the VCPU flushing it's VGIC hardware state is
+    present with the kvm_vgic_vcpu_pending_irq() check as well.
 
-What are your thoughts on letting userspace configure a range of from/to
-values in x0 for some value/range of the immediate field?
+    Now, if a host IRQ handler sets IRQ_PENDING to inform the guest to
+    wake up and inject an IRQ, then on wake up, while IRQ_PENDING will be
+    set, the IRQ will not yet be in the list. This means
+    kvm_vgic_vcpu_pending_irq(), alone, may not be sufficient to determine
+    when to wake up. It can be fixed, though, by either checking specific
+    pending state in runnable(), like 'irq_lines', or by adding the state
+    to the checks done in kvm_vgic_vcpu_pending_irq() - as is proposed in
+    the patch "KVM: arm/arm64: GICv4: Use pending_last as a scheduling
+    hint". The barrier analysis done for (1) would apply to either fix, as
+    long as the IRQ handler wakes up the VCPU with kvm_vcpu_wake_up() or
+    kvm_vcpu_kick(), which calls kvm_vcpu_wake_up().
 
-> +
->  #define KVM_NR_MEM_OBJS     40
->  
->  /*
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index 17d8a1677a0b..22eadf2cd82f 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -21,6 +21,7 @@
->  
->  #include <linux/kvm.h>
->  #include <linux/kvm_host.h>
-> +#include <linux/sdei.h>
->  
->  #include <asm/esr.h>
->  #include <asm/kvm_asm.h>
-> @@ -34,15 +35,40 @@
->  
->  typedef int (*exit_handle_fn)(struct kvm_vcpu *, struct kvm_run *);
->  
-> +#define HVC_PASSTHROUGH(kvm, range) (kvm->arch.hvc_passthrough_ranges & range)
+ 4) We must confirm the compound condition sufficiently determines when
+    a VCPU should be considered runnable.
 
-I think this should have parenthesis around (range) ?
+    It does, but it's not obvious, as it depends on the contexts of the
+    two callers.
 
-Are we not going to support this for SMC passthrough?  (for nested virt
-for example).
+    Conceptually, runnable() should be "not waiting, or waiting for
+    interrupts and interrupts are pending":
 
-> +
-> +/*
-> + * The guest made an SMC-CC call that user-space has claimed.
-> + */
-> +static int populate_hypercall_exit(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> +{
-> +	int i;
-> +
-> +	run->exit_reason = KVM_EXIT_HYPERCALL;
-> +
-> +	for (i = 0 ; i < ARRAY_SIZE(run->hypercall.args); i++)
-> +		run->hypercall.args[i] = vcpu_get_reg(vcpu, i);
-> +
-> +	run->hypercall.longmode = *vcpu_cpsr(vcpu);
-> +
-> +	return 0;
-> +}
-> +
->  static int handle_hvc(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  {
->  	int ret;
-> +	struct kvm *kvm = vcpu->kvm;
-> +	unsigned long x0 = vcpu_get_reg(vcpu, 0);
->  
->  	trace_kvm_hvc_arm64(*vcpu_pc(vcpu), vcpu_get_reg(vcpu, 0),
->  			    kvm_vcpu_hvc_get_imm(vcpu));
->  	vcpu->stat.hvc_exit_stat++;
->  
-> -	ret = kvm_psci_call(vcpu);
-> +	if (IS_SDEI_CALL(x0) && HVC_PASSTHROUGH(kvm, KVM_HVC_RANGE_SDEI))
-> +		ret = populate_hypercall_exit(vcpu, run);
-> +	else
-> +		ret = kvm_psci_call(vcpu);
-> +
->  	if (ret < 0) {
->  		kvm_inject_undefined(vcpu);
->  		return 1;
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 6cd63c18708a..8e6bc6ba918d 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -929,6 +929,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_PPC_SMT_POSSIBLE 147
->  #define KVM_CAP_HYPERV_SYNIC2 148
->  #define KVM_CAP_HYPERV_VP_INDEX 149
-> +#define KVM_CAP_ARM_SDEI_1_0 150
->  
->  #ifdef KVM_CAP_IRQ_ROUTING
->  
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index e9765ee6d769..b8657b68fea7 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -206,8 +206,10 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_READONLY_MEM:
->  	case KVM_CAP_MP_STATE:
->  	case KVM_CAP_IMMEDIATE_EXIT:
-> -		r = 1;
-> -		break;
-> +	case KVM_CAP_ENABLE_CAP_VM:
-> +#ifdef CONFIG_ARM64
-> +	case KVM_CAP_ARM_SDEI_1_0:
-> +#endif
->  	case KVM_CAP_ARM_SET_DEVICE_ADDR:
->  		r = 1;
->  		break;
-> @@ -1082,6 +1084,21 @@ static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
->  	}
->  }
->  
-> +static int kvm_vm_ioctl_enable_cap(struct kvm *kvm, struct kvm_enable_cap *req)
-> +{
-> +	int err = -EINVAL;
-> +
-> +	if (req->flags)
-> +		return err;
-> +
-> +	if (IS_ENABLED(CONFIG_ARM64) && req->cap == KVM_CAP_ARM_SDEI_1_0) {
-> +		kvm->arch.hvc_passthrough_ranges |= KVM_HVC_RANGE_SDEI;
-> +		err = 0;
-> +	}
-> +
-> +	return err;
-> +}
-> +
->  long kvm_arch_vm_ioctl(struct file *filp,
->  		       unsigned int ioctl, unsigned long arg)
->  {
-> @@ -1118,6 +1135,14 @@ long kvm_arch_vm_ioctl(struct file *filp,
->  
->  		return 0;
->  	}
-> +	case KVM_ENABLE_CAP: {
-> +		struct kvm_enable_cap req;
-> +
-> +		if (copy_from_user(&req, argp, sizeof(req)))
-> +			return -EFAULT;
-> +
-> +		return kvm_vm_ioctl_enable_cap(kvm, &req);
-> +	}
->  	default:
->  		return -EINVAL;
->  	}
-> -- 
-> 2.13.3
-> 
+     !waiting-uninterruptable &&
+     (!waiting-for-interrupts || interrupts-pending)
+
+    More concisely
+
+     !W_u && (!W_i || I)
+
+    But, the implementation is only
+
+     !W_u && I
+
+    Context1: Called from kvm_vcpu_block() we know W_i=1
+
+        !W_u && (!W_i || I)
+     => !W_u && (!(1) || I)
+     => !W_u && I
+
+    Context2: Called from kvm_vcpu_on_spin() we know (W_u || W_i) = 1,
+    which implies W_i=1 if W_u=0
+
+        !W_u && (!W_i || I)
+     => !(0) && (!(1) || I) = I, W_u=0
+        !(1) && (!W_i || I) = 0, W_u=1
+     => !W_u && I
+
+ 5) We must confirm the compound condition is not missing any conditions;
+    all conditions for waiting-uninterruptable and for interrupts-pending
+    must be present.
+
+    waiting-uninterruptable is
+
+     power_off || pause
+
+    which is correct, as there is currently no other way to request
+    uninterruptable waiting, a.k.a sleep.
+
+    interrupts-pending is
+
+     !!irq_lines || kvm_vgic_vcpu_pending_irq()
+
+    which is mostly correct. It is not correct regarding the vPMU. If
+    a VCPU's perf event overflow handler were to fire after the VCPU
+    started waiting, then the wake up done by the kvm_vcpu_kick() call
+    in the handler would do nothing, as no "pmu overflow" state is
+    checked in runnable().
+
+    We can fix this by adding and checking pending state, as described
+    in (3), or by deciding to just check IRQ_PENDING in runnable(), and
+    then fix 'irq_lines' instead, as described in (2).
+
+========
+Proposal
+========
+
+ 1) Add a VCPU request to be used by KVM_IRQ_LINE to deassert the line.
+    The new VCPU request will be flagged with KVM_REQUEST_NO_WAKEUP, and
+    the IRQ_PENDING request will not be set on deasserts.
+
+ 2) Make runnable() more obvious and future proof by adding an explicit
+    check for the 'waiting-for-interrupts' VCPU state. This can be done
+    with a new 'halted' boolean that gets set when emulating WFI.
+
+ 3) Just check the IRQ_PENDING VCPU request for runnable()'s
+    'interrupts-pending' check.
+
+ 4) Clean up all the 'power_off || pause' checks scattered throughout
+    virt/kvm/arm/arm.c by wrapping the condition in a function.
+
+===
+
+Sorry for TL;DR mail. If the analysis and proposal look reasonable, then
+I'll send patches.
 
 Thanks,
--Christoffer
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+drew
