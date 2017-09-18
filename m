@@ -1,178 +1,242 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: An ode to kvm_arch_vcpu_runnable()
-Date: Sun, 17 Sep 2017 18:32:10 +0200
-Message-ID: <20170917163210.3m7solx3oqiu6fwf@kamzik.brq.redhat.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Subject: Re: [PATCH v6 6/7] KVM: arm64: allow get exception information from
+ userspace
+Date: Mon, 18 Sep 2017 21:36:43 +0800
+Message-ID: <5af0cb96-be13-4cc4-13bb-1f608cdc171c@huawei.com>
+References: <1503916701-13516-1-git-send-email-gengdongjiu@huawei.com>
+ <1503916701-13516-7-git-send-email-gengdongjiu@huawei.com>
+ <59B17438.5070501@arm.com> <2a42d1ea-3456-2873-c9ea-d8a027b59789@huawei.com>
+ <59BA7D72.4090403@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C96D649C2B
- for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Sep 2017 12:29:29 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DAg4vop14fSb for <kvmarm@lists.cs.columbia.edu>;
- Sun, 17 Sep 2017 12:29:28 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 67A2B49C29
- for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Sep 2017 12:29:28 -0400 (EDT)
-Content-Disposition: inline
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
-Cc: marc.zyngier@arm.com, cdall@linaro.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <59BA7D72.4090403@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: James Morse <james.morse@arm.com>
+Cc: peter.maydell@linaro.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, lenb@kernel.org, robert.moore@intel.com, lv.zheng@intel.com, mark.rutland@arm.com, xiexiuqi@huawei.com, cov@codeaurora.org, david.daney@cavium.com, suzuki.poulose@arm.com, stefan@hello-penguin.com, Dave.Martin@arm.com, kristina.martsenko@arm.com, wangkefeng.wang@huawei.com, tbaicar@codeaurora.org, ard.biesheuvel@linaro.org, mingo@kernel.org, bp@suse.de, shiju.jose@huawei.com, zjzhang@codeaurora.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, devel@a
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Oh, kvm_arch_vcpu_runnable(), how I love thee. Let me count the ways:
+James，
+   Thanks for your comments, hope we can make the solution better.
 
- 1) We must confirm the observability of the loads of 'power_off',
-    'pause', and 'irq_lines', as they are used in the condition to stop
-    waiting.
+On 2017/9/14 21:00, James Morse wrote:
+> Hi gengdongjiu,
+> 
+> (re-ordered hunks)
+> 
+> On 13/09/17 08:32, gengdongjiu wrote:
+>> On 2017/9/8 0:30, James Morse wrote:
+>>> On 28/08/17 11:38, Dongjiu Geng wrote:
+>>> For BUS_MCEERR_A* from memory_failure() we can't know if they are caused by
+>>> an access or not.
+> 
+> Actually it looks like we can: I thought 'BUS_MCEERR_AR' could be triggered via
+> some CPER flags, but its not. The only code that flags MF_ACTION_REQUIRED is
+> x86's kernel-first handling, which nicely matches this 'direct access' problem.
+> BUS_MCEERR_AR also come from KVM stage2 faults (and the x86 equivalent). Powerpc
+> also triggers these directly, both from what look to be synchronous paths, so I
+> think its fair to equate BUS_MCEERR_AR to a synchronous access and BUS_MCEERR_AO
+> to something_else.
 
-    They're OK, because the check is done after prepare_to_swait(), which
-    calls set_current_state(), and all wakers do swake_up(). swake_up()
-    results in a try_to_wake_up(), which is designed to pair with
-    set_current_state(). Actually, the smp_mb() in kvm_psci_vcpu_on()
-    is not even necessary. Note, 'irq_lines' is awaken through a VCPU
-    kick, which calls kvm_vcpu_wake_up(). kvm_vcpu_wake_up() uses barriers
-    correctly since 5e0018b3e39e "kvm: Serialize wq active checks in
-    kvm_vcpu_wake_up()".
+James, thanks for your explanation.
+can I understand that your meaning that "BUS_MCEERR_AR" stands for synchronous access and BUS_MCEERR_AO stands for asynchronous access?
+Then for "BUS_MCEERR_AO", how to distinguish it is asynchronous data access(SError) and PCIE AER error?
+In the user space, we can check the si_code, if it is "BUS_MCEERR_AR", we use SEA notification type for the guest;
+if it is "BUS_MCEERR_AO", we use SEI notification type for the guest.
+Because there are only two values for si_code("BUS_MCEERR_AR" and BUS_MCEERR_AO), in which case we can use the GSIV(IRQ) notification type?
 
- 2) We should consider replacing the check of 'irq_lines' with a check of
-    the VCPU request, IRQ_PENDING.
 
-    VCPU request IRQ_PENDING and 'irq_lines' are not equivalent. While
-    IRQ_PENDING is always set when 'irq_lines' changes, runnable() only
-    checks if 'irq_lines' is nonzero, meaning a change from nonzero to
-    zero will not awaken a VCPU. This makes sense, because 'level=1' for
-    KVM_IRQ_LINE always means the IRQ is asserted, and 'level=0' always
-    means deasserted.
+> 
+> I don't think we need anything else.
+> 
+> 
+>>> When the mm code gets -EHWPOISON when trying to resolve a
+>>
+>> Because of that, so I allow  userspace getting exception information
+> 
+> ... and there are cases where you can't get the exception information, and other
+> cases where it wasn't an exception at all.
+> 
+> [...]
+> 
+> 
+>>> What happens if the dram-scrub hardware spots an error in guest memory, but
+>>> the guest wasn't running? KVM won't have a relevant ESR value to give you.
+> 
+>> if the dram-scrub hardware spots an error in guest memory, it will generate
+>> IRQ in DDR controller, not SEA or SEI exception. I still do not consider the
+>> GSIV. For GSIV, may be we can only handle it in the host OS.
+> 
+> Great example: this IRQ pulls us out of a guest, we tromp through APEI and then
+> memory_failure(), the memory happened to belong to the same guest
+> (coincidence!), we send it some signal and now its user-space's problem.
+> 
+> Your KVM_REG_ARM64_FAULT mechanism is going to return stale data, even though
+> the notification interrupted the guest, and it was guest memory that was
+> affected. KVM doesn't have a relevant ESR.
+> 
+> 
+> I'm strongly against exposing 'which notification type' this error originally
+> came from because:
+> * it doesn't matter once we've got the CPER records,
+> * there isn't always an answer (there are/will-be other ways of tripping
+>   memory_failure())
+> * it creates ABI between firwmare, host userspace and guest userspace.
+>   Firmware's choice of notification type shouldn't affect anything other than
+>   the host kernel.
+> 
+> 
+> On 13/09/17 08:32, gengdongjiu wrote:
+>> On 2017/9/8 0:30, James Morse wrote:
+>>> On 28/08/17 11:38, Dongjiu Geng wrote:
+>>>> when userspace gets SIGBUS signal, it does not know whether
+>>>> this is a synchronous external abort or SError,
+>>>
+>>> Why would Qemu/kvmtool need to know if the original notification (if there was
+>>> one) was synchronous or asynchronous? This is between firmware and the kernel.
+> 
+>> there are two reasons:
+>>
+>> 1. Let us firstly discuss the SEA and SEI, there are different workflow for the two different Errors.
+>> 2. when record the CPER in the user space, it needs to know the error type, because SEA and SEI are different Error source,
+>>    so they have different offset in the APEI table, that is to say they will be recorded to different place of the APEI table.
+> 
+> user-space can choose whether to use SEA or SEI, it doesn't have to choose the
+> same notification type that firmware used, which in turn doesn't have to be the
+> same as that used by the CPU to notify firmware.
+> 
+> The choice only matters because these notifications hang on an existing pieces
+> of the Arm-architecture, so the notification can only add to the architecturally
+> defined meaning. (i.e. You can only send an SEA for something that can already
+> be described as a synchronous external abort).
+> 
+> Once we get to user-space, for memory_failure() notifications, (which so far is
+> all we are talking about here), the only thing that could matter is whether the
+> guest hit a PG_hwpoison page as a stage2 fault. These can be described as
+> Synchronous-External-Abort.
+> 
+> The Synchronous-External-Abort/SError-Interrupt distinction matters for the CPU
+> because it can't always make an error synchronous. For memory_failure()
+> notifications to a KVM guest we really can do this, and we already have this
+> behaviour for free. An example:
+> 
+> A guest touches some hardware:poisoned memory, for whatever reason the CPU can't
+> put the world back together to make this a synchronous exception, so it reports
+> it to firmware as an SError-interrupt.
 
-    If we intend to check IRQ_PENDING in runnable() at all, then we need
-    to stop making the IRQ_PENDING request when KVM_IRQ_LINE is used to
-    deassert an IRQ. If we stop making the request on deassert, and start
-    checking IRQ_PENDING in runnable(), then the 'irq_lines' check may be
-    removed.
+> Linux gets an APEI notification and memory_failure() causes the affected page to
+> be unmapped from the guest's stage2, and SIGBUS_MCEERR_AO sent to user-space.
+> 
+> Qemu/kvmtool can now notify the guest with an IRQ or POLLed notification. AO->
+> action optional, probably asynchronous.
+If so, in this case, Qemu/kvmtool only got a little information(receive a SIGBUS), for this SIGBUS,
+it only include the SIGBUS_MCEERR_AO, error address. not include other information,
+only according the SIGBUS_MCEERR_AO and error address, user space does not know whether to use IRQ or POLLed notification.
+for example, SIGBUS_MCEERR_AO means asynchronous access, user space can use SEI, IRQ or POLLed notification.
+so user space will be confused to use which method.
 
- 3) We should consider replacing the call of kvm_vgic_vcpu_pending_irq()
-    with a check of the VCPU request, IRQ_PENDING.
+I think if we use such solution, user space only judging SIGBUS_MCEERR_A* is not enough.
+how we provide other extra information to let it choose the proper notification?
 
-    kvm_vgic_vcpu_pending_irq() iterates the VCPU's "Active or Pending
-    IRQ" list, looking for any pending and enabled IRQ, returning true
-    if it finds one. So, the questions are if every time there is at least
-    one pending and enabled IRQ on the VCPU's list, the VCPU will also
-    have its IRQ_PENDING request bit set, and, conversely, if IRQ_PENDING
-    will ever be set even when there are no pending and enabled IRQs.
+> 
+> But in our example it wasn't really asynchronous, that was just a property of
+> the original CPU->firmware notification. What happens? The guest vcpu is re-run,
+> it re-runs the same instructions (this was a contained error so KVM's ELR points
+> at/before the instruction that steps in the problem). This time KVM takes a
+> stage2 fault, which the mm code will refuse to fixup because the relevant page
+> was marked as PG_hwpoision by memory_failure(). KVM signals Qemu/kvmtool with
+> SIGBUS_MCEERR_AR. Now Qemu/kvmtool can notify the guest using SEA.
+> 
+> 
+> 
+> 
+>>          etc/acpi/tables                               etc/hardware_errors
+>>         ====================                    ==========================================
+>>     + +--------------------------+            +------------------+
+>>     | | HEST                     |            |    address       |              +--------------+
+>>     | +--------------------------+            |    registers     |              | Error Status |
+>>     | | GHES0                    |            | +----------------+              | Data Block 0 |
+>>     | +--------------------------+ +--------->| |status_address0 |------------->| +------------+
+>>     | | .................        | |          | +----------------+              | |  CPER      |
+>>     | | error_status_address-----+-+ +------->| |status_address1 |----------+   | |  CPER      |
+>>     | | .................        |   |        | +----------------+          |   | |  ....      |
+>>     | | read_ack_register--------+-+ |        |  .............   |          |   | |  CPER      |
+>>     | | read_ack_preserve        | | |        +------------------+          |   | +-+------------+
+>>     | | read_ack_write           | | | +----->| |status_address10|--------+ |   | Error Status |
+>>     + +--------------------------+ | | |      | +----------------+        | |   | Data Block 1 |
+>>     | | GHES1                    | +-+-+----->| | ack_value0     |        | +-->| +------------+
+>>     + +--------------------------+   | |      | +----------------+        |     | |  CPER      |
+>>     | | .................        |   | | +--->| | ack_value1     |        |     | |  CPER      |
+>>     | | error_status_address-----+---+ | |    | +----------------+        |     | |  ....      |
+>>     | | .................        |     | |    | |  ............. |        |     | |  CPER      |
+>>     | | read_ack_register--------+-----+-+    | +----------------+        |     +-+------------+
+>>     | | read_ack_preserve        |     |   +->| | ack_value10    |        |     | |..........  |
+>>     | | read_ack_write           |     |   |  | +----------------+        |     | +------------+
+>>     + +--------------------------|     |   |                              |     | Error Status |
+>>     | | ...............          |     |   |                              |     | Data Block 10|
+>>     + +--------------------------+     |   |                              +---->| +------------+
+>>     | | GHES10                   |     |   |                                    | |  CPER      |
+>>     + +--------------------------+     |   |                                    | |  CPER      |
+>>     | | .................        |     |   |                                    | |  ....      |
+>>     | | error_status_address-----+-----+   |                                    | |  CPER      |
+>>     | | .................        |         |                                    +-+------------+
+>>     | | read_ack_register--------+---------+
+>>     | | read_ack_preserve        |
+>>     | | read_ack_write           |
+>>     + +--------------------------+
+>>
+> 
+> (nice ascii art!)
+> 
+>>> I think I can see why you need this: to choose whether to emulate SEA or SEI,
+> 
+>> emulating SEA or SEI is one reason, another reason is that the CPER will be recorded to different place of APEI.
+> 
+> (This doesn't matter: Generate the CPER records after you've chosen the
+> notification and this isn't a problem. Or map your 'Error Status Data Blocks'
+> to status_address* depending on usage not in a fixed 1:1 way)
+> 
+> 
+>>> I think what you need is some way of knowing if the BUS_MCEERR_A* was directly
+>>> caused by a user-space (or guest) access, and if so was it a data or instruction
+> 
+>> when user space received the signal, it will judge whether the memory address is user-space (or guest) address
+> 
+>>> fetch. These can become SEA notifications.
+> 
+>> In fact, it can be SEI, not always SEA, why it will always SEA notifications?
+>> If the memory properties of data is device type, it may become SEI notification.
+> 
+> Let's take a step back: in what scenario should we use an emulated-SEA instead
+> of an emulated-SEI? (forget what the CPU and firmware did, this is up to Qemu to
+> decide).
+> 
+> It can use SEA if this is a valid Synchronous-external-abort. Stage 2 faults are
+> synchronous exceptions, if you hit a PG_hwpoision page on this path you can
+> report this back to the guest as a Synchronous-external-abort/SEA.
+> How do you know? You get SIGBUS_MCEERR_AR from KVM.
+I understand your idea, I agree we can use SEA notification for guest if it is SIGBUS_MCEERR_AR.
+I am worried about the SIGBUS_MCEERR_AO.
+if it is SIGBUS_MCEERR_AO, we can choose SEI, IRQ or POLLed notification. so according to what principles to choose that?
 
-    It appears IRQ_PENDING will be set every time an IRQ is added to
-    the list, thanks to vgic_queue_irq_unlock(), however, while IRQs may
-    be dropped or migrated from the VCPU's list, the IRQ_PENDING request
-    would remain. That said, it's of little consequence for the VCPU to
-    wake up due to an IRQ_PENDING request when there are no longer pending
-    IRQs. Indeed, the same race of a pending IRQ being dropped/migrated
-    immediately prior to the VCPU flushing it's VGIC hardware state is
-    present with the kvm_vgic_vcpu_pending_irq() check as well.
+In my platform, there is another issue.
+for the stage2 fault, we get the IPA from the HPFAR_EL2 register,
+but for  huawei's CPU, if it is data Error(DFSC[5:0] is 0b010000), not translation error(DFSC[5:0] is 0b0101xx),
+the HPFAR_EL2 is NULL, so the IPA is not recorded, in our current KVM code, we get the IPA from the HPFAR_EL2, so
+we can not get the right IPA value, because its value is zero.I do not know whether you have same issue.
 
-    Now, if a host IRQ handler sets IRQ_PENDING to inform the guest to
-    wake up and inject an IRQ, then on wake up, while IRQ_PENDING will be
-    set, the IRQ will not yet be in the list. This means
-    kvm_vgic_vcpu_pending_irq(), alone, may not be sufficient to determine
-    when to wake up. It can be fixed, though, by either checking specific
-    pending state in runnable(), like 'irq_lines', or by adding the state
-    to the checks done in kvm_vgic_vcpu_pending_irq() - as is proposed in
-    the patch "KVM: arm/arm64: GICv4: Use pending_last as a scheduling
-    hint". The barrier analysis done for (1) would apply to either fix, as
-    long as the IRQ handler wakes up the VCPU with kvm_vcpu_wake_up() or
-    kvm_vcpu_kick(), which calls kvm_vcpu_wake_up().
+Although hpfar_el2 does not record IPA, but host firmware can still record the PA
+If call memory_failure(), memory_failure can translate the PA to host VA, then deliver host VA to Qemu. Qemu can translate the host VA to IPA.
+so we rely on memory_failure() to get the IPA.
 
- 4) We must confirm the compound condition sufficiently determines when
-    a VCPU should be considered runnable.
 
-    It does, but it's not obvious, as it depends on the contexts of the
-    two callers.
 
-    Conceptually, runnable() should be "not waiting, or waiting for
-    interrupts and interrupts are pending":
-
-     !waiting-uninterruptable &&
-     (!waiting-for-interrupts || interrupts-pending)
-
-    More concisely
-
-     !W_u && (!W_i || I)
-
-    But, the implementation is only
-
-     !W_u && I
-
-    Context1: Called from kvm_vcpu_block() we know W_i=1
-
-        !W_u && (!W_i || I)
-     => !W_u && (!(1) || I)
-     => !W_u && I
-
-    Context2: Called from kvm_vcpu_on_spin() we know (W_u || W_i) = 1,
-    which implies W_i=1 if W_u=0
-
-        !W_u && (!W_i || I)
-     => !(0) && (!(1) || I) = I, W_u=0
-        !(1) && (!W_i || I) = 0, W_u=1
-     => !W_u && I
-
- 5) We must confirm the compound condition is not missing any conditions;
-    all conditions for waiting-uninterruptable and for interrupts-pending
-    must be present.
-
-    waiting-uninterruptable is
-
-     power_off || pause
-
-    which is correct, as there is currently no other way to request
-    uninterruptable waiting, a.k.a sleep.
-
-    interrupts-pending is
-
-     !!irq_lines || kvm_vgic_vcpu_pending_irq()
-
-    which is mostly correct. It is not correct regarding the vPMU. If
-    a VCPU's perf event overflow handler were to fire after the VCPU
-    started waiting, then the wake up done by the kvm_vcpu_kick() call
-    in the handler would do nothing, as no "pmu overflow" state is
-    checked in runnable().
-
-    We can fix this by adding and checking pending state, as described
-    in (3), or by deciding to just check IRQ_PENDING in runnable(), and
-    then fix 'irq_lines' instead, as described in (2).
-
-========
-Proposal
-========
-
- 1) Add a VCPU request to be used by KVM_IRQ_LINE to deassert the line.
-    The new VCPU request will be flagged with KVM_REQUEST_NO_WAKEUP, and
-    the IRQ_PENDING request will not be set on deasserts.
-
- 2) Make runnable() more obvious and future proof by adding an explicit
-    check for the 'waiting-for-interrupts' VCPU state. This can be done
-    with a new 'halted' boolean that gets set when emulating WFI.
-
- 3) Just check the IRQ_PENDING VCPU request for runnable()'s
-    'interrupts-pending' check.
-
- 4) Clean up all the 'power_off || pause' checks scattered throughout
-    virt/kvm/arm/arm.c by wrapping the condition in a function.
-
-===
-
-Sorry for TL;DR mail. If the analysis and proposal look reasonable, then
-I'll send patches.
-
-Thanks,
-drew
+> 
+> 
+> Thanks,
+> 
+> James
+> 
+> .
+> 
