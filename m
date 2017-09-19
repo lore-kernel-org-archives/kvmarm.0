@@ -1,133 +1,108 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH] KVM: arm64: vgic-its: Fix wrong return value check in
- vgic_its_restore_device_tables
-Date: Tue, 19 Sep 2017 10:17:33 +0200
-Message-ID: <cecab6c9-7f18-9db1-2b4d-a64cd12cd5c8@redhat.com>
-References: <1504675565-13641-1-git-send-email-vkilari@codeaurora.org>
- <65a66715-4f22-07d4-879a-1181c8dad889@redhat.com>
- <000401d32f8c$828f4270$87adc750$@codeaurora.org>
+From: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+Subject: Re: [PATCH v2 04/11] arm64: alternatives: use tpidr_el2 on VHE hosts
+Date: Tue, 19 Sep 2017 10:55:55 +0100
+Message-ID: <59C0E9AB.7040703@arm.com>
+References: <20170808164616.25949-1-james.morse@arm.com> <20170808164616.25949-5-james.morse@arm.com> <20170917144334.GB99021@lvm>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 984F840FA5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Sep 2017 04:17:38 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id q-sHlUdWJkFD for <kvmarm@lists.cs.columbia.edu>;
- Tue, 19 Sep 2017 04:17:37 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 53C5640C25
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Sep 2017 04:17:37 -0400 (EDT)
-In-Reply-To: <000401d32f8c$828f4270$87adc750$@codeaurora.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: vkilari@codeaurora.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, cdall@linaro.org, andre.przywara@arm.com
-Cc: vvenkat@codeaurora.org, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20170917144334.GB99021@lvm>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Christoffer Dall <cdall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Cc: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Loc Ho <lho-qTEPVZfXA3Y@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Vijaya,
-On 17/09/2017 10:10, vkilari@codeaurora.org wrote:
-> Hi Eric,
-> 
->  Sorry for delayed reply.
-> 
->> -----Original Message-----
->> From: Auger Eric [mailto:eric.auger@redhat.com]
->> Sent: Wednesday, September 6, 2017 12:53 PM
->> To: Vijaya Kumar K <vkilari@codeaurora.org>;
->> kvmarm@lists.cs.columbia.edu; marc.zyngier@arm.com; cdall@linaro.org;
->> andre.przywara@arm.com
->> Cc: vvenkat@codeaurora.org; shankerd@codeaurora.org;
->> kvm@vger.kernel.org; linux-arm-kernel@lists.infradead.org
->> Subject: Re: [PATCH] KVM: arm64: vgic-its: Fix wrong return value check in
->> vgic_its_restore_device_tables
->>
->> Hi Vijaya,
->>
->> On 06/09/2017 07:26, Vijaya Kumar K wrote:
->>> scan_its_table() return 1 on success.
->>
->> As mentioned in the kernel-doc comment of scan_its_table, this latter
->> returns 1 if the last element is not found. Than can happen while scanning
-> an
->> L2 table but shouldn't happen if we scan an L1 table.
->>
->>  * Return: < 0 on error, 0 if last element was identified, 1 otherwise
->>  * (the last element may not be found on second level tables)
-> 
-> OK. I will  fix this comment
-> 
->>
->>
->>  In the function vgic_its_restore_device_tables()
->>> the return value of scan_its_table() is checked against success value
->>> and returns -EINVAL. Hence migration fails for VM with ITS.
->>>
->>> With this patch the failure return value is checked while returning
->>> -EINVAL.
->>>
->>> Signed-off-by: Vijaya Kumar K <vkilari@codeaurora.org>
->>>
->>> diff --git a/virt/kvm/arm/vgic/vgic-its.c
->>> b/virt/kvm/arm/vgic/vgic-its.c index aa6b68d..63f8ac3 100644
->>> --- a/virt/kvm/arm/vgic/vgic-its.c
->>> +++ b/virt/kvm/arm/vgic/vgic-its.c
->>> @@ -2142,7 +2142,7 @@ static int vgic_its_restore_device_tables(struct
->> vgic_its *its)
->>>  				     vgic_its_restore_dte, NULL);
->>>  	}
->>>
->>> -	if (ret > 0)
->>> +	if (ret <= 0)
->>>  		ret = -EINVAL;
->> your modification would return -EINVAL for whatever error encountered
->> during the scan table or if last element is found. I don't think this is
-> what we
->> want.
-> 
-> IIUC, ret 0 indicates last entry of the table. So in this case return value
-> 0 is also success.
-> with the assumption that table might be smaller than size.
-0 indicates you successfully found all the valid data laid out in the
-table and you are done.
-> 
-> So only check for < 0 and return -EINVAL. For all other return values 0 and
->> 0  return 0.
-> as below. Please correct me if I wrong.
-> 
->            If (ret < 0)
->                           ret = -EINVAL;
-why overriding ret value by -EINVAL?
->            else
->                           ret = 0;
-I would rather do:
-        if (ret > 0)
-                ret = 0;
+Hi Christoffer,
 
-        return ret;
+On 17/09/17 15:43, Christoffer Dall wrote:
+> On Tue, Aug 08, 2017 at 05:46:09PM +0100, James Morse wrote:
+>> Now that KVM uses tpidr_el2 in the same way as Linux's cpu_offset in
+>> tpidr_el1, merge the two. This saves KVM from save/restoring tpidr_el1
+>> on VHE hosts, and allows future code to blindly access per-cpu variables
+>> without triggering world-switch.
 
-I think Wanghaibin intends to respin + his fix of same issue on
-vgic_its_restore_itt returned value.
+>> Changes since v1:
+>>  * cpu_copy_el2regs()'s 'have I been patched' test now always sets a register,
+>>    just in case the compiler puts do_copyregs on the stack.
 
-see https://www.spinics.net/lists/kvm-arm/msg27248.html
+> I don't understand this?
 
-Thanks
+Looks like this was a note to myself, translation below:
 
-Eric
 
+>> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+>> index 9f9e0064c8c1..1960706d2422 100644
+>> --- a/arch/arm64/kernel/cpufeature.c
+>> +++ b/arch/arm64/kernel/cpufeature.c
+>> @@ -1295,3 +1296,25 @@ static int __init enable_mrs_emulation(void)
+>>  }
+>>  
+>>  late_initcall(enable_mrs_emulation);
+>> +
+>> +int cpu_copy_el2regs(void *__unused)
+>> +{
+>> +	int do_copyregs = 0;
+>> +
+>> +	/*
+>> +	 * Copy register values that aren't redirected by hardware.
+>> +	 *
+>> +	 * Before code patching, we only set tpidr_el1, all CPUs need to copy
+>> +	 * this value to tpidr_el2 before we patch the code. Once we've done
+>> +	 * that, freshly-onlined CPUs will set tpidr_el2, so we don't need to
+>> +	 * do anything here.
+>> +	 */
+>> +	asm volatile(ALTERNATIVE("mov %0, #1", "mov %0, #0",
+>> +				 ARM64_HAS_VIRT_HOST_EXTN)
+>> +		    : "=r" (do_copyregs) : : );
+>> +
+>> +	if (do_copyregs)
+>> +		write_sysreg(read_sysreg(tpidr_el1), tpidr_el2);
 > 
+> Could you just use has_vhe() here ?
+
+This is the 'have I been patched' test.
+Before patching the my_cpu_offset value will be in tpidr_el1, we copy it to
+tpidr_el2.
+
+Once smp_cpus_done() calls apply_alternatives_all(), set_my_cpu_offset() is
+patched to write its value into tpidr_el2. CPUs that come online after this
+point don't need the value copying, but this cpufeature enable call will still
+be called.
+
+The skimmed-over information is that cpufeature's enable methods are called
+locally when any core comes online, even after the alternatives have been
+applied. (we also modify pstate and set sctlr bits from these).
+
+Would it be clearer if I rewrote the comment as:
+> cpufeature's enable methods are called whenever a CPU comes online, but we
+> only need to copy tpidr_el1 -> tpidr_el2 on CPUs that were online before the
+> alternatives are applied. After that point a VHE system will only use
+> tpidr_el2.
+
+
+The change-since-v1 was paranoia as 'do_copyregs' wasn't always updated: I was
+worried about the compiler ditching the '=0' initialisation as its written by
+the asm() before being read... but not once we've patched in the alternative.
+Having to put 'do_copyregs' on the stack, but then deciding to just allocate it
+late was where I thought this might happen. Short-version: I don't trust the
+compiler.
+
+
+>> +
+>> +	return 0;
+>> +}
+
+
+
+> Otherwise:
 > 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
-> 
+> Reviewed-by: Christoffer Dall <cdall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+
+Thanks!
+
+James
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
