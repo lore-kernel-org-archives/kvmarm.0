@@ -1,125 +1,115 @@
-From: Christoffer Dall <cdall@linaro.org>
+From: gengdongjiu <gengdongjiu@huawei.com>
 Subject: Re: consult a question about 'inject_abt64()'
-Date: Tue, 19 Sep 2017 00:32:56 +0200
-Message-ID: <20170918223256.GI4657@cbox>
+Date: Tue, 19 Sep 2017 10:22:16 +0800
+Message-ID: <ede83091-4b52-906b-717f-360db79c77db@huawei.com>
 References: <a9ec4c60-a1b1-9535-89a2-30db4facaf1f@huawei.com>
  <D8D110F4-5AC4-4AEF-817B-038F506B8D7D@arm.com>
  <1f06664f-c60d-5551-70e7-13219210ef97@huawei.com>
+ <20170918223256.GI4657@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1f06664f-c60d-5551-70e7-13219210ef97@huawei.com>
-Sender: kvm-owner@vger.kernel.org
-To: gengdongjiu <gengdongjiu@huawei.com>
-Cc: Matt Evans <Matt.Evans@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, marc.zyngier@arm.com, linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, James Morse <James.Morse@arm.com>, catalin.marinas@arm.com, Huangshaoyu <huangshaoyu@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 65D9440C5B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Sep 2017 22:22:51 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id L1eCc8GmIxzM for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Sep 2017 22:22:50 -0400 (EDT)
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 76D7840A66
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Sep 2017 22:22:49 -0400 (EDT)
+In-Reply-To: <20170918223256.GI4657@cbox>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <cdall@linaro.org>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, marc.zyngier@arm.com, linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, Matt Evans <Matt.Evans@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
-
-On Mon, Sep 18, 2017 at 09:49:25PM +0800, gengdongjiu wrote:
-> To KVM mailing List about below question, thanks.
-> 
-
-[Please send properly formatted and written e-mails to this mailing
-list instead of just forwarding a conversation withtout futher
-explanation.  It would have been more helpful if you had suggested a
-patch or at least explained what you concluded from your conversation
-with Matt.]
-
-I don't think there's a problem here, because the ESR values are defined
-as
-
-#define ESR_ELx_EC_IABT_LOW▸    (0x20)
-#define ESR_ELx_EC_IABT_CUR▸    (0x21)
-...
-#define ESR_ELx_EC_DABT_LOW▸    (0x24)
-#define ESR_ELx_EC_DABT_CUR▸    (0x25)
-
-and we just or on the differating bit for a data abort:
-
-if (!is_iabt)
-	esr |= ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT;
-
-So you'll see that ESR_ELx_EC_IABT_LOW and ESR_ELx_EC_IABT_CUR become
-ESR_ELx_EC_DABT_LOW and ESR_ELx_EC_DABT_CUR, respectively.
-
-Thanks,
--Christoffer
-
-> 
-> 
-> On 2017/9/18 21:17, Matt Evans wrote:
-> > Hi Gengdongjiu,
-> > 
-> > 
-> >> On 18 Sep 2017, at 07:39, gengdongjiu <gengdongjiu@huawei.com> wrote:
-> >>
-> >> Hi Matt,
-> >>   sorry to disturb you, I want to consult you a question about the function inject_abt64();
-> >> For this function, the abort EC can be ESR_ELx_EC_DABT_LOW or ESR_ELx_EC_DABT_CUR according to *vcpu_cpsr(vcpu);
-> >> why it always ESR_ELx_EC_DABT_LOW?  thanks!
-> >>
-> >> As you can see the Iabort, when injecting the Iabort, it will check the cpsr to decide to inject the ESR_ELx_EC_IABT_LOW or ESR_ELx_EC_IABT_CUR.
-> >> but I do not know why the Dabort will always be ESR_ELx_EC_DABT_LOW when injecting.
-> >>
-> >>        /*
-> >>         * Here, the guest runs in AArch64 mode when in EL1. If we get
-> >>         * an AArch32 fault, it means we managed to trap an EL0 fault.
-> >>         */
-> >>        if (is_aarch32 || (cpsr & PSR_MODE_MASK) == PSR_MODE_EL0t)
-> >>                esr |= (ESR_ELx_EC_IABT_LOW << ESR_ELx_EC_SHIFT);
-> >>        else
-> >>                esr |= (ESR_ELx_EC_IABT_CUR << ESR_ELx_EC_SHIFT);
-> > 
-> > I think you're right.  When I fixed that line I had noticed the lack of left-shift but didn't think about the actual ESR value.
-> > 
-> > The injected vector is calculated correctly (between current-EL or lower-EL vectors) by get_except_vector() but the EC should also correspond to current-EL or lower-EL.
-> > 
-> > It is worth following this up on the ARM KVM mailing list!  (To be fair, your question should have been sent there too :) )
-> > 
-> > Thanks,
-> > 
-> > 
-> > Matt
-> > 
-> > 
-> > 
-> >>
-> >>
-> >>
-> >> commit e4fe9e7dc3828bf6a5714eb3c55aef6260d823a2
-> >> Author: Matt Evans <matt.evans@arm.com>
-> >> Date:   Mon May 16 13:54:56 2016 +0100
-> >>
-> >>    kvm: arm64: Fix EC field in inject_abt64
-> >>
-> >>    The EC field of the constructed ESR is conditionally modified by ORing in
-> >>    ESR_ELx_EC_DABT_LOW for a data abort.  However, ESR_ELx_EC_SHIFT is missing
-> >>    from this condition.
-> >>
-> >>    Signed-off-by: Matt Evans <matt.evans@arm.com>
-> >>    Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-> >>    Cc: <stable@vger.kernel.org>
-> >>    Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> >>
-> >> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-> >> index 4d1ac81870d2..e9e0e6db73f6 100644
-> >> --- a/arch/arm64/kvm/inject_fault.c
-> >> +++ b/arch/arm64/kvm/inject_fault.c
-> >> @@ -162,7 +162,7 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
-> >>                esr |= (ESR_ELx_EC_IABT_CUR << ESR_ELx_EC_SHIFT);
-> >>
-> >>        if (!is_iabt)
-> >> -               esr |= ESR_ELx_EC_DABT_LOW;
-> >> +               esr |= ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT;
-> >>
-> >>        vcpu_sys_reg(vcpu, ESR_EL1) = esr | ESR_ELx_FSC_EXTABT;
-> >> }
-> >>
-> > 
-> > IMPORTANT NOTICE: The contents of this email and any attachments are confidential and may also be privileged. If you are not the intended recipient, please notify the sender immediately and do not disclose the contents to any other person, use it for any purpose, or store or copy the information in any medium. Thank you.
-> > 
-> > 
-> 
+SGksIENocmlzdG9mZmVyCgpPbiAyMDE3LzkvMTkgNjozMiwgQ2hyaXN0b2ZmZXIgRGFsbCB3cm90
+ZToKPiBIaSwKPiAKPiBPbiBNb24sIFNlcCAxOCwgMjAxNyBhdCAwOTo0OToyNVBNICswODAwLCBn
+ZW5nZG9uZ2ppdSB3cm90ZToKPj4gVG8gS1ZNIG1haWxpbmcgTGlzdCBhYm91dCBiZWxvdyBxdWVz
+dGlvbiwgdGhhbmtzLgo+Pgo+IAo+IFtQbGVhc2Ugc2VuZCBwcm9wZXJseSBmb3JtYXR0ZWQgYW5k
+IHdyaXR0ZW4gZS1tYWlscyB0byB0aGlzIG1haWxpbmcKPiBsaXN0IGluc3RlYWQgb2YganVzdCBm
+b3J3YXJkaW5nIGEgY29udmVyc2F0aW9uIHdpdGh0b3V0IGZ1dGhlcgo+IGV4cGxhbmF0aW9uLiAg
+SXQgd291bGQgaGF2ZSBiZWVuIG1vcmUgaGVscGZ1bCBpZiB5b3UgaGFkIHN1Z2dlc3RlZCBhCj4g
+cGF0Y2ggb3IgYXQgbGVhc3QgZXhwbGFpbmVkIHdoYXQgeW91IGNvbmNsdWRlZCBmcm9tIHlvdXIg
+Y29udmVyc2F0aW9uCj4gd2l0aCBNYXR0Ll0Kc29ycnkgZm9yIHRoZSBtYWlsIGZvcm1hdC4gSSB3
+aWxsIHBheSBhdHRlbnRpb24gdG8gdGhhdCBuZXh0IHRpbWUuCgo+IAo+IEkgZG9uJ3QgdGhpbmsg
+dGhlcmUncyBhIHByb2JsZW0gaGVyZSwgYmVjYXVzZSB0aGUgRVNSIHZhbHVlcyBhcmUgZGVmaW5l
+ZAo+IGFzCj4gCj4gI2RlZmluZSBFU1JfRUx4X0VDX0lBQlRfTE9X4pa4ICAgICgweDIwKQo+ICNk
+ZWZpbmUgRVNSX0VMeF9FQ19JQUJUX0NVUuKWuCAgICAoMHgyMSkKPiAuLi4KPiAjZGVmaW5lIEVT
+Ul9FTHhfRUNfREFCVF9MT1filrggICAgKDB4MjQpCj4gI2RlZmluZSBFU1JfRUx4X0VDX0RBQlRf
+Q1VS4pa4ICAgICgweDI1KQo+IAo+IGFuZCB3ZSBqdXN0IG9yIG9uIHRoZSBkaWZmZXJhdGluZyBi
+aXQgZm9yIGEgZGF0YSBhYm9ydDoKPiAKPiBpZiAoIWlzX2lhYnQpCj4gCWVzciB8PSBFU1JfRUx4
+X0VDX0RBQlRfTE9XIDw8IEVTUl9FTHhfRUNfU0hJRlQ7Cj4gCj4gU28geW91J2xsIHNlZSB0aGF0
+IEVTUl9FTHhfRUNfSUFCVF9MT1cgYW5kIEVTUl9FTHhfRUNfSUFCVF9DVVIgYmVjb21lCj4gRVNS
+X0VMeF9FQ19EQUJUX0xPVyBhbmQgRVNSX0VMeF9FQ19EQUJUX0NVUiwgcmVzcGVjdGl2ZWx5LgoK
+VGhhbmtzIGZvciB0aGUgZXhwbGFuYXRpb24uCgoKPiAKPiBUaGFua3MsCj4gLUNocmlzdG9mZmVy
+Cj4gCj4+Cj4+Cj4+IE9uIDIwMTcvOS8xOCAyMToxNywgTWF0dCBFdmFucyB3cm90ZToKPj4+IEhp
+IEdlbmdkb25naml1LAo+Pj4KPj4+Cj4+Pj4gT24gMTggU2VwIDIwMTcsIGF0IDA3OjM5LCBnZW5n
+ZG9uZ2ppdSA8Z2VuZ2RvbmdqaXVAaHVhd2VpLmNvbT4gd3JvdGU6Cj4+Pj4KPj4+PiBIaSBNYXR0
+LAo+Pj4+ICAgc29ycnkgdG8gZGlzdHVyYiB5b3UsIEkgd2FudCB0byBjb25zdWx0IHlvdSBhIHF1
+ZXN0aW9uIGFib3V0IHRoZSBmdW5jdGlvbiBpbmplY3RfYWJ0NjQoKTsKPj4+PiBGb3IgdGhpcyBm
+dW5jdGlvbiwgdGhlIGFib3J0IEVDIGNhbiBiZSBFU1JfRUx4X0VDX0RBQlRfTE9XIG9yIEVTUl9F
+THhfRUNfREFCVF9DVVIgYWNjb3JkaW5nIHRvICp2Y3B1X2Nwc3IodmNwdSk7Cj4+Pj4gd2h5IGl0
+IGFsd2F5cyBFU1JfRUx4X0VDX0RBQlRfTE9XPyAgdGhhbmtzIQo+Pj4+Cj4+Pj4gQXMgeW91IGNh
+biBzZWUgdGhlIElhYm9ydCwgd2hlbiBpbmplY3RpbmcgdGhlIElhYm9ydCwgaXQgd2lsbCBjaGVj
+ayB0aGUgY3BzciB0byBkZWNpZGUgdG8gaW5qZWN0IHRoZSBFU1JfRUx4X0VDX0lBQlRfTE9XIG9y
+IEVTUl9FTHhfRUNfSUFCVF9DVVIuCj4+Pj4gYnV0IEkgZG8gbm90IGtub3cgd2h5IHRoZSBEYWJv
+cnQgd2lsbCBhbHdheXMgYmUgRVNSX0VMeF9FQ19EQUJUX0xPVyB3aGVuIGluamVjdGluZy4KPj4+
+Pgo+Pj4+ICAgICAgICAvKgo+Pj4+ICAgICAgICAgKiBIZXJlLCB0aGUgZ3Vlc3QgcnVucyBpbiBB
+QXJjaDY0IG1vZGUgd2hlbiBpbiBFTDEuIElmIHdlIGdldAo+Pj4+ICAgICAgICAgKiBhbiBBQXJj
+aDMyIGZhdWx0LCBpdCBtZWFucyB3ZSBtYW5hZ2VkIHRvIHRyYXAgYW4gRUwwIGZhdWx0Lgo+Pj4+
+ICAgICAgICAgKi8KPj4+PiAgICAgICAgaWYgKGlzX2FhcmNoMzIgfHwgKGNwc3IgJiBQU1JfTU9E
+RV9NQVNLKSA9PSBQU1JfTU9ERV9FTDB0KQo+Pj4+ICAgICAgICAgICAgICAgIGVzciB8PSAoRVNS
+X0VMeF9FQ19JQUJUX0xPVyA8PCBFU1JfRUx4X0VDX1NISUZUKTsKPj4+PiAgICAgICAgZWxzZQo+
+Pj4+ICAgICAgICAgICAgICAgIGVzciB8PSAoRVNSX0VMeF9FQ19JQUJUX0NVUiA8PCBFU1JfRUx4
+X0VDX1NISUZUKTsKPj4+Cj4+PiBJIHRoaW5rIHlvdSdyZSByaWdodC4gIFdoZW4gSSBmaXhlZCB0
+aGF0IGxpbmUgSSBoYWQgbm90aWNlZCB0aGUgbGFjayBvZiBsZWZ0LXNoaWZ0IGJ1dCBkaWRuJ3Qg
+dGhpbmsgYWJvdXQgdGhlIGFjdHVhbCBFU1IgdmFsdWUuCj4+Pgo+Pj4gVGhlIGluamVjdGVkIHZl
+Y3RvciBpcyBjYWxjdWxhdGVkIGNvcnJlY3RseSAoYmV0d2VlbiBjdXJyZW50LUVMIG9yIGxvd2Vy
+LUVMIHZlY3RvcnMpIGJ5IGdldF9leGNlcHRfdmVjdG9yKCkgYnV0IHRoZSBFQyBzaG91bGQgYWxz
+byBjb3JyZXNwb25kIHRvIGN1cnJlbnQtRUwgb3IgbG93ZXItRUwuCj4+Pgo+Pj4gSXQgaXMgd29y
+dGggZm9sbG93aW5nIHRoaXMgdXAgb24gdGhlIEFSTSBLVk0gbWFpbGluZyBsaXN0ISAgKFRvIGJl
+IGZhaXIsIHlvdXIgcXVlc3Rpb24gc2hvdWxkIGhhdmUgYmVlbiBzZW50IHRoZXJlIHRvbyA6KSAp
+Cj4+Pgo+Pj4gVGhhbmtzLAo+Pj4KPj4+Cj4+PiBNYXR0Cj4+Pgo+Pj4KPj4+Cj4+Pj4KPj4+Pgo+
+Pj4+Cj4+Pj4gY29tbWl0IGU0ZmU5ZTdkYzM4MjhiZjZhNTcxNGViM2M1NWFlZjYyNjBkODIzYTIK
+Pj4+PiBBdXRob3I6IE1hdHQgRXZhbnMgPG1hdHQuZXZhbnNAYXJtLmNvbT4KPj4+PiBEYXRlOiAg
+IE1vbiBNYXkgMTYgMTM6NTQ6NTYgMjAxNiArMDEwMAo+Pj4+Cj4+Pj4gICAga3ZtOiBhcm02NDog
+Rml4IEVDIGZpZWxkIGluIGluamVjdF9hYnQ2NAo+Pj4+Cj4+Pj4gICAgVGhlIEVDIGZpZWxkIG9m
+IHRoZSBjb25zdHJ1Y3RlZCBFU1IgaXMgY29uZGl0aW9uYWxseSBtb2RpZmllZCBieSBPUmluZyBp
+bgo+Pj4+ICAgIEVTUl9FTHhfRUNfREFCVF9MT1cgZm9yIGEgZGF0YSBhYm9ydC4gIEhvd2V2ZXIs
+IEVTUl9FTHhfRUNfU0hJRlQgaXMgbWlzc2luZwo+Pj4+ICAgIGZyb20gdGhpcyBjb25kaXRpb24u
+Cj4+Pj4KPj4+PiAgICBTaWduZWQtb2ZmLWJ5OiBNYXR0IEV2YW5zIDxtYXR0LmV2YW5zQGFybS5j
+b20+Cj4+Pj4gICAgQWNrZWQtYnk6IE1hcmMgWnluZ2llciA8bWFyYy56eW5naWVyQGFybS5jb20+
+Cj4+Pj4gICAgQ2M6IDxzdGFibGVAdmdlci5rZXJuZWwub3JnPgo+Pj4+ICAgIFNpZ25lZC1vZmYt
+Ynk6IENocmlzdG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZz4KPj4+Pgo+
+Pj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS9pbmplY3RfZmF1bHQuYyBiL2FyY2gvYXJt
+NjQva3ZtL2luamVjdF9mYXVsdC5jCj4+Pj4gaW5kZXggNGQxYWM4MTg3MGQyLi5lOWUwZTZkYjcz
+ZjYgMTAwNjQ0Cj4+Pj4gLS0tIGEvYXJjaC9hcm02NC9rdm0vaW5qZWN0X2ZhdWx0LmMKPj4+PiAr
+KysgYi9hcmNoL2FybTY0L2t2bS9pbmplY3RfZmF1bHQuYwo+Pj4+IEBAIC0xNjIsNyArMTYyLDcg
+QEAgc3RhdGljIHZvaWQgaW5qZWN0X2FidDY0KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgYm9vbCBp
+c19pYWJ0LCB1bnNpZ25lZCBsb25nIGFkZHIKPj4+PiAgICAgICAgICAgICAgICBlc3IgfD0gKEVT
+Ul9FTHhfRUNfSUFCVF9DVVIgPDwgRVNSX0VMeF9FQ19TSElGVCk7Cj4+Pj4KPj4+PiAgICAgICAg
+aWYgKCFpc19pYWJ0KQo+Pj4+IC0gICAgICAgICAgICAgICBlc3IgfD0gRVNSX0VMeF9FQ19EQUJU
+X0xPVzsKPj4+PiArICAgICAgICAgICAgICAgZXNyIHw9IEVTUl9FTHhfRUNfREFCVF9MT1cgPDwg
+RVNSX0VMeF9FQ19TSElGVDsKPj4+Pgo+Pj4+ICAgICAgICB2Y3B1X3N5c19yZWcodmNwdSwgRVNS
+X0VMMSkgPSBlc3IgfCBFU1JfRUx4X0ZTQ19FWFRBQlQ7Cj4+Pj4gfQo+Pj4+Cj4+Pgo+Pj4gSU1Q
+T1JUQU5UIE5PVElDRTogVGhlIGNvbnRlbnRzIG9mIHRoaXMgZW1haWwgYW5kIGFueSBhdHRhY2ht
+ZW50cyBhcmUgY29uZmlkZW50aWFsIGFuZCBtYXkgYWxzbyBiZSBwcml2aWxlZ2VkLiBJZiB5b3Ug
+YXJlIG5vdCB0aGUgaW50ZW5kZWQgcmVjaXBpZW50LCBwbGVhc2Ugbm90aWZ5IHRoZSBzZW5kZXIg
+aW1tZWRpYXRlbHkgYW5kIGRvIG5vdCBkaXNjbG9zZSB0aGUgY29udGVudHMgdG8gYW55IG90aGVy
+IHBlcnNvbiwgdXNlIGl0IGZvciBhbnkgcHVycG9zZSwgb3Igc3RvcmUgb3IgY29weSB0aGUgaW5m
+b3JtYXRpb24gaW4gYW55IG1lZGl1bS4gVGhhbmsgeW91Lgo+Pj4KPj4+Cj4+Cj4gCj4gLgo+IAoK
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1h
+aWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3Mu
+Y29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
