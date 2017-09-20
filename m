@@ -1,53 +1,116 @@
-From: Alan Hayward <Alan.Hayward@arm.com>
+From: Dave Martin <dave.martin@foss.arm.com>
 Subject: Re: [PATCH v2 14/28] arm64/sve: Backend logic for setting the vector
  length
-Date: Wed, 20 Sep 2017 10:59:55 +0000
-Message-ID: <FC5BA359-D37C-493C-87CD-146B83D3CCB5@arm.com>
+Date: Wed, 20 Sep 2017 12:09:04 +0100
+Message-ID: <20170920110902.GG24231@e103592.cambridge.arm.com>
 References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com>
  <1504198860-12951-15-git-send-email-Dave.Martin@arm.com>
+ <FC5BA359-D37C-493C-87CD-146B83D3CCB5@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Return-path: <linux-arch-owner@vger.kernel.org>
-In-Reply-To: <1504198860-12951-15-git-send-email-Dave.Martin@arm.com>
-Content-Language: en-US
-Content-ID: <6B3111D0F66877459DFF3822341B37B7@eurprd08.prod.outlook.com>
+Content-Disposition: inline
+In-Reply-To: <FC5BA359-D37C-493C-87CD-146B83D3CCB5@arm.com>
 Sender: linux-arch-owner@vger.kernel.org
-To: Dave P Martin <Dave.Martin@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Catalin Marinas <Catalin.Marinas@arm.com>, Will Deacon <Will.Deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?utf-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Richard Sandiford <Richard.Sandiford@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "libc-alpha@sourceware.org" <libc-alpha@sourceware.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, "gdb@sourceware.org" <gdb@sourceware.org>, Yao Qi <Yao.Qi@arm.com>, nd <nd@arm.com>
+To: Alan Hayward <Alan.Hayward@arm.com>
+Cc: Dave P Martin <Dave.Martin@arm.com>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, "libc-alpha@sourceware.org" <libc-alpha@sourceware.org>, "gdb@sourceware.org" <gdb@sourceware.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Catalin Marinas <Catalin.Marinas@arm.com>, Yao Qi <Yao.Qi@arm.com>, Will Deacon <Will.Deacon@arm.com>, Richard Sandiford <Richard.Sandiford@arm.com>, nd <nd@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-KFJlc2VuZGluZyB3aXRob3V0IGRpc2NsYWltZXIpDQoNCj4gT24gMzEgQXVnIDIwMTcsIGF0IDE4
-OjAwLCBEYXZlIE1hcnRpbiA8RGF2ZS5NYXJ0aW5AYXJtLmNvbT4gd3JvdGU6DQoNCj4gDQo+ICtp
-bnQgc3ZlX3NldF92ZWN0b3JfbGVuZ3RoKHN0cnVjdCB0YXNrX3N0cnVjdCAqdGFzaywNCj4gKwkJ
-CSAgdW5zaWduZWQgbG9uZyB2bCwgdW5zaWduZWQgbG9uZyBmbGFncykNCj4gK3sNCj4gKwlXQVJO
-X09OKHRhc2sgPT0gY3VycmVudCAmJiBwcmVlbXB0aWJsZSgpKTsNCj4gKw0KPiArCWlmIChmbGFn
-cyAmIH4odW5zaWduZWQgbG9uZykoUFJfU1ZFX1ZMX0lOSEVSSVQgfA0KPiArCQkJCSAgICAgUFJf
-U1ZFX1NFVF9WTF9PTkVYRUMpKQ0KPiArCQlyZXR1cm4gLUVJTlZBTDsNCj4gKw0KPiArCWlmICgh
-c3ZlX3ZsX3ZhbGlkKHZsKSkNCj4gKwkJcmV0dXJuIC1FSU5WQUw7DQo+ICsNCj4gKwkvKg0KPiAr
-CSAqIENsYW1wIHRvIHRoZSBtYXhpbXVtIHZlY3RvciBsZW5ndGggdGhhdCBWTC1hZ25vc3RpYyBT
-VkUgY29kZSBjYW4NCj4gKwkgKiB3b3JrIHdpdGguICBBIGZsYWcgbWF5IGJlIGFzc2lnbmVkIGlu
-IHRoZSBmdXR1cmUgdG8gYWxsb3cgc2V0dGluZw0KPiArCSAqIG9mIGxhcmdlciB2ZWN0b3IgbGVu
-Z3RocyB3aXRob3V0IGNvbmZ1c2luZyBvbGRlciBzb2Z0d2FyZS4NCj4gKwkgKi8NCj4gKwlpZiAo
-dmwgPiBTVkVfVkxfQVJDSF9NQVgpDQo+ICsJCXZsID0gU1ZFX1ZMX0FSQ0hfTUFYOw0KPiArDQo+
-ICsJdmwgPSBmaW5kX3N1cHBvcnRlZF92ZWN0b3JfbGVuZ3RoKHZsKTsNCj4gKw0KDQoNCkdpdmVu
-LCBzdmVfc2V0X3ZlY3Rvcl9sZW5ndGggaXMgY2FsbGVkIHdoZW4gc2V0dGluZyB0aGUgdmVjdG9y
-IGxlbmd0aCBpbg0KUFRSQUNFX1NFVFJFR1NFVCwgaXQgbG9va3MgdG8gbWUgbGlrZSBpZiB5b3Ug
-c2V0IFZMIHRvIGEgdmFsdWUgdGhhdOKAmXMgbm90DQpzdXBwb3J0ZWQgYnkgdGhlIGhhcmR3YXJl
-LCB0aGVuIGl04oCZcyBnb2luZyB0byByb3VuZCBkb3duIHRvIHRoZSBwcmV2aW91cyB2YWx1ZS4N
-CklzIHRoYXQgY29ycmVjdD8gSeKAmW0gbm90IHN1cmUgaWYgdGhhdOKAmXMgZXhwbGFpbmVkIGlu
-IHRoZSBkb2NzPw0KDQpXaGF0IGhhcHBlbnMgaWYgeW91IGdpdmUgYSB2bCB2YWx1ZSBsb3dlciB0
-aGFuIHRoZSBtaW4gc3VwcG9ydGVkIHZhbHVlIGluIHRoZQ0KaGFyZHdhcmU/DQoNCg0KPiArLyoN
-Cj4gKyAqIEFsbCB2ZWN0b3IgbGVuZ3RoIHNlbGVjdGlvbiBmcm9tIHVzZXJzcGFjZSBjb21lcyB0
-aHJvdWdoIGhlcmUuDQo+ICsgKiBXZSdyZSBvbiBhIHNsb3cgcGF0aCwgc28gc29tZSBzYW5pdHkt
-Y2hlY2tzIGFyZSBpbmNsdWRlZC4NCj4gKyAqIElmIHRoaW5ncyBnbyB3cm9uZyB0aGVyZSdzIGEg
-YnVnIHNvbWV3aGVyZSwgYnV0IHRyeSB0byBmYWxsIGJhY2sgdG8gYQ0KPiArICogc2FmZSBjaG9p
-Y2UuDQo+ICsgKi8NCj4gK3N0YXRpYyB1bnNpZ25lZCBpbnQgZmluZF9zdXBwb3J0ZWRfdmVjdG9y
-X2xlbmd0aCh1bnNpZ25lZCBpbnQgdmwpDQo+ICt7DQo+ICsJaW50IGJpdDsNCj4gKwlpbnQgbWF4
-X3ZsID0gc3ZlX21heF92bDsNCj4gKw0KPiArCWlmIChXQVJOX09OKCFzdmVfdmxfdmFsaWQodmwp
-KSkNCj4gKwkJdmwgPSBTVkVfVkxfTUlOOw0KPiArDQo+ICsJaWYgKFdBUk5fT04oIXN2ZV92bF92
-YWxpZChtYXhfdmwpKSkNCj4gKwkJbWF4X3ZsID0gU1ZFX1ZMX01JTjsNCj4gKw0KPiArCWlmICh2
-bCA+IG1heF92bCkNCj4gKwkJdmwgPSBtYXhfdmw7DQo+ICsNCj4gKwliaXQgPSBmaW5kX25leHRf
-Yml0KHN2ZV92cV9tYXAsIFNWRV9WUV9NQVgsDQo+ICsJCQkgICAgdnFfdG9fYml0KHN2ZV92cV9m
-cm9tX3ZsKHZsKSkpOw0KPiArCXJldHVybiBzdmVfdmxfZnJvbV92cShiaXRfdG9fdnEoYml0KSk7
-DQo+ICt9DQo+ICsNCg0KDQpUaGFua3MsDQpBbGFuLg==
+On Wed, Sep 20, 2017 at 10:59:55AM +0000, Alan Hayward wrote:
+> (Resending without disclaimer)
+> 
+> > On 31 Aug 2017, at 18:00, Dave Martin <Dave.Martin@arm.com> wrote:
+> 
+> > 
+> > +int sve_set_vector_length(struct task_struct *task,
+> > +			  unsigned long vl, unsigned long flags)
+> > +{
+> > +	WARN_ON(task == current && preemptible());
+> > +
+> > +	if (flags & ~(unsigned long)(PR_SVE_VL_INHERIT |
+> > +				     PR_SVE_SET_VL_ONEXEC))
+> > +		return -EINVAL;
+> > +
+> > +	if (!sve_vl_valid(vl))
+> > +		return -EINVAL;
+> > +
+> > +	/*
+> > +	 * Clamp to the maximum vector length that VL-agnostic SVE code can
+> > +	 * work with.  A flag may be assigned in the future to allow setting
+> > +	 * of larger vector lengths without confusing older software.
+> > +	 */
+> > +	if (vl > SVE_VL_ARCH_MAX)
+> > +		vl = SVE_VL_ARCH_MAX;
+> > +
+> > +	vl = find_supported_vector_length(vl);
+> > +
+> 
+> 
+> Given, sve_set_vector_length is called when setting the vector length in
+> PTRACE_SETREGSET, it looks to me like if you set VL to a value that’s not
+> supported by the hardware, then it’s going to round down to the previous value.
+> Is that correct? I’m not sure if that’s explained in the docs?
+
+Does this cover it?
+
+"On success, the calling thread's vector length is changed to the
+largest value supported by the system that is less than or equal to vl."
+
+(For ptrace, I just cross-reference the PR_SVE_SET_VL behaviour, above.)
+
+> What happens if you give a vl value lower than the min supported value in the
+> hardware?
+
+This is impossible, unless vl < SVE_VL_MIN (which is rejected explicitly
+by the !sve_vl_valid() check in sve_set_vector_length()).
+
+The architecture required support for all power-of-two vector lengths
+less than the maximum supported vector length, so by construction
+SVE_VL_MIN is supported by all hardware.
+
+To be defensive, if we fail to detect support for SVE_VL_MIN, I set the
+corresponding bit in sve_vq_map and WARN.  This is just to help ensure
+find_supported_vector_length doesn't fall off the end of sve_vq_map.
+
+
+Does that sounds correct?  There may be a clearer way of achieving this.
+
+Cheers
+---Dave
+
+> 
+> 
+> > +/*
+> > + * All vector length selection from userspace comes through here.
+> > + * We're on a slow path, so some sanity-checks are included.
+> > + * If things go wrong there's a bug somewhere, but try to fall back to a
+> > + * safe choice.
+> > + */
+> > +static unsigned int find_supported_vector_length(unsigned int vl)
+> > +{
+> > +	int bit;
+> > +	int max_vl = sve_max_vl;
+> > +
+> > +	if (WARN_ON(!sve_vl_valid(vl)))
+> > +		vl = SVE_VL_MIN;
+> > +
+> > +	if (WARN_ON(!sve_vl_valid(max_vl)))
+> > +		max_vl = SVE_VL_MIN;
+> > +
+> > +	if (vl > max_vl)
+> > +		vl = max_vl;
+> > +
+> > +	bit = find_next_bit(sve_vq_map, SVE_VQ_MAX,
+> > +			    vq_to_bit(sve_vq_from_vl(vl)));
+> > +	return sve_vl_from_vq(bit_to_vq(bit));
+> > +}
+> > +
+> 
+> 
+> Thanks,
+> Alan.
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
