@@ -1,116 +1,91 @@
-From: Dave Martin <dave.martin@foss.arm.com>
-Subject: Re: [PATCH v2 14/28] arm64/sve: Backend logic for setting the vector
- length
-Date: Wed, 20 Sep 2017 12:09:04 +0100
-Message-ID: <20170920110902.GG24231@e103592.cambridge.arm.com>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v2 11/28] arm64/sve: Core task context handling
+Date: Wed, 20 Sep 2017 14:58:56 +0100
+Message-ID: <20170920135856.dfuowttwi4bk4nqb@localhost>
 References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com>
- <1504198860-12951-15-git-send-email-Dave.Martin@arm.com>
- <FC5BA359-D37C-493C-87CD-146B83D3CCB5@arm.com>
+ <1504198860-12951-12-git-send-email-Dave.Martin@arm.com>
+ <20170913143325.hi4cfcajbts3bbao@localhost>
+ <20170914195555.GB24231@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <linux-arch-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <FC5BA359-D37C-493C-87CD-146B83D3CCB5@arm.com>
+In-Reply-To: <20170914195555.GB24231@e103592.cambridge.arm.com>
 Sender: linux-arch-owner@vger.kernel.org
-To: Alan Hayward <Alan.Hayward@arm.com>
-Cc: Dave P Martin <Dave.Martin@arm.com>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, "libc-alpha@sourceware.org" <libc-alpha@sourceware.org>, "gdb@sourceware.org" <gdb@sourceware.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Catalin Marinas <Catalin.Marinas@arm.com>, Yao Qi <Yao.Qi@arm.com>, Will Deacon <Will.Deacon@arm.com>, Richard Sandiford <Richard.Sandiford@arm.com>, nd <nd@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Will Deacon <will.deacon@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Sep 20, 2017 at 10:59:55AM +0000, Alan Hayward wrote:
-> (Resending without disclaimer)
-> 
-> > On 31 Aug 2017, at 18:00, Dave Martin <Dave.Martin@arm.com> wrote:
-> 
+On Thu, Sep 14, 2017 at 08:55:56PM +0100, Dave P Martin wrote:
+> On Wed, Sep 13, 2017 at 07:33:25AM -0700, Catalin Marinas wrote:
+> > On Thu, Aug 31, 2017 at 06:00:43PM +0100, Dave P Martin wrote:
+> > > +/*
+> > > + * Handle SVE state across fork():
+> > > + *
+> > > + * dst and src must not end up with aliases of the same sve_state.
+> > > + * Because a task cannot fork except in a syscall, we can discard SVE
+> > > + * state for dst here, so long as we take care to retain the FPSIMD
+> > > + * subset of the state if SVE is in use.  Reallocation of the SVE state
+> > > + * will be deferred until dst tries to use SVE.
+> > > + */
+> > > +void fpsimd_dup_sve(struct task_struct *dst, struct task_struct const *src)
+> > > +{
+> > > +	if (test_and_clear_tsk_thread_flag(dst, TIF_SVE)) {
+> > > +		WARN_ON(dst->mm && !in_syscall(task_pt_regs(dst)));
+> > > +		sve_to_fpsimd(dst);
+> > > +	}
+> > > +
+> > > +	dst->thread.sve_state = NULL;
+> > > +}
 > > 
-> > +int sve_set_vector_length(struct task_struct *task,
-> > +			  unsigned long vl, unsigned long flags)
-> > +{
-> > +	WARN_ON(task == current && preemptible());
-> > +
-> > +	if (flags & ~(unsigned long)(PR_SVE_VL_INHERIT |
-> > +				     PR_SVE_SET_VL_ONEXEC))
-> > +		return -EINVAL;
-> > +
-> > +	if (!sve_vl_valid(vl))
-> > +		return -EINVAL;
-> > +
-> > +	/*
-> > +	 * Clamp to the maximum vector length that VL-agnostic SVE code can
-> > +	 * work with.  A flag may be assigned in the future to allow setting
-> > +	 * of larger vector lengths without confusing older software.
-> > +	 */
-> > +	if (vl > SVE_VL_ARCH_MAX)
-> > +		vl = SVE_VL_ARCH_MAX;
-> > +
-> > +	vl = find_supported_vector_length(vl);
-> > +
+> > I first thought the thread flags are not visible in dst yet since
+> > dup_task_struct() calls arch_dup_task_struct() before
+> > setup_thread_stack(). However, at the end of the last year we enabled
+> > CONFIG_THREAD_INFO_IN_TASK_STRUCT. But I don't particularly like relying
+> > on this.
 > 
+> Hmmm, I see your point, but there are some sequencing issues here.
 > 
-> Given, sve_set_vector_length is called when setting the vector length in
-> PTRACE_SETREGSET, it looks to me like if you set VL to a value that’s not
-> supported by the hardware, then it’s going to round down to the previous value.
-> Is that correct? I’m not sure if that’s explained in the docs?
-
-Does this cover it?
-
-"On success, the calling thread's vector length is changed to the
-largest value supported by the system that is less than or equal to vl."
-
-(For ptrace, I just cross-reference the PR_SVE_SET_VL behaviour, above.)
-
-> What happens if you give a vl value lower than the min supported value in the
-> hardware?
-
-This is impossible, unless vl < SVE_VL_MIN (which is rejected explicitly
-by the !sve_vl_valid() check in sve_set_vector_length()).
-
-The architecture required support for all power-of-two vector lengths
-less than the maximum supported vector length, so by construction
-SVE_VL_MIN is supported by all hardware.
-
-To be defensive, if we fail to detect support for SVE_VL_MIN, I set the
-corresponding bit in sve_vq_map and WARN.  This is just to help ensure
-find_supported_vector_length doesn't fall off the end of sve_vq_map.
-
-
-Does that sounds correct?  There may be a clearer way of achieving this.
-
-Cheers
----Dave
-
+> > Anyway, IIUC we don't need sve_to_fpsimd() here. The
+> > arch_dup_task_struct() already called fpsimd_preserve_current_state()
 > 
+> I consider SVE discard as an optional side effect of task_fpsimd_save(),
+> not something that is guaranteed to happen -- the decision about whether
+> to do so may become more intelligent later on.  So, for src, we may
+> discard SVE (because syscall), but for dst we must NULL .sve_state (and
+> therefore clear TIF_SVE) simply to avoid aliasing of src->sve_state and
+> dst->sve_state.
+
+My point was that the SVE state of src is already preserved at this
+point and copied into dst. You don't need the sve_to_fpsimd(dst) again
+which basically does the same copying of the src SVE saved state into
+the FPSIMD one in dst. This has already been done in
+arch_dup_task_struct() by the combination of
+fpsimd_preserve_current_state() and *dst = *src (and, of course,
+clearing TIF_SVE in dst).
+
+I don't think the TIF_SVE clearing in src is just a side effect of
+task_fpsimd_save() here but rather a requirement. When returning from
+fork(), both src and dst would need to have the same state. However,
+your fpsimd_dup_sve() implementation makes it very clear that the SVE
+state is lost in dst. This is only allowed if we also lose it in src (as
+a result of a syscall). So making dst->sve_state = NULL requires that
+TIF_SVE is also cleared in both src and dst. Alternatively, you'd have
+to allocate a new state here and copy the full src SVE state across to
+dst, together with setting TIF_SVE (that's not necessary, however, since
+we get here as a result of a syscall).
+
+> > for src, so the FPSIMD state (which we care about) is transferred during
+> > the *dst = *src assignment. So you'd only need the last statement,
+> > possibly with a different function name like fpsimd_erase_sve (and maybe
+> > make the function static inline in the header).
 > 
-> > +/*
-> > + * All vector length selection from userspace comes through here.
-> > + * We're on a slow path, so some sanity-checks are included.
-> > + * If things go wrong there's a bug somewhere, but try to fall back to a
-> > + * safe choice.
-> > + */
-> > +static unsigned int find_supported_vector_length(unsigned int vl)
-> > +{
-> > +	int bit;
-> > +	int max_vl = sve_max_vl;
-> > +
-> > +	if (WARN_ON(!sve_vl_valid(vl)))
-> > +		vl = SVE_VL_MIN;
-> > +
-> > +	if (WARN_ON(!sve_vl_valid(max_vl)))
-> > +		max_vl = SVE_VL_MIN;
-> > +
-> > +	if (vl > max_vl)
-> > +		vl = max_vl;
-> > +
-> > +	bit = find_next_bit(sve_vq_map, SVE_VQ_MAX,
-> > +			    vq_to_bit(sve_vq_from_vl(vl)));
-> > +	return sve_vl_from_vq(bit_to_vq(bit));
-> > +}
-> > +
-> 
-> 
-> Thanks,
-> Alan.
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+> Not quite: TIF_SVE must be cleared so that a context switch or
+> kernel_neon_begin() after dst is scheduled doesn't try to save state in
+> the (NULL) dst->sve_state.
+
+Yes, TIF_SVE must also be cleared in dst when dst->sve_state = NULL (I
+may have forgotten to mention this).
+
+-- 
+Catalin
