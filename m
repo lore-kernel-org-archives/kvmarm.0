@@ -1,83 +1,80 @@
-From: Alan Hayward <Alan.Hayward@arm.com>
-Subject: Re: [PATCH v2 14/28] arm64/sve: Backend logic for setting the vector
- length
-Date: Wed, 20 Sep 2017 18:08:21 +0000
-Message-ID: <E82895B2-3F95-4A54-8703-D654221F8CBA@arm.com>
-References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com>
- <1504198860-12951-15-git-send-email-Dave.Martin@arm.com>
- <FC5BA359-D37C-493C-87CD-146B83D3CCB5@arm.com>
- <20170920110902.GG24231@e103592.cambridge.arm.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Subject: Re: [PATCH v6 6/7] KVM: arm64: allow get exception information from
+ userspace
+Date: Thu, 21 Sep 2017 15:55:25 +0800
+Message-ID: <92f2fecc-9833-15e4-30cc-b4dd5ba93cb7@huawei.com>
+References: <1503916701-13516-1-git-send-email-gengdongjiu@huawei.com>
+ <1503916701-13516-7-git-send-email-gengdongjiu@huawei.com>
+ <59B17438.5070501@arm.com> <2a42d1ea-3456-2873-c9ea-d8a027b59789@huawei.com>
+ <59BA7D72.4090403@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <linux-arch-owner@vger.kernel.org>
-In-Reply-To: <20170920110902.GG24231@e103592.cambridge.arm.com>
-Content-Language: en-US
-Content-ID: <E10FDC6A16F67C418BEF1FD9A3874438@eurprd08.prod.outlook.com>
-Sender: linux-arch-owner@vger.kernel.org
-To: Dave Martin <dave.martin@foss.arm.com>
-Cc: Dave P Martin <Dave.Martin@arm.com>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, "libc-alpha@sourceware.org" <libc-alpha@sourceware.org>, "gdb@sourceware.org" <gdb@sourceware.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Catalin Marinas <Catalin.Marinas@arm.com>, Yao Qi <Yao.Qi@arm.com>, Will Deacon <Will.Deacon@arm.com>, Richard Sandiford <Richard.Sandiford@arm.com>, nd <nd@arm.com>, =?utf-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <59BA7D72.4090403@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: James Morse <james.morse@arm.com>, Achin.Gupta@arm.com
+Cc: peter.maydell@linaro.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, lenb@kernel.org, robert.moore@intel.com, lv.zheng@intel.com, mark.rutland@arm.com, xiexiuqi@huawei.com, cov@codeaurora.org, david.daney@cavium.com, suzuki.poulose@arm.com, stefan@hello-penguin.com, Dave.Martin@arm.com, kristina.martsenko@arm.com, wangkefeng.wang@huawei.com, tbaicar@codeaurora.org, ard.biesheuvel@linaro.org, mingo@kernel.org, bp@suse.de, shiju.jose@huawei.com, zjzhang@codeaurora.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, devel@a
 List-Id: kvmarm@lists.cs.columbia.edu
 
-DQo+IE9uIDIwIFNlcCAyMDE3LCBhdCAxMjowOSwgRGF2ZSBNYXJ0aW4gPGRhdmUubWFydGluQGZv
-c3MuYXJtLmNvbT4gd3JvdGU6DQo+IA0KPiBPbiBXZWQsIFNlcCAyMCwgMjAxNyBhdCAxMDo1OTo1
-NUFNICswMDAwLCBBbGFuIEhheXdhcmQgd3JvdGU6DQo+PiAoUmVzZW5kaW5nIHdpdGhvdXQgZGlz
-Y2xhaW1lcikNCj4+IA0KPj4+IE9uIDMxIEF1ZyAyMDE3LCBhdCAxODowMCwgRGF2ZSBNYXJ0aW4g
-PERhdmUuTWFydGluQGFybS5jb20+IHdyb3RlOg0KPj4gDQo+Pj4gDQo+Pj4gK2ludCBzdmVfc2V0
-X3ZlY3Rvcl9sZW5ndGgoc3RydWN0IHRhc2tfc3RydWN0ICp0YXNrLA0KPj4+ICsJCQkgIHVuc2ln
-bmVkIGxvbmcgdmwsIHVuc2lnbmVkIGxvbmcgZmxhZ3MpDQo+Pj4gK3sNCj4+PiArCVdBUk5fT04o
-dGFzayA9PSBjdXJyZW50ICYmIHByZWVtcHRpYmxlKCkpOw0KPj4+ICsNCj4+PiArCWlmIChmbGFn
-cyAmIH4odW5zaWduZWQgbG9uZykoUFJfU1ZFX1ZMX0lOSEVSSVQgfA0KPj4+ICsJCQkJICAgICBQ
-Ul9TVkVfU0VUX1ZMX09ORVhFQykpDQo+Pj4gKwkJcmV0dXJuIC1FSU5WQUw7DQo+Pj4gKw0KPj4+
-ICsJaWYgKCFzdmVfdmxfdmFsaWQodmwpKQ0KPj4+ICsJCXJldHVybiAtRUlOVkFMOw0KPj4+ICsN
-Cj4+PiArCS8qDQo+Pj4gKwkgKiBDbGFtcCB0byB0aGUgbWF4aW11bSB2ZWN0b3IgbGVuZ3RoIHRo
-YXQgVkwtYWdub3N0aWMgU1ZFIGNvZGUgY2FuDQo+Pj4gKwkgKiB3b3JrIHdpdGguICBBIGZsYWcg
-bWF5IGJlIGFzc2lnbmVkIGluIHRoZSBmdXR1cmUgdG8gYWxsb3cgc2V0dGluZw0KPj4+ICsJICog
-b2YgbGFyZ2VyIHZlY3RvciBsZW5ndGhzIHdpdGhvdXQgY29uZnVzaW5nIG9sZGVyIHNvZnR3YXJl
-Lg0KPj4+ICsJICovDQo+Pj4gKwlpZiAodmwgPiBTVkVfVkxfQVJDSF9NQVgpDQo+Pj4gKwkJdmwg
-PSBTVkVfVkxfQVJDSF9NQVg7DQo+Pj4gKw0KPj4+ICsJdmwgPSBmaW5kX3N1cHBvcnRlZF92ZWN0
-b3JfbGVuZ3RoKHZsKTsNCj4+PiArDQo+PiANCj4+IA0KPj4gR2l2ZW4sIHN2ZV9zZXRfdmVjdG9y
-X2xlbmd0aCBpcyBjYWxsZWQgd2hlbiBzZXR0aW5nIHRoZSB2ZWN0b3IgbGVuZ3RoIGluDQo+PiBQ
-VFJBQ0VfU0VUUkVHU0VULCBpdCBsb29rcyB0byBtZSBsaWtlIGlmIHlvdSBzZXQgVkwgdG8gYSB2
-YWx1ZSB0aGF04oCZcyBub3QNCj4+IHN1cHBvcnRlZCBieSB0aGUgaGFyZHdhcmUsIHRoZW4gaXTi
-gJlzIGdvaW5nIHRvIHJvdW5kIGRvd24gdG8gdGhlIHByZXZpb3VzIHZhbHVlLg0KPj4gSXMgdGhh
-dCBjb3JyZWN0PyBJ4oCZbSBub3Qgc3VyZSBpZiB0aGF04oCZcyBleHBsYWluZWQgaW4gdGhlIGRv
-Y3M/DQo+IA0KPiBEb2VzIHRoaXMgY292ZXIgaXQ/DQo+IA0KPiAiT24gc3VjY2VzcywgdGhlIGNh
-bGxpbmcgdGhyZWFkJ3MgdmVjdG9yIGxlbmd0aCBpcyBjaGFuZ2VkIHRvIHRoZQ0KPiBsYXJnZXN0
-IHZhbHVlIHN1cHBvcnRlZCBieSB0aGUgc3lzdGVtIHRoYXQgaXMgbGVzcyB0aGFuIG9yIGVxdWFs
-IHRvIHZsLiINCj4gDQo+IChGb3IgcHRyYWNlLCBJIGp1c3QgY3Jvc3MtcmVmZXJlbmNlIHRoZSBQ
-Ul9TVkVfU0VUX1ZMIGJlaGF2aW91ciwgYWJvdmUuKQ0KDQpGb3IgcHRyYWNlIGlzIGl0IHdvcnRo
-IG1lbnRpb25pbmcgdXNlciBzaG91bGQgZG8gYSBHRVQgYWZ0ZXIgYSBTRVQgdG8gY29uZmlybQ0K
-d2hhdCBWTCB2YWx1ZSB3YXMgYWN0dWFsbHkgc2V0Pw0KDQo+IA0KPj4gV2hhdCBoYXBwZW5zIGlm
-IHlvdSBnaXZlIGEgdmwgdmFsdWUgbG93ZXIgdGhhbiB0aGUgbWluIHN1cHBvcnRlZCB2YWx1ZSBp
-biB0aGUNCj4+IGhhcmR3YXJlPw0KPiANCj4gVGhpcyBpcyBpbXBvc3NpYmxlLCB1bmxlc3Mgdmwg
-PCBTVkVfVkxfTUlOICh3aGljaCBpcyByZWplY3RlZCBleHBsaWNpdGx5DQo+IGJ5IHRoZSAhc3Zl
-X3ZsX3ZhbGlkKCkgY2hlY2sgaW4gc3ZlX3NldF92ZWN0b3JfbGVuZ3RoKCkpLg0KPiANCj4gVGhl
-IGFyY2hpdGVjdHVyZSByZXF1aXJlZCBzdXBwb3J0IGZvciBhbGwgcG93ZXItb2YtdHdvIHZlY3Rv
-ciBsZW5ndGhzDQo+IGxlc3MgdGhhbiB0aGUgbWF4aW11bSBzdXBwb3J0ZWQgdmVjdG9yIGxlbmd0
-aCwgc28gYnkgY29uc3RydWN0aW9uDQo+IFNWRV9WTF9NSU4gaXMgc3VwcG9ydGVkIGJ5IGFsbCBo
-YXJkd2FyZS4NCg0KT2ssIEnigJltIGhhcHB5IHdpdGggdGhhdC4NCg0KPiANCj4gVG8gYmUgZGVm
-ZW5zaXZlLCBpZiB3ZSBmYWlsIHRvIGRldGVjdCBzdXBwb3J0IGZvciBTVkVfVkxfTUlOLCBJIHNl
-dCB0aGUNCj4gY29ycmVzcG9uZGluZyBiaXQgaW4gc3ZlX3ZxX21hcCBhbmQgV0FSTi4gIFRoaXMg
-aXMganVzdCB0byBoZWxwIGVuc3VyZQ0KPiBmaW5kX3N1cHBvcnRlZF92ZWN0b3JfbGVuZ3RoIGRv
-ZXNuJ3QgZmFsbCBvZmYgdGhlIGVuZCBvZiBzdmVfdnFfbWFwLg0KPiANCj4gDQo+IERvZXMgdGhh
-dCBzb3VuZHMgY29ycmVjdD8gIFRoZXJlIG1heSBiZSBhIGNsZWFyZXIgd2F5IG9mIGFjaGlldmlu
-ZyB0aGlzLg0KPiANCj4gQ2hlZXJzDQo+IC0tLURhdmUNCj4gDQo+PiANCj4+IA0KPj4+ICsvKg0K
-Pj4+ICsgKiBBbGwgdmVjdG9yIGxlbmd0aCBzZWxlY3Rpb24gZnJvbSB1c2Vyc3BhY2UgY29tZXMg
-dGhyb3VnaCBoZXJlLg0KPj4+ICsgKiBXZSdyZSBvbiBhIHNsb3cgcGF0aCwgc28gc29tZSBzYW5p
-dHktY2hlY2tzIGFyZSBpbmNsdWRlZC4NCj4+PiArICogSWYgdGhpbmdzIGdvIHdyb25nIHRoZXJl
-J3MgYSBidWcgc29tZXdoZXJlLCBidXQgdHJ5IHRvIGZhbGwgYmFjayB0byBhDQo+Pj4gKyAqIHNh
-ZmUgY2hvaWNlLg0KPj4+ICsgKi8NCj4+PiArc3RhdGljIHVuc2lnbmVkIGludCBmaW5kX3N1cHBv
-cnRlZF92ZWN0b3JfbGVuZ3RoKHVuc2lnbmVkIGludCB2bCkNCj4+PiArew0KPj4+ICsJaW50IGJp
-dDsNCj4+PiArCWludCBtYXhfdmwgPSBzdmVfbWF4X3ZsOw0KPj4+ICsNCj4+PiArCWlmIChXQVJO
-X09OKCFzdmVfdmxfdmFsaWQodmwpKSkNCj4+PiArCQl2bCA9IFNWRV9WTF9NSU47DQo+Pj4gKw0K
-Pj4+ICsJaWYgKFdBUk5fT04oIXN2ZV92bF92YWxpZChtYXhfdmwpKSkNCj4+PiArCQltYXhfdmwg
-PSBTVkVfVkxfTUlOOw0KPj4+ICsNCj4+PiArCWlmICh2bCA+IG1heF92bCkNCj4+PiArCQl2bCA9
-IG1heF92bDsNCj4+PiArDQo+Pj4gKwliaXQgPSBmaW5kX25leHRfYml0KHN2ZV92cV9tYXAsIFNW
-RV9WUV9NQVgsDQo+Pj4gKwkJCSAgICB2cV90b19iaXQoc3ZlX3ZxX2Zyb21fdmwodmwpKSk7DQo+
-Pj4gKwlyZXR1cm4gc3ZlX3ZsX2Zyb21fdnEoYml0X3RvX3ZxKGJpdCkpOw0KPj4+ICt9DQo+Pj4g
-Kw0KPj4gDQo+PiANCj4+IFRoYW5rcywNCj4+IEFsYW4uDQo+PiBfX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fXw0KPj4gbGludXgtYXJtLWtlcm5lbCBtYWlsaW5n
-IGxpc3QNCj4+IGxpbnV4LWFybS1rZXJuZWxAbGlzdHMuaW5mcmFkZWFkLm9yZw0KPj4gaHR0cDov
-L2xpc3RzLmluZnJhZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1hcm0ta2VybmVsDQoN
-Cg==
+Hi James
+
+On 2017/9/14 21:00, James Morse wrote:
+> Hi gengdongjiu,
+
+> user-space can choose whether to use SEA or SEI, it doesn't have to choose the
+> same notification type that firmware used, which in turn doesn't have to be the
+> same as that used by the CPU to notify firmware.
+> 
+> The choice only matters because these notifications hang on an existing pieces
+> of the Arm-architecture, so the notification can only add to the architecturally
+> defined meaning. (i.e. You can only send an SEA for something that can already
+> be described as a synchronous external abort).
+> 
+> Once we get to user-space, for memory_failure() notifications, (which so far is
+> all we are talking about here), the only thing that could matter is whether the
+> guest hit a PG_hwpoison page as a stage2 fault. These can be described as
+> Synchronous-External-Abort.
+> 
+> The Synchronous-External-Abort/SError-Interrupt distinction matters for the CPU
+> because it can't always make an error synchronous. For memory_failure()
+> notifications to a KVM guest we really can do this, and we already have this
+> behaviour for free. An example:
+> 
+> A guest touches some hardware:poisoned memory, for whatever reason the CPU can't
+> put the world back together to make this a synchronous exception, so it reports
+> it to firmware as an SError-interrupt.
+> Linux gets an APEI notification and memory_failure() causes the affected page to
+> be unmapped from the guest's stage2, and SIGBUS_MCEERR_AO sent to user-space.
+> 
+> Qemu/kvmtool can now notify the guest with an IRQ or POLLed notification. AO->
+> action optional, probably asynchronous.
+> 
+> But in our example it wasn't really asynchronous, that was just a property of
+> the original CPU->firmware notification. What happens? The guest vcpu is re-run,
+> it re-runs the same instructions (this was a contained error so KVM's ELR points
+> at/before the instruction that steps in the problem). This time KVM takes a
+> stage2 fault, which the mm code will refuse to fixup because the relevant page
+> was marked as PG_hwpoision by memory_failure(). KVM signals Qemu/kvmtool with
+> SIGBUS_MCEERR_AR. Now Qemu/kvmtool can notify the guest using SEA.
+
+CC Achin
+
+I have some personal opinion, if you think it is not right, hope you can point out.
+
+Synchronous External Abort and SError Interrupt are hardware exception(hardware concept), which is independent of software notification,
+in armv8 without RAS, the two concepts already exist. In the APEI spec, in order to better describe the two exceptions, so use SEA and SEI notification to stand for them.
+
+SEA notification stands for Synchronous External Abort, so may be it is not only a notification, it also stands for a hardware error type.
+SEI notification stands for SError Interrupt, so may be it is not only a notification, it also stands for a hardware error type.
+
+In the OS, it has different handling flow to the two exception(two notification):
+when the guest OS running, if the hardware generates a Synchronous External Abort, we told the guest OS this error is SError Interrupt instead of Synchronous External Abort.
+guest OS uses SEI notification handling flow to deal with it, I am not sure whether it will have problem, because the true hardware exception is Synchronous External Abort,
+but software treats it as SError interrupt to handle.
+
+In the mainline code, it does not have SEI notification support, the reason I think it is because of the error address record by firmware is not accurate(SError Interrupt is asynchronous exception).
+so if treat a hardware Synchronous External Abort as SError interrupt(SEI). The default OS behavior for SEI is PANIC, that is to say, when hardware triggers a Synchronous External Abort(SEA), if guest
+treat it as SError interrupt(SEI), the OS will be panic. in fact, it can be recoverable instead of Panic.
+
+I ever added a patch to support the SEI notification, but not sure whether it is can be accepted by open source, until now, not receive response.
