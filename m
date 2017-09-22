@@ -1,155 +1,151 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v6 6/7] KVM: arm64: allow get exception information from
- userspace
-Date: Fri, 22 Sep 2017 17:51:51 +0100
-Message-ID: <59C53FA7.2080803@arm.com>
-References: <1503916701-13516-1-git-send-email-gengdongjiu@huawei.com> <1503916701-13516-7-git-send-email-gengdongjiu@huawei.com> <59B17438.5070501@arm.com> <2a42d1ea-3456-2873-c9ea-d8a027b59789@huawei.com> <59BA7D72.4090403@arm.com> <92f2fecc-9833-15e4-30cc-b4dd5ba93cb7@huawei.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <92f2fecc-9833-15e4-30cc-b4dd5ba93cb7@huawei.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: gengdongjiu <gengdongjiu@huawei.com>
-Cc: Achin.Gupta@arm.com, peter.maydell@linaro.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, lenb@kernel.org, robert.moore@intel.com, lv.zheng@intel.com, mark.rutland@arm.com, xiexiuqi@huawei.com, cov@codeaurora.org, david.daney@cavium.com, suzuki.poulose@arm.com, stefan@hello-penguin.com, Dave.Martin@arm.com, kristina.martsenko@arm.com, wangkefeng.wang@huawei.com, tbaicar@codeaurora.org, ard.biesheuvel@linaro.org, mingo@kernel.org, bp@suse.de, shiju.jose@huawei.com, zjzhang@codeaurora.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, devel@acpica.org, mst@redhat.com, john.garry@huawei.com
+From: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+Subject: [PATCH v3 00/13] arm64/firmware: Software Delegated Exception Interface
+Date: Fri, 22 Sep 2017 19:26:01 +0100
+Message-ID: <20170922182614.27885-1-james.morse@arm.com>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+Cc: kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Lorenzo Pieralisi <lorenzo.pieralisi-5wv7dgnIgG8@public.gmane.org>, Loc Ho <lho-qTEPVZfXA3Y@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi gengdongjiu,
+Hello!
 
-On 21/09/17 08:55, gengdongjiu wrote:
-> On 2017/9/14 21:00, James Morse wrote:
->> user-space can choose whether to use SEA or SEI, it doesn't have to choose the
->> same notification type that firmware used, which in turn doesn't have to be the
->> same as that used by the CPU to notify firmware.
->>
->> The choice only matters because these notifications hang on an existing pieces
->> of the Arm-architecture, so the notification can only add to the architecturally
->> defined meaning. (i.e. You can only send an SEA for something that can already
->> be described as a synchronous external abort).
->>
->> Once we get to user-space, for memory_failure() notifications, (which so far is
->> all we are talking about here), the only thing that could matter is whether the
->> guest hit a PG_hwpoison page as a stage2 fault. These can be described as
->> Synchronous-External-Abort.
->>
->> The Synchronous-External-Abort/SError-Interrupt distinction matters for the CPU
->> because it can't always make an error synchronous. For memory_failure()
->> notifications to a KVM guest we really can do this, and we already have this
->> behaviour for free. An example:
->>
->> A guest touches some hardware:poisoned memory, for whatever reason the CPU can't
->> put the world back together to make this a synchronous exception, so it reports
->> it to firmware as an SError-interrupt.
->> Linux gets an APEI notification and memory_failure() causes the affected page to
->> be unmapped from the guest's stage2, and SIGBUS_MCEERR_AO sent to user-space.
->>
->> Qemu/kvmtool can now notify the guest with an IRQ or POLLed notification. AO->
->> action optional, probably asynchronous.
->>
->> But in our example it wasn't really asynchronous, that was just a property of
->> the original CPU->firmware notification. What happens? The guest vcpu is re-run,
->> it re-runs the same instructions (this was a contained error so KVM's ELR points
->> at/before the instruction that steps in the problem). This time KVM takes a
->> stage2 fault, which the mm code will refuse to fixup because the relevant page
->> was marked as PG_hwpoision by memory_failure(). KVM signals Qemu/kvmtool with
->> SIGBUS_MCEERR_AR. Now Qemu/kvmtool can notify the guest using SEA.
-> 
-> CC Achin
-> 
-> I have some personal opinion, if you think it is not right, hope you can point out.
-> 
-> Synchronous External Abort and SError Interrupt are hardware exception(hardware concept),
-> which is independent of software notification,
-> in armv8 without RAS, the two concepts already exist. In the APEI spec, in order to
-> better describe the two exceptions, so use SEA and SEI notification to stand
-for them.
+The Software Delegated Exception Interface (SDEI) is an ARM specification
+for registering callbacks from the platform firmware into the OS.
+This is intended to be used to implement firmware-first RAS notifications,
+but also supports vendor-defined events and binding IRQs as events.
 
-> SEA notification stands for Synchronous External Abort, so may be it is not only a
-> notification, it also stands for a hardware error type.
-> SEI notification stands for SError Interrupt, so may be it is not only a notification,
-> it also stands for a hardware error type.
+The document is here:
+http://infocenter.arm.com/help/topic/com.arm.doc.den0054a/ARM_DEN0054A_Software_Delegated_Exception_Interface.pdf
 
-> In the OS, it has different handling flow to the two exception(two notification):
-> when the guest OS running, if the hardware generates a Synchronous External Abort, we
-> told the guest OS this error is SError Interrupt instead of Synchronous
-External Abort.
+I anticpate once reviewed this series will go via the arm-soc tree, as the
+bulk of the code is under /drivers/firmware/.
 
-This should only happen when APEI doesn't claim the external-abort as a RAS
-notification. If there were CPER records to process then the error is handled by
-the host, and we can return to the guest.
+The major change in v3 is due to VMAP stacks. We can't trust sp when we take
+an event, so need our own SDEI stack. Events can nest, so we need two. Private
+events can be delivered per-cpu, so we need two per-cpu SDEI stacks.
 
-If this wasn't a firmware-first notification, then you're right KVM hands the
-guest an asynchronous external abort. This could be considered a bug in KVM. (we
-can discuss with Marc and Christoffer what it should do), but:
+The APCICA support for the SDEI table is now in mainline, so this series has
+grown the detection code for non-DT systems. The APEI/GHES wire-up is still
+being held back as APEI's ghes_proc() isn't (yet) safe for multiple sources
+of NMI.
 
-I'm not sure what scenario you could see this in: surely all your
-CPU:external-aborts are taken to EL3 by SCR_EL3.EA and become firmware-first
-notifications. So they should always be claimed by APEI.
+Exposing the HVC range through KVM to user-space is gone, this will be
+re-incarnated as something that better fits KVMs architecture emulation,
+as opposed to assuming all-the-world's-SMC-CC.
 
 
-> guest OS uses SEI notification handling flow to deal with it, I am not sure whether it
-> will have problem, because the true hardware exception is Synchronous External
-> Abort, but software treats it as SError interrupt to handle.
+This series (juggles some registers with KVM+VHE, then) adds a DT binding to
+trigger probing of the interface and support for the SDEI API.
 
-Once you're into a guest the original 'true hardware exception' shouldn't
-matter. In this scenario KVM has handed the guest an SError, our question is 'is
-it an SEI notification?':
+SDEI runs between adjacent exception levels, so events will always be delivered
+to EL2 if firmware is at EL3. For VHE hosts we run the SDEI event handler
+behind KVM's back with all exceptions masked. Once the handler has done its
+work we return to the appropriate vbar+irq entry. This allows KVM to
+world-switch and deliver any signals sent by the handler to Qemu/kvmtool. We
+do the same thing if we interrupt host EL0. If we interrupted code with
+interrupts masked, we use a different API call to return to the interrupted
+context.
 
-For firmware first the guest OS should poke around in the CPER buffers, find
-nothing to do, and return to the arch code for (future) kernel-first.
-For kernel first the guest OS should trawl through the v8.2 ERR registers, find
-nothing to do, and continue to the default case:
+What about non-VHE KVM? If you don't have VHE support and boot at EL2, the
+kernel drops to EL1. This driver will print an error message then give up. This
+is because events would still be delivered to EL2 hitting either KVM, or the
+hyp-stub. Supporting this is complicated, but because the main use-case is
+RAS, and ARM v8.2's RAS extensions imply v8.1's Virtual Host Extensions, we
+can assume all platforms with SDEI will support VHE too. (I have some ideas
+on how to support non-VHE).
 
-By default, we should panic on SError, unless its classified as a non-fatal RAS
-error. (I'm tempted to pr_warn_once() if we get RAS notifications but there is
-no work to do).
+Running the event handler behind VHE-KVM's back has some side effects: The
+event handler will blindly use any registers that are shared between the host
+and guest. The two that I think matter are TPIDR_EL1, and the debug state. The
+guest may have set MDSCR_EL1 so debug exceptions must remain masked. The
+guest's TPIDR_EL1 will be used by the event handler if it accesses per-cpu
+variables. This needs fixing. The first part of this series juggles KVMs use
+of TPIDR_EL2 so that we share it with the host on VHE systems. An equivalent
+change for 32bit is (still) on my todo list. (the alternative to this is to
+have a parody world switch in the SDEI event handler, but this would mean
+special casing interrupted guests, and be an ABI link to KVM.)
 
+Is this another begins-with-S RAS mechanism for arm64? Yes.
+Why? Any notification delivered as an exception will overwrite the exception
+registers. This is fatal for the running thread if it happens during entry.S's
+kernel_enter or kernel_exit. Instead of adding masking and routing controls,
+events are delivered to a registered address at a fixed exception level and
+don't change the exception registers when delivered.
 
-What you may be seeing is some awkwardness with the change in the SError ESR
-with v8.2. Previously the VSE mechanism injected an impdef SError, (but they
-were all impdef so it didn't matter).
-With VSESR_EL2 KVM has to specify one, and all-zeros is a bad choice as this
-means 'classified as a RAS error ... unknown!'.
+This series can be retrieved from:
+git://linux-arm.org/linux-jm.git -b sdei/v3/base
 
-I have a patch in the upcoming SError/RAS series that changes KVMs virtual-abort
-code to specify an impdef ESR for this path.
-
-
-> In the mainline code, it does not have SEI notification support, the reason I 
-> think it is because of the error address record by firmware is not accurate
-> (SError Interrupt is asynchronous exception).
-
-Yes, while we don't expect a FAR with an SError, but we do expect a valid
-representation of the RAS error in either the CPER records or the v8.2. ERR
-registers (or both). If we have neither of those, its not a RAS error and we
-should panic.
-
-
-> so if treat a hardware Synchronous External Abort as SError interrupt(SEI). 
-> The default OS behavior for SEI is PANIC, that is to say, when hardware triggers
-> a Synchronous External Abort(SEA), if guest treat it as SError interrupt(SEI),
-> the OS will be panic. in fact, it can be recoverable instead of Panic.
-
-If its a RAS error APEI (or in the future, the kernel-first handler), should
-claim the error, so the guest never sees it. If you are hitting this behaviour
-in KVM, then it wasn't a RAS error.
-
-
-> I ever added a patch to support the SEI notification, but not sure whether
-> it is can be accepted by open source, until now, not receive response.
-
-The patch you posted during the merge window made no sense on its own, so must
-replace $one_of the other patches in your v5 (or was it v6)... I'll get to it...
-
-Because the SEI notification depends on v8.2 I'd like to get the SError/RAS
-series posted (currently re-testing), then I'll pick up enough of the patches
-you've posted for a consolidated version of the series, and we can take the
-discussion from there.
-
-I'd still like to know what your firmware does if the normal-world believes its
-masked physical-SError and you want to hand it an SEI notification.
-
+Questions and contradictions welcome!
 
 Thanks,
 
 James
+
+[Changes since previous versions are noted on each patch]
+
+
+James Morse (13):
+  KVM: arm64: Store vcpu on the stack during __guest_enter()
+  KVM: arm/arm64: Convert kvm_host_cpu_state to a static per-cpu
+    allocation
+  KVM: arm64: Change hyp_panic()s dependency on tpidr_el2
+  arm64: alternatives: use tpidr_el2 on VHE hosts
+  KVM: arm64: Stop save/restoring host tpidr_el1 on VHE
+  Docs: dt: add devicetree binding for describing arm64 SDEI firmware
+  firmware: arm_sdei: Add driver for Software Delegated Exceptions
+  arm64: Add vmap_stack header file
+  arm64: kernel: Add arch-specific SDEI entry code and CPU masking
+  firmware: arm_sdei: Add support for CPU and system power states
+  firmware: arm_sdei: add support for CPU private events
+  arm64: acpi: Remove __init from acpi_psci_use_hvc() for use by SDEI
+  firmware: arm_sdei: Discover SDEI support via ACPI
+
+ .../devicetree/bindings/arm/firmware/sdei.txt      |   42 +
+ arch/arm64/Kconfig                                 |    2 +-
+ arch/arm64/include/asm/assembler.h                 |    8 +
+ arch/arm64/include/asm/kvm_host.h                  |    2 +
+ arch/arm64/include/asm/percpu.h                    |   11 +-
+ arch/arm64/include/asm/processor.h                 |    1 +
+ arch/arm64/include/asm/sdei.h                      |   63 ++
+ arch/arm64/include/asm/stacktrace.h                |    3 +
+ arch/arm64/include/asm/vmap_stack.h                |   41 +
+ arch/arm64/kernel/Makefile                         |    1 +
+ arch/arm64/kernel/acpi.c                           |    2 +-
+ arch/arm64/kernel/asm-offsets.c                    |    5 +
+ arch/arm64/kernel/cpufeature.c                     |   23 +
+ arch/arm64/kernel/irq.c                            |   13 +-
+ arch/arm64/kernel/sdei-entry.S                     |  122 +++
+ arch/arm64/kernel/sdei.c                           |  235 +++++
+ arch/arm64/kernel/smp.c                            |   11 +-
+ arch/arm64/kvm/hyp-init.S                          |    4 +
+ arch/arm64/kvm/hyp/entry.S                         |   10 +-
+ arch/arm64/kvm/hyp/hyp-entry.S                     |   18 +-
+ arch/arm64/kvm/hyp/switch.c                        |   25 +-
+ arch/arm64/kvm/hyp/sysreg-sr.c                     |   16 +-
+ arch/arm64/mm/proc.S                               |    8 +
+ drivers/firmware/Kconfig                           |    8 +
+ drivers/firmware/Makefile                          |    1 +
+ drivers/firmware/arm_sdei.c                        | 1096 ++++++++++++++++++++
+ include/linux/cpuhotplug.h                         |    1 +
+ include/linux/psci.h                               |    3 +-
+ include/linux/sdei.h                               |  105 ++
+ include/uapi/linux/sdei.h                          |   91 ++
+ virt/kvm/arm/arm.c                                 |   18 +-
+ 31 files changed, 1931 insertions(+), 58 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/arm/firmware/sdei.txt
+ create mode 100644 arch/arm64/include/asm/sdei.h
+ create mode 100644 arch/arm64/include/asm/vmap_stack.h
+ create mode 100644 arch/arm64/kernel/sdei-entry.S
+ create mode 100644 arch/arm64/kernel/sdei.c
+ create mode 100644 drivers/firmware/arm_sdei.c
+ create mode 100644 include/linux/sdei.h
+ create mode 100644 include/uapi/linux/sdei.h
+
+-- 
+2.13.3
+
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
