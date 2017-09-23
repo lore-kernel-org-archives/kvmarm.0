@@ -1,129 +1,162 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PATCH v3 00/20] KVM: arm/arm64: Optimize arch timer register handling
-Date: Sat, 23 Sep 2017 02:41:47 +0200
-Message-ID: <20170923004207.22356-1-cdall@linaro.org>
+Subject: [PATCH v3 01/20] irqchip/gic: Deal with broken firmware exposing only 4kB of GICv2 CPU interface
+Date: Sat, 23 Sep 2017 02:41:48 +0200
+Message-ID: <20170923004207.22356-2-cdall@linaro.org>
+References: <20170923004207.22356-1-cdall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20170923004207.22356-1-cdall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We currently spend a measurable amount of time on each entry/exit to the
-guest dealing with arch timer registers, even when the timer is not
-pending and not doing anything (on certain architectures).
+From: Marc Zyngier <marc.zyngier@arm.com>
 
-We can do much better by moving the arch timer save/restore to the
-vcpu_load and vcpu_put functions, but this means that if we don't read
-back the timer state on every exit from the guest, then we have to be
-able to start taking timer interrupts for the virtual timer in KVM and
-handle that properly.
+There is a lot of broken firmware out there that don't really
+expose the information the kernel requires when it comes with dealing
+with GICv2:
 
-That has a number of entertaining consequences, such as having to make
-sure we don't deadlock between any of the vgic code and interrupt
-injection happening from an ISR.  On the plus side, being able to inject
-virtual interrupts corresponding to a physical interrupt directly from
-an ISR is probably a good system design change overall.
+(1) Firmware that only describes the first 4kB of GICv2
+(2) Firmware that describe 128kB of CPU interface, while
+    the usable portion of the address space is between
+    60 and 68kB
 
-We also have to change the use of the physical vs. virtual counter in
-the arm64 kernel to avoid having to save/restore the CNTVOFF_EL2
-register on every return to the hypervisor.  The only reason I could
-find for using the virtual counter for the kernel on systems with access
-to the physical counter is to detect if firmware did not properly clear
-CNTVOFF_EL2, and this change has to weighed against the existing check
-(assuming I got this right).
+So far, we only deal with (2). But we have platforms exhibiting
+behaviour (1), resulting in two sub-cases:
+(a) The GIC is occupying 8kB, as required by the GICv2 architecture
+(b) It is actually spread 128kB, and this is likely to be a version
+    of (2)
 
-On a non-VHE system (AMD Seattle) I have measured this to improve the
-world-switch time by about ~100 cycles, but on an EL2 kernel (emulating
-VHE behavior on the same hardware) this gives us around ~250 cycles
-worth of improvement, and on Thunder-X we seem to get ~650 cycles
-improvement, because we can avoid the extra configuration of trapping
-accesses to the physical timer from EL1 on every switch.
+This patch tries to work around both (a) and (b) by poking at
+the outside of the described memory region, and try to work out
+what is actually there. This is of course unsafe, and should
+only be enabled if there is no way to otherwise fix the DT provided
+by the firmware (we provide a "irqchip.gicv2_force_probe" option
+to that effect).
 
-These patches require that the GICv2 hardware (on such systems) is
-properly reported by firmware to have the extra CPU interface page for
-the deactivate register.
+Note that for the time being, we restrict ourselves to GICv2
+implementations provided by ARM, since there I have no knowledge
+of an alternative implementations. This could be relaxed if such
+an implementation comes to light on a broken platform.
 
-Code is also available here:
-git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git timer-optimize-v3
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Christoffer Dall <cdall@linaro.org>
+---
+ Documentation/admin-guide/kernel-parameters.txt |  7 +++
+ drivers/irqchip/irq-gic.c                       | 71 +++++++++++++++++++++----
+ 2 files changed, 69 insertions(+), 9 deletions(-)
 
-Based on v4.14-rc1
-
-Some recent numbers I ran on Thunder-X with v4.14-rc1 with/without these
-patches (averaged over a few hundred thousand executions) for a base
-hypercall cost:
-
-Without this series, avg. cycles: 12,476
-Without this series, min. cycles: 12,052
-
-With this series, avg. cycles: 11,782
-With this series, min. cycles: 11,435
-
-Improvement ~650 cycles (over 5%)
-
-Changes since v2:
- - Removed RFC tag
- - Included Marc's patch to support EOI/deactivate on broken firmware
-   systems
- - Simplified patch 6 (was patch 5 in RFC v2)
- - Clarify percpu_devid interrupts in patch 12 (was patch 11)
-
-Thanks,
-  Christoffer
-
-Christoffer Dall (19):
-  arm64: Use physical counter for in-kernel reads
-  arm64: Use the physical counter when available for read_cycles
-  KVM: arm/arm64: Guard kvm_vgic_map_is_active against !vgic_initialized
-  KVM: arm/arm64: Support calling vgic_update_irq_pending from irq
-    context
-  KVM: arm/arm64: Check that system supports split eoi/deactivate
-  KVM: arm/arm64: Make timer_arm and timer_disarm helpers more generic
-  KVM: arm/arm64: Rename soft timer to bg_timer
-  KVM: arm/arm64: Use separate timer for phys timer emulation
-  KVM: arm/arm64: Move timer/vgic flush/sync under disabled irq
-  KVM: arm/arm64: Move timer save/restore out of the hyp code
-  genirq: Document vcpu_info usage for percpu_devid interrupts
-  KVM: arm/arm64: Set VCPU affinity for virt timer irq
-  KVM: arm/arm64: Avoid timer save/restore in vcpu entry/exit
-  KVM: arm/arm64: Support EL1 phys timer register access in set/get reg
-  KVM: arm/arm64: Use kvm_arm_timer_set/get_reg for guest register traps
-  KVM: arm/arm64: Move phys_timer_emulate function
-  KVM: arm/arm64: Avoid phys timer emulation in vcpu entry/exit
-  KVM: arm/arm64: Get rid of kvm_timer_flush_hwstate
-  KVM: arm/arm64: Rework kvm_timer_should_fire
-
-Marc Zyngier (1):
-  irqchip/gic: Deal with broken firmware exposing only 4kB of GICv2 CPU
-    interface
-
- Documentation/admin-guide/kernel-parameters.txt |   7 +
- arch/arm/include/asm/kvm_asm.h                  |   2 +
- arch/arm/include/asm/kvm_hyp.h                  |   4 +-
- arch/arm/include/uapi/asm/kvm.h                 |   6 +
- arch/arm/kvm/hyp/switch.c                       |   7 +-
- arch/arm64/include/asm/arch_timer.h             |  18 +-
- arch/arm64/include/asm/kvm_asm.h                |   2 +
- arch/arm64/include/asm/kvm_hyp.h                |   4 +-
- arch/arm64/include/asm/timex.h                  |   2 +-
- arch/arm64/include/uapi/asm/kvm.h               |   6 +
- arch/arm64/kvm/hyp/switch.c                     |   6 +-
- arch/arm64/kvm/sys_regs.c                       |  41 +--
- drivers/clocksource/arm_arch_timer.c            |  33 +-
- drivers/irqchip/irq-gic.c                       |  74 +++-
- include/kvm/arm_arch_timer.h                    |  19 +-
- kernel/irq/manage.c                             |   3 +-
- virt/kvm/arm/arch_timer.c                       | 446 ++++++++++++++++--------
- virt/kvm/arm/arm.c                              |  45 ++-
- virt/kvm/arm/hyp/timer-sr.c                     |  74 ++--
- virt/kvm/arm/vgic/vgic-its.c                    |  17 +-
- virt/kvm/arm/vgic/vgic-mmio-v2.c                |  22 +-
- virt/kvm/arm/vgic/vgic-mmio-v3.c                |  17 +-
- virt/kvm/arm/vgic/vgic-mmio.c                   |  44 ++-
- virt/kvm/arm/vgic/vgic-v2.c                     |   5 +-
- virt/kvm/arm/vgic/vgic-v3.c                     |  12 +-
- virt/kvm/arm/vgic/vgic.c                        |  63 ++--
- virt/kvm/arm/vgic/vgic.h                        |   3 +-
- 27 files changed, 648 insertions(+), 334 deletions(-)
-
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index 0549662..3daa0a5 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -1713,6 +1713,13 @@
+ 	irqaffinity=	[SMP] Set the default irq affinity mask
+ 			The argument is a cpu list, as described above.
+ 
++	irqchip.gicv2_force_probe=
++			[ARM, ARM64]
++			Format: <bool>
++			Force the kernel to look for the second 4kB page
++			of a GICv2 controller even if the memory range
++			exposed by the device tree is too small.
++
+ 	irqfixup	[HW]
+ 			When an interrupt is not handled search all handlers
+ 			for it. Intended to get systems with badly broken
+diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
+index 651d726..f641e8e 100644
+--- a/drivers/irqchip/irq-gic.c
++++ b/drivers/irqchip/irq-gic.c
+@@ -1256,6 +1256,19 @@ static void gic_teardown(struct gic_chip_data *gic)
+ 
+ #ifdef CONFIG_OF
+ static int gic_cnt __initdata;
++static bool gicv2_force_probe;
++
++static int __init gicv2_force_probe_cfg(char *buf)
++{
++	return strtobool(buf, &gicv2_force_probe);
++}
++early_param("irqchip.gicv2_force_probe", gicv2_force_probe_cfg);
++
++static bool gic_check_gicv2(void __iomem *base)
++{
++	u32 val = readl_relaxed(base + GIC_CPU_IDENT);
++	return (val & 0xff0fff) == 0x02043B;
++}
+ 
+ static bool gic_check_eoimode(struct device_node *node, void __iomem **base)
+ {
+@@ -1265,20 +1278,60 @@ static bool gic_check_eoimode(struct device_node *node, void __iomem **base)
+ 
+ 	if (!is_hyp_mode_available())
+ 		return false;
+-	if (resource_size(&cpuif_res) < SZ_8K)
+-		return false;
+-	if (resource_size(&cpuif_res) == SZ_128K) {
+-		u32 val_low, val_high;
++	if (resource_size(&cpuif_res) < SZ_8K) {
++		void __iomem *alt;
++		/*
++		 * Check for a stupid firmware that only exposes the
++		 * first page of a GICv2.
++		 */
++		if (!gic_check_gicv2(*base))
++			return false;
+ 
++		if (!gicv2_force_probe) {
++			pr_warn("GIC: GICv2 detected, but range too small and irqchip.gicv2_force_probe not set\n");
++			return false;
++		}
++
++		alt = ioremap(cpuif_res.start, SZ_8K);
++		if (!alt)
++			return false;
++		if (!gic_check_gicv2(alt + SZ_4K)) {
++			/*
++			 * The first page was that of a GICv2, and
++			 * the second was *something*. Let's trust it
++			 * to be a GICv2, and update the mapping.
++			 */
++			pr_warn("GIC: GICv2 at %pa, but range is too small (broken DT?), assuming 8kB\n",
++				&cpuif_res.start);
++			iounmap(*base);
++			*base = alt;
++			return true;
++		}
++
++		/*
++		 * We detected *two* initial GICv2 pages in a
++		 * row. Could be a GICv2 aliased over two 64kB
++		 * pages. Update the resource, map the iospace, and
++		 * pray.
++		 */
++		iounmap(alt);
++		alt = ioremap(cpuif_res.start, SZ_128K);
++		if (!alt)
++			return false;
++		pr_warn("GIC: Aliased GICv2 at %pa, trying to find the canonical range over 128kB\n",
++			&cpuif_res.start);
++		cpuif_res.end = cpuif_res.start + SZ_128K -1;
++		iounmap(*base);
++		*base = alt;
++	}
++	if (resource_size(&cpuif_res) == SZ_128K) {
+ 		/*
+-		 * Verify that we have the first 4kB of a GIC400
++		 * Verify that we have the first 4kB of a GICv2
+ 		 * aliased over the first 64kB by checking the
+ 		 * GICC_IIDR register on both ends.
+ 		 */
+-		val_low = readl_relaxed(*base + GIC_CPU_IDENT);
+-		val_high = readl_relaxed(*base + GIC_CPU_IDENT + 0xf000);
+-		if ((val_low & 0xffff0fff) != 0x0202043B ||
+-		    val_low != val_high)
++		if (!gic_check_gicv2(*base) ||
++		    !gic_check_gicv2(*base + 0xf000))
+ 			return false;
+ 
+ 		/*
 -- 
 2.9.0
