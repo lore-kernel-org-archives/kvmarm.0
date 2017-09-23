@@ -1,25 +1,24 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PATCH v3 16/20] KVM: arm/arm64: Use kvm_arm_timer_set/get_reg for
- guest register traps
-Date: Sat, 23 Sep 2017 02:42:03 +0200
-Message-ID: <20170923004207.22356-17-cdall@linaro.org>
+Subject: [PATCH v3 19/20] KVM: arm/arm64: Get rid of kvm_timer_flush_hwstate
+Date: Sat, 23 Sep 2017 02:42:06 +0200
+Message-ID: <20170923004207.22356-20-cdall@linaro.org>
 References: <20170923004207.22356-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AF06E49C52
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Sep 2017 20:42:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BB4649C9F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Sep 2017 20:42:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9UONdKqYQfc9 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 22 Sep 2017 20:42:18 -0400 (EDT)
-Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CD61249C69
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Sep 2017 20:42:17 -0400 (EDT)
-Received: by mail-wm0-f42.google.com with SMTP id q124so7623550wmb.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Sep 2017 17:42:29 -0700 (PDT)
+ with ESMTP id zznaE5P+AtnJ for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Sep 2017 20:42:22 -0400 (EDT)
+Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 94C8B49C8D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Sep 2017 20:42:22 -0400 (EDT)
+Received: by mail-wm0-f45.google.com with SMTP id r136so7640192wmf.2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Sep 2017 17:42:34 -0700 (PDT)
 In-Reply-To: <20170923004207.22356-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,89 +33,84 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvm@vger.kernel.org, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When trapping on a guest access to one of the timer registers, we were
-messing with the internals of the timer state from the sysregs handling
-code, and that logic was about to receive more added complexity when
-optimizing the timer handling code.
-
-Therefore, since we already have timer register access functions (to
-access registers from userspace), reuse those for the timer register
-traps from a VM and let the timer code maintain its own consistency.
+Now when both the vtimer and the ptimer when using both the in-kernel
+vgic emulation and a userspace IRQ chip are driven by the timer signals
+and at the vcpu load/put boundaries, instead of recomputing the timer
+state at every entry/exit to/from the guest, we can get entirely rid of
+the flush hwstate function.
 
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- arch/arm64/kvm/sys_regs.c | 41 ++++++++++++++---------------------------
- 1 file changed, 14 insertions(+), 27 deletions(-)
+ include/kvm/arm_arch_timer.h |  1 -
+ virt/kvm/arm/arch_timer.c    | 24 ------------------------
+ virt/kvm/arm/arm.c           |  1 -
+ 3 files changed, 26 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 2e070d3..bb0e41b 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -841,13 +841,16 @@ static bool access_cntp_tval(struct kvm_vcpu *vcpu,
- 		struct sys_reg_params *p,
- 		const struct sys_reg_desc *r)
- {
--	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
- 	u64 now = kvm_phys_timer_read();
-+	u64 cval;
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index 8e5ed54..af29563 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -61,7 +61,6 @@ int kvm_timer_hyp_init(void);
+ int kvm_timer_enable(struct kvm_vcpu *vcpu);
+ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu);
+ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu);
+-void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu);
+ void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu);
+ bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu);
+ void kvm_timer_update_run(struct kvm_vcpu *vcpu);
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index aa18a5d..f92459a 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -302,12 +302,6 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
+ 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+ 	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
  
--	if (p->is_write)
--		ptimer->cnt_cval = p->regval + now;
--	else
--		p->regval = ptimer->cnt_cval - now;
-+	if (p->is_write) {
-+		kvm_arm_timer_set_reg(vcpu, KVM_REG_ARM_PTIMER_CVAL,
-+				      p->regval + now);
-+	} else {
-+		cval = kvm_arm_timer_get_reg(vcpu, KVM_REG_ARM_PTIMER_CVAL);
-+		p->regval = cval - now;
-+	}
+-	/*
+-	 * If userspace modified the timer registers via SET_ONE_REG before
+-	 * the vgic was initialized, we mustn't set the vtimer->irq.level value
+-	 * because the guest would never see the interrupt.  Instead wait
+-	 * until we call this function from kvm_timer_flush_hwstate.
+-	 */
+ 	if (unlikely(!timer->enabled))
+ 		return;
  
- 	return true;
+@@ -493,24 +487,6 @@ bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu)
+ 	       ptimer->irq.level != plevel;
  }
-@@ -856,24 +859,10 @@ static bool access_cntp_ctl(struct kvm_vcpu *vcpu,
- 		struct sys_reg_params *p,
- 		const struct sys_reg_desc *r)
- {
--	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
--
--	if (p->is_write) {
--		/* ISTATUS bit is read-only */
--		ptimer->cnt_ctl = p->regval & ~ARCH_TIMER_CTRL_IT_STAT;
--	} else {
--		u64 now = kvm_phys_timer_read();
--
--		p->regval = ptimer->cnt_ctl;
--		/*
--		 * Set ISTATUS bit if it's expired.
--		 * Note that according to ARMv8 ARM Issue A.k, ISTATUS bit is
--		 * UNKNOWN when ENABLE bit is 0, so we chose to set ISTATUS bit
--		 * regardless of ENABLE bit for our implementation convenience.
--		 */
--		if (ptimer->cnt_cval <= now)
--			p->regval |= ARCH_TIMER_CTRL_IT_STAT;
--	}
-+	if (p->is_write)
-+		kvm_arm_timer_set_reg(vcpu, KVM_REG_ARM_PTIMER_CTL, p->regval);
-+	else
-+		p->regval = kvm_arm_timer_get_reg(vcpu, KVM_REG_ARM_PTIMER_CTL);
  
- 	return true;
- }
-@@ -882,12 +871,10 @@ static bool access_cntp_cval(struct kvm_vcpu *vcpu,
- 		struct sys_reg_params *p,
- 		const struct sys_reg_desc *r)
- {
+-/**
+- * kvm_timer_flush_hwstate - prepare timers before running the vcpu
+- * @vcpu: The vcpu pointer
+- *
+- * Check if the virtual timer has expired while we were running in the host,
+- * and inject an interrupt if that was the case, making sure the timer is
+- * masked or disabled on the host so that we keep executing.  Also schedule a
+- * software timer for the physical timer if it is enabled.
+- */
+-void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
+-{
+-	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
 -	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
 -
- 	if (p->is_write)
--		ptimer->cnt_cval = p->regval;
-+		kvm_arm_timer_set_reg(vcpu, KVM_REG_ARM_PTIMER_CVAL, p->regval);
- 	else
--		p->regval = ptimer->cnt_cval;
-+		p->regval = kvm_arm_timer_get_reg(vcpu, KVM_REG_ARM_PTIMER_CVAL);
+-	if (unlikely(!timer->enabled))
+-		return;
+-}
+-
+ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
+ {
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 132d39a..14c50d1 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -656,7 +656,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
  
- 	return true;
- }
+ 		local_irq_disable();
+ 
+-		kvm_timer_flush_hwstate(vcpu);
+ 		kvm_vgic_flush_hwstate(vcpu);
+ 
+ 		/*
 -- 
 2.9.0
