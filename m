@@ -1,7 +1,7 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PATCH v3 10/20] KVM: arm/arm64: Move timer/vgic flush/sync under disabled irq
-Date: Sat, 23 Sep 2017 02:41:57 +0200
-Message-ID: <20170923004207.22356-11-cdall@linaro.org>
+Subject: [PATCH v3 07/20] KVM: arm/arm64: Make timer_arm and timer_disarm helpers more generic
+Date: Sat, 23 Sep 2017 02:41:54 +0200
+Message-ID: <20170923004207.22356-8-cdall@linaro.org>
 References: <20170923004207.22356-1-cdall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20170923004207.22356-1-cdall@linaro.org>
@@ -10,83 +10,109 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As we are about to play tricks with the timer to be more lazy in saving
-and restoring state, we need to move the timer sync and flush functions
-under a disabled irq section and since we have to flush the vgic state
-after the timer and PMU state, we do the whole flush/sync sequence with
-disabled irqs.
-
-The only downside is a slightly longer delay before being able to
-process hardware interrupts and run softirqs.
+We are about to add an additional soft timer to the arch timer state for
+a VCPU and would like to be able to reuse the functions to program and
+cancel a timer, so we make them slightly more generic and rename to make
+it more clear that these functions work on soft timers and not the
+hardware resource that this code is managing.
 
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- virt/kvm/arm/arm.c | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+ virt/kvm/arm/arch_timer.c | 33 ++++++++++++++++-----------------
+ 1 file changed, 16 insertions(+), 17 deletions(-)
 
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index b9f68e4..27db222 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -654,11 +654,11 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index 8e89d63..871d8ae 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -56,26 +56,22 @@ u64 kvm_phys_timer_read(void)
+ 	return timecounter->cc->read(timecounter->cc);
+ }
  
- 		kvm_pmu_flush_hwstate(vcpu);
+-static bool timer_is_armed(struct arch_timer_cpu *timer)
++static bool soft_timer_is_armed(struct arch_timer_cpu *timer)
+ {
+ 	return timer->armed;
+ }
  
-+		local_irq_disable();
+-/* timer_arm: as in "arm the timer", not as in ARM the company */
+-static void timer_arm(struct arch_timer_cpu *timer, u64 ns)
++static void soft_timer_start(struct hrtimer *hrt, u64 ns)
+ {
+-	timer->armed = true;
+-	hrtimer_start(&timer->timer, ktime_add_ns(ktime_get(), ns),
++	hrtimer_start(hrt, ktime_add_ns(ktime_get(), ns),
+ 		      HRTIMER_MODE_ABS);
+ }
+ 
+-static void timer_disarm(struct arch_timer_cpu *timer)
++static void soft_timer_cancel(struct hrtimer *hrt, struct work_struct *work)
+ {
+-	if (timer_is_armed(timer)) {
+-		hrtimer_cancel(&timer->timer);
+-		cancel_work_sync(&timer->expired);
+-		timer->armed = false;
+-	}
++	hrtimer_cancel(hrt);
++	if (work)
++		cancel_work_sync(work);
+ }
+ 
+ static irqreturn_t kvm_arch_timer_handler(int irq, void *dev_id)
+@@ -271,7 +267,7 @@ static void kvm_timer_emulate(struct kvm_vcpu *vcpu,
+ 		return;
+ 
+ 	/*  The timer has not yet expired, schedule a background timer */
+-	timer_arm(timer, kvm_timer_compute_delta(timer_ctx));
++	soft_timer_start(&timer->timer, kvm_timer_compute_delta(timer_ctx));
+ }
+ 
+ /*
+@@ -285,7 +281,7 @@ void kvm_timer_schedule(struct kvm_vcpu *vcpu)
+ 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+ 	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+ 
+-	BUG_ON(timer_is_armed(timer));
++	BUG_ON(soft_timer_is_armed(timer));
+ 
+ 	/*
+ 	 * No need to schedule a background timer if any guest timer has
+@@ -306,13 +302,16 @@ void kvm_timer_schedule(struct kvm_vcpu *vcpu)
+ 	 * The guest timers have not yet expired, schedule a background timer.
+ 	 * Set the earliest expiration time among the guest timers.
+ 	 */
+-	timer_arm(timer, kvm_timer_earliest_exp(vcpu));
++	timer->armed = true;
++	soft_timer_start(&timer->timer, kvm_timer_earliest_exp(vcpu));
+ }
+ 
+ void kvm_timer_unschedule(struct kvm_vcpu *vcpu)
+ {
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+-	timer_disarm(timer);
 +
- 		kvm_timer_flush_hwstate(vcpu);
- 		kvm_vgic_flush_hwstate(vcpu);
++	soft_timer_cancel(&timer->timer, &timer->expired);
++	timer->armed = false;
+ }
  
--		local_irq_disable();
--
- 		/*
- 		 * If we have a singal pending, or need to notify a userspace
- 		 * irqchip about timer or PMU level changes, then we exit (and
-@@ -683,10 +683,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm) ||
- 		    kvm_request_pending(vcpu)) {
- 			vcpu->mode = OUTSIDE_GUEST_MODE;
--			local_irq_enable();
- 			kvm_pmu_sync_hwstate(vcpu);
- 			kvm_timer_sync_hwstate(vcpu);
- 			kvm_vgic_sync_hwstate(vcpu);
-+			local_irq_enable();
- 			preempt_enable();
- 			continue;
- 		}
-@@ -710,6 +710,16 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		kvm_arm_clear_debug(vcpu);
+ static void kvm_timer_flush_hwstate_vgic(struct kvm_vcpu *vcpu)
+@@ -448,7 +447,7 @@ void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
+ 	 * This is to cancel the background timer for the physical timer
+ 	 * emulation if it is set.
+ 	 */
+-	timer_disarm(timer);
++	soft_timer_cancel(&timer->timer, &timer->expired);
  
- 		/*
-+		 * We must sync the PMU and timer state before the vgic state so
-+		 * that the vgic can properly sample the updated state of the
-+		 * interrupt line.
-+		 */
-+		kvm_pmu_sync_hwstate(vcpu);
-+		kvm_timer_sync_hwstate(vcpu);
-+
-+		kvm_vgic_sync_hwstate(vcpu);
-+
-+		/*
- 		 * We may have taken a host interrupt in HYP mode (ie
- 		 * while executing the guest). This interrupt is still
- 		 * pending, as we haven't serviced it yet!
-@@ -732,16 +742,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		guest_exit();
- 		trace_kvm_exit(ret, kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
+ 	/*
+ 	 * The guest could have modified the timer registers or the timer
+@@ -615,7 +614,7 @@ void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu)
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+ 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
  
--		/*
--		 * We must sync the PMU and timer state before the vgic state so
--		 * that the vgic can properly sample the updated state of the
--		 * interrupt line.
--		 */
--		kvm_pmu_sync_hwstate(vcpu);
--		kvm_timer_sync_hwstate(vcpu);
--
--		kvm_vgic_sync_hwstate(vcpu);
--
- 		preempt_enable();
+-	timer_disarm(timer);
++	soft_timer_cancel(&timer->timer, &timer->expired);
+ 	kvm_vgic_unmap_phys_irq(vcpu, vtimer->irq.irq);
+ }
  
- 		ret = handle_exit(vcpu, run, ret);
 -- 
 2.9.0
