@@ -1,25 +1,25 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PATCH v3 09/20] KVM: arm/arm64: Use separate timer for phys timer
- emulation
-Date: Sat, 23 Sep 2017 02:41:56 +0200
-Message-ID: <20170923004207.22356-10-cdall@linaro.org>
+Subject: [PATCH v3 12/20] genirq: Document vcpu_info usage for percpu_devid
+ interrupts
+Date: Sat, 23 Sep 2017 02:41:59 +0200
+Message-ID: <20170923004207.22356-13-cdall@linaro.org>
 References: <20170923004207.22356-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E53949C6C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Sep 2017 20:42:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 31F9F49C76
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Sep 2017 20:42:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NGc+5iLslBvG for <kvmarm@lists.cs.columbia.edu>;
- Fri, 22 Sep 2017 20:42:07 -0400 (EDT)
-Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 337BA49C6D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Sep 2017 20:42:07 -0400 (EDT)
-Received: by mail-wm0-f44.google.com with SMTP id m127so7644065wmm.3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Sep 2017 17:42:18 -0700 (PDT)
+ with ESMTP id d4x5LpsuzQ1O for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Sep 2017 20:42:12 -0400 (EDT)
+Received: from mail-wm0-f48.google.com (mail-wm0-f48.google.com [74.125.82.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A426E49C90
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Sep 2017 20:42:11 -0400 (EDT)
+Received: by mail-wm0-f48.google.com with SMTP id r136so7639811wmf.2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Sep 2017 17:42:23 -0700 (PDT)
 In-Reply-To: <20170923004207.22356-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,109 +31,48 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvm@vger.kernel.org, Christoffer Dall <cdall@linaro.org>
+Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We were using the same hrtimer for emulating the physical timer and for
-making sure a blocking VCPU thread would be eventually woken up.  That
-worked fine in the previous arch timer design, but as we are about to
-actually use the soft timer expire function for the physical timer
-emulation, change the logic to use a dedicated hrtimer.
+It is currently unclear how to set the VCPU affinity for a percpu_devid
+interrupt , since the Linux irq_data structure describes the state for
+multiple interrupts, one for each physical CPU on the system.  Since
+each such interrupt can be associated with different VCPUs or none at
+all, associating a single VCPU state with such an interrupt does not
+capture the necessary semantics.
 
-This has the added benefit of not having to cancel any work in the sync
-path, which in turn allows us to run the flush and sync with IRQs
-disabled.
+The implementers of irq_set_affinity are the Intel and AMD IOMMUs, and
+the ARM GIC irqchip.  The Intel and AMD callers do not appear to use
+percpu_devid interrupts, and the ARM GIC implementation only checks the
+pointer against NULL vs. non-NULL.
 
+Therefore, simply update the function documentation to explain the
+expected use in the context of percpu_devid interrupts, allowing future
+changes or additions to irqchip implementers to do the right thing.
+
+This allows us to set the VCPU affinity for the virtual timer interrupt
+in KVM/ARM, which is a percpu_devid (PPI) interrupt.
+
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- include/kvm/arm_arch_timer.h |  3 +++
- virt/kvm/arm/arch_timer.c    | 18 ++++++++++++++----
- 2 files changed, 17 insertions(+), 4 deletions(-)
+ kernel/irq/manage.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index dcbb2e1..16887c0 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -47,6 +47,9 @@ struct arch_timer_cpu {
- 	/* Work queued with the above timer expires */
- 	struct work_struct		expired;
- 
-+	/* Physical timer emulation */
-+	struct hrtimer			phys_timer;
-+
- 	/* Background timer active */
- 	bool				armed;
- 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index c2e8326..7f87099 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -178,6 +178,12 @@ static enum hrtimer_restart kvm_bg_timer_expire(struct hrtimer *hrt)
- 	return HRTIMER_NORESTART;
- }
- 
-+static enum hrtimer_restart kvm_phys_timer_expire(struct hrtimer *hrt)
-+{
-+	WARN(1, "Timer only used to ensure guest exit - unexpected event.");
-+	return HRTIMER_NORESTART;
-+}
-+
- bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
- {
- 	u64 cval, now;
-@@ -255,7 +261,7 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
- }
- 
- /* Schedule the background timer for the emulated timer. */
--static void kvm_timer_emulate(struct kvm_vcpu *vcpu,
-+static void phys_timer_emulate(struct kvm_vcpu *vcpu,
- 			      struct arch_timer_context *timer_ctx)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-@@ -267,7 +273,7 @@ static void kvm_timer_emulate(struct kvm_vcpu *vcpu,
- 		return;
- 
- 	/*  The timer has not yet expired, schedule a background timer */
--	soft_timer_start(&timer->bg_timer, kvm_timer_compute_delta(timer_ctx));
-+	soft_timer_start(&timer->phys_timer, kvm_timer_compute_delta(timer_ctx));
- }
- 
- /*
-@@ -424,7 +430,7 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
- 	kvm_timer_update_state(vcpu);
- 
- 	/* Set the background timer for the physical timer emulation. */
--	kvm_timer_emulate(vcpu, vcpu_ptimer(vcpu));
-+	phys_timer_emulate(vcpu, vcpu_ptimer(vcpu));
- 
- 	if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
- 		kvm_timer_flush_hwstate_user(vcpu);
-@@ -447,7 +453,7 @@ void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
- 	 * This is to cancel the background timer for the physical timer
- 	 * emulation if it is set.
- 	 */
--	soft_timer_cancel(&timer->bg_timer, &timer->expired);
-+	soft_timer_cancel(&timer->phys_timer, NULL);
- 
- 	/*
- 	 * The guest could have modified the timer registers or the timer
-@@ -507,6 +513,9 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
- 	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
- 	timer->bg_timer.function = kvm_bg_timer_expire;
- 
-+	hrtimer_init(&timer->phys_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
-+	timer->phys_timer.function = kvm_phys_timer_expire;
-+
- 	vtimer->irq.irq = default_vtimer_irq.irq;
- 	ptimer->irq.irq = default_ptimer_irq.irq;
- }
-@@ -615,6 +624,7 @@ void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu)
- 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 
- 	soft_timer_cancel(&timer->bg_timer, &timer->expired);
-+	soft_timer_cancel(&timer->phys_timer, NULL);
- 	kvm_vgic_unmap_phys_irq(vcpu, vtimer->irq.irq);
- }
- 
+diff --git a/kernel/irq/manage.c b/kernel/irq/manage.c
+index 573dc52..2b2c94f 100644
+--- a/kernel/irq/manage.c
++++ b/kernel/irq/manage.c
+@@ -381,7 +381,8 @@ int irq_select_affinity_usr(unsigned int irq)
+ /**
+  *	irq_set_vcpu_affinity - Set vcpu affinity for the interrupt
+  *	@irq: interrupt number to set affinity
+- *	@vcpu_info: vCPU specific data
++ *	@vcpu_info: vCPU specific data or pointer to a percpu array of vCPU
++ *	            specific data for percpu_devid interrupts
+  *
+  *	This function uses the vCPU specific data to set the vCPU
+  *	affinity for an irq. The vCPU specific data is passed from
 -- 
 2.9.0
