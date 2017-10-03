@@ -1,25 +1,26 @@
 From: Jintack Lim <jintack.lim@linaro.org>
-Subject: [RFC PATCH v2 21/31] KVM: arm64: Emulate AT S1E[01] instructions
-Date: Mon,  2 Oct 2017 22:11:03 -0500
-Message-ID: <1507000273-3735-19-git-send-email-jintack.lim@linaro.org>
+Subject: [RFC PATCH v2 17/31] KVM: arm64: Rework the system instruction
+ emulation framework
+Date: Mon,  2 Oct 2017 22:10:59 -0500
+Message-ID: <1507000273-3735-15-git-send-email-jintack.lim@linaro.org>
 References: <1507000273-3735-1-git-send-email-jintack.lim@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B194B49D3B
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Oct 2017 23:11:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 32FCF49D3B
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Oct 2017 23:11:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6O6LHNOHZmaR for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 Oct 2017 23:11:45 -0400 (EDT)
-Received: from mail-it0-f45.google.com (mail-it0-f45.google.com
- [209.85.214.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BB44B49D28
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Oct 2017 23:11:42 -0400 (EDT)
-Received: by mail-it0-f45.google.com with SMTP id 85so9982949ith.2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 02 Oct 2017 20:12:02 -0700 (PDT)
+ with ESMTP id xnUUWNuCUVNK for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 Oct 2017 23:11:40 -0400 (EDT)
+Received: from mail-it0-f47.google.com (mail-it0-f47.google.com
+ [209.85.214.47])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2B80A49D29
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Oct 2017 23:11:38 -0400 (EDT)
+Received: by mail-it0-f47.google.com with SMTP id 4so9725571itv.4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 02 Oct 2017 20:11:57 -0700 (PDT)
 In-Reply-To: <1507000273-3735-1-git-send-email-jintack.lim@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,87 +35,113 @@ To: christoffer.dall@linaro.org, marc.zyngier@arm.com, kvmarm@lists.cs.columbia.
 Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, linux@armlinux.org.uk, linux-kernel@vger.kernel.org, pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Emulate AT S1E[01] instructions by issuing the same instructions in EL2. We
-set the physical EL1 registers, NV and NV1 bits as described in the AT
-instruction emulation overview.
+Rework the system instruction emulation framework to handle potentially
+all system instruction traps other than MSR/MRS instructions. Those
+system instructions would be AT and TLBI instructions controlled by
+HCR_EL2.NV, AT, and TTLB bits.
 
 Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 ---
- arch/arm64/include/asm/kvm_emulate.h | 11 +++++++++++
- arch/arm64/kvm/sys_regs.c            | 32 ++++++++++++++++++++++++++------
- 2 files changed, 37 insertions(+), 6 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 66 ++++++++++++++++++-----------------------------
+ 1 file changed, 25 insertions(+), 41 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 4c47bc7..a494db2 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -185,6 +185,17 @@ static inline bool vcpu_el2_tge_is_set(const struct kvm_vcpu *vcpu)
- 	return (vcpu_sys_reg(vcpu, HCR_EL2) & HCR_TGE);
- }
- 
-+
-+/*
-+ * When the NV and NV1 bits are set, the EL2 page table format is used for the
-+ * EL1 translation regime.
-+ */
-+static inline bool vcpu_el2_format_used(const struct kvm_vcpu *vcpu)
-+{
-+	return ((vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV) &&
-+		(vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV1));
-+}
-+
- static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
- {
- 	/*
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index d8728cc..a82274f 100644
+index 88ce172..481bea64 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1621,6 +1621,26 @@ static bool access_id_aa64mmfr0_el1(struct kvm_vcpu *v,
+@@ -1621,6 +1621,11 @@ static bool access_id_aa64mmfr0_el1(struct kvm_vcpu *v,
  	{ SYS_DESC(SYS_SP_EL2), NULL, reset_special, SP_EL2, 0},
  };
  
-+static bool handle_s1e01(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-+			 const struct sys_reg_desc *r)
++#define SYS_INSN_TO_DESC(insn, access_fn, forward_fn)	\
++	{ SYS_DESC((insn)), (access_fn), NULL, 0, 0, NULL, NULL, (forward_fn) }
++static struct sys_reg_desc sys_insn_descs[] = {
++};
++
+ #define reg_to_match_value(x)						\
+ 	({								\
+ 		unsigned long val;					\
+@@ -1674,6 +1679,25 @@ static void perform_access(struct kvm_vcpu *vcpu,
+ 		kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+ }
+ 
++static int emulate_sys_instr(struct kvm_vcpu *vcpu, struct sys_reg_params *p)
 +{
-+	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
-+	bool el2_format;
-+	int sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
 +
-+	/* See '2. EL0/EL1 AT instructions: S1E[01]x, S12E1x' table. */
-+	if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu))
-+		ctxt->hw_sys_regs = ctxt->shadow_sys_regs;
-+	else
-+		ctxt->hw_sys_regs = ctxt->sys_regs;
++	const struct sys_reg_desc *r;
 +
-+	el2_format = vcpu_el2_format_used(vcpu);
++	/* Search from the system instruction table. */
++	r = find_reg(p, sys_insn_descs, ARRAY_SIZE(sys_insn_descs));
 +
-+	kvm_call_hyp(__kvm_at_insn, vcpu, p->regval, el2_format, sys_encoding);
-+
-+	return true;
++	if (likely(r)) {
++		perform_access(vcpu, p, r);
++	} else {
++		kvm_err("Unsupported guest sys instruction at: %lx\n",
++			*vcpu_pc(vcpu));
++		print_sys_reg_instr(p);
++		kvm_inject_undefined(vcpu);
++	}
++	return 1;
 +}
 +
- /*
-  * AT instruction emulation
-  *
-@@ -1690,12 +1710,12 @@ static bool access_id_aa64mmfr0_el1(struct kvm_vcpu *v,
- #define SYS_INSN_TO_DESC(insn, access_fn, forward_fn)	\
- 	{ SYS_DESC((insn)), (access_fn), NULL, 0, 0, NULL, NULL, (forward_fn) }
- static struct sys_reg_desc sys_insn_descs[] = {
--	SYS_INSN_TO_DESC(AT_S1E1R, NULL, NULL),
--	SYS_INSN_TO_DESC(AT_S1E1W, NULL, NULL),
--	SYS_INSN_TO_DESC(AT_S1E0R, NULL, NULL),
--	SYS_INSN_TO_DESC(AT_S1E0W, NULL, NULL),
--	SYS_INSN_TO_DESC(AT_S1E1RP, NULL, NULL),
--	SYS_INSN_TO_DESC(AT_S1E1WP, NULL, NULL),
-+	SYS_INSN_TO_DESC(AT_S1E1R, handle_s1e01, NULL),
-+	SYS_INSN_TO_DESC(AT_S1E1W, handle_s1e01, NULL),
-+	SYS_INSN_TO_DESC(AT_S1E0R, handle_s1e01, NULL),
-+	SYS_INSN_TO_DESC(AT_S1E0W, handle_s1e01, NULL),
-+	SYS_INSN_TO_DESC(AT_S1E1RP, handle_s1e01, NULL),
-+	SYS_INSN_TO_DESC(AT_S1E1WP, handle_s1e01, NULL),
- 	SYS_INSN_TO_DESC(AT_S1E2R, NULL, NULL),
- 	SYS_INSN_TO_DESC(AT_S1E2W, NULL, NULL),
- 	SYS_INSN_TO_DESC(AT_S12E1R, NULL, NULL),
+ static bool trap_dbgidr(struct kvm_vcpu *vcpu,
+ 			struct sys_reg_params *p,
+ 			const struct sys_reg_desc *r)
+@@ -2236,47 +2260,6 @@ static int emulate_sys_reg(struct kvm_vcpu *vcpu,
+ 	return 1;
+ }
+ 
+-static int emulate_tlbi(struct kvm_vcpu *vcpu,
+-			     struct sys_reg_params *params)
+-{
+-	/* TODO: support tlbi instruction emulation*/
+-	kvm_inject_undefined(vcpu);
+-	return 1;
+-}
+-
+-static int emulate_at(struct kvm_vcpu *vcpu,
+-			     struct sys_reg_params *params)
+-{
+-	/* TODO: support address translation instruction emulation */
+-	kvm_inject_undefined(vcpu);
+-	return 1;
+-}
+-
+-static int emulate_sys_instr(struct kvm_vcpu *vcpu,
+-			     struct sys_reg_params *params)
+-{
+-	int ret = 0;
+-
+-	/*
+-	 * Forward this trap to the virtual EL2 if the virtual HCR_EL2.NV
+-	 * bit is set.
+-	 */
+-	if (forward_nv_traps(vcpu))
+-		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
+-
+-	/* TLB maintenance instructions*/
+-	if (params->CRn == 0b1000)
+-		ret = emulate_tlbi(vcpu, params);
+-	/* Address Translation instructions */
+-	else if (params->CRn == 0b0111 && params->CRm == 0b1000)
+-		ret = emulate_at(vcpu, params);
+-
+-	if (ret)
+-		kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+-
+-	return ret;
+-}
+-
+ static void reset_sys_reg_descs(struct kvm_vcpu *vcpu,
+ 			      const struct sys_reg_desc *table, size_t num)
+ {
+@@ -2754,6 +2737,7 @@ void kvm_sys_reg_table_init(void)
+ 	BUG_ON(check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs)));
+ 	BUG_ON(check_sysreg_table(cp15_64_regs, ARRAY_SIZE(cp15_64_regs)));
+ 	BUG_ON(check_sysreg_table(invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs)));
++	BUG_ON(check_sysreg_table(sys_insn_descs, ARRAY_SIZE(sys_insn_descs)));
+ 
+ 	/* We abuse the reset function to overwrite the table itself. */
+ 	for (i = 0; i < ARRAY_SIZE(invariant_sys_regs); i++)
 -- 
 1.9.1
