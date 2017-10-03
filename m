@@ -1,110 +1,57 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v2 11/28] arm64/sve: Core task context handling
-Date: Tue, 3 Oct 2017 12:33:03 +0100
-Message-ID: <20171003113302.GR3611@e103592.cambridge.arm.com>
-References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com>
- <1504198860-12951-12-git-send-email-Dave.Martin@arm.com>
- <20170913143325.hi4cfcajbts3bbao@localhost>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [RFC PATCH v2 19/31] KVM: arm64: Describe AT instruction emulation
+ design
+Date: Tue, 03 Oct 2017 18:37:54 +0100
+Message-ID: <59D3CAF2.2030704@arm.com>
+References: <1507000273-3735-1-git-send-email-jintack.lim@linaro.org> <1507000273-3735-17-git-send-email-jintack.lim@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-arch-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20170913143325.hi4cfcajbts3bbao@localhost>
-Sender: linux-arch-owner@vger.kernel.org
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Will Deacon <will.deacon@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1507000273-3735-17-git-send-email-jintack.lim@linaro.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Jintack Lim <jintack.lim@linaro.org>
+Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, linux@armlinux.org.uk, linux-kernel@vger.kernel.org, pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Sep 13, 2017 at 07:33:25AM -0700, Catalin Marinas wrote:
-> On Thu, Aug 31, 2017 at 06:00:43PM +0100, Dave P Martin wrote:
-> > +/*
-> > + * Handle SVE state across fork():
-> > + *
-> > + * dst and src must not end up with aliases of the same sve_state.
-> > + * Because a task cannot fork except in a syscall, we can discard SVE
-> > + * state for dst here, so long as we take care to retain the FPSIMD
-> > + * subset of the state if SVE is in use.  Reallocation of the SVE state
-> > + * will be deferred until dst tries to use SVE.
-> > + */
-> > +void fpsimd_dup_sve(struct task_struct *dst, struct task_struct const *src)
-> > +{
-> > +	if (test_and_clear_tsk_thread_flag(dst, TIF_SVE)) {
-> > +		WARN_ON(dst->mm && !in_syscall(task_pt_regs(dst)));
-> > +		sve_to_fpsimd(dst);
-> > +	}
-> > +
-> > +	dst->thread.sve_state = NULL;
-> > +}
-> 
-> I first thought the thread flags are not visible in dst yet since
-> dup_task_struct() calls arch_dup_task_struct() before
-> setup_thread_stack(). However, at the end of the last year we enabled
-> CONFIG_THREAD_INFO_IN_TASK_STRUCT. But I don't particularly like relying
-> on this.
-> 
-> Anyway, IIUC we don't need sve_to_fpsimd() here. The
-> arch_dup_task_struct() already called fpsimd_preserve_current_state()
-> for src, so the FPSIMD state (which we care about) is transferred during
-> the *dst = *src assignment. So you'd only need the last statement,
-> possibly with a different function name like fpsimd_erase_sve (and maybe
-> make the function static inline in the header).
+Hi Jintack,
 
-Regarding the intended meanings of the thread flags, does this help?
+On 03/10/17 04:11, Jintack Lim wrote:
+> This design overview will help to digest the subsequent patches that
+> implement AT instruction emulation.
 
---8<--
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 8d04926..d8728cc 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1621,6 +1621,72 @@ static bool access_id_aa64mmfr0_el1(struct kvm_vcpu *v,
+>  	{ SYS_DESC(SYS_SP_EL2), NULL, reset_special, SP_EL2, 0},
+>  };
+>  
+> +/*
+> + * AT instruction emulation
+> + *
+> + * We emulate AT instructions executed in the virtual EL2.
 
-TIF_FOREIGN_FPSTATE's meaning is expanded to cover SVE, but otherwise
-unchanged:
+> + * Basic strategy for the stage-1 translation emulation is to load proper
+> + * context, which depends on the trapped instruction and the virtual HCR_EL2,
+> + * to the EL1 virtual memory control registers and execute S1E[01] instructions
+> + * in EL2. See below for more detail.
 
- * If a task is running and !TIF_FOREIGN_FPSTATE, then the the CPU
-   registers of the CPU the task is running on contain the authoritative
-   FPSIMD/SVE state of the task.  The backing memory may be stale.
+What happens if the guest memory containing some stage1-page-table has been
+unmapped from stage2? (e.g. its swapped to disk).
 
- * Otherwise (i.e., task not running, or task running and
-   TIF_FOREIGN_FPSTATE), the task's FPSIMD/SVE backing memory is
-   authoritative.  If additionally per_cpu(fpsimd_last_state,
-   task->fpsimd_state.cpu) == &task->fpsimd_state.cpu, then
-   task->fpsimd_state.cpu's registers are also up to date for task, but
-   not authorititive: the current FPSIMD/SVE state may be read from
-   them, but they must not be written.
- 
-The FPSIMD/SVE backing memory is selected by TIF_SVE:
+(there is some background to this: I tried to implement the kvm_translate
+ioctl() using this approach, running 'at s1e1*' from EL2. I ran into problems
+when parts of the guest's stage1 page tables had been unmapped from stage2.)
 
- * TIF_SVE set: Zn (incorporating Vn in bits[127:0]), Pn and FFR are
-   stored in task->thread.sve_state, formatted appropriately for vector
-   length task->thread.sve_vl.  task->thread.sve_state must point to a
-   valid buffer at least sve_state_size(task) bytes in size.
+>From memory, I found that the AT instructions would fault-in those pages when
+run from EL1, but when executing the same instruction at EL2 they just failed
+without any hint of which IPA needed mapping in.
 
- * TIF_SVE clear: Vn are stored in task->fpsimd_state; Zn[max : 128] are
-   logically zero[*] but not stored anywhere; Pn, FFR are not stored and
-   have unspecified values from userspace's point of view.
-   task->thread.sve_state does not need to be non-null, valid or any
-   particular size: it must not be dereferenced.
-
-   In practice I don't exploit the "unspecifiedness" much.  The Zn high
-   bits, Pn and FFR are all zeroed when setting TIF_SVE again:
-   sve_alloc() is the common path for this.
-
- * FPSR and FPCR are always stored in task->fpsimd_state irrespctive of
-   whether TIF_SVE is clear or set, since these are not vector length
-   dependent.
+I can try digging for any left over code if we want to setup a test case for this...
 
 
-[*] theoretically unspecified, which is what I've written in sve.txt.
-However, on any FPSIMD Vn write the upper bits of the corresponding Zn
-must become logically zero in order to conform to the SVE programmer's
-model.  It's not feasible to track which Vn have been written
-individually because that would involve trapping every FPSIMD insn until
-all possible Vn have been written.  So the kernel ensures that the Zn
-high bits become zero.
+Thanks,
 
-Maybe we should just guarantee "zero-or-preserved" behaviour for
-userspace.  This may close down some future optimisation opportunities,
-but maybe it's better to be simple.
-
-Thoughts?
-
-[...]
-
-Cheers
----Dave
+James
