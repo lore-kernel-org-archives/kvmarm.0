@@ -1,26 +1,25 @@
 From: Jintack Lim <jintack.lim@linaro.org>
-Subject: [RFC PATCH v2 14/31] KVM: arm/arm64: Forward the guest hypervisor's
- stage 2 permission faults
-Date: Mon,  2 Oct 2017 22:10:56 -0500
-Message-ID: <1507000273-3735-12-git-send-email-jintack.lim@linaro.org>
+Subject: [RFC PATCH v2 21/31] KVM: arm64: Emulate AT S1E[01] instructions
+Date: Mon,  2 Oct 2017 22:11:03 -0500
+Message-ID: <1507000273-3735-19-git-send-email-jintack.lim@linaro.org>
 References: <1507000273-3735-1-git-send-email-jintack.lim@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 493CA406BB
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Oct 2017 23:11:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B194B49D3B
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Oct 2017 23:11:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GC2PCyvdZtR8 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 Oct 2017 23:11:38 -0400 (EDT)
-Received: from mail-it0-f52.google.com (mail-it0-f52.google.com
- [209.85.214.52])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BC7CD49D49
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Oct 2017 23:11:34 -0400 (EDT)
-Received: by mail-it0-f52.google.com with SMTP id 85so9735580ith.2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 02 Oct 2017 20:11:54 -0700 (PDT)
+ with ESMTP id 6O6LHNOHZmaR for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 Oct 2017 23:11:45 -0400 (EDT)
+Received: from mail-it0-f45.google.com (mail-it0-f45.google.com
+ [209.85.214.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BB44B49D28
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Oct 2017 23:11:42 -0400 (EDT)
+Received: by mail-it0-f45.google.com with SMTP id 85so9982949ith.2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 02 Oct 2017 20:12:02 -0700 (PDT)
 In-Reply-To: <1507000273-3735-1-git-send-email-jintack.lim@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,107 +34,87 @@ To: christoffer.dall@linaro.org, marc.zyngier@arm.com, kvmarm@lists.cs.columbia.
 Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, linux@armlinux.org.uk, linux-kernel@vger.kernel.org, pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+Emulate AT S1E[01] instructions by issuing the same instructions in EL2. We
+set the physical EL1 registers, NV and NV1 bits as described in the AT
+instruction emulation overview.
 
-We can have discrepancies between the nested stage 2 page table and the
-shadow one in a couple of cases.  For example, the guest hypervisor can
-mark a page writable but the host hypervisor maps the page read-only in
-the shadow page table, if using something like KSM on the host level.
-In this case, a write fault is handled directly by the host hypervisor.
-But we could also simply have a read-only page mapped read-only in both
-tables, in which case the host hypervisor cannot do anything else than
-telling the guest hypervisor about the fault.
-
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 ---
- arch/arm/include/asm/kvm_mmu.h   |  7 +++++++
- arch/arm64/include/asm/kvm_mmu.h |  2 ++
- arch/arm64/kvm/mmu-nested.c      | 22 ++++++++++++++++++++++
- virt/kvm/arm/mmu.c               |  7 +++++++
- 4 files changed, 38 insertions(+)
+ arch/arm64/include/asm/kvm_emulate.h | 11 +++++++++++
+ arch/arm64/kvm/sys_regs.c            | 32 ++++++++++++++++++++++++++------
+ 2 files changed, 37 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index 6a22846..1c5b652 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -237,6 +237,13 @@ static inline int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
- 	return 0;
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 4c47bc7..a494db2 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -185,6 +185,17 @@ static inline bool vcpu_el2_tge_is_set(const struct kvm_vcpu *vcpu)
+ 	return (vcpu_sys_reg(vcpu, HCR_EL2) & HCR_TGE);
  }
  
-+static inline int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
-+					   phys_addr_t fault_ipa,
-+					   struct kvm_s2_trans *trans)
-+{
-+	return 0;
-+}
 +
- static inline void kvm_nested_s2_unmap(struct kvm_vcpu *vcpu) { }
- static inline void kvm_nested_s2_free(struct kvm *kvm) { }
- static inline void kvm_nested_s2_wp(struct kvm *kvm) { }
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 425e4a2..239bb89 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -337,6 +337,8 @@ struct kvm_s2_trans {
- void update_nested_s2_mmu(struct kvm_vcpu *vcpu);
- int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
- 		       struct kvm_s2_trans *result);
-+int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-+			     struct kvm_s2_trans *trans);
- void kvm_nested_s2_unmap(struct kvm_vcpu *vcpu);
- void kvm_nested_s2_free(struct kvm *kvm);
- void kvm_nested_s2_wp(struct kvm *kvm);
-diff --git a/arch/arm64/kvm/mmu-nested.c b/arch/arm64/kvm/mmu-nested.c
-index 75570cc..a440d7b 100644
---- a/arch/arm64/kvm/mmu-nested.c
-+++ b/arch/arm64/kvm/mmu-nested.c
-@@ -271,6 +271,28 @@ int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
- 	return walk_nested_s2_pgd(vcpu, gipa, &wi, result);
- }
- 
 +/*
-+ * Returns non-zero if permission fault is handled by injecting it to the next
-+ * level hypervisor.
++ * When the NV and NV1 bits are set, the EL2 page table format is used for the
++ * EL1 translation regime.
 + */
-+int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-+			     struct kvm_s2_trans *trans)
++static inline bool vcpu_el2_format_used(const struct kvm_vcpu *vcpu)
 +{
-+	unsigned long fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
-+	bool write_fault = kvm_is_write_fault(vcpu);
-+
-+	if (fault_status != FSC_PERM)
-+		return 0;
-+
-+	if ((write_fault && !trans->writable) ||
-+	    (!write_fault && !trans->readable)) {
-+		trans->esr = esr_s2_fault(vcpu, trans->level, ESR_ELx_FSC_PERM);
-+		return 1;
-+	}
-+
-+	return 0;
++	return ((vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV) &&
++		(vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV1));
 +}
 +
- /* expects kvm->mmu_lock to be held */
- void kvm_nested_s2_wp(struct kvm *kvm)
+ static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
  {
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 74941ad..4fb7b3b 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -1591,6 +1591,13 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		if (ret)
- 			goto out_unlock;
+ 	/*
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index d8728cc..a82274f 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1621,6 +1621,26 @@ static bool access_id_aa64mmfr0_el1(struct kvm_vcpu *v,
+ 	{ SYS_DESC(SYS_SP_EL2), NULL, reset_special, SP_EL2, 0},
+ };
  
-+		nested_trans.esr = 0;
-+		ret = kvm_s2_handle_perm_fault(vcpu, fault_ipa, &nested_trans);
-+		if (nested_trans.esr)
-+			kvm_inject_s2_fault(vcpu, nested_trans.esr);
-+		if (ret)
-+			goto out_unlock;
++static bool handle_s1e01(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
++			 const struct sys_reg_desc *r)
++{
++	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
++	bool el2_format;
++	int sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
 +
- 		ipa = nested_trans.output;
- 	}
- 
++	/* See '2. EL0/EL1 AT instructions: S1E[01]x, S12E1x' table. */
++	if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu))
++		ctxt->hw_sys_regs = ctxt->shadow_sys_regs;
++	else
++		ctxt->hw_sys_regs = ctxt->sys_regs;
++
++	el2_format = vcpu_el2_format_used(vcpu);
++
++	kvm_call_hyp(__kvm_at_insn, vcpu, p->regval, el2_format, sys_encoding);
++
++	return true;
++}
++
+ /*
+  * AT instruction emulation
+  *
+@@ -1690,12 +1710,12 @@ static bool access_id_aa64mmfr0_el1(struct kvm_vcpu *v,
+ #define SYS_INSN_TO_DESC(insn, access_fn, forward_fn)	\
+ 	{ SYS_DESC((insn)), (access_fn), NULL, 0, 0, NULL, NULL, (forward_fn) }
+ static struct sys_reg_desc sys_insn_descs[] = {
+-	SYS_INSN_TO_DESC(AT_S1E1R, NULL, NULL),
+-	SYS_INSN_TO_DESC(AT_S1E1W, NULL, NULL),
+-	SYS_INSN_TO_DESC(AT_S1E0R, NULL, NULL),
+-	SYS_INSN_TO_DESC(AT_S1E0W, NULL, NULL),
+-	SYS_INSN_TO_DESC(AT_S1E1RP, NULL, NULL),
+-	SYS_INSN_TO_DESC(AT_S1E1WP, NULL, NULL),
++	SYS_INSN_TO_DESC(AT_S1E1R, handle_s1e01, NULL),
++	SYS_INSN_TO_DESC(AT_S1E1W, handle_s1e01, NULL),
++	SYS_INSN_TO_DESC(AT_S1E0R, handle_s1e01, NULL),
++	SYS_INSN_TO_DESC(AT_S1E0W, handle_s1e01, NULL),
++	SYS_INSN_TO_DESC(AT_S1E1RP, handle_s1e01, NULL),
++	SYS_INSN_TO_DESC(AT_S1E1WP, handle_s1e01, NULL),
+ 	SYS_INSN_TO_DESC(AT_S1E2R, NULL, NULL),
+ 	SYS_INSN_TO_DESC(AT_S1E2W, NULL, NULL),
+ 	SYS_INSN_TO_DESC(AT_S12E1R, NULL, NULL),
 -- 
 1.9.1
