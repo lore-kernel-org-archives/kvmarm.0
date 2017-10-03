@@ -1,26 +1,26 @@
 From: Jintack Lim <jintack.lim@linaro.org>
-Subject: [RFC PATCH v2 15/31] KVM: arm64: Move system register helper
- functions around
-Date: Mon,  2 Oct 2017 22:10:57 -0500
-Message-ID: <1507000273-3735-13-git-send-email-jintack.lim@linaro.org>
+Subject: [RFC PATCH v2 14/31] KVM: arm/arm64: Forward the guest hypervisor's
+ stage 2 permission faults
+Date: Mon,  2 Oct 2017 22:10:56 -0500
+Message-ID: <1507000273-3735-12-git-send-email-jintack.lim@linaro.org>
 References: <1507000273-3735-1-git-send-email-jintack.lim@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DC0549D3B
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 493CA406BB
  for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Oct 2017 23:11:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1vkzPwkEJ6bx for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id GC2PCyvdZtR8 for <kvmarm@lists.cs.columbia.edu>;
  Mon,  2 Oct 2017 23:11:38 -0400 (EDT)
-Received: from mail-it0-f44.google.com (mail-it0-f44.google.com
- [209.85.214.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DEAA140638
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Oct 2017 23:11:35 -0400 (EDT)
-Received: by mail-it0-f44.google.com with SMTP id x15so9995865itb.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 02 Oct 2017 20:11:55 -0700 (PDT)
+Received: from mail-it0-f52.google.com (mail-it0-f52.google.com
+ [209.85.214.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BC7CD49D49
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Oct 2017 23:11:34 -0400 (EDT)
+Received: by mail-it0-f52.google.com with SMTP id 85so9735580ith.2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 02 Oct 2017 20:11:54 -0700 (PDT)
 In-Reply-To: <1507000273-3735-1-git-send-email-jintack.lim@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,130 +35,107 @@ To: christoffer.dall@linaro.org, marc.zyngier@arm.com, kvmarm@lists.cs.columbia.
 Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, linux@armlinux.org.uk, linux-kernel@vger.kernel.org, pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Jintack Lim <jintack@cs.columbia.edu>
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
-We are about to add a framework to handle system instruction traps. To
-reuse existing helper functions, let's move them around.
+We can have discrepancies between the nested stage 2 page table and the
+shadow one in a couple of cases.  For example, the guest hypervisor can
+mark a page writable but the host hypervisor maps the page read-only in
+the shadow page table, if using something like KSM on the host level.
+In this case, a write fault is handled directly by the host hypervisor.
+But we could also simply have a read-only page mapped read-only in both
+tables, in which case the host hypervisor cannot do anything else than
+telling the guest hypervisor about the fault.
 
-No functional change.
-
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 ---
- arch/arm64/kvm/sys_regs.c | 89 ++++++++++++++++++++++++-----------------------
- 1 file changed, 45 insertions(+), 44 deletions(-)
+ arch/arm/include/asm/kvm_mmu.h   |  7 +++++++
+ arch/arm64/include/asm/kvm_mmu.h |  2 ++
+ arch/arm64/kvm/mmu-nested.c      | 22 ++++++++++++++++++++++
+ virt/kvm/arm/mmu.c               |  7 +++++++
+ 4 files changed, 38 insertions(+)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 395b964..541bb97 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1621,6 +1621,51 @@ static bool access_id_aa64mmfr0_el1(struct kvm_vcpu *v,
- 	{ SYS_DESC(SYS_SP_EL2), NULL, reset_special, SP_EL2, 0},
- };
- 
-+#define reg_to_match_value(x)						\
-+	({								\
-+		unsigned long val;					\
-+		val  = (x)->Op0 << 14;					\
-+		val |= (x)->Op1 << 11;					\
-+		val |= (x)->CRn << 7;					\
-+		val |= (x)->CRm << 3;					\
-+		val |= (x)->Op2;					\
-+		val;							\
-+	 })
-+
-+static int match_sys_reg(const void *key, const void *elt)
-+{
-+	const unsigned long pval = (unsigned long)key;
-+	const struct sys_reg_desc *r = elt;
-+
-+	return pval - reg_to_match_value(r);
-+}
-+
-+static const struct sys_reg_desc *find_reg(const struct sys_reg_params *params,
-+					 const struct sys_reg_desc table[],
-+					 unsigned int num)
-+{
-+	unsigned long pval = reg_to_match_value(params);
-+
-+	return bsearch((void *)pval, table, num, sizeof(table[0]),
-+		       match_sys_reg);
-+}
-+
-+static void perform_access(struct kvm_vcpu *vcpu,
-+			   struct sys_reg_params *params,
-+			   const struct sys_reg_desc *r)
-+{
-+	/*
-+	 * Not having an accessor means that we have configured a trap
-+	 * that we don't know how to handle. This certainly qualifies
-+	 * as a gross bug that should be fixed right away.
-+	 */
-+	BUG_ON(!r->access);
-+
-+	/* Skip instruction if instructed so */
-+	if (likely(r->access(vcpu, params, r)))
-+		kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-+}
-+
- static bool trap_dbgidr(struct kvm_vcpu *vcpu,
- 			struct sys_reg_params *p,
- 			const struct sys_reg_desc *r)
-@@ -1968,56 +2013,12 @@ static const struct sys_reg_desc *get_target_table(unsigned target,
- 	}
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index 6a22846..1c5b652 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -237,6 +237,13 @@ static inline int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+ 	return 0;
  }
  
--#define reg_to_match_value(x)						\
--	({								\
--		unsigned long val;					\
--		val  = (x)->Op0 << 14;					\
--		val |= (x)->Op1 << 11;					\
--		val |= (x)->CRn << 7;					\
--		val |= (x)->CRm << 3;					\
--		val |= (x)->Op2;					\
--		val;							\
--	 })
--
--static int match_sys_reg(const void *key, const void *elt)
--{
--	const unsigned long pval = (unsigned long)key;
--	const struct sys_reg_desc *r = elt;
--
--	return pval - reg_to_match_value(r);
--}
--
--static const struct sys_reg_desc *find_reg(const struct sys_reg_params *params,
--					 const struct sys_reg_desc table[],
--					 unsigned int num)
--{
--	unsigned long pval = reg_to_match_value(params);
--
--	return bsearch((void *)pval, table, num, sizeof(table[0]), match_sys_reg);
--}
--
- int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu, struct kvm_run *run)
++static inline int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
++					   phys_addr_t fault_ipa,
++					   struct kvm_s2_trans *trans)
++{
++	return 0;
++}
++
+ static inline void kvm_nested_s2_unmap(struct kvm_vcpu *vcpu) { }
+ static inline void kvm_nested_s2_free(struct kvm *kvm) { }
+ static inline void kvm_nested_s2_wp(struct kvm *kvm) { }
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 425e4a2..239bb89 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -337,6 +337,8 @@ struct kvm_s2_trans {
+ void update_nested_s2_mmu(struct kvm_vcpu *vcpu);
+ int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+ 		       struct kvm_s2_trans *result);
++int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
++			     struct kvm_s2_trans *trans);
+ void kvm_nested_s2_unmap(struct kvm_vcpu *vcpu);
+ void kvm_nested_s2_free(struct kvm *kvm);
+ void kvm_nested_s2_wp(struct kvm *kvm);
+diff --git a/arch/arm64/kvm/mmu-nested.c b/arch/arm64/kvm/mmu-nested.c
+index 75570cc..a440d7b 100644
+--- a/arch/arm64/kvm/mmu-nested.c
++++ b/arch/arm64/kvm/mmu-nested.c
+@@ -271,6 +271,28 @@ int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+ 	return walk_nested_s2_pgd(vcpu, gipa, &wi, result);
+ }
+ 
++/*
++ * Returns non-zero if permission fault is handled by injecting it to the next
++ * level hypervisor.
++ */
++int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
++			     struct kvm_s2_trans *trans)
++{
++	unsigned long fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
++	bool write_fault = kvm_is_write_fault(vcpu);
++
++	if (fault_status != FSC_PERM)
++		return 0;
++
++	if ((write_fault && !trans->writable) ||
++	    (!write_fault && !trans->readable)) {
++		trans->esr = esr_s2_fault(vcpu, trans->level, ESR_ELx_FSC_PERM);
++		return 1;
++	}
++
++	return 0;
++}
++
+ /* expects kvm->mmu_lock to be held */
+ void kvm_nested_s2_wp(struct kvm *kvm)
  {
- 	kvm_inject_undefined(vcpu);
- 	return 1;
- }
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 74941ad..4fb7b3b 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -1591,6 +1591,13 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		if (ret)
+ 			goto out_unlock;
  
--static void perform_access(struct kvm_vcpu *vcpu,
--			   struct sys_reg_params *params,
--			   const struct sys_reg_desc *r)
--{
--	/*
--	 * Not having an accessor means that we have configured a trap
--	 * that we don't know how to handle. This certainly qualifies
--	 * as a gross bug that should be fixed right away.
--	 */
--	BUG_ON(!r->access);
--
--	/* Skip instruction if instructed so */
--	if (likely(r->access(vcpu, params, r)))
--		kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
--}
--
- /*
-  * emulate_cp --  tries to match a sys_reg access in a handling table, and
-  *                call the corresponding trap handler.
++		nested_trans.esr = 0;
++		ret = kvm_s2_handle_perm_fault(vcpu, fault_ipa, &nested_trans);
++		if (nested_trans.esr)
++			kvm_inject_s2_fault(vcpu, nested_trans.esr);
++		if (ret)
++			goto out_unlock;
++
+ 		ipa = nested_trans.output;
+ 	}
+ 
 -- 
 1.9.1
