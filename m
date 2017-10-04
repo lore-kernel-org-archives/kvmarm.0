@@ -1,98 +1,146 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [RFC PATCH v2 19/31] KVM: arm64: Describe AT instruction
- emulation design
-Date: Wed, 4 Oct 2017 10:13:42 +0100
-Message-ID: <7335d045-fb58-3235-fadd-6f6b59304c2b@arm.com>
-References: <1507000273-3735-1-git-send-email-jintack.lim@linaro.org>
- <1507000273-3735-17-git-send-email-jintack.lim@linaro.org>
- <59D3CAF2.2030704@arm.com>
- <CAHyh4xgWaPTYn5C-KZKp-wmkCpZ5A--2iemVV5rfG1Opjk1yJw@mail.gmail.com>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v2 11/28] arm64/sve: Core task context handling
+Date: Wed, 4 Oct 2017 18:29:56 +0100
+Message-ID: <20171004172955.tyooqxdoo73iq66u@armageddon.cambridge.arm.com>
+References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com>
+ <1504198860-12951-12-git-send-email-Dave.Martin@arm.com>
+ <20170913143325.hi4cfcajbts3bbao@localhost>
+ <20170914195555.GB24231@e103592.cambridge.arm.com>
+ <20170920135856.dfuowttwi4bk4nqb@localhost>
+ <20171003111100.GQ3611@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAHyh4xgWaPTYn5C-KZKp-wmkCpZ5A--2iemVV5rfG1Opjk1yJw@mail.gmail.com>
-Content-Language: en-GB
-Sender: linux-kernel-owner@vger.kernel.org
-To: Jintack Lim <jintack@cs.columbia.edu>, James Morse <james.morse@arm.com>
-Cc: KVM General <kvm@vger.kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux@armlinux.org.uk, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-arch-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20171003111100.GQ3611@e103592.cambridge.arm.com>
+Sender: linux-arch-owner@vger.kernel.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Will Deacon <will.deacon@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 03/10/17 22:11, Jintack Lim wrote:
-> Hi James,
+On Tue, Oct 03, 2017 at 12:11:01PM +0100, Dave P Martin wrote:
+> On Wed, Sep 20, 2017 at 02:58:56PM +0100, Catalin Marinas wrote:
+> > On Thu, Sep 14, 2017 at 08:55:56PM +0100, Dave P Martin wrote:
+> > > On Wed, Sep 13, 2017 at 07:33:25AM -0700, Catalin Marinas wrote:
+> > > > On Thu, Aug 31, 2017 at 06:00:43PM +0100, Dave P Martin wrote:
+> > > > > +/*
+> > > > > + * Handle SVE state across fork():
+> > > > > + *
+> > > > > + * dst and src must not end up with aliases of the same sve_state.
+> > > > > + * Because a task cannot fork except in a syscall, we can discard SVE
+> > > > > + * state for dst here, so long as we take care to retain the FPSIMD
+> > > > > + * subset of the state if SVE is in use.  Reallocation of the SVE state
+> > > > > + * will be deferred until dst tries to use SVE.
+> > > > > + */
+> > > > > +void fpsimd_dup_sve(struct task_struct *dst, struct task_struct const *src)
+> > > > > +{
+> > > > > +	if (test_and_clear_tsk_thread_flag(dst, TIF_SVE)) {
+> > > > > +		WARN_ON(dst->mm && !in_syscall(task_pt_regs(dst)));
+> > > > > +		sve_to_fpsimd(dst);
+> > > > > +	}
+> > > > > +
+> > > > > +	dst->thread.sve_state = NULL;
+> > > > > +}
+> > > > 
+> > > > I first thought the thread flags are not visible in dst yet since
+> > > > dup_task_struct() calls arch_dup_task_struct() before
+> > > > setup_thread_stack(). However, at the end of the last year we enabled
+> > > > CONFIG_THREAD_INFO_IN_TASK_STRUCT. But I don't particularly like relying
+> > > > on this.
+> > > 
+> > > Hmmm, I see your point, but there are some sequencing issues here.
+> > > 
+> > > > Anyway, IIUC we don't need sve_to_fpsimd() here. The
+> > > > arch_dup_task_struct() already called fpsimd_preserve_current_state()
+> > > 
+> > > I consider SVE discard as an optional side effect of task_fpsimd_save(),
+> > > not something that is guaranteed to happen -- the decision about whether
+> > > to do so may become more intelligent later on.  So, for src, we may
+> > > discard SVE (because syscall), but for dst we must NULL .sve_state (and
+> > > therefore clear TIF_SVE) simply to avoid aliasing of src->sve_state and
+> > > dst->sve_state.
+> > 
+> > My point was that the SVE state of src is already preserved at this
+> > point and copied into dst. You don't need the sve_to_fpsimd(dst) again
+> > which basically does the same copying of the src SVE saved state into
+> > the FPSIMD one in dst. This has already been done in
+> > arch_dup_task_struct() by the combination of
+> > fpsimd_preserve_current_state() and *dst = *src (and, of course,
+> > clearing TIF_SVE in dst).
+> > 
+> > I don't think the TIF_SVE clearing in src is just a side effect of
+> > task_fpsimd_save() here but rather a requirement. When returning from
+> > fork(), both src and dst would need to have the same state. However,
+> > your fpsimd_dup_sve() implementation makes it very clear that the SVE
+> > state is lost in dst. This is only allowed if we also lose it in src (as
+> > a result of a syscall). So making dst->sve_state = NULL requires that
+> > TIF_SVE is also cleared in both src and dst. Alternatively, you'd have
+> > to allocate a new state here and copy the full src SVE state across to
+> > dst, together with setting TIF_SVE (that's not necessary, however, since
+> > we get here as a result of a syscall).
 > 
-> On Tue, Oct 3, 2017 at 1:37 PM, James Morse <james.morse@arm.com> wrote:
->> Hi Jintack,
->>
->> On 03/10/17 04:11, Jintack Lim wrote:
->>> This design overview will help to digest the subsequent patches that
->>> implement AT instruction emulation.
->>
->>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->>> index 8d04926..d8728cc 100644
->>> --- a/arch/arm64/kvm/sys_regs.c
->>> +++ b/arch/arm64/kvm/sys_regs.c
->>> @@ -1621,6 +1621,72 @@ static bool access_id_aa64mmfr0_el1(struct kvm_vcpu *v,
->>>       { SYS_DESC(SYS_SP_EL2), NULL, reset_special, SP_EL2, 0},
->>>  };
->>>
->>> +/*
->>> + * AT instruction emulation
->>> + *
->>> + * We emulate AT instructions executed in the virtual EL2.
->>
->>> + * Basic strategy for the stage-1 translation emulation is to load proper
->>> + * context, which depends on the trapped instruction and the virtual HCR_EL2,
->>> + * to the EL1 virtual memory control registers and execute S1E[01] instructions
->>> + * in EL2. See below for more detail.
->>
->> What happens if the guest memory containing some stage1-page-table has been
->> unmapped from stage2? (e.g. its swapped to disk).
->>
->> (there is some background to this: I tried to implement the kvm_translate
->> ioctl() using this approach, running 'at s1e1*' from EL2. I ran into problems
->> when parts of the guest's stage1 page tables had been unmapped from stage2.)
->>
->> From memory, I found that the AT instructions would fault-in those pages when
->> run from EL1, but when executing the same instruction at EL2 they just failed
->> without any hint of which IPA needed mapping in.
-
-Let me see if I follow:
-
-AT S1E1 at EL1 should only generate a fault if the page table walking
-itself generates a fault (the guest page tables have been swapped out),
-and the fault is taken to EL2. At that point, that's a normal
-translation fault, which EL2 can easily resolve and restart the AT
-instruction. This is in fact no different from a faulting load/store.
-
-Doing the same thing at EL2 would simply indeed indicate a failed
-translation, and not generate a fault, which I think is what you're
-observing. After all, it is the hypervisor that unmapped those pages, it
-might as well properly track what is happening.
-
-It is a bit of an odd case because the AT here is executed at vEL2
-(EL1), and trapped to EL2 because of the NV bits. If it wasn't trapped,
-everything would just work. In this case, I can't see any other way but
-to walk the S1PT by hand, having put all the other vcpus on hold to
-avoid concurrent modifications... Yes, this sucks. If only AT could do
-partial walks...
-
-The saving grace is that this only happens in the unmapped S1PT case.
-The above can be used as a fallback if the AT S1 from EL2 actually fails.
-
-> I think I haven't encountered this case yet, probably because I
-> usually don't set a swap partition.
+> The currently intended ABI is that the SVE bits are unspecified after a
+> syscall, so it is legitimate (though perhaps surprising) for different
+> things to happen in dst and src.
 > 
-> In fact, I couldn't find pseudocode for AT instructions. If you
-> happened to have one, is that behavior you observed described in ARM
-> ARM?
+> This complicates things a lot though, just to avoid the next SVE usage
+> exception in src after the fork.
+> 
+> 
+> It should be simpler to do what you suggest and discard the SVE state of
+> src unconditionally before the copy: then we really are just cloning the
+> thread apart from the need to set dst->thread.sve_state to NULL.
+> 
+> fpsimd_preserve_current_state() does not necessarily write back to
+> current->thread.fpsmid_state though: at the moment, it does do this as a
+> side effect of task_fpsimd_save() because we happen to be in a syscall
+> (i.e., fork).  
+> 
+> What we really want is unconditional discarding of the state.  This
+> wasn't needed anywhere else yet, so there's no explicit helper for it.
+> But it makes sense to add one.
+> 
+> What about refactoring along these lines:
+> 
+> 
+> fpsimd.c:
+> /* Unconditionally discard the SVE state */
+> void task_sve_discard(struct task_struct *task)
+> {
+> 	if (!system_supports_sve())
+> 		return;
+> 
+> 	local_bh_disable();
+> 	if (test_and_clear_tsk_thread_flag(task, TIF_SVE))
+> 		sve_to_fpsimd(task);
+> 	local_bh_enable();
+> }
+> 
+> process.c:
+> int arch_dup_task_struct(sturct task_struct *dst, struct task_struct *src)
+> {
+> 	if (current->mm) {
+> 		fpsimd_preserve_current_state();
+> 		task_sve_discard(src);
+> 	}
+> 
+> 	*dst = *src;
+> 
+> 	dst->thread.sve_state = NULL;
+> }
+> 
+> 
+> This also avoids having to touch dst's thread flags, since now we
+> are just cloning the task except for assigning NULL to
+> dst->thread.sve_state.
 
-See J1.1.5 in the ARMv8 ARM Rev B.a, and the various comments indicating
-how this applies to Address Translation instructions. There is also some
-description of what is expected from the AT instructions in D4.2.11.
+This looks fine to me, the execution of task_sve_discard() is nearly a
+no-op with the current code.
 
-Thanks,
+We still have some local_bh_disable/enable() calls, though I don't think
+it's worth optimising them now (e.g. having a
+fpsimd_preserve_current_state_and_discard_sve() function with a
+"sve_discard" argument to task_fpsimd_save() to force this). 
 
-	M.
 -- 
-Jazz is not dead. It just smells funny...
+Catalin
