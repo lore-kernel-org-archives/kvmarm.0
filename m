@@ -1,25 +1,24 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 5/5] KVM: arm/arm64: kvm_arch_vcpu_runnable: don't miss
- injected irqs
-Date: Thu, 5 Oct 2017 10:37:32 +0100
-Message-ID: <f94ab402-e108-baf7-1d4f-9e465a5b0f7f@arm.com>
+Subject: Re: [PATCH 6/5] KVM: arm/arm64: make kvm_vgic_vcpu_pending_irq static
+Date: Thu, 5 Oct 2017 10:37:50 +0100
+Message-ID: <6237ec2a-5b3f-88a9-8b03-e7b8a3b9d7b7@arm.com>
 References: <20170929113041.24371-1-drjones@redhat.com>
- <20170929113041.24371-6-drjones@redhat.com>
+ <20171002083133.24051-1-drjones@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E554C49C43
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Oct 2017 05:37:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B738A49D0E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Oct 2017 05:37:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xH8fE5K-Nfz3 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  5 Oct 2017 05:37:10 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 130C649C27
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Oct 2017 05:37:10 -0400 (EDT)
-In-Reply-To: <20170929113041.24371-6-drjones@redhat.com>
+ with ESMTP id SChU5-Vm4Mci for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  5 Oct 2017 05:37:26 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9942149C43
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Oct 2017 05:37:26 -0400 (EDT)
+In-Reply-To: <20171002083133.24051-1-drjones@redhat.com>
 Content-Language: en-GB
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,42 +33,57 @@ To: Andrew Jones <drjones@redhat.com>, kvmarm@lists.cs.columbia.edu
 Cc: cdall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 29/09/17 12:30, Andrew Jones wrote:
-> When the vPMU is in use if a VCPU's perf event overflow handler
-> were to fire after the VCPU started waiting, then the wake up
-> done by the kvm_vcpu_kick() call in the handler would do nothing,
-> as no "pmu overflow" state is checked in kvm_arch_vcpu_runnable().
-> Fix this by checking the IRQ_PENDING VCPU request in runnable().
-> Checking the request also sufficiently covers all the cases that
-> kvm_vgic_vcpu_pending_irq() cover, so we can just replace that.
+On 02/10/17 09:31, Andrew Jones wrote:
+> Now that the only caller of kvm_vgic_vcpu_pending_irq() is in the
+> vgic code, let's make it private in order to discourage it's use
+> outside, as checking the IRQ_PENDING VCPU request is likely the
+> right thing for non-vgic code to do. Also, remove a vgic prototype
+> that was mistakenly introduced with 0919e84c0fc1, and along for the
+> ride ever since.
 > 
 > Signed-off-by: Andrew Jones <drjones@redhat.com>
 > ---
->  virt/kvm/arm/arm.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  include/kvm/arm_vgic.h   | 3 ---
+>  virt/kvm/arm/vgic/vgic.c | 2 +-
+>  2 files changed, 1 insertion(+), 4 deletions(-)
 > 
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index 5bc9b0d2fd0f..725527f491e4 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -423,7 +423,7 @@ int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu)
->  	return !vcpu_should_sleep(vcpu) &&
->  	       (vcpu->arch.mp_state != KVM_MP_STATE_HALTED ||
->  		(!!vcpu->arch.irq_lines ||
-> -		 kvm_vgic_vcpu_pending_irq(vcpu)));
-> +		 kvm_test_request(KVM_REQ_IRQ_PENDING, vcpu)));
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index 34dba516ef24..aade132d2a30 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -311,8 +311,6 @@ int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, u32 virt_irq, u32 phys_irq);
+>  int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq);
+>  bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq);
+>  
+> -int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
+> -
+>  void kvm_vgic_load(struct kvm_vcpu *vcpu);
+>  void kvm_vgic_put(struct kvm_vcpu *vcpu);
+>  
+> @@ -322,7 +320,6 @@ void kvm_vgic_put(struct kvm_vcpu *vcpu);
+>  #define vgic_valid_spi(k, i)	(((i) >= VGIC_NR_PRIVATE_IRQS) && \
+>  			((i) < (k)->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS))
+>  
+> -bool kvm_vcpu_has_pending_irqs(struct kvm_vcpu *vcpu);
+>  void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu);
+>  void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu);
+>  
+> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> index fed717e07938..72a16259beec 100644
+> --- a/virt/kvm/arm/vgic/vgic.c
+> +++ b/virt/kvm/arm/vgic/vgic.c
+> @@ -730,7 +730,7 @@ void kvm_vgic_put(struct kvm_vcpu *vcpu)
+>  		vgic_v3_put(vcpu);
 >  }
 >  
->  bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+> -int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
+> +static int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+>  	struct vgic_irq *irq;
 > 
 
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-
-On a side note, I just had a look at our usage of KVM_REQ_IRQ_PENDING,
-and we always seem to have a make_request/kick pair (which definitely
-makes sense). Maybe there is room for a bit of consolidation there too.
-
-Thanks,
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 
 	M.
 -- 
