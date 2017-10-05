@@ -1,22 +1,22 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH v3 05/20] arm64: entry.S: Remove disable_dbg
-Date: Thu,  5 Oct 2017 20:17:57 +0100
-Message-ID: <20171005191812.5678-6-james.morse@arm.com>
+Subject: [PATCH v3 02/20] arm64: introduce an order for exceptions
+Date: Thu,  5 Oct 2017 20:17:54 +0100
+Message-ID: <20171005191812.5678-3-james.morse@arm.com>
 References: <20171005191812.5678-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BAE849D19
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Oct 2017 15:19:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2853649D10
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Oct 2017 15:19:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id e3cB3LYoYbe0 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  5 Oct 2017 15:19:40 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E93749D22
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Oct 2017 15:19:40 -0400 (EDT)
+ with ESMTP id fZZnRCzY5DCv for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  5 Oct 2017 15:19:32 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C5C0349D18
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Oct 2017 15:19:32 -0400 (EDT)
 In-Reply-To: <20171005191812.5678-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,49 +31,105 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-enable_step_tsk is the only user of disable_dbg, which doesn't respect
-our 'dai' order for exception masking. enable_step_tsk may enable
-single-step, so previously needed to mask debug exceptions to prevent us
-from single-stepping kernel_exit. enable_step_tsk is called at the end
-of the ret_to_user loop, which has already masked all exceptions so this
-is no longer needed.
+Currently SError is always masked in the kernel. To support RAS exceptions
+using SError on hardware with the v8.2 RAS Extensions we need to unmask
+SError as much as possible.
 
-Remove disable_dbg, add a comment that enable_step_tsk's caller should
-have masked debug.
+Let's define an order for masking and unmasking exceptions. 'dai' is
+memorable and effectively what we have today.
+
+Disabling debug exceptions should cause all other exceptions to be masked.
+Masking SError should mask irq, but not disable debug exceptions.
+Masking irqs has no side effects for other flags. Keeping to this order
+makes it easier for entry.S to know which exceptions should be unmasked.
+
+FIQ is never expected, but we mask it when we mask debug exceptions, and
+unmask it at all other times.
+
+Given masking debug exceptions masks everything, we don't need macros
+to save/restore that bit independently. Remove them and switch the last
+caller over to {en,dis}able_daif().
 
 Signed-off-by: James Morse <james.morse@arm.com>
 ---
- arch/arm64/include/asm/assembler.h | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+ arch/arm64/include/asm/irqflags.h  | 34 +++++++++++++---------------------
+ arch/arm64/kernel/debug-monitors.c |  5 +++--
+ 2 files changed, 16 insertions(+), 23 deletions(-)
 
-diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
-index 114e741ca873..1b0972046a72 100644
---- a/arch/arm64/include/asm/assembler.h
-+++ b/arch/arm64/include/asm/assembler.h
-@@ -68,13 +68,6 @@
- 	msr	daif, \flags
- 	.endm
+diff --git a/arch/arm64/include/asm/irqflags.h b/arch/arm64/include/asm/irqflags.h
+index 8c581281fa12..9ecdca7011f0 100644
+--- a/arch/arm64/include/asm/irqflags.h
++++ b/arch/arm64/include/asm/irqflags.h
+@@ -21,6 +21,19 @@
+ #include <asm/ptrace.h>
  
--/*
-- * Enable and disable debug exceptions.
-- */
--	.macro	disable_dbg
--	msr	daifset, #8
--	.endm
+ /*
++ * Aarch64 has flags for masking: Debug, Asynchronous (serror), Interrupts and
++ * FIQ exceptions, in the 'daif' register. We mask and unmask them in 'dai'
++ * order:
++ * Masking debug exceptions causes all other exceptions to be masked too/
++ * Masking SError masks irq, but not debug exceptions. Masking irqs has no
++ * side effects for other flags. Keeping to this order makes it easier for
++ * entry.S to know which exceptions should be unmasked.
++ *
++ * FIQ is never expected, but we mask it when we disable debug exceptions, and
++ * unmask it at all other times.
++ */
++
++/*
+  * CPU interrupt mask handling.
+  */
+ static inline unsigned long arch_local_irq_save(void)
+@@ -89,26 +102,5 @@ static inline int arch_irqs_disabled_flags(unsigned long flags)
+ {
+ 	return flags & PSR_I_BIT;
+ }
 -
- 	.macro	enable_dbg
- 	msr	daifclr, #8
- 	.endm
-@@ -88,9 +81,9 @@
- 9990:
- 	.endm
+-/*
+- * save and restore debug state
+- */
+-#define local_dbg_save(flags)						\
+-	do {								\
+-		typecheck(unsigned long, flags);			\
+-		asm volatile(						\
+-		"mrs    %0, daif		// local_dbg_save\n"	\
+-		"msr    daifset, #8"					\
+-		: "=r" (flags) : : "memory");				\
+-	} while (0)
+-
+-#define local_dbg_restore(flags)					\
+-	do {								\
+-		typecheck(unsigned long, flags);			\
+-		asm volatile(						\
+-		"msr    daif, %0		// local_dbg_restore\n"	\
+-		: : "r" (flags) : "memory");				\
+-	} while (0)
+-
+ #endif
+ #endif
+diff --git a/arch/arm64/kernel/debug-monitors.c b/arch/arm64/kernel/debug-monitors.c
+index c7ef99904934..bbfa4978b657 100644
+--- a/arch/arm64/kernel/debug-monitors.c
++++ b/arch/arm64/kernel/debug-monitors.c
+@@ -30,6 +30,7 @@
  
-+	/* call with daif masked */
- 	.macro	enable_step_tsk, flgs, tmp
- 	tbz	\flgs, #TIF_SINGLESTEP, 9990f
--	disable_dbg
- 	mrs	\tmp, mdscr_el1
- 	orr	\tmp, \tmp, #1
- 	msr	mdscr_el1, \tmp
+ #include <asm/cpufeature.h>
+ #include <asm/cputype.h>
++#include <asm/daifflags.h>
+ #include <asm/debug-monitors.h>
+ #include <asm/system_misc.h>
+ 
+@@ -46,9 +47,9 @@ u8 debug_monitors_arch(void)
+ static void mdscr_write(u32 mdscr)
+ {
+ 	unsigned long flags;
+-	local_dbg_save(flags);
++	flags = local_mask_daif();
+ 	write_sysreg(mdscr, mdscr_el1);
+-	local_dbg_restore(flags);
++	local_restore_daif(flags);
+ }
+ NOKPROBE_SYMBOL(mdscr_write);
+ 
 -- 
 2.13.3
