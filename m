@@ -1,22 +1,22 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH v3 17/20] KVM: arm64: Save ESR_EL2 on guest SError
-Date: Thu,  5 Oct 2017 20:18:09 +0100
-Message-ID: <20171005191812.5678-18-james.morse@arm.com>
+Subject: [PATCH v3 18/20] KVM: arm64: Handle RAS SErrors from EL1 on guest exit
+Date: Thu,  5 Oct 2017 20:18:10 +0100
+Message-ID: <20171005191812.5678-19-james.morse@arm.com>
 References: <20171005191812.5678-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CCE4540A74
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Oct 2017 15:20:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8961749D0E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Oct 2017 15:20:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0k8LJGyKyanC for <kvmarm@lists.cs.columbia.edu>;
- Thu,  5 Oct 2017 15:20:24 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D360E40BC5
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Oct 2017 15:20:24 -0400 (EDT)
+ with ESMTP id Dm5-vciuWaHA for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  5 Oct 2017 15:20:27 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A374649D31
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Oct 2017 15:20:27 -0400 (EDT)
 In-Reply-To: <20171005191812.5678-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,54 +31,61 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When we exit a guest due to an SError the vcpu fault info isn't updated
-with the ESR. Today this is only done for traps.
+We expect to have firmware-first handling of RAS SErrors, with errors
+notified via an APEI method. For systems without firmware-first, add
+some minimal handling to KVM.
 
-The v8.2 RAS Extensions define ISS values for SError. Update the vcpu's
-fault_info with the ESR on SError so that handle_exit() can determine
-if this was a RAS SError and decode its severity.
+There are two ways KVM can take an SError due to a guest, either may be a
+RAS error: we exit the guest due to an SError routed to EL2 by HCR_EL2.AMO,
+or we take an SError from EL2 when we unmask PSTATE.A from __guest_exit.
+
+For SError that interrupt a guest and are routed to EL2 the existing
+behaviour is to inject an impdef SError into the guest.
+
+Add code to handle RAS SError based on the ESR. For uncontained errors
+arm64_is_blocking_ras_serror() will panic(), these errors compromise
+the host too. All other error types are contained: For the 'blocking'
+errors the vCPU can't make progress, so we inject a virtual SError.
+We ignore contained errors where we can make progress as if we're lucky,
+we may not hit them again.
 
 Signed-off-by: James Morse <james.morse@arm.com>
 ---
- arch/arm64/kvm/hyp/switch.c | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/handle_exit.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index af37658223a0..cba6d8ac105c 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -230,13 +230,20 @@ static bool __hyp_text __translate_far_to_hpfar(u64 far, u64 *hpfar)
- 	return true;
- }
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 7debb74843a0..345fdbba6c2e 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -28,12 +28,19 @@
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_mmu.h>
+ #include <asm/kvm_psci.h>
++#include <asm/traps.h>
  
-+static void __hyp_text __populate_fault_info_esr(struct kvm_vcpu *vcpu)
+ #define CREATE_TRACE_POINTS
+ #include "trace.h"
+ 
+ typedef int (*exit_handle_fn)(struct kvm_vcpu *, struct kvm_run *);
+ 
++static void kvm_handle_guest_serror(struct kvm_vcpu *vcpu, u32 esr)
 +{
-+	vcpu->arch.fault.esr_el2 = read_sysreg_el2(esr);
++	if (!arm64_is_ras_serror(esr) || arm64_blocking_ras_serror(NULL, esr))
++		kvm_inject_vabt(vcpu);
 +}
 +
- static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
+ static int handle_hvc(struct kvm_vcpu *vcpu, struct kvm_run *run)
  {
--	u64 esr = read_sysreg_el2(esr);
--	u8 ec = ESR_ELx_EC(esr);
-+	u8 ec;
-+	u64 esr;
- 	u64 hpfar, far;
- 
--	vcpu->arch.fault.esr_el2 = esr;
-+	__populate_fault_info_esr(vcpu);
-+	esr = vcpu->arch.fault.esr_el2;
-+	ec = ESR_ELx_EC(esr);
- 
- 	if (ec != ESR_ELx_EC_DABT_LOW && ec != ESR_ELx_EC_IABT_LOW)
- 		return true;
-@@ -325,6 +332,8 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	 */
- 	if (exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
- 		goto again;
-+	else if (ARM_EXCEPTION_CODE(exit_code) == ARM_EXCEPTION_EL1_SERROR)
-+		__populate_fault_info_esr(vcpu);
- 
- 	if (static_branch_unlikely(&vgic_v2_cpuif_trap) &&
- 	    exit_code == ARM_EXCEPTION_TRAP) {
+ 	int ret;
+@@ -211,7 +218,7 @@ int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 	case ARM_EXCEPTION_IRQ:
+ 		return 1;
+ 	case ARM_EXCEPTION_EL1_SERROR:
+-		kvm_inject_vabt(vcpu);
++		kvm_handle_guest_serror(vcpu, kvm_vcpu_get_hsr(vcpu));
+ 		return 1;
+ 	case ARM_EXCEPTION_TRAP:
+ 		/*
 -- 
 2.13.3
