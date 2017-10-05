@@ -1,90 +1,90 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 6/5] KVM: arm/arm64: make kvm_vgic_vcpu_pending_irq static
-Date: Thu, 5 Oct 2017 10:37:50 +0100
-Message-ID: <6237ec2a-5b3f-88a9-8b03-e7b8a3b9d7b7@arm.com>
-References: <20170929113041.24371-1-drjones@redhat.com>
- <20171002083133.24051-1-drjones@redhat.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH v2 10/28] arm64/sve: Low-level CPU setup
+Date: Thu, 5 Oct 2017 11:47:17 +0100
+Message-ID: <20171005104716.GV3611@e103592.cambridge.arm.com>
+References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com>
+ <1504198860-12951-11-git-send-email-Dave.Martin@arm.com>
+ <20170913133206.rwobtu7ft5nrsh4p@localhost>
+ <20170913192110.GE23415@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B738A49D0E
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Oct 2017 05:37:27 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SChU5-Vm4Mci for <kvmarm@lists.cs.columbia.edu>;
- Thu,  5 Oct 2017 05:37:26 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9942149C43
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Oct 2017 05:37:26 -0400 (EDT)
-In-Reply-To: <20171002083133.24051-1-drjones@redhat.com>
-Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>, kvmarm@lists.cs.columbia.edu
-Cc: cdall@linaro.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-arch-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20170913192110.GE23415@e103592.cambridge.arm.com>
+Sender: linux-arch-owner@vger.kernel.org
+To: Catalin Marinas <catalin.marinas@arm.com>, Suzuki Poulose <suzuki.poulose@arm.com>
+Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Will Deacon <will.deacon@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 02/10/17 09:31, Andrew Jones wrote:
-> Now that the only caller of kvm_vgic_vcpu_pending_irq() is in the
-> vgic code, let's make it private in order to discourage it's use
-> outside, as checking the IRQ_PENDING VCPU request is likely the
-> right thing for non-vgic code to do. Also, remove a vgic prototype
-> that was mistakenly introduced with 0919e84c0fc1, and along for the
-> ride ever since.
+On Wed, Sep 13, 2017 at 08:21:11PM +0100, Dave Martin wrote:
+> On Wed, Sep 13, 2017 at 06:32:06AM -0700, Catalin Marinas wrote:
+> > On Thu, Aug 31, 2017 at 06:00:42PM +0100, Dave P Martin wrote:
+> > > diff --git a/arch/arm64/mm/proc.S b/arch/arm64/mm/proc.S
+> > > index 877d42f..dd22ef2 100644
+> > > --- a/arch/arm64/mm/proc.S
+> > > +++ b/arch/arm64/mm/proc.S
+> > > @@ -27,6 +27,7 @@
+> > >  #include <asm/pgtable-hwdef.h>
+> > >  #include <asm/cpufeature.h>
+> > >  #include <asm/alternative.h>
+> > > +#include <asm/sysreg.h>
+> > >  
+> > >  #ifdef CONFIG_ARM64_64K_PAGES
+> > >  #define TCR_TG_FLAGS	TCR_TG0_64K | TCR_TG1_64K
+> > > @@ -186,8 +187,17 @@ ENTRY(__cpu_setup)
+> > >  	tlbi	vmalle1				// Invalidate local TLB
+> > >  	dsb	nsh
+> > >  
+> > > -	mov	x0, #3 << 20
+> > > -	msr	cpacr_el1, x0			// Enable FP/ASIMD
+> > > +	mov	x0, #3 << 20			// FEN
+> > > +
+> > > +	/* SVE */
+> > > +	mrs	x5, id_aa64pfr0_el1
+> > > +	ubfx	x5, x5, #ID_AA64PFR0_SVE_SHIFT, #4
+> > > +	cbz	x5, 1f
+> > > +
+> > > +	bic	x0, x0, #CPACR_EL1_ZEN
+> > > +	orr	x0, x0, #CPACR_EL1_ZEN_EL1EN	// SVE: trap for EL0, not EL1
+> > > +1:	msr	cpacr_el1, x0			// Enable FP/ASIMD
+> > 
+> > For EL1, I wonder whether we could move this later to cpufeature.c. IIRC
+> > I tried to do the same with FPSIMD but hit an issue with EFI run-time
+> > services (I may be wrong though).
 > 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  include/kvm/arm_vgic.h   | 3 ---
->  virt/kvm/arm/vgic/vgic.c | 2 +-
->  2 files changed, 1 insertion(+), 4 deletions(-)
+> I'll take a look at this -- I believe it should be safe to disable this
+> trap for EL1 relatively late.  This is needed before probing for
+> available vector lengths, but apart from that the kernel shouldn't touch
+> SVE until/unless some user task uses SVE.
 > 
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index 34dba516ef24..aade132d2a30 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -311,8 +311,6 @@ int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, u32 virt_irq, u32 phys_irq);
->  int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq);
->  bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq);
->  
-> -int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
-> -
->  void kvm_vgic_load(struct kvm_vcpu *vcpu);
->  void kvm_vgic_put(struct kvm_vcpu *vcpu);
->  
-> @@ -322,7 +320,6 @@ void kvm_vgic_put(struct kvm_vcpu *vcpu);
->  #define vgic_valid_spi(k, i)	(((i) >= VGIC_NR_PRIVATE_IRQS) && \
->  			((i) < (k)->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS))
->  
-> -bool kvm_vcpu_has_pending_irqs(struct kvm_vcpu *vcpu);
->  void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu);
->  void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu);
->  
-> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> index fed717e07938..72a16259beec 100644
-> --- a/virt/kvm/arm/vgic/vgic.c
-> +++ b/virt/kvm/arm/vgic/vgic.c
-> @@ -730,7 +730,7 @@ void kvm_vgic_put(struct kvm_vcpu *vcpu)
->  		vgic_v3_put(vcpu);
->  }
->  
-> -int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
-> +static int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
->  {
->  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
->  	struct vgic_irq *irq;
+> This would change if we eventually enable kernel-mode SVE, but I wouldn't
+> expect that to get used in early boot before the cpufeatures code runs.
 > 
+> Ard may have a view on this.
 
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+I've had a go at this, but there's a lot of splatter.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+I can add a helper el1_enable_sve() say, and call it before probing
+ZCR_EL1 in the cpufeatures code.
+
+This makes enabling SVE a side-effect of the cpufeatures code, which
+I'm not that comfortable with -- it feels like something that later
+refactoring could easily break.
+
+I can also add an explicit call to el1_enable_sve() in sve_setup(),
+but this only works on the boot cpu.
+
+For secondaries, I could add something in secondary_start_kernel(),
+but this looks incongruous since there's no other call to do something
+similar yet.
+
+
+** Suzuki, do we have any other case where the trap for a CPU feature is
+turned off by the cpufeatures code?  If there's already a template for
+this then I'm happy to follow it.
+
+Otherwise, maybe it's simpler to keep it in __cpu_setup after all
+since that's a common path that all CPUs pass through.
+
+Cheers
+---Dave
