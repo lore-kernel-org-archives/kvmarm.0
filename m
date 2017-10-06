@@ -1,119 +1,96 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v2 11/28] arm64/sve: Core task context handling
-Date: Fri, 6 Oct 2017 14:36:40 +0100
-Message-ID: <20171006133639.ialgglabo7yca5bm@armageddon.cambridge.arm.com>
-References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com>
- <1504198860-12951-12-git-send-email-Dave.Martin@arm.com>
- <20170913143325.hi4cfcajbts3bbao@localhost>
- <20171003113302.GR3611@e103592.cambridge.arm.com>
- <20171005112835.2rhaqx23bhe6tnwl@armageddon.cambridge.arm.com>
- <20171006131005.GA3611@e103592.cambridge.arm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v1 2/2] kvm: arm64: handle single-step of userspace mmio instructions
+Date: Fri, 06 Oct 2017 14:45:35 +0100
+Message-ID: <878tgoxudc.fsf@linaro.org>
+References: <20171006113921.24880-1-alex.bennee@linaro.org> <20171006113921.24880-3-alex.bennee@linaro.org> <a9f8905e-18e9-267a-2479-f498c248e2f4@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-arch-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20171006131005.GA3611@e103592.cambridge.arm.com>
-Sender: linux-arch-owner@vger.kernel.org
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Will Deacon <will.deacon@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-reply-to: <a9f8905e-18e9-267a-2479-f498c248e2f4@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Julien Thierry <julien.thierry@arm.com>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 06, 2017 at 02:10:09PM +0100, Dave P Martin wrote:
-> On Thu, Oct 05, 2017 at 12:28:35PM +0100, Catalin Marinas wrote:
-> > On Tue, Oct 03, 2017 at 12:33:03PM +0100, Dave P Martin wrote:
-> > > TIF_FOREIGN_FPSTATE's meaning is expanded to cover SVE, but otherwise
-> > > unchanged:
-> > > 
-> > >  * If a task is running and !TIF_FOREIGN_FPSTATE, then the the CPU
-> > >    registers of the CPU the task is running on contain the authoritative
-> > >    FPSIMD/SVE state of the task.  The backing memory may be stale.
-> > > 
-> > >  * Otherwise (i.e., task not running, or task running and
-> > >    TIF_FOREIGN_FPSTATE), the task's FPSIMD/SVE backing memory is
-> > >    authoritative.  If additionally per_cpu(fpsimd_last_state,
-> > >    task->fpsimd_state.cpu) == &task->fpsimd_state.cpu, then
-> > >    task->fpsimd_state.cpu's registers are also up to date for task, but
-> > >    not authorititive: the current FPSIMD/SVE state may be read from
-> > >    them, but they must not be written.
-> > >  
-> > > The FPSIMD/SVE backing memory is selected by TIF_SVE:
-> > > 
-> > >  * TIF_SVE set: Zn (incorporating Vn in bits[127:0]), Pn and FFR are
-> > >    stored in task->thread.sve_state, formatted appropriately for vector
-> > >    length task->thread.sve_vl.  task->thread.sve_state must point to a
-> > >    valid buffer at least sve_state_size(task) bytes in size.
 
-"Zn [...] stored in  task->thread.sve_state" - is this still true with
-the changes you proposed? I guess even without these changes, you have
-situations where the hardware regs are out of sync with sve_state (see
-more below).
+Julien Thierry <julien.thierry@arm.com> writes:
 
-> > >  * TIF_SVE clear: Vn are stored in task->fpsimd_state; Zn[max : 128] are
-> > >    logically zero[*] but not stored anywhere; Pn, FFR are not stored and
-> > >    have unspecified values from userspace's point of view.
-> > >    task->thread.sve_state does not need to be non-null, valid or any
-> > >    particular size: it must not be dereferenced.
-> > > 
-> > >    In practice I don't exploit the "unspecifiedness" much.  The Zn high
-> > >    bits, Pn and FFR are all zeroed when setting TIF_SVE again:
-> > >    sve_alloc() is the common path for this.
-> > > 
-> > >  * FPSR and FPCR are always stored in task->fpsimd_state irrespctive of
-> > >    whether TIF_SVE is clear or set, since these are not vector length
-> > >    dependent.
-[...]
-> > Just wondering, as an optimisation for do_sve_acc() - instead of
-> > sve_alloc() and fpsimd_to_sve(), can we not force the loading of the
-> > FPSIMD regs on the return to user via TIF_FOREIGN_FPSTATE? This would
-> > ensure the zeroing of the top SVE bits and we only need to allocate the
-> > SVE state on the saving path. This means enabling SVE for user and
-> > setting TIF_SVE without having the backing storage allocated.
-> 
-> Currently the set of places where the "TIF_SVE implies sve_state valid"
-> assumption is applied is not very constrained, so while your suggestion
-> is reasonable I'd rather not mess with it just now, if possible.
-> 
-> 
-> But we can do this (which is what my current fixup has):
-> 
-> el0_sve_acc:
-> 	enable_dbg_and_irq
-> 	// ...
-> 	bl	do_sve_acc
-> 	b	ret_to_user
-> 
-> void do_sve_acc(unsigned int esr, struct pt_regs *regs)
-> {
-> 	/* Even if we chose not to use SVE, the hardware could still trap: */
-> 	if (unlikely(!system_supports_sve()) || WARN_ON(is_compat_task())) {
-> 		force_signal_inject(SIGILL, ILL_ILLOPC, regs, 0);
-> 		return;
-> 	}
-> 
-> 	sve_alloc(current);
-> 
-> 	local_bh_disable();
-> 	if (test_and_clear_thread_flag(TIF_FOREIGN_FPSTATE)) {
-> 		task_fpsimd_load(); /* flushes high Zn bits as a side-effect */
-> 		sve_flush_pregs();
-> 	} else {
-> 		sve_flush_all(); /* flush all the SVE bits in-place */
-> 	}
-> 
-> 	if (test_and_set_thread_flag(TIF_SVE))
-> 		WARN_ON(1); /* SVE access shouldn't have trapped */
-> 	local_bh_enable();
-> }
-> 
-> where sve_flush_all() zeroes all the high Zn bits via a series of
-> MOV Vn, Vn instructions, and also zeroes Pn and FFR.  sve_fplush_pregs()
-> just does the latter.
+> On 06/10/17 12:39, Alex Benn=C3=A9e wrote:
+>> The system state of KVM when using userspace emulation is not complete
+>> until we return into KVM_RUN. To handle mmio related updates we wait
+>> until they have been committed and then schedule our KVM_EXIT_DEBUG.
+>>
+>> I've introduced a new function kvm_arm_maybe_return_debug() to wrap up
+>> the differences between arm/arm64 which is currently null for arm.
+>>
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> ---
+>>   arch/arm/include/asm/kvm_host.h   |  2 ++
+>>   arch/arm64/include/asm/kvm_host.h |  1 +
+>>   arch/arm64/kvm/debug.c            | 21 +++++++++++++++++++++
+>>   arch/arm64/kvm/handle_exit.c      |  9 +++------
+>>   virt/kvm/arm/arm.c                |  2 +-
+>>   virt/kvm/arm/mmio.c               |  3 ++-
+>>   6 files changed, 30 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_=
+host.h
+>> index 4a879f6ff13b..aec943f6d123 100644
+>> --- a/arch/arm/include/asm/kvm_host.h
+>> +++ b/arch/arm/include/asm/kvm_host.h
+>> @@ -285,6 +285,8 @@ static inline void kvm_arm_init_debug(void) {}
+>>   static inline void kvm_arm_setup_debug(struct kvm_vcpu *vcpu) {}
+>>   static inline void kvm_arm_clear_debug(struct kvm_vcpu *vcpu) {}
+>>   static inline void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu) {}
+>> +static inline int  kvm_arm_maybe_return_debug(struct kvm_vcpu *vcpu,
+>> +						struct kvm_run *run) {}
+>>
+>
+> This function should return 1.
 
-This looks fine to me but I added a comment above. IIUC, we can now have
-TIF_SVE set while sve_state contains stale data. I don't see an issue
-given that every time you enter the kernel from user space you have
-TIF_SVE set and the sve_state storage out of sync. Maybe tweak the
-TIF_SVE description above slightly.
+So I did ponder making this a bool, returning true if we need to exit
+and testing in v/k/a/arm.c exit leg rather than in the mmio handler.
 
--- 
-Catalin
+At the moment it mirrors the existing exit logic which follows -1 err, 0
+return, >0 handled. But as I mentioned in the cover letter this fell
+down a bit when dealing with the mmio case.
+
+>
+>>   int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
+>>   			       struct kvm_device_attr *attr);
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/=
+kvm_host.h
+>> index e923b58606e2..fa67d21662f6 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -369,6 +369,7 @@ void kvm_arm_init_debug(void);
+>>   void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
+>>   void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
+>>   void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
+>> +int  kvm_arm_maybe_return_debug(struct kvm_vcpu *vcpu, struct kvm_run *=
+run);
+>
+> I feel the name could be a little bit more explicit:
+>
+> kvm_arm_trap_need_step_debug, kvm_arm_trap_step_return_debug,
+> kvm_arm_trap_need_return_debug.
+
+I wanted to keep the debug suffix so that's fine although I'm not so
+sure trap is correct because on the tail end of mmio emulation are we
+still trapping?
+
+Maybe kvm_arm_step_emulated_debug?
+
+> At least, I think it would be nice that the name reflect that this
+> check is meant for emulated instructions.
+>
+> Otherwise:
+>
+> Reviewed-by: Julien Thierry <julien.thierry@arm.com>
+>
+> Thanks,
+
+
+--
+Alex Benn=C3=A9e
