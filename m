@@ -1,182 +1,82 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v2 11/28] arm64/sve: Core task context handling
-Date: Fri, 6 Oct 2017 14:10:09 +0100
-Message-ID: <20171006131005.GA3611@e103592.cambridge.arm.com>
-References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com>
- <1504198860-12951-12-git-send-email-Dave.Martin@arm.com>
- <20170913143325.hi4cfcajbts3bbao@localhost>
- <20171003113302.GR3611@e103592.cambridge.arm.com>
- <20171005112835.2rhaqx23bhe6tnwl@armageddon.cambridge.arm.com>
+From: Julien Thierry <julien.thierry@arm.com>
+Subject: Re: [PATCH v1 2/2] kvm: arm64: handle single-step of userspace mmio
+ instructions
+Date: Fri, 6 Oct 2017 14:13:38 +0100
+Message-ID: <a9f8905e-18e9-267a-2479-f498c248e2f4@arm.com>
+References: <20171006113921.24880-1-alex.bennee@linaro.org>
+ <20171006113921.24880-3-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-arch-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20171005112835.2rhaqx23bhe6tnwl@armageddon.cambridge.arm.com>
-Sender: linux-arch-owner@vger.kernel.org
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Will Deacon <will.deacon@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 893D549C26
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Oct 2017 09:13:14 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 64eUeXafGhLx for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 Oct 2017 09:13:13 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B52C405F9
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Oct 2017 09:13:13 -0400 (EDT)
+In-Reply-To: <20171006113921.24880-3-alex.bennee@linaro.org>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Russell King <linux@armlinux.org.uk>, open list <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Oct 05, 2017 at 12:28:35PM +0100, Catalin Marinas wrote:
-> On Tue, Oct 03, 2017 at 12:33:03PM +0100, Dave P Martin wrote:
-> > On Wed, Sep 13, 2017 at 07:33:25AM -0700, Catalin Marinas wrote:
-> > > On Thu, Aug 31, 2017 at 06:00:43PM +0100, Dave P Martin wrote:
-> > > > +/*
-> > > > + * Handle SVE state across fork():
-> > > > + *
-> > > > + * dst and src must not end up with aliases of the same sve_state.
-> > > > + * Because a task cannot fork except in a syscall, we can discard SVE
-> > > > + * state for dst here, so long as we take care to retain the FPSIMD
-> > > > + * subset of the state if SVE is in use.  Reallocation of the SVE state
-> > > > + * will be deferred until dst tries to use SVE.
-> > > > + */
-> > > > +void fpsimd_dup_sve(struct task_struct *dst, struct task_struct const *src)
-> > > > +{
-> > > > +	if (test_and_clear_tsk_thread_flag(dst, TIF_SVE)) {
-> > > > +		WARN_ON(dst->mm && !in_syscall(task_pt_regs(dst)));
-> > > > +		sve_to_fpsimd(dst);
-> > > > +	}
-> > > > +
-> > > > +	dst->thread.sve_state = NULL;
-> > > > +}
-> > > 
-> > > I first thought the thread flags are not visible in dst yet since
-> > > dup_task_struct() calls arch_dup_task_struct() before
-> > > setup_thread_stack(). However, at the end of the last year we enabled
-> > > CONFIG_THREAD_INFO_IN_TASK_STRUCT. But I don't particularly like relying
-> > > on this.
-> > > 
-> > > Anyway, IIUC we don't need sve_to_fpsimd() here. The
-> > > arch_dup_task_struct() already called fpsimd_preserve_current_state()
-> > > for src, so the FPSIMD state (which we care about) is transferred during
-> > > the *dst = *src assignment. So you'd only need the last statement,
-> > > possibly with a different function name like fpsimd_erase_sve (and maybe
-> > > make the function static inline in the header).
-> > 
-> > Regarding the intended meanings of the thread flags, does this help?
-> > 
-> > --8<--
-> > 
-> > TIF_FOREIGN_FPSTATE's meaning is expanded to cover SVE, but otherwise
-> > unchanged:
-> > 
-> >  * If a task is running and !TIF_FOREIGN_FPSTATE, then the the CPU
-> >    registers of the CPU the task is running on contain the authoritative
-> >    FPSIMD/SVE state of the task.  The backing memory may be stale.
-> > 
-> >  * Otherwise (i.e., task not running, or task running and
-> >    TIF_FOREIGN_FPSTATE), the task's FPSIMD/SVE backing memory is
-> >    authoritative.  If additionally per_cpu(fpsimd_last_state,
-> >    task->fpsimd_state.cpu) == &task->fpsimd_state.cpu, then
-> >    task->fpsimd_state.cpu's registers are also up to date for task, but
-> >    not authorititive: the current FPSIMD/SVE state may be read from
-> >    them, but they must not be written.
-> >  
-> > The FPSIMD/SVE backing memory is selected by TIF_SVE:
-> > 
-> >  * TIF_SVE set: Zn (incorporating Vn in bits[127:0]), Pn and FFR are
-> >    stored in task->thread.sve_state, formatted appropriately for vector
-> >    length task->thread.sve_vl.  task->thread.sve_state must point to a
-> >    valid buffer at least sve_state_size(task) bytes in size.
-> > 
-> >  * TIF_SVE clear: Vn are stored in task->fpsimd_state; Zn[max : 128] are
-> >    logically zero[*] but not stored anywhere; Pn, FFR are not stored and
-> >    have unspecified values from userspace's point of view.
-> >    task->thread.sve_state does not need to be non-null, valid or any
-> >    particular size: it must not be dereferenced.
-> > 
-> >    In practice I don't exploit the "unspecifiedness" much.  The Zn high
-> >    bits, Pn and FFR are all zeroed when setting TIF_SVE again:
-> >    sve_alloc() is the common path for this.
-> > 
-> >  * FPSR and FPCR are always stored in task->fpsimd_state irrespctive of
-> >    whether TIF_SVE is clear or set, since these are not vector length
-> >    dependent.
-> 
-> This looks fine. I think we need to make sure (with a warning) that
-> task_fpsimd_save() (and probably load) is always called in a
-> non-preemptible context. 
-> 
-> > [*] theoretically unspecified, which is what I've written in sve.txt.
-> > However, on any FPSIMD Vn write the upper bits of the corresponding Zn
-> > must become logically zero in order to conform to the SVE programmer's
-> > model.  It's not feasible to track which Vn have been written
-> > individually because that would involve trapping every FPSIMD insn until
-> > all possible Vn have been written.  So the kernel ensures that the Zn
-> > high bits become zero.
-> > 
-> > Maybe we should just guarantee "zero-or-preserved" behaviour for
-> > userspace.  This may close down some future optimisation opportunities,
-> > but maybe it's better to be simple.
-> 
-> Does it work if we leave it as "unspecified" in the document but just do
-> zero-or-preserved in the kernel code?
-
-Sure, that's the behaviour today in effect.
-
-I'll leave the documentation unchanged, then we can take advantage of
-this flexibility later if is proves to be useful.
-
-> Just wondering, as an optimisation for do_sve_acc() - instead of
-> sve_alloc() and fpsimd_to_sve(), can we not force the loading of the
-> FPSIMD regs on the return to user via TIF_FOREIGN_FPSTATE? This would
-> ensure the zeroing of the top SVE bits and we only need to allocate the
-> SVE state on the saving path. This means enabling SVE for user and
-> setting TIF_SVE without having the backing storage allocated.
-
-Currently the set of places where the "TIF_SVE implies sve_state valid"
-assumption is applied is not very constrained, so while your suggestion
-is reasonable I'd rather not mess with it just now, if possible.
-
-
-But we can do this (which is what my current fixup has):
-
-el0_sve_acc:
-	enable_dbg_and_irq
-	// ...
-	bl	do_sve_acc
-	b	ret_to_user
-
-void do_sve_acc(unsigned int esr, struct pt_regs *regs)
-{
-	/* Even if we chose not to use SVE, the hardware could still trap: */
-	if (unlikely(!system_supports_sve()) || WARN_ON(is_compat_task())) {
-		force_signal_inject(SIGILL, ILL_ILLOPC, regs, 0);
-		return;
-	}
-
-	sve_alloc(current);
-
-	local_bh_disable();
-	if (test_and_clear_thread_flag(TIF_FOREIGN_FPSTATE)) {
-		task_fpsimd_load(); /* flushes high Zn bits as a side-effect */
-		sve_flush_pregs();
-	} else {
-		sve_flush_all(); /* flush all the SVE bits in-place */
-	}
-
-	if (test_and_set_thread_flag(TIF_SVE))
-		WARN_ON(1); /* SVE access shouldn't have trapped */
-	local_bh_enable();
-}
-
-where sve_flush_all() zeroes all the high Zn bits via a series of
-MOV Vn, Vn instructions, and also zeroes Pn and FFR.  sve_fplush_pregs()
-just does the latter.
-
-In the common case the sve_alloc() does a memzero, but doesn't
-allocate memory because more often than not, it will already have
-been allocated.
-
-On this path, the memzero is now pointless -- I'll need to double-check
-what else may be impacted by its removal (probably only ptrace, and I'm
-not sure if the zeroing is strictly required there).
-
-
-There is still a bit of room for improvement, but it's still a step up
-from v2.
-
-What do you think?
-
-Cheers
----Dave
+CgpPbiAwNi8xMC8xNyAxMjozOSwgQWxleCBCZW5uw6llIHdyb3RlOgo+IFRoZSBzeXN0ZW0gc3Rh
+dGUgb2YgS1ZNIHdoZW4gdXNpbmcgdXNlcnNwYWNlIGVtdWxhdGlvbiBpcyBub3QgY29tcGxldGUK
+PiB1bnRpbCB3ZSByZXR1cm4gaW50byBLVk1fUlVOLiBUbyBoYW5kbGUgbW1pbyByZWxhdGVkIHVw
+ZGF0ZXMgd2Ugd2FpdAo+IHVudGlsIHRoZXkgaGF2ZSBiZWVuIGNvbW1pdHRlZCBhbmQgdGhlbiBz
+Y2hlZHVsZSBvdXIgS1ZNX0VYSVRfREVCVUcuCj4gCj4gSSd2ZSBpbnRyb2R1Y2VkIGEgbmV3IGZ1
+bmN0aW9uIGt2bV9hcm1fbWF5YmVfcmV0dXJuX2RlYnVnKCkgdG8gd3JhcCB1cAo+IHRoZSBkaWZm
+ZXJlbmNlcyBiZXR3ZWVuIGFybS9hcm02NCB3aGljaCBpcyBjdXJyZW50bHkgbnVsbCBmb3IgYXJt
+Lgo+IAo+IFNpZ25lZC1vZmYtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9y
+Zz4KPiAtLS0KPiAgIGFyY2gvYXJtL2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggICB8ICAyICsrCj4g
+ICBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggfCAgMSArCj4gICBhcmNoL2FybTY0
+L2t2bS9kZWJ1Zy5jICAgICAgICAgICAgfCAyMSArKysrKysrKysrKysrKysrKysrKysKPiAgIGFy
+Y2gvYXJtNjQva3ZtL2hhbmRsZV9leGl0LmMgICAgICB8ICA5ICsrKy0tLS0tLQo+ICAgdmlydC9r
+dm0vYXJtL2FybS5jICAgICAgICAgICAgICAgIHwgIDIgKy0KPiAgIHZpcnQva3ZtL2FybS9tbWlv
+LmMgICAgICAgICAgICAgICB8ICAzICsrLQo+ICAgNiBmaWxlcyBjaGFuZ2VkLCAzMCBpbnNlcnRp
+b25zKCspLCA4IGRlbGV0aW9ucygtKQo+IAo+IGRpZmYgLS1naXQgYS9hcmNoL2FybS9pbmNsdWRl
+L2FzbS9rdm1faG9zdC5oIGIvYXJjaC9hcm0vaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+IGluZGV4
+IDRhODc5ZjZmZjEzYi4uYWVjOTQzZjZkMTIzIDEwMDY0NAo+IC0tLSBhL2FyY2gvYXJtL2luY2x1
+ZGUvYXNtL2t2bV9ob3N0LmgKPiArKysgYi9hcmNoL2FybS9pbmNsdWRlL2FzbS9rdm1faG9zdC5o
+Cj4gQEAgLTI4NSw2ICsyODUsOCBAQCBzdGF0aWMgaW5saW5lIHZvaWQga3ZtX2FybV9pbml0X2Rl
+YnVnKHZvaWQpIHt9Cj4gICBzdGF0aWMgaW5saW5lIHZvaWQga3ZtX2FybV9zZXR1cF9kZWJ1Zyhz
+dHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpIHt9Cj4gICBzdGF0aWMgaW5saW5lIHZvaWQga3ZtX2FybV9j
+bGVhcl9kZWJ1ZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpIHt9Cj4gICBzdGF0aWMgaW5saW5lIHZv
+aWQga3ZtX2FybV9yZXNldF9kZWJ1Z19wdHIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KSB7fQo+ICtz
+dGF0aWMgaW5saW5lIGludCAga3ZtX2FybV9tYXliZV9yZXR1cm5fZGVidWcoc3RydWN0IGt2bV92
+Y3B1ICp2Y3B1LAo+ICsJCQkJCQlzdHJ1Y3Qga3ZtX3J1biAqcnVuKSB7fQo+ICAgCgpUaGlzIGZ1
+bmN0aW9uIHNob3VsZCByZXR1cm4gMS4KCj4gICBpbnQga3ZtX2FybV92Y3B1X2FyY2hfc2V0X2F0
+dHIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LAo+ICAgCQkJICAgICAgIHN0cnVjdCBrdm1fZGV2aWNl
+X2F0dHIgKmF0dHIpOwo+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9o
+b3N0LmggYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKPiBpbmRleCBlOTIzYjU4
+NjA2ZTIuLmZhNjdkMjE2NjJmNiAxMDA2NDQKPiAtLS0gYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNt
+L2t2bV9ob3N0LmgKPiArKysgYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKPiBA
+QCAtMzY5LDYgKzM2OSw3IEBAIHZvaWQga3ZtX2FybV9pbml0X2RlYnVnKHZvaWQpOwo+ICAgdm9p
+ZCBrdm1fYXJtX3NldHVwX2RlYnVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSk7Cj4gICB2b2lkIGt2
+bV9hcm1fY2xlYXJfZGVidWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KTsKPiAgIHZvaWQga3ZtX2Fy
+bV9yZXNldF9kZWJ1Z19wdHIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KTsKPiAraW50ICBrdm1fYXJt
+X21heWJlX3JldHVybl9kZWJ1ZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHN0cnVjdCBrdm1fcnVu
+ICpydW4pOwoKSSBmZWVsIHRoZSBuYW1lIGNvdWxkIGJlIGEgbGl0dGxlIGJpdCBtb3JlIGV4cGxp
+Y2l0OgoKa3ZtX2FybV90cmFwX25lZWRfc3RlcF9kZWJ1Zywga3ZtX2FybV90cmFwX3N0ZXBfcmV0
+dXJuX2RlYnVnLCAKa3ZtX2FybV90cmFwX25lZWRfcmV0dXJuX2RlYnVnLgoKQXQgbGVhc3QsIEkg
+dGhpbmsgaXQgd291bGQgYmUgbmljZSB0aGF0IHRoZSBuYW1lIHJlZmxlY3QgdGhhdCB0aGlzIGNo
+ZWNrIAppcyBtZWFudCBmb3IgZW11bGF0ZWQgaW5zdHJ1Y3Rpb25zLgoKT3RoZXJ3aXNlOgoKUmV2
+aWV3ZWQtYnk6IEp1bGllbiBUaGllcnJ5IDxqdWxpZW4udGhpZXJyeUBhcm0uY29tPgoKVGhhbmtz
+LAoKLS0gCkp1bGllbiBUaGllcnJ5Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlh
+LmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFy
+bQo=
