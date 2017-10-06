@@ -1,104 +1,182 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v1 1/2] KVM: arm64: handle single-stepping trapped
- instructions
-Date: Fri, 6 Oct 2017 13:46:05 +0100
-Message-ID: <789ebd83-6ece-027d-a623-067187b9d7df@arm.com>
-References: <20171006113921.24880-1-alex.bennee@linaro.org>
- <20171006113921.24880-2-alex.bennee@linaro.org>
- <d95a7ce1-1996-b0c6-4a2d-64af011c0c79@arm.com>
- <49ddad48-d3ce-43e2-7aae-f6cc66ef1fad@arm.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH v2 11/28] arm64/sve: Core task context handling
+Date: Fri, 6 Oct 2017 14:10:09 +0100
+Message-ID: <20171006131005.GA3611@e103592.cambridge.arm.com>
+References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com>
+ <1504198860-12951-12-git-send-email-Dave.Martin@arm.com>
+ <20170913143325.hi4cfcajbts3bbao@localhost>
+ <20171003113302.GR3611@e103592.cambridge.arm.com>
+ <20171005112835.2rhaqx23bhe6tnwl@armageddon.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <49ddad48-d3ce-43e2-7aae-f6cc66ef1fad@arm.com>
-Content-Language: en-GB
-Sender: linux-kernel-owner@vger.kernel.org
-To: Julien Thierry <julien.thierry@arm.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-arch-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20171005112835.2rhaqx23bhe6tnwl@armageddon.cambridge.arm.com>
+Sender: linux-arch-owner@vger.kernel.org
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Will Deacon <will.deacon@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 06/10/17 13:34, Julien Thierry wrote:
+On Thu, Oct 05, 2017 at 12:28:35PM +0100, Catalin Marinas wrote:
+> On Tue, Oct 03, 2017 at 12:33:03PM +0100, Dave P Martin wrote:
+> > On Wed, Sep 13, 2017 at 07:33:25AM -0700, Catalin Marinas wrote:
+> > > On Thu, Aug 31, 2017 at 06:00:43PM +0100, Dave P Martin wrote:
+> > > > +/*
+> > > > + * Handle SVE state across fork():
+> > > > + *
+> > > > + * dst and src must not end up with aliases of the same sve_state.
+> > > > + * Because a task cannot fork except in a syscall, we can discard SVE
+> > > > + * state for dst here, so long as we take care to retain the FPSIMD
+> > > > + * subset of the state if SVE is in use.  Reallocation of the SVE state
+> > > > + * will be deferred until dst tries to use SVE.
+> > > > + */
+> > > > +void fpsimd_dup_sve(struct task_struct *dst, struct task_struct const *src)
+> > > > +{
+> > > > +	if (test_and_clear_tsk_thread_flag(dst, TIF_SVE)) {
+> > > > +		WARN_ON(dst->mm && !in_syscall(task_pt_regs(dst)));
+> > > > +		sve_to_fpsimd(dst);
+> > > > +	}
+> > > > +
+> > > > +	dst->thread.sve_state = NULL;
+> > > > +}
+> > > 
+> > > I first thought the thread flags are not visible in dst yet since
+> > > dup_task_struct() calls arch_dup_task_struct() before
+> > > setup_thread_stack(). However, at the end of the last year we enabled
+> > > CONFIG_THREAD_INFO_IN_TASK_STRUCT. But I don't particularly like relying
+> > > on this.
+> > > 
+> > > Anyway, IIUC we don't need sve_to_fpsimd() here. The
+> > > arch_dup_task_struct() already called fpsimd_preserve_current_state()
+> > > for src, so the FPSIMD state (which we care about) is transferred during
+> > > the *dst = *src assignment. So you'd only need the last statement,
+> > > possibly with a different function name like fpsimd_erase_sve (and maybe
+> > > make the function static inline in the header).
+> > 
+> > Regarding the intended meanings of the thread flags, does this help?
+> > 
+> > --8<--
+> > 
+> > TIF_FOREIGN_FPSTATE's meaning is expanded to cover SVE, but otherwise
+> > unchanged:
+> > 
+> >  * If a task is running and !TIF_FOREIGN_FPSTATE, then the the CPU
+> >    registers of the CPU the task is running on contain the authoritative
+> >    FPSIMD/SVE state of the task.  The backing memory may be stale.
+> > 
+> >  * Otherwise (i.e., task not running, or task running and
+> >    TIF_FOREIGN_FPSTATE), the task's FPSIMD/SVE backing memory is
+> >    authoritative.  If additionally per_cpu(fpsimd_last_state,
+> >    task->fpsimd_state.cpu) == &task->fpsimd_state.cpu, then
+> >    task->fpsimd_state.cpu's registers are also up to date for task, but
+> >    not authorititive: the current FPSIMD/SVE state may be read from
+> >    them, but they must not be written.
+> >  
+> > The FPSIMD/SVE backing memory is selected by TIF_SVE:
+> > 
+> >  * TIF_SVE set: Zn (incorporating Vn in bits[127:0]), Pn and FFR are
+> >    stored in task->thread.sve_state, formatted appropriately for vector
+> >    length task->thread.sve_vl.  task->thread.sve_state must point to a
+> >    valid buffer at least sve_state_size(task) bytes in size.
+> > 
+> >  * TIF_SVE clear: Vn are stored in task->fpsimd_state; Zn[max : 128] are
+> >    logically zero[*] but not stored anywhere; Pn, FFR are not stored and
+> >    have unspecified values from userspace's point of view.
+> >    task->thread.sve_state does not need to be non-null, valid or any
+> >    particular size: it must not be dereferenced.
+> > 
+> >    In practice I don't exploit the "unspecifiedness" much.  The Zn high
+> >    bits, Pn and FFR are all zeroed when setting TIF_SVE again:
+> >    sve_alloc() is the common path for this.
+> > 
+> >  * FPSR and FPCR are always stored in task->fpsimd_state irrespctive of
+> >    whether TIF_SVE is clear or set, since these are not vector length
+> >    dependent.
 > 
+> This looks fine. I think we need to make sure (with a warning) that
+> task_fpsimd_save() (and probably load) is always called in a
+> non-preemptible context. 
 > 
-> On 06/10/17 13:27, Marc Zyngier wrote:
->> On 06/10/17 12:39, Alex Bennée wrote:
->>> If we are using guest debug to single-step the guest we need to ensure
->>> we exit after emulating the instruction. This only affects
->>> instructions completely emulated by the kernel. For userspace emulated
->>> instructions we need to exit and return to complete the emulation.
->>>
->>> We fake debug.arch.hsr to contain ESR_ELx_EC_SOFTSTP_LOW so QEMU knows
->>> it was a single-step event (and without altering the userspace ABI).
->>>
->>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->>> ---
->>>   arch/arm64/kvm/handle_exit.c | 48 +++++++++++++++++++++++++++++++-------------
->>>   1 file changed, 34 insertions(+), 14 deletions(-)
->>>
->>> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
->>> index 7debb74843a0..c918d291cb58 100644
->>> --- a/arch/arm64/kvm/handle_exit.c
->>> +++ b/arch/arm64/kvm/handle_exit.c
->>> @@ -178,6 +178,39 @@ static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
->>>   	return arm_exit_handlers[hsr_ec];
->>>   }
->>>   
->>> +/*
->>> + * When handling traps we need to ensure exit the guest if we
->>> + * completely emulated the instruction while single-stepping. Stuff to
->>> + * be emulated in userspace needs to complete that first.
->>> + */
->>> +
->>> +static int handle_trap_exceptions(struct kvm_vcpu *vcpu, struct kvm_run *run)
->>> +{
->>> +	int handled;
->>> +
->>> +	/*
->>> +	 * See ARM ARM B1.14.1: "Hyp traps on instructions
->>> +	 * that fail their condition code check"
->>> +	 */
->>> +	if (!kvm_condition_valid(vcpu)) {
->>> +		kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
->>> +		handled = 1;
->>> +	} else {
->>> +		exit_handle_fn exit_handler;
->>> +
->>> +		exit_handler = kvm_get_exit_handler(vcpu);
->>> +		handled = exit_handler(vcpu, run);
->>> +	}
->>> +
->>> +	if (handled && (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)) {
->>> +		handled = 0;
->>> +		run->exit_reason = KVM_EXIT_DEBUG;
->>> +		run->debug.arch.hsr = ESR_ELx_EC_SOFTSTP_LOW << ESR_ELx_EC_SHIFT;
->>> +	}
->>
->> Doesn't this break an MMIO read? The registers haven't been updated yet,
->> and the debugger may not see the right thing...
->>
->> How about something like:
->>
->> 	if (handled && (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)) {
->> 		if (run->exit_reason == KVM_EXIT_MMIO)
->> 			kvm_handle_mmio_return(vcpu, run);
->> 		[...]
->> 	}
->>
->> Or am I missing something?
+> > [*] theoretically unspecified, which is what I've written in sve.txt.
+> > However, on any FPSIMD Vn write the upper bits of the corresponding Zn
+> > must become logically zero in order to conform to the SVE programmer's
+> > model.  It's not feasible to track which Vn have been written
+> > individually because that would involve trapping every FPSIMD insn until
+> > all possible Vn have been written.  So the kernel ensures that the Zn
+> > high bits become zero.
+> > 
+> > Maybe we should just guarantee "zero-or-preserved" behaviour for
+> > userspace.  This may close down some future optimisation opportunities,
+> > but maybe it's better to be simple.
 > 
-> If the MMIO was not handled by the kernel, exit_handler will return 0, 
-> so handled will be false and we won't pretend we have a debug exception 
-> (but will still return to userland with KVM_EXIT_MMIO).
-> 
-> I think the second patch takes care of properly handling single step for 
-> userland MMIO.
+> Does it work if we leave it as "unspecified" in the document but just do
+> zero-or-preserved in the kernel code?
 
-Indeed, I was just confused. We do have a kvm_handle_mmio_return in the
-vgic emulation, so it is all taken care off at this stage. Blimey.
+Sure, that's the behaviour today in effect.
 
-Thanks,
+I'll leave the documentation unchanged, then we can take advantage of
+this flexibility later if is proves to be useful.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+> Just wondering, as an optimisation for do_sve_acc() - instead of
+> sve_alloc() and fpsimd_to_sve(), can we not force the loading of the
+> FPSIMD regs on the return to user via TIF_FOREIGN_FPSTATE? This would
+> ensure the zeroing of the top SVE bits and we only need to allocate the
+> SVE state on the saving path. This means enabling SVE for user and
+> setting TIF_SVE without having the backing storage allocated.
+
+Currently the set of places where the "TIF_SVE implies sve_state valid"
+assumption is applied is not very constrained, so while your suggestion
+is reasonable I'd rather not mess with it just now, if possible.
+
+
+But we can do this (which is what my current fixup has):
+
+el0_sve_acc:
+	enable_dbg_and_irq
+	// ...
+	bl	do_sve_acc
+	b	ret_to_user
+
+void do_sve_acc(unsigned int esr, struct pt_regs *regs)
+{
+	/* Even if we chose not to use SVE, the hardware could still trap: */
+	if (unlikely(!system_supports_sve()) || WARN_ON(is_compat_task())) {
+		force_signal_inject(SIGILL, ILL_ILLOPC, regs, 0);
+		return;
+	}
+
+	sve_alloc(current);
+
+	local_bh_disable();
+	if (test_and_clear_thread_flag(TIF_FOREIGN_FPSTATE)) {
+		task_fpsimd_load(); /* flushes high Zn bits as a side-effect */
+		sve_flush_pregs();
+	} else {
+		sve_flush_all(); /* flush all the SVE bits in-place */
+	}
+
+	if (test_and_set_thread_flag(TIF_SVE))
+		WARN_ON(1); /* SVE access shouldn't have trapped */
+	local_bh_enable();
+}
+
+where sve_flush_all() zeroes all the high Zn bits via a series of
+MOV Vn, Vn instructions, and also zeroes Pn and FFR.  sve_fplush_pregs()
+just does the latter.
+
+In the common case the sve_alloc() does a memzero, but doesn't
+allocate memory because more often than not, it will already have
+been allocated.
+
+On this path, the memzero is now pointless -- I'll need to double-check
+what else may be impacted by its removal (probably only ptrace, and I'm
+not sure if the zeroing is strictly required there).
+
+
+There is still a bit of room for improvement, but it's still a step up
+from v2.
+
+What do you think?
+
+Cheers
+---Dave
