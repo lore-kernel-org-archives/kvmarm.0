@@ -1,118 +1,88 @@
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v1 2/2] kvm: arm64: handle single-step of userspace mmio
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v1 1/2] KVM: arm64: handle single-stepping trapped
  instructions
-Date: Fri,  6 Oct 2017 12:39:21 +0100
-Message-ID: <20171006113921.24880-3-alex.bennee@linaro.org>
+Date: Fri, 6 Oct 2017 13:27:22 +0100
+Message-ID: <d95a7ce1-1996-b0c6-4a2d-64af011c0c79@arm.com>
 References: <20171006113921.24880-1-alex.bennee@linaro.org>
+ <20171006113921.24880-2-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E0AF40A74
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Oct 2017 07:38:59 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id G6tCoVPO8pwG for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 Oct 2017 07:38:57 -0400 (EDT)
-Received: from mail-wr0-f171.google.com (mail-wr0-f171.google.com
- [209.85.128.171])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 21F1349D22
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Oct 2017 07:38:57 -0400 (EDT)
-Received: by mail-wr0-f171.google.com with SMTP id z1so4041019wre.3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 06 Oct 2017 04:39:25 -0700 (PDT)
-In-Reply-To: <20171006113921.24880-1-alex.bennee@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: julien.thierry@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Russell King <linux@armlinux.org.uk>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20171006113921.24880-2-alex.bennee@linaro.org>
+Content-Language: en-GB
+Sender: linux-kernel-owner@vger.kernel.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, julien.thierry@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VGhlIHN5c3RlbSBzdGF0ZSBvZiBLVk0gd2hlbiB1c2luZyB1c2Vyc3BhY2UgZW11bGF0aW9uIGlz
-IG5vdCBjb21wbGV0ZQp1bnRpbCB3ZSByZXR1cm4gaW50byBLVk1fUlVOLiBUbyBoYW5kbGUgbW1p
-byByZWxhdGVkIHVwZGF0ZXMgd2Ugd2FpdAp1bnRpbCB0aGV5IGhhdmUgYmVlbiBjb21taXR0ZWQg
-YW5kIHRoZW4gc2NoZWR1bGUgb3VyIEtWTV9FWElUX0RFQlVHLgoKSSd2ZSBpbnRyb2R1Y2VkIGEg
-bmV3IGZ1bmN0aW9uIGt2bV9hcm1fbWF5YmVfcmV0dXJuX2RlYnVnKCkgdG8gd3JhcCB1cAp0aGUg
-ZGlmZmVyZW5jZXMgYmV0d2VlbiBhcm0vYXJtNjQgd2hpY2ggaXMgY3VycmVudGx5IG51bGwgZm9y
-IGFybS4KClNpZ25lZC1vZmYtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9y
-Zz4KLS0tCiBhcmNoL2FybS9pbmNsdWRlL2FzbS9rdm1faG9zdC5oICAgfCAgMiArKwogYXJjaC9h
-cm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oIHwgIDEgKwogYXJjaC9hcm02NC9rdm0vZGVidWcu
-YyAgICAgICAgICAgIHwgMjEgKysrKysrKysrKysrKysrKysrKysrCiBhcmNoL2FybTY0L2t2bS9o
-YW5kbGVfZXhpdC5jICAgICAgfCAgOSArKystLS0tLS0KIHZpcnQva3ZtL2FybS9hcm0uYyAgICAg
-ICAgICAgICAgICB8ICAyICstCiB2aXJ0L2t2bS9hcm0vbW1pby5jICAgICAgICAgICAgICAgfCAg
-MyArKy0KIDYgZmlsZXMgY2hhbmdlZCwgMzAgaW5zZXJ0aW9ucygrKSwgOCBkZWxldGlvbnMoLSkK
-CmRpZmYgLS1naXQgYS9hcmNoL2FybS9pbmNsdWRlL2FzbS9rdm1faG9zdC5oIGIvYXJjaC9hcm0v
-aW5jbHVkZS9hc20va3ZtX2hvc3QuaAppbmRleCA0YTg3OWY2ZmYxM2IuLmFlYzk0M2Y2ZDEyMyAx
-MDA2NDQKLS0tIGEvYXJjaC9hcm0vaW5jbHVkZS9hc20va3ZtX2hvc3QuaAorKysgYi9hcmNoL2Fy
-bS9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCkBAIC0yODUsNiArMjg1LDggQEAgc3RhdGljIGlubGlu
-ZSB2b2lkIGt2bV9hcm1faW5pdF9kZWJ1Zyh2b2lkKSB7fQogc3RhdGljIGlubGluZSB2b2lkIGt2
-bV9hcm1fc2V0dXBfZGVidWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KSB7fQogc3RhdGljIGlubGlu
-ZSB2b2lkIGt2bV9hcm1fY2xlYXJfZGVidWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KSB7fQogc3Rh
-dGljIGlubGluZSB2b2lkIGt2bV9hcm1fcmVzZXRfZGVidWdfcHRyKHN0cnVjdCBrdm1fdmNwdSAq
-dmNwdSkge30KK3N0YXRpYyBpbmxpbmUgaW50ICBrdm1fYXJtX21heWJlX3JldHVybl9kZWJ1Zyhz
-dHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCisJCQkJCQlzdHJ1Y3Qga3ZtX3J1biAqcnVuKSB7fQogCiBp
-bnQga3ZtX2FybV92Y3B1X2FyY2hfc2V0X2F0dHIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LAogCQkJ
-ICAgICAgIHN0cnVjdCBrdm1fZGV2aWNlX2F0dHIgKmF0dHIpOwpkaWZmIC0tZ2l0IGEvYXJjaC9h
-cm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oIGIvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1f
-aG9zdC5oCmluZGV4IGU5MjNiNTg2MDZlMi4uZmE2N2QyMTY2MmY2IDEwMDY0NAotLS0gYS9hcmNo
-L2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKKysrIGIvYXJjaC9hcm02NC9pbmNsdWRlL2Fz
-bS9rdm1faG9zdC5oCkBAIC0zNjksNiArMzY5LDcgQEAgdm9pZCBrdm1fYXJtX2luaXRfZGVidWco
-dm9pZCk7CiB2b2lkIGt2bV9hcm1fc2V0dXBfZGVidWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KTsK
-IHZvaWQga3ZtX2FybV9jbGVhcl9kZWJ1ZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpOwogdm9pZCBr
-dm1fYXJtX3Jlc2V0X2RlYnVnX3B0cihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpOworaW50ICBrdm1f
-YXJtX21heWJlX3JldHVybl9kZWJ1ZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHN0cnVjdCBrdm1f
-cnVuICpydW4pOwogaW50IGt2bV9hcm1fdmNwdV9hcmNoX3NldF9hdHRyKHN0cnVjdCBrdm1fdmNw
-dSAqdmNwdSwKIAkJCSAgICAgICBzdHJ1Y3Qga3ZtX2RldmljZV9hdHRyICphdHRyKTsKIGludCBr
-dm1fYXJtX3ZjcHVfYXJjaF9nZXRfYXR0cihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCmRpZmYgLS1n
-aXQgYS9hcmNoL2FybTY0L2t2bS9kZWJ1Zy5jIGIvYXJjaC9hcm02NC9rdm0vZGVidWcuYwppbmRl
-eCBkYmFkZmFmODUwYTcuLmExMGExOGM1NWM4NyAxMDA2NDQKLS0tIGEvYXJjaC9hcm02NC9rdm0v
-ZGVidWcuYworKysgYi9hcmNoL2FybTY0L2t2bS9kZWJ1Zy5jCkBAIC0yMjEsMyArMjIxLDI0IEBA
-IHZvaWQga3ZtX2FybV9jbGVhcl9kZWJ1ZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCiAJCX0KIAl9
-CiB9CisKKworLyoKKyAqIFdoZW4gS1ZNIGhhcyBzdWNjZXNzZnVsbHkgZW11bGF0ZWQgdGhlIGlu
-c3RydWN0aW9uIHdlIG1pZ2h0IHdhbnQgdG8KKyAqIHJldHVybiB3ZSBhIEtWTV9FWElUX0RFQlVH
-LiBXZSBjYW4gb25seSBkbyB0aGlzIG9uY2UgdGhlIGVtdWxhdGlvbgorICogaXMgY29tcGxldGUg
-dGhvdWdoIHNvIGZvciB1c2Vyc3BhY2UgZW11bGF0aW9ucyB3ZSBoYXZlIHRvIHdhaXQKKyAqIHVu
-dGlsIHdlIGhhdmUgcmUtZW50ZXJlZCBLVk0uCisgKgorICogUmV0dXJuID4gMCB0byByZXR1cm4g
-dG8gZ3Vlc3QsIDAgKGFuZCBzZXQgZXhpdF9yZWFzb24pIG9uIHByb3BlcgorICogZXhpdCB0byB1
-c2Vyc3BhY2UuCisgKi8KKworaW50IGt2bV9hcm1fbWF5YmVfcmV0dXJuX2RlYnVnKHN0cnVjdCBr
-dm1fdmNwdSAqdmNwdSwgc3RydWN0IGt2bV9ydW4gKnJ1bikKK3sKKwlpZiAodmNwdS0+Z3Vlc3Rf
-ZGVidWcgJiBLVk1fR1VFU1REQkdfU0lOR0xFU1RFUCkgeworCQlydW4tPmV4aXRfcmVhc29uID0g
-S1ZNX0VYSVRfREVCVUc7CisJCXJ1bi0+ZGVidWcuYXJjaC5oc3IgPSBFU1JfRUx4X0VDX1NPRlRT
-VFBfTE9XIDw8IEVTUl9FTHhfRUNfU0hJRlQ7CisJCXJldHVybiAwOworCX0KKwlyZXR1cm4gMTsK
-K30KZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL2hhbmRsZV9leGl0LmMgYi9hcmNoL2FybTY0
-L2t2bS9oYW5kbGVfZXhpdC5jCmluZGV4IGM5MThkMjkxY2I1OC4uN2IwNGY1OTIxN2JmIDEwMDY0
-NAotLS0gYS9hcmNoL2FybTY0L2t2bS9oYW5kbGVfZXhpdC5jCisrKyBiL2FyY2gvYXJtNjQva3Zt
-L2hhbmRsZV9leGl0LmMKQEAgLTIwMiwxMyArMjAyLDEwIEBAIHN0YXRpYyBpbnQgaGFuZGxlX3Ry
-YXBfZXhjZXB0aW9ucyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHN0cnVjdCBrdm1fcnVuICpydW4p
-CiAJCWhhbmRsZWQgPSBleGl0X2hhbmRsZXIodmNwdSwgcnVuKTsKIAl9CiAKLQlpZiAoaGFuZGxl
-ZCAmJiAodmNwdS0+Z3Vlc3RfZGVidWcgJiBLVk1fR1VFU1REQkdfU0lOR0xFU1RFUCkpIHsKLQkJ
-aGFuZGxlZCA9IDA7Ci0JCXJ1bi0+ZXhpdF9yZWFzb24gPSBLVk1fRVhJVF9ERUJVRzsKLQkJcnVu
-LT5kZWJ1Zy5hcmNoLmhzciA9IEVTUl9FTHhfRUNfU09GVFNUUF9MT1cgPDwgRVNSX0VMeF9FQ19T
-SElGVDsKLQl9CisJaWYgKGhhbmRsZWQpCisJCXJldHVybiBrdm1fYXJtX21heWJlX3JldHVybl9k
-ZWJ1Zyh2Y3B1LCBydW4pOwogCi0JcmV0dXJuIGhhbmRsZWQ7CisJcmV0dXJuIDA7CiB9CiAKIC8q
-CmRpZmYgLS1naXQgYS92aXJ0L2t2bS9hcm0vYXJtLmMgYi92aXJ0L2t2bS9hcm0vYXJtLmMKaW5k
-ZXggYjlmNjhlNGFkZDcxLi4zZDI4ZmUyZGFhMjYgMTAwNjQ0Ci0tLSBhL3ZpcnQva3ZtL2FybS9h
-cm0uYworKysgYi92aXJ0L2t2bS9hcm0vYXJtLmMKQEAgLTYyMyw3ICs2MjMsNyBAQCBpbnQga3Zt
-X2FyY2hfdmNwdV9pb2N0bF9ydW4oc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBzdHJ1Y3Qga3ZtX3J1
-biAqcnVuKQogCiAJaWYgKHJ1bi0+ZXhpdF9yZWFzb24gPT0gS1ZNX0VYSVRfTU1JTykgewogCQly
-ZXQgPSBrdm1faGFuZGxlX21taW9fcmV0dXJuKHZjcHUsIHZjcHUtPnJ1bik7Ci0JCWlmIChyZXQp
-CisJCWlmIChyZXQgPCAxKQogCQkJcmV0dXJuIHJldDsKIAl9CiAKZGlmZiAtLWdpdCBhL3ZpcnQv
-a3ZtL2FybS9tbWlvLmMgYi92aXJ0L2t2bS9hcm0vbW1pby5jCmluZGV4IGI2ZTcxNWZkM2M5MC4u
-ZTQzZTNiZDYyMjJmIDEwMDY0NAotLS0gYS92aXJ0L2t2bS9hcm0vbW1pby5jCisrKyBiL3ZpcnQv
-a3ZtL2FybS9tbWlvLmMKQEAgLTExNyw3ICsxMTcsOCBAQCBpbnQga3ZtX2hhbmRsZV9tbWlvX3Jl
-dHVybihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHN0cnVjdCBrdm1fcnVuICpydW4pCiAJCXZjcHVf
-c2V0X3JlZyh2Y3B1LCB2Y3B1LT5hcmNoLm1taW9fZGVjb2RlLnJ0LCBkYXRhKTsKIAl9CiAKLQly
-ZXR1cm4gMDsKKwkvKiBJZiBkZWJ1Z2dpbmcgaW4gZWZmZWN0IHdlIG1heSBuZWVkIHRvIHJldHVy
-biBub3cgKi8KKwlyZXR1cm4ga3ZtX2FybV9tYXliZV9yZXR1cm5fZGVidWcodmNwdSwgcnVuKTsK
-IH0KIAogc3RhdGljIGludCBkZWNvZGVfaHNyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgYm9vbCAq
-aXNfd3JpdGUsIGludCAqbGVuKQotLSAKMi4xNC4xCgpfX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5j
-cy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0
-aW5mby9rdm1hcm0K
+On 06/10/17 12:39, Alex Bennée wrote:
+> If we are using guest debug to single-step the guest we need to ensure
+> we exit after emulating the instruction. This only affects
+> instructions completely emulated by the kernel. For userspace emulated
+> instructions we need to exit and return to complete the emulation.
+> 
+> We fake debug.arch.hsr to contain ESR_ELx_EC_SOFTSTP_LOW so QEMU knows
+> it was a single-step event (and without altering the userspace ABI).
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  arch/arm64/kvm/handle_exit.c | 48 +++++++++++++++++++++++++++++++-------------
+>  1 file changed, 34 insertions(+), 14 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index 7debb74843a0..c918d291cb58 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -178,6 +178,39 @@ static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
+>  	return arm_exit_handlers[hsr_ec];
+>  }
+>  
+> +/*
+> + * When handling traps we need to ensure exit the guest if we
+> + * completely emulated the instruction while single-stepping. Stuff to
+> + * be emulated in userspace needs to complete that first.
+> + */
+> +
+> +static int handle_trap_exceptions(struct kvm_vcpu *vcpu, struct kvm_run *run)
+> +{
+> +	int handled;
+> +
+> +	/*
+> +	 * See ARM ARM B1.14.1: "Hyp traps on instructions
+> +	 * that fail their condition code check"
+> +	 */
+> +	if (!kvm_condition_valid(vcpu)) {
+> +		kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+> +		handled = 1;
+> +	} else {
+> +		exit_handle_fn exit_handler;
+> +
+> +		exit_handler = kvm_get_exit_handler(vcpu);
+> +		handled = exit_handler(vcpu, run);
+> +	}
+> +
+> +	if (handled && (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)) {
+> +		handled = 0;
+> +		run->exit_reason = KVM_EXIT_DEBUG;
+> +		run->debug.arch.hsr = ESR_ELx_EC_SOFTSTP_LOW << ESR_ELx_EC_SHIFT;
+> +	}
+
+Doesn't this break an MMIO read? The registers haven't been updated yet,
+and the debugger may not see the right thing...
+
+How about something like:
+
+	if (handled && (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)) {
+		if (run->exit_reason == KVM_EXIT_MMIO)
+			kvm_handle_mmio_return(vcpu, run);
+		[...]
+	}
+
+Or am I missing something?
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
