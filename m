@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v4 24/26] KVM: arm/arm64: GICv4: Enable VLPI support
-Date: Fri,  6 Oct 2017 16:33:59 +0100
-Message-ID: <20171006153401.5481-25-marc.zyngier@arm.com>
+Subject: [PATCH v4 26/26] KVM: arm/arm64: GICv4: Theory of operations
+Date: Fri,  6 Oct 2017 16:34:01 +0100
+Message-ID: <20171006153401.5481-27-marc.zyngier@arm.com>
 References: <20171006153401.5481-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F128949D65
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Oct 2017 11:34:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BFBF49D0F
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Oct 2017 11:34:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cwuaNWu7aeMl for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 Oct 2017 11:34:25 -0400 (EDT)
+ with ESMTP id rj3BW7SFOaoX for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 Oct 2017 11:34:29 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CD01A49D21
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Oct 2017 11:34:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A499649D65
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Oct 2017 11:34:29 -0400 (EDT)
 In-Reply-To: <20171006153401.5481-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,70 +31,90 @@ To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger
 Cc: Andre Przywara <Andre.Przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-All it takes is the has_v4 flag to be set in gic_kvm_info
-as well as "kvm-arm.vgic_v4_enable=1" being passed on the
-command line for GICv4 to be enabled in KVM.
+Yet another braindump so I can free some cells...
 
-Acked-by: Christoffer Dall <cdall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- Documentation/admin-guide/kernel-parameters.txt |  4 ++++
- virt/kvm/arm/vgic/vgic-v3.c                     | 14 ++++++++++++++
- 2 files changed, 18 insertions(+)
+ virt/kvm/arm/vgic/vgic-v4.c | 67 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 67 insertions(+)
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 05496622b4ef..93c8fff399eb 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -1874,6 +1874,10 @@
- 			[KVM,ARM] Trap guest accesses to GICv3 common
- 			system registers
+diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
+index 68a2ef6df161..b87806fea554 100644
+--- a/virt/kvm/arm/vgic/vgic-v4.c
++++ b/virt/kvm/arm/vgic/vgic-v4.c
+@@ -22,6 +22,73 @@
  
-+	kvm-arm.vgic_v4_enable=
-+			[KVM,ARM] Allow use of GICv4 for direct injection of
-+			LPIs.
+ #include "vgic.h"
+ 
++/*
++ * How KVM uses GICv4 (insert rude comments here):
++ *
++ * The vgic-v4 layer acts as a bridge between several entities:
++ * - The GICv4 ITS representation offered by the ITS driver
++ * - VFIO, which is in charge of the PCI endpoint
++ * - The virtual ITS, which is the only thing the guest sees
++ *
++ * The configuration of VLPIs is triggered by a callback from VFIO,
++ * instructing KVM that a PCI device has been configured to deliver
++ * MSIs to a vITS.
++ *
++ * kvm_vgic_v4_set_forwarding() is thus called with the routing entry,
++ * and this is used to find the corresponding vITS data structures
++ * (ITS instance, device, event and irq) using a process that is
++ * extremely similar to the injection of an MSI.
++ *
++ * At this stage, we can link the guest's view of an LPI (uniquely
++ * identified by the routing entry) and the host irq, using the GICv4
++ * driver mapping operation. Should the mapping succeed, we've then
++ * successfully upgraded the guest's LPI to a VLPI. We can then start
++ * with updating GICv4's view of the property table and generating an
++ * INValidation in order to kickstart the delivery of this VLPI to the
++ * guest directly, without software intervention. Well, almost.
++ *
++ * When the PCI endpoint is deconfigured, this operation is reversed
++ * with VFIO calling kvm_vgic_v4_unset_forwarding().
++ *
++ * Once the VLPI has been mapped, it needs to follow any change the
++ * guest performs on its LPI through the vITS. For that, a number of
++ * command handlers have hooks to communicate these changes to the HW:
++ * - Any invalidation triggers a call to its_prop_update_vlpi()
++ * - The INT command results in a irq_set_irqchip_state(), which
++ *   generates an INT on the corresponding VLPI.
++ * - The CLEAR command results in a irq_set_irqchip_state(), which
++ *   generates an CLEAR on the corresponding VLPI.
++ * - DISCARD translates into an unmap, similar to a call to
++ *   kvm_vgic_v4_unset_forwarding().
++ * - MOVI is translated by an update of the existing mapping, changing
++ *   the target vcpu, resulting in a VMOVI being generated.
++ * - MOVALL is translated by a string of mapping updates (similar to
++ *   the handling of MOVI). MOVALL is horrible.
++ *
++ * Note that a DISCARD/MAPTI sequence emitted from the guest without
++ * reprogramming the PCI endpoint after MAPTI does not result in a
++ * VLPI being mapped, as there is no callback from VFIO (the guest
++ * will get the interrupt via the normal SW injection). Fixing this is
++ * not trivial, and requires some horrible messing with the VFIO
++ * internals. Not fun. Don't do that.
++ *
++ * Then there is the scheduling. Each time a vcpu is about to run on a
++ * physical CPU, KVM must tell the corresponding redistributor about
++ * it. And if we've migrated our vcpu from one CPU to another, we must
++ * tell the ITS (so that the messages reach the right redistributor).
++ * This is done in two steps: first issue a irq_set_affinity() on the
++ * irq corresponding to the vcpu, then call its_schedule_vpe(). You
++ * must be in a non-preemptible context. On exit, another call to
++ * its_schedule_vpe() tells the redistributor that we're done with the
++ * vcpu.
++ *
++ * Finally, the doorbell handling: Each vcpu is allocated an interrupt
++ * which will fire each time a VLPI is made pending whilst the vcpu is
++ * not running. Each time the vcpu gets blocked, the doorbell
++ * interrupt gets enabled. When the vcpu is unblocked (for whatever
++ * reason), the doorbell interrupt is disabled.
++ */
 +
- 	kvm-intel.ept=	[KVM,Intel] Disable extended page tables
- 			(virtualized MMU) support on capable Intel chips.
- 			Default is 1 (enabled)
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index 96ea597db0e7..405733678c2f 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -24,6 +24,7 @@
- static bool group0_trap;
- static bool group1_trap;
- static bool common_trap;
-+static bool gicv4_enable;
- 
- void vgic_v3_set_underflow(struct kvm_vcpu *vcpu)
+ static irqreturn_t vgic_v4_doorbell_handler(int irq, void *info)
  {
-@@ -459,6 +460,12 @@ static int __init early_common_trap_cfg(char *buf)
- }
- early_param("kvm-arm.vgic_v3_common_trap", early_common_trap_cfg);
- 
-+static int __init early_gicv4_enable(char *buf)
-+{
-+	return strtobool(buf, &gicv4_enable);
-+}
-+early_param("kvm-arm.vgic_v4_enable", early_gicv4_enable);
-+
- /**
-  * vgic_v3_probe - probe for a GICv3 compatible interrupt controller in DT
-  * @node:	pointer to the DT node
-@@ -478,6 +485,13 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
- 	kvm_vgic_global_state.can_emulate_gicv2 = false;
- 	kvm_vgic_global_state.ich_vtr_el2 = ich_vtr_el2;
- 
-+	/* GICv4 support? */
-+	if (info->has_v4) {
-+		kvm_vgic_global_state.has_gicv4 = gicv4_enable;
-+		kvm_info("GICv4 support %sabled\n",
-+			 gicv4_enable ? "en" : "dis");
-+	}
-+
- 	if (!info->vcpu.start) {
- 		kvm_info("GICv3: no GICV resource entry\n");
- 		kvm_vgic_global_state.vcpu_base = 0;
+ 	struct kvm_vcpu *vcpu = info;
 -- 
 2.14.1
