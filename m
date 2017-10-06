@@ -1,71 +1,139 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v2 11/28] arm64/sve: Core task context handling
-Date: Fri, 6 Oct 2017 16:33:13 +0100
-Message-ID: <20171006153312.cushhcb4m2qc4kwd@armageddon.cambridge.arm.com>
-References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com>
- <1504198860-12951-12-git-send-email-Dave.Martin@arm.com>
- <20170913143325.hi4cfcajbts3bbao@localhost>
- <20171003113302.GR3611@e103592.cambridge.arm.com>
- <20171005112835.2rhaqx23bhe6tnwl@armageddon.cambridge.arm.com>
- <20171006131005.GA3611@e103592.cambridge.arm.com>
- <20171006133639.ialgglabo7yca5bm@armageddon.cambridge.arm.com>
- <20171006151528.GB3611@e103592.cambridge.arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-arch-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20171006151528.GB3611@e103592.cambridge.arm.com>
-Sender: linux-arch-owner@vger.kernel.org
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Will Deacon <will.deacon@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH v4 01/26] KVM: arm/arm64: register irq bypass consumer on ARM/ARM64
+Date: Fri,  6 Oct 2017 16:33:36 +0100
+Message-ID: <20171006153401.5481-2-marc.zyngier@arm.com>
+References: <20171006153401.5481-1-marc.zyngier@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20171006153401.5481-1-marc.zyngier@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>, Shanker Donthineni <shankerd@codeaurora.org>, Mark Rutland <mark.rutland@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Andre Przywara <Andre.Przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 06, 2017 at 04:15:28PM +0100, Dave P Martin wrote:
-> On Fri, Oct 06, 2017 at 02:36:40PM +0100, Catalin Marinas wrote:
-> > On Fri, Oct 06, 2017 at 02:10:09PM +0100, Dave P Martin wrote:
-> > > On Thu, Oct 05, 2017 at 12:28:35PM +0100, Catalin Marinas wrote:
-> > > > On Tue, Oct 03, 2017 at 12:33:03PM +0100, Dave P Martin wrote:
-> > > > > TIF_FOREIGN_FPSTATE's meaning is expanded to cover SVE, but otherwise
-> > > > > unchanged:
-> > > > > 
-> > > > >  * If a task is running and !TIF_FOREIGN_FPSTATE, then the the CPU
-> > > > >    registers of the CPU the task is running on contain the authoritative
-> > > > >    FPSIMD/SVE state of the task.  The backing memory may be stale.
-> > > > > 
-> > > > >  * Otherwise (i.e., task not running, or task running and
-> > > > >    TIF_FOREIGN_FPSTATE), the task's FPSIMD/SVE backing memory is
-> > > > >    authoritative.  If additionally per_cpu(fpsimd_last_state,
-> > > > >    task->fpsimd_state.cpu) == &task->fpsimd_state.cpu, then
-> > > > >    task->fpsimd_state.cpu's registers are also up to date for task, but
-> > > > >    not authorititive: the current FPSIMD/SVE state may be read from
-> > > > >    them, but they must not be written.
-> > > > >  
-> > > > > The FPSIMD/SVE backing memory is selected by TIF_SVE:
-> > > > > 
-> > > > >  * TIF_SVE set: Zn (incorporating Vn in bits[127:0]), Pn and FFR are
-> > > > >    stored in task->thread.sve_state, formatted appropriately for vector
-> > > > >    length task->thread.sve_vl.  task->thread.sve_state must point to a
-> > > > >    valid buffer at least sve_state_size(task) bytes in size.
-> > 
-> > "Zn [...] stored in  task->thread.sve_state" - is this still true with
-> > the changes you proposed? I guess even without these changes, you have
-> > situations where the hardware regs are out of sync with sve_state (see
-> > more below).
-> 
-> I guess I need to tweak the wording here.
-> 
-> TIF_SVE says where the vector state should be loaded/stored from,
-> but does not say whether the data is up to date in memory, or when
-> it should be loaded/stored.
-> 
-> The latter is described by a cocktail of different things including
-> which bit of kernel code we are executing if any, whether the task
-> is running/stopped etc., TIF_FOREIGN_FPSTATE,
-> task->thread.fpsimd_state.cpu and per_cpu(fpsimd_last_state).
-> 
-> Does this make any better sense of my code below?
+From: Eric Auger <eric.auger@redhat.com>
 
-Yes, it looks fine.
+This patch selects IRQ_BYPASS_MANAGER and HAVE_KVM_IRQ_BYPASS
+configs for ARM/ARM64.
 
+kvm_arch_has_irq_bypass() now is implemented and returns true.
+As a consequence the irq bypass consumer will be registered for
+ARM/ARM64 with the forwarding callbacks:
+
+- stop/start: halt/resume guest execution
+- add/del_producer: set/unset forwarding at vgic/irqchip level
+
+We don't have any actual support yet, so nothing gets actually
+forwarded.
+
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+[maz: dropped the DEOI stuff for the time being in order to
+      reduce the dependency chain, amended commit message]
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm/kvm/Kconfig   |  3 +++
+ arch/arm64/kvm/Kconfig |  3 +++
+ virt/kvm/arm/arm.c     | 40 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 46 insertions(+)
+
+diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
+index 90d0176fb30d..4e2b192a030a 100644
+--- a/arch/arm/kvm/Kconfig
++++ b/arch/arm/kvm/Kconfig
+@@ -3,6 +3,7 @@
+ #
+ 
+ source "virt/kvm/Kconfig"
++source "virt/lib/Kconfig"
+ 
+ menuconfig VIRTUALIZATION
+ 	bool "Virtualization"
+@@ -35,6 +36,8 @@ config KVM
+ 	select HAVE_KVM_IRQCHIP
+ 	select HAVE_KVM_IRQ_ROUTING
+ 	select HAVE_KVM_MSI
++	select IRQ_BYPASS_MANAGER
++	select HAVE_KVM_IRQ_BYPASS
+ 	depends on ARM_VIRT_EXT && ARM_LPAE && ARM_ARCH_TIMER
+ 	---help---
+ 	  Support hosting virtualized guest machines.
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index 52cb7ad9b2fd..7e0d6e63cc71 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -3,6 +3,7 @@
+ #
+ 
+ source "virt/kvm/Kconfig"
++source "virt/lib/Kconfig"
+ 
+ menuconfig VIRTUALIZATION
+ 	bool "Virtualization"
+@@ -35,6 +36,8 @@ config KVM
+ 	select HAVE_KVM_MSI
+ 	select HAVE_KVM_IRQCHIP
+ 	select HAVE_KVM_IRQ_ROUTING
++	select IRQ_BYPASS_MANAGER
++	select HAVE_KVM_IRQ_BYPASS
+ 	---help---
+ 	  Support hosting virtualized guest machines.
+ 	  We don't support KVM with 16K page tables yet, due to the multiple
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index b9f68e4add71..7ac4ecba9ebd 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -27,6 +27,8 @@
+ #include <linux/mman.h>
+ #include <linux/sched.h>
+ #include <linux/kvm.h>
++#include <linux/kvm_irqfd.h>
++#include <linux/irqbypass.h>
+ #include <trace/events/kvm.h>
+ #include <kvm/arm_pmu.h>
+ 
+@@ -1449,6 +1451,44 @@ struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr)
+ 	return NULL;
+ }
+ 
++bool kvm_arch_has_irq_bypass(void)
++{
++	return true;
++}
++
++int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
++				      struct irq_bypass_producer *prod)
++{
++	struct kvm_kernel_irqfd *irqfd =
++		container_of(cons, struct kvm_kernel_irqfd, consumer);
++
++	return 0;
++}
++void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
++				      struct irq_bypass_producer *prod)
++{
++	struct kvm_kernel_irqfd *irqfd =
++		container_of(cons, struct kvm_kernel_irqfd, consumer);
++
++	return;
++}
++
++void kvm_arch_irq_bypass_stop(struct irq_bypass_consumer *cons)
++{
++	struct kvm_kernel_irqfd *irqfd =
++		container_of(cons, struct kvm_kernel_irqfd, consumer);
++
++	kvm_arm_halt_guest(irqfd->kvm);
++}
++
++void kvm_arch_irq_bypass_start(struct irq_bypass_consumer *cons)
++{
++	struct kvm_kernel_irqfd *irqfd =
++		container_of(cons, struct kvm_kernel_irqfd, consumer);
++
++	kvm_arm_resume_guest(irqfd->kvm);
++}
++
+ /**
+  * Initialize Hyp-mode and memory mappings on all CPUs.
+  */
 -- 
-Catalin
+2.14.1
