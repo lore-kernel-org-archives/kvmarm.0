@@ -1,96 +1,152 @@
-From: Julien Thierry <julien.thierry@arm.com>
-Subject: Re: [PATCH v1 1/2] KVM: arm64: handle single-stepping trapped
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v1 2/2] kvm: arm64: handle single-step of userspace mmio
  instructions
-Date: Fri, 6 Oct 2017 13:34:36 +0100
-Message-ID: <49ddad48-d3ce-43e2-7aae-f6cc66ef1fad@arm.com>
+Date: Fri, 6 Oct 2017 13:37:53 +0100
+Message-ID: <ca10e4b9-08cc-486c-a229-da5ebcdb76cf@arm.com>
 References: <20171006113921.24880-1-alex.bennee@linaro.org>
- <20171006113921.24880-2-alex.bennee@linaro.org>
- <d95a7ce1-1996-b0c6-4a2d-64af011c0c79@arm.com>
+ <20171006113921.24880-3-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <d95a7ce1-1996-b0c6-4a2d-64af011c0c79@arm.com>
-Content-Language: en-US
+In-Reply-To: <20171006113921.24880-3-alex.bennee@linaro.org>
+Content-Language: en-GB
 Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, julien.thierry@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
+Cc: Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 06/10/17 13:27, Marc Zyngier wrote:
-> On 06/10/17 12:39, Alex Bennée wrote:
->> If we are using guest debug to single-step the guest we need to ensure
->> we exit after emulating the instruction. This only affects
->> instructions completely emulated by the kernel. For userspace emulated
->> instructions we need to exit and return to complete the emulation.
->>
->> We fake debug.arch.hsr to contain ESR_ELx_EC_SOFTSTP_LOW so QEMU knows
->> it was a single-step event (and without altering the userspace ABI).
->>
->> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->> ---
->>   arch/arm64/kvm/handle_exit.c | 48 +++++++++++++++++++++++++++++++-------------
->>   1 file changed, 34 insertions(+), 14 deletions(-)
->>
->> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
->> index 7debb74843a0..c918d291cb58 100644
->> --- a/arch/arm64/kvm/handle_exit.c
->> +++ b/arch/arm64/kvm/handle_exit.c
->> @@ -178,6 +178,39 @@ static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
->>   	return arm_exit_handlers[hsr_ec];
->>   }
->>   
->> +/*
->> + * When handling traps we need to ensure exit the guest if we
->> + * completely emulated the instruction while single-stepping. Stuff to
->> + * be emulated in userspace needs to complete that first.
->> + */
->> +
->> +static int handle_trap_exceptions(struct kvm_vcpu *vcpu, struct kvm_run *run)
->> +{
->> +	int handled;
->> +
->> +	/*
->> +	 * See ARM ARM B1.14.1: "Hyp traps on instructions
->> +	 * that fail their condition code check"
->> +	 */
->> +	if (!kvm_condition_valid(vcpu)) {
->> +		kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
->> +		handled = 1;
->> +	} else {
->> +		exit_handle_fn exit_handler;
->> +
->> +		exit_handler = kvm_get_exit_handler(vcpu);
->> +		handled = exit_handler(vcpu, run);
->> +	}
->> +
->> +	if (handled && (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)) {
->> +		handled = 0;
->> +		run->exit_reason = KVM_EXIT_DEBUG;
->> +		run->debug.arch.hsr = ESR_ELx_EC_SOFTSTP_LOW << ESR_ELx_EC_SHIFT;
->> +	}
+On 06/10/17 12:39, Alex Bennée wrote:
+> The system state of KVM when using userspace emulation is not complete
+> until we return into KVM_RUN. To handle mmio related updates we wait
+> until they have been committed and then schedule our KVM_EXIT_DEBUG.
 > 
-> Doesn't this break an MMIO read? The registers haven't been updated yet,
-> and the debugger may not see the right thing...
+> I've introduced a new function kvm_arm_maybe_return_debug() to wrap up
+> the differences between arm/arm64 which is currently null for arm.
 > 
-> How about something like:
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  arch/arm/include/asm/kvm_host.h   |  2 ++
+>  arch/arm64/include/asm/kvm_host.h |  1 +
+>  arch/arm64/kvm/debug.c            | 21 +++++++++++++++++++++
+>  arch/arm64/kvm/handle_exit.c      |  9 +++------
+>  virt/kvm/arm/arm.c                |  2 +-
+>  virt/kvm/arm/mmio.c               |  3 ++-
+>  6 files changed, 30 insertions(+), 8 deletions(-)
 > 
-> 	if (handled && (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)) {
-> 		if (run->exit_reason == KVM_EXIT_MMIO)
-> 			kvm_handle_mmio_return(vcpu, run);
-> 		[...]
-> 	}
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index 4a879f6ff13b..aec943f6d123 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -285,6 +285,8 @@ static inline void kvm_arm_init_debug(void) {}
+>  static inline void kvm_arm_setup_debug(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_arm_clear_debug(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu) {}
+> +static inline int  kvm_arm_maybe_return_debug(struct kvm_vcpu *vcpu,
+> +						struct kvm_run *run) {}
+>  
+>  int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
+>  			       struct kvm_device_attr *attr);
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index e923b58606e2..fa67d21662f6 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -369,6 +369,7 @@ void kvm_arm_init_debug(void);
+>  void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
+>  void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
+>  void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
+> +int  kvm_arm_maybe_return_debug(struct kvm_vcpu *vcpu, struct kvm_run *run);
+>  int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
+>  			       struct kvm_device_attr *attr);
+>  int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> index dbadfaf850a7..a10a18c55c87 100644
+> --- a/arch/arm64/kvm/debug.c
+> +++ b/arch/arm64/kvm/debug.c
+> @@ -221,3 +221,24 @@ void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
+>  		}
+>  	}
+>  }
+> +
+> +
+> +/*
+> + * When KVM has successfully emulated the instruction we might want to
+> + * return we a KVM_EXIT_DEBUG. We can only do this once the emulation
+> + * is complete though so for userspace emulations we have to wait
+> + * until we have re-entered KVM.
+> + *
+> + * Return > 0 to return to guest, 0 (and set exit_reason) on proper
+> + * exit to userspace.
+> + */
+> +
+> +int kvm_arm_maybe_return_debug(struct kvm_vcpu *vcpu, struct kvm_run *run)
+> +{
+> +	if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
+> +		run->exit_reason = KVM_EXIT_DEBUG;
+> +		run->debug.arch.hsr = ESR_ELx_EC_SOFTSTP_LOW << ESR_ELx_EC_SHIFT;
+> +		return 0;
+> +	}
+> +	return 1;
+> +}
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index c918d291cb58..7b04f59217bf 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -202,13 +202,10 @@ static int handle_trap_exceptions(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  		handled = exit_handler(vcpu, run);
+>  	}
+>  
+> -	if (handled && (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)) {
+> -		handled = 0;
+> -		run->exit_reason = KVM_EXIT_DEBUG;
+> -		run->debug.arch.hsr = ESR_ELx_EC_SOFTSTP_LOW << ESR_ELx_EC_SHIFT;
+> -	}
+> +	if (handled)
+> +		return kvm_arm_maybe_return_debug(vcpu, run);
+>  
+> -	return handled;
+> +	return 0;
+>  }
+>  
+>  /*
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index b9f68e4add71..3d28fe2daa26 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -623,7 +623,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  
+>  	if (run->exit_reason == KVM_EXIT_MMIO) {
+>  		ret = kvm_handle_mmio_return(vcpu, vcpu->run);
+> -		if (ret)
+> +		if (ret < 1)
+>  			return ret;
+>  	}
+>  
+> diff --git a/virt/kvm/arm/mmio.c b/virt/kvm/arm/mmio.c
+> index b6e715fd3c90..e43e3bd6222f 100644
+> --- a/virt/kvm/arm/mmio.c
+> +++ b/virt/kvm/arm/mmio.c
+> @@ -117,7 +117,8 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  		vcpu_set_reg(vcpu, vcpu->arch.mmio_decode.rt, data);
+>  	}
+>  
+> -	return 0;
+> +	/* If debugging in effect we may need to return now */
+> +	return kvm_arm_maybe_return_debug(vcpu, run);
+
+Ah, that's how you do it. OK. Then the patch splitting is wrong, because
+everything is broken after patch #1.
+
+I'd prefer something like "kvm_handle_single_step" instead of this
+"kvm_arm_maybe_return_debug", but I'm very bad at naming things anyway.
+
+>  }
+>  
+>  static int decode_hsr(struct kvm_vcpu *vcpu, bool *is_write, int *len)
 > 
-> Or am I missing something?
 
-If the MMIO was not handled by the kernel, exit_handler will return 0, 
-so handled will be false and we won't pretend we have a debug exception 
-(but will still return to userland with KVM_EXIT_MMIO).
+Thanks,
 
-I think the second patch takes care of properly handling single step for 
-userland MMIO.
-
+	M.
 -- 
-Julien Thierry
+Jazz is not dead. It just smells funny...
