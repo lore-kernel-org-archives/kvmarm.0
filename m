@@ -1,181 +1,104 @@
 From: Julien Thierry <julien.thierry@arm.com>
 Subject: Re: [PATCH v1 2/2] kvm: arm64: handle single-step of userspace mmio
  instructions
-Date: Fri, 6 Oct 2017 15:26:23 +0100
-Message-ID: <2c09d93e-e444-1c83-478e-c3d96f0f8893@arm.com>
+Date: Fri, 6 Oct 2017 15:27:51 +0100
+Message-ID: <e7dafd0d-80b0-8a53-049e-9d4ecf431359@arm.com>
 References: <20171006113921.24880-1-alex.bennee@linaro.org>
  <20171006113921.24880-3-alex.bennee@linaro.org>
- <ca10e4b9-08cc-486c-a229-da5ebcdb76cf@arm.com>
- <3c2eed4b-fc66-b87c-c61e-106efdfa78df@arm.com> <877ew8xu9x.fsf@linaro.org>
- <3a969f2f-29b5-7847-9633-15ac45812ebb@arm.com>
+ <a9f8905e-18e9-267a-2479-f498c248e2f4@arm.com> <878tgoxudc.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <3a969f2f-29b5-7847-9633-15ac45812ebb@arm.com>
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 23D6340A74
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Oct 2017 10:27:27 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id h3lGMX8VaOG0 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 Oct 2017 10:27:26 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E431F406BB
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Oct 2017 10:27:25 -0400 (EDT)
+In-Reply-To: <878tgoxudc.fsf@linaro.org>
 Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Russell King <linux@armlinux.org.uk>, open list <linux-kernel@vger.kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 06/10/17 15:00, Marc Zyngier wrote:
-> On 06/10/17 14:47, Alex Bennée wrote:
->>
->> Marc Zyngier <marc.zyngier@arm.com> writes:
->>
->>> On 06/10/17 13:37, Marc Zyngier wrote:
->>>> On 06/10/17 12:39, Alex Bennée wrote:
->>>>> The system state of KVM when using userspace emulation is not complete
->>>>> until we return into KVM_RUN. To handle mmio related updates we wait
->>>>> until they have been committed and then schedule our KVM_EXIT_DEBUG.
->>>>>
->>>>> I've introduced a new function kvm_arm_maybe_return_debug() to wrap up
->>>>> the differences between arm/arm64 which is currently null for arm.
->>>>>
->>>>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->>>>> ---
->>>>>   arch/arm/include/asm/kvm_host.h   |  2 ++
->>>>>   arch/arm64/include/asm/kvm_host.h |  1 +
->>>>>   arch/arm64/kvm/debug.c            | 21 +++++++++++++++++++++
->>>>>   arch/arm64/kvm/handle_exit.c      |  9 +++------
->>>>>   virt/kvm/arm/arm.c                |  2 +-
->>>>>   virt/kvm/arm/mmio.c               |  3 ++-
->>>>>   6 files changed, 30 insertions(+), 8 deletions(-)
->>>>>
->>>>> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
->>>>> index 4a879f6ff13b..aec943f6d123 100644
->>>>> --- a/arch/arm/include/asm/kvm_host.h
->>>>> +++ b/arch/arm/include/asm/kvm_host.h
->>>>> @@ -285,6 +285,8 @@ static inline void kvm_arm_init_debug(void) {}
->>>>>   static inline void kvm_arm_setup_debug(struct kvm_vcpu *vcpu) {}
->>>>>   static inline void kvm_arm_clear_debug(struct kvm_vcpu *vcpu) {}
->>>>>   static inline void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu) {}
->>>>> +static inline int  kvm_arm_maybe_return_debug(struct kvm_vcpu *vcpu,
->>>>> +						struct kvm_run *run) {}
->>>>>
->>>>>   int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
->>>>>   			       struct kvm_device_attr *attr);
->>>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->>>>> index e923b58606e2..fa67d21662f6 100644
->>>>> --- a/arch/arm64/include/asm/kvm_host.h
->>>>> +++ b/arch/arm64/include/asm/kvm_host.h
->>>>> @@ -369,6 +369,7 @@ void kvm_arm_init_debug(void);
->>>>>   void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
->>>>>   void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
->>>>>   void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
->>>>> +int  kvm_arm_maybe_return_debug(struct kvm_vcpu *vcpu, struct kvm_run *run);
->>>>>   int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
->>>>>   			       struct kvm_device_attr *attr);
->>>>>   int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
->>>>> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
->>>>> index dbadfaf850a7..a10a18c55c87 100644
->>>>> --- a/arch/arm64/kvm/debug.c
->>>>> +++ b/arch/arm64/kvm/debug.c
->>>>> @@ -221,3 +221,24 @@ void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
->>>>>   		}
->>>>>   	}
->>>>>   }
->>>>> +
->>>>> +
->>>>> +/*
->>>>> + * When KVM has successfully emulated the instruction we might want to
->>>>> + * return we a KVM_EXIT_DEBUG. We can only do this once the emulation
->>>>> + * is complete though so for userspace emulations we have to wait
->>>>> + * until we have re-entered KVM.
->>>>> + *
->>>>> + * Return > 0 to return to guest, 0 (and set exit_reason) on proper
->>>>> + * exit to userspace.
->>>>> + */
->>>>> +
->>>>> +int kvm_arm_maybe_return_debug(struct kvm_vcpu *vcpu, struct kvm_run *run)
->>>>> +{
->>>>> +	if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
->>>>> +		run->exit_reason = KVM_EXIT_DEBUG;
->>>>> +		run->debug.arch.hsr = ESR_ELx_EC_SOFTSTP_LOW << ESR_ELx_EC_SHIFT;
->>>>> +		return 0;
->>>>> +	}
->>>>> +	return 1;
->>>>> +}
->>>>> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
->>>>> index c918d291cb58..7b04f59217bf 100644
->>>>> --- a/arch/arm64/kvm/handle_exit.c
->>>>> +++ b/arch/arm64/kvm/handle_exit.c
->>>>> @@ -202,13 +202,10 @@ static int handle_trap_exceptions(struct kvm_vcpu *vcpu, struct kvm_run *run)
->>>>>   		handled = exit_handler(vcpu, run);
->>>>>   	}
->>>>>
->>>>> -	if (handled && (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)) {
->>>>> -		handled = 0;
->>>>> -		run->exit_reason = KVM_EXIT_DEBUG;
->>>>> -		run->debug.arch.hsr = ESR_ELx_EC_SOFTSTP_LOW << ESR_ELx_EC_SHIFT;
->>>>> -	}
->>>>> +	if (handled)
->>>>> +		return kvm_arm_maybe_return_debug(vcpu, run);
->>>>>
->>>>> -	return handled;
->>>>> +	return 0;
->>>>>   }
->>>>>
->>>>>   /*
->>>>> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
->>>>> index b9f68e4add71..3d28fe2daa26 100644
->>>>> --- a/virt/kvm/arm/arm.c
->>>>> +++ b/virt/kvm/arm/arm.c
->>>>> @@ -623,7 +623,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->>>>>
->>>>>   	if (run->exit_reason == KVM_EXIT_MMIO) {
->>>>>   		ret = kvm_handle_mmio_return(vcpu, vcpu->run);
->>>>> -		if (ret)
->>>>> +		if (ret < 1)
->>>>>   			return ret;
->>>>>   	}
->>>>>
->>>>> diff --git a/virt/kvm/arm/mmio.c b/virt/kvm/arm/mmio.c
->>>>> index b6e715fd3c90..e43e3bd6222f 100644
->>>>> --- a/virt/kvm/arm/mmio.c
->>>>> +++ b/virt/kvm/arm/mmio.c
->>>>> @@ -117,7 +117,8 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
->>>>>   		vcpu_set_reg(vcpu, vcpu->arch.mmio_decode.rt, data);
->>>>>   	}
->>>>>
->>>>> -	return 0;
->>>>> +	/* If debugging in effect we may need to return now */
->>>>> +	return kvm_arm_maybe_return_debug(vcpu, run);
->>>>
->>>> Ah, that's how you do it. OK. Then the patch splitting is wrong, because
->>>> everything is broken after patch #1.
->>>
->>> Actually, it is not broken at all. I'm just confused by the very
->>> esoteric flow.
->>
->> We could just merge the whole patch in one but I wanted to show the
->> difference between in-kernel and out-of-kernel emulation.
->>
->> I could also move the step handling to the mmio leg in
->> kvm_arch_vcpu_ioctl_run but you mentioned you use the mmio completion
->> elsewhere anyway?
-> Yes, look at the end of io_mem_abort(). This is used by the vgic to
-> complete a read emulation in the kernel.
-> 
-> And actually, this means that we shouldn't have to mess with
-> handle_exit. Just check for the return value of kvm_handle_mmio_return
-> in the call sites (including the one in io_mem_abort), and exit if we
-> need to single-step...
-> 
-
-I think we need to mess with handle_exit (or at least something else 
-than kvm_handle_mmio call sites) because the patches don't only fix MMIO 
-single stepping, but also other emulated stuff (system register 
-accesses, ...).
-
-But with your suggestion maybe we can at least handle both MMIO cases in 
-a similar manner. I think we still need the code in handle_exit, or add 
-more code to deal case by case with other emulated instructions.
-
-Thanks,
-
--- 
-Julien Thierry
+CgpPbiAwNi8xMC8xNyAxNDo0NSwgQWxleCBCZW5uw6llIHdyb3RlOgo+IAo+IEp1bGllbiBUaGll
+cnJ5IDxqdWxpZW4udGhpZXJyeUBhcm0uY29tPiB3cml0ZXM6Cj4gCj4+IE9uIDA2LzEwLzE3IDEy
+OjM5LCBBbGV4IEJlbm7DqWUgd3JvdGU6Cj4+PiBUaGUgc3lzdGVtIHN0YXRlIG9mIEtWTSB3aGVu
+IHVzaW5nIHVzZXJzcGFjZSBlbXVsYXRpb24gaXMgbm90IGNvbXBsZXRlCj4+PiB1bnRpbCB3ZSBy
+ZXR1cm4gaW50byBLVk1fUlVOLiBUbyBoYW5kbGUgbW1pbyByZWxhdGVkIHVwZGF0ZXMgd2Ugd2Fp
+dAo+Pj4gdW50aWwgdGhleSBoYXZlIGJlZW4gY29tbWl0dGVkIGFuZCB0aGVuIHNjaGVkdWxlIG91
+ciBLVk1fRVhJVF9ERUJVRy4KPj4+Cj4+PiBJJ3ZlIGludHJvZHVjZWQgYSBuZXcgZnVuY3Rpb24g
+a3ZtX2FybV9tYXliZV9yZXR1cm5fZGVidWcoKSB0byB3cmFwIHVwCj4+PiB0aGUgZGlmZmVyZW5j
+ZXMgYmV0d2VlbiBhcm0vYXJtNjQgd2hpY2ggaXMgY3VycmVudGx5IG51bGwgZm9yIGFybS4KPj4+
+Cj4+PiBTaWduZWQtb2ZmLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+
+Cj4+PiAtLS0KPj4+ICAgIGFyY2gvYXJtL2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggICB8ICAyICsr
+Cj4+PiAgICBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggfCAgMSArCj4+PiAgICBh
+cmNoL2FybTY0L2t2bS9kZWJ1Zy5jICAgICAgICAgICAgfCAyMSArKysrKysrKysrKysrKysrKysr
+KysKPj4+ICAgIGFyY2gvYXJtNjQva3ZtL2hhbmRsZV9leGl0LmMgICAgICB8ICA5ICsrKy0tLS0t
+LQo+Pj4gICAgdmlydC9rdm0vYXJtL2FybS5jICAgICAgICAgICAgICAgIHwgIDIgKy0KPj4+ICAg
+IHZpcnQva3ZtL2FybS9tbWlvLmMgICAgICAgICAgICAgICB8ICAzICsrLQo+Pj4gICAgNiBmaWxl
+cyBjaGFuZ2VkLCAzMCBpbnNlcnRpb25zKCspLCA4IGRlbGV0aW9ucygtKQo+Pj4KPj4+IGRpZmYg
+LS1naXQgYS9hcmNoL2FybS9pbmNsdWRlL2FzbS9rdm1faG9zdC5oIGIvYXJjaC9hcm0vaW5jbHVk
+ZS9hc20va3ZtX2hvc3QuaAo+Pj4gaW5kZXggNGE4NzlmNmZmMTNiLi5hZWM5NDNmNmQxMjMgMTAw
+NjQ0Cj4+PiAtLS0gYS9hcmNoL2FybS9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCj4+PiArKysgYi9h
+cmNoL2FybS9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCj4+PiBAQCAtMjg1LDYgKzI4NSw4IEBAIHN0
+YXRpYyBpbmxpbmUgdm9pZCBrdm1fYXJtX2luaXRfZGVidWcodm9pZCkge30KPj4+ICAgIHN0YXRp
+YyBpbmxpbmUgdm9pZCBrdm1fYXJtX3NldHVwX2RlYnVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkg
+e30KPj4+ICAgIHN0YXRpYyBpbmxpbmUgdm9pZCBrdm1fYXJtX2NsZWFyX2RlYnVnKHN0cnVjdCBr
+dm1fdmNwdSAqdmNwdSkge30KPj4+ICAgIHN0YXRpYyBpbmxpbmUgdm9pZCBrdm1fYXJtX3Jlc2V0
+X2RlYnVnX3B0cihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpIHt9Cj4+PiArc3RhdGljIGlubGluZSBp
+bnQgIGt2bV9hcm1fbWF5YmVfcmV0dXJuX2RlYnVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPj4+
+ICsJCQkJCQlzdHJ1Y3Qga3ZtX3J1biAqcnVuKSB7fQo+Pj4KPj4KPj4gVGhpcyBmdW5jdGlvbiBz
+aG91bGQgcmV0dXJuIDEuCj4gCj4gU28gSSBkaWQgcG9uZGVyIG1ha2luZyB0aGlzIGEgYm9vbCwg
+cmV0dXJuaW5nIHRydWUgaWYgd2UgbmVlZCB0byBleGl0Cj4gYW5kIHRlc3RpbmcgaW4gdi9rL2Ev
+YXJtLmMgZXhpdCBsZWcgcmF0aGVyIHRoYW4gaW4gdGhlIG1taW8gaGFuZGxlci4KPiAKPiBBdCB0
+aGUgbW9tZW50IGl0IG1pcnJvcnMgdGhlIGV4aXN0aW5nIGV4aXQgbG9naWMgd2hpY2ggZm9sbG93
+cyAtMSBlcnIsIDAKPiByZXR1cm4sID4wIGhhbmRsZWQuIEJ1dCBhcyBJIG1lbnRpb25lZCBpbiB0
+aGUgY292ZXIgbGV0dGVyIHRoaXMgZmVsbAo+IGRvd24gYSBiaXQgd2hlbiBkZWFsaW5nIHdpdGgg
+dGhlIG1taW8gY2FzZS4KPiAKCkhtbW0sIG15IG1haW4gaXNzdWUgaXMgdGhhdCB0aGlzIHZlcnNp
+b24gZG9lc24ndCBoYXZlIGEgcmV0dXJuIApzdGF0ZW1lbnQsIHdoaWNoIHByb2JhYmx5IHRyaWdn
+ZXJzIGEgZ2NjIHdhcm5pbmcgd2l0aCBBUkNIPWFybSBhbmQgYWxzbyAKbWlnaHQgY2F1c2UgYXJt
+ICgzMmJpdCkga3ZtIHRvIGV4aXQgdXBvbiBoYW5kbGluZyBtbWlvIHJldHVybiB3aGVuIHdlIApk
+b24ndCB3YW50IHRvLgoKT3RoZXJ3aXNlLCBJIGFsc28gd29uZGVyZWQgYWJvdXQgdXNpbmcgYSBi
+b29sIGhlcmUuIEJ1dCBmb2xsb3dpbmcgdGhlIApwcmUtZXhpc3RpbmcgbG9naWMgbWFrZXMgc2Vu
+c2UgdG8gbWUgKGJ1dCBJIGhhdmUgbm8gc3Ryb25nIGZlZWxpbmcgYWJvdXQgCml0KS4KCj4+Cj4+
+PiAgICBpbnQga3ZtX2FybV92Y3B1X2FyY2hfc2V0X2F0dHIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1
+LAo+Pj4gICAgCQkJICAgICAgIHN0cnVjdCBrdm1fZGV2aWNlX2F0dHIgKmF0dHIpOwo+Pj4gZGlm
+ZiAtLWdpdCBhL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaCBiL2FyY2gvYXJtNjQv
+aW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+Pj4gaW5kZXggZTkyM2I1ODYwNmUyLi5mYTY3ZDIxNjYy
+ZjYgMTAwNjQ0Cj4+PiAtLS0gYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKPj4+
+ICsrKyBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+Pj4gQEAgLTM2OSw2ICsz
+NjksNyBAQCB2b2lkIGt2bV9hcm1faW5pdF9kZWJ1Zyh2b2lkKTsKPj4+ICAgIHZvaWQga3ZtX2Fy
+bV9zZXR1cF9kZWJ1ZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpOwo+Pj4gICAgdm9pZCBrdm1fYXJt
+X2NsZWFyX2RlYnVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSk7Cj4+PiAgICB2b2lkIGt2bV9hcm1f
+cmVzZXRfZGVidWdfcHRyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSk7Cj4+PiAraW50ICBrdm1fYXJt
+X21heWJlX3JldHVybl9kZWJ1ZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHN0cnVjdCBrdm1fcnVu
+ICpydW4pOwo+Pgo+PiBJIGZlZWwgdGhlIG5hbWUgY291bGQgYmUgYSBsaXR0bGUgYml0IG1vcmUg
+ZXhwbGljaXQ6Cj4+Cj4+IGt2bV9hcm1fdHJhcF9uZWVkX3N0ZXBfZGVidWcsIGt2bV9hcm1fdHJh
+cF9zdGVwX3JldHVybl9kZWJ1ZywKPj4ga3ZtX2FybV90cmFwX25lZWRfcmV0dXJuX2RlYnVnLgo+
+IAo+IEkgd2FudGVkIHRvIGtlZXAgdGhlIGRlYnVnIHN1ZmZpeCBzbyB0aGF0J3MgZmluZSBhbHRo
+b3VnaCBJJ20gbm90IHNvCj4gc3VyZSB0cmFwIGlzIGNvcnJlY3QgYmVjYXVzZSBvbiB0aGUgdGFp
+bCBlbmQgb2YgbW1pbyBlbXVsYXRpb24gYXJlIHdlCj4gc3RpbGwgdHJhcHBpbmc/Cj4gCj4gTWF5
+YmUga3ZtX2FybV9zdGVwX2VtdWxhdGVkX2RlYnVnPwo+IAoKWWVzLCBzb3VuZHMgZ29vZC4KClRo
+YW5rcywKCj4+IEF0IGxlYXN0LCBJIHRoaW5rIGl0IHdvdWxkIGJlIG5pY2UgdGhhdCB0aGUgbmFt
+ZSByZWZsZWN0IHRoYXQgdGhpcwo+PiBjaGVjayBpcyBtZWFudCBmb3IgZW11bGF0ZWQgaW5zdHJ1
+Y3Rpb25zLgo+Pgo+PiBPdGhlcndpc2U6Cj4+Cj4+IFJldmlld2VkLWJ5OiBKdWxpZW4gVGhpZXJy
+eSA8anVsaWVuLnRoaWVycnlAYXJtLmNvbT4KPj4KPj4gVGhhbmtzLAo+IAo+IAo+IC0tCj4gQWxl
+eCBCZW5uw6llCj4gCgotLSAKSnVsaWVuIFRoaWVycnkKX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMu
+Y3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlz
+dGluZm8va3ZtYXJtCg==
