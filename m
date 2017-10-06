@@ -1,164 +1,147 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v1 2/2] kvm: arm64: handle single-step of userspace mmio
- instructions
-Date: Fri, 6 Oct 2017 15:43:20 +0100
-Message-ID: <76290ca2-96c8-8f13-bedf-485913c2fcd6@arm.com>
-References: <20171006113921.24880-1-alex.bennee@linaro.org>
- <20171006113921.24880-3-alex.bennee@linaro.org>
- <ca10e4b9-08cc-486c-a229-da5ebcdb76cf@arm.com>
- <3c2eed4b-fc66-b87c-c61e-106efdfa78df@arm.com> <877ew8xu9x.fsf@linaro.org>
- <3a969f2f-29b5-7847-9633-15ac45812ebb@arm.com>
- <2c09d93e-e444-1c83-478e-c3d96f0f8893@arm.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH v2 11/28] arm64/sve: Core task context handling
+Date: Fri, 6 Oct 2017 16:15:28 +0100
+Message-ID: <20171006151528.GB3611@e103592.cambridge.arm.com>
+References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com>
+ <1504198860-12951-12-git-send-email-Dave.Martin@arm.com>
+ <20170913143325.hi4cfcajbts3bbao@localhost>
+ <20171003113302.GR3611@e103592.cambridge.arm.com>
+ <20171005112835.2rhaqx23bhe6tnwl@armageddon.cambridge.arm.com>
+ <20171006131005.GA3611@e103592.cambridge.arm.com>
+ <20171006133639.ialgglabo7yca5bm@armageddon.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DADB540A74
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Oct 2017 10:42:56 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id grUCeuSxjFqh for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 Oct 2017 10:42:55 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C5A2406BB
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Oct 2017 10:42:55 -0400 (EDT)
-In-Reply-To: <2c09d93e-e444-1c83-478e-c3d96f0f8893@arm.com>
-Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Julien Thierry <julien.thierry@arm.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Russell King <linux@armlinux.org.uk>, open list <linux-kernel@vger.kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=us-ascii
+Return-path: <libc-alpha-return-85511-glibc-alpha=m.gmane.org@sourceware.org>
+List-Unsubscribe: <mailto:libc-alpha-unsubscribe-glibc-alpha=m.gmane.org@sourceware.org>
+List-Subscribe: <mailto:libc-alpha-subscribe@sourceware.org>
+List-Archive: <http://sourceware.org/ml/libc-alpha/>
+List-Post: <mailto:libc-alpha@sourceware.org>
+List-Help: <mailto:libc-alpha-help@sourceware.org>, <http://sourceware.org/ml/#faqs>
+Sender: libc-alpha-owner@sourceware.org
+Content-Disposition: inline
+In-Reply-To: <20171006133639.ialgglabo7yca5bm@armageddon.cambridge.arm.com>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: linux-arch@vger.kernel.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Will Deacon <will.deacon@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMDYvMTAvMTcgMTU6MjYsIEp1bGllbiBUaGllcnJ5IHdyb3RlOgo+IAo+IAo+IE9uIDA2LzEw
-LzE3IDE1OjAwLCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4+IE9uIDA2LzEwLzE3IDE0OjQ3LCBBbGV4
-IEJlbm7DqWUgd3JvdGU6Cj4+Pgo+Pj4gTWFyYyBaeW5naWVyIDxtYXJjLnp5bmdpZXJAYXJtLmNv
-bT4gd3JpdGVzOgo+Pj4KPj4+PiBPbiAwNi8xMC8xNyAxMzozNywgTWFyYyBaeW5naWVyIHdyb3Rl
-Ogo+Pj4+PiBPbiAwNi8xMC8xNyAxMjozOSwgQWxleCBCZW5uw6llIHdyb3RlOgo+Pj4+Pj4gVGhl
-IHN5c3RlbSBzdGF0ZSBvZiBLVk0gd2hlbiB1c2luZyB1c2Vyc3BhY2UgZW11bGF0aW9uIGlzIG5v
-dCBjb21wbGV0ZQo+Pj4+Pj4gdW50aWwgd2UgcmV0dXJuIGludG8gS1ZNX1JVTi4gVG8gaGFuZGxl
-IG1taW8gcmVsYXRlZCB1cGRhdGVzIHdlIHdhaXQKPj4+Pj4+IHVudGlsIHRoZXkgaGF2ZSBiZWVu
-IGNvbW1pdHRlZCBhbmQgdGhlbiBzY2hlZHVsZSBvdXIgS1ZNX0VYSVRfREVCVUcuCj4+Pj4+Pgo+
-Pj4+Pj4gSSd2ZSBpbnRyb2R1Y2VkIGEgbmV3IGZ1bmN0aW9uIGt2bV9hcm1fbWF5YmVfcmV0dXJu
-X2RlYnVnKCkgdG8gd3JhcCB1cAo+Pj4+Pj4gdGhlIGRpZmZlcmVuY2VzIGJldHdlZW4gYXJtL2Fy
-bTY0IHdoaWNoIGlzIGN1cnJlbnRseSBudWxsIGZvciBhcm0uCj4+Pj4+Pgo+Pj4+Pj4gU2lnbmVk
-LW9mZi1ieTogQWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgo+Pj4+Pj4gLS0t
-Cj4+Pj4+PiAgIGFyY2gvYXJtL2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggICB8ICAyICsrCj4+Pj4+
-PiAgIGFyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaCB8ICAxICsKPj4+Pj4+ICAgYXJj
-aC9hcm02NC9rdm0vZGVidWcuYyAgICAgICAgICAgIHwgMjEgKysrKysrKysrKysrKysrKysrKysr
-Cj4+Pj4+PiAgIGFyY2gvYXJtNjQva3ZtL2hhbmRsZV9leGl0LmMgICAgICB8ICA5ICsrKy0tLS0t
-LQo+Pj4+Pj4gICB2aXJ0L2t2bS9hcm0vYXJtLmMgICAgICAgICAgICAgICAgfCAgMiArLQo+Pj4+
-Pj4gICB2aXJ0L2t2bS9hcm0vbW1pby5jICAgICAgICAgICAgICAgfCAgMyArKy0KPj4+Pj4+ICAg
-NiBmaWxlcyBjaGFuZ2VkLCAzMCBpbnNlcnRpb25zKCspLCA4IGRlbGV0aW9ucygtKQo+Pj4+Pj4K
-Pj4+Pj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybS9pbmNsdWRlL2FzbS9rdm1faG9zdC5oIGIvYXJj
-aC9hcm0vaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+Pj4+Pj4gaW5kZXggNGE4NzlmNmZmMTNiLi5h
-ZWM5NDNmNmQxMjMgMTAwNjQ0Cj4+Pj4+PiAtLS0gYS9hcmNoL2FybS9pbmNsdWRlL2FzbS9rdm1f
-aG9zdC5oCj4+Pj4+PiArKysgYi9hcmNoL2FybS9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCj4+Pj4+
-PiBAQCAtMjg1LDYgKzI4NSw4IEBAIHN0YXRpYyBpbmxpbmUgdm9pZCBrdm1fYXJtX2luaXRfZGVi
-dWcodm9pZCkge30KPj4+Pj4+ICAgc3RhdGljIGlubGluZSB2b2lkIGt2bV9hcm1fc2V0dXBfZGVi
-dWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KSB7fQo+Pj4+Pj4gICBzdGF0aWMgaW5saW5lIHZvaWQg
-a3ZtX2FybV9jbGVhcl9kZWJ1ZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpIHt9Cj4+Pj4+PiAgIHN0
-YXRpYyBpbmxpbmUgdm9pZCBrdm1fYXJtX3Jlc2V0X2RlYnVnX3B0cihzdHJ1Y3Qga3ZtX3ZjcHUg
-KnZjcHUpIHt9Cj4+Pj4+PiArc3RhdGljIGlubGluZSBpbnQgIGt2bV9hcm1fbWF5YmVfcmV0dXJu
-X2RlYnVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPj4+Pj4+ICsJCQkJCQlzdHJ1Y3Qga3ZtX3J1
-biAqcnVuKSB7fQo+Pj4+Pj4KPj4+Pj4+ICAgaW50IGt2bV9hcm1fdmNwdV9hcmNoX3NldF9hdHRy
-KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPj4+Pj4+ICAgCQkJICAgICAgIHN0cnVjdCBrdm1fZGV2
-aWNlX2F0dHIgKmF0dHIpOwo+Pj4+Pj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQvaW5jbHVkZS9h
-c20va3ZtX2hvc3QuaCBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+Pj4+Pj4g
-aW5kZXggZTkyM2I1ODYwNmUyLi5mYTY3ZDIxNjYyZjYgMTAwNjQ0Cj4+Pj4+PiAtLS0gYS9hcmNo
-L2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKPj4+Pj4+ICsrKyBiL2FyY2gvYXJtNjQvaW5j
-bHVkZS9hc20va3ZtX2hvc3QuaAo+Pj4+Pj4gQEAgLTM2OSw2ICszNjksNyBAQCB2b2lkIGt2bV9h
-cm1faW5pdF9kZWJ1Zyh2b2lkKTsKPj4+Pj4+ICAgdm9pZCBrdm1fYXJtX3NldHVwX2RlYnVnKHN0
-cnVjdCBrdm1fdmNwdSAqdmNwdSk7Cj4+Pj4+PiAgIHZvaWQga3ZtX2FybV9jbGVhcl9kZWJ1Zyhz
-dHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpOwo+Pj4+Pj4gICB2b2lkIGt2bV9hcm1fcmVzZXRfZGVidWdf
-cHRyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSk7Cj4+Pj4+PiAraW50ICBrdm1fYXJtX21heWJlX3Jl
-dHVybl9kZWJ1ZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHN0cnVjdCBrdm1fcnVuICpydW4pOwo+
-Pj4+Pj4gICBpbnQga3ZtX2FybV92Y3B1X2FyY2hfc2V0X2F0dHIoc3RydWN0IGt2bV92Y3B1ICp2
-Y3B1LAo+Pj4+Pj4gICAJCQkgICAgICAgc3RydWN0IGt2bV9kZXZpY2VfYXR0ciAqYXR0cik7Cj4+
-Pj4+PiAgIGludCBrdm1fYXJtX3ZjcHVfYXJjaF9nZXRfYXR0cihzdHJ1Y3Qga3ZtX3ZjcHUgKnZj
-cHUsCj4+Pj4+PiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vZGVidWcuYyBiL2FyY2gvYXJt
-NjQva3ZtL2RlYnVnLmMKPj4+Pj4+IGluZGV4IGRiYWRmYWY4NTBhNy4uYTEwYTE4YzU1Yzg3IDEw
-MDY0NAo+Pj4+Pj4gLS0tIGEvYXJjaC9hcm02NC9rdm0vZGVidWcuYwo+Pj4+Pj4gKysrIGIvYXJj
-aC9hcm02NC9rdm0vZGVidWcuYwo+Pj4+Pj4gQEAgLTIyMSwzICsyMjEsMjQgQEAgdm9pZCBrdm1f
-YXJtX2NsZWFyX2RlYnVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKPj4+Pj4+ICAgCQl9Cj4+Pj4+
-PiAgIAl9Cj4+Pj4+PiAgIH0KPj4+Pj4+ICsKPj4+Pj4+ICsKPj4+Pj4+ICsvKgo+Pj4+Pj4gKyAq
-IFdoZW4gS1ZNIGhhcyBzdWNjZXNzZnVsbHkgZW11bGF0ZWQgdGhlIGluc3RydWN0aW9uIHdlIG1p
-Z2h0IHdhbnQgdG8KPj4+Pj4+ICsgKiByZXR1cm4gd2UgYSBLVk1fRVhJVF9ERUJVRy4gV2UgY2Fu
-IG9ubHkgZG8gdGhpcyBvbmNlIHRoZSBlbXVsYXRpb24KPj4+Pj4+ICsgKiBpcyBjb21wbGV0ZSB0
-aG91Z2ggc28gZm9yIHVzZXJzcGFjZSBlbXVsYXRpb25zIHdlIGhhdmUgdG8gd2FpdAo+Pj4+Pj4g
-KyAqIHVudGlsIHdlIGhhdmUgcmUtZW50ZXJlZCBLVk0uCj4+Pj4+PiArICoKPj4+Pj4+ICsgKiBS
-ZXR1cm4gPiAwIHRvIHJldHVybiB0byBndWVzdCwgMCAoYW5kIHNldCBleGl0X3JlYXNvbikgb24g
-cHJvcGVyCj4+Pj4+PiArICogZXhpdCB0byB1c2Vyc3BhY2UuCj4+Pj4+PiArICovCj4+Pj4+PiAr
-Cj4+Pj4+PiAraW50IGt2bV9hcm1fbWF5YmVfcmV0dXJuX2RlYnVnKHN0cnVjdCBrdm1fdmNwdSAq
-dmNwdSwgc3RydWN0IGt2bV9ydW4gKnJ1bikKPj4+Pj4+ICt7Cj4+Pj4+PiArCWlmICh2Y3B1LT5n
-dWVzdF9kZWJ1ZyAmIEtWTV9HVUVTVERCR19TSU5HTEVTVEVQKSB7Cj4+Pj4+PiArCQlydW4tPmV4
-aXRfcmVhc29uID0gS1ZNX0VYSVRfREVCVUc7Cj4+Pj4+PiArCQlydW4tPmRlYnVnLmFyY2guaHNy
-ID0gRVNSX0VMeF9FQ19TT0ZUU1RQX0xPVyA8PCBFU1JfRUx4X0VDX1NISUZUOwo+Pj4+Pj4gKwkJ
-cmV0dXJuIDA7Cj4+Pj4+PiArCX0KPj4+Pj4+ICsJcmV0dXJuIDE7Cj4+Pj4+PiArfQo+Pj4+Pj4g
-ZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL2hhbmRsZV9leGl0LmMgYi9hcmNoL2FybTY0L2t2
-bS9oYW5kbGVfZXhpdC5jCj4+Pj4+PiBpbmRleCBjOTE4ZDI5MWNiNTguLjdiMDRmNTkyMTdiZiAx
-MDA2NDQKPj4+Pj4+IC0tLSBhL2FyY2gvYXJtNjQva3ZtL2hhbmRsZV9leGl0LmMKPj4+Pj4+ICsr
-KyBiL2FyY2gvYXJtNjQva3ZtL2hhbmRsZV9leGl0LmMKPj4+Pj4+IEBAIC0yMDIsMTMgKzIwMiwx
-MCBAQCBzdGF0aWMgaW50IGhhbmRsZV90cmFwX2V4Y2VwdGlvbnMoc3RydWN0IGt2bV92Y3B1ICp2
-Y3B1LCBzdHJ1Y3Qga3ZtX3J1biAqcnVuKQo+Pj4+Pj4gICAJCWhhbmRsZWQgPSBleGl0X2hhbmRs
-ZXIodmNwdSwgcnVuKTsKPj4+Pj4+ICAgCX0KPj4+Pj4+Cj4+Pj4+PiAtCWlmIChoYW5kbGVkICYm
-ICh2Y3B1LT5ndWVzdF9kZWJ1ZyAmIEtWTV9HVUVTVERCR19TSU5HTEVTVEVQKSkgewo+Pj4+Pj4g
-LQkJaGFuZGxlZCA9IDA7Cj4+Pj4+PiAtCQlydW4tPmV4aXRfcmVhc29uID0gS1ZNX0VYSVRfREVC
-VUc7Cj4+Pj4+PiAtCQlydW4tPmRlYnVnLmFyY2guaHNyID0gRVNSX0VMeF9FQ19TT0ZUU1RQX0xP
-VyA8PCBFU1JfRUx4X0VDX1NISUZUOwo+Pj4+Pj4gLQl9Cj4+Pj4+PiArCWlmIChoYW5kbGVkKQo+
-Pj4+Pj4gKwkJcmV0dXJuIGt2bV9hcm1fbWF5YmVfcmV0dXJuX2RlYnVnKHZjcHUsIHJ1bik7Cj4+
-Pj4+Pgo+Pj4+Pj4gLQlyZXR1cm4gaGFuZGxlZDsKPj4+Pj4+ICsJcmV0dXJuIDA7Cj4+Pj4+PiAg
-IH0KPj4+Pj4+Cj4+Pj4+PiAgIC8qCj4+Pj4+PiBkaWZmIC0tZ2l0IGEvdmlydC9rdm0vYXJtL2Fy
-bS5jIGIvdmlydC9rdm0vYXJtL2FybS5jCj4+Pj4+PiBpbmRleCBiOWY2OGU0YWRkNzEuLjNkMjhm
-ZTJkYWEyNiAxMDA2NDQKPj4+Pj4+IC0tLSBhL3ZpcnQva3ZtL2FybS9hcm0uYwo+Pj4+Pj4gKysr
-IGIvdmlydC9rdm0vYXJtL2FybS5jCj4+Pj4+PiBAQCAtNjIzLDcgKzYyMyw3IEBAIGludCBrdm1f
-YXJjaF92Y3B1X2lvY3RsX3J1bihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHN0cnVjdCBrdm1fcnVu
-ICpydW4pCj4+Pj4+Pgo+Pj4+Pj4gICAJaWYgKHJ1bi0+ZXhpdF9yZWFzb24gPT0gS1ZNX0VYSVRf
-TU1JTykgewo+Pj4+Pj4gICAJCXJldCA9IGt2bV9oYW5kbGVfbW1pb19yZXR1cm4odmNwdSwgdmNw
-dS0+cnVuKTsKPj4+Pj4+IC0JCWlmIChyZXQpCj4+Pj4+PiArCQlpZiAocmV0IDwgMSkKPj4+Pj4+
-ICAgCQkJcmV0dXJuIHJldDsKPj4+Pj4+ICAgCX0KPj4+Pj4+Cj4+Pj4+PiBkaWZmIC0tZ2l0IGEv
-dmlydC9rdm0vYXJtL21taW8uYyBiL3ZpcnQva3ZtL2FybS9tbWlvLmMKPj4+Pj4+IGluZGV4IGI2
-ZTcxNWZkM2M5MC4uZTQzZTNiZDYyMjJmIDEwMDY0NAo+Pj4+Pj4gLS0tIGEvdmlydC9rdm0vYXJt
-L21taW8uYwo+Pj4+Pj4gKysrIGIvdmlydC9rdm0vYXJtL21taW8uYwo+Pj4+Pj4gQEAgLTExNyw3
-ICsxMTcsOCBAQCBpbnQga3ZtX2hhbmRsZV9tbWlvX3JldHVybihzdHJ1Y3Qga3ZtX3ZjcHUgKnZj
-cHUsIHN0cnVjdCBrdm1fcnVuICpydW4pCj4+Pj4+PiAgIAkJdmNwdV9zZXRfcmVnKHZjcHUsIHZj
-cHUtPmFyY2gubW1pb19kZWNvZGUucnQsIGRhdGEpOwo+Pj4+Pj4gICAJfQo+Pj4+Pj4KPj4+Pj4+
-IC0JcmV0dXJuIDA7Cj4+Pj4+PiArCS8qIElmIGRlYnVnZ2luZyBpbiBlZmZlY3Qgd2UgbWF5IG5l
-ZWQgdG8gcmV0dXJuIG5vdyAqLwo+Pj4+Pj4gKwlyZXR1cm4ga3ZtX2FybV9tYXliZV9yZXR1cm5f
-ZGVidWcodmNwdSwgcnVuKTsKPj4+Pj4KPj4+Pj4gQWgsIHRoYXQncyBob3cgeW91IGRvIGl0LiBP
-Sy4gVGhlbiB0aGUgcGF0Y2ggc3BsaXR0aW5nIGlzIHdyb25nLCBiZWNhdXNlCj4+Pj4+IGV2ZXJ5
-dGhpbmcgaXMgYnJva2VuIGFmdGVyIHBhdGNoICMxLgo+Pj4+Cj4+Pj4gQWN0dWFsbHksIGl0IGlz
-IG5vdCBicm9rZW4gYXQgYWxsLiBJJ20ganVzdCBjb25mdXNlZCBieSB0aGUgdmVyeQo+Pj4+IGVz
-b3RlcmljIGZsb3cuCj4+Pgo+Pj4gV2UgY291bGQganVzdCBtZXJnZSB0aGUgd2hvbGUgcGF0Y2gg
-aW4gb25lIGJ1dCBJIHdhbnRlZCB0byBzaG93IHRoZQo+Pj4gZGlmZmVyZW5jZSBiZXR3ZWVuIGlu
-LWtlcm5lbCBhbmQgb3V0LW9mLWtlcm5lbCBlbXVsYXRpb24uCj4+Pgo+Pj4gSSBjb3VsZCBhbHNv
-IG1vdmUgdGhlIHN0ZXAgaGFuZGxpbmcgdG8gdGhlIG1taW8gbGVnIGluCj4+PiBrdm1fYXJjaF92
-Y3B1X2lvY3RsX3J1biBidXQgeW91IG1lbnRpb25lZCB5b3UgdXNlIHRoZSBtbWlvIGNvbXBsZXRp
-b24KPj4+IGVsc2V3aGVyZSBhbnl3YXk/Cj4+IFllcywgbG9vayBhdCB0aGUgZW5kIG9mIGlvX21l
-bV9hYm9ydCgpLiBUaGlzIGlzIHVzZWQgYnkgdGhlIHZnaWMgdG8KPj4gY29tcGxldGUgYSByZWFk
-IGVtdWxhdGlvbiBpbiB0aGUga2VybmVsLgo+Pgo+PiBBbmQgYWN0dWFsbHksIHRoaXMgbWVhbnMg
-dGhhdCB3ZSBzaG91bGRuJ3QgaGF2ZSB0byBtZXNzIHdpdGgKPj4gaGFuZGxlX2V4aXQuIEp1c3Qg
-Y2hlY2sgZm9yIHRoZSByZXR1cm4gdmFsdWUgb2Yga3ZtX2hhbmRsZV9tbWlvX3JldHVybgo+PiBp
-biB0aGUgY2FsbCBzaXRlcyAoaW5jbHVkaW5nIHRoZSBvbmUgaW4gaW9fbWVtX2Fib3J0KSwgYW5k
-IGV4aXQgaWYgd2UKPj4gbmVlZCB0byBzaW5nbGUtc3RlcC4uLgo+Pgo+IAo+IEkgdGhpbmsgd2Ug
-bmVlZCB0byBtZXNzIHdpdGggaGFuZGxlX2V4aXQgKG9yIGF0IGxlYXN0IHNvbWV0aGluZyBlbHNl
-IAo+IHRoYW4ga3ZtX2hhbmRsZV9tbWlvIGNhbGwgc2l0ZXMpIGJlY2F1c2UgdGhlIHBhdGNoZXMg
-ZG9uJ3Qgb25seSBmaXggTU1JTyAKPiBzaW5nbGUgc3RlcHBpbmcsIGJ1dCBhbHNvIG90aGVyIGVt
-dWxhdGVkIHN0dWZmIChzeXN0ZW0gcmVnaXN0ZXIgCj4gYWNjZXNzZXMsIC4uLikuCgpBaCwgdHJ1
-ZS4gSSB3YXMgdG9vIGZvY3Vzc2VkIG9uIHRoZSB0aGUgTU1JTyBwcm9ibGVtLgoKPiBCdXQgd2l0
-aCB5b3VyIHN1Z2dlc3Rpb24gbWF5YmUgd2UgY2FuIGF0IGxlYXN0IGhhbmRsZSBib3RoIE1NSU8g
-Y2FzZXMgaW4gCj4gYSBzaW1pbGFyIG1hbm5lci4gSSB0aGluayB3ZSBzdGlsbCBuZWVkIHRoZSBj
-b2RlIGluIGhhbmRsZV9leGl0LCBvciBhZGQgCj4gbW9yZSBjb2RlIHRvIGRlYWwgY2FzZSBieSBj
-YXNlIHdpdGggb3RoZXIgZW11bGF0ZWQgaW5zdHJ1Y3Rpb25zLgpGYWlyIGVub3VnaC4KCglNLgot
-LSAKSmF6eiBpcyBub3QgZGVhZC4gSXQganVzdCBzbWVsbHMgZnVubnkuLi4KX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdApr
-dm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1
-L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+On Fri, Oct 06, 2017 at 02:36:40PM +0100, Catalin Marinas wrote:
+> On Fri, Oct 06, 2017 at 02:10:09PM +0100, Dave P Martin wrote:
+> > On Thu, Oct 05, 2017 at 12:28:35PM +0100, Catalin Marinas wrote:
+> > > On Tue, Oct 03, 2017 at 12:33:03PM +0100, Dave P Martin wrote:
+> > > > TIF_FOREIGN_FPSTATE's meaning is expanded to cover SVE, but otherwise
+> > > > unchanged:
+> > > > 
+> > > >  * If a task is running and !TIF_FOREIGN_FPSTATE, then the the CPU
+> > > >    registers of the CPU the task is running on contain the authoritative
+> > > >    FPSIMD/SVE state of the task.  The backing memory may be stale.
+> > > > 
+> > > >  * Otherwise (i.e., task not running, or task running and
+> > > >    TIF_FOREIGN_FPSTATE), the task's FPSIMD/SVE backing memory is
+> > > >    authoritative.  If additionally per_cpu(fpsimd_last_state,
+> > > >    task->fpsimd_state.cpu) == &task->fpsimd_state.cpu, then
+> > > >    task->fpsimd_state.cpu's registers are also up to date for task, but
+> > > >    not authorititive: the current FPSIMD/SVE state may be read from
+> > > >    them, but they must not be written.
+> > > >  
+> > > > The FPSIMD/SVE backing memory is selected by TIF_SVE:
+> > > > 
+> > > >  * TIF_SVE set: Zn (incorporating Vn in bits[127:0]), Pn and FFR are
+> > > >    stored in task->thread.sve_state, formatted appropriately for vector
+> > > >    length task->thread.sve_vl.  task->thread.sve_state must point to a
+> > > >    valid buffer at least sve_state_size(task) bytes in size.
+> 
+> "Zn [...] stored in  task->thread.sve_state" - is this still true with
+> the changes you proposed? I guess even without these changes, you have
+> situations where the hardware regs are out of sync with sve_state (see
+> more below).
+
+I guess I need to tweak the wording here.
+
+TIF_SVE says where the vector state should be loaded/stored from,
+but does not say whether the data is up to date in memory, or when
+it should be loaded/stored.
+
+The latter is described by a cocktail of different things including
+which bit of kernel code we are executing if any, whether the task
+is running/stopped etc., TIF_FOREIGN_FPSTATE,
+task->thread.fpsimd_state.cpu and per_cpu(fpsimd_last_state).
+
+
+Does this make any better sense of my code below?
+
+> 
+> > > >  * TIF_SVE clear: Vn are stored in task->fpsimd_state; Zn[max : 128] are
+> > > >    logically zero[*] but not stored anywhere; Pn, FFR are not stored and
+> > > >    have unspecified values from userspace's point of view.
+> > > >    task->thread.sve_state does not need to be non-null, valid or any
+> > > >    particular size: it must not be dereferenced.
+> > > > 
+> > > >    In practice I don't exploit the "unspecifiedness" much.  The Zn high
+> > > >    bits, Pn and FFR are all zeroed when setting TIF_SVE again:
+> > > >    sve_alloc() is the common path for this.
+> > > > 
+> > > >  * FPSR and FPCR are always stored in task->fpsimd_state irrespctive of
+> > > >    whether TIF_SVE is clear or set, since these are not vector length
+> > > >    dependent.
+> [...]
+> > > Just wondering, as an optimisation for do_sve_acc() - instead of
+> > > sve_alloc() and fpsimd_to_sve(), can we not force the loading of the
+> > > FPSIMD regs on the return to user via TIF_FOREIGN_FPSTATE? This would
+> > > ensure the zeroing of the top SVE bits and we only need to allocate the
+> > > SVE state on the saving path. This means enabling SVE for user and
+> > > setting TIF_SVE without having the backing storage allocated.
+> > 
+> > Currently the set of places where the "TIF_SVE implies sve_state valid"
+> > assumption is applied is not very constrained, so while your suggestion
+> > is reasonable I'd rather not mess with it just now, if possible.
+> > 
+> > 
+> > But we can do this (which is what my current fixup has):
+> > 
+> > el0_sve_acc:
+> > 	enable_dbg_and_irq
+> > 	// ...
+> > 	bl	do_sve_acc
+> > 	b	ret_to_user
+> > 
+> > void do_sve_acc(unsigned int esr, struct pt_regs *regs)
+> > {
+> > 	/* Even if we chose not to use SVE, the hardware could still trap: */
+> > 	if (unlikely(!system_supports_sve()) || WARN_ON(is_compat_task())) {
+> > 		force_signal_inject(SIGILL, ILL_ILLOPC, regs, 0);
+> > 		return;
+> > 	}
+> > 
+> > 	sve_alloc(current);
+> > 
+> > 	local_bh_disable();
+> > 	if (test_and_clear_thread_flag(TIF_FOREIGN_FPSTATE)) {
+> > 		task_fpsimd_load(); /* flushes high Zn bits as a side-effect */
+> > 		sve_flush_pregs();
+> > 	} else {
+> > 		sve_flush_all(); /* flush all the SVE bits in-place */
+> > 	}
+> > 
+> > 	if (test_and_set_thread_flag(TIF_SVE))
+> > 		WARN_ON(1); /* SVE access shouldn't have trapped */
+> > 	local_bh_enable();
+> > }
+> > 
+> > where sve_flush_all() zeroes all the high Zn bits via a series of
+> > MOV Vn, Vn instructions, and also zeroes Pn and FFR.  sve_fplush_pregs()
+> > just does the latter.
+> 
+> This looks fine to me but I added a comment above. IIUC, we can now have
+> TIF_SVE set while sve_state contains stale data. I don't see an issue
+> given that every time you enter the kernel from user space you have
+> TIF_SVE set and the sve_state storage out of sync. Maybe tweak the
+> TIF_SVE description above slightly.
+> 
+
+See my comment above ... any better?
+
+If so, I'll paste some of that explanatory text into fpsimd.c (in lieu
+of a better place to put it).
+
+Cheers
+---Dave
