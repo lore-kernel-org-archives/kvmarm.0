@@ -1,125 +1,203 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 08/10] KVM: arm/arm64: Drop vcpu parameter from coherent_{d,i}cache_guest_page
-Date: Mon,  9 Oct 2017 16:20:30 +0100
-Message-ID: <20171009152032.27804-9-marc.zyngier@arm.com>
-References: <20171009152032.27804-1-marc.zyngier@arm.com>
+Subject: Re: [PATCH v3 02/20] arm64: Use physical counter for in-kernel reads
+Date: Mon, 9 Oct 2017 17:10:40 +0100
+Message-ID: <0f84a7fb-14cd-d172-6b90-eefb05a87aea@arm.com>
+References: <20170923004207.22356-1-cdall@linaro.org>
+ <20170923004207.22356-3-cdall@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20171009152032.27804-1-marc.zyngier@arm.com>
+In-Reply-To: <20170923004207.22356-3-cdall@linaro.org>
+Content-Language: en-GB
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+To: Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The vcpu parameter isn't used for anything, and gets in the way of
-further cleanups. Let's get rid of it.
+On 23/09/17 01:41, Christoffer Dall wrote:
+> Using the physical counter allows KVM to retain the offset between the
+> virtual and physical counter as long as it is actively running a VCPU.
+> 
+> As soon as a VCPU is released, another thread is scheduled or we start
+> running userspace applications, we reset the offset to 0, so that
+> userspace accessing the virtual timer can still read the cirtual counter
 
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm/include/asm/kvm_mmu.h   |  6 ++----
- arch/arm64/include/asm/kvm_mmu.h |  6 ++----
- virt/kvm/arm/mmu.c               | 18 ++++++++----------
- 3 files changed, 12 insertions(+), 18 deletions(-)
+s/cirtual/virtual/
 
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index ad442d86c23e..5f1ac88a5951 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -150,8 +150,7 @@ static inline bool vcpu_has_cache_enabled(struct kvm_vcpu *vcpu)
- 	return (vcpu_cp15(vcpu, c1_SCTLR) & 0b101) == 0b101;
- }
+> and get the same view of time as the kernel.
+> 
+> This opens up potential improvements for KVM performance.
+> 
+> VHE kernels or kernels continuing to use the virtual timer are
+> unaffected.
+> 
+> Signed-off-by: Christoffer Dall <cdall@linaro.org>
+> ---
+>  arch/arm64/include/asm/arch_timer.h  | 9 ++++-----
+>  drivers/clocksource/arm_arch_timer.c | 3 +--
+>  2 files changed, 5 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/arch_timer.h b/arch/arm64/include/asm/arch_timer.h
+> index a652ce0..1859a1c 100644
+> --- a/arch/arm64/include/asm/arch_timer.h
+> +++ b/arch/arm64/include/asm/arch_timer.h
+> @@ -148,11 +148,10 @@ static inline void arch_timer_set_cntkctl(u32 cntkctl)
+>  
+>  static inline u64 arch_counter_get_cntpct(void)
+>  {
+> -	/*
+> -	 * AArch64 kernel and user space mandate the use of CNTVCT.
+> -	 */
+> -	BUG();
+> -	return 0;
+> +	u64 cval;
+> +	isb();
+> +	asm volatile("mrs %0, cntpct_el0" : "=r" (cval));
+> +	return cval;
+
+This would be just fine if we were blessed with quality HW. This is 
+unfortunately not the case, and we need a staggering amount of crap to 
+deal with timer errata.
+
+I suggest you replace this with the (fully untested) following:
+
+diff --git a/arch/arm64/include/asm/arch_timer.h b/arch/arm64/include/asm/arch_timer.h
+index a652ce0a5cb2..04275de614db 100644
+--- a/arch/arm64/include/asm/arch_timer.h
++++ b/arch/arm64/include/asm/arch_timer.h
+@@ -52,6 +52,7 @@ struct arch_timer_erratum_workaround {
+ 	const char *desc;
+ 	u32 (*read_cntp_tval_el0)(void);
+ 	u32 (*read_cntv_tval_el0)(void);
++	u64 (*read_cntpct_el0)(void);
+ 	u64 (*read_cntvct_el0)(void);
+ 	int (*set_next_event_phys)(unsigned long, struct clock_event_device *);
+ 	int (*set_next_event_virt)(unsigned long, struct clock_event_device *);
+@@ -148,11 +149,8 @@ static inline void arch_timer_set_cntkctl(u32 cntkctl)
  
--static inline void __coherent_dcache_guest_page(struct kvm_vcpu *vcpu,
--						kvm_pfn_t pfn,
-+static inline void __coherent_dcache_guest_page(kvm_pfn_t pfn,
- 						unsigned long size)
+ static inline u64 arch_counter_get_cntpct(void)
  {
- 	/*
-@@ -177,8 +176,7 @@ static inline void __coherent_dcache_guest_page(struct kvm_vcpu *vcpu,
- 	}
+-	/*
+-	 * AArch64 kernel and user space mandate the use of CNTVCT.
+-	 */
+-	BUG();
+-	return 0;
++	isb();
++	return arch_timer_reg_read_stable(cntpct_el0);
  }
  
--static inline void __coherent_icache_guest_page(struct kvm_vcpu *vcpu,
--						kvm_pfn_t pfn,
-+static inline void __coherent_icache_guest_page(kvm_pfn_t pfn,
- 						unsigned long size)
+ static inline u64 arch_counter_get_cntvct(void)
+diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
+index fd4b7f684bd0..5b41a96fa8dd 100644
+--- a/drivers/clocksource/arm_arch_timer.c
++++ b/drivers/clocksource/arm_arch_timer.c
+@@ -217,6 +217,11 @@ static u32 notrace fsl_a008585_read_cntv_tval_el0(void)
+ 	return __fsl_a008585_read_reg(cntv_tval_el0);
+ }
+ 
++static u64 notrace fsl_a008585_read_cntpct_el0(void)
++{
++	return __fsl_a008585_read_reg(cntpct_el0);
++}
++
+ static u64 notrace fsl_a008585_read_cntvct_el0(void)
  {
- 	u32 iclsz;
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index e7af74b8b51a..33dcc3c79574 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -252,8 +252,7 @@ static inline bool vcpu_has_cache_enabled(struct kvm_vcpu *vcpu)
- 	return (vcpu_sys_reg(vcpu, SCTLR_EL1) & 0b101) == 0b101;
+ 	return __fsl_a008585_read_reg(cntvct_el0);
+@@ -258,6 +263,11 @@ static u32 notrace hisi_161010101_read_cntv_tval_el0(void)
+ 	return __hisi_161010101_read_reg(cntv_tval_el0);
  }
  
--static inline void __coherent_dcache_guest_page(struct kvm_vcpu *vcpu,
--						kvm_pfn_t pfn,
-+static inline void __coherent_dcache_guest_page(kvm_pfn_t pfn,
- 						unsigned long size)
++static u64 notrace hisi_161010101_read_cntpct_el0(void)
++{
++	return __hisi_161010101_read_reg(cntpct_el0);
++}
++
+ static u64 notrace hisi_161010101_read_cntvct_el0(void)
  {
- 	void *va = page_address(pfn_to_page(pfn));
-@@ -261,8 +260,7 @@ static inline void __coherent_dcache_guest_page(struct kvm_vcpu *vcpu,
- 	kvm_flush_dcache_to_poc(va, size);
+ 	return __hisi_161010101_read_reg(cntvct_el0);
+@@ -296,6 +306,15 @@ static u64 notrace arm64_858921_read_cntvct_el0(void)
+ 	new = read_sysreg(cntvct_el0);
+ 	return (((old ^ new) >> 32) & 1) ? old : new;
  }
++
++static u64 notrace arm64_858921_read_cntpct_el0(void)
++{
++	u64 old, new;
++
++	old = read_sysreg(cntpct_el0);
++	new = read_sysreg(cntpct_el0);
++	return (((old ^ new) >> 32) & 1) ? old : new;
++}
+ #endif
  
--static inline void __coherent_icache_guest_page(struct kvm_vcpu *vcpu,
--						kvm_pfn_t pfn,
-+static inline void __coherent_icache_guest_page(kvm_pfn_t pfn,
- 						unsigned long size)
+ #ifdef CONFIG_ARM_ARCH_TIMER_OOL_WORKAROUND
+@@ -310,7 +329,7 @@ static void erratum_set_next_event_tval_generic(const int access, unsigned long
+ 						struct clock_event_device *clk)
  {
- 	if (icache_is_aliasing()) {
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index ccc6106764a6..5b495450e92f 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -1268,16 +1268,14 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
- 	kvm_mmu_write_protect_pt_masked(kvm, slot, gfn_offset, mask);
- }
+ 	unsigned long ctrl;
+-	u64 cval = evt + arch_counter_get_cntvct();
++	u64 cval = evt + arch_timer_read_counter();
  
--static void coherent_dcache_guest_page(struct kvm_vcpu *vcpu, kvm_pfn_t pfn,
--				       unsigned long size)
-+static void coherent_dcache_guest_page(kvm_pfn_t pfn, unsigned long size)
- {
--	__coherent_dcache_guest_page(vcpu, pfn, size);
-+	__coherent_dcache_guest_page(pfn, size);
- }
- 
--static void coherent_icache_guest_page(struct kvm_vcpu *vcpu, kvm_pfn_t pfn,
--				       unsigned long size)
-+static void coherent_icache_guest_page(kvm_pfn_t pfn, unsigned long size)
- {
--	__coherent_icache_guest_page(vcpu, pfn, size);
-+	__coherent_icache_guest_page(pfn, size);
- }
- 
- static void kvm_send_hwpoison_signal(unsigned long address,
-@@ -1413,11 +1411,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		}
- 
- 		if (fault_status != FSC_PERM)
--			coherent_dcache_guest_page(vcpu, pfn, PMD_SIZE);
-+			coherent_dcache_guest_page(pfn, PMD_SIZE);
- 
- 		if (exec_fault) {
- 			new_pmd = kvm_s2pmd_mkexec(new_pmd);
--			coherent_icache_guest_page(vcpu, pfn, PMD_SIZE);
-+			coherent_icache_guest_page(pfn, PMD_SIZE);
- 		} else if (fault_status == FSC_PERM) {
- 			/* Preserve execute if XN was already cleared */
- 			pmd_t *old_pmdp = stage2_get_pmd(kvm, NULL, fault_ipa);
-@@ -1438,11 +1436,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		}
- 
- 		if (fault_status != FSC_PERM)
--			coherent_dcache_guest_page(vcpu, pfn, PAGE_SIZE);
-+			coherent_dcache_guest_page(pfn, PAGE_SIZE);
- 
- 		if (exec_fault) {
- 			new_pte = kvm_s2pte_mkexec(new_pte);
--			coherent_icache_guest_page(vcpu, pfn, PAGE_SIZE);
-+			coherent_icache_guest_page(pfn, PAGE_SIZE);
- 		} else if (fault_status == FSC_PERM) {
- 			/* Preserve execute if XN was already cleared */
- 			pte_t *old_ptep = stage2_get_pte(kvm, fault_ipa);
+ 	ctrl = arch_timer_reg_read(access, ARCH_TIMER_REG_CTRL, clk);
+ 	ctrl |= ARCH_TIMER_CTRL_ENABLE;
+@@ -346,6 +365,7 @@ static const struct arch_timer_erratum_workaround ool_workarounds[] = {
+ 		.desc = "Freescale erratum a005858",
+ 		.read_cntp_tval_el0 = fsl_a008585_read_cntp_tval_el0,
+ 		.read_cntv_tval_el0 = fsl_a008585_read_cntv_tval_el0,
++		.read_cntpct_el0 = fsl_a008585_read_cntpct_el0,
+ 		.read_cntvct_el0 = fsl_a008585_read_cntvct_el0,
+ 		.set_next_event_phys = erratum_set_next_event_tval_phys,
+ 		.set_next_event_virt = erratum_set_next_event_tval_virt,
+@@ -358,6 +378,7 @@ static const struct arch_timer_erratum_workaround ool_workarounds[] = {
+ 		.desc = "HiSilicon erratum 161010101",
+ 		.read_cntp_tval_el0 = hisi_161010101_read_cntp_tval_el0,
+ 		.read_cntv_tval_el0 = hisi_161010101_read_cntv_tval_el0,
++		.read_cntpct_el0 = hisi_161010101_read_cntpct_el0,
+ 		.read_cntvct_el0 = hisi_161010101_read_cntvct_el0,
+ 		.set_next_event_phys = erratum_set_next_event_tval_phys,
+ 		.set_next_event_virt = erratum_set_next_event_tval_virt,
+@@ -368,6 +389,7 @@ static const struct arch_timer_erratum_workaround ool_workarounds[] = {
+ 		.desc = "HiSilicon erratum 161010101",
+ 		.read_cntp_tval_el0 = hisi_161010101_read_cntp_tval_el0,
+ 		.read_cntv_tval_el0 = hisi_161010101_read_cntv_tval_el0,
++		.read_cntpct_el0 = hisi_161010101_read_cntpct_el0,
+ 		.read_cntvct_el0 = hisi_161010101_read_cntvct_el0,
+ 		.set_next_event_phys = erratum_set_next_event_tval_phys,
+ 		.set_next_event_virt = erratum_set_next_event_tval_virt,
+@@ -378,6 +400,7 @@ static const struct arch_timer_erratum_workaround ool_workarounds[] = {
+ 		.match_type = ate_match_local_cap_id,
+ 		.id = (void *)ARM64_WORKAROUND_858921,
+ 		.desc = "ARM erratum 858921",
++		.read_cntpct_el0 = arm64_858921_read_cntpct_el0,
+ 		.read_cntvct_el0 = arm64_858921_read_cntvct_el0,
+ 	},
+ #endif
+
+which ensures (at least in theory) that we do the right thing on our buggy
+hardware...
+
+>  }
+>  
+>  static inline u64 arch_counter_get_cntvct(void)
+> diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
+> index fd4b7f6..9b3322a 100644
+> --- a/drivers/clocksource/arm_arch_timer.c
+> +++ b/drivers/clocksource/arm_arch_timer.c
+> @@ -890,8 +890,7 @@ static void __init arch_counter_register(unsigned type)
+>  
+>  	/* Register the CP15 based counter if we have one */
+>  	if (type & ARCH_TIMER_TYPE_CP15) {
+> -		if (IS_ENABLED(CONFIG_ARM64) ||
+> -		    arch_timer_uses_ppi == ARCH_TIMER_VIRT_PPI)
+> +		if (arch_timer_uses_ppi == ARCH_TIMER_VIRT_PPI)
+>  			arch_timer_read_counter = arch_counter_get_cntvct;
+>  		else
+>  			arch_timer_read_counter = arch_counter_get_cntpct;
+> 
+
+Thanks,
+
+	M.
 -- 
-2.14.1
+Jazz is not dead. It just smells funny...
