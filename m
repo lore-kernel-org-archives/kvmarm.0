@@ -1,104 +1,234 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v2 26/28] arm64/sve: Add documentation
-Date: Mon, 9 Oct 2017 17:20:41 +0100
-Message-ID: <20171009162041.GE3611@e103592.cambridge.arm.com>
-References: <1504198860-12951-1-git-send-email-Dave.Martin@arm.com>
- <1504198860-12951-27-git-send-email-Dave.Martin@arm.com>
- <59D7A4AF.40408@arm.com>
- <20171006173715.GC3611@e103592.cambridge.arm.com>
- <878tgkbr6m.fsf@linaro.org>
- <20171009094930.GD3611@e103592.cambridge.arm.com>
- <87376sbejo.fsf@linaro.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v3 03/20] arm64: Use the physical counter when available
+ for read_cycles
+Date: Mon, 9 Oct 2017 17:21:24 +0100
+Message-ID: <9b06425f-7c2c-d44a-cd6c-aeaa4b76849c@arm.com>
+References: <20170923004207.22356-1-cdall@linaro.org>
+ <20170923004207.22356-4-cdall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Return-path: <libc-alpha-return-85558-glibc-alpha=m.gmane.org@sourceware.org>
-List-Unsubscribe: <mailto:libc-alpha-unsubscribe-glibc-alpha=m.gmane.org@sourceware.org>
-List-Subscribe: <mailto:libc-alpha-subscribe@sourceware.org>
-List-Archive: <http://sourceware.org/ml/libc-alpha/>
-List-Post: <mailto:libc-alpha@sourceware.org>
-List-Help: <mailto:libc-alpha-help@sourceware.org>, <http://sourceware.org/ml/#faqs>
-Sender: libc-alpha-owner@sourceware.org
-Content-Disposition: inline
-In-Reply-To: <87376sbejo.fsf@linaro.org>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: linux-arch@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>nd@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20170923004207.22356-4-cdall@linaro.org>
+Content-Language: en-GB
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Oct 09, 2017 at 03:07:23PM +0100, Alex Bennée wrote:
+On 23/09/17 01:41, Christoffer Dall wrote:
+> Currently get_cycles() is hardwired to arch_counter_get_cntvct() on
+> arm64, but as we move to using the physical timer for the in-kernel
+> time-keeping, we need to make that more flexible.
 > 
-> Dave Martin <Dave.Martin@arm.com> writes:
+> First, we need to make sure the physical counter can be read on equal
+> terms to the virtual counter, which includes adding physical counter
+> read functions for timers that require errata.
 > 
-> > On Mon, Oct 09, 2017 at 10:34:25AM +0100, Alex Bennée wrote:
-> >>
-> >> Dave Martin <Dave.Martin@arm.com> writes:
-> >>
-> >> > On Fri, Oct 06, 2017 at 04:43:43PM +0100, Szabolcs Nagy wrote:
-> >> >> On 31/08/17 18:00, Dave Martin wrote:
-> >> >> > +9.  System runtime configuration
-> >> >> > +--------------------------------
-> >> >> > +
-> >> >> > +* To mitigate the ABI impact of expansion of the signal frame, a policy
-> >> >> > +  mechanism is provided for administrators, distro maintainers and developers
-> >> >> > +  to set the default vector length for userspace processes:
-> >> >> > +
-> >> >> > +/proc/cpu/sve_default_vector_length
-> >> >>
-> >> >>
-> >> >> elsewhere in the patch series i see
-> >> >>
-> >> >> /proc/sys/abi/sve_default_vector_length
-> >> >>
-> >> >> is this supposed to be the same?
-> >> >
-> >> > Good spot, thanks!
-> >> >
-> >> > /proc/cpu/ was the old location: they should both say /proc/abi/.
-> >> > I'll fix it.
-> >>
-> >> Isn't /sys (or rather sysfs) the preferred location for modern control
-> >> knobs that mirror the kernels object model or is SVE a special case for
-> >> extending /proc?
-> >
-> > I couldn't figure out which kernel object this maps to.  There's no
-> > device, no driver.  This isn't even per-cpu.
+> Second, we need to make a choice between reading the physical vs virtual
+> counter, depending on which timer is used for time keeping in the kernel
+> otherwise.  We can do this using a static key to avoid a performance
+> penalty during runtime when reading the counter.
 > 
-> Hmm I can see:
-> 
->   /sys/devices/system/cpu
-> 
-> On both my x86 and arm64 systems - but I guess this is more ABIish than
-> CPU feature related.
-> 
-> > sysctl is already used for similar knobs to this one, so I followed that
-> > precedent -- though if someone argues strongly enough it could be
-> > changed.
-> >
-> > Are there already examples of arch controls like this in sysfs?  I
-> > wasn't aware of any, but I didn't look all that hard...
-> 
-> Given the paucity of the /proc/sys/abi on both systems I guess this sort
-> of knob is rare enough that people haven't expressed a strong preference
-> for sysfs here. I have no objection to staying with /proc/sys/abi/.
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will.deacon@arm.com>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Signed-off-by: Christoffer Dall <cdall@linaro.org>
 
-That was my thinking: sysctls tend to control the kernel, especially
-process behaviour, whereas /sys/ controls devices and subsystems.
-That's not a concrete rule though and not written down, and doubtless a
-major new set of sysctls would be shot down regardless of what they do.
+Right. I should have read patch #3. I'm an idiot.
 
-Part of the problem with /proc is that people historically put things in
-there that have random ad-hoc behaviour and semantics.  The sysctl
-framework at least imposes some sanity here.
+> ---
+>  arch/arm64/include/asm/arch_timer.h  | 15 ++++++++++++---
+>  arch/arm64/include/asm/timex.h       |  2 +-
+>  drivers/clocksource/arm_arch_timer.c | 32 ++++++++++++++++++++++++++++++--
+>  3 files changed, 43 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/arch_timer.h b/arch/arm64/include/asm/arch_timer.h
+> index 1859a1c..c56d8cd 100644
+> --- a/arch/arm64/include/asm/arch_timer.h
+> +++ b/arch/arm64/include/asm/arch_timer.h
+> @@ -30,6 +30,8 @@
+>  
+>  #include <clocksource/arm_arch_timer.h>
+>  
+> +extern struct static_key_false arch_timer_phys_counter_available;
+> +
+>  #if IS_ENABLED(CONFIG_ARM_ARCH_TIMER_OOL_WORKAROUND)
+>  extern struct static_key_false arch_timer_read_ool_enabled;
+>  #define needs_unstable_timer_counter_workaround() \
+> @@ -52,6 +54,7 @@ struct arch_timer_erratum_workaround {
+>  	const char *desc;
+>  	u32 (*read_cntp_tval_el0)(void);
+>  	u32 (*read_cntv_tval_el0)(void);
+> +	u64 (*read_cntpct_el0)(void);
+>  	u64 (*read_cntvct_el0)(void);
+>  	int (*set_next_event_phys)(unsigned long, struct clock_event_device *);
+>  	int (*set_next_event_virt)(unsigned long, struct clock_event_device *);
+> @@ -148,10 +151,8 @@ static inline void arch_timer_set_cntkctl(u32 cntkctl)
+>  
+>  static inline u64 arch_counter_get_cntpct(void)
+>  {
+> -	u64 cval;
+>  	isb();
+> -	asm volatile("mrs %0, cntpct_el0" : "=r" (cval));
+> -	return cval;
+> +	return arch_timer_reg_read_stable(cntpct_el0);
+>  }
+>  
+>  static inline u64 arch_counter_get_cntvct(void)
+> @@ -160,6 +161,14 @@ static inline u64 arch_counter_get_cntvct(void)
+>  	return arch_timer_reg_read_stable(cntvct_el0);
+>  }
+>  
+> +static inline u64 arch_counter_get_cycles(void)
+> +{
+> +	if (static_branch_unlikely(&arch_timer_phys_counter_available))
+> +	    return arch_counter_get_cntpct();
+> +	else
+> +	    return arch_counter_get_cntvct();
+> +}
+> +
+>  static inline int arch_timer_arch_init(void)
+>  {
+>  	return 0;
+> diff --git a/arch/arm64/include/asm/timex.h b/arch/arm64/include/asm/timex.h
+> index 81a076e..c0d214c 100644
+> --- a/arch/arm64/include/asm/timex.h
+> +++ b/arch/arm64/include/asm/timex.h
+> @@ -22,7 +22,7 @@
+>   * Use the current timer as a cycle counter since this is what we use for
+>   * the delay loop.
+>   */
+> -#define get_cycles()	arch_counter_get_cntvct()
+> +#define get_cycles()	arch_counter_get_cycles()
 
-There is also some support for specialising sysctls to user namespaces,
-which makes some sense in that /proc/sys/abi/* should probably be per-
-container -- though whether it's ever considered important enough to
-actually be implemented is another question.  I certainly don't attempt
-to do it today.
+Why can't this be arch_timer_read_counter() instead? Is there any 
+measurable advantage in using a static key compared to a memory 
+indirection?
 
-I don't know how sysfs interacts with namespaces, but probably it can.
+>  
+>  #include <asm-generic/timex.h>
+>  
+> diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
+> index 9b3322a..f35da20 100644
+> --- a/drivers/clocksource/arm_arch_timer.c
+> +++ b/drivers/clocksource/arm_arch_timer.c
+> @@ -77,6 +77,9 @@ static bool arch_timer_mem_use_virtual;
+>  static bool arch_counter_suspend_stop;
+>  static bool vdso_default = true;
+>  
+> +DEFINE_STATIC_KEY_FALSE(arch_timer_phys_counter_available);
+> +EXPORT_SYMBOL_GPL(arch_timer_phys_counter_available);
+> +
+>  static bool evtstrm_enable = IS_ENABLED(CONFIG_ARM_ARCH_TIMER_EVTSTREAM);
+>  
+>  static int __init early_evtstrm_cfg(char *buf)
+> @@ -217,6 +220,11 @@ static u32 notrace fsl_a008585_read_cntv_tval_el0(void)
+>  	return __fsl_a008585_read_reg(cntv_tval_el0);
+>  }
+>  
+> +static u64 notrace fsl_a008585_read_cntpct_el0(void)
+> +{
+> +	return __fsl_a008585_read_reg(cntpct_el0);
+> +}
+> +
+>  static u64 notrace fsl_a008585_read_cntvct_el0(void)
+>  {
+>  	return __fsl_a008585_read_reg(cntvct_el0);
+> @@ -258,6 +266,11 @@ static u32 notrace hisi_161010101_read_cntv_tval_el0(void)
+>  	return __hisi_161010101_read_reg(cntv_tval_el0);
+>  }
+>  
+> +static u64 notrace hisi_161010101_read_cntpct_el0(void)
+> +{
+> +	return __hisi_161010101_read_reg(cntpct_el0);
+> +}
+> +
+>  static u64 notrace hisi_161010101_read_cntvct_el0(void)
+>  {
+>  	return __hisi_161010101_read_reg(cntvct_el0);
+> @@ -288,6 +301,15 @@ static struct ate_acpi_oem_info hisi_161010101_oem_info[] = {
+>  #endif
+>  
+>  #ifdef CONFIG_ARM64_ERRATUM_858921
+> +static u64 notrace arm64_858921_read_cntpct_el0(void)
+> +{
+> +	u64 old, new;
+> +
+> +	old = read_sysreg(cntpct_el0);
+> +	new = read_sysreg(cntpct_el0);
+> +	return (((old ^ new) >> 32) & 1) ? old : new;
+> +}
+> +
+>  static u64 notrace arm64_858921_read_cntvct_el0(void)
+>  {
+>  	u64 old, new;
+> @@ -346,6 +368,7 @@ static const struct arch_timer_erratum_workaround ool_workarounds[] = {
+>  		.desc = "Freescale erratum a005858",
+>  		.read_cntp_tval_el0 = fsl_a008585_read_cntp_tval_el0,
+>  		.read_cntv_tval_el0 = fsl_a008585_read_cntv_tval_el0,
+> +		.read_cntpct_el0 = fsl_a008585_read_cntpct_el0,
+>  		.read_cntvct_el0 = fsl_a008585_read_cntvct_el0,
+>  		.set_next_event_phys = erratum_set_next_event_tval_phys,
+>  		.set_next_event_virt = erratum_set_next_event_tval_virt,
+> @@ -358,6 +381,7 @@ static const struct arch_timer_erratum_workaround ool_workarounds[] = {
+>  		.desc = "HiSilicon erratum 161010101",
+>  		.read_cntp_tval_el0 = hisi_161010101_read_cntp_tval_el0,
+>  		.read_cntv_tval_el0 = hisi_161010101_read_cntv_tval_el0,
+> +		.read_cntpct_el0 = hisi_161010101_read_cntpct_el0,
+>  		.read_cntvct_el0 = hisi_161010101_read_cntvct_el0,
+>  		.set_next_event_phys = erratum_set_next_event_tval_phys,
+>  		.set_next_event_virt = erratum_set_next_event_tval_virt,
+> @@ -368,6 +392,7 @@ static const struct arch_timer_erratum_workaround ool_workarounds[] = {
+>  		.desc = "HiSilicon erratum 161010101",
+>  		.read_cntp_tval_el0 = hisi_161010101_read_cntp_tval_el0,
+>  		.read_cntv_tval_el0 = hisi_161010101_read_cntv_tval_el0,
+> +		.read_cntpct_el0 = hisi_161010101_read_cntpct_el0,
+>  		.read_cntvct_el0 = hisi_161010101_read_cntvct_el0,
+>  		.set_next_event_phys = erratum_set_next_event_tval_phys,
+>  		.set_next_event_virt = erratum_set_next_event_tval_virt,
+> @@ -378,6 +403,7 @@ static const struct arch_timer_erratum_workaround ool_workarounds[] = {
+>  		.match_type = ate_match_local_cap_id,
+>  		.id = (void *)ARM64_WORKAROUND_858921,
+>  		.desc = "ARM erratum 858921",
+> +		.read_cntpct_el0 = arm64_858921_read_cntpct_el0,
+>  		.read_cntvct_el0 = arm64_858921_read_cntvct_el0,
+>  	},
+>  #endif
+> @@ -890,10 +916,12 @@ static void __init arch_counter_register(unsigned type)
+>  
+>  	/* Register the CP15 based counter if we have one */
+>  	if (type & ARCH_TIMER_TYPE_CP15) {
+> -		if (arch_timer_uses_ppi == ARCH_TIMER_VIRT_PPI)
+> +		if (arch_timer_uses_ppi == ARCH_TIMER_VIRT_PPI) {
+>  			arch_timer_read_counter = arch_counter_get_cntvct;
+> -		else
+> +		} else {
+>  			arch_timer_read_counter = arch_counter_get_cntpct;
+> +			static_branch_enable(&arch_timer_phys_counter_available);
+> +		}
+>  
+>  		clocksource_counter.archdata.vdso_direct = vdso_default;
+>  	} else {
+> 
 
-I guess I'll wait for someone to object loudly...
+In my reply to patch #2, I had the following hunk:
 
-Cheers
----Dave
+@@ -310,7 +329,7 @@ static void erratum_set_next_event_tval_generic(const int access, unsigned long
+ 						struct clock_event_device *clk)
+ {
+ 	unsigned long ctrl;
+-	u64 cval = evt + arch_counter_get_cntvct();
++	u64 cval = evt + arch_timer_read_counter();
+ 
+ 	ctrl = arch_timer_reg_read(access, ARCH_TIMER_REG_CTRL, clk);
+ 	ctrl |= ARCH_TIMER_CTRL_ENABLE;
+
+Once we start using a different timer, this could well have an effect...
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
