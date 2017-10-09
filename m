@@ -1,65 +1,59 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 12/20] genirq: Document vcpu_info usage for
- percpu_devid interrupts
-Date: Mon, 9 Oct 2017 18:48:33 +0100
-Message-ID: <1a21ed0e-39eb-a5a3-5cda-3a51d9f9c8da@arm.com>
+Subject: Re: [PATCH v3 13/20] KVM: arm/arm64: Set VCPU affinity for virt timer
+ irq
+Date: Mon, 9 Oct 2017 18:52:16 +0100
+Message-ID: <916c971f-861e-092e-3b3a-325eb558e599@arm.com>
 References: <20170923004207.22356-1-cdall@linaro.org>
- <20170923004207.22356-13-cdall@linaro.org>
+ <20170923004207.22356-14-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170923004207.22356-13-cdall@linaro.org>
+In-Reply-To: <20170923004207.22356-14-cdall@linaro.org>
 Content-Language: en-GB
 Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Thomas Gleixner <tglx@linutronix.de>
+Cc: kvm@vger.kernel.org, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 23/09/17 01:41, Christoffer Dall wrote:
-> It is currently unclear how to set the VCPU affinity for a percpu_devid
-> interrupt , since the Linux irq_data structure describes the state for
-> multiple interrupts, one for each physical CPU on the system.  Since
-> each such interrupt can be associated with different VCPUs or none at
-> all, associating a single VCPU state with such an interrupt does not
-> capture the necessary semantics.
+On 23/09/17 01:42, Christoffer Dall wrote:
+> As we are about to take physical interrupts for the virtual timer on the
+> host but want to leave those active while running the VM (and let the VM
+> deactivate them), we need to set the vtimer PPI affinity accordingly.
 > 
-> The implementers of irq_set_affinity are the Intel and AMD IOMMUs, and
-> the ARM GIC irqchip.  The Intel and AMD callers do not appear to use
-> percpu_devid interrupts, and the ARM GIC implementation only checks the
-> pointer against NULL vs. non-NULL.
-> 
-> Therefore, simply update the function documentation to explain the
-> expected use in the context of percpu_devid interrupts, allowing future
-> changes or additions to irqchip implementers to do the right thing.
-> 
-> This allows us to set the VCPU affinity for the virtual timer interrupt
-> in KVM/ARM, which is a percpu_devid (PPI) interrupt.
-> 
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
 > Signed-off-by: Christoffer Dall <cdall@linaro.org>
 > ---
->  kernel/irq/manage.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  virt/kvm/arm/arch_timer.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 > 
-> diff --git a/kernel/irq/manage.c b/kernel/irq/manage.c
-> index 573dc52..2b2c94f 100644
-> --- a/kernel/irq/manage.c
-> +++ b/kernel/irq/manage.c
-> @@ -381,7 +381,8 @@ int irq_select_affinity_usr(unsigned int irq)
->  /**
->   *	irq_set_vcpu_affinity - Set vcpu affinity for the interrupt
->   *	@irq: interrupt number to set affinity
-> - *	@vcpu_info: vCPU specific data
-> + *	@vcpu_info: vCPU specific data or pointer to a percpu array of vCPU
-> + *	            specific data for percpu_devid interrupts
->   *
->   *	This function uses the vCPU specific data to set the vCPU
->   *	affinity for an irq. The vCPU specific data is passed from
+> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> index 4254f88..4275f8f 100644
+> --- a/virt/kvm/arm/arch_timer.c
+> +++ b/virt/kvm/arm/arch_timer.c
+> @@ -650,11 +650,20 @@ int kvm_timer_hyp_init(void)
+>  		return err;
+>  	}
+>  
+> +	err = irq_set_vcpu_affinity(host_vtimer_irq, kvm_get_running_vcpus());
+> +	if (err) {
+> +		kvm_err("kvm_arch_timer: error setting vcpu affinity\n");
+> +		goto out_free_irq;
+> +	}
+> +
+>  	kvm_info("virtual timer IRQ%d\n", host_vtimer_irq);
+>  
+>  	cpuhp_setup_state(CPUHP_AP_KVM_ARM_TIMER_STARTING,
+>  			  "kvm/arm/timer:starting", kvm_timer_starting_cpu,
+>  			  kvm_timer_dying_cpu);
+> +	return 0;
+> +out_free_irq:
+> +	free_percpu_irq(host_vtimer_irq, kvm_get_running_vcpus());
+>  	return err;
+>  }
+>  
 > 
 
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 
 	M.
 -- 
