@@ -1,7 +1,7 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 10/10] arm: KVM: Use common implementation for all flushes to PoC
-Date: Mon,  9 Oct 2017 16:20:32 +0100
-Message-ID: <20171009152032.27804-11-marc.zyngier@arm.com>
+Subject: [PATCH 08/10] KVM: arm/arm64: Drop vcpu parameter from coherent_{d,i}cache_guest_page
+Date: Mon,  9 Oct 2017 16:20:30 +0100
+Message-ID: <20171009152032.27804-9-marc.zyngier@arm.com>
 References: <20171009152032.27804-1-marc.zyngier@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20171009152032.27804-1-marc.zyngier@arm.com>
@@ -10,95 +10,116 @@ To: Christoffer Dall <christoffer.dall@linaro.org>, Catalin Marinas <catalin.mar
 Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We currently have no less than three implementations for the
-"flush to PoC" code. Let standardize on a single one. This
-requires a bit of unpleasant moving around, and relies on
-__kvm_flush_dcache_pte and co being #defines so that they can
-call into coherent_dcache_guest_page...
+The vcpu parameter isn't used for anything, and gets in the way of
+further cleanups. Let's get rid of it.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/kvm_mmu.h | 28 ++++------------------------
- virt/kvm/arm/mmu.c             | 20 ++++++++++----------
- 2 files changed, 14 insertions(+), 34 deletions(-)
+ arch/arm/include/asm/kvm_mmu.h   |  6 ++----
+ arch/arm64/include/asm/kvm_mmu.h |  6 ++----
+ virt/kvm/arm/mmu.c               | 18 ++++++++----------
+ 3 files changed, 12 insertions(+), 18 deletions(-)
 
 diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index 5f1ac88a5951..011b0db85c02 100644
+index ad442d86c23e..5f1ac88a5951 100644
 --- a/arch/arm/include/asm/kvm_mmu.h
 +++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -235,31 +235,11 @@ static inline void __coherent_icache_guest_page(kvm_pfn_t pfn,
+@@ -150,8 +150,7 @@ static inline bool vcpu_has_cache_enabled(struct kvm_vcpu *vcpu)
+ 	return (vcpu_cp15(vcpu, c1_SCTLR) & 0b101) == 0b101;
+ }
+ 
+-static inline void __coherent_dcache_guest_page(struct kvm_vcpu *vcpu,
+-						kvm_pfn_t pfn,
++static inline void __coherent_dcache_guest_page(kvm_pfn_t pfn,
+ 						unsigned long size)
+ {
+ 	/*
+@@ -177,8 +176,7 @@ static inline void __coherent_dcache_guest_page(struct kvm_vcpu *vcpu,
  	}
  }
  
--static inline void __kvm_flush_dcache_pte(pte_t pte)
--{
--	void *va = kmap_atomic(pte_page(pte));
--
--	kvm_flush_dcache_to_poc(va, PAGE_SIZE);
--
--	kunmap_atomic(va);
--}
--
--static inline void __kvm_flush_dcache_pmd(pmd_t pmd)
--{
--	unsigned long size = PMD_SIZE;
--	kvm_pfn_t pfn = pmd_pfn(pmd);
--
--	while (size) {
--		void *va = kmap_atomic_pfn(pfn);
-+#define __kvm_flush_dcache_pte(p)				\
-+	coherent_dcache_guest_page(pte_pfn((p)), PAGE_SIZE)
- 
--		kvm_flush_dcache_to_poc(va, PAGE_SIZE);
--
--		pfn++;
--		size -= PAGE_SIZE;
--
--		kunmap_atomic(va);
--	}
--}
-+#define __kvm_flush_dcache_pmd(p)				\
-+	coherent_dcache_guest_page(pmd_pfn((p)), PMD_SIZE)
- 
- static inline void __kvm_flush_dcache_pud(pud_t pud)
+-static inline void __coherent_icache_guest_page(struct kvm_vcpu *vcpu,
+-						kvm_pfn_t pfn,
++static inline void __coherent_icache_guest_page(kvm_pfn_t pfn,
+ 						unsigned long size)
  {
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 5b495450e92f..ab027fdf76e7 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -70,6 +70,16 @@ static void kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
- 	kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, kvm, ipa);
+ 	u32 iclsz;
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index e7af74b8b51a..33dcc3c79574 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -252,8 +252,7 @@ static inline bool vcpu_has_cache_enabled(struct kvm_vcpu *vcpu)
+ 	return (vcpu_sys_reg(vcpu, SCTLR_EL1) & 0b101) == 0b101;
  }
  
-+static void coherent_dcache_guest_page(kvm_pfn_t pfn, unsigned long size)
-+{
-+	__coherent_dcache_guest_page(pfn, size);
-+}
-+
-+static void coherent_icache_guest_page(kvm_pfn_t pfn, unsigned long size)
-+{
-+	__coherent_icache_guest_page(pfn, size);
-+}
-+
- /*
-  * D-Cache management functions. They take the page table entries by
-  * value, as they are flushing the cache using the kernel mapping (or
-@@ -1268,16 +1278,6 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+-static inline void __coherent_dcache_guest_page(struct kvm_vcpu *vcpu,
+-						kvm_pfn_t pfn,
++static inline void __coherent_dcache_guest_page(kvm_pfn_t pfn,
+ 						unsigned long size)
+ {
+ 	void *va = page_address(pfn_to_page(pfn));
+@@ -261,8 +260,7 @@ static inline void __coherent_dcache_guest_page(struct kvm_vcpu *vcpu,
+ 	kvm_flush_dcache_to_poc(va, size);
+ }
+ 
+-static inline void __coherent_icache_guest_page(struct kvm_vcpu *vcpu,
+-						kvm_pfn_t pfn,
++static inline void __coherent_icache_guest_page(kvm_pfn_t pfn,
+ 						unsigned long size)
+ {
+ 	if (icache_is_aliasing()) {
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index ccc6106764a6..5b495450e92f 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -1268,16 +1268,14 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
  	kvm_mmu_write_protect_pt_masked(kvm, slot, gfn_offset, mask);
  }
  
--static void coherent_dcache_guest_page(kvm_pfn_t pfn, unsigned long size)
--{
--	__coherent_dcache_guest_page(pfn, size);
--}
--
--static void coherent_icache_guest_page(kvm_pfn_t pfn, unsigned long size)
--{
--	__coherent_icache_guest_page(pfn, size);
--}
--
- static void kvm_send_hwpoison_signal(unsigned long address,
- 				     struct vm_area_struct *vma)
+-static void coherent_dcache_guest_page(struct kvm_vcpu *vcpu, kvm_pfn_t pfn,
+-				       unsigned long size)
++static void coherent_dcache_guest_page(kvm_pfn_t pfn, unsigned long size)
  {
+-	__coherent_dcache_guest_page(vcpu, pfn, size);
++	__coherent_dcache_guest_page(pfn, size);
+ }
+ 
+-static void coherent_icache_guest_page(struct kvm_vcpu *vcpu, kvm_pfn_t pfn,
+-				       unsigned long size)
++static void coherent_icache_guest_page(kvm_pfn_t pfn, unsigned long size)
+ {
+-	__coherent_icache_guest_page(vcpu, pfn, size);
++	__coherent_icache_guest_page(pfn, size);
+ }
+ 
+ static void kvm_send_hwpoison_signal(unsigned long address,
+@@ -1413,11 +1411,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		}
+ 
+ 		if (fault_status != FSC_PERM)
+-			coherent_dcache_guest_page(vcpu, pfn, PMD_SIZE);
++			coherent_dcache_guest_page(pfn, PMD_SIZE);
+ 
+ 		if (exec_fault) {
+ 			new_pmd = kvm_s2pmd_mkexec(new_pmd);
+-			coherent_icache_guest_page(vcpu, pfn, PMD_SIZE);
++			coherent_icache_guest_page(pfn, PMD_SIZE);
+ 		} else if (fault_status == FSC_PERM) {
+ 			/* Preserve execute if XN was already cleared */
+ 			pmd_t *old_pmdp = stage2_get_pmd(kvm, NULL, fault_ipa);
+@@ -1438,11 +1436,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		}
+ 
+ 		if (fault_status != FSC_PERM)
+-			coherent_dcache_guest_page(vcpu, pfn, PAGE_SIZE);
++			coherent_dcache_guest_page(pfn, PAGE_SIZE);
+ 
+ 		if (exec_fault) {
+ 			new_pte = kvm_s2pte_mkexec(new_pte);
+-			coherent_icache_guest_page(vcpu, pfn, PAGE_SIZE);
++			coherent_icache_guest_page(pfn, PAGE_SIZE);
+ 		} else if (fault_status == FSC_PERM) {
+ 			/* Preserve execute if XN was already cleared */
+ 			pte_t *old_ptep = stage2_get_pte(kvm, fault_ipa);
 -- 
 2.14.1
