@@ -1,7 +1,7 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 09/10] KVM: arm/arm64: Detangle kvm_mmu.h from kvm_hyp.h
-Date: Mon,  9 Oct 2017 16:20:31 +0100
-Message-ID: <20171009152032.27804-10-marc.zyngier@arm.com>
+Subject: [PATCH 07/10] KVM: arm/arm64: Preserve Exec permission across R/W permission faults
+Date: Mon,  9 Oct 2017 16:20:29 +0100
+Message-ID: <20171009152032.27804-8-marc.zyngier@arm.com>
 References: <20171009152032.27804-1-marc.zyngier@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20171009152032.27804-1-marc.zyngier@arm.com>
@@ -10,117 +10,131 @@ To: Christoffer Dall <christoffer.dall@linaro.org>, Catalin Marinas <catalin.mar
 Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-kvm_hyp.h has an odd dependency on kvm_mmu.h, which makes the
-opposite inclusion impossible. Let's start with breaking that
-useless dependency.
+So far, we loose the Exec property whenever we take permission
+faults, as we always reconstruct the PTE/PMD from scratch. This
+can be counter productive as we can end-up with the following
+fault sequence:
+
+	X -> RO -> ROX -> RW -> RWX
+
+Instead, we can lookup the existing PTE/PMD and clear the XN bit in the
+new entry if it was already cleared in the old one, leadig to a much
+nicer fault sequence:
+
+	X -> ROX -> RWX
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/kvm_hyp.h   | 1 -
- arch/arm/kvm/hyp/switch.c        | 1 +
- arch/arm/kvm/hyp/tlb.c           | 1 +
- arch/arm64/include/asm/kvm_hyp.h | 1 -
- arch/arm64/kvm/hyp/debug-sr.c    | 1 +
- arch/arm64/kvm/hyp/switch.c      | 1 +
- arch/arm64/kvm/hyp/tlb.c         | 1 +
- virt/kvm/arm/hyp/vgic-v2-sr.c    | 1 +
- 8 files changed, 6 insertions(+), 2 deletions(-)
+ arch/arm/include/asm/kvm_mmu.h   | 10 ++++++++++
+ arch/arm64/include/asm/kvm_mmu.h | 10 ++++++++++
+ virt/kvm/arm/mmu.c               | 25 +++++++++++++++++++++++++
+ 3 files changed, 45 insertions(+)
 
-diff --git a/arch/arm/include/asm/kvm_hyp.h b/arch/arm/include/asm/kvm_hyp.h
-index ad541f9ecc78..8b29faa119ba 100644
---- a/arch/arm/include/asm/kvm_hyp.h
-+++ b/arch/arm/include/asm/kvm_hyp.h
-@@ -21,7 +21,6 @@
- #include <linux/compiler.h>
- #include <linux/kvm_host.h>
- #include <asm/cp15.h>
--#include <asm/kvm_mmu.h>
- #include <asm/vfp.h>
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index bf76150aad5f..ad442d86c23e 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -107,6 +107,11 @@ static inline bool kvm_s2pte_readonly(pte_t *pte)
+ 	return (pte_val(*pte) & L_PTE_S2_RDWR) == L_PTE_S2_RDONLY;
+ }
  
- #define __hyp_text __section(.hyp.text) notrace
-diff --git a/arch/arm/kvm/hyp/switch.c b/arch/arm/kvm/hyp/switch.c
-index ebd2dd46adf7..67e0a689c4b5 100644
---- a/arch/arm/kvm/hyp/switch.c
-+++ b/arch/arm/kvm/hyp/switch.c
-@@ -18,6 +18,7 @@
- 
- #include <asm/kvm_asm.h>
- #include <asm/kvm_hyp.h>
-+#include <asm/kvm_mmu.h>
- 
- __asm__(".arch_extension     virt");
- 
-diff --git a/arch/arm/kvm/hyp/tlb.c b/arch/arm/kvm/hyp/tlb.c
-index 6d810af2d9fd..c0edd450e104 100644
---- a/arch/arm/kvm/hyp/tlb.c
-+++ b/arch/arm/kvm/hyp/tlb.c
-@@ -19,6 +19,7 @@
-  */
- 
- #include <asm/kvm_hyp.h>
-+#include <asm/kvm_mmu.h>
- 
- /**
-  * Flush per-VMID TLBs
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index 4572a9b560fa..afbfbe0c12c5 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -20,7 +20,6 @@
- 
- #include <linux/compiler.h>
- #include <linux/kvm_host.h>
--#include <asm/kvm_mmu.h>
- #include <asm/sysreg.h>
- 
- #define __hyp_text __section(.hyp.text) notrace
-diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
-index f5154ed3da6c..d3a13d57f2c5 100644
---- a/arch/arm64/kvm/hyp/debug-sr.c
-+++ b/arch/arm64/kvm/hyp/debug-sr.c
-@@ -21,6 +21,7 @@
- #include <asm/debug-monitors.h>
- #include <asm/kvm_asm.h>
- #include <asm/kvm_hyp.h>
-+#include <asm/kvm_mmu.h>
- 
- #define read_debug(r,n)		read_sysreg(r##n##_el1)
- #define write_debug(v,r,n)	write_sysreg(v, r##n##_el1)
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 945e79c641c4..c52f7094122f 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -21,6 +21,7 @@
- #include <asm/kvm_asm.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_hyp.h>
-+#include <asm/kvm_mmu.h>
- #include <asm/fpsimd.h>
- 
- static bool __hyp_text __fpsimd_enabled_nvhe(void)
-diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
-index 73464a96c365..131c7772703c 100644
---- a/arch/arm64/kvm/hyp/tlb.c
-+++ b/arch/arm64/kvm/hyp/tlb.c
-@@ -16,6 +16,7 @@
-  */
- 
- #include <asm/kvm_hyp.h>
-+#include <asm/kvm_mmu.h>
- #include <asm/tlbflush.h>
- 
- static void __hyp_text __tlb_switch_to_guest_vhe(struct kvm *kvm)
-diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
-index a3f18d362366..77ccd8e2090b 100644
---- a/virt/kvm/arm/hyp/vgic-v2-sr.c
-+++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
-@@ -21,6 +21,7 @@
- 
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_hyp.h>
-+#include <asm/kvm_mmu.h>
- 
- static void __hyp_text save_elrsr(struct kvm_vcpu *vcpu, void __iomem *base)
++static inline bool kvm_s2pte_exec(pte_t *pte)
++{
++	return !(pte_val(*pte) & L_PTE_XN);
++}
++
+ static inline void kvm_set_s2pmd_readonly(pmd_t *pmd)
  {
+ 	pmd_val(*pmd) = (pmd_val(*pmd) & ~L_PMD_S2_RDWR) | L_PMD_S2_RDONLY;
+@@ -117,6 +122,11 @@ static inline bool kvm_s2pmd_readonly(pmd_t *pmd)
+ 	return (pmd_val(*pmd) & L_PMD_S2_RDWR) == L_PMD_S2_RDONLY;
+ }
+ 
++static inline bool kvm_s2pmd_exec(pmd_t *pmd)
++{
++	return !(pmd_val(*pmd) & PMD_SECT_XN);
++}
++
+ static inline bool kvm_page_empty(void *ptr)
+ {
+ 	struct page *ptr_page = virt_to_page(ptr);
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 60c420a5ac0d..e7af74b8b51a 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -203,6 +203,11 @@ static inline bool kvm_s2pte_readonly(pte_t *pte)
+ 	return (pte_val(*pte) & PTE_S2_RDWR) == PTE_S2_RDONLY;
+ }
+ 
++static inline bool kvm_s2pte_exec(pte_t *pte)
++{
++	return !(pte_val(*pte) & PTE_S2_XN);
++}
++
+ static inline void kvm_set_s2pmd_readonly(pmd_t *pmd)
+ {
+ 	kvm_set_s2pte_readonly((pte_t *)pmd);
+@@ -213,6 +218,11 @@ static inline bool kvm_s2pmd_readonly(pmd_t *pmd)
+ 	return kvm_s2pte_readonly((pte_t *)pmd);
+ }
+ 
++static inline bool kvm_s2pmd_exec(pmd_t *pmd)
++{
++	return !(pmd_val(*pmd) & PMD_S2_XN);
++}
++
+ static inline bool kvm_page_empty(void *ptr)
+ {
+ 	struct page *ptr_page = virt_to_page(ptr);
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 1911fadde88b..ccc6106764a6 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -926,6 +926,17 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
+ 	return 0;
+ }
+ 
++static pte_t *stage2_get_pte(struct kvm *kvm, phys_addr_t addr)
++{
++	pmd_t *pmdp;
++
++	pmdp = stage2_get_pmd(kvm, NULL, addr);
++	if (!pmdp || pmd_none(*pmdp))
++		return NULL;
++
++	return pte_offset_kernel(pmdp, addr);
++}
++
+ static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
+ 			  phys_addr_t addr, const pte_t *new_pte,
+ 			  unsigned long flags)
+@@ -1407,6 +1418,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		if (exec_fault) {
+ 			new_pmd = kvm_s2pmd_mkexec(new_pmd);
+ 			coherent_icache_guest_page(vcpu, pfn, PMD_SIZE);
++		} else if (fault_status == FSC_PERM) {
++			/* Preserve execute if XN was already cleared */
++			pmd_t *old_pmdp = stage2_get_pmd(kvm, NULL, fault_ipa);
++
++			if (old_pmdp && pmd_present(*old_pmdp) &&
++			    kvm_s2pmd_exec(old_pmdp))
++				new_pmd = kvm_s2pmd_mkexec(new_pmd);
+ 		}
+ 
+ 		ret = stage2_set_pmd_huge(kvm, memcache, fault_ipa, &new_pmd);
+@@ -1425,6 +1443,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		if (exec_fault) {
+ 			new_pte = kvm_s2pte_mkexec(new_pte);
+ 			coherent_icache_guest_page(vcpu, pfn, PAGE_SIZE);
++		} else if (fault_status == FSC_PERM) {
++			/* Preserve execute if XN was already cleared */
++			pte_t *old_ptep = stage2_get_pte(kvm, fault_ipa);
++
++			if (old_ptep && pte_present(*old_ptep) &&
++			    kvm_s2pte_exec(old_ptep))
++				new_pte = kvm_s2pte_mkexec(new_pte);
+ 		}
+ 
+ 		ret = stage2_set_pte(kvm, memcache, fault_ipa, &new_pte, flags);
 -- 
 2.14.1
