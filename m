@@ -1,188 +1,161 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [RFC PATCH v3 27/28] arm64: signal: Report signal frame size to userspace via auxv
-Date: Tue, 10 Oct 2017 19:38:44 +0100
-Message-ID: <1507660725-7986-28-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v3 25/28] arm64/sve: Detect SVE and activate runtime support
+Date: Tue, 10 Oct 2017 19:38:42 +0100
+Message-ID: <1507660725-7986-26-git-send-email-Dave.Martin@arm.com>
 References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
 Return-path: <linux-arch-owner@vger.kernel.org>
 In-Reply-To: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
 Sender: linux-arch-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Stateful CPU architecture extensions may require the signal frame
-to grow to a size that exceeds the arch's MINSIGSTKSZ #define.
-However, changing this #define is an ABI break.
+This patch enables detection of hardware SVE support via the
+cpufeatures framework, and reports its presence to the kernel and
+userspace via the new ARM64_SVE cpucap and HWCAP_SVE hwcap
+respectively.
 
-To allow userspace the option of determining the signal frame size
-in a more forwards-compatible way, this patch adds a new auxv entry
-tagged with AT_MINSIGSTKSZ, which provides the maximum signal frame
-size that the process can observe during its lifetime.
+Userspace can also detect SVE using ID_AA64PFR0_EL1, using the
+cpufeatures MRS emulation.
 
-If AT_MINSIGSTKSZ is absent from the aux vector, the caller can
-assume that the MINSIGSTKSZ #define is sufficient.  This allows for
-a consistent interface with older kernels that do not provide
-AT_MINSIGSTKSZ.
-
-The idea is that libc could expose this via sysconf() or some
-similar mechanism.
-
-There is deliberately no AT_SIGSTKSZ.  The kernel knows nothing
-about userspace's own stack overheads and should not pretend to
-know.
-
-For arm64:
-
-The primary motivation for this interface is the Scalable Vector
-Extension, which can require at least 4KB or so of extra space
-in the signal frame for the largest hardware implementations.
-
-To determine the correct value, a "Christmas tree" mode (via the
-add_all argument) is added to setup_sigframe_layout(), to simulate
-addition of all possible records to the signal frame at maximum
-possible size.
-
-If this procedure goes wrong somehow, resulting in a stupidly large
-frame layout and hence failure of sigframe_alloc() to allocate a
-record to the frame, then this is indicative of a kernel bug: the
-kernel's internal SIGFRAME_MAXSZ is supposed to sanity-check
-against generting frames that we consider _impossibly_ large.  In
-this case, SIGSTKSZ is returned as a "reasonable guess that is at
-least bigger than MINSIGSTKSZ" and we WARN().
+When running on hardware that supports SVE, this enables runtime
+kernel support for SVE, and allows user tasks to execute SVE
+instructions and make of the of the SVE-specific user/kernel
+interface extensions implemented by this series.
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
----
- arch/arm64/include/asm/elf.h         |  5 +++++
- arch/arm64/include/asm/processor.h   |  3 +++
- arch/arm64/include/uapi/asm/auxvec.h |  3 ++-
- arch/arm64/kernel/signal.c           | 39 +++++++++++++++++++++++++++++++-----
- 4 files changed, 44 insertions(+), 6 deletions(-)
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-diff --git a/arch/arm64/include/asm/elf.h b/arch/arm64/include/asm/elf.h
-index 33be513..8a2708a 100644
---- a/arch/arm64/include/asm/elf.h
-+++ b/arch/arm64/include/asm/elf.h
-@@ -24,6 +24,10 @@
- #include <asm/ptrace.h>
- #include <asm/user.h>
+---
+
+Dropped Suzuki's Reviewed-by, since there are non-trivial changes.
+
+Changes since v2
+----------------
+
+Requested by Catalin Marinas:
+
+ * Moved the EL1 SVE trap disable logic to cpufeatures.
+   This requires the trap to be disabled when the ARM64_SVE cpu
+   capability is detected on any booting cpu.
+---
+ Documentation/arm64/cpu-feature-registers.txt |  6 +++++-
+ arch/arm64/include/asm/cpucaps.h              |  3 ++-
+ arch/arm64/include/asm/cpufeature.h           |  3 ++-
+ arch/arm64/include/uapi/asm/hwcap.h           |  1 +
+ arch/arm64/kernel/cpufeature.c                | 17 +++++++++++++++++
+ arch/arm64/kernel/cpuinfo.c                   |  1 +
+ 6 files changed, 28 insertions(+), 3 deletions(-)
+
+diff --git a/Documentation/arm64/cpu-feature-registers.txt b/Documentation/arm64/cpu-feature-registers.txt
+index dad411d..d65504c 100644
+--- a/Documentation/arm64/cpu-feature-registers.txt
++++ b/Documentation/arm64/cpu-feature-registers.txt
+@@ -132,7 +132,11 @@ infrastructure:
+      x--------------------------------------------------x
+      | Name                         |  bits   | visible |
+      |--------------------------------------------------|
+-     | RES0                         | [63-28] |    n    |
++     | RES0                         | [63-36] |    n    |
++     |--------------------------------------------------|
++     | SVE                          | [35-32] |    y    |
++     |--------------------------------------------------|
++     | RES0                         | [31-28] |    n    |
+      |--------------------------------------------------|
+      | GIC                          | [27-24] |    n    |
+      |--------------------------------------------------|
+diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+index 8da6216..2ff7c5e 100644
+--- a/arch/arm64/include/asm/cpucaps.h
++++ b/arch/arm64/include/asm/cpucaps.h
+@@ -40,7 +40,8 @@
+ #define ARM64_WORKAROUND_858921			19
+ #define ARM64_WORKAROUND_CAVIUM_30115		20
+ #define ARM64_HAS_DCPOP				21
++#define ARM64_SVE				22
  
-+#ifndef __ASSEMBLY__
-+#include <asm/processor.h> /* for get_minsigstksz(), used by ARCH_DLINFO */
-+#endif
-+
+-#define ARM64_NCAPS				22
++#define ARM64_NCAPS				23
+ 
+ #endif /* __ASM_CPUCAPS_H */
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index 51be8e8..9ac1418 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -273,7 +273,8 @@ static inline bool system_uses_ttbr0_pan(void)
+ 
+ static inline bool system_supports_sve(void)
+ {
+-	return false;
++	return IS_ENABLED(CONFIG_ARM64_SVE) &&
++		cpus_have_const_cap(ARM64_SVE);
+ }
+ 
  /*
-  * AArch64 static relocation types.
-  */
-@@ -148,6 +152,7 @@ typedef struct user_fpsimd_state elf_fpregset_t;
- do {									\
- 	NEW_AUX_ENT(AT_SYSINFO_EHDR,					\
- 		    (elf_addr_t)current->mm->context.vdso);		\
-+	NEW_AUX_ENT(AT_MINSIGSTKSZ, get_minsigstksz());			\
- } while (0)
+diff --git a/arch/arm64/include/uapi/asm/hwcap.h b/arch/arm64/include/uapi/asm/hwcap.h
+index 4b9344c..c6e1e45 100644
+--- a/arch/arm64/include/uapi/asm/hwcap.h
++++ b/arch/arm64/include/uapi/asm/hwcap.h
+@@ -36,5 +36,6 @@
+ #define HWCAP_FCMA		(1 << 14)
+ #define HWCAP_LRCPC		(1 << 15)
+ #define HWCAP_DCPOP		(1 << 16)
++#define HWCAP_SVE		(1 << 17)
  
- #define ARCH_HAS_SETUP_ADDITIONAL_PAGES
-diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
-index df66452..18af4bd 100644
---- a/arch/arm64/include/asm/processor.h
-+++ b/arch/arm64/include/asm/processor.h
-@@ -197,6 +197,9 @@ static inline void spin_lock_prefetch(const void *ptr)
- int cpu_enable_pan(void *__unused);
- int cpu_enable_cache_maint_trap(void *__unused);
+ #endif /* _UAPI__ASM_HWCAP_H */
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index c5acf38..06aa958 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -141,6 +141,7 @@ static const struct arm64_ftr_bits ftr_id_aa64isar1[] = {
+ };
  
-+/* User signal frame size discovery: */
-+int get_minsigstksz(void);
-+
- /* Userspace interface for PR_SVE_{SET,GET}_VL prctl()s: */
- #define SVE_SET_VL(arg)	sve_set_current_vl(arg)
- #define SVE_GET_VL()	sve_get_current_vl()
-diff --git a/arch/arm64/include/uapi/asm/auxvec.h b/arch/arm64/include/uapi/asm/auxvec.h
-index 4cf0c17..1d45b28 100644
---- a/arch/arm64/include/uapi/asm/auxvec.h
-+++ b/arch/arm64/include/uapi/asm/auxvec.h
-@@ -18,7 +18,8 @@
- 
- /* vDSO location */
- #define AT_SYSINFO_EHDR	33
-+#define AT_MINSIGSTKSZ	34	/* stack needed for signal delivery */
- 
--#define AT_VECTOR_SIZE_ARCH 1 /* entries in ARCH_DLINFO */
-+#define AT_VECTOR_SIZE_ARCH 2 /* entries in ARCH_DLINFO */
- 
+ static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
++	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_SVE_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_EXACT, ID_AA64PFR0_GIC_SHIFT, 4, 0),
+ 	S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_ASIMD_SHIFT, 4, ID_AA64PFR0_ASIMD_NI),
+ 	S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_FP_SHIFT, 4, ID_AA64PFR0_FP_NI),
+@@ -942,6 +943,19 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.min_field_value = 1,
+ 	},
  #endif
-diff --git a/arch/arm64/kernel/signal.c b/arch/arm64/kernel/signal.c
-index 0d7a71e..3382e87 100644
---- a/arch/arm64/kernel/signal.c
-+++ b/arch/arm64/kernel/signal.c
-@@ -567,8 +567,15 @@ asmlinkage long sys_rt_sigreturn(struct pt_regs *regs)
- 	return 0;
- }
++#ifdef CONFIG_ARM64_SVE
++	{
++		.desc = "Scalable Vector Extension",
++		.capability = ARM64_SVE,
++		.def_scope = SCOPE_SYSTEM,
++		.sys_reg = SYS_ID_AA64PFR0_EL1,
++		.sign = FTR_UNSIGNED,
++		.field_pos = ID_AA64PFR0_SVE_SHIFT,
++		.min_field_value = ID_AA64PFR0_SVE,
++		.matches = has_cpuid_feature,
++		.enable = sve_kernel_enable,
++	},
++#endif /* CONFIG_ARM64_SVE */
+ 	{},
+ };
  
--/* Determine the layout of optional records in the signal frame */
--static int setup_sigframe_layout(struct rt_sigframe_user_layout *user)
-+/*
-+ * Determine the layout of optional records in the signal frame
-+ *
-+ * add_all: if true, lays out the biggest possible signal frame for
-+ *	this task; otherwise, generates a layout for the current state
-+ *	of the task.
-+ */
-+static int setup_sigframe_layout(struct rt_sigframe_user_layout *user,
-+				 bool add_all)
- {
- 	int err;
+@@ -974,6 +988,9 @@ static const struct arm64_cpu_capabilities arm64_elf_hwcaps[] = {
+ 	HWCAP_CAP(SYS_ID_AA64ISAR1_EL1, ID_AA64ISAR1_JSCVT_SHIFT, FTR_UNSIGNED, 1, CAP_HWCAP, HWCAP_JSCVT),
+ 	HWCAP_CAP(SYS_ID_AA64ISAR1_EL1, ID_AA64ISAR1_FCMA_SHIFT, FTR_UNSIGNED, 1, CAP_HWCAP, HWCAP_FCMA),
+ 	HWCAP_CAP(SYS_ID_AA64ISAR1_EL1, ID_AA64ISAR1_LRCPC_SHIFT, FTR_UNSIGNED, 1, CAP_HWCAP, HWCAP_LRCPC),
++#ifdef CONFIG_ARM64_SVE
++	HWCAP_CAP(SYS_ID_AA64PFR0_EL1, ID_AA64PFR0_SVE_SHIFT, FTR_UNSIGNED, ID_AA64PFR0_SVE, CAP_HWCAP, HWCAP_SVE),
++#endif
+ 	{},
+ };
  
-@@ -578,7 +585,7 @@ static int setup_sigframe_layout(struct rt_sigframe_user_layout *user)
- 		return err;
+diff --git a/arch/arm64/kernel/cpuinfo.c b/arch/arm64/kernel/cpuinfo.c
+index be260e8..9559dde 100644
+--- a/arch/arm64/kernel/cpuinfo.c
++++ b/arch/arm64/kernel/cpuinfo.c
+@@ -70,6 +70,7 @@ static const char *const hwcap_str[] = {
+ 	"fcma",
+ 	"lrcpc",
+ 	"dcpop",
++	"sve",
+ 	NULL
+ };
  
- 	/* fault information, if valid */
--	if (current->thread.fault_code) {
-+	if (add_all || current->thread.fault_code) {
- 		err = sigframe_alloc(user, &user->esr_offset,
- 				     sizeof(struct esr_context));
- 		if (err)
-@@ -600,7 +607,6 @@ static int setup_sigframe_layout(struct rt_sigframe_user_layout *user)
- 	return sigframe_alloc_end(user);
- }
- 
--
- static int setup_sigframe(struct rt_sigframe_user_layout *user,
- 			  struct pt_regs *regs, sigset_t *set)
- {
-@@ -698,7 +704,7 @@ static int get_sigframe(struct rt_sigframe_user_layout *user,
- 	int err;
- 
- 	init_user_layout(user);
--	err = setup_sigframe_layout(user);
-+	err = setup_sigframe_layout(user, false);
- 	if (err)
- 		return err;
- 
-@@ -936,3 +942,26 @@ asmlinkage void do_notify_resume(struct pt_regs *regs,
- 		thread_flags = READ_ONCE(current_thread_info()->flags);
- 	} while (thread_flags & _TIF_WORK_MASK);
- }
-+
-+/*
-+ * Determine the stack space required for guaranteed signal devliery.
-+ * This function is used to populate AT_MINSIGSTKSZ at process startup.
-+ */
-+int get_minsigstksz(void)
-+{
-+	struct rt_sigframe_user_layout user;
-+	int err;
-+
-+	init_user_layout(&user);
-+	err = setup_sigframe_layout(&user, true);
-+
-+	if (err) {
-+		WARN_ON(1);
-+
-+		return SIGSTKSZ;
-+	} else {
-+		return sigframe_size(&user) +
-+			round_up(sizeof(struct frame_record), 16) +
-+			16; /* max alignment padding */
-+	}
-+}
 -- 
 2.1.4
