@@ -1,96 +1,55 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v3 21/28] arm64/sve: Add sysctl to set the default vector
- length for new processes
-Date: Tue, 10 Oct 2017 19:38:38 +0100
-Message-ID: <1507660725-7986-22-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v3 23/28] arm64/sve: KVM: Treat guest SVE use as undefined instruction execution
+Date: Tue, 10 Oct 2017 19:38:40 +0100
+Message-ID: <1507660725-7986-24-git-send-email-Dave.Martin@arm.com>
 References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C4F6849D7F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Oct 2017 14:39:00 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ph4E03sI7s7n for <kvmarm@lists.cs.columbia.edu>;
- Tue, 10 Oct 2017 14:38:59 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 87C6049D69
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Oct 2017 14:38:59 -0400 (EDT)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-arch-owner@vger.kernel.org>
 In-Reply-To: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: linux-arch-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org
-Cc: linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-QmVjYXVzZSBvZiB0aGUgZWZmZWN0IG9mIFNWRSBvbiB0aGUgc2l6ZSBvZiB0aGUgc2lnbmFsIGZy
-YW1lLCB0aGUKZGVmYXVsdCB2ZWN0b3IgbGVuZ3RoIHVzZWQgZm9yIG5ldyBwcm9jZXNzZXMgaW52
-b2x2ZXMgYSB0cmFkZW9mZgpiZXR3ZWVuIHBlcmZvcm1hbmNlIG9mIFNWRS1lbmFibGVkIHNvZnR3
-YXJlIG9uIHRoZSBvbmUgaGFuZCwgYW5kCnJlbGlhYmlsaXR5IG9mIG5vbi1TVkUtYXdhcmUgc29m
-dHdhcmUgb24gdGhlIG90aGVyIGhhbmQuCgpGb3IgdGhpcyByZWFzb24sIHRoZSBiZXN0IGNob2lj
-ZSBkZXBlbmRzIG9uIHRoZSByZXBlcnRvaXJlIG9mCnVzZXJzcGFjZSBzb2Z0d2FyZSBpbiB1c2Ug
-YW5kIGlzIHRodXMgYmVzdCBsZWZ0IHVwIHRvIGRpc3RybwptYWludGFpbmVycywgc3lzYWRtaW5z
-IGFuZCBkZXZlbG9wZXJzLgoKSWYgQ09ORklHX1NZU0NUTCBpcyBlbmFibGVkLCB0aGlzIHBhdGNo
-IGV4cG9zZXMgdGhlIGRlZmF1bHQgdmVjdG9yCmxlbmd0aCBpbiAvcHJvYy9zeXMvYWJpL3N2ZV9k
-ZWZhdWx0X3ZlY3Rvcl9sZW5ndGgsIHdoZXJlIGJvb3QKc2NyaXB0cyBvciB0aGUgYWR2ZW50dXJv
-dXMgY2FuIHBva2UgaXQuCgpJbiBjb21tb24gd2l0aCBvdGhlciBhcm02NCBBQkkgc3lzY3Rscywg
-dGhpcyBjb250cm9sIGlzIGN1cnJlbnRseQpnbG9iYWw6IHNldHRpbmcgaXQgcmVxdWlyZXMgQ0FQ
-X1NZU19BRE1JTiBpbiB0aGUgcm9vdCB1c2VyCm5hbWVzcGFjZSwgYnV0IHRoZSB2YWx1ZSBzZXQg
-aXMgZWZmZWN0aXZlIGZvciBzdWJzZXF1ZW50IGV4ZWNzIGluCmFsbCBuYW1lc3BhY2VzLiAgVGhl
-IGNvbnRyb2wgb25seSBhZmZlY3RzIF9uZXdfIHByb2Nlc3NlcywgaG93ZXZlcjoKY2hhbmdpbmcg
-aXQgZG9lcyBub3QgYWZmZWN0IHRoZSB2ZWN0b3IgbGVuZ3RoIG9mIGFueSBleGlzdGluZwpwcm9j
-ZXNzLgoKVGhlIGludGVuZGVkIHVzYWdlIG1vZGVsIGlzIHRoYXQgaWYgdXNlcnNwYWNlIGlzIGtu
-b3duIHRvIGJlIGZ1bGx5ClNWRS10b2xlcmFudCAob3IgYSBkZXZlbG9wZXIgaXMgY3VyaW91cyB0
-byBmaW5kIG91dCkgdGhlbiBpbml0CnNjcmlwdHMgY2FuIGNyYW5rIHRoaXMgdXAgZHVyaW5nIHN0
-YXJ0dXAuCgpTaWduZWQtb2ZmLWJ5OiBEYXZlIE1hcnRpbiA8RGF2ZS5NYXJ0aW5AYXJtLmNvbT4K
-UmV2aWV3ZWQtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KLS0tCiBh
-cmNoL2FybTY0L2tlcm5lbC9mcHNpbWQuYyB8IDYyICsrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKy0KIDEgZmlsZSBjaGFuZ2VkLCA2MSBpbnNlcnRpb25zKCspLCAx
-IGRlbGV0aW9uKC0pCgpkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rZXJuZWwvZnBzaW1kLmMgYi9h
-cmNoL2FybTY0L2tlcm5lbC9mcHNpbWQuYwppbmRleCAyYzIzZTRhLi5hOWNiNzk0IDEwMDY0NAot
-LS0gYS9hcmNoL2FybTY0L2tlcm5lbC9mcHNpbWQuYworKysgYi9hcmNoL2FybTY0L2tlcm5lbC9m
-cHNpbWQuYwpAQCAtMzUsNiArMzUsNyBAQAogI2luY2x1ZGUgPGxpbnV4L3NjaGVkL3NpZ25hbC5o
-PgogI2luY2x1ZGUgPGxpbnV4L3NpZ25hbC5oPgogI2luY2x1ZGUgPGxpbnV4L3NsYWIuaD4KKyNp
-bmNsdWRlIDxsaW51eC9zeXNjdGwuaD4KIAogI2luY2x1ZGUgPGFzbS9mcHNpbWQuaD4KICNpbmNs
-dWRlIDxhc20vY3B1dHlwZS5oPgpAQCAtMzQ1LDYgKzM0Niw2NSBAQCBzdGF0aWMgdW5zaWduZWQg
-aW50IGZpbmRfc3VwcG9ydGVkX3ZlY3Rvcl9sZW5ndGgodW5zaWduZWQgaW50IHZsKQogCXJldHVy
-biBzdmVfdmxfZnJvbV92cShiaXRfdG9fdnEoYml0KSk7CiB9CiAKKyNpZmRlZiBDT05GSUdfU1lT
-Q1RMCisKK3N0YXRpYyBpbnQgc3ZlX3Byb2NfZG9fZGVmYXVsdF92bChzdHJ1Y3QgY3RsX3RhYmxl
-ICp0YWJsZSwgaW50IHdyaXRlLAorCQkJCSAgdm9pZCBfX3VzZXIgKmJ1ZmZlciwgc2l6ZV90ICps
-ZW5wLAorCQkJCSAgbG9mZl90ICpwcG9zKQoreworCWludCByZXQ7CisJaW50IHZsID0gc3ZlX2Rl
-ZmF1bHRfdmw7CisJc3RydWN0IGN0bF90YWJsZSB0bXBfdGFibGUgPSB7CisJCS5kYXRhID0gJnZs
-LAorCQkubWF4bGVuID0gc2l6ZW9mKHZsKSwKKwl9OworCisJcmV0ID0gcHJvY19kb2ludHZlYygm
-dG1wX3RhYmxlLCB3cml0ZSwgYnVmZmVyLCBsZW5wLCBwcG9zKTsKKwlpZiAocmV0IHx8ICF3cml0
-ZSkKKwkJcmV0dXJuIHJldDsKKworCS8qIFdyaXRpbmcgLTEgaGFzIHRoZSBzcGVjaWFsIG1lYW5p
-bmcgInNldCB0byBtYXgiOiAqLworCWlmICh2bCA9PSAtMSkgeworCQkvKiBGYWlsIHNhZmUgaWYg
-c3ZlX21heF92bCB3YXNuJ3QgaW5pdGlhbGlzZWQgKi8KKwkJaWYgKFdBUk5fT04oIXN2ZV92bF92
-YWxpZChzdmVfbWF4X3ZsKSkpCisJCQl2bCA9IFNWRV9WTF9NSU47CisJCWVsc2UKKwkJCXZsID0g
-c3ZlX21heF92bDsKKworCQlnb3RvIGNob3NlbjsKKwl9CisKKwlpZiAoIXN2ZV92bF92YWxpZCh2
-bCkpCisJCXJldHVybiAtRUlOVkFMOworCisJdmwgPSBmaW5kX3N1cHBvcnRlZF92ZWN0b3JfbGVu
-Z3RoKHZsKTsKK2Nob3NlbjoKKwlzdmVfZGVmYXVsdF92bCA9IHZsOworCXJldHVybiAwOworfQor
-CitzdGF0aWMgc3RydWN0IGN0bF90YWJsZSBzdmVfZGVmYXVsdF92bF90YWJsZVtdID0geworCXsK
-KwkJLnByb2NuYW1lCT0gInN2ZV9kZWZhdWx0X3ZlY3Rvcl9sZW5ndGgiLAorCQkubW9kZQkJPSAw
-NjQ0LAorCQkucHJvY19oYW5kbGVyCT0gc3ZlX3Byb2NfZG9fZGVmYXVsdF92bCwKKwl9LAorCXsg
-fQorfTsKKworc3RhdGljIGludCBfX2luaXQgc3ZlX3N5c2N0bF9pbml0KHZvaWQpCit7CisJaWYg
-KHN5c3RlbV9zdXBwb3J0c19zdmUoKSkKKwkJaWYgKCFyZWdpc3Rlcl9zeXNjdGwoImFiaSIsIHN2
-ZV9kZWZhdWx0X3ZsX3RhYmxlKSkKKwkJCXJldHVybiAtRUlOVkFMOworCisJcmV0dXJuIDA7Cit9
-CisKKyNlbHNlIC8qICEgQ09ORklHX1NZU0NUTCAqLworc3RhdGljIGludCBfX2luaXQgc3ZlX3N5
-c2N0bF9pbml0KHZvaWQpIHsgcmV0dXJuIDA7IH0KKyNlbmRpZiAvKiAhIENPTkZJR19TWVNDVEwg
-Ki8KKwogI2RlZmluZSBaUkVHKHN2ZV9zdGF0ZSwgdnEsIG4pICgoY2hhciAqKShzdmVfc3RhdGUp
-ICsJCVwKIAkoU1ZFX1NJR19aUkVHX09GRlNFVCh2cSwgbikgLSBTVkVfU0lHX1JFR1NfT0ZGU0VU
-KSkKIApAQCAtMTIzMiw2ICsxMjkyLDYgQEAgc3RhdGljIGludCBfX2luaXQgZnBzaW1kX2luaXQo
-dm9pZCkKIAlpZiAoIShlbGZfaHdjYXAgJiBIV0NBUF9BU0lNRCkpCiAJCXByX25vdGljZSgiQWR2
-YW5jZWQgU0lNRCBpcyBub3QgaW1wbGVtZW50ZWRcbiIpOwogCi0JcmV0dXJuIDA7CisJcmV0dXJu
-IHN2ZV9zeXNjdGxfaW5pdCgpOwogfQogY29yZV9pbml0Y2FsbChmcHNpbWRfaW5pdCk7Ci0tIAoy
-LjEuNAoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3Zt
-YXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlz
-dHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+When trapping forbidden attempts by a guest to use SVE, we want the
+guest to see a trap consistent with SVE not being implemented.
+
+This patch injects an undefined instruction exception into the
+guest in response to such an exception.
+
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ arch/arm64/kvm/handle_exit.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 7debb74..b712479 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -147,6 +147,13 @@ static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	return 1;
+ }
+ 
++static int handle_sve(struct kvm_vcpu *vcpu, struct kvm_run *run)
++{
++	/* Until SVE is supported for guests: */
++	kvm_inject_undefined(vcpu);
++	return 1;
++}
++
+ static exit_handle_fn arm_exit_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
+ 	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
+@@ -160,6 +167,7 @@ static exit_handle_fn arm_exit_handlers[] = {
+ 	[ESR_ELx_EC_HVC64]	= handle_hvc,
+ 	[ESR_ELx_EC_SMC64]	= handle_smc,
+ 	[ESR_ELx_EC_SYS64]	= kvm_handle_sys_reg,
++	[ESR_ELx_EC_SVE]	= handle_sve,
+ 	[ESR_ELx_EC_IABT_LOW]	= kvm_handle_guest_abort,
+ 	[ESR_ELx_EC_DABT_LOW]	= kvm_handle_guest_abort,
+ 	[ESR_ELx_EC_SOFTSTP_LOW]= kvm_handle_guest_debug,
+-- 
+2.1.4
