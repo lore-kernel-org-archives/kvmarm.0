@@ -1,7 +1,7 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v3 06/28] arm64/sve: System register and exception syndrome definitions
-Date: Tue, 10 Oct 2017 19:38:23 +0100
-Message-ID: <1507660725-7986-7-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v3 07/28] arm64/sve: Low-level SVE architectural state manipulation functions
+Date: Tue, 10 Oct 2017 19:38:24 +0100
+Message-ID: <1507660725-7986-8-git-send-email-Dave.Martin@arm.com>
 References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -13,125 +13,222 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The SVE architecture adds some system registers, ID register fields
-and a dedicated ESR exception class.
+Manipulating the SVE architectural state, including the vector and
+predicate registers, first-fault register and the vector length,
+requires the use of dedicated instructions added by SVE.
 
-This patch adds the appropriate definitions that will be needed by
-the kernel.
+This patch adds suitable assembly functions for saving and
+restoring the SVE registers and querying the vector length.
+Setting of the vector length is done as part of register restore.
+
+Since people building kernels may not all get an SVE-enabled
+toolchain for a while, this patch uses macros that generate
+explicit opcodes in place of assembler mnemonics.
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- arch/arm64/include/asm/esr.h     |  3 ++-
- arch/arm64/include/asm/kvm_arm.h |  1 +
- arch/arm64/include/asm/sysreg.h  | 21 +++++++++++++++++++++
- arch/arm64/kernel/traps.c        |  1 +
- 4 files changed, 25 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/fpsimd.h       |   5 ++
+ arch/arm64/include/asm/fpsimdmacros.h | 148 ++++++++++++++++++++++++++++++++++
+ arch/arm64/kernel/entry-fpsimd.S      |  17 ++++
+ 3 files changed, 170 insertions(+)
 
-diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-index 66ed8b6..014d7d8 100644
---- a/arch/arm64/include/asm/esr.h
-+++ b/arch/arm64/include/asm/esr.h
-@@ -43,7 +43,8 @@
- #define ESR_ELx_EC_HVC64	(0x16)
- #define ESR_ELx_EC_SMC64	(0x17)
- #define ESR_ELx_EC_SYS64	(0x18)
--/* Unallocated EC: 0x19 - 0x1E */
-+#define ESR_ELx_EC_SVE		(0x19)
-+/* Unallocated EC: 0x1A - 0x1E */
- #define ESR_ELx_EC_IMP_DEF	(0x1f)
- #define ESR_ELx_EC_IABT_LOW	(0x20)
- #define ESR_ELx_EC_IABT_CUR	(0x21)
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 61d694c..dbf0537 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -185,6 +185,7 @@
- #define CPTR_EL2_TCPAC	(1 << 31)
- #define CPTR_EL2_TTA	(1 << 20)
- #define CPTR_EL2_TFP	(1 << CPTR_EL2_TFP_SHIFT)
-+#define CPTR_EL2_TZ	(1 << 8)
- #define CPTR_EL2_DEFAULT	0x000033ff
+diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
+index 410c481..026a7c7 100644
+--- a/arch/arm64/include/asm/fpsimd.h
++++ b/arch/arm64/include/asm/fpsimd.h
+@@ -67,6 +67,11 @@ extern void fpsimd_update_current_state(struct fpsimd_state *state);
  
- /* Hyp Debug Configuration Register bits */
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 480ecd6..36fe2ae 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -145,6 +145,7 @@
+ extern void fpsimd_flush_task_state(struct task_struct *target);
  
- #define SYS_ID_AA64PFR0_EL1		sys_reg(3, 0, 0, 4, 0)
- #define SYS_ID_AA64PFR1_EL1		sys_reg(3, 0, 0, 4, 1)
-+#define SYS_ID_AA64ZFR0_EL1		sys_reg(3, 0, 0, 4, 4)
- 
- #define SYS_ID_AA64DFR0_EL1		sys_reg(3, 0, 0, 5, 0)
- #define SYS_ID_AA64DFR1_EL1		sys_reg(3, 0, 0, 5, 1)
-@@ -163,6 +164,8 @@
- #define SYS_ACTLR_EL1			sys_reg(3, 0, 1, 0, 1)
- #define SYS_CPACR_EL1			sys_reg(3, 0, 1, 0, 2)
- 
-+#define SYS_ZCR_EL1			sys_reg(3, 0, 1, 2, 0)
++extern void sve_save_state(void *state, u32 *pfpsr);
++extern void sve_load_state(void const *state, u32 const *pfpsr,
++			   unsigned long vq_minus_1);
++extern unsigned int sve_get_vl(void);
 +
- #define SYS_TTBR0_EL1			sys_reg(3, 0, 2, 0, 0)
- #define SYS_TTBR1_EL1			sys_reg(3, 0, 2, 0, 1)
- #define SYS_TCR_EL1			sys_reg(3, 0, 2, 0, 2)
-@@ -253,6 +256,8 @@
- 
- #define SYS_PMCCFILTR_EL0		sys_reg (3, 3, 14, 15, 7)
- 
-+#define SYS_ZCR_EL2			sys_reg(3, 4, 1, 2, 0)
+ /* For use by EFI runtime services calls only */
+ extern void __efi_fpsimd_begin(void);
+ extern void __efi_fpsimd_end(void);
+diff --git a/arch/arm64/include/asm/fpsimdmacros.h b/arch/arm64/include/asm/fpsimdmacros.h
+index 0f5fdd3..e050d76 100644
+--- a/arch/arm64/include/asm/fpsimdmacros.h
++++ b/arch/arm64/include/asm/fpsimdmacros.h
+@@ -75,3 +75,151 @@
+ 	ldr	w\tmpnr, [\state, #16 * 2 + 4]
+ 	fpsimd_restore_fpcr x\tmpnr, \state
+ .endm
 +
- #define SYS_DACR32_EL2			sys_reg(3, 4, 3, 0, 0)
- #define SYS_IFSR32_EL2			sys_reg(3, 4, 5, 0, 1)
- #define SYS_FPEXC32_EL2			sys_reg(3, 4, 5, 3, 0)
-@@ -335,6 +340,7 @@
- #define ID_AA64ISAR1_DPB_SHIFT		0
- 
- /* id_aa64pfr0 */
-+#define ID_AA64PFR0_SVE_SHIFT		32
- #define ID_AA64PFR0_GIC_SHIFT		24
- #define ID_AA64PFR0_ASIMD_SHIFT		20
- #define ID_AA64PFR0_FP_SHIFT		16
-@@ -343,6 +349,7 @@
- #define ID_AA64PFR0_EL1_SHIFT		4
- #define ID_AA64PFR0_EL0_SHIFT		0
- 
-+#define ID_AA64PFR0_SVE			0x1
- #define ID_AA64PFR0_FP_NI		0xf
- #define ID_AA64PFR0_FP_SUPPORTED	0x0
- #define ID_AA64PFR0_ASIMD_NI		0xf
-@@ -444,6 +451,20 @@
- #endif
- 
- 
-+/*
-+ * The ZCR_ELx_LEN_* definitions intentionally include bits [8:4] which
-+ * are reserved by the SVE architecture for future expansion of the LEN
-+ * field, with compatible semantics.
-+ */
-+#define ZCR_ELx_LEN_SHIFT	0
-+#define ZCR_ELx_LEN_SIZE	9
-+#define ZCR_ELx_LEN_MASK	0x1ff
++/* Sanity-check macros to help avoid encoding garbage instructions */
 +
-+#define CPACR_EL1_ZEN_EL1EN	(1 << 16) /* enable EL1 access */
-+#define CPACR_EL1_ZEN_EL0EN	(1 << 17) /* enable EL0 access, if EL1EN set */
-+#define CPACR_EL1_ZEN		(CPACR_EL1_ZEN_EL1EN | CPACR_EL1_ZEN_EL0EN)
++.macro _check_general_reg nr
++	.if (\nr) < 0 || (\nr) > 30
++		.error "Bad register number \nr."
++	.endif
++.endm
 +
++.macro _sve_check_zreg znr
++	.if (\znr) < 0 || (\znr) > 31
++		.error "Bad Scalable Vector Extension vector register number \znr."
++	.endif
++.endm
 +
- /* Safe value for MPIDR_EL1: Bit31:RES1, Bit30:U:0, Bit24:MT:0 */
- #define SYS_MPIDR_SAFE_VAL		(1UL << 31)
- 
-diff --git a/arch/arm64/kernel/traps.c b/arch/arm64/kernel/traps.c
-index 5ea4b85..f202932 100644
---- a/arch/arm64/kernel/traps.c
-+++ b/arch/arm64/kernel/traps.c
-@@ -603,6 +603,7 @@ static const char *esr_class_str[] = {
- 	[ESR_ELx_EC_HVC64]		= "HVC (AArch64)",
- 	[ESR_ELx_EC_SMC64]		= "SMC (AArch64)",
- 	[ESR_ELx_EC_SYS64]		= "MSR/MRS (AArch64)",
-+	[ESR_ELx_EC_SVE]		= "SVE",
- 	[ESR_ELx_EC_IMP_DEF]		= "EL3 IMP DEF",
- 	[ESR_ELx_EC_IABT_LOW]		= "IABT (lower EL)",
- 	[ESR_ELx_EC_IABT_CUR]		= "IABT (current EL)",
++.macro _sve_check_preg pnr
++	.if (\pnr) < 0 || (\pnr) > 15
++		.error "Bad Scalable Vector Extension predicate register number \pnr."
++	.endif
++.endm
++
++.macro _check_num n, min, max
++	.if (\n) < (\min) || (\n) > (\max)
++		.error "Number \n out of range [\min,\max]"
++	.endif
++.endm
++
++/* SVE instruction encodings for non-SVE-capable assemblers */
++
++/* STR (vector): STR Z\nz, [X\nxbase, #\offset, MUL VL] */
++.macro _sve_str_v nz, nxbase, offset=0
++	_sve_check_zreg \nz
++	_check_general_reg \nxbase
++	_check_num (\offset), -0x100, 0xff
++	.inst	0xe5804000			\
++		| (\nz)				\
++		| ((\nxbase) << 5)		\
++		| (((\offset) & 7) << 10)	\
++		| (((\offset) & 0x1f8) << 13)
++.endm
++
++/* LDR (vector): LDR Z\nz, [X\nxbase, #\offset, MUL VL] */
++.macro _sve_ldr_v nz, nxbase, offset=0
++	_sve_check_zreg \nz
++	_check_general_reg \nxbase
++	_check_num (\offset), -0x100, 0xff
++	.inst	0x85804000			\
++		| (\nz)				\
++		| ((\nxbase) << 5)		\
++		| (((\offset) & 7) << 10)	\
++		| (((\offset) & 0x1f8) << 13)
++.endm
++
++/* STR (predicate): STR P\np, [X\nxbase, #\offset, MUL VL] */
++.macro _sve_str_p np, nxbase, offset=0
++	_sve_check_preg \np
++	_check_general_reg \nxbase
++	_check_num (\offset), -0x100, 0xff
++	.inst	0xe5800000			\
++		| (\np)				\
++		| ((\nxbase) << 5)		\
++		| (((\offset) & 7) << 10)	\
++		| (((\offset) & 0x1f8) << 13)
++.endm
++
++/* LDR (predicate): LDR P\np, [X\nxbase, #\offset, MUL VL] */
++.macro _sve_ldr_p np, nxbase, offset=0
++	_sve_check_preg \np
++	_check_general_reg \nxbase
++	_check_num (\offset), -0x100, 0xff
++	.inst	0x85800000			\
++		| (\np)				\
++		| ((\nxbase) << 5)		\
++		| (((\offset) & 7) << 10)	\
++		| (((\offset) & 0x1f8) << 13)
++.endm
++
++/* RDVL X\nx, #\imm */
++.macro _sve_rdvl nx, imm
++	_check_general_reg \nx
++	_check_num (\imm), -0x20, 0x1f
++	.inst	0x04bf5000			\
++		| (\nx)				\
++		| (((\imm) & 0x3f) << 5)
++.endm
++
++/* RDFFR (unpredicated): RDFFR P\np.B */
++.macro _sve_rdffr np
++	_sve_check_preg \np
++	.inst	0x2519f000			\
++		| (\np)
++.endm
++
++/* WRFFR P\np.B */
++.macro _sve_wrffr np
++	_sve_check_preg \np
++	.inst	0x25289000			\
++		| ((\np) << 5)
++.endm
++
++.macro __for from:req, to:req
++	.if (\from) == (\to)
++		_for__body \from
++	.else
++		__for \from, (\from) + ((\to) - (\from)) / 2
++		__for (\from) + ((\to) - (\from)) / 2 + 1, \to
++	.endif
++.endm
++
++.macro _for var:req, from:req, to:req, insn:vararg
++	.macro _for__body \var:req
++		\insn
++	.endm
++
++	__for \from, \to
++
++	.purgem _for__body
++.endm
++
++.macro sve_save nxbase, xpfpsr, nxtmp
++ _for n, 0, 31,	_sve_str_v	\n, \nxbase, \n - 34
++ _for n, 0, 15,	_sve_str_p	\n, \nxbase, \n - 16
++		_sve_rdffr	0
++		_sve_str_p	0, \nxbase
++		_sve_ldr_p	0, \nxbase, -16
++
++		mrs		x\nxtmp, fpsr
++		str		w\nxtmp, [\xpfpsr]
++		mrs		x\nxtmp, fpcr
++		str		w\nxtmp, [\xpfpsr, #4]
++.endm
++
++.macro sve_load nxbase, xpfpsr, xvqminus1, nxtmp
++		mrs_s		x\nxtmp, SYS_ZCR_EL1
++		bic		x\nxtmp, x\nxtmp, ZCR_ELx_LEN_MASK
++		orr		x\nxtmp, x\nxtmp, \xvqminus1
++		msr_s		SYS_ZCR_EL1, x\nxtmp	// self-synchronising
++
++ _for n, 0, 31,	_sve_ldr_v	\n, \nxbase, \n - 34
++		_sve_ldr_p	0, \nxbase
++		_sve_wrffr	0
++ _for n, 0, 15,	_sve_ldr_p	\n, \nxbase, \n - 16
++
++		ldr		w\nxtmp, [\xpfpsr]
++		msr		fpsr, x\nxtmp
++		ldr		w\nxtmp, [\xpfpsr, #4]
++		msr		fpcr, x\nxtmp
++.endm
+diff --git a/arch/arm64/kernel/entry-fpsimd.S b/arch/arm64/kernel/entry-fpsimd.S
+index 6a27cd6..73f17bf 100644
+--- a/arch/arm64/kernel/entry-fpsimd.S
++++ b/arch/arm64/kernel/entry-fpsimd.S
+@@ -41,3 +41,20 @@ ENTRY(fpsimd_load_state)
+ 	fpsimd_restore x0, 8
+ 	ret
+ ENDPROC(fpsimd_load_state)
++
++#ifdef CONFIG_ARM64_SVE
++ENTRY(sve_save_state)
++	sve_save 0, x1, 2
++	ret
++ENDPROC(sve_save_state)
++
++ENTRY(sve_load_state)
++	sve_load 0, x1, x2, 3
++	ret
++ENDPROC(sve_load_state)
++
++ENTRY(sve_get_vl)
++	_sve_rdvl	0, 1
++	ret
++ENDPROC(sve_get_vl)
++#endif /* CONFIG_ARM64_SVE */
 -- 
 2.1.4
