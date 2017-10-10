@@ -1,58 +1,137 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v3 05/28] arm64: fpsimd: Simplify uses of {set,
- clear}_ti_thread_flag()
-Date: Tue, 10 Oct 2017 19:38:22 +0100
-Message-ID: <1507660725-7986-6-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v3 06/28] arm64/sve: System register and exception syndrome definitions
+Date: Tue, 10 Oct 2017 19:38:23 +0100
+Message-ID: <1507660725-7986-7-git-send-email-Dave.Martin@arm.com>
 References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A13C49D63
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Oct 2017 14:38:28 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lESrGodBJ-uB for <kvmarm@lists.cs.columbia.edu>;
- Tue, 10 Oct 2017 14:38:27 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4832449D8D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Oct 2017 14:38:26 -0400 (EDT)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-arch-owner@vger.kernel.org>
 In-Reply-To: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: linux-arch-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org
-Cc: linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VGhlIGV4aXN0aW5nIEZQU0lNRCBjb250ZXh0IHN3aXRjaCBjb2RlIGNvbnRhaW5zIGEgY291cGxl
-IG9mCmluc3RhbmNlcyBvZiB7c2V0LGNsZWFyfV90aV90aHJlYWQodGFza190aHJlYWRfaW5mbyh0
-YXNrKSkuICBTaW5jZQp0aGVyZSBhcmUgdGhyZWFkIGZsYWcgbWFuaXB1bGF0b3JzIHRoYXQgb3Bl
-cmF0ZSBkaXJlY3RseSBvbgp0YXNrX3N0cnVjdCwgdGhpcyB2ZXJib3NpdHkgaXNuJ3Qgc3RyaWN0
-bHkgbmVlZGVkLgoKRm9yIGNvbnNpc3RlbmN5LCB0aGlzIHBhdGNoIHNpbXBsaWZpZXMgdGhlIGFm
-ZmVjdGVkIGNhbGxzLiAgVGhpcwpzaG91bGQgaGF2ZSBubyBpbXBhY3Qgb24gYmVoYXZpb3VyLgoK
-U2lnbmVkLW9mZi1ieTogRGF2ZSBNYXJ0aW4gPERhdmUuTWFydGluQGFybS5jb20+ClJldmlld2Vk
-LWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+CkFja2VkLWJ5OiBBcmQg
-Qmllc2hldXZlbCA8YXJkLmJpZXNoZXV2ZWxAbGluYXJvLm9yZz4KLS0tCiBhcmNoL2FybTY0L2tl
-cm5lbC9mcHNpbWQuYyB8IDYgKystLS0tCiAxIGZpbGUgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCsp
-LCA0IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva2VybmVsL2Zwc2ltZC5j
-IGIvYXJjaC9hcm02NC9rZXJuZWwvZnBzaW1kLmMKaW5kZXggNWQ1NDdkZS4uN2E4NjVjOCAxMDA2
-NDQKLS0tIGEvYXJjaC9hcm02NC9rZXJuZWwvZnBzaW1kLmMKKysrIGIvYXJjaC9hcm02NC9rZXJu
-ZWwvZnBzaW1kLmMKQEAgLTE1OSwxMSArMTU5LDkgQEAgdm9pZCBmcHNpbWRfdGhyZWFkX3N3aXRj
-aChzdHJ1Y3QgdGFza19zdHJ1Y3QgKm5leHQpCiAKIAkJaWYgKF9fdGhpc19jcHVfcmVhZChmcHNp
-bWRfbGFzdF9zdGF0ZSkgPT0gc3QKIAkJICAgICYmIHN0LT5jcHUgPT0gc21wX3Byb2Nlc3Nvcl9p
-ZCgpKQotCQkJY2xlYXJfdGlfdGhyZWFkX2ZsYWcodGFza190aHJlYWRfaW5mbyhuZXh0KSwKLQkJ
-CQkJICAgICBUSUZfRk9SRUlHTl9GUFNUQVRFKTsKKwkJCWNsZWFyX3Rza190aHJlYWRfZmxhZyhu
-ZXh0LCBUSUZfRk9SRUlHTl9GUFNUQVRFKTsKIAkJZWxzZQotCQkJc2V0X3RpX3RocmVhZF9mbGFn
-KHRhc2tfdGhyZWFkX2luZm8obmV4dCksCi0JCQkJCSAgIFRJRl9GT1JFSUdOX0ZQU1RBVEUpOwor
-CQkJc2V0X3Rza190aHJlYWRfZmxhZyhuZXh0LCBUSUZfRk9SRUlHTl9GUFNUQVRFKTsKIAl9CiB9
-CiAKLS0gCjIuMS40CgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0
-cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+The SVE architecture adds some system registers, ID register fields
+and a dedicated ESR exception class.
+
+This patch adds the appropriate definitions that will be needed by
+the kernel.
+
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ arch/arm64/include/asm/esr.h     |  3 ++-
+ arch/arm64/include/asm/kvm_arm.h |  1 +
+ arch/arm64/include/asm/sysreg.h  | 21 +++++++++++++++++++++
+ arch/arm64/kernel/traps.c        |  1 +
+ 4 files changed, 25 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index 66ed8b6..014d7d8 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -43,7 +43,8 @@
+ #define ESR_ELx_EC_HVC64	(0x16)
+ #define ESR_ELx_EC_SMC64	(0x17)
+ #define ESR_ELx_EC_SYS64	(0x18)
+-/* Unallocated EC: 0x19 - 0x1E */
++#define ESR_ELx_EC_SVE		(0x19)
++/* Unallocated EC: 0x1A - 0x1E */
+ #define ESR_ELx_EC_IMP_DEF	(0x1f)
+ #define ESR_ELx_EC_IABT_LOW	(0x20)
+ #define ESR_ELx_EC_IABT_CUR	(0x21)
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 61d694c..dbf0537 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -185,6 +185,7 @@
+ #define CPTR_EL2_TCPAC	(1 << 31)
+ #define CPTR_EL2_TTA	(1 << 20)
+ #define CPTR_EL2_TFP	(1 << CPTR_EL2_TFP_SHIFT)
++#define CPTR_EL2_TZ	(1 << 8)
+ #define CPTR_EL2_DEFAULT	0x000033ff
+ 
+ /* Hyp Debug Configuration Register bits */
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 480ecd6..36fe2ae 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -145,6 +145,7 @@
+ 
+ #define SYS_ID_AA64PFR0_EL1		sys_reg(3, 0, 0, 4, 0)
+ #define SYS_ID_AA64PFR1_EL1		sys_reg(3, 0, 0, 4, 1)
++#define SYS_ID_AA64ZFR0_EL1		sys_reg(3, 0, 0, 4, 4)
+ 
+ #define SYS_ID_AA64DFR0_EL1		sys_reg(3, 0, 0, 5, 0)
+ #define SYS_ID_AA64DFR1_EL1		sys_reg(3, 0, 0, 5, 1)
+@@ -163,6 +164,8 @@
+ #define SYS_ACTLR_EL1			sys_reg(3, 0, 1, 0, 1)
+ #define SYS_CPACR_EL1			sys_reg(3, 0, 1, 0, 2)
+ 
++#define SYS_ZCR_EL1			sys_reg(3, 0, 1, 2, 0)
++
+ #define SYS_TTBR0_EL1			sys_reg(3, 0, 2, 0, 0)
+ #define SYS_TTBR1_EL1			sys_reg(3, 0, 2, 0, 1)
+ #define SYS_TCR_EL1			sys_reg(3, 0, 2, 0, 2)
+@@ -253,6 +256,8 @@
+ 
+ #define SYS_PMCCFILTR_EL0		sys_reg (3, 3, 14, 15, 7)
+ 
++#define SYS_ZCR_EL2			sys_reg(3, 4, 1, 2, 0)
++
+ #define SYS_DACR32_EL2			sys_reg(3, 4, 3, 0, 0)
+ #define SYS_IFSR32_EL2			sys_reg(3, 4, 5, 0, 1)
+ #define SYS_FPEXC32_EL2			sys_reg(3, 4, 5, 3, 0)
+@@ -335,6 +340,7 @@
+ #define ID_AA64ISAR1_DPB_SHIFT		0
+ 
+ /* id_aa64pfr0 */
++#define ID_AA64PFR0_SVE_SHIFT		32
+ #define ID_AA64PFR0_GIC_SHIFT		24
+ #define ID_AA64PFR0_ASIMD_SHIFT		20
+ #define ID_AA64PFR0_FP_SHIFT		16
+@@ -343,6 +349,7 @@
+ #define ID_AA64PFR0_EL1_SHIFT		4
+ #define ID_AA64PFR0_EL0_SHIFT		0
+ 
++#define ID_AA64PFR0_SVE			0x1
+ #define ID_AA64PFR0_FP_NI		0xf
+ #define ID_AA64PFR0_FP_SUPPORTED	0x0
+ #define ID_AA64PFR0_ASIMD_NI		0xf
+@@ -444,6 +451,20 @@
+ #endif
+ 
+ 
++/*
++ * The ZCR_ELx_LEN_* definitions intentionally include bits [8:4] which
++ * are reserved by the SVE architecture for future expansion of the LEN
++ * field, with compatible semantics.
++ */
++#define ZCR_ELx_LEN_SHIFT	0
++#define ZCR_ELx_LEN_SIZE	9
++#define ZCR_ELx_LEN_MASK	0x1ff
++
++#define CPACR_EL1_ZEN_EL1EN	(1 << 16) /* enable EL1 access */
++#define CPACR_EL1_ZEN_EL0EN	(1 << 17) /* enable EL0 access, if EL1EN set */
++#define CPACR_EL1_ZEN		(CPACR_EL1_ZEN_EL1EN | CPACR_EL1_ZEN_EL0EN)
++
++
+ /* Safe value for MPIDR_EL1: Bit31:RES1, Bit30:U:0, Bit24:MT:0 */
+ #define SYS_MPIDR_SAFE_VAL		(1UL << 31)
+ 
+diff --git a/arch/arm64/kernel/traps.c b/arch/arm64/kernel/traps.c
+index 5ea4b85..f202932 100644
+--- a/arch/arm64/kernel/traps.c
++++ b/arch/arm64/kernel/traps.c
+@@ -603,6 +603,7 @@ static const char *esr_class_str[] = {
+ 	[ESR_ELx_EC_HVC64]		= "HVC (AArch64)",
+ 	[ESR_ELx_EC_SMC64]		= "SMC (AArch64)",
+ 	[ESR_ELx_EC_SYS64]		= "MSR/MRS (AArch64)",
++	[ESR_ELx_EC_SVE]		= "SVE",
+ 	[ESR_ELx_EC_IMP_DEF]		= "EL3 IMP DEF",
+ 	[ESR_ELx_EC_IABT_LOW]		= "IABT (lower EL)",
+ 	[ESR_ELx_EC_IABT_CUR]		= "IABT (current EL)",
+-- 
+2.1.4
