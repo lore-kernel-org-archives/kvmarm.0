@@ -1,247 +1,268 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 7/7] KVM: arm/arm64: Support VGIC dist pend/active changes for mapped IRQs
-Date: Tue, 10 Oct 2017 11:49:35 +0100
-Message-ID: <87fuaruvk0.fsf@on-the-bus.cambridge.arm.com>
-References: <1505513994-77939-1-git-send-email-christoffer.dall@linaro.org>
-        <1505513994-77939-8-git-send-email-christoffer.dall@linaro.org>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH 2/5] KVM: arm/arm64: replace power_off with
+ mp_state=STOPPED
+Date: Tue, 10 Oct 2017 15:26:26 +0200
+Message-ID: <20171010132626.dzxpy7wnswywsrrj@kamzik.brq.redhat.com>
+References: <20170929113041.24371-1-drjones@redhat.com>
+ <20170929113041.24371-3-drjones@redhat.com>
+ <297c48e0-8ded-4121-079e-5372adac094f@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1505513994-77939-8-git-send-email-christoffer.dall@linaro.org>
-        (Christoffer Dall's message of "Fri, 15 Sep 2017 15:19:54 -0700")
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org, Christoffer Dall <cdall@linaro.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4269A49D37
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Oct 2017 09:25:54 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id btm8uiYsdk8f for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 10 Oct 2017 09:25:52 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DF1ED49D2C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Oct 2017 09:25:51 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <297c48e0-8ded-4121-079e-5372adac094f@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: cdall@linaro.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Sep 15 2017 at  3:19:54 pm BST, Christoffer Dall <christoffer.dall@linaro.org> wrote:
-> From: Christoffer Dall <cdall@linaro.org>
->
-> For mapped IRQs (with the HW bit set in the LR) we have to follow some
-> rules of the architecture.  One of these rules is that VM must not be
-> allowed to deactivate a virtual interrupt with the HW bit set unless the
-> physical interrupt is also active.
->
-> This works fine when injecting mapped interrupts, because we leave it up
-> to the injector to either set EOImode==1 or manually set the active
-> state of the physical interrupt.
->
-> However, the guest can set virtual interrupt to be pending or active by
-> writing to the virtual distributor, which could lead to deactivating a
-> virtual interrupt with the HW bit set without the physical interrupt
-> being active.
->
-> We could set the physical interrupt to active whenever we are about to
-> enter the VM with a HW interrupt either pending or active, but that
-> would be really slow, especially on GICv2.  So we take the long way
-> around and do the hard work when needed, which is expected to be
-> extremely rare.
->
-> When the VM sets the pending state for a HW interrupt on the virtual
-> distributor we set the active state on the physical distributor, because
-> the virtual interrupt can become active and then the guest can
-> deactivate it.
->
-> When the VM clears the pending state we also clear it on the physical
-> side, because the injector might otherwise raise the interrupt.  We also
-> clear the physical active state when the virtual interrupt is not
-> active, since otherwise a SPEND/CPEND sequence from the guest would
-> prevent signaling of future interrupts.
->
-> Changing the state of mapped interrupts from userspace is not supported,
-> and it's expected that userspace unmaps devices from VFIO before
-> attempting to set the interrupt state, because the interrupt state is
-> driven by hardware.  One annoying exception with this is the arch timer,
-> which is mapped directly from the kernel without userspace knowing when
-> that happens.  Since we already support saving/restoring the timer IRQ
-> state while it is mapped, and we rely on the timer code to set the
-> physical active state on VCPU entry, we have to preserve this behavior
-> and specifically check if the interrupt is for the timer.  Oh well.
->
-> Signed-off-by: Christoffer Dall <cdall@linaro.org>
-> ---
->  virt/kvm/arm/vgic/vgic-mmio.c | 79 ++++++++++++++++++++++++++++++++++++++-----
->  virt/kvm/arm/vgic/vgic.c      |  7 ++++
->  virt/kvm/arm/vgic/vgic.h      |  1 +
->  3 files changed, 79 insertions(+), 8 deletions(-)
->
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-> index f3087f6..3a8c7ae 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
-> @@ -16,6 +16,7 @@
->  #include <linux/kvm.h>
->  #include <linux/kvm_host.h>
->  #include <kvm/iodev.h>
-> +#include <kvm/arm_arch_timer.h>
->  #include <kvm/arm_vgic.h>
->  
->  #include "vgic.h"
-> @@ -140,10 +141,24 @@ static struct kvm_vcpu *vgic_get_mmio_requester_vcpu(void)
->  	return vcpu;
->  }
->  
-> +/* Must be called with irq->irq_lock held */
-> +static void vgic_hw_irq_spending(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
-> +				 bool is_uaccess)
-> +{
-> +	bool is_timer = irq->get_input_level == kvm_arch_timer_get_input_level;
-> +
-> +	if (!is_uaccess || is_timer)
-> +		irq->pending_latch = true;
-> +
-> +	if (!is_uaccess)
-> +		vgic_irq_set_phys_active(irq, true);
-> +}
-> +
->  void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
->  			      gpa_t addr, unsigned int len,
->  			      unsigned long val)
->  {
-> +	bool is_uaccess = !vgic_get_mmio_requester_vcpu();
->  	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
->  	int i;
->  
-> @@ -151,17 +166,47 @@ void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
->  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
->  
->  		spin_lock(&irq->irq_lock);
-> -		irq->pending_latch = true;
-> -
-> +		if (irq->hw)
-> +			vgic_hw_irq_spending(vcpu, irq, is_uaccess);
-> +		else
-> +			irq->pending_latch = true;
->  		vgic_queue_irq_unlock(vcpu->kvm, irq);
->  		vgic_put_irq(vcpu->kvm, irq);
->  	}
->  }
->  
-> +/* Must be called with irq->irq_lock held */
-> +static void vgic_hw_irq_cpending(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
-> +				 bool is_uaccess)
-> +{
-> +	bool is_timer = irq->get_input_level == kvm_arch_timer_get_input_level;
-> +
-> +	if (!is_uaccess || is_timer)
-> +		irq->pending_latch = false;;
+On Thu, Oct 05, 2017 at 09:32:02AM +0100, Marc Zyngier wrote:
+> On 29/09/17 12:30, Andrew Jones wrote:
+> > This prepares for more MP states to be used.
+> > 
+> > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > ---
+> >  arch/arm/include/asm/kvm_host.h   |  6 ++++--
+> >  arch/arm64/include/asm/kvm_host.h |  6 ++++--
+> >  virt/kvm/arm/arm.c                | 26 ++++++++++++++------------
+> >  virt/kvm/arm/psci.c               | 17 +++++------------
+> >  4 files changed, 27 insertions(+), 28 deletions(-)
+> > 
+> > diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> > index 4a879f6ff13b..85f3c20b9759 100644
+> > --- a/arch/arm/include/asm/kvm_host.h
+> > +++ b/arch/arm/include/asm/kvm_host.h
+> > @@ -171,8 +171,8 @@ struct kvm_vcpu_arch {
+> >  	 * here.
+> >  	 */
+> >  
+> > -	/* vcpu power-off state */
+> > -	bool power_off;
+> > +	/* Current VCPU MP state */
+> > +	u32 mp_state;
+> 
+> What is the rational for not using a struct kvm_mp_state directly here?
+> It is the same thing (a u32), but I certainly find it more explicit than
+> a bare u32.
 
-Extra ;
+No good rationale, only inspiration from reading x86 code. I agree using
+the struct makes more sense, though, so I'll change it.
 
-> +
-> +	if (!is_uaccess) {
-> +		/*
-> +		 * We don't want the guest to effectively mask the physical
-> +		 * interrupt by doing a write to SPENDR followed by a write to
-> +		 * CPENDR for HW interrupts, so we clear the active state on
-> +		 * the physical side if the virtual interrupt is not active.
-> +		 * This may lead to taking an additional interrupt on the
-> +		 * host, but that should not be a problem as the worst that
-> +		 * can happen is an additional vgic injection.  We also clear
-> +		 * the pending state to maintain proper semantics for edge HW
-> +		 * interrupts.
-> +		 */
-> +		vgic_irq_set_phys_pending(irq, false);
-> +		if (!irq->active)
-> +			vgic_irq_set_phys_active(irq, false);
-> +	}
-> +}
-> +
->  void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
->  			      gpa_t addr, unsigned int len,
->  			      unsigned long val)
->  {
-> +	bool is_uaccess = !vgic_get_mmio_requester_vcpu();
->  	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
->  	int i;
->  
-> @@ -169,9 +214,10 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
->  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
->  
->  		spin_lock(&irq->irq_lock);
-> -
-> -		irq->pending_latch = false;
-> -
-> +		if (irq->hw)
-> +			vgic_hw_irq_cpending(vcpu, irq, is_uaccess);
-> +		else
-> +			irq->pending_latch = false;
->  		spin_unlock(&irq->irq_lock);
->  		vgic_put_irq(vcpu->kvm, irq);
->  	}
-> @@ -197,8 +243,21 @@ unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
->  	return value;
->  }
->  
-> +/* Must be called with irq->irq_lock held */
-> +static void vgic_hw_irq_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
-> +				      bool active, bool is_uaccess)
-> +{
-> +	bool is_timer = irq->get_input_level == kvm_arch_timer_get_input_level;
-> +
-> +	if (!is_uaccess || is_timer)
-> +		irq->active = active;;
-> +
-> +	if (!is_uaccess)
-> +		vgic_irq_set_phys_active(irq, active);
-> +}
-> +
->  static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
-> -				    bool new_active_state)
-> +				    bool active)
->  {
->  	struct kvm_vcpu *requester_vcpu = vgic_get_mmio_requester_vcpu();
->  
-> @@ -225,8 +284,12 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
->  	       irq->vcpu->cpu != -1) /* VCPU thread is running */
->  		cond_resched_lock(&irq->irq_lock);
->  
-> -	irq->active = new_active_state;
-> -	if (new_active_state)
-> +	if (irq->hw)
-> +		vgic_hw_irq_change_active(vcpu, irq, active, !requester_vcpu);
-> +	else
-> +		irq->active = active;
-> +
-> +	if (irq->active)
->  		vgic_queue_irq_unlock(vcpu->kvm, irq);
->  	else
->  		spin_unlock(&irq->irq_lock);
-> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> index af0de3d..0ca2b3d 100644
-> --- a/virt/kvm/arm/vgic/vgic.c
-> +++ b/virt/kvm/arm/vgic/vgic.c
-> @@ -140,6 +140,13 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
->  	kfree(irq);
->  }
->  
-> +void vgic_irq_set_phys_pending(struct vgic_irq *irq, bool pending)
-> +{
-> +	WARN_ON(irq_set_irqchip_state(irq->host_irq,
-> +				      IRQCHIP_STATE_PENDING,
-> +				      pending));
-> +}
-> +
->  /* Get the input level of a mapped IRQ directly from the physical GIC */
->  bool vgic_get_phys_line_level(struct vgic_irq *irq)
->  {
-> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-> index 7bdcda2..498ee05 100644
-> --- a/virt/kvm/arm/vgic/vgic.h
-> +++ b/virt/kvm/arm/vgic/vgic.h
-> @@ -146,6 +146,7 @@ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
->  			      u32 intid);
->  void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq);
->  bool vgic_get_phys_line_level(struct vgic_irq *irq);
-> +void vgic_irq_set_phys_pending(struct vgic_irq *irq, bool pending);
->  void vgic_irq_set_phys_active(struct vgic_irq *irq, bool active);
->  bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq);
->  void vgic_kick_vcpus(struct kvm *kvm);
+> 
+> >  
+> >  	 /* Don't run the guest (internal implementation need) */
+> >  	bool pause;
+> > @@ -227,6 +227,8 @@ int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
+> >  
+> >  struct kvm_vcpu *kvm_arm_get_running_vcpu(void);
+> >  struct kvm_vcpu __percpu **kvm_get_running_vcpus(void);
+> > +void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
+> > +void kvm_arm_vcpu_power_on(struct kvm_vcpu *vcpu);
+> >  void kvm_arm_halt_guest(struct kvm *kvm);
+> >  void kvm_arm_resume_guest(struct kvm *kvm);
+> >  
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index e923b58606e2..25545a87de11 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -255,8 +255,8 @@ struct kvm_vcpu_arch {
+> >  		u32	mdscr_el1;
+> >  	} guest_debug_preserved;
+> >  
+> > -	/* vcpu power-off state */
+> > -	bool power_off;
+> > +	/* Current VCPU MP state */
+> > +	u32 mp_state;
+> >  
+> >  	/* Don't run the guest (internal implementation need) */
+> >  	bool pause;
+> > @@ -328,6 +328,8 @@ int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
+> >  
+> >  struct kvm_vcpu *kvm_arm_get_running_vcpu(void);
+> >  struct kvm_vcpu * __percpu *kvm_get_running_vcpus(void);
+> > +void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
+> > +void kvm_arm_vcpu_power_on(struct kvm_vcpu *vcpu);
+> >  void kvm_arm_halt_guest(struct kvm *kvm);
+> >  void kvm_arm_resume_guest(struct kvm *kvm);
+> >  
+> > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> > index e4bec508ee5b..954e77608d29 100644
+> > --- a/virt/kvm/arm/arm.c
+> > +++ b/virt/kvm/arm/arm.c
+> > @@ -368,21 +368,23 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+> >  	kvm_timer_vcpu_put(vcpu);
+> >  }
+> >  
+> > -static void vcpu_power_off(struct kvm_vcpu *vcpu)
+> > +void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
+> >  {
+> > -	vcpu->arch.power_off = true;
+> > +	vcpu->arch.mp_state = KVM_MP_STATE_STOPPED;
+> >  	kvm_make_request(KVM_REQ_SLEEP, vcpu);
+> >  	kvm_vcpu_kick(vcpu);
+> >  }
+> >  
+> > +void kvm_arm_vcpu_power_on(struct kvm_vcpu *vcpu)
+> > +{
+> > +	vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+> > +	kvm_vcpu_kick(vcpu);
+> > +}
+> > +
+> >  int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
+> >  				    struct kvm_mp_state *mp_state)
+> >  {
+> > -	if (vcpu->arch.power_off)
+> > -		mp_state->mp_state = KVM_MP_STATE_STOPPED;
+> > -	else
+> > -		mp_state->mp_state = KVM_MP_STATE_RUNNABLE;
+> > -
+> > +	mp_state->mp_state = vcpu->arch.mp_state;
+> >  	return 0;
+> >  }
+> >  
+> > @@ -391,10 +393,10 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+> >  {
+> >  	switch (mp_state->mp_state) {
+> >  	case KVM_MP_STATE_RUNNABLE:
+> > -		vcpu->arch.power_off = false;
+> > +		kvm_arm_vcpu_power_on(vcpu);
+> >  		break;
+> >  	case KVM_MP_STATE_STOPPED:
+> > -		vcpu_power_off(vcpu);
+> > +		kvm_arm_vcpu_power_off(vcpu);
+> >  		break;
+> >  	default:
+> >  		return -EINVAL;
+> > @@ -405,7 +407,7 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+> >  
+> >  static bool vcpu_should_sleep(struct kvm_vcpu *vcpu)
+> >  {
+> > -	return vcpu->arch.power_off || vcpu->arch.pause;
+> > +	return vcpu->arch.mp_state == KVM_MP_STATE_STOPPED || vcpu->arch.pause;
+> >  }
+> >  
+> >  /**
+> > @@ -919,9 +921,9 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+> >  	 * Handle the "start in power-off" case.
+> >  	 */
+> >  	if (test_bit(KVM_ARM_VCPU_POWER_OFF, vcpu->arch.features))
+> > -		vcpu_power_off(vcpu);
+> > +		kvm_arm_vcpu_power_off(vcpu);
+> >  	else
+> > -		vcpu->arch.power_off = false;
+> > +		kvm_arm_vcpu_power_on(vcpu);
+> >  
+> >  	return 0;
+> >  }
+> > diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
+> > index f1e363bab5e8..a7bf152f1247 100644
+> > --- a/virt/kvm/arm/psci.c
+> > +++ b/virt/kvm/arm/psci.c
+> > @@ -64,16 +64,13 @@ static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
+> >  
+> >  static void kvm_psci_vcpu_off(struct kvm_vcpu *vcpu)
+> >  {
+> > -	vcpu->arch.power_off = true;
+> > -	kvm_make_request(KVM_REQ_SLEEP, vcpu);
+> > -	kvm_vcpu_kick(vcpu);
+> > +	kvm_arm_vcpu_power_off(vcpu);
+> >  }
+> >  
+> >  static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+> >  {
+> >  	struct kvm *kvm = source_vcpu->kvm;
+> >  	struct kvm_vcpu *vcpu = NULL;
+> > -	struct swait_queue_head *wq;
+> >  	unsigned long cpu_id;
+> >  	unsigned long context_id;
+> >  	phys_addr_t target_pc;
+> > @@ -90,7 +87,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+> >  	 */
+> >  	if (!vcpu)
+> >  		return PSCI_RET_INVALID_PARAMS;
+> > -	if (!vcpu->arch.power_off) {
+> > +	if (vcpu->arch.mp_state != KVM_MP_STATE_STOPPED) {
+> 
+> Would it make sense to have a new helper to wrap that condition (also
+> used below)?
 
-Otherwise:
+I'll see how it looks.
 
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+> 
+> >  		if (kvm_psci_version(source_vcpu) != KVM_ARM_PSCI_0_1)
+> >  			return PSCI_RET_ALREADY_ON;
+> >  		else
+> > @@ -118,11 +115,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+> >  	 * the general puspose registers are undefined upon CPU_ON.
+> >  	 */
+> >  	vcpu_set_reg(vcpu, 0, context_id);
+> > -	vcpu->arch.power_off = false;
+> > -	smp_mb();		/* Make sure the above is visible */
+> > -
+> > -	wq = kvm_arch_vcpu_wq(vcpu);
+> > -	swake_up(wq);
+> > +	kvm_arm_vcpu_power_on(vcpu);
+> 
+> What guarantees that the mp_state update is now visible to other agents?
+> Or was the smp_mb() here superfluous? This should anyhow deserve a
+> mention in the commit message.
 
-	M.
--- 
-Jazz is not dead, it just smell funny.
+The smp_mb() was superfluous, as this has the same pattern as other
+uses of prepare_to_swait/swake_up. I'll update the commit message
+with more detail.
+
+> 
+> >  
+> >  	return PSCI_RET_SUCCESS;
+> >  }
+> > @@ -156,7 +149,7 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
+> >  		mpidr = kvm_vcpu_get_mpidr_aff(tmp);
+> >  		if ((mpidr & target_affinity_mask) == target_affinity) {
+> >  			matching_cpus++;
+> > -			if (!tmp->arch.power_off)
+> > +			if (tmp->arch.mp_state != KVM_MP_STATE_STOPPED)
+> >  				return PSCI_0_2_AFFINITY_LEVEL_ON;
+> >  		}
+> >  	}
+> > @@ -182,7 +175,7 @@ static void kvm_prepare_system_event(struct kvm_vcpu *vcpu, u32 type)
+> >  	 * re-initialized.
+> >  	 */
+> >  	kvm_for_each_vcpu(i, tmp, vcpu->kvm)
+> > -		tmp->arch.power_off = true;
+> > +		tmp->arch.mp_state = KVM_MP_STATE_STOPPED;
+> 
+> Ah, shame we can't get rid of this with a power_off...
+> 
+> >  	kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
+> >  
+> >  	memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
+> > 
+> 
+> Thanks,
+> 
+> 	M.
+> -- 
+> Jazz is not dead. It just smells funny...
+
+Thanks for the review!
+
+drew
