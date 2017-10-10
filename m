@@ -1,247 +1,442 @@
-From: Dave Martin <Dave.Martin-5wv7dgnIgG8@public.gmane.org>
-Subject: [PATCH v3 00/28] ARM Scalable Vector Extension (SVE)
-Date: Tue, 10 Oct 2017 19:38:17 +0100
-Message-ID: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-Cc: Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Ard Biesheuvel <ard.biesheuvel-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Szabolcs Nagy <szabolcs.nagy-5wv7dgnIgG8@public.gmane.org>, Richard Sandiford <richard.sandiford-5wv7dgnIgG8@public.gmane.org>, Okamoto Takayuki <tokamoto-+CUm20s59erQFUHtdCDX3A@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, libc-alpha-9JcytcrH/bA+uJoB2kUjGw@public.gmane.org, linux-arch-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Alan Hayward <alan.hayward-5wv7dgnIgG8@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, Michael Kerrisk <mtk.manpages-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Suzuki K Poulose <suzuki.poulose-5wv7dgnIgG8@public.gmane.org>, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: [PATCH v3 02/28] arm64: KVM: Hide unsupported AArch64 CPU features from guests
+Date: Tue, 10 Oct 2017 19:38:19 +0100
+Message-ID: <1507660725-7986-3-git-send-email-Dave.Martin@arm.com>
+References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
+Return-path: <linux-arch-owner@vger.kernel.org>
+In-Reply-To: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
+Sender: linux-arch-owner@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This series implements Linux kernel support for the ARM Scalable Vector
-Extension (SVE). [1]  It supersedes the previous v2: see [3] for link.
-See the individual patches for details of changes.
+Currently, a guest kernel sees the true CPU feature registers
+(ID_*_EL1) when it reads them using MRS instructions.  This means
+that the guest will observe features that are present in the
+hardware but the host doesn't understand or doesn't provide support
+for.  A guest may legimitately try to use such a feature as per the
+architecture, but use of the feature may trap instead of working
+normally, triggering undef injection into the guest.
 
-The patches apply on v4.14-rc4.
-For convenience, a git tree is available. [4]
+This is not a problem for the host, but the guest may go wrong when
+running on newer hardware than the host knows about.
 
+This patch hides from guest VMs any AArch64-specific CPU features
+that the host doesn't support, by exposing to the guest the
+sanitised versions of the registers computed by the cpufeatures
+framework, instead of the true hardware registers.  To achieve
+this, HCR_EL2.TID3 is now set for AArch64 guests, and emulation
+code is added to KVM to report the sanitised versions of the
+affected registers in response to MRS and register reads from
+userspace.
 
-To reduce spam, some people may not been copied on the entire series.
-For those who did not receive the whole series, it can be found in the
-linux-arm-kernel archive. [2]
+The affected registers are removed from invariant_sys_regs[] (since
+the invariant_sys_regs handling is no longer quite correct for
+them) and added to sys_reg_desgs[], with appropriate access(),
+get_user() and set_user() methods.  No runtime vcpu storage is
+allocated for the registers: instead, they are read on demand from
+the cpufeatures framework.  This may need modification in the
+future if there is a need for userspace to customise the features
+visible to the guest.
 
+Attempts by userspace to write the registers are handled similarly
+to the current invariant_sys_regs handling: writes are permitted,
+but only if they don't attempt to change the value.  This is
+sufficient to support VM snapshot/restore from userspace.
 
-*Note* The final two patches (27-28) of the series are still RFC --
-before committing to this ABI it would be good to get feedback on
-whether the approach makes sense and whether it suitable for other
-architectures.  These two patches are not required by the rest of the
-series and can be revised or merged later.
+Because of the additional registers, restoring a VM on an older
+kernel may not work unless userspace knows how to handle the extra
+VM registers exposed to the KVM user ABI by this patch.
 
+Under the principle of least damage, this patch makes no attempt to
+handle any of the other registers currently in
+invariant_sys_regs[], or to emulate registers for AArch32: however,
+these could be handled in a similar way in future, as necessary.
 
-Support for use of SVE by KVM guests is not currently included.
-Instead, such use will be trapped and reflected to the guest as
-undefined instruction execution.  SVE is hidden from the view of the
-CPU feature registers visible to guests, so that guests will not
-expect it to work.
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm64/include/asm/sysreg.h |   3 +
+ arch/arm64/kvm/hyp/switch.c     |   6 +
+ arch/arm64/kvm/sys_regs.c       | 282 +++++++++++++++++++++++++++++++++-------
+ 3 files changed, 246 insertions(+), 45 deletions(-)
 
-
-This series has been build- and boot-tested on the ARM FVP Base model
-with and without the SVE plugin.  Because there is no hardware with
-SVE support yet, testing of the SVE functionality has only been
-performed on the model.
-
-Regression testing of v3 is under way.
-
-
-Series summary:
-
- * Patches 1-5 contain some individual bits of preparatory spadework,
-   which are indirectly related to SVE.
-
-Dave Martin (5):
-  regset: Add support for dynamically sized regsets
-  arm64: KVM: Hide unsupported AArch64 CPU features from guests
-  arm64: efi: Add missing Kconfig dependency on KERNEL_MODE_NEON
-  arm64: Port deprecated instruction emulation to new sysctl interface
-  arm64: fpsimd: Simplify uses of {set,clear}_ti_thread_flag()
-
-   Non-trivial changes among these are:
-
-   * Patch 1: updates the regset core code to handle regsets whose size
-     is not fixed at compile time.  This avoids bloating coredumps even
-     though the maximum theoretical SVE regset size is large.
-
-   * Patch 2: extends KVM to modify the ARM architectural ID registers
-     seen by guests, by trapping and emulating certain registers.  For
-     SVE this is a temporary measure, but it may be useful for other
-     architecture extensions.  This patch may also be built on in the
-     future, since the only registers currently emulated are those
-     required for hiding SVE.
-
- * Patches 6-10 add SVE-specific system register and structure layout
-   definitions, and the low-level boot code and accessors needed for
-   making use of SVE.
-
-Dave Martin (5):
-  arm64/sve: System register and exception syndrome definitions
-  arm64/sve: Low-level SVE architectural state manipulation functions
-  arm64/sve: Kconfig update and conditional compilation support
-  arm64/sve: Signal frame and context structure definition
-  arm64/sve: Low-level CPU setup
-
- * Patches 11-13 implement the core context management facilities to
-   provide each user task with its own SVE register context, signal
-   handling facilities, and sane programmer's model interoperation
-   between SVE and FPSIMD.
-
-Dave Martin (3):
-  arm64/sve: Core task context handling
-  arm64/sve: Support vector length resetting for new processes
-  arm64/sve: Signal handling support
-
- * Patches 14 and 16 provide backend logic for detecting and making use
-   of the different SVE vector lengths supported by the hardware.
-
- * Patch 15 moves around code in cpufeatures.c to fit.
-
-Dave Martin (3):
-  arm64/sve: Backend logic for setting the vector length
-  arm64: cpufeature: Move sys_caps_initialised declarations
-  arm64/sve: Probe SVE capabilities and usable vector lengths
-
- * Patches 17-18 update the kernel-mode NEON / EFI FPSIMD frameworks to
-   interoperate correctly with SVE.
-
-Dave Martin (2):
-  arm64/sve: Preserve SVE registers around kernel-mode NEON use
-  arm64/sve: Preserve SVE registers around EFI runtime service calls
-
- * Patches 19-21 implement the userspace frontend for managing SVE,
-   comprising ptrace, some new arch-specific prctl() calls, and a new
-   sysctl for init-time setup.
-
-Dave Martin (3):
-  arm64/sve: ptrace and ELF coredump support
-  arm64/sve: Add prctl controls for userspace vector length management
-  arm64/sve: Add sysctl to set the default vector length for new
-    processes
-
- * Patches 22-24 provide stub KVM extensions for using KVM only on the
-   host, while denying guest access.  (A future series will extend this
-   with full support for SVE in guests.)
-
-Dave Martin (3):
-  arm64/sve: KVM: Prevent guests from using SVE
-  arm64/sve: KVM: Treat guest SVE use as undefined instruction
-    execution
-  arm64/sve: KVM: Hide SVE from CPU features exposed to guests
-
-And finally:
-
- * Patch 25 disengages the safety catch, enabling the kernel SVE runtime
-   support and allowing userspace to use SVE.
-
-Dave Martin (1):
-  arm64/sve: Detect SVE and activate runtime support
-
- * Patch 26 adds some basic documentation.
-
-Dave Martin (1):
-  arm64/sve: Add documentation
-
- * Patches 27-28 (which may be considered RFC) propose a mechanism to
-   report the maximum runtime signal frame size to userspace.
-
-Dave Martin (2):
-  arm64: signal: Report signal frame size to userspace via auxv
-  arm64/sve: signal: Include SVE when computing AT_MINSIGSTKSZ
-
-
-References:
-
-[1] ARM Scalable Vector Extension
-https://community.arm.com/groups/processors/blog/2016/08/22/technology-update-the-scalable-vector-extension-sve-for-the-armv8-a-architecture
-
-[2] linux-arm-kernel October 2017 Archives by thread
-http://lists.infradead.org/pipermail/linux-arm-kernel/2017-October/thread.html
-
-[3] [PATCH v2 00/28] ARM Scalable Vector Extension (SVE)
-http://lists.infradead.org/pipermail/linux-arm-kernel/2017-August/529575.html
-
-[4] http://linux-arm.org/git?p=linux-dm.git;a=shortlog;h=refs/heads/sve/v3
-    git://linux-arm.org/linux-dm.git sve/v3
-
-
-Full series and diffstat:
-
-Dave Martin (28):
-  regset: Add support for dynamically sized regsets
-  arm64: KVM: Hide unsupported AArch64 CPU features from guests
-  arm64: efi: Add missing Kconfig dependency on KERNEL_MODE_NEON
-  arm64: Port deprecated instruction emulation to new sysctl interface
-  arm64: fpsimd: Simplify uses of {set,clear}_ti_thread_flag()
-  arm64/sve: System register and exception syndrome definitions
-  arm64/sve: Low-level SVE architectural state manipulation functions
-  arm64/sve: Kconfig update and conditional compilation support
-  arm64/sve: Signal frame and context structure definition
-  arm64/sve: Low-level CPU setup
-  arm64/sve: Core task context handling
-  arm64/sve: Support vector length resetting for new processes
-  arm64/sve: Signal handling support
-  arm64/sve: Backend logic for setting the vector length
-  arm64: cpufeature: Move sys_caps_initialised declarations
-  arm64/sve: Probe SVE capabilities and usable vector lengths
-  arm64/sve: Preserve SVE registers around kernel-mode NEON use
-  arm64/sve: Preserve SVE registers around EFI runtime service calls
-  arm64/sve: ptrace and ELF coredump support
-  arm64/sve: Add prctl controls for userspace vector length management
-  arm64/sve: Add sysctl to set the default vector length for new
-    processes
-  arm64/sve: KVM: Prevent guests from using SVE
-  arm64/sve: KVM: Treat guest SVE use as undefined instruction execution
-  arm64/sve: KVM: Hide SVE from CPU features exposed to guests
-  arm64/sve: Detect SVE and activate runtime support
-  arm64/sve: Add documentation
-  arm64: signal: Report signal frame size to userspace via auxv
-  arm64/sve: signal: Include SVE when computing AT_MINSIGSTKSZ
-
- Documentation/arm64/cpu-feature-registers.txt |   6 +-
- Documentation/arm64/sve.txt                   | 484 ++++++++++++++
- arch/arm/include/asm/kvm_host.h               |   3 +
- arch/arm64/Kconfig                            |  12 +
- arch/arm64/include/asm/cpu.h                  |   4 +
- arch/arm64/include/asm/cpucaps.h              |   3 +-
- arch/arm64/include/asm/cpufeature.h           |  42 ++
- arch/arm64/include/asm/elf.h                  |   5 +
- arch/arm64/include/asm/esr.h                  |   3 +-
- arch/arm64/include/asm/fpsimd.h               |  73 +-
- arch/arm64/include/asm/fpsimdmacros.h         | 148 ++++
- arch/arm64/include/asm/kvm_arm.h              |   5 +-
- arch/arm64/include/asm/kvm_host.h             |  11 +
- arch/arm64/include/asm/processor.h            |  10 +
- arch/arm64/include/asm/sysreg.h               |  24 +
- arch/arm64/include/asm/thread_info.h          |   2 +
- arch/arm64/include/asm/traps.h                |   2 +
- arch/arm64/include/uapi/asm/auxvec.h          |   3 +-
- arch/arm64/include/uapi/asm/hwcap.h           |   1 +
- arch/arm64/include/uapi/asm/ptrace.h          | 138 ++++
- arch/arm64/include/uapi/asm/sigcontext.h      | 120 +++-
- arch/arm64/kernel/armv8_deprecated.c          |  15 +-
- arch/arm64/kernel/cpufeature.c                |  97 ++-
- arch/arm64/kernel/cpuinfo.c                   |   7 +
- arch/arm64/kernel/entry-fpsimd.S              |  17 +
- arch/arm64/kernel/entry.S                     |  14 +-
- arch/arm64/kernel/fpsimd.c                    | 927 +++++++++++++++++++++++++-
- arch/arm64/kernel/head.S                      |  13 +-
- arch/arm64/kernel/process.c                   |  14 +-
- arch/arm64/kernel/ptrace.c                    | 271 +++++++-
- arch/arm64/kernel/signal.c                    | 222 +++++-
- arch/arm64/kernel/signal32.c                  |   2 +-
- arch/arm64/kernel/traps.c                     |   7 +-
- arch/arm64/kvm/handle_exit.c                  |   8 +
- arch/arm64/kvm/hyp/switch.c                   |  12 +-
- arch/arm64/kvm/sys_regs.c                     | 292 ++++++--
- fs/binfmt_elf.c                               |   6 +-
- include/linux/regset.h                        |  67 +-
- include/uapi/linux/elf.h                      |   1 +
- include/uapi/linux/prctl.h                    |   9 +
- kernel/sys.c                                  |  12 +
- virt/kvm/arm/arm.c                            |   3 +
- 42 files changed, 2970 insertions(+), 145 deletions(-)
- create mode 100644 Documentation/arm64/sve.txt
-
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index f707fed..480ecd6 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -149,6 +149,9 @@
+ #define SYS_ID_AA64DFR0_EL1		sys_reg(3, 0, 0, 5, 0)
+ #define SYS_ID_AA64DFR1_EL1		sys_reg(3, 0, 0, 5, 1)
+ 
++#define SYS_ID_AA64AFR0_EL1		sys_reg(3, 0, 0, 5, 4)
++#define SYS_ID_AA64AFR1_EL1		sys_reg(3, 0, 0, 5, 5)
++
+ #define SYS_ID_AA64ISAR0_EL1		sys_reg(3, 0, 0, 6, 0)
+ #define SYS_ID_AA64ISAR1_EL1		sys_reg(3, 0, 0, 6, 1)
+ 
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 945e79c..35a90b8 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -81,11 +81,17 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+ 	 * it will cause an exception.
+ 	 */
+ 	val = vcpu->arch.hcr_el2;
++
+ 	if (!(val & HCR_RW) && system_supports_fpsimd()) {
+ 		write_sysreg(1 << 30, fpexc32_el2);
+ 		isb();
+ 	}
++
++	if (val & HCR_RW) /* for AArch64 only: */
++		val |= HCR_TID3; /* TID3: trap feature register accesses */
++
+ 	write_sysreg(val, hcr_el2);
++
+ 	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
+ 	write_sysreg(1 << 15, hstr_el2);
+ 	/*
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 2e070d3..b1f7552 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -892,6 +892,137 @@ static bool access_cntp_cval(struct kvm_vcpu *vcpu,
+ 	return true;
+ }
+ 
++/* Read a sanitised cpufeature ID register by sys_reg_desc */
++static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
++{
++	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
++			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
++
++	return raz ? 0 : read_sanitised_ftr_reg(id);
++}
++
++/* cpufeature ID register access trap handlers */
++
++static bool __access_id_reg(struct kvm_vcpu *vcpu,
++			    struct sys_reg_params *p,
++			    const struct sys_reg_desc *r,
++			    bool raz)
++{
++	if (p->is_write)
++		return write_to_read_only(vcpu, p, r);
++
++	p->regval = read_id_reg(r, raz);
++	return true;
++}
++
++static bool access_id_reg(struct kvm_vcpu *vcpu,
++			  struct sys_reg_params *p,
++			  const struct sys_reg_desc *r)
++{
++	return __access_id_reg(vcpu, p, r, false);
++}
++
++static bool access_raz_id_reg(struct kvm_vcpu *vcpu,
++			      struct sys_reg_params *p,
++			      const struct sys_reg_desc *r)
++{
++	return __access_id_reg(vcpu, p, r, true);
++}
++
++static int reg_from_user(u64 *val, const void __user *uaddr, u64 id);
++static int reg_to_user(void __user *uaddr, const u64 *val, u64 id);
++static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
++
++/*
++ * cpufeature ID register user accessors
++ *
++ * For now, these registers are immutable for userspace, so no values
++ * are stored, and for set_id_reg() we don't allow the effective value
++ * to be changed.
++ */
++static int __get_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
++			bool raz)
++{
++	const u64 id = sys_reg_to_index(rd);
++	const u64 val = read_id_reg(rd, raz);
++
++	return reg_to_user(uaddr, &val, id);
++}
++
++static int __set_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
++			bool raz)
++{
++	const u64 id = sys_reg_to_index(rd);
++	int err;
++	u64 val;
++
++	err = reg_from_user(&val, uaddr, id);
++	if (err)
++		return err;
++
++	/* This is what we mean by invariant: you can't change it. */
++	if (val != read_id_reg(rd, raz))
++		return -EINVAL;
++
++	return 0;
++}
++
++static int get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
++		      const struct kvm_one_reg *reg, void __user *uaddr)
++{
++	return __get_id_reg(rd, uaddr, false);
++}
++
++static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
++		      const struct kvm_one_reg *reg, void __user *uaddr)
++{
++	return __set_id_reg(rd, uaddr, false);
++}
++
++static int get_raz_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
++			  const struct kvm_one_reg *reg, void __user *uaddr)
++{
++	return __get_id_reg(rd, uaddr, true);
++}
++
++static int set_raz_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
++			  const struct kvm_one_reg *reg, void __user *uaddr)
++{
++	return __set_id_reg(rd, uaddr, true);
++}
++
++/* sys_reg_desc initialiser for known cpufeature ID registers */
++#define ID_SANITISED(name) {			\
++	SYS_DESC(SYS_##name),			\
++	.access	= access_id_reg,		\
++	.get_user = get_id_reg,			\
++	.set_user = set_id_reg,			\
++}
++
++/*
++ * sys_reg_desc initialiser for architecturally unallocated cpufeature ID
++ * register with encoding Op0=3, Op1=0, CRn=0, CRm=crm, Op2=op2
++ * (1 <= crm < 8, 0 <= Op2 < 8).
++ */
++#define ID_UNALLOCATED(crm, op2) {			\
++	Op0(3), Op1(0), CRn(0), CRm(crm), Op2(op2),	\
++	.access = access_raz_id_reg,			\
++	.get_user = get_raz_id_reg,			\
++	.set_user = set_raz_id_reg,			\
++}
++
++/*
++ * sys_reg_desc initialiser for known ID registers that we hide from guests.
++ * For now, these are exposed just like unallocated ID regs: they appear
++ * RAZ for the guest.
++ */
++#define ID_HIDDEN(name) {			\
++	SYS_DESC(SYS_##name),			\
++	.access = access_raz_id_reg,		\
++	.get_user = get_raz_id_reg,		\
++	.set_user = set_raz_id_reg,		\
++}
++
+ /*
+  * Architected system registers.
+  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+@@ -944,6 +1075,84 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_DBGVCR32_EL2), NULL, reset_val, DBGVCR32_EL2, 0 },
+ 
+ 	{ SYS_DESC(SYS_MPIDR_EL1), NULL, reset_mpidr, MPIDR_EL1 },
++
++	/*
++	 * ID regs: all ID_SANITISED() entries here must have corresponding
++	 * entries in arm64_ftr_regs[].
++	 */
++
++	/* AArch64 mappings of the AArch32 ID registers */
++	/* CRm=1 */
++	ID_SANITISED(ID_PFR0_EL1),
++	ID_SANITISED(ID_PFR1_EL1),
++	ID_SANITISED(ID_DFR0_EL1),
++	ID_HIDDEN(ID_AFR0_EL1),
++	ID_SANITISED(ID_MMFR0_EL1),
++	ID_SANITISED(ID_MMFR1_EL1),
++	ID_SANITISED(ID_MMFR2_EL1),
++	ID_SANITISED(ID_MMFR3_EL1),
++
++	/* CRm=2 */
++	ID_SANITISED(ID_ISAR0_EL1),
++	ID_SANITISED(ID_ISAR1_EL1),
++	ID_SANITISED(ID_ISAR2_EL1),
++	ID_SANITISED(ID_ISAR3_EL1),
++	ID_SANITISED(ID_ISAR4_EL1),
++	ID_SANITISED(ID_ISAR5_EL1),
++	ID_SANITISED(ID_MMFR4_EL1),
++	ID_UNALLOCATED(2,7),
++
++	/* CRm=3 */
++	ID_SANITISED(MVFR0_EL1),
++	ID_SANITISED(MVFR1_EL1),
++	ID_SANITISED(MVFR2_EL1),
++	ID_UNALLOCATED(3,3),
++	ID_UNALLOCATED(3,4),
++	ID_UNALLOCATED(3,5),
++	ID_UNALLOCATED(3,6),
++	ID_UNALLOCATED(3,7),
++
++	/* AArch64 ID registers */
++	/* CRm=4 */
++	ID_SANITISED(ID_AA64PFR0_EL1),
++	ID_SANITISED(ID_AA64PFR1_EL1),
++	ID_UNALLOCATED(4,2),
++	ID_UNALLOCATED(4,3),
++	ID_UNALLOCATED(4,4),
++	ID_UNALLOCATED(4,5),
++	ID_UNALLOCATED(4,6),
++	ID_UNALLOCATED(4,7),
++
++	/* CRm=5 */
++	ID_SANITISED(ID_AA64DFR0_EL1),
++	ID_SANITISED(ID_AA64DFR1_EL1),
++	ID_UNALLOCATED(5,2),
++	ID_UNALLOCATED(5,3),
++	ID_HIDDEN(ID_AA64AFR0_EL1),
++	ID_HIDDEN(ID_AA64AFR1_EL1),
++	ID_UNALLOCATED(5,6),
++	ID_UNALLOCATED(5,7),
++
++	/* CRm=6 */
++	ID_SANITISED(ID_AA64ISAR0_EL1),
++	ID_SANITISED(ID_AA64ISAR1_EL1),
++	ID_UNALLOCATED(6,2),
++	ID_UNALLOCATED(6,3),
++	ID_UNALLOCATED(6,4),
++	ID_UNALLOCATED(6,5),
++	ID_UNALLOCATED(6,6),
++	ID_UNALLOCATED(6,7),
++
++	/* CRm=7 */
++	ID_SANITISED(ID_AA64MMFR0_EL1),
++	ID_SANITISED(ID_AA64MMFR1_EL1),
++	ID_SANITISED(ID_AA64MMFR2_EL1),
++	ID_UNALLOCATED(7,3),
++	ID_UNALLOCATED(7,4),
++	ID_UNALLOCATED(7,5),
++	ID_UNALLOCATED(7,6),
++	ID_UNALLOCATED(7,7),
++
+ 	{ SYS_DESC(SYS_SCTLR_EL1), access_vm_reg, reset_val, SCTLR_EL1, 0x00C50078 },
+ 	{ SYS_DESC(SYS_CPACR_EL1), NULL, reset_val, CPACR_EL1, 0 },
+ 	{ SYS_DESC(SYS_TTBR0_EL1), access_vm_reg, reset_unknown, TTBR0_EL1 },
+@@ -1790,8 +1999,8 @@ static const struct sys_reg_desc *index_to_sys_reg_desc(struct kvm_vcpu *vcpu,
+ 	if (!r)
+ 		r = find_reg(&params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
+ 
+-	/* Not saved in the sys_reg array? */
+-	if (r && !r->reg)
++	/* Not saved in the sys_reg array and not otherwise accessible? */
++	if (r && !(r->reg || r->get_user))
+ 		r = NULL;
+ 
+ 	return r;
+@@ -1815,20 +2024,6 @@ static const struct sys_reg_desc *index_to_sys_reg_desc(struct kvm_vcpu *vcpu,
+ FUNCTION_INVARIANT(midr_el1)
+ FUNCTION_INVARIANT(ctr_el0)
+ FUNCTION_INVARIANT(revidr_el1)
+-FUNCTION_INVARIANT(id_pfr0_el1)
+-FUNCTION_INVARIANT(id_pfr1_el1)
+-FUNCTION_INVARIANT(id_dfr0_el1)
+-FUNCTION_INVARIANT(id_afr0_el1)
+-FUNCTION_INVARIANT(id_mmfr0_el1)
+-FUNCTION_INVARIANT(id_mmfr1_el1)
+-FUNCTION_INVARIANT(id_mmfr2_el1)
+-FUNCTION_INVARIANT(id_mmfr3_el1)
+-FUNCTION_INVARIANT(id_isar0_el1)
+-FUNCTION_INVARIANT(id_isar1_el1)
+-FUNCTION_INVARIANT(id_isar2_el1)
+-FUNCTION_INVARIANT(id_isar3_el1)
+-FUNCTION_INVARIANT(id_isar4_el1)
+-FUNCTION_INVARIANT(id_isar5_el1)
+ FUNCTION_INVARIANT(clidr_el1)
+ FUNCTION_INVARIANT(aidr_el1)
+ 
+@@ -1836,20 +2031,6 @@ FUNCTION_INVARIANT(aidr_el1)
+ static struct sys_reg_desc invariant_sys_regs[] = {
+ 	{ SYS_DESC(SYS_MIDR_EL1), NULL, get_midr_el1 },
+ 	{ SYS_DESC(SYS_REVIDR_EL1), NULL, get_revidr_el1 },
+-	{ SYS_DESC(SYS_ID_PFR0_EL1), NULL, get_id_pfr0_el1 },
+-	{ SYS_DESC(SYS_ID_PFR1_EL1), NULL, get_id_pfr1_el1 },
+-	{ SYS_DESC(SYS_ID_DFR0_EL1), NULL, get_id_dfr0_el1 },
+-	{ SYS_DESC(SYS_ID_AFR0_EL1), NULL, get_id_afr0_el1 },
+-	{ SYS_DESC(SYS_ID_MMFR0_EL1), NULL, get_id_mmfr0_el1 },
+-	{ SYS_DESC(SYS_ID_MMFR1_EL1), NULL, get_id_mmfr1_el1 },
+-	{ SYS_DESC(SYS_ID_MMFR2_EL1), NULL, get_id_mmfr2_el1 },
+-	{ SYS_DESC(SYS_ID_MMFR3_EL1), NULL, get_id_mmfr3_el1 },
+-	{ SYS_DESC(SYS_ID_ISAR0_EL1), NULL, get_id_isar0_el1 },
+-	{ SYS_DESC(SYS_ID_ISAR1_EL1), NULL, get_id_isar1_el1 },
+-	{ SYS_DESC(SYS_ID_ISAR2_EL1), NULL, get_id_isar2_el1 },
+-	{ SYS_DESC(SYS_ID_ISAR3_EL1), NULL, get_id_isar3_el1 },
+-	{ SYS_DESC(SYS_ID_ISAR4_EL1), NULL, get_id_isar4_el1 },
+-	{ SYS_DESC(SYS_ID_ISAR5_EL1), NULL, get_id_isar5_el1 },
+ 	{ SYS_DESC(SYS_CLIDR_EL1), NULL, get_clidr_el1 },
+ 	{ SYS_DESC(SYS_AIDR_EL1), NULL, get_aidr_el1 },
+ 	{ SYS_DESC(SYS_CTR_EL0), NULL, get_ctr_el0 },
+@@ -2079,12 +2260,31 @@ static bool copy_reg_to_user(const struct sys_reg_desc *reg, u64 __user **uind)
+ 	return true;
+ }
+ 
++static int walk_one_sys_reg(const struct sys_reg_desc *rd,
++			    u64 __user **uind,
++			    unsigned int *total)
++{
++	/*
++	 * Ignore registers we trap but don't save,
++	 * and for which no custom user accessor is provided.
++	 */
++	if (!(rd->reg || rd->get_user))
++		return 0;
++
++	if (!copy_reg_to_user(rd, uind))
++		return -EFAULT;
++
++	(*total)++;
++	return 0;
++}
++
+ /* Assumed ordered tables, see kvm_sys_reg_table_init. */
+ static int walk_sys_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
+ {
+ 	const struct sys_reg_desc *i1, *i2, *end1, *end2;
+ 	unsigned int total = 0;
+ 	size_t num;
++	int err;
+ 
+ 	/* We check for duplicates here, to allow arch-specific overrides. */
+ 	i1 = get_target_table(vcpu->arch.target, true, &num);
+@@ -2098,21 +2298,13 @@ static int walk_sys_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
+ 	while (i1 || i2) {
+ 		int cmp = cmp_sys_reg(i1, i2);
+ 		/* target-specific overrides generic entry. */
+-		if (cmp <= 0) {
+-			/* Ignore registers we trap but don't save. */
+-			if (i1->reg) {
+-				if (!copy_reg_to_user(i1, &uind))
+-					return -EFAULT;
+-				total++;
+-			}
+-		} else {
+-			/* Ignore registers we trap but don't save. */
+-			if (i2->reg) {
+-				if (!copy_reg_to_user(i2, &uind))
+-					return -EFAULT;
+-				total++;
+-			}
+-		}
++		if (cmp <= 0)
++			err = walk_one_sys_reg(i1, &uind, &total);
++		else
++			err = walk_one_sys_reg(i2, &uind, &total);
++
++		if (err)
++			return err;
+ 
+ 		if (cmp <= 0 && ++i1 == end1)
+ 			i1 = NULL;
 -- 
 2.1.4
