@@ -1,234 +1,67 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v3 07/28] arm64/sve: Low-level SVE architectural state manipulation functions
-Date: Tue, 10 Oct 2017 19:38:24 +0100
-Message-ID: <1507660725-7986-8-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v3 08/28] arm64/sve: Kconfig update and conditional
+ compilation support
+Date: Tue, 10 Oct 2017 19:38:25 +0100
+Message-ID: <1507660725-7986-9-git-send-email-Dave.Martin@arm.com>
 References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-arch-owner@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 696D749D5E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Oct 2017 14:38:34 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id V7KIJ4Osde8P for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 10 Oct 2017 14:38:32 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6AC5749D8A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Oct 2017 14:38:32 -0400 (EDT)
 In-Reply-To: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
-Sender: linux-arch-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org
+Cc: linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Manipulating the SVE architectural state, including the vector and
-predicate registers, first-fault register and the vector length,
-requires the use of dedicated instructions added by SVE.
-
-This patch adds suitable assembly functions for saving and
-restoring the SVE registers and querying the vector length.
-Setting of the vector length is done as part of register restore.
-
-Since people building kernels may not all get an SVE-enabled
-toolchain for a while, this patch uses macros that generate
-explicit opcodes in place of assembler mnemonics.
-
-Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
----
- arch/arm64/include/asm/fpsimd.h       |   5 ++
- arch/arm64/include/asm/fpsimdmacros.h | 148 ++++++++++++++++++++++++++++++++++
- arch/arm64/kernel/entry-fpsimd.S      |  17 ++++
- 3 files changed, 170 insertions(+)
-
-diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
-index 410c481..026a7c7 100644
---- a/arch/arm64/include/asm/fpsimd.h
-+++ b/arch/arm64/include/asm/fpsimd.h
-@@ -67,6 +67,11 @@ extern void fpsimd_update_current_state(struct fpsimd_state *state);
- 
- extern void fpsimd_flush_task_state(struct task_struct *target);
- 
-+extern void sve_save_state(void *state, u32 *pfpsr);
-+extern void sve_load_state(void const *state, u32 const *pfpsr,
-+			   unsigned long vq_minus_1);
-+extern unsigned int sve_get_vl(void);
-+
- /* For use by EFI runtime services calls only */
- extern void __efi_fpsimd_begin(void);
- extern void __efi_fpsimd_end(void);
-diff --git a/arch/arm64/include/asm/fpsimdmacros.h b/arch/arm64/include/asm/fpsimdmacros.h
-index 0f5fdd3..e050d76 100644
---- a/arch/arm64/include/asm/fpsimdmacros.h
-+++ b/arch/arm64/include/asm/fpsimdmacros.h
-@@ -75,3 +75,151 @@
- 	ldr	w\tmpnr, [\state, #16 * 2 + 4]
- 	fpsimd_restore_fpcr x\tmpnr, \state
- .endm
-+
-+/* Sanity-check macros to help avoid encoding garbage instructions */
-+
-+.macro _check_general_reg nr
-+	.if (\nr) < 0 || (\nr) > 30
-+		.error "Bad register number \nr."
-+	.endif
-+.endm
-+
-+.macro _sve_check_zreg znr
-+	.if (\znr) < 0 || (\znr) > 31
-+		.error "Bad Scalable Vector Extension vector register number \znr."
-+	.endif
-+.endm
-+
-+.macro _sve_check_preg pnr
-+	.if (\pnr) < 0 || (\pnr) > 15
-+		.error "Bad Scalable Vector Extension predicate register number \pnr."
-+	.endif
-+.endm
-+
-+.macro _check_num n, min, max
-+	.if (\n) < (\min) || (\n) > (\max)
-+		.error "Number \n out of range [\min,\max]"
-+	.endif
-+.endm
-+
-+/* SVE instruction encodings for non-SVE-capable assemblers */
-+
-+/* STR (vector): STR Z\nz, [X\nxbase, #\offset, MUL VL] */
-+.macro _sve_str_v nz, nxbase, offset=0
-+	_sve_check_zreg \nz
-+	_check_general_reg \nxbase
-+	_check_num (\offset), -0x100, 0xff
-+	.inst	0xe5804000			\
-+		| (\nz)				\
-+		| ((\nxbase) << 5)		\
-+		| (((\offset) & 7) << 10)	\
-+		| (((\offset) & 0x1f8) << 13)
-+.endm
-+
-+/* LDR (vector): LDR Z\nz, [X\nxbase, #\offset, MUL VL] */
-+.macro _sve_ldr_v nz, nxbase, offset=0
-+	_sve_check_zreg \nz
-+	_check_general_reg \nxbase
-+	_check_num (\offset), -0x100, 0xff
-+	.inst	0x85804000			\
-+		| (\nz)				\
-+		| ((\nxbase) << 5)		\
-+		| (((\offset) & 7) << 10)	\
-+		| (((\offset) & 0x1f8) << 13)
-+.endm
-+
-+/* STR (predicate): STR P\np, [X\nxbase, #\offset, MUL VL] */
-+.macro _sve_str_p np, nxbase, offset=0
-+	_sve_check_preg \np
-+	_check_general_reg \nxbase
-+	_check_num (\offset), -0x100, 0xff
-+	.inst	0xe5800000			\
-+		| (\np)				\
-+		| ((\nxbase) << 5)		\
-+		| (((\offset) & 7) << 10)	\
-+		| (((\offset) & 0x1f8) << 13)
-+.endm
-+
-+/* LDR (predicate): LDR P\np, [X\nxbase, #\offset, MUL VL] */
-+.macro _sve_ldr_p np, nxbase, offset=0
-+	_sve_check_preg \np
-+	_check_general_reg \nxbase
-+	_check_num (\offset), -0x100, 0xff
-+	.inst	0x85800000			\
-+		| (\np)				\
-+		| ((\nxbase) << 5)		\
-+		| (((\offset) & 7) << 10)	\
-+		| (((\offset) & 0x1f8) << 13)
-+.endm
-+
-+/* RDVL X\nx, #\imm */
-+.macro _sve_rdvl nx, imm
-+	_check_general_reg \nx
-+	_check_num (\imm), -0x20, 0x1f
-+	.inst	0x04bf5000			\
-+		| (\nx)				\
-+		| (((\imm) & 0x3f) << 5)
-+.endm
-+
-+/* RDFFR (unpredicated): RDFFR P\np.B */
-+.macro _sve_rdffr np
-+	_sve_check_preg \np
-+	.inst	0x2519f000			\
-+		| (\np)
-+.endm
-+
-+/* WRFFR P\np.B */
-+.macro _sve_wrffr np
-+	_sve_check_preg \np
-+	.inst	0x25289000			\
-+		| ((\np) << 5)
-+.endm
-+
-+.macro __for from:req, to:req
-+	.if (\from) == (\to)
-+		_for__body \from
-+	.else
-+		__for \from, (\from) + ((\to) - (\from)) / 2
-+		__for (\from) + ((\to) - (\from)) / 2 + 1, \to
-+	.endif
-+.endm
-+
-+.macro _for var:req, from:req, to:req, insn:vararg
-+	.macro _for__body \var:req
-+		\insn
-+	.endm
-+
-+	__for \from, \to
-+
-+	.purgem _for__body
-+.endm
-+
-+.macro sve_save nxbase, xpfpsr, nxtmp
-+ _for n, 0, 31,	_sve_str_v	\n, \nxbase, \n - 34
-+ _for n, 0, 15,	_sve_str_p	\n, \nxbase, \n - 16
-+		_sve_rdffr	0
-+		_sve_str_p	0, \nxbase
-+		_sve_ldr_p	0, \nxbase, -16
-+
-+		mrs		x\nxtmp, fpsr
-+		str		w\nxtmp, [\xpfpsr]
-+		mrs		x\nxtmp, fpcr
-+		str		w\nxtmp, [\xpfpsr, #4]
-+.endm
-+
-+.macro sve_load nxbase, xpfpsr, xvqminus1, nxtmp
-+		mrs_s		x\nxtmp, SYS_ZCR_EL1
-+		bic		x\nxtmp, x\nxtmp, ZCR_ELx_LEN_MASK
-+		orr		x\nxtmp, x\nxtmp, \xvqminus1
-+		msr_s		SYS_ZCR_EL1, x\nxtmp	// self-synchronising
-+
-+ _for n, 0, 31,	_sve_ldr_v	\n, \nxbase, \n - 34
-+		_sve_ldr_p	0, \nxbase
-+		_sve_wrffr	0
-+ _for n, 0, 15,	_sve_ldr_p	\n, \nxbase, \n - 16
-+
-+		ldr		w\nxtmp, [\xpfpsr]
-+		msr		fpsr, x\nxtmp
-+		ldr		w\nxtmp, [\xpfpsr, #4]
-+		msr		fpcr, x\nxtmp
-+.endm
-diff --git a/arch/arm64/kernel/entry-fpsimd.S b/arch/arm64/kernel/entry-fpsimd.S
-index 6a27cd6..73f17bf 100644
---- a/arch/arm64/kernel/entry-fpsimd.S
-+++ b/arch/arm64/kernel/entry-fpsimd.S
-@@ -41,3 +41,20 @@ ENTRY(fpsimd_load_state)
- 	fpsimd_restore x0, 8
- 	ret
- ENDPROC(fpsimd_load_state)
-+
-+#ifdef CONFIG_ARM64_SVE
-+ENTRY(sve_save_state)
-+	sve_save 0, x1, 2
-+	ret
-+ENDPROC(sve_save_state)
-+
-+ENTRY(sve_load_state)
-+	sve_load 0, x1, x2, 3
-+	ret
-+ENDPROC(sve_load_state)
-+
-+ENTRY(sve_get_vl)
-+	_sve_rdvl	0, 1
-+	ret
-+ENDPROC(sve_get_vl)
-+#endif /* CONFIG_ARM64_SVE */
--- 
-2.1.4
+VGhpcyBwYXRjaCBhZGRzIENPTkZJR19BUk02NF9TVkUgdG8gY29udHJvbCBidWlsZGluZyBvZiBT
+VkUgc3VwcG9ydAppbnRvIHRoZSBrZXJuZWwsIGFuZCBhZGRzIGEgc3R1YiBwcmVkaWNhdGUgc3lz
+dGVtX3N1cHBvcnRzX3N2ZSgpIHRvCmNvbnRyb2wgY29uZGl0aW9uYWwgY29tcGlsYXRpb24gYW5k
+IHJ1bnRpbWUgU1ZFIHN1cHBvcnQuCgpzeXN0ZW1fc3VwcG9ydHNfc3ZlKCkganVzdCByZXR1cm5z
+IGZhbHNlIGZvciBub3c6IGl0IHdpbGwgYmUKcmVwbGFjZWQgd2l0aCBhIG5vbi10cml2aWFsIGlt
+cGxlbWVudGF0aW9uIGluIGEgbGF0ZXIgcGF0Y2gsIG9uY2UKU1ZFIHN1cHBvcnQgaXMgY29tcGxl
+dGUgZW5vdWdoIHRvIGJlIGVuYWJsZWQgc2FmZWx5LgoKU2lnbmVkLW9mZi1ieTogRGF2ZSBNYXJ0
+aW4gPERhdmUuTWFydGluQGFybS5jb20+ClJldmlld2VkLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXgu
+YmVubmVlQGxpbmFyby5vcmc+Ci0tLQogYXJjaC9hcm02NC9LY29uZmlnICAgICAgICAgICAgICAg
+ICAgfCAxMSArKysrKysrKysrKwogYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9jcHVmZWF0dXJlLmgg
+fCAgNSArKysrKwogMiBmaWxlcyBjaGFuZ2VkLCAxNiBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0
+IGEvYXJjaC9hcm02NC9LY29uZmlnIGIvYXJjaC9hcm02NC9LY29uZmlnCmluZGV4IGNhNzExYWMu
+LjliM2E1MGUgMTAwNjQ0Ci0tLSBhL2FyY2gvYXJtNjQvS2NvbmZpZworKysgYi9hcmNoL2FybTY0
+L0tjb25maWcKQEAgLTk3NSw2ICs5NzUsMTcgQEAgY29uZmlnIEFSTTY0X1BNRU0KIAogZW5kbWVu
+dQogCitjb25maWcgQVJNNjRfU1ZFCisJYm9vbCAiQVJNIFNjYWxhYmxlIFZlY3RvciBFeHRlbnNp
+b24gc3VwcG9ydCIKKwlkZWZhdWx0IHkKKwloZWxwCisJICBUaGUgU2NhbGFibGUgVmVjdG9yIEV4
+dGVuc2lvbiAoU1ZFKSBpcyBhbiBleHRlbnNpb24gdG8gdGhlIEFBcmNoNjQKKwkgIGV4ZWN1dGlv
+biBzdGF0ZSB3aGljaCBjb21wbGVtZW50cyBhbmQgZXh0ZW5kcyB0aGUgU0lNRCBmdW5jdGlvbmFs
+aXR5CisJICBvZiB0aGUgYmFzZSBhcmNoaXRlY3R1cmUgdG8gc3VwcG9ydCBtdWNoIGxhcmdlciB2
+ZWN0b3JzIGFuZCB0byBlbmFibGUKKwkgIGFkZGl0aW9uYWwgdmVjdG9yaXNhdGlvbiBvcHBvcnR1
+bml0aWVzLgorCisJICBUbyBlbmFibGUgdXNlIG9mIHRoaXMgZXh0ZW5zaW9uIG9uIENQVXMgdGhh
+dCBpbXBsZW1lbnQgaXQsIHNheSBZLgorCiBjb25maWcgQVJNNjRfTU9EVUxFX0NNT0RFTF9MQVJH
+RQogCWJvb2wKIApkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9jcHVmZWF0dXJl
+LmggYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2NwdWZlYXR1cmUuaAppbmRleCA0MjhlZTFmLi40
+ZWEzNDQxIDEwMDY0NAotLS0gYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2NwdWZlYXR1cmUuaAor
+KysgYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2NwdWZlYXR1cmUuaApAQCAtMjYyLDYgKzI2Miwx
+MSBAQCBzdGF0aWMgaW5saW5lIGJvb2wgc3lzdGVtX3VzZXNfdHRicjBfcGFuKHZvaWQpCiAJCSFj
+cHVzX2hhdmVfY29uc3RfY2FwKEFSTTY0X0hBU19QQU4pOwogfQogCitzdGF0aWMgaW5saW5lIGJv
+b2wgc3lzdGVtX3N1cHBvcnRzX3N2ZSh2b2lkKQoreworCXJldHVybiBmYWxzZTsKK30KKwogI2Vu
+ZGlmIC8qIF9fQVNTRU1CTFlfXyAqLwogCiAjZW5kaWYKLS0gCjIuMS40CgpfX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2
+bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUv
+bWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
