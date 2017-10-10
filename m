@@ -1,58 +1,177 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v3 17/28] arm64/sve: Preserve SVE registers around kernel-mode
- NEON use
-Date: Tue, 10 Oct 2017 19:38:34 +0100
-Message-ID: <1507660725-7986-18-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v3 18/28] arm64/sve: Preserve SVE registers around EFI runtime service calls
+Date: Tue, 10 Oct 2017 19:38:35 +0100
+Message-ID: <1507660725-7986-19-git-send-email-Dave.Martin@arm.com>
 References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 34C1749D83
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Oct 2017 14:38:54 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ODSot8cmEMJZ for <kvmarm@lists.cs.columbia.edu>;
- Tue, 10 Oct 2017 14:38:53 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 345EA49DB1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Oct 2017 14:38:51 -0400 (EDT)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-arch-owner@vger.kernel.org>
 In-Reply-To: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: linux-arch-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org
-Cc: linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-S2VybmVsLW1vZGUgTkVPTiB3aWxsIGNvcnJ1cHQgdGhlIFNWRSB2ZWN0b3IgcmVnaXN0ZXJzLCBk
-dWUgdG8gdGhlCndheSB0aGV5IGFsaWFzIHRoZSBGUFNJTUQgdmVjdG9yIHJlZ2lzdGVycyBpbiB0
-aGUgaGFyZHdhcmUuCgpUaGlzIHBhdGNoIGVuc3VyZXMgdGhhdCBhbnkgbGl2ZSBTVkUgcmVnaXN0
-ZXIgY29udGVudCBmb3IgdGhlIHRhc2sKaXMgc2F2ZWQgYnkga2VybmVsX25lb25fYmVnaW4oKS4g
-IFRoZSBkYXRhIHdpbGwgYmUgcmVzdG9yZWQgaW4gdGhlCnVzdWFsIHdheSBvbiByZXR1cm4gdG8g
-dXNlcnNwYWNlLgoKU2lnbmVkLW9mZi1ieTogRGF2ZSBNYXJ0aW4gPERhdmUuTWFydGluQGFybS5j
-b20+ClJldmlld2VkLWJ5OiBBcmQgQmllc2hldXZlbCA8YXJkLmJpZXNoZXV2ZWxAbGluYXJvLm9y
-Zz4KUmV2aWV3ZWQtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KLS0t
-CiBhcmNoL2FybTY0L2tlcm5lbC9mcHNpbWQuYyB8IDYgKysrKy0tCiAxIGZpbGUgY2hhbmdlZCwg
-NCBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQv
-a2VybmVsL2Zwc2ltZC5jIGIvYXJjaC9hcm02NC9rZXJuZWwvZnBzaW1kLmMKaW5kZXggNTY3M2Y1
-MC4uYjFkMzgzYSAxMDA2NDQKLS0tIGEvYXJjaC9hcm02NC9rZXJuZWwvZnBzaW1kLmMKKysrIGIv
-YXJjaC9hcm02NC9rZXJuZWwvZnBzaW1kLmMKQEAgLTkwOSw4ICs5MDksMTAgQEAgdm9pZCBrZXJu
-ZWxfbmVvbl9iZWdpbih2b2lkKQogCV9fdGhpc19jcHVfd3JpdGUoa2VybmVsX25lb25fYnVzeSwg
-dHJ1ZSk7CiAKIAkvKiBTYXZlIHVuc2F2ZWQgdGFzayBmcHNpbWQgc3RhdGUsIGlmIGFueTogKi8K
-LQlpZiAoY3VycmVudC0+bW0gJiYgIXRlc3RfYW5kX3NldF90aHJlYWRfZmxhZyhUSUZfRk9SRUlH
-Tl9GUFNUQVRFKSkKLQkJZnBzaW1kX3NhdmVfc3RhdGUoJmN1cnJlbnQtPnRocmVhZC5mcHNpbWRf
-c3RhdGUpOworCWlmIChjdXJyZW50LT5tbSkgeworCQl0YXNrX2Zwc2ltZF9zYXZlKCk7CisJCXNl
-dF90aHJlYWRfZmxhZyhUSUZfRk9SRUlHTl9GUFNUQVRFKTsKKwl9CiAKIAkvKiBJbnZhbGlkYXRl
-IGFueSB0YXNrIHN0YXRlIHJlbWFpbmluZyBpbiB0aGUgZnBzaW1kIHJlZ3M6ICovCiAJX190aGlz
-X2NwdV93cml0ZShmcHNpbWRfbGFzdF9zdGF0ZSwgTlVMTCk7Ci0tIAoyLjEuNAoKX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlz
-dAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEu
-ZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+The EFI runtime services ABI allows EFI to make free use of the
+FPSIMD registers during EFI runtime service calls, subject to the
+callee-save requirements of the AArch64 procedure call standard.
+
+However, the SVE architecture allows upper bits of the SVE vector
+registers to be zeroed as a side-effect of FPSIMD V-register
+writes.  This means that the SVE vector registers must be saved in
+their entirety in order to avoid data loss: non-SVE-aware EFI
+implementations cannot restore them correctly.
+
+The non-IRQ case is already handled gracefully by
+kernel_neon_begin().  For the IRQ case, this patch allocates a
+suitable per-CPU stash buffer for the full SVE register state and
+uses it to preserve the affected registers around EFI calls.  It is
+currently unclear how the EFI runtime services ABI will be
+clarified with respect to SVE, so it safest to assume that the
+predicate registers and FFR must be saved and restored too.
+
+No attempt is made to restore the restore the vector length after
+a call, for now.  It is deemed rather insane for EFI to change it,
+and contemporary EFI implementations certainly won't.
+
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+
+---
+
+Changes since v2
+----------------
+
+Miscellaneous:
+
+ * Applied a BUG_ON removal that was split into the wrong patch in v2.
+
+ * Fixed overindentation of panic() call in sve_efi_setup().
+---
+ arch/arm64/kernel/fpsimd.c | 67 +++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 61 insertions(+), 6 deletions(-)
+
+diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+index b1d383a..c194627 100644
+--- a/arch/arm64/kernel/fpsimd.c
++++ b/arch/arm64/kernel/fpsimd.c
+@@ -121,11 +121,13 @@ static int sve_default_vl = -1;
+ int __ro_after_init sve_max_vl = -1;
+ /* Set of available vector lengths, as vq_to_bit(vq): */
+ static __ro_after_init DECLARE_BITMAP(sve_vq_map, SVE_VQ_MAX);
++static void __percpu *efi_sve_state;
+ 
+ #else /* ! CONFIG_ARM64_SVE */
+ 
+ /* Dummy declaration for code that will be optimised out: */
+ extern __ro_after_init DECLARE_BITMAP(sve_vq_map, SVE_VQ_MAX);
++extern void __percpu *efi_sve_state;
+ 
+ #endif /* ! CONFIG_ARM64_SVE */
+ 
+@@ -562,6 +564,30 @@ int sve_verify_vq_map(void)
+ 	return ret;
+ }
+ 
++static void __init sve_efi_setup(void)
++{
++	if (!IS_ENABLED(CONFIG_EFI))
++		return;
++
++	/*
++	 * alloc_percpu() warns and prints a backtrace if this goes wrong.
++	 * This is evidence of a crippled system and we are returning void,
++	 * so no attempt is made to handle this situation here.
++	 */
++	if (!sve_vl_valid(sve_max_vl))
++		goto fail;
++
++	efi_sve_state = __alloc_percpu(
++		SVE_SIG_REGS_SIZE(sve_vq_from_vl(sve_max_vl)), SVE_VQ_BYTES);
++	if (!efi_sve_state)
++		goto fail;
++
++	return;
++
++fail:
++	panic("Cannot allocate percpu memory for EFI SVE save/restore");
++}
++
+ /*
+  * Enable SVE for EL1.
+  * Intended for use by the cpufeatures code during CPU boot.
+@@ -609,6 +635,8 @@ void __init sve_setup(void)
+ 		sve_max_vl);
+ 	pr_info("SVE: default vector length %u bytes per vector\n",
+ 		sve_default_vl);
++
++	sve_efi_setup();
+ }
+ 
+ void fpsimd_release_thread(struct task_struct *dead_task)
+@@ -950,6 +978,7 @@ EXPORT_SYMBOL(kernel_neon_end);
+ 
+ static DEFINE_PER_CPU(struct fpsimd_state, efi_fpsimd_state);
+ static DEFINE_PER_CPU(bool, efi_fpsimd_state_used);
++static DEFINE_PER_CPU(bool, efi_sve_state_used);
+ 
+ /*
+  * EFI runtime services support functions
+@@ -975,10 +1004,24 @@ void __efi_fpsimd_begin(void)
+ 
+ 	WARN_ON(preemptible());
+ 
+-	if (may_use_simd())
++	if (may_use_simd()) {
+ 		kernel_neon_begin();
+-	else {
+-		fpsimd_save_state(this_cpu_ptr(&efi_fpsimd_state));
++	} else {
++		/*
++		 * If !efi_sve_state, SVE can't be in use yet and doesn't need
++		 * preserving:
++		 */
++		if (system_supports_sve() && likely(efi_sve_state)) {
++			char *sve_state = this_cpu_ptr(efi_sve_state);
++
++			__this_cpu_write(efi_sve_state_used, true);
++
++			sve_save_state(sve_state + sve_ffr_offset(sve_max_vl),
++				       &this_cpu_ptr(&efi_fpsimd_state)->fpsr);
++		} else {
++			fpsimd_save_state(this_cpu_ptr(&efi_fpsimd_state));
++		}
++
+ 		__this_cpu_write(efi_fpsimd_state_used, true);
+ 	}
+ }
+@@ -991,10 +1034,22 @@ void __efi_fpsimd_end(void)
+ 	if (!system_supports_fpsimd())
+ 		return;
+ 
+-	if (__this_cpu_xchg(efi_fpsimd_state_used, false))
+-		fpsimd_load_state(this_cpu_ptr(&efi_fpsimd_state));
+-	else
++	if (!__this_cpu_xchg(efi_fpsimd_state_used, false)) {
+ 		kernel_neon_end();
++	} else {
++		if (system_supports_sve() &&
++		    likely(__this_cpu_read(efi_sve_state_used))) {
++			char const *sve_state = this_cpu_ptr(efi_sve_state);
++
++			sve_load_state(sve_state + sve_ffr_offset(sve_max_vl),
++				       &this_cpu_ptr(&efi_fpsimd_state)->fpsr,
++				       sve_vq_from_vl(sve_get_vl()) - 1);
++
++			__this_cpu_write(efi_sve_state_used, false);
++		} else {
++			fpsimd_load_state(this_cpu_ptr(&efi_fpsimd_state));
++		}
++	}
+ }
+ 
+ #endif /* CONFIG_EFI */
+-- 
+2.1.4
