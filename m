@@ -1,21 +1,16 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 02/28] arm64: KVM: Hide unsupported AArch64 CPU
- features from guests
-Date: Wed, 11 Oct 2017 17:21:38 +0100
-Message-ID: <3a9fd4e1-c2e4-af4d-f307-5a19e0522922@arm.com>
+Subject: Re: [PATCH v3 22/28] arm64/sve: KVM: Prevent guests from using SVE
+Date: Wed, 11 Oct 2017 17:28:06 +0100
+Message-ID: <c28b3f0d-7beb-cca3-46db-3fce964f4725@arm.com>
 References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
- <1507660725-7986-3-git-send-email-Dave.Martin@arm.com>
+ <1507660725-7986-23-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Return-path: <libc-alpha-return-85658-glibc-alpha=m.gmane.org@sourceware.org>
-List-Unsubscribe: <mailto:libc-alpha-unsubscribe-glibc-alpha=m.gmane.org@sourceware.org>
-List-Subscribe: <mailto:libc-alpha-subscribe@sourceware.org>
-List-Archive: <http://sourceware.org/ml/libc-alpha/>
-List-Post: <mailto:libc-alpha@sourceware.org>
-List-Help: <mailto:libc-alpha-help@sourceware.org>, <http://sourceware.org/ml/#faqs>
-Sender: libc-alpha-owner@sourceware.org
-In-Reply-To: <1507660725-7986-3-git-send-email-Dave.Martin@arm.com>
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-arch-owner@vger.kernel.org>
+In-Reply-To: <1507660725-7986-23-git-send-email-Dave.Martin@arm.com>
+Content-Language: en-GB
+Sender: linux-arch-owner@vger.kernel.org
 To: Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
@@ -23,437 +18,220 @@ List-Id: kvmarm@lists.cs.columbia.edu
 [+ Christoffer]
 
 On 10/10/17 19:38, Dave Martin wrote:
-> Currently, a guest kernel sees the true CPU feature registers
-> (ID_*_EL1) when it reads them using MRS instructions.  This means
-> that the guest will observe features that are present in the
-> hardware but the host doesn't understand or doesn't provide support
-> for.  A guest may legimitately try to use such a feature as per the
-> architecture, but use of the feature may trap instead of working
-> normally, triggering undef injection into the guest.
+> Until KVM has full SVE support, guests must not be allowed to
+> execute SVE instructions.
 > 
-> This is not a problem for the host, but the guest may go wrong when
-> running on newer hardware than the host knows about.
+> This patch enables the necessary traps, and also ensures that the
+> traps are disabled again on exit from the guest so that the host
+> can still use SVE if it wants to.
 > 
-> This patch hides from guest VMs any AArch64-specific CPU features
-> that the host doesn't support, by exposing to the guest the
-> sanitised versions of the registers computed by the cpufeatures
-> framework, instead of the true hardware registers.  To achieve
-> this, HCR_EL2.TID3 is now set for AArch64 guests, and emulation
-> code is added to KVM to report the sanitised versions of the
-> affected registers in response to MRS and register reads from
-> userspace.
+> This patch introduces another instance of
+> __this_cpu_write(fpsimd_last_state, NULL), so this flush operation
+> is abstracted out as a separate helper fpsimd_flush_cpu_state().
+> Other instances are ported appropriately.
 > 
-> The affected registers are removed from invariant_sys_regs[] (since
-> the invariant_sys_regs handling is no longer quite correct for
-> them) and added to sys_reg_desgs[], with appropriate access(),
-> get_user() and set_user() methods.  No runtime vcpu storage is
-> allocated for the registers: instead, they are read on demand from
-> the cpufeatures framework.  This may need modification in the
-> future if there is a need for userspace to customise the features
-> visible to the guest.
-> 
-> Attempts by userspace to write the registers are handled similarly
-> to the current invariant_sys_regs handling: writes are permitted,
-> but only if they don't attempt to change the value.  This is
-> sufficient to support VM snapshot/restore from userspace.
-> 
-> Because of the additional registers, restoring a VM on an older
-> kernel may not work unless userspace knows how to handle the extra
-> VM registers exposed to the KVM user ABI by this patch.
-> 
-> Under the principle of least damage, this patch makes no attempt to
-> handle any of the other registers currently in
-> invariant_sys_regs[], or to emulate registers for AArch32: however,
-> these could be handled in a similar way in future, as necessary.
+> As a side effect of this refactoring, a this_cpu_write() in
+> fpsimd_cpu_pm_notifier() is changed to __this_cpu_write().  This
+> should be fine, since cpu_pm_enter() is supposed to be called only
+> with interrupts disabled.
 > 
 > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 > Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 > ---
->  arch/arm64/include/asm/sysreg.h |   3 +
->  arch/arm64/kvm/hyp/switch.c     |   6 +
->  arch/arm64/kvm/sys_regs.c       | 282 +++++++++++++++++++++++++++++++++-------
->  3 files changed, 246 insertions(+), 45 deletions(-)
+>  arch/arm/include/asm/kvm_host.h   |  3 +++
+>  arch/arm64/include/asm/fpsimd.h   |  1 +
+>  arch/arm64/include/asm/kvm_arm.h  |  4 +++-
+>  arch/arm64/include/asm/kvm_host.h | 11 +++++++++++
+>  arch/arm64/kernel/fpsimd.c        | 31 +++++++++++++++++++++++++++++--
+>  arch/arm64/kvm/hyp/switch.c       |  6 +++---
+>  virt/kvm/arm/arm.c                |  3 +++
+>  7 files changed, 53 insertions(+), 6 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index f707fed..480ecd6 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -149,6 +149,9 @@
->  #define SYS_ID_AA64DFR0_EL1		sys_reg(3, 0, 0, 5, 0)
->  #define SYS_ID_AA64DFR1_EL1		sys_reg(3, 0, 0, 5, 1)
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index 4a879f6..242151e 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -293,4 +293,7 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+>  int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+>  			       struct kvm_device_attr *attr);
 >  
-> +#define SYS_ID_AA64AFR0_EL1		sys_reg(3, 0, 0, 5, 4)
-> +#define SYS_ID_AA64AFR1_EL1		sys_reg(3, 0, 0, 5, 5)
+> +/* All host FP/SIMD state is restored on guest exit, so nothing to save: */
+> +static inline void kvm_fpsimd_flush_cpu_state(void) {}
 > +
->  #define SYS_ID_AA64ISAR0_EL1		sys_reg(3, 0, 0, 6, 0)
->  #define SYS_ID_AA64ISAR1_EL1		sys_reg(3, 0, 0, 6, 1)
+>  #endif /* __ARM_KVM_HOST_H__ */
+> diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
+> index 3cfdfbe..10b2824 100644
+> --- a/arch/arm64/include/asm/fpsimd.h
+> +++ b/arch/arm64/include/asm/fpsimd.h
+> @@ -75,6 +75,7 @@ extern void fpsimd_restore_current_state(void);
+>  extern void fpsimd_update_current_state(struct fpsimd_state *state);
 >  
+>  extern void fpsimd_flush_task_state(struct task_struct *target);
+> +extern void sve_flush_cpu_state(void);
+>  
+>  /* Maximum VL that SVE VL-agnostic software can transparently support */
+>  #define SVE_VL_ARCH_MAX 0x100
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index dbf0537..7f069ff 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -186,7 +186,8 @@
+>  #define CPTR_EL2_TTA	(1 << 20)
+>  #define CPTR_EL2_TFP	(1 << CPTR_EL2_TFP_SHIFT)
+>  #define CPTR_EL2_TZ	(1 << 8)
+> -#define CPTR_EL2_DEFAULT	0x000033ff
+> +#define CPTR_EL2_RES1	0x000032ff /* known RES1 bits in CPTR_EL2 */
+> +#define CPTR_EL2_DEFAULT	CPTR_EL2_RES1
+>  
+>  /* Hyp Debug Configuration Register bits */
+>  #define MDCR_EL2_TPMS		(1 << 14)
+> @@ -237,5 +238,6 @@
+>  
+>  #define CPACR_EL1_FPEN		(3 << 20)
+>  #define CPACR_EL1_TTA		(1 << 28)
+> +#define CPACR_EL1_DEFAULT	(CPACR_EL1_FPEN | CPACR_EL1_ZEN_EL1EN)
+>  
+>  #endif /* __ARM64_KVM_ARM_H__ */
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index e923b58..674912d 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -25,6 +25,7 @@
+>  #include <linux/types.h>
+>  #include <linux/kvm_types.h>
+>  #include <asm/cpufeature.h>
+> +#include <asm/fpsimd.h>
+>  #include <asm/kvm.h>
+>  #include <asm/kvm_asm.h>
+>  #include <asm/kvm_mmio.h>
+> @@ -384,4 +385,14 @@ static inline void __cpu_init_stage2(void)
+>  		  "PARange is %d bits, unsupported configuration!", parange);
+>  }
+>  
+> +/*
+> + * All host FP/SIMD state is restored on guest exit, so nothing needs
+> + * doing here except in the SVE case:
+> +*/
+> +static inline void kvm_fpsimd_flush_cpu_state(void)
+> +{
+> +	if (system_supports_sve())
+> +		sve_flush_cpu_state();
+
+Hmmm. How does this work if...
+
+> +}
+> +
+>  #endif /* __ARM64_KVM_HOST_H__ */
+> diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+> index a9cb794..6ae3703 100644
+> --- a/arch/arm64/kernel/fpsimd.c
+> +++ b/arch/arm64/kernel/fpsimd.c
+> @@ -1073,6 +1073,33 @@ void fpsimd_flush_task_state(struct task_struct *t)
+>  	t->thread.fpsimd_state.cpu = NR_CPUS;
+>  }
+>  
+> +static inline void fpsimd_flush_cpu_state(void)
+> +{
+> +	__this_cpu_write(fpsimd_last_state, NULL);
+> +}
+> +
+> +/*
+> + * Invalidate any task SVE state currently held in this CPU's regs.
+> + *
+> + * This is used to prevent the kernel from trying to reuse SVE register data
+> + * that is detroyed by KVM guest enter/exit.  This function should go away when
+> + * KVM SVE support is implemented.  Don't use it for anything else.
+> + */
+> +#ifdef CONFIG_ARM64_SVE
+> +void sve_flush_cpu_state(void)
+> +{
+> +	struct fpsimd_state *const fpstate = __this_cpu_read(fpsimd_last_state);
+> +	struct task_struct *tsk;
+> +
+> +	if (!fpstate)
+> +		return;
+> +
+> +	tsk = container_of(fpstate, struct task_struct, thread.fpsimd_state);
+> +	if (test_tsk_thread_flag(tsk, TIF_SVE))
+> +		fpsimd_flush_cpu_state();
+> +}
+> +#endif /* CONFIG_ARM64_SVE */
+
+... CONFIG_ARM64_SVE is not set? Fixing this should just be a matter of
+moving the #ifdef/#endif inside the function...
+
+> +
+>  #ifdef CONFIG_KERNEL_MODE_NEON
+>  
+>  DEFINE_PER_CPU(bool, kernel_neon_busy);
+> @@ -1113,7 +1140,7 @@ void kernel_neon_begin(void)
+>  	}
+>  
+>  	/* Invalidate any task state remaining in the fpsimd regs: */
+> -	__this_cpu_write(fpsimd_last_state, NULL);
+> +	fpsimd_flush_cpu_state();
+>  
+>  	preempt_disable();
+>  
+> @@ -1234,7 +1261,7 @@ static int fpsimd_cpu_pm_notifier(struct notifier_block *self,
+>  	case CPU_PM_ENTER:
+>  		if (current->mm)
+>  			task_fpsimd_save();
+> -		this_cpu_write(fpsimd_last_state, NULL);
+> +		fpsimd_flush_cpu_state();
+>  		break;
+>  	case CPU_PM_EXIT:
+>  		if (current->mm)
 > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> index 945e79c..35a90b8 100644
+> index 35a90b8..951f3eb 100644
 > --- a/arch/arm64/kvm/hyp/switch.c
 > +++ b/arch/arm64/kvm/hyp/switch.c
-> @@ -81,11 +81,17 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
->  	 * it will cause an exception.
->  	 */
->  	val = vcpu->arch.hcr_el2;
-> +
->  	if (!(val & HCR_RW) && system_supports_fpsimd()) {
->  		write_sysreg(1 << 30, fpexc32_el2);
->  		isb();
->  	}
-> +
-> +	if (val & HCR_RW) /* for AArch64 only: */
-> +		val |= HCR_TID3; /* TID3: trap feature register accesses */
-> +
->  	write_sysreg(val, hcr_el2);
-> +
->  	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
->  	write_sysreg(1 << 15, hstr_el2);
->  	/*
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 2e070d3..b1f7552 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -892,6 +892,137 @@ static bool access_cntp_cval(struct kvm_vcpu *vcpu,
->  	return true;
+> @@ -48,7 +48,7 @@ static void __hyp_text __activate_traps_vhe(void)
+>  
+>  	val = read_sysreg(cpacr_el1);
+>  	val |= CPACR_EL1_TTA;
+> -	val &= ~CPACR_EL1_FPEN;
+> +	val &= ~(CPACR_EL1_FPEN | CPACR_EL1_ZEN);
+>  	write_sysreg(val, cpacr_el1);
+>  
+>  	write_sysreg(__kvm_hyp_vector, vbar_el1);
+> @@ -59,7 +59,7 @@ static void __hyp_text __activate_traps_nvhe(void)
+>  	u64 val;
+>  
+>  	val = CPTR_EL2_DEFAULT;
+> -	val |= CPTR_EL2_TTA | CPTR_EL2_TFP;
+> +	val |= CPTR_EL2_TTA | CPTR_EL2_TFP | CPTR_EL2_TZ;
+>  	write_sysreg(val, cptr_el2);
 >  }
 >  
-> +/* Read a sanitised cpufeature ID register by sys_reg_desc */
-> +static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
-> +{
-> +	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
-> +			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
-> +
-> +	return raz ? 0 : read_sanitised_ftr_reg(id);
-> +}
-> +
-> +/* cpufeature ID register access trap handlers */
-> +
-> +static bool __access_id_reg(struct kvm_vcpu *vcpu,
-> +			    struct sys_reg_params *p,
-> +			    const struct sys_reg_desc *r,
-> +			    bool raz)
-> +{
-> +	if (p->is_write)
-> +		return write_to_read_only(vcpu, p, r);
-> +
-> +	p->regval = read_id_reg(r, raz);
-> +	return true;
-> +}
-> +
-> +static bool access_id_reg(struct kvm_vcpu *vcpu,
-> +			  struct sys_reg_params *p,
-> +			  const struct sys_reg_desc *r)
-> +{
-> +	return __access_id_reg(vcpu, p, r, false);
-> +}
-> +
-> +static bool access_raz_id_reg(struct kvm_vcpu *vcpu,
-> +			      struct sys_reg_params *p,
-> +			      const struct sys_reg_desc *r)
-> +{
-> +	return __access_id_reg(vcpu, p, r, true);
-> +}
-> +
-> +static int reg_from_user(u64 *val, const void __user *uaddr, u64 id);
-> +static int reg_to_user(void __user *uaddr, const u64 *val, u64 id);
-> +static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
-> +
-> +/*
-> + * cpufeature ID register user accessors
-> + *
-> + * For now, these registers are immutable for userspace, so no values
-> + * are stored, and for set_id_reg() we don't allow the effective value
-> + * to be changed.
-> + */
-> +static int __get_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
-> +			bool raz)
-> +{
-> +	const u64 id = sys_reg_to_index(rd);
-> +	const u64 val = read_id_reg(rd, raz);
-> +
-> +	return reg_to_user(uaddr, &val, id);
-> +}
-> +
-> +static int __set_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
-> +			bool raz)
-> +{
-> +	const u64 id = sys_reg_to_index(rd);
-> +	int err;
-> +	u64 val;
-> +
-> +	err = reg_from_user(&val, uaddr, id);
-> +	if (err)
-> +		return err;
-> +
-> +	/* This is what we mean by invariant: you can't change it. */
-> +	if (val != read_id_reg(rd, raz))
-> +		return -EINVAL;
-> +
-> +	return 0;
-> +}
-> +
-> +static int get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> +		      const struct kvm_one_reg *reg, void __user *uaddr)
-> +{
-> +	return __get_id_reg(rd, uaddr, false);
-> +}
-> +
-> +static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> +		      const struct kvm_one_reg *reg, void __user *uaddr)
-> +{
-> +	return __set_id_reg(rd, uaddr, false);
-> +}
-> +
-> +static int get_raz_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> +			  const struct kvm_one_reg *reg, void __user *uaddr)
-> +{
-> +	return __get_id_reg(rd, uaddr, true);
-> +}
-> +
-> +static int set_raz_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> +			  const struct kvm_one_reg *reg, void __user *uaddr)
-> +{
-> +	return __set_id_reg(rd, uaddr, true);
-> +}
-> +
-> +/* sys_reg_desc initialiser for known cpufeature ID registers */
-> +#define ID_SANITISED(name) {			\
-> +	SYS_DESC(SYS_##name),			\
-> +	.access	= access_id_reg,		\
-> +	.get_user = get_id_reg,			\
-> +	.set_user = set_id_reg,			\
-> +}
-> +
-> +/*
-> + * sys_reg_desc initialiser for architecturally unallocated cpufeature ID
-> + * register with encoding Op0=3, Op1=0, CRn=0, CRm=crm, Op2=op2
-> + * (1 <= crm < 8, 0 <= Op2 < 8).
-> + */
-> +#define ID_UNALLOCATED(crm, op2) {			\
-> +	Op0(3), Op1(0), CRn(0), CRm(crm), Op2(op2),	\
-> +	.access = access_raz_id_reg,			\
-> +	.get_user = get_raz_id_reg,			\
-> +	.set_user = set_raz_id_reg,			\
-> +}
-> +
-> +/*
-> + * sys_reg_desc initialiser for known ID registers that we hide from guests.
-> + * For now, these are exposed just like unallocated ID regs: they appear
-> + * RAZ for the guest.
-> + */
-> +#define ID_HIDDEN(name) {			\
-> +	SYS_DESC(SYS_##name),			\
-> +	.access = access_raz_id_reg,		\
-> +	.get_user = get_raz_id_reg,		\
-> +	.set_user = set_raz_id_reg,		\
-> +}
-> +
->  /*
->   * Architected system registers.
->   * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-> @@ -944,6 +1075,84 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	{ SYS_DESC(SYS_DBGVCR32_EL2), NULL, reset_val, DBGVCR32_EL2, 0 },
+> @@ -117,7 +117,7 @@ static void __hyp_text __deactivate_traps_vhe(void)
 >  
->  	{ SYS_DESC(SYS_MPIDR_EL1), NULL, reset_mpidr, MPIDR_EL1 },
-> +
-> +	/*
-> +	 * ID regs: all ID_SANITISED() entries here must have corresponding
-> +	 * entries in arm64_ftr_regs[].
-> +	 */
-> +
-> +	/* AArch64 mappings of the AArch32 ID registers */
-> +	/* CRm=1 */
-> +	ID_SANITISED(ID_PFR0_EL1),
-> +	ID_SANITISED(ID_PFR1_EL1),
-> +	ID_SANITISED(ID_DFR0_EL1),
-> +	ID_HIDDEN(ID_AFR0_EL1),
-> +	ID_SANITISED(ID_MMFR0_EL1),
-> +	ID_SANITISED(ID_MMFR1_EL1),
-> +	ID_SANITISED(ID_MMFR2_EL1),
-> +	ID_SANITISED(ID_MMFR3_EL1),
-> +
-> +	/* CRm=2 */
-> +	ID_SANITISED(ID_ISAR0_EL1),
-> +	ID_SANITISED(ID_ISAR1_EL1),
-> +	ID_SANITISED(ID_ISAR2_EL1),
-> +	ID_SANITISED(ID_ISAR3_EL1),
-> +	ID_SANITISED(ID_ISAR4_EL1),
-> +	ID_SANITISED(ID_ISAR5_EL1),
-> +	ID_SANITISED(ID_MMFR4_EL1),
-> +	ID_UNALLOCATED(2,7),
-> +
-> +	/* CRm=3 */
-> +	ID_SANITISED(MVFR0_EL1),
-> +	ID_SANITISED(MVFR1_EL1),
-> +	ID_SANITISED(MVFR2_EL1),
-> +	ID_UNALLOCATED(3,3),
-> +	ID_UNALLOCATED(3,4),
-> +	ID_UNALLOCATED(3,5),
-> +	ID_UNALLOCATED(3,6),
-> +	ID_UNALLOCATED(3,7),
-> +
-> +	/* AArch64 ID registers */
-> +	/* CRm=4 */
-> +	ID_SANITISED(ID_AA64PFR0_EL1),
-> +	ID_SANITISED(ID_AA64PFR1_EL1),
-> +	ID_UNALLOCATED(4,2),
-> +	ID_UNALLOCATED(4,3),
-> +	ID_UNALLOCATED(4,4),
-> +	ID_UNALLOCATED(4,5),
-> +	ID_UNALLOCATED(4,6),
-> +	ID_UNALLOCATED(4,7),
-> +
-> +	/* CRm=5 */
-> +	ID_SANITISED(ID_AA64DFR0_EL1),
-> +	ID_SANITISED(ID_AA64DFR1_EL1),
-> +	ID_UNALLOCATED(5,2),
-> +	ID_UNALLOCATED(5,3),
-> +	ID_HIDDEN(ID_AA64AFR0_EL1),
-> +	ID_HIDDEN(ID_AA64AFR1_EL1),
-> +	ID_UNALLOCATED(5,6),
-> +	ID_UNALLOCATED(5,7),
-> +
-> +	/* CRm=6 */
-> +	ID_SANITISED(ID_AA64ISAR0_EL1),
-> +	ID_SANITISED(ID_AA64ISAR1_EL1),
-> +	ID_UNALLOCATED(6,2),
-> +	ID_UNALLOCATED(6,3),
-> +	ID_UNALLOCATED(6,4),
-> +	ID_UNALLOCATED(6,5),
-> +	ID_UNALLOCATED(6,6),
-> +	ID_UNALLOCATED(6,7),
-> +
-> +	/* CRm=7 */
-> +	ID_SANITISED(ID_AA64MMFR0_EL1),
-> +	ID_SANITISED(ID_AA64MMFR1_EL1),
-> +	ID_SANITISED(ID_AA64MMFR2_EL1),
-> +	ID_UNALLOCATED(7,3),
-> +	ID_UNALLOCATED(7,4),
-> +	ID_UNALLOCATED(7,5),
-> +	ID_UNALLOCATED(7,6),
-> +	ID_UNALLOCATED(7,7),
-> +
->  	{ SYS_DESC(SYS_SCTLR_EL1), access_vm_reg, reset_val, SCTLR_EL1, 0x00C50078 },
->  	{ SYS_DESC(SYS_CPACR_EL1), NULL, reset_val, CPACR_EL1, 0 },
->  	{ SYS_DESC(SYS_TTBR0_EL1), access_vm_reg, reset_unknown, TTBR0_EL1 },
-> @@ -1790,8 +1999,8 @@ static const struct sys_reg_desc *index_to_sys_reg_desc(struct kvm_vcpu *vcpu,
->  	if (!r)
->  		r = find_reg(&params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
->  
-> -	/* Not saved in the sys_reg array? */
-> -	if (r && !r->reg)
-> +	/* Not saved in the sys_reg array and not otherwise accessible? */
-> +	if (r && !(r->reg || r->get_user))
->  		r = NULL;
->  
->  	return r;
-> @@ -1815,20 +2024,6 @@ static const struct sys_reg_desc *index_to_sys_reg_desc(struct kvm_vcpu *vcpu,
->  FUNCTION_INVARIANT(midr_el1)
->  FUNCTION_INVARIANT(ctr_el0)
->  FUNCTION_INVARIANT(revidr_el1)
-> -FUNCTION_INVARIANT(id_pfr0_el1)
-> -FUNCTION_INVARIANT(id_pfr1_el1)
-> -FUNCTION_INVARIANT(id_dfr0_el1)
-> -FUNCTION_INVARIANT(id_afr0_el1)
-> -FUNCTION_INVARIANT(id_mmfr0_el1)
-> -FUNCTION_INVARIANT(id_mmfr1_el1)
-> -FUNCTION_INVARIANT(id_mmfr2_el1)
-> -FUNCTION_INVARIANT(id_mmfr3_el1)
-> -FUNCTION_INVARIANT(id_isar0_el1)
-> -FUNCTION_INVARIANT(id_isar1_el1)
-> -FUNCTION_INVARIANT(id_isar2_el1)
-> -FUNCTION_INVARIANT(id_isar3_el1)
-> -FUNCTION_INVARIANT(id_isar4_el1)
-> -FUNCTION_INVARIANT(id_isar5_el1)
->  FUNCTION_INVARIANT(clidr_el1)
->  FUNCTION_INVARIANT(aidr_el1)
->  
-> @@ -1836,20 +2031,6 @@ FUNCTION_INVARIANT(aidr_el1)
->  static struct sys_reg_desc invariant_sys_regs[] = {
->  	{ SYS_DESC(SYS_MIDR_EL1), NULL, get_midr_el1 },
->  	{ SYS_DESC(SYS_REVIDR_EL1), NULL, get_revidr_el1 },
-> -	{ SYS_DESC(SYS_ID_PFR0_EL1), NULL, get_id_pfr0_el1 },
-> -	{ SYS_DESC(SYS_ID_PFR1_EL1), NULL, get_id_pfr1_el1 },
-> -	{ SYS_DESC(SYS_ID_DFR0_EL1), NULL, get_id_dfr0_el1 },
-> -	{ SYS_DESC(SYS_ID_AFR0_EL1), NULL, get_id_afr0_el1 },
-> -	{ SYS_DESC(SYS_ID_MMFR0_EL1), NULL, get_id_mmfr0_el1 },
-> -	{ SYS_DESC(SYS_ID_MMFR1_EL1), NULL, get_id_mmfr1_el1 },
-> -	{ SYS_DESC(SYS_ID_MMFR2_EL1), NULL, get_id_mmfr2_el1 },
-> -	{ SYS_DESC(SYS_ID_MMFR3_EL1), NULL, get_id_mmfr3_el1 },
-> -	{ SYS_DESC(SYS_ID_ISAR0_EL1), NULL, get_id_isar0_el1 },
-> -	{ SYS_DESC(SYS_ID_ISAR1_EL1), NULL, get_id_isar1_el1 },
-> -	{ SYS_DESC(SYS_ID_ISAR2_EL1), NULL, get_id_isar2_el1 },
-> -	{ SYS_DESC(SYS_ID_ISAR3_EL1), NULL, get_id_isar3_el1 },
-> -	{ SYS_DESC(SYS_ID_ISAR4_EL1), NULL, get_id_isar4_el1 },
-> -	{ SYS_DESC(SYS_ID_ISAR5_EL1), NULL, get_id_isar5_el1 },
->  	{ SYS_DESC(SYS_CLIDR_EL1), NULL, get_clidr_el1 },
->  	{ SYS_DESC(SYS_AIDR_EL1), NULL, get_aidr_el1 },
->  	{ SYS_DESC(SYS_CTR_EL0), NULL, get_ctr_el0 },
-> @@ -2079,12 +2260,31 @@ static bool copy_reg_to_user(const struct sys_reg_desc *reg, u64 __user **uind)
->  	return true;
+>  	write_sysreg(mdcr_el2, mdcr_el2);
+>  	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
+> -	write_sysreg(CPACR_EL1_FPEN, cpacr_el1);
+> +	write_sysreg(CPACR_EL1_DEFAULT, cpacr_el1);
+>  	write_sysreg(vectors, vbar_el1);
 >  }
 >  
-> +static int walk_one_sys_reg(const struct sys_reg_desc *rd,
-> +			    u64 __user **uind,
-> +			    unsigned int *total)
-> +{
-> +	/*
-> +	 * Ignore registers we trap but don't save,
-> +	 * and for which no custom user accessor is provided.
-> +	 */
-> +	if (!(rd->reg || rd->get_user))
-> +		return 0;
-> +
-> +	if (!copy_reg_to_user(rd, uind))
-> +		return -EFAULT;
-> +
-> +	(*total)++;
-> +	return 0;
-> +}
-> +
->  /* Assumed ordered tables, see kvm_sys_reg_table_init. */
->  static int walk_sys_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
->  {
->  	const struct sys_reg_desc *i1, *i2, *end1, *end2;
->  	unsigned int total = 0;
->  	size_t num;
-> +	int err;
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index b9f68e4..4d3cf9c 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -652,6 +652,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  		 */
+>  		preempt_disable();
 >  
->  	/* We check for duplicates here, to allow arch-specific overrides. */
->  	i1 = get_target_table(vcpu->arch.target, true, &num);
-> @@ -2098,21 +2298,13 @@ static int walk_sys_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
->  	while (i1 || i2) {
->  		int cmp = cmp_sys_reg(i1, i2);
->  		/* target-specific overrides generic entry. */
-> -		if (cmp <= 0) {
-> -			/* Ignore registers we trap but don't save. */
-> -			if (i1->reg) {
-> -				if (!copy_reg_to_user(i1, &uind))
-> -					return -EFAULT;
-> -				total++;
-> -			}
-> -		} else {
-> -			/* Ignore registers we trap but don't save. */
-> -			if (i2->reg) {
-> -				if (!copy_reg_to_user(i2, &uind))
-> -					return -EFAULT;
-> -				total++;
-> -			}
-> -		}
-> +		if (cmp <= 0)
-> +			err = walk_one_sys_reg(i1, &uind, &total);
-> +		else
-> +			err = walk_one_sys_reg(i2, &uind, &total);
+> +		/* Flush FP/SIMD state that can't survive guest entry/exit */
+> +		kvm_fpsimd_flush_cpu_state();
 > +
-> +		if (err)
-> +			return err;
+>  		kvm_pmu_flush_hwstate(vcpu);
 >  
->  		if (cmp <= 0 && ++i1 == end1)
->  			i1 = NULL;
+>  		kvm_timer_flush_hwstate(vcpu);
 > 
 
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Thanks,
 
 	M.
 -- 
