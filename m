@@ -1,122 +1,124 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v3 09/20] KVM: arm/arm64: mask/unmask daif around VHE
- guests
-Date: Wed, 11 Oct 2017 16:40:57 +0100
-Message-ID: <59DE3B89.6090005@arm.com>
-References: <20171005191812.5678-1-james.morse@arm.com>	<20171005191812.5678-10-james.morse@arm.com>
- <87lgkijbwk.fsf@on-the-bus.cambridge.arm.com>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v3 11/28] arm64/sve: Core task context handling
+Date: Wed, 11 Oct 2017 17:15:58 +0100
+Message-ID: <20171011161558.ts7adaryabttg47z@armageddon.cambridge.arm.com>
+References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
+ <1507660725-7986-12-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D6CA149D56
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Oct 2017 11:41:55 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ox1u3rRUZ+HL for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 Oct 2017 11:41:53 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 33EE449D3A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Oct 2017 11:41:53 -0400 (EDT)
-In-Reply-To: <87lgkijbwk.fsf@on-the-bus.cambridge.arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Jonathan.Zhang@cavium.com, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-arch-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1507660725-7986-12-git-send-email-Dave.Martin@arm.com>
+Sender: linux-arch-owner@vger.kernel.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
+On Tue, Oct 10, 2017 at 07:38:28PM +0100, Dave P Martin wrote:
+> diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
+> index 026a7c7..b1409de 100644
+> --- a/arch/arm64/include/asm/fpsimd.h
+> +++ b/arch/arm64/include/asm/fpsimd.h
+> @@ -72,6 +75,20 @@ extern void sve_load_state(void const *state, u32 const *pfpsr,
+>  			   unsigned long vq_minus_1);
+>  extern unsigned int sve_get_vl(void);
+>  
+> +#ifdef CONFIG_ARM64_SVE
+> +
+> +extern size_t sve_state_size(struct task_struct const *task);
+> +
+> +extern void sve_alloc(struct task_struct *task);
+> +extern void fpsimd_release_thread(struct task_struct *task);
+> +
+> +#else /* ! CONFIG_ARM64_SVE */
+> +
+> +static void __maybe_unused sve_alloc(struct task_struct *task) { }
+> +static void __maybe_unused fpsimd_release_thread(struct task_struct *task) { }
 
-On 11/10/17 10:01, Marc Zyngier wrote:
-> On Thu, Oct 05 2017 at  8:18:01 pm BST, James Morse <james.morse@arm.com> wrote:
->> Non-VHE systems take an exception to EL2 in order to world-switch into the
->> guest. When returning from the guest KVM implicitly restores the DAIF
->> flags when it returns to the kernel at EL1.
->>
->> With VHE none of this exception-level jumping happens, so KVMs
->> world-switch code is exposed to the host kernel's DAIF values, and KVM
->> spills the guest-exit DAIF values back into the host kernel.
->> On entry to a guest we have Debug and SError exceptions unmasked, KVM
->> has switched VBAR but isn't prepared to handle these. On guest exit
->> Debug exceptions are left disabled once we return to the host and will
->> stay this way until we enter user space.
->>
->> Add a helper to mask/unmask DAIF around VHE guests. The unmask can only
->> happen after the hosts VBAR value has been synchronised by the isb in
->> __vhe_hyp_call (via kvm_call_hyp()). Masking could be as late as
->> setting KVMs VBAR value, but is kept here for symmetry.
+Nitpick: usually we just add static inline functions here rather than
+__maybe_unused.
 
+> diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
+> index 29adab8..4831d28 100644
+> --- a/arch/arm64/include/asm/processor.h
+> +++ b/arch/arm64/include/asm/processor.h
+> @@ -39,6 +47,8 @@
+>  #define FPEXC_IDF	(1 << 7)
+>  
+>  /*
+> + * (Note: in this discussion, statements about FPSIMD apply equally to SVE.)
+> + *
+>   * In order to reduce the number of times the FPSIMD state is needlessly saved
+>   * and restored, we need to keep track of two things:
+>   * (a) for each task, we need to remember which CPU was the last one to have
+> @@ -99,6 +109,287 @@
+>   */
+>  static DEFINE_PER_CPU(struct fpsimd_state *, fpsimd_last_state);
+>  
+> +static void sve_free(struct task_struct *task)
+> +{
+> +	kfree(task->thread.sve_state);
+> +	task->thread.sve_state = NULL;
+> +}
 
->> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
->> index b9f68e4add71..665529924b34 100644
->> --- a/virt/kvm/arm/arm.c
->> +++ b/virt/kvm/arm/arm.c
->> @@ -698,9 +698,13 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->>  		 */
->>  		trace_kvm_entry(*vcpu_pc(vcpu));
->>  		guest_enter_irqoff();
->> +		if (has_vhe())
->> +			kvm_arm_vhe_guest_enter();
->>  
->>  		ret = kvm_call_hyp(__kvm_vcpu_run, vcpu);
->>  
->> +		if (has_vhe())
->> +			kvm_arm_vhe_guest_exit();
->>  		vcpu->mode = OUTSIDE_GUEST_MODE;
->>  		vcpu->stat.exits++;
->>  		/*
+I think we need a WARN_ON if TIF_SVE is still set here (and the callers
+making sure it is cleared). I haven't checked the code paths via
+fpsimd_release_thread() but wondering what happens if we get an
+interrupt between freeing the state and making the pointer NULL, with
+some context switching in a preemptible kernel.
 
-> Why is that masking limited to entering/exiting the guest? I would have
-> though that it would have been put in the kvm_call_hyp helper, in order
-> to cover all "HYP" accesses.
+Alternatively, always clear TIF_SVE here before freeing (also wondering
+whether we should make sve_state NULL before the actual freeing but I
+think TIF_SVE clearing should suffice).
 
-> Or is it that you've worked out that only
-> the guest run actually requires this because none of the other HYP
-> helpers are changing the flags?
+> +/*
+> + * TIF_SVE controls whether a task can use SVE without trapping while
+> + * in userspace, and also the way a task's FPSIMD/SVE state is stored
+> + * in thread_struct.
+> + *
+> + * The kernel uses this flag to track whether a user task is actively
+> + * using SVE, and therefore whether full SVE register state needs to
+> + * be tracked.  If not, the cheaper FPSIMD context handling code can
+> + * be used instead of the more costly SVE equivalents.
+> + *
+> + *  * TIF_SVE set:
+> + *
+> + *    The task can execute SVE instructions while in userspace without
+> + *    trapping to the kernel.
+> + *
+> + *    When stored, Z0-Z31 (incorporating Vn in bits[127:0] or the
+> + *    corresponding Zn), P0-P15 and FFR are encoded in in
+> + *    task->thread.sve_state, formatted appropriately for vector
+> + *    length task->thread.sve_vl.
+> + *
+> + *    task->thread.sve_state must point to a valid buffer at least
+> + *    sve_state_size(task) bytes in size.
+> + *
+> + *    During any syscall, the kernel may optionally clear TIF_SVE and
+> + *    discard the vector state except for the FPSIMD subset.
+> + *
+> + *  * TIF_SVE clear:
+> + *
+> + *    An attempt by the user task to execute an SVE instruction causes
+> + *    do_sve_acc() to be called, which does some preparation and then
+> + *    sets TIF_SVE.
+> + *
+> + *    When stored, FPSIMD registers V0-V31 are encoded in
+> + *    task->fpsimd_state; bits [max : 128] for each of Z0-Z31 are
+> + *    logically zero but not stored anywhere; P0-P15 and FFR are not
+> + *    stored and have unspecified values from userspace's point of
+> + *    view.  For hygiene purposes, the kernel zeroes them on next use,
+> + *    but userspace is discouraged from relying on this.
+> + *
+> + *    task->thread.sve_state does not need to be non-NULL, valid or any
+> + *    particular size: it must not be dereferenced.
+> + *
+> + *  * FPSR and FPCR are always stored in task->fpsimd_state irrespctive of
+> + *    whether TIF_SVE is clear or set, since these are not vector length
+> + *    dependent.
+> + */
 
-That too... Christoffer made the case[0] that for VHE the existing 'hyp code'
-shouldn't be considered as running in a 'special EL2 mode':
-> The rationale being that in the long run we want to keep "jumping to
-> hyp" the oddball legacy case, where everything else is just the
-> kernel/hypervisor functionality.
+This looks fine, thanks for adding the description.
 
-This lets us take interrupts out of e.g. __kvm_tlb_flush_local_vmid().
-
-These are the things kvm calls via kvm_call_hyp():
-> __kvm_get_mdcr_el2
-> __init_stage2_translation
-> __kvm_tlb_flush_local_vmid
-> __kvm_flush_vm_context
-> __kvm_vcpu_run
-> __kvm_tlb_flush_vmid
-> __kvm_tlb_flush_vmid_ipa
-> __vgic_v3_init_lrs
-> __vgic_v3_get_ich_vtr_el2
-> __vgic_v3_write_vmcr
-> __vgic_v3_read_vmcr
-
-These all read/write system-registers, but only __kvm_vcpu_run() manipulates the
-flags due to taking an exception to exit the guest.
-
-__kvm_vcpu_run() should also be masking exceptions when it changes VBAR.
-
-Only __kvm_vcpu_run() needs wrapping like this, if any other helper touches the
-debug registers or exception-routing I think it would need to do similar for VHE.
-
-(__vgic_v3_get_ich_vtr_el2() is also preemptible, but all it does is read an id
-register which looks safe to me...)
-
-
-Thanks,
-
-James
-
-[0] https://www.spinics.net/lists/arm-kernel/msg603990.html
+-- 
+Catalin
