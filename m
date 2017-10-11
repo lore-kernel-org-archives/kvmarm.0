@@ -1,103 +1,44 @@
 From: Szabolcs Nagy <szabolcs.nagy@arm.com>
-Subject: Re: [PATCH v3 26/28] arm64/sve: Add documentation
-Date: Wed, 11 Oct 2017 10:50:16 +0100
-Message-ID: <59DDE958.4080605@arm.com>
-References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com> <1507660725-7986-27-git-send-email-Dave.Martin@arm.com>
+Subject: Re: [RFC PATCH v3 27/28] arm64: signal: Report signal frame size
+ to userspace via auxv
+Date: Wed, 11 Oct 2017 11:19:03 +0100
+Message-ID: <59DDF017.7090203@arm.com>
+References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com> <1507660725-7986-28-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Return-path: <linux-arch-owner@vger.kernel.org>
-In-Reply-To: <1507660725-7986-27-git-send-email-Dave.Martin@arm.com>
+In-Reply-To: <1507660725-7986-28-git-send-email-Dave.Martin@arm.com>
 Sender: linux-arch-owner@vger.kernel.org
 To: Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: nd@arm.com, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Richard Sandiford <richard.sandiford@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org, linux-api@vger.kernel.org, Michael Kerrisk <mtk.manpages@gmail.com>, Mark Rutland <mark.rutland@arm.com>, Alan Hayward <alan.hayward@arm.com>
+Cc: nd@arm.com, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?windows-1252?Q?Alex_Benn?= =?windows-1252?Q?=E9e?= <alex.bennee@linaro.org>, Richard Sandiford <richard.sandiford@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On 10/10/17 19:38, Dave Martin wrote:
-> This patch adds basic documentation of the user/kernel interface
-> provided by the for SVE.
+> Stateful CPU architecture extensions may require the signal frame
+> to grow to a size that exceeds the arch's MINSIGSTKSZ #define.
+> However, changing this #define is an ABI break.
 > 
-> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> Cc: Alex Bennée <alex.bennee@linaro.org>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: Alan Hayward <alan.hayward@arm.com>
+> To allow userspace the option of determining the signal frame size
+> in a more forwards-compatible way, this patch adds a new auxv entry
+> tagged with AT_MINSIGSTKSZ, which provides the maximum signal frame
+> size that the process can observe during its lifetime.
 > 
-> ---
+> If AT_MINSIGSTKSZ is absent from the aux vector, the caller can
+> assume that the MINSIGSTKSZ #define is sufficient.  This allows for
+> a consistent interface with older kernels that do not provide
+> AT_MINSIGSTKSZ.
 > 
-> Changes since v2
-> ----------------
-> 
-> Changes requested by Alan Hayward:
-> 
->  * Added a note that the caller of PTRACE_SETREGSET will need to do a
->    GETREGSET if complete certainty about the resulting VL is desired.
-> 
-> ABI changes:
-> 
->  * Documented the changed return value value semantics for PR_SET_SET_VL
->    when the PR_SVE_SET_VL_ONEXEC flag is passed.
-> ---
-...
-> +prctl(PR_SVE_SET_VL, unsigned long arg)
-> +
-> +    Sets the vector length of the calling thread and related flags, where
-> +    arg == vl | flags.
-> +
-> +    vl is the desired vector length, where sve_vl_valid(vl) must be true.
-> +
-> +    flags:
-> +
-> +	PR_SVE_SET_VL_INHERIT
-> +
-> +	    Inherit the current vector length across execve().  Otherwise, the
-> +	    vector length is reset to the system default at execve().  (See
-> +	    Section 9.)
-> +
-> +	PR_SVE_SET_VL_ONEXEC
-> +
-> +	    Defer the requested vector length change until the next execve().
-> +	    This allows launching of a new program with a different vector
-> +	    length, while avoiding runtime side effects in the caller.
-> +
-> +	    This also overrides the effect of PR_SVE_SET_VL_INHERIT for the
-> +	    first execve().
-> +
-> +	    Without PR_SVE_SET_VL_ONEXEC, any outstanding deferred vector
-> +	    length change is cancelled.
-> +
 
-"next execve" is still ambiguous. (execve has process
-global effect so it may plausibly mean next in the
-process or next in the calling thread)
+the posix sigaltstack api shall fail with ENOMEM
+if smaller than MINSIGSTKSZ stack size is used.
 
-"any outstanding deferred vector length change" is
-ambiguous. (it may be for all threads in a process or
-in the calling thread only)
+so it is important to note somewhere if AT_MINSIGSTKSZ
+is intended to be always >= MINSIGSTKSZ define (which
+is rounded up to 5k) or it may be smaller as it provides
+the precise value of the largest signal frame.
 
-> +    Return value: a nonnegative on success, or a negative value on error:
-> +	EINVAL: SVE not supported, invalid vector length requested, or
-> +	    invalid flags.
-> +
-> +    On success, the calling thread's vector length is changed to the largest
-> +    value supported by the system that is less than or equal to vl.
-> +    If vl == SVE_VL_MAX, the calling thread's vector length is changed to the
-> +    largest value supported by the system.
-> +
-> +    The returned value describes the resulting configuration, encoded as for
-> +    PR_SVE_GET_VL.  The vector length reported in this value is the new current
-> +    vector length for this thread if PR_SVE_SET_VL_ONEXEC was not passed in the
-> +    input arg; otherwise, the reported vector length is the deferred vector
-> +    length that will be applied at the next exec.
-> +
-...
-> +9.  System runtime configuration
-> +--------------------------------
-> +
-> +* To mitigate the ABI impact of expansion of the signal frame, a policy
-> +  mechanism is provided for administrators, distro maintainers and developers
-> +  to set the default vector length for userspace processes:
-> +
-> +/proc/cpu/sve_default_vector_length
-> +
-
-still wrong.
+(i think it makes sense for it to be a precise value,
+but then users should do the >= check before calling
+the sigaltstack api, so they should be aware of this
+issue)
