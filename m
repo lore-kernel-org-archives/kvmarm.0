@@ -1,122 +1,103 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 09/20] KVM: arm/arm64: mask/unmask daif around VHE
- guests
-Date: Wed, 11 Oct 2017 10:01:47 +0100
-Message-ID: <87lgkijbwk.fsf@on-the-bus.cambridge.arm.com>
-References: <20171005191812.5678-1-james.morse@arm.com>
- <20171005191812.5678-10-james.morse@arm.com>
+From: Szabolcs Nagy <szabolcs.nagy@arm.com>
+Subject: Re: [PATCH v3 26/28] arm64/sve: Add documentation
+Date: Wed, 11 Oct 2017 10:50:16 +0100
+Message-ID: <59DDE958.4080605@arm.com>
+References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com> <1507660725-7986-27-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 358D649D1B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Oct 2017 05:01:24 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1jomgR-+IVMK for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 Oct 2017 05:01:18 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0211049D13
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Oct 2017 05:01:17 -0400 (EDT)
-In-Reply-To: <20171005191812.5678-10-james.morse@arm.com> (James Morse's
- message of "Thu, 5 Oct 2017 20:18:01 +0100")
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>
-Cc: Jonathan.Zhang@cavium.com, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-arch-owner@vger.kernel.org>
+In-Reply-To: <1507660725-7986-27-git-send-email-Dave.Martin@arm.com>
+Sender: linux-arch-owner@vger.kernel.org
+To: Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: nd@arm.com, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Richard Sandiford <richard.sandiford@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org, linux-api@vger.kernel.org, Michael Kerrisk <mtk.manpages@gmail.com>, Mark Rutland <mark.rutland@arm.com>, Alan Hayward <alan.hayward@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi James,
-
-On Thu, Oct 05 2017 at  8:18:01 pm BST, James Morse <james.morse@arm.com> wrote:
-> Non-VHE systems take an exception to EL2 in order to world-switch into the
-> guest. When returning from the guest KVM implicitly restores the DAIF
-> flags when it returns to the kernel at EL1.
->
-> With VHE none of this exception-level jumping happens, so KVMs
-> world-switch code is exposed to the host kernel's DAIF values, and KVM
-> spills the guest-exit DAIF values back into the host kernel.
-> On entry to a guest we have Debug and SError exceptions unmasked, KVM
-> has switched VBAR but isn't prepared to handle these. On guest exit
-> Debug exceptions are left disabled once we return to the host and will
-> stay this way until we enter user space.
->
-> Add a helper to mask/unmask DAIF around VHE guests. The unmask can only
-> happen after the hosts VBAR value has been synchronised by the isb in
-> __vhe_hyp_call (via kvm_call_hyp()). Masking could be as late as
-> setting KVMs VBAR value, but is kept here for symmetry.
->
-> Signed-off-by: James Morse <james.morse@arm.com>
->
+On 10/10/17 19:38, Dave Martin wrote:
+> This patch adds basic documentation of the user/kernel interface
+> provided by the for SVE.
+> 
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> Cc: Alex Bennée <alex.bennee@linaro.org>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Cc: Alan Hayward <alan.hayward@arm.com>
+> 
 > ---
-> Give me a kick if you want this reworked as a fix (which will then
-> conflict with this series), or a backportable version.
->
->  arch/arm64/include/asm/kvm_host.h | 10 ++++++++++
->  virt/kvm/arm/arm.c                |  4 ++++
->  2 files changed, 14 insertions(+)
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index e923b58606e2..d3eb79a9ed6b 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -25,6 +25,7 @@
->  #include <linux/types.h>
->  #include <linux/kvm_types.h>
->  #include <asm/cpufeature.h>
-> +#include <asm/daifflags.h>
->  #include <asm/kvm.h>
->  #include <asm/kvm_asm.h>
->  #include <asm/kvm_mmio.h>
-> @@ -384,4 +385,13 @@ static inline void __cpu_init_stage2(void)
->  		  "PARange is %d bits, unsupported configuration!", parange);
->  }
->  
-> +static inline void kvm_arm_vhe_guest_enter(void)
-> +{
-> +	local_mask_daif();
-> +}
+> 
+> Changes since v2
+> ----------------
+> 
+> Changes requested by Alan Hayward:
+> 
+>  * Added a note that the caller of PTRACE_SETREGSET will need to do a
+>    GETREGSET if complete certainty about the resulting VL is desired.
+> 
+> ABI changes:
+> 
+>  * Documented the changed return value value semantics for PR_SET_SET_VL
+>    when the PR_SVE_SET_VL_ONEXEC flag is passed.
+> ---
+...
+> +prctl(PR_SVE_SET_VL, unsigned long arg)
 > +
-> +static inline void kvm_arm_vhe_guest_exit(void)
-> +{
-> +	local_restore_daif(DAIF_PROCCTX_NOIRQ);
-> +}
->  #endif /* __ARM64_KVM_HOST_H__ */
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index b9f68e4add71..665529924b34 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -698,9 +698,13 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  		 */
->  		trace_kvm_entry(*vcpu_pc(vcpu));
->  		guest_enter_irqoff();
-> +		if (has_vhe())
-> +			kvm_arm_vhe_guest_enter();
->  
->  		ret = kvm_call_hyp(__kvm_vcpu_run, vcpu);
->  
-> +		if (has_vhe())
-> +			kvm_arm_vhe_guest_exit();
->  		vcpu->mode = OUTSIDE_GUEST_MODE;
->  		vcpu->stat.exits++;
->  		/*
+> +    Sets the vector length of the calling thread and related flags, where
+> +    arg == vl | flags.
+> +
+> +    vl is the desired vector length, where sve_vl_valid(vl) must be true.
+> +
+> +    flags:
+> +
+> +	PR_SVE_SET_VL_INHERIT
+> +
+> +	    Inherit the current vector length across execve().  Otherwise, the
+> +	    vector length is reset to the system default at execve().  (See
+> +	    Section 9.)
+> +
+> +	PR_SVE_SET_VL_ONEXEC
+> +
+> +	    Defer the requested vector length change until the next execve().
+> +	    This allows launching of a new program with a different vector
+> +	    length, while avoiding runtime side effects in the caller.
+> +
+> +	    This also overrides the effect of PR_SVE_SET_VL_INHERIT for the
+> +	    first execve().
+> +
+> +	    Without PR_SVE_SET_VL_ONEXEC, any outstanding deferred vector
+> +	    length change is cancelled.
+> +
 
-Why is that masking limited to entering/exiting the guest? I would have
-though that it would have been put in the kvm_call_hyp helper, in order
-to cover all "HYP" accesses. Or is it that you've worked out that only
-the guest run actually requires this because none of the other HYP
-helpers are changing the flags?
+"next execve" is still ambiguous. (execve has process
+global effect so it may plausibly mean next in the
+process or next in the calling thread)
 
-Thanks,
+"any outstanding deferred vector length change" is
+ambiguous. (it may be for all threads in a process or
+in the calling thread only)
 
-	M.
--- 
-Jazz is not dead, it just smell funny.
+> +    Return value: a nonnegative on success, or a negative value on error:
+> +	EINVAL: SVE not supported, invalid vector length requested, or
+> +	    invalid flags.
+> +
+> +    On success, the calling thread's vector length is changed to the largest
+> +    value supported by the system that is less than or equal to vl.
+> +    If vl == SVE_VL_MAX, the calling thread's vector length is changed to the
+> +    largest value supported by the system.
+> +
+> +    The returned value describes the resulting configuration, encoded as for
+> +    PR_SVE_GET_VL.  The vector length reported in this value is the new current
+> +    vector length for this thread if PR_SVE_SET_VL_ONEXEC was not passed in the
+> +    input arg; otherwise, the reported vector length is the deferred vector
+> +    length that will be applied at the next exec.
+> +
+...
+> +9.  System runtime configuration
+> +--------------------------------
+> +
+> +* To mitigate the ABI impact of expansion of the signal frame, a policy
+> +  mechanism is provided for administrators, distro maintainers and developers
+> +  to set the default vector length for userspace processes:
+> +
+> +/proc/cpu/sve_default_vector_length
+> +
+
+still wrong.
