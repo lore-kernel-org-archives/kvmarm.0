@@ -1,22 +1,22 @@
 From: Vladimir Murzin <vladimir.murzin@arm.com>
-Subject: [PATCH v2 3/3] arm64: Introduce command line parameter to disable CNP
-Date: Wed, 11 Oct 2017 13:19:55 +0100
-Message-ID: <1507724395-13735-4-git-send-email-vladimir.murzin@arm.com>
+Subject: [PATCH v2 2/3] arm64: KVM: Support Common Not Private translations
+Date: Wed, 11 Oct 2017 13:19:54 +0100
+Message-ID: <1507724395-13735-3-git-send-email-vladimir.murzin@arm.com>
 References: <1507724395-13735-1-git-send-email-vladimir.murzin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3450C49D39
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Oct 2017 08:19:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 94EBA49D6D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Oct 2017 08:19:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8ZcM+7exSY4v for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 Oct 2017 08:19:34 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7322C49D6F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Oct 2017 08:19:34 -0400 (EDT)
+ with ESMTP id clfQOD1VCWn9 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 11 Oct 2017 08:19:32 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A922549D39
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Oct 2017 08:19:32 -0400 (EDT)
 In-Reply-To: <1507724395-13735-1-git-send-email-vladimir.murzin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,64 +31,48 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: marc.zyngier@arm.com, catalin.marinas@arm.com, kbuild-all@01.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-There are cases when activating of Common Not Private (CNP) feature
-might not be desirable; this patch allows to forcefully disable CNP
-even it is supported by hardware.
+We rely on cpufeature framework to detect and enable CNP so for KVM we
+need to patch hyp to set CNP bit just before TTBR0_EL2 gets written.
+For the guest it is enough to update VTTBR_EL2 with CNP bit just
+before it gets scheduled.
 
 Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
 ---
- Documentation/admin-guide/kernel-parameters.txt |  4 ++++
- arch/arm64/kernel/cpufeature.c                  | 16 +++++++++++++++-
- 2 files changed, 19 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/hyp-init.S   | 4 ++++
+ arch/arm64/kvm/hyp/switch.c | 6 +++++-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 0549662..3c1e45d 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -2560,6 +2560,10 @@
+diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp-init.S
+index 3f96155..4fd31b3 100644
+--- a/arch/arm64/kvm/hyp-init.S
++++ b/arch/arm64/kvm/hyp-init.S
+@@ -63,6 +63,10 @@ __do_hyp_init:
+ 	cmp	x0, #HVC_STUB_HCALL_NR
+ 	b.lo	__kvm_handle_stub_hvc
  
- 	noclflush	[BUGS=X86] Don't use the CLFLUSH instruction
- 
-+	nocnp		[ARM64]
-+			Disable CNP (Common not Private translations)
-+			even if it is supported by processor.
++alternative_if ARM64_HAS_CNP
++	orr	x0, x0, #TTBR_CNP_BIT
++alternative_else_nop_endif
 +
- 	nodelayacct	[KNL] Disable per-task delay accounting
+ 	msr	ttbr0_el2, x0
  
- 	nodsp		[SH] Disable hardware DSP at boot time.
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 83809a8..9bceca3 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -771,6 +771,20 @@ static bool has_no_hw_prefetch(const struct arm64_cpu_capabilities *entry, int _
- 		MIDR_CPU_VAR_REV(1, MIDR_REVISION_MASK));
+ 	mrs	x4, tcr_el1
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 945e79c..a1f3bf2 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -150,7 +150,11 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
+ static void __hyp_text __activate_vm(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+-	write_sysreg(kvm->arch.vttbr, vttbr_el2);
++	u64 val = kvm->arch.vttbr;
++
++	if (system_supports_cnp())
++		val |= TTBR_CNP_BIT;
++	write_sysreg(val, vttbr_el2);
  }
  
-+static bool nocnp;
-+
-+static int __init early_nocnp(char *p)
-+{
-+	nocnp = true;
-+	return 0;
-+}
-+early_param("nocnp", early_nocnp);
-+
-+static bool has_useable_cnp(const struct arm64_cpu_capabilities *entry, int scope)
-+{
-+	return has_cpuid_feature(entry, scope) && !nocmp;
-+}
-+
- static bool runs_at_el2(const struct arm64_cpu_capabilities *entry, int __unused)
- {
- 	return is_kernel_in_hyp_mode();
-@@ -905,7 +919,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.desc = "Common not Private translations",
- 		.capability = ARM64_HAS_CNP,
- 		.def_scope = SCOPE_SYSTEM,
--		.matches = has_cpuid_feature,
-+		.matches = has_useable_cnp,
- 		.sys_reg = SYS_ID_AA64MMFR2_EL1,
- 		.sign = FTR_UNSIGNED,
- 		.field_pos = ID_AA64MMFR2_CNP_SHIFT,
+ static void __hyp_text __deactivate_vm(struct kvm_vcpu *vcpu)
 -- 
 2.0.0
