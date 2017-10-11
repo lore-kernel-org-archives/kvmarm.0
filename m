@@ -1,238 +1,125 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 22/28] arm64/sve: KVM: Prevent guests from using SVE
-Date: Wed, 11 Oct 2017 17:28:06 +0100
-Message-ID: <c28b3f0d-7beb-cca3-46db-3fce964f4725@arm.com>
-References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
- <1507660725-7986-23-git-send-email-Dave.Martin@arm.com>
+From: Julien Thierry <julien.thierry@arm.com>
+Subject: Re: [PATCH v3 01/20] arm64: explicitly mask all exceptions
+Date: Wed, 11 Oct 2017 17:30:08 +0100
+Message-ID: <25eb4c59-a09e-5b0a-66fb-6c650ab8e057@arm.com>
+References: <20171005191812.5678-1-james.morse@arm.com>
+ <20171005191812.5678-2-james.morse@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-arch-owner@vger.kernel.org>
-In-Reply-To: <1507660725-7986-23-git-send-email-Dave.Martin@arm.com>
-Content-Language: en-GB
-Sender: linux-arch-owner@vger.kernel.org
-To: Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org, Christoffer Dall <cdall@linaro.org>
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 195EA49D3A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Oct 2017 12:29:32 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id EcRyK9jcF0rO for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 11 Oct 2017 12:29:30 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7BF8240638
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Oct 2017 12:29:30 -0400 (EDT)
+In-Reply-To: <20171005191812.5678-2-james.morse@arm.com>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: James Morse <james.morse@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, wangxiongfeng2@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-[+ Christoffer]
+Hi James,
 
-On 10/10/17 19:38, Dave Martin wrote:
-> Until KVM has full SVE support, guests must not be allowed to
-> execute SVE instructions.
+On 05/10/17 20:17, James Morse wrote:
+> There are a few places where we want to mask all exceptions. Today we
+> do this in a piecemeal fashion, typically we expect the caller to
+> have masked irqs and the arch code masks debug exceptions, ignoring
+> SError which is probably masked.
 > 
-> This patch enables the necessary traps, and also ensures that the
-> traps are disabled again on exit from the guest so that the host
-> can still use SVE if it wants to.
+> Make it clear that 'mask all exceptions' is the intention by adding
+> helpers to do exactly that.
 > 
-> This patch introduces another instance of
-> __this_cpu_write(fpsimd_last_state, NULL), so this flush operation
-> is abstracted out as a separate helper fpsimd_flush_cpu_state().
-> Other instances are ported appropriately.
+> This will let us unmask SError without having to add 'oh and SError'
+> to these paths.
 > 
-> As a side effect of this refactoring, a this_cpu_write() in
-> fpsimd_cpu_pm_notifier() is changed to __this_cpu_write().  This
-> should be fine, since cpu_pm_enter() is supposed to be called only
-> with interrupts disabled.
+> Signed-off-by: James Morse <james.morse@arm.com>
 > 
-> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 > ---
->  arch/arm/include/asm/kvm_host.h   |  3 +++
->  arch/arm64/include/asm/fpsimd.h   |  1 +
->  arch/arm64/include/asm/kvm_arm.h  |  4 +++-
->  arch/arm64/include/asm/kvm_host.h | 11 +++++++++++
->  arch/arm64/kernel/fpsimd.c        | 31 +++++++++++++++++++++++++++++--
->  arch/arm64/kvm/hyp/switch.c       |  6 +++---
->  virt/kvm/arm/arm.c                |  3 +++
->  7 files changed, 53 insertions(+), 6 deletions(-)
+> Remove the disable IRQs comment above cpu_die(): we return from idle via
+> cpu_resume. This comment is confusing once the local_irq_disable() call
+> is changed.
 > 
-> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> index 4a879f6..242151e 100644
-> --- a/arch/arm/include/asm/kvm_host.h
-> +++ b/arch/arm/include/asm/kvm_host.h
-> @@ -293,4 +293,7 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
->  int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
->  			       struct kvm_device_attr *attr);
->  
-> +/* All host FP/SIMD state is restored on guest exit, so nothing to save: */
-> +static inline void kvm_fpsimd_flush_cpu_state(void) {}
-> +
->  #endif /* __ARM_KVM_HOST_H__ */
-> diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
-> index 3cfdfbe..10b2824 100644
-> --- a/arch/arm64/include/asm/fpsimd.h
-> +++ b/arch/arm64/include/asm/fpsimd.h
-> @@ -75,6 +75,7 @@ extern void fpsimd_restore_current_state(void);
->  extern void fpsimd_update_current_state(struct fpsimd_state *state);
->  
->  extern void fpsimd_flush_task_state(struct task_struct *target);
-> +extern void sve_flush_cpu_state(void);
->  
->  /* Maximum VL that SVE VL-agnostic software can transparently support */
->  #define SVE_VL_ARCH_MAX 0x100
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index dbf0537..7f069ff 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -186,7 +186,8 @@
->  #define CPTR_EL2_TTA	(1 << 20)
->  #define CPTR_EL2_TFP	(1 << CPTR_EL2_TFP_SHIFT)
->  #define CPTR_EL2_TZ	(1 << 8)
-> -#define CPTR_EL2_DEFAULT	0x000033ff
-> +#define CPTR_EL2_RES1	0x000032ff /* known RES1 bits in CPTR_EL2 */
-> +#define CPTR_EL2_DEFAULT	CPTR_EL2_RES1
->  
->  /* Hyp Debug Configuration Register bits */
->  #define MDCR_EL2_TPMS		(1 << 14)
-> @@ -237,5 +238,6 @@
->  
->  #define CPACR_EL1_FPEN		(3 << 20)
->  #define CPACR_EL1_TTA		(1 << 28)
-> +#define CPACR_EL1_DEFAULT	(CPACR_EL1_FPEN | CPACR_EL1_ZEN_EL1EN)
->  
->  #endif /* __ARM64_KVM_ARM_H__ */
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index e923b58..674912d 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -25,6 +25,7 @@
->  #include <linux/types.h>
->  #include <linux/kvm_types.h>
->  #include <asm/cpufeature.h>
-> +#include <asm/fpsimd.h>
->  #include <asm/kvm.h>
->  #include <asm/kvm_asm.h>
->  #include <asm/kvm_mmio.h>
-> @@ -384,4 +385,14 @@ static inline void __cpu_init_stage2(void)
->  		  "PARange is %d bits, unsupported configuration!", parange);
->  }
->  
-> +/*
-> + * All host FP/SIMD state is restored on guest exit, so nothing needs
-> + * doing here except in the SVE case:
-> +*/
-> +static inline void kvm_fpsimd_flush_cpu_state(void)
-> +{
-> +	if (system_supports_sve())
-> +		sve_flush_cpu_state();
+>   arch/arm64/include/asm/assembler.h | 17 +++++++++++
+>   arch/arm64/include/asm/daifflags.h | 59 ++++++++++++++++++++++++++++++++++++++
+>   arch/arm64/kernel/hibernate.c      |  5 ++--
+>   arch/arm64/kernel/machine_kexec.c  |  4 +--
+>   arch/arm64/kernel/smp.c            |  9 ++----
+>   arch/arm64/kernel/suspend.c        |  7 +++--
+>   arch/arm64/kernel/traps.c          |  3 +-
+>   arch/arm64/mm/proc.S               |  9 +++---
+>   8 files changed, 94 insertions(+), 19 deletions(-)
+>   create mode 100644 arch/arm64/include/asm/daifflags.h
 
-Hmmm. How does this work if...
+[...]
 
-> +}
-> +
->  #endif /* __ARM64_KVM_HOST_H__ */
-> diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-> index a9cb794..6ae3703 100644
-> --- a/arch/arm64/kernel/fpsimd.c
-> +++ b/arch/arm64/kernel/fpsimd.c
-> @@ -1073,6 +1073,33 @@ void fpsimd_flush_task_state(struct task_struct *t)
->  	t->thread.fpsimd_state.cpu = NR_CPUS;
->  }
->  
-> +static inline void fpsimd_flush_cpu_state(void)
-> +{
-> +	__this_cpu_write(fpsimd_last_state, NULL);
-> +}
-> +
+> diff --git a/arch/arm64/include/asm/daifflags.h b/arch/arm64/include/asm/daifflags.h
+> new file mode 100644
+> index 000000000000..fb40da8e1457
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/daifflags.h
+> @@ -0,0 +1,59 @@
 > +/*
-> + * Invalidate any task SVE state currently held in this CPU's regs.
+> + * Copyright (C) 2017 ARM Ltd.
 > + *
-> + * This is used to prevent the kernel from trying to reuse SVE register data
-> + * that is detroyed by KVM guest enter/exit.  This function should go away when
-> + * KVM SVE support is implemented.  Don't use it for anything else.
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 > + */
-> +#ifdef CONFIG_ARM64_SVE
-> +void sve_flush_cpu_state(void)
+> +#ifndef __ASM_DAIFFLAGS_H
+> +#define __ASM_DAIFFLAGS_H
+> +
+> +#include <asm/irqflags.h>
+> +#include <linux/irqflags.h>
+> +
+> +/* Mask/unmask/restore all exceptions, including interrupts. */
+> +static inline unsigned long local_mask_daif(void)
 > +{
-> +	struct fpsimd_state *const fpstate = __this_cpu_read(fpsimd_last_state);
-> +	struct task_struct *tsk;
-> +
-> +	if (!fpstate)
-> +		return;
-> +
-> +	tsk = container_of(fpstate, struct task_struct, thread.fpsimd_state);
-> +	if (test_tsk_thread_flag(tsk, TIF_SVE))
-> +		fpsimd_flush_cpu_state();
+> +	unsigned long flags;
+> +	asm volatile(
+> +		"mrs	%0, daif		// local_mask_daif\n"
+> +		"msr	daifset, #0xf"
+> +		: "=r" (flags)
+> +		:
+> +		: "memory");
+> +	trace_hardirqs_off();
+> +	return flags;
 > +}
-> +#endif /* CONFIG_ARM64_SVE */
-
-... CONFIG_ARM64_SVE is not set? Fixing this should just be a matter of
-moving the #ifdef/#endif inside the function...
-
 > +
->  #ifdef CONFIG_KERNEL_MODE_NEON
->  
->  DEFINE_PER_CPU(bool, kernel_neon_busy);
-> @@ -1113,7 +1140,7 @@ void kernel_neon_begin(void)
->  	}
->  
->  	/* Invalidate any task state remaining in the fpsimd regs: */
-> -	__this_cpu_write(fpsimd_last_state, NULL);
-> +	fpsimd_flush_cpu_state();
->  
->  	preempt_disable();
->  
-> @@ -1234,7 +1261,7 @@ static int fpsimd_cpu_pm_notifier(struct notifier_block *self,
->  	case CPU_PM_ENTER:
->  		if (current->mm)
->  			task_fpsimd_save();
-> -		this_cpu_write(fpsimd_last_state, NULL);
-> +		fpsimd_flush_cpu_state();
->  		break;
->  	case CPU_PM_EXIT:
->  		if (current->mm)
-> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> index 35a90b8..951f3eb 100644
-> --- a/arch/arm64/kvm/hyp/switch.c
-> +++ b/arch/arm64/kvm/hyp/switch.c
-> @@ -48,7 +48,7 @@ static void __hyp_text __activate_traps_vhe(void)
->  
->  	val = read_sysreg(cpacr_el1);
->  	val |= CPACR_EL1_TTA;
-> -	val &= ~CPACR_EL1_FPEN;
-> +	val &= ~(CPACR_EL1_FPEN | CPACR_EL1_ZEN);
->  	write_sysreg(val, cpacr_el1);
->  
->  	write_sysreg(__kvm_hyp_vector, vbar_el1);
-> @@ -59,7 +59,7 @@ static void __hyp_text __activate_traps_nvhe(void)
->  	u64 val;
->  
->  	val = CPTR_EL2_DEFAULT;
-> -	val |= CPTR_EL2_TTA | CPTR_EL2_TFP;
-> +	val |= CPTR_EL2_TTA | CPTR_EL2_TFP | CPTR_EL2_TZ;
->  	write_sysreg(val, cptr_el2);
->  }
->  
-> @@ -117,7 +117,7 @@ static void __hyp_text __deactivate_traps_vhe(void)
->  
->  	write_sysreg(mdcr_el2, mdcr_el2);
->  	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
-> -	write_sysreg(CPACR_EL1_FPEN, cpacr_el1);
-> +	write_sysreg(CPACR_EL1_DEFAULT, cpacr_el1);
->  	write_sysreg(vectors, vbar_el1);
->  }
->  
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index b9f68e4..4d3cf9c 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -652,6 +652,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  		 */
->  		preempt_disable();
->  
-> +		/* Flush FP/SIMD state that can't survive guest entry/exit */
-> +		kvm_fpsimd_flush_cpu_state();
-> +
->  		kvm_pmu_flush_hwstate(vcpu);
->  
->  		kvm_timer_flush_hwstate(vcpu);
-> 
+nit:
+Can we call this local_daif_save? (and maybe a version that only 
+disables without saving?)
 
-Thanks,
+Also, I was wondering why use 'local' as prefix? Is there gonna be a 
+similar set of function for arm that could be called by common code? 
+(e.g. drivers?)
 
-	M.
+Otherwise:
+Reviewed-by: Julien Thierry <julien.thierry@arm.com>
+
+Cheers,
+
 -- 
-Jazz is not dead. It just smells funny...
+Julien Thierry
