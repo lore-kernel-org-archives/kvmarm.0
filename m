@@ -1,145 +1,38 @@
-From: Julien Thierry <julien.thierry@arm.com>
-Subject: Re: [PATCH v3 02/20] arm64: introduce an order for exceptions
-Date: Wed, 11 Oct 2017 18:11:19 +0100
-Message-ID: <b4c4fe24-435f-6582-dd77-e00479875437@arm.com>
-References: <20171005191812.5678-1-james.morse@arm.com>
- <20171005191812.5678-3-james.morse@arm.com>
+From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Subject: Re: [PATCH v3 25/28] arm64/sve: Detect SVE and activate runtime
+ support
+Date: Wed, 11 Oct 2017 18:11:48 +0100
+Message-ID: <54bcf388-ee66-c3f3-8eca-d6553a7f2c54@arm.com>
+References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
+ <1507660725-7986-26-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8662149D53
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Oct 2017 13:10:42 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lrAZbi147U4L for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 Oct 2017 13:10:41 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 34E0C49D3A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Oct 2017 13:10:41 -0400 (EDT)
-In-Reply-To: <20171005191812.5678-3-james.morse@arm.com>
+Return-path: <linux-arch-owner@vger.kernel.org>
+In-Reply-To: <1507660725-7986-26-git-send-email-Dave.Martin@arm.com>
 Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, wangxiongfeng2@huawei.com
+Sender: linux-arch-owner@vger.kernel.org
+To: Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On 10/10/17 19:38, Dave Martin wrote:
+> This patch enables detection of hardware SVE support via the
+> cpufeatures framework, and reports its presence to the kernel and
+> userspace via the new ARM64_SVE cpucap and HWCAP_SVE hwcap
+> respectively.
+> 
+> Userspace can also detect SVE using ID_AA64PFR0_EL1, using the
+> cpufeatures MRS emulation.
+> 
+> When running on hardware that supports SVE, this enables runtime
+> kernel support for SVE, and allows user tasks to execute SVE
+> instructions and make of the of the SVE-specific user/kernel
+> interface extensions implemented by this series.
+> 
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
 
+Looks good to me.
 
-On 05/10/17 20:17, James Morse wrote:
-> Currently SError is always masked in the kernel. To support RAS exceptions
-> using SError on hardware with the v8.2 RAS Extensions we need to unmask
-> SError as much as possible.
-> 
-> Let's define an order for masking and unmasking exceptions. 'dai' is
-> memorable and effectively what we have today.
-> 
-> Disabling debug exceptions should cause all other exceptions to be masked.
-> Masking SError should mask irq, but not disable debug exceptions.
-> Masking irqs has no side effects for other flags. Keeping to this order
-> makes it easier for entry.S to know which exceptions should be unmasked.
-> 
-> FIQ is never expected, but we mask it when we mask debug exceptions, and
-> unmask it at all other times.
-> 
-> Given masking debug exceptions masks everything, we don't need macros
-> to save/restore that bit independently. Remove them and switch the last
-> caller over to {en,dis}able_daif().
-> 
-> Signed-off-by: James Morse <james.morse@arm.com>
-
-Reviewed-by: Julien Thierry <julien.thierry@arm.com>
-
-> ---
->   arch/arm64/include/asm/irqflags.h  | 34 +++++++++++++---------------------
->   arch/arm64/kernel/debug-monitors.c |  5 +++--
->   2 files changed, 16 insertions(+), 23 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/irqflags.h b/arch/arm64/include/asm/irqflags.h
-> index 8c581281fa12..9ecdca7011f0 100644
-> --- a/arch/arm64/include/asm/irqflags.h
-> +++ b/arch/arm64/include/asm/irqflags.h
-> @@ -21,6 +21,19 @@
->   #include <asm/ptrace.h>
->   
->   /*
-> + * Aarch64 has flags for masking: Debug, Asynchronous (serror), Interrupts and
-> + * FIQ exceptions, in the 'daif' register. We mask and unmask them in 'dai'
-> + * order:
-> + * Masking debug exceptions causes all other exceptions to be masked too/
-> + * Masking SError masks irq, but not debug exceptions. Masking irqs has no
-> + * side effects for other flags. Keeping to this order makes it easier for
-> + * entry.S to know which exceptions should be unmasked.
-> + *
-> + * FIQ is never expected, but we mask it when we disable debug exceptions, and
-> + * unmask it at all other times.
-> + */
-> +
-> +/*
->    * CPU interrupt mask handling.
->    */
->   static inline unsigned long arch_local_irq_save(void)
-> @@ -89,26 +102,5 @@ static inline int arch_irqs_disabled_flags(unsigned long flags)
->   {
->   	return flags & PSR_I_BIT;
->   }
-> -
-> -/*
-> - * save and restore debug state
-> - */
-> -#define local_dbg_save(flags)						\
-> -	do {								\
-> -		typecheck(unsigned long, flags);			\
-> -		asm volatile(						\
-> -		"mrs    %0, daif		// local_dbg_save\n"	\
-> -		"msr    daifset, #8"					\
-> -		: "=r" (flags) : : "memory");				\
-> -	} while (0)
-> -
-> -#define local_dbg_restore(flags)					\
-> -	do {								\
-> -		typecheck(unsigned long, flags);			\
-> -		asm volatile(						\
-> -		"msr    daif, %0		// local_dbg_restore\n"	\
-> -		: : "r" (flags) : "memory");				\
-> -	} while (0)
-> -
->   #endif
->   #endif
-> diff --git a/arch/arm64/kernel/debug-monitors.c b/arch/arm64/kernel/debug-monitors.c
-> index c7ef99904934..bbfa4978b657 100644
-> --- a/arch/arm64/kernel/debug-monitors.c
-> +++ b/arch/arm64/kernel/debug-monitors.c
-> @@ -30,6 +30,7 @@
->   
->   #include <asm/cpufeature.h>
->   #include <asm/cputype.h>
-> +#include <asm/daifflags.h>
->   #include <asm/debug-monitors.h>
->   #include <asm/system_misc.h>
->   
-> @@ -46,9 +47,9 @@ u8 debug_monitors_arch(void)
->   static void mdscr_write(u32 mdscr)
->   {
->   	unsigned long flags;
-> -	local_dbg_save(flags);
-> +	flags = local_mask_daif();
->   	write_sysreg(mdscr, mdscr_el1);
-> -	local_dbg_restore(flags);
-> +	local_restore_daif(flags);
->   }
->   NOKPROBE_SYMBOL(mdscr_write);
->   
-> 
-
--- 
-Julien Thierry
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
