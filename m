@@ -1,107 +1,233 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCH v3 16/28] arm64/sve: Probe SVE capabilities and usable
- vector lengths
-Date: Thu, 12 Oct 2017 13:56:51 +0100
-Message-ID: <a39354fb-9f21-47ff-2ad9-b5bcb04e9990@arm.com>
-References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
- <1507660725-7986-17-git-send-email-Dave.Martin@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 01/37] KVM: arm64: Avoid storing the vcpu pointer on the
+ stack
+Date: Thu, 12 Oct 2017 16:49:44 +0100
+Message-ID: <ef4bffe5-b3c5-5fdd-cb8b-1840d2243ae1@arm.com>
+References: <20171012104141.26902-1-christoffer.dall@linaro.org>
+ <20171012104141.26902-2-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-arch-owner@vger.kernel.org>
-In-Reply-To: <1507660725-7986-17-git-send-email-Dave.Martin@arm.com>
-Content-Language: en-US
-Sender: linux-arch-owner@vger.kernel.org
-To: Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20171012104141.26902-2-christoffer.dall@linaro.org>
+Content-Language: en-GB
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 10/10/17 19:38, Dave Martin wrote:
-> This patch uses the cpufeatures framework to determine common SVE
-> capabilities and vector lengths, and configures the runtime SVE
-> support code appropriately.
+On 12/10/17 11:41, Christoffer Dall wrote:
+> We already have the percpu area for the host cpu state, which points to
+> the VCPU, so there's no need to store the VCPU pointer on the stack on
+> every context switch.  We can be a little more clever and just use
+> tpidr_el2 for the percpu offset and load the VCPU pointer from the host
+> context.
 > 
-> ZCR_ELx is not really a feature register, but it is convenient to
-> use it as a template for recording the maximum vector length
-> supported by a CPU, using the LEN field.  This field is similar to
-> a feature field in that it is a contiguous bitfield for which we
-> want to determine the minimum system-wide value.  This patch adds
-> ZCR as a pseudo-register in cpuinfo/cpufeatures, with appropriate
-> custom code to populate it.  Finding the minimum supported value of
-> the LEN field is left to the cpufeatures framework in the usual
-> way.
+> This requires us to have a scratch register though, so we take the
+> chance to rearrange some of the el1_sync code to only look at the
+> vttbr_el2 to determine if this is a trap from the guest or an HVC from
+> the host.  We do add an extra check to call the panic code if the kernel
+> is configured with debugging enabled and we saw a trap from the host
+> which wasn't an HVC, indicating that we left some EL2 trap configured by
+> mistake.
 > 
-> The meaning of ID_AA64ZFR0_EL1 is not architecturally defined yet,
-> so for now we just require it to be zero.
-> 
-> Note that much of this code is dormant and SVE still won't be used
-> yet, since system_supports_sve() remains hardwired to false.
-> 
-> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> Cc: Alex Bennée <alex.bennee@linaro.org>
-> Cc: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-> 
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 > ---
+>  arch/arm64/include/asm/kvm_asm.h | 20 ++++++++++++++++++++
+>  arch/arm64/kernel/asm-offsets.c  |  1 +
+>  arch/arm64/kvm/hyp/entry.S       |  5 +----
+>  arch/arm64/kvm/hyp/hyp-entry.S   | 39 ++++++++++++++++++---------------------
+>  arch/arm64/kvm/hyp/switch.c      |  2 +-
+>  5 files changed, 41 insertions(+), 26 deletions(-)
 > 
-> Dropped Alex Bennée's Reviewed-by, since there is new logic in this
-> patch.
-> 
-> Changes since v2
-> ----------------
-> 
-> Bug fixes:
-> 
->   * Got rid of dynamic allocation of the shadow vector length map during
->     secondary boot.  Secondary CPU boot takes place in atomic context,
->     and relying on GFP_ATOMIC here doesn't seem justified.
-> 
->     Instead, the needed additional bitmap is allocated statically.  Only
->     one shadow map is needed, because CPUs don't boot concurrently.
-> 
-> Requested by Alex Bennée:
-> 
->   * Reflowed untidy comment above read_zcr_features()
-> 
->   * Added comments to read_zcr_features() to explain what it's trying to do
->     (which is otherwise not readily apparent).
-> 
-> Requested by Catalin Marinas:
-> 
->   * Moved disabling of the EL1 SVE trap to the cpufeatures C code.
->     This allows addition of new assembler in __cpu_setup to be
->     avoided.
-> 
-> Miscellaneous:
-> 
->   * Added comments explaining the intent, purpose and basic constraints
->     for fpsimd.c helpers.
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index ab4d0a9..7e48a39 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -70,4 +70,24 @@ extern u32 __init_stage2_translation(void);
+>  
+>  #endif
+>  
+> +#ifdef __ASSEMBLY__
+> +.macro get_host_ctxt reg, tmp
+> +	/*
+> +	 * '=kvm_host_cpu_state' is a host VA from the constant pool, it may
+> +	 * not be accessible by this address from EL2, hyp_panic() converts
+> +	 * it with kern_hyp_va() before use.
+> +	 */
 
-...
+This really looks like a stale comment, as there is no hyp_panic
+involved here anymore (thankfully!).
 
-   
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 92a9502..c5acf38 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
+> +	ldr	\reg, =kvm_host_cpu_state
+> +	mrs	\tmp, tpidr_el2
+> +	add	\reg, \reg, \tmp
+> +	kern_hyp_va \reg
 
-...
+Here, we're trading a load from the stack for a load from the constant
+pool. Can't we do something like:
 
-> @@ -670,6 +689,14 @@ void update_cpu_features(int cpu,
->   					info->reg_mvfr2, boot->reg_mvfr2);
->   	}
->   
-> +	if (id_aa64pfr0_sve(info->reg_id_aa64pfr0)) {
-> +		taint |= check_update_ftr_reg(SYS_ZCR_EL1, cpu,
-> +					info->reg_zcr, boot->reg_zcr);
+	adr_l	\reg, kvm_host_cpu_state
+	msr	\tmp, tpidr_el2
+	add	\reg, \reg, \tmp
+
+and that's it? This relies on the property that the kernel/hyp offset is
+constant, and that it doesn't matter if we add the offset to a kernel VA
+or a HYP VA... Completely untested of course!
+
+> +.endm
 > +
-> +		if (!sys_caps_initialised)
-> +			sve_update_vq_map();
-> +	}
+> +.macro get_vcpu vcpu, ctxt
+> +	ldr	\vcpu, [\ctxt, #HOST_CONTEXT_VCPU]
+> +	kern_hyp_va	\vcpu
+> +.endm
+> +
+> +#endif
+> +
+>  #endif /* __ARM_KVM_ASM_H__ */
+> diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
+> index 71bf088..612021d 100644
+> --- a/arch/arm64/kernel/asm-offsets.c
+> +++ b/arch/arm64/kernel/asm-offsets.c
+> @@ -135,6 +135,7 @@ int main(void)
+>    DEFINE(CPU_FP_REGS,		offsetof(struct kvm_regs, fp_regs));
+>    DEFINE(VCPU_FPEXC32_EL2,	offsetof(struct kvm_vcpu, arch.ctxt.sys_regs[FPEXC32_EL2]));
+>    DEFINE(VCPU_HOST_CONTEXT,	offsetof(struct kvm_vcpu, arch.host_cpu_context));
+> +  DEFINE(HOST_CONTEXT_VCPU,	offsetof(struct kvm_cpu_context, __hyp_running_vcpu));
+>  #endif
+>  #ifdef CONFIG_CPU_PM
+>    DEFINE(CPU_SUSPEND_SZ,	sizeof(struct cpu_suspend_ctx));
+> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+> index 9a8ab5d..76cd48f 100644
+> --- a/arch/arm64/kvm/hyp/entry.S
+> +++ b/arch/arm64/kvm/hyp/entry.S
+> @@ -62,9 +62,6 @@ ENTRY(__guest_enter)
+>  	// Store the host regs
+>  	save_callee_saved_regs x1
+>  
+> -	// Store host_ctxt and vcpu for use at exit time
+> -	stp	x1, x0, [sp, #-16]!
+> -
+>  	add	x18, x0, #VCPU_CONTEXT
+>  
+>  	// Restore guest regs x0-x17
+> @@ -119,7 +116,7 @@ ENTRY(__guest_exit)
+>  	save_callee_saved_regs x1
+>  
+>  	// Restore the host_ctxt from the stack
 
-nit: I am not sure if we should also check if the "current" sanitised value
-of the id_aa64pfr0 also supports sve and skip the update if it isn't. The code
-is as such fine without the check, its just that we can avoid computing the
-map. It is in the CPU boot up path and hence is not performance critical.
-So, either way we are fine.
+Stale comment again.
 
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> -	ldr	x2, [sp], #16
+> +	get_host_ctxt	x2, x3
+>  
+>  	// Now restore the host regs
+>  	restore_callee_saved_regs x2
+> diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+> index e4f37b9..2950f26 100644
+> --- a/arch/arm64/kvm/hyp/hyp-entry.S
+> +++ b/arch/arm64/kvm/hyp/hyp-entry.S
+> @@ -56,19 +56,16 @@ ENDPROC(__vhe_hyp_call)
+>  el1_sync:				// Guest trapped into EL2
+>  	stp	x0, x1, [sp, #-16]!
+>  
+> -alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
+> -	mrs	x1, esr_el2
+> -alternative_else
+> -	mrs	x1, esr_el1
+> -alternative_endif
+> -	lsr	x0, x1, #ESR_ELx_EC_SHIFT
+> -
+> -	cmp	x0, #ESR_ELx_EC_HVC64
+> -	b.ne	el1_trap
+> -
+>  	mrs	x1, vttbr_el2		// If vttbr is valid, the 64bit guest
+>  	cbnz	x1, el1_trap		// called HVC
+
+Comment is outdated. Any guest trap will take this path.
+
+>  
+> +#ifdef CONFIG_DEBUG
+> +	mrs	x0, esr_el2
+> +	lsr	x0, x0, #ESR_ELx_EC_SHIFT
+> +	cmp     x0, #ESR_ELx_EC_HVC64
+> +	b.ne    __hyp_panic
+> +#endif
+> +
+>  	/* Here, we're pretty sure the host called HVC. */
+>  	ldp	x0, x1, [sp], #16
+>  
+> @@ -101,10 +98,15 @@ alternative_endif
+>  	eret
+>  
+>  el1_trap:
+> +	get_host_ctxt	x0, x1
+> +	get_vcpu	x1, x0
+> +
+> +	mrs		x0, esr_el2
+> +	lsr		x0, x0, #ESR_ELx_EC_SHIFT
+>  	/*
+>  	 * x0: ESR_EC
+> +	 * x1: vcpu pointer
+>  	 */
+> -	ldr	x1, [sp, #16 + 8]	// vcpu stored by __guest_enter
+>  
+>  	/*
+>  	 * We trap the first access to the FP/SIMD to save the host context
+> @@ -122,13 +124,15 @@ alternative_else_nop_endif
+>  
+>  el1_irq:
+>  	stp     x0, x1, [sp, #-16]!
+> -	ldr	x1, [sp, #16 + 8]
+> +	get_host_ctxt	x0, x1
+> +	get_vcpu	x1, x0
+>  	mov	x0, #ARM_EXCEPTION_IRQ
+>  	b	__guest_exit
+>  
+>  el1_error:
+>  	stp     x0, x1, [sp, #-16]!
+> -	ldr	x1, [sp, #16 + 8]
+> +	get_host_ctxt	x0, x1
+> +	get_vcpu	x1, x0
+>  	mov	x0, #ARM_EXCEPTION_EL1_SERROR
+>  	b	__guest_exit
+>  
+> @@ -164,14 +168,7 @@ ENTRY(__hyp_do_panic)
+>  ENDPROC(__hyp_do_panic)
+>  
+>  ENTRY(__hyp_panic)
+> -	/*
+> -	 * '=kvm_host_cpu_state' is a host VA from the constant pool, it may
+> -	 * not be accessible by this address from EL2, hyp_panic() converts
+> -	 * it with kern_hyp_va() before use.
+> -	 */
+> -	ldr	x0, =kvm_host_cpu_state
+> -	mrs	x1, tpidr_el2
+> -	add	x0, x0, x1
+> +	get_host_ctxt x0, x1
+>  	b	hyp_panic
+>  ENDPROC(__hyp_panic)
+>  
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index 69ef24a..a0123ad 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -435,7 +435,7 @@ void __hyp_text __noreturn hyp_panic(struct kvm_cpu_context *__host_ctxt)
+>  	if (read_sysreg(vttbr_el2)) {
+>  		struct kvm_cpu_context *host_ctxt;
+>  
+> -		host_ctxt = kern_hyp_va(__host_ctxt);
+> +		host_ctxt = __host_ctxt;
+
+Can't we just rename __host_ctxt to host_ctxt and drop the local definition?
+
+>  		vcpu = host_ctxt->__hyp_running_vcpu;
+>  		__timer_disable_traps(vcpu);
+>  		__deactivate_traps(vcpu);
+> 
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
