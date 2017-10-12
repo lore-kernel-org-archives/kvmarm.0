@@ -1,169 +1,96 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v3 11/28] arm64/sve: Core task context handling
-Date: Thu, 12 Oct 2017 17:05:07 +0100
-Message-ID: <20171012160506.GH19485@e103592.cambridge.arm.com>
+Subject: Re: [PATCH v3 13/28] arm64/sve: Signal handling support
+Date: Thu, 12 Oct 2017 17:11:57 +0100
+Message-ID: <20171012161156.GI19485@e103592.cambridge.arm.com>
 References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
- <1507660725-7986-12-git-send-email-Dave.Martin@arm.com>
- <20171011161558.ts7adaryabttg47z@armageddon.cambridge.arm.com>
+ <1507660725-7986-14-git-send-email-Dave.Martin@arm.com>
+ <20171011164052.exvy2w5p47mewrmg@armageddon.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <linux-arch-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20171011161558.ts7adaryabttg47z@armageddon.cambridge.arm.com>
+In-Reply-To: <20171011164052.exvy2w5p47mewrmg@armageddon.cambridge.arm.com>
 Sender: linux-arch-owner@vger.kernel.org
 To: Catalin Marinas <catalin.marinas@arm.com>
 Cc: linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Will Deacon <will.deacon@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Oct 11, 2017 at 05:15:58PM +0100, Catalin Marinas wrote:
-> On Tue, Oct 10, 2017 at 07:38:28PM +0100, Dave P Martin wrote:
-> > diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
-> > index 026a7c7..b1409de 100644
-> > --- a/arch/arm64/include/asm/fpsimd.h
-> > +++ b/arch/arm64/include/asm/fpsimd.h
-> > @@ -72,6 +75,20 @@ extern void sve_load_state(void const *state, u32 const *pfpsr,
-> >  			   unsigned long vq_minus_1);
-> >  extern unsigned int sve_get_vl(void);
+On Wed, Oct 11, 2017 at 05:40:52PM +0100, Catalin Marinas wrote:
+> On Tue, Oct 10, 2017 at 07:38:30PM +0100, Dave P Martin wrote:
+> > diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+> > index aabeaee..fa4ed34 100644
+> > --- a/arch/arm64/kernel/fpsimd.c
+> > +++ b/arch/arm64/kernel/fpsimd.c
+> > @@ -310,6 +310,32 @@ static void fpsimd_to_sve(struct task_struct *task)
+> >  		       sizeof(fst->vregs[i]));
+> >  }
 > >  
-> > +#ifdef CONFIG_ARM64_SVE
-> > +
-> > +extern size_t sve_state_size(struct task_struct const *task);
-> > +
-> > +extern void sve_alloc(struct task_struct *task);
-> > +extern void fpsimd_release_thread(struct task_struct *task);
-> > +
-> > +#else /* ! CONFIG_ARM64_SVE */
-> > +
-> > +static void __maybe_unused sve_alloc(struct task_struct *task) { }
-> > +static void __maybe_unused fpsimd_release_thread(struct task_struct *task) { }
-> 
-> Nitpick: usually we just add static inline functions here rather than
-> __maybe_unused.
-
-Fair enough -- come to think of it I've already converted some other
-instances of this at Ard's request.
-
-> 
-> > diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
-> > index 29adab8..4831d28 100644
-> > --- a/arch/arm64/include/asm/processor.h
-> > +++ b/arch/arm64/include/asm/processor.h
-> > @@ -39,6 +47,8 @@
-> >  #define FPEXC_IDF	(1 << 7)
-> >  
-> >  /*
-> > + * (Note: in this discussion, statements about FPSIMD apply equally to SVE.)
+> > +/*
+> > + * Transfer the SVE state in task->thread.sve_state to
+> > + * task->thread.fpsimd_state.
 > > + *
-> >   * In order to reduce the number of times the FPSIMD state is needlessly saved
-> >   * and restored, we need to keep track of two things:
-> >   * (a) for each task, we need to remember which CPU was the last one to have
-> > @@ -99,6 +109,287 @@
-> >   */
-> >  static DEFINE_PER_CPU(struct fpsimd_state *, fpsimd_last_state);
-> >  
-> > +static void sve_free(struct task_struct *task)
+> > + * Task can be a non-runnable task, or current.  In the latter case,
+> > + * softirqs (and preemption) must be disabled.
+> > + * task->thread.sve_state must point to at least sve_state_size(task)
+> > + * bytes of allocated kernel memory.
+> > + * task->thread.sve_state must be up to date before calling this function.
+> > + */
+> > +static void sve_to_fpsimd(struct task_struct *task)
 > > +{
-> > +	kfree(task->thread.sve_state);
-> > +	task->thread.sve_state = NULL;
+> > +	unsigned int vq;
+> > +	void const *sst = task->thread.sve_state;
+> > +	struct fpsimd_state *fst = &task->thread.fpsimd_state;
+> > +	unsigned int i;
+> > +
+> > +	if (!system_supports_sve())
+> > +		return;
+> > +
+> > +	vq = sve_vq_from_vl(task->thread.sve_vl);
+> > +	for (i = 0; i < 32; ++i)
+> > +		memcpy(&fst->vregs[i], ZREG(sst, vq, i),
+> > +		       sizeof(fst->vregs[i]));
 > > +}
 > 
-> I think we need a WARN_ON if TIF_SVE is still set here (and the callers
-> making sure it is cleared). I haven't checked the code paths via
-> fpsimd_release_thread() but wondering what happens if we get an
-> interrupt between freeing the state and making the pointer NULL, with
-> some context switching in a preemptible kernel.
+> Nit: could we actually just do an assignment with some pointer casting?
+> It looks like we invoke memcpy for every 16 bytes (same for
+> fpsimd_to_sve).
 
-Having a WARN_ON() here may be a decent way to sanity-check that we
-don't ever have sve_state NULL with TIF_SVE set.  This is a lot more
-economical than putting a WARN_ON() at each dereference of sve_state
-(of which there are quite a few).  sve_free() is also a slow path.
+I was uneasy about what the type of ZREG(sst, vq, i) ought to be.
+In any case, memest() is magic: my oldskool GCC (5.3.0) generates:
 
-Currently, there are two callsites: sve_set_vector_length(), where we
-test_and_clear_tsk_thread_flags(task, TIF_SVE) before calling sve_free();
-and fpsimd_release_thread() where we "don't care" because the thread
-is dying.
-
-Looking more closely though, is the release_thread() path preemptible?
-I can't see anything in the scheduler core to ensure this, nor any
-general reason why it should be needed.
-
-In which case preemption during thread exit after sve_free() could
-result in a NULL deference in fpsimd_thread_switch().
-
-
-So, I think my favoured approach is:
-
-sve_release_thread()
-{
-	local_bh_disable();
-	fpsimd_flush_task_state(current);
-	clear_thread_flag(TIF_SVE);
-	local_bh_enable();
-
-	sve_free();
-}
-
-The local_bh stuff is cumbersome here, and could be replaced with
-barrier()s to force the order of fpsimd_flusk_task_state() versus
-clearing TIF_SVE.  Or should the barrier really be in
-fpsimd_flush_task_state()?  Disabling softirqs avoids the need to answer
-such questions...
+ffff000008084c70 <sve_to_fpsimd>:
+ffff000008084c70:       14000004        b       ffff000008084c80 <sve_to_fpsimd+0x10>
+ffff000008084c74:       d503201f        nop
+ffff000008084c78:       d65f03c0        ret
+ffff000008084c7c:       d503201f        nop
+ffff000008084c80:       f0007d61        adrp    x1, ffff000009033000 <reset_devices>
+ffff000008084c84:       f942a021        ldr     x1, [x1,#1344]
+ffff000008084c88:       36b001c1        tbz     w1, #22, ffff000008084cc0 <sve_to_fpsimd+0x50>
+ffff000008084c8c:       b94ca805        ldr     w5, [x0,#3240]
+ffff000008084c90:       912a0001        add     x1, x0, #0xa80
+ffff000008084c94:       91320004        add     x4, x0, #0xc80
+ffff000008084c98:       f9465006        ldr     x6, [x0,#3232]
+ffff000008084c9c:       121c6ca5        and     w5, w5, #0xfffffff0
+ffff000008084ca0:       52800000        mov     w0, #0x0                        // #0
+ffff000008084ca4:       8b2040c2        add     x2, x6, w0, uxtw
+ffff000008084ca8:       0b050000        add     w0, w0, w5
+ffff000008084cac:       a9400c42        ldp     x2, x3, [x2]
+ffff000008084cb0:       a8810c22        stp     x2, x3, [x1],#16
+ffff000008084cb4:       eb01009f        cmp     x4, x1
+ffff000008084cb8:       54ffff61        b.ne    ffff000008084ca4 <sve_to_fpsimd+0x34>
+ffff000008084cbc:       d65f03c0        ret
+ffff000008084cc0:       d65f03c0        ret
+ffff000008084cc4:       d503201f        nop
 
 
-Then:
+Without volatile, I think assigning a single object and doing a memcpy()
+are equivalent to the compiler: which it actually uses depends solely on
+optimisation considerations.
 
-sve_free(task)
-{
-	WARN_ON(test_thread_flag(TIF_SVE));
+(But then I'm not a language lawyer ... not a professional one anyway).
 
-	barrier();
-	kfree(task->thread.sve_state);
-	tash->thread.sve_state = NULL;
-}
 
-I'm assuming here that kfree() can't be called safely from atomic
-context, but this is unclear.  I would expect to be able to free
-GFP_ATOMIC memory from atomic context (though sve_statue is GFP_KERNEL,
-so dunno).
-
-> Alternatively, always clear TIF_SVE here before freeing (also wondering
-> whether we should make sve_state NULL before the actual freeing but I
-> think TIF_SVE clearing should suffice).
-
-Could do.  I feel that the current placement of the TIF_SVE clearing in
-sve_set_vector_length() feels "more natural", but this is a pretty
-flimsy argument.  How strongly do you feel about this?
-
-[...]
-
-> > + *  * TIF_SVE set:
-
-[...]
-
-> > + *  * TIF_SVE clear:
-> > + *
-> > + *    An attempt by the user task to execute an SVE instruction causes
-> > + *    do_sve_acc() to be called, which does some preparation and then
-> > + *    sets TIF_SVE.
-> > + *
-> > + *    When stored, FPSIMD registers V0-V31 are encoded in
-> > + *    task->fpsimd_state; bits [max : 128] for each of Z0-Z31 are
-> > + *    logically zero but not stored anywhere; P0-P15 and FFR are not
-> > + *    stored and have unspecified values from userspace's point of
-> > + *    view.  For hygiene purposes, the kernel zeroes them on next use,
-> > + *    but userspace is discouraged from relying on this.
-> > + *
-> > + *    task->thread.sve_state does not need to be non-NULL, valid or any
-> > + *    particular size: it must not be dereferenced.
-> > + *
-> > + *  * FPSR and FPCR are always stored in task->fpsimd_state irrespctive of
-> > + *    whether TIF_SVE is clear or set, since these are not vector length
-> > + *    dependent.
-> > + */
-> 
-> This looks fine, thanks for adding the description.
-
-OK, thanks for checking it.
+Are you concerned compilers may mess this up?
 
 Cheers
 ---Dave
