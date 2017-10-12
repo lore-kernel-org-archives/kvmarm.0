@@ -1,68 +1,106 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v3 18/28] arm64/sve: Preserve SVE registers around EFI
- runtime service calls
-Date: Thu, 12 Oct 2017 11:57:05 +0100
-Message-ID: <20171012105705.zbs3wokxhky36k4k@armageddon.cambridge.arm.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH v3 22/28] arm64/sve: KVM: Prevent guests from using SVE
+Date: Thu, 12 Oct 2017 12:04:12 +0100
+Message-ID: <20171012110409.GG19485@e103592.cambridge.arm.com>
 References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
- <1507660725-7986-19-git-send-email-Dave.Martin@arm.com>
+ <1507660725-7986-23-git-send-email-Dave.Martin@arm.com>
+ <c28b3f0d-7beb-cca3-46db-3fce964f4725@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6014349D3D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:56:27 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cn0hX9zVNALH for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Oct 2017 06:56:26 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C08C49D38
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:56:26 -0400 (EDT)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-arch-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1507660725-7986-19-git-send-email-Dave.Martin@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <c28b3f0d-7beb-cca3-46db-3fce964f4725@arm.com>
+Sender: linux-arch-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, Christoffer Dall <cdall@linaro.org>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Oct 10, 2017 at 07:38:35PM +0100, Dave P Martin wrote:
-> The EFI runtime services ABI allows EFI to make free use of the
-> FPSIMD registers during EFI runtime service calls, subject to the
-> callee-save requirements of the AArch64 procedure call standard.
-> =
+On Wed, Oct 11, 2017 at 05:28:06PM +0100, Marc Zyngier wrote:
+> [+ Christoffer]
+> 
+> On 10/10/17 19:38, Dave Martin wrote:
+> > Until KVM has full SVE support, guests must not be allowed to
+> > execute SVE instructions.
+> > 
+> > This patch enables the necessary traps, and also ensures that the
+> > traps are disabled again on exit from the guest so that the host
+> > can still use SVE if it wants to.
+> > 
+> > This patch introduces another instance of
+> > __this_cpu_write(fpsimd_last_state, NULL), so this flush operation
+> > is abstracted out as a separate helper fpsimd_flush_cpu_state().
+> > Other instances are ported appropriately.
+> > 
+> > As a side effect of this refactoring, a this_cpu_write() in
+> > fpsimd_cpu_pm_notifier() is changed to __this_cpu_write().  This
+> > should be fine, since cpu_pm_enter() is supposed to be called only
+> > with interrupts disabled.
+> > 
+> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> > Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+> > Cc: Marc Zyngier <marc.zyngier@arm.com>
+> > Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> > ---
 
-> However, the SVE architecture allows upper bits of the SVE vector
-> registers to be zeroed as a side-effect of FPSIMD V-register
-> writes.  This means that the SVE vector registers must be saved in
-> their entirety in order to avoid data loss: non-SVE-aware EFI
-> implementations cannot restore them correctly.
-> =
+[...]
 
-> The non-IRQ case is already handled gracefully by
-> kernel_neon_begin().  For the IRQ case, this patch allocates a
-> suitable per-CPU stash buffer for the full SVE register state and
-> uses it to preserve the affected registers around EFI calls.  It is
-> currently unclear how the EFI runtime services ABI will be
-> clarified with respect to SVE, so it safest to assume that the
-> predicate registers and FFR must be saved and restored too.
-> =
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index e923b58..674912d 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
 
-> No attempt is made to restore the restore the vector length after
-> a call, for now.  It is deemed rather insane for EFI to change it,
-> and contemporary EFI implementations certainly won't.
-> =
+[...]
 
-> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> Reviewed-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> > @@ -384,4 +385,14 @@ static inline void __cpu_init_stage2(void)
 
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+[...]
+
+> > +static inline void kvm_fpsimd_flush_cpu_state(void)
+> > +{
+> > +	if (system_supports_sve())
+> > +		sve_flush_cpu_state();
+> 
+> Hmmm. How does this work if...
+
+!IS_ENABLED(CONFIG_ARM64_SVE) implies !system_supports_sve(), so
+if CONFIG_ARM64_SVE is not set, the call is optimised away.
+
+[...]
+
+> > diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+> > index a9cb794..6ae3703 100644
+> > --- a/arch/arm64/kernel/fpsimd.c
+> > +++ b/arch/arm64/kernel/fpsimd.c
+> > @@ -1073,6 +1073,33 @@ void fpsimd_flush_task_state(struct task_struct *t)
+
+[...]
+
+> > +#ifdef CONFIG_ARM64_SVE
+> > +void sve_flush_cpu_state(void)
+> > +{
+> > +	struct fpsimd_state *const fpstate = __this_cpu_read(fpsimd_last_state);
+> > +	struct task_struct *tsk;
+> > +
+> > +	if (!fpstate)
+> > +		return;
+> > +
+> > +	tsk = container_of(fpstate, struct task_struct, thread.fpsimd_state);
+> > +	if (test_tsk_thread_flag(tsk, TIF_SVE))
+> > +		fpsimd_flush_cpu_state();
+> > +}
+> > +#endif /* CONFIG_ARM64_SVE */
+> 
+> ... CONFIG_ARM64_SVE is not set? Fixing this should just be a matter of
+> moving the #ifdef/#endif inside the function...
+
+Because sve_flush_cpu_state() is not in the same compilation unit it
+can't be static, and that means the compiler won't remove it
+automatically if it's unused -- hence the #ifdef.
+
+Because the call site is optimised away, there is no link failure.
+
+Don't we rely on this sort of thing all over the place?
+
+Cheers
+---Dave
