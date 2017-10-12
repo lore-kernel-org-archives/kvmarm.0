@@ -1,24 +1,25 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH 11/37] KVM: arm64: Improve debug register save/restore flow
-Date: Thu, 12 Oct 2017 12:41:15 +0200
-Message-ID: <20171012104141.26902-12-christoffer.dall@linaro.org>
+Subject: [PATCH 23/37] KVM: arm64: Prepare to handle traps on deferred VM
+ sysregs
+Date: Thu, 12 Oct 2017 12:41:27 +0200
+Message-ID: <20171012104141.26902-24-christoffer.dall@linaro.org>
 References: <20171012104141.26902-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A997349D90
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A9EFC49D96
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gVzyTv004-Oh for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Oct 2017 06:41:14 -0400 (EDT)
-Received: from mail-wm0-f47.google.com (mail-wm0-f47.google.com [74.125.82.47])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A1FAF49D9B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:13 -0400 (EDT)
-Received: by mail-wm0-f47.google.com with SMTP id m72so23422903wmc.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 03:41:58 -0700 (PDT)
+ with ESMTP id E9amGLccfecF for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Oct 2017 06:41:30 -0400 (EDT)
+Received: from mail-wm0-f41.google.com (mail-wm0-f41.google.com [74.125.82.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2107449D9D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:30 -0400 (EDT)
+Received: by mail-wm0-f41.google.com with SMTP id b189so11865774wmd.4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 03:42:14 -0700 (PDT)
 In-Reply-To: <20171012104141.26902-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,178 +34,122 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Instead of having multiple calls from the world switch path to the debug
-logic, each figuring out if the dirty bit is set and if we should
-save/restore the debug registes, let's just provide two hooks to the
-debug save/restore functionality, one for switching to the guest
-context, and one for switching to the host context, and we get the
-benefit of only having to evaluate the dirty flag once on each path,
-plus we give the compiler some more room to inline some of this
-functionality.
+When we defer the save/restore of system registers to vcpu_load and
+vcpu_put, we need to take care of the emulation code that handles traps
+to these registers, since simply reading the memory array will return
+stale data.
+
+Therefore, introduce two functions to directly read/write the registers
+from the physical CPU when we're on a VHE system that has loaded the
+system registers onto the physical CPU.
 
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/include/asm/kvm_hyp.h | 10 ++-----
- arch/arm64/kvm/hyp/debug-sr.c    | 56 +++++++++++++++++++++++++++-------------
- arch/arm64/kvm/hyp/switch.c      |  6 ++---
- 3 files changed, 42 insertions(+), 30 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  4 +++
+ arch/arm64/kvm/sys_regs.c         | 54 +++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 56 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index 08d3bb6..a0e5a70 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -139,14 +139,8 @@ void __sysreg_restore_guest_state(struct kvm_cpu_context *ctxt);
- void __sysreg32_save_state(struct kvm_vcpu *vcpu);
- void __sysreg32_restore_state(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 9f5761f..dcded44 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -278,6 +278,10 @@ struct kvm_vcpu_arch {
  
--void __debug_save_state(struct kvm_vcpu *vcpu,
--			struct kvm_guest_debug_arch *dbg,
--			struct kvm_cpu_context *ctxt);
--void __debug_restore_state(struct kvm_vcpu *vcpu,
--			   struct kvm_guest_debug_arch *dbg,
--			   struct kvm_cpu_context *ctxt);
--void __debug_cond_save_host_state(struct kvm_vcpu *vcpu);
--void __debug_cond_restore_host_state(struct kvm_vcpu *vcpu);
-+void __debug_switch_to_guest(struct kvm_vcpu *vcpu);
-+void __debug_switch_to_host(struct kvm_vcpu *vcpu);
+ 	/* Detect first run of a vcpu */
+ 	bool has_run_once;
++
++	/* True when deferrable sysregs are loaded on the physical CPU,
++	 * see kvm_vcpu_load_sysregs and kvm_vcpu_put_sysregs. */
++	bool sysregs_loaded_on_cpu;
+ };
  
- void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
- void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
-diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
-index a2291b6..b4cd8e0 100644
---- a/arch/arm64/kvm/hyp/debug-sr.c
-+++ b/arch/arm64/kvm/hyp/debug-sr.c
-@@ -116,16 +116,13 @@ static void __hyp_text __debug_restore_spe(u64 pmscr_el1)
- 	write_sysreg_s(pmscr_el1, PMSCR_EL1);
+ #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.gp_regs)
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index dbe35fd..f7887dd 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -34,6 +34,7 @@
+ #include <asm/kvm_coproc.h>
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_host.h>
++#include <asm/kvm_hyp.h>
+ #include <asm/kvm_mmu.h>
+ #include <asm/perf_event.h>
+ #include <asm/sysreg.h>
+@@ -110,8 +111,57 @@ static bool access_dcsw(struct kvm_vcpu *vcpu,
+ 	return true;
  }
  
--void __hyp_text __debug_save_state(struct kvm_vcpu *vcpu,
--				   struct kvm_guest_debug_arch *dbg,
--				   struct kvm_cpu_context *ctxt)
-+static void __hyp_text __debug_save_state(struct kvm_vcpu *vcpu,
-+					  struct kvm_guest_debug_arch *dbg,
-+					  struct kvm_cpu_context *ctxt)
- {
- 	u64 aa64dfr0;
- 	int brps, wrps;
- 
--	if (!(vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY))
--		return;
--
- 	aa64dfr0 = read_sysreg(id_aa64dfr0_el1);
- 	brps = (aa64dfr0 >> 12) & 0xf;
- 	wrps = (aa64dfr0 >> 20) & 0xf;
-@@ -138,16 +135,13 @@ void __hyp_text __debug_save_state(struct kvm_vcpu *vcpu,
- 	ctxt->sys_regs[MDCCINT_EL1] = read_sysreg(mdccint_el1);
- }
- 
--void __hyp_text __debug_restore_state(struct kvm_vcpu *vcpu,
--				      struct kvm_guest_debug_arch *dbg,
--				      struct kvm_cpu_context *ctxt)
-+static void __hyp_text __debug_restore_state(struct kvm_vcpu *vcpu,
-+					     struct kvm_guest_debug_arch *dbg,
-+					     struct kvm_cpu_context *ctxt)
- {
- 	u64 aa64dfr0;
- 	int brps, wrps;
- 
--	if (!(vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY))
--		return;
--
- 	aa64dfr0 = read_sysreg(id_aa64dfr0_el1);
- 
- 	brps = (aa64dfr0 >> 12) & 0xf;
-@@ -161,24 +155,50 @@ void __hyp_text __debug_restore_state(struct kvm_vcpu *vcpu,
- 	write_sysreg(ctxt->sys_regs[MDCCINT_EL1], mdccint_el1);
- }
- 
--void __hyp_text __debug_cond_save_host_state(struct kvm_vcpu *vcpu)
-+void __hyp_text __debug_switch_to_guest(struct kvm_vcpu *vcpu)
- {
--	__debug_save_state(vcpu, &vcpu->arch.host_debug_state.regs,
--			   kern_hyp_va(vcpu->arch.host_cpu_context));
-+	struct kvm_cpu_context *__host_ctxt;
-+	struct kvm_cpu_context *__guest_ctxt;
-+	struct kvm_guest_debug_arch *__host_dbg;
-+	struct kvm_guest_debug_arch *__guest_dbg;
- 
- 	/* Non-VHE: Disable and flush SPE data generation
- 	 * VHE: The vcpu can run. but it can't hide. */
- 	if (!has_vhe())
- 		__debug_save_spe_nvhe(&vcpu->arch.host_debug_state.pmscr_el1);
++static u64 read_deferrable_vm_reg(struct kvm_vcpu *vcpu, int reg)
++{
++	if (vcpu->arch.sysregs_loaded_on_cpu) {
++		switch (reg) {
++		case SCTLR_EL1:		return read_sysreg_el1(sctlr);
++		case TTBR0_EL1:		return read_sysreg_el1(ttbr0);
++		case TTBR1_EL1:		return read_sysreg_el1(ttbr1);
++		case TCR_EL1:		return read_sysreg_el1(tcr);
++		case ESR_EL1:		return read_sysreg_el1(esr);
++		case FAR_EL1:		return read_sysreg_el1(far);
++		case AFSR0_EL1:		return read_sysreg_el1(afsr0);
++		case AFSR1_EL1:		return read_sysreg_el1(afsr1);
++		case MAIR_EL1:		return read_sysreg_el1(mair);
++		case AMAIR_EL1:		return read_sysreg_el1(amair);
++		case CONTEXTIDR_EL1:	return read_sysreg_el1(contextidr);
++		case DACR32_EL2:	return read_sysreg(dacr32_el2);
++		case IFSR32_EL2:	return read_sysreg(ifsr32_el2);
++		default:		BUG();
++		}
++	}
 +
-+	if (!(vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY))
-+		return;
++	return vcpu_sys_reg(vcpu, reg);
++}
 +
-+	__host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-+	__guest_ctxt = &vcpu->arch.ctxt;
-+	__host_dbg = &vcpu->arch.host_debug_state.regs;
-+	__guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
++static void write_deferrable_vm_reg(struct kvm_vcpu *vcpu, int reg, u64 val)
++{
++	if (vcpu->arch.sysregs_loaded_on_cpu) {
++		switch (reg) {
++		case SCTLR_EL1:		write_sysreg_el1(val, sctlr);	return;
++		case TTBR0_EL1:		write_sysreg_el1(val, ttbr0);	return;
++		case TTBR1_EL1:		write_sysreg_el1(val, ttbr1);	return;
++		case TCR_EL1:		write_sysreg_el1(val, tcr);	return;
++		case ESR_EL1:		write_sysreg_el1(val, esr);	return;
++		case FAR_EL1:		write_sysreg_el1(val, far);	return;
++		case AFSR0_EL1:		write_sysreg_el1(val, afsr0);	return;
++		case AFSR1_EL1:		write_sysreg_el1(val, afsr1);	return;
++		case MAIR_EL1:		write_sysreg_el1(val, mair);	return;
++		case AMAIR_EL1:		write_sysreg_el1(val, amair);	return;
++		case CONTEXTIDR_EL1:	write_sysreg_el1(val, contextidr); return;
++		case DACR32_EL2:	write_sysreg(val, dacr32_el2); return;
++		case IFSR32_EL2:	write_sysreg(val, ifsr32_el2); return;
++		default:		BUG();
++		}
++	}
 +
-+	__debug_save_state(vcpu, __host_dbg, __host_ctxt);
-+	__debug_restore_state(vcpu, __guest_dbg, __guest_ctxt);
- }
- 
--void __hyp_text __debug_cond_restore_host_state(struct kvm_vcpu *vcpu)
-+void __hyp_text __debug_switch_to_host(struct kvm_vcpu *vcpu)
- {
-+	struct kvm_cpu_context *__host_ctxt;
-+	struct kvm_cpu_context *__guest_ctxt;
-+	struct kvm_guest_debug_arch *__host_dbg;
-+	struct kvm_guest_debug_arch *__guest_dbg;
++	vcpu_sys_reg(vcpu, reg) = val;
++}
 +
- 	if (!has_vhe())
- 		__debug_restore_spe(vcpu->arch.host_debug_state.pmscr_el1);
+ /*
+  * Generic accessor for VM registers. Only called as long as HCR_TVM
++ *
+  * is set. If the guest enables the MMU, we stop trapping the VM
+  * sys_regs and leave it in complete control of the caches.
+  */
+@@ -132,14 +182,14 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
+ 	if (!p->is_aarch32 || !p->is_32bit) {
+ 		val = p->regval;
+ 	} else {
+-		val = vcpu_sys_reg(vcpu, reg);
++		val = read_deferrable_vm_reg(vcpu, reg);
+ 		if (r->reg % 2)
+ 			val = (p->regval << 32) | (u64)lower_32_bits(val);
+ 		else
+ 			val = ((u64)upper_32_bits(val) << 32) |
+ 				(u64)lower_32_bits(p->regval);
+ 	}
+-	vcpu_sys_reg(vcpu, reg) = val;
++	write_deferrable_vm_reg(vcpu, reg, val);
  
--	__debug_restore_state(vcpu, &vcpu->arch.host_debug_state.regs,
--			      kern_hyp_va(vcpu->arch.host_cpu_context));
-+	if (!(vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY))
-+		return;
-+
-+	__host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-+	__guest_ctxt = &vcpu->arch.ctxt;
-+	__host_dbg = &vcpu->arch.host_debug_state.regs;
-+	__guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
-+
-+	__debug_save_state(vcpu, __guest_dbg, __guest_ctxt);
-+	__debug_restore_state(vcpu, __host_dbg, __host_ctxt);
- 
- 	vcpu->arch.debug_flags &= ~KVM_ARM64_DEBUG_DIRTY;
- }
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index ef05c59..e270cba 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -271,7 +271,6 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	guest_ctxt = &vcpu->arch.ctxt;
- 
- 	__sysreg_save_host_state(host_ctxt);
--	__debug_cond_save_host_state(vcpu);
- 
- 	__activate_traps(vcpu);
- 	__activate_vm(vcpu);
-@@ -285,7 +284,7 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	 */
- 	__sysreg32_restore_state(vcpu);
- 	__sysreg_restore_guest_state(guest_ctxt);
--	__debug_restore_state(vcpu, kern_hyp_va(vcpu->arch.debug_ptr), guest_ctxt);
-+	__debug_switch_to_guest(vcpu);
- 
- 	/* Jump in the fire! */
- again:
-@@ -353,12 +352,11 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 
- 	__sysreg_restore_host_state(host_ctxt);
- 
--	__debug_save_state(vcpu, kern_hyp_va(vcpu->arch.debug_ptr), guest_ctxt);
- 	/*
- 	 * This must come after restoring the host sysregs, since a non-VHE
- 	 * system may enable SPE here and make use of the TTBRs.
- 	 */
--	__debug_cond_restore_host_state(vcpu);
-+	__debug_switch_to_host(vcpu);
- 
- 	return exit_code;
- }
+ 	kvm_toggle_cache(vcpu, was_enabled);
+ 	return true;
 -- 
 2.9.0
