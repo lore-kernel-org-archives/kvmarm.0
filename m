@@ -1,25 +1,25 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH 17/37] KVM: arm64: Move userspace system registers into
- separate function
-Date: Thu, 12 Oct 2017 12:41:21 +0200
-Message-ID: <20171012104141.26902-18-christoffer.dall@linaro.org>
+Subject: [PATCH 29/37] KVM: arm64: Configure FPSIMD traps on vcpu load/put for
+ VHE
+Date: Thu, 12 Oct 2017 12:41:33 +0200
+Message-ID: <20171012104141.26902-30-christoffer.dall@linaro.org>
 References: <20171012104141.26902-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DBA249D78
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A93C849D4B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LQrByNQNtivG for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Oct 2017 06:41:21 -0400 (EDT)
-Received: from mail-wm0-f46.google.com (mail-wm0-f46.google.com [74.125.82.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BF4D949D31
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:21 -0400 (EDT)
-Received: by mail-wm0-f46.google.com with SMTP id i124so11857870wmf.3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 03:42:06 -0700 (PDT)
+ with ESMTP id dM3+I9UUC0mY for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Oct 2017 06:41:38 -0400 (EDT)
+Received: from mail-wm0-f54.google.com (mail-wm0-f54.google.com [74.125.82.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A98AA49D33
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:38 -0400 (EDT)
+Received: by mail-wm0-f54.google.com with SMTP id q124so11982734wmb.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 03:42:23 -0700 (PDT)
 In-Reply-To: <20171012104141.26902-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,115 +34,139 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-There's a semantic difference between the EL1 registers that control
-operation of a kernel running in EL1 and EL1 registers that only control
-userspace execution in EL0.  Since we can defer saving/restoring the
-latter, move them into their own function.
-
-We also take this chance to rename the function saving/restoring the
-remaining system register to make it clear this function deals with
-the EL1 system registers.
-
-No functional change.
+There is no need to enable/disable traps to FP registers on every switch
+to/from the VM, because the host kernel does not use this resource
+without calling vcpu_put.  We can therefore move things around enough
+that we still always write FPEXC32_EL2 before programming CPTR_EL2 but
+only program these during vcpu load/put.
 
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/kvm/hyp/sysreg-sr.c | 34 +++++++++++++++++++++++-----------
- 1 file changed, 23 insertions(+), 11 deletions(-)
+ arch/arm64/include/asm/kvm_hyp.h |  3 +++
+ arch/arm64/kvm/hyp/switch.c      | 34 ++++++++++++++++++++++++----------
+ arch/arm64/kvm/hyp/sysreg-sr.c   |  4 ++++
+ 3 files changed, 31 insertions(+), 10 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index 3f54c55..28d5f3c 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -148,6 +148,9 @@ void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
+ void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
+ bool __fpsimd_enabled(void);
+ 
++void activate_traps_vhe_load(struct kvm_vcpu *vcpu);
++void deactivate_traps_vhe_put(void);
++
+ u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
+ void __noreturn __hyp_do_panic(unsigned long, ...);
+ 
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index c587416..09be10f 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -23,22 +23,25 @@
+ #include <asm/kvm_hyp.h>
+ #include <asm/fpsimd.h>
+ 
+-static void __hyp_text __activate_traps_common(struct kvm_vcpu *vcpu)
++static void __hyp_text __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
+ {
+ 	/*
+-	 * We are about to set CPTR_EL2.TFP to trap all floating point
+-	 * register accesses to EL2, however, the ARM ARM clearly states that
+-	 * traps are only taken to EL2 if the operation would not otherwise
+-	 * trap to EL1.  Therefore, always make sure that for 32-bit guests,
+-	 * we set FPEXC.EN to prevent traps to EL1, when setting the TFP bit.
+-	 * If FP/ASIMD is not implemented, FPEXC is UNDEFINED and any access to
+-	 * it will cause an exception.
++	 * We are about to trap all floating point register accesses to EL2,
++	 * however, traps are only taken to EL2 if the operation would not
++	 * otherwise trap to EL1.  Therefore, always make sure that for 32-bit
++	 * guests, we set FPEXC.EN to prevent traps to EL1, when setting the
++	 * TFP bit.  If FP/ASIMD is not implemented, FPEXC is UNDEFINED and
++	 * any access to it will cause an exception.
+ 	 */
+ 	if (vcpu_el1_is_32bit(vcpu) && system_supports_fpsimd() &&
+ 	    !vcpu->arch.guest_vfp_loaded) {
+ 		write_sysreg(1 << 30, fpexc32_el2);
+ 		isb();
+ 	}
++}
++
++static void __hyp_text __activate_traps_common(struct kvm_vcpu *vcpu)
++{
+ 	write_sysreg(vcpu->arch.hcr_el2, hcr_el2);
+ 
+ 	/* Trap on AArch32 cp15 c15 (impdef sysregs) accesses (EL1 or EL0) */
+@@ -60,10 +63,12 @@ static void __hyp_text __deactivate_traps_common(void)
+ 	write_sysreg(0, pmuserenr_el0);
+ }
+ 
+-static void __hyp_text __activate_traps_vhe(struct kvm_vcpu *vcpu)
++void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
+ {
+ 	u64 val;
+ 
++	__activate_traps_fpsimd32(vcpu);
++
+ 	val = read_sysreg(cpacr_el1);
+ 	val |= CPACR_EL1_TTA;
+ 	if (vcpu->arch.guest_vfp_loaded)
+@@ -71,7 +76,15 @@ static void __hyp_text __activate_traps_vhe(struct kvm_vcpu *vcpu)
+ 	else
+ 		val &= ~CPACR_EL1_FPEN;
+ 	write_sysreg(val, cpacr_el1);
++}
+ 
++void deactivate_traps_vhe_put(void)
++{
++	write_sysreg(CPACR_EL1_FPEN, cpacr_el1);
++}
++
++static void __hyp_text __activate_traps_vhe(struct kvm_vcpu *vcpu)
++{
+ 	write_sysreg(__kvm_hyp_vector, vbar_el1);
+ }
+ 
+@@ -79,6 +92,8 @@ static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
+ {
+ 	u64 val;
+ 
++	__activate_traps_fpsimd32(vcpu);
++
+ 	val = CPTR_EL2_DEFAULT;
+ 	val |= CPTR_EL2_TTA;
+ 	if (vcpu->arch.guest_vfp_loaded)
+@@ -109,7 +124,6 @@ static void __hyp_text __deactivate_traps_vhe(void)
+ 
+ 	write_sysreg(mdcr_el2, mdcr_el2);
+ 	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
+-	write_sysreg(CPACR_EL1_FPEN, cpacr_el1);
+ 	write_sysreg(vectors, vbar_el1);
+ }
+ 
 diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-index c4a3714..193c2b0 100644
+index 6ff1ce5..54a4f55 100644
 --- a/arch/arm64/kvm/hyp/sysreg-sr.c
 +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-@@ -34,14 +34,18 @@ static void __hyp_text __sysreg_do_nothing(struct kvm_cpu_context *ctxt) { }
+@@ -242,6 +242,8 @@ void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu)
+ 	__sysreg_restore_el1_state(guest_ctxt);
  
- static void __hyp_text __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
- {
-+	ctxt->sys_regs[MDSCR_EL1]	= read_sysreg(mdscr_el1);
-+	ctxt->gp_regs.regs.sp		= read_sysreg(sp_el0);
-+}
+ 	vcpu->arch.sysregs_loaded_on_cpu = true;
 +
-+static void __hyp_text __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
-+{
- 	ctxt->sys_regs[ACTLR_EL1]	= read_sysreg(actlr_el1);
- 	ctxt->sys_regs[TPIDR_EL0]	= read_sysreg(tpidr_el0);
- 	ctxt->sys_regs[TPIDRRO_EL0]	= read_sysreg(tpidrro_el0);
--	ctxt->sys_regs[MDSCR_EL1]	= read_sysreg(mdscr_el1);
--	ctxt->gp_regs.regs.sp		= read_sysreg(sp_el0);
++	activate_traps_vhe_load(vcpu);
  }
  
--static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
-+static void __hyp_text __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
- {
- 	ctxt->sys_regs[MPIDR_EL1]	= read_sysreg(vmpidr_el2);
- 	ctxt->sys_regs[CSSELR_EL1]	= read_sysreg(csselr_el1);
-@@ -70,31 +74,37 @@ static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
- }
+ /**
+@@ -272,6 +274,8 @@ void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu)
+ 	if (!has_vhe())
+ 		return;
  
- static hyp_alternate_select(__sysreg_call_save_host_state,
--			    __sysreg_save_state, __sysreg_do_nothing,
-+			    __sysreg_save_el1_state, __sysreg_do_nothing,
- 			    ARM64_HAS_VIRT_HOST_EXTN);
- 
- void __hyp_text __sysreg_save_host_state(struct kvm_cpu_context *ctxt)
- {
- 	__sysreg_call_save_host_state()(ctxt);
- 	__sysreg_save_common_state(ctxt);
-+	__sysreg_save_user_state(ctxt);
- }
- 
- void __hyp_text __sysreg_save_guest_state(struct kvm_cpu_context *ctxt)
- {
--	__sysreg_save_state(ctxt);
-+	__sysreg_save_el1_state(ctxt);
- 	__sysreg_save_common_state(ctxt);
-+	__sysreg_save_user_state(ctxt);
- }
- 
- static void __hyp_text __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
- {
--	write_sysreg(ctxt->sys_regs[ACTLR_EL1],	  actlr_el1);
--	write_sysreg(ctxt->sys_regs[TPIDR_EL0],	  tpidr_el0);
--	write_sysreg(ctxt->sys_regs[TPIDRRO_EL0], tpidrro_el0);
- 	write_sysreg(ctxt->sys_regs[MDSCR_EL1],	  mdscr_el1);
- 	write_sysreg(ctxt->gp_regs.regs.sp,	  sp_el0);
- }
- 
--static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
-+static void __hyp_text __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
-+{
-+	write_sysreg(ctxt->sys_regs[ACTLR_EL1],	  	actlr_el1);
-+	write_sysreg(ctxt->sys_regs[TPIDR_EL0],	  	tpidr_el0);
-+	write_sysreg(ctxt->sys_regs[TPIDRRO_EL0], 	tpidrro_el0);
-+}
++	deactivate_traps_vhe_put();
 +
-+static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
- {
- 	write_sysreg(ctxt->sys_regs[MPIDR_EL1],		vmpidr_el2);
- 	write_sysreg(ctxt->sys_regs[CSSELR_EL1],	csselr_el1);
-@@ -123,19 +133,21 @@ static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
- }
- 
- static hyp_alternate_select(__sysreg_call_restore_host_state,
--			    __sysreg_restore_state, __sysreg_do_nothing,
-+			    __sysreg_restore_el1_state, __sysreg_do_nothing,
- 			    ARM64_HAS_VIRT_HOST_EXTN);
- 
- void __hyp_text __sysreg_restore_host_state(struct kvm_cpu_context *ctxt)
- {
- 	__sysreg_call_restore_host_state()(ctxt);
- 	__sysreg_restore_common_state(ctxt);
-+	__sysreg_restore_user_state(ctxt);
- }
- 
- void __hyp_text __sysreg_restore_guest_state(struct kvm_cpu_context *ctxt)
- {
--	__sysreg_restore_state(ctxt);
-+	__sysreg_restore_el1_state(ctxt);
- 	__sysreg_restore_common_state(ctxt);
-+	__sysreg_restore_user_state(ctxt);
- }
- 
- static void __hyp_text __fpsimd32_save_state(struct kvm_cpu_context *ctxt)
+ 	__sysreg_save_el1_state(guest_ctxt);
+ 	__sysreg_save_user_state(guest_ctxt);
+ 	__sysreg32_save_state(vcpu);
 -- 
 2.9.0
