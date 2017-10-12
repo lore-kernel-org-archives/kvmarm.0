@@ -1,144 +1,127 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH 02/37] KVM: arm64: Rework hyp_panic for VHE and non-VHE
-Date: Thu, 12 Oct 2017 19:06:26 +0200
-Message-ID: <20171012170626.GB26425@cbox>
-References: <20171012104141.26902-1-christoffer.dall@linaro.org>
- <20171012104141.26902-3-christoffer.dall@linaro.org>
- <313239e5-d755-95b6-4db7-6dafe2027155@arm.com>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v3 19/28] arm64/sve: ptrace and ELF coredump support
+Date: Thu, 12 Oct 2017 18:06:32 +0100
+Message-ID: <20171012170632.35zifttm55rzu745@armageddon.cambridge.arm.com>
+References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
+ <1507660725-7986-20-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Return-path: <linux-arch-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <313239e5-d755-95b6-4db7-6dafe2027155@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Shih-Wei Li <shihwei@cs.columbia.edu>
+In-Reply-To: <1507660725-7986-20-git-send-email-Dave.Martin@arm.com>
+Sender: linux-arch-owner@vger.kernel.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Alan Hayward <alan.hayward@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Oct 12, 2017 at 04:55:16PM +0100, Marc Zyngier wrote:
-> On 12/10/17 11:41, Christoffer Dall wrote:
-> > VHE actually doesn't rely on clearing the VTTBR when returning to the
-> > hsot kernel, and that is the current key mechanism of hyp_panic to
-> 
-> host
-> 
-> > figure out how to attempt to return to a state good enough to print a
-> > panic statement.
-> > 
-> > Therefore, we split the hyp_panic function into two functions, a VHE and
-> > a non-VHE, keeping the non-VHE version intact, but changing the VHE
-> > behavior.
-> > 
-> > The vttbr_el2 check on VHE doesn't really make that much sense, because
-> > the only situation where we can get here on VHE is when the hypervisor
-> > assembly code actually caleld into hyp_panic, which only happens when
-> 
-> called
-> 
-> > VBAR_EL2 has been set to the KVM exception vectors.  On VHE, we can
-> > always safely disable the traps and restore the host registers at this
-> > point, so we simply do that unconditionally and call into the panic
-> > function directly.
-> > 
-> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> > ---
-> >  arch/arm64/kvm/hyp/switch.c | 45 +++++++++++++++++++++++----------------------
-> >  1 file changed, 23 insertions(+), 22 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> > index a0123ad..a50ddf3 100644
-> > --- a/arch/arm64/kvm/hyp/switch.c
-> > +++ b/arch/arm64/kvm/hyp/switch.c
-> > @@ -394,10 +394,20 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
-> >  static const char __hyp_panic_string[] = "HYP panic:\nPS:%08llx PC:%016llx ESR:%08llx\nFAR:%016llx HPFAR:%016llx PAR:%016llx\nVCPU:%p\n";
-> >  
-> >  static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par,
-> > -					     struct kvm_vcpu *vcpu)
-> > +					     struct kvm_cpu_context *__host_ctxt)
-> >  {
-> > +	struct kvm_vcpu *vcpu;
-> >  	unsigned long str_va;
-> >  
-> > +	vcpu = __host_ctxt->__hyp_running_vcpu;
-> > +
-> > +	if (read_sysreg(vttbr_el2)) {
-> > +		__timer_disable_traps(vcpu);
-> > +		__deactivate_traps(vcpu);
-> > +		__deactivate_vm(vcpu);
-> > +		__sysreg_restore_host_state(__host_ctxt);
-> > +	}
-> > +
-> >  	/*
-> >  	 * Force the panic string to be loaded from the literal pool,
-> >  	 * making sure it is a kernel address and not a PC-relative
-> > @@ -411,40 +421,31 @@ static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par,
-> >  		       read_sysreg(hpfar_el2), par, vcpu);
-> >  }
-> >  
-> > -static void __hyp_text __hyp_call_panic_vhe(u64 spsr, u64 elr, u64 par,
-> > -					    struct kvm_vcpu *vcpu)
-> > +static void __hyp_call_panic_vhe(u64 spsr, u64 elr, u64 par,
-> > +				 struct kvm_cpu_context *host_ctxt)
-> >  {
-> > +	struct kvm_vcpu *vcpu;
-> > +	vcpu = host_ctxt->__hyp_running_vcpu;
-> > +
-> > +	__deactivate_traps_vhe();
-> 
-> Is there a reason why we can't just call __deactivate_traps(), rather
-> than the VHE-specific subset? It doesn't really matter, as we're about
-> to panic, but still...
-> 
+On Tue, Oct 10, 2017 at 07:38:36PM +0100, Dave P Martin wrote:
+> @@ -702,6 +737,211 @@ static int system_call_set(struct task_struct *target,
+>  	return ret;
+>  }
+>  
+> +#ifdef CONFIG_ARM64_SVE
+> +
+> +static void sve_init_header_from_task(struct user_sve_header *header,
+> +				      struct task_struct *target)
+> +{
+> +	unsigned int vq;
+> +
+> +	memset(header, 0, sizeof(*header));
+> +
+> +	header->flags = test_tsk_thread_flag(target, TIF_SVE) ?
+> +		SVE_PT_REGS_SVE : SVE_PT_REGS_FPSIMD;
 
-It doesn't really matter, especially as later patches will change this,
-but this patch would be slightly nicer keeping the __deactivate_traps.
-I don't mind changing that around in the next version.
+For PTRACE_SYSCALL, we may or may not have TIF_SVE depending on what
+happened with the target. Just a thought: shall we clear TIF_SVE (and
+sync it to fpsimd) in syscall_trace_enter()?
 
+> +	if (test_tsk_thread_flag(target, TIF_SVE_VL_INHERIT))
+> +		header->flags |= SVE_PT_VL_INHERIT;
+> +
+> +	header->vl = target->thread.sve_vl;
+> +	vq = sve_vq_from_vl(header->vl);
+> +
+> +	header->max_vl = sve_max_vl;
+> +	if (WARN_ON(!sve_vl_valid(sve_max_vl)))
+> +		header->max_vl = header->vl;
+> +
+> +	header->size = SVE_PT_SIZE(vq, header->flags);
+> +	header->max_size = SVE_PT_SIZE(sve_vq_from_vl(header->max_vl),
+> +				      SVE_PT_REGS_SVE);
+> +}
+[...]
+> +static int sve_set(struct task_struct *target,
+> +		   const struct user_regset *regset,
+> +		   unsigned int pos, unsigned int count,
+> +		   const void *kbuf, const void __user *ubuf)
+> +{
+> +	int ret;
+> +	struct user_sve_header header;
+> +	unsigned int vq;
+> +	unsigned long start, end;
+> +
+> +	if (!system_supports_sve())
+> +		return -EINVAL;
+> +
+> +	/* Header */
+> +	if (count < sizeof(header))
+> +		return -EINVAL;
+> +	ret = user_regset_copyin(&pos, &count, &kbuf, &ubuf, &header,
+> +				 0, sizeof(header));
+> +	if (ret)
+> +		goto out;
+> +
+> +	/*
+> +	 * Apart from PT_SVE_REGS_MASK, all PT_SVE_* flags are consumed by
+> +	 * sve_set_vector_length(), which will also validate them for us:
+> +	 */
+> +	ret = sve_set_vector_length(target, header.vl,
+> +		((unsigned long)header.flags & ~SVE_PT_REGS_MASK) << 16);
+> +	if (ret)
+> +		goto out;
+> +
+> +	/* Actual VL set may be less than the user asked for: */
+> +	vq = sve_vq_from_vl(target->thread.sve_vl);
+> +
+> +	/* Registers: FPSIMD-only case */
+> +
+> +	BUILD_BUG_ON(SVE_PT_FPSIMD_OFFSET != sizeof(header));
+> +	if ((header.flags & SVE_PT_REGS_MASK) == SVE_PT_REGS_FPSIMD) {
+> +		sve_sync_to_fpsimd(target);
+> +
+> +		ret = __fpr_set(target, regset, pos, count, kbuf, ubuf,
+> +				SVE_PT_FPSIMD_OFFSET);
+> +		clear_tsk_thread_flag(target, TIF_SVE);
+> +		goto out;
+> +	}
 
-> > +	__sysreg_restore_host_state(host_ctxt);
-> > +
-> >  	panic(__hyp_panic_string,
-> >  	      spsr,  elr,
-> >  	      read_sysreg_el2(esr),   read_sysreg_el2(far),
-> >  	      read_sysreg(hpfar_el2), par, vcpu);
-> >  }
-> >  
-> > -static hyp_alternate_select(__hyp_call_panic,
-> > -			    __hyp_call_panic_nvhe, __hyp_call_panic_vhe,
-> > -			    ARM64_HAS_VIRT_HOST_EXTN);
-> > -
-> >  void __hyp_text __noreturn hyp_panic(struct kvm_cpu_context *__host_ctxt)
-> >  {
-> > -	struct kvm_vcpu *vcpu = NULL;
-> > -
-> >  	u64 spsr = read_sysreg_el2(spsr);
-> >  	u64 elr = read_sysreg_el2(elr);
-> >  	u64 par = read_sysreg(par_el1);
-> >  
-> > -	if (read_sysreg(vttbr_el2)) {
-> > -		struct kvm_cpu_context *host_ctxt;
-> > -
-> > -		host_ctxt = __host_ctxt;
-> > -		vcpu = host_ctxt->__hyp_running_vcpu;
-> > -		__timer_disable_traps(vcpu);
-> > -		__deactivate_traps(vcpu);
-> > -		__deactivate_vm(vcpu);
-> > -		__sysreg_restore_host_state(host_ctxt);
-> > -	}
-> > -
-> > -	/* Call panic for real */
-> > -	__hyp_call_panic()(spsr, elr, par, vcpu);
-> > +	if (!has_vhe())
-> > +		__hyp_call_panic_nvhe(spsr, elr, par, __host_ctxt);
-> > +	else
-> > +		__hyp_call_panic_vhe(spsr, elr, par, __host_ctxt);
-> >  
-> >  	unreachable();
-> >  }
-> > 
-> 
-> Otherwise looks good.
-> 
+__fpr_set() already calls sve_sync_to_fpsimd(). Anyway, do you actually
+need this since we are going to override the FPSIMD state anyway here.
 
-Thanks,
--Christoffer
+> +
+> +	/* Otherwise: full SVE case */
+> +
+> +	/*
+> +	 * If setting a different VL from the requested VL and there is
+> +	 * register data, the data layout will be wrong: don't even
+> +	 * try to set the registers in this case.
+> +	 */
+> +	if (count && vq != sve_vq_from_vl(header.vl)) {
+> +		ret = -EIO;
+> +		goto out;
+> +	}
+> +
+> +	sve_alloc(target);
+> +	fpsimd_sync_to_sve(target);
+
+Similarly here, it's a full SVE case, so we are going to override it
+anyway.
+
+> +	set_tsk_thread_flag(target, TIF_SVE);
+
+This has the side-effect of enabling TIF_SVE even for PTRACE_SYSCALL
+which may be cleared in some circumstances. It may not be an issue
+though.
+
+-- 
+Catalin
