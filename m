@@ -1,24 +1,25 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH 15/37] KVM: arm64: Don't deactivate VM on VHE systems
-Date: Thu, 12 Oct 2017 12:41:19 +0200
-Message-ID: <20171012104141.26902-16-christoffer.dall@linaro.org>
+Subject: [PATCH 22/37] KVM: arm64: Change 32-bit handling of VM system
+ registers
+Date: Thu, 12 Oct 2017 12:41:26 +0200
+Message-ID: <20171012104141.26902-23-christoffer.dall@linaro.org>
 References: <20171012104141.26902-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C3A749D44
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6408749D4F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id a4+9Fx6x+YZk for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Oct 2017 06:41:19 -0400 (EDT)
-Received: from mail-wm0-f43.google.com (mail-wm0-f43.google.com [74.125.82.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BF6E149D78
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:18 -0400 (EDT)
-Received: by mail-wm0-f43.google.com with SMTP id q124so11980461wmb.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 03:42:03 -0700 (PDT)
+ with ESMTP id eTtcToK4mw8a for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Oct 2017 06:41:30 -0400 (EDT)
+Received: from mail-wm0-f51.google.com (mail-wm0-f51.google.com [74.125.82.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DFE9D49D31
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:28 -0400 (EDT)
+Received: by mail-wm0-f51.google.com with SMTP id b189so11865601wmd.4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 03:42:13 -0700 (PDT)
 In-Reply-To: <20171012104141.26902-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,42 +34,81 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-There is no need to reset the VTTBR to zero when exiting the guest on
-VHE systems.  VHE systems don't use stage 2 translations for the EL2&0
-translation regime used by the host.
+We currently handle 32-bit accesses to trapped VM system registers using
+the 32-bit index into the coproc array on the vcpu structure, which is a
+union of the coprog array and the sysreg array.
+
+Since all the 32-bit coproc indicies are created to correspond to the
+architectural mapping between 64-bit system registers and 32-bit
+coprocessor registers, and because the AArch64 system registers are the
+double in size of the AArch32 coprocessor registers, we can always find
+the system register entry that we must update by dividing the 32-bit
+coproc index by 2.
+
+This is going to make our lives much easier when we have to start
+accessing system registers that uses deferred save/restore and might
+have to be read directly from the physical CPU.
 
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/kvm/hyp/switch.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  8 --------
+ arch/arm64/kvm/sys_regs.c         | 20 +++++++++++++++-----
+ 2 files changed, 15 insertions(+), 13 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index b72dc66..2cedf12 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -136,13 +136,13 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
- 	write_sysreg(0, pmuserenr_el0);
- }
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 5e09eb9..9f5761f 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -289,14 +289,6 @@ struct kvm_vcpu_arch {
+ #define vcpu_cp14(v,r)		((v)->arch.ctxt.copro[(r)])
+ #define vcpu_cp15(v,r)		((v)->arch.ctxt.copro[(r)])
  
--static void __hyp_text __activate_vm(struct kvm_vcpu *vcpu)
-+static inline void __hyp_text __activate_vm(struct kvm_vcpu *vcpu)
+-#ifdef CONFIG_CPU_BIG_ENDIAN
+-#define vcpu_cp15_64_high(v,r)	vcpu_cp15((v),(r))
+-#define vcpu_cp15_64_low(v,r)	vcpu_cp15((v),(r) + 1)
+-#else
+-#define vcpu_cp15_64_high(v,r)	vcpu_cp15((v),(r) + 1)
+-#define vcpu_cp15_64_low(v,r)	vcpu_cp15((v),(r))
+-#endif
+-
+ struct kvm_vm_stat {
+ 	ulong remote_tlb_flush;
+ };
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index bb0e41b..dbe35fd 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -120,16 +120,26 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
+ 			  const struct sys_reg_desc *r)
  {
- 	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
- 	write_sysreg(kvm->arch.vttbr, vttbr_el2);
- }
+ 	bool was_enabled = vcpu_has_cache_enabled(vcpu);
++	u64 val;
++	int reg = r->reg;
  
--static void __hyp_text __deactivate_vm(struct kvm_vcpu *vcpu)
-+static inline void __hyp_text __deactivate_vm(struct kvm_vcpu *vcpu)
- {
- 	write_sysreg(0, vttbr_el2);
- }
-@@ -360,7 +360,6 @@ int kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	__vgic_save_state(vcpu);
+ 	BUG_ON(!p->is_write);
  
- 	__deactivate_traps(vcpu);
--	__deactivate_vm(vcpu);
+-	if (!p->is_aarch32) {
+-		vcpu_sys_reg(vcpu, r->reg) = p->regval;
++	/* See the 32bit mapping in kvm_host.h */
++	if (p->is_aarch32)
++		reg = r->reg / 2;
++
++	if (!p->is_aarch32 || !p->is_32bit) {
++		val = p->regval;
+ 	} else {
+-		if (!p->is_32bit)
+-			vcpu_cp15_64_high(vcpu, r->reg) = upper_32_bits(p->regval);
+-		vcpu_cp15_64_low(vcpu, r->reg) = lower_32_bits(p->regval);
++		val = vcpu_sys_reg(vcpu, reg);
++		if (r->reg % 2)
++			val = (p->regval << 32) | (u64)lower_32_bits(val);
++		else
++			val = ((u64)upper_32_bits(val) << 32) |
++				(u64)lower_32_bits(p->regval);
+ 	}
++	vcpu_sys_reg(vcpu, reg) = val;
  
- 	__sysreg_restore_host_state(host_ctxt);
- 
+ 	kvm_toggle_cache(vcpu, was_enabled);
+ 	return true;
 -- 
 2.9.0
