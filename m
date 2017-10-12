@@ -1,25 +1,25 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH 09/37] KVM: arm64: Move debug dirty flag calculation out of
- world switch
-Date: Thu, 12 Oct 2017 12:41:13 +0200
-Message-ID: <20171012104141.26902-10-christoffer.dall@linaro.org>
+Subject: [PATCH 07/37] KVM: arm/arm64: Add kvm_vcpu_load_sysregs and
+ kvm_vcpu_put_sysregs
+Date: Thu, 12 Oct 2017 12:41:11 +0200
+Message-ID: <20171012104141.26902-8-christoffer.dall@linaro.org>
 References: <20171012104141.26902-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0713F49D43
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 79F2E49D96
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IpeVPGM0Q5Am for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Oct 2017 06:41:11 -0400 (EDT)
-Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 00D1049D7B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:10 -0400 (EDT)
-Received: by mail-wm0-f42.google.com with SMTP id i124so11856472wmf.3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 03:41:55 -0700 (PDT)
+ with ESMTP id NFAP9KGYOeCy for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Oct 2017 06:41:09 -0400 (EDT)
+Received: from mail-wm0-f53.google.com (mail-wm0-f53.google.com [74.125.82.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7CCC649D87
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:08 -0400 (EDT)
+Received: by mail-wm0-f53.google.com with SMTP id m72so11976983wmc.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 03:41:52 -0700 (PDT)
 In-Reply-To: <20171012104141.26902-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,53 +34,95 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-There is no need to figure out inside the world-switch if we should
-save/restore the debug registers or not, we can might as well do that in
-the higher level debug setup code, making it easier to optimize down the
-line.
+As we are about to move a buch of save/restore logic for VHE kernels to
+the load and put functions, we need some infrastructure to do this.
 
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/kvm/debug.c        | 9 +++++++++
- arch/arm64/kvm/hyp/debug-sr.c | 6 ------
- 2 files changed, 9 insertions(+), 6 deletions(-)
+ arch/arm/include/asm/kvm_host.h   |  3 +++
+ arch/arm64/include/asm/kvm_host.h |  3 +++
+ arch/arm64/kvm/hyp/sysreg-sr.c    | 27 +++++++++++++++++++++++++++
+ virt/kvm/arm/arm.c                |  2 ++
+ 4 files changed, 35 insertions(+)
 
-diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-index dbadfaf..62550de19 100644
---- a/arch/arm64/kvm/debug.c
-+++ b/arch/arm64/kvm/debug.c
-@@ -193,6 +193,15 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
- 	if (trap_debug)
- 		vcpu->arch.mdcr_el2 |= MDCR_EL2_TDA;
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index 1100170..13f8165 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -290,4 +290,7 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+ 			       struct kvm_device_attr *attr);
  
-+	/*
-+	 * If any of KDE, MDE or KVM_ARM64_DEBUG_DIRTY is set, perform
-+	 * a full save/restore cycle.
-+	 */
-+	if ((vcpu_sys_reg(vcpu, MDSCR_EL1) & DBG_MDSCR_KDE) ||
-+	    (vcpu_sys_reg(vcpu, MDSCR_EL1) & DBG_MDSCR_MDE))
-+		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
++static inline void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu) {}
++static inline void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu) {}
 +
-+
- 	trace_kvm_arm_set_dreg32("MDCR_EL2", vcpu->arch.mdcr_el2);
- 	trace_kvm_arm_set_dreg32("MDSCR_EL1", vcpu_sys_reg(vcpu, MDSCR_EL1));
+ #endif /* __ARM_KVM_HOST_H__ */
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 27305e7..7d3bfa7 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -383,4 +383,7 @@ static inline void __cpu_init_stage2(void)
+ 		  "PARange is %d bits, unsupported configuration!", parange);
  }
-diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
-index f5154ed..0fc0758 100644
---- a/arch/arm64/kvm/hyp/debug-sr.c
-+++ b/arch/arm64/kvm/hyp/debug-sr.c
-@@ -172,12 +172,6 @@ void __hyp_text __debug_restore_state(struct kvm_vcpu *vcpu,
  
- void __hyp_text __debug_cond_save_host_state(struct kvm_vcpu *vcpu)
- {
--	/* If any of KDE, MDE or KVM_ARM64_DEBUG_DIRTY is set, perform
--	 * a full save/restore cycle. */
--	if ((vcpu->arch.ctxt.sys_regs[MDSCR_EL1] & DBG_MDSCR_KDE) ||
--	    (vcpu->arch.ctxt.sys_regs[MDSCR_EL1] & DBG_MDSCR_MDE))
--		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
--
- 	__debug_save_state(vcpu, &vcpu->arch.host_debug_state.regs,
- 			   kern_hyp_va(vcpu->arch.host_cpu_context));
- 	__debug_save_spe()(&vcpu->arch.host_debug_state.pmscr_el1);
++void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu);
++void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu);
++
+ #endif /* __ARM64_KVM_HOST_H__ */
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index c54cc2a..b7438c8 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -183,3 +183,30 @@ void __hyp_text __sysreg32_restore_state(struct kvm_vcpu *vcpu)
+ 	if (vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY)
+ 		write_sysreg(sysreg[DBGVCR32_EL2], dbgvcr32_el2);
+ }
++
++/**
++ * kvm_vcpu_load_sysregs - Load guest system register to physical CPU
++ *
++ * @vcpu: The VCPU pointer
++ *
++ * If the kernel runs in EL2 then load the system register state for the VCPU
++ * for EL1 onto the physical CPU so that we can go back and foward between the
++ * VM and the hypervisor without switching all this state around.
++ */
++void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu)
++{
++}
++
++/**
++ * kvm_vcpu_put_sysregs - Restore host system register state to physical CPU
++ *
++ * @vcpu: The VCPU pointer
++ *
++ * If the kernel runs in EL2 and the physical register state belongs to the
++ * VCPU, then restore the system register state for the host for EL1 onto the
++ * physical CPU so that we can run userspace and other threads on this
++ * physical CPU.
++ */
++void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu)
++{
++}
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index d495453..cf121b2 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -358,6 +358,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	kvm_arm_set_running_vcpu(vcpu);
+ 	kvm_vgic_load(vcpu);
+ 	kvm_timer_vcpu_load(vcpu);
++	kvm_vcpu_load_sysregs(vcpu);
+ }
+ 
+ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+@@ -365,6 +366,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+ 	if (vcpu->ioctl != KVM_RUN)
+ 		return;
+ 
++	kvm_vcpu_put_sysregs(vcpu);
+ 	kvm_timer_vcpu_put(vcpu);
+ 	kvm_vgic_put(vcpu);
+ 
 -- 
 2.9.0
