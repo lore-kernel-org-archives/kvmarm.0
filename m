@@ -1,137 +1,169 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 02/37] KVM: arm64: Rework hyp_panic for VHE and non-VHE
-Date: Thu, 12 Oct 2017 16:55:16 +0100
-Message-ID: <313239e5-d755-95b6-4db7-6dafe2027155@arm.com>
-References: <20171012104141.26902-1-christoffer.dall@linaro.org>
- <20171012104141.26902-3-christoffer.dall@linaro.org>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH v3 11/28] arm64/sve: Core task context handling
+Date: Thu, 12 Oct 2017 17:05:07 +0100
+Message-ID: <20171012160506.GH19485@e103592.cambridge.arm.com>
+References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
+ <1507660725-7986-12-git-send-email-Dave.Martin@arm.com>
+ <20171011161558.ts7adaryabttg47z@armageddon.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20171012104141.26902-3-christoffer.dall@linaro.org>
-Content-Language: en-GB
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Shih-Wei Li <shihwei@cs.columbia.edu>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-arch-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20171011161558.ts7adaryabttg47z@armageddon.cambridge.arm.com>
+Sender: linux-arch-owner@vger.kernel.org
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Will Deacon <will.deacon@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 12/10/17 11:41, Christoffer Dall wrote:
-> VHE actually doesn't rely on clearing the VTTBR when returning to the
-> hsot kernel, and that is the current key mechanism of hyp_panic to
-
-host
-
-> figure out how to attempt to return to a state good enough to print a
-> panic statement.
+On Wed, Oct 11, 2017 at 05:15:58PM +0100, Catalin Marinas wrote:
+> On Tue, Oct 10, 2017 at 07:38:28PM +0100, Dave P Martin wrote:
+> > diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
+> > index 026a7c7..b1409de 100644
+> > --- a/arch/arm64/include/asm/fpsimd.h
+> > +++ b/arch/arm64/include/asm/fpsimd.h
+> > @@ -72,6 +75,20 @@ extern void sve_load_state(void const *state, u32 const *pfpsr,
+> >  			   unsigned long vq_minus_1);
+> >  extern unsigned int sve_get_vl(void);
+> >  
+> > +#ifdef CONFIG_ARM64_SVE
+> > +
+> > +extern size_t sve_state_size(struct task_struct const *task);
+> > +
+> > +extern void sve_alloc(struct task_struct *task);
+> > +extern void fpsimd_release_thread(struct task_struct *task);
+> > +
+> > +#else /* ! CONFIG_ARM64_SVE */
+> > +
+> > +static void __maybe_unused sve_alloc(struct task_struct *task) { }
+> > +static void __maybe_unused fpsimd_release_thread(struct task_struct *task) { }
 > 
-> Therefore, we split the hyp_panic function into two functions, a VHE and
-> a non-VHE, keeping the non-VHE version intact, but changing the VHE
-> behavior.
+> Nitpick: usually we just add static inline functions here rather than
+> __maybe_unused.
+
+Fair enough -- come to think of it I've already converted some other
+instances of this at Ard's request.
+
 > 
-> The vttbr_el2 check on VHE doesn't really make that much sense, because
-> the only situation where we can get here on VHE is when the hypervisor
-> assembly code actually caleld into hyp_panic, which only happens when
-
-called
-
-> VBAR_EL2 has been set to the KVM exception vectors.  On VHE, we can
-> always safely disable the traps and restore the host registers at this
-> point, so we simply do that unconditionally and call into the panic
-> function directly.
+> > diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
+> > index 29adab8..4831d28 100644
+> > --- a/arch/arm64/include/asm/processor.h
+> > +++ b/arch/arm64/include/asm/processor.h
+> > @@ -39,6 +47,8 @@
+> >  #define FPEXC_IDF	(1 << 7)
+> >  
+> >  /*
+> > + * (Note: in this discussion, statements about FPSIMD apply equally to SVE.)
+> > + *
+> >   * In order to reduce the number of times the FPSIMD state is needlessly saved
+> >   * and restored, we need to keep track of two things:
+> >   * (a) for each task, we need to remember which CPU was the last one to have
+> > @@ -99,6 +109,287 @@
+> >   */
+> >  static DEFINE_PER_CPU(struct fpsimd_state *, fpsimd_last_state);
+> >  
+> > +static void sve_free(struct task_struct *task)
+> > +{
+> > +	kfree(task->thread.sve_state);
+> > +	task->thread.sve_state = NULL;
+> > +}
 > 
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> ---
->  arch/arm64/kvm/hyp/switch.c | 45 +++++++++++++++++++++++----------------------
->  1 file changed, 23 insertions(+), 22 deletions(-)
+> I think we need a WARN_ON if TIF_SVE is still set here (and the callers
+> making sure it is cleared). I haven't checked the code paths via
+> fpsimd_release_thread() but wondering what happens if we get an
+> interrupt between freeing the state and making the pointer NULL, with
+> some context switching in a preemptible kernel.
+
+Having a WARN_ON() here may be a decent way to sanity-check that we
+don't ever have sve_state NULL with TIF_SVE set.  This is a lot more
+economical than putting a WARN_ON() at each dereference of sve_state
+(of which there are quite a few).  sve_free() is also a slow path.
+
+Currently, there are two callsites: sve_set_vector_length(), where we
+test_and_clear_tsk_thread_flags(task, TIF_SVE) before calling sve_free();
+and fpsimd_release_thread() where we "don't care" because the thread
+is dying.
+
+Looking more closely though, is the release_thread() path preemptible?
+I can't see anything in the scheduler core to ensure this, nor any
+general reason why it should be needed.
+
+In which case preemption during thread exit after sve_free() could
+result in a NULL deference in fpsimd_thread_switch().
+
+
+So, I think my favoured approach is:
+
+sve_release_thread()
+{
+	local_bh_disable();
+	fpsimd_flush_task_state(current);
+	clear_thread_flag(TIF_SVE);
+	local_bh_enable();
+
+	sve_free();
+}
+
+The local_bh stuff is cumbersome here, and could be replaced with
+barrier()s to force the order of fpsimd_flusk_task_state() versus
+clearing TIF_SVE.  Or should the barrier really be in
+fpsimd_flush_task_state()?  Disabling softirqs avoids the need to answer
+such questions...
+
+
+Then:
+
+sve_free(task)
+{
+	WARN_ON(test_thread_flag(TIF_SVE));
+
+	barrier();
+	kfree(task->thread.sve_state);
+	tash->thread.sve_state = NULL;
+}
+
+I'm assuming here that kfree() can't be called safely from atomic
+context, but this is unclear.  I would expect to be able to free
+GFP_ATOMIC memory from atomic context (though sve_statue is GFP_KERNEL,
+so dunno).
+
+> Alternatively, always clear TIF_SVE here before freeing (also wondering
+> whether we should make sve_state NULL before the actual freeing but I
+> think TIF_SVE clearing should suffice).
+
+Could do.  I feel that the current placement of the TIF_SVE clearing in
+sve_set_vector_length() feels "more natural", but this is a pretty
+flimsy argument.  How strongly do you feel about this?
+
+[...]
+
+> > + *  * TIF_SVE set:
+
+[...]
+
+> > + *  * TIF_SVE clear:
+> > + *
+> > + *    An attempt by the user task to execute an SVE instruction causes
+> > + *    do_sve_acc() to be called, which does some preparation and then
+> > + *    sets TIF_SVE.
+> > + *
+> > + *    When stored, FPSIMD registers V0-V31 are encoded in
+> > + *    task->fpsimd_state; bits [max : 128] for each of Z0-Z31 are
+> > + *    logically zero but not stored anywhere; P0-P15 and FFR are not
+> > + *    stored and have unspecified values from userspace's point of
+> > + *    view.  For hygiene purposes, the kernel zeroes them on next use,
+> > + *    but userspace is discouraged from relying on this.
+> > + *
+> > + *    task->thread.sve_state does not need to be non-NULL, valid or any
+> > + *    particular size: it must not be dereferenced.
+> > + *
+> > + *  * FPSR and FPCR are always stored in task->fpsimd_state irrespctive of
+> > + *    whether TIF_SVE is clear or set, since these are not vector length
+> > + *    dependent.
+> > + */
 > 
-> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> index a0123ad..a50ddf3 100644
-> --- a/arch/arm64/kvm/hyp/switch.c
-> +++ b/arch/arm64/kvm/hyp/switch.c
-> @@ -394,10 +394,20 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
->  static const char __hyp_panic_string[] = "HYP panic:\nPS:%08llx PC:%016llx ESR:%08llx\nFAR:%016llx HPFAR:%016llx PAR:%016llx\nVCPU:%p\n";
->  
->  static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par,
-> -					     struct kvm_vcpu *vcpu)
-> +					     struct kvm_cpu_context *__host_ctxt)
->  {
-> +	struct kvm_vcpu *vcpu;
->  	unsigned long str_va;
->  
-> +	vcpu = __host_ctxt->__hyp_running_vcpu;
-> +
-> +	if (read_sysreg(vttbr_el2)) {
-> +		__timer_disable_traps(vcpu);
-> +		__deactivate_traps(vcpu);
-> +		__deactivate_vm(vcpu);
-> +		__sysreg_restore_host_state(__host_ctxt);
-> +	}
-> +
->  	/*
->  	 * Force the panic string to be loaded from the literal pool,
->  	 * making sure it is a kernel address and not a PC-relative
-> @@ -411,40 +421,31 @@ static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par,
->  		       read_sysreg(hpfar_el2), par, vcpu);
->  }
->  
-> -static void __hyp_text __hyp_call_panic_vhe(u64 spsr, u64 elr, u64 par,
-> -					    struct kvm_vcpu *vcpu)
-> +static void __hyp_call_panic_vhe(u64 spsr, u64 elr, u64 par,
-> +				 struct kvm_cpu_context *host_ctxt)
->  {
-> +	struct kvm_vcpu *vcpu;
-> +	vcpu = host_ctxt->__hyp_running_vcpu;
-> +
-> +	__deactivate_traps_vhe();
+> This looks fine, thanks for adding the description.
 
-Is there a reason why we can't just call __deactivate_traps(), rather
-than the VHE-specific subset? It doesn't really matter, as we're about
-to panic, but still...
+OK, thanks for checking it.
 
-> +	__sysreg_restore_host_state(host_ctxt);
-> +
->  	panic(__hyp_panic_string,
->  	      spsr,  elr,
->  	      read_sysreg_el2(esr),   read_sysreg_el2(far),
->  	      read_sysreg(hpfar_el2), par, vcpu);
->  }
->  
-> -static hyp_alternate_select(__hyp_call_panic,
-> -			    __hyp_call_panic_nvhe, __hyp_call_panic_vhe,
-> -			    ARM64_HAS_VIRT_HOST_EXTN);
-> -
->  void __hyp_text __noreturn hyp_panic(struct kvm_cpu_context *__host_ctxt)
->  {
-> -	struct kvm_vcpu *vcpu = NULL;
-> -
->  	u64 spsr = read_sysreg_el2(spsr);
->  	u64 elr = read_sysreg_el2(elr);
->  	u64 par = read_sysreg(par_el1);
->  
-> -	if (read_sysreg(vttbr_el2)) {
-> -		struct kvm_cpu_context *host_ctxt;
-> -
-> -		host_ctxt = __host_ctxt;
-> -		vcpu = host_ctxt->__hyp_running_vcpu;
-> -		__timer_disable_traps(vcpu);
-> -		__deactivate_traps(vcpu);
-> -		__deactivate_vm(vcpu);
-> -		__sysreg_restore_host_state(host_ctxt);
-> -	}
-> -
-> -	/* Call panic for real */
-> -	__hyp_call_panic()(spsr, elr, par, vcpu);
-> +	if (!has_vhe())
-> +		__hyp_call_panic_nvhe(spsr, elr, par, __host_ctxt);
-> +	else
-> +		__hyp_call_panic_vhe(spsr, elr, par, __host_ctxt);
->  
->  	unreachable();
->  }
-> 
-
-Otherwise looks good.
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Cheers
+---Dave
