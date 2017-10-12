@@ -1,25 +1,25 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH 10/37] KVM: arm64: Slightly improve debug save/restore
- functions
-Date: Thu, 12 Oct 2017 12:41:14 +0200
-Message-ID: <20171012104141.26902-11-christoffer.dall@linaro.org>
+Subject: [PATCH 09/37] KVM: arm64: Move debug dirty flag calculation out of
+ world switch
+Date: Thu, 12 Oct 2017 12:41:13 +0200
+Message-ID: <20171012104141.26902-10-christoffer.dall@linaro.org>
 References: <20171012104141.26902-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 669D849D24
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0713F49D43
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 62QpU0o1ysuP for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Oct 2017 06:41:13 -0400 (EDT)
-Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4DDA849D43
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:12 -0400 (EDT)
-Received: by mail-wm0-f45.google.com with SMTP id i124so11856616wmf.3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 03:41:56 -0700 (PDT)
+ with ESMTP id IpeVPGM0Q5Am for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Oct 2017 06:41:11 -0400 (EDT)
+Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 00D1049D7B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:10 -0400 (EDT)
+Received: by mail-wm0-f42.google.com with SMTP id i124so11856472wmf.3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 03:41:55 -0700 (PDT)
 In-Reply-To: <20171012104141.26902-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,76 +34,53 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The debug save/restore functions can be improved by using the has_vhe()
-static key instead of the instruction alternative.  Using the static key
-uses the same paradigm as we're going to use elsewhere, it makes the
-code more readable, and it generates slightly better code (no
-stack setups and function calls unless necessary).
-
-We also use a static key on the restore path, because it will be
-marginally faster than loading a value from memory.
-
-Finally, we don't have to conditionally clear the debug dirty flag if
-it's set, we can just clear it.
+There is no need to figure out inside the world-switch if we should
+save/restore the debug registers or not, we can might as well do that in
+the higher level debug setup code, making it easier to optimize down the
+line.
 
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/kvm/hyp/debug-sr.c | 22 +++++++++-------------
- 1 file changed, 9 insertions(+), 13 deletions(-)
+ arch/arm64/kvm/debug.c        | 9 +++++++++
+ arch/arm64/kvm/hyp/debug-sr.c | 6 ------
+ 2 files changed, 9 insertions(+), 6 deletions(-)
 
+diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+index dbadfaf..62550de19 100644
+--- a/arch/arm64/kvm/debug.c
++++ b/arch/arm64/kvm/debug.c
+@@ -193,6 +193,15 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+ 	if (trap_debug)
+ 		vcpu->arch.mdcr_el2 |= MDCR_EL2_TDA;
+ 
++	/*
++	 * If any of KDE, MDE or KVM_ARM64_DEBUG_DIRTY is set, perform
++	 * a full save/restore cycle.
++	 */
++	if ((vcpu_sys_reg(vcpu, MDSCR_EL1) & DBG_MDSCR_KDE) ||
++	    (vcpu_sys_reg(vcpu, MDSCR_EL1) & DBG_MDSCR_MDE))
++		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
++
++
+ 	trace_kvm_arm_set_dreg32("MDCR_EL2", vcpu->arch.mdcr_el2);
+ 	trace_kvm_arm_set_dreg32("MDSCR_EL1", vcpu_sys_reg(vcpu, MDSCR_EL1));
+ }
 diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
-index 0fc0758..a2291b6 100644
+index f5154ed..0fc0758 100644
 --- a/arch/arm64/kvm/hyp/debug-sr.c
 +++ b/arch/arm64/kvm/hyp/debug-sr.c
-@@ -75,11 +75,6 @@
+@@ -172,12 +172,6 @@ void __hyp_text __debug_restore_state(struct kvm_vcpu *vcpu,
  
- #define psb_csync()		asm volatile("hint #17")
- 
--static void __hyp_text __debug_save_spe_vhe(u64 *pmscr_el1)
--{
--	/* The vcpu can run. but it can't hide. */
--}
+ void __hyp_text __debug_cond_save_host_state(struct kvm_vcpu *vcpu)
+ {
+-	/* If any of KDE, MDE or KVM_ARM64_DEBUG_DIRTY is set, perform
+-	 * a full save/restore cycle. */
+-	if ((vcpu->arch.ctxt.sys_regs[MDSCR_EL1] & DBG_MDSCR_KDE) ||
+-	    (vcpu->arch.ctxt.sys_regs[MDSCR_EL1] & DBG_MDSCR_MDE))
+-		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
 -
- static void __hyp_text __debug_save_spe_nvhe(u64 *pmscr_el1)
- {
- 	u64 reg;
-@@ -109,10 +104,6 @@ static void __hyp_text __debug_save_spe_nvhe(u64 *pmscr_el1)
- 	dsb(nsh);
- }
- 
--static hyp_alternate_select(__debug_save_spe,
--			    __debug_save_spe_nvhe, __debug_save_spe_vhe,
--			    ARM64_HAS_VIRT_HOST_EXTN);
--
- static void __hyp_text __debug_restore_spe(u64 pmscr_el1)
- {
- 	if (!pmscr_el1)
-@@ -174,17 +165,22 @@ void __hyp_text __debug_cond_save_host_state(struct kvm_vcpu *vcpu)
- {
  	__debug_save_state(vcpu, &vcpu->arch.host_debug_state.regs,
  			   kern_hyp_va(vcpu->arch.host_cpu_context));
--	__debug_save_spe()(&vcpu->arch.host_debug_state.pmscr_el1);
-+
-+	/* Non-VHE: Disable and flush SPE data generation
-+	 * VHE: The vcpu can run. but it can't hide. */
-+	if (!has_vhe())
-+		__debug_save_spe_nvhe(&vcpu->arch.host_debug_state.pmscr_el1);
- }
- 
- void __hyp_text __debug_cond_restore_host_state(struct kvm_vcpu *vcpu)
- {
--	__debug_restore_spe(vcpu->arch.host_debug_state.pmscr_el1);
-+	if (!has_vhe())
-+		__debug_restore_spe(vcpu->arch.host_debug_state.pmscr_el1);
-+
- 	__debug_restore_state(vcpu, &vcpu->arch.host_debug_state.regs,
- 			      kern_hyp_va(vcpu->arch.host_cpu_context));
- 
--	if (vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY)
--		vcpu->arch.debug_flags &= ~KVM_ARM64_DEBUG_DIRTY;
-+	vcpu->arch.debug_flags &= ~KVM_ARM64_DEBUG_DIRTY;
- }
- 
- u32 __hyp_text __kvm_get_mdcr_el2(void)
+ 	__debug_save_spe()(&vcpu->arch.host_debug_state.pmscr_el1);
 -- 
 2.9.0
