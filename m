@@ -1,25 +1,24 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH 05/37] KVM: Record the executing ioctl number on the vcpu
- struct
-Date: Thu, 12 Oct 2017 12:41:09 +0200
-Message-ID: <20171012104141.26902-6-christoffer.dall@linaro.org>
+Subject: [PATCH 04/37] KVM: arm/arm64: Get rid of vcpu->arch.irq_lines
+Date: Thu, 12 Oct 2017 12:41:08 +0200
+Message-ID: <20171012104141.26902-5-christoffer.dall@linaro.org>
 References: <20171012104141.26902-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C643649D6F
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2627149D6C
  for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YY-GaoBojeh2 for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id Ux3YGXSJ6VyO for <kvmarm@lists.cs.columbia.edu>;
  Thu, 12 Oct 2017 06:41:05 -0400 (EDT)
-Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2A2F549D6D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:05 -0400 (EDT)
-Received: by mail-wm0-f49.google.com with SMTP id l68so12072539wmd.5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 03:41:49 -0700 (PDT)
+Received: from mail-wm0-f51.google.com (mail-wm0-f51.google.com [74.125.82.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CC4B049D5D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:03 -0400 (EDT)
+Received: by mail-wm0-f51.google.com with SMTP id q124so11978656wmb.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 03:41:48 -0700 (PDT)
 In-Reply-To: <20171012104141.26902-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,81 +30,219 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-U29tZSBhcmNoaXRlY3R1cmVzIG1heSBkZWNpZGUgdG8gZG8gZGlmZmVyZW50IHRoaW5ncyBkdXJp
-bmcKa3ZtX2FyY2hfdmNwdV9sb2FkIGRlcGVuZGluZyBvbiB0aGUgaW9jdGwgYmVpbmcgZXhlY3V0
-ZWQuICBGb3IgZXhhbXBsZSwKYXJtNjQgaXMgYWJvdXQgdG8gZG8gc2lnbmlmaWNhbnQgd29yayBp
-biB2Y3B1IGxvYWQvcHV0IHdoZW4gcnVubmluZyBhCnZjcHUsIGJ1dCBub3Qgd2hlbiBkb2luZyB0
-aGluZ3MgbGlrZSBLVk1fU0VUX09ORV9SRUcgb3IKS1ZNX1NFVF9NUF9TVEFURS4KClRoZXJlZm9y
-ZSwgc3RvcmUgdGhlIGlvY3RsIG51bWJlciB0aGF0IHdlIGFyZSBleGVjdXRpbmcgb24gdGhlIFZD
-UFUKZHVyaW5nIHRoZSBmaXJzdCB2Y3B1X2xvYWQoKSB3aGljaCBzdWNjZWVkcyBpbiBnZXR0aW5n
-IHRoZSB2Y3B1LT5tdXRleAphbmQgc2V0IHRoZSBpb2N0bCBudW1iZXIgdG8gMCB3aGVuIGV4aXRp
-bmcga3ZtX3ZjcHVfaW9jdGwoKSBhZnRlcgpzdWNjZXNzZnVsbHkgbG9hZGluZyB0aGUgdmNwdS4K
-CkNjOiBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPgpDYzogUmFkaW0gS3LEjW3D
-ocWZIDxya3JjbWFyQHJlZGhhdC5jb20+ClNpZ25lZC1vZmYtYnk6IENocmlzdG9mZmVyIERhbGwg
-PGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZz4KLS0tCiBhcmNoL3g4Ni9rdm0vdm14LmMgICAg
-ICAgfCAyICstCiBhcmNoL3g4Ni9rdm0veDg2LmMgICAgICAgfCA4ICsrKystLS0tCiBpbmNsdWRl
-L2xpbnV4L2t2bV9ob3N0LmggfCAzICsrLQogdmlydC9rdm0va3ZtX21haW4uYyAgICAgIHwgNiAr
-KysrLS0KIDQgZmlsZXMgY2hhbmdlZCwgMTEgaW5zZXJ0aW9ucygrKSwgOCBkZWxldGlvbnMoLSkK
-CmRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rdm0vdm14LmMgYi9hcmNoL3g4Ni9rdm0vdm14LmMKaW5k
-ZXggNjk3MDI0OS4uZDcyOTg4OSAxMDA2NDQKLS0tIGEvYXJjaC94ODYva3ZtL3ZteC5jCisrKyBi
-L2FyY2gveDg2L2t2bS92bXguYwpAQCAtOTQ5Myw3ICs5NDkzLDcgQEAgc3RhdGljIHZvaWQgdm14
-X2ZyZWVfdmNwdV9uZXN0ZWQoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQogICAgICAgIHN0cnVjdCB2
-Y3B1X3ZteCAqdm14ID0gdG9fdm14KHZjcHUpOwogICAgICAgIGludCByOwogCi0gICAgICAgciA9
-IHZjcHVfbG9hZCh2Y3B1KTsKKyAgICAgICByID0gdmNwdV9sb2FkKHZjcHUsIHZjcHUtPmlvY3Rs
-KTsKICAgICAgICBCVUdfT04ocik7CiAgICAgICAgdm14X3N3aXRjaF92bWNzKHZjcHUsICZ2bXgt
-PnZtY3MwMSk7CiAgICAgICAgZnJlZV9uZXN0ZWQodm14KTsKZGlmZiAtLWdpdCBhL2FyY2gveDg2
-L2t2bS94ODYuYyBiL2FyY2gveDg2L2t2bS94ODYuYwppbmRleCBjZDE3YjdkLi42OGQ5Yzk1IDEw
-MDY0NAotLS0gYS9hcmNoL3g4Ni9rdm0veDg2LmMKKysrIGIvYXJjaC94ODYva3ZtL3g4Ni5jCkBA
-IC03NzIzLDcgKzc3MjMsNyBAQCBpbnQga3ZtX2FyY2hfdmNwdV9zZXR1cChzdHJ1Y3Qga3ZtX3Zj
-cHUgKnZjcHUpCiAJaW50IHI7CiAKIAlrdm1fdmNwdV9tdHJyX2luaXQodmNwdSk7Ci0JciA9IHZj
-cHVfbG9hZCh2Y3B1KTsKKwlyID0gdmNwdV9sb2FkKHZjcHUsIHZjcHUtPmlvY3RsKTsKIAlpZiAo
-cikKIAkJcmV0dXJuIHI7CiAJa3ZtX3ZjcHVfcmVzZXQodmNwdSwgZmFsc2UpOwpAQCAtNzczOSw3
-ICs3NzM5LDcgQEAgdm9pZCBrdm1fYXJjaF92Y3B1X3Bvc3RjcmVhdGUoc3RydWN0IGt2bV92Y3B1
-ICp2Y3B1KQogCiAJa3ZtX2h2X3ZjcHVfcG9zdGNyZWF0ZSh2Y3B1KTsKIAotCWlmICh2Y3B1X2xv
-YWQodmNwdSkpCisJaWYgKHZjcHVfbG9hZCh2Y3B1LCB2Y3B1LT5pb2N0bCkpCiAJCXJldHVybjsK
-IAltc3IuZGF0YSA9IDB4MDsKIAltc3IuaW5kZXggPSBNU1JfSUEzMl9UU0M7CkBAIC03NzU5LDcg
-Kzc3NTksNyBAQCB2b2lkIGt2bV9hcmNoX3ZjcHVfZGVzdHJveShzdHJ1Y3Qga3ZtX3ZjcHUgKnZj
-cHUpCiAJaW50IHI7CiAJdmNwdS0+YXJjaC5hcGYubXNyX3ZhbCA9IDA7CiAKLQlyID0gdmNwdV9s
-b2FkKHZjcHUpOworCXIgPSB2Y3B1X2xvYWQodmNwdSwgdmNwdS0+aW9jdGwpOwogCUJVR19PTihy
-KTsKIAlrdm1fbW11X3VubG9hZCh2Y3B1KTsKIAl2Y3B1X3B1dCh2Y3B1KTsKQEAgLTgxMTYsNyAr
-ODExNiw3IEBAIGludCBrdm1fYXJjaF9pbml0X3ZtKHN0cnVjdCBrdm0gKmt2bSwgdW5zaWduZWQg
-bG9uZyB0eXBlKQogc3RhdGljIHZvaWQga3ZtX3VubG9hZF92Y3B1X21tdShzdHJ1Y3Qga3ZtX3Zj
-cHUgKnZjcHUpCiB7CiAJaW50IHI7Ci0JciA9IHZjcHVfbG9hZCh2Y3B1KTsKKwlyID0gdmNwdV9s
-b2FkKHZjcHUsIHZjcHUtPmlvY3RsKTsKIAlCVUdfT04ocik7CiAJa3ZtX21tdV91bmxvYWQodmNw
-dSk7CiAJdmNwdV9wdXQodmNwdSk7CmRpZmYgLS1naXQgYS9pbmNsdWRlL2xpbnV4L2t2bV9ob3N0
-LmggYi9pbmNsdWRlL2xpbnV4L2t2bV9ob3N0LmgKaW5kZXggNjg4MjUzOC4uZGEwYWNjMCAxMDA2
-NDQKLS0tIGEvaW5jbHVkZS9saW51eC9rdm1faG9zdC5oCisrKyBiL2luY2x1ZGUvbGludXgva3Zt
-X2hvc3QuaApAQCAtMjc0LDYgKzI3NCw3IEBAIHN0cnVjdCBrdm1fdmNwdSB7CiAJYm9vbCBwcmVl
-bXB0ZWQ7CiAJc3RydWN0IGt2bV92Y3B1X2FyY2ggYXJjaDsKIAlzdHJ1Y3QgZGVudHJ5ICpkZWJ1
-Z2ZzX2RlbnRyeTsKKwl1bnNpZ25lZCBpbnQgaW9jdGw7IC8qIGlvY3RsIGN1cnJlbnRseSBleGVj
-dXRpbmcgb3IgMCAqLwogfTsKIAogc3RhdGljIGlubGluZSBpbnQga3ZtX3ZjcHVfZXhpdGluZ19n
-dWVzdF9tb2RlKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKQEAgLTUzMyw3ICs1MzQsNyBAQCBzdGF0
-aWMgaW5saW5lIGludCBrdm1fdmNwdV9nZXRfaWR4KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKIGlu
-dCBrdm1fdmNwdV9pbml0KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgc3RydWN0IGt2bSAqa3ZtLCB1
-bnNpZ25lZCBpZCk7CiB2b2lkIGt2bV92Y3B1X3VuaW5pdChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUp
-OwogCi1pbnQgX19tdXN0X2NoZWNrIHZjcHVfbG9hZChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpOwor
-aW50IF9fbXVzdF9jaGVjayB2Y3B1X2xvYWQoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCB1bnNpZ25l
-ZCBpbnQgaW9jdGwpOwogdm9pZCB2Y3B1X3B1dChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpOwogCiAj
-aWZkZWYgX19LVk1fSEFWRV9JT0FQSUMKZGlmZiAtLWdpdCBhL3ZpcnQva3ZtL2t2bV9tYWluLmMg
-Yi92aXJ0L2t2bS9rdm1fbWFpbi5jCmluZGV4IDlkZWI1YTIuLjE5MTFlZjAgMTAwNjQ0Ci0tLSBh
-L3ZpcnQva3ZtL2t2bV9tYWluLmMKKysrIGIvdmlydC9rdm0va3ZtX21haW4uYwpAQCAtMTQ3LDEy
-ICsxNDcsMTMgQEAgYm9vbCBrdm1faXNfcmVzZXJ2ZWRfcGZuKGt2bV9wZm5fdCBwZm4pCiAvKgog
-ICogU3dpdGNoZXMgdG8gc3BlY2lmaWVkIHZjcHUsIHVudGlsIGEgbWF0Y2hpbmcgdmNwdV9wdXQo
-KQogICovCi1pbnQgdmNwdV9sb2FkKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKK2ludCB2Y3B1X2xv
-YWQoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCB1bnNpZ25lZCBpbnQgaW9jdGwpCiB7CiAJaW50IGNw
-dTsKIAogCWlmIChtdXRleF9sb2NrX2tpbGxhYmxlKCZ2Y3B1LT5tdXRleCkpCiAJCXJldHVybiAt
-RUlOVFI7CisJdmNwdS0+aW9jdGwgPSBpb2N0bDsKIAljcHUgPSBnZXRfY3B1KCk7CiAJcHJlZW1w
-dF9ub3RpZmllcl9yZWdpc3RlcigmdmNwdS0+cHJlZW1wdF9ub3RpZmllcik7CiAJa3ZtX2FyY2hf
-dmNwdV9sb2FkKHZjcHUsIGNwdSk7CkBAIC0yNTI5LDcgKzI1MzAsNyBAQCBzdGF0aWMgbG9uZyBr
-dm1fdmNwdV9pb2N0bChzdHJ1Y3QgZmlsZSAqZmlscCwKICNlbmRpZgogCiAKLQlyID0gdmNwdV9s
-b2FkKHZjcHUpOworCXIgPSB2Y3B1X2xvYWQodmNwdSwgaW9jdGwpOwogCWlmIChyKQogCQlyZXR1
-cm4gcjsKIAlzd2l0Y2ggKGlvY3RsKSB7CkBAIC0yNzA0LDYgKzI3MDUsNyBAQCBzdGF0aWMgbG9u
-ZyBrdm1fdmNwdV9pb2N0bChzdHJ1Y3QgZmlsZSAqZmlscCwKIAl9CiBvdXQ6CiAJdmNwdV9wdXQo
-dmNwdSk7CisJdmNwdS0+aW9jdGwgPSAwOwogCWtmcmVlKGZwdSk7CiAJa2ZyZWUoa3ZtX3NyZWdz
-KTsKIAlyZXR1cm4gcjsKLS0gCjIuOS4wCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1
-bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9r
-dm1hcm0K
+We currently have a separate read-modify-write of the HCR_EL2 on entry
+to the guest for the sole purpose of setting the VF and VI bits, if set.
+Since this is most rarely the case (only when using userspace IRQ chip
+and interrupts are in flight), let's get rid of this operation and
+instead modify the bits in the vcpu->arch.hcr[_el2] directly when
+needed.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+---
+ arch/arm/include/asm/kvm_emulate.h   |  9 ++-------
+ arch/arm/include/asm/kvm_host.h      |  3 ---
+ arch/arm/kvm/emulate.c               |  2 +-
+ arch/arm/kvm/hyp/switch.c            |  2 +-
+ arch/arm64/include/asm/kvm_emulate.h |  9 ++-------
+ arch/arm64/include/asm/kvm_host.h    |  3 ---
+ arch/arm64/kvm/hyp/switch.c          |  6 ------
+ arch/arm64/kvm/inject_fault.c        |  2 +-
+ virt/kvm/arm/arm.c                   | 11 ++++++-----
+ virt/kvm/arm/mmu.c                   |  6 +++---
+ 10 files changed, 16 insertions(+), 37 deletions(-)
+
+diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
+index 98089ff..34663a8 100644
+--- a/arch/arm/include/asm/kvm_emulate.h
++++ b/arch/arm/include/asm/kvm_emulate.h
+@@ -62,14 +62,9 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.hcr = HCR_GUEST_MASK;
+ }
+ 
+-static inline unsigned long vcpu_get_hcr(const struct kvm_vcpu *vcpu)
++static inline unsigned long *vcpu_hcr(const struct kvm_vcpu *vcpu)
+ {
+-	return vcpu->arch.hcr;
+-}
+-
+-static inline void vcpu_set_hcr(struct kvm_vcpu *vcpu, unsigned long hcr)
+-{
+-	vcpu->arch.hcr = hcr;
++	return (unsigned long *)&vcpu->arch.hcr;
+ }
+ 
+ static inline bool vcpu_mode_is_32bit(const struct kvm_vcpu *vcpu)
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index 4a879f6..1100170 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -153,9 +153,6 @@ struct kvm_vcpu_arch {
+ 	/* HYP trapping configuration */
+ 	u32 hcr;
+ 
+-	/* Interrupt related fields */
+-	u32 irq_lines;		/* IRQ and FIQ levels */
+-
+ 	/* Exception Information */
+ 	struct kvm_vcpu_fault_info fault;
+ 
+diff --git a/arch/arm/kvm/emulate.c b/arch/arm/kvm/emulate.c
+index 0064b86..4286a89 100644
+--- a/arch/arm/kvm/emulate.c
++++ b/arch/arm/kvm/emulate.c
+@@ -313,5 +313,5 @@ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
+  */
+ void kvm_inject_vabt(struct kvm_vcpu *vcpu)
+ {
+-	vcpu_set_hcr(vcpu, vcpu_get_hcr(vcpu) | HCR_VA);
++	*vcpu_hcr(vcpu) |= HCR_VA;
+ }
+diff --git a/arch/arm/kvm/hyp/switch.c b/arch/arm/kvm/hyp/switch.c
+index 330c9ce..c3b9799 100644
+--- a/arch/arm/kvm/hyp/switch.c
++++ b/arch/arm/kvm/hyp/switch.c
+@@ -43,7 +43,7 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu, u32 *fpexc_host)
+ 		isb();
+ 	}
+ 
+-	write_sysreg(vcpu->arch.hcr | vcpu->arch.irq_lines, HCR);
++	write_sysreg(vcpu->arch.hcr, HCR);
+ 	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
+ 	write_sysreg(HSTR_T(15), HSTR);
+ 	write_sysreg(HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11), HCPTR);
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index e5df3fc..1fbfe96 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -51,14 +51,9 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+ 		vcpu->arch.hcr_el2 &= ~HCR_RW;
+ }
+ 
+-static inline unsigned long vcpu_get_hcr(struct kvm_vcpu *vcpu)
++static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
+ {
+-	return vcpu->arch.hcr_el2;
+-}
+-
+-static inline void vcpu_set_hcr(struct kvm_vcpu *vcpu, unsigned long hcr)
+-{
+-	vcpu->arch.hcr_el2 = hcr;
++	return (unsigned long *)&vcpu->arch.hcr_el2;
+ }
+ 
+ static inline unsigned long *vcpu_pc(const struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 806ccef..27305e7 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -266,9 +266,6 @@ struct kvm_vcpu_arch {
+ 	/* IO related fields */
+ 	struct kvm_decode mmio_decode;
+ 
+-	/* Interrupt related fields */
+-	u64 irq_lines;		/* IRQ and FIQ levels */
+-
+ 	/* Cache some mmu pages needed inside spinlock regions */
+ 	struct kvm_mmu_memory_cache mmu_page_cache;
+ 
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index bcf1a79..7703d63 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -168,12 +168,6 @@ static void __hyp_text __vgic_save_state(struct kvm_vcpu *vcpu)
+ 
+ static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
+ {
+-	u64 val;
+-
+-	val = read_sysreg(hcr_el2);
+-	val |= vcpu->arch.irq_lines;
+-	write_sysreg(val, hcr_el2);
+-
+ 	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+ 		__vgic_v3_restore_state(vcpu);
+ 	else
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index da6a8cf..45c7026 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -241,5 +241,5 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
+  */
+ void kvm_inject_vabt(struct kvm_vcpu *vcpu)
+ {
+-	vcpu_set_hcr(vcpu, vcpu_get_hcr(vcpu) | HCR_VSE);
++	*vcpu_hcr(vcpu) |= HCR_VSE;
+ }
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 7f9296a..6e9513e 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -411,7 +411,8 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+  */
+ int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
+ {
+-	return ((!!v->arch.irq_lines || kvm_vgic_vcpu_pending_irq(v))
++	bool irq_lines = *vcpu_hcr(v) & (HCR_VI | HCR_VF);
++	return ((irq_lines || kvm_vgic_vcpu_pending_irq(v))
+ 		&& !v->arch.power_off && !v->arch.pause);
+ }
+ 
+@@ -771,18 +772,18 @@ static int vcpu_interrupt_line(struct kvm_vcpu *vcpu, int number, bool level)
+ {
+ 	int bit_index;
+ 	bool set;
+-	unsigned long *ptr;
++	unsigned long *hcr;
+ 
+ 	if (number == KVM_ARM_IRQ_CPU_IRQ)
+ 		bit_index = __ffs(HCR_VI);
+ 	else /* KVM_ARM_IRQ_CPU_FIQ */
+ 		bit_index = __ffs(HCR_VF);
+ 
+-	ptr = (unsigned long *)&vcpu->arch.irq_lines;
++	hcr = vcpu_hcr(vcpu);
+ 	if (level)
+-		set = test_and_set_bit(bit_index, ptr);
++		set = test_and_set_bit(bit_index, hcr);
+ 	else
+-		set = test_and_clear_bit(bit_index, ptr);
++		set = test_and_clear_bit(bit_index, hcr);
+ 
+ 	/*
+ 	 * If we didn't change anything, no need to wake up or kick other CPUs
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index b36945d..d93d56d 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -1987,7 +1987,7 @@ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+  */
+ void kvm_set_way_flush(struct kvm_vcpu *vcpu)
+ {
+-	unsigned long hcr = vcpu_get_hcr(vcpu);
++	unsigned long hcr = *vcpu_hcr(vcpu);
+ 
+ 	/*
+ 	 * If this is the first time we do a S/W operation
+@@ -2002,7 +2002,7 @@ void kvm_set_way_flush(struct kvm_vcpu *vcpu)
+ 		trace_kvm_set_way_flush(*vcpu_pc(vcpu),
+ 					vcpu_has_cache_enabled(vcpu));
+ 		stage2_flush_vm(vcpu->kvm);
+-		vcpu_set_hcr(vcpu, hcr | HCR_TVM);
++		*vcpu_hcr(vcpu) = hcr | HCR_TVM;
+ 	}
+ }
+ 
+@@ -2020,7 +2020,7 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled)
+ 
+ 	/* Caches are now on, stop trapping VM ops (until a S/W op) */
+ 	if (now_enabled)
+-		vcpu_set_hcr(vcpu, vcpu_get_hcr(vcpu) & ~HCR_TVM);
++		*vcpu_hcr(vcpu) &= ~HCR_TVM;
+ 
+ 	trace_kvm_toggle_cache(*vcpu_pc(vcpu), was_enabled, now_enabled);
+ }
+-- 
+2.9.0
