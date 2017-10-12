@@ -1,25 +1,25 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH 26/37] KVM: arm64: Prepare to handle traps on deferred AArch32
- sysregs
-Date: Thu, 12 Oct 2017 12:41:30 +0200
-Message-ID: <20171012104141.26902-27-christoffer.dall@linaro.org>
+Subject: [PATCH 21/37] KVM: arm64: Don't save the host ELR_EL2 and SPSR_EL2 on
+ VHE systems
+Date: Thu, 12 Oct 2017 12:41:25 +0200
+Message-ID: <20171012104141.26902-22-christoffer.dall@linaro.org>
 References: <20171012104141.26902-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E319549D5B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AECDE49D42
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pjffs3jvJoN8 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Oct 2017 06:41:34 -0400 (EDT)
+ with ESMTP id 5fzPgQGI1DA9 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Oct 2017 06:41:27 -0400 (EDT)
 Received: from mail-wm0-f52.google.com (mail-wm0-f52.google.com [74.125.82.52])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F15C849D33
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:33 -0400 (EDT)
-Received: by mail-wm0-f52.google.com with SMTP id m72so11980176wmc.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 03:42:18 -0700 (PDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7BF0C49D63
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:27 -0400 (EDT)
+Received: by mail-wm0-f52.google.com with SMTP id l68so12075470wmd.5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 03:42:11 -0700 (PDT)
 In-Reply-To: <20171012104141.26902-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,60 +34,75 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Handle accesses to any AArch32 EL1 system registers where we can defer
-saving and restoring them to vcpu_load and vcpu_put, and which are
-stored in special EL2 registers only used support 32-bit guests.
+On non-VHE systems we need to save the ELR_EL2 and SPSR_EL2 so that we
+can return to the host in EL1 in the same state and location where we
+issued a hypercall to EL2, but these registers don't contain anything
+important on VHE, because all of the host runs in EL2.  Therefore,
+exclude them when saving/restoring the host state.
 
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/kvm/inject_fault.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/sysreg-sr.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index f4513fc..02990f5 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -59,9 +59,18 @@ static void vcpu_set_elr_el1(struct kvm_vcpu *vcpu, u64 val)
- /* Set the SPSR for the current mode */
- static void vcpu_set_spsr(struct kvm_vcpu *vcpu, u64 val)
- {
--	if (vcpu_mode_is_32bit(vcpu))
-+	if (vcpu_mode_is_32bit(vcpu)) {
-+		if (vcpu->arch.sysregs_loaded_on_cpu)
-+			__sysreg32_save_state(vcpu);
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index f5c1b44..354ca02 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -66,6 +66,10 @@ static void __hyp_text __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+ 	ctxt->gp_regs.sp_el1		= read_sysreg(sp_el1);
+ 	ctxt->gp_regs.elr_el1		= read_sysreg_el1(elr);
+ 	ctxt->gp_regs.spsr[KVM_SPSR_EL1]= read_sysreg_el1(spsr);
++}
 +
- 		*vcpu_spsr32(vcpu) = val;
- 
-+		if (vcpu->arch.sysregs_loaded_on_cpu)
-+			__sysreg32_restore_state(vcpu);
-+
-+		return;
-+	}
-+
- 	if (vcpu->arch.sysregs_loaded_on_cpu)
- 		write_sysreg_el1(val, spsr);
- 	else
-@@ -129,11 +138,13 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
- 	 *   IFAR:  mapped to FAR_EL1
- 	 *   DFSR:  mapped to ESR_EL1
- 	 *   TTBCR: mapped to TCR_EL1
-+	 *   IFSR:  stored in IFSR32_EL2
- 	 */
- 	if (vcpu->arch.sysregs_loaded_on_cpu) {
- 		vcpu->arch.ctxt.sys_regs[FAR_EL1] = read_sysreg_el1(far);
- 		vcpu->arch.ctxt.sys_regs[ESR_EL1] = read_sysreg_el1(esr);
- 		vcpu->arch.ctxt.sys_regs[TCR_EL1] = read_sysreg_el1(tcr);
-+		vcpu->arch.ctxt.sys_regs[IFSR32_EL2] = read_sysreg(ifsr32_el2);
- 	}
- 
- 	if (is_pabt) {
-@@ -161,6 +172,7 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
- 	if (vcpu->arch.sysregs_loaded_on_cpu) {
- 		write_sysreg_el1(vcpu->arch.ctxt.sys_regs[FAR_EL1], far);
- 		write_sysreg_el1(vcpu->arch.ctxt.sys_regs[ESR_EL1], esr);
-+		write_sysreg(vcpu->arch.ctxt.sys_regs[IFSR32_EL2], ifsr32_el2);
- 	}
++static void __hyp_text __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
++{
+ 	ctxt->gp_regs.regs.pc		= read_sysreg_el2(elr);
+ 	ctxt->gp_regs.regs.pstate	= read_sysreg_el2(spsr);
+ }
+@@ -75,6 +79,7 @@ void __hyp_text __sysreg_save_state_nvhe(struct kvm_cpu_context *ctxt)
+ 	__sysreg_save_el1_state(ctxt);
+ 	__sysreg_save_common_state(ctxt);
+ 	__sysreg_save_user_state(ctxt);
++	__sysreg_save_el2_return_state(ctxt);
  }
  
+ void sysreg_save_host_state_vhe(struct kvm_cpu_context *ctxt)
+@@ -88,6 +93,7 @@ void sysreg_save_guest_state_vhe(struct kvm_cpu_context *ctxt)
+ 	__sysreg_save_el1_state(ctxt);
+ 	__sysreg_save_common_state(ctxt);
+ 	__sysreg_save_user_state(ctxt);
++	__sysreg_save_el2_return_state(ctxt);
+ }
+ 
+ static void __hyp_text __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
+@@ -127,6 +133,11 @@ static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+ 	write_sysreg(ctxt->gp_regs.sp_el1,		sp_el1);
+ 	write_sysreg_el1(ctxt->gp_regs.elr_el1,		elr);
+ 	write_sysreg_el1(ctxt->gp_regs.spsr[KVM_SPSR_EL1],spsr);
++}
++
++static void __hyp_text
++__sysreg_restore_el2_return_state(struct kvm_cpu_context *ctxt)
++{
+ 	write_sysreg_el2(ctxt->gp_regs.regs.pc,		elr);
+ 	write_sysreg_el2(ctxt->gp_regs.regs.pstate,	spsr);
+ }
+@@ -136,6 +147,7 @@ void __hyp_text __sysreg_restore_state_nvhe(struct kvm_cpu_context *ctxt)
+ 	__sysreg_restore_el1_state(ctxt);
+ 	__sysreg_restore_common_state(ctxt);
+ 	__sysreg_restore_user_state(ctxt);
++	__sysreg_restore_el2_return_state(ctxt);
+ }
+ 
+ void sysreg_restore_host_state_vhe(struct kvm_cpu_context *ctxt)
+@@ -149,6 +161,7 @@ void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt)
+ 	__sysreg_restore_el1_state(ctxt);
+ 	__sysreg_restore_common_state(ctxt);
+ 	__sysreg_restore_user_state(ctxt);
++	__sysreg_restore_el2_return_state(ctxt);
+ }
+ 
+ static void __hyp_text __fpsimd32_save_state(struct kvm_cpu_context *ctxt)
 -- 
 2.9.0
