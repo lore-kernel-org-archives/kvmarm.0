@@ -1,25 +1,25 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH 03/37] KVM: arm64: Move HCR_INT_OVERRIDE to default HCR_EL2
- guest flag
-Date: Thu, 12 Oct 2017 12:41:07 +0200
-Message-ID: <20171012104141.26902-4-christoffer.dall@linaro.org>
+Subject: [PATCH 05/37] KVM: Record the executing ioctl number on the vcpu
+ struct
+Date: Thu, 12 Oct 2017 12:41:09 +0200
+Message-ID: <20171012104141.26902-6-christoffer.dall@linaro.org>
 References: <20171012104141.26902-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C8CC749D7B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C643649D6F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OTZaNDlaVIZ3 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Oct 2017 06:41:03 -0400 (EDT)
-Received: from mail-wm0-f41.google.com (mail-wm0-f41.google.com [74.125.82.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3527349D65
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:02 -0400 (EDT)
-Received: by mail-wm0-f41.google.com with SMTP id q124so11978446wmb.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 03:41:46 -0700 (PDT)
+ with ESMTP id YY-GaoBojeh2 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Oct 2017 06:41:05 -0400 (EDT)
+Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2A2F549D6D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:05 -0400 (EDT)
+Received: by mail-wm0-f49.google.com with SMTP id l68so12072539wmd.5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 03:41:49 -0700 (PDT)
 In-Reply-To: <20171012104141.26902-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,60 +31,81 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Paolo Bonzini <pbonzini@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Shih-Wei Li <shihwei@cs.columbia.edu>
-
-We always set the IMO and FMO bits in the HCR_EL2 when running the
-guest, regardless if we use the vgic or not.  By moving these flags to
-HCR_GUEST_FLAGS we can avoid one of the extra save/restore operations of
-HCR_EL2 in the world switch code, and we can also soon get rid of the
-other one.
-
-Signed-off-by: Shih-Wei Li <shihwei@cs.columbia.edu>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
- arch/arm64/include/asm/kvm_arm.h | 4 ++--
- arch/arm64/kvm/hyp/switch.c      | 3 ---
- 2 files changed, 2 insertions(+), 5 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 61d694c..e67e279 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -79,9 +79,9 @@
-  */
- #define HCR_GUEST_FLAGS (HCR_TSC | HCR_TSW | HCR_TWE | HCR_TWI | HCR_VM | \
- 			 HCR_TVM | HCR_BSU_IS | HCR_FB | HCR_TAC | \
--			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW)
-+			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | \
-+			 HCR_FMO | HCR_IMO)
- #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
--#define HCR_INT_OVERRIDE   (HCR_FMO | HCR_IMO)
- #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
- 
- /* TCR_EL2 Registers bits */
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index a50ddf3..bcf1a79 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -164,8 +164,6 @@ static void __hyp_text __vgic_save_state(struct kvm_vcpu *vcpu)
- 		__vgic_v3_save_state(vcpu);
- 	else
- 		__vgic_v2_save_state(vcpu);
--
--	write_sysreg(read_sysreg(hcr_el2) & ~HCR_INT_OVERRIDE, hcr_el2);
- }
- 
- static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
-@@ -173,7 +171,6 @@ static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
- 	u64 val;
- 
- 	val = read_sysreg(hcr_el2);
--	val |= 	HCR_INT_OVERRIDE;
- 	val |= vcpu->arch.irq_lines;
- 	write_sysreg(val, hcr_el2);
- 
--- 
-2.9.0
+U29tZSBhcmNoaXRlY3R1cmVzIG1heSBkZWNpZGUgdG8gZG8gZGlmZmVyZW50IHRoaW5ncyBkdXJp
+bmcKa3ZtX2FyY2hfdmNwdV9sb2FkIGRlcGVuZGluZyBvbiB0aGUgaW9jdGwgYmVpbmcgZXhlY3V0
+ZWQuICBGb3IgZXhhbXBsZSwKYXJtNjQgaXMgYWJvdXQgdG8gZG8gc2lnbmlmaWNhbnQgd29yayBp
+biB2Y3B1IGxvYWQvcHV0IHdoZW4gcnVubmluZyBhCnZjcHUsIGJ1dCBub3Qgd2hlbiBkb2luZyB0
+aGluZ3MgbGlrZSBLVk1fU0VUX09ORV9SRUcgb3IKS1ZNX1NFVF9NUF9TVEFURS4KClRoZXJlZm9y
+ZSwgc3RvcmUgdGhlIGlvY3RsIG51bWJlciB0aGF0IHdlIGFyZSBleGVjdXRpbmcgb24gdGhlIFZD
+UFUKZHVyaW5nIHRoZSBmaXJzdCB2Y3B1X2xvYWQoKSB3aGljaCBzdWNjZWVkcyBpbiBnZXR0aW5n
+IHRoZSB2Y3B1LT5tdXRleAphbmQgc2V0IHRoZSBpb2N0bCBudW1iZXIgdG8gMCB3aGVuIGV4aXRp
+bmcga3ZtX3ZjcHVfaW9jdGwoKSBhZnRlcgpzdWNjZXNzZnVsbHkgbG9hZGluZyB0aGUgdmNwdS4K
+CkNjOiBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPgpDYzogUmFkaW0gS3LEjW3D
+ocWZIDxya3JjbWFyQHJlZGhhdC5jb20+ClNpZ25lZC1vZmYtYnk6IENocmlzdG9mZmVyIERhbGwg
+PGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZz4KLS0tCiBhcmNoL3g4Ni9rdm0vdm14LmMgICAg
+ICAgfCAyICstCiBhcmNoL3g4Ni9rdm0veDg2LmMgICAgICAgfCA4ICsrKystLS0tCiBpbmNsdWRl
+L2xpbnV4L2t2bV9ob3N0LmggfCAzICsrLQogdmlydC9rdm0va3ZtX21haW4uYyAgICAgIHwgNiAr
+KysrLS0KIDQgZmlsZXMgY2hhbmdlZCwgMTEgaW5zZXJ0aW9ucygrKSwgOCBkZWxldGlvbnMoLSkK
+CmRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rdm0vdm14LmMgYi9hcmNoL3g4Ni9rdm0vdm14LmMKaW5k
+ZXggNjk3MDI0OS4uZDcyOTg4OSAxMDA2NDQKLS0tIGEvYXJjaC94ODYva3ZtL3ZteC5jCisrKyBi
+L2FyY2gveDg2L2t2bS92bXguYwpAQCAtOTQ5Myw3ICs5NDkzLDcgQEAgc3RhdGljIHZvaWQgdm14
+X2ZyZWVfdmNwdV9uZXN0ZWQoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQogICAgICAgIHN0cnVjdCB2
+Y3B1X3ZteCAqdm14ID0gdG9fdm14KHZjcHUpOwogICAgICAgIGludCByOwogCi0gICAgICAgciA9
+IHZjcHVfbG9hZCh2Y3B1KTsKKyAgICAgICByID0gdmNwdV9sb2FkKHZjcHUsIHZjcHUtPmlvY3Rs
+KTsKICAgICAgICBCVUdfT04ocik7CiAgICAgICAgdm14X3N3aXRjaF92bWNzKHZjcHUsICZ2bXgt
+PnZtY3MwMSk7CiAgICAgICAgZnJlZV9uZXN0ZWQodm14KTsKZGlmZiAtLWdpdCBhL2FyY2gveDg2
+L2t2bS94ODYuYyBiL2FyY2gveDg2L2t2bS94ODYuYwppbmRleCBjZDE3YjdkLi42OGQ5Yzk1IDEw
+MDY0NAotLS0gYS9hcmNoL3g4Ni9rdm0veDg2LmMKKysrIGIvYXJjaC94ODYva3ZtL3g4Ni5jCkBA
+IC03NzIzLDcgKzc3MjMsNyBAQCBpbnQga3ZtX2FyY2hfdmNwdV9zZXR1cChzdHJ1Y3Qga3ZtX3Zj
+cHUgKnZjcHUpCiAJaW50IHI7CiAKIAlrdm1fdmNwdV9tdHJyX2luaXQodmNwdSk7Ci0JciA9IHZj
+cHVfbG9hZCh2Y3B1KTsKKwlyID0gdmNwdV9sb2FkKHZjcHUsIHZjcHUtPmlvY3RsKTsKIAlpZiAo
+cikKIAkJcmV0dXJuIHI7CiAJa3ZtX3ZjcHVfcmVzZXQodmNwdSwgZmFsc2UpOwpAQCAtNzczOSw3
+ICs3NzM5LDcgQEAgdm9pZCBrdm1fYXJjaF92Y3B1X3Bvc3RjcmVhdGUoc3RydWN0IGt2bV92Y3B1
+ICp2Y3B1KQogCiAJa3ZtX2h2X3ZjcHVfcG9zdGNyZWF0ZSh2Y3B1KTsKIAotCWlmICh2Y3B1X2xv
+YWQodmNwdSkpCisJaWYgKHZjcHVfbG9hZCh2Y3B1LCB2Y3B1LT5pb2N0bCkpCiAJCXJldHVybjsK
+IAltc3IuZGF0YSA9IDB4MDsKIAltc3IuaW5kZXggPSBNU1JfSUEzMl9UU0M7CkBAIC03NzU5LDcg
+Kzc3NTksNyBAQCB2b2lkIGt2bV9hcmNoX3ZjcHVfZGVzdHJveShzdHJ1Y3Qga3ZtX3ZjcHUgKnZj
+cHUpCiAJaW50IHI7CiAJdmNwdS0+YXJjaC5hcGYubXNyX3ZhbCA9IDA7CiAKLQlyID0gdmNwdV9s
+b2FkKHZjcHUpOworCXIgPSB2Y3B1X2xvYWQodmNwdSwgdmNwdS0+aW9jdGwpOwogCUJVR19PTihy
+KTsKIAlrdm1fbW11X3VubG9hZCh2Y3B1KTsKIAl2Y3B1X3B1dCh2Y3B1KTsKQEAgLTgxMTYsNyAr
+ODExNiw3IEBAIGludCBrdm1fYXJjaF9pbml0X3ZtKHN0cnVjdCBrdm0gKmt2bSwgdW5zaWduZWQg
+bG9uZyB0eXBlKQogc3RhdGljIHZvaWQga3ZtX3VubG9hZF92Y3B1X21tdShzdHJ1Y3Qga3ZtX3Zj
+cHUgKnZjcHUpCiB7CiAJaW50IHI7Ci0JciA9IHZjcHVfbG9hZCh2Y3B1KTsKKwlyID0gdmNwdV9s
+b2FkKHZjcHUsIHZjcHUtPmlvY3RsKTsKIAlCVUdfT04ocik7CiAJa3ZtX21tdV91bmxvYWQodmNw
+dSk7CiAJdmNwdV9wdXQodmNwdSk7CmRpZmYgLS1naXQgYS9pbmNsdWRlL2xpbnV4L2t2bV9ob3N0
+LmggYi9pbmNsdWRlL2xpbnV4L2t2bV9ob3N0LmgKaW5kZXggNjg4MjUzOC4uZGEwYWNjMCAxMDA2
+NDQKLS0tIGEvaW5jbHVkZS9saW51eC9rdm1faG9zdC5oCisrKyBiL2luY2x1ZGUvbGludXgva3Zt
+X2hvc3QuaApAQCAtMjc0LDYgKzI3NCw3IEBAIHN0cnVjdCBrdm1fdmNwdSB7CiAJYm9vbCBwcmVl
+bXB0ZWQ7CiAJc3RydWN0IGt2bV92Y3B1X2FyY2ggYXJjaDsKIAlzdHJ1Y3QgZGVudHJ5ICpkZWJ1
+Z2ZzX2RlbnRyeTsKKwl1bnNpZ25lZCBpbnQgaW9jdGw7IC8qIGlvY3RsIGN1cnJlbnRseSBleGVj
+dXRpbmcgb3IgMCAqLwogfTsKIAogc3RhdGljIGlubGluZSBpbnQga3ZtX3ZjcHVfZXhpdGluZ19n
+dWVzdF9tb2RlKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKQEAgLTUzMyw3ICs1MzQsNyBAQCBzdGF0
+aWMgaW5saW5lIGludCBrdm1fdmNwdV9nZXRfaWR4KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKIGlu
+dCBrdm1fdmNwdV9pbml0KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgc3RydWN0IGt2bSAqa3ZtLCB1
+bnNpZ25lZCBpZCk7CiB2b2lkIGt2bV92Y3B1X3VuaW5pdChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUp
+OwogCi1pbnQgX19tdXN0X2NoZWNrIHZjcHVfbG9hZChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpOwor
+aW50IF9fbXVzdF9jaGVjayB2Y3B1X2xvYWQoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCB1bnNpZ25l
+ZCBpbnQgaW9jdGwpOwogdm9pZCB2Y3B1X3B1dChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpOwogCiAj
+aWZkZWYgX19LVk1fSEFWRV9JT0FQSUMKZGlmZiAtLWdpdCBhL3ZpcnQva3ZtL2t2bV9tYWluLmMg
+Yi92aXJ0L2t2bS9rdm1fbWFpbi5jCmluZGV4IDlkZWI1YTIuLjE5MTFlZjAgMTAwNjQ0Ci0tLSBh
+L3ZpcnQva3ZtL2t2bV9tYWluLmMKKysrIGIvdmlydC9rdm0va3ZtX21haW4uYwpAQCAtMTQ3LDEy
+ICsxNDcsMTMgQEAgYm9vbCBrdm1faXNfcmVzZXJ2ZWRfcGZuKGt2bV9wZm5fdCBwZm4pCiAvKgog
+ICogU3dpdGNoZXMgdG8gc3BlY2lmaWVkIHZjcHUsIHVudGlsIGEgbWF0Y2hpbmcgdmNwdV9wdXQo
+KQogICovCi1pbnQgdmNwdV9sb2FkKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKK2ludCB2Y3B1X2xv
+YWQoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCB1bnNpZ25lZCBpbnQgaW9jdGwpCiB7CiAJaW50IGNw
+dTsKIAogCWlmIChtdXRleF9sb2NrX2tpbGxhYmxlKCZ2Y3B1LT5tdXRleCkpCiAJCXJldHVybiAt
+RUlOVFI7CisJdmNwdS0+aW9jdGwgPSBpb2N0bDsKIAljcHUgPSBnZXRfY3B1KCk7CiAJcHJlZW1w
+dF9ub3RpZmllcl9yZWdpc3RlcigmdmNwdS0+cHJlZW1wdF9ub3RpZmllcik7CiAJa3ZtX2FyY2hf
+dmNwdV9sb2FkKHZjcHUsIGNwdSk7CkBAIC0yNTI5LDcgKzI1MzAsNyBAQCBzdGF0aWMgbG9uZyBr
+dm1fdmNwdV9pb2N0bChzdHJ1Y3QgZmlsZSAqZmlscCwKICNlbmRpZgogCiAKLQlyID0gdmNwdV9s
+b2FkKHZjcHUpOworCXIgPSB2Y3B1X2xvYWQodmNwdSwgaW9jdGwpOwogCWlmIChyKQogCQlyZXR1
+cm4gcjsKIAlzd2l0Y2ggKGlvY3RsKSB7CkBAIC0yNzA0LDYgKzI3MDUsNyBAQCBzdGF0aWMgbG9u
+ZyBrdm1fdmNwdV9pb2N0bChzdHJ1Y3QgZmlsZSAqZmlscCwKIAl9CiBvdXQ6CiAJdmNwdV9wdXQo
+dmNwdSk7CisJdmNwdS0+aW9jdGwgPSAwOwogCWtmcmVlKGZwdSk7CiAJa2ZyZWUoa3ZtX3NyZWdz
+KTsKIAlyZXR1cm4gcjsKLS0gCjIuOS4wCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1
+bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9r
+dm1hcm0K
