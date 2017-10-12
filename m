@@ -1,196 +1,109 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH 01/37] KVM: arm64: Avoid storing the vcpu pointer on the stack
-Date: Thu, 12 Oct 2017 12:41:05 +0200
-Message-ID: <20171012104141.26902-2-christoffer.dall@linaro.org>
+Subject: [PATCH 10/37] KVM: arm64: Slightly improve debug save/restore
+ functions
+Date: Thu, 12 Oct 2017 12:41:14 +0200
+Message-ID: <20171012104141.26902-11-christoffer.dall@linaro.org>
 References: <20171012104141.26902-1-christoffer.dall@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 669D849D24
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:14 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 62QpU0o1ysuP for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Oct 2017 06:41:13 -0400 (EDT)
+Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4DDA849D43
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:12 -0400 (EDT)
+Received: by mail-wm0-f45.google.com with SMTP id i124so11856616wmf.3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 03:41:56 -0700 (PDT)
 In-Reply-To: <20171012104141.26902-1-christoffer.dall@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We already have the percpu area for the host cpu state, which points to
-the VCPU, so there's no need to store the VCPU pointer on the stack on
-every context switch.  We can be a little more clever and just use
-tpidr_el2 for the percpu offset and load the VCPU pointer from the host
-context.
+The debug save/restore functions can be improved by using the has_vhe()
+static key instead of the instruction alternative.  Using the static key
+uses the same paradigm as we're going to use elsewhere, it makes the
+code more readable, and it generates slightly better code (no
+stack setups and function calls unless necessary).
 
-This requires us to have a scratch register though, so we take the
-chance to rearrange some of the el1_sync code to only look at the
-vttbr_el2 to determine if this is a trap from the guest or an HVC from
-the host.  We do add an extra check to call the panic code if the kernel
-is configured with debugging enabled and we saw a trap from the host
-which wasn't an HVC, indicating that we left some EL2 trap configured by
-mistake.
+We also use a static key on the restore path, because it will be
+marginally faster than loading a value from memory.
+
+Finally, we don't have to conditionally clear the debug dirty flag if
+it's set, we can just clear it.
 
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/include/asm/kvm_asm.h | 20 ++++++++++++++++++++
- arch/arm64/kernel/asm-offsets.c  |  1 +
- arch/arm64/kvm/hyp/entry.S       |  5 +----
- arch/arm64/kvm/hyp/hyp-entry.S   | 39 ++++++++++++++++++---------------------
- arch/arm64/kvm/hyp/switch.c      |  2 +-
- 5 files changed, 41 insertions(+), 26 deletions(-)
+ arch/arm64/kvm/hyp/debug-sr.c | 22 +++++++++-------------
+ 1 file changed, 9 insertions(+), 13 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index ab4d0a9..7e48a39 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -70,4 +70,24 @@ extern u32 __init_stage2_translation(void);
+diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
+index 0fc0758..a2291b6 100644
+--- a/arch/arm64/kvm/hyp/debug-sr.c
++++ b/arch/arm64/kvm/hyp/debug-sr.c
+@@ -75,11 +75,6 @@
  
- #endif
+ #define psb_csync()		asm volatile("hint #17")
  
-+#ifdef __ASSEMBLY__
-+.macro get_host_ctxt reg, tmp
-+	/*
-+	 * '=kvm_host_cpu_state' is a host VA from the constant pool, it may
-+	 * not be accessible by this address from EL2, hyp_panic() converts
-+	 * it with kern_hyp_va() before use.
-+	 */
-+	ldr	\reg, =kvm_host_cpu_state
-+	mrs	\tmp, tpidr_el2
-+	add	\reg, \reg, \tmp
-+	kern_hyp_va \reg
-+.endm
-+
-+.macro get_vcpu vcpu, ctxt
-+	ldr	\vcpu, [\ctxt, #HOST_CONTEXT_VCPU]
-+	kern_hyp_va	\vcpu
-+.endm
-+
-+#endif
-+
- #endif /* __ARM_KVM_ASM_H__ */
-diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
-index 71bf088..612021d 100644
---- a/arch/arm64/kernel/asm-offsets.c
-+++ b/arch/arm64/kernel/asm-offsets.c
-@@ -135,6 +135,7 @@ int main(void)
-   DEFINE(CPU_FP_REGS,		offsetof(struct kvm_regs, fp_regs));
-   DEFINE(VCPU_FPEXC32_EL2,	offsetof(struct kvm_vcpu, arch.ctxt.sys_regs[FPEXC32_EL2]));
-   DEFINE(VCPU_HOST_CONTEXT,	offsetof(struct kvm_vcpu, arch.host_cpu_context));
-+  DEFINE(HOST_CONTEXT_VCPU,	offsetof(struct kvm_cpu_context, __hyp_running_vcpu));
- #endif
- #ifdef CONFIG_CPU_PM
-   DEFINE(CPU_SUSPEND_SZ,	sizeof(struct cpu_suspend_ctx));
-diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-index 9a8ab5d..76cd48f 100644
---- a/arch/arm64/kvm/hyp/entry.S
-+++ b/arch/arm64/kvm/hyp/entry.S
-@@ -62,9 +62,6 @@ ENTRY(__guest_enter)
- 	// Store the host regs
- 	save_callee_saved_regs x1
- 
--	// Store host_ctxt and vcpu for use at exit time
--	stp	x1, x0, [sp, #-16]!
+-static void __hyp_text __debug_save_spe_vhe(u64 *pmscr_el1)
+-{
+-	/* The vcpu can run. but it can't hide. */
+-}
 -
- 	add	x18, x0, #VCPU_CONTEXT
+ static void __hyp_text __debug_save_spe_nvhe(u64 *pmscr_el1)
+ {
+ 	u64 reg;
+@@ -109,10 +104,6 @@ static void __hyp_text __debug_save_spe_nvhe(u64 *pmscr_el1)
+ 	dsb(nsh);
+ }
  
- 	// Restore guest regs x0-x17
-@@ -119,7 +116,7 @@ ENTRY(__guest_exit)
- 	save_callee_saved_regs x1
- 
- 	// Restore the host_ctxt from the stack
--	ldr	x2, [sp], #16
-+	get_host_ctxt	x2, x3
- 
- 	// Now restore the host regs
- 	restore_callee_saved_regs x2
-diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index e4f37b9..2950f26 100644
---- a/arch/arm64/kvm/hyp/hyp-entry.S
-+++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -56,19 +56,16 @@ ENDPROC(__vhe_hyp_call)
- el1_sync:				// Guest trapped into EL2
- 	stp	x0, x1, [sp, #-16]!
- 
--alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
--	mrs	x1, esr_el2
--alternative_else
--	mrs	x1, esr_el1
--alternative_endif
--	lsr	x0, x1, #ESR_ELx_EC_SHIFT
+-static hyp_alternate_select(__debug_save_spe,
+-			    __debug_save_spe_nvhe, __debug_save_spe_vhe,
+-			    ARM64_HAS_VIRT_HOST_EXTN);
 -
--	cmp	x0, #ESR_ELx_EC_HVC64
--	b.ne	el1_trap
--
- 	mrs	x1, vttbr_el2		// If vttbr is valid, the 64bit guest
- 	cbnz	x1, el1_trap		// called HVC
- 
-+#ifdef CONFIG_DEBUG
-+	mrs	x0, esr_el2
-+	lsr	x0, x0, #ESR_ELx_EC_SHIFT
-+	cmp     x0, #ESR_ELx_EC_HVC64
-+	b.ne    __hyp_panic
-+#endif
+ static void __hyp_text __debug_restore_spe(u64 pmscr_el1)
+ {
+ 	if (!pmscr_el1)
+@@ -174,17 +165,22 @@ void __hyp_text __debug_cond_save_host_state(struct kvm_vcpu *vcpu)
+ {
+ 	__debug_save_state(vcpu, &vcpu->arch.host_debug_state.regs,
+ 			   kern_hyp_va(vcpu->arch.host_cpu_context));
+-	__debug_save_spe()(&vcpu->arch.host_debug_state.pmscr_el1);
 +
- 	/* Here, we're pretty sure the host called HVC. */
- 	ldp	x0, x1, [sp], #16
++	/* Non-VHE: Disable and flush SPE data generation
++	 * VHE: The vcpu can run. but it can't hide. */
++	if (!has_vhe())
++		__debug_save_spe_nvhe(&vcpu->arch.host_debug_state.pmscr_el1);
+ }
  
-@@ -101,10 +98,15 @@ alternative_endif
- 	eret
- 
- el1_trap:
-+	get_host_ctxt	x0, x1
-+	get_vcpu	x1, x0
+ void __hyp_text __debug_cond_restore_host_state(struct kvm_vcpu *vcpu)
+ {
+-	__debug_restore_spe(vcpu->arch.host_debug_state.pmscr_el1);
++	if (!has_vhe())
++		__debug_restore_spe(vcpu->arch.host_debug_state.pmscr_el1);
 +
-+	mrs		x0, esr_el2
-+	lsr		x0, x0, #ESR_ELx_EC_SHIFT
- 	/*
- 	 * x0: ESR_EC
-+	 * x1: vcpu pointer
- 	 */
--	ldr	x1, [sp, #16 + 8]	// vcpu stored by __guest_enter
+ 	__debug_restore_state(vcpu, &vcpu->arch.host_debug_state.regs,
+ 			      kern_hyp_va(vcpu->arch.host_cpu_context));
  
- 	/*
- 	 * We trap the first access to the FP/SIMD to save the host context
-@@ -122,13 +124,15 @@ alternative_else_nop_endif
+-	if (vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY)
+-		vcpu->arch.debug_flags &= ~KVM_ARM64_DEBUG_DIRTY;
++	vcpu->arch.debug_flags &= ~KVM_ARM64_DEBUG_DIRTY;
+ }
  
- el1_irq:
- 	stp     x0, x1, [sp, #-16]!
--	ldr	x1, [sp, #16 + 8]
-+	get_host_ctxt	x0, x1
-+	get_vcpu	x1, x0
- 	mov	x0, #ARM_EXCEPTION_IRQ
- 	b	__guest_exit
- 
- el1_error:
- 	stp     x0, x1, [sp, #-16]!
--	ldr	x1, [sp, #16 + 8]
-+	get_host_ctxt	x0, x1
-+	get_vcpu	x1, x0
- 	mov	x0, #ARM_EXCEPTION_EL1_SERROR
- 	b	__guest_exit
- 
-@@ -164,14 +168,7 @@ ENTRY(__hyp_do_panic)
- ENDPROC(__hyp_do_panic)
- 
- ENTRY(__hyp_panic)
--	/*
--	 * '=kvm_host_cpu_state' is a host VA from the constant pool, it may
--	 * not be accessible by this address from EL2, hyp_panic() converts
--	 * it with kern_hyp_va() before use.
--	 */
--	ldr	x0, =kvm_host_cpu_state
--	mrs	x1, tpidr_el2
--	add	x0, x0, x1
-+	get_host_ctxt x0, x1
- 	b	hyp_panic
- ENDPROC(__hyp_panic)
- 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 69ef24a..a0123ad 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -435,7 +435,7 @@ void __hyp_text __noreturn hyp_panic(struct kvm_cpu_context *__host_ctxt)
- 	if (read_sysreg(vttbr_el2)) {
- 		struct kvm_cpu_context *host_ctxt;
- 
--		host_ctxt = kern_hyp_va(__host_ctxt);
-+		host_ctxt = __host_ctxt;
- 		vcpu = host_ctxt->__hyp_running_vcpu;
- 		__timer_disable_traps(vcpu);
- 		__deactivate_traps(vcpu);
+ u32 __hyp_text __kvm_get_mdcr_el2(void)
 -- 
 2.9.0
