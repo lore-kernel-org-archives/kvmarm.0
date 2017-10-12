@@ -1,112 +1,110 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 22/28] arm64/sve: KVM: Prevent guests from using SVE
-Date: Thu, 12 Oct 2017 12:28:32 +0100
-Message-ID: <d8a50bf1-bfe0-2423-c56b-adac3925309e@arm.com>
-References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
- <1507660725-7986-23-git-send-email-Dave.Martin@arm.com>
- <c28b3f0d-7beb-cca3-46db-3fce964f4725@arm.com>
- <20171012110409.GG19485@e103592.cambridge.arm.com>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v3 01/20] arm64: explicitly mask all exceptions
+Date: Thu, 12 Oct 2017 13:26:17 +0100
+Message-ID: <59DF5F69.4080009@arm.com>
+References: <20171005191812.5678-1-james.morse@arm.com>
+ <20171005191812.5678-2-james.morse@arm.com>
+ <25eb4c59-a09e-5b0a-66fb-6c650ab8e057@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-arch-owner@vger.kernel.org>
-In-Reply-To: <20171012110409.GG19485@e103592.cambridge.arm.com>
-Content-Language: en-GB
-Sender: linux-arch-owner@vger.kernel.org
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, Christoffer Dall <cdall@linaro.org>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A57E249D37
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 08:27:12 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 9nxrHjZy-ogo for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Oct 2017 08:27:11 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7EEFF49D31
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 08:27:11 -0400 (EDT)
+In-Reply-To: <25eb4c59-a09e-5b0a-66fb-6c650ab8e057@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Julien Thierry <julien.thierry@arm.com>
+Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, wangxiongfeng2@huawei.com, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 12/10/17 12:04, Dave Martin wrote:
-> On Wed, Oct 11, 2017 at 05:28:06PM +0100, Marc Zyngier wrote:
->> [+ Christoffer]
->>
->> On 10/10/17 19:38, Dave Martin wrote:
->>> Until KVM has full SVE support, guests must not be allowed to
->>> execute SVE instructions.
->>>
->>> This patch enables the necessary traps, and also ensures that the
->>> traps are disabled again on exit from the guest so that the host
->>> can still use SVE if it wants to.
->>>
->>> This patch introduces another instance of
->>> __this_cpu_write(fpsimd_last_state, NULL), so this flush operation
->>> is abstracted out as a separate helper fpsimd_flush_cpu_state().
->>> Other instances are ported appropriately.
->>>
->>> As a side effect of this refactoring, a this_cpu_write() in
->>> fpsimd_cpu_pm_notifier() is changed to __this_cpu_write().  This
->>> should be fine, since cpu_pm_enter() is supposed to be called only
->>> with interrupts disabled.
->>>
->>> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
->>> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
->>> Cc: Marc Zyngier <marc.zyngier@arm.com>
->>> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
->>> ---
-> 
-> [...]
-> 
->>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->>> index e923b58..674912d 100644
->>> --- a/arch/arm64/include/asm/kvm_host.h
->>> +++ b/arch/arm64/include/asm/kvm_host.h
-> 
-> [...]
-> 
->>> @@ -384,4 +385,14 @@ static inline void __cpu_init_stage2(void)
-> 
-> [...]
-> 
->>> +static inline void kvm_fpsimd_flush_cpu_state(void)
->>> +{
->>> +	if (system_supports_sve())
->>> +		sve_flush_cpu_state();
->>
->> Hmmm. How does this work if...
-> 
-> !IS_ENABLED(CONFIG_ARM64_SVE) implies !system_supports_sve(), so
-> if CONFIG_ARM64_SVE is not set, the call is optimised away.
-> 
-> [...]
-> 
->>> diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
->>> index a9cb794..6ae3703 100644
->>> --- a/arch/arm64/kernel/fpsimd.c
->>> +++ b/arch/arm64/kernel/fpsimd.c
->>> @@ -1073,6 +1073,33 @@ void fpsimd_flush_task_state(struct task_struct *t)
-> 
-> [...]
-> 
->>> +#ifdef CONFIG_ARM64_SVE
->>> +void sve_flush_cpu_state(void)
->>> +{
->>> +	struct fpsimd_state *const fpstate = __this_cpu_read(fpsimd_last_state);
->>> +	struct task_struct *tsk;
->>> +
->>> +	if (!fpstate)
->>> +		return;
->>> +
->>> +	tsk = container_of(fpstate, struct task_struct, thread.fpsimd_state);
->>> +	if (test_tsk_thread_flag(tsk, TIF_SVE))
->>> +		fpsimd_flush_cpu_state();
->>> +}
->>> +#endif /* CONFIG_ARM64_SVE */
->>
->> ... CONFIG_ARM64_SVE is not set? Fixing this should just be a matter of
->> moving the #ifdef/#endif inside the function...
-> 
-> Because sve_flush_cpu_state() is not in the same compilation unit it
-> can't be static, and that means the compiler won't remove it
-> automatically if it's unused -- hence the #ifdef.
-> 
-> Because the call site is optimised away, there is no link failure.
-> 
-> Don't we rely on this sort of thing all over the place?
-Dunno. It just feels weird. But if you are sure that it won't break,
-fine by me. I guess we'll find out pretty quickly how this fares,
-specially with older toolchains.
+Hi Julien,
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+On 11/10/17 17:30, Julien Thierry wrote:
+> On 05/10/17 20:17, James Morse wrote:
+>> There are a few places where we want to mask all exceptions. Today we
+>> do this in a piecemeal fashion, typically we expect the caller to
+>> have masked irqs and the arch code masks debug exceptions, ignoring
+>> SError which is probably masked.
+>>
+>> Make it clear that 'mask all exceptions' is the intention by adding
+>> helpers to do exactly that.
+>>
+>> This will let us unmask SError without having to add 'oh and SError'
+>> to these paths.
+
+>> diff --git a/arch/arm64/include/asm/daifflags.h
+>> b/arch/arm64/include/asm/daifflags.h
+>> new file mode 100644
+>> index 000000000000..fb40da8e1457
+>> --- /dev/null
+>> +++ b/arch/arm64/include/asm/daifflags.h
+
+>> +#ifndef __ASM_DAIFFLAGS_H
+>> +#define __ASM_DAIFFLAGS_H
+>> +
+>> +#include <asm/irqflags.h>
+>> +#include <linux/irqflags.h>
+>> +
+>> +/* Mask/unmask/restore all exceptions, including interrupts. */
+>> +static inline unsigned long local_mask_daif(void)
+>> +{
+>> +    unsigned long flags;
+>> +    asm volatile(
+>> +        "mrs    %0, daif        // local_mask_daif\n"
+>> +        "msr    daifset, #0xf"
+>> +        : "=r" (flags)
+>> +        :
+>> +        : "memory");
+>> +    trace_hardirqs_off();
+>> +    return flags;
+>> +}
+>> +
+> nit:
+> Can we call this local_daif_save? 
+
+Sure, having a save version fits better with the C irqflags versions.
+
+mask/unmask is just being pedantic, irqs and SError aren't disabled by these
+flags, (but curiously debug is...).
+
+
+> (and maybe a version that only disables without saving?)
+
+irqflags.h has one, so yes, why not.
+
+
+> Also, I was wondering why use 'local' as prefix? Is there gonna be a similar set
+> of function for arm that could be called by common code? (e.g. drivers?)
+
+Its a hangover from the C irqflags calls like arch_local_save_flags() etc. I
+dropped the 'arch' as these should only be called by arch code and 'daif' should
+prevent any name collisions.
+
+Drivers should never touch this stuff, if they do its likely to be because they
+want to defer bursting-into-flames until we get to userspace, where its harder
+to work out which driver to blame.
+
+
+> Otherwise:
+> Reviewed-by: Julien Thierry <julien.thierry@arm.com>
+
+Thanks!
+
+
+James
