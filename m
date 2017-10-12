@@ -1,146 +1,274 @@
-From: Dongjiu Geng <gengdongjiu@huawei.com>
-Subject: [PATCH] arm64: KVM: set right LR register value for 32 bit guest when inject abort
-Date: Fri, 13 Oct 2017 00:44:51 +0800
-Message-ID: <1507826691-11812-1-git-send-email-gengdongjiu@huawei.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH 01/37] KVM: arm64: Avoid storing the vcpu pointer on the
+ stack
+Date: Thu, 12 Oct 2017 19:02:16 +0200
+Message-ID: <20171012170216.GA26425@cbox>
+References: <20171012104141.26902-1-christoffer.dall@linaro.org>
+ <20171012104141.26902-2-christoffer.dall@linaro.org>
+ <ef4bffe5-b3c5-5fdd-cb8b-1840d2243ae1@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-To: will.deacon@arm.com, christoffer.dall@linaro.org, marc.zyngier@arm.com, rkrcmar@redhat.com, catalin.marinas@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Dongjiu Geng <gengdongjiu@huawei.com>, Haibin Zhang <zhanghaibin7@huawei.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E33749D29
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 13:01:28 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 6ksH8OU6IPRF for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Oct 2017 13:01:26 -0400 (EDT)
+Received: from mail-wm0-f41.google.com (mail-wm0-f41.google.com [74.125.82.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E7D4B49D25
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 13:01:25 -0400 (EDT)
+Received: by mail-wm0-f41.google.com with SMTP id b189so14843406wmd.4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 10:02:11 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <ef4bffe5-b3c5-5fdd-cb8b-1840d2243ae1@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, Shih-Wei Li <shihwei@cs.columbia.edu>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When a exception is trapped to EL2, hardware uses  ELR_ELx to hold
-the current fault instruction address. If KVM wants to inject a
-abort to 32 bit guest, it needs to set the LR register for the
-guest to emulate this abort  happened in the guest. Because ARM32
-architecture is Multi-pipeline, so the LR value has an offset to
-the fault instruction address.
+On Thu, Oct 12, 2017 at 04:49:44PM +0100, Marc Zyngier wrote:
+> On 12/10/17 11:41, Christoffer Dall wrote:
+> > We already have the percpu area for the host cpu state, which points to
+> > the VCPU, so there's no need to store the VCPU pointer on the stack on
+> > every context switch.  We can be a little more clever and just use
+> > tpidr_el2 for the percpu offset and load the VCPU pointer from the host
+> > context.
+> > 
+> > This requires us to have a scratch register though, so we take the
+> > chance to rearrange some of the el1_sync code to only look at the
+> > vttbr_el2 to determine if this is a trap from the guest or an HVC from
+> > the host.  We do add an extra check to call the panic code if the kernel
+> > is configured with debugging enabled and we saw a trap from the host
+> > which wasn't an HVC, indicating that we left some EL2 trap configured by
+> > mistake.
+> > 
+> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_asm.h | 20 ++++++++++++++++++++
+> >  arch/arm64/kernel/asm-offsets.c  |  1 +
+> >  arch/arm64/kvm/hyp/entry.S       |  5 +----
+> >  arch/arm64/kvm/hyp/hyp-entry.S   | 39 ++++++++++++++++++---------------------
+> >  arch/arm64/kvm/hyp/switch.c      |  2 +-
+> >  5 files changed, 41 insertions(+), 26 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> > index ab4d0a9..7e48a39 100644
+> > --- a/arch/arm64/include/asm/kvm_asm.h
+> > +++ b/arch/arm64/include/asm/kvm_asm.h
+> > @@ -70,4 +70,24 @@ extern u32 __init_stage2_translation(void);
+> >  
+> >  #endif
+> >  
+> > +#ifdef __ASSEMBLY__
+> > +.macro get_host_ctxt reg, tmp
+> > +	/*
+> > +	 * '=kvm_host_cpu_state' is a host VA from the constant pool, it may
+> > +	 * not be accessible by this address from EL2, hyp_panic() converts
+> > +	 * it with kern_hyp_va() before use.
+> > +	 */
+> 
+> This really looks like a stale comment, as there is no hyp_panic
+> involved here anymore (thankfully!).
+> 
 
-The offsets applied to Link value for exceptions as shown below,
-which should be added for the ARM32 link register(LR).
+yeah, I suppose.
 
-Exception			Offset, for PE state of:
-				A32 	  T32
-Undefined Instruction 		+4 	  +2
-Prefetch Abort 			+4 	  +4
-Data Abort 			+8 	  +8
-IRQ or FIQ 			+4 	  +4
+> > +	ldr	\reg, =kvm_host_cpu_state
+> > +	mrs	\tmp, tpidr_el2
+> > +	add	\reg, \reg, \tmp
+> > +	kern_hyp_va \reg
+> 
+> Here, we're trading a load from the stack for a load from the constant
+> pool. Can't we do something like:
+> 
+> 	adr_l	\reg, kvm_host_cpu_state
+> 	msr	\tmp, tpidr_el2
+> 	add	\reg, \reg, \tmp
+> 
+> and that's it? 
 
-Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-Signed-off-by: Haibin Zhang <zhanghaibin7@huawei.com>
+That's definitely what the compiler generates from C code...
 
----
-For example, to the undefined instruction injection:
+> This relies on the property that the kernel/hyp offset is
+> constant, and that it doesn't matter if we add the offset to a kernel VA
+> or a HYP VA... Completely untested of course!
+> 
 
-1. Guest OS call SMC(Secure Monitor Call) instruction in the address
-0xc025405c, then Guest traps to hypervisor
+You're the hyp VA expert.  Is it valid to rely on that assumption?
 
-c0254050:   e59d5028    ldr r5, [sp, #40]   ; 0x28
-c0254054:   e3a03001    mov r3, #1
-c0254058:   e1a01003    mov r1, r3
-c025405c:   e1600070    smc 0
-c0254060:   e30a0270    movw    r0, #41584  ; 0xa270
-c0254064:   e34c00bf    movt    r0, #49343  ; 0xc0bf
+> > +.endm
+> > +
+> > +.macro get_vcpu vcpu, ctxt
+> > +	ldr	\vcpu, [\ctxt, #HOST_CONTEXT_VCPU]
+> > +	kern_hyp_va	\vcpu
+> > +.endm
+> > +
+> > +#endif
+> > +
+> >  #endif /* __ARM_KVM_ASM_H__ */
+> > diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
+> > index 71bf088..612021d 100644
+> > --- a/arch/arm64/kernel/asm-offsets.c
+> > +++ b/arch/arm64/kernel/asm-offsets.c
+> > @@ -135,6 +135,7 @@ int main(void)
+> >    DEFINE(CPU_FP_REGS,		offsetof(struct kvm_regs, fp_regs));
+> >    DEFINE(VCPU_FPEXC32_EL2,	offsetof(struct kvm_vcpu, arch.ctxt.sys_regs[FPEXC32_EL2]));
+> >    DEFINE(VCPU_HOST_CONTEXT,	offsetof(struct kvm_vcpu, arch.host_cpu_context));
+> > +  DEFINE(HOST_CONTEXT_VCPU,	offsetof(struct kvm_cpu_context, __hyp_running_vcpu));
+> >  #endif
+> >  #ifdef CONFIG_CPU_PM
+> >    DEFINE(CPU_SUSPEND_SZ,	sizeof(struct cpu_suspend_ctx));
+> > diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+> > index 9a8ab5d..76cd48f 100644
+> > --- a/arch/arm64/kvm/hyp/entry.S
+> > +++ b/arch/arm64/kvm/hyp/entry.S
+> > @@ -62,9 +62,6 @@ ENTRY(__guest_enter)
+> >  	// Store the host regs
+> >  	save_callee_saved_regs x1
+> >  
+> > -	// Store host_ctxt and vcpu for use at exit time
+> > -	stp	x1, x0, [sp, #-16]!
+> > -
+> >  	add	x18, x0, #VCPU_CONTEXT
+> >  
+> >  	// Restore guest regs x0-x17
+> > @@ -119,7 +116,7 @@ ENTRY(__guest_exit)
+> >  	save_callee_saved_regs x1
+> >  
+> >  	// Restore the host_ctxt from the stack
+> 
+> Stale comment again.
+> 
 
-2. KVM  injects undefined abort to guest
-3. We will find the fault PC is 0xc0254058, not 0xc025405c.
+yeah...
 
-[   12.348072] Internal error: Oops - undefined instruction: 0 [#1] SMP ARM
-[   12.349786] Modules linked in:
-[   12.350563] CPU: 1 PID: 71 Comm: cat Not tainted 4.1.0-dirty #25
-[   12.352061] Hardware name: Generic DT based system
-[   12.353275] task: d9d08000 ti: d9cfe000 task.ti: d9cfe000
-[   12.354637] PC is at proc_dointvec+0x20/0x60
-[   12.355717] LR is at proc_sys_call_handler+0xb0/0xc4
-[   12.356972] pc : [<c0254058>]    lr : [<c035699c>]    psr: a0060013
-[   12.356972] sp : d9cffe90  ip : c0254038  fp : 00000001
-[   12.359824] r10: d9cfff80  r9 : 00000004  r8 : 00000000
-[   12.361132] r7 : bec21cb0  r6 : d9cffec4  r5 : d9cfff80  r4 : c0e82de0
-[   12.362766] r3 : 00000001  r2 : bec21cb0  r1 : 00000001  r0 : c0e82de0
-[   12.364400] Flags: NzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment user
-[   12.366183] Control: 10c5383d  Table: 59d3406a  DAC: 00000015
-[   12.367623] Process cat (pid: 71, stack limit = 0xd9cfe220)
+> > -	ldr	x2, [sp], #16
+> > +	get_host_ctxt	x2, x3
+> >  
+> >  	// Now restore the host regs
+> >  	restore_callee_saved_regs x2
+> > diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+> > index e4f37b9..2950f26 100644
+> > --- a/arch/arm64/kvm/hyp/hyp-entry.S
+> > +++ b/arch/arm64/kvm/hyp/hyp-entry.S
+> > @@ -56,19 +56,16 @@ ENDPROC(__vhe_hyp_call)
+> >  el1_sync:				// Guest trapped into EL2
+> >  	stp	x0, x1, [sp, #-16]!
+> >  
+> > -alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
+> > -	mrs	x1, esr_el2
+> > -alternative_else
+> > -	mrs	x1, esr_el1
+> > -alternative_endif
+> > -	lsr	x0, x1, #ESR_ELx_EC_SHIFT
+> > -
+> > -	cmp	x0, #ESR_ELx_EC_HVC64
+> > -	b.ne	el1_trap
+> > -
+> >  	mrs	x1, vttbr_el2		// If vttbr is valid, the 64bit guest
+> >  	cbnz	x1, el1_trap		// called HVC
+> 
+> Comment is outdated. Any guest trap will take this path.
+> 
 
-4. After correct the LR register, it will have right value
+yeah...
 
-[  125.763370] Internal error: Oops - undefined instruction: 0 [#2] SMP ARM
-[  125.767010] Modules linked in:
-[  125.768472] CPU: 1 PID: 74 Comm: cat Tainted: G      D         4.1.0-dirty #25
-[  125.771854] Hardware name: Generic DT based system
-[  125.774053] task: db0bb900 ti: d9d10000 task.ti: d9d10000
-[  125.776821] PC is at proc_dointvec+0x24/0x60
-[  125.778919] LR is at proc_sys_call_handler+0xb0/0xc4
-[  125.781269] pc : [<c025405c>]    lr : [<c035699c>]    psr: a0060013
-[  125.781269] sp : d9d11e90  ip : c0254038  fp : 00000001
-[  125.786581] r10: d9d11f80  r9 : 00000004  r8 : 00000000
-[  125.789673] r7 : be92ccb0  r6 : d9d11ec4  r5 : d9d11f80  r4 : c0e82de0
-[  125.792828] r3 : 00000001  r2 : be92ccb0  r1 : 00000001  r0 : c0e82de0
-[  125.795890] Flags: NzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment user
+> >  
+> > +#ifdef CONFIG_DEBUG
+> > +	mrs	x0, esr_el2
+> > +	lsr	x0, x0, #ESR_ELx_EC_SHIFT
+> > +	cmp     x0, #ESR_ELx_EC_HVC64
+> > +	b.ne    __hyp_panic
+> > +#endif
+> > +
+> >  	/* Here, we're pretty sure the host called HVC. */
+> >  	ldp	x0, x1, [sp], #16
+> >  
+> > @@ -101,10 +98,15 @@ alternative_endif
+> >  	eret
+> >  
+> >  el1_trap:
+> > +	get_host_ctxt	x0, x1
+> > +	get_vcpu	x1, x0
+> > +
+> > +	mrs		x0, esr_el2
+> > +	lsr		x0, x0, #ESR_ELx_EC_SHIFT
+> >  	/*
+> >  	 * x0: ESR_EC
+> > +	 * x1: vcpu pointer
+> >  	 */
+> > -	ldr	x1, [sp, #16 + 8]	// vcpu stored by __guest_enter
+> >  
+> >  	/*
+> >  	 * We trap the first access to the FP/SIMD to save the host context
+> > @@ -122,13 +124,15 @@ alternative_else_nop_endif
+> >  
+> >  el1_irq:
+> >  	stp     x0, x1, [sp, #-16]!
+> > -	ldr	x1, [sp, #16 + 8]
+> > +	get_host_ctxt	x0, x1
+> > +	get_vcpu	x1, x0
+> >  	mov	x0, #ARM_EXCEPTION_IRQ
+> >  	b	__guest_exit
+> >  
+> >  el1_error:
+> >  	stp     x0, x1, [sp, #-16]!
+> > -	ldr	x1, [sp, #16 + 8]
+> > +	get_host_ctxt	x0, x1
+> > +	get_vcpu	x1, x0
+> >  	mov	x0, #ARM_EXCEPTION_EL1_SERROR
+> >  	b	__guest_exit
+> >  
+> > @@ -164,14 +168,7 @@ ENTRY(__hyp_do_panic)
+> >  ENDPROC(__hyp_do_panic)
+> >  
+> >  ENTRY(__hyp_panic)
+> > -	/*
+> > -	 * '=kvm_host_cpu_state' is a host VA from the constant pool, it may
+> > -	 * not be accessible by this address from EL2, hyp_panic() converts
+> > -	 * it with kern_hyp_va() before use.
+> > -	 */
+> > -	ldr	x0, =kvm_host_cpu_state
+> > -	mrs	x1, tpidr_el2
+> > -	add	x0, x0, x1
+> > +	get_host_ctxt x0, x1
+> >  	b	hyp_panic
+> >  ENDPROC(__hyp_panic)
+> >  
+> > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> > index 69ef24a..a0123ad 100644
+> > --- a/arch/arm64/kvm/hyp/switch.c
+> > +++ b/arch/arm64/kvm/hyp/switch.c
+> > @@ -435,7 +435,7 @@ void __hyp_text __noreturn hyp_panic(struct kvm_cpu_context *__host_ctxt)
+> >  	if (read_sysreg(vttbr_el2)) {
+> >  		struct kvm_cpu_context *host_ctxt;
+> >  
+> > -		host_ctxt = kern_hyp_va(__host_ctxt);
+> > +		host_ctxt = __host_ctxt;
+> 
+> Can't we just rename __host_ctxt to host_ctxt and drop the local definition?
+> 
 
-For other exception injection, such as Data/Prefetch abort, also needs to correct
----
- arch/arm64/kvm/inject_fault.c | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+yes, patch splitting snafu.  Will fix.
 
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index da6a8cf..da93508 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -33,12 +33,11 @@
- #define LOWER_EL_AArch64_VECTOR		0x400
- #define LOWER_EL_AArch32_VECTOR		0x600
- 
--static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
-+static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset,
-+				u32 return_offset)
- {
- 	unsigned long cpsr;
- 	unsigned long new_spsr_value = *vcpu_cpsr(vcpu);
--	bool is_thumb = (new_spsr_value & COMPAT_PSR_T_BIT);
--	u32 return_offset = (is_thumb) ? 4 : 0;
- 	u32 sctlr = vcpu_cp15(vcpu, c1_SCTLR);
- 
- 	cpsr = mode | COMPAT_PSR_I_BIT;
-@@ -65,7 +64,11 @@ static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
- 
- static void inject_undef32(struct kvm_vcpu *vcpu)
- {
--	prepare_fault32(vcpu, COMPAT_PSR_MODE_UND, 4);
-+	unsigned long spsr_value = *vcpu_cpsr(vcpu);
-+	bool is_thumb = (spsr_value & COMPAT_PSR_T_BIT);
-+	u32 return_offset = (is_thumb) ? 2 : 4;
-+
-+	prepare_fault32(vcpu, COMPAT_PSR_MODE_UND, 4, return_offset);
- }
- 
- /*
-@@ -75,21 +78,24 @@ static void inject_undef32(struct kvm_vcpu *vcpu)
- static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
- 			 unsigned long addr)
- {
--	u32 vect_offset;
-+	u32 vect_offset, return_offset;
- 	u32 *far, *fsr;
- 	bool is_lpae;
- 
- 	if (is_pabt) {
- 		vect_offset = 12;
-+		return_offset = 4;
- 		far = &vcpu_cp15(vcpu, c6_IFAR);
- 		fsr = &vcpu_cp15(vcpu, c5_IFSR);
- 	} else { /* !iabt */
- 		vect_offset = 16;
-+		return_offset = 8;
- 		far = &vcpu_cp15(vcpu, c6_DFAR);
- 		fsr = &vcpu_cp15(vcpu, c5_DFSR);
- 	}
- 
--	prepare_fault32(vcpu, COMPAT_PSR_MODE_ABT | COMPAT_PSR_A_BIT, vect_offset);
-+	prepare_fault32(vcpu, COMPAT_PSR_MODE_ABT | COMPAT_PSR_A_BIT,
-+		       vect_offset, return_offset);
- 
- 	*far = addr;
- 
--- 
-2.10.1
+By the way, what I'm going for is anything in the hyp address space has
+leading __, and otherwise ot.
+
+> >  		vcpu = host_ctxt->__hyp_running_vcpu;
+> >  		__timer_disable_traps(vcpu);
+> >  		__deactivate_traps(vcpu);
+> > 
+> 
+Thanks,
+-Christoffer
