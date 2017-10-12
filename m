@@ -1,25 +1,25 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH 19/37] KVM: arm64: Introduce separate VHE/non-VHE sysreg
- save/restore functions
-Date: Thu, 12 Oct 2017 12:41:23 +0200
-Message-ID: <20171012104141.26902-20-christoffer.dall@linaro.org>
+Subject: [PATCH 25/37] KVM: arm64: Prepare to handle traps on remaining
+ deferred EL1 sysregs
+Date: Thu, 12 Oct 2017 12:41:29 +0200
+Message-ID: <20171012104141.26902-26-christoffer.dall@linaro.org>
 References: <20171012104141.26902-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0761B49D44
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C2F049D8A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Xyqa+JqF0epa for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Oct 2017 06:41:25 -0400 (EDT)
-Received: from mail-wm0-f46.google.com (mail-wm0-f46.google.com [74.125.82.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D9F7749D63
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:24 -0400 (EDT)
-Received: by mail-wm0-f46.google.com with SMTP id m72so11979123wmc.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 03:42:09 -0700 (PDT)
+ with ESMTP id UDONXvznU+tE for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Oct 2017 06:41:33 -0400 (EDT)
+Received: from mail-wm0-f41.google.com (mail-wm0-f41.google.com [74.125.82.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C2D7149D31
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 06:41:32 -0400 (EDT)
+Received: by mail-wm0-f41.google.com with SMTP id f4so12126920wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Oct 2017 03:42:17 -0700 (PDT)
 In-Reply-To: <20171012104141.26902-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,203 +34,228 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As we are about to handle system registers quite differently between VHE
-and non-VHE systems.  In preparation for that, we need to split some of
-the handling functions between VHE and non-VHE functionality.
-
-For now, we simply copy the non-VHE functions, but we do change the use
-of static keys for VHE and non-VHE functionality now that we have
-separate functions.
+Handle accesses during traps to any remaining EL1 registers which can be
+deferred to vcpu_load and vcpu_put, by either accessing them directly on
+the physical CPU when the latest version is stored there, or by
+synchronizing the memory representation with the CPU state.
 
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/include/asm/kvm_hyp.h | 12 ++++++++----
- arch/arm64/kvm/hyp/switch.c      | 20 ++++++++++----------
- arch/arm64/kvm/hyp/sysreg-sr.c   | 40 ++++++++++++++++++++++++++++++++--------
- 3 files changed, 50 insertions(+), 22 deletions(-)
+ arch/arm64/include/asm/kvm_emulate.h | 14 -------
+ arch/arm64/kvm/inject_fault.c        | 79 ++++++++++++++++++++++++++++++++----
+ arch/arm64/kvm/sys_regs.c            |  6 ++-
+ 3 files changed, 76 insertions(+), 23 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index a0e5a70..998152d 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -132,10 +132,14 @@ int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu);
- void __timer_enable_traps(struct kvm_vcpu *vcpu);
- void __timer_disable_traps(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 630dd60..69bb40d 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -66,11 +66,6 @@ static inline unsigned long *vcpu_pc(const struct kvm_vcpu *vcpu)
+ 	return (unsigned long *)&vcpu_gp_regs(vcpu)->regs.pc;
+ }
  
--void __sysreg_save_host_state(struct kvm_cpu_context *ctxt);
--void __sysreg_restore_host_state(struct kvm_cpu_context *ctxt);
--void __sysreg_save_guest_state(struct kvm_cpu_context *ctxt);
--void __sysreg_restore_guest_state(struct kvm_cpu_context *ctxt);
-+void __sysreg_save_host_state_nvhe(struct kvm_cpu_context *ctxt);
-+void __sysreg_restore_host_state_nvhe(struct kvm_cpu_context *ctxt);
-+void __sysreg_save_guest_state_nvhe(struct kvm_cpu_context *ctxt);
-+void __sysreg_restore_guest_state_nvhe(struct kvm_cpu_context *ctxt);
-+void sysreg_save_host_state_vhe(struct kvm_cpu_context *ctxt);
-+void sysreg_restore_host_state_vhe(struct kvm_cpu_context *ctxt);
-+void sysreg_save_guest_state_vhe(struct kvm_cpu_context *ctxt);
-+void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt);
- void __sysreg32_save_state(struct kvm_vcpu *vcpu);
- void __sysreg32_restore_state(struct kvm_vcpu *vcpu);
+-static inline unsigned long *vcpu_elr_el1(const struct kvm_vcpu *vcpu)
+-{
+-	return (unsigned long *)&vcpu_gp_regs(vcpu)->elr_el1;
+-}
+-
+ static inline unsigned long *vcpu_cpsr(const struct kvm_vcpu *vcpu)
+ {
+ 	return (unsigned long *)&vcpu_gp_regs(vcpu)->regs.pstate;
+@@ -120,15 +115,6 @@ static inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
+ 		vcpu_gp_regs(vcpu)->regs.regs[reg_num] = val;
+ }
  
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index b98b73b..7c4d430 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -330,7 +330,7 @@ int kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	host_ctxt->__hyp_running_vcpu = vcpu;
- 	guest_ctxt = &vcpu->arch.ctxt;
+-/* Get vcpu SPSR for current mode */
+-static inline unsigned long *vcpu_spsr(const struct kvm_vcpu *vcpu)
+-{
+-	if (vcpu_mode_is_32bit(vcpu))
+-		return vcpu_spsr32(vcpu);
+-
+-	return (unsigned long *)&vcpu_gp_regs(vcpu)->spsr[KVM_SPSR_EL1];
+-}
+-
+ static inline bool vcpu_mode_priv(const struct kvm_vcpu *vcpu)
+ {
+ 	u32 mode;
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index 45c7026..f4513fc 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -23,6 +23,7 @@
  
--	__sysreg_save_host_state(host_ctxt);
-+	sysreg_save_host_state_vhe(host_ctxt);
+ #include <linux/kvm_host.h>
+ #include <asm/kvm_emulate.h>
++#include <asm/kvm_hyp.h>
+ #include <asm/esr.h>
  
- 	__activate_traps(vcpu);
- 	__activate_vm(vcpu);
-@@ -342,7 +342,7 @@ int kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	 * to erratum #852523 (Cortex-A57) or #853709 (Cortex-A72).
- 	 */
- 	__sysreg32_restore_state(vcpu);
--	__sysreg_restore_guest_state(guest_ctxt);
-+	sysreg_restore_guest_state_vhe(guest_ctxt);
- 	__debug_switch_to_guest(vcpu);
+ #define PSTATE_FAULT_BITS_64 	(PSR_MODE_EL1h | PSR_A_BIT | PSR_F_BIT | \
+@@ -33,13 +34,55 @@
+ #define LOWER_EL_AArch64_VECTOR		0x400
+ #define LOWER_EL_AArch32_VECTOR		0x600
  
- 	/* Jump in the fire! */
-@@ -353,13 +353,13 @@ int kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	if (fixup_guest_exit(vcpu, &exit_code))
- 		goto again;
++static u64 vcpu_get_vbar_el1(struct kvm_vcpu *vcpu)
++{
++	unsigned long vbar;
++
++	if (vcpu->arch.sysregs_loaded_on_cpu)
++		vbar = read_sysreg_el1(vbar);
++	else
++		vbar = vcpu_sys_reg(vcpu, VBAR_EL1);
++
++	if (vcpu_el1_is_32bit(vcpu))
++		return lower_32_bits(vbar);
++	return vbar;
++}
++
++static void vcpu_set_elr_el1(struct kvm_vcpu *vcpu, u64 val)
++{
++	if (vcpu->arch.sysregs_loaded_on_cpu)
++		write_sysreg_el1(val, elr);
++	else
++		vcpu_gp_regs(vcpu)->elr_el1 = val;
++}
++
++/* Set the SPSR for the current mode */
++static void vcpu_set_spsr(struct kvm_vcpu *vcpu, u64 val)
++{
++	if (vcpu_mode_is_32bit(vcpu))
++		*vcpu_spsr32(vcpu) = val;
++
++	if (vcpu->arch.sysregs_loaded_on_cpu)
++		write_sysreg_el1(val, spsr);
++	else
++		vcpu_gp_regs(vcpu)->spsr[KVM_SPSR_EL1] = val;
++}
++
++static u32 vcpu_get_c1_sctlr(struct kvm_vcpu *vcpu)
++{
++	if (vcpu->arch.sysregs_loaded_on_cpu)
++		return lower_32_bits(read_sysreg_el1(sctlr));
++	else
++		return vcpu_cp15(vcpu, c1_SCTLR);
++}
++
+ static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+ {
+ 	unsigned long cpsr;
+ 	unsigned long new_spsr_value = *vcpu_cpsr(vcpu);
+ 	bool is_thumb = (new_spsr_value & COMPAT_PSR_T_BIT);
+ 	u32 return_offset = (is_thumb) ? 4 : 0;
+-	u32 sctlr = vcpu_cp15(vcpu, c1_SCTLR);
++	u32 sctlr = vcpu_get_c1_sctlr(vcpu);
  
--	__sysreg_save_guest_state(guest_ctxt);
-+	sysreg_save_guest_state_vhe(guest_ctxt);
- 	__sysreg32_save_state(vcpu);
- 	__vgic_save_state(vcpu);
+ 	cpsr = mode | COMPAT_PSR_I_BIT;
  
- 	__deactivate_traps(vcpu);
+@@ -51,14 +94,14 @@ static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+ 	*vcpu_cpsr(vcpu) = cpsr;
  
--	__sysreg_restore_host_state(host_ctxt);
-+	sysreg_restore_host_state_vhe(host_ctxt);
+ 	/* Note: These now point to the banked copies */
+-	*vcpu_spsr(vcpu) = new_spsr_value;
++	vcpu_set_spsr(vcpu, new_spsr_value);
+ 	*vcpu_reg32(vcpu, 14) = *vcpu_pc(vcpu) + return_offset;
  
- 	/*
- 	 * This must come after restoring the host sysregs, since a non-VHE
-@@ -383,7 +383,7 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	host_ctxt->__hyp_running_vcpu = vcpu;
- 	guest_ctxt = &vcpu->arch.ctxt;
+ 	/* Branch to exception vector */
+ 	if (sctlr & (1 << 13))
+ 		vect_offset += 0xffff0000;
+ 	else /* always have security exceptions */
+-		vect_offset += vcpu_cp15(vcpu, c12_VBAR);
++		vect_offset += vcpu_get_vbar_el1(vcpu);
  
--	__sysreg_save_host_state(host_ctxt);
-+	__sysreg_save_host_state_nvhe(host_ctxt);
+ 	*vcpu_pc(vcpu) = vect_offset;
+ }
+@@ -79,6 +122,20 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
+ 	u32 *far, *fsr;
+ 	bool is_lpae;
  
- 	__activate_traps(vcpu);
- 	__activate_vm(vcpu);
-@@ -396,7 +396,7 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	 * to erratum #852523 (Cortex-A57) or #853709 (Cortex-A72).
- 	 */
- 	__sysreg32_restore_state(vcpu);
--	__sysreg_restore_guest_state(guest_ctxt);
-+	__sysreg_restore_guest_state_nvhe(guest_ctxt);
- 	__debug_switch_to_guest(vcpu);
++	/*
++	 * We are going to need the latest values of the following system
++	 * regiters:
++	 *   DFAR:  mapped to FAR_EL1
++	 *   IFAR:  mapped to FAR_EL1
++	 *   DFSR:  mapped to ESR_EL1
++	 *   TTBCR: mapped to TCR_EL1
++	 */
++	if (vcpu->arch.sysregs_loaded_on_cpu) {
++		vcpu->arch.ctxt.sys_regs[FAR_EL1] = read_sysreg_el1(far);
++		vcpu->arch.ctxt.sys_regs[ESR_EL1] = read_sysreg_el1(esr);
++		vcpu->arch.ctxt.sys_regs[TCR_EL1] = read_sysreg_el1(tcr);
++	}
++
+ 	if (is_pabt) {
+ 		vect_offset = 12;
+ 		far = &vcpu_cp15(vcpu, c6_IFAR);
+@@ -99,6 +156,12 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
+ 		*fsr = 1 << 9 | 0x34;
+ 	else
+ 		*fsr = 0x14;
++
++	/* Sync back any registers we may have changed */
++	if (vcpu->arch.sysregs_loaded_on_cpu) {
++		write_sysreg_el1(vcpu->arch.ctxt.sys_regs[FAR_EL1], far);
++		write_sysreg_el1(vcpu->arch.ctxt.sys_regs[ESR_EL1], esr);
++	}
+ }
  
- 	/* Jump in the fire! */
-@@ -407,7 +407,7 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	if (fixup_guest_exit(vcpu, &exit_code))
- 		goto again;
- 
--	__sysreg_save_guest_state(guest_ctxt);
-+	__sysreg_save_guest_state_nvhe(guest_ctxt);
- 	__sysreg32_save_state(vcpu);
- 	__timer_disable_traps(vcpu);
- 	__vgic_save_state(vcpu);
-@@ -415,7 +415,7 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	__deactivate_traps(vcpu);
- 	__deactivate_vm(vcpu);
- 
--	__sysreg_restore_host_state(host_ctxt);
-+	__sysreg_restore_host_state_nvhe(host_ctxt);
- 
- 	/*
- 	 * This must come after restoring the host sysregs, since a non-VHE
-@@ -440,7 +440,7 @@ static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par,
- 		__timer_disable_traps(vcpu);
- 		__deactivate_traps(vcpu);
- 		__deactivate_vm(vcpu);
--		__sysreg_restore_host_state(__host_ctxt);
-+		__sysreg_restore_host_state_nvhe(__host_ctxt);
+ enum exception_type {
+@@ -126,7 +189,7 @@ static u64 get_except_vector(struct kvm_vcpu *vcpu, enum exception_type type)
+ 		exc_offset = LOWER_EL_AArch32_VECTOR;
  	}
  
+-	return vcpu_sys_reg(vcpu, VBAR_EL1) + exc_offset + type;
++	return vcpu_get_vbar_el1(vcpu) + exc_offset + type;
+ }
+ 
+ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr)
+@@ -135,11 +198,11 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
+ 	bool is_aarch32 = vcpu_mode_is_32bit(vcpu);
+ 	u32 esr = 0;
+ 
+-	*vcpu_elr_el1(vcpu) = *vcpu_pc(vcpu);
++	vcpu_set_elr_el1(vcpu, *vcpu_pc(vcpu));
+ 	*vcpu_pc(vcpu) = get_except_vector(vcpu, except_type_sync);
+ 
+ 	*vcpu_cpsr(vcpu) = PSTATE_FAULT_BITS_64;
+-	*vcpu_spsr(vcpu) = cpsr;
++	vcpu_set_spsr(vcpu, cpsr);
+ 
+ 	vcpu_sys_reg(vcpu, FAR_EL1) = addr;
+ 
+@@ -170,11 +233,11 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
+ 	unsigned long cpsr = *vcpu_cpsr(vcpu);
+ 	u32 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
+ 
+-	*vcpu_elr_el1(vcpu) = *vcpu_pc(vcpu);
++	vcpu_set_elr_el1(vcpu, *vcpu_pc(vcpu));
+ 	*vcpu_pc(vcpu) = get_except_vector(vcpu, except_type_sync);
+ 
+ 	*vcpu_cpsr(vcpu) = PSTATE_FAULT_BITS_64;
+-	*vcpu_spsr(vcpu) = cpsr;
++	vcpu_set_spsr(vcpu, cpsr);
+ 
  	/*
-@@ -463,7 +463,7 @@ static void __hyp_call_panic_vhe(u64 spsr, u64 elr, u64 par,
- 	vcpu = host_ctxt->__hyp_running_vcpu;
- 
- 	__deactivate_traps_vhe();
--	__sysreg_restore_host_state(host_ctxt);
-+	sysreg_restore_host_state_vhe(host_ctxt);
- 
- 	panic(__hyp_panic_string,
- 	      spsr,  elr,
-diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-index b55c4ad..d8c42de 100644
---- a/arch/arm64/kvm/hyp/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-@@ -70,15 +70,27 @@ static void __hyp_text __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
- 	ctxt->gp_regs.regs.pstate	= read_sysreg_el2(spsr);
- }
- 
--void __hyp_text __sysreg_save_host_state(struct kvm_cpu_context *ctxt)
-+void __hyp_text __sysreg_save_host_state_nvhe(struct kvm_cpu_context *ctxt)
-+{
-+	__sysreg_save_el1_state(ctxt);
-+	__sysreg_save_common_state(ctxt);
-+	__sysreg_save_user_state(ctxt);
-+}
-+
-+void __hyp_text __sysreg_save_guest_state_nvhe(struct kvm_cpu_context *ctxt)
-+{
-+	__sysreg_save_el1_state(ctxt);
-+	__sysreg_save_common_state(ctxt);
-+	__sysreg_save_user_state(ctxt);
-+}
-+
-+void sysreg_save_host_state_vhe(struct kvm_cpu_context *ctxt)
+ 	 * Build an unknown exception, depending on the instruction
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index f7887dd..60d1660 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -86,12 +86,16 @@ static u32 cache_levels;
+ static u32 get_ccsidr(u32 csselr)
  {
--	if (!has_vhe())
--		__sysreg_save_el1_state(ctxt);
- 	__sysreg_save_common_state(ctxt);
- 	__sysreg_save_user_state(ctxt);
- }
+ 	u32 ccsidr;
++	u32 csselr_preserve;
  
--void __hyp_text __sysreg_save_guest_state(struct kvm_cpu_context *ctxt)
-+void sysreg_save_guest_state_vhe(struct kvm_cpu_context *ctxt)
- {
- 	__sysreg_save_el1_state(ctxt);
- 	__sysreg_save_common_state(ctxt);
-@@ -126,15 +138,27 @@ static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
- 	write_sysreg_el2(ctxt->gp_regs.regs.pstate,	spsr);
- }
+-	/* Make sure noone else changes CSSELR during this! */
++	/* Make sure noone else changes CSSELR during this and preserve any
++	 * existing value in the CSSELR! */
+ 	local_irq_disable();
++	csselr_preserve = read_sysreg(csselr_el1);
+ 	write_sysreg(csselr, csselr_el1);
+ 	isb();
+ 	ccsidr = read_sysreg(ccsidr_el1);
++	write_sysreg(csselr_preserve, csselr_el1);
+ 	local_irq_enable();
  
--void __hyp_text __sysreg_restore_host_state(struct kvm_cpu_context *ctxt)
-+void __hyp_text __sysreg_restore_host_state_nvhe(struct kvm_cpu_context *ctxt)
-+{
-+	__sysreg_restore_el1_state(ctxt);
-+	__sysreg_restore_common_state(ctxt);
-+	__sysreg_restore_user_state(ctxt);
-+}
-+
-+void __hyp_text __sysreg_restore_guest_state_nvhe(struct kvm_cpu_context *ctxt)
-+{
-+	__sysreg_restore_el1_state(ctxt);
-+	__sysreg_restore_common_state(ctxt);
-+	__sysreg_restore_user_state(ctxt);
-+}
-+
-+void sysreg_restore_host_state_vhe(struct kvm_cpu_context *ctxt)
- {
--	if (!has_vhe())
--		__sysreg_restore_el1_state(ctxt);
- 	__sysreg_restore_common_state(ctxt);
- 	__sysreg_restore_user_state(ctxt);
- }
- 
--void __hyp_text __sysreg_restore_guest_state(struct kvm_cpu_context *ctxt)
-+void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt)
- {
- 	__sysreg_restore_el1_state(ctxt);
- 	__sysreg_restore_common_state(ctxt);
+ 	return ccsidr;
 -- 
 2.9.0
