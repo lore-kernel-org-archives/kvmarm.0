@@ -1,27 +1,27 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v3 13/28] arm64/sve: Signal handling support
-Date: Fri, 13 Oct 2017 12:17:19 +0100
-Message-ID: <20171013111718.nqd2nllr7niytfss@armageddon.cambridge.arm.com>
-References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
- <1507660725-7986-14-git-send-email-Dave.Martin@arm.com>
- <20171011164052.exvy2w5p47mewrmg@armageddon.cambridge.arm.com>
- <20171012161156.GI19485@e103592.cambridge.arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 01/37] KVM: arm64: Avoid storing the vcpu pointer on the
+ stack
+Date: Fri, 13 Oct 2017 12:31:31 +0100
+Message-ID: <20a58b6b-7476-fed9-6b48-b9710b437750@arm.com>
+References: <20171012104141.26902-1-christoffer.dall@linaro.org>
+ <20171012104141.26902-2-christoffer.dall@linaro.org>
+ <ef4bffe5-b3c5-5fdd-cb8b-1840d2243ae1@arm.com> <20171012170216.GA26425@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E9D0A49D44
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 07:16:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EB09B49D40
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 07:30:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5z31fDCHTi4X for <kvmarm@lists.cs.columbia.edu>;
- Fri, 13 Oct 2017 07:16:37 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 61BDF49D25
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 07:16:37 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20171012161156.GI19485@e103592.cambridge.arm.com>
+ with ESMTP id Zlin-KZhpXSR for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 13 Oct 2017 07:30:48 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 77B6B49D25
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 07:30:48 -0400 (EDT)
+In-Reply-To: <20171012170216.GA26425@cbox>
+Content-Language: en-GB
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,90 +31,108 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Christoffer Dall <cdall@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org, Shih-Wei Li <shihwei@cs.columbia.edu>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Oct 12, 2017 at 05:11:57PM +0100, Dave P Martin wrote:
-> On Wed, Oct 11, 2017 at 05:40:52PM +0100, Catalin Marinas wrote:
-> > On Tue, Oct 10, 2017 at 07:38:30PM +0100, Dave P Martin wrote:
-> > > diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-> > > index aabeaee..fa4ed34 100644
-> > > --- a/arch/arm64/kernel/fpsimd.c
-> > > +++ b/arch/arm64/kernel/fpsimd.c
-> > > @@ -310,6 +310,32 @@ static void fpsimd_to_sve(struct task_struct *task)
-> > >  		       sizeof(fst->vregs[i]));
-> > >  }
-> > >  
-> > > +/*
-> > > + * Transfer the SVE state in task->thread.sve_state to
-> > > + * task->thread.fpsimd_state.
-> > > + *
-> > > + * Task can be a non-runnable task, or current.  In the latter case,
-> > > + * softirqs (and preemption) must be disabled.
-> > > + * task->thread.sve_state must point to at least sve_state_size(task)
-> > > + * bytes of allocated kernel memory.
-> > > + * task->thread.sve_state must be up to date before calling this function.
-> > > + */
-> > > +static void sve_to_fpsimd(struct task_struct *task)
-> > > +{
-> > > +	unsigned int vq;
-> > > +	void const *sst = task->thread.sve_state;
-> > > +	struct fpsimd_state *fst = &task->thread.fpsimd_state;
-> > > +	unsigned int i;
-> > > +
-> > > +	if (!system_supports_sve())
-> > > +		return;
-> > > +
-> > > +	vq = sve_vq_from_vl(task->thread.sve_vl);
-> > > +	for (i = 0; i < 32; ++i)
-> > > +		memcpy(&fst->vregs[i], ZREG(sst, vq, i),
-> > > +		       sizeof(fst->vregs[i]));
-> > > +}
-> > 
-> > Nit: could we actually just do an assignment with some pointer casting?
-> > It looks like we invoke memcpy for every 16 bytes (same for
-> > fpsimd_to_sve).
+On 12/10/17 18:02, Christoffer Dall wrote:
+> On Thu, Oct 12, 2017 at 04:49:44PM +0100, Marc Zyngier wrote:
+>> On 12/10/17 11:41, Christoffer Dall wrote:
+>>> We already have the percpu area for the host cpu state, which points to
+>>> the VCPU, so there's no need to store the VCPU pointer on the stack on
+>>> every context switch.  We can be a little more clever and just use
+>>> tpidr_el2 for the percpu offset and load the VCPU pointer from the host
+>>> context.
+>>>
+>>> This requires us to have a scratch register though, so we take the
+>>> chance to rearrange some of the el1_sync code to only look at the
+>>> vttbr_el2 to determine if this is a trap from the guest or an HVC from
+>>> the host.  We do add an extra check to call the panic code if the kernel
+>>> is configured with debugging enabled and we saw a trap from the host
+>>> which wasn't an HVC, indicating that we left some EL2 trap configured by
+>>> mistake.
+>>>
+>>> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+>>> ---
+>>>  arch/arm64/include/asm/kvm_asm.h | 20 ++++++++++++++++++++
+>>>  arch/arm64/kernel/asm-offsets.c  |  1 +
+>>>  arch/arm64/kvm/hyp/entry.S       |  5 +----
+>>>  arch/arm64/kvm/hyp/hyp-entry.S   | 39 ++++++++++++++++++---------------------
+>>>  arch/arm64/kvm/hyp/switch.c      |  2 +-
+>>>  5 files changed, 41 insertions(+), 26 deletions(-)
+>>>
+>>> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+>>> index ab4d0a9..7e48a39 100644
+>>> --- a/arch/arm64/include/asm/kvm_asm.h
+>>> +++ b/arch/arm64/include/asm/kvm_asm.h
+>>> @@ -70,4 +70,24 @@ extern u32 __init_stage2_translation(void);
+>>>  
+>>>  #endif
+>>>  
+>>> +#ifdef __ASSEMBLY__
+>>> +.macro get_host_ctxt reg, tmp
+>>> +	/*
+>>> +	 * '=kvm_host_cpu_state' is a host VA from the constant pool, it may
+>>> +	 * not be accessible by this address from EL2, hyp_panic() converts
+>>> +	 * it with kern_hyp_va() before use.
+>>> +	 */
+>>
+>> This really looks like a stale comment, as there is no hyp_panic
+>> involved here anymore (thankfully!).
+>>
 > 
-> I was uneasy about what the type of ZREG(sst, vq, i) ought to be.
-> In any case, memest() is magic: my oldskool GCC (5.3.0) generates:
+> yeah, I suppose.
 > 
-> ffff000008084c70 <sve_to_fpsimd>:
-> ffff000008084c70:       14000004        b       ffff000008084c80 <sve_to_fpsimd+0x10>
-> ffff000008084c74:       d503201f        nop
-> ffff000008084c78:       d65f03c0        ret
-> ffff000008084c7c:       d503201f        nop
-> ffff000008084c80:       f0007d61        adrp    x1, ffff000009033000 <reset_devices>
-> ffff000008084c84:       f942a021        ldr     x1, [x1,#1344]
-> ffff000008084c88:       36b001c1        tbz     w1, #22, ffff000008084cc0 <sve_to_fpsimd+0x50>
-> ffff000008084c8c:       b94ca805        ldr     w5, [x0,#3240]
-> ffff000008084c90:       912a0001        add     x1, x0, #0xa80
-> ffff000008084c94:       91320004        add     x4, x0, #0xc80
-> ffff000008084c98:       f9465006        ldr     x6, [x0,#3232]
-> ffff000008084c9c:       121c6ca5        and     w5, w5, #0xfffffff0
-> ffff000008084ca0:       52800000        mov     w0, #0x0                        // #0
-> ffff000008084ca4:       8b2040c2        add     x2, x6, w0, uxtw
-> ffff000008084ca8:       0b050000        add     w0, w0, w5
-> ffff000008084cac:       a9400c42        ldp     x2, x3, [x2]
-> ffff000008084cb0:       a8810c22        stp     x2, x3, [x1],#16
-> ffff000008084cb4:       eb01009f        cmp     x4, x1
-> ffff000008084cb8:       54ffff61        b.ne    ffff000008084ca4 <sve_to_fpsimd+0x34>
-> ffff000008084cbc:       d65f03c0        ret
-> ffff000008084cc0:       d65f03c0        ret
-> ffff000008084cc4:       d503201f        nop
+>>> +	ldr	\reg, =kvm_host_cpu_state
+>>> +	mrs	\tmp, tpidr_el2
+>>> +	add	\reg, \reg, \tmp
+>>> +	kern_hyp_va \reg
+>>
+>> Here, we're trading a load from the stack for a load from the constant
+>> pool. Can't we do something like:
+>>
+>> 	adr_l	\reg, kvm_host_cpu_state
+>> 	msr	\tmp, tpidr_el2
+>> 	add	\reg, \reg, \tmp
+>>
+>> and that's it? 
 > 
+> That's definitely what the compiler generates from C code...
 > 
-> Without volatile, I think assigning a single object and doing a memcpy()
-> are equivalent to the compiler: which it actually uses depends solely on
-> optimisation considerations.
+>> This relies on the property that the kernel/hyp offset is
+>> constant, and that it doesn't matter if we add the offset to a kernel VA
+>> or a HYP VA... Completely untested of course!
+>>
 > 
-> (But then I'm not a language lawyer ... not a professional one anyway).
-> 
-> Are you concerned compilers may mess this up?
+> You're the hyp VA expert.  Is it valid to rely on that assumption?
 
-That's fine, please ignore my comment then. I was worried that gcc would
-always generate a call to the memcpy implementation rather than inlining
-it.
+Absolutely. Otherwise, we've messed up something really badly.
 
+[...]
+
+>>> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+>>> index 69ef24a..a0123ad 100644
+>>> --- a/arch/arm64/kvm/hyp/switch.c
+>>> +++ b/arch/arm64/kvm/hyp/switch.c
+>>> @@ -435,7 +435,7 @@ void __hyp_text __noreturn hyp_panic(struct kvm_cpu_context *__host_ctxt)
+>>>  	if (read_sysreg(vttbr_el2)) {
+>>>  		struct kvm_cpu_context *host_ctxt;
+>>>  
+>>> -		host_ctxt = kern_hyp_va(__host_ctxt);
+>>> +		host_ctxt = __host_ctxt;
+>>
+>> Can't we just rename __host_ctxt to host_ctxt and drop the local definition?
+>>
+> 
+> yes, patch splitting snafu.  Will fix.
+> 
+> By the way, what I'm going for is anything in the hyp address space has
+> leading __, and otherwise ot.
+
+OK, that's a useful convention, actually.
+
+Thanks,
+
+	M.
 -- 
-Catalin
+Jazz is not dead. It just smells funny...
