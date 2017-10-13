@@ -1,30 +1,27 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v1 2/2] kvm: arm64: handle single-step of userspace mmio
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v1 1/2] KVM: arm64: handle single-stepping trapped
  instructions
-Date: Fri, 13 Oct 2017 10:59:47 +0200
-Message-ID: <20171013085947.GE8927@cbox>
+Date: Fri, 13 Oct 2017 10:15:09 +0100
+Message-ID: <87r2u79zoi.fsf@linaro.org>
 References: <20171006113921.24880-1-alex.bennee@linaro.org>
- <20171006113921.24880-3-alex.bennee@linaro.org>
- <a9f8905e-18e9-267a-2479-f498c248e2f4@arm.com>
- <878tgoxudc.fsf@linaro.org>
+ <20171006113921.24880-2-alex.bennee@linaro.org> <20171013082615.GC8927@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EC75349D24
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 04:58:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E2B2549D24
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 05:14:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id op4BYWaBGCLZ for <kvmarm@lists.cs.columbia.edu>;
- Fri, 13 Oct 2017 04:58:55 -0400 (EDT)
-Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com [74.125.82.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6257D40D25
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 04:58:55 -0400 (EDT)
-Received: by mail-wm0-f50.google.com with SMTP id u138so19510747wmu.5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 01:59:42 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <878tgoxudc.fsf@linaro.org>
+ with ESMTP id vsud9Xkp0ZYC for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 13 Oct 2017 05:14:25 -0400 (EDT)
+Received: from mail-wm0-f51.google.com (mail-wm0-f51.google.com [74.125.82.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 99B8149D21
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 05:14:25 -0400 (EDT)
+Received: by mail-wm0-f51.google.com with SMTP id q132so19932097wmd.2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 02:15:12 -0700 (PDT)
+In-reply-to: <20171013082615.GC8927@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,112 +31,83 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: kvm@vger.kernel.org, Julien Thierry <julien.thierry@arm.com>, marc.zyngier@arm.com, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Russell King <linux@armlinux.org.uk>, open list <linux-kernel@vger.kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+To: Christoffer Dall <cdall@linaro.org>
+Cc: kvm@vger.kernel.org, julien.thierry@arm.com, marc.zyngier@arm.com, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 06, 2017 at 02:45:35PM +0100, Alex Benn=E9e wrote:
-> =
-
-> Julien Thierry <julien.thierry@arm.com> writes:
-> =
-
-> > On 06/10/17 12:39, Alex Benn=E9e wrote:
-> >> The system state of KVM when using userspace emulation is not complete
-> >> until we return into KVM_RUN. To handle mmio related updates we wait
-> >> until they have been committed and then schedule our KVM_EXIT_DEBUG.
-> >>
-> >> I've introduced a new function kvm_arm_maybe_return_debug() to wrap up
-> >> the differences between arm/arm64 which is currently null for arm.
-> >>
-> >> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> >> ---
-> >>   arch/arm/include/asm/kvm_host.h   |  2 ++
-> >>   arch/arm64/include/asm/kvm_host.h |  1 +
-> >>   arch/arm64/kvm/debug.c            | 21 +++++++++++++++++++++
-> >>   arch/arm64/kvm/handle_exit.c      |  9 +++------
-> >>   virt/kvm/arm/arm.c                |  2 +-
-> >>   virt/kvm/arm/mmio.c               |  3 ++-
-> >>   6 files changed, 30 insertions(+), 8 deletions(-)
-> >>
-> >> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kv=
-m_host.h
-> >> index 4a879f6ff13b..aec943f6d123 100644
-> >> --- a/arch/arm/include/asm/kvm_host.h
-> >> +++ b/arch/arm/include/asm/kvm_host.h
-> >> @@ -285,6 +285,8 @@ static inline void kvm_arm_init_debug(void) {}
-> >>   static inline void kvm_arm_setup_debug(struct kvm_vcpu *vcpu) {}
-> >>   static inline void kvm_arm_clear_debug(struct kvm_vcpu *vcpu) {}
-> >>   static inline void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu) {}
-> >> +static inline int  kvm_arm_maybe_return_debug(struct kvm_vcpu *vcpu,
-> >> +						struct kvm_run *run) {}
-> >>
-> >
-> > This function should return 1.
-> =
-
-> So I did ponder making this a bool, returning true if we need to exit
-> and testing in v/k/a/arm.c exit leg rather than in the mmio handler.
-> =
-
-> At the moment it mirrors the existing exit logic which follows -1 err, 0
-> return, >0 handled. But as I mentioned in the cover letter this fell
-> down a bit when dealing with the mmio case.
-> =
-
-> >
-> >>   int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
-> >>   			       struct kvm_device_attr *attr);
-> >> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/as=
-m/kvm_host.h
-> >> index e923b58606e2..fa67d21662f6 100644
-> >> --- a/arch/arm64/include/asm/kvm_host.h
-> >> +++ b/arch/arm64/include/asm/kvm_host.h
-> >> @@ -369,6 +369,7 @@ void kvm_arm_init_debug(void);
-> >>   void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
-> >>   void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
-> >>   void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
-> >> +int  kvm_arm_maybe_return_debug(struct kvm_vcpu *vcpu, struct kvm_run=
- *run);
-> >
-> > I feel the name could be a little bit more explicit:
-> >
-> > kvm_arm_trap_need_step_debug, kvm_arm_trap_step_return_debug,
-> > kvm_arm_trap_need_return_debug.
-> =
-
-> I wanted to keep the debug suffix so that's fine although I'm not so
-> sure trap is correct because on the tail end of mmio emulation are we
-> still trapping?
-> =
-
-> Maybe kvm_arm_step_emulated_debug?
-
-I think you should name it:
-
-kvm_arm_should_complete_emulated_instr_debug() - or something better -
-and call it directly from kvm_arch_vcpu_ioctl_run, so that it becomes:
-
-	ret =3D kvm_handle_mmio_return(vcpu, vcpu->run);
-	if (ret)
-		return ret;
-	ret =3D kvm_arm_should_complete_emulated_instr_debug(vcpu);
-	if (ret)
-		return ret;
-
-> =
-
-> > At least, I think it would be nice that the name reflect that this
-> > check is meant for emulated instructions.
-> >
-> > Otherwise:
-> >
-> > Reviewed-by: Julien Thierry <julien.thierry@arm.com>
-> >
-> > Thanks,
-> =
-
-> =
-
-Thanks,
--Christoffer
+CkNocmlzdG9mZmVyIERhbGwgPGNkYWxsQGxpbmFyby5vcmc+IHdyaXRlczoKCj4gT24gRnJpLCBP
+Y3QgMDYsIDIwMTcgYXQgMTI6Mzk6MjBQTSArMDEwMCwgQWxleCBCZW5uw6llIHdyb3RlOgo+PiBJ
+ZiB3ZSBhcmUgdXNpbmcgZ3Vlc3QgZGVidWcgdG8gc2luZ2xlLXN0ZXAgdGhlIGd1ZXN0IHdlIG5l
+ZWQgdG8gZW5zdXJlCj4+IHdlIGV4aXQgYWZ0ZXIgZW11bGF0aW5nIHRoZSBpbnN0cnVjdGlvbi4g
+VGhpcyBvbmx5IGFmZmVjdHMKPj4gaW5zdHJ1Y3Rpb25zIGNvbXBsZXRlbHkgZW11bGF0ZWQgYnkg
+dGhlIGtlcm5lbC4gRm9yIHVzZXJzcGFjZSBlbXVsYXRlZAo+PiBpbnN0cnVjdGlvbnMgd2UgbmVl
+ZCB0byBleGl0IGFuZCByZXR1cm4gdG8gY29tcGxldGUgdGhlIGVtdWxhdGlvbi4KPj4KPj4gV2Ug
+ZmFrZSBkZWJ1Zy5hcmNoLmhzciB0byBjb250YWluIEVTUl9FTHhfRUNfU09GVFNUUF9MT1cgc28g
+UUVNVSBrbm93cwo+PiBpdCB3YXMgYSBzaW5nbGUtc3RlcCBldmVudCAoYW5kIHdpdGhvdXQgYWx0
+ZXJpbmcgdGhlIHVzZXJzcGFjZSBBQkkpLgo+Pgo+PiBTaWduZWQtb2ZmLWJ5OiBBbGV4IEJlbm7D
+qWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+Cj4+IC0tLQo+PiAgYXJjaC9hcm02NC9rdm0vaGFu
+ZGxlX2V4aXQuYyB8IDQ4ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0t
+LS0tCj4+ICAxIGZpbGUgY2hhbmdlZCwgMzQgaW5zZXJ0aW9ucygrKSwgMTQgZGVsZXRpb25zKC0p
+Cj4+Cj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS9oYW5kbGVfZXhpdC5jIGIvYXJjaC9h
+cm02NC9rdm0vaGFuZGxlX2V4aXQuYwo+PiBpbmRleCA3ZGViYjc0ODQzYTAuLmM5MThkMjkxY2I1
+OCAxMDA2NDQKPj4gLS0tIGEvYXJjaC9hcm02NC9rdm0vaGFuZGxlX2V4aXQuYwo+PiArKysgYi9h
+cmNoL2FybTY0L2t2bS9oYW5kbGVfZXhpdC5jCj4+IEBAIC0xNzgsNiArMTc4LDM5IEBAIHN0YXRp
+YyBleGl0X2hhbmRsZV9mbiBrdm1fZ2V0X2V4aXRfaGFuZGxlcihzdHJ1Y3Qga3ZtX3ZjcHUgKnZj
+cHUpCj4+ICAJcmV0dXJuIGFybV9leGl0X2hhbmRsZXJzW2hzcl9lY107Cj4+ICB9Cj4+Cj4+ICsv
+Kgo+PiArICogV2hlbiBoYW5kbGluZyB0cmFwcyB3ZSBuZWVkIHRvIGVuc3VyZSBleGl0IHRoZSBn
+dWVzdCBpZiB3ZQo+PiArICogY29tcGxldGVseSBlbXVsYXRlZCB0aGUgaW5zdHJ1Y3Rpb24gd2hp
+bGUgc2luZ2xlLXN0ZXBwaW5nLiBTdHVmZiB0bwo+PiArICogYmUgZW11bGF0ZWQgaW4gdXNlcnNw
+YWNlIG5lZWRzIHRvIGNvbXBsZXRlIHRoYXQgZmlyc3QuCj4+ICsgKi8KPgo+IEkgcmVhbGx5IGRv
+bid0IHVuZGVyc3RhbmQgdGhlIGZpcnN0IHNlbnRlbmNlIGhlcmUuICBXZSBhcmUgYWxyZWFkeSBv
+dXQKPiBvZiB0aGUgZ3Vlc3QsIHNvIGRvIHlvdSBtZWFuIGEgcmV0dXJuIHRvIHVzZXJzcGFjZT8K
+PiBJIHRoaW5rIHRoZSBzZWNvbmQgc2VudGVuY2UgY291bGQgYmUgbW9yZSBjbGVhciBhcyB3ZWxs
+LiAgSXMgJ3N0dWZmJyBub3QKPiBhY3R1YWxseSAnTU1JTyBlbXVsYXRpb24nIG9yICdlbXVsYXRp
+b24nIG1vcmUgYnJvYWRseT8KCllvdXIgcmlnaHQgLSBpdCdzIHNsb3BwaWx5IHdvcmRlZCBob3cg
+YWJvdXQ6CgogLyoKICAqIFdlIG1heSBiZSBzaW5nbGUtc3RlcHBpbmcgYW4gZW11bGF0ZWQgaW5z
+dHJ1Y3Rpb24uIElmIHRoZSBlbXVsYXRpb24KICAqIGhhcyBiZWVuIGNvbXBsZXRlZCBpbi1rZXJu
+ZWwgd2UgY2FuIHJldHVybiB0byB1c2Vyc3BhY2Ugd2l0aCBhCiAgKiBLVk1fRVhJVF9ERUJVRywg
+b3RoZXJ3aXNlIHRoZSB1c2Vyc3BhY2UgbmVlZHMgdG8gY29tcGxldGUgaXQncwogICogZW11bGF0
+aW9uIGZpcnN0LgogICovCgpGb3IgeDg2IHRoZXJlIGlzIGFsc28gSU8gZW11bGF0aW9uIGJ1dCBp
+biBwcmluY2lwbGUgYW55dGhpbmcgdGhhdCBtaWdodApiZSBwYXNzZWQgb2ZmIHRvIHVzZXJzcGFj
+ZSB0byBiZSBjb21wbGV0ZWQgc2hvdWxkIGJlIGRvbmUgZmlyc3QuCgo+Cj4+ICsKPj4gK3N0YXRp
+YyBpbnQgaGFuZGxlX3RyYXBfZXhjZXB0aW9ucyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHN0cnVj
+dCBrdm1fcnVuICpydW4pCj4+ICt7Cj4+ICsJaW50IGhhbmRsZWQ7Cj4+ICsKPj4gKwkvKgo+PiAr
+CSAqIFNlZSBBUk0gQVJNIEIxLjE0LjE6ICJIeXAgdHJhcHMgb24gaW5zdHJ1Y3Rpb25zCj4+ICsJ
+ICogdGhhdCBmYWlsIHRoZWlyIGNvbmRpdGlvbiBjb2RlIGNoZWNrIgo+PiArCSAqLwo+PiArCWlm
+ICgha3ZtX2NvbmRpdGlvbl92YWxpZCh2Y3B1KSkgewo+PiArCQlrdm1fc2tpcF9pbnN0cih2Y3B1
+LCBrdm1fdmNwdV90cmFwX2lsX2lzMzJiaXQodmNwdSkpOwo+PiArCQloYW5kbGVkID0gMTsKPj4g
+Kwl9IGVsc2Ugewo+PiArCQlleGl0X2hhbmRsZV9mbiBleGl0X2hhbmRsZXI7Cj4+ICsKPj4gKwkJ
+ZXhpdF9oYW5kbGVyID0ga3ZtX2dldF9leGl0X2hhbmRsZXIodmNwdSk7Cj4+ICsJCWhhbmRsZWQg
+PSBleGl0X2hhbmRsZXIodmNwdSwgcnVuKTsKPj4gKwl9Cj4+ICsKPj4gKwlpZiAoaGFuZGxlZCAm
+JiAodmNwdS0+Z3Vlc3RfZGVidWcgJiBLVk1fR1VFU1REQkdfU0lOR0xFU1RFUCkpIHsKPgo+IERv
+bid0IHlvdSB3YW50IGlmIChoYW5kbGVkID09IDEpIG9yIGlmIChoYW5kbGVkID4gMCkgPwo+Cj4g
+SWYgdGhlcmUgd2FzIGFuIGVycm9yIEkgdGhpbmsgd2Ugd2FudCB0byBqdXN0IHJldHVybiB0aGF0
+IHRvIHVzZXJzcGFjZQo+IGFuZCBub3Qgb3ZlcnJpZGUgaXQgYW5kIHByZXNlbnQgc2luZ2xlLXN0
+ZXBwaW5nLgoKWWVzLCBJJ2xsIGZpeCBpdC4KCj4KPj4gKwkJaGFuZGxlZCA9IDA7Cj4+ICsJCXJ1
+bi0+ZXhpdF9yZWFzb24gPSBLVk1fRVhJVF9ERUJVRzsKPj4gKwkJcnVuLT5kZWJ1Zy5hcmNoLmhz
+ciA9IEVTUl9FTHhfRUNfU09GVFNUUF9MT1cgPDwgRVNSX0VMeF9FQ19TSElGVDsKPj4gKwl9Cj4+
+ICsKPj4gKwlyZXR1cm4gaGFuZGxlZDsKPj4gK30KPj4gKwo+PiAgLyoKPj4gICAqIFJldHVybiA+
+IDAgdG8gcmV0dXJuIHRvIGd1ZXN0LCA8IDAgb24gZXJyb3IsIDAgKGFuZCBzZXQgZXhpdF9yZWFz
+b24pIG9uCj4+ICAgKiBwcm9wZXIgZXhpdCB0byB1c2Vyc3BhY2UuCj4+IEBAIC0xODUsOCArMjE4
+LDYgQEAgc3RhdGljIGV4aXRfaGFuZGxlX2ZuIGt2bV9nZXRfZXhpdF9oYW5kbGVyKHN0cnVjdCBr
+dm1fdmNwdSAqdmNwdSkKPj4gIGludCBoYW5kbGVfZXhpdChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUs
+IHN0cnVjdCBrdm1fcnVuICpydW4sCj4+ICAJCSAgICAgICBpbnQgZXhjZXB0aW9uX2luZGV4KQo+
+PiAgewo+PiAtCWV4aXRfaGFuZGxlX2ZuIGV4aXRfaGFuZGxlcjsKPj4gLQo+PiAgCWlmIChBUk1f
+U0VSUk9SX1BFTkRJTkcoZXhjZXB0aW9uX2luZGV4KSkgewo+PiAgCQl1OCBoc3JfZWMgPSBFU1Jf
+RUx4X0VDKGt2bV92Y3B1X2dldF9oc3IodmNwdSkpOwo+Pgo+PiBAQCAtMjE0LDE4ICsyNDUsNyBA
+QCBpbnQgaGFuZGxlX2V4aXQoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBzdHJ1Y3Qga3ZtX3J1biAq
+cnVuLAo+PiAgCQlrdm1faW5qZWN0X3ZhYnQodmNwdSk7Cj4+ICAJCXJldHVybiAxOwo+PiAgCWNh
+c2UgQVJNX0VYQ0VQVElPTl9UUkFQOgo+PiAtCQkvKgo+PiAtCQkgKiBTZWUgQVJNIEFSTSBCMS4x
+NC4xOiAiSHlwIHRyYXBzIG9uIGluc3RydWN0aW9ucwo+PiAtCQkgKiB0aGF0IGZhaWwgdGhlaXIg
+Y29uZGl0aW9uIGNvZGUgY2hlY2siCj4+IC0JCSAqLwo+PiAtCQlpZiAoIWt2bV9jb25kaXRpb25f
+dmFsaWQodmNwdSkpIHsKPj4gLQkJCWt2bV9za2lwX2luc3RyKHZjcHUsIGt2bV92Y3B1X3RyYXBf
+aWxfaXMzMmJpdCh2Y3B1KSk7Cj4+IC0JCQlyZXR1cm4gMTsKPj4gLQkJfQo+PiAtCj4+IC0JCWV4
+aXRfaGFuZGxlciA9IGt2bV9nZXRfZXhpdF9oYW5kbGVyKHZjcHUpOwo+PiAtCj4+IC0JCXJldHVy
+biBleGl0X2hhbmRsZXIodmNwdSwgcnVuKTsKPj4gKwkJcmV0dXJuIGhhbmRsZV90cmFwX2V4Y2Vw
+dGlvbnModmNwdSwgcnVuKTsKPj4gIAljYXNlIEFSTV9FWENFUFRJT05fSFlQX0dPTkU6Cj4+ICAJ
+CS8qCj4+ICAJCSAqIEVMMiBoYXMgYmVlbiByZXNldCB0byB0aGUgaHlwLXN0dWIuIFRoaXMgaGFw
+cGVucyB3aGVuIGEgZ3Vlc3QKPj4gLS0KPj4gMi4xNC4xCj4+Cj4KPiBUaGFua3MsCj4gLUNocmlz
+dG9mZmVyCgoKLS0KQWxleCBCZW5uw6llCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVt
+YmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2
+bWFybQo=
