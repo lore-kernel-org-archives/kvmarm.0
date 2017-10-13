@@ -1,178 +1,186 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH v1 2/2] kvm: arm64: handle single-step of userspace mmio instructions
-Date: Fri, 13 Oct 2017 10:27:36 +0100
-Message-ID: <87o9pb9z3r.fsf@linaro.org>
-References: <20171006113921.24880-1-alex.bennee@linaro.org> <20171006113921.24880-3-alex.bennee@linaro.org> <20171013085650.GD8927@cbox>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH] arm64: KVM: set right LR register value for 32 bit guest
+ when inject abort
+Date: Fri, 13 Oct 2017 10:28:33 +0100
+Message-ID: <5742ed3f-47ee-2726-92b8-ff01c3b3eee1@arm.com>
+References: <1507826691-11812-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-reply-to: <20171013085650.GD8927@cbox>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Christoffer Dall <cdall@linaro.org>
-Cc: julien.thierry@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7017D49D3A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 05:27:52 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id pn2kRzcHSqN8 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 13 Oct 2017 05:27:51 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E9C3A49D2C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 05:27:50 -0400 (EDT)
+In-Reply-To: <1507826691-11812-1-git-send-email-gengdongjiu@huawei.com>
+Content-Language: en-GB
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Dongjiu Geng <gengdongjiu@huawei.com>, will.deacon@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, catalin.marinas@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Haibin Zhang <zhanghaibin7@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On 12/10/17 17:44, Dongjiu Geng wrote:
+> When a exception is trapped to EL2, hardware uses  ELR_ELx to hold
+> the current fault instruction address. If KVM wants to inject a
+> abort to 32 bit guest, it needs to set the LR register for the
+> guest to emulate this abort  happened in the guest. Because ARM32
+> architecture is Multi-pipeline, so the LR value has an offset to
 
-Christoffer Dall <cdall@linaro.org> writes:
+What does "Multi-pipeline" mean?
 
-> On Fri, Oct 06, 2017 at 12:39:21PM +0100, Alex Benn=C3=A9e wrote:
->> The system state of KVM when using userspace emulation is not complete
->> until we return into KVM_RUN. To handle mmio related updates we wait
->> until they have been committed and then schedule our KVM_EXIT_DEBUG.
->>
->> I've introduced a new function kvm_arm_maybe_return_debug() to wrap up
->> the differences between arm/arm64 which is currently null for arm.
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> ---
->>  arch/arm/include/asm/kvm_host.h   |  2 ++
->>  arch/arm64/include/asm/kvm_host.h |  1 +
->>  arch/arm64/kvm/debug.c            | 21 +++++++++++++++++++++
->>  arch/arm64/kvm/handle_exit.c      |  9 +++------
->>  virt/kvm/arm/arm.c                |  2 +-
->>  virt/kvm/arm/mmio.c               |  3 ++-
->>  6 files changed, 30 insertions(+), 8 deletions(-)
->>
->> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_=
-host.h
->> index 4a879f6ff13b..aec943f6d123 100644
->> --- a/arch/arm/include/asm/kvm_host.h
->> +++ b/arch/arm/include/asm/kvm_host.h
->> @@ -285,6 +285,8 @@ static inline void kvm_arm_init_debug(void) {}
->>  static inline void kvm_arm_setup_debug(struct kvm_vcpu *vcpu) {}
->>  static inline void kvm_arm_clear_debug(struct kvm_vcpu *vcpu) {}
->>  static inline void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu) {}
->> +static inline int  kvm_arm_maybe_return_debug(struct kvm_vcpu *vcpu,
->> +						struct kvm_run *run) {}
->>
->>  int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
->>  			       struct kvm_device_attr *attr);
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/=
-kvm_host.h
->> index e923b58606e2..fa67d21662f6 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -369,6 +369,7 @@ void kvm_arm_init_debug(void);
->>  void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
->>  void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
->>  void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
->> +int  kvm_arm_maybe_return_debug(struct kvm_vcpu *vcpu, struct kvm_run *=
-run);
->>  int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
->>  			       struct kvm_device_attr *attr);
->>  int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
->> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
->> index dbadfaf850a7..a10a18c55c87 100644
->> --- a/arch/arm64/kvm/debug.c
->> +++ b/arch/arm64/kvm/debug.c
->> @@ -221,3 +221,24 @@ void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
->>  		}
->>  	}
->>  }
->> +
->> +
->> +/*
->> + * When KVM has successfully emulated the instruction we might want to
->> + * return we a KVM_EXIT_DEBUG. We can only do this once the emulation
->> + * is complete though so for userspace emulations we have to wait
->> + * until we have re-entered KVM.
->> + *
->> + * Return > 0 to return to guest, 0 (and set exit_reason) on proper
->> + * exit to userspace.
->> + */
->> +
->> +int kvm_arm_maybe_return_debug(struct kvm_vcpu *vcpu, struct kvm_run *r=
-un)
->> +{
->> +	if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
->> +		run->exit_reason =3D KVM_EXIT_DEBUG;
->> +		run->debug.arch.hsr =3D ESR_ELx_EC_SOFTSTP_LOW << ESR_ELx_EC_SHIFT;
->> +		return 0;
->> +	}
->> +	return 1;
->> +}
->> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
->> index c918d291cb58..7b04f59217bf 100644
->> --- a/arch/arm64/kvm/handle_exit.c
->> +++ b/arch/arm64/kvm/handle_exit.c
->> @@ -202,13 +202,10 @@ static int handle_trap_exceptions(struct kvm_vcpu =
-*vcpu, struct kvm_run *run)
->>  		handled =3D exit_handler(vcpu, run);
->>  	}
->>
->> -	if (handled && (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)) {
->> -		handled =3D 0;
->> -		run->exit_reason =3D KVM_EXIT_DEBUG;
->> -		run->debug.arch.hsr =3D ESR_ELx_EC_SOFTSTP_LOW << ESR_ELx_EC_SHIFT;
->> -	}
->> +	if (handled)
->> +		return kvm_arm_maybe_return_debug(vcpu, run);
->
-> Again, this seems to override the return value of exit_handler, which
-> may be something negative.
->
-> Just so I'm clear: There's no intended functionality change of this
-> particular hunk, it's just to share the logic in
-> kvm_arm_maybe_return_debug, right?
+> the fault instruction address.
+> 
+> The offsets applied to Link value for exceptions as shown below,
+> which should be added for the ARM32 link register(LR).
+> 
+> Exception			Offset, for PE state of:
+> 				A32 	  T32
+> Undefined Instruction 		+4 	  +2
+> Prefetch Abort 			+4 	  +4
+> Data Abort 			+8 	  +8
+> IRQ or FIQ 			+4 	  +4
 
-Yes, modulo the annoying semantics in the two places of the vcpu run
-ioctl loop.
+Please document where this table is coming from.
 
->
->>
->> -	return handled;
->> +	return 0;
->>  }
->>
->>  /*
->> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
->> index b9f68e4add71..3d28fe2daa26 100644
->> --- a/virt/kvm/arm/arm.c
->> +++ b/virt/kvm/arm/arm.c
->> @@ -623,7 +623,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, s=
-truct kvm_run *run)
->>
->>  	if (run->exit_reason =3D=3D KVM_EXIT_MMIO) {
->>  		ret =3D kvm_handle_mmio_return(vcpu, vcpu->run);
->> -		if (ret)
->> +		if (ret < 1)
->>  			return ret;
->>  	}
->>
->> diff --git a/virt/kvm/arm/mmio.c b/virt/kvm/arm/mmio.c
->> index b6e715fd3c90..e43e3bd6222f 100644
->> --- a/virt/kvm/arm/mmio.c
->> +++ b/virt/kvm/arm/mmio.c
->> @@ -117,7 +117,8 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, st=
-ruct kvm_run *run)
->>  		vcpu_set_reg(vcpu, vcpu->arch.mmio_decode.rt, data);
->>  	}
->>
->> -	return 0;
->> +	/* If debugging in effect we may need to return now */
->
-> Will this ever be about other types of debugging (watchpoint on a MMIO
-> access?) or should we limit the text and description to
-> single-stepping?
+> 
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> Signed-off-by: Haibin Zhang <zhanghaibin7@huawei.com>
+> 
+> ---
+> For example, to the undefined instruction injection:
+> 
+> 1. Guest OS call SMC(Secure Monitor Call) instruction in the address
+> 0xc025405c, then Guest traps to hypervisor
+> 
+> c0254050:   e59d5028    ldr r5, [sp, #40]   ; 0x28
+> c0254054:   e3a03001    mov r3, #1
+> c0254058:   e1a01003    mov r1, r3
+> c025405c:   e1600070    smc 0
+> c0254060:   e30a0270    movw    r0, #41584  ; 0xa270
+> c0254064:   e34c00bf    movt    r0, #49343  ; 0xc0bf
+> 
+> 2. KVM  injects undefined abort to guest
+> 3. We will find the fault PC is 0xc0254058, not 0xc025405c.
+> 
+> [   12.348072] Internal error: Oops - undefined instruction: 0 [#1] SMP ARM
+> [   12.349786] Modules linked in:
+> [   12.350563] CPU: 1 PID: 71 Comm: cat Not tainted 4.1.0-dirty #25
+> [   12.352061] Hardware name: Generic DT based system
+> [   12.353275] task: d9d08000 ti: d9cfe000 task.ti: d9cfe000
+> [   12.354637] PC is at proc_dointvec+0x20/0x60
+> [   12.355717] LR is at proc_sys_call_handler+0xb0/0xc4
+> [   12.356972] pc : [<c0254058>]    lr : [<c035699c>]    psr: a0060013
+> [   12.356972] sp : d9cffe90  ip : c0254038  fp : 00000001
+> [   12.359824] r10: d9cfff80  r9 : 00000004  r8 : 00000000
+> [   12.361132] r7 : bec21cb0  r6 : d9cffec4  r5 : d9cfff80  r4 : c0e82de0
+> [   12.362766] r3 : 00000001  r2 : bec21cb0  r1 : 00000001  r0 : c0e82de0
+> [   12.364400] Flags: NzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment user
+> [   12.366183] Control: 10c5383d  Table: 59d3406a  DAC: 00000015
+> [   12.367623] Process cat (pid: 71, stack limit = 0xd9cfe220)
+> 
+> 4. After correct the LR register, it will have right value
+> 
+> [  125.763370] Internal error: Oops - undefined instruction: 0 [#2] SMP ARM
+> [  125.767010] Modules linked in:
+> [  125.768472] CPU: 1 PID: 74 Comm: cat Tainted: G      D         4.1.0-dirty #25
+> [  125.771854] Hardware name: Generic DT based system
+> [  125.774053] task: db0bb900 ti: d9d10000 task.ti: d9d10000
+> [  125.776821] PC is at proc_dointvec+0x24/0x60
+> [  125.778919] LR is at proc_sys_call_handler+0xb0/0xc4
+> [  125.781269] pc : [<c025405c>]    lr : [<c035699c>]    psr: a0060013
+> [  125.781269] sp : d9d11e90  ip : c0254038  fp : 00000001
+> [  125.786581] r10: d9d11f80  r9 : 00000004  r8 : 00000000
+> [  125.789673] r7 : be92ccb0  r6 : d9d11ec4  r5 : d9d11f80  r4 : c0e82de0
+> [  125.792828] r3 : 00000001  r2 : be92ccb0  r1 : 00000001  r0 : c0e82de0
+> [  125.795890] Flags: NzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment user
+> 
+> For other exception injection, such as Data/Prefetch abort, also needs to correct
+> ---
+>  arch/arm64/kvm/inject_fault.c | 18 ++++++++++++------
+>  1 file changed, 12 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+> index da6a8cf..da93508 100644
+> --- a/arch/arm64/kvm/inject_fault.c
+> +++ b/arch/arm64/kvm/inject_fault.c
+> @@ -33,12 +33,11 @@
+>  #define LOWER_EL_AArch64_VECTOR		0x400
+>  #define LOWER_EL_AArch32_VECTOR		0x600
+>  
+> -static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+> +static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset,
+> +				u32 return_offset)
+>  {
+>  	unsigned long cpsr;
+>  	unsigned long new_spsr_value = *vcpu_cpsr(vcpu);
+> -	bool is_thumb = (new_spsr_value & COMPAT_PSR_T_BIT);
+> -	u32 return_offset = (is_thumb) ? 4 : 0;
+>  	u32 sctlr = vcpu_cp15(vcpu, c1_SCTLR);
+>  
+>  	cpsr = mode | COMPAT_PSR_I_BIT;
+> @@ -65,7 +64,11 @@ static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+>  
+>  static void inject_undef32(struct kvm_vcpu *vcpu)
+>  {
+> -	prepare_fault32(vcpu, COMPAT_PSR_MODE_UND, 4);
+> +	unsigned long spsr_value = *vcpu_cpsr(vcpu);
+> +	bool is_thumb = (spsr_value & COMPAT_PSR_T_BIT);
+> +	u32 return_offset = (is_thumb) ? 2 : 4;
+> +
+> +	prepare_fault32(vcpu, COMPAT_PSR_MODE_UND, 4, return_offset);
+>  }
+>  
+>  /*
+> @@ -75,21 +78,24 @@ static void inject_undef32(struct kvm_vcpu *vcpu)
+>  static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
+>  			 unsigned long addr)
+>  {
+> -	u32 vect_offset;
+> +	u32 vect_offset, return_offset;
+>  	u32 *far, *fsr;
+>  	bool is_lpae;
+>  
+>  	if (is_pabt) {
+>  		vect_offset = 12;
+> +		return_offset = 4;
+>  		far = &vcpu_cp15(vcpu, c6_IFAR);
+>  		fsr = &vcpu_cp15(vcpu, c5_IFSR);
+>  	} else { /* !iabt */
+>  		vect_offset = 16;
+> +		return_offset = 8;
+>  		far = &vcpu_cp15(vcpu, c6_DFAR);
+>  		fsr = &vcpu_cp15(vcpu, c5_DFSR);
+>  	}
+>  
+> -	prepare_fault32(vcpu, COMPAT_PSR_MODE_ABT | COMPAT_PSR_A_BIT, vect_offset);
+> +	prepare_fault32(vcpu, COMPAT_PSR_MODE_ABT | COMPAT_PSR_A_BIT,
+> +		       vect_offset, return_offset);
+>  
+>  	*far = addr;
+>  
+> 
 
-Hmm I don't think so. A hbreak should hit (via normal exception path)
-before we attempt any emulation. I suspect watchpoints wouldn't hit for
-emulation though - that would be trickier to do nicely though as it
-would need to be checked for in both kernel and userspace emulation.
+So instead of adding this extra parameter and littering the code with
+random constants, why don't you actually implement the table you've put
+in the commit log and compute the offset in a single place (which is
+likely to be prepare_fault32)?
 
->
->> +	return kvm_arm_maybe_return_debug(vcpu, run);
->>  }
->>
->>  static int decode_hsr(struct kvm_vcpu *vcpu, bool *is_write, int *len)
->> --
->> 2.14.1
->>
->
-> Thanks,
-> -Christoffer
+Thanks,
 
-
---
-Alex Benn=C3=A9e
+	M.
+-- 
+Jazz is not dead. It just smells funny...
