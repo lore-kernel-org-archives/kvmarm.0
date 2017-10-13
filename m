@@ -1,106 +1,158 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v3 13/28] arm64/sve: Signal handling support
-Date: Fri, 13 Oct 2017 15:26:32 +0100
-Message-ID: <20171013142632.GL19485@e103592.cambridge.arm.com>
-References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
- <1507660725-7986-14-git-send-email-Dave.Martin@arm.com>
- <20171011164052.exvy2w5p47mewrmg@armageddon.cambridge.arm.com>
- <20171012161156.GI19485@e103592.cambridge.arm.com>
- <20171013111718.nqd2nllr7niytfss@armageddon.cambridge.arm.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Subject: Re: [PATCH] arm64: KVM: set right LR register value for 32 bit
+ guest when inject abort
+Date: Fri, 13 Oct 2017 14:29:56 +0000
+Message-ID: <0184EA26B2509940AA629AE1405DD7F20168D7DA@DGGEMA503-MBS.china.huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-arch-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20171013111718.nqd2nllr7niytfss@armageddon.cambridge.arm.com>
-Sender: linux-arch-owner@vger.kernel.org
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Will Deacon <will.deacon@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Language: zh-CN
+Sender: linux-kernel-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Cc: "Zhanghaibin (Euler)" <zhanghaibin7@huawei.com>, Huangshaoyu <huangshaoyu@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 13, 2017 at 12:17:19PM +0100, Catalin Marinas wrote:
-> On Thu, Oct 12, 2017 at 05:11:57PM +0100, Dave P Martin wrote:
-> > On Wed, Oct 11, 2017 at 05:40:52PM +0100, Catalin Marinas wrote:
-> > > On Tue, Oct 10, 2017 at 07:38:30PM +0100, Dave P Martin wrote:
-> > > > diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-> > > > index aabeaee..fa4ed34 100644
-> > > > --- a/arch/arm64/kernel/fpsimd.c
-> > > > +++ b/arch/arm64/kernel/fpsimd.c
-> > > > @@ -310,6 +310,32 @@ static void fpsimd_to_sve(struct task_struct *task)
-> > > >  		       sizeof(fst->vregs[i]));
-> > > >  }
-> > > >  
-> > > > +/*
-> > > > + * Transfer the SVE state in task->thread.sve_state to
-> > > > + * task->thread.fpsimd_state.
-> > > > + *
-> > > > + * Task can be a non-runnable task, or current.  In the latter case,
-> > > > + * softirqs (and preemption) must be disabled.
-> > > > + * task->thread.sve_state must point to at least sve_state_size(task)
-> > > > + * bytes of allocated kernel memory.
-> > > > + * task->thread.sve_state must be up to date before calling this function.
-> > > > + */
-> > > > +static void sve_to_fpsimd(struct task_struct *task)
-> > > > +{
-> > > > +	unsigned int vq;
-> > > > +	void const *sst = task->thread.sve_state;
-> > > > +	struct fpsimd_state *fst = &task->thread.fpsimd_state;
-> > > > +	unsigned int i;
-> > > > +
-> > > > +	if (!system_supports_sve())
-> > > > +		return;
-> > > > +
-> > > > +	vq = sve_vq_from_vl(task->thread.sve_vl);
-> > > > +	for (i = 0; i < 32; ++i)
-> > > > +		memcpy(&fst->vregs[i], ZREG(sst, vq, i),
-> > > > +		       sizeof(fst->vregs[i]));
-> > > > +}
-> > > 
-> > > Nit: could we actually just do an assignment with some pointer casting?
-> > > It looks like we invoke memcpy for every 16 bytes (same for
-> > > fpsimd_to_sve).
-> > 
-> > I was uneasy about what the type of ZREG(sst, vq, i) ought to be.
-> > In any case, memest() is magic: my oldskool GCC (5.3.0) generates:
-> > 
-> > ffff000008084c70 <sve_to_fpsimd>:
-> > ffff000008084c70:       14000004        b       ffff000008084c80 <sve_to_fpsimd+0x10>
-> > ffff000008084c74:       d503201f        nop
-> > ffff000008084c78:       d65f03c0        ret
-> > ffff000008084c7c:       d503201f        nop
-> > ffff000008084c80:       f0007d61        adrp    x1, ffff000009033000 <reset_devices>
-> > ffff000008084c84:       f942a021        ldr     x1, [x1,#1344]
-> > ffff000008084c88:       36b001c1        tbz     w1, #22, ffff000008084cc0 <sve_to_fpsimd+0x50>
-> > ffff000008084c8c:       b94ca805        ldr     w5, [x0,#3240]
-> > ffff000008084c90:       912a0001        add     x1, x0, #0xa80
-> > ffff000008084c94:       91320004        add     x4, x0, #0xc80
-> > ffff000008084c98:       f9465006        ldr     x6, [x0,#3232]
-> > ffff000008084c9c:       121c6ca5        and     w5, w5, #0xfffffff0
-> > ffff000008084ca0:       52800000        mov     w0, #0x0                        // #0
-> > ffff000008084ca4:       8b2040c2        add     x2, x6, w0, uxtw
-> > ffff000008084ca8:       0b050000        add     w0, w0, w5
-> > ffff000008084cac:       a9400c42        ldp     x2, x3, [x2]
-> > ffff000008084cb0:       a8810c22        stp     x2, x3, [x1],#16
-> > ffff000008084cb4:       eb01009f        cmp     x4, x1
-> > ffff000008084cb8:       54ffff61        b.ne    ffff000008084ca4 <sve_to_fpsimd+0x34>
-> > ffff000008084cbc:       d65f03c0        ret
-> > ffff000008084cc0:       d65f03c0        ret
-> > ffff000008084cc4:       d503201f        nop
-> > 
-> > 
-> > Without volatile, I think assigning a single object and doing a memcpy()
-> > are equivalent to the compiler: which it actually uses depends solely on
-> > optimisation considerations.
-> > 
-> > (But then I'm not a language lawyer ... not a professional one anyway).
-> > 
-> > Are you concerned compilers may mess this up?
-> 
-> That's fine, please ignore my comment then. I was worried that gcc would
-> always generate a call to the memcpy implementation rather than inlining
-> it.
-
-OK.  I'll keep an eye on this, but in any case it won't impact the
-FPSIMD-only case.
-
-Cheers
----Dave
+SGkgTWFyYywNCiAgICBUaGFuayB5b3UgdmVyeSBtdWNoIGZvciB5b3VyIHRpbWUgdG8gcmV2aWV3
+IGl0Lg0KDQo+IE9uIDEyLzEwLzE3IDE3OjQ0LCBEb25naml1IEdlbmcgd3JvdGU6DQo+ID4gV2hl
+biBhIGV4Y2VwdGlvbiBpcyB0cmFwcGVkIHRvIEVMMiwgaGFyZHdhcmUgdXNlcyAgRUxSX0VMeCB0
+byBob2xkIHRoZQ0KPiA+IGN1cnJlbnQgZmF1bHQgaW5zdHJ1Y3Rpb24gYWRkcmVzcy4gSWYgS1ZN
+IHdhbnRzIHRvIGluamVjdCBhIGFib3J0IHRvDQo+ID4gMzIgYml0IGd1ZXN0LCBpdCBuZWVkcyB0
+byBzZXQgdGhlIExSIHJlZ2lzdGVyIGZvciB0aGUgZ3Vlc3QgdG8gZW11bGF0ZQ0KPiA+IHRoaXMg
+YWJvcnQgIGhhcHBlbmVkIGluIHRoZSBndWVzdC4gQmVjYXVzZSBBUk0zMiBhcmNoaXRlY3R1cmUg
+aXMNCj4gPiBNdWx0aS1waXBlbGluZSwgc28gdGhlIExSIHZhbHVlIGhhcyBhbiBvZmZzZXQgdG8N
+Cj4gDQo+IFdoYXQgZG9lcyAiTXVsdGktcGlwZWxpbmUiIG1lYW4/DQoNCkkgbWVhbiB0aGUgQVJN
+J3Mgc2luZ2xlLWN5Y2xlIGluc3RydWN0aW9uIDMtc3RhZ2UgcGlwZWxpbmUgb3BlcmF0aW9uLCBh
+cyBzaG93biBiZWxvdzoNCg0KZmV0Y2ggICBkZWNvZGUgICBleGVjdXRlDQogICAgICAgIGZldGNo
+ICAgIGRlY29kZSAgIGV4ZWN1dGUNCiAgICAgICAgICAgICAgICAgZmV0Y2ggICAgZGVjb2RlICAg
+ZXhlY3V0ZQ0KDQp3aGVuIENQVSBmaW5pc2ggaW5zdHJ1Y3Rpb25zIGZldGNoLCAgUEM9UEMgKyA0
+DQp3aGVuIENQVSBmaW5pc2ggaW5zdHJ1Y3Rpb25zIGRlY29kZSwgUEM9UEMgKyA4DQp3aGVuIENQ
+VSBmaW5pc2ggaW5zdHJ1Y3Rpb25zIGV4ZWN1dGlvbiwgUEM9UEMrMTINCg0KdGhhdCBpcyB0byBz
+YXksIHdoZW4gaGFwcGVuIGRhdGEgYWJvcnQsIA0KdGhlIFBDID0gZmF1bHQgaW5zdHJ1Y3Rpb24g
+YWRkcmVzcyArIDEyLCBMUl9hYnQgPSBmYXVsdCBpbnN0cnVjdGlvbiBhZGRyZXNzICsgOA0KDQpJ
+biBvcmRlciB0byBlbXVsYXRlIHRoaXMgYWJvcnQgZm9yIEtWTSwgTFJfYWJ0IG5lZWRzIHRvIGFk
+ZCBhbiBvZmZzZXQgOCB3aGVuIGluamVjdCBkYXRhIGFib3J0LiANCg0KPiANCj4gPiB0aGUgZmF1
+bHQgaW5zdHJ1Y3Rpb24gYWRkcmVzcy4NCj4gPg0KPiA+IFRoZSBvZmZzZXRzIGFwcGxpZWQgdG8g
+TGluayB2YWx1ZSBmb3IgZXhjZXB0aW9ucyBhcyBzaG93biBiZWxvdywgd2hpY2gNCj4gPiBzaG91
+bGQgYmUgYWRkZWQgZm9yIHRoZSBBUk0zMiBsaW5rIHJlZ2lzdGVyKExSKS4NCj4gPg0KPiA+IEV4
+Y2VwdGlvbgkJCU9mZnNldCwgZm9yIFBFIHN0YXRlIG9mOg0KPiA+IAkJCQlBMzIgCSAgVDMyDQo+
+ID4gVW5kZWZpbmVkIEluc3RydWN0aW9uIAkJKzQgCSAgKzINCj4gPiBQcmVmZXRjaCBBYm9ydCAJ
+CQkrNCAJICArNA0KPiA+IERhdGEgQWJvcnQgCQkJKzggCSAgKzgNCj4gPiBJUlEgb3IgRklRIAkJ
+CSs0IAkgICs0DQo+IA0KPiBQbGVhc2UgZG9jdW1lbnQgd2hlcmUgdGhpcyB0YWJsZSBpcyBjb21p
+bmcgZnJvbS4NCg0KDQpUaGFua3MgZm9yIHBvaW50aW5nIG91dC4gV2lsbCBhZGQgaXQuDQpJdCBj
+b21lIGZyb206ICBEREkwNDg3QV9rX2FybXY4X2FybV9pc3MxMDc3NSwgIkcxLjEyLjMgT3ZlcnZp
+ZXcgb2YgZXhjZXB0aW9uIGVudHJ5IiwgVGFibGUgRzEtMTAgT2Zmc2V0cyBhcHBsaWVkIHRvIExp
+bmsgdmFsdWUgZm9yIGV4Y2VwdGlvbnMgdGFrZW4gdG8gbm9uLUVMMiBtb2Rlcw0KDQo+IA0KPiA+
+DQo+ID4gU2lnbmVkLW9mZi1ieTogRG9uZ2ppdSBHZW5nIDxnZW5nZG9uZ2ppdUBodWF3ZWkuY29t
+Pg0KPiA+IFNpZ25lZC1vZmYtYnk6IEhhaWJpbiBaaGFuZyA8emhhbmdoYWliaW43QGh1YXdlaS5j
+b20+DQo+ID4NCj4gPiAtLS0NCj4gPiBGb3IgZXhhbXBsZSwgdG8gdGhlIHVuZGVmaW5lZCBpbnN0
+cnVjdGlvbiBpbmplY3Rpb246DQo+ID4NCj4gPiAxLiBHdWVzdCBPUyBjYWxsIFNNQyhTZWN1cmUg
+TW9uaXRvciBDYWxsKSBpbnN0cnVjdGlvbiBpbiB0aGUgYWRkcmVzcw0KPiA+IDB4YzAyNTQwNWMs
+IHRoZW4gR3Vlc3QgdHJhcHMgdG8gaHlwZXJ2aXNvcg0KPiA+DQo+ID4gYzAyNTQwNTA6ICAgZTU5
+ZDUwMjggICAgbGRyIHI1LCBbc3AsICM0MF0gICA7IDB4MjgNCj4gPiBjMDI1NDA1NDogICBlM2Ew
+MzAwMSAgICBtb3YgcjMsICMxDQo+ID4gYzAyNTQwNTg6ICAgZTFhMDEwMDMgICAgbW92IHIxLCBy
+Mw0KPiA+IGMwMjU0MDVjOiAgIGUxNjAwMDcwICAgIHNtYyAwDQo+ID4gYzAyNTQwNjA6ICAgZTMw
+YTAyNzAgICAgbW92dyAgICByMCwgIzQxNTg0ICA7IDB4YTI3MA0KPiA+IGMwMjU0MDY0OiAgIGUz
+NGMwMGJmICAgIG1vdnQgICAgcjAsICM0OTM0MyAgOyAweGMwYmYNCj4gPg0KPiA+IDIuIEtWTSAg
+aW5qZWN0cyB1bmRlZmluZWQgYWJvcnQgdG8gZ3Vlc3QgMy4gV2Ugd2lsbCBmaW5kIHRoZSBmYXVs
+dCBQQw0KPiA+IGlzIDB4YzAyNTQwNTgsIG5vdCAweGMwMjU0MDVjLg0KPiA+DQo+ID4gWyAgIDEy
+LjM0ODA3Ml0gSW50ZXJuYWwgZXJyb3I6IE9vcHMgLSB1bmRlZmluZWQgaW5zdHJ1Y3Rpb246IDAg
+WyMxXSBTTVAgQVJNDQo+ID4gWyAgIDEyLjM0OTc4Nl0gTW9kdWxlcyBsaW5rZWQgaW46DQo+ID4g
+WyAgIDEyLjM1MDU2M10gQ1BVOiAxIFBJRDogNzEgQ29tbTogY2F0IE5vdCB0YWludGVkIDQuMS4w
+LWRpcnR5ICMyNQ0KPiA+IFsgICAxMi4zNTIwNjFdIEhhcmR3YXJlIG5hbWU6IEdlbmVyaWMgRFQg
+YmFzZWQgc3lzdGVtDQo+ID4gWyAgIDEyLjM1MzI3NV0gdGFzazogZDlkMDgwMDAgdGk6IGQ5Y2Zl
+MDAwIHRhc2sudGk6IGQ5Y2ZlMDAwDQo+ID4gWyAgIDEyLjM1NDYzN10gUEMgaXMgYXQgcHJvY19k
+b2ludHZlYysweDIwLzB4NjANCj4gPiBbICAgMTIuMzU1NzE3XSBMUiBpcyBhdCBwcm9jX3N5c19j
+YWxsX2hhbmRsZXIrMHhiMC8weGM0DQo+ID4gWyAgIDEyLjM1Njk3Ml0gcGMgOiBbPGMwMjU0MDU4
+Pl0gICAgbHIgOiBbPGMwMzU2OTljPl0gICAgcHNyOiBhMDA2MDAxMw0KPiA+IFsgICAxMi4zNTY5
+NzJdIHNwIDogZDljZmZlOTAgIGlwIDogYzAyNTQwMzggIGZwIDogMDAwMDAwMDENCj4gPiBbICAg
+MTIuMzU5ODI0XSByMTA6IGQ5Y2ZmZjgwICByOSA6IDAwMDAwMDA0ICByOCA6IDAwMDAwMDAwDQo+
+ID4gWyAgIDEyLjM2MTEzMl0gcjcgOiBiZWMyMWNiMCAgcjYgOiBkOWNmZmVjNCAgcjUgOiBkOWNm
+ZmY4MCAgcjQgOiBjMGU4MmRlMA0KPiA+IFsgICAxMi4zNjI3NjZdIHIzIDogMDAwMDAwMDEgIHIy
+IDogYmVjMjFjYjAgIHIxIDogMDAwMDAwMDEgIHIwIDogYzBlODJkZTANCj4gPiBbICAgMTIuMzY0
+NDAwXSBGbGFnczogTnpDdiAgSVJRcyBvbiAgRklRcyBvbiAgTW9kZSBTVkNfMzIgIElTQSBBUk0g
+IFNlZ21lbnQgdXNlcg0KPiA+IFsgICAxMi4zNjYxODNdIENvbnRyb2w6IDEwYzUzODNkICBUYWJs
+ZTogNTlkMzQwNmEgIERBQzogMDAwMDAwMTUNCj4gPiBbICAgMTIuMzY3NjIzXSBQcm9jZXNzIGNh
+dCAocGlkOiA3MSwgc3RhY2sgbGltaXQgPSAweGQ5Y2ZlMjIwKQ0KPiA+DQo+ID4gNC4gQWZ0ZXIg
+Y29ycmVjdCB0aGUgTFIgcmVnaXN0ZXIsIGl0IHdpbGwgaGF2ZSByaWdodCB2YWx1ZQ0KPiA+DQo+
+ID4gWyAgMTI1Ljc2MzM3MF0gSW50ZXJuYWwgZXJyb3I6IE9vcHMgLSB1bmRlZmluZWQgaW5zdHJ1
+Y3Rpb246IDAgWyMyXQ0KPiA+IFNNUCBBUk0gWyAgMTI1Ljc2NzAxMF0gTW9kdWxlcyBsaW5rZWQg
+aW46DQo+ID4gWyAgMTI1Ljc2ODQ3Ml0gQ1BVOiAxIFBJRDogNzQgQ29tbTogY2F0IFRhaW50ZWQ6
+IEcgICAgICBEICAgICAgICAgNC4xLjAtZGlydHkgIzI1DQo+ID4gWyAgMTI1Ljc3MTg1NF0gSGFy
+ZHdhcmUgbmFtZTogR2VuZXJpYyBEVCBiYXNlZCBzeXN0ZW0gWyAgMTI1Ljc3NDA1M10NCj4gPiB0
+YXNrOiBkYjBiYjkwMCB0aTogZDlkMTAwMDAgdGFzay50aTogZDlkMTAwMDAgWyAgMTI1Ljc3Njgy
+MV0gUEMgaXMgYXQNCj4gPiBwcm9jX2RvaW50dmVjKzB4MjQvMHg2MCBbICAxMjUuNzc4OTE5XSBM
+UiBpcyBhdA0KPiA+IHByb2Nfc3lzX2NhbGxfaGFuZGxlcisweGIwLzB4YzQNCj4gPiBbICAxMjUu
+NzgxMjY5XSBwYyA6IFs8YzAyNTQwNWM+XSAgICBsciA6IFs8YzAzNTY5OWM+XSAgICBwc3I6IGEw
+MDYwMDEzDQo+ID4gWyAgMTI1Ljc4MTI2OV0gc3AgOiBkOWQxMWU5MCAgaXAgOiBjMDI1NDAzOCAg
+ZnAgOiAwMDAwMDAwMSBbDQo+ID4gMTI1Ljc4NjU4MV0gcjEwOiBkOWQxMWY4MCAgcjkgOiAwMDAw
+MDAwNCAgcjggOiAwMDAwMDAwMCBbICAxMjUuNzg5NjczXQ0KPiA+IHI3IDogYmU5MmNjYjAgIHI2
+IDogZDlkMTFlYzQgIHI1IDogZDlkMTFmODAgIHI0IDogYzBlODJkZTAgWw0KPiA+IDEyNS43OTI4
+MjhdIHIzIDogMDAwMDAwMDEgIHIyIDogYmU5MmNjYjAgIHIxIDogMDAwMDAwMDEgIHIwIDogYzBl
+ODJkZTANCj4gPiBbICAxMjUuNzk1ODkwXSBGbGFnczogTnpDdiAgSVJRcyBvbiAgRklRcyBvbiAg
+TW9kZSBTVkNfMzIgIElTQSBBUk0NCj4gPiBTZWdtZW50IHVzZXINCj4gPg0KPiA+IEZvciBvdGhl
+ciBleGNlcHRpb24gaW5qZWN0aW9uLCBzdWNoIGFzIERhdGEvUHJlZmV0Y2ggYWJvcnQsIGFsc28g
+bmVlZHMNCj4gPiB0byBjb3JyZWN0DQo+ID4gLS0tDQo+ID4gIGFyY2gvYXJtNjQva3ZtL2luamVj
+dF9mYXVsdC5jIHwgMTggKysrKysrKysrKysrLS0tLS0tDQo+ID4gIDEgZmlsZSBjaGFuZ2VkLCAx
+MiBpbnNlcnRpb25zKCspLCA2IGRlbGV0aW9ucygtKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2Fy
+Y2gvYXJtNjQva3ZtL2luamVjdF9mYXVsdC5jDQo+ID4gYi9hcmNoL2FybTY0L2t2bS9pbmplY3Rf
+ZmF1bHQuYyBpbmRleCBkYTZhOGNmLi5kYTkzNTA4IDEwMDY0NA0KPiA+IC0tLSBhL2FyY2gvYXJt
+NjQva3ZtL2luamVjdF9mYXVsdC5jDQo+ID4gKysrIGIvYXJjaC9hcm02NC9rdm0vaW5qZWN0X2Zh
+dWx0LmMNCj4gPiBAQCAtMzMsMTIgKzMzLDExIEBADQo+ID4gICNkZWZpbmUgTE9XRVJfRUxfQUFy
+Y2g2NF9WRUNUT1IJCTB4NDAwDQo+ID4gICNkZWZpbmUgTE9XRVJfRUxfQUFyY2gzMl9WRUNUT1IJ
+CTB4NjAwDQo+ID4NCj4gPiAtc3RhdGljIHZvaWQgcHJlcGFyZV9mYXVsdDMyKHN0cnVjdCBrdm1f
+dmNwdSAqdmNwdSwgdTMyIG1vZGUsIHUzMg0KPiA+IHZlY3Rfb2Zmc2V0KQ0KPiA+ICtzdGF0aWMg
+dm9pZCBwcmVwYXJlX2ZhdWx0MzIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCB1MzIgbW9kZSwgdTMy
+IHZlY3Rfb2Zmc2V0LA0KPiA+ICsJCQkJdTMyIHJldHVybl9vZmZzZXQpDQo+ID4gIHsNCj4gPiAg
+CXVuc2lnbmVkIGxvbmcgY3BzcjsNCj4gPiAgCXVuc2lnbmVkIGxvbmcgbmV3X3Nwc3JfdmFsdWUg
+PSAqdmNwdV9jcHNyKHZjcHUpOw0KPiA+IC0JYm9vbCBpc190aHVtYiA9IChuZXdfc3Bzcl92YWx1
+ZSAmIENPTVBBVF9QU1JfVF9CSVQpOw0KPiA+IC0JdTMyIHJldHVybl9vZmZzZXQgPSAoaXNfdGh1
+bWIpID8gNCA6IDA7DQo+ID4gIAl1MzIgc2N0bHIgPSB2Y3B1X2NwMTUodmNwdSwgYzFfU0NUTFIp
+Ow0KPiA+DQo+ID4gIAljcHNyID0gbW9kZSB8IENPTVBBVF9QU1JfSV9CSVQ7DQo+ID4gQEAgLTY1
+LDcgKzY0LDExIEBAIHN0YXRpYyB2b2lkIHByZXBhcmVfZmF1bHQzMihzdHJ1Y3Qga3ZtX3ZjcHUg
+KnZjcHUsDQo+ID4gdTMyIG1vZGUsIHUzMiB2ZWN0X29mZnNldCkNCj4gPg0KPiA+ICBzdGF0aWMg
+dm9pZCBpbmplY3RfdW5kZWYzMihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpICB7DQo+ID4gLQlwcmVw
+YXJlX2ZhdWx0MzIodmNwdSwgQ09NUEFUX1BTUl9NT0RFX1VORCwgNCk7DQo+ID4gKwl1bnNpZ25l
+ZCBsb25nIHNwc3JfdmFsdWUgPSAqdmNwdV9jcHNyKHZjcHUpOw0KPiA+ICsJYm9vbCBpc190aHVt
+YiA9IChzcHNyX3ZhbHVlICYgQ09NUEFUX1BTUl9UX0JJVCk7DQo+ID4gKwl1MzIgcmV0dXJuX29m
+ZnNldCA9IChpc190aHVtYikgPyAyIDogNDsNCj4gPiArDQo+ID4gKwlwcmVwYXJlX2ZhdWx0MzIo
+dmNwdSwgQ09NUEFUX1BTUl9NT0RFX1VORCwgNCwgcmV0dXJuX29mZnNldCk7DQo+ID4gIH0NCj4g
+Pg0KPiA+ICAvKg0KPiA+IEBAIC03NSwyMSArNzgsMjQgQEAgc3RhdGljIHZvaWQgaW5qZWN0X3Vu
+ZGVmMzIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQ0KPiA+IHN0YXRpYyB2b2lkIGluamVjdF9hYnQz
+MihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGJvb2wgaXNfcGFidCwNCj4gPiAgCQkJIHVuc2lnbmVk
+IGxvbmcgYWRkcikNCj4gPiAgew0KPiA+IC0JdTMyIHZlY3Rfb2Zmc2V0Ow0KPiA+ICsJdTMyIHZl
+Y3Rfb2Zmc2V0LCByZXR1cm5fb2Zmc2V0Ow0KPiA+ICAJdTMyICpmYXIsICpmc3I7DQo+ID4gIAli
+b29sIGlzX2xwYWU7DQo+ID4NCj4gPiAgCWlmIChpc19wYWJ0KSB7DQo+ID4gIAkJdmVjdF9vZmZz
+ZXQgPSAxMjsNCj4gPiArCQlyZXR1cm5fb2Zmc2V0ID0gNDsNCj4gPiAgCQlmYXIgPSAmdmNwdV9j
+cDE1KHZjcHUsIGM2X0lGQVIpOw0KPiA+ICAJCWZzciA9ICZ2Y3B1X2NwMTUodmNwdSwgYzVfSUZT
+Uik7DQo+ID4gIAl9IGVsc2UgeyAvKiAhaWFidCAqLw0KPiA+ICAJCXZlY3Rfb2Zmc2V0ID0gMTY7
+DQo+ID4gKwkJcmV0dXJuX29mZnNldCA9IDg7DQo+ID4gIAkJZmFyID0gJnZjcHVfY3AxNSh2Y3B1
+LCBjNl9ERkFSKTsNCj4gPiAgCQlmc3IgPSAmdmNwdV9jcDE1KHZjcHUsIGM1X0RGU1IpOw0KPiA+
+ICAJfQ0KPiA+DQo+ID4gLQlwcmVwYXJlX2ZhdWx0MzIodmNwdSwgQ09NUEFUX1BTUl9NT0RFX0FC
+VCB8IENPTVBBVF9QU1JfQV9CSVQsIHZlY3Rfb2Zmc2V0KTsNCj4gPiArCXByZXBhcmVfZmF1bHQz
+Mih2Y3B1LCBDT01QQVRfUFNSX01PREVfQUJUIHwgQ09NUEFUX1BTUl9BX0JJVCwNCj4gPiArCQkg
+ICAgICAgdmVjdF9vZmZzZXQsIHJldHVybl9vZmZzZXQpOw0KPiA+DQo+ID4gIAkqZmFyID0gYWRk
+cjsNCj4gPg0KPiA+DQo+IA0KPiBTbyBpbnN0ZWFkIG9mIGFkZGluZyB0aGlzIGV4dHJhIHBhcmFt
+ZXRlciBhbmQgbGl0dGVyaW5nIHRoZSBjb2RlIHdpdGggcmFuZG9tIGNvbnN0YW50cywgd2h5IGRv
+bid0IHlvdSBhY3R1YWxseSBpbXBsZW1lbnQgdGhlIHRhYmxlIHlvdSd2ZQ0KPiBwdXQgaW4gdGhl
+IGNvbW1pdCBsb2cgYW5kIGNvbXB1dGUgdGhlIG9mZnNldCBpbiBhIHNpbmdsZSBwbGFjZSAod2hp
+Y2ggaXMgbGlrZWx5IHRvIGJlIHByZXBhcmVfZmF1bHQzMik/DQoNCk1hcmMsDQogIEl0IGJlY2F1
+c2UgbXVsdGlwbGUgYWJvcnQoVW5kZWZpbmVkIEFib3J0L1ByZWZldGNoIEFib3J0L0RhdGEgQWJv
+cnQpIGNhbGwgdGhlIHByZXBhcmVfZmF1bHQzMigpLCBpZiBhZGRpbmcgdG8gYSBzaW5nbGUgcGxh
+Y2UgaW4gcHJlcGFyZV9mYXVsdDMyKCkscHJlcGFyZV9mYXVsdDMyKCkgd2lsbCANCm5vdCBrbm93
+IHdoZXRoZXIgdGhlIEFib3J0IGluamVjdGlvbiBpcyBmb3IgUHJlZmV0Y2ggQWJvcnQgb3IgRGF0
+YSBBYm9ydCBvciBVbmRlZmluZWQgQWJvcnQsIHRoZW4gd2lsbCBiZSBjb25mdXNlZCBmb3IgdGhl
+IHZhbHVlIG9mICJyZXR1cm5fb2Zmc2V0Ig0KDQpGb3IgZXhhbXBsZToNCmluamVjdF9hYnQzMigp
+IGlzIHVzZWQgdG8gaW5qZWN0IHByZWZldGNoIEFib3J0IG9yIERhdGEgQWJvcnQsIGl0IHBhc3Nl
+cyBzYW1lIHBhcmFtZXRlcnMgdG8gY2FsbCBwcmVwYXJlX2ZhdWx0MzIoKSBmb3IgdGhlIHR3byBB
+Ym9ydC4gSWYgYWRkaW5nIGFuZCBjb21wdXRpbmcgdGhlIG9mZnNldCBpbiBhIHByZXBhcmVfZmF1
+bHQzMigpLA0KaXQgd2lsbCBiZSBjb25mdXNlZCB0byBjb21wdXRlIHRoZSBvZmZzZXQsIGJlY2F1
+c2UgaXQgZG9lcyBub3Qga25vdyB3aGV0aGVyIHRoaXMgZnVuY3Rpb24gY2FsbCBpcyBmb3IgcHJl
+ZmV0Y2ggQWJvcnQgb3IgRGF0YSBBYm9ydC4gWzFdDQoNCklmIGNvbXB1dGluZyB0aGUgb2Zmc2V0
+IGluIGEgc2luZ2xlIHBsYWNlLCBkbyB5b3UgaGF2ZSBiZXR0ZXIgaWRlYSBmb3IgdGhhdD8NCg0K
+WzFdDQpzdGF0aWMgdm9pZCBpbmplY3RfYWJ0MzIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBib29s
+IGlzX3BhYnQsICAgDQoJCQkgdW5zaWduZWQgbG9uZyBhZGRyKQ0Kew0KCXUzMiB2ZWN0X29mZnNl
+dDsNCgl1MzIgKmZhciwgKmZzcjsNCglib29sIGlzX2xwYWU7DQoNCiAgICAuLi4uLi4NCglwcmVw
+YXJlX2ZhdWx0MzIodmNwdSwgQ09NUEFUX1BTUl9NT0RFX0FCVCB8IENPTVBBVF9QU1JfQV9CSVQs
+IHZlY3Rfb2Zmc2V0KTsNCiAgICAuLi4uLi4NCn0NCg0KDQo+IA0KPiBUaGFua3MsDQo+IA0KPiAJ
+TS4NCj4gLS0NCj4gSmF6eiBpcyBub3QgZGVhZC4gSXQganVzdCBzbWVsbHMgZnVubnkuLi4NCg==
