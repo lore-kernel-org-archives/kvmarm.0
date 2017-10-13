@@ -1,91 +1,98 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v3 15/20] KVM: arm64: Set an impdef ESR for Virtual-SError
- using VSESR_EL2.
-Date: Fri, 13 Oct 2017 17:53:57 +0100
-Message-ID: <59E0EFA5.1020103@arm.com>
-References: <20171005191812.5678-1-james.morse@arm.com>
- <20171005191812.5678-16-james.morse@arm.com>
- <f5f7859b-71a5-5f65-0344-7682bfac43bb@huawei.com>
+From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Subject: Re: [PATCH 05/37] KVM: Record the executing ioctl number on the vcpu
+ struct
+Date: Fri, 13 Oct 2017 19:13:07 +0200
+Message-ID: <20171013171307.GA16116@flask>
+References: <20171012104141.26902-1-christoffer.dall@linaro.org>
+ <20171012104141.26902-6-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0287049D33
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 12:54:50 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RqfNDRAKMh3c for <kvmarm@lists.cs.columbia.edu>;
- Fri, 13 Oct 2017 12:54:48 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BD45349D2C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 12:54:48 -0400 (EDT)
-In-Reply-To: <f5f7859b-71a5-5f65-0344-7682bfac43bb@huawei.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: gengdongjiu <gengdongjiu@huawei.com>
-Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20171012104141.26902-6-christoffer.dall@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Paolo Bonzini <pbonzini@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi gengdongjiu,
+2017-10-12 12:41+0200, Christoffer Dall:
+> Some architectures may decide to do different things during
+> kvm_arch_vcpu_load depending on the ioctl being executed.  For example,
+> arm64 is about to do significant work in vcpu load/put when running a
+> vcpu, but not when doing things like KVM_SET_ONE_REG or
+> KVM_SET_MP_STATE.
+> 
+> Therefore, store the ioctl number that we are executing on the VCPU
+> during the first vcpu_load() which succeeds in getting the vcpu->mutex
+> and set the ioctl number to 0 when exiting kvm_vcpu_ioctl() after
+> successfully loading the vcpu.
+> 
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Radim Krčmář <rkrcmar@redhat.com>
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> ---
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> @@ -147,12 +147,13 @@ bool kvm_is_reserved_pfn(kvm_pfn_t pfn)
+>  /*
+>   * Switches to specified vcpu, until a matching vcpu_put()
+>   */
+> -int vcpu_load(struct kvm_vcpu *vcpu)
+> +int vcpu_load(struct kvm_vcpu *vcpu, unsigned int ioctl)
+>  {
+>  	int cpu;
+>  
+>  	if (mutex_lock_killable(&vcpu->mutex))
+>  		return -EINTR;
+> +	vcpu->ioctl = ioctl;
 
-On 13/10/17 10:25, gengdongjiu wrote:
-> After checking this patch, I think my patch[1] already include this logic(only a little
-> difference).
+This seems to prevent races by protecting the store by a mutex, but
 
-Your kvm_handle_guest_sei() is similar to where this series ends up, but the
-purpose of this patch is to keep KVMs existing behaviour.
+>  	cpu = get_cpu();
+>  	preempt_notifier_register(&vcpu->preempt_notifier);
+>  	kvm_arch_vcpu_load(vcpu, cpu);
+> @@ -2529,7 +2530,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
+>  #endif
+>  
+>  
+> -	r = vcpu_load(vcpu);
+> +	r = vcpu_load(vcpu, ioctl);
+>  	if (r)
+>  		return r;
+>  	switch (ioctl) {
+> @@ -2704,6 +2705,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
+>  	}
+>  out:
+>  	vcpu_put(vcpu);
+> +	vcpu->ioctl = 0;
 
-KVM already injects SError into the guest all by itself, now with the RAS
-extensions it can specify and ESR, and because of the new ESR encoding it can't
-use the reset value of all-zeroes.
+we should still have a race as we clear ioctl only after releasing the
+lock.  For example malicious userspace could break KVM terms of use and
+issue !KVM_RUN followed by KVM_RUN, so we would have these races:
 
+   !KVM_RUN                             |   KVM_RUN
 
-> In my first version patch [2], It sets the virtual ESR in the KVM, but Marc and
-> other people disagree that[3][4],and propose to set its value and injection by userspace(when
-> RAS is enabled). 
+   mutex_lock_killable(&vcpu->mutex);   |
+   vcpu->ioctl = !KVM_RUN;              |
+   ...                                  | mutex_lock_killable(&vcpu->mutex);
+   mutex_unlock(&vcpu->mutex);          |
+                                        | vcpu->ioctl = KVM_RUN;
+                                        | kvm_arch_vcpu_load() // variant 1
+   vcpu->ioctl = 0;                     | ...
+                                        | kvm_arch_vcpu_load() // variant 2
+                                        | vcpu_put()
 
-Not quite: for RAS errors.
-When we want to hand a RAS error to a guest, Qemu should be driving that.
+where the observed value of vcpu->ioctl in vcpu_put() would not
+correctly pair with vcpu_load() or worse, kvm_arch_arch_load() in
+KVM_RUN would execute with vcpu->ioctl = 0.
 
-What about impdef SError? Qemu should be able to drive that with the same API.
+I think that other (special) callsites of vcpu_load()/vcpu_put() have a
+well defined IOCTL that can be used instead of vcpu->ioctl, so we could
+just pass the ioctl value all the way to arch code and never save it
+anywhere,
 
-What about this nasty corner where KVM already injects an impdef SError
-directly? This patch keeps that working.
+thanks.
 
-
-I'd love to get rid of KVMs internal use of kvm_inject_vabt(). But what do we
-replace it with? It needs to be a guest exit type that existing software can't
-ignore...
-
-(The best I can suggest is: Once we have a mechanism to inject SError into a
-guest from Qemu, KVM could make an impdef SError pending, then give Qemu the
-opportunity to kill the guest, or set a different ESR. Existing software can
-ignore the exit, and take the existing behaviour.)
-
-
-> So I think we no need to submit another patch, it will be duplicated, and waste our review
-> time. thank you very much. I will combine that.
-
-I agree we're posting competing series, there was some off-list co-ordination on
-this with Xie XiuQi and Xiongfeng Wang in ~may, it looks like you weren't
-involved at that point.
-
-In your last series touching all this:
-https://lkml.org/lkml/2017/8/31/698
-
-You had Xie XiuQi's RAS-cpufeature patch in isolation, without the SError rework
-underneath it. Applied like this SError is still always masked in the kernel, so
-any system without firmware-first will silently consume and discard an
-uncontained-RAS-error using the esb() in __switch_to(). We can't do this, hence
-the first half of this series.
-
-
-James
+>  	kfree(fpu);
+>  	kfree(kvm_sregs);
+>  	return r;
