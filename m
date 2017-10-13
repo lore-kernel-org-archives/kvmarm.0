@@ -1,27 +1,28 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 01/37] KVM: arm64: Avoid storing the vcpu pointer on the
- stack
-Date: Fri, 13 Oct 2017 12:31:31 +0100
-Message-ID: <20a58b6b-7476-fed9-6b48-b9710b437750@arm.com>
-References: <20171012104141.26902-1-christoffer.dall@linaro.org>
- <20171012104141.26902-2-christoffer.dall@linaro.org>
- <ef4bffe5-b3c5-5fdd-cb8b-1840d2243ae1@arm.com> <20171012170216.GA26425@cbox>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH] KVM: arm64: its: Fix missing dynamic allocation check in
+ scan_its_table
+Date: Fri, 13 Oct 2017 13:57:42 +0200
+Message-ID: <20171013115742.GA10539@cbox>
+References: <20171013105259.9728-1-christoffer.dall@linaro.org>
+ <0fbee4b3-c555-76d6-4a9e-8a869e87d8ee@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EB09B49D40
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 07:30:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DF6349D2C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 07:56:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Zlin-KZhpXSR for <kvmarm@lists.cs.columbia.edu>;
- Fri, 13 Oct 2017 07:30:48 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 77B6B49D25
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 07:30:48 -0400 (EDT)
-In-Reply-To: <20171012170216.GA26425@cbox>
-Content-Language: en-GB
+ with ESMTP id 43FbnyrMFGF5 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 13 Oct 2017 07:56:50 -0400 (EDT)
+Received: from mail-wm0-f43.google.com (mail-wm0-f43.google.com [74.125.82.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3677E49D24
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 07:56:49 -0400 (EDT)
+Received: by mail-wm0-f43.google.com with SMTP id q124so20877802wmb.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 04:57:37 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <0fbee4b3-c555-76d6-4a9e-8a869e87d8ee@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,108 +32,101 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, Shih-Wei Li <shihwei@cs.columbia.edu>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, stable@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 12/10/17 18:02, Christoffer Dall wrote:
-> On Thu, Oct 12, 2017 at 04:49:44PM +0100, Marc Zyngier wrote:
->> On 12/10/17 11:41, Christoffer Dall wrote:
->>> We already have the percpu area for the host cpu state, which points to
->>> the VCPU, so there's no need to store the VCPU pointer on the stack on
->>> every context switch.  We can be a little more clever and just use
->>> tpidr_el2 for the percpu offset and load the VCPU pointer from the host
->>> context.
->>>
->>> This requires us to have a scratch register though, so we take the
->>> chance to rearrange some of the el1_sync code to only look at the
->>> vttbr_el2 to determine if this is a trap from the guest or an HVC from
->>> the host.  We do add an extra check to call the panic code if the kernel
->>> is configured with debugging enabled and we saw a trap from the host
->>> which wasn't an HVC, indicating that we left some EL2 trap configured by
->>> mistake.
->>>
->>> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
->>> ---
->>>  arch/arm64/include/asm/kvm_asm.h | 20 ++++++++++++++++++++
->>>  arch/arm64/kernel/asm-offsets.c  |  1 +
->>>  arch/arm64/kvm/hyp/entry.S       |  5 +----
->>>  arch/arm64/kvm/hyp/hyp-entry.S   | 39 ++++++++++++++++++---------------------
->>>  arch/arm64/kvm/hyp/switch.c      |  2 +-
->>>  5 files changed, 41 insertions(+), 26 deletions(-)
->>>
->>> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
->>> index ab4d0a9..7e48a39 100644
->>> --- a/arch/arm64/include/asm/kvm_asm.h
->>> +++ b/arch/arm64/include/asm/kvm_asm.h
->>> @@ -70,4 +70,24 @@ extern u32 __init_stage2_translation(void);
->>>  
->>>  #endif
->>>  
->>> +#ifdef __ASSEMBLY__
->>> +.macro get_host_ctxt reg, tmp
->>> +	/*
->>> +	 * '=kvm_host_cpu_state' is a host VA from the constant pool, it may
->>> +	 * not be accessible by this address from EL2, hyp_panic() converts
->>> +	 * it with kern_hyp_va() before use.
->>> +	 */
->>
->> This really looks like a stale comment, as there is no hyp_panic
->> involved here anymore (thankfully!).
->>
+On Fri, Oct 13, 2017 at 12:00:50PM +0100, Marc Zyngier wrote:
+> On 13/10/17 11:52, Christoffer Dall wrote:
+> > We currently allocate an entry dynamically, but we never check if the
+> > allocation actually succeeded.  We actually don't need a dynamic
+> > allocation, because we know the maximum size of an ITS table entry, so
+> > we can simply use an allocation on the stack.
+> > 
+> > Cc: <stable@vger.kernel.org>
+> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> > ---
+> >  virt/kvm/arm/vgic/vgic-its.c | 19 ++++++++-----------
+> >  1 file changed, 8 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> > index f51c1e1..555f42f 100644
+> > --- a/virt/kvm/arm/vgic/vgic-its.c
+> > +++ b/virt/kvm/arm/vgic/vgic-its.c
+> > @@ -176,6 +176,7 @@ static const struct vgic_its_abi its_table_abi_versions[] = {
+> >  };
+> >  
+> >  #define NR_ITS_ABIS	ARRAY_SIZE(its_table_abi_versions)
+> > +#define MAX_ENTRY_SIZE	8	/* Max Entry size across all ABI versions */
+> >  
+> >  inline const struct vgic_its_abi *vgic_its_get_abi(struct vgic_its *its)
+> >  {
+> > @@ -1801,37 +1802,33 @@ typedef int (*entry_fn_t)(struct vgic_its *its, u32 id, void *entry,
+> >  static int scan_its_table(struct vgic_its *its, gpa_t base, int size, int esz,
+> >  			  int start_id, entry_fn_t fn, void *opaque)
+> >  {
+> > -	void *entry = kzalloc(esz, GFP_KERNEL);
+> >  	struct kvm *kvm = its->dev->kvm;
+> >  	unsigned long len = size;
+> >  	int id = start_id;
+> >  	gpa_t gpa = base;
+> > +	char entry[MAX_ENTRY_SIZE];
 > 
-> yeah, I suppose.
+> Nit: you can drop the memset below if you initialize immediately, and
+> GCC supporting dynamic arrays allows you to write this:
 > 
->>> +	ldr	\reg, =kvm_host_cpu_state
->>> +	mrs	\tmp, tpidr_el2
->>> +	add	\reg, \reg, \tmp
->>> +	kern_hyp_va \reg
->>
->> Here, we're trading a load from the stack for a load from the constant
->> pool. Can't we do something like:
->>
->> 	adr_l	\reg, kvm_host_cpu_state
->> 	msr	\tmp, tpidr_el2
->> 	add	\reg, \reg, \tmp
->>
->> and that's it? 
+> 	char entry[esz] = { 0, };
 > 
-> That's definitely what the compiler generates from C code...
+> so that you don't have to add the MAX_ENTRY_SIZE.
 > 
->> This relies on the property that the kernel/hyp offset is
->> constant, and that it doesn't matter if we add the offset to a kernel VA
->> or a HYP VA... Completely untested of course!
->>
-> 
-> You're the hyp VA expert.  Is it valid to rely on that assumption?
 
-Absolutely. Otherwise, we've messed up something really badly.
+Using a dynamic sized array is a great idea, but trying to initalize it
+at the same time gives me:
 
-[...]
+    error: variable-sized object may not be initialized
 
->>> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
->>> index 69ef24a..a0123ad 100644
->>> --- a/arch/arm64/kvm/hyp/switch.c
->>> +++ b/arch/arm64/kvm/hyp/switch.c
->>> @@ -435,7 +435,7 @@ void __hyp_text __noreturn hyp_panic(struct kvm_cpu_context *__host_ctxt)
->>>  	if (read_sysreg(vttbr_el2)) {
->>>  		struct kvm_cpu_context *host_ctxt;
->>>  
->>> -		host_ctxt = kern_hyp_va(__host_ctxt);
->>> +		host_ctxt = __host_ctxt;
->>
->> Can't we just rename __host_ctxt to host_ctxt and drop the local definition?
->>
+Is there a trick I'm unfamiliar with?
+
+> >  	int ret;
+> >  
+> > +	memset(entry, 0, MAX_ENTRY_SIZE);
+> > +
+> >  	while (len > 0) {
+> >  		int next_offset;
+> >  		size_t byte_offset;
+> >  
+> >  		ret = kvm_read_guest(kvm, gpa, entry, esz);
+> >  		if (ret)
+> > -			goto out;
+> > +			return ret;
+> >  
+> >  		next_offset = fn(its, id, entry, opaque);
+> > -		if (next_offset <= 0) {
+> > -			ret = next_offset;
+> > -			goto out;
+> > -		}
+> > +		if (next_offset <= 0)
+> > +			return next_offset;
+> >  
+> >  		byte_offset = next_offset * esz;
+> >  		id += next_offset;
+> >  		gpa += byte_offset;
+> >  		len -= byte_offset;
+> >  	}
+> > -	ret =  1;
+> > -
+> > -out:
+> > -	kfree(entry);
+> > -	return ret;
+> > +	return 1;
+> >  }
+> >  
+> >  /**
+> > 
 > 
-> yes, patch splitting snafu.  Will fix.
+> Otherwise:
 > 
-> By the way, what I'm going for is anything in the hyp address space has
-> leading __, and otherwise ot.
-
-OK, that's a useful convention, actually.
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+> 
+Thanks!
+-Christoffer
