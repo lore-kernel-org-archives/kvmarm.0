@@ -1,172 +1,178 @@
-From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: Re: [PATCH v3 15/20] KVM: arm64: Set an impdef ESR for Virtual-SError
- using VSESR_EL2.
-Date: Fri, 13 Oct 2017 17:25:35 +0800
-Message-ID: <f5f7859b-71a5-5f65-0344-7682bfac43bb@huawei.com>
-References: <20171005191812.5678-1-james.morse@arm.com>
- <20171005191812.5678-16-james.morse@arm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v1 2/2] kvm: arm64: handle single-step of userspace mmio instructions
+Date: Fri, 13 Oct 2017 10:27:36 +0100
+Message-ID: <87o9pb9z3r.fsf@linaro.org>
+References: <20171006113921.24880-1-alex.bennee@linaro.org> <20171006113921.24880-3-alex.bennee@linaro.org> <20171013085650.GD8927@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E138E49D31
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 05:25:14 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Rbe1S80VGapR for <kvmarm@lists.cs.columbia.edu>;
- Fri, 13 Oct 2017 05:25:13 -0400 (EDT)
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 73A1649D2C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 05:25:11 -0400 (EDT)
-In-Reply-To: <20171005191812.5678-16-james.morse@arm.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-reply-to: <20171013085650.GD8927@cbox>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Christoffer Dall <cdall@linaro.org>
+Cc: julien.thierry@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi James,
 
-   After checking this patch, I think my patch[1] already include this logic(only a little difference). In my first version patch [2], It sets the virtual ESR in the KVM, but Marc and
-other people disagree that[3][4],and propose to set its value and injection by userspace(when RAS is enabled). If you think we also need to support injection by KVM, I can extend my
-patch to support that(but I think we should not support according previous review comments). So I think we no need to submit another patch, it will be duplicated, and waste our review
-time. thank you very much. I will combine that.
+Christoffer Dall <cdall@linaro.org> writes:
 
-[1] https://lkml.org/lkml/2017/8/28/497
-[2] https://patchwork.kernel.org/patch/9633105/
-[3]https://lkml.org/lkml/2017/3/20/441
-[4]https://lkml.org/lkml/2017/3/20/516
+> On Fri, Oct 06, 2017 at 12:39:21PM +0100, Alex Benn=C3=A9e wrote:
+>> The system state of KVM when using userspace emulation is not complete
+>> until we return into KVM_RUN. To handle mmio related updates we wait
+>> until they have been committed and then schedule our KVM_EXIT_DEBUG.
+>>
+>> I've introduced a new function kvm_arm_maybe_return_debug() to wrap up
+>> the differences between arm/arm64 which is currently null for arm.
+>>
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> ---
+>>  arch/arm/include/asm/kvm_host.h   |  2 ++
+>>  arch/arm64/include/asm/kvm_host.h |  1 +
+>>  arch/arm64/kvm/debug.c            | 21 +++++++++++++++++++++
+>>  arch/arm64/kvm/handle_exit.c      |  9 +++------
+>>  virt/kvm/arm/arm.c                |  2 +-
+>>  virt/kvm/arm/mmio.c               |  3 ++-
+>>  6 files changed, 30 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_=
+host.h
+>> index 4a879f6ff13b..aec943f6d123 100644
+>> --- a/arch/arm/include/asm/kvm_host.h
+>> +++ b/arch/arm/include/asm/kvm_host.h
+>> @@ -285,6 +285,8 @@ static inline void kvm_arm_init_debug(void) {}
+>>  static inline void kvm_arm_setup_debug(struct kvm_vcpu *vcpu) {}
+>>  static inline void kvm_arm_clear_debug(struct kvm_vcpu *vcpu) {}
+>>  static inline void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu) {}
+>> +static inline int  kvm_arm_maybe_return_debug(struct kvm_vcpu *vcpu,
+>> +						struct kvm_run *run) {}
+>>
+>>  int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
+>>  			       struct kvm_device_attr *attr);
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/=
+kvm_host.h
+>> index e923b58606e2..fa67d21662f6 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -369,6 +369,7 @@ void kvm_arm_init_debug(void);
+>>  void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
+>>  void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
+>>  void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
+>> +int  kvm_arm_maybe_return_debug(struct kvm_vcpu *vcpu, struct kvm_run *=
+run);
+>>  int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
+>>  			       struct kvm_device_attr *attr);
+>>  int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+>> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+>> index dbadfaf850a7..a10a18c55c87 100644
+>> --- a/arch/arm64/kvm/debug.c
+>> +++ b/arch/arm64/kvm/debug.c
+>> @@ -221,3 +221,24 @@ void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
+>>  		}
+>>  	}
+>>  }
+>> +
+>> +
+>> +/*
+>> + * When KVM has successfully emulated the instruction we might want to
+>> + * return we a KVM_EXIT_DEBUG. We can only do this once the emulation
+>> + * is complete though so for userspace emulations we have to wait
+>> + * until we have re-entered KVM.
+>> + *
+>> + * Return > 0 to return to guest, 0 (and set exit_reason) on proper
+>> + * exit to userspace.
+>> + */
+>> +
+>> +int kvm_arm_maybe_return_debug(struct kvm_vcpu *vcpu, struct kvm_run *r=
+un)
+>> +{
+>> +	if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
+>> +		run->exit_reason =3D KVM_EXIT_DEBUG;
+>> +		run->debug.arch.hsr =3D ESR_ELx_EC_SOFTSTP_LOW << ESR_ELx_EC_SHIFT;
+>> +		return 0;
+>> +	}
+>> +	return 1;
+>> +}
+>> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+>> index c918d291cb58..7b04f59217bf 100644
+>> --- a/arch/arm64/kvm/handle_exit.c
+>> +++ b/arch/arm64/kvm/handle_exit.c
+>> @@ -202,13 +202,10 @@ static int handle_trap_exceptions(struct kvm_vcpu =
+*vcpu, struct kvm_run *run)
+>>  		handled =3D exit_handler(vcpu, run);
+>>  	}
+>>
+>> -	if (handled && (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)) {
+>> -		handled =3D 0;
+>> -		run->exit_reason =3D KVM_EXIT_DEBUG;
+>> -		run->debug.arch.hsr =3D ESR_ELx_EC_SOFTSTP_LOW << ESR_ELx_EC_SHIFT;
+>> -	}
+>> +	if (handled)
+>> +		return kvm_arm_maybe_return_debug(vcpu, run);
+>
+> Again, this seems to override the return value of exit_handler, which
+> may be something negative.
+>
+> Just so I'm clear: There's no intended functionality change of this
+> particular hunk, it's just to share the logic in
+> kvm_arm_maybe_return_debug, right?
+
+Yes, modulo the annoying semantics in the two places of the vcpu run
+ioctl loop.
+
+>
+>>
+>> -	return handled;
+>> +	return 0;
+>>  }
+>>
+>>  /*
+>> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+>> index b9f68e4add71..3d28fe2daa26 100644
+>> --- a/virt/kvm/arm/arm.c
+>> +++ b/virt/kvm/arm/arm.c
+>> @@ -623,7 +623,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, s=
+truct kvm_run *run)
+>>
+>>  	if (run->exit_reason =3D=3D KVM_EXIT_MMIO) {
+>>  		ret =3D kvm_handle_mmio_return(vcpu, vcpu->run);
+>> -		if (ret)
+>> +		if (ret < 1)
+>>  			return ret;
+>>  	}
+>>
+>> diff --git a/virt/kvm/arm/mmio.c b/virt/kvm/arm/mmio.c
+>> index b6e715fd3c90..e43e3bd6222f 100644
+>> --- a/virt/kvm/arm/mmio.c
+>> +++ b/virt/kvm/arm/mmio.c
+>> @@ -117,7 +117,8 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, st=
+ruct kvm_run *run)
+>>  		vcpu_set_reg(vcpu, vcpu->arch.mmio_decode.rt, data);
+>>  	}
+>>
+>> -	return 0;
+>> +	/* If debugging in effect we may need to return now */
+>
+> Will this ever be about other types of debugging (watchpoint on a MMIO
+> access?) or should we limit the text and description to
+> single-stepping?
+
+Hmm I don't think so. A hbreak should hit (via normal exception path)
+before we attempt any emulation. I suspect watchpoints wouldn't hit for
+emulation though - that would be trickier to do nicely though as it
+would need to be checked for in both kernel and userspace emulation.
+
+>
+>> +	return kvm_arm_maybe_return_debug(vcpu, run);
+>>  }
+>>
+>>  static int decode_hsr(struct kvm_vcpu *vcpu, bool *is_write, int *len)
+>> --
+>> 2.14.1
+>>
+>
+> Thanks,
+> -Christoffer
 
 
-On 2017/10/6 3:18, James Morse wrote:
-> Prior to v8.2's RAS Extensions, the HCR_EL2.VSE 'virtual SError' feature
-> generated an SError with an implementation defined ESR_EL1.ISS, because we
-> had no mechanism to specify the ESR value.
-> 
-> On Juno this generates an all-zero ESR, the most significant bit 'ISV'
-> is clear indicating the remainder of the ISS field is invalid.
-> 
-> With the RAS Extensions we have a mechanism to specify this value, and the
-> most significant bit has a new meaning: 'IDS - Implementation Defined
-> Syndrome'. An all-zero SError ESR now means: 'RAS error: Uncategorized'
-> instead of 'no valid ISS'.
-> 
-> Add KVM support for the VSESR_EL2 register to specify an ESR value when
-> HCR_EL2.VSE generates a virtual SError. Change kvm_inject_vabt() to
-> specify an implementation-defined value.
-> 
-> We only need to restore the VSESR_EL2 value when HCR_EL2.VSE is set, KVM
-> save/restores this bit during __deactivate_traps() and hardware clears the
-> bit once the guest has consumed the virtual-SError.
-> 
-> Future patches may add an API (or KVM CAP) to pend a virtual SError with
-> a specified ESR.
-> 
-> Cc: Dongjiu Geng <gengdongjiu@huawei.com>
-> Signed-off-by: James Morse <james.morse@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_emulate.h |  5 +++++
->  arch/arm64/include/asm/kvm_host.h    |  3 +++
->  arch/arm64/include/asm/sysreg.h      |  1 +
->  arch/arm64/kvm/hyp/switch.c          |  4 ++++
->  arch/arm64/kvm/inject_fault.c        | 13 ++++++++++++-
->  5 files changed, 25 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index e5df3fce0008..8a7a838eb17a 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -61,6 +61,11 @@ static inline void vcpu_set_hcr(struct kvm_vcpu *vcpu, unsigned long hcr)
->  	vcpu->arch.hcr_el2 = hcr;
->  }
->  
-> +static inline void vcpu_set_vsesr(struct kvm_vcpu *vcpu, u64 vsesr)
-> +{
-> +	vcpu->arch.vsesr_el2 = vsesr;
-> +}
-> +
->  static inline unsigned long *vcpu_pc(const struct kvm_vcpu *vcpu)
->  {
->  	return (unsigned long *)&vcpu_gp_regs(vcpu)->regs.pc;
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index d3eb79a9ed6b..0af35e71fedb 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -277,6 +277,9 @@ struct kvm_vcpu_arch {
->  
->  	/* Detect first run of a vcpu */
->  	bool has_run_once;
-> +
-> +	/* Virtual SError ESR to restore when HCR_EL2.VSE is set */
-> +	u64 vsesr_el2;
->  };
->  
->  #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.gp_regs)
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index 427c36bc5dd6..a493e93de296 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -253,6 +253,7 @@
->  
->  #define SYS_DACR32_EL2			sys_reg(3, 4, 3, 0, 0)
->  #define SYS_IFSR32_EL2			sys_reg(3, 4, 5, 0, 1)
-> +#define SYS_VSESR_EL2			sys_reg(3, 4, 5, 2, 3)
->  #define SYS_FPEXC32_EL2			sys_reg(3, 4, 5, 3, 0)
->  
->  #define __SYS__AP0Rx_EL2(x)		sys_reg(3, 4, 12, 8, x)
-> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> index 945e79c641c4..af37658223a0 100644
-> --- a/arch/arm64/kvm/hyp/switch.c
-> +++ b/arch/arm64/kvm/hyp/switch.c
-> @@ -86,6 +86,10 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
->  		isb();
->  	}
->  	write_sysreg(val, hcr_el2);
-> +
-> +	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN) && (val & HCR_VSE))
-> +		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
-> +
->  	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
->  	write_sysreg(1 << 15, hstr_el2);
->  	/*
-> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-> index da6a8cfa54a0..52f7f66f1356 100644
-> --- a/arch/arm64/kvm/inject_fault.c
-> +++ b/arch/arm64/kvm/inject_fault.c
-> @@ -232,14 +232,25 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
->  		inject_undef64(vcpu);
->  }
->  
-> +static void pend_guest_serror(struct kvm_vcpu *vcpu, u64 esr)
-> +{
-> +	vcpu_set_vsesr(vcpu, esr);
-> +	vcpu_set_hcr(vcpu, vcpu_get_hcr(vcpu) | HCR_VSE);
-> +}
-> +
->  /**
->   * kvm_inject_vabt - inject an async abort / SError into the guest
->   * @vcpu: The VCPU to receive the exception
->   *
->   * It is assumed that this code is called from the VCPU thread and that the
->   * VCPU therefore is not currently executing guest code.
-> + *
-> + * Systems with the RAS Extensions specify an imp-def ESR (ISV/IDS = 1) with
-> + * the remaining ISS all-zeros so that this error is not interpreted as an
-> + * uncatagorized RAS error. Without the RAS Extensions we can't specify an ESR
-> + * value, so the CPU generates an imp-def value.
->   */
->  void kvm_inject_vabt(struct kvm_vcpu *vcpu)
->  {
-> -	vcpu_set_hcr(vcpu, vcpu_get_hcr(vcpu) | HCR_VSE);
-> +	pend_guest_serror(vcpu, ESR_ELx_ISV);
->  }
-> 
+--
+Alex Benn=C3=A9e
