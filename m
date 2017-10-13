@@ -1,88 +1,91 @@
-From: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
-Subject: Re: [PATCH v3 04/13] arm64: alternatives: use tpidr_el2 on VHE hosts
-Date: Fri, 13 Oct 2017 17:50:45 +0100
-Message-ID: <59E0EEE5.2020208@arm.com>
-References: <20170922182614.27885-1-james.morse@arm.com> <20170922182614.27885-5-james.morse@arm.com> <20171013153148.dnejsvhxeui6opfw@armageddon.cambridge.arm.com>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v3 15/20] KVM: arm64: Set an impdef ESR for Virtual-SError
+ using VSESR_EL2.
+Date: Fri, 13 Oct 2017 17:53:57 +0100
+Message-ID: <59E0EFA5.1020103@arm.com>
+References: <20171005191812.5678-1-james.morse@arm.com>
+ <20171005191812.5678-16-james.morse@arm.com>
+ <f5f7859b-71a5-5f65-0344-7682bfac43bb@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171013153148.dnejsvhxeui6opfw-+1aNUgJU5qkijLcmloz0ER/iLCjYCKR+VpNB7YpNyf8@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>
-Cc: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Lorenzo Pieralisi <lorenzo.pieralisi-5wv7dgnIgG8@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Loc Ho <lho-qTEPVZfXA3Y@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0287049D33
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 12:54:50 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id RqfNDRAKMh3c for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 13 Oct 2017 12:54:48 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BD45349D2C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 12:54:48 -0400 (EDT)
+In-Reply-To: <f5f7859b-71a5-5f65-0344-7682bfac43bb@huawei.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: gengdongjiu <gengdongjiu@huawei.com>
+Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Catalin,
+Hi gengdongjiu,
 
-On 13/10/17 16:31, Catalin Marinas wrote:
-> On Fri, Sep 22, 2017 at 07:26:05PM +0100, James Morse wrote:
->> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
->> index cd52d365d1f0..8e4c7da2b126 100644
->> --- a/arch/arm64/kernel/cpufeature.c
->> +++ b/arch/arm64/kernel/cpufeature.c
+On 13/10/17 10:25, gengdongjiu wrote:
+> After checking this patch, I think my patch[1] already include this logic(only a little
+> difference).
 
->> @@ -1308,3 +1309,25 @@ static int __init enable_mrs_emulation(void)
->>  }
->>  
->>  late_initcall(enable_mrs_emulation);
->> +
->> +int cpu_copy_el2regs(void *__unused)
->> +{
->> +	int do_copyregs = 0;
->> +
->> +	/*
->> +	 * Copy register values that aren't redirected by hardware.
->> +	 *
->> +	 * Before code patching, we only set tpidr_el1, all CPUs need to copy
->> +	 * this value to tpidr_el2 before we patch the code. Once we've done
->> +	 * that, freshly-onlined CPUs will set tpidr_el2, so we don't need to
->> +	 * do anything here.
->> +	 */
->> +	asm volatile(ALTERNATIVE("mov %0, #1", "mov %0, #0",
->> +				 ARM64_HAS_VIRT_HOST_EXTN)
->> +		    : "=r" (do_copyregs) : : );
-> 
-> Can you just do:
-> 
-> 	if (cpu_have_const_cap(ARM64_HAS_VIRT_HOST_EXTN))
-> 		write_sysreg(read_sysreg(tpidr_el1), tpidr_el2);
-> 
-> At this point the capability bits should be set and the jump labels
-> enabled.
+Your kvm_handle_guest_sei() is similar to where this series ends up, but the
+purpose of this patch is to keep KVMs existing behaviour.
 
-These are enabled too early, we haven't done patching yet.
-
-We need to copy tpidr_el1 -> tpidr_el2 on all CPUs that are online before code
-patching.
-
-After code patching new CPUs set tpidr_el2 when they come online, so we don't
-need to do the copy... but this enable method is still called. There is nothing
-for us to do, and tpidr_el1 now contains junk, so the copy
+KVM already injects SError into the guest all by itself, now with the RAS
+extensions it can specify and ESR, and because of the new ESR encoding it can't
+use the reset value of all-zeroes.
 
 
-cpu_have_const_cap() is great for knowing if we have a feature, here we want to
-know if we've done the patching for this feature.
+> In my first version patch [2], It sets the virtual ESR in the KVM, but Marc and
+> other people disagree that[3][4],and propose to set its value and injection by userspace(when
+> RAS is enabled). 
 
-I can wrap the ALTERNATIVE() into a helper, something like:
-> arm64_alternatives_applied(ARM64_HAS_VIRT_HOST_EXTN)
+Not quite: for RAS errors.
+When we want to hand a RAS error to a guest, Qemu should be driving that.
 
-which should make it clearer.
+What about impdef SError? Qemu should be able to drive that with the same API.
 
-Christoffer had the same question at connect, so I evidently haven't found the
-right way of describing this yet.
+What about this nasty corner where KVM already injects an impdef SError
+directly? This patch keeps that working.
 
 
-> Otherwise:
-> 
-> Reviewed-by: Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>
+I'd love to get rid of KVMs internal use of kvm_inject_vabt(). But what do we
+replace it with? It needs to be a guest exit type that existing software can't
+ignore...
 
-Thanks for taking a look, I'll leave this RB until your happy with the
-ALTERNATIVE() hackery above.
+(The best I can suggest is: Once we have a mechanism to inject SError into a
+guest from Qemu, KVM could make an impdef SError pending, then give Qemu the
+opportunity to kill the guest, or set a different ESR. Existing software can
+ignore the exit, and take the existing behaviour.)
+
+
+> So I think we no need to submit another patch, it will be duplicated, and waste our review
+> time. thank you very much. I will combine that.
+
+I agree we're posting competing series, there was some off-list co-ordination on
+this with Xie XiuQi and Xiongfeng Wang in ~may, it looks like you weren't
+involved at that point.
+
+In your last series touching all this:
+https://lkml.org/lkml/2017/8/31/698
+
+You had Xie XiuQi's RAS-cpufeature patch in isolation, without the SError rework
+underneath it. Applied like this SError is still always masked in the kernel, so
+any system without firmware-first will silently consume and discard an
+uncontained-RAS-error using the esb() in __switch_to(). We can't do this, hence
+the first half of this series.
 
 
 James
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
