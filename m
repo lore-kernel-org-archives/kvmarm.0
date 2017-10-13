@@ -1,158 +1,265 @@
-From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: Re: [PATCH] arm64: KVM: set right LR register value for 32 bit
- guest when inject abort
-Date: Fri, 13 Oct 2017 14:29:56 +0000
-Message-ID: <0184EA26B2509940AA629AE1405DD7F20168D7DA@DGGEMA503-MBS.china.huawei.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH] arm64: KVM: set right LR register value for 32 bit guest
+ when inject abort
+Date: Fri, 13 Oct 2017 16:12:44 +0100
+Message-ID: <b2bac33a-329e-05e6-b31b-ffd8abaed512@arm.com>
+References: <0184EA26B2509940AA629AE1405DD7F20168D7DA@DGGEMA503-MBS.china.huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Language: zh-CN
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Cc: "Zhanghaibin (Euler)" <zhanghaibin7@huawei.com>, Huangshaoyu <huangshaoyu@huawei.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 426A049D39
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 11:12:03 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 8X5Tu3IYQIT7 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 13 Oct 2017 11:12:01 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 85D4549D24
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 11:12:01 -0400 (EDT)
+In-Reply-To: <0184EA26B2509940AA629AE1405DD7F20168D7DA@DGGEMA503-MBS.china.huawei.com>
+Content-Language: en-GB
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: gengdongjiu <gengdongjiu@huawei.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Cc: Huangshaoyu <huangshaoyu@huawei.com>, "Zhanghaibin (Euler)" <zhanghaibin7@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGkgTWFyYywNCiAgICBUaGFuayB5b3UgdmVyeSBtdWNoIGZvciB5b3VyIHRpbWUgdG8gcmV2aWV3
-IGl0Lg0KDQo+IE9uIDEyLzEwLzE3IDE3OjQ0LCBEb25naml1IEdlbmcgd3JvdGU6DQo+ID4gV2hl
-biBhIGV4Y2VwdGlvbiBpcyB0cmFwcGVkIHRvIEVMMiwgaGFyZHdhcmUgdXNlcyAgRUxSX0VMeCB0
-byBob2xkIHRoZQ0KPiA+IGN1cnJlbnQgZmF1bHQgaW5zdHJ1Y3Rpb24gYWRkcmVzcy4gSWYgS1ZN
-IHdhbnRzIHRvIGluamVjdCBhIGFib3J0IHRvDQo+ID4gMzIgYml0IGd1ZXN0LCBpdCBuZWVkcyB0
-byBzZXQgdGhlIExSIHJlZ2lzdGVyIGZvciB0aGUgZ3Vlc3QgdG8gZW11bGF0ZQ0KPiA+IHRoaXMg
-YWJvcnQgIGhhcHBlbmVkIGluIHRoZSBndWVzdC4gQmVjYXVzZSBBUk0zMiBhcmNoaXRlY3R1cmUg
-aXMNCj4gPiBNdWx0aS1waXBlbGluZSwgc28gdGhlIExSIHZhbHVlIGhhcyBhbiBvZmZzZXQgdG8N
-Cj4gDQo+IFdoYXQgZG9lcyAiTXVsdGktcGlwZWxpbmUiIG1lYW4/DQoNCkkgbWVhbiB0aGUgQVJN
-J3Mgc2luZ2xlLWN5Y2xlIGluc3RydWN0aW9uIDMtc3RhZ2UgcGlwZWxpbmUgb3BlcmF0aW9uLCBh
-cyBzaG93biBiZWxvdzoNCg0KZmV0Y2ggICBkZWNvZGUgICBleGVjdXRlDQogICAgICAgIGZldGNo
-ICAgIGRlY29kZSAgIGV4ZWN1dGUNCiAgICAgICAgICAgICAgICAgZmV0Y2ggICAgZGVjb2RlICAg
-ZXhlY3V0ZQ0KDQp3aGVuIENQVSBmaW5pc2ggaW5zdHJ1Y3Rpb25zIGZldGNoLCAgUEM9UEMgKyA0
-DQp3aGVuIENQVSBmaW5pc2ggaW5zdHJ1Y3Rpb25zIGRlY29kZSwgUEM9UEMgKyA4DQp3aGVuIENQ
-VSBmaW5pc2ggaW5zdHJ1Y3Rpb25zIGV4ZWN1dGlvbiwgUEM9UEMrMTINCg0KdGhhdCBpcyB0byBz
-YXksIHdoZW4gaGFwcGVuIGRhdGEgYWJvcnQsIA0KdGhlIFBDID0gZmF1bHQgaW5zdHJ1Y3Rpb24g
-YWRkcmVzcyArIDEyLCBMUl9hYnQgPSBmYXVsdCBpbnN0cnVjdGlvbiBhZGRyZXNzICsgOA0KDQpJ
-biBvcmRlciB0byBlbXVsYXRlIHRoaXMgYWJvcnQgZm9yIEtWTSwgTFJfYWJ0IG5lZWRzIHRvIGFk
-ZCBhbiBvZmZzZXQgOCB3aGVuIGluamVjdCBkYXRhIGFib3J0LiANCg0KPiANCj4gPiB0aGUgZmF1
-bHQgaW5zdHJ1Y3Rpb24gYWRkcmVzcy4NCj4gPg0KPiA+IFRoZSBvZmZzZXRzIGFwcGxpZWQgdG8g
-TGluayB2YWx1ZSBmb3IgZXhjZXB0aW9ucyBhcyBzaG93biBiZWxvdywgd2hpY2gNCj4gPiBzaG91
-bGQgYmUgYWRkZWQgZm9yIHRoZSBBUk0zMiBsaW5rIHJlZ2lzdGVyKExSKS4NCj4gPg0KPiA+IEV4
-Y2VwdGlvbgkJCU9mZnNldCwgZm9yIFBFIHN0YXRlIG9mOg0KPiA+IAkJCQlBMzIgCSAgVDMyDQo+
-ID4gVW5kZWZpbmVkIEluc3RydWN0aW9uIAkJKzQgCSAgKzINCj4gPiBQcmVmZXRjaCBBYm9ydCAJ
-CQkrNCAJICArNA0KPiA+IERhdGEgQWJvcnQgCQkJKzggCSAgKzgNCj4gPiBJUlEgb3IgRklRIAkJ
-CSs0IAkgICs0DQo+IA0KPiBQbGVhc2UgZG9jdW1lbnQgd2hlcmUgdGhpcyB0YWJsZSBpcyBjb21p
-bmcgZnJvbS4NCg0KDQpUaGFua3MgZm9yIHBvaW50aW5nIG91dC4gV2lsbCBhZGQgaXQuDQpJdCBj
-b21lIGZyb206ICBEREkwNDg3QV9rX2FybXY4X2FybV9pc3MxMDc3NSwgIkcxLjEyLjMgT3ZlcnZp
-ZXcgb2YgZXhjZXB0aW9uIGVudHJ5IiwgVGFibGUgRzEtMTAgT2Zmc2V0cyBhcHBsaWVkIHRvIExp
-bmsgdmFsdWUgZm9yIGV4Y2VwdGlvbnMgdGFrZW4gdG8gbm9uLUVMMiBtb2Rlcw0KDQo+IA0KPiA+
-DQo+ID4gU2lnbmVkLW9mZi1ieTogRG9uZ2ppdSBHZW5nIDxnZW5nZG9uZ2ppdUBodWF3ZWkuY29t
-Pg0KPiA+IFNpZ25lZC1vZmYtYnk6IEhhaWJpbiBaaGFuZyA8emhhbmdoYWliaW43QGh1YXdlaS5j
-b20+DQo+ID4NCj4gPiAtLS0NCj4gPiBGb3IgZXhhbXBsZSwgdG8gdGhlIHVuZGVmaW5lZCBpbnN0
-cnVjdGlvbiBpbmplY3Rpb246DQo+ID4NCj4gPiAxLiBHdWVzdCBPUyBjYWxsIFNNQyhTZWN1cmUg
-TW9uaXRvciBDYWxsKSBpbnN0cnVjdGlvbiBpbiB0aGUgYWRkcmVzcw0KPiA+IDB4YzAyNTQwNWMs
-IHRoZW4gR3Vlc3QgdHJhcHMgdG8gaHlwZXJ2aXNvcg0KPiA+DQo+ID4gYzAyNTQwNTA6ICAgZTU5
-ZDUwMjggICAgbGRyIHI1LCBbc3AsICM0MF0gICA7IDB4MjgNCj4gPiBjMDI1NDA1NDogICBlM2Ew
-MzAwMSAgICBtb3YgcjMsICMxDQo+ID4gYzAyNTQwNTg6ICAgZTFhMDEwMDMgICAgbW92IHIxLCBy
-Mw0KPiA+IGMwMjU0MDVjOiAgIGUxNjAwMDcwICAgIHNtYyAwDQo+ID4gYzAyNTQwNjA6ICAgZTMw
-YTAyNzAgICAgbW92dyAgICByMCwgIzQxNTg0ICA7IDB4YTI3MA0KPiA+IGMwMjU0MDY0OiAgIGUz
-NGMwMGJmICAgIG1vdnQgICAgcjAsICM0OTM0MyAgOyAweGMwYmYNCj4gPg0KPiA+IDIuIEtWTSAg
-aW5qZWN0cyB1bmRlZmluZWQgYWJvcnQgdG8gZ3Vlc3QgMy4gV2Ugd2lsbCBmaW5kIHRoZSBmYXVs
-dCBQQw0KPiA+IGlzIDB4YzAyNTQwNTgsIG5vdCAweGMwMjU0MDVjLg0KPiA+DQo+ID4gWyAgIDEy
-LjM0ODA3Ml0gSW50ZXJuYWwgZXJyb3I6IE9vcHMgLSB1bmRlZmluZWQgaW5zdHJ1Y3Rpb246IDAg
-WyMxXSBTTVAgQVJNDQo+ID4gWyAgIDEyLjM0OTc4Nl0gTW9kdWxlcyBsaW5rZWQgaW46DQo+ID4g
-WyAgIDEyLjM1MDU2M10gQ1BVOiAxIFBJRDogNzEgQ29tbTogY2F0IE5vdCB0YWludGVkIDQuMS4w
-LWRpcnR5ICMyNQ0KPiA+IFsgICAxMi4zNTIwNjFdIEhhcmR3YXJlIG5hbWU6IEdlbmVyaWMgRFQg
-YmFzZWQgc3lzdGVtDQo+ID4gWyAgIDEyLjM1MzI3NV0gdGFzazogZDlkMDgwMDAgdGk6IGQ5Y2Zl
-MDAwIHRhc2sudGk6IGQ5Y2ZlMDAwDQo+ID4gWyAgIDEyLjM1NDYzN10gUEMgaXMgYXQgcHJvY19k
-b2ludHZlYysweDIwLzB4NjANCj4gPiBbICAgMTIuMzU1NzE3XSBMUiBpcyBhdCBwcm9jX3N5c19j
-YWxsX2hhbmRsZXIrMHhiMC8weGM0DQo+ID4gWyAgIDEyLjM1Njk3Ml0gcGMgOiBbPGMwMjU0MDU4
-Pl0gICAgbHIgOiBbPGMwMzU2OTljPl0gICAgcHNyOiBhMDA2MDAxMw0KPiA+IFsgICAxMi4zNTY5
-NzJdIHNwIDogZDljZmZlOTAgIGlwIDogYzAyNTQwMzggIGZwIDogMDAwMDAwMDENCj4gPiBbICAg
-MTIuMzU5ODI0XSByMTA6IGQ5Y2ZmZjgwICByOSA6IDAwMDAwMDA0ICByOCA6IDAwMDAwMDAwDQo+
-ID4gWyAgIDEyLjM2MTEzMl0gcjcgOiBiZWMyMWNiMCAgcjYgOiBkOWNmZmVjNCAgcjUgOiBkOWNm
-ZmY4MCAgcjQgOiBjMGU4MmRlMA0KPiA+IFsgICAxMi4zNjI3NjZdIHIzIDogMDAwMDAwMDEgIHIy
-IDogYmVjMjFjYjAgIHIxIDogMDAwMDAwMDEgIHIwIDogYzBlODJkZTANCj4gPiBbICAgMTIuMzY0
-NDAwXSBGbGFnczogTnpDdiAgSVJRcyBvbiAgRklRcyBvbiAgTW9kZSBTVkNfMzIgIElTQSBBUk0g
-IFNlZ21lbnQgdXNlcg0KPiA+IFsgICAxMi4zNjYxODNdIENvbnRyb2w6IDEwYzUzODNkICBUYWJs
-ZTogNTlkMzQwNmEgIERBQzogMDAwMDAwMTUNCj4gPiBbICAgMTIuMzY3NjIzXSBQcm9jZXNzIGNh
-dCAocGlkOiA3MSwgc3RhY2sgbGltaXQgPSAweGQ5Y2ZlMjIwKQ0KPiA+DQo+ID4gNC4gQWZ0ZXIg
-Y29ycmVjdCB0aGUgTFIgcmVnaXN0ZXIsIGl0IHdpbGwgaGF2ZSByaWdodCB2YWx1ZQ0KPiA+DQo+
-ID4gWyAgMTI1Ljc2MzM3MF0gSW50ZXJuYWwgZXJyb3I6IE9vcHMgLSB1bmRlZmluZWQgaW5zdHJ1
-Y3Rpb246IDAgWyMyXQ0KPiA+IFNNUCBBUk0gWyAgMTI1Ljc2NzAxMF0gTW9kdWxlcyBsaW5rZWQg
-aW46DQo+ID4gWyAgMTI1Ljc2ODQ3Ml0gQ1BVOiAxIFBJRDogNzQgQ29tbTogY2F0IFRhaW50ZWQ6
-IEcgICAgICBEICAgICAgICAgNC4xLjAtZGlydHkgIzI1DQo+ID4gWyAgMTI1Ljc3MTg1NF0gSGFy
-ZHdhcmUgbmFtZTogR2VuZXJpYyBEVCBiYXNlZCBzeXN0ZW0gWyAgMTI1Ljc3NDA1M10NCj4gPiB0
-YXNrOiBkYjBiYjkwMCB0aTogZDlkMTAwMDAgdGFzay50aTogZDlkMTAwMDAgWyAgMTI1Ljc3Njgy
-MV0gUEMgaXMgYXQNCj4gPiBwcm9jX2RvaW50dmVjKzB4MjQvMHg2MCBbICAxMjUuNzc4OTE5XSBM
-UiBpcyBhdA0KPiA+IHByb2Nfc3lzX2NhbGxfaGFuZGxlcisweGIwLzB4YzQNCj4gPiBbICAxMjUu
-NzgxMjY5XSBwYyA6IFs8YzAyNTQwNWM+XSAgICBsciA6IFs8YzAzNTY5OWM+XSAgICBwc3I6IGEw
-MDYwMDEzDQo+ID4gWyAgMTI1Ljc4MTI2OV0gc3AgOiBkOWQxMWU5MCAgaXAgOiBjMDI1NDAzOCAg
-ZnAgOiAwMDAwMDAwMSBbDQo+ID4gMTI1Ljc4NjU4MV0gcjEwOiBkOWQxMWY4MCAgcjkgOiAwMDAw
-MDAwNCAgcjggOiAwMDAwMDAwMCBbICAxMjUuNzg5NjczXQ0KPiA+IHI3IDogYmU5MmNjYjAgIHI2
-IDogZDlkMTFlYzQgIHI1IDogZDlkMTFmODAgIHI0IDogYzBlODJkZTAgWw0KPiA+IDEyNS43OTI4
-MjhdIHIzIDogMDAwMDAwMDEgIHIyIDogYmU5MmNjYjAgIHIxIDogMDAwMDAwMDEgIHIwIDogYzBl
-ODJkZTANCj4gPiBbICAxMjUuNzk1ODkwXSBGbGFnczogTnpDdiAgSVJRcyBvbiAgRklRcyBvbiAg
-TW9kZSBTVkNfMzIgIElTQSBBUk0NCj4gPiBTZWdtZW50IHVzZXINCj4gPg0KPiA+IEZvciBvdGhl
-ciBleGNlcHRpb24gaW5qZWN0aW9uLCBzdWNoIGFzIERhdGEvUHJlZmV0Y2ggYWJvcnQsIGFsc28g
-bmVlZHMNCj4gPiB0byBjb3JyZWN0DQo+ID4gLS0tDQo+ID4gIGFyY2gvYXJtNjQva3ZtL2luamVj
-dF9mYXVsdC5jIHwgMTggKysrKysrKysrKysrLS0tLS0tDQo+ID4gIDEgZmlsZSBjaGFuZ2VkLCAx
-MiBpbnNlcnRpb25zKCspLCA2IGRlbGV0aW9ucygtKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2Fy
-Y2gvYXJtNjQva3ZtL2luamVjdF9mYXVsdC5jDQo+ID4gYi9hcmNoL2FybTY0L2t2bS9pbmplY3Rf
-ZmF1bHQuYyBpbmRleCBkYTZhOGNmLi5kYTkzNTA4IDEwMDY0NA0KPiA+IC0tLSBhL2FyY2gvYXJt
-NjQva3ZtL2luamVjdF9mYXVsdC5jDQo+ID4gKysrIGIvYXJjaC9hcm02NC9rdm0vaW5qZWN0X2Zh
-dWx0LmMNCj4gPiBAQCAtMzMsMTIgKzMzLDExIEBADQo+ID4gICNkZWZpbmUgTE9XRVJfRUxfQUFy
-Y2g2NF9WRUNUT1IJCTB4NDAwDQo+ID4gICNkZWZpbmUgTE9XRVJfRUxfQUFyY2gzMl9WRUNUT1IJ
-CTB4NjAwDQo+ID4NCj4gPiAtc3RhdGljIHZvaWQgcHJlcGFyZV9mYXVsdDMyKHN0cnVjdCBrdm1f
-dmNwdSAqdmNwdSwgdTMyIG1vZGUsIHUzMg0KPiA+IHZlY3Rfb2Zmc2V0KQ0KPiA+ICtzdGF0aWMg
-dm9pZCBwcmVwYXJlX2ZhdWx0MzIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCB1MzIgbW9kZSwgdTMy
-IHZlY3Rfb2Zmc2V0LA0KPiA+ICsJCQkJdTMyIHJldHVybl9vZmZzZXQpDQo+ID4gIHsNCj4gPiAg
-CXVuc2lnbmVkIGxvbmcgY3BzcjsNCj4gPiAgCXVuc2lnbmVkIGxvbmcgbmV3X3Nwc3JfdmFsdWUg
-PSAqdmNwdV9jcHNyKHZjcHUpOw0KPiA+IC0JYm9vbCBpc190aHVtYiA9IChuZXdfc3Bzcl92YWx1
-ZSAmIENPTVBBVF9QU1JfVF9CSVQpOw0KPiA+IC0JdTMyIHJldHVybl9vZmZzZXQgPSAoaXNfdGh1
-bWIpID8gNCA6IDA7DQo+ID4gIAl1MzIgc2N0bHIgPSB2Y3B1X2NwMTUodmNwdSwgYzFfU0NUTFIp
-Ow0KPiA+DQo+ID4gIAljcHNyID0gbW9kZSB8IENPTVBBVF9QU1JfSV9CSVQ7DQo+ID4gQEAgLTY1
-LDcgKzY0LDExIEBAIHN0YXRpYyB2b2lkIHByZXBhcmVfZmF1bHQzMihzdHJ1Y3Qga3ZtX3ZjcHUg
-KnZjcHUsDQo+ID4gdTMyIG1vZGUsIHUzMiB2ZWN0X29mZnNldCkNCj4gPg0KPiA+ICBzdGF0aWMg
-dm9pZCBpbmplY3RfdW5kZWYzMihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpICB7DQo+ID4gLQlwcmVw
-YXJlX2ZhdWx0MzIodmNwdSwgQ09NUEFUX1BTUl9NT0RFX1VORCwgNCk7DQo+ID4gKwl1bnNpZ25l
-ZCBsb25nIHNwc3JfdmFsdWUgPSAqdmNwdV9jcHNyKHZjcHUpOw0KPiA+ICsJYm9vbCBpc190aHVt
-YiA9IChzcHNyX3ZhbHVlICYgQ09NUEFUX1BTUl9UX0JJVCk7DQo+ID4gKwl1MzIgcmV0dXJuX29m
-ZnNldCA9IChpc190aHVtYikgPyAyIDogNDsNCj4gPiArDQo+ID4gKwlwcmVwYXJlX2ZhdWx0MzIo
-dmNwdSwgQ09NUEFUX1BTUl9NT0RFX1VORCwgNCwgcmV0dXJuX29mZnNldCk7DQo+ID4gIH0NCj4g
-Pg0KPiA+ICAvKg0KPiA+IEBAIC03NSwyMSArNzgsMjQgQEAgc3RhdGljIHZvaWQgaW5qZWN0X3Vu
-ZGVmMzIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQ0KPiA+IHN0YXRpYyB2b2lkIGluamVjdF9hYnQz
-MihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGJvb2wgaXNfcGFidCwNCj4gPiAgCQkJIHVuc2lnbmVk
-IGxvbmcgYWRkcikNCj4gPiAgew0KPiA+IC0JdTMyIHZlY3Rfb2Zmc2V0Ow0KPiA+ICsJdTMyIHZl
-Y3Rfb2Zmc2V0LCByZXR1cm5fb2Zmc2V0Ow0KPiA+ICAJdTMyICpmYXIsICpmc3I7DQo+ID4gIAli
-b29sIGlzX2xwYWU7DQo+ID4NCj4gPiAgCWlmIChpc19wYWJ0KSB7DQo+ID4gIAkJdmVjdF9vZmZz
-ZXQgPSAxMjsNCj4gPiArCQlyZXR1cm5fb2Zmc2V0ID0gNDsNCj4gPiAgCQlmYXIgPSAmdmNwdV9j
-cDE1KHZjcHUsIGM2X0lGQVIpOw0KPiA+ICAJCWZzciA9ICZ2Y3B1X2NwMTUodmNwdSwgYzVfSUZT
-Uik7DQo+ID4gIAl9IGVsc2UgeyAvKiAhaWFidCAqLw0KPiA+ICAJCXZlY3Rfb2Zmc2V0ID0gMTY7
-DQo+ID4gKwkJcmV0dXJuX29mZnNldCA9IDg7DQo+ID4gIAkJZmFyID0gJnZjcHVfY3AxNSh2Y3B1
-LCBjNl9ERkFSKTsNCj4gPiAgCQlmc3IgPSAmdmNwdV9jcDE1KHZjcHUsIGM1X0RGU1IpOw0KPiA+
-ICAJfQ0KPiA+DQo+ID4gLQlwcmVwYXJlX2ZhdWx0MzIodmNwdSwgQ09NUEFUX1BTUl9NT0RFX0FC
-VCB8IENPTVBBVF9QU1JfQV9CSVQsIHZlY3Rfb2Zmc2V0KTsNCj4gPiArCXByZXBhcmVfZmF1bHQz
-Mih2Y3B1LCBDT01QQVRfUFNSX01PREVfQUJUIHwgQ09NUEFUX1BTUl9BX0JJVCwNCj4gPiArCQkg
-ICAgICAgdmVjdF9vZmZzZXQsIHJldHVybl9vZmZzZXQpOw0KPiA+DQo+ID4gIAkqZmFyID0gYWRk
-cjsNCj4gPg0KPiA+DQo+IA0KPiBTbyBpbnN0ZWFkIG9mIGFkZGluZyB0aGlzIGV4dHJhIHBhcmFt
-ZXRlciBhbmQgbGl0dGVyaW5nIHRoZSBjb2RlIHdpdGggcmFuZG9tIGNvbnN0YW50cywgd2h5IGRv
-bid0IHlvdSBhY3R1YWxseSBpbXBsZW1lbnQgdGhlIHRhYmxlIHlvdSd2ZQ0KPiBwdXQgaW4gdGhl
-IGNvbW1pdCBsb2cgYW5kIGNvbXB1dGUgdGhlIG9mZnNldCBpbiBhIHNpbmdsZSBwbGFjZSAod2hp
-Y2ggaXMgbGlrZWx5IHRvIGJlIHByZXBhcmVfZmF1bHQzMik/DQoNCk1hcmMsDQogIEl0IGJlY2F1
-c2UgbXVsdGlwbGUgYWJvcnQoVW5kZWZpbmVkIEFib3J0L1ByZWZldGNoIEFib3J0L0RhdGEgQWJv
-cnQpIGNhbGwgdGhlIHByZXBhcmVfZmF1bHQzMigpLCBpZiBhZGRpbmcgdG8gYSBzaW5nbGUgcGxh
-Y2UgaW4gcHJlcGFyZV9mYXVsdDMyKCkscHJlcGFyZV9mYXVsdDMyKCkgd2lsbCANCm5vdCBrbm93
-IHdoZXRoZXIgdGhlIEFib3J0IGluamVjdGlvbiBpcyBmb3IgUHJlZmV0Y2ggQWJvcnQgb3IgRGF0
-YSBBYm9ydCBvciBVbmRlZmluZWQgQWJvcnQsIHRoZW4gd2lsbCBiZSBjb25mdXNlZCBmb3IgdGhl
-IHZhbHVlIG9mICJyZXR1cm5fb2Zmc2V0Ig0KDQpGb3IgZXhhbXBsZToNCmluamVjdF9hYnQzMigp
-IGlzIHVzZWQgdG8gaW5qZWN0IHByZWZldGNoIEFib3J0IG9yIERhdGEgQWJvcnQsIGl0IHBhc3Nl
-cyBzYW1lIHBhcmFtZXRlcnMgdG8gY2FsbCBwcmVwYXJlX2ZhdWx0MzIoKSBmb3IgdGhlIHR3byBB
-Ym9ydC4gSWYgYWRkaW5nIGFuZCBjb21wdXRpbmcgdGhlIG9mZnNldCBpbiBhIHByZXBhcmVfZmF1
-bHQzMigpLA0KaXQgd2lsbCBiZSBjb25mdXNlZCB0byBjb21wdXRlIHRoZSBvZmZzZXQsIGJlY2F1
-c2UgaXQgZG9lcyBub3Qga25vdyB3aGV0aGVyIHRoaXMgZnVuY3Rpb24gY2FsbCBpcyBmb3IgcHJl
-ZmV0Y2ggQWJvcnQgb3IgRGF0YSBBYm9ydC4gWzFdDQoNCklmIGNvbXB1dGluZyB0aGUgb2Zmc2V0
-IGluIGEgc2luZ2xlIHBsYWNlLCBkbyB5b3UgaGF2ZSBiZXR0ZXIgaWRlYSBmb3IgdGhhdD8NCg0K
-WzFdDQpzdGF0aWMgdm9pZCBpbmplY3RfYWJ0MzIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBib29s
-IGlzX3BhYnQsICAgDQoJCQkgdW5zaWduZWQgbG9uZyBhZGRyKQ0Kew0KCXUzMiB2ZWN0X29mZnNl
-dDsNCgl1MzIgKmZhciwgKmZzcjsNCglib29sIGlzX2xwYWU7DQoNCiAgICAuLi4uLi4NCglwcmVw
-YXJlX2ZhdWx0MzIodmNwdSwgQ09NUEFUX1BTUl9NT0RFX0FCVCB8IENPTVBBVF9QU1JfQV9CSVQs
-IHZlY3Rfb2Zmc2V0KTsNCiAgICAuLi4uLi4NCn0NCg0KDQo+IA0KPiBUaGFua3MsDQo+IA0KPiAJ
-TS4NCj4gLS0NCj4gSmF6eiBpcyBub3QgZGVhZC4gSXQganVzdCBzbWVsbHMgZnVubnkuLi4NCg==
+On 13/10/17 15:29, gengdongjiu wrote:
+> Hi Marc,
+>     Thank you very much for your time to review it.
+> 
+>> On 12/10/17 17:44, Dongjiu Geng wrote:
+>>> When a exception is trapped to EL2, hardware uses  ELR_ELx to hold the
+>>> current fault instruction address. If KVM wants to inject a abort to
+>>> 32 bit guest, it needs to set the LR register for the guest to emulate
+>>> this abort  happened in the guest. Because ARM32 architecture is
+>>> Multi-pipeline, so the LR value has an offset to
+>>
+>> What does "Multi-pipeline" mean?
+> 
+> I mean the ARM's single-cycle instruction 3-stage pipeline operation, as shown below:
+> 
+> fetch   decode   execute
+>         fetch    decode   execute
+>                  fetch    decode   execute
+> 
+> when CPU finish instructions fetch,  PC=PC + 4
+> when CPU finish instructions decode, PC=PC + 8
+> when CPU finish instructions execution, PC=PC+12
+
+Yeah, and that's called pipelined execution. "Multi-pipeline" doesn't 
+mean anything. Also, that's an artefact of the original ARM1 
+implementation, and not how modern CPUs work anymore.
+
+> 
+> that is to say, when happen data abort, 
+> the PC = fault instruction address + 12, LR_abt = fault instruction address + 8
+> 
+> In order to emulate this abort for KVM, LR_abt needs to add an offset 8 when inject data abort. 
+> 
+>>
+>>> the fault instruction address.
+>>>
+>>> The offsets applied to Link value for exceptions as shown below, which
+>>> should be added for the ARM32 link register(LR).
+>>>
+>>> Exception			Offset, for PE state of:
+>>> 				A32 	  T32
+>>> Undefined Instruction 		+4 	  +2
+>>> Prefetch Abort 			+4 	  +4
+>>> Data Abort 			+8 	  +8
+>>> IRQ or FIQ 			+4 	  +4
+>>
+>> Please document where this table is coming from.
+> 
+> 
+> Thanks for pointing out. Will add it.
+> It come from:  DDI0487A_k_armv8_arm_iss10775, "G1.12.3 Overview of exception entry", Table G1-10 Offsets applied to Link value for exceptions taken to non-EL2 modes
+> 
+>>
+>>>
+>>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+>>> Signed-off-by: Haibin Zhang <zhanghaibin7@huawei.com>
+>>>
+>>> ---
+>>> For example, to the undefined instruction injection:
+>>>
+>>> 1. Guest OS call SMC(Secure Monitor Call) instruction in the address
+>>> 0xc025405c, then Guest traps to hypervisor
+>>>
+>>> c0254050:   e59d5028    ldr r5, [sp, #40]   ; 0x28
+>>> c0254054:   e3a03001    mov r3, #1
+>>> c0254058:   e1a01003    mov r1, r3
+>>> c025405c:   e1600070    smc 0
+>>> c0254060:   e30a0270    movw    r0, #41584  ; 0xa270
+>>> c0254064:   e34c00bf    movt    r0, #49343  ; 0xc0bf
+>>>
+>>> 2. KVM  injects undefined abort to guest 3. We will find the fault PC
+>>> is 0xc0254058, not 0xc025405c.
+>>>
+>>> [   12.348072] Internal error: Oops - undefined instruction: 0 [#1] SMP ARM
+>>> [   12.349786] Modules linked in:
+>>> [   12.350563] CPU: 1 PID: 71 Comm: cat Not tainted 4.1.0-dirty #25
+>>> [   12.352061] Hardware name: Generic DT based system
+>>> [   12.353275] task: d9d08000 ti: d9cfe000 task.ti: d9cfe000
+>>> [   12.354637] PC is at proc_dointvec+0x20/0x60
+>>> [   12.355717] LR is at proc_sys_call_handler+0xb0/0xc4
+>>> [   12.356972] pc : [<c0254058>]    lr : [<c035699c>]    psr: a0060013
+>>> [   12.356972] sp : d9cffe90  ip : c0254038  fp : 00000001
+>>> [   12.359824] r10: d9cfff80  r9 : 00000004  r8 : 00000000
+>>> [   12.361132] r7 : bec21cb0  r6 : d9cffec4  r5 : d9cfff80  r4 : c0e82de0
+>>> [   12.362766] r3 : 00000001  r2 : bec21cb0  r1 : 00000001  r0 : c0e82de0
+>>> [   12.364400] Flags: NzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment user
+>>> [   12.366183] Control: 10c5383d  Table: 59d3406a  DAC: 00000015
+>>> [   12.367623] Process cat (pid: 71, stack limit = 0xd9cfe220)
+>>>
+>>> 4. After correct the LR register, it will have right value
+>>>
+>>> [  125.763370] Internal error: Oops - undefined instruction: 0 [#2]
+>>> SMP ARM [  125.767010] Modules linked in:
+>>> [  125.768472] CPU: 1 PID: 74 Comm: cat Tainted: G      D         4.1.0-dirty #25
+>>> [  125.771854] Hardware name: Generic DT based system [  125.774053]
+>>> task: db0bb900 ti: d9d10000 task.ti: d9d10000 [  125.776821] PC is at
+>>> proc_dointvec+0x24/0x60 [  125.778919] LR is at
+>>> proc_sys_call_handler+0xb0/0xc4
+>>> [  125.781269] pc : [<c025405c>]    lr : [<c035699c>]    psr: a0060013
+>>> [  125.781269] sp : d9d11e90  ip : c0254038  fp : 00000001 [
+>>> 125.786581] r10: d9d11f80  r9 : 00000004  r8 : 00000000 [  125.789673]
+>>> r7 : be92ccb0  r6 : d9d11ec4  r5 : d9d11f80  r4 : c0e82de0 [
+>>> 125.792828] r3 : 00000001  r2 : be92ccb0  r1 : 00000001  r0 : c0e82de0
+>>> [  125.795890] Flags: NzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM
+>>> Segment user
+>>>
+>>> For other exception injection, such as Data/Prefetch abort, also needs
+>>> to correct
+>>> ---
+>>>  arch/arm64/kvm/inject_fault.c | 18 ++++++++++++------
+>>>  1 file changed, 12 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/arch/arm64/kvm/inject_fault.c
+>>> b/arch/arm64/kvm/inject_fault.c index da6a8cf..da93508 100644
+>>> --- a/arch/arm64/kvm/inject_fault.c
+>>> +++ b/arch/arm64/kvm/inject_fault.c
+>>> @@ -33,12 +33,11 @@
+>>>  #define LOWER_EL_AArch64_VECTOR		0x400
+>>>  #define LOWER_EL_AArch32_VECTOR		0x600
+>>>
+>>> -static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32
+>>> vect_offset)
+>>> +static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset,
+>>> +				u32 return_offset)
+>>>  {
+>>>  	unsigned long cpsr;
+>>>  	unsigned long new_spsr_value = *vcpu_cpsr(vcpu);
+>>> -	bool is_thumb = (new_spsr_value & COMPAT_PSR_T_BIT);
+>>> -	u32 return_offset = (is_thumb) ? 4 : 0;
+>>>  	u32 sctlr = vcpu_cp15(vcpu, c1_SCTLR);
+>>>
+>>>  	cpsr = mode | COMPAT_PSR_I_BIT;
+>>> @@ -65,7 +64,11 @@ static void prepare_fault32(struct kvm_vcpu *vcpu,
+>>> u32 mode, u32 vect_offset)
+>>>
+>>>  static void inject_undef32(struct kvm_vcpu *vcpu)  {
+>>> -	prepare_fault32(vcpu, COMPAT_PSR_MODE_UND, 4);
+>>> +	unsigned long spsr_value = *vcpu_cpsr(vcpu);
+>>> +	bool is_thumb = (spsr_value & COMPAT_PSR_T_BIT);
+>>> +	u32 return_offset = (is_thumb) ? 2 : 4;
+>>> +
+>>> +	prepare_fault32(vcpu, COMPAT_PSR_MODE_UND, 4, return_offset);
+>>>  }
+>>>
+>>>  /*
+>>> @@ -75,21 +78,24 @@ static void inject_undef32(struct kvm_vcpu *vcpu)
+>>> static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
+>>>  			 unsigned long addr)
+>>>  {
+>>> -	u32 vect_offset;
+>>> +	u32 vect_offset, return_offset;
+>>>  	u32 *far, *fsr;
+>>>  	bool is_lpae;
+>>>
+>>>  	if (is_pabt) {
+>>>  		vect_offset = 12;
+>>> +		return_offset = 4;
+>>>  		far = &vcpu_cp15(vcpu, c6_IFAR);
+>>>  		fsr = &vcpu_cp15(vcpu, c5_IFSR);
+>>>  	} else { /* !iabt */
+>>>  		vect_offset = 16;
+>>> +		return_offset = 8;
+>>>  		far = &vcpu_cp15(vcpu, c6_DFAR);
+>>>  		fsr = &vcpu_cp15(vcpu, c5_DFSR);
+>>>  	}
+>>>
+>>> -	prepare_fault32(vcpu, COMPAT_PSR_MODE_ABT | COMPAT_PSR_A_BIT, vect_offset);
+>>> +	prepare_fault32(vcpu, COMPAT_PSR_MODE_ABT | COMPAT_PSR_A_BIT,
+>>> +		       vect_offset, return_offset);
+>>>
+>>>  	*far = addr;
+>>>
+>>>
+>>
+>> So instead of adding this extra parameter and littering the code with random constants, why don't you actually implement the table you've
+>> put in the commit log and compute the offset in a single place (which is likely to be prepare_fault32)?
+> 
+> Marc,
+>   It because multiple abort(Undefined Abort/Prefetch Abort/Data Abort) call the prepare_fault32(), if adding to a single place in prepare_fault32(),prepare_fault32() will 
+> not know whether the Abort injection is for Prefetch Abort or Data Abort or Undefined Abort, then will be confused for the value of "return_offset"
+> 
+> For example:
+> inject_abt32() is used to inject prefetch Abort or Data Abort, it passes same parameters to call prepare_fault32() for the two Abort. If adding and computing the offset in a prepare_fault32(),
+> it will be confused to compute the offset, because it does not know whether this function call is for prefetch Abort or Data Abort. [1]
+> 
+> If computing the offset in a single place, do you have better idea for that?
+
+Yes. Realise that vect_offset uniquely identify the type of fault we're 
+trying to inject:
+
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index da6a8cfa54a0..0416f1857c68 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -33,12 +33,26 @@
+ #define LOWER_EL_AArch64_VECTOR		0x400
+ #define LOWER_EL_AArch32_VECTOR		0x600
+ 
++/*
++ * Table taken from ARMv8 ARM DDI0487B-B, table G1-10.
++ */
++static u8 return_offsets[8][2] = {
++	[0] = { 0, 0 },		/* Reset, unused */
++	[1] = { 4, 2 },		/* Undefined */
++	[2] = { 0, 0 },		/* SVC, unused */
++	[3] = { 4, 4 },		/* Prefetch abort */
++	[4] = { 8, 8 },		/* Data abort */
++	[5] = { 0, 0 },		/* HVC, unused */
++	[6] = { 4, 4 },		/* IRQ, unused */
++	[7] = { 4, 4 },		/* FIQ, unused */
++};
++
+ static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+ {
+ 	unsigned long cpsr;
+ 	unsigned long new_spsr_value = *vcpu_cpsr(vcpu);
+ 	bool is_thumb = (new_spsr_value & COMPAT_PSR_T_BIT);
+-	u32 return_offset = (is_thumb) ? 4 : 0;
++	u32 return_offset = return_offsets[vect_offset >> 2][is_thumb];
+ 	u32 sctlr = vcpu_cp15(vcpu, c1_SCTLR);
+ 
+ 	cpsr = mode | COMPAT_PSR_I_BIT;
+
+Please also update the 32bit code accordingly, as it looks broken too.
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
