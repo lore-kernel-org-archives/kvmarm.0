@@ -1,156 +1,145 @@
 From: Christoffer Dall <cdall@linaro.org>
 Subject: Re: [PATCH v1 2/2] kvm: arm64: handle single-step of userspace mmio
  instructions
-Date: Fri, 13 Oct 2017 10:56:50 +0200
-Message-ID: <20171013085650.GD8927@cbox>
+Date: Fri, 13 Oct 2017 10:59:47 +0200
+Message-ID: <20171013085947.GE8927@cbox>
 References: <20171006113921.24880-1-alex.bennee@linaro.org>
  <20171006113921.24880-3-alex.bennee@linaro.org>
+ <a9f8905e-18e9-267a-2479-f498c248e2f4@arm.com>
+ <878tgoxudc.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EC75349D24
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 04:58:58 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id op4BYWaBGCLZ for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 13 Oct 2017 04:58:55 -0400 (EDT)
+Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com [74.125.82.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6257D40D25
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 04:58:55 -0400 (EDT)
+Received: by mail-wm0-f50.google.com with SMTP id u138so19510747wmu.5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 01:59:42 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <20171006113921.24880-3-alex.bennee@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <878tgoxudc.fsf@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: julien.thierry@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>
+Cc: kvm@vger.kernel.org, Julien Thierry <julien.thierry@arm.com>, marc.zyngier@arm.com, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Russell King <linux@armlinux.org.uk>, open list <linux-kernel@vger.kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 06, 2017 at 12:39:21PM +0100, Alex Bennée wrote:
-> The system state of KVM when using userspace emulation is not complete
-> until we return into KVM_RUN. To handle mmio related updates we wait
-> until they have been committed and then schedule our KVM_EXIT_DEBUG.
-> 
-> I've introduced a new function kvm_arm_maybe_return_debug() to wrap up
-> the differences between arm/arm64 which is currently null for arm.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  arch/arm/include/asm/kvm_host.h   |  2 ++
->  arch/arm64/include/asm/kvm_host.h |  1 +
->  arch/arm64/kvm/debug.c            | 21 +++++++++++++++++++++
->  arch/arm64/kvm/handle_exit.c      |  9 +++------
->  virt/kvm/arm/arm.c                |  2 +-
->  virt/kvm/arm/mmio.c               |  3 ++-
->  6 files changed, 30 insertions(+), 8 deletions(-)
-> 
-> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> index 4a879f6ff13b..aec943f6d123 100644
-> --- a/arch/arm/include/asm/kvm_host.h
-> +++ b/arch/arm/include/asm/kvm_host.h
-> @@ -285,6 +285,8 @@ static inline void kvm_arm_init_debug(void) {}
->  static inline void kvm_arm_setup_debug(struct kvm_vcpu *vcpu) {}
->  static inline void kvm_arm_clear_debug(struct kvm_vcpu *vcpu) {}
->  static inline void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu) {}
-> +static inline int  kvm_arm_maybe_return_debug(struct kvm_vcpu *vcpu,
-> +						struct kvm_run *run) {}
->  
->  int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
->  			       struct kvm_device_attr *attr);
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index e923b58606e2..fa67d21662f6 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -369,6 +369,7 @@ void kvm_arm_init_debug(void);
->  void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
->  void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
->  void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
-> +int  kvm_arm_maybe_return_debug(struct kvm_vcpu *vcpu, struct kvm_run *run);
->  int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
->  			       struct kvm_device_attr *attr);
->  int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
-> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> index dbadfaf850a7..a10a18c55c87 100644
-> --- a/arch/arm64/kvm/debug.c
-> +++ b/arch/arm64/kvm/debug.c
-> @@ -221,3 +221,24 @@ void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
->  		}
->  	}
->  }
-> +
-> +
-> +/*
-> + * When KVM has successfully emulated the instruction we might want to
-> + * return we a KVM_EXIT_DEBUG. We can only do this once the emulation
-> + * is complete though so for userspace emulations we have to wait
-> + * until we have re-entered KVM.
-> + *
-> + * Return > 0 to return to guest, 0 (and set exit_reason) on proper
-> + * exit to userspace.
-> + */
-> +
-> +int kvm_arm_maybe_return_debug(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> +{
-> +	if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
-> +		run->exit_reason = KVM_EXIT_DEBUG;
-> +		run->debug.arch.hsr = ESR_ELx_EC_SOFTSTP_LOW << ESR_ELx_EC_SHIFT;
-> +		return 0;
-> +	}
-> +	return 1;
-> +}
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index c918d291cb58..7b04f59217bf 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -202,13 +202,10 @@ static int handle_trap_exceptions(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  		handled = exit_handler(vcpu, run);
->  	}
->  
-> -	if (handled && (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)) {
-> -		handled = 0;
-> -		run->exit_reason = KVM_EXIT_DEBUG;
-> -		run->debug.arch.hsr = ESR_ELx_EC_SOFTSTP_LOW << ESR_ELx_EC_SHIFT;
-> -	}
-> +	if (handled)
-> +		return kvm_arm_maybe_return_debug(vcpu, run);
+On Fri, Oct 06, 2017 at 02:45:35PM +0100, Alex Benn=E9e wrote:
+> =
 
-Again, this seems to override the return value of exit_handler, which
-may be something negative.
+> Julien Thierry <julien.thierry@arm.com> writes:
+> =
 
-Just so I'm clear: There's no intended functionality change of this
-particular hunk, it's just to share the logic in
-kvm_arm_maybe_return_debug, right?
+> > On 06/10/17 12:39, Alex Benn=E9e wrote:
+> >> The system state of KVM when using userspace emulation is not complete
+> >> until we return into KVM_RUN. To handle mmio related updates we wait
+> >> until they have been committed and then schedule our KVM_EXIT_DEBUG.
+> >>
+> >> I've introduced a new function kvm_arm_maybe_return_debug() to wrap up
+> >> the differences between arm/arm64 which is currently null for arm.
+> >>
+> >> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> >> ---
+> >>   arch/arm/include/asm/kvm_host.h   |  2 ++
+> >>   arch/arm64/include/asm/kvm_host.h |  1 +
+> >>   arch/arm64/kvm/debug.c            | 21 +++++++++++++++++++++
+> >>   arch/arm64/kvm/handle_exit.c      |  9 +++------
+> >>   virt/kvm/arm/arm.c                |  2 +-
+> >>   virt/kvm/arm/mmio.c               |  3 ++-
+> >>   6 files changed, 30 insertions(+), 8 deletions(-)
+> >>
+> >> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kv=
+m_host.h
+> >> index 4a879f6ff13b..aec943f6d123 100644
+> >> --- a/arch/arm/include/asm/kvm_host.h
+> >> +++ b/arch/arm/include/asm/kvm_host.h
+> >> @@ -285,6 +285,8 @@ static inline void kvm_arm_init_debug(void) {}
+> >>   static inline void kvm_arm_setup_debug(struct kvm_vcpu *vcpu) {}
+> >>   static inline void kvm_arm_clear_debug(struct kvm_vcpu *vcpu) {}
+> >>   static inline void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu) {}
+> >> +static inline int  kvm_arm_maybe_return_debug(struct kvm_vcpu *vcpu,
+> >> +						struct kvm_run *run) {}
+> >>
+> >
+> > This function should return 1.
+> =
 
->  
-> -	return handled;
-> +	return 0;
->  }
->  
->  /*
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index b9f68e4add71..3d28fe2daa26 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -623,7 +623,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  
->  	if (run->exit_reason == KVM_EXIT_MMIO) {
->  		ret = kvm_handle_mmio_return(vcpu, vcpu->run);
-> -		if (ret)
-> +		if (ret < 1)
->  			return ret;
->  	}
->  
-> diff --git a/virt/kvm/arm/mmio.c b/virt/kvm/arm/mmio.c
-> index b6e715fd3c90..e43e3bd6222f 100644
-> --- a/virt/kvm/arm/mmio.c
-> +++ b/virt/kvm/arm/mmio.c
-> @@ -117,7 +117,8 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  		vcpu_set_reg(vcpu, vcpu->arch.mmio_decode.rt, data);
->  	}
->  
-> -	return 0;
-> +	/* If debugging in effect we may need to return now */
+> So I did ponder making this a bool, returning true if we need to exit
+> and testing in v/k/a/arm.c exit leg rather than in the mmio handler.
+> =
 
-Will this ever be about other types of debugging (watchpoint on a MMIO
-access?) or should we limit the text and description to single-stepping?
+> At the moment it mirrors the existing exit logic which follows -1 err, 0
+> return, >0 handled. But as I mentioned in the cover letter this fell
+> down a bit when dealing with the mmio case.
+> =
 
-> +	return kvm_arm_maybe_return_debug(vcpu, run);
->  }
->  
->  static int decode_hsr(struct kvm_vcpu *vcpu, bool *is_write, int *len)
-> -- 
-> 2.14.1
-> 
+> >
+> >>   int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
+> >>   			       struct kvm_device_attr *attr);
+> >> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/as=
+m/kvm_host.h
+> >> index e923b58606e2..fa67d21662f6 100644
+> >> --- a/arch/arm64/include/asm/kvm_host.h
+> >> +++ b/arch/arm64/include/asm/kvm_host.h
+> >> @@ -369,6 +369,7 @@ void kvm_arm_init_debug(void);
+> >>   void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
+> >>   void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
+> >>   void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
+> >> +int  kvm_arm_maybe_return_debug(struct kvm_vcpu *vcpu, struct kvm_run=
+ *run);
+> >
+> > I feel the name could be a little bit more explicit:
+> >
+> > kvm_arm_trap_need_step_debug, kvm_arm_trap_step_return_debug,
+> > kvm_arm_trap_need_return_debug.
+> =
+
+> I wanted to keep the debug suffix so that's fine although I'm not so
+> sure trap is correct because on the tail end of mmio emulation are we
+> still trapping?
+> =
+
+> Maybe kvm_arm_step_emulated_debug?
+
+I think you should name it:
+
+kvm_arm_should_complete_emulated_instr_debug() - or something better -
+and call it directly from kvm_arch_vcpu_ioctl_run, so that it becomes:
+
+	ret =3D kvm_handle_mmio_return(vcpu, vcpu->run);
+	if (ret)
+		return ret;
+	ret =3D kvm_arm_should_complete_emulated_instr_debug(vcpu);
+	if (ret)
+		return ret;
+
+> =
+
+> > At least, I think it would be nice that the name reflect that this
+> > check is meant for emulated instructions.
+> >
+> > Otherwise:
+> >
+> > Reviewed-by: Julien Thierry <julien.thierry@arm.com>
+> >
+> > Thanks,
+> =
+
+> =
 
 Thanks,
 -Christoffer
