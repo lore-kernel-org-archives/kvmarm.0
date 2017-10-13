@@ -1,109 +1,53 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH 05/37] KVM: Record the executing ioctl number on the vcpu
- struct
-Date: Fri, 13 Oct 2017 19:31:51 +0200
-Message-ID: <20171013173151.GA17578@cbox>
-References: <20171012104141.26902-1-christoffer.dall@linaro.org>
- <20171012104141.26902-6-christoffer.dall@linaro.org>
- <20171013171307.GA16116@flask>
+From: Dave Martin <Dave.Martin-5wv7dgnIgG8@public.gmane.org>
+Subject: Re: [PATCH v3 26/28] arm64/sve: Add documentation
+Date: Fri, 13 Oct 2017 18:35:01 +0100
+Message-ID: <20171013173500.GP19485@e103592.cambridge.arm.com>
+References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
+ <1507660725-7986-27-git-send-email-Dave.Martin@arm.com>
+ <20171013142421.j32jzisukewxtosx@armageddon.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <20171013171307.GA16116@flask>
-Sender: kvm-owner@vger.kernel.org
-To: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20171013142421.j32jzisukewxtosx-+1aNUgJU5qkijLcmloz0ER/iLCjYCKR+VpNB7YpNyf8@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>
+Cc: linux-arch-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, Okamoto Takayuki <tokamoto-+CUm20s59erQFUHtdCDX3A@public.gmane.org>, libc-alpha-9JcytcrH/bA+uJoB2kUjGw@public.gmane.org, Ard Biesheuvel <ard.biesheuvel-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Szabolcs Nagy <szabolcs.nagy-5wv7dgnIgG8@public.gmane.org>, Richard Sandiford <richard.sandiford-5wv7dgnIgG8@public.gmane.org>, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Michael Kerrisk <mtk.manpages-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Alan Hayward <alan.hayward-5wv7dgnIgG8@public.gmane.org>, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 13, 2017 at 07:13:07PM +0200, Radim Krčmář wrote:
-> 2017-10-12 12:41+0200, Christoffer Dall:
-> > Some architectures may decide to do different things during
-> > kvm_arch_vcpu_load depending on the ioctl being executed.  For example,
-> > arm64 is about to do significant work in vcpu load/put when running a
-> > vcpu, but not when doing things like KVM_SET_ONE_REG or
-> > KVM_SET_MP_STATE.
-> > 
-> > Therefore, store the ioctl number that we are executing on the VCPU
-> > during the first vcpu_load() which succeeds in getting the vcpu->mutex
-> > and set the ioctl number to 0 when exiting kvm_vcpu_ioctl() after
-> > successfully loading the vcpu.
-> > 
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Radim Krčmář <rkrcmar@redhat.com>
-> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> > ---
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > @@ -147,12 +147,13 @@ bool kvm_is_reserved_pfn(kvm_pfn_t pfn)
-> >  /*
-> >   * Switches to specified vcpu, until a matching vcpu_put()
-> >   */
-> > -int vcpu_load(struct kvm_vcpu *vcpu)
-> > +int vcpu_load(struct kvm_vcpu *vcpu, unsigned int ioctl)
-> >  {
-> >  	int cpu;
-> >  
-> >  	if (mutex_lock_killable(&vcpu->mutex))
-> >  		return -EINTR;
-> > +	vcpu->ioctl = ioctl;
-> 
-> This seems to prevent races by protecting the store by a mutex, but
-> 
-> >  	cpu = get_cpu();
-> >  	preempt_notifier_register(&vcpu->preempt_notifier);
-> >  	kvm_arch_vcpu_load(vcpu, cpu);
-> > @@ -2529,7 +2530,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
-> >  #endif
-> >  
-> >  
-> > -	r = vcpu_load(vcpu);
-> > +	r = vcpu_load(vcpu, ioctl);
-> >  	if (r)
-> >  		return r;
-> >  	switch (ioctl) {
-> > @@ -2704,6 +2705,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
-> >  	}
-> >  out:
-> >  	vcpu_put(vcpu);
-> > +	vcpu->ioctl = 0;
-> 
-> we should still have a race as we clear ioctl only after releasing the
-> lock.  For example malicious userspace could break KVM terms of use and
-> issue !KVM_RUN followed by KVM_RUN, so we would have these races:
-> 
->    !KVM_RUN                             |   KVM_RUN
-> 
->    mutex_lock_killable(&vcpu->mutex);   |
->    vcpu->ioctl = !KVM_RUN;              |
->    ...                                  | mutex_lock_killable(&vcpu->mutex);
->    mutex_unlock(&vcpu->mutex);          |
->                                         | vcpu->ioctl = KVM_RUN;
->                                         | kvm_arch_vcpu_load() // variant 1
->    vcpu->ioctl = 0;                     | ...
->                                         | kvm_arch_vcpu_load() // variant 2
->                                         | vcpu_put()
-> 
-> where the observed value of vcpu->ioctl in vcpu_put() would not
-> correctly pair with vcpu_load() or worse, kvm_arch_arch_load() in
-> KVM_RUN would execute with vcpu->ioctl = 0.
+On Fri, Oct 13, 2017 at 03:24:21PM +0100, Catalin Marinas wrote:
+> On Tue, Oct 10, 2017 at 07:38:43PM +0100, Dave P Martin wrote:
 
-Yeah, this is super racy, thanks for pointing that out.
+[...]
 
+> > +* If the SVE context is too big to fit in sigcontext.__reserved[], then extra
+> > +  space is allocated on the stack, an extra_context record is written in
+> > +  __reserved[] referencing this space.  sve_context is then written in the
+> > +  extra space.  Refer to [1] for further details about this mechanism.
 > 
-> I think that other (special) callsites of vcpu_load()/vcpu_put() have a
-> well defined IOCTL that can be used instead of vcpu->ioctl, so we could
-> just pass the ioctl value all the way to arch code and never save it
-> anywhere,
+> Does this document require that the user stack is sufficiently large or
+> should we cap the vector length (prior to the last two RFC patches)?
 
-I don't think that works; what would you do with preempt notifier calls?
+Oh, I think I missed your point here.
 
-One solution is to add a parameter to vcpu_put, lie for vcpu_load, which
-also sets the ioctl, and other callers than the final vcpu_put in
-kvm_vcpu_ioctl() just pass the existing value, where the kvm_vcpu_ioctl
-call can pass 0 which gets set before releasing the mutex.
+I don't think it's worth capping the vector length beyond what the
+series alread does: the last two patches provide a way to find out how
+big the signal frame could be, but software still needs porting either
+way if it enables large vectors via prctl or ptrace.
 
-Can you think of a more elegant solution?
+Conversely, software basing its stack allocations on SIGSTKSZ (16K) will
+probably get away with it: this seems to be the common choice when
+allocating stacks.  Apart from models, we're not likely to see SVE
+implementations with huge vector lengths for a while yet.
 
-Thanks,
--Christoffer
+
+In any case, /proc/sys/abi/sve_default_vector_length proves a
+discretionary global clamp that can be set by the distro or admin.  This
+will prevent programs from seeing large frames unless the VL is set
+explicitly to something > 64 bytes via prctl/ptrace (which current
+software won't do).
+
+[...]
+
+Cheers
+---Dave
