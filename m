@@ -1,96 +1,88 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v3 22/28] arm64/sve: KVM: Prevent guests from using SVE
-Date: Fri, 13 Oct 2017 17:47:07 +0100
-Message-ID: <20171013164706.GN19485@e103592.cambridge.arm.com>
-References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
- <1507660725-7986-23-git-send-email-Dave.Martin@arm.com>
- <c28b3f0d-7beb-cca3-46db-3fce964f4725@arm.com>
- <20171012110409.GG19485@e103592.cambridge.arm.com>
- <d8a50bf1-bfe0-2423-c56b-adac3925309e@arm.com>
- <20171013141539.GK19485@e103592.cambridge.arm.com>
- <f273491e-2ae6-18b1-53de-6fbda2056631@arm.com>
+From: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+Subject: Re: [PATCH v3 04/13] arm64: alternatives: use tpidr_el2 on VHE hosts
+Date: Fri, 13 Oct 2017 17:50:45 +0100
+Message-ID: <59E0EEE5.2020208@arm.com>
+References: <20170922182614.27885-1-james.morse@arm.com> <20170922182614.27885-5-james.morse@arm.com> <20171013153148.dnejsvhxeui6opfw@armageddon.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-arch-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <f273491e-2ae6-18b1-53de-6fbda2056631@arm.com>
-Sender: linux-arch-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arch@vger.kernel.org, Christoffer Dall <cdall@linaro.org>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20171013153148.dnejsvhxeui6opfw-+1aNUgJU5qkijLcmloz0ER/iLCjYCKR+VpNB7YpNyf8@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>
+Cc: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Lorenzo Pieralisi <lorenzo.pieralisi-5wv7dgnIgG8@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Loc Ho <lho-qTEPVZfXA3Y@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 13, 2017 at 03:21:59PM +0100, Marc Zyngier wrote:
-> On 13/10/17 15:15, Dave Martin wrote:
-> > On Thu, Oct 12, 2017 at 12:28:32PM +0100, Marc Zyngier wrote:
-> >> On 12/10/17 12:04, Dave Martin wrote:
-> >>> On Wed, Oct 11, 2017 at 05:28:06PM +0100, Marc Zyngier wrote:
-> >>>> [+ Christoffer]
-> >>>>
-> >>>> On 10/10/17 19:38, Dave Martin wrote:
+Hi Catalin,
 
-[...]
+On 13/10/17 16:31, Catalin Marinas wrote:
+> On Fri, Sep 22, 2017 at 07:26:05PM +0100, James Morse wrote:
+>> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+>> index cd52d365d1f0..8e4c7da2b126 100644
+>> --- a/arch/arm64/kernel/cpufeature.c
+>> +++ b/arch/arm64/kernel/cpufeature.c
 
-> >>>> Hmmm. How does this work if...
-> >>>
-> >>> !IS_ENABLED(CONFIG_ARM64_SVE) implies !system_supports_sve(), so
-> >>> if CONFIG_ARM64_SVE is not set, the call is optimised away.
-> >>>
-> >>> [...]
-> >>>
-> >>>>> diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-> >>>>> index a9cb794..6ae3703 100644
-> >>>>> --- a/arch/arm64/kernel/fpsimd.c
-> >>>>> +++ b/arch/arm64/kernel/fpsimd.c
-> >>>>> @@ -1073,6 +1073,33 @@ void fpsimd_flush_task_state(struct task_struct *t)
-> >>>
-> >>> [...]
-> >>>
-> >>>>> +#ifdef CONFIG_ARM64_SVE
-> >>>>> +void sve_flush_cpu_state(void)
-> >>>>> +{
-> >>>>> +	struct fpsimd_state *const fpstate = __this_cpu_read(fpsimd_last_state);
-> >>>>> +	struct task_struct *tsk;
-> >>>>> +
-> >>>>> +	if (!fpstate)
-> >>>>> +		return;
-> >>>>> +
-> >>>>> +	tsk = container_of(fpstate, struct task_struct, thread.fpsimd_state);
-> >>>>> +	if (test_tsk_thread_flag(tsk, TIF_SVE))
-> >>>>> +		fpsimd_flush_cpu_state();
-> >>>>> +}
-> >>>>> +#endif /* CONFIG_ARM64_SVE */
-> >>>>
-> >>>> ... CONFIG_ARM64_SVE is not set? Fixing this should just be a matter of
-> >>>> moving the #ifdef/#endif inside the function...
-> >>>
-> >>> Because sve_flush_cpu_state() is not in the same compilation unit it
-> >>> can't be static, and that means the compiler won't remove it
-> >>> automatically if it's unused -- hence the #ifdef.
-> >>>
-> >>> Because the call site is optimised away, there is no link failure.
-> >>>
-> >>> Don't we rely on this sort of thing all over the place?
-> >> Dunno. It just feels weird. But if you are sure that it won't break,
-> >> fine by me. I guess we'll find out pretty quickly how this fares,
-> >> specially with older toolchains.
-> > 
-> > I thought this was why the kernel doesn't support building with -O0.
-> > There are many instances of this in the series, not just here.
-> > 
-> > Let me know if you feel this isn't good enough though.
+>> @@ -1308,3 +1309,25 @@ static int __init enable_mrs_emulation(void)
+>>  }
+>>  
+>>  late_initcall(enable_mrs_emulation);
+>> +
+>> +int cpu_copy_el2regs(void *__unused)
+>> +{
+>> +	int do_copyregs = 0;
+>> +
+>> +	/*
+>> +	 * Copy register values that aren't redirected by hardware.
+>> +	 *
+>> +	 * Before code patching, we only set tpidr_el1, all CPUs need to copy
+>> +	 * this value to tpidr_el2 before we patch the code. Once we've done
+>> +	 * that, freshly-onlined CPUs will set tpidr_el2, so we don't need to
+>> +	 * do anything here.
+>> +	 */
+>> +	asm volatile(ALTERNATIVE("mov %0, #1", "mov %0, #0",
+>> +				 ARM64_HAS_VIRT_HOST_EXTN)
+>> +		    : "=r" (do_copyregs) : : );
 > 
-> That's OK to me. As I said, we'll find out pretty quickly if anything
-> breaks unexpectedly.
-
-Yup
-
+> Can you just do:
 > 
-> > Do you have any other comments on this patch?
-> None. You can add my:
+> 	if (cpu_have_const_cap(ARM64_HAS_VIRT_HOST_EXTN))
+> 		write_sysreg(read_sysreg(tpidr_el1), tpidr_el2);
 > 
-> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+> At this point the capability bits should be set and the jump labels
+> enabled.
 
-OK, thanks for the input.
+These are enabled too early, we haven't done patching yet.
 
-Cheers
----Dave
+We need to copy tpidr_el1 -> tpidr_el2 on all CPUs that are online before code
+patching.
+
+After code patching new CPUs set tpidr_el2 when they come online, so we don't
+need to do the copy... but this enable method is still called. There is nothing
+for us to do, and tpidr_el1 now contains junk, so the copy
+
+
+cpu_have_const_cap() is great for knowing if we have a feature, here we want to
+know if we've done the patching for this feature.
+
+I can wrap the ALTERNATIVE() into a helper, something like:
+> arm64_alternatives_applied(ARM64_HAS_VIRT_HOST_EXTN)
+
+which should make it clearer.
+
+Christoffer had the same question at connect, so I evidently haven't found the
+right way of describing this yet.
+
+
+> Otherwise:
+> 
+> Reviewed-by: Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>
+
+Thanks for taking a look, I'll leave this RB until your happy with the
+ALTERNATIVE() hackery above.
+
+
+James
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
