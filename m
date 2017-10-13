@@ -1,103 +1,120 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] KVM: arm64: its: Fix missing dynamic allocation check in
- scan_its_table
-Date: Fri, 13 Oct 2017 12:00:50 +0100
-Message-ID: <0fbee4b3-c555-76d6-4a9e-8a869e87d8ee@arm.com>
-References: <20171013105259.9728-1-christoffer.dall@linaro.org>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v3 13/28] arm64/sve: Signal handling support
+Date: Fri, 13 Oct 2017 12:17:19 +0100
+Message-ID: <20171013111718.nqd2nllr7niytfss@armageddon.cambridge.arm.com>
+References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
+ <1507660725-7986-14-git-send-email-Dave.Martin@arm.com>
+ <20171011164052.exvy2w5p47mewrmg@armageddon.cambridge.arm.com>
+ <20171012161156.GI19485@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <20171013105259.9728-1-christoffer.dall@linaro.org>
-Content-Language: en-GB
-Sender: stable-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Eric Auger <eric.auger@redhat.com>, Andre Przywara <andre.przywara@arm.com>, stable@vger.kernel.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E9D0A49D44
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 07:16:38 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 5z31fDCHTi4X for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 13 Oct 2017 07:16:37 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 61BDF49D25
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Oct 2017 07:16:37 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <20171012161156.GI19485@e103592.cambridge.arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 13/10/17 11:52, Christoffer Dall wrote:
-> We currently allocate an entry dynamically, but we never check if the
-> allocation actually succeeded.  We actually don't need a dynamic
-> allocation, because we know the maximum size of an ITS table entry, so
-> we can simply use an allocation on the stack.
+On Thu, Oct 12, 2017 at 05:11:57PM +0100, Dave P Martin wrote:
+> On Wed, Oct 11, 2017 at 05:40:52PM +0100, Catalin Marinas wrote:
+> > On Tue, Oct 10, 2017 at 07:38:30PM +0100, Dave P Martin wrote:
+> > > diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+> > > index aabeaee..fa4ed34 100644
+> > > --- a/arch/arm64/kernel/fpsimd.c
+> > > +++ b/arch/arm64/kernel/fpsimd.c
+> > > @@ -310,6 +310,32 @@ static void fpsimd_to_sve(struct task_struct *task)
+> > >  		       sizeof(fst->vregs[i]));
+> > >  }
+> > >  
+> > > +/*
+> > > + * Transfer the SVE state in task->thread.sve_state to
+> > > + * task->thread.fpsimd_state.
+> > > + *
+> > > + * Task can be a non-runnable task, or current.  In the latter case,
+> > > + * softirqs (and preemption) must be disabled.
+> > > + * task->thread.sve_state must point to at least sve_state_size(task)
+> > > + * bytes of allocated kernel memory.
+> > > + * task->thread.sve_state must be up to date before calling this function.
+> > > + */
+> > > +static void sve_to_fpsimd(struct task_struct *task)
+> > > +{
+> > > +	unsigned int vq;
+> > > +	void const *sst = task->thread.sve_state;
+> > > +	struct fpsimd_state *fst = &task->thread.fpsimd_state;
+> > > +	unsigned int i;
+> > > +
+> > > +	if (!system_supports_sve())
+> > > +		return;
+> > > +
+> > > +	vq = sve_vq_from_vl(task->thread.sve_vl);
+> > > +	for (i = 0; i < 32; ++i)
+> > > +		memcpy(&fst->vregs[i], ZREG(sst, vq, i),
+> > > +		       sizeof(fst->vregs[i]));
+> > > +}
+> > 
+> > Nit: could we actually just do an assignment with some pointer casting?
+> > It looks like we invoke memcpy for every 16 bytes (same for
+> > fpsimd_to_sve).
 > 
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> ---
->  virt/kvm/arm/vgic/vgic-its.c | 19 ++++++++-----------
->  1 file changed, 8 insertions(+), 11 deletions(-)
+> I was uneasy about what the type of ZREG(sst, vq, i) ought to be.
+> In any case, memest() is magic: my oldskool GCC (5.3.0) generates:
 > 
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index f51c1e1..555f42f 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -176,6 +176,7 @@ static const struct vgic_its_abi its_table_abi_versions[] = {
->  };
->  
->  #define NR_ITS_ABIS	ARRAY_SIZE(its_table_abi_versions)
-> +#define MAX_ENTRY_SIZE	8	/* Max Entry size across all ABI versions */
->  
->  inline const struct vgic_its_abi *vgic_its_get_abi(struct vgic_its *its)
->  {
-> @@ -1801,37 +1802,33 @@ typedef int (*entry_fn_t)(struct vgic_its *its, u32 id, void *entry,
->  static int scan_its_table(struct vgic_its *its, gpa_t base, int size, int esz,
->  			  int start_id, entry_fn_t fn, void *opaque)
->  {
-> -	void *entry = kzalloc(esz, GFP_KERNEL);
->  	struct kvm *kvm = its->dev->kvm;
->  	unsigned long len = size;
->  	int id = start_id;
->  	gpa_t gpa = base;
-> +	char entry[MAX_ENTRY_SIZE];
-
-Nit: you can drop the memset below if you initialize immediately, and
-GCC supporting dynamic arrays allows you to write this:
-
-	char entry[esz] = { 0, };
-
-so that you don't have to add the MAX_ENTRY_SIZE.
-
->  	int ret;
->  
-> +	memset(entry, 0, MAX_ENTRY_SIZE);
-> +
->  	while (len > 0) {
->  		int next_offset;
->  		size_t byte_offset;
->  
->  		ret = kvm_read_guest(kvm, gpa, entry, esz);
->  		if (ret)
-> -			goto out;
-> +			return ret;
->  
->  		next_offset = fn(its, id, entry, opaque);
-> -		if (next_offset <= 0) {
-> -			ret = next_offset;
-> -			goto out;
-> -		}
-> +		if (next_offset <= 0)
-> +			return next_offset;
->  
->  		byte_offset = next_offset * esz;
->  		id += next_offset;
->  		gpa += byte_offset;
->  		len -= byte_offset;
->  	}
-> -	ret =  1;
-> -
-> -out:
-> -	kfree(entry);
-> -	return ret;
-> +	return 1;
->  }
->  
->  /**
+> ffff000008084c70 <sve_to_fpsimd>:
+> ffff000008084c70:       14000004        b       ffff000008084c80 <sve_to_fpsimd+0x10>
+> ffff000008084c74:       d503201f        nop
+> ffff000008084c78:       d65f03c0        ret
+> ffff000008084c7c:       d503201f        nop
+> ffff000008084c80:       f0007d61        adrp    x1, ffff000009033000 <reset_devices>
+> ffff000008084c84:       f942a021        ldr     x1, [x1,#1344]
+> ffff000008084c88:       36b001c1        tbz     w1, #22, ffff000008084cc0 <sve_to_fpsimd+0x50>
+> ffff000008084c8c:       b94ca805        ldr     w5, [x0,#3240]
+> ffff000008084c90:       912a0001        add     x1, x0, #0xa80
+> ffff000008084c94:       91320004        add     x4, x0, #0xc80
+> ffff000008084c98:       f9465006        ldr     x6, [x0,#3232]
+> ffff000008084c9c:       121c6ca5        and     w5, w5, #0xfffffff0
+> ffff000008084ca0:       52800000        mov     w0, #0x0                        // #0
+> ffff000008084ca4:       8b2040c2        add     x2, x6, w0, uxtw
+> ffff000008084ca8:       0b050000        add     w0, w0, w5
+> ffff000008084cac:       a9400c42        ldp     x2, x3, [x2]
+> ffff000008084cb0:       a8810c22        stp     x2, x3, [x1],#16
+> ffff000008084cb4:       eb01009f        cmp     x4, x1
+> ffff000008084cb8:       54ffff61        b.ne    ffff000008084ca4 <sve_to_fpsimd+0x34>
+> ffff000008084cbc:       d65f03c0        ret
+> ffff000008084cc0:       d65f03c0        ret
+> ffff000008084cc4:       d503201f        nop
 > 
+> 
+> Without volatile, I think assigning a single object and doing a memcpy()
+> are equivalent to the compiler: which it actually uses depends solely on
+> optimisation considerations.
+> 
+> (But then I'm not a language lawyer ... not a professional one anyway).
+> 
+> Are you concerned compilers may mess this up?
 
-Otherwise:
+That's fine, please ignore my comment then. I was worried that gcc would
+always generate a call to the memcpy implementation rather than inlining
+it.
 
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-
-	M.
 -- 
-Jazz is not dead. It just smells funny...
+Catalin
