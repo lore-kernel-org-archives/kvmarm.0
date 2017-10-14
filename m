@@ -1,29 +1,28 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v1 2/2] kvm: arm64: handle single-step of userspace mmio
- instructions
-Date: Sat, 14 Oct 2017 07:20:05 -0700
-Message-ID: <20171014142005.GC5886@lvm>
-References: <20171006113921.24880-1-alex.bennee@linaro.org>
- <20171006113921.24880-3-alex.bennee@linaro.org>
- <20171013085650.GD8927@cbox> <87o9pb9z3r.fsf@linaro.org>
+Subject: Re: [PATCH 2/5] KVM: arm/arm64: replace power_off with
+ mp_state=STOPPED
+Date: Sat, 14 Oct 2017 21:12:54 +0200
+Message-ID: <20171014191254.GA1929@lvm>
+References: <20170929113041.24371-1-drjones@redhat.com>
+ <20170929113041.24371-3-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6975349D25
- for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Oct 2017 10:19:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2740149D3F
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Oct 2017 15:12:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nxjDYA6+r5Ry for <kvmarm@lists.cs.columbia.edu>;
- Sat, 14 Oct 2017 10:19:18 -0400 (EDT)
-Received: from mail-wm0-f41.google.com (mail-wm0-f41.google.com [74.125.82.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4CB7F49D24
- for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Oct 2017 10:19:18 -0400 (EDT)
-Received: by mail-wm0-f41.google.com with SMTP id f4so26405772wme.0
- for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Oct 2017 07:20:08 -0700 (PDT)
+ with ESMTP id KV6Z8rcetbaN for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 14 Oct 2017 15:12:07 -0400 (EDT)
+Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CEAA449D20
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Oct 2017 15:12:06 -0400 (EDT)
+Received: by mail-wm0-f42.google.com with SMTP id b189so26534344wmd.4
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Oct 2017 12:12:57 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <87o9pb9z3r.fsf@linaro.org>
+In-Reply-To: <20170929113041.24371-3-drjones@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,171 +32,208 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: kvm@vger.kernel.org, julien.thierry@arm.com, marc.zyngier@arm.com, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Russell King <linux@armlinux.org.uk>, open list <linux-kernel@vger.kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>
+Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 13, 2017 at 10:27:36AM +0100, Alex Benn=E9e wrote:
-> =
+On Fri, Sep 29, 2017 at 01:30:38PM +0200, Andrew Jones wrote:
+> This prepares for more MP states to be used.
+> 
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  arch/arm/include/asm/kvm_host.h   |  6 ++++--
+>  arch/arm64/include/asm/kvm_host.h |  6 ++++--
+>  virt/kvm/arm/arm.c                | 26 ++++++++++++++------------
+>  virt/kvm/arm/psci.c               | 17 +++++------------
+>  4 files changed, 27 insertions(+), 28 deletions(-)
+> 
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index 4a879f6ff13b..85f3c20b9759 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -171,8 +171,8 @@ struct kvm_vcpu_arch {
+>  	 * here.
+>  	 */
+>  
+> -	/* vcpu power-off state */
+> -	bool power_off;
+> +	/* Current VCPU MP state */
+> +	u32 mp_state;
+>  
+>  	 /* Don't run the guest (internal implementation need) */
+>  	bool pause;
+> @@ -227,6 +227,8 @@ int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
+>  
+>  struct kvm_vcpu *kvm_arm_get_running_vcpu(void);
+>  struct kvm_vcpu __percpu **kvm_get_running_vcpus(void);
+> +void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
+> +void kvm_arm_vcpu_power_on(struct kvm_vcpu *vcpu);
+>  void kvm_arm_halt_guest(struct kvm *kvm);
+>  void kvm_arm_resume_guest(struct kvm *kvm);
+>  
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index e923b58606e2..25545a87de11 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -255,8 +255,8 @@ struct kvm_vcpu_arch {
+>  		u32	mdscr_el1;
+>  	} guest_debug_preserved;
+>  
+> -	/* vcpu power-off state */
+> -	bool power_off;
+> +	/* Current VCPU MP state */
+> +	u32 mp_state;
+>  
+>  	/* Don't run the guest (internal implementation need) */
+>  	bool pause;
+> @@ -328,6 +328,8 @@ int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
+>  
+>  struct kvm_vcpu *kvm_arm_get_running_vcpu(void);
+>  struct kvm_vcpu * __percpu *kvm_get_running_vcpus(void);
+> +void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
+> +void kvm_arm_vcpu_power_on(struct kvm_vcpu *vcpu);
+>  void kvm_arm_halt_guest(struct kvm *kvm);
+>  void kvm_arm_resume_guest(struct kvm *kvm);
+>  
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index e4bec508ee5b..954e77608d29 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -368,21 +368,23 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>  	kvm_timer_vcpu_put(vcpu);
+>  }
+>  
+> -static void vcpu_power_off(struct kvm_vcpu *vcpu)
+> +void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
+>  {
+> -	vcpu->arch.power_off = true;
+> +	vcpu->arch.mp_state = KVM_MP_STATE_STOPPED;
+>  	kvm_make_request(KVM_REQ_SLEEP, vcpu);
+>  	kvm_vcpu_kick(vcpu);
+>  }
+>  
+> +void kvm_arm_vcpu_power_on(struct kvm_vcpu *vcpu)
+> +{
+> +	vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+> +	kvm_vcpu_kick(vcpu);
 
-> Christoffer Dall <cdall@linaro.org> writes:
-> =
+Given your rant about request-less kicks, shouldn't this be a
+kvm_vcpu_wake_up() ?
 
-> > On Fri, Oct 06, 2017 at 12:39:21PM +0100, Alex Benn=E9e wrote:
-> >> The system state of KVM when using userspace emulation is not complete
-> >> until we return into KVM_RUN. To handle mmio related updates we wait
-> >> until they have been committed and then schedule our KVM_EXIT_DEBUG.
-> >>
-> >> I've introduced a new function kvm_arm_maybe_return_debug() to wrap up
-> >> the differences between arm/arm64 which is currently null for arm.
-> >>
-> >> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> >> ---
-> >>  arch/arm/include/asm/kvm_host.h   |  2 ++
-> >>  arch/arm64/include/asm/kvm_host.h |  1 +
-> >>  arch/arm64/kvm/debug.c            | 21 +++++++++++++++++++++
-> >>  arch/arm64/kvm/handle_exit.c      |  9 +++------
-> >>  virt/kvm/arm/arm.c                |  2 +-
-> >>  virt/kvm/arm/mmio.c               |  3 ++-
-> >>  6 files changed, 30 insertions(+), 8 deletions(-)
-> >>
-> >> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kv=
-m_host.h
-> >> index 4a879f6ff13b..aec943f6d123 100644
-> >> --- a/arch/arm/include/asm/kvm_host.h
-> >> +++ b/arch/arm/include/asm/kvm_host.h
-> >> @@ -285,6 +285,8 @@ static inline void kvm_arm_init_debug(void) {}
-> >>  static inline void kvm_arm_setup_debug(struct kvm_vcpu *vcpu) {}
-> >>  static inline void kvm_arm_clear_debug(struct kvm_vcpu *vcpu) {}
-> >>  static inline void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu) {}
-> >> +static inline int  kvm_arm_maybe_return_debug(struct kvm_vcpu *vcpu,
-> >> +						struct kvm_run *run) {}
-> >>
-> >>  int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
-> >>  			       struct kvm_device_attr *attr);
-> >> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/as=
-m/kvm_host.h
-> >> index e923b58606e2..fa67d21662f6 100644
-> >> --- a/arch/arm64/include/asm/kvm_host.h
-> >> +++ b/arch/arm64/include/asm/kvm_host.h
-> >> @@ -369,6 +369,7 @@ void kvm_arm_init_debug(void);
-> >>  void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
-> >>  void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
-> >>  void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
-> >> +int  kvm_arm_maybe_return_debug(struct kvm_vcpu *vcpu, struct kvm_run=
- *run);
-> >>  int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
-> >>  			       struct kvm_device_attr *attr);
-> >>  int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
-> >> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> >> index dbadfaf850a7..a10a18c55c87 100644
-> >> --- a/arch/arm64/kvm/debug.c
-> >> +++ b/arch/arm64/kvm/debug.c
-> >> @@ -221,3 +221,24 @@ void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
-> >>  		}
-> >>  	}
-> >>  }
-> >> +
-> >> +
-> >> +/*
-> >> + * When KVM has successfully emulated the instruction we might want to
-> >> + * return we a KVM_EXIT_DEBUG. We can only do this once the emulation
-> >> + * is complete though so for userspace emulations we have to wait
-> >> + * until we have re-entered KVM.
-> >> + *
-> >> + * Return > 0 to return to guest, 0 (and set exit_reason) on proper
-> >> + * exit to userspace.
-> >> + */
-> >> +
-> >> +int kvm_arm_maybe_return_debug(struct kvm_vcpu *vcpu, struct kvm_run =
-*run)
-> >> +{
-> >> +	if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
-> >> +		run->exit_reason =3D KVM_EXIT_DEBUG;
-> >> +		run->debug.arch.hsr =3D ESR_ELx_EC_SOFTSTP_LOW << ESR_ELx_EC_SHIFT;
-> >> +		return 0;
-> >> +	}
-> >> +	return 1;
-> >> +}
-> >> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit=
-.c
-> >> index c918d291cb58..7b04f59217bf 100644
-> >> --- a/arch/arm64/kvm/handle_exit.c
-> >> +++ b/arch/arm64/kvm/handle_exit.c
-> >> @@ -202,13 +202,10 @@ static int handle_trap_exceptions(struct kvm_vcp=
-u *vcpu, struct kvm_run *run)
-> >>  		handled =3D exit_handler(vcpu, run);
-> >>  	}
-> >>
-> >> -	if (handled && (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)) {
-> >> -		handled =3D 0;
-> >> -		run->exit_reason =3D KVM_EXIT_DEBUG;
-> >> -		run->debug.arch.hsr =3D ESR_ELx_EC_SOFTSTP_LOW << ESR_ELx_EC_SHIFT;
-> >> -	}
-> >> +	if (handled)
-> >> +		return kvm_arm_maybe_return_debug(vcpu, run);
-> >
-> > Again, this seems to override the return value of exit_handler, which
-> > may be something negative.
-> >
-> > Just so I'm clear: There's no intended functionality change of this
-> > particular hunk, it's just to share the logic in
-> > kvm_arm_maybe_return_debug, right?
-> =
+> +}
+> +
+>  int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
+>  				    struct kvm_mp_state *mp_state)
+>  {
+> -	if (vcpu->arch.power_off)
+> -		mp_state->mp_state = KVM_MP_STATE_STOPPED;
+> -	else
+> -		mp_state->mp_state = KVM_MP_STATE_RUNNABLE;
+> -
+> +	mp_state->mp_state = vcpu->arch.mp_state;
+>  	return 0;
+>  }
+>  
+> @@ -391,10 +393,10 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+>  {
+>  	switch (mp_state->mp_state) {
+>  	case KVM_MP_STATE_RUNNABLE:
+> -		vcpu->arch.power_off = false;
+> +		kvm_arm_vcpu_power_on(vcpu);
+>  		break;
+>  	case KVM_MP_STATE_STOPPED:
+> -		vcpu_power_off(vcpu);
+> +		kvm_arm_vcpu_power_off(vcpu);
+>  		break;
+>  	default:
+>  		return -EINVAL;
+> @@ -405,7 +407,7 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+>  
+>  static bool vcpu_should_sleep(struct kvm_vcpu *vcpu)
+>  {
+> -	return vcpu->arch.power_off || vcpu->arch.pause;
+> +	return vcpu->arch.mp_state == KVM_MP_STATE_STOPPED || vcpu->arch.pause;
+>  }
+>  
+>  /**
+> @@ -919,9 +921,9 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+>  	 * Handle the "start in power-off" case.
+>  	 */
+>  	if (test_bit(KVM_ARM_VCPU_POWER_OFF, vcpu->arch.features))
+> -		vcpu_power_off(vcpu);
+> +		kvm_arm_vcpu_power_off(vcpu);
+>  	else
+> -		vcpu->arch.power_off = false;
+> +		kvm_arm_vcpu_power_on(vcpu);
+>  
+>  	return 0;
+>  }
+> diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
+> index f1e363bab5e8..a7bf152f1247 100644
+> --- a/virt/kvm/arm/psci.c
+> +++ b/virt/kvm/arm/psci.c
+> @@ -64,16 +64,13 @@ static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
+>  
+>  static void kvm_psci_vcpu_off(struct kvm_vcpu *vcpu)
+>  {
+> -	vcpu->arch.power_off = true;
+> -	kvm_make_request(KVM_REQ_SLEEP, vcpu);
+> -	kvm_vcpu_kick(vcpu);
+> +	kvm_arm_vcpu_power_off(vcpu);
+>  }
+>  
+>  static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>  {
+>  	struct kvm *kvm = source_vcpu->kvm;
+>  	struct kvm_vcpu *vcpu = NULL;
+> -	struct swait_queue_head *wq;
+>  	unsigned long cpu_id;
+>  	unsigned long context_id;
+>  	phys_addr_t target_pc;
+> @@ -90,7 +87,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>  	 */
+>  	if (!vcpu)
+>  		return PSCI_RET_INVALID_PARAMS;
+> -	if (!vcpu->arch.power_off) {
+> +	if (vcpu->arch.mp_state != KVM_MP_STATE_STOPPED) {
+>  		if (kvm_psci_version(source_vcpu) != KVM_ARM_PSCI_0_1)
+>  			return PSCI_RET_ALREADY_ON;
+>  		else
+> @@ -118,11 +115,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>  	 * the general puspose registers are undefined upon CPU_ON.
+>  	 */
+>  	vcpu_set_reg(vcpu, 0, context_id);
+> -	vcpu->arch.power_off = false;
+> -	smp_mb();		/* Make sure the above is visible */
+> -
+> -	wq = kvm_arch_vcpu_wq(vcpu);
+> -	swake_up(wq);
+> +	kvm_arm_vcpu_power_on(vcpu);
+>  
+>  	return PSCI_RET_SUCCESS;
+>  }
+> @@ -156,7 +149,7 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
+>  		mpidr = kvm_vcpu_get_mpidr_aff(tmp);
+>  		if ((mpidr & target_affinity_mask) == target_affinity) {
+>  			matching_cpus++;
+> -			if (!tmp->arch.power_off)
+> +			if (tmp->arch.mp_state != KVM_MP_STATE_STOPPED)
+>  				return PSCI_0_2_AFFINITY_LEVEL_ON;
+>  		}
+>  	}
+> @@ -182,7 +175,7 @@ static void kvm_prepare_system_event(struct kvm_vcpu *vcpu, u32 type)
+>  	 * re-initialized.
+>  	 */
+>  	kvm_for_each_vcpu(i, tmp, vcpu->kvm)
+> -		tmp->arch.power_off = true;
+> +		tmp->arch.mp_state = KVM_MP_STATE_STOPPED;
+>  	kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
+>  
+>  	memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
+> -- 
+> 2.13.5
+> 
 
-> Yes, modulo the annoying semantics in the two places of the vcpu run
-> ioctl loop.
-> =
+Otherwise looks good to me:
 
-> >
-> >>
-> >> -	return handled;
-> >> +	return 0;
-> >>  }
-> >>
-> >>  /*
-> >> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> >> index b9f68e4add71..3d28fe2daa26 100644
-> >> --- a/virt/kvm/arm/arm.c
-> >> +++ b/virt/kvm/arm/arm.c
-> >> @@ -623,7 +623,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu,=
- struct kvm_run *run)
-> >>
-> >>  	if (run->exit_reason =3D=3D KVM_EXIT_MMIO) {
-> >>  		ret =3D kvm_handle_mmio_return(vcpu, vcpu->run);
-> >> -		if (ret)
-> >> +		if (ret < 1)
-> >>  			return ret;
-> >>  	}
-> >>
-> >> diff --git a/virt/kvm/arm/mmio.c b/virt/kvm/arm/mmio.c
-> >> index b6e715fd3c90..e43e3bd6222f 100644
-> >> --- a/virt/kvm/arm/mmio.c
-> >> +++ b/virt/kvm/arm/mmio.c
-> >> @@ -117,7 +117,8 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, =
-struct kvm_run *run)
-> >>  		vcpu_set_reg(vcpu, vcpu->arch.mmio_decode.rt, data);
-> >>  	}
-> >>
-> >> -	return 0;
-> >> +	/* If debugging in effect we may need to return now */
-> >
-> > Will this ever be about other types of debugging (watchpoint on a MMIO
-> > access?) or should we limit the text and description to
-> > single-stepping?
-> =
-
-> Hmm I don't think so. A hbreak should hit (via normal exception path)
-> before we attempt any emulation. I suspect watchpoints wouldn't hit for
-> emulation though - that would be trickier to do nicely though as it
-> would need to be checked for in both kernel and userspace emulation.
-> =
-
-> >
-
-Then I think we should be specific in function naming and comments and
-refer to single-stepping as opposed to something more generic, because
-single-stepping seems to be the case we care about.
-
-Thanks,
--Christoffer
+Reviewed-by: Christoffer Dall <cdall@linaro.org>
