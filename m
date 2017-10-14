@@ -1,28 +1,27 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH 3/5] KVM: arm/arm64: factor out common wfe/wfi emulation
- code
-Date: Sat, 14 Oct 2017 21:13:08 +0200
-Message-ID: <20171014191308.GB1929@lvm>
+Subject: Re: [PATCH 4/5] KVM: arm/arm64: improve kvm_arch_vcpu_runnable
+Date: Sat, 14 Oct 2017 21:13:25 +0200
+Message-ID: <20171014191325.GC1929@lvm>
 References: <20170929113041.24371-1-drjones@redhat.com>
- <20170929113041.24371-4-drjones@redhat.com>
+ <20170929113041.24371-5-drjones@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 60E3049D42
- for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Oct 2017 15:12:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8ABDC49D35
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Oct 2017 15:12:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yMno2B1xDK6f for <kvmarm@lists.cs.columbia.edu>;
- Sat, 14 Oct 2017 15:12:20 -0400 (EDT)
-Received: from mail-wm0-f53.google.com (mail-wm0-f53.google.com [74.125.82.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3280949D41
- for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Oct 2017 15:12:20 -0400 (EDT)
-Received: by mail-wm0-f53.google.com with SMTP id q124so26713142wmb.0
- for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Oct 2017 12:13:10 -0700 (PDT)
+ with ESMTP id z0rhq5xQlJAZ for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 14 Oct 2017 15:12:37 -0400 (EDT)
+Received: from mail-wm0-f51.google.com (mail-wm0-f51.google.com [74.125.82.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8743A49D32
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Oct 2017 15:12:37 -0400 (EDT)
+Received: by mail-wm0-f51.google.com with SMTP id q132so27068469wmd.2
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Oct 2017 12:13:28 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <20170929113041.24371-4-drjones@redhat.com>
+In-Reply-To: <20170929113041.24371-5-drjones@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,179 +35,119 @@ To: Andrew Jones <drjones@redhat.com>
 Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Sep 29, 2017 at 01:30:39PM +0200, Andrew Jones wrote:
-> Before we add more common code to the wfi emulation, let's first
-> factor out everything common.
+On Fri, Sep 29, 2017 at 01:30:40PM +0200, Andrew Jones wrote:
+> Conceptually, kvm_arch_vcpu_runnable() should be "not waiting,
+> or waiting for interrupts and interrupts are pending",
+> 
+>   !waiting-uninterruptable &&
+>   (!waiting-for-interrupts || interrupts-pending)
+> 
+> but the implementation was only
+> 
+>   !waiting-uninterruptable && interrupts-pending
+> 
+> Thanks to the context of the two callers there wasn't an issue,
+> however, to future-proof the function, this patch implements the
+> conceptual condition by applying mp_state to track waiting-
+> uninterruptable vs. waiting-for-interrupts.
 > 
 > Signed-off-by: Andrew Jones <drjones@redhat.com>
 > ---
->  arch/arm/include/asm/kvm_host.h   |  2 ++
->  arch/arm/kvm/handle_exit.c        | 14 +++++---------
->  arch/arm64/include/asm/kvm_host.h |  2 ++
->  arch/arm64/kvm/handle_exit.c      | 14 +++++---------
->  virt/kvm/arm/arm.c                | 13 +++++++++++++
->  virt/kvm/arm/psci.c               | 15 +++++++--------
->  6 files changed, 34 insertions(+), 26 deletions(-)
+>  Documentation/virtual/kvm/api.txt | 10 ++++++----
+>  virt/kvm/arm/arm.c                | 13 +++++++++----
+>  2 files changed, 15 insertions(+), 8 deletions(-)
 > 
-> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> index 85f3c20b9759..964320825372 100644
-> --- a/arch/arm/include/asm/kvm_host.h
-> +++ b/arch/arm/include/asm/kvm_host.h
-> @@ -231,6 +231,8 @@ void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
->  void kvm_arm_vcpu_power_on(struct kvm_vcpu *vcpu);
->  void kvm_arm_halt_guest(struct kvm *kvm);
->  void kvm_arm_resume_guest(struct kvm *kvm);
-> +void kvm_arm_emulate_wfe(struct kvm_vcpu *vcpu);
-> +void kvm_arm_emulate_wfi(struct kvm_vcpu *vcpu);
+> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+> index e63a35fafef0..7c0bb1ae10a2 100644
+> --- a/Documentation/virtual/kvm/api.txt
+> +++ b/Documentation/virtual/kvm/api.txt
+> @@ -1071,7 +1071,7 @@ Possible values are:
+>   - KVM_MP_STATE_INIT_RECEIVED:   the vcpu has received an INIT signal, and is
+>                                   now ready for a SIPI [x86]
+>   - KVM_MP_STATE_HALTED:          the vcpu has executed a HLT instruction and
+> -                                 is waiting for an interrupt [x86]
+> +                                 is waiting for an interrupt [x86,arm/arm64]
+>   - KVM_MP_STATE_SIPI_RECEIVED:   the vcpu has just received a SIPI (vector
+>                                   accessible via KVM_GET_VCPU_EVENTS) [x86]
+>   - KVM_MP_STATE_STOPPED:         the vcpu is stopped [s390,arm/arm64]
+> @@ -1087,8 +1087,9 @@ these architectures.
 >  
->  int kvm_arm_copy_coproc_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
->  unsigned long kvm_arm_num_coproc_regs(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm/kvm/handle_exit.c b/arch/arm/kvm/handle_exit.c
-> index cf8bf6bf87c4..e40466577c87 100644
-> --- a/arch/arm/kvm/handle_exit.c
-> +++ b/arch/arm/kvm/handle_exit.c
-> @@ -57,22 +57,18 @@ static int handle_smc(struct kvm_vcpu *vcpu, struct kvm_run *run)
->   * @run:	the kvm_run structure pointer
->   *
->   * WFE: Yield the CPU and come back to this vcpu when the scheduler
-> - * decides to.
-> - * WFI: Simply call kvm_vcpu_block(), which will halt execution of
-> - * world-switches and schedule other host processes until there is an
-> - * incoming IRQ or FIQ to the VM.
-> + *      decides to.
-> + * WFI: Halt execution of world-switches and schedule other host
-> + *      processes until there is an incoming IRQ or FIQ to the VM.
+>  For arm/arm64:
+>  
+> -The only states that are valid are KVM_MP_STATE_STOPPED and
+> -KVM_MP_STATE_RUNNABLE which reflect if the vcpu is paused or not.
+> +The only states that are valid are KVM_MP_STATE_STOPPED, KVM_MP_STATE_HALTED,
+> +and KVM_MP_STATE_RUNNABLE which reflect if the vcpu is powered-off, waiting
+> +for interrupts, or powered-on and not waiting for interrupts.
+>  
 
-s/VM/VCPU/
+Is it valid to introduce another value after we've publicly declared
+that it's not valid?  What if userspace has an assert(state ==
+KVM_MP_STATE_STOPPED || state == KVM_MP_STATE_RUNNABLE) ?
 
->   */
->  static int kvm_handle_wfx(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  {
->  	if (kvm_vcpu_get_hsr(vcpu) & HSR_WFI_IS_WFE) {
->  		trace_kvm_wfx(*vcpu_pc(vcpu), true);
-> -		vcpu->stat.wfe_exit_stat++;
-> -		kvm_vcpu_on_spin(vcpu, vcpu_mode_priv(vcpu));
-> +		kvm_arm_emulate_wfe(vcpu);
->  	} else {
->  		trace_kvm_wfx(*vcpu_pc(vcpu), false);
-> -		vcpu->stat.wfi_exit_stat++;
-> -		kvm_vcpu_block(vcpu);
-> -		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
-> +		kvm_arm_emulate_wfi(vcpu);
->  	}
+At least we should make that is not the case.
+
+>  4.39 KVM_SET_MP_STATE
 >  
->  	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 25545a87de11..a774f6b30474 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -332,6 +332,8 @@ void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
->  void kvm_arm_vcpu_power_on(struct kvm_vcpu *vcpu);
->  void kvm_arm_halt_guest(struct kvm *kvm);
->  void kvm_arm_resume_guest(struct kvm *kvm);
-> +void kvm_arm_emulate_wfe(struct kvm_vcpu *vcpu);
-> +void kvm_arm_emulate_wfi(struct kvm_vcpu *vcpu);
+> @@ -1108,7 +1109,8 @@ these architectures.
+>  For arm/arm64:
 >  
->  u64 __kvm_call_hyp(void *hypfn, ...);
->  #define kvm_call_hyp(f, ...) __kvm_call_hyp(kvm_ksym_ref(f), ##__VA_ARGS__)
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index 7debb74843a0..7ba50a296d10 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -74,22 +74,18 @@ static int handle_no_fpsimd(struct kvm_vcpu *vcpu, struct kvm_run *run)
->   * @vcpu:	the vcpu pointer
->   *
->   * WFE: Yield the CPU and come back to this vcpu when the scheduler
-> - * decides to.
-> - * WFI: Simply call kvm_vcpu_block(), which will halt execution of
-> - * world-switches and schedule other host processes until there is an
-> - * incoming IRQ or FIQ to the VM.
-> + *      decides to.
-> + * WFI: Halt execution of world-switches and schedule other host
-> + *      processes until there is an incoming IRQ or FIQ to the VM.
->   */
->  static int kvm_handle_wfx(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  {
->  	if (kvm_vcpu_get_hsr(vcpu) & ESR_ELx_WFx_ISS_WFE) {
->  		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), true);
-> -		vcpu->stat.wfe_exit_stat++;
-> -		kvm_vcpu_on_spin(vcpu, vcpu_mode_priv(vcpu));
-> +		kvm_arm_emulate_wfe(vcpu);
->  	} else {
->  		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), false);
-> -		vcpu->stat.wfi_exit_stat++;
-> -		kvm_vcpu_block(vcpu);
-> -		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
-> +		kvm_arm_emulate_wfi(vcpu);
->  	}
+>  The only states that are valid are KVM_MP_STATE_STOPPED and
+> -KVM_MP_STATE_RUNNABLE which reflect if the vcpu should be paused or not.
+> +KVM_MP_STATE_RUNNABLE which reflect if the vcpu should be
+> +powered-off or not.
 >  
->  	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+
+It looks pretty dodgy to me that we can return an MP state which we
+cannot set again.  Feels like this could break migration.
+
+>  4.40 KVM_SET_IDENTITY_MAP_ADDR
+>  
 > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index 954e77608d29..220a3dbda76c 100644
+> index 220a3dbda76c..5bc9b0d2fd0f 100644
 > --- a/virt/kvm/arm/arm.c
 > +++ b/virt/kvm/arm/arm.c
-> @@ -573,6 +573,19 @@ void kvm_arm_resume_guest(struct kvm *kvm)
->  	}
+> @@ -414,13 +414,16 @@ static bool vcpu_should_sleep(struct kvm_vcpu *vcpu)
+>   * kvm_arch_vcpu_runnable - determine if the vcpu can be scheduled
+>   * @vcpu:	The VCPU pointer
+>   *
+> - * If the guest CPU is not waiting for interrupts or an interrupt line is
+> - * asserted, the CPU is by definition runnable.
+> + * If the VCPU is not waiting at all (including sleeping, which is waiting
+> + * uninterruptably), or it's waiting for interrupts but interrupts are
+> + * pending, then it is by definition runnable.
+>   */
+>  int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu)
+>  {
+> -	return (!!vcpu->arch.irq_lines || kvm_vgic_vcpu_pending_irq(vcpu))
+> -		&& !vcpu_should_sleep(vcpu);
+> +	return !vcpu_should_sleep(vcpu) &&
+> +	       (vcpu->arch.mp_state != KVM_MP_STATE_HALTED ||
+> +		(!!vcpu->arch.irq_lines ||
+> +		 kvm_vgic_vcpu_pending_irq(vcpu)));
+
+This is hard to read.  How about:
+
+	bool irq_pending = !!vcpu->arch.irq_lines ||
+			   kvm_vgic_vcpu_pending_irq(vcpu);
+	
+	if (vcpu_should_sleep(vcpu)
+		return false;
+	else if (vcpu->arch.mp_state == KVM_MP_STATE_HALTED && !irq_pending)
+		return false;
+	return true;
+
 >  }
 >  
-> +void kvm_arm_emulate_wfe(struct kvm_vcpu *vcpu)
-> +{
-> +	vcpu->stat.wfe_exit_stat++;
-> +	kvm_vcpu_on_spin(vcpu, vcpu_mode_priv(vcpu));
-> +}
-> +
-> +void kvm_arm_emulate_wfi(struct kvm_vcpu *vcpu)
-> +{
-> +	vcpu->stat.wfi_exit_stat++;
-> +	kvm_vcpu_block(vcpu);
-> +	kvm_clear_request(KVM_REQ_UNHALT, vcpu);
-> +}
-> +
->  static void vcpu_req_sleep(struct kvm_vcpu *vcpu)
+>  bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+> @@ -582,7 +585,9 @@ void kvm_arm_emulate_wfe(struct kvm_vcpu *vcpu)
+>  void kvm_arm_emulate_wfi(struct kvm_vcpu *vcpu)
 >  {
->  	struct swait_queue_head *wq = kvm_arch_vcpu_wq(vcpu);
-> diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
-> index a7bf152f1247..755c415304ea 100644
-> --- a/virt/kvm/arm/psci.c
-> +++ b/virt/kvm/arm/psci.c
-> @@ -50,20 +50,19 @@ static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
->  	 * This means for KVM the wakeup events are interrupts and
->  	 * this is consistent with intended use of StateID as described
->  	 * in section 5.4.1 of PSCI v0.2 specification (ARM DEN 0022A).
-> -	 *
-> -	 * Further, we also treat power-down request to be same as
-> -	 * stand-by request as-per section 5.4.2 clause 3 of PSCI v0.2
-> -	 * specification (ARM DEN 0022A). This means all suspend states
-> -	 * for KVM will preserve the register state.
->  	 */
-> -	kvm_vcpu_block(vcpu);
-> -	kvm_clear_request(KVM_REQ_UNHALT, vcpu);
-> -
-> +	kvm_arm_emulate_wfi(vcpu);
->  	return PSCI_RET_SUCCESS;
->  }
->  
->  static void kvm_psci_vcpu_off(struct kvm_vcpu *vcpu)
->  {
-> +	/*
-> +	 * We treat a power-off request the same as a stand-by request,
-> +	 * as-per section 5.4.2 clause 3 of PSCI v0.2* specification
-> +	 * (ARM DEN 0022A). This means all suspend states for KVM will
-> +	 * preserve the register state.
-> +	 */
-
-I'm not actually convinced that this part of the comment was about
-power-off.  I think what it was trying to say was simply that a suspend
-operation should preverse the register state, and therefore the
-commentary doesn't belong in this function.  I agree that the comment is
-potentially more confusing (I lost the exact version of the document
-referred to in the original comment so can't be sure if there was
-something unclear in the original document or if the comment is just
-vaguely written), than it helps.  Therefore, I think you should either
-(a) keep the comment as it is, (b) rewrite it to make sense, or (c) just
-delete it.
-
->  	kvm_arm_vcpu_power_off(vcpu);
+>  	vcpu->stat.wfi_exit_stat++;
+> +	vcpu->arch.mp_state = KVM_MP_STATE_HALTED;
+>  	kvm_vcpu_block(vcpu);
+> +	vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+>  	kvm_clear_request(KVM_REQ_UNHALT, vcpu);
 >  }
 >  
 > -- 
