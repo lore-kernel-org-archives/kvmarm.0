@@ -1,119 +1,145 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v3 16/28] arm64/sve: Probe SVE capabilities and usable
- vector lengths
-Date: Mon, 16 Oct 2017 16:46:00 +0100
-Message-ID: <20171016154557.GR19485@e103592.cambridge.arm.com>
-References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
- <1507660725-7986-17-git-send-email-Dave.Martin@arm.com>
- <a39354fb-9f21-47ff-2ad9-b5bcb04e9990@arm.com>
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+Subject: [PATCH v2] arm/arm64: KVM: set right LR register value for 32 bit guest when inject abort
+Date: Mon, 16 Oct 2017 23:58:40 +0800
+Message-ID: <20171016155840.33584-1-gengdongjiu@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Return-path: <libc-alpha-return-85879-glibc-alpha=m.gmane.org@sourceware.org>
-List-Unsubscribe: <mailto:libc-alpha-unsubscribe-glibc-alpha=m.gmane.org@sourceware.org>
-List-Subscribe: <mailto:libc-alpha-subscribe@sourceware.org>
-List-Archive: <http://sourceware.org/ml/libc-alpha/>
-List-Post: <mailto:libc-alpha@sourceware.org>
-List-Help: <mailto:libc-alpha-help@sourceware.org>, <http://sourceware.org/ml/#faqs>
-Sender: libc-alpha-owner@sourceware.org
-Content-Disposition: inline
-In-Reply-To: <a39354fb-9f21-47ff-2ad9-b5bcb04e9990@arm.com>
-To: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, gengdongjiu@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Oct 12, 2017 at 01:56:51PM +0100, Suzuki K Poulose wrote:
-> On 10/10/17 19:38, Dave Martin wrote:
-> >This patch uses the cpufeatures framework to determine common SVE
-> >capabilities and vector lengths, and configures the runtime SVE
-> >support code appropriately.
-> >
-> >ZCR_ELx is not really a feature register, but it is convenient to
-> >use it as a template for recording the maximum vector length
-> >supported by a CPU, using the LEN field.  This field is similar to
-> >a feature field in that it is a contiguous bitfield for which we
-> >want to determine the minimum system-wide value.  This patch adds
-> >ZCR as a pseudo-register in cpuinfo/cpufeatures, with appropriate
-> >custom code to populate it.  Finding the minimum supported value of
-> >the LEN field is left to the cpufeatures framework in the usual
-> >way.
-> >
-> >The meaning of ID_AA64ZFR0_EL1 is not architecturally defined yet,
-> >so for now we just require it to be zero.
-> >
-> >Note that much of this code is dormant and SVE still won't be used
-> >yet, since system_supports_sve() remains hardwired to false.
-> >
-> >Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> >Cc: Alex Bennée <alex.bennee@linaro.org>
-> >Cc: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-> >
-> >---
-> >
-> >Dropped Alex Bennée's Reviewed-by, since there is new logic in this
-> >patch.
-> >
-> >Changes since v2
-> >----------------
-> >
-> >Bug fixes:
-> >
-> >  * Got rid of dynamic allocation of the shadow vector length map during
-> >    secondary boot.  Secondary CPU boot takes place in atomic context,
-> >    and relying on GFP_ATOMIC here doesn't seem justified.
-> >
-> >    Instead, the needed additional bitmap is allocated statically.  Only
-> >    one shadow map is needed, because CPUs don't boot concurrently.
-> >
-> >Requested by Alex Bennée:
-> >
-> >  * Reflowed untidy comment above read_zcr_features()
-> >
-> >  * Added comments to read_zcr_features() to explain what it's trying to do
-> >    (which is otherwise not readily apparent).
-> >
-> >Requested by Catalin Marinas:
-> >
-> >  * Moved disabling of the EL1 SVE trap to the cpufeatures C code.
-> >    This allows addition of new assembler in __cpu_setup to be
-> >    avoided.
-> >
-> >Miscellaneous:
-> >
-> >  * Added comments explaining the intent, purpose and basic constraints
-> >    for fpsimd.c helpers.
-> 
-> ...
-> 
-> >diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> >index 92a9502..c5acf38 100644
-> >--- a/arch/arm64/kernel/cpufeature.c
-> >+++ b/arch/arm64/kernel/cpufeature.c
-> 
-> ...
-> 
-> >@@ -670,6 +689,14 @@ void update_cpu_features(int cpu,
-> >  					info->reg_mvfr2, boot->reg_mvfr2);
-> >  	}
-> >+	if (id_aa64pfr0_sve(info->reg_id_aa64pfr0)) {
-> >+		taint |= check_update_ftr_reg(SYS_ZCR_EL1, cpu,
-> >+					info->reg_zcr, boot->reg_zcr);
-> >+
-> >+		if (!sys_caps_initialised)
-> >+			sve_update_vq_map();
-> >+	}
-> 
-> nit: I am not sure if we should also check if the "current" sanitised value
-> of the id_aa64pfr0 also supports sve and skip the update if it isn't. The code
-> is as such fine without the check, its just that we can avoid computing the
-> map. It is in the CPU boot up path and hence is not performance critical.
-> So, either way we are fine.
-> 
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+When a exception is trapped to EL2, hardware uses  ELR_ELx to hold
+the current fault instruction address. If KVM wants to inject a
+abort to 32 bit guest, it needs to set the LR register for the
+guest to emulate this abort happened in the guest. Because ARM32
+architecture is pipelined execution, so the LR value has an offset to
+the fault instruction address.
 
-I think I prefer to avoid adding extra code to optimise the "broken SoC
-design" case.
+The offsets applied to Link value for exceptions as shown below,
+which should be added for the ARM32 link register(LR).
 
-Maybe we could revisit this later if needed.
+Table taken from ARMv8 ARM DDI0487B-B, table G1-10:
+Exception			Offset, for PE state of:
+				A32 	  T32
+Undefined Instruction 		+4 	  +2
+Prefetch Abort 			+4 	  +4
+Data Abort 			+8 	  +8
+IRQ or FIQ 			+4 	  +4
 
-Can you suggest some code?  Maybe the check is simpler than I think.
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+Tested-by: Haibin Zhang <zhanghaibin7@huawei.com>
+
+---
+Note: now only test it in the arm64 host because there is no arm32 host environment,
+firstly send the patch out for review.
+
+In the arm64 platform, to the undefined instruction injection:
+
+1. Guest OS call SMC(Secure Monitor Call) instruction in the address
+0xc025405c, then Guest traps to hypervisor
+
+c0254050:   e59d5028    ldr r5, [sp, #40]   ; 0x28
+c0254054:   e3a03001    mov r3, #1
+c0254058:   e1a01003    mov r1, r3
+c025405c:   e1600070    smc 0
+c0254060:   e30a0270    movw    r0, #41584  ; 0xa270
+c0254064:   e34c00bf    movt    r0, #49343  ; 0xc0bf
+
+2. KVM  injects undefined abort to guest
+3. We will find the fault PC is 0xc0254058, not 0xc025405c.
+
+[   12.348072] Internal error: Oops - undefined instruction: 0 [#1] SMP ARM
+[   12.349786] Modules linked in:
+[   12.350563] CPU: 1 PID: 71 Comm: cat Not tainted 4.1.0-dirty #25
+[   12.352061] Hardware name: Generic DT based system
+[   12.353275] task: d9d08000 ti: d9cfe000 task.ti: d9cfe000
+[   12.354637] PC is at proc_dointvec+0x20/0x60
+[   12.355717] LR is at proc_sys_call_handler+0xb0/0xc4
+[   12.356972] pc : [<c0254058>]    lr : [<c035699c>]    psr: a0060013
+[   12.356972] sp : d9cffe90  ip : c0254038  fp : 00000001
+[   12.359824] r10: d9cfff80  r9 : 00000004  r8 : 00000000
+[   12.361132] r7 : bec21cb0  r6 : d9cffec4  r5 : d9cfff80  r4 : c0e82de0
+[   12.362766] r3 : 00000001  r2 : bec21cb0  r1 : 00000001  r0 : c0e82de0
+[   12.364400] Flags: NzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment user
+[   12.366183] Control: 10c5383d  Table: 59d3406a  DAC: 00000015
+[   12.367623] Process cat (pid: 71, stack limit = 0xd9cfe220)
+
+4. After correct the LR register, it will have right value
+
+[  125.763370] Internal error: Oops - undefined instruction: 0 [#2] SMP ARM
+[  125.767010] Modules linked in:
+[  125.768472] CPU: 1 PID: 74 Comm: cat Tainted: G      D         4.1.0-dirty #25
+[  125.771854] Hardware name: Generic DT based system
+[  125.774053] task: db0bb900 ti: d9d10000 task.ti: d9d10000
+[  125.776821] PC is at proc_dointvec+0x24/0x60
+[  125.778919] LR is at proc_sys_call_handler+0xb0/0xc4
+[  125.781269] pc : [<c025405c>]    lr : [<c035699c>]    psr: a0060013
+[  125.781269] sp : d9d11e90  ip : c0254038  fp : 00000001
+[  125.786581] r10: d9d11f80  r9 : 00000004  r8 : 00000000
+[  125.789673] r7 : be92ccb0  r6 : d9d11ec4  r5 : d9d11f80  r4 : c0e82de0
+[  125.792828] r3 : 00000001  r2 : be92ccb0  r1 : 00000001  r0 : c0e82de0
+[  125.795890] Flags: NzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment user
+
+For other exception injection, such as Data/Prefetch abort, also needs to correct
+---
+ arch/arm/kvm/emulate.c        |  4 ++--
+ arch/arm64/kvm/inject_fault.c | 16 +++++++++++++++-
+ 2 files changed, 17 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm/kvm/emulate.c b/arch/arm/kvm/emulate.c
+index 0064b86..2419328 100644
+--- a/arch/arm/kvm/emulate.c
++++ b/arch/arm/kvm/emulate.c
+@@ -227,7 +227,7 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
+ 	u32 return_offset = (is_thumb) ? 2 : 4;
+ 
+ 	kvm_update_psr(vcpu, UND_MODE);
+-	*vcpu_reg(vcpu, 14) = *vcpu_pc(vcpu) - return_offset;
++	*vcpu_reg(vcpu, 14) = *vcpu_pc(vcpu) + return_offset;
+ 
+ 	/* Branch to exception vector */
+ 	*vcpu_pc(vcpu) = exc_vector_base(vcpu) + vect_offset;
+@@ -242,7 +242,7 @@ static void inject_abt(struct kvm_vcpu *vcpu, bool is_pabt, unsigned long addr)
+ 	unsigned long cpsr = *vcpu_cpsr(vcpu);
+ 	bool is_thumb = (cpsr & PSR_T_BIT);
+ 	u32 vect_offset;
+-	u32 return_offset = (is_thumb) ? 4 : 0;
++	u32 return_offset = (is_pabt) ? 4 : 8;
+ 	bool is_lpae;
+ 
+ 	kvm_update_psr(vcpu, ABT_MODE);
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index da6a8cf..0416f18 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -33,12 +33,26 @@
+ #define LOWER_EL_AArch64_VECTOR		0x400
+ #define LOWER_EL_AArch32_VECTOR		0x600
+ 
++/*
++ * Table taken from ARMv8 ARM DDI0487B-B, table G1-10.
++ */
++static u8 return_offsets[8][2] = {
++	[0] = { 0, 0 },		/* Reset, unused */
++	[1] = { 4, 2 },		/* Undefined */
++	[2] = { 0, 0 },		/* SVC, unused */
++	[3] = { 4, 4 },		/* Prefetch abort */
++	[4] = { 8, 8 },		/* Data abort */
++	[5] = { 0, 0 },		/* HVC, unused */
++	[6] = { 4, 4 },		/* IRQ, unused */
++	[7] = { 4, 4 },		/* FIQ, unused */
++};
++
+ static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+ {
+ 	unsigned long cpsr;
+ 	unsigned long new_spsr_value = *vcpu_cpsr(vcpu);
+ 	bool is_thumb = (new_spsr_value & COMPAT_PSR_T_BIT);
+-	u32 return_offset = (is_thumb) ? 4 : 0;
++	u32 return_offset = return_offsets[vect_offset >> 2][is_thumb];
+ 	u32 sctlr = vcpu_cp15(vcpu, c1_SCTLR);
+ 
+ 	cpsr = mode | COMPAT_PSR_I_BIT;
+-- 
+2.10.1
