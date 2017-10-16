@@ -1,23 +1,23 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v3 05/11] KVM: arm/arm64: vgic-its: Check GITS_BASER Valid bit
- before saving tables
-Date: Mon, 16 Oct 2017 17:03:26 +0200
-Message-ID: <1508166212-9599-6-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v3 08/11] KVM: arm/arm64: vgic-its: new helper functions to
+ free the caches
+Date: Mon, 16 Oct 2017 17:03:29 +0200
+Message-ID: <1508166212-9599-9-git-send-email-eric.auger@redhat.com>
 References: <1508166212-9599-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DA39E49D2D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 11:03:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 71F9340651
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 11:03:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HviH+6cEx40U for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Oct 2017 11:03:14 -0400 (EDT)
+ with ESMTP id HVA+26cXJaO9 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Oct 2017 11:03:31 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2DBBB49D20
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 11:03:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8F00D49D09
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 11:03:31 -0400 (EDT)
 In-Reply-To: <1508166212-9599-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,95 +32,130 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.or
 Cc: wu.wubin@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-At the moment we don't properly check the GITS_BASER<n>.Valid
-bit before saving the collection and device tables.
+From: wanghaibin <wanghaibin.wang@huawei.com>
 
-On vgic_its_save_collection_table() we use the GITS_BASER gpa
-field whereas the Valid bit should be used.
+We create 2 new functions that frees the device and
+collection lists. this is currently called by vgic_its_destroy()
+and we will add other callers in subsequent patches.
 
-On vgic_its_save_device_tables() there is no check. This can
-cause various bugs, among which a subsequent fault when accessing
-the table in guest memory.
+We also remove the check on its->device_list.next as it looks
+unnecessary. Indeed, the device list always is initialized
+when vgic_its_destroy gets called: the kvm device is removed
+by kvm_destroy_devices() which loops on all the devices
+added to kvm->devices. kvm_ioctl_create_device() only adds
+the device to kvm_devices once the lists have been initialized
+(in vgic_create_its).
 
-Let's systematically check the Valid bit before doing anything.
+We also move vgic_its_free_device to prepare for new callers.
 
-We also uniformize the code between save and restore.
-
+Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 
 ---
-
-v2 -> v3:
-- slight rewording of the commit message
-- added Andre's and Christoffer's R-b
+[Eric] removed its->device_list.next which is not needed as
+pointed out by Wanghaibin. Reword the commit message
 ---
- virt/kvm/arm/vgic/vgic-its.c | 20 +++++++++++---------
- 1 file changed, 11 insertions(+), 9 deletions(-)
+ virt/kvm/arm/vgic/vgic-its.c | 76 ++++++++++++++++++++++++--------------------
+ 1 file changed, 41 insertions(+), 35 deletions(-)
 
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index c5717cf..1d22f04 100644
+index 3c2a6e7..1e17cfe 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -2110,11 +2110,12 @@ static int vgic_its_device_cmp(void *priv, struct list_head *a,
- static int vgic_its_save_device_tables(struct vgic_its *its)
+@@ -611,6 +611,45 @@ static void its_free_ite(struct kvm *kvm, struct its_ite *ite)
+ 	kfree(ite);
+ }
+ 
++static void vgic_its_free_device(struct kvm *kvm, struct its_device *dev)
++{
++	struct its_ite *ite, *tmp;
++
++	list_for_each_entry_safe(ite, tmp, &dev->itt_head, ite_list)
++		its_free_ite(kvm, ite);
++	list_del(&dev->dev_list);
++	kfree(dev);
++}
++
++static void vgic_its_free_device_list(struct kvm *kvm, struct vgic_its *its)
++{
++	struct list_head *cur, *temp;
++
++	mutex_lock(&its->its_lock);
++	list_for_each_safe(cur, temp, &its->device_list) {
++		struct its_device *dev;
++
++		dev = list_entry(cur, struct its_device, dev_list);
++		vgic_its_free_device(kvm, dev);
++	}
++	mutex_unlock(&its->its_lock);
++}
++
++static void vgic_its_free_collection_list(struct kvm *kvm, struct vgic_its *its)
++{
++	struct list_head *cur, *temp;
++
++	list_for_each_safe(cur, temp, &its->collection_list) {
++		struct its_collection *coll;
++
++		coll = list_entry(cur, struct its_collection, coll_list);
++		list_del(cur);
++		kfree(coll);
++	}
++	mutex_unlock(&its->its_lock);
++}
++
++
+ static u64 its_cmd_mask_field(u64 *its_cmd, int word, int shift, int size)
  {
- 	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
-+	u64 baser = its->baser_device_table;
- 	struct its_device *dev;
- 	int dte_esz = abi->dte_esz;
--	u64 baser;
+ 	return (le64_to_cpu(its_cmd[word]) >> shift) & (BIT_ULL(size) - 1);
+@@ -1644,46 +1683,13 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
+ 	return vgic_its_set_abi(its, NR_ITS_ABIS - 1);
+ }
  
--	baser = its->baser_device_table;
-+	if (!(baser & GITS_BASER_VALID))
-+		return 0;
- 
- 	list_sort(NULL, &its->device_list, vgic_its_device_cmp);
- 
-@@ -2283,17 +2284,17 @@ static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, int esz,
- static int vgic_its_save_collection_table(struct vgic_its *its)
+-static void vgic_its_free_device(struct kvm *kvm, struct its_device *dev)
+-{
+-	struct its_ite *ite, *tmp;
+-
+-	list_for_each_entry_safe(ite, tmp, &dev->itt_head, ite_list)
+-		its_free_ite(kvm, ite);
+-	list_del(&dev->dev_list);
+-	kfree(dev);
+-}
+-
+ static void vgic_its_destroy(struct kvm_device *kvm_dev)
  {
- 	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
-+	u64 baser = its->baser_coll_table;
-+	gpa_t gpa = BASER_ADDRESS(baser);
- 	struct its_collection *collection;
- 	u64 val;
--	gpa_t gpa;
- 	size_t max_size, filled = 0;
- 	int ret, cte_esz = abi->cte_esz;
+ 	struct kvm *kvm = kvm_dev->kvm;
+ 	struct vgic_its *its = kvm_dev->private;
+-	struct list_head *cur, *temp;
+-
+-	/*
+-	 * We may end up here without the lists ever having been initialized.
+-	 * Check this and bail out early to avoid dereferencing a NULL pointer.
+-	 */
+-	if (!its->device_list.next)
+-		return;
+-
+-	mutex_lock(&its->its_lock);
+-	list_for_each_safe(cur, temp, &its->device_list) {
+-		struct its_device *dev;
+-
+-		dev = list_entry(cur, struct its_device, dev_list);
+-		vgic_its_free_device(kvm, dev);
+-	}
+-
+-	list_for_each_safe(cur, temp, &its->collection_list) {
+-		struct its_collection *coll;
+-
+-		coll = list_entry(cur, struct its_collection, coll_list);
+-		list_del(cur);
+-		kfree(coll);
+-	}
+-	mutex_unlock(&its->its_lock);
  
--	gpa = BASER_ADDRESS(its->baser_coll_table);
--	if (!gpa)
-+	if (!(baser & GITS_BASER_VALID))
- 		return 0;
++	vgic_its_free_device_list(kvm, its);
++	vgic_its_free_collection_list(kvm, its);
+ 	kfree(its);
+ }
  
--	max_size = GITS_BASER_NR_PAGES(its->baser_coll_table) * SZ_64K;
-+	max_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
- 
- 	list_for_each_entry(collection, &its->collection_list, coll_list) {
- 		ret = vgic_its_save_cte(its, collection, gpa, cte_esz);
-@@ -2329,17 +2330,18 @@ static int vgic_its_save_collection_table(struct vgic_its *its)
- static int vgic_its_restore_collection_table(struct vgic_its *its)
- {
- 	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
-+	u64 baser = its->baser_coll_table;
- 	int cte_esz = abi->cte_esz;
- 	size_t max_size, read = 0;
- 	gpa_t gpa;
- 	int ret;
- 
--	if (!(its->baser_coll_table & GITS_BASER_VALID))
-+	if (!(baser & GITS_BASER_VALID))
- 		return 0;
- 
--	gpa = BASER_ADDRESS(its->baser_coll_table);
-+	gpa = BASER_ADDRESS(baser);
- 
--	max_size = GITS_BASER_NR_PAGES(its->baser_coll_table) * SZ_64K;
-+	max_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
- 
- 	while (read < max_size) {
- 		bool last;
 -- 
 2.5.5
