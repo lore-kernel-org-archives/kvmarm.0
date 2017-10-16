@@ -1,59 +1,46 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v3 04/13] arm64: alternatives: use tpidr_el2 on VHE hosts
-Date: Mon, 16 Oct 2017 11:17:37 +0100
-Message-ID: <20171016101736.fkaikxflyc46zczf@armageddon.cambridge.arm.com>
-References: <20170922182614.27885-1-james.morse@arm.com>
- <20170922182614.27885-5-james.morse@arm.com>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v6 5/7] arm64: kvm: route synchronous external abort exceptions
+ to el2
+Date: Mon, 16 Oct 2017 12:44:56 +0100
+Message-ID: <59E49BB8.8080801@arm.com>
+References: <1503916701-13516-1-git-send-email-gengdongjiu@huawei.com> <1503916701-13516-6-git-send-email-gengdongjiu@huawei.com> <59B17449.6010201@arm.com> <fb7da3e3-d0f7-7ac6-b088-888a563d7ee7@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E590549D29
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 06:16:48 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RBPxaTkU-pW8 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Oct 2017 06:16:47 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BB4B040017
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 06:16:47 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20170922182614.27885-5-james.morse@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>
-Cc: devicetree@vger.kernel.org, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, Rob Herring <robh+dt@kernel.org>, Loc Ho <lho@apm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <linux-acpi-owner@vger.kernel.org>
+In-Reply-To: <fb7da3e3-d0f7-7ac6-b088-888a563d7ee7@huawei.com>
+Sender: linux-acpi-owner@vger.kernel.org
+To: gengdongjiu <gengdongjiu@huawei.com>
+Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, lenb@kernel.org, robert.moore@intel.com, lv.zheng@intel.com, mark.rutland@arm.com, xiexiuqi@huawei.com, cov@codeaurora.org, david.daney@cavium.com, suzuki.poulose@arm.com, stefan@hello-penguin.com, Dave.Martin@arm.com, kristina.martsenko@arm.com, wangkefeng.wang@huawei.com, tbaicar@codeaurora.org, ard.biesheuvel@linaro.org, mingo@kernel.org, bp@suse.de, shiju.jose@huawei.com, zjzhang@codeaurora.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, devel@acpica.org, mst@redhat.com, john.garry@huawei.com, jonathan.cameron@huawei.com, shameerali.kolot
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Sep 22, 2017 at 07:26:05PM +0100, James Morse wrote:
-> diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
-> index 29adab8138c3..8f2d0f7d193b 100644
-> --- a/arch/arm64/include/asm/processor.h
-> +++ b/arch/arm64/include/asm/processor.h
-> @@ -193,5 +193,6 @@ static inline void spin_lock_prefetch(const void *ptr)
->  
->  int cpu_enable_pan(void *__unused);
->  int cpu_enable_cache_maint_trap(void *__unused);
-> +int cpu_copy_el2regs(void *__unused);
->  
->  #endif /* __ASM_PROCESSOR_H */
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index cd52d365d1f0..8e4c7da2b126 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-[...]
-> +int cpu_copy_el2regs(void *__unused)
+Hi gengdongjiu,
 
-Can this be static? I couldn't find it used anywhere else apart from
-cpufeature.c
+On 14/09/17 12:12, gengdongjiu wrote:
+> On 2017/9/8 0:31, James Morse wrote:
+>> KVM already handles external aborts from lower exception levels, no more work
+>> needs doing for TEA.
+> If it is firmware first solution, that is SCR_EL3.EA=1, all SError interrupt and synchronous External
+> Abort exceptions are taken to EL3, so EL3 firmware will handle it, KVM no needs to handle it.
+> 
+> HCR_EL3.TEA is only for EL3 to check its value to decide to jump to hypervisor or kernel.
+> 
+>>
+>> What happens when a guest access the RAS-Error-Record registers?
+>>
+>> Before we can set HCR_EL2.TERR I think we need to add some minimal emulation for
+>> the registers it traps. Most of them should be RAZ/WI, so it should be
+>> straightforward. (I think KVMs default is to emulate an undef for unknown traps).
 
--- 
-Catalin
+> Today I added the support to do some minimal emulation for RAS-Error-Record registers, thanks
+> for the good suggestion.
+
+Where can I find this patch?
+I'd like to repost it as part of the SError_rework/RAS/IESB series: this is one
+of the bits KVM needs but I didn't touch as it looks like your updated version
+of this patch should cover it.
+
+
+Thanks,
+
+James
