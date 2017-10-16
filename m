@@ -1,111 +1,88 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+From: Dave Martin <Dave.Martin@arm.com>
 Subject: Re: [PATCH v3 16/28] arm64/sve: Probe SVE capabilities and usable
  vector lengths
-Date: Mon, 16 Oct 2017 17:27:59 +0100
-Message-ID: <812b6d11-2458-6d5d-c490-3421f7d3afb3@arm.com>
+Date: Mon, 16 Oct 2017 17:44:07 +0100
+Message-ID: <20171016164407.GS19485@e103592.cambridge.arm.com>
 References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
  <1507660725-7986-17-git-send-email-Dave.Martin@arm.com>
  <a39354fb-9f21-47ff-2ad9-b5bcb04e9990@arm.com>
  <20171016154557.GR19485@e103592.cambridge.arm.com>
+ <812b6d11-2458-6d5d-c490-3421f7d3afb3@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A32B240EA6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 12:27:09 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wHYANuPcuM-1 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Oct 2017 12:27:08 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4857D40638
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 12:27:08 -0400 (EDT)
-In-Reply-To: <20171016154557.GR19485@e103592.cambridge.arm.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <libc-alpha-return-85885-glibc-alpha=m.gmane.org@sourceware.org>
+List-Unsubscribe: <mailto:libc-alpha-unsubscribe-glibc-alpha=m.gmane.org@sourceware.org>
+List-Subscribe: <mailto:libc-alpha-subscribe@sourceware.org>
+List-Archive: <http://sourceware.org/ml/libc-alpha/>
+List-Post: <mailto:libc-alpha@sourceware.org>
+List-Help: <mailto:libc-alpha-help@sourceware.org>, <http://sourceware.org/ml/#faqs>
+Sender: libc-alpha-owner@sourceware.org
+Content-Disposition: inline
+In-Reply-To: <812b6d11-2458-6d5d-c490-3421f7d3afb3@arm.com>
+To: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Cc: linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMTYvMTAvMTcgMTY6NDYsIERhdmUgTWFydGluIHdyb3RlOgo+IE9uIFRodSwgT2N0IDEyLCAy
-MDE3IGF0IDAxOjU2OjUxUE0gKzAxMDAsIFN1enVraSBLIFBvdWxvc2Ugd3JvdGU6Cj4+IE9uIDEw
-LzEwLzE3IDE5OjM4LCBEYXZlIE1hcnRpbiB3cm90ZToKPj4+IFRoaXMgcGF0Y2ggdXNlcyB0aGUg
-Y3B1ZmVhdHVyZXMgZnJhbWV3b3JrIHRvIGRldGVybWluZSBjb21tb24gU1ZFCj4+PiBjYXBhYmls
-aXRpZXMgYW5kIHZlY3RvciBsZW5ndGhzLCBhbmQgY29uZmlndXJlcyB0aGUgcnVudGltZSBTVkUK
-Pj4+IHN1cHBvcnQgY29kZSBhcHByb3ByaWF0ZWx5Lgo+Pj4KPj4+IFpDUl9FTHggaXMgbm90IHJl
-YWxseSBhIGZlYXR1cmUgcmVnaXN0ZXIsIGJ1dCBpdCBpcyBjb252ZW5pZW50IHRvCj4+PiB1c2Ug
-aXQgYXMgYSB0ZW1wbGF0ZSBmb3IgcmVjb3JkaW5nIHRoZSBtYXhpbXVtIHZlY3RvciBsZW5ndGgK
-Pj4+IHN1cHBvcnRlZCBieSBhIENQVSwgdXNpbmcgdGhlIExFTiBmaWVsZC4gIFRoaXMgZmllbGQg
-aXMgc2ltaWxhciB0bwo+Pj4gYSBmZWF0dXJlIGZpZWxkIGluIHRoYXQgaXQgaXMgYSBjb250aWd1
-b3VzIGJpdGZpZWxkIGZvciB3aGljaCB3ZQo+Pj4gd2FudCB0byBkZXRlcm1pbmUgdGhlIG1pbmlt
-dW0gc3lzdGVtLXdpZGUgdmFsdWUuICBUaGlzIHBhdGNoIGFkZHMKPj4+IFpDUiBhcyBhIHBzZXVk
-by1yZWdpc3RlciBpbiBjcHVpbmZvL2NwdWZlYXR1cmVzLCB3aXRoIGFwcHJvcHJpYXRlCj4+PiBj
-dXN0b20gY29kZSB0byBwb3B1bGF0ZSBpdC4gIEZpbmRpbmcgdGhlIG1pbmltdW0gc3VwcG9ydGVk
-IHZhbHVlIG9mCj4+PiB0aGUgTEVOIGZpZWxkIGlzIGxlZnQgdG8gdGhlIGNwdWZlYXR1cmVzIGZy
-YW1ld29yayBpbiB0aGUgdXN1YWwKPj4+IHdheS4KPj4+Cj4+PiBUaGUgbWVhbmluZyBvZiBJRF9B
-QTY0WkZSMF9FTDEgaXMgbm90IGFyY2hpdGVjdHVyYWxseSBkZWZpbmVkIHlldCwKPj4+IHNvIGZv
-ciBub3cgd2UganVzdCByZXF1aXJlIGl0IHRvIGJlIHplcm8uCj4+Pgo+Pj4gTm90ZSB0aGF0IG11
-Y2ggb2YgdGhpcyBjb2RlIGlzIGRvcm1hbnQgYW5kIFNWRSBzdGlsbCB3b24ndCBiZSB1c2VkCj4+
-PiB5ZXQsIHNpbmNlIHN5c3RlbV9zdXBwb3J0c19zdmUoKSByZW1haW5zIGhhcmR3aXJlZCB0byBm
-YWxzZS4KPj4+Cj4+PiBTaWduZWQtb2ZmLWJ5OiBEYXZlIE1hcnRpbiA8RGF2ZS5NYXJ0aW5AYXJt
-LmNvbT4KPj4+IENjOiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+Cj4+PiBD
-YzogU3V6dWtpIEsgUG91bG9zZSA8U3V6dWtpLlBvdWxvc2VAYXJtLmNvbT4KPj4+Cj4+PiAtLS0K
-Pj4+Cj4+PiBEcm9wcGVkIEFsZXggQmVubsOpZSdzIFJldmlld2VkLWJ5LCBzaW5jZSB0aGVyZSBp
-cyBuZXcgbG9naWMgaW4gdGhpcwo+Pj4gcGF0Y2guCj4+Pgo+Pj4gQ2hhbmdlcyBzaW5jZSB2Mgo+
-Pj4gLS0tLS0tLS0tLS0tLS0tLQo+Pj4KPj4+IEJ1ZyBmaXhlczoKPj4+Cj4+PiAgICogR290IHJp
-ZCBvZiBkeW5hbWljIGFsbG9jYXRpb24gb2YgdGhlIHNoYWRvdyB2ZWN0b3IgbGVuZ3RoIG1hcCBk
-dXJpbmcKPj4+ICAgICBzZWNvbmRhcnkgYm9vdC4gIFNlY29uZGFyeSBDUFUgYm9vdCB0YWtlcyBw
-bGFjZSBpbiBhdG9taWMgY29udGV4dCwKPj4+ICAgICBhbmQgcmVseWluZyBvbiBHRlBfQVRPTUlD
-IGhlcmUgZG9lc24ndCBzZWVtIGp1c3RpZmllZC4KPj4+Cj4+PiAgICAgSW5zdGVhZCwgdGhlIG5l
-ZWRlZCBhZGRpdGlvbmFsIGJpdG1hcCBpcyBhbGxvY2F0ZWQgc3RhdGljYWxseS4gIE9ubHkKPj4+
-ICAgICBvbmUgc2hhZG93IG1hcCBpcyBuZWVkZWQsIGJlY2F1c2UgQ1BVcyBkb24ndCBib290IGNv
-bmN1cnJlbnRseS4KPj4+Cj4+PiBSZXF1ZXN0ZWQgYnkgQWxleCBCZW5uw6llOgo+Pj4KPj4+ICAg
-KiBSZWZsb3dlZCB1bnRpZHkgY29tbWVudCBhYm92ZSByZWFkX3pjcl9mZWF0dXJlcygpCj4+Pgo+
-Pj4gICAqIEFkZGVkIGNvbW1lbnRzIHRvIHJlYWRfemNyX2ZlYXR1cmVzKCkgdG8gZXhwbGFpbiB3
-aGF0IGl0J3MgdHJ5aW5nIHRvIGRvCj4+PiAgICAgKHdoaWNoIGlzIG90aGVyd2lzZSBub3QgcmVh
-ZGlseSBhcHBhcmVudCkuCj4+Pgo+Pj4gUmVxdWVzdGVkIGJ5IENhdGFsaW4gTWFyaW5hczoKPj4+
-Cj4+PiAgICogTW92ZWQgZGlzYWJsaW5nIG9mIHRoZSBFTDEgU1ZFIHRyYXAgdG8gdGhlIGNwdWZl
-YXR1cmVzIEMgY29kZS4KPj4+ICAgICBUaGlzIGFsbG93cyBhZGRpdGlvbiBvZiBuZXcgYXNzZW1i
-bGVyIGluIF9fY3B1X3NldHVwIHRvIGJlCj4+PiAgICAgYXZvaWRlZC4KPj4+Cj4+PiBNaXNjZWxs
-YW5lb3VzOgo+Pj4KPj4+ICAgKiBBZGRlZCBjb21tZW50cyBleHBsYWluaW5nIHRoZSBpbnRlbnQs
-IHB1cnBvc2UgYW5kIGJhc2ljIGNvbnN0cmFpbnRzCj4+PiAgICAgZm9yIGZwc2ltZC5jIGhlbHBl
-cnMuCj4+Cj4+IC4uLgo+Pgo+Pj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva2VybmVsL2NwdWZl
-YXR1cmUuYyBiL2FyY2gvYXJtNjQva2VybmVsL2NwdWZlYXR1cmUuYwo+Pj4gaW5kZXggOTJhOTUw
-Mi4uYzVhY2YzOCAxMDA2NDQKPj4+IC0tLSBhL2FyY2gvYXJtNjQva2VybmVsL2NwdWZlYXR1cmUu
-Ywo+Pj4gKysrIGIvYXJjaC9hcm02NC9rZXJuZWwvY3B1ZmVhdHVyZS5jCj4+Cj4+IC4uLgo+Pgo+
-Pj4gQEAgLTY3MCw2ICs2ODksMTQgQEAgdm9pZCB1cGRhdGVfY3B1X2ZlYXR1cmVzKGludCBjcHUs
-Cj4+PiAgIAkJCQkJaW5mby0+cmVnX212ZnIyLCBib290LT5yZWdfbXZmcjIpOwo+Pj4gICAJfQo+
-Pj4gKwlpZiAoaWRfYWE2NHBmcjBfc3ZlKGluZm8tPnJlZ19pZF9hYTY0cGZyMCkpIHsKPj4+ICsJ
-CXRhaW50IHw9IGNoZWNrX3VwZGF0ZV9mdHJfcmVnKFNZU19aQ1JfRUwxLCBjcHUsCj4+PiArCQkJ
-CQlpbmZvLT5yZWdfemNyLCBib290LT5yZWdfemNyKTsKPj4+ICsKPj4+ICsJCWlmICghc3lzX2Nh
-cHNfaW5pdGlhbGlzZWQpCj4+PiArCQkJc3ZlX3VwZGF0ZV92cV9tYXAoKTsKPj4+ICsJfQo+Pgo+
-PiBuaXQ6IEkgYW0gbm90IHN1cmUgaWYgd2Ugc2hvdWxkIGFsc28gY2hlY2sgaWYgdGhlICJjdXJy
-ZW50IiBzYW5pdGlzZWQgdmFsdWUKPj4gb2YgdGhlIGlkX2FhNjRwZnIwIGFsc28gc3VwcG9ydHMg
-c3ZlIGFuZCBza2lwIHRoZSB1cGRhdGUgaWYgaXQgaXNuJ3QuIFRoZSBjb2RlCj4+IGlzIGFzIHN1
-Y2ggZmluZSB3aXRob3V0IHRoZSBjaGVjaywgaXRzIGp1c3QgdGhhdCB3ZSBjYW4gYXZvaWQgY29t
-cHV0aW5nIHRoZQo+PiBtYXAuIEl0IGlzIGluIHRoZSBDUFUgYm9vdCB1cCBwYXRoIGFuZCBoZW5j
-ZSBpcyBub3QgcGVyZm9ybWFuY2UgY3JpdGljYWwuCj4+IFNvLCBlaXRoZXIgd2F5IHdlIGFyZSBm
-aW5lLgo+Pgo+PiBSZXZpZXdlZC1ieTogU3V6dWtpIEsgUG91bG9zZSA8c3V6dWtpLnBvdWxvc2VA
-YXJtLmNvbT4KPiAKPiBJIHRoaW5rIEkgcHJlZmVyIHRvIGF2b2lkIGFkZGluZyBleHRyYSBjb2Rl
-IHRvIG9wdGltaXNlIHRoZSAiYnJva2VuIFNvQwo+IGRlc2lnbiIgY2FzZS4KPiAKClN1cmUuCgo+
-IE1heWJlIHdlIGNvdWxkIHJldmlzaXQgdGhpcyBsYXRlciBpZiBuZWVkZWQuCj4gCj4gQ2FuIHlv
-dSBzdWdnZXN0IHNvbWUgY29kZT8gIE1heWJlIHRoZSBjaGVjayBpcyBzaW1wbGVyIHRoYW4gSSB0
-aGluay4KClNvbWV0aGluZyBsaWtlIDoKCmlmIChpZF9hYTY0cGZyMF9zdmUocmVhZF9zYW5pdGlz
-ZWRfZnRyX3JlZyhTWVNfSURBQTY0UEZSMCkpICYmCiAgICAgaWRfYWE2NHBmcjBfc3ZlKGlkX2Fh
-NjRwZnIwKSkgewogICAgIC4uLgp9CgpzaG91bGQgYmUgZW5vdWdoLgoKT3IgZXZlbiB3ZSBjb3Vs
-ZCBoYWNrIGl0IHRvIDoKCmlmIChpZF9hYTY0cGZyMF9zdmUoaWRfYWE2NHBmcjAgfCByZWFkX3Nh
-bml0aXNlZF9mdHJfcmVnKFNZU19JREFBNjRQRlIwKSkpCgpBcyBJIG1lbnRpb25lZCwgdGhlIGNv
-ZGUgYXMgc3VjaCBpcyBmaW5lLiBJdHMganVzdCB0aGF0IHdlIHRyeSB0byBkZXRlY3QKaWYgdGhl
-IFNWRSBpcyBhbHJlYWR5IG1vb3QgYW5kIHNraXAgdGhlIHN0ZXBzIGZvciB0aGlzIENQVS4KCgpD
-aGVlcnMKU3V6dWtpCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0
-cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+On Mon, Oct 16, 2017 at 05:27:59PM +0100, Suzuki K Poulose wrote:
+> On 16/10/17 16:46, Dave Martin wrote:
+> >On Thu, Oct 12, 2017 at 01:56:51PM +0100, Suzuki K Poulose wrote:
+> >>On 10/10/17 19:38, Dave Martin wrote:
+
+[...]
+
+> >>>@@ -670,6 +689,14 @@ void update_cpu_features(int cpu,
+> >>>  					info->reg_mvfr2, boot->reg_mvfr2);
+> >>>  	}
+> >>>+	if (id_aa64pfr0_sve(info->reg_id_aa64pfr0)) {
+> >>>+		taint |= check_update_ftr_reg(SYS_ZCR_EL1, cpu,
+> >>>+					info->reg_zcr, boot->reg_zcr);
+> >>>+
+> >>>+		if (!sys_caps_initialised)
+> >>>+			sve_update_vq_map();
+> >>>+	}
+> >>
+> >>nit: I am not sure if we should also check if the "current" sanitised value
+> >>of the id_aa64pfr0 also supports sve and skip the update if it isn't. The code
+> >>is as such fine without the check, its just that we can avoid computing the
+> >>map. It is in the CPU boot up path and hence is not performance critical.
+> >>So, either way we are fine.
+> >>
+> >>Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> >
+> >I think I prefer to avoid adding extra code to optimise the "broken SoC
+> >design" case.
+> >
+> 
+> Sure.
+> 
+> >Maybe we could revisit this later if needed.
+> >
+> >Can you suggest some code?  Maybe the check is simpler than I think.
+> 
+> Something like :
+> 
+> if (id_aa64pfr0_sve(read_sanitised_ftr_reg(SYS_IDAA64PFR0)) &&
+>     id_aa64pfr0_sve(id_aa64pfr0)) {
+>     ...
+> }
+> 
+> should be enough.
+> 
+> Or even we could hack it to :
+> 
+> if (id_aa64pfr0_sve(id_aa64pfr0 | read_sanitised_ftr_reg(SYS_IDAA64PFR0)))
+> 
+> As I mentioned, the code as such is fine. Its just that we try to detect
+> if the SVE is already moot and skip the steps for this CPU.
+
+How about the following, keeping the outer
+if(id_aa64pfr0_sve(int->reg_id_aa64pfr0)) from my current code:
+
+-		if (!sys_caps_initialised)
++		/* Probe vector lengths, unless we already gave up on SVE */
++		if (id_aa64pfr0_sve(read_sanitised_ftr_reg(ID_AA64PFR0_SVE)) &&
++		    !sys_caps_initialised)
+			sve_update_vq_map();
+
+Cheers
+---Dave
