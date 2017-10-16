@@ -1,22 +1,23 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v3 10/11] KVM: arm/arm64: Document KVM_DEV_ARM_ITS_CTRL_RESET
-Date: Mon, 16 Oct 2017 17:03:31 +0200
-Message-ID: <1508166212-9599-11-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v3 11/11] KVM: arm/arm64: vgic-its: Implement
+ KVM_DEV_ARM_ITS_CTRL_RESET
+Date: Mon, 16 Oct 2017 17:03:32 +0200
+Message-ID: <1508166212-9599-12-git-send-email-eric.auger@redhat.com>
 References: <1508166212-9599-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4556941185
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 11:03:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8066441185
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 11:03:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xDxx6G0W+V04 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Oct 2017 11:03:40 -0400 (EDT)
+ with ESMTP id Atjq3p+yUKQa for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Oct 2017 11:03:46 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5D71340638
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 11:03:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8092C49D39
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 11:03:46 -0400 (EDT)
 In-Reply-To: <1508166212-9599-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,81 +32,89 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.or
 Cc: wu.wubin@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-At the moment, the in-kernel emulated ITS is not properly reset.
-On guest restart/reset some registers keep their old values and
-internal structures like device, ITE, and collection lists are not
-freed.
-
-This may lead to various bugs. Among them, we can have incorrect state
-backup or failure when saving the ITS state at early guest boot stage.
-
-This patch documents a new attribute, KVM_DEV_ARM_ITS_CTRL_RESET in
-the KVM_DEV_ARM_VGIC_GRP_CTRL group.
-
-Upon this action, we can reset registers and especially those
-pointing to tables previously allocated by the guest and free
-the internal data structures storing the list of devices, collections
-and lpis.
-
-The usual approach for device reset of having userspace write
-the reset values of the registers to the kernel via the register
-read/write APIs doesn't work for the ITS because it has some
-internal state (caches) which is not exposed as registers,
-and there is no register interface for "drop cached data without
-writing it back to RAM". So we need a KVM API which mimics the
-hardware's reset line, to provide the equivalent behaviour to
-a "pull the power cord out of the back of the machine" reset.
+On reset we clear the valid bits of GITS_CBASER and GITS_BASER<n>.
+We also clear command queue registers and free the cache (device,
+collection, and lpi lists).
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reported-by: wanghaibin <wanghaibin.wang@huawei.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 
 ---
+
 v2 -> v3:
-- reword commit message, credit to Peter Maydell.
-- take into account Christoffer rewording comments but still
-  kept details. Added Peter's comment but still kept details.
-  Peter may disagree.
-
-v1 -> v2:
-- Describe architecturally-defined reset values
+- added Christoffer's R-b
 ---
- Documentation/virtual/kvm/devices/arm-vgic-its.txt | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ arch/arm/include/uapi/asm/kvm.h   |  1 +
+ arch/arm64/include/uapi/asm/kvm.h |  1 +
+ virt/kvm/arm/vgic/vgic-its.c      | 18 ++++++++++++++++++
+ 3 files changed, 20 insertions(+)
 
-diff --git a/Documentation/virtual/kvm/devices/arm-vgic-its.txt b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
-index eb06beb..4e9bb6f 100644
---- a/Documentation/virtual/kvm/devices/arm-vgic-its.txt
-+++ b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
-@@ -33,6 +33,10 @@ Groups:
-       request the initialization of the ITS, no additional parameter in
-       kvm_device_attr.addr.
+diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+index 5db2d4c..7ef0c06 100644
+--- a/arch/arm/include/uapi/asm/kvm.h
++++ b/arch/arm/include/uapi/asm/kvm.h
+@@ -215,6 +215,7 @@ struct kvm_arch_memory_slot {
+ #define   KVM_DEV_ARM_ITS_SAVE_TABLES		1
+ #define   KVM_DEV_ARM_ITS_RESTORE_TABLES	2
+ #define   KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES	3
++#define   KVM_DEV_ARM_ITS_CTRL_RESET		4
  
-+    KVM_DEV_ARM_ITS_CTRL_RESET
-+      reset the ITS, no additional parameter in kvm_device_attr.addr.
-+      See "ITS Reset State" section.
+ /* KVM_IRQ_LINE irq field index values */
+ #define KVM_ARM_IRQ_TYPE_SHIFT		24
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index 9f3ca24..b5306ce 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -227,6 +227,7 @@ struct kvm_arch_memory_slot {
+ #define   KVM_DEV_ARM_ITS_SAVE_TABLES           1
+ #define   KVM_DEV_ARM_ITS_RESTORE_TABLES        2
+ #define   KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES	3
++#define   KVM_DEV_ARM_ITS_CTRL_RESET		4
+ 
+ /* Device Control API on vcpu fd */
+ #define KVM_ARM_VCPU_PMU_V3_CTRL	0
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index c3f57ea..789b7be 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -2455,6 +2455,19 @@ static int vgic_its_commit_v0(struct vgic_its *its)
+ 	return 0;
+ }
+ 
++static void vgic_its_reset(struct kvm *kvm, struct vgic_its *its)
++{
++	/* We need to keep the ABI specific field values */
++	its->baser_coll_table &= ~GITS_BASER_VALID;
++	its->baser_device_table &= ~GITS_BASER_VALID;
++	its->cbaser = 0;
++	its->creadr = 0;
++	its->cwriter = 0;
++	its->enabled = 0;
++	vgic_its_free_device_list(kvm, its);
++	vgic_its_free_collection_list(kvm, its);
++}
 +
-     KVM_DEV_ARM_ITS_SAVE_TABLES
-       save the ITS table data into guest RAM, at the location provisioned
-       by the guest in corresponding registers/table entries.
-@@ -157,3 +161,19 @@ Then vcpus can be started.
-  - pINTID is the physical LPI ID; if zero, it means the entry is not valid
-    and other fields are not meaningful.
-  - ICID is the collection ID
-+
-+ ITS Reset State:
-+ ----------------
-+
-+RESET returns the ITS to the same state that it was when first created and
-+inited:
-+
-+- The ITS is not enabled and quiescent
-+  GITS_CTLR.Enabled = 0 .Quiescent=1
-+- There is no internally cache state
-+- No collection or device table are used
-+  GITS_BASER<n>.Valid = 0
-+- The command queue is not allocated:
-+  GITS_CBASER = 0, GITS_CREADR = 0, GITS_CWRITER = 0
-+- The ABI version is unchanged and remains the one set when the ITS
-+  device was first created.
+ static int vgic_its_has_attr(struct kvm_device *dev,
+ 			     struct kvm_device_attr *attr)
+ {
+@@ -2469,6 +2482,8 @@ static int vgic_its_has_attr(struct kvm_device *dev,
+ 		switch (attr->attr) {
+ 		case KVM_DEV_ARM_VGIC_CTRL_INIT:
+ 			return 0;
++		case KVM_DEV_ARM_ITS_CTRL_RESET:
++			return 0;
+ 		case KVM_DEV_ARM_ITS_SAVE_TABLES:
+ 			return 0;
+ 		case KVM_DEV_ARM_ITS_RESTORE_TABLES:
+@@ -2513,6 +2528,9 @@ static int vgic_its_set_attr(struct kvm_device *dev,
+ 		case KVM_DEV_ARM_VGIC_CTRL_INIT:
+ 			/* Nothing to do */
+ 			return 0;
++		case KVM_DEV_ARM_ITS_CTRL_RESET:
++			vgic_its_reset(dev->kvm, its);
++			return 0;
+ 		case KVM_DEV_ARM_ITS_SAVE_TABLES:
+ 			return abi->save_tables(its);
+ 		case KVM_DEV_ARM_ITS_RESTORE_TABLES:
 -- 
 2.5.5
