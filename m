@@ -1,108 +1,87 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCH v3 16/28] arm64/sve: Probe SVE capabilities and usable
- vector lengths
-Date: Mon, 16 Oct 2017 17:58:45 +0100
-Message-ID: <d08bc563-93ea-f438-ba58-14db5b57f66a@arm.com>
-References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
- <1507660725-7986-17-git-send-email-Dave.Martin@arm.com>
- <a39354fb-9f21-47ff-2ad9-b5bcb04e9990@arm.com>
- <20171016154557.GR19485@e103592.cambridge.arm.com>
- <812b6d11-2458-6d5d-c490-3421f7d3afb3@arm.com>
- <20171016164407.GS19485@e103592.cambridge.arm.com>
- <7854a2cc-d3b1-ac76-8d12-2aa5e1be7aca@arm.com>
- <20171016165553.GT19485@e103592.cambridge.arm.com>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v3 15/20] KVM: arm64: Set an impdef ESR for Virtual-SError
+ using VSESR_EL2.
+Date: Mon, 16 Oct 2017 18:02:51 +0100
+Message-ID: <59E4E63B.2050208@arm.com>
+References: <0184EA26B2509940AA629AE1405DD7F2016959EE@DGGEMA503-MBX.china.huawei.com>
+ <CAMj-D2BbOJBOUnY5r6mGUBB34Lq_z6xGAhvHyuNFjp29KLif7Q@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arch-owner@vger.kernel.org>
-In-Reply-To: <20171016165553.GT19485@e103592.cambridge.arm.com>
-Content-Language: en-US
-Sender: linux-arch-owner@vger.kernel.org
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D968A49D1F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 13:03:36 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 0B-4aXRy+lae for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Oct 2017 13:03:35 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AE1E40795
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 13:03:35 -0400 (EDT)
+In-Reply-To: <CAMj-D2BbOJBOUnY5r6mGUBB34Lq_z6xGAhvHyuNFjp29KLif7Q@mail.gmail.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: gengdongjiu <gengdj.1984@gmail.com>, gengdongjiu <gengdongjiu@huawei.com>
+Cc: "Jonathan.Zhang@cavium.com" <Jonathan.Zhang@cavium.com>, Wuquanming <wuquanming@huawei.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Huangshaoyu <huangshaoyu@huawei.com>, "wangxiongfeng (C)" <wangxiongfeng2@huawei.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 16/10/17 17:55, Dave Martin wrote:
-> On Mon, Oct 16, 2017 at 05:47:16PM +0100, Suzuki K Poulose wrote:
->> On 16/10/17 17:44, Dave Martin wrote:
->>> On Mon, Oct 16, 2017 at 05:27:59PM +0100, Suzuki K Poulose wrote:
->>>> On 16/10/17 16:46, Dave Martin wrote:
->>>>> On Thu, Oct 12, 2017 at 01:56:51PM +0100, Suzuki K Poulose wrote:
->>>>>> On 10/10/17 19:38, Dave Martin wrote:
->>>
->>> [...]
->>>
->>>>>>> @@ -670,6 +689,14 @@ void update_cpu_features(int cpu,
->>>>>>>   					info->reg_mvfr2, boot->reg_mvfr2);
->>>>>>>   	}
->>>>>>> +	if (id_aa64pfr0_sve(info->reg_id_aa64pfr0)) {
->>>>>>> +		taint |= check_update_ftr_reg(SYS_ZCR_EL1, cpu,
->>>>>>> +					info->reg_zcr, boot->reg_zcr);
->>>>>>> +
->>>>>>> +		if (!sys_caps_initialised)
->>>>>>> +			sve_update_vq_map();
->>>>>>> +	}
->>>>>>
->>>>>> nit: I am not sure if we should also check if the "current" sanitised value
->>>>>> of the id_aa64pfr0 also supports sve and skip the update if it isn't. The code
->>>>>> is as such fine without the check, its just that we can avoid computing the
->>>>>> map. It is in the CPU boot up path and hence is not performance critical.
->>>>>> So, either way we are fine.
->>>>>>
->>>>>> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->>>>>
->>>>> I think I prefer to avoid adding extra code to optimise the "broken SoC
->>>>> design" case.
->>>>>
->>>>
->>>> Sure.
->>>>
->>>>> Maybe we could revisit this later if needed.
->>>>>
->>>>> Can you suggest some code?  Maybe the check is simpler than I think.
->>>>
->>>> Something like :
->>>>
->>>> if (id_aa64pfr0_sve(read_sanitised_ftr_reg(SYS_IDAA64PFR0)) &&
->>>>      id_aa64pfr0_sve(id_aa64pfr0)) {
->>>>      ...
->>>> }
->>>>
->>>> should be enough.
->>>>
->>>> Or even we could hack it to :
->>>>
->>>> if (id_aa64pfr0_sve(id_aa64pfr0 | read_sanitised_ftr_reg(SYS_IDAA64PFR0)))
->>>>
->>>> As I mentioned, the code as such is fine. Its just that we try to detect
->>>> if the SVE is already moot and skip the steps for this CPU.
->>>
->>> How about the following, keeping the outer
->>> if(id_aa64pfr0_sve(int->reg_id_aa64pfr0)) from my current code:
->>>
->>> -		if (!sys_caps_initialised)
->>> +		/* Probe vector lengths, unless we already gave up on SVE */
->>> +		if (id_aa64pfr0_sve(read_sanitised_ftr_reg(ID_AA64PFR0_SVE)) &&
->>> +		    !sys_caps_initialised)
->>> 			sve_update_vq_map();
+Hi gengdongjiu,
+
+On 16/10/17 04:17, gengdongjiu wrote:
+>> In fact I have below method for that, what do you think about that?
 >>
->> Yep, that looks neater.
+>> 1.  If there is no RAS, old method, directly inject virtual SError, not need to specify ESR, as shown in the [1]
+>> 2.  If there is RAS, KVM set "the kvm_run" guest exit type value to let user space handle the SError abort
+>>    A. If ESR_EL2 is IMPLEMENTATION or uncategorized, return " ESR_ELx_ISV " to let user space specify an implementation-defined value, as shown [2]
+>>    B. If ESR_EL2 is categorized and error not propagated,  the error come from guest user space, return " (ESR_ELx_AET_UCU | ESR_ELx_FSC_SERROR " to let user space specify a recoverable ESR.
+>>      Here one side calling memory failure, another side let user pace inject SError. Because usually SEI notification does not deliver SIGBUS signal to user space, so here inject virtual SEI to ensure that. As shown [3]
+>>    C. If ESR_EL2 is categorized and error not propagated,  the error come from guest kernel, return "-1" to terminate guest. As shown [4]
+>>    D. Otherwise, Panic host OS. As shown [5]
+>>
 > 
-> Sorry, that should have been
+> For the IMPLEMENTATION ESR, for the safety purposes, I have below suggestion
 > 
-> 	if (id_aa64pfr0_sve(read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1)) &&
-> 
-> (Disturbingly, the original does build and then hits a BUG(), because
-> ID_AA64PFR0_SVE happens to be defined).
+> 1. When there is no guest,  host OS receives IMPLEMENTATION ESR, I
+> hope host can be panic, because we do not know its implementation
+> meaning.
 
-Ouch ! I didn't notice that ;-). Good to see the BUG() catching such mistakes.
+> 2. when guest received MPLEMENTATION  ESR, and the Error is isolated
+> to guest by "ESB" instruction, not propagate to host. I hope guest
+> will exit, but host not panic.
 
-> 
-> 
-> With the above, are you happy for me to apply your Reviewed-by, or would
-> you prefer to wait for the respin?
+How do we know if impdef SError values are contained by ESB?
 
-With the changes as we discussed above, please feel free to
-add :
+'2.4.3 ESB and other physical errors' of [0]:
+> It is IMPLEMENTATION DEFINED whether IMPLEMENTATION DEFINED and uncategorized
+> SError interrupts are containable or Uncontainable, and whether they can be
+> synchronized by an Error Synchronization Barrier.
 
-Reviewed-by : Suzuki K Poulose <suzuki.poulose@arm.com>
+
+> 3. when guest received MPLEMENTATION  ESR, and the Error is propagate
+> to host, I hope host can be panic.
+
+
+I tried to keep this behaviour 'the same' because I don't think there is a
+'right thing' to do here:
+If the SError is due to some catastrophic failure, we should panic the host. If
+the SError is due to the guest poking a device we don't want to panic the host.
+
+We can't tell these two cases apart.
+
+We can spot RAS errors and handle those.
+
+
+Thanks,
+
+James
+
+[0]
+https://static.docs.arm.com/ddi0587/a/RAS%20Extension-release%20candidate_march_29.pdf
