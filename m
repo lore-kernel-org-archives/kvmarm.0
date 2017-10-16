@@ -1,27 +1,27 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH 09/10] KVM: arm/arm64: Detangle kvm_mmu.h from kvm_hyp.h
-Date: Mon, 16 Oct 2017 22:08:44 +0200
-Message-ID: <20171016200844.GL1845@lvm>
+Subject: Re: [PATCH 02/10] arm64: KVM: Add invalidate_icache_range helper
+Date: Mon, 16 Oct 2017 22:08:53 +0200
+Message-ID: <20171016200853.GM1845@lvm>
 References: <20171009152032.27804-1-marc.zyngier@arm.com>
- <20171009152032.27804-10-marc.zyngier@arm.com>
+ <20171009152032.27804-3-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D249341185
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 16:07:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1761A41185
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 16:08:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PJnQxnm8950t for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Oct 2017 16:07:51 -0400 (EDT)
-Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com [74.125.82.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D17C040D25
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 16:07:50 -0400 (EDT)
-Received: by mail-wm0-f50.google.com with SMTP id q124so6285421wmb.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 13:08:47 -0700 (PDT)
+ with ESMTP id boZ8H0f8aEug for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Oct 2017 16:08:00 -0400 (EDT)
+Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0A37D49D09
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 16:08:00 -0400 (EDT)
+Received: by mail-wm0-f42.google.com with SMTP id t69so6260795wmt.2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 13:08:56 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <20171009152032.27804-10-marc.zyngier@arm.com>
+In-Reply-To: <20171009152032.27804-3-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,122 +35,101 @@ To: Marc Zyngier <marc.zyngier@arm.com>
 Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Oct 09, 2017 at 04:20:31PM +0100, Marc Zyngier wrote:
-> kvm_hyp.h has an odd dependency on kvm_mmu.h, which makes the
-> opposite inclusion impossible. Let's start with breaking that
-> useless dependency.
+On Mon, Oct 09, 2017 at 04:20:24PM +0100, Marc Zyngier wrote:
+> We currently tightly couple dcache clean with icache invalidation,
+> but KVM could do without the initial flush to PoU, as we've
+> already flushed things to PoC.
+> 
+> Let's introduce invalidate_icache_range which is limited to
+> invalidating the icache from the linear mapping (and thus
+> has none of the userspace fault handling complexity), and
+> wire it in KVM instead of flush_icache_range.
 > 
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
-
 > ---
->  arch/arm/include/asm/kvm_hyp.h   | 1 -
->  arch/arm/kvm/hyp/switch.c        | 1 +
->  arch/arm/kvm/hyp/tlb.c           | 1 +
->  arch/arm64/include/asm/kvm_hyp.h | 1 -
->  arch/arm64/kvm/hyp/debug-sr.c    | 1 +
->  arch/arm64/kvm/hyp/switch.c      | 1 +
->  arch/arm64/kvm/hyp/tlb.c         | 1 +
->  virt/kvm/arm/hyp/vgic-v2-sr.c    | 1 +
->  8 files changed, 6 insertions(+), 2 deletions(-)
+>  arch/arm64/include/asm/cacheflush.h |  8 ++++++++
+>  arch/arm64/include/asm/kvm_mmu.h    |  4 ++--
+>  arch/arm64/mm/cache.S               | 24 ++++++++++++++++++++++++
+>  3 files changed, 34 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/arm/include/asm/kvm_hyp.h b/arch/arm/include/asm/kvm_hyp.h
-> index ad541f9ecc78..8b29faa119ba 100644
-> --- a/arch/arm/include/asm/kvm_hyp.h
-> +++ b/arch/arm/include/asm/kvm_hyp.h
-> @@ -21,7 +21,6 @@
->  #include <linux/compiler.h>
->  #include <linux/kvm_host.h>
->  #include <asm/cp15.h>
-> -#include <asm/kvm_mmu.h>
->  #include <asm/vfp.h>
->  
->  #define __hyp_text __section(.hyp.text) notrace
-> diff --git a/arch/arm/kvm/hyp/switch.c b/arch/arm/kvm/hyp/switch.c
-> index ebd2dd46adf7..67e0a689c4b5 100644
-> --- a/arch/arm/kvm/hyp/switch.c
-> +++ b/arch/arm/kvm/hyp/switch.c
-> @@ -18,6 +18,7 @@
->  
->  #include <asm/kvm_asm.h>
->  #include <asm/kvm_hyp.h>
-> +#include <asm/kvm_mmu.h>
->  
->  __asm__(".arch_extension     virt");
->  
-> diff --git a/arch/arm/kvm/hyp/tlb.c b/arch/arm/kvm/hyp/tlb.c
-> index 6d810af2d9fd..c0edd450e104 100644
-> --- a/arch/arm/kvm/hyp/tlb.c
-> +++ b/arch/arm/kvm/hyp/tlb.c
-> @@ -19,6 +19,7 @@
+> diff --git a/arch/arm64/include/asm/cacheflush.h b/arch/arm64/include/asm/cacheflush.h
+> index 76d1cc85d5b1..ad56406944c6 100644
+> --- a/arch/arm64/include/asm/cacheflush.h
+> +++ b/arch/arm64/include/asm/cacheflush.h
+> @@ -52,6 +52,13 @@
+>   *		- start  - virtual start address
+>   *		- end    - virtual end address
+>   *
+> + *	invalidate_icache_range(start, end)
+> + *
+> + *		Invalidate the I-cache in the region described by start, end.
+> + *		Linear mapping only!
+> + *		- start  - virtual start address
+> + *		- end    - virtual end address
+> + *
+>   *	__flush_cache_user_range(start, end)
+>   *
+>   *		Ensure coherency between the I-cache and the D-cache in the
+> @@ -66,6 +73,7 @@
+>   *		- size   - region size
 >   */
+>  extern void flush_icache_range(unsigned long start, unsigned long end);
+> +extern void invalidate_icache_range(unsigned long start, unsigned long end);
+>  extern void __flush_dcache_area(void *addr, size_t len);
+>  extern void __inval_dcache_area(void *addr, size_t len);
+>  extern void __clean_dcache_area_poc(void *addr, size_t len);
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index 4c4cb4f0e34f..48d31ca2ce9c 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -250,8 +250,8 @@ static inline void __coherent_icache_guest_page(struct kvm_vcpu *vcpu,
+>  		/* PIPT or VPIPT at EL2 (see comment in __kvm_tlb_flush_vmid_ipa) */
+>  		void *va = page_address(pfn_to_page(pfn));
 >  
->  #include <asm/kvm_hyp.h>
-> +#include <asm/kvm_mmu.h>
+> -		flush_icache_range((unsigned long)va,
+> -				   (unsigned long)va + size);
+> +		invalidate_icache_range((unsigned long)va,
+> +					(unsigned long)va + size);
+>  	}
+>  }
 >  
->  /**
->   * Flush per-VMID TLBs
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index 4572a9b560fa..afbfbe0c12c5 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -20,7 +20,6 @@
+> diff --git a/arch/arm64/mm/cache.S b/arch/arm64/mm/cache.S
+> index 7f1dbe962cf5..0c330666a8c9 100644
+> --- a/arch/arm64/mm/cache.S
+> +++ b/arch/arm64/mm/cache.S
+> @@ -80,6 +80,30 @@ USER(9f, ic	ivau, x4	)		// invalidate I line PoU
+>  ENDPROC(flush_icache_range)
+>  ENDPROC(__flush_cache_user_range)
 >  
->  #include <linux/compiler.h>
->  #include <linux/kvm_host.h>
-> -#include <asm/kvm_mmu.h>
->  #include <asm/sysreg.h>
->  
->  #define __hyp_text __section(.hyp.text) notrace
-> diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
-> index f5154ed3da6c..d3a13d57f2c5 100644
-> --- a/arch/arm64/kvm/hyp/debug-sr.c
-> +++ b/arch/arm64/kvm/hyp/debug-sr.c
-> @@ -21,6 +21,7 @@
->  #include <asm/debug-monitors.h>
->  #include <asm/kvm_asm.h>
->  #include <asm/kvm_hyp.h>
-> +#include <asm/kvm_mmu.h>
->  
->  #define read_debug(r,n)		read_sysreg(r##n##_el1)
->  #define write_debug(v,r,n)	write_sysreg(v, r##n##_el1)
-> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> index 945e79c641c4..c52f7094122f 100644
-> --- a/arch/arm64/kvm/hyp/switch.c
-> +++ b/arch/arm64/kvm/hyp/switch.c
-> @@ -21,6 +21,7 @@
->  #include <asm/kvm_asm.h>
->  #include <asm/kvm_emulate.h>
->  #include <asm/kvm_hyp.h>
-> +#include <asm/kvm_mmu.h>
->  #include <asm/fpsimd.h>
->  
->  static bool __hyp_text __fpsimd_enabled_nvhe(void)
-> diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
-> index 73464a96c365..131c7772703c 100644
-> --- a/arch/arm64/kvm/hyp/tlb.c
-> +++ b/arch/arm64/kvm/hyp/tlb.c
-> @@ -16,6 +16,7 @@
->   */
->  
->  #include <asm/kvm_hyp.h>
-> +#include <asm/kvm_mmu.h>
->  #include <asm/tlbflush.h>
->  
->  static void __hyp_text __tlb_switch_to_guest_vhe(struct kvm *kvm)
-> diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
-> index a3f18d362366..77ccd8e2090b 100644
-> --- a/virt/kvm/arm/hyp/vgic-v2-sr.c
-> +++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
-> @@ -21,6 +21,7 @@
->  
->  #include <asm/kvm_emulate.h>
->  #include <asm/kvm_hyp.h>
-> +#include <asm/kvm_mmu.h>
->  
->  static void __hyp_text save_elrsr(struct kvm_vcpu *vcpu, void __iomem *base)
->  {
+> +/*
+> + *	invalidate_icache_range(start,end)
+> + *
+> + *	Ensure that the I cache is invalid within specified region. This
+> + *	assumes that this is done on the linear mapping. Do not use it
+> + *	on a userspace range, as this may fault horribly.
+> + *
+> + *	- start   - virtual start address of region
+> + *	- end     - virtual end address of region
+> + */
+> +ENTRY(invalidate_icache_range)
+> +	icache_line_size x2, x3
+> +	sub	x3, x2, #1
+> +	bic	x4, x0, x3
+> +1:
+> +	ic	ivau, x4			// invalidate I line PoU
+> +	add	x4, x4, x2
+> +	cmp	x4, x1
+> +	b.lo	1b
+> +	dsb	ish
+> +	isb
+> +	ret
+> +ENDPROC(invalidate_icache_range)
+> +
+>  /*
+>   *	__flush_dcache_area(kaddr, size)
+>   *
 > -- 
 > 2.14.1
 > 
+
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
