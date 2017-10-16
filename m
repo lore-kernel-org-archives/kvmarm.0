@@ -1,169 +1,191 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH 07/10] KVM: arm/arm64: Preserve Exec permission across
- R/W permission faults
-Date: Mon, 16 Oct 2017 22:08:24 +0200
-Message-ID: <20171016200824.GI1845@lvm>
+Subject: Re: [PATCH 05/10] KVM: arm/arm64: Limit icache invalidation to
+ prefetch aborts
+Date: Mon, 16 Oct 2017 22:08:32 +0200
+Message-ID: <20171016200832.GJ1845@lvm>
 References: <20171009152032.27804-1-marc.zyngier@arm.com>
- <20171009152032.27804-8-marc.zyngier@arm.com>
+ <20171009152032.27804-6-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F303E49D19
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 16:07:39 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 3sWXfjQkQKgH for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Oct 2017 16:07:39 -0400 (EDT)
+Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D18BA49D15
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 16:07:38 -0400 (EDT)
+Received: by mail-wm0-f44.google.com with SMTP id i124so6276026wmf.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 13:08:35 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <20171009152032.27804-8-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
+In-Reply-To: <20171009152032.27804-6-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Oct 09, 2017 at 04:20:29PM +0100, Marc Zyngier wrote:
-> So far, we loose the Exec property whenever we take permission
-> faults, as we always reconstruct the PTE/PMD from scratch. This
-> can be counter productive as we can end-up with the following
-> fault sequence:
+On Mon, Oct 09, 2017 at 04:20:27PM +0100, Marc Zyngier wrote:
+> We've so far eagerly invalidated the icache, no matter how
+> the page was faulted in (data or prefetch abort).
 > 
-> 	X -> RO -> ROX -> RW -> RWX
+> But we can easily track execution by setting the XN bits
+> in the S2 page tables, get the prefetch abort at HYP and
+> perform the icache invalidation at that time only.
 > 
-> Instead, we can lookup the existing PTE/PMD and clear the XN bit in the
-> new entry if it was already cleared in the old one, leadig to a much
-> nicer fault sequence:
-> 
-> 	X -> ROX -> RWX
+> As for most VMs, the instruction working set is pretty
+> small compared to the data set, this is likely to save
+> some traffic (specially as the invalidation is broadcast).
 > 
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
->  arch/arm/include/asm/kvm_mmu.h   | 10 ++++++++++
->  arch/arm64/include/asm/kvm_mmu.h | 10 ++++++++++
->  virt/kvm/arm/mmu.c               | 25 +++++++++++++++++++++++++
->  3 files changed, 45 insertions(+)
+>  arch/arm/include/asm/kvm_mmu.h        | 12 ++++++++++++
+>  arch/arm/include/asm/pgtable.h        |  4 ++--
+>  arch/arm64/include/asm/kvm_mmu.h      | 12 ++++++++++++
+>  arch/arm64/include/asm/pgtable-prot.h |  4 ++--
+>  virt/kvm/arm/mmu.c                    | 19 +++++++++++++++----
+>  5 files changed, 43 insertions(+), 8 deletions(-)
 > 
 > diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-> index bf76150aad5f..ad442d86c23e 100644
+> index 6773dcf21bff..bf76150aad5f 100644
 > --- a/arch/arm/include/asm/kvm_mmu.h
 > +++ b/arch/arm/include/asm/kvm_mmu.h
-> @@ -107,6 +107,11 @@ static inline bool kvm_s2pte_readonly(pte_t *pte)
->  	return (pte_val(*pte) & L_PTE_S2_RDWR) == L_PTE_S2_RDONLY;
+> @@ -85,6 +85,18 @@ static inline pmd_t kvm_s2pmd_mkwrite(pmd_t pmd)
+>  	return pmd;
 >  }
 >  
-> +static inline bool kvm_s2pte_exec(pte_t *pte)
+> +static inline pte_t kvm_s2pte_mkexec(pte_t pte)
 > +{
-> +	return !(pte_val(*pte) & L_PTE_XN);
+> +	pte_val(pte) &= ~L_PTE_XN;
+> +	return pte;
 > +}
 > +
->  static inline void kvm_set_s2pmd_readonly(pmd_t *pmd)
+> +static inline pmd_t kvm_s2pmd_mkexec(pmd_t pmd)
+> +{
+> +	pmd_val(pmd) &= ~PMD_SECT_XN;
+> +	return pmd;
+> +}
+> +
+>  static inline void kvm_set_s2pte_readonly(pte_t *pte)
 >  {
->  	pmd_val(*pmd) = (pmd_val(*pmd) & ~L_PMD_S2_RDWR) | L_PMD_S2_RDONLY;
-> @@ -117,6 +122,11 @@ static inline bool kvm_s2pmd_readonly(pmd_t *pmd)
->  	return (pmd_val(*pmd) & L_PMD_S2_RDWR) == L_PMD_S2_RDONLY;
->  }
+>  	pte_val(*pte) = (pte_val(*pte) & ~L_PTE_S2_RDWR) | L_PTE_S2_RDONLY;
+> diff --git a/arch/arm/include/asm/pgtable.h b/arch/arm/include/asm/pgtable.h
+> index 1c462381c225..9b6e77b9ab7e 100644
+> --- a/arch/arm/include/asm/pgtable.h
+> +++ b/arch/arm/include/asm/pgtable.h
+> @@ -102,8 +102,8 @@ extern pgprot_t		pgprot_s2_device;
+>  #define PAGE_HYP_EXEC		_MOD_PROT(pgprot_kernel, L_PTE_HYP | L_PTE_RDONLY)
+>  #define PAGE_HYP_RO		_MOD_PROT(pgprot_kernel, L_PTE_HYP | L_PTE_RDONLY | L_PTE_XN)
+>  #define PAGE_HYP_DEVICE		_MOD_PROT(pgprot_hyp_device, L_PTE_HYP)
+> -#define PAGE_S2			_MOD_PROT(pgprot_s2, L_PTE_S2_RDONLY)
+> -#define PAGE_S2_DEVICE		_MOD_PROT(pgprot_s2_device, L_PTE_S2_RDONLY)
+> +#define PAGE_S2			_MOD_PROT(pgprot_s2, L_PTE_S2_RDONLY | L_PTE_XN)
+> +#define PAGE_S2_DEVICE		_MOD_PROT(pgprot_s2_device, L_PTE_S2_RDONLY | L_PTE_XN)
 >  
-> +static inline bool kvm_s2pmd_exec(pmd_t *pmd)
-> +{
-> +	return !(pmd_val(*pmd) & PMD_SECT_XN);
-> +}
-> +
->  static inline bool kvm_page_empty(void *ptr)
->  {
->  	struct page *ptr_page = virt_to_page(ptr);
+>  #define __PAGE_NONE		__pgprot(_L_PTE_DEFAULT | L_PTE_RDONLY | L_PTE_XN | L_PTE_NONE)
+>  #define __PAGE_SHARED		__pgprot(_L_PTE_DEFAULT | L_PTE_USER | L_PTE_XN)
 > diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index 60c420a5ac0d..e7af74b8b51a 100644
+> index 48d31ca2ce9c..60c420a5ac0d 100644
 > --- a/arch/arm64/include/asm/kvm_mmu.h
 > +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -203,6 +203,11 @@ static inline bool kvm_s2pte_readonly(pte_t *pte)
->  	return (pte_val(*pte) & PTE_S2_RDWR) == PTE_S2_RDONLY;
+> @@ -173,6 +173,18 @@ static inline pmd_t kvm_s2pmd_mkwrite(pmd_t pmd)
+>  	return pmd;
 >  }
 >  
-> +static inline bool kvm_s2pte_exec(pte_t *pte)
+> +static inline pte_t kvm_s2pte_mkexec(pte_t pte)
 > +{
-> +	return !(pte_val(*pte) & PTE_S2_XN);
+> +	pte_val(pte) &= ~PTE_S2_XN;
+> +	return pte;
 > +}
 > +
->  static inline void kvm_set_s2pmd_readonly(pmd_t *pmd)
+> +static inline pmd_t kvm_s2pmd_mkexec(pmd_t pmd)
+> +{
+> +	pmd_val(pmd) &= ~PMD_S2_XN;
+> +	return pmd;
+> +}
+> +
+>  static inline void kvm_set_s2pte_readonly(pte_t *pte)
 >  {
->  	kvm_set_s2pte_readonly((pte_t *)pmd);
-> @@ -213,6 +218,11 @@ static inline bool kvm_s2pmd_readonly(pmd_t *pmd)
->  	return kvm_s2pte_readonly((pte_t *)pmd);
->  }
+>  	pteval_t old_pteval, pteval;
+> diff --git a/arch/arm64/include/asm/pgtable-prot.h b/arch/arm64/include/asm/pgtable-prot.h
+> index 0a5635fb0ef9..4e12dabd342b 100644
+> --- a/arch/arm64/include/asm/pgtable-prot.h
+> +++ b/arch/arm64/include/asm/pgtable-prot.h
+> @@ -60,8 +60,8 @@
+>  #define PAGE_HYP_RO		__pgprot(_PAGE_DEFAULT | PTE_HYP | PTE_RDONLY | PTE_HYP_XN)
+>  #define PAGE_HYP_DEVICE		__pgprot(PROT_DEVICE_nGnRE | PTE_HYP)
 >  
-> +static inline bool kvm_s2pmd_exec(pmd_t *pmd)
-> +{
-> +	return !(pmd_val(*pmd) & PMD_S2_XN);
-> +}
-> +
->  static inline bool kvm_page_empty(void *ptr)
->  {
->  	struct page *ptr_page = virt_to_page(ptr);
+> -#define PAGE_S2			__pgprot(PROT_DEFAULT | PTE_S2_MEMATTR(MT_S2_NORMAL) | PTE_S2_RDONLY)
+> -#define PAGE_S2_DEVICE		__pgprot(PROT_DEFAULT | PTE_S2_MEMATTR(MT_S2_DEVICE_nGnRE) | PTE_S2_RDONLY | PTE_UXN)
+> +#define PAGE_S2			__pgprot(PROT_DEFAULT | PTE_S2_MEMATTR(MT_S2_NORMAL) | PTE_S2_RDONLY | PTE_S2_XN)
+> +#define PAGE_S2_DEVICE		__pgprot(PROT_DEFAULT | PTE_S2_MEMATTR(MT_S2_DEVICE_nGnRE) | PTE_S2_RDONLY | PTE_S2_XN)
+>  
+>  #define PAGE_NONE		__pgprot(((_PAGE_DEFAULT) & ~PTE_VALID) | PTE_PROT_NONE | PTE_RDONLY | PTE_PXN | PTE_UXN)
+>  #define PAGE_SHARED		__pgprot(_PAGE_DEFAULT | PTE_USER | PTE_NG | PTE_PXN | PTE_UXN | PTE_WRITE)
 > diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 1911fadde88b..ccc6106764a6 100644
+> index 9e5628388af8..1d47da22f75c 100644
 > --- a/virt/kvm/arm/mmu.c
 > +++ b/virt/kvm/arm/mmu.c
-> @@ -926,6 +926,17 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
->  	return 0;
->  }
+> @@ -1292,7 +1292,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  			  unsigned long fault_status)
+>  {
+>  	int ret;
+> -	bool write_fault, writable, hugetlb = false, force_pte = false;
+> +	bool write_fault, exec_fault, writable, hugetlb = false, force_pte = false;
+>  	unsigned long mmu_seq;
+>  	gfn_t gfn = fault_ipa >> PAGE_SHIFT;
+>  	struct kvm *kvm = vcpu->kvm;
+> @@ -1304,7 +1304,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	unsigned long flags = 0;
 >  
-> +static pte_t *stage2_get_pte(struct kvm *kvm, phys_addr_t addr)
-> +{
-> +	pmd_t *pmdp;
+>  	write_fault = kvm_is_write_fault(vcpu);
+> -	if (fault_status == FSC_PERM && !write_fault) {
+> +	exec_fault = kvm_vcpu_trap_is_iabt(vcpu);
+> +	VM_BUG_ON(write_fault && exec_fault);
 > +
-> +	pmdp = stage2_get_pmd(kvm, NULL, addr);
-> +	if (!pmdp || pmd_none(*pmdp))
-> +		return NULL;
-> +
-> +	return pte_offset_kernel(pmdp, addr);
-> +}
-> +
-
-nit, couldn't you change this to be
-
-    stage2_is_exec(struct kvm *kvm, phys_addr_t addr)
-
-Which, if the pmd is a section mapping just checks that, and if we find
-a pte, we check that, and then we can have a simpler one-line call and
-check from both the pte and pmd paths below?
-
->  static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
->  			  phys_addr_t addr, const pte_t *new_pte,
->  			  unsigned long flags)
-> @@ -1407,6 +1418,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  		if (exec_fault) {
->  			new_pmd = kvm_s2pmd_mkexec(new_pmd);
->  			coherent_icache_guest_page(vcpu, pfn, PMD_SIZE);
-> +		} else if (fault_status == FSC_PERM) {
-> +			/* Preserve execute if XN was already cleared */
-> +			pmd_t *old_pmdp = stage2_get_pmd(kvm, NULL, fault_ipa);
-> +
-> +			if (old_pmdp && pmd_present(*old_pmdp) &&
-> +			    kvm_s2pmd_exec(old_pmdp))
-> +				new_pmd = kvm_s2pmd_mkexec(new_pmd);
-
-Is the reverse case not also possible then?  That is, if we have an
-exec_fault, we could check if the entry is already writable and maintain
-the property as well.  Not sure how often that would get hit though, as
-a VM would only execute instructions on a page that has been written to,
-but is somehow read-only at stage2, meaning the host must have marked
-the page as read-only since content was written.  I think this could be
-a somewhat common pattern with something like KSM though?
-
-
+> +	if (fault_status == FSC_PERM && !write_fault && !exec_fault) {
+>  		kvm_err("Unexpected L2 read permission error\n");
+>  		return -EFAULT;
+>  	}
+> @@ -1398,7 +1401,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  			kvm_set_pfn_dirty(pfn);
 >  		}
+>  		coherent_dcache_guest_page(vcpu, pfn, PMD_SIZE);
+> -		coherent_icache_guest_page(vcpu, pfn, PMD_SIZE);
+> +
+> +		if (exec_fault) {
+> +			new_pmd = kvm_s2pmd_mkexec(new_pmd);
+> +			coherent_icache_guest_page(vcpu, pfn, PMD_SIZE);
+> +		}
 >  
 >  		ret = stage2_set_pmd_huge(kvm, memcache, fault_ipa, &new_pmd);
-> @@ -1425,6 +1443,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  		if (exec_fault) {
->  			new_pte = kvm_s2pte_mkexec(new_pte);
->  			coherent_icache_guest_page(vcpu, pfn, PAGE_SIZE);
-> +		} else if (fault_status == FSC_PERM) {
-> +			/* Preserve execute if XN was already cleared */
-> +			pte_t *old_ptep = stage2_get_pte(kvm, fault_ipa);
-> +
-> +			if (old_ptep && pte_present(*old_ptep) &&
-> +			    kvm_s2pte_exec(old_ptep))
-> +				new_pte = kvm_s2pte_mkexec(new_pte);
+>  	} else {
+> @@ -1410,7 +1417,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  			mark_page_dirty(kvm, gfn);
 >  		}
+>  		coherent_dcache_guest_page(vcpu, pfn, PAGE_SIZE);
+> -		coherent_icache_guest_page(vcpu, pfn, PAGE_SIZE);
+> +
+> +		if (exec_fault) {
+> +			new_pte = kvm_s2pte_mkexec(new_pte);
+> +			coherent_icache_guest_page(vcpu, pfn, PAGE_SIZE);
+> +		}
 >  
 >  		ret = stage2_set_pte(kvm, memcache, fault_ipa, &new_pte, flags);
+>  	}
 > -- 
 > 2.14.1
 > 
 
-Thanks,
--Christoffer
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
