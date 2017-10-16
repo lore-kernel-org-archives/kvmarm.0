@@ -1,72 +1,40 @@
-From: gengdongjiu <gengdj.1984@gmail.com>
-Subject: Re: [PATCH v6 5/7] arm64: kvm: route synchronous external abort
- exceptions to el2
-Date: Mon, 16 Oct 2017 21:44:59 +0800
-Message-ID: <CAMj-D2Bn8HUL=HJO-tysisVT4HSTZW0z-xY-1w1EsgPvShFooQ@mail.gmail.com>
-References: <1503916701-13516-1-git-send-email-gengdongjiu@huawei.com>
- <1503916701-13516-6-git-send-email-gengdongjiu@huawei.com>
- <59B17449.6010201@arm.com> <fb7da3e3-d0f7-7ac6-b088-888a563d7ee7@huawei.com>
- <59E49BB8.8080801@arm.com>
+From: Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>
+Subject: Re: [PATCH v3 10/13] firmware: arm_sdei: Add support for CPU and
+ system power states
+Date: Mon, 16 Oct 2017 14:52:05 +0100
+Message-ID: <20171016135204.ncz6fzw5gh3gv57c@armageddon.cambridge.arm.com>
+References: <20170922182614.27885-1-james.morse@arm.com>
+ <20170922182614.27885-11-james.morse@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BAD3240D25
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 09:44:05 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rESw2kM4PFW6 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Oct 2017 09:44:04 -0400 (EDT)
-Received: from mail-vk0-f41.google.com (mail-vk0-f41.google.com
- [209.85.213.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B1A20406D0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 09:44:04 -0400 (EDT)
-Received: by mail-vk0-f41.google.com with SMTP id t203so7678755vke.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 06:45:00 -0700 (PDT)
-In-Reply-To: <59E49BB8.8080801@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>
-Cc: wangkefeng.wang@huawei.com, kvm@vger.kernel.org, david.daney@cavium.com, catalin.marinas@arm.com, tbaicar@codeaurora.org, will.deacon@arm.com, linuxarm@huawei.com, linux@armlinux.org.uk, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, stefan@hello-penguin.com, zjzhang@codeaurora.org, robert.moore@intel.com, gengdongjiu <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, huangshaoyu@huawei.com, huangdaode@hisilicon.com, bp@suse.de, Dave.Martin@arm.com, lenb@kernel.org, mingo@kernel.org, wuquanming@huawei.com, marc.zyngier@arm.com, john.garry@huawei.com, kristina.martsenko@arm.com, cov@codeaurora.org, jonathan.cameron@huawei.com, zhengqiang10@huawei.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, ard.biesheuvel@linaro.org, linux-kernel@vger.kernel.org, wangzhou1@hisilicon.com, mst@redhat.com, shiju.jose@huawei.com
+Content-Type: text/plain; charset=us-ascii
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20170922182614.27885-11-james.morse-5wv7dgnIgG8@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+Cc: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Lorenzo Pieralisi <lorenzo.pieralisi-5wv7dgnIgG8@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Loc Ho <lho-qTEPVZfXA3Y@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi James,
+On Fri, Sep 22, 2017 at 07:26:11PM +0100, James Morse wrote:
+> diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
+> index f24bfb2b9a2d..466b949474df 100644
+> --- a/include/linux/cpuhotplug.h
+> +++ b/include/linux/cpuhotplug.h
+> @@ -88,6 +88,7 @@ enum cpuhp_state {
+>  	CPUHP_AP_PERF_XTENSA_STARTING,
+>  	CPUHP_AP_PERF_METAG_STARTING,
+>  	CPUHP_AP_MIPS_OP_LOONGSON3_STARTING,
+> +	CPUHP_AP_SDEI_STARTING,
 
->
->> Today I added the support to do some minimal emulation for
->> RAS-Error-Record registers, thanks
->> for the good suggestion.
->
-> Where can I find this patch?
-> I'd like to repost it as part of the SError_rework/RAS/IESB series: this is
-> one
-> of the bits KVM needs but I didn't touch as it looks like your updated
-> version
-> of this patch should cover it.
+Nitpick: how generic is this as to apply to other architectures?
+Probably not, so shall we prefix this with ARM_?
 
-I have updated this patch according your suggestion that do some
-emulation for the ERR* trap. and have verified it. but still not sent
-it out. Tomorrow I will send it out for your review(now it is Chinese
-midnight), if you think it is ok, you can add it as part of the
-SError_rework/RAS/IESB series. thanks for your reminder and good
-review comments.
+Not actually a strong preferences but similar question for the
+definitions in the sdei.h files (and maybe the filenames themselves).
 
-
->
->
-> Thanks,
->
-> James
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
->
+-- 
+Catalin
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
