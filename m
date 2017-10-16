@@ -1,82 +1,85 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [RFC 00/11] KVM, EFI, arm64: EFI Runtime Services Sandboxing
-Date: Mon, 16 Oct 2017 22:47:34 +0200
-Message-ID: <20171016204734.GO1845@lvm>
-References: <1503649901-5834-1-git-send-email-florent.revest@arm.com>
- <20170831092615.GB13572@cbox>
- <1506460492.5507.58.camel@gmail.com>
+Subject: Re: [PATCH 00/10] arm/arm64: KVM: limit icache invalidation to
+ prefetch aborts
+Date: Mon, 16 Oct 2017 22:59:16 +0200
+Message-ID: <20171016205916.GP1845@lvm>
+References: <20171009152032.27804-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AF57849D1C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 16:58:24 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id o04+X5H6WHM1 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Oct 2017 16:58:23 -0400 (EDT)
+Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 74E7740638
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 16:58:23 -0400 (EDT)
+Received: by mail-wm0-f44.google.com with SMTP id b189so6368075wmd.4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Oct 2017 13:59:19 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1506460492.5507.58.camel@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Florent Revest <revestflo@gmail.com>
-Cc: Florent Revest <florent.revest@arm.com>, linux-arm-kernel@lists.infradead.org, matt@codeblueprint.co.uk, ard.biesheuvel@linaro.org, pbonzini@redhat.com, rkrcmar@redhat.com, christoffer.dall@linaro.org, catalin.marinas@arm.com, will.deacon@arm.com, mark.rutland@arm.com, marc.zyngier@arm.com, linux-efi@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, leif.lindholm@arm.com
+In-Reply-To: <20171009152032.27804-1-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Sep 26, 2017 at 11:14:52PM +0200, Florent Revest wrote:
-> On Thu, 2017-08-31 at 11:26 +0200, Christoffer Dall wrote:
-> > I wonder if this should be split into two series; one that sets up
-> > anything you may need from KVM, and another one that uses that for
-> > UEFI.
-> > 
-> > There's a lot KVM and UEFI intertwined logic and assumptions in patch
-> > 10, which makes this series a bit hard to read.
+On Mon, Oct 09, 2017 at 04:20:22PM +0100, Marc Zyngier wrote:
+> It was recently reported that on a VM restore, we seem to spend a
+> disproportionate amount of time invalidation the icache. This is
+> partially due to some HW behaviour, but also because we're being a bit
+> dumb and are invalidating the icache for every page we map at S2, even
+> if that on a data access.
 > 
-> The way hypercalls are currently handled in handle_hvc required this
-> mixed patch. Would some kind of HVC subscription mechanism be suitable
-> to have in KVM? (e.g: a function allowing to register a callback on a
-> certain HVC function ID) This would allow the 10/11 patch to keep the
-> kvm code intact.
-
-Yes, I would have no objections to that if it were relatively
-non-invasive at runtime for normal VMs.
-
+> The slightly better way of doing this is to mark the pages XN at S2,
+> and wait for the the guest to execute something in that page, at which
+> point we perform the invalidation. As it is likely that there is a lot
+> less instruction than data, we win (or so we hope).
 > 
-> > I'd like some documentation (in the series and in
-> > Documentation/virtual/kvm) of how this works, and which hidden
-> > assumptions there are. For example, how do you ensure you never
-> > attempt to return to userspace?
+> We also take this opportunity to drop the extra dcache clean to the
+> PoU which is pretty useless, as we already clean all the way to the
+> PoC...
 > 
-> I don't think my code ensured this. I'd need to give it a second look.
+> Running a bare metal test that touches 1GB of memory (using a 4kB
+> stride) leads to the following results on Seattle:
 > 
-> >  How many VCPUs do you support?
+> 4.13:
+> do_fault_read.bin:       0.565885992 seconds time elapsed
+> do_fault_write.bin:       0.738296337 seconds time elapsed
+> do_fault_read_write.bin:       1.241812231 seconds time elapsed
 > 
-> You can create as many VCPUs as you would in a "normal VM". Also, each
-> VCPU can be ran in a kthread.
+> 4.14-rc3+patches:
+> do_fault_read.bin:       0.244961803 seconds time elapsed
+> do_fault_write.bin:       0.422740092 seconds time elapsed
+> do_fault_read_write.bin:       0.643402470 seconds time elapsed
 > 
-> >  Do you support any form of virtual interrupts? How about timers?
+> We're almost halving the time of something that more or less looks
+> like a restore operation. Some larger systems will show much bigger
+> benefits as they become less impacted by the icache invalidation
+> (which is broadcast in the inner shareable domain).
 > 
-> No support for virtual interrupts or timers indeed. The EFI Runtime
-> Services sandboxing wouldn't require that.
+> I've also given it a test run on both Cubietruck and Jetson-TK1.
 > 
-> > Can a VM access physical devices?
+> Tests are archived here:
+> https://git.kernel.org/pub/scm/linux/kernel/git/maz/kvm-ws-tests.git/
 > 
-> The very idea of Runtime Services sandboxing requires Internal VMs to
-> have access to some of the physical devices.
-> 
-> >  How do you debug and trace something like this? Can the VM be
-> > monitored from userspace?
-> 
-> There is nothing ready for that.
-> 
-> > These feel like fundamental questions to me that needs addressing
-> > before I can competently review the code.
-> > 
-> > I think a slightly more concrete motivation and outlining the example
-> > of the broken UEFI on Seattle would help paving the way for these
-> > patches.
-> 
-> As far as I can remember, EFI Runtime Services on this platform have
-> already been reported to sometimes disable or enable interrupts. Maybe
-> someone at ARM has more details about the problem ?
+> I'd value some additional test results on HW I don't have access to.
 > 
 
-Thanks for answering these questions.  If you or anyone else picks up
-this work, we can gather some of the stuff in the thread for
-documentation and todo items.
+What would also be interesting is some insight into how big the hit then
+is on first execution, but that should in no way gate merging these
+patches.
 
 Thanks,
 -Christoffer
