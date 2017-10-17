@@ -1,108 +1,91 @@
-From: James Morse <james.morse@arm.com>
-Subject: [PATCH v4 06/13] Docs: dt: add devicetree binding for describing
- arm64 SDEI firmware
-Date: Tue, 17 Oct 2017 18:44:25 +0100
-Message-ID: <20171017174432.1684-7-james.morse@arm.com>
+From: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+Subject: [PATCH v4 02/13] KVM: arm/arm64: Convert kvm_host_cpu_state to a static per-cpu allocation
+Date: Tue, 17 Oct 2017 18:44:21 +0100
+Message-ID: <20171017174432.1684-3-james.morse@arm.com>
 References: <20171017174432.1684-1-james.morse@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E129140651
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 13:45:41 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YhAT5H-Zx7rn for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Oct 2017 13:45:39 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E15D149D4E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 13:45:38 -0400 (EDT)
-In-Reply-To: <20171017174432.1684-1-james.morse@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org
-Cc: devicetree@vger.kernel.org, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Rob Herring <robh+dt@kernel.org>, Loc Ho <lho@apm.com>, kvmarm@lists.cs.columbia.edu
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20171017174432.1684-1-james.morse-5wv7dgnIgG8@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+Cc: kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Lorenzo Pieralisi <lorenzo.pieralisi-5wv7dgnIgG8@public.gmane.org>, Loc Ho <lho-qTEPVZfXA3Y@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The Software Delegated Exception Interface (SDEI) is an ARM standard
-for registering callbacks from the platform firmware into the OS.
-This is typically used to implement RAS notifications, or from an
-IRQ that has been promoted to a firmware-assisted NMI.
+kvm_host_cpu_state is a per-cpu allocation made from kvm_arch_init()
+used to store the host EL1 registers when KVM switches to a guest.
 
-Add a new devicetree binding to describe the SDE firmware interface.
+Make it easier for ASM to generate pointers into this per-cpu memory
+by making it a static allocation.
 
-Signed-off-by: James Morse <james.morse@arm.com>
-Acked-by: Rob Herring <robh@kernel.org>
-
+Signed-off-by: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+Acked-by: Christoffer Dall <cdall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
 ---
-Changes since v2:
- * Added Rob's Ack
- * Fixed 'childe node' typo
+ virt/kvm/arm/arm.c | 18 +++---------------
+ 1 file changed, 3 insertions(+), 15 deletions(-)
 
-Changes since v1:
-* Added bound IRQ description for binding,
-* Reference SMC-CC, not 'AAPCS like'
-* Move sdei node under firmware node (and the file path)
-
- .../devicetree/bindings/arm/firmware/sdei.txt      | 42 ++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/arm/firmware/sdei.txt
-
-diff --git a/Documentation/devicetree/bindings/arm/firmware/sdei.txt b/Documentation/devicetree/bindings/arm/firmware/sdei.txt
-new file mode 100644
-index 000000000000..ee3f0ff49889
---- /dev/null
-+++ b/Documentation/devicetree/bindings/arm/firmware/sdei.txt
-@@ -0,0 +1,42 @@
-+* Software Delegated Exception Interface (SDEI)
-+
-+Firmware implementing the SDEI functions described in ARM document number
-+ARM DEN 0054A ("Software Delegated Exception Interface") can be used by
-+Linux to receive notification of events such as those generated by
-+firmware-first error handling, or from an IRQ that has been promoted to
-+a firmware-assisted NMI.
-+
-+The interface provides a number of API functions for registering callbacks
-+and enabling/disabling events. Functions are invoked by trapping to the
-+privilege level of the SDEI firmware (specified as part of the binding
-+below) and passing arguments in a manner specified by the "SMC Calling
-+Convention (ARM DEN 0028B):
-+
-+	 r0		=> 32-bit Function ID / return value
-+	{r1 - r3}	=> Parameters
-+
-+Note that the immediate field of the trapping instruction must be set
-+to #0.
-+
-+The SDEI_EVENT_REGISTER function registers a callback in the kernel
-+text to handle the specified event number.
-+
-+The sdei node should be a child node of '/firmware' and have required
-+properties:
-+
-+ - compatible    : should contain:
-+	* "arm,sdei-1.0" : For implementations complying to SDEI version 1.x.
-+
-+ - method        : The method of calling the SDEI firmware. Permitted
-+                   values are:
-+	* "smc" : SMC #0, with the register assignments specified in this
-+	          binding.
-+	* "hvc" : HVC #0, with the register assignments specified in this
-+	          binding.
-+Example:
-+	firmware {
-+		sdei {
-+			compatible	= "arm,sdei-1.0";
-+			method		= "smc";
-+		};
-+	};
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index b9f68e4add71..3786dd7e277d 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -51,8 +51,8 @@
+ __asm__(".arch_extension	virt");
+ #endif
+ 
++DEFINE_PER_CPU(kvm_cpu_context_t, kvm_host_cpu_state);
+ static DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
+-static kvm_cpu_context_t __percpu *kvm_host_cpu_state;
+ 
+ /* Per-CPU variable containing the currently running vcpu. */
+ static DEFINE_PER_CPU(struct kvm_vcpu *, kvm_arm_running_vcpu);
+@@ -351,7 +351,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	}
+ 
+ 	vcpu->cpu = cpu;
+-	vcpu->arch.host_cpu_context = this_cpu_ptr(kvm_host_cpu_state);
++	vcpu->arch.host_cpu_context = this_cpu_ptr(&kvm_host_cpu_state);
+ 
+ 	kvm_arm_set_running_vcpu(vcpu);
+ 
+@@ -1255,19 +1255,8 @@ static inline void hyp_cpu_pm_exit(void)
+ }
+ #endif
+ 
+-static void teardown_common_resources(void)
+-{
+-	free_percpu(kvm_host_cpu_state);
+-}
+-
+ static int init_common_resources(void)
+ {
+-	kvm_host_cpu_state = alloc_percpu(kvm_cpu_context_t);
+-	if (!kvm_host_cpu_state) {
+-		kvm_err("Cannot allocate host CPU state\n");
+-		return -ENOMEM;
+-	}
+-
+ 	/* set size of VMID supported by CPU */
+ 	kvm_vmid_bits = kvm_get_vmid_bits();
+ 	kvm_info("%d-bit VMID\n", kvm_vmid_bits);
+@@ -1412,7 +1401,7 @@ static int init_hyp_mode(void)
+ 	for_each_possible_cpu(cpu) {
+ 		kvm_cpu_context_t *cpu_ctxt;
+ 
+-		cpu_ctxt = per_cpu_ptr(kvm_host_cpu_state, cpu);
++		cpu_ctxt = per_cpu_ptr(&kvm_host_cpu_state, cpu);
+ 		err = create_hyp_mappings(cpu_ctxt, cpu_ctxt + 1, PAGE_HYP);
+ 
+ 		if (err) {
+@@ -1490,7 +1479,6 @@ int kvm_arch_init(void *opaque)
+ out_hyp:
+ 	teardown_hyp_mode();
+ out_err:
+-	teardown_common_resources();
+ 	return err;
+ }
+ 
 -- 
 2.13.3
+
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
