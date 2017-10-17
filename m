@@ -1,202 +1,118 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v4 03/11] KVM: arm/arm64: vgic-its: Improve error reporting on
- device table save
-Date: Tue, 17 Oct 2017 09:10:01 +0200
-Message-ID: <1508224209-15366-4-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v4 02/11] KVM: arm/arm64: vgic-its: fix vgic_its_restore_collection_table returned value
+Date: Tue, 17 Oct 2017 09:10:00 +0200
+Message-ID: <1508224209-15366-3-git-send-email-eric.auger@redhat.com>
 References: <1508224209-15366-1-git-send-email-eric.auger@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CAB9349D19
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 03:09:44 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wI9NvmKRJz0S for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Oct 2017 03:09:43 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BB08D40795
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 03:09:43 -0400 (EDT)
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1508224209-15366-1-git-send-email-eric.auger@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: linux-kernel-owner@vger.kernel.org
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, cdall@linaro.org, peter.maydell@linaro.org, andre.przywara@arm.com, wanghaibin.wang@huawei.com
-Cc: wu.wubin@huawei.com
+Cc: wu.wubin@huawei.com, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-At the moment the device table save() returns -EINVAL if
-vgic_its_check_id() fails to return the gpa of the entry
-associated to the device/collection id. Let vgic_its_check_id()
-return an int instead of a bool and return a more precised
-error value:
-- EINVAL in case the id is out of range
-- EFAULT if the gpa is not provisionned or is not valid
+vgic_its_restore_cte returns +1 if the collection table entry
+is valid and properly decoded. As a consequence, if the
+collection table is fully filled with valid data that are
+decoded without error, vgic_its_restore_collection_table()
+returns +1.  This is wrong.
 
-We also check first the GITS_BASER<n> Valid bit is set.
+Let's use the standard C convention for both vgic_its_restore_cte
+and vgic_its_restore_collection_table. vgic_its_restore_cte now
+returns whether we have reached the end of the table in the @last
+output parameter. vgic_its_restore_collection_table aborts in case
+of error or if the end is found. Otherwise, it now returns 0.
 
-This allows the userspace to discriminate failure reasons.
-
+Fixes: ea1ad53e1e31a3 (KVM: arm64: vgic-its: Collection table save/restore)
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 
-need to CC stable
-
-v2 -> v3:
-- correct kerneldoc comment
+v2 -> v3: creation
 ---
- virt/kvm/arm/vgic/vgic-its.c | 55 +++++++++++++++++++++++++++++---------------
- 1 file changed, 37 insertions(+), 18 deletions(-)
+ virt/kvm/arm/vgic/vgic-its.c | 40 +++++++++++++++++++++++++++++++---------
+ 1 file changed, 31 insertions(+), 9 deletions(-)
 
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index a4ff8f7..e59363e 100644
+index eea14a1..a4ff8f7 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -687,15 +687,25 @@ static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
- 	return 0;
+@@ -2204,7 +2204,19 @@ static int vgic_its_save_cte(struct vgic_its *its,
+ 	return kvm_write_guest(its->dev->kvm, gpa, &val, esz);
  }
  
--/*
-- * Check whether an ID can be stored into the corresponding guest table.
+-static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, int esz)
 +/**
-+ * vgic_its_check_id - Check whether an ID can be stored into
-+ * the corresponding guest table.
++ * vgic_its_restore_cte - Restore a collection table entry
 + *
 + * @its: its handle
-+ * @baser: GITS_BASER<n> register
-+ * @id: id of the device/collection
-+ * @eaddr: output gpa of the corresponding table entry
++ * @gpa: guest physical address of the entry
++ * @esz: entry size
++ * @last: output boolean indicating whether we have reached the
++ *       end of the collection table (ie. an invalid entry was decoded)
 + *
-  * For a direct table this is pretty easy, but gets a bit nasty for
-  * indirect tables. We check whether the resulting guest physical address
-  * is actually valid (covered by a memslot and guest accessible).
-  * For this we have to read the respective first level entry.
-+ *
-+ * Return: 0 on success, -EINVAL if @id is out of range, -EFAULT if
-+ * the address cannot be computed or is not valid
-  */
--static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
--			      gpa_t *eaddr)
-+static int vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
-+			     gpa_t *eaddr)
- {
- 	int l1_tbl_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
- 	u64 indirect_ptr, type = GITS_BASER_TYPE(baser);
-@@ -703,50 +713,56 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
- 	int index;
- 	gfn_t gfn;
- 
-+	if (!(baser & GITS_BASER_VALID))
-+		return -EFAULT;
-+
- 	switch (type) {
- 	case GITS_BASER_TYPE_DEVICE:
- 		if (id >= BIT_ULL(VITS_TYPER_DEVBITS))
--			return false;
-+			return -EINVAL;
- 		break;
- 	case GITS_BASER_TYPE_COLLECTION:
- 		/* as GITS_TYPER.CIL == 0, ITS supports 16-bit collection ID */
- 		if (id >= BIT_ULL(16))
--			return false;
-+			return -EINVAL;
- 		break;
- 	default:
--		return false;
-+		return -EINVAL;
- 	}
- 
- 	if (!(baser & GITS_BASER_INDIRECT)) {
- 		phys_addr_t addr;
- 
- 		if (id >= (l1_tbl_size / esz))
--			return false;
-+			return -EINVAL;
- 
- 		addr = BASER_ADDRESS(baser) + id * esz;
- 		gfn = addr >> PAGE_SHIFT;
- 
- 		if (eaddr)
- 			*eaddr = addr;
--		return kvm_is_visible_gfn(its->dev->kvm, gfn);
-+		if (kvm_is_visible_gfn(its->dev->kvm, gfn))
-+			return 0;
-+		else
-+			return -EFAULT;
- 	}
- 
- 	/* calculate and check the index into the 1st level */
- 	index = id / (SZ_64K / esz);
- 	if (index >= (l1_tbl_size / sizeof(u64)))
--		return false;
-+		return -EINVAL;
- 
- 	/* Each 1st level entry is represented by a 64-bit value. */
- 	if (kvm_read_guest(its->dev->kvm,
- 			   BASER_ADDRESS(baser) + index * sizeof(indirect_ptr),
- 			   &indirect_ptr, sizeof(indirect_ptr)))
--		return false;
-+		return -EFAULT;
- 
- 	indirect_ptr = le64_to_cpu(indirect_ptr);
- 
- 	/* check the valid bit of the first level entry */
- 	if (!(indirect_ptr & BIT_ULL(63)))
--		return false;
-+		return -EFAULT;
- 
- 	/*
- 	 * Mask the guest physical address and calculate the frame number.
-@@ -762,7 +778,10 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
- 
- 	if (eaddr)
- 		*eaddr = indirect_ptr;
--	return kvm_is_visible_gfn(its->dev->kvm, gfn);
-+	if (kvm_is_visible_gfn(its->dev->kvm, gfn))
-+		return 0;
-+	else
-+		return -EFAULT;
- }
- 
- static int vgic_its_alloc_collection(struct vgic_its *its,
-@@ -771,7 +790,7 @@ static int vgic_its_alloc_collection(struct vgic_its *its,
++ * Return: 0 upon success, < 0 on error
++ */
++static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, int esz,
++				bool *last)
  {
  	struct its_collection *collection;
+ 	struct kvm *kvm = its->dev->kvm;
+@@ -2217,7 +2229,8 @@ static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, int esz)
+ 	if (ret)
+ 		return ret;
+ 	val = le64_to_cpu(val);
+-	if (!(val & KVM_ITS_CTE_VALID_MASK))
++	*last = !(val & KVM_ITS_CTE_VALID_MASK);
++	if (*last)
+ 		return 0;
  
--	if (!vgic_its_check_id(its, its->baser_coll_table, coll_id, NULL))
-+	if (vgic_its_check_id(its, its->baser_coll_table, coll_id, NULL))
- 		return E_ITS_MAPC_COLLECTION_OOR;
+ 	target_addr = (u32)(val >> KVM_ITS_CTE_RDBASE_SHIFT);
+@@ -2233,7 +2246,7 @@ static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, int esz)
+ 	if (ret)
+ 		return ret;
+ 	collection->target_addr = target_addr;
+-	return 1;
++	return 0;
+ }
  
- 	collection = kzalloc(sizeof(*collection), GFP_KERNEL);
-@@ -943,7 +962,7 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
- 	gpa_t itt_addr = its_cmd_get_ittaddr(its_cmd);
- 	struct its_device *device;
+ /**
+@@ -2278,8 +2291,13 @@ static int vgic_its_save_collection_table(struct vgic_its *its)
  
--	if (!vgic_its_check_id(its, its->baser_device_table, device_id, NULL))
-+	if (vgic_its_check_id(its, its->baser_device_table, device_id, NULL))
- 		return E_ITS_MAPD_DEVICE_OOR;
+ /**
+  * vgic_its_restore_collection_table - reads the collection table
+- * in guest memory and restores the ITS internal state. Requires the
+- * BASER registers to be restored before.
++ * in guest memory and restores the ITS collection cache.
++ *
++ * @its: its handle
++ *
++ * Requires the Collection BASER to be previously restored.
++ *
++ * Returns 0 on success or < 0 on error
+  */
+ static int vgic_its_restore_collection_table(struct vgic_its *its)
+ {
+@@ -2297,13 +2315,17 @@ static int vgic_its_restore_collection_table(struct vgic_its *its)
+ 	max_size = GITS_BASER_NR_PAGES(its->baser_coll_table) * SZ_64K;
  
- 	if (valid && num_eventid_bits > VITS_TYPER_IDBITS)
-@@ -2093,9 +2112,9 @@ static int vgic_its_save_device_tables(struct vgic_its *its)
- 		int ret;
- 		gpa_t eaddr;
- 
--		if (!vgic_its_check_id(its, baser,
--				       dev->device_id, &eaddr))
--			return -EINVAL;
-+		ret = vgic_its_check_id(its, baser, dev->device_id, &eaddr);
-+		if (ret)
+ 	while (read < max_size) {
+-		ret = vgic_its_restore_cte(its, gpa, cte_esz);
+-		if (ret <= 0)
+-			break;
++		bool last;
++
++		ret = vgic_its_restore_cte(its, gpa, cte_esz, &last);
++		if (ret < 0 || last)
 +			return ret;
+ 		gpa += cte_esz;
+ 		read += cte_esz;
+ 	}
+-	return ret;
++
++	/* table was fully filled with valid entries, decoded without error */
++	return 0;
+ }
  
- 		ret = vgic_its_save_itt(its, dev);
- 		if (ret)
+ /**
 -- 
 2.5.5
