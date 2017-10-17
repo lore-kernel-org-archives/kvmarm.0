@@ -1,183 +1,236 @@
-From: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
-Subject: [PATCH v4 03/13] KVM: arm64: Change hyp_panic()s dependency on tpidr_el2
-Date: Tue, 17 Oct 2017 18:44:22 +0100
-Message-ID: <20171017174432.1684-4-james.morse@arm.com>
+From: James Morse <james.morse@arm.com>
+Subject: [PATCH v4 04/13] arm64: alternatives: use tpidr_el2 on VHE hosts
+Date: Tue, 17 Oct 2017 18:44:23 +0100
+Message-ID: <20171017174432.1684-5-james.morse@arm.com>
 References: <20171017174432.1684-1-james.morse@arm.com>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171017174432.1684-1-james.morse-5wv7dgnIgG8@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-Cc: kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Lorenzo Pieralisi <lorenzo.pieralisi-5wv7dgnIgG8@public.gmane.org>, Loc Ho <lho-qTEPVZfXA3Y@public.gmane.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 92E1249D24
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 13:45:34 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id xSW6OYMskABb for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Oct 2017 13:45:33 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F15B749D48
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 13:45:32 -0400 (EDT)
+In-Reply-To: <20171017174432.1684-1-james.morse@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: linux-arm-kernel@lists.infradead.org
+Cc: devicetree@vger.kernel.org, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Rob Herring <robh+dt@kernel.org>, Loc Ho <lho@apm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Make tpidr_el2 a cpu-offset for per-cpu variables in the same way the
-host uses tpidr_el1. This lets tpidr_el{1,2} have the same value, and
-on VHE they can be the same register.
+Now that KVM uses tpidr_el2 in the same way as Linux's cpu_offset in
+tpidr_el1, merge the two. This saves KVM from save/restoring tpidr_el1
+on VHE hosts, and allows future code to blindly access per-cpu variables
+without triggering world-switch.
 
-KVM calls hyp_panic() when anything unexpected happens. This may occur
-while a guest owns the EL1 registers. KVM stashes the vcpu pointer in
-tpidr_el2, which it uses to find the host context in order to restore
-the host EL1 registers before parachuting into the host's panic().
-
-The host context is a struct kvm_cpu_context allocated in the per-cpu
-area, and mapped to hyp. Given the per-cpu offset for this CPU, this is
-easy to find. Change hyp_panic() to take a pointer to the
-struct kvm_cpu_context. Wrap these calls with an asm function that
-retrieves the struct kvm_cpu_context from the host's per-cpu area.
-
-Copy the per-cpu offset from the hosts tpidr_el1 into tpidr_el2 during
-kvm init. (Later patches will make this unnecessary for VHE hosts)
-
-We print out the vcpu pointer as part of the panic message. Add a back
-reference to the 'running vcpu' in the host cpu context to preserve this.
-
-Signed-off-by: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
-Reviewed-by: Christoffer Dall <cdall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Signed-off-by: James Morse <james.morse@arm.com>
+Reviewed-by: Christoffer Dall <cdall@linaro.org>
 
 ---
+Changes since v3:
+ * Moved 'alternatives_applied' test all into C,
+ * Made enable method static and dragged up before first-use.
+
 Changes since v1:
- * Added a comment explaining how =kvm_host_cpu_state gets from a host-va
-   to a hyp va.
- * Added the first paragraph to the commit message.
+ * cpu_copy_el2regs()'s 'have I been patched' test now always sets a register,
+   just in case the compiler optimises out part of the logic.
 
- arch/arm64/include/asm/kvm_host.h |  2 ++
- arch/arm64/kvm/hyp/hyp-entry.S    | 12 ++++++++++++
- arch/arm64/kvm/hyp/s2-setup.c     |  3 +++
- arch/arm64/kvm/hyp/switch.c       | 25 +++++++++++++------------
- 4 files changed, 30 insertions(+), 12 deletions(-)
+ arch/arm64/include/asm/alternative.h |  2 ++
+ arch/arm64/include/asm/assembler.h   |  8 ++++++++
+ arch/arm64/include/asm/percpu.h      | 11 +++++++++--
+ arch/arm64/kernel/alternative.c      |  9 +++++----
+ arch/arm64/kernel/cpufeature.c       | 17 +++++++++++++++++
+ arch/arm64/mm/proc.S                 |  8 ++++++++
+ 6 files changed, 49 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index e923b58606e2..806ccef7470a 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -191,6 +191,8 @@ struct kvm_cpu_context {
- 		u64 sys_regs[NR_SYS_REGS];
- 		u32 copro[NR_COPRO_REGS];
- 	};
+diff --git a/arch/arm64/include/asm/alternative.h b/arch/arm64/include/asm/alternative.h
+index 6e1cb8c5af4d..f9e2f69f296e 100644
+--- a/arch/arm64/include/asm/alternative.h
++++ b/arch/arm64/include/asm/alternative.h
+@@ -11,6 +11,8 @@
+ #include <linux/stddef.h>
+ #include <linux/stringify.h>
+ 
++extern int alternatives_applied;
 +
-+	struct kvm_vcpu *__hyp_running_vcpu;
- };
+ struct alt_instr {
+ 	s32 orig_offset;	/* offset to original instruction */
+ 	s32 alt_offset;		/* offset to replacement instruction */
+diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
+index d58a6253c6ab..1ba12f59dec0 100644
+--- a/arch/arm64/include/asm/assembler.h
++++ b/arch/arm64/include/asm/assembler.h
+@@ -242,7 +242,11 @@ lr	.req	x30		// link register
+ #else
+ 	adr_l	\dst, \sym
+ #endif
++alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
+ 	mrs	\tmp, tpidr_el1
++alternative_else
++	mrs	\tmp, tpidr_el2
++alternative_endif
+ 	add	\dst, \dst, \tmp
+ 	.endm
  
- typedef struct kvm_cpu_context kvm_cpu_context_t;
-diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index fce7cc507e0a..e4f37b9dd47c 100644
---- a/arch/arm64/kvm/hyp/hyp-entry.S
-+++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -163,6 +163,18 @@ ENTRY(__hyp_do_panic)
- 	eret
- ENDPROC(__hyp_do_panic)
+@@ -253,7 +257,11 @@ lr	.req	x30		// link register
+ 	 */
+ 	.macro ldr_this_cpu dst, sym, tmp
+ 	adr_l	\dst, \sym
++alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
+ 	mrs	\tmp, tpidr_el1
++alternative_else
++	mrs	\tmp, tpidr_el2
++alternative_endif
+ 	ldr	\dst, [\dst, \tmp]
+ 	.endm
  
-+ENTRY(__hyp_panic)
-+	/*
-+	 * '=kvm_host_cpu_state' is a host VA from the constant pool, it may
-+	 * not be accessible by this address from EL2, hyp_panic() converts
-+	 * it with kern_hyp_va() before use.
-+	 */
-+	ldr	x0, =kvm_host_cpu_state
-+	mrs	x1, tpidr_el2
-+	add	x0, x0, x1
-+	b	hyp_panic
-+ENDPROC(__hyp_panic)
-+
- .macro invalid_vector	label, target = __hyp_panic
- 	.align	2
- \label:
-diff --git a/arch/arm64/kvm/hyp/s2-setup.c b/arch/arm64/kvm/hyp/s2-setup.c
-index a81f5e10fc8c..7fb88274eba1 100644
---- a/arch/arm64/kvm/hyp/s2-setup.c
-+++ b/arch/arm64/kvm/hyp/s2-setup.c
-@@ -84,5 +84,8 @@ u32 __hyp_text __init_stage2_translation(void)
+diff --git a/arch/arm64/include/asm/percpu.h b/arch/arm64/include/asm/percpu.h
+index 3bd498e4de4c..43393208229e 100644
+--- a/arch/arm64/include/asm/percpu.h
++++ b/arch/arm64/include/asm/percpu.h
+@@ -16,11 +16,15 @@
+ #ifndef __ASM_PERCPU_H
+ #define __ASM_PERCPU_H
  
- 	write_sysreg(val, vtcr_el2);
++#include <asm/alternative.h>
+ #include <asm/stack_pointer.h>
  
-+	/* copy tpidr_el1 into tpidr_el2 for use by HYP */
-+	write_sysreg(read_sysreg(tpidr_el1), tpidr_el2);
-+
- 	return parange;
- }
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 945e79c641c4..235d615cee30 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -286,9 +286,9 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	u64 exit_code;
- 
- 	vcpu = kern_hyp_va(vcpu);
--	write_sysreg(vcpu, tpidr_el2);
- 
- 	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-+	host_ctxt->__hyp_running_vcpu = vcpu;
- 	guest_ctxt = &vcpu->arch.ctxt;
- 
- 	__sysreg_save_host_state(host_ctxt);
-@@ -393,7 +393,8 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 
- static const char __hyp_panic_string[] = "HYP panic:\nPS:%08llx PC:%016llx ESR:%08llx\nFAR:%016llx HPFAR:%016llx PAR:%016llx\nVCPU:%p\n";
- 
--static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par)
-+static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par,
-+					     struct kvm_vcpu *vcpu)
+ static inline void set_my_cpu_offset(unsigned long off)
  {
- 	unsigned long str_va;
- 
-@@ -407,35 +408,35 @@ static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par)
- 	__hyp_do_panic(str_va,
- 		       spsr,  elr,
- 		       read_sysreg(esr_el2),   read_sysreg_el2(far),
--		       read_sysreg(hpfar_el2), par,
--		       (void *)read_sysreg(tpidr_el2));
-+		       read_sysreg(hpfar_el2), par, vcpu);
+-	asm volatile("msr tpidr_el1, %0" :: "r" (off) : "memory");
++	asm volatile(ALTERNATIVE("msr tpidr_el1, %0",
++				 "msr tpidr_el2, %0",
++				 ARM64_HAS_VIRT_HOST_EXTN)
++			:: "r" (off) : "memory");
  }
  
--static void __hyp_text __hyp_call_panic_vhe(u64 spsr, u64 elr, u64 par)
-+static void __hyp_text __hyp_call_panic_vhe(u64 spsr, u64 elr, u64 par,
-+					    struct kvm_vcpu *vcpu)
- {
- 	panic(__hyp_panic_string,
- 	      spsr,  elr,
- 	      read_sysreg_el2(esr),   read_sysreg_el2(far),
--	      read_sysreg(hpfar_el2), par,
--	      (void *)read_sysreg(tpidr_el2));
-+	      read_sysreg(hpfar_el2), par, vcpu);
- }
+ static inline unsigned long __my_cpu_offset(void)
+@@ -31,7 +35,10 @@ static inline unsigned long __my_cpu_offset(void)
+ 	 * We want to allow caching the value, so avoid using volatile and
+ 	 * instead use a fake stack read to hazard against barrier().
+ 	 */
+-	asm("mrs %0, tpidr_el1" : "=r" (off) :
++	asm(ALTERNATIVE("mrs %0, tpidr_el1",
++			"mrs %0, tpidr_el2",
++			ARM64_HAS_VIRT_HOST_EXTN)
++		: "=r" (off) :
+ 		"Q" (*(const unsigned long *)current_stack_pointer));
  
- static hyp_alternate_select(__hyp_call_panic,
- 			    __hyp_call_panic_nvhe, __hyp_call_panic_vhe,
- 			    ARM64_HAS_VIRT_HOST_EXTN);
+ 	return off;
+diff --git a/arch/arm64/kernel/alternative.c b/arch/arm64/kernel/alternative.c
+index 6dd0a3a3e5c9..414288a558c8 100644
+--- a/arch/arm64/kernel/alternative.c
++++ b/arch/arm64/kernel/alternative.c
+@@ -32,6 +32,8 @@
+ #define ALT_ORIG_PTR(a)		__ALT_PTR(a, orig_offset)
+ #define ALT_REPL_PTR(a)		__ALT_PTR(a, alt_offset)
  
--void __hyp_text __noreturn __hyp_panic(void)
-+void __hyp_text __noreturn hyp_panic(struct kvm_cpu_context *__host_ctxt)
- {
-+	struct kvm_vcpu *vcpu = NULL;
++int alternatives_applied;
 +
- 	u64 spsr = read_sysreg_el2(spsr);
- 	u64 elr = read_sysreg_el2(elr);
- 	u64 par = read_sysreg(par_el1);
+ struct alt_region {
+ 	struct alt_instr *begin;
+ 	struct alt_instr *end;
+@@ -143,7 +145,6 @@ static void __apply_alternatives(void *alt_region, bool use_linear_alias)
+  */
+ static int __apply_alternatives_multi_stop(void *unused)
+ {
+-	static int patched = 0;
+ 	struct alt_region region = {
+ 		.begin	= (struct alt_instr *)__alt_instructions,
+ 		.end	= (struct alt_instr *)__alt_instructions_end,
+@@ -151,14 +152,14 @@ static int __apply_alternatives_multi_stop(void *unused)
  
- 	if (read_sysreg(vttbr_el2)) {
--		struct kvm_vcpu *vcpu;
- 		struct kvm_cpu_context *host_ctxt;
- 
--		vcpu = (struct kvm_vcpu *)read_sysreg(tpidr_el2);
--		host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-+		host_ctxt = kern_hyp_va(__host_ctxt);
-+		vcpu = host_ctxt->__hyp_running_vcpu;
- 		__timer_save_state(vcpu);
- 		__deactivate_traps(vcpu);
- 		__deactivate_vm(vcpu);
-@@ -443,7 +444,7 @@ void __hyp_text __noreturn __hyp_panic(void)
+ 	/* We always have a CPU 0 at this point (__init) */
+ 	if (smp_processor_id()) {
+-		while (!READ_ONCE(patched))
++		while (!READ_ONCE(alternatives_applied))
+ 			cpu_relax();
+ 		isb();
+ 	} else {
+-		BUG_ON(patched);
++		BUG_ON(alternatives_applied);
+ 		__apply_alternatives(&region, true);
+ 		/* Barriers provided by the cache flushing */
+-		WRITE_ONCE(patched, 1);
++		WRITE_ONCE(alternatives_applied, 1);
  	}
  
- 	/* Call panic for real */
--	__hyp_call_panic()(spsr, elr, par);
-+	__hyp_call_panic()(spsr, elr, par, vcpu);
- 
- 	unreachable();
+ 	return 0;
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index cd52d365d1f0..ecceb51f4998 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -796,6 +796,22 @@ static bool has_no_fpsimd(const struct arm64_cpu_capabilities *entry, int __unus
+ 					ID_AA64PFR0_FP_SHIFT) < 0;
  }
+ 
++static int cpu_copy_el2regs(void *__unused)
++{
++	/*
++	 * Copy register values that aren't redirected by hardware.
++	 *
++	 * Before code patching, we only set tpidr_el1, all CPUs need to copy
++	 * this value to tpidr_el2 before we patch the code. Once we've done
++	 * that, freshly-onlined CPUs will set tpidr_el2, so we don't need to
++	 * do anything here.
++	 */
++	if (!alternatives_applied)
++		write_sysreg(read_sysreg(tpidr_el1), tpidr_el2);
++
++	return 0;
++}
++
+ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 	{
+ 		.desc = "GIC system register CPU interface",
+@@ -865,6 +881,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.capability = ARM64_HAS_VIRT_HOST_EXTN,
+ 		.def_scope = SCOPE_SYSTEM,
+ 		.matches = runs_at_el2,
++		.enable = cpu_copy_el2regs,
+ 	},
+ 	{
+ 		.desc = "32-bit EL0 Support",
+diff --git a/arch/arm64/mm/proc.S b/arch/arm64/mm/proc.S
+index 877d42fb0df6..109d43a15aaf 100644
+--- a/arch/arm64/mm/proc.S
++++ b/arch/arm64/mm/proc.S
+@@ -70,7 +70,11 @@ ENTRY(cpu_do_suspend)
+ 	mrs	x8, mdscr_el1
+ 	mrs	x9, oslsr_el1
+ 	mrs	x10, sctlr_el1
++alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
+ 	mrs	x11, tpidr_el1
++alternative_else
++	mrs	x11, tpidr_el2
++alternative_endif
+ 	mrs	x12, sp_el0
+ 	stp	x2, x3, [x0]
+ 	stp	x4, xzr, [x0, #16]
+@@ -116,7 +120,11 @@ ENTRY(cpu_do_resume)
+ 	msr	mdscr_el1, x10
+ 
+ 	msr	sctlr_el1, x12
++alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
+ 	msr	tpidr_el1, x13
++alternative_else
++	msr	tpidr_el2, x13
++alternative_endif
+ 	msr	sp_el0, x14
+ 	/*
+ 	 * Restore oslsr_el1 by writing oslar_el1
 -- 
 2.13.3
-
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
