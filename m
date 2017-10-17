@@ -1,161 +1,90 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v4 08/11] KVM: arm/arm64: vgic-its: new helper functions to
- free the caches
-Date: Tue, 17 Oct 2017 09:10:06 +0200
-Message-ID: <1508224209-15366-9-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v4 10/11] KVM: arm/arm64: Document KVM_DEV_ARM_ITS_CTRL_RESET
+Date: Tue, 17 Oct 2017 09:10:08 +0200
+Message-ID: <1508224209-15366-11-git-send-email-eric.auger@redhat.com>
 References: <1508224209-15366-1-git-send-email-eric.auger@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C41AF49D2B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 03:10:07 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5u-HbU+eQeMH for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Oct 2017 03:10:05 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BC13649D28
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 03:10:05 -0400 (EDT)
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1508224209-15366-1-git-send-email-eric.auger@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: linux-kernel-owner@vger.kernel.org
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, cdall@linaro.org, peter.maydell@linaro.org, andre.przywara@arm.com, wanghaibin.wang@huawei.com
-Cc: wu.wubin@huawei.com
+Cc: wu.wubin@huawei.com, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: wanghaibin <wanghaibin.wang@huawei.com>
+At the moment, the in-kernel emulated ITS is not properly reset.
+On guest restart/reset some registers keep their old values and
+internal structures like device, ITE, and collection lists are not
+freed.
 
-We create 2 new functions that frees the device and
-collection lists. this is currently called by vgic_its_destroy()
-and we will add other callers in subsequent patches.
+This may lead to various bugs. Among them, we can have incorrect state
+backup or failure when saving the ITS state at early guest boot stage.
 
-We also remove the check on its->device_list.next as it looks
-unnecessary. Indeed, the device list always is initialized
-when vgic_its_destroy gets called: the kvm device is removed
-by kvm_destroy_devices() which loops on all the devices
-added to kvm->devices. kvm_ioctl_create_device() only adds
-the device to kvm_devices once the lists have been initialized
-(in vgic_create_its).
+This patch documents a new attribute, KVM_DEV_ARM_ITS_CTRL_RESET in
+the KVM_DEV_ARM_VGIC_GRP_CTRL group.
 
-We also move vgic_its_free_device to prepare for new callers.
+Upon this action, we can reset registers and especially those
+pointing to tables previously allocated by the guest and free
+the internal data structures storing the list of devices, collections
+and lpis.
 
-Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
+The usual approach for device reset of having userspace write
+the reset values of the registers to the kernel via the register
+read/write APIs doesn't work for the ITS because it has some
+internal state (caches) which is not exposed as registers,
+and there is no register interface for "drop cached data without
+writing it back to RAM". So we need a KVM API which mimics the
+hardware's reset line, to provide the equivalent behaviour to
+a "pull the power cord out of the back of the machine" reset.
+
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reported-by: wanghaibin <wanghaibin.wang@huawei.com>
 
 ---
-[Eric] removed its->device_list.next which is not needed as
-pointed out by Wanghaibin. Reword the commit message
----
- virt/kvm/arm/vgic/vgic-its.c | 76 ++++++++++++++++++++++++--------------------
- 1 file changed, 41 insertions(+), 35 deletions(-)
+v2 -> v3:
+- reword commit message, credit to Peter Maydell.
+- take into account Christoffer rewording comments but still
+  kept details. Added Peter's comment but still kept details.
+  Peter may disagree.
 
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 1c3e83f..f3f0026f 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -611,6 +611,45 @@ static void its_free_ite(struct kvm *kvm, struct its_ite *ite)
- 	kfree(ite);
- }
+v1 -> v2:
+- Describe architecturally-defined reset values
+---
+ Documentation/virtual/kvm/devices/arm-vgic-its.txt | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/Documentation/virtual/kvm/devices/arm-vgic-its.txt b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+index eb06beb..4e9bb6f 100644
+--- a/Documentation/virtual/kvm/devices/arm-vgic-its.txt
++++ b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+@@ -33,6 +33,10 @@ Groups:
+       request the initialization of the ITS, no additional parameter in
+       kvm_device_attr.addr.
  
-+static void vgic_its_free_device(struct kvm *kvm, struct its_device *dev)
-+{
-+	struct its_ite *ite, *tmp;
++    KVM_DEV_ARM_ITS_CTRL_RESET
++      reset the ITS, no additional parameter in kvm_device_attr.addr.
++      See "ITS Reset State" section.
 +
-+	list_for_each_entry_safe(ite, tmp, &dev->itt_head, ite_list)
-+		its_free_ite(kvm, ite);
-+	list_del(&dev->dev_list);
-+	kfree(dev);
-+}
+     KVM_DEV_ARM_ITS_SAVE_TABLES
+       save the ITS table data into guest RAM, at the location provisioned
+       by the guest in corresponding registers/table entries.
+@@ -157,3 +161,19 @@ Then vcpus can be started.
+  - pINTID is the physical LPI ID; if zero, it means the entry is not valid
+    and other fields are not meaningful.
+  - ICID is the collection ID
 +
-+static void vgic_its_free_device_list(struct kvm *kvm, struct vgic_its *its)
-+{
-+	struct list_head *cur, *temp;
++ ITS Reset State:
++ ----------------
 +
-+	mutex_lock(&its->its_lock);
-+	list_for_each_safe(cur, temp, &its->device_list) {
-+		struct its_device *dev;
++RESET returns the ITS to the same state that it was when first created and
++inited:
 +
-+		dev = list_entry(cur, struct its_device, dev_list);
-+		vgic_its_free_device(kvm, dev);
-+	}
-+	mutex_unlock(&its->its_lock);
-+}
-+
-+static void vgic_its_free_collection_list(struct kvm *kvm, struct vgic_its *its)
-+{
-+	struct list_head *cur, *temp;
-+
-+	list_for_each_safe(cur, temp, &its->collection_list) {
-+		struct its_collection *coll;
-+
-+		coll = list_entry(cur, struct its_collection, coll_list);
-+		list_del(cur);
-+		kfree(coll);
-+	}
-+	mutex_unlock(&its->its_lock);
-+}
-+
-+
- static u64 its_cmd_mask_field(u64 *its_cmd, int word, int shift, int size)
- {
- 	return (le64_to_cpu(its_cmd[word]) >> shift) & (BIT_ULL(size) - 1);
-@@ -1644,46 +1683,13 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
- 	return vgic_its_set_abi(its, NR_ITS_ABIS - 1);
- }
- 
--static void vgic_its_free_device(struct kvm *kvm, struct its_device *dev)
--{
--	struct its_ite *ite, *tmp;
--
--	list_for_each_entry_safe(ite, tmp, &dev->itt_head, ite_list)
--		its_free_ite(kvm, ite);
--	list_del(&dev->dev_list);
--	kfree(dev);
--}
--
- static void vgic_its_destroy(struct kvm_device *kvm_dev)
- {
- 	struct kvm *kvm = kvm_dev->kvm;
- 	struct vgic_its *its = kvm_dev->private;
--	struct list_head *cur, *temp;
--
--	/*
--	 * We may end up here without the lists ever having been initialized.
--	 * Check this and bail out early to avoid dereferencing a NULL pointer.
--	 */
--	if (!its->device_list.next)
--		return;
--
--	mutex_lock(&its->its_lock);
--	list_for_each_safe(cur, temp, &its->device_list) {
--		struct its_device *dev;
--
--		dev = list_entry(cur, struct its_device, dev_list);
--		vgic_its_free_device(kvm, dev);
--	}
--
--	list_for_each_safe(cur, temp, &its->collection_list) {
--		struct its_collection *coll;
--
--		coll = list_entry(cur, struct its_collection, coll_list);
--		list_del(cur);
--		kfree(coll);
--	}
--	mutex_unlock(&its->its_lock);
- 
-+	vgic_its_free_device_list(kvm, its);
-+	vgic_its_free_collection_list(kvm, its);
- 	kfree(its);
- }
- 
++- The ITS is not enabled and quiescent
++  GITS_CTLR.Enabled = 0 .Quiescent=1
++- There is no internally cache state
++- No collection or device table are used
++  GITS_BASER<n>.Valid = 0
++- The command queue is not allocated:
++  GITS_CBASER = 0, GITS_CREADR = 0, GITS_CWRITER = 0
++- The ABI version is unchanged and remains the one set when the ITS
++  device was first created.
 -- 
 2.5.5
