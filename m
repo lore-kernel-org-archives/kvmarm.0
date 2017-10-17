@@ -1,18 +1,39 @@
 From: Christoffer Dall <cdall@linaro.org>
 Subject: Re: [PATCH v4 04/11] KVM: arm/arm64: vgic-its: Check CBASER/BASER
  validity before enabling the ITS
-Date: Wed, 18 Oct 2017 00:02:03 +0200
-Message-ID: <20171017220203.GD8326@lvm>
+Date: Wed, 18 Oct 2017 00:05:54 +0200
+Message-ID: <20171017220554.GE8326@lvm>
 References: <1508224209-15366-1-git-send-email-eric.auger@redhat.com>
  <1508224209-15366-5-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A4D4349D20
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 18:04:59 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id mvu4Gkf0jHXP for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Oct 2017 18:04:58 -0400 (EDT)
+Received: from mail-wm0-f43.google.com (mail-wm0-f43.google.com [74.125.82.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 98E9849D15
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 18:04:58 -0400 (EDT)
+Received: by mail-wm0-f43.google.com with SMTP id i124so6615824wmf.3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 15:05:57 -0700 (PDT)
 Content-Disposition: inline
 In-Reply-To: <1508224209-15366-5-git-send-email-eric.auger@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, peter.maydell@linaro.org, andre.przywara@arm.com, wanghaibin.wang@huawei.com, wu.wubin@huawei.com, drjones@redhat.com, wei@redhat.com
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andre.przywara@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On Tue, Oct 17, 2017 at 09:10:02AM +0200, Eric Auger wrote:
@@ -53,16 +74,11 @@ On Tue, Oct 17, 2017 at 09:10:02AM +0200, Eric Auger wrote:
 > +		(!(its->baser_device_table & GITS_BASER_VALID) ||
 > +		 !(its->baser_coll_table & GITS_BASER_VALID) ||
 > +		 !(its->cbaser && GITS_CBASER_VALID)))
+
+whoops, you wanted &, not && in the last one I think.
+
 > +		its->enabled = false;
 > +
-
-uh, why don't we check these conditions before we enable the ITS instead
-of enabling, checking, and then disabling?
-
-
-Thanks,
--Christoffer
-
 > +	/*
 >  	 * Try to process any pending commands. This function bails out early
 >  	 * if the ITS is disabled or no commands have been queued.
