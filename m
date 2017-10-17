@@ -1,120 +1,68 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH 10/10] arm: KVM: Use common implementation for all
- flushes to PoC
-Date: Tue, 17 Oct 2017 07:48:16 -0700
-Message-ID: <20171017144816.GK5886@lvm>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 06/10] KVM: arm/arm64: Only clean the dcache on
+ translation fault
+Date: Tue, 17 Oct 2017 15:52:36 +0100
+Message-ID: <07d1238a-78e2-af45-c2fd-bd7c9d1edf4d@arm.com>
 References: <20171009152032.27804-1-marc.zyngier@arm.com>
- <20171009152032.27804-11-marc.zyngier@arm.com>
- <20171016200647.GD1845@lvm>
- <afc3cde3-da2d-de83-40bb-d419370607f2@arm.com>
+ <20171009152032.27804-7-marc.zyngier@arm.com> <20171016200811.GH1845@lvm>
+ <210cf2dc-2566-a29b-637e-901f3dcc80b6@arm.com> <20171017143634.GI5886@lvm>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 144F940D25
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 10:47:22 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cVrNRBkF53Jw for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Oct 2017 10:47:21 -0400 (EDT)
-Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DFF6A40638
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 10:47:20 -0400 (EDT)
-Received: by mail-wm0-f49.google.com with SMTP id t69so4426047wmt.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 07:48:19 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <afc3cde3-da2d-de83-40bb-d419370607f2@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20171017143634.GI5886@lvm>
+Content-Language: en-GB
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <cdall@linaro.org>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Oct 17, 2017 at 01:40:00PM +0100, Marc Zyngier wrote:
-> On 16/10/17 21:06, Christoffer Dall wrote:
-> > On Mon, Oct 09, 2017 at 04:20:32PM +0100, Marc Zyngier wrote:
-> >> We currently have no less than three implementations for the
-> >> "flush to PoC" code. Let standardize on a single one. This
-> >> requires a bit of unpleasant moving around, and relies on
-> >> __kvm_flush_dcache_pte and co being #defines so that they can
-> >> call into coherent_dcache_guest_page...
-> >>
-> >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> >> ---
-> >>  arch/arm/include/asm/kvm_mmu.h | 28 ++++------------------------
-> >>  virt/kvm/arm/mmu.c             | 20 ++++++++++----------
-> >>  2 files changed, 14 insertions(+), 34 deletions(-)
-> >>
-> >> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-> >> index 5f1ac88a5951..011b0db85c02 100644
-> >> --- a/arch/arm/include/asm/kvm_mmu.h
-> >> +++ b/arch/arm/include/asm/kvm_mmu.h
-> >> @@ -235,31 +235,11 @@ static inline void __coherent_icache_guest_page(kvm_pfn_t pfn,
-> >>  	}
-> >>  }
-> >>  
-> >> -static inline void __kvm_flush_dcache_pte(pte_t pte)
-> >> -{
-> >> -	void *va = kmap_atomic(pte_page(pte));
-> >> -
-> >> -	kvm_flush_dcache_to_poc(va, PAGE_SIZE);
-> >> -
-> >> -	kunmap_atomic(va);
-> >> -}
-> >> -
-> >> -static inline void __kvm_flush_dcache_pmd(pmd_t pmd)
-> >> -{
-> >> -	unsigned long size = PMD_SIZE;
-> >> -	kvm_pfn_t pfn = pmd_pfn(pmd);
-> >> -
-> >> -	while (size) {
-> >> -		void *va = kmap_atomic_pfn(pfn);
-> >> +#define __kvm_flush_dcache_pte(p)				\
-> >> +	coherent_dcache_guest_page(pte_pfn((p)), PAGE_SIZE)
-> >>  
-> >> -		kvm_flush_dcache_to_poc(va, PAGE_SIZE);
-> >> -
-> >> -		pfn++;
-> >> -		size -= PAGE_SIZE;
-> >> -
-> >> -		kunmap_atomic(va);
-> >> -	}
-> >> -}
-> >> +#define __kvm_flush_dcache_pmd(p)				\
-> >> +	coherent_dcache_guest_page(pmd_pfn((p)), PMD_SIZE)
-> > 
-> > Why can't these just be static inlines which call
-> > __coherent_dcache_guest_page already in the header file directly?
+On 17/10/17 15:36, Christoffer Dall wrote:
+> On Tue, Oct 17, 2017 at 10:34:15AM +0100, Marc Zyngier wrote:
+>> On 16/10/17 21:08, Christoffer Dall wrote:
+>>> On Mon, Oct 09, 2017 at 04:20:28PM +0100, Marc Zyngier wrote:
+>>>> The only case where we actually need to perform a dache maintenance
+>>>> is when we map the page for the first time, and subsequent permission
+>>>> faults do not require cache maintenance. Let's make it conditional
+>>>> on not being a permission fault (and thus a translation fault).
+>>>
+>>> Why do we actually need to do any dcache maintenance when faulting in a
+>>> page?
+>>>
+>>> Is this for the case when the stage 1 MMU is disabled, or to support
+>>> guest mappings using uncached attributes?
+>>
+>> These are indeed the two cases that require cleaning the dcache to PoC.
+>>
+>>> Can we do better, for example
+>>> by only flushing the cache if the guest MMU is disabled?
+>>
+>> The guest MMU being disabled is easy. But the uncached mapping is much
+>> trickier, and would involve parsing the guest page tables. Not something
+>> I'm really eager to implement.
+>>
 > 
-> Because if we do that, we get a significant code expansion in the
-> resulting binary (all the call sites end up having a copy of that function.
-> 
-> > I'm really not too crazy about these #defines.
-> 
-> Neither am I. But actually, this patch is completely wrong. Using the
-> same functions as the guest cleaning doesn't provide the guarantees
-> documented next to unmap_stage2_ptes, as we need a clean+invalidate, not
-> just a clean.
-> 
-> I'll rework this patch (or just drop it).
-> 
-> > In fact, why do we need the coherent_Xcache_guest_page static
-> > indirection functions in mmu.c in the first place?
-> 
-> Code expansion. That's the only reason.
-> 
-Then maybe a reworked patch needs a function defined in some
-arch-specific object file that we can just call.  The functions don't
-look that complicated to me, but I suppose if they inline the things
-they call, it could become a bit hairy.
+> Hmm, if the guest actually maps memory uncached, wouldn't it have to
+> invalidate caches itself, or is this the annoying thing where disabling
+> the MMU on hardware that doesn't have stage 2 would in fact always
+> completely bypass the cache, and therefore we have to do this work?
+
+The architecture is massively ambiguous about what is actually required
+in terms of CMOs when using an uncached mapping (and whether you can hit
+in the cache or not).
+
+But even if the guest had done an invalidate in order not to hit in the
+cache, the host could have evicted the page to disk, the guest faulted
+the page back in, and it would still be the host's responsibility to
+ensure that the guest sees something consistent.
+
+> Sorry, I have forgotten all the details here, but wanted to make sure
+> we're not being overly careful.
+
+No worries, I'm always happy to revisit this particular rabbit hole... ;-)
 
 Thanks,
--Christoffer
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
