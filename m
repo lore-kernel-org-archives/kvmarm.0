@@ -1,23 +1,23 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v4 11/11] KVM: arm/arm64: vgic-its: Implement
- KVM_DEV_ARM_ITS_CTRL_RESET
-Date: Tue, 17 Oct 2017 09:10:09 +0200
-Message-ID: <1508224209-15366-12-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v4 09/11] KVM: arm/arm64: vgic-its: free caches when
+ GITS_BASER Valid bit is cleared
+Date: Tue, 17 Oct 2017 09:10:07 +0200
+Message-ID: <1508224209-15366-10-git-send-email-eric.auger@redhat.com>
 References: <1508224209-15366-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 603EC49D09
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 03:10:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9522940795
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 03:10:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ijXOqqSdakhD for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Oct 2017 03:10:24 -0400 (EDT)
+ with ESMTP id vpZZJDUymvHS for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Oct 2017 03:10:11 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 32C0840EA6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 03:10:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CDC6C49D4E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 03:10:11 -0400 (EDT)
 In-Reply-To: <1508224209-15366-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,89 +32,76 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.or
 Cc: wu.wubin@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On reset we clear the valid bits of GITS_CBASER and GITS_BASER<n>.
-We also clear command queue registers and free the cache (device,
-collection, and lpi lists).
+When the GITS_BASER<n>.Valid gets cleared, the data structures in
+guest RAM are not valid anymore. The device, collection
+and LPI lists stored in the in-kernel ITS represent the same
+information in some form of cache. So let's void the cache.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 
 ---
 
 v2 -> v3:
-- added Christoffer's R-b
+- add a comment and clear cache in if block
 ---
- arch/arm/include/uapi/asm/kvm.h   |  1 +
- arch/arm64/include/uapi/asm/kvm.h |  1 +
- virt/kvm/arm/vgic/vgic-its.c      | 18 ++++++++++++++++++
- 3 files changed, 20 insertions(+)
+ virt/kvm/arm/vgic/vgic-its.c | 23 +++++++++++++++++++----
+ 1 file changed, 19 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
-index 5db2d4c..7ef0c06 100644
---- a/arch/arm/include/uapi/asm/kvm.h
-+++ b/arch/arm/include/uapi/asm/kvm.h
-@@ -215,6 +215,7 @@ struct kvm_arch_memory_slot {
- #define   KVM_DEV_ARM_ITS_SAVE_TABLES		1
- #define   KVM_DEV_ARM_ITS_RESTORE_TABLES	2
- #define   KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES	3
-+#define   KVM_DEV_ARM_ITS_CTRL_RESET		4
- 
- /* KVM_IRQ_LINE irq field index values */
- #define KVM_ARM_IRQ_TYPE_SHIFT		24
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 9f3ca24..b5306ce 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -227,6 +227,7 @@ struct kvm_arch_memory_slot {
- #define   KVM_DEV_ARM_ITS_SAVE_TABLES           1
- #define   KVM_DEV_ARM_ITS_RESTORE_TABLES        2
- #define   KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES	3
-+#define   KVM_DEV_ARM_ITS_CTRL_RESET		4
- 
- /* Device Control API on vcpu fd */
- #define KVM_ARM_VCPU_PMU_V3_CTRL	0
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 084239c..9ceb348 100644
+index f3f0026f..084239c 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -2457,6 +2457,19 @@ static int vgic_its_commit_v0(struct vgic_its *its)
- 	return 0;
+@@ -1471,8 +1471,9 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
+ 				      unsigned long val)
+ {
+ 	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+-	u64 entry_size, device_type;
++	u64 entry_size;
+ 	u64 reg, *regptr, clearbits = 0;
++	int type;
+ 
+ 	/* When GITS_CTLR.Enable is 1, we ignore write accesses. */
+ 	if (its->enabled)
+@@ -1482,12 +1483,12 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
+ 	case 0:
+ 		regptr = &its->baser_device_table;
+ 		entry_size = abi->dte_esz;
+-		device_type = GITS_BASER_TYPE_DEVICE;
++		type = GITS_BASER_TYPE_DEVICE;
+ 		break;
+ 	case 1:
+ 		regptr = &its->baser_coll_table;
+ 		entry_size = abi->cte_esz;
+-		device_type = GITS_BASER_TYPE_COLLECTION;
++		type = GITS_BASER_TYPE_COLLECTION;
+ 		clearbits = GITS_BASER_INDIRECT;
+ 		break;
+ 	default:
+@@ -1499,10 +1500,24 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
+ 	reg &= ~clearbits;
+ 
+ 	reg |= (entry_size - 1) << GITS_BASER_ENTRY_SIZE_SHIFT;
+-	reg |= device_type << GITS_BASER_TYPE_SHIFT;
++	reg |= (u64)type << GITS_BASER_TYPE_SHIFT;
+ 	reg = vgic_sanitise_its_baser(reg);
+ 
+ 	*regptr = reg;
++
++	/* Table no longer valid: clear cached data */
++	if (!(reg & GITS_BASER_VALID)) {
++		switch (type) {
++		case GITS_BASER_TYPE_DEVICE:
++			vgic_its_free_device_list(kvm, its);
++			break;
++		case GITS_BASER_TYPE_COLLECTION:
++			vgic_its_free_collection_list(kvm, its);
++			break;
++		default:
++			break;
++		}
++	}
  }
  
-+static void vgic_its_reset(struct kvm *kvm, struct vgic_its *its)
-+{
-+	/* We need to keep the ABI specific field values */
-+	its->baser_coll_table &= ~GITS_BASER_VALID;
-+	its->baser_device_table &= ~GITS_BASER_VALID;
-+	its->cbaser = 0;
-+	its->creadr = 0;
-+	its->cwriter = 0;
-+	its->enabled = 0;
-+	vgic_its_free_device_list(kvm, its);
-+	vgic_its_free_collection_list(kvm, its);
-+}
-+
- static int vgic_its_has_attr(struct kvm_device *dev,
- 			     struct kvm_device_attr *attr)
- {
-@@ -2471,6 +2484,8 @@ static int vgic_its_has_attr(struct kvm_device *dev,
- 		switch (attr->attr) {
- 		case KVM_DEV_ARM_VGIC_CTRL_INIT:
- 			return 0;
-+		case KVM_DEV_ARM_ITS_CTRL_RESET:
-+			return 0;
- 		case KVM_DEV_ARM_ITS_SAVE_TABLES:
- 			return 0;
- 		case KVM_DEV_ARM_ITS_RESTORE_TABLES:
-@@ -2515,6 +2530,9 @@ static int vgic_its_set_attr(struct kvm_device *dev,
- 		case KVM_DEV_ARM_VGIC_CTRL_INIT:
- 			/* Nothing to do */
- 			return 0;
-+		case KVM_DEV_ARM_ITS_CTRL_RESET:
-+			vgic_its_reset(dev->kvm, its);
-+			return 0;
- 		case KVM_DEV_ARM_ITS_SAVE_TABLES:
- 			return abi->save_tables(its);
- 		case KVM_DEV_ARM_ITS_RESTORE_TABLES:
+ static unsigned long vgic_mmio_read_its_ctlr(struct kvm *vcpu,
 -- 
 2.5.5
