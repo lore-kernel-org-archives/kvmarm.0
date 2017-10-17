@@ -1,121 +1,129 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH 01/10] KVM: arm/arm64: Split dcache/icache flushing
-Date: Tue, 17 Oct 2017 08:44:48 +0200
-Message-ID: <20171017064448.GR1845@lvm>
-References: <20171009152032.27804-1-marc.zyngier@arm.com>
- <20171009152032.27804-2-marc.zyngier@arm.com>
- <CAK-u0QmHubcdxzBqncMd5fkO5O-wHQiyvrB7aY+6d-1b5j_cJA@mail.gmail.com>
+From: Eric Auger <eric.auger@redhat.com>
+Subject: [PATCH v4 00/11] vITS Migration fixes and reset
+Date: Tue, 17 Oct 2017 09:09:58 +0200
+Message-ID: <1508224209-15366-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAK-u0QmHubcdxzBqncMd5fkO5O-wHQiyvrB7aY+6d-1b5j_cJA@mail.gmail.com>
-Sender: kvm-owner@vger.kernel.org
-To: roy.franz@cavium.com
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5960549D1A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 03:09:27 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id JIVyZpG13Jc3 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Oct 2017 03:09:24 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C2E3740795
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 03:09:24 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, cdall@linaro.org, peter.maydell@linaro.org, andre.przywara@arm.com, wanghaibin.wang@huawei.com
+Cc: wu.wubin@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Oct 16, 2017 at 02:35:47PM -0700, Roy Franz (Cavium) wrote:
-> On Mon, Oct 9, 2017 at 8:20 AM, Marc Zyngier <marc.zyngier@arm.com> wrote:
-> > As we're about to introduce opportunistic invalidation of the icache,
-> > let's split dcache and icache flushing.
-> >
-> > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> > ---
-> >  arch/arm/include/asm/kvm_mmu.h   | 60 ++++++++++++++++++++++++++++------------
-> >  arch/arm64/include/asm/kvm_mmu.h | 13 +++++++--
-> >  virt/kvm/arm/mmu.c               | 20 ++++++++++----
-> >  3 files changed, 67 insertions(+), 26 deletions(-)
-> >
-> > diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-> > index fa6f2174276b..f553aa62d0c3 100644
-> > --- a/arch/arm/include/asm/kvm_mmu.h
-> > +++ b/arch/arm/include/asm/kvm_mmu.h
-> > @@ -126,21 +126,12 @@ static inline bool vcpu_has_cache_enabled(struct kvm_vcpu *vcpu)
-> >         return (vcpu_cp15(vcpu, c1_SCTLR) & 0b101) == 0b101;
-> >  }
-> >
-> > -static inline void __coherent_cache_guest_page(struct kvm_vcpu *vcpu,
-> > -                                              kvm_pfn_t pfn,
-> > -                                              unsigned long size)
-> > +static inline void __coherent_dcache_guest_page(struct kvm_vcpu *vcpu,
-> > +                                               kvm_pfn_t pfn,
-> > +                                               unsigned long size)
-> >  {
-> >         /*
-> > -        * If we are going to insert an instruction page and the icache is
-> > -        * either VIPT or PIPT, there is a potential problem where the host
-> > -        * (or another VM) may have used the same page as this guest, and we
-> > -        * read incorrect data from the icache.  If we're using a PIPT cache,
-> > -        * we can invalidate just that page, but if we are using a VIPT cache
-> > -        * we need to invalidate the entire icache - damn shame - as written
-> > -        * in the ARM ARM (DDI 0406C.b - Page B3-1393).
-> > -        *
-> > -        * VIVT caches are tagged using both the ASID and the VMID and doesn't
-> > -        * need any kind of flushing (DDI 0406C.b - Page B3-1392).
-> > +        * Clean the dcache to the Point of Coherency.
-> >          *
-> >          * We need to do this through a kernel mapping (using the
-> >          * user-space mapping has proved to be the wrong
-> > @@ -155,19 +146,52 @@ static inline void __coherent_cache_guest_page(struct kvm_vcpu *vcpu,
-> >
-> >                 kvm_flush_dcache_to_poc(va, PAGE_SIZE);
-> >
-> > -               if (icache_is_pipt())
-> > -                       __cpuc_coherent_user_range((unsigned long)va,
-> > -                                                  (unsigned long)va + PAGE_SIZE);
-> > -
-> >                 size -= PAGE_SIZE;
-> >                 pfn++;
-> >
-> >                 kunmap_atomic(va);
-> >         }
-> > +}
-> >
-> > -       if (!icache_is_pipt() && !icache_is_vivt_asid_tagged()) {
-> > +static inline void __coherent_icache_guest_page(struct kvm_vcpu *vcpu,
-> > +                                               kvm_pfn_t pfn,
-> > +                                               unsigned long size)
-> > +{
-> > +       /*
-> > +        * If we are going to insert an instruction page and the icache is
-> > +        * either VIPT or PIPT, there is a potential problem where the host
-> > +        * (or another VM) may have used the same page as this guest, and we
-> > +        * read incorrect data from the icache.  If we're using a PIPT cache,
-> > +        * we can invalidate just that page, but if we are using a VIPT cache
-> > +        * we need to invalidate the entire icache - damn shame - as written
-> > +        * in the ARM ARM (DDI 0406C.b - Page B3-1393).
-> > +        *
-> > +        * VIVT caches are tagged using both the ASID and the VMID and doesn't
-> > +        * need any kind of flushing (DDI 0406C.b - Page B3-1392).
-> > +        */
-> > +
-> > +       VM_BUG_ON(size & ~PAGE_MASK);
-> > +
-> > +       if (icache_is_vivt_asid_tagged())
-> > +               return;
-> > +
-> > +       if (!icache_is_pipt()) {
-> >                 /* any kind of VIPT cache */
-> >                 __flush_icache_all();
-> > +               return;
-> > +       }
-> How does cache_is_vivt() fit into these checks?   From my digging it looks like
-> that is ARMv5 and earlier only, so am I right in thinking those don't support
-> virtualization?  It looks like this code properly handles all the cache types
-> described in the ARM ARM that you referenced, and that the 'extra' cache
-> types in Linux are for older spec chips.
-> 
-> 
-That's certainly my understanding.  From the ARMv7 ARM the only types of
-instruction caches we should worry about are:
+This series fixes various bugs observed when saving/restoring the
+ITS state before the guest writes the ITS registers (on first boot or
+after reset/reboot).
 
- - PIPT instruction caches
- - Virtually-indexed, physically-tagged (VIPT) instruction caches
- - ASID and VMID tagged Virtually-indexed, virtually-tagged (VIVT)
-   instruction caches.
+This is a follow up of Wanghaibin's series [1] plus additional
+patches following additional code review. It also proposes one
+ITS reset implementation.
 
-And I think that's covered here.
+Currently, the in-kernel emulated ITS is not reset. After a
+reset/reboot, the ITS register values and caches are left
+unchanged. Registers may point to some tables in guest memory
+which do not exist anymore. If an ITS state backup is initiated
+before the guest re-writes the registers, the save fails
+because inconsistencies are detected. Also restore of data saved
+as such moment is failing.
 
-Thanks,
--Christoffer
+Patches [1-7] attempt to fix the migration issues without
+implementing the reset.
+As such they may be candidate for stable:
+- handle case where all collection, device and ITT entries are
+  invalid on restore (which shouldn't be an error)
+- limit the cases where we return -EINVAL in table save()
+- never attempt to use GITS_BASER<n> and GITS_CBASER if they are
+  not valid.
+- Check GITS_BASER<n> and GITS_CBASER on ITS enable
+- systematically do both device and collection save/restore even if
+  one fails.
+
+Patches [8-11] implement a new ITS reset IOCTL
+
+Best Regards
+
+Eric
+
+Git: complete series available at
+https://github.com/eauger/linux/tree/v4.14-rc5-its-reset-v4
+
+* Testing:
+- on Cavium using a virtio-net-pci guest and various sequences of
+  guest shutdown -r now, virsh reset, virsh suspend/resume,
+  virsh reboot, virsh save.restore, virsh shutdown
+
+References:
+[1] [RFC PATCH 0/3] fix migrate failed when vm is in booting
+https://www.spinics.net/lists/kvm-arm/msg27121.html
+
+History:
+v3 -> v4:
+- fixes a bug in indirect mode: in handle_l1_dte, set
+  *valid at the beginning of the function
+
+v2 -> v3:
+- Revisited error handling in restore functions
+- Added "KVM: arm/arm64: vgic-its: fix
+        vgic_its_restore_collection_table returned value"
+- Added "KVM: arm/arm64: vgic-its: Check CBASER/BASER validity
+  before enabling the ITS"
+- Removed KVM: arm/arm64: vgic-its: Always allow clearing
+  GITS_CREADR/CWRITER
+- Reworded documentation according to Christoffer's comments
+
+v1 -> v2:
+- added KVM: arm/arm64: vgic-its: Always attempt to save/restore
+  device and collection tables
+
+PATCH v1
+- series including 2 modified patches of Wanghaibin
+
+
+Eric Auger (10):
+  KVM: arm/arm64: vgic-its: fix return value for device table restore
+  KVM: arm/arm64: vgic-its: fix vgic_its_restore_collection_table
+    returned value
+  KVM: arm/arm64: vgic-its: Improve error reporting on device table save
+  KVM: arm/arm64: vgic-its: Check CBASER/BASER validity before enabling
+    the ITS
+  KVM: arm/arm64: vgic-its: Check GITS_BASER Valid bit before saving
+    tables
+  KVM: arm/arm64: vgic-its: Check GITS_CBASER validity before processing
+    commands
+  KVM: arm/arm64: vgic-its: Always attempt to save/restore device and
+    collection tables
+  KVM: arm/arm64: vgic-its: free caches when GITS_BASER Valid bit is
+    cleared
+  KVM: arm/arm64: Document KVM_DEV_ARM_ITS_CTRL_RESET
+  KVM: arm/arm64: vgic-its: Implement KVM_DEV_ARM_ITS_CTRL_RESET
+
+wanghaibin (1):
+  KVM: arm/arm64: vgic-its: new helper functions to free the caches
+
+ Documentation/virtual/kvm/devices/arm-vgic-its.txt |  20 ++
+ arch/arm/include/uapi/asm/kvm.h                    |   1 +
+ arch/arm64/include/uapi/asm/kvm.h                  |   1 +
+ virt/kvm/arm/vgic/vgic-its.c                       | 361 ++++++++++++++-------
+ 4 files changed, 270 insertions(+), 113 deletions(-)
+
+-- 
+2.5.5
