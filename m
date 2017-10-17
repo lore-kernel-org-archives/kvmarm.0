@@ -1,96 +1,156 @@
 From: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
-Subject: Re: [PATCH v3 04/13] arm64: alternatives: use tpidr_el2 on VHE hosts
-Date: Tue, 17 Oct 2017 17:36:22 +0100
-Message-ID: <59E63186.4010005@arm.com>
-References: <20170922182614.27885-1-james.morse@arm.com> <20170922182614.27885-5-james.morse@arm.com> <20171013153148.dnejsvhxeui6opfw@armageddon.cambridge.arm.com> <59E0EEE5.2020208@arm.com> <20171016095845.htg2g4jkyw3nvzub@armageddon.cambridge.arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH v4 00/13] arm64/firmware: Software Delegated Exception Interface
+Date: Tue, 17 Oct 2017 18:44:19 +0100
+Message-ID: <20171017174432.1684-1-james.morse@arm.com>
 Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171016095845.htg2g4jkyw3nvzub-+1aNUgJU5qkijLcmloz0ER/iLCjYCKR+VpNB7YpNyf8@public.gmane.org>
 Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>
-Cc: Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Lorenzo Pieralisi <lorenzo.pieralisi-5wv7dgnIgG8@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Loc Ho <lho-qTEPVZfXA3Y@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+To: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+Cc: kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Lorenzo Pieralisi <lorenzo.pieralisi-5wv7dgnIgG8@public.gmane.org>, Loc Ho <lho-qTEPVZfXA3Y@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Catalin,
+Hello!
 
-On 16/10/17 10:58, Catalin Marinas wrote:
-> On Fri, Oct 13, 2017 at 05:50:45PM +0100, James Morse wrote:
->> On 13/10/17 16:31, Catalin Marinas wrote:
->>> On Fri, Sep 22, 2017 at 07:26:05PM +0100, James Morse wrote:
->>>> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
->>>> index cd52d365d1f0..8e4c7da2b126 100644
->>>> --- a/arch/arm64/kernel/cpufeature.c
->>>> +++ b/arch/arm64/kernel/cpufeature.c
->>
->>>> @@ -1308,3 +1309,25 @@ static int __init enable_mrs_emulation(void)
->>>>  }
->>>>  
->>>>  late_initcall(enable_mrs_emulation);
->>>> +
->>>> +int cpu_copy_el2regs(void *__unused)
->>>> +{
->>>> +	int do_copyregs = 0;
->>>> +
->>>> +	/*
->>>> +	 * Copy register values that aren't redirected by hardware.
->>>> +	 *
->>>> +	 * Before code patching, we only set tpidr_el1, all CPUs need to copy
->>>> +	 * this value to tpidr_el2 before we patch the code. Once we've done
->>>> +	 * that, freshly-onlined CPUs will set tpidr_el2, so we don't need to
->>>> +	 * do anything here.
->>>> +	 */
->>>> +	asm volatile(ALTERNATIVE("mov %0, #1", "mov %0, #0",
->>>> +				 ARM64_HAS_VIRT_HOST_EXTN)
->>>> +		    : "=r" (do_copyregs) : : );
->>>
->>> Can you just do:
->>>
->>> 	if (cpu_have_const_cap(ARM64_HAS_VIRT_HOST_EXTN))
->>> 		write_sysreg(read_sysreg(tpidr_el1), tpidr_el2);
->>>
->>> At this point the capability bits should be set and the jump labels
->>> enabled.
->>
->> These are enabled too early, we haven't done patching yet.
->>
->> We need to copy tpidr_el1 -> tpidr_el2 on all CPUs that are online before code
->> patching.
->>
->> After code patching new CPUs set tpidr_el2 when they come online, so we don't
->> need to do the copy... but this enable method is still called. There is nothing
->> for us to do, and tpidr_el1 now contains junk, so the copy
+The Software Delegated Exception Interface (SDEI) is an ARM specification
+for registering callbacks from the platform firmware into the OS.
+This is intended to be used to implement firmware-first RAS notifications,
+but also supports vendor-defined events and binding IRQs as events.
 
-> Ah, I get it now (should've read the comment but I usually expect the
-> code to be obvious; it wasn't, at least to me, in this case ;)).
+The document is here:
+http://infocenter.arm.com/help/topic/com.arm.doc.den0054a/ARM_DEN0054A_Software_Delegated_Exception_Interface.pdf
 
-> You could have added the sysreg copying directly in the asm volatile.
+I anticpate once reviewed this series will go via the arm-soc tree, as the
+bulk of the code is under /drivers/firmware/.
 
-I was trying to stick to the sysreg C accessors, and thought there would be more
-registers that needed copying. (I discovered this VHE doesn't remap all the _ELx
-registers quite late.)
+The major change in v4 is file renames.
+The major change in v3 was due to VMAP stacks. We can't trust sp when we take
+an event, so need our own SDEI stack. Events can nest, so we need two. Private
+events can be delivered per-cpu, so we need two per-cpu SDEI stacks.
+
+Future patches may try to reduce this stack size, or push the stacks to be
+allocated when events are registered.
 
 
-> Anyway, I think it's better if we keep it entirely in C with this hunk
-> (untested):
+The APCICA support for the SDEI table is now in mainline, so this series has
+grown the detection code for non-DT systems. The APEI/GHES wire-up is still
+being held back as APEI's ghes_proc() isn't (yet) safe for multiple sources
+of NMI.
 
-[...]
+Exposing the HVC range through KVM to user-space is gone, this will be
+re-incarnated as something that better fits KVMs architecture emulation,
+as opposed to assuming all-the-world's-SMC-CC.
 
-Yes, that looks much better. I got tangled up in 'which alternative', but you're
-right, they are all applied in one go so it doesn't matter.
+
+This series (juggles some registers with KVM+VHE, then) adds a DT binding to
+trigger probing of the interface and support for the SDEI API.
+
+SDEI runs between adjacent exception levels, so events will always be delivered
+to EL2 if firmware is at EL3. For VHE hosts we run the SDEI event handler
+behind KVM's back with all exceptions masked. Once the handler has done its
+work we return to the appropriate vbar+irq entry. This allows KVM to
+world-switch and deliver any signals sent by the handler to Qemu/kvmtool. We
+do the same thing if we interrupt host EL0. If we interrupted code with
+interrupts masked, we use a different API call to return to the interrupted
+context.
+
+What about non-VHE KVM? If you don't have VHE support and boot at EL2, the
+kernel drops to EL1. This driver will print an error message then give up. This
+is because events would still be delivered to EL2 hitting either KVM, or the
+hyp-stub. Supporting this is complicated, but because the main use-case is
+RAS, and ARM v8.2's RAS extensions imply v8.1's Virtual Host Extensions, we
+can assume all platforms with SDEI will support VHE too. (I have some ideas
+on how to support non-VHE).
+
+Running the event handler behind VHE-KVM's back has some side effects: The
+event handler will blindly use any registers that are shared between the host
+and guest. The two that I think matter are TPIDR_EL1, and the debug state. The
+guest may have set MDSCR_EL1 so debug exceptions must remain masked. The
+guest's TPIDR_EL1 will be used by the event handler if it accesses per-cpu
+variables. This needs fixing. The first part of this series juggles KVMs use
+of TPIDR_EL2 so that we share it with the host on VHE systems. An equivalent
+change for 32bit is (still) on my todo list. (the alternative to this is to
+have a parody world switch in the SDEI event handler, but this would mean
+special casing interrupted guests, and be an ABI link to KVM.)
+
+Is this another begins-with-S RAS mechanism for arm64? Yes.
+Why? Any notification delivered as an exception will overwrite the exception
+registers. This is fatal for the running thread if it happens during entry.S's
+kernel_enter or kernel_exit. Instead of adding masking and routing controls,
+events are delivered to a registered address at a fixed exception level and
+don't change the exception registers when delivered.
+
+This series can be retrieved from:
+git://linux-arm.org/linux-jm.git -b sdei/v4/base
 
 
->	if (!READ_ONCE(alternatives_applied))
-> 		write_sysreg(read_sysreg(tpidr_el1), tpidr_el2);
-
-I don't think this READ_ONCE() is needed, that only matters within the
-stop_machine()/alternatives-patching code that modifies the value on one CPU.
-
+Questions and contradictions welcome!
 
 Thanks,
 
 James
+
+[Changes since previous versions are noted on each patch]
+
+James Morse (13):
+  KVM: arm64: Store vcpu on the stack during __guest_enter()
+  KVM: arm/arm64: Convert kvm_host_cpu_state to a static per-cpu
+    allocation
+  KVM: arm64: Change hyp_panic()s dependency on tpidr_el2
+  arm64: alternatives: use tpidr_el2 on VHE hosts
+  KVM: arm64: Stop save/restoring host tpidr_el1 on VHE
+  Docs: dt: add devicetree binding for describing arm64 SDEI firmware
+  firmware: arm_sdei: Add driver for Software Delegated Exceptions
+  arm64: Add vmap_stack header file
+  arm64: kernel: Add arch-specific SDEI entry code and CPU masking
+  firmware: arm_sdei: Add support for CPU and system power states
+  firmware: arm_sdei: add support for CPU private events
+  arm64: acpi: Remove __init from acpi_psci_use_hvc() for use by SDEI
+  firmware: arm_sdei: Discover SDEI support via ACPI
+
+ .../devicetree/bindings/arm/firmware/sdei.txt      |   42 +
+ MAINTAINERS                                        |    9 +
+ arch/arm64/Kconfig                                 |    2 +-
+ arch/arm64/include/asm/alternative.h               |    2 +
+ arch/arm64/include/asm/assembler.h                 |    8 +
+ arch/arm64/include/asm/kvm_host.h                  |    2 +
+ arch/arm64/include/asm/percpu.h                    |   11 +-
+ arch/arm64/include/asm/sdei.h                      |   63 ++
+ arch/arm64/include/asm/stacktrace.h                |    3 +
+ arch/arm64/include/asm/vmap_stack.h                |   38 +
+ arch/arm64/kernel/Makefile                         |    1 +
+ arch/arm64/kernel/acpi.c                           |    2 +-
+ arch/arm64/kernel/alternative.c                    |    9 +-
+ arch/arm64/kernel/asm-offsets.c                    |    5 +
+ arch/arm64/kernel/cpufeature.c                     |   17 +
+ arch/arm64/kernel/irq.c                            |   13 +-
+ arch/arm64/kernel/sdei-entry.S                     |  122 +++
+ arch/arm64/kernel/sdei.c                           |  235 +++++
+ arch/arm64/kernel/smp.c                            |   11 +-
+ arch/arm64/kvm/hyp-init.S                          |    4 +
+ arch/arm64/kvm/hyp/entry.S                         |   10 +-
+ arch/arm64/kvm/hyp/hyp-entry.S                     |   18 +-
+ arch/arm64/kvm/hyp/switch.c                        |   25 +-
+ arch/arm64/kvm/hyp/sysreg-sr.c                     |   16 +-
+ arch/arm64/mm/proc.S                               |    8 +
+ drivers/firmware/Kconfig                           |    8 +
+ drivers/firmware/Makefile                          |    1 +
+ drivers/firmware/arm_sdei.c                        | 1095 ++++++++++++++++++++
+ include/linux/arm_sdei.h                           |  102 ++
+ include/linux/cpuhotplug.h                         |    1 +
+ include/linux/psci.h                               |    3 +-
+ include/uapi/linux/arm_sdei.h                      |   91 ++
+ virt/kvm/arm/arm.c                                 |   18 +-
+ 33 files changed, 1933 insertions(+), 62 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/arm/firmware/sdei.txt
+ create mode 100644 arch/arm64/include/asm/sdei.h
+ create mode 100644 arch/arm64/include/asm/vmap_stack.h
+ create mode 100644 arch/arm64/kernel/sdei-entry.S
+ create mode 100644 arch/arm64/kernel/sdei.c
+ create mode 100644 drivers/firmware/arm_sdei.c
+ create mode 100644 include/linux/arm_sdei.h
+ create mode 100644 include/uapi/linux/arm_sdei.h
+
+-- 
+2.13.3
 
 --
 To unsubscribe from this list: send the line "unsubscribe devicetree" in
