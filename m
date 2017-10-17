@@ -1,118 +1,79 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v4 02/11] KVM: arm/arm64: vgic-its: fix vgic_its_restore_collection_table returned value
-Date: Tue, 17 Oct 2017 09:10:00 +0200
-Message-ID: <1508224209-15366-3-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v4 04/11] KVM: arm/arm64: vgic-its: Check CBASER/BASER
+ validity before enabling the ITS
+Date: Tue, 17 Oct 2017 09:10:02 +0200
+Message-ID: <1508224209-15366-5-git-send-email-eric.auger@redhat.com>
 References: <1508224209-15366-1-git-send-email-eric.auger@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BEB2240795
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 03:09:47 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 6ZpdBtb-43Du for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Oct 2017 03:09:47 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2076849D54
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 03:09:47 -0400 (EDT)
 In-Reply-To: <1508224209-15366-1-git-send-email-eric.auger@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, cdall@linaro.org, peter.maydell@linaro.org, andre.przywara@arm.com, wanghaibin.wang@huawei.com
-Cc: wu.wubin@huawei.com, drjones@redhat.com, wei@redhat.com
+Cc: wu.wubin@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-vgic_its_restore_cte returns +1 if the collection table entry
-is valid and properly decoded. As a consequence, if the
-collection table is fully filled with valid data that are
-decoded without error, vgic_its_restore_collection_table()
-returns +1.  This is wrong.
+The spec says it is UNPREDICTABLE to enable the ITS
+if any of the following conditions are true:
 
-Let's use the standard C convention for both vgic_its_restore_cte
-and vgic_its_restore_collection_table. vgic_its_restore_cte now
-returns whether we have reached the end of the table in the @last
-output parameter. vgic_its_restore_collection_table aborts in case
-of error or if the end is found. Otherwise, it now returns 0.
+- GITS_CBASER.Valid == 0.
+- GITS_BASER<n>.Valid == 0, for any GITS_BASER<n> register
+  where the Type field indicates Device.
+- GITS_BASER<n>.Valid == 0, for any GITS_BASER<n> register
+  where the Type field indicates Interrupt Collection and
+  GITS_TYPER.HCC == 0.
 
-Fixes: ea1ad53e1e31a3 (KVM: arm64: vgic-its: Collection table save/restore)
+In that case, let's keep the ITS disabled.
+
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reported-by: Andre Przywara <andre.przywara@arm.com>
 
 ---
 
-v2 -> v3: creation
+v3: creation
 ---
- virt/kvm/arm/vgic/vgic-its.c | 40 +++++++++++++++++++++++++++++++---------
- 1 file changed, 31 insertions(+), 9 deletions(-)
+ virt/kvm/arm/vgic/vgic-its.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index eea14a1..a4ff8f7 100644
+index e59363e..e61736b 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -2204,7 +2204,19 @@ static int vgic_its_save_cte(struct vgic_its *its,
- 	return kvm_write_guest(its->dev->kvm, gpa, &val, esz);
- }
+@@ -1488,6 +1488,16 @@ static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
+ 	its->enabled = !!(val & GITS_CTLR_ENABLE);
  
--static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, int esz)
-+/**
-+ * vgic_its_restore_cte - Restore a collection table entry
-+ *
-+ * @its: its handle
-+ * @gpa: guest physical address of the entry
-+ * @esz: entry size
-+ * @last: output boolean indicating whether we have reached the
-+ *       end of the collection table (ie. an invalid entry was decoded)
-+ *
-+ * Return: 0 upon success, < 0 on error
-+ */
-+static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, int esz,
-+				bool *last)
- {
- 	struct its_collection *collection;
- 	struct kvm *kvm = its->dev->kvm;
-@@ -2217,7 +2229,8 @@ static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, int esz)
- 	if (ret)
- 		return ret;
- 	val = le64_to_cpu(val);
--	if (!(val & KVM_ITS_CTE_VALID_MASK))
-+	*last = !(val & KVM_ITS_CTE_VALID_MASK);
-+	if (*last)
- 		return 0;
- 
- 	target_addr = (u32)(val >> KVM_ITS_CTE_RDBASE_SHIFT);
-@@ -2233,7 +2246,7 @@ static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, int esz)
- 	if (ret)
- 		return ret;
- 	collection->target_addr = target_addr;
--	return 1;
-+	return 0;
- }
- 
- /**
-@@ -2278,8 +2291,13 @@ static int vgic_its_save_collection_table(struct vgic_its *its)
- 
- /**
-  * vgic_its_restore_collection_table - reads the collection table
-- * in guest memory and restores the ITS internal state. Requires the
-- * BASER registers to be restored before.
-+ * in guest memory and restores the ITS collection cache.
-+ *
-+ * @its: its handle
-+ *
-+ * Requires the Collection BASER to be previously restored.
-+ *
-+ * Returns 0 on success or < 0 on error
-  */
- static int vgic_its_restore_collection_table(struct vgic_its *its)
- {
-@@ -2297,13 +2315,17 @@ static int vgic_its_restore_collection_table(struct vgic_its *its)
- 	max_size = GITS_BASER_NR_PAGES(its->baser_coll_table) * SZ_64K;
- 
- 	while (read < max_size) {
--		ret = vgic_its_restore_cte(its, gpa, cte_esz);
--		if (ret <= 0)
--			break;
-+		bool last;
+ 	/*
++	 * It is UNPREDICTABLE to enable the ITS if any of the CBASER or
++	 * device/collection BASER are invalid
++	 */
++	if (its->enabled &&
++		(!(its->baser_device_table & GITS_BASER_VALID) ||
++		 !(its->baser_coll_table & GITS_BASER_VALID) ||
++		 !(its->cbaser && GITS_CBASER_VALID)))
++		its->enabled = false;
 +
-+		ret = vgic_its_restore_cte(its, gpa, cte_esz, &last);
-+		if (ret < 0 || last)
-+			return ret;
- 		gpa += cte_esz;
- 		read += cte_esz;
- 	}
--	return ret;
-+
-+	/* table was fully filled with valid entries, decoded without error */
-+	return 0;
- }
- 
- /**
++	/*
+ 	 * Try to process any pending commands. This function bails out early
+ 	 * if the ITS is disabled or no commands have been queued.
+ 	 */
 -- 
 2.5.5
