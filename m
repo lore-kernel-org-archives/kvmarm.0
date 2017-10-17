@@ -1,94 +1,183 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v3 24/28] arm64/sve: KVM: Hide SVE from CPU features
- exposed to guests
-Date: Tue, 17 Oct 2017 16:47:08 +0100
-Message-ID: <20171017154708.GY19485@e103592.cambridge.arm.com>
-References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
- <1507660725-7986-25-git-send-email-Dave.Martin@arm.com>
- <20171017135816.GF5886@lvm>
- <20171017140749.GW19485@e103592.cambridge.arm.com>
- <2c6d9aa4-f6a8-2c6b-4138-e07d773bf4a2@arm.com>
+From: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+Subject: Re: [PATCH v3 09/13] arm64: kernel: Add arch-specific SDEI entry
+ code and CPU masking
+Date: Tue, 17 Oct 2017 17:34:13 +0100
+Message-ID: <59E63105.9080804@arm.com>
+References: <20170922182614.27885-1-james.morse@arm.com> <20170922182614.27885-10-james.morse@arm.com> <20171016134139.sqe6xabdson2d5rd@armageddon.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-arch-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <2c6d9aa4-f6a8-2c6b-4138-e07d773bf4a2@arm.com>
-Sender: linux-arch-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <cdall@linaro.org>, linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20171016134139.sqe6xabdson2d5rd-+1aNUgJU5qkijLcmloz0ER/iLCjYCKR+VpNB7YpNyf8@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>
+Cc: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Lorenzo Pieralisi <lorenzo.pieralisi-5wv7dgnIgG8@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Loc Ho <lho-qTEPVZfXA3Y@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Oct 17, 2017 at 03:29:36PM +0100, Marc Zyngier wrote:
-> On 17/10/17 15:07, Dave Martin wrote:
-> > On Tue, Oct 17, 2017 at 06:58:16AM -0700, Christoffer Dall wrote:
-> >> On Tue, Oct 10, 2017 at 07:38:41PM +0100, Dave Martin wrote:
-> >>> KVM guests cannot currently use SVE, because SVE is always
-> >>> configured to trap to EL2.
-> >>>
-> >>> However, a guest that sees SVE reported as present in
-> >>> ID_AA64PFR0_EL1 may legitimately expect that SVE works and try to
-> >>> use it.  Instead of working, the guest will receive an injected
-> >>> undef exception, which may cause the guest to oops or go into a
-> >>> spin.
-> >>>
-> >>> To avoid misleading the guest into believing that SVE will work,
-> >>> this patch masks out the SVE field from ID_AA64PFR0_EL1 when a
-> >>> guest attempts to read this register.  No support is explicitly
-> >>> added for ID_AA64ZFR0_EL1 either, so that is still emulated as
-> >>> reading as zero, which is consistent with SVE not being
-> >>> implemented.
-> >>>
-> >>> This is a temporary measure, and will be removed in a later series
-> >>> when full KVM support for SVE is implemented.
-> >>>
-> >>> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> >>> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-> >>> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> >>> ---
-> >>>  arch/arm64/kvm/sys_regs.c | 12 +++++++++++-
-> >>>  1 file changed, 11 insertions(+), 1 deletion(-)
-> >>>
-> >>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> >>> index b1f7552..a0ee9b0 100644
-> >>> --- a/arch/arm64/kvm/sys_regs.c
-> >>> +++ b/arch/arm64/kvm/sys_regs.c
-> >>> @@ -23,6 +23,7 @@
-> >>>  #include <linux/bsearch.h>
-> >>>  #include <linux/kvm_host.h>
-> >>>  #include <linux/mm.h>
-> >>> +#include <linux/printk.h>
-> >>>  #include <linux/uaccess.h>
-> >>>  
-> >>>  #include <asm/cacheflush.h>
-> >>> @@ -897,8 +898,17 @@ static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
-> >>>  {
-> >>>  	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
-> >>>  			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
-> >>> +	u64 val = raz ? 0 : read_sanitised_ftr_reg(id);
-> >>>  
-> >>> -	return raz ? 0 : read_sanitised_ftr_reg(id);
-> >>> +	if (id == SYS_ID_AA64PFR0_EL1) {
-> >>> +		if (val & (0xfUL << ID_AA64PFR0_SVE_SHIFT))
-> >>> +			pr_err_once("kvm [%i]: SVE unsupported for guests, suppressing\n",
-> >>> +				    task_pid_nr(current));
-> >>
-> >> nit: does this really qualify as an error print?
-> > 
-> > I have no strong opinion on this: maz suggested I should add this --
-> > his concern was to make it difficult to ignore.
-> > 
-> > This is transitional: the main purpose is to circumvent bug reports from
-> > people who find that SVE doesn't work in their guests, in the interim
-> > before proper KVM support lands upstream.
-> > 
-> > Marc, do you still agree with this position?
+Hi Catalin,
+
+On 16/10/17 14:41, Catalin Marinas wrote:
+> On Fri, Sep 22, 2017 at 07:26:10PM +0100, James Morse wrote:
+>> diff --git a/arch/arm64/kernel/sdei-entry.S b/arch/arm64/kernel/sdei-entry.S
+>> new file mode 100644
+>> index 000000000000..cf12f8da0789
+>> --- /dev/null
+>> +++ b/arch/arm64/kernel/sdei-entry.S
+>> @@ -0,0 +1,122 @@
+>> +/*
+>> + * Software Delegated Exception entry point from firmware to the kernel.
+>> + *
+>> + * Copyright (C) 2017 ARM Ltd.
+>> + *
+>> + * This program is free software; you can redistribute it and/or modify
+>> + * it under the terms of the GNU General Public License version 2 as
+>> + * published by the Free Software Foundation.
+>> + *
+>> + * This program is distributed in the hope that it will be useful,
+>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>> + * GNU General Public License for more details.
+>> + *
+>> + * You should have received a copy of the GNU General Public License
+>> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+>> + */
+>> +
+>> +#include <linux/linkage.h>
+>> +
+>> +#include <asm/alternative.h>
+>> +#include <asm/asm-offsets.h>
+>> +#include <asm/assembler.h>
+>> +#include <asm/memory.h>
+>> +#include <asm/ptrace.h>
+>> +#include <asm/sdei.h>
+>> +#include <uapi/linux/sdei.h>
+>> +
+>> +/*
+>> + * Software Delegated Exception entry point.
+>> + *
+>> + * x0: Event number
 > 
-> As long as this is transitional, I'm OK with this.
+> Currently the only event number is 0. Shall we plan for having other
+> events in the future or we just ignore this argument?
 
-No argument from me, since it was your request in the first place ;)
+'0' is the only event number specified by the SDEI specification. For use with
+RAS the event number is read from the HEST. (and there may me more than one of
+them).
 
-Christoffer?
 
-Cheers
----Dave
+
+>> + * x1: struct sdei_registered_event argument from registration time.
+>> + * x2: interrupted PC
+>> + * x3: interrupted PSTATE
+> [...]
+>> +/*
+>> + * __sdei_handler() returns one of:
+>> + *  SDEI_EV_HANDLED -  success, return to the interrupted context.
+>> + *  SDEI_EV_FAILED  -  failure, return this error code to firmare.
+>> + *  virtual-address -  success, return to this address.
+>> + */
+>> +static __kprobes unsigned long _sdei_handler(struct pt_regs *regs,
+>> +					     struct sdei_registered_event *arg)
+>> +{
+>> +	u32 mode;
+>> +	int i, err = 0;
+>> +	int clobbered_registers = 4;
+
+> Maybe const int here if you want to avoid magic numbers in the 'for'
+> loop below. Otherwise it looks like some variable you intend to modify
+> in this function.
+
+Sure.
+
+(this was modified in my various attempts to get this working on non-vhe systems
+with KVM).
+
+
+>> +	u64 elr = read_sysreg(elr_el1);
+>> +	u32 kernel_mode = read_sysreg(CurrentEL) | 1;	/* +SPSel */
+>> +	unsigned long vbar = read_sysreg(vbar_el1);
+>> +
+>> +	/* Retrieve the missing registers values */
+>> +	for (i = 0; i < clobbered_registers; i++) {
+>> +		/* from within the handler, this call always succeeds */
+>> +		sdei_api_event_context(i, &regs->regs[i]);
+>> +	}
+>> +
+>> +	/*
+>> +	 * We didn't take an exception to get here, set PAN. UAO will be cleared
+>> +	 * by sdei_event_handler()s set_fs(USER_DS) call.
+>> +	 */
+>> +	asm(ALTERNATIVE("nop", SET_PSTATE_PAN(1), ARM64_HAS_PAN,
+>> +			CONFIG_ARM64_PAN));
+
+> Can you use uaccess_disable() directly?
+
+Wouldn't this invoke sw-pan's __uaccess_ttbr0_disable():
+> write_sysreg(ttbr, ttbr0_el1);
+
+Probing depends on VHE if booted at EL2, can we guarantee to have PAN (and
+therefore not-SW-PAN) too?
+
+(otherwise I can add 'depends on !ARM64_SW_TTBR0_PAN' to the Kconfig)
+
+
+>> diff --git a/drivers/firmware/Kconfig b/drivers/firmware/Kconfig
+>> index d8a9859f6102..1f6633b337aa 100644
+>> --- a/drivers/firmware/Kconfig
+>> +++ b/drivers/firmware/Kconfig
+>> @@ -50,6 +50,7 @@ config ARM_SCPI_POWER_DOMAIN
+>>  
+>>  config ARM_SDE_INTERFACE
+>>  	bool "ARM Software Delegated Exception Interface (SDEI)"
+>> +	depends on ARM64
+>>  	help
+>>  	  The Software Delegated Exception Interface (SDEI) is an ARM
+>>  	  standard for registering callbacks from the platform firmware
+>> diff --git a/drivers/firmware/arm_sdei.c b/drivers/firmware/arm_sdei.c
+>> index 4b3c7fd99c34..3ea6a19ae439 100644
+>> --- a/drivers/firmware/arm_sdei.c
+>> +++ b/drivers/firmware/arm_sdei.c
+>> @@ -154,6 +154,7 @@ int sdei_api_event_context(u32 query, u64 *result)
+>>  	return invoke_sdei_fn(SDEI_1_0_FN_SDEI_EVENT_CONTEXT, query, 0, 0, 0, 0,
+>>  			      result);
+>>  }
+>> +NOKPROBE_SYMBOL(sdei_api_event_context);
+
+> Should this be part of the patch introducing arm_sdei.c?
+
+Yes.
+
+
+>>  static int sdei_api_event_get_info(u32 event, u32 info, u64 *result)
+>>  {
+>> diff --git a/include/linux/sdei.h b/include/linux/sdei.h
+>> index bb3dd000771e..df3fe6373e32 100644
+>> --- a/include/linux/sdei.h
+>> +++ b/include/linux/sdei.h
+>> @@ -32,6 +32,8 @@ enum sdei_conduit_types {
+>>  	CONDUIT_HVC,
+>>  };
+>>  
+>> +#include <asm/sdei.h>
+>> +
+>>  /* Arch code should override this to set the entry point from firmware... */
+>>  #ifndef sdei_arch_get_entry_point
+>>  #define sdei_arch_get_entry_point(conduit)	(0)
+> 
+> Same here. This should not be built before the Kconfig change anyway.
+
+(I've been building this on x86 to check I'd not done anything arm64 specific
+outside the arch code...)
+
+Sure, I'll move this hunk and the Kconfig create a place holder asm/sdei.h in
+the earlier patch.
+
+
+Thanks,
+
+James
+
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
