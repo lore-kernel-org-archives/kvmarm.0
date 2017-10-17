@@ -1,28 +1,28 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v4 04/11] KVM: arm/arm64: vgic-its: Check CBASER/BASER
- validity before enabling the ITS
-Date: Wed, 18 Oct 2017 00:05:54 +0200
-Message-ID: <20171017220554.GE8326@lvm>
+Subject: Re: [PATCH v4 06/11] KVM: arm/arm64: vgic-its: Check GITS_CBASER
+ validity before processing commands
+Date: Wed, 18 Oct 2017 00:10:16 +0200
+Message-ID: <20171017221016.GF8326@lvm>
 References: <1508224209-15366-1-git-send-email-eric.auger@redhat.com>
- <1508224209-15366-5-git-send-email-eric.auger@redhat.com>
+ <1508224209-15366-7-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A4D4349D20
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 18:04:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B91394078A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 18:09:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mvu4Gkf0jHXP for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Oct 2017 18:04:58 -0400 (EDT)
-Received: from mail-wm0-f43.google.com (mail-wm0-f43.google.com [74.125.82.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 98E9849D15
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 18:04:58 -0400 (EDT)
-Received: by mail-wm0-f43.google.com with SMTP id i124so6615824wmf.3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 15:05:57 -0700 (PDT)
+ with ESMTP id FnNcOCkmPfWo for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Oct 2017 18:09:20 -0400 (EDT)
+Received: from mail-wm0-f47.google.com (mail-wm0-f47.google.com [74.125.82.47])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8FAB4406D0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 18:09:20 -0400 (EDT)
+Received: by mail-wm0-f47.google.com with SMTP id i124so6471613wmf.3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 15:10:19 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1508224209-15366-5-git-send-email-eric.auger@redhat.com>
+In-Reply-To: <1508224209-15366-7-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,53 +36,61 @@ To: Eric Auger <eric.auger@redhat.com>
 Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andre.przywara@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Oct 17, 2017 at 09:10:02AM +0200, Eric Auger wrote:
-> The spec says it is UNPREDICTABLE to enable the ITS
-> if any of the following conditions are true:
+On Tue, Oct 17, 2017 at 09:10:04AM +0200, Eric Auger wrote:
+> At the moment vgic_its_process_commands() does not
+> check the CBASER is valid before processing any command.
+> Let's fix that.
 > 
-> - GITS_CBASER.Valid == 0.
-> - GITS_BASER<n>.Valid == 0, for any GITS_BASER<n> register
->   where the Type field indicates Device.
-> - GITS_BASER<n>.Valid == 0, for any GITS_BASER<n> register
->   where the Type field indicates Interrupt Collection and
->   GITS_TYPER.HCC == 0.
-> 
-> In that case, let's keep the ITS disabled.
+> Also rename cbaser local variable into cbaser_pa to avoid
+> any confusion with the full register.
 > 
 > Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Reported-by: Andre Przywara <andre.przywara@arm.com>
-> 
 > ---
-> 
-> v3: creation
-> ---
->  virt/kvm/arm/vgic/vgic-its.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
+>  virt/kvm/arm/vgic/vgic-its.c | 13 ++++++++-----
+>  1 file changed, 8 insertions(+), 5 deletions(-)
 > 
 > diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index e59363e..e61736b 100644
+> index 3b539d4..e18f1e4 100644
 > --- a/virt/kvm/arm/vgic/vgic-its.c
 > +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -1488,6 +1488,16 @@ static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
->  	its->enabled = !!(val & GITS_CTLR_ENABLE);
+> @@ -1301,17 +1301,20 @@ static void vgic_mmio_write_its_cbaser(struct kvm *kvm, struct vgic_its *its,
+>  /* Must be called with the cmd_lock held. */
+>  static void vgic_its_process_commands(struct kvm *kvm, struct vgic_its *its)
+>  {
+> -	gpa_t cbaser;
+> +	gpa_t cbaser_pa;
+>  	u64 cmd_buf[4];
 >  
->  	/*
-> +	 * It is UNPREDICTABLE to enable the ITS if any of the CBASER or
-> +	 * device/collection BASER are invalid
-> +	 */
-> +	if (its->enabled &&
-> +		(!(its->baser_device_table & GITS_BASER_VALID) ||
-> +		 !(its->baser_coll_table & GITS_BASER_VALID) ||
-> +		 !(its->cbaser && GITS_CBASER_VALID)))
-
-whoops, you wanted &, not && in the last one I think.
-
-> +		its->enabled = false;
-> +
+> -	/* Commands are only processed when the ITS is enabled. */
+> -	if (!its->enabled)
 > +	/*
->  	 * Try to process any pending commands. This function bails out early
->  	 * if the ITS is disabled or no commands have been queued.
->  	 */
+> +	 * Commands are only processed when the ITS is enabled and
+> +	 * CBASER is valid
+> +	 */
+> +	if (!its->enabled || (!(its->cbaser & GITS_CBASER_VALID)))
+
+Is it valid to clear the CBASER valid bit after having enabled the ITS?
+If not, I think you should check changes to CBASER and then this
+shouldn't be necessary.
+
+
+
+>  		return;
+>  
+> -	cbaser = CBASER_ADDRESS(its->cbaser);
+> +	cbaser_pa = CBASER_ADDRESS(its->cbaser);
+>  
+>  	while (its->cwriter != its->creadr) {
+> -		int ret = kvm_read_guest(kvm, cbaser + its->creadr,
+> +		int ret = kvm_read_guest(kvm, cbaser_pa + its->creadr,
+>  					 cmd_buf, ITS_CMD_SIZE);
+>  		/*
+>  		 * If kvm_read_guest() fails, this could be due to the guest
 > -- 
 > 2.5.5
 > 
+
+Otherwise, this looks fine.
+
+Thanks,
+-Christoffer
