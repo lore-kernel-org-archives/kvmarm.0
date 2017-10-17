@@ -1,449 +1,363 @@
-From: James Morse <james.morse@arm.com>
-Subject: [PATCH v4 11/13] firmware: arm_sdei: add support for CPU private
- events
-Date: Tue, 17 Oct 2017 18:44:30 +0100
-Message-ID: <20171017174432.1684-12-james.morse@arm.com>
-References: <20171017174432.1684-1-james.morse@arm.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH v4 01/11] KVM: arm/arm64: vgic-its: fix return value for
+ device table restore
+Date: Tue, 17 Oct 2017 23:40:30 +0200
+Message-ID: <20171017214030.GA8326@lvm>
+References: <1508224209-15366-1-git-send-email-eric.auger@redhat.com>
+ <1508224209-15366-2-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DC27406BB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 13:45:54 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VeGl0WCY21oF for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Oct 2017 13:45:53 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3261B49D34
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 13:45:52 -0400 (EDT)
-In-Reply-To: <20171017174432.1684-1-james.morse@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org
-Cc: devicetree@vger.kernel.org, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Rob Herring <robh+dt@kernel.org>, Loc Ho <lho@apm.com>, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1508224209-15366-2-git-send-email-eric.auger@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, peter.maydell@linaro.org, andre.przywara@arm.com, wanghaibin.wang@huawei.com, wu.wubin@huawei.com, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Private SDE events are per-cpu, and need to be registered and enabled
-on each CPU.
+On Tue, Oct 17, 2017 at 09:09:59AM +0200, Eric Auger wrote:
+> AT the moment if ITT only contains invalid entries,
+> vgic_its_restore_itt returns 1 and this is considered as
+> an an error in vgic_its_restore_dte.
+> 
+> Also in case the device table only contains invalid entries,
+> the table restore fails and this is not correct.
+> 
+> This patch fully revisits the errror handling while fixing those
+> 2 bugs.
+> 
+> - entry_fn_t now takes a valid output paraleter
 
-Hide this detail from the caller by adapting our {,un}register and
-{en,dis}able calls to send an IPI to each CPU if the event is private.
+                                        parameter
 
-CPU private events are unregistered when the CPU is powered-off, and
-re-registered when the CPU is brought back online. This saves bringing
-secondary cores back online to call private_reset() on shutdown, kexec
-and resume from hibernate.
+> - scan_its_table() now returns <= 0 values and output 2 booleans,
+                                                 outputs
+>   valid and last.
+> - vgic_its_restore_itt() now returns <= 0 values.
+> - vgic_its_restore_device_tables() also returns <= 0 values.
+> 
+> With that patch we are able to properly handle the case where
+> all data are invalid but we still are able to detect the case
+> where a next entry was referenced by some valid entry and
+> never found.
+> 
+> Fixes: 57a9a117154c93 (KVM: arm64: vgic-its: Device table save/restore)
+> Fixes: eff484e0298da5 (KVM: arm64: vgic-its: ITT save and restore)
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Reported-by: wanghaibin <wanghaibin.wang@huawei.com>
+> 
+> ---
+> 
+> need to CC stable
+> 
+> v3 -> v4:
+> - set *valid at beginning of handle_l1_dte
+> 
+> v2 -> v3:
+> - add comments
+> - added valid parameter
+> - vgic_its_restore_itt don't return +1 anymore
+> - reword the commit message
+> 
+> v1 -> v2:
+> - if (ret > 0) ret = 0
+> ---
+>  virt/kvm/arm/vgic/vgic-its.c | 95 ++++++++++++++++++++++++++++++++------------
+>  1 file changed, 70 insertions(+), 25 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> index f51c1e1..eea14a1 100644
+> --- a/virt/kvm/arm/vgic/vgic-its.c
+> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> @@ -1772,16 +1772,20 @@ static u32 compute_next_eventid_offset(struct list_head *h, struct its_ite *ite)
+>  
+>  /**
+>   * entry_fn_t - Callback called on a table entry restore path
+> + *
+>   * @its: its handle
+>   * @id: id of the entry
+>   * @entry: pointer to the entry
+>   * @opaque: pointer to an opaque data
+> + * @valid: indicates whether valid data is associated to this entry
+> + * (the entry itself in case of linear table or entries in the next level,
+> + * in case of hierachical tables)
+>   *
+>   * Return: < 0 on error, 0 if last element was identified, id offset to next
+>   * element otherwise
+>   */
+>  typedef int (*entry_fn_t)(struct vgic_its *its, u32 id, void *entry,
+> -			  void *opaque);
+> +			  void *opaque, bool *valid);
+>  
+>  /**
+>   * scan_its_table - Scan a contiguous table in guest RAM and applies a function
+> @@ -1794,29 +1798,34 @@ typedef int (*entry_fn_t)(struct vgic_its *its, u32 id, void *entry,
+>   * @start_id: the ID of the first entry in the table
+>   * (non zero for 2d level tables)
+>   * @fn: function to apply on each entry
+> + * @opaque: opaque data passed to @fn
+> + * @valid: indicates whether the table contains any valid data
+> + * @last: returns whether the last valid entry was decoded
+>   *
+> - * Return: < 0 on error, 0 if last element was identified, 1 otherwise
+> - * (the last element may not be found on second level tables)
+> + * Return: < 0 on error, 0 on success
+>   */
+>  static int scan_its_table(struct vgic_its *its, gpa_t base, int size, int esz,
+> -			  int start_id, entry_fn_t fn, void *opaque)
+> +			  int start_id, entry_fn_t fn, void *opaque,
+> +			  bool *valid, bool *last)
+>  {
+>  	void *entry = kzalloc(esz, GFP_KERNEL);
+>  	struct kvm *kvm = its->dev->kvm;
+>  	unsigned long len = size;
+>  	int id = start_id;
+>  	gpa_t gpa = base;
+> +	int next_offset = 0;
+>  	int ret;
+>  
+>  	while (len > 0) {
+> -		int next_offset;
+>  		size_t byte_offset;
+> +		bool entry_valid;
+>  
+>  		ret = kvm_read_guest(kvm, gpa, entry, esz);
+>  		if (ret)
+>  			goto out;
+>  
+> -		next_offset = fn(its, id, entry, opaque);
+> +		next_offset = fn(its, id, entry, opaque, &entry_valid);
+> +		*valid |= entry_valid;
+>  		if (next_offset <= 0) {
+>  			ret = next_offset;
+>  			goto out;
+> @@ -1827,9 +1836,15 @@ static int scan_its_table(struct vgic_its *its, gpa_t base, int size, int esz,
+>  		gpa += byte_offset;
+>  		len -= byte_offset;
+>  	}
+> -	ret =  1;
+> -
+> +	/*
+> +	 * the table lookup was completed without identifying the
+> +	 * last valid entry (ie. next_offset > 0).
+> +	 */
 
-Signed-off-by: James Morse <james.morse@arm.com>
----
- drivers/firmware/arm_sdei.c | 242 +++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 228 insertions(+), 14 deletions(-)
+but you never set last to false?  If you require the caller to set the
+variable to false, that should be documented, but it's weird.
 
-diff --git a/drivers/firmware/arm_sdei.c b/drivers/firmware/arm_sdei.c
-index 28e4c4cbb16d..5598d9ba8b5d 100644
---- a/drivers/firmware/arm_sdei.c
-+++ b/drivers/firmware/arm_sdei.c
-@@ -21,9 +21,11 @@
- #include <linux/acpi.h>
- #include <linux/arm_sdei.h>
- #include <linux/arm-smccc.h>
-+#include <linux/atomic.h>
- #include <linux/bitops.h>
- #include <linux/compiler.h>
- #include <linux/cpuhotplug.h>
-+#include <linux/cpu.h>
- #include <linux/cpu_pm.h>
- #include <linux/errno.h>
- #include <linux/hardirq.h>
-@@ -64,12 +66,49 @@ struct sdei_event {
- 	u8			priority;
- 
- 	/* This pointer is handed to firmware as the event argument. */
--	struct sdei_registered_event *registered;
-+	union {
-+		/* Shared events */
-+		struct sdei_registered_event *registered;
-+
-+		/* CPU private events */
-+		struct sdei_registered_event __percpu *private_registered;
-+	};
- };
- 
- static LIST_HEAD(sdei_events);
- static DEFINE_SPINLOCK(sdei_events_lock);
- 
-+/* When frozen, cpu-hotplug notifiers shouldn't unregister/re-register events */
-+static bool frozen;
-+
-+/* Private events are registered/enabled via IPI passing one of these */
-+struct sdei_crosscall_args {
-+	struct sdei_event *event;
-+	atomic_t errors;
-+	int first_error;
-+};
-+
-+#define CROSSCALL_INIT(arg, event)	(arg.event = event, \
-+					 arg.first_error = 0, \
-+					 atomic_set(&arg.errors, 0))
-+
-+static inline int sdei_do_cross_call(void *fn, struct sdei_event *event)
-+{
-+	struct sdei_crosscall_args arg;
-+
-+	CROSSCALL_INIT(arg, event);
-+	on_each_cpu(fn, &arg, true);
-+
-+	return arg.first_error;
-+}
-+
-+static inline void
-+sdei_cross_call_return(struct sdei_crosscall_args *arg, int err)
-+{
-+	if (err && (atomic_inc_return(&arg->errors) == 1))
-+		arg->first_error = err;
-+}
-+
- static int sdei_to_linux_errno(unsigned long sdei_err)
- {
- 	switch (sdei_err) {
-@@ -213,6 +252,26 @@ static struct sdei_event *sdei_event_create(u32 event_num,
- 		reg->callback = cb;
- 		reg->callback_arg = cb_arg;
- 		event->registered = reg;
-+	} else {
-+		int cpu;
-+		struct sdei_registered_event __percpu *regs;
-+
-+		regs = alloc_percpu(struct sdei_registered_event);
-+		if (!regs) {
-+			kfree(event);
-+			return ERR_PTR(-ENOMEM);
-+		}
-+
-+		for_each_possible_cpu(cpu) {
-+			reg = per_cpu_ptr(regs, cpu);
-+
-+			reg->event_num = event->event_num;
-+			reg->priority = event->priority;
-+			reg->callback = cb;
-+			reg->callback_arg = cb_arg;
-+		}
-+
-+		event->private_registered = regs;
- 	}
- 
- 	if (sdei_event_find(event_num)) {
-@@ -234,6 +293,8 @@ static void sdei_event_destroy(struct sdei_event *event)
- 
- 	if (event->type == SDEI_EVENT_TYPE_SHARED)
- 		kfree(event->registered);
-+	else
-+		free_percpu(event->private_registered);
- 
- 	kfree(event);
- }
-@@ -264,11 +325,6 @@ static void _ipi_mask_cpu(void *ignored)
- 	sdei_mask_local_cpu();
- }
- 
--static int sdei_cpuhp_down(unsigned int ignored)
--{
--	return sdei_mask_local_cpu();
--}
--
- int sdei_unmask_local_cpu(void)
- {
- 	int err;
-@@ -290,11 +346,6 @@ static void _ipi_unmask_cpu(void *ignored)
- 	sdei_unmask_local_cpu();
- }
- 
--static int sdei_cpuhp_up(unsigned int ignored)
--{
--	return sdei_unmask_local_cpu();
--}
--
- static void _ipi_private_reset(void *ignored)
- {
- 	int err;
-@@ -345,6 +396,16 @@ static int sdei_api_event_enable(u32 event_num)
- 			      0, NULL);
- }
- 
-+static void _ipi_event_enable(void *data)
-+{
-+	int err;
-+	struct sdei_crosscall_args *arg = data;
-+
-+	err = sdei_api_event_enable(arg->event->event_num);
-+
-+	sdei_cross_call_return(arg, err);
-+}
-+
- int sdei_event_enable(u32 event_num)
- {
- 	int err = -EINVAL;
-@@ -356,6 +417,8 @@ int sdei_event_enable(u32 event_num)
- 		err = -ENOENT;
- 	else if (event->type == SDEI_EVENT_TYPE_SHARED)
- 		err = sdei_api_event_enable(event->event_num);
-+	else
-+		err = sdei_do_cross_call(_ipi_event_enable, event);
- 	spin_unlock(&sdei_events_lock);
- 
- 	return err;
-@@ -368,6 +431,16 @@ static int sdei_api_event_disable(u32 event_num)
- 			      0, 0, NULL);
- }
- 
-+static void _ipi_event_disable(void *data)
-+{
-+	int err;
-+	struct sdei_crosscall_args *arg = data;
-+
-+	err = sdei_api_event_disable(arg->event->event_num);
-+
-+	sdei_cross_call_return(arg, err);
-+}
-+
- int sdei_event_disable(u32 event_num)
- {
- 	int err = -EINVAL;
-@@ -379,6 +452,9 @@ int sdei_event_disable(u32 event_num)
- 		err = -ENOENT;
- 	else if (event->type == SDEI_EVENT_TYPE_SHARED)
- 		err = sdei_api_event_disable(event->event_num);
-+	else
-+		err = sdei_do_cross_call(_ipi_event_disable, event);
-+
- 	spin_unlock(&sdei_events_lock);
- 
- 	return err;
-@@ -391,6 +467,27 @@ static int sdei_api_event_unregister(u32 event_num)
- 			      0, 0, 0, NULL);
- }
- 
-+static void _local_event_unregister(void *data)
-+{
-+	int err;
-+	u64 result;
-+	struct sdei_registered_event *reg;
-+	struct sdei_crosscall_args *arg = data;
-+
-+	WARN_ON_ONCE(preemptible());
-+	lockdep_assert_held(&sdei_events_lock);
-+
-+	reg = per_cpu_ptr(arg->event->private_registered, smp_processor_id());
-+	err = sdei_api_event_status(reg->event_num, &result);
-+	if (!err) {
-+		reg->was_enabled = !!(result & BIT(SDEI_EVENT_STATUS_ENABLED));
-+
-+		err = sdei_api_event_unregister(arg->event->event_num);
-+	}
-+
-+	sdei_cross_call_return(arg, err);
-+}
-+
- static int _sdei_event_unregister(struct sdei_event *event)
- {
- 	int err;
-@@ -411,7 +508,7 @@ static int _sdei_event_unregister(struct sdei_event *event)
- 		return sdei_api_event_unregister(event->event_num);
- 	}
- 
--	return -EINVAL;
-+	return sdei_do_cross_call(_local_event_unregister, event);
- }
- 
- int sdei_event_unregister(u32 event_num)
-@@ -470,15 +567,41 @@ static int sdei_api_event_register(u32 event_num, unsigned long entry_point,
- 			      flags, affinity, NULL);
- }
- 
-+static void _local_event_register(void *data)
-+{
-+	int err;
-+	struct sdei_registered_event *reg;
-+	struct sdei_crosscall_args *arg = data;
-+
-+	WARN_ON(preemptible());
-+	lockdep_assert_held(&sdei_events_lock);
-+
-+	reg = per_cpu_ptr(arg->event->private_registered, smp_processor_id());
-+	err = sdei_api_event_register(arg->event->event_num, sdei_entry_point,
-+				      reg, 0, 0);
-+
-+	sdei_cross_call_return(arg, err);
-+}
-+
- static int _sdei_event_register(struct sdei_event *event)
- {
-+	int err;
-+
- 	if (event->type == SDEI_EVENT_TYPE_SHARED)
- 		return sdei_api_event_register(event->event_num,
- 					       sdei_entry_point,
- 					       event->registered,
- 					       SDEI_EVENT_REGISTER_RM_ANY, 0);
- 
--	return -EINVAL;
-+	get_online_cpus();
-+
-+	err = sdei_do_cross_call(_local_event_register, event);
-+	if (err)
-+		sdei_do_cross_call(_local_event_unregister, event);
-+
-+	put_online_cpus();
-+
-+	return err;
- }
- 
- int sdei_event_register(u32 event_num, sdei_event_callback *cb, void *arg,
-@@ -518,6 +641,22 @@ int sdei_event_register(u32 event_num, sdei_event_callback *cb, void *arg,
- }
- EXPORT_SYMBOL(sdei_event_register);
- 
-+static void _local_event_reenable(void *data)
-+{
-+	int err = 0;
-+	struct sdei_registered_event *reg;
-+	struct sdei_crosscall_args *arg = data;
-+
-+	WARN_ON_ONCE(preemptible());
-+	lockdep_assert_held(&sdei_events_lock);
-+
-+	reg = per_cpu_ptr(arg->event->private_registered, smp_processor_id());
-+	if (reg->was_enabled)
-+		err = sdei_api_event_enable(arg->event->event_num);
-+
-+	sdei_cross_call_return(arg, err);
-+}
-+
- static int sdei_reregister_event(struct sdei_event *event)
- {
- 	int err;
-@@ -534,6 +673,8 @@ static int sdei_reregister_event(struct sdei_event *event)
- 	if (event->type == SDEI_EVENT_TYPE_SHARED) {
- 		if (event->registered->was_enabled)
- 			err = sdei_api_event_enable(event->event_num);
-+	} else {
-+		err = sdei_do_cross_call(_local_event_reenable, event);
- 	}
- 
- 	if (err)
-@@ -558,6 +699,68 @@ static int sdei_reregister_events(void)
- 	return err;
- }
- 
-+static int sdei_cpuhp_down(unsigned int cpu)
-+{
-+	struct sdei_event *event;
-+	struct sdei_crosscall_args arg;
-+
-+	if (frozen) {
-+		/* All events unregistered  */
-+		return sdei_mask_local_cpu();
-+	}
-+
-+	/* un-register private events */
-+	spin_lock(&sdei_events_lock);
-+	list_for_each_entry(event, &sdei_events, list) {
-+		if (event->type == SDEI_EVENT_TYPE_SHARED)
-+			continue;
-+
-+		CROSSCALL_INIT(arg, event);
-+		/* call the cross-call function locally... */
-+		_local_event_unregister(&arg);
-+		if (arg.first_error)
-+			pr_err("Failed to unregister event %u: %d\n",
-+			       event->event_num, arg.first_error);
-+	}
-+	spin_unlock(&sdei_events_lock);
-+
-+	return sdei_mask_local_cpu();
-+}
-+
-+static int sdei_cpuhp_up(unsigned int cpu)
-+{
-+	struct sdei_event *event;
-+	struct sdei_crosscall_args arg;
-+
-+	if (frozen) {
-+		/* Events will be re-registered when we thaw. */
-+		return sdei_unmask_local_cpu();
-+	}
-+
-+	/* re-register/enable private events */
-+	spin_lock(&sdei_events_lock);
-+	list_for_each_entry(event, &sdei_events, list) {
-+		if (event->type == SDEI_EVENT_TYPE_SHARED)
-+			continue;
-+
-+		CROSSCALL_INIT(arg, event);
-+		/* call the cross-call function locally... */
-+		_local_event_register(&arg);
-+		if (arg.first_error)
-+			pr_err("Failed to re-register event %u: %d\n",
-+			       event->event_num, arg.first_error);
-+
-+		CROSSCALL_INIT(arg, event);
-+		_local_event_reenable(&arg);
-+		if (arg.first_error)
-+			pr_err("Failed to re-enable event %u: %d\n",
-+			       event->event_num, arg.first_error);
-+	}
-+	spin_unlock(&sdei_events_lock);
-+
-+	return sdei_unmask_local_cpu();
-+}
-+
- /* When entering idle, mask/unmask events for this cpu */
- static int sdei_pm_notifier(struct notifier_block *nb, unsigned long action,
- 			    void *data)
-@@ -610,6 +813,7 @@ static int sdei_device_freeze(struct device *dev)
- {
- 	int err;
- 
-+	frozen = true;
- 	err = sdei_event_unregister_all();
- 	if (err)
- 		return err;
-@@ -619,9 +823,13 @@ static int sdei_device_freeze(struct device *dev)
- 
- static int sdei_device_thaw(struct device *dev)
- {
-+	int err;
-+
- 	sdei_device_resume(dev);
- 
--	return sdei_reregister_events();
-+	err = sdei_reregister_events();
-+	frozen = false;
-+	return err;
- }
- 
- static int sdei_device_restore(struct device *dev)
-@@ -653,6 +861,12 @@ static int sdei_reboot_notifier(struct notifier_block *nb, unsigned long action,
- 
- 	sdei_platform_reset();
- 
-+	/*
-+	 * There is now no point trying to unregister private events if we go on
-+	 * to take CPUs offline.
-+	 */
-+	frozen = true;
-+
- 	return NOTIFY_OK;
- }
- 
--- 
-2.13.3
+> +	ret = 0;
+>  out:
+> +	if (!next_offset)
+> +		*last = true;
+> +
+
+so if we scan the entire table to the end we won't set last?  Isn't that
+a bit strange?
+
+Also, if we can get id of the valid out parameter and instead handle
+that within this function, I don't think you'll need the 'last' return
+value in vgic_its_restore_device_tables, and you could make this:
+
+	if (!next_offset && last)
+		*last = true;
+	else if (last)
+		*last = false;
+
+>  	kfree(entry);
+>  	return ret;
+>  }
+> @@ -1854,12 +1869,14 @@ static int vgic_its_save_ite(struct vgic_its *its, struct its_device *dev,
+>  
+>  /**
+>   * vgic_its_restore_ite - restore an interrupt translation entry
+> + *
+>   * @event_id: id used for indexing
+>   * @ptr: pointer to the ITE entry
+>   * @opaque: pointer to the its_device
+> + * @valid: indicates whether the ite is valid
+>   */
+>  static int vgic_its_restore_ite(struct vgic_its *its, u32 event_id,
+> -				void *ptr, void *opaque)
+> +				void *ptr, void *opaque, bool *valid)
+>  {
+>  	struct its_device *dev = (struct its_device *)opaque;
+>  	struct its_collection *collection;
+> @@ -1879,7 +1896,9 @@ static int vgic_its_restore_ite(struct vgic_its *its, u32 event_id,
+>  	coll_id = val & KVM_ITS_ITE_ICID_MASK;
+>  	lpi_id = (val & KVM_ITS_ITE_PINTID_MASK) >> KVM_ITS_ITE_PINTID_SHIFT;
+>  
+> -	if (!lpi_id)
+> +	*valid = !!lpi_id;
+> +
+> +	if (!*valid)
+>  		return 1; /* invalid entry, no choice but to scan next entry */
+>  
+>  	if (lpi_id < VGIC_MIN_LPI)
+> @@ -1940,6 +1959,14 @@ static int vgic_its_save_itt(struct vgic_its *its, struct its_device *device)
+>  	return 0;
+>  }
+>  
+> +/**
+> + * vgic_its_restore_itt - restore the ITT of a device
+> + *
+> + * @its: its handle
+> + * @dev: device handle
+> + *
+> + * Return 0 on success, < 0 on error
+> + */
+>  static int vgic_its_restore_itt(struct vgic_its *its, struct its_device *dev)
+>  {
+>  	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+> @@ -1947,9 +1974,15 @@ static int vgic_its_restore_itt(struct vgic_its *its, struct its_device *dev)
+>  	int ret;
+>  	int ite_esz = abi->ite_esz;
+>  	size_t max_size = BIT_ULL(dev->num_eventid_bits) * ite_esz;
+> +	bool valid = false, last = false;
+>  
+>  	ret = scan_its_table(its, base, max_size, ite_esz, 0,
+> -			     vgic_its_restore_ite, dev);
+> +			     vgic_its_restore_ite, dev, &valid, &last);
+> +
+> +	if (!ret && valid && !last) {
+> +		/* a next element was referenced but not found */
+> +		return -EINVAL;
+
+So this is if we ever found a valid entry, but somehow it didn't lead us
+to the last entry, right?  Can't you handle that within the
+scan_its_table?
+
+As I understand it, scan_its_table is in one of two modes, either it's
+linearly scanning, or it found a valid entry, and it's jumping from one
+entry to the next, given the offsets.  If it's in the second mode, and
+finds an invalid entry, it should return an error.
+
+I think you can also get rid of the '*valid = false; return 1;' thing,
+which looks a bit strange.
+
+> +	}
+>  
+>  	return ret;
+>  }
+> @@ -1985,29 +2018,29 @@ static int vgic_its_save_dte(struct vgic_its *its, struct its_device *dev,
+>   * @id: device id the DTE corresponds to
+>   * @ptr: kernel VA where the 8 byte DTE is located
+>   * @opaque: unused
+> + * @valid: indicates whether the dte is valid
+>   *
+>   * Return: < 0 on error, 0 if the dte is the last one, id offset to the
+>   * next dte otherwise
+>   */
+>  static int vgic_its_restore_dte(struct vgic_its *its, u32 id,
+> -				void *ptr, void *opaque)
+> +				void *ptr, void *opaque, bool *valid)
+>  {
+>  	struct its_device *dev;
+>  	gpa_t itt_addr;
+>  	u8 num_eventid_bits;
+>  	u64 entry = *(u64 *)ptr;
+> -	bool valid;
+>  	u32 offset;
+>  	int ret;
+>  
+>  	entry = le64_to_cpu(entry);
+>  
+> -	valid = entry >> KVM_ITS_DTE_VALID_SHIFT;
+> +	*valid = entry >> KVM_ITS_DTE_VALID_SHIFT;
+>  	num_eventid_bits = (entry & KVM_ITS_DTE_SIZE_MASK) + 1;
+>  	itt_addr = ((entry & KVM_ITS_DTE_ITTADDR_MASK)
+>  			>> KVM_ITS_DTE_ITTADDR_SHIFT) << 8;
+>  
+> -	if (!valid)
+> +	if (!*valid)
+>  		return 1;
+>  
+>  	/* dte entry is valid */
+> @@ -2082,13 +2115,14 @@ static int vgic_its_save_device_tables(struct vgic_its *its)
+>   * @id: index of the entry in the L1 table
+>   * @addr: kernel VA
+>   * @opaque: unused
+> + * @valid: indicates whether any dte entry was found
+>   *
+>   * L1 table entries are scanned by steps of 1 entry
+>   * Return < 0 if error, 0 if last dte was found when scanning the L2
+>   * table, +1 otherwise (meaning next L1 entry must be scanned)
+>   */
+>  static int handle_l1_dte(struct vgic_its *its, u32 id, void *addr,
+> -			 void *opaque)
+> +			 void *opaque, bool *valid)
+>  {
+>  	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+>  	int l2_start_id = id * (SZ_64K / abi->dte_esz);
+> @@ -2096,21 +2130,29 @@ static int handle_l1_dte(struct vgic_its *its, u32 id, void *addr,
+>  	int dte_esz = abi->dte_esz;
+>  	gpa_t gpa;
+>  	int ret;
+> +	bool last;
+>  
+>  	entry = le64_to_cpu(entry);
+>  
+> -	if (!(entry & KVM_ITS_L1E_VALID_MASK))
+> +	*valid = entry & KVM_ITS_L1E_VALID_MASK;
+> +
+> +	if (!*valid)
+>  		return 1;
+>  
+>  	gpa = entry & KVM_ITS_L1E_ADDR_MASK;
+>  
+>  	ret = scan_its_table(its, gpa, SZ_64K, dte_esz,
+> -			     l2_start_id, vgic_its_restore_dte, NULL);
+> +			     l2_start_id, vgic_its_restore_dte, NULL,
+> +			     valid, &last);
+>  
+> -	if (ret <= 0)
+> -		return ret;
+> +	/*
+> +	 * if the last dte has not been found in this L2 table, we
+> +	 * need to scan the next L1 entry
+> +	 */
+> +	if (!ret && !last)
+> +		return 1;
+>  
+> -	return 1;
+> +	return ret;
+>  }
+>  
+>  /**
+> @@ -2124,6 +2166,7 @@ static int vgic_its_restore_device_tables(struct vgic_its *its)
+>  	int l1_esz, ret;
+>  	int l1_tbl_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
+>  	gpa_t l1_gpa;
+> +	bool valid = false, last = false;
+>  
+>  	if (!(baser & GITS_BASER_VALID))
+>  		return 0;
+> @@ -2133,15 +2176,17 @@ static int vgic_its_restore_device_tables(struct vgic_its *its)
+>  	if (baser & GITS_BASER_INDIRECT) {
+>  		l1_esz = GITS_LVL1_ENTRY_SIZE;
+>  		ret = scan_its_table(its, l1_gpa, l1_tbl_size, l1_esz, 0,
+> -				     handle_l1_dte, NULL);
+> +				     handle_l1_dte, NULL, &valid, &last);
+>  	} else {
+>  		l1_esz = abi->dte_esz;
+>  		ret = scan_its_table(its, l1_gpa, l1_tbl_size, l1_esz, 0,
+> -				     vgic_its_restore_dte, NULL);
+> +				     vgic_its_restore_dte, NULL, &valid, &last);
+>  	}
+>  
+> -	if (ret > 0)
+> -		ret = -EINVAL;
+> +	if (!ret && valid && !last) {
+> +		/* a next element was referenced but not found */
+> +		return -EINVAL;
+> +	}
+
+Same comment as above.
+
+>  
+>  	return ret;
+>  }
+> -- 
+> 2.5.5
+> 
+Thanks,
+-Christoffer
