@@ -1,71 +1,86 @@
-From: Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>
-Subject: Re: [PATCH v3 26/28] arm64/sve: Add documentation
-Date: Wed, 18 Oct 2017 10:32:03 +0100
-Message-ID: <20171018093203.xp5tro636chgaiuq@armageddon.cambridge.arm.com>
-References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
- <1507660725-7986-27-git-send-email-Dave.Martin@arm.com>
- <20171013142421.j32jzisukewxtosx@armageddon.cambridge.arm.com>
- <20171013171758.GO19485@e103592.cambridge.arm.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH v3 02/20] arm64: Use physical counter for in-kernel reads
+Date: Wed, 18 Oct 2017 12:00:07 +0200
+Message-ID: <20171018100007.GK8326@lvm>
+References: <20170923004207.22356-1-cdall@linaro.org>
+ <20170923004207.22356-3-cdall@linaro.org>
+ <20171017153305.GB19711@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20171013171758.GO19485-M5GwZQ6tE7x5pKCnmE3YQBJ8xKzm50AiAL8bYrjMMd8@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Dave Martin <Dave.Martin-5wv7dgnIgG8@public.gmane.org>
-Cc: linux-arch-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, Okamoto Takayuki <tokamoto-+CUm20s59erQFUHtdCDX3A@public.gmane.org>, libc-alpha-9JcytcrH/bA+uJoB2kUjGw@public.gmane.org, Ard Biesheuvel <ard.biesheuvel-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Szabolcs Nagy <szabolcs.nagy-5wv7dgnIgG8@public.gmane.org>, Richard Sandiford <richard.sandiford-5wv7dgnIgG8@public.gmane.org>, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Michael Kerrisk <mtk.manpages-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Alan Hayward <alan.hayward-5wv7dgnIgG8@public.gmane.org>, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+In-Reply-To: <20171017153305.GB19711@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Will Deacon <will.deacon@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 13, 2017 at 06:17:59PM +0100, Dave P Martin wrote:
-> On Fri, Oct 13, 2017 at 03:24:21PM +0100, Catalin Marinas wrote:
-> > On Tue, Oct 10, 2017 at 07:38:43PM +0100, Dave P Martin wrote:
-> > > +* If the SVE context is too big to fit in sigcontext.__reserved[], then extra
-> > > +  space is allocated on the stack, an extra_context record is written in
-> > > +  __reserved[] referencing this space.  sve_context is then written in the
-> > > +  extra space.  Refer to [1] for further details about this mechanism.
-> > 
-> > Does this document require that the user stack is sufficiently large or
-> > should we cap the vector length (prior to the last two RFC patches)?
+On Tue, Oct 17, 2017 at 04:33:05PM +0100, Will Deacon wrote:
+> Hi Christoffer,
 > 
-> We don't know how much free stack space there actually is until the
-> signal is delivered.
-[...]
-> Possibly sigaltstack() should fail with ENOMEM if ss_size is too small
-> for the maximum VL supported by the system, but strictly speaking that
-> violates POSIX if ss_size >= MINSIGSTKSZ.
-
-We also don't know whether the application is going to use SVE or not,
-so MINSIGSTKSZ could be just fine. I don't have a better idea here
-without the last two RFC patches. So just ignore my comment.
-
-> > > +5.  Signal return
-> > > +-----------------
-> > > +
-> > > +When returning from a signal handler:
-> > > +
-> > > +* If there is no sve_context record in the signal frame, or if the record is
-> > > +  present but contains no register data as desribed in the previous section,
-> > > +  then the SVE registers/bits become non-live and take unspecified values.
-> > > +
-> > > +* If sve_context is present in the signal frame and contains full register
-> > > +  data, the SVE registers become live and are populated with the specified
-> > > +  data.  However, for backward compatibility reasons, bits [127:0] of Z0..Z31
-> > > +  are always restored from the corresponding members of fpsimd_context.vregs[]
-> > > +  and not from sve_context.  The remaining bits are restored from sve_context.
-> > > +
-> > > +* Inclusion of fpsimd_context in the signal frame remains mandatory,
-> > > +  irrespective of whether sve_context is present or not.
+> On Sat, Sep 23, 2017 at 02:41:49AM +0200, Christoffer Dall wrote:
+> > Using the physical counter allows KVM to retain the offset between the
+> > virtual and physical counter as long as it is actively running a VCPU.
 > > 
-> > Could we relax this? I'm not sure it's worth it.
+> > As soon as a VCPU is released, another thread is scheduled or we start
+> > running userspace applications, we reset the offset to 0, so that
+> > userspace accessing the virtual timer can still read the cirtual counter
+> > and get the same view of time as the kernel.
+> > 
+> > This opens up potential improvements for KVM performance.
+> > 
+> > VHE kernels or kernels continuing to use the virtual timer are
+> > unaffected.
+> > 
+> > Signed-off-by: Christoffer Dall <cdall@linaro.org>
+> > ---
+> >  arch/arm64/include/asm/arch_timer.h  | 9 ++++-----
+> >  drivers/clocksource/arm_arch_timer.c | 3 +--
+> >  2 files changed, 5 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/arch_timer.h b/arch/arm64/include/asm/arch_timer.h
+> > index a652ce0..1859a1c 100644
+> > --- a/arch/arm64/include/asm/arch_timer.h
+> > +++ b/arch/arm64/include/asm/arch_timer.h
+> > @@ -148,11 +148,10 @@ static inline void arch_timer_set_cntkctl(u32 cntkctl)
+> >  
+> >  static inline u64 arch_counter_get_cntpct(void)
+> >  {
+> > -	/*
+> > -	 * AArch64 kernel and user space mandate the use of CNTVCT.
+> > -	 */
+> > -	BUG();
+> > -	return 0;
+> > +	u64 cval;
+> > +	isb();
+> > +	asm volatile("mrs %0, cntpct_el0" : "=r" (cval));
+> > +	return cval;
+> >  }
+> >  
+> >  static inline u64 arch_counter_get_cntvct(void)
+> > diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
+> > index fd4b7f6..9b3322a 100644
+> > --- a/drivers/clocksource/arm_arch_timer.c
+> > +++ b/drivers/clocksource/arm_arch_timer.c
+> > @@ -890,8 +890,7 @@ static void __init arch_counter_register(unsigned type)
+> >  
+> >  	/* Register the CP15 based counter if we have one */
+> >  	if (type & ARCH_TIMER_TYPE_CP15) {
+> > -		if (IS_ENABLED(CONFIG_ARM64) ||
+> > -		    arch_timer_uses_ppi == ARCH_TIMER_VIRT_PPI)
+> > +		if (arch_timer_uses_ppi == ARCH_TIMER_VIRT_PPI)
 > 
-> It would be cleaner, but I think it's an ABI break.  Consider a non-SVE
-> program that gets linked (perhaps dynamically) against a library variant
-> that happens to use SVE:
+> Please can you add an is_hyp_mode_available() check here, as you suggested
+> last time?
+> 
+> http://lists.infradead.org/pipermail/linux-arm-kernel/2017-July/521542.html
+> 
+> Without it, I worry that the kernel timekeeper will be out of sync with the
+> vDSO (which uses the virtual counter) on systems where CNTVOFF is
+> initialised to a consistent non-zero offset and Linux was loaded at EL1.
+> 
 
-I agree that in general the kernel always needs to provide user space
-with FPSIMD_MAGIC. I was wondering whether on sigreturn the kernel may
-choose not to enforce this. But I'm not sure we have a scenario where it
-actually matters (IIUC set/getcontext is done in user space anyway).
+Yes, will do.
 
--- 
-Catalin
+Thanks,
+-Christoffer
