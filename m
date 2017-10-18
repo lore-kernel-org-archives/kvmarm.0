@@ -1,112 +1,94 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v2 1/3] arm64: mm: Support Common Not Private translations
-Date: Wed, 18 Oct 2017 16:00:14 +0100
-Message-ID: <59E76C7E.2060108@arm.com>
-References: <1507724395-13735-1-git-send-email-vladimir.murzin@arm.com>
- <1507724395-13735-2-git-send-email-vladimir.murzin@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v3 03/20] arm64: Use the physical counter when available for read_cycles
+Date: Wed, 18 Oct 2017 16:52:26 +0100
+Message-ID: <878tg8jvwl.fsf@on-the-bus.cambridge.arm.com>
+References: <20170923004207.22356-1-cdall@linaro.org>
+        <20170923004207.22356-4-cdall@linaro.org>
+        <9b06425f-7c2c-d44a-cd6c-aeaa4b76849c@arm.com>
+        <20171018113405.GA8900@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A4F1849D3E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Oct 2017 11:00:59 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eBWOtr+MdEwO for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 Oct 2017 11:00:53 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 70F67406BB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Oct 2017 11:00:53 -0400 (EDT)
-In-Reply-To: <1507724395-13735-2-git-send-email-vladimir.murzin@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Vladimir Murzin <vladimir.murzin@arm.com>
-Cc: marc.zyngier@arm.com, catalin.marinas@arm.com, kbuild-all@01.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20171018113405.GA8900@cbox> (Christoffer Dall's message of "Wed,
+        18 Oct 2017 13:34:05 +0200")
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <cdall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Vladimir,
+On Wed, Oct 18 2017 at  1:34:05 pm BST, Christoffer Dall <cdall@linaro.org> wrote:
+> On Mon, Oct 09, 2017 at 05:21:24PM +0100, Marc Zyngier wrote:
+>> On 23/09/17 01:41, Christoffer Dall wrote:
+>> > Currently get_cycles() is hardwired to arch_counter_get_cntvct() on
+>> > arm64, but as we move to using the physical timer for the in-kernel
+>> > time-keeping, we need to make that more flexible.
+>> > 
+>> > First, we need to make sure the physical counter can be read on equal
+>> > terms to the virtual counter, which includes adding physical counter
+>> > read functions for timers that require errata.
+>> > 
+>> > Second, we need to make a choice between reading the physical vs virtual
+>> > counter, depending on which timer is used for time keeping in the kernel
+>> > otherwise.  We can do this using a static key to avoid a performance
+>> > penalty during runtime when reading the counter.
+>> > 
+>> > Cc: Catalin Marinas <catalin.marinas@arm.com>
+>> > Cc: Will Deacon <will.deacon@arm.com>
+>> > Cc: Mark Rutland <mark.rutland@arm.com>
+>> > Cc: Marc Zyngier <marc.zyngier@arm.com>
+>> > Signed-off-by: Christoffer Dall <cdall@linaro.org>
 
-On 11/10/17 13:19, Vladimir Murzin wrote:
-> Common Not Private (CNP) is a feature of ARMv8.2 extension which
-> allows translation table entries to be shared between different PEs in
-> the same inner shareable domain, so the hardware can use this fact to
-> optimise the caching of such entries in the TLB.
-> 
-> CNP occupies one bit in TTBRx_ELy and VTTBR_EL2, which advertises to
-> the hardware that the translation table entries pointed to by this
-> TTBR are the same as every PE in the same inner shareable domain for
-> which the equivalent TTBR also has CNP bit set. In case CNP bit is set
-> but TTBR does not point at the same translation table entries or a
-> given ASID and VMID, then the system is mis-configured, so the results
-> of translations are UNPREDICTABLE.
-> 
-> This patch adds support for Common Not Private translations on
-> different exceptions levels:
-> 
-> (1) For EL0 there are a few cases we need to care of changes in
->     TTBR0_EL1:
->     - a switch to idmap
->     - software emulated PAN
->     we rule out latter via Kconfig options and for the former we make
->     sure that CNP is set for non-zero ASIDs only.
+[...]
 
-I've been looking at how CNP interacts with the asid allocator. I think we
-depend on a subtlety that wasn't obvious to me at first.
+>> In my reply to patch #2, I had the following hunk:
+>> 
+>> @@ -310,7 +329,7 @@ static void erratum_set_next_event_tval_generic(const int access, unsigned long
+>>  						struct clock_event_device *clk)
+>>  {
+>>  	unsigned long ctrl;
+>> -	u64 cval = evt + arch_counter_get_cntvct();
+>> +	u64 cval = evt + arch_timer_read_counter();
+>>  
+>>  	ctrl = arch_timer_reg_read(access, ARCH_TIMER_REG_CTRL, clk);
+>>  	ctrl |= ARCH_TIMER_CTRL_ENABLE;
+>> 
+>> Once we start using a different timer, this could well have an effect...
+>> 
+>
+> Right, but wouldn't the following be a more correct way to go about it then:
+>
+> diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
+> index 9a7b359..07f19db 100644
+> --- a/drivers/clocksource/arm_arch_timer.c
+> +++ b/drivers/clocksource/arm_arch_timer.c
+> @@ -329,16 +329,19 @@ static void erratum_set_next_event_tval_generic(const int access, unsigned long
+>  						struct clock_event_device *clk)
+>  {
+>  	unsigned long ctrl;
+> -	u64 cval = evt + arch_timer_read_counter();
+> +	u64 cval;
+>  
+>  	ctrl = arch_timer_reg_read(access, ARCH_TIMER_REG_CTRL, clk);
+>  	ctrl |= ARCH_TIMER_CTRL_ENABLE;
+>  	ctrl &= ~ARCH_TIMER_CTRL_IT_MASK;
+>  
+> -	if (access == ARCH_TIMER_PHYS_ACCESS)
+> +	if (access == ARCH_TIMER_PHYS_ACCESS) {
+> +		cval = evt + arch_counter_get_cntpct();
+>  		write_sysreg(cval, cntp_cval_el0);
+> -	else
+> +	} else {
+> +		cval = evt + arch_counter_get_cntvct();
+>  		write_sysreg(cval, cntv_cval_el0);
+> +	}
+>  
+>  	arch_timer_reg_write(access, ARCH_TIMER_REG_CTRL, ctrl, clk);
+>  }
 
-Can you check I'm reading this properly:
-The ARM-ARM's 'D4.8.1 Use of ASIDs and VMIDs to reduce TLB maintenance
-requirements' reads as if you can only share a TLB entry if both CPUs are using
-that ASID at the same time:
-
-> When the value of a TTBR_ELx.CnP field is 1,
-
-(on CPU-A)
-
-> translation table entries pointed to by that TTBR_ELx are shared with all
-> other PEs in the Inner Shareable domain for which the following conditions
-> are met:
-
->         The corresponding TTBR_ELx.CnP field has the value 1.
-
-(CPU-B's corresponding TTBR right?)
-
-This would suggest CPU-A stops sharing its TLB entries for an asid when it
-changes asid by scheduling a new task. A single-threaded task would never
-benefit from CNP.
-
-
-We will depend on this behaviour when we re-use an asid that was previously used
-on a remote CPU that hasn't yet noticed the rollover and invalidated its TLB.
-
-
-> diff --git a/arch/arm64/kernel/suspend.c b/arch/arm64/kernel/suspend.c
-> index 1e3be90..f28c44a 100644
-> --- a/arch/arm64/kernel/suspend.c
-> +++ b/arch/arm64/kernel/suspend.c
-> @@ -46,6 +46,9 @@ void notrace __cpu_suspend_exit(void)
->  	 */
->  	cpu_uninstall_idmap();
-
-
-> +	/* Restore CnP bit in TTBR1_EL1 */
-> +	cpu_replace_ttbr1(lm_alias(swapper_pg_dir));
-
-Could you wrap this in system_supports_cnp(). Otherwise it replaces ttbr1
-unnecessarily.
-
-This function is called with the idmap loaded, it seems unnecessary to remove it
-twice. You could refactor cpu_replace_ttbr1() to have a __version that is called
-with the idmap loaded, then call that before the cpu_uninstall_idmap() above.
-
+Yup, that's much better.
 
 Thanks,
 
-James
+	M.
+-- 
+Jazz is not dead, it just smell funny.
