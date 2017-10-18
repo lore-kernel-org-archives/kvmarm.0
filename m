@@ -1,26 +1,26 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v3 01/20] arm64: explicitly mask all exceptions
-Date: Wed, 18 Oct 2017 15:25:46 +0100
-Message-ID: <20171018142545.fgwihep2hptr44zb@armageddon.cambridge.arm.com>
-References: <20171005191812.5678-1-james.morse@arm.com>
- <20171005191812.5678-2-james.morse@arm.com>
- <20171018142315.vt44zeuke5po3tf7@armageddon.cambridge.arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v4 06/11] KVM: arm/arm64: vgic-its: Check GITS_CBASER
+ validity before processing commands
+Date: Wed, 18 Oct 2017 16:34:04 +0200
+Message-ID: <af19b9bb-02f0-7e6f-6555-7a6d0ce30ef7@redhat.com>
+References: <1508224209-15366-1-git-send-email-eric.auger@redhat.com>
+ <1508224209-15366-7-git-send-email-eric.auger@redhat.com>
+ <20171017221016.GF8326@lvm>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E36EB40D25
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Oct 2017 10:24:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D0A0240D25
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Oct 2017 10:33:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wpq4loaVqE1v for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 Oct 2017 10:24:49 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A775240795
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Oct 2017 10:24:49 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20171018142315.vt44zeuke5po3tf7@armageddon.cambridge.arm.com>
+ with ESMTP id mjNLPhsUMVm5 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 Oct 2017 10:33:13 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E717E40795
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Oct 2017 10:33:12 -0400 (EDT)
+In-Reply-To: <20171017221016.GF8326@lvm>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,48 +30,80 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>
-Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+To: Christoffer Dall <cdall@linaro.org>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andre.przywara@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Oct 18, 2017 at 03:23:16PM +0100, Catalin Marinas wrote:
-> On Thu, Oct 05, 2017 at 08:17:53PM +0100, James Morse wrote:
-> > diff --git a/arch/arm64/include/asm/daifflags.h b/arch/arm64/include/asm/daifflags.h
-> > new file mode 100644
-> > index 000000000000..fb40da8e1457
-> > --- /dev/null
-> > +++ b/arch/arm64/include/asm/daifflags.h
-> > @@ -0,0 +1,59 @@
-> > +/*
-> > + * Copyright (C) 2017 ARM Ltd.
-> > + *
-> > + * This program is free software; you can redistribute it and/or modify
-> > + * it under the terms of the GNU General Public License version 2 as
-> > + * published by the Free Software Foundation.
-> > + *
-> > + * This program is distributed in the hope that it will be useful,
-> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> > + * GNU General Public License for more details.
-> > + *
-> > + * You should have received a copy of the GNU General Public License
-> > + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> > + */
-> > +#ifndef __ASM_DAIFFLAGS_H
-> > +#define __ASM_DAIFFLAGS_H
-> > +
-> > +#include <asm/irqflags.h>
-> > +#include <linux/irqflags.h>
-> 
-> Nitpick: linux/irqflags.h already includes asm/irqflags.h.
-> 
-> We currently have local_dbg_save in asm/irqflags.h. Shall we keep all of
-> them in the same file (either asm/irqflags.h or the new asm/daifflags.h;
-> slight preference for irqflags.h unless you are worried about drivers
-> abusing these).
+Hi Christoffer,
 
-Ah, you removed local_dbg_* in the following patch, so please ignore
-this.
+On 18/10/2017 00:10, Christoffer Dall wrote:
+> On Tue, Oct 17, 2017 at 09:10:04AM +0200, Eric Auger wrote:
+>> At the moment vgic_its_process_commands() does not
+>> check the CBASER is valid before processing any command.
+>> Let's fix that.
+>>
+>> Also rename cbaser local variable into cbaser_pa to avoid
+>> any confusion with the full register.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> ---
+>>  virt/kvm/arm/vgic/vgic-its.c | 13 ++++++++-----
+>>  1 file changed, 8 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+>> index 3b539d4..e18f1e4 100644
+>> --- a/virt/kvm/arm/vgic/vgic-its.c
+>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+>> @@ -1301,17 +1301,20 @@ static void vgic_mmio_write_its_cbaser(struct kvm *kvm, struct vgic_its *its,
+>>  /* Must be called with the cmd_lock held. */
+>>  static void vgic_its_process_commands(struct kvm *kvm, struct vgic_its *its)
+>>  {
+>> -	gpa_t cbaser;
+>> +	gpa_t cbaser_pa;
+>>  	u64 cmd_buf[4];
+>>  
+>> -	/* Commands are only processed when the ITS is enabled. */
+>> -	if (!its->enabled)
+>> +	/*
+>> +	 * Commands are only processed when the ITS is enabled and
+>> +	 * CBASER is valid
+>> +	 */
+>> +	if (!its->enabled || (!(its->cbaser & GITS_CBASER_VALID)))
+> 
+> Is it valid to clear the CBASER valid bit after having enabled the ITS?
+> If not, I think you should check changes to CBASER and then this
+> shouldn't be necessary.
 
--- 
-Catalin
+Yes you're right. the spec says:
+When GITS_CTLR.Enable == 1 or GITS_CTLR.Quiescent == 0, writing this
+register (CBASER) is UNPREDICTABLE .
+
+Given we already check its->enabled in vgic_mmio_write_its_cbaser, I
+think it is safe to remove this patch.
+
+Thanks
+
+Eric
+> 
+> 
+> 
+>>  		return;
+>>  
+>> -	cbaser = CBASER_ADDRESS(its->cbaser);
+>> +	cbaser_pa = CBASER_ADDRESS(its->cbaser);
+>>  
+>>  	while (its->cwriter != its->creadr) {
+>> -		int ret = kvm_read_guest(kvm, cbaser + its->creadr,
+>> +		int ret = kvm_read_guest(kvm, cbaser_pa + its->creadr,
+>>  					 cmd_buf, ITS_CMD_SIZE);
+>>  		/*
+>>  		 * If kvm_read_guest() fails, this could be due to the guest
+>> -- 
+>> 2.5.5
+>>
+> 
+> Otherwise, this looks fine.
+> 
+> Thanks,
+> -Christoffer
+> 
