@@ -1,75 +1,112 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v3 24/28] arm64/sve: KVM: Hide SVE from CPU features
- exposed to guests
-Date: Wed, 18 Oct 2017 16:01:50 +0100
-Message-ID: <20171018150149.GB19485@e103592.cambridge.arm.com>
-References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
- <1507660725-7986-25-git-send-email-Dave.Martin@arm.com>
- <20171017135816.GF5886@lvm>
- <20171017140749.GW19485@e103592.cambridge.arm.com>
- <2c6d9aa4-f6a8-2c6b-4138-e07d773bf4a2@arm.com>
- <20171017154708.GY19485@e103592.cambridge.arm.com>
- <20171018132145.GF8900@cbox>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v2 1/3] arm64: mm: Support Common Not Private translations
+Date: Wed, 18 Oct 2017 16:00:14 +0100
+Message-ID: <59E76C7E.2060108@arm.com>
+References: <1507724395-13735-1-git-send-email-vladimir.murzin@arm.com>
+ <1507724395-13735-2-git-send-email-vladimir.murzin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <libc-alpha-return-86027-glibc-alpha=m.gmane.org@sourceware.org>
-List-Unsubscribe: <mailto:libc-alpha-unsubscribe-glibc-alpha=m.gmane.org@sourceware.org>
-List-Subscribe: <mailto:libc-alpha-subscribe@sourceware.org>
-List-Archive: <http://sourceware.org/ml/libc-alpha/>
-List-Post: <mailto:libc-alpha@sourceware.org>
-List-Help: <mailto:libc-alpha-help@sourceware.org>, <http://sourceware.org/ml/#faqs>
-Sender: libc-alpha-owner@sourceware.org
-Content-Disposition: inline
-In-Reply-To: <20171018132145.GF8900@cbox>
-To: Christoffer Dall <cdall@linaro.org>
-Cc: linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A4F1849D3E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Oct 2017 11:00:59 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id eBWOtr+MdEwO for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 Oct 2017 11:00:53 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 70F67406BB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Oct 2017 11:00:53 -0400 (EDT)
+In-Reply-To: <1507724395-13735-2-git-send-email-vladimir.murzin@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Vladimir Murzin <vladimir.murzin@arm.com>
+Cc: marc.zyngier@arm.com, catalin.marinas@arm.com, kbuild-all@01.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Oct 18, 2017 at 03:21:45PM +0200, Christoffer Dall wrote:
-> On Tue, Oct 17, 2017 at 04:47:08PM +0100, Dave Martin wrote:
-> > On Tue, Oct 17, 2017 at 03:29:36PM +0100, Marc Zyngier wrote:
-> > > On 17/10/17 15:07, Dave Martin wrote:
-> > > > On Tue, Oct 17, 2017 at 06:58:16AM -0700, Christoffer Dall wrote:
-> > > >> On Tue, Oct 10, 2017 at 07:38:41PM +0100, Dave Martin wrote:
+Hi Vladimir,
 
-[...]
+On 11/10/17 13:19, Vladimir Murzin wrote:
+> Common Not Private (CNP) is a feature of ARMv8.2 extension which
+> allows translation table entries to be shared between different PEs in
+> the same inner shareable domain, so the hardware can use this fact to
+> optimise the caching of such entries in the TLB.
+> 
+> CNP occupies one bit in TTBRx_ELy and VTTBR_EL2, which advertises to
+> the hardware that the translation table entries pointed to by this
+> TTBR are the same as every PE in the same inner shareable domain for
+> which the equivalent TTBR also has CNP bit set. In case CNP bit is set
+> but TTBR does not point at the same translation table entries or a
+> given ASID and VMID, then the system is mis-configured, so the results
+> of translations are UNPREDICTABLE.
+> 
+> This patch adds support for Common Not Private translations on
+> different exceptions levels:
+> 
+> (1) For EL0 there are a few cases we need to care of changes in
+>     TTBR0_EL1:
+>     - a switch to idmap
+>     - software emulated PAN
+>     we rule out latter via Kconfig options and for the former we make
+>     sure that CNP is set for non-zero ASIDs only.
 
-> > > >>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+I've been looking at how CNP interacts with the asid allocator. I think we
+depend on a subtlety that wasn't obvious to me at first.
 
-[...]
+Can you check I'm reading this properly:
+The ARM-ARM's 'D4.8.1 Use of ASIDs and VMIDs to reduce TLB maintenance
+requirements' reads as if you can only share a TLB entry if both CPUs are using
+that ASID at the same time:
 
-> > > >>> @@ -897,8 +898,17 @@ static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
-> > > >>>  {
-> > > >>>  	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
-> > > >>>  			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
-> > > >>> +	u64 val = raz ? 0 : read_sanitised_ftr_reg(id);
-> > > >>>  
-> > > >>> -	return raz ? 0 : read_sanitised_ftr_reg(id);
-> > > >>> +	if (id == SYS_ID_AA64PFR0_EL1) {
-> > > >>> +		if (val & (0xfUL << ID_AA64PFR0_SVE_SHIFT))
-> > > >>> +			pr_err_once("kvm [%i]: SVE unsupported for guests, suppressing\n",
-> > > >>> +				    task_pid_nr(current));
-> > > >>
-> > > >> nit: does this really qualify as an error print?
-> > > > 
-> > > > I have no strong opinion on this: maz suggested I should add this --
-> > > > his concern was to make it difficult to ignore.
-> > > > 
-> > > > This is transitional: the main purpose is to circumvent bug reports from
-> > > > people who find that SVE doesn't work in their guests, in the interim
-> > > > before proper KVM support lands upstream.
-> > > > 
-> > > > Marc, do you still agree with this position?
-> > > 
-> > > As long as this is transitional, I'm OK with this.
-> > 
-> > No argument from me, since it was your request in the first place ;)
-> > 
-> > Christoffer?
-> > 
-> No (further) argument from me.
+> When the value of a TTBR_ELx.CnP field is 1,
 
-OK, thanks.  Can I take that as an Ack?
+(on CPU-A)
 
-Cheers
----Dave
+> translation table entries pointed to by that TTBR_ELx are shared with all
+> other PEs in the Inner Shareable domain for which the following conditions
+> are met:
+
+>         The corresponding TTBR_ELx.CnP field has the value 1.
+
+(CPU-B's corresponding TTBR right?)
+
+This would suggest CPU-A stops sharing its TLB entries for an asid when it
+changes asid by scheduling a new task. A single-threaded task would never
+benefit from CNP.
+
+
+We will depend on this behaviour when we re-use an asid that was previously used
+on a remote CPU that hasn't yet noticed the rollover and invalidated its TLB.
+
+
+> diff --git a/arch/arm64/kernel/suspend.c b/arch/arm64/kernel/suspend.c
+> index 1e3be90..f28c44a 100644
+> --- a/arch/arm64/kernel/suspend.c
+> +++ b/arch/arm64/kernel/suspend.c
+> @@ -46,6 +46,9 @@ void notrace __cpu_suspend_exit(void)
+>  	 */
+>  	cpu_uninstall_idmap();
+
+
+> +	/* Restore CnP bit in TTBR1_EL1 */
+> +	cpu_replace_ttbr1(lm_alias(swapper_pg_dir));
+
+Could you wrap this in system_supports_cnp(). Otherwise it replaces ttbr1
+unnecessarily.
+
+This function is called with the idmap loaded, it seems unnecessary to remove it
+twice. You could refactor cpu_replace_ttbr1() to have a __version that is called
+with the idmap loaded, then call that before the cpu_uninstall_idmap() above.
+
+
+Thanks,
+
+James
