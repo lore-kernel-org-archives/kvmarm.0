@@ -1,45 +1,35 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v4 12/13] arm64: acpi: Remove __init from
- acpi_psci_use_hvc() for use by SDEI
-Date: Wed, 18 Oct 2017 12:11:57 +0100
-Message-ID: <20171018111157.lqzouwbsqrm2expe@armageddon.cambridge.arm.com>
+From: Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>
+Subject: Re: [PATCH v4 13/13] firmware: arm_sdei: Discover SDEI support via
+ ACPI
+Date: Wed, 18 Oct 2017 12:12:14 +0100
+Message-ID: <20171018111214.buwjjqzibh3ll6ef@armageddon.cambridge.arm.com>
 References: <20171017174432.1684-1-james.morse@arm.com>
- <20171017174432.1684-13-james.morse@arm.com>
+ <20171017174432.1684-14-james.morse@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A6F5F40795
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Oct 2017 07:11:03 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wCRLAP31swQ9 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 Oct 2017 07:11:01 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AF0744078A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Oct 2017 07:11:01 -0400 (EDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <20171017174432.1684-13-james.morse@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>
-Cc: devicetree@vger.kernel.org, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, Rob Herring <robh+dt@kernel.org>, Loc Ho <lho@apm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20171017174432.1684-14-james.morse-5wv7dgnIgG8@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+Cc: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Lorenzo Pieralisi <lorenzo.pieralisi-5wv7dgnIgG8@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Loc Ho <lho-qTEPVZfXA3Y@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Oct 17, 2017 at 06:44:31PM +0100, James Morse wrote:
-> SDEI inherits the 'use hvc' bit that is also used by PSCI. PSCI does all
-> its initialisation early, SDEI does its late.
+On Tue, Oct 17, 2017 at 06:44:32PM +0100, James Morse wrote:
+> SDEI defines a new ACPI table to indicate the presence of the interface.
+> The conduit is discovered in the same way as PSCI.
 > 
-> Remove the __init annotation from acpi_psci_use_hvc().
+> For ACPI we need to create the platform device ourselves as SDEI doesn't
+> have an entry in the DSDT.
 > 
-> Signed-off-by: James Morse <james.morse@arm.com>
+> The SDEI platform device should be created after ACPI has been initialised
+> so that we can parse the table, but before GHES devices are created, which
+> may register SDE events if they use SDEI as their notification type.
+> 
+> Signed-off-by: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
 
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Acked-by: Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
