@@ -1,129 +1,71 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v4 10/11] KVM: arm/arm64: Document
- KVM_DEV_ARM_ITS_CTRL_RESET
-Date: Wed, 18 Oct 2017 00:38:36 +0200
-Message-ID: <20171017223836.GJ8326@lvm>
-References: <1508224209-15366-1-git-send-email-eric.auger@redhat.com>
- <1508224209-15366-11-git-send-email-eric.auger@redhat.com>
+From: Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>
+Subject: Re: [PATCH v3 26/28] arm64/sve: Add documentation
+Date: Wed, 18 Oct 2017 10:32:03 +0100
+Message-ID: <20171018093203.xp5tro636chgaiuq@armageddon.cambridge.arm.com>
+References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
+ <1507660725-7986-27-git-send-email-Dave.Martin@arm.com>
+ <20171013142421.j32jzisukewxtosx@armageddon.cambridge.arm.com>
+ <20171013171758.GO19485@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E574449D21
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 18:37:41 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cwAxFJF2uMzB for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Oct 2017 18:37:40 -0400 (EDT)
-Received: from mail-wm0-f53.google.com (mail-wm0-f53.google.com [74.125.82.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BF2D149D15
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 18:37:40 -0400 (EDT)
-Received: by mail-wm0-f53.google.com with SMTP id i124so6550973wmf.3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Oct 2017 15:38:40 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <1508224209-15366-11-git-send-email-eric.auger@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@redhat.com>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andre.przywara@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com, eric.auger.pro@gmail.com
+In-Reply-To: <20171013171758.GO19485-M5GwZQ6tE7x5pKCnmE3YQBJ8xKzm50AiAL8bYrjMMd8@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Dave Martin <Dave.Martin-5wv7dgnIgG8@public.gmane.org>
+Cc: linux-arch-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, Okamoto Takayuki <tokamoto-+CUm20s59erQFUHtdCDX3A@public.gmane.org>, libc-alpha-9JcytcrH/bA+uJoB2kUjGw@public.gmane.org, Ard Biesheuvel <ard.biesheuvel-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Szabolcs Nagy <szabolcs.nagy-5wv7dgnIgG8@public.gmane.org>, Richard Sandiford <richard.sandiford-5wv7dgnIgG8@public.gmane.org>, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Michael Kerrisk <mtk.manpages-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Alan Hayward <alan.hayward-5wv7dgnIgG8@public.gmane.org>, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Oct 17, 2017 at 09:10:08AM +0200, Eric Auger wrote:
-> At the moment, the in-kernel emulated ITS is not properly reset.
-> On guest restart/reset some registers keep their old values and
-> internal structures like device, ITE, and collection lists are not
-> freed.
+On Fri, Oct 13, 2017 at 06:17:59PM +0100, Dave P Martin wrote:
+> On Fri, Oct 13, 2017 at 03:24:21PM +0100, Catalin Marinas wrote:
+> > On Tue, Oct 10, 2017 at 07:38:43PM +0100, Dave P Martin wrote:
+> > > +* If the SVE context is too big to fit in sigcontext.__reserved[], then extra
+> > > +  space is allocated on the stack, an extra_context record is written in
+> > > +  __reserved[] referencing this space.  sve_context is then written in the
+> > > +  extra space.  Refer to [1] for further details about this mechanism.
+> > 
+> > Does this document require that the user stack is sufficiently large or
+> > should we cap the vector length (prior to the last two RFC patches)?
 > 
-> This may lead to various bugs. Among them, we can have incorrect state
-> backup or failure when saving the ITS state at early guest boot stage.
-> 
-> This patch documents a new attribute, KVM_DEV_ARM_ITS_CTRL_RESET in
-> the KVM_DEV_ARM_VGIC_GRP_CTRL group.
-> 
-> Upon this action, we can reset registers and especially those
-> pointing to tables previously allocated by the guest and free
-> the internal data structures storing the list of devices, collections
-> and lpis.
-> 
-> The usual approach for device reset of having userspace write
-> the reset values of the registers to the kernel via the register
-> read/write APIs doesn't work for the ITS because it has some
-> internal state (caches) which is not exposed as registers,
-> and there is no register interface for "drop cached data without
-> writing it back to RAM". So we need a KVM API which mimics the
-> hardware's reset line, to provide the equivalent behaviour to
-> a "pull the power cord out of the back of the machine" reset.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Reported-by: wanghaibin <wanghaibin.wang@huawei.com>
-> 
-> ---
-> v2 -> v3:
-> - reword commit message, credit to Peter Maydell.
-> - take into account Christoffer rewording comments but still
->   kept details. Added Peter's comment but still kept details.
->   Peter may disagree.
-> 
-> v1 -> v2:
-> - Describe architecturally-defined reset values
-> ---
->  Documentation/virtual/kvm/devices/arm-vgic-its.txt | 20 ++++++++++++++++++++
->  1 file changed, 20 insertions(+)
-> 
-> diff --git a/Documentation/virtual/kvm/devices/arm-vgic-its.txt b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
-> index eb06beb..4e9bb6f 100644
-> --- a/Documentation/virtual/kvm/devices/arm-vgic-its.txt
-> +++ b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
-> @@ -33,6 +33,10 @@ Groups:
->        request the initialization of the ITS, no additional parameter in
->        kvm_device_attr.addr.
->  
-> +    KVM_DEV_ARM_ITS_CTRL_RESET
-> +      reset the ITS, no additional parameter in kvm_device_attr.addr.
-> +      See "ITS Reset State" section.
-> +
->      KVM_DEV_ARM_ITS_SAVE_TABLES
->        save the ITS table data into guest RAM, at the location provisioned
->        by the guest in corresponding registers/table entries.
-> @@ -157,3 +161,19 @@ Then vcpus can be started.
->   - pINTID is the physical LPI ID; if zero, it means the entry is not valid
->     and other fields are not meaningful.
->   - ICID is the collection ID
-> +
-> + ITS Reset State:
-> + ----------------
-> +
-> +RESET returns the ITS to the same state that it was when first created and
-> +inited:
+> We don't know how much free stack space there actually is until the
+> signal is delivered.
+[...]
+> Possibly sigaltstack() should fail with ENOMEM if ss_size is too small
+> for the maximum VL supported by the system, but strictly speaking that
+> violates POSIX if ss_size >= MINSIGSTKSZ.
 
-initialized.  When the RESET command returns, the following things are
-guaranteed:
+We also don't know whether the application is going to use SVE or not,
+so MINSIGSTKSZ could be just fine. I don't have a better idea here
+without the last two RFC patches. So just ignore my comment.
 
-> +
-> +- The ITS is not enabled and quiescent
-> +  GITS_CTLR.Enabled = 0 .Quiescent=1
-> +- There is no internally cache state
-
-internally cached,  or internal cache
-
-> +- No collection or device table are used
-> +  GITS_BASER<n>.Valid = 0
-> +- The command queue is not allocated:
-> +  GITS_CBASER = 0, GITS_CREADR = 0, GITS_CWRITER = 0
-> +- The ABI version is unchanged and remains the one set when the ITS
-> +  device was first created.
-> -- 
-> 2.5.5
+> > > +5.  Signal return
+> > > +-----------------
+> > > +
+> > > +When returning from a signal handler:
+> > > +
+> > > +* If there is no sve_context record in the signal frame, or if the record is
+> > > +  present but contains no register data as desribed in the previous section,
+> > > +  then the SVE registers/bits become non-live and take unspecified values.
+> > > +
+> > > +* If sve_context is present in the signal frame and contains full register
+> > > +  data, the SVE registers become live and are populated with the specified
+> > > +  data.  However, for backward compatibility reasons, bits [127:0] of Z0..Z31
+> > > +  are always restored from the corresponding members of fpsimd_context.vregs[]
+> > > +  and not from sve_context.  The remaining bits are restored from sve_context.
+> > > +
+> > > +* Inclusion of fpsimd_context in the signal frame remains mandatory,
+> > > +  irrespective of whether sve_context is present or not.
+> > 
+> > Could we relax this? I'm not sure it's worth it.
 > 
-With those changes, this looks ok to me.
+> It would be cleaner, but I think it's an ABI break.  Consider a non-SVE
+> program that gets linked (perhaps dynamically) against a library variant
+> that happens to use SVE:
 
-Thanks,
--Christoffer
+I agree that in general the kernel always needs to provide user space
+with FPSIMD_MAGIC. I was wondering whether on sigreturn the kernel may
+choose not to enforce this. But I'm not sure we have a scenario where it
+actually matters (IIUC set/getcontext is done in user space anyway).
+
+-- 
+Catalin
