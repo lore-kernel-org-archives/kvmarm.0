@@ -1,20 +1,20 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH RESEND v2] arm/arm64: KVM: set right LR register value
- for 32 bit guest when inject abort
-Date: Wed, 18 Oct 2017 12:09:20 +0200
-Message-ID: <20171018100920.GA38304@lvm>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH RESEND v2] arm/arm64: KVM: set right LR register value for
+ 32 bit guest when inject abort
+Date: Wed, 18 Oct 2017 11:19:30 +0100
+Message-ID: <76baaa48-2a38-6deb-f11f-53361e3d7936@arm.com>
 References: <1508250229-17895-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
 In-Reply-To: <1508250229-17895-1-git-send-email-gengdongjiu@huawei.com>
+Content-Language: en-GB
 Sender: linux-kernel-owner@vger.kernel.org
-To: Dongjiu Geng <gengdongjiu@huawei.com>
-Cc: will.deacon@arm.com, christoffer.dall@linaro.org, marc.zyngier@arm.com, rkrcmar@redhat.com, catalin.marinas@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, zhanghaibin7@huawei.com
+To: Dongjiu Geng <gengdongjiu@huawei.com>, will.deacon@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, catalin.marinas@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, zhanghaibin7@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Oct 17, 2017 at 10:23:49PM +0800, Dongjiu Geng wrote:
+On 17/10/17 15:23, Dongjiu Geng wrote:
 > When a exception is trapped to EL2, hardware uses  ELR_ELx to hold
 > the current fault instruction address. If KVM wants to inject a
 > abort to 32 bit guest, it needs to set the LR register for the
@@ -35,6 +35,9 @@ On Tue, Oct 17, 2017 at 10:23:49PM +0800, Dongjiu Geng wrote:
 > 
 > Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 > Tested-by: Haibin Zhang <zhanghaibin7@huawei.com>
+
+Cc: stable@vger.kernel.org
+
 > 
 > ---
 > Have tested in both arm32 and arm64
@@ -126,6 +129,9 @@ On Tue, Oct 17, 2017 at 10:23:49PM +0800, Dongjiu Geng wrote:
 > + * Table taken from ARMv8 ARM DDI0487B-B, table G1-10.
 > + */
 > +static u8 return_offsets[8][2] = {
+
+static const
+
 > +	[0] = { 0, 0 },		/* Reset, unused */
 > +	[1] = { 4, 2 },		/* Undefined */
 > +	[2] = { 0, 0 },		/* SVC, unused */
@@ -146,8 +152,16 @@ On Tue, Oct 17, 2017 at 10:23:49PM +0800, Dongjiu Geng wrote:
 >  	u32 sctlr = vcpu_cp15(vcpu, c1_SCTLR);
 >  
 >  	cpsr = mode | COMPAT_PSR_I_BIT;
-> -- 
-> 2.10.1
 > 
-Applied, thanks.
--Christoffer
+
+Otherwise:
+
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+
+I'll shortly post a patch moving most of the 32bit fault injection to
+virt/kvm/arm/aarch32.c so that we don't have two subtly different copies
+of the same code...
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
