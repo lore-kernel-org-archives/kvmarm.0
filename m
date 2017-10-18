@@ -1,153 +1,96 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v3 06/20] KVM: arm/arm64: Check that system supports
- split eoi/deactivate
-Date: Wed, 18 Oct 2017 21:16:38 +0200
-Message-ID: <20171018191638.GJ8900@cbox>
-References: <20170923004207.22356-1-cdall@linaro.org>
- <20170923004207.22356-7-cdall@linaro.org>
- <edc875ee-335c-56c1-0cbc-9e45f7915529@arm.com>
- <20171018134145.GH8900@cbox>
- <874lqwjvdv.fsf@on-the-bus.cambridge.arm.com>
+Subject: Re: [PATCH v3 02/28] arm64: KVM: Hide unsupported AArch64 CPU
+ features from guests
+Date: Wed, 18 Oct 2017 21:19:55 +0200
+Message-ID: <20171018191955.GK8900@cbox>
+References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
+ <1507660725-7986-3-git-send-email-Dave.Martin@arm.com>
+ <20171017135145.GT1845@lvm>
+ <d7b9fac4-1a71-d7be-822a-1898f133aa70@arm.com>
+ <20171018132026.GE8900@cbox>
+ <20171018144509.GZ19485@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D21C4078A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Oct 2017 15:15:36 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YpYUTkEbtGKh for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 Oct 2017 15:15:35 -0400 (EDT)
-Received: from mail-wm0-f67.google.com (mail-wm0-f67.google.com [74.125.82.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5051249D42
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Oct 2017 15:15:34 -0400 (EDT)
-Received: by mail-wm0-f67.google.com with SMTP id m72so11841627wmc.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Oct 2017 12:16:36 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-arch-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <874lqwjvdv.fsf@on-the-bus.cambridge.arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+In-Reply-To: <20171018144509.GZ19485@e103592.cambridge.arm.com>
+Sender: linux-arch-owner@vger.kernel.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, Richard Sandiford <richard.sandiford@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Oct 18, 2017 at 05:03:40PM +0100, Marc Zyngier wrote:
-> On Wed, Oct 18 2017 at  3:41:45 pm BST, Christoffer Dall <cdall@linaro.org> wrote:
-> > On Mon, Oct 09, 2017 at 05:47:18PM +0100, Marc Zyngier wrote:
-> >> On 23/09/17 01:41, Christoffer Dall wrote:
-> >> > Some systems without proper firmware and/or hardware description data
-> >> > don't support the split EOI and deactivate operation.
-> >> > 
-> >> > On such systems, we cannot leave the physical interrupt active after the
-> >> > timer handler on the host has run, so we cannot support KVM with an
-> >> > in-kernel GIC with the timer changes we are about to introduce.
-> >> > 
-> >> > This patch makes sure that trying to initialize the KVM GIC code will
-> >> > fail on such systems.
-> >> > 
-> >> > Cc: Marc Zyngier <marc.zyngier@arm.com>
-> >> > Signed-off-by: Christoffer Dall <cdall@linaro.org>
-> >> > ---
-> >> >  drivers/irqchip/irq-gic.c | 3 ++-
-> >> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >> > 
-> >> > diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
-> >> > index f641e8e..ab12bf4 100644
-> >> > --- a/drivers/irqchip/irq-gic.c
-> >> > +++ b/drivers/irqchip/irq-gic.c
-> >> > @@ -1420,7 +1420,8 @@ static void __init gic_of_setup_kvm_info(struct device_node *node)
-> >> >  	if (ret)
-> >> >  		return;
-> >> >  
-> >> > -	gic_set_kvm_info(&gic_v2_kvm_info);
-> >> > +	if (static_key_true(&supports_deactivate))
-> >> > +		gic_set_kvm_info(&gic_v2_kvm_info);
-> >> >  }
-> >> >  
-> >> >  int __init
-> >> > 
-> >> 
-> >> Should we add the same level of checking on the ACPI path, just for the
-> >> sake symmetry?
-> >
-> > Yes, we should, if anyone is crazy enough to use ACPI :)
+On Wed, Oct 18, 2017 at 03:45:10PM +0100, Dave Martin wrote:
+> On Wed, Oct 18, 2017 at 03:20:26PM +0200, Christoffer Dall wrote:
+> > On Tue, Oct 17, 2017 at 03:08:40PM +0100, Marc Zyngier wrote:
+> > > On 17/10/17 14:51, Christoffer Dall wrote:
+> > > > On Tue, Oct 10, 2017 at 07:38:19PM +0100, Dave Martin wrote:
 > 
-> Sadly, the madness is becoming commonplace.
+> [...]
 > 
-> >> 
-> >> Also, do we need to add the same thing for GICv3?
-> >> 
-> >
-> > Why would split EOI/deactivate not be available on GICv3, actually?  It
-> > looks like this is not supported unless you have EL2, but I can't seem
-> > to find anything in the spec for this, and KVM should support
-> > EOI/deactivate for GICv3 guests I think.  Am I missing something?
+> > > >> +/* sys_reg_desc initialiser for known cpufeature ID registers */
+> > > >> +#define ID_SANITISED(name) {			\
+> > > >> +	SYS_DESC(SYS_##name),			\
+> > > >> +	.access	= access_id_reg,		\
+> > > >> +	.get_user = get_id_reg,			\
+> > > >> +	.set_user = set_id_reg,			\
+> > > >> +}
+> > > >> +
+> > > >> +/*
+> > > >> + * sys_reg_desc initialiser for architecturally unallocated cpufeature ID
+> > > >> + * register with encoding Op0=3, Op1=0, CRn=0, CRm=crm, Op2=op2
+> > > >> + * (1 <= crm < 8, 0 <= Op2 < 8).
+> > > >> + */
+> > > >> +#define ID_UNALLOCATED(crm, op2) {			\
+> > > >> +	Op0(3), Op1(0), CRn(0), CRm(crm), Op2(op2),	\
+> > > >> +	.access = access_raz_id_reg,			\
+> > > >> +	.get_user = get_raz_id_reg,			\
+> > > >> +	.set_user = set_raz_id_reg,			\
+> > > >> +}
+> > > >> +
+> > > >> +/*
+> > > >> + * sys_reg_desc initialiser for known ID registers that we hide from guests.
+> > > >> + * For now, these are exposed just like unallocated ID regs: they appear
+> > > >> + * RAZ for the guest.
+> > > >> + */
+> > > > 
+> > > > What is a hidden ID register as opposed to an unallocated one?
+> > > 
+> > > A hidden register is one where all the features have been removed (RAZ),
+> > > making it similar to an unallocated one.
+> > > 
+> > > > Shouldn't one of them presumably cause an undefined exception in the
+> > > > guest?
+> > > 
+> > > No, that'd be a violation of the architecture. The unallocated ID
+> > > registers are required to be RAZ (see table D9-2 in D9.3.1), so that
+> > > software can probe for feature without running the risk of getting an UNDEF.
+> > > 
+> > Then I'm not really sure why we need the two defines.  Is that just to
+> > make it clear what the different rationales for dealing with various
+> > registers in the same way are?
 > 
-> No, you're not. This is just a Linux choice (or rather mine) not to use
-> EOImode=1 in guests (or anything booted at EL1), as we don't really need
-> the two-stage deactivate in that situation (it is pure overhead).
+> Basically yes.
 > 
-> I'm just worried of potentially broken HW, and would like to make sure
-> that when we force EOImode=0 on these systems, we truly tell KVM about
-> it.
+> ID_HIDDEN() means we are bodging around something that we don't know
+> how to sanitise, whereas ID_UNALLOCATED() means that we follow the
+> architecture in returning zero for reads (maybe following an older
+> architecture version than the silicon).  
 > 
-
-Yes, makes sense, it's also more cosistent that way.
-
-> > Assuming I'm wrong about GICv3, which I probably am, how does this look
-> > (on top of the posted patch):
-> >
-> > diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
-> > index 519149e..aed524c 100644
-> > --- a/drivers/irqchip/irq-gic-v3.c
-> > +++ b/drivers/irqchip/irq-gic-v3.c
-> > @@ -1228,7 +1228,9 @@ static int __init gic_of_init(struct device_node *node, struct device_node *pare
-> >  		goto out_unmap_rdist;
-> >  
-> >  	gic_populate_ppi_partitions(node);
-> > -	gic_of_setup_kvm_info(node);
-> > +
-> > +	if (static_key_true(&supports_deactivate))
-> > +		gic_of_setup_kvm_info(node);
-> >  	return 0;
-> >  
-> >  out_unmap_rdist:
-> > @@ -1517,7 +1519,9 @@ gic_acpi_init(struct acpi_subtable_header *header, const unsigned long end)
-> >  		goto out_fwhandle_free;
-> >  
-> >  	acpi_set_irq_model(ACPI_IRQ_MODEL_GIC, domain_handle);
-> > -	gic_acpi_setup_kvm_info();
-> > +
-> > +	if (static_key_true(&supports_deactivate))
-> > +		gic_acpi_setup_kvm_info();
-> >  
-> >  	return 0;
-> >  
-> > diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
-> > index ab12bf4..121af5c 100644
-> > --- a/drivers/irqchip/irq-gic.c
-> > +++ b/drivers/irqchip/irq-gic.c
-> > @@ -1653,7 +1653,8 @@ static int __init gic_v2_acpi_init(struct acpi_subtable_header *header,
-> >  	if (IS_ENABLED(CONFIG_ARM_GIC_V2M))
-> >  		gicv2m_init(NULL, gic_data[0].domain);
-> >  
-> > -	gic_acpi_setup_kvm_info();
-> > +	if (static_key_true(&supports_deactivate))
-> > +		gic_acpi_setup_kvm_info();
-> >  
-> >  	return 0;
-> >  }
+> ID_HIDDEN()s may need to evolve SoC-specific quirkage if we need to
+> expose non-architectural SoC-specific features via the mechanism.
+> These should never simply be exposed unless the architecture is
+> tightened in the future in such a way as to make this safe (unlikely).
 > 
-> Yup, looks good to me!
+> ID_UNALLOCATED()s OTOH will mostly turn into ID_SANITISED() as the
+> architecture gains new features.  The architecture could allocate new
+> IMP DEF feature regs though, in which case they would become ID_HIDDEN()
+> as soon as we know about them.
+> 
+> 
+> The distinction is drawn in attempt to help maintainers: the future
+> maintenance requirements for IN_UNALLOCATED()s will differ from
+> ID_HIDDEN()s.
 > 
 
-Thanks,
+Thanks for the explanation.
 -Christoffer
