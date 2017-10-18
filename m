@@ -1,109 +1,93 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v4 06/11] KVM: arm/arm64: vgic-its: Check GITS_CBASER
- validity before processing commands
-Date: Wed, 18 Oct 2017 16:34:04 +0200
-Message-ID: <af19b9bb-02f0-7e6f-6555-7a6d0ce30ef7@redhat.com>
-References: <1508224209-15366-1-git-send-email-eric.auger@redhat.com>
- <1508224209-15366-7-git-send-email-eric.auger@redhat.com>
- <20171017221016.GF8326@lvm>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH v3 02/28] arm64: KVM: Hide unsupported AArch64 CPU
+ features from guests
+Date: Wed, 18 Oct 2017 15:45:10 +0100
+Message-ID: <20171018144509.GZ19485@e103592.cambridge.arm.com>
+References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
+ <1507660725-7986-3-git-send-email-Dave.Martin@arm.com>
+ <20171017135145.GT1845@lvm>
+ <d7b9fac4-1a71-d7be-822a-1898f133aa70@arm.com>
+ <20171018132026.GE8900@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D0A0240D25
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Oct 2017 10:33:13 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mjNLPhsUMVm5 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 Oct 2017 10:33:13 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E717E40795
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Oct 2017 10:33:12 -0400 (EDT)
-In-Reply-To: <20171017221016.GF8326@lvm>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-arch-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20171018132026.GE8900@cbox>
+Sender: linux-arch-owner@vger.kernel.org
 To: Christoffer Dall <cdall@linaro.org>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andre.przywara@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com, eric.auger.pro@gmail.com
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, Richard Sandiford <richard.sandiford@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
+On Wed, Oct 18, 2017 at 03:20:26PM +0200, Christoffer Dall wrote:
+> On Tue, Oct 17, 2017 at 03:08:40PM +0100, Marc Zyngier wrote:
+> > On 17/10/17 14:51, Christoffer Dall wrote:
+> > > On Tue, Oct 10, 2017 at 07:38:19PM +0100, Dave Martin wrote:
 
-On 18/10/2017 00:10, Christoffer Dall wrote:
-> On Tue, Oct 17, 2017 at 09:10:04AM +0200, Eric Auger wrote:
->> At the moment vgic_its_process_commands() does not
->> check the CBASER is valid before processing any command.
->> Let's fix that.
->>
->> Also rename cbaser local variable into cbaser_pa to avoid
->> any confusion with the full register.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->>  virt/kvm/arm/vgic/vgic-its.c | 13 ++++++++-----
->>  1 file changed, 8 insertions(+), 5 deletions(-)
->>
->> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->> index 3b539d4..e18f1e4 100644
->> --- a/virt/kvm/arm/vgic/vgic-its.c
->> +++ b/virt/kvm/arm/vgic/vgic-its.c
->> @@ -1301,17 +1301,20 @@ static void vgic_mmio_write_its_cbaser(struct kvm *kvm, struct vgic_its *its,
->>  /* Must be called with the cmd_lock held. */
->>  static void vgic_its_process_commands(struct kvm *kvm, struct vgic_its *its)
->>  {
->> -	gpa_t cbaser;
->> +	gpa_t cbaser_pa;
->>  	u64 cmd_buf[4];
->>  
->> -	/* Commands are only processed when the ITS is enabled. */
->> -	if (!its->enabled)
->> +	/*
->> +	 * Commands are only processed when the ITS is enabled and
->> +	 * CBASER is valid
->> +	 */
->> +	if (!its->enabled || (!(its->cbaser & GITS_CBASER_VALID)))
-> 
-> Is it valid to clear the CBASER valid bit after having enabled the ITS?
-> If not, I think you should check changes to CBASER and then this
-> shouldn't be necessary.
+[...]
 
-Yes you're right. the spec says:
-When GITS_CTLR.Enable == 1 or GITS_CTLR.Quiescent == 0, writing this
-register (CBASER) is UNPREDICTABLE .
+> > >> +/* sys_reg_desc initialiser for known cpufeature ID registers */
+> > >> +#define ID_SANITISED(name) {			\
+> > >> +	SYS_DESC(SYS_##name),			\
+> > >> +	.access	= access_id_reg,		\
+> > >> +	.get_user = get_id_reg,			\
+> > >> +	.set_user = set_id_reg,			\
+> > >> +}
+> > >> +
+> > >> +/*
+> > >> + * sys_reg_desc initialiser for architecturally unallocated cpufeature ID
+> > >> + * register with encoding Op0=3, Op1=0, CRn=0, CRm=crm, Op2=op2
+> > >> + * (1 <= crm < 8, 0 <= Op2 < 8).
+> > >> + */
+> > >> +#define ID_UNALLOCATED(crm, op2) {			\
+> > >> +	Op0(3), Op1(0), CRn(0), CRm(crm), Op2(op2),	\
+> > >> +	.access = access_raz_id_reg,			\
+> > >> +	.get_user = get_raz_id_reg,			\
+> > >> +	.set_user = set_raz_id_reg,			\
+> > >> +}
+> > >> +
+> > >> +/*
+> > >> + * sys_reg_desc initialiser for known ID registers that we hide from guests.
+> > >> + * For now, these are exposed just like unallocated ID regs: they appear
+> > >> + * RAZ for the guest.
+> > >> + */
+> > > 
+> > > What is a hidden ID register as opposed to an unallocated one?
+> > 
+> > A hidden register is one where all the features have been removed (RAZ),
+> > making it similar to an unallocated one.
+> > 
+> > > Shouldn't one of them presumably cause an undefined exception in the
+> > > guest?
+> > 
+> > No, that'd be a violation of the architecture. The unallocated ID
+> > registers are required to be RAZ (see table D9-2 in D9.3.1), so that
+> > software can probe for feature without running the risk of getting an UNDEF.
+> > 
+> Then I'm not really sure why we need the two defines.  Is that just to
+> make it clear what the different rationales for dealing with various
+> registers in the same way are?
 
-Given we already check its->enabled in vgic_mmio_write_its_cbaser, I
-think it is safe to remove this patch.
+Basically yes.
 
-Thanks
+ID_HIDDEN() means we are bodging around something that we don't know
+how to sanitise, whereas ID_UNALLOCATED() means that we follow the
+architecture in returning zero for reads (maybe following an older
+architecture version than the silicon).  
 
-Eric
-> 
-> 
-> 
->>  		return;
->>  
->> -	cbaser = CBASER_ADDRESS(its->cbaser);
->> +	cbaser_pa = CBASER_ADDRESS(its->cbaser);
->>  
->>  	while (its->cwriter != its->creadr) {
->> -		int ret = kvm_read_guest(kvm, cbaser + its->creadr,
->> +		int ret = kvm_read_guest(kvm, cbaser_pa + its->creadr,
->>  					 cmd_buf, ITS_CMD_SIZE);
->>  		/*
->>  		 * If kvm_read_guest() fails, this could be due to the guest
->> -- 
->> 2.5.5
->>
-> 
-> Otherwise, this looks fine.
-> 
-> Thanks,
-> -Christoffer
-> 
+ID_HIDDEN()s may need to evolve SoC-specific quirkage if we need to
+expose non-architectural SoC-specific features via the mechanism.
+These should never simply be exposed unless the architecture is
+tightened in the future in such a way as to make this safe (unlikely).
+
+ID_UNALLOCATED()s OTOH will mostly turn into ID_SANITISED() as the
+architecture gains new features.  The architecture could allocate new
+IMP DEF feature regs though, in which case they would become ID_HIDDEN()
+as soon as we know about them.
+
+
+The distinction is drawn in attempt to help maintainers: the future
+maintenance requirements for IN_UNALLOCATED()s will differ from
+ID_HIDDEN()s.
+
+Cheers
+---Dave
