@@ -1,93 +1,196 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v3 24/28] arm64/sve: KVM: Hide SVE from CPU features
- exposed to guests
-Date: Wed, 18 Oct 2017 18:49:29 +0200
-Message-ID: <CAMJs5B9cA0xMeeZ2UYa9es0HfTH=vt=TZ=oMX6iBkvx5aBLDow@mail.gmail.com>
-References: <1507660725-7986-1-git-send-email-Dave.Martin@arm.com>
- <1507660725-7986-25-git-send-email-Dave.Martin@arm.com>
- <20171017135816.GF5886@lvm>
- <20171017140749.GW19485@e103592.cambridge.arm.com>
- <2c6d9aa4-f6a8-2c6b-4138-e07d773bf4a2@arm.com>
- <20171017154708.GY19485@e103592.cambridge.arm.com>
- <20171018132145.GF8900@cbox>
- <20171018150149.GB19485@e103592.cambridge.arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v3 07/20] KVM: arm/arm64: Make timer_arm and timer_disarm helpers more generic
+Date: Wed, 18 Oct 2017 17:53:23 +0100
+Message-ID: <87o9p4ieik.fsf@on-the-bus.cambridge.arm.com>
+References: <20170923004207.22356-1-cdall@linaro.org>
+        <20170923004207.22356-8-cdall@linaro.org>
+        <f593256a-3f37-0f4c-ba9d-913481a95e0b@arm.com>
+        <20171018164750.GI8900@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EC33F49D24
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Oct 2017 12:48:30 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AsNPPrUrGo2t for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 Oct 2017 12:48:30 -0400 (EDT)
-Received: from mail-pg0-f66.google.com (mail-pg0-f66.google.com [74.125.83.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0AAF040A74
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Oct 2017 12:48:30 -0400 (EDT)
-Received: by mail-pg0-f66.google.com with SMTP id p9so4730493pgc.8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Oct 2017 09:49:31 -0700 (PDT)
-In-Reply-To: <20171018150149.GB19485@e103592.cambridge.arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Richard Sandiford <richard.sandiford@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20171018164750.GI8900@cbox> (Christoffer Dall's message of "Wed,
+        18 Oct 2017 18:47:50 +0200")
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <cdall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Oct 18, 2017 at 5:01 PM, Dave Martin <Dave.Martin@arm.com> wrote:
-> On Wed, Oct 18, 2017 at 03:21:45PM +0200, Christoffer Dall wrote:
->> On Tue, Oct 17, 2017 at 04:47:08PM +0100, Dave Martin wrote:
->> > On Tue, Oct 17, 2017 at 03:29:36PM +0100, Marc Zyngier wrote:
->> > > On 17/10/17 15:07, Dave Martin wrote:
->> > > > On Tue, Oct 17, 2017 at 06:58:16AM -0700, Christoffer Dall wrote:
->> > > >> On Tue, Oct 10, 2017 at 07:38:41PM +0100, Dave Martin wrote:
+On Wed, Oct 18 2017 at  6:47:50 pm BST, Christoffer Dall <cdall@linaro.org> wrote:
+> On Mon, Oct 09, 2017 at 06:05:04PM +0100, Marc Zyngier wrote:
+>> On 23/09/17 01:41, Christoffer Dall wrote:
+>> > We are about to add an additional soft timer to the arch timer state for
+>> > a VCPU and would like to be able to reuse the functions to program and
+>> > cancel a timer, so we make them slightly more generic and rename to make
+>> > it more clear that these functions work on soft timers and not the
+>> > hardware resource that this code is managing.
+>> > 
+>> > Signed-off-by: Christoffer Dall <cdall@linaro.org>
+>> > ---
+>> >  virt/kvm/arm/arch_timer.c | 33 ++++++++++++++++-----------------
+>> >  1 file changed, 16 insertions(+), 17 deletions(-)
+>> > 
+>> > diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+>> > index 8e89d63..871d8ae 100644
+>> > --- a/virt/kvm/arm/arch_timer.c
+>> > +++ b/virt/kvm/arm/arch_timer.c
+>> > @@ -56,26 +56,22 @@ u64 kvm_phys_timer_read(void)
+>> >  	return timecounter->cc->read(timecounter->cc);
+>> >  }
+>> >  
+>> > -static bool timer_is_armed(struct arch_timer_cpu *timer)
+>> > +static bool soft_timer_is_armed(struct arch_timer_cpu *timer)
+>> >  {
+>> >  	return timer->armed;
+>> >  }
+>> >  
+>> > -/* timer_arm: as in "arm the timer", not as in ARM the company */
+>> > -static void timer_arm(struct arch_timer_cpu *timer, u64 ns)
+>> > +static void soft_timer_start(struct hrtimer *hrt, u64 ns)
+>> >  {
+>> > -	timer->armed = true;
+>> > -	hrtimer_start(&timer->timer, ktime_add_ns(ktime_get(), ns),
+>> > +	hrtimer_start(hrt, ktime_add_ns(ktime_get(), ns),
+>> >  		      HRTIMER_MODE_ABS);
+>> >  }
+>> >  
+>> > -static void timer_disarm(struct arch_timer_cpu *timer)
+>> > +static void soft_timer_cancel(struct hrtimer *hrt, struct work_struct *work)
+>> >  {
+>> > -	if (timer_is_armed(timer)) {
+>> > -		hrtimer_cancel(&timer->timer);
+>> > -		cancel_work_sync(&timer->expired);
+>> > -		timer->armed = false;
+>> > -	}
+>> > +	hrtimer_cancel(hrt);
+>> > +	if (work)
+>> 
+>> When can this happen? Something in a following patch?
+>> 
 >
-> [...]
+> Yeah, sorry about that.  I will point this out in the commit message.
 >
->> > > >>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>> > +		cancel_work_sync(work);
+>> >  }
+>> >  
+>> >  static irqreturn_t kvm_arch_timer_handler(int irq, void *dev_id)
+>> > @@ -271,7 +267,7 @@ static void kvm_timer_emulate(struct kvm_vcpu *vcpu,
+>> >  		return;
+>> >  
+>> >  	/*  The timer has not yet expired, schedule a background timer */
+>> > -	timer_arm(timer, kvm_timer_compute_delta(timer_ctx));
+>> > +	soft_timer_start(&timer->timer, kvm_timer_compute_delta(timer_ctx));
+>> >  }
+>> >  
+>> >  /*
+>> > @@ -285,7 +281,7 @@ void kvm_timer_schedule(struct kvm_vcpu *vcpu)
+>> >  	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+>> >  	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+>> >  
+>> > -	BUG_ON(timer_is_armed(timer));
+>> > +	BUG_ON(soft_timer_is_armed(timer));
+>> >  
+>> >  	/*
+>> >  	 * No need to schedule a background timer if any guest timer has
+>> > @@ -306,13 +302,16 @@ void kvm_timer_schedule(struct kvm_vcpu *vcpu)
+>> >  	 * The guest timers have not yet expired, schedule a background timer.
+>> >  	 * Set the earliest expiration time among the guest timers.
+>> >  	 */
+>> > -	timer_arm(timer, kvm_timer_earliest_exp(vcpu));
+>> > +	timer->armed = true;
+>> > +	soft_timer_start(&timer->timer, kvm_timer_earliest_exp(vcpu));
+>> >  }
+>> >  
+>> >  void kvm_timer_unschedule(struct kvm_vcpu *vcpu)
+>> >  {
+>> >  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+>> > -	timer_disarm(timer);
+>> > +
+>> > +	soft_timer_cancel(&timer->timer, &timer->expired);
+>> > +	timer->armed = false;
+>> >  }
+>> >  
+>> >  static void kvm_timer_flush_hwstate_vgic(struct kvm_vcpu *vcpu)
+>> > @@ -448,7 +447,7 @@ void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
+>> >  	 * This is to cancel the background timer for the physical timer
+>> >  	 * emulation if it is set.
+>> >  	 */
+>> > -	timer_disarm(timer);
+>> > +	soft_timer_cancel(&timer->timer, &timer->expired);
+>> 
+>> timer_disarm() used to set timer->armed to false, but that's not the
+>> case any more. Don't we risk hitting the BUG_ON() in kvm_timer_schedule
+>> if we hit WFI?
+>> 
 >
-> [...]
+> We do, and I just didn't hit that because this goes away at the end of
+> the series, and I didn't vigurously test every single patch in the
+> series (just a compile test).
 >
->> > > >>> @@ -897,8 +898,17 @@ static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
->> > > >>>  {
->> > > >>>       u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
->> > > >>>                        (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
->> > > >>> +     u64 val = raz ? 0 : read_sanitised_ftr_reg(id);
->> > > >>>
->> > > >>> -     return raz ? 0 : read_sanitised_ftr_reg(id);
->> > > >>> +     if (id == SYS_ID_AA64PFR0_EL1) {
->> > > >>> +             if (val & (0xfUL << ID_AA64PFR0_SVE_SHIFT))
->> > > >>> +                     pr_err_once("kvm [%i]: SVE unsupported for guests, suppressing\n",
->> > > >>> +                                 task_pid_nr(current));
->> > > >>
->> > > >> nit: does this really qualify as an error print?
->> > > >
->> > > > I have no strong opinion on this: maz suggested I should add this --
->> > > > his concern was to make it difficult to ignore.
->> > > >
->> > > > This is transitional: the main purpose is to circumvent bug reports from
->> > > > people who find that SVE doesn't work in their guests, in the interim
->> > > > before proper KVM support lands upstream.
->> > > >
->> > > > Marc, do you still agree with this position?
->> > >
->> > > As long as this is transitional, I'm OK with this.
->> >
->> > No argument from me, since it was your request in the first place ;)
->> >
->> > Christoffer?
->> >
->> No (further) argument from me.
+> We actually only use the armed flag for the BUG_ON(), and I don't think
+> we need that check really.  So I suggest simply merging this logic into
+> this patch:
 >
-> OK, thanks.  Can I take that as an Ack?
->
-Yes:
+> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+> index f0053f884b4a..d0beae98f755 100644
+> --- a/include/kvm/arm_arch_timer.h
+> +++ b/include/kvm/arm_arch_timer.h
+> @@ -48,9 +48,6 @@ struct arch_timer_cpu {
+>  	/* Work queued with the above timer expires */
+>  	struct work_struct		expired;
+>  
+> -	/* Background timer active */
+> -	bool				armed;
+> -
+>  	/* Is the timer enabled */
+>  	bool			enabled;
+>  };
+> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> index 871d8ae52f9b..98643bc696a9 100644
+> --- a/virt/kvm/arm/arch_timer.c
+> +++ b/virt/kvm/arm/arch_timer.c
+> @@ -56,11 +56,6 @@ u64 kvm_phys_timer_read(void)
+>  	return timecounter->cc->read(timecounter->cc);
+>  }
+>  
+> -static bool soft_timer_is_armed(struct arch_timer_cpu *timer)
+> -{
+> -	return timer->armed;
+> -}
+> -
+>  static void soft_timer_start(struct hrtimer *hrt, u64 ns)
+>  {
+>  	hrtimer_start(hrt, ktime_add_ns(ktime_get(), ns),
+> @@ -281,8 +276,6 @@ void kvm_timer_schedule(struct kvm_vcpu *vcpu)
+>  	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+>  	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+>  
+> -	BUG_ON(soft_timer_is_armed(timer));
+> -
+>  	/*
+>  	 * No need to schedule a background timer if any guest timer has
+>  	 * already expired, because kvm_vcpu_block will return before putting
+> @@ -302,7 +295,6 @@ void kvm_timer_schedule(struct kvm_vcpu *vcpu)
+>  	 * The guest timers have not yet expired, schedule a background timer.
+>  	 * Set the earliest expiration time among the guest timers.
+>  	 */
+> -	timer->armed = true;
+>  	soft_timer_start(&timer->timer, kvm_timer_earliest_exp(vcpu));
+>  }
+>  
+> @@ -311,7 +303,6 @@ void kvm_timer_unschedule(struct kvm_vcpu *vcpu)
+>  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+>  
+>  	soft_timer_cancel(&timer->timer, &timer->expired);
+> -	timer->armed = false;
+>  }
+>  
+>  static void kvm_timer_flush_hwstate_vgic(struct kvm_vcpu *vcpu)
 
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+Yes, this seems like a sensible thing to do.
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead, it just smell funny.
