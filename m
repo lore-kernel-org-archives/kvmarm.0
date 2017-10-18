@@ -1,269 +1,188 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v3 03/20] arm64: Use the physical counter when available
- for read_cycles
-Date: Wed, 18 Oct 2017 13:34:05 +0200
-Message-ID: <20171018113405.GA8900@cbox>
-References: <20170923004207.22356-1-cdall@linaro.org>
- <20170923004207.22356-4-cdall@linaro.org>
- <9b06425f-7c2c-d44a-cd6c-aeaa4b76849c@arm.com>
+Subject: Re: [PATCH RESEND v2] arm/arm64: KVM: set right LR register value
+ for 32 bit guest when inject abort
+Date: Wed, 18 Oct 2017 13:39:32 +0200
+Message-ID: <20171018113932.GB8900@cbox>
+References: <1508250229-17895-1-git-send-email-gengdongjiu@huawei.com>
+ <76baaa48-2a38-6deb-f11f-53361e3d7936@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 28D3D40A74
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Oct 2017 07:38:31 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id EPYn+7DDnG9k for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 Oct 2017 07:38:30 -0400 (EDT)
+Received: from mail-wm0-f67.google.com (mail-wm0-f67.google.com [74.125.82.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E3516405F9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Oct 2017 07:38:29 -0400 (EDT)
+Received: by mail-wm0-f67.google.com with SMTP id u138so9450007wmu.5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Oct 2017 04:39:30 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <9b06425f-7c2c-d44a-cd6c-aeaa4b76849c@arm.com>
-Sender: kvm-owner@vger.kernel.org
+In-Reply-To: <76baaa48-2a38-6deb-f11f-53361e3d7936@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>
+Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, zhanghaibin7@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Oct 09, 2017 at 05:21:24PM +0100, Marc Zyngier wrote:
-> On 23/09/17 01:41, Christoffer Dall wrote:
-> > Currently get_cycles() is hardwired to arch_counter_get_cntvct() on
-> > arm64, but as we move to using the physical timer for the in-kernel
-> > time-keeping, we need to make that more flexible.
+On Wed, Oct 18, 2017 at 11:19:30AM +0100, Marc Zyngier wrote:
+> On 17/10/17 15:23, Dongjiu Geng wrote:
+> > When a exception is trapped to EL2, hardware uses  ELR_ELx to hold
+> > the current fault instruction address. If KVM wants to inject a
+> > abort to 32 bit guest, it needs to set the LR register for the
+> > guest to emulate this abort happened in the guest. Because ARM32
+> > architecture is pipelined execution, so the LR value has an offset to
+> > the fault instruction address.
 > > 
-> > First, we need to make sure the physical counter can be read on equal
-> > terms to the virtual counter, which includes adding physical counter
-> > read functions for timers that require errata.
+> > The offsets applied to Link value for exceptions as shown below,
+> > which should be added for the ARM32 link register(LR).
 > > 
-> > Second, we need to make a choice between reading the physical vs virtual
-> > counter, depending on which timer is used for time keeping in the kernel
-> > otherwise.  We can do this using a static key to avoid a performance
-> > penalty during runtime when reading the counter.
+> > Table taken from ARMv8 ARM DDI0487B-B, table G1-10:
+> > Exception			Offset, for PE state of:
+> > 				A32 	  T32
+> > Undefined Instruction 		+4 	  +2
+> > Prefetch Abort 			+4 	  +4
+> > Data Abort 			+8 	  +8
+> > IRQ or FIQ 			+4 	  +4
 > > 
-> > Cc: Catalin Marinas <catalin.marinas@arm.com>
-> > Cc: Will Deacon <will.deacon@arm.com>
-> > Cc: Mark Rutland <mark.rutland@arm.com>
-> > Cc: Marc Zyngier <marc.zyngier@arm.com>
-> > Signed-off-by: Christoffer Dall <cdall@linaro.org>
+> > Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> > Tested-by: Haibin Zhang <zhanghaibin7@huawei.com>
 > 
-> Right. I should have read patch #3. I'm an idiot.
+> Cc: stable@vger.kernel.org
 > 
+> > 
 > > ---
-> >  arch/arm64/include/asm/arch_timer.h  | 15 ++++++++++++---
-> >  arch/arm64/include/asm/timex.h       |  2 +-
-> >  drivers/clocksource/arm_arch_timer.c | 32 ++++++++++++++++++++++++++++++--
-> >  3 files changed, 43 insertions(+), 6 deletions(-)
+> > Have tested in both arm32 and arm64
 > > 
-> > diff --git a/arch/arm64/include/asm/arch_timer.h b/arch/arm64/include/asm/arch_timer.h
-> > index 1859a1c..c56d8cd 100644
-> > --- a/arch/arm64/include/asm/arch_timer.h
-> > +++ b/arch/arm64/include/asm/arch_timer.h
-> > @@ -30,6 +30,8 @@
+> > For example, in the arm64 platform, to the undefined instruction injection:
+> > 
+> > 1. Guest OS call SMC(Secure Monitor Call) instruction in the address
+> > 0xc025405c, then Guest traps to hypervisor
+> > 
+> > c0254050:   e59d5028    ldr r5, [sp, #40]   ; 0x28
+> > c0254054:   e3a03001    mov r3, #1
+> > c0254058:   e1a01003    mov r1, r3
+> > c025405c:   e1600070    smc 0
+> > c0254060:   e30a0270    movw    r0, #41584  ; 0xa270
+> > c0254064:   e34c00bf    movt    r0, #49343  ; 0xc0bf
+> > 
+> > 2. KVM  injects undefined abort to guest
+> > 3. We will find the fault PC is 0xc0254058, not 0xc025405c.
+> > 
+> > [   12.348072] Internal error: Oops - undefined instruction: 0 [#1] SMP ARM
+> > [   12.349786] Modules linked in:
+> > [   12.350563] CPU: 1 PID: 71 Comm: cat Not tainted 4.1.0-dirty #25
+> > [   12.352061] Hardware name: Generic DT based system
+> > [   12.353275] task: d9d08000 ti: d9cfe000 task.ti: d9cfe000
+> > [   12.354637] PC is at proc_dointvec+0x20/0x60
+> > [   12.355717] LR is at proc_sys_call_handler+0xb0/0xc4
+> > [   12.356972] pc : [<c0254058>]    lr : [<c035699c>]    psr: a0060013
+> > [   12.356972] sp : d9cffe90  ip : c0254038  fp : 00000001
+> > [   12.359824] r10: d9cfff80  r9 : 00000004  r8 : 00000000
+> > [   12.361132] r7 : bec21cb0  r6 : d9cffec4  r5 : d9cfff80  r4 : c0e82de0
+> > [   12.362766] r3 : 00000001  r2 : bec21cb0  r1 : 00000001  r0 : c0e82de0
+> > [   12.364400] Flags: NzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment user
+> > [   12.366183] Control: 10c5383d  Table: 59d3406a  DAC: 00000015
+> > [   12.367623] Process cat (pid: 71, stack limit = 0xd9cfe220)
+> > 
+> > 4. After correct the LR register, it will have right value
+> > 
+> > [  125.763370] Internal error: Oops - undefined instruction: 0 [#2] SMP ARM
+> > [  125.767010] Modules linked in:
+> > [  125.768472] CPU: 1 PID: 74 Comm: cat Tainted: G      D         4.1.0-dirty #25
+> > [  125.771854] Hardware name: Generic DT based system
+> > [  125.774053] task: db0bb900 ti: d9d10000 task.ti: d9d10000
+> > [  125.776821] PC is at proc_dointvec+0x24/0x60
+> > [  125.778919] LR is at proc_sys_call_handler+0xb0/0xc4
+> > [  125.781269] pc : [<c025405c>]    lr : [<c035699c>]    psr: a0060013
+> > [  125.781269] sp : d9d11e90  ip : c0254038  fp : 00000001
+> > [  125.786581] r10: d9d11f80  r9 : 00000004  r8 : 00000000
+> > [  125.789673] r7 : be92ccb0  r6 : d9d11ec4  r5 : d9d11f80  r4 : c0e82de0
+> > [  125.792828] r3 : 00000001  r2 : be92ccb0  r1 : 00000001  r0 : c0e82de0
+> > [  125.795890] Flags: NzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment user
+> > 
+> > For other exception injection, such as Data/Prefetch abort, also needs to correct
+> > ---
+> >  arch/arm/kvm/emulate.c        |  4 ++--
+> >  arch/arm64/kvm/inject_fault.c | 16 +++++++++++++++-
+> >  2 files changed, 17 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/arch/arm/kvm/emulate.c b/arch/arm/kvm/emulate.c
+> > index 0064b86..2419328 100644
+> > --- a/arch/arm/kvm/emulate.c
+> > +++ b/arch/arm/kvm/emulate.c
+> > @@ -227,7 +227,7 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
+> >  	u32 return_offset = (is_thumb) ? 2 : 4;
 > >  
-> >  #include <clocksource/arm_arch_timer.h>
+> >  	kvm_update_psr(vcpu, UND_MODE);
+> > -	*vcpu_reg(vcpu, 14) = *vcpu_pc(vcpu) - return_offset;
+> > +	*vcpu_reg(vcpu, 14) = *vcpu_pc(vcpu) + return_offset;
 > >  
-> > +extern struct static_key_false arch_timer_phys_counter_available;
-> > +
-> >  #if IS_ENABLED(CONFIG_ARM_ARCH_TIMER_OOL_WORKAROUND)
-> >  extern struct static_key_false arch_timer_read_ool_enabled;
-> >  #define needs_unstable_timer_counter_workaround() \
-> > @@ -52,6 +54,7 @@ struct arch_timer_erratum_workaround {
-> >  	const char *desc;
-> >  	u32 (*read_cntp_tval_el0)(void);
-> >  	u32 (*read_cntv_tval_el0)(void);
-> > +	u64 (*read_cntpct_el0)(void);
-> >  	u64 (*read_cntvct_el0)(void);
-> >  	int (*set_next_event_phys)(unsigned long, struct clock_event_device *);
-> >  	int (*set_next_event_virt)(unsigned long, struct clock_event_device *);
-> > @@ -148,10 +151,8 @@ static inline void arch_timer_set_cntkctl(u32 cntkctl)
+> >  	/* Branch to exception vector */
+> >  	*vcpu_pc(vcpu) = exc_vector_base(vcpu) + vect_offset;
+> > @@ -242,7 +242,7 @@ static void inject_abt(struct kvm_vcpu *vcpu, bool is_pabt, unsigned long addr)
+> >  	unsigned long cpsr = *vcpu_cpsr(vcpu);
+> >  	bool is_thumb = (cpsr & PSR_T_BIT);
+> >  	u32 vect_offset;
+> > -	u32 return_offset = (is_thumb) ? 4 : 0;
+> > +	u32 return_offset = (is_pabt) ? 4 : 8;
+> >  	bool is_lpae;
 > >  
-> >  static inline u64 arch_counter_get_cntpct(void)
-> >  {
-> > -	u64 cval;
-> >  	isb();
-> > -	asm volatile("mrs %0, cntpct_el0" : "=r" (cval));
-> > -	return cval;
-> > +	return arch_timer_reg_read_stable(cntpct_el0);
-> >  }
+> >  	kvm_update_psr(vcpu, ABT_MODE);
+> > diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+> > index da6a8cf..0416f18 100644
+> > --- a/arch/arm64/kvm/inject_fault.c
+> > +++ b/arch/arm64/kvm/inject_fault.c
+> > @@ -33,12 +33,26 @@
+> >  #define LOWER_EL_AArch64_VECTOR		0x400
+> >  #define LOWER_EL_AArch32_VECTOR		0x600
 > >  
-> >  static inline u64 arch_counter_get_cntvct(void)
-> > @@ -160,6 +161,14 @@ static inline u64 arch_counter_get_cntvct(void)
-> >  	return arch_timer_reg_read_stable(cntvct_el0);
-> >  }
-> >  
-> > +static inline u64 arch_counter_get_cycles(void)
-> > +{
-> > +	if (static_branch_unlikely(&arch_timer_phys_counter_available))
-> > +	    return arch_counter_get_cntpct();
-> > +	else
-> > +	    return arch_counter_get_cntvct();
-> > +}
-> > +
-> >  static inline int arch_timer_arch_init(void)
-> >  {
-> >  	return 0;
-> > diff --git a/arch/arm64/include/asm/timex.h b/arch/arm64/include/asm/timex.h
-> > index 81a076e..c0d214c 100644
-> > --- a/arch/arm64/include/asm/timex.h
-> > +++ b/arch/arm64/include/asm/timex.h
-> > @@ -22,7 +22,7 @@
-> >   * Use the current timer as a cycle counter since this is what we use for
-> >   * the delay loop.
-> >   */
-> > -#define get_cycles()	arch_counter_get_cntvct()
-> > +#define get_cycles()	arch_counter_get_cycles()
+> > +/*
+> > + * Table taken from ARMv8 ARM DDI0487B-B, table G1-10.
+> > + */
+> > +static u8 return_offsets[8][2] = {
 > 
-> Why can't this be arch_timer_read_counter() instead? Is there any 
-> measurable advantage in using a static key compared to a memory 
-> indirection?
+> static const
 > 
-
-No reason.  I think I thought there was an include dependency issue that
-led me to do it the other way, but I must have confused myself, because
-using arch_timer_read_counter seems to work perfectly well.
-
-> >  
-> >  #include <asm-generic/timex.h>
-> >  
-> > diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
-> > index 9b3322a..f35da20 100644
-> > --- a/drivers/clocksource/arm_arch_timer.c
-> > +++ b/drivers/clocksource/arm_arch_timer.c
-> > @@ -77,6 +77,9 @@ static bool arch_timer_mem_use_virtual;
-> >  static bool arch_counter_suspend_stop;
-> >  static bool vdso_default = true;
-> >  
-> > +DEFINE_STATIC_KEY_FALSE(arch_timer_phys_counter_available);
-> > +EXPORT_SYMBOL_GPL(arch_timer_phys_counter_available);
+> > +	[0] = { 0, 0 },		/* Reset, unused */
+> > +	[1] = { 4, 2 },		/* Undefined */
+> > +	[2] = { 0, 0 },		/* SVC, unused */
+> > +	[3] = { 4, 4 },		/* Prefetch abort */
+> > +	[4] = { 8, 8 },		/* Data abort */
+> > +	[5] = { 0, 0 },		/* HVC, unused */
+> > +	[6] = { 4, 4 },		/* IRQ, unused */
+> > +	[7] = { 4, 4 },		/* FIQ, unused */
+> > +};
 > > +
-> >  static bool evtstrm_enable = IS_ENABLED(CONFIG_ARM_ARCH_TIMER_EVTSTREAM);
-> >  
-> >  static int __init early_evtstrm_cfg(char *buf)
-> > @@ -217,6 +220,11 @@ static u32 notrace fsl_a008585_read_cntv_tval_el0(void)
-> >  	return __fsl_a008585_read_reg(cntv_tval_el0);
-> >  }
-> >  
-> > +static u64 notrace fsl_a008585_read_cntpct_el0(void)
-> > +{
-> > +	return __fsl_a008585_read_reg(cntpct_el0);
-> > +}
-> > +
-> >  static u64 notrace fsl_a008585_read_cntvct_el0(void)
+> >  static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
 > >  {
-> >  	return __fsl_a008585_read_reg(cntvct_el0);
-> > @@ -258,6 +266,11 @@ static u32 notrace hisi_161010101_read_cntv_tval_el0(void)
-> >  	return __hisi_161010101_read_reg(cntv_tval_el0);
-> >  }
+> >  	unsigned long cpsr;
+> >  	unsigned long new_spsr_value = *vcpu_cpsr(vcpu);
+> >  	bool is_thumb = (new_spsr_value & COMPAT_PSR_T_BIT);
+> > -	u32 return_offset = (is_thumb) ? 4 : 0;
+> > +	u32 return_offset = return_offsets[vect_offset >> 2][is_thumb];
+> >  	u32 sctlr = vcpu_cp15(vcpu, c1_SCTLR);
 > >  
-> > +static u64 notrace hisi_161010101_read_cntpct_el0(void)
-> > +{
-> > +	return __hisi_161010101_read_reg(cntpct_el0);
-> > +}
-> > +
-> >  static u64 notrace hisi_161010101_read_cntvct_el0(void)
-> >  {
-> >  	return __hisi_161010101_read_reg(cntvct_el0);
-> > @@ -288,6 +301,15 @@ static struct ate_acpi_oem_info hisi_161010101_oem_info[] = {
-> >  #endif
-> >  
-> >  #ifdef CONFIG_ARM64_ERRATUM_858921
-> > +static u64 notrace arm64_858921_read_cntpct_el0(void)
-> > +{
-> > +	u64 old, new;
-> > +
-> > +	old = read_sysreg(cntpct_el0);
-> > +	new = read_sysreg(cntpct_el0);
-> > +	return (((old ^ new) >> 32) & 1) ? old : new;
-> > +}
-> > +
-> >  static u64 notrace arm64_858921_read_cntvct_el0(void)
-> >  {
-> >  	u64 old, new;
-> > @@ -346,6 +368,7 @@ static const struct arch_timer_erratum_workaround ool_workarounds[] = {
-> >  		.desc = "Freescale erratum a005858",
-> >  		.read_cntp_tval_el0 = fsl_a008585_read_cntp_tval_el0,
-> >  		.read_cntv_tval_el0 = fsl_a008585_read_cntv_tval_el0,
-> > +		.read_cntpct_el0 = fsl_a008585_read_cntpct_el0,
-> >  		.read_cntvct_el0 = fsl_a008585_read_cntvct_el0,
-> >  		.set_next_event_phys = erratum_set_next_event_tval_phys,
-> >  		.set_next_event_virt = erratum_set_next_event_tval_virt,
-> > @@ -358,6 +381,7 @@ static const struct arch_timer_erratum_workaround ool_workarounds[] = {
-> >  		.desc = "HiSilicon erratum 161010101",
-> >  		.read_cntp_tval_el0 = hisi_161010101_read_cntp_tval_el0,
-> >  		.read_cntv_tval_el0 = hisi_161010101_read_cntv_tval_el0,
-> > +		.read_cntpct_el0 = hisi_161010101_read_cntpct_el0,
-> >  		.read_cntvct_el0 = hisi_161010101_read_cntvct_el0,
-> >  		.set_next_event_phys = erratum_set_next_event_tval_phys,
-> >  		.set_next_event_virt = erratum_set_next_event_tval_virt,
-> > @@ -368,6 +392,7 @@ static const struct arch_timer_erratum_workaround ool_workarounds[] = {
-> >  		.desc = "HiSilicon erratum 161010101",
-> >  		.read_cntp_tval_el0 = hisi_161010101_read_cntp_tval_el0,
-> >  		.read_cntv_tval_el0 = hisi_161010101_read_cntv_tval_el0,
-> > +		.read_cntpct_el0 = hisi_161010101_read_cntpct_el0,
-> >  		.read_cntvct_el0 = hisi_161010101_read_cntvct_el0,
-> >  		.set_next_event_phys = erratum_set_next_event_tval_phys,
-> >  		.set_next_event_virt = erratum_set_next_event_tval_virt,
-> > @@ -378,6 +403,7 @@ static const struct arch_timer_erratum_workaround ool_workarounds[] = {
-> >  		.match_type = ate_match_local_cap_id,
-> >  		.id = (void *)ARM64_WORKAROUND_858921,
-> >  		.desc = "ARM erratum 858921",
-> > +		.read_cntpct_el0 = arm64_858921_read_cntpct_el0,
-> >  		.read_cntvct_el0 = arm64_858921_read_cntvct_el0,
-> >  	},
-> >  #endif
-> > @@ -890,10 +916,12 @@ static void __init arch_counter_register(unsigned type)
-> >  
-> >  	/* Register the CP15 based counter if we have one */
-> >  	if (type & ARCH_TIMER_TYPE_CP15) {
-> > -		if (arch_timer_uses_ppi == ARCH_TIMER_VIRT_PPI)
-> > +		if (arch_timer_uses_ppi == ARCH_TIMER_VIRT_PPI) {
-> >  			arch_timer_read_counter = arch_counter_get_cntvct;
-> > -		else
-> > +		} else {
-> >  			arch_timer_read_counter = arch_counter_get_cntpct;
-> > +			static_branch_enable(&arch_timer_phys_counter_available);
-> > +		}
-> >  
-> >  		clocksource_counter.archdata.vdso_direct = vdso_default;
-> >  	} else {
+> >  	cpsr = mode | COMPAT_PSR_I_BIT;
 > > 
 > 
-> In my reply to patch #2, I had the following hunk:
+> Otherwise:
 > 
-> @@ -310,7 +329,7 @@ static void erratum_set_next_event_tval_generic(const int access, unsigned long
->  						struct clock_event_device *clk)
->  {
->  	unsigned long ctrl;
-> -	u64 cval = evt + arch_counter_get_cntvct();
-> +	u64 cval = evt + arch_timer_read_counter();
->  
->  	ctrl = arch_timer_reg_read(access, ARCH_TIMER_REG_CTRL, clk);
->  	ctrl |= ARCH_TIMER_CTRL_ENABLE;
-> 
-> Once we start using a different timer, this could well have an effect...
+> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 > 
 
-Right, but wouldn't the following be a more correct way to go about it then:
-
-diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
-index 9a7b359..07f19db 100644
---- a/drivers/clocksource/arm_arch_timer.c
-+++ b/drivers/clocksource/arm_arch_timer.c
-@@ -329,16 +329,19 @@ static void erratum_set_next_event_tval_generic(const int access, unsigned long
- 						struct clock_event_device *clk)
- {
- 	unsigned long ctrl;
--	u64 cval = evt + arch_timer_read_counter();
-+	u64 cval;
- 
- 	ctrl = arch_timer_reg_read(access, ARCH_TIMER_REG_CTRL, clk);
- 	ctrl |= ARCH_TIMER_CTRL_ENABLE;
- 	ctrl &= ~ARCH_TIMER_CTRL_IT_MASK;
- 
--	if (access == ARCH_TIMER_PHYS_ACCESS)
-+	if (access == ARCH_TIMER_PHYS_ACCESS) {
-+		cval = evt + arch_counter_get_cntpct();
- 		write_sysreg(cval, cntp_cval_el0);
--	else
-+	} else {
-+		cval = evt + arch_counter_get_cntvct();
- 		write_sysreg(cval, cntv_cval_el0);
-+	}
- 
- 	arch_timer_reg_write(access, ARCH_TIMER_REG_CTRL, ctrl, clk);
- }
-
+I fixed up the const and applied cc stable.
 
 Thanks,
 -Christoffer
