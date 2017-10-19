@@ -1,22 +1,23 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH v4 14/21] arm64: kernel: Prepare for a DISR user
-Date: Thu, 19 Oct 2017 15:58:00 +0100
-Message-ID: <20171019145807.23251-15-james.morse@arm.com>
+Subject: [PATCH v4 13/21] arm64: cpufeature: Enable IESB on exception
+ entry/return for firmware-first
+Date: Thu, 19 Oct 2017 15:57:59 +0100
+Message-ID: <20171019145807.23251-14-james.morse@arm.com>
 References: <20171019145807.23251-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D1FA49D39
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Oct 2017 10:59:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5413449D1F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Oct 2017 10:59:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id K6k9rBqDnCV0 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Oct 2017 10:59:27 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EBDA406BB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Oct 2017 10:59:27 -0400 (EDT)
+ with ESMTP id b3HpYTdJVfKu for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 Oct 2017 10:59:25 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 828D849D70
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Oct 2017 10:59:24 -0400 (EDT)
 In-Reply-To: <20171019145807.23251-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,161 +32,121 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Julien Thierry <julien.thierry@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-KVM would like to consume any pending SError (or RAS error) after guest
-exit. Today it has to unmask SError and use dsb+isb to synchronise the
-CPU. With the RAS extensions we can use ESB to synchronise any pending
-SError.
+ARM v8.2 has a feature to add implicit error synchronization barriers
+whenever the CPU enters or returns from an exception level. Add code to
+detect this feature and enable the SCTLR_ELx.IESB bit.
 
-Add the necessary macros to allow DISR to be read and converted to an
-ESR.
+This feature causes RAS errors that are not yet visible to software to
+become pending SErrors. We expect to have firmware-first RAS support
+so synchronised RAS errors will be take immediately to EL3.
+Any system without firmware-first handling of errors will take the SError
+either immediatly after exception return, or when we unmask SError after
+entry.S's work.
 
-We clear the DISR register when we enable the RAS cpufeature. While the
-kernel has issued ESB instructions before this point it has only done so
-with SError unmasked, any value we find in DISR must have belonged to
-firmware. Executing an ESB instruction is the only way to update DISR,
-so we can expect firmware to have handled any deferred SError. By the
-same logic we clear DISR in the idle path.
+Platform level RAS support may require additional firmware support.
 
+Cc: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: James Morse <james.morse@arm.com>
 Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+
 ---
- arch/arm64/include/asm/assembler.h |  7 +++++++
- arch/arm64/include/asm/esr.h       |  7 +++++++
- arch/arm64/include/asm/exception.h | 14 ++++++++++++++
+Note the sneaky KVM change,
+
+Changes since v3:
+ * removed IESB Kconfig option
+
+ arch/arm64/include/asm/cpucaps.h   |  3 ++-
  arch/arm64/include/asm/processor.h |  1 +
  arch/arm64/include/asm/sysreg.h    |  1 +
- arch/arm64/kernel/cpufeature.c     |  9 +++++++++
- arch/arm64/mm/proc.S               |  5 +++++
- 7 files changed, 44 insertions(+)
+ arch/arm64/kernel/cpufeature.c     | 19 +++++++++++++++++++
+ arch/arm64/kvm/hyp-init.S          |  3 +++
+ 5 files changed, 26 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
-index e4ac505b7b3d..7a918a4cf4f7 100644
---- a/arch/arm64/include/asm/assembler.h
-+++ b/arch/arm64/include/asm/assembler.h
-@@ -109,6 +109,13 @@
- 	.endm
+diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+index 4820d441bfb9..7a2bbbfdff49 100644
+--- a/arch/arm64/include/asm/cpucaps.h
++++ b/arch/arm64/include/asm/cpucaps.h
+@@ -41,7 +41,8 @@
+ #define ARM64_WORKAROUND_CAVIUM_30115		20
+ #define ARM64_HAS_DCPOP				21
+ #define ARM64_HAS_RAS_EXTN			22
++#define ARM64_HAS_IESB				23
  
- /*
-+ * RAS Error Synchronization barrier
-+ */
-+	.macro  esb
-+	hint    #16
-+	.endm
-+
-+/*
-  * NOP sequence
-  */
- 	.macro	nops, num
-diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-index 8ea52f15bf1c..b3f17fd18b14 100644
---- a/arch/arm64/include/asm/esr.h
-+++ b/arch/arm64/include/asm/esr.h
-@@ -136,6 +136,13 @@
- #define ESR_ELx_WFx_ISS_WFE	(UL(1) << 0)
- #define ESR_ELx_xVC_IMM_MASK	((1UL << 16) - 1)
+-#define ARM64_NCAPS				23
++#define ARM64_NCAPS				24
  
-+#define DISR_EL1_IDS		(UL(1) << 24)
-+/*
-+ * DISR_EL1 and ESR_ELx share the bottom 13 bits, but the RES0 bits may mean
-+ * different things in the future...
-+ */
-+#define DISR_EL1_ESR_MASK	(ESR_ELx_AET | ESR_ELx_EA | ESR_ELx_FSC)
-+
- /* ESR value templates for specific events */
- 
- /* BRK instruction trap from AArch64 state */
-diff --git a/arch/arm64/include/asm/exception.h b/arch/arm64/include/asm/exception.h
-index 0c2eec490abf..bc30429d8e91 100644
---- a/arch/arm64/include/asm/exception.h
-+++ b/arch/arm64/include/asm/exception.h
-@@ -18,6 +18,8 @@
- #ifndef __ASM_EXCEPTION_H
- #define __ASM_EXCEPTION_H
- 
-+#include <asm/esr.h>
-+
- #include <linux/interrupt.h>
- 
- #define __exception	__attribute__((section(".exception.text")))
-@@ -27,4 +29,16 @@
- #define __exception_irq_entry	__exception
- #endif
- 
-+static inline u32 disr_to_esr(u64 disr)
-+{
-+	unsigned int esr = ESR_ELx_EC_SERROR << ESR_ELx_EC_SHIFT;
-+
-+	if ((disr & DISR_EL1_IDS) == 0)
-+		esr |= (disr & DISR_EL1_ESR_MASK);
-+	else
-+		esr |= (disr & ESR_ELx_ISS_MASK);
-+
-+	return esr;
-+}
-+
- #endif	/* __ASM_EXCEPTION_H */
+ #endif /* __ASM_CPUCAPS_H */
 diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
-index 6b72ddc33d06..9de3f839be8a 100644
+index 29adab8138c3..6b72ddc33d06 100644
 --- a/arch/arm64/include/asm/processor.h
 +++ b/arch/arm64/include/asm/processor.h
-@@ -194,5 +194,6 @@ static inline void spin_lock_prefetch(const void *ptr)
+@@ -193,5 +193,6 @@ static inline void spin_lock_prefetch(const void *ptr)
+ 
  int cpu_enable_pan(void *__unused);
  int cpu_enable_cache_maint_trap(void *__unused);
- int cpu_enable_iesb(void *__unused);
-+int cpu_clear_disr(void *__unused);
++int cpu_enable_iesb(void *__unused);
  
  #endif /* __ASM_PROCESSOR_H */
 diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 4500a70c6a57..427c36bc5dd6 100644
+index 64e2a80fd749..4500a70c6a57 100644
 --- a/arch/arm64/include/asm/sysreg.h
 +++ b/arch/arm64/include/asm/sysreg.h
-@@ -179,6 +179,7 @@
- #define SYS_AMAIR_EL1			sys_reg(3, 0, 10, 3, 0)
+@@ -297,6 +297,7 @@
  
- #define SYS_VBAR_EL1			sys_reg(3, 0, 12, 0, 0)
-+#define SYS_DISR_EL1			sys_reg(3, 0, 12, 1,  1)
- 
- #define SYS_ICC_IAR0_EL1		sys_reg(3, 0, 12, 8, 0)
- #define SYS_ICC_EOIR0_EL1		sys_reg(3, 0, 12, 8, 1)
+ /* Common SCTLR_ELx flags. */
+ #define SCTLR_ELx_EE    (1 << 25)
++#define SCTLR_ELx_IESB	(1 << 21)
+ #define SCTLR_ELx_I	(1 << 12)
+ #define SCTLR_ELx_SA	(1 << 3)
+ #define SCTLR_ELx_C	(1 << 2)
 diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 356a5de51f5e..e799b72f1395 100644
+index 0fc017b55cb1..356a5de51f5e 100644
 --- a/arch/arm64/kernel/cpufeature.c
 +++ b/arch/arm64/kernel/cpufeature.c
-@@ -911,6 +911,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.sign = FTR_UNSIGNED,
+@@ -912,6 +912,17 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
  		.field_pos = ID_AA64PFR0_RAS_SHIFT,
  		.min_field_value = ID_AA64PFR0_RAS_V1,
-+		.enable = cpu_clear_disr,
  	},
- 	{
- 		.desc = "Implicit Error Synchronization Barrier",
-@@ -1340,3 +1341,11 @@ int cpu_enable_iesb(void *__unused)
- 
- 	return 0;
++	{
++		.desc = "Implicit Error Synchronization Barrier",
++		.capability = ARM64_HAS_IESB,
++		.def_scope = SCOPE_SYSTEM,
++		.matches = has_cpuid_feature,
++		.sys_reg = SYS_ID_AA64MMFR2_EL1,
++		.sign = FTR_UNSIGNED,
++		.field_pos = ID_AA64MMFR2_IESB_SHIFT,
++		.min_field_value = 1,
++		.enable = cpu_enable_iesb,
++	},
+ #endif /* CONFIG_ARM64_RAS_EXTN */
+ 	{},
+ };
+@@ -1321,3 +1332,11 @@ static int __init enable_mrs_emulation(void)
  }
+ 
+ late_initcall(enable_mrs_emulation);
 +
-+int cpu_clear_disr(void *__unused)
++int cpu_enable_iesb(void *__unused)
 +{
-+	/* Firmware may have left a deferred SError in this register. */
-+	write_sysreg_s(0, SYS_DISR_EL1);
++	if (cpus_have_cap(ARM64_HAS_RAS_EXTN))
++		config_sctlr_el1(0, SCTLR_ELx_IESB);
 +
 +	return 0;
 +}
-diff --git a/arch/arm64/mm/proc.S b/arch/arm64/mm/proc.S
-index 95233dfc4c39..ac571223672d 100644
---- a/arch/arm64/mm/proc.S
-+++ b/arch/arm64/mm/proc.S
-@@ -124,6 +124,11 @@ ENTRY(cpu_do_resume)
- 	ubfx	x11, x11, #1, #1
- 	msr	oslar_el1, x11
- 	reset_pmuserenr_el0 x0			// Disable PMU access from EL0
-+
-+alternative_if ARM64_HAS_RAS_EXTN
-+	msr_s	SYS_DISR_EL1, xzr
+diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp-init.S
+index 3f9615582377..8983e9473017 100644
+--- a/arch/arm64/kvm/hyp-init.S
++++ b/arch/arm64/kvm/hyp-init.S
+@@ -113,6 +113,9 @@ __do_hyp_init:
+ 	 */
+ 	ldr	x4, =(SCTLR_EL2_RES1 | (SCTLR_ELx_FLAGS & ~SCTLR_ELx_A))
+ CPU_BE(	orr	x4, x4, #SCTLR_ELx_EE)
++alternative_if ARM64_HAS_IESB
++	orr	x4, x4, #SCTLR_ELx_IESB
 +alternative_else_nop_endif
-+
+ 	msr	sctlr_el2, x4
  	isb
- 	ret
- ENDPROC(cpu_do_resume)
+ 
 -- 
 2.13.3
