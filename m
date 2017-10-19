@@ -1,246 +1,111 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v3 18/20] KVM: arm/arm64: Avoid phys timer emulation in
- vcpu entry/exit
-Date: Thu, 19 Oct 2017 10:44:43 +0200
-Message-ID: <20171019084443.GQ8900@cbox>
-References: <20170923004207.22356-1-cdall@linaro.org>
- <20170923004207.22356-19-cdall@linaro.org>
- <8760bnwd3o.fsf@on-the-bus.cambridge.arm.com>
+Subject: Re: [PATCH v4 3/7] KVM: arm/arm64: Don't cache the timer IRQ level
+Date: Thu, 19 Oct 2017 15:05:48 +0200
+Message-ID: <20171019130548.GR8900@cbox>
+References: <1505513994-77939-1-git-send-email-christoffer.dall@linaro.org>
+ <1505513994-77939-4-git-send-email-christoffer.dall@linaro.org>
+ <87k203uw01.fsf@on-the-bus.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <8760bnwd3o.fsf@on-the-bus.cambridge.arm.com>
+In-Reply-To: <87k203uw01.fsf@on-the-bus.cambridge.arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Oct 10, 2017 at 10:45:15AM +0100, Marc Zyngier wrote:
-> On Sat, Sep 23 2017 at  2:42:05 am BST, Christoffer Dall <cdall@linaro.org> wrote:
-> > There is no need to schedule and cancel a hrtimer when entering and
-> > exiting the guest, because we know when the physical timer is going to
-> > fire when the guest programs it, and we can simply program the hrtimer
-> > at that point.
+On Tue, Oct 10, 2017 at 11:39:58AM +0100, Marc Zyngier wrote:
+> On Fri, Sep 15 2017 at  3:19:50 pm BST, Christoffer Dall <christoffer.dall@linaro.org> wrote:
+> > From: Christoffer Dall <cdall@linaro.org>
 > >
-> > Now when the register modifications from the guest go through the
-> > kvm_arm_timer_set/get_reg functions, which always call
-> > kvm_timer_update_state(), we can simply consider the timer state in this
-> > function and schedule and cancel the timers as needed.
+> > The timer was modeled after a strict idea of modelling an interrupt line
+> > level in software, meaning that only transitions in the level needed to
+> > be reported to the VGIC.  This works well for the timer, because the
+> > arch timer code is in complete control of the device and can track the
+> > transitions of the line.
 > >
-> > This avoids looking at the physical timer emulation state when entering
-> > and exiting the VCPU, allowing for faster servicing of the VM when
-> > needed.
+> > However, as we are about to support using the HW bit in the VGIC not
+> > just for the timer, but also for VFIO which cannot track transitions of
+> > the interrupt line, we have to decide on an interface for level
+> > triggered mapped interrupts to the GIC, which both the timer and VFIO
+> > can use.
+> >
+> > VFIO only sees an asserting transition of the physical interrupt line,
+> > and tells the VGIC when that happens.  That means that part of the
+> > interrupt flow is offloaded to the hardware.
+> >
+> > To use the same interface for VFIO devices and the timer, we therefore
+> > have to change the timer (we cannot change VFIO because it doesn't know
+> > the details of the device it is assigning to a VM).
+> >
+> > Luckily, changing the timer is simple, we just need to stop 'caching'
+> > the line level, but instead let the VGIC know the state of the timer on
+> > every entry to the guest, and the VGIC can ignore notifications using
+> > its validate mechanism.
 > >
 > > Signed-off-by: Christoffer Dall <cdall@linaro.org>
 > > ---
-> >  virt/kvm/arm/arch_timer.c | 75 ++++++++++++++++++++++++++++++++---------------
-> >  1 file changed, 51 insertions(+), 24 deletions(-)
+> >  virt/kvm/arm/arch_timer.c | 14 ++++++++------
+> >  1 file changed, 8 insertions(+), 6 deletions(-)
 > >
 > > diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-> > index 1f82c21..aa18a5d 100644
+> > index 8e89d63..2a5f877 100644
 > > --- a/virt/kvm/arm/arch_timer.c
 > > +++ b/virt/kvm/arm/arch_timer.c
-> > @@ -199,7 +199,27 @@ static enum hrtimer_restart kvm_bg_timer_expire(struct hrtimer *hrt)
+> > @@ -219,9 +219,10 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+> >  	int ret;
 > >  
-> >  static enum hrtimer_restart kvm_phys_timer_expire(struct hrtimer *hrt)
-> >  {
-> > -	WARN(1, "Timer only used to ensure guest exit - unexpected event.");
-> > +	struct arch_timer_context *ptimer;
-> > +	struct arch_timer_cpu *timer;
-> > +	struct kvm_vcpu *vcpu;
-> > +	u64 ns;
-> > +
-> > +	timer = container_of(hrt, struct arch_timer_cpu, phys_timer);
-> > +	vcpu = container_of(timer, struct kvm_vcpu, arch.timer_cpu);
-> > +	ptimer = vcpu_ptimer(vcpu);
-> > +
-> > +	/*
-> > +	 * Check that the timer has really expired from the guest's
-> > +	 * PoV (NTP on the host may have forced it to expire
-> > +	 * early). If not ready, schedule for a later time.
-> > +	 */
-> > +	ns = kvm_timer_compute_delta(ptimer);
-> > +	if (unlikely(ns)) {
-> > +		hrtimer_forward_now(hrt, ns_to_ktime(ns));
-> > +		return HRTIMER_RESTART;
-> > +	}
-> 
-> Don't we already have a similar logic for the background timer (I must
-> admit I've lost track of how we changed things in this series)? If so,
-> can we make this common code?
-> 
-
-I looked at it, but the functions are slightly different.  In the
-phys_timer, we just have to calculate the delta and figure out if we
-need to restart it.  In the bg_timer, we have to compute the delta of
-both the vtimer and the ptimer, figure out the earliest one, and figure
-out if we have to restart it.  Therefore, kvm_timer_earliest_exp()
-alrady calls kvm_timer_compute_delate() to share code, and the only code
-we can really share is:
-
-	if (unlikely(ns)) {
-		hrtimer_forward_now(hrt, ns_to_ktime(ns));
-		return HRTIMER_RESTART;
-	}
-
-The following code also cannot really be shared because in one case we
-have to schedule work (the bg timer) and in the other case we have to
-inject an irq (the phys timer).  Ther alternative would be:
-
-static enum hrtimer_restart kvm_soft_timer_expire(struct hrtimer *hrt, bool is_bg_timer)
-{
-	struct arch_timer_context *ptimer;
-	struct arch_timer_cpu *timer;
-	struct kvm_vcpu *vcpu;
-	u64 ns;
-
-	if (is_bg_timer)
-		timer = container_of(hrt, struct arch_timer_cpu, bg_timer);
-	else
-		timer = container_of(hrt, struct arch_timer_cpu, phys_timer);
-	vcpu = container_of(timer, struct kvm_vcpu, arch.timer_cpu);
-	ptimer = vcpu_ptimer(vcpu);
-
-	/*
-	 * Check that the timer has really expired from the guest's
-	 * PoV (NTP on the host may have forced it to expire
-	 * early). If we should have slept longer, restart it.
-	 */
-	if (is_bg_timer)
-		ns = kvm_timer_earliest_exp(vcpu);
-	else
-		ns = kvm_timer_compute_delta(ptimer);
-	if (unlikely(ns)) {
-		hrtimer_forward_now(hrt, ns_to_ktime(ns));
-		return HRTIMER_RESTART;
-	}
-
-	if (is_bg_timer)
-		schedule_work(&timer->expired);
-	else
-		kvm_timer_update_irq(vcpu, true, ptimer);
-	return HRTIMER_NORESTART;
-}
-
-But I prefer just having them separate.
-
-
-> > +
-> > +	kvm_timer_update_irq(vcpu, true, ptimer);
-> >  	return HRTIMER_NORESTART;
-> >  }
+> >  	timer_ctx->active_cleared_last = false;
+> > +	if (timer_ctx->irq.level != new_level)
+> > +		trace_kvm_timer_update_irq(vcpu->vcpu_id, timer_ctx->irq.irq,
+> > +					   new_level);
+> >  	timer_ctx->irq.level = new_level;
+> > -	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer_ctx->irq.irq,
+> > -				   timer_ctx->irq.level);
 > >  
-> > @@ -253,24 +273,28 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+> >  	if (likely(irqchip_in_kernel(vcpu->kvm))) {
+> >  		ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
+> > @@ -241,6 +242,7 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
+> >  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> >  	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+> >  	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+> > +	bool level;
+> >  
+> >  	/*
+> >  	 * If userspace modified the timer registers via SET_ONE_REG before
+> > @@ -251,11 +253,11 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
+> >  	if (unlikely(!timer->enabled))
+> >  		return;
+> >  
+> > -	if (kvm_timer_should_fire(vtimer) != vtimer->irq.level)
+> > -		kvm_timer_update_irq(vcpu, !vtimer->irq.level, vtimer);
+> > +	level = kvm_timer_should_fire(vtimer);
+> > +	kvm_timer_update_irq(vcpu, level, vtimer);
+> >  
+> > -	if (kvm_timer_should_fire(ptimer) != ptimer->irq.level)
+> > -		kvm_timer_update_irq(vcpu, !ptimer->irq.level, ptimer);
+> > +	level = kvm_timer_should_fire(ptimer);
+> > +	kvm_timer_update_irq(vcpu, level, ptimer);
+> 
+> Well, at this stage, you might as well fold the kvm_timer_should_fire()
+> into kvm_timer_update_irq() and from the level parameter. But I suspect
+> this is going to clash badly with your timer series?
+> 
+
+Yes, it's doing extra unnecessary work in the critical path on IRQ
+injections from the ISR after the timer series.
+
+How about I rebase this series on the timer series and do a resend of
+this one, without additional changes, and we have a look at it?
+
 > >  }
 > >  
 > >  /* Schedule the background timer for the emulated timer. */
-> > -static void phys_timer_emulate(struct kvm_vcpu *vcpu,
-> > -			      struct arch_timer_context *timer_ctx)
-> > +static void phys_timer_emulate(struct kvm_vcpu *vcpu)
-> >  {
-> >  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-> > +	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
-> >  
-> > -	if (kvm_timer_should_fire(timer_ctx))
-> > -		return;
-> > -
-> > -	if (!kvm_timer_irq_can_fire(timer_ctx))
-> > +	/*
-> > +	 * If the timer can fire now we have just raised the IRQ line and we
-> > +	 * don't need to have a soft timer scheduled for the future.  If the
-> > +	 * timer cannot fire at all, then we also don't need a soft timer.
-> > +	 */
-> > +	if (kvm_timer_should_fire(ptimer) || !kvm_timer_irq_can_fire(ptimer)) {
-> > +		soft_timer_cancel(&timer->phys_timer, NULL);
-> >  		return;
-> > +	}
-> >  
-> > -	/*  The timer has not yet expired, schedule a background timer */
-> > -	soft_timer_start(&timer->phys_timer, kvm_timer_compute_delta(timer_ctx));
-> > +	soft_timer_start(&timer->phys_timer, kvm_timer_compute_delta(ptimer));
-> >  }
-> >  
-> >  /*
-> > - * Check if there was a change in the timer state (should we raise or lower
-> > - * the line level to the GIC).
-> > + * Check if there was a change in the timer state, so that we should either
-> > + * raise or lower the line level to the GIC or schedule a background timer to
-> > + * emulate the physical timer.
-> >   */
-> >  static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
-> >  {
-> > @@ -292,6 +316,8 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
-> >  
-> >  	if (kvm_timer_should_fire(ptimer) != ptimer->irq.level)
-> >  		kvm_timer_update_irq(vcpu, !ptimer->irq.level, ptimer);
-> > +
-> > +	phys_timer_emulate(vcpu);
-> >  }
-> >  
-> >  static void vtimer_save_state(struct kvm_vcpu *vcpu)
-> > @@ -445,6 +471,9 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
-> >  
-> >  	if (has_vhe())
-> >  		disable_el1_phys_timer_access();
-> > +
-> > +	/* Set the background timer for the physical timer emulation. */
-> > +	phys_timer_emulate(vcpu);
-> >  }
-> >  
-> >  bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu)
-> > @@ -480,12 +509,6 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
-> >  
-> >  	if (unlikely(!timer->enabled))
-> >  		return;
-> > -
-> > -	if (kvm_timer_should_fire(ptimer) != ptimer->irq.level)
-> > -		kvm_timer_update_irq(vcpu, !ptimer->irq.level, ptimer);
-> > -
-> > -	/* Set the background timer for the physical timer emulation. */
-> > -	phys_timer_emulate(vcpu, vcpu_ptimer(vcpu));
-> >  }
-> >  
-> >  void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
-> > @@ -500,6 +523,17 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
-> >  
-> >  	vtimer_save_state(vcpu);
-> >  
-> > +	/*
-> > +	 * Cancel the physical timer emulation, because the only case where we
-> > +	 * need it after a vcpu_put is in the context of a sleeping VCPU, and
-> > +	 * in that case we already factor in the deadline for the physical
-> > +	 * timer when scheduling the bg_timer.
-> > +	 *
-> > +	 * In any case, we re-schedule the hrtimer for the physical timer when
-> > +	 * coming back to the VCPU thread in kvm_timer_vcpu_load().
-> > +	 */
-> > +	soft_timer_cancel(&timer->phys_timer, NULL);
-> > +
-> >  	set_cntvoff(0);
-> >  }
-> >  
-> > @@ -536,16 +570,9 @@ static void unmask_vtimer_irq(struct kvm_vcpu *vcpu)
-> >   */
-> >  void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
-> >  {
-> > -	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-> >  	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
-> >  
-> >  	/*
-> > -	 * This is to cancel the background timer for the physical timer
-> > -	 * emulation if it is set.
-> > -	 */
-> > -	soft_timer_cancel(&timer->phys_timer, NULL);
-> > -
-> > -	/*
-> >  	 * If we entered the guest with the vtimer output asserted we have to
-> >  	 * check if the guest has modified the timer so that we should lower
-> >  	 * the line at this point.
 > 
 > Otherwise:
 > 
 > Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 > 
-Thanks,
+Thanks!
 -Christoffer
