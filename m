@@ -1,23 +1,22 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH v4 13/21] arm64: cpufeature: Enable IESB on exception
- entry/return for firmware-first
-Date: Thu, 19 Oct 2017 15:57:59 +0100
-Message-ID: <20171019145807.23251-14-james.morse@arm.com>
+Subject: [PATCH v4 18/21] KVM: arm64: Handle RAS SErrors from EL1 on guest exit
+Date: Thu, 19 Oct 2017 15:58:04 +0100
+Message-ID: <20171019145807.23251-19-james.morse@arm.com>
 References: <20171019145807.23251-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5413449D1F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Oct 2017 10:59:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CC33049D4C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Oct 2017 10:59:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id b3HpYTdJVfKu for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Oct 2017 10:59:25 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 828D849D70
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Oct 2017 10:59:24 -0400 (EDT)
+ with ESMTP id FpK3yMSBHAOZ for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 Oct 2017 10:59:38 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B5C0449D15
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Oct 2017 10:59:38 -0400 (EDT)
 In-Reply-To: <20171019145807.23251-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,121 +31,61 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Julien Thierry <julien.thierry@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-ARM v8.2 has a feature to add implicit error synchronization barriers
-whenever the CPU enters or returns from an exception level. Add code to
-detect this feature and enable the SCTLR_ELx.IESB bit.
+We expect to have firmware-first handling of RAS SErrors, with errors
+notified via an APEI method. For systems without firmware-first, add
+some minimal handling to KVM.
 
-This feature causes RAS errors that are not yet visible to software to
-become pending SErrors. We expect to have firmware-first RAS support
-so synchronised RAS errors will be take immediately to EL3.
-Any system without firmware-first handling of errors will take the SError
-either immediatly after exception return, or when we unmask SError after
-entry.S's work.
+There are two ways KVM can take an SError due to a guest, either may be a
+RAS error: we exit the guest due to an SError routed to EL2 by HCR_EL2.AMO,
+or we take an SError from EL2 when we unmask PSTATE.A from __guest_exit.
 
-Platform level RAS support may require additional firmware support.
+For SError that interrupt a guest and are routed to EL2 the existing
+behaviour is to inject an impdef SError into the guest.
 
-Cc: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
+Add code to handle RAS SError based on the ESR. For uncontained errors
+arm64_is_blocking_ras_serror() will panic(), these errors compromise
+the host too. All other error types are contained: For the 'blocking'
+errors the vCPU can't make progress, so we inject a virtual SError.
+We ignore contained errors where we can make progress as if we're lucky,
+we may not hit them again.
+
 Signed-off-by: James Morse <james.morse@arm.com>
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-
 ---
-Note the sneaky KVM change,
+ arch/arm64/kvm/handle_exit.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-Changes since v3:
- * removed IESB Kconfig option
-
- arch/arm64/include/asm/cpucaps.h   |  3 ++-
- arch/arm64/include/asm/processor.h |  1 +
- arch/arm64/include/asm/sysreg.h    |  1 +
- arch/arm64/kernel/cpufeature.c     | 19 +++++++++++++++++++
- arch/arm64/kvm/hyp-init.S          |  3 +++
- 5 files changed, 26 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-index 4820d441bfb9..7a2bbbfdff49 100644
---- a/arch/arm64/include/asm/cpucaps.h
-+++ b/arch/arm64/include/asm/cpucaps.h
-@@ -41,7 +41,8 @@
- #define ARM64_WORKAROUND_CAVIUM_30115		20
- #define ARM64_HAS_DCPOP				21
- #define ARM64_HAS_RAS_EXTN			22
-+#define ARM64_HAS_IESB				23
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 7debb74843a0..345fdbba6c2e 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -28,12 +28,19 @@
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_mmu.h>
+ #include <asm/kvm_psci.h>
++#include <asm/traps.h>
  
--#define ARM64_NCAPS				23
-+#define ARM64_NCAPS				24
+ #define CREATE_TRACE_POINTS
+ #include "trace.h"
  
- #endif /* __ASM_CPUCAPS_H */
-diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
-index 29adab8138c3..6b72ddc33d06 100644
---- a/arch/arm64/include/asm/processor.h
-+++ b/arch/arm64/include/asm/processor.h
-@@ -193,5 +193,6 @@ static inline void spin_lock_prefetch(const void *ptr)
+ typedef int (*exit_handle_fn)(struct kvm_vcpu *, struct kvm_run *);
  
- int cpu_enable_pan(void *__unused);
- int cpu_enable_cache_maint_trap(void *__unused);
-+int cpu_enable_iesb(void *__unused);
- 
- #endif /* __ASM_PROCESSOR_H */
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 64e2a80fd749..4500a70c6a57 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -297,6 +297,7 @@
- 
- /* Common SCTLR_ELx flags. */
- #define SCTLR_ELx_EE    (1 << 25)
-+#define SCTLR_ELx_IESB	(1 << 21)
- #define SCTLR_ELx_I	(1 << 12)
- #define SCTLR_ELx_SA	(1 << 3)
- #define SCTLR_ELx_C	(1 << 2)
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 0fc017b55cb1..356a5de51f5e 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -912,6 +912,17 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.field_pos = ID_AA64PFR0_RAS_SHIFT,
- 		.min_field_value = ID_AA64PFR0_RAS_V1,
- 	},
-+	{
-+		.desc = "Implicit Error Synchronization Barrier",
-+		.capability = ARM64_HAS_IESB,
-+		.def_scope = SCOPE_SYSTEM,
-+		.matches = has_cpuid_feature,
-+		.sys_reg = SYS_ID_AA64MMFR2_EL1,
-+		.sign = FTR_UNSIGNED,
-+		.field_pos = ID_AA64MMFR2_IESB_SHIFT,
-+		.min_field_value = 1,
-+		.enable = cpu_enable_iesb,
-+	},
- #endif /* CONFIG_ARM64_RAS_EXTN */
- 	{},
- };
-@@ -1321,3 +1332,11 @@ static int __init enable_mrs_emulation(void)
- }
- 
- late_initcall(enable_mrs_emulation);
-+
-+int cpu_enable_iesb(void *__unused)
++static void kvm_handle_guest_serror(struct kvm_vcpu *vcpu, u32 esr)
 +{
-+	if (cpus_have_cap(ARM64_HAS_RAS_EXTN))
-+		config_sctlr_el1(0, SCTLR_ELx_IESB);
-+
-+	return 0;
++	if (!arm64_is_ras_serror(esr) || arm64_blocking_ras_serror(NULL, esr))
++		kvm_inject_vabt(vcpu);
 +}
-diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp-init.S
-index 3f9615582377..8983e9473017 100644
---- a/arch/arm64/kvm/hyp-init.S
-+++ b/arch/arm64/kvm/hyp-init.S
-@@ -113,6 +113,9 @@ __do_hyp_init:
- 	 */
- 	ldr	x4, =(SCTLR_EL2_RES1 | (SCTLR_ELx_FLAGS & ~SCTLR_ELx_A))
- CPU_BE(	orr	x4, x4, #SCTLR_ELx_EE)
-+alternative_if ARM64_HAS_IESB
-+	orr	x4, x4, #SCTLR_ELx_IESB
-+alternative_else_nop_endif
- 	msr	sctlr_el2, x4
- 	isb
- 
++
+ static int handle_hvc(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ {
+ 	int ret;
+@@ -211,7 +218,7 @@ int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 	case ARM_EXCEPTION_IRQ:
+ 		return 1;
+ 	case ARM_EXCEPTION_EL1_SERROR:
+-		kvm_inject_vabt(vcpu);
++		kvm_handle_guest_serror(vcpu, kvm_vcpu_get_hsr(vcpu));
+ 		return 1;
+ 	case ARM_EXCEPTION_TRAP:
+ 		/*
 -- 
 2.13.3
