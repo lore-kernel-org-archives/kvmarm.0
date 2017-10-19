@@ -1,201 +1,151 @@
-From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: =?UTF-8?Q?Re:_=e7=ad=94=e5=a4=8d:_[PATCH_v6_6/7]_KVM:_arm64:_allow_?=
- =?UTF-8?Q?get_exception_information_from_userspace?=
-Date: Thu, 19 Oct 2017 13:48:49 +0800
-Message-ID: <563add29-a00b-f170-3a19-056badf62be0@huawei.com>
-References: <1503916701-13516-1-git-send-email-gengdongjiu@huawei.com>
- <1503916701-13516-7-git-send-email-gengdongjiu@huawei.com>
- <59B17438.5070501@arm.com> <2a42d1ea-3456-2873-c9ea-d8a027b59789@huawei.com>
- <59BA7D72.4090403@arm.com> <5af0cb96-be13-4cc4-13bb-1f608cdc171c@huawei.com>
- <59C53CB9.5000003@arm.com>
- <0184EA26B2509940AA629AE1405DD7F20164F660@DGGEMA503-MBS.china.huawei.com>
- <59D7B365.3020503@arm.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH v3 09/20] KVM: arm/arm64: Use separate timer for phys
+ timer emulation
+Date: Thu, 19 Oct 2017 09:38:09 +0200
+Message-ID: <20171019073809.GM8900@cbox>
+References: <20170923004207.22356-1-cdall@linaro.org>
+ <20170923004207.22356-10-cdall@linaro.org>
+ <fd6c92dc-630f-62e6-5a47-f4f2b7638dad@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 204B049D28
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Oct 2017 01:49:42 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2n6avwI5cM5c for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Oct 2017 01:49:40 -0400 (EDT)
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C449B406BB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Oct 2017 01:49:39 -0400 (EDT)
-In-Reply-To: <59D7B365.3020503@arm.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>
-Cc: "Wangkefeng (Kevin)" <wangkefeng.wang@huawei.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "david.daney@cavium.com" <david.daney@cavium.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "tbaicar@codeaurora.org" <tbaicar@codeaurora.org>, "will.deacon@arm.com" <will.deacon@arm.com>, Linuxarm <linuxarm@huawei.com>, "robert.moore@intel.com" <robert.moore@intel.com>, "lv.zheng@intel.com" <lv.zheng@intel.com>, "zjzhang@codeaurora.org" <zjzhang@codeaurora.org>, "mingo@kernel.org" <mingo@kernel.org>, "stefan@hello-penguin.com" <stefan@hello-penguin.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>, Huangshaoyu <huangshaoyu@huawei.com>, huangdaode <huangdaode@hisilicon.com>, "bp@suse.de" <bp@suse.de>, "Dave.Martin@arm.com" <Dave.Martin@ar>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <fd6c92dc-630f-62e6-5a47-f4f2b7638dad@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi james,
-   thanks for the mail, and sorry for my late response.
+On Mon, Oct 09, 2017 at 06:23:45PM +0100, Marc Zyngier wrote:
+> On 23/09/17 01:41, Christoffer Dall wrote:
+> > We were using the same hrtimer for emulating the physical timer and for
+> > making sure a blocking VCPU thread would be eventually woken up.  That
+> > worked fine in the previous arch timer design, but as we are about to
+> > actually use the soft timer expire function for the physical timer
+> > emulation, change the logic to use a dedicated hrtimer.
+> > 
+> > This has the added benefit of not having to cancel any work in the sync
+> > path, which in turn allows us to run the flush and sync with IRQs
+> > disabled.
+> > 
+> > Signed-off-by: Christoffer Dall <cdall@linaro.org>
+> > ---
+> >  include/kvm/arm_arch_timer.h |  3 +++
+> >  virt/kvm/arm/arch_timer.c    | 18 ++++++++++++++----
+> >  2 files changed, 17 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+> > index dcbb2e1..16887c0 100644
+> > --- a/include/kvm/arm_arch_timer.h
+> > +++ b/include/kvm/arm_arch_timer.h
+> > @@ -47,6 +47,9 @@ struct arch_timer_cpu {
+> >  	/* Work queued with the above timer expires */
+> >  	struct work_struct		expired;
+> >  
+> > +	/* Physical timer emulation */
+> > +	struct hrtimer			phys_timer;
+> > +
+> >  	/* Background timer active */
+> >  	bool				armed;
+> >  
+> > diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> > index c2e8326..7f87099 100644
+> > --- a/virt/kvm/arm/arch_timer.c
+> > +++ b/virt/kvm/arm/arch_timer.c
+> > @@ -178,6 +178,12 @@ static enum hrtimer_restart kvm_bg_timer_expire(struct hrtimer *hrt)
+> >  	return HRTIMER_NORESTART;
+> >  }
+> >  
+> > +static enum hrtimer_restart kvm_phys_timer_expire(struct hrtimer *hrt)
+> > +{
+> > +	WARN(1, "Timer only used to ensure guest exit - unexpected event.");
+> > +	return HRTIMER_NORESTART;
+> > +}
+> > +
+> 
+> So what prevents this handler from actually firing? Is it that we cancel
+> the hrtimer while interrupts are still disabled, hence the timer never
+> fires? If that's the intention, then this patch is slightly out of
+> place, as we haven't moved the timer sync within the irq_disable() section.
+> 
+> Or am I missing something obvious?
+> 
 
+No you're not missing anything, indeed, that is broken.  I think I had
+in the back of my mind that we disable stuff in the world-switch still,
+but that obviously doesn't apply to the soft timers.
 
-On 2017/10/7 0:46, James Morse wrote:
->>> will give you an BUS_MCEERR_AO signal for any guest memory that is 
->>> affected, and a BUS_MCEERR_AR if the guest directly accesses a page of affected memory.
->>>
->>> What Qemu/kvmtool do with this is up to them. If they're emulating a 
->>> machine with no RAS features, printing an error and exit.
->>>
->>> Otherwise BUS_MCEERR_AR could be notified as one of the flavours of 
->>> IRQ, unless the affected vcpu has interrupts masked, in which case an 
->>> SEA notification gives you some NMI-like behaviour.
->> Thanks for explanation. 
->> Now that SEA notification can provide NMI-like behaviour. How about we use it for
->> BUS_MCEERR_AR to avoid check the interrupts mask status?
-> ... yes, that's the suggestion. Qemu/kvmtool can take MCEERR_AR from KVM and
-> SET_ONE_REG the vcpu into taking a synchronous-external-abort instead.
-> 
-> (but there is trouble ahead where this suggestion unravels)
-> 
-> 
->> Even though guest OS not support SEA notification, It is still a valid
->> guest:Synchronous-external-abort
-> When it comes from KVM, Yes.
-> 
-> If you think of linux+KVM's stage2 translation as your guests memory controller.
-> It is effectively guaranteeing you to:
-> 1. 'interrupt' userspace with MCEERR_AO when it detects an error,
-> 2. contain it (by unmapping and marking the page PG_poison) then,
-> 3. give you a synchronous external abort with MCEERR_AR if the guest touches the
-> contained memory.
-> 
-> This is fine when the MCEERR_AR came from KVM, what we need to find out is
-> whether this will still be true for some future kernel code that sends MCEERR_AR...
+I'll just move this patch following the next one where interrupts are
+disabled.
 
-Ok
+Nice catch!
 
+> >  bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
+> >  {
+> >  	u64 cval, now;
+> > @@ -255,7 +261,7 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
+> >  }
+> >  
+> >  /* Schedule the background timer for the emulated timer. */
+> > -static void kvm_timer_emulate(struct kvm_vcpu *vcpu,
+> > +static void phys_timer_emulate(struct kvm_vcpu *vcpu,
+> >  			      struct arch_timer_context *timer_ctx)
+> >  {
+> >  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> > @@ -267,7 +273,7 @@ static void kvm_timer_emulate(struct kvm_vcpu *vcpu,
+> >  		return;
+> >  
+> >  	/*  The timer has not yet expired, schedule a background timer */
+> > -	soft_timer_start(&timer->bg_timer, kvm_timer_compute_delta(timer_ctx));
+> > +	soft_timer_start(&timer->phys_timer, kvm_timer_compute_delta(timer_ctx));
+> >  }
+> >  
+> >  /*
+> > @@ -424,7 +430,7 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
+> >  	kvm_timer_update_state(vcpu);
+> >  
+> >  	/* Set the background timer for the physical timer emulation. */
+> > -	kvm_timer_emulate(vcpu, vcpu_ptimer(vcpu));
+> > +	phys_timer_emulate(vcpu, vcpu_ptimer(vcpu));
+> >  
+> >  	if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
+> >  		kvm_timer_flush_hwstate_user(vcpu);
+> > @@ -447,7 +453,7 @@ void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
+> >  	 * This is to cancel the background timer for the physical timer
+> >  	 * emulation if it is set.
+> >  	 */
+> > -	soft_timer_cancel(&timer->bg_timer, &timer->expired);
+> > +	soft_timer_cancel(&timer->phys_timer, NULL);
 > 
+> Right, that now explains the "work" test in one of the previous patches.
 > 
->>> For BUS_MCEERR_AO you could use SEI, IRQ or polled notification. My 
->>> choice would be IRQ, as you can't know if the guest supports SEI and 
->>> it would be a shame to
->> How about we first check whether user space can specify the virtual SError Exception Syndrome(have vsesr_el2 register)?
->> If can specify, using SEI notification, otherwise use IRQ notification. 
->> The advantage is that it can pass more error information than IRQ if can specify Syndrome information.
-> If this is for APEI firmware-first, its the severity in the CPER records that
-> matters, so the SEI/IRQ choice doesn't matter if the guest supports both.
-> 
-> But its unlikely the guest supports both. (v4.14 doesn't).
-> If you pick IRQ and the guest doesn't support it, nothing happens, the guest
-> never takes the IRQ. You take the memory-error as a MCEERR_AR some time later.
-> 
-> If you pick SEI and the guest doesn't support it, the guest dies of an unknown
-> SError.
-> 
-> I would pick POLLed by default, as this would let the Qemu/kvmtool code that
-> does this work be portable between x86 and arm64.
-> 
-> [...]
 
-AS we disused in another mail, we can use GPIO-signal or GPIO interrupts which is also suggestion by APEI spec
-and does not let to guest dies, as shown in [1]
+Yes, I've moved the addition of the test to this patch which actually
+uses is.
 
-[1]
-HW-reduced ACPI platforms signal the error using a GPIO interrupt or another interrupt declared
-under a generic event device (Section 5.6.9). In the case of GPIO-signaled events, an _AEI object
-lists the appropriate GPIO pin, while for Interrupt-signaled events a _CRS object is used to list
-the interrupt:
+> >  
+> >  	/*
+> >  	 * The guest could have modified the timer registers or the timer
+> > @@ -507,6 +513,9 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+> >  	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
+> >  	timer->bg_timer.function = kvm_bg_timer_expire;
+> >  
+> > +	hrtimer_init(&timer->phys_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
+> > +	timer->phys_timer.function = kvm_phys_timer_expire;
+> > +
+> >  	vtimer->irq.irq = default_vtimer_irq.irq;
+> >  	ptimer->irq.irq = default_ptimer_irq.irq;
+> >  }
+> > @@ -615,6 +624,7 @@ void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu)
+> >  	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+> >  
+> >  	soft_timer_cancel(&timer->bg_timer, &timer->expired);
+> > +	soft_timer_cancel(&timer->phys_timer, NULL);
+> >  	kvm_vgic_unmap_phys_irq(vcpu, vtimer->irq.irq);
+> >  }
+> >  
+> > 
+> 
 
-> 
->>>> If call memory_failure(), memory_failure can translate the PA to host 
->>>> VA, then deliver host VA to Qemu.
->>> Yes, this is how it works for any user-space process as two processes 
->>> sharing the same page may map it in different locations.
->>>
->>>
->>>> Qemu can translate the host VA to IPA. so we rely on memory_failure() 
->>>> to get the IPA.
->>> Yes. I don't see why this is a problem: The kernel isn't going to pass 
->>> RAS events into the guest, so it never needs to know the IPA.
->>>
->>> Instead we notify user-space about ranges of memory affected by 
->>> memory_failure(), KVM's user-space isn't a special case here.
->>>
->>> As you point out, if Qemu wants to notify the guest it can calculate 
->>> the IPA and either use CPER for firmware-first, or in the future, 
->>> update some representation of the v8.2 ERR records once we can virtualise kernel-first.
->>>
->>> (I'm not sure I understand your point here, but I don't think we 
->>> disagree,)
->> Yes, I only describe the workflow, not think we do not disagree.
-> (double negative?)
-> 
-> 
->> If not pass exception information to user space, there is another issue.
->> As our agreement, if we want to inject a Synchronous-external-abort, we let Qemu/kvmtool injects it.
-> Yes, because all we do for user space is send it MCEERR_AR when this happens.
-> 
-> KVM only does this to make guest-accesses the same as user-space accesses.
-> (See arm64's do_page_fault() and x86's do_sigbus() for the regular path)
-> 
-> 
->> when Qemu injecting it, it needs to set the value of FAR_EL1 with the value of FAR_EL2. but if we do not 
->> pass the far_el2's value to user space, Qemu will have to set the FAR_EL1 to 0, then FAR_EL1's value is invalid.
->> The FAR_EL1 usually is used to save the fault guest VA. 
-> Yes, Qemu doesn't know the the guest VA, but it doesn't need to for this
-> mechanism to work: Set the DFSC to '0b010000 Synchronous external abort, not on
-> translation table walk', then set 'FnV - Far Not Valid'.
-
-yes, I think so. thanks for your good suggestion.
-
-
-> 
-> ...
-> 
-> But there is one piece of information Qemu needs here but doesn't have: whether
-> this was an instruction or a data abort, which you need to pick the correct EC.
-so this is patch aim to pass more information to  user space. but you have some concern
-
-> 
-> Ideally, this would come with the signal, but that doesn't happen today.
-I ever mentioned that the information is not enough, but you reply user space should not need that.
-
-> 
-> I don't think user-space generally needs to know this, only a JIT is likely to
-> be able to handle these errors, and it would know which regions were code or data.
-why it is related with a JIT?
-
-> 
-> So it looks like we really do need more information from KVM, and guests have to
-> be a special-case here. Bother.
-
-I think my current patch can pass the needed information. in fact, Qemu
-will judge whether the fault address is belong to guest, only belong to guest, it will
-get these information. not exist information stale issue. how about we keep this patch?
-
-For the guest APEI CPER recording, if want to make it better, it also need to pass more information.
-
-> 
-> I'll try and put together an RFC to let user-space generate a believable
-> architectural exception when it gets this signal.
-
-I think this patch can pass the enough information for guest, why you will put another patch?
-
-
-> 
-> 
->> Of course, if guest cannot get the fault VA from the FAR_EL1. it still can read the CPER to get
->> the guest fault PA and translate it to fault VA.
-> _A_ fault VA, there may be a set of them. This is why memory_failure() walks the
-> rmap to find all the users of the page, and why the faulting VA isn't really
-> relevant for this sort of RAS error.
-
-yes.
-
-> 
-> 
-> Thanks,
+Thanks,
+-Christoffer
