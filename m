@@ -1,23 +1,22 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH v4 03/21] arm64: Move the async/fiq helpers to explicitly set
- process context flags
-Date: Thu, 19 Oct 2017 15:57:49 +0100
-Message-ID: <20171019145807.23251-4-james.morse@arm.com>
+Subject: [PATCH v4 06/21] arm64: entry.S: convert el1_sync
+Date: Thu, 19 Oct 2017 15:57:52 +0100
+Message-ID: <20171019145807.23251-7-james.morse@arm.com>
 References: <20171019145807.23251-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C48E49D21
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Oct 2017 10:59:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E167C49D1C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Oct 2017 10:59:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3d7TbaelW+WC for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Oct 2017 10:58:58 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6716849D38
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Oct 2017 10:58:57 -0400 (EDT)
+ with ESMTP id GHpGk1K7KcHX for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 Oct 2017 10:59:06 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FEC449D56
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Oct 2017 10:59:05 -0400 (EDT)
 In-Reply-To: <20171019145807.23251-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,102 +31,84 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Julien Thierry <julien.thierry@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Remove the local_{async,fiq}_{en,dis}able macros as they don't respect
-our newly defined order and are only used to set the flags for process
-context when we bring CPUs online.
+el1_sync unmasks exceptions on a case-by-case basis, debug exceptions
+are unmasked, unless this was a debug exception. IRQs are unmasked
+for instruction and data aborts only if the interupted context had
+irqs unmasked.
 
-Add a helper to do this. The IRQ flag varies as we want it masked on
-the boot CPU until we are ready to handle interrupts.
-The boot CPU unmasks SError during early boot once it can print an error
-message. If we can print an error message about SError, we can do the
-same for FIQ. Debug exceptions are already enabled by __cpu_setup(),
-which has also configured MDSCR_EL1 to disable MDE and KDE.
+Following our 'dai' order, el1_dbg should run with everything masked.
+For the other cases we can inherit whatever we interrupted.
+
+Add a macro inherit_daif to set daif based on the interrupted pstate.
 
 Signed-off-by: James Morse <james.morse@arm.com>
 Reviewed-by: Julien Thierry <julien.thierry@arm.com>
 Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-
 ---
-Changes since v3:
- * swapped verb/daif word-order.
+ arch/arm64/include/asm/assembler.h |  6 ++++++
+ arch/arm64/kernel/entry.S          | 12 ++++--------
+ 2 files changed, 10 insertions(+), 8 deletions(-)
 
- arch/arm64/include/asm/daifflags.h | 3 +++
- arch/arm64/include/asm/irqflags.h  | 6 ------
- arch/arm64/kernel/setup.c          | 8 +++++---
- arch/arm64/kernel/smp.c            | 3 +--
- 4 files changed, 9 insertions(+), 11 deletions(-)
-
-diff --git a/arch/arm64/include/asm/daifflags.h b/arch/arm64/include/asm/daifflags.h
-index 55e2598a8c4c..22e4c83de5a5 100644
---- a/arch/arm64/include/asm/daifflags.h
-+++ b/arch/arm64/include/asm/daifflags.h
-@@ -18,6 +18,9 @@
+diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
+index 1b0972046a72..abb5abd61ddb 100644
+--- a/arch/arm64/include/asm/assembler.h
++++ b/arch/arm64/include/asm/assembler.h
+@@ -48,6 +48,12 @@
+ 	msr	daif, \flags
+ 	.endm
  
- #include <linux/irqflags.h>
- 
-+#define DAIF_PROCCTX		0
-+#define DAIF_PROCCTX_NOIRQ	PSR_I_BIT
++	/* Only on aarch64 pstate, PSR_D_BIT is different for aarch32 */
++	.macro	inherit_daif, pstate:req, tmp:req
++	and	\tmp, \pstate, #(PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT)
++	msr	daif, \tmp
++	.endm
 +
- /* mask/save/unmask/restore all exceptions, including interrupts. */
- static inline void local_daif_mask(void)
- {
-diff --git a/arch/arm64/include/asm/irqflags.h b/arch/arm64/include/asm/irqflags.h
-index 9ecdca7011f0..24692edf1a69 100644
---- a/arch/arm64/include/asm/irqflags.h
-+++ b/arch/arm64/include/asm/irqflags.h
-@@ -66,12 +66,6 @@ static inline void arch_local_irq_disable(void)
- 		: "memory");
- }
- 
--#define local_fiq_enable()	asm("msr	daifclr, #1" : : : "memory")
--#define local_fiq_disable()	asm("msr	daifset, #1" : : : "memory")
--
--#define local_async_enable()	asm("msr	daifclr, #4" : : : "memory")
--#define local_async_disable()	asm("msr	daifset, #4" : : : "memory")
--
  /*
-  * Save the current interrupt enable state.
+  * Enable and disable interrupts.
   */
-diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
-index d4b740538ad5..ad285f024934 100644
---- a/arch/arm64/kernel/setup.c
-+++ b/arch/arm64/kernel/setup.c
-@@ -48,6 +48,7 @@
- #include <asm/fixmap.h>
- #include <asm/cpu.h>
- #include <asm/cputype.h>
-+#include <asm/daifflags.h>
- #include <asm/elf.h>
- #include <asm/cpufeature.h>
- #include <asm/cpu_ops.h>
-@@ -262,10 +263,11 @@ void __init setup_arch(char **cmdline_p)
- 	parse_early_param();
- 
- 	/*
--	 *  Unmask asynchronous aborts after bringing up possible earlycon.
--	 * (Report possible System Errors once we can report this occurred)
-+	 * Unmask asynchronous aborts and fiq after bringing up possible
-+	 * earlycon. (Report possible System Errors once we can report this
-+	 * occurred).
+diff --git a/arch/arm64/kernel/entry.S b/arch/arm64/kernel/entry.S
+index f7d7bf9d76e7..bd54115972a4 100644
+--- a/arch/arm64/kernel/entry.S
++++ b/arch/arm64/kernel/entry.S
+@@ -510,11 +510,7 @@ el1_da:
+ 	 * Data abort handling
  	 */
--	local_async_enable();
-+	local_daif_restore(DAIF_PROCCTX_NOIRQ);
- 
+ 	mrs	x3, far_el1
+-	enable_dbg
+-	// re-enable interrupts if they were enabled in the aborted context
+-	tbnz	x23, #7, 1f			// PSR_I_BIT
+-	enable_irq
+-1:
++	inherit_daif	pstate=x23, tmp=x2
+ 	clear_address_tag x0, x3
+ 	mov	x2, sp				// struct pt_regs
+ 	bl	do_mem_abort
+@@ -525,7 +521,7 @@ el1_sp_pc:
+ 	 * Stack or PC alignment exception handling
+ 	 */
+ 	mrs	x0, far_el1
+-	enable_dbg
++	inherit_daif	pstate=x23, tmp=x2
+ 	mov	x2, sp
+ 	bl	do_sp_pc_abort
+ 	ASM_BUG()
+@@ -533,7 +529,7 @@ el1_undef:
  	/*
- 	 * TTBR0 is only used for the identity mapping at this stage. Make it
-diff --git a/arch/arm64/kernel/smp.c b/arch/arm64/kernel/smp.c
-index 5a407eba01f7..d92e03faa51a 100644
---- a/arch/arm64/kernel/smp.c
-+++ b/arch/arm64/kernel/smp.c
-@@ -272,8 +272,7 @@ asmlinkage void secondary_start_kernel(void)
- 	set_cpu_online(cpu, true);
- 	complete(&cpu_running);
- 
--	local_irq_enable();
--	local_async_enable();
-+	local_daif_restore(DAIF_PROCCTX);
- 
- 	/*
- 	 * OK, it's off to the idle thread for us
+ 	 * Undefined instruction
+ 	 */
+-	enable_dbg
++	inherit_daif	pstate=x23, tmp=x2
+ 	mov	x0, sp
+ 	bl	do_undefinstr
+ 	ASM_BUG()
+@@ -550,7 +546,7 @@ el1_dbg:
+ 	kernel_exit 1
+ el1_inv:
+ 	// TODO: add support for undefined instructions in kernel mode
+-	enable_dbg
++	inherit_daif	pstate=x23, tmp=x2
+ 	mov	x0, sp
+ 	mov	x2, x1
+ 	mov	x1, #BAD_SYNC
 -- 
 2.13.3
