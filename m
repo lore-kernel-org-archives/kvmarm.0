@@ -1,22 +1,22 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH v4 02/21] arm64: introduce an order for exceptions
-Date: Thu, 19 Oct 2017 15:57:48 +0100
-Message-ID: <20171019145807.23251-3-james.morse@arm.com>
+Subject: [PATCH v4 04/21] arm64: Mask all exceptions during kernel_exit
+Date: Thu, 19 Oct 2017 15:57:50 +0100
+Message-ID: <20171019145807.23251-5-james.morse@arm.com>
 References: <20171019145807.23251-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4589F49D3C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Oct 2017 10:58:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 73FE340A74
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Oct 2017 10:59:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZPcvUrNkF9l2 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Oct 2017 10:58:55 -0400 (EDT)
+ with ESMTP id TDiu7GAQnt0I for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 Oct 2017 10:59:00 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C9F57406D0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Oct 2017 10:58:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1001C406D0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Oct 2017 10:59:00 -0400 (EDT)
 In-Reply-To: <20171019145807.23251-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,24 +31,23 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Julien Thierry <julien.thierry@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Currently SError is always masked in the kernel. To support RAS exceptions
-using SError on hardware with the v8.2 RAS Extensions we need to unmask
-SError as much as possible.
+To take RAS Exceptions as quickly as possible we need to keep SError
+unmasked as much as possible. We need to mask it during kernel_exit
+as taking an error from this code will overwrite the exception-registers.
 
-Let's define an order for masking and unmasking exceptions. 'dai' is
-memorable and effectively what we have today.
+Adding a naked 'disable_daif' to kernel_exit causes a performance problem
+for micro-benchmarks that do no real work, (e.g. calling getpid() in a
+loop). This is because the ret_to_user loop has already masked IRQs so
+that the TIF_WORK_MASK thread flags can't change underneath it, adding
+disable_daif is an additional self-synchronising operation.
 
-Disabling debug exceptions should cause all other exceptions to be masked.
-Masking SError should mask irq, but not disable debug exceptions.
-Masking irqs has no side effects for other flags. Keeping to this order
-makes it easier for entry.S to know which exceptions should be unmasked.
+In the future, the RAS APEI code may need to modify the TIF_WORK_MASK
+flags from an SError, in which case the ret_to_user loop must mask SError
+while it examines the flags.
 
-FIQ is never expected, but we mask it when we mask debug exceptions, and
-unmask it at all other times.
-
-Given masking debug exceptions masks everything, we don't need macros
-to save/restore that bit independently. Remove them and switch the last
-caller over to use the daif calls.
+Disable all exceptions for return to EL1. For return to EL0 get the
+ret_to_user loop to leave all exceptions masked once it has done its
+work, this avoids an extra pstate-write.
 
 Signed-off-by: James Morse <james.morse@arm.com>
 Reviewed-by: Julien Thierry <julien.thierry@arm.com>
@@ -56,87 +55,95 @@ Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 
 ---
 Changes since v3:
- * Use save_daif version, swapped verb/daif word-order.
- * tweak last sentence of commit message.
+* swapped verb/daif word-order.
 
- arch/arm64/include/asm/irqflags.h  | 34 +++++++++++++---------------------
- arch/arm64/kernel/debug-monitors.c |  5 +++--
- 2 files changed, 16 insertions(+), 23 deletions(-)
+ arch/arm64/kernel/entry.S  | 10 +++++-----
+ arch/arm64/kernel/signal.c |  8 ++++++--
+ 2 files changed, 11 insertions(+), 7 deletions(-)
 
-diff --git a/arch/arm64/include/asm/irqflags.h b/arch/arm64/include/asm/irqflags.h
-index 8c581281fa12..9ecdca7011f0 100644
---- a/arch/arm64/include/asm/irqflags.h
-+++ b/arch/arm64/include/asm/irqflags.h
-@@ -21,6 +21,19 @@
- #include <asm/ptrace.h>
+diff --git a/arch/arm64/kernel/entry.S b/arch/arm64/kernel/entry.S
+index e1c59d4008a8..f7d7bf9d76e7 100644
+--- a/arch/arm64/kernel/entry.S
++++ b/arch/arm64/kernel/entry.S
+@@ -221,6 +221,8 @@ alternative_else_nop_endif
+ 
+ 	.macro	kernel_exit, el
+ 	.if	\el != 0
++	disable_daif
++
+ 	/* Restore the task's original addr_limit. */
+ 	ldr	x20, [sp, #S_ORIG_ADDR_LIMIT]
+ 	str	x20, [tsk, #TSK_TI_ADDR_LIMIT]
+@@ -517,8 +519,6 @@ el1_da:
+ 	mov	x2, sp				// struct pt_regs
+ 	bl	do_mem_abort
+ 
+-	// disable interrupts before pulling preserved data off the stack
+-	disable_irq
+ 	kernel_exit 1
+ el1_sp_pc:
+ 	/*
+@@ -793,7 +793,7 @@ ENDPROC(el0_irq)
+  * and this includes saving x0 back into the kernel stack.
+  */
+ ret_fast_syscall:
+-	disable_irq				// disable interrupts
++	disable_daif
+ 	str	x0, [sp, #S_X0]			// returned x0
+ 	ldr	x1, [tsk, #TSK_TI_FLAGS]	// re-check for syscall tracing
+ 	and	x2, x1, #_TIF_SYSCALL_WORK
+@@ -803,7 +803,7 @@ ret_fast_syscall:
+ 	enable_step_tsk x1, x2
+ 	kernel_exit 0
+ ret_fast_syscall_trace:
+-	enable_irq				// enable interrupts
++	enable_daif
+ 	b	__sys_trace_return_skipped	// we already saved x0
  
  /*
-+ * Aarch64 has flags for masking: Debug, Asynchronous (serror), Interrupts and
-+ * FIQ exceptions, in the 'daif' register. We mask and unmask them in 'dai'
-+ * order:
-+ * Masking debug exceptions causes all other exceptions to be masked too/
-+ * Masking SError masks irq, but not debug exceptions. Masking irqs has no
-+ * side effects for other flags. Keeping to this order makes it easier for
-+ * entry.S to know which exceptions should be unmasked.
-+ *
-+ * FIQ is never expected, but we mask it when we disable debug exceptions, and
-+ * unmask it at all other times.
-+ */
-+
-+/*
-  * CPU interrupt mask handling.
+@@ -821,7 +821,7 @@ work_pending:
+  * "slow" syscall return path.
   */
- static inline unsigned long arch_local_irq_save(void)
-@@ -89,26 +102,5 @@ static inline int arch_irqs_disabled_flags(unsigned long flags)
- {
- 	return flags & PSR_I_BIT;
- }
--
--/*
-- * save and restore debug state
-- */
--#define local_dbg_save(flags)						\
--	do {								\
--		typecheck(unsigned long, flags);			\
--		asm volatile(						\
--		"mrs    %0, daif		// local_dbg_save\n"	\
--		"msr    daifset, #8"					\
--		: "=r" (flags) : : "memory");				\
--	} while (0)
--
--#define local_dbg_restore(flags)					\
--	do {								\
--		typecheck(unsigned long, flags);			\
--		asm volatile(						\
--		"msr    daif, %0		// local_dbg_restore\n"	\
--		: : "r" (flags) : "memory");				\
--	} while (0)
--
- #endif
- #endif
-diff --git a/arch/arm64/kernel/debug-monitors.c b/arch/arm64/kernel/debug-monitors.c
-index c7ef99904934..a88b6ccebbb4 100644
---- a/arch/arm64/kernel/debug-monitors.c
-+++ b/arch/arm64/kernel/debug-monitors.c
-@@ -30,6 +30,7 @@
+ ret_to_user:
+-	disable_irq				// disable interrupts
++	disable_daif
+ 	ldr	x1, [tsk, #TSK_TI_FLAGS]
+ 	and	x2, x1, #_TIF_WORK_MASK
+ 	cbnz	x2, work_pending
+diff --git a/arch/arm64/kernel/signal.c b/arch/arm64/kernel/signal.c
+index 0bdc96c61bc0..8e6500c9471b 100644
+--- a/arch/arm64/kernel/signal.c
++++ b/arch/arm64/kernel/signal.c
+@@ -31,6 +31,7 @@
+ #include <linux/ratelimit.h>
+ #include <linux/syscalls.h>
  
- #include <asm/cpufeature.h>
- #include <asm/cputype.h>
 +#include <asm/daifflags.h>
  #include <asm/debug-monitors.h>
- #include <asm/system_misc.h>
+ #include <asm/elf.h>
+ #include <asm/cacheflush.h>
+@@ -756,9 +757,12 @@ asmlinkage void do_notify_resume(struct pt_regs *regs,
+ 		addr_limit_user_check();
  
-@@ -46,9 +47,9 @@ u8 debug_monitors_arch(void)
- static void mdscr_write(u32 mdscr)
- {
- 	unsigned long flags;
--	local_dbg_save(flags);
-+	flags = local_daif_save();
- 	write_sysreg(mdscr, mdscr_el1);
--	local_dbg_restore(flags);
-+	local_daif_restore(flags);
+ 		if (thread_flags & _TIF_NEED_RESCHED) {
++			/* Unmask Debug and SError for the next task */
++			local_daif_restore(DAIF_PROCCTX_NOIRQ);
++
+ 			schedule();
+ 		} else {
+-			local_irq_enable();
++			local_daif_restore(DAIF_PROCCTX);
+ 
+ 			if (thread_flags & _TIF_UPROBE)
+ 				uprobe_notify_resume(regs);
+@@ -775,7 +779,7 @@ asmlinkage void do_notify_resume(struct pt_regs *regs,
+ 				fpsimd_restore_current_state();
+ 		}
+ 
+-		local_irq_disable();
++		local_daif_mask();
+ 		thread_flags = READ_ONCE(current_thread_info()->flags);
+ 	} while (thread_flags & _TIF_WORK_MASK);
  }
- NOKPROBE_SYMBOL(mdscr_write);
- 
 -- 
 2.13.3
