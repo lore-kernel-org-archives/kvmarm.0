@@ -1,25 +1,24 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH 02/10] arm64: KVM: Add invalidate_icache_range helper
-Date: Thu, 19 Oct 2017 17:47:36 +0100
-Message-ID: <20171019164736.GC30652@arm.com>
-References: <20171009152032.27804-1-marc.zyngier@arm.com>
- <20171009152032.27804-3-marc.zyngier@arm.com>
+From: Julien Thierry <julien.thierry@arm.com>
+Subject: [RESEND PATCH 2/2] arm/arm64: kvm: Disable branch profiling in HYP
+ code
+Date: Fri, 20 Oct 2017 12:34:17 +0100
+Message-ID: <1508499257-10014-3-git-send-email-julien.thierry@arm.com>
+References: <1508499257-10014-1-git-send-email-julien.thierry@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F38B049D21
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Oct 2017 12:46:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CA7A149D3B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Oct 2017 07:33:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DmYKCwHyHi6B for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Oct 2017 12:46:27 -0400 (EDT)
+ with ESMTP id wFwgPtj3nTFd for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 20 Oct 2017 07:33:24 -0400 (EDT)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C5B8240638
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Oct 2017 12:46:27 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20171009152032.27804-3-marc.zyngier@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BE79549D29
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Oct 2017 07:33:24 -0400 (EDT)
+In-Reply-To: <1508499257-10014-1-git-send-email-julien.thierry@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,63 +28,52 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: Julien Thierry <julien.thierry@arm.com>, marc.zyngier@arm.com, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Russell King <linux@armlinux.org.uk>, stable@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Oct 09, 2017 at 04:20:24PM +0100, Marc Zyngier wrote:
-> We currently tightly couple dcache clean with icache invalidation,
-> but KVM could do without the initial flush to PoU, as we've
-> already flushed things to PoC.
-> 
-> Let's introduce invalidate_icache_range which is limited to
-> invalidating the icache from the linear mapping (and thus
-> has none of the userspace fault handling complexity), and
-> wire it in KVM instead of flush_icache_range.
-> 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  arch/arm64/include/asm/cacheflush.h |  8 ++++++++
->  arch/arm64/include/asm/kvm_mmu.h    |  4 ++--
->  arch/arm64/mm/cache.S               | 24 ++++++++++++++++++++++++
->  3 files changed, 34 insertions(+), 2 deletions(-)
+When HYP code runs into branch profiling code, it attempts to jump to
+unmapped memory, causing a HYP Panic.
 
-[...]
+Disable the branch profiling for code designed to run at HYP mode.
 
-> diff --git a/arch/arm64/mm/cache.S b/arch/arm64/mm/cache.S
-> index 7f1dbe962cf5..0c330666a8c9 100644
-> --- a/arch/arm64/mm/cache.S
-> +++ b/arch/arm64/mm/cache.S
-> @@ -80,6 +80,30 @@ USER(9f, ic	ivau, x4	)		// invalidate I line PoU
->  ENDPROC(flush_icache_range)
->  ENDPROC(__flush_cache_user_range)
->  
-> +/*
-> + *	invalidate_icache_range(start,end)
-> + *
-> + *	Ensure that the I cache is invalid within specified region. This
-> + *	assumes that this is done on the linear mapping. Do not use it
-> + *	on a userspace range, as this may fault horribly.
-> + *
-> + *	- start   - virtual start address of region
-> + *	- end     - virtual end address of region
-> + */
-> +ENTRY(invalidate_icache_range)
-> +	icache_line_size x2, x3
-> +	sub	x3, x2, #1
-> +	bic	x4, x0, x3
-> +1:
-> +	ic	ivau, x4			// invalidate I line PoU
-> +	add	x4, x4, x2
-> +	cmp	x4, x1
-> +	b.lo	1b
-> +	dsb	ish
-> +	isb
-> +	ret
-> +ENDPROC(invalidate_icache_range)
+Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
+Cc: Russell King <linux@armlinux.org.uk>
+Cc: <stable@vger.kernel.org>
+---
+ arch/arm/kvm/hyp/Makefile   | 2 +-
+ arch/arm64/kvm/hyp/Makefile | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-Is there a good reason not to make this work for user addresses? If it's as
-simple as adding a USER annotation and a fallback, then we should wrap that
-in a macro and reuse it for __flush_cache_user_range.
+diff --git a/arch/arm/kvm/hyp/Makefile b/arch/arm/kvm/hyp/Makefile
+index 8679405..92eab1d 100644
+--- a/arch/arm/kvm/hyp/Makefile
++++ b/arch/arm/kvm/hyp/Makefile
+@@ -2,7 +2,7 @@
+ # Makefile for Kernel-based Virtual Machine module, HYP part
+ #
 
-Will
+-ccflags-y += -fno-stack-protector
++ccflags-y += -fno-stack-protector -DDISABLE_BRANCH_PROFILING
+
+ KVM=../../../../virt/kvm
+
+diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+index 14c4e3b..48b0354 100644
+--- a/arch/arm64/kvm/hyp/Makefile
++++ b/arch/arm64/kvm/hyp/Makefile
+@@ -2,7 +2,7 @@
+ # Makefile for Kernel-based Virtual Machine module, HYP part
+ #
+
+-ccflags-y += -fno-stack-protector
++ccflags-y += -fno-stack-protector -DDISABLE_BRANCH_PROFILING
+
+ KVM=../../../../virt/kvm
+
+--
+1.9.1
