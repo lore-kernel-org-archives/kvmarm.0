@@ -1,24 +1,25 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v4 17/20] KVM: arm/arm64: Move phys_timer_emulate function
-Date: Fri, 20 Oct 2017 13:49:36 +0200
-Message-ID: <20171020114939.12554-18-christoffer.dall@linaro.org>
+Subject: [PATCH v4 16/20] KVM: arm/arm64: Use kvm_arm_timer_set/get_reg for
+ guest register traps
+Date: Fri, 20 Oct 2017 13:49:35 +0200
+Message-ID: <20171020114939.12554-17-christoffer.dall@linaro.org>
 References: <20171020114939.12554-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AD99349D17
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Oct 2017 07:49:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 89DE749D2D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Oct 2017 07:49:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0D8IgVt7Tb5L for <kvmarm@lists.cs.columbia.edu>;
- Fri, 20 Oct 2017 07:49:02 -0400 (EDT)
-Received: from mail-wm0-f66.google.com (mail-wm0-f66.google.com [74.125.82.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5544049D64
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Oct 2017 07:49:01 -0400 (EDT)
-Received: by mail-wm0-f66.google.com with SMTP id k4so21985348wmc.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Oct 2017 04:50:07 -0700 (PDT)
+ with ESMTP id ngYg7g9EpgNM for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 20 Oct 2017 07:49:00 -0400 (EDT)
+Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D26C049D23
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Oct 2017 07:48:59 -0400 (EDT)
+Received: by mail-wm0-f68.google.com with SMTP id t69so21444343wmt.2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Oct 2017 04:50:06 -0700 (PDT)
 In-Reply-To: <20171020114939.12554-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,68 +36,90 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Christoffer Dall <cdall@linaro.org>
 
-We are about to call phys_timer_emulate() from kvm_timer_update_state()
-and modify phys_timer_emulate() at the same time.  Moving the function
-and modifying it in a single patch makes the diff hard to read, so do
-this separately first.
+When trapping on a guest access to one of the timer registers, we were
+messing with the internals of the timer state from the sysregs handling
+code, and that logic was about to receive more added complexity when
+optimizing the timer handling code.
 
-No functional change.
+Therefore, since we already have timer register access functions (to
+access registers from userspace), reuse those for the timer register
+traps from a VM and let the timer code maintain its own consistency.
 
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/arch_timer.c | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 41 ++++++++++++++---------------------------
+ 1 file changed, 14 insertions(+), 27 deletions(-)
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index d1a6fb12121f..7f4f12d48a1a 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -255,6 +255,22 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
- 	}
- }
- 
-+/* Schedule the background timer for the emulated timer. */
-+static void phys_timer_emulate(struct kvm_vcpu *vcpu,
-+			      struct arch_timer_context *timer_ctx)
-+{
-+	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-+
-+	if (kvm_timer_should_fire(timer_ctx))
-+		return;
-+
-+	if (!kvm_timer_irq_can_fire(timer_ctx))
-+		return;
-+
-+	/*  The timer has not yet expired, schedule a background timer */
-+	soft_timer_start(&timer->phys_timer, kvm_timer_compute_delta(timer_ctx));
-+}
-+
- /*
-  * Check if there was a change in the timer state (should we raise or lower
-  * the line level to the GIC).
-@@ -281,22 +297,6 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
- 		kvm_timer_update_irq(vcpu, !ptimer->irq.level, ptimer);
- }
- 
--/* Schedule the background timer for the emulated timer. */
--static void phys_timer_emulate(struct kvm_vcpu *vcpu,
--			      struct arch_timer_context *timer_ctx)
--{
--	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
--
--	if (kvm_timer_should_fire(timer_ctx))
--		return;
--
--	if (!kvm_timer_irq_can_fire(timer_ctx))
--		return;
--
--	/*  The timer has not yet expired, schedule a background timer */
--	soft_timer_start(&timer->phys_timer, kvm_timer_compute_delta(timer_ctx));
--}
--
- static void vtimer_save_state(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 2e070d3baf9f..bb0e41b3154e 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -841,13 +841,16 @@ static bool access_cntp_tval(struct kvm_vcpu *vcpu,
+ 		struct sys_reg_params *p,
+ 		const struct sys_reg_desc *r)
  {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+-	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+ 	u64 now = kvm_phys_timer_read();
++	u64 cval;
+ 
+-	if (p->is_write)
+-		ptimer->cnt_cval = p->regval + now;
+-	else
+-		p->regval = ptimer->cnt_cval - now;
++	if (p->is_write) {
++		kvm_arm_timer_set_reg(vcpu, KVM_REG_ARM_PTIMER_CVAL,
++				      p->regval + now);
++	} else {
++		cval = kvm_arm_timer_get_reg(vcpu, KVM_REG_ARM_PTIMER_CVAL);
++		p->regval = cval - now;
++	}
+ 
+ 	return true;
+ }
+@@ -856,24 +859,10 @@ static bool access_cntp_ctl(struct kvm_vcpu *vcpu,
+ 		struct sys_reg_params *p,
+ 		const struct sys_reg_desc *r)
+ {
+-	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+-
+-	if (p->is_write) {
+-		/* ISTATUS bit is read-only */
+-		ptimer->cnt_ctl = p->regval & ~ARCH_TIMER_CTRL_IT_STAT;
+-	} else {
+-		u64 now = kvm_phys_timer_read();
+-
+-		p->regval = ptimer->cnt_ctl;
+-		/*
+-		 * Set ISTATUS bit if it's expired.
+-		 * Note that according to ARMv8 ARM Issue A.k, ISTATUS bit is
+-		 * UNKNOWN when ENABLE bit is 0, so we chose to set ISTATUS bit
+-		 * regardless of ENABLE bit for our implementation convenience.
+-		 */
+-		if (ptimer->cnt_cval <= now)
+-			p->regval |= ARCH_TIMER_CTRL_IT_STAT;
+-	}
++	if (p->is_write)
++		kvm_arm_timer_set_reg(vcpu, KVM_REG_ARM_PTIMER_CTL, p->regval);
++	else
++		p->regval = kvm_arm_timer_get_reg(vcpu, KVM_REG_ARM_PTIMER_CTL);
+ 
+ 	return true;
+ }
+@@ -882,12 +871,10 @@ static bool access_cntp_cval(struct kvm_vcpu *vcpu,
+ 		struct sys_reg_params *p,
+ 		const struct sys_reg_desc *r)
+ {
+-	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+-
+ 	if (p->is_write)
+-		ptimer->cnt_cval = p->regval;
++		kvm_arm_timer_set_reg(vcpu, KVM_REG_ARM_PTIMER_CVAL, p->regval);
+ 	else
+-		p->regval = ptimer->cnt_cval;
++		p->regval = kvm_arm_timer_get_reg(vcpu, KVM_REG_ARM_PTIMER_CVAL);
+ 
+ 	return true;
+ }
 -- 
 2.14.2
