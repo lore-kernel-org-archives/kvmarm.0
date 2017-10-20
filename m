@@ -1,63 +1,162 @@
-From: Julien Thierry <julien.thierry@arm.com>
-Subject: [RESEND PATCH 0/2] arm/arm64: kvm: Disable branch profiling in HYP
- code
-Date: Fri, 20 Oct 2017 12:34:15 +0100
-Message-ID: <1508499257-10014-1-git-send-email-julien.thierry@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 59EF549D24
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Oct 2017 07:33:21 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XCdrE4k63fyu for <kvmarm@lists.cs.columbia.edu>;
- Fri, 20 Oct 2017 07:33:20 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 365F7406D0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Oct 2017 07:33:20 -0400 (EDT)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc: marc.zyngier@arm.com, Julien Thierry <julien.thierry@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: [PATCH v4 01/20] irqchip/gic: Deal with broken firmware exposing only 4kB of GICv2 CPU interface
+Date: Fri, 20 Oct 2017 13:49:20 +0200
+Message-ID: <20171020114939.12554-2-christoffer.dall@linaro.org>
+References: <20171020114939.12554-1-christoffer.dall@linaro.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20171020114939.12554-1-christoffer.dall@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-[Resending for Christoffer and adding kvmarm to recipients]
+From: Marc Zyngier <marc.zyngier@arm.com>
 
-Hi,
+There is a lot of broken firmware out there that don't really
+expose the information the kernel requires when it comes with dealing
+with GICv2:
 
-When enabling branch profiling, a lockup occurs at boot time, after
-displaying: "kvm [1]: Hyp mode initialized successfully"
+(1) Firmware that only describes the first 4kB of GICv2
+(2) Firmware that describe 128kB of CPU interface, while
+    the usable portion of the address space is between
+    60 and 68kB
 
-The issue is caused by the Hyp code getting instrumented and trying to
-access unmapped code or data, which happens when trying to initialize EL2.
+So far, we only deal with (2). But we have platforms exhibiting
+behaviour (1), resulting in two sub-cases:
+(a) The GIC is occupying 8kB, as required by the GICv2 architecture
+(b) It is actually spread 128kB, and this is likely to be a version
+    of (2)
 
-So it also seems like KVM is misleadingly announcing it was initialized and
-yet gets stuck during initialization.
+This patch tries to work around both (a) and (b) by poking at
+the outside of the described memory region, and try to work out
+what is actually there. This is of course unsafe, and should
+only be enabled if there is no way to otherwise fix the DT provided
+by the firmware (we provide a "irqchip.gicv2_force_probe" option
+to that effect).
 
-* First patch deals with printing the initialization message once KVM has
-  fully initialized Hyp mode
-* Second patch actually disables branch profiling instrumentation in Hyp
-  code
+Note that for the time being, we restrict ourselves to GICv2
+implementations provided by ARM, since there I have no knowledge
+of an alternative implementations. This could be relaxed if such
+an implementation comes to light on a broken platform.
 
-Cheers,
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Christoffer Dall <cdall@linaro.org>
+---
+ Documentation/admin-guide/kernel-parameters.txt |  7 +++
+ drivers/irqchip/irq-gic.c                       | 71 +++++++++++++++++++++----
+ 2 files changed, 69 insertions(+), 9 deletions(-)
 
-Julien Thierry (2):
-  arm/arm64: kvm: Move initialization completion message
-  arm/arm64: kvm: Disable branch profiling in HYP code
-
- arch/arm/kvm/hyp/Makefile   |  2 +-
- arch/arm64/kvm/hyp/Makefile |  2 +-
- virt/kvm/arm/arm.c          | 31 ++++++++++++++-----------------
- 3 files changed, 16 insertions(+), 19 deletions(-)
-
---
-1.9.1
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index 05496622b4ef..3daa0a590236 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -1713,6 +1713,13 @@
+ 	irqaffinity=	[SMP] Set the default irq affinity mask
+ 			The argument is a cpu list, as described above.
+ 
++	irqchip.gicv2_force_probe=
++			[ARM, ARM64]
++			Format: <bool>
++			Force the kernel to look for the second 4kB page
++			of a GICv2 controller even if the memory range
++			exposed by the device tree is too small.
++
+ 	irqfixup	[HW]
+ 			When an interrupt is not handled search all handlers
+ 			for it. Intended to get systems with badly broken
+diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
+index 651d726e8b12..f641e8e2c78d 100644
+--- a/drivers/irqchip/irq-gic.c
++++ b/drivers/irqchip/irq-gic.c
+@@ -1256,6 +1256,19 @@ static void gic_teardown(struct gic_chip_data *gic)
+ 
+ #ifdef CONFIG_OF
+ static int gic_cnt __initdata;
++static bool gicv2_force_probe;
++
++static int __init gicv2_force_probe_cfg(char *buf)
++{
++	return strtobool(buf, &gicv2_force_probe);
++}
++early_param("irqchip.gicv2_force_probe", gicv2_force_probe_cfg);
++
++static bool gic_check_gicv2(void __iomem *base)
++{
++	u32 val = readl_relaxed(base + GIC_CPU_IDENT);
++	return (val & 0xff0fff) == 0x02043B;
++}
+ 
+ static bool gic_check_eoimode(struct device_node *node, void __iomem **base)
+ {
+@@ -1265,20 +1278,60 @@ static bool gic_check_eoimode(struct device_node *node, void __iomem **base)
+ 
+ 	if (!is_hyp_mode_available())
+ 		return false;
+-	if (resource_size(&cpuif_res) < SZ_8K)
+-		return false;
+-	if (resource_size(&cpuif_res) == SZ_128K) {
+-		u32 val_low, val_high;
++	if (resource_size(&cpuif_res) < SZ_8K) {
++		void __iomem *alt;
++		/*
++		 * Check for a stupid firmware that only exposes the
++		 * first page of a GICv2.
++		 */
++		if (!gic_check_gicv2(*base))
++			return false;
+ 
++		if (!gicv2_force_probe) {
++			pr_warn("GIC: GICv2 detected, but range too small and irqchip.gicv2_force_probe not set\n");
++			return false;
++		}
++
++		alt = ioremap(cpuif_res.start, SZ_8K);
++		if (!alt)
++			return false;
++		if (!gic_check_gicv2(alt + SZ_4K)) {
++			/*
++			 * The first page was that of a GICv2, and
++			 * the second was *something*. Let's trust it
++			 * to be a GICv2, and update the mapping.
++			 */
++			pr_warn("GIC: GICv2 at %pa, but range is too small (broken DT?), assuming 8kB\n",
++				&cpuif_res.start);
++			iounmap(*base);
++			*base = alt;
++			return true;
++		}
++
++		/*
++		 * We detected *two* initial GICv2 pages in a
++		 * row. Could be a GICv2 aliased over two 64kB
++		 * pages. Update the resource, map the iospace, and
++		 * pray.
++		 */
++		iounmap(alt);
++		alt = ioremap(cpuif_res.start, SZ_128K);
++		if (!alt)
++			return false;
++		pr_warn("GIC: Aliased GICv2 at %pa, trying to find the canonical range over 128kB\n",
++			&cpuif_res.start);
++		cpuif_res.end = cpuif_res.start + SZ_128K -1;
++		iounmap(*base);
++		*base = alt;
++	}
++	if (resource_size(&cpuif_res) == SZ_128K) {
+ 		/*
+-		 * Verify that we have the first 4kB of a GIC400
++		 * Verify that we have the first 4kB of a GICv2
+ 		 * aliased over the first 64kB by checking the
+ 		 * GICC_IIDR register on both ends.
+ 		 */
+-		val_low = readl_relaxed(*base + GIC_CPU_IDENT);
+-		val_high = readl_relaxed(*base + GIC_CPU_IDENT + 0xf000);
+-		if ((val_low & 0xffff0fff) != 0x0202043B ||
+-		    val_low != val_high)
++		if (!gic_check_gicv2(*base) ||
++		    !gic_check_gicv2(*base + 0xf000))
+ 			return false;
+ 
+ 		/*
+-- 
+2.14.2
