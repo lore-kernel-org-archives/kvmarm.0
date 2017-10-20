@@ -1,44 +1,84 @@
-From: Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH v4 12/20] genirq: Document vcpu_info usage for percpu_devid
- interrupts
-Date: Fri, 20 Oct 2017 13:56:16 +0200 (CEST)
-Message-ID: <alpine.DEB.2.20.1710201354590.2908@nanos>
-References: <20171020114939.12554-1-christoffer.dall@linaro.org> <20171020114939.12554-13-christoffer.dall@linaro.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 02/10] arm64: KVM: Add invalidate_icache_range helper
+Date: Fri, 20 Oct 2017 14:41:29 +0100
+Message-ID: <278f54d4-6235-8ff0-da98-f7d59e4c5345@arm.com>
+References: <20171009152032.27804-1-marc.zyngier@arm.com>
+ <20171009152032.27804-3-marc.zyngier@arm.com>
+ <20171019164736.GC30652@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20171020114939.12554-13-christoffer.dall@linaro.org>
+In-Reply-To: <20171019164736.GC30652@arm.com>
+Content-Language: en-GB
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Christoffer Dall <cdall@linaro.org>
+To: Will Deacon <will.deacon@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, 20 Oct 2017, Christoffer Dall wrote:
-
-Please Cc lkml when changing genirq core code.
-
-> It is currently unclear how to set the VCPU affinity for a percpu_devid
-> interrupt , since the Linux irq_data structure describes the state for
-> multiple interrupts, one for each physical CPU on the system.  Since
-> each such interrupt can be associated with different VCPUs or none at
-> all, associating a single VCPU state with such an interrupt does not
-> capture the necessary semantics.
+On 19/10/17 17:47, Will Deacon wrote:
+> On Mon, Oct 09, 2017 at 04:20:24PM +0100, Marc Zyngier wrote:
+>> We currently tightly couple dcache clean with icache invalidation,
+>> but KVM could do without the initial flush to PoU, as we've
+>> already flushed things to PoC.
+>>
+>> Let's introduce invalidate_icache_range which is limited to
+>> invalidating the icache from the linear mapping (and thus
+>> has none of the userspace fault handling complexity), and
+>> wire it in KVM instead of flush_icache_range.
+>>
+>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>> ---
+>>  arch/arm64/include/asm/cacheflush.h |  8 ++++++++
+>>  arch/arm64/include/asm/kvm_mmu.h    |  4 ++--
+>>  arch/arm64/mm/cache.S               | 24 ++++++++++++++++++++++++
+>>  3 files changed, 34 insertions(+), 2 deletions(-)
 > 
-> The implementers of irq_set_affinity are the Intel and AMD IOMMUs, and
-> the ARM GIC irqchip.  The Intel and AMD callers do not appear to use
-> percpu_devid interrupts, and the ARM GIC implementation only checks the
-> pointer against NULL vs. non-NULL.
+> [...]
 > 
-> Therefore, simply update the function documentation to explain the
-> expected use in the context of percpu_devid interrupts, allowing future
-> changes or additions to irqchip implementers to do the right thing.
+>> diff --git a/arch/arm64/mm/cache.S b/arch/arm64/mm/cache.S
+>> index 7f1dbe962cf5..0c330666a8c9 100644
+>> --- a/arch/arm64/mm/cache.S
+>> +++ b/arch/arm64/mm/cache.S
+>> @@ -80,6 +80,30 @@ USER(9f, ic	ivau, x4	)		// invalidate I line PoU
+>>  ENDPROC(flush_icache_range)
+>>  ENDPROC(__flush_cache_user_range)
+>>  
+>> +/*
+>> + *	invalidate_icache_range(start,end)
+>> + *
+>> + *	Ensure that the I cache is invalid within specified region. This
+>> + *	assumes that this is done on the linear mapping. Do not use it
+>> + *	on a userspace range, as this may fault horribly.
+>> + *
+>> + *	- start   - virtual start address of region
+>> + *	- end     - virtual end address of region
+>> + */
+>> +ENTRY(invalidate_icache_range)
+>> +	icache_line_size x2, x3
+>> +	sub	x3, x2, #1
+>> +	bic	x4, x0, x3
+>> +1:
+>> +	ic	ivau, x4			// invalidate I line PoU
+>> +	add	x4, x4, x2
+>> +	cmp	x4, x1
+>> +	b.lo	1b
+>> +	dsb	ish
+>> +	isb
+>> +	ret
+>> +ENDPROC(invalidate_icache_range)
 > 
-> This allows us to set the VCPU affinity for the virtual timer interrupt
-> in KVM/ARM, which is a percpu_devid (PPI) interrupt.
+> Is there a good reason not to make this work for user addresses? If it's as
+> simple as adding a USER annotation and a fallback, then we should wrap that
+> in a macro and reuse it for __flush_cache_user_range.
 
-I have a hard time to understand how adding the comment allows you to set
-VCPU affinity ....
+Fair enough. I've done that now (with an optional label that triggers
+the generation of a USER() annotation).
+
+I'll post the revised series shortly.
 
 Thanks,
 
-	tglx
+	M.
+-- 
+Jazz is not dead. It just smells funny...
