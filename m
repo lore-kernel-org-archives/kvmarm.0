@@ -1,554 +1,137 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v4 14/20] KVM: arm/arm64: Avoid timer save/restore in vcpu entry/exit
-Date: Fri, 20 Oct 2017 13:49:33 +0200
-Message-ID: <20171020114939.12554-15-christoffer.dall@linaro.org>
+Subject: [PATCH v4 20/20] KVM: arm/arm64: Rework kvm_timer_should_fire
+Date: Fri, 20 Oct 2017 13:49:39 +0200
+Message-ID: <20171020114939.12554-21-christoffer.dall@linaro.org>
 References: <20171020114939.12554-1-christoffer.dall@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 06BB849D23
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Oct 2017 07:49:07 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id VCNf4snmx5Lr for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 20 Oct 2017 07:49:06 -0400 (EDT)
+Received: from mail-wm0-f65.google.com (mail-wm0-f65.google.com [74.125.82.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A8C3449D1C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Oct 2017 07:49:05 -0400 (EDT)
+Received: by mail-wm0-f65.google.com with SMTP id p75so2269169wmg.3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Oct 2017 04:50:11 -0700 (PDT)
 In-Reply-To: <20171020114939.12554-1-christoffer.dall@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Christoffer Dall <cdall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@linaro.org>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Christoffer Dall <cdall@linaro.org>
 
-We don't need to save and restore the hardware timer state and examine
-if it generates interrupts on on every entry/exit to the guest.  The
-timer hardware is perfectly capable of telling us when it has expired
-by signaling interrupts.
+kvm_timer_should_fire() can be called in two different situations from
+the kvm_vcpu_block().
 
-When taking a vtimer interrupt in the host, we don't want to mess with
-the timer configuration, we just want to forward the physical interrupt
-to the guest as a virtual interrupt.  We can use the split priority drop
-and deactivate feature of the GIC to do this, which leaves an EOI'ed
-interrupt active on the physical distributor, making sure we don't keep
-taking timer interrupts which would prevent the guest from running.  We
-can then forward the physical interrupt to the VM using the HW bit in
-the LR of the GIC, like we do already, which lets the guest directly
-deactivate both the physical and virtual timer simultaneously, allowing
-the timer hardware to exit the VM and generate a new physical interrupt
-when the timer output is again asserted later on.
+The first case is before calling kvm_timer_schedule(), used for wait
+polling, and in this case the VCPU thread is running and the timer state
+is loaded onto the hardware so all we have to do is check if the virtual
+interrupt lines are asserted, becasue the timer interrupt handler
+functions will raise those lines as appropriate.
 
-We do need to capture this state when migrating VCPUs between physical
-CPUs, however, which we use the vcpu put/load functions for, which are
-called through preempt notifiers whenever the thread is scheduled away
-from the CPU or called directly if we return from the ioctl to
-userspace.
-
-One caveat is that we have to save and restore the timer state in both
-kvm_timer_vcpu_[put/load] and kvm_timer_[schedule/unschedule], because
-we can have the following flows:
-
-  1. kvm_vcpu_block
-  2. kvm_timer_schedule
-  3. schedule
-  4. kvm_timer_vcpu_put (preempt notifier)
-  5. schedule (vcpu thread gets scheduled back)
-  6. kvm_timer_vcpu_load (preempt notifier)
-  7. kvm_timer_unschedule
-
-And a version where we don't actually call schedule:
-
-  1. kvm_vcpu_block
-  2. kvm_timer_schedule
-  7. kvm_timer_unschedule
-
-Since kvm_timer_[schedule/unschedule] may not be followed by put/load,
-but put/load also may be called independently, we call the timer
-save/restore functions from both paths.  Since they rely on the loaded
-flag to never save/restore when unnecessary, this doesn't cause any
-harm, and we ensure that all invokations of either set of functions work
-as intended.
-
-An added benefit beyond not having to read and write the timer sysregs
-on every entry and exit is that we no longer have to actively write the
-active state to the physical distributor, because we configured the
-irq for the vtimer to only get a priority drop when handling the
-interrupt in the GIC driver (we called irq_set_vcpu_affinity()), and
-the interrupt stays active after firing on the host.
+The second case is inside the wait loop of kvm_vcpu_block(), where we
+have already called kvm_timer_schedule() and therefore the hardware will
+be disabled and the software view of the timer state is up to date
+(timer->loaded is false), and so we can simply check if the timer should
+fire by looking at the software state.
 
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
-
-Notes:
-    Changes since v3:
-     - Added comments explaining the 'loaded' flag and made other clarifying
-       comments.
-     - No longer rely on the armed flag to conditionally save/restore state,
-       as we already rely on the 'loaded' flag to not repetitively
-       save/restore state.
-     - Reworded parts of the commit message.
-     - Removed renames not belonging to this patch.
-     - Added warning in kvm_arch_timer_handler in case we see spurious
-       interrupts, for example if the hardware doesn't retire the
-       level-triggered timer signal fast enough.
-
- include/kvm/arm_arch_timer.h |  16 ++-
- virt/kvm/arm/arch_timer.c    | 237 +++++++++++++++++++++++++++----------------
- virt/kvm/arm/arm.c           |  19 +++-
- 3 files changed, 178 insertions(+), 94 deletions(-)
+ include/kvm/arm_arch_timer.h |  3 ++-
+ virt/kvm/arm/arch_timer.c    | 22 +++++++++++++++++++++-
+ virt/kvm/arm/arm.c           |  3 +--
+ 3 files changed, 24 insertions(+), 4 deletions(-)
 
 diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index 184c3ef2df93..c538f707e1c1 100644
+index 2352f3a4e88b..01ee473517e2 100644
 --- a/include/kvm/arm_arch_timer.h
 +++ b/include/kvm/arm_arch_timer.h
-@@ -31,8 +31,15 @@ struct arch_timer_context {
- 	/* Timer IRQ */
- 	struct kvm_irq_level		irq;
+@@ -78,7 +78,8 @@ int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+ int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+ int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
  
--	/* Active IRQ state caching */
--	bool				active_cleared_last;
-+	/*
-+	 * We have multiple paths which can save/restore the timer state
-+	 * onto the hardware, so we need some way of keeping track of
-+	 * where the latest state is.
-+	 *
-+	 * loaded == true:  State is loaded on the hardware registers.
-+	 * loaded == false: State is stored in memory.
-+	 */
-+	bool			loaded;
- 
- 	/* Virtual offset */
- 	u64			cntvoff;
-@@ -78,10 +85,15 @@ void kvm_timer_unschedule(struct kvm_vcpu *vcpu);
- 
- u64 kvm_phys_timer_read(void);
- 
-+void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu);
- void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu);
- 
- void kvm_timer_init_vhe(void);
- 
- #define vcpu_vtimer(v)	(&(v)->arch.timer_cpu.vtimer)
- #define vcpu_ptimer(v)	(&(v)->arch.timer_cpu.ptimer)
+-bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx);
++bool kvm_timer_is_pending(struct kvm_vcpu *vcpu);
 +
-+void enable_el1_phys_timer_access(void);
-+void disable_el1_phys_timer_access(void);
-+
- #endif
+ void kvm_timer_schedule(struct kvm_vcpu *vcpu);
+ void kvm_timer_unschedule(struct kvm_vcpu *vcpu);
+ 
 diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index eac1b3d83a86..ec685c1f3b78 100644
+index 53d9bd4a734f..2035cf251701 100644
 --- a/virt/kvm/arm/arch_timer.c
 +++ b/virt/kvm/arm/arch_timer.c
-@@ -46,10 +46,9 @@ static const struct kvm_irq_level default_vtimer_irq = {
- 	.level	= 1,
- };
- 
--void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
--{
--	vcpu_vtimer(vcpu)->active_cleared_last = false;
--}
-+static bool kvm_timer_irq_can_fire(struct arch_timer_context *timer_ctx);
-+static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
-+				 struct arch_timer_context *timer_ctx);
+@@ -49,6 +49,7 @@ static const struct kvm_irq_level default_vtimer_irq = {
+ static bool kvm_timer_irq_can_fire(struct arch_timer_context *timer_ctx);
+ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+ 				 struct arch_timer_context *timer_ctx);
++static bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx);
  
  u64 kvm_phys_timer_read(void)
  {
-@@ -69,17 +68,45 @@ static void soft_timer_cancel(struct hrtimer *hrt, struct work_struct *work)
- 		cancel_work_sync(work);
+@@ -226,7 +227,7 @@ static enum hrtimer_restart kvm_phys_timer_expire(struct hrtimer *hrt)
+ 	return HRTIMER_NORESTART;
  }
  
--static irqreturn_t kvm_arch_timer_handler(int irq, void *dev_id)
-+static void kvm_vtimer_update_mask_user(struct kvm_vcpu *vcpu)
+-bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
++static bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
  {
--	struct kvm_vcpu *vcpu = *(struct kvm_vcpu **)dev_id;
+ 	u64 cval, now;
+ 
+@@ -239,6 +240,25 @@ bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
+ 	return cval <= now;
+ }
+ 
++bool kvm_timer_is_pending(struct kvm_vcpu *vcpu)
++{
 +	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 
- 	/*
--	 * We disable the timer in the world switch and let it be
--	 * handled by kvm_timer_sync_hwstate(). Getting a timer
--	 * interrupt at this point is a sure sign of some major
--	 * breakage.
-+	 * When using a userspace irqchip with the architected timers, we must
-+	 * prevent continuously exiting from the guest, and therefore mask the
-+	 * physical interrupt by disabling it on the host interrupt controller
-+	 * when the virtual level is high, such that the guest can make
-+	 * forward progress.  Once we detect the output level being
-+	 * de-asserted, we unmask the interrupt again so that we exit from the
-+	 * guest when the timer fires.
- 	 */
--	pr_warn("Unexpected interrupt %d on vcpu %p\n", irq, vcpu);
-+	if (vtimer->irq.level)
-+		disable_percpu_irq(host_vtimer_irq);
-+	else
-+		enable_percpu_irq(host_vtimer_irq, 0);
-+}
-+
-+static irqreturn_t kvm_arch_timer_handler(int irq, void *dev_id)
-+{
-+	struct kvm_vcpu *vcpu = *(struct kvm_vcpu **)dev_id;
-+	struct arch_timer_context *vtimer;
-+
-+	if (!vcpu) {
-+		pr_warn_once("Spurious arch timer IRQ on non-VCPU thread\n");
-+		return IRQ_NONE;
-+	}
-+	vtimer = vcpu_vtimer(vcpu);
-+
-+	if (!vtimer->irq.level) {
-+		vtimer->cnt_ctl = read_sysreg_el0(cntv_ctl);
-+		if (kvm_timer_irq_can_fire(vtimer))
-+			kvm_timer_update_irq(vcpu, true, vtimer);
-+	}
-+
-+	if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
-+		kvm_vtimer_update_mask_user(vcpu);
-+
- 	return IRQ_HANDLED;
- }
- 
-@@ -215,7 +242,6 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
- {
- 	int ret;
- 
--	timer_ctx->active_cleared_last = false;
- 	timer_ctx->irq.level = new_level;
- 	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer_ctx->irq.irq,
- 				   timer_ctx->irq.level);
-@@ -271,10 +297,16 @@ static void phys_timer_emulate(struct kvm_vcpu *vcpu,
- 	soft_timer_start(&timer->phys_timer, kvm_timer_compute_delta(timer_ctx));
- }
- 
--static void timer_save_state(struct kvm_vcpu *vcpu)
-+static void vtimer_save_state(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
- 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
-+	unsigned long flags;
-+
-+	local_irq_save(flags);
-+
-+	if (!vtimer->loaded)
-+		goto out;
- 
- 	if (timer->enabled) {
- 		vtimer->cnt_ctl = read_sysreg_el0(cntv_ctl);
-@@ -283,6 +315,10 @@ static void timer_save_state(struct kvm_vcpu *vcpu)
- 
- 	/* Disable the virtual timer */
- 	write_sysreg_el0(0, cntv_ctl);
-+
-+	vtimer->loaded = false;
-+out:
-+	local_irq_restore(flags);
- }
- 
- /*
-@@ -296,6 +332,8 @@ void kvm_timer_schedule(struct kvm_vcpu *vcpu)
- 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
- 
-+	vtimer_save_state(vcpu);
-+
- 	/*
- 	 * No need to schedule a background timer if any guest timer has
- 	 * already expired, because kvm_vcpu_block will return before putting
-@@ -318,22 +356,34 @@ void kvm_timer_schedule(struct kvm_vcpu *vcpu)
- 	soft_timer_start(&timer->bg_timer, kvm_timer_earliest_exp(vcpu));
- }
- 
--static void timer_restore_state(struct kvm_vcpu *vcpu)
-+static void vtimer_restore_state(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
- 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
-+	unsigned long flags;
-+
-+	local_irq_save(flags);
-+
-+	if (vtimer->loaded)
-+		goto out;
- 
- 	if (timer->enabled) {
- 		write_sysreg_el0(vtimer->cnt_cval, cntv_cval);
- 		isb();
- 		write_sysreg_el0(vtimer->cnt_ctl, cntv_ctl);
- 	}
-+
-+	vtimer->loaded = true;
-+out:
-+	local_irq_restore(flags);
- }
- 
- void kvm_timer_unschedule(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
- 
-+	vtimer_restore_state(vcpu);
-+
- 	soft_timer_cancel(&timer->bg_timer, &timer->expired);
- }
- 
-@@ -352,61 +402,45 @@ static void set_cntvoff(u64 cntvoff)
- 	kvm_call_hyp(__kvm_timer_set_cntvoff, low, high);
- }
- 
--static void kvm_timer_flush_hwstate_vgic(struct kvm_vcpu *vcpu)
-+static void kvm_timer_vcpu_load_vgic(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 	bool phys_active;
- 	int ret;
- 
--	/*
--	* If we enter the guest with the virtual input level to the VGIC
--	* asserted, then we have already told the VGIC what we need to, and
--	* we don't need to exit from the guest until the guest deactivates
--	* the already injected interrupt, so therefore we should set the
--	* hardware active state to prevent unnecessary exits from the guest.
--	*
--	* Also, if we enter the guest with the virtual timer interrupt active,
--	* then it must be active on the physical distributor, because we set
--	* the HW bit and the guest must be able to deactivate the virtual and
--	* physical interrupt at the same time.
--	*
--	* Conversely, if the virtual input level is deasserted and the virtual
--	* interrupt is not active, then always clear the hardware active state
--	* to ensure that hardware interrupts from the timer triggers a guest
--	* exit.
--	*/
- 	phys_active = vtimer->irq.level ||
--			kvm_vgic_map_is_active(vcpu, vtimer->irq.irq);
--
--	/*
--	 * We want to avoid hitting the (re)distributor as much as
--	 * possible, as this is a potentially expensive MMIO access
--	 * (not to mention locks in the irq layer), and a solution for
--	 * this is to cache the "active" state in memory.
--	 *
--	 * Things to consider: we cannot cache an "active set" state,
--	 * because the HW can change this behind our back (it becomes
--	 * "clear" in the HW). We must then restrict the caching to
--	 * the "clear" state.
--	 *
--	 * The cache is invalidated on:
--	 * - vcpu put, indicating that the HW cannot be trusted to be
--	 *   in a sane state on the next vcpu load,
--	 * - any change in the interrupt state
--	 *
--	 * Usage conditions:
--	 * - cached value is "active clear"
--	 * - value to be programmed is "active clear"
--	 */
--	if (vtimer->active_cleared_last && !phys_active)
--		return;
-+		      kvm_vgic_map_is_active(vcpu, vtimer->irq.irq);
- 
- 	ret = irq_set_irqchip_state(host_vtimer_irq,
- 				    IRQCHIP_STATE_ACTIVE,
- 				    phys_active);
- 	WARN_ON(ret);
-+}
- 
--	vtimer->active_cleared_last = !phys_active;
-+static void kvm_timer_vcpu_load_user(struct kvm_vcpu *vcpu)
-+{
-+	kvm_vtimer_update_mask_user(vcpu);
-+}
-+
-+void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
-+{
-+	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-+	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
-+
-+	if (unlikely(!timer->enabled))
-+		return;
-+
-+	if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
-+		kvm_timer_vcpu_load_user(vcpu);
-+	else
-+		kvm_timer_vcpu_load_vgic(vcpu);
-+
-+	set_cntvoff(vtimer->cntvoff);
-+
-+	vtimer_restore_state(vcpu);
-+
-+	if (has_vhe())
-+		disable_el1_phys_timer_access();
- }
- 
- bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu)
-@@ -426,23 +460,6 @@ bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu)
- 	       ptimer->irq.level != plevel;
- }
- 
--static void kvm_timer_flush_hwstate_user(struct kvm_vcpu *vcpu)
--{
--	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
--
--	/*
--	 * To prevent continuously exiting from the guest, we mask the
--	 * physical interrupt such that the guest can make forward progress.
--	 * Once we detect the output level being deasserted, we unmask the
--	 * interrupt again so that we exit from the guest when the timer
--	 * fires.
--	*/
--	if (vtimer->irq.level)
--		disable_percpu_irq(host_vtimer_irq);
--	else
--		enable_percpu_irq(host_vtimer_irq, 0);
--}
--
- /**
-  * kvm_timer_flush_hwstate - prepare timers before running the vcpu
-  * @vcpu: The vcpu pointer
-@@ -455,23 +472,61 @@ static void kvm_timer_flush_hwstate_user(struct kvm_vcpu *vcpu)
- void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
--	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
 +	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
- 
- 	if (unlikely(!timer->enabled))
- 		return;
- 
--	kvm_timer_update_state(vcpu);
-+	if (kvm_timer_should_fire(ptimer) != ptimer->irq.level)
-+		kvm_timer_update_irq(vcpu, !ptimer->irq.level, ptimer);
- 
- 	/* Set the background timer for the physical timer emulation. */
- 	phys_timer_emulate(vcpu, vcpu_ptimer(vcpu));
-+}
- 
--	if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
--		kvm_timer_flush_hwstate_user(vcpu);
--	else
--		kvm_timer_flush_hwstate_vgic(vcpu);
-+void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
-+{
-+	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
- 
--	set_cntvoff(vtimer->cntvoff);
--	timer_restore_state(vcpu);
-+	if (unlikely(!timer->enabled))
-+		return;
 +
-+	if (has_vhe())
-+		enable_el1_phys_timer_access();
-+
-+	vtimer_save_state(vcpu);
++	if (vtimer->irq.level || ptimer->irq.level)
++		return true;
 +
 +	/*
-+	 * The kernel may decide to run userspace after calling vcpu_put, so
-+	 * we reset cntvoff to 0 to ensure a consistent read between user
-+	 * accesses to the virtual counter and kernel access to the physical
-+	 * counter.
++	 * When this is called from withing the wait loop of kvm_vcpu_block(),
++	 * the software view of the timer state is up to date (timer->loaded
++	 * is false), and so we can simply check if the timer should fire now.
 +	 */
-+	set_cntvoff(0);
++	if (!vtimer->loaded && kvm_timer_should_fire(vtimer))
++		return true;
++
++	return kvm_timer_should_fire(ptimer);
 +}
 +
-+static void unmask_vtimer_irq(struct kvm_vcpu *vcpu)
-+{
-+	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
-+
-+	if (unlikely(!irqchip_in_kernel(vcpu->kvm))) {
-+		kvm_vtimer_update_mask_user(vcpu);
-+		return;
-+	}
-+
-+	/*
-+	 * If the guest disabled the timer without acking the interrupt, then
-+	 * we must make sure the physical and virtual active states are in
-+	 * sync by deactivating the physical interrupt, because otherwise we
-+	 * wouldn't see the next timer interrupt in the host.
-+	 */
-+	if (!kvm_vgic_map_is_active(vcpu, vtimer->irq.irq)) {
-+		int ret;
-+		ret = irq_set_irqchip_state(host_vtimer_irq,
-+					    IRQCHIP_STATE_ACTIVE,
-+					    false);
-+		WARN_ON(ret);
-+	}
- }
- 
- /**
-@@ -484,6 +539,7 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
- void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-+	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 
- 	/*
- 	 * This is to cancel the background timer for the physical timer
-@@ -491,14 +547,19 @@ void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
- 	 */
- 	soft_timer_cancel(&timer->phys_timer, NULL);
- 
--	timer_save_state(vcpu);
--	set_cntvoff(0);
--
- 	/*
--	 * The guest could have modified the timer registers or the timer
--	 * could have expired, update the timer state.
-+	 * If we entered the guest with the vtimer output asserted we have to
-+	 * check if the guest has modified the timer so that we should lower
-+	 * the line at this point.
- 	 */
--	kvm_timer_update_state(vcpu);
-+	if (vtimer->irq.level) {
-+		vtimer->cnt_ctl = read_sysreg_el0(cntv_ctl);
-+		vtimer->cnt_cval = read_sysreg_el0(cntv_cval);
-+		if (!kvm_timer_should_fire(vtimer)) {
-+			kvm_timer_update_irq(vcpu, false, vtimer);
-+			unmask_vtimer_irq(vcpu);
-+		}
-+	}
- }
- 
- int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
+ /*
+  * Reflect the timer output level into the kvm_run structure
+  */
 diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 27db222a0c8d..132d39ae13d2 100644
+index 14c50d142c67..bc126fb99a3d 100644
 --- a/virt/kvm/arm/arm.c
 +++ b/virt/kvm/arm/arm.c
-@@ -354,18 +354,18 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	vcpu->arch.host_cpu_context = this_cpu_ptr(kvm_host_cpu_state);
+@@ -307,8 +307,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
  
- 	kvm_arm_set_running_vcpu(vcpu);
--
- 	kvm_vgic_load(vcpu);
-+	kvm_timer_vcpu_load(vcpu);
- }
- 
- void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+ int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
  {
-+	kvm_timer_vcpu_put(vcpu);
- 	kvm_vgic_put(vcpu);
- 
- 	vcpu->cpu = -1;
- 
- 	kvm_arm_set_running_vcpu(NULL);
--	kvm_timer_vcpu_put(vcpu);
+-	return kvm_timer_should_fire(vcpu_vtimer(vcpu)) ||
+-	       kvm_timer_should_fire(vcpu_ptimer(vcpu));
++	return kvm_timer_is_pending(vcpu);
  }
  
- static void vcpu_power_off(struct kvm_vcpu *vcpu)
-@@ -710,15 +710,26 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		kvm_arm_clear_debug(vcpu);
- 
- 		/*
--		 * We must sync the PMU and timer state before the vgic state so
-+		 * We must sync the PMU state before the vgic state so
- 		 * that the vgic can properly sample the updated state of the
- 		 * interrupt line.
- 		 */
- 		kvm_pmu_sync_hwstate(vcpu);
--		kvm_timer_sync_hwstate(vcpu);
- 
-+		/*
-+		 * Sync the vgic state before syncing the timer state because
-+		 * the timer code needs to know if the virtual timer
-+		 * interrupts are active.
-+		 */
- 		kvm_vgic_sync_hwstate(vcpu);
- 
-+		/*
-+		 * Sync the timer hardware state before enabling interrupts as
-+		 * we don't want vtimer interrupts to race with syncing the
-+		 * timer virtual interrupt state.
-+		 */
-+		kvm_timer_sync_hwstate(vcpu);
-+
- 		/*
- 		 * We may have taken a host interrupt in HYP mode (ie
- 		 * while executing the guest). This interrupt is still
+ void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
 -- 
 2.14.2
