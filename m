@@ -1,39 +1,148 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 3/8] arm64: KVM: PTE/PMD S2 XN bit definition
-Date: Fri, 20 Oct 2017 16:48:59 +0100
-Message-ID: <20171020154904.31427-4-marc.zyngier@arm.com>
+Subject: [PATCH v2 8/8] KVM: arm/arm64: Detangle kvm_mmu.h from kvm_hyp.h
+Date: Fri, 20 Oct 2017 16:49:04 +0100
+Message-ID: <20171020154904.31427-9-marc.zyngier@arm.com>
 References: <20171020154904.31427-1-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D248549D40
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Oct 2017 11:48:24 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id SRxT94FiSKzH for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 20 Oct 2017 11:48:24 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 95CE749D52
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Oct 2017 11:48:23 -0400 (EDT)
 In-Reply-To: <20171020154904.31427-1-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As we're about to make S2 page-tables eXecute Never by default,
-add the required bits for both PMDs and PTEs.
+kvm_hyp.h has an odd dependency on kvm_mmu.h, which makes the
+opposite inclusion impossible. Let's start with breaking that
+useless dependency.
 
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/pgtable-hwdef.h | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/arm/include/asm/kvm_hyp.h   | 1 -
+ arch/arm/kvm/hyp/switch.c        | 1 +
+ arch/arm/kvm/hyp/tlb.c           | 1 +
+ arch/arm64/include/asm/kvm_hyp.h | 1 -
+ arch/arm64/kvm/hyp/debug-sr.c    | 1 +
+ arch/arm64/kvm/hyp/switch.c      | 1 +
+ arch/arm64/kvm/hyp/tlb.c         | 1 +
+ virt/kvm/arm/hyp/vgic-v2-sr.c    | 1 +
+ 8 files changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-index eb0c2bd90de9..af035331fb09 100644
---- a/arch/arm64/include/asm/pgtable-hwdef.h
-+++ b/arch/arm64/include/asm/pgtable-hwdef.h
-@@ -177,9 +177,11 @@
+diff --git a/arch/arm/include/asm/kvm_hyp.h b/arch/arm/include/asm/kvm_hyp.h
+index ad541f9ecc78..8b29faa119ba 100644
+--- a/arch/arm/include/asm/kvm_hyp.h
++++ b/arch/arm/include/asm/kvm_hyp.h
+@@ -21,7 +21,6 @@
+ #include <linux/compiler.h>
+ #include <linux/kvm_host.h>
+ #include <asm/cp15.h>
+-#include <asm/kvm_mmu.h>
+ #include <asm/vfp.h>
+ 
+ #define __hyp_text __section(.hyp.text) notrace
+diff --git a/arch/arm/kvm/hyp/switch.c b/arch/arm/kvm/hyp/switch.c
+index ebd2dd46adf7..67e0a689c4b5 100644
+--- a/arch/arm/kvm/hyp/switch.c
++++ b/arch/arm/kvm/hyp/switch.c
+@@ -18,6 +18,7 @@
+ 
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_hyp.h>
++#include <asm/kvm_mmu.h>
+ 
+ __asm__(".arch_extension     virt");
+ 
+diff --git a/arch/arm/kvm/hyp/tlb.c b/arch/arm/kvm/hyp/tlb.c
+index 6d810af2d9fd..c0edd450e104 100644
+--- a/arch/arm/kvm/hyp/tlb.c
++++ b/arch/arm/kvm/hyp/tlb.c
+@@ -19,6 +19,7 @@
   */
- #define PTE_S2_RDONLY		(_AT(pteval_t, 1) << 6)   /* HAP[2:1] */
- #define PTE_S2_RDWR		(_AT(pteval_t, 3) << 6)   /* HAP[2:1] */
-+#define PTE_S2_XN		(_AT(pteval_t, 2) << 53)  /* XN[1:0] */
  
- #define PMD_S2_RDONLY		(_AT(pmdval_t, 1) << 6)   /* HAP[2:1] */
- #define PMD_S2_RDWR		(_AT(pmdval_t, 3) << 6)   /* HAP[2:1] */
-+#define PMD_S2_XN		(_AT(pmdval_t, 2) << 53)  /* XN[1:0] */
+ #include <asm/kvm_hyp.h>
++#include <asm/kvm_mmu.h>
  
- /*
-  * Memory Attribute override for Stage-2 (MemAttr[3:0])
+ /**
+  * Flush per-VMID TLBs
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index 4572a9b560fa..afbfbe0c12c5 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -20,7 +20,6 @@
+ 
+ #include <linux/compiler.h>
+ #include <linux/kvm_host.h>
+-#include <asm/kvm_mmu.h>
+ #include <asm/sysreg.h>
+ 
+ #define __hyp_text __section(.hyp.text) notrace
+diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
+index f5154ed3da6c..d3a13d57f2c5 100644
+--- a/arch/arm64/kvm/hyp/debug-sr.c
++++ b/arch/arm64/kvm/hyp/debug-sr.c
+@@ -21,6 +21,7 @@
+ #include <asm/debug-monitors.h>
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_hyp.h>
++#include <asm/kvm_mmu.h>
+ 
+ #define read_debug(r,n)		read_sysreg(r##n##_el1)
+ #define write_debug(v,r,n)	write_sysreg(v, r##n##_el1)
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 945e79c641c4..c52f7094122f 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -21,6 +21,7 @@
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_hyp.h>
++#include <asm/kvm_mmu.h>
+ #include <asm/fpsimd.h>
+ 
+ static bool __hyp_text __fpsimd_enabled_nvhe(void)
+diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
+index 73464a96c365..131c7772703c 100644
+--- a/arch/arm64/kvm/hyp/tlb.c
++++ b/arch/arm64/kvm/hyp/tlb.c
+@@ -16,6 +16,7 @@
+  */
+ 
+ #include <asm/kvm_hyp.h>
++#include <asm/kvm_mmu.h>
+ #include <asm/tlbflush.h>
+ 
+ static void __hyp_text __tlb_switch_to_guest_vhe(struct kvm *kvm)
+diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
+index a3f18d362366..77ccd8e2090b 100644
+--- a/virt/kvm/arm/hyp/vgic-v2-sr.c
++++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
+@@ -21,6 +21,7 @@
+ 
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_hyp.h>
++#include <asm/kvm_mmu.h>
+ 
+ static void __hyp_text save_elrsr(struct kvm_vcpu *vcpu, void __iomem *base)
+ {
 -- 
 2.14.1
