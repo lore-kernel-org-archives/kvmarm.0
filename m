@@ -1,301 +1,69 @@
-From: gengdongjiu <gengdj.1984@gmail.com>
-Subject: Re: [PATCH v7 1/4] arm64: kvm: route synchronous external abort
- exceptions to EL2
-Date: Fri, 20 Oct 2017 22:25:11 +0800
-Message-ID: <CAMj-D2CidM6m3Vm27h90NwQM+OWAeu-jYUQmgmkqMuN-bezFJA@mail.gmail.com>
-References: <1508249689-10350-1-git-send-email-gengdongjiu@huawei.com>
- <1508249689-10350-2-git-send-email-gengdongjiu@huawei.com>
- <59E78DAC.1090107@arm.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Subject: Re: [PATCH v6 6/7] KVM: arm64: allow get exception information from
+ userspace
+Date: Fri, 20 Oct 2017 15:33:05 +0000
+Message-ID: <0184EA26B2509940AA629AE1405DD7F2016BAC2B@DGGEMA503-MBX.china.huawei.com>
+References: <0184EA26B2509940AA629AE1405DD7F2016BA9E4@DGGEMA503-MBX.china.huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 712D240D25
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Oct 2017 10:24:07 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3w9K6yuumeHK for <kvmarm@lists.cs.columbia.edu>;
- Fri, 20 Oct 2017 10:24:06 -0400 (EDT)
-Received: from mail-ua0-f195.google.com (mail-ua0-f195.google.com
- [209.85.217.195])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2CAFA40651
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Oct 2017 10:24:05 -0400 (EDT)
-Received: by mail-ua0-f195.google.com with SMTP id h34so8439154uaa.6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Oct 2017 07:25:12 -0700 (PDT)
-In-Reply-To: <59E78DAC.1090107@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>
-Cc: Dave.Martin@arm.com, stefan@hello-penguin.com, linux-kernel@vger.kernel.org, kamensky@cisco.com, kvm@vger.kernel.org, corbet@lwn.net, marc.zyngier@arm.com, catalin.marinas@arm.com, stephen.boyd@linaro.org, will.deacon@arm.com, linux@armlinux.org.uk, kristina.martsenko@arm.com, Dongjiu Geng <gengdongjiu@huawei.com>, wuquanming@huawei.com, kvmarm@lists.cs.columbia.edu, punit.agrawal@arm.com, mingo@kernel.org, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <0184EA26B2509940AA629AE1405DD7F2016BA9E4@DGGEMA503-MBX.china.huawei.com>
+Content-Language: zh-CN
+Sender: kvm-owner@vger.kernel.org
+To: gengdongjiu <gengdongjiu@huawei.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
+Cc: "lishuo (A)" <lishuo1@hisilicon.com>, "Liujun (Jun Liu)" <liujun88@hisilicon.com>, "Lilei (Lious)" <lious.lilei@hisilicon.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Huangshaoyu <huangshaoyu@huawei.com>, Wuquanming <wuquanming@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi james,
-  Thanks for the mail and sorry for my late response.
+> > In the user space, we can check the si_code, if it is "BUS_MCEERR_AR",
+> > we use SEA notification type for the guest; if it is "BUS_MCEERR_AO", we use SEI notification type for the guest.
+> > Because there are only two values for si_code("BUS_MCEERR_AR" and BUS_MCEERR_AO), in which case we can use the GSIV(IRQ)
+> notification type?
+> 
+> This is for Qemu/kvmtool to decide, it depends on what sort of machine they are emulating.
+> 
+> For example, the physical machine's memory-controller may notify the CPU about memory errors by triggering SError trapped to EL3, or
+> with a dedicated FIQ, also routed to EL3. By the time this gets to the host kernel the distinction doesn't matter. The host has handled the
+> error.
+> 
+> For a guest, your memory-controller is effectively the host kernel. It will give you an BUS_MCEERR_AO signal for any guest memory that is
+> affected, and a BUS_MCEERR_AR if the guest directly accesses a page of affected memory.
+> 
+> What Qemu/kvmtool do with this is up to them. If they're emulating a machine with no RAS features, printing an error and exit.
+> 
+> Otherwise BUS_MCEERR_AR could be notified as one of the flavours of IRQ, unless the affected vcpu has interrupts masked, in which case
+> an SEA notification gives you some NMI-like behaviour.
+> 
+> For BUS_MCEERR_AO you could use SEI, IRQ or polled notification. My choice would be IRQ, as you can't know if the guest supports SEI and
+> it would be a shame to kill it with an SError if the affected memory was free. SEA for synchronous errors is still a good choice even if the
+> guest doesn't support it as that memory is still gone so its still a valid guest:Synchronous-external-abort.
+> 
 
+CC some huawei's hardware engineers.
 
-2017-10-19 1:21 GMT+08:00, James Morse <james.morse@arm.com>:
-> Hi Dongjiu Geng,
->
-> On 17/10/17 15:14, Dongjiu Geng wrote:
->> ARMv8.2 adds a new bit HCR_EL2.TEA which controls to
->> route synchronous external aborts to EL2, and adds a
->> trap control bit HCR_EL2.TERR which controls to
->> trap all Non-secure EL1&0 error record accesses to EL2.
->
-> The bulk of this patch is about trap-and-emulating these ERR registers, but
-> that's not reflected in the title:
->> KVM: arm64: Emulate RAS error registers and set HCR_EL2's TERR & TEA
->
->
->> This patch enables the two bits for the guest OS.
->> when an synchronous abort is generated in the guest OS,
->> it will trap to EL3 firmware, EL3 firmware will check the
->
-> *buzz*
-> This depends on SCR_EL3.EA, which this patch doesn't touch and the
-> normal-world
-> can't even know about. This is what your system does, the commit message
-> should
-> be about the change to Linux.
->
-> (I've said this before)
+Hi James/Marc/Christoffer,
 
-Thanks for the point out, I make this series in a hurry(you are
-waiting this patch), forget to check again your comments before.
+  As we discuss below solution:
+When guest happen SEA/SEI, KVM calls memory_failure() to send an asynchronous SIGBUS signal(BUS_MCEERR_AO) to QEMU, and make this address to poisoned.
+after QEMU receive this BUS_MCEERR_AO, it will record this address to CPER and notify guest. When guest happen stage2 page fault, KVM send a synchronous SIGBUS BUS_MCEERR_AR
+to QEMU, and QEMU also record CPER and immediately inject SEA abort.
 
->
->
->> HCR_EL2.TEA value to decide to jump to hypervisor or host
->> OS. Enabling HCR_EL2.TERR makes error record access
->> from guest trap to EL2.
->>
->> Add some minimal emulation for RAS-Error-Record registers.
->> In the emulation, ERRIDR_EL1 and ERRSELR_EL1 are zero.
->> Then, the others ERX* registers are RAZ/WI.
->
->> diff --git a/arch/arm64/include/asm/kvm_emulate.h
->> b/arch/arm64/include/asm/kvm_emulate.h
->> index fe39e68..47983db 100644
->> --- a/arch/arm64/include/asm/kvm_emulate.h
->> +++ b/arch/arm64/include/asm/kvm_emulate.h
->> @@ -47,6 +47,13 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu
->> *vcpu)
->>  	vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS;
->>  	if (is_kernel_in_hyp_mode())
->>  		vcpu->arch.hcr_el2 |= HCR_E2H;
->> +	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN)) {
->
-> This ARM64_HAS_RAS_EXTN isn't in mainline, nor is it added by your series.
-> I
-> know where it comes from, but other reviewers may not. If you have
-> dependencies
-> on another series, please call them out in the cover letter.
+But this solution, still have some problems.
 
-yes, thanks for the point out.
+1. In some situation, For RAS, when happen SEA, hardware cannot provide an error physical address to software instead it can only provide virtual address in FAR_ELx, 
+This is to say, firmware cannot provide physical error address, but provided the virtual address in the FAR_ELx.
+so BIOS cannot record this address to APEI table. In this case, when firmware Jump to hypervisor, hypervisor cannot call memory_failure(), 
+now only the physical address is recorded and valid, APEI driver will call the memory_failure()), 
+in this case, host will not send SIGBUS to QEMU. So guest cannot know there is SEA happen.
+At least there is such issue in Huawei's platform (cannot provide PA for RAS firmware-first, only can provide VA in FAR_ELx)
 
->
-> This is the first cpus_have_const_cap() user in this header file, it
-> probably needs:
-> #include <asm/cpufeature.h>
+2. if there is SEA/SEI, only deliver SIGBUS to notify QEMU. This information is limit.
+ This SIGBUS can only provide an address and si_code(BUS_MCEERR_AO/ BUS_MCEERR_AR), nothing else.
+ if QEMU record CPER and inject SEA/specify ESR, it may needs to know more information.
+For example, if it injects SEA, it needs so setup many registers for guest, such as FAR_EL1. If sets it, it needs to know FAR_EL2.
+ But QEMU cannot know this information to setup it if KVM cannot pass more fault info to QEMU.
+ Of cause, we can identify the guest FAR_El1 register to invalid. But some time, guest needs to know it in the situation that host cannot provide the PA.
 
-OK
-
->
->
->> +		/* route synchronous external abort exceptions to EL2 */
->> +		vcpu->arch.hcr_el2 |= HCR_TEA;
->> +		/* trap error record accesses */
->> +		vcpu->arch.hcr_el2 |= HCR_TERR;
->> +	}
->> +
->>  	if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features))
->>  		vcpu->arch.hcr_el2 &= ~HCR_RW;
->>  }
->> diff --git a/arch/arm64/include/asm/kvm_host.h
->> b/arch/arm64/include/asm/kvm_host.h
->> index d686300..af55b3bc 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -105,6 +105,8 @@ enum vcpu_sysreg {
->>  	TTBR1_EL1,	/* Translation Table Base Register 1 */
->>  	TCR_EL1,	/* Translation Control Register */
->>  	ESR_EL1,	/* Exception Syndrome Register */
->
->> +	ERRIDR_EL1,     /* Error Record ID Register */
->
-> Page 39 of [0]: 'ERRIDR_EL1 is a 64-bit read-only ...'.
-
-yes, it is read-only.
-
->
->
->> +	ERRSELR_EL1,    /* Error Record Select Register */
->
-> We're emulating these as RAZ/WI, do we really need to allocate
-> vcpu->arch.ctxt.sys_regs space for them? If we always return 0 for ERRIDR,
-> then
-> we don't need to keep ERRSELR as 'the value read back [..] is UNKNOWN'.
-
-https://lists.cs.columbia.edu/pipermail/kvmarm/2017-September/027176.html
-
-" 'If ERRSELR_EL1.SEL is
-[>=]  ERRIDR_EL1.NUM' that makes the ERX* registers RAZ/WI"
-
-This is because I want to make above simulation as you suggested, if
-want to make above simulation, it needs set "vcpu->arch.ctxt.sys_regs"
-to 0, instead of reading from system register.
-
-so need a space to store it
-
->
-> I think we only need space for these once their value needs to be migrated,
-> user-space doesn't need to know they exist until then.
->
->
->>  	AFSR0_EL1,	/* Auxiliary Fault Status Register 0 */
->>  	AFSR1_EL1,	/* Auxiliary Fault Status Register 1 */
->>  	FAR_EL1,	/* Fault Address Register */
->
->> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index 2e070d3..a74617b 100644
->> --- a/arch/arm64/kvm/sys_regs.c
->> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -775,6 +775,36 @@ static bool access_pmovs(struct kvm_vcpu *vcpu,
->> struct sys_reg_params *p,
->>  	return true;
->>  }
->>
->> +static bool access_error_reg(struct kvm_vcpu *vcpu, struct sys_reg_params
->> *p,
->> +			 const struct sys_reg_desc *r)
->> +{
->> +	/* accessing ERRIDR_EL1 */
->> +	if (r->CRm == 3 && r->Op2 == 0) {
->> +		if (p->is_write)
->> +			vcpu_sys_reg(vcpu, ERRIDR_EL1) = 0;
->
-> As above, this register is read-only.
-
-yes, it is my mistake.
-
->
->
->> +		return trap_raz_wi(vcpu, p, r);
->
-> If we can get rid of the vcpu storage this just becomes trap_raz_wi() .
-
-yes
-
->
->
->> +	}
->> +
->> +	/* accessing ERRSELR_EL1 */
->> +	if (r->CRm == 3 && r->Op2 == 1) {
->> +		if (p->is_write)
->> +			vcpu_sys_reg(vcpu, ERRSELR_EL1) = 0;
->> +
->> +		return trap_raz_wi(vcpu, p, r);
->> +	}
->
-> Same here.
->
->
->> +
->> +	/*
->> +	 * If ERRSELR_EL1.SEL is greater than or equal to ERRIDR_EL1.NUM,
->> +	 * the ERX* registers are RAZ/WI.
->> +	 */
->> +	if ((vcpu_sys_reg(vcpu, ERRSELR_EL1) & 0xff) >=
->> +			(vcpu_sys_reg(vcpu, ERRIDR_EL1) && 0xff))
->> +		return trap_raz_wi(vcpu, p, r);
->
-> The trick here is ERRIDR_EL1 is read only, KVM can choose how many records
-> it
-> emulates. Let's pick zero:
-
-yes, if it is read only, just pick zero.
-
-
->> Zero indicates no records can be accessed through the Error Record System
->> registers.
->
-> Which lets us collapse this entire function down to trap_raz_wi().
->
->
-> I agree we will need this code once we need to allow user-space to populate
-> values for these registers. (and I bet no-one will want to do that until we
-> get
-> kernel-first support)
->
-
-yes.
-
->
->> +	return true;
->> +}
->> +
->>  static bool access_pmswinc(struct kvm_vcpu *vcpu, struct sys_reg_params
->> *p,
->>  			   const struct sys_reg_desc *r)
->>  {
->> @@ -953,6 +983,16 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->>  	{ SYS_DESC(SYS_AFSR0_EL1), access_vm_reg, reset_unknown, AFSR0_EL1 },
->>  	{ SYS_DESC(SYS_AFSR1_EL1), access_vm_reg, reset_unknown, AFSR1_EL1 },
->>  	{ SYS_DESC(SYS_ESR_EL1), access_vm_reg, reset_unknown, ESR_EL1 },
->> +
->> +	{ SYS_DESC(SYS_ERRIDR_EL1), access_error_reg, reset_val, ERRIDR_EL1, 0
->> },
->> +	{ SYS_DESC(SYS_ERRSELR_EL1), access_error_reg, reset_val, ERRSELR_EL1, 0
->> },
->> +	{ SYS_DESC(SYS_ERXFR_EL1), access_error_reg },
->> +	{ SYS_DESC(SYS_ERXCTLR_EL1), access_error_reg },
->> +	{ SYS_DESC(SYS_ERXSTATUS_EL1), access_error_reg },
->> +	{ SYS_DESC(SYS_ERXADDR_EL1), access_error_reg },
->> +	{ SYS_DESC(SYS_ERXMISC0_EL1), access_error_reg },
->> +	{ SYS_DESC(SYS_ERXMISC1_EL1), access_error_reg },
->
-> Why can't we just make all these trap_raz_wi()?
-
-https://lists.cs.columbia.edu/pipermail/kvmarm/2017-September/027176.html
-
-you ever have below suggestion, so use a function "access_error_reg" to do it.
-'If ERRSELR_EL1.SEL is
-[>=]  ERRIDR_EL1.NUM' that makes the ERX* registers RAZ/WI too.
-
-make all  to  trap_raz_wi() is simple.
-
->
->
->>  	{ SYS_DESC(SYS_FAR_EL1), access_vm_reg, reset_unknown, FAR_EL1 },
->>  	{ SYS_DESC(SYS_PAR_EL1), NULL, reset_unknown, PAR_EL1 },
->
->
-> I'll make these changes and then repost this as part of the RAS+IESB series
-> it
-> depends on.
-
-Ok,  thanks
-
->
->
-> Thanks!
->
-> James
->
->
-> [0]
-> https://static.docs.arm.com/ddi0587/a/RAS%20Extension-release%20candidate_march_29.pdf
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
->
+3. For SEI, the address is invalid, so in some platform, firmware will not record this AP. At least in HUAWEI's platform, firmware will not record it.
+  we cannot always think that all platform can record PA for RAS, sometime it may use VA(in FAR_ELx).
+  For SEI, if the address is not recorded, then the memory_failure() will be not called. So guest will not know it happens SEI. 
