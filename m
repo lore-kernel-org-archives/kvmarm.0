@@ -1,25 +1,25 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v4 02/20] arm64: Implement arch_counter_get_cntpct to read the
- physical counter
-Date: Fri, 20 Oct 2017 13:49:21 +0200
-Message-ID: <20171020114939.12554-3-christoffer.dall@linaro.org>
+Subject: [PATCH v4 03/20] arm64: Use physical counter for in-kernel reads when
+ booted in EL2
+Date: Fri, 20 Oct 2017 13:49:22 +0200
+Message-ID: <20171020114939.12554-4-christoffer.dall@linaro.org>
 References: <20171020114939.12554-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EE5FF49D1A
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Oct 2017 07:48:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F40E949D19
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Oct 2017 07:48:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lR70O30dBG-l for <kvmarm@lists.cs.columbia.edu>;
- Fri, 20 Oct 2017 07:48:40 -0400 (EDT)
-Received: from mail-wm0-f66.google.com (mail-wm0-f66.google.com [74.125.82.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 37AF949D20
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Oct 2017 07:48:39 -0400 (EDT)
-Received: by mail-wm0-f66.google.com with SMTP id l68so21954411wmd.5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Oct 2017 04:49:45 -0700 (PDT)
+ with ESMTP id lq6vcpIo7XrA for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 20 Oct 2017 07:48:41 -0400 (EDT)
+Received: from mail-wm0-f65.google.com (mail-wm0-f65.google.com [74.125.82.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E9EFD49D1B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Oct 2017 07:48:40 -0400 (EDT)
+Received: by mail-wm0-f65.google.com with SMTP id p75so2266985wmg.3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Oct 2017 04:49:47 -0700 (PDT)
 In-Reply-To: <20171020114939.12554-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,125 +31,115 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
+Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As we are about to use the physical counter on arm64 systems that have
-KVM support, implement arch_counter_get_cntpct() and the associated
-errata workaround functionality for stable timer reads.
+From: Christoffer Dall <cdall@linaro.org>
 
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Using the physical counter allows KVM to retain the offset between the
+virtual and physical counter as long as it is actively running a VCPU.
+
+As soon as a VCPU is released, another thread is scheduled or we start
+running userspace applications, we reset the offset to 0, so that
+userspace accessing the virtual timer can still read the virtual counter
+and get the same view of time as the kernel.
+
+This opens up potential improvements for KVM performance, but we have to
+make a few adjustments to preserve system consistency.
+
+Currently get_cycles() is hardwired to arch_counter_get_cntvct() on
+arm64, but as we move to using the physical timer for the in-kernel
+time-keeping on systems that boot in EL2, we should use the same counter
+for get_cycles() as for other in-kernel timekeeping operations.
+
+Similarly, implementations of arch_timer_set_next_event_phys() is
+modified to use the counter specific to the timer being programmed.
+
+VHE kernels or kernels continuing to use the virtual timer are
+unaffected.
+
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
 
 Notes:
     Changes since v3:
-     - Factored out this change into a separate patch
+     - Consolidated the change of the arch_timer_read_counter function
+       pointer and the change to get_cycles().  A new patch was added prior
+       to this one to support stable reads of the physical counter including
+       errata workaround.
+    
+     - Added !is_hyp_mode_available() clause to ARM64 systems when selecting
+       the in-kernel counter, so that arm64 kernels not booting in EL2 remain
+       unmodified.
+    
+     - Added EXPORT_SYMBOL_GPL(arch_timer_read_counter) to support building
+       modules that reference get_cycles() and thereby
+       arch_timer_read_counter.
 
- arch/arm64/include/asm/arch_timer.h  |  8 +++-----
- drivers/clocksource/arm_arch_timer.c | 23 +++++++++++++++++++++++
- 2 files changed, 26 insertions(+), 5 deletions(-)
+ arch/arm64/include/asm/timex.h       |  2 +-
+ drivers/clocksource/arm_arch_timer.c | 12 ++++++++----
+ 2 files changed, 9 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/include/asm/arch_timer.h b/arch/arm64/include/asm/arch_timer.h
-index a652ce0a5cb2..04275de614db 100644
---- a/arch/arm64/include/asm/arch_timer.h
-+++ b/arch/arm64/include/asm/arch_timer.h
-@@ -52,6 +52,7 @@ struct arch_timer_erratum_workaround {
- 	const char *desc;
- 	u32 (*read_cntp_tval_el0)(void);
- 	u32 (*read_cntv_tval_el0)(void);
-+	u64 (*read_cntpct_el0)(void);
- 	u64 (*read_cntvct_el0)(void);
- 	int (*set_next_event_phys)(unsigned long, struct clock_event_device *);
- 	int (*set_next_event_virt)(unsigned long, struct clock_event_device *);
-@@ -148,11 +149,8 @@ static inline void arch_timer_set_cntkctl(u32 cntkctl)
+diff --git a/arch/arm64/include/asm/timex.h b/arch/arm64/include/asm/timex.h
+index 81a076eb37fa..9ad60bae5c8d 100644
+--- a/arch/arm64/include/asm/timex.h
++++ b/arch/arm64/include/asm/timex.h
+@@ -22,7 +22,7 @@
+  * Use the current timer as a cycle counter since this is what we use for
+  * the delay loop.
+  */
+-#define get_cycles()	arch_counter_get_cntvct()
++#define get_cycles()	arch_timer_read_counter()
  
- static inline u64 arch_counter_get_cntpct(void)
- {
--	/*
--	 * AArch64 kernel and user space mandate the use of CNTVCT.
--	 */
--	BUG();
--	return 0;
-+	isb();
-+	return arch_timer_reg_read_stable(cntpct_el0);
- }
+ #include <asm-generic/timex.h>
  
- static inline u64 arch_counter_get_cntvct(void)
 diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
-index fd4b7f684bd0..ff8f8a177156 100644
+index ff8f8a177156..061476e92db7 100644
 --- a/drivers/clocksource/arm_arch_timer.c
 +++ b/drivers/clocksource/arm_arch_timer.c
-@@ -217,6 +217,11 @@ static u32 notrace fsl_a008585_read_cntv_tval_el0(void)
- 	return __fsl_a008585_read_reg(cntv_tval_el0);
+@@ -158,6 +158,7 @@ u32 arch_timer_reg_read(int access, enum arch_timer_reg reg,
+  * if we don't have the cp15 accessors we won't have a problem.
+  */
+ u64 (*arch_timer_read_counter)(void) = arch_counter_get_cntvct;
++EXPORT_SYMBOL_GPL(arch_timer_read_counter);
+ 
+ static u64 arch_counter_read(struct clocksource *cs)
+ {
+@@ -329,16 +330,19 @@ static void erratum_set_next_event_tval_generic(const int access, unsigned long
+ 						struct clock_event_device *clk)
+ {
+ 	unsigned long ctrl;
+-	u64 cval = evt + arch_counter_get_cntvct();
++	u64 cval;
+ 
+ 	ctrl = arch_timer_reg_read(access, ARCH_TIMER_REG_CTRL, clk);
+ 	ctrl |= ARCH_TIMER_CTRL_ENABLE;
+ 	ctrl &= ~ARCH_TIMER_CTRL_IT_MASK;
+ 
+-	if (access == ARCH_TIMER_PHYS_ACCESS)
++	if (access == ARCH_TIMER_PHYS_ACCESS) {
++		cval = evt + arch_counter_get_cntpct();
+ 		write_sysreg(cval, cntp_cval_el0);
+-	else
++	} else {
++		cval = evt + arch_counter_get_cntvct();
+ 		write_sysreg(cval, cntv_cval_el0);
++	}
+ 
+ 	arch_timer_reg_write(access, ARCH_TIMER_REG_CTRL, ctrl, clk);
  }
+@@ -913,7 +917,7 @@ static void __init arch_counter_register(unsigned type)
  
-+static u64 notrace fsl_a008585_read_cntpct_el0(void)
-+{
-+	return __fsl_a008585_read_reg(cntpct_el0);
-+}
-+
- static u64 notrace fsl_a008585_read_cntvct_el0(void)
- {
- 	return __fsl_a008585_read_reg(cntvct_el0);
-@@ -258,6 +263,11 @@ static u32 notrace hisi_161010101_read_cntv_tval_el0(void)
- 	return __hisi_161010101_read_reg(cntv_tval_el0);
- }
- 
-+static u64 notrace hisi_161010101_read_cntpct_el0(void)
-+{
-+	return __hisi_161010101_read_reg(cntpct_el0);
-+}
-+
- static u64 notrace hisi_161010101_read_cntvct_el0(void)
- {
- 	return __hisi_161010101_read_reg(cntvct_el0);
-@@ -288,6 +298,15 @@ static struct ate_acpi_oem_info hisi_161010101_oem_info[] = {
- #endif
- 
- #ifdef CONFIG_ARM64_ERRATUM_858921
-+static u64 notrace arm64_858921_read_cntpct_el0(void)
-+{
-+	u64 old, new;
-+
-+	old = read_sysreg(cntpct_el0);
-+	new = read_sysreg(cntpct_el0);
-+	return (((old ^ new) >> 32) & 1) ? old : new;
-+}
-+
- static u64 notrace arm64_858921_read_cntvct_el0(void)
- {
- 	u64 old, new;
-@@ -346,6 +365,7 @@ static const struct arch_timer_erratum_workaround ool_workarounds[] = {
- 		.desc = "Freescale erratum a005858",
- 		.read_cntp_tval_el0 = fsl_a008585_read_cntp_tval_el0,
- 		.read_cntv_tval_el0 = fsl_a008585_read_cntv_tval_el0,
-+		.read_cntpct_el0 = fsl_a008585_read_cntpct_el0,
- 		.read_cntvct_el0 = fsl_a008585_read_cntvct_el0,
- 		.set_next_event_phys = erratum_set_next_event_tval_phys,
- 		.set_next_event_virt = erratum_set_next_event_tval_virt,
-@@ -358,6 +378,7 @@ static const struct arch_timer_erratum_workaround ool_workarounds[] = {
- 		.desc = "HiSilicon erratum 161010101",
- 		.read_cntp_tval_el0 = hisi_161010101_read_cntp_tval_el0,
- 		.read_cntv_tval_el0 = hisi_161010101_read_cntv_tval_el0,
-+		.read_cntpct_el0 = hisi_161010101_read_cntpct_el0,
- 		.read_cntvct_el0 = hisi_161010101_read_cntvct_el0,
- 		.set_next_event_phys = erratum_set_next_event_tval_phys,
- 		.set_next_event_virt = erratum_set_next_event_tval_virt,
-@@ -368,6 +389,7 @@ static const struct arch_timer_erratum_workaround ool_workarounds[] = {
- 		.desc = "HiSilicon erratum 161010101",
- 		.read_cntp_tval_el0 = hisi_161010101_read_cntp_tval_el0,
- 		.read_cntv_tval_el0 = hisi_161010101_read_cntv_tval_el0,
-+		.read_cntpct_el0 = hisi_161010101_read_cntpct_el0,
- 		.read_cntvct_el0 = hisi_161010101_read_cntvct_el0,
- 		.set_next_event_phys = erratum_set_next_event_tval_phys,
- 		.set_next_event_virt = erratum_set_next_event_tval_virt,
-@@ -378,6 +400,7 @@ static const struct arch_timer_erratum_workaround ool_workarounds[] = {
- 		.match_type = ate_match_local_cap_id,
- 		.id = (void *)ARM64_WORKAROUND_858921,
- 		.desc = "ARM erratum 858921",
-+		.read_cntpct_el0 = arm64_858921_read_cntpct_el0,
- 		.read_cntvct_el0 = arm64_858921_read_cntvct_el0,
- 	},
- #endif
+ 	/* Register the CP15 based counter if we have one */
+ 	if (type & ARCH_TIMER_TYPE_CP15) {
+-		if (IS_ENABLED(CONFIG_ARM64) ||
++		if ((IS_ENABLED(CONFIG_ARM64) && !is_hyp_mode_available()) ||
+ 		    arch_timer_uses_ppi == ARCH_TIMER_VIRT_PPI)
+ 			arch_timer_read_counter = arch_counter_get_cntvct;
+ 		else
 -- 
 2.14.2
