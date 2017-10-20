@@ -1,97 +1,164 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 0/8] arm/arm64: KVM: limit icache invalidation to prefetch aborts
-Date: Fri, 20 Oct 2017 16:48:56 +0100
-Message-ID: <20171020154904.31427-1-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
-Sender: kvm-owner@vger.kernel.org
+Subject: [PATCH v2 6/8] KVM: arm/arm64: Preserve Exec permission across R/W
+ permission faults
+Date: Fri, 20 Oct 2017 16:49:02 +0100
+Message-ID: <20171020154904.31427-7-marc.zyngier@arm.com>
+References: <20171020154904.31427-1-marc.zyngier@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EAA9E49D3F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Oct 2017 11:48:21 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id fmATUexYlyNf for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 20 Oct 2017 11:48:20 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BCEB49D48
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Oct 2017 11:48:20 -0400 (EDT)
+In-Reply-To: <20171020154904.31427-1-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-It was recently reported that on a VM restore, we seem to spend a
-disproportionate amount of time invalidation the icache. This is
-partially due to some HW behaviour, but also because we're being a bit
-dumb and are invalidating the icache for every page we map at S2, even
-if that on a data access.
+So far, we loose the Exec property whenever we take permission
+faults, as we always reconstruct the PTE/PMD from scratch. This
+can be counter productive as we can end-up with the following
+fault sequence:
 
-The slightly better way of doing this is to mark the pages XN at S2,
-and wait for the the guest to execute something in that page, at which
-point we perform the invalidation. As it is likely that there is a lot
-less instruction than data, we win (or so we hope).
+	X -> RO -> ROX -> RW -> RWX
 
-We also take this opportunity to drop the extra dcache clean to the
-PoU which is pretty useless, as we already clean all the way to the
-PoC...
+Instead, we can lookup the existing PTE/PMD and clear the XN bit in the
+new entry if it was already cleared in the old one, leadig to a much
+nicer fault sequence:
 
-Running a bare metal test that touches 1GB of memory (using a 4kB
-stride) leads to the following results on Seattle:
+	X -> ROX -> RWX
 
-4.13:
-do_fault_read.bin:       0.565885992 seconds time elapsed
-do_fault_write.bin:       0.738296337 seconds time elapsed
-do_fault_read_write.bin:       1.241812231 seconds time elapsed
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm/include/asm/kvm_mmu.h   | 10 ++++++++++
+ arch/arm64/include/asm/kvm_mmu.h | 10 ++++++++++
+ virt/kvm/arm/mmu.c               | 27 +++++++++++++++++++++++++++
+ 3 files changed, 47 insertions(+)
 
-4.14-rc3+patches:
-do_fault_read.bin:       0.244961803 seconds time elapsed
-do_fault_write.bin:       0.422740092 seconds time elapsed
-do_fault_read_write.bin:       0.643402470 seconds time elapsed
-
-We're almost halving the time of something that more or less looks
-like a restore operation. Some larger systems will show much bigger
-benefits as they become less impacted by the icache invalidation
-(which is broadcast in the inner shareable domain). I've tried to
-measure the impact on a VM boot in order to assess the impact of
-taking an extra permission fault, but found that any difference was
-simply noise.
-
-I've also given it a test run on both Cubietruck and Jetson-TK1.
-
-Tests are archived here:
-https://git.kernel.org/pub/scm/linux/kernel/git/maz/kvm-ws-tests.git/
-
-I'd value some additional test results on HW I don't have access to.
-
-* From v1:
-  - Some function renaming (coherent->clean/invalidate)
-  - Made the arm64 icache invalidation a macro that's now used in
-    two places
-  - Fixed BTB flushing on 32bit
-  - Added stage2_is_exec as a predicate for XN being absent from the
-    entry
-  - Dropped patch #10 which was both useless and broken, and patch #9
-    that thus became useless
-  - Tried to measure the impact on kernel boot time and failed to see
-    any difference
-
-Marc Zyngier (8):
-  arm64: KVM: Add invalidate_icache_range helper
-  arm: KVM: Add optimized PIPT icache flushing
-  arm64: KVM: PTE/PMD S2 XN bit definition
-  KVM: arm/arm64: Limit icache invalidation to prefetch aborts
-  KVM: arm/arm64: Only clean the dcache on translation fault
-  KVM: arm/arm64: Preserve Exec permission across R/W permission faults
-  KVM: arm/arm64: Drop vcpu parameter from guest cache maintenance
-    operartions
-  KVM: arm/arm64: Detangle kvm_mmu.h from kvm_hyp.h
-
- arch/arm/include/asm/kvm_hyp.h         |  3 +-
- arch/arm/include/asm/kvm_mmu.h         | 61 +++++++++++++++++++++++++++-----
- arch/arm/include/asm/pgtable.h         |  4 +--
- arch/arm/kvm/hyp/switch.c              |  1 +
- arch/arm/kvm/hyp/tlb.c                 |  1 +
- arch/arm64/include/asm/assembler.h     | 26 ++++++++++++++
- arch/arm64/include/asm/cacheflush.h    |  8 +++++
- arch/arm64/include/asm/kvm_hyp.h       |  1 -
- arch/arm64/include/asm/kvm_mmu.h       | 33 ++++++++++++++----
- arch/arm64/include/asm/pgtable-hwdef.h |  2 ++
- arch/arm64/include/asm/pgtable-prot.h  |  4 +--
- arch/arm64/kvm/hyp/debug-sr.c          |  1 +
- arch/arm64/kvm/hyp/switch.c            |  1 +
- arch/arm64/kvm/hyp/tlb.c               |  1 +
- arch/arm64/mm/cache.S                  | 26 ++++++++------
- virt/kvm/arm/hyp/vgic-v2-sr.c          |  1 +
- virt/kvm/arm/mmu.c                     | 64 +++++++++++++++++++++++++++-------
- 17 files changed, 195 insertions(+), 43 deletions(-)
-
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index 4d7a54cbb3ab..aab64fe52146 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -107,6 +107,11 @@ static inline bool kvm_s2pte_readonly(pte_t *pte)
+ 	return (pte_val(*pte) & L_PTE_S2_RDWR) == L_PTE_S2_RDONLY;
+ }
+ 
++static inline bool kvm_s2pte_exec(pte_t *pte)
++{
++	return !(pte_val(*pte) & L_PTE_XN);
++}
++
+ static inline void kvm_set_s2pmd_readonly(pmd_t *pmd)
+ {
+ 	pmd_val(*pmd) = (pmd_val(*pmd) & ~L_PMD_S2_RDWR) | L_PMD_S2_RDONLY;
+@@ -117,6 +122,11 @@ static inline bool kvm_s2pmd_readonly(pmd_t *pmd)
+ 	return (pmd_val(*pmd) & L_PMD_S2_RDWR) == L_PMD_S2_RDONLY;
+ }
+ 
++static inline bool kvm_s2pmd_exec(pmd_t *pmd)
++{
++	return !(pmd_val(*pmd) & PMD_SECT_XN);
++}
++
+ static inline bool kvm_page_empty(void *ptr)
+ {
+ 	struct page *ptr_page = virt_to_page(ptr);
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 1e1b20cb348f..126abefffe7f 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -203,6 +203,11 @@ static inline bool kvm_s2pte_readonly(pte_t *pte)
+ 	return (pte_val(*pte) & PTE_S2_RDWR) == PTE_S2_RDONLY;
+ }
+ 
++static inline bool kvm_s2pte_exec(pte_t *pte)
++{
++	return !(pte_val(*pte) & PTE_S2_XN);
++}
++
+ static inline void kvm_set_s2pmd_readonly(pmd_t *pmd)
+ {
+ 	kvm_set_s2pte_readonly((pte_t *)pmd);
+@@ -213,6 +218,11 @@ static inline bool kvm_s2pmd_readonly(pmd_t *pmd)
+ 	return kvm_s2pte_readonly((pte_t *)pmd);
+ }
+ 
++static inline bool kvm_s2pmd_exec(pmd_t *pmd)
++{
++	return !(pmd_val(*pmd) & PMD_S2_XN);
++}
++
+ static inline bool kvm_page_empty(void *ptr)
+ {
+ 	struct page *ptr_page = virt_to_page(ptr);
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index f956efbd933d..b83b5a8442bb 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -926,6 +926,25 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
+ 	return 0;
+ }
+ 
++static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr)
++{
++	pmd_t *pmdp;
++	pte_t *ptep;
++
++	pmdp = stage2_get_pmd(kvm, NULL, addr);
++	if (!pmdp || pmd_none(*pmdp) || !pmd_present(*pmdp))
++		return false;
++
++	if (pmd_thp_or_huge(*pmdp))
++		return kvm_s2pmd_exec(pmdp);
++
++	ptep = pte_offset_kernel(pmdp, addr);
++	if (!ptep || pte_none(*ptep) || !pte_present(*ptep))
++		return false;
++
++	return kvm_s2pte_exec(ptep);
++}
++
+ static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
+ 			  phys_addr_t addr, const pte_t *new_pte,
+ 			  unsigned long flags)
+@@ -1407,6 +1426,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		if (exec_fault) {
+ 			new_pmd = kvm_s2pmd_mkexec(new_pmd);
+ 			invalidate_icache_guest_page(vcpu, pfn, PMD_SIZE);
++		} else if (fault_status == FSC_PERM) {
++			/* Preserve execute if XN was already cleared */
++			if (stage2_is_exec(kvm, fault_ipa))
++				new_pmd = kvm_s2pmd_mkexec(new_pmd);
+ 		}
+ 
+ 		ret = stage2_set_pmd_huge(kvm, memcache, fault_ipa, &new_pmd);
+@@ -1425,6 +1448,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		if (exec_fault) {
+ 			new_pte = kvm_s2pte_mkexec(new_pte);
+ 			invalidate_icache_guest_page(vcpu, pfn, PAGE_SIZE);
++		} else if (fault_status == FSC_PERM) {
++			/* Preserve execute if XN was already cleared */
++			if (stage2_is_exec(kvm, fault_ipa))
++				new_pte = kvm_s2pte_mkexec(new_pte);
+ 		}
+ 
+ 		ret = stage2_set_pte(kvm, memcache, fault_ipa, &new_pte, flags);
 -- 
 2.14.1
