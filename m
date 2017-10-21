@@ -1,82 +1,87 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v4 12/20] genirq: Document vcpu_info usage for
- percpu_devid interrupts
-Date: Sat, 21 Oct 2017 17:30:16 +0200
-Message-ID: <20171021153016.GG12618@cbox>
-References: <20171020114939.12554-1-christoffer.dall@linaro.org>
- <20171020114939.12554-13-christoffer.dall@linaro.org>
- <alpine.DEB.2.20.1710201354590.2908@nanos>
- <20171021142923.GA12618@cbox>
- <alpine.DEB.2.20.1710211653180.5790@nanos>
+Subject: Re: [PATCH v4 01/11] KVM: arm/arm64: vgic-its: fix return value for
+ device table restore
+Date: Sat, 21 Oct 2017 17:42:03 +0200
+Message-ID: <20171021154203.GH12618@cbox>
+References: <1508224209-15366-1-git-send-email-eric.auger@redhat.com>
+ <1508224209-15366-2-git-send-email-eric.auger@redhat.com>
+ <20171017214030.GA8326@lvm>
+ <39442c3f-5c71-ccd5-a976-db3c2830e2c9@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.20.1710211653180.5790@nanos>
-Sender: kvm-owner@vger.kernel.org
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Shih-Wei Li <shihwei@cs.columbia.edu>
+In-Reply-To: <39442c3f-5c71-ccd5-a976-db3c2830e2c9@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Auger Eric <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, peter.maydell@linaro.org, andre.przywara@arm.com, wanghaibin.wang@huawei.com, wu.wubin@huawei.com, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sat, Oct 21, 2017 at 04:55:01PM +0200, Thomas Gleixner wrote:
-> On Sat, 21 Oct 2017, Christoffer Dall wrote:
+On Sat, Oct 21, 2017 at 04:40:00PM +0200, Auger Eric wrote:
+> Hi Christoffer,
 > 
-> > On Fri, Oct 20, 2017 at 01:56:16PM +0200, Thomas Gleixner wrote:
-> > > On Fri, 20 Oct 2017, Christoffer Dall wrote:
-> > > 
-> > > Please Cc lkml when changing genirq core code.
-> > > 
+> On 17/10/2017 23:40, Christoffer Dall wrote:
+> > On Tue, Oct 17, 2017 at 09:09:59AM +0200, Eric Auger wrote:
+> >> AT the moment if ITT only contains invalid entries,
+> >> vgic_its_restore_itt returns 1 and this is considered as
+> >> an an error in vgic_its_restore_dte.
+> >>
+> >> Also in case the device table only contains invalid entries,
+> >> the table restore fails and this is not correct.
+> >>
+> >> This patch fully revisits the errror handling while fixing those
+> >> 2 bugs.
+> >>
+> >> - entry_fn_t now takes a valid output paraleter
 > > 
-> > ok, will do so in the future.
+> >                                         parameter
 > > 
-> > > > It is currently unclear how to set the VCPU affinity for a percpu_devid
-> > > > interrupt , since the Linux irq_data structure describes the state for
-> > > > multiple interrupts, one for each physical CPU on the system.  Since
-> > > > each such interrupt can be associated with different VCPUs or none at
-> > > > all, associating a single VCPU state with such an interrupt does not
-> > > > capture the necessary semantics.
-> > > > 
-> > > > The implementers of irq_set_affinity are the Intel and AMD IOMMUs, and
-> > > > the ARM GIC irqchip.  The Intel and AMD callers do not appear to use
-> > > > percpu_devid interrupts, and the ARM GIC implementation only checks the
-> > > > pointer against NULL vs. non-NULL.
-> > > > 
-> > > > Therefore, simply update the function documentation to explain the
-> > > > expected use in the context of percpu_devid interrupts, allowing future
-> > > > changes or additions to irqchip implementers to do the right thing.
-> > > > 
-> > > > This allows us to set the VCPU affinity for the virtual timer interrupt
-> > > > in KVM/ARM, which is a percpu_devid (PPI) interrupt.
-> > > 
-> > > I have a hard time to understand how adding the comment allows you to set
-> > > VCPU affinity ....
-> > > 
-> > 
-> > Obviously everything already works without adding the comment, however
-> > it is not entirely clear how to use the vcpu_into for percpu_devid
-> > interrupts, and this patch aims to make that clear, as it is the first
-> > user of irq_set_vcpu_affinity for a percpu_devid interrupt which
-> > actually uses the vcpu_info pointer.
-> > 
-> > Would you rather that we did not update the documentation or what do you
-> > suggest?
-> 
-> Documentation is welcome of course. I just want a changelog which is not
-> misleading. i.e. it says:
-> 
->    Update the function documentation .....
-> 
->    This allow us to set ....
-> 
-> Which reads like: Updating the documentation allows us to set ...
+> >> - scan_its_table() now returns <= 0 values and output 2 booleans,
+> >                                                  outputs
+> >>   valid and last.
+> >> - vgic_its_restore_itt() now returns <= 0 values.
+> >> - vgic_its_restore_device_tables() also returns <= 0 values.
+> >>
+> >> With that patch we are able to properly handle the case where
+> >> all data are invalid but we still are able to detect the case
+> >> where a next entry was referenced by some valid entry and
+> >> never found.
+> >>
+> >> Fixes: 57a9a117154c93 (KVM: arm64: vgic-its: Device table save/restore)
+> >> Fixes: eff484e0298da5 (KVM: arm64: vgic-its: ITT save and restore)
+> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> >> Reported-by: wanghaibin <wanghaibin.wang@huawei.com>
+> >>
+> >> ---
+> >>
+> >> need to CC stable
+> >>
+> >> v3 -> v4:
+> >> - set *valid at beginning of handle_l1_dte
+> >>
+> >> v2 -> v3:
+> >> - add comments
+> >> - added valid parameter
+> >> - vgic_its_restore_itt don't return +1 anymore
+> >> - reword the commit message
+> >>
+> >> v1 -> v2:
+> >> - if (ret > 0) ret = 0
+> >> ---
 
-Ah, your comment was regarding the commit message.  That's a fair point.
-How about:
+[...]
 
-  This documents the use of the vcpu_info parameter for percpu_devid
-  interrupts when setting the VCPU affinity for the virtual timer interrupt
-  in KVM/ARM.
+> 
+> Given the number of changes this rework will produce I guess this patch
+> wouldn't be candidate for cc'ed stable. Then shouldn't we consider to
+> first apply the fix proposed by Wanghaibin (cc'ed stable) and then apply
+> the rework in a second and subsequent patch?
+> 
 
+Yes, probably, let's keep the fix small and obviously correct and get
+that in for v4.14 ASAP.
+
+Then we can do rework for v4.15 or later, to clean things up.
 
 Thanks,
 -Christoffer
