@@ -1,72 +1,82 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v2 0/8] arm/arm64: KVM: limit icache invalidation to
- prefetch aborts
-Date: Sat, 21 Oct 2017 17:24:55 +0200
-Message-ID: <20171021152455.GF12618@cbox>
-References: <20171020154904.31427-1-marc.zyngier@arm.com>
+Subject: Re: [PATCH v4 12/20] genirq: Document vcpu_info usage for
+ percpu_devid interrupts
+Date: Sat, 21 Oct 2017 17:30:16 +0200
+Message-ID: <20171021153016.GG12618@cbox>
+References: <20171020114939.12554-1-christoffer.dall@linaro.org>
+ <20171020114939.12554-13-christoffer.dall@linaro.org>
+ <alpine.DEB.2.20.1710201354590.2908@nanos>
+ <20171021142923.GA12618@cbox>
+ <alpine.DEB.2.20.1710211653180.5790@nanos>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20171020154904.31427-1-marc.zyngier@arm.com>
+In-Reply-To: <alpine.DEB.2.20.1710211653180.5790@nanos>
 Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc, Will, Catalain, and Russell,
+On Sat, Oct 21, 2017 at 04:55:01PM +0200, Thomas Gleixner wrote:
+> On Sat, 21 Oct 2017, Christoffer Dall wrote:
+> 
+> > On Fri, Oct 20, 2017 at 01:56:16PM +0200, Thomas Gleixner wrote:
+> > > On Fri, 20 Oct 2017, Christoffer Dall wrote:
+> > > 
+> > > Please Cc lkml when changing genirq core code.
+> > > 
+> > 
+> > ok, will do so in the future.
+> > 
+> > > > It is currently unclear how to set the VCPU affinity for a percpu_devid
+> > > > interrupt , since the Linux irq_data structure describes the state for
+> > > > multiple interrupts, one for each physical CPU on the system.  Since
+> > > > each such interrupt can be associated with different VCPUs or none at
+> > > > all, associating a single VCPU state with such an interrupt does not
+> > > > capture the necessary semantics.
+> > > > 
+> > > > The implementers of irq_set_affinity are the Intel and AMD IOMMUs, and
+> > > > the ARM GIC irqchip.  The Intel and AMD callers do not appear to use
+> > > > percpu_devid interrupts, and the ARM GIC implementation only checks the
+> > > > pointer against NULL vs. non-NULL.
+> > > > 
+> > > > Therefore, simply update the function documentation to explain the
+> > > > expected use in the context of percpu_devid interrupts, allowing future
+> > > > changes or additions to irqchip implementers to do the right thing.
+> > > > 
+> > > > This allows us to set the VCPU affinity for the virtual timer interrupt
+> > > > in KVM/ARM, which is a percpu_devid (PPI) interrupt.
+> > > 
+> > > I have a hard time to understand how adding the comment allows you to set
+> > > VCPU affinity ....
+> > > 
+> > 
+> > Obviously everything already works without adding the comment, however
+> > it is not entirely clear how to use the vcpu_into for percpu_devid
+> > interrupts, and this patch aims to make that clear, as it is the first
+> > user of irq_set_vcpu_affinity for a percpu_devid interrupt which
+> > actually uses the vcpu_info pointer.
+> > 
+> > Would you rather that we did not update the documentation or what do you
+> > suggest?
+> 
+> Documentation is welcome of course. I just want a changelog which is not
+> misleading. i.e. it says:
+> 
+>    Update the function documentation .....
+> 
+>    This allow us to set ....
+> 
+> Which reads like: Updating the documentation allows us to set ...
 
-On Fri, Oct 20, 2017 at 04:48:56PM +0100, Marc Zyngier wrote:
-> It was recently reported that on a VM restore, we seem to spend a
-> disproportionate amount of time invalidation the icache. This is
-> partially due to some HW behaviour, but also because we're being a bit
-> dumb and are invalidating the icache for every page we map at S2, even
-> if that on a data access.
-> 
-> The slightly better way of doing this is to mark the pages XN at S2,
-> and wait for the the guest to execute something in that page, at which
-> point we perform the invalidation. As it is likely that there is a lot
-> less instruction than data, we win (or so we hope).
-> 
-> We also take this opportunity to drop the extra dcache clean to the
-> PoU which is pretty useless, as we already clean all the way to the
-> PoC...
-> 
-> Running a bare metal test that touches 1GB of memory (using a 4kB
-> stride) leads to the following results on Seattle:
-> 
-> 4.13:
-> do_fault_read.bin:       0.565885992 seconds time elapsed
-> do_fault_write.bin:       0.738296337 seconds time elapsed
-> do_fault_read_write.bin:       1.241812231 seconds time elapsed
-> 
-> 4.14-rc3+patches:
-> do_fault_read.bin:       0.244961803 seconds time elapsed
-> do_fault_write.bin:       0.422740092 seconds time elapsed
-> do_fault_read_write.bin:       0.643402470 seconds time elapsed
-> 
-> We're almost halving the time of something that more or less looks
-> like a restore operation. Some larger systems will show much bigger
-> benefits as they become less impacted by the icache invalidation
-> (which is broadcast in the inner shareable domain). I've tried to
-> measure the impact on a VM boot in order to assess the impact of
-> taking an extra permission fault, but found that any difference was
-> simply noise.
-> 
-> I've also given it a test run on both Cubietruck and Jetson-TK1.
-> 
-> Tests are archived here:
-> https://git.kernel.org/pub/scm/linux/kernel/git/maz/kvm-ws-tests.git/
-> 
-> I'd value some additional test results on HW I don't have access to.
+Ah, your comment was regarding the commit message.  That's a fair point.
+How about:
 
-Since these patches are mostly KVM patches I think taking them via the
-KVM tree makes the most sense, but they do touch architecture parts of both
-arm and arm64.  Are you ok with us merging these via the KVM tree, or do
-you prefer some more advanced merge strategy?
+  This documents the use of the vcpu_info parameter for percpu_devid
+  interrupts when setting the VCPU affinity for the virtual timer interrupt
+  in KVM/ARM.
 
-The 32-bit arm change is really tiny, but it would be good to have an
-ack on patch 1 from the arm64 maintainer.
 
 Thanks,
 -Christoffer
