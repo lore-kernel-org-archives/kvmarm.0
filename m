@@ -1,87 +1,120 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v4 01/11] KVM: arm/arm64: vgic-its: fix return value for
- device table restore
-Date: Sat, 21 Oct 2017 17:42:03 +0200
-Message-ID: <20171021154203.GH12618@cbox>
+Subject: Re: [PATCH v4 09/11] KVM: arm/arm64: vgic-its: free caches when
+ GITS_BASER Valid bit is cleared
+Date: Sat, 21 Oct 2017 17:42:34 +0200
+Message-ID: <20171021154234.GI12618@cbox>
 References: <1508224209-15366-1-git-send-email-eric.auger@redhat.com>
- <1508224209-15366-2-git-send-email-eric.auger@redhat.com>
- <20171017214030.GA8326@lvm>
- <39442c3f-5c71-ccd5-a976-db3c2830e2c9@redhat.com>
+ <1508224209-15366-10-git-send-email-eric.auger@redhat.com>
+ <20171017223456.GI8326@lvm>
+ <5845e6bc-52a6-57ef-a5d3-5c5182b19e53@redhat.com>
+ <20171021143149.GB12618@cbox>
+ <fd2f211e-c5dc-9e63-b81a-07a7dc3a5108@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <39442c3f-5c71-ccd5-a976-db3c2830e2c9@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <fd2f211e-c5dc-9e63-b81a-07a7dc3a5108@redhat.com>
+Sender: kvm-owner@vger.kernel.org
 To: Auger Eric <eric.auger@redhat.com>
 Cc: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, peter.maydell@linaro.org, andre.przywara@arm.com, wanghaibin.wang@huawei.com, wu.wubin@huawei.com, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sat, Oct 21, 2017 at 04:40:00PM +0200, Auger Eric wrote:
+On Sat, Oct 21, 2017 at 04:36:22PM +0200, Auger Eric wrote:
 > Hi Christoffer,
 > 
-> On 17/10/2017 23:40, Christoffer Dall wrote:
-> > On Tue, Oct 17, 2017 at 09:09:59AM +0200, Eric Auger wrote:
-> >> AT the moment if ITT only contains invalid entries,
-> >> vgic_its_restore_itt returns 1 and this is considered as
-> >> an an error in vgic_its_restore_dte.
+> On 21/10/2017 16:31, Christoffer Dall wrote:
+> > On Sat, Oct 21, 2017 at 12:13:21PM +0200, Auger Eric wrote:
+> >> Hi Christoffer,
 > >>
-> >> Also in case the device table only contains invalid entries,
-> >> the table restore fails and this is not correct.
+> >> On 18/10/2017 00:34, Christoffer Dall wrote:
+> >>> On Tue, Oct 17, 2017 at 09:10:07AM +0200, Eric Auger wrote:
+> >>>> When the GITS_BASER<n>.Valid gets cleared, the data structures in
+> >>>> guest RAM are not valid anymore. The device, collection
+> >>>> and LPI lists stored in the in-kernel ITS represent the same
+> >>>> information in some form of cache. So let's void the cache.
+> >>>>
+> >>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> >>>>
+> >>>> ---
+> >>>>
+> >>>> v2 -> v3:
+> >>>> - add a comment and clear cache in if block
+> >>>> ---
+> >>>>  virt/kvm/arm/vgic/vgic-its.c | 23 +++++++++++++++++++----
+> >>>>  1 file changed, 19 insertions(+), 4 deletions(-)
+> >>>>
+> >>>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> >>>> index f3f0026f..084239c 100644
+> >>>> --- a/virt/kvm/arm/vgic/vgic-its.c
+> >>>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> >>>> @@ -1471,8 +1471,9 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
+> >>>>  				      unsigned long val)
+> >>>>  {
+> >>>>  	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+> >>>> -	u64 entry_size, device_type;
+> >>>> +	u64 entry_size;
+> >>>>  	u64 reg, *regptr, clearbits = 0;
+> >>>> +	int type;
+> >>>>  
+> >>>>  	/* When GITS_CTLR.Enable is 1, we ignore write accesses. */
+> >>>>  	if (its->enabled)
+> >>>> @@ -1482,12 +1483,12 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
+> >>>>  	case 0:
+> >>>>  		regptr = &its->baser_device_table;
+> >>>>  		entry_size = abi->dte_esz;
+> >>>> -		device_type = GITS_BASER_TYPE_DEVICE;
+> >>>> +		type = GITS_BASER_TYPE_DEVICE;
+> >>>>  		break;
+> >>>>  	case 1:
+> >>>>  		regptr = &its->baser_coll_table;
+> >>>>  		entry_size = abi->cte_esz;
+> >>>> -		device_type = GITS_BASER_TYPE_COLLECTION;
+> >>>> +		type = GITS_BASER_TYPE_COLLECTION;
+> >>>>  		clearbits = GITS_BASER_INDIRECT;
+> >>>>  		break;
+> >>>>  	default:
+> >>>> @@ -1499,10 +1500,24 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
+> >>>>  	reg &= ~clearbits;
+> >>>>  
+> >>>>  	reg |= (entry_size - 1) << GITS_BASER_ENTRY_SIZE_SHIFT;
+> >>>> -	reg |= device_type << GITS_BASER_TYPE_SHIFT;
+> >>>> +	reg |= (u64)type << GITS_BASER_TYPE_SHIFT;
+> >>>>  	reg = vgic_sanitise_its_baser(reg);
+> >>>>  
+> >>>>  	*regptr = reg;
+> >>>> +
+> >>>> +	/* Table no longer valid: clear cached data */
+> >>>> +	if (!(reg & GITS_BASER_VALID)) {
+> >>>> +		switch (type) {
+> >>>> +		case GITS_BASER_TYPE_DEVICE:
+> >>>> +			vgic_its_free_device_list(kvm, its);
+> >>>> +			break;
+> >>>> +		case GITS_BASER_TYPE_COLLECTION:
+> >>>> +			vgic_its_free_collection_list(kvm, its);
+> >>>> +			break;
+> >>>> +		default:
+> >>>> +			break;
+> >>>> +		}
+> >>>> +	}
+> >>>
+> >>> So we do this after setting the *regptr, which makes we worried about
+> >>> races.
+> >>>
+> >>> How are guest writes to these registers synchronized with, for example
+> >>> trying to save the tables.  Perhaps we don't care because userspace
+> >>> should have stopped the VM before trying to save the ITS state?
 > >>
-> >> This patch fully revisits the errror handling while fixing those
-> >> 2 bugs.
+> >> Yes save & restore can happen only if all vcpus are locked. Same for
+> >> user space accesses.
 > >>
-> >> - entry_fn_t now takes a valid output paraleter
 > > 
-> >                                         parameter
-> > 
-> >> - scan_its_table() now returns <= 0 values and output 2 booleans,
-> >                                                  outputs
-> >>   valid and last.
-> >> - vgic_its_restore_itt() now returns <= 0 values.
-> >> - vgic_its_restore_device_tables() also returns <= 0 values.
-> >>
-> >> With that patch we are able to properly handle the case where
-> >> all data are invalid but we still are able to detect the case
-> >> where a next entry was referenced by some valid entry and
-> >> never found.
-> >>
-> >> Fixes: 57a9a117154c93 (KVM: arm64: vgic-its: Device table save/restore)
-> >> Fixes: eff484e0298da5 (KVM: arm64: vgic-its: ITT save and restore)
-> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> >> Reported-by: wanghaibin <wanghaibin.wang@huawei.com>
-> >>
-> >> ---
-> >>
-> >> need to CC stable
-> >>
-> >> v3 -> v4:
-> >> - set *valid at beginning of handle_l1_dte
-> >>
-> >> v2 -> v3:
-> >> - add comments
-> >> - added valid parameter
-> >> - vgic_its_restore_itt don't return +1 anymore
-> >> - reword the commit message
-> >>
-> >> v1 -> v2:
-> >> - if (ret > 0) ret = 0
-> >> ---
-
-[...]
-
+> > So this cannot happens, because the save/restore operation will fail to
+> > get the lock of an executing VCPU which is modifying this function?
 > 
-> Given the number of changes this rework will produce I guess this patch
-> wouldn't be candidate for cc'ed stable. Then shouldn't we consider to
-> first apply the fix proposed by Wanghaibin (cc'ed stable) and then apply
-> the rework in a second and subsequent patch?
+> Yes that's my understanding.
 > 
 
-Yes, probably, let's keep the fix small and obviously correct and get
-that in for v4.14 ASAP.
-
-Then we can do rework for v4.15 or later, to clean things up.
+ok.  If you respin, putting a comment here may be worth it.
 
 Thanks,
 -Christoffer
