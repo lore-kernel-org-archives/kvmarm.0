@@ -1,120 +1,136 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v4 09/11] KVM: arm/arm64: vgic-its: free caches when
- GITS_BASER Valid bit is cleared
-Date: Sat, 21 Oct 2017 17:42:34 +0200
-Message-ID: <20171021154234.GI12618@cbox>
-References: <1508224209-15366-1-git-send-email-eric.auger@redhat.com>
- <1508224209-15366-10-git-send-email-eric.auger@redhat.com>
- <20171017223456.GI8326@lvm>
- <5845e6bc-52a6-57ef-a5d3-5c5182b19e53@redhat.com>
- <20171021143149.GB12618@cbox>
- <fd2f211e-c5dc-9e63-b81a-07a7dc3a5108@redhat.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: [PATCH] KVM: arm/arm64: Allow usercopy to vcpu->arch.ctxt and arm64
+ debug
+Date: Sat, 21 Oct 2017 20:45:45 +0200
+Message-ID: <20171021184545.2497-1-christoffer.dall@linaro.org>
+References: <20171020232525.7387-1-pbonzini@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <fd2f211e-c5dc-9e63-b81a-07a7dc3a5108@redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: Auger Eric <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, peter.maydell@linaro.org, andre.przywara@arm.com, wanghaibin.wang@huawei.com, wu.wubin@huawei.com, drjones@redhat.com, wei@redhat.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CF2240D25
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 21 Oct 2017 14:44:39 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id SqysxQeZg5Wz for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 21 Oct 2017 14:44:38 -0400 (EDT)
+Received: from mail-wm0-f67.google.com (mail-wm0-f67.google.com [74.125.82.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4C75A4078A
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 21 Oct 2017 14:44:38 -0400 (EDT)
+Received: by mail-wm0-f67.google.com with SMTP id m72so4015268wmc.0
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 21 Oct 2017 11:45:47 -0700 (PDT)
+In-Reply-To: <20171020232525.7387-1-pbonzini@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
+Cc: Kees Cook <keescook@chromium.org>, kvm@vger.kernel.org, kernel-hardening@lists.openwall.com, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sat, Oct 21, 2017 at 04:36:22PM +0200, Auger Eric wrote:
-> Hi Christoffer,
-> 
-> On 21/10/2017 16:31, Christoffer Dall wrote:
-> > On Sat, Oct 21, 2017 at 12:13:21PM +0200, Auger Eric wrote:
-> >> Hi Christoffer,
-> >>
-> >> On 18/10/2017 00:34, Christoffer Dall wrote:
-> >>> On Tue, Oct 17, 2017 at 09:10:07AM +0200, Eric Auger wrote:
-> >>>> When the GITS_BASER<n>.Valid gets cleared, the data structures in
-> >>>> guest RAM are not valid anymore. The device, collection
-> >>>> and LPI lists stored in the in-kernel ITS represent the same
-> >>>> information in some form of cache. So let's void the cache.
-> >>>>
-> >>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> >>>>
-> >>>> ---
-> >>>>
-> >>>> v2 -> v3:
-> >>>> - add a comment and clear cache in if block
-> >>>> ---
-> >>>>  virt/kvm/arm/vgic/vgic-its.c | 23 +++++++++++++++++++----
-> >>>>  1 file changed, 19 insertions(+), 4 deletions(-)
-> >>>>
-> >>>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> >>>> index f3f0026f..084239c 100644
-> >>>> --- a/virt/kvm/arm/vgic/vgic-its.c
-> >>>> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> >>>> @@ -1471,8 +1471,9 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
-> >>>>  				      unsigned long val)
-> >>>>  {
-> >>>>  	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
-> >>>> -	u64 entry_size, device_type;
-> >>>> +	u64 entry_size;
-> >>>>  	u64 reg, *regptr, clearbits = 0;
-> >>>> +	int type;
-> >>>>  
-> >>>>  	/* When GITS_CTLR.Enable is 1, we ignore write accesses. */
-> >>>>  	if (its->enabled)
-> >>>> @@ -1482,12 +1483,12 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
-> >>>>  	case 0:
-> >>>>  		regptr = &its->baser_device_table;
-> >>>>  		entry_size = abi->dte_esz;
-> >>>> -		device_type = GITS_BASER_TYPE_DEVICE;
-> >>>> +		type = GITS_BASER_TYPE_DEVICE;
-> >>>>  		break;
-> >>>>  	case 1:
-> >>>>  		regptr = &its->baser_coll_table;
-> >>>>  		entry_size = abi->cte_esz;
-> >>>> -		device_type = GITS_BASER_TYPE_COLLECTION;
-> >>>> +		type = GITS_BASER_TYPE_COLLECTION;
-> >>>>  		clearbits = GITS_BASER_INDIRECT;
-> >>>>  		break;
-> >>>>  	default:
-> >>>> @@ -1499,10 +1500,24 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
-> >>>>  	reg &= ~clearbits;
-> >>>>  
-> >>>>  	reg |= (entry_size - 1) << GITS_BASER_ENTRY_SIZE_SHIFT;
-> >>>> -	reg |= device_type << GITS_BASER_TYPE_SHIFT;
-> >>>> +	reg |= (u64)type << GITS_BASER_TYPE_SHIFT;
-> >>>>  	reg = vgic_sanitise_its_baser(reg);
-> >>>>  
-> >>>>  	*regptr = reg;
-> >>>> +
-> >>>> +	/* Table no longer valid: clear cached data */
-> >>>> +	if (!(reg & GITS_BASER_VALID)) {
-> >>>> +		switch (type) {
-> >>>> +		case GITS_BASER_TYPE_DEVICE:
-> >>>> +			vgic_its_free_device_list(kvm, its);
-> >>>> +			break;
-> >>>> +		case GITS_BASER_TYPE_COLLECTION:
-> >>>> +			vgic_its_free_collection_list(kvm, its);
-> >>>> +			break;
-> >>>> +		default:
-> >>>> +			break;
-> >>>> +		}
-> >>>> +	}
-> >>>
-> >>> So we do this after setting the *regptr, which makes we worried about
-> >>> races.
-> >>>
-> >>> How are guest writes to these registers synchronized with, for example
-> >>> trying to save the tables.  Perhaps we don't care because userspace
-> >>> should have stopped the VM before trying to save the ITS state?
-> >>
-> >> Yes save & restore can happen only if all vcpus are locked. Same for
-> >> user space accesses.
-> >>
-> > 
-> > So this cannot happens, because the save/restore operation will fail to
-> > get the lock of an executing VCPU which is modifying this function?
-> 
-> Yes that's my understanding.
-> 
-
-ok.  If you respin, putting a comment here may be worth it.
-
-Thanks,
--Christoffer
+V2UgZG8gZGlyZWN0IHVzZXJhY2Nlc3MgY29weWluZyB0byB0aGUga3ZtX2NwdV9jb250ZXh0IHN0
+cnVjdHVyZQplbWJlZGRlZCBpbiB0aGUga3ZtX3ZjcHVfYXJjaCBzdHJ1Y3R1cmUsIGFuZCB0byB0
+aGUgdmNwdSBkZWJ1ZyByZWdpc3RlcgpzdGF0ZS4gIEV2ZXJ5dGhpbmcgZWxzZSAodGltZXIsIFBN
+VSwgdmdpYykgZ29lcyB0aHJvdWdoIGEgdGVtcG9yYXJ5CmluZGlyZWN0aW9uLgoKRml4aW5nIGFs
+bCBhY2Nlc3NlcyB0byBrdm1fY3B1X2NvbnRleHQgaXMgbWFzc2l2ZWx5IGludmFzaXZlLCBhbmQg
+d2UnZApsaWtlIHRvIGF2b2lkIHRoYXQsIHNvIHdlIHRlbGwga3ZtX2luaXRfdXNlcmNvcHkgdG8g
+d2hpdGVsaXN0IGFjY2Vzc2VzCnRvIG91dCBjb250ZXh0IHN0cnVjdHVyZS4KClRoZSBkZWJ1ZyBz
+eXN0ZW0gcmVnaXN0ZXIgYWNjZXNzZXMgb24gYXJtNjQgYXJlIG1vZGlmaWVkIHRvIHdvcmsgdGhy
+b3VnaAphbiBpbmRpcmVjdGlvbiBpbnN0ZWFkLgoKQ2M6IGtlcm5lbC1oYXJkZW5pbmdAbGlzdHMu
+b3BlbndhbGwuY29tCkNjOiBLZWVzIENvb2sgPGtlZXNjb29rQGNocm9taXVtLm9yZz4KQ2M6IFBh
+b2xvIEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5jb20+CkNjOiBSYWRpbSBLcsSNbcOhxZkgPHJr
+cmNtYXJAcmVkaGF0LmNvbT4KQ2M6IE1hcmMgWnluZ2llciA8bWFyYy56eW5naWVyQGFybS5jb20+
+ClNpZ25lZC1vZmYtYnk6IENocmlzdG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRhbGxAbGluYXJv
+Lm9yZz4KLS0tClRoaXMgZml4ZXMgS1ZNL0FSTSBvbiB0b2RheSdzIGxpbnV4IG5leHQgd2l0aCBD
+T05GSUdfSEFSREVORURfVVNFUkNPUFkuCgpUaGUgcGF0Y2ggaXMgYmFzZWQgb24gbGludXgtbmV4
+dCBwbHVzIFBhb2xvJ3MgeDg2IHBhdGNoIHdoaWNoIGludHJvZHVjZXMKa3ZtX2luaXRfdXNlcmNv
+cHkuICBOb3Qgc3VyZSBob3cgdGhpcyBuZWVkcyB0byBnZXQgbWVyZ2VkLCBidXQgaXQgd291bGQK
+cG90ZW50aWFsbHkgbWFrZSBzZW5zZSBmb3IgUGFvbG8gdG8gcHV0IHRvZ2V0aGVyIGEgc2V0IG9m
+IHRoZSBwYXRjaGVzCm5lZWRlZCBmb3IgdGhpcy4KClRoYW5rcywKLUNocmlzdG9mZmVyCgogYXJj
+aC9hcm02NC9rdm0vc3lzX3JlZ3MuYyB8IDM2ICsrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0t
+LS0tLS0tLQogdmlydC9rdm0vYXJtL2FybS5jICAgICAgICB8ICA1ICsrKystCiAyIGZpbGVzIGNo
+YW5nZWQsIDI0IGluc2VydGlvbnMoKyksIDE3IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2Fy
+Y2gvYXJtNjQva3ZtL3N5c19yZWdzLmMgYi9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jCmluZGV4
+IDJlMDcwZDNiYWY5Zi4uY2RmNDdhOTEwOGZlIDEwMDY0NAotLS0gYS9hcmNoL2FybTY0L2t2bS9z
+eXNfcmVncy5jCisrKyBiL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmMKQEAgLTI5MywxOSArMjkz
+LDIwIEBAIHN0YXRpYyBib29sIHRyYXBfYnZyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKIHN0YXRp
+YyBpbnQgc2V0X2J2cihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGNvbnN0IHN0cnVjdCBzeXNfcmVn
+X2Rlc2MgKnJkLAogCQljb25zdCBzdHJ1Y3Qga3ZtX29uZV9yZWcgKnJlZywgdm9pZCBfX3VzZXIg
+KnVhZGRyKQogewotCV9fdTY0ICpyID0gJnZjcHUtPmFyY2gudmNwdV9kZWJ1Z19zdGF0ZS5kYmdf
+YnZyW3JkLT5yZWddOworCV9fdTY0IHI7CiAKLQlpZiAoY29weV9mcm9tX3VzZXIociwgdWFkZHIs
+IEtWTV9SRUdfU0laRShyZWctPmlkKSkgIT0gMCkKKwlpZiAoY29weV9mcm9tX3VzZXIoJnIsIHVh
+ZGRyLCBLVk1fUkVHX1NJWkUocmVnLT5pZCkpICE9IDApCiAJCXJldHVybiAtRUZBVUxUOworCXZj
+cHUtPmFyY2gudmNwdV9kZWJ1Z19zdGF0ZS5kYmdfYnZyW3JkLT5yZWddID0gcjsKIAlyZXR1cm4g
+MDsKIH0KIAogc3RhdGljIGludCBnZXRfYnZyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgY29uc3Qg
+c3RydWN0IHN5c19yZWdfZGVzYyAqcmQsCiAJY29uc3Qgc3RydWN0IGt2bV9vbmVfcmVnICpyZWcs
+IHZvaWQgX191c2VyICp1YWRkcikKIHsKLQlfX3U2NCAqciA9ICZ2Y3B1LT5hcmNoLnZjcHVfZGVi
+dWdfc3RhdGUuZGJnX2J2cltyZC0+cmVnXTsKKwlfX3U2NCByID0gdmNwdS0+YXJjaC52Y3B1X2Rl
+YnVnX3N0YXRlLmRiZ19idnJbcmQtPnJlZ107CiAKLQlpZiAoY29weV90b191c2VyKHVhZGRyLCBy
+LCBLVk1fUkVHX1NJWkUocmVnLT5pZCkpICE9IDApCisJaWYgKGNvcHlfdG9fdXNlcih1YWRkciwg
+JnIsIEtWTV9SRUdfU0laRShyZWctPmlkKSkgIT0gMCkKIAkJcmV0dXJuIC1FRkFVTFQ7CiAJcmV0
+dXJuIDA7CiB9CkBAIC0zMzUsMTAgKzMzNiwxMSBAQCBzdGF0aWMgYm9vbCB0cmFwX2JjcihzdHJ1
+Y3Qga3ZtX3ZjcHUgKnZjcHUsCiBzdGF0aWMgaW50IHNldF9iY3Ioc3RydWN0IGt2bV92Y3B1ICp2
+Y3B1LCBjb25zdCBzdHJ1Y3Qgc3lzX3JlZ19kZXNjICpyZCwKIAkJY29uc3Qgc3RydWN0IGt2bV9v
+bmVfcmVnICpyZWcsIHZvaWQgX191c2VyICp1YWRkcikKIHsKLQlfX3U2NCAqciA9ICZ2Y3B1LT5h
+cmNoLnZjcHVfZGVidWdfc3RhdGUuZGJnX2JjcltyZC0+cmVnXTsKKwlfX3U2NCByOwogCi0JaWYg
+KGNvcHlfZnJvbV91c2VyKHIsIHVhZGRyLCBLVk1fUkVHX1NJWkUocmVnLT5pZCkpICE9IDApCisJ
+aWYgKGNvcHlfZnJvbV91c2VyKCZyLCB1YWRkciwgS1ZNX1JFR19TSVpFKHJlZy0+aWQpKSAhPSAw
+KQogCQlyZXR1cm4gLUVGQVVMVDsKKwl2Y3B1LT5hcmNoLnZjcHVfZGVidWdfc3RhdGUuZGJnX2Jj
+cltyZC0+cmVnXSA9IHI7CiAKIAlyZXR1cm4gMDsKIH0KQEAgLTM0Niw5ICszNDgsOSBAQCBzdGF0
+aWMgaW50IHNldF9iY3Ioc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBjb25zdCBzdHJ1Y3Qgc3lzX3Jl
+Z19kZXNjICpyZCwKIHN0YXRpYyBpbnQgZ2V0X2JjcihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGNv
+bnN0IHN0cnVjdCBzeXNfcmVnX2Rlc2MgKnJkLAogCWNvbnN0IHN0cnVjdCBrdm1fb25lX3JlZyAq
+cmVnLCB2b2lkIF9fdXNlciAqdWFkZHIpCiB7Ci0JX191NjQgKnIgPSAmdmNwdS0+YXJjaC52Y3B1
+X2RlYnVnX3N0YXRlLmRiZ19iY3JbcmQtPnJlZ107CisJX191NjQgciA9IHZjcHUtPmFyY2gudmNw
+dV9kZWJ1Z19zdGF0ZS5kYmdfYmNyW3JkLT5yZWddOwogCi0JaWYgKGNvcHlfdG9fdXNlcih1YWRk
+ciwgciwgS1ZNX1JFR19TSVpFKHJlZy0+aWQpKSAhPSAwKQorCWlmIChjb3B5X3RvX3VzZXIodWFk
+ZHIsICZyLCBLVk1fUkVHX1NJWkUocmVnLT5pZCkpICE9IDApCiAJCXJldHVybiAtRUZBVUxUOwog
+CXJldHVybiAwOwogfQpAQCAtMzc5LDE5ICszODEsMjAgQEAgc3RhdGljIGJvb2wgdHJhcF93dnIo
+c3RydWN0IGt2bV92Y3B1ICp2Y3B1LAogc3RhdGljIGludCBzZXRfd3ZyKHN0cnVjdCBrdm1fdmNw
+dSAqdmNwdSwgY29uc3Qgc3RydWN0IHN5c19yZWdfZGVzYyAqcmQsCiAJCWNvbnN0IHN0cnVjdCBr
+dm1fb25lX3JlZyAqcmVnLCB2b2lkIF9fdXNlciAqdWFkZHIpCiB7Ci0JX191NjQgKnIgPSAmdmNw
+dS0+YXJjaC52Y3B1X2RlYnVnX3N0YXRlLmRiZ193dnJbcmQtPnJlZ107CisJX191NjQgcjsKIAot
+CWlmIChjb3B5X2Zyb21fdXNlcihyLCB1YWRkciwgS1ZNX1JFR19TSVpFKHJlZy0+aWQpKSAhPSAw
+KQorCWlmIChjb3B5X2Zyb21fdXNlcigmciwgdWFkZHIsIEtWTV9SRUdfU0laRShyZWctPmlkKSkg
+IT0gMCkKIAkJcmV0dXJuIC1FRkFVTFQ7CisJdmNwdS0+YXJjaC52Y3B1X2RlYnVnX3N0YXRlLmRi
+Z193dnJbcmQtPnJlZ10gPSByOwogCXJldHVybiAwOwogfQogCiBzdGF0aWMgaW50IGdldF93dnIo
+c3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBjb25zdCBzdHJ1Y3Qgc3lzX3JlZ19kZXNjICpyZCwKIAlj
+b25zdCBzdHJ1Y3Qga3ZtX29uZV9yZWcgKnJlZywgdm9pZCBfX3VzZXIgKnVhZGRyKQogewotCV9f
+dTY0ICpyID0gJnZjcHUtPmFyY2gudmNwdV9kZWJ1Z19zdGF0ZS5kYmdfd3ZyW3JkLT5yZWddOwor
+CV9fdTY0IHIgPSB2Y3B1LT5hcmNoLnZjcHVfZGVidWdfc3RhdGUuZGJnX3d2cltyZC0+cmVnXTsK
+IAotCWlmIChjb3B5X3RvX3VzZXIodWFkZHIsIHIsIEtWTV9SRUdfU0laRShyZWctPmlkKSkgIT0g
+MCkKKwlpZiAoY29weV90b191c2VyKHVhZGRyLCAmciwgS1ZNX1JFR19TSVpFKHJlZy0+aWQpKSAh
+PSAwKQogCQlyZXR1cm4gLUVGQVVMVDsKIAlyZXR1cm4gMDsKIH0KQEAgLTQyMSwxOSArNDI0LDIw
+IEBAIHN0YXRpYyBib29sIHRyYXBfd2NyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKIHN0YXRpYyBp
+bnQgc2V0X3djcihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGNvbnN0IHN0cnVjdCBzeXNfcmVnX2Rl
+c2MgKnJkLAogCQljb25zdCBzdHJ1Y3Qga3ZtX29uZV9yZWcgKnJlZywgdm9pZCBfX3VzZXIgKnVh
+ZGRyKQogewotCV9fdTY0ICpyID0gJnZjcHUtPmFyY2gudmNwdV9kZWJ1Z19zdGF0ZS5kYmdfd2Ny
+W3JkLT5yZWddOworCV9fdTY0IHI7CiAKLQlpZiAoY29weV9mcm9tX3VzZXIociwgdWFkZHIsIEtW
+TV9SRUdfU0laRShyZWctPmlkKSkgIT0gMCkKKwlpZiAoY29weV9mcm9tX3VzZXIoJnIsIHVhZGRy
+LCBLVk1fUkVHX1NJWkUocmVnLT5pZCkpICE9IDApCiAJCXJldHVybiAtRUZBVUxUOworCXZjcHUt
+PmFyY2gudmNwdV9kZWJ1Z19zdGF0ZS5kYmdfd2NyW3JkLT5yZWddID0gcjsKIAlyZXR1cm4gMDsK
+IH0KIAogc3RhdGljIGludCBnZXRfd2NyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgY29uc3Qgc3Ry
+dWN0IHN5c19yZWdfZGVzYyAqcmQsCiAJY29uc3Qgc3RydWN0IGt2bV9vbmVfcmVnICpyZWcsIHZv
+aWQgX191c2VyICp1YWRkcikKIHsKLQlfX3U2NCAqciA9ICZ2Y3B1LT5hcmNoLnZjcHVfZGVidWdf
+c3RhdGUuZGJnX3djcltyZC0+cmVnXTsKKwlfX3U2NCByID0gdmNwdS0+YXJjaC52Y3B1X2RlYnVn
+X3N0YXRlLmRiZ193Y3JbcmQtPnJlZ107CiAKLQlpZiAoY29weV90b191c2VyKHVhZGRyLCByLCBL
+Vk1fUkVHX1NJWkUocmVnLT5pZCkpICE9IDApCisJaWYgKGNvcHlfdG9fdXNlcih1YWRkciwgJnIs
+IEtWTV9SRUdfU0laRShyZWctPmlkKSkgIT0gMCkKIAkJcmV0dXJuIC1FRkFVTFQ7CiAJcmV0dXJu
+IDA7CiB9CmRpZmYgLS1naXQgYS92aXJ0L2t2bS9hcm0vYXJtLmMgYi92aXJ0L2t2bS9hcm0vYXJt
+LmMKaW5kZXggYjlmNjhlNGFkZDcxLi42MzllMzg4Njc4ZmYgMTAwNjQ0Ci0tLSBhL3ZpcnQva3Zt
+L2FybS9hcm0uYworKysgYi92aXJ0L2t2bS9hcm0vYXJtLmMKQEAgLTE1MDIsNyArMTUwMiwxMCBA
+QCB2b2lkIGt2bV9hcmNoX2V4aXQodm9pZCkKIAogc3RhdGljIGludCBhcm1faW5pdCh2b2lkKQog
+ewotCWludCByYyA9IGt2bV9pbml0KE5VTEwsIHNpemVvZihzdHJ1Y3Qga3ZtX3ZjcHUpLCAwLCBU
+SElTX01PRFVMRSk7CisJaW50IHJjID0ga3ZtX2luaXRfdXNlcmNvcHkoTlVMTCwgc2l6ZW9mKHN0
+cnVjdCBrdm1fdmNwdSksIDAsCisJCQkJICAgb2Zmc2V0b2Yoc3RydWN0IGt2bV92Y3B1X2FyY2gs
+IGN0eHQpLAorCQkJCSAgIHNpemVvZl9maWVsZChzdHJ1Y3Qga3ZtX3ZjcHVfYXJjaCwgY3R4dCks
+CisJCQkJICAgVEhJU19NT0RVTEUpOwogCXJldHVybiByYzsKIH0KIAotLSAKMi4xNC4yCgpfX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGlu
+ZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1
+bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
