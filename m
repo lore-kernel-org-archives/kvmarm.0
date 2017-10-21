@@ -1,27 +1,26 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH v2 2/8] arm: KVM: Add optimized PIPT icache flushing
-Date: Fri, 20 Oct 2017 17:54:40 +0100
-Message-ID: <20171020165440.sdqfdyt6jsmbjcx5@lakrids.cambridge.arm.com>
-References: <20171020154904.31427-1-marc.zyngier@arm.com>
- <20171020154904.31427-3-marc.zyngier@arm.com>
- <20171020162711.2mb2wyw5xqfhkc4o@lakrids.cambridge.arm.com>
- <d0dd031b-976f-0a77-9b63-8807aa8f9b4b@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v4 09/11] KVM: arm/arm64: vgic-its: free caches when
+ GITS_BASER Valid bit is cleared
+Date: Sat, 21 Oct 2017 12:13:21 +0200
+Message-ID: <5845e6bc-52a6-57ef-a5d3-5c5182b19e53@redhat.com>
+References: <1508224209-15366-1-git-send-email-eric.auger@redhat.com>
+ <1508224209-15366-10-git-send-email-eric.auger@redhat.com>
+ <20171017223456.GI8326@lvm>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 549E541185
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Oct 2017 12:53:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F86C49D1D
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 21 Oct 2017 06:12:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xGFopCFDhPgD for <kvmarm@lists.cs.columbia.edu>;
- Fri, 20 Oct 2017 12:53:38 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 398D34078A
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Oct 2017 12:53:38 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <d0dd031b-976f-0a77-9b63-8807aa8f9b4b@arm.com>
+ with ESMTP id 49G2VBJSFiGG for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 21 Oct 2017 06:12:20 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 42BE349D09
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 21 Oct 2017 06:12:20 -0400 (EDT)
+In-Reply-To: <20171017223456.GI8326@lvm>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,69 +30,107 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Christoffer Dall <cdall@linaro.org>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andre.przywara@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 20, 2017 at 05:53:39PM +0100, Marc Zyngier wrote:
-> Hi Mark,
+Hi Christoffer,
+
+On 18/10/2017 00:34, Christoffer Dall wrote:
+> On Tue, Oct 17, 2017 at 09:10:07AM +0200, Eric Auger wrote:
+>> When the GITS_BASER<n>.Valid gets cleared, the data structures in
+>> guest RAM are not valid anymore. The device, collection
+>> and LPI lists stored in the in-kernel ITS represent the same
+>> information in some form of cache. So let's void the cache.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>>
+>> v2 -> v3:
+>> - add a comment and clear cache in if block
+>> ---
+>>  virt/kvm/arm/vgic/vgic-its.c | 23 +++++++++++++++++++----
+>>  1 file changed, 19 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+>> index f3f0026f..084239c 100644
+>> --- a/virt/kvm/arm/vgic/vgic-its.c
+>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+>> @@ -1471,8 +1471,9 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
+>>  				      unsigned long val)
+>>  {
+>>  	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+>> -	u64 entry_size, device_type;
+>> +	u64 entry_size;
+>>  	u64 reg, *regptr, clearbits = 0;
+>> +	int type;
+>>  
+>>  	/* When GITS_CTLR.Enable is 1, we ignore write accesses. */
+>>  	if (its->enabled)
+>> @@ -1482,12 +1483,12 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
+>>  	case 0:
+>>  		regptr = &its->baser_device_table;
+>>  		entry_size = abi->dte_esz;
+>> -		device_type = GITS_BASER_TYPE_DEVICE;
+>> +		type = GITS_BASER_TYPE_DEVICE;
+>>  		break;
+>>  	case 1:
+>>  		regptr = &its->baser_coll_table;
+>>  		entry_size = abi->cte_esz;
+>> -		device_type = GITS_BASER_TYPE_COLLECTION;
+>> +		type = GITS_BASER_TYPE_COLLECTION;
+>>  		clearbits = GITS_BASER_INDIRECT;
+>>  		break;
+>>  	default:
+>> @@ -1499,10 +1500,24 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
+>>  	reg &= ~clearbits;
+>>  
+>>  	reg |= (entry_size - 1) << GITS_BASER_ENTRY_SIZE_SHIFT;
+>> -	reg |= device_type << GITS_BASER_TYPE_SHIFT;
+>> +	reg |= (u64)type << GITS_BASER_TYPE_SHIFT;
+>>  	reg = vgic_sanitise_its_baser(reg);
+>>  
+>>  	*regptr = reg;
+>> +
+>> +	/* Table no longer valid: clear cached data */
+>> +	if (!(reg & GITS_BASER_VALID)) {
+>> +		switch (type) {
+>> +		case GITS_BASER_TYPE_DEVICE:
+>> +			vgic_its_free_device_list(kvm, its);
+>> +			break;
+>> +		case GITS_BASER_TYPE_COLLECTION:
+>> +			vgic_its_free_collection_list(kvm, its);
+>> +			break;
+>> +		default:
+>> +			break;
+>> +		}
+>> +	}
 > 
-> On 20/10/17 17:27, Mark Rutland wrote:
-> > Hi Marc,
-> > 
-> > On Fri, Oct 20, 2017 at 04:48:58PM +0100, Marc Zyngier wrote:
-> >> @@ -181,18 +185,40 @@ static inline void __invalidate_icache_guest_page(struct kvm_vcpu *vcpu,
-> >>  		return;
-> >>  	}
-> >>  
-> >> -	/* PIPT cache. As for the d-side, use a temporary kernel mapping. */
-> >> +	/*
-> >> +	 * CTR IminLine contains Log2 of the number of words in the
-> >> +	 * cache line, so we can get the number of words as
-> >> +	 * 2 << (IminLine - 1).  To get the number of bytes, we
-> >> +	 * multiply by 4 (the number of bytes in a 32-bit word), and
-> >> +	 * get 4 << (IminLine).
-> >> +	 */
-> >> +	iclsz = 4 << (read_cpuid(CPUID_CACHETYPE) & 0xf);
-> >> +
-> >>  	while (size) {
-> >>  		void *va = kmap_atomic_pfn(pfn);
-> >> +		void *end = va + PAGE_SIZE;
-> >> +		void *addr = va;
-> >>  
-> >> -		__cpuc_coherent_user_range((unsigned long)va,
-> >> -					   (unsigned long)va + PAGE_SIZE);
-> >> +		do {
-> >> +			write_sysreg(addr, ICIMVAU);
-> >> +			addr += iclsz;
-> >> +		} while (addr < end);
-> >> +
-> >> +		dsb(ishst);
-> > 
-> > I believe this needs to be ISH rather than ISHST.
-> > 
-> > Per, ARM DDI 0487B.b, page G3-4701, "G3.4 AArch32 cache and branch
-> > predictor support":
-> > 
-> >     A DSB or DMB instruction intended to ensure the completion of cache
-> >     maintenance instructions or branch predictor instructions must have
-> >     an access type of both loads and stores.
+> So we do this after setting the *regptr, which makes we worried about
+> races.
 > 
-> Right. This actually comes from 6abdd491698a ("ARM: mm: use
-> inner-shareable barriers for TLB and user cache operations"), and the
-> ARMv7 ARM doesn't mention any of this.
+> How are guest writes to these registers synchronized with, for example
+> trying to save the tables.  Perhaps we don't care because userspace
+> should have stopped the VM before trying to save the ITS state?
 
-Ah; so it doesn't. :/
+Yes save & restore can happen only if all vcpus are locked. Same for
+user space accesses.
 
-> My take is that we want to be consistent. Given that KVM/ARM on 32bit is
-> basically ARMv7 only, I'd rather keep the ST version of the barrier
-> here, and change it everywhere if/when someone decides to support a
-> 32bit kernel on ARMv8 (yes, we already do as a guest, but it doesn't
-> seem to really matter so far).
+Thanks
 
-Keeping things consistent makes sense to me.
+Eric
 
-Another one for the backlog...
-
-Thanks,
-Mark.
+> 
+> 
+> 
+>>  }
+>>  
+>>  static unsigned long vgic_mmio_read_its_ctlr(struct kvm *vcpu,
+>> -- 
+>> 2.5.5
+>>
+> 
+> Otherwise looks good to me.
+> -Christoffer
+> 
