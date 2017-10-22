@@ -1,165 +1,60 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v2] KVM: arm/arm64: Allow usercopy to vcpu->arch.ctxt and arm64 debug
-Date: Sun, 22 Oct 2017 09:48:36 +0200
-Message-ID: <20171022074836.17728-1-christoffer.dall@linaro.org>
-References: <20171020232525.7387-1-pbonzini@redhat.com>
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20171020232525.7387-1-pbonzini@redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: kvmarm@lists.cs.columbia.edu
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v2 0/8] arm/arm64: KVM: limit icache invalidation to
+ prefetch aborts
+Date: Sun, 22 Oct 2017 10:20:52 +0100
+Message-ID: <86o9ozh72j.fsf@arm.com>
+References: <20171020154904.31427-1-marc.zyngier@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2055A49D23
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 22 Oct 2017 05:19:47 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Ly45UCU9CgGV for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 22 Oct 2017 05:19:45 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C3CBB406BB
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 22 Oct 2017 05:19:45 -0400 (EDT)
+In-Reply-To: <20171020154904.31427-1-marc.zyngier@arm.com> (Marc Zyngier's
+ message of "Fri, 20 Oct 2017 16:48:56 +0100")
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We do direct useraccess copying to the kvm_cpu_context structure
-embedded in the kvm_vcpu_arch structure, and to the vcpu debug register
-state.  Everything else (timer, PMU, vgic) goes through a temporary
-indirection.
+On Fri, Oct 20 2017 at  4:48:56 pm BST, Marc Zyngier <marc.zyngier@arm.com> wrote:
 
-Fixing all accesses to kvm_cpu_context is massively invasive, and we'd
-like to avoid that, so we tell kvm_init_usercopy to whitelist accesses
-to out context structure.
+[...]
 
-The debug system register accesses on arm64 are modified to work through
-an indirection instead.
+> * From v1:
+[...]
 
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
-Changes since v1:
-  - Use get_user() and put_user() instead of the implicit understanding
-    that these will always be 64-bit values.
+>   - Dropped patch #10 which was both useless and broken, and patch #9
+>     that thus became useless
 
- arch/arm64/kvm/sys_regs.c | 44 ++++++++++++++++++++++++++++----------------
- virt/kvm/arm/arm.c        |  5 ++++-
- 2 files changed, 32 insertions(+), 17 deletions(-)
+Tuuut!!!!! patch #9[1] is not useless at all, as it allows patch #2 to
+compile. I failed to notice it because I still had #9 in my tree as I
+pushed things out. Duh.
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 2e070d3baf9f..34b9e1734a3f 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -293,19 +293,22 @@ static bool trap_bvr(struct kvm_vcpu *vcpu,
- static int set_bvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 		const struct kvm_one_reg *reg, void __user *uaddr)
- {
--	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg];
-+	__u64 __user *uval = uaddr;
-+	__u64 r;
- 
--	if (copy_from_user(r, uaddr, KVM_REG_SIZE(reg->id)) != 0)
-+	if (get_user(r, uval))
- 		return -EFAULT;
-+	vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg] = r;
- 	return 0;
- }
- 
- static int get_bvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 	const struct kvm_one_reg *reg, void __user *uaddr)
- {
--	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg];
-+	__u64 r = vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg];
-+	__u64 __user *uval = uaddr;
- 
--	if (copy_to_user(uaddr, r, KVM_REG_SIZE(reg->id)) != 0)
-+	if (put_user(r, uval))
- 		return -EFAULT;
- 	return 0;
- }
-@@ -335,10 +338,12 @@ static bool trap_bcr(struct kvm_vcpu *vcpu,
- static int set_bcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 		const struct kvm_one_reg *reg, void __user *uaddr)
- {
--	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_bcr[rd->reg];
-+	__u64 __user *uval = uaddr;
-+	__u64 r;
- 
--	if (copy_from_user(r, uaddr, KVM_REG_SIZE(reg->id)) != 0)
-+	if (get_user(r, uval))
- 		return -EFAULT;
-+	vcpu->arch.vcpu_debug_state.dbg_bcr[rd->reg] = r;
- 
- 	return 0;
- }
-@@ -346,9 +351,10 @@ static int set_bcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- static int get_bcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 	const struct kvm_one_reg *reg, void __user *uaddr)
- {
--	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_bcr[rd->reg];
-+	__u64 r = vcpu->arch.vcpu_debug_state.dbg_bcr[rd->reg];
-+	__u64 __user *uval = uaddr;
- 
--	if (copy_to_user(uaddr, r, KVM_REG_SIZE(reg->id)) != 0)
-+	if (put_user(r, uval))
- 		return -EFAULT;
- 	return 0;
- }
-@@ -379,19 +385,22 @@ static bool trap_wvr(struct kvm_vcpu *vcpu,
- static int set_wvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 		const struct kvm_one_reg *reg, void __user *uaddr)
- {
--	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_wvr[rd->reg];
-+	__u64 __user *uval = uaddr;
-+	__u64 r;
- 
--	if (copy_from_user(r, uaddr, KVM_REG_SIZE(reg->id)) != 0)
-+	if (get_user(r, uval))
- 		return -EFAULT;
-+	vcpu->arch.vcpu_debug_state.dbg_wvr[rd->reg] = r;
- 	return 0;
- }
- 
- static int get_wvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 	const struct kvm_one_reg *reg, void __user *uaddr)
- {
--	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_wvr[rd->reg];
-+	__u64 r = vcpu->arch.vcpu_debug_state.dbg_wvr[rd->reg];
-+	__u64 __user *uval = uaddr;
- 
--	if (copy_to_user(uaddr, r, KVM_REG_SIZE(reg->id)) != 0)
-+	if (put_user(r, uval))
- 		return -EFAULT;
- 	return 0;
- }
-@@ -421,19 +430,22 @@ static bool trap_wcr(struct kvm_vcpu *vcpu,
- static int set_wcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 		const struct kvm_one_reg *reg, void __user *uaddr)
- {
--	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_wcr[rd->reg];
-+	__u64 __user *uval = uaddr;
-+	__u64 r;
- 
--	if (copy_from_user(r, uaddr, KVM_REG_SIZE(reg->id)) != 0)
-+	if (get_user(r, uval))
- 		return -EFAULT;
-+	vcpu->arch.vcpu_debug_state.dbg_wcr[rd->reg] = r;
- 	return 0;
- }
- 
- static int get_wcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 	const struct kvm_one_reg *reg, void __user *uaddr)
- {
--	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_wcr[rd->reg];
-+	__u64 r = vcpu->arch.vcpu_debug_state.dbg_wcr[rd->reg];
-+	__u64 __user *uval = uaddr;
- 
--	if (copy_to_user(uaddr, r, KVM_REG_SIZE(reg->id)) != 0)
-+	if (put_user(r, uval))
- 		return -EFAULT;
- 	return 0;
- }
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index b9f68e4add71..639e388678ff 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -1502,7 +1502,10 @@ void kvm_arch_exit(void)
- 
- static int arm_init(void)
- {
--	int rc = kvm_init(NULL, sizeof(struct kvm_vcpu), 0, THIS_MODULE);
-+	int rc = kvm_init_usercopy(NULL, sizeof(struct kvm_vcpu), 0,
-+				   offsetof(struct kvm_vcpu_arch, ctxt),
-+				   sizeof_field(struct kvm_vcpu_arch, ctxt),
-+				   THIS_MODULE);
- 	return rc;
- }
- 
+I've pushed out a branch[2] with that patch as a prerequisite. Let me
+know if I should repost the whole thing.
+
+Sorry for the fsckup,
+
+	M.
+
+[1] https://patchwork.kernel.org/patch/9993695/
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/icache
 -- 
-2.14.2
+Jazz is not dead. It just smells funny.
