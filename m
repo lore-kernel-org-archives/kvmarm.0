@@ -1,35 +1,37 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
+From: Christoffer Dall <cdall@linaro.org>
 Subject: Re: [PATCH] KVM: arm/arm64: Allow usercopy to vcpu->arch.ctxt and
  arm64 debug
-Date: Mon, 23 Oct 2017 16:14:35 +0200
-Message-ID: <d2a7dcec-060b-6279-1c1d-a18b3eedb394@redhat.com>
-References: <20171020232525.7387-1-pbonzini@redhat.com>
- <20171021184545.2497-1-christoffer.dall@linaro.org>
+Date: Mon, 23 Oct 2017 16:49:07 +0200
+Message-ID: <CAMJs5B-VhREFk4qH+5we7JFtkx6CsKF+xN8mFg+2zSyc-DARYQ@mail.gmail.com>
+References: <20171020232525.7387-1-pbonzini@redhat.com> <20171021184545.2497-1-christoffer.dall@linaro.org>
  <CAGXu5jKJ2jPz2540ZLCwmcdVZxrgnhVPHs0uumiJm2o0ZgpVag@mail.gmail.com>
- <20171022074418.GA3805@cbox>
+ <20171022074418.GA3805@cbox> <d2a7dcec-060b-6279-1c1d-a18b3eedb394@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20171022074418.GA3805@cbox>
-Content-Language: en-US
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <cdall@linaro.org>, Kees Cook <keescook@chromium.org>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, KVM <kvm@vger.kernel.org>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>
+Content-Type: text/plain; charset="UTF-8"
+Return-path: <kernel-hardening-return-10260-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+In-Reply-To: <d2a7dcec-060b-6279-1c1d-a18b3eedb394@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Kees Cook <keescook@chromium.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, KVM <kvm@vger.kernel.org>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 22/10/2017 09:44, Christoffer Dall wrote:
-> However, I think it's much clearer if I
-> rewrite these to use get_user() and put_user().  v2 incoming.
+On Mon, Oct 23, 2017 at 4:14 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 22/10/2017 09:44, Christoffer Dall wrote:
+>> However, I think it's much clearer if I
+>> rewrite these to use get_user() and put_user().  v2 incoming.
+>
+> I'd actually prefer if you all do a trivial conversion to
+> kvm_init_usercopy to begin with.  In fact, we could just change the
+> default from "0, 0" to "0, sizeof (kvm_arch_vcpu)" in kvm_init.  Any
+> other change can be applied after the patches are merged to Linus's
+> tree, especially with KVM Forum and the merge window both coming soon.
+>
+In that case, expect no further action from me on this one until the
+patches have landed and I can resend my patch, unless you specifically
+tell me otherwise.
 
-I'd actually prefer if you all do a trivial conversion to
-kvm_init_usercopy to begin with.  In fact, we could just change the
-default from "0, 0" to "0, sizeof (kvm_arch_vcpu)" in kvm_init.  Any
-other change can be applied after the patches are merged to Linus's
-tree, especially with KVM Forum and the merge window both coming soon.
-
-I'll send a v2 myself later this week.
-
-Thanks all,
-
-Paolo
+Thanks,
+-Christoffer
