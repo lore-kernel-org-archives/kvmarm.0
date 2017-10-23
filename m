@@ -1,26 +1,22 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v4 15/21] KVM: arm64: Set an impdef ESR for Virtual-SError
- using VSESR_EL2.
-Date: Mon, 23 Oct 2017 16:26:39 +0100
-Message-ID: <59EE0A2F.8050703@arm.com>
-References: <20171019145807.23251-1-james.morse@arm.com>
- <20171019145807.23251-16-james.morse@arm.com>
- <CAMj-D2AMy1_SPrLGti9U=oz1JvBDHvRAMsBtw51B3JK0omLyXg@mail.gmail.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH v3 0/9] arm/arm64: KVM: limit icache invalidation to prefetch
+ aborts
+Date: Mon, 23 Oct 2017 16:49:36 +0100
+Message-ID: <20171023154945.14654-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F47D41185
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Oct 2017 11:27:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C4A5B49D2B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Oct 2017 11:49:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bspXnwlYS-uB for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Oct 2017 11:27:07 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 366F040795
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Oct 2017 11:27:07 -0400 (EDT)
-In-Reply-To: <CAMj-D2AMy1_SPrLGti9U=oz1JvBDHvRAMsBtw51B3JK0omLyXg@mail.gmail.com>
+ with ESMTP id D5DewyNk3Q5f for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 Oct 2017 11:49:12 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5346840795
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Oct 2017 11:49:12 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,102 +26,100 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: gengdongjiu <gengdj.1984@gmail.com>
-Cc: Jonathan.Zhang@cavium.com, Julien Thierry <julien.thierry@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu, Xiongfeng Wang <wangxiongfeng2@huawei.com>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+To: Christoffer Dall <christoffer.dall@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi gengdongjiu,
+It was recently reported that on a VM restore, we seem to spend a
+disproportionate amount of time invalidation the icache. This is
+partially due to some HW behaviour, but also because we're being a bit
+dumb and are invalidating the icache for every page we map at S2, even
+if that on a data access.
 
-On 20/10/17 17:44, gengdongjiu wrote:
-> 2017-10-19 22:58 GMT+08:00 James Morse <james.morse@arm.com>:
->> Prior to v8.2's RAS Extensions, the HCR_EL2.VSE 'virtual SError' feature
->> generated an SError with an implementation defined ESR_EL1.ISS, because we
->> had no mechanism to specify the ESR value.
->>
->> On Juno this generates an all-zero ESR, the most significant bit 'ISV'
->> is clear indicating the remainder of the ISS field is invalid.
->>
->> With the RAS Extensions we have a mechanism to specify this value, and the
->> most significant bit has a new meaning: 'IDS - Implementation Defined
->> Syndrome'. An all-zero SError ESR now means: 'RAS error: Uncategorized'
->> instead of 'no valid ISS'.
-> 
-> consider again.
+The slightly better way of doing this is to mark the pages XN at S2,
+and wait for the the guest to execute something in that page, at which
+point we perform the invalidation. As it is likely that there is a lot
+less instruction than data, we win (or so we hope).
 
-> I still consider that it is not better set  "Implementation Defined
-> Syndrome" here.
+We also take this opportunity to drop the extra dcache clean to the
+PoU which is pretty useless, as we already clean all the way to the
+PoC...
 
-Do you agree KVM does this today?
-ddb3d07cfe90 ("arm64: KVM: Inject a Virtual SError if it was pending")
+Running a bare metal test that touches 1GB of memory (using a 4kB
+stride) leads to the following results on Seattle:
 
-All I've changed here is that you don't get a RAS error passed into the guest.
-Its either deemed non-blocking and ignored, or we kick the guest with an impdef
-SError.
+4.13:
+do_fault_read.bin:       0.565885992 seconds time elapsed
+do_fault_write.bin:       0.738296337 seconds time elapsed
+do_fault_read_write.bin:       1.241812231 seconds time elapsed
 
-To do any better we need kernel first support, or a firmware first notification.
+4.14-rc3+patches:
+do_fault_read.bin:       0.244961803 seconds time elapsed
+do_fault_write.bin:       0.422740092 seconds time elapsed
+do_fault_read_write.bin:       0.643402470 seconds time elapsed
 
+We're almost halving the time of something that more or less looks
+like a restore operation. Some larger systems will show much bigger
+benefits as they become less impacted by the icache invalidation
+(which is broadcast in the inner shareable domain). I've tried to
+measure the impact on a VM boot in order to assess the impact of
+taking an extra permission fault, but found that any difference was
+simply noise.                                                                   
 
-> I know your meaning that An all-zero SError means Uncategorized
+I've also given it a test run on both Cubietruck and Jetson-TK1.
 
-Uncategorized RAS error. RAS errors should be handled by the host, we should not
-inject them into the guest on a path like this.
+Tests are archived here:
+https://git.kernel.org/pub/scm/linux/kernel/git/maz/kvm-ws-tests.git/
 
-Which impdef ESR would you like to use, and why does it matter?
+I'd value some additional test results on HW I don't have access to.
 
+* From v2:
+  - Brought back the "detangling" patch that allows 32bit ARM to still
+    compile...
+  - Let arm64 icache invalidation deal with userspace addresses
 
-> From the beginning,  our starting point is KVM is the architecture
-> related and Qemu/kvmtool is platform related.
-> Qemu/kvmtool is the role of host firmware.
-> so we let Qemu to create APEI/GHES table and record CPER,
+* From v1:
+  - Some function renaming (coherent->clean/invalidate)
+  - Made the arm64 icache invalidation a macro that's now used in
+    two places
+  - Fixed BTB flushing on 32bit
+  - Added stage2_is_exec as a predicate for XN being absent from the
+    entry
+  - Dropped patch #10 which was both useless and broken, and patch #9
+    that thus became useless
+  - Tried to measure the impact on kernel boot time and failed to see
+    any difference
 
-> and also injects SEA/SEI in the Qemu.
+Marc Zyngier (9):
+  KVM: arm/arm64: Detangle kvm_mmu.h from kvm_hyp.h
+  KVM: arm/arm64: Split dcache/icache flushing
+  arm64: KVM: Add invalidate_icache_range helper
+  arm: KVM: Add optimized PIPT icache flushing
+  arm64: KVM: PTE/PMD S2 XN bit definition
+  KVM: arm/arm64: Limit icache invalidation to prefetch aborts
+  KVM: arm/arm64: Only clean the dcache on translation fault
+  KVM: arm/arm64: Preserve Exec permission across R/W permission faults
+  KVM: arm/arm64: Drop vcpu parameter from guest cache maintenance
+    operartions
 
-For RAS events it generated all by itself, or was notified by the kernel using
-signals.
+ arch/arm/include/asm/kvm_hyp.h         |  3 +-
+ arch/arm/include/asm/kvm_mmu.h         | 99 ++++++++++++++++++++++++++++------
+ arch/arm/include/asm/pgtable.h         |  4 +-
+ arch/arm/kvm/hyp/switch.c              |  1 +
+ arch/arm/kvm/hyp/tlb.c                 |  1 +
+ arch/arm64/include/asm/assembler.h     | 21 ++++++++
+ arch/arm64/include/asm/cacheflush.h    |  7 +++
+ arch/arm64/include/asm/kvm_hyp.h       |  1 -
+ arch/arm64/include/asm/kvm_mmu.h       | 36 +++++++++++--
+ arch/arm64/include/asm/pgtable-hwdef.h |  2 +
+ arch/arm64/include/asm/pgtable-prot.h  |  4 +-
+ arch/arm64/kvm/hyp/debug-sr.c          |  1 +
+ arch/arm64/kvm/hyp/switch.c            |  1 +
+ arch/arm64/kvm/hyp/tlb.c               |  1 +
+ arch/arm64/mm/cache.S                  | 32 +++++++----
+ virt/kvm/arm/hyp/vgic-v2-sr.c          |  1 +
+ virt/kvm/arm/mmu.c                     | 64 +++++++++++++++++++---
+ 17 files changed, 236 insertions(+), 43 deletions(-)
 
-This is not one of those cases. But that's fine as we aren't injecting a RAS error.
-
-
-> About the vsesr_el2 which is used to specify the guest ESR,   also all
-> set by Qemu/kvmtool are better.
-> including the three cases  even the ESR are  all-zero(uncategorized).
-> 1. IMPLEMENTATION DEFINED
-> 2  categorized,
-> 3  uncategorized,
-
-I can't work out what you're saying here.
-
-If you're suggesting Qemu should set a default 'unknown' ESR for use when KVM
-doesn't know what to do, and SError is pretty much its only option:
-
-Why would Qemu set anything other than impdef:all-zeros?
-
-The only use would be to fake this back into a RAS error. Qemu isn't involved
-here so this can't be used to emulate NOTIFY_SEI without the kernel support. We
-don't have support for emulating the RAS ERR registers either, so this can't be
-used to emulate kernel first.
-
-
-If you're suggesting Qemu should specify a set of ESR values for the different
-cases where KVM doesn't know what do: this would be an early shortcut that burns
-us in the future, these things are going to be changed. This is too specific to
-KVMs internals:
-
-When we add NOTIFY_SEI support, we will call out of this KVM code and APEI
-should 'claim' any SError that arrived with CPER records.
-
-I expect this code to change dramatically if/when we add kernel first support.
-
-
-The KVM patches on the end of this series are just the minimum needed to enable
-IESB and keep the status quo for all other behaviour. And this is just so we can
-tackle the other bits of support that depends on the cpufeature without
-reposting all the same code.
-
-
-
-James
-
-
-> For this case, Qemu just set the ESR, nothing else, not passing
-> RAS-error to userspace.
+-- 
+2.11.0
