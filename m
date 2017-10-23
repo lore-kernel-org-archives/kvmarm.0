@@ -1,133 +1,60 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v5 07/10] KVM: arm/arm64: vgic-its: New helper functions to
- free the caches
-Date: Mon, 23 Oct 2017 16:08:26 +0200
-Message-ID: <1508767709-15256-8-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v5 05/10] KVM: arm/arm64: vgic-its: Save the collection table before device tables
+Date: Mon, 23 Oct 2017 16:08:24 +0200
+Message-ID: <1508767709-15256-6-git-send-email-eric.auger@redhat.com>
 References: <1508767709-15256-1-git-send-email-eric.auger@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 454DE49D69
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Oct 2017 10:08:00 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NJOl0vvGDA3e for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Oct 2017 10:07:59 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DAEAC49D42
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Oct 2017 10:07:57 -0400 (EDT)
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1508767709-15256-1-git-send-email-eric.auger@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: linux-kernel-owner@vger.kernel.org
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, cdall@linaro.org, peter.maydell@linaro.org, andre.przywara@arm.com, wanghaibin.wang@huawei.com
-Cc: wu.wubin@huawei.com
+Cc: wu.wubin@huawei.com, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: wanghaibin <wanghaibin.wang@huawei.com>
+Currently the ITS caches are not emptied on reset.
 
-We create two new functions that free the device and
-collection lists. They are currently called by vgic_its_destroy()
-and other callers will be added in subsequent patches.
+After a reset, in case we attempt to save the state before
+the bound devices have registered their MSIs and after the
+1st level table has been allocated by the ITS driver
+(device BASER is valid), the first level entries are still
+invalid. If the device cache is not empty (devices registered
+before the reset), vgic_its_save_device_tables fails.
 
-We also remove the check on its->device_list.next.
-Lists are initialized in vgic_create_its() and the device
-is added to the device list only if this latter succeeds.
+This failure has no consequence as those devices do not
+deserve to be saved: they correspond to the state before
+the reset.
 
-vgic_its_destroy is the device destroy ops. This latter is called
-by kvm_destroy_devices() which loops on all created devices. So
-at this point the list is initialized.
+However the ITS driver already sent MAPC for collections
+and those need to be saved. With the current code, they
+will not and the restored guest will not work properly.
 
-Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
+So this patch saves collection tables  before device tables.
+
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 
-v4 -> v5:
-- add mutex_lock in vgic_its_free_collection_list
-- use list_for_each_entry_safe
-- reword commit message
+candidate to be CC'ed stable
 ---
- virt/kvm/arm/vgic/vgic-its.c | 51 ++++++++++++++++++++++----------------------
- 1 file changed, 26 insertions(+), 25 deletions(-)
+ virt/kvm/arm/vgic/vgic-its.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 2f3c3a1..8098f91 100644
+index b6650c2..8472417 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -910,6 +910,30 @@ static void vgic_its_free_device(struct kvm *kvm, struct its_device *device)
- 	kfree(device);
- }
+@@ -2324,11 +2324,11 @@ static int vgic_its_save_tables_v0(struct vgic_its *its)
+ 		return -EBUSY;
+ 	}
  
-+static void vgic_its_free_device_list(struct kvm *kvm, struct vgic_its *its)
-+{
-+	struct its_device *cur, *temp;
-+
-+	mutex_lock(&its->its_lock);
-+
-+	list_for_each_entry_safe(cur, temp, &its->device_list, dev_list)
-+		vgic_its_free_device(kvm, cur);
-+
-+	mutex_unlock(&its->its_lock);
-+}
-+
-+static void vgic_its_free_collection_list(struct kvm *kvm, struct vgic_its *its)
-+{
-+	struct its_collection *cur, *temp;
-+
-+	mutex_lock(&its->its_lock);
-+
-+	list_for_each_entry_safe(cur, temp, &its->collection_list, coll_list)
-+		vgic_its_free_collection(its, cur->collection_id);
-+
-+	mutex_unlock(&its->its_lock);
-+}
-+
- /* Must be called with its_lock mutex held */
- static struct its_device *vgic_its_alloc_device(struct vgic_its *its,
- 						u32 device_id, gpa_t itt_addr,
-@@ -1627,32 +1651,9 @@ static void vgic_its_destroy(struct kvm_device *kvm_dev)
- {
- 	struct kvm *kvm = kvm_dev->kvm;
- 	struct vgic_its *its = kvm_dev->private;
--	struct list_head *cur, *temp;
--
--	/*
--	 * We may end up here without the lists ever having been initialized.
--	 * Check this and bail out early to avoid dereferencing a NULL pointer.
--	 */
--	if (!its->device_list.next)
--		return;
--
--	mutex_lock(&its->its_lock);
--	list_for_each_safe(cur, temp, &its->device_list) {
--		struct its_device *dev;
--
--		dev = list_entry(cur, struct its_device, dev_list);
--		vgic_its_free_device(kvm, dev);
--	}
--
--	list_for_each_safe(cur, temp, &its->collection_list) {
--		struct its_collection *coll;
--
--		coll = list_entry(cur, struct its_collection, coll_list);
--		list_del(cur);
--		kfree(coll);
--	}
--	mutex_unlock(&its->its_lock);
+-	ret = vgic_its_save_device_tables(its);
++	ret = vgic_its_save_collection_table(its);
+ 	if (ret)
+ 		goto out;
  
-+	vgic_its_free_device_list(kvm, its);
-+	vgic_its_free_collection_list(kvm, its);
- 	kfree(its);
- }
+-	ret = vgic_its_save_collection_table(its);
++	ret = vgic_its_save_device_tables(its);
  
+ out:
+ 	unlock_all_vcpus(kvm);
 -- 
 2.5.5
