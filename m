@@ -1,105 +1,154 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 0/9] arm/arm64: KVM: limit icache invalidation to prefetch aborts
-Date: Mon, 23 Oct 2017 17:11:13 +0100
-Message-ID: <20171023161122.15291-1-marc.zyngier@arm.com>
+Subject: [PATCH v3 3/9] arm64: KVM: Add invalidate_icache_range helper
+Date: Mon, 23 Oct 2017 17:11:16 +0100
+Message-ID: <20171023161122.15291-4-marc.zyngier@arm.com>
+References: <20171023161122.15291-1-marc.zyngier@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20171023161122.15291-1-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-[now with the patches correctly following...]
+We currently tightly couple dcache clean with icache invalidation,
+but KVM could do without the initial flush to PoU, as we've
+already flushed things to PoC.
 
-It was recently reported that on a VM restore, we seem to spend a
-disproportionate amount of time invalidation the icache. This is
-partially due to some HW behaviour, but also because we're being a bit
-dumb and are invalidating the icache for every page we map at S2, even
-if that on a data access.
+Let's introduce invalidate_icache_range which is limited to
+invalidating the icache from the linear mapping (and thus
+has none of the userspace fault handling complexity), and
+wire it in KVM instead of flush_icache_range.
 
-The slightly better way of doing this is to mark the pages XN at S2,
-and wait for the the guest to execute something in that page, at which
-point we perform the invalidation. As it is likely that there is a lot
-less instruction than data, we win (or so we hope).
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm64/include/asm/assembler.h  | 21 +++++++++++++++++++++
+ arch/arm64/include/asm/cacheflush.h |  7 +++++++
+ arch/arm64/include/asm/kvm_mmu.h    |  4 ++--
+ arch/arm64/mm/cache.S               | 32 ++++++++++++++++++++++----------
+ 4 files changed, 52 insertions(+), 12 deletions(-)
 
-We also take this opportunity to drop the extra dcache clean to the
-PoU which is pretty useless, as we already clean all the way to the
-PoC...
-
-Running a bare metal test that touches 1GB of memory (using a 4kB
-stride) leads to the following results on Seattle:
-
-4.13:
-do_fault_read.bin:       0.565885992 seconds time elapsed
-do_fault_write.bin:       0.738296337 seconds time elapsed
-do_fault_read_write.bin:       1.241812231 seconds time elapsed
-
-4.14-rc3+patches:
-do_fault_read.bin:       0.244961803 seconds time elapsed
-do_fault_write.bin:       0.422740092 seconds time elapsed
-do_fault_read_write.bin:       0.643402470 seconds time elapsed
-
-We're almost halving the time of something that more or less looks
-like a restore operation. Some larger systems will show much bigger
-benefits as they become less impacted by the icache invalidation
-(which is broadcast in the inner shareable domain). I've tried to
-measure the impact on a VM boot in order to assess the impact of
-taking an extra permission fault, but found that any difference was
-simply noise.                                                                   
-
-I've also given it a test run on both Cubietruck and Jetson-TK1.
-
-Tests are archived here:
-https://git.kernel.org/pub/scm/linux/kernel/git/maz/kvm-ws-tests.git/
-
-I'd value some additional test results on HW I don't have access to.
-
-* From v2:
-  - Brought back the "detangling" patch that allows 32bit ARM to still
-    compile...
-  - Let arm64 icache invalidation deal with userspace addresses
-
-* From v1:
-  - Some function renaming (coherent->clean/invalidate)
-  - Made the arm64 icache invalidation a macro that's now used in
-    two places
-  - Fixed BTB flushing on 32bit
-  - Added stage2_is_exec as a predicate for XN being absent from the
-    entry
-  - Dropped patch #10 which was both useless and broken, and patch #9
-    that thus became useless
-  - Tried to measure the impact on kernel boot time and failed to see
-    any difference
-
-Marc Zyngier (9):
-  KVM: arm/arm64: Detangle kvm_mmu.h from kvm_hyp.h
-  KVM: arm/arm64: Split dcache/icache flushing
-  arm64: KVM: Add invalidate_icache_range helper
-  arm: KVM: Add optimized PIPT icache flushing
-  arm64: KVM: PTE/PMD S2 XN bit definition
-  KVM: arm/arm64: Limit icache invalidation to prefetch aborts
-  KVM: arm/arm64: Only clean the dcache on translation fault
-  KVM: arm/arm64: Preserve Exec permission across R/W permission faults
-  KVM: arm/arm64: Drop vcpu parameter from guest cache maintenance
-    operartions
-
- arch/arm/include/asm/kvm_hyp.h         |  3 +-
- arch/arm/include/asm/kvm_mmu.h         | 99 ++++++++++++++++++++++++++++------
- arch/arm/include/asm/pgtable.h         |  4 +-
- arch/arm/kvm/hyp/switch.c              |  1 +
- arch/arm/kvm/hyp/tlb.c                 |  1 +
- arch/arm64/include/asm/assembler.h     | 21 ++++++++
- arch/arm64/include/asm/cacheflush.h    |  7 +++
- arch/arm64/include/asm/kvm_hyp.h       |  1 -
- arch/arm64/include/asm/kvm_mmu.h       | 36 +++++++++++--
- arch/arm64/include/asm/pgtable-hwdef.h |  2 +
- arch/arm64/include/asm/pgtable-prot.h  |  4 +-
- arch/arm64/kvm/hyp/debug-sr.c          |  1 +
- arch/arm64/kvm/hyp/switch.c            |  1 +
- arch/arm64/kvm/hyp/tlb.c               |  1 +
- arch/arm64/mm/cache.S                  | 32 +++++++----
- virt/kvm/arm/hyp/vgic-v2-sr.c          |  1 +
- virt/kvm/arm/mmu.c                     | 64 +++++++++++++++++++---
- 17 files changed, 236 insertions(+), 43 deletions(-)
-
+diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
+index d58a6253c6ab..27093cf2b91f 100644
+--- a/arch/arm64/include/asm/assembler.h
++++ b/arch/arm64/include/asm/assembler.h
+@@ -375,6 +375,27 @@ alternative_endif
+ 	.endm
+ 
+ /*
++ * Macro to perform an instruction cache maintenance for the interval
++ * [start, end)
++ *
++ * 	start, end:	virtual addresses describing the region
++ *	label:		A label to branch to on user fault.
++ * 	Corrupts:	tmp1, tmp2
++ */
++	.macro invalidate_icache_by_line start, end, tmp1, tmp2, label
++	icache_line_size \tmp1, \tmp2
++	sub	\tmp2, \tmp1, #1
++	bic	\tmp2, \start, \tmp2
++9997:
++USER(\label, ic	ivau, \tmp2)			// invalidate I line PoU
++	add	\tmp2, \tmp2, \tmp1
++	cmp	\tmp2, \end
++	b.lo	9997b
++	dsb	ish
++	isb
++	.endm
++
++/*
+  * reset_pmuserenr_el0 - reset PMUSERENR_EL0 if PMUv3 present
+  */
+ 	.macro	reset_pmuserenr_el0, tmpreg
+diff --git a/arch/arm64/include/asm/cacheflush.h b/arch/arm64/include/asm/cacheflush.h
+index 76d1cc85d5b1..e671e73c6453 100644
+--- a/arch/arm64/include/asm/cacheflush.h
++++ b/arch/arm64/include/asm/cacheflush.h
+@@ -52,6 +52,12 @@
+  *		- start  - virtual start address
+  *		- end    - virtual end address
+  *
++ *	invalidate_icache_range(start, end)
++ *
++ *		Invalidate the I-cache in the region described by start, end.
++ *		- start  - virtual start address
++ *		- end    - virtual end address
++ *
+  *	__flush_cache_user_range(start, end)
+  *
+  *		Ensure coherency between the I-cache and the D-cache in the
+@@ -66,6 +72,7 @@
+  *		- size   - region size
+  */
+ extern void flush_icache_range(unsigned long start, unsigned long end);
++extern int  invalidate_icache_range(unsigned long start, unsigned long end);
+ extern void __flush_dcache_area(void *addr, size_t len);
+ extern void __inval_dcache_area(void *addr, size_t len);
+ extern void __clean_dcache_area_poc(void *addr, size_t len);
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 8034b96fb3a4..56b3e03c85e7 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -250,8 +250,8 @@ static inline void __invalidate_icache_guest_page(struct kvm_vcpu *vcpu,
+ 		/* PIPT or VPIPT at EL2 (see comment in __kvm_tlb_flush_vmid_ipa) */
+ 		void *va = page_address(pfn_to_page(pfn));
+ 
+-		flush_icache_range((unsigned long)va,
+-				   (unsigned long)va + size);
++		invalidate_icache_range((unsigned long)va,
++					(unsigned long)va + size);
+ 	}
+ }
+ 
+diff --git a/arch/arm64/mm/cache.S b/arch/arm64/mm/cache.S
+index 7f1dbe962cf5..bedd23da83f4 100644
+--- a/arch/arm64/mm/cache.S
++++ b/arch/arm64/mm/cache.S
+@@ -60,16 +60,7 @@ user_alt 9f, "dc cvau, x4",  "dc civac, x4",  ARM64_WORKAROUND_CLEAN_CACHE
+ 	b.lo	1b
+ 	dsb	ish
+ 
+-	icache_line_size x2, x3
+-	sub	x3, x2, #1
+-	bic	x4, x0, x3
+-1:
+-USER(9f, ic	ivau, x4	)		// invalidate I line PoU
+-	add	x4, x4, x2
+-	cmp	x4, x1
+-	b.lo	1b
+-	dsb	ish
+-	isb
++	invalidate_icache_by_line x0, x1, x2, x3, 9f
+ 	mov	x0, #0
+ 1:
+ 	uaccess_ttbr0_disable x1
+@@ -81,6 +72,27 @@ ENDPROC(flush_icache_range)
+ ENDPROC(__flush_cache_user_range)
+ 
+ /*
++ *	invalidate_icache_range(start,end)
++ *
++ *	Ensure that the I cache is invalid within specified region.
++ *
++ *	- start   - virtual start address of region
++ *	- end     - virtual end address of region
++ */
++ENTRY(invalidate_icache_range)
++	uaccess_ttbr0_enable x2, x3
++
++	invalidate_icache_by_line x0, x1, x2, x3, 2f
++	mov	x0, xzr
++1:
++	uaccess_ttbr0_disable x1
++	ret
++2:
++	mov	x0, #-EFAULT
++	b	1b
++ENDPROC(invalidate_icache_range)
++
++/*
+  *	__flush_dcache_area(kaddr, size)
+  *
+  *	Ensure that any D-cache lines for the interval [kaddr, kaddr+size)
 -- 
 2.11.0
