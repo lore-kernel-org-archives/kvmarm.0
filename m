@@ -1,23 +1,23 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v5 03/10] KVM: arm/arm64: vgic-its: Check CBASER/BASER
- validity before enabling the ITS
-Date: Mon, 23 Oct 2017 16:08:22 +0200
-Message-ID: <1508767709-15256-4-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v5 04/10] KVM: arm/arm64: vgic-its: Check GITS_BASER Valid bit
+ before saving tables
+Date: Mon, 23 Oct 2017 16:08:23 +0200
+Message-ID: <1508767709-15256-5-git-send-email-eric.auger@redhat.com>
 References: <1508767709-15256-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A5BC349D47
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Oct 2017 10:07:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E87FA49D29
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Oct 2017 10:07:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GoCFtpBCQNZz for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Oct 2017 10:07:38 -0400 (EDT)
+ with ESMTP id 2zeINcrjJwkB for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 Oct 2017 10:07:46 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C8F1849D36
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Oct 2017 10:07:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EFF2B49D20
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Oct 2017 10:07:45 -0400 (EDT)
 In-Reply-To: <1508767709-15256-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,62 +32,97 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.or
 Cc: wu.wubin@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The spec says it is UNPREDICTABLE to enable the ITS
-if any of the following conditions are true:
+At the moment we don't properly check the GITS_BASER<n>.Valid
+bit before saving the collection and device tables.
 
-- GITS_CBASER.Valid == 0.
-- GITS_BASER<n>.Valid == 0, for any GITS_BASER<n> register
-  where the Type field indicates Device.
-- GITS_BASER<n>.Valid == 0, for any GITS_BASER<n> register
-  where the Type field indicates Interrupt Collection and
-  GITS_TYPER.HCC == 0.
+On vgic_its_save_collection_table() we use the GITS_BASER gpa
+field whereas the Valid bit should be used.
 
-In that case, let's keep the ITS disabled.
+On vgic_its_save_device_tables() there is no check. This can
+cause various bugs, among which a subsequent fault when accessing
+the table in guest memory.
+
+Let's systematically check the Valid bit before doing anything.
+
+We also uniformize the code between save and restore.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reported-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 
 ---
 
 need to be CC'ed stable
 
-v4 -> v5:
-- check the condition before updating its->enabled and
-  fix its->cbaser && GITS_CBASER_VALID
-
-v3: creation
+v2 -> v3:
+- slight rewording of the commit message
+- added Andre's and Christoffer's R-b
 ---
- virt/kvm/arm/vgic/vgic-its.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ virt/kvm/arm/vgic/vgic-its.c | 20 +++++++++++---------
+ 1 file changed, 11 insertions(+), 9 deletions(-)
 
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index b0ba80f..1eb355e 100644
+index 1eb355e..b6650c2 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -1466,6 +1466,16 @@ static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
+@@ -2071,11 +2071,12 @@ static int vgic_its_device_cmp(void *priv, struct list_head *a,
+ static int vgic_its_save_device_tables(struct vgic_its *its)
  {
- 	mutex_lock(&its->cmd_lock);
+ 	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
++	u64 baser = its->baser_device_table;
+ 	struct its_device *dev;
+ 	int dte_esz = abi->dte_esz;
+-	u64 baser;
  
-+	/*
-+	 * It is UNPREDICTABLE to enable the ITS if any of the CBASER or
-+	 * device/collection BASER are invalid
-+	 */
-+	if (!its->enabled && (val & GITS_CTLR_ENABLE) &&
-+		(!(its->baser_device_table & GITS_BASER_VALID) ||
-+		 !(its->baser_coll_table & GITS_BASER_VALID) ||
-+		 !(its->cbaser & GITS_CBASER_VALID)))
-+		goto out;
-+
- 	its->enabled = !!(val & GITS_CTLR_ENABLE);
+-	baser = its->baser_device_table;
++	if (!(baser & GITS_BASER_VALID))
++		return 0;
  
- 	/*
-@@ -1474,6 +1484,7 @@ static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
- 	 */
- 	vgic_its_process_commands(kvm, its);
+ 	list_sort(NULL, &its->device_list, vgic_its_device_cmp);
  
-+out:
- 	mutex_unlock(&its->cmd_lock);
- }
+@@ -2232,17 +2233,17 @@ static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, int esz,
+ static int vgic_its_save_collection_table(struct vgic_its *its)
+ {
+ 	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
++	u64 baser = its->baser_coll_table;
++	gpa_t gpa = BASER_ADDRESS(baser);
+ 	struct its_collection *collection;
+ 	u64 val;
+-	gpa_t gpa;
+ 	size_t max_size, filled = 0;
+ 	int ret, cte_esz = abi->cte_esz;
  
+-	gpa = BASER_ADDRESS(its->baser_coll_table);
+-	if (!gpa)
++	if (!(baser & GITS_BASER_VALID))
+ 		return 0;
+ 
+-	max_size = GITS_BASER_NR_PAGES(its->baser_coll_table) * SZ_64K;
++	max_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
+ 
+ 	list_for_each_entry(collection, &its->collection_list, coll_list) {
+ 		ret = vgic_its_save_cte(its, collection, gpa, cte_esz);
+@@ -2278,17 +2279,18 @@ static int vgic_its_save_collection_table(struct vgic_its *its)
+ static int vgic_its_restore_collection_table(struct vgic_its *its)
+ {
+ 	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
++	u64 baser = its->baser_coll_table;
+ 	int cte_esz = abi->cte_esz;
+ 	size_t max_size, read = 0;
+ 	gpa_t gpa;
+ 	int ret;
+ 
+-	if (!(its->baser_coll_table & GITS_BASER_VALID))
++	if (!(baser & GITS_BASER_VALID))
+ 		return 0;
+ 
+-	gpa = BASER_ADDRESS(its->baser_coll_table);
++	gpa = BASER_ADDRESS(baser);
+ 
+-	max_size = GITS_BASER_NR_PAGES(its->baser_coll_table) * SZ_64K;
++	max_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
+ 
+ 	while (read < max_size) {
+ 		bool last;
 -- 
 2.5.5
