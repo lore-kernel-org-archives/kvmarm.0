@@ -1,112 +1,133 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v5 01/10] KVM: arm/arm64: vgic-its: Fix return value for
- device table restore
-Date: Tue, 24 Oct 2017 18:02:20 +0200
-Message-ID: <20171024160220.GB91785@lvm>
+Subject: Re: [PATCH v5 02/10] KVM: arm/arm64: vgic-its: Fix
+ vgic_its_restore_collection_table returned value
+Date: Tue, 24 Oct 2017 18:15:43 +0200
+Message-ID: <20171024161543.GC91785@lvm>
 References: <1508767709-15256-1-git-send-email-eric.auger@redhat.com>
- <1508767709-15256-2-git-send-email-eric.auger@redhat.com>
+ <1508767709-15256-3-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1508767709-15256-2-git-send-email-eric.auger@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <1508767709-15256-3-git-send-email-eric.auger@redhat.com>
+Sender: kvm-owner@vger.kernel.org
 To: Eric Auger <eric.auger@redhat.com>
 Cc: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, peter.maydell@linaro.org, andre.przywara@arm.com, wanghaibin.wang@huawei.com, wu.wubin@huawei.com, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Oct 23, 2017 at 04:08:20PM +0200, Eric Auger wrote:
-> From: wanghaibin <wanghaibin.wang@huawei.com>
+On Mon, Oct 23, 2017 at 04:08:21PM +0200, Eric Auger wrote:
+> vgic_its_restore_cte returns +1 if the collection table entry
+> is valid and properly decoded. As a consequence, if the
+> collection table is fully filled with valid data that are
+> decoded without error, vgic_its_restore_collection_table()
+> returns +1.  This is wrong.
 > 
-> If ITT only contains invalid entries, vgic_its_restore_itt
-> returns 1 and this is considered as an an error in
-> vgic_its_restore_dte.
+> Let's use the standard C convention for both vgic_its_restore_cte
+> and vgic_its_restore_collection_table. vgic_its_restore_cte now
+> returns whether we have reached the end of the table in the @last
+> output parameter. vgic_its_restore_collection_table aborts in case
+> of error or if the end is found. Otherwise, it now returns 0.
 > 
-> Also in case the device table only contains invalid entries,
-> the table restore fails and this is not correct.
-> 
-> This patch fixes those 2 issues:
-> - vgic_its_restore_itt now returns <= 0 values. If all
->   ITEs are invalid, this is considered as successful.
-> - vgic_its_restore_device_tables also returns <= 0 values.
-> 
-> We also simplify the returned value computation in
-> handle_l1_dte.
-> 
-> Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
+> Fixes: ea1ad53e1e31a3 (KVM: arm64: vgic-its: Collection table save/restore)
 > Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
-
+> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 > 
 > ---
 > 
-> need to CC'ed stable
+> need to be CC'ed stable
 > 
-> v2 -> v3:
-> - add comments
-> - vgic_its_restore_itt don't return +1 anymore
-> - reword the commit message
+> v4 -> v5:
+> - added Christoffer R-b
 > 
-> v1 -> v2:
-> - if (ret > 0) ret = 0
+> v2 -> v3: creation
 > ---
->  virt/kvm/arm/vgic/vgic-its.c | 20 +++++++++++++++-----
->  1 file changed, 15 insertions(+), 5 deletions(-)
+>  virt/kvm/arm/vgic/vgic-its.c | 40 +++++++++++++++++++++++++++++++---------
+>  1 file changed, 31 insertions(+), 9 deletions(-)
 > 
 > diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index f51c1e1..d27a301 100644
+> index d27a301..b0ba80f 100644
 > --- a/virt/kvm/arm/vgic/vgic-its.c
 > +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -1940,6 +1940,14 @@ static int vgic_its_save_itt(struct vgic_its *its, struct its_device *device)
->  	return 0;
+> @@ -2169,7 +2169,19 @@ static int vgic_its_save_cte(struct vgic_its *its,
+>  	return kvm_write_guest(its->dev->kvm, gpa, &val, esz);
 >  }
 >  
+> -static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, int esz)
 > +/**
-> + * vgic_its_restore_itt - restore the ITT of a device
+> + * vgic_its_restore_cte - Restore a collection table entry
 > + *
 > + * @its: its handle
-> + * @dev: device handle
+> + * @gpa: guest physical address of the entry
+> + * @esz: entry size
+> + * @last: output boolean indicating whether we have reached the
+> + *       end of the collection table (ie. an invalid entry was decoded)
 > + *
-> + * Return 0 on success, < 0 on error
+> + * Return: 0 upon success, < 0 on error
 > + */
->  static int vgic_its_restore_itt(struct vgic_its *its, struct its_device *dev)
+> +static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, int esz,
+> +				bool *last)
 >  {
->  	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
-> @@ -1951,6 +1959,10 @@ static int vgic_its_restore_itt(struct vgic_its *its, struct its_device *dev)
->  	ret = scan_its_table(its, base, max_size, ite_esz, 0,
->  			     vgic_its_restore_ite, dev);
+>  	struct its_collection *collection;
+>  	struct kvm *kvm = its->dev->kvm;
+> @@ -2182,7 +2194,8 @@ static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, int esz)
+>  	if (ret)
+>  		return ret;
+>  	val = le64_to_cpu(val);
+> -	if (!(val & KVM_ITS_CTE_VALID_MASK))
+> +	*last = !(val & KVM_ITS_CTE_VALID_MASK);
+> +	if (*last)
+>  		return 0;
 >  
-> +	/* scan_its_table returns +1 if all ITEs are invalid */
-> +	if (ret > 0)
-> +		ret = 0;
-> +
->  	return ret;
->  }
->  
-> @@ -2107,10 +2119,7 @@ static int handle_l1_dte(struct vgic_its *its, u32 id, void *addr,
->  	ret = scan_its_table(its, gpa, SZ_64K, dte_esz,
->  			     l2_start_id, vgic_its_restore_dte, NULL);
->  
-> -	if (ret <= 0)
-> -		return ret;
-> -
+>  	target_addr = (u32)(val >> KVM_ITS_CTE_RDBASE_SHIFT);
+> @@ -2198,7 +2211,7 @@ static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, int esz)
+>  	if (ret)
+>  		return ret;
+>  	collection->target_addr = target_addr;
 > -	return 1;
-> +	return ret;
+> +	return 0;
 >  }
 >  
 >  /**
-> @@ -2140,8 +2149,9 @@ static int vgic_its_restore_device_tables(struct vgic_its *its)
->  				     vgic_its_restore_dte, NULL);
+> @@ -2243,8 +2256,13 @@ static int vgic_its_save_collection_table(struct vgic_its *its)
+>  
+>  /**
+>   * vgic_its_restore_collection_table - reads the collection table
+> - * in guest memory and restores the ITS internal state. Requires the
+> - * BASER registers to be restored before.
+> + * in guest memory and restores the ITS collection cache.
+> + *
+> + * @its: its handle
+> + *
+> + * Requires the Collection BASER to be previously restored.
+> + *
+> + * Returns 0 on success or < 0 on error
+>   */
+>  static int vgic_its_restore_collection_table(struct vgic_its *its)
+>  {
+> @@ -2262,13 +2280,17 @@ static int vgic_its_restore_collection_table(struct vgic_its *its)
+>  	max_size = GITS_BASER_NR_PAGES(its->baser_coll_table) * SZ_64K;
+>  
+>  	while (read < max_size) {
+> -		ret = vgic_its_restore_cte(its, gpa, cte_esz);
+> -		if (ret <= 0)
+> -			break;
+> +		bool last;
+> +
+> +		ret = vgic_its_restore_cte(its, gpa, cte_esz, &last);
+> +		if (ret < 0 || last)
+> +			return ret;
+>  		gpa += cte_esz;
+>  		read += cte_esz;
 >  	}
->  
-> +	/* scan_its_table returns +1 if all entries are invalid */
->  	if (ret > 0)
-> -		ret = -EINVAL;
-> +		ret = 0;
->  
->  	return ret;
->  }
-> -- 
-> 2.5.5
-> 
+> -	return ret;
+> +
+> +	/* table was fully filled with valid entries, decoded without error */
+> +	return 0;
+
+Why is this patch not replaced with:
+
+	if (ret > 0)
+		ret = 0;
+
+Thanks,
+-Christoffer
