@@ -1,31 +1,37 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 07/20] KVM: arm/arm64: Make timer_arm and timer_disarm helpers more generic
-Date: Wed, 25 Oct 2017 14:49:14 +0100
-Message-ID: <86bmkvcp7p.fsf@arm.com>
+Subject: Re: [PATCH v4 10/20] KVM: arm/arm64: Use separate timer for phys timer emulation
+Date: Wed, 25 Oct 2017 14:59:13 +0100
+Message-ID: <867evjcor2.fsf@arm.com>
 References: <20171020114939.12554-1-christoffer.dall@linaro.org>
-        <20171020114939.12554-8-christoffer.dall@linaro.org>
+        <20171020114939.12554-11-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20171020114939.12554-8-christoffer.dall@linaro.org> (Christoffer
-        Dall's message of "Fri, 20 Oct 2017 13:49:26 +0200")
+In-Reply-To: <20171020114939.12554-11-christoffer.dall@linaro.org>
+        (Christoffer Dall's message of "Fri, 20 Oct 2017 13:49:29 +0200")
 Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Shih-Wei Li <shihwei@cs.columbia.edu>, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 20 2017 at  1:49:26 pm BST, Christoffer Dall <christoffer.dall@linaro.org> wrote:
+On Fri, Oct 20 2017 at  1:49:29 pm BST, Christoffer Dall <christoffer.dall@linaro.org> wrote:
 > From: Christoffer Dall <cdall@linaro.org>
 >
-> We are about to add an additional soft timer to the arch timer state for
-> a VCPU and would like to be able to reuse the functions to program and
-> cancel a timer, so we make them slightly more generic and rename to make
-> it more clear that these functions work on soft timers and not the
-> hardware resource that this code is managing.
+> We were using the same hrtimer for emulating the physical timer and for
+> making sure a blocking VCPU thread would be eventually woken up.  That
+> worked fine in the previous arch timer design, but as we are about to
+> actually use the soft timer expire function for the physical timer
+> emulation, change the logic to use a dedicated hrtimer.
 >
-> The armed flag on the timer state is only used to assert a condition,
-> and we don't rely on this assertion in any meaningful way, so we can
-> simply get rid of this flack and slightly reduce complexity.
+> This has the added benefit of not having to cancel any work in the sync
+> path, which in turn allows us to run the flush and sync with IRQs
+> disabled.
+>
+> Note that the hrtimer used to program the host kernel's timer to
+> generate an exit from the guest when the emulated physical timer fires
+> never has to inject any work, and to share the soft_timer_cancel()
+> function with the bg_timer, we change the function to only cancel any
+> pending work if the pointer to the work struct is not null.
 >
 > Signed-off-by: Christoffer Dall <cdall@linaro.org>
 
