@@ -1,107 +1,98 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v4 14/26] KVM: arm/arm64: GICv4: Handle MOVALL applied to
- a vPE
-Date: Wed, 25 Oct 2017 18:27:19 +0200
-Message-ID: <20171025162719.GN91785@lvm>
+Subject: Re: [PATCH v4 17/26] KVM: arm/arm64: GICv4: Propagate VLPI
+ properties at map time
+Date: Wed, 25 Oct 2017 18:48:27 +0200
+Message-ID: <20171025164827.GO91785@lvm>
 References: <20171006153401.5481-1-marc.zyngier@arm.com>
- <20171006153401.5481-15-marc.zyngier@arm.com>
+ <20171006153401.5481-18-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 198C749D26
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Oct 2017 12:26:05 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0+Vjinr1QWCr for <kvmarm@lists.cs.columbia.edu>;
- Wed, 25 Oct 2017 12:26:03 -0400 (EDT)
-Received: from mail-wm0-f65.google.com (mail-wm0-f65.google.com [74.125.82.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 12605406BB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Oct 2017 12:26:03 -0400 (EDT)
-Received: by mail-wm0-f65.google.com with SMTP id u138so2975164wmu.5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Oct 2017 09:27:23 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20171006153401.5481-15-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+In-Reply-To: <20171006153401.5481-18-marc.zyngier@arm.com>
+Sender: kvm-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Andre Przywara <Andre.Przywara@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Andre Przywara <Andre.Przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 06, 2017 at 04:33:49PM +0100, Marc Zyngier wrote:
-> The current implementation of MOVALL doesn't allow us to call
-> into the core ITS code as we hold a number of spinlocks.
+On Fri, Oct 06, 2017 at 04:33:52PM +0100, Marc Zyngier wrote:
+> When the VLPI gets mapped, it must inherit the configuration of
+> the LPI configured at the vITS level. For that purpose, let's make
+> update_lpi_config globally available and call it just after
+> having performed the VLPI map operation.
 > 
-> Let's try a method used in other parts of the code, were we copy
-> the intids of the candicate interrupts, and then do whatever
-> we need to do with them outside of the critical section.
-> 
-> This allows us to move the interrupts one by one, at the expense
-> of a bit of CPU time. Who cares? MOVALL is such a stupid command
-> anyway...
-> 
+> Acked-by: Christoffer Dall <cdall@linaro.org>
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
-
 > ---
->  virt/kvm/arm/vgic/vgic-its.c | 19 ++++++++++---------
->  1 file changed, 10 insertions(+), 9 deletions(-)
+>  virt/kvm/arm/vgic/vgic-its.c | 6 ++----
+>  virt/kvm/arm/vgic/vgic-v4.c  | 2 ++
+>  virt/kvm/arm/vgic/vgic.h     | 2 ++
+>  3 files changed, 6 insertions(+), 4 deletions(-)
 > 
 > diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index 5778b50911e8..0b7e648e7a0c 100644
+> index eb72eb027060..f434748439ee 100644
 > --- a/virt/kvm/arm/vgic/vgic-its.c
 > +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -1148,11 +1148,12 @@ static int vgic_its_cmd_handle_invall(struct kvm *kvm, struct vgic_its *its,
->  static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
->  				      u64 *its_cmd)
+> @@ -37,8 +37,6 @@
+>  static int vgic_its_save_tables_v0(struct vgic_its *its);
+>  static int vgic_its_restore_tables_v0(struct vgic_its *its);
+>  static int vgic_its_commit_v0(struct vgic_its *its);
+> -static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
+> -			     struct kvm_vcpu *filter_vcpu, bool needs_inv);
+>  
+>  /*
+>   * Creates a new (reference to a) struct vgic_irq for a given LPI.
+> @@ -272,8 +270,8 @@ static struct its_collection *find_collection(struct vgic_its *its, int coll_id)
+>   * If filter_vcpu is not NULL, applies only if the IRQ is targeting this
+>   * VCPU. Unconditionally applies if filter_vcpu is NULL.
+>   */
+> -static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
+> -			     struct kvm_vcpu *filter_vcpu, bool needs_inv)
+> +int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
+> +		      struct kvm_vcpu *filter_vcpu, bool needs_inv)
 >  {
-> -	struct vgic_dist *dist = &kvm->arch.vgic;
->  	u32 target1_addr = its_cmd_get_target_addr(its_cmd);
->  	u32 target2_addr = its_cmd_mask_field(its_cmd, 3, 16, 32);
->  	struct kvm_vcpu *vcpu1, *vcpu2;
->  	struct vgic_irq *irq;
-> +	u32 *intids;
-> +	int irq_count, i;
+>  	u64 propbase = GICR_PROPBASER_ADDRESS(kvm->arch.vgic.propbaser);
+>  	u8 prop;
+> diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
+> index ba1dd3162eba..b79a0450bb1c 100644
+> --- a/virt/kvm/arm/vgic/vgic-v4.c
+> +++ b/virt/kvm/arm/vgic/vgic-v4.c
+> @@ -147,6 +147,8 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
+>  	irq->hw		= true;
+>  	irq->host_irq	= virq;
 >  
->  	if (target1_addr >= atomic_read(&kvm->online_vcpus) ||
->  	    target2_addr >= atomic_read(&kvm->online_vcpus))
-> @@ -1164,19 +1165,19 @@ static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
->  	vcpu1 = kvm_get_vcpu(kvm, target1_addr);
->  	vcpu2 = kvm_get_vcpu(kvm, target2_addr);
+> +	/* Force the property update and invalidate */
+> +	update_lpi_config(kvm, irq, NULL, true);
+
+Actually, when re-reading this patch, this looks weird to me.
+
+I think this needs to either be done as part of the map, or before the
+map, to prevent for example a disabled interrupt from the guest'ss PoV
+to fire when it doesn't expect it.
+
+Thanks,
+-Christoffer
+
+>  out:
+>  	mutex_unlock(&its->its_lock);
+>  	return ret;
+> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+> index c4105f613f57..1bd2e28ac097 100644
+> --- a/virt/kvm/arm/vgic/vgic.h
+> +++ b/virt/kvm/arm/vgic/vgic.h
+> @@ -239,6 +239,8 @@ static inline int vgic_v3_max_apr_idx(struct kvm_vcpu *vcpu)
+>  int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
+>  			 u32 devid, u32 eventid, struct vgic_irq **irq);
+>  struct vgic_its *vgic_msi_to_its(struct kvm *kvm, struct kvm_msi *msi);
+> +int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
+> +		      struct kvm_vcpu *filter_vcpu, bool needs_inv);
 >  
-> -	spin_lock(&dist->lpi_list_lock);
-> +	irq_count = vgic_copy_lpi_list(vcpu1, &intids);
-> +	if (irq_count < 0)
-> +		return irq_count;
->  
-> -	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
-> -		spin_lock(&irq->irq_lock);
-> +	for (i = 0; i < irq_count; i++) {
-> +		irq = vgic_get_irq(kvm, NULL, intids[i]);
->  
-> -		if (irq->target_vcpu == vcpu1)
-> -			irq->target_vcpu = vcpu2;
-> +		update_affinity(irq, vcpu2);
->  
-> -		spin_unlock(&irq->irq_lock);
-> +		vgic_put_irq(kvm, irq);
->  	}
->  
-> -	spin_unlock(&dist->lpi_list_lock);
-> -
-> +	kfree(intids);
->  	return 0;
->  }
->  
+>  bool vgic_supports_direct_msis(struct kvm *kvm);
+>  int vgic_v4_init(struct kvm *kvm);
 > -- 
 > 2.14.1
 > 
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
