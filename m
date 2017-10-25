@@ -1,41 +1,82 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 10/20] KVM: arm/arm64: Use separate timer for phys timer emulation
-Date: Wed, 25 Oct 2017 14:59:13 +0100
-Message-ID: <867evjcor2.fsf@arm.com>
+Subject: Re: [PATCH v4 14/20] KVM: arm/arm64: Avoid timer save/restore in vcpu entry/exit
+Date: Wed, 25 Oct 2017 15:36:21 +0100
+Message-ID: <863767cn16.fsf@arm.com>
 References: <20171020114939.12554-1-christoffer.dall@linaro.org>
-        <20171020114939.12554-11-christoffer.dall@linaro.org>
+        <20171020114939.12554-15-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20171020114939.12554-11-christoffer.dall@linaro.org>
-        (Christoffer Dall's message of "Fri, 20 Oct 2017 13:49:29 +0200")
+In-Reply-To: <20171020114939.12554-15-christoffer.dall@linaro.org>
+        (Christoffer Dall's message of "Fri, 20 Oct 2017 13:49:33 +0200")
 Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Shih-Wei Li <shihwei@cs.columbia.edu>, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 20 2017 at  1:49:29 pm BST, Christoffer Dall <christoffer.dall@linaro.org> wrote:
+On Fri, Oct 20 2017 at  1:49:33 pm BST, Christoffer Dall <christoffer.dall@linaro.org> wrote:
 > From: Christoffer Dall <cdall@linaro.org>
 >
-> We were using the same hrtimer for emulating the physical timer and for
-> making sure a blocking VCPU thread would be eventually woken up.  That
-> worked fine in the previous arch timer design, but as we are about to
-> actually use the soft timer expire function for the physical timer
-> emulation, change the logic to use a dedicated hrtimer.
+> We don't need to save and restore the hardware timer state and examine
+> if it generates interrupts on on every entry/exit to the guest.  The
+> timer hardware is perfectly capable of telling us when it has expired
+> by signaling interrupts.
 >
-> This has the added benefit of not having to cancel any work in the sync
-> path, which in turn allows us to run the flush and sync with IRQs
-> disabled.
+> When taking a vtimer interrupt in the host, we don't want to mess with
+> the timer configuration, we just want to forward the physical interrupt
+> to the guest as a virtual interrupt.  We can use the split priority drop
+> and deactivate feature of the GIC to do this, which leaves an EOI'ed
+> interrupt active on the physical distributor, making sure we don't keep
+> taking timer interrupts which would prevent the guest from running.  We
+> can then forward the physical interrupt to the VM using the HW bit in
+> the LR of the GIC, like we do already, which lets the guest directly
+> deactivate both the physical and virtual timer simultaneously, allowing
+> the timer hardware to exit the VM and generate a new physical interrupt
+> when the timer output is again asserted later on.
 >
-> Note that the hrtimer used to program the host kernel's timer to
-> generate an exit from the guest when the emulated physical timer fires
-> never has to inject any work, and to share the soft_timer_cancel()
-> function with the bg_timer, we change the function to only cancel any
-> pending work if the pointer to the work struct is not null.
+> We do need to capture this state when migrating VCPUs between physical
+> CPUs, however, which we use the vcpu put/load functions for, which are
+> called through preempt notifiers whenever the thread is scheduled away
+> from the CPU or called directly if we return from the ioctl to
+> userspace.
+>
+> One caveat is that we have to save and restore the timer state in both
+> kvm_timer_vcpu_[put/load] and kvm_timer_[schedule/unschedule], because
+> we can have the following flows:
+>
+>   1. kvm_vcpu_block
+>   2. kvm_timer_schedule
+>   3. schedule
+>   4. kvm_timer_vcpu_put (preempt notifier)
+>   5. schedule (vcpu thread gets scheduled back)
+>   6. kvm_timer_vcpu_load (preempt notifier)
+>   7. kvm_timer_unschedule
+>
+> And a version where we don't actually call schedule:
+>
+>   1. kvm_vcpu_block
+>   2. kvm_timer_schedule
+>   7. kvm_timer_unschedule
+>
+> Since kvm_timer_[schedule/unschedule] may not be followed by put/load,
+> but put/load also may be called independently, we call the timer
+> save/restore functions from both paths.  Since they rely on the loaded
+> flag to never save/restore when unnecessary, this doesn't cause any
+> harm, and we ensure that all invokations of either set of functions work
+> as intended.
+>
+> An added benefit beyond not having to read and write the timer sysregs
+> on every entry and exit is that we no longer have to actively write the
+> active state to the physical distributor, because we configured the
+> irq for the vtimer to only get a priority drop when handling the
+> interrupt in the GIC driver (we called irq_set_vcpu_affinity()), and
+> the interrupt stays active after firing on the host.
 >
 > Signed-off-by: Christoffer Dall <cdall@linaro.org>
 
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+That was a pretty interesting read! :-)
+
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 
 	M.
 -- 
