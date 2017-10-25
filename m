@@ -1,51 +1,56 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 03/20] arm64: Use physical counter for in-kernel reads when booted in EL2
-Date: Wed, 25 Oct 2017 14:43:59 +0100
-Message-ID: <86o9ovcpgg.fsf@arm.com>
+Subject: Re: [PATCH v4 05/20] KVM: arm/arm64: Support calling
+ vgic_update_irq_pending from irq context
+Date: Wed, 25 Oct 2017 14:45:28 +0100
+Message-ID: <86k1zjcpdz.fsf@arm.com>
 References: <20171020114939.12554-1-christoffer.dall@linaro.org>
-        <20171020114939.12554-4-christoffer.dall@linaro.org>
+ <20171020114939.12554-6-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20171020114939.12554-4-christoffer.dall@linaro.org> (Christoffer
-        Dall's message of "Fri, 20 Oct 2017 13:49:22 +0200")
-Sender: kvm-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F275149D37
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Oct 2017 09:44:14 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 0L+buIrxgG3X for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 25 Oct 2017 09:44:13 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 02B7040651
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Oct 2017 09:44:13 -0400 (EDT)
+In-Reply-To: <20171020114939.12554-6-christoffer.dall@linaro.org> (Christoffer
+ Dall's message of "Fri, 20 Oct 2017 13:49:24 +0200")
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Shih-Wei Li <shihwei@cs.columbia.edu>, Christoffer Dall <cdall@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>
+Cc: Christoffer Dall <cdall@linaro.org>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 20 2017 at  1:49:22 pm BST, Christoffer Dall <christoffer.dall@linaro.org> wrote:
+On Fri, Oct 20 2017 at  1:49:24 pm BST, Christoffer Dall <christoffer.dall@linaro.org> wrote:
 > From: Christoffer Dall <cdall@linaro.org>
 >
-> Using the physical counter allows KVM to retain the offset between the
-> virtual and physical counter as long as it is actively running a VCPU.
+> We are about to optimize our timer handling logic which involves
+> injecting irqs to the vgic directly from the irq handler.
 >
-> As soon as a VCPU is released, another thread is scheduled or we start
-> running userspace applications, we reset the offset to 0, so that
-> userspace accessing the virtual timer can still read the virtual counter
-> and get the same view of time as the kernel.
+> Unfortunately, the injection path can take any AP list lock and irq lock
+> and we must therefore make sure to use spin_lock_irqsave where ever
+> interrupts are enabled and we are taking any of those locks, to avoid
+> deadlocking between process context and the ISR.
 >
-> This opens up potential improvements for KVM performance, but we have to
-> make a few adjustments to preserve system consistency.
+> This changes a lot of the VGIC code, but The good news are that the
+> changes are mostly mechanical.
 >
-> Currently get_cycles() is hardwired to arch_counter_get_cntvct() on
-> arm64, but as we move to using the physical timer for the in-kernel
-> time-keeping on systems that boot in EL2, we should use the same counter
-> for get_cycles() as for other in-kernel timekeeping operations.
->
-> Similarly, implementations of arch_timer_set_next_event_phys() is
-> modified to use the counter specific to the timer being programmed.
->
-> VHE kernels or kernels continuing to use the virtual timer are
-> unaffected.
->
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will.deacon@arm.com>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
 > Signed-off-by: Christoffer Dall <cdall@linaro.org>
 
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Acked-by: Marc Zyngier <marc,zyngier@arm.com>
 
 	M.
 -- 
