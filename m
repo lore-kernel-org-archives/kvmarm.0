@@ -1,23 +1,22 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v6 7/9] KVM: arm/arm64: vgic-its: Free caches when GITS_BASER
- Valid bit is cleared
-Date: Thu, 26 Oct 2017 17:23:09 +0200
-Message-ID: <1509031391-4407-8-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v6 8/9] KVM: arm/arm64: Document KVM_DEV_ARM_ITS_CTRL_RESET
+Date: Thu, 26 Oct 2017 17:23:10 +0200
+Message-ID: <1509031391-4407-9-git-send-email-eric.auger@redhat.com>
 References: <1509031391-4407-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 08A9A49D36
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Oct 2017 11:22:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 29B8B49D3F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Oct 2017 11:23:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ONh0fcCfTWiW for <kvmarm@lists.cs.columbia.edu>;
- Thu, 26 Oct 2017 11:22:55 -0400 (EDT)
+ with ESMTP id spgdgnObDz0k for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 26 Oct 2017 11:23:00 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E2AB340651
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Oct 2017 11:22:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3645949D19
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Oct 2017 11:23:00 -0400 (EDT)
 In-Reply-To: <1509031391-4407-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,85 +31,87 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.or
 Cc: wu.wubin@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When the GITS_BASER<n>.Valid gets cleared, the data structures in
-guest RAM are not valid anymore. The device, collection
-and LPI lists stored in the in-kernel ITS represent the same
-information in some form of cache. So let's void the cache.
+At the moment, the in-kernel emulated ITS is not properly reset.
+On guest restart/reset some registers keep their old values and
+internal structures like device, ITE, and collection lists are not
+freed.
+
+This may lead to various bugs. Among them, we can have incorrect state
+backup or failure when saving the ITS state at early guest boot stage.
+
+This patch documents a new attribute, KVM_DEV_ARM_ITS_CTRL_RESET in
+the KVM_DEV_ARM_VGIC_GRP_CTRL group.
+
+Upon this action, we can reset registers and especially those
+pointing to tables previously allocated by the guest and free
+the internal data structures storing the list of devices, collections
+and lpis.
+
+The usual approach for device reset of having userspace write
+the reset values of the registers to the kernel via the register
+read/write APIs doesn't work for the ITS because it has some
+internal state (caches) which is not exposed as registers,
+and there is no register interface for "drop cached data without
+writing it back to RAM". So we need a KVM API which mimics the
+hardware's reset line, to provide the equivalent behaviour to
+a "pull the power cord out of the back of the machine" reset.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reported-by: wanghaibin <wanghaibin.wang@huawei.com>
 
 ---
 v5 -> v6:
-- rename type into device_type and revert tthe u64 -> int change
-- remove the default clause
-- take the its mutex lock around vgic_its_free_device/collection_list
+- remove "The command queue is not allocated:"
 
 v4 -> v5:
-- add comment about locking
+- some rewording according to Christoffer's comments
 
 v2 -> v3:
-- add a comment and clear cache in if block
----
- virt/kvm/arm/vgic/vgic-its.c | 26 ++++++++++++++++++++++----
- 1 file changed, 22 insertions(+), 4 deletions(-)
+- reword commit message, credit to Peter Maydell.
+- take into account Christoffer rewording comments but still
+  kept details. Added Peter's comment but still kept details.
+  Peter may disagree.
 
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 5b7be85..2a92d4d 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -1428,7 +1428,7 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
- 				      unsigned long val)
- {
- 	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
--	u64 entry_size, device_type;
-+	u64 entry_size, table_type;
- 	u64 reg, *regptr, clearbits = 0;
+v1 -> v2:
+- Describe architecturally-defined reset values
+---
+ Documentation/virtual/kvm/devices/arm-vgic-its.txt | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/Documentation/virtual/kvm/devices/arm-vgic-its.txt b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+index eb06beb..8d5830e 100644
+--- a/Documentation/virtual/kvm/devices/arm-vgic-its.txt
++++ b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+@@ -33,6 +33,10 @@ Groups:
+       request the initialization of the ITS, no additional parameter in
+       kvm_device_attr.addr.
  
- 	/* When GITS_CTLR.Enable is 1, we ignore write accesses. */
-@@ -1439,12 +1439,12 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
- 	case 0:
- 		regptr = &its->baser_device_table;
- 		entry_size = abi->dte_esz;
--		device_type = GITS_BASER_TYPE_DEVICE;
-+		table_type = GITS_BASER_TYPE_DEVICE;
- 		break;
- 	case 1:
- 		regptr = &its->baser_coll_table;
- 		entry_size = abi->cte_esz;
--		device_type = GITS_BASER_TYPE_COLLECTION;
-+		table_type = GITS_BASER_TYPE_COLLECTION;
- 		clearbits = GITS_BASER_INDIRECT;
- 		break;
- 	default:
-@@ -1456,10 +1456,28 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
- 	reg &= ~clearbits;
- 
- 	reg |= (entry_size - 1) << GITS_BASER_ENTRY_SIZE_SHIFT;
--	reg |= device_type << GITS_BASER_TYPE_SHIFT;
-+	reg |= table_type << GITS_BASER_TYPE_SHIFT;
- 	reg = vgic_sanitise_its_baser(reg);
- 
- 	*regptr = reg;
++    KVM_DEV_ARM_ITS_CTRL_RESET
++      reset the ITS, no additional parameter in kvm_device_attr.addr.
++      See "ITS Reset State" section.
 +
-+	/*
-+	 * If the table is no longer valid, we clear the associated cached data.
-+	 * Note: there cannot be any race with save/restore code which locks
-+	 * all vcpus.
-+	 */
-+	if (!(reg & GITS_BASER_VALID)) {
-+		mutex_lock(&its->its_lock);
-+		switch (table_type) {
-+		case GITS_BASER_TYPE_DEVICE:
-+			vgic_its_free_device_list(kvm, its);
-+			break;
-+		case GITS_BASER_TYPE_COLLECTION:
-+			vgic_its_free_collection_list(kvm, its);
-+			break;
-+		}
-+		mutex_unlock(&its->its_lock);
-+	}
- }
- 
- static unsigned long vgic_mmio_read_its_ctlr(struct kvm *vcpu,
+     KVM_DEV_ARM_ITS_SAVE_TABLES
+       save the ITS table data into guest RAM, at the location provisioned
+       by the guest in corresponding registers/table entries.
+@@ -157,3 +161,19 @@ Then vcpus can be started.
+  - pINTID is the physical LPI ID; if zero, it means the entry is not valid
+    and other fields are not meaningful.
+  - ICID is the collection ID
++
++ ITS Reset State:
++ ----------------
++
++RESET returns the ITS to the same state that it was when first created and
++initialized. When the RESET command returns, the following things are
++guaranteed:
++
++- The ITS is not enabled and quiescent
++  GITS_CTLR.Enabled = 0 .Quiescent=1
++- There is no internally cached state
++- No collection or device table are used
++  GITS_BASER<n>.Valid = 0
++- GITS_CBASER = 0, GITS_CREADR = 0, GITS_CWRITER = 0
++- The ABI version is unchanged and remains the one set when the ITS
++  device was first created.
 -- 
 2.5.5
