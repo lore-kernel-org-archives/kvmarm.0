@@ -1,244 +1,121 @@
-From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v6 9/9] KVM: arm/arm64: vgic-its: Implement
- KVM_DEV_ARM_ITS_CTRL_RESET
-Date: Thu, 26 Oct 2017 17:23:11 +0200
-Message-ID: <1509031391-4407-10-git-send-email-eric.auger@redhat.com>
-References: <1509031391-4407-1-git-send-email-eric.auger@redhat.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH v4 21/26] KVM: arm/arm64: GICv4: Hook vPE scheduling into
+ vgic flush/sync
+Date: Thu, 26 Oct 2017 17:24:45 +0200
+Message-ID: <20171026152445.GB2166@lvm>
+References: <20171006153401.5481-1-marc.zyngier@arm.com>
+ <20171006153401.5481-22-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D3F549D37
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Oct 2017 11:23:13 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ve9kIAFfPTV9 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 26 Oct 2017 11:23:12 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 18A7149D27
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Oct 2017 11:23:12 -0400 (EDT)
-In-Reply-To: <1509031391-4407-1-git-send-email-eric.auger@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, cdall@linaro.org, peter.maydell@linaro.org, andre.przywara@arm.com, wanghaibin.wang@huawei.com
-Cc: wu.wubin@huawei.com
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20171006153401.5481-22-marc.zyngier@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>, Shanker Donthineni <shankerd@codeaurora.org>, Mark Rutland <mark.rutland@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Andre Przywara <Andre.Przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On reset we clear the valid bits of GITS_CBASER and GITS_BASER<n>.
-We also clear command queue registers and free the cache (device,
-collection, and lpi lists).
+On Fri, Oct 06, 2017 at 04:33:56PM +0100, Marc Zyngier wrote:
+> The redistributor needs to be told which vPE is about to be run,
+> and tells us whether there is any pending VLPI on exit.
+> 
+> Let's add the scheduling calls to the vgic flush/sync functions,
+> allowing the VLPIs to be delivered to the guest.
+> 
 
-As we need to take the same locks as save/restore functions, we
-create a vgic_its_ctrl() wrapper that handles KVM_DEV_ARM_VGIC_GRP_CTRL
-group functions.
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
----
-
-v5 -> v6:
-- Rework the locking and create vgic_its_ctrl
-
-v2 -> v3:
-- added Christoffer's R-b
----
- arch/arm/include/uapi/asm/kvm.h   |   1 +
- arch/arm64/include/uapi/asm/kvm.h |   1 +
- virt/kvm/arm/vgic/vgic-its.c      | 105 ++++++++++++++++++++------------------
- 3 files changed, 58 insertions(+), 49 deletions(-)
-
-diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
-index 5db2d4c..7ef0c06 100644
---- a/arch/arm/include/uapi/asm/kvm.h
-+++ b/arch/arm/include/uapi/asm/kvm.h
-@@ -215,6 +215,7 @@ struct kvm_arch_memory_slot {
- #define   KVM_DEV_ARM_ITS_SAVE_TABLES		1
- #define   KVM_DEV_ARM_ITS_RESTORE_TABLES	2
- #define   KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES	3
-+#define   KVM_DEV_ARM_ITS_CTRL_RESET		4
- 
- /* KVM_IRQ_LINE irq field index values */
- #define KVM_ARM_IRQ_TYPE_SHIFT		24
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 9f3ca24..b5306ce 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -227,6 +227,7 @@ struct kvm_arch_memory_slot {
- #define   KVM_DEV_ARM_ITS_SAVE_TABLES           1
- #define   KVM_DEV_ARM_ITS_RESTORE_TABLES        2
- #define   KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES	3
-+#define   KVM_DEV_ARM_ITS_CTRL_RESET		4
- 
- /* Device Control API on vcpu fd */
- #define KVM_ARM_VCPU_PMU_V3_CTRL	0
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 2a92d4d..09a459b 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -2301,29 +2301,13 @@ static int vgic_its_restore_collection_table(struct vgic_its *its)
-  */
- static int vgic_its_save_tables_v0(struct vgic_its *its)
- {
--	struct kvm *kvm = its->dev->kvm;
- 	int ret;
- 
--	mutex_lock(&kvm->lock);
--	mutex_lock(&its->its_lock);
--
--	if (!lock_all_vcpus(kvm)) {
--		mutex_unlock(&its->its_lock);
--		mutex_unlock(&kvm->lock);
--		return -EBUSY;
--	}
--
- 	ret = vgic_its_save_device_tables(its);
- 	if (ret)
--		goto out;
--
--	ret = vgic_its_save_collection_table(its);
-+		return ret;
- 
--out:
--	unlock_all_vcpus(kvm);
--	mutex_unlock(&its->its_lock);
--	mutex_unlock(&kvm->lock);
--	return ret;
-+	return vgic_its_save_collection_table(its);
- }
- 
- /**
-@@ -2333,29 +2317,13 @@ static int vgic_its_save_tables_v0(struct vgic_its *its)
-  */
- static int vgic_its_restore_tables_v0(struct vgic_its *its)
- {
--	struct kvm *kvm = its->dev->kvm;
- 	int ret;
- 
--	mutex_lock(&kvm->lock);
--	mutex_lock(&its->its_lock);
--
--	if (!lock_all_vcpus(kvm)) {
--		mutex_unlock(&its->its_lock);
--		mutex_unlock(&kvm->lock);
--		return -EBUSY;
--	}
--
- 	ret = vgic_its_restore_collection_table(its);
- 	if (ret)
--		goto out;
--
--	ret = vgic_its_restore_device_tables(its);
--out:
--	unlock_all_vcpus(kvm);
--	mutex_unlock(&its->its_lock);
--	mutex_unlock(&kvm->lock);
-+		return ret;
- 
--	return ret;
-+	return vgic_its_restore_device_tables(its);
- }
- 
- static int vgic_its_commit_v0(struct vgic_its *its)
-@@ -2374,6 +2342,19 @@ static int vgic_its_commit_v0(struct vgic_its *its)
- 	return 0;
- }
- 
-+static void vgic_its_reset(struct kvm *kvm, struct vgic_its *its)
-+{
-+	/* We need to keep the ABI specific field values */
-+	its->baser_coll_table &= ~GITS_BASER_VALID;
-+	its->baser_device_table &= ~GITS_BASER_VALID;
-+	its->cbaser = 0;
-+	its->creadr = 0;
-+	its->cwriter = 0;
-+	its->enabled = 0;
-+	vgic_its_free_device_list(kvm, its);
-+	vgic_its_free_collection_list(kvm, its);
-+}
-+
- static int vgic_its_has_attr(struct kvm_device *dev,
- 			     struct kvm_device_attr *attr)
- {
-@@ -2388,6 +2369,8 @@ static int vgic_its_has_attr(struct kvm_device *dev,
- 		switch (attr->attr) {
- 		case KVM_DEV_ARM_VGIC_CTRL_INIT:
- 			return 0;
-+		case KVM_DEV_ARM_ITS_CTRL_RESET:
-+			return 0;
- 		case KVM_DEV_ARM_ITS_SAVE_TABLES:
- 			return 0;
- 		case KVM_DEV_ARM_ITS_RESTORE_TABLES:
-@@ -2400,6 +2383,41 @@ static int vgic_its_has_attr(struct kvm_device *dev,
- 	return -ENXIO;
- }
- 
-+static int vgic_its_ctrl(struct kvm *kvm, struct vgic_its *its, u64 attr)
-+{
-+	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
-+	int ret = 0;
-+
-+	if (attr == KVM_DEV_ARM_VGIC_CTRL_INIT) /* Nothing to do */
-+		return 0;
-+
-+	mutex_lock(&kvm->lock);
-+	mutex_lock(&its->its_lock);
-+
-+	if (!lock_all_vcpus(kvm)) {
-+		mutex_unlock(&its->its_lock);
-+		mutex_unlock(&kvm->lock);
-+		return -EBUSY;
-+	}
-+
-+	switch (attr) {
-+	case KVM_DEV_ARM_ITS_CTRL_RESET:
-+		vgic_its_reset(kvm, its);
-+		break;
-+	case KVM_DEV_ARM_ITS_SAVE_TABLES:
-+		ret = abi->save_tables(its);
-+		break;
-+	case KVM_DEV_ARM_ITS_RESTORE_TABLES:
-+		ret = abi->restore_tables(its);
-+		break;
-+	}
-+
-+	unlock_all_vcpus(kvm);
-+	mutex_unlock(&its->its_lock);
-+	mutex_unlock(&kvm->lock);
-+	return ret;
-+}
-+
- static int vgic_its_set_attr(struct kvm_device *dev,
- 			     struct kvm_device_attr *attr)
- {
-@@ -2425,19 +2443,8 @@ static int vgic_its_set_attr(struct kvm_device *dev,
- 
- 		return vgic_register_its_iodev(dev->kvm, its, addr);
- 	}
--	case KVM_DEV_ARM_VGIC_GRP_CTRL: {
--		const struct vgic_its_abi *abi = vgic_its_get_abi(its);
--
--		switch (attr->attr) {
--		case KVM_DEV_ARM_VGIC_CTRL_INIT:
--			/* Nothing to do */
--			return 0;
--		case KVM_DEV_ARM_ITS_SAVE_TABLES:
--			return abi->save_tables(its);
--		case KVM_DEV_ARM_ITS_RESTORE_TABLES:
--			return abi->restore_tables(its);
--		}
--	}
-+	case KVM_DEV_ARM_VGIC_GRP_CTRL:
-+		return vgic_its_ctrl(dev->kvm, its, attr->attr);
- 	case KVM_DEV_ARM_VGIC_GRP_ITS_REGS: {
- 		u64 __user *uaddr = (u64 __user *)(long)attr->addr;
- 		u64 reg;
--- 
-2.5.5
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  virt/kvm/arm/vgic/vgic-v4.c | 39 +++++++++++++++++++++++++++++++++++++++
+>  virt/kvm/arm/vgic/vgic.c    |  4 ++++
+>  virt/kvm/arm/vgic/vgic.h    |  2 ++
+>  3 files changed, 45 insertions(+)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
+> index 5ee69aec990a..68a2ef6df161 100644
+> --- a/virt/kvm/arm/vgic/vgic-v4.c
+> +++ b/virt/kvm/arm/vgic/vgic-v4.c
+> @@ -130,6 +130,45 @@ void vgic_v4_teardown(struct kvm *kvm)
+>  	its_vm->vpes = NULL;
+>  }
+>  
+> +int vgic_v4_sync_hwstate(struct kvm_vcpu *vcpu)
+> +{
+> +	if (!vgic_supports_direct_msis(vcpu->kvm))
+> +		return 0;
+> +
+> +	return its_schedule_vpe(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe, false);
+> +}
+> +
+> +int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu)
+> +{
+> +	int irq = vcpu->arch.vgic_cpu.vgic_v3.its_vpe.irq;
+> +	int err;
+> +
+> +	if (!vgic_supports_direct_msis(vcpu->kvm))
+> +		return 0;
+> +
+> +	/*
+> +	 * Before making the VPE resident, make sure the redistributor
+> +	 * corresponding to our current CPU expects us here. See the
+> +	 * doc in drivers/irqchip/irq-gic-v4.c to understand how this
+> +	 * turns into a VMOVP command at the ITS level.
+> +	 */
+> +	err = irq_set_affinity(irq, cpumask_of(smp_processor_id()));
+> +	if (err)
+> +		return err;
+> +
+> +	err = its_schedule_vpe(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe, true);
+> +	if (err)
+> +		return err;
+> +
+> +	/*
+> +	 * Now that the VPE is resident, let's get rid of a potential
+> +	 * doorbell interrupt that would still be pending.
+> +	 */
+> +	err = irq_set_irqchip_state(irq, IRQCHIP_STATE_PENDING, false);
+> +
+> +	return err;
+> +}
+> +
+>  static struct vgic_its *vgic_get_its(struct kvm *kvm,
+>  				     struct kvm_kernel_irq_routing_entry *irq_entry)
+>  {
+> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> index 0691a2250949..71ca0ff1b35a 100644
+> --- a/virt/kvm/arm/vgic/vgic.c
+> +++ b/virt/kvm/arm/vgic/vgic.c
+> @@ -709,6 +709,8 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+>  
+> +	WARN_ON(vgic_v4_sync_hwstate(vcpu));
+> +
+>  	/* An empty ap_list_head implies used_lrs == 0 */
+>  	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
+>  		return;
+> @@ -721,6 +723,8 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+>  /* Flush our emulation state into the GIC hardware before entering the guest. */
+>  void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+>  {
+> +	WARN_ON(vgic_v4_flush_hwstate(vcpu));
+> +
+>  	/*
+>  	 * If there are no virtual interrupts active or pending for this
+>  	 * VCPU, then there is no work to do and we can bail out without
+> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+> index 1bd2e28ac097..1c65750892d7 100644
+> --- a/virt/kvm/arm/vgic/vgic.h
+> +++ b/virt/kvm/arm/vgic/vgic.h
+> @@ -245,5 +245,7 @@ int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
+>  bool vgic_supports_direct_msis(struct kvm *kvm);
+>  int vgic_v4_init(struct kvm *kvm);
+>  void vgic_v4_teardown(struct kvm *kvm);
+> +int vgic_v4_sync_hwstate(struct kvm_vcpu *vcpu);
+> +int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu);
+>  
+>  #endif
+> -- 
+> 2.14.1
+> 
