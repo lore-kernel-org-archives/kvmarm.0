@@ -1,108 +1,116 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v6 6/9] KVM: arm/arm64: vgic-its: New helper functions to free the caches
-Date: Thu, 26 Oct 2017 17:23:08 +0200
-Message-ID: <1509031391-4407-7-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v6 7/9] KVM: arm/arm64: vgic-its: Free caches when GITS_BASER
+ Valid bit is cleared
+Date: Thu, 26 Oct 2017 17:23:09 +0200
+Message-ID: <1509031391-4407-8-git-send-email-eric.auger@redhat.com>
 References: <1509031391-4407-1-git-send-email-eric.auger@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 08A9A49D36
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Oct 2017 11:22:56 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id ONh0fcCfTWiW for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 26 Oct 2017 11:22:55 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E2AB340651
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Oct 2017 11:22:54 -0400 (EDT)
 In-Reply-To: <1509031391-4407-1-git-send-email-eric.auger@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, cdall@linaro.org, peter.maydell@linaro.org, andre.przywara@arm.com, wanghaibin.wang@huawei.com
-Cc: wu.wubin@huawei.com, drjones@redhat.com, wei@redhat.com
+Cc: wu.wubin@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: wanghaibin <wanghaibin.wang@huawei.com>
+When the GITS_BASER<n>.Valid gets cleared, the data structures in
+guest RAM are not valid anymore. The device, collection
+and LPI lists stored in the in-kernel ITS represent the same
+information in some form of cache. So let's void the cache.
 
-We create two new functions that free the device and
-collection lists. They are currently called by vgic_its_destroy()
-and other callers will be added in subsequent patches.
-
-We also remove the check on its->device_list.next.
-Lists are initialized in vgic_create_its() and the device
-is added to the device list only if this latter succeeds.
-
-vgic_its_destroy is the device destroy ops. This latter is called
-by kvm_destroy_devices() which loops on all created devices. So
-at this point the list is initialized.
-
-Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 v5 -> v6:
-- take the its lock in vgic_its_destroy() instead of in
-  vgic_its_free_device_list and vgic_its_free_collection_list
+- rename type into device_type and revert tthe u64 -> int change
+- remove the default clause
+- take the its mutex lock around vgic_its_free_device/collection_list
 
 v4 -> v5:
-- add mutex_lock in vgic_its_free_collection_list
-- use list_for_each_entry_safe
-- reword commit message
+- add comment about locking
+
+v2 -> v3:
+- add a comment and clear cache in if block
 ---
- virt/kvm/arm/vgic/vgic-its.c | 41 ++++++++++++++++++++---------------------
- 1 file changed, 20 insertions(+), 21 deletions(-)
+ virt/kvm/arm/vgic/vgic-its.c | 26 ++++++++++++++++++++++----
+ 1 file changed, 22 insertions(+), 4 deletions(-)
 
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index d21c960..5b7be85 100644
+index 5b7be85..2a92d4d 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -910,6 +910,24 @@ static void vgic_its_free_device(struct kvm *kvm, struct its_device *device)
- 	kfree(device);
- }
- 
-+/* its lock must be held */
-+static void vgic_its_free_device_list(struct kvm *kvm, struct vgic_its *its)
-+{
-+	struct its_device *cur, *temp;
-+
-+	list_for_each_entry_safe(cur, temp, &its->device_list, dev_list)
-+		vgic_its_free_device(kvm, cur);
-+}
-+
-+/* its lock must be held */
-+static void vgic_its_free_collection_list(struct kvm *kvm, struct vgic_its *its)
-+{
-+	struct its_collection *cur, *temp;
-+
-+	list_for_each_entry_safe(cur, temp, &its->collection_list, coll_list)
-+		vgic_its_free_collection(its, cur->collection_id);
-+}
-+
- /* Must be called with its_lock mutex held */
- static struct its_device *vgic_its_alloc_device(struct vgic_its *its,
- 						u32 device_id, gpa_t itt_addr,
-@@ -1627,32 +1645,13 @@ static void vgic_its_destroy(struct kvm_device *kvm_dev)
+@@ -1428,7 +1428,7 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
+ 				      unsigned long val)
  {
- 	struct kvm *kvm = kvm_dev->kvm;
- 	struct vgic_its *its = kvm_dev->private;
--	struct list_head *cur, *temp;
--
--	/*
--	 * We may end up here without the lists ever having been initialized.
--	 * Check this and bail out early to avoid dereferencing a NULL pointer.
--	 */
--	if (!its->device_list.next)
--		return;
+ 	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+-	u64 entry_size, device_type;
++	u64 entry_size, table_type;
+ 	u64 reg, *regptr, clearbits = 0;
  
- 	mutex_lock(&its->its_lock);
--	list_for_each_safe(cur, temp, &its->device_list) {
--		struct its_device *dev;
+ 	/* When GITS_CTLR.Enable is 1, we ignore write accesses. */
+@@ -1439,12 +1439,12 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
+ 	case 0:
+ 		regptr = &its->baser_device_table;
+ 		entry_size = abi->dte_esz;
+-		device_type = GITS_BASER_TYPE_DEVICE;
++		table_type = GITS_BASER_TYPE_DEVICE;
+ 		break;
+ 	case 1:
+ 		regptr = &its->baser_coll_table;
+ 		entry_size = abi->cte_esz;
+-		device_type = GITS_BASER_TYPE_COLLECTION;
++		table_type = GITS_BASER_TYPE_COLLECTION;
+ 		clearbits = GITS_BASER_INDIRECT;
+ 		break;
+ 	default:
+@@ -1456,10 +1456,28 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
+ 	reg &= ~clearbits;
  
--		dev = list_entry(cur, struct its_device, dev_list);
--		vgic_its_free_device(kvm, dev);
--	}
--
--	list_for_each_safe(cur, temp, &its->collection_list) {
--		struct its_collection *coll;
-+	vgic_its_free_device_list(kvm, its);
-+	vgic_its_free_collection_list(kvm, its);
+ 	reg |= (entry_size - 1) << GITS_BASER_ENTRY_SIZE_SHIFT;
+-	reg |= device_type << GITS_BASER_TYPE_SHIFT;
++	reg |= table_type << GITS_BASER_TYPE_SHIFT;
+ 	reg = vgic_sanitise_its_baser(reg);
  
--		coll = list_entry(cur, struct its_collection, coll_list);
--		list_del(cur);
--		kfree(coll);
--	}
- 	mutex_unlock(&its->its_lock);
--
- 	kfree(its);
+ 	*regptr = reg;
++
++	/*
++	 * If the table is no longer valid, we clear the associated cached data.
++	 * Note: there cannot be any race with save/restore code which locks
++	 * all vcpus.
++	 */
++	if (!(reg & GITS_BASER_VALID)) {
++		mutex_lock(&its->its_lock);
++		switch (table_type) {
++		case GITS_BASER_TYPE_DEVICE:
++			vgic_its_free_device_list(kvm, its);
++			break;
++		case GITS_BASER_TYPE_COLLECTION:
++			vgic_its_free_collection_list(kvm, its);
++			break;
++		}
++		mutex_unlock(&its->its_lock);
++	}
  }
  
+ static unsigned long vgic_mmio_read_its_ctlr(struct kvm *vcpu,
 -- 
 2.5.5
