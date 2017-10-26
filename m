@@ -1,21 +1,24 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v6 0/9] vITS Migration fixes and reset
-Date: Thu, 26 Oct 2017 17:23:02 +0200
-Message-ID: <1509031391-4407-1-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v6 1/9] KVM: arm/arm64: vgic-its: Fix return value for device
+ table restore
+Date: Thu, 26 Oct 2017 17:23:03 +0200
+Message-ID: <1509031391-4407-2-git-send-email-eric.auger@redhat.com>
+References: <1509031391-4407-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C18B49D36
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Oct 2017 11:22:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5228B49D19
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Oct 2017 11:22:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vkeHrJT3umDB for <kvmarm@lists.cs.columbia.edu>;
- Thu, 26 Oct 2017 11:22:05 -0400 (EDT)
+ with ESMTP id Vpxf4GEVRkIg for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 26 Oct 2017 11:22:10 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8790A49D19
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Oct 2017 11:22:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 81B2F49D36
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Oct 2017 11:22:10 -0400 (EDT)
+In-Reply-To: <1509031391-4407-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,120 +32,95 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.or
 Cc: wu.wubin@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This series fixes various bugs observed when saving/restoring the
-ITS state before the guest writes the ITS registers (on first boot or
-after reset/reboot).
+From: wanghaibin <wanghaibin.wang@huawei.com>
 
-This is a follow up of Wanghaibin's series [1] plus additional
-patches following additional code review. It also proposes one
-ITS reset implementation.
+If ITT only contains invalid entries, vgic_its_restore_itt
+returns 1 and this is considered as an an error in
+vgic_its_restore_dte.
 
-Currently, the in-kernel emulated ITS is not reset. After a
-reset/reboot, the ITS register values and caches are left
-unchanged. Registers may point to some tables in guest memory
-which do not exist anymore. If an ITS state backup is initiated
-before the guest re-writes the registers, the save fails
-because inconsistencies are detected. Also restore of data saved
-as such moment is failing.
+Also in case the device table only contains invalid entries,
+the table restore fails and this is not correct.
 
-Patches [1-4] are fixes of bugs observed during migration at
-early guets boot stage.
-- handle case where all collection, device and ITT entries are
-  invalid on restore (which is not an error)
-- Check the GITS_BASER<n> valid bit before attempting the save
-  any table
-- Check the GITS_BASER<n> and GITS_CBASER are valid before enabling
-  the ITS
+This patch fixes those 2 issues:
+- vgic_its_restore_itt now returns <= 0 values. If all
+  ITEs are invalid, this is considered as successful.
+- vgic_its_restore_device_tables also returns <= 0 values.
 
-Patches [5-9] allow to empty the caches on reset and implement a
-new ITS reset IOCTL
+We also simplify the returned value computation in
+handle_l1_dte.
 
-Best Regards
+Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 
-Eric
+---
 
-Git: complete series available at
-https://github.com/eauger/linux/tree/v4.14-rc5-its-reset-v6
-
-* Testing:
-- on Cavium using a virtio-net-pci guest and various sequences of
-  guest shutdown -r now, virsh reset, virsh suspend/resume,
-  virsh reboot, virsh save.restore, virsh shutdown
-
-References:
-[1] [RFC PATCH 0/3] fix migrate failed when vm is in booting
-https://www.spinics.net/lists/kvm-arm/msg27121.html
-
-History:
 v5 -> v6:
-as per the discussions we had in the KVM forum, :
-- don't try to fix everything without reset IOCTL
-- removed "KVM: arm/arm64: vgic-its: Save the collection table
-  before device tables"
-- remove "The command queue is not allocated:" in API doc
-- rework the locking in last patch
-- vgic_its_free_device_list and vgic_its_free_collection_list
-  do not take the its->lock anymore. The caller does.
-- in vgic_its_restore_collection_table(), return 0 if last
-  vgic_its_restore_cte returned +1
-
-v4 -> v5:
-- came back to the original version of
-  KVM: arm/arm64: vgic-its: Fix return value for device table restore
-  Rework of error handling will come later
-- remove [PATCH v4 03/11] KVM: arm/arm64: vgic-its: Improve error reporting
-  on device table save as of now
-- remove KVM: arm/arm64: vgic-its: Always attempt to save/restore device
-  and collection tables
-  inversing the save order of device/collection tables fixes the same issue
-- reword ITS IOCTL doc
-- add mutex lock in vgic_its_free_collection_list
-- remove vgic_its_unmap_device
-
-v3 -> v4:
-- fixes a bug in indirect mode: in handle_l1_dte, set
-  *valid at the beginning of the function
+- added Christoffer's R-b
 
 v2 -> v3:
-- Revisited error handling in restore functions
-- Added "KVM: arm/arm64: vgic-its: fix
-        vgic_its_restore_collection_table returned value"
-- Added "KVM: arm/arm64: vgic-its: Check CBASER/BASER validity
-  before enabling the ITS"
-- Removed KVM: arm/arm64: vgic-its: Always allow clearing
-  GITS_CREADR/CWRITER
-- Reworded documentation according to Christoffer's comments
+- add comments
+- vgic_its_restore_itt don't return +1 anymore
+- reword the commit message
 
 v1 -> v2:
-- added KVM: arm/arm64: vgic-its: Always attempt to save/restore
-  device and collection tables
+- if (ret > 0) ret = 0
+---
+ virt/kvm/arm/vgic/vgic-its.c | 20 +++++++++++++++-----
+ 1 file changed, 15 insertions(+), 5 deletions(-)
 
-PATCH v1
-- series including 2 modified patches of Wanghaibin
-
-
-Eric Auger (7):
-  KVM: arm/arm64: vgic-its: Fix vgic_its_restore_collection_table
-    returned value
-  KVM: arm/arm64: vgic-its: Check CBASER/BASER validity before enabling
-    the ITS
-  KVM: arm/arm64: vgic-its: Check GITS_BASER Valid bit before saving
-    tables
-  KVM: arm/arm64: vgic-its: Remove kvm_its_unmap_device
-  KVM: arm/arm64: vgic-its: Free caches when GITS_BASER Valid bit is
-    cleared
-  KVM: arm/arm64: Document KVM_DEV_ARM_ITS_CTRL_RESET
-  KVM: arm/arm64: vgic-its: Implement KVM_DEV_ARM_ITS_CTRL_RESET
-
-wanghaibin (2):
-  KVM: arm/arm64: vgic-its: Fix return value for device table restore
-  KVM: arm/arm64: vgic-its: New helper functions to free the caches
-
- Documentation/virtual/kvm/devices/arm-vgic-its.txt |  20 ++
- arch/arm/include/uapi/asm/kvm.h                    |   1 +
- arch/arm64/include/uapi/asm/kvm.h                  |   1 +
- virt/kvm/arm/vgic/vgic-its.c                       | 241 ++++++++++++---------
- 4 files changed, 163 insertions(+), 100 deletions(-)
-
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index f51c1e1..d27a301 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -1940,6 +1940,14 @@ static int vgic_its_save_itt(struct vgic_its *its, struct its_device *device)
+ 	return 0;
+ }
+ 
++/**
++ * vgic_its_restore_itt - restore the ITT of a device
++ *
++ * @its: its handle
++ * @dev: device handle
++ *
++ * Return 0 on success, < 0 on error
++ */
+ static int vgic_its_restore_itt(struct vgic_its *its, struct its_device *dev)
+ {
+ 	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+@@ -1951,6 +1959,10 @@ static int vgic_its_restore_itt(struct vgic_its *its, struct its_device *dev)
+ 	ret = scan_its_table(its, base, max_size, ite_esz, 0,
+ 			     vgic_its_restore_ite, dev);
+ 
++	/* scan_its_table returns +1 if all ITEs are invalid */
++	if (ret > 0)
++		ret = 0;
++
+ 	return ret;
+ }
+ 
+@@ -2107,10 +2119,7 @@ static int handle_l1_dte(struct vgic_its *its, u32 id, void *addr,
+ 	ret = scan_its_table(its, gpa, SZ_64K, dte_esz,
+ 			     l2_start_id, vgic_its_restore_dte, NULL);
+ 
+-	if (ret <= 0)
+-		return ret;
+-
+-	return 1;
++	return ret;
+ }
+ 
+ /**
+@@ -2140,8 +2149,9 @@ static int vgic_its_restore_device_tables(struct vgic_its *its)
+ 				     vgic_its_restore_dte, NULL);
+ 	}
+ 
++	/* scan_its_table returns +1 if all entries are invalid */
+ 	if (ret > 0)
+-		ret = -EINVAL;
++		ret = 0;
+ 
+ 	return ret;
+ }
 -- 
 2.5.5
