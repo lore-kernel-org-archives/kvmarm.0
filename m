@@ -1,27 +1,21 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 17/26] KVM: arm/arm64: GICv4: Propagate VLPI properties
- at map time
-Date: Thu, 26 Oct 2017 09:21:53 +0100
-Message-ID: <86po9ab9pa.fsf@arm.com>
-References: <20171006153401.5481-1-marc.zyngier@arm.com>
- <20171006153401.5481-18-marc.zyngier@arm.com>
- <20171025164827.GO91785@lvm> <86tvynb1rm.fsf@arm.com>
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+Subject: [PATCH v2] KVM: arm/arm64: Fix external abort type matching
+Date: Thu, 26 Oct 2017 18:07:01 +0800
+Message-ID: <1509012421-8772-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 60F7649D23
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Oct 2017 04:20:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A27049D41
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Oct 2017 05:43:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XtQbbYMjKKEk for <kvmarm@lists.cs.columbia.edu>;
- Thu, 26 Oct 2017 04:20:36 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 011D5406D0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Oct 2017 04:20:35 -0400 (EDT)
-In-Reply-To: <86tvynb1rm.fsf@arm.com> (Marc Zyngier's message of "Wed, 25 Oct
- 2017 18:01:01 +0100")
+ with ESMTP id C-v19TlLKmQu for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 26 Oct 2017 05:43:10 -0400 (EDT)
+Received: from huawei.com (unknown [45.249.212.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B458D406BB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Oct 2017 05:43:09 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,81 +25,148 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>
-Cc: Andre Przywara <Andre.Przywara@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+To: christoffer.dall@linaro.org, marc.zyngier@arm.com, linux@armlinux.org.uk, james.morse@arm.com, tbaicar@codeaurora.org, catalin.marinas@arm.com, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, gengdongjiu@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Oct 25 2017 at  6:01:01 pm BST, Marc Zyngier <marc.zyngier@arm.com> wrote:
-> On Wed, Oct 25 2017 at  6:48:27 pm BST, Christoffer Dall <cdall@linaro.org> wrote:
->> On Fri, Oct 06, 2017 at 04:33:52PM +0100, Marc Zyngier wrote:
->>> When the VLPI gets mapped, it must inherit the configuration of
->>> the LPI configured at the vITS level. For that purpose, let's make
->>> update_lpi_config globally available and call it just after
->>> having performed the VLPI map operation.
->>> 
->>> Acked-by: Christoffer Dall <cdall@linaro.org>
->>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->>> ---
->>>  virt/kvm/arm/vgic/vgic-its.c | 6 ++----
->>>  virt/kvm/arm/vgic/vgic-v4.c  | 2 ++
->>>  virt/kvm/arm/vgic/vgic.h     | 2 ++
->>>  3 files changed, 6 insertions(+), 4 deletions(-)
->>> 
->>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->>> index eb72eb027060..f434748439ee 100644
->>> --- a/virt/kvm/arm/vgic/vgic-its.c
->>> +++ b/virt/kvm/arm/vgic/vgic-its.c
->>> @@ -37,8 +37,6 @@
->>>  static int vgic_its_save_tables_v0(struct vgic_its *its);
->>>  static int vgic_its_restore_tables_v0(struct vgic_its *its);
->>>  static int vgic_its_commit_v0(struct vgic_its *its);
->>> -static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
->>> -			     struct kvm_vcpu *filter_vcpu, bool needs_inv);
->>>  
->>>  /*
->>>   * Creates a new (reference to a) struct vgic_irq for a given LPI.
->>> @@ -272,8 +270,8 @@ static struct its_collection *find_collection(struct vgic_its *its, int coll_id)
->>>   * If filter_vcpu is not NULL, applies only if the IRQ is targeting this
->>>   * VCPU. Unconditionally applies if filter_vcpu is NULL.
->>>   */
->>> -static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
->>> -			     struct kvm_vcpu *filter_vcpu, bool needs_inv)
->>> +int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
->>> +		      struct kvm_vcpu *filter_vcpu, bool needs_inv)
->>>  {
->>>  	u64 propbase = GICR_PROPBASER_ADDRESS(kvm->arch.vgic.propbaser);
->>>  	u8 prop;
->>> diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
->>> index ba1dd3162eba..b79a0450bb1c 100644
->>> --- a/virt/kvm/arm/vgic/vgic-v4.c
->>> +++ b/virt/kvm/arm/vgic/vgic-v4.c
->>> @@ -147,6 +147,8 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
->>>  	irq->hw		= true;
->>>  	irq->host_irq	= virq;
->>>  
->>> +	/* Force the property update and invalidate */
->>> +	update_lpi_config(kvm, irq, NULL, true);
->>
->> Actually, when re-reading this patch, this looks weird to me.
->>
->> I think this needs to either be done as part of the map, or before the
->> map, to prevent for example a disabled interrupt from the guest'ss PoV
->> to fire when it doesn't expect it.
->
-> Indeed, that's a good point. I don't really like making it part of the
-> VLPI mapping, as this is an ITS thing (and the property update is more a
-> redistributor concept), but moving it it before the map is probably the
-> best thing to do. Thanks for pointing this out!
+For this matching, current code using the {I,D}FSC
+range to match kvm_vcpu_trap_get_fault_type() return
+value, but kvm_vcpu_trap_get_fault_type() only return
+the part {I,D}FSC instead of whole, so fix this issue
 
-Scratch that. Doing it before the map cannot succeed, as the ITS driver
-explicitly refuses to do any VLPI changes until this is actually mapped
-(which is a completely unreasonable behaviour).
+Value       Type
+0x10        FSC_SEA
+0x14        FSC_SEA_TTW0 FSC_SEA_TTW1 FSC_SEA_TTW2 FSC_SEA_TTW3
+0x18        FSC_SECC
+0x1c        FSC_SECC_TTW0 FSC_SECC_TTW1 FSC_SECC_TTW2 FSC_SECC_TTW3
 
-I guess that leaves setting the properties as part of the map operation
-the only viable choice. I'll give it a go.
+CC: James Morse <james.morse@arm.com>
+CC: Tyler Baicar <tbaicar@codeaurora.org>
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 
-Thanks,
+---
+As shown below code:
 
-	M.
+The kvm_vcpu_trap_get_fault_type() only return {I,D}FSC bit[5]:bit[2], not
+the whole {I,D}FSC, but FSC_SEA_TTWx and FSC_SECC_TTWx are the whole {I,D}FSC
+value.
+
+static inline u8 kvm_vcpu_trap_get_fault_type(const struct kvm_vcpu *vcpu)
+{
+    return kvm_vcpu_get_hsr(vcpu) & ESR_ELx_FSC_TYPE;
+}
+
+static inline bool kvm_vcpu_dabt_isextabt(const struct kvm_vcpu *vcpu)
+{
+    switch (kvm_vcpu_trap_get_fault_type(vcpu)) {
+    case FSC_SEA:
+    case FSC_SEA_TTW0:
+    case FSC_SEA_TTW1:
+    case FSC_SEA_TTW2:
+    case FSC_SEA_TTW3:
+    case FSC_SECC:
+    case FSC_SECC_TTW0:
+    case FSC_SECC_TTW1:
+    case FSC_SECC_TTW2:
+    case FSC_SECC_TTW3:
+        return true;
+    default:
+        return false;
+    }
+}
+---
+ arch/arm/include/asm/kvm_arm.h       | 10 ++--------
+ arch/arm/include/asm/kvm_emulate.h   | 10 ++--------
+ arch/arm64/include/asm/kvm_arm.h     | 10 ++--------
+ arch/arm64/include/asm/kvm_emulate.h | 10 ++--------
+ 4 files changed, 8 insertions(+), 32 deletions(-)
+
+diff --git a/arch/arm/include/asm/kvm_arm.h b/arch/arm/include/asm/kvm_arm.h
+index c878145..b4b155c 100644
+--- a/arch/arm/include/asm/kvm_arm.h
++++ b/arch/arm/include/asm/kvm_arm.h
+@@ -188,15 +188,9 @@
+ #define FSC_ACCESS	(0x08)
+ #define FSC_PERM	(0x0c)
+ #define FSC_SEA		(0x10)
+-#define FSC_SEA_TTW0	(0x14)
+-#define FSC_SEA_TTW1	(0x15)
+-#define FSC_SEA_TTW2	(0x16)
+-#define FSC_SEA_TTW3	(0x17)
++#define FSC_SEA_TTW	(0x14)
+ #define FSC_SECC	(0x18)
+-#define FSC_SECC_TTW0	(0x1c)
+-#define FSC_SECC_TTW1	(0x1d)
+-#define FSC_SECC_TTW2	(0x1e)
+-#define FSC_SECC_TTW3	(0x1f)
++#define FSC_SECC_TTW	(0x1c)
+ 
+ /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+ #define HPFAR_MASK	(~0xf)
+diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
+index 98089ff..aed8279 100644
+--- a/arch/arm/include/asm/kvm_emulate.h
++++ b/arch/arm/include/asm/kvm_emulate.h
+@@ -205,15 +205,9 @@ static inline bool kvm_vcpu_dabt_isextabt(struct kvm_vcpu *vcpu)
+ {
+ 	switch (kvm_vcpu_trap_get_fault_type(vcpu)) {
+ 	case FSC_SEA:
+-	case FSC_SEA_TTW0:
+-	case FSC_SEA_TTW1:
+-	case FSC_SEA_TTW2:
+-	case FSC_SEA_TTW3:
++	case FSC_SEA_TTW:
+ 	case FSC_SECC:
+-	case FSC_SECC_TTW0:
+-	case FSC_SECC_TTW1:
+-	case FSC_SECC_TTW2:
+-	case FSC_SECC_TTW3:
++	case FSC_SECC_TTW:
+ 		return true;
+ 	default:
+ 		return false;
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 61d694c..c0f1798 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -205,15 +205,9 @@
+ #define FSC_ACCESS	ESR_ELx_FSC_ACCESS
+ #define FSC_PERM	ESR_ELx_FSC_PERM
+ #define FSC_SEA		ESR_ELx_FSC_EXTABT
+-#define FSC_SEA_TTW0	(0x14)
+-#define FSC_SEA_TTW1	(0x15)
+-#define FSC_SEA_TTW2	(0x16)
+-#define FSC_SEA_TTW3	(0x17)
++#define FSC_SEA_TTW	(0x14)
+ #define FSC_SECC	(0x18)
+-#define FSC_SECC_TTW0	(0x1c)
+-#define FSC_SECC_TTW1	(0x1d)
+-#define FSC_SECC_TTW2	(0x1e)
+-#define FSC_SECC_TTW3	(0x1f)
++#define FSC_SECC_TTW	(0x1c)
+ 
+ /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+ #define HPFAR_MASK	(~UL(0xf))
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index e5df3fc..5cde311 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -239,15 +239,9 @@ static inline bool kvm_vcpu_dabt_isextabt(const struct kvm_vcpu *vcpu)
+ {
+ 	switch (kvm_vcpu_trap_get_fault_type(vcpu)) {
+ 	case FSC_SEA:
+-	case FSC_SEA_TTW0:
+-	case FSC_SEA_TTW1:
+-	case FSC_SEA_TTW2:
+-	case FSC_SEA_TTW3:
++	case FSC_SEA_TTW:
+ 	case FSC_SECC:
+-	case FSC_SECC_TTW0:
+-	case FSC_SECC_TTW1:
+-	case FSC_SECC_TTW2:
+-	case FSC_SECC_TTW3:
++	case FSC_SECC_TTW:
+ 		return true;
+ 	default:
+ 		return false;
 -- 
-Jazz is not dead. It just smells funny.
+1.9.1
