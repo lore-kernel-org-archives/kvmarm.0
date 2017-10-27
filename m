@@ -1,87 +1,163 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 25/26] KVM: arm/arm64: GICv4: Prevent heterogenous systems from using GICv4
-Date: Fri, 27 Oct 2017 09:31:12 +0100
-Message-ID: <86mv4d9elr.fsf@arm.com>
-References: <20171006153401.5481-1-marc.zyngier@arm.com>
-        <20171006153401.5481-26-marc.zyngier@arm.com>
-        <20171026154839.ebtmqzcy7jjyejul@salmiak> <868tfxaxiv.fsf@arm.com>
-        <20171027073728.taejncafoehkfzuc@salmiak> <86r2tp9g2s.fsf@arm.com>
-        <20171027080421.m3ruegg6liflcvro@salmiak>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: [PATCH v5 00/20] KVM: arm/arm64: Optimize arch timer register handling
+Date: Fri, 27 Oct 2017 10:34:21 +0200
+Message-ID: <1509093281-15225-1-git-send-email-cdall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20171027080421.m3ruegg6liflcvro@salmiak> (Mark Rutland's message
-        of "Fri, 27 Oct 2017 09:04:21 +0100")
-Sender: kvm-owner@vger.kernel.org
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>, Shanker Donthineni <shankerd@codeaurora.org>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Andre Przywara <Andre.Przywara@arm.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 42E8840795
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 04:33:37 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id IJDaPO91LKfr for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 Oct 2017 04:33:36 -0400 (EDT)
+Received: from mail-lf0-f50.google.com (mail-lf0-f50.google.com
+ [209.85.215.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DF842405F9
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 04:33:35 -0400 (EDT)
+Received: by mail-lf0-f50.google.com with SMTP id 75so6551342lfx.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 01:35:00 -0700 (PDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 27 2017 at  9:04:21 am BST, Mark Rutland <mark.rutland@arm.com> wrote:
-> On Fri, Oct 27, 2017 at 08:59:23AM +0100, Marc Zyngier wrote:
->> On Fri, Oct 27 2017 at  8:37:28 am BST, Mark Rutland <mark.rutland@arm.com> wrote:
->> > On Fri, Oct 27, 2017 at 07:57:12AM +0100, Marc Zyngier wrote:
->> >> On Thu, Oct 26 2017 at  4:48:39 pm BST, Mark Rutland <mark.rutland@arm.com> wrote:
->> >> > On Fri, Oct 06, 2017 at 04:34:00PM +0100, Marc Zyngier wrote:
->> >
->> >> >> @@ -485,8 +495,21 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
->> >> >>  	kvm_vgic_global_state.can_emulate_gicv2 = false;
->> >> >>  	kvm_vgic_global_state.ich_vtr_el2 = ich_vtr_el2;
->> >> >>  
->> >> >> -	/* GICv4 support? */
->> >> >> +	/*
->> >> >> +	 * GICv4 support? We need to check on all CPUs in case of some
->> >> >> +	 * extremely creative form of big-little brain damage...
->> >> >> +	 */
->> >> >>  	if (info->has_v4) {
->> >> >> +		int cpu;
->> >> >> +
->> >> >> +		for_each_online_cpu(cpu) {
->> >> >> +			bool enable;
->> >> >> +
->> >> >> +			smp_call_function_single(cpu, vgic_check_v4_cpuif,
->> >> >> +						 &enable, 1);
->> >> >> +			gicv4_enable = gicv4_enable && enable;
->> >> >> +		}
->> >> >
->> >> > With maxcpus=N on the command line, CPUs can be brought online late, so we
->> >> > might need this in a hotplug callback (and/or in the arm64 cpufeature
->> >> > framework) to handle that case.
->> >> 
->> >> I'm afraid that won't be enough. If the CPU is brought up once we've
->> >> already started a VM, we're screwed, as we cannot retroactively decide
->> >> to drop GICv4 on the floor and nuke the guest. Or did you have something
->> >> more radical in mind? Panic?
->> >
->> > If you teach the arm64 cpufeature framework about this, it can abort bringing a
->> > !GICv4 CPU online late.
->> 
->> You wish.
->> 
->> There is all kind of difficulties with that. This requires checking an
->> EL2 register (ICH_VTR_EL2) when we've not initialised KVM yet (so no HYP
->> call facility). We could make it an additional hyp-stub feature, but
->> that feels pretty involved.
->
-> Aargh; I'd assumed we could probe this from EL1 somewhow.
->
->> Effectively, GICv4 support having it supported on the redistributors,
->> the ITSs, and the CPUs. The cpufeature framework only addresses the
->> first one. So unless the solution encompasses all the elements in the
->> chain, any checking feels pretty pointless.
->
-> Sure thing. :/
+We currently spend a measurable amount of time on each entry/exit to the
+guest dealing with arch timer registers, even when the timer is not
+pending and not doing anything (on certain architectures).
 
-How are we taking this further?
+We can do much better by moving the arch timer save/restore to the
+vcpu_load and vcpu_put functions, but this means that if we don't read
+back the timer state on every exit from the guest, then we have to be
+able to start taking timer interrupts for the virtual timer in KVM and
+handle that properly.
 
-I can drop this altogether (after all, you will get what you deserve if
-you design a broken system). The alternative would be to add a hotplug
-notifier here, and spit out a warning if we're going to be in
-trouble. We still run into the risk of messing with a VM that's already
-been started before the non-v4 CPU.
+That has a number of entertaining consequences, such as having to make
+sure we don't deadlock between any of the vgic code and interrupt
+injection happening from an ISR.  On the plus side, being able to inject
+virtual interrupts corresponding to a physical interrupt directly from
+an ISR is probably a good system design change overall.
 
-Thoughts anyone?
+We also have to change the use of the physical vs. virtual counter in
+the arm64 kernel to avoid having to save/restore the CNTVOFF_EL2
+register on every return to the hypervisor.  The only reason I could
+find for using the virtual counter for the kernel on systems with access
+to the physical counter is to detect if firmware did not properly clear
+CNTVOFF_EL2, and this change has to weighed against the existing check
+(assuming I got this right).
 
-	M.
+On a non-VHE system (AMD Seattle) I have measured this to improve the
+world-switch time by about ~100 cycles, but on an EL2 kernel (emulating
+VHE behavior on the same hardware) this gives us around ~250 cycles
+worth of improvement, and on Thunder-X we seem to get ~650 cycles
+improvement, because we can avoid the extra configuration of trapping
+accesses to the physical timer from EL1 on every switch.
+
+These patches require that the GICv2 hardware (on such systems) is
+properly reported by firmware to have the extra CPU interface page for
+the deactivate register.
+
+Code is also available here:
+git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git timer-optimize-v5
+
+Based on v4.14-rc4
+
+Some recent numbers I ran on Thunder-X with v4.14-rc1 with/without these
+patches (averaged over a few hundred thousand executions) for a base
+hypercall cost:
+
+Without this series, avg. cycles: 12,476
+Without this series, min. cycles: 12,052
+
+With this series, avg. cycles: 11,782
+With this series, min. cycles: 11,435
+
+Improvement ~650 cycles (over 5%)
+
+Changes sinve v4:
+ - Applied reviewed-by and acked-by tags
+ - Reworded commit message of patch 12
+
+Changes since v3:
+ - Rebased on v4.14-rc4
+ - Changes to specific patches appended to the modified patch
+ - Applied acked-by/reviewed-by tags
+
+Changes since v2:
+ - Removed RFC tag
+ - Included Marc's patch to support EOI/deactivate on broken firmware
+   systems
+ - Simplified patch 6 (was patch 5 in RFC v2)
+ - Clarify percpu_devid interrupts in patch 12 (was patch 11)
+
+Thanks,
+-Christoffer
+
+Christoffer Dall (19):
+  arm64: Implement arch_counter_get_cntpct to read the physical counter
+  arm64: Use physical counter for in-kernel reads when booted in EL2
+  KVM: arm/arm64: Guard kvm_vgic_map_is_active against !vgic_initialized
+  KVM: arm/arm64: Support calling vgic_update_irq_pending from irq
+    context
+  KVM: arm/arm64: Check that system supports split eoi/deactivate
+  KVM: arm/arm64: Make timer_arm and timer_disarm helpers more generic
+  KVM: arm/arm64: Rename soft timer to bg_timer
+  KVM: arm/arm64: Move timer/vgic flush/sync under disabled irq
+  KVM: arm/arm64: Use separate timer for phys timer emulation
+  KVM: arm/arm64: Move timer save/restore out of the hyp code
+  genirq: Document vcpu_info usage for percpu_devid interrupts
+  KVM: arm/arm64: Set VCPU affinity for virt timer irq
+  KVM: arm/arm64: Avoid timer save/restore in vcpu entry/exit
+  KVM: arm/arm64: Support EL1 phys timer register access in set/get reg
+  KVM: arm/arm64: Use kvm_arm_timer_set/get_reg for guest register traps
+  KVM: arm/arm64: Move phys_timer_emulate function
+  KVM: arm/arm64: Avoid phys timer emulation in vcpu entry/exit
+  KVM: arm/arm64: Get rid of kvm_timer_flush_hwstate
+  KVM: arm/arm64: Rework kvm_timer_should_fire
+
+Marc Zyngier (1):
+  irqchip/gic: Deal with broken firmware exposing only 4kB of GICv2 CPU
+    interface
+
+ Documentation/admin-guide/kernel-parameters.txt |   7 +
+ arch/arm/include/asm/kvm_asm.h                  |   2 +
+ arch/arm/include/asm/kvm_hyp.h                  |   4 +-
+ arch/arm/include/uapi/asm/kvm.h                 |   6 +
+ arch/arm/kvm/hyp/switch.c                       |   7 +-
+ arch/arm64/include/asm/arch_timer.h             |   8 +-
+ arch/arm64/include/asm/kvm_asm.h                |   2 +
+ arch/arm64/include/asm/kvm_hyp.h                |   4 +-
+ arch/arm64/include/asm/timex.h                  |   2 +-
+ arch/arm64/include/uapi/asm/kvm.h               |   6 +
+ arch/arm64/kvm/hyp/switch.c                     |   6 +-
+ arch/arm64/kvm/sys_regs.c                       |  41 +--
+ drivers/clocksource/arm_arch_timer.c            |  35 +-
+ drivers/irqchip/irq-gic-v3.c                    |   8 +-
+ drivers/irqchip/irq-gic.c                       |  77 +++-
+ include/kvm/arm_arch_timer.h                    |  26 +-
+ kernel/irq/manage.c                             |   3 +-
+ virt/kvm/arm/arch_timer.c                       | 448 ++++++++++++++++--------
+ virt/kvm/arm/arm.c                              |  45 ++-
+ virt/kvm/arm/hyp/timer-sr.c                     |  74 ++--
+ virt/kvm/arm/vgic/vgic-its.c                    |  17 +-
+ virt/kvm/arm/vgic/vgic-mmio-v2.c                |  22 +-
+ virt/kvm/arm/vgic/vgic-mmio-v3.c                |  17 +-
+ virt/kvm/arm/vgic/vgic-mmio.c                   |  44 ++-
+ virt/kvm/arm/vgic/vgic-v2.c                     |   5 +-
+ virt/kvm/arm/vgic/vgic-v3.c                     |  12 +-
+ virt/kvm/arm/vgic/vgic.c                        |  62 ++--
+ virt/kvm/arm/vgic/vgic.h                        |   3 +-
+ 28 files changed, 654 insertions(+), 339 deletions(-)
+
 -- 
-Jazz is not dead. It just smells funny.
+2.7.4
