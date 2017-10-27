@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v5 12/26] KVM: arm/arm64: GICv4: Unmap VLPI when freeing an LPI
-Date: Fri, 27 Oct 2017 15:28:41 +0100
-Message-ID: <20171027142855.21584-13-marc.zyngier@arm.com>
+Subject: [PATCH v5 08/26] KVM: arm/arm64: GICv4: Add property field and per-VM
+ predicate
+Date: Fri, 27 Oct 2017 15:28:37 +0100
+Message-ID: <20171027142855.21584-9-marc.zyngier@arm.com>
 References: <20171027142855.21584-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 33EB440795
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 10:28:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5764C49D63
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 10:28:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kuWATrobPwBF for <kvmarm@lists.cs.columbia.edu>;
- Fri, 27 Oct 2017 10:28:17 -0400 (EDT)
+ with ESMTP id euFiObhVva3n for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 Oct 2017 10:28:06 -0400 (EDT)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F8FA49D32
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 10:28:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3834149D15
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 10:28:06 -0400 (EDT)
 In-Reply-To: <20171027142855.21584-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -28,35 +29,62 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Christoffer Dall <cdall@linaro.org>, Andre Przywara <Andre.Przywara@arm.com>
+Cc: Andre Przywara <Andre.Przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When freeing an LPI (on a DISCARD command, for example), we need
-to unmap the VLPI down to the physical ITS level.
+Add a new has_gicv4 field in the global VGIC state that indicates
+whether the HW is GICv4 capable, as a per-VM predicate indicating
+if there is a possibility for a VM to support direct injection
+(the above being true and the VM having an ITS).
 
-Acked-by: Christoffer Dall <cdall@linaro.org>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-its.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ include/kvm/arm_vgic.h           | 3 +++
+ virt/kvm/arm/vgic/vgic-mmio-v3.c | 5 +++++
+ virt/kvm/arm/vgic/vgic.h         | 2 ++
+ 3 files changed, 10 insertions(+)
 
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index b2a678d131d0..c9b1c0967426 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -628,8 +628,12 @@ static void its_free_ite(struct kvm *kvm, struct its_ite *ite)
- 	list_del(&ite->ite_list);
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 53f631bdec75..ba9fb450aa1b 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -73,6 +73,9 @@ struct vgic_global {
+ 	/* Only needed for the legacy KVM_CREATE_IRQCHIP */
+ 	bool			can_emulate_gicv2;
  
- 	/* This put matches the get in vgic_add_lpi. */
--	if (ite->irq)
-+	if (ite->irq) {
-+		if (ite->irq->hw)
-+			WARN_ON(its_unmap_vlpi(ite->irq->host_irq));
++	/* Hardware has GICv4? */
++	bool			has_gicv4;
 +
- 		vgic_put_irq(kvm, ite->irq);
-+	}
+ 	/* GIC system register CPU interface */
+ 	struct static_key_false gicv3_cpuif;
  
- 	kfree(ite);
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index 408ef06638fc..f87fd17b2eb9 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -54,6 +54,11 @@ bool vgic_has_its(struct kvm *kvm)
+ 	return dist->has_its;
  }
+ 
++bool vgic_supports_direct_msis(struct kvm *kvm)
++{
++	return kvm_vgic_global_state.has_gicv4 && vgic_has_its(kvm);
++}
++
+ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
+ 					    gpa_t addr, unsigned int len)
+ {
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index 31b70326b966..e67ccb6a6250 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -240,4 +240,6 @@ int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
+ 			 u32 devid, u32 eventid, struct vgic_irq **irq);
+ struct vgic_its *vgic_msi_to_its(struct kvm *kvm, struct kvm_msi *msi);
+ 
++bool vgic_supports_direct_msis(struct kvm *kvm);
++
+ #endif
 -- 
 2.11.0
