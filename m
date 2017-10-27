@@ -1,235 +1,136 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v4 07/28] arm64/sve: Low-level SVE architectural state manipulation functions
-Date: Fri, 27 Oct 2017 11:50:49 +0100
-Message-ID: <1509101470-7881-8-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v4 09/28] arm64/sve: Signal frame and context structure
+ definition
+Date: Fri, 27 Oct 2017 11:50:51 +0100
+Message-ID: <1509101470-7881-10-git-send-email-Dave.Martin@arm.com>
 References: <1509101470-7881-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-arch-owner@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E81149D23
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 06:50:15 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id P0qD3-uJVNQR for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 Oct 2017 06:50:14 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 96CB349D4E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 06:50:12 -0400 (EDT)
 In-Reply-To: <1509101470-7881-1-git-send-email-Dave.Martin@arm.com>
-Sender: linux-arch-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org
+Cc: linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Manipulating the SVE architectural state, including the vector and
-predicate registers, first-fault register and the vector length,
-requires the use of dedicated instructions added by SVE.
-
-This patch adds suitable assembly functions for saving and
-restoring the SVE registers and querying the vector length.
-Setting of the vector length is done as part of register restore.
-
-Since people building kernels may not all get an SVE-enabled
-toolchain for a while, this patch uses macros that generate
-explicit opcodes in place of assembler mnemonics.
-
-Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
----
- arch/arm64/include/asm/fpsimd.h       |   5 ++
- arch/arm64/include/asm/fpsimdmacros.h | 148 ++++++++++++++++++++++++++++++++++
- arch/arm64/kernel/entry-fpsimd.S      |  17 ++++
- 3 files changed, 170 insertions(+)
-
-diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
-index 410c481..026a7c7 100644
---- a/arch/arm64/include/asm/fpsimd.h
-+++ b/arch/arm64/include/asm/fpsimd.h
-@@ -67,6 +67,11 @@ extern void fpsimd_update_current_state(struct fpsimd_state *state);
- 
- extern void fpsimd_flush_task_state(struct task_struct *target);
- 
-+extern void sve_save_state(void *state, u32 *pfpsr);
-+extern void sve_load_state(void const *state, u32 const *pfpsr,
-+			   unsigned long vq_minus_1);
-+extern unsigned int sve_get_vl(void);
-+
- /* For use by EFI runtime services calls only */
- extern void __efi_fpsimd_begin(void);
- extern void __efi_fpsimd_end(void);
-diff --git a/arch/arm64/include/asm/fpsimdmacros.h b/arch/arm64/include/asm/fpsimdmacros.h
-index 0f5fdd3..e050d76 100644
---- a/arch/arm64/include/asm/fpsimdmacros.h
-+++ b/arch/arm64/include/asm/fpsimdmacros.h
-@@ -75,3 +75,151 @@
- 	ldr	w\tmpnr, [\state, #16 * 2 + 4]
- 	fpsimd_restore_fpcr x\tmpnr, \state
- .endm
-+
-+/* Sanity-check macros to help avoid encoding garbage instructions */
-+
-+.macro _check_general_reg nr
-+	.if (\nr) < 0 || (\nr) > 30
-+		.error "Bad register number \nr."
-+	.endif
-+.endm
-+
-+.macro _sve_check_zreg znr
-+	.if (\znr) < 0 || (\znr) > 31
-+		.error "Bad Scalable Vector Extension vector register number \znr."
-+	.endif
-+.endm
-+
-+.macro _sve_check_preg pnr
-+	.if (\pnr) < 0 || (\pnr) > 15
-+		.error "Bad Scalable Vector Extension predicate register number \pnr."
-+	.endif
-+.endm
-+
-+.macro _check_num n, min, max
-+	.if (\n) < (\min) || (\n) > (\max)
-+		.error "Number \n out of range [\min,\max]"
-+	.endif
-+.endm
-+
-+/* SVE instruction encodings for non-SVE-capable assemblers */
-+
-+/* STR (vector): STR Z\nz, [X\nxbase, #\offset, MUL VL] */
-+.macro _sve_str_v nz, nxbase, offset=0
-+	_sve_check_zreg \nz
-+	_check_general_reg \nxbase
-+	_check_num (\offset), -0x100, 0xff
-+	.inst	0xe5804000			\
-+		| (\nz)				\
-+		| ((\nxbase) << 5)		\
-+		| (((\offset) & 7) << 10)	\
-+		| (((\offset) & 0x1f8) << 13)
-+.endm
-+
-+/* LDR (vector): LDR Z\nz, [X\nxbase, #\offset, MUL VL] */
-+.macro _sve_ldr_v nz, nxbase, offset=0
-+	_sve_check_zreg \nz
-+	_check_general_reg \nxbase
-+	_check_num (\offset), -0x100, 0xff
-+	.inst	0x85804000			\
-+		| (\nz)				\
-+		| ((\nxbase) << 5)		\
-+		| (((\offset) & 7) << 10)	\
-+		| (((\offset) & 0x1f8) << 13)
-+.endm
-+
-+/* STR (predicate): STR P\np, [X\nxbase, #\offset, MUL VL] */
-+.macro _sve_str_p np, nxbase, offset=0
-+	_sve_check_preg \np
-+	_check_general_reg \nxbase
-+	_check_num (\offset), -0x100, 0xff
-+	.inst	0xe5800000			\
-+		| (\np)				\
-+		| ((\nxbase) << 5)		\
-+		| (((\offset) & 7) << 10)	\
-+		| (((\offset) & 0x1f8) << 13)
-+.endm
-+
-+/* LDR (predicate): LDR P\np, [X\nxbase, #\offset, MUL VL] */
-+.macro _sve_ldr_p np, nxbase, offset=0
-+	_sve_check_preg \np
-+	_check_general_reg \nxbase
-+	_check_num (\offset), -0x100, 0xff
-+	.inst	0x85800000			\
-+		| (\np)				\
-+		| ((\nxbase) << 5)		\
-+		| (((\offset) & 7) << 10)	\
-+		| (((\offset) & 0x1f8) << 13)
-+.endm
-+
-+/* RDVL X\nx, #\imm */
-+.macro _sve_rdvl nx, imm
-+	_check_general_reg \nx
-+	_check_num (\imm), -0x20, 0x1f
-+	.inst	0x04bf5000			\
-+		| (\nx)				\
-+		| (((\imm) & 0x3f) << 5)
-+.endm
-+
-+/* RDFFR (unpredicated): RDFFR P\np.B */
-+.macro _sve_rdffr np
-+	_sve_check_preg \np
-+	.inst	0x2519f000			\
-+		| (\np)
-+.endm
-+
-+/* WRFFR P\np.B */
-+.macro _sve_wrffr np
-+	_sve_check_preg \np
-+	.inst	0x25289000			\
-+		| ((\np) << 5)
-+.endm
-+
-+.macro __for from:req, to:req
-+	.if (\from) == (\to)
-+		_for__body \from
-+	.else
-+		__for \from, (\from) + ((\to) - (\from)) / 2
-+		__for (\from) + ((\to) - (\from)) / 2 + 1, \to
-+	.endif
-+.endm
-+
-+.macro _for var:req, from:req, to:req, insn:vararg
-+	.macro _for__body \var:req
-+		\insn
-+	.endm
-+
-+	__for \from, \to
-+
-+	.purgem _for__body
-+.endm
-+
-+.macro sve_save nxbase, xpfpsr, nxtmp
-+ _for n, 0, 31,	_sve_str_v	\n, \nxbase, \n - 34
-+ _for n, 0, 15,	_sve_str_p	\n, \nxbase, \n - 16
-+		_sve_rdffr	0
-+		_sve_str_p	0, \nxbase
-+		_sve_ldr_p	0, \nxbase, -16
-+
-+		mrs		x\nxtmp, fpsr
-+		str		w\nxtmp, [\xpfpsr]
-+		mrs		x\nxtmp, fpcr
-+		str		w\nxtmp, [\xpfpsr, #4]
-+.endm
-+
-+.macro sve_load nxbase, xpfpsr, xvqminus1, nxtmp
-+		mrs_s		x\nxtmp, SYS_ZCR_EL1
-+		bic		x\nxtmp, x\nxtmp, ZCR_ELx_LEN_MASK
-+		orr		x\nxtmp, x\nxtmp, \xvqminus1
-+		msr_s		SYS_ZCR_EL1, x\nxtmp	// self-synchronising
-+
-+ _for n, 0, 31,	_sve_ldr_v	\n, \nxbase, \n - 34
-+		_sve_ldr_p	0, \nxbase
-+		_sve_wrffr	0
-+ _for n, 0, 15,	_sve_ldr_p	\n, \nxbase, \n - 16
-+
-+		ldr		w\nxtmp, [\xpfpsr]
-+		msr		fpsr, x\nxtmp
-+		ldr		w\nxtmp, [\xpfpsr, #4]
-+		msr		fpcr, x\nxtmp
-+.endm
-diff --git a/arch/arm64/kernel/entry-fpsimd.S b/arch/arm64/kernel/entry-fpsimd.S
-index 6a27cd6..73f17bf 100644
---- a/arch/arm64/kernel/entry-fpsimd.S
-+++ b/arch/arm64/kernel/entry-fpsimd.S
-@@ -41,3 +41,20 @@ ENTRY(fpsimd_load_state)
- 	fpsimd_restore x0, 8
- 	ret
- ENDPROC(fpsimd_load_state)
-+
-+#ifdef CONFIG_ARM64_SVE
-+ENTRY(sve_save_state)
-+	sve_save 0, x1, 2
-+	ret
-+ENDPROC(sve_save_state)
-+
-+ENTRY(sve_load_state)
-+	sve_load 0, x1, x2, 3
-+	ret
-+ENDPROC(sve_load_state)
-+
-+ENTRY(sve_get_vl)
-+	_sve_rdvl	0, 1
-+	ret
-+ENDPROC(sve_get_vl)
-+#endif /* CONFIG_ARM64_SVE */
--- 
-2.1.4
+VGhpcyBwYXRjaCBkZWZpbmVzIHRoZSByZXByZXNlbnRhdGlvbiB0aGF0IHdpbGwgYmUgdXNlZCBm
+b3IgdGhlIFNWRQpyZWdpc3RlciBzdGF0ZSBpbiB0aGUgc2lnbmFsIGZyYW1lLCBhbmQgaW1wbGVt
+ZW50cyBzdXBwb3J0IGZvcgpzYXZpbmcgYW5kIHJlc3RvcmluZyB0aGUgU1ZFIHJlZ2lzdGVycyBh
+cm91bmQgc2lnbmFscy4KClRoZSBzYW1lIGxheW91dCB3aWxsIGFsc28gYmUgdXNlZCBmb3IgdGhl
+IGluLWtlcm5lbCB0YXNrIHN0YXRlLgoKRHVlIHRvIHRoZSB2YXJpYWJpbGl0eSBvZiB0aGUgU1ZF
+IHZlY3RvciBsZW5ndGgsIGl0IGlzIG5vdCBwb3NzaWJsZQp0byBkZWZpbmUgYSBmaXhlZCBDIHN0
+cnVjdCB0byBkZXNjcmliZSBhbGwgdGhlIHJlZ2lzdGVycy4gIEluc3RlYWQsCk1hY3JvcyBhcmUg
+ZGVmaW5lZCBpbiBzaWdjb250ZXh0LmggdG8gZmFjaWxpdGF0ZSBhY2Nlc3MgdG8gdGhlCnBhcnRz
+IG9mIHRoZSBzdHJ1Y3R1cmUuCgpTaWduZWQtb2ZmLWJ5OiBEYXZlIE1hcnRpbiA8RGF2ZS5NYXJ0
+aW5AYXJtLmNvbT4KUmV2aWV3ZWQtYnk6IENhdGFsaW4gTWFyaW5hcyA8Y2F0YWxpbi5tYXJpbmFz
+QGFybS5jb20+CkNjOiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+Ci0tLQog
+YXJjaC9hcm02NC9pbmNsdWRlL3VhcGkvYXNtL3NpZ2NvbnRleHQuaCB8IDExNyArKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKystCiAxIGZpbGUgY2hhbmdlZCwgMTE2IGluc2VydGlvbnMoKyks
+IDEgZGVsZXRpb24oLSkKCmRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2luY2x1ZGUvdWFwaS9hc20v
+c2lnY29udGV4dC5oIGIvYXJjaC9hcm02NC9pbmNsdWRlL3VhcGkvYXNtL3NpZ2NvbnRleHQuaApp
+bmRleCBmMGE3NmI5Li43NjU0YTgxIDEwMDY0NAotLS0gYS9hcmNoL2FybTY0L2luY2x1ZGUvdWFw
+aS9hc20vc2lnY29udGV4dC5oCisrKyBiL2FyY2gvYXJtNjQvaW5jbHVkZS91YXBpL2FzbS9zaWdj
+b250ZXh0LmgKQEAgLTE2LDYgKzE2LDggQEAKICNpZm5kZWYgX1VBUElfX0FTTV9TSUdDT05URVhU
+X0gKICNkZWZpbmUgX1VBUElfX0FTTV9TSUdDT05URVhUX0gKIAorI2lmbmRlZiBfX0FTU0VNQkxZ
+X18KKwogI2luY2x1ZGUgPGxpbnV4L3R5cGVzLmg+CiAKIC8qCkBAIC00MSwxMCArNDMsMTEgQEAg
+c3RydWN0IHNpZ2NvbnRleHQgewogICoKICAqCTB4MjEwCQlmcHNpbWRfY29udGV4dAogICoJIDB4
+MTAJCWVzcl9jb250ZXh0CisgKgkweDhhMAkJc3ZlX2NvbnRleHQgKHZsIDw9IDY0KSAob3B0aW9u
+YWwpCiAgKgkgMHgyMAkJZXh0cmFfY29udGV4dCAob3B0aW9uYWwpCiAgKgkgMHgxMAkJdGVybWlu
+YXRvciAobnVsbCBfYWFyY2g2NF9jdHgpCiAgKgotICoJMHhkYjAJCShyZXNlcnZlZCBmb3IgZnV0
+dXJlIGFsbG9jYXRpb24pCisgKgkweDUxMAkJKHJlc2VydmVkIGZvciBmdXR1cmUgYWxsb2NhdGlv
+bikKICAqCiAgKiBOZXcgcmVjb3JkcyB0aGF0IGNhbiBleGNlZWQgdGhpcyBzcGFjZSBuZWVkIHRv
+IGJlIG9wdC1pbiBmb3IgdXNlcnNwYWNlLCBzbwogICogdGhhdCBhbiBleHBhbmRlZCBzaWduYWwg
+ZnJhbWUgaXMgbm90IGdlbmVyYXRlZCB1bmV4cGVjdGVkbHkuICBUaGUgbWVjaGFuaXNtCkBAIC0x
+MTYsNCArMTE5LDExNiBAQCBzdHJ1Y3QgZXh0cmFfY29udGV4dCB7CiAJX191MzIgX19yZXNlcnZl
+ZFszXTsKIH07CiAKKyNkZWZpbmUgU1ZFX01BR0lDCTB4NTM1NjQ1MDEKKworc3RydWN0IHN2ZV9j
+b250ZXh0IHsKKwlzdHJ1Y3QgX2FhcmNoNjRfY3R4IGhlYWQ7CisJX191MTYgdmw7CisJX191MTYg
+X19yZXNlcnZlZFszXTsKK307CisKKyNlbmRpZiAvKiAhX19BU1NFTUJMWV9fICovCisKKy8qCisg
+KiBUaGUgU1ZFIGFyY2hpdGVjdHVyZSBsZWF2ZXMgc3BhY2UgZm9yIGZ1dHVyZSBleHBhbnNpb24g
+b2YgdGhlCisgKiB2ZWN0b3IgbGVuZ3RoIGJleW9uZCBpdHMgaW5pdGlhbCBhcmNoaXRlY3R1cmFs
+IGxpbWl0IG9mIDIwNDggYml0cworICogKDE2IHF1YWR3b3JkcykuCisgKi8KKyNkZWZpbmUgU1ZF
+X1ZRX0JZVEVTCQkxNgkvKiBudW1iZXIgb2YgYnl0ZXMgcGVyIHF1YWR3b3JkICovCisKKyNkZWZp
+bmUgU1ZFX1ZRX01JTgkJMQorI2RlZmluZSBTVkVfVlFfTUFYCQk1MTIKKworI2RlZmluZSBTVkVf
+VkxfTUlOCQkoU1ZFX1ZRX01JTiAqIFNWRV9WUV9CWVRFUykKKyNkZWZpbmUgU1ZFX1ZMX01BWAkJ
+KFNWRV9WUV9NQVggKiBTVkVfVlFfQllURVMpCisKKyNkZWZpbmUgU1ZFX05VTV9aUkVHUwkJMzIK
+KyNkZWZpbmUgU1ZFX05VTV9QUkVHUwkJMTYKKworI2RlZmluZSBzdmVfdmxfdmFsaWQodmwpIFwK
+KwkoKHZsKSAlIFNWRV9WUV9CWVRFUyA9PSAwICYmICh2bCkgPj0gU1ZFX1ZMX01JTiAmJiAodmwp
+IDw9IFNWRV9WTF9NQVgpCisjZGVmaW5lIHN2ZV92cV9mcm9tX3ZsKHZsKQkoKHZsKSAvIFNWRV9W
+UV9CWVRFUykKKyNkZWZpbmUgc3ZlX3ZsX2Zyb21fdnEodnEpCSgodnEpICogU1ZFX1ZRX0JZVEVT
+KQorCisvKgorICogSWYgdGhlIFNWRSByZWdpc3RlcnMgYXJlIGN1cnJlbnRseSBsaXZlIGZvciB0
+aGUgdGhyZWFkIGF0IHNpZ25hbCBkZWxpdmVyeSwKKyAqIHN2ZV9jb250ZXh0LmhlYWQuc2l6ZSA+
+PQorICoJU1ZFX1NJR19DT05URVhUX1NJWkUoc3ZlX3ZxX2Zyb21fdmwoc3ZlX2NvbnRleHQudmwp
+KQorICogYW5kIHRoZSByZWdpc3RlciBkYXRhIG1heSBiZSBhY2Nlc3NlZCB1c2luZyB0aGUgU1ZF
+X1NJR18qKCkgbWFjcm9zLgorICoKKyAqIElmIHN2ZV9jb250ZXh0LmhlYWQuc2l6ZSA8CisgKglT
+VkVfU0lHX0NPTlRFWFRfU0laRShzdmVfdnFfZnJvbV92bChzdmVfY29udGV4dC52bCkpLAorICog
+dGhlIFNWRSByZWdpc3RlcnMgd2VyZSBub3QgbGl2ZSBmb3IgdGhlIHRocmVhZCBhbmQgbm8gcmVn
+aXN0ZXIgZGF0YQorICogaXMgaW5jbHVkZWQ6IGluIHRoaXMgY2FzZSwgdGhlIFNWRV9TSUdfKigp
+IG1hY3JvcyBzaG91bGQgbm90IGJlCisgKiB1c2VkIGV4Y2VwdCBmb3IgdGhpcyBjaGVjay4KKyAq
+CisgKiBUaGUgc2FtZSBjb252ZW50aW9uIGFwcGxpZXMgd2hlbiByZXR1cm5pbmcgZnJvbSBhIHNp
+Z25hbDogYSBjYWxsZXIKKyAqIHdpbGwgbmVlZCB0byByZW1vdmUgb3IgcmVzaXplIHRoZSBzdmVf
+Y29udGV4dCBibG9jayBpZiBpdCB3YW50cyB0bworICogbWFrZSB0aGUgU1ZFIHJlZ2lzdGVycyBs
+aXZlIHdoZW4gdGhleSB3ZXJlIHByZXZpb3VzbHkgbm9uLWxpdmUgb3IKKyAqIHZpY2UtdmVyc2Eu
+ICBUaGlzIG1heSByZXF1aXJlIHRoZSB0aGUgY2FsbGVyIHRvIGFsbG9jYXRlIGZyZXNoCisgKiBt
+ZW1vcnkgYW5kL29yIG1vdmUgb3RoZXIgY29udGV4dCBibG9ja3MgaW4gdGhlIHNpZ25hbCBmcmFt
+ZS4KKyAqCisgKiBDaGFuZ2luZyB0aGUgdmVjdG9yIGxlbmd0aCBkdXJpbmcgc2lnbmFsIHJldHVy
+biBpcyBub3QgcGVybWl0dGVkOgorICogc3ZlX2NvbnRleHQudmwgbXVzdCBlcXVhbCB0aGUgdGhy
+ZWFkJ3MgY3VycmVudCB2ZWN0b3IgbGVuZ3RoIHdoZW4KKyAqIGRvaW5nIGEgc2lncmV0dXJuLgor
+ICoKKyAqCisgKiBOb3RlOiBmb3IgYWxsIHRoZXNlIG1hY3JvcywgdGhlICJ2cSIgYXJndW1lbnQg
+ZGVub3RlcyB0aGUgU1ZFCisgKiB2ZWN0b3IgbGVuZ3RoIGluIHF1YWR3b3JkcyAoaS5lLiwgdW5p
+dHMgb2YgMTI4IGJpdHMpLgorICoKKyAqIFRoZSBjb3JyZWN0IHdheSB0byBvYnRhaW4gdnEgaXMg
+dG8gdXNlIHN2ZV92cV9mcm9tX3ZsKHZsKS4gIFRoZQorICogcmVzdWx0IGlzIHZhbGlkIGlmIGFu
+ZCBvbmx5IGlmIHN2ZV92bF92YWxpZCh2bCkgaXMgdHJ1ZS4gIFRoaXMgaXMKKyAqIGd1YXJhbnRl
+ZWQgZm9yIGEgc3RydWN0IHN2ZV9jb250ZXh0IHdyaXR0ZW4gYnkgdGhlIGtlcm5lbC4KKyAqCisg
+KgorICogQWRkaXRpb25hbCBtYWNyb3MgZGVzY3JpYmUgdGhlIGNvbnRlbnRzIGFuZCBsYXlvdXQg
+b2YgdGhlIHBheWxvYWQuCisgKiBGb3IgZWFjaCwgU1ZFX1NJR194X09GRlNFVChhcmdzKSBpcyB0
+aGUgc3RhcnQgb2Zmc2V0IHJlbGF0aXZlIHRvCisgKiB0aGUgc3RhcnQgb2Ygc3RydWN0IHN2ZV9j
+b250ZXh0LCBhbmQgU1ZFX1NJR194X1NJWkUoYXJncykgaXMgdGhlCisgKiBzaXplIGluIGJ5dGVz
+OgorICoKKyAqCXgJdHlwZQkJCQlkZXNjcmlwdGlvbgorICoJLQktLS0tCQkJCS0tLS0tLS0tLS0t
+CisgKglSRUdTCQkJCQl0aGUgZW50aXJlIFNWRSBjb250ZXh0CisgKgorICoJWlJFR1MJX191aW50
+MTI4X3RbU1ZFX05VTV9aUkVHU11bdnFdCWFsbCBaLXJlZ2lzdGVycworICoJWlJFRwlfX3VpbnQx
+MjhfdFt2cV0JCQlpbmRpdmlkdWFsIFotcmVnaXN0ZXIgWm4KKyAqCisgKglQUkVHUwl1aW50MTZf
+dFtTVkVfTlVNX1BSRUdTXVt2cV0JYWxsIFAtcmVnaXN0ZXJzCisgKglQUkVHCXVpbnQxNl90W3Zx
+XQkJCWluZGl2aWR1YWwgUC1yZWdpc3RlciBQbgorICoKKyAqCUZGUgl1aW50MTZfdFt2cV0JCQlm
+aXJzdC1mYXVsdCBzdGF0dXMgcmVnaXN0ZXIKKyAqCisgKiBBZGRpdGlvbmFsIGRhdGEgbWlnaHQg
+YmUgYXBwZW5kZWQgaW4gdGhlIGZ1dHVyZS4KKyAqLworCisjZGVmaW5lIFNWRV9TSUdfWlJFR19T
+SVpFKHZxKQkoKF9fdTMyKSh2cSkgKiBTVkVfVlFfQllURVMpCisjZGVmaW5lIFNWRV9TSUdfUFJF
+R19TSVpFKHZxKQkoKF9fdTMyKSh2cSkgKiAoU1ZFX1ZRX0JZVEVTIC8gOCkpCisjZGVmaW5lIFNW
+RV9TSUdfRkZSX1NJWkUodnEpCVNWRV9TSUdfUFJFR19TSVpFKHZxKQorCisjZGVmaW5lIFNWRV9T
+SUdfUkVHU19PRkZTRVQJCQkJCVwKKwkoKHNpemVvZihzdHJ1Y3Qgc3ZlX2NvbnRleHQpICsgKFNW
+RV9WUV9CWVRFUyAtIDEpKQlcCisJCS8gU1ZFX1ZRX0JZVEVTICogU1ZFX1ZRX0JZVEVTKQorCisj
+ZGVmaW5lIFNWRV9TSUdfWlJFR1NfT0ZGU0VUCVNWRV9TSUdfUkVHU19PRkZTRVQKKyNkZWZpbmUg
+U1ZFX1NJR19aUkVHX09GRlNFVCh2cSwgbikgXAorCShTVkVfU0lHX1pSRUdTX09GRlNFVCArIFNW
+RV9TSUdfWlJFR19TSVpFKHZxKSAqIChuKSkKKyNkZWZpbmUgU1ZFX1NJR19aUkVHU19TSVpFKHZx
+KSBcCisJKFNWRV9TSUdfWlJFR19PRkZTRVQodnEsIFNWRV9OVU1fWlJFR1MpIC0gU1ZFX1NJR19a
+UkVHU19PRkZTRVQpCisKKyNkZWZpbmUgU1ZFX1NJR19QUkVHU19PRkZTRVQodnEpIFwKKwkoU1ZF
+X1NJR19aUkVHU19PRkZTRVQgKyBTVkVfU0lHX1pSRUdTX1NJWkUodnEpKQorI2RlZmluZSBTVkVf
+U0lHX1BSRUdfT0ZGU0VUKHZxLCBuKSBcCisJKFNWRV9TSUdfUFJFR1NfT0ZGU0VUKHZxKSArIFNW
+RV9TSUdfUFJFR19TSVpFKHZxKSAqIChuKSkKKyNkZWZpbmUgU1ZFX1NJR19QUkVHU19TSVpFKHZx
+KSBcCisJKFNWRV9TSUdfUFJFR19PRkZTRVQodnEsIFNWRV9OVU1fUFJFR1MpIC0gU1ZFX1NJR19Q
+UkVHU19PRkZTRVQodnEpKQorCisjZGVmaW5lIFNWRV9TSUdfRkZSX09GRlNFVCh2cSkgXAorCShT
+VkVfU0lHX1BSRUdTX09GRlNFVCh2cSkgKyBTVkVfU0lHX1BSRUdTX1NJWkUodnEpKQorCisjZGVm
+aW5lIFNWRV9TSUdfUkVHU19TSVpFKHZxKSBcCisJKFNWRV9TSUdfRkZSX09GRlNFVCh2cSkgKyBT
+VkVfU0lHX0ZGUl9TSVpFKHZxKSAtIFNWRV9TSUdfUkVHU19PRkZTRVQpCisKKyNkZWZpbmUgU1ZF
+X1NJR19DT05URVhUX1NJWkUodnEpIChTVkVfU0lHX1JFR1NfT0ZGU0VUICsgU1ZFX1NJR19SRUdT
+X1NJWkUodnEpKQorCisKICNlbmRpZiAvKiBfVUFQSV9fQVNNX1NJR0NPTlRFWFRfSCAqLwotLSAK
+Mi4xLjQKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2
+bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xp
+c3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
