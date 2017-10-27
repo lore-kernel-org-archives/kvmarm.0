@@ -1,89 +1,100 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v5 24/26] KVM: arm/arm64: GICv4: Prevent userspace from
- changing doorbell affinity
-Date: Fri, 27 Oct 2017 15:28:53 +0100
-Message-ID: <20171027142855.21584-25-marc.zyngier@arm.com>
+Subject: [PATCH v5 26/26] KVM: arm/arm64: GICv4: Theory of operations
+Date: Fri, 27 Oct 2017 15:28:55 +0100
+Message-ID: <20171027142855.21584-27-marc.zyngier@arm.com>
 References: <20171027142855.21584-1-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 87CEE49D6B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 10:28:57 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OjmBAg6ZNRgB for <kvmarm@lists.cs.columbia.edu>;
- Fri, 27 Oct 2017 10:28:54 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 68BD649D4D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 10:28:54 -0400 (EDT)
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20171027142855.21584-1-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: linux-kernel-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Andre Przywara <Andre.Przywara@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>, Shanker Donthineni <shankerd@codeaurora.org>, Mark Rutland <mark.rutland@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Andre Przywara <Andre.Przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We so far allocate the doorbell interrupts without taking any
-special measure regarding the affinity of these interrupts. We
-simply move them around as required when the vcpu gets scheduled
-on a different CPU.
+Yet another braindump so I can free some cells...
 
-But that's counting without userspace (and the evil irqbalance) that
-can try and move the VPE interrupt around, causing the ITS code
-to emit VMOVP commands and remap the doorbell to another redistributor.
-Worse, this can happen while the vcpu is running, causing all kind
-of trouble if the VPE is already resident, and we end-up in UNPRED
-territory.
-
-So let's take a definitive action and prevent userspace from messing
-with us. This is just a matter of adding IRQ_NO_BALANCING to the
-set of flags we already have, letting the kernel in sole control
-of the affinity.
-
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-v4.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ virt/kvm/arm/vgic/vgic-v4.c | 67 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 67 insertions(+)
 
 diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
-index d7fe610bb1f5..d10e18eabd3b 100644
+index d10e18eabd3b..e367d65a0ebe 100644
 --- a/virt/kvm/arm/vgic/vgic-v4.c
 +++ b/virt/kvm/arm/vgic/vgic-v4.c
-@@ -23,6 +23,8 @@
+@@ -23,6 +23,73 @@
  
  #include "vgic.h"
  
-+#define DB_IRQ_FLAGS	(IRQ_NOAUTOEN | IRQ_DISABLE_UNLAZY | IRQ_NO_BALANCING)
++/*
++ * How KVM uses GICv4 (insert rude comments here):
++ *
++ * The vgic-v4 layer acts as a bridge between several entities:
++ * - The GICv4 ITS representation offered by the ITS driver
++ * - VFIO, which is in charge of the PCI endpoint
++ * - The virtual ITS, which is the only thing the guest sees
++ *
++ * The configuration of VLPIs is triggered by a callback from VFIO,
++ * instructing KVM that a PCI device has been configured to deliver
++ * MSIs to a vITS.
++ *
++ * kvm_vgic_v4_set_forwarding() is thus called with the routing entry,
++ * and this is used to find the corresponding vITS data structures
++ * (ITS instance, device, event and irq) using a process that is
++ * extremely similar to the injection of an MSI.
++ *
++ * At this stage, we can link the guest's view of an LPI (uniquely
++ * identified by the routing entry) and the host irq, using the GICv4
++ * driver mapping operation. Should the mapping succeed, we've then
++ * successfully upgraded the guest's LPI to a VLPI. We can then start
++ * with updating GICv4's view of the property table and generating an
++ * INValidation in order to kickstart the delivery of this VLPI to the
++ * guest directly, without software intervention. Well, almost.
++ *
++ * When the PCI endpoint is deconfigured, this operation is reversed
++ * with VFIO calling kvm_vgic_v4_unset_forwarding().
++ *
++ * Once the VLPI has been mapped, it needs to follow any change the
++ * guest performs on its LPI through the vITS. For that, a number of
++ * command handlers have hooks to communicate these changes to the HW:
++ * - Any invalidation triggers a call to its_prop_update_vlpi()
++ * - The INT command results in a irq_set_irqchip_state(), which
++ *   generates an INT on the corresponding VLPI.
++ * - The CLEAR command results in a irq_set_irqchip_state(), which
++ *   generates an CLEAR on the corresponding VLPI.
++ * - DISCARD translates into an unmap, similar to a call to
++ *   kvm_vgic_v4_unset_forwarding().
++ * - MOVI is translated by an update of the existing mapping, changing
++ *   the target vcpu, resulting in a VMOVI being generated.
++ * - MOVALL is translated by a string of mapping updates (similar to
++ *   the handling of MOVI). MOVALL is horrible.
++ *
++ * Note that a DISCARD/MAPTI sequence emitted from the guest without
++ * reprogramming the PCI endpoint after MAPTI does not result in a
++ * VLPI being mapped, as there is no callback from VFIO (the guest
++ * will get the interrupt via the normal SW injection). Fixing this is
++ * not trivial, and requires some horrible messing with the VFIO
++ * internals. Not fun. Don't do that.
++ *
++ * Then there is the scheduling. Each time a vcpu is about to run on a
++ * physical CPU, KVM must tell the corresponding redistributor about
++ * it. And if we've migrated our vcpu from one CPU to another, we must
++ * tell the ITS (so that the messages reach the right redistributor).
++ * This is done in two steps: first issue a irq_set_affinity() on the
++ * irq corresponding to the vcpu, then call its_schedule_vpe(). You
++ * must be in a non-preemptible context. On exit, another call to
++ * its_schedule_vpe() tells the redistributor that we're done with the
++ * vcpu.
++ *
++ * Finally, the doorbell handling: Each vcpu is allocated an interrupt
++ * which will fire each time a VLPI is made pending whilst the vcpu is
++ * not running. Each time the vcpu gets blocked, the doorbell
++ * interrupt gets enabled. When the vcpu is unblocked (for whatever
++ * reason), the doorbell interrupt is disabled.
++ */
 +
+ #define DB_IRQ_FLAGS	(IRQ_NOAUTOEN | IRQ_DISABLE_UNLAZY | IRQ_NO_BALANCING)
+ 
  static irqreturn_t vgic_v4_doorbell_handler(int irq, void *info)
- {
- 	struct kvm_vcpu *vcpu = info;
-@@ -83,7 +85,7 @@ int vgic_v4_init(struct kvm *kvm)
- 		 * doorbell could kick us out of the guest too
- 		 * early...
- 		 */
--		irq_set_status_flags(irq, IRQ_NOAUTOEN | IRQ_DISABLE_UNLAZY);
-+		irq_set_status_flags(irq, DB_IRQ_FLAGS);
- 		ret = request_irq(irq, vgic_v4_doorbell_handler,
- 				  0, "vcpu", vcpu);
- 		if (ret) {
-@@ -121,7 +123,7 @@ void vgic_v4_teardown(struct kvm *kvm)
- 		struct kvm_vcpu *vcpu = kvm_get_vcpu(kvm, i);
- 		int irq = its_vm->vpes[i]->irq;
- 
--		irq_clear_status_flags(irq, IRQ_NOAUTOEN | IRQ_DISABLE_UNLAZY);
-+		irq_clear_status_flags(irq, DB_IRQ_FLAGS);
- 		free_irq(irq, vcpu);
- 	}
- 
 -- 
 2.11.0
