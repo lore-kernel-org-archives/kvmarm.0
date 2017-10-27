@@ -1,233 +1,121 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v4 22/28] arm64/sve: KVM: Prevent guests from using SVE
-Date: Fri, 27 Oct 2017 11:51:04 +0100
-Message-ID: <1509101470-7881-23-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v4 18/28] arm64/sve: Preserve SVE registers around EFI runtime
+ service calls
+Date: Fri, 27 Oct 2017 11:51:00 +0100
+Message-ID: <1509101470-7881-19-git-send-email-Dave.Martin@arm.com>
 References: <1509101470-7881-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-arch-owner@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7479549D5D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 06:50:31 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id SJEk58Ia2wfq for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 Oct 2017 06:50:30 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A3DE49D63
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 06:50:30 -0400 (EDT)
 In-Reply-To: <1509101470-7881-1-git-send-email-Dave.Martin@arm.com>
-Sender: linux-arch-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org
+Cc: linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Until KVM has full SVE support, guests must not be allowed to
-execute SVE instructions.
-
-This patch enables the necessary traps, and also ensures that the
-traps are disabled again on exit from the guest so that the host
-can still use SVE if it wants to.
-
-On guest exit, high bits of the SVE Zn registers may have been
-clobbered as a side-effect the execution of FPSIMD instructions in
-the guest.  The existing KVM host FPSIMD restore code is not
-sufficient to restore these bits, so this patch explicitly marks
-the CPU as not containing cached vector state for any task, thus
-forcing a reload on the next return to userspace.  This is an
-interim measure, in advance of adding full SVE awareness to KVM.
-
-This marking of cached vector state in the CPU as invalid is done
-using __this_cpu_write(fpsimd_last_state, NULL) in fpsimd.c.  Due
-to the repeated use of this rather obscure operation, it makes
-sense to factor it out as a separate helper with a clearer name.
-This patch factors it out as fpsimd_flush_cpu_state(), and ports
-all callers to use it.
-
-As a side effect of this refactoring, a this_cpu_write() in
-fpsimd_cpu_pm_notifier() is changed to __this_cpu_write().  This
-should be fine, since cpu_pm_enter() is supposed to be called only
-with interrupts disabled.
-
-Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- arch/arm/include/asm/kvm_host.h   |  3 +++
- arch/arm64/include/asm/fpsimd.h   |  1 +
- arch/arm64/include/asm/kvm_arm.h  |  4 +++-
- arch/arm64/include/asm/kvm_host.h | 11 +++++++++++
- arch/arm64/kernel/fpsimd.c        | 31 +++++++++++++++++++++++++++++--
- arch/arm64/kvm/hyp/switch.c       |  6 +++---
- virt/kvm/arm/arm.c                |  3 +++
- 7 files changed, 53 insertions(+), 6 deletions(-)
-
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 4a879f6..242151e 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -293,4 +293,7 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
- int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
- 			       struct kvm_device_attr *attr);
- 
-+/* All host FP/SIMD state is restored on guest exit, so nothing to save: */
-+static inline void kvm_fpsimd_flush_cpu_state(void) {}
-+
- #endif /* __ARM_KVM_HOST_H__ */
-diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
-index b868412..74f3439 100644
---- a/arch/arm64/include/asm/fpsimd.h
-+++ b/arch/arm64/include/asm/fpsimd.h
-@@ -74,6 +74,7 @@ extern void fpsimd_restore_current_state(void);
- extern void fpsimd_update_current_state(struct fpsimd_state *state);
- 
- extern void fpsimd_flush_task_state(struct task_struct *target);
-+extern void sve_flush_cpu_state(void);
- 
- /* Maximum VL that SVE VL-agnostic software can transparently support */
- #define SVE_VL_ARCH_MAX 0x100
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index dbf0537..7f069ff 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -186,7 +186,8 @@
- #define CPTR_EL2_TTA	(1 << 20)
- #define CPTR_EL2_TFP	(1 << CPTR_EL2_TFP_SHIFT)
- #define CPTR_EL2_TZ	(1 << 8)
--#define CPTR_EL2_DEFAULT	0x000033ff
-+#define CPTR_EL2_RES1	0x000032ff /* known RES1 bits in CPTR_EL2 */
-+#define CPTR_EL2_DEFAULT	CPTR_EL2_RES1
- 
- /* Hyp Debug Configuration Register bits */
- #define MDCR_EL2_TPMS		(1 << 14)
-@@ -237,5 +238,6 @@
- 
- #define CPACR_EL1_FPEN		(3 << 20)
- #define CPACR_EL1_TTA		(1 << 28)
-+#define CPACR_EL1_DEFAULT	(CPACR_EL1_FPEN | CPACR_EL1_ZEN_EL1EN)
- 
- #endif /* __ARM64_KVM_ARM_H__ */
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index e923b58..674912d 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -25,6 +25,7 @@
- #include <linux/types.h>
- #include <linux/kvm_types.h>
- #include <asm/cpufeature.h>
-+#include <asm/fpsimd.h>
- #include <asm/kvm.h>
- #include <asm/kvm_asm.h>
- #include <asm/kvm_mmio.h>
-@@ -384,4 +385,14 @@ static inline void __cpu_init_stage2(void)
- 		  "PARange is %d bits, unsupported configuration!", parange);
- }
- 
-+/*
-+ * All host FP/SIMD state is restored on guest exit, so nothing needs
-+ * doing here except in the SVE case:
-+*/
-+static inline void kvm_fpsimd_flush_cpu_state(void)
-+{
-+	if (system_supports_sve())
-+		sve_flush_cpu_state();
-+}
-+
- #endif /* __ARM64_KVM_HOST_H__ */
-diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index f9d3287..8f15462 100644
---- a/arch/arm64/kernel/fpsimd.c
-+++ b/arch/arm64/kernel/fpsimd.c
-@@ -1048,6 +1048,33 @@ void fpsimd_flush_task_state(struct task_struct *t)
- 	t->thread.fpsimd_state.cpu = NR_CPUS;
- }
- 
-+static inline void fpsimd_flush_cpu_state(void)
-+{
-+	__this_cpu_write(fpsimd_last_state, NULL);
-+}
-+
-+/*
-+ * Invalidate any task SVE state currently held in this CPU's regs.
-+ *
-+ * This is used to prevent the kernel from trying to reuse SVE register data
-+ * that is detroyed by KVM guest enter/exit.  This function should go away when
-+ * KVM SVE support is implemented.  Don't use it for anything else.
-+ */
-+#ifdef CONFIG_ARM64_SVE
-+void sve_flush_cpu_state(void)
-+{
-+	struct fpsimd_state *const fpstate = __this_cpu_read(fpsimd_last_state);
-+	struct task_struct *tsk;
-+
-+	if (!fpstate)
-+		return;
-+
-+	tsk = container_of(fpstate, struct task_struct, thread.fpsimd_state);
-+	if (test_tsk_thread_flag(tsk, TIF_SVE))
-+		fpsimd_flush_cpu_state();
-+}
-+#endif /* CONFIG_ARM64_SVE */
-+
- #ifdef CONFIG_KERNEL_MODE_NEON
- 
- DEFINE_PER_CPU(bool, kernel_neon_busy);
-@@ -1088,7 +1115,7 @@ void kernel_neon_begin(void)
- 	}
- 
- 	/* Invalidate any task state remaining in the fpsimd regs: */
--	__this_cpu_write(fpsimd_last_state, NULL);
-+	fpsimd_flush_cpu_state();
- 
- 	preempt_disable();
- 
-@@ -1209,7 +1236,7 @@ static int fpsimd_cpu_pm_notifier(struct notifier_block *self,
- 	case CPU_PM_ENTER:
- 		if (current->mm)
- 			task_fpsimd_save();
--		this_cpu_write(fpsimd_last_state, NULL);
-+		fpsimd_flush_cpu_state();
- 		break;
- 	case CPU_PM_EXIT:
- 		if (current->mm)
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 35a90b8..951f3eb 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -48,7 +48,7 @@ static void __hyp_text __activate_traps_vhe(void)
- 
- 	val = read_sysreg(cpacr_el1);
- 	val |= CPACR_EL1_TTA;
--	val &= ~CPACR_EL1_FPEN;
-+	val &= ~(CPACR_EL1_FPEN | CPACR_EL1_ZEN);
- 	write_sysreg(val, cpacr_el1);
- 
- 	write_sysreg(__kvm_hyp_vector, vbar_el1);
-@@ -59,7 +59,7 @@ static void __hyp_text __activate_traps_nvhe(void)
- 	u64 val;
- 
- 	val = CPTR_EL2_DEFAULT;
--	val |= CPTR_EL2_TTA | CPTR_EL2_TFP;
-+	val |= CPTR_EL2_TTA | CPTR_EL2_TFP | CPTR_EL2_TZ;
- 	write_sysreg(val, cptr_el2);
- }
- 
-@@ -117,7 +117,7 @@ static void __hyp_text __deactivate_traps_vhe(void)
- 
- 	write_sysreg(mdcr_el2, mdcr_el2);
- 	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
--	write_sysreg(CPACR_EL1_FPEN, cpacr_el1);
-+	write_sysreg(CPACR_EL1_DEFAULT, cpacr_el1);
- 	write_sysreg(vectors, vbar_el1);
- }
- 
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index b9f68e4..4d3cf9c 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -652,6 +652,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		 */
- 		preempt_disable();
- 
-+		/* Flush FP/SIMD state that can't survive guest entry/exit */
-+		kvm_fpsimd_flush_cpu_state();
-+
- 		kvm_pmu_flush_hwstate(vcpu);
- 
- 		kvm_timer_flush_hwstate(vcpu);
--- 
-2.1.4
+VGhlIEVGSSBydW50aW1lIHNlcnZpY2VzIEFCSSBhbGxvd3MgRUZJIHRvIG1ha2UgZnJlZSB1c2Ug
+b2YgdGhlCkZQU0lNRCByZWdpc3RlcnMgZHVyaW5nIEVGSSBydW50aW1lIHNlcnZpY2UgY2FsbHMs
+IHN1YmplY3QgdG8gdGhlCmNhbGxlZS1zYXZlIHJlcXVpcmVtZW50cyBvZiB0aGUgQUFyY2g2NCBw
+cm9jZWR1cmUgY2FsbCBzdGFuZGFyZC4KCkhvd2V2ZXIsIHRoZSBTVkUgYXJjaGl0ZWN0dXJlIGFs
+bG93cyB1cHBlciBiaXRzIG9mIHRoZSBTVkUgdmVjdG9yCnJlZ2lzdGVycyB0byBiZSB6ZXJvZWQg
+YXMgYSBzaWRlLWVmZmVjdCBvZiBGUFNJTUQgVi1yZWdpc3Rlcgp3cml0ZXMuICBUaGlzIG1lYW5z
+IHRoYXQgdGhlIFNWRSB2ZWN0b3IgcmVnaXN0ZXJzIG11c3QgYmUgc2F2ZWQgaW4KdGhlaXIgZW50
+aXJldHkgaW4gb3JkZXIgdG8gYXZvaWQgZGF0YSBsb3NzOiBub24tU1ZFLWF3YXJlIEVGSQppbXBs
+ZW1lbnRhdGlvbnMgY2Fubm90IHJlc3RvcmUgdGhlbSBjb3JyZWN0bHkuCgpUaGUgbm9uLUlSUSBj
+YXNlIGlzIGFscmVhZHkgaGFuZGxlZCBncmFjZWZ1bGx5IGJ5Cmtlcm5lbF9uZW9uX2JlZ2luKCku
+ICBGb3IgdGhlIElSUSBjYXNlLCB0aGlzIHBhdGNoIGFsbG9jYXRlcyBhCnN1aXRhYmxlIHBlci1D
+UFUgc3Rhc2ggYnVmZmVyIGZvciB0aGUgZnVsbCBTVkUgcmVnaXN0ZXIgc3RhdGUgYW5kCnVzZXMg
+aXQgdG8gcHJlc2VydmUgdGhlIGFmZmVjdGVkIHJlZ2lzdGVycyBhcm91bmQgRUZJIGNhbGxzLiAg
+SXQgaXMKY3VycmVudGx5IHVuY2xlYXIgaG93IHRoZSBFRkkgcnVudGltZSBzZXJ2aWNlcyBBQkkg
+d2lsbCBiZQpjbGFyaWZpZWQgd2l0aCByZXNwZWN0IHRvIFNWRSwgc28gaXQgc2FmZXN0IHRvIGFz
+c3VtZSB0aGF0IHRoZQpwcmVkaWNhdGUgcmVnaXN0ZXJzIGFuZCBGRlIgbXVzdCBiZSBzYXZlZCBh
+bmQgcmVzdG9yZWQgdG9vLgoKTm8gYXR0ZW1wdCBpcyBtYWRlIHRvIHJlc3RvcmUgdGhlIHJlc3Rv
+cmUgdGhlIHZlY3RvciBsZW5ndGggYWZ0ZXIKYSBjYWxsLCBmb3Igbm93LiAgSXQgaXMgZGVlbWVk
+IHJhdGhlciBpbnNhbmUgZm9yIEVGSSB0byBjaGFuZ2UgaXQsCmFuZCBjb250ZW1wb3JhcnkgRUZJ
+IGltcGxlbWVudGF0aW9ucyBjZXJ0YWlubHkgd29uJ3QuCgpTaWduZWQtb2ZmLWJ5OiBEYXZlIE1h
+cnRpbiA8RGF2ZS5NYXJ0aW5AYXJtLmNvbT4KUmV2aWV3ZWQtYnk6IEFsZXggQmVubsOpZSA8YWxl
+eC5iZW5uZWVAbGluYXJvLm9yZz4KUmV2aWV3ZWQtYnk6IENhdGFsaW4gTWFyaW5hcyA8Y2F0YWxp
+bi5tYXJpbmFzQGFybS5jb20+CkNjOiBBcmQgQmllc2hldXZlbCA8YXJkLmJpZXNoZXV2ZWxAbGlu
+YXJvLm9yZz4KLS0tCiBhcmNoL2FybTY0L2tlcm5lbC9mcHNpbWQuYyB8IDY3ICsrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0KIDEgZmlsZSBjaGFuZ2VkLCA2MSBp
+bnNlcnRpb25zKCspLCA2IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva2Vy
+bmVsL2Zwc2ltZC5jIGIvYXJjaC9hcm02NC9rZXJuZWwvZnBzaW1kLmMKaW5kZXggZDUxMDhlOC4u
+ZWRjMjdkMiAxMDA2NDQKLS0tIGEvYXJjaC9hcm02NC9rZXJuZWwvZnBzaW1kLmMKKysrIGIvYXJj
+aC9hcm02NC9rZXJuZWwvZnBzaW1kLmMKQEAgLTEyMSwxMSArMTIxLDEzIEBAIHN0YXRpYyBpbnQg
+c3ZlX2RlZmF1bHRfdmwgPSAtMTsKIGludCBfX3JvX2FmdGVyX2luaXQgc3ZlX21heF92bCA9IC0x
+OwogLyogU2V0IG9mIGF2YWlsYWJsZSB2ZWN0b3IgbGVuZ3RocywgYXMgdnFfdG9fYml0KHZxKTog
+Ki8KIHN0YXRpYyBfX3JvX2FmdGVyX2luaXQgREVDTEFSRV9CSVRNQVAoc3ZlX3ZxX21hcCwgU1ZF
+X1ZRX01BWCk7CitzdGF0aWMgdm9pZCBfX3BlcmNwdSAqZWZpX3N2ZV9zdGF0ZTsKIAogI2Vsc2Ug
+LyogISBDT05GSUdfQVJNNjRfU1ZFICovCiAKIC8qIER1bW15IGRlY2xhcmF0aW9uIGZvciBjb2Rl
+IHRoYXQgd2lsbCBiZSBvcHRpbWlzZWQgb3V0OiAqLwogZXh0ZXJuIF9fcm9fYWZ0ZXJfaW5pdCBE
+RUNMQVJFX0JJVE1BUChzdmVfdnFfbWFwLCBTVkVfVlFfTUFYKTsKK2V4dGVybiB2b2lkIF9fcGVy
+Y3B1ICplZmlfc3ZlX3N0YXRlOwogCiAjZW5kaWYgLyogISBDT05GSUdfQVJNNjRfU1ZFICovCiAK
+QEAgLTU1MCw2ICs1NTIsMzAgQEAgaW50IHN2ZV92ZXJpZnlfdnFfbWFwKHZvaWQpCiAJcmV0dXJu
+IHJldDsKIH0KIAorc3RhdGljIHZvaWQgX19pbml0IHN2ZV9lZmlfc2V0dXAodm9pZCkKK3sKKwlp
+ZiAoIUlTX0VOQUJMRUQoQ09ORklHX0VGSSkpCisJCXJldHVybjsKKworCS8qCisJICogYWxsb2Nf
+cGVyY3B1KCkgd2FybnMgYW5kIHByaW50cyBhIGJhY2t0cmFjZSBpZiB0aGlzIGdvZXMgd3Jvbmcu
+CisJICogVGhpcyBpcyBldmlkZW5jZSBvZiBhIGNyaXBwbGVkIHN5c3RlbSBhbmQgd2UgYXJlIHJl
+dHVybmluZyB2b2lkLAorCSAqIHNvIG5vIGF0dGVtcHQgaXMgbWFkZSB0byBoYW5kbGUgdGhpcyBz
+aXR1YXRpb24gaGVyZS4KKwkgKi8KKwlpZiAoIXN2ZV92bF92YWxpZChzdmVfbWF4X3ZsKSkKKwkJ
+Z290byBmYWlsOworCisJZWZpX3N2ZV9zdGF0ZSA9IF9fYWxsb2NfcGVyY3B1KAorCQlTVkVfU0lH
+X1JFR1NfU0laRShzdmVfdnFfZnJvbV92bChzdmVfbWF4X3ZsKSksIFNWRV9WUV9CWVRFUyk7CisJ
+aWYgKCFlZmlfc3ZlX3N0YXRlKQorCQlnb3RvIGZhaWw7CisKKwlyZXR1cm47CisKK2ZhaWw6CisJ
+cGFuaWMoIkNhbm5vdCBhbGxvY2F0ZSBwZXJjcHUgbWVtb3J5IGZvciBFRkkgU1ZFIHNhdmUvcmVz
+dG9yZSIpOworfQorCiAvKgogICogRW5hYmxlIFNWRSBmb3IgRUwxLgogICogSW50ZW5kZWQgZm9y
+IHVzZSBieSB0aGUgY3B1ZmVhdHVyZXMgY29kZSBkdXJpbmcgQ1BVIGJvb3QuCkBAIC01OTcsNiAr
+NjIzLDggQEAgdm9pZCBfX2luaXQgc3ZlX3NldHVwKHZvaWQpCiAJCXN2ZV9tYXhfdmwpOwogCXBy
+X2luZm8oIlNWRTogZGVmYXVsdCB2ZWN0b3IgbGVuZ3RoICV1IGJ5dGVzIHBlciB2ZWN0b3JcbiIs
+CiAJCXN2ZV9kZWZhdWx0X3ZsKTsKKworCXN2ZV9lZmlfc2V0dXAoKTsKIH0KIAogLyoKQEAgLTky
+NSw2ICs5NTMsNyBAQCBFWFBPUlRfU1lNQk9MKGtlcm5lbF9uZW9uX2VuZCk7CiAKIHN0YXRpYyBE
+RUZJTkVfUEVSX0NQVShzdHJ1Y3QgZnBzaW1kX3N0YXRlLCBlZmlfZnBzaW1kX3N0YXRlKTsKIHN0
+YXRpYyBERUZJTkVfUEVSX0NQVShib29sLCBlZmlfZnBzaW1kX3N0YXRlX3VzZWQpOworc3RhdGlj
+IERFRklORV9QRVJfQ1BVKGJvb2wsIGVmaV9zdmVfc3RhdGVfdXNlZCk7CiAKIC8qCiAgKiBFRkkg
+cnVudGltZSBzZXJ2aWNlcyBzdXBwb3J0IGZ1bmN0aW9ucwpAQCAtOTUwLDEwICs5NzksMjQgQEAg
+dm9pZCBfX2VmaV9mcHNpbWRfYmVnaW4odm9pZCkKIAogCVdBUk5fT04ocHJlZW1wdGlibGUoKSk7
+CiAKLQlpZiAobWF5X3VzZV9zaW1kKCkpCisJaWYgKG1heV91c2Vfc2ltZCgpKSB7CiAJCWtlcm5l
+bF9uZW9uX2JlZ2luKCk7Ci0JZWxzZSB7Ci0JCWZwc2ltZF9zYXZlX3N0YXRlKHRoaXNfY3B1X3B0
+cigmZWZpX2Zwc2ltZF9zdGF0ZSkpOworCX0gZWxzZSB7CisJCS8qCisJCSAqIElmICFlZmlfc3Zl
+X3N0YXRlLCBTVkUgY2FuJ3QgYmUgaW4gdXNlIHlldCBhbmQgZG9lc24ndCBuZWVkCisJCSAqIHBy
+ZXNlcnZpbmc6CisJCSAqLworCQlpZiAoc3lzdGVtX3N1cHBvcnRzX3N2ZSgpICYmIGxpa2VseShl
+Zmlfc3ZlX3N0YXRlKSkgeworCQkJY2hhciAqc3ZlX3N0YXRlID0gdGhpc19jcHVfcHRyKGVmaV9z
+dmVfc3RhdGUpOworCisJCQlfX3RoaXNfY3B1X3dyaXRlKGVmaV9zdmVfc3RhdGVfdXNlZCwgdHJ1
+ZSk7CisKKwkJCXN2ZV9zYXZlX3N0YXRlKHN2ZV9zdGF0ZSArIHN2ZV9mZnJfb2Zmc2V0KHN2ZV9t
+YXhfdmwpLAorCQkJCSAgICAgICAmdGhpc19jcHVfcHRyKCZlZmlfZnBzaW1kX3N0YXRlKS0+ZnBz
+cik7CisJCX0gZWxzZSB7CisJCQlmcHNpbWRfc2F2ZV9zdGF0ZSh0aGlzX2NwdV9wdHIoJmVmaV9m
+cHNpbWRfc3RhdGUpKTsKKwkJfQorCiAJCV9fdGhpc19jcHVfd3JpdGUoZWZpX2Zwc2ltZF9zdGF0
+ZV91c2VkLCB0cnVlKTsKIAl9CiB9CkBAIC05NjYsMTAgKzEwMDksMjIgQEAgdm9pZCBfX2VmaV9m
+cHNpbWRfZW5kKHZvaWQpCiAJaWYgKCFzeXN0ZW1fc3VwcG9ydHNfZnBzaW1kKCkpCiAJCXJldHVy
+bjsKIAotCWlmIChfX3RoaXNfY3B1X3hjaGcoZWZpX2Zwc2ltZF9zdGF0ZV91c2VkLCBmYWxzZSkp
+Ci0JCWZwc2ltZF9sb2FkX3N0YXRlKHRoaXNfY3B1X3B0cigmZWZpX2Zwc2ltZF9zdGF0ZSkpOwot
+CWVsc2UKKwlpZiAoIV9fdGhpc19jcHVfeGNoZyhlZmlfZnBzaW1kX3N0YXRlX3VzZWQsIGZhbHNl
+KSkgewogCQlrZXJuZWxfbmVvbl9lbmQoKTsKKwl9IGVsc2UgeworCQlpZiAoc3lzdGVtX3N1cHBv
+cnRzX3N2ZSgpICYmCisJCSAgICBsaWtlbHkoX190aGlzX2NwdV9yZWFkKGVmaV9zdmVfc3RhdGVf
+dXNlZCkpKSB7CisJCQljaGFyIGNvbnN0ICpzdmVfc3RhdGUgPSB0aGlzX2NwdV9wdHIoZWZpX3N2
+ZV9zdGF0ZSk7CisKKwkJCXN2ZV9sb2FkX3N0YXRlKHN2ZV9zdGF0ZSArIHN2ZV9mZnJfb2Zmc2V0
+KHN2ZV9tYXhfdmwpLAorCQkJCSAgICAgICAmdGhpc19jcHVfcHRyKCZlZmlfZnBzaW1kX3N0YXRl
+KS0+ZnBzciwKKwkJCQkgICAgICAgc3ZlX3ZxX2Zyb21fdmwoc3ZlX2dldF92bCgpKSAtIDEpOwor
+CisJCQlfX3RoaXNfY3B1X3dyaXRlKGVmaV9zdmVfc3RhdGVfdXNlZCwgZmFsc2UpOworCQl9IGVs
+c2UgeworCQkJZnBzaW1kX2xvYWRfc3RhdGUodGhpc19jcHVfcHRyKCZlZmlfZnBzaW1kX3N0YXRl
+KSk7CisJCX0KKwl9CiB9CiAKICNlbmRpZiAvKiBDT05GSUdfRUZJICovCi0tIAoyLjEuNAoKX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxp
+bmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29s
+dW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
