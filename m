@@ -1,162 +1,128 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PATCH v5 01/20] irqchip/gic: Deal with broken firmware exposing only 4kB of GICv2 CPU interface
-Date: Fri, 27 Oct 2017 10:34:22 +0200
-Message-ID: <1509093281-15225-2-git-send-email-cdall@linaro.org>
+Subject: [PATCH v5 03/20] arm64: Use physical counter for in-kernel reads when
+ booted in EL2
+Date: Fri, 27 Oct 2017 10:34:24 +0200
+Message-ID: <1509093281-15225-4-git-send-email-cdall@linaro.org>
 References: <1509093281-15225-1-git-send-email-cdall@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A6A041185
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 04:33:55 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id ZU-BDNvbpwgT for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 Oct 2017 04:33:54 -0400 (EDT)
+Received: from mail-lf0-f65.google.com (mail-lf0-f65.google.com
+ [209.85.215.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C15C140795
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 04:33:53 -0400 (EDT)
+Received: by mail-lf0-f65.google.com with SMTP id a69so6544407lfe.5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 01:35:18 -0700 (PDT)
 In-Reply-To: <1509093281-15225-1-git-send-email-cdall@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <cdall@linaro.org>
+Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Marc Zyngier <marc.zyngier@arm.com>
+Using the physical counter allows KVM to retain the offset between the
+virtual and physical counter as long as it is actively running a VCPU.
 
-There is a lot of broken firmware out there that don't really
-expose the information the kernel requires when it comes with dealing
-with GICv2:
+As soon as a VCPU is released, another thread is scheduled or we start
+running userspace applications, we reset the offset to 0, so that
+userspace accessing the virtual timer can still read the virtual counter
+and get the same view of time as the kernel.
 
-(1) Firmware that only describes the first 4kB of GICv2
-(2) Firmware that describe 128kB of CPU interface, while
-    the usable portion of the address space is between
-    60 and 68kB
+This opens up potential improvements for KVM performance, but we have to
+make a few adjustments to preserve system consistency.
 
-So far, we only deal with (2). But we have platforms exhibiting
-behaviour (1), resulting in two sub-cases:
-(a) The GIC is occupying 8kB, as required by the GICv2 architecture
-(b) It is actually spread 128kB, and this is likely to be a version
-    of (2)
+Currently get_cycles() is hardwired to arch_counter_get_cntvct() on
+arm64, but as we move to using the physical timer for the in-kernel
+time-keeping on systems that boot in EL2, we should use the same counter
+for get_cycles() as for other in-kernel timekeeping operations.
 
-This patch tries to work around both (a) and (b) by poking at
-the outside of the described memory region, and try to work out
-what is actually there. This is of course unsafe, and should
-only be enabled if there is no way to otherwise fix the DT provided
-by the firmware (we provide a "irqchip.gicv2_force_probe" option
-to that effect).
+Similarly, implementations of arch_timer_set_next_event_phys() is
+modified to use the counter specific to the timer being programmed.
 
-Note that for the time being, we restrict ourselves to GICv2
-implementations provided by ARM, since there I have no knowledge
-of an alternative implementations. This could be relaxed if such
-an implementation comes to light on a broken platform.
+VHE kernels or kernels continuing to use the virtual timer are
+unaffected.
 
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- Documentation/admin-guide/kernel-parameters.txt |  7 +++
- drivers/irqchip/irq-gic.c                       | 71 +++++++++++++++++++++----
- 2 files changed, 69 insertions(+), 9 deletions(-)
+ arch/arm64/include/asm/timex.h       |  2 +-
+ drivers/clocksource/arm_arch_timer.c | 12 ++++++++----
+ 2 files changed, 9 insertions(+), 5 deletions(-)
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 0549662..3daa0a5 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -1713,6 +1713,13 @@
- 	irqaffinity=	[SMP] Set the default irq affinity mask
- 			The argument is a cpu list, as described above.
+diff --git a/arch/arm64/include/asm/timex.h b/arch/arm64/include/asm/timex.h
+index 81a076e..9ad60ba 100644
+--- a/arch/arm64/include/asm/timex.h
++++ b/arch/arm64/include/asm/timex.h
+@@ -22,7 +22,7 @@
+  * Use the current timer as a cycle counter since this is what we use for
+  * the delay loop.
+  */
+-#define get_cycles()	arch_counter_get_cntvct()
++#define get_cycles()	arch_timer_read_counter()
  
-+	irqchip.gicv2_force_probe=
-+			[ARM, ARM64]
-+			Format: <bool>
-+			Force the kernel to look for the second 4kB page
-+			of a GICv2 controller even if the memory range
-+			exposed by the device tree is too small.
-+
- 	irqfixup	[HW]
- 			When an interrupt is not handled search all handlers
- 			for it. Intended to get systems with badly broken
-diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
-index 651d726..f641e8e 100644
---- a/drivers/irqchip/irq-gic.c
-+++ b/drivers/irqchip/irq-gic.c
-@@ -1256,6 +1256,19 @@ static void gic_teardown(struct gic_chip_data *gic)
+ #include <asm-generic/timex.h>
  
- #ifdef CONFIG_OF
- static int gic_cnt __initdata;
-+static bool gicv2_force_probe;
-+
-+static int __init gicv2_force_probe_cfg(char *buf)
-+{
-+	return strtobool(buf, &gicv2_force_probe);
-+}
-+early_param("irqchip.gicv2_force_probe", gicv2_force_probe_cfg);
-+
-+static bool gic_check_gicv2(void __iomem *base)
-+{
-+	u32 val = readl_relaxed(base + GIC_CPU_IDENT);
-+	return (val & 0xff0fff) == 0x02043B;
-+}
+diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
+index ff8f8a1..061476e 100644
+--- a/drivers/clocksource/arm_arch_timer.c
++++ b/drivers/clocksource/arm_arch_timer.c
+@@ -158,6 +158,7 @@ u32 arch_timer_reg_read(int access, enum arch_timer_reg reg,
+  * if we don't have the cp15 accessors we won't have a problem.
+  */
+ u64 (*arch_timer_read_counter)(void) = arch_counter_get_cntvct;
++EXPORT_SYMBOL_GPL(arch_timer_read_counter);
  
- static bool gic_check_eoimode(struct device_node *node, void __iomem **base)
+ static u64 arch_counter_read(struct clocksource *cs)
  {
-@@ -1265,20 +1278,60 @@ static bool gic_check_eoimode(struct device_node *node, void __iomem **base)
+@@ -329,16 +330,19 @@ static void erratum_set_next_event_tval_generic(const int access, unsigned long
+ 						struct clock_event_device *clk)
+ {
+ 	unsigned long ctrl;
+-	u64 cval = evt + arch_counter_get_cntvct();
++	u64 cval;
  
- 	if (!is_hyp_mode_available())
- 		return false;
--	if (resource_size(&cpuif_res) < SZ_8K)
--		return false;
--	if (resource_size(&cpuif_res) == SZ_128K) {
--		u32 val_low, val_high;
-+	if (resource_size(&cpuif_res) < SZ_8K) {
-+		void __iomem *alt;
-+		/*
-+		 * Check for a stupid firmware that only exposes the
-+		 * first page of a GICv2.
-+		 */
-+		if (!gic_check_gicv2(*base))
-+			return false;
+ 	ctrl = arch_timer_reg_read(access, ARCH_TIMER_REG_CTRL, clk);
+ 	ctrl |= ARCH_TIMER_CTRL_ENABLE;
+ 	ctrl &= ~ARCH_TIMER_CTRL_IT_MASK;
  
-+		if (!gicv2_force_probe) {
-+			pr_warn("GIC: GICv2 detected, but range too small and irqchip.gicv2_force_probe not set\n");
-+			return false;
-+		}
-+
-+		alt = ioremap(cpuif_res.start, SZ_8K);
-+		if (!alt)
-+			return false;
-+		if (!gic_check_gicv2(alt + SZ_4K)) {
-+			/*
-+			 * The first page was that of a GICv2, and
-+			 * the second was *something*. Let's trust it
-+			 * to be a GICv2, and update the mapping.
-+			 */
-+			pr_warn("GIC: GICv2 at %pa, but range is too small (broken DT?), assuming 8kB\n",
-+				&cpuif_res.start);
-+			iounmap(*base);
-+			*base = alt;
-+			return true;
-+		}
-+
-+		/*
-+		 * We detected *two* initial GICv2 pages in a
-+		 * row. Could be a GICv2 aliased over two 64kB
-+		 * pages. Update the resource, map the iospace, and
-+		 * pray.
-+		 */
-+		iounmap(alt);
-+		alt = ioremap(cpuif_res.start, SZ_128K);
-+		if (!alt)
-+			return false;
-+		pr_warn("GIC: Aliased GICv2 at %pa, trying to find the canonical range over 128kB\n",
-+			&cpuif_res.start);
-+		cpuif_res.end = cpuif_res.start + SZ_128K -1;
-+		iounmap(*base);
-+		*base = alt;
+-	if (access == ARCH_TIMER_PHYS_ACCESS)
++	if (access == ARCH_TIMER_PHYS_ACCESS) {
++		cval = evt + arch_counter_get_cntpct();
+ 		write_sysreg(cval, cntp_cval_el0);
+-	else
++	} else {
++		cval = evt + arch_counter_get_cntvct();
+ 		write_sysreg(cval, cntv_cval_el0);
 +	}
-+	if (resource_size(&cpuif_res) == SZ_128K) {
- 		/*
--		 * Verify that we have the first 4kB of a GIC400
-+		 * Verify that we have the first 4kB of a GICv2
- 		 * aliased over the first 64kB by checking the
- 		 * GICC_IIDR register on both ends.
- 		 */
--		val_low = readl_relaxed(*base + GIC_CPU_IDENT);
--		val_high = readl_relaxed(*base + GIC_CPU_IDENT + 0xf000);
--		if ((val_low & 0xffff0fff) != 0x0202043B ||
--		    val_low != val_high)
-+		if (!gic_check_gicv2(*base) ||
-+		    !gic_check_gicv2(*base + 0xf000))
- 			return false;
  
- 		/*
+ 	arch_timer_reg_write(access, ARCH_TIMER_REG_CTRL, ctrl, clk);
+ }
+@@ -913,7 +917,7 @@ static void __init arch_counter_register(unsigned type)
+ 
+ 	/* Register the CP15 based counter if we have one */
+ 	if (type & ARCH_TIMER_TYPE_CP15) {
+-		if (IS_ENABLED(CONFIG_ARM64) ||
++		if ((IS_ENABLED(CONFIG_ARM64) && !is_hyp_mode_available()) ||
+ 		    arch_timer_uses_ppi == ARCH_TIMER_VIRT_PPI)
+ 			arch_timer_read_counter = arch_counter_get_cntvct;
+ 		else
 -- 
 2.7.4
