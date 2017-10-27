@@ -1,56 +1,87 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v5 16/26] KVM: arm/arm64: GICv4: Propagate property updates to
- VLPIs
-Date: Fri, 27 Oct 2017 15:28:45 +0100
-Message-ID: <20171027142855.21584-17-marc.zyngier@arm.com>
+Subject: [PATCH v5 17/26] KVM: arm/arm64: GICv4: Handle INVALL applied to a vPE
+Date: Fri, 27 Oct 2017 15:28:46 +0100
+Message-ID: <20171027142855.21584-18-marc.zyngier@arm.com>
 References: <20171027142855.21584-1-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D798549D4E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 10:28:29 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id a8h6MwIabcIz for <kvmarm@lists.cs.columbia.edu>;
- Fri, 27 Oct 2017 10:28:29 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E60C049D27
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 10:28:28 -0400 (EDT)
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20171027142855.21584-1-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: linux-kernel-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Christoffer Dall <cdall@linaro.org>, Andre Przywara <Andre.Przywara@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>, Shanker Donthineni <shankerd@codeaurora.org>, Mark Rutland <mark.rutland@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Andre Przywara <Andre.Przywara@arm.com>, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Upon updating a property, we propagate it all the way to the physical
-ITS, and ask for an INV command to be executed there.
+Since when updating the properties one LPI at a time, there is no
+need to perform an INV each time we read one. Instead, we rely
+on the final VINVALL that gets sent to the ITS to do the work.
 
 Acked-by: Christoffer Dall <cdall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-its.c | 3 +++
- 1 file changed, 3 insertions(+)
+ virt/kvm/arm/vgic/vgic-its.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 0b7e648e7a0c..2e77c7c83942 100644
+index 2e77c7c83942..eb72eb027060 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -296,6 +296,9 @@ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
- 		spin_unlock(&irq->irq_lock);
+@@ -38,7 +38,7 @@ static int vgic_its_save_tables_v0(struct vgic_its *its);
+ static int vgic_its_restore_tables_v0(struct vgic_its *its);
+ static int vgic_its_commit_v0(struct vgic_its *its);
+ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
+-			     struct kvm_vcpu *filter_vcpu);
++			     struct kvm_vcpu *filter_vcpu, bool needs_inv);
+ 
+ /*
+  * Creates a new (reference to a) struct vgic_irq for a given LPI.
+@@ -106,7 +106,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+ 	 * However we only have those structs for mapped IRQs, so we read in
+ 	 * the respective config data from memory here upon mapping the LPI.
+ 	 */
+-	ret = update_lpi_config(kvm, irq, NULL);
++	ret = update_lpi_config(kvm, irq, NULL, false);
+ 	if (ret)
+ 		return ERR_PTR(ret);
+ 
+@@ -273,7 +273,7 @@ static struct its_collection *find_collection(struct vgic_its *its, int coll_id)
+  * VCPU. Unconditionally applies if filter_vcpu is NULL.
+  */
+ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
+-			     struct kvm_vcpu *filter_vcpu)
++			     struct kvm_vcpu *filter_vcpu, bool needs_inv)
+ {
+ 	u64 propbase = GICR_PROPBASER_ADDRESS(kvm->arch.vgic.propbaser);
+ 	u8 prop;
+@@ -297,7 +297,7 @@ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
  	}
  
-+	if (irq->hw)
-+		return its_prop_update_vlpi(irq->host_irq, prop, true);
+ 	if (irq->hw)
+-		return its_prop_update_vlpi(irq->host_irq, prop, true);
++		return its_prop_update_vlpi(irq->host_irq, prop, needs_inv);
+ 
+ 	return 0;
+ }
+@@ -1096,7 +1096,7 @@ static int vgic_its_cmd_handle_inv(struct kvm *kvm, struct vgic_its *its,
+ 	if (!ite)
+ 		return E_ITS_INV_UNMAPPED_INTERRUPT;
+ 
+-	return update_lpi_config(kvm, ite->irq, NULL);
++	return update_lpi_config(kvm, ite->irq, NULL, true);
+ }
+ 
+ /*
+@@ -1131,12 +1131,15 @@ static int vgic_its_cmd_handle_invall(struct kvm *kvm, struct vgic_its *its,
+ 		irq = vgic_get_irq(kvm, NULL, intids[i]);
+ 		if (!irq)
+ 			continue;
+-		update_lpi_config(kvm, irq, vcpu);
++		update_lpi_config(kvm, irq, vcpu, false);
+ 		vgic_put_irq(kvm, irq);
+ 	}
+ 
+ 	kfree(intids);
+ 
++	if (vcpu->arch.vgic_cpu.vgic_v3.its_vpe.its_vm)
++		its_invall_vpe(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe);
 +
  	return 0;
  }
