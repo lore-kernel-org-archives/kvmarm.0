@@ -1,26 +1,26 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH v4 25/26] KVM: arm/arm64: GICv4: Prevent heterogenous
- systems from using GICv4
-Date: Thu, 26 Oct 2017 16:48:39 +0100
-Message-ID: <20171026154839.ebtmqzcy7jjyejul@salmiak>
-References: <20171006153401.5481-1-marc.zyngier@arm.com>
- <20171006153401.5481-26-marc.zyngier@arm.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Subject: Re: [PATCH v4 19/21] KVM: arm64: Handle RAS SErrors from EL2 on guest
+ exit
+Date: Fri, 27 Oct 2017 14:26:14 +0800
+Message-ID: <6c0eaa5b-32a5-5562-2322-7dffb698d27d@huawei.com>
+References: <20171019145807.23251-1-james.morse@arm.com>
+ <20171019145807.23251-20-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E53EF49D23
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Oct 2017 11:47:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E589D406BB
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 02:25:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id T7uR3E7+2ABQ for <kvmarm@lists.cs.columbia.edu>;
- Thu, 26 Oct 2017 11:47:28 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7702349D21
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Oct 2017 11:47:28 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20171006153401.5481-26-marc.zyngier@arm.com>
+ with ESMTP id TQBAHOuo0C+p for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 Oct 2017 02:25:12 -0400 (EDT)
+Received: from huawei.com (unknown [45.249.212.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 836E040638
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 02:25:12 -0400 (EDT)
+In-Reply-To: <20171019145807.23251-20-james.morse@arm.com>
+Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,47 +30,27 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Andre Przywara <Andre.Przywara@arm.com>, kvmarm@lists.cs.columbia.edu
+To: James Morse <james.morse@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Julien Thierry <julien.thierry@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
 
-On Fri, Oct 06, 2017 at 04:34:00PM +0100, Marc Zyngier wrote:
-> The GICv4 architecture doesn't prevent CPUs implementing GICv4 to
-> cohabit with CPUs limited to GICv3 in the same system.
-> 
-> This is mad (the scheduler would have to be made aware of the v4
-> capability), and we're certainly not going to support this any
-> time soon. So let's check that all online CPUs are GICv4 capable,
-> and disable the functionnality if not.
 
-I just spotted this because of Christoffer's review; apologies for the late
-drive-by comment...
+On 2017/10/19 22:58, James Morse wrote:
+> +alternative_if ARM64_HAS_RAS_EXTN
+> +	// If we have the RAS extensions we can consume a pending error
+> +	// without an unmask-SError and isb.
+> +	esb
+> +	mrs_s	x2, SYS_DISR_EL1
+I do not think you can get the right value when esb produce a SError. when
+SError happen, it will take to EL3 firmware immediately. so the disr_el1 will not record
+the error and value is 0.
 
-> @@ -485,8 +495,21 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
->  	kvm_vgic_global_state.can_emulate_gicv2 = false;
->  	kvm_vgic_global_state.ich_vtr_el2 = ich_vtr_el2;
->  
-> -	/* GICv4 support? */
-> +	/*
-> +	 * GICv4 support? We need to check on all CPUs in case of some
-> +	 * extremely creative form of big-little brain damage...
-> +	 */
->  	if (info->has_v4) {
-> +		int cpu;
-> +
-> +		for_each_online_cpu(cpu) {
-> +			bool enable;
-> +
-> +			smp_call_function_single(cpu, vgic_check_v4_cpuif,
-> +						 &enable, 1);
-> +			gicv4_enable = gicv4_enable && enable;
-> +		}
+> +	str	x2, [x1, #(VCPU_FAULT_DISR - VCPU_CONTEXT)]
+> +	cbz	x2, 1f
+why will jump to 1, if there is not SError, also "ret"?
 
-With maxcpus=N on the command line, CPUs can be brought online late, so we
-might need this in a hotplug callback (and/or in the arm64 cpufeature
-framework) to handle that case.
-
-Thanks,
-Mark.
+> +	msr_s	SYS_DISR_EL1, xzr
+> +	orr	x0, x0, #(1<<ARM_EXIT_WITH_SERROR_BIT)
+> +1:	ret
+> +alternative_else
