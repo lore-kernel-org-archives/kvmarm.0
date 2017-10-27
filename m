@@ -1,99 +1,198 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v5 01/26] irqchip/gic-v3-its: Setup VLPI properties at map time
-Date: Fri, 27 Oct 2017 15:28:30 +0100
-Message-ID: <20171027142855.21584-2-marc.zyngier@arm.com>
+Subject: [PATCH v5 06/26] KVM: arm/arm64: vITS: Add MSI translation helpers
+Date: Fri, 27 Oct 2017 15:28:35 +0100
+Message-ID: <20171027142855.21584-7-marc.zyngier@arm.com>
 References: <20171027142855.21584-1-marc.zyngier@arm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D46C549D23
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 10:28:02 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 3frrtrVINpFS for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 Oct 2017 10:28:01 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D96B349D61
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 10:28:00 -0400 (EDT)
 In-Reply-To: <20171027142855.21584-1-marc.zyngier@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>, Shanker Donthineni <shankerd@codeaurora.org>, Mark Rutland <mark.rutland@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Andre Przywara <Andre.Przywara@arm.com>
+Cc: Christoffer Dall <cdall@linaro.org>, Andre Przywara <Andre.Przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-So far, we require the hypervisor to update the VLPI properties
-once the the VLPI mapping has been established. While this
-makes it easy for the ITS driver, it creates a window where
-an incoming interrupt can be delivered with an unknown set
-of properties. Not very nice.
+The whole MSI injection process is fairly monolithic. An MSI write
+gets turned into an injected LPI in one swift go. But this is actually
+a more fine-grained process:
 
-Instead, let's add a "properties" field to the mapping structure,
-and use that to configure the VLPI before it actually gets mapped.
+- First, a virtual ITS gets selected using the doorbell address
+- Then the DevID/EventID pair gets translated into an LPI
+- Finally the LPI is injected
 
+Since the GICv4 code needs the first two steps in order to match
+an IRQ routing entry to an LPI, let's expose them as helpers,
+and refactor the existing code to use them
+
+Reviewed-by: Christoffer Dall <cdall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/irqchip/irq-gic-v3-its.c   | 19 +++++++++++++++++--
- include/linux/irqchip/arm-gic-v4.h |  2 ++
- 2 files changed, 19 insertions(+), 2 deletions(-)
+ virt/kvm/arm/vgic/vgic-its.c | 93 +++++++++++++++++++++++++-------------------
+ virt/kvm/arm/vgic/vgic.h     |  4 ++
+ 2 files changed, 57 insertions(+), 40 deletions(-)
 
-diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 85f47ef4f1f7..2c4074c97454 100644
---- a/drivers/irqchip/irq-gic-v3-its.c
-+++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -1006,9 +1006,15 @@ static void lpi_write_config(struct irq_data *d, u8 clr, u8 set)
- 	if (irqd_is_forwarded_to_vcpu(d)) {
- 		struct its_device *its_dev = irq_data_get_irq_chip_data(d);
- 		u32 event = its_get_event_id(d);
-+		struct its_vlpi_map *map;
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index f51c1e1b3f70..475dffd0a44c 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -503,15 +503,8 @@ static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
+ 	return 0;
+ }
  
- 		prop_page = its_dev->event_map.vm->vprop_page;
--		hwirq = its_dev->event_map.vlpi_maps[event].vintid;
-+		map = &its_dev->event_map.vlpi_maps[event];
-+		hwirq = map->vintid;
+-/*
+- * Find the target VCPU and the LPI number for a given devid/eventid pair
+- * and make this IRQ pending, possibly injecting it.
+- * Must be called with the its_lock mutex held.
+- * Returns 0 on success, a positive error value for any ITS mapping
+- * related errors and negative error values for generic errors.
+- */
+-static int vgic_its_trigger_msi(struct kvm *kvm, struct vgic_its *its,
+-				u32 devid, u32 eventid)
++int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
++			 u32 devid, u32 eventid, struct vgic_irq **irq)
+ {
+ 	struct kvm_vcpu *vcpu;
+ 	struct its_ite *ite;
+@@ -530,26 +523,60 @@ static int vgic_its_trigger_msi(struct kvm *kvm, struct vgic_its *its,
+ 	if (!vcpu->arch.vgic_cpu.lpis_enabled)
+ 		return -EBUSY;
+ 
+-	spin_lock(&ite->irq->irq_lock);
+-	ite->irq->pending_latch = true;
+-	vgic_queue_irq_unlock(kvm, ite->irq);
+-
++	*irq = ite->irq;
+ 	return 0;
+ }
+ 
+-static struct vgic_io_device *vgic_get_its_iodev(struct kvm_io_device *dev)
++struct vgic_its *vgic_msi_to_its(struct kvm *kvm, struct kvm_msi *msi)
+ {
++	u64 address;
++	struct kvm_io_device *kvm_io_dev;
+ 	struct vgic_io_device *iodev;
+ 
+-	if (dev->ops != &kvm_io_gic_ops)
+-		return NULL;
++	if (!vgic_has_its(kvm))
++		return ERR_PTR(-ENODEV);
+ 
+-	iodev = container_of(dev, struct vgic_io_device, dev);
++	if (!(msi->flags & KVM_MSI_VALID_DEVID))
++		return ERR_PTR(-EINVAL);
 +
-+		/* Remember the updated property */
-+		map->properties &= ~clr;
-+		map->properties |= set | LPI_PROP_GROUP1;
- 	} else {
- 		prop_page = gic_rdists->prop_page;
- 		hwirq = d->hwirq;
-@@ -1018,6 +1024,7 @@ static void lpi_write_config(struct irq_data *d, u8 clr, u8 set)
- 	*cfg &= ~clr;
- 	*cfg |= set | LPI_PROP_GROUP1;
- 
++	address = (u64)msi->address_hi << 32 | msi->address_lo;
 +
- 	/*
- 	 * Make the above write visible to the redistributors.
- 	 * And yes, we're flushing exactly: One. Single. Byte.
-@@ -1238,12 +1245,20 @@ static int its_vlpi_map(struct irq_data *d, struct its_cmd_info *info)
- 		/* Ensure all the VPEs are mapped on this ITS */
- 		its_map_vm(its_dev->its, info->map->vm);
++	kvm_io_dev = kvm_io_bus_get_dev(kvm, KVM_MMIO_BUS, address);
++	if (!kvm_io_dev)
++		return ERR_PTR(-EINVAL);
  
-+		/*
-+		 * Flag the interrupt as forwarded so that we can
-+		 * start poking the virtual property table.
-+		 */
-+		irqd_set_forwarded_to_vcpu(d);
++	if (kvm_io_dev->ops != &kvm_io_gic_ops)
++		return ERR_PTR(-EINVAL);
 +
-+		/* Write out the property to the prop table */
-+		lpi_write_config(d, 0xff, info->map->properties);
++	iodev = container_of(kvm_io_dev, struct vgic_io_device, dev);
+ 	if (iodev->iodev_type != IODEV_ITS)
+-		return NULL;
++		return ERR_PTR(-EINVAL);
+ 
+-	return iodev;
++	return iodev->its;
++}
 +
- 		/* Drop the physical mapping */
- 		its_send_discard(its_dev, event);
++/*
++ * Find the target VCPU and the LPI number for a given devid/eventid pair
++ * and make this IRQ pending, possibly injecting it.
++ * Must be called with the its_lock mutex held.
++ * Returns 0 on success, a positive error value for any ITS mapping
++ * related errors and negative error values for generic errors.
++ */
++static int vgic_its_trigger_msi(struct kvm *kvm, struct vgic_its *its,
++				u32 devid, u32 eventid)
++{
++	struct vgic_irq *irq = NULL;
++	int err;
++
++	err = vgic_its_resolve_lpi(kvm, its, devid, eventid, &irq);
++	if (err)
++		return err;
++
++	spin_lock(&irq->irq_lock);
++	irq->pending_latch = true;
++	vgic_queue_irq_unlock(kvm, irq);
++
++	return 0;
+ }
  
- 		/* and install the virtual one */
- 		its_send_vmapti(its_dev, event);
--		irqd_set_forwarded_to_vcpu(d);
- 
- 		/* Increment the number of VLPIs */
- 		its_dev->event_map.nr_vlpis++;
-diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
-index 43cde15f221b..447da8ca2156 100644
---- a/include/linux/irqchip/arm-gic-v4.h
-+++ b/include/linux/irqchip/arm-gic-v4.h
-@@ -71,12 +71,14 @@ struct its_vpe {
-  * @vm:		Pointer to the GICv4 notion of a VM
-  * @vpe:	Pointer to the GICv4 notion of a virtual CPU (VPE)
-  * @vintid:	Virtual LPI number
-+ * @properties:	Priority and enable bits (as written in the prop table)
-  * @db_enabled:	Is the VPE doorbell to be generated?
+ /*
+@@ -560,30 +587,16 @@ static struct vgic_io_device *vgic_get_its_iodev(struct kvm_io_device *dev)
   */
- struct its_vlpi_map {
- 	struct its_vm		*vm;
- 	struct its_vpe		*vpe;
- 	u32			vintid;
-+	u8			properties;
- 	bool			db_enabled;
- };
+ int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
+ {
+-	u64 address;
+-	struct kvm_io_device *kvm_io_dev;
+-	struct vgic_io_device *iodev;
++	struct vgic_its *its;
+ 	int ret;
  
+-	if (!vgic_has_its(kvm))
+-		return -ENODEV;
+-
+-	if (!(msi->flags & KVM_MSI_VALID_DEVID))
+-		return -EINVAL;
+-
+-	address = (u64)msi->address_hi << 32 | msi->address_lo;
+-
+-	kvm_io_dev = kvm_io_bus_get_dev(kvm, KVM_MMIO_BUS, address);
+-	if (!kvm_io_dev)
+-		return -EINVAL;
++	its = vgic_msi_to_its(kvm, msi);
++	if (IS_ERR(its))
++		return PTR_ERR(its);
+ 
+-	iodev = vgic_get_its_iodev(kvm_io_dev);
+-	if (!iodev)
+-		return -EINVAL;
+-
+-	mutex_lock(&iodev->its->its_lock);
+-	ret = vgic_its_trigger_msi(kvm, iodev->its, msi->devid, msi->data);
+-	mutex_unlock(&iodev->its->its_lock);
++	mutex_lock(&its->its_lock);
++	ret = vgic_its_trigger_msi(kvm, its, msi->devid, msi->data);
++	mutex_unlock(&its->its_lock);
+ 
+ 	if (ret < 0)
+ 		return ret;
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index bf9ceab67c77..31b70326b966 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -236,4 +236,8 @@ static inline int vgic_v3_max_apr_idx(struct kvm_vcpu *vcpu)
+ 	}
+ }
+ 
++int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
++			 u32 devid, u32 eventid, struct vgic_irq **irq);
++struct vgic_its *vgic_msi_to_its(struct kvm *kvm, struct kvm_msi *msi);
++
+ #endif
 -- 
 2.11.0
