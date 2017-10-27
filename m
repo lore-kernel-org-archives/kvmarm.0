@@ -1,134 +1,86 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v5 21/26] KVM: arm/arm64: GICv4: Hook vPE scheduling into vgic
- flush/sync
-Date: Fri, 27 Oct 2017 15:28:50 +0100
-Message-ID: <20171027142855.21584-22-marc.zyngier@arm.com>
+Subject: [PATCH v5 20/26] KVM: arm/arm64: GICv4: Use the doorbell interrupt as an unblocking source
+Date: Fri, 27 Oct 2017 15:28:49 +0100
+Message-ID: <20171027142855.21584-21-marc.zyngier@arm.com>
 References: <20171027142855.21584-1-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 00A2B49D37
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 10:28:53 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sQNA+yz3Mcg8 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 27 Oct 2017 10:28:47 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B356449D6C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 10:28:45 -0400 (EDT)
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20171027142855.21584-1-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: linux-kernel-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Andre Przywara <Andre.Przywara@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>, Shanker Donthineni <shankerd@codeaurora.org>, Mark Rutland <mark.rutland@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Andre Przywara <Andre.Przywara@arm.com>, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The redistributor needs to be told which vPE is about to be run,
-and tells us whether there is any pending VLPI on exit.
+The doorbell interrupt is only useful if the vcpu is blocked on WFI.
+In all other cases, recieving a doorbell interrupt is just a waste
+of cycles.
 
-Let's add the scheduling calls to the vgic flush/sync functions,
-allowing the VLPIs to be delivered to the guest.
+So let's only enable the doorbell if a vcpu is getting blocked,
+and disable it when it is unblocked. This is very similar to
+what we're doing for the background timer.
 
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Reviewed-by: Christoffer Dall <cdall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-v4.c | 39 +++++++++++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic.c    |  4 ++++
- virt/kvm/arm/vgic/vgic.h    |  2 ++
- 3 files changed, 45 insertions(+)
+ include/kvm/arm_vgic.h      |  3 +++
+ virt/kvm/arm/arm.c          |  2 ++
+ virt/kvm/arm/vgic/vgic-v4.c | 18 ++++++++++++++++++
+ 3 files changed, 23 insertions(+)
 
-diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
-index 1a2f2fcdfa67..d7fe610bb1f5 100644
---- a/virt/kvm/arm/vgic/vgic-v4.c
-+++ b/virt/kvm/arm/vgic/vgic-v4.c
-@@ -131,6 +131,45 @@ void vgic_v4_teardown(struct kvm *kvm)
- 	its_vm->vpes = NULL;
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 2f750c770bf2..8c896540a72c 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -381,4 +381,7 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int irq,
+ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int irq,
+ 				 struct kvm_kernel_irq_routing_entry *irq_entry);
+ 
++void kvm_vgic_v4_enable_doorbell(struct kvm_vcpu *vcpu);
++void kvm_vgic_v4_disable_doorbell(struct kvm_vcpu *vcpu);
++
+ #endif /* __KVM_ARM_VGIC_H */
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 8388c1cc23f6..092a4ec03e57 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -316,11 +316,13 @@ int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
+ void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
+ {
+ 	kvm_timer_schedule(vcpu);
++	kvm_vgic_v4_enable_doorbell(vcpu);
  }
  
-+int vgic_v4_sync_hwstate(struct kvm_vcpu *vcpu)
-+{
-+	if (!vgic_supports_direct_msis(vcpu->kvm))
-+		return 0;
+ void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
+ {
+ 	kvm_timer_unschedule(vcpu);
++	kvm_vgic_v4_disable_doorbell(vcpu);
+ }
+ 
+ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
+diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
+index ea898af1a7a9..1a2f2fcdfa67 100644
+--- a/virt/kvm/arm/vgic/vgic-v4.c
++++ b/virt/kvm/arm/vgic/vgic-v4.c
+@@ -237,3 +237,21 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int virq,
+ 	mutex_unlock(&its->its_lock);
+ 	return ret;
+ }
 +
-+	return its_schedule_vpe(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe, false);
++void kvm_vgic_v4_enable_doorbell(struct kvm_vcpu *vcpu)
++{
++	if (vgic_supports_direct_msis(vcpu->kvm)) {
++		int irq = vcpu->arch.vgic_cpu.vgic_v3.its_vpe.irq;
++		if (irq)
++			enable_irq(irq);
++	}
 +}
 +
-+int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu)
++void kvm_vgic_v4_disable_doorbell(struct kvm_vcpu *vcpu)
 +{
-+	int irq = vcpu->arch.vgic_cpu.vgic_v3.its_vpe.irq;
-+	int err;
-+
-+	if (!vgic_supports_direct_msis(vcpu->kvm))
-+		return 0;
-+
-+	/*
-+	 * Before making the VPE resident, make sure the redistributor
-+	 * corresponding to our current CPU expects us here. See the
-+	 * doc in drivers/irqchip/irq-gic-v4.c to understand how this
-+	 * turns into a VMOVP command at the ITS level.
-+	 */
-+	err = irq_set_affinity(irq, cpumask_of(smp_processor_id()));
-+	if (err)
-+		return err;
-+
-+	err = its_schedule_vpe(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe, true);
-+	if (err)
-+		return err;
-+
-+	/*
-+	 * Now that the VPE is resident, let's get rid of a potential
-+	 * doorbell interrupt that would still be pending.
-+	 */
-+	err = irq_set_irqchip_state(irq, IRQCHIP_STATE_PENDING, false);
-+
-+	return err;
++	if (vgic_supports_direct_msis(vcpu->kvm)) {
++		int irq = vcpu->arch.vgic_cpu.vgic_v3.its_vpe.irq;
++		if (irq)
++			disable_irq(irq);
++	}
 +}
-+
- static struct vgic_its *vgic_get_its(struct kvm *kvm,
- 				     struct kvm_kernel_irq_routing_entry *irq_entry)
- {
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index 0691a2250949..71ca0ff1b35a 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -709,6 +709,8 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
- 
-+	WARN_ON(vgic_v4_sync_hwstate(vcpu));
-+
- 	/* An empty ap_list_head implies used_lrs == 0 */
- 	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
- 		return;
-@@ -721,6 +723,8 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
- /* Flush our emulation state into the GIC hardware before entering the guest. */
- void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
- {
-+	WARN_ON(vgic_v4_flush_hwstate(vcpu));
-+
- 	/*
- 	 * If there are no virtual interrupts active or pending for this
- 	 * VCPU, then there is no work to do and we can bail out without
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index c4105f613f57..9cafb61b79af 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -243,5 +243,7 @@ struct vgic_its *vgic_msi_to_its(struct kvm *kvm, struct kvm_msi *msi);
- bool vgic_supports_direct_msis(struct kvm *kvm);
- int vgic_v4_init(struct kvm *kvm);
- void vgic_v4_teardown(struct kvm *kvm);
-+int vgic_v4_sync_hwstate(struct kvm_vcpu *vcpu);
-+int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu);
- 
- #endif
 -- 
 2.11.0
