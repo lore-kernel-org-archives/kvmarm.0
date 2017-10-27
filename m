@@ -1,23 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v5 23/26] KVM: arm/arm64: GICv4: Prevent a VM using GICv4 from
- being saved
-Date: Fri, 27 Oct 2017 15:28:52 +0100
-Message-ID: <20171027142855.21584-24-marc.zyngier@arm.com>
+Subject: [PATCH v5 24/26] KVM: arm/arm64: GICv4: Prevent userspace from
+ changing doorbell affinity
+Date: Fri, 27 Oct 2017 15:28:53 +0100
+Message-ID: <20171027142855.21584-25-marc.zyngier@arm.com>
 References: <20171027142855.21584-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ABEF949D2A
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 10:28:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 87CEE49D6B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 10:28:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EOxd9qzv+3U0 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 27 Oct 2017 10:28:51 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BB2649D26
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 10:28:51 -0400 (EDT)
+ with ESMTP id OjmBAg6ZNRgB for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 Oct 2017 10:28:54 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 68BD649D4D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 10:28:54 -0400 (EDT)
 In-Reply-To: <20171027142855.21584-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,53 +32,58 @@ To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger
 Cc: Andre Przywara <Andre.Przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The GICv4 architecture doesn't make it easy for save/restore to
-work, as it doesn't give any guarantee that the pending state
-is written into the pending table.
+We so far allocate the doorbell interrupts without taking any
+special measure regarding the affinity of these interrupts. We
+simply move them around as required when the vcpu gets scheduled
+on a different CPU.
 
-So let's not take any chance, and let's return an error if
-we encounter any LPI that has the HW bit set. In order for
-userspace to distinguish this error from other failure modes,
-use -EACCES as an error code.
+But that's counting without userspace (and the evil irqbalance) that
+can try and move the VPE interrupt around, causing the ITS code
+to emit VMOVP commands and remap the doorbell to another redistributor.
+Worse, this can happen while the vcpu is running, causing all kind
+of trouble if the VPE is already resident, and we end-up in UNPRED
+territory.
+
+So let's take a definitive action and prevent userspace from messing
+with us. This is just a matter of adding IRQ_NO_BALANCING to the
+set of flags we already have, letting the kernel in sole control
+of the affinity.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- Documentation/virtual/kvm/devices/arm-vgic-its.txt | 2 ++
- virt/kvm/arm/vgic/vgic-its.c                       | 9 +++++++++
- 2 files changed, 11 insertions(+)
+ virt/kvm/arm/vgic/vgic-v4.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/virtual/kvm/devices/arm-vgic-its.txt b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
-index eb06beb75960..1eec7bcb2d52 100644
---- a/Documentation/virtual/kvm/devices/arm-vgic-its.txt
-+++ b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
-@@ -60,6 +60,8 @@ Groups:
-     -EINVAL: Inconsistent restored data
-     -EFAULT: Invalid guest ram access
-     -EBUSY:  One or more VCPUS are running
-+    -EACCES: The virtual ITS is backed by a physical GICv4 ITS, and the
-+    	     state is not available
+diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
+index d7fe610bb1f5..d10e18eabd3b 100644
+--- a/virt/kvm/arm/vgic/vgic-v4.c
++++ b/virt/kvm/arm/vgic/vgic-v4.c
+@@ -23,6 +23,8 @@
  
-   KVM_DEV_ARM_VGIC_GRP_ITS_REGS
-   Attributes:
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index eb72eb027060..2710834d0920 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -1989,6 +1989,15 @@ static int vgic_its_save_itt(struct vgic_its *its, struct its_device *device)
- 	list_for_each_entry(ite, &device->itt_head, ite_list) {
- 		gpa_t gpa = base + ite->event_id * ite_esz;
+ #include "vgic.h"
  
-+		/*
-+		 * If an LPI carries the HW bit, this means that this
-+		 * interrupt is controlled by GICv4, and we do not
-+		 * have direct access to that state. Let's simply fail
-+		 * the save operation...
-+		 */
-+		if (ite->irq->hw)
-+			return -EACCES;
++#define DB_IRQ_FLAGS	(IRQ_NOAUTOEN | IRQ_DISABLE_UNLAZY | IRQ_NO_BALANCING)
 +
- 		ret = vgic_its_save_ite(its, device, ite, gpa, ite_esz);
- 		if (ret)
- 			return ret;
+ static irqreturn_t vgic_v4_doorbell_handler(int irq, void *info)
+ {
+ 	struct kvm_vcpu *vcpu = info;
+@@ -83,7 +85,7 @@ int vgic_v4_init(struct kvm *kvm)
+ 		 * doorbell could kick us out of the guest too
+ 		 * early...
+ 		 */
+-		irq_set_status_flags(irq, IRQ_NOAUTOEN | IRQ_DISABLE_UNLAZY);
++		irq_set_status_flags(irq, DB_IRQ_FLAGS);
+ 		ret = request_irq(irq, vgic_v4_doorbell_handler,
+ 				  0, "vcpu", vcpu);
+ 		if (ret) {
+@@ -121,7 +123,7 @@ void vgic_v4_teardown(struct kvm *kvm)
+ 		struct kvm_vcpu *vcpu = kvm_get_vcpu(kvm, i);
+ 		int irq = its_vm->vpes[i]->irq;
+ 
+-		irq_clear_status_flags(irq, IRQ_NOAUTOEN | IRQ_DISABLE_UNLAZY);
++		irq_clear_status_flags(irq, DB_IRQ_FLAGS);
+ 		free_irq(irq, vcpu);
+ 	}
+ 
 -- 
 2.11.0
