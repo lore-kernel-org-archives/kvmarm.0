@@ -1,58 +1,52 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: [RFC PATCH v4 28/28] arm64/sve: signal: Include SVE when computing AT_MINSIGSTKSZ
-Date: Fri, 27 Oct 2017 11:51:10 +0100
-Message-ID: <1509101470-7881-29-git-send-email-Dave.Martin@arm.com>
-References: <1509101470-7881-1-git-send-email-Dave.Martin@arm.com>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v5 02/20] arm64: Implement arch_counter_get_cntpct to
+ read the physical counter
+Date: Fri, 27 Oct 2017 11:53:24 +0100
+Message-ID: <20171027105323.hvbewckytr5gbpph@armageddon.cambridge.arm.com>
+References: <1509093281-15225-1-git-send-email-cdall@linaro.org>
+ <1509093281-15225-3-git-send-email-cdall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-arch-owner@vger.kernel.org>
-In-Reply-To: <1509101470-7881-1-git-send-email-Dave.Martin@arm.com>
-Sender: linux-arch-owner@vger.kernel.org
-To: linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A26349D19
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 06:52:05 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id t2bpX1vJUtyf for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 Oct 2017 06:52:04 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3534040638
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 06:52:04 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <1509093281-15225-3-git-send-email-cdall@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <cdall@linaro.org>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The SVE context block in the signal frame needs to be considered
-too when computing the maximum possible signal frame size.
+On Fri, Oct 27, 2017 at 10:34:23AM +0200, Christoffer Dall wrote:
+> From: Christoffer Dall <christoffer.dall@linaro.org>
+> 
+> As we are about to use the physical counter on arm64 systems that have
+> KVM support, implement arch_counter_get_cntpct() and the associated
+> errata workaround functionality for stable timer reads.
+> 
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will.deacon@arm.com>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 
-Because the size of this block depends on the vector length, this
-patch computes the size based not on the thread's current vector
-length but instead on the maximum possible vector length: this
-determines the maximum size of SVE context block that can be
-observed in any signal frame for the lifetime of the process.
+Just in case you need an ack for the arch/arm64/ hunks:
 
-Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Alex Bennée <alex.bennee@linaro.org>
----
- arch/arm64/kernel/signal.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
-
-diff --git a/arch/arm64/kernel/signal.c b/arch/arm64/kernel/signal.c
-index ecae147..260b67f 100644
---- a/arch/arm64/kernel/signal.c
-+++ b/arch/arm64/kernel/signal.c
-@@ -595,8 +595,18 @@ static int setup_sigframe_layout(struct rt_sigframe_user_layout *user,
- 	if (system_supports_sve()) {
- 		unsigned int vq = 0;
- 
--		if (test_thread_flag(TIF_SVE))
--			vq = sve_vq_from_vl(current->thread.sve_vl);
-+		if (add_all || test_thread_flag(TIF_SVE)) {
-+			int vl = sve_max_vl;
-+
-+			if (!add_all)
-+				vl = current->thread.sve_vl;
-+
-+			/* Fail safe if something wasn't initialised */
-+			if (WARN_ON(!sve_vl_valid(vl)))
-+				vl = SVE_VL_MIN;
-+
-+			vq = sve_vq_from_vl(vl);
-+		}
- 
- 		err = sigframe_alloc(user, &user->sve_offset,
- 				     SVE_SIG_CONTEXT_SIZE(vq));
--- 
-2.1.4
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
