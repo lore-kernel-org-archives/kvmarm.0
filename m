@@ -1,25 +1,26 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PATCH v5 08/20] KVM: arm/arm64: Rename soft timer to bg_timer
-Date: Fri, 27 Oct 2017 10:34:29 +0200
-Message-ID: <1509093281-15225-9-git-send-email-cdall@linaro.org>
+Subject: [PATCH v5 06/20] KVM: arm/arm64: Check that system supports split
+ eoi/deactivate
+Date: Fri, 27 Oct 2017 10:34:27 +0200
+Message-ID: <1509093281-15225-7-git-send-email-cdall@linaro.org>
 References: <1509093281-15225-1-git-send-email-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AA7340651
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 04:34:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 210EE41185
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 04:34:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fd5ENjVOQm60 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 27 Oct 2017 04:34:20 -0400 (EDT)
-Received: from mail-lf0-f67.google.com (mail-lf0-f67.google.com
- [209.85.215.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 01BE449D29
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 04:34:19 -0400 (EDT)
-Received: by mail-lf0-f67.google.com with SMTP id k40so6540434lfi.4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 01:35:44 -0700 (PDT)
+ with ESMTP id NY7zfwwP37uV for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 Oct 2017 04:34:10 -0400 (EDT)
+Received: from mail-lf0-f66.google.com (mail-lf0-f66.google.com
+ [209.85.215.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2377040651
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 04:34:10 -0400 (EDT)
+Received: by mail-lf0-f66.google.com with SMTP id 75so6553004lfx.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 01:35:34 -0700 (PDT)
 In-Reply-To: <1509093281-15225-1-git-send-email-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,104 +35,72 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As we are about to introduce a separate hrtimer for the physical timer,
-call this timer bg_timer, because we refer to this timer as the
-background timer in the code and comments elsewhere.
+Some systems without proper firmware and/or hardware description data
+don't support the split EOI and deactivate operation.
 
-Signed-off-by: Christoffer Dall <cdall@linaro.org>
+On such systems, we cannot leave the physical interrupt active after the
+timer handler on the host has run, so we cannot support KVM with an
+in-kernel GIC with the timer changes we are about to introduce.
+
+This patch makes sure that trying to initialize the KVM GIC code will
+fail on such systems.
+
 Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- include/kvm/arm_arch_timer.h |  2 +-
- virt/kvm/arm/arch_timer.c    | 18 +++++++++---------
- 2 files changed, 10 insertions(+), 10 deletions(-)
+ drivers/irqchip/irq-gic-v3.c | 8 ++++++--
+ drivers/irqchip/irq-gic.c    | 6 ++++--
+ 2 files changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index d0beae9..0eed5bc 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -43,7 +43,7 @@ struct arch_timer_cpu {
- 	struct arch_timer_context	ptimer;
+diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+index b5df99c..854334a 100644
+--- a/drivers/irqchip/irq-gic-v3.c
++++ b/drivers/irqchip/irq-gic-v3.c
+@@ -1228,7 +1228,9 @@ static int __init gic_of_init(struct device_node *node, struct device_node *pare
+ 		goto out_unmap_rdist;
  
- 	/* Background timer used when the guest is not running */
--	struct hrtimer			timer;
-+	struct hrtimer			bg_timer;
+ 	gic_populate_ppi_partitions(node);
+-	gic_of_setup_kvm_info(node);
++
++	if (static_key_true(&supports_deactivate))
++		gic_of_setup_kvm_info(node);
+ 	return 0;
  
- 	/* Work queued with the above timer expires */
- 	struct work_struct		expired;
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 2232301..8ec3928 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -148,13 +148,13 @@ static u64 kvm_timer_earliest_exp(struct kvm_vcpu *vcpu)
- 	return min(min_virt, min_phys);
- }
+ out_unmap_rdist:
+@@ -1517,7 +1519,9 @@ gic_acpi_init(struct acpi_subtable_header *header, const unsigned long end)
+ 		goto out_fwhandle_free;
  
--static enum hrtimer_restart kvm_timer_expire(struct hrtimer *hrt)
-+static enum hrtimer_restart kvm_bg_timer_expire(struct hrtimer *hrt)
- {
- 	struct arch_timer_cpu *timer;
- 	struct kvm_vcpu *vcpu;
- 	u64 ns;
+ 	acpi_set_irq_model(ACPI_IRQ_MODEL_GIC, domain_handle);
+-	gic_acpi_setup_kvm_info();
++
++	if (static_key_true(&supports_deactivate))
++		gic_acpi_setup_kvm_info();
  
--	timer = container_of(hrt, struct arch_timer_cpu, timer);
-+	timer = container_of(hrt, struct arch_timer_cpu, bg_timer);
- 	vcpu = container_of(timer, struct kvm_vcpu, arch.timer_cpu);
+ 	return 0;
  
- 	/*
-@@ -261,7 +261,7 @@ static void kvm_timer_emulate(struct kvm_vcpu *vcpu,
+diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
+index f641e8e..121af5c 100644
+--- a/drivers/irqchip/irq-gic.c
++++ b/drivers/irqchip/irq-gic.c
+@@ -1420,7 +1420,8 @@ static void __init gic_of_setup_kvm_info(struct device_node *node)
+ 	if (ret)
  		return;
  
- 	/*  The timer has not yet expired, schedule a background timer */
--	soft_timer_start(&timer->timer, kvm_timer_compute_delta(timer_ctx));
-+	soft_timer_start(&timer->bg_timer, kvm_timer_compute_delta(timer_ctx));
+-	gic_set_kvm_info(&gic_v2_kvm_info);
++	if (static_key_true(&supports_deactivate))
++		gic_set_kvm_info(&gic_v2_kvm_info);
  }
  
- /*
-@@ -294,14 +294,14 @@ void kvm_timer_schedule(struct kvm_vcpu *vcpu)
- 	 * The guest timers have not yet expired, schedule a background timer.
- 	 * Set the earliest expiration time among the guest timers.
- 	 */
--	soft_timer_start(&timer->timer, kvm_timer_earliest_exp(vcpu));
-+	soft_timer_start(&timer->bg_timer, kvm_timer_earliest_exp(vcpu));
+ int __init
+@@ -1652,7 +1653,8 @@ static int __init gic_v2_acpi_init(struct acpi_subtable_header *header,
+ 	if (IS_ENABLED(CONFIG_ARM_GIC_V2M))
+ 		gicv2m_init(NULL, gic_data[0].domain);
+ 
+-	gic_acpi_setup_kvm_info();
++	if (static_key_true(&supports_deactivate))
++		gic_acpi_setup_kvm_info();
+ 
+ 	return 0;
  }
- 
- void kvm_timer_unschedule(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
- 
--	soft_timer_cancel(&timer->timer, &timer->expired);
-+	soft_timer_cancel(&timer->bg_timer, &timer->expired);
- }
- 
- static void kvm_timer_flush_hwstate_vgic(struct kvm_vcpu *vcpu)
-@@ -437,7 +437,7 @@ void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
- 	 * This is to cancel the background timer for the physical timer
- 	 * emulation if it is set.
- 	 */
--	soft_timer_cancel(&timer->timer, &timer->expired);
-+	soft_timer_cancel(&timer->bg_timer, &timer->expired);
- 
- 	/*
- 	 * The guest could have modified the timer registers or the timer
-@@ -494,8 +494,8 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
- 	vcpu_ptimer(vcpu)->cntvoff = 0;
- 
- 	INIT_WORK(&timer->expired, kvm_timer_inject_irq_work);
--	hrtimer_init(&timer->timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
--	timer->timer.function = kvm_timer_expire;
-+	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
-+	timer->bg_timer.function = kvm_bg_timer_expire;
- 
- 	vtimer->irq.irq = default_vtimer_irq.irq;
- 	ptimer->irq.irq = default_ptimer_irq.irq;
-@@ -604,7 +604,7 @@ void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu)
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
- 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 
--	soft_timer_cancel(&timer->timer, &timer->expired);
-+	soft_timer_cancel(&timer->bg_timer, &timer->expired);
- 	kvm_vgic_unmap_phys_irq(vcpu, vtimer->irq.irq);
- }
- 
 -- 
 2.7.4
