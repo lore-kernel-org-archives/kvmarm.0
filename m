@@ -1,157 +1,130 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH v4 20/28] arm64/sve: Add prctl controls for userspace
- vector length management
-Date: Fri, 27 Oct 2017 18:52:50 +0100
-Message-ID: <87r2toiikt.fsf@linaro.org>
-References: <1509101470-7881-1-git-send-email-Dave.Martin@arm.com>
- <1509101470-7881-21-git-send-email-Dave.Martin@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v2] KVM: arm/arm64: Fix external abort type matching
+Date: Fri, 27 Oct 2017 19:28:32 +0100
+Message-ID: <86a80ca1in.fsf@arm.com>
+References: <0184EA26B2509940AA629AE1405DD7F2016E999C@DGGEMA503-MBS.china.huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 995F840A74
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 13:51:31 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OYxJ-y31r9Kx for <kvmarm@lists.cs.columbia.edu>;
- Fri, 27 Oct 2017 13:51:28 -0400 (EDT)
-Received: from mail-wr0-f196.google.com (mail-wr0-f196.google.com
- [209.85.128.196])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 061E040651
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 13:51:28 -0400 (EDT)
-Received: by mail-wr0-f196.google.com with SMTP id r79so6843808wrb.13
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Oct 2017 10:52:53 -0700 (PDT)
-In-reply-to: <1509101470-7881-21-git-send-email-Dave.Martin@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <0184EA26B2509940AA629AE1405DD7F2016E999C@DGGEMA503-MBS.china.huawei.com>
+        (gengdongjiu@huawei.com's message of "Fri, 27 Oct 2017 15:43:26
+        +0000")
+Sender: linux-kernel-owner@vger.kernel.org
+To: gengdongjiu <gengdongjiu@huawei.com>
+Cc: "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "james.morse@arm.com" <james.morse@arm.com>, "tbaicar@codeaurora.org" <tbaicar@codeaurora.org>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo+IFRoaXMgcGF0Y2gg
-YWRkcyB0d28gYXJtNjQtc3BlY2lmaWMgcHJjdGxzLCB0byBwZXJtaXQgdXNlcnNwYWNlIHRvCj4g
-Y29udHJvbCBpdHMgdmVjdG9yIGxlbmd0aDoKPgo+ICAqIFBSX1NWRV9TRVRfVkw6IHNldCB0aGUg
-dGhyZWFkJ3MgU1ZFIHZlY3RvciBsZW5ndGggYW5kIHZlY3Rvcgo+ICAgIGxlbmd0aCBpbmhlcml0
-YW5jZSBtb2RlLgo+Cj4gICogUFJfU1ZFX0dFVF9WTDogZ2V0IHRoZSBzYW1lIGluZm9ybWF0aW9u
-Lgo+Cj4gQWx0aG91Z2ggdGhlc2UgcHJjdGxzIHJlc2VtYmxlIGluc3RydWN0aW9uIHNldCBmZWF0
-dXJlcyBpbiB0aGUgU1ZFCj4gYXJjaGl0ZWN0dXJlLCB0aGV5IHByb3ZpZGUgYWRkaXRpb25hbCBj
-b250cm9sOiB0aGUgdmVjdG9yIGxlbmd0aAo+IGluaGVyaXRhbmNlIG1vZGUgaXMgTGludXgtc3Bl
-Y2lmaWMgYW5kIG5vdGhpbmcgdG8gZG8gd2l0aCB0aGUKPiBhcmNoaXRlY3R1cmUsIGFuZCB0aGUg
-YXJjaGl0ZWN0dXJlIGRvZXMgbm90IHBlcm1pdCBFTDAgdG8gc2V0IGl0cwo+IG93biB2ZWN0b3Ig
-bGVuZ3RoIGRpcmVjdGx5LiAgQm90aCBjYW4gYmUgdXNlZCBpbiBwb3J0YWJsZSB0b29scwo+IHdp
-dGhvdXQgcmVxdWlyaW5nIHRoZSB1c2Ugb2YgU1ZFIGluc3RydWN0aW9ucy4KPgo+IFNpZ25lZC1v
-ZmYtYnk6IERhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPgo+IFJldmlld2VkLWJ5OiBD
-YXRhbGluIE1hcmluYXMgPGNhdGFsaW4ubWFyaW5hc0Bhcm0uY29tPgo+IENjOiBBbGV4IEJlbm7D
-qWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+CgpGWUkgdGhlcmUgaXMgYSBtaW5vciBjb25mbGlj
-dCBhcHBseWluZyB0aGlzIG9uIGN1cnJlbnQgbWFzdGVyLgoKPgo+IC0tLQo+Cj4gKipEcm9wcGVk
-IGF0IHYzKiogUmV2aWV3ZWQtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9y
-Zz4KPiBkdWUgdG8gbm9uLXRyaXZpYWwgY2hhbmdlcy9maXhlcyBhZnRlciB2Mi4KPgo+IENoYW5n
-ZXMgc2luY2UgdjMKPiAtLS0tLS0tLS0tLS0tLS0tCj4KPiBSZXF1ZXN0ZWQgYnkgQ2F0YWxpbiBN
-YXJpbmFzOgo+Cj4gICogUmVwbGFjZSBzdGF0aWMgX19tYXliZV91bnVzZWQgZnVuY3Rpb25zIHdp
-dGggc3RhdGljIGlubGluZXMuCj4KPiAgICAoUmV0YWluaW5nIENhdGFsaW4ncyBSZXZpZXdlZC1i
-eSB3aXRoIGhpcyBhcHByb3ZhbC4pCj4gLS0tCj4gIGFyY2gvYXJtNjQvaW5jbHVkZS9hc20vZnBz
-aW1kLmggICAgfCAxNCArKysrKysrKysrKwo+ICBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL3Byb2Nl
-c3Nvci5oIHwgIDQgKysrCj4gIGFyY2gvYXJtNjQva2VybmVsL2Zwc2ltZC5jICAgICAgICAgfCA1
-MCArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKwo+ICBpbmNsdWRlL3VhcGkv
-bGludXgvcHJjdGwuaCAgICAgICAgIHwgIDQgKysrCj4gIGtlcm5lbC9zeXMuYyAgICAgICAgICAg
-ICAgICAgICAgICAgfCAxMiArKysrKysrKysKPiAgNSBmaWxlcyBjaGFuZ2VkLCA4NCBpbnNlcnRp
-b25zKCspCj4KPiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9mcHNpbWQuaCBi
-L2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vZnBzaW1kLmgKPiBpbmRleCBkNzU0ZTVhLi5iODY4NDEy
-IDEwMDY0NAo+IC0tLSBhL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vZnBzaW1kLmgKPiArKysgYi9h
-cmNoL2FybTY0L2luY2x1ZGUvYXNtL2Zwc2ltZC5oCj4gQEAgLTE3LDYgKzE3LDcgQEAKPiAgI2Rl
-ZmluZSBfX0FTTV9GUF9ICj4KPiAgI2luY2x1ZGUgPGFzbS9wdHJhY2UuaD4KPiArI2luY2x1ZGUg
-PGFzbS9lcnJuby5oPgo+Cj4gICNpZm5kZWYgX19BU1NFTUJMWV9fCj4KPiBAQCAtOTgsNiArOTks
-OSBAQCBleHRlcm4gdm9pZCBzdmVfc3luY19mcm9tX2Zwc2ltZF96ZXJvcGFkKHN0cnVjdCB0YXNr
-X3N0cnVjdCAqdGFzayk7Cj4gIGV4dGVybiBpbnQgc3ZlX3NldF92ZWN0b3JfbGVuZ3RoKHN0cnVj
-dCB0YXNrX3N0cnVjdCAqdGFzaywKPiAgCQkJCSB1bnNpZ25lZCBsb25nIHZsLCB1bnNpZ25lZCBs
-b25nIGZsYWdzKTsKPgo+ICtleHRlcm4gaW50IHN2ZV9zZXRfY3VycmVudF92bCh1bnNpZ25lZCBs
-b25nIGFyZyk7Cj4gK2V4dGVybiBpbnQgc3ZlX2dldF9jdXJyZW50X3ZsKHZvaWQpOwo+ICsKPiAg
-LyoKPiAgICogUHJvYmluZyBhbmQgc2V0dXAgZnVuY3Rpb25zLgo+ICAgKiBDYWxscyB0byB0aGVz
-ZSBmdW5jdGlvbnMgbXVzdCBiZSBzZXJpYWxpc2VkIHdpdGggb25lIGFub3RoZXIuCj4gQEAgLTEx
-NCw2ICsxMTgsMTYgQEAgc3RhdGljIGlubGluZSB2b2lkIGZwc2ltZF9yZWxlYXNlX3Rhc2soc3Ry
-dWN0IHRhc2tfc3RydWN0ICp0YXNrKSB7IH0KPiAgc3RhdGljIGlubGluZSB2b2lkIHN2ZV9zeW5j
-X3RvX2Zwc2ltZChzdHJ1Y3QgdGFza19zdHJ1Y3QgKnRhc2spIHsgfQo+ICBzdGF0aWMgaW5saW5l
-IHZvaWQgc3ZlX3N5bmNfZnJvbV9mcHNpbWRfemVyb3BhZChzdHJ1Y3QgdGFza19zdHJ1Y3QgKnRh
-c2spIHsgfQo+Cj4gK3N0YXRpYyBpbmxpbmUgaW50IHN2ZV9zZXRfY3VycmVudF92bCh1bnNpZ25l
-ZCBsb25nIGFyZykKPiArewo+ICsJcmV0dXJuIC1FSU5WQUw7Cj4gK30KPiArCj4gK3N0YXRpYyBp
-bmxpbmUgaW50IHN2ZV9nZXRfY3VycmVudF92bCh2b2lkKQo+ICt7Cj4gKwlyZXR1cm4gLUVJTlZB
-TDsKPiArfQo+ICsKPiAgc3RhdGljIGlubGluZSB2b2lkIHN2ZV9pbml0X3ZxX21hcCh2b2lkKSB7
-IH0KPiAgc3RhdGljIGlubGluZSB2b2lkIHN2ZV91cGRhdGVfdnFfbWFwKHZvaWQpIHsgfQo+ICBz
-dGF0aWMgaW5saW5lIGludCBzdmVfdmVyaWZ5X3ZxX21hcCh2b2lkKSB7IHJldHVybiAwOyB9Cj4g
-ZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vcHJvY2Vzc29yLmggYi9hcmNoL2Fy
-bTY0L2luY2x1ZGUvYXNtL3Byb2Nlc3Nvci5oCj4gaW5kZXggYzZmZGRiMC4uMDIzY2FjYiAxMDA2
-NDQKPiAtLS0gYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL3Byb2Nlc3Nvci5oCj4gKysrIGIvYXJj
-aC9hcm02NC9pbmNsdWRlL2FzbS9wcm9jZXNzb3IuaAo+IEBAIC0yMTcsNSArMjE3LDkgQEAgc3Rh
-dGljIGlubGluZSB2b2lkIHNwaW5fbG9ja19wcmVmZXRjaChjb25zdCB2b2lkICpwdHIpCj4gIGlu
-dCBjcHVfZW5hYmxlX3Bhbih2b2lkICpfX3VudXNlZCk7Cj4gIGludCBjcHVfZW5hYmxlX2NhY2hl
-X21haW50X3RyYXAodm9pZCAqX191bnVzZWQpOwo+Cj4gKy8qIFVzZXJzcGFjZSBpbnRlcmZhY2Ug
-Zm9yIFBSX1NWRV97U0VULEdFVH1fVkwgcHJjdGwoKXM6ICovCj4gKyNkZWZpbmUgU1ZFX1NFVF9W
-TChhcmcpCXN2ZV9zZXRfY3VycmVudF92bChhcmcpCj4gKyNkZWZpbmUgU1ZFX0dFVF9WTCgpCXN2
-ZV9nZXRfY3VycmVudF92bCgpCj4gKwo+ICAjZW5kaWYgLyogX19BU1NFTUJMWV9fICovCj4gICNl
-bmRpZiAvKiBfX0FTTV9QUk9DRVNTT1JfSCAqLwo+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2tl
-cm5lbC9mcHNpbWQuYyBiL2FyY2gvYXJtNjQva2VybmVsL2Zwc2ltZC5jCj4gaW5kZXggYTQ3Y2U0
-NC4uNzQ2NTYyMiAxMDA2NDQKPiAtLS0gYS9hcmNoL2FybTY0L2tlcm5lbC9mcHNpbWQuYwo+ICsr
-KyBiL2FyY2gvYXJtNjQva2VybmVsL2Zwc2ltZC5jCj4gQEAgLTI4LDYgKzI4LDcgQEAKPiAgI2lu
-Y2x1ZGUgPGxpbnV4L2lycWZsYWdzLmg+Cj4gICNpbmNsdWRlIDxsaW51eC9pbml0Lmg+Cj4gICNp
-bmNsdWRlIDxsaW51eC9wZXJjcHUuaD4KPiArI2luY2x1ZGUgPGxpbnV4L3ByY3RsLmg+Cj4gICNp
-bmNsdWRlIDxsaW51eC9wcmVlbXB0Lmg+Cj4gICNpbmNsdWRlIDxsaW51eC9wcmN0bC5oPgo+ICAj
-aW5jbHVkZSA8bGludXgvcHRyYWNlLmg+Cj4gQEAgLTU1Nyw2ICs1NTgsNTUgQEAgaW50IHN2ZV9z
-ZXRfdmVjdG9yX2xlbmd0aChzdHJ1Y3QgdGFza19zdHJ1Y3QgKnRhc2ssCj4gIH0KPgo+ICAvKgo+
-ICsgKiBFbmNvZGUgdGhlIGN1cnJlbnQgdmVjdG9yIGxlbmd0aCBhbmQgZmxhZ3MgZm9yIHJldHVy
-bi4KPiArICogVGhpcyBpcyBvbmx5IHJlcXVpcmVkIGZvciBwcmN0bCgpOiBwdHJhY2UgaGFzIHNl
-cGFyYXRlIGZpZWxkcwo+ICsgKgo+ICsgKiBmbGFncyBhcmUgYXMgZm9yIHN2ZV9zZXRfdmVjdG9y
-X2xlbmd0aCgpLgo+ICsgKi8KPiArc3RhdGljIGludCBzdmVfcHJjdGxfc3RhdHVzKHVuc2lnbmVk
-IGxvbmcgZmxhZ3MpCj4gK3sKPiArCWludCByZXQ7Cj4gKwo+ICsJaWYgKGZsYWdzICYgUFJfU1ZF
-X1NFVF9WTF9PTkVYRUMpCj4gKwkJcmV0ID0gY3VycmVudC0+dGhyZWFkLnN2ZV92bF9vbmV4ZWM7
-Cj4gKwllbHNlCj4gKwkJcmV0ID0gY3VycmVudC0+dGhyZWFkLnN2ZV92bDsKPiArCj4gKwlpZiAo
-dGVzdF90aHJlYWRfZmxhZyhUSUZfU1ZFX1ZMX0lOSEVSSVQpKQo+ICsJCXJldCB8PSBQUl9TVkVf
-VkxfSU5IRVJJVDsKPiArCj4gKwlyZXR1cm4gcmV0Owo+ICt9Cj4gKwo+ICsvKiBQUl9TVkVfU0VU
-X1ZMICovCj4gK2ludCBzdmVfc2V0X2N1cnJlbnRfdmwodW5zaWduZWQgbG9uZyBhcmcpCj4gK3sK
-PiArCXVuc2lnbmVkIGxvbmcgdmwsIGZsYWdzOwo+ICsJaW50IHJldDsKPiArCj4gKwl2bCA9IGFy
-ZyAmIFBSX1NWRV9WTF9MRU5fTUFTSzsKPiArCWZsYWdzID0gYXJnICYgfnZsOwo+ICsKPiArCWlm
-ICghc3lzdGVtX3N1cHBvcnRzX3N2ZSgpKQo+ICsJCXJldHVybiAtRUlOVkFMOwo+ICsKPiArCXJl
-dCA9IHN2ZV9zZXRfdmVjdG9yX2xlbmd0aChjdXJyZW50LCB2bCwgZmxhZ3MpOwo+ICsJaWYgKHJl
-dCkKPiArCQlyZXR1cm4gcmV0Owo+ICsKPiArCXJldHVybiBzdmVfcHJjdGxfc3RhdHVzKGZsYWdz
-KTsKPiArfQo+ICsKPiArLyogUFJfU1ZFX0dFVF9WTCAqLwo+ICtpbnQgc3ZlX2dldF9jdXJyZW50
-X3ZsKHZvaWQpCj4gK3sKPiArCWlmICghc3lzdGVtX3N1cHBvcnRzX3N2ZSgpKQo+ICsJCXJldHVy
-biAtRUlOVkFMOwo+ICsKPiArCXJldHVybiBzdmVfcHJjdGxfc3RhdHVzKDApOwo+ICt9Cj4gKwo+
-ICsvKgo+ICAgKiBCaXRtYXAgZm9yIHRlbXBvcmFyeSBzdG9yYWdlIG9mIHRoZSBwZXItQ1BVIHNl
-dCBvZiBzdXBwb3J0ZWQgdmVjdG9yIGxlbmd0aHMKPiAgICogZHVyaW5nIHNlY29uZGFyeSBib290
-Lgo+ICAgKi8KPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS91YXBpL2xpbnV4L3ByY3RsLmggYi9pbmNs
-dWRlL3VhcGkvbGludXgvcHJjdGwuaAo+IGluZGV4IDFiNjQ5MDEuLjFlZjkzNzAgMTAwNjQ0Cj4g
-LS0tIGEvaW5jbHVkZS91YXBpL2xpbnV4L3ByY3RsLmgKPiArKysgYi9pbmNsdWRlL3VhcGkvbGlu
-dXgvcHJjdGwuaAo+IEBAIC0xOTgsNyArMTk4LDExIEBAIHN0cnVjdCBwcmN0bF9tbV9tYXAgewo+
-ICAjIGRlZmluZSBQUl9DQVBfQU1CSUVOVF9DTEVBUl9BTEwJNAo+Cj4gIC8qIGFybTY0IFNjYWxh
-YmxlIFZlY3RvciBFeHRlbnNpb24gY29udHJvbHMgKi8KPiArLyogRmxhZyB2YWx1ZXMgbXVzdCBi
-ZSBrZXB0IGluIHN5bmMgd2l0aCBwdHJhY2UgTlRfQVJNX1NWRSBpbnRlcmZhY2UgKi8KPiArI2Rl
-ZmluZSBQUl9TVkVfU0VUX1ZMCQkJNDgJLyogc2V0IHRhc2sgdmVjdG9yIGxlbmd0aCAqLwo+ICAj
-IGRlZmluZSBQUl9TVkVfU0VUX1ZMX09ORVhFQwkJKDEgPDwgMTgpIC8qIGRlZmVyIGVmZmVjdCB1
-bnRpbCBleGVjICovCj4gKyNkZWZpbmUgUFJfU1ZFX0dFVF9WTAkJCTQ5CS8qIGdldCB0YXNrIHZl
-Y3RvciBsZW5ndGggKi8KPiArLyogQml0cyBjb21tb24gdG8gUFJfU1ZFX1NFVF9WTCBhbmQgUFJf
-U1ZFX0dFVF9WTCAqLwo+ICAjIGRlZmluZSBQUl9TVkVfVkxfTEVOX01BU0sJCTB4ZmZmZgo+ICAj
-IGRlZmluZSBQUl9TVkVfVkxfSU5IRVJJVAkJKDEgPDwgMTcpIC8qIGluaGVyaXQgYWNyb3NzIGV4
-ZWMgKi8KPgo+IGRpZmYgLS1naXQgYS9rZXJuZWwvc3lzLmMgYi9rZXJuZWwvc3lzLmMKPiBpbmRl
-eCA5YWViYzI5Li5jNTQxOTE2IDEwMDY0NAo+IC0tLSBhL2tlcm5lbC9zeXMuYwo+ICsrKyBiL2tl
-cm5lbC9zeXMuYwo+IEBAIC0xMTAsNiArMTEwLDEyIEBACj4gICNpZm5kZWYgU0VUX0ZQX01PREUK
-PiAgIyBkZWZpbmUgU0VUX0ZQX01PREUoYSxiKQkoLUVJTlZBTCkKPiAgI2VuZGlmCj4gKyNpZm5k
-ZWYgU1ZFX1NFVF9WTAo+ICsjIGRlZmluZSBTVkVfU0VUX1ZMKGEpCQkoLUVJTlZBTCkKPiArI2Vu
-ZGlmCj4gKyNpZm5kZWYgU1ZFX0dFVF9WTAo+ICsjIGRlZmluZSBTVkVfR0VUX1ZMKCkJCSgtRUlO
-VkFMKQo+ICsjZW5kaWYKPgo+ICAvKgo+ICAgKiB0aGlzIGlzIHdoZXJlIHRoZSBzeXN0ZW0td2lk
-ZSBvdmVyZmxvdyBVSUQgYW5kIEdJRCBhcmUgZGVmaW5lZCwgZm9yCj4gQEAgLTIzODUsNiArMjM5
-MSwxMiBAQCBTWVNDQUxMX0RFRklORTUocHJjdGwsIGludCwgb3B0aW9uLCB1bnNpZ25lZCBsb25n
-LCBhcmcyLCB1bnNpZ25lZCBsb25nLCBhcmczLAo+ICAJY2FzZSBQUl9HRVRfRlBfTU9ERToKPiAg
-CQllcnJvciA9IEdFVF9GUF9NT0RFKG1lKTsKPiAgCQlicmVhazsKPiArCWNhc2UgUFJfU1ZFX1NF
-VF9WTDoKPiArCQllcnJvciA9IFNWRV9TRVRfVkwoYXJnMik7Cj4gKwkJYnJlYWs7Cj4gKwljYXNl
-IFBSX1NWRV9HRVRfVkw6Cj4gKwkJZXJyb3IgPSBTVkVfR0VUX1ZMKCk7Cj4gKwkJYnJlYWs7Cj4g
-IAlkZWZhdWx0Ogo+ICAJCWVycm9yID0gLUVJTlZBTDsKPiAgCQlicmVhazsKCgotLQpBbGV4IEJl
-bm7DqWUKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3Zt
-YXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlz
-dHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+On Fri, Oct 27 2017 at  3:43:26 pm GMT, gengdongjiu <gengdongjiu@huawei.com> wrote:
+>> 
+>> On Thu, Oct 26 2017 at  6:07:01 pm BST, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+>> > For this matching, current code using the {I,D}FSC range to match
+>> > kvm_vcpu_trap_get_fault_type() return value, but
+>> > kvm_vcpu_trap_get_fault_type() only return the part {I,D}FSC instead
+>> > of whole, so fix this issue
+>> >
+>> > Value       Type
+>> > 0x10        FSC_SEA
+>> > 0x14        FSC_SEA_TTW0 FSC_SEA_TTW1 FSC_SEA_TTW2 FSC_SEA_TTW3
+>> > 0x18        FSC_SECC
+>> > 0x1c        FSC_SECC_TTW0 FSC_SECC_TTW1 FSC_SECC_TTW2 FSC_SECC_TTW3
+>> >
+>> > CC: James Morse <james.morse@arm.com>
+>> > CC: Tyler Baicar <tbaicar@codeaurora.org>
+>> > Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+
+[...]
+
+>> > diff --git a/arch/arm64/include/asm/kvm_arm.h
+>> > b/arch/arm64/include/asm/kvm_arm.h
+>> > index 61d694c..c0f1798 100644
+>> > --- a/arch/arm64/include/asm/kvm_arm.h
+>> > +++ b/arch/arm64/include/asm/kvm_arm.h
+>> > @@ -205,15 +205,9 @@
+>> >  #define FSC_ACCESS	ESR_ELx_FSC_ACCESS
+>> >  #define FSC_PERM	ESR_ELx_FSC_PERM
+>> >  #define FSC_SEA		ESR_ELx_FSC_EXTABT
+>> > -#define FSC_SEA_TTW0	(0x14)
+>> > -#define FSC_SEA_TTW1	(0x15)
+>> > -#define FSC_SEA_TTW2	(0x16)
+>> > -#define FSC_SEA_TTW3	(0x17)
+>> > +#define FSC_SEA_TTW	(0x14)
+>> >  #define FSC_SECC	(0x18)
+>> > -#define FSC_SECC_TTW0	(0x1c)
+>> > -#define FSC_SECC_TTW1	(0x1d)
+>> > -#define FSC_SECC_TTW2	(0x1e)
+>> > -#define FSC_SECC_TTW3	(0x1f)
+>> > +#define FSC_SECC_TTW	(0x1c)
+>> >
+>> >  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+>> >  #define HPFAR_MASK	(~UL(0xf))
+>> > diff --git a/arch/arm64/include/asm/kvm_emulate.h
+>> > b/arch/arm64/include/asm/kvm_emulate.h
+>> > index e5df3fc..5cde311 100644
+>> > --- a/arch/arm64/include/asm/kvm_emulate.h
+>> > +++ b/arch/arm64/include/asm/kvm_emulate.h
+>> > @@ -239,15 +239,9 @@ static inline bool kvm_vcpu_dabt_isextabt(const
+>> > struct kvm_vcpu *vcpu)  {
+>> >  	switch (kvm_vcpu_trap_get_fault_type(vcpu)) {
+>> >  	case FSC_SEA:
+>> > -	case FSC_SEA_TTW0:
+>> > -	case FSC_SEA_TTW1:
+>> > -	case FSC_SEA_TTW2:
+>> > -	case FSC_SEA_TTW3:
+>> > +	case FSC_SEA_TTW:
+>> >  	case FSC_SECC:
+>> > -	case FSC_SECC_TTW0:
+>> > -	case FSC_SECC_TTW1:
+>> > -	case FSC_SECC_TTW2:
+>> > -	case FSC_SECC_TTW3:
+>> > +	case FSC_SECC_TTW:
+>> >  		return true;
+>> >  	default:
+>> >  		return false;
+>> 
+>> What is the bug you're fixing? From what I can tell, you're simply
+>> removing valuable symbols from the kernel, and inventing another one
+>> that doesn't exist in the architecture.
+>
+> Marc, I mean the "kvm_vcpu_trap_get_fault_type(vcpu))" return the
+> value of fault type which is not the syndrome value {D,I}FSC.
+> the case sentence matches the syndrome value instead of fault type.
+> So the two are not match, I mean here has issue.
+> So the FSC_SECC_TTW1/ FSC_SECC_TTW2/ FSC_SECC_TTW3 and FSC_SECC_TTW1/
+> FSC_SECC_TTW2/ FSC_SECC_TTW3 are dead code.
+>
+> Below value are syndrome {D,I}FSC value, which is not fault type.
+> FSC_SECC_TTW0:
+> FSC_SECC_TTW1
+> FSC_SECC_TTW2:
+> FSC_SECC_TTW3:
+> FSC_SEA_TTW1:
+> FSC_SEA_TTW2
+> FSC_SEA_TTW3:
+>
+> kvm_vcpu_trap_get_fault_type() will clear the low two bits to zero. So
+> I use FSC_SEA_TTW represent "Synchronous external abort on translation
+> table walk"
+
+I understand that, and I certainly not keen on adding another "fault
+type" for this.
+
+> As we can see the Translation fault type "FSC_FAULT", which does not
+> define the "FSC_FAULT0" "FSC_FAULT1" "FSC_FAULT2" "FSC_FAULT3".
+> Because the fault type " FSC_FAULT " include the four cases. 
+
+Indeed, and I'm still not convinced this is the best thing we have in
+the code.
+
+> static inline u8 kvm_vcpu_trap_get_fault(const struct kvm_vcpu *vcpu)
+> {
+> 	return kvm_vcpu_get_hsr(vcpu) & 0x3f;
+> }
+
+Here you go. This should give you a pretty good idea of how to provide a
+proper fix.
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny.
