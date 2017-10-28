@@ -1,70 +1,55 @@
-From: Dongjiu Geng <gengdongjiu@huawei.com>
-Subject: [PATCH v3] KVM: arm/arm64: fix the incompatible matching for external
- abort
-Date: Sat, 28 Oct 2017 14:45:59 +0800
-Message-ID: <1509173159-30579-1-git-send-email-gengdongjiu@huawei.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH v4 20/28] arm64/sve: Add prctl controls for userspace
+ vector length management
+Date: Sat, 28 Oct 2017 17:05:09 +0100
+Message-ID: <20171028160506.GI19485@e103592.cambridge.arm.com>
+References: <1509101470-7881-1-git-send-email-Dave.Martin@arm.com>
+ <1509101470-7881-21-git-send-email-Dave.Martin@arm.com>
+ <87r2toiikt.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CC1F40EA6
- for <kvmarm@lists.cs.columbia.edu>; Sat, 28 Oct 2017 02:18:57 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HXk9K0OvWTQ6 for <kvmarm@lists.cs.columbia.edu>;
- Sat, 28 Oct 2017 02:18:55 -0400 (EDT)
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8B18E405F9
- for <kvmarm@lists.cs.columbia.edu>; Sat, 28 Oct 2017 02:18:54 -0400 (EDT)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: christoffer.dall@linaro.org, marc.zyngier@arm.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, gengdongjiu@huawei.com, huangshaoyu@huawei.com, wuquanming@huawei.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-arch-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <87r2toiikt.fsf@linaro.org>
+Sender: linux-arch-owner@vger.kernel.org
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-For this matching, switch expression uses fault type which is
-not {I,D}FSC value, but the case expression uses {I,D}FSC,
-they are incompatible. So change the switch expression to
-use {I,D}FSC.
+On Fri, Oct 27, 2017 at 06:52:50PM +0100, Alex Bennée wrote:
+> 
+> Dave Martin <Dave.Martin@arm.com> writes:
+> 
+> > This patch adds two arm64-specific prctls, to permit userspace to
+> > control its vector length:
+> >
+> >  * PR_SVE_SET_VL: set the thread's SVE vector length and vector
+> >    length inheritance mode.
+> >
+> >  * PR_SVE_GET_VL: get the same information.
+> >
+> > Although these prctls resemble instruction set features in the SVE
+> > architecture, they provide additional control: the vector length
+> > inheritance mode is Linux-specific and nothing to do with the
+> > architecture, and the architecture does not permit EL0 to set its
+> > own vector length directly.  Both can be used in portable tools
+> > without requiring the use of SVE instructions.
+> >
+> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> > Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> > Cc: Alex Bennée <alex.bennee@linaro.org>
+> 
+> FYI there is a minor conflict applying this on current master.
 
-Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
----
- arch/arm/include/asm/kvm_emulate.h   | 2 +-
- arch/arm64/include/asm/kvm_emulate.h | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+There are some trivial conflicts with one or two patches that already
+went into arm64/for-next/core, so I based on that for this posting, not
+torvalds/master.
 
-diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
-index 98089ff..7571b4e 100644
---- a/arch/arm/include/asm/kvm_emulate.h
-+++ b/arch/arm/include/asm/kvm_emulate.h
-@@ -203,7 +203,7 @@ static inline u8 kvm_vcpu_trap_get_fault_type(struct kvm_vcpu *vcpu)
- 
- static inline bool kvm_vcpu_dabt_isextabt(struct kvm_vcpu *vcpu)
- {
--	switch (kvm_vcpu_trap_get_fault_type(vcpu)) {
-+	switch (kvm_vcpu_trap_get_fault(vcpu)) {
- 	case FSC_SEA:
- 	case FSC_SEA_TTW0:
- 	case FSC_SEA_TTW1:
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index e5df3fc..8c918c5 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -237,7 +237,7 @@ static inline u8 kvm_vcpu_trap_get_fault_type(const struct kvm_vcpu *vcpu)
- 
- static inline bool kvm_vcpu_dabt_isextabt(const struct kvm_vcpu *vcpu)
- {
--	switch (kvm_vcpu_trap_get_fault_type(vcpu)) {
-+	switch (kvm_vcpu_trap_get_fault(vcpu)) {
- 	case FSC_SEA:
- 	case FSC_SEA_TTW0:
- 	case FSC_SEA_TTW1:
--- 
-1.9.1
+There's a note in the cover letter giving the precise commit I based
+on, though the branch doesn't seem to have moved yet since I posted.
+
+Otherwise, I don't see any conflict -- can you give details?
+
+Cheers
+---Dave
