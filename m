@@ -1,55 +1,39 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v4 20/28] arm64/sve: Add prctl controls for userspace
- vector length management
-Date: Sat, 28 Oct 2017 17:05:09 +0100
-Message-ID: <20171028160506.GI19485@e103592.cambridge.arm.com>
-References: <1509101470-7881-1-git-send-email-Dave.Martin@arm.com>
- <1509101470-7881-21-git-send-email-Dave.Martin@arm.com>
- <87r2toiikt.fsf@linaro.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v3] KVM: arm/arm64: fix the incompatible matching for external abort
+Date: Sun, 29 Oct 2017 01:12:32 +0000
+Message-ID: <861slmaha7.fsf@arm.com>
+References: <1509173159-30579-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-arch-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <87r2toiikt.fsf@linaro.org>
-Sender: linux-arch-owner@vger.kernel.org
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1509173159-30579-1-git-send-email-gengdongjiu@huawei.com>
+        (Dongjiu Geng's message of "Sat, 28 Oct 2017 14:45:59 +0800")
+Sender: linux-kernel-owner@vger.kernel.org
+To: Dongjiu Geng <gengdongjiu@huawei.com>
+Cc: christoffer.dall@linaro.org, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, huangshaoyu@huawei.com, wuquanming@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 27, 2017 at 06:52:50PM +0100, Alex Bennée wrote:
-> 
-> Dave Martin <Dave.Martin@arm.com> writes:
-> 
-> > This patch adds two arm64-specific prctls, to permit userspace to
-> > control its vector length:
-> >
-> >  * PR_SVE_SET_VL: set the thread's SVE vector length and vector
-> >    length inheritance mode.
-> >
-> >  * PR_SVE_GET_VL: get the same information.
-> >
-> > Although these prctls resemble instruction set features in the SVE
-> > architecture, they provide additional control: the vector length
-> > inheritance mode is Linux-specific and nothing to do with the
-> > architecture, and the architecture does not permit EL0 to set its
-> > own vector length directly.  Both can be used in portable tools
-> > without requiring the use of SVE instructions.
-> >
-> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> > Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-> > Cc: Alex Bennée <alex.bennee@linaro.org>
-> 
-> FYI there is a minor conflict applying this on current master.
+On Sat, Oct 28 2017 at  2:45:59 pm BST, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+> For this matching, switch expression uses fault type which is
+> not {I,D}FSC value, but the case expression uses {I,D}FSC,
+> they are incompatible. So change the switch expression to
+> use {I,D}FSC.
 
-There are some trivial conflicts with one or two patches that already
-went into arm64/for-next/core, so I based on that for this posting, not
-torvalds/master.
+I'm sorry, but I can't manage to parse this commit message. How about
+something like this?
 
-There's a note in the cover letter giving the precise commit I based
-on, though the branch doesn't seem to have moved yet since I posted.
+"kvm_vcpu_dabt_isextabt() tries to match a full fault syndrome, but
+ calls kvm_vcpu_trap_get_fault_type() that only returns the fault class,
+ thus reducing the scope of the check. This doesn't cause any observable
+ bug yet as we end-up matching a closely related syndrome for which we
+ return the same value.
 
-Otherwise, I don't see any conflict -- can you give details?
+ Using kvm_vcpu_trap_get_fault() instead fixes it for good"
 
-Cheers
----Dave
+Otherwise:
+
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+
+	M.
+-- 
+Jazz is not dead. It just smells funny.
