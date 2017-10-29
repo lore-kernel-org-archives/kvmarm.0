@@ -1,115 +1,474 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v4 25/26] KVM: arm/arm64: GICv4: Prevent heterogenous
- systems from using GICv4
-Date: Sun, 29 Oct 2017 03:16:50 +0100
-Message-ID: <20171029021650.GH2166@lvm>
-References: <20171006153401.5481-1-marc.zyngier@arm.com>
- <20171006153401.5481-26-marc.zyngier@arm.com>
- <20171026154839.ebtmqzcy7jjyejul@salmiak> <868tfxaxiv.fsf@arm.com>
- <20171027073728.taejncafoehkfzuc@salmiak> <86r2tp9g2s.fsf@arm.com>
- <20171027080421.m3ruegg6liflcvro@salmiak> <86mv4d9elr.fsf@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 87BA340A74
- for <kvmarm@lists.cs.columbia.edu>; Sat, 28 Oct 2017 22:15:33 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tZWIR7MFBOwa for <kvmarm@lists.cs.columbia.edu>;
- Sat, 28 Oct 2017 22:15:32 -0400 (EDT)
-Received: from mail-lf0-f68.google.com (mail-lf0-f68.google.com
- [209.85.215.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 07C9640638
- for <kvmarm@lists.cs.columbia.edu>; Sat, 28 Oct 2017 22:15:32 -0400 (EDT)
-Received: by mail-lf0-f68.google.com with SMTP id l23so11096479lfk.10
- for <kvmarm@lists.cs.columbia.edu>; Sat, 28 Oct 2017 19:17:01 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <86mv4d9elr.fsf@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvm@vger.kernel.org, Andre Przywara <Andre.Przywara@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH] KVM: arm/arm64: Unify 32bit fault injection
+Date: Sun, 29 Oct 2017 02:18:09 +0000
+Message-ID: <20171029021809.26913-1-marc.zyngier@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 27, 2017 at 09:31:12AM +0100, Marc Zyngier wrote:
-> On Fri, Oct 27 2017 at  9:04:21 am BST, Mark Rutland <mark.rutland@arm.com> wrote:
-> > On Fri, Oct 27, 2017 at 08:59:23AM +0100, Marc Zyngier wrote:
-> >> On Fri, Oct 27 2017 at  8:37:28 am BST, Mark Rutland <mark.rutland@arm.com> wrote:
-> >> > On Fri, Oct 27, 2017 at 07:57:12AM +0100, Marc Zyngier wrote:
-> >> >> On Thu, Oct 26 2017 at  4:48:39 pm BST, Mark Rutland <mark.rutland@arm.com> wrote:
-> >> >> > On Fri, Oct 06, 2017 at 04:34:00PM +0100, Marc Zyngier wrote:
-> >> >
-> >> >> >> @@ -485,8 +495,21 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
-> >> >> >>  	kvm_vgic_global_state.can_emulate_gicv2 = false;
-> >> >> >>  	kvm_vgic_global_state.ich_vtr_el2 = ich_vtr_el2;
-> >> >> >>  
-> >> >> >> -	/* GICv4 support? */
-> >> >> >> +	/*
-> >> >> >> +	 * GICv4 support? We need to check on all CPUs in case of some
-> >> >> >> +	 * extremely creative form of big-little brain damage...
-> >> >> >> +	 */
-> >> >> >>  	if (info->has_v4) {
-> >> >> >> +		int cpu;
-> >> >> >> +
-> >> >> >> +		for_each_online_cpu(cpu) {
-> >> >> >> +			bool enable;
-> >> >> >> +
-> >> >> >> +			smp_call_function_single(cpu, vgic_check_v4_cpuif,
-> >> >> >> +						 &enable, 1);
-> >> >> >> +			gicv4_enable = gicv4_enable && enable;
-> >> >> >> +		}
-> >> >> >
-> >> >> > With maxcpus=N on the command line, CPUs can be brought online late, so we
-> >> >> > might need this in a hotplug callback (and/or in the arm64 cpufeature
-> >> >> > framework) to handle that case.
-> >> >> 
-> >> >> I'm afraid that won't be enough. If the CPU is brought up once we've
-> >> >> already started a VM, we're screwed, as we cannot retroactively decide
-> >> >> to drop GICv4 on the floor and nuke the guest. Or did you have something
-> >> >> more radical in mind? Panic?
-> >> >
-> >> > If you teach the arm64 cpufeature framework about this, it can abort bringing a
-> >> > !GICv4 CPU online late.
-> >> 
-> >> You wish.
-> >> 
-> >> There is all kind of difficulties with that. This requires checking an
-> >> EL2 register (ICH_VTR_EL2) when we've not initialised KVM yet (so no HYP
-> >> call facility). We could make it an additional hyp-stub feature, but
-> >> that feels pretty involved.
-> >
-> > Aargh; I'd assumed we could probe this from EL1 somewhow.
-> >
-> >> Effectively, GICv4 support having it supported on the redistributors,
-> >> the ITSs, and the CPUs. The cpufeature framework only addresses the
-> >> first one. So unless the solution encompasses all the elements in the
-> >> chain, any checking feels pretty pointless.
-> >
-> > Sure thing. :/
-> 
-> How are we taking this further?
-> 
-> I can drop this altogether (after all, you will get what you deserve if
-> you design a broken system). The alternative would be to add a hotplug
-> notifier here, and spit out a warning if we're going to be in
-> trouble. We still run into the risk of messing with a VM that's already
-> been started before the non-v4 CPU.
-> 
-> Thoughts anyone?
-> 
-I think it's fine to drop the check like you do in v5, and if platforms
-that actually have this problem show up and we need to detect against
-bringing certain CPUs online, we can have a look at building a massive
-control-infrastructure then.
+Both arm and arm64 implementations are capable of injecting
+fauls, and yet have completely divergent implementations,
+leading to different bugs and reduced maintainability.
 
-Thanks,
--Christoffer
+Let's get elect the arm64 version as the canonical one
+and move it into aarch32.c, which is common to both
+architectures.
+
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+
+Notes:
+    This is likely to generate a conflict when merged in mainline,
+    as it deletes code that got fixed in the meantime. The resolution
+    of that conflict is pretty trivial though.
+
+ arch/arm/include/asm/kvm_emulate.h   |  36 ++++++++-
+ arch/arm/kvm/emulate.c               | 139 -----------------------------------
+ arch/arm64/include/asm/kvm_emulate.h |   3 +
+ arch/arm64/kvm/inject_fault.c        |  74 +------------------
+ virt/kvm/arm/aarch32.c               |  98 ++++++++++++++++++++++--
+ 5 files changed, 132 insertions(+), 218 deletions(-)
+
+diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
+index 98089ffd91bb..dcae3970148d 100644
+--- a/arch/arm/include/asm/kvm_emulate.h
++++ b/arch/arm/include/asm/kvm_emulate.h
+@@ -25,7 +25,22 @@
+ #include <asm/kvm_arm.h>
+ #include <asm/cputype.h>
+ 
++/* arm64 compatibility macros */
++#define COMPAT_PSR_MODE_ABT	ABT_MODE
++#define COMPAT_PSR_MODE_UND	UND_MODE
++#define COMPAT_PSR_T_BIT	PSR_T_BIT
++#define COMPAT_PSR_I_BIT	PSR_I_BIT
++#define COMPAT_PSR_A_BIT	PSR_A_BIT
++#define COMPAT_PSR_E_BIT	PSR_E_BIT
++#define COMPAT_PSR_IT_MASK	PSR_IT_MASK
++
+ unsigned long *vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num);
++
++static inline unsigned long *vcpu_reg32(struct kvm_vcpu *vcpu, u8 reg_num)
++{
++	return vcpu_reg(vcpu, reg_num);
++}
++
+ unsigned long *vcpu_spsr(struct kvm_vcpu *vcpu);
+ 
+ static inline unsigned long vcpu_get_reg(struct kvm_vcpu *vcpu,
+@@ -42,10 +57,25 @@ static inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
+ 
+ bool kvm_condition_valid32(const struct kvm_vcpu *vcpu);
+ void kvm_skip_instr32(struct kvm_vcpu *vcpu, bool is_wide_instr);
+-void kvm_inject_undefined(struct kvm_vcpu *vcpu);
++void kvm_inject_undef32(struct kvm_vcpu *vcpu);
++void kvm_inject_dabt32(struct kvm_vcpu *vcpu, unsigned long addr);
++void kvm_inject_pabt32(struct kvm_vcpu *vcpu, unsigned long addr);
+ void kvm_inject_vabt(struct kvm_vcpu *vcpu);
+-void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
+-void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
++
++static inline void kvm_inject_undefined(struct kvm_vcpu *vcpu)
++{
++	kvm_inject_undef32(vcpu);
++}
++
++static inline void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr)
++{
++	kvm_inject_dabt32(vcpu, addr);
++}
++
++static inline void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
++{
++	kvm_inject_pabt32(vcpu, addr);
++}
+ 
+ static inline bool kvm_condition_valid(const struct kvm_vcpu *vcpu)
+ {
+diff --git a/arch/arm/kvm/emulate.c b/arch/arm/kvm/emulate.c
+index 0064b86a2c87..cdff963f133a 100644
+--- a/arch/arm/kvm/emulate.c
++++ b/arch/arm/kvm/emulate.c
+@@ -165,145 +165,6 @@ unsigned long *vcpu_spsr(struct kvm_vcpu *vcpu)
+  * Inject exceptions into the guest
+  */
+ 
+-static u32 exc_vector_base(struct kvm_vcpu *vcpu)
+-{
+-	u32 sctlr = vcpu_cp15(vcpu, c1_SCTLR);
+-	u32 vbar = vcpu_cp15(vcpu, c12_VBAR);
+-
+-	if (sctlr & SCTLR_V)
+-		return 0xffff0000;
+-	else /* always have security exceptions */
+-		return vbar;
+-}
+-
+-/*
+- * Switch to an exception mode, updating both CPSR and SPSR. Follow
+- * the logic described in AArch32.EnterMode() from the ARMv8 ARM.
+- */
+-static void kvm_update_psr(struct kvm_vcpu *vcpu, unsigned long mode)
+-{
+-	unsigned long cpsr = *vcpu_cpsr(vcpu);
+-	u32 sctlr = vcpu_cp15(vcpu, c1_SCTLR);
+-
+-	*vcpu_cpsr(vcpu) = (cpsr & ~MODE_MASK) | mode;
+-
+-	switch (mode) {
+-	case FIQ_MODE:
+-		*vcpu_cpsr(vcpu) |= PSR_F_BIT;
+-		/* Fall through */
+-	case ABT_MODE:
+-	case IRQ_MODE:
+-		*vcpu_cpsr(vcpu) |= PSR_A_BIT;
+-		/* Fall through */
+-	default:
+-		*vcpu_cpsr(vcpu) |= PSR_I_BIT;
+-	}
+-
+-	*vcpu_cpsr(vcpu) &= ~(PSR_IT_MASK | PSR_J_BIT | PSR_E_BIT | PSR_T_BIT);
+-
+-	if (sctlr & SCTLR_TE)
+-		*vcpu_cpsr(vcpu) |= PSR_T_BIT;
+-	if (sctlr & SCTLR_EE)
+-		*vcpu_cpsr(vcpu) |= PSR_E_BIT;
+-
+-	/* Note: These now point to the mode banked copies */
+-	*vcpu_spsr(vcpu) = cpsr;
+-}
+-
+-/**
+- * kvm_inject_undefined - inject an undefined exception into the guest
+- * @vcpu: The VCPU to receive the undefined exception
+- *
+- * It is assumed that this code is called from the VCPU thread and that the
+- * VCPU therefore is not currently executing guest code.
+- *
+- * Modelled after TakeUndefInstrException() pseudocode.
+- */
+-void kvm_inject_undefined(struct kvm_vcpu *vcpu)
+-{
+-	unsigned long cpsr = *vcpu_cpsr(vcpu);
+-	bool is_thumb = (cpsr & PSR_T_BIT);
+-	u32 vect_offset = 4;
+-	u32 return_offset = (is_thumb) ? 2 : 4;
+-
+-	kvm_update_psr(vcpu, UND_MODE);
+-	*vcpu_reg(vcpu, 14) = *vcpu_pc(vcpu) - return_offset;
+-
+-	/* Branch to exception vector */
+-	*vcpu_pc(vcpu) = exc_vector_base(vcpu) + vect_offset;
+-}
+-
+-/*
+- * Modelled after TakeDataAbortException() and TakePrefetchAbortException
+- * pseudocode.
+- */
+-static void inject_abt(struct kvm_vcpu *vcpu, bool is_pabt, unsigned long addr)
+-{
+-	unsigned long cpsr = *vcpu_cpsr(vcpu);
+-	bool is_thumb = (cpsr & PSR_T_BIT);
+-	u32 vect_offset;
+-	u32 return_offset = (is_thumb) ? 4 : 0;
+-	bool is_lpae;
+-
+-	kvm_update_psr(vcpu, ABT_MODE);
+-	*vcpu_reg(vcpu, 14) = *vcpu_pc(vcpu) + return_offset;
+-
+-	if (is_pabt)
+-		vect_offset = 12;
+-	else
+-		vect_offset = 16;
+-
+-	/* Branch to exception vector */
+-	*vcpu_pc(vcpu) = exc_vector_base(vcpu) + vect_offset;
+-
+-	if (is_pabt) {
+-		/* Set IFAR and IFSR */
+-		vcpu_cp15(vcpu, c6_IFAR) = addr;
+-		is_lpae = (vcpu_cp15(vcpu, c2_TTBCR) >> 31);
+-		/* Always give debug fault for now - should give guest a clue */
+-		if (is_lpae)
+-			vcpu_cp15(vcpu, c5_IFSR) = 1 << 9 | 0x22;
+-		else
+-			vcpu_cp15(vcpu, c5_IFSR) = 2;
+-	} else { /* !iabt */
+-		/* Set DFAR and DFSR */
+-		vcpu_cp15(vcpu, c6_DFAR) = addr;
+-		is_lpae = (vcpu_cp15(vcpu, c2_TTBCR) >> 31);
+-		/* Always give debug fault for now - should give guest a clue */
+-		if (is_lpae)
+-			vcpu_cp15(vcpu, c5_DFSR) = 1 << 9 | 0x22;
+-		else
+-			vcpu_cp15(vcpu, c5_DFSR) = 2;
+-	}
+-
+-}
+-
+-/**
+- * kvm_inject_dabt - inject a data abort into the guest
+- * @vcpu: The VCPU to receive the undefined exception
+- * @addr: The address to report in the DFAR
+- *
+- * It is assumed that this code is called from the VCPU thread and that the
+- * VCPU therefore is not currently executing guest code.
+- */
+-void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr)
+-{
+-	inject_abt(vcpu, false, addr);
+-}
+-
+-/**
+- * kvm_inject_pabt - inject a prefetch abort into the guest
+- * @vcpu: The VCPU to receive the undefined exception
+- * @addr: The address to report in the DFAR
+- *
+- * It is assumed that this code is called from the VCPU thread and that the
+- * VCPU therefore is not currently executing guest code.
+- */
+-void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
+-{
+-	inject_abt(vcpu, true, addr);
+-}
+-
+ /**
+  * kvm_inject_vabt - inject an async abort / SError into the guest
+  * @vcpu: The VCPU to receive the exception
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index e5df3fce0008..bf61da0ef82b 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -41,6 +41,9 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu);
+ void kvm_inject_vabt(struct kvm_vcpu *vcpu);
+ void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
+ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
++void kvm_inject_undef32(struct kvm_vcpu *vcpu);
++void kvm_inject_dabt32(struct kvm_vcpu *vcpu, unsigned long addr);
++void kvm_inject_pabt32(struct kvm_vcpu *vcpu, unsigned long addr);
+ 
+ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+ {
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index da6a8cfa54a0..8ecbcb40e317 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -33,74 +33,6 @@
+ #define LOWER_EL_AArch64_VECTOR		0x400
+ #define LOWER_EL_AArch32_VECTOR		0x600
+ 
+-static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+-{
+-	unsigned long cpsr;
+-	unsigned long new_spsr_value = *vcpu_cpsr(vcpu);
+-	bool is_thumb = (new_spsr_value & COMPAT_PSR_T_BIT);
+-	u32 return_offset = (is_thumb) ? 4 : 0;
+-	u32 sctlr = vcpu_cp15(vcpu, c1_SCTLR);
+-
+-	cpsr = mode | COMPAT_PSR_I_BIT;
+-
+-	if (sctlr & (1 << 30))
+-		cpsr |= COMPAT_PSR_T_BIT;
+-	if (sctlr & (1 << 25))
+-		cpsr |= COMPAT_PSR_E_BIT;
+-
+-	*vcpu_cpsr(vcpu) = cpsr;
+-
+-	/* Note: These now point to the banked copies */
+-	*vcpu_spsr(vcpu) = new_spsr_value;
+-	*vcpu_reg32(vcpu, 14) = *vcpu_pc(vcpu) + return_offset;
+-
+-	/* Branch to exception vector */
+-	if (sctlr & (1 << 13))
+-		vect_offset += 0xffff0000;
+-	else /* always have security exceptions */
+-		vect_offset += vcpu_cp15(vcpu, c12_VBAR);
+-
+-	*vcpu_pc(vcpu) = vect_offset;
+-}
+-
+-static void inject_undef32(struct kvm_vcpu *vcpu)
+-{
+-	prepare_fault32(vcpu, COMPAT_PSR_MODE_UND, 4);
+-}
+-
+-/*
+- * Modelled after TakeDataAbortException() and TakePrefetchAbortException
+- * pseudocode.
+- */
+-static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
+-			 unsigned long addr)
+-{
+-	u32 vect_offset;
+-	u32 *far, *fsr;
+-	bool is_lpae;
+-
+-	if (is_pabt) {
+-		vect_offset = 12;
+-		far = &vcpu_cp15(vcpu, c6_IFAR);
+-		fsr = &vcpu_cp15(vcpu, c5_IFSR);
+-	} else { /* !iabt */
+-		vect_offset = 16;
+-		far = &vcpu_cp15(vcpu, c6_DFAR);
+-		fsr = &vcpu_cp15(vcpu, c5_DFSR);
+-	}
+-
+-	prepare_fault32(vcpu, COMPAT_PSR_MODE_ABT | COMPAT_PSR_A_BIT, vect_offset);
+-
+-	*far = addr;
+-
+-	/* Give the guest an IMPLEMENTATION DEFINED exception */
+-	is_lpae = (vcpu_cp15(vcpu, c2_TTBCR) >> 31);
+-	if (is_lpae)
+-		*fsr = 1 << 9 | 0x34;
+-	else
+-		*fsr = 0x14;
+-}
+-
+ enum exception_type {
+ 	except_type_sync	= 0,
+ 	except_type_irq		= 0x80,
+@@ -197,7 +129,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
+ void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr)
+ {
+ 	if (!(vcpu->arch.hcr_el2 & HCR_RW))
+-		inject_abt32(vcpu, false, addr);
++		kvm_inject_dabt32(vcpu, addr);
+ 	else
+ 		inject_abt64(vcpu, false, addr);
+ }
+@@ -213,7 +145,7 @@ void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr)
+ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
+ {
+ 	if (!(vcpu->arch.hcr_el2 & HCR_RW))
+-		inject_abt32(vcpu, true, addr);
++		kvm_inject_pabt32(vcpu, addr);
+ 	else
+ 		inject_abt64(vcpu, true, addr);
+ }
+@@ -227,7 +159,7 @@ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
+ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
+ {
+ 	if (!(vcpu->arch.hcr_el2 & HCR_RW))
+-		inject_undef32(vcpu);
++		kvm_inject_undef32(vcpu);
+ 	else
+ 		inject_undef64(vcpu);
+ }
+diff --git a/virt/kvm/arm/aarch32.c b/virt/kvm/arm/aarch32.c
+index 79c7c357804b..d8d266db06d9 100644
+--- a/virt/kvm/arm/aarch32.c
++++ b/virt/kvm/arm/aarch32.c
+@@ -25,11 +25,6 @@
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_hyp.h>
+ 
+-#ifndef CONFIG_ARM64
+-#define COMPAT_PSR_T_BIT	PSR_T_BIT
+-#define COMPAT_PSR_IT_MASK	PSR_IT_MASK
+-#endif
+-
+ /*
+  * stolen from arch/arm/kernel/opcodes.c
+  *
+@@ -150,3 +145,96 @@ void __hyp_text kvm_skip_instr32(struct kvm_vcpu *vcpu, bool is_wide_instr)
+ 		*vcpu_pc(vcpu) += 4;
+ 	kvm_adjust_itstate(vcpu);
+ }
++
++/*
++ * Table taken from ARMv8 ARM DDI0487B-B, table G1-10.
++ */
++static const u8 return_offsets[8][2] = {
++	[0] = { 0, 0 },		/* Reset, unused */
++	[1] = { 4, 2 },		/* Undefined */
++	[2] = { 0, 0 },		/* SVC, unused */
++	[3] = { 4, 4 },		/* Prefetch abort */
++	[4] = { 8, 8 },		/* Data abort */
++	[5] = { 0, 0 },		/* HVC, unused */
++	[6] = { 4, 4 },		/* IRQ, unused */
++	[7] = { 4, 4 },		/* FIQ, unused */
++};
++
++static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
++{
++	unsigned long cpsr;
++	unsigned long new_spsr_value = *vcpu_cpsr(vcpu);
++	bool is_thumb = (new_spsr_value & COMPAT_PSR_T_BIT);
++	u32 return_offset = return_offsets[vect_offset >> 2][is_thumb];
++	u32 sctlr = vcpu_cp15(vcpu, c1_SCTLR);
++
++	cpsr = mode | COMPAT_PSR_I_BIT;
++
++	if (sctlr & (1 << 30))
++		cpsr |= COMPAT_PSR_T_BIT;
++	if (sctlr & (1 << 25))
++		cpsr |= COMPAT_PSR_E_BIT;
++
++	*vcpu_cpsr(vcpu) = cpsr;
++
++	/* Note: These now point to the banked copies */
++	*vcpu_spsr(vcpu) = new_spsr_value;
++	*vcpu_reg32(vcpu, 14) = *vcpu_pc(vcpu) + return_offset;
++
++	/* Branch to exception vector */
++	if (sctlr & (1 << 13))
++		vect_offset += 0xffff0000;
++	else /* always have security exceptions */
++		vect_offset += vcpu_cp15(vcpu, c12_VBAR);
++
++	*vcpu_pc(vcpu) = vect_offset;
++}
++
++void kvm_inject_undef32(struct kvm_vcpu *vcpu)
++{
++	prepare_fault32(vcpu, COMPAT_PSR_MODE_UND, 4);
++}
++
++/*
++ * Modelled after TakeDataAbortException() and TakePrefetchAbortException
++ * pseudocode.
++ */
++static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
++			 unsigned long addr)
++{
++	u32 vect_offset;
++	u32 *far, *fsr;
++	bool is_lpae;
++
++	if (is_pabt) {
++		vect_offset = 12;
++		far = &vcpu_cp15(vcpu, c6_IFAR);
++		fsr = &vcpu_cp15(vcpu, c5_IFSR);
++	} else { /* !iabt */
++		vect_offset = 16;
++		far = &vcpu_cp15(vcpu, c6_DFAR);
++		fsr = &vcpu_cp15(vcpu, c5_DFSR);
++	}
++
++	prepare_fault32(vcpu, COMPAT_PSR_MODE_ABT | COMPAT_PSR_A_BIT, vect_offset);
++
++	*far = addr;
++
++	/* Give the guest an IMPLEMENTATION DEFINED exception */
++	is_lpae = (vcpu_cp15(vcpu, c2_TTBCR) >> 31);
++	if (is_lpae)
++		*fsr = 1 << 9 | 0x34;
++	else
++		*fsr = 0x14;
++}
++
++void kvm_inject_dabt32(struct kvm_vcpu *vcpu, unsigned long addr)
++{
++	inject_abt32(vcpu, false, addr);
++}
++
++void kvm_inject_pabt32(struct kvm_vcpu *vcpu, unsigned long addr)
++{
++	inject_abt32(vcpu, true, addr);
++}
++
+-- 
+2.11.0
