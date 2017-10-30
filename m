@@ -1,32 +1,75 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v6 9/9] KVM: arm/arm64: vgic-its: Implement KVM_DEV_ARM_ITS_CTRL_RESET
-Date: Mon, 30 Oct 2017 03:22:59 +0000
-Message-ID: <861sll720c.fsf@arm.com>
-References: <1509031391-4407-1-git-send-email-eric.auger@redhat.com>
-        <1509031391-4407-10-git-send-email-eric.auger@redhat.com>
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+Subject: [PATCH v4] KVM: arm/arm64: fix the incompatible matching for external
+ abort
+Date: Mon, 30 Oct 2017 14:05:18 +0800
+Message-ID: <1509343518-27137-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1509031391-4407-10-git-send-email-eric.auger@redhat.com> (Eric
-        Auger's message of "Thu, 26 Oct 2017 17:23:11 +0200")
-Sender: linux-kernel-owner@vger.kernel.org
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, cdall@linaro.org, peter.maydell@linaro.org, andre.przywara@arm.com, wanghaibin.wang@huawei.com, wu.wubin@huawei.com, drjones@redhat.com, wei@redhat.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E3860406D0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Oct 2017 01:38:07 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 8seu--pU8+nb for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 30 Oct 2017 01:38:04 -0400 (EDT)
+Received: from huawei.com (unknown [45.249.212.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CEE0A405F9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Oct 2017 01:38:03 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: marc.zyngier@arm.com, christoffer.dall@linaro.org, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, gengdongjiu@huawei.com
+Cc: wuquanming@huawei.com, huangshaoyu@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Oct 26 2017 at  6:23:11 pm BST, Eric Auger <eric.auger@redhat.com> wrote:
-> On reset we clear the valid bits of GITS_CBASER and GITS_BASER<n>.
-> We also clear command queue registers and free the cache (device,
-> collection, and lpi lists).
->
-> As we need to take the same locks as save/restore functions, we
-> create a vgic_its_ctrl() wrapper that handles KVM_DEV_ARM_VGIC_GRP_CTRL
-> group functions.
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+kvm_vcpu_dabt_isextabt() tries to match a full fault syndrome, but
+calls kvm_vcpu_trap_get_fault_type() that only returns the fault class,
+thus reducing the scope of the check. This doesn't cause any observable
+bug yet as we end-up matching a closely related syndrome for which we
+return the same value.
 
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Using kvm_vcpu_trap_get_fault() instead fixes it for good.
 
-	M.
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm/include/asm/kvm_emulate.h   | 2 +-
+ arch/arm64/include/asm/kvm_emulate.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
+index 98089ff..7571b4e 100644
+--- a/arch/arm/include/asm/kvm_emulate.h
++++ b/arch/arm/include/asm/kvm_emulate.h
+@@ -203,7 +203,7 @@ static inline u8 kvm_vcpu_trap_get_fault_type(struct kvm_vcpu *vcpu)
+ 
+ static inline bool kvm_vcpu_dabt_isextabt(struct kvm_vcpu *vcpu)
+ {
+-	switch (kvm_vcpu_trap_get_fault_type(vcpu)) {
++	switch (kvm_vcpu_trap_get_fault(vcpu)) {
+ 	case FSC_SEA:
+ 	case FSC_SEA_TTW0:
+ 	case FSC_SEA_TTW1:
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index e5df3fc..8c918c5 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -237,7 +237,7 @@ static inline u8 kvm_vcpu_trap_get_fault_type(const struct kvm_vcpu *vcpu)
+ 
+ static inline bool kvm_vcpu_dabt_isextabt(const struct kvm_vcpu *vcpu)
+ {
+-	switch (kvm_vcpu_trap_get_fault_type(vcpu)) {
++	switch (kvm_vcpu_trap_get_fault(vcpu)) {
+ 	case FSC_SEA:
+ 	case FSC_SEA_TTW0:
+ 	case FSC_SEA_TTW1:
 -- 
-Jazz is not dead. It just smells funny.
+1.9.1
