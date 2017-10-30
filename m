@@ -1,89 +1,116 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 7/8] KVM: arm/arm64: vgic-its: Check CBASER/BASER validity
- before enabling the ITS
-Date: Mon, 30 Oct 2017 03:56:02 +0100
-Message-ID: <20171030025603.23550-8-christoffer.dall@linaro.org>
-References: <20171030025603.23550-1-christoffer.dall@linaro.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v6 7/9] KVM: arm/arm64: vgic-its: Free caches when GITS_BASER Valid bit is cleared
+Date: Mon, 30 Oct 2017 03:19:54 +0000
+Message-ID: <86efpl725h.fsf@arm.com>
+References: <1509031391-4407-1-git-send-email-eric.auger@redhat.com>
+        <1509031391-4407-8-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6102B406D0
- for <kvmarm@lists.cs.columbia.edu>; Sun, 29 Oct 2017 22:54:48 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YlK3IVR8beDY for <kvmarm@lists.cs.columbia.edu>;
- Sun, 29 Oct 2017 22:54:47 -0400 (EDT)
-Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 35B1949D1B
- for <kvmarm@lists.cs.columbia.edu>; Sun, 29 Oct 2017 22:54:47 -0400 (EDT)
-Received: by mail-wm0-f68.google.com with SMTP id b189so12864242wmd.4
- for <kvmarm@lists.cs.columbia.edu>; Sun, 29 Oct 2017 19:56:19 -0700 (PDT)
-In-Reply-To: <20171030025603.23550-1-christoffer.dall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1509031391-4407-8-git-send-email-eric.auger@redhat.com> (Eric
+        Auger's message of "Thu, 26 Oct 2017 17:23:09 +0200")
+Sender: linux-kernel-owner@vger.kernel.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, cdall@linaro.org, peter.maydell@linaro.org, andre.przywara@arm.com, wanghaibin.wang@huawei.com, wu.wubin@huawei.com, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Eric Auger <eric.auger@redhat.com>
+On Thu, Oct 26 2017 at  6:23:09 pm BST, Eric Auger <eric.auger@redhat.com> wrote:
+> When the GITS_BASER<n>.Valid gets cleared, the data structures in
+> guest RAM are not valid anymore. The device, collection
+> and LPI lists stored in the in-kernel ITS represent the same
+> information in some form of cache. So let's void the cache.
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>
+> ---
+> v5 -> v6:
+> - rename type into device_type and revert tthe u64 -> int change
+> - remove the default clause
+> - take the its mutex lock around vgic_its_free_device/collection_list
+>
+> v4 -> v5:
+> - add comment about locking
+>
+> v2 -> v3:
+> - add a comment and clear cache in if block
+> ---
+>  virt/kvm/arm/vgic/vgic-its.c | 26 ++++++++++++++++++++++----
+>  1 file changed, 22 insertions(+), 4 deletions(-)
+>
+> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> index 5b7be85..2a92d4d 100644
+> --- a/virt/kvm/arm/vgic/vgic-its.c
+> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> @@ -1428,7 +1428,7 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
+>  				      unsigned long val)
+>  {
+>  	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+> -	u64 entry_size, device_type;
+> +	u64 entry_size, table_type;
+>  	u64 reg, *regptr, clearbits = 0;
+>  
+>  	/* When GITS_CTLR.Enable is 1, we ignore write accesses. */
+> @@ -1439,12 +1439,12 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
+>  	case 0:
+>  		regptr = &its->baser_device_table;
+>  		entry_size = abi->dte_esz;
+> -		device_type = GITS_BASER_TYPE_DEVICE;
+> +		table_type = GITS_BASER_TYPE_DEVICE;
+>  		break;
+>  	case 1:
+>  		regptr = &its->baser_coll_table;
+>  		entry_size = abi->cte_esz;
+> -		device_type = GITS_BASER_TYPE_COLLECTION;
+> +		table_type = GITS_BASER_TYPE_COLLECTION;
+>  		clearbits = GITS_BASER_INDIRECT;
+>  		break;
+>  	default:
+> @@ -1456,10 +1456,28 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
+>  	reg &= ~clearbits;
+>  
+>  	reg |= (entry_size - 1) << GITS_BASER_ENTRY_SIZE_SHIFT;
+> -	reg |= device_type << GITS_BASER_TYPE_SHIFT;
+> +	reg |= table_type << GITS_BASER_TYPE_SHIFT;
+>  	reg = vgic_sanitise_its_baser(reg);
+>  
+>  	*regptr = reg;
+> +
+> +	/*
+> +	 * If the table is no longer valid, we clear the associated cached data.
+> +	 * Note: there cannot be any race with save/restore code which locks
+> +	 * all vcpus.
+> +	 */
 
-The spec says it is UNPREDICTABLE to enable the ITS
-if any of the following conditions are true:
+nit: I found this comment to be pretty confusing, as it talks about
+locks that we don't try to take here. The actual mutual exclusion is
+done by taking the its_lock, which is also taken on the save/restore
+path.
 
-- GITS_CBASER.Valid == 0.
-- GITS_BASER<n>.Valid == 0, for any GITS_BASER<n> register
-  where the Type field indicates Device.
-- GITS_BASER<n>.Valid == 0, for any GITS_BASER<n> register
-  where the Type field indicates Interrupt Collection and
-  GITS_TYPER.HCC == 0.
+Christoffer: can you fix that when applying this patch? I don't think
+there is a need for a respin of the series just for this.
 
-In that case, let's keep the ITS disabled.
+> +	if (!(reg & GITS_BASER_VALID)) {
+> +		mutex_lock(&its->its_lock);
+> +		switch (table_type) {
+> +		case GITS_BASER_TYPE_DEVICE:
+> +			vgic_its_free_device_list(kvm, its);
+> +			break;
+> +		case GITS_BASER_TYPE_COLLECTION:
+> +			vgic_its_free_collection_list(kvm, its);
+> +			break;
+> +		}
+> +		mutex_unlock(&its->its_lock);
+> +	}
+>  }
+>  
+>  static unsigned long vgic_mmio_read_its_ctlr(struct kvm *vcpu,
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reported-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
- virt/kvm/arm/vgic/vgic-its.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+Otherwise:
 
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 6a715a6ec64e..e69ef7d27fde 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -1466,6 +1466,16 @@ static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
- {
- 	mutex_lock(&its->cmd_lock);
- 
-+	/*
-+	 * It is UNPREDICTABLE to enable the ITS if any of the CBASER or
-+	 * device/collection BASER are invalid
-+	 */
-+	if (!its->enabled && (val & GITS_CTLR_ENABLE) &&
-+		(!(its->baser_device_table & GITS_BASER_VALID) ||
-+		 !(its->baser_coll_table & GITS_BASER_VALID) ||
-+		 !(its->cbaser & GITS_CBASER_VALID)))
-+		goto out;
-+
- 	its->enabled = !!(val & GITS_CTLR_ENABLE);
- 
- 	/*
-@@ -1474,6 +1484,7 @@ static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
- 	 */
- 	vgic_its_process_commands(kvm, its);
- 
-+out:
- 	mutex_unlock(&its->cmd_lock);
- }
- 
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+
+Thanks,
+
+	M.
 -- 
-2.14.2
+Jazz is not dead. It just smells funny.
