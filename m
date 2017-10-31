@@ -1,29 +1,26 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v6 0/9] vITS Migration fixes and reset
-Date: Tue, 31 Oct 2017 07:43:13 +0100
-Message-ID: <20171031064313.GB2166@lvm>
-References: <1509031391-4407-1-git-send-email-eric.auger@redhat.com>
- <20171030062032.GL2166@lvm>
- <cd3ef7af-38c1-fa3a-0ebc-5b731857865b@redhat.com>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH v4 00/21] SError rework + RAS&IESB for firmware first
+ support
+Date: Tue, 31 Oct 2017 10:08:29 +0000
+Message-ID: <20171031100829.GC5584@arm.com>
+References: <20171019145807.23251-1-james.morse@arm.com>
+ <20171031063535.GA2166@lvm>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A35549D5E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 02:41:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F34C49D09
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 06:07:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JTNs80Rr7kmu for <kvmarm@lists.cs.columbia.edu>;
- Tue, 31 Oct 2017 02:41:49 -0400 (EDT)
-Received: from mail-lf0-f51.google.com (mail-lf0-f51.google.com
- [209.85.215.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E457B49D4F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 02:41:48 -0400 (EDT)
-Received: by mail-lf0-f51.google.com with SMTP id 90so17687337lfs.13
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Oct 2017 23:43:24 -0700 (PDT)
+ with ESMTP id IPn-RdhrIEGs for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 31 Oct 2017 06:06:53 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CEC8440795
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 06:06:53 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <cd3ef7af-38c1-fa3a-0ebc-5b731857865b@redhat.com>
+In-Reply-To: <20171031063535.GA2166@lvm>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,76 +30,51 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Auger Eric <eric.auger@redhat.com>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andre.przywara@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com, eric.auger.pro@gmail.com
+To: Christoffer Dall <cdall@linaro.org>
+Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Julien Thierry <julien.thierry@arm.com>, wangxiongfeng2@huawei.com, linux-arm-kernel@lists.infradead.org, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Oct 30, 2017 at 08:59:36AM +0100, Auger Eric wrote:
-> Hi Christoffer,
+On Tue, Oct 31, 2017 at 07:35:35AM +0100, Christoffer Dall wrote:
+> Hi James, Catalin, and Will,
 > 
-> On 30/10/2017 07:20, Christoffer Dall wrote:
-> > Hi Eric,
+> On Thu, Oct 19, 2017 at 03:57:46PM +0100, James Morse wrote:
+> > Hello,
 > > 
-> > On Thu, Oct 26, 2017 at 05:23:02PM +0200, Eric Auger wrote:
-> >> This series fixes various bugs observed when saving/restoring the
-> >> ITS state before the guest writes the ITS registers (on first boot or
-> >> after reset/reboot).
-> >>
-> >> This is a follow up of Wanghaibin's series [1] plus additional
-> >> patches following additional code review. It also proposes one
-> >> ITS reset implementation.
-> >>
-> >> Currently, the in-kernel emulated ITS is not reset. After a
-> >> reset/reboot, the ITS register values and caches are left
-> >> unchanged. Registers may point to some tables in guest memory
-> >> which do not exist anymore. If an ITS state backup is initiated
-> >> before the guest re-writes the registers, the save fails
-> >> because inconsistencies are detected. Also restore of data saved
-> >> as such moment is failing.
-> >>
-> >> Patches [1-4] are fixes of bugs observed during migration at
-> >> early guets boot stage.
-> >> - handle case where all collection, device and ITT entries are
-> >>   invalid on restore (which is not an error)
-> >> - Check the GITS_BASER<n> valid bit before attempting the save
-> >>   any table
-> >> - Check the GITS_BASER<n> and GITS_CBASER are valid before enabling
-> >>   the ITS
-> >>
-> >> Patches [5-9] allow to empty the caches on reset and implement a
-> >> new ITS reset IOCTL
+> > The aim of this series is to enable IESB and add ESB-instructions to let us
+> > kick any pending RAS errors into firmware to be handled by firmware-first.
 > > 
-> > I applied patches 1-4 to kvmarm/master and included them in a late pull
-> > request to kvm.
+> > Not all systems will have this firmware, so these RAS errors will become
+> > pending SErrors. We should take these as quickly as possible and avoid
+> > panic()ing for errors where we could have continued.
 > > 
-> > I also took the remaining patches with the adjusted comment in
-> > kvmarm/next.
-> 
-> OK Thanks.
+> > This first part of this series reworks the DAIF masking so that SError is
+> > unmasked unless we are handling a debug exception.
 > > 
-> > One question:  Don't we have a remaining issue to support saving the
-> > collection table even if the device table is inconsistent and vice
-> > versa?  Are you planning on picking up that work?
+> > The last part provides the same minimal handling for SError that interrupt
+> > KVM. KVM is currently unable to handle SErrors during world-switch, unless
+> > they occur during a magic single-instruction window, it hyp-panics. I suspect
+> > this will be easier to fix once the VHE world-switch is further optimised.
+> > 
+> > KVMs kvm_inject_vabt() needs updating for v8.2 as now we can specify an ESR,
+> > and all-zeros has a RAS meaning.
+> > 
+> > KVM's existing 'impdef SError to the guest' behaviour probably needs revisiting.
+> > These are errors where we don't know what they mean, they may not be
+> > synchronised by ESB. Today we blame the guest.
+> > My half-baked suggestion would be to make a virtual SError pending, but then
+> > exit to user-space to give Qemu the change to quit (for virtual machines that
+> > don't generate SError), pend an SError with a new Qemu-specific ESR, or blindly
+> > continue and take KVMs default all-zeros impdef ESR.
 > 
-> Actually to make it clear, patches 1-4 don't fix all failures but we
-> discussed at KVM forum that we shouldn't try to fix all of them without
-> a proper ITS reset implementation. So indeed even with patches 1-4 you
-> can get the migration failing as the save can happen after a reset,
-> in-between the collection creation and the PCIe device MSI registration.
-> This happens because the caches are not void and the L1 device table
-> entries are not valid. In that case the device table save fails and we
-> get no chance to save the collection as we abort the save immediately.
-> So on restore, guest will not work properly.
+> The KVM side of this series is looking pretty good.
 > 
-> But on top of kvmarm/next, caches are void and we shouldn't face this
-> issue anymore. So in case the device table save fails, I think it still
-> makes sense to return an error.
-> 
-> But this means that the migration of ITS at early guest boot stage only
-> is fixed on kvmarm/next.
-> 
+> What are the merge plans for this?  I am fine if you will take this via
+> the arm64 tree with our acks from the KVM side.  Alternatively, I
+> suppose you can apply all the arm64 patches and provide us with a stable
+> branch for that?
 
-I think you're right.
+I'll take a look this afternoon, but we haven't had a linux next release
+since the 18th so I'm starting to get nervous about conflicts if I end up
+pulling in new trees now.
 
-Thanks,
--Christoffer
+Will
