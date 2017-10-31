@@ -1,169 +1,167 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v5 16/30] arm64/sve: Backend logic for setting the vector
- length
-Date: Tue, 31 Oct 2017 15:51:08 +0000
-Message-ID: <1509465082-30427-17-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v5 20/30] arm64/sve: Preserve SVE registers around EFI runtime service calls
+Date: Tue, 31 Oct 2017 15:51:12 +0000
+Message-ID: <1509465082-30427-21-git-send-email-Dave.Martin@arm.com>
 References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6949B49D73
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 11:50:28 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8KgEm3uf3nW8 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 31 Oct 2017 11:50:26 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 902F749D8F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 11:50:26 -0400 (EDT)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-arch-owner@vger.kernel.org>
 In-Reply-To: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: linux-arch-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org
-Cc: linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VGhpcyBwYXRjaCBpbXBsZW1lbnRzIHRoZSBjb3JlIGxvZ2ljIGZvciBjaGFuZ2luZyBhIHRhc2sn
-cyB2ZWN0b3IKbGVuZ3RoIG9uIHJlcXVlc3QgZnJvbSB1c2Vyc3BhY2UuICBUaGlzIHdpbGwgYmUg
-dXNlZCBieSB0aGUgcHRyYWNlCmFuZCBwcmN0bCBmcm9udGVuZHMgdGhhdCBhcmUgaW1wbGVtZW50
-ZWQgaW4gbGF0ZXIgcGF0Y2hlcy4KClRoZSBTVkUgYXJjaGl0ZWN0dXJlIHBlcm1pdHMsIGJ1dCBk
-b2VzIG5vdCByZXF1aXJlLCBpbXBsZW1lbnRhdGlvbnMKdG8gc3VwcG9ydCB2ZWN0b3IgbGVuZ3Ro
-cyB0aGF0IGFyZSBub3QgYSBwb3dlciBvZiB0d28uICBUbyBoYW5kbGUKdGhpcywgbG9naWMgaXMg
-YWRkZWQgdG8gY2hlY2sgYSByZXF1ZXN0ZWQgdmVjdG9yIGxlbmd0aCBhZ2FpbnN0IGEKcG9zc2li
-bHkgc3BhcnNlIGJpdG1hcCBvZiBhdmFpbGFibGUgdmVjdG9yIGxlbmd0aHMgYXQgcnVudGltZSwg
-c28KdGhhdCB0aGUgYmVzdCBzdXBwb3J0ZWQgdmFsdWUgY2FuIGJlIGNob3Nlbi4KClNpZ25lZC1v
-ZmYtYnk6IERhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPgpSZXZpZXdlZC1ieTogQ2F0
-YWxpbiBNYXJpbmFzIDxjYXRhbGluLm1hcmluYXNAYXJtLmNvbT4KQ2M6IEFsZXggQmVubsOpZSA8
-YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KLS0tCiBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2Zwc2lt
-ZC5oIHwgICA4ICsrKwogYXJjaC9hcm02NC9rZXJuZWwvZnBzaW1kLmMgICAgICB8IDEzNyArKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystCiBpbmNsdWRlL3VhcGkvbGludXgv
-cHJjdGwuaCAgICAgIHwgICA1ICsrCiAzIGZpbGVzIGNoYW5nZWQsIDE0OSBpbnNlcnRpb25zKCsp
-LCAxIGRlbGV0aW9uKC0pCgpkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9mcHNp
-bWQuaCBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vZnBzaW1kLmgKaW5kZXggOWJiZDc0Yy4uODZm
-NTUwYyAxMDA2NDQKLS0tIGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9mcHNpbWQuaAorKysgYi9h
-cmNoL2FybTY0L2luY2x1ZGUvYXNtL2Zwc2ltZC5oCkBAIC0yMCw2ICsyMCw3IEBACiAKICNpZm5k
-ZWYgX19BU1NFTUJMWV9fCiAKKyNpbmNsdWRlIDxsaW51eC9jYWNoZS5oPgogI2luY2x1ZGUgPGxp
-bnV4L3N0ZGRlZi5oPgogCiAvKgpAQCAtNzAsMTcgKzcxLDI0IEBAIGV4dGVybiB2b2lkIGZwc2lt
-ZF91cGRhdGVfY3VycmVudF9zdGF0ZShzdHJ1Y3QgZnBzaW1kX3N0YXRlICpzdGF0ZSk7CiAKIGV4
-dGVybiB2b2lkIGZwc2ltZF9mbHVzaF90YXNrX3N0YXRlKHN0cnVjdCB0YXNrX3N0cnVjdCAqdGFy
-Z2V0KTsKIAorLyogTWF4aW11bSBWTCB0aGF0IFNWRSBWTC1hZ25vc3RpYyBzb2Z0d2FyZSBjYW4g
-dHJhbnNwYXJlbnRseSBzdXBwb3J0ICovCisjZGVmaW5lIFNWRV9WTF9BUkNIX01BWCAweDEwMAor
-CiBleHRlcm4gdm9pZCBzdmVfc2F2ZV9zdGF0ZSh2b2lkICpzdGF0ZSwgdTMyICpwZnBzcik7CiBl
-eHRlcm4gdm9pZCBzdmVfbG9hZF9zdGF0ZSh2b2lkIGNvbnN0ICpzdGF0ZSwgdTMyIGNvbnN0ICpw
-ZnBzciwKIAkJCSAgIHVuc2lnbmVkIGxvbmcgdnFfbWludXNfMSk7CiBleHRlcm4gdW5zaWduZWQg
-aW50IHN2ZV9nZXRfdmwodm9pZCk7CiAKK2V4dGVybiBpbnQgX19yb19hZnRlcl9pbml0IHN2ZV9t
-YXhfdmw7CisKICNpZmRlZiBDT05GSUdfQVJNNjRfU1ZFCiAKIGV4dGVybiBzaXplX3Qgc3ZlX3N0
-YXRlX3NpemUoc3RydWN0IHRhc2tfc3RydWN0IGNvbnN0ICp0YXNrKTsKIAogZXh0ZXJuIHZvaWQg
-c3ZlX2FsbG9jKHN0cnVjdCB0YXNrX3N0cnVjdCAqdGFzayk7CiBleHRlcm4gdm9pZCBmcHNpbWRf
-cmVsZWFzZV90YXNrKHN0cnVjdCB0YXNrX3N0cnVjdCAqdGFzayk7CitleHRlcm4gaW50IHN2ZV9z
-ZXRfdmVjdG9yX2xlbmd0aChzdHJ1Y3QgdGFza19zdHJ1Y3QgKnRhc2ssCisJCQkJIHVuc2lnbmVk
-IGxvbmcgdmwsIHVuc2lnbmVkIGxvbmcgZmxhZ3MpOwogCiAjZWxzZSAvKiAhIENPTkZJR19BUk02
-NF9TVkUgKi8KIApkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rZXJuZWwvZnBzaW1kLmMgYi9hcmNo
-L2FybTY0L2tlcm5lbC9mcHNpbWQuYwppbmRleCBlMGI1ZWY1Li4xY2ViMDY5IDEwMDY0NAotLS0g
-YS9hcmNoL2FybTY0L2tlcm5lbC9mcHNpbWQuYworKysgYi9hcmNoL2FybTY0L2tlcm5lbC9mcHNp
-bWQuYwpAQCAtMTcsOCArMTcsMTAgQEAKICAqIGFsb25nIHdpdGggdGhpcyBwcm9ncmFtLiAgSWYg
-bm90LCBzZWUgPGh0dHA6Ly93d3cuZ251Lm9yZy9saWNlbnNlcy8+LgogICovCiAKKyNpbmNsdWRl
-IDxsaW51eC9iaXRtYXAuaD4KICNpbmNsdWRlIDxsaW51eC9ib3R0b21faGFsZi5oPgogI2luY2x1
-ZGUgPGxpbnV4L2J1Zy5oPgorI2luY2x1ZGUgPGxpbnV4L2NhY2hlLmg+CiAjaW5jbHVkZSA8bGlu
-dXgvY29tcGF0Lmg+CiAjaW5jbHVkZSA8bGludXgvY3B1Lmg+CiAjaW5jbHVkZSA8bGludXgvY3B1
-X3BtLmg+CkBAIC0yOCw2ICszMCw3IEBACiAjaW5jbHVkZSA8bGludXgvaW5pdC5oPgogI2luY2x1
-ZGUgPGxpbnV4L3BlcmNwdS5oPgogI2luY2x1ZGUgPGxpbnV4L3ByZWVtcHQuaD4KKyNpbmNsdWRl
-IDxsaW51eC9wcmN0bC5oPgogI2luY2x1ZGUgPGxpbnV4L3B0cmFjZS5oPgogI2luY2x1ZGUgPGxp
-bnV4L3NjaGVkL3NpZ25hbC5oPgogI2luY2x1ZGUgPGxpbnV4L3NpZ25hbC5oPgpAQCAtMTEzLDYg
-KzExNiwyMCBAQCBzdGF0aWMgREVGSU5FX1BFUl9DUFUoc3RydWN0IGZwc2ltZF9zdGF0ZSAqLCBm
-cHNpbWRfbGFzdF9zdGF0ZSk7CiAvKiBEZWZhdWx0IFZMIGZvciB0YXNrcyB0aGF0IGRvbid0IHNl
-dCBpdCBleHBsaWNpdGx5OiAqLwogc3RhdGljIGludCBzdmVfZGVmYXVsdF92bCA9IFNWRV9WTF9N
-SU47CiAKKyNpZmRlZiBDT05GSUdfQVJNNjRfU1ZFCisKKy8qIE1heGltdW0gc3VwcG9ydGVkIHZl
-Y3RvciBsZW5ndGggYWNyb3NzIGFsbCBDUFVzIChpbml0aWFsbHkgcG9pc29uZWQpICovCitpbnQg
-X19yb19hZnRlcl9pbml0IHN2ZV9tYXhfdmwgPSAtMTsKKy8qIFNldCBvZiBhdmFpbGFibGUgdmVj
-dG9yIGxlbmd0aHMsIGFzIHZxX3RvX2JpdCh2cSk6ICovCitzdGF0aWMgREVDTEFSRV9CSVRNQVAo
-c3ZlX3ZxX21hcCwgU1ZFX1ZRX01BWCk7CisKKyNlbHNlIC8qICEgQ09ORklHX0FSTTY0X1NWRSAq
-LworCisvKiBEdW1teSBkZWNsYXJhdGlvbiBmb3IgY29kZSB0aGF0IHdpbGwgYmUgb3B0aW1pc2Vk
-IG91dDogKi8KK2V4dGVybiBERUNMQVJFX0JJVE1BUChzdmVfdnFfbWFwLCBTVkVfVlFfTUFYKTsK
-KworI2VuZGlmIC8qICEgQ09ORklHX0FSTTY0X1NWRSAqLworCiAvKgogICogQ2FsbCBfX3N2ZV9m
-cmVlKCkgZGlyZWN0bHkgb25seSBpZiB5b3Uga25vdyB0YXNrIGNhbid0IGJlIHNjaGVkdWxlZAog
-ICogb3IgcHJlZW1wdGVkLgpAQCAtMjcwLDYgKzI4Nyw1MCBAQCBzdGF0aWMgdm9pZCB0YXNrX2Zw
-c2ltZF9zYXZlKHZvaWQpCiAJfQogfQogCisvKgorICogSGVscGVycyB0byB0cmFuc2xhdGUgYml0
-IGluZGljZXMgaW4gc3ZlX3ZxX21hcCB0byBWUSB2YWx1ZXMgKGFuZAorICogdmljZSB2ZXJzYSku
-ICBUaGlzIGFsbG93cyBmaW5kX25leHRfYml0KCkgdG8gYmUgdXNlZCB0byBmaW5kIHRoZQorICog
-X21heGltdW1fIFZRIG5vdCBleGNlZWRpbmcgYSBjZXJ0YWluIHZhbHVlLgorICovCisKK3N0YXRp
-YyB1bnNpZ25lZCBpbnQgdnFfdG9fYml0KHVuc2lnbmVkIGludCB2cSkKK3sKKwlyZXR1cm4gU1ZF
-X1ZRX01BWCAtIHZxOworfQorCitzdGF0aWMgdW5zaWduZWQgaW50IGJpdF90b192cSh1bnNpZ25l
-ZCBpbnQgYml0KQoreworCWlmIChXQVJOX09OKGJpdCA+PSBTVkVfVlFfTUFYKSkKKwkJYml0ID0g
-U1ZFX1ZRX01BWCAtIDE7CisKKwlyZXR1cm4gU1ZFX1ZRX01BWCAtIGJpdDsKK30KKworLyoKKyAq
-IEFsbCB2ZWN0b3IgbGVuZ3RoIHNlbGVjdGlvbiBmcm9tIHVzZXJzcGFjZSBjb21lcyB0aHJvdWdo
-IGhlcmUuCisgKiBXZSdyZSBvbiBhIHNsb3cgcGF0aCwgc28gc29tZSBzYW5pdHktY2hlY2tzIGFy
-ZSBpbmNsdWRlZC4KKyAqIElmIHRoaW5ncyBnbyB3cm9uZyB0aGVyZSdzIGEgYnVnIHNvbWV3aGVy
-ZSwgYnV0IHRyeSB0byBmYWxsIGJhY2sgdG8gYQorICogc2FmZSBjaG9pY2UuCisgKi8KK3N0YXRp
-YyB1bnNpZ25lZCBpbnQgZmluZF9zdXBwb3J0ZWRfdmVjdG9yX2xlbmd0aCh1bnNpZ25lZCBpbnQg
-dmwpCit7CisJaW50IGJpdDsKKwlpbnQgbWF4X3ZsID0gc3ZlX21heF92bDsKKworCWlmIChXQVJO
-X09OKCFzdmVfdmxfdmFsaWQodmwpKSkKKwkJdmwgPSBTVkVfVkxfTUlOOworCisJaWYgKFdBUk5f
-T04oIXN2ZV92bF92YWxpZChtYXhfdmwpKSkKKwkJbWF4X3ZsID0gU1ZFX1ZMX01JTjsKKworCWlm
-ICh2bCA+IG1heF92bCkKKwkJdmwgPSBtYXhfdmw7CisKKwliaXQgPSBmaW5kX25leHRfYml0KHN2
-ZV92cV9tYXAsIFNWRV9WUV9NQVgsCisJCQkgICAgdnFfdG9fYml0KHN2ZV92cV9mcm9tX3ZsKHZs
-KSkpOworCXJldHVybiBzdmVfdmxfZnJvbV92cShiaXRfdG9fdnEoYml0KSk7Cit9CisKICNkZWZp
-bmUgWlJFRyhzdmVfc3RhdGUsIHZxLCBuKSAoKGNoYXIgKikoc3ZlX3N0YXRlKSArCQlcCiAJKFNW
-RV9TSUdfWlJFR19PRkZTRVQodnEsIG4pIC0gU1ZFX1NJR19SRUdTX09GRlNFVCkpCiAKQEAgLTM2
-NCw2ICs0MjUsNzYgQEAgdm9pZCBzdmVfYWxsb2Moc3RydWN0IHRhc2tfc3RydWN0ICp0YXNrKQog
-CUJVR19PTighdGFzay0+dGhyZWFkLnN2ZV9zdGF0ZSk7CiB9CiAKK2ludCBzdmVfc2V0X3ZlY3Rv
-cl9sZW5ndGgoc3RydWN0IHRhc2tfc3RydWN0ICp0YXNrLAorCQkJICB1bnNpZ25lZCBsb25nIHZs
-LCB1bnNpZ25lZCBsb25nIGZsYWdzKQoreworCWlmIChmbGFncyAmIH4odW5zaWduZWQgbG9uZyko
-UFJfU1ZFX1ZMX0lOSEVSSVQgfAorCQkJCSAgICAgUFJfU1ZFX1NFVF9WTF9PTkVYRUMpKQorCQly
-ZXR1cm4gLUVJTlZBTDsKKworCWlmICghc3ZlX3ZsX3ZhbGlkKHZsKSkKKwkJcmV0dXJuIC1FSU5W
-QUw7CisKKwkvKgorCSAqIENsYW1wIHRvIHRoZSBtYXhpbXVtIHZlY3RvciBsZW5ndGggdGhhdCBW
-TC1hZ25vc3RpYyBTVkUgY29kZSBjYW4KKwkgKiB3b3JrIHdpdGguICBBIGZsYWcgbWF5IGJlIGFz
-c2lnbmVkIGluIHRoZSBmdXR1cmUgdG8gYWxsb3cgc2V0dGluZworCSAqIG9mIGxhcmdlciB2ZWN0
-b3IgbGVuZ3RocyB3aXRob3V0IGNvbmZ1c2luZyBvbGRlciBzb2Z0d2FyZS4KKwkgKi8KKwlpZiAo
-dmwgPiBTVkVfVkxfQVJDSF9NQVgpCisJCXZsID0gU1ZFX1ZMX0FSQ0hfTUFYOworCisJdmwgPSBm
-aW5kX3N1cHBvcnRlZF92ZWN0b3JfbGVuZ3RoKHZsKTsKKworCWlmIChmbGFncyAmIChQUl9TVkVf
-VkxfSU5IRVJJVCB8CisJCSAgICAgUFJfU1ZFX1NFVF9WTF9PTkVYRUMpKQorCQl0YXNrLT50aHJl
-YWQuc3ZlX3ZsX29uZXhlYyA9IHZsOworCWVsc2UKKwkJLyogUmVzZXQgVkwgdG8gc3lzdGVtIGRl
-ZmF1bHQgb24gbmV4dCBleGVjOiAqLworCQl0YXNrLT50aHJlYWQuc3ZlX3ZsX29uZXhlYyA9IDA7
-CisKKwkvKiBPbmx5IGFjdHVhbGx5IHNldCB0aGUgVkwgaWYgbm90IGRlZmVycmVkOiAqLworCWlm
-IChmbGFncyAmIFBSX1NWRV9TRVRfVkxfT05FWEVDKQorCQlnb3RvIG91dDsKKworCWlmICh2bCA9
-PSB0YXNrLT50aHJlYWQuc3ZlX3ZsKQorCQlnb3RvIG91dDsKKworCS8qCisJICogVG8gZW5zdXJl
-IHRoZSBGUFNJTUQgYml0cyBvZiB0aGUgU1ZFIHZlY3RvciByZWdpc3RlcnMgYXJlIHByZXNlcnZl
-ZCwKKwkgKiB3cml0ZSBhbnkgbGl2ZSByZWdpc3RlciBzdGF0ZSBiYWNrIHRvIHRhc2tfc3RydWN0
-LCBhbmQgY29udmVydCB0byBhCisJICogbm9uLVNWRSB0aHJlYWQuCisJICovCisJaWYgKHRhc2sg
-PT0gY3VycmVudCkgeworCQlsb2NhbF9iaF9kaXNhYmxlKCk7CisKKwkJdGFza19mcHNpbWRfc2F2
-ZSgpOworCQlzZXRfdGhyZWFkX2ZsYWcoVElGX0ZPUkVJR05fRlBTVEFURSk7CisJfQorCisJZnBz
-aW1kX2ZsdXNoX3Rhc2tfc3RhdGUodGFzayk7CisJaWYgKHRlc3RfYW5kX2NsZWFyX3Rza190aHJl
-YWRfZmxhZyh0YXNrLCBUSUZfU1ZFKSkKKwkJc3ZlX3RvX2Zwc2ltZCh0YXNrKTsKKworCWlmICh0
-YXNrID09IGN1cnJlbnQpCisJCWxvY2FsX2JoX2VuYWJsZSgpOworCisJLyoKKwkgKiBGb3JjZSBy
-ZWFsbG9jYXRpb24gb2YgdGFzayBTVkUgc3RhdGUgdG8gdGhlIGNvcnJlY3Qgc2l6ZQorCSAqIG9u
-IG5leHQgdXNlOgorCSAqLworCXN2ZV9mcmVlKHRhc2spOworCisJdGFzay0+dGhyZWFkLnN2ZV92
-bCA9IHZsOworCitvdXQ6CisJaWYgKGZsYWdzICYgUFJfU1ZFX1ZMX0lOSEVSSVQpCisJCXNldF90
-c2tfdGhyZWFkX2ZsYWcodGFzaywgVElGX1NWRV9WTF9JTkhFUklUKTsKKwllbHNlCisJCWNsZWFy
-X3Rza190aHJlYWRfZmxhZyh0YXNrLCBUSUZfU1ZFX1ZMX0lOSEVSSVQpOworCisJcmV0dXJuIDA7
-Cit9CisKIC8qCiAgKiBDYWxsZWQgZnJvbSB0aGUgcHV0X3Rhc2tfc3RydWN0KCkgcGF0aCwgd2hp
-Y2ggY2Fubm90IGdldCBoZXJlCiAgKiB1bmxlc3MgZGVhZF90YXNrIGlzIHJlYWxseSBkZWFkIGFu
-ZCBub3Qgc2NoZWR1bGFibGUuCkBAIC00ODAsNyArNjExLDcgQEAgdm9pZCBmcHNpbWRfdGhyZWFk
-X3N3aXRjaChzdHJ1Y3QgdGFza19zdHJ1Y3QgKm5leHQpCiAKIHZvaWQgZnBzaW1kX2ZsdXNoX3Ro
-cmVhZCh2b2lkKQogewotCWludCB2bDsKKwlpbnQgdmwsIHN1cHBvcnRlZF92bDsKIAogCWlmICgh
-c3lzdGVtX3N1cHBvcnRzX2Zwc2ltZCgpKQogCQlyZXR1cm47CkBAIC01MDgsNiArNjM5LDEwIEBA
-IHZvaWQgZnBzaW1kX2ZsdXNoX3RocmVhZCh2b2lkKQogCQlpZiAoV0FSTl9PTighc3ZlX3ZsX3Zh
-bGlkKHZsKSkpCiAJCQl2bCA9IFNWRV9WTF9NSU47CiAKKwkJc3VwcG9ydGVkX3ZsID0gZmluZF9z
-dXBwb3J0ZWRfdmVjdG9yX2xlbmd0aCh2bCk7CisJCWlmIChXQVJOX09OKHN1cHBvcnRlZF92bCAh
-PSB2bCkpCisJCQl2bCA9IHN1cHBvcnRlZF92bDsKKwogCQljdXJyZW50LT50aHJlYWQuc3ZlX3Zs
-ID0gdmw7CiAKIAkJLyoKZGlmZiAtLWdpdCBhL2luY2x1ZGUvdWFwaS9saW51eC9wcmN0bC5oIGIv
-aW5jbHVkZS91YXBpL2xpbnV4L3ByY3RsLmgKaW5kZXggYThkMDc1OS4uMWI2NDkwMSAxMDA2NDQK
-LS0tIGEvaW5jbHVkZS91YXBpL2xpbnV4L3ByY3RsLmgKKysrIGIvaW5jbHVkZS91YXBpL2xpbnV4
-L3ByY3RsLmgKQEAgLTE5Nyw0ICsxOTcsOSBAQCBzdHJ1Y3QgcHJjdGxfbW1fbWFwIHsKICMgZGVm
-aW5lIFBSX0NBUF9BTUJJRU5UX0xPV0VSCQkzCiAjIGRlZmluZSBQUl9DQVBfQU1CSUVOVF9DTEVB
-Ul9BTEwJNAogCisvKiBhcm02NCBTY2FsYWJsZSBWZWN0b3IgRXh0ZW5zaW9uIGNvbnRyb2xzICov
-CisjIGRlZmluZSBQUl9TVkVfU0VUX1ZMX09ORVhFQwkJKDEgPDwgMTgpIC8qIGRlZmVyIGVmZmVj
-dCB1bnRpbCBleGVjICovCisjIGRlZmluZSBQUl9TVkVfVkxfTEVOX01BU0sJCTB4ZmZmZgorIyBk
-ZWZpbmUgUFJfU1ZFX1ZMX0lOSEVSSVQJCSgxIDw8IDE3KSAvKiBpbmhlcml0IGFjcm9zcyBleGVj
-ICovCisKICNlbmRpZiAvKiBfTElOVVhfUFJDVExfSCAqLwotLSAKMi4xLjQKCl9fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QK
-a3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVk
-dS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+The EFI runtime services ABI allows EFI to make free use of the
+FPSIMD registers during EFI runtime service calls, subject to the
+callee-save requirements of the AArch64 procedure call standard.
+
+However, the SVE architecture allows upper bits of the SVE vector
+registers to be zeroed as a side-effect of FPSIMD V-register
+writes.  This means that the SVE vector registers must be saved in
+their entirety in order to avoid data loss: non-SVE-aware EFI
+implementations cannot restore them correctly.
+
+The non-IRQ case is already handled gracefully by
+kernel_neon_begin().  For the IRQ case, this patch allocates a
+suitable per-CPU stash buffer for the full SVE register state and
+uses it to preserve the affected registers around EFI calls.  It is
+currently unclear how the EFI runtime services ABI will be
+clarified with respect to SVE, so it safest to assume that the
+predicate registers and FFR must be saved and restored too.
+
+No attempt is made to restore the restore the vector length after
+a call, for now.  It is deemed rather insane for EFI to change it,
+and contemporary EFI implementations certainly won't.
+
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ arch/arm64/kernel/fpsimd.c | 67 +++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 61 insertions(+), 6 deletions(-)
+
+diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+index ae10ddb..26bd1a8 100644
+--- a/arch/arm64/kernel/fpsimd.c
++++ b/arch/arm64/kernel/fpsimd.c
+@@ -122,11 +122,13 @@ static int sve_default_vl = -1;
+ int __ro_after_init sve_max_vl = -1;
+ /* Set of available vector lengths, as vq_to_bit(vq): */
+ static __ro_after_init DECLARE_BITMAP(sve_vq_map, SVE_VQ_MAX);
++static void __percpu *efi_sve_state;
+ 
+ #else /* ! CONFIG_ARM64_SVE */
+ 
+ /* Dummy declaration for code that will be optimised out: */
+ extern __ro_after_init DECLARE_BITMAP(sve_vq_map, SVE_VQ_MAX);
++extern void __percpu *efi_sve_state;
+ 
+ #endif /* ! CONFIG_ARM64_SVE */
+ 
+@@ -551,6 +553,30 @@ int sve_verify_vq_map(void)
+ 	return ret;
+ }
+ 
++static void __init sve_efi_setup(void)
++{
++	if (!IS_ENABLED(CONFIG_EFI))
++		return;
++
++	/*
++	 * alloc_percpu() warns and prints a backtrace if this goes wrong.
++	 * This is evidence of a crippled system and we are returning void,
++	 * so no attempt is made to handle this situation here.
++	 */
++	if (!sve_vl_valid(sve_max_vl))
++		goto fail;
++
++	efi_sve_state = __alloc_percpu(
++		SVE_SIG_REGS_SIZE(sve_vq_from_vl(sve_max_vl)), SVE_VQ_BYTES);
++	if (!efi_sve_state)
++		goto fail;
++
++	return;
++
++fail:
++	panic("Cannot allocate percpu memory for EFI SVE save/restore");
++}
++
+ /*
+  * Enable SVE for EL1.
+  * Intended for use by the cpufeatures code during CPU boot.
+@@ -598,6 +624,8 @@ void __init sve_setup(void)
+ 		sve_max_vl);
+ 	pr_info("SVE: default vector length %u bytes per vector\n",
+ 		sve_default_vl);
++
++	sve_efi_setup();
+ }
+ 
+ /*
+@@ -926,6 +954,7 @@ EXPORT_SYMBOL(kernel_neon_end);
+ 
+ static DEFINE_PER_CPU(struct fpsimd_state, efi_fpsimd_state);
+ static DEFINE_PER_CPU(bool, efi_fpsimd_state_used);
++static DEFINE_PER_CPU(bool, efi_sve_state_used);
+ 
+ /*
+  * EFI runtime services support functions
+@@ -951,10 +980,24 @@ void __efi_fpsimd_begin(void)
+ 
+ 	WARN_ON(preemptible());
+ 
+-	if (may_use_simd())
++	if (may_use_simd()) {
+ 		kernel_neon_begin();
+-	else {
+-		fpsimd_save_state(this_cpu_ptr(&efi_fpsimd_state));
++	} else {
++		/*
++		 * If !efi_sve_state, SVE can't be in use yet and doesn't need
++		 * preserving:
++		 */
++		if (system_supports_sve() && likely(efi_sve_state)) {
++			char *sve_state = this_cpu_ptr(efi_sve_state);
++
++			__this_cpu_write(efi_sve_state_used, true);
++
++			sve_save_state(sve_state + sve_ffr_offset(sve_max_vl),
++				       &this_cpu_ptr(&efi_fpsimd_state)->fpsr);
++		} else {
++			fpsimd_save_state(this_cpu_ptr(&efi_fpsimd_state));
++		}
++
+ 		__this_cpu_write(efi_fpsimd_state_used, true);
+ 	}
+ }
+@@ -967,10 +1010,22 @@ void __efi_fpsimd_end(void)
+ 	if (!system_supports_fpsimd())
+ 		return;
+ 
+-	if (__this_cpu_xchg(efi_fpsimd_state_used, false))
+-		fpsimd_load_state(this_cpu_ptr(&efi_fpsimd_state));
+-	else
++	if (!__this_cpu_xchg(efi_fpsimd_state_used, false)) {
+ 		kernel_neon_end();
++	} else {
++		if (system_supports_sve() &&
++		    likely(__this_cpu_read(efi_sve_state_used))) {
++			char const *sve_state = this_cpu_ptr(efi_sve_state);
++
++			sve_load_state(sve_state + sve_ffr_offset(sve_max_vl),
++				       &this_cpu_ptr(&efi_fpsimd_state)->fpsr,
++				       sve_vq_from_vl(sve_get_vl()) - 1);
++
++			__this_cpu_write(efi_sve_state_used, false);
++		} else {
++			fpsimd_load_state(this_cpu_ptr(&efi_fpsimd_state));
++		}
++	}
+ }
+ 
+ #endif /* CONFIG_EFI */
+-- 
+2.1.4
