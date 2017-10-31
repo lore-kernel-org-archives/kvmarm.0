@@ -1,8 +1,8 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v4 19/21] KVM: arm64: Handle RAS SErrors from EL2 on
- guest exit
-Date: Tue, 31 Oct 2017 07:13:28 +0100
-Message-ID: <20171031061328.GX2166@lvm>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v4 19/21] KVM: arm64: Handle RAS SErrors from EL2 on guest
+ exit
+Date: Tue, 31 Oct 2017 06:13:21 +0000
+Message-ID: <86375z4zge.fsf@arm.com>
 References: <20171019145807.23251-1-james.morse@arm.com>
  <20171019145807.23251-20-james.morse@arm.com>
 Mime-Version: 1.0
@@ -10,20 +10,17 @@ Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0262749D60
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 02:12:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C45A49D4F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 02:11:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VFT6axHmvoy9 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 31 Oct 2017 02:12:02 -0400 (EDT)
-Received: from mail-lf0-f66.google.com (mail-lf0-f66.google.com
- [209.85.215.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A3D8549D28
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 02:12:02 -0400 (EDT)
-Received: by mail-lf0-f66.google.com with SMTP id n69so17644993lfn.2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Oct 2017 23:13:37 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20171019145807.23251-20-james.morse@arm.com>
+ with ESMTP id EVjqRoR14Hcj for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 31 Oct 2017 02:11:52 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 05CD049D28
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 02:11:52 -0400 (EDT)
+In-Reply-To: <20171019145807.23251-20-james.morse@arm.com> (James Morse's
+ message of "Thu, 19 Oct 2017 15:58:05 +0100")
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,26 +31,26 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: James Morse <james.morse@arm.com>
-Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Julien Thierry <julien.thierry@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, linux-arm-kernel@lists.infradead.org, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
+Cc: Jonathan.Zhang@cavium.com, Catalin Marinas <catalin.marinas@arm.com>, Julien Thierry <julien.thierry@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, linux-arm-kernel@lists.infradead.org, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Oct 19, 2017 at 03:58:05PM +0100, James Morse wrote:
+On Thu, Oct 19 2017 at  4:58:05 pm BST, James Morse <james.morse@arm.com> wrote:
 > We expect to have firmware-first handling of RAS SErrors, with errors
 > notified via an APEI method. For systems without firmware-first, add
 > some minimal handling to KVM.
-> 
+>
 > There are two ways KVM can take an SError due to a guest, either may be a
 > RAS error: we exit the guest due to an SError routed to EL2 by HCR_EL2.AMO,
 > or we take an SError from EL2 when we unmask PSTATE.A from __guest_exit.
-> 
+>
 > The current SError from EL2 code unmasks SError and tries to fence any
 > pending SError into a single instruction window. It then leaves SError
 > unmasked.
-> 
+>
 > With the v8.2 RAS Extensions we may take an SError for a 'corrected'
 > error, but KVM is only able to handle SError from EL2 if they occur
 > during this single instruction window...
-> 
+>
 > The RAS Extensions give us a new instruction to synchronise and
 > consume SErrors. The RAS Extensions document (ARM DDI0587),
 > '2.4.1 ESB and Unrecoverable errors' describes ESB as synchronising
@@ -61,128 +58,16 @@ On Thu, Oct 19, 2017 at 03:58:05PM +0100, James Morse wrote:
 > hardware updates to the translation tables, and instruction fetches on
 > the same PE'. This makes ESB equivalent to KVMs existing
 > 'dsb, mrs-daifclr, isb' sequence.
-> 
+>
 > Use the alternatives to synchronise and consume any SError using ESB
 > instead of unmasking and taking the SError. Set ARM_EXIT_WITH_SERROR_BIT
 > in the exit_code so that we can restart the vcpu if it turns out this
 > SError has no impact on the vcpu.
-> 
+>
 > Signed-off-by: James Morse <james.morse@arm.com>
 
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 
-> 
-> ---
-> Changes since v3:
->  * Moved that nop out of the firing line
-> 
->  arch/arm64/include/asm/kvm_emulate.h |  5 +++++
->  arch/arm64/include/asm/kvm_host.h    |  1 +
->  arch/arm64/kernel/asm-offsets.c      |  1 +
->  arch/arm64/kvm/handle_exit.c         | 10 +++++++++-
->  arch/arm64/kvm/hyp/entry.S           | 13 +++++++++++++
->  5 files changed, 29 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 8a7a838eb17a..8274d16df3cd 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -173,6 +173,11 @@ static inline phys_addr_t kvm_vcpu_get_fault_ipa(const struct kvm_vcpu *vcpu)
->  	return ((phys_addr_t)vcpu->arch.fault.hpfar_el2 & HPFAR_MASK) << 8;
->  }
->  
-> +static inline u64 kvm_vcpu_get_disr(const struct kvm_vcpu *vcpu)
-> +{
-> +	return vcpu->arch.fault.disr_el1;
-> +}
-> +
->  static inline u32 kvm_vcpu_hvc_get_imm(const struct kvm_vcpu *vcpu)
->  {
->  	return kvm_vcpu_get_hsr(vcpu) & ESR_ELx_xVC_IMM_MASK;
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 97438cc3a9ad..cf5d78ba14b5 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -89,6 +89,7 @@ struct kvm_vcpu_fault_info {
->  	u32 esr_el2;		/* Hyp Syndrom Register */
->  	u64 far_el2;		/* Hyp Fault Address Register */
->  	u64 hpfar_el2;		/* Hyp IPA Fault Address Register */
-> +	u64 disr_el1;		/* Deferred [SError] Status Register */
->  };
->  
->  /*
-> diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
-> index 71bf088f1e4b..121889c49542 100644
-> --- a/arch/arm64/kernel/asm-offsets.c
-> +++ b/arch/arm64/kernel/asm-offsets.c
-> @@ -130,6 +130,7 @@ int main(void)
->    BLANK();
->  #ifdef CONFIG_KVM_ARM_HOST
->    DEFINE(VCPU_CONTEXT,		offsetof(struct kvm_vcpu, arch.ctxt));
-> +  DEFINE(VCPU_FAULT_DISR,	offsetof(struct kvm_vcpu, arch.fault.disr_el1));
->    DEFINE(CPU_GP_REGS,		offsetof(struct kvm_cpu_context, gp_regs));
->    DEFINE(CPU_USER_PT_REGS,	offsetof(struct kvm_regs, regs));
->    DEFINE(CPU_FP_REGS,		offsetof(struct kvm_regs, fp_regs));
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index 345fdbba6c2e..e1e6cfe7d4d9 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -23,6 +23,7 @@
->  #include <linux/kvm_host.h>
->  
->  #include <asm/esr.h>
-> +#include <asm/exception.h>
->  #include <asm/kvm_asm.h>
->  #include <asm/kvm_coproc.h>
->  #include <asm/kvm_emulate.h>
-> @@ -208,7 +209,14 @@ int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
->  			*vcpu_pc(vcpu) -= adj;
->  		}
->  
-> -		kvm_inject_vabt(vcpu);
-> +		if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN)) {
-> +			u64 disr = kvm_vcpu_get_disr(vcpu);
-> +
-> +			kvm_handle_guest_serror(vcpu, disr_to_esr(disr));
-> +		} else {
-> +			kvm_inject_vabt(vcpu);
-> +		}
-> +
->  		return 1;
->  	}
->  
-> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-> index 12ee62d6d410..024c7afc78f8 100644
-> --- a/arch/arm64/kvm/hyp/entry.S
-> +++ b/arch/arm64/kvm/hyp/entry.S
-> @@ -124,6 +124,17 @@ ENTRY(__guest_exit)
->  	// Now restore the host regs
->  	restore_callee_saved_regs x2
->  
-> +alternative_if ARM64_HAS_RAS_EXTN
-> +	// If we have the RAS extensions we can consume a pending error
-> +	// without an unmask-SError and isb.
-> +	esb
-> +	mrs_s	x2, SYS_DISR_EL1
-> +	str	x2, [x1, #(VCPU_FAULT_DISR - VCPU_CONTEXT)]
-> +	cbz	x2, 1f
-> +	msr_s	SYS_DISR_EL1, xzr
-> +	orr	x0, x0, #(1<<ARM_EXIT_WITH_SERROR_BIT)
-> +1:	ret
-> +alternative_else
->  	// If we have a pending asynchronous abort, now is the
->  	// time to find out. From your VAXorcist book, page 666:
->  	// "Threaten me not, oh Evil one!  For I speak with
-> @@ -134,7 +145,9 @@ ENTRY(__guest_exit)
->  	mov	x5, x0
->  
->  	dsb	sy		// Synchronize against in-flight ld/st
-> +	nop
->  	msr	daifclr, #4	// Unmask aborts
-> +alternative_endif
->  
->  	// This is our single instruction exception window. A pending
->  	// SError is guaranteed to occur at the earliest when we unmask
-> -- 
-> 2.13.3
-> 
+	M.
+-- 
+Jazz is not dead. It just smells funny.
