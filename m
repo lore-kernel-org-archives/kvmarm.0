@@ -1,29 +1,29 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v4 20/21] KVM: arm64: Take any host SError before
- entering the guest
-Date: Tue, 31 Oct 2017 07:23:15 +0100
-Message-ID: <20171031062315.GY2166@lvm>
+Subject: Re: [PATCH v4 21/21] KVM: arm64: Trap RAS error registers and set
+ HCR_EL2's TERR & TEA
+Date: Tue, 31 Oct 2017 07:32:39 +0100
+Message-ID: <20171031063239.GZ2166@lvm>
 References: <20171019145807.23251-1-james.morse@arm.com>
- <20171019145807.23251-21-james.morse@arm.com>
+ <20171019145807.23251-22-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D997549D21
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 02:21:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DCE3849D24
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 02:31:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0kW6+kV9Bmqc for <kvmarm@lists.cs.columbia.edu>;
- Tue, 31 Oct 2017 02:21:51 -0400 (EDT)
-Received: from mail-lf0-f65.google.com (mail-lf0-f65.google.com
- [209.85.215.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BACF649D1F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 02:21:50 -0400 (EDT)
-Received: by mail-lf0-f65.google.com with SMTP id n69so17666706lfn.2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Oct 2017 23:23:26 -0700 (PDT)
+ with ESMTP id ffHCZEOxfyDZ for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 31 Oct 2017 02:31:15 -0400 (EDT)
+Received: from mail-lf0-f68.google.com (mail-lf0-f68.google.com
+ [209.85.215.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9D5B249D23
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 02:31:15 -0400 (EDT)
+Received: by mail-lf0-f68.google.com with SMTP id w21so17696327lfc.6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Oct 2017 23:32:50 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <20171019145807.23251-21-james.morse@arm.com>
+In-Reply-To: <20171019145807.23251-22-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -37,60 +37,107 @@ To: James Morse <james.morse@arm.com>
 Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Julien Thierry <julien.thierry@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, linux-arm-kernel@lists.infradead.org, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi James,
-
-On Thu, Oct 19, 2017 at 03:58:06PM +0100, James Morse wrote:
-> On VHE systems KVM masks SError before switching the VBAR value. Any
-> host RAS error that the CPU knew about before world-switch may become
-> pending as an SError during world-switch, and only be taken once we enter
-> the guest.
+On Thu, Oct 19, 2017 at 03:58:07PM +0100, James Morse wrote:
+> From: Dongjiu Geng <gengdongjiu@huawei.com>
 > 
-> Until KVM can take RAS SErrors during world switch, add an ESB to
-> force any RAS errors to be synchronised and taken on the host before
-> we enter world switch.
+> ARMv8.2 adds a new bit HCR_EL2.TEA which routes synchronous external
+> aborts to EL2, and adds a trap control bit HCR_EL2.TERR which traps
+> all Non-secure EL1&0 error record accesses to EL2.
 > 
-> RAS errors that become pending during world switch are still taken
-> once we enter the guest.
+> This patch enables the two bits for the guest OS, guaranteeing that
+> KVM takes external aborts and traps attempts to access the physical
+> error registers.
 > 
+> ERRIDR_EL1 advertises the number of error records, we return
+> zero meaning we can treat all the other registers as RAZ/WI too.
+> 
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> [removed specific emulation, use trap_raz_wi() directly for everything,
+>  rephrased parts of the commit message]
 > Signed-off-by: James Morse <james.morse@arm.com>
+
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+
 > ---
->  arch/arm64/include/asm/kvm_host.h | 1 +
->  1 file changed, 1 insertion(+)
+>  arch/arm64/include/asm/kvm_arm.h     |  2 ++
+>  arch/arm64/include/asm/kvm_emulate.h |  7 +++++++
+>  arch/arm64/include/asm/sysreg.h      | 10 ++++++++++
+>  arch/arm64/kvm/sys_regs.c            | 10 ++++++++++
+>  4 files changed, 29 insertions(+)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index cf5d78ba14b5..5dc6f2877762 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -392,6 +392,7 @@ static inline void __cpu_init_stage2(void)
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index 61d694c2eae5..1188272003c4 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -23,6 +23,8 @@
+>  #include <asm/types.h>
 >  
->  static inline void kvm_arm_vhe_guest_enter(void)
->  {
-> +	esb();
-
-I don't fully appreciate what the point of this is?
-
-As I understand it, our fundamental goal here is to try to distinguish
-between errors happening on the host or in the guest.
-
-If that's correct, then why don't we do it at the last possible moment
-when we still have a scratch register left, in the world switch code
-itself, and in the case abort the guest entry and report back a "host
-SError" return code.
-
-If the answer to that question is, that since we will always have some
-instruction window before entering the guest and things will never be
-precise anyway, so we do it here where it's more convenient, then my
-counter-question would be why we do it at all then?  If we're not
-precise anyway, then why not simply take our chances and hope that the
-hardware delivers the SError before we mask them, and if not, tough
-luck?
-
->  	local_daif_mask();
+>  /* Hyp Configuration Register (HCR) bits */
+> +#define HCR_TEA		(UL(1) << 37)
+> +#define HCR_TERR	(UL(1) << 36)
+>  #define HCR_E2H		(UL(1) << 34)
+>  #define HCR_ID		(UL(1) << 33)
+>  #define HCR_CD		(UL(1) << 32)
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 8274d16df3cd..2cd666a9d47e 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -47,6 +47,13 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+>  	vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS;
+>  	if (is_kernel_in_hyp_mode())
+>  		vcpu->arch.hcr_el2 |= HCR_E2H;
+> +	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN)) {
+> +		/* route synchronous external abort exceptions to EL2 */
+> +		vcpu->arch.hcr_el2 |= HCR_TEA;
+> +		/* trap error record accesses */
+> +		vcpu->arch.hcr_el2 |= HCR_TERR;
+> +	}
+> +
+>  	if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features))
+>  		vcpu->arch.hcr_el2 &= ~HCR_RW;
 >  }
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 1b8b9012234d..0d3c5c7bb425 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -169,6 +169,16 @@
+>  #define SYS_AFSR0_EL1			sys_reg(3, 0, 5, 1, 0)
+>  #define SYS_AFSR1_EL1			sys_reg(3, 0, 5, 1, 1)
+>  #define SYS_ESR_EL1			sys_reg(3, 0, 5, 2, 0)
+> +
+> +#define SYS_ERRIDR_EL1			sys_reg(3, 0, 5, 3, 0)
+> +#define SYS_ERRSELR_EL1			sys_reg(3, 0, 5, 3, 1)
+> +#define SYS_ERXFR_EL1			sys_reg(3, 0, 5, 4, 0)
+> +#define SYS_ERXCTLR_EL1			sys_reg(3, 0, 5, 4, 1)
+> +#define SYS_ERXSTATUS_EL1		sys_reg(3, 0, 5, 4, 2)
+> +#define SYS_ERXADDR_EL1			sys_reg(3, 0, 5, 4, 3)
+> +#define SYS_ERXMISC0_EL1		sys_reg(3, 0, 5, 5, 0)
+> +#define SYS_ERXMISC1_EL1		sys_reg(3, 0, 5, 5, 1)
+> +
+>  #define SYS_FAR_EL1			sys_reg(3, 0, 6, 0, 0)
+>  #define SYS_PAR_EL1			sys_reg(3, 0, 7, 4, 0)
+>  
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 713275b501ce..2b3b16bf5275 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -953,6 +953,16 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	{ SYS_DESC(SYS_AFSR0_EL1), access_vm_reg, reset_unknown, AFSR0_EL1 },
+>  	{ SYS_DESC(SYS_AFSR1_EL1), access_vm_reg, reset_unknown, AFSR1_EL1 },
+>  	{ SYS_DESC(SYS_ESR_EL1), access_vm_reg, reset_unknown, ESR_EL1 },
+> +
+> +	{ SYS_DESC(SYS_ERRIDR_EL1), trap_raz_wi },
+> +	{ SYS_DESC(SYS_ERRSELR_EL1), trap_raz_wi },
+> +	{ SYS_DESC(SYS_ERXFR_EL1), trap_raz_wi },
+> +	{ SYS_DESC(SYS_ERXCTLR_EL1), trap_raz_wi },
+> +	{ SYS_DESC(SYS_ERXSTATUS_EL1), trap_raz_wi },
+> +	{ SYS_DESC(SYS_ERXADDR_EL1), trap_raz_wi },
+> +	{ SYS_DESC(SYS_ERXMISC0_EL1), trap_raz_wi },
+> +	{ SYS_DESC(SYS_ERXMISC1_EL1), trap_raz_wi },
+> +
+>  	{ SYS_DESC(SYS_FAR_EL1), access_vm_reg, reset_unknown, FAR_EL1 },
+>  	{ SYS_DESC(SYS_PAR_EL1), NULL, reset_unknown, PAR_EL1 },
 >  
 > -- 
 > 2.13.3
 > 
-
-Thanks,
--Christoffer
