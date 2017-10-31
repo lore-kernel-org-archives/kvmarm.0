@@ -1,25 +1,31 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 17/21] KVM: arm64: Save ESR_EL2 on guest SError
-Date: Tue, 31 Oct 2017 05:47:36 +0000
-Message-ID: <86efpj50nb.fsf@arm.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH v4 15/21] KVM: arm64: Set an impdef ESR for
+ Virtual-SError using VSESR_EL2.
+Date: Tue, 31 Oct 2017 06:48:40 +0100
+Message-ID: <20171031054840.GV2166@lvm>
 References: <20171019145807.23251-1-james.morse@arm.com>
- <20171019145807.23251-18-james.morse@arm.com> <86po943puu.fsf@arm.com>
+ <20171019145807.23251-16-james.morse@arm.com>
+ <20171030075951.GT2166@lvm> <20171030105140.GU2166@lvm>
+ <59F748D1.4030507@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0529949D28
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 01:46:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0462D49D28
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 01:47:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id icOTAldsINjs for <kvmarm@lists.cs.columbia.edu>;
- Tue, 31 Oct 2017 01:46:10 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C30E749D20
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 01:46:10 -0400 (EDT)
-In-Reply-To: <86po943puu.fsf@arm.com> (Marc Zyngier's message of "Tue, 31 Oct
- 2017 04:26:01 +0000")
+ with ESMTP id rb9EPJ-LRKAs for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 31 Oct 2017 01:47:16 -0400 (EDT)
+Received: from mail-lf0-f53.google.com (mail-lf0-f53.google.com
+ [209.85.215.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BFDD541185
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 01:47:15 -0400 (EDT)
+Received: by mail-lf0-f53.google.com with SMTP id 75so17599771lfx.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Oct 2017 22:48:50 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <59F748D1.4030507@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,74 +36,103 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: James Morse <james.morse@arm.com>
-Cc: Jonathan.Zhang@cavium.com, Catalin Marinas <catalin.marinas@arm.com>, Julien Thierry <julien.thierry@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, linux-arm-kernel@lists.infradead.org, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
+Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Julien Thierry <julien.thierry@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, linux-arm-kernel@lists.infradead.org, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Oct 31 2017 at  4:26:01 am GMT, Marc Zyngier <marc.zyngier@arm.com> wrote:
-> On Thu, Oct 19 2017 at  4:58:03 pm BST, James Morse <james.morse@arm.com> wrote:
->> When we exit a guest due to an SError the vcpu fault info isn't updated
->> with the ESR. Today this is only done for traps.
->>
->> The v8.2 RAS Extensions define ISS values for SError. Update the vcpu's
->> fault_info with the ESR on SError so that handle_exit() can determine
->> if this was a RAS SError and decode its severity.
->>
->> Signed-off-by: James Morse <james.morse@arm.com>
->> ---
->>  arch/arm64/kvm/hyp/switch.c | 15 ++++++++++++---
->>  1 file changed, 12 insertions(+), 3 deletions(-)
->>
->> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
->> index af37658223a0..cba6d8ac105c 100644
->> --- a/arch/arm64/kvm/hyp/switch.c
->> +++ b/arch/arm64/kvm/hyp/switch.c
->> @@ -230,13 +230,20 @@ static bool __hyp_text __translate_far_to_hpfar(u64 far, u64 *hpfar)
->>  	return true;
->>  }
->>  
->> +static void __hyp_text __populate_fault_info_esr(struct kvm_vcpu *vcpu)
->> +{
->> +	vcpu->arch.fault.esr_el2 = read_sysreg_el2(esr);
->> +}
->> +
->>  static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
->>  {
->> -	u64 esr = read_sysreg_el2(esr);
->> -	u8 ec = ESR_ELx_EC(esr);
->> +	u8 ec;
->> +	u64 esr;
->>  	u64 hpfar, far;
->>  
->> -	vcpu->arch.fault.esr_el2 = esr;
->> +	__populate_fault_info_esr(vcpu);
->> +	esr = vcpu->arch.fault.esr_el2;
->> +	ec = ESR_ELx_EC(esr);
->>  
->>  	if (ec != ESR_ELx_EC_DABT_LOW && ec != ESR_ELx_EC_IABT_LOW)
->>  		return true;
->> @@ -325,6 +332,8 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
->>  	 */
->>  	if (exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
->>  		goto again;
->> +	else if (ARM_EXCEPTION_CODE(exit_code) == ARM_EXCEPTION_EL1_SERROR)
->> +		__populate_fault_info_esr(vcpu);
->>  
->>  	if (static_branch_unlikely(&vgic_v2_cpuif_trap) &&
->>  	    exit_code == ARM_EXCEPTION_TRAP) {
->
-> With this patch, the only case were we don't save ESR_EL2 is when we
-> take an interrupt. I think we should bite the bullet and make it
-> slightly more streamlined, always saving ESR_EL2.
+On Mon, Oct 30, 2017 at 03:44:17PM +0000, James Morse wrote:
+> Hi Christoffer,
+> 
+> On 30/10/17 10:51, Christoffer Dall wrote:
+> > On Mon, Oct 30, 2017 at 08:59:51AM +0100, Christoffer Dall wrote:
+> >> On Thu, Oct 19, 2017 at 03:58:01PM +0100, James Morse wrote:
+> >>> Prior to v8.2's RAS Extensions, the HCR_EL2.VSE 'virtual SError' feature
+> >>> generated an SError with an implementation defined ESR_EL1.ISS, because we
+> >>> had no mechanism to specify the ESR value.
+> >>>
+> >>> On Juno this generates an all-zero ESR, the most significant bit 'ISV'
+> >>> is clear indicating the remainder of the ISS field is invalid.
+> >>>
+> >>> With the RAS Extensions we have a mechanism to specify this value, and the
+> >>> most significant bit has a new meaning: 'IDS - Implementation Defined
+> >>> Syndrome'. An all-zero SError ESR now means: 'RAS error: Uncategorized'
+> >>> instead of 'no valid ISS'.
+> >>>
+> >>> Add KVM support for the VSESR_EL2 register to specify an ESR value when
+> >>> HCR_EL2.VSE generates a virtual SError. Change kvm_inject_vabt() to
+> >>> specify an implementation-defined value.
+> >>>
+> >>> We only need to restore the VSESR_EL2 value when HCR_EL2.VSE is set, KVM
+> >>> save/restores this bit during __deactivate_traps() and hardware clears the
+> >>> bit once the guest has consumed the virtual-SError.
+> >>>
+> >>> Future patches may add an API (or KVM CAP) to pend a virtual SError with
+> >>> a specified ESR.
+> 
+> 
+> >>> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> >>> index 945e79c641c4..af37658223a0 100644
+> >>> --- a/arch/arm64/kvm/hyp/switch.c
+> >>> +++ b/arch/arm64/kvm/hyp/switch.c
+> >>> @@ -86,6 +86,10 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+> >>>  		isb();
+> >>>  	}
+> >>>  	write_sysreg(val, hcr_el2);
+> >>> +
+> >>> +	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN) && (val & HCR_VSE))
+> >>> +		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
+> >>> +
+> 
+> >> Just a heads up: If my optimization work gets merged, that will
+> >> eventually move stuff like this in to load/put hooks for system
+> >> registers, but I can deal with this easily, also adding a direct write
+> >> in pend_guest_serror when moving the logic around.
+> 
+> Sure. This would always be called when the vcpu is loaded, so yes it should end
+> up as a direct write to the system register.
+> 
+> 
+> >> However, if we start architecting something more complex, it would be
+> >> good to keep in mind how to maintain minimum work on the switching path
+> >> after we've optimized the hypervisor.
+> 
+> I think gengdongjiu's trick of only restoring VSESR if HCR_EL2.VSE is set is the
+> best we can do here. (Hence the Celebrate-Contribution tag).
 
-Otherwise, an alternative would be to write something like:
+yes, I agree.
 
-	if (ARM_EXCEPTION_CODE(exit_code) != ARM_EXCEPTION_IRQ)
-        	vcpu->arch.fault.esr_el2 = read_sysreg_el2(esr);
+> 
+> For VDISR_EL2 we can probably only save/restore it if its non-zero. On most
+> systems it will never be touched so the cost is testing that whenever we exit
+> the guest/unload the vcpu.
+> 
 
-which still avoids saving it, and is a lot more readable.
+I think VDISR_EL2 should just be saved/restored in vcpu_put/load after
+the optimization.
+
+> 
+> > Actually, after thinking about this, if the guest can only see this via
+> > the ESR if we set the HCR_EL2.VSE, wouldn't it make sense to just set
+> > this value in pend_guest_serror, and if we're on a non-VHE system --
+> > assuming that's something we want to support with this 8.2 feature
+> > -- we jump to EL2 and back to set the value?
+> 
+> It thought this was the 'eventually ... direct write' above.
+
+Yes, that's what I mean.
+
+> Once your load/put hooks are merged? Yes, just write it straight to the CPU
+> register and set the guests HCR_EL2.VSE.
+> 
+> Now? Wouldn't this get lost if we reschedule onto another cpu...
+> 
+> 
+
+That's why we'd also save/restore it in vcpu_put/vcpu_load.
+
+So, for VSESR, we'd save/restore it in put/load (conditionally on VSE
+being set if we like), and we'd also set it from pend_guest_serror.
+
+For VDISR, it's just saved/restored in put/load.
 
 Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny.
+-Christoffer
