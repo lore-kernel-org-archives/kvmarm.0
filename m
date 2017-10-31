@@ -1,7 +1,7 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v5 12/30] arm64/sve: Low-level CPU setup
-Date: Tue, 31 Oct 2017 15:51:04 +0000
-Message-ID: <1509465082-30427-13-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v5 01/30] regset: Add support for dynamically sized regsets
+Date: Tue, 31 Oct 2017 15:50:53 +0000
+Message-ID: <1509465082-30427-2-git-send-email-Dave.Martin@arm.com>
 References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -10,54 +10,211 @@ Return-path: <linux-arch-owner@vger.kernel.org>
 In-Reply-To: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
 Sender: linux-arch-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org, Oleg Nesterov <oleg@redhat.com>, Alexander Viro <viro@zeniv.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Dmitry Safonov <dsafonov@virtuozzo.com>, "H. J. Lu" <hjl.tools@gmail.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-To enable the kernel to use SVE, SVE traps from EL1 to EL2 must be
-disabled.  To take maximum advantage of the hardware, the full
-available vector length also needs to be enabled for EL1 by
-programming ZCR_EL2.LEN.  (The kernel will program ZCR_EL1.LEN as
-required, but this cannot override the limit set by ZCR_EL2.)
+Currently the regset API doesn't allow for the possibility that
+regsets (or at least, the amount of meaningful data in a regset)
+may change in size.
 
-This patch makes the appropriate changes to the EL2 early setup
-code.
+In particular, this results in useless padding being added to
+coredumps if a regset's current size is smaller than its
+theoretical maximum size.
+
+This patch adds a get_size() function to struct user_regset.
+Individual regset implementations can implement this function to
+return the current size of the regset data.  A regset_size()
+function is added to provide callers with an abstract interface for
+determining the size of a regset without needing to know whether
+the regset is dynamically sized or not.
+
+The only affected user of this interface is the ELF coredump code:
+This patch ports ELF coredump to dump regsets with their actual
+size in the coredump.  This has no effect except for new regsets
+that are dynamically sized and provide a get_size() implementation.
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Alex Bennée <alex.bennee@linaro.org>
+Cc: Oleg Nesterov <oleg@redhat.com>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Dmitry Safonov <dsafonov@virtuozzo.com>
+Cc: H. J. Lu <hjl.tools@gmail.com>
 
 ---
 
-**Dropped at v3** Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-(Due to significant changes to the logic.)
----
- arch/arm64/kernel/head.S | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+**Dropped** Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+**Dropped** Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+(due to bug fix applied against v4 of this patch.)
 
-diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
-index cfa90a4..67e86a0 100644
---- a/arch/arm64/kernel/head.S
-+++ b/arch/arm64/kernel/head.S
-@@ -524,8 +524,19 @@ CPU_LE(	movk	x0, #0x30d0, lsl #16	)	// Clear EE and E0E on LE systems
- 	mov	x0, #0x33ff
- 	msr	cptr_el2, x0			// Disable copro. traps to EL2
+Changes since v4
+----------------
+
+ * [bugfix] Due to some mis-renaming, the previous version of this
+   patch changed NT_PRFPREG dumping behaviour in some situations on
+   x86.
+
+   To reduce the scope for confusion, the local variable previously
+   named regset_size that was renamed (ambiguously) to size, is
+   renamed again, to regset0_size.  This makes it clear exactly what
+   this variable is referring to.  The reference to this variable
+   from inside the regset loop is fixed to point back to it.
+---
+ fs/binfmt_elf.c        | 10 ++++----
+ include/linux/regset.h | 67 ++++++++++++++++++++++++++++++++++++++++++++------
+ 2 files changed, 65 insertions(+), 12 deletions(-)
+
+diff --git a/fs/binfmt_elf.c b/fs/binfmt_elf.c
+index 73b01e4..c697882 100644
+--- a/fs/binfmt_elf.c
++++ b/fs/binfmt_elf.c
+@@ -1699,7 +1699,7 @@ static int fill_thread_core_info(struct elf_thread_core_info *t,
+ 				 long signr, size_t *total)
+ {
+ 	unsigned int i;
+-	unsigned int regset_size = view->regsets[0].n * view->regsets[0].size;
++	unsigned int regset0_size = regset_size(t->task, &view->regsets[0]);
  
-+	/* SVE register access */
-+	mrs	x1, id_aa64pfr0_el1
-+	ubfx	x1, x1, #ID_AA64PFR0_SVE_SHIFT, #4
-+	cbz	x1, 7f
-+
-+	bic	x0, x0, #CPTR_EL2_TZ		// Also disable SVE traps
-+	msr	cptr_el2, x0			// Disable copro. traps to EL2
-+	isb
-+	mov	x1, #ZCR_ELx_LEN_MASK		// SVE: Enable full vector
-+	msr_s	SYS_ZCR_EL2, x1			// length for EL1.
-+
- 	/* Hypervisor stub */
--	adr_l	x0, __hyp_stub_vectors
-+7:	adr_l	x0, __hyp_stub_vectors
- 	msr	vbar_el2, x0
+ 	/*
+ 	 * NT_PRSTATUS is the one special case, because the regset data
+@@ -1708,11 +1708,11 @@ static int fill_thread_core_info(struct elf_thread_core_info *t,
+ 	 * We assume that regset 0 is NT_PRSTATUS.
+ 	 */
+ 	fill_prstatus(&t->prstatus, t->task, signr);
+-	(void) view->regsets[0].get(t->task, &view->regsets[0], 0, regset_size,
++	(void) view->regsets[0].get(t->task, &view->regsets[0], 0, regset0_size,
+ 				    &t->prstatus.pr_reg, NULL);
  
- 	/* spsr */
+ 	fill_note(&t->notes[0], "CORE", NT_PRSTATUS,
+-		  PRSTATUS_SIZE(t->prstatus, regset_size), &t->prstatus);
++		  PRSTATUS_SIZE(t->prstatus, regset0_size), &t->prstatus);
+ 	*total += notesize(&t->notes[0]);
+ 
+ 	do_thread_regset_writeback(t->task, &view->regsets[0]);
+@@ -1728,7 +1728,7 @@ static int fill_thread_core_info(struct elf_thread_core_info *t,
+ 		if (regset->core_note_type && regset->get &&
+ 		    (!regset->active || regset->active(t->task, regset))) {
+ 			int ret;
+-			size_t size = regset->n * regset->size;
++			size_t size = regset_size(t->task, regset);
+ 			void *data = kmalloc(size, GFP_KERNEL);
+ 			if (unlikely(!data))
+ 				return 0;
+@@ -1743,7 +1743,7 @@ static int fill_thread_core_info(struct elf_thread_core_info *t,
+ 						  size, data);
+ 				else {
+ 					SET_PR_FPVALID(&t->prstatus,
+-							1, regset_size);
++							1, regset0_size);
+ 					fill_note(&t->notes[i], "CORE",
+ 						  NT_PRFPREG, size, data);
+ 				}
+diff --git a/include/linux/regset.h b/include/linux/regset.h
+index 8e0c9fe..494ceda 100644
+--- a/include/linux/regset.h
++++ b/include/linux/regset.h
+@@ -107,6 +107,28 @@ typedef int user_regset_writeback_fn(struct task_struct *target,
+ 				     int immediate);
+ 
+ /**
++ * user_regset_get_size_fn - type of @get_size function in &struct user_regset
++ * @target:	thread being examined
++ * @regset:	regset being examined
++ *
++ * This call is optional; usually the pointer is %NULL.
++ *
++ * When provided, this function must return the current size of regset
++ * data, as observed by the @get function in &struct user_regset.  The
++ * value returned must be a multiple of @size.  The returned size is
++ * required to be valid only until the next time (if any) @regset is
++ * modified for @target.
++ *
++ * This function is intended for dynamically sized regsets.  A regset
++ * that is statically sized does not need to implement it.
++ *
++ * This function should not be called directly: instead, callers should
++ * call regset_size() to determine the current size of a regset.
++ */
++typedef unsigned int user_regset_get_size_fn(struct task_struct *target,
++					     const struct user_regset *regset);
++
++/**
+  * struct user_regset - accessible thread CPU state
+  * @n:			Number of slots (registers).
+  * @size:		Size in bytes of a slot (register).
+@@ -117,19 +139,33 @@ typedef int user_regset_writeback_fn(struct task_struct *target,
+  * @set:		Function to store values.
+  * @active:		Function to report if regset is active, or %NULL.
+  * @writeback:		Function to write data back to user memory, or %NULL.
++ * @get_size:		Function to return the regset's size, or %NULL.
+  *
+  * This data structure describes a machine resource we call a register set.
+  * This is part of the state of an individual thread, not necessarily
+  * actual CPU registers per se.  A register set consists of a number of
+  * similar slots, given by @n.  Each slot is @size bytes, and aligned to
+- * @align bytes (which is at least @size).
++ * @align bytes (which is at least @size).  For dynamically-sized
++ * regsets, @n must contain the maximum possible number of slots for the
++ * regset, and @get_size must point to a function that returns the
++ * current regset size.
+  *
+- * These functions must be called only on the current thread or on a
+- * thread that is in %TASK_STOPPED or %TASK_TRACED state, that we are
+- * guaranteed will not be woken up and return to user mode, and that we
+- * have called wait_task_inactive() on.  (The target thread always might
+- * wake up for SIGKILL while these functions are working, in which case
+- * that thread's user_regset state might be scrambled.)
++ * Callers that need to know only the current size of the regset and do
++ * not care about its internal structure should call regset_size()
++ * instead of inspecting @n or calling @get_size.
++ *
++ * For backward compatibility, the @get and @set methods must pad to, or
++ * accept, @n * @size bytes, even if the current regset size is smaller.
++ * The precise semantics of these operations depend on the regset being
++ * accessed.
++ *
++ * The functions to which &struct user_regset members point must be
++ * called only on the current thread or on a thread that is in
++ * %TASK_STOPPED or %TASK_TRACED state, that we are guaranteed will not
++ * be woken up and return to user mode, and that we have called
++ * wait_task_inactive() on.  (The target thread always might wake up for
++ * SIGKILL while these functions are working, in which case that
++ * thread's user_regset state might be scrambled.)
+  *
+  * The @pos argument must be aligned according to @align; the @count
+  * argument must be a multiple of @size.  These functions are not
+@@ -156,6 +192,7 @@ struct user_regset {
+ 	user_regset_set_fn		*set;
+ 	user_regset_active_fn		*active;
+ 	user_regset_writeback_fn	*writeback;
++	user_regset_get_size_fn		*get_size;
+ 	unsigned int			n;
+ 	unsigned int 			size;
+ 	unsigned int 			align;
+@@ -371,5 +408,21 @@ static inline int copy_regset_from_user(struct task_struct *target,
+ 	return regset->set(target, regset, offset, size, NULL, data);
+ }
+ 
++/**
++ * regset_size - determine the current size of a regset
++ * @target:	thread to be examined
++ * @regset:	regset to be examined
++ *
++ * Note that the returned size is valid only until the next time
++ * (if any) @regset is modified for @target.
++ */
++static inline unsigned int regset_size(struct task_struct *target,
++				       const struct user_regset *regset)
++{
++	if (!regset->get_size)
++		return regset->n * regset->size;
++	else
++		return regset->get_size(target, regset);
++}
+ 
+ #endif	/* <linux/regset.h> */
 -- 
 2.1.4
