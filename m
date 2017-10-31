@@ -1,696 +1,305 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v5 21/30] arm64/sve: ptrace and ELF coredump support
-Date: Tue, 31 Oct 2017 15:51:13 +0000
-Message-ID: <1509465082-30427-22-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v5 18/30] arm64/sve: Probe SVE capabilities and usable vector
+ lengths
+Date: Tue, 31 Oct 2017 15:51:10 +0000
+Message-ID: <1509465082-30427-19-git-send-email-Dave.Martin@arm.com>
 References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-arch-owner@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B85449D4F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 11:50:38 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 9MUM23Mm3pVP for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 31 Oct 2017 11:50:36 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 62C9049D6E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 11:50:30 -0400 (EDT)
 In-Reply-To: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
-Sender: linux-arch-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org, Alan Hayward <alan.hayward@arm.com>
+Cc: linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch defines and implements a new regset NT_ARM_SVE, which
-describes a thread's SVE register state.  This allows a debugger to
-manipulate the SVE state, as well as being included in ELF
-coredumps for post-mortem debugging.
-
-Because the regset size and layout are dependent on the thread's
-current vector length, it is not possible to define a C struct to
-describe the regset contents as is done for existing regsets.
-Instead, and for the same reasons, NT_ARM_SVE is based on the
-freeform variable-layout approach used for the SVE signal frame.
-
-Additionally, to reduce debug overhead when debugging threads that
-might or might not have live SVE register state, NT_ARM_SVE may be
-presented in one of two different formats: the old struct
-user_fpsimd_state format is embedded for describing the state of a
-thread with no live SVE state, whereas a new variable-layout
-structure is embedded for describing live SVE state.  This avoids a
-debugger needing to poll NT_PRFPREG in addition to NT_ARM_SVE, and
-allows existing userspace code to handle the non-SVE case without
-too much modification.
-
-For this to work, NT_ARM_SVE is defined with a fixed-format header
-of type struct user_sve_header, which the recipient can use to
-figure out the content, size and layout of the reset of the regset.
-Accessor macros are defined to allow the vector-length-dependent
-parts of the regset to be manipulated.
-
-Signed-off-by: Alan Hayward <alan.hayward@arm.com>
-Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Alex Bennée <alex.bennee@linaro.org>
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>
-
----
-
-**Dropped at v3** Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-See v3 posting for history.
----
- arch/arm64/include/asm/fpsimd.h      |  12 +-
- arch/arm64/include/uapi/asm/ptrace.h | 138 +++++++++++++++++
- arch/arm64/kernel/fpsimd.c           |  60 ++++++++
- arch/arm64/kernel/ptrace.c           | 280 ++++++++++++++++++++++++++++++++++-
- include/uapi/linux/elf.h             |   1 +
- 5 files changed, 482 insertions(+), 9 deletions(-)
-
-diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
-index d8e0dc9..d754e5a 100644
---- a/arch/arm64/include/asm/fpsimd.h
-+++ b/arch/arm64/include/asm/fpsimd.h
-@@ -38,13 +38,16 @@ struct fpsimd_state {
- 			__uint128_t vregs[32];
- 			u32 fpsr;
- 			u32 fpcr;
-+			/*
-+			 * For ptrace compatibility, pad to next 128-bit
-+			 * boundary here if extending this struct.
-+			 */
- 		};
- 	};
- 	/* the id of the last cpu to have restored this state */
- 	unsigned int cpu;
- };
- 
--
- #if defined(__KERNEL__) && defined(CONFIG_COMPAT)
- /* Masks for extracting the FPSR and FPCR from the FPSCR */
- #define VFP_FPSCR_STAT_MASK	0xf800009f
-@@ -88,6 +91,10 @@ extern size_t sve_state_size(struct task_struct const *task);
- 
- extern void sve_alloc(struct task_struct *task);
- extern void fpsimd_release_task(struct task_struct *task);
-+extern void fpsimd_sync_to_sve(struct task_struct *task);
-+extern void sve_sync_to_fpsimd(struct task_struct *task);
-+extern void sve_sync_from_fpsimd_zeropad(struct task_struct *task);
-+
- extern int sve_set_vector_length(struct task_struct *task,
- 				 unsigned long vl, unsigned long flags);
- 
-@@ -104,6 +111,9 @@ extern void __init sve_setup(void);
- 
- static inline void sve_alloc(struct task_struct *task) { }
- static inline void fpsimd_release_task(struct task_struct *task) { }
-+static inline void sve_sync_to_fpsimd(struct task_struct *task) { }
-+static inline void sve_sync_from_fpsimd_zeropad(struct task_struct *task) { }
-+
- static inline void sve_init_vq_map(void) { }
- static inline void sve_update_vq_map(void) { }
- static inline int sve_verify_vq_map(void) { return 0; }
-diff --git a/arch/arm64/include/uapi/asm/ptrace.h b/arch/arm64/include/uapi/asm/ptrace.h
-index 3697d95..e708558 100644
---- a/arch/arm64/include/uapi/asm/ptrace.h
-+++ b/arch/arm64/include/uapi/asm/ptrace.h
-@@ -22,6 +22,7 @@
- #include <linux/types.h>
- 
- #include <asm/hwcap.h>
-+#include <asm/sigcontext.h>
- 
- 
- /*
-@@ -62,6 +63,8 @@
- 
- #ifndef __ASSEMBLY__
- 
-+#include <linux/prctl.h>
-+
- /*
-  * User structures for general purpose, floating point and debug registers.
-  */
-@@ -89,6 +92,141 @@ struct user_hwdebug_state {
- 	}		dbg_regs[16];
- };
- 
-+/* SVE/FP/SIMD state (NT_ARM_SVE) */
-+
-+struct user_sve_header {
-+	__u32 size; /* total meaningful regset content in bytes */
-+	__u32 max_size; /* maxmium possible size for this thread */
-+	__u16 vl; /* current vector length */
-+	__u16 max_vl; /* maximum possible vector length */
-+	__u16 flags;
-+	__u16 __reserved;
-+};
-+
-+/* Definitions for user_sve_header.flags: */
-+#define SVE_PT_REGS_MASK		(1 << 0)
-+
-+#define SVE_PT_REGS_FPSIMD		0
-+#define SVE_PT_REGS_SVE			SVE_PT_REGS_MASK
-+
-+/*
-+ * Common SVE_PT_* flags:
-+ * These must be kept in sync with prctl interface in <linux/ptrace.h>
-+ */
-+#define SVE_PT_VL_INHERIT		(PR_SVE_VL_INHERIT >> 16)
-+#define SVE_PT_VL_ONEXEC		(PR_SVE_SET_VL_ONEXEC >> 16)
-+
-+
-+/*
-+ * The remainder of the SVE state follows struct user_sve_header.  The
-+ * total size of the SVE state (including header) depends on the
-+ * metadata in the header:  SVE_PT_SIZE(vq, flags) gives the total size
-+ * of the state in bytes, including the header.
-+ *
-+ * Refer to <asm/sigcontext.h> for details of how to pass the correct
-+ * "vq" argument to these macros.
-+ */
-+
-+/* Offset from the start of struct user_sve_header to the register data */
-+#define SVE_PT_REGS_OFFSET					\
-+	((sizeof(struct sve_context) + (SVE_VQ_BYTES - 1))	\
-+		/ SVE_VQ_BYTES * SVE_VQ_BYTES)
-+
-+/*
-+ * The register data content and layout depends on the value of the
-+ * flags field.
-+ */
-+
-+/*
-+ * (flags & SVE_PT_REGS_MASK) == SVE_PT_REGS_FPSIMD case:
-+ *
-+ * The payload starts at offset SVE_PT_FPSIMD_OFFSET, and is of type
-+ * struct user_fpsimd_state.  Additional data might be appended in the
-+ * future: use SVE_PT_FPSIMD_SIZE(vq, flags) to compute the total size.
-+ * SVE_PT_FPSIMD_SIZE(vq, flags) will never be less than
-+ * sizeof(struct user_fpsimd_state).
-+ */
-+
-+#define SVE_PT_FPSIMD_OFFSET		SVE_PT_REGS_OFFSET
-+
-+#define SVE_PT_FPSIMD_SIZE(vq, flags)	(sizeof(struct user_fpsimd_state))
-+
-+/*
-+ * (flags & SVE_PT_REGS_MASK) == SVE_PT_REGS_SVE case:
-+ *
-+ * The payload starts at offset SVE_PT_SVE_OFFSET, and is of size
-+ * SVE_PT_SVE_SIZE(vq, flags).
-+ *
-+ * Additional macros describe the contents and layout of the payload.
-+ * For each, SVE_PT_SVE_x_OFFSET(args) is the start offset relative to
-+ * the start of struct user_sve_header, and SVE_PT_SVE_x_SIZE(args) is
-+ * the size in bytes:
-+ *
-+ *	x	type				description
-+ *	-	----				-----------
-+ *	ZREGS		\
-+ *	ZREG		|
-+ *	PREGS		| refer to <asm/sigcontext.h>
-+ *	PREG		|
-+ *	FFR		/
-+ *
-+ *	FPSR	uint32_t			FPSR
-+ *	FPCR	uint32_t			FPCR
-+ *
-+ * Additional data might be appended in the future.
-+ */
-+
-+#define SVE_PT_SVE_ZREG_SIZE(vq)	SVE_SIG_ZREG_SIZE(vq)
-+#define SVE_PT_SVE_PREG_SIZE(vq)	SVE_SIG_PREG_SIZE(vq)
-+#define SVE_PT_SVE_FFR_SIZE(vq)		SVE_SIG_FFR_SIZE(vq)
-+#define SVE_PT_SVE_FPSR_SIZE		sizeof(__u32)
-+#define SVE_PT_SVE_FPCR_SIZE		sizeof(__u32)
-+
-+#define __SVE_SIG_TO_PT(offset) \
-+	((offset) - SVE_SIG_REGS_OFFSET + SVE_PT_REGS_OFFSET)
-+
-+#define SVE_PT_SVE_OFFSET		SVE_PT_REGS_OFFSET
-+
-+#define SVE_PT_SVE_ZREGS_OFFSET \
-+	__SVE_SIG_TO_PT(SVE_SIG_ZREGS_OFFSET)
-+#define SVE_PT_SVE_ZREG_OFFSET(vq, n) \
-+	__SVE_SIG_TO_PT(SVE_SIG_ZREG_OFFSET(vq, n))
-+#define SVE_PT_SVE_ZREGS_SIZE(vq) \
-+	(SVE_PT_SVE_ZREG_OFFSET(vq, SVE_NUM_ZREGS) - SVE_PT_SVE_ZREGS_OFFSET)
-+
-+#define SVE_PT_SVE_PREGS_OFFSET(vq) \
-+	__SVE_SIG_TO_PT(SVE_SIG_PREGS_OFFSET(vq))
-+#define SVE_PT_SVE_PREG_OFFSET(vq, n) \
-+	__SVE_SIG_TO_PT(SVE_SIG_PREG_OFFSET(vq, n))
-+#define SVE_PT_SVE_PREGS_SIZE(vq) \
-+	(SVE_PT_SVE_PREG_OFFSET(vq, SVE_NUM_PREGS) - \
-+		SVE_PT_SVE_PREGS_OFFSET(vq))
-+
-+#define SVE_PT_SVE_FFR_OFFSET(vq) \
-+	__SVE_SIG_TO_PT(SVE_SIG_FFR_OFFSET(vq))
-+
-+#define SVE_PT_SVE_FPSR_OFFSET(vq)				\
-+	((SVE_PT_SVE_FFR_OFFSET(vq) + SVE_PT_SVE_FFR_SIZE(vq) +	\
-+			(SVE_VQ_BYTES - 1))			\
-+		/ SVE_VQ_BYTES * SVE_VQ_BYTES)
-+#define SVE_PT_SVE_FPCR_OFFSET(vq) \
-+	(SVE_PT_SVE_FPSR_OFFSET(vq) + SVE_PT_SVE_FPSR_SIZE)
-+
-+/*
-+ * Any future extension appended after FPCR must be aligned to the next
-+ * 128-bit boundary.
-+ */
-+
-+#define SVE_PT_SVE_SIZE(vq, flags)					\
-+	((SVE_PT_SVE_FPCR_OFFSET(vq) + SVE_PT_SVE_FPCR_SIZE		\
-+			- SVE_PT_SVE_OFFSET + (SVE_VQ_BYTES - 1))	\
-+		/ SVE_VQ_BYTES * SVE_VQ_BYTES)
-+
-+#define SVE_PT_SIZE(vq, flags)						\
-+	 (((flags) & SVE_PT_REGS_MASK) == SVE_PT_REGS_SVE ?		\
-+		  SVE_PT_SVE_OFFSET + SVE_PT_SVE_SIZE(vq, flags)	\
-+		: SVE_PT_FPSIMD_OFFSET + SVE_PT_FPSIMD_SIZE(vq, flags))
-+
- #endif /* __ASSEMBLY__ */
- 
- #endif /* _UAPI__ASM_PTRACE_H */
-diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index 26bd1a8..5715622 100644
---- a/arch/arm64/kernel/fpsimd.c
-+++ b/arch/arm64/kernel/fpsimd.c
-@@ -427,6 +427,66 @@ void sve_alloc(struct task_struct *task)
- 	BUG_ON(!task->thread.sve_state);
- }
- 
-+
-+/*
-+ * Ensure that task->thread.sve_state is up to date with respect to
-+ * the user task, irrespective of when SVE is in use or not.
-+ *
-+ * This should only be called by ptrace.  task must be non-runnable.
-+ * task->thread.sve_state must point to at least sve_state_size(task)
-+ * bytes of allocated kernel memory.
-+ */
-+void fpsimd_sync_to_sve(struct task_struct *task)
-+{
-+	if (!test_tsk_thread_flag(task, TIF_SVE))
-+		fpsimd_to_sve(task);
-+}
-+
-+/*
-+ * Ensure that task->thread.fpsimd_state is up to date with respect to
-+ * the user task, irrespective of whether SVE is in use or not.
-+ *
-+ * This should only be called by ptrace.  task must be non-runnable.
-+ * task->thread.sve_state must point to at least sve_state_size(task)
-+ * bytes of allocated kernel memory.
-+ */
-+void sve_sync_to_fpsimd(struct task_struct *task)
-+{
-+	if (test_tsk_thread_flag(task, TIF_SVE))
-+		sve_to_fpsimd(task);
-+}
-+
-+/*
-+ * Ensure that task->thread.sve_state is up to date with respect to
-+ * the task->thread.fpsimd_state.
-+ *
-+ * This should only be called by ptrace to merge new FPSIMD register
-+ * values into a task for which SVE is currently active.
-+ * task must be non-runnable.
-+ * task->thread.sve_state must point to at least sve_state_size(task)
-+ * bytes of allocated kernel memory.
-+ * task->thread.fpsimd_state must already have been initialised with
-+ * the new FPSIMD register values to be merged in.
-+ */
-+void sve_sync_from_fpsimd_zeropad(struct task_struct *task)
-+{
-+	unsigned int vq;
-+	void *sst = task->thread.sve_state;
-+	struct fpsimd_state const *fst = &task->thread.fpsimd_state;
-+	unsigned int i;
-+
-+	if (!test_tsk_thread_flag(task, TIF_SVE))
-+		return;
-+
-+	vq = sve_vq_from_vl(task->thread.sve_vl);
-+
-+	memset(sst, 0, SVE_SIG_REGS_SIZE(vq));
-+
-+	for (i = 0; i < 32; ++i)
-+		memcpy(ZREG(sst, vq, i), &fst->vregs[i],
-+		       sizeof(fst->vregs[i]));
-+}
-+
- int sve_set_vector_length(struct task_struct *task,
- 			  unsigned long vl, unsigned long flags)
- {
-diff --git a/arch/arm64/kernel/ptrace.c b/arch/arm64/kernel/ptrace.c
-index 9cbb612..7c44658 100644
---- a/arch/arm64/kernel/ptrace.c
-+++ b/arch/arm64/kernel/ptrace.c
-@@ -32,6 +32,7 @@
- #include <linux/security.h>
- #include <linux/init.h>
- #include <linux/signal.h>
-+#include <linux/string.h>
- #include <linux/uaccess.h>
- #include <linux/perf_event.h>
- #include <linux/hw_breakpoint.h>
-@@ -40,6 +41,7 @@
- #include <linux/elf.h>
- 
- #include <asm/compat.h>
-+#include <asm/cpufeature.h>
- #include <asm/debug-monitors.h>
- #include <asm/pgtable.h>
- #include <asm/stacktrace.h>
-@@ -618,17 +620,56 @@ static int gpr_set(struct task_struct *target, const struct user_regset *regset,
- /*
-  * TODO: update fp accessors for lazy context switching (sync/flush hwstate)
-  */
--static int fpr_get(struct task_struct *target, const struct user_regset *regset,
--		   unsigned int pos, unsigned int count,
--		   void *kbuf, void __user *ubuf)
-+static int __fpr_get(struct task_struct *target,
-+		     const struct user_regset *regset,
-+		     unsigned int pos, unsigned int count,
-+		     void *kbuf, void __user *ubuf, unsigned int start_pos)
- {
- 	struct user_fpsimd_state *uregs;
-+
-+	sve_sync_to_fpsimd(target);
-+
- 	uregs = &target->thread.fpsimd_state.user_fpsimd;
- 
-+	return user_regset_copyout(&pos, &count, &kbuf, &ubuf, uregs,
-+				   start_pos, start_pos + sizeof(*uregs));
-+}
-+
-+static int fpr_get(struct task_struct *target, const struct user_regset *regset,
-+		   unsigned int pos, unsigned int count,
-+		   void *kbuf, void __user *ubuf)
-+{
- 	if (target == current)
- 		fpsimd_preserve_current_state();
- 
--	return user_regset_copyout(&pos, &count, &kbuf, &ubuf, uregs, 0, -1);
-+	return __fpr_get(target, regset, pos, count, kbuf, ubuf, 0);
-+}
-+
-+static int __fpr_set(struct task_struct *target,
-+		     const struct user_regset *regset,
-+		     unsigned int pos, unsigned int count,
-+		     const void *kbuf, const void __user *ubuf,
-+		     unsigned int start_pos)
-+{
-+	int ret;
-+	struct user_fpsimd_state newstate;
-+
-+	/*
-+	 * Ensure target->thread.fpsimd_state is up to date, so that a
-+	 * short copyin can't resurrect stale data.
-+	 */
-+	sve_sync_to_fpsimd(target);
-+
-+	newstate = target->thread.fpsimd_state.user_fpsimd;
-+
-+	ret = user_regset_copyin(&pos, &count, &kbuf, &ubuf, &newstate,
-+				 start_pos, start_pos + sizeof(newstate));
-+	if (ret)
-+		return ret;
-+
-+	target->thread.fpsimd_state.user_fpsimd = newstate;
-+
-+	return ret;
- }
- 
- static int fpr_set(struct task_struct *target, const struct user_regset *regset,
-@@ -636,15 +677,14 @@ static int fpr_set(struct task_struct *target, const struct user_regset *regset,
- 		   const void *kbuf, const void __user *ubuf)
- {
- 	int ret;
--	struct user_fpsimd_state newstate =
--		target->thread.fpsimd_state.user_fpsimd;
- 
--	ret = user_regset_copyin(&pos, &count, &kbuf, &ubuf, &newstate, 0, -1);
-+	ret = __fpr_set(target, regset, pos, count, kbuf, ubuf, 0);
- 	if (ret)
- 		return ret;
- 
--	target->thread.fpsimd_state.user_fpsimd = newstate;
-+	sve_sync_from_fpsimd_zeropad(target);
- 	fpsimd_flush_task_state(target);
-+
- 	return ret;
- }
- 
-@@ -702,6 +742,215 @@ static int system_call_set(struct task_struct *target,
- 	return ret;
- }
- 
-+#ifdef CONFIG_ARM64_SVE
-+
-+static void sve_init_header_from_task(struct user_sve_header *header,
-+				      struct task_struct *target)
-+{
-+	unsigned int vq;
-+
-+	memset(header, 0, sizeof(*header));
-+
-+	header->flags = test_tsk_thread_flag(target, TIF_SVE) ?
-+		SVE_PT_REGS_SVE : SVE_PT_REGS_FPSIMD;
-+	if (test_tsk_thread_flag(target, TIF_SVE_VL_INHERIT))
-+		header->flags |= SVE_PT_VL_INHERIT;
-+
-+	header->vl = target->thread.sve_vl;
-+	vq = sve_vq_from_vl(header->vl);
-+
-+	header->max_vl = sve_max_vl;
-+	if (WARN_ON(!sve_vl_valid(sve_max_vl)))
-+		header->max_vl = header->vl;
-+
-+	header->size = SVE_PT_SIZE(vq, header->flags);
-+	header->max_size = SVE_PT_SIZE(sve_vq_from_vl(header->max_vl),
-+				      SVE_PT_REGS_SVE);
-+}
-+
-+static unsigned int sve_size_from_header(struct user_sve_header const *header)
-+{
-+	return ALIGN(header->size, SVE_VQ_BYTES);
-+}
-+
-+static unsigned int sve_get_size(struct task_struct *target,
-+				 const struct user_regset *regset)
-+{
-+	struct user_sve_header header;
-+
-+	if (!system_supports_sve())
-+		return 0;
-+
-+	sve_init_header_from_task(&header, target);
-+	return sve_size_from_header(&header);
-+}
-+
-+static int sve_get(struct task_struct *target,
-+		   const struct user_regset *regset,
-+		   unsigned int pos, unsigned int count,
-+		   void *kbuf, void __user *ubuf)
-+{
-+	int ret;
-+	struct user_sve_header header;
-+	unsigned int vq;
-+	unsigned long start, end;
-+
-+	if (!system_supports_sve())
-+		return -EINVAL;
-+
-+	/* Header */
-+	sve_init_header_from_task(&header, target);
-+	vq = sve_vq_from_vl(header.vl);
-+
-+	ret = user_regset_copyout(&pos, &count, &kbuf, &ubuf, &header,
-+				  0, sizeof(header));
-+	if (ret)
-+		return ret;
-+
-+	if (target == current)
-+		fpsimd_preserve_current_state();
-+
-+	/* Registers: FPSIMD-only case */
-+
-+	BUILD_BUG_ON(SVE_PT_FPSIMD_OFFSET != sizeof(header));
-+	if ((header.flags & SVE_PT_REGS_MASK) == SVE_PT_REGS_FPSIMD)
-+		return __fpr_get(target, regset, pos, count, kbuf, ubuf,
-+				 SVE_PT_FPSIMD_OFFSET);
-+
-+	/* Otherwise: full SVE case */
-+
-+	BUILD_BUG_ON(SVE_PT_SVE_OFFSET != sizeof(header));
-+	start = SVE_PT_SVE_OFFSET;
-+	end = SVE_PT_SVE_FFR_OFFSET(vq) + SVE_PT_SVE_FFR_SIZE(vq);
-+	ret = user_regset_copyout(&pos, &count, &kbuf, &ubuf,
-+				  target->thread.sve_state,
-+				  start, end);
-+	if (ret)
-+		return ret;
-+
-+	start = end;
-+	end = SVE_PT_SVE_FPSR_OFFSET(vq);
-+	ret = user_regset_copyout_zero(&pos, &count, &kbuf, &ubuf,
-+				       start, end);
-+	if (ret)
-+		return ret;
-+
-+	/*
-+	 * Copy fpsr, and fpcr which must follow contiguously in
-+	 * struct fpsimd_state:
-+	 */
-+	start = end;
-+	end = SVE_PT_SVE_FPCR_OFFSET(vq) + SVE_PT_SVE_FPCR_SIZE;
-+	ret = user_regset_copyout(&pos, &count, &kbuf, &ubuf,
-+				  &target->thread.fpsimd_state.fpsr,
-+				  start, end);
-+	if (ret)
-+		return ret;
-+
-+	start = end;
-+	end = sve_size_from_header(&header);
-+	return user_regset_copyout_zero(&pos, &count, &kbuf, &ubuf,
-+					start, end);
-+}
-+
-+static int sve_set(struct task_struct *target,
-+		   const struct user_regset *regset,
-+		   unsigned int pos, unsigned int count,
-+		   const void *kbuf, const void __user *ubuf)
-+{
-+	int ret;
-+	struct user_sve_header header;
-+	unsigned int vq;
-+	unsigned long start, end;
-+
-+	if (!system_supports_sve())
-+		return -EINVAL;
-+
-+	/* Header */
-+	if (count < sizeof(header))
-+		return -EINVAL;
-+	ret = user_regset_copyin(&pos, &count, &kbuf, &ubuf, &header,
-+				 0, sizeof(header));
-+	if (ret)
-+		goto out;
-+
-+	/*
-+	 * Apart from PT_SVE_REGS_MASK, all PT_SVE_* flags are consumed by
-+	 * sve_set_vector_length(), which will also validate them for us:
-+	 */
-+	ret = sve_set_vector_length(target, header.vl,
-+		((unsigned long)header.flags & ~SVE_PT_REGS_MASK) << 16);
-+	if (ret)
-+		goto out;
-+
-+	/* Actual VL set may be less than the user asked for: */
-+	vq = sve_vq_from_vl(target->thread.sve_vl);
-+
-+	/* Registers: FPSIMD-only case */
-+
-+	BUILD_BUG_ON(SVE_PT_FPSIMD_OFFSET != sizeof(header));
-+	if ((header.flags & SVE_PT_REGS_MASK) == SVE_PT_REGS_FPSIMD) {
-+		ret = __fpr_set(target, regset, pos, count, kbuf, ubuf,
-+				SVE_PT_FPSIMD_OFFSET);
-+		clear_tsk_thread_flag(target, TIF_SVE);
-+		goto out;
-+	}
-+
-+	/* Otherwise: full SVE case */
-+
-+	/*
-+	 * If setting a different VL from the requested VL and there is
-+	 * register data, the data layout will be wrong: don't even
-+	 * try to set the registers in this case.
-+	 */
-+	if (count && vq != sve_vq_from_vl(header.vl)) {
-+		ret = -EIO;
-+		goto out;
-+	}
-+
-+	sve_alloc(target);
-+
-+	/*
-+	 * Ensure target->thread.sve_state is up to date with target's
-+	 * FPSIMD regs, so that a short copyin leaves trailing registers
-+	 * unmodified.
-+	 */
-+	fpsimd_sync_to_sve(target);
-+	set_tsk_thread_flag(target, TIF_SVE);
-+
-+	BUILD_BUG_ON(SVE_PT_SVE_OFFSET != sizeof(header));
-+	start = SVE_PT_SVE_OFFSET;
-+	end = SVE_PT_SVE_FFR_OFFSET(vq) + SVE_PT_SVE_FFR_SIZE(vq);
-+	ret = user_regset_copyin(&pos, &count, &kbuf, &ubuf,
-+				 target->thread.sve_state,
-+				 start, end);
-+	if (ret)
-+		goto out;
-+
-+	start = end;
-+	end = SVE_PT_SVE_FPSR_OFFSET(vq);
-+	ret = user_regset_copyin_ignore(&pos, &count, &kbuf, &ubuf,
-+					start, end);
-+	if (ret)
-+		goto out;
-+
-+	/*
-+	 * Copy fpsr, and fpcr which must follow contiguously in
-+	 * struct fpsimd_state:
-+	 */
-+	start = end;
-+	end = SVE_PT_SVE_FPCR_OFFSET(vq) + SVE_PT_SVE_FPCR_SIZE;
-+	ret = user_regset_copyin(&pos, &count, &kbuf, &ubuf,
-+				 &target->thread.fpsimd_state.fpsr,
-+				 start, end);
-+
-+out:
-+	fpsimd_flush_task_state(target);
-+	return ret;
-+}
-+
-+#endif /* CONFIG_ARM64_SVE */
-+
- enum aarch64_regset {
- 	REGSET_GPR,
- 	REGSET_FPR,
-@@ -711,6 +960,9 @@ enum aarch64_regset {
- 	REGSET_HW_WATCH,
- #endif
- 	REGSET_SYSTEM_CALL,
-+#ifdef CONFIG_ARM64_SVE
-+	REGSET_SVE,
-+#endif
- };
- 
- static const struct user_regset aarch64_regsets[] = {
-@@ -768,6 +1020,18 @@ static const struct user_regset aarch64_regsets[] = {
- 		.get = system_call_get,
- 		.set = system_call_set,
- 	},
-+#ifdef CONFIG_ARM64_SVE
-+	[REGSET_SVE] = { /* Scalable Vector Extension */
-+		.core_note_type = NT_ARM_SVE,
-+		.n = DIV_ROUND_UP(SVE_PT_SIZE(SVE_VQ_MAX, SVE_PT_REGS_SVE),
-+				  SVE_VQ_BYTES),
-+		.size = SVE_VQ_BYTES,
-+		.align = SVE_VQ_BYTES,
-+		.get = sve_get,
-+		.set = sve_set,
-+		.get_size = sve_get_size,
-+	},
-+#endif
- };
- 
- static const struct user_regset_view user_aarch64_view = {
-diff --git a/include/uapi/linux/elf.h b/include/uapi/linux/elf.h
-index b5280db..735b8f4 100644
---- a/include/uapi/linux/elf.h
-+++ b/include/uapi/linux/elf.h
-@@ -416,6 +416,7 @@ typedef struct elf64_shdr {
- #define NT_ARM_HW_BREAK	0x402		/* ARM hardware breakpoint registers */
- #define NT_ARM_HW_WATCH	0x403		/* ARM hardware watchpoint registers */
- #define NT_ARM_SYSTEM_CALL	0x404	/* ARM system call number */
-+#define NT_ARM_SVE	0x405		/* ARM Scalable Vector Extension registers */
- #define NT_METAG_CBUF	0x500		/* Metag catch buffer registers */
- #define NT_METAG_RPIPE	0x501		/* Metag read pipeline state */
- #define NT_METAG_TLS	0x502		/* Metag TLS pointer */
--- 
-2.1.4
+VGhpcyBwYXRjaCB1c2VzIHRoZSBjcHVmZWF0dXJlcyBmcmFtZXdvcmsgdG8gZGV0ZXJtaW5lIGNv
+bW1vbiBTVkUKY2FwYWJpbGl0aWVzIGFuZCB2ZWN0b3IgbGVuZ3RocywgYW5kIGNvbmZpZ3VyZXMg
+dGhlIHJ1bnRpbWUgU1ZFCnN1cHBvcnQgY29kZSBhcHByb3ByaWF0ZWx5LgoKWkNSX0VMeCBpcyBu
+b3QgcmVhbGx5IGEgZmVhdHVyZSByZWdpc3RlciwgYnV0IGl0IGlzIGNvbnZlbmllbnQgdG8KdXNl
+IGl0IGFzIGEgdGVtcGxhdGUgZm9yIHJlY29yZGluZyB0aGUgbWF4aW11bSB2ZWN0b3IgbGVuZ3Ro
+CnN1cHBvcnRlZCBieSBhIENQVSwgdXNpbmcgdGhlIExFTiBmaWVsZC4gIFRoaXMgZmllbGQgaXMg
+c2ltaWxhciB0bwphIGZlYXR1cmUgZmllbGQgaW4gdGhhdCBpdCBpcyBhIGNvbnRpZ3VvdXMgYml0
+ZmllbGQgZm9yIHdoaWNoIHdlCndhbnQgdG8gZGV0ZXJtaW5lIHRoZSBtaW5pbXVtIHN5c3RlbS13
+aWRlIHZhbHVlLiAgVGhpcyBwYXRjaCBhZGRzClpDUiBhcyBhIHBzZXVkby1yZWdpc3RlciBpbiBj
+cHVpbmZvL2NwdWZlYXR1cmVzLCB3aXRoIGFwcHJvcHJpYXRlCmN1c3RvbSBjb2RlIHRvIHBvcHVs
+YXRlIGl0LiAgRmluZGluZyB0aGUgbWluaW11bSBzdXBwb3J0ZWQgdmFsdWUgb2YKdGhlIExFTiBm
+aWVsZCBpcyBsZWZ0IHRvIHRoZSBjcHVmZWF0dXJlcyBmcmFtZXdvcmsgaW4gdGhlIHVzdWFsCndh
+eS4KClRoZSBtZWFuaW5nIG9mIElEX0FBNjRaRlIwX0VMMSBpcyBub3QgYXJjaGl0ZWN0dXJhbGx5
+IGRlZmluZWQgeWV0LApzbyBmb3Igbm93IHdlIGp1c3QgcmVxdWlyZSBpdCB0byBiZSB6ZXJvLgoK
+Tm90ZSB0aGF0IG11Y2ggb2YgdGhpcyBjb2RlIGlzIGRvcm1hbnQgYW5kIFNWRSBzdGlsbCB3b24n
+dCBiZSB1c2VkCnlldCwgc2luY2Ugc3lzdGVtX3N1cHBvcnRzX3N2ZSgpIHJlbWFpbnMgaGFyZHdp
+cmVkIHRvIGZhbHNlLgoKU2lnbmVkLW9mZi1ieTogRGF2ZSBNYXJ0aW4gPERhdmUuTWFydGluQGFy
+bS5jb20+ClJldmlld2VkLWJ5OiBTdXp1a2kgSyBQb3Vsb3NlIDxzdXp1a2kucG91bG9zZUBhcm0u
+Y29tPgpSZXZpZXdlZC1ieTogQ2F0YWxpbiBNYXJpbmFzIDxjYXRhbGluLm1hcmluYXNAYXJtLmNv
+bT4KQ2M6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KCi0tLQoKKipEcm9w
+cGVkIGF0IHYzKiogUmV2aWV3ZWQtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJv
+Lm9yZz4KU2VlIHYzIHBvc3RpbmcgZm9yIGhpc3RvcnkuCi0tLQogYXJjaC9hcm02NC9pbmNsdWRl
+L2FzbS9jcHUuaCAgICAgICAgfCAgIDQgKysKIGFyY2gvYXJtNjQvaW5jbHVkZS9hc20vY3B1ZmVh
+dHVyZS5oIHwgIDM2ICsrKysrKysrKysrKwogYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9mcHNpbWQu
+aCAgICAgfCAgMTQgKysrKysKIGFyY2gvYXJtNjQva2VybmVsL2NwdWZlYXR1cmUuYyAgICAgIHwg
+IDUyICsrKysrKysrKysrKysrKysKIGFyY2gvYXJtNjQva2VybmVsL2NwdWluZm8uYyAgICAgICAg
+IHwgICA2ICsrCiBhcmNoL2FybTY0L2tlcm5lbC9mcHNpbWQuYyAgICAgICAgICB8IDExNCArKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0KIDYgZmlsZXMgY2hhbmdlZCwgMjIzIGlu
+c2VydGlvbnMoKyksIDMgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9pbmNs
+dWRlL2FzbS9jcHUuaCBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vY3B1LmgKaW5kZXggODg5MjI2
+Yi4uODgzOTIyNyAxMDA2NDQKLS0tIGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9jcHUuaAorKysg
+Yi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2NwdS5oCkBAIC00MSw2ICs0MSw3IEBAIHN0cnVjdCBj
+cHVpbmZvX2FybTY0IHsKIAl1NjQJCXJlZ19pZF9hYTY0bW1mcjI7CiAJdTY0CQlyZWdfaWRfYWE2
+NHBmcjA7CiAJdTY0CQlyZWdfaWRfYWE2NHBmcjE7CisJdTY0CQlyZWdfaWRfYWE2NHpmcjA7CiAK
+IAl1MzIJCXJlZ19pZF9kZnIwOwogCXUzMgkJcmVnX2lkX2lzYXIwOwpAQCAtNTksNiArNjAsOSBA
+QCBzdHJ1Y3QgY3B1aW5mb19hcm02NCB7CiAJdTMyCQlyZWdfbXZmcjA7CiAJdTMyCQlyZWdfbXZm
+cjE7CiAJdTMyCQlyZWdfbXZmcjI7CisKKwkvKiBwc2V1ZG8tWkNSIGZvciByZWNvcmRpbmcgbWF4
+aW11bSBaQ1JfRUwxIExFTiB2YWx1ZTogKi8KKwl1NjQJCXJlZ196Y3I7CiB9OwogCiBERUNMQVJF
+X1BFUl9DUFUoc3RydWN0IGNwdWluZm9fYXJtNjQsIGNwdV9kYXRhKTsKZGlmZiAtLWdpdCBhL2Fy
+Y2gvYXJtNjQvaW5jbHVkZS9hc20vY3B1ZmVhdHVyZS5oIGIvYXJjaC9hcm02NC9pbmNsdWRlL2Fz
+bS9jcHVmZWF0dXJlLmgKaW5kZXggNGVhMzQ0MS4uOWIyN2U4YyAxMDA2NDQKLS0tIGEvYXJjaC9h
+cm02NC9pbmNsdWRlL2FzbS9jcHVmZWF0dXJlLmgKKysrIGIvYXJjaC9hcm02NC9pbmNsdWRlL2Fz
+bS9jcHVmZWF0dXJlLmgKQEAgLTEwLDcgKzEwLDkgQEAKICNkZWZpbmUgX19BU01fQ1BVRkVBVFVS
+RV9ICiAKICNpbmNsdWRlIDxhc20vY3B1Y2Fwcy5oPgorI2luY2x1ZGUgPGFzbS9mcHNpbWQuaD4K
+ICNpbmNsdWRlIDxhc20vaHdjYXAuaD4KKyNpbmNsdWRlIDxhc20vc2lnY29udGV4dC5oPgogI2lu
+Y2x1ZGUgPGFzbS9zeXNyZWcuaD4KIAogLyoKQEAgLTIyMyw2ICsyMjUsMTMgQEAgc3RhdGljIGlu
+bGluZSBib29sIGlkX2FhNjRwZnIwXzMyYml0X2VsMCh1NjQgcGZyMCkKIAlyZXR1cm4gdmFsID09
+IElEX0FBNjRQRlIwX0VMMF8zMkJJVF82NEJJVDsKIH0KIAorc3RhdGljIGlubGluZSBib29sIGlk
+X2FhNjRwZnIwX3N2ZSh1NjQgcGZyMCkKK3sKKwl1MzIgdmFsID0gY3B1aWRfZmVhdHVyZV9leHRy
+YWN0X3Vuc2lnbmVkX2ZpZWxkKHBmcjAsIElEX0FBNjRQRlIwX1NWRV9TSElGVCk7CisKKwlyZXR1
+cm4gdmFsID4gMDsKK30KKwogdm9pZCBfX2luaXQgc2V0dXBfY3B1X2ZlYXR1cmVzKHZvaWQpOwog
+CiB2b2lkIHVwZGF0ZV9jcHVfY2FwYWJpbGl0aWVzKGNvbnN0IHN0cnVjdCBhcm02NF9jcHVfY2Fw
+YWJpbGl0aWVzICpjYXBzLApAQCAtMjY3LDYgKzI3NiwzMyBAQCBzdGF0aWMgaW5saW5lIGJvb2wg
+c3lzdGVtX3N1cHBvcnRzX3N2ZSh2b2lkKQogCXJldHVybiBmYWxzZTsKIH0KIAorLyoKKyAqIFJl
+YWQgdGhlIHBzZXVkby1aQ1IgdXNlZCBieSBjcHVmZWF0dXJlcyB0byBpZGVudGlmeSB0aGUgc3Vw
+cG9ydGVkIFNWRQorICogdmVjdG9yIGxlbmd0aC4KKyAqCisgKiBVc2Ugb25seSBpZiBTVkUgaXMg
+cHJlc2VudC4KKyAqIFRoaXMgZnVuY3Rpb24gY2xvYmJlcnMgdGhlIFNWRSB2ZWN0b3IgbGVuZ3Ro
+LgorICovCitzdGF0aWMgaW5saW5lIHU2NCByZWFkX3pjcl9mZWF0dXJlcyh2b2lkKQoreworCXU2
+NCB6Y3I7CisJdW5zaWduZWQgaW50IHZxX21heDsKKworCS8qCisJICogU2V0IHRoZSBtYXhpbXVt
+IHBvc3NpYmxlIFZMLCBhbmQgd3JpdGUgemVyb2VzIHRvIGFsbCBvdGhlcgorCSAqIGJpdHMgdG8g
+c2VlIGlmIHRoZXkgc3RpY2suCisJICovCisJc3ZlX2tlcm5lbF9lbmFibGUoTlVMTCk7CisJd3Jp
+dGVfc3lzcmVnX3MoWkNSX0VMeF9MRU5fTUFTSywgU1lTX1pDUl9FTDEpOworCisJemNyID0gcmVh
+ZF9zeXNyZWdfcyhTWVNfWkNSX0VMMSk7CisJemNyICY9IH4odTY0KVpDUl9FTHhfTEVOX01BU0s7
+IC8qIGZpbmQgc3RpY2t5IDFzIG91dHNpZGUgTEVOIGZpZWxkICovCisJdnFfbWF4ID0gc3ZlX3Zx
+X2Zyb21fdmwoc3ZlX2dldF92bCgpKTsKKwl6Y3IgfD0gdnFfbWF4IC0gMTsgLyogc2V0IExFTiBm
+aWVsZCB0byBtYXhpbXVtIGVmZmVjdGl2ZSB2YWx1ZSAqLworCisJcmV0dXJuIHpjcjsKK30KKwog
+I2VuZGlmIC8qIF9fQVNTRU1CTFlfXyAqLwogCiAjZW5kaWYKZGlmZiAtLWdpdCBhL2FyY2gvYXJt
+NjQvaW5jbHVkZS9hc20vZnBzaW1kLmggYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2Zwc2ltZC5o
+CmluZGV4IDg2ZjU1MGMuLmQ4ZTBkYzkgMTAwNjQ0Ci0tLSBhL2FyY2gvYXJtNjQvaW5jbHVkZS9h
+c20vZnBzaW1kLmgKKysrIGIvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9mcHNpbWQuaApAQCAtNzgs
+NiArNzgsNyBAQCBleHRlcm4gdm9pZCBzdmVfc2F2ZV9zdGF0ZSh2b2lkICpzdGF0ZSwgdTMyICpw
+ZnBzcik7CiBleHRlcm4gdm9pZCBzdmVfbG9hZF9zdGF0ZSh2b2lkIGNvbnN0ICpzdGF0ZSwgdTMy
+IGNvbnN0ICpwZnBzciwKIAkJCSAgIHVuc2lnbmVkIGxvbmcgdnFfbWludXNfMSk7CiBleHRlcm4g
+dW5zaWduZWQgaW50IHN2ZV9nZXRfdmwodm9pZCk7CitleHRlcm4gaW50IHN2ZV9rZXJuZWxfZW5h
+YmxlKHZvaWQgKik7CiAKIGV4dGVybiBpbnQgX19yb19hZnRlcl9pbml0IHN2ZV9tYXhfdmw7CiAK
+QEAgLTkwLDEwICs5MSwyMyBAQCBleHRlcm4gdm9pZCBmcHNpbWRfcmVsZWFzZV90YXNrKHN0cnVj
+dCB0YXNrX3N0cnVjdCAqdGFzayk7CiBleHRlcm4gaW50IHN2ZV9zZXRfdmVjdG9yX2xlbmd0aChz
+dHJ1Y3QgdGFza19zdHJ1Y3QgKnRhc2ssCiAJCQkJIHVuc2lnbmVkIGxvbmcgdmwsIHVuc2lnbmVk
+IGxvbmcgZmxhZ3MpOwogCisvKgorICogUHJvYmluZyBhbmQgc2V0dXAgZnVuY3Rpb25zLgorICog
+Q2FsbHMgdG8gdGhlc2UgZnVuY3Rpb25zIG11c3QgYmUgc2VyaWFsaXNlZCB3aXRoIG9uZSBhbm90
+aGVyLgorICovCitleHRlcm4gdm9pZCBfX2luaXQgc3ZlX2luaXRfdnFfbWFwKHZvaWQpOworZXh0
+ZXJuIHZvaWQgc3ZlX3VwZGF0ZV92cV9tYXAodm9pZCk7CitleHRlcm4gaW50IHN2ZV92ZXJpZnlf
+dnFfbWFwKHZvaWQpOworZXh0ZXJuIHZvaWQgX19pbml0IHN2ZV9zZXR1cCh2b2lkKTsKKwogI2Vs
+c2UgLyogISBDT05GSUdfQVJNNjRfU1ZFICovCiAKIHN0YXRpYyBpbmxpbmUgdm9pZCBzdmVfYWxs
+b2Moc3RydWN0IHRhc2tfc3RydWN0ICp0YXNrKSB7IH0KIHN0YXRpYyBpbmxpbmUgdm9pZCBmcHNp
+bWRfcmVsZWFzZV90YXNrKHN0cnVjdCB0YXNrX3N0cnVjdCAqdGFzaykgeyB9CitzdGF0aWMgaW5s
+aW5lIHZvaWQgc3ZlX2luaXRfdnFfbWFwKHZvaWQpIHsgfQorc3RhdGljIGlubGluZSB2b2lkIHN2
+ZV91cGRhdGVfdnFfbWFwKHZvaWQpIHsgfQorc3RhdGljIGlubGluZSBpbnQgc3ZlX3ZlcmlmeV92
+cV9tYXAodm9pZCkgeyByZXR1cm4gMDsgfQorc3RhdGljIGlubGluZSB2b2lkIHN2ZV9zZXR1cCh2
+b2lkKSB7IH0KIAogI2VuZGlmIC8qICEgQ09ORklHX0FSTTY0X1NWRSAqLwogCmRpZmYgLS1naXQg
+YS9hcmNoL2FybTY0L2tlcm5lbC9jcHVmZWF0dXJlLmMgYi9hcmNoL2FybTY0L2tlcm5lbC9jcHVm
+ZWF0dXJlLmMKaW5kZXggZTIyNjc5OS4uMjE1NDM3MyAxMDA2NDQKLS0tIGEvYXJjaC9hcm02NC9r
+ZXJuZWwvY3B1ZmVhdHVyZS5jCisrKyBiL2FyY2gvYXJtNjQva2VybmVsL2NwdWZlYXR1cmUuYwpA
+QCAtMjcsNiArMjcsNyBAQAogI2luY2x1ZGUgPGFzbS9jcHUuaD4KICNpbmNsdWRlIDxhc20vY3B1
+ZmVhdHVyZS5oPgogI2luY2x1ZGUgPGFzbS9jcHVfb3BzLmg+CisjaW5jbHVkZSA8YXNtL2Zwc2lt
+ZC5oPgogI2luY2x1ZGUgPGFzbS9tbXVfY29udGV4dC5oPgogI2luY2x1ZGUgPGFzbS9wcm9jZXNz
+b3IuaD4KICNpbmNsdWRlIDxhc20vc3lzcmVnLmg+CkBAIC0yODcsNiArMjg4LDEyIEBAIHN0YXRp
+YyBjb25zdCBzdHJ1Y3QgYXJtNjRfZnRyX2JpdHMgZnRyX2lkX2RmcjBbXSA9IHsKIAlBUk02NF9G
+VFJfRU5ELAogfTsKIAorc3RhdGljIGNvbnN0IHN0cnVjdCBhcm02NF9mdHJfYml0cyBmdHJfemNy
+W10gPSB7CisJQVJNNjRfRlRSX0JJVFMoRlRSX0hJRERFTiwgRlRSX05PTlNUUklDVCwgRlRSX0xP
+V0VSX1NBRkUsCisJCVpDUl9FTHhfTEVOX1NISUZULCBaQ1JfRUx4X0xFTl9TSVpFLCAwKSwJLyog
+TEVOICovCisJQVJNNjRfRlRSX0VORCwKK307CisKIC8qCiAgKiBDb21tb24gZnRyIGJpdHMgZm9y
+IGEgMzJiaXQgcmVnaXN0ZXIgd2l0aCBhbGwgaGlkZGVuLCBzdHJpY3QKICAqIGF0dHJpYnV0ZXMs
+IHdpdGggNGJpdCBmZWF0dXJlIGZpZWxkcyBhbmQgYSBkZWZhdWx0IHNhZmUgdmFsdWUgb2YKQEAg
+LTM1Myw2ICszNjAsNyBAQCBzdGF0aWMgY29uc3Qgc3RydWN0IF9fZnRyX3JlZ19lbnRyeSB7CiAJ
+LyogT3AxID0gMCwgQ1JuID0gMCwgQ1JtID0gNCAqLwogCUFSTTY0X0ZUUl9SRUcoU1lTX0lEX0FB
+NjRQRlIwX0VMMSwgZnRyX2lkX2FhNjRwZnIwKSwKIAlBUk02NF9GVFJfUkVHKFNZU19JRF9BQTY0
+UEZSMV9FTDEsIGZ0cl9yYXopLAorCUFSTTY0X0ZUUl9SRUcoU1lTX0lEX0FBNjRaRlIwX0VMMSwg
+ZnRyX3JheiksCiAKIAkvKiBPcDEgPSAwLCBDUm4gPSAwLCBDUm0gPSA1ICovCiAJQVJNNjRfRlRS
+X1JFRyhTWVNfSURfQUE2NERGUjBfRUwxLCBmdHJfaWRfYWE2NGRmcjApLApAQCAtMzY3LDYgKzM3
+NSw5IEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3QgX19mdHJfcmVnX2VudHJ5IHsKIAlBUk02NF9GVFJf
+UkVHKFNZU19JRF9BQTY0TU1GUjFfRUwxLCBmdHJfaWRfYWE2NG1tZnIxKSwKIAlBUk02NF9GVFJf
+UkVHKFNZU19JRF9BQTY0TU1GUjJfRUwxLCBmdHJfaWRfYWE2NG1tZnIyKSwKIAorCS8qIE9wMSA9
+IDAsIENSbiA9IDEsIENSbSA9IDIgKi8KKwlBUk02NF9GVFJfUkVHKFNZU19aQ1JfRUwxLCBmdHJf
+emNyKSwKKwogCS8qIE9wMSA9IDMsIENSbiA9IDAsIENSbSA9IDAgKi8KIAl7IFNZU19DVFJfRUww
+LCAmYXJtNjRfZnRyX3JlZ19jdHJlbDAgfSwKIAlBUk02NF9GVFJfUkVHKFNZU19EQ1pJRF9FTDAs
+IGZ0cl9kY3ppZCksCkBAIC01MDQsNiArNTE1LDcgQEAgdm9pZCBfX2luaXQgaW5pdF9jcHVfZmVh
+dHVyZXMoc3RydWN0IGNwdWluZm9fYXJtNjQgKmluZm8pCiAJaW5pdF9jcHVfZnRyX3JlZyhTWVNf
+SURfQUE2NE1NRlIyX0VMMSwgaW5mby0+cmVnX2lkX2FhNjRtbWZyMik7CiAJaW5pdF9jcHVfZnRy
+X3JlZyhTWVNfSURfQUE2NFBGUjBfRUwxLCBpbmZvLT5yZWdfaWRfYWE2NHBmcjApOwogCWluaXRf
+Y3B1X2Z0cl9yZWcoU1lTX0lEX0FBNjRQRlIxX0VMMSwgaW5mby0+cmVnX2lkX2FhNjRwZnIxKTsK
+Kwlpbml0X2NwdV9mdHJfcmVnKFNZU19JRF9BQTY0WkZSMF9FTDEsIGluZm8tPnJlZ19pZF9hYTY0
+emZyMCk7CiAKIAlpZiAoaWRfYWE2NHBmcjBfMzJiaXRfZWwwKGluZm8tPnJlZ19pZF9hYTY0cGZy
+MCkpIHsKIAkJaW5pdF9jcHVfZnRyX3JlZyhTWVNfSURfREZSMF9FTDEsIGluZm8tPnJlZ19pZF9k
+ZnIwKTsKQEAgLTUyNCw2ICs1MzYsMTAgQEAgdm9pZCBfX2luaXQgaW5pdF9jcHVfZmVhdHVyZXMo
+c3RydWN0IGNwdWluZm9fYXJtNjQgKmluZm8pCiAJCWluaXRfY3B1X2Z0cl9yZWcoU1lTX01WRlIy
+X0VMMSwgaW5mby0+cmVnX212ZnIyKTsKIAl9CiAKKwlpZiAoaWRfYWE2NHBmcjBfc3ZlKGluZm8t
+PnJlZ19pZF9hYTY0cGZyMCkpIHsKKwkJaW5pdF9jcHVfZnRyX3JlZyhTWVNfWkNSX0VMMSwgaW5m
+by0+cmVnX3pjcik7CisJCXN2ZV9pbml0X3ZxX21hcCgpOworCX0KIH0KIAogc3RhdGljIHZvaWQg
+dXBkYXRlX2NwdV9mdHJfcmVnKHN0cnVjdCBhcm02NF9mdHJfcmVnICpyZWcsIHU2NCBuZXcpCkBA
+IC02MjcsNiArNjQzLDkgQEAgdm9pZCB1cGRhdGVfY3B1X2ZlYXR1cmVzKGludCBjcHUsCiAJdGFp
+bnQgfD0gY2hlY2tfdXBkYXRlX2Z0cl9yZWcoU1lTX0lEX0FBNjRQRlIxX0VMMSwgY3B1LAogCQkJ
+CSAgICAgIGluZm8tPnJlZ19pZF9hYTY0cGZyMSwgYm9vdC0+cmVnX2lkX2FhNjRwZnIxKTsKIAor
+CXRhaW50IHw9IGNoZWNrX3VwZGF0ZV9mdHJfcmVnKFNZU19JRF9BQTY0WkZSMF9FTDEsIGNwdSwK
+KwkJCQkgICAgICBpbmZvLT5yZWdfaWRfYWE2NHpmcjAsIGJvb3QtPnJlZ19pZF9hYTY0emZyMCk7
+CisKIAkvKgogCSAqIElmIHdlIGhhdmUgQUFyY2gzMiwgd2UgY2FyZSBhYm91dCAzMi1iaXQgZmVh
+dHVyZXMgZm9yIGNvbXBhdC4KIAkgKiBJZiB0aGUgc3lzdGVtIGRvZXNuJ3Qgc3VwcG9ydCBBQXJj
+aDMyLCBkb24ndCB1cGRhdGUgdGhlbS4KQEAgLTY3NCw2ICs2OTMsMTYgQEAgdm9pZCB1cGRhdGVf
+Y3B1X2ZlYXR1cmVzKGludCBjcHUsCiAJCQkJCWluZm8tPnJlZ19tdmZyMiwgYm9vdC0+cmVnX212
+ZnIyKTsKIAl9CiAKKwlpZiAoaWRfYWE2NHBmcjBfc3ZlKGluZm8tPnJlZ19pZF9hYTY0cGZyMCkp
+IHsKKwkJdGFpbnQgfD0gY2hlY2tfdXBkYXRlX2Z0cl9yZWcoU1lTX1pDUl9FTDEsIGNwdSwKKwkJ
+CQkJaW5mby0+cmVnX3pjciwgYm9vdC0+cmVnX3pjcik7CisKKwkJLyogUHJvYmUgdmVjdG9yIGxl
+bmd0aHMsIHVubGVzcyB3ZSBhbHJlYWR5IGdhdmUgdXAgb24gU1ZFICovCisJCWlmIChpZF9hYTY0
+cGZyMF9zdmUocmVhZF9zYW5pdGlzZWRfZnRyX3JlZyhTWVNfSURfQUE2NFBGUjBfRUwxKSkgJiYK
+KwkJICAgICFzeXNfY2Fwc19pbml0aWFsaXNlZCkKKwkJCXN2ZV91cGRhdGVfdnFfbWFwKCk7CisJ
+fQorCiAJLyoKIAkgKiBNaXNtYXRjaGVkIENQVSBmZWF0dXJlcyBhcmUgYSByZWNpcGUgZm9yIGRp
+c2FzdGVyLiBEb24ndCBldmVuCiAJICogcHJldGVuZCB0byBzdXBwb3J0IHRoZW0uCkBAIC0xMTA2
+LDYgKzExMzUsMjMgQEAgdmVyaWZ5X2xvY2FsX2NwdV9mZWF0dXJlcyhjb25zdCBzdHJ1Y3QgYXJt
+NjRfY3B1X2NhcGFiaWxpdGllcyAqY2FwcykKIAl9CiB9CiAKK3N0YXRpYyB2b2lkIHZlcmlmeV9z
+dmVfZmVhdHVyZXModm9pZCkKK3sKKwl1NjQgc2FmZV96Y3IgPSByZWFkX3Nhbml0aXNlZF9mdHJf
+cmVnKFNZU19aQ1JfRUwxKTsKKwl1NjQgemNyID0gcmVhZF96Y3JfZmVhdHVyZXMoKTsKKworCXVu
+c2lnbmVkIGludCBzYWZlX2xlbiA9IHNhZmVfemNyICYgWkNSX0VMeF9MRU5fTUFTSzsKKwl1bnNp
+Z25lZCBpbnQgbGVuID0gemNyICYgWkNSX0VMeF9MRU5fTUFTSzsKKworCWlmIChsZW4gPCBzYWZl
+X2xlbiB8fCBzdmVfdmVyaWZ5X3ZxX21hcCgpKSB7CisJCXByX2NyaXQoIkNQVSVkOiBTVkU6IHJl
+cXVpcmVkIHZlY3RvciBsZW5ndGgocykgbWlzc2luZ1xuIiwKKwkJCXNtcF9wcm9jZXNzb3JfaWQo
+KSk7CisJCWNwdV9kaWVfZWFybHkoKTsKKwl9CisKKwkvKiBBZGQgY2hlY2tzIG9uIG90aGVyIFpD
+UiBiaXRzIGhlcmUgaWYgbmVjZXNzYXJ5ICovCit9CisKIC8qCiAgKiBSdW4gdGhyb3VnaCB0aGUg
+ZW5hYmxlZCBzeXN0ZW0gY2FwYWJpbGl0aWVzIGFuZCBlbmFibGUoKSBpdCBvbiB0aGlzIENQVS4K
+ICAqIFRoZSBjYXBhYmlsaXRpZXMgd2VyZSBkZWNpZGVkIGJhc2VkIG9uIHRoZSBhdmFpbGFibGUg
+Q1BVcyBhdCB0aGUgYm9vdCB0aW1lLgpAQCAtMTExOSw4ICsxMTY1LDEyIEBAIHN0YXRpYyB2b2lk
+IHZlcmlmeV9sb2NhbF9jcHVfY2FwYWJpbGl0aWVzKHZvaWQpCiAJdmVyaWZ5X2xvY2FsX2NwdV9l
+cnJhdGFfd29ya2Fyb3VuZHMoKTsKIAl2ZXJpZnlfbG9jYWxfY3B1X2ZlYXR1cmVzKGFybTY0X2Zl
+YXR1cmVzKTsKIAl2ZXJpZnlfbG9jYWxfZWxmX2h3Y2Fwcyhhcm02NF9lbGZfaHdjYXBzKTsKKwog
+CWlmIChzeXN0ZW1fc3VwcG9ydHNfMzJiaXRfZWwwKCkpCiAJCXZlcmlmeV9sb2NhbF9lbGZfaHdj
+YXBzKGNvbXBhdF9lbGZfaHdjYXBzKTsKKworCWlmIChzeXN0ZW1fc3VwcG9ydHNfc3ZlKCkpCisJ
+CXZlcmlmeV9zdmVfZmVhdHVyZXMoKTsKIH0KIAogdm9pZCBjaGVja19sb2NhbF9jcHVfY2FwYWJp
+bGl0aWVzKHZvaWQpCkBAIC0xMTk4LDYgKzEyNDgsOCBAQCB2b2lkIF9faW5pdCBzZXR1cF9jcHVf
+ZmVhdHVyZXModm9pZCkKIAlpZiAoc3lzdGVtX3N1cHBvcnRzXzMyYml0X2VsMCgpKQogCQlzZXR1
+cF9lbGZfaHdjYXBzKGNvbXBhdF9lbGZfaHdjYXBzKTsKIAorCXN2ZV9zZXR1cCgpOworCiAJLyog
+QWR2ZXJ0aXNlIHRoYXQgd2UgaGF2ZSBjb21wdXRlZCB0aGUgc3lzdGVtIGNhcGFiaWxpdGllcyAq
+LwogCXNldF9zeXNfY2Fwc19pbml0aWFsaXNlZCgpOwogCmRpZmYgLS1naXQgYS9hcmNoL2FybTY0
+L2tlcm5lbC9jcHVpbmZvLmMgYi9hcmNoL2FybTY0L2tlcm5lbC9jcHVpbmZvLmMKaW5kZXggMWZm
+MWM1YS4uNThkYTUwNCAxMDA2NDQKLS0tIGEvYXJjaC9hcm02NC9rZXJuZWwvY3B1aW5mby5jCisr
+KyBiL2FyY2gvYXJtNjQva2VybmVsL2NwdWluZm8uYwpAQCAtMTksNiArMTksNyBAQAogI2luY2x1
+ZGUgPGFzbS9jcHUuaD4KICNpbmNsdWRlIDxhc20vY3B1dHlwZS5oPgogI2luY2x1ZGUgPGFzbS9j
+cHVmZWF0dXJlLmg+CisjaW5jbHVkZSA8YXNtL2Zwc2ltZC5oPgogCiAjaW5jbHVkZSA8bGludXgv
+Yml0b3BzLmg+CiAjaW5jbHVkZSA8bGludXgvYnVnLmg+CkBAIC0zMzEsNiArMzMyLDcgQEAgc3Rh
+dGljIHZvaWQgX19jcHVpbmZvX3N0b3JlX2NwdShzdHJ1Y3QgY3B1aW5mb19hcm02NCAqaW5mbykK
+IAlpbmZvLT5yZWdfaWRfYWE2NG1tZnIyID0gcmVhZF9jcHVpZChJRF9BQTY0TU1GUjJfRUwxKTsK
+IAlpbmZvLT5yZWdfaWRfYWE2NHBmcjAgPSByZWFkX2NwdWlkKElEX0FBNjRQRlIwX0VMMSk7CiAJ
+aW5mby0+cmVnX2lkX2FhNjRwZnIxID0gcmVhZF9jcHVpZChJRF9BQTY0UEZSMV9FTDEpOworCWlu
+Zm8tPnJlZ19pZF9hYTY0emZyMCA9IHJlYWRfY3B1aWQoSURfQUE2NFpGUjBfRUwxKTsKIAogCS8q
+IFVwZGF0ZSB0aGUgMzJiaXQgSUQgcmVnaXN0ZXJzIG9ubHkgaWYgQUFyY2gzMiBpcyBpbXBsZW1l
+bnRlZCAqLwogCWlmIChpZF9hYTY0cGZyMF8zMmJpdF9lbDAoaW5mby0+cmVnX2lkX2FhNjRwZnIw
+KSkgewpAQCAtMzUzLDYgKzM1NSwxMCBAQCBzdGF0aWMgdm9pZCBfX2NwdWluZm9fc3RvcmVfY3B1
+KHN0cnVjdCBjcHVpbmZvX2FybTY0ICppbmZvKQogCQlpbmZvLT5yZWdfbXZmcjIgPSByZWFkX2Nw
+dWlkKE1WRlIyX0VMMSk7CiAJfQogCisJaWYgKElTX0VOQUJMRUQoQ09ORklHX0FSTTY0X1NWRSkg
+JiYKKwkgICAgaWRfYWE2NHBmcjBfc3ZlKGluZm8tPnJlZ19pZF9hYTY0cGZyMCkpCisJCWluZm8t
+PnJlZ196Y3IgPSByZWFkX3pjcl9mZWF0dXJlcygpOworCiAJY3B1aW5mb19kZXRlY3RfaWNhY2hl
+X3BvbGljeShpbmZvKTsKIH0KIApkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rZXJuZWwvZnBzaW1k
+LmMgYi9hcmNoL2FybTY0L2tlcm5lbC9mcHNpbWQuYwppbmRleCAxY2ViMDY5Li5jMTEyOTcyIDEw
+MDY0NAotLS0gYS9hcmNoL2FybTY0L2tlcm5lbC9mcHNpbWQuYworKysgYi9hcmNoL2FybTY0L2tl
+cm5lbC9mcHNpbWQuYwpAQCAtMTE0LDE5ICsxMTQsMTkgQEAKIHN0YXRpYyBERUZJTkVfUEVSX0NQ
+VShzdHJ1Y3QgZnBzaW1kX3N0YXRlICosIGZwc2ltZF9sYXN0X3N0YXRlKTsKIAogLyogRGVmYXVs
+dCBWTCBmb3IgdGFza3MgdGhhdCBkb24ndCBzZXQgaXQgZXhwbGljaXRseTogKi8KLXN0YXRpYyBp
+bnQgc3ZlX2RlZmF1bHRfdmwgPSBTVkVfVkxfTUlOOworc3RhdGljIGludCBzdmVfZGVmYXVsdF92
+bCA9IC0xOwogCiAjaWZkZWYgQ09ORklHX0FSTTY0X1NWRQogCiAvKiBNYXhpbXVtIHN1cHBvcnRl
+ZCB2ZWN0b3IgbGVuZ3RoIGFjcm9zcyBhbGwgQ1BVcyAoaW5pdGlhbGx5IHBvaXNvbmVkKSAqLwog
+aW50IF9fcm9fYWZ0ZXJfaW5pdCBzdmVfbWF4X3ZsID0gLTE7CiAvKiBTZXQgb2YgYXZhaWxhYmxl
+IHZlY3RvciBsZW5ndGhzLCBhcyB2cV90b19iaXQodnEpOiAqLwotc3RhdGljIERFQ0xBUkVfQklU
+TUFQKHN2ZV92cV9tYXAsIFNWRV9WUV9NQVgpOworc3RhdGljIF9fcm9fYWZ0ZXJfaW5pdCBERUNM
+QVJFX0JJVE1BUChzdmVfdnFfbWFwLCBTVkVfVlFfTUFYKTsKIAogI2Vsc2UgLyogISBDT05GSUdf
+QVJNNjRfU1ZFICovCiAKIC8qIER1bW15IGRlY2xhcmF0aW9uIGZvciBjb2RlIHRoYXQgd2lsbCBi
+ZSBvcHRpbWlzZWQgb3V0OiAqLwotZXh0ZXJuIERFQ0xBUkVfQklUTUFQKHN2ZV92cV9tYXAsIFNW
+RV9WUV9NQVgpOworZXh0ZXJuIF9fcm9fYWZ0ZXJfaW5pdCBERUNMQVJFX0JJVE1BUChzdmVfdnFf
+bWFwLCBTVkVfVlFfTUFYKTsKIAogI2VuZGlmIC8qICEgQ09ORklHX0FSTTY0X1NWRSAqLwogCkBA
+IC00OTYsNiArNDk2LDExMSBAQCBpbnQgc3ZlX3NldF92ZWN0b3JfbGVuZ3RoKHN0cnVjdCB0YXNr
+X3N0cnVjdCAqdGFzaywKIH0KIAogLyoKKyAqIEJpdG1hcCBmb3IgdGVtcG9yYXJ5IHN0b3JhZ2Ug
+b2YgdGhlIHBlci1DUFUgc2V0IG9mIHN1cHBvcnRlZCB2ZWN0b3IgbGVuZ3RocworICogZHVyaW5n
+IHNlY29uZGFyeSBib290LgorICovCitzdGF0aWMgREVDTEFSRV9CSVRNQVAoc3ZlX3NlY29uZGFy
+eV92cV9tYXAsIFNWRV9WUV9NQVgpOworCitzdGF0aWMgdm9pZCBzdmVfcHJvYmVfdnFzKERFQ0xB
+UkVfQklUTUFQKG1hcCwgU1ZFX1ZRX01BWCkpCit7CisJdW5zaWduZWQgaW50IHZxLCB2bDsKKwl1
+bnNpZ25lZCBsb25nIHpjcjsKKworCWJpdG1hcF96ZXJvKG1hcCwgU1ZFX1ZRX01BWCk7CisKKwl6
+Y3IgPSBaQ1JfRUx4X0xFTl9NQVNLOworCXpjciA9IHJlYWRfc3lzcmVnX3MoU1lTX1pDUl9FTDEp
+ICYgfnpjcjsKKworCWZvciAodnEgPSBTVkVfVlFfTUFYOyB2cSA+PSBTVkVfVlFfTUlOOyAtLXZx
+KSB7CisJCXdyaXRlX3N5c3JlZ19zKHpjciB8ICh2cSAtIDEpLCBTWVNfWkNSX0VMMSk7IC8qIHNl
+bGYtc3luY2luZyAqLworCQl2bCA9IHN2ZV9nZXRfdmwoKTsKKwkJdnEgPSBzdmVfdnFfZnJvbV92
+bCh2bCk7IC8qIHNraXAgaW50ZXJ2ZW5pbmcgbGVuZ3RocyAqLworCQlzZXRfYml0KHZxX3RvX2Jp
+dCh2cSksIG1hcCk7CisJfQorfQorCit2b2lkIF9faW5pdCBzdmVfaW5pdF92cV9tYXAodm9pZCkK
+K3sKKwlzdmVfcHJvYmVfdnFzKHN2ZV92cV9tYXApOworfQorCisvKgorICogSWYgd2UgaGF2ZW4n
+dCBjb21taXR0ZWQgdG8gdGhlIHNldCBvZiBzdXBwb3J0ZWQgVlFzIHlldCwgZmlsdGVyIG91dAor
+ICogdGhvc2Ugbm90IHN1cHBvcnRlZCBieSB0aGUgY3VycmVudCBDUFUuCisgKi8KK3ZvaWQgc3Zl
+X3VwZGF0ZV92cV9tYXAodm9pZCkKK3sKKwlzdmVfcHJvYmVfdnFzKHN2ZV9zZWNvbmRhcnlfdnFf
+bWFwKTsKKwliaXRtYXBfYW5kKHN2ZV92cV9tYXAsIHN2ZV92cV9tYXAsIHN2ZV9zZWNvbmRhcnlf
+dnFfbWFwLCBTVkVfVlFfTUFYKTsKK30KKworLyogQ2hlY2sgd2hldGhlciB0aGUgY3VycmVudCBD
+UFUgc3VwcG9ydHMgYWxsIFZRcyBpbiB0aGUgY29tbWl0dGVkIHNldCAqLworaW50IHN2ZV92ZXJp
+ZnlfdnFfbWFwKHZvaWQpCit7CisJaW50IHJldCA9IDA7CisKKwlzdmVfcHJvYmVfdnFzKHN2ZV9z
+ZWNvbmRhcnlfdnFfbWFwKTsKKwliaXRtYXBfYW5kbm90KHN2ZV9zZWNvbmRhcnlfdnFfbWFwLCBz
+dmVfdnFfbWFwLCBzdmVfc2Vjb25kYXJ5X3ZxX21hcCwKKwkJICAgICAgU1ZFX1ZRX01BWCk7CisJ
+aWYgKCFiaXRtYXBfZW1wdHkoc3ZlX3NlY29uZGFyeV92cV9tYXAsIFNWRV9WUV9NQVgpKSB7CisJ
+CXByX3dhcm4oIlNWRTogY3B1JWQ6IFJlcXVpcmVkIHZlY3RvciBsZW5ndGgocykgbWlzc2luZ1xu
+IiwKKwkJCXNtcF9wcm9jZXNzb3JfaWQoKSk7CisJCXJldCA9IC1FSU5WQUw7CisJfQorCisJcmV0
+dXJuIHJldDsKK30KKworLyoKKyAqIEVuYWJsZSBTVkUgZm9yIEVMMS4KKyAqIEludGVuZGVkIGZv
+ciB1c2UgYnkgdGhlIGNwdWZlYXR1cmVzIGNvZGUgZHVyaW5nIENQVSBib290LgorICovCitpbnQg
+c3ZlX2tlcm5lbF9lbmFibGUodm9pZCAqX19hbHdheXNfdW51c2VkIHApCit7CisJd3JpdGVfc3lz
+cmVnKHJlYWRfc3lzcmVnKENQQUNSX0VMMSkgfCBDUEFDUl9FTDFfWkVOX0VMMUVOLCBDUEFDUl9F
+TDEpOworCWlzYigpOworCisJcmV0dXJuIDA7Cit9CisKK3ZvaWQgX19pbml0IHN2ZV9zZXR1cCh2
+b2lkKQoreworCXU2NCB6Y3I7CisKKwlpZiAoIXN5c3RlbV9zdXBwb3J0c19zdmUoKSkKKwkJcmV0
+dXJuOworCisJLyoKKwkgKiBUaGUgU1ZFIGFyY2hpdGVjdHVyZSBtYW5kYXRlcyBzdXBwb3J0IGZv
+ciAxMjgtYml0IHZlY3RvcnMsCisJICogc28gc3ZlX3ZxX21hcCBtdXN0IGhhdmUgYXQgbGVhc3Qg
+U1ZFX1ZRX01JTiBzZXQuCisJICogSWYgc29tZXRoaW5nIHdlbnQgd3JvbmcsIGF0IGxlYXN0IHRy
+eSB0byBwYXRjaCBpdCB1cDoKKwkgKi8KKwlpZiAoV0FSTl9PTighdGVzdF9iaXQodnFfdG9fYml0
+KFNWRV9WUV9NSU4pLCBzdmVfdnFfbWFwKSkpCisJCXNldF9iaXQodnFfdG9fYml0KFNWRV9WUV9N
+SU4pLCBzdmVfdnFfbWFwKTsKKworCXpjciA9IHJlYWRfc2FuaXRpc2VkX2Z0cl9yZWcoU1lTX1pD
+Ul9FTDEpOworCXN2ZV9tYXhfdmwgPSBzdmVfdmxfZnJvbV92cSgoemNyICYgWkNSX0VMeF9MRU5f
+TUFTSykgKyAxKTsKKworCS8qCisJICogU2FuaXR5LWNoZWNrIHRoYXQgdGhlIG1heCBWTCB3ZSBk
+ZXRlcm1pbmVkIHRocm91Z2ggQ1BVIGZlYXR1cmVzCisJICogY29ycmVzcG9uZHMgcHJvcGVybHkg
+dG8gc3ZlX3ZxX21hcC4gIElmIG5vdCwgZG8gb3VyIGJlc3Q6CisJICovCisJaWYgKFdBUk5fT04o
+c3ZlX21heF92bCAhPSBmaW5kX3N1cHBvcnRlZF92ZWN0b3JfbGVuZ3RoKHN2ZV9tYXhfdmwpKSkK
+KwkJc3ZlX21heF92bCA9IGZpbmRfc3VwcG9ydGVkX3ZlY3Rvcl9sZW5ndGgoc3ZlX21heF92bCk7
+CisKKwkvKgorCSAqIEZvciB0aGUgZGVmYXVsdCBWTCwgcGljayB0aGUgbWF4aW11bSBzdXBwb3J0
+ZWQgdmFsdWUgPD0gNjQuCisJICogVkwgPT0gNjQgaXMgZ3VhcmFudGVlZCBub3QgdG8gZ3JvdyB0
+aGUgc2lnbmFsIGZyYW1lLgorCSAqLworCXN2ZV9kZWZhdWx0X3ZsID0gZmluZF9zdXBwb3J0ZWRf
+dmVjdG9yX2xlbmd0aCg2NCk7CisKKwlwcl9pbmZvKCJTVkU6IG1heGltdW0gYXZhaWxhYmxlIHZl
+Y3RvciBsZW5ndGggJXUgYnl0ZXMgcGVyIHZlY3RvclxuIiwKKwkJc3ZlX21heF92bCk7CisJcHJf
+aW5mbygiU1ZFOiBkZWZhdWx0IHZlY3RvciBsZW5ndGggJXUgYnl0ZXMgcGVyIHZlY3RvclxuIiwK
+KwkJc3ZlX2RlZmF1bHRfdmwpOworfQorCisvKgogICogQ2FsbGVkIGZyb20gdGhlIHB1dF90YXNr
+X3N0cnVjdCgpIHBhdGgsIHdoaWNoIGNhbm5vdCBnZXQgaGVyZQogICogdW5sZXNzIGRlYWRfdGFz
+ayBpcyByZWFsbHkgZGVhZCBhbmQgbm90IHNjaGVkdWxhYmxlLgogICovCkBAIC02MzAsNiArNzM1
+LDkgQEAgdm9pZCBmcHNpbWRfZmx1c2hfdGhyZWFkKHZvaWQpCiAJCSAqIFRoaXMgaXMgd2hlcmUg
+d2UgZW5zdXJlIHRoYXQgYWxsIHVzZXIgdGFza3MgaGF2ZSBhIHZhbGlkCiAJCSAqIHZlY3RvciBs
+ZW5ndGggY29uZmlndXJlZDogbm8ga2VybmVsIHRhc2sgY2FuIGJlY29tZSBhIHVzZXIKIAkJICog
+dGFzayB3aXRob3V0IGFuIGV4ZWMgYW5kIGhlbmNlIGEgY2FsbCB0byB0aGlzIGZ1bmN0aW9uLgor
+CQkgKiBCeSB0aGUgdGltZSB0aGUgZmlyc3QgY2FsbCB0byB0aGlzIGZ1bmN0aW9uIGlzIG1hZGUs
+IGFsbAorCQkgKiBlYXJseSBoYXJkd2FyZSBwcm9iaW5nIGlzIGNvbXBsZXRlLCBzbyBzdmVfZGVm
+YXVsdF92bAorCQkgKiBzaG91bGQgYmUgdmFsaWQuCiAJCSAqIElmIGEgYnVnIGNhdXNlcyB0aGlz
+IHRvIGdvIHdyb25nLCB3ZSBtYWtlIHNvbWUgbm9pc2UgYW5kCiAJCSAqIHRyeSB0byBmdWRnZSB0
+aHJlYWQuc3ZlX3ZsIHRvIGEgc2FmZSB2YWx1ZSBoZXJlLgogCQkgKi8KLS0gCjIuMS40CgpfX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGlu
+ZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1
+bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
