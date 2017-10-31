@@ -1,23 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v5 23/30] arm64/sve: Add sysctl to set the default vector
- length for new processes
-Date: Tue, 31 Oct 2017 15:51:15 +0000
-Message-ID: <1509465082-30427-24-git-send-email-Dave.Martin@arm.com>
+Subject: [RFC PATCH v5 29/30] arm64: signal: Report signal frame size to
+ userspace via auxv
+Date: Tue, 31 Oct 2017 15:51:21 +0000
+Message-ID: <1509465082-30427-30-git-send-email-Dave.Martin@arm.com>
 References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B97649D4F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 11:50:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3005249D72
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 11:50:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rjeQAQhO5ftx for <kvmarm@lists.cs.columbia.edu>;
- Tue, 31 Oct 2017 11:50:42 -0400 (EDT)
+ with ESMTP id Ph6BB7bS5nxp for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 31 Oct 2017 11:50:55 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D1F449D60
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 11:50:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5585049D15
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 11:50:52 -0400 (EDT)
 In-Reply-To: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,67 +32,179 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-QmVjYXVzZSBvZiB0aGUgZWZmZWN0IG9mIFNWRSBvbiB0aGUgc2l6ZSBvZiB0aGUgc2lnbmFsIGZy
-YW1lLCB0aGUKZGVmYXVsdCB2ZWN0b3IgbGVuZ3RoIHVzZWQgZm9yIG5ldyBwcm9jZXNzZXMgaW52
-b2x2ZXMgYSB0cmFkZW9mZgpiZXR3ZWVuIHBlcmZvcm1hbmNlIG9mIFNWRS1lbmFibGVkIHNvZnR3
-YXJlIG9uIHRoZSBvbmUgaGFuZCwgYW5kCnJlbGlhYmlsaXR5IG9mIG5vbi1TVkUtYXdhcmUgc29m
-dHdhcmUgb24gdGhlIG90aGVyIGhhbmQuCgpGb3IgdGhpcyByZWFzb24sIHRoZSBiZXN0IGNob2lj
-ZSBkZXBlbmRzIG9uIHRoZSByZXBlcnRvaXJlIG9mCnVzZXJzcGFjZSBzb2Z0d2FyZSBpbiB1c2Ug
-YW5kIGlzIHRodXMgYmVzdCBsZWZ0IHVwIHRvIGRpc3RybwptYWludGFpbmVycywgc3lzYWRtaW5z
-IGFuZCBkZXZlbG9wZXJzLgoKSWYgQ09ORklHX1NZU0NUTCBhbmQgQ09ORklHX1BST0NfU1lTQ1RM
-IGFyZSBlbmFibGVkLCB0aGlzIHBhdGNoCmV4cG9zZXMgdGhlIGRlZmF1bHQgdmVjdG9yIGxlbmd0
-aCBpbgovcHJvYy9zeXMvYWJpL3N2ZV9kZWZhdWx0X3ZlY3Rvcl9sZW5ndGgsIHdoZXJlIGJvb3Qg
-c2NyaXB0cyBvciB0aGUKYWR2ZW50dXJvdXMgY2FuIHBva2UgaXQuCgpJbiBjb21tb24gd2l0aCBv
-dGhlciBhcm02NCBBQkkgc3lzY3RscywgdGhpcyBjb250cm9sIGlzIGN1cnJlbnRseQpnbG9iYWw6
-IHNldHRpbmcgaXQgcmVxdWlyZXMgQ0FQX1NZU19BRE1JTiBpbiB0aGUgcm9vdCB1c2VyCm5hbWVz
-cGFjZSwgYnV0IHRoZSB2YWx1ZSBzZXQgaXMgZWZmZWN0aXZlIGZvciBzdWJzZXF1ZW50IGV4ZWNz
-IGluCmFsbCBuYW1lc3BhY2VzLiAgVGhlIGNvbnRyb2wgb25seSBhZmZlY3RzIF9uZXdfIHByb2Nl
-c3NlcywgaG93ZXZlcjoKY2hhbmdpbmcgaXQgZG9lcyBub3QgYWZmZWN0IHRoZSB2ZWN0b3IgbGVu
-Z3RoIG9mIGFueSBleGlzdGluZwpwcm9jZXNzLgoKVGhlIGludGVuZGVkIHVzYWdlIG1vZGVsIGlz
-IHRoYXQgaWYgdXNlcnNwYWNlIGlzIGtub3duIHRvIGJlIGZ1bGx5ClNWRS10b2xlcmFudCAob3Ig
-YSBkZXZlbG9wZXIgaXMgY3VyaW91cyB0byBmaW5kIG91dCkgdGhlbiB0aGlzCnBhcmFtZXRlciBj
-YW4gYmUgY3JhbmtlZCB1cCBkdXJpbmcgc3lzdGVtIHN0YXJ0dXAuCgpTaWduZWQtb2ZmLWJ5OiBE
-YXZlIE1hcnRpbiA8RGF2ZS5NYXJ0aW5AYXJtLmNvbT4KUmV2aWV3ZWQtYnk6IEFsZXggQmVubsOp
-ZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KUmV2aWV3ZWQtYnk6IENhdGFsaW4gTWFyaW5hcyA8
-Y2F0YWxpbi5tYXJpbmFzQGFybS5jb20+Ci0tLQogYXJjaC9hcm02NC9rZXJuZWwvZnBzaW1kLmMg
-fCA2MiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystCiAxIGZp
-bGUgY2hhbmdlZCwgNjEgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQoKZGlmZiAtLWdpdCBh
-L2FyY2gvYXJtNjQva2VybmVsL2Zwc2ltZC5jIGIvYXJjaC9hcm02NC9rZXJuZWwvZnBzaW1kLmMK
-aW5kZXggY2JiMmM2My4uNGRhNjRmYyAxMDA2NDQKLS0tIGEvYXJjaC9hcm02NC9rZXJuZWwvZnBz
-aW1kLmMKKysrIGIvYXJjaC9hcm02NC9rZXJuZWwvZnBzaW1kLmMKQEAgLTM2LDYgKzM2LDcgQEAK
-ICNpbmNsdWRlIDxsaW51eC9zY2hlZC9zaWduYWwuaD4KICNpbmNsdWRlIDxsaW51eC9zaWduYWwu
-aD4KICNpbmNsdWRlIDxsaW51eC9zbGFiLmg+CisjaW5jbHVkZSA8bGludXgvc3lzY3RsLmg+CiAK
-ICNpbmNsdWRlIDxhc20vZnBzaW1kLmg+CiAjaW5jbHVkZSA8YXNtL2NwdXR5cGUuaD4KQEAgLTMz
-NCw2ICszMzUsNjUgQEAgc3RhdGljIHVuc2lnbmVkIGludCBmaW5kX3N1cHBvcnRlZF92ZWN0b3Jf
-bGVuZ3RoKHVuc2lnbmVkIGludCB2bCkKIAlyZXR1cm4gc3ZlX3ZsX2Zyb21fdnEoYml0X3RvX3Zx
-KGJpdCkpOwogfQogCisjaWZkZWYgQ09ORklHX1NZU0NUTAorCitzdGF0aWMgaW50IHN2ZV9wcm9j
-X2RvX2RlZmF1bHRfdmwoc3RydWN0IGN0bF90YWJsZSAqdGFibGUsIGludCB3cml0ZSwKKwkJCQkg
-IHZvaWQgX191c2VyICpidWZmZXIsIHNpemVfdCAqbGVucCwKKwkJCQkgIGxvZmZfdCAqcHBvcykK
-K3sKKwlpbnQgcmV0OworCWludCB2bCA9IHN2ZV9kZWZhdWx0X3ZsOworCXN0cnVjdCBjdGxfdGFi
-bGUgdG1wX3RhYmxlID0geworCQkuZGF0YSA9ICZ2bCwKKwkJLm1heGxlbiA9IHNpemVvZih2bCks
-CisJfTsKKworCXJldCA9IHByb2NfZG9pbnR2ZWMoJnRtcF90YWJsZSwgd3JpdGUsIGJ1ZmZlciwg
-bGVucCwgcHBvcyk7CisJaWYgKHJldCB8fCAhd3JpdGUpCisJCXJldHVybiByZXQ7CisKKwkvKiBX
-cml0aW5nIC0xIGhhcyB0aGUgc3BlY2lhbCBtZWFuaW5nICJzZXQgdG8gbWF4IjogKi8KKwlpZiAo
-dmwgPT0gLTEpIHsKKwkJLyogRmFpbCBzYWZlIGlmIHN2ZV9tYXhfdmwgd2Fzbid0IGluaXRpYWxp
-c2VkICovCisJCWlmIChXQVJOX09OKCFzdmVfdmxfdmFsaWQoc3ZlX21heF92bCkpKQorCQkJdmwg
-PSBTVkVfVkxfTUlOOworCQllbHNlCisJCQl2bCA9IHN2ZV9tYXhfdmw7CisKKwkJZ290byBjaG9z
-ZW47CisJfQorCisJaWYgKCFzdmVfdmxfdmFsaWQodmwpKQorCQlyZXR1cm4gLUVJTlZBTDsKKwor
-CXZsID0gZmluZF9zdXBwb3J0ZWRfdmVjdG9yX2xlbmd0aCh2bCk7CitjaG9zZW46CisJc3ZlX2Rl
-ZmF1bHRfdmwgPSB2bDsKKwlyZXR1cm4gMDsKK30KKworc3RhdGljIHN0cnVjdCBjdGxfdGFibGUg
-c3ZlX2RlZmF1bHRfdmxfdGFibGVbXSA9IHsKKwl7CisJCS5wcm9jbmFtZQk9ICJzdmVfZGVmYXVs
-dF92ZWN0b3JfbGVuZ3RoIiwKKwkJLm1vZGUJCT0gMDY0NCwKKwkJLnByb2NfaGFuZGxlcgk9IHN2
-ZV9wcm9jX2RvX2RlZmF1bHRfdmwsCisJfSwKKwl7IH0KK307CisKK3N0YXRpYyBpbnQgX19pbml0
-IHN2ZV9zeXNjdGxfaW5pdCh2b2lkKQoreworCWlmIChzeXN0ZW1fc3VwcG9ydHNfc3ZlKCkpCisJ
-CWlmICghcmVnaXN0ZXJfc3lzY3RsKCJhYmkiLCBzdmVfZGVmYXVsdF92bF90YWJsZSkpCisJCQly
-ZXR1cm4gLUVJTlZBTDsKKworCXJldHVybiAwOworfQorCisjZWxzZSAvKiAhIENPTkZJR19TWVND
-VEwgKi8KK3N0YXRpYyBpbnQgX19pbml0IHN2ZV9zeXNjdGxfaW5pdCh2b2lkKSB7IHJldHVybiAw
-OyB9CisjZW5kaWYgLyogISBDT05GSUdfU1lTQ1RMICovCisKICNkZWZpbmUgWlJFRyhzdmVfc3Rh
-dGUsIHZxLCBuKSAoKGNoYXIgKikoc3ZlX3N0YXRlKSArCQlcCiAJKFNWRV9TSUdfWlJFR19PRkZT
-RVQodnEsIG4pIC0gU1ZFX1NJR19SRUdTX09GRlNFVCkpCiAKQEAgLTEyMDgsNiArMTI2OCw2IEBA
-IHN0YXRpYyBpbnQgX19pbml0IGZwc2ltZF9pbml0KHZvaWQpCiAJaWYgKCEoZWxmX2h3Y2FwICYg
-SFdDQVBfQVNJTUQpKQogCQlwcl9ub3RpY2UoIkFkdmFuY2VkIFNJTUQgaXMgbm90IGltcGxlbWVu
-dGVkXG4iKTsKIAotCXJldHVybiAwOworCXJldHVybiBzdmVfc3lzY3RsX2luaXQoKTsKIH0KIGNv
-cmVfaW5pdGNhbGwoZnBzaW1kX2luaXQpOwotLSAKMi4xLjQKCl9fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxp
-c3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFu
-L2xpc3RpbmZvL2t2bWFybQo=
+Stateful CPU architecture extensions may require the signal frame
+to grow to a size that exceeds the arch's MINSIGSTKSZ #define.
+However, changing this #define is an ABI break.
+
+To allow userspace the option of determining the signal frame size
+in a more forwards-compatible way, this patch adds a new auxv entry
+tagged with AT_MINSIGSTKSZ, which provides the maximum signal frame
+size that the process can observe during its lifetime.
+
+If AT_MINSIGSTKSZ is absent from the aux vector, the caller can
+assume that the MINSIGSTKSZ #define is sufficient.  This allows for
+a consistent interface with older kernels that do not provide
+AT_MINSIGSTKSZ.
+
+The idea is that libc could expose this via sysconf() or some
+similar mechanism.
+
+There is deliberately no AT_SIGSTKSZ.  The kernel knows nothing
+about userspace's own stack overheads and should not pretend to
+know.
+
+For arm64:
+
+The primary motivation for this interface is the Scalable Vector
+Extension, which can require at least 4KB or so of extra space
+in the signal frame for the largest hardware implementations.
+
+To determine the correct value, a "Christmas tree" mode (via the
+add_all argument) is added to setup_sigframe_layout(), to simulate
+addition of all possible records to the signal frame at maximum
+possible size.
+
+If this procedure goes wrong somehow, resulting in a stupidly large
+frame layout and hence failure of sigframe_alloc() to allocate a
+record to the frame, then this is indicative of a kernel bug: the
+kernel's internal SIGFRAME_MAXSZ is supposed to sanity-check
+against generting frames that we consider _impossibly_ large.  In
+this case, SIGSTKSZ is returned as a "reasonable guess that is at
+least bigger than MINSIGSTKSZ" and we WARN().
+
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+---
+ arch/arm64/include/asm/elf.h         |  5 +++++
+ arch/arm64/include/asm/processor.h   |  3 +++
+ arch/arm64/include/uapi/asm/auxvec.h |  3 ++-
+ arch/arm64/kernel/signal.c           | 39 +++++++++++++++++++++++++++++++-----
+ 4 files changed, 44 insertions(+), 6 deletions(-)
+
+diff --git a/arch/arm64/include/asm/elf.h b/arch/arm64/include/asm/elf.h
+index fac1c4d..771c7a8 100644
+--- a/arch/arm64/include/asm/elf.h
++++ b/arch/arm64/include/asm/elf.h
+@@ -24,6 +24,10 @@
+ #include <asm/ptrace.h>
+ #include <asm/user.h>
+ 
++#ifndef __ASSEMBLY__
++#include <asm/processor.h> /* for get_minsigstksz(), used by ARCH_DLINFO */
++#endif
++
+ /*
+  * AArch64 static relocation types.
+  */
+@@ -148,6 +152,7 @@ typedef struct user_fpsimd_state elf_fpregset_t;
+ do {									\
+ 	NEW_AUX_ENT(AT_SYSINFO_EHDR,					\
+ 		    (elf_addr_t)current->mm->context.vdso);		\
++	NEW_AUX_ENT(AT_MINSIGSTKSZ, get_minsigstksz());			\
+ } while (0)
+ 
+ #define ARCH_HAS_SETUP_ADDITIONAL_PAGES
+diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
+index 023cacb..055b06d 100644
+--- a/arch/arm64/include/asm/processor.h
++++ b/arch/arm64/include/asm/processor.h
+@@ -217,6 +217,9 @@ static inline void spin_lock_prefetch(const void *ptr)
+ int cpu_enable_pan(void *__unused);
+ int cpu_enable_cache_maint_trap(void *__unused);
+ 
++/* User signal frame size discovery: */
++int get_minsigstksz(void);
++
+ /* Userspace interface for PR_SVE_{SET,GET}_VL prctl()s: */
+ #define SVE_SET_VL(arg)	sve_set_current_vl(arg)
+ #define SVE_GET_VL()	sve_get_current_vl()
+diff --git a/arch/arm64/include/uapi/asm/auxvec.h b/arch/arm64/include/uapi/asm/auxvec.h
+index 4cf0c17..1d45b28 100644
+--- a/arch/arm64/include/uapi/asm/auxvec.h
++++ b/arch/arm64/include/uapi/asm/auxvec.h
+@@ -18,7 +18,8 @@
+ 
+ /* vDSO location */
+ #define AT_SYSINFO_EHDR	33
++#define AT_MINSIGSTKSZ	34	/* stack needed for signal delivery */
+ 
+-#define AT_VECTOR_SIZE_ARCH 1 /* entries in ARCH_DLINFO */
++#define AT_VECTOR_SIZE_ARCH 2 /* entries in ARCH_DLINFO */
+ 
+ #endif
+diff --git a/arch/arm64/kernel/signal.c b/arch/arm64/kernel/signal.c
+index 64abf88..7c7d9ae 100644
+--- a/arch/arm64/kernel/signal.c
++++ b/arch/arm64/kernel/signal.c
+@@ -571,8 +571,15 @@ asmlinkage long sys_rt_sigreturn(struct pt_regs *regs)
+ 	return 0;
+ }
+ 
+-/* Determine the layout of optional records in the signal frame */
+-static int setup_sigframe_layout(struct rt_sigframe_user_layout *user)
++/*
++ * Determine the layout of optional records in the signal frame
++ *
++ * add_all: if true, lays out the biggest possible signal frame for
++ *	this task; otherwise, generates a layout for the current state
++ *	of the task.
++ */
++static int setup_sigframe_layout(struct rt_sigframe_user_layout *user,
++				 bool add_all)
+ {
+ 	int err;
+ 
+@@ -582,7 +589,7 @@ static int setup_sigframe_layout(struct rt_sigframe_user_layout *user)
+ 		return err;
+ 
+ 	/* fault information, if valid */
+-	if (current->thread.fault_code) {
++	if (add_all || current->thread.fault_code) {
+ 		err = sigframe_alloc(user, &user->esr_offset,
+ 				     sizeof(struct esr_context));
+ 		if (err)
+@@ -604,7 +611,6 @@ static int setup_sigframe_layout(struct rt_sigframe_user_layout *user)
+ 	return sigframe_alloc_end(user);
+ }
+ 
+-
+ static int setup_sigframe(struct rt_sigframe_user_layout *user,
+ 			  struct pt_regs *regs, sigset_t *set)
+ {
+@@ -702,7 +708,7 @@ static int get_sigframe(struct rt_sigframe_user_layout *user,
+ 	int err;
+ 
+ 	init_user_layout(user);
+-	err = setup_sigframe_layout(user);
++	err = setup_sigframe_layout(user, false);
+ 	if (err)
+ 		return err;
+ 
+@@ -934,3 +940,26 @@ asmlinkage void do_notify_resume(struct pt_regs *regs,
+ 		thread_flags = READ_ONCE(current_thread_info()->flags);
+ 	} while (thread_flags & _TIF_WORK_MASK);
+ }
++
++/*
++ * Determine the stack space required for guaranteed signal devliery.
++ * This function is used to populate AT_MINSIGSTKSZ at process startup.
++ */
++int get_minsigstksz(void)
++{
++	struct rt_sigframe_user_layout user;
++	int err;
++
++	init_user_layout(&user);
++	err = setup_sigframe_layout(&user, true);
++
++	if (err) {
++		WARN_ON(1);
++
++		return SIGSTKSZ;
++	} else {
++		return sigframe_size(&user) +
++			round_up(sizeof(struct frame_record), 16) +
++			16; /* max alignment padding */
++	}
++}
+-- 
+2.1.4
