@@ -1,7 +1,7 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v5 09/30] arm64/sve: Low-level SVE architectural state manipulation functions
-Date: Tue, 31 Oct 2017 15:51:01 +0000
-Message-ID: <1509465082-30427-10-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v5 07/30] arm64: fpsimd: Simplify uses of {set,clear}_ti_thread_flag()
+Date: Tue, 31 Oct 2017 15:50:59 +0000
+Message-ID: <1509465082-30427-8-git-send-email-Dave.Martin@arm.com>
 References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -13,223 +13,39 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Manipulating the SVE architectural state, including the vector and
-predicate registers, first-fault register and the vector length,
-requires the use of dedicated instructions added by SVE.
+The existing FPSIMD context switch code contains a couple of
+instances of {set,clear}_ti_thread(task_thread_info(task)).  Since
+there are thread flag manipulators that operate directly on
+task_struct, this verbosity isn't strictly needed.
 
-This patch adds suitable assembly functions for saving and
-restoring the SVE registers and querying the vector length.
-Setting of the vector length is done as part of register restore.
-
-Since people building kernels may not all get an SVE-enabled
-toolchain for a while, this patch uses macros that generate
-explicit opcodes in place of assembler mnemonics.
+For consistency, this patch simplifies the affected calls.  This
+should have no impact on behaviour.
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/include/asm/fpsimd.h       |   5 ++
- arch/arm64/include/asm/fpsimdmacros.h | 148 ++++++++++++++++++++++++++++++++++
- arch/arm64/kernel/entry-fpsimd.S      |  17 ++++
- 3 files changed, 170 insertions(+)
+ arch/arm64/kernel/fpsimd.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
-index 410c481..026a7c7 100644
---- a/arch/arm64/include/asm/fpsimd.h
-+++ b/arch/arm64/include/asm/fpsimd.h
-@@ -67,6 +67,11 @@ extern void fpsimd_update_current_state(struct fpsimd_state *state);
+diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+index e851faa19..2baba0d 100644
+--- a/arch/arm64/kernel/fpsimd.c
++++ b/arch/arm64/kernel/fpsimd.c
+@@ -160,11 +160,9 @@ void fpsimd_thread_switch(struct task_struct *next)
  
- extern void fpsimd_flush_task_state(struct task_struct *target);
+ 		if (__this_cpu_read(fpsimd_last_state) == st
+ 		    && st->cpu == smp_processor_id())
+-			clear_ti_thread_flag(task_thread_info(next),
+-					     TIF_FOREIGN_FPSTATE);
++			clear_tsk_thread_flag(next, TIF_FOREIGN_FPSTATE);
+ 		else
+-			set_ti_thread_flag(task_thread_info(next),
+-					   TIF_FOREIGN_FPSTATE);
++			set_tsk_thread_flag(next, TIF_FOREIGN_FPSTATE);
+ 	}
+ }
  
-+extern void sve_save_state(void *state, u32 *pfpsr);
-+extern void sve_load_state(void const *state, u32 const *pfpsr,
-+			   unsigned long vq_minus_1);
-+extern unsigned int sve_get_vl(void);
-+
- /* For use by EFI runtime services calls only */
- extern void __efi_fpsimd_begin(void);
- extern void __efi_fpsimd_end(void);
-diff --git a/arch/arm64/include/asm/fpsimdmacros.h b/arch/arm64/include/asm/fpsimdmacros.h
-index 0f5fdd3..e050d76 100644
---- a/arch/arm64/include/asm/fpsimdmacros.h
-+++ b/arch/arm64/include/asm/fpsimdmacros.h
-@@ -75,3 +75,151 @@
- 	ldr	w\tmpnr, [\state, #16 * 2 + 4]
- 	fpsimd_restore_fpcr x\tmpnr, \state
- .endm
-+
-+/* Sanity-check macros to help avoid encoding garbage instructions */
-+
-+.macro _check_general_reg nr
-+	.if (\nr) < 0 || (\nr) > 30
-+		.error "Bad register number \nr."
-+	.endif
-+.endm
-+
-+.macro _sve_check_zreg znr
-+	.if (\znr) < 0 || (\znr) > 31
-+		.error "Bad Scalable Vector Extension vector register number \znr."
-+	.endif
-+.endm
-+
-+.macro _sve_check_preg pnr
-+	.if (\pnr) < 0 || (\pnr) > 15
-+		.error "Bad Scalable Vector Extension predicate register number \pnr."
-+	.endif
-+.endm
-+
-+.macro _check_num n, min, max
-+	.if (\n) < (\min) || (\n) > (\max)
-+		.error "Number \n out of range [\min,\max]"
-+	.endif
-+.endm
-+
-+/* SVE instruction encodings for non-SVE-capable assemblers */
-+
-+/* STR (vector): STR Z\nz, [X\nxbase, #\offset, MUL VL] */
-+.macro _sve_str_v nz, nxbase, offset=0
-+	_sve_check_zreg \nz
-+	_check_general_reg \nxbase
-+	_check_num (\offset), -0x100, 0xff
-+	.inst	0xe5804000			\
-+		| (\nz)				\
-+		| ((\nxbase) << 5)		\
-+		| (((\offset) & 7) << 10)	\
-+		| (((\offset) & 0x1f8) << 13)
-+.endm
-+
-+/* LDR (vector): LDR Z\nz, [X\nxbase, #\offset, MUL VL] */
-+.macro _sve_ldr_v nz, nxbase, offset=0
-+	_sve_check_zreg \nz
-+	_check_general_reg \nxbase
-+	_check_num (\offset), -0x100, 0xff
-+	.inst	0x85804000			\
-+		| (\nz)				\
-+		| ((\nxbase) << 5)		\
-+		| (((\offset) & 7) << 10)	\
-+		| (((\offset) & 0x1f8) << 13)
-+.endm
-+
-+/* STR (predicate): STR P\np, [X\nxbase, #\offset, MUL VL] */
-+.macro _sve_str_p np, nxbase, offset=0
-+	_sve_check_preg \np
-+	_check_general_reg \nxbase
-+	_check_num (\offset), -0x100, 0xff
-+	.inst	0xe5800000			\
-+		| (\np)				\
-+		| ((\nxbase) << 5)		\
-+		| (((\offset) & 7) << 10)	\
-+		| (((\offset) & 0x1f8) << 13)
-+.endm
-+
-+/* LDR (predicate): LDR P\np, [X\nxbase, #\offset, MUL VL] */
-+.macro _sve_ldr_p np, nxbase, offset=0
-+	_sve_check_preg \np
-+	_check_general_reg \nxbase
-+	_check_num (\offset), -0x100, 0xff
-+	.inst	0x85800000			\
-+		| (\np)				\
-+		| ((\nxbase) << 5)		\
-+		| (((\offset) & 7) << 10)	\
-+		| (((\offset) & 0x1f8) << 13)
-+.endm
-+
-+/* RDVL X\nx, #\imm */
-+.macro _sve_rdvl nx, imm
-+	_check_general_reg \nx
-+	_check_num (\imm), -0x20, 0x1f
-+	.inst	0x04bf5000			\
-+		| (\nx)				\
-+		| (((\imm) & 0x3f) << 5)
-+.endm
-+
-+/* RDFFR (unpredicated): RDFFR P\np.B */
-+.macro _sve_rdffr np
-+	_sve_check_preg \np
-+	.inst	0x2519f000			\
-+		| (\np)
-+.endm
-+
-+/* WRFFR P\np.B */
-+.macro _sve_wrffr np
-+	_sve_check_preg \np
-+	.inst	0x25289000			\
-+		| ((\np) << 5)
-+.endm
-+
-+.macro __for from:req, to:req
-+	.if (\from) == (\to)
-+		_for__body \from
-+	.else
-+		__for \from, (\from) + ((\to) - (\from)) / 2
-+		__for (\from) + ((\to) - (\from)) / 2 + 1, \to
-+	.endif
-+.endm
-+
-+.macro _for var:req, from:req, to:req, insn:vararg
-+	.macro _for__body \var:req
-+		\insn
-+	.endm
-+
-+	__for \from, \to
-+
-+	.purgem _for__body
-+.endm
-+
-+.macro sve_save nxbase, xpfpsr, nxtmp
-+ _for n, 0, 31,	_sve_str_v	\n, \nxbase, \n - 34
-+ _for n, 0, 15,	_sve_str_p	\n, \nxbase, \n - 16
-+		_sve_rdffr	0
-+		_sve_str_p	0, \nxbase
-+		_sve_ldr_p	0, \nxbase, -16
-+
-+		mrs		x\nxtmp, fpsr
-+		str		w\nxtmp, [\xpfpsr]
-+		mrs		x\nxtmp, fpcr
-+		str		w\nxtmp, [\xpfpsr, #4]
-+.endm
-+
-+.macro sve_load nxbase, xpfpsr, xvqminus1, nxtmp
-+		mrs_s		x\nxtmp, SYS_ZCR_EL1
-+		bic		x\nxtmp, x\nxtmp, ZCR_ELx_LEN_MASK
-+		orr		x\nxtmp, x\nxtmp, \xvqminus1
-+		msr_s		SYS_ZCR_EL1, x\nxtmp	// self-synchronising
-+
-+ _for n, 0, 31,	_sve_ldr_v	\n, \nxbase, \n - 34
-+		_sve_ldr_p	0, \nxbase
-+		_sve_wrffr	0
-+ _for n, 0, 15,	_sve_ldr_p	\n, \nxbase, \n - 16
-+
-+		ldr		w\nxtmp, [\xpfpsr]
-+		msr		fpsr, x\nxtmp
-+		ldr		w\nxtmp, [\xpfpsr, #4]
-+		msr		fpcr, x\nxtmp
-+.endm
-diff --git a/arch/arm64/kernel/entry-fpsimd.S b/arch/arm64/kernel/entry-fpsimd.S
-index 6a27cd6..73f17bf 100644
---- a/arch/arm64/kernel/entry-fpsimd.S
-+++ b/arch/arm64/kernel/entry-fpsimd.S
-@@ -41,3 +41,20 @@ ENTRY(fpsimd_load_state)
- 	fpsimd_restore x0, 8
- 	ret
- ENDPROC(fpsimd_load_state)
-+
-+#ifdef CONFIG_ARM64_SVE
-+ENTRY(sve_save_state)
-+	sve_save 0, x1, 2
-+	ret
-+ENDPROC(sve_save_state)
-+
-+ENTRY(sve_load_state)
-+	sve_load 0, x1, x2, 3
-+	ret
-+ENDPROC(sve_load_state)
-+
-+ENTRY(sve_get_vl)
-+	_sve_rdvl	0, 1
-+	ret
-+ENDPROC(sve_get_vl)
-+#endif /* CONFIG_ARM64_SVE */
 -- 
 2.1.4
