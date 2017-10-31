@@ -1,25 +1,25 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v4 20/21] KVM: arm64: Take any host SError before entering
- the guest
-Date: Tue, 31 Oct 2017 11:43:42 +0000
-Message-ID: <59F861EE.4010505@arm.com>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH v4 11/21] arm64: cpufeature: Detect CPU RAS Extentions
+Date: Tue, 31 Oct 2017 13:14:03 +0000
+Message-ID: <20171031131403.GJ5584@arm.com>
 References: <20171019145807.23251-1-james.morse@arm.com>
- <20171019145807.23251-21-james.morse@arm.com> <20171031062315.GY2166@lvm>
+ <20171019145807.23251-12-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3833249D1F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 07:43:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 134CA40A74
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 09:12:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XPxSp2dpABAv for <kvmarm@lists.cs.columbia.edu>;
- Tue, 31 Oct 2017 07:43:52 -0400 (EDT)
+ with ESMTP id mfncsDTc41CR for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 31 Oct 2017 09:12:25 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A37D240795
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 07:43:52 -0400 (EDT)
-In-Reply-To: <20171031062315.GY2166@lvm>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DAAB40651
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 09:12:25 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <20171019145807.23251-12-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,82 +29,135 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>
-Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Julien Thierry <julien.thierry@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, linux-arm-kernel@lists.infradead.org, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
+To: James Morse <james.morse@arm.com>
+Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Julien Thierry <julien.thierry@arm.com>, wangxiongfeng2@huawei.com, linux-arm-kernel@lists.infradead.org, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
-
-On 31/10/17 06:23, Christoffer Dall wrote:
-> On Thu, Oct 19, 2017 at 03:58:06PM +0100, James Morse wrote:
->> On VHE systems KVM masks SError before switching the VBAR value. Any
->> host RAS error that the CPU knew about before world-switch may become
->> pending as an SError during world-switch, and only be taken once we enter
->> the guest.
->>
->> Until KVM can take RAS SErrors during world switch, add an ESB to
->> force any RAS errors to be synchronised and taken on the host before
->> we enter world switch.
->>
->> RAS errors that become pending during world switch are still taken
->> once we enter the guest.
-
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index cf5d78ba14b5..5dc6f2877762 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -392,6 +392,7 @@ static inline void __cpu_init_stage2(void)
->>  
->>  static inline void kvm_arm_vhe_guest_enter(void)
->>  {
->> +	esb();
-
-> I don't fully appreciate what the point of this is?
+On Thu, Oct 19, 2017 at 03:57:57PM +0100, James Morse wrote:
+> From: Xie XiuQi <xiexiuqi@huawei.com>
 > 
-> As I understand it, our fundamental goal here is to try to distinguish
-> between errors happening on the host or in the guest.
+> ARM's v8.2 Extentions add support for Reliability, Availability and
+> Serviceability (RAS). On CPUs with these extensions system software
+> can use additional barriers to isolate errors and determine if faults
+> are pending.
+> 
+> Add cpufeature detection and a barrier in the context-switch code.
+> There is no need to use alternatives for this as CPUs that don't
+> support this feature will treat the instruction as a nop.
+> 
+> Platform level RAS support may require additional firmware support.
+> 
+> Signed-off-by: Xie XiuQi <xiexiuqi@huawei.com>
+> [Rebased, added esb and config option, reworded commit message]
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> ---
+>  arch/arm64/Kconfig               | 16 ++++++++++++++++
+>  arch/arm64/include/asm/barrier.h |  1 +
+>  arch/arm64/include/asm/cpucaps.h |  3 ++-
+>  arch/arm64/include/asm/sysreg.h  |  2 ++
+>  arch/arm64/kernel/cpufeature.c   | 13 +++++++++++++
+>  arch/arm64/kernel/process.c      |  3 +++
+>  6 files changed, 37 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+> index 70dfe4e9ccc5..b68f5e93baac 100644
+> --- a/arch/arm64/Kconfig
+> +++ b/arch/arm64/Kconfig
+> @@ -973,6 +973,22 @@ config ARM64_PMEM
+>  	  operations if DC CVAP is not supported (following the behaviour of
+>  	  DC CVAP itself if the system does not define a point of persistence).
+>  
+> +config ARM64_RAS_EXTN
+> +	bool "Enable support for RAS CPU Extensions"
+> +	default y
+> +	help
+> +	  CPUs that support the Reliability, Availability and Serviceability
+> +	  (RAS) Extensions, part of ARMv8.2 are able to track faults and
+> +	  errors, classify them and report them to software.
+> +
+> +	  On CPUs with these extensions system software can use additional
+> +	  barriers to determine if faults are pending and read the
+> +	  classification from a new set of registers.
+> +
+> +	  Selecting this feature will allow the kernel to use these barriers
+> +	  and access the new registers if the system supports the extension.
+> +	  Platform RAS features may additionally depend on firmware support.
+> +
+>  endmenu
+>  
+>  config ARM64_MODULE_CMODEL_LARGE
+> diff --git a/arch/arm64/include/asm/barrier.h b/arch/arm64/include/asm/barrier.h
+> index 0fe7e43b7fbc..8b0a0eb67625 100644
+> --- a/arch/arm64/include/asm/barrier.h
+> +++ b/arch/arm64/include/asm/barrier.h
+> @@ -30,6 +30,7 @@
+>  #define isb()		asm volatile("isb" : : : "memory")
+>  #define dmb(opt)	asm volatile("dmb " #opt : : : "memory")
+>  #define dsb(opt)	asm volatile("dsb " #opt : : : "memory")
+> +#define esb()		asm volatile("hint #16"  : : : "memory")
+>  
+>  #define mb()		dsb(sy)
+>  #define rmb()		dsb(ld)
+> diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+> index 8da621627d7c..4820d441bfb9 100644
+> --- a/arch/arm64/include/asm/cpucaps.h
+> +++ b/arch/arm64/include/asm/cpucaps.h
+> @@ -40,7 +40,8 @@
+>  #define ARM64_WORKAROUND_858921			19
+>  #define ARM64_WORKAROUND_CAVIUM_30115		20
+>  #define ARM64_HAS_DCPOP				21
+> +#define ARM64_HAS_RAS_EXTN			22
+>  
+> -#define ARM64_NCAPS				22
+> +#define ARM64_NCAPS				23
+>  
+>  #endif /* __ASM_CPUCAPS_H */
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index f707fed5886f..64e2a80fd749 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -332,6 +332,7 @@
+>  #define ID_AA64ISAR1_DPB_SHIFT		0
+>  
+>  /* id_aa64pfr0 */
+> +#define ID_AA64PFR0_RAS_SHIFT		28
+>  #define ID_AA64PFR0_GIC_SHIFT		24
+>  #define ID_AA64PFR0_ASIMD_SHIFT		20
+>  #define ID_AA64PFR0_FP_SHIFT		16
+> @@ -340,6 +341,7 @@
+>  #define ID_AA64PFR0_EL1_SHIFT		4
+>  #define ID_AA64PFR0_EL0_SHIFT		0
+>  
+> +#define ID_AA64PFR0_RAS_V1		0x1
+>  #define ID_AA64PFR0_FP_NI		0xf
+>  #define ID_AA64PFR0_FP_SUPPORTED	0x0
+>  #define ID_AA64PFR0_ASIMD_NI		0xf
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index cd52d365d1f0..0fc017b55cb1 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -125,6 +125,7 @@ static const struct arm64_ftr_bits ftr_id_aa64isar1[] = {
+>  };
+>  
+>  static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
+> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_EXACT, ID_AA64PFR0_RAS_SHIFT, 4, 0),
 
-Not just host/guest, but also those we can and can't handle.
+We probably want FTR_LOWER_SAFE here now, right? (we changed the other
+fields in for-next/core).
 
-KVM can't currently take an SError during world switch, so a RAS error that the
-CPU was hoping to defer may spread from the host into KVM's
-no-SError:world-switch code. If this happens it will (almost certainly) have to
-be re-classified as uncontainable.
+> diff --git a/arch/arm64/kernel/process.c b/arch/arm64/kernel/process.c
+> index 2dc0f8482210..5e5d2f0a1d0a 100644
+> --- a/arch/arm64/kernel/process.c
+> +++ b/arch/arm64/kernel/process.c
+> @@ -365,6 +365,9 @@ __notrace_funcgraph struct task_struct *__switch_to(struct task_struct *prev,
+>  	 */
+>  	dsb(ish);
+>  
+> +	/* Deliver any pending SError from prev */
+> +	esb();
 
-There is also a firmware-first angle here: NOTIFY_SEI can't be delivered if the
-normal world has SError masked, so any error that spreads past this point
-becomes a reboot-by-firmware instead of an OS notification and almost-helpful
-error message.
+I'm assuming this is going to be expensive. What if we moved it to switch_mm
+instead. Do we actually need thread granularity for error isolation?
 
-
-> If that's correct, then why don't we do it at the last possible moment
-> when we still have a scratch register left, in the world switch code
-> itself, and in the case abort the guest entry and report back a "host
-> SError" return code.
-
-We have IESB to run the error-barrier as we enter the guest. This would make any
-host error pending as an SError, and we would exit the guest immediately. But if
-there was an RAS error during world switch, by this point its likely to be
-classified as uncontainable.
-
-This esb() is trying to keep this window of code as small as possible, to just
-errors that occur during world switch.
-
-With your vcpu load/save this window becomes a lot smaller, it may be possible
-to get a VHE-host's arch-code SError handler to take errors from EL2, in which
-case this barrier can disappear.
-(note to self: guest may still own the debug hardware)
-
-
-Thanks,
-
-James
-
-
-> If the answer to that question is, that since we will always have some
-> instruction window before entering the guest and things will never be
-> precise anyway, so we do it here where it's more convenient, then my
-> counter-question would be why we do it at all then?  If we're not
-> precise anyway, then why not simply take our chances and hope that the
-> hardware delivers the SError before we mask them, and if not, tough
-> luck?
+Will
