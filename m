@@ -1,52 +1,56 @@
-From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: Re: [PATCH v1 1/3] arm64: add a macro for SError synchronization
-Date: Wed, 1 Nov 2017 14:13:35 +0000
-Message-ID: <0184EA26B2509940AA629AE1405DD7F20193CD1C@DGGEMA503-MBX.china.huawei.com>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v5 15/30] arm64/sve: Signal handling support
+Date: Wed, 1 Nov 2017 14:33:49 +0000
+Message-ID: <20171101143349.emzluowg5k3zmyhn@armageddon.cambridge.arm.com>
+References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
+ <1509465082-30427-16-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Language: zh-CN
-Sender: linux-kernel-owner@vger.kernel.org
-To: Robin Murphy <robin.murphy@arm.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "james.morse@arm.com" <james.morse@arm.com>, "mark.rutland@arm.com" <mark.rutland@arm.com>, "ard.biesheuvel@linaro.org" <ard.biesheuvel@linaro.org>, "cov@codeaurora.org" <cov@codeaurora.org>, "Dave.Martin@arm.com" <Dave.Martin@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-arch-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1509465082-30427-16-git-send-email-Dave.Martin@arm.com>
+Sender: linux-arch-owner@vger.kernel.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Will Deacon <will.deacon@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-PiANCj4gT24gMDEvMTEvMTcgMTI6NTQsIGdlbmdkb25naml1IHdyb3RlOg0KPiA+IEhpIFJvYmlu
-LA0KPiA+DQo+ID4gT24gMjAxNy8xMS8xIDE5OjI0LCBSb2JpbiBNdXJwaHkgd3JvdGU6DQo+ID4+
-PiArCWVzYg0KPiA+Pj4gK2FsdGVybmF0aXZlX2Vsc2Vfbm9wX2VuZGlmDQo+ID4+PiArMToNCj4g
-Pj4+ICsJLmVuZG0NCj4gPj4gSGF2aW5nIGEgYnJhbmNoIGluIGhlcmUgaXMgcHJldHR5IGhvcnJp
-YmxlLCBhbmQgZnVydGhlcm1vcmUgdXNpbmcNCj4gPj4gbGFiZWwgbnVtYmVyIDEgaGFzIGEgcHJl
-dHR5IGhpZ2ggY2hhbmNlIG9mIHN1YnRseSBicmVha2luZyBjb2RlIHdoZXJlDQo+ID4+IHRoaXMg
-bWFjcm8gaXMgaW5zZXJ0ZWQuDQo+ID4+DQo+ID4+IENhbiB3ZSBub3Qgc29tZWhvdyBuZXN0IG9y
-IGNvbWJpbmUgdGhlIGFsdGVybmF0aXZlIGNvbmRpdGlvbnMgaGVyZT8NCj4gPg0KPiA+IEkgZm91
-bmQgaXQgd2lsbCByZXBvcnQgZXJyb3IgaWYgY29tYmluZSB0aGUgYWx0ZXJuYXRpdmUgY29uZGl0
-aW9ucyBoZXJlLg0KPiA+DQo+ID4gRm9yIGV4YW1wbGU6DQo+ID4NCj4gPiArCS5tYWNybwllcnJv
-cl9zeW5jaHJvbml6ZQ0KPiA+ICthbHRlcm5hdGl2ZV9pZiBBUk02NF9IQVNfSUVTQg0KPiA+ICth
-bHRlcm5hdGl2ZV9pZiBBUk02NF9IQVNfUkFTX0VYVE4NCj4gPiArCWVzYg0KPiA+ICthbHRlcm5h
-dGl2ZV9lbHNlX25vcF9lbmRpZg0KPiA+ICthbHRlcm5hdGl2ZV9lbHNlX25vcF9lbmRpZg0KPiA+
-ICsJLmVuZG0NCj4gPg0KPiA+IEFuZCBldmVuIHVzaW5nIGIuZXEvY2J6IGluc3RydWN0aW9uIGlu
-IHRoZSBhbHRlcm5hdGl2ZSBpbnN0cnVjdGlvbiBpbg0KPiA+IGFyY2gvYXJtNjQva2VybmVsL2Vu
-dHJ5LlMsIGl0IHdpbGwgcmVwb3J0IEVycm9yLg0KPiA+DQo+ID4gRm9yIGV4YW1wbGUgYmVsb3cN
-Cj4gPg0KPiA+IGFsdGVybmF0aXZlX2lmIEFSTTY0X0hBU19QQU4NCj4gPiAJeHh4eHh4eHh4eHh4
-eHh4eHh4eHgNCj4gPiAgICAgICAgIGIuZXEgICAgeHh4eHgNCj4gPiBhbHRlcm5hdGl2ZV9lbHNl
-X25vcF9lbmRpZg0KPiA+DQo+ID4gSSBkbyBub3QgZGlnIGl0IGRlZXBseSwgZG8geW91IGtub3cg
-dGhlIHJlYXNvbiBhYm91dCBpdCBvciBnb29kIHN1Z2dlc3Rpb24gYWJvdXQgdGhhdD8NCj4gPiBU
-aGFua3MgYSBsb3QgaW4gYWR2YW5jZS4NCj4gDQo+IEFjdHVhbGx5LCBvbiBzZWNvbmQgbG9vayBB
-Uk02NF9IQVNfUkFTX0VYVE4gZG9lc24ndCBldmVuIG1hdHRlciAtIEVTQiBpcyBhIGhpbnQsIHNv
-IGlmIHRoZSBDUFUgZG9lc24ndCBoYXZlIFJBUyBpdCBzaG91bGQgYmVoYXZlIGFzIGENCj4gTk9Q
-IGFueXdheS4NCg0KDQpZZXMsIHlvdSBhcmUgcmlnaHQuIEl0IGlzICJISU5UICMxNiINCg0KU28g
-aW4gZmFjdCBpdCBjYW4gYmUgd3JpdHRlbiBiZWxvdzoNCg0KKyAgICAgICAubWFjcm8gIGVycm9y
-X3N5bmNocm9uaXplDQorYWx0ZXJuYXRpdmVfaWZfbm90IEFSTTY0X0hBU19JRVNCDQorICAgICAg
-IGVzYg0KK2FsdGVybmF0aXZlX2Vsc2Vfbm9wX2VuZGlmDQorICAgICAgIC5lbmRtDQoNCklmIHdy
-aXR0ZW4gdG8gdGhhdCwgd2hldGhlciBpdCB3aWxsIGJlIHN0cmFuZ2U/IGFsdGhvdWdoIEVTQiBz
-aG91bGQgYmVoYXZlIGFzIGENCk5PUCBhbnl3YXkgaWYgdGhlIENQVSBkb2Vzbid0IGhhdmUgUkFT
-LiANCg0KPiANCj4gT24gd2hpY2ggbm90ZSwgc2luY2UgSSBkb24ndCBzZWUgb25lIGhlcmUgLSBh
-cmUgYW55IG9mIHRob3NlIG90aGVyIHBhdGNoZXMgZGVmaW5pbmcgYW4gImVzYiIgYXNzZW1ibHkg
-bWFjcm8gc2ltaWxhciB0byB0aGUgaW5saW5lIGFzbSBjYXNlPw0KPiBJZiBub3QgdGhlbiB0aGlz
-IGlzbid0IGdvaW5nIHRvIGJ1aWxkIHdpdGggb2xkZXIgdG9vbGNoYWlucyAtIHBlcmhhcHMgd2Ug
-c2hvdWxkIGp1c3QgdXNlIHRoZSByYXcgaGludCBzeW50YXggZGlyZWN0bHkuDQoNCg0KU29ycnkg
-Zm9yIHRoYXQgSSBkbyBub3QgcHVzaCB0aGUgZGVwZW5kZW50IHBhdGNoWzFdLg0KVGhlICJFU0Ii
-IGlzIGRlZmluZWQgYXMgYSBtYWNybyANCg0KLyoNCisgKiBSQVMgRXJyb3IgU3luY2hyb25pemF0
-aW9uIGJhcnJpZXINCisgKi8NCisJLm1hY3JvICBlc2INCisJaGludCAgICAjMTYNCisJLmVuZG0N
-CisNCisvKg0KDQpbMV0NCmh0dHBzOi8vd3d3LnNwaW5pY3MubmV0L2xpc3RzL2FybS1rZXJuZWwv
-bXNnNjEyODg0Lmh0bWwNCg0KPiANCj4gUm9iaW4uDQo=
+On Tue, Oct 31, 2017 at 03:51:07PM +0000, Dave P Martin wrote:
+> This patch implements support for saving and restoring the SVE
+> registers around signals.
+> 
+> A fixed-size header struct sve_context is always included in the
+> signal frame encoding the thread's vector length at the time of
+> signal delivery, optionally followed by a variable-layout structure
+> encoding the SVE registers.
+> 
+> Because of the need to preserve backwards compatibility, the FPSIMD
+> view of the SVE registers is always dumped as a struct
+> fpsimd_context in the usual way, in addition to any sve_context.
+> 
+> The SVE vector registers are dumped in full, including bits 127:0
+> of each register which alias the corresponding FPSIMD vector
+> registers in the hardware.  To avoid any ambiguity about which
+> alias to restore during sigreturn, the kernel always restores bits
+> 127:0 of each SVE vector register from the fpsimd_context in the
+> signal frame (which must be present): userspace needs to take this
+> into account if it wants to modify the SVE vector register contents
+> on return from a signal.
+> 
+> FPSR and FPCR, which are used by both FPSIMD and SVE, are not
+> included in sve_context because they are always present in
+> fpsimd_context anyway.
+> 
+> For signal delivery, a new helper
+> fpsimd_signal_preserve_current_state() is added to update _both_
+> the FPSIMD and SVE views in the task struct, to make it easier to
+> populate this information into the signal frame.  Because of the
+> redundancy between the two views of the state, only one is updated
+> otherwise.
+> 
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> Cc: Alex Bennée <alex.bennee@linaro.org>
+> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Cc: Will Deacon <will.deacon@arm.com>
+
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
