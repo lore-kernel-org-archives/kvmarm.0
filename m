@@ -1,22 +1,22 @@
 From: Dongjiu Geng <gengdongjiu@huawei.com>
-Subject: [PATCH v1 2/3] arm64: add error synchronization barrier in
- kernel_entry/kernel_exit
-Date: Thu, 2 Nov 2017 03:14:56 +0800
-Message-ID: <1509563697-6359-3-git-send-email-gengdongjiu@huawei.com>
+Subject: [PATCH v1 3/3] KVM: arm64: add ESB in exception handler entry and
+ exit.
+Date: Thu, 2 Nov 2017 03:14:57 +0800
+Message-ID: <1509563697-6359-4-git-send-email-gengdongjiu@huawei.com>
 References: <1509563697-6359-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D1D0E49D52
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Nov 2017 07:08:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3979D49D5E
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Nov 2017 07:08:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aY8RV4O-qIRW for <kvmarm@lists.cs.columbia.edu>;
- Wed,  1 Nov 2017 07:08:47 -0400 (EDT)
+ with ESMTP id Mx9Wxt8PJ4cB for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  1 Nov 2017 07:08:46 -0400 (EDT)
 Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2D67F49D2A
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BDDEE40A74
  for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Nov 2017 07:08:45 -0400 (EDT)
 In-Reply-To: <1509563697-6359-1-git-send-email-gengdongjiu@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
@@ -31,45 +31,54 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: catalin.marinas@arm.com, will.deacon@arm.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, james.morse@arm.com, mark.rutland@arm.com, ard.biesheuvel@linaro.org, robin.murphy@arm.com, cov@codeaurora.org, Dave.Martin@arm.com, gengdongjiu@huawei.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-If taking an exception from or return to user space, insert
-a Error Synchronization Barrier(ESB) to isolate the error.
+Some hardware platform can support RAS Extension instead
+of support IESB, so software need to insert Synchronization
+Barrier operations at exception handler entry and exit.
 
-If a user space process is pending a SError, when enter to
-kernel, the SError will be immediately synchronized in the
-handler entry. Otherwise if kernel space is pending a SError,
-before return to user space, the SError will be synchronized
-in the handler exit.
+In the __guest_exit(), it added a ESB instruction, but can
+not cover the path which is not guest exit. For example, if
+EL1 host call HVC instruction enter to hypervisor, it will
+not call __guest_exit().
 
-In order to reduce impact on performance, not check the DISR_EL1
-to see whether an SError is consumed by an ESB instruction.
-This is because DISR_EL1 is RAZ/WI in firmware-first RAS
-solution, if happen SError, it will immediately trap to EL3
-firmware.
+In the kvm_arm_vhe_guest_enter(), it synchronised any host
+RAS errors for VHE mode, but it can not handle the non-VHE
+mode. For example, if EL1 host is pending a SError, the error
+can be propagated to guest without error synchronization
+operation.
+
+Only add the ESB in the important exception handler path to
+reduce the impact on performance.
 
 Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 ---
- arch/arm64/kernel/entry.S | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/arm64/kvm/hyp/entry.S     | 2 ++
+ arch/arm64/kvm/hyp/hyp-entry.S | 1 +
+ 2 files changed, 3 insertions(+)
 
-diff --git a/arch/arm64/kernel/entry.S b/arch/arm64/kernel/entry.S
-index e147c1d..6dde644 100644
---- a/arch/arm64/kernel/entry.S
-+++ b/arch/arm64/kernel/entry.S
-@@ -138,6 +138,7 @@
- 	stp	x28, x29, [sp, #16 * 14]
+diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+index 96caa53..fce6806 100644
+--- a/arch/arm64/kvm/hyp/entry.S
++++ b/arch/arm64/kvm/hyp/entry.S
+@@ -84,6 +84,8 @@ ENTRY(__guest_enter)
+ 	// Restore guest reg x18
+ 	ldr	x18,      [x18, #CPU_XREG_OFFSET(18)]
  
- 	.if	\el == 0
++	// synchronize host pending asynchronous error
 +	error_synchronize
- 	mrs	x21, sp_el0
- 	ldr_this_cpu	tsk, __entry_task, x20	// Ensure MDSCR_EL1.SS is clear,
- 	ldr	x19, [tsk, #TSK_TI_FLAGS]	// since we can unmask debug
-@@ -281,6 +282,7 @@ alternative_if ARM64_WORKAROUND_845719
- 1:
- alternative_else_nop_endif
- #endif
-+	error_synchronize
- 	.endif
+ 	// Do not touch any register after this!
+ 	eret
+ ENDPROC(__guest_enter)
+diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+index 5170ce1..ac85029 100644
+--- a/arch/arm64/kvm/hyp/hyp-entry.S
++++ b/arch/arm64/kvm/hyp/hyp-entry.S
+@@ -54,6 +54,7 @@ ENTRY(__vhe_hyp_call)
+ ENDPROC(__vhe_hyp_call)
  
- 	msr	elr_el1, x21			// set up the return data
+ el1_sync:				// Guest trapped into EL2
++	error_synchronize
+ 	stp	x0, x1, [sp, #-16]!
+ 
+ alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
 -- 
 1.9.1
