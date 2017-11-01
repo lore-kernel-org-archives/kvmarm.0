@@ -1,82 +1,52 @@
-From: Mark Rutland <mark.rutland@arm.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
 Subject: Re: [PATCH v1 1/3] arm64: add a macro for SError synchronization
-Date: Wed, 1 Nov 2017 14:16:33 +0000
-Message-ID: <20171101141603.4ppgwup4grnmcswe@lakrids.cambridge.arm.com>
-References: <1509563697-6359-1-git-send-email-gengdongjiu@huawei.com>
- <1509563697-6359-2-git-send-email-gengdongjiu@huawei.com>
- <6dc82768-8564-a54e-041b-3b9965fa038b@arm.com>
- <d7b8b779-9e00-8e8f-b44e-48e3d7e37058@huawei.com>
+Date: Wed, 1 Nov 2017 14:13:35 +0000
+Message-ID: <0184EA26B2509940AA629AE1405DD7F20193CD1C@DGGEMA503-MBX.china.huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 76DA849D24
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Nov 2017 10:15:45 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bL5u3stQztEE for <kvmarm@lists.cs.columbia.edu>;
- Wed,  1 Nov 2017 10:15:44 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 68BEE41185
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Nov 2017 10:15:44 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <d7b8b779-9e00-8e8f-b44e-48e3d7e37058@huawei.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: gengdongjiu <gengdongjiu@huawei.com>
-Cc: linux-arm-kernel@lists.infradead.org, ard.biesheuvel@linaro.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, cov@codeaurora.org, Robin Murphy <robin.murphy@arm.com>, Dave.Martin@arm.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Language: zh-CN
+Sender: linux-kernel-owner@vger.kernel.org
+To: Robin Murphy <robin.murphy@arm.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "james.morse@arm.com" <james.morse@arm.com>, "mark.rutland@arm.com" <mark.rutland@arm.com>, "ard.biesheuvel@linaro.org" <ard.biesheuvel@linaro.org>, "cov@codeaurora.org" <cov@codeaurora.org>, "Dave.Martin@arm.com" <Dave.Martin@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Nov 01, 2017 at 08:54:44PM +0800, gengdongjiu wrote:
-> On 2017/11/1 19:24, Robin Murphy wrote:
-> >> +	esb
-> >> +alternative_else_nop_endif
-> >> +1:
-> >> +	.endm
-> > Having a branch in here is pretty horrible, and furthermore using label
-> > number 1 has a pretty high chance of subtly breaking code where this
-> > macro is inserted.
-> > 
-> > Can we not somehow nest or combine the alternative conditions here?
-> 
-> I found it will report error if combine the alternative conditions here.
-> 
-> For example:
-> 
-> +	.macro	error_synchronize
-> +alternative_if ARM64_HAS_IESB
-> +alternative_if ARM64_HAS_RAS_EXTN
-> +	esb
-> +alternative_else_nop_endif
-> +alternative_else_nop_endif
-> +	.endm
-> 
-> And even using b.eq/cbz instruction in the alternative instruction in arch/arm64/kernel/entry.S,
-> it will report Error.
-
-Alternatives cannot be nested. You need to define a cap like:
-
-  ARM64_HAS_RAS_NOT_IESB
-
-... which is set when ARM64_HAS_RAS_EXTN && !ARM64_HAS_IESB.
-
-Then you can do:
-
-alternative_if ARM64_HAS_RAS_NOT_IESB
-	esb
-alternative_else_nop_endif
-
-See ARM64_ALT_PAN_NOT_UAO for an example.
-
-That said, as Robin points out we may not even need the alternative.
-
-Thanks,
-Mark.
+PiANCj4gT24gMDEvMTEvMTcgMTI6NTQsIGdlbmdkb25naml1IHdyb3RlOg0KPiA+IEhpIFJvYmlu
+LA0KPiA+DQo+ID4gT24gMjAxNy8xMS8xIDE5OjI0LCBSb2JpbiBNdXJwaHkgd3JvdGU6DQo+ID4+
+PiArCWVzYg0KPiA+Pj4gK2FsdGVybmF0aXZlX2Vsc2Vfbm9wX2VuZGlmDQo+ID4+PiArMToNCj4g
+Pj4+ICsJLmVuZG0NCj4gPj4gSGF2aW5nIGEgYnJhbmNoIGluIGhlcmUgaXMgcHJldHR5IGhvcnJp
+YmxlLCBhbmQgZnVydGhlcm1vcmUgdXNpbmcNCj4gPj4gbGFiZWwgbnVtYmVyIDEgaGFzIGEgcHJl
+dHR5IGhpZ2ggY2hhbmNlIG9mIHN1YnRseSBicmVha2luZyBjb2RlIHdoZXJlDQo+ID4+IHRoaXMg
+bWFjcm8gaXMgaW5zZXJ0ZWQuDQo+ID4+DQo+ID4+IENhbiB3ZSBub3Qgc29tZWhvdyBuZXN0IG9y
+IGNvbWJpbmUgdGhlIGFsdGVybmF0aXZlIGNvbmRpdGlvbnMgaGVyZT8NCj4gPg0KPiA+IEkgZm91
+bmQgaXQgd2lsbCByZXBvcnQgZXJyb3IgaWYgY29tYmluZSB0aGUgYWx0ZXJuYXRpdmUgY29uZGl0
+aW9ucyBoZXJlLg0KPiA+DQo+ID4gRm9yIGV4YW1wbGU6DQo+ID4NCj4gPiArCS5tYWNybwllcnJv
+cl9zeW5jaHJvbml6ZQ0KPiA+ICthbHRlcm5hdGl2ZV9pZiBBUk02NF9IQVNfSUVTQg0KPiA+ICth
+bHRlcm5hdGl2ZV9pZiBBUk02NF9IQVNfUkFTX0VYVE4NCj4gPiArCWVzYg0KPiA+ICthbHRlcm5h
+dGl2ZV9lbHNlX25vcF9lbmRpZg0KPiA+ICthbHRlcm5hdGl2ZV9lbHNlX25vcF9lbmRpZg0KPiA+
+ICsJLmVuZG0NCj4gPg0KPiA+IEFuZCBldmVuIHVzaW5nIGIuZXEvY2J6IGluc3RydWN0aW9uIGlu
+IHRoZSBhbHRlcm5hdGl2ZSBpbnN0cnVjdGlvbiBpbg0KPiA+IGFyY2gvYXJtNjQva2VybmVsL2Vu
+dHJ5LlMsIGl0IHdpbGwgcmVwb3J0IEVycm9yLg0KPiA+DQo+ID4gRm9yIGV4YW1wbGUgYmVsb3cN
+Cj4gPg0KPiA+IGFsdGVybmF0aXZlX2lmIEFSTTY0X0hBU19QQU4NCj4gPiAJeHh4eHh4eHh4eHh4
+eHh4eHh4eHgNCj4gPiAgICAgICAgIGIuZXEgICAgeHh4eHgNCj4gPiBhbHRlcm5hdGl2ZV9lbHNl
+X25vcF9lbmRpZg0KPiA+DQo+ID4gSSBkbyBub3QgZGlnIGl0IGRlZXBseSwgZG8geW91IGtub3cg
+dGhlIHJlYXNvbiBhYm91dCBpdCBvciBnb29kIHN1Z2dlc3Rpb24gYWJvdXQgdGhhdD8NCj4gPiBU
+aGFua3MgYSBsb3QgaW4gYWR2YW5jZS4NCj4gDQo+IEFjdHVhbGx5LCBvbiBzZWNvbmQgbG9vayBB
+Uk02NF9IQVNfUkFTX0VYVE4gZG9lc24ndCBldmVuIG1hdHRlciAtIEVTQiBpcyBhIGhpbnQsIHNv
+IGlmIHRoZSBDUFUgZG9lc24ndCBoYXZlIFJBUyBpdCBzaG91bGQgYmVoYXZlIGFzIGENCj4gTk9Q
+IGFueXdheS4NCg0KDQpZZXMsIHlvdSBhcmUgcmlnaHQuIEl0IGlzICJISU5UICMxNiINCg0KU28g
+aW4gZmFjdCBpdCBjYW4gYmUgd3JpdHRlbiBiZWxvdzoNCg0KKyAgICAgICAubWFjcm8gIGVycm9y
+X3N5bmNocm9uaXplDQorYWx0ZXJuYXRpdmVfaWZfbm90IEFSTTY0X0hBU19JRVNCDQorICAgICAg
+IGVzYg0KK2FsdGVybmF0aXZlX2Vsc2Vfbm9wX2VuZGlmDQorICAgICAgIC5lbmRtDQoNCklmIHdy
+aXR0ZW4gdG8gdGhhdCwgd2hldGhlciBpdCB3aWxsIGJlIHN0cmFuZ2U/IGFsdGhvdWdoIEVTQiBz
+aG91bGQgYmVoYXZlIGFzIGENCk5PUCBhbnl3YXkgaWYgdGhlIENQVSBkb2Vzbid0IGhhdmUgUkFT
+LiANCg0KPiANCj4gT24gd2hpY2ggbm90ZSwgc2luY2UgSSBkb24ndCBzZWUgb25lIGhlcmUgLSBh
+cmUgYW55IG9mIHRob3NlIG90aGVyIHBhdGNoZXMgZGVmaW5pbmcgYW4gImVzYiIgYXNzZW1ibHkg
+bWFjcm8gc2ltaWxhciB0byB0aGUgaW5saW5lIGFzbSBjYXNlPw0KPiBJZiBub3QgdGhlbiB0aGlz
+IGlzbid0IGdvaW5nIHRvIGJ1aWxkIHdpdGggb2xkZXIgdG9vbGNoYWlucyAtIHBlcmhhcHMgd2Ug
+c2hvdWxkIGp1c3QgdXNlIHRoZSByYXcgaGludCBzeW50YXggZGlyZWN0bHkuDQoNCg0KU29ycnkg
+Zm9yIHRoYXQgSSBkbyBub3QgcHVzaCB0aGUgZGVwZW5kZW50IHBhdGNoWzFdLg0KVGhlICJFU0Ii
+IGlzIGRlZmluZWQgYXMgYSBtYWNybyANCg0KLyoNCisgKiBSQVMgRXJyb3IgU3luY2hyb25pemF0
+aW9uIGJhcnJpZXINCisgKi8NCisJLm1hY3JvICBlc2INCisJaGludCAgICAjMTYNCisJLmVuZG0N
+CisNCisvKg0KDQpbMV0NCmh0dHBzOi8vd3d3LnNwaW5pY3MubmV0L2xpc3RzL2FybS1rZXJuZWwv
+bXNnNjEyODg0Lmh0bWwNCg0KPiANCj4gUm9iaW4uDQo=
