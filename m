@@ -1,102 +1,75 @@
 From: Dongjiu Geng <gengdongjiu@huawei.com>
-Subject: [PATCH v1 0/3] manually add Error Synchronization Barrier at
- exception handler entry and exit
-Date: Thu, 2 Nov 2017 03:14:54 +0800
-Message-ID: <1509563697-6359-1-git-send-email-gengdongjiu@huawei.com>
+Subject: [PATCH v1 2/3] arm64: add error synchronization barrier in
+ kernel_entry/kernel_exit
+Date: Thu, 2 Nov 2017 03:14:56 +0800
+Message-ID: <1509563697-6359-3-git-send-email-gengdongjiu@huawei.com>
+References: <1509563697-6359-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D1D0E49D52
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Nov 2017 07:08:47 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id aY8RV4O-qIRW for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  1 Nov 2017 07:08:47 -0400 (EDT)
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2D67F49D2A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Nov 2017 07:08:45 -0400 (EDT)
+In-Reply-To: <1509563697-6359-1-git-send-email-gengdongjiu@huawei.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: catalin.marinas@arm.com, will.deacon@arm.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, james.morse@arm.com, mark.rutland@arm.com, ard.biesheuvel@linaro.org, robin.murphy@arm.com, cov@codeaurora.org, Dave.Martin@arm.com, gengdongjiu@huawei.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Some hardware platform can support RAS Extension, but not support IESB,
-such as Huawei's platform, so software need to insert Synchronization Barrier
-operations at exception handler entry.
+If taking an exception from or return to user space, insert
+a Error Synchronization Barrier(ESB) to isolate the error.
 
-This series patches are based on  James's series patches "SError rework +
-RAS&IESB for firmware first support". In Huawei's platform, we do not
-support IESB, so software needs to insert that.
+If a user space process is pending a SError, when enter to
+kernel, the SError will be immediately synchronized in the
+handler entry. Otherwise if kernel space is pending a SError,
+before return to user space, the SError will be synchronized
+in the handler exit.
 
+In order to reduce impact on performance, not check the DISR_EL1
+to see whether an SError is consumed by an ESB instruction.
+This is because DISR_EL1 is RAZ/WI in firmware-first RAS
+solution, if happen SError, it will immediately trap to EL3
+firmware.
 
-Dongjiu Geng (3):
-  arm64: add a macro for SError synchronization
-  arm64: add error synchronization barrier in kernel_entry/kernel_exit
-  KVM: arm64: add ESB in exception handler entry and exit.
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+---
+ arch/arm64/kernel/entry.S | 2 ++
+ 1 file changed, 2 insertions(+)
 
-James Morse (18):
-  arm64: explicitly mask all exceptions
-  arm64: introduce an order for exceptions
-  arm64: Move the async/fiq helpers to explicitly set process context
-    flags
-  arm64: Mask all exceptions during kernel_exit
-  arm64: entry.S: Remove disable_dbg
-  arm64: entry.S: convert el1_sync
-  arm64: entry.S convert el0_sync
-  arm64: entry.S: convert elX_irq
-  KVM: arm/arm64: mask/unmask daif around VHE guests
-  arm64: kernel: Survive corrected RAS errors notified by SError
-  arm64: cpufeature: Enable IESB on exception entry/return for
-    firmware-first
-  arm64: kernel: Prepare for a DISR user
-  KVM: arm64: Set an impdef ESR for Virtual-SError using VSESR_EL2.
-  KVM: arm64: Save/Restore guest DISR_EL1
-  KVM: arm64: Save ESR_EL2 on guest SError
-  KVM: arm64: Handle RAS SErrors from EL1 on guest exit
-  KVM: arm64: Handle RAS SErrors from EL2 on guest exit
-  KVM: arm64: Take any host SError before entering the guest
-
-Xie XiuQi (2):
-  arm64: entry.S: move SError handling into a C function for future
-    expansion
-  arm64: cpufeature: Detect CPU RAS Extentions
-
- arch/arm64/Kconfig                   | 33 +++++++++++++-
- arch/arm64/include/asm/assembler.h   | 59 +++++++++++++++++-------
- arch/arm64/include/asm/barrier.h     |  1 +
- arch/arm64/include/asm/cpucaps.h     |  4 +-
- arch/arm64/include/asm/daifflags.h   | 61 +++++++++++++++++++++++++
- arch/arm64/include/asm/esr.h         | 17 +++++++
- arch/arm64/include/asm/exception.h   | 14 ++++++
- arch/arm64/include/asm/irqflags.h    | 40 ++++++----------
- arch/arm64/include/asm/kvm_emulate.h | 10 ++++
- arch/arm64/include/asm/kvm_host.h    | 16 +++++++
- arch/arm64/include/asm/processor.h   |  2 +
- arch/arm64/include/asm/sysreg.h      |  6 +++
- arch/arm64/include/asm/traps.h       | 36 +++++++++++++++
- arch/arm64/kernel/asm-offsets.c      |  1 +
- arch/arm64/kernel/cpufeature.c       | 43 ++++++++++++++++++
- arch/arm64/kernel/debug-monitors.c   |  5 +-
- arch/arm64/kernel/entry.S            | 88 +++++++++++++++++++++---------------
- arch/arm64/kernel/hibernate.c        |  5 +-
- arch/arm64/kernel/machine_kexec.c    |  4 +-
- arch/arm64/kernel/process.c          |  3 ++
- arch/arm64/kernel/setup.c            |  8 ++--
- arch/arm64/kernel/signal.c           |  8 +++-
- arch/arm64/kernel/smp.c              | 12 ++---
- arch/arm64/kernel/suspend.c          |  7 +--
- arch/arm64/kernel/traps.c            | 64 +++++++++++++++++++++++++-
- arch/arm64/kvm/handle_exit.c         | 19 +++++++-
- arch/arm64/kvm/hyp-init.S            |  3 ++
- arch/arm64/kvm/hyp/entry.S           | 15 ++++++
- arch/arm64/kvm/hyp/hyp-entry.S       |  1 +
- arch/arm64/kvm/hyp/switch.c          | 19 ++++++--
- arch/arm64/kvm/hyp/sysreg-sr.c       |  6 +++
- arch/arm64/kvm/inject_fault.c        | 13 +++++-
- arch/arm64/kvm/sys_regs.c            |  1 +
- arch/arm64/mm/proc.S                 | 14 ++++--
- virt/kvm/arm/arm.c                   |  4 ++
- 35 files changed, 527 insertions(+), 115 deletions(-)
- create mode 100644 arch/arm64/include/asm/daifflags.h
-
+diff --git a/arch/arm64/kernel/entry.S b/arch/arm64/kernel/entry.S
+index e147c1d..6dde644 100644
+--- a/arch/arm64/kernel/entry.S
++++ b/arch/arm64/kernel/entry.S
+@@ -138,6 +138,7 @@
+ 	stp	x28, x29, [sp, #16 * 14]
+ 
+ 	.if	\el == 0
++	error_synchronize
+ 	mrs	x21, sp_el0
+ 	ldr_this_cpu	tsk, __entry_task, x20	// Ensure MDSCR_EL1.SS is clear,
+ 	ldr	x19, [tsk, #TSK_TI_FLAGS]	// since we can unmask debug
+@@ -281,6 +282,7 @@ alternative_if ARM64_WORKAROUND_845719
+ 1:
+ alternative_else_nop_endif
+ #endif
++	error_synchronize
+ 	.endif
+ 
+ 	msr	elr_el1, x21			// set up the return data
 -- 
 1.9.1
