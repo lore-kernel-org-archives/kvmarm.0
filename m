@@ -1,89 +1,60 @@
 From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: Re: [PATCH v1 0/3] manually add Error Synchronization Barrier at
- exception handler entry and exit
-Date: Wed, 1 Nov 2017 20:44:02 +0800
-Message-ID: <1d4b77c4-5505-ff4c-1aa2-b15f58e2b354@huawei.com>
+Subject: Re: [PATCH v1 1/3] arm64: add a macro for SError synchronization
+Date: Wed, 1 Nov 2017 20:54:44 +0800
+Message-ID: <d7b8b779-9e00-8e8f-b44e-48e3d7e37058@huawei.com>
 References: <1509563697-6359-1-git-send-email-gengdongjiu@huawei.com>
- <59F9B0E9.5090609@arm.com>
+ <1509563697-6359-2-git-send-email-gengdongjiu@huawei.com>
+ <6dc82768-8564-a54e-041b-3b9965fa038b@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <59F9B0E9.5090609@arm.com>
+In-Reply-To: <6dc82768-8564-a54e-041b-3b9965fa038b@arm.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
-To: James Morse <james.morse@arm.com>
-Cc: catalin.marinas@arm.com, will.deacon@arm.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, mark.rutland@arm.com, ard.biesheuvel@linaro.org, robin.murphy@arm.com, cov@codeaurora.org, Dave.Martin@arm.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, lishuo1@hisilicon.com, liujun88@hisilicon.com
+To: Robin Murphy <robin.murphy@arm.com>, catalin.marinas@arm.com, will.deacon@arm.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, james.morse@arm.com, mark.rutland@arm.com, ard.biesheuvel@linaro.org, cov@codeaurora.org, Dave.Martin@arm.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
+Hi Robin,
 
-On 2017/11/1 19:32, James Morse wrote:
->> RAS&IESB for firmware first support". In Huawei's platform, we do not
->> support IESB, so software needs to insert that.
-> Surely you don't implement it because your CPU doesn't need it. Can
-> unrecoverable errors really cross an exception without becoming an SError?
+On 2017/11/1 19:24, Robin Murphy wrote:
+>> +	esb
+>> +alternative_else_nop_endif
+>> +1:
+>> +	.endm
+> Having a branch in here is pretty horrible, and furthermore using label
+> number 1 has a pretty high chance of subtly breaking code where this
+> macro is inserted.
+> 
+> Can we not somehow nest or combine the alternative conditions here?
 
-CC lishuo and liujun.
+I found it will report error if combine the alternative conditions here.
 
-Hi James,
+For example:
 
-we will needs that if we can ensure that the Error is not propagated.
-The unrecoverable errors can cross an different exception, so hardware use IESB to isolate it.
-Afterwards we may also not support IESB(about the definition as shown in [3] ), the reason that
-we are not support IESB is that hardware colleague think software insert it in exception entry/exit can be flexibly.
-And ARM spec allow that:
-ARM spec allow software inset ESB instead of hardware insert as shown in [1].
-About how to use the ESB in the software, the SPEC even give an example[2]:
++	.macro	error_synchronize
++alternative_if ARM64_HAS_IESB
++alternative_if ARM64_HAS_RAS_EXTN
++	esb
++alternative_else_nop_endif
++alternative_else_nop_endif
++	.endm
 
-[1]
-AArch_v8A_v8.2_Extension_ARM-ECM-0326763-20-0:
-"ARMv8.2 adds an extension to RAS to allow system software to insert implicit Error Synchronization Barrier operations at exception handler entry and exit".
+And even using b.eq/cbz instruction in the alternative instruction in arch/arm64/kernel/entry.S,
+it will report Error.
 
-[2]
-RAS_Extension_PRD03-PRDC-010953-39-0:
+For example below
 
-Example exception entry sequence
-Example 1 shows a typical sequence for exception entry.
+alternative_if ARM64_HAS_PAN
+	xxxxxxxxxxxxxxxxxxxx
+        b.eq    xxxxx
+alternative_else_nop_endif
 
-Vector: ESB 					;; Error Synchronization Barrier
-	SUB SP,SP,#34*8
-	STP X0,X1,[SP] 				;; Save all general purpose registers
-	STP X2,X3,[SP,#2*8]
-	...
-	STP X28,X29,[SP,#28*8]
-	MRS X21,SP_EL0
-	MRS X22,ELR_EL1 			;; Save exception syndrome registers
-	MRS X23,SPSR_EL1
-	STP X30,X21,[SP,#30*8]
-	STP X22,X23,[SP,#32*8]
-	...
-	MRS X21,DISR_EL1 			;; Check for deferred error
-	TBNZ X21,#DISR_A_bit,Error_Handler
-	MSR DAIFClr,#0xF 			;; Clear flags
-Example 1: Exception entry sequence
+I do not dig it deeply, do you know the reason about it or good suggestion about that?
+Thanks a lot in advance.
 
-
-[3]
-Below is the SCTLR_ELx.IESB definition.
-SCTLR_ELx[21]: IESB – Implicit Error Synchronization Barrier enable.
-0: Disabled.
-1: An implicit ErrorSynchronizationBarrier() call is added:
-   After each exception taken to ELx.
-   Before the operational pseudocode of each ERET instruction executed at ELx.
-
-
-Hi lishuo/liujun,
-   could you explain more to James about the reason that why we need software inserts ESB instead of hardware support IESB?
 
 > 
-> The ESB instruction does the barrier, but it also consumes any pending SError.
-> As it is this series will silently consume-and-discard uncontainable errors.
-
-In the firmware-first solution, if ESB consumed a SError, it will trap to firmware.
-firmware will handle it and record the Error. the DISR_EL1 will not record, so no need to Check for deferred error
-
-But if it is non-firmware solution, it will not trap, it needs to check the defered error through DISR_EL1 and
-call the Error_Handler, as shown in [2].
-In the kernel patchset, I do not are check the defered error. If you think it should be added, I can add it.
-
-welcome comments.
+> Robin.
+> 
+>>  #endif	/* __ASM_ASSEMBLER_H */
