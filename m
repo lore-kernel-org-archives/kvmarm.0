@@ -1,75 +1,84 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v5 01/30] regset: Add support for dynamically sized
- regsets
-Date: Wed, 1 Nov 2017 13:16:44 +0000
-Message-ID: <20171101131644.GL19485@e103592.cambridge.arm.com>
-References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
- <1509465082-30427-2-git-send-email-Dave.Martin@arm.com>
- <20171101114228.jm53aj7jx6j4mxhn@armageddon.cambridge.arm.com>
+From: Robin Murphy <robin.murphy@arm.com>
+Subject: Re: [PATCH v1 1/3] arm64: add a macro for SError synchronization
+Date: Wed, 1 Nov 2017 13:31:03 +0000
+Message-ID: <32039c76-8e9b-77e5-dfe6-3f519821a08d@arm.com>
+References: <1509563697-6359-1-git-send-email-gengdongjiu@huawei.com>
+ <1509563697-6359-2-git-send-email-gengdongjiu@huawei.com>
+ <6dc82768-8564-a54e-041b-3b9965fa038b@arm.com>
+ <d7b8b779-9e00-8e8f-b44e-48e3d7e37058@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Return-path: <libc-alpha-return-86644-glibc-alpha=m.gmane.org@sourceware.org>
-List-Unsubscribe: <mailto:libc-alpha-unsubscribe-glibc-alpha=m.gmane.org@sourceware.org>
-List-Subscribe: <mailto:libc-alpha-subscribe@sourceware.org>
-List-Archive: <http://sourceware.org/ml/libc-alpha/>
-List-Post: <mailto:libc-alpha@sourceware.org>
-List-Help: <mailto:libc-alpha-help@sourceware.org>, <http://sourceware.org/ml/#faqs>
-Sender: libc-alpha-owner@sourceware.org
-Content-Disposition: inline
-In-Reply-To: <20171101114228.jm53aj7jx6j4mxhn@armageddon.cambridge.arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: linux-arch@vger.kernel.org, "H. J. Lu" <hjl.tools@gmail.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Dmitry Safonov <dsafonov@virtuozzo.com>, Will Deacon <will.deacon@arm.com>, Oleg Nesterov <oleg@redhat.com>, Ingo Molnar <mingo@redhat.com>, Alexander Viro <viro@zeniv.linux.org.uk>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5335749D26
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Nov 2017 09:29:33 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id j97ss+dDcTbj for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  1 Nov 2017 09:29:29 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 12DFC406D0
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Nov 2017 09:29:29 -0400 (EDT)
+In-Reply-To: <d7b8b779-9e00-8e8f-b44e-48e3d7e37058@huawei.com>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: gengdongjiu <gengdongjiu@huawei.com>, catalin.marinas@arm.com, will.deacon@arm.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, james.morse@arm.com, mark.rutland@arm.com, ard.biesheuvel@linaro.org, cov@codeaurora.org, Dave.Martin@arm.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Nov 01, 2017 at 11:42:29AM +0000, Catalin Marinas wrote:
-> On Tue, Oct 31, 2017 at 03:50:53PM +0000, Dave P Martin wrote:
-> > Currently the regset API doesn't allow for the possibility that
-> > regsets (or at least, the amount of meaningful data in a regset)
-> > may change in size.
-> > 
-> > In particular, this results in useless padding being added to
-> > coredumps if a regset's current size is smaller than its
-> > theoretical maximum size.
-> > 
-> > This patch adds a get_size() function to struct user_regset.
-> > Individual regset implementations can implement this function to
-> > return the current size of the regset data.  A regset_size()
-> > function is added to provide callers with an abstract interface for
-> > determining the size of a regset without needing to know whether
-> > the regset is dynamically sized or not.
-> > 
-> > The only affected user of this interface is the ELF coredump code:
-> > This patch ports ELF coredump to dump regsets with their actual
-> > size in the coredump.  This has no effect except for new regsets
-> > that are dynamically sized and provide a get_size() implementation.
-> > 
-> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> > Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-> > Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-> > Cc: Oleg Nesterov <oleg@redhat.com>
-> > Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-> > Cc: Thomas Gleixner <tglx@linutronix.de>
-> > Cc: Ingo Molnar <mingo@redhat.com>
-> > Cc: "H. Peter Anvin" <hpa@zytor.com>
-> > Cc: Dmitry Safonov <dsafonov@virtuozzo.com>
-> > Cc: H. J. Lu <hjl.tools@gmail.com>
-> > 
-> > ---
-> > 
-> > **Dropped** Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-> > **Dropped** Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-> > (due to bug fix applied against v4 of this patch.)
+On 01/11/17 12:54, gengdongjiu wrote:
+> Hi Robin,
 > 
-> It seems that the Reviewed-by tags are still there ;). Anyway, on the
-
-Oops, looks like that only happened on this patch.  I've removed
-Alex's R-b from my own version in case of repost -- can you also
-do the same?
-
-> new patch:
+> On 2017/11/1 19:24, Robin Murphy wrote:
+>>> +	esb
+>>> +alternative_else_nop_endif
+>>> +1:
+>>> +	.endm
+>> Having a branch in here is pretty horrible, and furthermore using label
+>> number 1 has a pretty high chance of subtly breaking code where this
+>> macro is inserted.
+>>
+>> Can we not somehow nest or combine the alternative conditions here?
 > 
-> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> I found it will report error if combine the alternative conditions here.
+> 
+> For example:
+> 
+> +	.macro	error_synchronize
+> +alternative_if ARM64_HAS_IESB
+> +alternative_if ARM64_HAS_RAS_EXTN
+> +	esb
+> +alternative_else_nop_endif
+> +alternative_else_nop_endif
+> +	.endm
+> 
+> And even using b.eq/cbz instruction in the alternative instruction in arch/arm64/kernel/entry.S,
+> it will report Error.
+> 
+> For example below
+> 
+> alternative_if ARM64_HAS_PAN
+> 	xxxxxxxxxxxxxxxxxxxx
+>         b.eq    xxxxx
+> alternative_else_nop_endif
+> 
+> I do not dig it deeply, do you know the reason about it or good suggestion about that?
+> Thanks a lot in advance.
 
-Cheers
----Dave
+Actually, on second look ARM64_HAS_RAS_EXTN doesn't even matter - ESB is
+a hint, so if the CPU doesn't have RAS it should behave as a NOP anyway.
+
+On which note, since I don't see one here - are any of those other
+patches defining an "esb" assembly macro similar to the inline asm case?
+If not then this isn't going to build with older toolchains - perhaps we
+should just use the raw hint syntax directly.
+
+Robin.
