@@ -1,38 +1,60 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v1 0/3] manually add Error Synchronization Barrier at
- exception handler entry and exit
-Date: Wed, 01 Nov 2017 11:32:57 +0000
-Message-ID: <59F9B0E9.5090609@arm.com>
-References: <1509563697-6359-1-git-send-email-gengdongjiu@huawei.com>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v5 01/30] regset: Add support for dynamically sized
+ regsets
+Date: Wed, 1 Nov 2017 11:42:29 +0000
+Message-ID: <20171101114228.jm53aj7jx6j4mxhn@armageddon.cambridge.arm.com>
+References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
+ <1509465082-30427-2-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1509563697-6359-1-git-send-email-gengdongjiu@huawei.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Dongjiu Geng <gengdongjiu@huawei.com>
-Cc: catalin.marinas@arm.com, will.deacon@arm.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, mark.rutland@arm.com, ard.biesheuvel@linaro.org, robin.murphy@arm.com, cov@codeaurora.org, Dave.Martin@arm.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-arch-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1509465082-30427-2-git-send-email-Dave.Martin@arm.com>
+Sender: linux-arch-owner@vger.kernel.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, "H. J. Lu" <hjl.tools@gmail.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Will Deacon <will.deacon@arm.com>, Oleg Nesterov <oleg@redhat.com>, Dmitry Safonov <dsafonov@virtuozzo.com>, Ingo Molnar <mingo@redhat.com>, Alexander Viro <viro@zeniv.linux.org.uk>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Dongjiu Geng,
-
-On 01/11/17 19:14, Dongjiu Geng wrote:
-> Some hardware platform can support RAS Extension, but not support IESB,
-> such as Huawei's platform, so software need to insert Synchronization Barrier
-> operations at exception handler entry.
+On Tue, Oct 31, 2017 at 03:50:53PM +0000, Dave P Martin wrote:
+> Currently the regset API doesn't allow for the possibility that
+> regsets (or at least, the amount of meaningful data in a regset)
+> may change in size.
 > 
-> This series patches are based on  James's series patches "SError rework +
-> RAS&IESB for firmware first support". In Huawei's platform, we do not
-> support IESB, so software needs to insert that.
+> In particular, this results in useless padding being added to
+> coredumps if a regset's current size is smaller than its
+> theoretical maximum size.
+> 
+> This patch adds a get_size() function to struct user_regset.
+> Individual regset implementations can implement this function to
+> return the current size of the regset data.  A regset_size()
+> function is added to provide callers with an abstract interface for
+> determining the size of a regset without needing to know whether
+> the regset is dynamically sized or not.
+> 
+> The only affected user of this interface is the ELF coredump code:
+> This patch ports ELF coredump to dump regsets with their actual
+> size in the coredump.  This has no effect except for new regsets
+> that are dynamically sized and provide a get_size() implementation.
+> 
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Oleg Nesterov <oleg@redhat.com>
+> Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: Dmitry Safonov <dsafonov@virtuozzo.com>
+> Cc: H. J. Lu <hjl.tools@gmail.com>
+> 
+> ---
+> 
+> **Dropped** Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+> **Dropped** Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> (due to bug fix applied against v4 of this patch.)
 
-Surely you don't implement it because your CPU doesn't need it. Can
-unrecoverable errors really cross an exception without becoming an SError?
+It seems that the Reviewed-by tags are still there ;). Anyway, on the
+new patch:
 
-The ESB instruction does the barrier, but it also consumes any pending SError.
-As it is this series will silently consume-and-discard uncontainable errors.
-
-
-
-Thanks,
-
-James
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
