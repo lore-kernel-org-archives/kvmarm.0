@@ -1,110 +1,109 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v5 04/30] arm64: KVM: Hide unsupported AArch64 CPU
- features from guests
-Date: Wed, 1 Nov 2017 05:47:29 +0100
-Message-ID: <20171101044729.GA11166@lvm>
-References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
- <1509465082-30427-5-git-send-email-Dave.Martin@arm.com>
+Subject: Re: [PATCH v4 20/21] KVM: arm64: Take any host SError before
+ entering the guest
+Date: Wed, 1 Nov 2017 05:55:50 +0100
+Message-ID: <20171101045550.GB11166@lvm>
+References: <20171019145807.23251-1-james.morse@arm.com>
+ <20171019145807.23251-21-james.morse@arm.com>
+ <20171031062315.GY2166@lvm> <59F861EE.4010505@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-arch-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5791349D4E
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Nov 2017 00:54:26 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id GUbIiNFzJZqX for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  1 Nov 2017 00:54:25 -0400 (EDT)
+Received: from mail-lf0-f47.google.com (mail-lf0-f47.google.com
+ [209.85.215.47])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2DA7F49D14
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Nov 2017 00:54:25 -0400 (EDT)
+Received: by mail-lf0-f47.google.com with SMTP id a2so1182811lfh.11
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Oct 2017 21:56:02 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1509465082-30427-5-git-send-email-Dave.Martin@arm.com>
-Sender: linux-arch-owner@vger.kernel.org
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>
+In-Reply-To: <59F861EE.4010505@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: James Morse <james.morse@arm.com>
+Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Julien Thierry <julien.thierry@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, linux-arm-kernel@lists.infradead.org, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Oct 31, 2017 at 03:50:56PM +0000, Dave Martin wrote:
-> Currently, a guest kernel sees the true CPU feature registers
-> (ID_*_EL1) when it reads them using MRS instructions.  This means
-> that the guest may observe features that are present in the
-> hardware but the host doesn't understand or doesn't provide support
-> for.  A guest may legimitately try to use such a feature as per the
-> architecture, but use of the feature may trap instead of working
-> normally, triggering undef injection into the guest.
+On Tue, Oct 31, 2017 at 11:43:42AM +0000, James Morse wrote:
+> Hi Christoffer,
 > 
-> This is not a problem for the host, but the guest may go wrong when
-> running on newer hardware than the host knows about.
+> On 31/10/17 06:23, Christoffer Dall wrote:
+> > On Thu, Oct 19, 2017 at 03:58:06PM +0100, James Morse wrote:
+> >> On VHE systems KVM masks SError before switching the VBAR value. Any
+> >> host RAS error that the CPU knew about before world-switch may become
+> >> pending as an SError during world-switch, and only be taken once we enter
+> >> the guest.
+> >>
+> >> Until KVM can take RAS SErrors during world switch, add an ESB to
+> >> force any RAS errors to be synchronised and taken on the host before
+> >> we enter world switch.
+> >>
+> >> RAS errors that become pending during world switch are still taken
+> >> once we enter the guest.
 > 
-> This patch hides from guest VMs any AArch64-specific CPU features
-> that the host doesn't support, by exposing to the guest the
-> sanitised versions of the registers computed by the cpufeatures
-> framework, instead of the true hardware registers.  To achieve
-> this, HCR_EL2.TID3 is now set for AArch64 guests, and emulation
-> code is added to KVM to report the sanitised versions of the
-> affected registers in response to MRS and register reads from
-> userspace.
+> >> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> >> index cf5d78ba14b5..5dc6f2877762 100644
+> >> --- a/arch/arm64/include/asm/kvm_host.h
+> >> +++ b/arch/arm64/include/asm/kvm_host.h
+> >> @@ -392,6 +392,7 @@ static inline void __cpu_init_stage2(void)
+> >>  
+> >>  static inline void kvm_arm_vhe_guest_enter(void)
+> >>  {
+> >> +	esb();
 > 
-> The affected registers are removed from invariant_sys_regs[] (since
-> the invariant_sys_regs handling is no longer quite correct for
-> them) and added to sys_reg_desgs[], with appropriate access(),
-> get_user() and set_user() methods.  No runtime vcpu storage is
-> allocated for the registers: instead, they are read on demand from
-> the cpufeatures framework.  This may need modification in the
-> future if there is a need for userspace to customise the features
-> visible to the guest.
+> > I don't fully appreciate what the point of this is?
+> > 
+> > As I understand it, our fundamental goal here is to try to distinguish
+> > between errors happening on the host or in the guest.
 > 
-> Attempts by userspace to write the registers are handled similarly
-> to the current invariant_sys_regs handling: writes are permitted,
-> but only if they don't attempt to change the value.  This is
-> sufficient to support VM snapshot/restore from userspace.
+> Not just host/guest, but also those we can and can't handle.
 > 
-> Because of the additional registers, restoring a VM on an older
-> kernel may not work unless userspace knows how to handle the extra
-> VM registers exposed to the KVM user ABI by this patch.
+> KVM can't currently take an SError during world switch, so a RAS error that the
+> CPU was hoping to defer may spread from the host into KVM's
+> no-SError:world-switch code. If this happens it will (almost certainly) have to
+> be re-classified as uncontainable.
 > 
-> Under the principle of least damage, this patch makes no attempt to
-> handle any of the other registers currently in
-> invariant_sys_regs[], or to emulate registers for AArch32: however,
-> these could be handled in a similar way in future, as necessary.
+> There is also a firmware-first angle here: NOTIFY_SEI can't be delivered if the
+> normal world has SError masked, so any error that spreads past this point
+> becomes a reboot-by-firmware instead of an OS notification and almost-helpful
+> error message.
 > 
-> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Christoffer Dall <christoffer.dall@linaro.org>
-> ---
->  arch/arm64/include/asm/sysreg.h |   3 +
->  arch/arm64/kvm/hyp/switch.c     |   6 +
->  arch/arm64/kvm/sys_regs.c       | 282 +++++++++++++++++++++++++++++++++-------
->  3 files changed, 246 insertions(+), 45 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index 4dceb12..609d59af 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -149,6 +149,9 @@
->  #define SYS_ID_AA64DFR0_EL1		sys_reg(3, 0, 0, 5, 0)
->  #define SYS_ID_AA64DFR1_EL1		sys_reg(3, 0, 0, 5, 1)
->  
-> +#define SYS_ID_AA64AFR0_EL1		sys_reg(3, 0, 0, 5, 4)
-> +#define SYS_ID_AA64AFR1_EL1		sys_reg(3, 0, 0, 5, 5)
-> +
->  #define SYS_ID_AA64ISAR0_EL1		sys_reg(3, 0, 0, 6, 0)
->  #define SYS_ID_AA64ISAR1_EL1		sys_reg(3, 0, 0, 6, 1)
->  
-> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> index 945e79c..35a90b8 100644
-> --- a/arch/arm64/kvm/hyp/switch.c
-> +++ b/arch/arm64/kvm/hyp/switch.c
-> @@ -81,11 +81,17 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
->  	 * it will cause an exception.
->  	 */
->  	val = vcpu->arch.hcr_el2;
-> +
->  	if (!(val & HCR_RW) && system_supports_fpsimd()) {
->  		write_sysreg(1 << 30, fpexc32_el2);
->  		isb();
->  	}
-> +
-> +	if (val & HCR_RW) /* for AArch64 only: */
-> +		val |= HCR_TID3; /* TID3: trap feature register accesses */
-> +
+> > If that's correct, then why don't we do it at the last possible moment
+> > when we still have a scratch register left, in the world switch code
+> > itself, and in the case abort the guest entry and report back a "host
+> > SError" return code.
+> 
+> We have IESB to run the error-barrier as we enter the guest. This would make any
+> host error pending as an SError, and we would exit the guest immediately. But if
+> there was an RAS error during world switch, by this point its likely to be
+> classified as uncontainable.
+> 
+> This esb() is trying to keep this window of code as small as possible, to just
+> errors that occur during world switch.
+> 
+> With your vcpu load/save this window becomes a lot smaller, it may be possible
+> to get a VHE-host's arch-code SError handler to take errors from EL2, in which
+> case this barrier can disappear.
+> (note to self: guest may still own the debug hardware)
+> 
 
-I still think we should set this in vcpu_reset_hcr() and do it once
-instead of adding code in every iteration of the critical path.
+ok, thanks for your detailed explanation.  I didn't consider that the
+classification of a RAS error as containable vs. non-containable
+depended on where we take the exception.
 
-Otherwise this patch looks good to me.
-
-Thanks,
--Christoffer
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
