@@ -1,87 +1,67 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v4 00/21] SError rework + RAS&IESB for firmware first
- support
-Date: Wed, 01 Nov 2017 15:23:50 +0000
-Message-ID: <59F9E706.40503@arm.com>
-References: <20171019145807.23251-1-james.morse@arm.com>
- <20171031063535.GA2166@lvm> <20171031100829.GC5584@arm.com>
+From: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+Subject: Re: [PATCH v4 11/13] firmware: arm_sdei: add support for CPU private
+ events
+Date: Wed, 01 Nov 2017 15:59:52 +0000
+Message-ID: <59F9EF78.8090107@arm.com>
+References: <20171017174432.1684-1-james.morse@arm.com> <20171017174432.1684-12-james.morse@arm.com> <20171018171959.GJ21820@arm.com> <59EF798A.9000609@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B912749D27
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Nov 2017 11:23:59 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pCKtAtdplZ2B for <kvmarm@lists.cs.columbia.edu>;
- Wed,  1 Nov 2017 11:23:58 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6335D49D26
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Nov 2017 11:23:58 -0400 (EDT)
-In-Reply-To: <20171031100829.GC5584@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Will Deacon <will.deacon@arm.com>, Christoffer Dall <cdall@linaro.org>
-Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Julien Thierry <julien.thierry@arm.com>, wangxiongfeng2@huawei.com, linux-arm-kernel@lists.infradead.org, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <59EF798A.9000609-5wv7dgnIgG8@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>
+Cc: devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Lorenzo Pieralisi <lorenzo.pieralisi-5wv7dgnIgG8@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, Loc Ho <lho-qTEPVZfXA3Y@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi guys,
+Hi Will,
 
-On 31/10/17 10:08, Will Deacon wrote:
-> On Tue, Oct 31, 2017 at 07:35:35AM +0100, Christoffer Dall wrote:
->> On Thu, Oct 19, 2017 at 03:57:46PM +0100, James Morse wrote:
->>> The aim of this series is to enable IESB and add ESB-instructions to let us
->>> kick any pending RAS errors into firmware to be handled by firmware-first.
+On 24/10/17 18:34, James Morse wrote:
+> On 18/10/17 18:19, Will Deacon wrote:
+>> On Tue, Oct 17, 2017 at 06:44:30PM +0100, James Morse wrote:
+>>> Private SDE events are per-cpu, and need to be registered and enabled
+>>> on each CPU.
 >>>
->>> Not all systems will have this firmware, so these RAS errors will become
->>> pending SErrors. We should take these as quickly as possible and avoid
->>> panic()ing for errors where we could have continued.
+>>> Hide this detail from the caller by adapting our {,un}register and
+>>> {en,dis}able calls to send an IPI to each CPU if the event is private.
 >>>
->>> This first part of this series reworks the DAIF masking so that SError is
->>> unmasked unless we are handling a debug exception.
->>>
->>> The last part provides the same minimal handling for SError that interrupt
->>> KVM. KVM is currently unable to handle SErrors during world-switch, unless
->>> they occur during a magic single-instruction window, it hyp-panics. I suspect
->>> this will be easier to fix once the VHE world-switch is further optimised.
->>>
->>> KVMs kvm_inject_vabt() needs updating for v8.2 as now we can specify an ESR,
->>> and all-zeros has a RAS meaning.
->>>
->>> KVM's existing 'impdef SError to the guest' behaviour probably needs revisiting.
->>> These are errors where we don't know what they mean, they may not be
->>> synchronised by ESB. Today we blame the guest.
->>> My half-baked suggestion would be to make a virtual SError pending, but then
->>> exit to user-space to give Qemu the change to quit (for virtual machines that
->>> don't generate SError), pend an SError with a new Qemu-specific ESR, or blindly
->>> continue and take KVMs default all-zeros impdef ESR.
->>
->> The KVM side of this series is looking pretty good.
->>
->> What are the merge plans for this?  I am fine if you will take this via
->> the arm64 tree with our acks from the KVM side.  Alternatively, I
->> suppose you can apply all the arm64 patches and provide us with a stable
->> branch for that?
+>>> CPU private events are unregistered when the CPU is powered-off, and
+>>> re-registered when the CPU is brought back online. This saves bringing
+>>> secondary cores back online to call private_reset() on shutdown, kexec
+>>> and resume from hibernate.
 > 
-> I'll take a look this afternoon, but we haven't had a linux next release
-> since the 18th so I'm starting to get nervous about conflicts if I end up
-> pulling in new trees now.
+>>> diff --git a/drivers/firmware/arm_sdei.c b/drivers/firmware/arm_sdei.c
+>>> index 28e4c4cbb16d..5598d9ba8b5d 100644
+>>> --- a/drivers/firmware/arm_sdei.c
+>>> +++ b/drivers/firmware/arm_sdei.c
+>>> @@ -610,6 +813,7 @@ static int sdei_device_freeze(struct device *dev)
+>>>  {
+>>>  	int err;
+>>>  
+>>> +	frozen = true;
+>>>  	err = sdei_event_unregister_all();
+> 
+>> Are the release semantics from spin_unlock in sdei_event_unregister_all
+>> sufficient for the ordering guarantees you need?
+> 
+> ... ordering ...
+> 
+> The hotplug notifiers don't touch that lock, so at the first level: no.
+> 
+> It looks like I was relying on the cpu-hotplug code using stop-machine for its
+> work, and the spinlocks changing the pre-empt count for this to work. Which is
+> not something I want to debug if it changes!
+> 
+> I'll post a patch changing this bool to a more sensible atomic type.
 
-Will's 'what about mixed RAS support' comment will take me a while to get to
-fix, and I don't think I can test that before the end of the week.
-
-Unless there is an rc8+linux-next I think this is too late, but I will split off
-and repost the SError_rework bits as that seems uncontentious...
+Here I show my ignorance: atomic_t didn't do what I thought. But I do take the
+spinlock inside the hotplug callback, so I'll move the variable in there.
 
 
 Thanks,
 
 James
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
