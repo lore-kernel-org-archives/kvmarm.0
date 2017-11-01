@@ -1,31 +1,50 @@
 From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v5 02/30] arm64: fpsimd: Correctly annotate exception
- helpers called from asm
-Date: Wed, 1 Nov 2017 11:42:55 +0000
-Message-ID: <20171101114254.hqeakwpri53ga7p5@armageddon.cambridge.arm.com>
+Subject: Re: [PATCH v5 03/30] arm64: signal: Verify extra data is
+ user-readable in sys_rt_sigreturn
+Date: Wed, 1 Nov 2017 11:43:29 +0000
+Message-ID: <20171101114329.5eaejnxwojvadbex@armageddon.cambridge.arm.com>
 References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
- <1509465082-30427-3-git-send-email-Dave.Martin@arm.com>
+ <1509465082-30427-4-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <linux-arch-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1509465082-30427-3-git-send-email-Dave.Martin@arm.com>
+In-Reply-To: <1509465082-30427-4-git-send-email-Dave.Martin@arm.com>
 Sender: linux-arch-owner@vger.kernel.org
 To: Dave Martin <Dave.Martin@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Will Deacon <will.deacon@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Oct 31, 2017 at 03:50:54PM +0000, Dave P Martin wrote:
-> A couple of FPSIMD exception handling functions that are called
-> from entry.S are currently not annotated as such.
+On Tue, Oct 31, 2017 at 03:50:55PM +0000, Dave P Martin wrote:
+> Currently sys_rt_sigreturn() verifies that the base sigframe is
+> readable, but no similar check is performed on the extra data to
+> which an extra_context record points.
 > 
-> This is not a big deal since asmlinkage does nothing on arm/arm64,
-> but fixing the annotations is more consistent and may help avoid
-> future surprises.
+> This matters because the extra data will be read with the
+> unprotected user accessors.  However, this is not a problem at
+> present because the extra data base address is required to be
+> exactly at the end of the base sigframe.  So, there would need to
+> be a non-user-readable kernel address within about 59K
+> (SIGFRAME_MAXSZ - sizeof(struct rt_sigframe)) of some address for
+> which access_ok(VERIFY_READ) returns true, in order for sigreturn
+> to be able to read kernel memory that should be inaccessible to the
+> user task.  This is currently impossible due to the untranslatable
+> address hole between the TTBR0 and TTBR1 address ranges.
 > 
-> This patch adds appropriate asmlinkage annotations for
-> do_fpsimd_acc() and do_fpsimd_exc().
+> Disappearance of the hole between the TTBR0 and TTBR1 mapping
+> ranges would require the VA size for TTBR0 and TTBR1 to grow to at
+> least 55 bits, and either the disabling of tagged pointers for
+> userspace or enabling of tagged pointers for kernel space; none of
+> which is currently envisaged.
 > 
+> Even so, it is wrong to use the unprotected user accessors without
+> an accompanying access_ok() check.
+> 
+> To avoid the potential for future surprises, this patch does an
+> explicit access_ok() check on the extra data space when parsing an
+> extra_context record.
+> 
+> Fixes: 33f082614c34 ("arm64: signal: Allow expansion of the signal frame")
 > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 
 Acked-by: Catalin Marinas <catalin.marinas@arm.com>
