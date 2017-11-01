@@ -1,24 +1,24 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH 15/13] firmware: arm_sdei: move the frozen flag under the
- spinlock
-Date: Wed,  1 Nov 2017 15:59:41 +0000
-Message-ID: <20171101155941.19432-1-james.morse@arm.com>
-References: <20171017174432.1684-1-james.morse@arm.com>
+Subject: Re: [PATCH v4 17/21] KVM: arm64: Save ESR_EL2 on guest SError
+Date: Wed, 01 Nov 2017 17:42:37 +0000
+Message-ID: <59FA078D.6030005@arm.com>
+References: <20171019145807.23251-1-james.morse@arm.com>	<20171019145807.23251-18-james.morse@arm.com>
+ <86po943puu.fsf@arm.com> <86efpj50nb.fsf@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A287649D53
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Nov 2017 11:59:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E2B4D49D13
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Nov 2017 13:42:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gVAivTeYvGE4 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  1 Nov 2017 11:59:54 -0400 (EDT)
+ with ESMTP id MLW5wGGx2lYl for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  1 Nov 2017 13:42:44 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 49D1949D23
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Nov 2017 11:59:54 -0400 (EDT)
-In-Reply-To: <20171017174432.1684-1-james.morse@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C126F40EA6
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Nov 2017 13:42:44 -0400 (EDT)
+In-Reply-To: <86efpj50nb.fsf@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,112 +28,78 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org
-Cc: devicetree@vger.kernel.org, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Rob Herring <robh+dt@kernel.org>, Loc Ho <lho@apm.com>, kvmarm@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Jonathan.Zhang@cavium.com, Catalin Marinas <catalin.marinas@arm.com>, Julien Thierry <julien.thierry@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, linux-arm-kernel@lists.infradead.org, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-dpm_suspend() calls the freeze/thaw callbacks for hibernate before
-disable_non_bootcpus() takes down secondaries.
+Hi Marc,
 
-This leads to a fun race where the freeze/thaw callbacks reset the
-SDEI interface (as we may be restoring a kernel with a different
-layout due to KASLR), then the cpu-hotplug callbacks come in to
-save the current state, which has already been reset.
+On 31/10/17 05:47, Marc Zyngier wrote:
+> On Tue, Oct 31 2017 at  4:26:01 am GMT, Marc Zyngier <marc.zyngier@arm.com> wrote:
+>> On Thu, Oct 19 2017 at  4:58:03 pm BST, James Morse <james.morse@arm.com> wrote:
+>>> When we exit a guest due to an SError the vcpu fault info isn't updated
+>>> with the ESR. Today this is only done for traps.
+>>>
+>>> The v8.2 RAS Extensions define ISS values for SError. Update the vcpu's
+>>> fault_info with the ESR on SError so that handle_exit() can determine
+>>> if this was a RAS SError and decode its severity.
 
-We solve this with a 'frozen' flag that stops the hotplug callback
-from overwriting the saved values.
+>>> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+>>> index af37658223a0..cba6d8ac105c 100644
+>>> --- a/arch/arm64/kvm/hyp/switch.c
+>>> +++ b/arch/arm64/kvm/hyp/switch.c
+>>> @@ -230,13 +230,20 @@ static bool __hyp_text __translate_far_to_hpfar(u64 far, u64 *hpfar)
+>>>  	return true;
+>>>  }
+>>>  
+>>> +static void __hyp_text __populate_fault_info_esr(struct kvm_vcpu *vcpu)
+>>> +{
+>>> +	vcpu->arch.fault.esr_el2 = read_sysreg_el2(esr);
+>>> +}
+>>> +
+>>>  static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
+>>>  {
+>>> -	u64 esr = read_sysreg_el2(esr);
+>>> -	u8 ec = ESR_ELx_EC(esr);
+>>> +	u8 ec;
+>>> +	u64 esr;
+>>>  	u64 hpfar, far;
+>>>  
+>>> -	vcpu->arch.fault.esr_el2 = esr;
+>>> +	__populate_fault_info_esr(vcpu);
+>>> +	esr = vcpu->arch.fault.esr_el2;
+>>> +	ec = ESR_ELx_EC(esr);
+>>>  
+>>>  	if (ec != ESR_ELx_EC_DABT_LOW && ec != ESR_ELx_EC_IABT_LOW)
+>>>  		return true;
+>>> @@ -325,6 +332,8 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>>>  	 */
+>>>  	if (exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
+>>>  		goto again;
+>>> +	else if (ARM_EXCEPTION_CODE(exit_code) == ARM_EXCEPTION_EL1_SERROR)
+>>> +		__populate_fault_info_esr(vcpu);
+>>>  
+>>>  	if (static_branch_unlikely(&vgic_v2_cpuif_trap) &&
+>>>  	    exit_code == ARM_EXCEPTION_TRAP) {
+>>
+>> With this patch, the only case were we don't save ESR_EL2 is when we
+>> take an interrupt. I think we should bite the bullet and make it
+>> slightly more streamlined, always saving ESR_EL2.
 
-This patch moves the flag under the 'events' spinlock we take
-in the hotplug callbacks, to avoid depending on cpu-hotplug's
-mechanics to ensure the callback sees the correct value.
+We always read it __guest_exit, just in case we take an SError and have to put
+it back.
 
-Reported-by: Will Deacon <will.deacon@arm.com>
-Signed-off-by: James Morse <james.morse@arm.com>
----
- drivers/firmware/arm_sdei.c | 21 ++++++++++++++++++---
- 1 file changed, 18 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/firmware/arm_sdei.c b/drivers/firmware/arm_sdei.c
-index 14b6d170518c..0ae497975064 100644
---- a/drivers/firmware/arm_sdei.c
-+++ b/drivers/firmware/arm_sdei.c
-@@ -78,7 +78,10 @@ struct sdei_event {
- static LIST_HEAD(sdei_events);
- static DEFINE_SPINLOCK(sdei_events_lock);
- 
--/* When frozen, cpu-hotplug notifiers shouldn't unregister/re-register events */
-+/*
-+ * When frozen, cpu-hotplug notifiers shouldn't unregister/re-register events.
-+ * Protected by sdei_events_lock.
-+ */
- static bool frozen;
- 
- /* Private events are registered/enabled via IPI passing one of these */
-@@ -704,13 +707,15 @@ static int sdei_cpuhp_down(unsigned int cpu)
- 	struct sdei_event *event;
- 	struct sdei_crosscall_args arg;
- 
-+
-+	spin_lock(&sdei_events_lock);
- 	if (frozen) {
- 		/* All events unregistered  */
-+		spin_unlock(&sdei_events_lock);
- 		return sdei_mask_local_cpu();
- 	}
- 
- 	/* un-register private events */
--	spin_lock(&sdei_events_lock);
- 	list_for_each_entry(event, &sdei_events, list) {
- 		if (event->type == SDEI_EVENT_TYPE_SHARED)
- 			continue;
-@@ -732,13 +737,14 @@ static int sdei_cpuhp_up(unsigned int cpu)
- 	struct sdei_event *event;
- 	struct sdei_crosscall_args arg;
- 
-+	spin_lock(&sdei_events_lock);
- 	if (frozen) {
- 		/* Events will be re-registered when we thaw. */
-+		spin_unlock(&sdei_events_lock);
- 		return sdei_unmask_local_cpu();
- 	}
- 
- 	/* re-register/enable private events */
--	spin_lock(&sdei_events_lock);
- 	list_for_each_entry(event, &sdei_events, list) {
- 		if (event->type == SDEI_EVENT_TYPE_SHARED)
- 			continue;
-@@ -813,7 +819,10 @@ static int sdei_device_freeze(struct device *dev)
- {
- 	int err;
- 
-+	spin_lock(&sdei_events_lock);
- 	frozen = true;
-+	spin_unlock(&sdei_events_lock);
-+
- 	err = sdei_event_unregister_all();
- 	if (err)
- 		return err;
-@@ -828,7 +837,11 @@ static int sdei_device_thaw(struct device *dev)
- 	sdei_device_resume(dev);
- 
- 	err = sdei_reregister_events();
-+
-+	spin_lock(&sdei_events_lock);
- 	frozen = false;
-+	spin_unlock(&sdei_events_lock);
-+
- 	return err;
- }
- 
-@@ -865,7 +878,9 @@ static int sdei_reboot_notifier(struct notifier_block *nb, unsigned long action,
- 	 * There is now no point trying to unregister private events if we go on
- 	 * to take CPUs offline.
- 	 */
-+	spin_lock(&sdei_events_lock);
- 	frozen = true;
-+	spin_unlock(&sdei_events_lock);
- 
- 	return NOTIFY_OK;
- }
--- 
-2.15.0.rc2
+> Otherwise, an alternative would be to write something like:
+> 
+> 	if (ARM_EXCEPTION_CODE(exit_code) != ARM_EXCEPTION_IRQ)
+>         	vcpu->arch.fault.esr_el2 = read_sysreg_el2(esr);
+> 
+> which still avoids saving it, and is a lot more readable.
+
+I'll switch to this in the next version.
+
+
+Thanks,
+
+James
