@@ -1,24 +1,28 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v4 17/21] KVM: arm64: Save ESR_EL2 on guest SError
-Date: Wed, 01 Nov 2017 17:42:37 +0000
-Message-ID: <59FA078D.6030005@arm.com>
-References: <20171019145807.23251-1-james.morse@arm.com>	<20171019145807.23251-18-james.morse@arm.com>
- <86po943puu.fsf@arm.com> <86efpj50nb.fsf@arm.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH v6 2/9] KVM: arm/arm64: vgic-its: Fix
+ vgic_its_restore_collection_table returned value
+Date: Thu, 2 Nov 2017 06:50:01 +0100
+Message-ID: <CAMJs5B8_zfmb0kwHy0To0P3MqucS08QyW2yVzaOdEZS7+k9PiA@mail.gmail.com>
+References: <1509031391-4407-1-git-send-email-eric.auger@redhat.com>
+ <1509031391-4407-3-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E2B4D49D13
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Nov 2017 13:42:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F1BB749D21
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Nov 2017 01:48:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MLW5wGGx2lYl for <kvmarm@lists.cs.columbia.edu>;
- Wed,  1 Nov 2017 13:42:44 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C126F40EA6
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Nov 2017 13:42:44 -0400 (EDT)
-In-Reply-To: <86efpj50nb.fsf@arm.com>
+ with ESMTP id qHCcuJZXSdp4 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Nov 2017 01:48:22 -0400 (EDT)
+Received: from mail-pf0-f194.google.com (mail-pf0-f194.google.com
+ [209.85.192.194])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B7E3F406D0
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Nov 2017 01:48:22 -0400 (EDT)
+Received: by mail-pf0-f194.google.com with SMTP id i5so3792091pfe.6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 01 Nov 2017 22:50:03 -0700 (PDT)
+In-Reply-To: <1509031391-4407-3-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,78 +32,54 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Jonathan.Zhang@cavium.com, Catalin Marinas <catalin.marinas@arm.com>, Julien Thierry <julien.thierry@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, linux-arm-kernel@lists.infradead.org, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
+To: Eric Auger <eric.auger@redhat.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, wu.wubin@huawei.com, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
+On Thu, Oct 26, 2017 at 05:23:04PM +0200, Eric Auger wrote:
+> vgic_its_restore_cte returns +1 if the collection table entry
+> is valid and properly decoded. As a consequence, if the
+> collection table is fully filled with valid data that are
+> decoded without error, vgic_its_restore_collection_table()
+> returns +1. This is wrong.
+>
+> Let's return 0 in that case.
+>
 
-On 31/10/17 05:47, Marc Zyngier wrote:
-> On Tue, Oct 31 2017 at  4:26:01 am GMT, Marc Zyngier <marc.zyngier@arm.com> wrote:
->> On Thu, Oct 19 2017 at  4:58:03 pm BST, James Morse <james.morse@arm.com> wrote:
->>> When we exit a guest due to an SError the vcpu fault info isn't updated
->>> with the ESR. Today this is only done for traps.
->>>
->>> The v8.2 RAS Extensions define ISS values for SError. Update the vcpu's
->>> fault_info with the ESR on SError so that handle_exit() can determine
->>> if this was a RAS SError and decode its severity.
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 
->>> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
->>> index af37658223a0..cba6d8ac105c 100644
->>> --- a/arch/arm64/kvm/hyp/switch.c
->>> +++ b/arch/arm64/kvm/hyp/switch.c
->>> @@ -230,13 +230,20 @@ static bool __hyp_text __translate_far_to_hpfar(u64 far, u64 *hpfar)
->>>  	return true;
->>>  }
->>>  
->>> +static void __hyp_text __populate_fault_info_esr(struct kvm_vcpu *vcpu)
->>> +{
->>> +	vcpu->arch.fault.esr_el2 = read_sysreg_el2(esr);
->>> +}
->>> +
->>>  static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
->>>  {
->>> -	u64 esr = read_sysreg_el2(esr);
->>> -	u8 ec = ESR_ELx_EC(esr);
->>> +	u8 ec;
->>> +	u64 esr;
->>>  	u64 hpfar, far;
->>>  
->>> -	vcpu->arch.fault.esr_el2 = esr;
->>> +	__populate_fault_info_esr(vcpu);
->>> +	esr = vcpu->arch.fault.esr_el2;
->>> +	ec = ESR_ELx_EC(esr);
->>>  
->>>  	if (ec != ESR_ELx_EC_DABT_LOW && ec != ESR_ELx_EC_IABT_LOW)
->>>  		return true;
->>> @@ -325,6 +332,8 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
->>>  	 */
->>>  	if (exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
->>>  		goto again;
->>> +	else if (ARM_EXCEPTION_CODE(exit_code) == ARM_EXCEPTION_EL1_SERROR)
->>> +		__populate_fault_info_esr(vcpu);
->>>  
->>>  	if (static_branch_unlikely(&vgic_v2_cpuif_trap) &&
->>>  	    exit_code == ARM_EXCEPTION_TRAP) {
->>
->> With this patch, the only case were we don't save ESR_EL2 is when we
->> take an interrupt. I think we should bite the bullet and make it
->> slightly more streamlined, always saving ESR_EL2.
-
-We always read it __guest_exit, just in case we take an SError and have to put
-it back.
-
-
-> Otherwise, an alternative would be to write something like:
-> 
-> 	if (ARM_EXCEPTION_CODE(exit_code) != ARM_EXCEPTION_IRQ)
->         	vcpu->arch.fault.esr_el2 = read_sysreg_el2(esr);
-> 
-> which still avoids saving it, and is a lot more readable.
-
-I'll switch to this in the next version.
-
-
-Thanks,
-
-James
+> Fixes: ea1ad53e1e31a3 (KVM: arm64: vgic-its: Collection table save/restore)
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>
+> ---
+>
+> v5 -> v6:
+> - use the same trick as vgic_its_restore_itt and
+>   vgic_its_restore_device_tables
+>
+> v4 -> v5:
+> - added Christoffer R-b
+>
+> v2 -> v3: creation
+> ---
+>  virt/kvm/arm/vgic/vgic-its.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> index d27a301..8230ffe 100644
+> --- a/virt/kvm/arm/vgic/vgic-its.c
+> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> @@ -2268,6 +2268,10 @@ static int vgic_its_restore_collection_table(struct vgic_its *its)
+>   gpa += cte_esz;
+>   read += cte_esz;
+>   }
+> +
+> + if (ret > 0)
+> + return 0;
+> +
+>   return ret;
+>  }
+>
+> --
+> 2.5.5
+>
