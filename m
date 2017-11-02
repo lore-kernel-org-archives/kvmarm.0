@@ -1,76 +1,153 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PULL 0/8] KVM/ARM Fixes for v4.14
-Date: Thu, 2 Nov 2017 18:38:45 +0100
-Message-ID: <f36c74ab-ce35-e3cd-a772-b83407228cfe@redhat.com>
-References: <20171030025603.23550-1-christoffer.dall@linaro.org>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH v5 04/30] arm64: KVM: Hide unsupported AArch64 CPU
+ features from guests
+Date: Thu, 2 Nov 2017 20:18:31 +0100
+Message-ID: <20171102191831.GA14144@cbox>
+References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
+ <1509465082-30427-5-git-send-email-Dave.Martin@arm.com>
+ <20171101044729.GA11166@lvm>
+ <20171101102601.GK19485@e103592.cambridge.arm.com>
+ <20171102081557.GB20075@cbox>
+ <20171102110137.GN19485@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20171030025603.23550-1-christoffer.dall@linaro.org>
-Content-Language: en-US
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-arch-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20171102110137.GN19485@e103592.cambridge.arm.com>
+Sender: linux-arch-owner@vger.kernel.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 30/10/2017 03:55, Christoffer Dall wrote:
-> Hi Paolo and Radim,
+On Thu, Nov 02, 2017 at 11:01:37AM +0000, Dave Martin wrote:
+> On Thu, Nov 02, 2017 at 09:15:57AM +0100, Christoffer Dall wrote:
+> > On Wed, Nov 01, 2017 at 10:26:03AM +0000, Dave Martin wrote:
+> > > On Wed, Nov 01, 2017 at 05:47:29AM +0100, Christoffer Dall wrote:
+> > > > On Tue, Oct 31, 2017 at 03:50:56PM +0000, Dave Martin wrote:
+> > > > > Currently, a guest kernel sees the true CPU feature registers
+> > > > > (ID_*_EL1) when it reads them using MRS instructions.  This means
+> > > > > that the guest may observe features that are present in the
+> > > > > hardware but the host doesn't understand or doesn't provide support
+> > > > > for.  A guest may legimitately try to use such a feature as per the
+> > > > > architecture, but use of the feature may trap instead of working
+> > > > > normally, triggering undef injection into the guest.
+> > > > > 
+> > > > > This is not a problem for the host, but the guest may go wrong when
+> > > > > running on newer hardware than the host knows about.
+> > > > > 
+> > > > > This patch hides from guest VMs any AArch64-specific CPU features
+> > > > > that the host doesn't support, by exposing to the guest the
+> > > > > sanitised versions of the registers computed by the cpufeatures
+> > > > > framework, instead of the true hardware registers.  To achieve
+> > > > > this, HCR_EL2.TID3 is now set for AArch64 guests, and emulation
+> > > > > code is added to KVM to report the sanitised versions of the
+> > > > > affected registers in response to MRS and register reads from
+> > > > > userspace.
+> > > > > 
+> > > > > The affected registers are removed from invariant_sys_regs[] (since
+> > > > > the invariant_sys_regs handling is no longer quite correct for
+> > > > > them) and added to sys_reg_desgs[], with appropriate access(),
+> > > > > get_user() and set_user() methods.  No runtime vcpu storage is
+> > > > > allocated for the registers: instead, they are read on demand from
+> > > > > the cpufeatures framework.  This may need modification in the
+> > > > > future if there is a need for userspace to customise the features
+> > > > > visible to the guest.
+> > > > > 
+> > > > > Attempts by userspace to write the registers are handled similarly
+> > > > > to the current invariant_sys_regs handling: writes are permitted,
+> > > > > but only if they don't attempt to change the value.  This is
+> > > > > sufficient to support VM snapshot/restore from userspace.
+> > > > > 
+> > > > > Because of the additional registers, restoring a VM on an older
+> > > > > kernel may not work unless userspace knows how to handle the extra
+> > > > > VM registers exposed to the KVM user ABI by this patch.
+> > > > > 
+> > > > > Under the principle of least damage, this patch makes no attempt to
+> > > > > handle any of the other registers currently in
+> > > > > invariant_sys_regs[], or to emulate registers for AArch32: however,
+> > > > > these could be handled in a similar way in future, as necessary.
+> > > > > 
+> > > > > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> > > > > Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+> > > > > Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+> > > > > Cc: Christoffer Dall <christoffer.dall@linaro.org>
+> > > > > ---
+> > > > >  arch/arm64/include/asm/sysreg.h |   3 +
+> > > > >  arch/arm64/kvm/hyp/switch.c     |   6 +
+> > > > >  arch/arm64/kvm/sys_regs.c       | 282 +++++++++++++++++++++++++++++++++-------
+> > > > >  3 files changed, 246 insertions(+), 45 deletions(-)
+> > > > > 
+> > > > > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> > > > > index 4dceb12..609d59af 100644
+> > > > > --- a/arch/arm64/include/asm/sysreg.h
+> > > > > +++ b/arch/arm64/include/asm/sysreg.h
+> > > > > @@ -149,6 +149,9 @@
+> > > > >  #define SYS_ID_AA64DFR0_EL1		sys_reg(3, 0, 0, 5, 0)
+> > > > >  #define SYS_ID_AA64DFR1_EL1		sys_reg(3, 0, 0, 5, 1)
+> > > > >  
+> > > > > +#define SYS_ID_AA64AFR0_EL1		sys_reg(3, 0, 0, 5, 4)
+> > > > > +#define SYS_ID_AA64AFR1_EL1		sys_reg(3, 0, 0, 5, 5)
+> > > > > +
+> > > > >  #define SYS_ID_AA64ISAR0_EL1		sys_reg(3, 0, 0, 6, 0)
+> > > > >  #define SYS_ID_AA64ISAR1_EL1		sys_reg(3, 0, 0, 6, 1)
+> > > > >  
+> > > > > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> > > > > index 945e79c..35a90b8 100644
+> > > > > --- a/arch/arm64/kvm/hyp/switch.c
+> > > > > +++ b/arch/arm64/kvm/hyp/switch.c
+> > > > > @@ -81,11 +81,17 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+> > > > >  	 * it will cause an exception.
+> > > > >  	 */
+> > > > >  	val = vcpu->arch.hcr_el2;
+> > > > > +
+> > > > >  	if (!(val & HCR_RW) && system_supports_fpsimd()) {
+> > > > >  		write_sysreg(1 << 30, fpexc32_el2);
+> > > > >  		isb();
+> > > > >  	}
+> > > > > +
+> > > > > +	if (val & HCR_RW) /* for AArch64 only: */
+> > > > > +		val |= HCR_TID3; /* TID3: trap feature register accesses */
+> > > > > +
+> > > > 
+> > > > I still think we should set this in vcpu_reset_hcr() and do it once
+> > > > instead of adding code in every iteration of the critical path.
+> > > 
+> > > Dang, I somehow missed this in the last round.
+> > > 
+> > > How about:
+> > > 
+> > > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> > > index e5df3fc..c87be0d 100644
+> > > --- a/arch/arm64/include/asm/kvm_emulate.h
+> > > +++ b/arch/arm64/include/asm/kvm_emulate.h
+> > > @@ -49,6 +49,14 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+> > >  		vcpu->arch.hcr_el2 |= HCR_E2H;
+> > >  	if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features))
+> > >  		vcpu->arch.hcr_el2 &= ~HCR_RW;
+> > > +
+> > > +	/*
+> > > +	 * TID3: trap feature register accesses that we virtualise.
+> > > +	 * For now this is conditional, since no AArch32 feature regs
+> > > +	 * are currently virtualised.
+> > > +	 */
+> > > +	if (vcpu->arch.hcr_el2 & HCR_RW)
+> > > +		vcpu->arch.hcr_el2 |= HCR_TID3;
+> > >  }
+> > >  
+> > >  static inline unsigned long vcpu_get_hcr(struct kvm_vcpu *vcpu)
+> > > > 
+> > > > Otherwise this patch looks good to me.
+> > > 
+> > > I'll probably post this as a separate follow-up patch, unless there's
+> > > some other reason for a full respin.
+> > > 
+> > 
+> > Fine with me, just remember to remove the part of the world-switch that
+> > was added in this patch, as that's what we want to savoid.
 > 
-> Here are the fixes we've been trying to get ready for v4.14 for a while;
-> sorry about sending these so late.
+> To be clear, does this amount to an Ack on the _original_ patch,
+> providing I follow up with this optimisation after the merge window?
 > 
-> We're fixing:
-> 
->  - a number of issues with saving/restoring the ITS
->  - a bug in KVM/ARM when branch profiling is enabled in Hyp mode
->  - an emulation bug for 32-bit guests when injecting aborts
->  - a failure to check if a kmalloc succeeds in the ITS emulation
-> 
-> The following changes since commit 8a5776a5f49812d29fe4b2d0a2d71675c3facf3f:
-> 
->   Linux 4.14-rc4 (2017-10-08 20:53:29 -0700)
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-fixes-for-v4.14
-> 
-> for you to fetch changes up to c2385eaa6c5a87cdc4e04ed589ae103ca3297c84:
-> 
->   KVM: arm/arm64: vgic-its: Check GITS_BASER Valid bit before saving tables (2017-10-29 03:25:06 +0100)
-> 
-> 
-> Thanks,
-> -Christoffer
-> 
-> Christoffer Dall (1):
->       KVM: arm64: its: Fix missing dynamic allocation check in scan_its_table
-> 
-> Dongjiu Geng (1):
->       arm/arm64: KVM: set right LR register value for 32 bit guest when inject abort
-> 
-> Eric Auger (3):
->       KVM: arm/arm64: vgic-its: Fix vgic_its_restore_collection_table returned value
->       KVM: arm/arm64: vgic-its: Check CBASER/BASER validity before enabling the ITS
->       KVM: arm/arm64: vgic-its: Check GITS_BASER Valid bit before saving tables
-> 
-> Julien Thierry (2):
->       arm/arm64: kvm: Move initialization completion message
->       arm/arm64: kvm: Disable branch profiling in HYP code
-> 
-> wanghaibin (1):
->       KVM: arm/arm64: vgic-its: Fix return value for device table restore
-> 
->  arch/arm/kvm/emulate.c        |  6 ++--
->  arch/arm/kvm/hyp/Makefile     |  2 +-
->  arch/arm64/kvm/hyp/Makefile   |  2 +-
->  arch/arm64/kvm/inject_fault.c | 16 +++++++++-
->  virt/kvm/arm/arm.c            | 31 +++++++++---------
->  virt/kvm/arm/vgic/vgic-its.c  | 73 ++++++++++++++++++++++++++++---------------
->  6 files changed, 81 insertions(+), 49 deletions(-)
-> 
+Yes:
 
-
-Pulled, thanks.
-
-Paolo
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
