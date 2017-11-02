@@ -1,42 +1,76 @@
-From: Dave P Martin <Dave.Martin-5wv7dgnIgG8@public.gmane.org>
-Subject: Re: [PATCH v5 00/30] ARM Scalable Vector Extension (SVE)
-Date: Thu, 2 Nov 2017 17:04:34 +0000
-Message-ID: <20171102170434.GD32200@e103592.cambridge.arm.com>
-References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
- <20171102163248.GB595@arm.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PULL 0/8] KVM/ARM Fixes for v4.14
+Date: Thu, 2 Nov 2017 18:38:45 +0100
+Message-ID: <f36c74ab-ce35-e3cd-a772-b83407228cfe@redhat.com>
+References: <20171030025603.23550-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <20171102163248.GB595-5wv7dgnIgG8@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>
-Cc: "linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org" <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>, Catalin Marinas <Catalin.Marinas-5wv7dgnIgG8@public.gmane.org>, Ard Biesheuvel <ard.biesheuvel-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Szabolcs Nagy <Szabolcs.Nagy-5wv7dgnIgG8@public.gmane.org>, "tokamoto-+CUm20s59erQFUHtdCDX3A@public.gmane.org" <tokamoto-+CUm20s59erQFUHtdCDX3A@public.gmane.org>, "kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org" <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>, "libc-alpha-9JcytcrH/bA+uJoB2kUjGw@public.gmane.org" <libc-alpha-9JcytcrH/bA+uJoB2kUjGw@public.gmane.org>, "linux-arch-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-arch-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Alan Hayward <Alan.Hayward-5wv7dgnIgG8@public.gmane.org>, Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Mark Rutland <Mark.Rutland-5wv7dgnIgG8@public.gmane.org>, Oleg Nesterov <oleg-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Dmitry Safonov <dsafonov-5HdwGun5lf+gSpxsJD1C4w@public.gmane.org>, "H . J . Lu" <hjl.tools-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20171030025603.23550-1-christoffer.dall@linaro.org>
+Content-Language: en-US
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Nov 02, 2017 at 04:32:49PM +0000, Will Deacon wrote:
-> On Tue, Oct 31, 2017 at 03:50:52PM +0000, Dave Martin wrote:
-> > This series implements Linux kernel support for the ARM Scalable Vector
-> > Extension (SVE). [1]  It supersedes the previous v3: see [3] for link
-> > and full cover letter.
-> >
-> > This is a minor update to v4, but does contain a couple of important
-> > fixes.
->
-> I've pushed a version of this series out to the arm64 devel branch, with
-> a view to putting it into next.
->
-> git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git devel
->
-> Please kick the tyres and let me know of any issues ASAP.
+On 30/10/2017 03:55, Christoffer Dall wrote:
+> Hi Paolo and Radim,
+> 
+> Here are the fixes we've been trying to get ready for v4.14 for a while;
+> sorry about sending these so late.
+> 
+> We're fixing:
+> 
+>  - a number of issues with saving/restoring the ITS
+>  - a bug in KVM/ARM when branch profiling is enabled in Hyp mode
+>  - an emulation bug for 32-bit guests when injecting aborts
+>  - a failure to check if a kmalloc succeeds in the ITS emulation
+> 
+> The following changes since commit 8a5776a5f49812d29fe4b2d0a2d71675c3facf3f:
+> 
+>   Linux 4.14-rc4 (2017-10-08 20:53:29 -0700)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-fixes-for-v4.14
+> 
+> for you to fetch changes up to c2385eaa6c5a87cdc4e04ed589ae103ca3297c84:
+> 
+>   KVM: arm/arm64: vgic-its: Check GITS_BASER Valid bit before saving tables (2017-10-29 03:25:06 +0100)
+> 
+> 
+> Thanks,
+> -Christoffer
+> 
+> Christoffer Dall (1):
+>       KVM: arm64: its: Fix missing dynamic allocation check in scan_its_table
+> 
+> Dongjiu Geng (1):
+>       arm/arm64: KVM: set right LR register value for 32 bit guest when inject abort
+> 
+> Eric Auger (3):
+>       KVM: arm/arm64: vgic-its: Fix vgic_its_restore_collection_table returned value
+>       KVM: arm/arm64: vgic-its: Check CBASER/BASER validity before enabling the ITS
+>       KVM: arm/arm64: vgic-its: Check GITS_BASER Valid bit before saving tables
+> 
+> Julien Thierry (2):
+>       arm/arm64: kvm: Move initialization completion message
+>       arm/arm64: kvm: Disable branch profiling in HYP code
+> 
+> wanghaibin (1):
+>       KVM: arm/arm64: vgic-its: Fix return value for device table restore
+> 
+>  arch/arm/kvm/emulate.c        |  6 ++--
+>  arch/arm/kvm/hyp/Makefile     |  2 +-
+>  arch/arm64/kvm/hyp/Makefile   |  2 +-
+>  arch/arm64/kvm/inject_fault.c | 16 +++++++++-
+>  virt/kvm/arm/arm.c            | 31 +++++++++---------
+>  virt/kvm/arm/vgic/vgic-its.c  | 73 ++++++++++++++++++++++++++++---------------
+>  6 files changed, 81 insertions(+), 49 deletions(-)
+> 
 
-No obvious problems so far.
 
-Cheers
----Dave
-IMPORTANT NOTICE: The contents of this email and any attachments are confid=
-ential and may also be privileged. If you are not the intended recipient, p=
-lease notify the sender immediately and do not disclose the contents to any=
- other person, use it for any purpose, or store or copy the information in =
-any medium. Thank you.
+Pulled, thanks.
+
+Paolo
