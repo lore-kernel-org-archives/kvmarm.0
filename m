@@ -1,22 +1,22 @@
 From: James Morse <james.morse@arm.com>
-Subject: [RESEND PATCH v4 7/9] arm64: entry.S convert el0_sync
-Date: Thu,  2 Nov 2017 12:12:40 +0000
-Message-ID: <20171102121242.8925-8-james.morse@arm.com>
+Subject: [RESEND PATCH v4 8/9] arm64: entry.S: convert elX_irq
+Date: Thu,  2 Nov 2017 12:12:41 +0000
+Message-ID: <20171102121242.8925-9-james.morse@arm.com>
 References: <20171102121242.8925-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 65B7F49D24
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Nov 2017 08:13:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 82EC749D4E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Nov 2017 08:13:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id M2yiWuephVSi for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Nov 2017 08:13:09 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C950049D4F
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Nov 2017 08:13:09 -0400 (EDT)
+ with ESMTP id EmFwqLryjsi8 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Nov 2017 08:13:14 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E137449D53
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Nov 2017 08:13:11 -0400 (EDT)
 In-Reply-To: <20171102121242.8925-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,138 +31,60 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Julien Thierry <julien.thierry@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-el0_sync also unmasks exceptions on a case-by-case basis, debug exceptions
-are enabled, unless this was a debug exception. Irqs are unmasked for
-some exception types but not for others.
+Following our 'dai' order, irqs should be processed with debug and
+serror exceptions unmasked.
 
-el0_dbg should run with everything masked to prevent us taking a debug
-exception from do_debug_exception. For the other cases we can unmask
-everything. This changes the behaviour of fpsimd_{acc,exc} and el0_inv
-which previously ran with irqs masked.
-
-This patch removed the last user of enable_dbg_and_irq, remove it.
+Add a helper to unmask these two, (and fiq for good measure).
 
 Signed-off-by: James Morse <james.morse@arm.com>
 Reviewed-by: Julien Thierry <julien.thierry@arm.com>
 Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+
+==
+Changes since v3:
+* Added comment against enable_da_f
 ---
- arch/arm64/include/asm/assembler.h |  9 ---------
- arch/arm64/kernel/entry.S          | 24 ++++++++++--------------
- 2 files changed, 10 insertions(+), 23 deletions(-)
+ arch/arm64/include/asm/assembler.h | 5 +++++
+ arch/arm64/kernel/entry.S          | 4 ++--
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
-index abb5abd61ddb..c2a37e2f733c 100644
+index c2a37e2f733c..e4ac505b7b3d 100644
 --- a/arch/arm64/include/asm/assembler.h
 +++ b/arch/arm64/include/asm/assembler.h
-@@ -96,15 +96,6 @@
- 9990:
+@@ -54,6 +54,11 @@
+ 	msr	daif, \tmp
  	.endm
  
--/*
-- * Enable both debug exceptions and interrupts. This is likely to be
-- * faster than two daifclr operations, since writes to this register
-- * are self-synchronising.
-- */
--	.macro	enable_dbg_and_irq
--	msr	daifclr, #(8 | 2)
--	.endm
--
++	/* IRQ is the lowest priority flag, unconditionally unmask the rest. */
++	.macro enable_da_f
++	msr	daifclr, #(8 | 4 | 1)
++	.endm
++
  /*
-  * SMP data memory barrier
+  * Enable and disable interrupts.
   */
 diff --git a/arch/arm64/kernel/entry.S b/arch/arm64/kernel/entry.S
-index bd54115972a4..f7dfe5d2b1fb 100644
+index f7dfe5d2b1fb..df085ec003b0 100644
 --- a/arch/arm64/kernel/entry.S
 +++ b/arch/arm64/kernel/entry.S
-@@ -670,8 +670,7 @@ el0_da:
- 	 * Data abort handling
- 	 */
- 	mrs	x26, far_el1
--	// enable interrupts before calling the main handler
--	enable_dbg_and_irq
-+	enable_daif
- 	ct_user_exit
- 	clear_address_tag x0, x26
- 	mov	x1, x25
-@@ -683,8 +682,7 @@ el0_ia:
- 	 * Instruction abort handling
- 	 */
- 	mrs	x26, far_el1
--	// enable interrupts before calling the main handler
--	enable_dbg_and_irq
-+	enable_daif
- 	ct_user_exit
- 	mov	x0, x26
- 	mov	x1, x25
-@@ -695,7 +693,7 @@ el0_fpsimd_acc:
- 	/*
- 	 * Floating Point or Advanced SIMD access
- 	 */
+@@ -557,7 +557,7 @@ ENDPROC(el1_sync)
+ 	.align	6
+ el1_irq:
+ 	kernel_entry 1
 -	enable_dbg
-+	enable_daif
- 	ct_user_exit
- 	mov	x0, x25
- 	mov	x1, sp
-@@ -705,7 +703,7 @@ el0_fpsimd_exc:
- 	/*
- 	 * Floating Point or Advanced SIMD exception
- 	 */
++	enable_da_f
+ #ifdef CONFIG_TRACE_IRQFLAGS
+ 	bl	trace_hardirqs_off
+ #endif
+@@ -766,7 +766,7 @@ ENDPROC(el0_sync)
+ el0_irq:
+ 	kernel_entry 0
+ el0_irq_naked:
 -	enable_dbg
-+	enable_daif
- 	ct_user_exit
- 	mov	x0, x25
- 	mov	x1, sp
-@@ -716,8 +714,7 @@ el0_sp_pc:
- 	 * Stack or PC alignment exception handling
- 	 */
- 	mrs	x26, far_el1
--	// enable interrupts before calling the main handler
--	enable_dbg_and_irq
-+	enable_daif
- 	ct_user_exit
- 	mov	x0, x26
- 	mov	x1, x25
-@@ -728,8 +725,7 @@ el0_undef:
- 	/*
- 	 * Undefined instruction
- 	 */
--	// enable interrupts before calling the main handler
--	enable_dbg_and_irq
-+	enable_daif
- 	ct_user_exit
- 	mov	x0, sp
- 	bl	do_undefinstr
-@@ -738,7 +734,7 @@ el0_sys:
- 	/*
- 	 * System instructions, for trapped cache maintenance instructions
- 	 */
--	enable_dbg_and_irq
-+	enable_daif
- 	ct_user_exit
- 	mov	x0, x25
- 	mov	x1, sp
-@@ -753,11 +749,11 @@ el0_dbg:
- 	mov	x1, x25
- 	mov	x2, sp
- 	bl	do_debug_exception
--	enable_dbg
-+	enable_daif
- 	ct_user_exit
- 	b	ret_to_user
- el0_inv:
--	enable_dbg
-+	enable_daif
- 	ct_user_exit
- 	mov	x0, sp
- 	mov	x1, #BAD_SYNC
-@@ -836,7 +832,7 @@ el0_svc:
- 	mov	wsc_nr, #__NR_syscalls
- el0_svc_naked:					// compat entry point
- 	stp	x0, xscno, [sp, #S_ORIG_X0]	// save the original x0 and syscall number
--	enable_dbg_and_irq
-+	enable_daif
- 	ct_user_exit 1
- 
- 	ldr	x16, [tsk, #TSK_TI_FLAGS]	// check for syscall hooks
++	enable_da_f
+ #ifdef CONFIG_TRACE_IRQFLAGS
+ 	bl	trace_hardirqs_off
+ #endif
 -- 
 2.15.0.rc2
