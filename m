@@ -1,22 +1,23 @@
 From: James Morse <james.morse@arm.com>
-Subject: [RESEND PATCH v4 5/9] arm64: entry.S: Remove disable_dbg
-Date: Thu,  2 Nov 2017 12:12:38 +0000
-Message-ID: <20171102121242.8925-6-james.morse@arm.com>
+Subject: [RESEND PATCH v4 9/9] arm64: entry.S: move SError handling into a C
+ function for future expansion
+Date: Thu,  2 Nov 2017 12:12:42 +0000
+Message-ID: <20171102121242.8925-10-james.morse@arm.com>
 References: <20171102121242.8925-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DAB449D4B
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Nov 2017 08:13:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6ED6549D4E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Nov 2017 08:13:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id J+-d3XNV-Flo for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Nov 2017 08:13:05 -0400 (EDT)
+ with ESMTP id 5HSy6f-HEqDN for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Nov 2017 08:13:14 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B68A849D56
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Nov 2017 08:13:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D7DC40795
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Nov 2017 08:13:14 -0400 (EDT)
 In-Reply-To: <20171102121242.8925-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -28,54 +29,148 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org
-Cc: Julien Thierry <julien.thierry@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, kvmarm@lists.cs.columbia.edu
+Cc: Julien Thierry <julien.thierry@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, Wang Xiongfeng <wangxiongfengi2@huawei.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-enable_step_tsk is the only user of disable_dbg, which doesn't respect
-our 'dai' order for exception masking. enable_step_tsk may enable
-single-step, so previously needed to mask debug exceptions to prevent us
-from single-stepping kernel_exit. enable_step_tsk is called at the end
-of the ret_to_user loop, which has already masked all exceptions so this
-is no longer needed.
+From: Xie XiuQi <xiexiuqi@huawei.com>
 
-Remove disable_dbg, add a comment that enable_step_tsk's caller should
-have masked debug.
+Today SError is taken using the inv_entry macro that ends up in
+bad_mode.
 
+SError can be used by the RAS Extensions to notify either the OS or
+firmware of CPU problems, some of which may have been corrected.
+
+To allow this handling to be added, add a do_serror() C function
+that just panic()s. Add the entry.S boiler plate to save/restore the
+CPU registers and unmask debug exceptions. Future patches may change
+do_serror() to return if the SError Interrupt was notification of a
+corrected error.
+
+Signed-off-by: Xie XiuQi <xiexiuqi@huawei.com>
+Signed-off-by: Wang Xiongfeng <wangxiongfengi2@huawei.com>
+[Split out of a bigger patch, added compat path, renamed, enabled debug
+ exceptions]
 Signed-off-by: James Morse <james.morse@arm.com>
-Reviewed-by: Julien Thierry <julien.thierry@arm.com>
 Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 ---
- arch/arm64/include/asm/assembler.h | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+ arch/arm64/Kconfig        |  2 +-
+ arch/arm64/kernel/entry.S | 36 +++++++++++++++++++++++++++++-------
+ arch/arm64/kernel/traps.c | 13 +++++++++++++
+ 3 files changed, 43 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
-index 114e741ca873..1b0972046a72 100644
---- a/arch/arm64/include/asm/assembler.h
-+++ b/arch/arm64/include/asm/assembler.h
-@@ -68,13 +68,6 @@
- 	msr	daif, \flags
- 	.endm
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 0df64a6a56d4..70dfe4e9ccc5 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -98,7 +98,7 @@ config ARM64
+ 	select HAVE_IRQ_TIME_ACCOUNTING
+ 	select HAVE_MEMBLOCK
+ 	select HAVE_MEMBLOCK_NODE_MAP if NUMA
+-	select HAVE_NMI if ACPI_APEI_SEA
++	select HAVE_NMI
+ 	select HAVE_PATA_PLATFORM
+ 	select HAVE_PERF_EVENTS
+ 	select HAVE_PERF_REGS
+diff --git a/arch/arm64/kernel/entry.S b/arch/arm64/kernel/entry.S
+index df085ec003b0..e147c1d00b41 100644
+--- a/arch/arm64/kernel/entry.S
++++ b/arch/arm64/kernel/entry.S
+@@ -375,18 +375,18 @@ ENTRY(vectors)
+ 	kernel_ventry	el1_sync			// Synchronous EL1h
+ 	kernel_ventry	el1_irq				// IRQ EL1h
+ 	kernel_ventry	el1_fiq_invalid			// FIQ EL1h
+-	kernel_ventry	el1_error_invalid		// Error EL1h
++	kernel_ventry	el1_error			// Error EL1h
  
--/*
-- * Enable and disable debug exceptions.
-- */
--	.macro	disable_dbg
--	msr	daifset, #8
--	.endm
+ 	kernel_ventry	el0_sync			// Synchronous 64-bit EL0
+ 	kernel_ventry	el0_irq				// IRQ 64-bit EL0
+ 	kernel_ventry	el0_fiq_invalid			// FIQ 64-bit EL0
+-	kernel_ventry	el0_error_invalid		// Error 64-bit EL0
++	kernel_ventry	el0_error			// Error 64-bit EL0
+ 
+ #ifdef CONFIG_COMPAT
+ 	kernel_ventry	el0_sync_compat			// Synchronous 32-bit EL0
+ 	kernel_ventry	el0_irq_compat			// IRQ 32-bit EL0
+ 	kernel_ventry	el0_fiq_invalid_compat		// FIQ 32-bit EL0
+-	kernel_ventry	el0_error_invalid_compat	// Error 32-bit EL0
++	kernel_ventry	el0_error_compat		// Error 32-bit EL0
+ #else
+ 	kernel_ventry	el0_sync_invalid		// Synchronous 32-bit EL0
+ 	kernel_ventry	el0_irq_invalid			// IRQ 32-bit EL0
+@@ -455,10 +455,6 @@ ENDPROC(el0_error_invalid)
+ el0_fiq_invalid_compat:
+ 	inv_entry 0, BAD_FIQ, 32
+ ENDPROC(el0_fiq_invalid_compat)
 -
- 	.macro	enable_dbg
- 	msr	daifclr, #8
- 	.endm
-@@ -88,9 +81,9 @@
- 9990:
- 	.endm
+-el0_error_invalid_compat:
+-	inv_entry 0, BAD_ERROR, 32
+-ENDPROC(el0_error_invalid_compat)
+ #endif
  
-+	/* call with daif masked */
- 	.macro	enable_step_tsk, flgs, tmp
- 	tbz	\flgs, #TIF_SINGLESTEP, 9990f
--	disable_dbg
- 	mrs	\tmp, mdscr_el1
- 	orr	\tmp, \tmp, #1
- 	msr	mdscr_el1, \tmp
+ el1_sync_invalid:
+@@ -663,6 +659,10 @@ el0_svc_compat:
+ el0_irq_compat:
+ 	kernel_entry 0, 32
+ 	b	el0_irq_naked
++
++el0_error_compat:
++	kernel_entry 0, 32
++	b	el0_error_naked
+ #endif
+ 
+ el0_da:
+@@ -780,6 +780,28 @@ el0_irq_naked:
+ 	b	ret_to_user
+ ENDPROC(el0_irq)
+ 
++el1_error:
++	kernel_entry 1
++	mrs	x1, esr_el1
++	enable_dbg
++	mov	x0, sp
++	bl	do_serror
++	kernel_exit 1
++ENDPROC(el1_error)
++
++el0_error:
++	kernel_entry 0
++el0_error_naked:
++	mrs	x1, esr_el1
++	enable_dbg
++	mov	x0, sp
++	bl	do_serror
++	enable_daif
++	ct_user_exit
++	b	ret_to_user
++ENDPROC(el0_error)
++
++
+ /*
+  * This is the fast syscall return path.  We do as little as possible here,
+  * and this includes saving x0 back into the kernel stack.
+diff --git a/arch/arm64/kernel/traps.c b/arch/arm64/kernel/traps.c
+index 1808be65d22f..773aae69c376 100644
+--- a/arch/arm64/kernel/traps.c
++++ b/arch/arm64/kernel/traps.c
+@@ -709,6 +709,19 @@ asmlinkage void handle_bad_stack(struct pt_regs *regs)
+ }
+ #endif
+ 
++asmlinkage void do_serror(struct pt_regs *regs, unsigned int esr)
++{
++	nmi_enter();
++
++	console_verbose();
++
++	pr_crit("SError Interrupt on CPU%d, code 0x%08x -- %s\n",
++		smp_processor_id(), esr, esr_get_class_string(esr));
++	__show_regs(regs);
++
++	panic("Asynchronous SError Interrupt");
++}
++
+ void __pte_error(const char *file, int line, unsigned long val)
+ {
+ 	pr_err("%s:%d: bad pte %016lx.\n", file, line, val);
 -- 
 2.15.0.rc2
