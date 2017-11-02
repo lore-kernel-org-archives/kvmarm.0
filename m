@@ -1,150 +1,363 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v5 04/30] arm64: KVM: Hide unsupported AArch64 CPU
- features from guests
-Date: Thu, 2 Nov 2017 11:01:37 +0000
-Message-ID: <20171102110137.GN19485@e103592.cambridge.arm.com>
-References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
- <1509465082-30427-5-git-send-email-Dave.Martin@arm.com>
- <20171101044729.GA11166@lvm>
- <20171101102601.GK19485@e103592.cambridge.arm.com>
- <20171102081557.GB20075@cbox>
+From: James Morse <james.morse@arm.com>
+Subject: [RESEND PATCH v4 1/9] arm64: explicitly mask all exceptions
+Date: Thu,  2 Nov 2017 12:12:34 +0000
+Message-ID: <20171102121242.8925-2-james.morse@arm.com>
+References: <20171102121242.8925-1-james.morse@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-arch-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20171102081557.GB20075@cbox>
-Sender: linux-arch-owner@vger.kernel.org
-To: Christoffer Dall <cdall@linaro.org>
-Cc: linux-arch@vger.kernel.org, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7265149D36
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Nov 2017 08:12:57 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id OaGdj0z1DYxi for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Nov 2017 08:12:55 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B6C4849D29
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Nov 2017 08:12:55 -0400 (EDT)
+In-Reply-To: <20171102121242.8925-1-james.morse@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: linux-arm-kernel@lists.infradead.org
+Cc: Julien Thierry <julien.thierry@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Nov 02, 2017 at 09:15:57AM +0100, Christoffer Dall wrote:
-> On Wed, Nov 01, 2017 at 10:26:03AM +0000, Dave Martin wrote:
-> > On Wed, Nov 01, 2017 at 05:47:29AM +0100, Christoffer Dall wrote:
-> > > On Tue, Oct 31, 2017 at 03:50:56PM +0000, Dave Martin wrote:
-> > > > Currently, a guest kernel sees the true CPU feature registers
-> > > > (ID_*_EL1) when it reads them using MRS instructions.  This means
-> > > > that the guest may observe features that are present in the
-> > > > hardware but the host doesn't understand or doesn't provide support
-> > > > for.  A guest may legimitately try to use such a feature as per the
-> > > > architecture, but use of the feature may trap instead of working
-> > > > normally, triggering undef injection into the guest.
-> > > > 
-> > > > This is not a problem for the host, but the guest may go wrong when
-> > > > running on newer hardware than the host knows about.
-> > > > 
-> > > > This patch hides from guest VMs any AArch64-specific CPU features
-> > > > that the host doesn't support, by exposing to the guest the
-> > > > sanitised versions of the registers computed by the cpufeatures
-> > > > framework, instead of the true hardware registers.  To achieve
-> > > > this, HCR_EL2.TID3 is now set for AArch64 guests, and emulation
-> > > > code is added to KVM to report the sanitised versions of the
-> > > > affected registers in response to MRS and register reads from
-> > > > userspace.
-> > > > 
-> > > > The affected registers are removed from invariant_sys_regs[] (since
-> > > > the invariant_sys_regs handling is no longer quite correct for
-> > > > them) and added to sys_reg_desgs[], with appropriate access(),
-> > > > get_user() and set_user() methods.  No runtime vcpu storage is
-> > > > allocated for the registers: instead, they are read on demand from
-> > > > the cpufeatures framework.  This may need modification in the
-> > > > future if there is a need for userspace to customise the features
-> > > > visible to the guest.
-> > > > 
-> > > > Attempts by userspace to write the registers are handled similarly
-> > > > to the current invariant_sys_regs handling: writes are permitted,
-> > > > but only if they don't attempt to change the value.  This is
-> > > > sufficient to support VM snapshot/restore from userspace.
-> > > > 
-> > > > Because of the additional registers, restoring a VM on an older
-> > > > kernel may not work unless userspace knows how to handle the extra
-> > > > VM registers exposed to the KVM user ABI by this patch.
-> > > > 
-> > > > Under the principle of least damage, this patch makes no attempt to
-> > > > handle any of the other registers currently in
-> > > > invariant_sys_regs[], or to emulate registers for AArch32: however,
-> > > > these could be handled in a similar way in future, as necessary.
-> > > > 
-> > > > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> > > > Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-> > > > Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-> > > > Cc: Christoffer Dall <christoffer.dall@linaro.org>
-> > > > ---
-> > > >  arch/arm64/include/asm/sysreg.h |   3 +
-> > > >  arch/arm64/kvm/hyp/switch.c     |   6 +
-> > > >  arch/arm64/kvm/sys_regs.c       | 282 +++++++++++++++++++++++++++++++++-------
-> > > >  3 files changed, 246 insertions(+), 45 deletions(-)
-> > > > 
-> > > > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> > > > index 4dceb12..609d59af 100644
-> > > > --- a/arch/arm64/include/asm/sysreg.h
-> > > > +++ b/arch/arm64/include/asm/sysreg.h
-> > > > @@ -149,6 +149,9 @@
-> > > >  #define SYS_ID_AA64DFR0_EL1		sys_reg(3, 0, 0, 5, 0)
-> > > >  #define SYS_ID_AA64DFR1_EL1		sys_reg(3, 0, 0, 5, 1)
-> > > >  
-> > > > +#define SYS_ID_AA64AFR0_EL1		sys_reg(3, 0, 0, 5, 4)
-> > > > +#define SYS_ID_AA64AFR1_EL1		sys_reg(3, 0, 0, 5, 5)
-> > > > +
-> > > >  #define SYS_ID_AA64ISAR0_EL1		sys_reg(3, 0, 0, 6, 0)
-> > > >  #define SYS_ID_AA64ISAR1_EL1		sys_reg(3, 0, 0, 6, 1)
-> > > >  
-> > > > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> > > > index 945e79c..35a90b8 100644
-> > > > --- a/arch/arm64/kvm/hyp/switch.c
-> > > > +++ b/arch/arm64/kvm/hyp/switch.c
-> > > > @@ -81,11 +81,17 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
-> > > >  	 * it will cause an exception.
-> > > >  	 */
-> > > >  	val = vcpu->arch.hcr_el2;
-> > > > +
-> > > >  	if (!(val & HCR_RW) && system_supports_fpsimd()) {
-> > > >  		write_sysreg(1 << 30, fpexc32_el2);
-> > > >  		isb();
-> > > >  	}
-> > > > +
-> > > > +	if (val & HCR_RW) /* for AArch64 only: */
-> > > > +		val |= HCR_TID3; /* TID3: trap feature register accesses */
-> > > > +
-> > > 
-> > > I still think we should set this in vcpu_reset_hcr() and do it once
-> > > instead of adding code in every iteration of the critical path.
-> > 
-> > Dang, I somehow missed this in the last round.
-> > 
-> > How about:
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> > index e5df3fc..c87be0d 100644
-> > --- a/arch/arm64/include/asm/kvm_emulate.h
-> > +++ b/arch/arm64/include/asm/kvm_emulate.h
-> > @@ -49,6 +49,14 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
-> >  		vcpu->arch.hcr_el2 |= HCR_E2H;
-> >  	if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features))
-> >  		vcpu->arch.hcr_el2 &= ~HCR_RW;
-> > +
-> > +	/*
-> > +	 * TID3: trap feature register accesses that we virtualise.
-> > +	 * For now this is conditional, since no AArch32 feature regs
-> > +	 * are currently virtualised.
-> > +	 */
-> > +	if (vcpu->arch.hcr_el2 & HCR_RW)
-> > +		vcpu->arch.hcr_el2 |= HCR_TID3;
-> >  }
-> >  
-> >  static inline unsigned long vcpu_get_hcr(struct kvm_vcpu *vcpu)
-> > > 
-> > > Otherwise this patch looks good to me.
-> > 
-> > I'll probably post this as a separate follow-up patch, unless there's
-> > some other reason for a full respin.
-> > 
-> 
-> Fine with me, just remember to remove the part of the world-switch that
-> was added in this patch, as that's what we want to savoid.
+There are a few places where we want to mask all exceptions. Today we
+do this in a piecemeal fashion, typically we expect the caller to
+have masked irqs and the arch code masks debug exceptions, ignoring
+serror which is probably masked.
 
-To be clear, does this amount to an Ack on the _original_ patch,
-providing I follow up with this optimisation after the merge window?
+Make it clear that 'mask all exceptions' is the intention by adding
+helpers to do exactly that.
 
-Cheers
----Dave
+This will let us unmask SError without having to add 'oh and SError'
+to these paths.
+
+Signed-off-by: James Morse <james.morse@arm.com>
+Reviewed-by: Julien Thierry <julien.thierry@arm.com>
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+
+==
+Remove the disable IRQs comment above cpu_die(): we return from idle via
+cpu_resume. This comment is confusing once the local_irq_disable() call
+is changed.
+
+Changes since v3:
+ * Split local_mask_daif into a save and mask versions,
+ * swapped verb/daif word-order.
+ * Removed {asm,linux} includes - one will always include the other
+---
+ arch/arm64/include/asm/assembler.h | 17 ++++++++++
+ arch/arm64/include/asm/daifflags.h | 69 ++++++++++++++++++++++++++++++++++++++
+ arch/arm64/kernel/hibernate.c      |  5 +--
+ arch/arm64/kernel/machine_kexec.c  |  4 +--
+ arch/arm64/kernel/smp.c            |  9 ++---
+ arch/arm64/kernel/suspend.c        |  7 ++--
+ arch/arm64/kernel/traps.c          |  3 +-
+ arch/arm64/mm/proc.S               |  9 +++--
+ 8 files changed, 104 insertions(+), 19 deletions(-)
+ create mode 100644 arch/arm64/include/asm/daifflags.h
+
+diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
+index d58a6253c6ab..114e741ca873 100644
+--- a/arch/arm64/include/asm/assembler.h
++++ b/arch/arm64/include/asm/assembler.h
+@@ -31,6 +31,23 @@
+ #include <asm/ptrace.h>
+ #include <asm/thread_info.h>
+ 
++	.macro save_and_disable_daif, flags
++	mrs	\flags, daif
++	msr	daifset, #0xf
++	.endm
++
++	.macro disable_daif
++	msr	daifset, #0xf
++	.endm
++
++	.macro enable_daif
++	msr	daifclr, #0xf
++	.endm
++
++	.macro	restore_daif, flags:req
++	msr	daif, \flags
++	.endm
++
+ /*
+  * Enable and disable interrupts.
+  */
+diff --git a/arch/arm64/include/asm/daifflags.h b/arch/arm64/include/asm/daifflags.h
+new file mode 100644
+index 000000000000..55e2598a8c4c
+--- /dev/null
++++ b/arch/arm64/include/asm/daifflags.h
+@@ -0,0 +1,69 @@
++/*
++ * Copyright (C) 2017 ARM Ltd.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++#ifndef __ASM_DAIFFLAGS_H
++#define __ASM_DAIFFLAGS_H
++
++#include <linux/irqflags.h>
++
++/* mask/save/unmask/restore all exceptions, including interrupts. */
++static inline void local_daif_mask(void)
++{
++	asm volatile(
++		"msr	daifset, #0xf		// local_daif_mask\n"
++		:
++		:
++		: "memory");
++	trace_hardirqs_off();
++}
++
++static inline unsigned long local_daif_save(void)
++{
++	unsigned long flags;
++
++	asm volatile(
++		"mrs	%0, daif		// local_daif_save\n"
++		: "=r" (flags)
++		:
++		: "memory");
++	local_daif_mask();
++
++	return flags;
++}
++
++static inline void local_daif_unmask(void)
++{
++	trace_hardirqs_on();
++	asm volatile(
++		"msr	daifclr, #0xf		// local_daif_unmask"
++		:
++		:
++		: "memory");
++}
++
++static inline void local_daif_restore(unsigned long flags)
++{
++	if (!arch_irqs_disabled_flags(flags))
++		trace_hardirqs_on();
++	asm volatile(
++		"msr	daif, %0		// local_daif_restore"
++		:
++		: "r" (flags)
++		: "memory");
++	if (arch_irqs_disabled_flags(flags))
++		trace_hardirqs_off();
++}
++
++#endif
+diff --git a/arch/arm64/kernel/hibernate.c b/arch/arm64/kernel/hibernate.c
+index 095d3c170f5d..3009b8b80f08 100644
+--- a/arch/arm64/kernel/hibernate.c
++++ b/arch/arm64/kernel/hibernate.c
+@@ -27,6 +27,7 @@
+ #include <asm/barrier.h>
+ #include <asm/cacheflush.h>
+ #include <asm/cputype.h>
++#include <asm/daifflags.h>
+ #include <asm/irqflags.h>
+ #include <asm/kexec.h>
+ #include <asm/memory.h>
+@@ -285,7 +286,7 @@ int swsusp_arch_suspend(void)
+ 		return -EBUSY;
+ 	}
+ 
+-	local_dbg_save(flags);
++	flags = local_daif_save();
+ 
+ 	if (__cpu_suspend_enter(&state)) {
+ 		/* make the crash dump kernel image visible/saveable */
+@@ -315,7 +316,7 @@ int swsusp_arch_suspend(void)
+ 		__cpu_suspend_exit();
+ 	}
+ 
+-	local_dbg_restore(flags);
++	local_daif_restore(flags);
+ 
+ 	return ret;
+ }
+diff --git a/arch/arm64/kernel/machine_kexec.c b/arch/arm64/kernel/machine_kexec.c
+index 11121f608eb5..f76ea92dff91 100644
+--- a/arch/arm64/kernel/machine_kexec.c
++++ b/arch/arm64/kernel/machine_kexec.c
+@@ -18,6 +18,7 @@
+ 
+ #include <asm/cacheflush.h>
+ #include <asm/cpu_ops.h>
++#include <asm/daifflags.h>
+ #include <asm/memory.h>
+ #include <asm/mmu.h>
+ #include <asm/mmu_context.h>
+@@ -195,8 +196,7 @@ void machine_kexec(struct kimage *kimage)
+ 
+ 	pr_info("Bye!\n");
+ 
+-	/* Disable all DAIF exceptions. */
+-	asm volatile ("msr daifset, #0xf" : : : "memory");
++	local_daif_mask();
+ 
+ 	/*
+ 	 * cpu_soft_restart will shutdown the MMU, disable data caches, then
+diff --git a/arch/arm64/kernel/smp.c b/arch/arm64/kernel/smp.c
+index 9f7195a5773e..5a407eba01f7 100644
+--- a/arch/arm64/kernel/smp.c
++++ b/arch/arm64/kernel/smp.c
+@@ -47,6 +47,7 @@
+ #include <asm/cpu.h>
+ #include <asm/cputype.h>
+ #include <asm/cpu_ops.h>
++#include <asm/daifflags.h>
+ #include <asm/mmu_context.h>
+ #include <asm/numa.h>
+ #include <asm/pgtable.h>
+@@ -368,10 +369,6 @@ void __cpu_die(unsigned int cpu)
+ /*
+  * Called from the idle thread for the CPU which has been shutdown.
+  *
+- * Note that we disable IRQs here, but do not re-enable them
+- * before returning to the caller. This is also the behaviour
+- * of the other hotplug-cpu capable cores, so presumably coming
+- * out of idle fixes this.
+  */
+ void cpu_die(void)
+ {
+@@ -379,7 +376,7 @@ void cpu_die(void)
+ 
+ 	idle_task_exit();
+ 
+-	local_irq_disable();
++	local_daif_mask();
+ 
+ 	/* Tell __cpu_die() that this CPU is now safe to dispose of */
+ 	(void)cpu_report_death();
+@@ -837,7 +834,7 @@ static void ipi_cpu_stop(unsigned int cpu)
+ {
+ 	set_cpu_online(cpu, false);
+ 
+-	local_irq_disable();
++	local_daif_mask();
+ 
+ 	while (1)
+ 		cpu_relax();
+diff --git a/arch/arm64/kernel/suspend.c b/arch/arm64/kernel/suspend.c
+index 1e3be9064cfa..d2d2edac78f2 100644
+--- a/arch/arm64/kernel/suspend.c
++++ b/arch/arm64/kernel/suspend.c
+@@ -4,6 +4,7 @@
+ #include <asm/alternative.h>
+ #include <asm/cacheflush.h>
+ #include <asm/cpufeature.h>
++#include <asm/daifflags.h>
+ #include <asm/debug-monitors.h>
+ #include <asm/exec.h>
+ #include <asm/pgtable.h>
+@@ -57,7 +58,7 @@ void notrace __cpu_suspend_exit(void)
+ 	/*
+ 	 * Restore HW breakpoint registers to sane values
+ 	 * before debug exceptions are possibly reenabled
+-	 * through local_dbg_restore.
++	 * by cpu_suspend()s local_daif_restore() call.
+ 	 */
+ 	if (hw_breakpoint_restore)
+ 		hw_breakpoint_restore(cpu);
+@@ -81,7 +82,7 @@ int cpu_suspend(unsigned long arg, int (*fn)(unsigned long))
+ 	 * updates to mdscr register (saved and restored along with
+ 	 * general purpose registers) from kernel debuggers.
+ 	 */
+-	local_dbg_save(flags);
++	flags = local_daif_save();
+ 
+ 	/*
+ 	 * Function graph tracer state gets incosistent when the kernel
+@@ -114,7 +115,7 @@ int cpu_suspend(unsigned long arg, int (*fn)(unsigned long))
+ 	 * restored, so from this point onwards, debugging is fully
+ 	 * renabled if it was enabled when core started shutdown.
+ 	 */
+-	local_dbg_restore(flags);
++	local_daif_restore(flags);
+ 
+ 	return ret;
+ }
+diff --git a/arch/arm64/kernel/traps.c b/arch/arm64/kernel/traps.c
+index 5ea4b85aee0e..1808be65d22f 100644
+--- a/arch/arm64/kernel/traps.c
++++ b/arch/arm64/kernel/traps.c
+@@ -38,6 +38,7 @@
+ 
+ #include <asm/atomic.h>
+ #include <asm/bug.h>
++#include <asm/daifflags.h>
+ #include <asm/debug-monitors.h>
+ #include <asm/esr.h>
+ #include <asm/insn.h>
+@@ -642,7 +643,7 @@ asmlinkage void bad_mode(struct pt_regs *regs, int reason, unsigned int esr)
+ 		esr_get_class_string(esr));
+ 
+ 	die("Oops - bad mode", regs, 0);
+-	local_irq_disable();
++	local_daif_mask();
+ 	panic("bad mode");
+ }
+ 
+diff --git a/arch/arm64/mm/proc.S b/arch/arm64/mm/proc.S
+index 877d42fb0df6..95233dfc4c39 100644
+--- a/arch/arm64/mm/proc.S
++++ b/arch/arm64/mm/proc.S
+@@ -109,10 +109,10 @@ ENTRY(cpu_do_resume)
+ 	/*
+ 	 * __cpu_setup() cleared MDSCR_EL1.MDE and friends, before unmasking
+ 	 * debug exceptions. By restoring MDSCR_EL1 here, we may take a debug
+-	 * exception. Mask them until local_dbg_restore() in cpu_suspend()
++	 * exception. Mask them until local_daif_restore() in cpu_suspend()
+ 	 * resets them.
+ 	 */
+-	disable_dbg
++	disable_daif
+ 	msr	mdscr_el1, x10
+ 
+ 	msr	sctlr_el1, x12
+@@ -155,8 +155,7 @@ ENDPROC(cpu_do_switch_mm)
+  * called by anything else. It can only be executed from a TTBR0 mapping.
+  */
+ ENTRY(idmap_cpu_replace_ttbr1)
+-	mrs	x2, daif
+-	msr	daifset, #0xf
++	save_and_disable_daif flags=x2
+ 
+ 	adrp	x1, empty_zero_page
+ 	msr	ttbr1_el1, x1
+@@ -169,7 +168,7 @@ ENTRY(idmap_cpu_replace_ttbr1)
+ 	msr	ttbr1_el1, x0
+ 	isb
+ 
+-	msr	daif, x2
++	restore_daif x2
+ 
+ 	ret
+ ENDPROC(idmap_cpu_replace_ttbr1)
+-- 
+2.15.0.rc2
