@@ -1,135 +1,188 @@
 From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v4 09/21] KVM: arm/arm64: mask/unmask daif around VHE
- guests
-Date: Fri, 03 Nov 2017 17:19:40 +0000
-Message-ID: <59FCA52C.1070406@arm.com>
-References: <20171019145807.23251-1-james.morse@arm.com>
- <20171019145807.23251-10-james.morse@arm.com> <20171030074019.GS2166@lvm>
- <59FB0C24.7080503@arm.com> <20171103124502.GB14144@cbox>
+Subject: Re: [PATCH v6 6/7] KVM: arm64: allow get exception information from
+ userspace
+Date: Fri, 03 Nov 2017 18:36:52 +0000
+Message-ID: <59FCB744.30609@arm.com>
+References: <0184EA26B2509940AA629AE1405DD7F2016BA9E4@DGGEMA503-MBX.china.huawei.com> <0184EA26B2509940AA629AE1405DD7F2016BAC2B@DGGEMA503-MBX.china.huawei.com> <59F0CD1F.9070201@arm.com> <900d0b35-e0dc-1e9d-b62a-bc587136f918@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CA1049D32
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Nov 2017 13:19:44 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kVBfCOtj9+B6 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  3 Nov 2017 13:19:43 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EFD0140D25
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Nov 2017 13:19:42 -0400 (EDT)
-In-Reply-To: <20171103124502.GB14144@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>
-Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Julien Thierry <julien.thierry@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, linux-arm-kernel@lists.infradead.org, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <900d0b35-e0dc-1e9d-b62a-bc587136f918@huawei.com>
+Sender: kvm-owner@vger.kernel.org
+To: gengdongjiu <gengdongjiu@huawei.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Huangshaoyu <huangshaoyu@huawei.com>, Wuquanming <wuquanming@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
+Hi gengdongjiu,
 
-On 03/11/17 12:45, Christoffer Dall wrote:
-> On Thu, Nov 02, 2017 at 12:14:28PM +0000, James Morse wrote:
->> On 30/10/17 07:40, Christoffer Dall wrote:
->>> On Thu, Oct 19, 2017 at 03:57:55PM +0100, James Morse wrote:
->>>> Non-VHE systems take an exception to EL2 in order to world-switch into the
->>>> guest. When returning from the guest KVM implicitly restores the DAIF
->>>> flags when it returns to the kernel at EL1.
->>>>
->>>> With VHE none of this exception-level jumping happens, so KVMs
->>>> world-switch code is exposed to the host kernel's DAIF values, and KVM
->>>> spills the guest-exit DAIF values back into the host kernel.
->>>> On entry to a guest we have Debug and SError exceptions unmasked, KVM
->>>> has switched VBAR but isn't prepared to handle these. On guest exit
->>>> Debug exceptions are left disabled once we return to the host and will
->>>> stay this way until we enter user space.
-
-
->>>> Give me a kick if you want this reworked as a fix (which will then
->>>> conflict with this series), or a backportable version.
+On 27/10/17 08:21, gengdongjiu wrote:
+> On 2017/10/26 1:42, James Morse wrote:
+>> On 20/10/17 16:33, gengdongjiu wrote:
+>>> As we discuss below solution:
+>>> When guest happen SEA/SEI, KVM calls memory_failure() to send an asynchronous SIGBUS
+>>> signal(BUS_MCEERR_AO) to QEMU, and make this address to poisoned.
+>>> after QEMU receive this BUS_MCEERR_AO, it will record this address to CPER and notify guest.
+>>> When guest happen stage2 page fault, KVM send a synchronous SIGBUS
+>>> BUS_MCEERR_AR to QEMU, and QEMU also record CPER and immediately inject SEA abort.
 >>>
->>> I don't know of any real-world issues where some more graceful handling
->>> of SErrors would make sense on older kernels, so I'm fine with just
->>> merging this together with this series.
+>>> But this solution, still have some problems.
+>>>
+>>> 1. In some situation, For RAS, when happen SEA, hardware cannot provide an error physical
+>>> address
 >>
->> What about debug?
+>> Eh? For any RAS error you should get a physical address in ERR<n>ADDR.
+>>
+>> When you get an external abort due to RAS you can scan these nodes to find which
+>> one generated the error and collect the component information.
+>> Doing this in firmware is better because firmware knows the SoC topology, so it
+>> can skip the nodes it knows won't be relevant to an error on this CPU.
 
-> Are we unmasking debug exceptions as we should with this patch?
+> Thanks for you suggestion.
+> After discussed this issue internally in our side,  I think this should be our firmware issue.
+> Not a common issue.
+> so let us ignore the issue that hardware does not record physical error address.
 
-With this patch, yes, it directly restores the DAIF flags the arch code wants
-for irq-masked process-context. Debug is re-enabled.
+This is going to give you problems in the long run. All we can do with 'memory
+corrupt at an unknown address' is reboot.
 
 
-> If so, I suppose that could be required for something like kgdb or when
-> running KVM as a guest hypervisor (nested).
+>>> to software instead it can only provide virtual address in FAR_ELx, 
+>>> This is to say, firmware cannot provide physical error address, but provided the virtual
+>>> address in the FAR_ELx. so BIOS cannot record this address to APEI table. In
+>>
+>> Nit: APEI table, you mean recorded as CPER records in a buffer pointed to by a
+>> GHES's ErrorStatusAddress. APEI tables aren't parsed post boot.
+>>
+>>
+>>> this case, when firmware Jump to hypervisor, hypervisor cannot call
+>>> memory_failure(), now only the physical address is recorded and valid, APEI
+>>> driver will call the memory_failure()), in this case, host will not send SIGBUS
+>>> to QEMU. So guest cannot know there is SEA happen.
+>>> At least there is such issue in Huawei's platform (cannot provide PA for RAS firmware-first,
+>>> only can provide VA in FAR_ELx)
+>>
+>> This isn't a KVM problem.
+>>
+>> It looks like both of UEFI's 'Table 275. Memory Error Record' and 'Table 276.
+>> Memory Error Record 2' require a physical address. You can't describe a memory
+>> error without one.
+>>
+>> Is this really a memory error?, or some other component, say, a virtually
+>> indexed cache.
+
+> When happen SEA, if the {D,I}FSC is 0b0101xx which is SEA on translation table walk or hardware update of translation
+> table, it means the page table itself happen issue, not the target address error.
+> For this case, even firmware can report a error page table physical address, but memory_memory()
+> can not recognize this address because the page table address is not belong to any task include Qemu,
+> so memory_failure() will not deliver SIGBUS. Of course, this is memory address.
+
+Both KVM's stage2 and Qemu's user-space page tables are made up of pages of
+kernel memory. When memory_failure() is told one of these is corrupt, it should
+panic.
+
+E.g, arm64 allocates pmd pages like so:
+> static inline pmd_t *pmd_alloc_one(struct mm_struct *mm, unsigned long addr)
+> {
+>	return (pmd_t *)__get_free_page(PGALLOC_GFP);
+> }
+
+To do any better the kernel would need to know this memory is page-table and
+that it wasn't the kernel's page-table. It also needs to know which mm_struct it
+belonged to, and where in the page-table tree the corrupted page lives. There
+would need to be a per-arch helper to ensure no CPU (or other component) had
+cached the corrupted page table entries. (it's contained right?)
+
+This isn't an arm64 specific issue, and its going to be very difficult to do.
+
+
+> I ever make a  experiment, if a APP's page table itself generated SEA, memory_failure() will consider it
+> as unknown issue. please see below log, I think this should be a common issue. 
+
+This shouldn't be a common issue, page-tables are small compared to the memory
+they map.
+
+
+> so in KVM code, I plan to separately handle the page table error of SEA if
+> the {D,I}FSC is 0b0101xx, and not call memory_failure(), what do you
+> think about that?
+
+I think we shouldn't special case KVM. All user-space task's page-tables are
+kernel memory too, they shouldn't be treated differently. Once linux can handle
+user-space page-table corruption, we can wire-in KVMs stage2.
+
+KVM shouldn't call memory_failure() directly, for RAS it should rely on a
+firmware-first or kernel-first handler to diagnose the error and do this dirty work.
+
+I agree 'unknown error' sounds fishy:
+
+> only the memory access SEA call memory_failure().
 > 
-> In that case, we should probably provide a backport for stable, if we
-> think people are going to be running older kernels on VHE systems, which
-> they probably are.
+> [   25.482904] {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 7
+> [   25.484862] {1}[Hardware Error]: event severity: recoverable
+> [   25.486192] {1}[Hardware Error]:  Error 0, type: recoverable
+> [   25.487519] {1}[Hardware Error]:   section_type: memory error
+> [   25.490169] {1}[Hardware Error]:   physical_address: 0x000000007ce81000
+> [   25.491718] {1}[Hardware Error]:   error_type: 3, multi-bit ECC
+> [   25.501178] Memory failure: 0x7ce81: Unknown page state
+> [   25.501181] Memory failure: 0x7ce81: unknown page still referenced by 1 users
+> [   25.501183] Memory failure: 0x7ce81: recovery action for unknown page: Failed
 
-Okay, I will produce a backport once this gets merged.
+We should spot this as corrupted kernel memory and bring the machine down.
+
+/me goes digging
+
+It looks like memory_failure()s 'error_states[]' only matches PG_reserved or
+PG_slab as being kernel memory and then ...
+> /*
+>  * Error hit kernel page.
+>  * Do nothing, try to be lucky and not touch this instead. For a few cases we
+>  * could be more sophisticated.
+>  */
+> static int me_kernel(struct page *p, unsigned long pfn)
+> {
+> 	return MF_IGNORED;
+> }
+
+Eeew. This is relying on hardware containment to stop us silently propagating
+the corrupt memory, and hoping we'll 'be lucky' that the in-kernel owner will
+never actually need this page again. If it does? Presumably we spin through the
+firmware and APEI handler, until firmware decides to stop the merry-go-round.
+
+We can only end up in here via APEI (for now), so we can expect firmware to have
+some way of doing containment. The RAS extensions require it.
 
 
->>> On guest exit Debug exceptions are left disabled once we return to the host
->>> and will stay this way until we enter user space.
-
-> [The indentation seems to indicate I wrote this, but I don't think I
-> did.  I'm confused.]
-
-I quoted it from the commit message, but evidently not from this depth-of-reply.
-Sorry for the confusion.
-
-
->> Today VHE:KVM causes the kernel to run with SError unmasked and debug disabled
->> until the next return to user-space, whereas previously the kernel expected
->> SError to be masked and debug enabled.
+>>> 3. For SEI, the address is invalid, 
 >>
+>> You mean FAR_ELx?
+
+> I mean the physical address. Because SEI is asynchronous, so usually firmware will not record this address,
+
+(is this this issue I'm to ignore?)
+
+
+> If not record this address, the memory_failure() will be not called, then SIGBUS will not be sent, then guest will
+> not know there is SEI happen, so for this case may be we should also inject a virtual SError to avoid the issue that
+> physical address is not record.
+
+We don't know the SError only affected the guest unless you can give us
+information about what triggered it. Even if it is guest memory that is
+affected, we don't know that page wasn't merged by KSM into another guest, or
+another user-space process.
+
+
+>>> so in some platform, firmware will not record this AP.
 >>
->> (Reposting just the SError rework without this patch changes the kernel to
->> expect SError to be unmasked, which isn't making this any worse.)
+>> For any RAS error you should get a physical address in ERR<n>ADDR.
 
-> I'm sorry, I don't understand this discussion.  What is today, and what
+> how about the address is not accurate?
+> For SEI, even we can get a physical address from ERR<n>ADDR, but this address is not accurate.
+> so firmware will make it as invalid or not record it.
 
-English has failed me. I'll try again:
-
-v4.14-rc7 with VHE causes the kernel to run after guest-exit with SError
-unmasked and debug disabled until the next return to user-space.
-
-The arch code expects SError masked and debug enabled.
-
-In your kgdb example, if we switch-to a new task instead of returning to user
-space, it won't hit any break/watchpoints.
+This is an unknown RAS error, firmware doesn't know what happened, the host
+doesn't know if it can safely continue running. The kernel should panic.
 
 
-> is previously, and are you suggesting we drop this patch, or that the
-> rest of this series is somehow going to be applied without this patch?
-
-I reposted just the SError rework, patches 1-10 without this patch.
-
-If merged, this would change the arch code to expect SError to be unmasked from
-process context, leaving just the debug disabled after VHE guest-exit.
-
-I was (hurriedly) trying to work out if reposting the SError-rework without this
-patch made the situation worse.
-
-
-Sorry for the confusion!
 
 James
-
-
-
-> Reset: I think this patch is fine in the context of this series..  I now
-> have no idea what we need to do in terms of older kernels.
-> 
-> Thanks,
-> -Christoffer
-> 
