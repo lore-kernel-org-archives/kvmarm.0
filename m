@@ -1,40 +1,109 @@
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Subject: [PATCH kvmtool 1/2] Prevent segfault when kvm_pause is called too early
-Date: Fri,  3 Nov 2017 11:38:40 +0000
-Message-ID: <20171103113841.3066-2-jean-philippe.brucker@arm.com>
-References: <20171103113841.3066-1-jean-philippe.brucker@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20171103113841.3066-1-jean-philippe.brucker@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: kvm@vger.kernel.org
-Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, andre.przywara@arm.com, punit.agrawal@arm.com, will.deacon@arm.com
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH v4 09/21] KVM: arm/arm64: mask/unmask daif around VHE
+ guests
+Date: Fri, 3 Nov 2017 13:45:02 +0100
+Message-ID: <20171103124502.GB14144@cbox>
+References: <20171019145807.23251-1-james.morse@arm.com>
+ <20171019145807.23251-10-james.morse@arm.com>
+ <20171030074019.GS2166@lvm> <59FB0C24.7080503@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 889D149D28
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Nov 2017 08:43:18 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id ANEkAiz++LQ5 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  3 Nov 2017 08:43:17 -0400 (EDT)
+Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3EAE249D26
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Nov 2017 08:43:17 -0400 (EDT)
+Received: by mail-wm0-f68.google.com with SMTP id y80so1286835wmd.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 03 Nov 2017 05:45:01 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <59FB0C24.7080503@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: James Morse <james.morse@arm.com>
+Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Julien Thierry <julien.thierry@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, linux-arm-kernel@lists.infradead.org, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When kvm_pause is called early (from taking the rwlock), it segfaults
-because the CPU array is initialized slightly later. Fix this.
+On Thu, Nov 02, 2017 at 12:14:28PM +0000, James Morse wrote:
+> Hi Christoffer,
+> 
+> On 30/10/17 07:40, Christoffer Dall wrote:
+> > On Thu, Oct 19, 2017 at 03:57:55PM +0100, James Morse wrote:
+> >> Non-VHE systems take an exception to EL2 in order to world-switch into the
+> >> guest. When returning from the guest KVM implicitly restores the DAIF
+> >> flags when it returns to the kernel at EL1.
+> >>
+> >> With VHE none of this exception-level jumping happens, so KVMs
+> >> world-switch code is exposed to the host kernel's DAIF values, and KVM
+> >> spills the guest-exit DAIF values back into the host kernel.
+> >> On entry to a guest we have Debug and SError exceptions unmasked, KVM
+> >> has switched VBAR but isn't prepared to handle these. On guest exit
+> >> Debug exceptions are left disabled once we return to the host and will
+> >> stay this way until we enter user space.
+> >>
+> >> Add a helper to mask/unmask DAIF around VHE guests. The unmask can only
+> >> happen after the hosts VBAR value has been synchronised by the isb in
+> >> __vhe_hyp_call (via kvm_call_hyp()). Masking could be as late as
+> >> setting KVMs VBAR value, but is kept here for symmetry.
+> 
+> > Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+> 
+> Thanks!
+> 
+> 
+> >> ---
+> >> Give me a kick if you want this reworked as a fix (which will then
+> >> conflict with this series), or a backportable version.
+> > 
+> > I don't know of any real-world issues where some more graceful handling
+> > of SErrors would make sense on older kernels, so I'm fine with just
+> > merging this together with this series.
+> 
+> What about debug?
 
-This doesn't happen at the moment but the gicv2m patch will register an
-MMIO region, which requires br_write_lock. gicv2m is instantiated by
-kvm__arch_init from within core_init (level 0). The CPU array is
-initialized later in base_init (level 1).
+Are we unmasking debug exceptions as we should with this patch?
 
-Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
----
- kvm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+If so, I suppose that could be required for something like kgdb or when
+running KVM as a guest hypervisor (nested).
 
-diff --git a/kvm.c b/kvm.c
-index 9078a026411b..7de825a9d063 100644
---- a/kvm.c
-+++ b/kvm.c
-@@ -512,7 +512,7 @@ void kvm__pause(struct kvm *kvm)
- 	mutex_lock(&pause_lock);
- 
- 	/* Check if the guest is running */
--	if (!kvm->cpus[0] || kvm->cpus[0]->thread == 0)
-+	if (!kvm->cpus || !kvm->cpus[0] || kvm->cpus[0]->thread == 0)
- 		return;
- 
- 	pause_event = eventfd(0, 0);
--- 
-2.14.3
+In that case, we should probably provide a backport for stable, if we
+think people are going to be running older kernels on VHE systems, which
+they probably are.
+
+> > On guest exit Debug exceptions are left disabled once we return to the host
+> > and will stay this way until we enter user space.
+
+[The indentation seems to indicate I wrote this, but I don't think I
+did.  I'm confused.]
+
+> 
+> Today VHE:KVM causes the kernel to run with SError unmasked and debug disabled
+> until the next return to user-space, whereas previously the kernel expected
+> SError to be masked and debug enabled.
+> 
+> 
+> (Reposting just the SError rework without this patch changes the kernel to
+> expect SError to be unmasked, which isn't making this any worse.)
+> 
+I'm sorry, I don't understand this discussion.  What is today, and what
+is previously, and are you suggesting we drop this patch, or that the
+rest of this series is somehow going to be applied without this patch?
+
+Reset: I think this patch is fine in the context of this series..  I now
+have no idea what we need to do in terms of older kernels.
+
+Thanks,
+-Christoffer
