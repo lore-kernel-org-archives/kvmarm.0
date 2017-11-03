@@ -1,29 +1,30 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v4 09/21] KVM: arm/arm64: mask/unmask daif around VHE
- guests
-Date: Fri, 3 Nov 2017 13:45:02 +0100
-Message-ID: <20171103124502.GB14144@cbox>
+Subject: Re: [PATCH v4 20/21] KVM: arm64: Take any host SError before
+ entering the guest
+Date: Fri, 3 Nov 2017 13:49:04 +0100
+Message-ID: <20171103124904.GC14144@cbox>
 References: <20171019145807.23251-1-james.morse@arm.com>
- <20171019145807.23251-10-james.morse@arm.com>
- <20171030074019.GS2166@lvm> <59FB0C24.7080503@arm.com>
+ <20171019145807.23251-21-james.morse@arm.com>
+ <20171031062315.GY2166@lvm> <59F861EE.4010505@arm.com>
+ <20171101045550.GB11166@lvm> <59FB0D0C.1010208@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 889D149D28
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Nov 2017 08:43:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A096049D28
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Nov 2017 08:47:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ANEkAiz++LQ5 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  3 Nov 2017 08:43:17 -0400 (EDT)
-Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3EAE249D26
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Nov 2017 08:43:17 -0400 (EDT)
-Received: by mail-wm0-f68.google.com with SMTP id y80so1286835wmd.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 03 Nov 2017 05:45:01 -0700 (PDT)
+ with ESMTP id BexBp2KFjm7L for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  3 Nov 2017 08:47:19 -0400 (EDT)
+Received: from mail-wm0-f66.google.com (mail-wm0-f66.google.com [74.125.82.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 622B749D26
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Nov 2017 08:47:19 -0400 (EDT)
+Received: by mail-wm0-f66.google.com with SMTP id b9so1353538wmh.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 03 Nov 2017 05:49:03 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <59FB0C24.7080503@arm.com>
+In-Reply-To: <59FB0D0C.1010208@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -37,73 +38,106 @@ To: James Morse <james.morse@arm.com>
 Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Julien Thierry <julien.thierry@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, linux-arm-kernel@lists.infradead.org, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Nov 02, 2017 at 12:14:28PM +0000, James Morse wrote:
+On Thu, Nov 02, 2017 at 12:18:20PM +0000, James Morse wrote:
 > Hi Christoffer,
 > 
-> On 30/10/17 07:40, Christoffer Dall wrote:
-> > On Thu, Oct 19, 2017 at 03:57:55PM +0100, James Morse wrote:
-> >> Non-VHE systems take an exception to EL2 in order to world-switch into the
-> >> guest. When returning from the guest KVM implicitly restores the DAIF
-> >> flags when it returns to the kernel at EL1.
+> On 01/11/17 04:55, Christoffer Dall wrote:
+> > On Tue, Oct 31, 2017 at 11:43:42AM +0000, James Morse wrote:
+> >> On 31/10/17 06:23, Christoffer Dall wrote:
+> >>> On Thu, Oct 19, 2017 at 03:58:06PM +0100, James Morse wrote:
+> >>>> On VHE systems KVM masks SError before switching the VBAR value. Any
+> >>>> host RAS error that the CPU knew about before world-switch may become
+> >>>> pending as an SError during world-switch, and only be taken once we enter
+> >>>> the guest.
+> >>>>
+> >>>> Until KVM can take RAS SErrors during world switch, add an ESB to
+> >>>> force any RAS errors to be synchronised and taken on the host before
+> >>>> we enter world switch.
+> >>>>
+> >>>> RAS errors that become pending during world switch are still taken
+> >>>> once we enter the guest.
 > >>
-> >> With VHE none of this exception-level jumping happens, so KVMs
-> >> world-switch code is exposed to the host kernel's DAIF values, and KVM
-> >> spills the guest-exit DAIF values back into the host kernel.
-> >> On entry to a guest we have Debug and SError exceptions unmasked, KVM
-> >> has switched VBAR but isn't prepared to handle these. On guest exit
-> >> Debug exceptions are left disabled once we return to the host and will
-> >> stay this way until we enter user space.
+> >>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> >>>> index cf5d78ba14b5..5dc6f2877762 100644
+> >>>> --- a/arch/arm64/include/asm/kvm_host.h
+> >>>> +++ b/arch/arm64/include/asm/kvm_host.h
+> >>>> @@ -392,6 +392,7 @@ static inline void __cpu_init_stage2(void)
+> >>>>  
+> >>>>  static inline void kvm_arm_vhe_guest_enter(void)
+> >>>>  {
+> >>>> +	esb();
 > >>
-> >> Add a helper to mask/unmask DAIF around VHE guests. The unmask can only
-> >> happen after the hosts VBAR value has been synchronised by the isb in
-> >> __vhe_hyp_call (via kvm_call_hyp()). Masking could be as late as
-> >> setting KVMs VBAR value, but is kept here for symmetry.
-> 
-> > Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
-> 
-> Thanks!
-> 
-> 
-> >> ---
-> >> Give me a kick if you want this reworked as a fix (which will then
-> >> conflict with this series), or a backportable version.
+> >>> I don't fully appreciate what the point of this is?
+> >>>
+> >>> As I understand it, our fundamental goal here is to try to distinguish
+> >>> between errors happening on the host or in the guest.
+> >>
+> >> Not just host/guest, but also those we can and can't handle.
+> >>
+> >> KVM can't currently take an SError during world switch, so a RAS error that the
+> >> CPU was hoping to defer may spread from the host into KVM's
+> >> no-SError:world-switch code. If this happens it will (almost certainly) have to
+> >> be re-classified as uncontainable.
+> >>
+> >> There is also a firmware-first angle here: NOTIFY_SEI can't be delivered if the
+> >> normal world has SError masked, so any error that spreads past this point
+> >> becomes a reboot-by-firmware instead of an OS notification and almost-helpful
+> >> error message.
+> >>
+> >>
+> >>> If that's correct, then why don't we do it at the last possible moment
+> >>> when we still have a scratch register left, in the world switch code
+> >>> itself, and in the case abort the guest entry and report back a "host
+> >>> SError" return code.
+> >>
+> >> We have IESB to run the error-barrier as we enter the guest. This would make any
+> >> host error pending as an SError, and we would exit the guest immediately. But if
+> >> there was an RAS error during world switch, by this point its likely to be
+> >> classified as uncontainable.
+> >>
+> >> This esb() is trying to keep this window of code as small as possible, to just
+> >> errors that occur during world switch.
+> >>
+> >> With your vcpu load/save this window becomes a lot smaller, it may be possible
+> >> to get a VHE-host's arch-code SError handler to take errors from EL2, in which
+> >> case this barrier can disappear.
+> >> (note to self: guest may still own the debug hardware)
+> >>
 > > 
-> > I don't know of any real-world issues where some more graceful handling
-> > of SErrors would make sense on older kernels, so I'm fine with just
-> > merging this together with this series.
+> > ok, thanks for your detailed explanation.  I didn't consider that the
+> > classification of a RAS error as containable vs. non-containable
+> > depended on where we take the exception.
 > 
-> What about debug?
+> Will makes the point over on patch 11 that until we have different handling for
+> these different classifications of error, there isn't much point doing this now.
+> (i.e. we treat an error generated here, or when we enter the guest in the same way).
+> 
+> I was trying to keep my eye on what we need for kernel-first support, so we
+> don't have to change the code twice, we just expand the error handling to do better.
 
-Are we unmasking debug exceptions as we should with this patch?
-
-If so, I suppose that could be required for something like kgdb or when
-running KVM as a guest hypervisor (nested).
-
-In that case, we should probably provide a backport for stable, if we
-think people are going to be running older kernels on VHE systems, which
-they probably are.
-
-> > On guest exit Debug exceptions are left disabled once we return to the host
-> > and will stay this way until we enter user space.
-
-[The indentation seems to indicate I wrote this, but I don't think I
-did.  I'm confused.]
+I figured as much...
 
 > 
-> Today VHE:KVM causes the kernel to run with SError unmasked and debug disabled
-> until the next return to user-space, whereas previously the kernel expected
-> SError to be masked and debug enabled.
-> 
-> 
-> (Reposting just the SError rework without this patch changes the kernel to
-> expect SError to be unmasked, which isn't making this any worse.)
-> 
-I'm sorry, I don't understand this discussion.  What is today, and what
-is previously, and are you suggesting we drop this patch, or that the
-rest of this series is somehow going to be applied without this patch?
+> I'll drop this patch for now, it will come back if/when we get kernel-first
+> support for RAS.
 
-Reset: I think this patch is fine in the context of this series..  I now
-have no idea what we need to do in terms of older kernels.
+Either way is fine from my point of view.
+> 
+> 
+> What about firmware-first? Firmware can always take these errors when the normal
+> world is running. Dropping the barrier means its up to the CPU when any error
+> gets reported, if firmware has to use NOTIFY_SEI it will have to do a reboot if
+> the error occurs during world-switch (as SError is masked). If an error spreads
+> over this boundary, that's just tough-luck, the kernel would have panic'd anyway.
+> 
+> 
+
+Does a non-secure esb() cause the error to be delivered to firmware on
+the secure side if anything is pending?
+
+I'm not sure I fully understand the interaction between issuing an
+esb() in non-secure and firmware handling a RAS error; I thought there
+would be none, and that this was only for kernel-first ?
 
 Thanks,
 -Christoffer
