@@ -1,30 +1,31 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v4 09/21] KVM: arm/arm64: mask/unmask daif around VHE
- guests
-Date: Mon, 6 Nov 2017 13:42:53 +0100
-Message-ID: <20171106124253.GD14144@cbox>
+Subject: Re: [PATCH v4 20/21] KVM: arm64: Take any host SError before
+ entering the guest
+Date: Mon, 6 Nov 2017 13:45:25 +0100
+Message-ID: <20171106124525.GE14144@cbox>
 References: <20171019145807.23251-1-james.morse@arm.com>
- <20171019145807.23251-10-james.morse@arm.com>
- <20171030074019.GS2166@lvm> <59FB0C24.7080503@arm.com>
- <20171103124502.GB14144@cbox> <59FCA52C.1070406@arm.com>
+ <20171019145807.23251-21-james.morse@arm.com>
+ <20171031062315.GY2166@lvm> <59F861EE.4010505@arm.com>
+ <20171101045550.GB11166@lvm> <59FB0D0C.1010208@arm.com>
+ <20171103124904.GC14144@cbox> <59FC95CC.3090706@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B866E49D1B
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Nov 2017 07:40:58 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E6CDF49D1B
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Nov 2017 07:43:29 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id s9V6x+oQefG8 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Nov 2017 07:40:57 -0500 (EST)
-Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 71B4D49D19
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Nov 2017 07:40:57 -0500 (EST)
-Received: by mail-wm0-f68.google.com with SMTP id r68so13954887wmr.3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 06 Nov 2017 04:42:49 -0800 (PST)
+ with ESMTP id Ep+xpsLZMIvy for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Nov 2017 07:43:29 -0500 (EST)
+Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EF8BB49D19
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Nov 2017 07:43:28 -0500 (EST)
+Received: by mail-wm0-f45.google.com with SMTP id r196so13546252wmf.2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 06 Nov 2017 04:45:21 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <59FCA52C.1070406@arm.com>
+In-Reply-To: <59FC95CC.3090706@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -38,95 +39,34 @@ To: James Morse <james.morse@arm.com>
 Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Julien Thierry <julien.thierry@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, linux-arm-kernel@lists.infradead.org, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Nov 03, 2017 at 05:19:40PM +0000, James Morse wrote:
+On Fri, Nov 03, 2017 at 04:14:04PM +0000, James Morse wrote:
 > Hi Christoffer,
 > 
-> On 03/11/17 12:45, Christoffer Dall wrote:
-> > On Thu, Nov 02, 2017 at 12:14:28PM +0000, James Morse wrote:
-> >> On 30/10/17 07:40, Christoffer Dall wrote:
-> >>> On Thu, Oct 19, 2017 at 03:57:55PM +0100, James Morse wrote:
-> >>>> Non-VHE systems take an exception to EL2 in order to world-switch into the
-> >>>> guest. When returning from the guest KVM implicitly restores the DAIF
-> >>>> flags when it returns to the kernel at EL1.
-> >>>>
-> >>>> With VHE none of this exception-level jumping happens, so KVMs
-> >>>> world-switch code is exposed to the host kernel's DAIF values, and KVM
-> >>>> spills the guest-exit DAIF values back into the host kernel.
-> >>>> On entry to a guest we have Debug and SError exceptions unmasked, KVM
-> >>>> has switched VBAR but isn't prepared to handle these. On guest exit
-> >>>> Debug exceptions are left disabled once we return to the host and will
-> >>>> stay this way until we enter user space.
+> On 03/11/17 12:49, Christoffer Dall wrote:
+> > Does a non-secure esb() cause the error to be delivered to firmware on
+> > the secure side if anything is pending?
+> 
+> Yes, the ESB-instruction causes 'synchronisable' errors to become pending as an
+> SError. They then follow the normal SError rules.
 > 
 > 
-> >>>> Give me a kick if you want this reworked as a fix (which will then
-> >>>> conflict with this series), or a backportable version.
-> >>>
-> >>> I don't know of any real-world issues where some more graceful handling
-> >>> of SErrors would make sense on older kernels, so I'm fine with just
-> >>> merging this together with this series.
-> >>
-> >> What about debug?
+> > I'm not sure I fully understand the interaction between issuing an
+> > esb() in non-secure and firmware handling a RAS error; I thought there
+> > would be none, and that this was only for kernel-first ?
 > 
-> > Are we unmasking debug exceptions as we should with this patch?
+> To implement firmware-first, EL3 has to set SCR_EL3.EA to route external-aborts
+> and physical SError to EL3. So an ESB-instruction, even in a guest, may cause an
+> SError to be taken to EL3 for firmware-first handling.
 > 
-> With this patch, yes, it directly restores the DAIF flags the arch code wants
-> for irq-masked process-context. Debug is re-enabled.
+> This is why RAS is causing so much noise for KVM, any notification could also
+> interrupt a guest, so firmware has to emulate an exception taken to EL2
+> correctly and KVM will have to plumb the notification across to the host APEI code.
 > 
 > 
-> > If so, I suppose that could be required for something like kgdb or when
-> > running KVM as a guest hypervisor (nested).
-> > 
-> > In that case, we should probably provide a backport for stable, if we
-> > think people are going to be running older kernels on VHE systems, which
-> > they probably are.
-> 
-> Okay, I will produce a backport once this gets merged.
-> 
-> 
-> >>> On guest exit Debug exceptions are left disabled once we return to the host
-> >>> and will stay this way until we enter user space.
-> 
-> > [The indentation seems to indicate I wrote this, but I don't think I
-> > did.  I'm confused.]
-> 
-> I quoted it from the commit message, but evidently not from this depth-of-reply.
-> Sorry for the confusion.
-> 
-> 
-> >> Today VHE:KVM causes the kernel to run with SError unmasked and debug disabled
-> >> until the next return to user-space, whereas previously the kernel expected
-> >> SError to be masked and debug enabled.
-> >>
-> >>
-> >> (Reposting just the SError rework without this patch changes the kernel to
-> >> expect SError to be unmasked, which isn't making this any worse.)
-> 
-> > I'm sorry, I don't understand this discussion.  What is today, and what
-> 
-> English has failed me. I'll try again:
-> 
-> v4.14-rc7 with VHE causes the kernel to run after guest-exit with SError
-> unmasked and debug disabled until the next return to user-space.
-> 
-> The arch code expects SError masked and debug enabled.
-> 
-> In your kgdb example, if we switch-to a new task instead of returning to user
-> space, it won't hit any break/watchpoints.
-> 
-> 
-> > is previously, and are you suggesting we drop this patch, or that the
-> > rest of this series is somehow going to be applied without this patch?
-> 
-> I reposted just the SError rework, patches 1-10 without this patch.
-> 
-> If merged, this would change the arch code to expect SError to be unmasked from
-> process context, leaving just the debug disabled after VHE guest-exit.
-> 
-> I was (hurriedly) trying to work out if reposting the SError-rework without this
-> patch made the situation worse.
-> 
-> 
-> Sorry for the confusion!
-> 
-No worries, and thanks for the explanation.
+
+I see, but since the end result is that either we panic or firmware
+reboots the machine, we don't care and can leave this patch out for now.
+Makes sense.
+
+Thanks for the explanation!
 -Christoffer
