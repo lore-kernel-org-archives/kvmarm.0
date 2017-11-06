@@ -1,249 +1,132 @@
-From: Shanker Donthineni <shankerd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-Subject: Re: [PATCH 3/3] arm64: Add software workaround for Falkor erratum
- 1041
-Date: Sat, 4 Nov 2017 16:43:25 -0500
-Message-ID: <2ef66b5c-d1b7-a5fc-a19d-88dddff95bad@codeaurora.org>
-References: <1509679664-3749-1-git-send-email-shankerd@codeaurora.org>
- <1509679664-3749-4-git-send-email-shankerd@codeaurora.org>
- <1f4a523c-608b-b46b-527a-bc1e02e7db5e@arm.com>
-Reply-To: shankerd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH v4 09/21] KVM: arm/arm64: mask/unmask daif around VHE
+ guests
+Date: Mon, 6 Nov 2017 13:42:53 +0100
+Message-ID: <20171106124253.GD14144@cbox>
+References: <20171019145807.23251-1-james.morse@arm.com>
+ <20171019145807.23251-10-james.morse@arm.com>
+ <20171030074019.GS2166@lvm> <59FB0C24.7080503@arm.com>
+ <20171103124502.GB14144@cbox> <59FCA52C.1070406@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1f4a523c-608b-b46b-527a-bc1e02e7db5e-5wv7dgnIgG8@public.gmane.org>
-Content-Language: en-US
-Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Robin Murphy <robin.murphy-5wv7dgnIgG8@public.gmane.org>, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-Cc: linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Ard Biesheuvel <ard.biesheuvel-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Matt Fleming <matt-mF/unelCI9GS6iBeEJttW/XRex20P6io@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B866E49D1B
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Nov 2017 07:40:58 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id s9V6x+oQefG8 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Nov 2017 07:40:57 -0500 (EST)
+Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 71B4D49D19
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Nov 2017 07:40:57 -0500 (EST)
+Received: by mail-wm0-f68.google.com with SMTP id r68so13954887wmr.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 06 Nov 2017 04:42:49 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <59FCA52C.1070406@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: James Morse <james.morse@arm.com>
+Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Julien Thierry <julien.thierry@arm.com>, Will Deacon <will.deacon@arm.com>, wangxiongfeng2@huawei.com, linux-arm-kernel@lists.infradead.org, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Robin, Thanks for your review comments. 
-
-On 11/03/2017 10:11 AM, Robin Murphy wrote:
-> On 03/11/17 03:27, Shanker Donthineni wrote:
->> The ARM architecture defines the memory locations that are permitted
->> to be accessed as the result of a speculative instruction fetch from
->> an exception level for which all stages of translation are disabled.
->> Specifically, the core is permitted to speculatively fetch from the
->> 4KB region containing the current program counter and next 4KB.
->>
->> When translation is changed from enabled to disabled for the running
->> exception level (SCTLR_ELn[M] changed from a value of 1 to 0), the
->> Falkor core may errantly speculatively access memory locations outside
->> of the 4KB region permitted by the architecture. The errant memory
->> access may lead to one of the following unexpected behaviors.
->>
->> 1) A System Error Interrupt (SEI) being raised by the Falkor core due
->>    to the errant memory access attempting to access a region of memory
->>    that is protected by a slave-side memory protection unit.
->> 2) Unpredictable device behavior due to a speculative read from device
->>    memory. This behavior may only occur if the instruction cache is
->>    disabled prior to or coincident with translation being changed from
->>    enabled to disabled.
->>
->> To avoid the errant behavior, software must execute an ISB immediately
->> prior to executing the MSR that will change SCTLR_ELn[M] from 1 to 0.
->>
->> Signed-off-by: Shanker Donthineni <shankerd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
->> ---
->>  Documentation/arm64/silicon-errata.txt |  1 +
->>  arch/arm64/Kconfig                     | 10 ++++++++++
->>  arch/arm64/include/asm/assembler.h     | 17 +++++++++++++++++
->>  arch/arm64/include/asm/cpucaps.h       |  3 ++-
->>  arch/arm64/kernel/cpu_errata.c         | 16 ++++++++++++++++
->>  arch/arm64/kernel/efi-entry.S          |  4 ++--
->>  arch/arm64/kernel/head.S               |  4 ++--
->>  7 files changed, 50 insertions(+), 5 deletions(-)
->>
->> diff --git a/Documentation/arm64/silicon-errata.txt b/Documentation/arm64/silicon-errata.txt
->> index 66e8ce1..704770c0 100644
->> --- a/Documentation/arm64/silicon-errata.txt
->> +++ b/Documentation/arm64/silicon-errata.txt
->> @@ -74,3 +74,4 @@ stable kernels.
->>  | Qualcomm Tech. | Falkor v1       | E1003           | QCOM_FALKOR_ERRATUM_1003    |
->>  | Qualcomm Tech. | Falkor v1       | E1009           | QCOM_FALKOR_ERRATUM_1009    |
->>  | Qualcomm Tech. | QDF2400 ITS     | E0065           | QCOM_QDF2400_ERRATUM_0065   |
->> +| Qualcomm Tech. | Falkor v{1,2}   | E1041           | QCOM_FALKOR_ERRATUM_1041    |
->> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
->> index 0df64a6..7e933fb 100644
->> --- a/arch/arm64/Kconfig
->> +++ b/arch/arm64/Kconfig
->> @@ -539,6 +539,16 @@ config QCOM_QDF2400_ERRATUM_0065
->>  
->>  	  If unsure, say Y.
->>  
->> +config QCOM_FALKOR_ERRATUM_1041
->> +	bool "Falkor E1041: Speculative instruction fetches might cause errant memory access"
->> +	default y
->> +	help
->> +	  Falkor CPU may speculatively fetch instructions from an improper
->> +	  memory location when MMU translation is changed from SCTLR_ELn[M]=1
->> +	  to SCTLR_ELn[M]=0. Prefix an ISB instruction to fix the problem.
->> +
->> +	  If unsure, say Y.
->> +
->>  endmenu
->>  
->>  
->> diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
->> index b6dfb4f..4c91efb 100644
->> --- a/arch/arm64/include/asm/assembler.h
->> +++ b/arch/arm64/include/asm/assembler.h
->> @@ -30,6 +30,7 @@
->>  #include <asm/pgtable-hwdef.h>
->>  #include <asm/ptrace.h>
->>  #include <asm/thread_info.h>
->> +#include <asm/alternative.h>
->>  
->>  /*
->>   * Enable and disable interrupts.
->> @@ -514,6 +515,22 @@
->>   *   reg: the value to be written.
->>   */
->>  	.macro	write_sctlr, eln, reg
->> +#ifdef CONFIG_QCOM_FALKOR_ERRATUM_1041
->> +alternative_if ARM64_WORKAROUND_QCOM_FALKOR_E1041
->> +	tbnz    \reg, #0, 8000f          // enable MMU?
+On Fri, Nov 03, 2017 at 05:19:40PM +0000, James Morse wrote:
+> Hi Christoffer,
 > 
-> Do we really need the branch here? It's not like enabling the MMU is
-> something we do on the syscall fastpath, and I can't imagine an extra
-> ISB hurts much (and is probably comparable to a mispredicted branch
-
-I don't have any strong opinion on whether to use an ISB conditionally
-or unconditionally. Yes, the current kernel code is not touching
-SCTLR_ELn register on the system call fast path. I would like to keep
-it as a conditional ISB in case if the future kernel accesses the
-SCTLR_ELn on the fast path. An extra ISB should not hurt a lot but I
-believe it has more overhead than the TBZ+branch mis-prediction on Falkor
-CPU. This patch has been tested on the real hardware to fix the problem.
-
-I'm open to change to an unconditional ISB if it's the better fix.
-
-> anyway). In fact, is there any noticeable hit on other
-> microarchitectures if we save the alternative bother and just do it
-> unconditionally always?
-> 
-
-I can't comment on the performance impacts of other CPUs since I don't
-have access to their development platforms. I'll prefer alternatives
-just to avoid the unnecessary overhead on future Qualcomm Datacenter
-server CPUs and regression on other CPUs because of inserting an ISB
-prior to SCTLR_ELn register update. Let's see what rest of the ARM 
-maintainers think about always using an ISB instead of alternatives.
-
-> Robin.
-> 
->> +	isb
->> +8000:
->> +alternative_else_nop_endif
->> +#endif
->> +	msr	sctlr_\eln, \reg
->> +	.endm
->> +
->> +	.macro	early_write_sctlr, eln, reg
->> +#ifdef CONFIG_QCOM_FALKOR_ERRATUM_1041
->> +	tbnz    \reg, #0, 8000f          // enable MMU?
->> +	isb
->> +8000:
->> +#endif
->>  	msr	sctlr_\eln, \reg
->>  	.endm
->>  
->> diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
->> index 8da6216..7f7a59d 100644
->> --- a/arch/arm64/include/asm/cpucaps.h
->> +++ b/arch/arm64/include/asm/cpucaps.h
->> @@ -40,7 +40,8 @@
->>  #define ARM64_WORKAROUND_858921			19
->>  #define ARM64_WORKAROUND_CAVIUM_30115		20
->>  #define ARM64_HAS_DCPOP				21
->> +#define ARM64_WORKAROUND_QCOM_FALKOR_E1041	22
->>  
->> -#define ARM64_NCAPS				22
->> +#define ARM64_NCAPS				23
->>  
->>  #endif /* __ASM_CPUCAPS_H */
->> diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
->> index 0e27f86..27f9a45 100644
->> --- a/arch/arm64/kernel/cpu_errata.c
->> +++ b/arch/arm64/kernel/cpu_errata.c
->> @@ -179,6 +179,22 @@ static int cpu_enable_trap_ctr_access(void *__unused)
->>  			   MIDR_CPU_VAR_REV(0, 0)),
->>  	},
->>  #endif
->> +#ifdef CONFIG_QCOM_FALKOR_ERRATUM_1041
->> +	{
->> +		.desc = "Qualcomm Technologies Falkor erratum 1041",
->> +		.capability = ARM64_WORKAROUND_QCOM_FALKOR_E1041,
->> +		MIDR_RANGE(MIDR_QCOM_FALKOR_V1,
->> +			MIDR_CPU_VAR_REV(0, 0),
->> +			MIDR_CPU_VAR_REV(0, 0)),
->> +	},
->> +	{
->> +		.desc = "Qualcomm Technologies Falkor erratum 1041",
->> +		.capability = ARM64_WORKAROUND_QCOM_FALKOR_E1041,
->> +		MIDR_RANGE(MIDR_QCOM_FALKOR,
->> +			MIDR_CPU_VAR_REV(0, 1),
->> +			MIDR_CPU_VAR_REV(0, 2)),
->> +	},
->> +#endif
->>  #ifdef CONFIG_ARM64_ERRATUM_858921
->>  	{
->>  	/* Cortex-A73 all versions */
->> diff --git a/arch/arm64/kernel/efi-entry.S b/arch/arm64/kernel/efi-entry.S
->> index acae627..c31be1b 100644
->> --- a/arch/arm64/kernel/efi-entry.S
->> +++ b/arch/arm64/kernel/efi-entry.S
->> @@ -96,14 +96,14 @@ ENTRY(entry)
->>  	read_sctlr el2, x0
->>  	bic	x0, x0, #1 << 0	// clear SCTLR.M
->>  	bic	x0, x0, #1 << 2	// clear SCTLR.C
->> -	write_sctlr el2, x0
->> +	early_write_sctlr el2, x0
->>  	isb
->>  	b	2f
->>  1:
->>  	read_sctlr el1, x0
->>  	bic	x0, x0, #1 << 0	// clear SCTLR.M
->>  	bic	x0, x0, #1 << 2	// clear SCTLR.C
->> -	write_sctlr el1, x0
->> +	early_write_sctlr el1, x0
->>  	isb
->>  2:
->>  	/* Jump to kernel entry point */
->> diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
->> index b8d5b73..9512ce7 100644
->> --- a/arch/arm64/kernel/head.S
->> +++ b/arch/arm64/kernel/head.S
->> @@ -511,7 +511,7 @@ install_el2_stub:
->>  	mov	x0, #0x0800			// Set/clear RES{1,0} bits
->>  CPU_BE(	movk	x0, #0x33d0, lsl #16	)	// Set EE and E0E on BE systems
->>  CPU_LE(	movk	x0, #0x30d0, lsl #16	)	// Clear EE and E0E on LE systems
->> -	write_sctlr el1, x0
->> +	early_write_sctlr el1, x0
->>  
->>  	/* Coprocessor traps. */
->>  	mov	x0, #0x33ff
->> @@ -732,7 +732,7 @@ __primary_switch:
->>  	 * to take into account by discarding the current kernel mapping and
->>  	 * creating a new one.
->>  	 */
->> -	write_sctlr el1, x20			// disable the MMU
->> +	early_write_sctlr el1, x20		// disable the MMU
->>  	isb
->>  	bl	__create_page_tables		// recreate kernel mapping
->>  
->>
+> On 03/11/17 12:45, Christoffer Dall wrote:
+> > On Thu, Nov 02, 2017 at 12:14:28PM +0000, James Morse wrote:
+> >> On 30/10/17 07:40, Christoffer Dall wrote:
+> >>> On Thu, Oct 19, 2017 at 03:57:55PM +0100, James Morse wrote:
+> >>>> Non-VHE systems take an exception to EL2 in order to world-switch into the
+> >>>> guest. When returning from the guest KVM implicitly restores the DAIF
+> >>>> flags when it returns to the kernel at EL1.
+> >>>>
+> >>>> With VHE none of this exception-level jumping happens, so KVMs
+> >>>> world-switch code is exposed to the host kernel's DAIF values, and KVM
+> >>>> spills the guest-exit DAIF values back into the host kernel.
+> >>>> On entry to a guest we have Debug and SError exceptions unmasked, KVM
+> >>>> has switched VBAR but isn't prepared to handle these. On guest exit
+> >>>> Debug exceptions are left disabled once we return to the host and will
+> >>>> stay this way until we enter user space.
 > 
 > 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+> >>>> Give me a kick if you want this reworked as a fix (which will then
+> >>>> conflict with this series), or a backportable version.
+> >>>
+> >>> I don't know of any real-world issues where some more graceful handling
+> >>> of SErrors would make sense on older kernels, so I'm fine with just
+> >>> merging this together with this series.
+> >>
+> >> What about debug?
 > 
-
--- 
-Shanker Donthineni
-Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
+> > Are we unmasking debug exceptions as we should with this patch?
+> 
+> With this patch, yes, it directly restores the DAIF flags the arch code wants
+> for irq-masked process-context. Debug is re-enabled.
+> 
+> 
+> > If so, I suppose that could be required for something like kgdb or when
+> > running KVM as a guest hypervisor (nested).
+> > 
+> > In that case, we should probably provide a backport for stable, if we
+> > think people are going to be running older kernels on VHE systems, which
+> > they probably are.
+> 
+> Okay, I will produce a backport once this gets merged.
+> 
+> 
+> >>> On guest exit Debug exceptions are left disabled once we return to the host
+> >>> and will stay this way until we enter user space.
+> 
+> > [The indentation seems to indicate I wrote this, but I don't think I
+> > did.  I'm confused.]
+> 
+> I quoted it from the commit message, but evidently not from this depth-of-reply.
+> Sorry for the confusion.
+> 
+> 
+> >> Today VHE:KVM causes the kernel to run with SError unmasked and debug disabled
+> >> until the next return to user-space, whereas previously the kernel expected
+> >> SError to be masked and debug enabled.
+> >>
+> >>
+> >> (Reposting just the SError rework without this patch changes the kernel to
+> >> expect SError to be unmasked, which isn't making this any worse.)
+> 
+> > I'm sorry, I don't understand this discussion.  What is today, and what
+> 
+> English has failed me. I'll try again:
+> 
+> v4.14-rc7 with VHE causes the kernel to run after guest-exit with SError
+> unmasked and debug disabled until the next return to user-space.
+> 
+> The arch code expects SError masked and debug enabled.
+> 
+> In your kgdb example, if we switch-to a new task instead of returning to user
+> space, it won't hit any break/watchpoints.
+> 
+> 
+> > is previously, and are you suggesting we drop this patch, or that the
+> > rest of this series is somehow going to be applied without this patch?
+> 
+> I reposted just the SError rework, patches 1-10 without this patch.
+> 
+> If merged, this would change the arch code to expect SError to be unmasked from
+> process context, leaving just the debug disabled after VHE guest-exit.
+> 
+> I was (hurriedly) trying to work out if reposting the SError-rework without this
+> patch made the situation worse.
+> 
+> 
+> Sorry for the confusion!
+> 
+No worries, and thanks for the explanation.
+-Christoffer
