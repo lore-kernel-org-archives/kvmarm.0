@@ -1,72 +1,55 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v5 13/26] KVM: arm/arm64: GICv4: Propagate affinity
- changes to the physical ITS
-Date: Tue, 7 Nov 2017 22:01:41 +0100
-Message-ID: <52c64fa1-f662-2703-53c5-d2024ef12254@redhat.com>
+Subject: Re: [PATCH v5 14/26] KVM: arm/arm64: GICv4: Handle CLEAR applied to a
+ VLPI
+Date: Tue, 7 Nov 2017 22:04:59 +0100
+Message-ID: <5bb9dd2f-2fdf-b705-56c2-f3829a7e86ad@redhat.com>
 References: <20171027142855.21584-1-marc.zyngier@arm.com>
- <20171027142855.21584-14-marc.zyngier@arm.com>
+ <20171027142855.21584-15-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20171027142855.21584-14-marc.zyngier@arm.com>
+In-Reply-To: <20171027142855.21584-15-marc.zyngier@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Mark Rutland <mark.rutland@arm.com>, Andre Przywara <Andre.Przywara@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Christoffer Dall <christoffer.dall@linaro.org>, Shanker Donthineni <shankerd@codeaurora.org>
+Cc: Mark Rutland <mark.rutland@arm.com>, Christoffer Dall <cdall@linaro.org>, Andre Przywara <Andre.Przywara@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Christoffer Dall <christoffer.dall@linaro.org>, Shanker Donthineni <shankerd@codeaurora.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
-
+Hi,
 On 27/10/2017 16:28, Marc Zyngier wrote:
-> When the guest issues an affinity change, we need to tell the physical
-> ITS that we're now targetting a new vcpu.  This is done by extracting
-> the current mapping, updating the target, and reapplying the mapping.
+> Handling CLEAR is pretty easy. Just ask the ITS driver to clear
+> the corresponding pending bit (which will turn into a CLEAR
+> command on the physical side).
 > 
-> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+> Acked-by: Christoffer Dall <cdall@linaro.org>
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
->  virt/kvm/arm/vgic/vgic-its.c | 16 +++++++++++++++-
->  1 file changed, 15 insertions(+), 1 deletion(-)
+>  virt/kvm/arm/vgic/vgic-its.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
 > diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index c9b1c0967426..42ffb9084bb7 100644
+> index 42ffb9084bb7..5778b50911e8 100644
 > --- a/virt/kvm/arm/vgic/vgic-its.c
 > +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -337,11 +337,25 @@ static int vgic_copy_lpi_list(struct kvm_vcpu *vcpu, u32 **intid_ptr)
+> @@ -1070,6 +1070,10 @@ static int vgic_its_cmd_handle_clear(struct kvm *kvm, struct vgic_its *its,
 >  
->  static int update_affinity(struct vgic_irq *irq, struct kvm_vcpu *vcpu)
->  {
-> +	int ret = 0;
-> +
->  	spin_lock(&irq->irq_lock);
->  	irq->target_vcpu = vcpu;
->  	spin_unlock(&irq->irq_lock);
+>  	ite->irq->pending_latch = false;
 >  
-> -	return 0;
-> +	if (irq->hw) {
-> +		struct its_vlpi_map map;
+> +	if (ite->irq->hw)
+> +		return irq_set_irqchip_state(ite->irq->host_irq,
+> +					     IRQCHIP_STATE_PENDING, false);
 > +
-> +		ret = its_get_vlpi(irq->host_irq, &map);
-> +		if (ret)
-> +			return ret;
-> +
-> +		map.vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
-> +
-> +		ret = its_map_vlpi(irq->host_irq, &map);
-Do we check somewhere the virtual LPI ID does not exceed the capacity of
-the VPT. I fail to find that in the irq-gic-v3-its.c driver.
+nit: could be done before the pending_latch setting as this latter is
+not used in that case.
 
-Also in case the hw part fails, should we still have the irq->target_cpu
-set to the new value. In other words shouldn't we first do the hw block
-and upon success set the target_vcpu?
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
 Thanks
 
 Eric
-> +	}
-> +
-> +	return ret;
+
+
+>  	return 0;
 >  }
 >  
->  /*
 > 
