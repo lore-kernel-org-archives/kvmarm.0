@@ -1,77 +1,173 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v5 23/26] KVM: arm/arm64: GICv4: Prevent a VM using GICv4
- from being saved
-Date: Tue, 7 Nov 2017 16:24:32 +0100
-Message-ID: <1f75a11a-41c3-71b8-6abf-4aa2962e348e@redhat.com>
-References: <20171027142855.21584-1-marc.zyngier@arm.com>
- <20171027142855.21584-24-marc.zyngier@arm.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH 13/37] KVM: arm64: Introduce VHE-specific kvm_vcpu_run
+Date: Tue, 7 Nov 2017 16:25:29 +0100
+Message-ID: <20171107152529.taszxq37f35yw3ga@kamzik.brq.redhat.com>
+References: <20171012104141.26902-1-christoffer.dall@linaro.org>
+ <20171012104141.26902-14-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20171027142855.21584-24-marc.zyngier@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Mark Rutland <mark.rutland@arm.com>, Andre Przywara <Andre.Przywara@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Christoffer Dall <christoffer.dall@linaro.org>, Shanker Donthineni <shankerd@codeaurora.org>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20171012104141.26902-14-christoffer.dall@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
-
-Hi Marc,
-On 27/10/2017 16:28, Marc Zyngier wrote:
-> The GICv4 architecture doesn't make it easy for save/restore to
-> work, as it doesn't give any guarantee that the pending state
-> is written into the pending table.
-
-I don't understand where does the limitation exactly come from. Can't we
-use the GICR_VPENDBASER table data?
-
-Thanks
-
-Eric
+On Thu, Oct 12, 2017 at 12:41:17PM +0200, Christoffer Dall wrote:
+> So far this is just a copy of the legacy non-VHE switch function, where
+> we only change the existing calls to has_vhe() in both the original and
+> new functions.
 > 
-> So let's not take any chance, and let's return an error if
-> we encounter any LPI that has the HW bit set. In order for
-> userspace to distinguish this error from other failure modes,
-> use -EACCES as an error code.
-> 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 > ---
->  Documentation/virtual/kvm/devices/arm-vgic-its.txt | 2 ++
->  virt/kvm/arm/vgic/vgic-its.c                       | 9 +++++++++
->  2 files changed, 11 insertions(+)
+>  arch/arm/include/asm/kvm_asm.h   |  4 +++
+>  arch/arm64/include/asm/kvm_asm.h |  2 ++
+>  arch/arm64/kvm/hyp/switch.c      | 57 ++++++++++++++++++++++++++++++++++++++++
+>  virt/kvm/arm/arm.c               |  5 +++-
+>  4 files changed, 67 insertions(+), 1 deletion(-)
 > 
-> diff --git a/Documentation/virtual/kvm/devices/arm-vgic-its.txt b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
-> index eb06beb75960..1eec7bcb2d52 100644
-> --- a/Documentation/virtual/kvm/devices/arm-vgic-its.txt
-> +++ b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
-> @@ -60,6 +60,8 @@ Groups:
->      -EINVAL: Inconsistent restored data
->      -EFAULT: Invalid guest ram access
->      -EBUSY:  One or more VCPUS are running
-> +    -EACCES: The virtual ITS is backed by a physical GICv4 ITS, and the
-> +    	     state is not available
+> diff --git a/arch/arm/include/asm/kvm_asm.h b/arch/arm/include/asm/kvm_asm.h
+> index 36dd296..1a7bc5f 100644
+> --- a/arch/arm/include/asm/kvm_asm.h
+> +++ b/arch/arm/include/asm/kvm_asm.h
+> @@ -70,8 +70,12 @@ extern void __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu);
 >  
->    KVM_DEV_ARM_VGIC_GRP_ITS_REGS
->    Attributes:
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index eb72eb027060..2710834d0920 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -1989,6 +1989,15 @@ static int vgic_its_save_itt(struct vgic_its *its, struct its_device *device)
->  	list_for_each_entry(ite, &device->itt_head, ite_list) {
->  		gpa_t gpa = base + ite->event_id * ite_esz;
+>  extern void __kvm_timer_set_cntvoff(u32 cntvoff_low, u32 cntvoff_high);
 >  
-> +		/*
-> +		 * If an LPI carries the HW bit, this means that this
-> +		 * interrupt is controlled by GICv4, and we do not
-> +		 * have direct access to that state. Let's simply fail
-> +		 * the save operation...
-> +		 */
-> +		if (ite->irq->hw)
-> +			return -EACCES;
+> +/* no VHE on 32-bit :( */
+> +static inline int kvm_vcpu_run(struct kvm_vcpu *vcpu) { return 0; }
 > +
->  		ret = vgic_its_save_ite(its, device, ite, gpa, ite_esz);
->  		if (ret)
->  			return ret;
+>  extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+>  
+> +
+
+stray new blank line
+
+>  extern void __init_stage2_translation(void);
+>  
+>  extern u64 __vgic_v3_get_ich_vtr_el2(void);
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index 7e48a39..2eb5b23 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -57,6 +57,8 @@ extern void __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu);
+>  
+>  extern void __kvm_timer_set_cntvoff(u32 cntvoff_low, u32 cntvoff_high);
+>  
+> +extern int kvm_vcpu_run(struct kvm_vcpu *vcpu);
+> +
+>  extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+>  
+>  extern u64 __vgic_v3_get_ich_vtr_el2(void);
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index ed30af5..8a0f38f 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -319,6 +319,63 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  	return false;
+>  }
+>  
+> +/* Switch to the guest for VHE systems running in EL2 */
+> +int kvm_vcpu_run(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_cpu_context *host_ctxt;
+> +	struct kvm_cpu_context *guest_ctxt;
+> +	u64 exit_code;
+> +
+> +	vcpu = kern_hyp_va(vcpu);
+> +
+> +	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> +	host_ctxt->__hyp_running_vcpu = vcpu;
+> +	guest_ctxt = &vcpu->arch.ctxt;
+> +
+> +	__sysreg_save_host_state(host_ctxt);
+> +
+> +	__activate_traps(vcpu);
+> +	__activate_vm(vcpu);
+> +
+> +	__vgic_restore_state(vcpu);
+> +	__timer_enable_traps(vcpu);
+> +
+> +	/*
+> +	 * We must restore the 32-bit state before the sysregs, thanks
+> +	 * to erratum #852523 (Cortex-A57) or #853709 (Cortex-A72).
+> +	 */
+> +	__sysreg32_restore_state(vcpu);
+> +	__sysreg_restore_guest_state(guest_ctxt);
+> +	__debug_switch_to_guest(vcpu);
+> +
+> +	/* Jump in the fire! */
+> +again:
+> +	exit_code = __guest_enter(vcpu, host_ctxt);
+> +	/* And we're baaack! */
+> +
+> +	if (fixup_guest_exit(vcpu, &exit_code))
+> +		goto again;
+> +
+> +	__sysreg_save_guest_state(guest_ctxt);
+> +	__sysreg32_save_state(vcpu);
+> +	__timer_disable_traps(vcpu);
+> +	__vgic_save_state(vcpu);
+> +
+> +	__deactivate_traps(vcpu);
+> +	__deactivate_vm(vcpu);
+> +
+> +	__sysreg_restore_host_state(host_ctxt);
+> +
+> +	/*
+> +	 * This must come after restoring the host sysregs, since a non-VHE
+> +	 * system may enable SPE here and make use of the TTBRs.
+> +	 */
+> +	__debug_switch_to_host(vcpu);
+> +
+> +	return exit_code;
+> +}
+> +
+> +/* Switch to the guest for legacy non-VHE systems */
+>  int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_cpu_context *host_ctxt;
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index cf121b2..b11647a 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -706,7 +706,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  		trace_kvm_entry(*vcpu_pc(vcpu));
+>  		guest_enter_irqoff();
+>  
+> -		ret = kvm_call_hyp(__kvm_vcpu_run, vcpu);
+> +		if (has_vhe())
+> +			ret = kvm_vcpu_run(vcpu);
+> +		else
+> +			ret = kvm_call_hyp(__kvm_vcpu_run, vcpu);
+
+So kvm_vcpu_run() is going to be VHE only, but the only way for people
+stepping through the code to know that is by seeing this callsite or by
+reading the comment above it. Everywhere else we make it much more clear
+with the _vhe and _nvhe suffixes. I wonder if we should keep that pattern
+by adding
+
+ static int kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ {
+    if (has_vhe())
+        ret = kvm_vcpu_run_vhe(vcpu);
+    else
+        ret = kvm_call_hyp(__kvm_vcpu_run_nvhe, vcpu);
+ }
+
+to virt/kvm/arm/arm.c and then calling that from here.
+
+I'm afraid the __ prefix is too ambiguous in the kernel to interpret
+__foo() as the hyp mode non-VHE version of foo(), the hyp mode VHE
+version.
+
+Thanks,
+drew
+
+>  
+>  		vcpu->mode = OUTSIDE_GUEST_MODE;
+>  		vcpu->stat.exits++;
+> -- 
+> 2.9.0
 > 
