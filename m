@@ -1,82 +1,90 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v5 07/26] KVM: arm/arm64: vITS: Add a helper to update the
- affinity of an LPI
-Date: Tue, 7 Nov 2017 14:44:28 +0100
-Message-ID: <e2d14bc3-dd30-955a-1afd-afbff479c64f@redhat.com>
-References: <20171027142855.21584-1-marc.zyngier@arm.com>
- <20171027142855.21584-8-marc.zyngier@arm.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH 09/37] KVM: arm64: Move debug dirty flag calculation out
+ of world switch
+Date: Tue, 7 Nov 2017 15:09:19 +0100
+Message-ID: <20171107140919.p6act55ubmzlv66b@kamzik.brq.redhat.com>
+References: <20171012104141.26902-1-christoffer.dall@linaro.org>
+ <20171012104141.26902-10-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20171027142855.21584-8-marc.zyngier@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Mark Rutland <mark.rutland@arm.com>, Andre Przywara <Andre.Przywara@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Christoffer Dall <christoffer.dall@linaro.org>, Shanker Donthineni <shankerd@codeaurora.org>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20171012104141.26902-10-christoffer.dall@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
-
-On 27/10/2017 16:28, Marc Zyngier wrote:
-> In order help integrating the vITS code with GICv4, let's add
-in order to
-> a new helper that deals with updating the affinity of an LPI,
-> which will later be augmented with super duper extra GICv4
-> goodness.
+On Thu, Oct 12, 2017 at 12:41:13PM +0200, Christoffer Dall wrote:
+> There is no need to figure out inside the world-switch if we should
+> save/restore the debug registers or not, we can might as well do that in
+> the higher level debug setup code, making it easier to optimize down the
+> line.
 > 
-> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Eric
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 > ---
->  virt/kvm/arm/vgic/vgic-its.c | 20 +++++++++++---------
->  1 file changed, 11 insertions(+), 9 deletions(-)
+>  arch/arm64/kvm/debug.c        | 9 +++++++++
+>  arch/arm64/kvm/hyp/debug-sr.c | 6 ------
+>  2 files changed, 9 insertions(+), 6 deletions(-)
 > 
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index 475dffd0a44c..8ee03f1e89fc 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -335,6 +335,15 @@ static int vgic_copy_lpi_list(struct kvm_vcpu *vcpu, u32 **intid_ptr)
->  	return i;
->  }
+> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> index dbadfaf..62550de19 100644
+> --- a/arch/arm64/kvm/debug.c
+> +++ b/arch/arm64/kvm/debug.c
+> @@ -193,6 +193,15 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+>  	if (trap_debug)
+>  		vcpu->arch.mdcr_el2 |= MDCR_EL2_TDA;
 >  
-> +static int update_affinity(struct vgic_irq *irq, struct kvm_vcpu *vcpu)
-> +{
-> +	spin_lock(&irq->irq_lock);
-> +	irq->target_vcpu = vcpu;
-> +	spin_unlock(&irq->irq_lock);
+> +	/*
+> +	 * If any of KDE, MDE or KVM_ARM64_DEBUG_DIRTY is set, perform
+> +	 * a full save/restore cycle.
+
+The commit message implies testing KVM_ARM64_DEBUG_DIRTY, but it only
+tests KDE and MDE.
+
+> +	 */
+> +	if ((vcpu_sys_reg(vcpu, MDSCR_EL1) & DBG_MDSCR_KDE) ||
+> +	    (vcpu_sys_reg(vcpu, MDSCR_EL1) & DBG_MDSCR_MDE))
+
+nit: could also write as
+
+ if (vcpu_sys_reg(vcpu, MDSCR_EL1) & (DBG_MDSCR_KDE | DBG_MDSCR_MDE))
+
+> +		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
 > +
-> +	return 0;
-> +}
+
+It looks like there's only one flag for debug_flags - this dirty flag,
+which I guess is also used to trigger trapping. So maybe this could be a
+second flag of a "lazy state" field, as I suggested earlier?
+
 > +
->  /*
->   * Promotes the ITS view of affinity of an ITTE (which redistributor this LPI
->   * is targeting) to the VGIC's view, which deals with target VCPUs.
-> @@ -349,10 +358,7 @@ static void update_affinity_ite(struct kvm *kvm, struct its_ite *ite)
->  		return;
->  
->  	vcpu = kvm_get_vcpu(kvm, ite->collection->target_addr);
-> -
-> -	spin_lock(&ite->irq->irq_lock);
-> -	ite->irq->target_vcpu = vcpu;
-> -	spin_unlock(&ite->irq->irq_lock);
-> +	update_affinity(ite->irq, vcpu);
+>  	trace_kvm_arm_set_dreg32("MDCR_EL2", vcpu->arch.mdcr_el2);
+>  	trace_kvm_arm_set_dreg32("MDSCR_EL1", vcpu_sys_reg(vcpu, MDSCR_EL1));
 >  }
+> diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
+> index f5154ed..0fc0758 100644
+> --- a/arch/arm64/kvm/hyp/debug-sr.c
+> +++ b/arch/arm64/kvm/hyp/debug-sr.c
+> @@ -172,12 +172,6 @@ void __hyp_text __debug_restore_state(struct kvm_vcpu *vcpu,
 >  
->  /*
-> @@ -693,11 +699,7 @@ static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
->  	ite->collection = collection;
->  	vcpu = kvm_get_vcpu(kvm, collection->target_addr);
->  
-> -	spin_lock(&ite->irq->irq_lock);
-> -	ite->irq->target_vcpu = vcpu;
-> -	spin_unlock(&ite->irq->irq_lock);
+>  void __hyp_text __debug_cond_save_host_state(struct kvm_vcpu *vcpu)
+>  {
+> -	/* If any of KDE, MDE or KVM_ARM64_DEBUG_DIRTY is set, perform
+> -	 * a full save/restore cycle. */
+> -	if ((vcpu->arch.ctxt.sys_regs[MDSCR_EL1] & DBG_MDSCR_KDE) ||
+> -	    (vcpu->arch.ctxt.sys_regs[MDSCR_EL1] & DBG_MDSCR_MDE))
+> -		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
 > -
-> -	return 0;
-> +	return update_affinity(ite->irq, vcpu);
->  }
->  
->  /*
-> 
+>  	__debug_save_state(vcpu, &vcpu->arch.host_debug_state.regs,
+>  			   kern_hyp_va(vcpu->arch.host_cpu_context));
+>  	__debug_save_spe()(&vcpu->arch.host_debug_state.pmscr_el1);
+> -- 
+> 2.9.0
+>
+
+Also, while grepping, I noticed __debug_cond_restore_host_state() unsets
+KVM_ARM64_DEBUG_DIRTY on that condition that it's set. A micro
+optimization could be to do it unconditionally, removing the branch.
+
+Thanks,
+drew
