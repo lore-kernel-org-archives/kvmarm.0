@@ -1,137 +1,66 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 18/26] KVM: arm/arm64: Rework kvm_timer_should_fire
-Date: Tue,  7 Nov 2017 11:47:51 +0100
-Message-ID: <20171107104800.30021-19-christoffer.dall@linaro.org>
+Subject: [PULL 20/26] KVM: arm/arm64: vgic-its: Remove kvm_its_unmap_device
+Date: Tue,  7 Nov 2017 11:47:53 +0100
+Message-ID: <20171107104800.30021-21-christoffer.dall@linaro.org>
 References: <20171107104800.30021-1-christoffer.dall@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 34DCA49D8C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Nov 2017 05:46:49 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jjNeUvqnOuD8 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Nov 2017 05:46:47 -0500 (EST)
-Received: from mail-wm0-f65.google.com (mail-wm0-f65.google.com [74.125.82.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B2A8F49D84
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Nov 2017 05:46:41 -0500 (EST)
-Received: by mail-wm0-f65.google.com with SMTP id y83so2800448wmc.4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Nov 2017 02:48:36 -0800 (PST)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20171107104800.30021-1-christoffer.dall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Eric Auger <eric.auger@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <cdall@linaro.org>
+From: Eric Auger <eric.auger@redhat.com>
 
-kvm_timer_should_fire() can be called in two different situations from
-the kvm_vcpu_block().
+Let's remove kvm_its_unmap_device and use kvm_its_free_device
+as both functions are identical.
 
-The first case is before calling kvm_timer_schedule(), used for wait
-polling, and in this case the VCPU thread is running and the timer state
-is loaded onto the hardware so all we have to do is check if the virtual
-interrupt lines are asserted, becasue the timer interrupt handler
-functions will raise those lines as appropriate.
-
-The second case is inside the wait loop of kvm_vcpu_block(), where we
-have already called kvm_timer_schedule() and therefore the hardware will
-be disabled and the software view of the timer state is up to date
-(timer->loaded is false), and so we can simply check if the timer should
-fire by looking at the software state.
-
-Signed-off-by: Christoffer Dall <cdall@linaro.org>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- include/kvm/arm_arch_timer.h |  3 ++-
- virt/kvm/arm/arch_timer.c    | 22 +++++++++++++++++++++-
- virt/kvm/arm/arm.c           |  3 +--
- 3 files changed, 24 insertions(+), 4 deletions(-)
+ virt/kvm/arm/vgic/vgic-its.c | 14 ++------------
+ 1 file changed, 2 insertions(+), 12 deletions(-)
 
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index 2352f3a4e88b..01ee473517e2 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -78,7 +78,8 @@ int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
- int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
- int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
- 
--bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx);
-+bool kvm_timer_is_pending(struct kvm_vcpu *vcpu);
-+
- void kvm_timer_schedule(struct kvm_vcpu *vcpu);
- void kvm_timer_unschedule(struct kvm_vcpu *vcpu);
- 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 53d9bd4a734f..2035cf251701 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -49,6 +49,7 @@ static const struct kvm_irq_level default_vtimer_irq = {
- static bool kvm_timer_irq_can_fire(struct arch_timer_context *timer_ctx);
- static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
- 				 struct arch_timer_context *timer_ctx);
-+static bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx);
- 
- u64 kvm_phys_timer_read(void)
- {
-@@ -226,7 +227,7 @@ static enum hrtimer_restart kvm_phys_timer_expire(struct hrtimer *hrt)
- 	return HRTIMER_NORESTART;
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index 9f5e34767628..75c18183eee3 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -897,7 +897,7 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
  }
  
--bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
-+static bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
+ /* Requires the its_lock to be held. */
+-static void vgic_its_unmap_device(struct kvm *kvm, struct its_device *device)
++static void vgic_its_free_device(struct kvm *kvm, struct its_device *device)
  {
- 	u64 cval, now;
+ 	struct its_ite *ite, *temp;
  
-@@ -239,6 +240,25 @@ bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
- 	return cval <= now;
+@@ -960,7 +960,7 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
+ 	 * by removing the mapping and re-establishing it.
+ 	 */
+ 	if (device)
+-		vgic_its_unmap_device(kvm, device);
++		vgic_its_free_device(kvm, device);
+ 
+ 	/*
+ 	 * The spec does not say whether unmapping a not-mapped device
+@@ -1615,16 +1615,6 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
+ 	return vgic_its_set_abi(its, NR_ITS_ABIS - 1);
  }
  
-+bool kvm_timer_is_pending(struct kvm_vcpu *vcpu)
-+{
-+	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
-+	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
-+
-+	if (vtimer->irq.level || ptimer->irq.level)
-+		return true;
-+
-+	/*
-+	 * When this is called from withing the wait loop of kvm_vcpu_block(),
-+	 * the software view of the timer state is up to date (timer->loaded
-+	 * is false), and so we can simply check if the timer should fire now.
-+	 */
-+	if (!vtimer->loaded && kvm_timer_should_fire(vtimer))
-+		return true;
-+
-+	return kvm_timer_should_fire(ptimer);
-+}
-+
- /*
-  * Reflect the timer output level into the kvm_run structure
-  */
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 14c50d142c67..bc126fb99a3d 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -307,8 +307,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
- 
- int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
+-static void vgic_its_free_device(struct kvm *kvm, struct its_device *dev)
+-{
+-	struct its_ite *ite, *tmp;
+-
+-	list_for_each_entry_safe(ite, tmp, &dev->itt_head, ite_list)
+-		its_free_ite(kvm, ite);
+-	list_del(&dev->dev_list);
+-	kfree(dev);
+-}
+-
+ static void vgic_its_destroy(struct kvm_device *kvm_dev)
  {
--	return kvm_timer_should_fire(vcpu_vtimer(vcpu)) ||
--	       kvm_timer_should_fire(vcpu_ptimer(vcpu));
-+	return kvm_timer_is_pending(vcpu);
- }
- 
- void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
+ 	struct kvm *kvm = kvm_dev->kvm;
 -- 
 2.14.2
