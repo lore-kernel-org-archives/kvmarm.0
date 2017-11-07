@@ -1,25 +1,25 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 14/26] KVM: arm/arm64: Use kvm_arm_timer_set/get_reg for guest
- register traps
-Date: Tue,  7 Nov 2017 11:47:47 +0100
-Message-ID: <20171107104800.30021-15-christoffer.dall@linaro.org>
+Subject: [PULL 13/26] KVM: arm/arm64: Support EL1 phys timer register access
+ in set/get reg
+Date: Tue,  7 Nov 2017 11:47:46 +0100
+Message-ID: <20171107104800.30021-14-christoffer.dall@linaro.org>
 References: <20171107104800.30021-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D01B49D88
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Nov 2017 05:46:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 946B549D6B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Nov 2017 05:46:39 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jPbn5BRaBF5p for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Nov 2017 05:46:39 -0500 (EST)
+ with ESMTP id 9wpogTd1fD7h for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Nov 2017 05:46:38 -0500 (EST)
 Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 06C7F49D92
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Nov 2017 05:46:36 -0500 (EST)
-Received: by mail-wm0-f68.google.com with SMTP id b189so2701830wmd.4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Nov 2017 02:48:30 -0800 (PST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D41CD49D83
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Nov 2017 05:46:34 -0500 (EST)
+Received: by mail-wm0-f68.google.com with SMTP id y83so2799685wmc.4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Nov 2017 02:48:29 -0800 (PST)
 In-Reply-To: <20171107104800.30021-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -36,90 +36,126 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Christoffer Dall <cdall@linaro.org>
 
-When trapping on a guest access to one of the timer registers, we were
-messing with the internals of the timer state from the sysregs handling
-code, and that logic was about to receive more added complexity when
-optimizing the timer handling code.
+Add suport for the physical timer registers in kvm_arm_timer_set_reg and
+kvm_arm_timer_get_reg so that these functions can be reused to interact
+with the rest of the system.
 
-Therefore, since we already have timer register access functions (to
-access registers from userspace), reuse those for the timer register
-traps from a VM and let the timer code maintain its own consistency.
+Note that this paves part of the way for the physical timer state
+save/restore, but we still need to add those registers to
+KVM_GET_REG_LIST before we support migrating the physical timer state.
 
-Signed-off-by: Christoffer Dall <cdall@linaro.org>
 Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- arch/arm64/kvm/sys_regs.c | 41 ++++++++++++++---------------------------
- 1 file changed, 14 insertions(+), 27 deletions(-)
+ arch/arm/include/uapi/asm/kvm.h   |  6 ++++++
+ arch/arm64/include/uapi/asm/kvm.h |  6 ++++++
+ virt/kvm/arm/arch_timer.c         | 33 +++++++++++++++++++++++++++++++--
+ 3 files changed, 43 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 2e070d3baf9f..bb0e41b3154e 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -841,13 +841,16 @@ static bool access_cntp_tval(struct kvm_vcpu *vcpu,
- 		struct sys_reg_params *p,
- 		const struct sys_reg_desc *r)
+diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+index 5db2d4c6a55f..665c454e50d0 100644
+--- a/arch/arm/include/uapi/asm/kvm.h
++++ b/arch/arm/include/uapi/asm/kvm.h
+@@ -151,6 +151,12 @@ struct kvm_arch_memory_slot {
+ 	(__ARM_CP15_REG(op1, 0, crm, 0) | KVM_REG_SIZE_U64)
+ #define ARM_CP15_REG64(...) __ARM_CP15_REG64(__VA_ARGS__)
+ 
++/* PL1 Physical Timer Registers */
++#define KVM_REG_ARM_PTIMER_CTL		ARM_CP15_REG32(0, 14, 2, 1)
++#define KVM_REG_ARM_PTIMER_CNT		ARM_CP15_REG64(0, 14)
++#define KVM_REG_ARM_PTIMER_CVAL		ARM_CP15_REG64(2, 14)
++
++/* Virtual Timer Registers */
+ #define KVM_REG_ARM_TIMER_CTL		ARM_CP15_REG32(0, 14, 3, 1)
+ #define KVM_REG_ARM_TIMER_CNT		ARM_CP15_REG64(1, 14)
+ #define KVM_REG_ARM_TIMER_CVAL		ARM_CP15_REG64(3, 14)
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index 9f3ca24bbcc6..0004feef7cc2 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -195,6 +195,12 @@ struct kvm_arch_memory_slot {
+ 
+ #define ARM64_SYS_REG(...) (__ARM64_SYS_REG(__VA_ARGS__) | KVM_REG_SIZE_U64)
+ 
++/* Physical Timer EL0 Registers */
++#define KVM_REG_ARM_PTIMER_CTL		ARM64_SYS_REG(3, 3, 14, 2, 1)
++#define KVM_REG_ARM_PTIMER_CVAL		ARM64_SYS_REG(3, 3, 14, 2, 2)
++#define KVM_REG_ARM_PTIMER_CNT		ARM64_SYS_REG(3, 3, 14, 0, 1)
++
++/* EL0 Virtual Timer Registers */
+ #define KVM_REG_ARM_TIMER_CTL		ARM64_SYS_REG(3, 3, 14, 3, 1)
+ #define KVM_REG_ARM_TIMER_CNT		ARM64_SYS_REG(3, 3, 14, 3, 2)
+ #define KVM_REG_ARM_TIMER_CVAL		ARM64_SYS_REG(3, 3, 14, 0, 2)
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index ec685c1f3b78..d1a6fb12121f 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -628,10 +628,11 @@ static void kvm_timer_init_interrupt(void *info)
+ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
  {
--	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
- 	u64 now = kvm_phys_timer_read();
-+	u64 cval;
+ 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
++	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
  
--	if (p->is_write)
--		ptimer->cnt_cval = p->regval + now;
--	else
--		p->regval = ptimer->cnt_cval - now;
-+	if (p->is_write) {
-+		kvm_arm_timer_set_reg(vcpu, KVM_REG_ARM_PTIMER_CVAL,
-+				      p->regval + now);
-+	} else {
-+		cval = kvm_arm_timer_get_reg(vcpu, KVM_REG_ARM_PTIMER_CVAL);
-+		p->regval = cval - now;
-+	}
- 
- 	return true;
+ 	switch (regid) {
+ 	case KVM_REG_ARM_TIMER_CTL:
+-		vtimer->cnt_ctl = value;
++		vtimer->cnt_ctl = value & ~ARCH_TIMER_CTRL_IT_STAT;
+ 		break;
+ 	case KVM_REG_ARM_TIMER_CNT:
+ 		update_vtimer_cntvoff(vcpu, kvm_phys_timer_read() - value);
+@@ -639,6 +640,13 @@ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
+ 	case KVM_REG_ARM_TIMER_CVAL:
+ 		vtimer->cnt_cval = value;
+ 		break;
++	case KVM_REG_ARM_PTIMER_CTL:
++		ptimer->cnt_ctl = value & ~ARCH_TIMER_CTRL_IT_STAT;
++		break;
++	case KVM_REG_ARM_PTIMER_CVAL:
++		ptimer->cnt_cval = value;
++		break;
++
+ 	default:
+ 		return -1;
+ 	}
+@@ -647,17 +655,38 @@ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
+ 	return 0;
  }
-@@ -856,24 +859,10 @@ static bool access_cntp_ctl(struct kvm_vcpu *vcpu,
- 		struct sys_reg_params *p,
- 		const struct sys_reg_desc *r)
- {
--	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
--
--	if (p->is_write) {
--		/* ISTATUS bit is read-only */
--		ptimer->cnt_ctl = p->regval & ~ARCH_TIMER_CTRL_IT_STAT;
--	} else {
--		u64 now = kvm_phys_timer_read();
--
--		p->regval = ptimer->cnt_ctl;
--		/*
--		 * Set ISTATUS bit if it's expired.
--		 * Note that according to ARMv8 ARM Issue A.k, ISTATUS bit is
--		 * UNKNOWN when ENABLE bit is 0, so we chose to set ISTATUS bit
--		 * regardless of ENABLE bit for our implementation convenience.
--		 */
--		if (ptimer->cnt_cval <= now)
--			p->regval |= ARCH_TIMER_CTRL_IT_STAT;
--	}
-+	if (p->is_write)
-+		kvm_arm_timer_set_reg(vcpu, KVM_REG_ARM_PTIMER_CTL, p->regval);
+ 
++static u64 read_timer_ctl(struct arch_timer_context *timer)
++{
++	/*
++	 * Set ISTATUS bit if it's expired.
++	 * Note that according to ARMv8 ARM Issue A.k, ISTATUS bit is
++	 * UNKNOWN when ENABLE bit is 0, so we chose to set ISTATUS bit
++	 * regardless of ENABLE bit for our implementation convenience.
++	 */
++	if (!kvm_timer_compute_delta(timer))
++		return timer->cnt_ctl | ARCH_TIMER_CTRL_IT_STAT;
 +	else
-+		p->regval = kvm_arm_timer_get_reg(vcpu, KVM_REG_ARM_PTIMER_CTL);
- 
- 	return true;
- }
-@@ -882,12 +871,10 @@ static bool access_cntp_cval(struct kvm_vcpu *vcpu,
- 		struct sys_reg_params *p,
- 		const struct sys_reg_desc *r)
++		return timer->cnt_ctl;
++}
++
+ u64 kvm_arm_timer_get_reg(struct kvm_vcpu *vcpu, u64 regid)
  {
--	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
--
- 	if (p->is_write)
--		ptimer->cnt_cval = p->regval;
-+		kvm_arm_timer_set_reg(vcpu, KVM_REG_ARM_PTIMER_CVAL, p->regval);
- 	else
--		p->regval = ptimer->cnt_cval;
-+		p->regval = kvm_arm_timer_get_reg(vcpu, KVM_REG_ARM_PTIMER_CVAL);
++	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+ 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
  
- 	return true;
+ 	switch (regid) {
+ 	case KVM_REG_ARM_TIMER_CTL:
+-		return vtimer->cnt_ctl;
++		return read_timer_ctl(vtimer);
+ 	case KVM_REG_ARM_TIMER_CNT:
+ 		return kvm_phys_timer_read() - vtimer->cntvoff;
+ 	case KVM_REG_ARM_TIMER_CVAL:
+ 		return vtimer->cnt_cval;
++	case KVM_REG_ARM_PTIMER_CTL:
++		return read_timer_ctl(ptimer);
++	case KVM_REG_ARM_PTIMER_CVAL:
++		return ptimer->cnt_cval;
++	case KVM_REG_ARM_PTIMER_CNT:
++		return kvm_phys_timer_read();
+ 	}
+ 	return (u64)-1;
  }
 -- 
 2.14.2
