@@ -1,197 +1,77 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH 12/37] KVM: arm64: Factor out fault info population and
- gic workarounds
-Date: Tue, 7 Nov 2017 16:12:09 +0100
-Message-ID: <20171107151209.zee3ww7mq3xl6f3n@kamzik.brq.redhat.com>
-References: <20171012104141.26902-1-christoffer.dall@linaro.org>
- <20171012104141.26902-13-christoffer.dall@linaro.org>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v5 23/26] KVM: arm/arm64: GICv4: Prevent a VM using GICv4
+ from being saved
+Date: Tue, 7 Nov 2017 16:24:32 +0100
+Message-ID: <1f75a11a-41c3-71b8-6abf-4aa2962e348e@redhat.com>
+References: <20171027142855.21584-1-marc.zyngier@arm.com>
+ <20171027142855.21584-24-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20171012104141.26902-13-christoffer.dall@linaro.org>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20171027142855.21584-24-marc.zyngier@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Mark Rutland <mark.rutland@arm.com>, Andre Przywara <Andre.Przywara@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Christoffer Dall <christoffer.dall@linaro.org>, Shanker Donthineni <shankerd@codeaurora.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Oct 12, 2017 at 12:41:16PM +0200, Christoffer Dall wrote:
-> The current world-switch function has functionality to detect a number
-> of cases where we need to fixup some part of the exit condition and
-> possibly run the guest again, before having restored the host state.
-> 
-> This includes populating missing fault info, emulating GICv2 CPU
-> interface accesses when mapped at unaligned addresses, and emulating
-> the GICv3 CPU interfaceon systems that need that.
+Hi Marc,
 
-interface on
-need it.
+Hi Marc,
+On 27/10/2017 16:28, Marc Zyngier wrote:
+> The GICv4 architecture doesn't make it easy for save/restore to
+> work, as it doesn't give any guarantee that the pending state
+> is written into the pending table.
 
+I don't understand where does the limitation exactly come from. Can't we
+use the GICR_VPENDBASER table data?
+
+Thanks
+
+Eric
 > 
-> As we are about to have an alternative switch function for VHE systems,
-> but VHE systems still need the same early fixup logic, factor out this
-> logic into a separate function that can be shared by both switch
-> functions.
+> So let's not take any chance, and let's return an error if
+> we encounter any LPI that has the HW bit set. In order for
+> userspace to distinguish this error from other failure modes,
+> use -EACCES as an error code.
 > 
-> No functional change.
-> 
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
->  arch/arm64/kvm/hyp/switch.c | 91 ++++++++++++++++++++++++++-------------------
->  1 file changed, 52 insertions(+), 39 deletions(-)
+>  Documentation/virtual/kvm/devices/arm-vgic-its.txt | 2 ++
+>  virt/kvm/arm/vgic/vgic-its.c                       | 9 +++++++++
+>  2 files changed, 11 insertions(+)
 > 
-> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> index e270cba..ed30af5 100644
-> --- a/arch/arm64/kvm/hyp/switch.c
-> +++ b/arch/arm64/kvm/hyp/switch.c
-> @@ -258,50 +258,24 @@ static void __hyp_text __skip_instr(struct kvm_vcpu *vcpu)
->  	write_sysreg_el2(*vcpu_pc(vcpu), elr);
->  }
+> diff --git a/Documentation/virtual/kvm/devices/arm-vgic-its.txt b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+> index eb06beb75960..1eec7bcb2d52 100644
+> --- a/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+> +++ b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+> @@ -60,6 +60,8 @@ Groups:
+>      -EINVAL: Inconsistent restored data
+>      -EFAULT: Invalid guest ram access
+>      -EBUSY:  One or more VCPUS are running
+> +    -EACCES: The virtual ITS is backed by a physical GICv4 ITS, and the
+> +    	     state is not available
 >  
-> -int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
-> +/*
-> + * Return true when we were able to fixup the guest exit and should return to
-> + * the guest, false when we should restore the host state and return to the
-> + * main run loop.
-> + */
-> +static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
->  {
-> -	struct kvm_cpu_context *host_ctxt;
-> -	struct kvm_cpu_context *guest_ctxt;
-> -	u64 exit_code;
-> -
-> -	vcpu = kern_hyp_va(vcpu);
-> -
-> -	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-> -	host_ctxt->__hyp_running_vcpu = vcpu;
-> -	guest_ctxt = &vcpu->arch.ctxt;
-> -
-> -	__sysreg_save_host_state(host_ctxt);
-> -
-> -	__activate_traps(vcpu);
-> -	__activate_vm(vcpu);
-> -
-> -	__vgic_restore_state(vcpu);
-> -	__timer_enable_traps(vcpu);
-> -
-> -	/*
-> -	 * We must restore the 32-bit state before the sysregs, thanks
-> -	 * to erratum #852523 (Cortex-A57) or #853709 (Cortex-A72).
-> -	 */
-> -	__sysreg32_restore_state(vcpu);
-> -	__sysreg_restore_guest_state(guest_ctxt);
-> -	__debug_switch_to_guest(vcpu);
-> -
-> -	/* Jump in the fire! */
-> -again:
-> -	exit_code = __guest_enter(vcpu, host_ctxt);
-> -	/* And we're baaack! */
-> -
->  	/*
->  	 * We're using the raw exception code in order to only process
->  	 * the trap if no SError is pending. We will come back to the
->  	 * same PC once the SError has been injected, and replay the
->  	 * trapping instruction.
->  	 */
-> -	if (exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
-> -		goto again;
-> +	if (*exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
-> +		return true;
+>    KVM_DEV_ARM_VGIC_GRP_ITS_REGS
+>    Attributes:
+> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> index eb72eb027060..2710834d0920 100644
+> --- a/virt/kvm/arm/vgic/vgic-its.c
+> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> @@ -1989,6 +1989,15 @@ static int vgic_its_save_itt(struct vgic_its *its, struct its_device *device)
+>  	list_for_each_entry(ite, &device->itt_head, ite_list) {
+>  		gpa_t gpa = base + ite->event_id * ite_esz;
 >  
->  	if (static_branch_unlikely(&vgic_v2_cpuif_trap) &&
-> -	    exit_code == ARM_EXCEPTION_TRAP) {
-> +	    *exit_code == ARM_EXCEPTION_TRAP) {
->  		bool valid;
->  
->  		valid = kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_DABT_LOW &&
-> @@ -315,13 +289,13 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
->  
->  			if (ret == 1) {
->  				__skip_instr(vcpu);
-> -				goto again;
-> +				return true;
->  			}
->  
->  			if (ret == -1) {
->  				/* Promote an illegal access to an SError */
->  				__skip_instr(vcpu);
-> -				exit_code = ARM_EXCEPTION_EL1_SERROR;
-> +				*exit_code = ARM_EXCEPTION_EL1_SERROR;
->  			}
->  
->  			/* 0 falls through to be handler out of EL2 */
-> @@ -329,19 +303,58 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
->  	}
->  
->  	if (static_branch_unlikely(&vgic_v3_cpuif_trap) &&
-> -	    exit_code == ARM_EXCEPTION_TRAP &&
-> +	    *exit_code == ARM_EXCEPTION_TRAP &&
->  	    (kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_SYS64 ||
->  	     kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_CP15_32)) {
->  		int ret = __vgic_v3_perform_cpuif_access(vcpu);
->  
->  		if (ret == 1) {
->  			__skip_instr(vcpu);
-> -			goto again;
-> +			return true;
->  		}
->  
->  		/* 0 falls through to be handled out of EL2 */
-
-I'm not sure the "0 falls through..." comments are as easy to understand
-now that we only fall through to a 'return false'. Maybe they should be
-modified?
-
->  	}
->  
-> +	return false;
-> +}
+> +		/*
+> +		 * If an LPI carries the HW bit, this means that this
+> +		 * interrupt is controlled by GICv4, and we do not
+> +		 * have direct access to that state. Let's simply fail
+> +		 * the save operation...
+> +		 */
+> +		if (ite->irq->hw)
+> +			return -EACCES;
 > +
-> +int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_cpu_context *host_ctxt;
-> +	struct kvm_cpu_context *guest_ctxt;
-> +	u64 exit_code;
-> +
-> +	vcpu = kern_hyp_va(vcpu);
-> +
-> +	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-> +	host_ctxt->__hyp_running_vcpu = vcpu;
-> +	guest_ctxt = &vcpu->arch.ctxt;
-> +
-> +	__sysreg_save_host_state(host_ctxt);
-> +
-> +	__activate_traps(vcpu);
-> +	__activate_vm(vcpu);
-> +
-> +	__vgic_restore_state(vcpu);
-> +	__timer_enable_traps(vcpu);
-> +
-> +	/*
-> +	 * We must restore the 32-bit state before the sysregs, thanks
-> +	 * to erratum #852523 (Cortex-A57) or #853709 (Cortex-A72).
-> +	 */
-> +	__sysreg32_restore_state(vcpu);
-> +	__sysreg_restore_guest_state(guest_ctxt);
-> +	__debug_switch_to_guest(vcpu);
-> +
-> +	/* Jump in the fire! */
-> +again:
-> +	exit_code = __guest_enter(vcpu, host_ctxt);
-> +	/* And we're baaack! */
-> +
-> +	if (fixup_guest_exit(vcpu, &exit_code))
-> +		goto again;
-
-We can change this goto to a do-while now.
-
-> +
->  	__sysreg_save_guest_state(guest_ctxt);
->  	__sysreg32_save_state(vcpu);
->  	__timer_disable_traps(vcpu);
-> -- 
-> 2.9.0
->
-
-Thanks,
-drew
+>  		ret = vgic_its_save_ite(its, device, ite, gpa, ite_esz);
+>  		if (ret)
+>  			return ret;
+> 
