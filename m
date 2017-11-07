@@ -1,212 +1,197 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH 11/37] KVM: arm64: Improve debug register save/restore
- flow
-Date: Tue, 7 Nov 2017 15:48:57 +0100
-Message-ID: <20171107144857.hmgwxshk6eiorm4i@kamzik.brq.redhat.com>
+Subject: Re: [PATCH 12/37] KVM: arm64: Factor out fault info population and
+ gic workarounds
+Date: Tue, 7 Nov 2017 16:12:09 +0100
+Message-ID: <20171107151209.zee3ww7mq3xl6f3n@kamzik.brq.redhat.com>
 References: <20171012104141.26902-1-christoffer.dall@linaro.org>
- <20171012104141.26902-12-christoffer.dall@linaro.org>
+ <20171012104141.26902-13-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20171012104141.26902-12-christoffer.dall@linaro.org>
+In-Reply-To: <20171012104141.26902-13-christoffer.dall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Oct 12, 2017 at 12:41:15PM +0200, Christoffer Dall wrote:
-> Instead of having multiple calls from the world switch path to the debug
-> logic, each figuring out if the dirty bit is set and if we should
-> save/restore the debug registes, let's just provide two hooks to the
-> debug save/restore functionality, one for switching to the guest
-> context, and one for switching to the host context, and we get the
-> benefit of only having to evaluate the dirty flag once on each path,
-> plus we give the compiler some more room to inline some of this
-> functionality.
+On Thu, Oct 12, 2017 at 12:41:16PM +0200, Christoffer Dall wrote:
+> The current world-switch function has functionality to detect a number
+> of cases where we need to fixup some part of the exit condition and
+> possibly run the guest again, before having restored the host state.
+> 
+> This includes populating missing fault info, emulating GICv2 CPU
+> interface accesses when mapped at unaligned addresses, and emulating
+> the GICv3 CPU interfaceon systems that need that.
+
+interface on
+need it.
+
+> 
+> As we are about to have an alternative switch function for VHE systems,
+> but VHE systems still need the same early fixup logic, factor out this
+> logic into a separate function that can be shared by both switch
+> functions.
+> 
+> No functional change.
 > 
 > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 > ---
->  arch/arm64/include/asm/kvm_hyp.h | 10 ++-----
->  arch/arm64/kvm/hyp/debug-sr.c    | 56 +++++++++++++++++++++++++++-------------
->  arch/arm64/kvm/hyp/switch.c      |  6 ++---
->  3 files changed, 42 insertions(+), 30 deletions(-)
+>  arch/arm64/kvm/hyp/switch.c | 91 ++++++++++++++++++++++++++-------------------
+>  1 file changed, 52 insertions(+), 39 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index 08d3bb6..a0e5a70 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -139,14 +139,8 @@ void __sysreg_restore_guest_state(struct kvm_cpu_context *ctxt);
->  void __sysreg32_save_state(struct kvm_vcpu *vcpu);
->  void __sysreg32_restore_state(struct kvm_vcpu *vcpu);
->  
-> -void __debug_save_state(struct kvm_vcpu *vcpu,
-> -			struct kvm_guest_debug_arch *dbg,
-> -			struct kvm_cpu_context *ctxt);
-> -void __debug_restore_state(struct kvm_vcpu *vcpu,
-> -			   struct kvm_guest_debug_arch *dbg,
-> -			   struct kvm_cpu_context *ctxt);
-> -void __debug_cond_save_host_state(struct kvm_vcpu *vcpu);
-> -void __debug_cond_restore_host_state(struct kvm_vcpu *vcpu);
-> +void __debug_switch_to_guest(struct kvm_vcpu *vcpu);
-> +void __debug_switch_to_host(struct kvm_vcpu *vcpu);
->  
->  void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
->  void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
-> diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
-> index a2291b6..b4cd8e0 100644
-> --- a/arch/arm64/kvm/hyp/debug-sr.c
-> +++ b/arch/arm64/kvm/hyp/debug-sr.c
-> @@ -116,16 +116,13 @@ static void __hyp_text __debug_restore_spe(u64 pmscr_el1)
->  	write_sysreg_s(pmscr_el1, PMSCR_EL1);
->  }
->  
-> -void __hyp_text __debug_save_state(struct kvm_vcpu *vcpu,
-> -				   struct kvm_guest_debug_arch *dbg,
-> -				   struct kvm_cpu_context *ctxt)
-> +static void __hyp_text __debug_save_state(struct kvm_vcpu *vcpu,
-> +					  struct kvm_guest_debug_arch *dbg,
-> +					  struct kvm_cpu_context *ctxt)
->  {
->  	u64 aa64dfr0;
->  	int brps, wrps;
->  
-> -	if (!(vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY))
-> -		return;
-> -
->  	aa64dfr0 = read_sysreg(id_aa64dfr0_el1);
->  	brps = (aa64dfr0 >> 12) & 0xf;
->  	wrps = (aa64dfr0 >> 20) & 0xf;
-> @@ -138,16 +135,13 @@ void __hyp_text __debug_save_state(struct kvm_vcpu *vcpu,
->  	ctxt->sys_regs[MDCCINT_EL1] = read_sysreg(mdccint_el1);
->  }
->  
-> -void __hyp_text __debug_restore_state(struct kvm_vcpu *vcpu,
-> -				      struct kvm_guest_debug_arch *dbg,
-> -				      struct kvm_cpu_context *ctxt)
-> +static void __hyp_text __debug_restore_state(struct kvm_vcpu *vcpu,
-> +					     struct kvm_guest_debug_arch *dbg,
-> +					     struct kvm_cpu_context *ctxt)
->  {
->  	u64 aa64dfr0;
->  	int brps, wrps;
->  
-> -	if (!(vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY))
-> -		return;
-> -
->  	aa64dfr0 = read_sysreg(id_aa64dfr0_el1);
->  
->  	brps = (aa64dfr0 >> 12) & 0xf;
-> @@ -161,24 +155,50 @@ void __hyp_text __debug_restore_state(struct kvm_vcpu *vcpu,
->  	write_sysreg(ctxt->sys_regs[MDCCINT_EL1], mdccint_el1);
->  }
->  
-> -void __hyp_text __debug_cond_save_host_state(struct kvm_vcpu *vcpu)
-> +void __hyp_text __debug_switch_to_guest(struct kvm_vcpu *vcpu)
->  {
-> -	__debug_save_state(vcpu, &vcpu->arch.host_debug_state.regs,
-> -			   kern_hyp_va(vcpu->arch.host_cpu_context));
-> +	struct kvm_cpu_context *__host_ctxt;
-> +	struct kvm_cpu_context *__guest_ctxt;
-> +	struct kvm_guest_debug_arch *__host_dbg;
-> +	struct kvm_guest_debug_arch *__guest_dbg;
-
-I caught in your reply to Marc that the __ prefix here is for hyp mode
-accessible code and data, but do we also need to use it for stack data?
-No big deal, but it's not very pretty.
-
->  
->  	/* Non-VHE: Disable and flush SPE data generation
->  	 * VHE: The vcpu can run. but it can't hide. */
->  	if (!has_vhe())
->  		__debug_save_spe_nvhe(&vcpu->arch.host_debug_state.pmscr_el1);
-> +
-> +	if (!(vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY))
-> +		return;
-> +
-> +	__host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-> +	__guest_ctxt = &vcpu->arch.ctxt;
-> +	__host_dbg = &vcpu->arch.host_debug_state.regs;
-> +	__guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
-> +
-> +	__debug_save_state(vcpu, __host_dbg, __host_ctxt);
-> +	__debug_restore_state(vcpu, __guest_dbg, __guest_ctxt);
->  }
->  
-> -void __hyp_text __debug_cond_restore_host_state(struct kvm_vcpu *vcpu)
-> +void __hyp_text __debug_switch_to_host(struct kvm_vcpu *vcpu)
->  {
-> +	struct kvm_cpu_context *__host_ctxt;
-> +	struct kvm_cpu_context *__guest_ctxt;
-> +	struct kvm_guest_debug_arch *__host_dbg;
-> +	struct kvm_guest_debug_arch *__guest_dbg;
-> +
->  	if (!has_vhe())
->  		__debug_restore_spe(vcpu->arch.host_debug_state.pmscr_el1);
->  
-> -	__debug_restore_state(vcpu, &vcpu->arch.host_debug_state.regs,
-> -			      kern_hyp_va(vcpu->arch.host_cpu_context));
-> +	if (!(vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY))
-> +		return;
-> +
-> +	__host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-> +	__guest_ctxt = &vcpu->arch.ctxt;
-> +	__host_dbg = &vcpu->arch.host_debug_state.regs;
-> +	__guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
-> +
-> +	__debug_save_state(vcpu, __guest_dbg, __guest_ctxt);
-> +	__debug_restore_state(vcpu, __host_dbg, __host_ctxt);
->  
->  	vcpu->arch.debug_flags &= ~KVM_ARM64_DEBUG_DIRTY;
->  }
 > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> index ef05c59..e270cba 100644
+> index e270cba..ed30af5 100644
 > --- a/arch/arm64/kvm/hyp/switch.c
 > +++ b/arch/arm64/kvm/hyp/switch.c
-> @@ -271,7 +271,6 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
->  	guest_ctxt = &vcpu->arch.ctxt;
->  
->  	__sysreg_save_host_state(host_ctxt);
-> -	__debug_cond_save_host_state(vcpu);
->  
->  	__activate_traps(vcpu);
->  	__activate_vm(vcpu);
-> @@ -285,7 +284,7 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
->  	 */
->  	__sysreg32_restore_state(vcpu);
->  	__sysreg_restore_guest_state(guest_ctxt);
-> -	__debug_restore_state(vcpu, kern_hyp_va(vcpu->arch.debug_ptr), guest_ctxt);
-> +	__debug_switch_to_guest(vcpu);
->  
->  	/* Jump in the fire! */
->  again:
-> @@ -353,12 +352,11 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
->  
->  	__sysreg_restore_host_state(host_ctxt);
->  
-> -	__debug_save_state(vcpu, kern_hyp_va(vcpu->arch.debug_ptr), guest_ctxt);
->  	/*
->  	 * This must come after restoring the host sysregs, since a non-VHE
->  	 * system may enable SPE here and make use of the TTBRs.
->  	 */
-> -	__debug_cond_restore_host_state(vcpu);
-> +	__debug_switch_to_host(vcpu);
->  
->  	return exit_code;
+> @@ -258,50 +258,24 @@ static void __hyp_text __skip_instr(struct kvm_vcpu *vcpu)
+>  	write_sysreg_el2(*vcpu_pc(vcpu), elr);
 >  }
+>  
+> -int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+> +/*
+> + * Return true when we were able to fixup the guest exit and should return to
+> + * the guest, false when we should restore the host state and return to the
+> + * main run loop.
+> + */
+> +static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  {
+> -	struct kvm_cpu_context *host_ctxt;
+> -	struct kvm_cpu_context *guest_ctxt;
+> -	u64 exit_code;
+> -
+> -	vcpu = kern_hyp_va(vcpu);
+> -
+> -	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> -	host_ctxt->__hyp_running_vcpu = vcpu;
+> -	guest_ctxt = &vcpu->arch.ctxt;
+> -
+> -	__sysreg_save_host_state(host_ctxt);
+> -
+> -	__activate_traps(vcpu);
+> -	__activate_vm(vcpu);
+> -
+> -	__vgic_restore_state(vcpu);
+> -	__timer_enable_traps(vcpu);
+> -
+> -	/*
+> -	 * We must restore the 32-bit state before the sysregs, thanks
+> -	 * to erratum #852523 (Cortex-A57) or #853709 (Cortex-A72).
+> -	 */
+> -	__sysreg32_restore_state(vcpu);
+> -	__sysreg_restore_guest_state(guest_ctxt);
+> -	__debug_switch_to_guest(vcpu);
+> -
+> -	/* Jump in the fire! */
+> -again:
+> -	exit_code = __guest_enter(vcpu, host_ctxt);
+> -	/* And we're baaack! */
+> -
+>  	/*
+>  	 * We're using the raw exception code in order to only process
+>  	 * the trap if no SError is pending. We will come back to the
+>  	 * same PC once the SError has been injected, and replay the
+>  	 * trapping instruction.
+>  	 */
+> -	if (exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
+> -		goto again;
+> +	if (*exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
+> +		return true;
+>  
+>  	if (static_branch_unlikely(&vgic_v2_cpuif_trap) &&
+> -	    exit_code == ARM_EXCEPTION_TRAP) {
+> +	    *exit_code == ARM_EXCEPTION_TRAP) {
+>  		bool valid;
+>  
+>  		valid = kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_DABT_LOW &&
+> @@ -315,13 +289,13 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  
+>  			if (ret == 1) {
+>  				__skip_instr(vcpu);
+> -				goto again;
+> +				return true;
+>  			}
+>  
+>  			if (ret == -1) {
+>  				/* Promote an illegal access to an SError */
+>  				__skip_instr(vcpu);
+> -				exit_code = ARM_EXCEPTION_EL1_SERROR;
+> +				*exit_code = ARM_EXCEPTION_EL1_SERROR;
+>  			}
+>  
+>  			/* 0 falls through to be handler out of EL2 */
+> @@ -329,19 +303,58 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  	}
+>  
+>  	if (static_branch_unlikely(&vgic_v3_cpuif_trap) &&
+> -	    exit_code == ARM_EXCEPTION_TRAP &&
+> +	    *exit_code == ARM_EXCEPTION_TRAP &&
+>  	    (kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_SYS64 ||
+>  	     kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_CP15_32)) {
+>  		int ret = __vgic_v3_perform_cpuif_access(vcpu);
+>  
+>  		if (ret == 1) {
+>  			__skip_instr(vcpu);
+> -			goto again;
+> +			return true;
+>  		}
+>  
+>  		/* 0 falls through to be handled out of EL2 */
+
+I'm not sure the "0 falls through..." comments are as easy to understand
+now that we only fall through to a 'return false'. Maybe they should be
+modified?
+
+>  	}
+>  
+> +	return false;
+> +}
+> +
+> +int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_cpu_context *host_ctxt;
+> +	struct kvm_cpu_context *guest_ctxt;
+> +	u64 exit_code;
+> +
+> +	vcpu = kern_hyp_va(vcpu);
+> +
+> +	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> +	host_ctxt->__hyp_running_vcpu = vcpu;
+> +	guest_ctxt = &vcpu->arch.ctxt;
+> +
+> +	__sysreg_save_host_state(host_ctxt);
+> +
+> +	__activate_traps(vcpu);
+> +	__activate_vm(vcpu);
+> +
+> +	__vgic_restore_state(vcpu);
+> +	__timer_enable_traps(vcpu);
+> +
+> +	/*
+> +	 * We must restore the 32-bit state before the sysregs, thanks
+> +	 * to erratum #852523 (Cortex-A57) or #853709 (Cortex-A72).
+> +	 */
+> +	__sysreg32_restore_state(vcpu);
+> +	__sysreg_restore_guest_state(guest_ctxt);
+> +	__debug_switch_to_guest(vcpu);
+> +
+> +	/* Jump in the fire! */
+> +again:
+> +	exit_code = __guest_enter(vcpu, host_ctxt);
+> +	/* And we're baaack! */
+> +
+> +	if (fixup_guest_exit(vcpu, &exit_code))
+> +		goto again;
+
+We can change this goto to a do-while now.
+
+> +
+>  	__sysreg_save_guest_state(guest_ctxt);
+>  	__sysreg32_save_state(vcpu);
+>  	__timer_disable_traps(vcpu);
 > -- 
 > 2.9.0
 >
-
-This looks like a nice cleanup, but can you please add a note to the
-commit message about why we don't need to use the
-
- save-host-state
- activate-traps-and-vm
- restore-guest-state
-
-and the reverse, patterns for the debug registers? As of this patch, that
-pattern still exists for the sysregs.
 
 Thanks,
 drew
