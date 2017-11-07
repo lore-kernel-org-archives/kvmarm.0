@@ -1,37 +1,18 @@
 From: Andrew Jones <drjones@redhat.com>
 Subject: Re: [PATCH 07/37] KVM: arm/arm64: Add kvm_vcpu_load_sysregs and
  kvm_vcpu_put_sysregs
-Date: Tue, 7 Nov 2017 11:56:06 +0100
-Message-ID: <20171107105606.rrcvdc3vue7fezsj@kamzik.brq.redhat.com>
+Date: Tue, 7 Nov 2017 12:10:00 +0100
+Message-ID: <20171107111000.uwpiofgbchm3s5gn@kamzik.brq.redhat.com>
 References: <20171012104141.26902-1-christoffer.dall@linaro.org>
  <20171012104141.26902-8-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9EBF349D32
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Nov 2017 05:54:17 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rFuSMgBlhDxq for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Nov 2017 05:54:16 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9FC3F49D14
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Nov 2017 05:54:16 -0500 (EST)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
 In-Reply-To: <20171012104141.26902-8-christoffer.dall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On Thu, Oct 12, 2017 at 12:41:11PM +0200, Christoffer Dall wrote:
@@ -81,64 +62,19 @@ On Thu, Oct 12, 2017 at 12:41:11PM +0200, Christoffer Dall wrote:
 > +
 > +/**
 > + * kvm_vcpu_load_sysregs - Load guest system register to physical CPU
-
-system registers to the physical CPU
-
 > + *
 > + * @vcpu: The VCPU pointer
 > + *
 > + * If the kernel runs in EL2 then load the system register state for the VCPU
 > + * for EL1 onto the physical CPU so that we can go back and foward between the
-
-/foward/forth/
-
 > + * VM and the hypervisor without switching all this state around.
-> + */
-> +void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu)
-> +{
-> +}
-> +
-> +/**
-> + * kvm_vcpu_put_sysregs - Restore host system register state to physical CPU
 
-system registers to the physical CPU
+Actually, on second thought, I'm a bit confused by this comment. Maybe
+it'll be clearer after the code that goes here will be added, but, ATM,
+I'm not sure why we want to specifically load EL1 VCPU state here. Will
+that always be the case, even with nested? Also, I'm not sure what
+alternative loading scheme we're avoiding in order to ensure the state
+isn't "switched around", which I don't really understand either.
 
-> + *
-> + * @vcpu: The VCPU pointer
-> + *
-> + * If the kernel runs in EL2 and the physical register state belongs to the
-> + * VCPU, then restore the system register state for the host for EL1 onto the
-> + * physical CPU so that we can run userspace and other threads on this
-> + * physical CPU.
-> + */
-> +void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu)
-> +{
-> +}
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index d495453..cf121b2 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -358,6 +358,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  	kvm_arm_set_running_vcpu(vcpu);
->  	kvm_vgic_load(vcpu);
->  	kvm_timer_vcpu_load(vcpu);
-> +	kvm_vcpu_load_sysregs(vcpu);
->  }
->  
->  void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
-> @@ -365,6 +366,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->  	if (vcpu->ioctl != KVM_RUN)
->  		return;
->  
-> +	kvm_vcpu_put_sysregs(vcpu);
->  	kvm_timer_vcpu_put(vcpu);
->  	kvm_vgic_put(vcpu);
->  
-> -- 
-> 2.9.0
-> 
-
-I'm not sure this needs to be a separate patch, but it was a nice relaxing
-review :-)
-
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Thanks,
+drew
