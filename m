@@ -1,132 +1,77 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v5 21/26] KVM: arm/arm64: GICv4: Hook vPE scheduling into
- vgic flush/sync
-Date: Tue, 7 Nov 2017 23:14:29 +0100
-Message-ID: <07aa9cea-830b-d515-293e-b128e296c7d0@redhat.com>
+Subject: Re: [PATCH v5 24/26] KVM: arm/arm64: GICv4: Prevent userspace from
+ changing doorbell affinity
+Date: Tue, 7 Nov 2017 23:17:51 +0100
+Message-ID: <27d2f799-c2de-27a9-8e92-21bbdd583307@redhat.com>
 References: <20171027142855.21584-1-marc.zyngier@arm.com>
- <20171027142855.21584-22-marc.zyngier@arm.com>
- <e4acdd9f-417d-c293-b754-07324a063c11@redhat.com>
+ <20171027142855.21584-25-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <e4acdd9f-417d-c293-b754-07324a063c11@redhat.com>
+In-Reply-To: <20171027142855.21584-25-marc.zyngier@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc: Mark Rutland <mark.rutland@arm.com>, Andre Przywara <Andre.Przywara@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Christoffer Dall <christoffer.dall@linaro.org>, Shanker Donthineni <shankerd@codeaurora.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
+Hi,
 
-On 07/11/2017 22:54, Auger Eric wrote:
-> Hi Marc,
+On 27/10/2017 16:28, Marc Zyngier wrote:
+> We so far allocate the doorbell interrupts without taking any
+> special measure regarding the affinity of these interrupts. We
+> simply move them around as required when the vcpu gets scheduled
+> on a different CPU.
 > 
-> On 27/10/2017 16:28, Marc Zyngier wrote:
->> The redistributor needs to be told which vPE is about to be run,
->> and tells us whether there is any pending VLPI on exit.
->>
->> Let's add the scheduling calls to the vgic flush/sync functions,
->> allowing the VLPIs to be delivered to the guest.
->>
->> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  virt/kvm/arm/vgic/vgic-v4.c | 39 +++++++++++++++++++++++++++++++++++++++
->>  virt/kvm/arm/vgic/vgic.c    |  4 ++++
->>  virt/kvm/arm/vgic/vgic.h    |  2 ++
->>  3 files changed, 45 insertions(+)
->>
->> diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
->> index 1a2f2fcdfa67..d7fe610bb1f5 100644
->> --- a/virt/kvm/arm/vgic/vgic-v4.c
->> +++ b/virt/kvm/arm/vgic/vgic-v4.c
->> @@ -131,6 +131,45 @@ void vgic_v4_teardown(struct kvm *kvm)
->>  	its_vm->vpes = NULL;
->>  }
->>  
->> +int vgic_v4_sync_hwstate(struct kvm_vcpu *vcpu)
->> +{
->> +	if (!vgic_supports_direct_msis(vcpu->kvm))
->> +		return 0;
->> +
->> +	return its_schedule_vpe(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe, false);
->> +}
->> +
->> +int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu)
->> +{
->> +	int irq = vcpu->arch.vgic_cpu.vgic_v3.its_vpe.irq;
->> +	int err;
->> +
->> +	if (!vgic_supports_direct_msis(vcpu->kvm))
->> +		return 0;
->> +
->> +	/*
->> +	 * Before making the VPE resident, make sure the redistributor
->> +	 * corresponding to our current CPU expects us here. See the
->> +	 * doc in drivers/irqchip/irq-gic-v4.c to understand how this
->> +	 * turns into a VMOVP command at the ITS level.
->> +	 */
-> I don't get the above comment. Don't you set the affinity of the
-> doorbell irq below?
-Forget that one. I now recall the trick and see its_vpe_set_affinity()
+> But that's counting without userspace (and the evil irqbalance) that
+> can try and move the VPE interrupt around, causing the ITS code
+> to emit VMOVP commands and remap the doorbell to another redistributor.
+> Worse, this can happen while the vcpu is running, causing all kind
+> of trouble if the VPE is already resident, and we end-up in UNPRED
+> territory.
+> 
+> So let's take a definitive action and prevent userspace from messing
+> with us. This is just a matter of adding IRQ_NO_BALANCING to the
+> set of flags we already have, letting the kernel in sole control
+> of the affinity.
+> 
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
 Eric
+> ---
+>  virt/kvm/arm/vgic/vgic-v4.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 > 
-> Thanks
+> diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
+> index d7fe610bb1f5..d10e18eabd3b 100644
+> --- a/virt/kvm/arm/vgic/vgic-v4.c
+> +++ b/virt/kvm/arm/vgic/vgic-v4.c
+> @@ -23,6 +23,8 @@
+>  
+>  #include "vgic.h"
+>  
+> +#define DB_IRQ_FLAGS	(IRQ_NOAUTOEN | IRQ_DISABLE_UNLAZY | IRQ_NO_BALANCING)
+> +
+>  static irqreturn_t vgic_v4_doorbell_handler(int irq, void *info)
+>  {
+>  	struct kvm_vcpu *vcpu = info;
+> @@ -83,7 +85,7 @@ int vgic_v4_init(struct kvm *kvm)
+>  		 * doorbell could kick us out of the guest too
+>  		 * early...
+>  		 */
+> -		irq_set_status_flags(irq, IRQ_NOAUTOEN | IRQ_DISABLE_UNLAZY);
+> +		irq_set_status_flags(irq, DB_IRQ_FLAGS);
+>  		ret = request_irq(irq, vgic_v4_doorbell_handler,
+>  				  0, "vcpu", vcpu);
+>  		if (ret) {
+> @@ -121,7 +123,7 @@ void vgic_v4_teardown(struct kvm *kvm)
+>  		struct kvm_vcpu *vcpu = kvm_get_vcpu(kvm, i);
+>  		int irq = its_vm->vpes[i]->irq;
+>  
+> -		irq_clear_status_flags(irq, IRQ_NOAUTOEN | IRQ_DISABLE_UNLAZY);
+> +		irq_clear_status_flags(irq, DB_IRQ_FLAGS);
+>  		free_irq(irq, vcpu);
+>  	}
+>  
 > 
-> Eric
->> +	err = irq_set_affinity(irq, cpumask_of(smp_processor_id()));
->> +	if (err)
->> +		return err;
->> +
->> +	err = its_schedule_vpe(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe, true);
->> +	if (err)
->> +		return err;
->> +
->> +	/*
->> +	 * Now that the VPE is resident, let's get rid of a potential
->> +	 * doorbell interrupt that would still be pending.
->> +	 */
->> +	err = irq_set_irqchip_state(irq, IRQCHIP_STATE_PENDING, false);
->> +
->> +	return err;
->> +}
->> +
->>  static struct vgic_its *vgic_get_its(struct kvm *kvm,
->>  				     struct kvm_kernel_irq_routing_entry *irq_entry)
->>  {
->> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
->> index 0691a2250949..71ca0ff1b35a 100644
->> --- a/virt/kvm/arm/vgic/vgic.c
->> +++ b/virt/kvm/arm/vgic/vgic.c
->> @@ -709,6 +709,8 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
->>  {
->>  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
->>  
->> +	WARN_ON(vgic_v4_sync_hwstate(vcpu));
->> +
->>  	/* An empty ap_list_head implies used_lrs == 0 */
->>  	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
->>  		return;
->> @@ -721,6 +723,8 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
->>  /* Flush our emulation state into the GIC hardware before entering the guest. */
->>  void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
->>  {
->> +	WARN_ON(vgic_v4_flush_hwstate(vcpu));
->> +
->>  	/*
->>  	 * If there are no virtual interrupts active or pending for this
->>  	 * VCPU, then there is no work to do and we can bail out without
->> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
->> index c4105f613f57..9cafb61b79af 100644
->> --- a/virt/kvm/arm/vgic/vgic.h
->> +++ b/virt/kvm/arm/vgic/vgic.h
->> @@ -243,5 +243,7 @@ struct vgic_its *vgic_msi_to_its(struct kvm *kvm, struct kvm_msi *msi);
->>  bool vgic_supports_direct_msis(struct kvm *kvm);
->>  int vgic_v4_init(struct kvm *kvm);
->>  void vgic_v4_teardown(struct kvm *kvm);
->> +int vgic_v4_sync_hwstate(struct kvm_vcpu *vcpu);
->> +int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu);
->>  
->>  #endif
->>
