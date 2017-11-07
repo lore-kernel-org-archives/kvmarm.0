@@ -1,219 +1,473 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 24/26] KVM: arm/arm64: vgic-its: Implement KVM_DEV_ARM_ITS_CTRL_RESET
-Date: Tue,  7 Nov 2017 11:47:57 +0100
-Message-ID: <20171107104800.30021-25-christoffer.dall@linaro.org>
+Subject: [PULL 25/26] KVM: arm/arm64: Unify 32bit fault injection
+Date: Tue,  7 Nov 2017 11:47:58 +0100
+Message-ID: <20171107104800.30021-26-christoffer.dall@linaro.org>
 References: <20171107104800.30021-1-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20171107104800.30021-1-christoffer.dall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Eric Auger <eric.auger@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Eric Auger <eric.auger@redhat.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
 
-On reset we clear the valid bits of GITS_CBASER and GITS_BASER<n>.
-We also clear command queue registers and free the cache (device,
-collection, and lpi lists).
+Both arm and arm64 implementations are capable of injecting
+faults, and yet have completely divergent implementations,
+leading to different bugs and reduced maintainability.
 
-As we need to take the same locks as save/restore functions, we
-create a vgic_its_ctrl() wrapper that handles KVM_DEV_ARM_VGIC_GRP_CTRL
-group functions.
+Let's elect the arm64 version as the canonical one
+and move it into aarch32.c, which is common to both
+architectures.
 
 Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm/include/uapi/asm/kvm.h   |   1 +
- arch/arm64/include/uapi/asm/kvm.h |   1 +
- virt/kvm/arm/vgic/vgic-its.c      | 105 ++++++++++++++++++++------------------
- 3 files changed, 58 insertions(+), 49 deletions(-)
+ arch/arm/include/asm/kvm_emulate.h   |  36 ++++++++-
+ arch/arm/kvm/emulate.c               | 139 -----------------------------------
+ arch/arm64/include/asm/kvm_emulate.h |   3 +
+ arch/arm64/kvm/inject_fault.c        |  74 +------------------
+ virt/kvm/arm/aarch32.c               |  97 ++++++++++++++++++++++--
+ 5 files changed, 131 insertions(+), 218 deletions(-)
 
-diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
-index 665c454e50d0..b56895593c84 100644
---- a/arch/arm/include/uapi/asm/kvm.h
-+++ b/arch/arm/include/uapi/asm/kvm.h
-@@ -221,6 +221,7 @@ struct kvm_arch_memory_slot {
- #define   KVM_DEV_ARM_ITS_SAVE_TABLES		1
- #define   KVM_DEV_ARM_ITS_RESTORE_TABLES	2
- #define   KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES	3
-+#define   KVM_DEV_ARM_ITS_CTRL_RESET		4
+diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
+index 98089ffd91bb..dcae3970148d 100644
+--- a/arch/arm/include/asm/kvm_emulate.h
++++ b/arch/arm/include/asm/kvm_emulate.h
+@@ -25,7 +25,22 @@
+ #include <asm/kvm_arm.h>
+ #include <asm/cputype.h>
  
- /* KVM_IRQ_LINE irq field index values */
- #define KVM_ARM_IRQ_TYPE_SHIFT		24
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 0004feef7cc2..37ca7394549c 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -233,6 +233,7 @@ struct kvm_arch_memory_slot {
- #define   KVM_DEV_ARM_ITS_SAVE_TABLES           1
- #define   KVM_DEV_ARM_ITS_RESTORE_TABLES        2
- #define   KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES	3
-+#define   KVM_DEV_ARM_ITS_CTRL_RESET		4
++/* arm64 compatibility macros */
++#define COMPAT_PSR_MODE_ABT	ABT_MODE
++#define COMPAT_PSR_MODE_UND	UND_MODE
++#define COMPAT_PSR_T_BIT	PSR_T_BIT
++#define COMPAT_PSR_I_BIT	PSR_I_BIT
++#define COMPAT_PSR_A_BIT	PSR_A_BIT
++#define COMPAT_PSR_E_BIT	PSR_E_BIT
++#define COMPAT_PSR_IT_MASK	PSR_IT_MASK
++
+ unsigned long *vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num);
++
++static inline unsigned long *vcpu_reg32(struct kvm_vcpu *vcpu, u8 reg_num)
++{
++	return vcpu_reg(vcpu, reg_num);
++}
++
+ unsigned long *vcpu_spsr(struct kvm_vcpu *vcpu);
  
- /* Device Control API on vcpu fd */
- #define KVM_ARM_VCPU_PMU_V3_CTRL	0
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 1732e08a4375..40791c121710 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -2273,29 +2273,13 @@ static int vgic_its_restore_collection_table(struct vgic_its *its)
-  */
- static int vgic_its_save_tables_v0(struct vgic_its *its)
+ static inline unsigned long vcpu_get_reg(struct kvm_vcpu *vcpu,
+@@ -42,10 +57,25 @@ static inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
+ 
+ bool kvm_condition_valid32(const struct kvm_vcpu *vcpu);
+ void kvm_skip_instr32(struct kvm_vcpu *vcpu, bool is_wide_instr);
+-void kvm_inject_undefined(struct kvm_vcpu *vcpu);
++void kvm_inject_undef32(struct kvm_vcpu *vcpu);
++void kvm_inject_dabt32(struct kvm_vcpu *vcpu, unsigned long addr);
++void kvm_inject_pabt32(struct kvm_vcpu *vcpu, unsigned long addr);
+ void kvm_inject_vabt(struct kvm_vcpu *vcpu);
+-void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
+-void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
++
++static inline void kvm_inject_undefined(struct kvm_vcpu *vcpu)
++{
++	kvm_inject_undef32(vcpu);
++}
++
++static inline void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr)
++{
++	kvm_inject_dabt32(vcpu, addr);
++}
++
++static inline void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
++{
++	kvm_inject_pabt32(vcpu, addr);
++}
+ 
+ static inline bool kvm_condition_valid(const struct kvm_vcpu *vcpu)
  {
--	struct kvm *kvm = its->dev->kvm;
- 	int ret;
+diff --git a/arch/arm/kvm/emulate.c b/arch/arm/kvm/emulate.c
+index 0064b86a2c87..cdff963f133a 100644
+--- a/arch/arm/kvm/emulate.c
++++ b/arch/arm/kvm/emulate.c
+@@ -165,145 +165,6 @@ unsigned long *vcpu_spsr(struct kvm_vcpu *vcpu)
+  * Inject exceptions into the guest
+  */
  
--	mutex_lock(&kvm->lock);
--	mutex_lock(&its->its_lock);
+-static u32 exc_vector_base(struct kvm_vcpu *vcpu)
+-{
+-	u32 sctlr = vcpu_cp15(vcpu, c1_SCTLR);
+-	u32 vbar = vcpu_cp15(vcpu, c12_VBAR);
 -
--	if (!lock_all_vcpus(kvm)) {
--		mutex_unlock(&its->its_lock);
--		mutex_unlock(&kvm->lock);
--		return -EBUSY;
+-	if (sctlr & SCTLR_V)
+-		return 0xffff0000;
+-	else /* always have security exceptions */
+-		return vbar;
+-}
+-
+-/*
+- * Switch to an exception mode, updating both CPSR and SPSR. Follow
+- * the logic described in AArch32.EnterMode() from the ARMv8 ARM.
+- */
+-static void kvm_update_psr(struct kvm_vcpu *vcpu, unsigned long mode)
+-{
+-	unsigned long cpsr = *vcpu_cpsr(vcpu);
+-	u32 sctlr = vcpu_cp15(vcpu, c1_SCTLR);
+-
+-	*vcpu_cpsr(vcpu) = (cpsr & ~MODE_MASK) | mode;
+-
+-	switch (mode) {
+-	case FIQ_MODE:
+-		*vcpu_cpsr(vcpu) |= PSR_F_BIT;
+-		/* Fall through */
+-	case ABT_MODE:
+-	case IRQ_MODE:
+-		*vcpu_cpsr(vcpu) |= PSR_A_BIT;
+-		/* Fall through */
+-	default:
+-		*vcpu_cpsr(vcpu) |= PSR_I_BIT;
 -	}
 -
- 	ret = vgic_its_save_device_tables(its);
- 	if (ret)
--		goto out;
+-	*vcpu_cpsr(vcpu) &= ~(PSR_IT_MASK | PSR_J_BIT | PSR_E_BIT | PSR_T_BIT);
 -
--	ret = vgic_its_save_collection_table(its);
-+		return ret;
- 
--out:
--	unlock_all_vcpus(kvm);
--	mutex_unlock(&its->its_lock);
--	mutex_unlock(&kvm->lock);
--	return ret;
-+	return vgic_its_save_collection_table(its);
- }
- 
+-	if (sctlr & SCTLR_TE)
+-		*vcpu_cpsr(vcpu) |= PSR_T_BIT;
+-	if (sctlr & SCTLR_EE)
+-		*vcpu_cpsr(vcpu) |= PSR_E_BIT;
+-
+-	/* Note: These now point to the mode banked copies */
+-	*vcpu_spsr(vcpu) = cpsr;
+-}
+-
+-/**
+- * kvm_inject_undefined - inject an undefined exception into the guest
+- * @vcpu: The VCPU to receive the undefined exception
+- *
+- * It is assumed that this code is called from the VCPU thread and that the
+- * VCPU therefore is not currently executing guest code.
+- *
+- * Modelled after TakeUndefInstrException() pseudocode.
+- */
+-void kvm_inject_undefined(struct kvm_vcpu *vcpu)
+-{
+-	unsigned long cpsr = *vcpu_cpsr(vcpu);
+-	bool is_thumb = (cpsr & PSR_T_BIT);
+-	u32 vect_offset = 4;
+-	u32 return_offset = (is_thumb) ? 2 : 4;
+-
+-	kvm_update_psr(vcpu, UND_MODE);
+-	*vcpu_reg(vcpu, 14) = *vcpu_pc(vcpu) - return_offset;
+-
+-	/* Branch to exception vector */
+-	*vcpu_pc(vcpu) = exc_vector_base(vcpu) + vect_offset;
+-}
+-
+-/*
+- * Modelled after TakeDataAbortException() and TakePrefetchAbortException
+- * pseudocode.
+- */
+-static void inject_abt(struct kvm_vcpu *vcpu, bool is_pabt, unsigned long addr)
+-{
+-	unsigned long cpsr = *vcpu_cpsr(vcpu);
+-	bool is_thumb = (cpsr & PSR_T_BIT);
+-	u32 vect_offset;
+-	u32 return_offset = (is_thumb) ? 4 : 0;
+-	bool is_lpae;
+-
+-	kvm_update_psr(vcpu, ABT_MODE);
+-	*vcpu_reg(vcpu, 14) = *vcpu_pc(vcpu) + return_offset;
+-
+-	if (is_pabt)
+-		vect_offset = 12;
+-	else
+-		vect_offset = 16;
+-
+-	/* Branch to exception vector */
+-	*vcpu_pc(vcpu) = exc_vector_base(vcpu) + vect_offset;
+-
+-	if (is_pabt) {
+-		/* Set IFAR and IFSR */
+-		vcpu_cp15(vcpu, c6_IFAR) = addr;
+-		is_lpae = (vcpu_cp15(vcpu, c2_TTBCR) >> 31);
+-		/* Always give debug fault for now - should give guest a clue */
+-		if (is_lpae)
+-			vcpu_cp15(vcpu, c5_IFSR) = 1 << 9 | 0x22;
+-		else
+-			vcpu_cp15(vcpu, c5_IFSR) = 2;
+-	} else { /* !iabt */
+-		/* Set DFAR and DFSR */
+-		vcpu_cp15(vcpu, c6_DFAR) = addr;
+-		is_lpae = (vcpu_cp15(vcpu, c2_TTBCR) >> 31);
+-		/* Always give debug fault for now - should give guest a clue */
+-		if (is_lpae)
+-			vcpu_cp15(vcpu, c5_DFSR) = 1 << 9 | 0x22;
+-		else
+-			vcpu_cp15(vcpu, c5_DFSR) = 2;
+-	}
+-
+-}
+-
+-/**
+- * kvm_inject_dabt - inject a data abort into the guest
+- * @vcpu: The VCPU to receive the undefined exception
+- * @addr: The address to report in the DFAR
+- *
+- * It is assumed that this code is called from the VCPU thread and that the
+- * VCPU therefore is not currently executing guest code.
+- */
+-void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr)
+-{
+-	inject_abt(vcpu, false, addr);
+-}
+-
+-/**
+- * kvm_inject_pabt - inject a prefetch abort into the guest
+- * @vcpu: The VCPU to receive the undefined exception
+- * @addr: The address to report in the DFAR
+- *
+- * It is assumed that this code is called from the VCPU thread and that the
+- * VCPU therefore is not currently executing guest code.
+- */
+-void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
+-{
+-	inject_abt(vcpu, true, addr);
+-}
+-
  /**
-@@ -2305,29 +2289,13 @@ static int vgic_its_save_tables_v0(struct vgic_its *its)
-  */
- static int vgic_its_restore_tables_v0(struct vgic_its *its)
- {
--	struct kvm *kvm = its->dev->kvm;
- 	int ret;
+  * kvm_inject_vabt - inject an async abort / SError into the guest
+  * @vcpu: The VCPU to receive the exception
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index e5df3fce0008..bf61da0ef82b 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -41,6 +41,9 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu);
+ void kvm_inject_vabt(struct kvm_vcpu *vcpu);
+ void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
+ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
++void kvm_inject_undef32(struct kvm_vcpu *vcpu);
++void kvm_inject_dabt32(struct kvm_vcpu *vcpu, unsigned long addr);
++void kvm_inject_pabt32(struct kvm_vcpu *vcpu, unsigned long addr);
  
--	mutex_lock(&kvm->lock);
--	mutex_lock(&its->its_lock);
+ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+ {
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index da6a8cfa54a0..8ecbcb40e317 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -33,74 +33,6 @@
+ #define LOWER_EL_AArch64_VECTOR		0x400
+ #define LOWER_EL_AArch32_VECTOR		0x600
+ 
+-static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+-{
+-	unsigned long cpsr;
+-	unsigned long new_spsr_value = *vcpu_cpsr(vcpu);
+-	bool is_thumb = (new_spsr_value & COMPAT_PSR_T_BIT);
+-	u32 return_offset = (is_thumb) ? 4 : 0;
+-	u32 sctlr = vcpu_cp15(vcpu, c1_SCTLR);
 -
--	if (!lock_all_vcpus(kvm)) {
--		mutex_unlock(&its->its_lock);
--		mutex_unlock(&kvm->lock);
--		return -EBUSY;
+-	cpsr = mode | COMPAT_PSR_I_BIT;
+-
+-	if (sctlr & (1 << 30))
+-		cpsr |= COMPAT_PSR_T_BIT;
+-	if (sctlr & (1 << 25))
+-		cpsr |= COMPAT_PSR_E_BIT;
+-
+-	*vcpu_cpsr(vcpu) = cpsr;
+-
+-	/* Note: These now point to the banked copies */
+-	*vcpu_spsr(vcpu) = new_spsr_value;
+-	*vcpu_reg32(vcpu, 14) = *vcpu_pc(vcpu) + return_offset;
+-
+-	/* Branch to exception vector */
+-	if (sctlr & (1 << 13))
+-		vect_offset += 0xffff0000;
+-	else /* always have security exceptions */
+-		vect_offset += vcpu_cp15(vcpu, c12_VBAR);
+-
+-	*vcpu_pc(vcpu) = vect_offset;
+-}
+-
+-static void inject_undef32(struct kvm_vcpu *vcpu)
+-{
+-	prepare_fault32(vcpu, COMPAT_PSR_MODE_UND, 4);
+-}
+-
+-/*
+- * Modelled after TakeDataAbortException() and TakePrefetchAbortException
+- * pseudocode.
+- */
+-static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
+-			 unsigned long addr)
+-{
+-	u32 vect_offset;
+-	u32 *far, *fsr;
+-	bool is_lpae;
+-
+-	if (is_pabt) {
+-		vect_offset = 12;
+-		far = &vcpu_cp15(vcpu, c6_IFAR);
+-		fsr = &vcpu_cp15(vcpu, c5_IFSR);
+-	} else { /* !iabt */
+-		vect_offset = 16;
+-		far = &vcpu_cp15(vcpu, c6_DFAR);
+-		fsr = &vcpu_cp15(vcpu, c5_DFSR);
 -	}
 -
- 	ret = vgic_its_restore_collection_table(its);
- 	if (ret)
--		goto out;
+-	prepare_fault32(vcpu, COMPAT_PSR_MODE_ABT | COMPAT_PSR_A_BIT, vect_offset);
 -
--	ret = vgic_its_restore_device_tables(its);
--out:
--	unlock_all_vcpus(kvm);
--	mutex_unlock(&its->its_lock);
--	mutex_unlock(&kvm->lock);
-+		return ret;
- 
--	return ret;
-+	return vgic_its_restore_device_tables(its);
+-	*far = addr;
+-
+-	/* Give the guest an IMPLEMENTATION DEFINED exception */
+-	is_lpae = (vcpu_cp15(vcpu, c2_TTBCR) >> 31);
+-	if (is_lpae)
+-		*fsr = 1 << 9 | 0x34;
+-	else
+-		*fsr = 0x14;
+-}
+-
+ enum exception_type {
+ 	except_type_sync	= 0,
+ 	except_type_irq		= 0x80,
+@@ -197,7 +129,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
+ void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr)
+ {
+ 	if (!(vcpu->arch.hcr_el2 & HCR_RW))
+-		inject_abt32(vcpu, false, addr);
++		kvm_inject_dabt32(vcpu, addr);
+ 	else
+ 		inject_abt64(vcpu, false, addr);
  }
- 
- static int vgic_its_commit_v0(struct vgic_its *its)
-@@ -2346,6 +2314,19 @@ static int vgic_its_commit_v0(struct vgic_its *its)
- 	return 0;
+@@ -213,7 +145,7 @@ void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr)
+ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
+ {
+ 	if (!(vcpu->arch.hcr_el2 & HCR_RW))
+-		inject_abt32(vcpu, true, addr);
++		kvm_inject_pabt32(vcpu, addr);
+ 	else
+ 		inject_abt64(vcpu, true, addr);
  }
+@@ -227,7 +159,7 @@ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
+ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
+ {
+ 	if (!(vcpu->arch.hcr_el2 & HCR_RW))
+-		inject_undef32(vcpu);
++		kvm_inject_undef32(vcpu);
+ 	else
+ 		inject_undef64(vcpu);
+ }
+diff --git a/virt/kvm/arm/aarch32.c b/virt/kvm/arm/aarch32.c
+index 79c7c357804b..8bc479fa37e6 100644
+--- a/virt/kvm/arm/aarch32.c
++++ b/virt/kvm/arm/aarch32.c
+@@ -25,11 +25,6 @@
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_hyp.h>
  
-+static void vgic_its_reset(struct kvm *kvm, struct vgic_its *its)
+-#ifndef CONFIG_ARM64
+-#define COMPAT_PSR_T_BIT	PSR_T_BIT
+-#define COMPAT_PSR_IT_MASK	PSR_IT_MASK
+-#endif
+-
+ /*
+  * stolen from arch/arm/kernel/opcodes.c
+  *
+@@ -150,3 +145,95 @@ void __hyp_text kvm_skip_instr32(struct kvm_vcpu *vcpu, bool is_wide_instr)
+ 		*vcpu_pc(vcpu) += 4;
+ 	kvm_adjust_itstate(vcpu);
+ }
++
++/*
++ * Table taken from ARMv8 ARM DDI0487B-B, table G1-10.
++ */
++static const u8 return_offsets[8][2] = {
++	[0] = { 0, 0 },		/* Reset, unused */
++	[1] = { 4, 2 },		/* Undefined */
++	[2] = { 0, 0 },		/* SVC, unused */
++	[3] = { 4, 4 },		/* Prefetch abort */
++	[4] = { 8, 8 },		/* Data abort */
++	[5] = { 0, 0 },		/* HVC, unused */
++	[6] = { 4, 4 },		/* IRQ, unused */
++	[7] = { 4, 4 },		/* FIQ, unused */
++};
++
++static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
 +{
-+	/* We need to keep the ABI specific field values */
-+	its->baser_coll_table &= ~GITS_BASER_VALID;
-+	its->baser_device_table &= ~GITS_BASER_VALID;
-+	its->cbaser = 0;
-+	its->creadr = 0;
-+	its->cwriter = 0;
-+	its->enabled = 0;
-+	vgic_its_free_device_list(kvm, its);
-+	vgic_its_free_collection_list(kvm, its);
++	unsigned long cpsr;
++	unsigned long new_spsr_value = *vcpu_cpsr(vcpu);
++	bool is_thumb = (new_spsr_value & COMPAT_PSR_T_BIT);
++	u32 return_offset = return_offsets[vect_offset >> 2][is_thumb];
++	u32 sctlr = vcpu_cp15(vcpu, c1_SCTLR);
++
++	cpsr = mode | COMPAT_PSR_I_BIT;
++
++	if (sctlr & (1 << 30))
++		cpsr |= COMPAT_PSR_T_BIT;
++	if (sctlr & (1 << 25))
++		cpsr |= COMPAT_PSR_E_BIT;
++
++	*vcpu_cpsr(vcpu) = cpsr;
++
++	/* Note: These now point to the banked copies */
++	*vcpu_spsr(vcpu) = new_spsr_value;
++	*vcpu_reg32(vcpu, 14) = *vcpu_pc(vcpu) + return_offset;
++
++	/* Branch to exception vector */
++	if (sctlr & (1 << 13))
++		vect_offset += 0xffff0000;
++	else /* always have security exceptions */
++		vect_offset += vcpu_cp15(vcpu, c12_VBAR);
++
++	*vcpu_pc(vcpu) = vect_offset;
 +}
 +
- static int vgic_its_has_attr(struct kvm_device *dev,
- 			     struct kvm_device_attr *attr)
- {
-@@ -2360,6 +2341,8 @@ static int vgic_its_has_attr(struct kvm_device *dev,
- 		switch (attr->attr) {
- 		case KVM_DEV_ARM_VGIC_CTRL_INIT:
- 			return 0;
-+		case KVM_DEV_ARM_ITS_CTRL_RESET:
-+			return 0;
- 		case KVM_DEV_ARM_ITS_SAVE_TABLES:
- 			return 0;
- 		case KVM_DEV_ARM_ITS_RESTORE_TABLES:
-@@ -2372,6 +2355,41 @@ static int vgic_its_has_attr(struct kvm_device *dev,
- 	return -ENXIO;
- }
- 
-+static int vgic_its_ctrl(struct kvm *kvm, struct vgic_its *its, u64 attr)
++void kvm_inject_undef32(struct kvm_vcpu *vcpu)
 +{
-+	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
-+	int ret = 0;
-+
-+	if (attr == KVM_DEV_ARM_VGIC_CTRL_INIT) /* Nothing to do */
-+		return 0;
-+
-+	mutex_lock(&kvm->lock);
-+	mutex_lock(&its->its_lock);
-+
-+	if (!lock_all_vcpus(kvm)) {
-+		mutex_unlock(&its->its_lock);
-+		mutex_unlock(&kvm->lock);
-+		return -EBUSY;
-+	}
-+
-+	switch (attr) {
-+	case KVM_DEV_ARM_ITS_CTRL_RESET:
-+		vgic_its_reset(kvm, its);
-+		break;
-+	case KVM_DEV_ARM_ITS_SAVE_TABLES:
-+		ret = abi->save_tables(its);
-+		break;
-+	case KVM_DEV_ARM_ITS_RESTORE_TABLES:
-+		ret = abi->restore_tables(its);
-+		break;
-+	}
-+
-+	unlock_all_vcpus(kvm);
-+	mutex_unlock(&its->its_lock);
-+	mutex_unlock(&kvm->lock);
-+	return ret;
++	prepare_fault32(vcpu, COMPAT_PSR_MODE_UND, 4);
 +}
 +
- static int vgic_its_set_attr(struct kvm_device *dev,
- 			     struct kvm_device_attr *attr)
- {
-@@ -2397,19 +2415,8 @@ static int vgic_its_set_attr(struct kvm_device *dev,
- 
- 		return vgic_register_its_iodev(dev->kvm, its, addr);
- 	}
--	case KVM_DEV_ARM_VGIC_GRP_CTRL: {
--		const struct vgic_its_abi *abi = vgic_its_get_abi(its);
--
--		switch (attr->attr) {
--		case KVM_DEV_ARM_VGIC_CTRL_INIT:
--			/* Nothing to do */
--			return 0;
--		case KVM_DEV_ARM_ITS_SAVE_TABLES:
--			return abi->save_tables(its);
--		case KVM_DEV_ARM_ITS_RESTORE_TABLES:
--			return abi->restore_tables(its);
--		}
--	}
-+	case KVM_DEV_ARM_VGIC_GRP_CTRL:
-+		return vgic_its_ctrl(dev->kvm, its, attr->attr);
- 	case KVM_DEV_ARM_VGIC_GRP_ITS_REGS: {
- 		u64 __user *uaddr = (u64 __user *)(long)attr->addr;
- 		u64 reg;
++/*
++ * Modelled after TakeDataAbortException() and TakePrefetchAbortException
++ * pseudocode.
++ */
++static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
++			 unsigned long addr)
++{
++	u32 vect_offset;
++	u32 *far, *fsr;
++	bool is_lpae;
++
++	if (is_pabt) {
++		vect_offset = 12;
++		far = &vcpu_cp15(vcpu, c6_IFAR);
++		fsr = &vcpu_cp15(vcpu, c5_IFSR);
++	} else { /* !iabt */
++		vect_offset = 16;
++		far = &vcpu_cp15(vcpu, c6_DFAR);
++		fsr = &vcpu_cp15(vcpu, c5_DFSR);
++	}
++
++	prepare_fault32(vcpu, COMPAT_PSR_MODE_ABT | COMPAT_PSR_A_BIT, vect_offset);
++
++	*far = addr;
++
++	/* Give the guest an IMPLEMENTATION DEFINED exception */
++	is_lpae = (vcpu_cp15(vcpu, c2_TTBCR) >> 31);
++	if (is_lpae)
++		*fsr = 1 << 9 | 0x34;
++	else
++		*fsr = 0x14;
++}
++
++void kvm_inject_dabt32(struct kvm_vcpu *vcpu, unsigned long addr)
++{
++	inject_abt32(vcpu, false, addr);
++}
++
++void kvm_inject_pabt32(struct kvm_vcpu *vcpu, unsigned long addr)
++{
++	inject_abt32(vcpu, true, addr);
++}
 -- 
 2.14.2
