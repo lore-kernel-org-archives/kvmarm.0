@@ -1,288 +1,273 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v5 09/26] KVM: arm/arm64: GICv4: Add init/teardown of the
- per-VM vPE irq domain
-Date: Tue, 7 Nov 2017 14:09:51 +0100
-Message-ID: <29cf6620-5dd4-2f8f-790a-8b77092ef39d@redhat.com>
-References: <20171027142855.21584-1-marc.zyngier@arm.com>
- <20171027142855.21584-10-marc.zyngier@arm.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH 08/37] KVM: arm64: Defer restoring host VFP state to
+ vcpu_put
+Date: Tue, 7 Nov 2017 14:15:50 +0100
+Message-ID: <20171107131550.33u2igwikbem67un@kamzik.brq.redhat.com>
+References: <20171012104141.26902-1-christoffer.dall@linaro.org>
+ <20171012104141.26902-9-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BAC6649D2B
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Nov 2017 08:08:02 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zlR8nmIKrFds for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Nov 2017 08:08:01 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 639D549D28
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Nov 2017 08:08:01 -0500 (EST)
-In-Reply-To: <20171027142855.21584-10-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Andre Przywara <Andre.Przywara@arm.com>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20171012104141.26902-9-christoffer.dall@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
+On Thu, Oct 12, 2017 at 12:41:12PM +0200, Christoffer Dall wrote:
+> Avoid saving the guest VFP registers and restoring the host VFP
+> registers on every exit from the VM.  Only when we're about to run
+> userspace or other threads in the kernel do we really have to switch the
+> state back to the host state.
+> 
+> We still initially configure the VFP registers to trap when entering the
+> VM, but the difference is that we now leave the guest state in the
+> hardware registers while running the VM.
 
-On 27/10/2017 16:28, Marc Zyngier wrote:
-> In order to control the GICv4 view of virtual CPUs, we rely
-> on an irqdomain allocated for that purpose. Let's add a couple
-> of helpers to that effect.
+running the host.
+
 > 
-> At the same time, the vgic data structures gain new fields to
-> track all this... erm... wonderful stuff.
-> 
-> The way we hook into the vgic init is slightly convoluted. We
-> need the vgic to be initialized (in order to guarantee that
-> the number of vcpus is now fixed), and we must have a vITS
-> (otherwise this is all very pointless). So we end-up calling
-> the init from both vgic_init and vgic_its_create.
-> 
-> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 > ---
->  arch/arm/kvm/Makefile         |  1 +
->  arch/arm64/kvm/Makefile       |  1 +
->  include/kvm/arm_vgic.h        | 19 ++++++++++
->  virt/kvm/arm/vgic/vgic-init.c |  9 +++++
->  virt/kvm/arm/vgic/vgic-its.c  |  8 +++++
->  virt/kvm/arm/vgic/vgic-v4.c   | 83 +++++++++++++++++++++++++++++++++++++++++++
->  virt/kvm/arm/vgic/vgic.h      |  2 ++
->  7 files changed, 123 insertions(+)
->  create mode 100644 virt/kvm/arm/vgic/vgic-v4.c
+>  arch/arm64/include/asm/kvm_emulate.h |  5 ++++
+>  arch/arm64/include/asm/kvm_host.h    |  3 +++
+>  arch/arm64/kernel/asm-offsets.c      |  1 +
+>  arch/arm64/kvm/hyp/entry.S           |  3 +++
+>  arch/arm64/kvm/hyp/switch.c          | 47 +++++++++++-------------------------
+>  arch/arm64/kvm/hyp/sysreg-sr.c       | 21 +++++++++++++---
+>  6 files changed, 44 insertions(+), 36 deletions(-)
 > 
-> diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
-> index d9beee652d36..0a1dd2cdb928 100644
-> --- a/arch/arm/kvm/Makefile
-> +++ b/arch/arm/kvm/Makefile
-> @@ -31,6 +31,7 @@ obj-y += $(KVM)/arm/vgic/vgic-init.o
->  obj-y += $(KVM)/arm/vgic/vgic-irqfd.o
->  obj-y += $(KVM)/arm/vgic/vgic-v2.o
->  obj-y += $(KVM)/arm/vgic/vgic-v3.o
-> +obj-y += $(KVM)/arm/vgic/vgic-v4.o
->  obj-y += $(KVM)/arm/vgic/vgic-mmio.o
->  obj-y += $(KVM)/arm/vgic/vgic-mmio-v2.o
->  obj-y += $(KVM)/arm/vgic/vgic-mmio-v3.o
-> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> index 5d9810086c25..c30fd388ef80 100644
-> --- a/arch/arm64/kvm/Makefile
-> +++ b/arch/arm64/kvm/Makefile
-> @@ -26,6 +26,7 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-init.o
->  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-irqfd.o
->  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-v2.o
->  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-v3.o
-> +kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-v4.o
->  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-mmio.o
->  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-mmio-v2.o
->  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-mmio-v3.o
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index ba9fb450aa1b..7eeb6c2a2f9c 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -26,6 +26,8 @@
->  #include <linux/list.h>
->  #include <linux/jump_label.h>
->  
-> +#include <linux/irqchip/arm-gic-v4.h>
-> +
->  #define VGIC_V3_MAX_CPUS	255
->  #define VGIC_V2_MAX_CPUS	8
->  #define VGIC_NR_IRQS_LEGACY     256
-> @@ -236,6 +238,15 @@ struct vgic_dist {
->  
->  	/* used by vgic-debug */
->  	struct vgic_state_iter *iter;
-> +
-> +	/*
-> +	 * GICv4 ITS per-VM data, containing the IRQ domain, the VPE
-> +	 * array, the property table pointer as well as allocation
-> +	 * data. This essentially ties the Linux IRQ core and ITS
-> +	 * together, and avoids leaking KVM's data structures anywhere
-> +	 * else.
-> +	 */
-> +	struct its_vm		its_vm;
->  };
->  
->  struct vgic_v2_cpu_if {
-> @@ -254,6 +265,14 @@ struct vgic_v3_cpu_if {
->  	u32		vgic_ap0r[4];
->  	u32		vgic_ap1r[4];
->  	u64		vgic_lr[VGIC_V3_MAX_LRS];
-> +
-> +	/*
-> +	 * GICv4 ITS per-VPE data, containing the doorbell IRQ, the
-> +	 * pending table pointer, the its_vm pointer and a few other
-> +	 * HW specific things. As for the its_vm structure, this is
-> +	 * linking the Linux IRQ subsystem and the ITS together.
-> +	 */
-> +	struct its_vpe	its_vpe;
->  };
->  
->  struct vgic_cpu {
-> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-> index 5801261f3add..40be908da238 100644
-> --- a/virt/kvm/arm/vgic/vgic-init.c
-> +++ b/virt/kvm/arm/vgic/vgic-init.c
-> @@ -285,6 +285,12 @@ int vgic_init(struct kvm *kvm)
->  	if (ret)
->  		goto out;
->  
-> +	if (vgic_supports_direct_msis(kvm)) {
-> +		ret = vgic_v4_init(kvm);
-> +		if (ret)
-> +			goto out;
-> +	}
-> +
->  	kvm_for_each_vcpu(i, vcpu, kvm)
->  		kvm_vgic_vcpu_enable(vcpu);
->  
-> @@ -320,6 +326,9 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
->  
->  	kfree(dist->spis);
->  	dist->nr_spis = 0;
-> +
-> +	if (vgic_supports_direct_msis(kvm))
-> +		vgic_v4_teardown(kvm);
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 1fbfe96..630dd60 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -56,6 +56,11 @@ static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
+>  	return (unsigned long *)&vcpu->arch.hcr_el2;
 >  }
 >  
->  void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index 8ee03f1e89fc..89768d2b6a91 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -1603,6 +1603,14 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
->  	if (!its)
->  		return -ENOMEM;
->  
-> +	if (vgic_initialized(dev->kvm)) {
-> +		int ret = vgic_v4_init(dev->kvm);
-
-If you respin I forgot 2 nits below:
-nit: line to be added
-> +		if (ret) {
-> +			kfree(its);
-> +			return ret;
-> +		}
-> +	}
-> +	
->  	mutex_init(&its->its_lock);
->  	mutex_init(&its->cmd_lock);
->  
-> diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
-> new file mode 100644
-> index 000000000000..c794f0cef09e
-> --- /dev/null
-> +++ b/virt/kvm/arm/vgic/vgic-v4.c
-> @@ -0,0 +1,83 @@
-> +/*
-> + * Copyright (C) 2017 ARM Ltd.
-> + * Author: Marc Zyngier <marc.zyngier@arm.com>
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 as
-> + * published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include <linux/interrupt.h>
-> +#include <linux/irqdomain.h>
-> +#include <linux/kvm_host.h>
-> +
-> +#include "vgic.h"
-> +
-> +/**
-> + * vgic_v4_init - Initialize the GICv4 data structures
-> + * @kvm:	Pointer to the VM being initialized
-> + *
-> + * We may be called each time a vITS is created, or when the
-> + * vgic is initialized. This relies on kvm->lock to be
-> + * held. In both cases, the number of vcpus should now be
-> + * fixed.
-> + */
-> +int vgic_v4_init(struct kvm *kvm)
+> +static inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
 > +{
-> +	struct vgic_dist *dist = &kvm->arch.vgic;
-> +	struct kvm_vcpu *vcpu;
-> +	int i, nr_vcpus, ret;
-> +
-> +	if (dist->its_vm.vpes)
-> +		return 0;
-> +
-> +	nr_vcpus = atomic_read(&kvm->online_vcpus);
-> +
-> +	dist->its_vm.vpes = kzalloc(sizeof(*dist->its_vm.vpes) * nr_vcpus,
-> +				    GFP_KERNEL);
-> +	if (!dist->its_vm.vpes)
-> +		return -ENOMEM;
-> +
-> +	dist->its_vm.nr_vpes = nr_vcpus;
-> +
-> +	kvm_for_each_vcpu(i, vcpu, kvm)
-> +		dist->its_vm.vpes[i] = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
-> +
-> +	ret = its_alloc_vcpu_irqs(&dist->its_vm);
-> +	if (ret < 0) {
-> +		kvm_err("VPE IRQ allocation failure\n");
-> +		kfree(dist->its_vm.vpes);
-> +		dist->its_vm.nr_vpes = 0;
-> +		dist->its_vm.vpes = NULL;
-> +		return ret;
-nit: not requested
+> +	return (!(vcpu->arch.hcr_el2 & HCR_RW));
 
-Thanks
+nit: no need for the outer ().
 
-Eric
-> +	}
-> +
-> +	return ret;
 > +}
 > +
-> +/**
-> + * vgic_v4_teardown - Free the GICv4 data structures
-> + * @kvm:	Pointer to the VM being destroyed
-> + *
-> + * Relies on kvm->lock to be held.
-> + */
-> +void vgic_v4_teardown(struct kvm *kvm)
+>  static inline unsigned long *vcpu_pc(const struct kvm_vcpu *vcpu)
+>  {
+>  	return (unsigned long *)&vcpu_gp_regs(vcpu)->regs.pc;
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 7d3bfa7..5e09eb9 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -210,6 +210,9 @@ struct kvm_vcpu_arch {
+>  	/* Guest debug state */
+>  	u64 debug_flags;
+>  
+> +	/* 1 if the guest VFP state is loaded into the hardware */
+> +	u64 guest_vfp_loaded;
+> +
+
+Is there a chance we'll want other flags like this? Should we just make
+this a lazy state flags field with the (currently only) flag VFP? If not,
+then a bool would be nicer, although I see below the u64 was chosen in
+order for the 'str' to be used.
+
+>  	/*
+>  	 * We maintain more than a single set of debug registers to support
+>  	 * debugging the guest from the host and to maintain separate host and
+> diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
+> index 612021d..9946732 100644
+> --- a/arch/arm64/kernel/asm-offsets.c
+> +++ b/arch/arm64/kernel/asm-offsets.c
+> @@ -133,6 +133,7 @@ int main(void)
+>    DEFINE(CPU_GP_REGS,		offsetof(struct kvm_cpu_context, gp_regs));
+>    DEFINE(CPU_USER_PT_REGS,	offsetof(struct kvm_regs, regs));
+>    DEFINE(CPU_FP_REGS,		offsetof(struct kvm_regs, fp_regs));
+> +  DEFINE(VCPU_GUEST_VFP_LOADED,	offsetof(struct kvm_vcpu, arch.guest_vfp_loaded));
+>    DEFINE(VCPU_FPEXC32_EL2,	offsetof(struct kvm_vcpu, arch.ctxt.sys_regs[FPEXC32_EL2]));
+>    DEFINE(VCPU_HOST_CONTEXT,	offsetof(struct kvm_vcpu, arch.host_cpu_context));
+>    DEFINE(HOST_CONTEXT_VCPU,	offsetof(struct kvm_cpu_context, __hyp_running_vcpu));
+> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+> index 76cd48f..b3e7191 100644
+> --- a/arch/arm64/kvm/hyp/entry.S
+> +++ b/arch/arm64/kvm/hyp/entry.S
+> @@ -185,6 +185,9 @@ alternative_endif
+>  	add	x0, x2, #CPU_GP_REG_OFFSET(CPU_FP_REGS)
+>  	bl	__fpsimd_restore_state
+>  
+> +	mov	x0, #1
+> +	str	x0, [x3, #VCPU_GUEST_VFP_LOADED]
+> +
+>  	// Skip restoring fpexc32 for AArch64 guests
+>  	mrs	x1, hcr_el2
+>  	tbnz	x1, #HCR_RW_SHIFT, 1f
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index 7703d63..ef05c59 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -23,43 +23,31 @@
+>  #include <asm/kvm_hyp.h>
+>  #include <asm/fpsimd.h>
+>  
+> -static bool __hyp_text __fpsimd_enabled_nvhe(void)
+> -{
+> -	return !(read_sysreg(cptr_el2) & CPTR_EL2_TFP);
+> -}
+> -
+> -static bool __hyp_text __fpsimd_enabled_vhe(void)
+> -{
+> -	return !!(read_sysreg(cpacr_el1) & CPACR_EL1_FPEN);
+> -}
+> -
+> -static hyp_alternate_select(__fpsimd_is_enabled,
+> -			    __fpsimd_enabled_nvhe, __fpsimd_enabled_vhe,
+> -			    ARM64_HAS_VIRT_HOST_EXTN);
+> -
+> -bool __hyp_text __fpsimd_enabled(void)
+> -{
+> -	return __fpsimd_is_enabled()();
+> -}
+> -
+> -static void __hyp_text __activate_traps_vhe(void)
+> +static void __hyp_text __activate_traps_vhe(struct kvm_vcpu *vcpu)
+>  {
+>  	u64 val;
+>  
+>  	val = read_sysreg(cpacr_el1);
+>  	val |= CPACR_EL1_TTA;
+> -	val &= ~CPACR_EL1_FPEN;
+> +	if (vcpu->arch.guest_vfp_loaded)
+> +		val |= CPACR_EL1_FPEN;
+> +	else
+> +		val &= ~CPACR_EL1_FPEN;
+>  	write_sysreg(val, cpacr_el1);
+>  
+>  	write_sysreg(__kvm_hyp_vector, vbar_el1);
+>  }
+>  
+> -static void __hyp_text __activate_traps_nvhe(void)
+> +static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
+>  {
+>  	u64 val;
+>  
+>  	val = CPTR_EL2_DEFAULT;
+> -	val |= CPTR_EL2_TTA | CPTR_EL2_TFP;
+> +	val |= CPTR_EL2_TTA;
+> +	if (vcpu->arch.guest_vfp_loaded)
+> +		val &= ~CPTR_EL2_TFP;
+> +	else
+> +		val |= CPTR_EL2_TFP;
+>  	write_sysreg(val, cptr_el2);
+>  }
+>  
+> @@ -81,7 +69,8 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+>  	 * it will cause an exception.
+>  	 */
+>  	val = vcpu->arch.hcr_el2;
+> -	if (!(val & HCR_RW) && system_supports_fpsimd()) {
+> +	if (vcpu_el1_is_32bit(vcpu) && system_supports_fpsimd() &&
+> +	    !vcpu->arch.guest_vfp_loaded) {
+>  		write_sysreg(1 << 30, fpexc32_el2);
+>  		isb();
+>  	}
+> @@ -97,7 +86,7 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+>  	write_sysreg(0, pmselr_el0);
+>  	write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
+>  	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+> -	__activate_traps_arch()();
+> +	__activate_traps_arch()(vcpu);
+>  }
+>  
+>  static void __hyp_text __deactivate_traps_vhe(void)
+> @@ -273,7 +262,6 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_cpu_context *host_ctxt;
+>  	struct kvm_cpu_context *guest_ctxt;
+> -	bool fp_enabled;
+>  	u64 exit_code;
+>  
+>  	vcpu = kern_hyp_va(vcpu);
+> @@ -355,8 +343,6 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  		/* 0 falls through to be handled out of EL2 */
+>  	}
+>  
+> -	fp_enabled = __fpsimd_enabled();
+> -
+>  	__sysreg_save_guest_state(guest_ctxt);
+>  	__sysreg32_save_state(vcpu);
+>  	__timer_disable_traps(vcpu);
+> @@ -367,11 +353,6 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  
+>  	__sysreg_restore_host_state(host_ctxt);
+>  
+> -	if (fp_enabled) {
+> -		__fpsimd_save_state(&guest_ctxt->gp_regs.fp_regs);
+> -		__fpsimd_restore_state(&host_ctxt->gp_regs.fp_regs);
+> -	}
+> -
+>  	__debug_save_state(vcpu, kern_hyp_va(vcpu->arch.debug_ptr), guest_ctxt);
+>  	/*
+>  	 * This must come after restoring the host sysregs, since a non-VHE
+> diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+> index b7438c8..c4a3714 100644
+> --- a/arch/arm64/kvm/hyp/sysreg-sr.c
+> +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+> @@ -19,6 +19,7 @@
+>  #include <linux/kvm_host.h>
+>  
+>  #include <asm/kvm_asm.h>
+> +#include <asm/kvm_emulate.h>
+>  #include <asm/kvm_hyp.h>
+>  
+>  /* Yes, this does nothing, on purpose */
+> @@ -137,6 +138,11 @@ void __hyp_text __sysreg_restore_guest_state(struct kvm_cpu_context *ctxt)
+>  	__sysreg_restore_common_state(ctxt);
+>  }
+>  
+> +static void __hyp_text __fpsimd32_save_state(struct kvm_cpu_context *ctxt)
 > +{
-> +	struct its_vm *its_vm = &kvm->arch.vgic.its_vm;
-> +
-> +	if (!its_vm->vpes)
-> +		return;
-> +
-> +	its_free_vcpu_irqs(its_vm);
-> +	kfree(its_vm->vpes);
-> +	its_vm->nr_vpes = 0;
-> +	its_vm->vpes = NULL;
+> +	ctxt->sys_regs[FPEXC32_EL2] = read_sysreg(fpexc32_el2);
 > +}
-> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-> index e67ccb6a6250..c4105f613f57 100644
-> --- a/virt/kvm/arm/vgic/vgic.h
-> +++ b/virt/kvm/arm/vgic/vgic.h
-> @@ -241,5 +241,7 @@ int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
->  struct vgic_its *vgic_msi_to_its(struct kvm *kvm, struct kvm_msi *msi);
+> +
+>  void __hyp_text __sysreg32_save_state(struct kvm_vcpu *vcpu)
+>  {
+>  	u64 *spsr, *sysreg;
+> @@ -155,9 +161,6 @@ void __hyp_text __sysreg32_save_state(struct kvm_vcpu *vcpu)
+>  	sysreg[DACR32_EL2] = read_sysreg(dacr32_el2);
+>  	sysreg[IFSR32_EL2] = read_sysreg(ifsr32_el2);
 >  
->  bool vgic_supports_direct_msis(struct kvm *kvm);
-> +int vgic_v4_init(struct kvm *kvm);
-> +void vgic_v4_teardown(struct kvm *kvm);
->  
->  #endif
-> 
+> -	if (__fpsimd_enabled())
+> -		sysreg[FPEXC32_EL2] = read_sysreg(fpexc32_el2);
+> -
+>  	if (vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY)
+>  		sysreg[DBGVCR32_EL2] = read_sysreg(dbgvcr32_el2);
+>  }
+> @@ -209,4 +212,16 @@ void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu)
+>   */
+>  void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu)
+>  {
+> +	struct kvm_cpu_context *host_ctxt = vcpu->arch.host_cpu_context;
+> +	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
+> +
+> +	/* Restore host FP/SIMD state */
+> +	if (vcpu->arch.guest_vfp_loaded) {
+> +		if (vcpu_el1_is_32bit(vcpu))
+> +			kvm_call_hyp(__fpsimd32_save_state,
+> +				     kern_hyp_va(guest_ctxt));
+
+nit: might be nice to use {} since we need two lines.
+
+> +		__fpsimd_save_state(&guest_ctxt->gp_regs.fp_regs);
+> +		__fpsimd_restore_state(&host_ctxt->gp_regs.fp_regs);
+> +		vcpu->arch.guest_vfp_loaded = 0;
+> +	}
+>  }
+> -- 
+> 2.9.0
+>
+
+Otherwise,
+
+Reviewed-by: Andrew Jones <drjones@redhat.com>
