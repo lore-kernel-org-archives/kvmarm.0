@@ -1,100 +1,102 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 21/26] KVM: arm/arm64: vgic-its: New helper functions to free the caches
-Date: Tue,  7 Nov 2017 11:47:54 +0100
-Message-ID: <20171107104800.30021-22-christoffer.dall@linaro.org>
+Subject: [PULL 15/26] KVM: arm/arm64: Move phys_timer_emulate function
+Date: Tue,  7 Nov 2017 11:47:48 +0100
+Message-ID: <20171107104800.30021-16-christoffer.dall@linaro.org>
 References: <20171107104800.30021-1-christoffer.dall@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A7DCD49D8C
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Nov 2017 05:46:47 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id B81K8hAlbENy for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Nov 2017 05:46:42 -0500 (EST)
+Received: from mail-wm0-f67.google.com (mail-wm0-f67.google.com [74.125.82.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AE45C49D79
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Nov 2017 05:46:37 -0500 (EST)
+Received: by mail-wm0-f67.google.com with SMTP id r68so12478751wmr.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Nov 2017 02:48:32 -0800 (PST)
 In-Reply-To: <20171107104800.30021-1-christoffer.dall@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, wanghaibin <wanghaibin.wang@huawei.com>, Eric Auger <eric.auger@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: wanghaibin <wanghaibin.wang@huawei.com>
+From: Christoffer Dall <cdall@linaro.org>
 
-We create two new functions that free the device and
-collection lists. They are currently called by vgic_its_destroy()
-and other callers will be added in subsequent patches.
+We are about to call phys_timer_emulate() from kvm_timer_update_state()
+and modify phys_timer_emulate() at the same time.  Moving the function
+and modifying it in a single patch makes the diff hard to read, so do
+this separately first.
 
-We also remove the check on its->device_list.next.
-Lists are initialized in vgic_create_its() and the device
-is added to the device list only if this latter succeeds.
+No functional change.
 
-vgic_its_destroy is the device destroy ops. This latter is called
-by kvm_destroy_devices() which loops on all created devices. So
-at this point the list is initialized.
-
+Signed-off-by: Christoffer Dall <cdall@linaro.org>
 Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/vgic/vgic-its.c | 41 ++++++++++++++++++++---------------------
- 1 file changed, 20 insertions(+), 21 deletions(-)
+ virt/kvm/arm/arch_timer.c | 32 ++++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 75c18183eee3..d46256c07ba5 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -913,6 +913,24 @@ static void vgic_its_free_device(struct kvm *kvm, struct its_device *device)
- 	kfree(device);
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index d1a6fb12121f..7f4f12d48a1a 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -255,6 +255,22 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+ 	}
  }
  
-+/* its lock must be held */
-+static void vgic_its_free_device_list(struct kvm *kvm, struct vgic_its *its)
++/* Schedule the background timer for the emulated timer. */
++static void phys_timer_emulate(struct kvm_vcpu *vcpu,
++			      struct arch_timer_context *timer_ctx)
 +{
-+	struct its_device *cur, *temp;
++	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
 +
-+	list_for_each_entry_safe(cur, temp, &its->device_list, dev_list)
-+		vgic_its_free_device(kvm, cur);
++	if (kvm_timer_should_fire(timer_ctx))
++		return;
++
++	if (!kvm_timer_irq_can_fire(timer_ctx))
++		return;
++
++	/*  The timer has not yet expired, schedule a background timer */
++	soft_timer_start(&timer->phys_timer, kvm_timer_compute_delta(timer_ctx));
 +}
 +
-+/* its lock must be held */
-+static void vgic_its_free_collection_list(struct kvm *kvm, struct vgic_its *its)
-+{
-+	struct its_collection *cur, *temp;
-+
-+	list_for_each_entry_safe(cur, temp, &its->collection_list, coll_list)
-+		vgic_its_free_collection(its, cur->collection_id);
-+}
-+
- /* Must be called with its_lock mutex held */
- static struct its_device *vgic_its_alloc_device(struct vgic_its *its,
- 						u32 device_id, gpa_t itt_addr,
-@@ -1619,32 +1637,13 @@ static void vgic_its_destroy(struct kvm_device *kvm_dev)
- {
- 	struct kvm *kvm = kvm_dev->kvm;
- 	struct vgic_its *its = kvm_dev->private;
--	struct list_head *cur, *temp;
+ /*
+  * Check if there was a change in the timer state (should we raise or lower
+  * the line level to the GIC).
+@@ -281,22 +297,6 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
+ 		kvm_timer_update_irq(vcpu, !ptimer->irq.level, ptimer);
+ }
+ 
+-/* Schedule the background timer for the emulated timer. */
+-static void phys_timer_emulate(struct kvm_vcpu *vcpu,
+-			      struct arch_timer_context *timer_ctx)
+-{
+-	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
 -
--	/*
--	 * We may end up here without the lists ever having been initialized.
--	 * Check this and bail out early to avoid dereferencing a NULL pointer.
--	 */
--	if (!its->device_list.next)
+-	if (kvm_timer_should_fire(timer_ctx))
 -		return;
- 
- 	mutex_lock(&its->its_lock);
--	list_for_each_safe(cur, temp, &its->device_list) {
--		struct its_device *dev;
- 
--		dev = list_entry(cur, struct its_device, dev_list);
--		vgic_its_free_device(kvm, dev);
--	}
 -
--	list_for_each_safe(cur, temp, &its->collection_list) {
--		struct its_collection *coll;
-+	vgic_its_free_device_list(kvm, its);
-+	vgic_its_free_collection_list(kvm, its);
- 
--		coll = list_entry(cur, struct its_collection, coll_list);
--		list_del(cur);
--		kfree(coll);
--	}
- 	mutex_unlock(&its->its_lock);
+-	if (!kvm_timer_irq_can_fire(timer_ctx))
+-		return;
 -
- 	kfree(its);
- }
- 
+-	/*  The timer has not yet expired, schedule a background timer */
+-	soft_timer_start(&timer->phys_timer, kvm_timer_compute_delta(timer_ctx));
+-}
+-
+ static void vtimer_save_state(struct kvm_vcpu *vcpu)
+ {
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
 -- 
 2.14.2
