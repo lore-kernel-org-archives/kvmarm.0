@@ -1,53 +1,70 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v5 23/26] KVM: arm/arm64: GICv4: Prevent a VM using GICv4
- from being saved
-Date: Tue, 7 Nov 2017 17:12:12 +0100
-Message-ID: <77d479e5-98f9-9081-a3a6-87bef1009775@redhat.com>
-References: <20171027142855.21584-1-marc.zyngier@arm.com>
- <20171027142855.21584-24-marc.zyngier@arm.com>
- <1f75a11a-41c3-71b8-6abf-4aa2962e348e@redhat.com>
- <9c1e1c92-e0fa-737f-63ab-a335b93af6da@arm.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH 15/37] KVM: arm64: Don't deactivate VM on VHE systems
+Date: Tue, 7 Nov 2017 17:14:50 +0100
+Message-ID: <20171107161450.akn7yspt4ebxynjy@kamzik.brq.redhat.com>
+References: <20171012104141.26902-1-christoffer.dall@linaro.org>
+ <20171012104141.26902-16-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <9c1e1c92-e0fa-737f-63ab-a335b93af6da@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Mark Rutland <mark.rutland@arm.com>, Andre Przywara <Andre.Przywara@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Christoffer Dall <christoffer.dall@linaro.org>, Shanker Donthineni <shankerd@codeaurora.org>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20171012104141.26902-16-christoffer.dall@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
+On Thu, Oct 12, 2017 at 12:41:19PM +0200, Christoffer Dall wrote:
+> There is no need to reset the VTTBR to zero when exiting the guest on
+> VHE systems.  VHE systems don't use stage 2 translations for the EL2&0
+> translation regime used by the host.
+> 
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> ---
+>  arch/arm64/kvm/hyp/switch.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index b72dc66..2cedf12 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -136,13 +136,13 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
+>  	write_sysreg(0, pmuserenr_el0);
+>  }
+>  
+> -static void __hyp_text __activate_vm(struct kvm_vcpu *vcpu)
+> +static inline void __hyp_text __activate_vm(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
 
-On 07/11/2017 16:38, Marc Zyngier wrote:
-> On 07/11/17 15:24, Auger Eric wrote:
->> Hi Marc,
->>
->> Hi Marc,
->> On 27/10/2017 16:28, Marc Zyngier wrote:
->>> The GICv4 architecture doesn't make it easy for save/restore to
->>> work, as it doesn't give any guarantee that the pending state
->>> is written into the pending table.
->>
->> I don't understand where does the limitation exactly come from. Can't we
->> use the GICR_VPENDBASER table data?
-> You can't. None of the tables that are written by either the ITS or the
-> redistributors are architected. All you know is that there is one bit
-> per vLPI, but that's it (you don't even know which one is which).
-Oh I thought the redistributor config and pending tables were fully
-specified (6.1.2 and 6.1.3 of the spec), except the 1kB of the pending
-table.
-> 
-> But that's not a big deal. I don't think you can realistically migrate a
-> VM that has a directly assigned device anyway. Or can we?
-No we can't except for mediated devices for which migration can be
-supported.
+Hmm, should we change __activate_vm to take a kvm pointer instead of a
+vcpu, and then call the function from the VHE kvm_vcpu_run normally, but
+from the non-VHE kvm_vcpu_run with kern_hyp_va(vcpu->kvm)? I only ask,
+because it appears to be the last kern_hyp_va() that VHE code would still
+invoke, at least considering the code in arch/arm64/kvm/hyp/switch.c
 
-Thanks
+>  	write_sysreg(kvm->arch.vttbr, vttbr_el2);
+>  }
+>  
+> -static void __hyp_text __deactivate_vm(struct kvm_vcpu *vcpu)
+> +static inline void __hyp_text __deactivate_vm(struct kvm_vcpu *vcpu)
 
-Eric
+Adding these 'inline' attributes is unrelated to this patch, and probably
+unnecessary, as the compiler probably knew to do so anyway, but whatever.
+
+>  {
+>  	write_sysreg(0, vttbr_el2);
+>  }
+> @@ -360,7 +360,6 @@ int kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  	__vgic_save_state(vcpu);
+>  
+>  	__deactivate_traps(vcpu);
+> -	__deactivate_vm(vcpu);
+>  
+>  	__sysreg_restore_host_state(host_ctxt);
+>  
+> -- 
+> 2.9.0
 > 
-> Thanks,
-> 
-> 	M.
-> 
+
+Reviewed-by: Andrew Jones <drjones@redhat.com>
