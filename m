@@ -1,18 +1,36 @@
 From: Auger Eric <eric.auger@redhat.com>
 Subject: Re: [PATCH v5 09/26] KVM: arm/arm64: GICv4: Add init/teardown of the
  per-VM vPE irq domain
-Date: Tue, 7 Nov 2017 14:08:23 +0100
-Message-ID: <4a41a67d-a04b-b3ca-a5e8-c582e27c17d1@redhat.com>
+Date: Tue, 7 Nov 2017 14:09:51 +0100
+Message-ID: <29cf6620-5dd4-2f8f-790a-8b77092ef39d@redhat.com>
 References: <20171027142855.21584-1-marc.zyngier@arm.com>
  <20171027142855.21584-10-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BAC6649D2B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Nov 2017 08:08:02 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id zlR8nmIKrFds for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Nov 2017 08:08:01 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 639D549D28
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Nov 2017 08:08:01 -0500 (EST)
 In-Reply-To: <20171027142855.21584-10-marc.zyngier@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Shanker Donthineni <shankerd@codeaurora.org>, Mark Rutland <mark.rutland@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Andre Przywara <Andre.Przywara@arm.com>
+Cc: Andre Przywara <Andre.Przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi Marc,
@@ -148,12 +166,10 @@ On 27/10/2017 16:28, Marc Zyngier wrote:
 >  		return -ENOMEM;
 >  
 > +	if (vgic_initialized(dev->kvm)) {
-Don't we need to test vgic_supports_direct_msis() on this path too?
-
-Thanks
-
-Eric
 > +		int ret = vgic_v4_init(dev->kvm);
+
+If you respin I forgot 2 nits below:
+nit: line to be added
 > +		if (ret) {
 > +			kfree(its);
 > +			return ret;
@@ -229,6 +245,11 @@ Eric
 > +		dist->its_vm.nr_vpes = 0;
 > +		dist->its_vm.vpes = NULL;
 > +		return ret;
+nit: not requested
+
+Thanks
+
+Eric
 > +	}
 > +
 > +	return ret;
