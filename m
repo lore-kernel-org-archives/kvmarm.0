@@ -1,56 +1,44 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v5 16/26] KVM: arm/arm64: GICv4: Propagate property
- updates to VLPIs
-Date: Wed, 8 Nov 2017 15:08:36 +0000
-Message-ID: <49bff080-0908-cc7a-7036-543f963180a5@arm.com>
-References: <20171027142855.21584-1-marc.zyngier@arm.com>
- <20171027142855.21584-17-marc.zyngier@arm.com>
- <6763d90f-93bf-ddbb-d456-5979b8870aa2@redhat.com>
+From: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+Subject: Re: [PATCH 15/13] firmware: arm_sdei: move the frozen flag under
+ the spinlock
+Date: Wed, 08 Nov 2017 15:11:26 +0000
+Message-ID: <5A031E9E.2090809@arm.com>
+References: <20171017174432.1684-1-james.morse@arm.com> <20171101155941.19432-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <6763d90f-93bf-ddbb-d456-5979b8870aa2@redhat.com>
-Content-Language: en-GB
-Sender: linux-kernel-owner@vger.kernel.org
-To: Auger Eric <eric.auger@redhat.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Mark Rutland <mark.rutland@arm.com>, Christoffer Dall <cdall@linaro.org>, Andre Przywara <Andre.Przywara@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Christoffer Dall <christoffer.dall@linaro.org>, Shanker Donthineni <shankerd@codeaurora.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20171101155941.19432-1-james.morse-5wv7dgnIgG8@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+Cc: devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Lorenzo Pieralisi <lorenzo.pieralisi-5wv7dgnIgG8@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Loc Ho <lho-qTEPVZfXA3Y@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 07/11/17 21:28, Auger Eric wrote:
-> Hi Marc,
+On 01/11/17 15:59, James Morse wrote:
+> dpm_suspend() calls the freeze/thaw callbacks for hibernate before
+> disable_non_bootcpus() takes down secondaries.
 > 
-> On 27/10/2017 16:28, Marc Zyngier wrote:
->> Upon updating a property, we propagate it all the way to the physical
->> ITS, and ask for an INV command to be executed there.
->>
->> Acked-by: Christoffer Dall <cdall@linaro.org>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  virt/kvm/arm/vgic/vgic-its.c | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->> index 0b7e648e7a0c..2e77c7c83942 100644
->> --- a/virt/kvm/arm/vgic/vgic-its.c
->> +++ b/virt/kvm/arm/vgic/vgic-its.c
->> @@ -296,6 +296,9 @@ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
->>  		spin_unlock(&irq->irq_lock);
->>  	}
->>  
->> +	if (irq->hw)
->> +		return its_prop_update_vlpi(irq->host_irq, prop, true);
->> +
->>  	return 0;
->>  }
-> I am confused by the vgic_queue_irq_unlock() on the "hw" path. Why is it
-> needed in hw mode?
+> This leads to a fun race where the freeze/thaw callbacks reset the
+> SDEI interface (as we may be restoring a kernel with a different
+> layout due to KASLR), then the cpu-hotplug callbacks come in to
+> save the current state, which has already been reset.
+> 
+> We solve this with a 'frozen' flag that stops the hotplug callback
+> from overwriting the saved values.
+> 
+> This patch moves the flag under the 'events' spinlock we take
+> in the hotplug callbacks, to avoid depending on cpu-hotplug's
+> mechanics to ensure the callback sees the correct value.
 
-It's not. I guess we could bypass this altogether and take a short cut
-after having updated the priority and enabled fields.
+Scratch this. All this has really done is moved the race around. Will had a much
+better suggestion that makes it look like all the CPUs are down. That makes
+hotplug and power-management behave the same.
+
 
 Thanks,
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+James
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
