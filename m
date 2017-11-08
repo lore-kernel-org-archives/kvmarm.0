@@ -1,78 +1,69 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v5 13/26] KVM: arm/arm64: GICv4: Propagate affinity
- changes to the physical ITS
-Date: Wed, 8 Nov 2017 12:05:21 +0000
-Message-ID: <cc8aac2e-3b13-b6e4-97de-ecf16bbf6283@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v5 12/26] KVM: arm/arm64: GICv4: Unmap VLPI when freeing
+ an LPI
+Date: Wed, 8 Nov 2017 15:14:03 +0100
+Message-ID: <1da6c685-28f0-ae5c-b47c-738730d2faa9@redhat.com>
 References: <20171027142855.21584-1-marc.zyngier@arm.com>
- <20171027142855.21584-14-marc.zyngier@arm.com>
- <52c64fa1-f662-2703-53c5-d2024ef12254@redhat.com>
+ <20171027142855.21584-13-marc.zyngier@arm.com>
+ <052a6676-c15a-6d91-da1e-660312c29f1b@redhat.com>
+ <aa3f7570-d200-d138-2a45-798d9d051274@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <52c64fa1-f662-2703-53c5-d2024ef12254@redhat.com>
-Content-Language: en-GB
+In-Reply-To: <aa3f7570-d200-d138-2a45-798d9d051274@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Auger Eric <eric.auger@redhat.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Mark Rutland <mark.rutland@arm.com>, Andre Przywara <Andre.Przywara@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Christoffer Dall <christoffer.dall@linaro.org>, Shanker Donthineni <shankerd@codeaurora.org>
+To: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Shanker Donthineni <shankerd@codeaurora.org>, Mark Rutland <mark.rutland@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Andre Przywara <Andre.Przywara@arm.com>, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 07/11/17 21:01, Auger Eric wrote:
-> Hi Marc,
+Hi,
+
+On 08/11/2017 12:52, Marc Zyngier wrote:
+> On 07/11/17 20:28, Auger Eric wrote:
+>> Hi Marc,
+>>
+>> On 27/10/2017 16:28, Marc Zyngier wrote:
+>>> When freeing an LPI (on a DISCARD command, for example), we need
+>>> to unmap the VLPI down to the physical ITS level.
+>>>
+>>> Acked-by: Christoffer Dall <cdall@linaro.org>
+>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>>> ---
+>>>  virt/kvm/arm/vgic/vgic-its.c | 6 +++++-
+>>>  1 file changed, 5 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+>>> index b2a678d131d0..c9b1c0967426 100644
+>>> --- a/virt/kvm/arm/vgic/vgic-its.c
+>>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+>>> @@ -628,8 +628,12 @@ static void its_free_ite(struct kvm *kvm, struct its_ite *ite)
+>>>  	list_del(&ite->ite_list);
+>>>  
+>>>  	/* This put matches the get in vgic_add_lpi. */
+>>> -	if (ite->irq)
+>>> +	if (ite->irq) {
+>>> +		if (ite->irq->hw)
+>>> +			WARN_ON(its_unmap_vlpi(ite->irq->host_irq));
+>>> +
+>>>  		vgic_put_irq(kvm, ite->irq);
+>> You could have put the its_unmap_vlpi() directly in vgic_put_irq which
+>> is meant to decr the ref/release the LPI irq.
 > 
-> On 27/10/2017 16:28, Marc Zyngier wrote:
->> When the guest issues an affinity change, we need to tell the physical
->> ITS that we're now targetting a new vcpu.  This is done by extracting
->> the current mapping, updating the target, and reapplying the mapping.
->>
->> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  virt/kvm/arm/vgic/vgic-its.c | 16 +++++++++++++++-
->>  1 file changed, 15 insertions(+), 1 deletion(-)
->>
->> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->> index c9b1c0967426..42ffb9084bb7 100644
->> --- a/virt/kvm/arm/vgic/vgic-its.c
->> +++ b/virt/kvm/arm/vgic/vgic-its.c
->> @@ -337,11 +337,25 @@ static int vgic_copy_lpi_list(struct kvm_vcpu *vcpu, u32 **intid_ptr)
->>  
->>  static int update_affinity(struct vgic_irq *irq, struct kvm_vcpu *vcpu)
->>  {
->> +	int ret = 0;
->> +
->>  	spin_lock(&irq->irq_lock);
->>  	irq->target_vcpu = vcpu;
->>  	spin_unlock(&irq->irq_lock);
->>  
->> -	return 0;
->> +	if (irq->hw) {
->> +		struct its_vlpi_map map;
->> +
->> +		ret = its_get_vlpi(irq->host_irq, &map);
->> +		if (ret)
->> +			return ret;
->> +
->> +		map.vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
->> +
->> +		ret = its_map_vlpi(irq->host_irq, &map);
-> Do we check somewhere the virtual LPI ID does not exceed the capacity of
-> the VPT. I fail to find that in the irq-gic-v3-its.c driver.
+> Do you see this as an issue?
 
-The worse case is that we end-up with a VMAPVI that silently fails, and
-the guest doesn't gets its interrupts. The real issue here is that we
-don't expose the size of the VPT allocation to the guest. I'll see how
-to address this.
+not really. I just thought it would be nicer in vgic_put_irq but that's
+a detail.
 
-> Also in case the hw part fails, should we still have the irq->target_cpu
-> set to the new value. In other words shouldn't we first do the hw block
-> and upon success set the target_vcpu?
+Thanks
 
-Sure. But given that we'll never use target_vcpu for anything either (we
-keep the vlpi mapped), I'm not sure what this gets us...
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Eric
+> 
+> I'm trying hard to keep the GICv4 changes local to the ITS code, and not
+> spread it everywhere in the vgic, but I'll happily change it if you spot
+> something that seems wrong.
+> 
+> Thanks,
+> 
+> 	M.
+> 
