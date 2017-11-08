@@ -1,44 +1,62 @@
-From: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
-Subject: Re: [PATCH 15/13] firmware: arm_sdei: move the frozen flag under
- the spinlock
-Date: Wed, 08 Nov 2017 15:11:26 +0000
-Message-ID: <5A031E9E.2090809@arm.com>
-References: <20171017174432.1684-1-james.morse@arm.com> <20171101155941.19432-1-james.morse@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v5 25/26] KVM: arm/arm64: GICv4: Enable VLPI support
+Date: Wed, 8 Nov 2017 15:14:39 +0000
+Message-ID: <ba1b912b-e15b-1c76-f8e7-b9f7c5d6dc38@arm.com>
+References: <20171027142855.21584-1-marc.zyngier@arm.com>
+ <20171027142855.21584-26-marc.zyngier@arm.com>
+ <2d20a22e-214d-3835-7f61-29fc5e88413a@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171101155941.19432-1-james.morse-5wv7dgnIgG8@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-Cc: devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Lorenzo Pieralisi <lorenzo.pieralisi-5wv7dgnIgG8@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Loc Ho <lho-qTEPVZfXA3Y@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1535C49D55
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Nov 2017 10:12:47 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id o+4rQJTqCbvk for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Nov 2017 10:12:45 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D990F40418
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Nov 2017 10:12:45 -0500 (EST)
+In-Reply-To: <2d20a22e-214d-3835-7f61-29fc5e88413a@redhat.com>
+Content-Language: en-GB
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Auger Eric <eric.auger@redhat.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Christoffer Dall <cdall@linaro.org>, Andre Przywara <Andre.Przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 01/11/17 15:59, James Morse wrote:
-> dpm_suspend() calls the freeze/thaw callbacks for hibernate before
-> disable_non_bootcpus() takes down secondaries.
+On 08/11/17 08:44, Auger Eric wrote:
+> Hi Marc,
 > 
-> This leads to a fun race where the freeze/thaw callbacks reset the
-> SDEI interface (as we may be restoring a kernel with a different
-> layout due to KASLR), then the cpu-hotplug callbacks come in to
-> save the current state, which has already been reset.
+> On 27/10/2017 16:28, Marc Zyngier wrote:
+>> All it takes is the has_v4 flag to be set in gic_kvm_info
+>> as well as "kvm-arm.vgic_v4_enable=1" being passed on the
+>> command line for GICv4 to be enabled in KVM.
 > 
-> We solve this with a 'frozen' flag that stops the hotplug callback
-> from overwriting the saved values.
-> 
-> This patch moves the flag under the 'events' spinlock we take
-> in the hotplug callbacks, to avoid depending on cpu-hotplug's
-> mechanics to ensure the callback sees the correct value.
+> What did you motivate your choice of having an enable option instead of
+> a disable option?
 
-Scratch this. All this has really done is moved the race around. Will had a much
-better suggestion that makes it look like all the CPUs are down. That makes
-hotplug and power-management behave the same.
+Currently, SW MSI injection works really well. It's been validated,
+plenty of people are using it. On the other hand, GICv4 is new and
+probably buggy. I only know of 2 other people having tried it. I'm also
+not sure it gives the best possible performance in the general use case
+(oversubscribed host with freely migrating vcpus).
 
+Given that, I'm not keen on making it the default. But if you can report
+that it is better and more reliable than SW injection, I'll switch the
+default the other way around! ;-)
 
 Thanks,
 
-James
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+	M.
+-- 
+Jazz is not dead. It just smells funny...
