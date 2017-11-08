@@ -1,141 +1,79 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH 17/37] KVM: arm64: Move userspace system registers into
- separate function
-Date: Wed, 8 Nov 2017 10:32:30 +0100
-Message-ID: <20171108093230.kusus6zsrf5jbkr6@kamzik.brq.redhat.com>
-References: <20171012104141.26902-1-christoffer.dall@linaro.org>
- <20171012104141.26902-18-christoffer.dall@linaro.org>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v5 23/26] KVM: arm/arm64: GICv4: Prevent a VM using GICv4
+ from being saved
+Date: Wed, 8 Nov 2017 10:35:14 +0100
+Message-ID: <c5640b41-62fd-0f16-1907-bc053f649ea5@redhat.com>
+References: <20171027142855.21584-1-marc.zyngier@arm.com>
+ <20171027142855.21584-24-marc.zyngier@arm.com>
+ <1f75a11a-41c3-71b8-6abf-4aa2962e348e@redhat.com>
+ <9c1e1c92-e0fa-737f-63ab-a335b93af6da@arm.com>
+ <77d479e5-98f9-9081-a3a6-87bef1009775@redhat.com>
+ <33f4de5f-004e-6b92-d4f6-651e536dc697@arm.com>
+ <32f1d6ae-4ab5-25e4-587d-9a51fccb955f@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20171012104141.26902-18-christoffer.dall@linaro.org>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <32f1d6ae-4ab5-25e4-587d-9a51fccb955f@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Mark Rutland <mark.rutland@arm.com>, Andre Przywara <Andre.Przywara@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Christoffer Dall <christoffer.dall@linaro.org>, Shanker Donthineni <shankerd@codeaurora.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Oct 12, 2017 at 12:41:21PM +0200, Christoffer Dall wrote:
-> There's a semantic difference between the EL1 registers that control
-> operation of a kernel running in EL1 and EL1 registers that only control
-> userspace execution in EL0.  Since we can defer saving/restoring the
-> latter, move them into their own function.
-> 
-> We also take this chance to rename the function saving/restoring the
-> remaining system register to make it clear this function deals with
-> the EL1 system registers.
-> 
-> No functional change.
-> 
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> ---
->  arch/arm64/kvm/hyp/sysreg-sr.c | 34 +++++++++++++++++++++++-----------
->  1 file changed, 23 insertions(+), 11 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-> index c4a3714..193c2b0 100644
-> --- a/arch/arm64/kvm/hyp/sysreg-sr.c
-> +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-> @@ -34,14 +34,18 @@ static void __hyp_text __sysreg_do_nothing(struct kvm_cpu_context *ctxt) { }
->  
->  static void __hyp_text __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
->  {
-> +	ctxt->sys_regs[MDSCR_EL1]	= read_sysreg(mdscr_el1);
-> +	ctxt->gp_regs.regs.sp		= read_sysreg(sp_el0);
+Hi,
 
-Maybe a comment stating that sp_el0 is here, instead of down in user
-state, because arm64 Linux chooses to use it for the 'current' pointer.
-At least that's why I think it's been promoted to common state, but maybe
-there was a different reason I missed.
+On 07/11/2017 23:24, Auger Eric wrote:
+> Hi
+> 
+> On 07/11/2017 17:34, Marc Zyngier wrote:
+>> On 07/11/17 16:12, Auger Eric wrote:
+>>> Hi Marc,
+>>>
+>>> On 07/11/2017 16:38, Marc Zyngier wrote:
+>>>> On 07/11/17 15:24, Auger Eric wrote:
+>>>>> Hi Marc,
+>>>>>
+>>>>> Hi Marc,
+>>>>> On 27/10/2017 16:28, Marc Zyngier wrote:
+>>>>>> The GICv4 architecture doesn't make it easy for save/restore to
+>>>>>> work, as it doesn't give any guarantee that the pending state
+>>>>>> is written into the pending table.
+>>>>>
+>>>>> I don't understand where does the limitation exactly come from. Can't we
+>>>>> use the GICR_VPENDBASER table data?
+>>>> You can't. None of the tables that are written by either the ITS or the
+>>>> redistributors are architected. All you know is that there is one bit
+>>>> per vLPI, but that's it (you don't even know which one is which).
+>>> Oh I thought the redistributor config and pending tables were fully
+>>> specified (6.1.2 and 6.1.3 of the spec), except the 1kB of the pending
+>>> table.
+>>
+>> The property table is definitely architected. It is a lot less clear for
+>> the pending table. The main issue is that you cannot really know when
+>> the various bits have actually been flushed all the way from the
+>> redistributor caches to memory to be introspected. Yes, it sucks.
+> Oh OK the INV only guarantees the caches are consistent with the LPI
+> config table. Maybe you could clarify the commit message with those details.
+> 
+> So
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-> +}
-> +
-> +static void __hyp_text __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
-> +{
->  	ctxt->sys_regs[ACTLR_EL1]	= read_sysreg(actlr_el1);
->  	ctxt->sys_regs[TPIDR_EL0]	= read_sysreg(tpidr_el0);
->  	ctxt->sys_regs[TPIDRRO_EL0]	= read_sysreg(tpidrro_el0);
-> -	ctxt->sys_regs[MDSCR_EL1]	= read_sysreg(mdscr_el1);
-> -	ctxt->gp_regs.regs.sp		= read_sysreg(sp_el0);
->  }
->  
-> -static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
-> +static void __hyp_text __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
->  {
->  	ctxt->sys_regs[MPIDR_EL1]	= read_sysreg(vmpidr_el2);
->  	ctxt->sys_regs[CSSELR_EL1]	= read_sysreg(csselr_el1);
-> @@ -70,31 +74,37 @@ static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
->  }
->  
->  static hyp_alternate_select(__sysreg_call_save_host_state,
-> -			    __sysreg_save_state, __sysreg_do_nothing,
-> +			    __sysreg_save_el1_state, __sysreg_do_nothing,
->  			    ARM64_HAS_VIRT_HOST_EXTN);
->  
->  void __hyp_text __sysreg_save_host_state(struct kvm_cpu_context *ctxt)
->  {
->  	__sysreg_call_save_host_state()(ctxt);
->  	__sysreg_save_common_state(ctxt);
-> +	__sysreg_save_user_state(ctxt);
->  }
->  
->  void __hyp_text __sysreg_save_guest_state(struct kvm_cpu_context *ctxt)
->  {
-> -	__sysreg_save_state(ctxt);
-> +	__sysreg_save_el1_state(ctxt);
->  	__sysreg_save_common_state(ctxt);
-> +	__sysreg_save_user_state(ctxt);
->  }
->  
->  static void __hyp_text __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
->  {
-> -	write_sysreg(ctxt->sys_regs[ACTLR_EL1],	  actlr_el1);
-> -	write_sysreg(ctxt->sys_regs[TPIDR_EL0],	  tpidr_el0);
-> -	write_sysreg(ctxt->sys_regs[TPIDRRO_EL0], tpidrro_el0);
->  	write_sysreg(ctxt->sys_regs[MDSCR_EL1],	  mdscr_el1);
->  	write_sysreg(ctxt->gp_regs.regs.sp,	  sp_el0);
->  }
->  
-> -static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
-> +static void __hyp_text __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
-> +{
-> +	write_sysreg(ctxt->sys_regs[ACTLR_EL1],	  	actlr_el1);
-> +	write_sysreg(ctxt->sys_regs[TPIDR_EL0],	  	tpidr_el0);
-> +	write_sysreg(ctxt->sys_regs[TPIDRRO_EL0], 	tpidrro_el0);
-> +}
-> +
-> +static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
->  {
->  	write_sysreg(ctxt->sys_regs[MPIDR_EL1],		vmpidr_el2);
->  	write_sysreg(ctxt->sys_regs[CSSELR_EL1],	csselr_el1);
-> @@ -123,19 +133,21 @@ static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
->  }
->  
->  static hyp_alternate_select(__sysreg_call_restore_host_state,
-> -			    __sysreg_restore_state, __sysreg_do_nothing,
-> +			    __sysreg_restore_el1_state, __sysreg_do_nothing,
->  			    ARM64_HAS_VIRT_HOST_EXTN);
->  
->  void __hyp_text __sysreg_restore_host_state(struct kvm_cpu_context *ctxt)
->  {
->  	__sysreg_call_restore_host_state()(ctxt);
->  	__sysreg_restore_common_state(ctxt);
-> +	__sysreg_restore_user_state(ctxt);
->  }
->  
->  void __hyp_text __sysreg_restore_guest_state(struct kvm_cpu_context *ctxt)
->  {
-> -	__sysreg_restore_state(ctxt);
-> +	__sysreg_restore_el1_state(ctxt);
->  	__sysreg_restore_common_state(ctxt);
-> +	__sysreg_restore_user_state(ctxt);
->  }
->  
->  static void __hyp_text __fpsimd32_save_state(struct kvm_cpu_context *ctxt)
-> -- 
-> 2.9.0
->
+Reading the spec further, looks setting the Valid bit of GICR_VPENDBASER
+is supposed  to force the redistributor to retrieve pending interrupts
+from the the VCPU I/F and ensure the VPT in memory is correct.
 
-Otherwise
- 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Anyway that's not a big deal at the moment as you pointed out...
+
+Thanks
+
+Eric
+> 
+> Thanks
+> 
+> Eric
+> 
+>>
+>> Thanks,
+>>
+>> 	M.
+>>
