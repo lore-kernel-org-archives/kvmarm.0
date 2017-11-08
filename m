@@ -1,70 +1,100 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH v5 12/30] arm64/sve: Low-level CPU setup
-Date: Wed, 08 Nov 2017 16:37:51 +0000
-Message-ID: <87efp8rajk.fsf@linaro.org>
-References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com> <1509465082-30427-13-git-send-email-Dave.Martin@arm.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH 21/37] KVM: arm64: Don't save the host ELR_EL2 and
+ SPSR_EL2 on VHE systems
+Date: Wed, 8 Nov 2017 18:03:23 +0100
+Message-ID: <20171108170323.q5ikpwgruos3giay@kamzik.brq.redhat.com>
+References: <20171012104141.26902-1-christoffer.dall@linaro.org>
+ <20171012104141.26902-22-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Return-path: <linux-arch-owner@vger.kernel.org>
-In-reply-to: <1509465082-30427-13-git-send-email-Dave.Martin@arm.com>
-Sender: linux-arch-owner@vger.kernel.org
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20171012104141.26902-22-christoffer.dall@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On Thu, Oct 12, 2017 at 12:41:25PM +0200, Christoffer Dall wrote:
+> On non-VHE systems we need to save the ELR_EL2 and SPSR_EL2 so that we
+> can return to the host in EL1 in the same state and location where we
+> issued a hypercall to EL2, but these registers don't contain anything
+> important on VHE, because all of the host runs in EL2.  Therefore,
+> exclude them when saving/restoring the host state.
 
-Dave Martin <Dave.Martin@arm.com> writes:
+This commit message implies we start excluding now, but this patch
+actually has no functional change. It just prepares things for
+patch 27/37 "KVM: arm64: Defer saving/restoring system registers to
+vcpu load/put on VHE". Can you please clarify it?
 
-> To enable the kernel to use SVE, SVE traps from EL1 to EL2 must be
-> disabled.  To take maximum advantage of the hardware, the full
-> available vector length also needs to be enabled for EL1 by
-> programming ZCR_EL2.LEN.  (The kernel will program ZCR_EL1.LEN as
-> required, but this cannot override the limit set by ZCR_EL2.)
->
-> This patch makes the appropriate changes to the EL2 early setup
-> code.
->
-> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->
+Thanks,
+drew
+
+> 
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 > ---
->
-> **Dropped at v3** Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> (Due to significant changes to the logic.)
-
-Have it back:
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  arch/arm64/kernel/head.S | 13 ++++++++++++-
->  1 file changed, 12 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
-> index cfa90a4..67e86a0 100644
-> --- a/arch/arm64/kernel/head.S
-> +++ b/arch/arm64/kernel/head.S
-> @@ -524,8 +524,19 @@ CPU_LE(	movk	x0, #0x30d0, lsl #16	)	// Clear EE and =
-E0E on LE systems
->  	mov	x0, #0x33ff
->  	msr	cptr_el2, x0			// Disable copro. traps to EL2
->
-> +	/* SVE register access */
-> +	mrs	x1, id_aa64pfr0_el1
-> +	ubfx	x1, x1, #ID_AA64PFR0_SVE_SHIFT, #4
-> +	cbz	x1, 7f
+>  arch/arm64/kvm/hyp/sysreg-sr.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+> index f5c1b44..354ca02 100644
+> --- a/arch/arm64/kvm/hyp/sysreg-sr.c
+> +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+> @@ -66,6 +66,10 @@ static void __hyp_text __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+>  	ctxt->gp_regs.sp_el1		= read_sysreg(sp_el1);
+>  	ctxt->gp_regs.elr_el1		= read_sysreg_el1(elr);
+>  	ctxt->gp_regs.spsr[KVM_SPSR_EL1]= read_sysreg_el1(spsr);
+> +}
 > +
-> +	bic	x0, x0, #CPTR_EL2_TZ		// Also disable SVE traps
-> +	msr	cptr_el2, x0			// Disable copro. traps to EL2
-> +	isb
-> +	mov	x1, #ZCR_ELx_LEN_MASK		// SVE: Enable full vector
-> +	msr_s	SYS_ZCR_EL2, x1			// length for EL1.
+> +static void __hyp_text __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
+> +{
+>  	ctxt->gp_regs.regs.pc		= read_sysreg_el2(elr);
+>  	ctxt->gp_regs.regs.pstate	= read_sysreg_el2(spsr);
+>  }
+> @@ -75,6 +79,7 @@ void __hyp_text __sysreg_save_state_nvhe(struct kvm_cpu_context *ctxt)
+>  	__sysreg_save_el1_state(ctxt);
+>  	__sysreg_save_common_state(ctxt);
+>  	__sysreg_save_user_state(ctxt);
+> +	__sysreg_save_el2_return_state(ctxt);
+>  }
+>  
+>  void sysreg_save_host_state_vhe(struct kvm_cpu_context *ctxt)
+> @@ -88,6 +93,7 @@ void sysreg_save_guest_state_vhe(struct kvm_cpu_context *ctxt)
+>  	__sysreg_save_el1_state(ctxt);
+>  	__sysreg_save_common_state(ctxt);
+>  	__sysreg_save_user_state(ctxt);
+> +	__sysreg_save_el2_return_state(ctxt);
+>  }
+>  
+>  static void __hyp_text __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
+> @@ -127,6 +133,11 @@ static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+>  	write_sysreg(ctxt->gp_regs.sp_el1,		sp_el1);
+>  	write_sysreg_el1(ctxt->gp_regs.elr_el1,		elr);
+>  	write_sysreg_el1(ctxt->gp_regs.spsr[KVM_SPSR_EL1],spsr);
+> +}
 > +
->  	/* Hypervisor stub */
-> -	adr_l	x0, __hyp_stub_vectors
-> +7:	adr_l	x0, __hyp_stub_vectors
->  	msr	vbar_el2, x0
->
->  	/* spsr */
+> +static void __hyp_text
+> +__sysreg_restore_el2_return_state(struct kvm_cpu_context *ctxt)
+> +{
+>  	write_sysreg_el2(ctxt->gp_regs.regs.pc,		elr);
+>  	write_sysreg_el2(ctxt->gp_regs.regs.pstate,	spsr);
+>  }
+> @@ -136,6 +147,7 @@ void __hyp_text __sysreg_restore_state_nvhe(struct kvm_cpu_context *ctxt)
+>  	__sysreg_restore_el1_state(ctxt);
+>  	__sysreg_restore_common_state(ctxt);
+>  	__sysreg_restore_user_state(ctxt);
+> +	__sysreg_restore_el2_return_state(ctxt);
+>  }
+>  
+>  void sysreg_restore_host_state_vhe(struct kvm_cpu_context *ctxt)
+> @@ -149,6 +161,7 @@ void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt)
+>  	__sysreg_restore_el1_state(ctxt);
+>  	__sysreg_restore_common_state(ctxt);
+>  	__sysreg_restore_user_state(ctxt);
+> +	__sysreg_restore_el2_return_state(ctxt);
+>  }
+>  
+>  static void __hyp_text __fpsimd32_save_state(struct kvm_cpu_context *ctxt)
+> -- 
+> 2.9.0
+> 
