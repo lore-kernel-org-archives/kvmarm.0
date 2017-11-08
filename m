@@ -1,94 +1,75 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v5 11/26] KVM: arm/arm64: GICv4: Handle INT command
- applied to a VLPI
-Date: Wed, 8 Nov 2017 11:40:38 +0000
-Message-ID: <26647099-f16c-f4ef-6902-ebbfb7a40a3a@arm.com>
-References: <20171027142855.21584-1-marc.zyngier@arm.com>
- <20171027142855.21584-12-marc.zyngier@arm.com>
- <6e12eac9-7b75-2c2c-0c79-d17a3c0d65eb@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v5 01/30] regset: Add support for dynamically sized regsets
+Date: Wed, 08 Nov 2017 11:50:00 +0000
+Message-ID: <87inelq9av.fsf@linaro.org>
+References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com> <1509465082-30427-2-git-send-email-Dave.Martin@arm.com> <20171101114228.jm53aj7jx6j4mxhn@armageddon.cambridge.arm.com> <20171101131644.GL19485@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DEE7A49D46
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Nov 2017 06:38:45 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tQ8eDXf7yXxA for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Nov 2017 06:38:44 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B5C6540651
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Nov 2017 06:38:44 -0500 (EST)
-In-Reply-To: <6e12eac9-7b75-2c2c-0c79-d17a3c0d65eb@redhat.com>
-Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Auger Eric <eric.auger@redhat.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Christoffer Dall <cdall@linaro.org>, Andre Przywara <Andre.Przywara@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Return-path: <linux-arch-owner@vger.kernel.org>
+In-reply-to: <20171101131644.GL19485@e103592.cambridge.arm.com>
+Sender: linux-arch-owner@vger.kernel.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-arch@vger.kernel.org, "H. J. Lu" <hjl.tools@gmail.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Dmitry Safonov <dsafonov@virtuozzo.com>, Will Deacon <will.deacon@arm.com>, Oleg Nesterov <oleg@redhat.com>, Ingo Molnar <mingo@redhat.com>, Alexander Viro <viro@zeniv.linux.org.uk>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 07/11/17 20:15, Auger Eric wrote:
-> Hi Marc,
-> 
-> On 27/10/2017 16:28, Marc Zyngier wrote:
->> If the guest issues an INT command targetting a VLPI, let's
->> call into the irq_set_irqchip_state() helper to make it pending
->> on the physical side.
+
+Dave Martin <Dave.Martin@arm.com> writes:
+
+> On Wed, Nov 01, 2017 at 11:42:29AM +0000, Catalin Marinas wrote:
+>> On Tue, Oct 31, 2017 at 03:50:53PM +0000, Dave P Martin wrote:
+>> > Currently the regset API doesn't allow for the possibility that
+>> > regsets (or at least, the amount of meaningful data in a regset)
+>> > may change in size.
+>> >
+>> > In particular, this results in useless padding being added to
+>> > coredumps if a regset's current size is smaller than its
+>> > theoretical maximum size.
+>> >
+>> > This patch adds a get_size() function to struct user_regset.
+>> > Individual regset implementations can implement this function to
+>> > return the current size of the regset data.  A regset_size()
+>> > function is added to provide callers with an abstract interface for
+>> > determining the size of a regset without needing to know whether
+>> > the regset is dynamically sized or not.
+>> >
+>> > The only affected user of this interface is the ELF coredump code:
+>> > This patch ports ELF coredump to dump regsets with their actual
+>> > size in the coredump.  This has no effect except for new regsets
+>> > that are dynamically sized and provide a get_size() implementation.
+>> >
+>> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+>> > Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> > Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+>> > Cc: Oleg Nesterov <oleg@redhat.com>
+>> > Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+>> > Cc: Thomas Gleixner <tglx@linutronix.de>
+>> > Cc: Ingo Molnar <mingo@redhat.com>
+>> > Cc: "H. Peter Anvin" <hpa@zytor.com>
+>> > Cc: Dmitry Safonov <dsafonov@virtuozzo.com>
+>> > Cc: H. J. Lu <hjl.tools@gmail.com>
+>> >
+>> > ---
+>> >
+>> > **Dropped** Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> > **Dropped** Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+>> > (due to bug fix applied against v4 of this patch.)
 >>
->> This works just as well if userspace decides to inject an interrupt
->> using the normal userspace API...
-> There is also another path:
-> KVM_SIGNAL_MSI ioctl / kvm_send_userspace_msi / kvm_set_msi /
-> vgic_its_inject_msi / vgic_its_trigger_msi
-
-Isn't this path covered by this very patch?
-
-> I wonder whether we shouldn't prevent the userspace from messing up with
-> the host irq pending state?
-
-What do we gain from that limitation? Here, we're just making sure
-things will work correctly, and we're not preventing userspace from
-doing something silly (the guest will only see spurious interrupts anyway).
-
-Thanks,
-
-	M.
-
-> Thanks
-> 
-> Eric
+>> It seems that the Reviewed-by tags are still there ;). Anyway, on the
+>
+> Oops, looks like that only happened on this patch.  I've removed
+> Alex's R-b from my own version in case of repost -- can you also
+> do the same?
+>
+>> new patch:
 >>
->> Acked-by: Christoffer Dall <cdall@linaro.org>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  virt/kvm/arm/vgic/vgic-its.c | 4 ++++
->>  1 file changed, 4 insertions(+)
->>
->> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->> index 89768d2b6a91..b2a678d131d0 100644
->> --- a/virt/kvm/arm/vgic/vgic-its.c
->> +++ b/virt/kvm/arm/vgic/vgic-its.c
->> @@ -578,6 +578,10 @@ static int vgic_its_trigger_msi(struct kvm *kvm, struct vgic_its *its,
->>  	if (err)
->>  		return err;
->>  
->> +	if (irq->hw)
->> +		return irq_set_irqchip_state(irq->host_irq,
->> +					     IRQCHIP_STATE_PENDING, true);
->> +
->>  	spin_lock(&irq->irq_lock);
->>  	irq->pending_latch = true;
->>  	vgic_queue_irq_unlock(kvm, irq);
->>
+>> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+
+You can have my:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 
--- 
-Jazz is not dead. It just smells funny...
+>
+> Cheers
+> ---Dave
