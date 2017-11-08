@@ -1,86 +1,56 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v5 11/26] KVM: arm/arm64: GICv4: Handle INT command
- applied to a VLPI
-Date: Wed, 8 Nov 2017 15:14:07 +0100
-Message-ID: <5c6f1428-2cf8-0a28-7554-d45dd53f2179@redhat.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v5 16/26] KVM: arm/arm64: GICv4: Propagate property
+ updates to VLPIs
+Date: Wed, 8 Nov 2017 15:08:36 +0000
+Message-ID: <49bff080-0908-cc7a-7036-543f963180a5@arm.com>
 References: <20171027142855.21584-1-marc.zyngier@arm.com>
- <20171027142855.21584-12-marc.zyngier@arm.com>
- <6e12eac9-7b75-2c2c-0c79-d17a3c0d65eb@redhat.com>
- <26647099-f16c-f4ef-6902-ebbfb7a40a3a@arm.com>
+ <20171027142855.21584-17-marc.zyngier@arm.com>
+ <6763d90f-93bf-ddbb-d456-5979b8870aa2@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <26647099-f16c-f4ef-6902-ebbfb7a40a3a@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <6763d90f-93bf-ddbb-d456-5979b8870aa2@redhat.com>
+Content-Language: en-GB
+Sender: linux-kernel-owner@vger.kernel.org
+To: Auger Eric <eric.auger@redhat.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc: Mark Rutland <mark.rutland@arm.com>, Christoffer Dall <cdall@linaro.org>, Andre Przywara <Andre.Przywara@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Christoffer Dall <christoffer.dall@linaro.org>, Shanker Donthineni <shankerd@codeaurora.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
-
-On 08/11/2017 12:40, Marc Zyngier wrote:
-> On 07/11/17 20:15, Auger Eric wrote:
->> Hi Marc,
+On 07/11/17 21:28, Auger Eric wrote:
+> Hi Marc,
+> 
+> On 27/10/2017 16:28, Marc Zyngier wrote:
+>> Upon updating a property, we propagate it all the way to the physical
+>> ITS, and ask for an INV command to be executed there.
 >>
->> On 27/10/2017 16:28, Marc Zyngier wrote:
->>> If the guest issues an INT command targetting a VLPI, let's
->>> call into the irq_set_irqchip_state() helper to make it pending
->>> on the physical side.
->>>
->>> This works just as well if userspace decides to inject an interrupt
->>> using the normal userspace API...
->> There is also another path:
->> KVM_SIGNAL_MSI ioctl / kvm_send_userspace_msi / kvm_set_msi /
->> vgic_its_inject_msi / vgic_its_trigger_msi
-> 
-> Isn't this path covered by this very patch?
-
-I should have read the last sentence of the commit msg to see you
-haven't ignored it ;-)
-> 
->> I wonder whether we shouldn't prevent the userspace from messing up with
->> the host irq pending state?
-> 
-> What do we gain from that limitation? Here, we're just making sure
-> things will work correctly, and we're not preventing userspace from
-> doing something silly (the guest will only see spurious interrupts anyway).
-
-OK. Just wanted to make sure this was not an issue.
-
-Thanks
-
-Eric
-> 
-> Thanks,
-> 
-> 	M.
-> 
->> Thanks
+>> Acked-by: Christoffer Dall <cdall@linaro.org>
+>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>> ---
+>>  virt/kvm/arm/vgic/vgic-its.c | 3 +++
+>>  1 file changed, 3 insertions(+)
 >>
->> Eric
->>>
->>> Acked-by: Christoffer Dall <cdall@linaro.org>
->>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->>> ---
->>>  virt/kvm/arm/vgic/vgic-its.c | 4 ++++
->>>  1 file changed, 4 insertions(+)
->>>
->>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->>> index 89768d2b6a91..b2a678d131d0 100644
->>> --- a/virt/kvm/arm/vgic/vgic-its.c
->>> +++ b/virt/kvm/arm/vgic/vgic-its.c
->>> @@ -578,6 +578,10 @@ static int vgic_its_trigger_msi(struct kvm *kvm, struct vgic_its *its,
->>>  	if (err)
->>>  		return err;
->>>  
->>> +	if (irq->hw)
->>> +		return irq_set_irqchip_state(irq->host_irq,
->>> +					     IRQCHIP_STATE_PENDING, true);
->>> +
->>>  	spin_lock(&irq->irq_lock);
->>>  	irq->pending_latch = true;
->>>  	vgic_queue_irq_unlock(kvm, irq);
->>>
-> 
-> 
+>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+>> index 0b7e648e7a0c..2e77c7c83942 100644
+>> --- a/virt/kvm/arm/vgic/vgic-its.c
+>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+>> @@ -296,6 +296,9 @@ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
+>>  		spin_unlock(&irq->irq_lock);
+>>  	}
+>>  
+>> +	if (irq->hw)
+>> +		return its_prop_update_vlpi(irq->host_irq, prop, true);
+>> +
+>>  	return 0;
+>>  }
+> I am confused by the vgic_queue_irq_unlock() on the "hw" path. Why is it
+> needed in hw mode?
+
+It's not. I guess we could bypass this altogether and take a short cut
+after having updated the priority and enabled fields.
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
