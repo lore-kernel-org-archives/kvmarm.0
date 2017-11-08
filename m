@@ -1,79 +1,227 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v5 23/26] KVM: arm/arm64: GICv4: Prevent a VM using GICv4
- from being saved
-Date: Wed, 8 Nov 2017 10:35:14 +0100
-Message-ID: <c5640b41-62fd-0f16-1907-bc053f649ea5@redhat.com>
-References: <20171027142855.21584-1-marc.zyngier@arm.com>
- <20171027142855.21584-24-marc.zyngier@arm.com>
- <1f75a11a-41c3-71b8-6abf-4aa2962e348e@redhat.com>
- <9c1e1c92-e0fa-737f-63ab-a335b93af6da@arm.com>
- <77d479e5-98f9-9081-a3a6-87bef1009775@redhat.com>
- <33f4de5f-004e-6b92-d4f6-651e536dc697@arm.com>
- <32f1d6ae-4ab5-25e4-587d-9a51fccb955f@redhat.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH 19/37] KVM: arm64: Introduce separate VHE/non-VHE sysreg
+ save/restore functions
+Date: Wed, 8 Nov 2017 11:31:56 +0100
+Message-ID: <20171108103156.72gynfsuylk65s5a@kamzik.brq.redhat.com>
+References: <20171012104141.26902-1-christoffer.dall@linaro.org>
+ <20171012104141.26902-20-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <32f1d6ae-4ab5-25e4-587d-9a51fccb955f@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Mark Rutland <mark.rutland@arm.com>, Andre Przywara <Andre.Przywara@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Christoffer Dall <christoffer.dall@linaro.org>, Shanker Donthineni <shankerd@codeaurora.org>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20171012104141.26902-20-christoffer.dall@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
-
-On 07/11/2017 23:24, Auger Eric wrote:
-> Hi
+On Thu, Oct 12, 2017 at 12:41:23PM +0200, Christoffer Dall wrote:
+> As we are about to handle system registers quite differently between VHE
+> and non-VHE systems.  In preparation for that, we need to split some of
+> the handling functions between VHE and non-VHE functionality.
 > 
-> On 07/11/2017 17:34, Marc Zyngier wrote:
->> On 07/11/17 16:12, Auger Eric wrote:
->>> Hi Marc,
->>>
->>> On 07/11/2017 16:38, Marc Zyngier wrote:
->>>> On 07/11/17 15:24, Auger Eric wrote:
->>>>> Hi Marc,
->>>>>
->>>>> Hi Marc,
->>>>> On 27/10/2017 16:28, Marc Zyngier wrote:
->>>>>> The GICv4 architecture doesn't make it easy for save/restore to
->>>>>> work, as it doesn't give any guarantee that the pending state
->>>>>> is written into the pending table.
->>>>>
->>>>> I don't understand where does the limitation exactly come from. Can't we
->>>>> use the GICR_VPENDBASER table data?
->>>> You can't. None of the tables that are written by either the ITS or the
->>>> redistributors are architected. All you know is that there is one bit
->>>> per vLPI, but that's it (you don't even know which one is which).
->>> Oh I thought the redistributor config and pending tables were fully
->>> specified (6.1.2 and 6.1.3 of the spec), except the 1kB of the pending
->>> table.
->>
->> The property table is definitely architected. It is a lot less clear for
->> the pending table. The main issue is that you cannot really know when
->> the various bits have actually been flushed all the way from the
->> redistributor caches to memory to be introspected. Yes, it sucks.
-> Oh OK the INV only guarantees the caches are consistent with the LPI
-> config table. Maybe you could clarify the commit message with those details.
+> For now, we simply copy the non-VHE functions, but we do change the use
+> of static keys for VHE and non-VHE functionality now that we have
+> separate functions.
 > 
-> So
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Reading the spec further, looks setting the Valid bit of GICR_VPENDBASER
-is supposed  to force the redistributor to retrieve pending interrupts
-from the the VCPU I/F and ensure the VPT in memory is correct.
-
-Anyway that's not a big deal at the moment as you pointed out...
-
-Thanks
-
-Eric
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> ---
+>  arch/arm64/include/asm/kvm_hyp.h | 12 ++++++++----
+>  arch/arm64/kvm/hyp/switch.c      | 20 ++++++++++----------
+>  arch/arm64/kvm/hyp/sysreg-sr.c   | 40 ++++++++++++++++++++++++++++++++--------
+>  3 files changed, 50 insertions(+), 22 deletions(-)
 > 
-> Thanks
-> 
-> Eric
-> 
->>
->> Thanks,
->>
->> 	M.
->>
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index a0e5a70..998152d 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -132,10 +132,14 @@ int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu);
+>  void __timer_enable_traps(struct kvm_vcpu *vcpu);
+>  void __timer_disable_traps(struct kvm_vcpu *vcpu);
+>  
+> -void __sysreg_save_host_state(struct kvm_cpu_context *ctxt);
+> -void __sysreg_restore_host_state(struct kvm_cpu_context *ctxt);
+> -void __sysreg_save_guest_state(struct kvm_cpu_context *ctxt);
+> -void __sysreg_restore_guest_state(struct kvm_cpu_context *ctxt);
+> +void __sysreg_save_host_state_nvhe(struct kvm_cpu_context *ctxt);
+> +void __sysreg_restore_host_state_nvhe(struct kvm_cpu_context *ctxt);
+> +void __sysreg_save_guest_state_nvhe(struct kvm_cpu_context *ctxt);
+> +void __sysreg_restore_guest_state_nvhe(struct kvm_cpu_context *ctxt);
+> +void sysreg_save_host_state_vhe(struct kvm_cpu_context *ctxt);
+> +void sysreg_restore_host_state_vhe(struct kvm_cpu_context *ctxt);
+> +void sysreg_save_guest_state_vhe(struct kvm_cpu_context *ctxt);
+> +void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt);
+>  void __sysreg32_save_state(struct kvm_vcpu *vcpu);
+>  void __sysreg32_restore_state(struct kvm_vcpu *vcpu);
+>  
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index b98b73b..7c4d430 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -330,7 +330,7 @@ int kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  	host_ctxt->__hyp_running_vcpu = vcpu;
+>  	guest_ctxt = &vcpu->arch.ctxt;
+>  
+> -	__sysreg_save_host_state(host_ctxt);
+> +	sysreg_save_host_state_vhe(host_ctxt);
+>  
+>  	__activate_traps(vcpu);
+>  	__activate_vm(vcpu);
+> @@ -342,7 +342,7 @@ int kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  	 * to erratum #852523 (Cortex-A57) or #853709 (Cortex-A72).
+>  	 */
+>  	__sysreg32_restore_state(vcpu);
+> -	__sysreg_restore_guest_state(guest_ctxt);
+> +	sysreg_restore_guest_state_vhe(guest_ctxt);
+>  	__debug_switch_to_guest(vcpu);
+>  
+>  	/* Jump in the fire! */
+> @@ -353,13 +353,13 @@ int kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  	if (fixup_guest_exit(vcpu, &exit_code))
+>  		goto again;
+>  
+> -	__sysreg_save_guest_state(guest_ctxt);
+> +	sysreg_save_guest_state_vhe(guest_ctxt);
+>  	__sysreg32_save_state(vcpu);
+>  	__vgic_save_state(vcpu);
+>  
+>  	__deactivate_traps(vcpu);
+>  
+> -	__sysreg_restore_host_state(host_ctxt);
+> +	sysreg_restore_host_state_vhe(host_ctxt);
+>  
+>  	/*
+>  	 * This must come after restoring the host sysregs, since a non-VHE
+
+This comment is a carry over from the non-VHE function. It's a bit
+confusing in a VHE-only function, so it should probably be removed,
+perhaps with its own patch though.
+
+
+> @@ -383,7 +383,7 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  	host_ctxt->__hyp_running_vcpu = vcpu;
+>  	guest_ctxt = &vcpu->arch.ctxt;
+>  
+> -	__sysreg_save_host_state(host_ctxt);
+> +	__sysreg_save_host_state_nvhe(host_ctxt);
+>  
+>  	__activate_traps(vcpu);
+>  	__activate_vm(vcpu);
+> @@ -396,7 +396,7 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  	 * to erratum #852523 (Cortex-A57) or #853709 (Cortex-A72).
+>  	 */
+>  	__sysreg32_restore_state(vcpu);
+> -	__sysreg_restore_guest_state(guest_ctxt);
+> +	__sysreg_restore_guest_state_nvhe(guest_ctxt);
+>  	__debug_switch_to_guest(vcpu);
+>  
+>  	/* Jump in the fire! */
+> @@ -407,7 +407,7 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  	if (fixup_guest_exit(vcpu, &exit_code))
+>  		goto again;
+>  
+> -	__sysreg_save_guest_state(guest_ctxt);
+> +	__sysreg_save_guest_state_nvhe(guest_ctxt);
+>  	__sysreg32_save_state(vcpu);
+>  	__timer_disable_traps(vcpu);
+>  	__vgic_save_state(vcpu);
+> @@ -415,7 +415,7 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  	__deactivate_traps(vcpu);
+>  	__deactivate_vm(vcpu);
+>  
+> -	__sysreg_restore_host_state(host_ctxt);
+> +	__sysreg_restore_host_state_nvhe(host_ctxt);
+>  
+>  	/*
+>  	 * This must come after restoring the host sysregs, since a non-VHE
+> @@ -440,7 +440,7 @@ static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par,
+>  		__timer_disable_traps(vcpu);
+>  		__deactivate_traps(vcpu);
+>  		__deactivate_vm(vcpu);
+> -		__sysreg_restore_host_state(__host_ctxt);
+> +		__sysreg_restore_host_state_nvhe(__host_ctxt);
+>  	}
+>  
+>  	/*
+> @@ -463,7 +463,7 @@ static void __hyp_call_panic_vhe(u64 spsr, u64 elr, u64 par,
+>  	vcpu = host_ctxt->__hyp_running_vcpu;
+>  
+>  	__deactivate_traps_vhe();
+> -	__sysreg_restore_host_state(host_ctxt);
+> +	sysreg_restore_host_state_vhe(host_ctxt);
+>  
+>  	panic(__hyp_panic_string,
+>  	      spsr,  elr,
+> diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+> index b55c4ad..d8c42de 100644
+> --- a/arch/arm64/kvm/hyp/sysreg-sr.c
+> +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+> @@ -70,15 +70,27 @@ static void __hyp_text __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+>  	ctxt->gp_regs.regs.pstate	= read_sysreg_el2(spsr);
+>  }
+>  
+> -void __hyp_text __sysreg_save_host_state(struct kvm_cpu_context *ctxt)
+> +void __hyp_text __sysreg_save_host_state_nvhe(struct kvm_cpu_context *ctxt)
+> +{
+> +	__sysreg_save_el1_state(ctxt);
+> +	__sysreg_save_common_state(ctxt);
+> +	__sysreg_save_user_state(ctxt);
+> +}
+> +
+> +void __hyp_text __sysreg_save_guest_state_nvhe(struct kvm_cpu_context *ctxt)
+> +{
+> +	__sysreg_save_el1_state(ctxt);
+> +	__sysreg_save_common_state(ctxt);
+> +	__sysreg_save_user_state(ctxt);
+> +}
+> +
+> +void sysreg_save_host_state_vhe(struct kvm_cpu_context *ctxt)
+>  {
+> -	if (!has_vhe())
+> -		__sysreg_save_el1_state(ctxt);
+>  	__sysreg_save_common_state(ctxt);
+>  	__sysreg_save_user_state(ctxt);
+>  }
+>  
+> -void __hyp_text __sysreg_save_guest_state(struct kvm_cpu_context *ctxt)
+> +void sysreg_save_guest_state_vhe(struct kvm_cpu_context *ctxt)
+>  {
+>  	__sysreg_save_el1_state(ctxt);
+>  	__sysreg_save_common_state(ctxt);
+> @@ -126,15 +138,27 @@ static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+>  	write_sysreg_el2(ctxt->gp_regs.regs.pstate,	spsr);
+>  }
+>  
+> -void __hyp_text __sysreg_restore_host_state(struct kvm_cpu_context *ctxt)
+> +void __hyp_text __sysreg_restore_host_state_nvhe(struct kvm_cpu_context *ctxt)
+> +{
+> +	__sysreg_restore_el1_state(ctxt);
+> +	__sysreg_restore_common_state(ctxt);
+> +	__sysreg_restore_user_state(ctxt);
+> +}
+> +
+> +void __hyp_text __sysreg_restore_guest_state_nvhe(struct kvm_cpu_context *ctxt)
+> +{
+> +	__sysreg_restore_el1_state(ctxt);
+> +	__sysreg_restore_common_state(ctxt);
+> +	__sysreg_restore_user_state(ctxt);
+> +}
+> +
+> +void sysreg_restore_host_state_vhe(struct kvm_cpu_context *ctxt)
+>  {
+> -	if (!has_vhe())
+> -		__sysreg_restore_el1_state(ctxt);
+>  	__sysreg_restore_common_state(ctxt);
+>  	__sysreg_restore_user_state(ctxt);
+>  }
+>  
+> -void __hyp_text __sysreg_restore_guest_state(struct kvm_cpu_context *ctxt)
+> +void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt)
+>  {
+>  	__sysreg_restore_el1_state(ctxt);
+>  	__sysreg_restore_common_state(ctxt);
+> -- 
+> 2.9.0
+>
+
+Reviewed-by: Andrew Jones <drjones@redhat.com>
