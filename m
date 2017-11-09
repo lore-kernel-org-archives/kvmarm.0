@@ -1,56 +1,107 @@
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v2 3/3] kvm: arm64: handle single-step of userspace mmio
- instructions
-Date: Thu,  9 Nov 2017 17:00:21 +0000
-Message-ID: <20171109170021.2984-4-alex.bennee@linaro.org>
+Subject: [PATCH v2 2/3] kvm: arm64: handle single-stepping trapped instructions
+Date: Thu,  9 Nov 2017 17:00:20 +0000
+Message-ID: <20171109170021.2984-3-alex.bennee@linaro.org>
 References: <20171109170021.2984-1-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 30A5549D59
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Nov 2017 11:58:26 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oIBz8XuVRM4c for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Nov 2017 11:58:25 -0500 (EST)
-Received: from mail-wr0-f193.google.com (mail-wr0-f193.google.com
- [209.85.128.193])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 463F449D52
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Nov 2017 11:58:25 -0500 (EST)
-Received: by mail-wr0-f193.google.com with SMTP id l22so6204776wrc.11
- for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Nov 2017 09:00:26 -0800 (PST)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20171109170021.2984-1-alex.bennee@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: julien.thierry@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
-Cc: open list <linux-kernel@vger.kernel.org>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VGhlIHN5c3RlbSBzdGF0ZSBvZiBLVk0gd2hlbiB1c2luZyB1c2Vyc3BhY2UgZW11bGF0aW9uIGlz
-IG5vdCBjb21wbGV0ZQp1bnRpbCB3ZSByZXR1cm4gaW50byBLVk1fUlVOLiBUbyBoYW5kbGUgbW1p
-byByZWxhdGVkIHVwZGF0ZXMgd2Ugd2FpdAp1bnRpbCB0aGV5IGhhdmUgYmVlbiBjb21taXR0ZWQg
-YW5kIHRoZW4gc2NoZWR1bGUgb3VyIEtWTV9FWElUX0RFQlVHLgoKVGhlIGt2bV9hcm1faGFuZGxl
-X3N0ZXBfZGVidWcoKSBoZWxwZXIgdGVsbHMgdXMgaWYgd2UgbmVlZCB0byByZXR1cm4KYW5kIHNl
-dHMgdXAgdGhlIGV4aXRfcmVhc29uIGZvciB1cy4KClNpZ25lZC1vZmYtYnk6IEFsZXggQmVubsOp
-ZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KCi0tLQp2MgogIC0gY2FsbCBoZWxwZXIgZGlyZWN0
-bHkgZnJvbSBrdm1fYXJjaF92Y3B1X2lvY3RsX3J1bgotLS0KIHZpcnQva3ZtL2FybS9hcm0uYyB8
-IDMgKysrCiAxIGZpbGUgY2hhbmdlZCwgMyBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEvdmly
-dC9rdm0vYXJtL2FybS5jIGIvdmlydC9rdm0vYXJtL2FybS5jCmluZGV4IDk1Y2JhMDc5OTgyOC4u
-Mjk5MWFkZmFjYTlkIDEwMDY0NAotLS0gYS92aXJ0L2t2bS9hcm0vYXJtLmMKKysrIGIvdmlydC9r
-dm0vYXJtL2FybS5jCkBAIC02MjUsNiArNjI1LDkgQEAgaW50IGt2bV9hcmNoX3ZjcHVfaW9jdGxf
-cnVuKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgc3RydWN0IGt2bV9ydW4gKnJ1bikKIAkJcmV0ID0g
-a3ZtX2hhbmRsZV9tbWlvX3JldHVybih2Y3B1LCB2Y3B1LT5ydW4pOwogCQlpZiAocmV0KQogCQkJ
-cmV0dXJuIHJldDsKKwkJaWYgKGt2bV9hcm1faGFuZGxlX3N0ZXBfZGVidWcodmNwdSwgdmNwdS0+
-cnVuKSkKKwkJCXJldHVybiAxOworCiAJfQogCiAJaWYgKHJ1bi0+aW1tZWRpYXRlX2V4aXQpCi0t
-IAoyLjE0LjIKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-Cmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczov
-L2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+If we are using guest debug to single-step the guest we need to ensure
+we exit after emulating the instruction. This only affects
+instructions completely emulated by the kernel. For userspace emulated
+instructions we need to exit and return to complete the emulation.
+
+The kvm_arm_handle_step_debug() helper sets up the necessary exit
+state if needed.
+
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+
+---
+v2
+  - use helper from patch 1
+  - if (handled > 0) instead of if (handled) so errors propagate
+---
+ arch/arm64/kvm/handle_exit.c | 47 +++++++++++++++++++++++++++++++-------------
+ 1 file changed, 33 insertions(+), 14 deletions(-)
+
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 7debb74843a0..af1c804742f6 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -178,6 +178,38 @@ static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
+ 	return arm_exit_handlers[hsr_ec];
+ }
+ 
++/*
++ * We may be single-stepping an emulated instruction. If the emulation
++ * has been completed in-kernel we can return to userspace with a
++ * KVM_EXIT_DEBUG, otherwise the userspace needs to complete its
++ * emulation first.
++ */
++
++static int handle_trap_exceptions(struct kvm_vcpu *vcpu, struct kvm_run *run)
++{
++	int handled;
++
++	/*
++	 * See ARM ARM B1.14.1: "Hyp traps on instructions
++	 * that fail their condition code check"
++	 */
++	if (!kvm_condition_valid(vcpu)) {
++		kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
++		handled = 1;
++	} else {
++		exit_handle_fn exit_handler;
++
++		exit_handler = kvm_get_exit_handler(vcpu);
++		handled = exit_handler(vcpu, run);
++	}
++
++	/* helper sets exit_reason if we need to return to userspace */
++	if (handled > 0 && kvm_arm_handle_step_debug(vcpu, run))
++		handled = 0;
++
++	return handled;
++}
++
+ /*
+  * Return > 0 to return to guest, < 0 on error, 0 (and set exit_reason) on
+  * proper exit to userspace.
+@@ -185,8 +217,6 @@ static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
+ int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 		       int exception_index)
+ {
+-	exit_handle_fn exit_handler;
+-
+ 	if (ARM_SERROR_PENDING(exception_index)) {
+ 		u8 hsr_ec = ESR_ELx_EC(kvm_vcpu_get_hsr(vcpu));
+ 
+@@ -214,18 +244,7 @@ int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 		kvm_inject_vabt(vcpu);
+ 		return 1;
+ 	case ARM_EXCEPTION_TRAP:
+-		/*
+-		 * See ARM ARM B1.14.1: "Hyp traps on instructions
+-		 * that fail their condition code check"
+-		 */
+-		if (!kvm_condition_valid(vcpu)) {
+-			kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+-			return 1;
+-		}
+-
+-		exit_handler = kvm_get_exit_handler(vcpu);
+-
+-		return exit_handler(vcpu, run);
++		return handle_trap_exceptions(vcpu, run);
+ 	case ARM_EXCEPTION_HYP_GONE:
+ 		/*
+ 		 * EL2 has been reset to the hyp-stub. This happens when a guest
+-- 
+2.14.2
