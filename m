@@ -1,199 +1,87 @@
-From: Manoj Iyer <manoj.iyer-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
-Subject: Re: [3/3] arm64: Add software workaround for Falkor erratum 1041
-Date: Thu, 9 Nov 2017 10:58:29 -0600 (CST)
-Message-ID: <alpine.DEB.2.20.1711091041180.15101@lazy>
-References: <1509679664-3749-4-git-send-email-shankerd@codeaurora.org> <alpine.DEB.2.20.1711081305310.26324@lazy> <5A04369A.2020405@arm.com> <alpine.DEB.2.20.1711090949110.15101@lazy> <alpine.DEB.2.20.1711091010570.15101@lazy>
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: [PATCH v2 1/3] kvm: arm debug: introduce helper for single-step
+Date: Thu,  9 Nov 2017 17:00:19 +0000
+Message-ID: <20171109170021.2984-2-alex.bennee@linaro.org>
+References: <20171109170021.2984-1-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <alpine.DEB.2.20.1711091010570.15101@lazy>
-Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
-Cc: Manoj Iyer <manoj.iyer-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>, Shanker Donthineni <shankerd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Ard Biesheuvel <ard.biesheuvel-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Matt Fleming <matt-mF/unelCI9GS6iBeEJttW/XRex20P6io@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 836DE49D52
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Nov 2017 11:58:26 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id TEtMBjoLP7IE for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Nov 2017 11:58:24 -0500 (EST)
+Received: from mail-wm0-f65.google.com (mail-wm0-f65.google.com [74.125.82.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 87DEE49D2A
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Nov 2017 11:58:24 -0500 (EST)
+Received: by mail-wm0-f65.google.com with SMTP id p75so18605831wmg.3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Nov 2017 09:00:25 -0800 (PST)
+In-Reply-To: <20171109170021.2984-1-alex.bennee@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: julien.thierry@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Russell King <linux@armlinux.org.uk>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-James,
-
-Looks like my VM test raised a false alarm. I retested stock Artful 4.13 
-kernel (No erratum 1041 patches applied).
-
-Host: Ubuntu Artful 4.13 kernel with *no* erratum 1041 patches applied.
-Guest: Ubuntu Zesty (4.10) kernel.
-
-- Created 20 VMs one at a time
-
-In a loop:
-- Stop (virsh destroy) 20 VMs one at a time
-- Start (virsh start) 20 VMs one at a time.
-
-And, I am able to reproduce the system reset issue I previously reported. 
-I think the problem I reported with VMs might have nothing to do with the 
-erratum 1041 patches, and probably needs to be root caused seperately.
-
-With stock 4.13 kernel (no erratum 1041 patches applied):
-
-awrep6 login: [  461.881379] ACPI CPPC: PCC check channel failed. Status=0
-[  462.051194] ACPI CPPC: PCC check channel failed. Status=0
-[  462.223137] ACPI CPPC: PCC check channel failed. Status=0
-[  462.633790] ACPI CPPC: PCC check channel failed. Status=0
-[  463.231971] ACPI CPPC: PCC check channel failed. Status=0
-[  463.403163] ACPI CPPC: PCC check channel failed. Status=0
-[  463.822936] ACPI CPPC: PCC check channel failed. Status=0
-[  463.995222] ACPI CPPC: PCC check channel failed. Status=0
-[  464.130962] ACPI CPPC: PCC check channel failed. Status=0
-[  464.258973] ACPI CPPC: PCC check channel failed. Status=0
-[  465.283028] ACPI CPPC: PCC check channel failed. Status=0
-
-
-SYS_DBG: Running SDI image (immediate mode)
-SYS_DBG: Ram Dump Init
-SYS_DBG: Failed to init SD card
-SYS_DBG: Resetting system!
-
-
-On Thu, 9 Nov 2017, Manoj Iyer wrote:
-
->
->
->
-> On Thu, 9 Nov 2017, Manoj Iyer wrote:
->
->> 
->> James,
->> 
->> (sorry for top-posting)
->> 
->> Applied patch 3 patches to Ubuntu Artful Kernel ( 4.13.0-16-generic )
->> 
->> - Start 20 VMs one at a time
->> 
->> In a loop:
->> - Stop (virsh destroy) 20 VMs one at a time
->> - Start (virsh start) 20 VMs one at a time.
->
-> Fixing some confusion I might have introduced in my prev email.
->
-> - Applied all 3 patches to Ubuntu Artful Kernel ( 4.13.0-16-generic )
->
-> - Created 20 VMs one at a time
->
-> In a loop:
-> - Stop (virsh destroy) 20 VMs one at a time
-> - Start (virsh start) 20 VMs one at a time.
->
->> 
->> The system reset's itself after starting the last VM on the 1st loop 
->> displaying the following:
->> 
->> awrep6 login: [ 603.349141] ACPI CPPC: PCC check channel failed. Status=0
->> [ 603.765101] ACPI CPPC: PCC check channel failed. Status=0
->> [ 603.937389] ACPI CPPC: PCC check channel failed. Status=0
->> [ 608.285495] ACPI CPPC: PCC check channel failed. Status=0
->> [ 608.289481] ACPI CPPC: PCC check channel failed. Status=0
->> 
->> SYS_DBG: Running SDI image (immediate mode)
->> SYS_DBG: Ram Dump Init
->> SYS_DBG: Failed to init SD card
->> SYS_DBG: Resetting system!
->> 
->> Followed by the following messages on system reboot:
->> [ 6.616891] BERT: Error records from previous boot:
->> [ 6.621655] [Hardware Error]: event severity: fatal
->> [ 6.626516] [Hardware Error]: imprecise tstamp: 0000-00-00 00:00:00
->> [ 6.632851] [Hardware Error]: Error 0, type: fatal
->> [ 6.637713] [Hardware Error]: section type: unknown, 
->> d2e2621c-f936-468d-0d84-15a4ed015c8b
->> [ 6.646045] [Hardware Error]: section length: 0x238
->> [ 6.651082] [Hardware Error]: 00000000: 72724502 5220726f 6f736165 6e55206e 
->> .Error Reason Un
->> [ 6.659761] [Hardware Error]: 00000010: 776f6e6b 0000006e 00000000 00000000 
->> known...........
->> [ 6.668442] [Hardware Error]: 00000020: 00000000 00000000 00000000 00000000 
->> ................
->> [ 6.677122] [Hardware Error]: 00000030: 00000000 00000000 00000000 00000000 
->> ................
->> 
->> 
->> On Thu, 9 Nov 2017, James Morse wrote:
->> 
->>> Hi Manoj,
->>> 
->>> On 08/11/17 19:05, Manoj Iyer wrote:
->>>> On Thu, 2 Nov 2017, Shanker Donthineni wrote:
->>>>> The ARM architecture defines the memory locations that are permitted
->>>>> to be accessed as the result of a speculative instruction fetch from
->>>>> an exception level for which all stages of translation are disabled.
->>>>> Specifically, the core is permitted to speculatively fetch from the
->>>>> 4KB region containing the current program counter and next 4KB.
->>>>> 
->>>>> When translation is changed from enabled to disabled for the running
->>>>> exception level (SCTLR_ELn[M] changed from a value of 1 to 0), the
->>>>> Falkor core may errantly speculatively access memory locations outside
->>>>> of the 4KB region permitted by the architecture. The errant memory
->>>>> access may lead to one of the following unexpected behaviors.
->>> 
->>>> I applied the 3 patches to Ubuntu 4.13.0-16-generic (Artful) kernel and
->>>> ran stress-ng cpu tests on QDF2400 server
->>> 
->>> [...]
->>> 
->>>> Where stress-ng would spawn N workers and test cpu offline/online, 
->>>> perform
->>>> matrix operations, do rapid context switchs, and anonymous mmaps. 
->>>> Although
->>>> I was not able to reproduce the erratum on the stock 4.13 kernel using 
->>>> the
->>>> same test case, the patched kernel did not seem to introduce any
->>>> regressions either. I ran the stress-ng tests for over 8hrs found the
->>>> system to be stable.
->>> 
->>> 
->>> Could you throw kexec and KVM into the mix? This issue only shows up when 
->>> we
->>> disable the MMU, which we almost never do.
->>> 
->>> For CPU offline/online we make the PSCI 'offline' call with the MMU 
->>> enabled.
->>> When the CPU comes back firmware has reset the EL2/EL1 SCTLR from a higher
->>> exception level, so it won't hit this issue.
->>> 
->>> One place we do this is kexec, where we drop into purgatory with the MMU 
->>> disabled.
->>> 
->>> The other is KVM unloading itself to return to the hyp stub. You can 
->>> stress this
->>> by starting and stopping a VM. When the number of VMs reaches 0 KVM should
->>> unload via 'kvm_arch_hardware_disable()'.
->>> 
->>> 
->>> Thanks,
->>> 
->>> James
->>> 
->>> 
->> 
->> --
->> ============================
->> Manoj Iyer
->> Ubuntu/Canonical
->> ARM Servers - Cloud
->> ============================
->> 
->> 
->
-> --
-> ============================
-> Manoj Iyer
-> Ubuntu/Canonical
-> ARM Servers - Cloud
-> ============================
->
->
-
---
-============================
-Manoj Iyer
-Ubuntu/Canonical
-ARM Servers - Cloud
-============================
+QWZ0ZXIgZW11bGF0aW5nIGluc3RydWN0aW9ucyB3ZSBtYXkgd2FudCByZXR1cm4gdG8gdXNlci1z
+cGFjZSB0bwpoYW5kbGUgYSBzaW5nbGUtc3RlcC4gSWYgc2luZ2xlLXN0ZXAgaXMgZW5hYmxlZCB0
+aGUgaGVscGVyIHNldCB0aGUgcnVuCnN0cnVjdHVyZSBmb3IgcmV0dXJuIGFuZCByZXR1cm5zIHRy
+dWUuCgpTaWduZWQtb2ZmLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+
+CgotLS0KdjIKICAtIGt2bV9hcm1fbWF5YmVfcmV0dXJuX2RlYnVnIC0+IGt2bV9hcm1faGFuZGxl
+X3N0ZXBfZGVidWcKICAtIHJldHVybiBib29sLCB0cnVlIGlmIHJldHVybiB0byB1c2Vyc3BhY2Ug
+aXMgcmVxdWlyZWQKLS0tCiBhcmNoL2FybS9pbmNsdWRlL2FzbS9rdm1faG9zdC5oICAgfCAgMiAr
+KwogYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oIHwgIDEgKwogYXJjaC9hcm02NC9r
+dm0vZGVidWcuYyAgICAgICAgICAgIHwgMjIgKysrKysrKysrKysrKysrKysrKysrKwogMyBmaWxl
+cyBjaGFuZ2VkLCAyNSBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEvYXJjaC9hcm0vaW5jbHVk
+ZS9hc20va3ZtX2hvc3QuaCBiL2FyY2gvYXJtL2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKaW5kZXgg
+NGE4NzlmNmZmMTNiLi5hMmU4ODFkNjEwOGUgMTAwNjQ0Ci0tLSBhL2FyY2gvYXJtL2luY2x1ZGUv
+YXNtL2t2bV9ob3N0LmgKKysrIGIvYXJjaC9hcm0vaW5jbHVkZS9hc20va3ZtX2hvc3QuaApAQCAt
+Mjg1LDYgKzI4NSw4IEBAIHN0YXRpYyBpbmxpbmUgdm9pZCBrdm1fYXJtX2luaXRfZGVidWcodm9p
+ZCkge30KIHN0YXRpYyBpbmxpbmUgdm9pZCBrdm1fYXJtX3NldHVwX2RlYnVnKHN0cnVjdCBrdm1f
+dmNwdSAqdmNwdSkge30KIHN0YXRpYyBpbmxpbmUgdm9pZCBrdm1fYXJtX2NsZWFyX2RlYnVnKHN0
+cnVjdCBrdm1fdmNwdSAqdmNwdSkge30KIHN0YXRpYyBpbmxpbmUgdm9pZCBrdm1fYXJtX3Jlc2V0
+X2RlYnVnX3B0cihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpIHt9CitzdGF0aWMgaW5saW5lIGJvb2wg
+a3ZtX2FybV9oYW5kbGVfc3RlcF9kZWJ1ZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCisJCQkJCSAg
+ICAgc3RydWN0IGt2bV9ydW4gKnJ1bikge30KIAogaW50IGt2bV9hcm1fdmNwdV9hcmNoX3NldF9h
+dHRyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKIAkJCSAgICAgICBzdHJ1Y3Qga3ZtX2RldmljZV9h
+dHRyICphdHRyKTsKZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3Qu
+aCBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAppbmRleCBlOTIzYjU4NjA2ZTIu
+LmJiZmQ2YTJhZGIyYiAxMDA2NDQKLS0tIGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9z
+dC5oCisrKyBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaApAQCAtMzY5LDYgKzM2
+OSw3IEBAIHZvaWQga3ZtX2FybV9pbml0X2RlYnVnKHZvaWQpOwogdm9pZCBrdm1fYXJtX3NldHVw
+X2RlYnVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSk7CiB2b2lkIGt2bV9hcm1fY2xlYXJfZGVidWco
+c3RydWN0IGt2bV92Y3B1ICp2Y3B1KTsKIHZvaWQga3ZtX2FybV9yZXNldF9kZWJ1Z19wdHIoc3Ry
+dWN0IGt2bV92Y3B1ICp2Y3B1KTsKK2Jvb2wga3ZtX2FybV9oYW5kbGVfc3RlcF9kZWJ1ZyhzdHJ1
+Y3Qga3ZtX3ZjcHUgKnZjcHUsIHN0cnVjdCBrdm1fcnVuICpydW4pOwogaW50IGt2bV9hcm1fdmNw
+dV9hcmNoX3NldF9hdHRyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKIAkJCSAgICAgICBzdHJ1Y3Qg
+a3ZtX2RldmljZV9hdHRyICphdHRyKTsKIGludCBrdm1fYXJtX3ZjcHVfYXJjaF9nZXRfYXR0cihz
+dHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCmRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS9kZWJ1Zy5j
+IGIvYXJjaC9hcm02NC9rdm0vZGVidWcuYwppbmRleCBkYmFkZmFmODUwYTcuLjk1YWZkMjJhNDYz
+NCAxMDA2NDQKLS0tIGEvYXJjaC9hcm02NC9rdm0vZGVidWcuYworKysgYi9hcmNoL2FybTY0L2t2
+bS9kZWJ1Zy5jCkBAIC0yMjEsMyArMjIxLDI1IEBAIHZvaWQga3ZtX2FybV9jbGVhcl9kZWJ1Zyhz
+dHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCiAJCX0KIAl9CiB9CisKKworLyoKKyAqIFdoZW4gS1ZNIGhh
+cyBzdWNjZXNzZnVsbHkgZW11bGF0ZWQgdGhlIGluc3RydWN0aW9uIHdlIG1pZ2h0IHdhbnQgdG8K
+KyAqIHJldHVybiB0byB1c2VyIHNwYWNlIHdpdGggYSBLVk1fRVhJVF9ERUJVRy4gV2UgY2FuIG9u
+bHkgZG8gdGhpcworICogb25jZSB0aGUgZW11bGF0aW9uIGlzIGNvbXBsZXRlIHRob3VnaCBzbyBm
+b3IgdXNlcnNwYWNlIGVtdWxhdGlvbnMKKyAqIHdlIGhhdmUgdG8gd2FpdCB1bnRpbCB3ZSBoYXZl
+IHJlLWVudGVyZWQgS1ZNIGJlZm9yZSBjYWxsaW5nIHRoaXMKKyAqIGhlbHBlci4KKyAqCisgKiBS
+ZXR1cm4gdHJ1ZSAoYW5kIHNldCBleGl0X3JlYXNvbikgdG8gcmV0dXJuIHRvIHVzZXJzcGFjZSBv
+ciBmYWxzZQorICogaWYgbm8gZnVydGhlciBhY3Rpb24gcmVxdWlyZWQuCisgKi8KKworYm9vbCBr
+dm1fYXJtX2hhbmRsZV9zdGVwX2RlYnVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgc3RydWN0IGt2
+bV9ydW4gKnJ1bikKK3sKKwlpZiAodmNwdS0+Z3Vlc3RfZGVidWcgJiBLVk1fR1VFU1REQkdfU0lO
+R0xFU1RFUCkgeworCQlydW4tPmV4aXRfcmVhc29uID0gS1ZNX0VYSVRfREVCVUc7CisJCXJ1bi0+
+ZGVidWcuYXJjaC5oc3IgPSBFU1JfRUx4X0VDX1NPRlRTVFBfTE9XIDw8IEVTUl9FTHhfRUNfU0hJ
+RlQ7CisJCXJldHVybiB0cnVlOworCX0KKwlyZXR1cm4gZmFsc2U7Cit9Ci0tIAoyLjE0LjIKCl9f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWls
+aW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNv
+bHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
