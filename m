@@ -1,107 +1,53 @@
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v2 2/3] kvm: arm64: handle single-stepping trapped instructions
-Date: Thu,  9 Nov 2017 17:00:20 +0000
-Message-ID: <20171109170021.2984-3-alex.bennee@linaro.org>
-References: <20171109170021.2984-1-alex.bennee@linaro.org>
+Subject: [PATCH v2 0/3] KVM: arm64: single step emulation instructions
+Date: Thu,  9 Nov 2017 17:00:18 +0000
+Message-ID: <20171109170021.2984-1-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20171109170021.2984-1-alex.bennee@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D8B5A49D54
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Nov 2017 11:58:24 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id I+YEgITpFYtr for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Nov 2017 11:58:23 -0500 (EST)
+Received: from mail-wr0-f194.google.com (mail-wr0-f194.google.com
+ [209.85.128.194])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C040B49D27
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Nov 2017 11:58:23 -0500 (EST)
+Received: by mail-wr0-f194.google.com with SMTP id o88so6215915wrb.6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Nov 2017 09:00:24 -0800 (PST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: julien.thierry@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-If we are using guest debug to single-step the guest we need to ensure
-we exit after emulating the instruction. This only affects
-instructions completely emulated by the kernel. For userspace emulated
-instructions we need to exit and return to complete the emulation.
-
-The kvm_arm_handle_step_debug() helper sets up the necessary exit
-state if needed.
-
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
----
-v2
-  - use helper from patch 1
-  - if (handled > 0) instead of if (handled) so errors propagate
----
- arch/arm64/kvm/handle_exit.c | 47 +++++++++++++++++++++++++++++++-------------
- 1 file changed, 33 insertions(+), 14 deletions(-)
-
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 7debb74843a0..af1c804742f6 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -178,6 +178,38 @@ static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
- 	return arm_exit_handlers[hsr_ec];
- }
- 
-+/*
-+ * We may be single-stepping an emulated instruction. If the emulation
-+ * has been completed in-kernel we can return to userspace with a
-+ * KVM_EXIT_DEBUG, otherwise the userspace needs to complete its
-+ * emulation first.
-+ */
-+
-+static int handle_trap_exceptions(struct kvm_vcpu *vcpu, struct kvm_run *run)
-+{
-+	int handled;
-+
-+	/*
-+	 * See ARM ARM B1.14.1: "Hyp traps on instructions
-+	 * that fail their condition code check"
-+	 */
-+	if (!kvm_condition_valid(vcpu)) {
-+		kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-+		handled = 1;
-+	} else {
-+		exit_handle_fn exit_handler;
-+
-+		exit_handler = kvm_get_exit_handler(vcpu);
-+		handled = exit_handler(vcpu, run);
-+	}
-+
-+	/* helper sets exit_reason if we need to return to userspace */
-+	if (handled > 0 && kvm_arm_handle_step_debug(vcpu, run))
-+		handled = 0;
-+
-+	return handled;
-+}
-+
- /*
-  * Return > 0 to return to guest, < 0 on error, 0 (and set exit_reason) on
-  * proper exit to userspace.
-@@ -185,8 +217,6 @@ static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
- int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 		       int exception_index)
- {
--	exit_handle_fn exit_handler;
--
- 	if (ARM_SERROR_PENDING(exception_index)) {
- 		u8 hsr_ec = ESR_ELx_EC(kvm_vcpu_get_hsr(vcpu));
- 
-@@ -214,18 +244,7 @@ int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 		kvm_inject_vabt(vcpu);
- 		return 1;
- 	case ARM_EXCEPTION_TRAP:
--		/*
--		 * See ARM ARM B1.14.1: "Hyp traps on instructions
--		 * that fail their condition code check"
--		 */
--		if (!kvm_condition_valid(vcpu)) {
--			kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
--			return 1;
--		}
--
--		exit_handler = kvm_get_exit_handler(vcpu);
--
--		return exit_handler(vcpu, run);
-+		return handle_trap_exceptions(vcpu, run);
- 	case ARM_EXCEPTION_HYP_GONE:
- 		/*
- 		 * EL2 has been reset to the hyp-stub. This happens when a guest
--- 
-2.14.2
+SGksCgpUaGlzIGlzIHJldiAyIG9mIHRoZSBzZXJpZXMuIFRoZSBtYWluIGNoYW5nZSBpcyBJJ3Zl
+IG1vdmVkIHRoZSBoZWxwZXIKaW50byBpdCdzIG93biBwYXRjaCBhbmQgY2hhbmdlZCBpdCdzIHJl
+dHVybiB0byBhIGJvb2wgcmF0aGVyIHRoYW4gdHJ5CmFuZCBzdHJhZGRsZSB0aGUgZGlmZmVyZW50
+IHJldHVybiBzZW1hbnRpY3Mgb2Yga3ZtX2hhbmRsZV9tbWlvX3JldHVybgphbmQgaGFuZGxlX2V4
+aXQuCgpUaGUgcmVzdWx0IGlzIHdlIG5vIGxvbmdlciBoYXZlIGNvZGUgbW90aW9uIGluIHBhdGNo
+IDIgKG5vdyAzKSB0bwppbnRyb2R1Y2UgdGhlIGhlbHBlciBtYWtpbmcgaXQgZW1iYXJyYXNzaW5n
+bHkgc2hvcnQgLSBidXQgaG9wZWZ1bGx5IGEKbG90IGNsZWFyZXIuCgpBcyB1c3VhbCByZXZpc2lv
+biBkZXRhaWxzIGJlbGxvdyB0aGUgLS0tIGluIGVhY2ggcGF0Y2guCgpBbGV4IEJlbm7DqWUgKDMp
+OgogIGt2bTogYXJtIGRlYnVnOiBpbnRyb2R1Y2UgaGVscGVyIGZvciBzaW5nbGUtc3RlcAogIGt2
+bTogYXJtNjQ6IGhhbmRsZSBzaW5nbGUtc3RlcHBpbmcgdHJhcHBlZCBpbnN0cnVjdGlvbnMKICBr
+dm06IGFybTY0OiBoYW5kbGUgc2luZ2xlLXN0ZXAgb2YgdXNlcnNwYWNlIG1taW8gaW5zdHJ1Y3Rp
+b25zCgogYXJjaC9hcm0vaW5jbHVkZS9hc20va3ZtX2hvc3QuaCAgIHwgIDIgKysKIGFyY2gvYXJt
+NjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaCB8ICAxICsKIGFyY2gvYXJtNjQva3ZtL2RlYnVnLmMg
+ICAgICAgICAgICB8IDIyICsrKysrKysrKysrKysrKysrKwogYXJjaC9hcm02NC9rdm0vaGFuZGxl
+X2V4aXQuYyAgICAgIHwgNDcgKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0t
+CiB2aXJ0L2t2bS9hcm0vYXJtLmMgICAgICAgICAgICAgICAgfCAgMyArKysKIDUgZmlsZXMgY2hh
+bmdlZCwgNjEgaW5zZXJ0aW9ucygrKSwgMTQgZGVsZXRpb25zKC0pCgotLSAKMi4xNC4yCgpfX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGlu
+ZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1
+bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
