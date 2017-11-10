@@ -1,23 +1,26 @@
-From: Dongjiu Geng <gengdongjiu@huawei.com>
-Subject: [PATCH v8 3/7] acpi: apei: Add SEI notification type support for ARMv8
-Date: Sat, 11 Nov 2017 03:54:06 +0800
-Message-ID: <1510343650-23659-4-git-send-email-gengdongjiu@huawei.com>
-References: <1510343650-23659-1-git-send-email-gengdongjiu@huawei.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Subject: Re: [PATCH v4 00/21] SError rework + RAS&IESB for firmware first
+ support
+Date: Fri, 10 Nov 2017 20:03:48 +0800
+Message-ID: <07913a3b-fa58-d089-6f84-d6671e2dab97@huawei.com>
+References: <20171019145807.23251-1-james.morse@arm.com>
+ <5A049B20.6000501@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CE15B49D76
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Nov 2017 06:48:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5937F40FB0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Nov 2017 07:02:36 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1DDy0vVV4zwr for <kvmarm@lists.cs.columbia.edu>;
- Fri, 10 Nov 2017 06:48:08 -0500 (EST)
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BDDF349D50
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Nov 2017 06:48:06 -0500 (EST)
-In-Reply-To: <1510343650-23659-1-git-send-email-gengdongjiu@huawei.com>
+ with ESMTP id 5NV1Oo1Kknjh for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 10 Nov 2017 07:02:34 -0500 (EST)
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 33BE940D25
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Nov 2017 07:02:32 -0500 (EST)
+In-Reply-To: <5A049B20.6000501@arm.com>
+Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,147 +30,71 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: christoffer.dall@linaro.org, marc.zyngier@arm.com, linux@armlinux.org.uk, bp@alien8.de, rjw@rjwysocki.net, james.morse@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, corbet@lwn.net, catalin.marinas@arm.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-acpi@vger.kernel.org, devel@acpica.org, gengdongjiu@huawei.com, huangshaoyu@huawei.com, wuquanming@huawei.com, linuxarm@huawei.com
+To: James Morse <james.morse@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Julien Thierry <julien.thierry@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, wangxiongfeng2@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-ARMv8.2 requires implementation of the RAS extension, in
-this extension it adds SEI(SError Interrupt) notification
-type, this patch adds new GHES error source SEI handling
-functions. This error source parsing and handling method
-is similar with the SEA.
 
-Expose API ghes_notify_sei() to external users. External
-modules can call this exposed API to parse APEI table and
-handle the SEI notification.
 
-Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
----
- drivers/acpi/apei/Kconfig | 15 ++++++++++++++
- drivers/acpi/apei/ghes.c  | 53 +++++++++++++++++++++++++++++++++++++++++++++++
- include/acpi/ghes.h       |  1 +
- 3 files changed, 69 insertions(+)
+On 2017/11/10 2:14, James Morse wrote:
+> Hi guys,
+> 
+> On 19/10/17 15:57, James Morse wrote:
+>> Known issues:
+> [...]
+>>  * KVM-Migration: VDISR_EL2 is exposed to userspace as DISR_EL1, but how should
+>>    HCR_EL2.VSE or VSESR_EL2 be migrated when the guest has an SError pending but
+>>    hasn't taken it yet...?
+> 
+> I've been trying to work out how this pending-SError-migration could work.
 
-diff --git a/drivers/acpi/apei/Kconfig b/drivers/acpi/apei/Kconfig
-index 52ae543..ff4afc3 100644
---- a/drivers/acpi/apei/Kconfig
-+++ b/drivers/acpi/apei/Kconfig
-@@ -55,6 +55,21 @@ config ACPI_APEI_SEA
- 	  option allows the OS to look for such hardware error record, and
- 	  take appropriate action.
- 
-+config ACPI_APEI_SEI
-+	bool "APEI SError(System Error) Interrupt logging/recovering support"
-+	depends on ARM64 && ACPI_APEI_GHES
-+	default y
-+	help
-+	  This option should be enabled if the system supports
-+	  firmware first handling of SEI (SError interrupt).
-+
-+	  SEI happens with asynchronous external abort for errors on device
-+	  memory reads on ARMv8 systems. If a system supports firmware first
-+	  handling of SEI, the platform analyzes and handles hardware error
-+	  notifications from SEI, and it may then form a hardware error record for
-+	  the OS to parse and handle. This option allows the OS to look for
-+	  such hardware error record, and take appropriate action.
-+
- config ACPI_APEI_MEMORY_FAILURE
- 	bool "APEI memory error recovering support"
- 	depends on ACPI_APEI && MEMORY_FAILURE
-diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-index 6a3f824..67cd3a7 100644
---- a/drivers/acpi/apei/ghes.c
-+++ b/drivers/acpi/apei/ghes.c
-@@ -855,6 +855,46 @@ static inline void ghes_sea_add(struct ghes *ghes) { }
- static inline void ghes_sea_remove(struct ghes *ghes) { }
- #endif /* CONFIG_ACPI_APEI_SEA */
- 
-+#ifdef CONFIG_ACPI_APEI_SEI
-+static LIST_HEAD(ghes_sei);
-+
-+/*
-+ * Return 0 only if one of the SEI error sources successfully reported an error
-+ * record sent from the firmware.
-+ */
-+int ghes_notify_sei(void)
-+{
-+	struct ghes *ghes;
-+	int ret = -ENOENT;
-+
-+	rcu_read_lock();
-+	list_for_each_entry_rcu(ghes, &ghes_sei, list) {
-+		if (!ghes_proc(ghes))
-+			ret = 0;
-+	}
-+	rcu_read_unlock();
-+	return ret;
-+}
-+
-+static void ghes_sei_add(struct ghes *ghes)
-+{
-+	mutex_lock(&ghes_list_mutex);
-+	list_add_rcu(&ghes->list, &ghes_sei);
-+	mutex_unlock(&ghes_list_mutex);
-+}
-+
-+static void ghes_sei_remove(struct ghes *ghes)
-+{
-+	mutex_lock(&ghes_list_mutex);
-+	list_del_rcu(&ghes->list);
-+	mutex_unlock(&ghes_list_mutex);
-+	synchronize_rcu();
-+}
-+#else /* CONFIG_ACPI_APEI_SEI */
-+static inline void ghes_sei_add(struct ghes *ghes) { }
-+static inline void ghes_sei_remove(struct ghes *ghes) { }
-+#endif /* CONFIG_ACPI_APEI_SEI */
-+
- #ifdef CONFIG_HAVE_ACPI_APEI_NMI
- /*
-  * printk is not safe in NMI context.  So in NMI handler, we allocate
-@@ -1086,6 +1126,13 @@ static int ghes_probe(struct platform_device *ghes_dev)
- 			goto err;
- 		}
- 		break;
-+	case ACPI_HEST_NOTIFY_SEI:
-+		if (!IS_ENABLED(CONFIG_ACPI_APEI_SEI)) {
-+			pr_warn(GHES_PFX "Generic hardware error source: %d notified via SEI is not supported!\n",
-+				generic->header.source_id);
-+		goto err;
-+	}
-+	break;
- 	case ACPI_HEST_NOTIFY_NMI:
- 		if (!IS_ENABLED(CONFIG_HAVE_ACPI_APEI_NMI)) {
- 			pr_warn(GHES_PFX "Generic hardware error source: %d notified via NMI interrupt is not supported!\n",
-@@ -1158,6 +1205,9 @@ static int ghes_probe(struct platform_device *ghes_dev)
- 	case ACPI_HEST_NOTIFY_SEA:
- 		ghes_sea_add(ghes);
- 		break;
-+	case ACPI_HEST_NOTIFY_SEI:
-+		ghes_sei_add(ghes);
-+		break;
- 	case ACPI_HEST_NOTIFY_NMI:
- 		ghes_nmi_add(ghes);
- 		break;
-@@ -1211,6 +1261,9 @@ static int ghes_remove(struct platform_device *ghes_dev)
- 	case ACPI_HEST_NOTIFY_SEA:
- 		ghes_sea_remove(ghes);
- 		break;
-+	case ACPI_HEST_NOTIFY_SEI:
-+		ghes_sei_remove(ghes);
-+		break;
- 	case ACPI_HEST_NOTIFY_NMI:
- 		ghes_nmi_remove(ghes);
- 		break;
-diff --git a/include/acpi/ghes.h b/include/acpi/ghes.h
-index 8feb0c8..9ba59e2 100644
---- a/include/acpi/ghes.h
-+++ b/include/acpi/ghes.h
-@@ -120,5 +120,6 @@ static inline void *acpi_hest_get_next(struct acpi_hest_generic_data *gdata)
- 	     section = acpi_hest_get_next(section))
- 
- int ghes_notify_sea(void);
-+int ghes_notify_sei(void);
- 
- #endif /* GHES_H */
--- 
-1.9.1
+
+Hi James,
+  I have finished the Qemu part development about RAS and sent the patches out, I think the solution followed your suggestion and other people's suggestion in the mail discussion.
+For example, not pass KVM exception information to Qemu, according to the SIGBUS type(BUS_MCEERR_AR or BUS_MCEERR_A0)
+to use different notification type,  create guest APEI table and record CPER in rumtime for guest, etc
+
+how about you have a look at these implementation and then we discuss this migration again? thanks.
+
+
+
+> 
+> If HCR_EL2.VSE is set then the guest will take a virtual SError when it next
+> unmasks SError. Today this doesn't get migrated, but only KVM sets this bit as
+> an attempt to kill the guest.
+> 
+> This will be more of a problem with GengDongjiu's SError CAP for triggering
+> guest SError from user-space, which will also allow the VSESR_EL2 to be
+> specified. (this register becomes the guest ESR_EL1 when the virtual SError is
+> taken and is used to emulate firmware-first's NOTIFY_SEI and eventually
+> kernel-first RAS). These errors are likely to be handled by the guest.
+> 
+> 
+> We don't want to expose VSESR_EL2 to user-space, and for migration it isn't
+> enough as a value of '0' doesn't tell us if HCR_EL2.VSE is set.
+> 
+> To get out of this corner: why not declare pending-SError-migration an invalid
+> thing to do?
+> 
+> We can give Qemu a way to query if a virtual SError is (still) pending. Qemu
+> would need to check this on each vcpu after migration, just before it throws the
+> switch and the guest runs on the new host. This way the VSESR_EL2 value doesn't
+> need migrating at all.
+> 
+> In the ideal world, Qemu could re-inject the last SError it triggered if there
+> is still one pending when it migrates... but because KVM injects errors too, it
+> would need to block migration until this flag is cleared.
+> KVM can promise this doesn't change unless you run the vcpu, so provided the
+> vcpu actually takes the SError at some point this thing can still be migrated.
+> 
+> This does make the VSE machinery hidden unmigratable state in KVM, which is nasty.
+> 
+> Can anyone suggest a better way?
+> 
+> 
+> Thanks,
+> 
+> James
+> 
+> .
+> 
