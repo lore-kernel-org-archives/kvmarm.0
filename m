@@ -1,142 +1,288 @@
-From: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
-Subject: Re: [PATCH 3/3] arm64: Add software workaround for Falkor erratum
- 1041
-Date: Fri, 10 Nov 2017 10:24:04 +0000
-Message-ID: <5A057E44.3050109@arm.com>
-References: <1509679664-3749-1-git-send-email-shankerd@codeaurora.org> <1509679664-3749-4-git-send-email-shankerd@codeaurora.org> <1f4a523c-608b-b46b-527a-bc1e02e7db5e@arm.com> <2ef66b5c-d1b7-a5fc-a19d-88dddff95bad@codeaurora.org> <5A04372B.2090902@arm.com> <93801988-e785-bd49-796e-4a73e0b77413@codeaurora.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v5 16/30] arm64/sve: Backend logic for setting the vector length
+Date: Fri, 10 Nov 2017 10:27:36 +0000
+Message-ID: <8760aiqvhj.fsf@linaro.org>
+References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com> <1509465082-30427-17-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <93801988-e785-bd49-796e-4a73e0b77413-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: shankerd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org
-Cc: Robin Murphy <robin.murphy-5wv7dgnIgG8@public.gmane.org>, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Ard Biesheuvel <ard.biesheuvel-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Matt Fleming <matt-mF/unelCI9GS6iBeEJttW/XRex20P6io@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+Content-Transfer-Encoding: quoted-printable
+Return-path: <linux-arch-owner@vger.kernel.org>
+In-reply-to: <1509465082-30427-17-git-send-email-Dave.Martin@arm.com>
+Sender: linux-arch-owner@vger.kernel.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Shanker,
 
-On 09/11/17 15:22, Shanker Donthineni wrote:
-> On 11/09/2017 05:08 AM, James Morse wrote:
->> On 04/11/17 21:43, Shanker Donthineni wrote:
->>> On 11/03/2017 10:11 AM, Robin Murphy wrote:
->>>> On 03/11/17 03:27, Shanker Donthineni wrote:
->>>>> The ARM architecture defines the memory locations that are permitted
->>>>> to be accessed as the result of a speculative instruction fetch from
->>>>> an exception level for which all stages of translation are disabled.
->>>>> Specifically, the core is permitted to speculatively fetch from the
->>>>> 4KB region containing the current program counter and next 4KB.
->>>>>
->>>>> When translation is changed from enabled to disabled for the running
->>>>> exception level (SCTLR_ELn[M] changed from a value of 1 to 0), the
->>>>> Falkor core may errantly speculatively access memory locations outside
->>>>> of the 4KB region permitted by the architecture. The errant memory
->>>>> access may lead to one of the following unexpected behaviors.
->>>>>
->>>>> 1) A System Error Interrupt (SEI) being raised by the Falkor core due
->>>>>    to the errant memory access attempting to access a region of memory
->>>>>    that is protected by a slave-side memory protection unit.
->>>>> 2) Unpredictable device behavior due to a speculative read from device
->>>>>    memory. This behavior may only occur if the instruction cache is
->>>>>    disabled prior to or coincident with translation being changed from
->>>>>    enabled to disabled.
->>>>>
->>>>> To avoid the errant behavior, software must execute an ISB immediately
->>>>> prior to executing the MSR that will change SCTLR_ELn[M] from 1 to 0.
+Dave Martin <Dave.Martin@arm.com> writes:
 
->>>>> diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
->>>>> index b6dfb4f..4c91efb 100644
->>>>> --- a/arch/arm64/include/asm/assembler.h
->>>>> +++ b/arch/arm64/include/asm/assembler.h
->>>>> @@ -514,6 +515,22 @@
->>>>>   *   reg: the value to be written.
->>>>>   */
->>>>>  	.macro	write_sctlr, eln, reg
->>>>> +#ifdef CONFIG_QCOM_FALKOR_ERRATUM_1041
->>>>> +alternative_if ARM64_WORKAROUND_QCOM_FALKOR_E1041
->>>>> +	tbnz    \reg, #0, 8000f          // enable MMU?
->>
->> Won't this match any change that leaves the MMU enabled?
-> 
-> Yes. No need to apply workaround if the MMU is going to be enabled.
+> This patch implements the core logic for changing a task's vector
+> length on request from userspace.  This will be used by the ptrace
+> and prctl frontends that are implemented in later patches.
+>
+> The SVE architecture permits, but does not require, implementations
+> to support vector lengths that are not a power of two.  To handle
+> this, logic is added to check a requested vector length against a
+> possibly sparse bitmap of available vector lengths at runtime, so
+> that the best supported value can be chosen.
+>
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-(Sorry, looks like I had this upside down)
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-My badly-made-point is you can't know if the MMU is being disabled unless you
-have both the old and new values.
-
-As an example, in el2_setup, (where the MMU is disabled), we set the EE/E0E bits
-to match the kernel's endianness. Won't your macro will insert an unnecessary
-isb? Is this needed for the errata workaround?
-
-
->> I think the macro is making this more confusing. Disabling the MMU is obvious
->> from the call-site, (and really rare!). Trying to work it out from a macro makes
->> it more complicated than necessary.
-
-> Not clear, are you suggesting not to use read{write}_sctlr() macros instead apply 
-> the workaround from the call-site based on the MMU-on status?
-
-Yes. This is the only way to patch only the locations that turn the MMU off.
-
-
-> If yes, It simplifies
-> the code logic but CONFIG_QCOM_FALKOR_ERRATUM_1041 references are scatter everywhere. 
-
-Wouldn't they only appear in the places that are affected by the errata?
-This is exactly what we want, anyone touching that code now knows they need to
-double check this behaviour, (and ask you to test it!).
-
-Otherwise we have a macro second guessing what is happening, if its not quite
-right (because some information has been lost), we're now not sure what we need
-to do if we ever refactor any of this code.
-
-[...]
-
->>> I'll prefer alternatives
->>> just to avoid the unnecessary overhead on future Qualcomm Datacenter
->>> server CPUs and regression on other CPUs because of inserting an ISB
->>
->> I think hiding errata on other CPUs is a good argument.
->>
->> My suggestion would be:
->>> #ifdef CONFIG_QCOM_FALKOR_ERRATUM_1041
->>> 	isb
->>> #endif
->>
->> In head.S and efi-entry.S, as these run before alternatives.
->> Then use alternatives to add just the isb in the mmu-off path for the other callers.
-
-> Thanks for your opinion on this one, I'll change to an unconditional ISB in v2 patch.
-> After this change the enable_mmu() issues two ISBs before writing to SCTLR_EL1.
-
-Another great reason not to wrap this in a macro, there may already be a
-suitable isb, in which case a comment will suffice.
-
-
-> Are you okay with this behavior?
-
-Back-to-back isb doesn't sound like a good idea.
-
-
->  ENTRY(__enable_mmu)
->         mrs     x1, ID_AA64MMFR0_EL1
->         ubfx    x2, x1, #ID_AA64MMFR0_TGRAN_SHIFT, 4
->         cmp     x2, #ID_AA64MMFR0_TGRAN_SUPPORTED
->         b.ne    __no_granule_support
->         update_early_cpu_boot_status 0, x1, x2
->         adrp    x1, idmap_pg_dir
->         adrp    x2, swapper_pg_dir
->         msr     ttbr0_el1, x1                   // load TTBR0
->         msr     ttbr1_el1, x2                   // load TTBR1
->         isb
->         write_sctlr el1, x0
->         isb
-
-Now I'm thoroughly confused. Isn't this one of the sequences that doesn't hit
-the issue? Here we're switching SCTLR.M from 0 to 1.
-
-
-Thanks,
-
-James
+> ---
+>  arch/arm64/include/asm/fpsimd.h |   8 +++
+>  arch/arm64/kernel/fpsimd.c      | 137 ++++++++++++++++++++++++++++++++++=
++++++-
+>  include/uapi/linux/prctl.h      |   5 ++
+>  3 files changed, 149 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fps=
+imd.h
+> index 9bbd74c..86f550c 100644
+> --- a/arch/arm64/include/asm/fpsimd.h
+> +++ b/arch/arm64/include/asm/fpsimd.h
+> @@ -20,6 +20,7 @@
+>
+>  #ifndef __ASSEMBLY__
+>
+> +#include <linux/cache.h>
+>  #include <linux/stddef.h>
+>
+>  /*
+> @@ -70,17 +71,24 @@ extern void fpsimd_update_current_state(struct fpsimd=
+_state *state);
+>
+>  extern void fpsimd_flush_task_state(struct task_struct *target);
+>
+> +/* Maximum VL that SVE VL-agnostic software can transparently support */
+> +#define SVE_VL_ARCH_MAX 0x100
+> +
+>  extern void sve_save_state(void *state, u32 *pfpsr);
+>  extern void sve_load_state(void const *state, u32 const *pfpsr,
+>  			   unsigned long vq_minus_1);
+>  extern unsigned int sve_get_vl(void);
+>
+> +extern int __ro_after_init sve_max_vl;
+> +
+>  #ifdef CONFIG_ARM64_SVE
+>
+>  extern size_t sve_state_size(struct task_struct const *task);
+>
+>  extern void sve_alloc(struct task_struct *task);
+>  extern void fpsimd_release_task(struct task_struct *task);
+> +extern int sve_set_vector_length(struct task_struct *task,
+> +				 unsigned long vl, unsigned long flags);
+>
+>  #else /* ! CONFIG_ARM64_SVE */
+>
+> diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+> index e0b5ef5..1ceb069 100644
+> --- a/arch/arm64/kernel/fpsimd.c
+> +++ b/arch/arm64/kernel/fpsimd.c
+> @@ -17,8 +17,10 @@
+>   * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+>   */
+>
+> +#include <linux/bitmap.h>
+>  #include <linux/bottom_half.h>
+>  #include <linux/bug.h>
+> +#include <linux/cache.h>
+>  #include <linux/compat.h>
+>  #include <linux/cpu.h>
+>  #include <linux/cpu_pm.h>
+> @@ -28,6 +30,7 @@
+>  #include <linux/init.h>
+>  #include <linux/percpu.h>
+>  #include <linux/preempt.h>
+> +#include <linux/prctl.h>
+>  #include <linux/ptrace.h>
+>  #include <linux/sched/signal.h>
+>  #include <linux/signal.h>
+> @@ -113,6 +116,20 @@ static DEFINE_PER_CPU(struct fpsimd_state *, fpsimd_=
+last_state);
+>  /* Default VL for tasks that don't set it explicitly: */
+>  static int sve_default_vl =3D SVE_VL_MIN;
+>
+> +#ifdef CONFIG_ARM64_SVE
+> +
+> +/* Maximum supported vector length across all CPUs (initially poisoned) =
+*/
+> +int __ro_after_init sve_max_vl =3D -1;
+> +/* Set of available vector lengths, as vq_to_bit(vq): */
+> +static DECLARE_BITMAP(sve_vq_map, SVE_VQ_MAX);
+> +
+> +#else /* ! CONFIG_ARM64_SVE */
+> +
+> +/* Dummy declaration for code that will be optimised out: */
+> +extern DECLARE_BITMAP(sve_vq_map, SVE_VQ_MAX);
+> +
+> +#endif /* ! CONFIG_ARM64_SVE */
+> +
+>  /*
+>   * Call __sve_free() directly only if you know task can't be scheduled
+>   * or preempted.
+> @@ -270,6 +287,50 @@ static void task_fpsimd_save(void)
+>  	}
+>  }
+>
+> +/*
+> + * Helpers to translate bit indices in sve_vq_map to VQ values (and
+> + * vice versa).  This allows find_next_bit() to be used to find the
+> + * _maximum_ VQ not exceeding a certain value.
+> + */
+> +
+> +static unsigned int vq_to_bit(unsigned int vq)
+> +{
+> +	return SVE_VQ_MAX - vq;
+> +}
+> +
+> +static unsigned int bit_to_vq(unsigned int bit)
+> +{
+> +	if (WARN_ON(bit >=3D SVE_VQ_MAX))
+> +		bit =3D SVE_VQ_MAX - 1;
+> +
+> +	return SVE_VQ_MAX - bit;
+> +}
+> +
+> +/*
+> + * All vector length selection from userspace comes through here.
+> + * We're on a slow path, so some sanity-checks are included.
+> + * If things go wrong there's a bug somewhere, but try to fall back to a
+> + * safe choice.
+> + */
+> +static unsigned int find_supported_vector_length(unsigned int vl)
+> +{
+> +	int bit;
+> +	int max_vl =3D sve_max_vl;
+> +
+> +	if (WARN_ON(!sve_vl_valid(vl)))
+> +		vl =3D SVE_VL_MIN;
+> +
+> +	if (WARN_ON(!sve_vl_valid(max_vl)))
+> +		max_vl =3D SVE_VL_MIN;
+> +
+> +	if (vl > max_vl)
+> +		vl =3D max_vl;
+> +
+> +	bit =3D find_next_bit(sve_vq_map, SVE_VQ_MAX,
+> +			    vq_to_bit(sve_vq_from_vl(vl)));
+> +	return sve_vl_from_vq(bit_to_vq(bit));
+> +}
+> +
+>  #define ZREG(sve_state, vq, n) ((char *)(sve_state) +		\
+>  	(SVE_SIG_ZREG_OFFSET(vq, n) - SVE_SIG_REGS_OFFSET))
+>
+> @@ -364,6 +425,76 @@ void sve_alloc(struct task_struct *task)
+>  	BUG_ON(!task->thread.sve_state);
+>  }
+>
+> +int sve_set_vector_length(struct task_struct *task,
+> +			  unsigned long vl, unsigned long flags)
+> +{
+> +	if (flags & ~(unsigned long)(PR_SVE_VL_INHERIT |
+> +				     PR_SVE_SET_VL_ONEXEC))
+> +		return -EINVAL;
+> +
+> +	if (!sve_vl_valid(vl))
+> +		return -EINVAL;
+> +
+> +	/*
+> +	 * Clamp to the maximum vector length that VL-agnostic SVE code can
+> +	 * work with.  A flag may be assigned in the future to allow setting
+> +	 * of larger vector lengths without confusing older software.
+> +	 */
+> +	if (vl > SVE_VL_ARCH_MAX)
+> +		vl =3D SVE_VL_ARCH_MAX;
+> +
+> +	vl =3D find_supported_vector_length(vl);
+> +
+> +	if (flags & (PR_SVE_VL_INHERIT |
+> +		     PR_SVE_SET_VL_ONEXEC))
+> +		task->thread.sve_vl_onexec =3D vl;
+> +	else
+> +		/* Reset VL to system default on next exec: */
+> +		task->thread.sve_vl_onexec =3D 0;
+> +
+> +	/* Only actually set the VL if not deferred: */
+> +	if (flags & PR_SVE_SET_VL_ONEXEC)
+> +		goto out;
+> +
+> +	if (vl =3D=3D task->thread.sve_vl)
+> +		goto out;
+> +
+> +	/*
+> +	 * To ensure the FPSIMD bits of the SVE vector registers are preserved,
+> +	 * write any live register state back to task_struct, and convert to a
+> +	 * non-SVE thread.
+> +	 */
+> +	if (task =3D=3D current) {
+> +		local_bh_disable();
+> +
+> +		task_fpsimd_save();
+> +		set_thread_flag(TIF_FOREIGN_FPSTATE);
+> +	}
+> +
+> +	fpsimd_flush_task_state(task);
+> +	if (test_and_clear_tsk_thread_flag(task, TIF_SVE))
+> +		sve_to_fpsimd(task);
+> +
+> +	if (task =3D=3D current)
+> +		local_bh_enable();
+> +
+> +	/*
+> +	 * Force reallocation of task SVE state to the correct size
+> +	 * on next use:
+> +	 */
+> +	sve_free(task);
+> +
+> +	task->thread.sve_vl =3D vl;
+> +
+> +out:
+> +	if (flags & PR_SVE_VL_INHERIT)
+> +		set_tsk_thread_flag(task, TIF_SVE_VL_INHERIT);
+> +	else
+> +		clear_tsk_thread_flag(task, TIF_SVE_VL_INHERIT);
+> +
+> +	return 0;
+> +}
+> +
+>  /*
+>   * Called from the put_task_struct() path, which cannot get here
+>   * unless dead_task is really dead and not schedulable.
+> @@ -480,7 +611,7 @@ void fpsimd_thread_switch(struct task_struct *next)
+>
+>  void fpsimd_flush_thread(void)
+>  {
+> -	int vl;
+> +	int vl, supported_vl;
+>
+>  	if (!system_supports_fpsimd())
+>  		return;
+> @@ -508,6 +639,10 @@ void fpsimd_flush_thread(void)
+>  		if (WARN_ON(!sve_vl_valid(vl)))
+>  			vl =3D SVE_VL_MIN;
+>
+> +		supported_vl =3D find_supported_vector_length(vl);
+> +		if (WARN_ON(supported_vl !=3D vl))
+> +			vl =3D supported_vl;
+> +
+>  		current->thread.sve_vl =3D vl;
+>
+>  		/*
+> diff --git a/include/uapi/linux/prctl.h b/include/uapi/linux/prctl.h
+> index a8d0759..1b64901 100644
+> --- a/include/uapi/linux/prctl.h
+> +++ b/include/uapi/linux/prctl.h
+> @@ -197,4 +197,9 @@ struct prctl_mm_map {
+>  # define PR_CAP_AMBIENT_LOWER		3
+>  # define PR_CAP_AMBIENT_CLEAR_ALL	4
+>
+> +/* arm64 Scalable Vector Extension controls */
+> +# define PR_SVE_SET_VL_ONEXEC		(1 << 18) /* defer effect until exec */
+> +# define PR_SVE_VL_LEN_MASK		0xffff
+> +# define PR_SVE_VL_INHERIT		(1 << 17) /* inherit across exec */
+> +
+>  #endif /* _LINUX_PRCTL_H */
