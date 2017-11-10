@@ -1,173 +1,225 @@
 From: Dongjiu Geng <gengdongjiu@huawei.com>
-Subject: [PATCH v8 5/7] arm64: kvm: Introduce KVM_ARM_SET_SERROR_ESR ioctl
-Date: Sat, 11 Nov 2017 03:54:08 +0800
-Message-ID: <1510343650-23659-6-git-send-email-gengdongjiu@huawei.com>
+Subject: [PATCH v8 7/7] arm64: kvm: handle SError Interrupt by categorization
+Date: Sat, 11 Nov 2017 03:54:10 +0800
+Message-ID: <1510343650-23659-8-git-send-email-gengdongjiu@huawei.com>
 References: <1510343650-23659-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain
-Return-path: <kvm-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1510343650-23659-1-git-send-email-gengdongjiu@huawei.com>
-Sender: kvm-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 To: christoffer.dall@linaro.org, marc.zyngier@arm.com, linux@armlinux.org.uk, bp@alien8.de, rjw@rjwysocki.net, james.morse@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, corbet@lwn.net, catalin.marinas@arm.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-acpi@vger.kernel.org, devel@acpica.org, gengdongjiu@huawei.com, huangshaoyu@huawei.com, wuquanming@huawei.com, linuxarm@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The ARM64 RAS SError Interrupt(SEI) syndrome value is specific to the
-guest and user space needs a way to tell KVM this value. So we add a
-new ioctl. Before user space specifies the Exception Syndrome Register
-ESR(ESR), it firstly checks that whether KVM has the capability to
-set the guest ESR, If has, will set it. Otherwise, nothing to do.
+If it is not RAS SError, directly inject virtual SError,
+which will keep the old way. If it is RAS SError, firstly
+let host ACPI module to handle it. For the ACPI handling,
+if the error address is invalid, APEI driver will not
+identify the address to hwpoison memory and can not notify
+guest to do the recovery. In order to safe, KVM continues
+categorizing errors and handle it separately.
 
-For this ESR specifying, Only support for AArch64, not support AArch32.
+If the RAS error is not propagated, let host user space to
+handle it. The reason is that sometimes we can only kill the
+guest effected application instead of panic whose guest OS.
+Host user space specifies a valid ESR and inject virtual
+SError, guest can just kill the current application if the
+non-consumed error coming from guest application.
 
 Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 Signed-off-by: Quanming Wu <wuquanming@huawei.com>
-
-change the name to KVM_CAP_ARM_INJECT_SERROR_ESR instead of
-XXXXX_ARM_RAS_EXTENSION, suggested here
-
-https://patchwork.kernel.org/patch/9925203/
 ---
- Documentation/virtual/kvm/api.txt | 11 +++++++++++
- arch/arm/include/asm/kvm_host.h   |  1 +
- arch/arm/kvm/guest.c              |  9 +++++++++
- arch/arm64/include/asm/kvm_host.h |  1 +
- arch/arm64/kvm/guest.c            |  5 +++++
- arch/arm64/kvm/reset.c            |  3 +++
- include/uapi/linux/kvm.h          |  3 +++
- virt/kvm/arm/arm.c                |  7 +++++++
- 8 files changed, 40 insertions(+)
+ arch/arm64/include/asm/esr.h         | 15 ++++++++
+ arch/arm64/include/asm/kvm_asm.h     |  3 ++
+ arch/arm64/include/asm/system_misc.h |  1 +
+ arch/arm64/kvm/handle_exit.c         | 67 +++++++++++++++++++++++++++++++++---
+ arch/arm64/mm/fault.c                | 16 +++++++++
+ 5 files changed, 98 insertions(+), 4 deletions(-)
 
-diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-index e63a35f..6dfb9fc 100644
---- a/Documentation/virtual/kvm/api.txt
-+++ b/Documentation/virtual/kvm/api.txt
-@@ -4347,3 +4347,14 @@ This capability indicates that userspace can load HV_X64_MSR_VP_INDEX msr.  Its
- value is used to denote the target vcpu for a SynIC interrupt.  For
- compatibilty, KVM initializes this msr to KVM's internal vcpu index.  When this
- capability is absent, userspace can still query this msr's value.
-+
-+8.13 KVM_CAP_ARM_SET_SERROR_ESR
-+
-+Architectures: arm, arm64
-+
-+This capability indicates that userspace can specify syndrome value reported to
-+guest OS when guest takes a virtual SError interrupt exception.
-+If KVM has this capability, userspace can only specify the ISS field for the ESR
-+syndrome, can not specify the EC field which is not under control by KVM.
-+If this virtual SError is taken to EL1 using AArch64, this value will be reported
-+into ISS filed of ESR_EL1
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 4a879f6..6cf5c7b 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -211,6 +211,7 @@ struct kvm_vcpu_stat {
- int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *indices);
- int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
- int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
-+int kvm_arm_set_sei_esr(struct kvm_vcpu *vcpu, u32 *syndrome);
- unsigned long kvm_call_hyp(void *hypfn, ...);
- void force_vm_exit(const cpumask_t *mask);
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index 66ed8b6..aca7eee 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -102,6 +102,7 @@
+ #define ESR_ELx_FSC_ACCESS	(0x08)
+ #define ESR_ELx_FSC_FAULT	(0x04)
+ #define ESR_ELx_FSC_PERM	(0x0C)
++#define ESR_ELx_FSC_SERROR	(0x11)
  
-diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
-index 1e0784e..1e15fa2 100644
---- a/arch/arm/kvm/guest.c
-+++ b/arch/arm/kvm/guest.c
-@@ -248,6 +248,15 @@ int kvm_arch_vcpu_ioctl_set_sregs(struct kvm_vcpu *vcpu,
- 	return -EINVAL;
+ /* ISS field definitions for Data Aborts */
+ #define ESR_ELx_ISV_SHIFT	(24)
+@@ -119,6 +120,20 @@
+ #define ESR_ELx_CM_SHIFT	(8)
+ #define ESR_ELx_CM 		(UL(1) << ESR_ELx_CM_SHIFT)
+ 
++/* ISS field definitions for SError interrupt */
++#define ESR_ELx_AET_SHIFT	(10)
++#define ESR_ELx_AET		(UL(0x7) << ESR_ELx_AET_SHIFT)
++/* Uncontainable error */
++#define ESR_ELx_AET_UC		(UL(0) << ESR_ELx_AET_SHIFT)
++/* Unrecoverable error */
++#define ESR_ELx_AET_UEU		(UL(1) << ESR_ELx_AET_SHIFT)
++/* Restartable error */
++#define ESR_ELx_AET_UEO		(UL(2) << ESR_ELx_AET_SHIFT)
++/* Recoverable error */
++#define ESR_ELx_AET_UER		(UL(3) << ESR_ELx_AET_SHIFT)
++/* Corrected */
++#define ESR_ELx_AET_CE		(UL(6) << ESR_ELx_AET_SHIFT)
++
+ /* ISS field definitions for exceptions taken in to Hyp */
+ #define ESR_ELx_CV		(UL(1) << 24)
+ #define ESR_ELx_COND_SHIFT	(20)
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 26a64d0..884f723 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -27,6 +27,9 @@
+ #define ARM_EXCEPTION_IRQ	  0
+ #define ARM_EXCEPTION_EL1_SERROR  1
+ #define ARM_EXCEPTION_TRAP	  2
++/* Error code for SError Interrupt (SEI) exception */
++#define KVM_SEI_SEV_RECOVERABLE	  1
++
+ /* The hyp-stub will return this for any kvm_call_hyp() call */
+ #define ARM_EXCEPTION_HYP_GONE	  HVC_STUB_ERR
+ 
+diff --git a/arch/arm64/include/asm/system_misc.h b/arch/arm64/include/asm/system_misc.h
+index 07aa8e3..9ee13ad 100644
+--- a/arch/arm64/include/asm/system_misc.h
++++ b/arch/arm64/include/asm/system_misc.h
+@@ -57,6 +57,7 @@ void hook_debug_fault_code(int nr, int (*fn)(unsigned long, unsigned int,
+ })
+ 
+ int handle_guest_sea(phys_addr_t addr, unsigned int esr);
++int handle_guest_sei(void);
+ 
+ #endif	/* __ASSEMBLY__ */
+ 
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 7debb74..1afdc87 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -28,6 +28,7 @@
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_mmu.h>
+ #include <asm/kvm_psci.h>
++#include <asm/system_misc.h>
+ 
+ #define CREATE_TRACE_POINTS
+ #include "trace.h"
+@@ -178,6 +179,66 @@ static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
+ 	return arm_exit_handlers[hsr_ec];
  }
  
-+/*
-+ * we only support guest SError syndrome specifying
-+ * for ARM64, not support it for ARM32.
++/**
++ * kvm_handle_guest_sei - handles SError interrupt or asynchronous aborts
++ * @vcpu:	the VCPU pointer
++ *
++ * For RAS SError interrupt, firstly let host kernel handle it.
++ * If the AET is [ESR_ELx_AET_UER], then let user space handle it,
 + */
-+int kvm_arm_set_sei_esr(struct kvm_vcpu *vcpu, u32 *syndrome)
++static int kvm_handle_guest_sei(struct kvm_vcpu *vcpu, struct kvm_run *run)
 +{
-+	return -EINVAL;
++	unsigned int esr = kvm_vcpu_get_hsr(vcpu);
++	bool impdef_syndrome =  esr & ESR_ELx_ISV;	/* aka IDS */
++	unsigned int aet = esr & ESR_ELx_AET;
++
++	/*
++	 * This is not RAS SError
++	 */
++	if (!cpus_have_const_cap(ARM64_HAS_RAS_EXTN)) {
++		kvm_inject_vabt(vcpu);
++		return 1;
++	}
++
++	/* The host kernel may handle this abort. */
++	handle_guest_sei();
++
++	/*
++	 * In below two conditions, it will directly inject the
++	 * virtual SError:
++	 * 1. The Syndrome is IMPLEMENTATION DEFINED
++	 * 2. It is Uncategorized SEI
++	 */
++	if (impdef_syndrome ||
++		((esr & ESR_ELx_FSC) != ESR_ELx_FSC_SERROR)) {
++		kvm_inject_vabt(vcpu);
++		return 1;
++	}
++
++	switch (aet) {
++	case ESR_ELx_AET_CE:	/* corrected error */
++	case ESR_ELx_AET_UEO:	/* restartable error, not yet consumed */
++		return 1;	/* continue processing the guest exit */
++	case ESR_ELx_AET_UER:	/* The error has not been propagated */
++		/*
++		 * Userspace only handle the guest SError Interrupt(SEI) if the
++		 * error has not been propagated
++		 */
++		run->exit_reason = KVM_EXIT_EXCEPTION;
++		run->ex.exception = ESR_ELx_EC_SERROR;
++		run->ex.error_code = KVM_SEI_SEV_RECOVERABLE;
++		return 0;
++	default:
++		/*
++		 * Until now, the CPU supports RAS and SEI is fatal, or host
++		 * does not support to handle the SError.
++		 */
++		panic("This Asynchronous SError interrupt is dangerous, panic");
++	}
++
++	return 0;
 +}
 +
- int __attribute_const__ kvm_target_cpu(void)
- {
- 	switch (read_cpuid_part()) {
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index e923b58..769cc58 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -317,6 +317,7 @@ struct kvm_vcpu_stat {
- int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *indices);
- int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
- int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
-+int kvm_arm_set_sei_esr(struct kvm_vcpu *vcpu, u32 *syndrome);
+ /*
+  * Return > 0 to return to guest, < 0 on error, 0 (and set exit_reason) on
+  * proper exit to userspace.
+@@ -201,8 +262,7 @@ int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 			*vcpu_pc(vcpu) -= adj;
+ 		}
  
- #define KVM_ARCH_WANT_MMU_NOTIFIER
- int kvm_unmap_hva(struct kvm *kvm, unsigned long hva);
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 5c7f657..738ae90 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -277,6 +277,11 @@ int kvm_arch_vcpu_ioctl_set_sregs(struct kvm_vcpu *vcpu,
- 	return -EINVAL;
+-		kvm_inject_vabt(vcpu);
+-		return 1;
++		return kvm_handle_guest_sei(vcpu, run);
+ 	}
+ 
+ 	exception_index = ARM_EXCEPTION_CODE(exception_index);
+@@ -211,8 +271,7 @@ int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 	case ARM_EXCEPTION_IRQ:
+ 		return 1;
+ 	case ARM_EXCEPTION_EL1_SERROR:
+-		kvm_inject_vabt(vcpu);
+-		return 1;
++		return kvm_handle_guest_sei(vcpu, run);
+ 	case ARM_EXCEPTION_TRAP:
+ 		/*
+ 		 * See ARM ARM B1.14.1: "Hyp traps on instructions
+diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+index b64958b..8560672 100644
+--- a/arch/arm64/mm/fault.c
++++ b/arch/arm64/mm/fault.c
+@@ -728,6 +728,22 @@ int handle_guest_sea(phys_addr_t addr, unsigned int esr)
  }
  
-+int kvm_arm_set_sei_esr(struct kvm_vcpu *vcpu, u32 *syndrome)
+ /*
++ * Handle SError interrupt that occurred in guest OS.
++ *
++ * The return value will be zero if the SEI was successfully handled
++ * and non-zero if handling is failed.
++ */
++int handle_guest_sei(void)
 +{
-+	return -EINVAL;
++	int ret = -ENOENT;
++
++	if (IS_ENABLED(CONFIG_ACPI_APEI_SEI))
++		ret = ghes_notify_sei();
++
++	return ret;
 +}
 +
- int __attribute_const__ kvm_target_cpu(void)
- {
- 	unsigned long implementor = read_cpuid_implementor();
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 3256b92..38c8a64 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -77,6 +77,9 @@ int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ARM_PMU_V3:
- 		r = kvm_arm_support_pmu_v3();
- 		break;
-+	case KVM_CAP_ARM_INJECT_SERROR_ESR:
-+		r = cpus_have_const_cap(ARM64_HAS_RAS_EXTN);
-+		break;
- 	case KVM_CAP_SET_GUEST_DEBUG:
- 	case KVM_CAP_VCPU_ATTRIBUTES:
- 		r = 1;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 7e99999..0c861c4 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -931,6 +931,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_PPC_SMT_POSSIBLE 147
- #define KVM_CAP_HYPERV_SYNIC2 148
- #define KVM_CAP_HYPERV_VP_INDEX 149
-+#define KVM_CAP_ARM_INJECT_SERROR_ESR 150
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-@@ -1357,6 +1358,8 @@ struct kvm_s390_ucas_mapping {
- /* Available with KVM_CAP_S390_CMMA_MIGRATION */
- #define KVM_S390_GET_CMMA_BITS      _IOWR(KVMIO, 0xb8, struct kvm_s390_cmma_log)
- #define KVM_S390_SET_CMMA_BITS      _IOW(KVMIO, 0xb9, struct kvm_s390_cmma_log)
-+/* Available with KVM_CAP_ARM_INJECT_SERROR_ESR */
-+#define KVM_ARM_INJECT_SERROR_ESR   _IOW(KVMIO,  0xba, __u32)
- 
- #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
- #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 95cba07..60dea5f 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -1027,6 +1027,13 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 			return -EFAULT;
- 		return kvm_arm_vcpu_has_attr(vcpu, &attr);
- 	}
-+	case KVM_ARM_INJECT_SERROR_ESR: {
-+		u32 syndrome;
-+
-+		if (copy_from_user(&syndrome, argp, sizeof(syndrome)))
-+			return -EFAULT;
-+		return kvm_arm_set_sei_esr(vcpu, &syndrome);
-+	}
- 	default:
- 		return -EINVAL;
- 	}
++/*
+  * Dispatch a data abort to the relevant handler.
+  */
+ asmlinkage void __exception do_mem_abort(unsigned long addr, unsigned int esr,
 -- 
 1.9.1
