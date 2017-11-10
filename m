@@ -1,288 +1,173 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH v5 16/30] arm64/sve: Backend logic for setting the vector length
-Date: Fri, 10 Nov 2017 10:27:36 +0000
-Message-ID: <8760aiqvhj.fsf@linaro.org>
-References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com> <1509465082-30427-17-git-send-email-Dave.Martin@arm.com>
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+Subject: [PATCH v8 5/7] arm64: kvm: Introduce KVM_ARM_SET_SERROR_ESR ioctl
+Date: Sat, 11 Nov 2017 03:54:08 +0800
+Message-ID: <1510343650-23659-6-git-send-email-gengdongjiu@huawei.com>
+References: <1510343650-23659-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Return-path: <linux-arch-owner@vger.kernel.org>
-In-reply-to: <1509465082-30427-17-git-send-email-Dave.Martin@arm.com>
-Sender: linux-arch-owner@vger.kernel.org
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, libc-alpha@sourceware.org, linux-arch@vger.kernel.org
+Content-Type: text/plain
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1510343650-23659-1-git-send-email-gengdongjiu@huawei.com>
+Sender: kvm-owner@vger.kernel.org
+To: christoffer.dall@linaro.org, marc.zyngier@arm.com, linux@armlinux.org.uk, bp@alien8.de, rjw@rjwysocki.net, james.morse@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, corbet@lwn.net, catalin.marinas@arm.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-acpi@vger.kernel.org, devel@acpica.org, gengdongjiu@huawei.com, huangshaoyu@huawei.com, wuquanming@huawei.com, linuxarm@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
+The ARM64 RAS SError Interrupt(SEI) syndrome value is specific to the
+guest and user space needs a way to tell KVM this value. So we add a
+new ioctl. Before user space specifies the Exception Syndrome Register
+ESR(ESR), it firstly checks that whether KVM has the capability to
+set the guest ESR, If has, will set it. Otherwise, nothing to do.
 
-Dave Martin <Dave.Martin@arm.com> writes:
+For this ESR specifying, Only support for AArch64, not support AArch32.
 
-> This patch implements the core logic for changing a task's vector
-> length on request from userspace.  This will be used by the ptrace
-> and prctl frontends that are implemented in later patches.
->
-> The SVE architecture permits, but does not require, implementations
-> to support vector lengths that are not a power of two.  To handle
-> this, logic is added to check a requested vector length against a
-> possibly sparse bitmap of available vector lengths at runtime, so
-> that the best supported value can be chosen.
->
-> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+Signed-off-by: Quanming Wu <wuquanming@huawei.com>
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+change the name to KVM_CAP_ARM_INJECT_SERROR_ESR instead of
+XXXXX_ARM_RAS_EXTENSION, suggested here
 
-> ---
->  arch/arm64/include/asm/fpsimd.h |   8 +++
->  arch/arm64/kernel/fpsimd.c      | 137 ++++++++++++++++++++++++++++++++++=
-+++++-
->  include/uapi/linux/prctl.h      |   5 ++
->  3 files changed, 149 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fps=
-imd.h
-> index 9bbd74c..86f550c 100644
-> --- a/arch/arm64/include/asm/fpsimd.h
-> +++ b/arch/arm64/include/asm/fpsimd.h
-> @@ -20,6 +20,7 @@
->
->  #ifndef __ASSEMBLY__
->
-> +#include <linux/cache.h>
->  #include <linux/stddef.h>
->
->  /*
-> @@ -70,17 +71,24 @@ extern void fpsimd_update_current_state(struct fpsimd=
-_state *state);
->
->  extern void fpsimd_flush_task_state(struct task_struct *target);
->
-> +/* Maximum VL that SVE VL-agnostic software can transparently support */
-> +#define SVE_VL_ARCH_MAX 0x100
-> +
->  extern void sve_save_state(void *state, u32 *pfpsr);
->  extern void sve_load_state(void const *state, u32 const *pfpsr,
->  			   unsigned long vq_minus_1);
->  extern unsigned int sve_get_vl(void);
->
-> +extern int __ro_after_init sve_max_vl;
-> +
->  #ifdef CONFIG_ARM64_SVE
->
->  extern size_t sve_state_size(struct task_struct const *task);
->
->  extern void sve_alloc(struct task_struct *task);
->  extern void fpsimd_release_task(struct task_struct *task);
-> +extern int sve_set_vector_length(struct task_struct *task,
-> +				 unsigned long vl, unsigned long flags);
->
->  #else /* ! CONFIG_ARM64_SVE */
->
-> diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-> index e0b5ef5..1ceb069 100644
-> --- a/arch/arm64/kernel/fpsimd.c
-> +++ b/arch/arm64/kernel/fpsimd.c
-> @@ -17,8 +17,10 @@
->   * along with this program.  If not, see <http://www.gnu.org/licenses/>.
->   */
->
-> +#include <linux/bitmap.h>
->  #include <linux/bottom_half.h>
->  #include <linux/bug.h>
-> +#include <linux/cache.h>
->  #include <linux/compat.h>
->  #include <linux/cpu.h>
->  #include <linux/cpu_pm.h>
-> @@ -28,6 +30,7 @@
->  #include <linux/init.h>
->  #include <linux/percpu.h>
->  #include <linux/preempt.h>
-> +#include <linux/prctl.h>
->  #include <linux/ptrace.h>
->  #include <linux/sched/signal.h>
->  #include <linux/signal.h>
-> @@ -113,6 +116,20 @@ static DEFINE_PER_CPU(struct fpsimd_state *, fpsimd_=
-last_state);
->  /* Default VL for tasks that don't set it explicitly: */
->  static int sve_default_vl =3D SVE_VL_MIN;
->
-> +#ifdef CONFIG_ARM64_SVE
-> +
-> +/* Maximum supported vector length across all CPUs (initially poisoned) =
-*/
-> +int __ro_after_init sve_max_vl =3D -1;
-> +/* Set of available vector lengths, as vq_to_bit(vq): */
-> +static DECLARE_BITMAP(sve_vq_map, SVE_VQ_MAX);
-> +
-> +#else /* ! CONFIG_ARM64_SVE */
-> +
-> +/* Dummy declaration for code that will be optimised out: */
-> +extern DECLARE_BITMAP(sve_vq_map, SVE_VQ_MAX);
-> +
-> +#endif /* ! CONFIG_ARM64_SVE */
-> +
->  /*
->   * Call __sve_free() directly only if you know task can't be scheduled
->   * or preempted.
-> @@ -270,6 +287,50 @@ static void task_fpsimd_save(void)
->  	}
->  }
->
-> +/*
-> + * Helpers to translate bit indices in sve_vq_map to VQ values (and
-> + * vice versa).  This allows find_next_bit() to be used to find the
-> + * _maximum_ VQ not exceeding a certain value.
-> + */
-> +
-> +static unsigned int vq_to_bit(unsigned int vq)
-> +{
-> +	return SVE_VQ_MAX - vq;
-> +}
-> +
-> +static unsigned int bit_to_vq(unsigned int bit)
-> +{
-> +	if (WARN_ON(bit >=3D SVE_VQ_MAX))
-> +		bit =3D SVE_VQ_MAX - 1;
-> +
-> +	return SVE_VQ_MAX - bit;
-> +}
-> +
-> +/*
-> + * All vector length selection from userspace comes through here.
-> + * We're on a slow path, so some sanity-checks are included.
-> + * If things go wrong there's a bug somewhere, but try to fall back to a
-> + * safe choice.
-> + */
-> +static unsigned int find_supported_vector_length(unsigned int vl)
-> +{
-> +	int bit;
-> +	int max_vl =3D sve_max_vl;
-> +
-> +	if (WARN_ON(!sve_vl_valid(vl)))
-> +		vl =3D SVE_VL_MIN;
-> +
-> +	if (WARN_ON(!sve_vl_valid(max_vl)))
-> +		max_vl =3D SVE_VL_MIN;
-> +
-> +	if (vl > max_vl)
-> +		vl =3D max_vl;
-> +
-> +	bit =3D find_next_bit(sve_vq_map, SVE_VQ_MAX,
-> +			    vq_to_bit(sve_vq_from_vl(vl)));
-> +	return sve_vl_from_vq(bit_to_vq(bit));
-> +}
-> +
->  #define ZREG(sve_state, vq, n) ((char *)(sve_state) +		\
->  	(SVE_SIG_ZREG_OFFSET(vq, n) - SVE_SIG_REGS_OFFSET))
->
-> @@ -364,6 +425,76 @@ void sve_alloc(struct task_struct *task)
->  	BUG_ON(!task->thread.sve_state);
->  }
->
-> +int sve_set_vector_length(struct task_struct *task,
-> +			  unsigned long vl, unsigned long flags)
-> +{
-> +	if (flags & ~(unsigned long)(PR_SVE_VL_INHERIT |
-> +				     PR_SVE_SET_VL_ONEXEC))
-> +		return -EINVAL;
-> +
-> +	if (!sve_vl_valid(vl))
-> +		return -EINVAL;
-> +
-> +	/*
-> +	 * Clamp to the maximum vector length that VL-agnostic SVE code can
-> +	 * work with.  A flag may be assigned in the future to allow setting
-> +	 * of larger vector lengths without confusing older software.
-> +	 */
-> +	if (vl > SVE_VL_ARCH_MAX)
-> +		vl =3D SVE_VL_ARCH_MAX;
-> +
-> +	vl =3D find_supported_vector_length(vl);
-> +
-> +	if (flags & (PR_SVE_VL_INHERIT |
-> +		     PR_SVE_SET_VL_ONEXEC))
-> +		task->thread.sve_vl_onexec =3D vl;
-> +	else
-> +		/* Reset VL to system default on next exec: */
-> +		task->thread.sve_vl_onexec =3D 0;
-> +
-> +	/* Only actually set the VL if not deferred: */
-> +	if (flags & PR_SVE_SET_VL_ONEXEC)
-> +		goto out;
-> +
-> +	if (vl =3D=3D task->thread.sve_vl)
-> +		goto out;
-> +
-> +	/*
-> +	 * To ensure the FPSIMD bits of the SVE vector registers are preserved,
-> +	 * write any live register state back to task_struct, and convert to a
-> +	 * non-SVE thread.
-> +	 */
-> +	if (task =3D=3D current) {
-> +		local_bh_disable();
-> +
-> +		task_fpsimd_save();
-> +		set_thread_flag(TIF_FOREIGN_FPSTATE);
-> +	}
-> +
-> +	fpsimd_flush_task_state(task);
-> +	if (test_and_clear_tsk_thread_flag(task, TIF_SVE))
-> +		sve_to_fpsimd(task);
-> +
-> +	if (task =3D=3D current)
-> +		local_bh_enable();
-> +
-> +	/*
-> +	 * Force reallocation of task SVE state to the correct size
-> +	 * on next use:
-> +	 */
-> +	sve_free(task);
-> +
-> +	task->thread.sve_vl =3D vl;
-> +
-> +out:
-> +	if (flags & PR_SVE_VL_INHERIT)
-> +		set_tsk_thread_flag(task, TIF_SVE_VL_INHERIT);
-> +	else
-> +		clear_tsk_thread_flag(task, TIF_SVE_VL_INHERIT);
-> +
-> +	return 0;
-> +}
-> +
->  /*
->   * Called from the put_task_struct() path, which cannot get here
->   * unless dead_task is really dead and not schedulable.
-> @@ -480,7 +611,7 @@ void fpsimd_thread_switch(struct task_struct *next)
->
->  void fpsimd_flush_thread(void)
->  {
-> -	int vl;
-> +	int vl, supported_vl;
->
->  	if (!system_supports_fpsimd())
->  		return;
-> @@ -508,6 +639,10 @@ void fpsimd_flush_thread(void)
->  		if (WARN_ON(!sve_vl_valid(vl)))
->  			vl =3D SVE_VL_MIN;
->
-> +		supported_vl =3D find_supported_vector_length(vl);
-> +		if (WARN_ON(supported_vl !=3D vl))
-> +			vl =3D supported_vl;
-> +
->  		current->thread.sve_vl =3D vl;
->
->  		/*
-> diff --git a/include/uapi/linux/prctl.h b/include/uapi/linux/prctl.h
-> index a8d0759..1b64901 100644
-> --- a/include/uapi/linux/prctl.h
-> +++ b/include/uapi/linux/prctl.h
-> @@ -197,4 +197,9 @@ struct prctl_mm_map {
->  # define PR_CAP_AMBIENT_LOWER		3
->  # define PR_CAP_AMBIENT_CLEAR_ALL	4
->
-> +/* arm64 Scalable Vector Extension controls */
-> +# define PR_SVE_SET_VL_ONEXEC		(1 << 18) /* defer effect until exec */
-> +# define PR_SVE_VL_LEN_MASK		0xffff
-> +# define PR_SVE_VL_INHERIT		(1 << 17) /* inherit across exec */
-> +
->  #endif /* _LINUX_PRCTL_H */
+https://patchwork.kernel.org/patch/9925203/
+---
+ Documentation/virtual/kvm/api.txt | 11 +++++++++++
+ arch/arm/include/asm/kvm_host.h   |  1 +
+ arch/arm/kvm/guest.c              |  9 +++++++++
+ arch/arm64/include/asm/kvm_host.h |  1 +
+ arch/arm64/kvm/guest.c            |  5 +++++
+ arch/arm64/kvm/reset.c            |  3 +++
+ include/uapi/linux/kvm.h          |  3 +++
+ virt/kvm/arm/arm.c                |  7 +++++++
+ 8 files changed, 40 insertions(+)
+
+diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+index e63a35f..6dfb9fc 100644
+--- a/Documentation/virtual/kvm/api.txt
++++ b/Documentation/virtual/kvm/api.txt
+@@ -4347,3 +4347,14 @@ This capability indicates that userspace can load HV_X64_MSR_VP_INDEX msr.  Its
+ value is used to denote the target vcpu for a SynIC interrupt.  For
+ compatibilty, KVM initializes this msr to KVM's internal vcpu index.  When this
+ capability is absent, userspace can still query this msr's value.
++
++8.13 KVM_CAP_ARM_SET_SERROR_ESR
++
++Architectures: arm, arm64
++
++This capability indicates that userspace can specify syndrome value reported to
++guest OS when guest takes a virtual SError interrupt exception.
++If KVM has this capability, userspace can only specify the ISS field for the ESR
++syndrome, can not specify the EC field which is not under control by KVM.
++If this virtual SError is taken to EL1 using AArch64, this value will be reported
++into ISS filed of ESR_EL1
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index 4a879f6..6cf5c7b 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -211,6 +211,7 @@ struct kvm_vcpu_stat {
+ int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *indices);
+ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
+ int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
++int kvm_arm_set_sei_esr(struct kvm_vcpu *vcpu, u32 *syndrome);
+ unsigned long kvm_call_hyp(void *hypfn, ...);
+ void force_vm_exit(const cpumask_t *mask);
+ 
+diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
+index 1e0784e..1e15fa2 100644
+--- a/arch/arm/kvm/guest.c
++++ b/arch/arm/kvm/guest.c
+@@ -248,6 +248,15 @@ int kvm_arch_vcpu_ioctl_set_sregs(struct kvm_vcpu *vcpu,
+ 	return -EINVAL;
+ }
+ 
++/*
++ * we only support guest SError syndrome specifying
++ * for ARM64, not support it for ARM32.
++ */
++int kvm_arm_set_sei_esr(struct kvm_vcpu *vcpu, u32 *syndrome)
++{
++	return -EINVAL;
++}
++
+ int __attribute_const__ kvm_target_cpu(void)
+ {
+ 	switch (read_cpuid_part()) {
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index e923b58..769cc58 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -317,6 +317,7 @@ struct kvm_vcpu_stat {
+ int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *indices);
+ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
+ int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
++int kvm_arm_set_sei_esr(struct kvm_vcpu *vcpu, u32 *syndrome);
+ 
+ #define KVM_ARCH_WANT_MMU_NOTIFIER
+ int kvm_unmap_hva(struct kvm *kvm, unsigned long hva);
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 5c7f657..738ae90 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -277,6 +277,11 @@ int kvm_arch_vcpu_ioctl_set_sregs(struct kvm_vcpu *vcpu,
+ 	return -EINVAL;
+ }
+ 
++int kvm_arm_set_sei_esr(struct kvm_vcpu *vcpu, u32 *syndrome)
++{
++	return -EINVAL;
++}
++
+ int __attribute_const__ kvm_target_cpu(void)
+ {
+ 	unsigned long implementor = read_cpuid_implementor();
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 3256b92..38c8a64 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -77,6 +77,9 @@ int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_ARM_PMU_V3:
+ 		r = kvm_arm_support_pmu_v3();
+ 		break;
++	case KVM_CAP_ARM_INJECT_SERROR_ESR:
++		r = cpus_have_const_cap(ARM64_HAS_RAS_EXTN);
++		break;
+ 	case KVM_CAP_SET_GUEST_DEBUG:
+ 	case KVM_CAP_VCPU_ATTRIBUTES:
+ 		r = 1;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 7e99999..0c861c4 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -931,6 +931,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_PPC_SMT_POSSIBLE 147
+ #define KVM_CAP_HYPERV_SYNIC2 148
+ #define KVM_CAP_HYPERV_VP_INDEX 149
++#define KVM_CAP_ARM_INJECT_SERROR_ESR 150
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+@@ -1357,6 +1358,8 @@ struct kvm_s390_ucas_mapping {
+ /* Available with KVM_CAP_S390_CMMA_MIGRATION */
+ #define KVM_S390_GET_CMMA_BITS      _IOWR(KVMIO, 0xb8, struct kvm_s390_cmma_log)
+ #define KVM_S390_SET_CMMA_BITS      _IOW(KVMIO, 0xb9, struct kvm_s390_cmma_log)
++/* Available with KVM_CAP_ARM_INJECT_SERROR_ESR */
++#define KVM_ARM_INJECT_SERROR_ESR   _IOW(KVMIO,  0xba, __u32)
+ 
+ #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
+ #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 95cba07..60dea5f 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -1027,6 +1027,13 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 			return -EFAULT;
+ 		return kvm_arm_vcpu_has_attr(vcpu, &attr);
+ 	}
++	case KVM_ARM_INJECT_SERROR_ESR: {
++		u32 syndrome;
++
++		if (copy_from_user(&syndrome, argp, sizeof(syndrome)))
++			return -EFAULT;
++		return kvm_arm_set_sei_esr(vcpu, &syndrome);
++	}
+ 	default:
+ 		return -EINVAL;
+ 	}
+-- 
+1.9.1
