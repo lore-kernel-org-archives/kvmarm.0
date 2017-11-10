@@ -1,206 +1,142 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v5 10/26] KVM: arm/arm64: GICv4: Wire mapping/unmapping of
- VLPIs in VFIO irq bypass
-Date: Fri, 10 Nov 2017 10:41:34 +0100
-Message-ID: <CAMJs5B_Jb_FE3OWpM1Yg1GGu0rq02RzsW70ie9ZUhzTek__RZQ@mail.gmail.com>
-References: <20171027142855.21584-1-marc.zyngier@arm.com>
- <20171027142855.21584-11-marc.zyngier@arm.com>
- <1b60525f-5bb3-d19b-78df-fdfa5f48dc30@redhat.com>
- <0331ecc1-d4d6-420f-1ce8-7be1f386cdff@arm.com>
- <20171110082846.GH14144@cbox> <b9a0e890-f92c-b174-0959-5f14fd3ac726@arm.com>
+From: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+Subject: Re: [PATCH 3/3] arm64: Add software workaround for Falkor erratum
+ 1041
+Date: Fri, 10 Nov 2017 10:24:04 +0000
+Message-ID: <5A057E44.3050109@arm.com>
+References: <1509679664-3749-1-git-send-email-shankerd@codeaurora.org> <1509679664-3749-4-git-send-email-shankerd@codeaurora.org> <1f4a523c-608b-b46b-527a-bc1e02e7db5e@arm.com> <2ef66b5c-d1b7-a5fc-a19d-88dddff95bad@codeaurora.org> <5A04372B.2090902@arm.com> <93801988-e785-bd49-796e-4a73e0b77413@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BE21749D4B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Nov 2017 04:39:34 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jo90qRmIqEec for <kvmarm@lists.cs.columbia.edu>;
- Fri, 10 Nov 2017 04:39:33 -0500 (EST)
-Received: from mail-pf0-f193.google.com (mail-pf0-f193.google.com
- [209.85.192.193])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7DE9D40795
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Nov 2017 04:39:33 -0500 (EST)
-Received: by mail-pf0-f193.google.com with SMTP id b85so6327767pfj.13
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Nov 2017 01:41:35 -0800 (PST)
-In-Reply-To: <b9a0e890-f92c-b174-0959-5f14fd3ac726@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Andre Przywara <Andre.Przywara@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <93801988-e785-bd49-796e-4a73e0b77413-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: shankerd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org
+Cc: Robin Murphy <robin.murphy-5wv7dgnIgG8@public.gmane.org>, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Ard Biesheuvel <ard.biesheuvel-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Matt Fleming <matt-mF/unelCI9GS6iBeEJttW/XRex20P6io@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Nov 10, 2017 at 10:05 AM, Marc Zyngier <marc.zyngier@arm.com> wrote:
-> On 10/11/17 08:28, Christoffer Dall wrote:
->> Hi Eric and Marc,
->>
->> On Tue, Nov 07, 2017 at 02:42:44PM +0000, Marc Zyngier wrote:
->>> Hi Eric,
->>>
->>> On 07/11/17 13:06, Auger Eric wrote:
->>>> Hi Marc,
->>>>
->>>> On 27/10/2017 16:28, Marc Zyngier wrote:
->>>>> Let's use the irq bypass mechanism introduced for platform device
->>>>> interrupts
->>>> nit: I would remove "introduced for platform device interrupts"
->>>> as this is not upstream yet. x86 posted interrupts also use it.
->>>>
->>>>>
->>>>  and establish our LPI->VLPI mapping.
->>
->> I have tweaked the commit message.
->>
->>>>>
->>>>> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
->>>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->>>>> ---
->>>>>  include/kvm/arm_vgic.h      |   8 ++++
->>>>>  virt/kvm/arm/arm.c          |   6 ++-
->>>>>  virt/kvm/arm/vgic/vgic-v4.c | 108 ++++++++++++++++++++++++++++++++++++++++++++
->>>>>  3 files changed, 120 insertions(+), 2 deletions(-)
->>>>>
->>>>> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
->>>>> index 7eeb6c2a2f9c..2f750c770bf2 100644
->>>>> --- a/include/kvm/arm_vgic.h
->>>>> +++ b/include/kvm/arm_vgic.h
->>>>> @@ -373,4 +373,12 @@ int kvm_vgic_setup_default_irq_routing(struct kvm *kvm);
->>>>>
->>>>>  int kvm_vgic_set_owner(struct kvm_vcpu *vcpu, unsigned int intid, void *owner);
->>>>>
->>>>> +struct kvm_kernel_irq_routing_entry;
->>>>> +
->>>>> +int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int irq,
->>>>> +                         struct kvm_kernel_irq_routing_entry *irq_entry);
->>>>> +
->>>>> +int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int irq,
->>>>> +                           struct kvm_kernel_irq_routing_entry *irq_entry);
->>>>> +
->>>>>  #endif /* __KVM_ARM_VGIC_H */
->>>>> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
->>>>> index 5d5218ecd547..8388c1cc23f6 100644
->>>>> --- a/virt/kvm/arm/arm.c
->>>>> +++ b/virt/kvm/arm/arm.c
->>>>> @@ -1462,7 +1462,8 @@ int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
->>>>>    struct kvm_kernel_irqfd *irqfd =
->>>>>            container_of(cons, struct kvm_kernel_irqfd, consumer);
->>>>>
->>>>> -  return 0;
->>>>> +  return kvm_vgic_v4_set_forwarding(irqfd->kvm, prod->irq,
->>>>> +                                    &irqfd->irq_entry);
->>>>>  }
->>>>>  void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
->>>>>                                  struct irq_bypass_producer *prod)
->>>>> @@ -1470,7 +1471,8 @@ void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
->>>>>    struct kvm_kernel_irqfd *irqfd =
->>>>>            container_of(cons, struct kvm_kernel_irqfd, consumer);
->>>>>
->>>>> -  return;
->>>>> +  kvm_vgic_v4_unset_forwarding(irqfd->kvm, prod->irq,
->>>>> +                               &irqfd->irq_entry);
->>>>>  }
->>>>>
->>>>>  void kvm_arch_irq_bypass_stop(struct irq_bypass_consumer *cons)
->>>>> diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
->>>>> index c794f0cef09e..01a2889b7b7c 100644
->>>>> --- a/virt/kvm/arm/vgic/vgic-v4.c
->>>>> +++ b/virt/kvm/arm/vgic/vgic-v4.c
->>>>> @@ -18,6 +18,7 @@
->>>>>  #include <linux/interrupt.h>
->>>>>  #include <linux/irqdomain.h>
->>>>>  #include <linux/kvm_host.h>
->>>>> +#include <linux/irqchip/arm-gic-v3.h>
->>>>>
->>>>>  #include "vgic.h"
->>>>>
->>>>> @@ -81,3 +82,110 @@ void vgic_v4_teardown(struct kvm *kvm)
->>>>>    its_vm->nr_vpes = 0;
->>>>>    its_vm->vpes = NULL;
->>>>>  }
->>>>> +
->>>>> +static struct vgic_its *vgic_get_its(struct kvm *kvm,
->>>>> +                               struct kvm_kernel_irq_routing_entry *irq_entry)
->>>>> +{
->>>>> +  struct kvm_msi msi  = (struct kvm_msi) {
->>>>> +          .address_lo     = irq_entry->msi.address_lo,
->>>>> +          .address_hi     = irq_entry->msi.address_hi,
->>>>> +          .data           = irq_entry->msi.data,
->>>>> +          .flags          = irq_entry->msi.flags,
->>>>> +          .devid          = irq_entry->msi.devid,
->>>>> +  };
->>>>> +
->>>>> +  /*
->>>>> +   * Get a reference on the LPI. If NULL, this is not a valid
->>>>> +   * translation for any of our vITSs.
->>>>> +   */
->>>> I don't understand the relevance of the above comment.
->>>
->>> Hmmm. The first part looks like an outdated leftover, as the ITS is not
->>> refcounted, and we don't deal with LPIs here.
->>>
->>
->> I simply removed this comment.
->>
->> [...]
->>
->> I think the only thing left to fix on this patch is the IRQ_DISABLE_LAZY
->> thing on its_map_vlpi() failures, which Marc can fix post -rc1.
->
-> Here's what I've queued on the irqchip side:
->
-> From 9c0733704b99c89773416af3a412332b0e8bd2a4 Mon Sep 17 00:00:00 2001
-> From: Marc Zyngier <marc.zyngier@arm.com>
-> Date: Fri, 10 Nov 2017 09:00:41 +0000
-> Subject: [PATCH] irqchip/gic-v4: Clear IRQ_DISABLE_UNLAZY again if mapping
->  fails
->
-> Should the call to irq_set_vcpu_affinity() fail at map time,
-> we should restore the normal lazy-disable behaviour instead
-> of staying with the eager disable that GICv4 requires.
->
-> Reported-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  drivers/irqchip/irq-gic-v4.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
-> index cd0bcc3b7e33..dba9d67cb9c1 100644
-> --- a/drivers/irqchip/irq-gic-v4.c
-> +++ b/drivers/irqchip/irq-gic-v4.c
-> @@ -177,6 +177,7 @@ int its_map_vlpi(int irq, struct its_vlpi_map *map)
->                         .map      = map,
->                 },
->         };
-> +       int ret;
->
->         /*
->          * The host will never see that interrupt firing again, so it
-> @@ -184,7 +185,11 @@ int its_map_vlpi(int irq, struct its_vlpi_map *map)
->          */
->         irq_set_status_flags(irq, IRQ_DISABLE_UNLAZY);
->
-> -       return irq_set_vcpu_affinity(irq, &info);
-> +       ret = irq_set_vcpu_affinity(irq, &info);
-> +       if (ret)
-> +               irq_clear_status_flags(irq, IRQ_DISABLE_UNLAZY);
-> +
-> +       return ret;
->  }
->
->  int its_get_vlpi(int irq, struct its_vlpi_map *map)
-> --
-> 2.14.2
->
->
+Hi Shanker,
 
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+On 09/11/17 15:22, Shanker Donthineni wrote:
+> On 11/09/2017 05:08 AM, James Morse wrote:
+>> On 04/11/17 21:43, Shanker Donthineni wrote:
+>>> On 11/03/2017 10:11 AM, Robin Murphy wrote:
+>>>> On 03/11/17 03:27, Shanker Donthineni wrote:
+>>>>> The ARM architecture defines the memory locations that are permitted
+>>>>> to be accessed as the result of a speculative instruction fetch from
+>>>>> an exception level for which all stages of translation are disabled.
+>>>>> Specifically, the core is permitted to speculatively fetch from the
+>>>>> 4KB region containing the current program counter and next 4KB.
+>>>>>
+>>>>> When translation is changed from enabled to disabled for the running
+>>>>> exception level (SCTLR_ELn[M] changed from a value of 1 to 0), the
+>>>>> Falkor core may errantly speculatively access memory locations outside
+>>>>> of the 4KB region permitted by the architecture. The errant memory
+>>>>> access may lead to one of the following unexpected behaviors.
+>>>>>
+>>>>> 1) A System Error Interrupt (SEI) being raised by the Falkor core due
+>>>>>    to the errant memory access attempting to access a region of memory
+>>>>>    that is protected by a slave-side memory protection unit.
+>>>>> 2) Unpredictable device behavior due to a speculative read from device
+>>>>>    memory. This behavior may only occur if the instruction cache is
+>>>>>    disabled prior to or coincident with translation being changed from
+>>>>>    enabled to disabled.
+>>>>>
+>>>>> To avoid the errant behavior, software must execute an ISB immediately
+>>>>> prior to executing the MSR that will change SCTLR_ELn[M] from 1 to 0.
+
+>>>>> diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
+>>>>> index b6dfb4f..4c91efb 100644
+>>>>> --- a/arch/arm64/include/asm/assembler.h
+>>>>> +++ b/arch/arm64/include/asm/assembler.h
+>>>>> @@ -514,6 +515,22 @@
+>>>>>   *   reg: the value to be written.
+>>>>>   */
+>>>>>  	.macro	write_sctlr, eln, reg
+>>>>> +#ifdef CONFIG_QCOM_FALKOR_ERRATUM_1041
+>>>>> +alternative_if ARM64_WORKAROUND_QCOM_FALKOR_E1041
+>>>>> +	tbnz    \reg, #0, 8000f          // enable MMU?
+>>
+>> Won't this match any change that leaves the MMU enabled?
+> 
+> Yes. No need to apply workaround if the MMU is going to be enabled.
+
+(Sorry, looks like I had this upside down)
+
+My badly-made-point is you can't know if the MMU is being disabled unless you
+have both the old and new values.
+
+As an example, in el2_setup, (where the MMU is disabled), we set the EE/E0E bits
+to match the kernel's endianness. Won't your macro will insert an unnecessary
+isb? Is this needed for the errata workaround?
+
+
+>> I think the macro is making this more confusing. Disabling the MMU is obvious
+>> from the call-site, (and really rare!). Trying to work it out from a macro makes
+>> it more complicated than necessary.
+
+> Not clear, are you suggesting not to use read{write}_sctlr() macros instead apply 
+> the workaround from the call-site based on the MMU-on status?
+
+Yes. This is the only way to patch only the locations that turn the MMU off.
+
+
+> If yes, It simplifies
+> the code logic but CONFIG_QCOM_FALKOR_ERRATUM_1041 references are scatter everywhere. 
+
+Wouldn't they only appear in the places that are affected by the errata?
+This is exactly what we want, anyone touching that code now knows they need to
+double check this behaviour, (and ask you to test it!).
+
+Otherwise we have a macro second guessing what is happening, if its not quite
+right (because some information has been lost), we're now not sure what we need
+to do if we ever refactor any of this code.
+
+[...]
+
+>>> I'll prefer alternatives
+>>> just to avoid the unnecessary overhead on future Qualcomm Datacenter
+>>> server CPUs and regression on other CPUs because of inserting an ISB
+>>
+>> I think hiding errata on other CPUs is a good argument.
+>>
+>> My suggestion would be:
+>>> #ifdef CONFIG_QCOM_FALKOR_ERRATUM_1041
+>>> 	isb
+>>> #endif
+>>
+>> In head.S and efi-entry.S, as these run before alternatives.
+>> Then use alternatives to add just the isb in the mmu-off path for the other callers.
+
+> Thanks for your opinion on this one, I'll change to an unconditional ISB in v2 patch.
+> After this change the enable_mmu() issues two ISBs before writing to SCTLR_EL1.
+
+Another great reason not to wrap this in a macro, there may already be a
+suitable isb, in which case a comment will suffice.
+
+
+> Are you okay with this behavior?
+
+Back-to-back isb doesn't sound like a good idea.
+
+
+>  ENTRY(__enable_mmu)
+>         mrs     x1, ID_AA64MMFR0_EL1
+>         ubfx    x2, x1, #ID_AA64MMFR0_TGRAN_SHIFT, 4
+>         cmp     x2, #ID_AA64MMFR0_TGRAN_SUPPORTED
+>         b.ne    __no_granule_support
+>         update_early_cpu_boot_status 0, x1, x2
+>         adrp    x1, idmap_pg_dir
+>         adrp    x2, swapper_pg_dir
+>         msr     ttbr0_el1, x1                   // load TTBR0
+>         msr     ttbr1_el1, x2                   // load TTBR1
+>         isb
+>         write_sctlr el1, x0
+>         isb
+
+Now I'm thoroughly confused. Isn't this one of the sequences that doesn't hit
+the issue? Here we're switching SCTLR.M from 0 to 1.
+
+
+Thanks,
+
+James
