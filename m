@@ -1,27 +1,27 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v5 16/26] KVM: arm/arm64: GICv4: Propagate property
- updates to VLPIs
-Date: Fri, 10 Nov 2017 08:58:18 +0000
-Message-ID: <ad882c6d-8a7b-3291-ef5d-9e6889d39038@arm.com>
+Subject: Re: [PATCH v5 10/26] KVM: arm/arm64: GICv4: Wire mapping/unmapping of
+ VLPIs in VFIO irq bypass
+Date: Fri, 10 Nov 2017 09:05:26 +0000
+Message-ID: <b9a0e890-f92c-b174-0959-5f14fd3ac726@arm.com>
 References: <20171027142855.21584-1-marc.zyngier@arm.com>
- <20171027142855.21584-17-marc.zyngier@arm.com>
- <6763d90f-93bf-ddbb-d456-5979b8870aa2@redhat.com>
- <49bff080-0908-cc7a-7036-543f963180a5@arm.com> <20171110083755.GI14144@cbox>
+ <20171027142855.21584-11-marc.zyngier@arm.com>
+ <1b60525f-5bb3-d19b-78df-fdfa5f48dc30@redhat.com>
+ <0331ecc1-d4d6-420f-1ce8-7be1f386cdff@arm.com> <20171110082846.GH14144@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C4FFA49D09
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Nov 2017 03:56:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 14ABB49D40
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Nov 2017 04:03:29 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EYKL1Pzhrw2M for <kvmarm@lists.cs.columbia.edu>;
- Fri, 10 Nov 2017 03:56:19 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CEA740FB0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Nov 2017 03:56:19 -0500 (EST)
-In-Reply-To: <20171110083755.GI14144@cbox>
+ with ESMTP id PXLH7fEd0Qde for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 10 Nov 2017 04:03:27 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C7A140FB0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Nov 2017 04:03:27 -0500 (EST)
+In-Reply-To: <20171110082846.GH14144@cbox>
 Content-Language: en-GB
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,81 +33,172 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <cdall@linaro.org>
-Cc: kvm@vger.kernel.org, Andre Przywara <Andre.Przywara@arm.com>, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Andre Przywara <Andre.Przywara@arm.com>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 10/11/17 08:37, Christoffer Dall wrote:
-> On Wed, Nov 08, 2017 at 03:08:36PM +0000, Marc Zyngier wrote:
->> On 07/11/17 21:28, Auger Eric wrote:
+On 10/11/17 08:28, Christoffer Dall wrote:
+> Hi Eric and Marc,
+> 
+> On Tue, Nov 07, 2017 at 02:42:44PM +0000, Marc Zyngier wrote:
+>> Hi Eric,
+>>
+>> On 07/11/17 13:06, Auger Eric wrote:
 >>> Hi Marc,
 >>>
 >>> On 27/10/2017 16:28, Marc Zyngier wrote:
->>>> Upon updating a property, we propagate it all the way to the physical
->>>> ITS, and ask for an INV command to be executed there.
+>>>> Let's use the irq bypass mechanism introduced for platform device
+>>>> interrupts
+>>> nit: I would remove "introduced for platform device interrupts"
+>>> as this is not upstream yet. x86 posted interrupts also use it.
+>>>
 >>>>
->>>> Acked-by: Christoffer Dall <cdall@linaro.org>
+>>>  and establish our LPI->VLPI mapping.
+> 
+> I have tweaked the commit message.
+> 
+>>>>
+>>>> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 >>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 >>>> ---
->>>>  virt/kvm/arm/vgic/vgic-its.c | 3 +++
->>>>  1 file changed, 3 insertions(+)
+>>>>  include/kvm/arm_vgic.h      |   8 ++++
+>>>>  virt/kvm/arm/arm.c          |   6 ++-
+>>>>  virt/kvm/arm/vgic/vgic-v4.c | 108 ++++++++++++++++++++++++++++++++++++++++++++
+>>>>  3 files changed, 120 insertions(+), 2 deletions(-)
 >>>>
->>>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->>>> index 0b7e648e7a0c..2e77c7c83942 100644
->>>> --- a/virt/kvm/arm/vgic/vgic-its.c
->>>> +++ b/virt/kvm/arm/vgic/vgic-its.c
->>>> @@ -296,6 +296,9 @@ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
->>>>  		spin_unlock(&irq->irq_lock);
->>>>  	}
+>>>> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+>>>> index 7eeb6c2a2f9c..2f750c770bf2 100644
+>>>> --- a/include/kvm/arm_vgic.h
+>>>> +++ b/include/kvm/arm_vgic.h
+>>>> @@ -373,4 +373,12 @@ int kvm_vgic_setup_default_irq_routing(struct kvm *kvm);
 >>>>  
->>>> +	if (irq->hw)
->>>> +		return its_prop_update_vlpi(irq->host_irq, prop, true);
+>>>>  int kvm_vgic_set_owner(struct kvm_vcpu *vcpu, unsigned int intid, void *owner);
+>>>>  
+>>>> +struct kvm_kernel_irq_routing_entry;
 >>>> +
->>>>  	return 0;
+>>>> +int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int irq,
+>>>> +			       struct kvm_kernel_irq_routing_entry *irq_entry);
+>>>> +
+>>>> +int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int irq,
+>>>> +				 struct kvm_kernel_irq_routing_entry *irq_entry);
+>>>> +
+>>>>  #endif /* __KVM_ARM_VGIC_H */
+>>>> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+>>>> index 5d5218ecd547..8388c1cc23f6 100644
+>>>> --- a/virt/kvm/arm/arm.c
+>>>> +++ b/virt/kvm/arm/arm.c
+>>>> @@ -1462,7 +1462,8 @@ int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
+>>>>  	struct kvm_kernel_irqfd *irqfd =
+>>>>  		container_of(cons, struct kvm_kernel_irqfd, consumer);
+>>>>  
+>>>> -	return 0;
+>>>> +	return kvm_vgic_v4_set_forwarding(irqfd->kvm, prod->irq,
+>>>> +					  &irqfd->irq_entry);
 >>>>  }
->>> I am confused by the vgic_queue_irq_unlock() on the "hw" path. Why is it
->>> needed in hw mode?
+>>>>  void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
+>>>>  				      struct irq_bypass_producer *prod)
+>>>> @@ -1470,7 +1471,8 @@ void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
+>>>>  	struct kvm_kernel_irqfd *irqfd =
+>>>>  		container_of(cons, struct kvm_kernel_irqfd, consumer);
+>>>>  
+>>>> -	return;
+>>>> +	kvm_vgic_v4_unset_forwarding(irqfd->kvm, prod->irq,
+>>>> +				     &irqfd->irq_entry);
+>>>>  }
+>>>>  
+>>>>  void kvm_arch_irq_bypass_stop(struct irq_bypass_consumer *cons)
+>>>> diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
+>>>> index c794f0cef09e..01a2889b7b7c 100644
+>>>> --- a/virt/kvm/arm/vgic/vgic-v4.c
+>>>> +++ b/virt/kvm/arm/vgic/vgic-v4.c
+>>>> @@ -18,6 +18,7 @@
+>>>>  #include <linux/interrupt.h>
+>>>>  #include <linux/irqdomain.h>
+>>>>  #include <linux/kvm_host.h>
+>>>> +#include <linux/irqchip/arm-gic-v3.h>
+>>>>  
+>>>>  #include "vgic.h"
+>>>>  
+>>>> @@ -81,3 +82,110 @@ void vgic_v4_teardown(struct kvm *kvm)
+>>>>  	its_vm->nr_vpes = 0;
+>>>>  	its_vm->vpes = NULL;
+>>>>  }
+>>>> +
+>>>> +static struct vgic_its *vgic_get_its(struct kvm *kvm,
+>>>> +				     struct kvm_kernel_irq_routing_entry *irq_entry)
+>>>> +{
+>>>> +	struct kvm_msi msi  = (struct kvm_msi) {
+>>>> +		.address_lo	= irq_entry->msi.address_lo,
+>>>> +		.address_hi	= irq_entry->msi.address_hi,
+>>>> +		.data		= irq_entry->msi.data,
+>>>> +		.flags		= irq_entry->msi.flags,
+>>>> +		.devid		= irq_entry->msi.devid,
+>>>> +	};
+>>>> +
+>>>> +	/*
+>>>> +	 * Get a reference on the LPI. If NULL, this is not a valid
+>>>> +	 * translation for any of our vITSs.
+>>>> +	 */
+>>> I don't understand the relevance of the above comment.
 >>
->> It's not. I guess we could bypass this altogether and take a short cut
->> after having updated the priority and enabled fields.
+>> Hmmm. The first part looks like an outdated leftover, as the ITS is not
+>> refcounted, and we don't deal with LPIs here.
 >>
 > 
-> I can apply this on top of the series as well if you're happy with it:
+> I simply removed this comment.
 > 
-> commit b54fba93b1330803a59ca75f3a5102e22cadc871 (HEAD -> next-gicv4)
-> Author: Christoffer Dall <christoffer.dall@linaro.org>
-> Date:   Fri Nov 10 09:34:54 2017 +0100
+> [...]
 > 
->     KVM: arm/arm64: Don't queue VLPIs on INV/INVALL
->     
->     Since VLPIs are injected directly by the hardware there's no need to
->     mark these as pending in software and queue them on the AP list.
->     
->     Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index c93ecd4a903b..a3754ec719c4 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -292,11 +292,14 @@ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
->  		irq->priority = LPI_PROP_PRIORITY(prop);
->  		irq->enabled = LPI_PROP_ENABLE_BIT(prop);
->  
-> -		vgic_queue_irq_unlock(kvm, irq, flags);
-> -	} else {
-> -		spin_unlock_irqrestore(&irq->irq_lock, flags);
-> +		if (!irq->hw) {
-> +			vgic_queue_irq_unlock(kvm, irq, flags);
-> +			return 0;
-> +		}
->  	}
->  
-> +	spin_unlock_irqrestore(&irq->irq_lock, flags);
-> +
->  	if (irq->hw)
->  		return its_prop_update_vlpi(irq->host_irq, prop, needs_inv);
->  
+> I think the only thing left to fix on this patch is the IRQ_DISABLE_LAZY
+> thing on its_map_vlpi() failures, which Marc can fix post -rc1.
 
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Here's what I've queued on the irqchip side:
+
+>From 9c0733704b99c89773416af3a412332b0e8bd2a4 Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <marc.zyngier@arm.com>
+Date: Fri, 10 Nov 2017 09:00:41 +0000
+Subject: [PATCH] irqchip/gic-v4: Clear IRQ_DISABLE_UNLAZY again if mapping
+ fails
+
+Should the call to irq_set_vcpu_affinity() fail at map time,
+we should restore the normal lazy-disable behaviour instead
+of staying with the eager disable that GICv4 requires.
+
+Reported-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ drivers/irqchip/irq-gic-v4.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
+index cd0bcc3b7e33..dba9d67cb9c1 100644
+--- a/drivers/irqchip/irq-gic-v4.c
++++ b/drivers/irqchip/irq-gic-v4.c
+@@ -177,6 +177,7 @@ int its_map_vlpi(int irq, struct its_vlpi_map *map)
+ 			.map      = map,
+ 		},
+ 	};
++	int ret;
+ 
+ 	/*
+ 	 * The host will never see that interrupt firing again, so it
+@@ -184,7 +185,11 @@ int its_map_vlpi(int irq, struct its_vlpi_map *map)
+ 	 */
+ 	irq_set_status_flags(irq, IRQ_DISABLE_UNLAZY);
+ 
+-	return irq_set_vcpu_affinity(irq, &info);
++	ret = irq_set_vcpu_affinity(irq, &info);
++	if (ret)
++		irq_clear_status_flags(irq, IRQ_DISABLE_UNLAZY);
++
++	return ret;
+ }
+ 
+ int its_get_vlpi(int irq, struct its_vlpi_map *map)
+-- 
+2.14.2
+
+
+Thanks,
 
 	M.
 -- 
