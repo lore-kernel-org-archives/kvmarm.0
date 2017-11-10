@@ -1,22 +1,23 @@
 From: Dongjiu Geng <gengdongjiu@huawei.com>
-Subject: [PATCH v8 2/7] KVM: arm64: Save ESR_EL2 on guest SError
-Date: Sat, 11 Nov 2017 03:54:05 +0800
-Message-ID: <1510343650-23659-3-git-send-email-gengdongjiu@huawei.com>
+Subject: [PATCH v8 6/7] arm64: kvm: Set Virtual SError Exception Syndrome for
+ guest
+Date: Sat, 11 Nov 2017 03:54:09 +0800
+Message-ID: <1510343650-23659-7-git-send-email-gengdongjiu@huawei.com>
 References: <1510343650-23659-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C1C249D6C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Nov 2017 06:48:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F242649D71
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Nov 2017 06:48:12 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id v8v4DDJHn3q4 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 10 Nov 2017 06:48:07 -0500 (EST)
+ with ESMTP id CTFC6T7Gj8bd for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 10 Nov 2017 06:48:12 -0500 (EST)
 Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7F9C049D4F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Nov 2017 06:48:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7C1C749D6E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Nov 2017 06:48:09 -0500 (EST)
 In-Reply-To: <1510343650-23659-1-git-send-email-gengdongjiu@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -30,57 +31,170 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: christoffer.dall@linaro.org, marc.zyngier@arm.com, linux@armlinux.org.uk, bp@alien8.de, rjw@rjwysocki.net, james.morse@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, corbet@lwn.net, catalin.marinas@arm.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-acpi@vger.kernel.org, devel@acpica.org, gengdongjiu@huawei.com, huangshaoyu@huawei.com, wuquanming@huawei.com, linuxarm@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: James Morse <james.morse@arm.com>
+RAS Extension add a VSESR_EL2 register which can provides
+the syndrome value reported to software on taking a virtual
+SError interrupt exception. This patch supports to specify
+this Syndrome.
 
-When we exit a guest due to an SError the vcpu fault info isn't updated
-with the ESR. Today this is only done for traps.
+In the RAS Extensions we can not set all-zero syndrome value
+for SError, which means 'RAS error: Uncategorized' instead of
+'no valid ISS'. So set it to IMPLEMENTATION DEFINED syndrome
+by default.
 
-The v8.2 RAS Extensions define ISS values for SError. Update the vcpu's
-fault_info with the ESR on SError so that handle_exit() can determine
-if this was a RAS SError and decode its severity.
+We also need to support userspace to specify a valid syndrome
+value, Because in some case, the recovery is driven by userspace.
+This patch can support that userspace can specify it.
 
-Signed-off-by: James Morse <james.morse@arm.com>
+In the guest/host world switch, restore this value to VSESR_EL2
+only when HCR_EL2.VSE is set. This value no need to be saved
+because it is stale vale when guest exit.
+
 Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+Signed-off-by: Quanming Wu <wuquanming@huawei.com>
+[Set an impdef ESR for Virtual-SError]
+Signed-off-by: James Morse <james.morse@arm.com>
 ---
- arch/arm64/kvm/hyp/switch.c | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/kvm_emulate.h | 10 ++++++++++
+ arch/arm64/include/asm/kvm_host.h    |  1 +
+ arch/arm64/include/asm/sysreg.h      |  3 +++
+ arch/arm64/kvm/guest.c               | 11 ++++++++++-
+ arch/arm64/kvm/hyp/switch.c          | 16 ++++++++++++++++
+ arch/arm64/kvm/inject_fault.c        | 13 ++++++++++++-
+ 6 files changed, 52 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 945e79c..c6f17c7 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -226,13 +226,20 @@ static bool __hyp_text __translate_far_to_hpfar(u64 far, u64 *hpfar)
- 	return true;
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 555b28b..73c84d0 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -155,6 +155,16 @@ static inline u32 kvm_vcpu_get_hsr(const struct kvm_vcpu *vcpu)
+ 	return vcpu->arch.fault.esr_el2;
  }
  
-+static void __hyp_text __populate_fault_info_esr(struct kvm_vcpu *vcpu)
++static inline u32 kvm_vcpu_get_vsesr(const struct kvm_vcpu *vcpu)
 +{
-+	vcpu->arch.fault.esr_el2 = read_sysreg_el2(esr);
++	return vcpu->arch.fault.vsesr_el2;
 +}
 +
- static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
++static inline void kvm_vcpu_set_vsesr(struct kvm_vcpu *vcpu, unsigned long val)
++{
++	vcpu->arch.fault.vsesr_el2 = val;
++}
++
+ static inline int kvm_vcpu_get_condition(const struct kvm_vcpu *vcpu)
  {
--	u64 esr = read_sysreg_el2(esr);
--	u8 ec = ESR_ELx_EC(esr);
-+	u8 ec;
-+	u64 esr;
- 	u64 hpfar, far;
+ 	u32 esr = kvm_vcpu_get_hsr(vcpu);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 769cc58..53d1d81 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -88,6 +88,7 @@ struct kvm_vcpu_fault_info {
+ 	u32 esr_el2;		/* Hyp Syndrom Register */
+ 	u64 far_el2;		/* Hyp Fault Address Register */
+ 	u64 hpfar_el2;		/* Hyp IPA Fault Address Register */
++	u32 vsesr_el2;          /* Virtual SError Exception Syndrome Register */
+ };
  
--	vcpu->arch.fault.esr_el2 = esr;
-+	__populate_fault_info_esr(vcpu);
-+	esr = vcpu->arch.fault.esr_el2;
-+	ec = ESR_ELx_EC(esr);
+ /*
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 47b967d..3b035cc 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -86,6 +86,9 @@
+ #define REG_PSTATE_PAN_IMM		sys_reg(0, 0, 4, 0, 4)
+ #define REG_PSTATE_UAO_IMM		sys_reg(0, 0, 4, 0, 3)
  
- 	if (ec != ESR_ELx_EC_DABT_LOW && ec != ESR_ELx_EC_IABT_LOW)
- 		return true;
-@@ -321,6 +328,8 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	 */
- 	if (exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
- 		goto again;
-+	else if (ARM_EXCEPTION_CODE(exit_code) == ARM_EXCEPTION_EL1_SERROR)
-+		__populate_fault_info_esr(vcpu);
++/* virtual SError exception syndrome register */
++#define REG_VSESR_EL2                  sys_reg(3, 4, 5, 2, 3)
++
+ #define SET_PSTATE_PAN(x) __emit_inst(0xd5000000 | REG_PSTATE_PAN_IMM |	\
+ 				      (!!x)<<8 | 0x1f)
+ #define SET_PSTATE_UAO(x) __emit_inst(0xd5000000 | REG_PSTATE_UAO_IMM |	\
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 738ae90..ffad42b 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -279,7 +279,16 @@ int kvm_arch_vcpu_ioctl_set_sregs(struct kvm_vcpu *vcpu,
  
- 	if (static_branch_unlikely(&vgic_v2_cpuif_trap) &&
- 	    exit_code == ARM_EXCEPTION_TRAP) {
+ int kvm_arm_set_sei_esr(struct kvm_vcpu *vcpu, u32 *syndrome)
+ {
+-	return -EINVAL;
++	u64 reg = *syndrome;
++
++	/* inject virtual system Error or asynchronous abort */
++	kvm_inject_vabt(vcpu);
++
++	if (reg)
++		/* set vsesr_el2[24:0] with value that user space specified */
++		kvm_vcpu_set_vsesr(vcpu, reg & ESR_ELx_ISS_MASK);
++
++	return 0;
+ }
+ 
+ int __attribute_const__ kvm_target_cpu(void)
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index c6f17c7..06a71d2 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -67,6 +67,14 @@ static hyp_alternate_select(__activate_traps_arch,
+ 			    __activate_traps_nvhe, __activate_traps_vhe,
+ 			    ARM64_HAS_VIRT_HOST_EXTN);
+ 
++static void __hyp_text __sysreg_set_vsesr(struct kvm_vcpu *vcpu, u64 value)
++{
++	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN) &&
++			       (value & HCR_VSE))
++		write_sysreg_s(kvm_vcpu_get_vsesr(vcpu), REG_VSESR_EL2);
++}
++
++
+ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+ {
+ 	u64 val;
+@@ -86,6 +94,14 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+ 		isb();
+ 	}
+ 	write_sysreg(val, hcr_el2);
++
++	/*
++	 * If the virtual SError interrupt is taken to EL1 using AArch64,
++	 * then VSESR_EL2 provides the syndrome value reported in ISS field
++	 * of ESR_EL1.
++	 */
++	__sysreg_set_vsesr(vcpu, val);
++
+ 	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
+ 	write_sysreg(1 << 15, hstr_el2);
+ 	/*
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index 3556715..fb94b5e 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -246,14 +246,25 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
+ 		inject_undef64(vcpu);
+ }
+ 
++static void pend_guest_serror(struct kvm_vcpu *vcpu, u64 esr)
++{
++	kvm_vcpu_set_vsesr(vcpu, esr);
++	vcpu_set_hcr(vcpu, vcpu_get_hcr(vcpu) | HCR_VSE);
++}
++
+ /**
+  * kvm_inject_vabt - inject an async abort / SError into the guest
+  * @vcpu: The VCPU to receive the exception
+  *
+  * It is assumed that this code is called from the VCPU thread and that the
+  * VCPU therefore is not currently executing guest code.
++ *
++ * Systems with the RAS Extensions specify an imp-def ESR (ISV/IDS = 1) with
++ * the remaining ISS all-zeros so that this error is not interpreted as an
++ * uncatagorized RAS error. Without the RAS Extensions we can't specify an ESR
++ * value, so the CPU generates an imp-def value.
+  */
+ void kvm_inject_vabt(struct kvm_vcpu *vcpu)
+ {
+-	vcpu_set_hcr(vcpu, vcpu_get_hcr(vcpu) | HCR_VSE);
++	pend_guest_serror(vcpu, ESR_ELx_ISV);
+ }
 -- 
 1.9.1
