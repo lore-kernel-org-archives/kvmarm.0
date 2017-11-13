@@ -1,24 +1,26 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 18/27] KVM: arm/arm64: GICv4: Add doorbell interrupt handling
-Date: Mon, 13 Nov 2017 10:17:43 +0100
-Message-ID: <20171113091752.10663-19-christoffer.dall@linaro.org>
+Subject: [PULL 22/27] KVM: arm/arm64: GICv4: Prevent a VM using GICv4 from
+ being saved
+Date: Mon, 13 Nov 2017 10:17:47 +0100
+Message-ID: <20171113091752.10663-23-christoffer.dall@linaro.org>
 References: <20171113091752.10663-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 910BB49DC7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 04:16:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0195949DB4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 04:16:20 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Bh3ji4fZEU9y for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Nov 2017 04:16:11 -0500 (EST)
-Received: from mail-wm0-f65.google.com (mail-wm0-f65.google.com [74.125.82.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E455949DB5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 04:16:09 -0500 (EST)
-Received: by mail-wm0-f65.google.com with SMTP id b189so6523877wmd.5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 01:18:20 -0800 (PST)
+ with ESMTP id klUjA+FuJucE for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Nov 2017 04:16:19 -0500 (EST)
+Received: from mail-wr0-f196.google.com (mail-wr0-f196.google.com
+ [209.85.128.196])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2248349DAA
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 04:16:19 -0500 (EST)
+Received: by mail-wr0-f196.google.com with SMTP id y42so13796596wrd.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 01:18:29 -0800 (PST)
 In-Reply-To: <20171113091752.10663-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,105 +37,55 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Marc Zyngier <marc.zyngier@arm.com>
 
-When a vPE is not running, a VLPI being made pending results in a
-doorbell interrupt being delivered. Let's handle this interrupt
-and update the pending_last flag that indicates that VLPIs are
-pending. The corresponding vcpu is also kicked into action.
+The GICv4 architecture doesn't make it easy for save/restore to
+work, as it doesn't give any guarantee that the pending state
+is written into the pending table.
 
-Special care is taken to prevent the doorbell from being enabled
-at request time (this is controlled separately), and to make
-the disabling on the interrupt non-lazy.
+So let's not take any chance, and let's return an error if
+we encounter any LPI that has the HW bit set. In order for
+userspace to distinguish this error from other failure modes,
+use -EACCES as an error code.
 
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/vgic/vgic-v4.c | 48 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
+ Documentation/virtual/kvm/devices/arm-vgic-its.txt | 2 ++
+ virt/kvm/arm/vgic/vgic-its.c                       | 9 +++++++++
+ 2 files changed, 11 insertions(+)
 
-diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
-index 2edfe23c8238..796e00c77903 100644
---- a/virt/kvm/arm/vgic/vgic-v4.c
-+++ b/virt/kvm/arm/vgic/vgic-v4.c
-@@ -16,12 +16,24 @@
-  */
+diff --git a/Documentation/virtual/kvm/devices/arm-vgic-its.txt b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+index 8d5830eab26a..4f0c9fc40365 100644
+--- a/Documentation/virtual/kvm/devices/arm-vgic-its.txt
++++ b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+@@ -64,6 +64,8 @@ Groups:
+     -EINVAL: Inconsistent restored data
+     -EFAULT: Invalid guest ram access
+     -EBUSY:  One or more VCPUS are running
++    -EACCES: The virtual ITS is backed by a physical GICv4 ITS, and the
++	     state is not available
  
- #include <linux/interrupt.h>
-+#include <linux/irq.h>
- #include <linux/irqdomain.h>
- #include <linux/kvm_host.h>
- #include <linux/irqchip/arm-gic-v3.h>
+   KVM_DEV_ARM_VGIC_GRP_ITS_REGS
+   Attributes:
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index bf571f6d2b32..b8c1b724ba3e 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -1995,6 +1995,15 @@ static int vgic_its_save_itt(struct vgic_its *its, struct its_device *device)
+ 	list_for_each_entry(ite, &device->itt_head, ite_list) {
+ 		gpa_t gpa = base + ite->event_id * ite_esz;
  
- #include "vgic.h"
- 
-+static irqreturn_t vgic_v4_doorbell_handler(int irq, void *info)
-+{
-+	struct kvm_vcpu *vcpu = info;
-+
-+	vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last = true;
-+	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
-+	kvm_vcpu_kick(vcpu);
-+
-+	return IRQ_HANDLED;
-+}
-+
- /**
-  * vgic_v4_init - Initialize the GICv4 data structures
-  * @kvm:	Pointer to the VM being initialized
-@@ -61,6 +73,33 @@ int vgic_v4_init(struct kvm *kvm)
- 		return ret;
- 	}
- 
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		int irq = dist->its_vm.vpes[i]->irq;
-+
 +		/*
-+		 * Don't automatically enable the doorbell, as we're
-+		 * flipping it back and forth when the vcpu gets
-+		 * blocked. Also disable the lazy disabling, as the
-+		 * doorbell could kick us out of the guest too
-+		 * early...
++		 * If an LPI carries the HW bit, this means that this
++		 * interrupt is controlled by GICv4, and we do not
++		 * have direct access to that state. Let's simply fail
++		 * the save operation...
 +		 */
-+		irq_set_status_flags(irq, IRQ_NOAUTOEN | IRQ_DISABLE_UNLAZY);
-+		ret = request_irq(irq, vgic_v4_doorbell_handler,
-+				  0, "vcpu", vcpu);
-+		if (ret) {
-+			kvm_err("failed to allocate vcpu IRQ%d\n", irq);
-+			/*
-+			 * Trick: adjust the number of vpes so we know
-+			 * how many to nuke on teardown...
-+			 */
-+			dist->its_vm.nr_vpes = i;
-+			break;
-+		}
-+	}
++		if (ite->irq->hw)
++			return -EACCES;
 +
-+	if (ret)
-+		vgic_v4_teardown(kvm);
-+
- 	return ret;
- }
- 
-@@ -73,10 +112,19 @@ int vgic_v4_init(struct kvm *kvm)
- void vgic_v4_teardown(struct kvm *kvm)
- {
- 	struct its_vm *its_vm = &kvm->arch.vgic.its_vm;
-+	int i;
- 
- 	if (!its_vm->vpes)
- 		return;
- 
-+	for (i = 0; i < its_vm->nr_vpes; i++) {
-+		struct kvm_vcpu *vcpu = kvm_get_vcpu(kvm, i);
-+		int irq = its_vm->vpes[i]->irq;
-+
-+		irq_clear_status_flags(irq, IRQ_NOAUTOEN | IRQ_DISABLE_UNLAZY);
-+		free_irq(irq, vcpu);
-+	}
-+
- 	its_free_vcpu_irqs(its_vm);
- 	kfree(its_vm->vpes);
- 	its_vm->nr_vpes = 0;
+ 		ret = vgic_its_save_ite(its, device, ite, gpa, ite_esz);
+ 		if (ret)
+ 			return ret;
 -- 
 2.14.2
