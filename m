@@ -1,94 +1,114 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 16/27] KVM: arm/arm64: GICv4: Handle INVALL applied to a vPE
-Date: Mon, 13 Nov 2017 10:17:41 +0100
-Message-ID: <20171113091752.10663-17-christoffer.dall@linaro.org>
+Subject: [PULL 19/27] KVM: arm/arm64: GICv4: Use the doorbell interrupt as an
+ unblocking source
+Date: Mon, 13 Nov 2017 10:17:44 +0100
+Message-ID: <20171113091752.10663-20-christoffer.dall@linaro.org>
 References: <20171113091752.10663-1-christoffer.dall@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 58DBA49DAF
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 04:16:15 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id EbbunWwqL5e6 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Nov 2017 04:16:14 -0500 (EST)
+Received: from mail-wm0-f65.google.com (mail-wm0-f65.google.com [74.125.82.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7ADA149DA9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 04:16:14 -0500 (EST)
+Received: by mail-wm0-f65.google.com with SMTP id r68so13278607wmr.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 01:18:25 -0800 (PST)
 In-Reply-To: <20171113091752.10663-1-christoffer.dall@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Marc Zyngier <marc.zyngier@arm.com>
 
-There is no need to perform an INV for each interrupt when updating
-multiple interrupts.  Instead, we can rely on the final VINVALL that
-gets sent to the ITS to do the work for all of them.
+The doorbell interrupt is only useful if the vcpu is blocked on WFI.
+In all other cases, recieving a doorbell interrupt is just a waste
+of cycles.
 
-Acked-by: Christoffer Dall <cdall@linaro.org>
+So let's only enable the doorbell if a vcpu is getting blocked,
+and disable it when it is unblocked. This is very similar to
+what we're doing for the background timer.
+
+Reviewed-by: Christoffer Dall <cdall@linaro.org>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/vgic/vgic-its.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+ include/kvm/arm_vgic.h      |  3 +++
+ virt/kvm/arm/arm.c          |  2 ++
+ virt/kvm/arm/vgic/vgic-v4.c | 18 ++++++++++++++++++
+ 3 files changed, 23 insertions(+)
 
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 4768a0e21cc5..bf571f6d2b32 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -38,7 +38,7 @@ static int vgic_its_save_tables_v0(struct vgic_its *its);
- static int vgic_its_restore_tables_v0(struct vgic_its *its);
- static int vgic_its_commit_v0(struct vgic_its *its);
- static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
--			     struct kvm_vcpu *filter_vcpu);
-+			     struct kvm_vcpu *filter_vcpu, bool needs_inv);
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 2f750c770bf2..8c896540a72c 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -381,4 +381,7 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int irq,
+ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int irq,
+ 				 struct kvm_kernel_irq_routing_entry *irq_entry);
  
- /*
-  * Creates a new (reference to a) struct vgic_irq for a given LPI.
-@@ -106,7 +106,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
- 	 * However we only have those structs for mapped IRQs, so we read in
- 	 * the respective config data from memory here upon mapping the LPI.
- 	 */
--	ret = update_lpi_config(kvm, irq, NULL);
-+	ret = update_lpi_config(kvm, irq, NULL, false);
- 	if (ret)
- 		return ERR_PTR(ret);
- 
-@@ -273,7 +273,7 @@ static struct its_collection *find_collection(struct vgic_its *its, int coll_id)
-  * VCPU. Unconditionally applies if filter_vcpu is NULL.
-  */
- static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
--			     struct kvm_vcpu *filter_vcpu)
-+			     struct kvm_vcpu *filter_vcpu, bool needs_inv)
- {
- 	u64 propbase = GICR_PROPBASER_ADDRESS(kvm->arch.vgic.propbaser);
- 	u8 prop;
-@@ -298,7 +298,7 @@ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
- 	}
- 
- 	if (irq->hw)
--		return its_prop_update_vlpi(irq->host_irq, prop, true);
-+		return its_prop_update_vlpi(irq->host_irq, prop, needs_inv);
- 
- 	return 0;
- }
-@@ -1117,7 +1117,7 @@ static int vgic_its_cmd_handle_inv(struct kvm *kvm, struct vgic_its *its,
- 	if (!ite)
- 		return E_ITS_INV_UNMAPPED_INTERRUPT;
- 
--	return update_lpi_config(kvm, ite->irq, NULL);
-+	return update_lpi_config(kvm, ite->irq, NULL, true);
- }
- 
- /*
-@@ -1152,12 +1152,15 @@ static int vgic_its_cmd_handle_invall(struct kvm *kvm, struct vgic_its *its,
- 		irq = vgic_get_irq(kvm, NULL, intids[i]);
- 		if (!irq)
- 			continue;
--		update_lpi_config(kvm, irq, vcpu);
-+		update_lpi_config(kvm, irq, vcpu, false);
- 		vgic_put_irq(kvm, irq);
- 	}
- 
- 	kfree(intids);
- 
-+	if (vcpu->arch.vgic_cpu.vgic_v3.its_vpe.its_vm)
-+		its_invall_vpe(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe);
++void kvm_vgic_v4_enable_doorbell(struct kvm_vcpu *vcpu);
++void kvm_vgic_v4_disable_doorbell(struct kvm_vcpu *vcpu);
 +
- 	return 0;
+ #endif /* __KVM_ARM_VGIC_H */
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 34a15c0c65ab..01e575b9f78b 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -315,11 +315,13 @@ int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
+ void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
+ {
+ 	kvm_timer_schedule(vcpu);
++	kvm_vgic_v4_enable_doorbell(vcpu);
  }
  
+ void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
+ {
+ 	kvm_timer_unschedule(vcpu);
++	kvm_vgic_v4_disable_doorbell(vcpu);
+ }
+ 
+ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
+diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
+index 796e00c77903..1375a53054b9 100644
+--- a/virt/kvm/arm/vgic/vgic-v4.c
++++ b/virt/kvm/arm/vgic/vgic-v4.c
+@@ -233,3 +233,21 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int virq,
+ 	mutex_unlock(&its->its_lock);
+ 	return ret;
+ }
++
++void kvm_vgic_v4_enable_doorbell(struct kvm_vcpu *vcpu)
++{
++	if (vgic_supports_direct_msis(vcpu->kvm)) {
++		int irq = vcpu->arch.vgic_cpu.vgic_v3.its_vpe.irq;
++		if (irq)
++			enable_irq(irq);
++	}
++}
++
++void kvm_vgic_v4_disable_doorbell(struct kvm_vcpu *vcpu)
++{
++	if (vgic_supports_direct_msis(vcpu->kvm)) {
++		int irq = vcpu->arch.vgic_cpu.vgic_v3.its_vpe.irq;
++		if (irq)
++			disable_irq(irq);
++	}
++}
 -- 
 2.14.2
