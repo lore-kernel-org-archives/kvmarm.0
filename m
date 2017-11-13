@@ -1,92 +1,59 @@
-From: Julien Thierry <julien.thierry@arm.com>
-Subject: Re: [PATCH v2 1/3] kvm: arm debug: introduce helper for single-step
-Date: Mon, 13 Nov 2017 09:32:27 +0000
-Message-ID: <883136c1-1a22-6b19-e019-cd666ed53444@arm.com>
-References: <20171109170021.2984-1-alex.bennee@linaro.org>
- <20171109170021.2984-2-alex.bennee@linaro.org>
+From: Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>
+Subject: Re: [PATCH v4 15/13] firmware: arm_sdei: be more robust against
+ cpu-hotplug
+Date: Mon, 13 Nov 2017 11:01:10 +0000
+Message-ID: <20171113110109.GB8968@arm.com>
+References: <5A031E9E.2090809@arm.com>
+ <20171108160624.10355-1-james.morse@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 82D4B49D86
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 04:30:21 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QdaHK+GyE+ml for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Nov 2017 04:30:20 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4035F49D53
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 04:30:20 -0500 (EST)
-In-Reply-To: <20171109170021.2984-2-alex.bennee@linaro.org>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Russell King <linux@armlinux.org.uk>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20171108160624.10355-1-james.morse-5wv7dgnIgG8@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+Cc: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Lorenzo Pieralisi <lorenzo.pieralisi-5wv7dgnIgG8@public.gmane.org>, Loc Ho <lho-qTEPVZfXA3Y@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CgpPbiAwOS8xMS8xNyAxNzowMCwgQWxleCBCZW5uw6llIHdyb3RlOgo+IEFmdGVyIGVtdWxhdGlu
-ZyBpbnN0cnVjdGlvbnMgd2UgbWF5IHdhbnQgcmV0dXJuIHRvIHVzZXItc3BhY2UgdG8KPiBoYW5k
-bGUgYSBzaW5nbGUtc3RlcC4gSWYgc2luZ2xlLXN0ZXAgaXMgZW5hYmxlZCB0aGUgaGVscGVyIHNl
-dCB0aGUgcnVuCj4gc3RydWN0dXJlIGZvciByZXR1cm4gYW5kIHJldHVybnMgdHJ1ZS4KPiAKPiBT
-aWduZWQtb2ZmLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+CgpXaXRo
-IHRoZSBmaXh1cDoKClJldmlld2VkLWJ5OiBKdWxpZW4gVGhpZXJyeSA8anVsaWVuLnRoaWVycnlA
-YXJtLmNvbT4KCj4gCj4gLS0tCj4gdjIKPiAgICAtIGt2bV9hcm1fbWF5YmVfcmV0dXJuX2RlYnVn
-IC0+IGt2bV9hcm1faGFuZGxlX3N0ZXBfZGVidWcKPiAgICAtIHJldHVybiBib29sLCB0cnVlIGlm
-IHJldHVybiB0byB1c2Vyc3BhY2UgaXMgcmVxdWlyZWQKPiAtLS0KPiAgIGFyY2gvYXJtL2luY2x1
-ZGUvYXNtL2t2bV9ob3N0LmggICB8ICAyICsrCj4gICBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2
-bV9ob3N0LmggfCAgMSArCj4gICBhcmNoL2FybTY0L2t2bS9kZWJ1Zy5jICAgICAgICAgICAgfCAy
-MiArKysrKysrKysrKysrKysrKysrKysrCj4gICAzIGZpbGVzIGNoYW5nZWQsIDI1IGluc2VydGlv
-bnMoKykKPiAKPiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm0vaW5jbHVkZS9hc20va3ZtX2hvc3QuaCBi
-L2FyY2gvYXJtL2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKPiBpbmRleCA0YTg3OWY2ZmYxM2IuLmEy
-ZTg4MWQ2MTA4ZSAxMDA2NDQKPiAtLS0gYS9hcmNoL2FybS9pbmNsdWRlL2FzbS9rdm1faG9zdC5o
-Cj4gKysrIGIvYXJjaC9hcm0vaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+IEBAIC0yODUsNiArMjg1
-LDggQEAgc3RhdGljIGlubGluZSB2b2lkIGt2bV9hcm1faW5pdF9kZWJ1Zyh2b2lkKSB7fQo+ICAg
-c3RhdGljIGlubGluZSB2b2lkIGt2bV9hcm1fc2V0dXBfZGVidWcoc3RydWN0IGt2bV92Y3B1ICp2
-Y3B1KSB7fQo+ICAgc3RhdGljIGlubGluZSB2b2lkIGt2bV9hcm1fY2xlYXJfZGVidWcoc3RydWN0
-IGt2bV92Y3B1ICp2Y3B1KSB7fQo+ICAgc3RhdGljIGlubGluZSB2b2lkIGt2bV9hcm1fcmVzZXRf
-ZGVidWdfcHRyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkge30KPiArc3RhdGljIGlubGluZSBib29s
-IGt2bV9hcm1faGFuZGxlX3N0ZXBfZGVidWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LAo+ICsJCQkJ
-CSAgICAgc3RydWN0IGt2bV9ydW4gKnJ1bikge30KPiAgIAo+ICAgaW50IGt2bV9hcm1fdmNwdV9h
-cmNoX3NldF9hdHRyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPiAgIAkJCSAgICAgICBzdHJ1Y3Qg
-a3ZtX2RldmljZV9hdHRyICphdHRyKTsKPiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9pbmNsdWRl
-L2FzbS9rdm1faG9zdC5oIGIvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCj4gaW5k
-ZXggZTkyM2I1ODYwNmUyLi5iYmZkNmEyYWRiMmIgMTAwNjQ0Cj4gLS0tIGEvYXJjaC9hcm02NC9p
-bmNsdWRlL2FzbS9rdm1faG9zdC5oCj4gKysrIGIvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1f
-aG9zdC5oCj4gQEAgLTM2OSw2ICszNjksNyBAQCB2b2lkIGt2bV9hcm1faW5pdF9kZWJ1Zyh2b2lk
-KTsKPiAgIHZvaWQga3ZtX2FybV9zZXR1cF9kZWJ1ZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpOwo+
-ICAgdm9pZCBrdm1fYXJtX2NsZWFyX2RlYnVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSk7Cj4gICB2
-b2lkIGt2bV9hcm1fcmVzZXRfZGVidWdfcHRyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSk7Cj4gK2Jv
-b2wga3ZtX2FybV9oYW5kbGVfc3RlcF9kZWJ1ZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHN0cnVj
-dCBrdm1fcnVuICpydW4pOwo+ICAgaW50IGt2bV9hcm1fdmNwdV9hcmNoX3NldF9hdHRyKHN0cnVj
-dCBrdm1fdmNwdSAqdmNwdSwKPiAgIAkJCSAgICAgICBzdHJ1Y3Qga3ZtX2RldmljZV9hdHRyICph
-dHRyKTsKPiAgIGludCBrdm1fYXJtX3ZjcHVfYXJjaF9nZXRfYXR0cihzdHJ1Y3Qga3ZtX3ZjcHUg
-KnZjcHUsCj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL2RlYnVnLmMgYi9hcmNoL2FybTY0
-L2t2bS9kZWJ1Zy5jCj4gaW5kZXggZGJhZGZhZjg1MGE3Li45NWFmZDIyYTQ2MzQgMTAwNjQ0Cj4g
-LS0tIGEvYXJjaC9hcm02NC9rdm0vZGVidWcuYwo+ICsrKyBiL2FyY2gvYXJtNjQva3ZtL2RlYnVn
-LmMKPiBAQCAtMjIxLDMgKzIyMSwyNSBAQCB2b2lkIGt2bV9hcm1fY2xlYXJfZGVidWcoc3RydWN0
-IGt2bV92Y3B1ICp2Y3B1KQo+ICAgCQl9Cj4gICAJfQo+ICAgfQo+ICsKPiArCj4gKy8qCj4gKyAq
-IFdoZW4gS1ZNIGhhcyBzdWNjZXNzZnVsbHkgZW11bGF0ZWQgdGhlIGluc3RydWN0aW9uIHdlIG1p
-Z2h0IHdhbnQgdG8KPiArICogcmV0dXJuIHRvIHVzZXIgc3BhY2Ugd2l0aCBhIEtWTV9FWElUX0RF
-QlVHLiBXZSBjYW4gb25seSBkbyB0aGlzCj4gKyAqIG9uY2UgdGhlIGVtdWxhdGlvbiBpcyBjb21w
-bGV0ZSB0aG91Z2ggc28gZm9yIHVzZXJzcGFjZSBlbXVsYXRpb25zCj4gKyAqIHdlIGhhdmUgdG8g
-d2FpdCB1bnRpbCB3ZSBoYXZlIHJlLWVudGVyZWQgS1ZNIGJlZm9yZSBjYWxsaW5nIHRoaXMKPiAr
-ICogaGVscGVyLgo+ICsgKgo+ICsgKiBSZXR1cm4gdHJ1ZSAoYW5kIHNldCBleGl0X3JlYXNvbikg
-dG8gcmV0dXJuIHRvIHVzZXJzcGFjZSBvciBmYWxzZQo+ICsgKiBpZiBubyBmdXJ0aGVyIGFjdGlv
-biByZXF1aXJlZC4KPiArICovCj4gKwo+ICtib29sIGt2bV9hcm1faGFuZGxlX3N0ZXBfZGVidWco
-c3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBzdHJ1Y3Qga3ZtX3J1biAqcnVuKQo+ICt7Cj4gKwlpZiAo
-dmNwdS0+Z3Vlc3RfZGVidWcgJiBLVk1fR1VFU1REQkdfU0lOR0xFU1RFUCkgewo+ICsJCXJ1bi0+
-ZXhpdF9yZWFzb24gPSBLVk1fRVhJVF9ERUJVRzsKPiArCQlydW4tPmRlYnVnLmFyY2guaHNyID0g
-RVNSX0VMeF9FQ19TT0ZUU1RQX0xPVyA8PCBFU1JfRUx4X0VDX1NISUZUOwo+ICsJCXJldHVybiB0
-cnVlOwo+ICsJfQo+ICsJcmV0dXJuIGZhbHNlOwo+ICt9Cj4gCgotLSAKSnVsaWVuIFRoaWVycnkK
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1h
-aWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3Mu
-Y29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+On Wed, Nov 08, 2017 at 04:06:24PM +0000, James Morse wrote:
+> dpm_suspend() calls the freeze/thaw callbacks for hibernate before
+> disable_non_bootcpus() takes down secondaries.
+> 
+> This leads to a fun race where the freeze/thaw callbacks reset the
+> SDEI interface (as we may be restoring a kernel with a different
+> layout due to KASLR), then the cpu-hotplug callbacks come in to
+> save the current state, which has already been reset.
+> 
+> I tried to solve this with a 'frozen' flag that stops the hotplug
+> callback from overwriting the saved values. Instead this just
+> moves the race around and makes it even harder to think about.
+> 
+> Instead, make it look like the secondaries have gone offline.
+> Call cpuhp_remove_state() in the freeze callback, this will call the
+> teardown hook on all online CPUs, then remove the state. This saves
+> all private events and makes future CPU up/down events invisible.
+> 
+> Change sdei_event_unregister_all()/sdei_reregister_events() to
+> only save/restore shared events, which are all that is left. With
+> this we can remove the frozen flag. We can remove the device
+> suspend/resume calls too as cpuhotplug's teardown call has masked
+> the CPUs.
+> 
+> All that is left is the reboot notifier, (which was abusing the
+> frozen flag). Call cpuhp_remove_state() to make it look like
+> secondary CPUs have gone offline.
+> 
+> Suggested-by: Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>
+> Signed-off-by: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+> ---
+>  drivers/firmware/arm_sdei.c | 60 +++++++++++++++++++++++----------------------
+>  1 file changed, 31 insertions(+), 29 deletions(-)
+
+Thanks, this appears to address my concerns. It's too late for 4.15 now,
+but please resend for 4.16 and Catalin can pick this series up.
+
+Will
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
