@@ -1,26 +1,26 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 17/27] KVM: arm/arm64: GICv4: Use pending_last as a scheduling
- hint
-Date: Mon, 13 Nov 2017 10:17:42 +0100
-Message-ID: <20171113091752.10663-18-christoffer.dall@linaro.org>
+Subject: [PULL 21/27] KVM: arm/arm64: GICv4: Enable virtual cpuif if VLPIs can
+ be delivered
+Date: Mon, 13 Nov 2017 10:17:46 +0100
+Message-ID: <20171113091752.10663-22-christoffer.dall@linaro.org>
 References: <20171113091752.10663-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 74C5649D9B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 04:16:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 794CE49DAA
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 04:16:18 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FvoHuhSnieK9 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Nov 2017 04:16:11 -0500 (EST)
+ with ESMTP id x8Rh5yQFwrvd for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Nov 2017 04:16:17 -0500 (EST)
 Received: from mail-wr0-f196.google.com (mail-wr0-f196.google.com
  [209.85.128.196])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6DA6C49D9C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 04:16:08 -0500 (EST)
-Received: by mail-wr0-f196.google.com with SMTP id p96so13755756wrb.7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 01:18:19 -0800 (PST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6772249D96
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 04:16:17 -0500 (EST)
+Received: by mail-wr0-f196.google.com with SMTP id l22so13756059wrc.11
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 01:18:28 -0800 (PST)
 In-Reply-To: <20171113091752.10663-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -37,34 +37,45 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Marc Zyngier <marc.zyngier@arm.com>
 
-When a vPE exits, the pending_last flag is set when there are pending
-VLPIs stored in the pending table. Similarily, this flag will be set
-when a doorbell interrupt fires, as it indicates the same condition.
-
-Let's update kvm_vgic_vcpu_pending_irq() to account for that
-flag as well, making a vcpu runnable when set.
+In order for VLPIs to be delivered to the guest, we must make sure that
+the virtual cpuif is always enabled, irrespective of the presence of
+virtual interrupt in the LRs.
 
 Acked-by: Christoffer Dall <cdall@linaro.org>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/vgic/vgic.c | 3 +++
- 1 file changed, 3 insertions(+)
+ virt/kvm/arm/hyp/vgic-v3-sr.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index a05a5700910b..d29e91215366 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -781,6 +781,9 @@ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
- 	if (!vcpu->kvm->arch.vgic.enabled)
- 		return false;
+diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
+index 91728faa13fd..f5c3d6d7019e 100644
+--- a/virt/kvm/arm/hyp/vgic-v3-sr.c
++++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
+@@ -258,7 +258,8 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
+ 			cpu_if->vgic_ap1r[0] = __vgic_v3_read_ap1rn(0);
+ 		}
+ 	} else {
+-		if (static_branch_unlikely(&vgic_v3_cpuif_trap))
++		if (static_branch_unlikely(&vgic_v3_cpuif_trap) ||
++		    cpu_if->its_vpe.its_vm)
+ 			write_gicreg(0, ICH_HCR_EL2);
  
-+	if (vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last)
-+		return true;
-+
- 	spin_lock_irqsave(&vgic_cpu->ap_list_lock, flags);
+ 		cpu_if->vgic_elrsr = 0xffff;
+@@ -337,9 +338,11 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
+ 		/*
+ 		 * If we need to trap system registers, we must write
+ 		 * ICH_HCR_EL2 anyway, even if no interrupts are being
+-		 * injected,
++		 * injected. Same thing if GICv4 is used, as VLPI
++		 * delivery is gated by ICH_HCR_EL2.En.
+ 		 */
+-		if (static_branch_unlikely(&vgic_v3_cpuif_trap))
++		if (static_branch_unlikely(&vgic_v3_cpuif_trap) ||
++		    cpu_if->its_vpe.its_vm)
+ 			write_gicreg(cpu_if->vgic_hcr, ICH_HCR_EL2);
+ 	}
  
- 	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
 -- 
 2.14.2
