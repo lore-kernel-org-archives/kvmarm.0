@@ -1,152 +1,56 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH 23/37] KVM: arm64: Prepare to handle traps on deferred VM
- sysregs
-Date: Mon, 13 Nov 2017 18:54:02 +0100
-Message-ID: <20171113175402.rw3on4vps2o24q4d@hawk.localdomain>
-References: <20171012104141.26902-1-christoffer.dall@linaro.org>
- <20171012104141.26902-24-christoffer.dall@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v4 00/21] SError rework + RAS&IESB for firmware first
+ support
+Date: Mon, 13 Nov 2017 17:56:14 +0000
+Message-ID: <CAFEAcA-uS0gyKHTvNxdTihoi37D=6jCTwzUTjFQttR=mivheBA@mail.gmail.com>
+References: <20171019145807.23251-1-james.morse@arm.com>
+ <5A049B20.6000501@arm.com> <20171113112946.GK14144@cbox>
+ <20171113161445.xfqyuntza76ckdmq@hawk.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20171012104141.26902-24-christoffer.dall@linaro.org>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 37B3D49D6E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 12:54:25 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Fu-1zRMhyiNo for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Nov 2017 12:54:24 -0500 (EST)
+Received: from mail-wr0-f177.google.com (mail-wr0-f177.google.com
+ [209.85.128.177])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 345E449D53
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 12:54:24 -0500 (EST)
+Received: by mail-wr0-f177.google.com with SMTP id l22so15164847wrc.11
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 09:56:35 -0800 (PST)
+In-Reply-To: <20171113161445.xfqyuntza76ckdmq@hawk.localdomain>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>
+Cc: Jonathan.Zhang@cavium.com, Christoffer Dall <cdall@linaro.org>, Julien Thierry <julien.thierry@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, wangxiongfeng2@huawei.com, arm-mail-list <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Oct 12, 2017 at 12:41:27PM +0200, Christoffer Dall wrote:
-> When we defer the save/restore of system registers to vcpu_load and
-> vcpu_put, we need to take care of the emulation code that handles traps
-> to these registers, since simply reading the memory array will return
-> stale data.
-> 
-> Therefore, introduce two functions to directly read/write the registers
-> from the physical CPU when we're on a VHE system that has loaded the
-> system registers onto the physical CPU.
-> 
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> ---
->  arch/arm64/include/asm/kvm_host.h |  4 +++
->  arch/arm64/kvm/sys_regs.c         | 54 +++++++++++++++++++++++++++++++++++++--
->  2 files changed, 56 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 9f5761f..dcded44 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -278,6 +278,10 @@ struct kvm_vcpu_arch {
->  
->  	/* Detect first run of a vcpu */
->  	bool has_run_once;
-> +
-> +	/* True when deferrable sysregs are loaded on the physical CPU,
-> +	 * see kvm_vcpu_load_sysregs and kvm_vcpu_put_sysregs. */
-> +	bool sysregs_loaded_on_cpu;
-
-To be sure I understand correctly, this should only be false when we're
-servicing ioctls that don't do a full vcpu_load first (non-KVM_RUN) or
-when we're not running on a CPU with VHE. If we didn't need to worry
-about non-KVM_RUN ioctls, then we could use the static key has_vhe(),
-right?
-
->  };
->  
->  #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.gp_regs)
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index dbe35fd..f7887dd 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -34,6 +34,7 @@
->  #include <asm/kvm_coproc.h>
->  #include <asm/kvm_emulate.h>
->  #include <asm/kvm_host.h>
-> +#include <asm/kvm_hyp.h>
->  #include <asm/kvm_mmu.h>
->  #include <asm/perf_event.h>
->  #include <asm/sysreg.h>
-> @@ -110,8 +111,57 @@ static bool access_dcsw(struct kvm_vcpu *vcpu,
->  	return true;
->  }
->  
-> +static u64 read_deferrable_vm_reg(struct kvm_vcpu *vcpu, int reg)
-> +{
-> +	if (vcpu->arch.sysregs_loaded_on_cpu) {
-> +		switch (reg) {
-> +		case SCTLR_EL1:		return read_sysreg_el1(sctlr);
-> +		case TTBR0_EL1:		return read_sysreg_el1(ttbr0);
-> +		case TTBR1_EL1:		return read_sysreg_el1(ttbr1);
-> +		case TCR_EL1:		return read_sysreg_el1(tcr);
-> +		case ESR_EL1:		return read_sysreg_el1(esr);
-> +		case FAR_EL1:		return read_sysreg_el1(far);
-> +		case AFSR0_EL1:		return read_sysreg_el1(afsr0);
-> +		case AFSR1_EL1:		return read_sysreg_el1(afsr1);
-> +		case MAIR_EL1:		return read_sysreg_el1(mair);
-> +		case AMAIR_EL1:		return read_sysreg_el1(amair);
-> +		case CONTEXTIDR_EL1:	return read_sysreg_el1(contextidr);
-> +		case DACR32_EL2:	return read_sysreg(dacr32_el2);
-> +		case IFSR32_EL2:	return read_sysreg(ifsr32_el2);
-> +		default:		BUG();
-> +		}
-> +	}
-> +
-> +	return vcpu_sys_reg(vcpu, reg);
-> +}
-> +
-> +static void write_deferrable_vm_reg(struct kvm_vcpu *vcpu, int reg, u64 val)
-> +{
-> +	if (vcpu->arch.sysregs_loaded_on_cpu) {
-> +		switch (reg) {
-> +		case SCTLR_EL1:		write_sysreg_el1(val, sctlr);	return;
-> +		case TTBR0_EL1:		write_sysreg_el1(val, ttbr0);	return;
-> +		case TTBR1_EL1:		write_sysreg_el1(val, ttbr1);	return;
-> +		case TCR_EL1:		write_sysreg_el1(val, tcr);	return;
-> +		case ESR_EL1:		write_sysreg_el1(val, esr);	return;
-> +		case FAR_EL1:		write_sysreg_el1(val, far);	return;
-> +		case AFSR0_EL1:		write_sysreg_el1(val, afsr0);	return;
-> +		case AFSR1_EL1:		write_sysreg_el1(val, afsr1);	return;
-> +		case MAIR_EL1:		write_sysreg_el1(val, mair);	return;
-> +		case AMAIR_EL1:		write_sysreg_el1(val, amair);	return;
-> +		case CONTEXTIDR_EL1:	write_sysreg_el1(val, contextidr); return;
-> +		case DACR32_EL2:	write_sysreg(val, dacr32_el2); return;
-> +		case IFSR32_EL2:	write_sysreg(val, ifsr32_el2); return;
-> +		default:		BUG();
-> +		}
-> +	}
-> +
-> +	vcpu_sys_reg(vcpu, reg) = val;
-> +}
-> +
->  /*
->   * Generic accessor for VM registers. Only called as long as HCR_TVM
-> + *
->   * is set. If the guest enables the MMU, we stop trapping the VM
->   * sys_regs and leave it in complete control of the caches.
->   */
-> @@ -132,14 +182,14 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
->  	if (!p->is_aarch32 || !p->is_32bit) {
->  		val = p->regval;
->  	} else {
-> -		val = vcpu_sys_reg(vcpu, reg);
-> +		val = read_deferrable_vm_reg(vcpu, reg);
->  		if (r->reg % 2)
->  			val = (p->regval << 32) | (u64)lower_32_bits(val);
->  		else
->  			val = ((u64)upper_32_bits(val) << 32) |
->  				(u64)lower_32_bits(p->regval);
->  	}
-> -	vcpu_sys_reg(vcpu, reg) = val;
-> +	write_deferrable_vm_reg(vcpu, reg, val);
->  
->  	kvm_toggle_cache(vcpu, was_enabled);
->  	return true;
-> -- 
-> 2.9.0
+On 13 November 2017 at 16:14, Andrew Jones <drjones@redhat.com> wrote:
+> On Mon, Nov 13, 2017 at 12:29:46PM +0100, Christoffer Dall wrote:
+>> I'm thinking this is analogous to migrating a VM that uses an irqchip in
+>> userspace and has set the IRQ or FIQ lines using KVM_IRQ_LINE.  My
+>> feeling is that this is also not supported today.
 >
+> Luckily userspace irqchip is mostly a debug feature, or just to support
+> oddball hardware. Or at least that's the way I see its usecases...
 
-I read ahead and see other wrappers that check sysregs_loaded_on_cpu are
-added, but only write_deferrable_vm_reg() has 'deferrable' in its name.
-Should it just be named read/write_vm_reg?
+True, but I think we should always insist on migration working
+for new features, because it's just an easier line to define;
+otherwise we end up with an annoying "feature mostly works,
+unless you happened to be using [list of random things], in
+which case it silently doesn't" effect.
 
-Thanks,
-drew
+thanks
+-- PMM
