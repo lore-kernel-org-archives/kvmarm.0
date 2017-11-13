@@ -1,24 +1,25 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 00/27] KVM/ARM GICv4 Support for v4.15
-Date: Mon, 13 Nov 2017 10:17:25 +0100
-Message-ID: <20171113091752.10663-1-christoffer.dall@linaro.org>
+Subject: [PULL 01/27] KVM: arm/arm64: register irq bypass consumer on ARM/ARM64
+Date: Mon, 13 Nov 2017 10:17:26 +0100
+Message-ID: <20171113091752.10663-2-christoffer.dall@linaro.org>
+References: <20171113091752.10663-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BBC5E49D95
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 04:15:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2530049D4B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 04:15:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Vqk+KgPkmDG2 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Nov 2017 04:15:43 -0500 (EST)
-Received: from mail-wr0-f196.google.com (mail-wr0-f196.google.com
- [209.85.128.196])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 90A9A49D4B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 04:15:43 -0500 (EST)
-Received: by mail-wr0-f196.google.com with SMTP id l22so13754611wrc.11
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 01:17:54 -0800 (PST)
+ with ESMTP id EqubJRQMwLdU for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Nov 2017 04:15:45 -0500 (EST)
+Received: from mail-wm0-f66.google.com (mail-wm0-f66.google.com [74.125.82.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0DF4D49D95
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 04:15:45 -0500 (EST)
+Received: by mail-wm0-f66.google.com with SMTP id r68so13643872wmr.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 01:17:55 -0800 (PST)
+In-Reply-To: <20171113091752.10663-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,97 +30,135 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, Thomas Gleixner <tglx@linutronix.de>, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Paolo and Radim,
+From: Eric Auger <eric.auger@redhat.com>
 
-Here is the second pull request for KVM/ARM for v4.15. These changes
-introduce GICv4 support in KVM/ARM, allowing direct injection of LPIs
-from devices generating MSIs into VMs.  The changes rely on irqchip
-infrastructure for GICv4 already merged in tip:irq/core.
+This patch selects IRQ_BYPASS_MANAGER and HAVE_KVM_IRQ_BYPASS
+configs for ARM/ARM64.
 
-The pull request is based on kvm-arm-for-v4.15 plus 722c908f84c6 merged
-from tip:irq/core.  The diffstat has been trimmed to only show the
-changes between the merge base mentioned above and the KVM/ARM side of
-GICv4 support, and does not include the additional changes in KVM not
-present in tip:irq/core.
+kvm_arch_has_irq_bypass() now is implemented and returns true.
+As a consequence the irq bypass consumer will be registered for
+ARM/ARM64 with the forwarding callbacks:
 
-I expect that pulling this into the KVM tree after the irq/core changes
-land in Linus' tree should result in a clean subsequent pull request
-upstream, but let me know if you want me to work this out in some other
-way.
+- stop/start: halt/resume guest execution
+- add/del_producer: set/unset forwarding at vgic/irqchip level
 
-The following changes since commit 722c908f84c67bf120105ca870675cadc1bb7b20:
+We don't have any actual support yet, so nothing gets actually
+forwarded.
 
-  Merge tag 'irqchip-4.15-2' of git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms into irq/core (2017-11-02 19:18:08 +0100)
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+[maz: dropped the DEOI stuff for the time being in order to
+      reduce the dependency chain, amended commit message]
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+---
+ arch/arm/kvm/Kconfig   |  3 +++
+ arch/arm64/kvm/Kconfig |  3 +++
+ virt/kvm/arm/arm.c     | 40 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 46 insertions(+)
 
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-gicv4-for-v4.15
-
-for you to fetch changes up to 95b110ab9a093b5baf3a72e51f71279368d618e2:
-
-  KVM: arm/arm64: Don't queue VLPIs on INV/INVALL (2017-11-10 09:59:20 +0100)
-
-Thanks,
--Christoffer
-
-Christoffer Dall (2):
-  KVM: arm/arm64: Fix GICv4 ITS initialization issues
-  KVM: arm/arm64: Don't queue VLPIs on INV/INVALL
-
-Eric Auger (2):
-  KVM: arm/arm64: register irq bypass consumer on ARM/ARM64
-  KVM: arm/arm64: vgic: restructure kvm_vgic_(un)map_phys_irq
-
-Marc Zyngier (23):
-  KVM: arm: Select ARM_GIC_V3 and ARM_GIC_V3_ITS
-  KVM: arm/arm64: vgic: Move kvm_vgic_destroy call around
-  KVM: arm/arm64: vITS: Add MSI translation helpers
-  KVM: arm/arm64: vITS: Add a helper to update the affinity of an LPI
-  KVM: arm/arm64: GICv4: Add property field and per-VM predicate
-  KVM: arm/arm64: GICv4: Add init/teardown of the per-VM vPE irq domain
-  KVM: arm/arm64: GICv4: Wire mapping/unmapping of VLPIs in VFIO irq
-    bypass
-  KVM: arm/arm64: GICv4: Handle INT command applied to a VLPI
-  KVM: arm/arm64: GICv4: Unmap VLPI when freeing an LPI
-  KVM: arm/arm64: GICv4: Propagate affinity changes to the physical ITS
-  KVM: arm/arm64: GICv4: Handle CLEAR applied to a VLPI
-  KVM: arm/arm64: GICv4: Handle MOVALL applied to a vPE
-  KVM: arm/arm64: GICv4: Propagate property updates to VLPIs
-  KVM: arm/arm64: GICv4: Handle INVALL applied to a vPE
-  KVM: arm/arm64: GICv4: Use pending_last as a scheduling hint
-  KVM: arm/arm64: GICv4: Add doorbell interrupt handling
-  KVM: arm/arm64: GICv4: Use the doorbell interrupt as an unblocking
-    source
-  KVM: arm/arm64: GICv4: Hook vPE scheduling into vgic flush/sync
-  KVM: arm/arm64: GICv4: Enable virtual cpuif if VLPIs can be delivered
-  KVM: arm/arm64: GICv4: Prevent a VM using GICv4 from being saved
-  KVM: arm/arm64: GICv4: Prevent userspace from changing doorbell
-    affinity
-  KVM: arm/arm64: GICv4: Enable VLPI support
-  KVM: arm/arm64: GICv4: Theory of operations
-
- Documentation/admin-guide/kernel-parameters.txt    |   4 +
- Documentation/virtual/kvm/devices/arm-vgic-its.txt |   2 +
- arch/arm/kvm/Kconfig                               |   5 +
- arch/arm/kvm/Makefile                              |   1 +
- arch/arm64/kvm/Kconfig                             |   3 +
- arch/arm64/kvm/Makefile                            |   1 +
- include/kvm/arm_vgic.h                             |  41 ++-
- virt/kvm/arm/arch_timer.c                          |  24 +-
- virt/kvm/arm/arm.c                                 |  48 ++-
- virt/kvm/arm/hyp/vgic-v3-sr.c                      |   9 +-
- virt/kvm/arm/vgic/vgic-init.c                      |   7 +
- virt/kvm/arm/vgic/vgic-its.c                       | 204 ++++++++----
- virt/kvm/arm/vgic/vgic-mmio-v3.c                   |   5 +
- virt/kvm/arm/vgic/vgic-v3.c                        |  14 +
- virt/kvm/arm/vgic/vgic-v4.c                        | 364 +++++++++++++++++++++
- virt/kvm/arm/vgic/vgic.c                           |  67 +++-
- virt/kvm/arm/vgic/vgic.h                           |  10 +
- 17 files changed, 695 insertions(+), 114 deletions(-)
- create mode 100644 virt/kvm/arm/vgic/vgic-v4.c
-
+diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
+index 90d0176fb30d..4e2b192a030a 100644
+--- a/arch/arm/kvm/Kconfig
++++ b/arch/arm/kvm/Kconfig
+@@ -3,6 +3,7 @@
+ #
+ 
+ source "virt/kvm/Kconfig"
++source "virt/lib/Kconfig"
+ 
+ menuconfig VIRTUALIZATION
+ 	bool "Virtualization"
+@@ -35,6 +36,8 @@ config KVM
+ 	select HAVE_KVM_IRQCHIP
+ 	select HAVE_KVM_IRQ_ROUTING
+ 	select HAVE_KVM_MSI
++	select IRQ_BYPASS_MANAGER
++	select HAVE_KVM_IRQ_BYPASS
+ 	depends on ARM_VIRT_EXT && ARM_LPAE && ARM_ARCH_TIMER
+ 	---help---
+ 	  Support hosting virtualized guest machines.
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index 52cb7ad9b2fd..7e0d6e63cc71 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -3,6 +3,7 @@
+ #
+ 
+ source "virt/kvm/Kconfig"
++source "virt/lib/Kconfig"
+ 
+ menuconfig VIRTUALIZATION
+ 	bool "Virtualization"
+@@ -35,6 +36,8 @@ config KVM
+ 	select HAVE_KVM_MSI
+ 	select HAVE_KVM_IRQCHIP
+ 	select HAVE_KVM_IRQ_ROUTING
++	select IRQ_BYPASS_MANAGER
++	select HAVE_KVM_IRQ_BYPASS
+ 	---help---
+ 	  Support hosting virtualized guest machines.
+ 	  We don't support KVM with 16K page tables yet, due to the multiple
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index bc126fb99a3d..79f8ddd604c1 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -27,6 +27,8 @@
+ #include <linux/mman.h>
+ #include <linux/sched.h>
+ #include <linux/kvm.h>
++#include <linux/kvm_irqfd.h>
++#include <linux/irqbypass.h>
+ #include <trace/events/kvm.h>
+ #include <kvm/arm_pmu.h>
+ 
+@@ -1458,6 +1460,44 @@ struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr)
+ 	return NULL;
+ }
+ 
++bool kvm_arch_has_irq_bypass(void)
++{
++	return true;
++}
++
++int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
++				      struct irq_bypass_producer *prod)
++{
++	struct kvm_kernel_irqfd *irqfd =
++		container_of(cons, struct kvm_kernel_irqfd, consumer);
++
++	return 0;
++}
++void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
++				      struct irq_bypass_producer *prod)
++{
++	struct kvm_kernel_irqfd *irqfd =
++		container_of(cons, struct kvm_kernel_irqfd, consumer);
++
++	return;
++}
++
++void kvm_arch_irq_bypass_stop(struct irq_bypass_consumer *cons)
++{
++	struct kvm_kernel_irqfd *irqfd =
++		container_of(cons, struct kvm_kernel_irqfd, consumer);
++
++	kvm_arm_halt_guest(irqfd->kvm);
++}
++
++void kvm_arch_irq_bypass_start(struct irq_bypass_consumer *cons)
++{
++	struct kvm_kernel_irqfd *irqfd =
++		container_of(cons, struct kvm_kernel_irqfd, consumer);
++
++	kvm_arm_resume_guest(irqfd->kvm);
++}
++
+ /**
+  * Initialize Hyp-mode and memory mappings on all CPUs.
+  */
 -- 
 2.14.2
