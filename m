@@ -1,100 +1,142 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH 22/37] KVM: arm64: Change 32-bit handling of VM system
- registers
-Date: Mon, 13 Nov 2017 17:25:51 +0100
-Message-ID: <20171113162551.i6xnmohnzs6lpf3w@hawk.localdomain>
+Subject: Re: [PATCH 23/37] KVM: arm64: Prepare to handle traps on deferred VM
+ sysregs
+Date: Mon, 13 Nov 2017 18:54:02 +0100
+Message-ID: <20171113175402.rw3on4vps2o24q4d@hawk.localdomain>
 References: <20171012104141.26902-1-christoffer.dall@linaro.org>
- <20171012104141.26902-23-christoffer.dall@linaro.org>
+ <20171012104141.26902-24-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20171012104141.26902-23-christoffer.dall@linaro.org>
+In-Reply-To: <20171012104141.26902-24-christoffer.dall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Oct 12, 2017 at 12:41:26PM +0200, Christoffer Dall wrote:
-> We currently handle 32-bit accesses to trapped VM system registers using
-> the 32-bit index into the coproc array on the vcpu structure, which is a
-> union of the coprog array and the sysreg array.
-
-coproc
-
+On Thu, Oct 12, 2017 at 12:41:27PM +0200, Christoffer Dall wrote:
+> When we defer the save/restore of system registers to vcpu_load and
+> vcpu_put, we need to take care of the emulation code that handles traps
+> to these registers, since simply reading the memory array will return
+> stale data.
 > 
-> Since all the 32-bit coproc indicies are created to correspond to the
-> architectural mapping between 64-bit system registers and 32-bit
-> coprocessor registers, and because the AArch64 system registers are the
-> double in size of the AArch32 coprocessor registers, we can always find
-> the system register entry that we must update by dividing the 32-bit
-> coproc index by 2.
-> 
-> This is going to make our lives much easier when we have to start
-> accessing system registers that uses deferred save/restore and might
-
-use
-
-> have to be read directly from the physical CPU.
+> Therefore, introduce two functions to directly read/write the registers
+> from the physical CPU when we're on a VHE system that has loaded the
+> system registers onto the physical CPU.
 > 
 > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 > ---
->  arch/arm64/include/asm/kvm_host.h |  8 --------
->  arch/arm64/kvm/sys_regs.c         | 20 +++++++++++++++-----
->  2 files changed, 15 insertions(+), 13 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h |  4 +++
+>  arch/arm64/kvm/sys_regs.c         | 54 +++++++++++++++++++++++++++++++++++++--
+>  2 files changed, 56 insertions(+), 2 deletions(-)
 > 
 > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 5e09eb9..9f5761f 100644
+> index 9f5761f..dcded44 100644
 > --- a/arch/arm64/include/asm/kvm_host.h
 > +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -289,14 +289,6 @@ struct kvm_vcpu_arch {
->  #define vcpu_cp14(v,r)		((v)->arch.ctxt.copro[(r)])
->  #define vcpu_cp15(v,r)		((v)->arch.ctxt.copro[(r)])
+> @@ -278,6 +278,10 @@ struct kvm_vcpu_arch {
 >  
-> -#ifdef CONFIG_CPU_BIG_ENDIAN
-> -#define vcpu_cp15_64_high(v,r)	vcpu_cp15((v),(r))
-> -#define vcpu_cp15_64_low(v,r)	vcpu_cp15((v),(r) + 1)
-> -#else
-> -#define vcpu_cp15_64_high(v,r)	vcpu_cp15((v),(r) + 1)
-> -#define vcpu_cp15_64_low(v,r)	vcpu_cp15((v),(r))
-> -#endif
-> -
->  struct kvm_vm_stat {
->  	ulong remote_tlb_flush;
+>  	/* Detect first run of a vcpu */
+>  	bool has_run_once;
+> +
+> +	/* True when deferrable sysregs are loaded on the physical CPU,
+> +	 * see kvm_vcpu_load_sysregs and kvm_vcpu_put_sysregs. */
+> +	bool sysregs_loaded_on_cpu;
+
+To be sure I understand correctly, this should only be false when we're
+servicing ioctls that don't do a full vcpu_load first (non-KVM_RUN) or
+when we're not running on a CPU with VHE. If we didn't need to worry
+about non-KVM_RUN ioctls, then we could use the static key has_vhe(),
+right?
+
 >  };
+>  
+>  #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.gp_regs)
 > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index bb0e41b..dbe35fd 100644
+> index dbe35fd..f7887dd 100644
 > --- a/arch/arm64/kvm/sys_regs.c
 > +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -120,16 +120,26 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
->  			  const struct sys_reg_desc *r)
->  {
->  	bool was_enabled = vcpu_has_cache_enabled(vcpu);
-> +	u64 val;
-> +	int reg = r->reg;
+> @@ -34,6 +34,7 @@
+>  #include <asm/kvm_coproc.h>
+>  #include <asm/kvm_emulate.h>
+>  #include <asm/kvm_host.h>
+> +#include <asm/kvm_hyp.h>
+>  #include <asm/kvm_mmu.h>
+>  #include <asm/perf_event.h>
+>  #include <asm/sysreg.h>
+> @@ -110,8 +111,57 @@ static bool access_dcsw(struct kvm_vcpu *vcpu,
+>  	return true;
+>  }
 >  
->  	BUG_ON(!p->is_write);
->  
-> -	if (!p->is_aarch32) {
-> -		vcpu_sys_reg(vcpu, r->reg) = p->regval;
-> +	/* See the 32bit mapping in kvm_host.h */
-> +	if (p->is_aarch32)
-> +		reg = r->reg / 2;
+> +static u64 read_deferrable_vm_reg(struct kvm_vcpu *vcpu, int reg)
+> +{
+> +	if (vcpu->arch.sysregs_loaded_on_cpu) {
+> +		switch (reg) {
+> +		case SCTLR_EL1:		return read_sysreg_el1(sctlr);
+> +		case TTBR0_EL1:		return read_sysreg_el1(ttbr0);
+> +		case TTBR1_EL1:		return read_sysreg_el1(ttbr1);
+> +		case TCR_EL1:		return read_sysreg_el1(tcr);
+> +		case ESR_EL1:		return read_sysreg_el1(esr);
+> +		case FAR_EL1:		return read_sysreg_el1(far);
+> +		case AFSR0_EL1:		return read_sysreg_el1(afsr0);
+> +		case AFSR1_EL1:		return read_sysreg_el1(afsr1);
+> +		case MAIR_EL1:		return read_sysreg_el1(mair);
+> +		case AMAIR_EL1:		return read_sysreg_el1(amair);
+> +		case CONTEXTIDR_EL1:	return read_sysreg_el1(contextidr);
+> +		case DACR32_EL2:	return read_sysreg(dacr32_el2);
+> +		case IFSR32_EL2:	return read_sysreg(ifsr32_el2);
+> +		default:		BUG();
+> +		}
+> +	}
 > +
-> +	if (!p->is_aarch32 || !p->is_32bit) {
-> +		val = p->regval;
->  	} else {
-> -		if (!p->is_32bit)
-> -			vcpu_cp15_64_high(vcpu, r->reg) = upper_32_bits(p->regval);
-> -		vcpu_cp15_64_low(vcpu, r->reg) = lower_32_bits(p->regval);
-> +		val = vcpu_sys_reg(vcpu, reg);
-> +		if (r->reg % 2)
-> +			val = (p->regval << 32) | (u64)lower_32_bits(val);
-> +		else
-> +			val = ((u64)upper_32_bits(val) << 32) |
-> +				(u64)lower_32_bits(p->regval);
->  	}
+> +	return vcpu_sys_reg(vcpu, reg);
+> +}
+> +
+> +static void write_deferrable_vm_reg(struct kvm_vcpu *vcpu, int reg, u64 val)
+> +{
+> +	if (vcpu->arch.sysregs_loaded_on_cpu) {
+> +		switch (reg) {
+> +		case SCTLR_EL1:		write_sysreg_el1(val, sctlr);	return;
+> +		case TTBR0_EL1:		write_sysreg_el1(val, ttbr0);	return;
+> +		case TTBR1_EL1:		write_sysreg_el1(val, ttbr1);	return;
+> +		case TCR_EL1:		write_sysreg_el1(val, tcr);	return;
+> +		case ESR_EL1:		write_sysreg_el1(val, esr);	return;
+> +		case FAR_EL1:		write_sysreg_el1(val, far);	return;
+> +		case AFSR0_EL1:		write_sysreg_el1(val, afsr0);	return;
+> +		case AFSR1_EL1:		write_sysreg_el1(val, afsr1);	return;
+> +		case MAIR_EL1:		write_sysreg_el1(val, mair);	return;
+> +		case AMAIR_EL1:		write_sysreg_el1(val, amair);	return;
+> +		case CONTEXTIDR_EL1:	write_sysreg_el1(val, contextidr); return;
+> +		case DACR32_EL2:	write_sysreg(val, dacr32_el2); return;
+> +		case IFSR32_EL2:	write_sysreg(val, ifsr32_el2); return;
+> +		default:		BUG();
+> +		}
+> +	}
+> +
 > +	vcpu_sys_reg(vcpu, reg) = val;
+> +}
+> +
+>  /*
+>   * Generic accessor for VM registers. Only called as long as HCR_TVM
+> + *
+>   * is set. If the guest enables the MMU, we stop trapping the VM
+>   * sys_regs and leave it in complete control of the caches.
+>   */
+> @@ -132,14 +182,14 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
+>  	if (!p->is_aarch32 || !p->is_32bit) {
+>  		val = p->regval;
+>  	} else {
+> -		val = vcpu_sys_reg(vcpu, reg);
+> +		val = read_deferrable_vm_reg(vcpu, reg);
+>  		if (r->reg % 2)
+>  			val = (p->regval << 32) | (u64)lower_32_bits(val);
+>  		else
+>  			val = ((u64)upper_32_bits(val) << 32) |
+>  				(u64)lower_32_bits(p->regval);
+>  	}
+> -	vcpu_sys_reg(vcpu, reg) = val;
+> +	write_deferrable_vm_reg(vcpu, reg, val);
 >  
 >  	kvm_toggle_cache(vcpu, was_enabled);
 >  	return true;
@@ -102,4 +144,9 @@ use
 > 2.9.0
 >
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+I read ahead and see other wrappers that check sysregs_loaded_on_cpu are
+added, but only write_deferrable_vm_reg() has 'deferrable' in its name.
+Should it just be named read/write_vm_reg?
+
+Thanks,
+drew
