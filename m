@@ -1,72 +1,104 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 23/27] KVM: arm/arm64: GICv4: Prevent userspace from changing doorbell affinity
-Date: Mon, 13 Nov 2017 10:17:48 +0100
-Message-ID: <20171113091752.10663-24-christoffer.dall@linaro.org>
+Subject: [PULL 26/27] KVM: arm/arm64: Fix GICv4 ITS initialization issues
+Date: Mon, 13 Nov 2017 10:17:51 +0100
+Message-ID: <20171113091752.10663-27-christoffer.dall@linaro.org>
 References: <20171113091752.10663-1-christoffer.dall@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C77549DBD
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 04:16:25 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id ZjjDaoWsFz6A for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Nov 2017 04:16:24 -0500 (EST)
+Received: from mail-wm0-f66.google.com (mail-wm0-f66.google.com [74.125.82.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B244649DA2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 04:16:24 -0500 (EST)
+Received: by mail-wm0-f66.google.com with SMTP id l8so7822435wmg.4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 01:18:35 -0800 (PST)
 In-Reply-To: <20171113091752.10663-1-christoffer.dall@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Marc Zyngier <marc.zyngier@arm.com>
+We should only try to initialize GICv4 data structures on a GICv4
+capable system.  Move the vgic_supports_direct_msis() check inito
+vgic_v4_init() so that any KVM VGIC initialization path does not fail
+on non-GICv4 systems.
 
-We so far allocate the doorbell interrupts without taking any
-special measure regarding the affinity of these interrupts. We
-simply move them around as required when the vcpu gets scheduled
-on a different CPU.
+Also be slightly more strict in the checking of the return value in
+vgic_its_create, and only error out on negative return values from the
+vgic_v4_init() function.  This is important because the kvm device code
+only treats negative values as errors and only cleans up in this case.
+Errornously treating a positive return value as an error from the
+vgic_v4_init() function can lead to NULL pointer dereferences, as has
+recently been observed.
 
-But that's counting without userspace (and the evil irqbalance) that
-can try and move the VPE interrupt around, causing the ITS code
-to emit VMOVP commands and remap the doorbell to another redistributor.
-Worse, this can happen while the vcpu is running, causing all kind
-of trouble if the VPE is already resident, and we end-up in UNPRED
-territory.
-
-So let's take a definitive action and prevent userspace from messing
-with us. This is just a matter of adding IRQ_NO_BALANCING to the
-set of flags we already have, letting the kernel in sole control
-of the affinity.
-
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/vgic/vgic-v4.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ virt/kvm/arm/vgic/vgic-init.c | 8 +++-----
+ virt/kvm/arm/vgic/vgic-its.c  | 2 +-
+ virt/kvm/arm/vgic/vgic-v4.c   | 3 +++
+ 3 files changed, 7 insertions(+), 6 deletions(-)
 
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index 40be908da238..62310122ee78 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -285,11 +285,9 @@ int vgic_init(struct kvm *kvm)
+ 	if (ret)
+ 		goto out;
+ 
+-	if (vgic_supports_direct_msis(kvm)) {
+-		ret = vgic_v4_init(kvm);
+-		if (ret)
+-			goto out;
+-	}
++	ret = vgic_v4_init(kvm);
++	if (ret)
++		goto out;
+ 
+ 	kvm_for_each_vcpu(i, vcpu, kvm)
+ 		kvm_vgic_vcpu_enable(vcpu);
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index b8c1b724ba3e..c93ecd4a903b 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -1673,7 +1673,7 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
+ 
+ 	if (vgic_initialized(dev->kvm)) {
+ 		int ret = vgic_v4_init(dev->kvm);
+-		if (ret) {
++		if (ret < 0) {
+ 			kfree(its);
+ 			return ret;
+ 		}
 diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
-index c9cec01008c2..bf874dd01fc0 100644
+index 915d09dc2638..53c324aa44ef 100644
 --- a/virt/kvm/arm/vgic/vgic-v4.c
 +++ b/virt/kvm/arm/vgic/vgic-v4.c
-@@ -23,6 +23,8 @@
+@@ -118,6 +118,9 @@ int vgic_v4_init(struct kvm *kvm)
+ 	struct kvm_vcpu *vcpu;
+ 	int i, nr_vcpus, ret;
  
- #include "vgic.h"
- 
-+#define DB_IRQ_FLAGS	(IRQ_NOAUTOEN | IRQ_DISABLE_UNLAZY | IRQ_NO_BALANCING)
++	if (!vgic_supports_direct_msis(kvm))
++		return 0; /* Nothing to see here... move along. */
 +
- static irqreturn_t vgic_v4_doorbell_handler(int irq, void *info)
- {
- 	struct kvm_vcpu *vcpu = info;
-@@ -83,7 +85,7 @@ int vgic_v4_init(struct kvm *kvm)
- 		 * doorbell could kick us out of the guest too
- 		 * early...
- 		 */
--		irq_set_status_flags(irq, IRQ_NOAUTOEN | IRQ_DISABLE_UNLAZY);
-+		irq_set_status_flags(irq, DB_IRQ_FLAGS);
- 		ret = request_irq(irq, vgic_v4_doorbell_handler,
- 				  0, "vcpu", vcpu);
- 		if (ret) {
-@@ -121,7 +123,7 @@ void vgic_v4_teardown(struct kvm *kvm)
- 		struct kvm_vcpu *vcpu = kvm_get_vcpu(kvm, i);
- 		int irq = its_vm->vpes[i]->irq;
- 
--		irq_clear_status_flags(irq, IRQ_NOAUTOEN | IRQ_DISABLE_UNLAZY);
-+		irq_clear_status_flags(irq, DB_IRQ_FLAGS);
- 		free_irq(irq, vcpu);
- 	}
+ 	if (dist->its_vm.vpes)
+ 		return 0;
  
 -- 
 2.14.2
