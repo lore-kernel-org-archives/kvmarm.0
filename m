@@ -1,26 +1,26 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 22/27] KVM: arm/arm64: GICv4: Prevent a VM using GICv4 from
- being saved
-Date: Mon, 13 Nov 2017 10:17:47 +0100
-Message-ID: <20171113091752.10663-23-christoffer.dall@linaro.org>
+Subject: [PULL 17/27] KVM: arm/arm64: GICv4: Use pending_last as a scheduling
+ hint
+Date: Mon, 13 Nov 2017 10:17:42 +0100
+Message-ID: <20171113091752.10663-18-christoffer.dall@linaro.org>
 References: <20171113091752.10663-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0195949DB4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 04:16:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 74C5649D9B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 04:16:12 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id klUjA+FuJucE for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Nov 2017 04:16:19 -0500 (EST)
+ with ESMTP id FvoHuhSnieK9 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Nov 2017 04:16:11 -0500 (EST)
 Received: from mail-wr0-f196.google.com (mail-wr0-f196.google.com
  [209.85.128.196])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2248349DAA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 04:16:19 -0500 (EST)
-Received: by mail-wr0-f196.google.com with SMTP id y42so13796596wrd.3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 01:18:29 -0800 (PST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6DA6C49D9C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 04:16:08 -0500 (EST)
+Received: by mail-wr0-f196.google.com with SMTP id p96so13755756wrb.7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Nov 2017 01:18:19 -0800 (PST)
 In-Reply-To: <20171113091752.10663-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -37,55 +37,34 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Marc Zyngier <marc.zyngier@arm.com>
 
-The GICv4 architecture doesn't make it easy for save/restore to
-work, as it doesn't give any guarantee that the pending state
-is written into the pending table.
+When a vPE exits, the pending_last flag is set when there are pending
+VLPIs stored in the pending table. Similarily, this flag will be set
+when a doorbell interrupt fires, as it indicates the same condition.
 
-So let's not take any chance, and let's return an error if
-we encounter any LPI that has the HW bit set. In order for
-userspace to distinguish this error from other failure modes,
-use -EACCES as an error code.
+Let's update kvm_vgic_vcpu_pending_irq() to account for that
+flag as well, making a vcpu runnable when set.
 
+Acked-by: Christoffer Dall <cdall@linaro.org>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- Documentation/virtual/kvm/devices/arm-vgic-its.txt | 2 ++
- virt/kvm/arm/vgic/vgic-its.c                       | 9 +++++++++
- 2 files changed, 11 insertions(+)
+ virt/kvm/arm/vgic/vgic.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/Documentation/virtual/kvm/devices/arm-vgic-its.txt b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
-index 8d5830eab26a..4f0c9fc40365 100644
---- a/Documentation/virtual/kvm/devices/arm-vgic-its.txt
-+++ b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
-@@ -64,6 +64,8 @@ Groups:
-     -EINVAL: Inconsistent restored data
-     -EFAULT: Invalid guest ram access
-     -EBUSY:  One or more VCPUS are running
-+    -EACCES: The virtual ITS is backed by a physical GICv4 ITS, and the
-+	     state is not available
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index a05a5700910b..d29e91215366 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -781,6 +781,9 @@ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
+ 	if (!vcpu->kvm->arch.vgic.enabled)
+ 		return false;
  
-   KVM_DEV_ARM_VGIC_GRP_ITS_REGS
-   Attributes:
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index bf571f6d2b32..b8c1b724ba3e 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -1995,6 +1995,15 @@ static int vgic_its_save_itt(struct vgic_its *its, struct its_device *device)
- 	list_for_each_entry(ite, &device->itt_head, ite_list) {
- 		gpa_t gpa = base + ite->event_id * ite_esz;
- 
-+		/*
-+		 * If an LPI carries the HW bit, this means that this
-+		 * interrupt is controlled by GICv4, and we do not
-+		 * have direct access to that state. Let's simply fail
-+		 * the save operation...
-+		 */
-+		if (ite->irq->hw)
-+			return -EACCES;
++	if (vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last)
++		return true;
 +
- 		ret = vgic_its_save_ite(its, device, ite, gpa, ite_esz);
- 		if (ret)
- 			return ret;
+ 	spin_lock_irqsave(&vgic_cpu->ap_list_lock, flags);
+ 
+ 	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
 -- 
 2.14.2
