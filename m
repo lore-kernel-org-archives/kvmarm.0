@@ -1,7 +1,7 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 11/27] KVM: arm/arm64: GICv4: Unmap VLPI when freeing an LPI
-Date: Mon, 13 Nov 2017 10:17:36 +0100
-Message-ID: <20171113091752.10663-12-christoffer.dall@linaro.org>
+Subject: [PULL 12/27] KVM: arm/arm64: GICv4: Propagate affinity changes to the physical ITS
+Date: Mon, 13 Nov 2017 10:17:37 +0100
+Message-ID: <20171113091752.10663-13-christoffer.dall@linaro.org>
 References: <20171113091752.10663-1-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20171113091752.10663-1-christoffer.dall@linaro.org>
@@ -12,33 +12,47 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Marc Zyngier <marc.zyngier@arm.com>
 
-When freeing an LPI (on a DISCARD command, for example), we need
-to unmap the VLPI down to the physical ITS level.
+When the guest issues an affinity change, we need to tell the physical
+ITS that we're now targetting a new vcpu.  This is done by extracting
+the current mapping, updating the target, and reapplying the mapping.
 
-Acked-by: Christoffer Dall <cdall@linaro.org>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/vgic/vgic-its.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ virt/kvm/arm/vgic/vgic-its.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 590f794b7330..ad14af8a4412 100644
+index ad14af8a4412..80bea7021e2e 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -631,8 +631,12 @@ static void its_free_ite(struct kvm *kvm, struct its_ite *ite)
- 	list_del(&ite->ite_list);
+@@ -338,11 +338,25 @@ static int vgic_copy_lpi_list(struct kvm_vcpu *vcpu, u32 **intid_ptr)
  
- 	/* This put matches the get in vgic_add_lpi. */
--	if (ite->irq)
-+	if (ite->irq) {
-+		if (ite->irq->hw)
-+			WARN_ON(its_unmap_vlpi(ite->irq->host_irq));
+ static int update_affinity(struct vgic_irq *irq, struct kvm_vcpu *vcpu)
+ {
++	int ret = 0;
 +
- 		vgic_put_irq(kvm, ite->irq);
-+	}
+ 	spin_lock(&irq->irq_lock);
+ 	irq->target_vcpu = vcpu;
+ 	spin_unlock(&irq->irq_lock);
  
- 	kfree(ite);
+-	return 0;
++	if (irq->hw) {
++		struct its_vlpi_map map;
++
++		ret = its_get_vlpi(irq->host_irq, &map);
++		if (ret)
++			return ret;
++
++		map.vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
++
++		ret = its_map_vlpi(irq->host_irq, &map);
++	}
++
++	return ret;
  }
+ 
+ /*
 -- 
 2.14.2
