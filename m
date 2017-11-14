@@ -1,54 +1,78 @@
-From: Kristina Martsenko <kristina.martsenko@arm.com>
-Subject: [PATCH] arm64: KVM: fix VTTBR_BADDR_MASK BUG_ON off-by-one
-Date: Tue, 14 Nov 2017 14:37:43 +0000
-Message-ID: <1510670263-13092-1-git-send-email-kristina.martsenko@arm.com>
-Return-path: <stable-owner@vger.kernel.org>
-Sender: stable-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, stable@vger.kernel.org
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v8 0/7] Support RAS virtualization in KVM
+Date: Tue, 14 Nov 2017 16:00:44 +0000
+Message-ID: <5A0B132C.6070400@arm.com>
+References: <1510343650-23659-1-git-send-email-gengdongjiu@huawei.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-doc-owner@vger.kernel.org>
+In-Reply-To: <1510343650-23659-1-git-send-email-gengdongjiu@huawei.com>
+Sender: linux-doc-owner@vger.kernel.org
+To: Dongjiu Geng <gengdongjiu@huawei.com>
+Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, linux@armlinux.org.uk, bp@alien8.de, rjw@rjwysocki.net, pbonzini@redhat.com, rkrcmar@redhat.com, corbet@lwn.net, catalin.marinas@arm.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-acpi@vger.kernel.org, devel@acpica.org, huangshaoyu@huawei.com, wuquanming@huawei.com, linuxarm@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VTTBR_BADDR_MASK is used to sanity check the size and alignment of the
-VTTBR address. It seems to currently be off by one, thereby only
-allowing up to 47-bit addresses (instead of 48-bit) and also
-insufficiently checking the alignment. This patch fixes it.
+Hi Dongjiu Geng,
 
-As an example, with 4k pages, before this patch we have:
+On 10/11/17 19:54, Dongjiu Geng wrote:
+> This series patches mainly do below things:
+> 
+> 1. Trap RAS ERR* registers Accesses to EL2 from Non-secure EL1,
+>    KVM will will do a minimum simulation, there registers are simulated
+>    to RAZ/WI in KVM.
+> 2. Route synchronous External Abort exceptions from Non-secure EL0
+>    and EL1 to EL2. When exception EL3 routing is enabled by firmware,
+>    system will trap to EL3 firmware instead of EL2 KVM, then firmware
+>    judges whether El2 routing is enabled, if enabled, jump to EL2 KVM, 
+>    otherwise jump to EL1 host kernel.
+> 3. Enable APEI ARv8 SEI notification to parse the CPER records for SError
+>    in the ACPI GHES driver, KVM will call handle_guest_sei() to let ACPI
+>    driver to parse the CPER record for SError which happened in the guest
+> 4. Although we can use APEI driver to handle the guest SError, but not all
+>    system support SEI notification, such as kernel-first. So here KVM will
+>    also classify the Error through Exception Syndrome Register and do different
+>    approaches according to Asynchronous Error Type
 
-  PHYS_MASK_SHIFT = 48
-  VTTBR_X = 37 - 24 = 13
-  VTTBR_BADDR_SHIFT = 13 - 1 = 12
-  VTTBR_BADDR_MASK = ((1 << 35) - 1) << 12 = 0x00007ffffffff000
+> 5. If the guest SError error is not propagated and not consumed, then KVM return
+>    recoverable error status to user-space, user-space will specify the guest ESR
 
-Which is wrong, because the mask doesn't allow bit 47 of the VTTBR
-address to be set, and only requires the address to be 12-bit (4k)
-aligned, while it actually needs to be 13-bit (8k) aligned because we
-concatenate two 4k tables.
+I thought we'd gone over this. There should be no RAS errors/notifications in
+user space. Only the symptoms should be sent, using the SIGBUS_MCEERR_A{O,R} if
+the kernel has handled as much as it can. This hides the actual mechanisms the
+kernel and firmware used.
 
-With this patch, the mask becomes 0x0000ffffffffe000, which is what we
-want.
+User-space should not have to know how to handle RAS errors directly. This is a
+service the operating system provides for it. This abstraction means the smae
+user-space code is portable between x86, arm64, powerpc etc.
 
-Fixes: 0369f6a34b9f ("arm64: KVM: EL2 register definitions")
-Cc: <stable@vger.kernel.org> # 3.11.x
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
----
- arch/arm64/include/asm/kvm_arm.h | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+What if the firmware uses another notification method? User space should expect
+the kernel to hide things like this from it.
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 61d694c2eae5..555d463c0eaa 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -170,8 +170,7 @@
- #define VTCR_EL2_FLAGS			(VTCR_EL2_COMMON_BITS | VTCR_EL2_TGRAN_FLAGS)
- #define VTTBR_X				(VTTBR_X_TGRAN_MAGIC - VTCR_EL2_T0SZ_IPA)
- 
--#define VTTBR_BADDR_SHIFT (VTTBR_X - 1)
--#define VTTBR_BADDR_MASK  (((UL(1) << (PHYS_MASK_SHIFT - VTTBR_X)) - 1) << VTTBR_BADDR_SHIFT)
-+#define VTTBR_BADDR_MASK  (((UL(1) << (PHYS_MASK_SHIFT - VTTBR_X)) - 1) << VTTBR_X)
- #define VTTBR_VMID_SHIFT  (UL(48))
- #define VTTBR_VMID_MASK(size) (_AT(u64, (1 << size) - 1) << VTTBR_VMID_SHIFT)
- 
--- 
-2.1.4
+If the kernel has no information to interpret a notification, how is user space
+supposed to know?
+
+I understand you are trying to work around your 'memory corruption at an unknown
+address'[0] problem, but if the kernel can't know where this corrupt memory is
+it should really reboot. What stops this corrupt data being swapped to disk?
+
+Killing 'the thing' that was running at the time is not sufficient because we
+don't know that this 'got' all the users of the corrupt memory. KSM can merge
+pages between guests. This is the difference between the error persisting
+forever killing off all the VMs one by one, and the corrupt page being silently
+re-read from disk clearing the error.
+
+
+>    and inject a virtual SError. For other Asynchronous Error Type, KVM directly
+>    injects virtual SError with IMPLEMENTATION DEFINED ESR or KVM is panic if the
+>    error is fatal. In the RAS extension, guest virtual ESR must be set, because
+>    all-zero  means 'RAS error: Uncategorized' instead of 'no valid ISS', so set
+>    this ESR to IMPLEMENTATION DEFINED by default if user space does not specify it.
+
+
+Thanks,
+
+James
+
+
+[0] https://www.spinics.net/lists/arm-kernel/msg605345.html
