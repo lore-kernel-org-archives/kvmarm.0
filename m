@@ -1,256 +1,490 @@
-From: Manoj Iyer <manoj.iyer-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
-Subject: Re: [v3,2/2] arm64: Add software workaround for Falkor erratum
- 1041
-Date: Wed, 15 Nov 2017 11:40:31 -0600 (CST)
-Message-ID: <alpine.DEB.2.20.1711151134200.22395@lazy>
-References: <1510537359-9978-3-git-send-email-shankerd@codeaurora.org>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH 32/37] KVM: arm/arm64: Handle VGICv2 save/restore from the
+ main VGIC code
+Date: Wed, 15 Nov 2017 17:50:07 +0000
+Message-ID: <2f7e5d1f-4d60-cd53-f6ff-f4af127bc0b6@arm.com>
+References: <20171012104141.26902-1-christoffer.dall@linaro.org>
+ <20171012104141.26902-33-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1510537359-9978-3-git-send-email-shankerd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Shanker Donthineni <shankerd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-Cc: Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>, Robin Murphy <robin.murphy-5wv7dgnIgG8@public.gmane.org>, Ard Biesheuvel <ard.biesheuvel-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Matt Fleming <matt-mF/unelCI9GS6iBeEJttW/XRex20P6io@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20171012104141.26902-33-christoffer.dall@linaro.org>
+Content-Language: en-GB
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sun, 12 Nov 2017, Shanker Donthineni wrote:
+Hi,
 
-> The ARM architecture defines the memory locations that are permitted
-> to be accessed as the result of a speculative instruction fetch from
-> an exception level for which all stages of translation are disabled.
-> Specifically, the core is permitted to speculatively fetch from the
-> 4KB region containing the current program counter 4K and next 4K.
->
-> When translation is changed from enabled to disabled for the running
-> exception level (SCTLR_ELn[M] changed from a value of 1 to 0), the
-> Falkor core may errantly speculatively access memory locations outside
-> of the 4KB region permitted by the architecture. The errant memory
-> access may lead to one of the following unexpected behaviors.
->
-> 1) A System Error Interrupt (SEI) being raised by the Falkor core due
->   to the errant memory access attempting to access a region of memory
->   that is protected by a slave-side memory protection unit.
-> 2) Unpredictable device behavior due to a speculative read from device
->   memory. This behavior may only occur if the instruction cache is
->   disabled prior to or coincident with translation being changed from
->   enabled to disabled.
->
-> The conditions leading to this erratum will not occur when either of the
-> following occur:
-> 1) A higher exception level disables translation of a lower exception level
->   (e.g. EL2 changing SCTLR_EL1[M] from a value of 1 to 0).
-> 2) An exception level disabling its stage-1 translation if its stage-2
->    translation is enabled (e.g. EL1 changing SCTLR_EL1[M] from a value of 1
->    to 0 when HCR_EL2[VM] has a value of 1).
->
-> To avoid the errant behavior, software must execute an ISB immediately
-> prior to executing the MSR that will change SCTLR_ELn[M] from 1 to 0.
->
-> Signed-off-by: Shanker Donthineni <shankerd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+those last few patches are actually helpful for the Xen port ...
+
+On 12/10/17 11:41, Christoffer Dall wrote:
+> We can program the GICv2 hypervisor control interface logic directly
+> from the core vgic code and can instead do the save/restore directly
+> from the flush/sync functions, which can lead to a number of future
+> optimizations.
+> 
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 > ---
-> Changes since v1:
->  Apply the workaround where it's required.
-> Changes since v2:
->  Repost the corrected patches.
->
-> Documentation/arm64/silicon-errata.txt |  1 +
-> arch/arm64/Kconfig                     | 10 ++++++++++
-> arch/arm64/include/asm/assembler.h     | 19 +++++++++++++++++++
-> arch/arm64/include/asm/cpucaps.h       |  3 ++-
-> arch/arm64/kernel/cpu-reset.S          |  1 +
-> arch/arm64/kernel/cpu_errata.c         | 16 ++++++++++++++++
-> arch/arm64/kernel/efi-entry.S          |  2 ++
-> arch/arm64/kernel/head.S               |  1 +
-> arch/arm64/kernel/relocate_kernel.S    |  1 +
-> arch/arm64/kvm/hyp-init.S              |  1 +
-> 10 files changed, 54 insertions(+), 1 deletion(-)
->
-> diff --git a/Documentation/arm64/silicon-errata.txt b/Documentation/arm64/silicon-errata.txt
-> index 66e8ce1..704770c0 100644
-> --- a/Documentation/arm64/silicon-errata.txt
-> +++ b/Documentation/arm64/silicon-errata.txt
-> @@ -74,3 +74,4 @@ stable kernels.
-> | Qualcomm Tech. | Falkor v1       | E1003           | QCOM_FALKOR_ERRATUM_1003    |
-> | Qualcomm Tech. | Falkor v1       | E1009           | QCOM_FALKOR_ERRATUM_1009    |
-> | Qualcomm Tech. | QDF2400 ITS     | E0065           | QCOM_QDF2400_ERRATUM_0065   |
-> +| Qualcomm Tech. | Falkor v{1,2}   | E1041           | QCOM_FALKOR_ERRATUM_1041    |
-> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> index 0df64a6..8f73eac 100644
-> --- a/arch/arm64/Kconfig
-> +++ b/arch/arm64/Kconfig
-> @@ -539,6 +539,16 @@ config QCOM_QDF2400_ERRATUM_0065
->
-> 	  If unsure, say Y.
->
-> +config QCOM_FALKOR_ERRATUM_E1041
-> +	bool "Falkor E1041: Speculative instruction fetches might cause errant memory access"
-> +	default y
-> +	help
-> +	  Falkor CPU may speculatively fetch instructions from an improper
-> +	  memory location when MMU translation is changed from SCTLR_ELn[M]=1
-> +	  to SCTLR_ELn[M]=0. Prefix an ISB instruction to fix the problem.
-> +
-> +	  If unsure, say Y.
-> +
-> endmenu
->
->
-> diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
-> index d58a625..dd9cec5 100644
-> --- a/arch/arm64/include/asm/assembler.h
-> +++ b/arch/arm64/include/asm/assembler.h
-> @@ -30,6 +30,7 @@
-> #include <asm/pgtable-hwdef.h>
-> #include <asm/ptrace.h>
-> #include <asm/thread_info.h>
-> +#include <asm/alternative.h>
->
-> /*
->  * Enable and disable interrupts.
-> @@ -499,4 +500,22 @@
-> #endif
-> 	.endm
->
-> +/**
-> + * Errata workaround prior to disable MMU. Insert an ISB immediately prior
-> + * to executing the MSR that will change SCTLR_ELn[M] from a value of 1 to 0.
-> + */
-> +	.macro pre_disable_mmu_workaround
-> +#ifdef CONFIG_QCOM_FALKOR_ERRATUM_E1041
-> +alternative_if ARM64_WORKAROUND_QCOM_FALKOR_E1041
-> +	isb
-> +alternative_else_nop_endif
-> +#endif
-> +	.endm
-> +
-> +	.macro pre_disable_mmu_early_workaround
-> +#ifdef CONFIG_QCOM_FALKOR_ERRATUM_E1041
-> +	isb
-> +#endif
-> +	.endm
-> +
-> #endif	/* __ASM_ASSEMBLER_H */
-> diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-> index 8da6216..7f7a59d 100644
-> --- a/arch/arm64/include/asm/cpucaps.h
-> +++ b/arch/arm64/include/asm/cpucaps.h
-> @@ -40,7 +40,8 @@
-> #define ARM64_WORKAROUND_858921			19
-> #define ARM64_WORKAROUND_CAVIUM_30115		20
-> #define ARM64_HAS_DCPOP				21
-> +#define ARM64_WORKAROUND_QCOM_FALKOR_E1041	22
->
-> -#define ARM64_NCAPS				22
-> +#define ARM64_NCAPS				23
->
-> #endif /* __ASM_CPUCAPS_H */
-> diff --git a/arch/arm64/kernel/cpu-reset.S b/arch/arm64/kernel/cpu-reset.S
-> index 65f42d2..2a752cb 100644
-> --- a/arch/arm64/kernel/cpu-reset.S
-> +++ b/arch/arm64/kernel/cpu-reset.S
-> @@ -37,6 +37,7 @@ ENTRY(__cpu_soft_restart)
-> 	mrs	x12, sctlr_el1
-> 	ldr	x13, =SCTLR_ELx_FLAGS
-> 	bic	x12, x12, x13
-> +	pre_disable_mmu_workaround
-> 	msr	sctlr_el1, x12
-> 	isb
->
-> diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-> index 0e27f86..2fd1938 100644
-> --- a/arch/arm64/kernel/cpu_errata.c
-> +++ b/arch/arm64/kernel/cpu_errata.c
-> @@ -179,6 +179,22 @@ static int cpu_enable_trap_ctr_access(void *__unused)
-> 			   MIDR_CPU_VAR_REV(0, 0)),
-> 	},
-> #endif
-> +#ifdef CONFIG_QCOM_FALKOR_ERRATUM_E1041
-> +	{
-> +		.desc = "Qualcomm Technologies Falkor erratum 1041",
-> +		.capability = ARM64_WORKAROUND_QCOM_FALKOR_E1041,
-> +		MIDR_RANGE(MIDR_QCOM_FALKOR_V1,
-> +			MIDR_CPU_VAR_REV(0, 0),
-> +			MIDR_CPU_VAR_REV(0, 0)),
-> +	},
-> +	{
-> +		.desc = "Qualcomm Technologies Falkor erratum 1041",
-> +		.capability = ARM64_WORKAROUND_QCOM_FALKOR_E1041,
-> +		MIDR_RANGE(MIDR_QCOM_FALKOR,
-> +			MIDR_CPU_VAR_REV(0, 1),
-> +			MIDR_CPU_VAR_REV(0, 2)),
-> +	},
-> +#endif
-> #ifdef CONFIG_ARM64_ERRATUM_858921
-> 	{
-> 	/* Cortex-A73 all versions */
-> diff --git a/arch/arm64/kernel/efi-entry.S b/arch/arm64/kernel/efi-entry.S
-> index 4e6ad35..dc675ba 100644
-> --- a/arch/arm64/kernel/efi-entry.S
-> +++ b/arch/arm64/kernel/efi-entry.S
-> @@ -96,6 +96,7 @@ ENTRY(entry)
-> 	mrs	x0, sctlr_el2
-> 	bic	x0, x0, #1 << 0	// clear SCTLR.M
-> 	bic	x0, x0, #1 << 2	// clear SCTLR.C
-> +	pre_disable_mmu_early_workaround
-> 	msr	sctlr_el2, x0
-> 	isb
-> 	b	2f
-> @@ -103,6 +104,7 @@ ENTRY(entry)
-> 	mrs	x0, sctlr_el1
-> 	bic	x0, x0, #1 << 0	// clear SCTLR.M
-> 	bic	x0, x0, #1 << 2	// clear SCTLR.C
-> +	pre_disable_mmu_early_workaround
-> 	msr	sctlr_el1, x0
-> 	isb
-> 2:
-> diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
-> index 0b243ec..a807fca 100644
-> --- a/arch/arm64/kernel/head.S
-> +++ b/arch/arm64/kernel/head.S
-> @@ -732,6 +732,7 @@ __primary_switch:
-> 	 * to take into account by discarding the current kernel mapping and
-> 	 * creating a new one.
-> 	 */
-> +	pre_disable_mmu_early_workaround
-> 	msr	sctlr_el1, x20			// disable the MMU
-> 	isb
-> 	bl	__create_page_tables		// recreate kernel mapping
-> diff --git a/arch/arm64/kernel/relocate_kernel.S b/arch/arm64/kernel/relocate_kernel.S
-> index ce704a4..f407e42 100644
-> --- a/arch/arm64/kernel/relocate_kernel.S
-> +++ b/arch/arm64/kernel/relocate_kernel.S
-> @@ -45,6 +45,7 @@ ENTRY(arm64_relocate_new_kernel)
-> 	mrs	x0, sctlr_el2
-> 	ldr	x1, =SCTLR_ELx_FLAGS
-> 	bic	x0, x0, x1
-> +	pre_disable_mmu_workaround
-> 	msr	sctlr_el2, x0
-> 	isb
-> 1:
-> diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp-init.S
-> index 3f96155..870828c 100644
-> --- a/arch/arm64/kvm/hyp-init.S
-> +++ b/arch/arm64/kvm/hyp-init.S
-> @@ -151,6 +151,7 @@ reset:
-> 	mrs	x5, sctlr_el2
-> 	ldr	x6, =SCTLR_ELx_FLAGS
-> 	bic	x5, x5, x6		// Clear SCTL_M and etc
-> +	pre_disable_mmu_workaround
-> 	msr	sctlr_el2, x5
-> 	isb
->
->
+>  arch/arm/kvm/hyp/switch.c        |  4 --
+>  arch/arm64/include/asm/kvm_hyp.h |  2 -
+>  arch/arm64/kvm/hyp/switch.c      |  4 --
+>  virt/kvm/arm/hyp/vgic-v2-sr.c    | 83 ------------------------------------
+>  virt/kvm/arm/vgic/vgic-init.c    | 22 ++++++----
+>  virt/kvm/arm/vgic/vgic-v2.c      | 92 ++++++++++++++++++++++++++++++++++++++++
+>  virt/kvm/arm/vgic/vgic.c         | 21 ++++++++-
+>  virt/kvm/arm/vgic/vgic.h         |  5 +++
+>  8 files changed, 130 insertions(+), 103 deletions(-)
+> 
+> diff --git a/arch/arm/kvm/hyp/switch.c b/arch/arm/kvm/hyp/switch.c
+> index c3b9799..0d834f8 100644
+> --- a/arch/arm/kvm/hyp/switch.c
+> +++ b/arch/arm/kvm/hyp/switch.c
+> @@ -91,16 +91,12 @@ static void __hyp_text __vgic_save_state(struct kvm_vcpu *vcpu)
+>  {
+>  	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+>  		__vgic_v3_save_state(vcpu);
+> -	else
+> -		__vgic_v2_save_state(vcpu);
+>  }
+>  
+>  static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
+>  {
+>  	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+>  		__vgic_v3_restore_state(vcpu);
+> -	else
+> -		__vgic_v2_restore_state(vcpu);
+>  }
+>  
+>  static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index 28d5f3c..bd3fe64 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -121,8 +121,6 @@ typeof(orig) * __hyp_text fname(void)					\
+>  	return val;							\
+>  }
+>  
+> -void __vgic_v2_save_state(struct kvm_vcpu *vcpu);
+> -void __vgic_v2_restore_state(struct kvm_vcpu *vcpu);
+>  int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu);
+>  
+>  void __vgic_v3_save_state(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index 5692aa0..90da506 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -186,16 +186,12 @@ static void __hyp_text __vgic_save_state(struct kvm_vcpu *vcpu)
+>  {
+>  	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+>  		__vgic_v3_save_state(vcpu);
+> -	else
+> -		__vgic_v2_save_state(vcpu);
+>  }
+>  
+>  static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
+>  {
+>  	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+>  		__vgic_v3_restore_state(vcpu);
+> -	else
+> -		__vgic_v2_restore_state(vcpu);
+>  }
+>  
+>  static bool __hyp_text __true_value(void)
+> diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
+> index a3f18d3..b433257 100644
+> --- a/virt/kvm/arm/hyp/vgic-v2-sr.c
+> +++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
+> @@ -22,89 +22,6 @@
+>  #include <asm/kvm_emulate.h>
+>  #include <asm/kvm_hyp.h>
+>  
+> -static void __hyp_text save_elrsr(struct kvm_vcpu *vcpu, void __iomem *base)
+> -{
+> -	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+> -	int nr_lr = (kern_hyp_va(&kvm_vgic_global_state))->nr_lr;
+> -	u32 elrsr0, elrsr1;
+> -
+> -	elrsr0 = readl_relaxed(base + GICH_ELRSR0);
+> -	if (unlikely(nr_lr > 32))
+> -		elrsr1 = readl_relaxed(base + GICH_ELRSR1);
+> -	else
+> -		elrsr1 = 0;
+> -
+> -#ifdef CONFIG_CPU_BIG_ENDIAN
+> -	cpu_if->vgic_elrsr = ((u64)elrsr0 << 32) | elrsr1;
+> -#else
+> -	cpu_if->vgic_elrsr = ((u64)elrsr1 << 32) | elrsr0;
+> -#endif
+> -}
+> -
+> -static void __hyp_text save_lrs(struct kvm_vcpu *vcpu, void __iomem *base)
+> -{
+> -	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+> -	int i;
+> -	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
+> -
+> -	for (i = 0; i < used_lrs; i++) {
+> -		if (cpu_if->vgic_elrsr & (1UL << i))
+> -			cpu_if->vgic_lr[i] &= ~GICH_LR_STATE;
+> -		else
+> -			cpu_if->vgic_lr[i] = readl_relaxed(base + GICH_LR0 + (i * 4));
+> -
+> -		writel_relaxed(0, base + GICH_LR0 + (i * 4));
+> -	}
+> -}
+> -
+> -/* vcpu is already in the HYP VA space */
+> -void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
+> -{
+> -	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+> -	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+> -	struct vgic_dist *vgic = &kvm->arch.vgic;
+> -	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
+> -	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
+> -
+> -	if (!base)
+> -		return;
+> -
+> -	if (used_lrs) {
+> -		cpu_if->vgic_apr = readl_relaxed(base + GICH_APR);
+> -
+> -		save_elrsr(vcpu, base);
+> -		save_lrs(vcpu, base);
+> -
+> -		writel_relaxed(0, base + GICH_HCR);
+> -	} else {
+> -		cpu_if->vgic_elrsr = ~0UL;
+> -		cpu_if->vgic_apr = 0;
+> -	}
+> -}
+> -
+> -/* vcpu is already in the HYP VA space */
+> -void __hyp_text __vgic_v2_restore_state(struct kvm_vcpu *vcpu)
+> -{
+> -	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+> -	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+> -	struct vgic_dist *vgic = &kvm->arch.vgic;
+> -	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
+> -	int i;
+> -	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
+> -
+> -	if (!base)
+> -		return;
+> -
+> -	if (used_lrs) {
+> -		writel_relaxed(cpu_if->vgic_hcr, base + GICH_HCR);
+> -		writel_relaxed(cpu_if->vgic_apr, base + GICH_APR);
+> -		for (i = 0; i < used_lrs; i++) {
+> -			writel_relaxed(cpu_if->vgic_lr[i],
+> -				       base + GICH_LR0 + (i * 4));
+> -		}
+> -	}
+> -}
+> -
+>  #ifdef CONFIG_ARM64
+>  /*
+>   * __vgic_v2_perform_cpuif_access -- perform a GICV access on behalf of the
+> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+> index 5801261f..fa2b565 100644
+> --- a/virt/kvm/arm/vgic/vgic-init.c
+> +++ b/virt/kvm/arm/vgic/vgic-init.c
+> @@ -425,14 +425,16 @@ static int vgic_init_cpu_dying(unsigned int cpu)
+>  	return 0;
+>  }
+>  
+> -static irqreturn_t vgic_maintenance_handler(int irq, void *data)
+> +static irqreturn_t vgic_v3_maintenance_handler(int irq, void *data)
+>  {
+> -	/*
+> -	 * We cannot rely on the vgic maintenance interrupt to be
+> -	 * delivered synchronously. This means we can only use it to
+> -	 * exit the VM, and we perform the handling of EOIed
+> -	 * interrupts on the exit path (see vgic_process_maintenance).
+> -	 */
 
-I applied the V3 of errtum 1041 patches to Ubuntu Artful 4.13 kernel and 
-ran the stress-ng and VM create/stop/restart testing like I did on the 
-previous version of this patch series. Tests successfully ran on qdf2400 
-platform, I did not observe any regressions on the Artful 4.13 kernel.
+I always found this comment quite enlightening, especially as it points
+out that we need to deviate somewhat from the architectural idea here.
+I see that you have shortened it below. Is it no longer true? Can we
+keep the more elaborate version? If not here, then below?
 
-Tested-by: Manoj Iyer <manoj.iyer-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+> +	BUG(); /* Not implemented lazy save/restore on GICv3 */
+> +	return IRQ_HANDLED;
+> +}
+> +
+> +static irqreturn_t vgic_v2_maintenance_handler(int irq, void *data)
+> +{
+> +	struct kvm_vcpu *vcpu = (struct kvm_vcpu *)data;
 
---
-============================
-Manoj Iyer
-Ubuntu/Canonical
-ARM Servers - Cloud
-============================
+I think you need an empty line here, to separate variable declaration
+from code.
+
+> +	vgic_v2_handle_maintenance(vcpu);
+
+>  	return IRQ_HANDLED;
+>  }
+>  
+> @@ -464,6 +466,7 @@ void kvm_vgic_init_cpu_hardware(void)
+>  int kvm_vgic_hyp_init(void)
+>  {
+>  	const struct gic_kvm_info *gic_kvm_info;
+> +	irqreturn_t (*handler)(int irq, void *data);
+>  	int ret;
+>  
+>  	gic_kvm_info = gic_get_kvm_info();
+> @@ -478,6 +481,7 @@ int kvm_vgic_hyp_init(void)
+>  	switch (gic_kvm_info->type) {
+>  	case GIC_V2:
+>  		ret = vgic_v2_probe(gic_kvm_info);
+> +		handler = vgic_v2_maintenance_handler;
+>  		break;
+1>  	case GIC_V3:
+>  		ret = vgic_v3_probe(gic_kvm_info);
+> @@ -485,6 +489,7 @@ int kvm_vgic_hyp_init(void)
+>  			static_branch_enable(&kvm_vgic_global_state.gicv3_cpuif);
+>  			kvm_info("GIC system register CPU interface enabled\n");
+>  		}
+> +		handler = vgic_v3_maintenance_handler;
+>  		break;
+>  	default:
+>  		ret = -ENODEV;
+> @@ -494,8 +499,7 @@ int kvm_vgic_hyp_init(void)
+>  		return ret;
+>  
+>  	kvm_vgic_global_state.maint_irq = gic_kvm_info->maint_irq;
+> -	ret = request_percpu_irq(kvm_vgic_global_state.maint_irq,
+> -				 vgic_maintenance_handler,
+> +	ret = request_percpu_irq(kvm_vgic_global_state.maint_irq, handler,
+>  				 "vgic", kvm_get_running_vcpus());
+>  	if (ret) {
+>  		kvm_err("Cannot register interrupt %d\n",
+> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+> index 8089710..259079b 100644
+> --- a/virt/kvm/arm/vgic/vgic-v2.c
+> +++ b/virt/kvm/arm/vgic/vgic-v2.c
+> @@ -37,6 +37,17 @@ void vgic_v2_init_lrs(void)
+>  		vgic_v2_write_lr(i, 0);
+>  }
+>  
+> +void vgic_v2_handle_maintenance(struct kvm_vcpu *vcpu)
+> +{
+> +	void __iomem *base = kvm_vgic_global_state.vctrl_base;
+> +
+> +	/*
+> +	 * Disable maintenance interrupt as we only use it to generate an exit
+> +	 * from the VM.
+> +	 */
+
+Isn't that comment a bit misleading, as writing 0 to HCR not only
+disables all interrupt sources, but also the whole GICV interface
+altogether (bit 0: EN)?
+I see that it gets enabled later on when writing ->vgic_hcr into the
+register, but this function here looks a bit surprising to me.
+
+In general these changes to the interrupt handling leave me a bit
+puzzled. Should this be a separate patch? Or explained in the commit
+message?
+
+> +	writel_relaxed(0, base + GICH_HCR);
+> +}
+> +
+>  void vgic_v2_set_underflow(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vgic_v2_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v2;
+> @@ -393,6 +404,87 @@ int vgic_v2_probe(const struct gic_kvm_info *info)
+>  	return ret;
+>  }
+>  
+> +static void save_elrsr(struct kvm_vcpu *vcpu, void __iomem *base)
+> +{
+> +	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+> +	int nr_lr = kvm_vgic_global_state.nr_lr;
+> +	u32 elrsr0, elrsr1;
+> +
+> +	elrsr0 = readl_relaxed(base + GICH_ELRSR0);
+> +	if (unlikely(nr_lr > 32))
+> +		elrsr1 = readl_relaxed(base + GICH_ELRSR1);
+> +	else
+> +		elrsr1 = 0;
+> +
+> +#ifdef CONFIG_CPU_BIG_ENDIAN
+> +	cpu_if->vgic_elrsr = ((u64)elrsr0 << 32) | elrsr1;
+> +#else
+> +	cpu_if->vgic_elrsr = ((u64)elrsr1 << 32) | elrsr0;
+> +#endif
+
+I have some gut feeling that this is really broken, since we mix up
+endian *byte* ordering with *bit* ordering here, don't we?
+
+I understand it's just copied and gets removed later on, so I was
+wondering if you could actually move patch 35/37 ("Get rid of
+vgic_elrsr") before this patch here, to avoid copying bogus code around?
+Or does 35/37 depend on 34/37 to be correct?
+
+> +}
+> +
+> +static void save_lrs(struct kvm_vcpu *vcpu, void __iomem *base)
+> +{
+> +	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+> +	int i;
+> +	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
+> +
+> +	for (i = 0; i < used_lrs; i++) {
+> +		if (cpu_if->vgic_elrsr & (1UL << i))
+> +			cpu_if->vgic_lr[i] &= ~GICH_LR_STATE;
+> +		else
+> +			cpu_if->vgic_lr[i] = readl_relaxed(base + GICH_LR0 + (i * 4));
+> +
+> +		writel_relaxed(0, base + GICH_LR0 + (i * 4));
+> +	}
+> +}
+> +
+> +void vgic_v2_save_state(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm *kvm = vcpu->kvm;
+> +	struct vgic_dist *vgic = &kvm->arch.vgic;
+> +	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+> +	void __iomem *base = vgic->vctrl_base;
+> +	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
+> +
+> +	if (!base)
+> +		return;
+> +
+> +	if (used_lrs) {
+> +		cpu_if->vgic_apr = readl_relaxed(base + GICH_APR);
+> +
+> +		save_elrsr(vcpu, base);
+> +		save_lrs(vcpu, base);
+> +
+> +		writel_relaxed(0, base + GICH_HCR);
+> +	} else {
+> +		cpu_if->vgic_elrsr = ~0UL;
+> +		cpu_if->vgic_apr = 0;
+> +	}
+> +}
+> +
+> +void vgic_v2_restore_state(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm *kvm = vcpu->kvm;
+> +	struct vgic_dist *vgic = &kvm->arch.vgic;
+> +	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+> +	void __iomem *base = vgic->vctrl_base;
+> +	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
+> +	int i;
+> +
+> +	if (!base)
+> +		return;
+> +
+> +	if (used_lrs) {
+> +		writel_relaxed(cpu_if->vgic_hcr, base + GICH_HCR);
+> +		writel_relaxed(cpu_if->vgic_apr, base + GICH_APR);
+> +		for (i = 0; i < used_lrs; i++) {
+> +			writel_relaxed(cpu_if->vgic_lr[i],
+> +				       base + GICH_LR0 + (i * 4));
+> +		}
+> +	}
+> +}
+> +
+>  void vgic_v2_load(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> index b1bd238..790fd66 100644
+> --- a/virt/kvm/arm/vgic/vgic.c
+> +++ b/virt/kvm/arm/vgic/vgic.c
+> @@ -18,6 +18,8 @@
+>  #include <linux/kvm_host.h>
+>  #include <linux/list_sort.h>
+>  
+> +#include <asm/kvm_hyp.h>
+
+Why do you need that? Commenting this out seems to compile anyway for me.
+
+> +
+>  #include "vgic.h"
+>  
+>  #define CREATE_TRACE_POINTS
+> @@ -683,11 +685,19 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+>  		vgic_clear_lr(vcpu, count);
+>  }
+>  
+> +static inline void vgic_save_state(struct kvm_vcpu *vcpu)
+
+Isn't "inline" frowned upon in .c files?
+
+> +{
+> +	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+> +		vgic_v2_save_state(vcpu);
+> +}
+> +
+>  /* Sync back the hardware VGIC state into our emulation after a guest's run. */
+>  void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+>  
+> +	vgic_save_state(vcpu);
+> +
+>  	/* An empty ap_list_head implies used_lrs == 0 */
+>  	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
+>  		return;
+> @@ -697,6 +707,12 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+>  	vgic_prune_ap_list(vcpu);
+>  }
+>  
+> +static inline void vgic_restore_state(struct kvm_vcpu *vcpu)
+
+Same here.
+
+Apart from those rather cosmetic issues I have at least verified that
+the code is actually moved from vgic-v2-sr.c to vgic-v2.c, plus/minus
+the required changes when moving this from HYP to vGIC/EL1.
+
+Cheers,
+Andre.
+
+
+> +{
+> +	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+> +		vgic_v2_restore_state(vcpu);
+> +}
+> +
+>  /* Flush our emulation state into the GIC hardware before entering the guest. */
+>  void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+>  {
+> @@ -710,13 +726,16 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+>  	 * this.
+>  	 */
+>  	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
+> -		return;
+> +		goto out;
+>  
+>  	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
+>  
+>  	spin_lock(&vcpu->arch.vgic_cpu.ap_list_lock);
+>  	vgic_flush_lr_state(vcpu);
+>  	spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
+> +
+> +out:
+> +	vgic_restore_state(vcpu);
+>  }
+>  
+>  void kvm_vgic_load(struct kvm_vcpu *vcpu)
+> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+> index 4f8aecb..9895396 100644
+> --- a/virt/kvm/arm/vgic/vgic.h
+> +++ b/virt/kvm/arm/vgic/vgic.h
+> @@ -167,6 +167,11 @@ int vgic_register_dist_iodev(struct kvm *kvm, gpa_t dist_base_address,
+>  void vgic_v2_init_lrs(void);
+>  void vgic_v2_load(struct kvm_vcpu *vcpu);
+>  void vgic_v2_put(struct kvm_vcpu *vcpu);
+> +void vgic_v2_handle_maintenance(struct kvm_vcpu *vcpu);
+> +
+> +void vgic_v2_save_state(struct kvm_vcpu *vcpu);
+> +void vgic_v2_restore_state(struct kvm_vcpu *vcpu);
+> +
+>  
+>  static inline void vgic_get_irq_kref(struct vgic_irq *irq)
+>  {
+> 
