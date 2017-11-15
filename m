@@ -1,490 +1,110 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH 32/37] KVM: arm/arm64: Handle VGICv2 save/restore from the
- main VGIC code
-Date: Wed, 15 Nov 2017 17:50:07 +0000
-Message-ID: <2f7e5d1f-4d60-cd53-f6ff-f4af127bc0b6@arm.com>
+Subject: Re: [PATCH 33/37] KVM: arm/arm64: Move arm64-only vgic-v2-sr.c file
+ to arm64
+Date: Wed, 15 Nov 2017 17:52:06 +0000
+Message-ID: <4da8d7ff-28ac-2945-7376-7d0b91e0a018@arm.com>
 References: <20171012104141.26902-1-christoffer.dall@linaro.org>
- <20171012104141.26902-33-christoffer.dall@linaro.org>
+ <20171012104141.26902-34-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20171012104141.26902-33-christoffer.dall@linaro.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BA6049D1A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Nov 2017 12:49:55 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id MRzkgJZKWTpa for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 15 Nov 2017 12:49:54 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6698740795
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Nov 2017 12:49:54 -0500 (EST)
+In-Reply-To: <20171012104141.26902-34-christoffer.dall@linaro.org>
 Content-Language: en-GB
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi,
 
-those last few patches are actually helpful for the Xen port ...
-
 On 12/10/17 11:41, Christoffer Dall wrote:
-> We can program the GICv2 hypervisor control interface logic directly
-> from the core vgic code and can instead do the save/restore directly
-> from the flush/sync functions, which can lead to a number of future
-> optimizations.
-> 
+> The vgic-v2-sr.c file now only contains the logic to replay unaligned
+> accesses to the virtual CPU interface on 16K and 64K page systems, which
+> is only relevant on 64-bit platforms.  Therefore move this file to the
+> arm64 KVM tree, remove the compile directive from the 32-bit side
+> makefile, and remove the ifdef in the C file.
+
+I like that one!
+
 > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> ---
->  arch/arm/kvm/hyp/switch.c        |  4 --
->  arch/arm64/include/asm/kvm_hyp.h |  2 -
->  arch/arm64/kvm/hyp/switch.c      |  4 --
->  virt/kvm/arm/hyp/vgic-v2-sr.c    | 83 ------------------------------------
->  virt/kvm/arm/vgic/vgic-init.c    | 22 ++++++----
->  virt/kvm/arm/vgic/vgic-v2.c      | 92 ++++++++++++++++++++++++++++++++++++++++
->  virt/kvm/arm/vgic/vgic.c         | 21 ++++++++-
->  virt/kvm/arm/vgic/vgic.h         |  5 +++
->  8 files changed, 130 insertions(+), 103 deletions(-)
-> 
-> diff --git a/arch/arm/kvm/hyp/switch.c b/arch/arm/kvm/hyp/switch.c
-> index c3b9799..0d834f8 100644
-> --- a/arch/arm/kvm/hyp/switch.c
-> +++ b/arch/arm/kvm/hyp/switch.c
-> @@ -91,16 +91,12 @@ static void __hyp_text __vgic_save_state(struct kvm_vcpu *vcpu)
->  {
->  	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
->  		__vgic_v3_save_state(vcpu);
-> -	else
-> -		__vgic_v2_save_state(vcpu);
->  }
->  
->  static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
->  {
->  	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
->  		__vgic_v3_restore_state(vcpu);
-> -	else
-> -		__vgic_v2_restore_state(vcpu);
->  }
->  
->  static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index 28d5f3c..bd3fe64 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -121,8 +121,6 @@ typeof(orig) * __hyp_text fname(void)					\
->  	return val;							\
->  }
->  
-> -void __vgic_v2_save_state(struct kvm_vcpu *vcpu);
-> -void __vgic_v2_restore_state(struct kvm_vcpu *vcpu);
->  int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu);
->  
->  void __vgic_v3_save_state(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> index 5692aa0..90da506 100644
-> --- a/arch/arm64/kvm/hyp/switch.c
-> +++ b/arch/arm64/kvm/hyp/switch.c
-> @@ -186,16 +186,12 @@ static void __hyp_text __vgic_save_state(struct kvm_vcpu *vcpu)
->  {
->  	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
->  		__vgic_v3_save_state(vcpu);
-> -	else
-> -		__vgic_v2_save_state(vcpu);
->  }
->  
->  static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
->  {
->  	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
->  		__vgic_v3_restore_state(vcpu);
-> -	else
-> -		__vgic_v2_restore_state(vcpu);
->  }
->  
->  static bool __hyp_text __true_value(void)
-> diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
-> index a3f18d3..b433257 100644
-> --- a/virt/kvm/arm/hyp/vgic-v2-sr.c
-> +++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
-> @@ -22,89 +22,6 @@
->  #include <asm/kvm_emulate.h>
->  #include <asm/kvm_hyp.h>
->  
-> -static void __hyp_text save_elrsr(struct kvm_vcpu *vcpu, void __iomem *base)
-> -{
-> -	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
-> -	int nr_lr = (kern_hyp_va(&kvm_vgic_global_state))->nr_lr;
-> -	u32 elrsr0, elrsr1;
-> -
-> -	elrsr0 = readl_relaxed(base + GICH_ELRSR0);
-> -	if (unlikely(nr_lr > 32))
-> -		elrsr1 = readl_relaxed(base + GICH_ELRSR1);
-> -	else
-> -		elrsr1 = 0;
-> -
-> -#ifdef CONFIG_CPU_BIG_ENDIAN
-> -	cpu_if->vgic_elrsr = ((u64)elrsr0 << 32) | elrsr1;
-> -#else
-> -	cpu_if->vgic_elrsr = ((u64)elrsr1 << 32) | elrsr0;
-> -#endif
-> -}
-> -
-> -static void __hyp_text save_lrs(struct kvm_vcpu *vcpu, void __iomem *base)
-> -{
-> -	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
-> -	int i;
-> -	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
-> -
-> -	for (i = 0; i < used_lrs; i++) {
-> -		if (cpu_if->vgic_elrsr & (1UL << i))
-> -			cpu_if->vgic_lr[i] &= ~GICH_LR_STATE;
-> -		else
-> -			cpu_if->vgic_lr[i] = readl_relaxed(base + GICH_LR0 + (i * 4));
-> -
-> -		writel_relaxed(0, base + GICH_LR0 + (i * 4));
-> -	}
-> -}
-> -
-> -/* vcpu is already in the HYP VA space */
-> -void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
-> -{
-> -	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
-> -	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
-> -	struct vgic_dist *vgic = &kvm->arch.vgic;
-> -	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
-> -	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
-> -
-> -	if (!base)
-> -		return;
-> -
-> -	if (used_lrs) {
-> -		cpu_if->vgic_apr = readl_relaxed(base + GICH_APR);
-> -
-> -		save_elrsr(vcpu, base);
-> -		save_lrs(vcpu, base);
-> -
-> -		writel_relaxed(0, base + GICH_HCR);
-> -	} else {
-> -		cpu_if->vgic_elrsr = ~0UL;
-> -		cpu_if->vgic_apr = 0;
-> -	}
-> -}
-> -
-> -/* vcpu is already in the HYP VA space */
-> -void __hyp_text __vgic_v2_restore_state(struct kvm_vcpu *vcpu)
-> -{
-> -	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
-> -	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
-> -	struct vgic_dist *vgic = &kvm->arch.vgic;
-> -	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
-> -	int i;
-> -	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
-> -
-> -	if (!base)
-> -		return;
-> -
-> -	if (used_lrs) {
-> -		writel_relaxed(cpu_if->vgic_hcr, base + GICH_HCR);
-> -		writel_relaxed(cpu_if->vgic_apr, base + GICH_APR);
-> -		for (i = 0; i < used_lrs; i++) {
-> -			writel_relaxed(cpu_if->vgic_lr[i],
-> -				       base + GICH_LR0 + (i * 4));
-> -		}
-> -	}
-> -}
-> -
->  #ifdef CONFIG_ARM64
->  /*
->   * __vgic_v2_perform_cpuif_access -- perform a GICV access on behalf of the
-> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-> index 5801261f..fa2b565 100644
-> --- a/virt/kvm/arm/vgic/vgic-init.c
-> +++ b/virt/kvm/arm/vgic/vgic-init.c
-> @@ -425,14 +425,16 @@ static int vgic_init_cpu_dying(unsigned int cpu)
->  	return 0;
->  }
->  
-> -static irqreturn_t vgic_maintenance_handler(int irq, void *data)
-> +static irqreturn_t vgic_v3_maintenance_handler(int irq, void *data)
->  {
-> -	/*
-> -	 * We cannot rely on the vgic maintenance interrupt to be
-> -	 * delivered synchronously. This means we can only use it to
-> -	 * exit the VM, and we perform the handling of EOIed
-> -	 * interrupts on the exit path (see vgic_process_maintenance).
-> -	 */
 
-I always found this comment quite enlightening, especially as it points
-out that we need to deviate somewhat from the architectural idea here.
-I see that you have shortened it below. Is it no longer true? Can we
-keep the more elaborate version? If not here, then below?
-
-> +	BUG(); /* Not implemented lazy save/restore on GICv3 */
-> +	return IRQ_HANDLED;
-> +}
-> +
-> +static irqreturn_t vgic_v2_maintenance_handler(int irq, void *data)
-> +{
-> +	struct kvm_vcpu *vcpu = (struct kvm_vcpu *)data;
-
-I think you need an empty line here, to separate variable declaration
-from code.
-
-> +	vgic_v2_handle_maintenance(vcpu);
-
->  	return IRQ_HANDLED;
->  }
->  
-> @@ -464,6 +466,7 @@ void kvm_vgic_init_cpu_hardware(void)
->  int kvm_vgic_hyp_init(void)
->  {
->  	const struct gic_kvm_info *gic_kvm_info;
-> +	irqreturn_t (*handler)(int irq, void *data);
->  	int ret;
->  
->  	gic_kvm_info = gic_get_kvm_info();
-> @@ -478,6 +481,7 @@ int kvm_vgic_hyp_init(void)
->  	switch (gic_kvm_info->type) {
->  	case GIC_V2:
->  		ret = vgic_v2_probe(gic_kvm_info);
-> +		handler = vgic_v2_maintenance_handler;
->  		break;
-1>  	case GIC_V3:
->  		ret = vgic_v3_probe(gic_kvm_info);
-> @@ -485,6 +489,7 @@ int kvm_vgic_hyp_init(void)
->  			static_branch_enable(&kvm_vgic_global_state.gicv3_cpuif);
->  			kvm_info("GIC system register CPU interface enabled\n");
->  		}
-> +		handler = vgic_v3_maintenance_handler;
->  		break;
->  	default:
->  		ret = -ENODEV;
-> @@ -494,8 +499,7 @@ int kvm_vgic_hyp_init(void)
->  		return ret;
->  
->  	kvm_vgic_global_state.maint_irq = gic_kvm_info->maint_irq;
-> -	ret = request_percpu_irq(kvm_vgic_global_state.maint_irq,
-> -				 vgic_maintenance_handler,
-> +	ret = request_percpu_irq(kvm_vgic_global_state.maint_irq, handler,
->  				 "vgic", kvm_get_running_vcpus());
->  	if (ret) {
->  		kvm_err("Cannot register interrupt %d\n",
-> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-> index 8089710..259079b 100644
-> --- a/virt/kvm/arm/vgic/vgic-v2.c
-> +++ b/virt/kvm/arm/vgic/vgic-v2.c
-> @@ -37,6 +37,17 @@ void vgic_v2_init_lrs(void)
->  		vgic_v2_write_lr(i, 0);
->  }
->  
-> +void vgic_v2_handle_maintenance(struct kvm_vcpu *vcpu)
-> +{
-> +	void __iomem *base = kvm_vgic_global_state.vctrl_base;
-> +
-> +	/*
-> +	 * Disable maintenance interrupt as we only use it to generate an exit
-> +	 * from the VM.
-> +	 */
-
-Isn't that comment a bit misleading, as writing 0 to HCR not only
-disables all interrupt sources, but also the whole GICV interface
-altogether (bit 0: EN)?
-I see that it gets enabled later on when writing ->vgic_hcr into the
-register, but this function here looks a bit surprising to me.
-
-In general these changes to the interrupt handling leave me a bit
-puzzled. Should this be a separate patch? Or explained in the commit
-message?
-
-> +	writel_relaxed(0, base + GICH_HCR);
-> +}
-> +
->  void vgic_v2_set_underflow(struct kvm_vcpu *vcpu)
->  {
->  	struct vgic_v2_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v2;
-> @@ -393,6 +404,87 @@ int vgic_v2_probe(const struct gic_kvm_info *info)
->  	return ret;
->  }
->  
-> +static void save_elrsr(struct kvm_vcpu *vcpu, void __iomem *base)
-> +{
-> +	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
-> +	int nr_lr = kvm_vgic_global_state.nr_lr;
-> +	u32 elrsr0, elrsr1;
-> +
-> +	elrsr0 = readl_relaxed(base + GICH_ELRSR0);
-> +	if (unlikely(nr_lr > 32))
-> +		elrsr1 = readl_relaxed(base + GICH_ELRSR1);
-> +	else
-> +		elrsr1 = 0;
-> +
-> +#ifdef CONFIG_CPU_BIG_ENDIAN
-> +	cpu_if->vgic_elrsr = ((u64)elrsr0 << 32) | elrsr1;
-> +#else
-> +	cpu_if->vgic_elrsr = ((u64)elrsr1 << 32) | elrsr0;
-> +#endif
-
-I have some gut feeling that this is really broken, since we mix up
-endian *byte* ordering with *bit* ordering here, don't we?
-
-I understand it's just copied and gets removed later on, so I was
-wondering if you could actually move patch 35/37 ("Get rid of
-vgic_elrsr") before this patch here, to avoid copying bogus code around?
-Or does 35/37 depend on 34/37 to be correct?
-
-> +}
-> +
-> +static void save_lrs(struct kvm_vcpu *vcpu, void __iomem *base)
-> +{
-> +	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
-> +	int i;
-> +	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
-> +
-> +	for (i = 0; i < used_lrs; i++) {
-> +		if (cpu_if->vgic_elrsr & (1UL << i))
-> +			cpu_if->vgic_lr[i] &= ~GICH_LR_STATE;
-> +		else
-> +			cpu_if->vgic_lr[i] = readl_relaxed(base + GICH_LR0 + (i * 4));
-> +
-> +		writel_relaxed(0, base + GICH_LR0 + (i * 4));
-> +	}
-> +}
-> +
-> +void vgic_v2_save_state(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm *kvm = vcpu->kvm;
-> +	struct vgic_dist *vgic = &kvm->arch.vgic;
-> +	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
-> +	void __iomem *base = vgic->vctrl_base;
-> +	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
-> +
-> +	if (!base)
-> +		return;
-> +
-> +	if (used_lrs) {
-> +		cpu_if->vgic_apr = readl_relaxed(base + GICH_APR);
-> +
-> +		save_elrsr(vcpu, base);
-> +		save_lrs(vcpu, base);
-> +
-> +		writel_relaxed(0, base + GICH_HCR);
-> +	} else {
-> +		cpu_if->vgic_elrsr = ~0UL;
-> +		cpu_if->vgic_apr = 0;
-> +	}
-> +}
-> +
-> +void vgic_v2_restore_state(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm *kvm = vcpu->kvm;
-> +	struct vgic_dist *vgic = &kvm->arch.vgic;
-> +	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
-> +	void __iomem *base = vgic->vctrl_base;
-> +	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
-> +	int i;
-> +
-> +	if (!base)
-> +		return;
-> +
-> +	if (used_lrs) {
-> +		writel_relaxed(cpu_if->vgic_hcr, base + GICH_HCR);
-> +		writel_relaxed(cpu_if->vgic_apr, base + GICH_APR);
-> +		for (i = 0; i < used_lrs; i++) {
-> +			writel_relaxed(cpu_if->vgic_lr[i],
-> +				       base + GICH_LR0 + (i * 4));
-> +		}
-> +	}
-> +}
-> +
->  void vgic_v2_load(struct kvm_vcpu *vcpu)
->  {
->  	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
-> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> index b1bd238..790fd66 100644
-> --- a/virt/kvm/arm/vgic/vgic.c
-> +++ b/virt/kvm/arm/vgic/vgic.c
-> @@ -18,6 +18,8 @@
->  #include <linux/kvm_host.h>
->  #include <linux/list_sort.h>
->  
-> +#include <asm/kvm_hyp.h>
-
-Why do you need that? Commenting this out seems to compile anyway for me.
-
-> +
->  #include "vgic.h"
->  
->  #define CREATE_TRACE_POINTS
-> @@ -683,11 +685,19 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
->  		vgic_clear_lr(vcpu, count);
->  }
->  
-> +static inline void vgic_save_state(struct kvm_vcpu *vcpu)
-
-Isn't "inline" frowned upon in .c files?
-
-> +{
-> +	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
-> +		vgic_v2_save_state(vcpu);
-> +}
-> +
->  /* Sync back the hardware VGIC state into our emulation after a guest's run. */
->  void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
->  {
->  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
->  
-> +	vgic_save_state(vcpu);
-> +
->  	/* An empty ap_list_head implies used_lrs == 0 */
->  	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
->  		return;
-> @@ -697,6 +707,12 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
->  	vgic_prune_ap_list(vcpu);
->  }
->  
-> +static inline void vgic_restore_state(struct kvm_vcpu *vcpu)
-
-Same here.
-
-Apart from those rather cosmetic issues I have at least verified that
-the code is actually moved from vgic-v2-sr.c to vgic-v2.c, plus/minus
-the required changes when moving this from HYP to vGIC/EL1.
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 
 Cheers,
 Andre.
 
-
-> +{
-> +	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
-> +		vgic_v2_restore_state(vcpu);
-> +}
-> +
->  /* Flush our emulation state into the GIC hardware before entering the guest. */
->  void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
->  {
-> @@ -710,13 +726,16 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
->  	 * this.
->  	 */
->  	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
-> -		return;
-> +		goto out;
+> ---
+>  arch/arm/kvm/hyp/Makefile                         | 1 -
+>  arch/arm64/kvm/hyp/Makefile                       | 2 +-
+>  {virt/kvm/arm => arch/arm64/kvm}/hyp/vgic-v2-sr.c | 2 --
+>  3 files changed, 1 insertion(+), 4 deletions(-)
+>  rename {virt/kvm/arm => arch/arm64/kvm}/hyp/vgic-v2-sr.c (98%)
+> 
+> diff --git a/arch/arm/kvm/hyp/Makefile b/arch/arm/kvm/hyp/Makefile
+> index 8679405..4be5061 100644
+> --- a/arch/arm/kvm/hyp/Makefile
+> +++ b/arch/arm/kvm/hyp/Makefile
+> @@ -6,7 +6,6 @@ ccflags-y += -fno-stack-protector
 >  
->  	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
+>  KVM=../../../../virt/kvm
 >  
->  	spin_lock(&vcpu->arch.vgic_cpu.ap_list_lock);
->  	vgic_flush_lr_state(vcpu);
->  	spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
-> +
-> +out:
-> +	vgic_restore_state(vcpu);
+> -obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v2-sr.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v3-sr.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/timer-sr.o
+>  
+> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+> index 14c4e3b..b746fa5 100644
+> --- a/arch/arm64/kvm/hyp/Makefile
+> +++ b/arch/arm64/kvm/hyp/Makefile
+> @@ -6,10 +6,10 @@ ccflags-y += -fno-stack-protector
+>  
+>  KVM=../../../../virt/kvm
+>  
+> -obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v2-sr.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v3-sr.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/timer-sr.o
+>  
+> +obj-$(CONFIG_KVM_ARM_HOST) += vgic-v2-sr.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += sysreg-sr.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += debug-sr.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += entry.o
+> diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/arch/arm64/kvm/hyp/vgic-v2-sr.c
+> similarity index 98%
+> rename from virt/kvm/arm/hyp/vgic-v2-sr.c
+> rename to arch/arm64/kvm/hyp/vgic-v2-sr.c
+> index b433257..fcd7b4e 100644
+> --- a/virt/kvm/arm/hyp/vgic-v2-sr.c
+> +++ b/arch/arm64/kvm/hyp/vgic-v2-sr.c
+> @@ -22,7 +22,6 @@
+>  #include <asm/kvm_emulate.h>
+>  #include <asm/kvm_hyp.h>
+>  
+> -#ifdef CONFIG_ARM64
+>  /*
+>   * __vgic_v2_perform_cpuif_access -- perform a GICV access on behalf of the
+>   *				     guest.
+> @@ -76,4 +75,3 @@ int __hyp_text __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
+>  
+>  	return 1;
 >  }
->  
->  void kvm_vgic_load(struct kvm_vcpu *vcpu)
-> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-> index 4f8aecb..9895396 100644
-> --- a/virt/kvm/arm/vgic/vgic.h
-> +++ b/virt/kvm/arm/vgic/vgic.h
-> @@ -167,6 +167,11 @@ int vgic_register_dist_iodev(struct kvm *kvm, gpa_t dist_base_address,
->  void vgic_v2_init_lrs(void);
->  void vgic_v2_load(struct kvm_vcpu *vcpu);
->  void vgic_v2_put(struct kvm_vcpu *vcpu);
-> +void vgic_v2_handle_maintenance(struct kvm_vcpu *vcpu);
-> +
-> +void vgic_v2_save_state(struct kvm_vcpu *vcpu);
-> +void vgic_v2_restore_state(struct kvm_vcpu *vcpu);
-> +
->  
->  static inline void vgic_get_irq_kref(struct vgic_irq *irq)
->  {
+> -#endif
 > 
