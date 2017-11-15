@@ -1,194 +1,241 @@
-From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: Re: [PATCH v8 7/7] arm64: kvm: handle SError Interrupt by
- categorization
-Date: Wed, 15 Nov 2017 19:29:18 +0800
-Message-ID: <3995cbd7-f631-605f-bdc4-0259e3650d02@huawei.com>
-References: <1510343650-23659-1-git-send-email-gengdongjiu@huawei.com>
- <1510343650-23659-8-git-send-email-gengdongjiu@huawei.com>
- <5A0B1334.7060500@arm.com>
+From: Manoj Iyer <manoj.iyer-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+Subject: Re: [3/3] arm64: Add software workaround for Falkor erratum 1041
+Date: Wed, 15 Nov 2017 09:12:33 -0600 (CST)
+Message-ID: <alpine.DEB.2.20.1711150905001.7346@hungry>
+References: <1509679664-3749-4-git-send-email-shankerd@codeaurora.org> <alpine.DEB.2.20.1711081305310.26324@lazy> <5A04369A.2020405@arm.com> <alpine.DEB.2.20.1711090949110.15101@lazy> <alpine.DEB.2.20.1711091010570.15101@lazy> <alpine.DEB.2.20.1711091041180.15101@lazy>
+ <alpine.DEB.2.20.1711101146400.4353@lazy>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-acpi-owner@vger.kernel.org>
-In-Reply-To: <5A0B1334.7060500@arm.com>
-Content-Language: en-US
-Sender: linux-acpi-owner@vger.kernel.org
-To: James Morse <james.morse@arm.com>
-Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, linux@armlinux.org.uk, bp@alien8.de, rjw@rjwysocki.net, pbonzini@redhat.com, rkrcmar@redhat.com, corbet@lwn.net, catalin.marinas@arm.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-acpi@vger.kernel.org, devel@acpica.org, huangshaoyu@huawei.com, wuquanming@huawei.com, linuxarm@huawei.com
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <alpine.DEB.2.20.1711101146400.4353@lazy>
+Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Shanker Donthineni <shankerd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>, James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+Cc: Manoj Iyer <manoj.iyer-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Ard Biesheuvel <ard.biesheuvel-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Matt Fleming <matt-mF/unelCI9GS6iBeEJttW/XRex20P6io@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi James,
+On Fri, 10 Nov 2017, Manoj Iyer wrote:
 
-   Thanks a lot for the review.
+> On Thu, 9 Nov 2017, Manoj Iyer wrote:
+>
+>> 
+>> James,
+>> 
+>> Looks like my VM test raised a false alarm. I retested stock Artful 4.13 
+>> kernel (No erratum 1041 patches applied).
+>> 
+>
+> James, an update on the crash (false alarm). We suspect this is a firmware 
+> crash due to a possible fw bug. Once this is addressed I will be able to send 
+> you the test results you requested on VM start/stop with the erratum 1041 
+> patches applied.
+>
 
-On 2017/11/15 0:00, James Morse wrote:
-> Hi Dongjiu Geng,
-> 
-> On 10/11/17 19:54, Dongjiu Geng wrote:
->> If it is not RAS SError, directly inject virtual SError,
->> which will keep the old way. If it is RAS SError, firstly
->> let host ACPI module to handle it.
-> 
->> For the ACPI handling,
->> if the error address is invalid, APEI driver will not
->> identify the address to hwpoison memory and can not notify
->> guest to do the recovery.
-> 
-> The guest can't do any recover either. There is no recovery you can do without
-> some information about what the error is.
-> 
-> This is your memory corruption at an unknown address? We should reboot.
-> 
-> (I agree memory_failure.c's::me_kernel() is ignoring kernel errors, we should
-> try and fix this. It makes some sense for polled or irq notifications, but not
-> SEA/SEI).
-> 
-> 
->> In order to safe, KVM continues
->> categorizing errors and handle it separately.
-> 
->> If the RAS error is not propagated, let host user space to
->> handle it. 
-> 
-> No. Host user space should not know anything about the kernel or platform RAS
-> support. Doing so creates an ABI link between EL3 firmware and Qemu. This is
-> totally unmaintainable.
+James/Shanker,
 
-Here I have two question:
-(1) If the AET(Asynchronous Error Type) is Recoverable error (UER), do you mean we also reboot or panic?
-(2) what is the chance to set guest ESR for Qemu?  here I return a error code to Qemu. when Qemu get this error return,
-    it will specify guest ESR and inject the abort. here if KVM does not return error to Qemu, Qemu will do
-    not know when to set the guest ESR value and inject abort.
+I can report that VM start/stop/restart tests worked with the patches 
+applied to Ubuntu 4.13 (Artful) kernel on the qdf2400 hardware.
 
+Host: Ubuntu 4.13 with Erratum 1041 patches applied
+Guest: Stock Ubuntu 4.13 kernel
 
-> 
-> This thing needs to be portable. The kernel should handle the error, and report
-> any symptoms to user-space. e.g. 'this memory is gone'.
-> 
-> We shouldn't special case KVM.
-> 
-> 
->> The reason is that sometimes we can only kill the
->> guest effected application instead of panic whose guest OS.
->> Host user space specifies a valid ESR and inject virtual
->> SError, guest can just kill the current application if the
->> non-consumed error coming from guest application.
->>
->> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
->> Signed-off-by: Quanming Wu <wuquanming@huawei.com>
-> 
-> The last Signed-off-by should match the person posting the patch. It's a chain
-> of custody for GPL-signoff purposes, not a 'partially-written-by'. If you want
-> to credit Quanming Wu you can add CC and they can Ack/Review your patch.
+- create 20 vms one at a time
 
-Ok, got it. thanks a lot for your suggestion.
+10 iteration of:
+- Stop (virsh destroy) 20 VMs one at a time
+- Start (virsh start) 20 VMs one at a time.
 
+Tested-by: Manoj Iyer <manoj.iyer-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
 
-> 
-> 
->> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
->> index 7debb74..1afdc87 100644
->> --- a/arch/arm64/kvm/handle_exit.c
->> +++ b/arch/arm64/kvm/handle_exit.c
->> @@ -178,6 +179,66 @@ static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
->>  	return arm_exit_handlers[hsr_ec];
->>  }
->>  
->> +/**
->> + * kvm_handle_guest_sei - handles SError interrupt or asynchronous aborts
->> + * @vcpu:	the VCPU pointer
->> + *
->> + * For RAS SError interrupt, firstly let host kernel handle it.
->> + * If the AET is [ESR_ELx_AET_UER], then let user space handle it,
->> + */
->> +static int kvm_handle_guest_sei(struct kvm_vcpu *vcpu, struct kvm_run *run)
->> +{
->> +	unsigned int esr = kvm_vcpu_get_hsr(vcpu);
->> +	bool impdef_syndrome =  esr & ESR_ELx_ISV;	/* aka IDS */
->> +	unsigned int aet = esr & ESR_ELx_AET;
->> +
->> +	/*
->> +	 * This is not RAS SError
->> +	 */
->> +	if (!cpus_have_const_cap(ARM64_HAS_RAS_EXTN)) {
->> +		kvm_inject_vabt(vcpu);
->> +		return 1;
->> +	}
-> 
->> +	/* The host kernel may handle this abort. */
->> +	handle_guest_sei();
-> 
-> This has to claim the SError as a notification. If APEI claims the error, KVM
-> doesn't need to do anything more. You ignore its return code.
-
-Thanks for the pointing out.
-I will check the return code, if it return success, KVM doesn't need to do anything more,
-otherwise, continue run.
-
-> 
-> 
->> +
->> +	/*
->> +	 * In below two conditions, it will directly inject the
->> +	 * virtual SError:
->> +	 * 1. The Syndrome is IMPLEMENTATION DEFINED
->> +	 * 2. It is Uncategorized SEI
->> +	 */
->> +	if (impdef_syndrome ||
->> +		((esr & ESR_ELx_FSC) != ESR_ELx_FSC_SERROR)) {
->> +		kvm_inject_vabt(vcpu);
->> +		return 1;
->> +	}
->> +
->> +	switch (aet) {
->> +	case ESR_ELx_AET_CE:	/* corrected error */
->> +	case ESR_ELx_AET_UEO:	/* restartable error, not yet consumed */
->> +		return 1;	/* continue processing the guest exit */
-> 
->> +	case ESR_ELx_AET_UER:	/* The error has not been propagated */
->> +		/*
->> +		 * Userspace only handle the guest SError Interrupt(SEI) if the
->> +		 * error has not been propagated
->> +		 */
->> +		run->exit_reason = KVM_EXIT_EXCEPTION;
->> +		run->ex.exception = ESR_ELx_EC_SERROR;
->> +		run->ex.error_code = KVM_SEI_SEV_RECOVERABLE;
->> +		return 0;
-> 
-> We should not pass RAS notifications to user space. The kernel either handles
-> them, or it panics(). User space shouldn't even know if the kernel supports RAS
-> until it gets an MCEERR signal.
-
-Now I rely on this error return to let Qemu set guest ESR, otherwise user space will do not know when to set the guest ESR.
-If so, how and when we told user space(Qemu) to set the guest ESR and inject abort?
-
-
-> 
-> You're making your firmware-first notification an EL3->EL0 signal, bypassing the OS.
-> 
-> If we get a RAS SError and there are no CPER records or values in the ERR nodes,
-> we should panic as it looks like the CPU/firmware is broken. (spurious RAS errors)
-> 
-> 
->> +	default:
->> +		/*
->> +		 * Until now, the CPU supports RAS and SEI is fatal, or host
->> +		 * does not support to handle the SError.
->> +		 */
->> +		panic("This Asynchronous SError interrupt is dangerous, panic");
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->>  /*
->>   * Return > 0 to return to guest, < 0 on error, 0 (and set exit_reason) on
->>   * proper exit to userspace.
-> 
-> 
-> 
-> James
-> 
-> .
-> 
-
+>
+>> Host: Ubuntu Artful 4.13 kernel with *no* erratum 1041 patches applied.
+>> Guest: Ubuntu Zesty (4.10) kernel.
+>> 
+>> - Created 20 VMs one at a time
+>> 
+>> In a loop:
+>> - Stop (virsh destroy) 20 VMs one at a time
+>> - Start (virsh start) 20 VMs one at a time.
+>> 
+>> And, I am able to reproduce the system reset issue I previously reported. I 
+>> think the problem I reported with VMs might have nothing to do with the 
+>> erratum 1041 patches, and probably needs to be root caused seperately.
+>> 
+>> With stock 4.13 kernel (no erratum 1041 patches applied):
+>> 
+>> awrep6 login: [  461.881379] ACPI CPPC: PCC check channel failed. Status=0
+>> [  462.051194] ACPI CPPC: PCC check channel failed. Status=0
+>> [  462.223137] ACPI CPPC: PCC check channel failed. Status=0
+>> [  462.633790] ACPI CPPC: PCC check channel failed. Status=0
+>> [  463.231971] ACPI CPPC: PCC check channel failed. Status=0
+>> [  463.403163] ACPI CPPC: PCC check channel failed. Status=0
+>> [  463.822936] ACPI CPPC: PCC check channel failed. Status=0
+>> [  463.995222] ACPI CPPC: PCC check channel failed. Status=0
+>> [  464.130962] ACPI CPPC: PCC check channel failed. Status=0
+>> [  464.258973] ACPI CPPC: PCC check channel failed. Status=0
+>> [  465.283028] ACPI CPPC: PCC check channel failed. Status=0
+>> 
+>> 
+>> SYS_DBG: Running SDI image (immediate mode)
+>> SYS_DBG: Ram Dump Init
+>> SYS_DBG: Failed to init SD card
+>> SYS_DBG: Resetting system!
+>> 
+>> 
+>> On Thu, 9 Nov 2017, Manoj Iyer wrote:
+>> 
+>>> 
+>>> 
+>>> 
+>>> On Thu, 9 Nov 2017, Manoj Iyer wrote:
+>>> 
+>>>> 
+>>>> James,
+>>>> 
+>>>> (sorry for top-posting)
+>>>> 
+>>>> Applied patch 3 patches to Ubuntu Artful Kernel ( 4.13.0-16-generic )
+>>>> 
+>>>> - Start 20 VMs one at a time
+>>>> 
+>>>> In a loop:
+>>>> - Stop (virsh destroy) 20 VMs one at a time
+>>>> - Start (virsh start) 20 VMs one at a time.
+>>> 
+>>> Fixing some confusion I might have introduced in my prev email.
+>>> 
+>>> - Applied all 3 patches to Ubuntu Artful Kernel ( 4.13.0-16-generic )
+>>> 
+>>> - Created 20 VMs one at a time
+>>> 
+>>> In a loop:
+>>> - Stop (virsh destroy) 20 VMs one at a time
+>>> - Start (virsh start) 20 VMs one at a time.
+>>> 
+>>>> 
+>>>> The system reset's itself after starting the last VM on the 1st loop 
+>>>> displaying the following:
+>>>> 
+>>>> awrep6 login: [ 603.349141] ACPI CPPC: PCC check channel failed. Status=0
+>>>> [ 603.765101] ACPI CPPC: PCC check channel failed. Status=0
+>>>> [ 603.937389] ACPI CPPC: PCC check channel failed. Status=0
+>>>> [ 608.285495] ACPI CPPC: PCC check channel failed. Status=0
+>>>> [ 608.289481] ACPI CPPC: PCC check channel failed. Status=0
+>>>> 
+>>>> SYS_DBG: Running SDI image (immediate mode)
+>>>> SYS_DBG: Ram Dump Init
+>>>> SYS_DBG: Failed to init SD card
+>>>> SYS_DBG: Resetting system!
+>>>> 
+>>>> Followed by the following messages on system reboot:
+>>>> [ 6.616891] BERT: Error records from previous boot:
+>>>> [ 6.621655] [Hardware Error]: event severity: fatal
+>>>> [ 6.626516] [Hardware Error]: imprecise tstamp: 0000-00-00 00:00:00
+>>>> [ 6.632851] [Hardware Error]: Error 0, type: fatal
+>>>> [ 6.637713] [Hardware Error]: section type: unknown, 
+>>>> d2e2621c-f936-468d-0d84-15a4ed015c8b
+>>>> [ 6.646045] [Hardware Error]: section length: 0x238
+>>>> [ 6.651082] [Hardware Error]: 00000000: 72724502 5220726f 6f736165 
+>>>> 6e55206e .Error Reason Un
+>>>> [ 6.659761] [Hardware Error]: 00000010: 776f6e6b 0000006e 00000000 
+>>>> 00000000 known...........
+>>>> [ 6.668442] [Hardware Error]: 00000020: 00000000 00000000 00000000 
+>>>> 00000000 ................
+>>>> [ 6.677122] [Hardware Error]: 00000030: 00000000 00000000 00000000 
+>>>> 00000000 ................
+>>>> 
+>>>> 
+>>>> On Thu, 9 Nov 2017, James Morse wrote:
+>>>> 
+>>>>> Hi Manoj,
+>>>>> 
+>>>>> On 08/11/17 19:05, Manoj Iyer wrote:
+>>>>>> On Thu, 2 Nov 2017, Shanker Donthineni wrote:
+>>>>>>> The ARM architecture defines the memory locations that are permitted
+>>>>>>> to be accessed as the result of a speculative instruction fetch from
+>>>>>>> an exception level for which all stages of translation are disabled.
+>>>>>>> Specifically, the core is permitted to speculatively fetch from the
+>>>>>>> 4KB region containing the current program counter and next 4KB.
+>>>>>>> 
+>>>>>>> When translation is changed from enabled to disabled for the running
+>>>>>>> exception level (SCTLR_ELn[M] changed from a value of 1 to 0), the
+>>>>>>> Falkor core may errantly speculatively access memory locations outside
+>>>>>>> of the 4KB region permitted by the architecture. The errant memory
+>>>>>>> access may lead to one of the following unexpected behaviors.
+>>>>> 
+>>>>>> I applied the 3 patches to Ubuntu 4.13.0-16-generic (Artful) kernel and
+>>>>>> ran stress-ng cpu tests on QDF2400 server
+>>>>> 
+>>>>> [...]
+>>>>> 
+>>>>>> Where stress-ng would spawn N workers and test cpu offline/online, 
+>>>>>> perform
+>>>>>> matrix operations, do rapid context switchs, and anonymous mmaps. 
+>>>>>> Although
+>>>>>> I was not able to reproduce the erratum on the stock 4.13 kernel using 
+>>>>>> the
+>>>>>> same test case, the patched kernel did not seem to introduce any
+>>>>>> regressions either. I ran the stress-ng tests for over 8hrs found the
+>>>>>> system to be stable.
+>>>>> 
+>>>>> 
+>>>>> Could you throw kexec and KVM into the mix? This issue only shows up 
+>>>>> when we
+>>>>> disable the MMU, which we almost never do.
+>>>>> 
+>>>>> For CPU offline/online we make the PSCI 'offline' call with the MMU 
+>>>>> enabled.
+>>>>> When the CPU comes back firmware has reset the EL2/EL1 SCTLR from a 
+>>>>> higher
+>>>>> exception level, so it won't hit this issue.
+>>>>> 
+>>>>> One place we do this is kexec, where we drop into purgatory with the MMU 
+>>>>> disabled.
+>>>>> 
+>>>>> The other is KVM unloading itself to return to the hyp stub. You can 
+>>>>> stress this
+>>>>> by starting and stopping a VM. When the number of VMs reaches 0 KVM 
+>>>>> should
+>>>>> unload via 'kvm_arch_hardware_disable()'.
+>>>>> 
+>>>>> 
+>>>>> Thanks,
+>>>>> 
+>>>>> James
+>>>>> 
+>>>>> 
+>>>> 
+>>>> --
+>>>> ============================
+>>>> Manoj Iyer
+>>>> Ubuntu/Canonical
+>>>> ARM Servers - Cloud
+>>>> ============================
+>>>> 
+>>>> 
+>>> 
+>>> --
+>>> ============================
+>>> Manoj Iyer
+>>> Ubuntu/Canonical
+>>> ARM Servers - Cloud
+>>> ============================
+>>> 
+>>> 
+>> 
+>> --
+>> ============================
+>> Manoj Iyer
+>> Ubuntu/Canonical
+>> ARM Servers - Cloud
+>> ============================
+>> 
+>> 
+>
+> --
+> ============================
+> Manoj Iyer
+> Ubuntu/Canonical
+> ARM Servers - Cloud
+> ============================
+>
+>
