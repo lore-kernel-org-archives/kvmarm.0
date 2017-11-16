@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 7/7] arm: KVM: Fix VTTBR_BADDR_MASK BUG_ON off-by-one
-Date: Thu, 16 Nov 2017 17:58:21 +0000
-Message-ID: <20171116175821.26544-8-marc.zyngier@arm.com>
+Subject: [PATCH 5/7] KVM: arm/arm64: vgic-v4: Only perform an unmap for valid
+ vLPIs
+Date: Thu, 16 Nov 2017 17:58:19 +0000
+Message-ID: <20171116175821.26544-6-marc.zyngier@arm.com>
 References: <20171116175821.26544-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 283EB49D23
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Nov 2017 12:56:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F7BD49D14
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Nov 2017 12:56:25 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VhkIx-MkAvHe for <kvmarm@lists.cs.columbia.edu>;
- Thu, 16 Nov 2017 12:56:26 -0500 (EST)
+ with ESMTP id CnsxE3RLNQrU for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 16 Nov 2017 12:56:24 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 089EB49D56
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Nov 2017 12:56:26 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C6BBD406D0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Nov 2017 12:56:22 -0500 (EST)
 In-Reply-To: <20171116175821.26544-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,35 +32,30 @@ To: Christoffer Dall <cdall@linaro.org>
 Cc: kvm@vger.kernel.org, Kristina Martsenko <kristina.martsenko@arm.com>, AKASHI Takahiro <takahiro.akashi@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VTTBR_BADDR_MASK is used to sanity check the size and alignment of the
-VTTBR address. It seems to currently be off by one, thereby only
-allowing up to 39-bit addresses (instead of 40-bit) and also
-insufficiently checking the alignment. This patch fixes it.
+Before performing an unmap, let's check that what we have was
+really mapped the first place.
 
-This patch is the 32bit pendent of Kristina's arm64 fix, and
-she deserves the actual kudos for pinpointing that one.
-
-Fixes: f7ed45be3ba52 ("KVM: ARM: World-switch implementation")
-Cc: <stable@vger.kernel.org> # 3.9
-Reported-by: Kristina Martsenko <kristina.martsenko@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/kvm_arm.h | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ virt/kvm/arm/vgic/vgic-v4.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_arm.h b/arch/arm/include/asm/kvm_arm.h
-index c8781450905b..3ab8b3781bfe 100644
---- a/arch/arm/include/asm/kvm_arm.h
-+++ b/arch/arm/include/asm/kvm_arm.h
-@@ -161,8 +161,7 @@
- #else
- #define VTTBR_X		(5 - KVM_T0SZ)
- #endif
--#define VTTBR_BADDR_SHIFT (VTTBR_X - 1)
--#define VTTBR_BADDR_MASK  (((_AC(1, ULL) << (40 - VTTBR_X)) - 1) << VTTBR_BADDR_SHIFT)
-+#define VTTBR_BADDR_MASK  (((_AC(1, ULL) << (40 - VTTBR_X)) - 1) << VTTBR_X)
- #define VTTBR_VMID_SHIFT  _AC(48, ULL)
- #define VTTBR_VMID_MASK(size)	(_AT(u64, (1 << size) - 1) << VTTBR_VMID_SHIFT)
+diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
+index 53c324aa44ef..4a37292855bc 100644
+--- a/virt/kvm/arm/vgic/vgic-v4.c
++++ b/virt/kvm/arm/vgic/vgic-v4.c
+@@ -337,8 +337,10 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int virq,
+ 		goto out;
  
+ 	WARN_ON(!(irq->hw && irq->host_irq == virq));
+-	irq->hw = false;
+-	ret = its_unmap_vlpi(virq);
++	if (irq->hw) {
++		irq->hw = false;
++		ret = its_unmap_vlpi(virq);
++	}
+ 
+ out:
+ 	mutex_unlock(&its->its_lock);
 -- 
 2.14.2
