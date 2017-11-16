@@ -1,31 +1,60 @@
-From: Timur Tabi <timur-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-Subject: Re: [PATCH v3 2/2] arm64: Add software workaround for Falkor erratum 1041
-Date: Wed, 15 Nov 2017 17:24:13 -0600
-Message-ID: <CAOZdJXW5CACx4n_ugKCHqjtGyft0gVAX7s5yAz0pEEs5NyYRmQ@mail.gmail.com>
-References: <1510537359-9978-1-git-send-email-shankerd@codeaurora.org>
- <1510537359-9978-3-git-send-email-shankerd@codeaurora.org> <20171115010505.GO11955@codeaurora.org>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH v5 04/20] KVM: arm/arm64: Guard kvm_vgic_map_is_active
+ against !vgic_initialized
+Date: Thu, 16 Nov 2017 12:29:48 +0000
+Message-ID: <475960cf-8b85-3a9f-d166-455e8bc5a43c@arm.com>
+References: <1509093281-15225-1-git-send-email-cdall@linaro.org>
+ <1509093281-15225-5-git-send-email-cdall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171115010505.GO11955-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Stephen Boyd <sboyd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-Cc: Shanker Donthineni <shankerd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Ard Biesheuvel <ard.biesheuvel-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, lkml <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Matt Fleming <matt-mF/unelCI9GS6iBeEJttW/XRex20P6io@public.gmane.org>, James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Robin Murphy <robin.murphy-5wv7dgnIgG8@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, "linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org" <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1509093281-15225-5-git-send-email-cdall@linaro.org>
+Content-Language: en-GB
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Nov 14, 2017 at 7:05 PM, Stephen Boyd <sboyd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org> wrote:
+Hi,
 
-> This also applies to Kryo CPUs. I have a patch[1] for the 1003
-> Falkor errata that adds the Kryo MIDR check which can also be
-> used for this errata.
->
-> [1] https://patchwork.kernel.org/patch/10048987/
+On 27/10/17 09:34, Christoffer Dall wrote:
+> If the vgic is not initialized, don't try to grab its spinlocks or
+> traverse its data structures.
+> 
+> This is important because we soon have to start considering the active
+> state of a virtual interrupts when doing vcpu_load, which may happen
+> early on before the vgic is initialized.
 
-Please submit a follow-up patch for E1041 after our patch is merged.
-We don't want to submit a patch for your SOCs, even if it's the same
-erratum and work-around.
+I understand this patch is on its way to Linus already, but I just found
+this by browsing for VGIC changes...
 
--- 
-Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm
-Technologies, Inc.  Qualcomm Technologies, Inc. is a member of the
-Code Aurora Forum, a Linux Foundation Collaborative Project.
+> Signed-off-by: Christoffer Dall <cdall@linaro.org>
+> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  virt/kvm/arm/vgic/vgic.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> index fed717e..e1f7dbc 100644
+> --- a/virt/kvm/arm/vgic/vgic.c
+> +++ b/virt/kvm/arm/vgic/vgic.c
+> @@ -777,6 +777,9 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq)
+>  	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
+
+Isn't vgic_get_irq() already accessing VGIC data structures? In which
+case this assignment should be moved after the vgic_initialized() check
+below?
+
+Cheers,
+Andre.
+
+>  	bool map_is_active;
+>  
+> +	if (!vgic_initialized(vcpu->kvm))
+> +		return false;
+> +
+>  	spin_lock(&irq->irq_lock);
+>  	map_is_active = irq->hw && irq->active;
+>  	spin_unlock(&irq->irq_lock);
+> 
