@@ -1,60 +1,50 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v5 04/20] KVM: arm/arm64: Guard kvm_vgic_map_is_active
- against !vgic_initialized
-Date: Thu, 16 Nov 2017 12:29:48 +0000
-Message-ID: <475960cf-8b85-3a9f-d166-455e8bc5a43c@arm.com>
-References: <1509093281-15225-1-git-send-email-cdall@linaro.org>
- <1509093281-15225-5-git-send-email-cdall@linaro.org>
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: [PATCH v3 0/3] KVM: arm64: single step emulation instructions
+Date: Thu, 16 Nov 2017 15:39:18 +0000
+Message-ID: <20171116153921.21991-1-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1509093281-15225-5-git-send-email-cdall@linaro.org>
-Content-Language: en-GB
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EC28D49D4F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Nov 2017 10:37:05 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id HSksZP+J2HKc for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 16 Nov 2017 10:37:05 -0500 (EST)
+Received: from mail-wr0-f194.google.com (mail-wr0-f194.google.com
+ [209.85.128.194])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id ECA2A406D0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Nov 2017 10:37:04 -0500 (EST)
+Received: by mail-wr0-f194.google.com with SMTP id p96so23130106wrb.7
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Nov 2017 07:39:24 -0800 (PST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: julien.thierry@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
-
-On 27/10/17 09:34, Christoffer Dall wrote:
-> If the vgic is not initialized, don't try to grab its spinlocks or
-> traverse its data structures.
-> 
-> This is important because we soon have to start considering the active
-> state of a virtual interrupts when doing vcpu_load, which may happen
-> early on before the vgic is initialized.
-
-I understand this patch is on its way to Linus already, but I just found
-this by browsing for VGIC changes...
-
-> Signed-off-by: Christoffer Dall <cdall@linaro.org>
-> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  virt/kvm/arm/vgic/vgic.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> index fed717e..e1f7dbc 100644
-> --- a/virt/kvm/arm/vgic/vgic.c
-> +++ b/virt/kvm/arm/vgic/vgic.c
-> @@ -777,6 +777,9 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq)
->  	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
-
-Isn't vgic_get_irq() already accessing VGIC data structures? In which
-case this assignment should be moved after the vgic_initialized() check
-below?
-
-Cheers,
-Andre.
-
->  	bool map_is_active;
->  
-> +	if (!vgic_initialized(vcpu->kvm))
-> +		return false;
-> +
->  	spin_lock(&irq->irq_lock);
->  	map_is_active = irq->hw && irq->active;
->  	spin_unlock(&irq->irq_lock);
-> 
+SGksCgpUaGlzIGlzIHJldiAzIG9mIHRoZSBzZXJpZXMsIHByYWN0aWNhbGx5IHRoZSBzYW1lIHRo
+YW4gcmV2IDIgYnV0IGZpeGVkCmEgcmV0dXJuIDEtPjAgaW4gdGhlIGt2bV9ydW4gbG9vcCB0aGF0
+IEp1bGllbiBjYXVnaHQuIEkndmUgYWRkZWQgaGlzCnItYiB0YWdzIHRvIHRoZSBvdGhlciBwYXRj
+aGVzLgoKQXMgdXN1YWwgcmV2aXNpb24gZGV0YWlscyBiZWxsb3cgdGhlIC0tLSBpbiBlYWNoIHBh
+dGNoLgoKQWxleCBCZW5uw6llICgzKToKICBrdm06IGFybSBkZWJ1ZzogaW50cm9kdWNlIGhlbHBl
+ciBmb3Igc2luZ2xlLXN0ZXAKICBrdm06IGFybTY0OiBoYW5kbGUgc2luZ2xlLXN0ZXBwaW5nIHRy
+YXBwZWQgaW5zdHJ1Y3Rpb25zCiAga3ZtOiBhcm02NDogaGFuZGxlIHNpbmdsZS1zdGVwIG9mIHVz
+ZXJzcGFjZSBtbWlvIGluc3RydWN0aW9ucwoKIGFyY2gvYXJtL2luY2x1ZGUvYXNtL2t2bV9ob3N0
+LmggICB8ICA1ICsrKysrCiBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggfCAgMSAr
+CiBhcmNoL2FybTY0L2t2bS9kZWJ1Zy5jICAgICAgICAgICAgfCAyMiArKysrKysrKysrKysrKysr
+KysKIGFyY2gvYXJtNjQva3ZtL2hhbmRsZV9leGl0LmMgICAgICB8IDQ3ICsrKysrKysrKysrKysr
+KysrKysrKysrKysrKy0tLS0tLS0tLS0tLQogdmlydC9rdm0vYXJtL2FybS5jICAgICAgICAgICAg
+ICAgIHwgIDMgKysrCiA1IGZpbGVzIGNoYW5nZWQsIDY0IGluc2VydGlvbnMoKyksIDE0IGRlbGV0
+aW9ucygtKQoKLS0gCjIuMTUuMAoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEu
+ZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJt
+Cg==
