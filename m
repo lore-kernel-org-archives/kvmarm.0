@@ -1,24 +1,25 @@
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v3 0/3] KVM: arm64: single step emulation instructions
-Date: Thu, 16 Nov 2017 15:39:18 +0000
-Message-ID: <20171116153921.21991-1-alex.bennee@linaro.org>
+Subject: [PATCH v3 1/3] kvm: arm debug: introduce helper for single-step
+Date: Thu, 16 Nov 2017 15:39:19 +0000
+Message-ID: <20171116153921.21991-2-alex.bennee@linaro.org>
+References: <20171116153921.21991-1-alex.bennee@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EC28D49D4F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Nov 2017 10:37:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C124E406D0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Nov 2017 10:37:06 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HSksZP+J2HKc for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id 5VIRs1CKjKDH for <kvmarm@lists.cs.columbia.edu>;
  Thu, 16 Nov 2017 10:37:05 -0500 (EST)
-Received: from mail-wr0-f194.google.com (mail-wr0-f194.google.com
- [209.85.128.194])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id ECA2A406D0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Nov 2017 10:37:04 -0500 (EST)
-Received: by mail-wr0-f194.google.com with SMTP id p96so23130106wrb.7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Nov 2017 07:39:24 -0800 (PST)
+Received: from mail-wm0-f65.google.com (mail-wm0-f65.google.com [74.125.82.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B3D7B49D4B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Nov 2017 10:37:05 -0500 (EST)
+Received: by mail-wm0-f65.google.com with SMTP id v186so1068078wma.2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Nov 2017 07:39:25 -0800 (PST)
+In-Reply-To: <20171116153921.21991-1-alex.bennee@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,22 +30,59 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: julien.thierry@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Russell King <linux@armlinux.org.uk>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGksCgpUaGlzIGlzIHJldiAzIG9mIHRoZSBzZXJpZXMsIHByYWN0aWNhbGx5IHRoZSBzYW1lIHRo
-YW4gcmV2IDIgYnV0IGZpeGVkCmEgcmV0dXJuIDEtPjAgaW4gdGhlIGt2bV9ydW4gbG9vcCB0aGF0
-IEp1bGllbiBjYXVnaHQuIEkndmUgYWRkZWQgaGlzCnItYiB0YWdzIHRvIHRoZSBvdGhlciBwYXRj
-aGVzLgoKQXMgdXN1YWwgcmV2aXNpb24gZGV0YWlscyBiZWxsb3cgdGhlIC0tLSBpbiBlYWNoIHBh
-dGNoLgoKQWxleCBCZW5uw6llICgzKToKICBrdm06IGFybSBkZWJ1ZzogaW50cm9kdWNlIGhlbHBl
-ciBmb3Igc2luZ2xlLXN0ZXAKICBrdm06IGFybTY0OiBoYW5kbGUgc2luZ2xlLXN0ZXBwaW5nIHRy
-YXBwZWQgaW5zdHJ1Y3Rpb25zCiAga3ZtOiBhcm02NDogaGFuZGxlIHNpbmdsZS1zdGVwIG9mIHVz
-ZXJzcGFjZSBtbWlvIGluc3RydWN0aW9ucwoKIGFyY2gvYXJtL2luY2x1ZGUvYXNtL2t2bV9ob3N0
-LmggICB8ICA1ICsrKysrCiBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggfCAgMSAr
-CiBhcmNoL2FybTY0L2t2bS9kZWJ1Zy5jICAgICAgICAgICAgfCAyMiArKysrKysrKysrKysrKysr
-KysKIGFyY2gvYXJtNjQva3ZtL2hhbmRsZV9leGl0LmMgICAgICB8IDQ3ICsrKysrKysrKysrKysr
-KysrKysrKysrKysrKy0tLS0tLS0tLS0tLQogdmlydC9rdm0vYXJtL2FybS5jICAgICAgICAgICAg
-ICAgIHwgIDMgKysrCiA1IGZpbGVzIGNoYW5nZWQsIDY0IGluc2VydGlvbnMoKyksIDE0IGRlbGV0
-aW9ucygtKQoKLS0gCjIuMTUuMAoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEu
-ZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJt
-Cg==
+QWZ0ZXIgZW11bGF0aW5nIGluc3RydWN0aW9ucyB3ZSBtYXkgd2FudCByZXR1cm4gdG8gdXNlci1z
+cGFjZSB0bwpoYW5kbGUgYSBzaW5nbGUtc3RlcC4gSWYgc2luZ2xlLXN0ZXAgaXMgZW5hYmxlZCB0
+aGUgaGVscGVyIHNldCB0aGUgcnVuCnN0cnVjdHVyZSBmb3IgcmV0dXJuIGFuZCByZXR1cm5zIHRy
+dWUuCgpTaWduZWQtb2ZmLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+
+ClJldmlld2VkLWJ5OiBKdWxpZW4gVGhpZXJyeSA8anVsaWVuLnRoaWVycnlAYXJtLmNvbT4KLS0t
+CnYyCiAgLSBrdm1fYXJtX21heWJlX3JldHVybl9kZWJ1ZyAtPiBrdm1fYXJtX2hhbmRsZV9zdGVw
+X2RlYnVnCiAgLSByZXR1cm4gYm9vbCwgdHJ1ZSBpZiByZXR1cm4gdG8gdXNlcnNwYWNlIGlzIHJl
+cXVpcmVkCi0tLQogYXJjaC9hcm0vaW5jbHVkZS9hc20va3ZtX2hvc3QuaCAgIHwgIDUgKysrKysK
+IGFyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaCB8ICAxICsKIGFyY2gvYXJtNjQva3Zt
+L2RlYnVnLmMgICAgICAgICAgICB8IDIyICsrKysrKysrKysrKysrKysrKysrKysKIDMgZmlsZXMg
+Y2hhbmdlZCwgMjggaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdpdCBhL2FyY2gvYXJtL2luY2x1ZGUv
+YXNtL2t2bV9ob3N0LmggYi9hcmNoL2FybS9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCmluZGV4IDRh
+ODc5ZjZmZjEzYi4uMjZhMWVhNmM2NTQyIDEwMDY0NAotLS0gYS9hcmNoL2FybS9pbmNsdWRlL2Fz
+bS9rdm1faG9zdC5oCisrKyBiL2FyY2gvYXJtL2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKQEAgLTI4
+NSw2ICsyODUsMTEgQEAgc3RhdGljIGlubGluZSB2b2lkIGt2bV9hcm1faW5pdF9kZWJ1Zyh2b2lk
+KSB7fQogc3RhdGljIGlubGluZSB2b2lkIGt2bV9hcm1fc2V0dXBfZGVidWcoc3RydWN0IGt2bV92
+Y3B1ICp2Y3B1KSB7fQogc3RhdGljIGlubGluZSB2b2lkIGt2bV9hcm1fY2xlYXJfZGVidWcoc3Ry
+dWN0IGt2bV92Y3B1ICp2Y3B1KSB7fQogc3RhdGljIGlubGluZSB2b2lkIGt2bV9hcm1fcmVzZXRf
+ZGVidWdfcHRyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkge30KK3N0YXRpYyBpbmxpbmUgYm9vbCBr
+dm1fYXJtX2hhbmRsZV9zdGVwX2RlYnVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKKwkJCQkJICAg
+ICBzdHJ1Y3Qga3ZtX3J1biAqcnVuKQoreworCXJldHVybiBmYWxzZTsKK30KIAogaW50IGt2bV9h
+cm1fdmNwdV9hcmNoX3NldF9hdHRyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKIAkJCSAgICAgICBz
+dHJ1Y3Qga3ZtX2RldmljZV9hdHRyICphdHRyKTsKZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQvaW5j
+bHVkZS9hc20va3ZtX2hvc3QuaCBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaApp
+bmRleCBlOTIzYjU4NjA2ZTIuLmJiZmQ2YTJhZGIyYiAxMDA2NDQKLS0tIGEvYXJjaC9hcm02NC9p
+bmNsdWRlL2FzbS9rdm1faG9zdC5oCisrKyBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hv
+c3QuaApAQCAtMzY5LDYgKzM2OSw3IEBAIHZvaWQga3ZtX2FybV9pbml0X2RlYnVnKHZvaWQpOwog
+dm9pZCBrdm1fYXJtX3NldHVwX2RlYnVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSk7CiB2b2lkIGt2
+bV9hcm1fY2xlYXJfZGVidWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KTsKIHZvaWQga3ZtX2FybV9y
+ZXNldF9kZWJ1Z19wdHIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KTsKK2Jvb2wga3ZtX2FybV9oYW5k
+bGVfc3RlcF9kZWJ1ZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHN0cnVjdCBrdm1fcnVuICpydW4p
+OwogaW50IGt2bV9hcm1fdmNwdV9hcmNoX3NldF9hdHRyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwK
+IAkJCSAgICAgICBzdHJ1Y3Qga3ZtX2RldmljZV9hdHRyICphdHRyKTsKIGludCBrdm1fYXJtX3Zj
+cHVfYXJjaF9nZXRfYXR0cihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCmRpZmYgLS1naXQgYS9hcmNo
+L2FybTY0L2t2bS9kZWJ1Zy5jIGIvYXJjaC9hcm02NC9rdm0vZGVidWcuYwppbmRleCBkYmFkZmFm
+ODUwYTcuLjk1YWZkMjJhNDYzNCAxMDA2NDQKLS0tIGEvYXJjaC9hcm02NC9rdm0vZGVidWcuYwor
+KysgYi9hcmNoL2FybTY0L2t2bS9kZWJ1Zy5jCkBAIC0yMjEsMyArMjIxLDI1IEBAIHZvaWQga3Zt
+X2FybV9jbGVhcl9kZWJ1ZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCiAJCX0KIAl9CiB9CisKKwor
+LyoKKyAqIFdoZW4gS1ZNIGhhcyBzdWNjZXNzZnVsbHkgZW11bGF0ZWQgdGhlIGluc3RydWN0aW9u
+IHdlIG1pZ2h0IHdhbnQgdG8KKyAqIHJldHVybiB0byB1c2VyIHNwYWNlIHdpdGggYSBLVk1fRVhJ
+VF9ERUJVRy4gV2UgY2FuIG9ubHkgZG8gdGhpcworICogb25jZSB0aGUgZW11bGF0aW9uIGlzIGNv
+bXBsZXRlIHRob3VnaCBzbyBmb3IgdXNlcnNwYWNlIGVtdWxhdGlvbnMKKyAqIHdlIGhhdmUgdG8g
+d2FpdCB1bnRpbCB3ZSBoYXZlIHJlLWVudGVyZWQgS1ZNIGJlZm9yZSBjYWxsaW5nIHRoaXMKKyAq
+IGhlbHBlci4KKyAqCisgKiBSZXR1cm4gdHJ1ZSAoYW5kIHNldCBleGl0X3JlYXNvbikgdG8gcmV0
+dXJuIHRvIHVzZXJzcGFjZSBvciBmYWxzZQorICogaWYgbm8gZnVydGhlciBhY3Rpb24gcmVxdWly
+ZWQuCisgKi8KKworYm9vbCBrdm1fYXJtX2hhbmRsZV9zdGVwX2RlYnVnKHN0cnVjdCBrdm1fdmNw
+dSAqdmNwdSwgc3RydWN0IGt2bV9ydW4gKnJ1bikKK3sKKwlpZiAodmNwdS0+Z3Vlc3RfZGVidWcg
+JiBLVk1fR1VFU1REQkdfU0lOR0xFU1RFUCkgeworCQlydW4tPmV4aXRfcmVhc29uID0gS1ZNX0VY
+SVRfREVCVUc7CisJCXJ1bi0+ZGVidWcuYXJjaC5oc3IgPSBFU1JfRUx4X0VDX1NPRlRTVFBfTE9X
+IDw8IEVTUl9FTHhfRUNfU0hJRlQ7CisJCXJldHVybiB0cnVlOworCX0KKwlyZXR1cm4gZmFsc2U7
+Cit9Ci0tIAoyLjE1LjAKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpo
+dHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
