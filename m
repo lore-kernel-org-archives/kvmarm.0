@@ -1,9 +1,9 @@
 From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Subject: [RFC PATCH v2 2/5] iommu/virtio-iommu: Add probe request
-Date: Fri, 17 Nov 2017 18:52:08 +0000
-Message-ID: <20171117185211.32593-3-jean-philippe.brucker@arm.com>
+Subject: [RFC PATCH v2 3/5] iommu/virtio-iommu: Add event queue
+Date: Fri, 17 Nov 2017 18:52:09 +0000
+Message-ID: <20171117185211.32593-4-jean-philippe.brucker@arm.com>
 References: <20171117185211.32593-1-jean-philippe.brucker@arm.com>
-Return-path: <virtio-dev-return-2697-gcvd-virtio-dev=m.gmane.org@lists.oasis-open.org>
+Return-path: <virtio-dev-return-2698-gcvd-virtio-dev=m.gmane.org@lists.oasis-open.org>
 Sender: <virtio-dev@lists.oasis-open.org>
 List-Post: <mailto:virtio-dev@lists.oasis-open.org>
 List-Help: <mailto:virtio-dev-help@lists.oasis-open.org>
@@ -14,337 +14,271 @@ To: iommu@lists.linux-foundation.org, devel@acpica.org, linux-acpi@vger.kernel.o
 Cc: jasowang@redhat.com, mst@redhat.com, lv.zheng@intel.com, robert.moore@intel.com, joro@8bytes.org, alex.williamson@redhat.com, sudeep.holla@arm.com, hanjun.guo@linaro.org, lorenzo.pieralisi@arm.com, lenb@kernel.org, rjw@rjwysocki.net, marc.zyngier@arm.com, robin.murphy@arm.com, will.deacon@arm.com, eric.auger@redhat.com, bharat.bhushan@nxp.com, Jayachandran.Nair@cavium.com, ashok.raj@intel.com, peterx@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When the device offers the probe feature, send a probe request for each
-device managed by the IOMMU. Extract RESV_MEM information. When we
-encounter a MSI doorbell region, set it up as a IOMMU_RESV_MSI region.
-This will tell other subsystems that there is no need to map the MSI
-doorbell in the virtio-iommu, because MSIs bypass it.
+The event queue offers a way for the device to report access faults from
+devices. It is implemented on virtqueue #1, whenever the host needs to
+signal a fault it fills one of the buffers offered by the guest and
+interrupts it.
 
 Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 ---
- drivers/iommu/virtio-iommu.c      | 165 ++++++++++++++++++++++++++++++++++++--
- include/uapi/linux/virtio_iommu.h |  37 +++++++++
- 2 files changed, 195 insertions(+), 7 deletions(-)
+ drivers/iommu/virtio-iommu.c      | 138 ++++++++++++++++++++++++++++++++++----
+ include/uapi/linux/virtio_iommu.h |  18 +++++
+ 2 files changed, 142 insertions(+), 14 deletions(-)
 
 diff --git a/drivers/iommu/virtio-iommu.c b/drivers/iommu/virtio-iommu.c
-index feb8c8925c3a..79e0add94e05 100644
+index 79e0add94e05..fe0d449bf489 100644
 --- a/drivers/iommu/virtio-iommu.c
 +++ b/drivers/iommu/virtio-iommu.c
-@@ -45,6 +45,7 @@ struct viommu_dev {
- 	struct iommu_domain_geometry	geometry;
- 	u64				pgsize_bitmap;
- 	u8				domain_bits;
-+	u32				probe_size;
+@@ -30,6 +30,12 @@
+ #define MSI_IOVA_BASE			0x8000000
+ #define MSI_IOVA_LENGTH			0x100000
+ 
++enum viommu_vq_idx {
++	VIOMMU_REQUEST_VQ	= 0,
++	VIOMMU_EVENT_VQ		= 1,
++	VIOMMU_NUM_VQS		= 2,
++};
++
+ struct viommu_dev {
+ 	struct iommu_device		iommu;
+ 	struct device			*dev;
+@@ -37,7 +43,7 @@ struct viommu_dev {
+ 
+ 	struct ida			domain_ids;
+ 
+-	struct virtqueue		*vq;
++	struct virtqueue		*vqs[VIOMMU_NUM_VQS];
+ 	/* Serialize anything touching the request queue */
+ 	spinlock_t			request_lock;
+ 
+@@ -84,6 +90,15 @@ struct viommu_request {
+ 	struct list_head		list;
  };
  
- struct viommu_mapping {
-@@ -72,6 +73,7 @@ struct viommu_domain {
- struct viommu_endpoint {
- 	struct viommu_dev		*viommu;
- 	struct viommu_domain		*vdomain;
-+	struct list_head		resv_regions;
- };
++#define VIOMMU_FAULT_RESV_MASK		0xffffff00
++
++struct viommu_event {
++	union {
++		u32			head;
++		struct virtio_iommu_fault fault;
++	};
++};
++
+ #define to_viommu_domain(domain) container_of(domain, struct viommu_domain, domain)
  
- struct viommu_request {
-@@ -139,6 +141,10 @@ static int viommu_get_req_size(struct viommu_dev *viommu,
- 	case VIRTIO_IOMMU_T_UNMAP:
- 		size = sizeof(r->unmap);
- 		break;
-+	case VIRTIO_IOMMU_T_PROBE:
-+		*bottom += viommu->probe_size;
-+		size = sizeof(r->probe) + *bottom;
-+		break;
- 	default:
- 		return -EINVAL;
+ /* Virtio transport */
+@@ -160,12 +175,13 @@ static int viommu_receive_resp(struct viommu_dev *viommu, int nr_sent,
+ 	unsigned int len;
+ 	int nr_received = 0;
+ 	struct viommu_request *req, *pending;
++	struct virtqueue *vq = viommu->vqs[VIOMMU_REQUEST_VQ];
+ 
+ 	pending = list_first_entry_or_null(sent, struct viommu_request, list);
+ 	if (WARN_ON(!pending))
+ 		return 0;
+ 
+-	while ((req = virtqueue_get_buf(viommu->vq, &len)) != NULL) {
++	while ((req = virtqueue_get_buf(vq, &len)) != NULL) {
+ 		if (req != pending) {
+ 			dev_warn(viommu->dev, "discarding stale request\n");
+ 			continue;
+@@ -202,6 +218,7 @@ static int _viommu_send_reqs_sync(struct viommu_dev *viommu,
+ 	 * dies.
+ 	 */
+ 	unsigned long timeout_ms = 1000;
++	struct virtqueue *vq = viommu->vqs[VIOMMU_REQUEST_VQ];
+ 
+ 	*nr_sent = 0;
+ 
+@@ -211,15 +228,14 @@ static int _viommu_send_reqs_sync(struct viommu_dev *viommu,
+ 		sg[0] = &req->top;
+ 		sg[1] = &req->bottom;
+ 
+-		ret = virtqueue_add_sgs(viommu->vq, sg, 1, 1, req,
+-					GFP_ATOMIC);
++		ret = virtqueue_add_sgs(vq, sg, 1, 1, req, GFP_ATOMIC);
+ 		if (ret)
+ 			break;
+ 
+ 		list_add_tail(&req->list, &pending);
  	}
-@@ -448,6 +454,106 @@ static int viommu_replay_mappings(struct viommu_domain *vdomain)
- 	return ret;
+ 
+-	if (i && !virtqueue_kick(viommu->vq))
++	if (i && !virtqueue_kick(vq))
+ 		return -EPIPE;
+ 
+ 	timeout = ktime_add_ms(ktime_get(), timeout_ms * i);
+@@ -554,6 +570,70 @@ static int viommu_probe_endpoint(struct viommu_dev *viommu, struct device *dev)
+ 	return 0;
  }
  
-+static int viommu_add_resv_mem(struct viommu_endpoint *vdev,
-+			       struct virtio_iommu_probe_resv_mem *mem,
-+			       size_t len)
++static int viommu_fault_handler(struct viommu_dev *viommu,
++				struct virtio_iommu_fault *fault)
 +{
-+	struct iommu_resv_region *region = NULL;
-+	unsigned long prot = IOMMU_WRITE | IOMMU_NOEXEC | IOMMU_MMIO;
++	char *reason_str;
 +
-+	u64 addr = le64_to_cpu(mem->addr);
-+	u64 size = le64_to_cpu(mem->size);
++	u8 reason	= fault->reason;
++	u32 flags	= le32_to_cpu(fault->flags);
++	u32 endpoint	= le32_to_cpu(fault->endpoint);
++	u64 address	= le64_to_cpu(fault->address);
 +
-+	if (len < sizeof(*mem))
-+		return -EINVAL;
-+
-+	switch (mem->subtype) {
-+	case VIRTIO_IOMMU_RESV_MEM_T_MSI:
-+		region = iommu_alloc_resv_region(addr, size, prot,
-+						 IOMMU_RESV_MSI);
++	switch (reason) {
++	case VIRTIO_IOMMU_FAULT_R_DOMAIN:
++		reason_str = "domain";
 +		break;
-+	case VIRTIO_IOMMU_RESV_MEM_T_RESERVED:
++	case VIRTIO_IOMMU_FAULT_R_MAPPING:
++		reason_str = "page";
++		break;
++	case VIRTIO_IOMMU_FAULT_R_UNKNOWN:
 +	default:
-+		region = iommu_alloc_resv_region(addr, size, 0,
-+						 IOMMU_RESV_RESERVED);
++		reason_str = "unknown";
 +		break;
 +	}
 +
-+	list_add(&vdev->resv_regions, &region->list);
-+
-+	if (mem->subtype != VIRTIO_IOMMU_RESV_MEM_T_RESERVED &&
-+	    mem->subtype != VIRTIO_IOMMU_RESV_MEM_T_MSI) {
-+		/* Please update your driver. */
-+		pr_warn("unknown resv mem subtype 0x%x\n", mem->subtype);
-+		return -EINVAL;
-+	}
++	/* TODO: find EP by ID and report_iommu_fault */
++	if (flags & VIRTIO_IOMMU_FAULT_F_ADDRESS)
++		dev_err_ratelimited(viommu->dev, "%s fault from EP %u at %#llx [%s%s%s]\n",
++				    reason_str, endpoint, address,
++				    flags & VIRTIO_IOMMU_FAULT_F_READ ? "R" : "",
++				    flags & VIRTIO_IOMMU_FAULT_F_WRITE ? "W" : "",
++				    flags & VIRTIO_IOMMU_FAULT_F_EXEC ? "X" : "");
++	else
++		dev_err_ratelimited(viommu->dev, "%s fault from EP %u\n",
++				    reason_str, endpoint);
 +
 +	return 0;
 +}
 +
-+static int viommu_probe_endpoint(struct viommu_dev *viommu, struct device *dev)
++static void viommu_event_handler(struct virtqueue *vq)
 +{
 +	int ret;
-+	u16 type, len;
-+	size_t cur = 0;
-+	struct virtio_iommu_req_probe *probe;
-+	struct virtio_iommu_probe_property *prop;
-+	struct iommu_fwspec *fwspec = dev->iommu_fwspec;
-+	struct viommu_endpoint *vdev = fwspec->iommu_priv;
++	unsigned int len;
++	struct scatterlist sg[1];
++	struct viommu_event *evt;
++	struct viommu_dev *viommu = vq->vdev->priv;
 +
-+	if (!fwspec->num_ids)
-+		/* Trouble ahead. */
-+		return -EINVAL;
-+
-+	probe = kzalloc(sizeof(*probe) + viommu->probe_size +
-+			sizeof(struct virtio_iommu_req_tail), GFP_KERNEL);
-+	if (!probe)
-+		return -ENOMEM;
-+
-+	probe->head.type = VIRTIO_IOMMU_T_PROBE;
-+	/*
-+	 * For now, assume that properties of an endpoint that outputs multiple
-+	 * IDs are consistent. Only probe the first one.
-+	 */
-+	probe->endpoint = cpu_to_le32(fwspec->ids[0]);
-+
-+	ret = viommu_send_req_sync(viommu, probe);
-+	if (ret) {
-+		kfree(probe);
-+		return ret;
-+	}
-+
-+	prop = (void *)probe->properties;
-+	type = le16_to_cpu(prop->type) & VIRTIO_IOMMU_PROBE_T_MASK;
-+
-+	while (type != VIRTIO_IOMMU_PROBE_T_NONE &&
-+	       cur < viommu->probe_size) {
-+		len = le16_to_cpu(prop->length);
-+
-+		switch (type) {
-+		case VIRTIO_IOMMU_PROBE_T_RESV_MEM:
-+			ret = viommu_add_resv_mem(vdev, (void *)prop->value, len);
-+			break;
-+		default:
-+			dev_dbg(dev, "unknown viommu prop 0x%x\n", type);
++	while ((evt = virtqueue_get_buf(vq, &len)) != NULL) {
++		if (len > sizeof(*evt)) {
++			dev_err(viommu->dev,
++				"invalid event buffer (len %u != %zu)\n",
++				len, sizeof(*evt));
++		} else if (!(evt->head & VIOMMU_FAULT_RESV_MASK)) {
++			viommu_fault_handler(viommu, &evt->fault);
 +		}
 +
++		sg_init_one(sg, evt, sizeof(*evt));
++		ret = virtqueue_add_inbuf(vq, sg, 1, evt, GFP_ATOMIC);
 +		if (ret)
-+			dev_err(dev, "failed to parse viommu prop 0x%x\n", type);
-+
-+		cur += sizeof(*prop) + len;
-+		if (cur >= viommu->probe_size)
-+			break;
-+
-+		prop = (void *)probe->properties + cur;
-+		type = le16_to_cpu(prop->type) & VIRTIO_IOMMU_PROBE_T_MASK;
++			dev_err(viommu->dev, "could not add event buffer\n");
 +	}
 +
-+	kfree(probe);
-+
-+	return 0;
++	if (!virtqueue_kick(vq))
++		dev_err(viommu->dev, "kick failed\n");
 +}
 +
  /* IOMMU API */
  
  static bool viommu_capable(enum iommu_cap cap)
-@@ -706,6 +812,7 @@ static struct viommu_dev *viommu_get_by_fwnode(struct fwnode_handle *fwnode)
+@@ -938,19 +1018,44 @@ static struct iommu_ops viommu_ops = {
+ 	.put_resv_regions	= viommu_put_resv_regions,
+ };
  
- static int viommu_add_device(struct device *dev)
+-static int viommu_init_vq(struct viommu_dev *viommu)
++static int viommu_init_vqs(struct viommu_dev *viommu)
  {
-+	int ret;
- 	struct iommu_group *group;
- 	struct viommu_endpoint *vdev;
- 	struct viommu_dev *viommu = NULL;
-@@ -723,8 +830,16 @@ static int viommu_add_device(struct device *dev)
- 		return -ENOMEM;
+ 	struct virtio_device *vdev = dev_to_virtio(viommu->dev);
+-	const char *name = "request";
+-	void *ret;
++	const char *names[] = { "request", "event" };
++	vq_callback_t *callbacks[] = {
++		NULL, /* No async requests */
++		viommu_event_handler,
++	};
++
++	return virtio_find_vqs(vdev, VIOMMU_NUM_VQS, viommu->vqs, callbacks,
++			       names, NULL);
++}
  
- 	vdev->viommu = viommu;
-+	INIT_LIST_HEAD(&vdev->resv_regions);
- 	fwspec->iommu_priv = vdev;
- 
-+	if (viommu->probe_size) {
-+		/* Get additional information for this endpoint */
-+		ret = viommu_probe_endpoint(viommu, dev);
+-	ret = virtio_find_single_vq(vdev, NULL, name);
+-	if (IS_ERR(ret)) {
+-		dev_err(viommu->dev, "cannot find VQ\n");
+-		return PTR_ERR(ret);
++static int viommu_fill_evtq(struct viommu_dev *viommu)
++{
++	int i, ret;
++	struct scatterlist sg[1];
++	struct viommu_event *evts;
++	struct virtqueue *vq = viommu->vqs[VIOMMU_EVENT_VQ];
++	size_t nr_evts = min_t(size_t, PAGE_SIZE / sizeof(struct viommu_event),
++			       viommu->vqs[VIOMMU_EVENT_VQ]->num_free);
++
++	evts = devm_kmalloc_array(viommu->dev, nr_evts, sizeof(*evts),
++				  GFP_KERNEL);
++	if (!evts)
++		return -ENOMEM;
++
++	for (i = 0; i < nr_evts; i++) {
++		sg_init_one(sg, &evts[i], sizeof(*evts));
++		ret = virtqueue_add_inbuf(vq, sg, 1, &evts[i], GFP_KERNEL);
 +		if (ret)
 +			return ret;
-+	}
-+
- 	/*
- 	 * Last step creates a default domain and attaches to it. Everything
- 	 * must be ready.
-@@ -738,7 +853,19 @@ static int viommu_add_device(struct device *dev)
+ 	}
  
- static void viommu_remove_device(struct device *dev)
- {
--	kfree(dev->iommu_fwspec->iommu_priv);
-+	struct viommu_endpoint *vdev;
-+	struct iommu_resv_region *entry, *next;
-+	struct iommu_fwspec *fwspec = dev->iommu_fwspec;
+-	viommu->vq = ret;
++	if (!virtqueue_kick(vq))
++		return -EPIPE;
 +
-+	if (!fwspec || fwspec->ops != &viommu_ops)
-+		return;
-+
-+	vdev = fwspec->iommu_priv;
-+
-+	list_for_each_entry_safe(entry, next, &vdev->resv_regions, list)
-+		kfree(entry);
-+
-+	kfree(vdev);
++	dev_info(viommu->dev, "%zu event buffers\n", nr_evts);
+ 
+ 	return 0;
  }
+@@ -973,7 +1078,7 @@ static int viommu_probe(struct virtio_device *vdev)
+ 	viommu->dev = dev;
+ 	viommu->vdev = vdev;
  
- static struct iommu_group *viommu_device_group(struct device *dev)
-@@ -756,15 +883,34 @@ static int viommu_of_xlate(struct device *dev, struct of_phandle_args *args)
+-	ret = viommu_init_vq(viommu);
++	ret = viommu_init_vqs(viommu);
+ 	if (ret)
+ 		goto err_free_viommu;
  
- static void viommu_get_resv_regions(struct device *dev, struct list_head *head)
- {
--	struct iommu_resv_region *region;
-+	struct iommu_resv_region *entry, *new_entry, *msi = NULL;
-+	struct viommu_endpoint *vdev = dev->iommu_fwspec->iommu_priv;
- 	int prot = IOMMU_WRITE | IOMMU_NOEXEC | IOMMU_MMIO;
+@@ -1014,6 +1119,11 @@ static int viommu_probe(struct virtio_device *vdev)
  
--	region = iommu_alloc_resv_region(MSI_IOVA_BASE, MSI_IOVA_LENGTH, prot,
--					 IOMMU_RESV_SW_MSI);
--	if (!region)
--		return;
-+	list_for_each_entry(entry, &vdev->resv_regions, list) {
-+		/*
-+		 * If the device registered a bypass MSI windows, use it.
-+		 * Otherwise add a software-mapped region
-+		 */
-+		if (entry->type == IOMMU_RESV_MSI)
-+			msi = entry;
+ 	virtio_device_ready(vdev);
+ 
++	/* Populate the event queue with buffers */
++	ret = viommu_fill_evtq(viommu);
++	if (ret)
++		goto err_free_viommu;
 +
-+		new_entry = kmemdup(entry, sizeof(*entry), GFP_KERNEL);
-+		if (!new_entry)
-+			return;
-+		list_add_tail(&new_entry->list, head);
-+	}
- 
--	list_add_tail(&region->list, head);
-+	if (!msi) {
-+		msi = iommu_alloc_resv_region(MSI_IOVA_BASE, MSI_IOVA_LENGTH,
-+					      prot, IOMMU_RESV_SW_MSI);
-+		if (!msi)
-+			return;
-+
-+		list_add_tail(&msi->list, head);
-+	}
-+
-+	iommu_dma_get_resv_regions(dev, head);
- }
- 
- static void viommu_put_resv_regions(struct device *dev, struct list_head *head)
-@@ -854,6 +1000,10 @@ static int viommu_probe(struct virtio_device *vdev)
- 			     struct virtio_iommu_config, domain_bits,
- 			     &viommu->domain_bits);
- 
-+	virtio_cread_feature(vdev, VIRTIO_IOMMU_F_PROBE,
-+			     struct virtio_iommu_config, probe_size,
-+			     &viommu->probe_size);
-+
- 	viommu->geometry = (struct iommu_domain_geometry) {
- 		.aperture_start	= input_start,
- 		.aperture_end	= input_end,
-@@ -931,6 +1081,7 @@ static unsigned int features[] = {
- 	VIRTIO_IOMMU_F_MAP_UNMAP,
- 	VIRTIO_IOMMU_F_DOMAIN_BITS,
- 	VIRTIO_IOMMU_F_INPUT_RANGE,
-+	VIRTIO_IOMMU_F_PROBE,
- };
- 
- static struct virtio_device_id id_table[] = {
+ 	ret = iommu_device_sysfs_add(&viommu->iommu, dev, NULL, "%s",
+ 				     virtio_bus_name(vdev));
+ 	if (ret)
 diff --git a/include/uapi/linux/virtio_iommu.h b/include/uapi/linux/virtio_iommu.h
-index 2b4cd2042897..eec90a2ab547 100644
+index eec90a2ab547..b57543b4145b 100644
 --- a/include/uapi/linux/virtio_iommu.h
 +++ b/include/uapi/linux/virtio_iommu.h
-@@ -38,6 +38,7 @@
- #define VIRTIO_IOMMU_F_DOMAIN_BITS		1
- #define VIRTIO_IOMMU_F_MAP_UNMAP		2
- #define VIRTIO_IOMMU_F_BYPASS			3
-+#define VIRTIO_IOMMU_F_PROBE			4
- 
- struct virtio_iommu_config {
- 	/* Supported page sizes */
-@@ -49,6 +50,9 @@ struct virtio_iommu_config {
- 	} input_range;
- 	/* Max domain ID size */
- 	__u8 					domain_bits;
-+	__u8					padding[3];
-+	/* Probe buffer size */
-+	__u32					probe_size;
- } __packed;
- 
- /* Request types */
-@@ -56,6 +60,7 @@ struct virtio_iommu_config {
- #define VIRTIO_IOMMU_T_DETACH			0x02
- #define VIRTIO_IOMMU_T_MAP			0x03
- #define VIRTIO_IOMMU_T_UNMAP			0x04
-+#define VIRTIO_IOMMU_T_PROBE			0x05
- 
- /* Status types */
- #define VIRTIO_IOMMU_S_OK			0x00
-@@ -128,6 +133,37 @@ struct virtio_iommu_req_unmap {
- 	struct virtio_iommu_req_tail		tail;
- } __packed;
- 
-+#define VIRTIO_IOMMU_RESV_MEM_T_RESERVED	0
-+#define VIRTIO_IOMMU_RESV_MEM_T_MSI		1
-+
-+struct virtio_iommu_probe_resv_mem {
-+	__u8					subtype;
-+	__u8					reserved[3];
-+	__le64					addr;
-+	__le64					size;
-+} __packed;
-+
-+#define VIRTIO_IOMMU_PROBE_T_NONE		0
-+#define VIRTIO_IOMMU_PROBE_T_RESV_MEM		1
-+
-+#define VIRTIO_IOMMU_PROBE_T_MASK		0xfff
-+
-+struct virtio_iommu_probe_property {
-+	__le16					type;
-+	__le16					length;
-+	__u8					value[];
-+} __packed;
-+
-+struct virtio_iommu_req_probe {
-+	struct virtio_iommu_req_head		head;
-+	__le32					endpoint;
-+	__u8					reserved[64];
-+
-+	__u8					properties[];
-+
-+	/* Tail follows the variable-length properties array (no padding) */
-+} __packed;
-+
- union virtio_iommu_req {
- 	struct virtio_iommu_req_head		head;
- 
-@@ -135,6 +171,7 @@ union virtio_iommu_req {
- 	struct virtio_iommu_req_detach		detach;
- 	struct virtio_iommu_req_map		map;
- 	struct virtio_iommu_req_unmap		unmap;
-+	struct virtio_iommu_req_probe		probe;
+@@ -174,4 +174,22 @@ union virtio_iommu_req {
+ 	struct virtio_iommu_req_probe		probe;
  };
  
++/* Fault types */
++#define VIRTIO_IOMMU_FAULT_R_UNKNOWN		0
++#define VIRTIO_IOMMU_FAULT_R_DOMAIN		1
++#define VIRTIO_IOMMU_FAULT_R_MAPPING		2
++
++#define VIRTIO_IOMMU_FAULT_F_READ		(1 << 0)
++#define VIRTIO_IOMMU_FAULT_F_WRITE		(1 << 1)
++#define VIRTIO_IOMMU_FAULT_F_EXEC		(1 << 2)
++#define VIRTIO_IOMMU_FAULT_F_ADDRESS		(1 << 8)
++
++struct virtio_iommu_fault {
++	__u8					reason;
++	__u8					padding[3];
++	__le32					flags;
++	__le32					endpoint;
++	__le64					address;
++} __packed;
++
  #endif
 -- 
 2.14.3
