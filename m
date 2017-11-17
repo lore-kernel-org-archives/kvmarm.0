@@ -1,9 +1,9 @@
 From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Subject: [RFC PATCH v2 3/5] iommu/virtio-iommu: Add event queue
-Date: Fri, 17 Nov 2017 18:52:09 +0000
-Message-ID: <20171117185211.32593-4-jean-philippe.brucker@arm.com>
+Subject: [RFC PATCH v2 4/5] ACPI/IORT: Support paravirtualized IOMMU
+Date: Fri, 17 Nov 2017 18:52:10 +0000
+Message-ID: <20171117185211.32593-5-jean-philippe.brucker@arm.com>
 References: <20171117185211.32593-1-jean-philippe.brucker@arm.com>
-Return-path: <virtio-dev-return-2698-gcvd-virtio-dev=m.gmane.org@lists.oasis-open.org>
+Return-path: <virtio-dev-return-2699-gcvd-virtio-dev=m.gmane.org@lists.oasis-open.org>
 Sender: <virtio-dev@lists.oasis-open.org>
 List-Post: <mailto:virtio-dev@lists.oasis-open.org>
 List-Help: <mailto:virtio-dev-help@lists.oasis-open.org>
@@ -14,271 +14,259 @@ To: iommu@lists.linux-foundation.org, devel@acpica.org, linux-acpi@vger.kernel.o
 Cc: jasowang@redhat.com, mst@redhat.com, lv.zheng@intel.com, robert.moore@intel.com, joro@8bytes.org, alex.williamson@redhat.com, sudeep.holla@arm.com, hanjun.guo@linaro.org, lorenzo.pieralisi@arm.com, lenb@kernel.org, rjw@rjwysocki.net, marc.zyngier@arm.com, robin.murphy@arm.com, will.deacon@arm.com, eric.auger@redhat.com, bharat.bhushan@nxp.com, Jayachandran.Nair@cavium.com, ashok.raj@intel.com, peterx@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The event queue offers a way for the device to report access faults from
-devices. It is implemented on virtqueue #1, whenever the host needs to
-signal a fault it fills one of the buffers offered by the guest and
-interrupts it.
+To describe the virtual topology in relation to a virtio-iommu device,
+ACPI-based systems use a "paravirtualized IOMMU" IORT node. Add support
+for it.
+
+This is a RFC because the IORT specification doesn't describe the
+paravirtualized node at the moment, it is only provided as an example in
+the virtio-iommu spec. What we need to do first is confirm that x86
+kernels are able to use the IORT driver with the virtio-iommu. There isn't
+anything specific to arm64 in the driver but there might be other blockers
+we're not aware of (I know for example that x86 also requires custom DMA
+ops rather than iommu-dma ones, but it's unrelated) so this needs to be
+tested on the x86 prototype.
+
+Rationale: virtio-iommu requires an ACPI table to be passed between host
+and guest that describes its relation to PCI and platform endpoints in the
+virtual system. A table that maps PCI RIDs and integrated devices to IOMMU
+device IDs, telling the IOMMU driver which endpoints it manages.
+
+As far as I'm aware, there are three existing tables that solve this
+problem: Intel DMAR, AMD IVRS and ARM IORT. The first two are specific to
+Intel VT-d and AMD IOMMU respectively, while the third describes multiple
+remapping devices -- currently only ARM IOMMUs and MSI controllers, but it
+is easy to extend.
+
+IORT table and drivers are easiest to extend and they do the job, so
+rather than introducing a fourth solution to solve a generic problem,
+reuse what exists.
 
 Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 ---
- drivers/iommu/virtio-iommu.c      | 138 ++++++++++++++++++++++++++++++++++----
- include/uapi/linux/virtio_iommu.h |  18 +++++
- 2 files changed, 142 insertions(+), 14 deletions(-)
+ drivers/acpi/arm64/iort.c | 95 +++++++++++++++++++++++++++++++++++++++++++----
+ drivers/iommu/Kconfig     |  1 +
+ include/acpi/actbl2.h     | 18 ++++++++-
+ 3 files changed, 106 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/iommu/virtio-iommu.c b/drivers/iommu/virtio-iommu.c
-index 79e0add94e05..fe0d449bf489 100644
---- a/drivers/iommu/virtio-iommu.c
-+++ b/drivers/iommu/virtio-iommu.c
-@@ -30,6 +30,12 @@
- #define MSI_IOVA_BASE			0x8000000
- #define MSI_IOVA_LENGTH			0x100000
+diff --git a/drivers/acpi/arm64/iort.c b/drivers/acpi/arm64/iort.c
+index fde279b0a6d8..c7132e4a0560 100644
+--- a/drivers/acpi/arm64/iort.c
++++ b/drivers/acpi/arm64/iort.c
+@@ -29,7 +29,8 @@
+ #define IORT_TYPE_MASK(type)	(1 << (type))
+ #define IORT_MSI_TYPE		(1 << ACPI_IORT_NODE_ITS_GROUP)
+ #define IORT_IOMMU_TYPE		((1 << ACPI_IORT_NODE_SMMU) |	\
+-				(1 << ACPI_IORT_NODE_SMMU_V3))
++				(1 << ACPI_IORT_NODE_SMMU_V3) | \
++				(1 << ACPI_IORT_NODE_PARAVIRT))
  
-+enum viommu_vq_idx {
-+	VIOMMU_REQUEST_VQ	= 0,
-+	VIOMMU_EVENT_VQ		= 1,
-+	VIOMMU_NUM_VQS		= 2,
-+};
-+
- struct viommu_dev {
- 	struct iommu_device		iommu;
- 	struct device			*dev;
-@@ -37,7 +43,7 @@ struct viommu_dev {
- 
- 	struct ida			domain_ids;
- 
--	struct virtqueue		*vq;
-+	struct virtqueue		*vqs[VIOMMU_NUM_VQS];
- 	/* Serialize anything touching the request queue */
- 	spinlock_t			request_lock;
- 
-@@ -84,6 +90,15 @@ struct viommu_request {
- 	struct list_head		list;
- };
- 
-+#define VIOMMU_FAULT_RESV_MASK		0xffffff00
-+
-+struct viommu_event {
-+	union {
-+		u32			head;
-+		struct virtio_iommu_fault fault;
-+	};
-+};
-+
- #define to_viommu_domain(domain) container_of(domain, struct viommu_domain, domain)
- 
- /* Virtio transport */
-@@ -160,12 +175,13 @@ static int viommu_receive_resp(struct viommu_dev *viommu, int nr_sent,
- 	unsigned int len;
- 	int nr_received = 0;
- 	struct viommu_request *req, *pending;
-+	struct virtqueue *vq = viommu->vqs[VIOMMU_REQUEST_VQ];
- 
- 	pending = list_first_entry_or_null(sent, struct viommu_request, list);
- 	if (WARN_ON(!pending))
- 		return 0;
- 
--	while ((req = virtqueue_get_buf(viommu->vq, &len)) != NULL) {
-+	while ((req = virtqueue_get_buf(vq, &len)) != NULL) {
- 		if (req != pending) {
- 			dev_warn(viommu->dev, "discarding stale request\n");
- 			continue;
-@@ -202,6 +218,7 @@ static int _viommu_send_reqs_sync(struct viommu_dev *viommu,
- 	 * dies.
- 	 */
- 	unsigned long timeout_ms = 1000;
-+	struct virtqueue *vq = viommu->vqs[VIOMMU_REQUEST_VQ];
- 
- 	*nr_sent = 0;
- 
-@@ -211,15 +228,14 @@ static int _viommu_send_reqs_sync(struct viommu_dev *viommu,
- 		sg[0] = &req->top;
- 		sg[1] = &req->bottom;
- 
--		ret = virtqueue_add_sgs(viommu->vq, sg, 1, 1, req,
--					GFP_ATOMIC);
-+		ret = virtqueue_add_sgs(vq, sg, 1, 1, req, GFP_ATOMIC);
- 		if (ret)
- 			break;
- 
- 		list_add_tail(&req->list, &pending);
- 	}
- 
--	if (i && !virtqueue_kick(viommu->vq))
-+	if (i && !virtqueue_kick(vq))
- 		return -EPIPE;
- 
- 	timeout = ktime_add_ms(ktime_get(), timeout_ms * i);
-@@ -554,6 +570,70 @@ static int viommu_probe_endpoint(struct viommu_dev *viommu, struct device *dev)
- 	return 0;
+ /* Until ACPICA headers cover IORT rev. C */
+ #ifndef ACPI_IORT_SMMU_V3_CAVIUM_CN99XX
+@@ -616,6 +617,8 @@ static inline bool iort_iommu_driver_enabled(u8 type)
+ 		return IS_BUILTIN(CONFIG_ARM_SMMU_V3);
+ 	case ACPI_IORT_NODE_SMMU:
+ 		return IS_BUILTIN(CONFIG_ARM_SMMU);
++	case ACPI_IORT_NODE_PARAVIRT:
++		return IS_BUILTIN(CONFIG_VIRTIO_IOMMU);
+ 	default:
+ 		pr_warn("IORT node type %u does not describe an SMMU\n", type);
+ 		return false;
+@@ -1062,6 +1065,48 @@ static bool __init arm_smmu_is_coherent(struct acpi_iort_node *node)
+ 	return smmu->flags & ACPI_IORT_SMMU_COHERENT_WALK;
  }
  
-+static int viommu_fault_handler(struct viommu_dev *viommu,
-+				struct virtio_iommu_fault *fault)
++static int __init paravirt_count_resources(struct acpi_iort_node *node)
 +{
-+	char *reason_str;
++	struct acpi_iort_pviommu *pviommu;
 +
-+	u8 reason	= fault->reason;
-+	u32 flags	= le32_to_cpu(fault->flags);
-+	u32 endpoint	= le32_to_cpu(fault->endpoint);
-+	u64 address	= le64_to_cpu(fault->address);
++	pviommu = (struct acpi_iort_pviommu *)node->node_data;
 +
-+	switch (reason) {
-+	case VIRTIO_IOMMU_FAULT_R_DOMAIN:
-+		reason_str = "domain";
-+		break;
-+	case VIRTIO_IOMMU_FAULT_R_MAPPING:
-+		reason_str = "page";
-+		break;
-+	case VIRTIO_IOMMU_FAULT_R_UNKNOWN:
-+	default:
-+		reason_str = "unknown";
-+		break;
-+	}
-+
-+	/* TODO: find EP by ID and report_iommu_fault */
-+	if (flags & VIRTIO_IOMMU_FAULT_F_ADDRESS)
-+		dev_err_ratelimited(viommu->dev, "%s fault from EP %u at %#llx [%s%s%s]\n",
-+				    reason_str, endpoint, address,
-+				    flags & VIRTIO_IOMMU_FAULT_F_READ ? "R" : "",
-+				    flags & VIRTIO_IOMMU_FAULT_F_WRITE ? "W" : "",
-+				    flags & VIRTIO_IOMMU_FAULT_F_EXEC ? "X" : "");
-+	else
-+		dev_err_ratelimited(viommu->dev, "%s fault from EP %u\n",
-+				    reason_str, endpoint);
-+
-+	return 0;
++	/* Mem + IRQs */
++	return 1 + pviommu->interrupt_count;
 +}
 +
-+static void viommu_event_handler(struct virtqueue *vq)
++static void __init paravirt_init_resources(struct resource *res,
++					   struct acpi_iort_node *node)
 +{
-+	int ret;
-+	unsigned int len;
-+	struct scatterlist sg[1];
-+	struct viommu_event *evt;
-+	struct viommu_dev *viommu = vq->vdev->priv;
++	int i;
++	int num_res = 0;
++	int hw_irq, trigger;
++	struct acpi_iort_pviommu *pviommu;
 +
-+	while ((evt = virtqueue_get_buf(vq, &len)) != NULL) {
-+		if (len > sizeof(*evt)) {
-+			dev_err(viommu->dev,
-+				"invalid event buffer (len %u != %zu)\n",
-+				len, sizeof(*evt));
-+		} else if (!(evt->head & VIOMMU_FAULT_RESV_MASK)) {
-+			viommu_fault_handler(viommu, &evt->fault);
-+		}
++	pviommu = (struct acpi_iort_pviommu *)node->node_data;
 +
-+		sg_init_one(sg, evt, sizeof(*evt));
-+		ret = virtqueue_add_inbuf(vq, sg, 1, evt, GFP_ATOMIC);
-+		if (ret)
-+			dev_err(viommu->dev, "could not add event buffer\n");
++	res[num_res].start = pviommu->base_address;
++	res[num_res].end = pviommu->base_address + pviommu->span - 1;
++	res[num_res].flags = IORESOURCE_MEM;
++	num_res++;
++
++	for (i = 0; i < pviommu->interrupt_count; i++) {
++		hw_irq = IORT_IRQ_MASK(pviommu->interrupts[i]);
++		trigger = IORT_IRQ_TRIGGER_MASK(pviommu->interrupts[i]);
++
++		acpi_iort_register_irq(hw_irq, "pviommu", trigger, &res[num_res++]);
 +	}
-+
-+	if (!virtqueue_kick(vq))
-+		dev_err(viommu->dev, "kick failed\n");
 +}
 +
- /* IOMMU API */
- 
- static bool viommu_capable(enum iommu_cap cap)
-@@ -938,19 +1018,44 @@ static struct iommu_ops viommu_ops = {
- 	.put_resv_regions	= viommu_put_resv_regions,
++static bool __init paravirt_is_coherent(struct acpi_iort_node *node)
++{
++	struct acpi_iort_pviommu *pviommu;
++
++	pviommu = (struct acpi_iort_pviommu *)node->node_data;
++
++	return pviommu->flags & ACPI_IORT_NODE_PV_CACHE_COHERENT;
++}
++
+ struct iort_iommu_config {
+ 	const char *name;
+ 	int (*iommu_init)(struct acpi_iort_node *node);
+@@ -1088,6 +1133,13 @@ static const struct iort_iommu_config iort_arm_smmu_cfg __initconst = {
+ 	.iommu_init_resources = arm_smmu_init_resources
  };
  
--static int viommu_init_vq(struct viommu_dev *viommu)
-+static int viommu_init_vqs(struct viommu_dev *viommu)
++static const struct iort_iommu_config iort_paravirt_cfg __initconst = {
++	.name = "pviommu",
++	.iommu_is_coherent = paravirt_is_coherent,
++	.iommu_count_resources = paravirt_count_resources,
++	.iommu_init_resources = paravirt_init_resources
++};
++
+ static __init
+ const struct iort_iommu_config *iort_get_iommu_cfg(struct acpi_iort_node *node)
  {
- 	struct virtio_device *vdev = dev_to_virtio(viommu->dev);
--	const char *name = "request";
--	void *ret;
-+	const char *names[] = { "request", "event" };
-+	vq_callback_t *callbacks[] = {
-+		NULL, /* No async requests */
-+		viommu_event_handler,
-+	};
-+
-+	return virtio_find_vqs(vdev, VIOMMU_NUM_VQS, viommu->vqs, callbacks,
-+			       names, NULL);
-+}
- 
--	ret = virtio_find_single_vq(vdev, NULL, name);
--	if (IS_ERR(ret)) {
--		dev_err(viommu->dev, "cannot find VQ\n");
--		return PTR_ERR(ret);
-+static int viommu_fill_evtq(struct viommu_dev *viommu)
-+{
-+	int i, ret;
-+	struct scatterlist sg[1];
-+	struct viommu_event *evts;
-+	struct virtqueue *vq = viommu->vqs[VIOMMU_EVENT_VQ];
-+	size_t nr_evts = min_t(size_t, PAGE_SIZE / sizeof(struct viommu_event),
-+			       viommu->vqs[VIOMMU_EVENT_VQ]->num_free);
-+
-+	evts = devm_kmalloc_array(viommu->dev, nr_evts, sizeof(*evts),
-+				  GFP_KERNEL);
-+	if (!evts)
-+		return -ENOMEM;
-+
-+	for (i = 0; i < nr_evts; i++) {
-+		sg_init_one(sg, &evts[i], sizeof(*evts));
-+		ret = virtqueue_add_inbuf(vq, sg, 1, &evts[i], GFP_KERNEL);
-+		if (ret)
-+			return ret;
+@@ -1096,18 +1148,22 @@ const struct iort_iommu_config *iort_get_iommu_cfg(struct acpi_iort_node *node)
+ 		return &iort_arm_smmu_v3_cfg;
+ 	case ACPI_IORT_NODE_SMMU:
+ 		return &iort_arm_smmu_cfg;
++	case ACPI_IORT_NODE_PARAVIRT:
++		return &iort_paravirt_cfg;
+ 	default:
+ 		return NULL;
  	}
- 
--	viommu->vq = ret;
-+	if (!virtqueue_kick(vq))
-+		return -EPIPE;
-+
-+	dev_info(viommu->dev, "%zu event buffers\n", nr_evts);
- 
- 	return 0;
  }
-@@ -973,7 +1078,7 @@ static int viommu_probe(struct virtio_device *vdev)
- 	viommu->dev = dev;
- 	viommu->vdev = vdev;
  
--	ret = viommu_init_vq(viommu);
-+	ret = viommu_init_vqs(viommu);
- 	if (ret)
- 		goto err_free_viommu;
+ /**
+- * iort_add_smmu_platform_device() - Allocate a platform device for SMMU
+- * @node: Pointer to SMMU ACPI IORT node
++ * iort_add_iommu_platform_device() - Allocate a platform device for an IOMMU
++ * @node: Pointer to IOMMU ACPI IORT node
++ * @name: Base name of the device
+  *
+  * Returns: 0 on success, <0 failure
+  */
+-static int __init iort_add_smmu_platform_device(struct acpi_iort_node *node)
++static int __init iort_add_iommu_platform_device(struct acpi_iort_node *node,
++						 const char *name)
+ {
+ 	struct fwnode_handle *fwnode;
+ 	struct platform_device *pdev;
+@@ -1119,7 +1175,7 @@ static int __init iort_add_smmu_platform_device(struct acpi_iort_node *node)
+ 	if (!ops)
+ 		return -ENODEV;
  
-@@ -1014,6 +1119,11 @@ static int viommu_probe(struct virtio_device *vdev)
+-	pdev = platform_device_alloc(ops->name, PLATFORM_DEVID_AUTO);
++	pdev = platform_device_alloc(name, PLATFORM_DEVID_AUTO);
+ 	if (!pdev)
+ 		return -ENOMEM;
  
- 	virtio_device_ready(vdev);
+@@ -1189,6 +1245,28 @@ static int __init iort_add_smmu_platform_device(struct acpi_iort_node *node)
+ 	return ret;
+ }
  
-+	/* Populate the event queue with buffers */
-+	ret = viommu_fill_evtq(viommu);
-+	if (ret)
-+		goto err_free_viommu;
++static int __init iort_add_smmu_platform_device(struct acpi_iort_node *node)
++{
++	const struct iort_iommu_config *ops = iort_get_iommu_cfg(node);
 +
- 	ret = iommu_device_sysfs_add(&viommu->iommu, dev, NULL, "%s",
- 				     virtio_bus_name(vdev));
- 	if (ret)
-diff --git a/include/uapi/linux/virtio_iommu.h b/include/uapi/linux/virtio_iommu.h
-index eec90a2ab547..b57543b4145b 100644
---- a/include/uapi/linux/virtio_iommu.h
-+++ b/include/uapi/linux/virtio_iommu.h
-@@ -174,4 +174,22 @@ union virtio_iommu_req {
- 	struct virtio_iommu_req_probe		probe;
++	if (!ops)
++		return -ENODEV;
++
++	return iort_add_iommu_platform_device(node, ops->name);
++}
++
++static int __init iort_add_paravirt_platform_device(struct acpi_iort_node *node)
++{
++	struct acpi_iort_pviommu *pviommu;
++
++	pviommu = (struct acpi_iort_pviommu *)node->node_data;
++
++	if (WARN_ON(pviommu->model != ACPI_IORT_NODE_PV_VIRTIO_IOMMU))
++		return -ENODEV;
++
++	return iort_add_iommu_platform_device(node, "virtio-mmio");
++}
++
+ static bool __init iort_enable_acs(struct acpi_iort_node *iort_node)
+ {
+ 	if (iort_node->type == ACPI_IORT_NODE_PCI_ROOT_COMPLEX) {
+@@ -1250,7 +1328,8 @@ static void __init iort_init_platform_devices(void)
+ 			acs_enabled = iort_enable_acs(iort_node);
+ 
+ 		if ((iort_node->type == ACPI_IORT_NODE_SMMU) ||
+-			(iort_node->type == ACPI_IORT_NODE_SMMU_V3)) {
++			(iort_node->type == ACPI_IORT_NODE_SMMU_V3) ||
++			(iort_node->type == ACPI_IORT_NODE_PARAVIRT)) {
+ 
+ 			fwnode = acpi_alloc_fwnode_static();
+ 			if (!fwnode)
+@@ -1258,7 +1337,9 @@ static void __init iort_init_platform_devices(void)
+ 
+ 			iort_set_fwnode(iort_node, fwnode);
+ 
+-			ret = iort_add_smmu_platform_device(iort_node);
++			ret = iort_node->type == ACPI_IORT_NODE_PARAVIRT ?
++				iort_add_paravirt_platform_device(iort_node) :
++				iort_add_smmu_platform_device(iort_node);
+ 			if (ret) {
+ 				iort_delete_fwnode(iort_node);
+ 				acpi_free_fwnode_static(fwnode);
+diff --git a/drivers/iommu/Kconfig b/drivers/iommu/Kconfig
+index 7271e59e8b23..3e28a5d682c3 100644
+--- a/drivers/iommu/Kconfig
++++ b/drivers/iommu/Kconfig
+@@ -409,6 +409,7 @@ config VIRTIO_IOMMU
+ 	select IOMMU_API
+ 	select INTERVAL_TREE
+ 	select ARM_DMA_USE_IOMMU if ARM
++	select ACPI_IORT
+ 	help
+ 	  Para-virtualised IOMMU driver with virtio.
+ 
+diff --git a/include/acpi/actbl2.h b/include/acpi/actbl2.h
+index 686b6f8c09dc..23ae5bbc36d1 100644
+--- a/include/acpi/actbl2.h
++++ b/include/acpi/actbl2.h
+@@ -696,7 +696,8 @@ enum acpi_iort_node_type {
+ 	ACPI_IORT_NODE_NAMED_COMPONENT = 0x01,
+ 	ACPI_IORT_NODE_PCI_ROOT_COMPLEX = 0x02,
+ 	ACPI_IORT_NODE_SMMU = 0x03,
+-	ACPI_IORT_NODE_SMMU_V3 = 0x04
++	ACPI_IORT_NODE_SMMU_V3 = 0x04,
++	ACPI_IORT_NODE_PARAVIRT = 0x05,
  };
  
-+/* Fault types */
-+#define VIRTIO_IOMMU_FAULT_R_UNKNOWN		0
-+#define VIRTIO_IOMMU_FAULT_R_DOMAIN		1
-+#define VIRTIO_IOMMU_FAULT_R_MAPPING		2
+ struct acpi_iort_id_mapping {
+@@ -824,6 +825,21 @@ struct acpi_iort_smmu_v3 {
+ #define ACPI_IORT_SMMU_V3_HTTU_OVERRIDE     (1<<1)
+ #define ACPI_IORT_SMMU_V3_PXM_VALID         (1<<3)
+ 
++struct acpi_iort_pviommu {
++	u64 base_address;
++	u64 span;
++	u32 model;
++	u32 flags;
++	u32 interrupt_count;
++	u64 interrupts[];
++};
 +
-+#define VIRTIO_IOMMU_FAULT_F_READ		(1 << 0)
-+#define VIRTIO_IOMMU_FAULT_F_WRITE		(1 << 1)
-+#define VIRTIO_IOMMU_FAULT_F_EXEC		(1 << 2)
-+#define VIRTIO_IOMMU_FAULT_F_ADDRESS		(1 << 8)
++enum acpi_iort_paravirt_node_model {
++	ACPI_IORT_NODE_PV_VIRTIO_IOMMU = 0x00,
++};
 +
-+struct virtio_iommu_fault {
-+	__u8					reason;
-+	__u8					padding[3];
-+	__le32					flags;
-+	__le32					endpoint;
-+	__le64					address;
-+} __packed;
++#define ACPI_IORT_NODE_PV_CACHE_COHERENT    (1<<0)
 +
- #endif
+ /*******************************************************************************
+  *
+  * IVRS - I/O Virtualization Reporting Structure
 -- 
 2.14.3
