@@ -1,52 +1,72 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH 7/7] arm: KVM: Fix VTTBR_BADDR_MASK BUG_ON off-by-one
-Date: Mon, 20 Nov 2017 14:29:07 +0100
-Message-ID: <20171120132907.GI28855@cbox>
+Subject: Re: [PATCH 1/7] KVM: arm/arm64: vgic-irqfd: Fix MSI entry allocation
+Date: Mon, 20 Nov 2017 15:49:57 +0100
+Message-ID: <20171120144957.GJ28855@cbox>
 References: <20171116175821.26544-1-marc.zyngier@arm.com>
- <20171116175821.26544-8-marc.zyngier@arm.com>
+ <20171116175821.26544-2-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4365C40FB0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Nov 2017 09:47:20 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 8h5BpyTsOb7B for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 20 Nov 2017 09:47:19 -0500 (EST)
+Received: from mail-wr0-f194.google.com (mail-wr0-f194.google.com
+ [209.85.128.194])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1080840D25
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Nov 2017 09:47:19 -0500 (EST)
+Received: by mail-wr0-f194.google.com with SMTP id a63so8285772wrc.12
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Nov 2017 06:49:49 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <20171116175821.26544-8-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
+In-Reply-To: <20171116175821.26544-2-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: AKASHI Takahiro <takahiro.akashi@linaro.org>, Kristina Martsenko <kristina.martsenko@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Kristina Martsenko <kristina.martsenko@arm.com>, AKASHI Takahiro <takahiro.akashi@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Nov 16, 2017 at 05:58:21PM +0000, Marc Zyngier wrote:
-> VTTBR_BADDR_MASK is used to sanity check the size and alignment of the
-> VTTBR address. It seems to currently be off by one, thereby only
-> allowing up to 39-bit addresses (instead of 40-bit) and also
-> insufficiently checking the alignment. This patch fixes it.
-> 
-> This patch is the 32bit pendent of Kristina's arm64 fix, and
-> she deserves the actual kudos for pinpointing that one.
-> 
-> Fixes: f7ed45be3ba52 ("KVM: ARM: World-switch implementation")
-> Cc: <stable@vger.kernel.org> # 3.9
-> Reported-by: Kristina Martsenko <kristina.martsenko@arm.com>
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+On Thu, Nov 16, 2017 at 05:58:15PM +0000, Marc Zyngier wrote:
+> Using the size of the structure we're allocating is a good idea
+> and avoids any surprise... In this case, we're happilly confusing
+> kvm_kernel_irq_routing_entry and kvm_irq_routing_entry...
+
+Yikes.
 
 Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 
+> 
+> Fixes: 95b110ab9a09 ("KVM: arm/arm64: Enable irqchip routing")
+> Cc: stable@vger.kernel.org # 4.8
+> Reported-by: AKASHI Takahiro <takahiro.akashi@linaro.org>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
->  arch/arm/include/asm/kvm_arm.h | 3 +--
+>  virt/kvm/arm/vgic/vgic-irqfd.c | 3 +--
 >  1 file changed, 1 insertion(+), 2 deletions(-)
 > 
-> diff --git a/arch/arm/include/asm/kvm_arm.h b/arch/arm/include/asm/kvm_arm.h
-> index c8781450905b..3ab8b3781bfe 100644
-> --- a/arch/arm/include/asm/kvm_arm.h
-> +++ b/arch/arm/include/asm/kvm_arm.h
-> @@ -161,8 +161,7 @@
->  #else
->  #define VTTBR_X		(5 - KVM_T0SZ)
->  #endif
-> -#define VTTBR_BADDR_SHIFT (VTTBR_X - 1)
-> -#define VTTBR_BADDR_MASK  (((_AC(1, ULL) << (40 - VTTBR_X)) - 1) << VTTBR_BADDR_SHIFT)
-> +#define VTTBR_BADDR_MASK  (((_AC(1, ULL) << (40 - VTTBR_X)) - 1) << VTTBR_X)
->  #define VTTBR_VMID_SHIFT  _AC(48, ULL)
->  #define VTTBR_VMID_MASK(size)	(_AT(u64, (1 << size) - 1) << VTTBR_VMID_SHIFT)
+> diff --git a/virt/kvm/arm/vgic/vgic-irqfd.c b/virt/kvm/arm/vgic/vgic-irqfd.c
+> index b7baf581611a..99e026d2dade 100644
+> --- a/virt/kvm/arm/vgic/vgic-irqfd.c
+> +++ b/virt/kvm/arm/vgic/vgic-irqfd.c
+> @@ -112,8 +112,7 @@ int kvm_vgic_setup_default_irq_routing(struct kvm *kvm)
+>  	u32 nr = dist->nr_spis;
+>  	int i, ret;
+>  
+> -	entries = kcalloc(nr, sizeof(struct kvm_kernel_irq_routing_entry),
+> -			  GFP_KERNEL);
+> +	entries = kcalloc(nr, sizeof(*entries), GFP_KERNEL);
+>  	if (!entries)
+>  		return -ENOMEM;
 >  
 > -- 
 > 2.14.2
