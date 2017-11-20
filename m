@@ -1,61 +1,62 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v5 04/20] KVM: arm/arm64: Guard kvm_vgic_map_is_active
- against !vgic_initialized
-Date: Mon, 20 Nov 2017 12:20:58 +0100
-Message-ID: <20171120112058.GF28855@cbox>
-References: <1509093281-15225-1-git-send-email-cdall@linaro.org>
- <1509093281-15225-5-git-send-email-cdall@linaro.org>
- <475960cf-8b85-3a9f-d166-455e8bc5a43c@arm.com>
+Subject: Re: [PATCH] KVM: arm/arm64: VGIC: extend !vgic_is_initialized guard
+Date: Mon, 20 Nov 2017 12:23:06 +0100
+Message-ID: <20171120112306.GG28855@cbox>
+References: <20171117175821.23250-1-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <475960cf-8b85-3a9f-d166-455e8bc5a43c@arm.com>
+In-Reply-To: <20171117175821.23250-1-andre.przywara@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Andre Przywara <andre.przywara@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Nov 16, 2017 at 12:29:48PM +0000, Andre Przywara wrote:
-> Hi,
-> 
-> On 27/10/17 09:34, Christoffer Dall wrote:
-> > If the vgic is not initialized, don't try to grab its spinlocks or
-> > traverse its data structures.
-> > 
-> > This is important because we soon have to start considering the active
-> > state of a virtual interrupts when doing vcpu_load, which may happen
-> > early on before the vgic is initialized.
-> 
-> I understand this patch is on its way to Linus already, but I just found
-> this by browsing for VGIC changes...
-> 
-> > Signed-off-by: Christoffer Dall <cdall@linaro.org>
-> > Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-> > ---
-> >  virt/kvm/arm/vgic/vgic.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> > 
-> > diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> > index fed717e..e1f7dbc 100644
-> > --- a/virt/kvm/arm/vgic/vgic.c
-> > +++ b/virt/kvm/arm/vgic/vgic.c
-> > @@ -777,6 +777,9 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq)
-> >  	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
-> 
-> Isn't vgic_get_irq() already accessing VGIC data structures? In which
-> case this assignment should be moved after the vgic_initialized() check
-> below?
+Hi Andre,
 
-Theoretically, yes, but we're saved by two things:
+On Fri, Nov 17, 2017 at 05:58:21PM +0000, Andre Przywara wrote:
+> Commit f39d16cbabf9 ("KVM: arm/arm64: Guard kvm_vgic_map_is_active against
+> !vgic_initialized") introduced a check whether the VGIC has been
+> initialized before accessing the spinlock and the VGIC data structure.
+> However the vgic_get_irq() call in the variable declaration sneaked
+> through the net, so lets make sure that this also gets called only after
+> we actually allocated the arrays this function accesses.
+> 
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  virt/kvm/arm/vgic/vgic.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> index e54ef2fdf73d..967983a33ab2 100644
+> --- a/virt/kvm/arm/vgic/vgic.c
+> +++ b/virt/kvm/arm/vgic/vgic.c
+> @@ -786,13 +786,14 @@ void vgic_kick_vcpus(struct kvm *kvm)
+>  
+>  bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq)
+>  {
+> -	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
+> +	struct vgic_irq *irq;
+>  	bool map_is_active;
+>  	unsigned long flags;
+>  
+>  	if (!vgic_initialized(vcpu->kvm))
+>  		return false;
+>  
+> +	irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
+>  	spin_lock_irqsave(&irq->irq_lock, flags);
+>  	map_is_active = irq->hw && irq->active;
+>  	spin_unlock_irqrestore(&irq->irq_lock, flags);
+> -- 
+> 2.14.1
+> 
+As explained in the other e-mail this isn't actually strictly necessary
+anymore, but I think our current appraoch of "how do we handle calls
+from generic code the VGIC when the VGIC potentially hasn't been
+initialized yet?" is to have an initialized check on most entry points
+to the VGIC, unless strictly performance sensitive.
 
-First, this is only ever called on PPIs from the timer code, which are
-always statically allocated as part of the VCPU.
+Therefore:
 
-Second, this isn't actually needed anymore after the irqchip in
-userspace support, which partially reworked the timer init sequence
-(done after the first version of these patches), so this patch could
-actually have been entirely dropped, or reworked as you suggest.
-
-Thanks,
--Christoffer
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
