@@ -1,132 +1,61 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH] KVM: arm/arm64: Don't enable/disable physical timer access on VHE
-Date: Mon, 20 Nov 2017 12:16:37 +0100
-Message-ID: <20171120111637.26215-1-christoffer.dall@linaro.org>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH v5 04/20] KVM: arm/arm64: Guard kvm_vgic_map_is_active
+ against !vgic_initialized
+Date: Mon, 20 Nov 2017 12:20:58 +0100
+Message-ID: <20171120112058.GF28855@cbox>
+References: <1509093281-15225-1-git-send-email-cdall@linaro.org>
+ <1509093281-15225-5-git-send-email-cdall@linaro.org>
+ <475960cf-8b85-3a9f-d166-455e8bc5a43c@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <475960cf-8b85-3a9f-d166-455e8bc5a43c@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Jintack Lim <jintack@cs.columbia.edu>, Christoffer Dall <christoffer.dall@linaro.org>
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-After the timer optimization rework we accidentally end up calling
-physical timer enable/disable functions on VHE systems, which is neither
-needed nor correct, since the CNTHCTL_EL2 register format is
-different when HCR_EL2.E2H is set.
+On Thu, Nov 16, 2017 at 12:29:48PM +0000, Andre Przywara wrote:
+> Hi,
+> 
+> On 27/10/17 09:34, Christoffer Dall wrote:
+> > If the vgic is not initialized, don't try to grab its spinlocks or
+> > traverse its data structures.
+> > 
+> > This is important because we soon have to start considering the active
+> > state of a virtual interrupts when doing vcpu_load, which may happen
+> > early on before the vgic is initialized.
+> 
+> I understand this patch is on its way to Linus already, but I just found
+> this by browsing for VGIC changes...
+> 
+> > Signed-off-by: Christoffer Dall <cdall@linaro.org>
+> > Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+> > ---
+> >  virt/kvm/arm/vgic/vgic.c | 3 +++
+> >  1 file changed, 3 insertions(+)
+> > 
+> > diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> > index fed717e..e1f7dbc 100644
+> > --- a/virt/kvm/arm/vgic/vgic.c
+> > +++ b/virt/kvm/arm/vgic/vgic.c
+> > @@ -777,6 +777,9 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq)
+> >  	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
+> 
+> Isn't vgic_get_irq() already accessing VGIC data structures? In which
+> case this assignment should be moved after the vgic_initialized() check
+> below?
 
-The CNTHCTL_EL2 is initialized when CPUs become online in
-kvm_timer_init_vhe() and we don't have to call these functions on VHE
-systems, which also allows us to inline the non-VHE functionality.
+Theoretically, yes, but we're saved by two things:
 
-Reported-by: Jintack Lim <jintack@cs.columbia.edu>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
- include/kvm/arm_arch_timer.h |  3 ---
- virt/kvm/arm/arch_timer.c    |  6 ------
- virt/kvm/arm/hyp/timer-sr.c  | 48 ++++++++++++++++++--------------------------
- 3 files changed, 20 insertions(+), 37 deletions(-)
+First, this is only ever called on PPIs from the timer code, which are
+always statically allocated as part of the VCPU.
 
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index 01ee473517e2..6e45608b2399 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -93,7 +93,4 @@ void kvm_timer_init_vhe(void);
- #define vcpu_vtimer(v)	(&(v)->arch.timer_cpu.vtimer)
- #define vcpu_ptimer(v)	(&(v)->arch.timer_cpu.ptimer)
- 
--void enable_el1_phys_timer_access(void);
--void disable_el1_phys_timer_access(void);
--
- #endif
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 4151250ce8da..190c99ed1b73 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -479,9 +479,6 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
- 
- 	vtimer_restore_state(vcpu);
- 
--	if (has_vhe())
--		disable_el1_phys_timer_access();
--
- 	/* Set the background timer for the physical timer emulation. */
- 	phys_timer_emulate(vcpu);
- }
-@@ -510,9 +507,6 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
- 	if (unlikely(!timer->enabled))
- 		return;
- 
--	if (has_vhe())
--		enable_el1_phys_timer_access();
--
- 	vtimer_save_state(vcpu);
- 
- 	/*
-diff --git a/virt/kvm/arm/hyp/timer-sr.c b/virt/kvm/arm/hyp/timer-sr.c
-index f39861639f08..f24404b3c8df 100644
---- a/virt/kvm/arm/hyp/timer-sr.c
-+++ b/virt/kvm/arm/hyp/timer-sr.c
-@@ -27,42 +27,34 @@ void __hyp_text __kvm_timer_set_cntvoff(u32 cntvoff_low, u32 cntvoff_high)
- 	write_sysreg(cntvoff, cntvoff_el2);
- }
- 
--void __hyp_text enable_el1_phys_timer_access(void)
--{
--	u64 val;
--
--	/* Allow physical timer/counter access for the host */
--	val = read_sysreg(cnthctl_el2);
--	val |= CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN;
--	write_sysreg(val, cnthctl_el2);
--}
--
--void __hyp_text disable_el1_phys_timer_access(void)
--{
--	u64 val;
--
--	/*
--	 * Disallow physical timer access for the guest
--	 * Physical counter access is allowed
--	 */
--	val = read_sysreg(cnthctl_el2);
--	val &= ~CNTHCTL_EL1PCEN;
--	val |= CNTHCTL_EL1PCTEN;
--	write_sysreg(val, cnthctl_el2);
--}
--
- void __hyp_text __timer_disable_traps(struct kvm_vcpu *vcpu)
- {
- 	/*
- 	 * We don't need to do this for VHE since the host kernel runs in EL2
- 	 * with HCR_EL2.TGE ==1, which makes those bits have no impact.
- 	 */
--	if (!has_vhe())
--		enable_el1_phys_timer_access();
-+	if (!has_vhe()) {
-+		u64 val;
-+
-+		/* Allow physical timer/counter access for the host */
-+		val = read_sysreg(cnthctl_el2);
-+		val |= CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN;
-+		write_sysreg(val, cnthctl_el2);
-+	}
- }
- 
- void __hyp_text __timer_enable_traps(struct kvm_vcpu *vcpu)
- {
--	if (!has_vhe())
--		disable_el1_phys_timer_access();
-+	if (!has_vhe()) {
-+		u64 val;
-+
-+		/*
-+		 * Disallow physical timer access for the guest
-+		 * Physical counter access is allowed
-+		 */
-+		val = read_sysreg(cnthctl_el2);
-+		val &= ~CNTHCTL_EL1PCEN;
-+		val |= CNTHCTL_EL1PCTEN;
-+		write_sysreg(val, cnthctl_el2);
-+	}
- }
--- 
-2.14.2
+Second, this isn't actually needed anymore after the irqchip in
+userspace support, which partially reworked the timer init sequence
+(done after the first version of these patches), so this patch could
+actually have been entirely dropped, or reworked as you suggest.
+
+Thanks,
+-Christoffer
