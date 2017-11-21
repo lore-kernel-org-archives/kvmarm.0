@@ -1,78 +1,90 @@
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 Subject: Re: [PATCH v3 0/3] KVM: arm64: single step emulation instructions
-Date: Tue, 21 Nov 2017 12:12:58 +0000
-Message-ID: <874lpnygmt.fsf@linaro.org>
-References: <20171116153921.21991-1-alex.bennee@linaro.org> <20171120154131.GO28855@cbox>
+Date: Tue, 21 Nov 2017 12:43:12 +0000
+Message-ID: <873757yf8f.fsf@linaro.org>
+References: <20171116153921.21991-1-alex.bennee@linaro.org>
+ <20171120154131.GO28855@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C1DE406BB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Nov 2017 07:40:43 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 8IsOxVGZy2Ll for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Nov 2017 07:40:42 -0500 (EST)
+Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 216ED40651
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Nov 2017 07:40:42 -0500 (EST)
+Received: by mail-wm0-f68.google.com with SMTP id l188so1298687wma.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Nov 2017 04:43:14 -0800 (PST)
 In-reply-to: <20171120154131.GO28855@cbox>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <cdall@linaro.org>
-Cc: julien.thierry@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
+Cc: kvm@vger.kernel.org, julien.thierry@arm.com, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-Christoffer Dall <cdall@linaro.org> writes:
-
-> Hi Alex,
->
-> On Thu, Nov 16, 2017 at 03:39:18PM +0000, Alex Benn=C3=A9e wrote:
->> Hi,
->>
->> This is rev 3 of the series, practically the same than rev 2 but fixed
->> a return 1->0 in the kvm_run loop that Julien caught. I've added his
->> r-b tags to the other patches.
->>
->> As usual revision details bellow the --- in each patch.
->
-> Thanks for taking care of this.
->
-> I have applied the series and slightly tweaked the commit messages and
-> commentary.
->
-> Did we simply decide to not worry about exiting to userspace if we do
-> fast-path emulation, such as for the errata workaround and GIC
-> mashaling in switch.c ?
-
-Hmm I'd forgotten about that - I figured it was all in handle_exit or
-passed to userspace. So I guess in-hyp emulation is a 3rd class of
-instruction emulation?
-
-Which particular interface cases are we covering here?
-
-I suspect if these are regions that are only accessed once the system is
-up and running we are going to run into problems due to single stepping
-while IRQs are enabled. But conceptually we just need to do the same
-flag check after __skip_instr has done before deciding to fall out the
-loop or goto again;
-
-We would have to fake up HSR so handle_exit did the right thing on the
-way out though. That seems a little icky....
-
->
-> Thanks,
-> -Christoffer
->
->>
->> Alex Benn=C3=A9e (3):
->>   kvm: arm debug: introduce helper for single-step
->>   kvm: arm64: handle single-stepping trapped instructions
->>   kvm: arm64: handle single-step of userspace mmio instructions
->>
->>  arch/arm/include/asm/kvm_host.h   |  5 +++++
->>  arch/arm64/include/asm/kvm_host.h |  1 +
->>  arch/arm64/kvm/debug.c            | 22 ++++++++++++++++++
->>  arch/arm64/kvm/handle_exit.c      | 47 +++++++++++++++++++++++++++-----=
--------
->>  virt/kvm/arm/arm.c                |  3 +++
->>  5 files changed, 64 insertions(+), 14 deletions(-)
->>
->> --
->> 2.15.0
->>
-
-
---
-Alex Benn=C3=A9e
+CkNocmlzdG9mZmVyIERhbGwgPGNkYWxsQGxpbmFyby5vcmc+IHdyaXRlczoKCj4gSGkgQWxleCwK
+Pgo+IE9uIFRodSwgTm92IDE2LCAyMDE3IGF0IDAzOjM5OjE4UE0gKzAwMDAsIEFsZXggQmVubsOp
+ZSB3cm90ZToKPj4gSGksCj4+Cj4+IFRoaXMgaXMgcmV2IDMgb2YgdGhlIHNlcmllcywgcHJhY3Rp
+Y2FsbHkgdGhlIHNhbWUgdGhhbiByZXYgMiBidXQgZml4ZWQKPj4gYSByZXR1cm4gMS0+MCBpbiB0
+aGUga3ZtX3J1biBsb29wIHRoYXQgSnVsaWVuIGNhdWdodC4gSSd2ZSBhZGRlZCBoaXMKPj4gci1i
+IHRhZ3MgdG8gdGhlIG90aGVyIHBhdGNoZXMuCj4+Cj4+IEFzIHVzdWFsIHJldmlzaW9uIGRldGFp
+bHMgYmVsbG93IHRoZSAtLS0gaW4gZWFjaCBwYXRjaC4KPgo+IFRoYW5rcyBmb3IgdGFraW5nIGNh
+cmUgb2YgdGhpcy4KPgo+IEkgaGF2ZSBhcHBsaWVkIHRoZSBzZXJpZXMgYW5kIHNsaWdodGx5IHR3
+ZWFrZWQgdGhlIGNvbW1pdCBtZXNzYWdlcyBhbmQKPiBjb21tZW50YXJ5Lgo+Cj4gRGlkIHdlIHNp
+bXBseSBkZWNpZGUgdG8gbm90IHdvcnJ5IGFib3V0IGV4aXRpbmcgdG8gdXNlcnNwYWNlIGlmIHdl
+IGRvCj4gZmFzdC1wYXRoIGVtdWxhdGlvbiwgc3VjaCBhcyBmb3IgdGhlIGVycmF0YSB3b3JrYXJv
+dW5kIGFuZCBHSUMKPiBtYXNoYWxpbmcgaW4gc3dpdGNoLmMgPwoKQ29tcGlsZSB0ZXN0ZWQgb25s
+eToKCi0tODwtLS0tLS0tLS0tLS0tLS1jdXQgaGVyZS0tLS0tLS0tLS0tLS0tLXN0YXJ0LS0tLS0t
+LS0tLS0tLT44LS0tCmt2bTogYXJtNjQ6IGhhbmRsZSBzaW5nbGUtc3RlcCBvZiBoeXAgZW11bGF0
+ZWQgbW1pbwoKVGhlcmUgaXMgYSBmYXN0LXBhdGggb2YgTU1JTyBlbXVsYXRpb24gaW5zaWRlIGh5
+cCBtb2RlLiBUaGUgaGFuZGxpbmcKb2Ygc2luZ2xlLXN0ZXAgaXMgYnJvYWRseSB0aGUgc2FtZSBh
+cyBrdm1fYXJtX2hhbmRsZV9zdGVwX2RlYnVnKCkKZXhjZXB0IHdlIGp1c3Qgc2V0dXAgRVNSL0hT
+UiBzbyBoYW5kbGVfZXhpdCgpIGRvZXMgdGhlIGNvcnJlY3QgdGhpbmcKYXMgd2UgZXhpdC4KClNp
+Z25lZC1vZmYtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KLS0tCiBh
+cmNoL2FybTY0L2t2bS9oeXAvc3dpdGNoLmMgfCAyNiArKysrKysrKysrKysrKysrKysrKystLS0t
+LQogMSBmaWxlIGNoYW5nZWQsIDIxIGluc2VydGlvbnMoKyksIDUgZGVsZXRpb25zKC0pCgpkaWZm
+IC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vaHlwL3N3aXRjaC5jIGIvYXJjaC9hcm02NC9rdm0vaHlw
+L3N3aXRjaC5jCmluZGV4IDk0NWU3OWM2NDFjNC4uODQxZGM3OWQxMWZkIDEwMDY0NAotLS0gYS9h
+cmNoL2FybTY0L2t2bS9oeXAvc3dpdGNoLmMKKysrIGIvYXJjaC9hcm02NC9rdm0vaHlwL3N3aXRj
+aC5jCkBAIC0yNjMsNyArMjYzLDExIEBAIHN0YXRpYyBib29sIF9faHlwX3RleHQgX19wb3B1bGF0
+ZV9mYXVsdF9pbmZvKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKIAlyZXR1cm4gdHJ1ZTsKIH0KCi1z
+dGF0aWMgdm9pZCBfX2h5cF90ZXh0IF9fc2tpcF9pbnN0cihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUp
+CisvKiBTa2lwIGFuIGluc3RydWN0aW9uIHdoaWNoIGhhcyBiZWVuIGVtdWxhdGVkLiBSZXR1cm5z
+IHRydWUgaWYKKyAqIGV4ZWN1dGlvbiBjYW4gY29udGludWUgb3IgZmFsc2UgaWYgd2UgbmVlZCB0
+byBleGl0IGh5cCBtb2RlIGJlY2F1c2UKKyAqIHNpbmdsZS1zdGVwIHdhcyBpbiBlZmZlY3QuCisg
+Ki8KK3N0YXRpYyBib29sIF9faHlwX3RleHQgX19za2lwX2luc3RyKHN0cnVjdCBrdm1fdmNwdSAq
+dmNwdSkKIHsKIAkqdmNwdV9wYyh2Y3B1KSA9IHJlYWRfc3lzcmVnX2VsMihlbHIpOwoKQEAgLTI3
+Niw2ICsyODAsMTQgQEAgc3RhdGljIHZvaWQgX19oeXBfdGV4dCBfX3NraXBfaW5zdHIoc3RydWN0
+IGt2bV92Y3B1ICp2Y3B1KQogCX0KCiAJd3JpdGVfc3lzcmVnX2VsMigqdmNwdV9wYyh2Y3B1KSwg
+ZWxyKTsKKworCWlmICh2Y3B1LT5ndWVzdF9kZWJ1ZyAmIEtWTV9HVUVTVERCR19TSU5HTEVTVEVQ
+KSB7CisJCXZjcHUtPmFyY2guZmF1bHQuZXNyX2VsMiA9CisJCQkoRVNSX0VMeF9FQ19TT0ZUU1RQ
+X0xPVyA8PCBFU1JfRUx4X0VDX1NISUZUKSB8IDB4MjI7CisJCXJldHVybiBmYWxzZTsKKwl9IGVs
+c2UgeworCQlyZXR1cm4gdHJ1ZTsKKwl9CiB9CgogaW50IF9faHlwX3RleHQgX19rdm1fdmNwdV9y
+dW4oc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQpAQCAtMzM2LDggKzM0OCwxMCBAQCBpbnQgX19oeXBf
+dGV4dCBfX2t2bV92Y3B1X3J1bihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCiAJCQlpbnQgcmV0ID0g
+X192Z2ljX3YyX3BlcmZvcm1fY3B1aWZfYWNjZXNzKHZjcHUpOwoKIAkJCWlmIChyZXQgPT0gMSkg
+ewotCQkJCV9fc2tpcF9pbnN0cih2Y3B1KTsKLQkJCQlnb3RvIGFnYWluOworCQkJCWlmIChfX3Nr
+aXBfaW5zdHIodmNwdSkpCisJCQkJCWdvdG8gYWdhaW47CisJCQkJZWxzZQorCQkJCQlleGl0X2Nv
+ZGUgPSBBUk1fRVhDRVBUSU9OX1RSQVA7CiAJCQl9CgogCQkJaWYgKHJldCA9PSAtMSkgewpAQCAt
+MzU3LDggKzM3MSwxMCBAQCBpbnQgX19oeXBfdGV4dCBfX2t2bV92Y3B1X3J1bihzdHJ1Y3Qga3Zt
+X3ZjcHUgKnZjcHUpCiAJCWludCByZXQgPSBfX3ZnaWNfdjNfcGVyZm9ybV9jcHVpZl9hY2Nlc3Mo
+dmNwdSk7CgogCQlpZiAocmV0ID09IDEpIHsKLQkJCV9fc2tpcF9pbnN0cih2Y3B1KTsKLQkJCWdv
+dG8gYWdhaW47CisJCQlpZiAoX19za2lwX2luc3RyKHZjcHUpKQorCQkJCWdvdG8gYWdhaW47CisJ
+CQllbHNlCisJCQkJZXhpdF9jb2RlID0gQVJNX0VYQ0VQVElPTl9UUkFQOwogCQl9CgogCQkvKiAw
+IGZhbGxzIHRocm91Z2ggdG8gYmUgaGFuZGxlZCBvdXQgb2YgRUwyICovCi0tODwtLS0tLS0tLS0t
+LS0tLS1jdXQgaGVyZS0tLS0tLS0tLS0tLS0tLWVuZC0tLS0tLS0tLS0tLS0tLT44LS0tCl9fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5n
+IGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVt
+YmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
