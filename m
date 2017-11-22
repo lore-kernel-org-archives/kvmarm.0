@@ -1,119 +1,122 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: [RFC] KVM API extensions for SVE
-Date: Tue, 21 Nov 2017 13:49:16 +0000
-Message-ID: <20171121134913.GI22781@e103592.cambridge.arm.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH v3 0/3] KVM: arm64: single step emulation instructions
+Date: Wed, 22 Nov 2017 12:46:29 +0100
+Message-ID: <20171122114629.GP28855@cbox>
+References: <20171116153921.21991-1-alex.bennee@linaro.org>
+ <20171120154131.GO28855@cbox>
+ <873757yf8f.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 70EDD40D25
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Nov 2017 08:46:49 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TV7gNtfYeJW0 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Nov 2017 08:46:48 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 133EC40651
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Nov 2017 08:46:48 -0500 (EST)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
-Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <873757yf8f.fsf@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: julien.thierry@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi all,
+On Tue, Nov 21, 2017 at 12:43:12PM +0000, Alex Bennée wrote:
+> 
+> Christoffer Dall <cdall@linaro.org> writes:
+> 
+> > Hi Alex,
+> >
+> > On Thu, Nov 16, 2017 at 03:39:18PM +0000, Alex Bennée wrote:
+> >> Hi,
+> >>
+> >> This is rev 3 of the series, practically the same than rev 2 but fixed
+> >> a return 1->0 in the kvm_run loop that Julien caught. I've added his
+> >> r-b tags to the other patches.
+> >>
+> >> As usual revision details bellow the --- in each patch.
+> >
+> > Thanks for taking care of this.
+> >
+> > I have applied the series and slightly tweaked the commit messages and
+> > commentary.
+> >
+> > Did we simply decide to not worry about exiting to userspace if we do
+> > fast-path emulation, such as for the errata workaround and GIC
+> > mashaling in switch.c ?
+> 
+> Compile tested only:
+> 
+> --8<---------------cut here---------------start------------->8---
+> kvm: arm64: handle single-step of hyp emulated mmio
+> 
+> There is a fast-path of MMIO emulation inside hyp mode. The handling
+> of single-step is broadly the same as kvm_arm_handle_step_debug()
+> except we just setup ESR/HSR so handle_exit() does the correct thing
+> as we exit.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  arch/arm64/kvm/hyp/switch.c | 26 +++++++++++++++++++++-----
+>  1 file changed, 21 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index 945e79c641c4..841dc79d11fd 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -263,7 +263,11 @@ static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
+>  	return true;
+>  }
+> 
+> -static void __hyp_text __skip_instr(struct kvm_vcpu *vcpu)
+> +/* Skip an instruction which has been emulated. Returns true if
+> + * execution can continue or false if we need to exit hyp mode because
+> + * single-step was in effect.
+> + */
+> +static bool __hyp_text __skip_instr(struct kvm_vcpu *vcpu)
+>  {
+>  	*vcpu_pc(vcpu) = read_sysreg_el2(elr);
+> 
+> @@ -276,6 +280,14 @@ static void __hyp_text __skip_instr(struct kvm_vcpu *vcpu)
+>  	}
+> 
+>  	write_sysreg_el2(*vcpu_pc(vcpu), elr);
+> +
+> +	if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
+> +		vcpu->arch.fault.esr_el2 =
+> +			(ESR_ELx_EC_SOFTSTP_LOW << ESR_ELx_EC_SHIFT) | 0x22;
+> +		return false;
+> +	} else {
+> +		return true;
+> +	}
+>  }
+> 
+>  int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+> @@ -336,8 +348,10 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  			int ret = __vgic_v2_perform_cpuif_access(vcpu);
+> 
+>  			if (ret == 1) {
+> -				__skip_instr(vcpu);
+> -				goto again;
+> +				if (__skip_instr(vcpu))
+> +					goto again;
+> +				else
+> +					exit_code = ARM_EXCEPTION_TRAP;
+>  			}
+> 
+>  			if (ret == -1) {
+> @@ -357,8 +371,10 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  		int ret = __vgic_v3_perform_cpuif_access(vcpu);
+> 
+>  		if (ret == 1) {
+> -			__skip_instr(vcpu);
+> -			goto again;
+> +			if (__skip_instr(vcpu))
+> +				goto again;
+> +			else
+> +				exit_code = ARM_EXCEPTION_TRAP;
+>  		}
+> 
+>  		/* 0 falls through to be handled out of EL2 */
+> --8<---------------cut here---------------end--------------->8---
 
-SVE adds some new registers, and their size depends on the hardware ando
-on runtime sysreg settings.
+Assuming you fix Marc's comment this looks reasonable to me.  Please
+send as a separate patch.
 
-Before coding something, I'd like to get people's views on my current
-approach here.
-
---8<--
-
-New vcpu feature flag:
-/*
- * userspace can support regs up to at least 2048 bits in size via ioctl,
- * and will honour the size field in the reg iD
- */
-#define KVM_ARM_VCPU_LARGE_REGS	4
-
-Should we just error out of userspace fails to set this on a system that
-supports SVE, or is that too brutal?  If we do treat that as an error,
-then we can unconditionally enable SVE for the guest when the host
-supports it -- which cuts down on unnecessary implementation complexity.
-
-Alternatively, we would need logic to disable SVE if userspace is too
-old, i.e., doesn't set this flag.  Then we might need to enforce that
-the flag is set the same on every vcpu -- but from the kernel's PoV
-it probably doesn't matter.
-
-
-/*
- * For the SVE regs, we add some new reg IDs.
- * Zn are presented in 2048-bit slices; Pn, FFR are presented in 256-bit
- * slices.  This is sufficient for only a single slice to be required
- * per register for SVE, but ensures expansion room in case future arch
- * versions grow the maximum size.
- */
-#define KVM_REG_SIZE_U2048 (ULL(8) << KVM_REG_SIZE_MASK)
-#define KVM_REG_ARM64_SVE_Z(n, i) /* Zn[2048 * (i + 1) - 1 : 2048 * i] */ \
-	((0x0014 << KVM_REG_ARM_COPROC_SHIFT) | KVM_REG_SIZE_U2048 |	\
-		((n) << 5) | (i))
-#define KVM_REG_ARM64_SVE_P(n, i) /* Pn[256 * (i + 1) - 1 : 256 * i] */	\
-	((0x0014 << KVM_REG_ARM_COPROC_SHIFT) | KVM_REG_SIZE_U256 |	\
-		(((n) + 32) << 5) | (i))
-#define KVM_REG_ARM64_SVE_FFR(i) /* FFR[256 * (i + 1) - 1 : 256 * i] */	\
-	 KVM_REG_ARM64_SVE_P(16, i)
-
-For j in [0,3], KVM_REG_ARM64_SVE_Z(n, 0) bits [32(j + 1) - 1 : 32 * j]
-	alias KVM_REG_ARM_CORE_REG(fp_regs.vregs[n]) + j
-
-
-Bits above the max vector length could be
- * don't care (or not copied at all) on read; ignored on write
- * zero on read; ignored on write
- * zero on read; must be zero on write
-
-Bits between the current and max vector length are trickier to specify:
-the "current" vector length for ioctl access is ill-defined, because
-we would need to specify ordering dependencies between Zn/Pn/FFR access
-and access to ZCR_EL1.
-
-So, it may be simpler to expose the full maximum supported vector size
-unconditionally through ioctl, and pack/unpack as necessary.
-
-Currently, data is packed in the vcpu struct in a vector length
-dependent format, since this seems optimal for low-level save/restore,
-so there will be potential data loss / zero padding when converting.
-
-This may cause some unexpected effects.  For example:
-
-KVM_SET_ONE_REG(ZCR_EL1, 0) 
-/* Guest's current vector length will be 128 bits when started */
-
-KVM_SET_ONE_REG(Z0, (uint256_t)1 << 128)
-KVM_GET_ONE_REG(Z0) /* yields (uint256_t)1 << 128 */
-
-KVM_RUN /* reg data packed down to 128-bit in vcpu struct */
-
-KVM_GET_ONE_REG(Z0) /* yields 0 even if guest doesn't use SVE */
-
-
-Since the guest should be treated mostly as a black box, I'm not sure
-how big a deal this is.  The guest _might_ have explicitly set those
-bits to 0... who are we to say?
-
-Can anyone think of a scenario where effects like this would matter?
-
-Cheers
----Dave
+Thanks,
+-Christoffer
