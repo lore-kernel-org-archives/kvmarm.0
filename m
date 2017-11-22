@@ -1,29 +1,26 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [RFC PATCH 3/4] arm64/sve: KVM: Ensure user SVE use traps after
- vcpu execution
-Date: Wed, 22 Nov 2017 20:23:44 +0100
-Message-ID: <20171122192344.GS28855@cbox>
-References: <1510936735-6762-1-git-send-email-Dave.Martin@arm.com>
- <1510936735-6762-4-git-send-email-Dave.Martin@arm.com>
+Subject: Re: [RFC] KVM API extensions for SVE
+Date: Wed, 22 Nov 2017 20:52:30 +0100
+Message-ID: <20171122195230.GT28855@cbox>
+References: <20171121134913.GI22781@e103592.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 600E9406BB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Nov 2017 14:20:59 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1644240EA6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Nov 2017 14:49:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id y7rDEKNrYFL5 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Nov 2017 14:20:58 -0500 (EST)
-Received: from mail-wr0-f194.google.com (mail-wr0-f194.google.com
- [209.85.128.194])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6F2D149D7F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Nov 2017 14:20:58 -0500 (EST)
-Received: by mail-wr0-f194.google.com with SMTP id w95so15573530wrc.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Nov 2017 11:23:34 -0800 (PST)
+ with ESMTP id tBBiIfDjhFgf for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Nov 2017 14:49:44 -0500 (EST)
+Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AE69540D8B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Nov 2017 14:49:44 -0500 (EST)
+Received: by mail-wm0-f44.google.com with SMTP id b189so12648314wmd.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Nov 2017 11:52:20 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <1510936735-6762-4-git-send-email-Dave.Martin@arm.com>
+In-Reply-To: <20171121134913.GI22781@e103592.cambridge.arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -37,78 +34,164 @@ To: Dave Martin <Dave.Martin@arm.com>
 Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Nov 17, 2017 at 04:38:54PM +0000, Dave Martin wrote:
-> Currently, SVE use can remain untrapped if a KVM vcpu thread is
-> preempted inside the kernel and we then switch back to some user
-> thread.
+Hi Dave,
+
+On Tue, Nov 21, 2017 at 01:49:16PM +0000, Dave Martin wrote:
+> Hi all,
 > 
-> This patch ensures that SVE traps for userspace are enabled before
-> switching away from the vcpu thread.
+> SVE adds some new registers, and their size depends on the hardware ando
+> on runtime sysreg settings.
+> 
+> Before coding something, I'd like to get people's views on my current
+> approach here.
+> 
+> --8<--
+> 
+> New vcpu feature flag:
+> /*
+>  * userspace can support regs up to at least 2048 bits in size via ioctl,
+>  * and will honour the size field in the reg iD
+>  */
+> #define KVM_ARM_VCPU_LARGE_REGS	4
+> 
+> Should we just error out of userspace fails to set this on a system that
+> supports SVE, or is that too brutal?  
 
-I don't really understand why KVM is any different then any other thread
-which could be using SVE that gets preempted?
+That would break older userspace on newer kernels on certain hardware,
+which would certainly not be acceptable.  Or did I misunderstand?
+
+> If we do treat that as an error,
+> then we can unconditionally enable SVE for the guest when the host
+> supports it -- which cuts down on unnecessary implementation complexity.
+
+I think it makes sense to be able to disable SVE, especially if there's
+high overhead related to context switching the state.  Since you say the
+implementation complexity is unnecessary, I may be missing some larger
+point?
 
 > 
-> In an attempt to preserve some clarity about why and when this is
-> needed, kvm_fpsimd_flush_cpu_state() is used as a hook for doing
-> this.  This means that this function needs to be called after
-> exiting the vcpu instead of before entry: 
+> Alternatively, we would need logic to disable SVE if userspace is too
+> old, i.e., doesn't set this flag.  Then we might need to enforce that
+> the flag is set the same on every vcpu -- but from the kernel's PoV
+> it probably doesn't matter.
 
-I don't understand why the former means the latter?
+Not sure I understand why it doesn't matter from the kernel's PoV.
 
-> this patch moves the call
-> as appropriate.  As a side-effect, this will avoid the call if vcpu
-> entry is shortcircuited by a signal etc.
+I think SVE should be disabled by default (as it is now) and then we
+should expose a capability (potentially simply via the vcpu attributes
+being present), and let userspace enable SVE and set a vector length.
+
+It makes sense that userspace needs to know about SVE for VMs to use it,
+doesn't it?
+
+I assume SVE systems will have SVE on all CPUs in an SMP system, or am I
+being way too optimistic about the ARM ecosystem here?  Just like we
+don't model big.LITTLE, I think we should enforce in the kernel, that
+userspace configures all VCPUs with the same SVE properties.
+
 > 
-> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> ---
->  arch/arm64/kernel/fpsimd.c | 2 ++
->  virt/kvm/arm/arm.c         | 6 +++---
->  2 files changed, 5 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-> index 3dc8058..3b135eb 100644
-> --- a/arch/arm64/kernel/fpsimd.c
-> +++ b/arch/arm64/kernel/fpsimd.c
-> @@ -1083,6 +1083,8 @@ void sve_flush_cpu_state(void)
->  
->  	if (last->st && last->sve_in_use)
->  		fpsimd_flush_cpu_state();
-> +
-> +	sve_user_disable();
->  }
->  #endif /* CONFIG_ARM64_SVE */
->  
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index 772bf74..554b157 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -651,9 +651,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  		 */
->  		preempt_disable();
->  
-> -		/* Flush FP/SIMD state that can't survive guest entry/exit */
-> -		kvm_fpsimd_flush_cpu_state();
-> -
->  		kvm_pmu_flush_hwstate(vcpu);
->  
->  		local_irq_disable();
-> @@ -754,6 +751,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  		guest_exit();
->  		trace_kvm_exit(ret, kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
->  
-> +		/* Flush FP/SIMD state that can't survive guest entry/exit */
-> +		kvm_fpsimd_flush_cpu_state();
-> +
+> /*
+>  * For the SVE regs, we add some new reg IDs.
+>  * Zn are presented in 2048-bit slices; Pn, FFR are presented in 256-bit
+>  * slices.  This is sufficient for only a single slice to be required
+>  * per register for SVE, but ensures expansion room in case future arch
+>  * versions grow the maximum size.
+>  */
 
-Could this be done in kvm_arch_vcpu_put() instead?
+I don't understand the last part of this comment?
 
->  		preempt_enable();
->  
->  		ret = handle_exit(vcpu, run, ret);
-> -- 
-> 2.1.4
+> #define KVM_REG_SIZE_U2048 (ULL(8) << KVM_REG_SIZE_MASK)
+
+Shift left by KVM_REG_SIZE_MASK?  I'm confused.
+
+> #define KVM_REG_ARM64_SVE_Z(n, i) /* Zn[2048 * (i + 1) - 1 : 2048 * i] */ \
+> 	((0x0014 << KVM_REG_ARM_COPROC_SHIFT) | KVM_REG_SIZE_U2048 |	\
+> 		((n) << 5) | (i))
+> #define KVM_REG_ARM64_SVE_P(n, i) /* Pn[256 * (i + 1) - 1 : 256 * i] */	\
+> 	((0x0014 << KVM_REG_ARM_COPROC_SHIFT) | KVM_REG_SIZE_U256 |	\
+> 		(((n) + 32) << 5) | (i))
+> #define KVM_REG_ARM64_SVE_FFR(i) /* FFR[256 * (i + 1) - 1 : 256 * i] */	\
+> 	 KVM_REG_ARM64_SVE_P(16, i)
 > 
+> For j in [0,3], KVM_REG_ARM64_SVE_Z(n, 0) bits [32(j + 1) - 1 : 32 * j]
+> 	alias KVM_REG_ARM_CORE_REG(fp_regs.vregs[n]) + j
+> 
+
+This is hard to read and understand the way presented here.  I would
+suggest you formulate this suggestion in the form of an RFC patch to
+Documentation/virtual/kvm/api.txt plus the header definitions.
+
+(I'm not sure where to look to look to decode the "<< 5" and the
+" + 32) << 5)" stuff above.
+
+> 
+> Bits above the max vector length could be
+
+Which bits are these and where are they, and why do we have them?
+
+Is the max vector length the max architecturally (current version)
+defined length, or what is chosen for this VM?
+
+>  * don't care (or not copied at all) on read; ignored on write
+>  * zero on read; ignored on write
+>  * zero on read; must be zero on write
+> 
+> Bits between the current and max vector length are trickier to specify:
+> the "current" vector length for ioctl access is ill-defined, because
+> we would need to specify ordering dependencies between Zn/Pn/FFR access
+> and access to ZCR_EL1.
+
+I think you want userspace to be able to read/write these values in any
+order compared to configuring SVE for the VM, and then fix up whatever
+needs masking etc. in the kernel later, if possible.  Ordering
+requirements to userspace accesses have shown to be hard to enforce and
+get right in the past.
+
+What happens on hardware if you give a certain vector length to EL0, EL0
+writes a value of the full length, and then EL1 restricts the length to
+something smaller, and subsequently expands it again?  Is the original
+full value visible or are some bits potentially lost?  IOW, can't we
+rely on what the architecture says here?
+
+> 
+> So, it may be simpler to expose the full maximum supported vector size
+> unconditionally through ioctl, and pack/unpack as necessary.
+
+yes, I think this was what I tried to say.
+
+> 
+> Currently, data is packed in the vcpu struct in a vector length
+> dependent format, since this seems optimal for low-level save/restore,
+> so there will be potential data loss / zero padding when converting.
+> 
+> This may cause some unexpected effects.  For example:
+> 
+> KVM_SET_ONE_REG(ZCR_EL1, 0) 
+> /* Guest's current vector length will be 128 bits when started */
+> 
+> KVM_SET_ONE_REG(Z0, (uint256_t)1 << 128)
+> KVM_GET_ONE_REG(Z0) /* yields (uint256_t)1 << 128 */
+> 
+> KVM_RUN /* reg data packed down to 128-bit in vcpu struct */
+> 
+> KVM_GET_ONE_REG(Z0) /* yields 0 even if guest doesn't use SVE */
+> 
+
+I really don't know how to parse this or what the point here is?  Sorry.
+
+> 
+> Since the guest should be treated mostly as a black box, I'm not sure
+> how big a deal this is.  The guest _might_ have explicitly set those
+> bits to 0... who are we to say?
+
+How big a deal what is?  I'm lost.
+
+> 
+> Can anyone think of a scenario where effects like this would matter?
+> 
+
+I think we need more information.
 
 Thanks,
 -Christoffer
