@@ -1,27 +1,27 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [RFC PATCH 2/4] arm64/sve: KVM: Avoid dereference of dead task
- during guest entry
-Date: Thu, 23 Nov 2017 14:16:46 +0000
-Message-ID: <20171123141643.GJ22781@e103592.cambridge.arm.com>
+Subject: Re: [RFC PATCH 3/4] arm64/sve: KVM: Ensure user SVE use traps after
+ vcpu execution
+Date: Thu, 23 Nov 2017 14:34:04 +0000
+Message-ID: <20171123143403.GK22781@e103592.cambridge.arm.com>
 References: <1510936735-6762-1-git-send-email-Dave.Martin@arm.com>
- <1510936735-6762-3-git-send-email-Dave.Martin@arm.com>
- <20171122192338.GR28855@cbox>
+ <1510936735-6762-4-git-send-email-Dave.Martin@arm.com>
+ <20171122192344.GS28855@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 364AC49D7F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Nov 2017 09:14:14 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B65D49D6A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Nov 2017 09:31:36 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id luRwBcOcaCNG for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Nov 2017 09:14:12 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A8BA549D6A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Nov 2017 09:14:12 -0500 (EST)
+ with ESMTP id zbRjWgD8-YXh for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 23 Nov 2017 09:31:30 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D9C5749D26
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Nov 2017 09:31:29 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <20171122192338.GR28855@cbox>
+In-Reply-To: <20171122192344.GS28855@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,148 +35,103 @@ To: Christoffer Dall <cdall@linaro.org>
 Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Nov 22, 2017 at 08:23:38PM +0100, Christoffer Dall wrote:
-> Hi Dave,
+On Wed, Nov 22, 2017 at 08:23:44PM +0100, Christoffer Dall wrote:
+> On Fri, Nov 17, 2017 at 04:38:54PM +0000, Dave Martin wrote:
+> > Currently, SVE use can remain untrapped if a KVM vcpu thread is
+> > preempted inside the kernel and we then switch back to some user
+> > thread.
+> > 
+> > This patch ensures that SVE traps for userspace are enabled before
+> > switching away from the vcpu thread.
 > 
-> On Fri, Nov 17, 2017 at 04:38:53PM +0000, Dave Martin wrote:
-> > When deciding whether to invalidate FPSIMD state cached in the cpu,
-> > the backend function sve_flush_cpu_state() attempts to dereference
-> > __this_cpu_read(fpsimd_last_state).  However, this is not safe:
-> > there is no guarantee that the pointer is still valid, because the
-> > task could have exited in the meantime.  For this reason, this
-> > percpu pointer should only be assigned or compared, never
-> > dereferenced.
-> > 
-> > This means that we need another means to get the appropriate value
-> > of TIF_SVE for the associated task.
-> > 
-> > This patch solves this issue by adding a cached copy of the TIF_SVE
-> > flag in fpsimd_last_state, which we can check without dereferencing
-> > the task pointer.
+> I don't really understand why KVM is any different then any other thread
+> which could be using SVE that gets preempted?
+
+The state of CPACR_EL1.ZEN is part of the per-task SVE state in the host,
+and needs to be context switched.  This is different from CPACR_EL1.FEN
+which is always 0b11 in the host.  KVM currently is unaware of the
+context handling on flow in the host though, and corrupts the ZEN field
+rather than saving/restoring it.
+
+We could truly save/restore ZEN, but this feels like a misstep: firstly
+this only applies to the VHE case so will be a bit ugly, and secondly
+I expect context handling cleanup that makes KVM aware of the host
+FPSIMD/SVE handling flow will make such save/restore unnecessary, in
+any case, the affected ZEN bit is already recorded as the TIF_SVE flag,
+so saving it is redundant.
+
+> > In an attempt to preserve some clarity about why and when this is
+> > needed, kvm_fpsimd_flush_cpu_state() is used as a hook for doing
+> > this.  This means that this function needs to be called after
+> > exiting the vcpu instead of before entry: 
+> 
+> I don't understand why the former means the latter?
+
+I preferred to keep sve_flush_cpu_state() as the "invalidate any SVE
+context cached in the CPU" notification, but if we handle CPACR here
+then we need to do this after running the vcpu -- because the hyp
+switch code will corrupt the trap state anyway in the VHE case, as a
+side effect of disabling traps on vcpu exit.
+
+Alternatively, the hyp trap disable code could be changed to actually
+_enable_ SVE traps in the VHE case, but I thought this was both
+confusing and tends to hide the real rationale.
+
+> 
+> > this patch moves the call
+> > as appropriate.  As a side-effect, this will avoid the call if vcpu
+> > entry is shortcircuited by a signal etc.
 > > 
 > > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 > > ---
-> >  arch/arm64/kernel/fpsimd.c | 28 ++++++++++++++++------------
-> >  1 file changed, 16 insertions(+), 12 deletions(-
+> >  arch/arm64/kernel/fpsimd.c | 2 ++
+> >  virt/kvm/arm/arm.c         | 6 +++---
+> >  2 files changed, 5 insertions(+), 3 deletions(-)
 > > 
 > > diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-> > index 007140b..3dc8058 100644
+> > index 3dc8058..3b135eb 100644
 > > --- a/arch/arm64/kernel/fpsimd.c
 > > +++ b/arch/arm64/kernel/fpsimd.c
-> > @@ -114,7 +114,12 @@
-> >   *   returned from the 2nd syscall yet, TIF_FOREIGN_FPSTATE is still set so
-> >   *   whatever is in the FPSIMD registers is not saved to memory, but discarded.
-> >   */
-> > -static DEFINE_PER_CPU(struct fpsimd_state *, fpsimd_last_state);
-> > +struct fpsimd_last_state_struct {
-> > +	struct fpsimd_state *st;
-> > +	bool sve_in_use;
-> > +};
-> > +
-> > +static DEFINE_PER_CPU(struct fpsimd_last_state_struct, fpsimd_last_state);
+> > @@ -1083,6 +1083,8 @@ void sve_flush_cpu_state(void)
 > >  
-> >  /* Default VL for tasks that don't set it explicitly: */
-> >  static int sve_default_vl = -1;
-> > @@ -905,7 +910,7 @@ void fpsimd_thread_switch(struct task_struct *next)
-> >  		 */
-> >  		struct fpsimd_state *st = &next->thread.fpsimd_state;
-> >  
-> > -		if (__this_cpu_read(fpsimd_last_state) == st
-> > +		if (__this_cpu_read(fpsimd_last_state.st) == st
-> >  		    && st->cpu == smp_processor_id())
-> >  			clear_tsk_thread_flag(next, TIF_FOREIGN_FPSTATE);
-> >  		else
-> > @@ -997,9 +1002,12 @@ void fpsimd_signal_preserve_current_state(void)
-> >   */
-> >  static void fpsimd_bind_to_cpu(void)
-> >  {
-> > +	struct fpsimd_last_state_struct *last =
-> > +		this_cpu_ptr(&fpsimd_last_state);
-> >  	struct fpsimd_state *st = &current->thread.fpsimd_state;
-> >  
-> > -	__this_cpu_write(fpsimd_last_state, st);
-> > +	last->st = st;
-> > +	last->sve_in_use = test_thread_flag(TIF_SVE);
-> >  	st->cpu = smp_processor_id();
-> >  }
-> >  
-> > @@ -1057,7 +1065,7 @@ void fpsimd_flush_task_state(struct task_struct *t)
-> >  
-> >  static inline void fpsimd_flush_cpu_state(void)
-> >  {
-> > -	__this_cpu_write(fpsimd_last_state, NULL);
-> > +	__this_cpu_write(fpsimd_last_state.st, NULL);
-> >  }
-> >  
-> >  /*
-> > @@ -1070,14 +1078,10 @@ static inline void fpsimd_flush_cpu_state(void)
-> >  #ifdef CONFIG_ARM64_SVE
-> >  void sve_flush_cpu_state(void)
-> >  {
-> > -	struct fpsimd_state *const fpstate = __this_cpu_read(fpsimd_last_state);
-> > -	struct task_struct *tsk;
-> > -
-> > -	if (!fpstate)
-> > -		return;
-> > +	struct fpsimd_last_state_struct const *last =
-> > +		this_cpu_ptr(&fpsimd_last_state);
-> >  
-> > -	tsk = container_of(fpstate, struct task_struct, thread.fpsimd_state);
-> > -	if (test_tsk_thread_flag(tsk, TIF_SVE))
-> > +	if (last->st && last->sve_in_use)
+> >  	if (last->st && last->sve_in_use)
 > >  		fpsimd_flush_cpu_state();
+> > +
+> > +	sve_user_disable();
+> >  }
+> >  #endif /* CONFIG_ARM64_SVE */
+> >  
+> > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> > index 772bf74..554b157 100644
+> > --- a/virt/kvm/arm/arm.c
+> > +++ b/virt/kvm/arm/arm.c
+> > @@ -651,9 +651,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+> >  		 */
+> >  		preempt_disable();
+> >  
+> > -		/* Flush FP/SIMD state that can't survive guest entry/exit */
+> > -		kvm_fpsimd_flush_cpu_state();
+> > -
+> >  		kvm_pmu_flush_hwstate(vcpu);
+> >  
+> >  		local_irq_disable();
+> > @@ -754,6 +751,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+> >  		guest_exit();
+> >  		trace_kvm_exit(ret, kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
+> >  
+> > +		/* Flush FP/SIMD state that can't survive guest entry/exit */
+> > +		kvm_fpsimd_flush_cpu_state();
+> > +
 > 
-> I'm confused though; why can't we simply flush the state
-> unconditionally?  What is the harm of setting the pointer to NULL if the
-> task whose state may be pointed to didn't actually use SVE?
+> Could this be done in kvm_arch_vcpu_put() instead?
 
-We can, but it defeats an existing optimisation on the host side,
-which I was trying to avoid.
-
-
-The scenario is as follows:
-
-Task A is some random user task.
-Task B is a vcpu thread, which is initially not running, having been
-preempted in the kernel vcpu run loop.
-
- * A runs in userspace
- * B preempts A
- * A's FPSIMD state is still in the CPU
- * KVM saves A's FPSIMD state in the host context for this CPU
- * KVM enters vcpu for B
- * B's vcpu exits for some reason
- * KVM restores the host FPSIMD context (= A's FPSIMD state)
- * A is scheduled
- * A returns to userspace
-
-If we NULL the fpsimd_last_state pointer, A's FPSIMD state is now
-reloaded even though it is in the CPU already.
-
-In the SVE case this is currently necessary though, because the
-(non-SVE-aware) host context save/restore done by KVM is insufficient
-to ensure that the whole SVE state is preserved for A.  My initial
-patch for this was broken though: this one should fix it.
+I think so -- I didn't want to take the VHE optimisation series into
+account yet so I wasn't tracking a moving target, but I think this would
+fit naturally there.
 
 
-I don't want to add host context save/restore for full SVE, because it
-will almost always be redundant: the vcpu thread won't have any SVE
-state anyway because it is in a syscall (the run ioctl()); a second
-user thread has already saved its FPSIMD state during sched- out and
-would restore it at ret_to_user anyway, so it is pointless for KVM
-either to save or restore this context in that case.
-
-
-Ideally, KVM should be aware of and make use of the host's FPSIMD/SVE
-context management rather than doing its own: this would eliminate
-redundant save/restore.
-
-However, I see that as a separate optimisation and didn't want to
-address it yet.
-
-Does that make sense?
-
-[...]
+All of this is fairly confusing, so if there is a way to make it
+clearer, I'd be happy to pick it up...
 
 Cheers
 ---Dave
