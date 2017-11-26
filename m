@@ -1,26 +1,27 @@
 From: Yury Norov <ynorov@caviumnetworks.com>
-Subject: Re: [PATCH 35/37] KVM: arm/arm64: Get rid of vgic_elrsr
-Date: Sun, 26 Nov 2017 17:39:02 +0300
-Message-ID: <20171126143902.vwunp2uucw42xvwo@yury-thinkpad>
+Subject: Re: [PATCH 36/37] KVM: arm/arm64: Move VGIC APR save/restore to vgic
+ put/load
+Date: Sun, 26 Nov 2017 18:09:25 +0300
+Message-ID: <20171126150925.n2c24dqjh2h4g4wb@yury-thinkpad>
 References: <20171012104141.26902-1-christoffer.dall@linaro.org>
- <20171012104141.26902-36-christoffer.dall@linaro.org>
+ <20171012104141.26902-37-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 07DF549DA8
- for <kvmarm@lists.cs.columbia.edu>; Sun, 26 Nov 2017 09:36:32 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 43F7849DA8
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 26 Nov 2017 10:06:54 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jHudvZmh1FKB for <kvmarm@lists.cs.columbia.edu>;
- Sun, 26 Nov 2017 09:36:30 -0500 (EST)
-Received: from NAM01-SN1-obe.outbound.protection.outlook.com
- (mail-sn1nam01on0086.outbound.protection.outlook.com [104.47.32.86])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8134A49DA3
- for <kvmarm@lists.cs.columbia.edu>; Sun, 26 Nov 2017 09:36:30 -0500 (EST)
+ with ESMTP id YOMmz9k-elLF for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 26 Nov 2017 10:06:53 -0500 (EST)
+Received: from NAM03-CO1-obe.outbound.protection.outlook.com
+ (mail-co1nam03on0053.outbound.protection.outlook.com [104.47.40.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C8D2449DA3
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 26 Nov 2017 10:06:52 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <20171012104141.26902-36-christoffer.dall@linaro.org>
+In-Reply-To: <20171012104141.26902-37-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,176 +35,200 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Oct 12, 2017 at 12:41:39PM +0200, Christoffer Dall wrote:
-> There is really no need to store the vgic_elrsr on the VGIC data
-> structures as the only need we have for the elrsr is to figure out if an
-> LR is inavtive when we save the VGIC state upon returning from the
-> guest.  We can might as well store this in a temporary local variable.
+On Thu, Oct 12, 2017 at 12:41:40PM +0200, Christoffer Dall wrote:
+> The APRs can only have bits set when the guest acknowledges an interrupt
+> in the LR and can only have a bit cleared when the guest EOIs an
+> interrupt in the LR.  Therefore, if we have no LRs with any
+> pending/active interrupts, the APR cannot change value and there is no
+> need to clear it on every exit from the VM (hint: it will have already
+> been cleared when we exited the guest the last time with the LRs all
+> EOIed).
 > 
-> This also gets rid of the endianness conversion in the VGIC save
-> function, which is completely unnecessary and would actually result in
-> incorrect functionality on big-endian systems,
-
-Does it mean that existing code in mainline is broken for BE systems?
-If so, I think that it should be fixed in separated patch...
-
-> because we are only using
-> typed values here and not converting pointers and reading different
-> types here.
+> The only case we need to take care of is when we migrate the VCPU away
+> from a CPU or migrate a new VCPU onto a CPU, or when we return to
+> userspace to capture the state of the VCPU for migration.  To make sure
+> this works, factor out the APR save/restore functionality into separate
+> functions called from the VCPU (and by extension VGIC) put/load hooks.
 > 
 > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 > ---
->  include/kvm/arm_vgic.h        |  2 --
->  virt/kvm/arm/hyp/vgic-v3-sr.c |  6 +++---
->  virt/kvm/arm/vgic/vgic-v2.c   | 33 +++++++--------------------------
->  virt/kvm/arm/vgic/vgic-v3.c   |  1 -
->  4 files changed, 10 insertions(+), 32 deletions(-)
-> 
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index 34dba51..79c9e67 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -237,7 +237,6 @@ struct vgic_dist {
->  struct vgic_v2_cpu_if {
->  	u32		vgic_hcr;
->  	u32		vgic_vmcr;
-> -	u64		vgic_elrsr;	/* Saved only */
->  	u32		vgic_apr;
->  	u32		vgic_lr[VGIC_V2_MAX_LRS];
->  };
-> @@ -246,7 +245,6 @@ struct vgic_v3_cpu_if {
->  	u32		vgic_hcr;
->  	u32		vgic_vmcr;
->  	u32		vgic_sre;	/* Restored only, change ignored */
-> -	u32		vgic_elrsr;	/* Saved only */
->  	u32		vgic_ap0r[4];
->  	u32		vgic_ap1r[4];
->  	u64		vgic_lr[VGIC_V3_MAX_LRS];
-> diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
-> index 91728fa..05548b2 100644
-> --- a/virt/kvm/arm/hyp/vgic-v3-sr.c
-> +++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
-> @@ -222,15 +222,16 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
->  	if (used_lrs) {
->  		int i;
->  		u32 nr_pre_bits;
-> +		u32 elrsr;
->  
-> -		cpu_if->vgic_elrsr = read_gicreg(ICH_ELSR_EL2);
-> +		elrsr = read_gicreg(ICH_ELSR_EL2);
->  
->  		write_gicreg(0, ICH_HCR_EL2);
->  		val = read_gicreg(ICH_VTR_EL2);
->  		nr_pre_bits = vtr_to_nr_pre_bits(val);
->  
->  		for (i = 0; i < used_lrs; i++) {
-> -			if (cpu_if->vgic_elrsr & (1 << i))
-> +			if (elrsr & (1 << i))
+>  arch/arm/include/asm/kvm_hyp.h   |   2 +
+>  arch/arm64/include/asm/kvm_hyp.h |   2 +
+>  virt/kvm/arm/hyp/vgic-v3-sr.c    | 123 +++++++++++++++++++++------------------
+>  virt/kvm/arm/vgic/vgic-v2.c      |   7 +--
+>  virt/kvm/arm/vgic/vgic-v3.c      |   5 ++
+>  5 files changed, 77 insertions(+), 62 deletions(-)
 
-Same comments as to patch 28. Here should be test_bit(), I think.
-And if it's possible, for set bits in elrsr it's simpler not to write
-~ICH_LR_STATE to cpu_if->vgic_lr, but directly to IO memory in
-__vgic_v3_restore_state().
+[...]
 
->  				cpu_if->vgic_lr[i] &= ~ICH_LR_STATE;
->  			else
->  				cpu_if->vgic_lr[i] = __gic_v3_get_lr(i);
-> @@ -261,7 +262,6 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
->  		if (static_branch_unlikely(&vgic_v3_cpuif_trap))
->  			write_gicreg(0, ICH_HCR_EL2);
->  
-> -		cpu_if->vgic_elrsr = 0xffff;
->  		cpu_if->vgic_ap0r[0] = 0;
->  		cpu_if->vgic_ap0r[1] = 0;
->  		cpu_if->vgic_ap0r[2] = 0;
-> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-> index 259079b..df7e03b 100644
-> --- a/virt/kvm/arm/vgic/vgic-v2.c
-> +++ b/virt/kvm/arm/vgic/vgic-v2.c
-> @@ -247,7 +247,6 @@ void vgic_v2_enable(struct kvm_vcpu *vcpu)
->  	 * anyway.
->  	 */
->  	vcpu->arch.vgic_cpu.vgic_v2.vgic_vmcr = 0;
-> -	vcpu->arch.vgic_cpu.vgic_v2.vgic_elrsr = ~0;
->  
->  	/* Get the show on the road... */
->  	vcpu->arch.vgic_cpu.vgic_v2.vgic_hcr = GICH_HCR_EN;
-> @@ -404,33 +403,19 @@ int vgic_v2_probe(const struct gic_kvm_info *info)
->  	return ret;
+> @@ -361,6 +304,72 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
+>  		     ICC_SRE_EL2);
 >  }
 >  
-> -static void save_elrsr(struct kvm_vcpu *vcpu, void __iomem *base)
-> -{
-> -	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
-> -	int nr_lr = kvm_vgic_global_state.nr_lr;
-> -	u32 elrsr0, elrsr1;
-> -
-> -	elrsr0 = readl_relaxed(base + GICH_ELRSR0);
-> -	if (unlikely(nr_lr > 32))
-> -		elrsr1 = readl_relaxed(base + GICH_ELRSR1);
-> -	else
-> -		elrsr1 = 0;
-> -
-> -#ifdef CONFIG_CPU_BIG_ENDIAN
-> -	cpu_if->vgic_elrsr = ((u64)elrsr0 << 32) | elrsr1;
-> -#else
-> -	cpu_if->vgic_elrsr = ((u64)elrsr1 << 32) | elrsr0;
-> -#endif
-> -}
-> -
->  static void save_lrs(struct kvm_vcpu *vcpu, void __iomem *base)
->  {
->  	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
-> -	int i;
->  	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
+> +void __hyp_text __vgic_v3_save_aprs(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vgic_v3_cpu_if *cpu_if;
+> +	u64 val;
+> +	u32 nr_pre_bits;
+> +
+> +	vcpu = kern_hyp_va(vcpu);
+> +	cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+> +
+> +	val = read_gicreg(ICH_VTR_EL2);
+> +	nr_pre_bits = vtr_to_nr_pre_bits(val);
+> +
+> +	switch (nr_pre_bits) {
+> +	case 7:
+> +		cpu_if->vgic_ap0r[3] = __vgic_v3_read_ap0rn(3);
+> +		cpu_if->vgic_ap0r[2] = __vgic_v3_read_ap0rn(2);
+> +	case 6:
+> +		cpu_if->vgic_ap0r[1] = __vgic_v3_read_ap0rn(1);
+> +	default:
+> +		cpu_if->vgic_ap0r[0] = __vgic_v3_read_ap0rn(0);
+> +	}
+> +
+> +	switch (nr_pre_bits) {
+> +	case 7:
+> +		cpu_if->vgic_ap1r[3] = __vgic_v3_read_ap1rn(3);
+> +		cpu_if->vgic_ap1r[2] = __vgic_v3_read_ap1rn(2);
+> +	case 6:
+> +		cpu_if->vgic_ap1r[1] = __vgic_v3_read_ap1rn(1);
+> +	default:
+> +		cpu_if->vgic_ap1r[0] = __vgic_v3_read_ap1rn(0);
+> +	}
+> +}
 
-Not to this patch, but anyway, what for to reserve u64 for used_lrs
-here and in struct vgic_cpu, when maximum value for it is 64?
-
-> +	u64 elrsr;
-> +	int i;
-
-Nit. What for you move 'int i' declaration?
+What for 2 switch-cases here? At first glance, you can join them:
+	switch (nr_pre_bits) {
+	case 7:
+		cpu_if->vgic_ap0r[3] = __vgic_v3_read_ap0rn(3);
+		cpu_if->vgic_ap0r[2] = __vgic_v3_read_ap0rn(2);
+		cpu_if->vgic_ap1r[3] = __vgic_v3_read_ap1rn(3);
+		cpu_if->vgic_ap1r[2] = __vgic_v3_read_ap1rn(2);
+	case 6:
+		cpu_if->vgic_ap0r[1] = __vgic_v3_read_ap0rn(1);
+		cpu_if->vgic_ap1r[1] = __vgic_v3_read_ap1rn(1);
+	default:
+		cpu_if->vgic_ap1r[0] = __vgic_v3_read_ap1rn(0);
+		cpu_if->vgic_ap0r[0] = __vgic_v3_read_ap0rn(0);
+	}
 
 > +
-> +	elrsr = readl_relaxed(base + GICH_ELRSR0);
-> +	if (unlikely(used_lrs > 32))
-> +		elrsr |= ((u64)readl_relaxed(base + GICH_ELRSR1)) << 32;
+> +void __hyp_text __vgic_v3_restore_aprs(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vgic_v3_cpu_if *cpu_if;
+> +	u64 val;
+> +	u32 nr_pre_bits;
+> +
+> +	vcpu = kern_hyp_va(vcpu);
+> +	cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+> +
+> +	val = read_gicreg(ICH_VTR_EL2);
+> +	nr_pre_bits = vtr_to_nr_pre_bits(val);
+> +
+> +	switch (nr_pre_bits) {
+> +	case 7:
+> +		__vgic_v3_write_ap0rn(cpu_if->vgic_ap0r[3], 3);
+> +		__vgic_v3_write_ap0rn(cpu_if->vgic_ap0r[2], 2);
+> +	case 6:
+> +		__vgic_v3_write_ap0rn(cpu_if->vgic_ap0r[1], 1);
+> +	default:
+> +		__vgic_v3_write_ap0rn(cpu_if->vgic_ap0r[0], 0);
+> +	}
+> +
+> +	switch (nr_pre_bits) {
+> +	case 7:
+> +		__vgic_v3_write_ap1rn(cpu_if->vgic_ap1r[3], 3);
+> +		__vgic_v3_write_ap1rn(cpu_if->vgic_ap1r[2], 2);
+> +	case 6:
+> +		__vgic_v3_write_ap1rn(cpu_if->vgic_ap1r[1], 1);
+> +	default:
+> +		__vgic_v3_write_ap1rn(cpu_if->vgic_ap1r[0], 0);
+> +	}
+
+And here
+
+Thanks,
+Yury
+
+> +}
+> +
+>  void __hyp_text __vgic_v3_init_lrs(void)
+>  {
+>  	int max_lr_idx = vtr_to_max_lr_idx(read_gicreg(ICH_VTR_EL2));
+> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+> index df7e03b..c04c3475 100644
+> --- a/virt/kvm/arm/vgic/vgic-v2.c
+> +++ b/virt/kvm/arm/vgic/vgic-v2.c
+> @@ -428,7 +428,6 @@ void vgic_v2_save_state(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm *kvm = vcpu->kvm;
+>  	struct vgic_dist *vgic = &kvm->arch.vgic;
+> -	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+>  	void __iomem *base = vgic->vctrl_base;
+>  	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
 >  
->  	for (i = 0; i < used_lrs; i++) {
-> -		if (cpu_if->vgic_elrsr & (1UL << i))
-> +		if (elrsr & (1UL << i))
-
-test_bit()
-
->  			cpu_if->vgic_lr[i] &= ~GICH_LR_STATE;
->  		else
->  			cpu_if->vgic_lr[i] = readl_relaxed(base + GICH_LR0 + (i * 4));
-> @@ -452,13 +437,9 @@ void vgic_v2_save_state(struct kvm_vcpu *vcpu)
+> @@ -436,11 +435,8 @@ void vgic_v2_save_state(struct kvm_vcpu *vcpu)
+>  		return;
 >  
 >  	if (used_lrs) {
->  		cpu_if->vgic_apr = readl_relaxed(base + GICH_APR);
-> -
-> -		save_elrsr(vcpu, base);
+> -		cpu_if->vgic_apr = readl_relaxed(base + GICH_APR);
 >  		save_lrs(vcpu, base);
-> -
 >  		writel_relaxed(0, base + GICH_HCR);
->  	} else {
-> -		cpu_if->vgic_elrsr = ~0UL;
->  		cpu_if->vgic_apr = 0;
+> -	} else {
+> -		cpu_if->vgic_apr = 0;
 >  	}
 >  }
+>  
+> @@ -458,7 +454,6 @@ void vgic_v2_restore_state(struct kvm_vcpu *vcpu)
+>  
+>  	if (used_lrs) {
+>  		writel_relaxed(cpu_if->vgic_hcr, base + GICH_HCR);
+> -		writel_relaxed(cpu_if->vgic_apr, base + GICH_APR);
+>  		for (i = 0; i < used_lrs; i++) {
+>  			writel_relaxed(cpu_if->vgic_lr[i],
+>  				       base + GICH_LR0 + (i * 4));
+> @@ -472,6 +467,7 @@ void vgic_v2_load(struct kvm_vcpu *vcpu)
+>  	struct vgic_dist *vgic = &vcpu->kvm->arch.vgic;
+>  
+>  	writel_relaxed(cpu_if->vgic_vmcr, vgic->vctrl_base + GICH_VMCR);
+> +	writel_relaxed(cpu_if->vgic_apr, vgic->vctrl_base + GICH_APR);
+>  }
+>  
+>  void vgic_v2_put(struct kvm_vcpu *vcpu)
+> @@ -480,4 +476,5 @@ void vgic_v2_put(struct kvm_vcpu *vcpu)
+>  	struct vgic_dist *vgic = &vcpu->kvm->arch.vgic;
+>  
+>  	cpu_if->vgic_vmcr = readl_relaxed(vgic->vctrl_base + GICH_VMCR);
+> +	cpu_if->vgic_apr = readl_relaxed(vgic->vctrl_base + GICH_APR);
+>  }
 > diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> index 863351c..0900649 100644
+> index 0900649..df3a222 100644
 > --- a/virt/kvm/arm/vgic/vgic-v3.c
 > +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> @@ -237,7 +237,6 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
->  	 * anyway.
->  	 */
->  	vgic_v3->vgic_vmcr = 0;
-> -	vgic_v3->vgic_elrsr = ~0;
+> @@ -16,6 +16,7 @@
+>  #include <linux/kvm.h>
+>  #include <linux/kvm_host.h>
+>  #include <kvm/arm_vgic.h>
+> +#include <asm/kvm_hyp.h>
+>  #include <asm/kvm_mmu.h>
+>  #include <asm/kvm_asm.h>
 >  
->  	/*
->  	 * If we are emulating a GICv3, we do it in an non-GICv2-compatible
+> @@ -544,6 +545,8 @@ void vgic_v3_load(struct kvm_vcpu *vcpu)
+>  	 */
+>  	if (likely(cpu_if->vgic_sre))
+>  		kvm_call_hyp(__vgic_v3_write_vmcr, cpu_if->vgic_vmcr);
+> +
+> +	kvm_call_hyp(__vgic_v3_restore_aprs, vcpu);
+>  }
+>  
+>  void vgic_v3_put(struct kvm_vcpu *vcpu)
+> @@ -552,4 +555,6 @@ void vgic_v3_put(struct kvm_vcpu *vcpu)
+>  
+>  	if (likely(cpu_if->vgic_sre))
+>  		cpu_if->vgic_vmcr = kvm_call_hyp(__vgic_v3_read_vmcr);
+> +
+> +	kvm_call_hyp(__vgic_v3_save_aprs, vcpu);
+>  }
 > -- 
 > 2.9.0
