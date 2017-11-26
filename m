@@ -1,126 +1,91 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH 13/15] KVM: Move vcpu_load to arch-specific
- kvm_arch_vcpu_ioctl_set_fpu
-Date: Sat, 25 Nov 2017 21:57:16 +0100
-Message-ID: <20171125205718.7731-14-christoffer.dall@linaro.org>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH 14/15] KVM: Move vcpu_load to arch-specific
+ kvm_arch_vcpu_ioctl
+Date: Sun, 26 Nov 2017 10:09:43 +0100
+Message-ID: <20171126090943.GH28855@cbox>
 References: <20171125205718.7731-1-christoffer.dall@linaro.org>
+ <20171125205718.7731-15-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DAE149D87
- for <kvmarm@lists.cs.columbia.edu>; Sat, 25 Nov 2017 15:54:53 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rummqkkb+7Bp for <kvmarm@lists.cs.columbia.edu>;
- Sat, 25 Nov 2017 15:54:52 -0500 (EST)
-Received: from mail-wm0-f65.google.com (mail-wm0-f65.google.com [74.125.82.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D51C749DDC
- for <kvmarm@lists.cs.columbia.edu>; Sat, 25 Nov 2017 15:54:50 -0500 (EST)
-Received: by mail-wm0-f65.google.com with SMTP id u83so27776994wmb.5
- for <kvmarm@lists.cs.columbia.edu>; Sat, 25 Nov 2017 12:57:35 -0800 (PST)
-In-Reply-To: <20171125205718.7731-1-christoffer.dall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvm@vger.kernel.org
-Cc: linux-mips@linux-mips.org, Marc Zyngier <marc.zyngier@arm.com>, James Hogan <jhogan@kernel.org>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, kvm-ppc@vger.kernel.org, Alexander Graf <agraf@suse.com>, linux-arm-kernel@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>, linux-s390@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20171125205718.7731-15-christoffer.dall@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, Andrew Jones <drjones@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, James Hogan <jhogan@kernel.org>, linux-mips@linux-mips.org, Alexander Graf <agraf@suse.com>, kvm-ppc@vger.kernel.org, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, linux-s390@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Move vcpu_load() and vcpu_put() into the architecture specific
-implementations of kvm_arch_vcpu_ioctl_set_fpu().
+Hi,
 
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
- arch/s390/kvm/kvm-s390.c | 15 +++++++++++++--
- arch/x86/kvm/x86.c       | 11 +++++++++--
- virt/kvm/kvm_main.c      |  4 ----
- 3 files changed, 22 insertions(+), 8 deletions(-)
+[replying to myself]
 
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index e4ddf6a5cb4e..46d015083136 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -2769,15 +2769,26 @@ int kvm_arch_vcpu_ioctl_get_sregs(struct kvm_vcpu *vcpu,
- 
- int kvm_arch_vcpu_ioctl_set_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
- {
-+	int ret;
-+
-+	ret = vcpu_load(vcpu);
-+	if (ret)
-+		return ret;
-+
-+	ret = -EINVAL;
- 	if (test_fp_ctl(fpu->fpc))
--		return -EINVAL;
-+		goto out;
- 	vcpu->run->s.regs.fpc = fpu->fpc;
- 	if (MACHINE_HAS_VX)
- 		convert_fp_to_vx((__vector128 *) vcpu->run->s.regs.vrs,
- 				 (freg_t *) fpu->fprs);
- 	else
- 		memcpy(vcpu->run->s.regs.fprs, &fpu->fprs, sizeof(fpu->fprs));
--	return 0;
-+
-+	ret = 0;
-+out:
-+	vcpu_put(vcpu);
-+	return ret;
- }
- 
- int kvm_arch_vcpu_ioctl_get_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index f275fefbc4e0..230d552cdc4b 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -7701,8 +7701,14 @@ int kvm_arch_vcpu_ioctl_get_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
- 
- int kvm_arch_vcpu_ioctl_set_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
- {
--	struct fxregs_state *fxsave =
--			&vcpu->arch.guest_fpu.state.fxsave;
-+	int ret;
-+	struct fxregs_state *fxsave;
-+
-+	ret = vcpu_load(vcpu);
-+	if (ret)
-+		return ret;
-+
-+	fxsave = &vcpu->arch.guest_fpu.state.fxsave;
- 
- 	memcpy(fxsave->st_space, fpu->fpr, 128);
- 	fxsave->cwd = fpu->fcw;
-@@ -7713,6 +7719,7 @@ int kvm_arch_vcpu_ioctl_set_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
- 	fxsave->rdp = fpu->last_dp;
- 	memcpy(fxsave->xmm_space, fpu->xmm, sizeof fxsave->xmm_space);
- 
-+	vcpu_put(vcpu);
- 	return 0;
- }
- 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 8f767922fbbd..08a610619572 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -2697,11 +2697,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
- 			fpu = NULL;
- 			goto out;
- 		}
--		r = vcpu_load(vcpu);
--		if (r)
--			goto out;
- 		r = kvm_arch_vcpu_ioctl_set_fpu(vcpu, fpu);
--		vcpu_put(vcpu);
- 		break;
- 	}
- 	default:
--- 
-2.14.2
+On Sat, Nov 25, 2017 at 09:57:17PM +0100, Christoffer Dall wrote:
+> Move the calls to vcpu_load() and vcpu_put() in to the architecture
+> specific implementations of kvm_arch_vcpu_ioctl() which dispatches
+> further architecture-specific ioctls on to other functions.
+> 
+> Some architectures support asynchronous vcpu ioctls which cannot call
+> vcpu_load() or take the vcpu->mutex, because that would prevent
+> concurrent execution with a running VCPU, which is the intended purpose
+> of these ioctls, for example because they inject interrupts.
+> 
+> We move the checks for these specifics into the architecture code for
+> MIPS, S390 and PPC, and it has the added benefit of getting rid of the
+> ifdef in the generic dispatcher.
+> 
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> ---
+>  arch/mips/kvm/mips.c       | 51 +++++++++++++++++++++++----------------
+>  arch/powerpc/kvm/powerpc.c | 15 +++++++-----
+>  arch/s390/kvm/kvm-s390.c   | 21 +++++++++-------
+>  arch/x86/kvm/x86.c         | 24 ++++++++++++++-----
+>  virt/kvm/arm/arm.c         | 60 ++++++++++++++++++++++++++++++++--------------
+>  virt/kvm/kvm_main.c        | 15 +-----------
+>  6 files changed, 114 insertions(+), 72 deletions(-)
+> 
+
+[...]
+
+> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+> index 66e5c2445a87..027a6259c3c4 100644
+> --- a/arch/powerpc/kvm/powerpc.c
+> +++ b/arch/powerpc/kvm/powerpc.c
+> @@ -1621,16 +1621,18 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>  	void __user *argp = (void __user *)arg;
+>  	long r;
+>  
+> -	switch (ioctl) {
+> -	case KVM_INTERRUPT: {
+> +	if (ioctl == KVM_INTERRUPT) {
+>  		struct kvm_interrupt irq;
+> -		r = -EFAULT;
+>  		if (copy_from_user(&irq, argp, sizeof(irq)))
+> -			goto out;
+> -		r = kvm_vcpu_ioctl_interrupt(vcpu, &irq);
+> -		goto out;
+> +			return -EFAULT;
+> +		return kvm_vcpu_ioctl_interrupt(vcpu, &irq);
+>  	}
+>  
+> +	r = vcpu_load(vcpu);
+> +	if (r)
+> +		return r;
+> +
+> +	switch (ioctl) {
+>  	case KVM_ENABLE_CAP:
+>  	{
+>  		struct kvm_enable_cap cap;
+> @@ -1670,6 +1672,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>  	}
+>  
+>  out:
+> +	vcpu_put(r);
+>  	return r;
+
+This should obviously be
+	vcpu_put(vcpu);
+
+Fixed for v2.
+
+Thanks,
+-Christoffer
