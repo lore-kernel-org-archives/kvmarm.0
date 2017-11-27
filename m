@@ -1,63 +1,72 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 01/15] KVM: Prepare for moving vcpu_load/vcpu_put into
- arch specific code
-Date: Mon, 27 Nov 2017 17:53:01 +0100
-Message-ID: <838db374-6040-c805-82f3-187a2cdfc40d@redhat.com>
-References: <20171125205718.7731-1-christoffer.dall@linaro.org>
- <20171125205718.7731-2-christoffer.dall@linaro.org>
+From: Andrew Jones <drjones@redhat.com>
+Subject: [PATCH] KVM: arm/arm64: kvm_arch_destroy_vm cleanups
+Date: Mon, 27 Nov 2017 19:17:18 +0100
+Message-ID: <20171127181718.5290-1-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20171125205718.7731-2-christoffer.dall@linaro.org>
-Content-Language: en-US
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>, kvm@vger.kernel.org
-Cc: Andrew Jones <drjones@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, James Hogan <jhogan@kernel.org>, linux-mips@linux-mips.org, Alexander Graf <agraf@suse.com>, kvm-ppc@vger.kernel.org, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, linux-s390@vger.kernel.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A945B49D90
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Nov 2017 13:14:33 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id sQLkL75H2xSZ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Nov 2017 13:14:32 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DA8BC49D7A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Nov 2017 13:14:32 -0500 (EST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
+Cc: marc.zyngier@arm.com, cdall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 25/11/2017 21:57, Christoffer Dall wrote:
-> In preparation for moving calls to vcpu_load() and vcpu_put() into the
-> architecture specific implementations of the KVM vcpu ioctls, move the
-> calls in the main kvm_vcpu_ioctl() dispatcher function to each case
-> of the ioctl select statement.  This allows us to move the vcpu_load()
-> and vcpu_put() calls into architecture specific implementations of vcpu
-> ioctls, one by one.
-> 
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> ---
->  virt/kvm/kvm_main.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++++-----
->  1 file changed, 48 insertions(+), 5 deletions(-)
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 9deb5a245b83..fafafcc38b5a 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2528,16 +2528,15 @@ static long kvm_vcpu_ioctl(struct file *filp,
->  		return kvm_arch_vcpu_ioctl(filp, ioctl, arg);
->  #endif
->  
-> -
-> -	r = vcpu_load(vcpu);
-> -	if (r)
-> -		return r;
->  	switch (ioctl) {
->  	case KVM_RUN: {
->  		struct pid *oldpid;
->  		r = -EINVAL;
->  		if (arg)
->  			goto out;
-> +		r = vcpu_load(vcpu);
-> +		if (r)
-> +			goto out;
->  		oldpid = rcu_access_pointer(vcpu->pid);
+Recently commit b2c9a85dd75a ("KVM: arm/arm64: vgic: Move
+kvm_vgic_destroy call around") caught my eye. When I looked closer I
+saw that while it made the code saner, it wasn't changing anything.
+kvm_for_each_vcpu() checks for NULL kvm->vcpus[i], so there wasn't
+a NULL dereference being fixed, and because kvm_vgic_vcpu_destroy()
+was called by kvm_arch_vcpu_free() it was still getting called, just
+not by kvm_vgic_destroy() as intended. But now the call from
+kvm_arch_vcpu_free() is redundant, and while currently harmless, it
+should be removed in case kvm_vgic_vcpu_destroy() were ever to
+want to reference vgic state, as kvm_vgic_destroy() now comes before
+kvm_arch_vcpu_free(). Additionally the other architectures set
+kvm->online_vcpus to zero after freeing them. We might as well do
+that for ARM too.
 
-If it is not a problem for ARM, maybe it would actually be best to leave
-the locking in kvm_vcpu_ioctl (with the already existing exception of
-KVM_INTERRUPT).  This would make vcpu_load void, and would also let you
-keep the PID adjustment in common code.  This would be more similar to
-the previous version, but without introducing __vcpu_load/__vcpu_put.
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+ virt/kvm/arm/arm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Looks good apart from this doubt!  Thanks,
-
-Paolo
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index a6524ff27de4..c5bc79c4ccf7 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -188,6 +188,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+ 			kvm->vcpus[i] = NULL;
+ 		}
+ 	}
++	atomic_set(&kvm->online_vcpus, 0);
+ }
+ 
+ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+@@ -296,7 +297,6 @@ void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu)
+ {
+ 	kvm_mmu_free_memory_caches(vcpu);
+ 	kvm_timer_vcpu_terminate(vcpu);
+-	kvm_vgic_vcpu_destroy(vcpu);
+ 	kvm_pmu_vcpu_destroy(vcpu);
+ 	kvm_vcpu_uninit(vcpu);
+ 	kmem_cache_free(kvm_vcpu_cache, vcpu);
+-- 
+2.13.6
