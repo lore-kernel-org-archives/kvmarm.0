@@ -1,26 +1,21 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH 01/37] KVM: arm64: Avoid storing the vcpu pointer on the
- stack
-Date: Mon, 27 Nov 2017 11:11:20 +0000
-Message-ID: <5A1BF2D8.1050907@arm.com>
-References: <20171012104141.26902-1-christoffer.dall@linaro.org>
- <20171012104141.26902-2-christoffer.dall@linaro.org>
- <ef4bffe5-b3c5-5fdd-cb8b-1840d2243ae1@arm.com> <20171123205902.GF28855@cbox>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: [PATCHv2 00/12] ARMv8.3 pointer authentication userspace support
+Date: Mon, 27 Nov 2017 16:37:54 +0000
+Message-ID: <20171127163806.31435-1-mark.rutland@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A54DD49D90
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Nov 2017 06:10:31 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3246849D19
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Nov 2017 11:35:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AXfVaqMI+LI1 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Nov 2017 06:10:30 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F0DDB49D6C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Nov 2017 06:10:29 -0500 (EST)
-In-Reply-To: <20171123205902.GF28855@cbox>
+ with ESMTP id N7KZnvTRG611 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Nov 2017 11:35:28 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8789A40FB0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Nov 2017 11:35:28 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,157 +25,145 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Shih-Wei Li <shihwei@cs.columbia.edu>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org
+Cc: linux-arch@vger.kernel.org, cdall@linaro.org, arnd@arndb.de, marc.zyngier@arm.com, catalin.marinas@arm.com, yao.qi@arm.com, kernel-hardening@lists.openwall.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, awallis@codeaurora.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
+This series adds support for the ARMv8.3 pointer authentication extension,
+enabling userspace return address protection with recent versions of GCC.
 
-On 23/11/17 20:59, Christoffer Dall wrote:
-> On Thu, Oct 12, 2017 at 04:49:44PM +0100, Marc Zyngier wrote:
->> On 12/10/17 11:41, Christoffer Dall wrote:
->>> We already have the percpu area for the host cpu state, which points to
->>> the VCPU, so there's no need to store the VCPU pointer on the stack on
->>> every context switch.  We can be a little more clever and just use
->>> tpidr_el2 for the percpu offset and load the VCPU pointer from the host
->>> context.
->>>
->>> This requires us to have a scratch register though, so we take the
->>> chance to rearrange some of the el1_sync code to only look at the
->>> vttbr_el2 to determine if this is a trap from the guest or an HVC from
->>> the host.  We do add an extra check to call the panic code if the kernel
->>> is configured with debugging enabled and we saw a trap from the host
->>> which wasn't an HVC, indicating that we left some EL2 trap configured by
->>> mistake.
+Since RFC [1]:
+* Make the KVM context switch (semi-lazy)
+* Rebase to v4.13-rc1
+* Improve pointer authentication documentation
+* Add hwcap documentation
+* Various minor cleanups
 
->>> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
->>> index ab4d0a9..7e48a39 100644
->>> --- a/arch/arm64/include/asm/kvm_asm.h
->>> +++ b/arch/arm64/include/asm/kvm_asm.h
->>> @@ -70,4 +70,24 @@ extern u32 __init_stage2_translation(void);
->>>  
->>>  #endif
->>>  
->>> +#ifdef __ASSEMBLY__
->>> +.macro get_host_ctxt reg, tmp
->>> +	/*
->>> +	 * '=kvm_host_cpu_state' is a host VA from the constant pool, it may
->>> +	 * not be accessible by this address from EL2, hyp_panic() converts
->>> +	 * it with kern_hyp_va() before use.
->>> +	 */
->>
->> This really looks like a stale comment, as there is no hyp_panic
->> involved here anymore (thankfully!).
->>
->>> +	ldr	\reg, =kvm_host_cpu_state
->>> +	mrs	\tmp, tpidr_el2
->>> +	add	\reg, \reg, \tmp
+Since v1 [2]:
+* Rebase to v4.15-rc1
+* Settle on per-process keys
+* Strip PACs when unwinding userspace
+* Don't expose an XPAC hwcap (this is implied by ID registers)
+* Leave APIB, ABPDA, APDB, and APGA keys unsupported for now
+* Support IMP DEF algorithms
+* Rely on KVM ID register emulation
+* Various cleanups
 
-This looks like the arch code's adr_this_cpu.
+While there are use-cases for keys other than APIAKey, the only software that
+I'm aware of with pointer authentication support is GCC, which only makes use
+of APIAKey. I'm happy to add support for other keys as users appear.
+
+I've pushed the series to the arm64/pointer-auth branch [3] of my linux tree.
+I've also pushed out a necessary bootwrapper patch to the pointer-auth branch
+[4] of my bootwrapper repo.
 
 
->>> +	kern_hyp_va \reg
->>
->> Here, we're trading a load from the stack for a load from the constant
->> pool. Can't we do something like:
->>
->> 	adr_l	\reg, kvm_host_cpu_state
->> 	msr	\tmp, tpidr_el2
->> 	add	\reg, \reg, \tmp
->>
->> and that's it? This relies on the property that the kernel/hyp offset is
->> constant, and that it doesn't matter if we add the offset to a kernel VA
->> or a HYP VA... Completely untested of course!
->>
-> 
-> Coming back to this one, annoyingly, it doesn't seem to work. 
+Extension Overview 
+==================
 
-The disassembly looks wrong?, or it generates the wrong address?
+The ARMv8.3 pointer authentication extension adds functionality to detect
+modification of pointer values, mitigating certain classes of attack such as
+stack smashing, and making return oriented programming attacks harder
 
+The extension introduces the concept of a pointer authentication code (PAC),
+which is stored in some upper bits of pointers. Each PAC is derived from the
+original pointer, another 64-bit value (e.g. the stack pointer), and a secret
+128-bit key.
 
-> This is the code I use for get_host_ctxt:
-> 
-> .macro get_host_ctxt reg, tmp
-> 	adr_l	\reg, kvm_host_cpu_state
-> 	mrs	\tmp, tpidr_el2
-> 	add	\reg, \reg, \tmp
+New instructions are added which can be used to:
 
-(adr_this_cpu)
+* Insert a PAC into a pointer
+* Strip a PAC from a pointer
+* Authenticate strip a PAC from a pointer
 
-> 	kern_hyp_va \reg
+If authentication succeeds, the code is removed, yielding the original pointer.
+If authentication fails, bits are set in the pointer such that it is guaranteed
+to cause a fault if used.
 
-As we know adr_l used adrp to generate a PC-relative address, when executed at
-EL2 it should always generate an EL2 address, so the kern_hyp_va will just mask
-out some bits that are already zero.
+These instructions can make use of four keys:
 
-(this subtly depends on KVM's EL2 code not being a module, and
-kvm_host_cpu_state not being percpu_alloc()d)
+* APIAKey (A.K.A. Instruction A key)
+* APIBKey (A.K.A. Instruction B key)
+* APDAKey (A.K.A. Data A key)
+* APDBKey (A.K.A. Data B Key)
 
+A subset of these instruction encodings have been allocated from the HINT
+space, and will operate as NOPs on any ARMv8-A parts which do not feature the
+extension (or if purposefully disabled by the kernel). Software using only this
+subset of the instructions should function correctly on all ARMv8-A parts.
 
-> .endm
-> 
-> And this is the disassembly for one of the uses in the hyp code:
-> 
-> 	adrp	x0, ffff000008ca9000 <overflow_stack+0xd20>
-> 	add	x0, x0, #0x7f0
-> 	mrs	x1, tpidr_el2
-> 	add	x0, x0, x1
-> 	and	x0, x0, #0xffffffffffff
-
-(that looks right to me).
+Additionally, instructions are added to authenticate small blocks of memory in
+similar fashion, using APGAKey (A.K.A. Generic key).
 
 
-> For comparison, the following C-code:
-> 
-> 	struct kvm_cpu_context *host_ctxt;
-> 	host_ctxt = this_cpu_ptr(&kvm_host_cpu_state);
-> 	host_ctxt = kern_hyp_va(host_ctxt);
-> 
-> Gets compiled into this:
-> 
-> 	adrp	x0, ffff000008ca9000 <overflow_stack+0xd20>
-> 	add	x0, x0, #0x7d0
-> 	mrs	x1, tpidr_el1
-> 	add	x0, x0, #0x20
-> 	add	x0, x0, x1
-> 	and	x0, x0, #0xffffffffffff
+This Series
+===========
 
-> Any ideas what could be going on here?
+This series enables the use of instructions using APIAKey, which is initialised
+and maintained per-process (shared by all threads). This series does not add
+support for APIBKey, APDAKey, APDBKey, nor APGAKey.
 
-You expected tpidr_el2 in the above disassembly?
+I've given this some basic testing with a homebrew test suite. More ideally,
+we'd add some tests to the kernel source tree.
 
-The patch 'arm64: alternatives: use tpidr_el2 on VHE hosts'[0] wraps the tpidr
-access in adr_this_cpu,ldr_this_cpu and __my_cpu_offset() in
-ARM64_HAS_VIRT_HOST_EXTN alternatives.
-
-You should have an altinstr_replacement section that contains the 'mrs x1,
-tpidr_el2' for this sequence, which will get patched in by the cpufeature code
-when we find VHE.
-
-
-I'm guessing you want to always use tpidr_el2 as cpu_offset for KVM, even on
-v8.0 hardware. To do this you can't use the kernel's 'this_cpu_ptr' as its
-defined in percpu-defs.h as:
-> SHIFT_PERCPU_PTR(ptr, my_cpu_offset)
-
-... and the arch code provides a static-inline 'my_cpu_offset' that resolves to
-the correct tpidr for EL1.
-
-I guess you need an asm-accessor for each per-cpu variable you want to access,
-or a kvm_this_per_cpu().
-
-
-> And, during hyp init we do:
-> 	mrs	x1, tpidr_el1
-> 	msr	tpidr_el2, x1
-
-In the SDEI series this was so that the asm that used tpidr_el2 directly had the
-correct value on non-VHE hardware.
-
+I've added some basic KVM support, which relies on the recently introduced ID
+register emulation to hide mismatched support from guests.
 
 Thanks,
+Mark.
 
-James
+[1] http://lists.infradead.org/pipermail/linux-arm-kernel/2017-April/498941.html
+[2] https://lkml.kernel.org/r/1500480092-28480-1-git-send-email-mark.rutland@arm.com
+[3] git://git.kernel.org/pub/scm/linux/kernel/git/mark/linux.git arm64/pointer-auth
+[4] git://git.kernel.org/pub/scm/linux/kernel/git/mark/boot-wrapper-aarch64.git pointer-auth
 
 
-[0] https://patchwork.kernel.org/patch/10012641/
+Mark Rutland (12):
+  asm-generic: mm_hooks: allow hooks to be overridden individually
+  arm64: add pointer authentication register bits
+  arm64/cpufeature: add ARMv8.3 id_aa64isar1 bits
+  arm64/cpufeature: detect pointer authentication
+  arm64: Don't trap host pointer auth use to EL2
+  arm64: add basic pointer authentication support
+  arm64: expose user PAC bit positions via ptrace
+  arm64: perf: strip PAC when unwinding userspace
+  arm64/kvm: preserve host HCR_EL2 value
+  arm64/kvm: context-switch ptrauth registers
+  arm64: enable pointer authentication
+  arm64: docs: document pointer authentication
+
+ Documentation/arm64/booting.txt                |   8 ++
+ Documentation/arm64/elf_hwcaps.txt             |   6 ++
+ Documentation/arm64/pointer-authentication.txt |  85 ++++++++++++++++++++
+ arch/arm64/Kconfig                             |  23 ++++++
+ arch/arm64/include/asm/cpucaps.h               |   8 +-
+ arch/arm64/include/asm/esr.h                   |   3 +-
+ arch/arm64/include/asm/kvm_arm.h               |   3 +-
+ arch/arm64/include/asm/kvm_host.h              |  28 ++++++-
+ arch/arm64/include/asm/kvm_hyp.h               |   7 ++
+ arch/arm64/include/asm/mmu.h                   |   5 ++
+ arch/arm64/include/asm/mmu_context.h           |  25 +++++-
+ arch/arm64/include/asm/pointer_auth.h          | 104 +++++++++++++++++++++++++
+ arch/arm64/include/asm/sysreg.h                |  30 +++++++
+ arch/arm64/include/uapi/asm/hwcap.h            |   1 +
+ arch/arm64/include/uapi/asm/ptrace.h           |   7 ++
+ arch/arm64/kernel/cpufeature.c                 | 103 ++++++++++++++++++++++++
+ arch/arm64/kernel/cpuinfo.c                    |   1 +
+ arch/arm64/kernel/head.S                       |  19 ++++-
+ arch/arm64/kernel/perf_callchain.c             |   5 +-
+ arch/arm64/kernel/ptrace.c                     |  38 +++++++++
+ arch/arm64/kvm/handle_exit.c                   |  21 +++++
+ arch/arm64/kvm/hyp/Makefile                    |   1 +
+ arch/arm64/kvm/hyp/ptrauth-sr.c                |  91 ++++++++++++++++++++++
+ arch/arm64/kvm/hyp/switch.c                    |   9 ++-
+ arch/arm64/kvm/hyp/tlb.c                       |   6 +-
+ arch/arm64/kvm/sys_regs.c                      |  32 ++++++++
+ include/asm-generic/mm_hooks.h                 |  11 +++
+ include/uapi/linux/elf.h                       |   1 +
+ 28 files changed, 668 insertions(+), 13 deletions(-)
+ create mode 100644 Documentation/arm64/pointer-authentication.txt
+ create mode 100644 arch/arm64/include/asm/pointer_auth.h
+ create mode 100644 arch/arm64/kvm/hyp/ptrauth-sr.c
+
+-- 
+2.11.0
