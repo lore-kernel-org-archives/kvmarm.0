@@ -1,44 +1,63 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v5 19/20] KVM: arm/arm64: Get rid of
- kvm_timer_flush_hwstate
-Date: Mon, 27 Nov 2017 17:50:12 +0100
-Message-ID: <20171127165012.2egz3dos6h4zj7ub@kamzik.brq.redhat.com>
-References: <1509093281-15225-1-git-send-email-cdall@linaro.org>
- <1509093281-15225-20-git-send-email-cdall@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 01/15] KVM: Prepare for moving vcpu_load/vcpu_put into
+ arch specific code
+Date: Mon, 27 Nov 2017 17:53:01 +0100
+Message-ID: <838db374-6040-c805-82f3-187a2cdfc40d@redhat.com>
+References: <20171125205718.7731-1-christoffer.dall@linaro.org>
+ <20171125205718.7731-2-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1509093281-15225-20-git-send-email-cdall@linaro.org>
+In-Reply-To: <20171125205718.7731-2-christoffer.dall@linaro.org>
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <cdall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
+To: Christoffer Dall <christoffer.dall@linaro.org>, kvm@vger.kernel.org
+Cc: Andrew Jones <drjones@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, James Hogan <jhogan@kernel.org>, linux-mips@linux-mips.org, Alexander Graf <agraf@suse.com>, kvm-ppc@vger.kernel.org, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, linux-s390@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 27, 2017 at 10:34:40AM +0200, Christoffer Dall wrote:
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index 132d39a..14c50d1 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -656,7 +656,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+On 25/11/2017 21:57, Christoffer Dall wrote:
+> In preparation for moving calls to vcpu_load() and vcpu_put() into the
+> architecture specific implementations of the KVM vcpu ioctls, move the
+> calls in the main kvm_vcpu_ioctl() dispatcher function to each case
+> of the ioctl select statement.  This allows us to move the vcpu_load()
+> and vcpu_put() calls into architecture specific implementations of vcpu
+> ioctls, one by one.
+> 
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> ---
+>  virt/kvm/kvm_main.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 48 insertions(+), 5 deletions(-)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 9deb5a245b83..fafafcc38b5a 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2528,16 +2528,15 @@ static long kvm_vcpu_ioctl(struct file *filp,
+>  		return kvm_arch_vcpu_ioctl(filp, ioctl, arg);
+>  #endif
 >  
->  		local_irq_disable();
->  
-> -		kvm_timer_flush_hwstate(vcpu);
->  		kvm_vgic_flush_hwstate(vcpu);
->  
->  		/*
-> -- 
-> 2.7.4
+> -
+> -	r = vcpu_load(vcpu);
+> -	if (r)
+> -		return r;
+>  	switch (ioctl) {
+>  	case KVM_RUN: {
+>  		struct pid *oldpid;
+>  		r = -EINVAL;
+>  		if (arg)
+>  			goto out;
+> +		r = vcpu_load(vcpu);
+> +		if (r)
+> +			goto out;
+>  		oldpid = rcu_access_pointer(vcpu->pid);
 
-Hi Christoffer,
+If it is not a problem for ARM, maybe it would actually be best to leave
+the locking in kvm_vcpu_ioctl (with the already existing exception of
+KVM_INTERRUPT).  This would make vcpu_load void, and would also let you
+keep the PID adjustment in common code.  This would be more similar to
+the previous version, but without introducing __vcpu_load/__vcpu_put.
 
-I realize this is already merged, but I have a question about the
-above hunk. IIUC, the patch "KVM: arm/arm64: Move timer/vgic
-flush/sync under disabled irq" only moved kvm_vgic_flush_hwstate()
-under disabled irq because it had to be run after
-kvm_timer_flush_hwstate(). Now that kvm_timer_flush_hwstate() is
-gone can/should it be moved back out?
+Looks good apart from this doubt!  Thanks,
 
-Thanks,
-drew
+Paolo
