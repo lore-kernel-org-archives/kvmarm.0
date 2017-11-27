@@ -1,72 +1,83 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: [PATCH] KVM: arm/arm64: kvm_arch_destroy_vm cleanups
-Date: Mon, 27 Nov 2017 19:17:18 +0100
-Message-ID: <20171127181718.5290-1-drjones@redhat.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH 11/15] KVM: Move vcpu_load to arch-specific
+ kvm_arch_vcpu_ioctl_set_guest_debug
+Date: Mon, 27 Nov 2017 20:28:25 +0100
+Message-ID: <20171127192825.GA16941@cbox>
+References: <20171125205718.7731-1-christoffer.dall@linaro.org>
+ <20171125205718.7731-12-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A945B49D90
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Nov 2017 13:14:33 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sQLkL75H2xSZ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Nov 2017 13:14:32 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DA8BC49D7A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Nov 2017 13:14:32 -0500 (EST)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
-Cc: marc.zyngier@arm.com, cdall@linaro.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20171125205718.7731-12-christoffer.dall@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, Andrew Jones <drjones@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, James Hogan <jhogan@kernel.org>, linux-mips@linux-mips.org, Alexander Graf <agraf@suse.com>, kvm-ppc@vger.kernel.org, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, linux-s390@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Recently commit b2c9a85dd75a ("KVM: arm/arm64: vgic: Move
-kvm_vgic_destroy call around") caught my eye. When I looked closer I
-saw that while it made the code saner, it wasn't changing anything.
-kvm_for_each_vcpu() checks for NULL kvm->vcpus[i], so there wasn't
-a NULL dereference being fixed, and because kvm_vgic_vcpu_destroy()
-was called by kvm_arch_vcpu_free() it was still getting called, just
-not by kvm_vgic_destroy() as intended. But now the call from
-kvm_arch_vcpu_free() is redundant, and while currently harmless, it
-should be removed in case kvm_vgic_vcpu_destroy() were ever to
-want to reference vgic state, as kvm_vgic_destroy() now comes before
-kvm_arch_vcpu_free(). Additionally the other architectures set
-kvm->online_vcpus to zero after freeing them. We might as well do
-that for ARM too.
+Replying to myself again...
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- virt/kvm/arm/arm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Sat, Nov 25, 2017 at 09:57:14PM +0100, Christoffer Dall wrote:
+> Move vcpu_load() and vcpu_put() into the architecture specific
+> implementations of kvm_arch_vcpu_ioctl_set_guest_debug().
+> 
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> ---
+>  arch/arm64/kvm/guest.c    | 17 ++++++++++++++---
+>  arch/powerpc/kvm/book3s.c |  6 ++++++
+>  arch/powerpc/kvm/booke.c  | 21 +++++++++++++++------
+>  arch/s390/kvm/kvm-s390.c  | 14 +++++++++++---
+>  arch/x86/kvm/x86.c        |  6 +++++-
+>  virt/kvm/kvm_main.c       |  4 ----
+>  6 files changed, 51 insertions(+), 17 deletions(-)
+> 
 
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index a6524ff27de4..c5bc79c4ccf7 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -188,6 +188,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
- 			kvm->vcpus[i] = NULL;
- 		}
- 	}
-+	atomic_set(&kvm->online_vcpus, 0);
- }
- 
- int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-@@ -296,7 +297,6 @@ void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu)
- {
- 	kvm_mmu_free_memory_caches(vcpu);
- 	kvm_timer_vcpu_terminate(vcpu);
--	kvm_vgic_vcpu_destroy(vcpu);
- 	kvm_pmu_vcpu_destroy(vcpu);
- 	kvm_vcpu_uninit(vcpu);
- 	kmem_cache_free(kvm_vcpu_cache, vcpu);
--- 
-2.13.6
+[...]
+
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index aa76d2988178..ac26d95444c9 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -2819,15 +2819,20 @@ int kvm_arch_vcpu_ioctl_translate(struct kvm_vcpu *vcpu,
+>  int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+>  					struct kvm_guest_debug *dbg)
+>  {
+> -	int rc = 0;
+> +	int rc;
+> +
+> +	rc = vcpu_load(vcpu);
+> +	if (rc)
+> +		return rc;
+>  
+>  	vcpu->guest_debug = 0;
+>  	kvm_s390_clear_bp_data(vcpu);
+>  
+> +	rc = -EINVAL;
+>  	if (dbg->control & ~VALID_GUESTDBG_FLAGS)
+> -		return -EINVAL;
+> +		goto out;
+>  	if (!sclp.has_gpere)
+> -		return -EINVAL;
+> +		goto out;
+>  
+>  	if (dbg->control & KVM_GUESTDBG_ENABLE) {
+>  		vcpu->guest_debug = dbg->control;
+> @@ -2847,6 +2852,9 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+>  		atomic_andnot(CPUSTAT_P, &vcpu->arch.sie_block->cpuflags);
+>  	}
+>  
+> +	rc = 0;
+
+This is totally broken (although not clearly visible in the diff),
+because it overrides a potential error code.
+
+I'll fix it for v2.
+
+> +out:
+> +	vcpu_put(vcpu);
+>  	return rc;
+>  }
+>  
+
+Thanks,
+-Christoffer
