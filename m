@@ -1,7 +1,7 @@
 From: Mark Rutland <mark.rutland@arm.com>
-Subject: [PATCHv2 12/12] arm64: docs: document pointer authentication
-Date: Mon, 27 Nov 2017 16:38:06 +0000
-Message-ID: <20171127163806.31435-13-mark.rutland@arm.com>
+Subject: [PATCHv2 09/12] arm64/kvm: preserve host HCR_EL2 value
+Date: Mon, 27 Nov 2017 16:38:03 +0000
+Message-ID: <20171127163806.31435-10-mark.rutland@arm.com>
 References: <20171127163806.31435-1-mark.rutland@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20171127163806.31435-1-mark.rutland@arm.com>
@@ -10,143 +10,127 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: arnd@arndb.de, catalin.marinas@arm.com, cdall@linaro.org, kvmarm@lists.cs.columbia.edu, linux-arch@vger.kernel.org, marc.zyngier@arm.com, mark.rutland@arm.com, suzuki.poulose@arm.com, will.deacon@arm.com, yao.qi@arm.com, kernel-hardening@lists.openwall.com, linux-kernel@vger.kernel.org, awallis@codeaurora.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now that we've added code to support pointer authentication, add some
-documentation so that people can figure out if/how to use it.
+When restoring HCR_EL2 for the host, KVM uses HCR_HOST_VHE_FLAGS, which
+is a constant value. This works today, as the host HCR_EL2 value is
+always the same, but this will get in the way of supporting extensions
+that require HCR_EL2 bits to be set conditionally for the host.
+
+To allow such features to work without KVM having to explicitly handle
+every possible host feature combination, this patch has KVM save/restore
+the host HCR when switching to/from a guest HCR.
+
+For __{activate,deactivate}_traps(), the HCR save/restore is made common
+across the !VHE and VHE paths. As the host and guest HCR values must
+have E2H set when VHE is in use, register redirection should always be
+in effect at EL2, and this change should not adversely affect the VHE
+code.
+
+For the hyp TLB maintenance code, __tlb_switch_to_host_vhe() is updated
+to toggle the TGE bit with a RMW sequence, as we already do in
+__tlb_switch_to_guest_vhe().
+
+The now unused HCR_HOST_VHE_FLAGS definition is removed.
 
 Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will.deacon@arm.com>
-Cc: Yao Qi <yao.qi@arm.com>
+Reviewed-by: Christoffer Dall <cdall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu
 ---
- Documentation/arm64/booting.txt                |  8 +++
- Documentation/arm64/elf_hwcaps.txt             |  6 ++
- Documentation/arm64/pointer-authentication.txt | 85 ++++++++++++++++++++++++++
- 3 files changed, 99 insertions(+)
- create mode 100644 Documentation/arm64/pointer-authentication.txt
+ arch/arm64/include/asm/kvm_arm.h  | 1 -
+ arch/arm64/include/asm/kvm_host.h | 5 ++++-
+ arch/arm64/kvm/hyp/switch.c       | 5 +++--
+ arch/arm64/kvm/hyp/tlb.c          | 6 +++++-
+ 4 files changed, 12 insertions(+), 5 deletions(-)
 
-diff --git a/Documentation/arm64/booting.txt b/Documentation/arm64/booting.txt
-index 8d0df62c3fe0..8df9f4658d6f 100644
---- a/Documentation/arm64/booting.txt
-+++ b/Documentation/arm64/booting.txt
-@@ -205,6 +205,14 @@ Before jumping into the kernel, the following conditions must be met:
-     ICC_SRE_EL2.SRE (bit 0) must be initialised to 0b0.
-   - The DT or ACPI tables must describe a GICv2 interrupt controller.
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 62854d5d1d3b..aa02b05430e8 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -84,7 +84,6 @@
+ 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW)
+ #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
+ #define HCR_INT_OVERRIDE   (HCR_FMO | HCR_IMO)
+-#define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
  
-+  For CPUs with pointer authentication functionality:
-+  - If EL3 is present:
-+    SCR_EL3.APK (bit 16) must be initialised to 0b1
-+    SCR_EL3.API (bit 17) must be initialised to 0b1
-+  - If the kernel is entered at EL1:
-+    HCR_EL2.APK (bit 40) must be initialised to 0b1
-+    HCR_EL2.API (bit 41) must be initialised to 0b1
-+
- The requirements described above for CPU mode, caches, MMUs, architected
- timers, coherency and system registers apply to all CPUs.  All CPUs must
- enter the kernel in the same exception level.
-diff --git a/Documentation/arm64/elf_hwcaps.txt b/Documentation/arm64/elf_hwcaps.txt
-index 89edba12a9e0..6cf40e419a9d 100644
---- a/Documentation/arm64/elf_hwcaps.txt
-+++ b/Documentation/arm64/elf_hwcaps.txt
-@@ -158,3 +158,9 @@ HWCAP_SHA512
- HWCAP_SVE
+ /* TCR_EL2 Registers bits */
+ #define TCR_EL2_RES1		((1 << 31) | (1 << 23))
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 674912d7a571..39184aa3e2f2 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -199,10 +199,13 @@ typedef struct kvm_cpu_context kvm_cpu_context_t;
+ struct kvm_vcpu_arch {
+ 	struct kvm_cpu_context ctxt;
  
-     Functionality implied by ID_AA64PFR0_EL1.SVE == 0b0001.
+-	/* HYP configuration */
++	/* Guest HYP configuration */
+ 	u64 hcr_el2;
+ 	u32 mdcr_el2;
+ 
++	/* Host HYP configuration */
++	u64 host_hcr_el2;
 +
-+HWCAP_APIA
+ 	/* Exception Information */
+ 	struct kvm_vcpu_fault_info fault;
+ 
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 525c01f48867..2205f0be3ced 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -71,6 +71,8 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+ {
+ 	u64 val;
+ 
++	vcpu->arch.host_hcr_el2 = read_sysreg(hcr_el2);
 +
-+    EL0 AddPac and Auth functionality using APIAKey_EL1 is enabled, as
-+    described by Documentation/arm64/pointer-authentication.txt.
+ 	/*
+ 	 * We are about to set CPTR_EL2.TFP to trap all floating point
+ 	 * register accesses to EL2, however, the ARM ARM clearly states that
+@@ -116,7 +118,6 @@ static void __hyp_text __deactivate_traps_vhe(void)
+ 		    MDCR_EL2_TPMS;
+ 
+ 	write_sysreg(mdcr_el2, mdcr_el2);
+-	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
+ 	write_sysreg(CPACR_EL1_DEFAULT, cpacr_el1);
+ 	write_sysreg(vectors, vbar_el1);
+ }
+@@ -129,7 +130,6 @@ static void __hyp_text __deactivate_traps_nvhe(void)
+ 	mdcr_el2 |= MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT;
+ 
+ 	write_sysreg(mdcr_el2, mdcr_el2);
+-	write_sysreg(HCR_RW, hcr_el2);
+ 	write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
+ }
+ 
+@@ -151,6 +151,7 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
+ 	__deactivate_traps_arch()();
+ 	write_sysreg(0, hstr_el2);
+ 	write_sysreg(0, pmuserenr_el0);
++	write_sysreg(vcpu->arch.host_hcr_el2, hcr_el2);
+ }
+ 
+ static void __hyp_text __activate_vm(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
+index 73464a96c365..c2b0680efa2c 100644
+--- a/arch/arm64/kvm/hyp/tlb.c
++++ b/arch/arm64/kvm/hyp/tlb.c
+@@ -49,12 +49,16 @@ static hyp_alternate_select(__tlb_switch_to_guest,
+ 
+ static void __hyp_text __tlb_switch_to_host_vhe(struct kvm *kvm)
+ {
++	u64 val;
 +
-diff --git a/Documentation/arm64/pointer-authentication.txt b/Documentation/arm64/pointer-authentication.txt
-new file mode 100644
-index 000000000000..e9b5c6bdb84f
---- /dev/null
-+++ b/Documentation/arm64/pointer-authentication.txt
-@@ -0,0 +1,85 @@
-+Pointer authentication in AArch64 Linux
-+=======================================
-+
-+Author: Mark Rutland <mark.rutland@arm.com>
-+Date: 2017-07-19
-+
-+This document briefly describes the provision of pointer authentication
-+functionality in AArch64 Linux.
-+
-+
-+Architecture overview
-+---------------------
-+
-+The ARMv8.3 Pointer Authentication extension adds primitives that can be
-+used to mitigate certain classes of attack where an attacker can corrupt
-+the contents of some memory (e.g. the stack).
-+
-+The extension uses a Pointer Authentication Code (PAC) to determine
-+whether pointers have been modified unexpectedly. A PAC is derived from
-+a pointer, another value (such as the stack pointer), and a secret key
-+held in system registers.
-+
-+The extension adds instructions to insert a valid PAC into a pointer,
-+and to verify/remove the PAC from a pointer. The PAC occupies a number
-+of high-order bits of the pointer, which varies dependent on the
-+configured virtual address size and whether pointer tagging is in use.
-+
-+A subset of these instructions have been allocated from the HINT
-+encoding space. In the absence of the extension (or when disabled),
-+these instructions behave as NOPs. Applications and libraries using
-+these instructions operate correctly regardless of the presence of the
-+extension.
-+
-+
-+Basic support
-+-------------
-+
-+When CONFIG_ARM64_POINTER_AUTHENTICATION is selected, and relevant HW
-+support is present, the kernel will assign a random APIAKey value to
-+each process at exec*() time. This key is shared by all threads within
-+the process, and the key is preserved across fork(). Presence of
-+functionality using APIAKey is advertised via HWCAP_APIA.
-+
-+Recent versions of GCC can compile code with APIAKey-based return
-+address protection when passed the -msign-return-address option. This
-+uses instructions in the HINT space, and such code can run on systems
-+without the pointer authentication extension.
-+
-+The remaining instruction and data keys (APIBKey, APDAKey, APDBKey) are
-+reserved for future use, and instructions using these keys must not be
-+used by software until a purpose and scope for their use has been
-+decided. To enable future software using these keys to function on
-+contemporary kernels, where possible, instructions using these keys are
-+made to behave as NOPs.
-+
-+The generic key (APGAKey) is currently unsupported. Instructions using
-+the generic key must not be used by software.
-+
-+
-+Debugging
-+---------
-+
-+When CONFIG_ARM64_POINTER_AUTHENTICATION is selected, and relevant HW
-+support is present, the kernel will expose the position of TTBR0 PAC
-+bits in the NT_ARM_PAC_MASK regset (struct user_pac_mask), which
-+userspace can acqure via PTRACE_GETREGSET.
-+
-+Separate masks are exposed for data pointers and instruction pointers,
-+as the set of PAC bits can vary between the two. Debuggers should not
-+expect that HWCAP_APIA implies the presence (or non-presence) of this
-+regset -- in future the kernel may support the use of APIBKey, APDAKey,
-+and/or APBAKey, even in the absence of APIAKey.
-+
-+Note that the masks apply to TTBR0 addresses, and are not valid to apply
-+to TTBR1 addresses (e.g. kernel pointers).
-+
-+
-+Virtualization
-+--------------
-+
-+When CONFIG_ARM64_POINTER_AUTHENTICATION is selected, and uniform HW
-+support is present, KVM will context switch all keys used by vCPUs.
-+Otherwise, the feature is disabled. When disabled, accesses to keys, or
-+use of instructions enabled within the guest will trap to EL2, and an
-+UNDEFINED exception will be injected into the guest.
+ 	/*
+ 	 * We're done with the TLB operation, let's restore the host's
+ 	 * view of HCR_EL2.
+ 	 */
+ 	write_sysreg(0, vttbr_el2);
+-	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
++	val = read_sysreg(hcr_el2);
++	val |= HCR_TGE;
++	write_sysreg(val, hcr_el2);
+ }
+ 
+ static void __hyp_text __tlb_switch_to_host_nvhe(struct kvm *kvm)
 -- 
 2.11.0
