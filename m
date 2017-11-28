@@ -1,66 +1,78 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] kvm: arm: don't treat unavailable HYP mode as an error
-Date: Tue, 28 Nov 2017 15:26:30 +0000
-Message-ID: <6e5efe9a-cd2f-c717-f2e3-6a05679a5e2e@arm.com>
-References: <20171128151819.18669-1-ard.biesheuvel@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH 00/15] Move vcpu_load and vcpu_put calls to arch code
+Date: Tue, 28 Nov 2017 21:55:20 +0100
+Message-ID: <dd738b4f-3d99-ec3b-fa5e-d166230f9d2b@redhat.com>
+References: <20171125205718.7731-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EED349D09
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Nov 2017 10:23:44 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yyAe+XeZzsvX for <kvmarm@lists.cs.columbia.edu>;
- Tue, 28 Nov 2017 10:23:43 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B22C40D25
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Nov 2017 10:23:43 -0500 (EST)
-In-Reply-To: <20171128151819.18669-1-ard.biesheuvel@linaro.org>
-Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>, christoffer.dall@linaro.org, kvmarm@lists.cs.columbia.edu
-Cc: linux-arm-kernel@lists.infradead.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20171125205718.7731-1-christoffer.dall@linaro.org>
+Content-Language: en-US
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>, kvm@vger.kernel.org
+Cc: Andrew Jones <drjones@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, James Hogan <jhogan@kernel.org>, linux-mips@linux-mips.org, Alexander Graf <agraf@suse.com>, kvm-ppc@vger.kernel.org, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, linux-s390@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 28/11/17 15:18, Ard Biesheuvel wrote:
-> Since it is perfectly legal to run the kernel at EL1, it is not
-> actually an error if HYP mode is not available when attempting to
-> initialize KVM, given that KVM support cannot be built as a module.
-> So demote the kvm_err() to kvm_info(), which prevents the error from
-> appearing on an otherwise 'quiet' console.
+On 25.11.2017 21:57, Christoffer Dall wrote:
+> Some architectures may decide to do different things during
+> kvm_arch_vcpu_load depending on the ioctl being executed.  For example,
+> arm64 is about to do significant work in vcpu load/put when running a
+> vcpu, but it's problematic to do this for any other vcpu ioctl than
+> KVM_RUN.
 > 
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> ---
->  virt/kvm/arm/arm.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Further, while it may be possible to call kvm_arch_vcpu_load() for a
+> number of non-KVM_RUN ioctls, it makes the KVM/ARM code more difficult
+> to reason about, especially after my optimization series, because a lot
+> of things can now happen, where we have to consider if we're really in
+> the process of running a vcpu or not.
 > 
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index 772bf74ac2e9..988c888a9667 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -1460,7 +1460,7 @@ int kvm_arch_init(void *opaque)
->  	bool in_hyp_mode;
->  
->  	if (!is_hyp_mode_available()) {
-> -		kvm_err("HYP mode not available\n");
-> +		kvm_info("HYP mode not available\n");
->  		return -ENODEV;
->  	}
->  
+> This series will first move the vcpu_load() and vcpu_put() calls in the
+> arch generic dispatch function into each case of the switch statement
+> and then, one-by-one, pushed the calls down into the architecture
+> specific code making the changes for each ioctl as required.
+> 
+> Thanks,
+> -Christoffer
+> 
+> Christoffer Dall (15):
+>   KVM: Prepare for moving vcpu_load/vcpu_put into arch specific code
+>   KVM: Factor out vcpu->pid adjustment for KVM_RUN
+>   KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_run
+>   KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_get_regs
+>   KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_set_regs
+>   KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_get_sregs
+>   KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_set_sregs
+>   KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_get_mpstate
+>   KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_set_mpstate
+>   KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_translate
+>   KVM: Move vcpu_load to arch-specific
+>     kvm_arch_vcpu_ioctl_set_guest_debug
+>   KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_get_fpu
+>   KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_set_fpu
+>   KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl
+>   KVM: arm/arm64: Avoid vcpu_load for other vcpu ioctls than KVM_RUN
+> 
+>  arch/arm64/kvm/guest.c     |  17 +++++--
+>  arch/mips/kvm/mips.c       |  72 +++++++++++++++++++--------
+>  arch/powerpc/kvm/book3s.c  |  38 +++++++++++++-
+>  arch/powerpc/kvm/booke.c   |  65 +++++++++++++++++++-----
+>  arch/powerpc/kvm/powerpc.c |  24 ++++++---
+>  arch/s390/kvm/kvm-s390.c   | 119 +++++++++++++++++++++++++++++++++++++-------
+>  arch/x86/kvm/x86.c         | 121 ++++++++++++++++++++++++++++++++++++++-------
+>  include/linux/kvm_host.h   |   2 +
+>  virt/kvm/arm/arm.c         |  91 +++++++++++++++++++++++++---------
+>  virt/kvm/kvm_main.c        |  43 +++++++---------
+>  10 files changed, 463 insertions(+), 129 deletions(-)
 > 
 
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Looking at the amount of code we duplicate, I wonder if simple ifdefery
+(if possible) would be easier for the single known "special" case.
 
-	M.
+(most probably an unpopular opinion :) )
+
 -- 
-Jazz is not dead. It just smells funny...
+
+Thanks,
+
+David / dhildenb
