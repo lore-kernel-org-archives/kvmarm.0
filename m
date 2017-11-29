@@ -1,60 +1,67 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: unmap_ptes is not complete
-Date: Wed, 29 Nov 2017 19:08:44 +0100
-Message-ID: <20171129180844.GF10563@lvm>
-References: <CAPB=Z-piv-Fe+7p9xH8TuZ=xH6oJHmh2+g+Dk6gJRagixseL_Q@mail.gmail.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH v5 19/20] KVM: arm/arm64: Get rid of
+ kvm_timer_flush_hwstate
+Date: Wed, 29 Nov 2017 19:17:41 +0100
+Message-ID: <20171129181741.jykflvgx67j7fxu4@kamzik.brq.redhat.com>
+References: <1509093281-15225-1-git-send-email-cdall@linaro.org>
+ <1509093281-15225-20-git-send-email-cdall@linaro.org>
+ <20171127165012.2egz3dos6h4zj7ub@kamzik.brq.redhat.com>
+ <20171129173900.GE10563@lvm>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3003A49D75
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Nov 2017 13:05:54 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ro3dQJ33aL1D for <kvmarm@lists.cs.columbia.edu>;
- Wed, 29 Nov 2017 13:05:53 -0500 (EST)
-Received: from mail-wr0-f180.google.com (mail-wr0-f180.google.com
- [209.85.128.180])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DD1F949D6C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Nov 2017 13:05:52 -0500 (EST)
-Received: by mail-wr0-f180.google.com with SMTP id a41so2359476wra.6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Nov 2017 10:08:47 -0800 (PST)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <CAPB=Z-piv-Fe+7p9xH8TuZ=xH6oJHmh2+g+Dk6gJRagixseL_Q@mail.gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Raz <raziebe@gmail.com>
-Cc: kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20171129173900.GE10563@lvm>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <cdall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Raz,
-
-On Mon, Nov 27, 2017 at 09:10:56PM +0000, Raz wrote:
-> Hey
-> in mmu.c unmap_ptes() you invalidate *pte but not the pte itself. This
-> leads to inconsistency in el2 translation tables. ie; the pte entry is
-> cleared in the cached memory but not in the RAM, so the entry may still be
-> valid in EL2 translation tables.
-
-I'm not sure which code you're talking about.  Perhaps try sending a
-patch?
-
-> You should also clear pte itself.
+On Wed, Nov 29, 2017 at 06:39:00PM +0100, Christoffer Dall wrote:
+> On Mon, Nov 27, 2017 at 05:50:12PM +0100, Andrew Jones wrote:
+> > On Fri, Oct 27, 2017 at 10:34:40AM +0200, Christoffer Dall wrote:
+> > > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> > > index 132d39a..14c50d1 100644
+> > > --- a/virt/kvm/arm/arm.c
+> > > +++ b/virt/kvm/arm/arm.c
+> > > @@ -656,7 +656,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+> > >  
+> > >  		local_irq_disable();
+> > >  
+> > > -		kvm_timer_flush_hwstate(vcpu);
+> > >  		kvm_vgic_flush_hwstate(vcpu);
+> > >  
+> > >  		/*
+> > > -- 
+> > > 2.7.4
+> > 
+> > Hi Christoffer,
+> > 
+> > I realize this is already merged, but I have a question about the
+> > above hunk. IIUC, the patch "KVM: arm/arm64: Move timer/vgic
+> > flush/sync under disabled irq" only moved kvm_vgic_flush_hwstate()
+> > under disabled irq because it had to be run after
+> > kvm_timer_flush_hwstate(). Now that kvm_timer_flush_hwstate() is
+> > gone can/should it be moved back out?
+> > 
 > 
+> That's a great question.
+> 
+> I think my reasoning was, that since we now disable the VCPU interface
+> (and thereby maintenance interrupts), any logic that relies on a
+> maintenance interrupt firing and causing a guest exit after we've called
+> flush, would no longer work if we move this back out where interrupts
+> are enabled.
+> 
+> Thinking about this a bit more, I don't think that would ever make
+> sense, and we should be able to move it out.
+> 
+> I've tested these patches pretty heavily and would want such a change to
+> get the same kind of exposure, so I can start testing it, and if there
+> are no issues, put it in next later on in the cycle.
+> 
+> Does that sound reasonable?
 
-If you're talking about unmap_stage2_ptes(), then I must be missing
-something, because I don't see why setting the pointer to 0 should
-matter, and what you say about cached memory and RAM doesn't sound
-correct, as all virtualization-capable ARM CPUs have coherent page table
-walks.
+Sounds good to me. Thanks!
 
-Thanks,
--Christoffer
+drew
