@@ -1,64 +1,103 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v5 19/20] KVM: arm/arm64: Get rid of
- kvm_timer_flush_hwstate
-Date: Wed, 29 Nov 2017 18:39:00 +0100
-Message-ID: <20171129173900.GE10563@lvm>
-References: <1509093281-15225-1-git-send-email-cdall@linaro.org>
- <1509093281-15225-20-git-send-email-cdall@linaro.org>
- <20171127165012.2egz3dos6h4zj7ub@kamzik.brq.redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v2 12/16] KVM: Move vcpu_load to arch-specific
+ kvm_arch_vcpu_ioctl_get_fpu
+Date: Wed, 29 Nov 2017 18:40:24 +0100
+Message-ID: <ae58005c-4b83-fac0-56aa-b77511249beb@redhat.com>
+References: <20171129164116.16167-1-christoffer.dall@linaro.org>
+ <20171129164116.16167-13-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20171127165012.2egz3dos6h4zj7ub@kamzik.brq.redhat.com>
+In-Reply-To: <20171129164116.16167-13-christoffer.dall@linaro.org>
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
-To: Andrew Jones <drjones@redhat.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
+To: Christoffer Dall <christoffer.dall@linaro.org>, kvm@vger.kernel.org
+Cc: Andrew Jones <drjones@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, James Hogan <jhogan@kernel.org>, linux-mips@linux-mips.org, Alexander Graf <agraf@suse.com>, kvm-ppc@vger.kernel.org, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, linux-s390@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Nov 27, 2017 at 05:50:12PM +0100, Andrew Jones wrote:
-> On Fri, Oct 27, 2017 at 10:34:40AM +0200, Christoffer Dall wrote:
-> > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> > index 132d39a..14c50d1 100644
-> > --- a/virt/kvm/arm/arm.c
-> > +++ b/virt/kvm/arm/arm.c
-> > @@ -656,7 +656,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> >  
-> >  		local_irq_disable();
-> >  
-> > -		kvm_timer_flush_hwstate(vcpu);
-> >  		kvm_vgic_flush_hwstate(vcpu);
-> >  
-> >  		/*
-> > -- 
-> > 2.7.4
+On 29.11.2017 17:41, Christoffer Dall wrote:
+> Move vcpu_load() and vcpu_put() into the architecture specific
+> implementations of kvm_arch_vcpu_ioctl_get_fpu().
 > 
-> Hi Christoffer,
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> ---
+>  arch/s390/kvm/kvm-s390.c | 4 ++++
+>  arch/x86/kvm/x86.c       | 7 +++++--
+>  virt/kvm/kvm_main.c      | 2 --
+>  3 files changed, 9 insertions(+), 4 deletions(-)
 > 
-> I realize this is already merged, but I have a question about the
-> above hunk. IIUC, the patch "KVM: arm/arm64: Move timer/vgic
-> flush/sync under disabled irq" only moved kvm_vgic_flush_hwstate()
-> under disabled irq because it had to be run after
-> kvm_timer_flush_hwstate(). Now that kvm_timer_flush_hwstate() is
-> gone can/should it be moved back out?
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 4bf80b5..88dcb89 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -2765,6 +2765,8 @@ int kvm_arch_vcpu_ioctl_set_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
+>  
+>  int kvm_arch_vcpu_ioctl_get_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
+>  {
+> +	vcpu_load(vcpu);
+> +
+>  	/* make sure we have the latest values */
+>  	save_fpu_regs();
+>  	if (MACHINE_HAS_VX)
+> @@ -2773,6 +2775,8 @@ int kvm_arch_vcpu_ioctl_get_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
+>  	else
+>  		memcpy(fpu->fprs, vcpu->run->s.regs.fprs, sizeof(fpu->fprs));
+>  	fpu->fpc = vcpu->run->s.regs.fpc;
+> +
+> +	vcpu_put(vcpu);
+
+This is one example where we need the vcpu_put/load.
+
+>  	return 0;
+>  }
+>  
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index a074b0bd..8b54567 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -7679,9 +7679,11 @@ int kvm_arch_vcpu_ioctl_translate(struct kvm_vcpu *vcpu,
+>  
+>  int kvm_arch_vcpu_ioctl_get_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
+>  {
+> -	struct fxregs_state *fxsave =
+> -			&vcpu->arch.guest_fpu.state.fxsave;
+> +	struct fxregs_state *fxsave;
+>  
+> +	vcpu_load(vcpu);
+> +
+> +	fxsave = &vcpu->arch.guest_fpu.state.fxsave;
+>  	memcpy(fpu->fpr, fxsave->st_space, 128);
+>  	fpu->fcw = fxsave->cwd;
+>  	fpu->fsw = fxsave->swd;
+> @@ -7691,6 +7693,7 @@ int kvm_arch_vcpu_ioctl_get_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
+>  	fpu->last_dp = fxsave->rdp;
+>  	memcpy(fpu->xmm, fxsave->xmm_space, sizeof fxsave->xmm_space);
+>  
+> +	vcpu_put(vcpu);
+>  	return 0;
+>  }
+>  
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index c688eb7..73ad70a 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2673,9 +2673,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
+>  		r = -ENOMEM;
+>  		if (!fpu)
+>  			goto out;
+> -		vcpu_load(vcpu);
+>  		r = kvm_arch_vcpu_ioctl_get_fpu(vcpu, fpu);
+> -		vcpu_put(vcpu);
+>  		if (r)
+>  			goto out;
+>  		r = -EFAULT;
 > 
 
-That's a great question.
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-I think my reasoning was, that since we now disable the VCPU interface
-(and thereby maintenance interrupts), any logic that relies on a
-maintenance interrupt firing and causing a guest exit after we've called
-flush, would no longer work if we move this back out where interrupts
-are enabled.
-
-Thinking about this a bit more, I don't think that would ever make
-sense, and we should be able to move it out.
-
-I've tested these patches pretty heavily and would want such a change to
-get the same kind of exposure, so I can start testing it, and if there
-are no issues, put it in next later on in the cycle.
-
-Does that sound reasonable?
+-- 
 
 Thanks,
--Christoffer
+
+David / dhildenb
