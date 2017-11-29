@@ -1,43 +1,99 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH] KVM: arm/arm64: Avoid attempting to load timer vgic state without a vgic
-Date: Wed, 29 Nov 2017 17:30:09 +0100
-Message-ID: <1511973009-56442-1-git-send-email-christoffer.dall@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
-Sender: kvm-owner@vger.kernel.org
-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Subject: [PATCH v2 00/16] Move vcpu_load and vcpu_put calls to arch code
+Date: Wed, 29 Nov 2017 17:41:00 +0100
+Message-ID: <20171129164116.16167-1-christoffer.dall@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AA9AF49D51
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Nov 2017 11:38:26 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id PdHchr5WqGS1 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 29 Nov 2017 11:38:25 -0500 (EST)
+Received: from mail-wm0-f66.google.com (mail-wm0-f66.google.com [74.125.82.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6CF6349D4E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Nov 2017 11:38:25 -0500 (EST)
+Received: by mail-wm0-f66.google.com with SMTP id 9so7566417wme.4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Nov 2017 08:41:20 -0800 (PST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvm@vger.kernel.org
+Cc: linux-mips@linux-mips.org, Marc Zyngier <marc.zyngier@arm.com>, James Hogan <jhogan@kernel.org>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, kvm-ppc@vger.kernel.org, Alexander Graf <agraf@suse.com>, linux-arm-kernel@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>, linux-s390@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The timer optimization patches inadvertendly changed the logic to always
-load the timer state as if we have a vgic, even if we don't have a vgic.
+Some architectures may decide to do different things during
+kvm_arch_vcpu_load depending on the ioctl being executed.  For example,
+arm64 is about to do significant work in vcpu load/put when running a
+vcpu, but it's problematic to do this for any other vcpu ioctl than
+KVM_RUN.
 
-Fix this by doing the usual irqchip_in_kernel() check and call the
-appropriate load function.
+Further, while it may be possible to call kvm_arch_vcpu_load() for a
+number of non-KVM_RUN ioctls, it makes the KVM/ARM code more difficult
+to reason about, especially after my optimization series, because a lot
+of things can now happen, where we have to consider if we're really in
+the process of running a vcpu or not.
 
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
-I'm aware that this looks slightly ugly following the no_vgic label, but
-this code is about to disappear with the vcpu_load/vcpu_put series, so
-it's just a fix for the current version.
+This series will first move the vcpu_load() and vcpu_put() calls in the
+arch generic dispatch function into each case of the switch statement
+and then, one-by-one, pushed the calls down into the architecture
+specific code making the changes for each ioctl as required.
 
- virt/kvm/arm/arch_timer.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Patches also available at:
+git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git vcpu-load-put-v2
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 190c99e..f9555b1 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -835,7 +835,10 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
- no_vgic:
- 	preempt_disable();
- 	timer->enabled = 1;
--	kvm_timer_vcpu_load_vgic(vcpu);
-+	if (!irqchip_in_kernel(vcpu->kvm))
-+		kvm_timer_vcpu_load_user(vcpu);
-+	else
-+		kvm_timer_vcpu_load_vgic(vcpu);
- 	preempt_enable();
- 
- 	return 0;
+Changes since v1:
+ - Fix PPC and S390 bugs from v1
+ - Take the mutex in the main disaptcher function and make vcpu_load a
+   void, which simplifies the patches overall.
+ - Add a patch that moves vcpu_load for arm/arm64 after the first-run
+   init function.
+
+Thanks,
+-Christoffer
+
+Christoffer Dall (16):
+  KVM: Take vcpu->mutex outside vcpu_load
+  KVM: Prepare for moving vcpu_load/vcpu_put into arch specific code
+  KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_run
+  KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_get_regs
+  KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_set_regs
+  KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_get_sregs
+  KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_set_sregs
+  KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_get_mpstate
+  KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_set_mpstate
+  KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_translate
+  KVM: Move vcpu_load to arch-specific
+    kvm_arch_vcpu_ioctl_set_guest_debug
+  KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_get_fpu
+  KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_set_fpu
+  KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl
+  KVM: arm/arm64: Avoid vcpu_load for other vcpu ioctls than KVM_RUN
+  KVM: arm/arm64: Move vcpu_load call after kvm_vcpu_first_run_init
+
+ arch/arm64/kvm/guest.c        |  12 +++--
+ arch/mips/kvm/mips.c          |  58 +++++++++++++++--------
+ arch/powerpc/kvm/book3s.c     |  24 +++++++++-
+ arch/powerpc/kvm/booke.c      |  51 +++++++++++++++-----
+ arch/powerpc/kvm/powerpc.c    |  19 +++++---
+ arch/s390/kvm/kvm-s390.c      |  90 +++++++++++++++++++++++++++--------
+ arch/x86/kvm/vmx.c            |   4 +-
+ arch/x86/kvm/x86.c            | 107 ++++++++++++++++++++++++++++++------------
+ include/linux/kvm_host.h      |   2 +-
+ virt/kvm/arm/arch_timer.c     |   4 --
+ virt/kvm/arm/arm.c            |  68 ++++++++++++++++++---------
+ virt/kvm/arm/vgic/vgic-init.c |  11 -----
+ virt/kvm/kvm_main.c           |  17 ++-----
+ 13 files changed, 323 insertions(+), 144 deletions(-)
+
 -- 
 2.7.4
