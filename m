@@ -1,26 +1,27 @@
-From: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v2 08/16] KVM: Move vcpu_load to arch-specific
- kvm_arch_vcpu_ioctl_get_mpstate
-Date: Wed, 29 Nov 2017 18:47:42 +0100
-Message-ID: <70d9ce37-8c96-fcf9-b736-20455dfaf440@redhat.com>
-References: <20171129164116.16167-1-christoffer.dall@linaro.org>
- <20171129164116.16167-9-christoffer.dall@linaro.org>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: unmap_ptes is not complete
+Date: Wed, 29 Nov 2017 19:08:44 +0100
+Message-ID: <20171129180844.GF10563@lvm>
+References: <CAPB=Z-piv-Fe+7p9xH8TuZ=xH6oJHmh2+g+Dk6gJRagixseL_Q@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 630DF49D75
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Nov 2017 12:44:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3003A49D75
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Nov 2017 13:05:54 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id X0PpMNhuqSFM for <kvmarm@lists.cs.columbia.edu>;
- Wed, 29 Nov 2017 12:44:55 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 88BE249D6C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Nov 2017 12:44:55 -0500 (EST)
-In-Reply-To: <20171129164116.16167-9-christoffer.dall@linaro.org>
-Content-Language: en-US
+ with ESMTP id ro3dQJ33aL1D for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 29 Nov 2017 13:05:53 -0500 (EST)
+Received: from mail-wr0-f180.google.com (mail-wr0-f180.google.com
+ [209.85.128.180])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DD1F949D6C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Nov 2017 13:05:52 -0500 (EST)
+Received: by mail-wr0-f180.google.com with SMTP id a41so2359476wra.6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Nov 2017 10:08:47 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <CAPB=Z-piv-Fe+7p9xH8TuZ=xH6oJHmh2+g+Dk6gJRagixseL_Q@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,105 +31,30 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>, kvm@vger.kernel.org
-Cc: linux-mips@linux-mips.org, Marc Zyngier <marc.zyngier@arm.com>, James Hogan <jhogan@kernel.org>, Cornelia Huck <cohuck@redhat.com>, kvm-ppc@vger.kernel.org, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.com>, Paolo Bonzini <pbonzini@redhat.com>, linux-s390@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Raz <raziebe@gmail.com>
+Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 29.11.2017 17:41, Christoffer Dall wrote:
-> Move vcpu_load() and vcpu_put() into the architecture specific
-> implementations of kvm_arch_vcpu_ioctl_get_mpstate().
-> 
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> ---
->  arch/s390/kvm/kvm-s390.c | 11 +++++++++--
->  arch/x86/kvm/x86.c       |  3 +++
->  virt/kvm/arm/arm.c       |  3 +++
->  virt/kvm/kvm_main.c      |  2 --
->  4 files changed, 15 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index d95b4f1..396fc3d 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -2836,9 +2836,16 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
->  int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
->  				    struct kvm_mp_state *mp_state)
->  {
-> +	int ret;
-> +
-> +	vcpu_load(vcpu);
-> +
->  	/* CHECK_STOP and LOAD are not supported yet */
-> -	return is_vcpu_stopped(vcpu) ? KVM_MP_STATE_STOPPED :
-> -				       KVM_MP_STATE_OPERATING;
-> +	ret = is_vcpu_stopped(vcpu) ? KVM_MP_STATE_STOPPED :
-> +				      KVM_MP_STATE_OPERATING;
-> +
-> +	vcpu_put(vcpu);
-> +	return ret;
->  }
->  
->  int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index a31a80a..9bf62c3 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -7440,6 +7440,8 @@ int kvm_arch_vcpu_ioctl_get_sregs(struct kvm_vcpu *vcpu,
->  int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
->  				    struct kvm_mp_state *mp_state)
->  {
-> +	vcpu_load(vcpu);
-> +
->  	kvm_apic_accept_events(vcpu);
->  	if (vcpu->arch.mp_state == KVM_MP_STATE_HALTED &&
->  					vcpu->arch.pv.pv_unhalted)
-> @@ -7447,6 +7449,7 @@ int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
->  	else
->  		mp_state->mp_state = vcpu->arch.mp_state;
->  
-> +	vcpu_put(vcpu);
->  	return 0;
->  }
->  
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index 1f448b2..a717170 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -381,11 +381,14 @@ static void vcpu_power_off(struct kvm_vcpu *vcpu)
->  int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
->  				    struct kvm_mp_state *mp_state)
->  {
-> +	vcpu_load(vcpu);
-> +
->  	if (vcpu->arch.power_off)
->  		mp_state->mp_state = KVM_MP_STATE_STOPPED;
->  	else
->  		mp_state->mp_state = KVM_MP_STATE_RUNNABLE;
->  
-> +	vcpu_put(vcpu);
->  	return 0;
->  }
->  
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 19cf2d1..eac3c29 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2603,9 +2603,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
->  	case KVM_GET_MP_STATE: {
->  		struct kvm_mp_state mp_state;
->  
-> -		vcpu_load(vcpu);
->  		r = kvm_arch_vcpu_ioctl_get_mpstate(vcpu, &mp_state);
-> -		vcpu_put(vcpu);
->  		if (r)
->  			goto out;
->  		r = -EFAULT;
+Hi Raz,
+
+On Mon, Nov 27, 2017 at 09:10:56PM +0000, Raz wrote:
+> Hey
+> in mmu.c unmap_ptes() you invalidate *pte but not the pte itself. This
+> leads to inconsistency in el2 translation tables. ie; the pte entry is
+> cleared in the cached memory but not in the RAM, so the entry may still be
+> valid in EL2 translation tables.
+
+I'm not sure which code you're talking about.  Perhaps try sending a
+patch?
+
+> You should also clear pte itself.
 > 
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
--- 
+If you're talking about unmap_stage2_ptes(), then I must be missing
+something, because I don't see why setting the pointer to 0 should
+matter, and what you say about cached memory and RAM doesn't sound
+correct, as all virtualization-capable ARM CPUs have coherent page table
+walks.
 
 Thanks,
-
-David / dhildenb
+-Christoffer
