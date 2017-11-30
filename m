@@ -1,136 +1,104 @@
-From: Yury Norov <ynorov@caviumnetworks.com>
-Subject: Re: [PATCH 37/37] KVM: arm/arm64: Avoid VGICv3 save/restore on VHE
- with no IRQs
-Date: Thu, 30 Nov 2017 21:33:30 +0300
-Message-ID: <20171130183330.x7jc6m2yffcxcvkz@yury-thinkpad>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 08/37] KVM: arm64: Defer restoring host VFP state to
+ vcpu_put
+Date: Thu, 30 Nov 2017 19:07:36 +0000
+Message-ID: <9c050311-16dc-7459-6c87-76400c6997e4@arm.com>
 References: <20171012104141.26902-1-christoffer.dall@linaro.org>
- <20171012104141.26902-38-christoffer.dall@linaro.org>
+ <20171012104141.26902-9-christoffer.dall@linaro.org>
+ <20171125075221.oj5euwo7hnktxxsj@yury-thinkpad> <20171126161716.GK28855@cbox>
+ <20171126185852.bjte7raycorctft2@yury-thinkpad>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20171012104141.26902-38-christoffer.dall@linaro.org>
+In-Reply-To: <20171126185852.bjte7raycorctft2@yury-thinkpad>
+Content-Language: en-GB
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
+To: Yury Norov <ynorov@caviumnetworks.com>, Christoffer Dall <cdall@linaro.org>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Oct 12, 2017 at 12:41:41PM +0200, Christoffer Dall wrote:
-> We can finally get completely rid of any calls to the VGICv3
-> save/restore functions when the AP lists are empty on VHE systems.  This
-> requires carefully factoring out trap configuration from saving and
-> restoring state, and carefully choosing what to do on the VHE and
-> non-VHE path.
+On 26/11/17 18:58, Yury Norov wrote:
+> On Sun, Nov 26, 2017 at 05:17:16PM +0100, Christoffer Dall wrote:
+>> Hi Yury,
+>>
+>> On Sat, Nov 25, 2017 at 10:52:21AM +0300, Yury Norov wrote:
+>>>
+>>> On Thu, Oct 12, 2017 at 12:41:12PM +0200, Christoffer Dall wrote:
+>>>> Avoid saving the guest VFP registers and restoring the host VFP
+>>>> registers on every exit from the VM.  Only when we're about to run
+>>>> userspace or other threads in the kernel do we really have to switch the
+>>>> state back to the host state.
+>>>>
+>>>> We still initially configure the VFP registers to trap when entering the
+>>>> VM, but the difference is that we now leave the guest state in the
+>>>> hardware registers while running the VM.
+>>>>
+>>>> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+>>>> ---
+>>>>  arch/arm64/include/asm/kvm_emulate.h |  5 ++++
+>>>>  arch/arm64/include/asm/kvm_host.h    |  3 +++
+>>>>  arch/arm64/kernel/asm-offsets.c      |  1 +
+>>>>  arch/arm64/kvm/hyp/entry.S           |  3 +++
+>>>>  arch/arm64/kvm/hyp/switch.c          | 47 +++++++++++-------------------------
+>>>>  arch/arm64/kvm/hyp/sysreg-sr.c       | 21 +++++++++++++---
+>>>>  6 files changed, 44 insertions(+), 36 deletions(-)
+>>>>
+>>>> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+>>>> index 1fbfe96..630dd60 100644
+>>>> --- a/arch/arm64/include/asm/kvm_emulate.h
+>>>> +++ b/arch/arm64/include/asm/kvm_emulate.h
+>>>> @@ -56,6 +56,11 @@ static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
+>>>>  	return (unsigned long *)&vcpu->arch.hcr_el2;
+>>>>  }
+>>>>  
+>>>> +static inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
+>>>> +{
+>>>> +	return (!(vcpu->arch.hcr_el2 & HCR_RW));
+>>>> +}
+>>>> +
+>>>>  static inline unsigned long *vcpu_pc(const struct kvm_vcpu *vcpu)
+>>>>  {
+>>>>  	return (unsigned long *)&vcpu_gp_regs(vcpu)->regs.pc;
+>>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>>>> index 7d3bfa7..5e09eb9 100644
+>>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>>> @@ -210,6 +210,9 @@ struct kvm_vcpu_arch {
+>>>>  	/* Guest debug state */
+>>>>  	u64 debug_flags;
+>>>>  
+>>>> +	/* 1 if the guest VFP state is loaded into the hardware */
+>>>> +	u64 guest_vfp_loaded;
+>>>
+>>> May it be just u8/bool?
+>>>
+>> This particular field is accessed from assembly code, and I'm not sure
+>> what guarantees the compiler makes in terms of how a u8/bool is
+>> allocated with respect to padding and alignment, and I think that's why
+>> we've been using u64 fields in the past.
+>>
+>> I don't actually remember the details, but I'd rather err on the side of
+>> caution than trying to save a few bytes.  However, if someone can
+>> convince me there's a completely safe way to do this, then I'm happy to
+>> change it.
 > 
-> One of the challenges is that we cannot save/restore the VMCR lazily
-> because we can only write the VMCR when ICC_SRE_EL1.SRE is cleared when
-> emulating a GICv2-on-GICv3, since otherwise all Group-0 interrupts end
-> up being delivered as FIQ.
+> 'strb     w0, [x3, #VCPU_GUEST_VFP_LOADED]' would work. See
+> C6.6.181 STRB (register) in ARM64 ARM.
 > 
-> To solve this problem, and still provide fast performance in the fast
-> path of exiting a VM when no interrupts are pending (which also
-> optimized the latency for actually delivering virtual interrupts coming
-> from physical interrupts), we orchestrate a dance of only doing the
-> activate/deactivate traps in vgic load/put for VHE systems (which can
-> have ICC_SRE_EL1.SRE cleared when running in the host), and doing the
-> configuration on every round-trip on non-VHE systems.
-> 
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> ---
->  arch/arm/include/asm/kvm_hyp.h   |   2 +
->  arch/arm/kvm/hyp/switch.c        |   8 ++-
->  arch/arm64/include/asm/kvm_hyp.h |   2 +
->  arch/arm64/kvm/hyp/switch.c      |   8 ++-
->  virt/kvm/arm/hyp/vgic-v3-sr.c    | 116 +++++++++++++++++++++++++--------------
->  virt/kvm/arm/vgic/vgic-v3.c      |   6 ++
->  virt/kvm/arm/vgic/vgic.c         |   7 +--
->  7 files changed, 101 insertions(+), 48 deletions(-)
+> The only thing I would recommend is to reorder fields in kvm_vcpu_arch
+> to avoid unneeded holes in the structure. It already spend 10 bytes for
+> nothing in 3 holes.
 
-[...]
+Terrifying. How many vcpu are you going to run before this becomes a
+real bottleneck? KVM on a 6502? ;-)
 
-> diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
-> index ed5da75..34d71d2 100644
-> --- a/virt/kvm/arm/hyp/vgic-v3-sr.c
-> +++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
-> @@ -208,15 +208,15 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
->  {
->  	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
->  	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
-> -	u64 val;
->  
->  	/*
->  	 * Make sure stores to the GIC via the memory mapped interface
-> -	 * are now visible to the system register interface.
-> +	 * are now visible to the system register interface when reading the
-> +	 * LRs, and when reading back the VMCR on non-VHE systems.
->  	 */
-> -	if (!cpu_if->vgic_sre) {
-> -		dsb(st);
-> -		cpu_if->vgic_vmcr = read_gicreg(ICH_VMCR_EL2);
-> +	if (used_lrs || !has_vhe()) {
-> +		if (!cpu_if->vgic_sre)
-> +			dsb(st);
->  	}
+Now, when it comes to reordering fields, please keep in mind that the
+order of the fields in the structure does matter. We want the hottest
+fields grouped together so that they are fetched in the same cache line.
 
-Nit:
-	if ((used_lrs || !has_vhe()) && !cpu_if->vgic_sre)
-		dsb(st);
+Thanks,
 
->  
->  	if (used_lrs) {
-> @@ -225,7 +225,7 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
->  
->  		elrsr = read_gicreg(ICH_ELSR_EL2);
->  
-> -		write_gicreg(0, ICH_HCR_EL2);
-> +		write_gicreg(cpu_if->vgic_hcr & ~ICH_HCR_EN, ICH_HCR_EL2);
->  
->  		for (i = 0; i < used_lrs; i++) {
->  			if (elrsr & (1 << i))
-> @@ -235,18 +235,6 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
->  
->  			__gic_v3_set_lr(0, i);
->  		}
-> -	} else {
-> -		if (static_branch_unlikely(&vgic_v3_cpuif_trap))
-> -			write_gicreg(0, ICH_HCR_EL2);
-> -	}
-> -
-> -	val = read_gicreg(ICC_SRE_EL2);
-> -	write_gicreg(val | ICC_SRE_EL2_ENABLE, ICC_SRE_EL2);
-> -
-> -	if (!cpu_if->vgic_sre) {
-> -		/* Make sure ENABLE is set at EL2 before setting SRE at EL1 */
-> -		isb();
-> -		write_gicreg(1, ICC_SRE_EL1);
->  	}
->  }
->  
-> @@ -256,6 +244,31 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
->  	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
->  	int i;
->  
-> +	if (used_lrs) {
-> +		write_gicreg(cpu_if->vgic_hcr, ICH_HCR_EL2);
-> +
-> +		for (i = 0; i < used_lrs; i++)
-> +			__gic_v3_set_lr(cpu_if->vgic_lr[i], i);
-> +	}
-> +
-> +	/*
-> +	 * Ensure that writes to the LRs, and on non-VHE systems ensure that
-> +	 * the write to the VMCR in __vgic_v3_activate_traps(), will have
-> +	 * reached the (re)distributors. This ensure the guest will read the
-> +	 * correct values from the memory-mapped interface.
-> +	 */
-> +	if (used_lrs || !has_vhe()) {
-> +		if (!cpu_if->vgic_sre) {
-> +			isb();
-> +			dsb(sy);
-> +		}
-> +	}
-
-And here
-
-> +}
-> +
+	M.
+-- 
+Jazz is not dead. It just smells funny...
