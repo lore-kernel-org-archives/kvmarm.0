@@ -1,102 +1,170 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v5 3/8] KVM: arm/arm64: Don't cache the timer IRQ level
-Date: Fri, 1 Dec 2017 18:04:55 +0000
-Message-ID: <bf436ce1-1908-ff74-386b-45870c04a133@arm.com>
-References: <20171120191649.17290-1-christoffer.dall@linaro.org>
- <20171120191649.17290-4-christoffer.dall@linaro.org>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH 13/37] KVM: arm64: Introduce VHE-specific kvm_vcpu_run
+Date: Fri, 1 Dec 2017 19:10:00 +0100
+Message-ID: <20171201181000.GE6615@lvm>
+References: <20171012104141.26902-1-christoffer.dall@linaro.org>
+ <20171012104141.26902-14-christoffer.dall@linaro.org>
+ <20171107152529.taszxq37f35yw3ga@kamzik.brq.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20171120191649.17290-4-christoffer.dall@linaro.org>
-Content-Language: en-GB
+Content-Disposition: inline
+In-Reply-To: <20171107152529.taszxq37f35yw3ga@kamzik.brq.redhat.com>
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@redhat.com>
+To: Andrew Jones <drjones@redhat.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
-
-On 20/11/17 19:16, Christoffer Dall wrote:
-> The timer was modeled after a strict idea of modelling an interrupt line
-> level in software, meaning that only transitions in the level needed to
-> be reported to the VGIC.  This works well for the timer, because the
-> arch timer code is in complete control of the device and can track the
-> transitions of the line.
+On Tue, Nov 07, 2017 at 04:25:29PM +0100, Andrew Jones wrote:
+> On Thu, Oct 12, 2017 at 12:41:17PM +0200, Christoffer Dall wrote:
+> > So far this is just a copy of the legacy non-VHE switch function, where
+> > we only change the existing calls to has_vhe() in both the original and
+> > new functions.
+> > 
+> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> > ---
+> >  arch/arm/include/asm/kvm_asm.h   |  4 +++
+> >  arch/arm64/include/asm/kvm_asm.h |  2 ++
+> >  arch/arm64/kvm/hyp/switch.c      | 57 ++++++++++++++++++++++++++++++++++++++++
+> >  virt/kvm/arm/arm.c               |  5 +++-
+> >  4 files changed, 67 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm/include/asm/kvm_asm.h b/arch/arm/include/asm/kvm_asm.h
+> > index 36dd296..1a7bc5f 100644
+> > --- a/arch/arm/include/asm/kvm_asm.h
+> > +++ b/arch/arm/include/asm/kvm_asm.h
+> > @@ -70,8 +70,12 @@ extern void __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu);
+> >  
+> >  extern void __kvm_timer_set_cntvoff(u32 cntvoff_low, u32 cntvoff_high);
+> >  
+> > +/* no VHE on 32-bit :( */
+> > +static inline int kvm_vcpu_run(struct kvm_vcpu *vcpu) { return 0; }
+> > +
+> >  extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+> >  
+> > +
 > 
-> However, as we are about to support using the HW bit in the VGIC not
-> just for the timer, but also for VFIO which cannot track transitions of
-> the interrupt line, we have to decide on an interface for level
-> triggered mapped interrupts to the GIC, which both the timer and VFIO
-> can use.
+> stray new blank line
 > 
-> VFIO only sees an asserting transition of the physical interrupt line,
-> and tells the VGIC when that happens.  That means that part of the
-> interrupt flow is offloaded to the hardware.
+> >  extern void __init_stage2_translation(void);
+> >  
+> >  extern u64 __vgic_v3_get_ich_vtr_el2(void);
+> > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> > index 7e48a39..2eb5b23 100644
+> > --- a/arch/arm64/include/asm/kvm_asm.h
+> > +++ b/arch/arm64/include/asm/kvm_asm.h
+> > @@ -57,6 +57,8 @@ extern void __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu);
+> >  
+> >  extern void __kvm_timer_set_cntvoff(u32 cntvoff_low, u32 cntvoff_high);
+> >  
+> > +extern int kvm_vcpu_run(struct kvm_vcpu *vcpu);
+> > +
+> >  extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+> >  
+> >  extern u64 __vgic_v3_get_ich_vtr_el2(void);
+> > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> > index ed30af5..8a0f38f 100644
+> > --- a/arch/arm64/kvm/hyp/switch.c
+> > +++ b/arch/arm64/kvm/hyp/switch.c
+> > @@ -319,6 +319,63 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+> >  	return false;
+> >  }
+> >  
+> > +/* Switch to the guest for VHE systems running in EL2 */
+> > +int kvm_vcpu_run(struct kvm_vcpu *vcpu)
+> > +{
+> > +	struct kvm_cpu_context *host_ctxt;
+> > +	struct kvm_cpu_context *guest_ctxt;
+> > +	u64 exit_code;
+> > +
+> > +	vcpu = kern_hyp_va(vcpu);
+> > +
+> > +	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> > +	host_ctxt->__hyp_running_vcpu = vcpu;
+> > +	guest_ctxt = &vcpu->arch.ctxt;
+> > +
+> > +	__sysreg_save_host_state(host_ctxt);
+> > +
+> > +	__activate_traps(vcpu);
+> > +	__activate_vm(vcpu);
+> > +
+> > +	__vgic_restore_state(vcpu);
+> > +	__timer_enable_traps(vcpu);
+> > +
+> > +	/*
+> > +	 * We must restore the 32-bit state before the sysregs, thanks
+> > +	 * to erratum #852523 (Cortex-A57) or #853709 (Cortex-A72).
+> > +	 */
+> > +	__sysreg32_restore_state(vcpu);
+> > +	__sysreg_restore_guest_state(guest_ctxt);
+> > +	__debug_switch_to_guest(vcpu);
+> > +
+> > +	/* Jump in the fire! */
+> > +again:
+> > +	exit_code = __guest_enter(vcpu, host_ctxt);
+> > +	/* And we're baaack! */
+> > +
+> > +	if (fixup_guest_exit(vcpu, &exit_code))
+> > +		goto again;
+> > +
+> > +	__sysreg_save_guest_state(guest_ctxt);
+> > +	__sysreg32_save_state(vcpu);
+> > +	__timer_disable_traps(vcpu);
+> > +	__vgic_save_state(vcpu);
+> > +
+> > +	__deactivate_traps(vcpu);
+> > +	__deactivate_vm(vcpu);
+> > +
+> > +	__sysreg_restore_host_state(host_ctxt);
+> > +
+> > +	/*
+> > +	 * This must come after restoring the host sysregs, since a non-VHE
+> > +	 * system may enable SPE here and make use of the TTBRs.
+> > +	 */
+> > +	__debug_switch_to_host(vcpu);
+> > +
+> > +	return exit_code;
+> > +}
+> > +
+> > +/* Switch to the guest for legacy non-VHE systems */
+> >  int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+> >  {
+> >  	struct kvm_cpu_context *host_ctxt;
+> > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> > index cf121b2..b11647a 100644
+> > --- a/virt/kvm/arm/arm.c
+> > +++ b/virt/kvm/arm/arm.c
+> > @@ -706,7 +706,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+> >  		trace_kvm_entry(*vcpu_pc(vcpu));
+> >  		guest_enter_irqoff();
+> >  
+> > -		ret = kvm_call_hyp(__kvm_vcpu_run, vcpu);
+> > +		if (has_vhe())
+> > +			ret = kvm_vcpu_run(vcpu);
+> > +		else
+> > +			ret = kvm_call_hyp(__kvm_vcpu_run, vcpu);
 > 
-> To use the same interface for VFIO devices and the timer, we therefore
-> have to change the timer (we cannot change VFIO because it doesn't know
-> the details of the device it is assigning to a VM).
+> So kvm_vcpu_run() is going to be VHE only, but the only way for people
+> stepping through the code to know that is by seeing this callsite or by
+> reading the comment above it. Everywhere else we make it much more clear
+> with the _vhe and _nvhe suffixes. I wonder if we should keep that pattern
+> by adding
 > 
-> Luckily, changing the timer is simple, we just need to stop 'caching'
-> the line level, but instead let the VGIC know the state of the timer
-> every time there is a potential change in the line level, and when the
-> line level should be asserted from the timer ISR.  The VGIC can ignore
-> extra notifications using its validate mechanism.
-
-Indeed vgic_validate_injection() should take care of that change.
-
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-
-Cheers,
-Andre.
-
-> ---
->  virt/kvm/arm/arch_timer.c | 20 +++++++++++++-------
->  1 file changed, 13 insertions(+), 7 deletions(-)
+>  static int kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  {
+>     if (has_vhe())
+>         ret = kvm_vcpu_run_vhe(vcpu);
+>     else
+>         ret = kvm_call_hyp(__kvm_vcpu_run_nvhe, vcpu);
+>  }
 > 
-> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-> index 190c99ed1b73..5f8ad8e3f3ff 100644
-> --- a/virt/kvm/arm/arch_timer.c
-> +++ b/virt/kvm/arm/arch_timer.c
-> @@ -99,11 +99,9 @@ static irqreturn_t kvm_arch_timer_handler(int irq, void *dev_id)
->  	}
->  	vtimer = vcpu_vtimer(vcpu);
->  
-> -	if (!vtimer->irq.level) {
-> -		vtimer->cnt_ctl = read_sysreg_el0(cntv_ctl);
-> -		if (kvm_timer_irq_can_fire(vtimer))
-> -			kvm_timer_update_irq(vcpu, true, vtimer);
-> -	}
-> +	vtimer->cnt_ctl = read_sysreg_el0(cntv_ctl);
-> +	if (kvm_timer_irq_can_fire(vtimer))
-> +		kvm_timer_update_irq(vcpu, true, vtimer);
->  
->  	if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
->  		kvm_vtimer_update_mask_user(vcpu);
-> @@ -324,12 +322,20 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
->  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
->  	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
->  	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
-> +	bool level;
->  
->  	if (unlikely(!timer->enabled))
->  		return;
->  
-> -	if (kvm_timer_should_fire(vtimer) != vtimer->irq.level)
-> -		kvm_timer_update_irq(vcpu, !vtimer->irq.level, vtimer);
-> +	/*
-> +	 * The vtimer virtual interrupt is a 'mapped' interrupt, meaning part
-> +	 * of its lifecycle is offloaded to the hardware, and we therefore may
-> +	 * not have lowered the irq.level value before having to signal a new
-> +	 * interrupt, but have to signal an interrupt every time the level is
-> +	 * asserted.
-> +	 */
-> +	level = kvm_timer_should_fire(vtimer);
-> +	kvm_timer_update_irq(vcpu, level, vtimer);
->  
->  	if (kvm_timer_should_fire(ptimer) != ptimer->irq.level)
->  		kvm_timer_update_irq(vcpu, !ptimer->irq.level, ptimer);
+> to virt/kvm/arm/arm.c and then calling that from here.
 > 
+> I'm afraid the __ prefix is too ambiguous in the kernel to interpret
+> __foo() as the hyp mode non-VHE version of foo(), the hyp mode VHE
+> version.
+> 
+Sure.
+
+Thanks,
+-Christoffer
