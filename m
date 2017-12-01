@@ -1,72 +1,74 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH] KVM: arm/arm64: kvm_arch_destroy_vm cleanups
-Date: Fri, 1 Dec 2017 09:46:40 +0000
-Message-ID: <CAMJs5B-hATRa7ajuVj0ivT2RSTieVMNK=kBgfZ6h2vr2c7TdyQ@mail.gmail.com>
-References: <20171127181718.5290-1-drjones@redhat.com>
- <20171201080919.GC4218@cbox>
- <20171201081837.ggr7wnn6dtx7m2bl@hawk.localdomain>
+From: Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>
+Subject: Re: [PATCH v4 2/2] arm64: Add software workaround for Falkor erratum
+ 1041
+Date: Fri, 1 Dec 2017 11:24:58 +0000
+Message-ID: <20171201112457.GE18083@arm.com>
+References: <1511824680-16397-1-git-send-email-shankerd@codeaurora.org>
+ <1511824680-16397-3-git-send-email-shankerd@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 874B840D8B
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Dec 2017 04:43:44 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ibau48zAe8sj for <kvmarm@lists.cs.columbia.edu>;
- Fri,  1 Dec 2017 04:43:43 -0500 (EST)
-Received: from mail-pg0-f66.google.com (mail-pg0-f66.google.com [74.125.83.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6144240D25
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Dec 2017 04:43:43 -0500 (EST)
-Received: by mail-pg0-f66.google.com with SMTP id j9so4265145pgc.11
- for <kvmarm@lists.cs.columbia.edu>; Fri, 01 Dec 2017 01:46:42 -0800 (PST)
-In-Reply-To: <20171201081837.ggr7wnn6dtx7m2bl@hawk.localdomain>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <1511824680-16397-3-git-send-email-shankerd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Shanker Donthineni <shankerd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+Cc: Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>, Robin Murphy <robin.murphy-5wv7dgnIgG8@public.gmane.org>, Ard Biesheuvel <ard.biesheuvel-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Matt Fleming <matt-mF/unelCI9GS6iBeEJttW/XRex20P6io@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Dec 1, 2017 at 8:18 AM, Andrew Jones <drjones@redhat.com> wrote:
-> On Fri, Dec 01, 2017 at 09:09:19AM +0100, Christoffer Dall wrote:
->> Hi Drew,
->>
->> On Mon, Nov 27, 2017 at 07:17:18PM +0100, Andrew Jones wrote:
->> > Recently commit b2c9a85dd75a ("KVM: arm/arm64: vgic: Move
->> > kvm_vgic_destroy call around") caught my eye. When I looked closer I
->> > saw that while it made the code saner, it wasn't changing anything.
->> > kvm_for_each_vcpu() checks for NULL kvm->vcpus[i], so there wasn't
->> > a NULL dereference being fixed, and because kvm_vgic_vcpu_destroy()
->> > was called by kvm_arch_vcpu_free() it was still getting called, just
->> > not by kvm_vgic_destroy() as intended. But now the call from
->> > kvm_arch_vcpu_free() is redundant, and while currently harmless, it
->> > should be removed in case kvm_vgic_vcpu_destroy() were ever to
->> > want to reference vgic state, as kvm_vgic_destroy() now comes before
->> > kvm_arch_vcpu_free(). Additionally the other architectures set
->> > kvm->online_vcpus to zero after freeing them. We might as well do
->> > that for ARM too.
->>
->> Could this commit message be rewritten to:
->>
->>   kvm_vgic_vcpu_destroy already gets called from kvm_vgic_destroy for
->>   each vcpu, so we don't have to call it from kvm_arch_vcpu_free.
->>
->>   Additionally the other architectures set kvm->online_vcpus to zero
->>   after freeing them. We might as well do that for ARM too.
->
-> Sure, I don't mind you removing the '-v' (verbose) from it. Should I
-> respin? Or is that something you don't mind doing while applying?
->
-No need to respin, I already applied your patch with the adjusted
-commit message.
+On Mon, Nov 27, 2017 at 05:18:00PM -0600, Shanker Donthineni wrote:
+> The ARM architecture defines the memory locations that are permitted
+> to be accessed as the result of a speculative instruction fetch from
+> an exception level for which all stages of translation are disabled.
+> Specifically, the core is permitted to speculatively fetch from the
+> 4KB region containing the current program counter 4K and next 4K.
+> 
+> When translation is changed from enabled to disabled for the running
+> exception level (SCTLR_ELn[M] changed from a value of 1 to 0), the
+> Falkor core may errantly speculatively access memory locations outside
+> of the 4KB region permitted by the architecture. The errant memory
+> access may lead to one of the following unexpected behaviors.
+> 
+> 1) A System Error Interrupt (SEI) being raised by the Falkor core due
+>    to the errant memory access attempting to access a region of memory
+>    that is protected by a slave-side memory protection unit.
+> 2) Unpredictable device behavior due to a speculative read from device
+>    memory. This behavior may only occur if the instruction cache is
+>    disabled prior to or coincident with translation being changed from
+>    enabled to disabled.
+> 
+> The conditions leading to this erratum will not occur when either of the
+> following occur:
+>  1) A higher exception level disables translation of a lower exception level
+>    (e.g. EL2 changing SCTLR_EL1[M] from a value of 1 to 0).
+>  2) An exception level disabling its stage-1 translation if its stage-2
+>     translation is enabled (e.g. EL1 changing SCTLR_EL1[M] from a value of 1
+>     to 0 when HCR_EL2[VM] has a value of 1).
+> 
+> To avoid the errant behavior, software must execute an ISB immediately
+> prior to executing the MSR that will change SCTLR_ELn[M] from 1 to 0.
+> 
+> Signed-off-by: Shanker Donthineni <shankerd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+> ---
+> Changes since v3:
+>   Rebased to kernel v4.15-rc1.
+> Changes since v2:
+>   Repost the corrected patches.
+> Changes since v1:
+>   Apply the workaround where it's required.
+> 
+>  Documentation/arm64/silicon-errata.txt |  1 +
+>  arch/arm64/Kconfig                     | 12 +++++++++++-
+>  arch/arm64/include/asm/assembler.h     | 19 +++++++++++++++++++
+>  arch/arm64/include/asm/cpucaps.h       |  3 ++-
+>  arch/arm64/kernel/cpu-reset.S          |  1 +
+>  arch/arm64/kernel/cpu_errata.c         | 16 ++++++++++++++++
+>  arch/arm64/kernel/efi-entry.S          |  2 ++
+>  arch/arm64/kernel/head.S               |  1 +
+>  arch/arm64/kernel/relocate_kernel.S    |  1 +
+>  arch/arm64/kvm/hyp-init.S              |  1 +
 
-Thanks,
--Christoffer
+This is an awful lot of code just to add an ISB instruction prior to
+disabling the MMU. Why do you need to go through the alternatives framework
+for this? Just do it with an #ifdef; this isn't a fastpath.
+
+Will
