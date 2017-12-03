@@ -1,110 +1,102 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH 09/37] KVM: arm64: Move debug dirty flag calculation out
- of world switch
-Date: Sun, 3 Dec 2017 14:17:13 +0100
-Message-ID: <20171203131713.auwmzt3iwxxg2n4w@hawk.localdomain>
-References: <20171012104141.26902-1-christoffer.dall@linaro.org>
- <20171012104141.26902-10-christoffer.dall@linaro.org>
- <20171107140919.p6act55ubmzlv66b@kamzik.brq.redhat.com>
- <20171201172546.GB6615@lvm>
+From: Shanker Donthineni <shankerd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+Subject: Re: [PATCH v4 2/2] arm64: Add software workaround for Falkor erratum
+ 1041
+Date: Sun, 3 Dec 2017 07:35:28 -0600
+Message-ID: <12cb0f4a-577b-ffd5-21b7-26ce0e46505a@codeaurora.org>
+References: <1511824680-16397-1-git-send-email-shankerd@codeaurora.org>
+ <1511824680-16397-3-git-send-email-shankerd@codeaurora.org>
+ <20171201112457.GE18083@arm.com>
+Reply-To: shankerd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E85A849D66
- for <kvmarm@lists.cs.columbia.edu>; Sun,  3 Dec 2017 08:14:31 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7PEUHsfSqprj for <kvmarm@lists.cs.columbia.edu>;
- Sun,  3 Dec 2017 08:14:31 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E95EF40D25
- for <kvmarm@lists.cs.columbia.edu>; Sun,  3 Dec 2017 08:14:30 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <20171201172546.GB6615@lvm>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20171201112457.GE18083-5wv7dgnIgG8@public.gmane.org>
+Content-Language: en-US
+Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>
+Cc: linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Ard Biesheuvel <ard.biesheuvel-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Matt Fleming <matt-mF/unelCI9GS6iBeEJttW/XRex20P6io@public.gmane.org>, James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Robin Murphy <robin.murphy-5wv7dgnIgG8@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Dec 01, 2017 at 06:25:46PM +0100, Christoffer Dall wrote:
-> On Tue, Nov 07, 2017 at 03:09:19PM +0100, Andrew Jones wrote:
-> > On Thu, Oct 12, 2017 at 12:41:13PM +0200, Christoffer Dall wrote:
-> > > There is no need to figure out inside the world-switch if we should
-> > > save/restore the debug registers or not, we can might as well do that in
-> > > the higher level debug setup code, making it easier to optimize down the
-> > > line.
-> > > 
-> > > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> > > ---
-> > >  arch/arm64/kvm/debug.c        | 9 +++++++++
-> > >  arch/arm64/kvm/hyp/debug-sr.c | 6 ------
-> > >  2 files changed, 9 insertions(+), 6 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> > > index dbadfaf..62550de19 100644
-> > > --- a/arch/arm64/kvm/debug.c
-> > > +++ b/arch/arm64/kvm/debug.c
-> > > @@ -193,6 +193,15 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
-> > >  	if (trap_debug)
-> > >  		vcpu->arch.mdcr_el2 |= MDCR_EL2_TDA;
-> > >  
-> > > +	/*
-> > > +	 * If any of KDE, MDE or KVM_ARM64_DEBUG_DIRTY is set, perform
-> > > +	 * a full save/restore cycle.
-> > 
-> > The commit message implies testing KVM_ARM64_DEBUG_DIRTY, but it only
-> > tests KDE and MDE.
-> > 
+Hi Will, thanks for your review comments.
+
+On 12/01/2017 05:24 AM, Will Deacon wrote:
+> On Mon, Nov 27, 2017 at 05:18:00PM -0600, Shanker Donthineni wrote:
+>> The ARM architecture defines the memory locations that are permitted
+>> to be accessed as the result of a speculative instruction fetch from
+>> an exception level for which all stages of translation are disabled.
+>> Specifically, the core is permitted to speculatively fetch from the
+>> 4KB region containing the current program counter 4K and next 4K.
+>>
+>> When translation is changed from enabled to disabled for the running
+>> exception level (SCTLR_ELn[M] changed from a value of 1 to 0), the
+>> Falkor core may errantly speculatively access memory locations outside
+>> of the 4KB region permitted by the architecture. The errant memory
+>> access may lead to one of the following unexpected behaviors.
+>>
+>> 1) A System Error Interrupt (SEI) being raised by the Falkor core due
+>>    to the errant memory access attempting to access a region of memory
+>>    that is protected by a slave-side memory protection unit.
+>> 2) Unpredictable device behavior due to a speculative read from device
+>>    memory. This behavior may only occur if the instruction cache is
+>>    disabled prior to or coincident with translation being changed from
+>>    enabled to disabled.
+>>
+>> The conditions leading to this erratum will not occur when either of the
+>> following occur:
+>>  1) A higher exception level disables translation of a lower exception level
+>>    (e.g. EL2 changing SCTLR_EL1[M] from a value of 1 to 0).
+>>  2) An exception level disabling its stage-1 translation if its stage-2
+>>     translation is enabled (e.g. EL1 changing SCTLR_EL1[M] from a value of 1
+>>     to 0 when HCR_EL2[VM] has a value of 1).
+>>
+>> To avoid the errant behavior, software must execute an ISB immediately
+>> prior to executing the MSR that will change SCTLR_ELn[M] from 1 to 0.
+>>
+>> Signed-off-by: Shanker Donthineni <shankerd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+>> ---
+>> Changes since v3:
+>>   Rebased to kernel v4.15-rc1.
+>> Changes since v2:
+>>   Repost the corrected patches.
+>> Changes since v1:
+>>   Apply the workaround where it's required.
+>>
+>>  Documentation/arm64/silicon-errata.txt |  1 +
+>>  arch/arm64/Kconfig                     | 12 +++++++++++-
+>>  arch/arm64/include/asm/assembler.h     | 19 +++++++++++++++++++
+>>  arch/arm64/include/asm/cpucaps.h       |  3 ++-
+>>  arch/arm64/kernel/cpu-reset.S          |  1 +
+>>  arch/arm64/kernel/cpu_errata.c         | 16 ++++++++++++++++
+>>  arch/arm64/kernel/efi-entry.S          |  2 ++
+>>  arch/arm64/kernel/head.S               |  1 +
+>>  arch/arm64/kernel/relocate_kernel.S    |  1 +
+>>  arch/arm64/kvm/hyp-init.S              |  1 +
 > 
-> You meant the comment, right?
-
-yup
-
+> This is an awful lot of code just to add an ISB instruction prior to
+> disabling the MMU. Why do you need to go through the alternatives framework
+> for this? Just do it with an #ifdef; this isn't a fastpath.
 > 
-> > > +	 */
-> > > +	if ((vcpu_sys_reg(vcpu, MDSCR_EL1) & DBG_MDSCR_KDE) ||
-> > > +	    (vcpu_sys_reg(vcpu, MDSCR_EL1) & DBG_MDSCR_MDE))
-> > 
-> > nit: could also write as
-> > 
-> >  if (vcpu_sys_reg(vcpu, MDSCR_EL1) & (DBG_MDSCR_KDE | DBG_MDSCR_MDE))
-> > 
+
+We can avoid changes to only two files cpu_errata.c and cpucaps.h without using
+the alternatives framework. Even though it's in slow path, cpu-errata.c changes 
+provides a nice debug message which indicates the erratum E1041 is applied. 
+
+Erratum log information would be very useful to conform our customers using the
+right kernel with E1014 patch by looking at dmesg. Other than that I don't have
+any other strong opinion to avoid alternatives and handle using #idef.
+
+Should I go head and post v5 patch without alternatives?
+
+> Will
 > 
-> I actually prefer it the other way, and I think the compiler will figure
-> out what to do in terms of efficiency.
-
-I won't argue about code aesthetics (although I disagree here :-). I will
-point out that in this case the compiler will no doubt do the right thing,
-as vcpu_sys_reg() is just a macro, but for a pointer taking function in
-general there would be potential to get both calls emitted, as the
-compiler wouldn't be sure there would be no side effect.
-
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
 > 
-> > > +		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
-> > > +
-> > 
-> > It looks like there's only one flag for debug_flags - this dirty flag,
-> > which I guess is also used to trigger trapping. So maybe this could be a
-> > second flag of a "lazy state" field, as I suggested earlier?
-> > 
-> 
-> I'm going to leave this one for now, but we can improve that later on if
-> we want to save a little space in the vcpu struct, or rather if we want
-> to rearrange things to make frequently accessed fields fit in the same
-> cache line.
->
 
-OK
-
-Thanks,
-drew
+-- 
+Shanker Donthineni
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
