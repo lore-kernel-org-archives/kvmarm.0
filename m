@@ -1,121 +1,110 @@
-From: Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH 1/1] timecounter: Make cyclecounter struct
- part of timecounter struct
-Date: Sat, 2 Dec 2017 10:04:58 -0800
-Message-ID: <20171202180458.winwznbstsi355ed@localhost>
-References: <1512189095-28654-1-git-send-email-sagar.a.kamble@intel.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH 09/37] KVM: arm64: Move debug dirty flag calculation out
+ of world switch
+Date: Sun, 3 Dec 2017 14:17:13 +0100
+Message-ID: <20171203131713.auwmzt3iwxxg2n4w@hawk.localdomain>
+References: <20171012104141.26902-1-christoffer.dall@linaro.org>
+ <20171012104141.26902-10-christoffer.dall@linaro.org>
+ <20171107140919.p6act55ubmzlv66b@kamzik.brq.redhat.com>
+ <20171201172546.GB6615@lvm>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <alsa-devel-bounces@alsa-project.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E85A849D66
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  3 Dec 2017 08:14:31 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 7PEUHsfSqprj for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  3 Dec 2017 08:14:31 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E95EF40D25
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  3 Dec 2017 08:14:30 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <1512189095-28654-1-git-send-email-sagar.a.kamble@intel.com>
-List-Unsubscribe: <http://mailman.alsa-project.org/mailman/options/alsa-devel>,
- <mailto:alsa-devel-request@alsa-project.org?subject=unsubscribe>
-List-Archive: <http://mailman.alsa-project.org/pipermail/alsa-devel/>
-List-Post: <mailto:alsa-devel@alsa-project.org>
-List-Help: <mailto:alsa-devel-request@alsa-project.org?subject=help>
-List-Subscribe: <http://mailman.alsa-project.org/mailman/listinfo/alsa-devel>,
- <mailto:alsa-devel-request@alsa-project.org?subject=subscribe>
-Errors-To: alsa-devel-bounces@alsa-project.org
-Sender: alsa-devel-bounces@alsa-project.org
-To: Sagar Arun Kamble <sagar.a.kamble@intel.com>
-Cc: alsa-devel@alsa-project.org, linux-rdma@vger.kernel.org, netdev@vger.kernel.org, Stephen Boyd <sboyd@codeaurora.org>, linux-kernel@vger.kernel.org, Chris Wilson <chris@chris-wilson.co.uk>, John Stultz <john.stultz@linaro.org>, intel-wired-lan@lists.osuosl.org, Thomas Gleixner <tglx@linutronix.de>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20171201172546.GB6615@lvm>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <cdall@linaro.org>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sat, Dec 02, 2017 at 10:01:35AM +0530, Sagar Arun Kamble wrote:
-> There is no real need for the users of timecounters to define cyclecounter
-> and timecounter variables separately. Since timecounter will always be
-> based on cyclecounter, have cyclecounter struct as member of timecounter
-> struct.
+On Fri, Dec 01, 2017 at 06:25:46PM +0100, Christoffer Dall wrote:
+> On Tue, Nov 07, 2017 at 03:09:19PM +0100, Andrew Jones wrote:
+> > On Thu, Oct 12, 2017 at 12:41:13PM +0200, Christoffer Dall wrote:
+> > > There is no need to figure out inside the world-switch if we should
+> > > save/restore the debug registers or not, we can might as well do that in
+> > > the higher level debug setup code, making it easier to optimize down the
+> > > line.
+> > > 
+> > > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> > > ---
+> > >  arch/arm64/kvm/debug.c        | 9 +++++++++
+> > >  arch/arm64/kvm/hyp/debug-sr.c | 6 ------
+> > >  2 files changed, 9 insertions(+), 6 deletions(-)
+> > > 
+> > > diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> > > index dbadfaf..62550de19 100644
+> > > --- a/arch/arm64/kvm/debug.c
+> > > +++ b/arch/arm64/kvm/debug.c
+> > > @@ -193,6 +193,15 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+> > >  	if (trap_debug)
+> > >  		vcpu->arch.mdcr_el2 |= MDCR_EL2_TDA;
+> > >  
+> > > +	/*
+> > > +	 * If any of KDE, MDE or KVM_ARM64_DEBUG_DIRTY is set, perform
+> > > +	 * a full save/restore cycle.
+> > 
+> > The commit message implies testing KVM_ARM64_DEBUG_DIRTY, but it only
+> > tests KDE and MDE.
+> > 
+> 
+> You meant the comment, right?
 
-Overall, this is a welcome change.  However, it doesn't go far enough,
-IMHO, and I'll explain that more below.
+yup
 
-> diff --git a/drivers/net/ethernet/mellanox/mlx4/en_clock.c b/drivers/net/ethernet/mellanox/mlx4/en_clock.c
-> index 0247885..35987b5 100644
-> --- a/drivers/net/ethernet/mellanox/mlx4/en_clock.c
-> +++ b/drivers/net/ethernet/mellanox/mlx4/en_clock.c
-...
+> 
+> > > +	 */
+> > > +	if ((vcpu_sys_reg(vcpu, MDSCR_EL1) & DBG_MDSCR_KDE) ||
+> > > +	    (vcpu_sys_reg(vcpu, MDSCR_EL1) & DBG_MDSCR_MDE))
+> > 
+> > nit: could also write as
+> > 
+> >  if (vcpu_sys_reg(vcpu, MDSCR_EL1) & (DBG_MDSCR_KDE | DBG_MDSCR_MDE))
+> > 
+> 
+> I actually prefer it the other way, and I think the compiler will figure
+> out what to do in terms of efficiency.
 
-As it stands now, timecounter_init() is used for two totally different
-reasons.  Some callers only want to set the time, ...
+I won't argue about code aesthetics (although I disagree here :-). I will
+point out that in this case the compiler will no doubt do the right thing,
+as vcpu_sys_reg() is just a macro, but for a pointer taking function in
+general there would be potential to get both calls emitted, as the
+compiler wouldn't be sure there would be no side effect.
 
-> @@ -207,7 +207,7 @@ static int mlx4_en_phc_settime(struct ptp_clock_info *ptp,
->  
->  	/* reset the timecounter */
->  	write_seqlock_irqsave(&mdev->clock_lock, flags);
-> -	timecounter_init(&mdev->clock, &mdev->cycles, ns);
-> +	timecounter_init(&mdev->clock, ns);
->  	write_sequnlock_irqrestore(&mdev->clock_lock, flags);
->  
->  	return 0;
+> 
+> > > +		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
+> > > +
+> > 
+> > It looks like there's only one flag for debug_flags - this dirty flag,
+> > which I guess is also used to trigger trapping. So maybe this could be a
+> > second flag of a "lazy state" field, as I suggested earlier?
+> > 
+> 
+> I'm going to leave this one for now, but we can improve that later on if
+> we want to save a little space in the vcpu struct, or rather if we want
+> to rearrange things to make frequently accessed fields fit in the same
+> cache line.
+>
 
-... while others initialize the data structure the first time:
-
-> @@ -274,17 +274,17 @@ void mlx4_en_init_timestamp(struct mlx4_en_dev *mdev)
->  
->  	seqlock_init(&mdev->clock_lock);
->  
-> -	memset(&mdev->cycles, 0, sizeof(mdev->cycles));
-> -	mdev->cycles.read = mlx4_en_read_clock;
-> -	mdev->cycles.mask = CLOCKSOURCE_MASK(48);
-> -	mdev->cycles.shift = freq_to_shift(dev->caps.hca_core_clock);
-> -	mdev->cycles.mult =
-> -		clocksource_khz2mult(1000 * dev->caps.hca_core_clock, mdev->cycles.shift);
-> -	mdev->nominal_c_mult = mdev->cycles.mult;
-> +	memset(&mdev->clock.cc, 0, sizeof(mdev->clock.cc));
-> +	mdev->clock.cc.read = mlx4_en_read_clock;
-> +	mdev->clock.cc.mask = CLOCKSOURCE_MASK(48);
-> +	mdev->clock.cc.shift = freq_to_shift(dev->caps.hca_core_clock);
-> +	mdev->clock.cc.mult =
-> +		clocksource_khz2mult(1000 * dev->caps.hca_core_clock,
-> +				     mdev->clock.cc.shift);
-> +	mdev->nominal_c_mult = mdev->clock.cc.mult;
->  
->  	write_seqlock_irqsave(&mdev->clock_lock, flags);
-> -	timecounter_init(&mdev->clock, &mdev->cycles,
-> -			 ktime_to_ns(ktime_get_real()));
-> +	timecounter_init(&mdev->clock, ktime_to_ns(ktime_get_real()));
-
-I'd like to see two followup patches to this one:
-
-1. Convert timecounter_init() callers to a new timecounter_reset()
-   function where the intent is to reset the time.
-
-2. Change timecounter_init() to take the cyclecounter fields as
-   arguments.
-
-	void timecounter_init(struct timecounter *tc,
-			      u64 (*read)(const struct cyclecounter *cc),
-			      u64 mask,
-			      u32 mult,
-			      u32 shift,
-			      u64 start_tstamp);
-
-Then we can clean up all this stuff:
-
-	mdev->clock.cc.read = mlx4_en_read_clock;
-	mdev->clock.cc.mask = CLOCKSOURCE_MASK(48);
-	mdev->clock.cc.shift = freq_to_shift(dev->caps.hca_core_clock);
-	mdev->clock.cc.mult = clocksource_khz2mult(...);
-
-This second step can be phased in by calling the new function
-timecounter_initialize() and converting the drivers one by one.
-
-> diff --git a/include/linux/timecounter.h b/include/linux/timecounter.h
-> index 2496ad4..6daca06 100644
-> --- a/include/linux/timecounter.h
-> +++ b/include/linux/timecounter.h
-...
-> @@ -98,7 +98,6 @@ static inline void timecounter_adjtime(struct timecounter *tc, s64 delta)
->  /**
->   * timecounter_init - initialize a time counter
->   * @tc:			Pointer to time counter which is to be initialized/reset
-> - * @cc:			A cycle counter, ready to be used.
-
-This "ready to used" requirement should go.  The init() function
-should make the instance ready to be used all at once.
+OK
 
 Thanks,
-Richard
+drew
