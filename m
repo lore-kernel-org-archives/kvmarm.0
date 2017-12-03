@@ -1,109 +1,256 @@
 From: Christoffer Dall <cdall@kernel.org>
-Subject: Re: [PATCH 37/37] KVM: arm/arm64: Avoid VGICv3 save/restore on VHE
- with no IRQs
-Date: Sun, 3 Dec 2017 21:38:02 +0100
-Message-ID: <20171203203802.GC32397@cbox>
+Subject: Re: [PATCH 11/37] KVM: arm64: Improve debug register save/restore
+ flow
+Date: Sun, 3 Dec 2017 21:47:57 +0100
+Message-ID: <20171203204757.GD32397@cbox>
 References: <20171012104141.26902-1-christoffer.dall@linaro.org>
- <20171012104141.26902-38-christoffer.dall@linaro.org>
- <20171130183330.x7jc6m2yffcxcvkz@yury-thinkpad>
+ <20171012104141.26902-12-christoffer.dall@linaro.org>
+ <20171107144857.hmgwxshk6eiorm4i@kamzik.brq.redhat.com>
+ <20171201175203.GD6615@lvm>
+ <20171203134958.b5zfdv2mbu6lr6gj@hawk.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 69A7249D5E
- for <kvmarm@lists.cs.columbia.edu>; Sun,  3 Dec 2017 15:34:57 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MQM5TIoffn7A for <kvmarm@lists.cs.columbia.edu>;
- Sun,  3 Dec 2017 15:34:56 -0500 (EST)
-Received: from mail-wm0-f67.google.com (mail-wm0-f67.google.com [74.125.82.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7F8CA40651
- for <kvmarm@lists.cs.columbia.edu>; Sun,  3 Dec 2017 15:34:56 -0500 (EST)
-Received: by mail-wm0-f67.google.com with SMTP id 64so10980362wme.3
- for <kvmarm@lists.cs.columbia.edu>; Sun, 03 Dec 2017 12:38:02 -0800 (PST)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20171130183330.x7jc6m2yffcxcvkz@yury-thinkpad>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Yury Norov <ynorov@caviumnetworks.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20171203134958.b5zfdv2mbu6lr6gj@hawk.localdomain>
+Sender: kvm-owner@vger.kernel.org
+To: Andrew Jones <drjones@redhat.com>
+Cc: Christoffer Dall <cdall@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Yury,
+On Sun, Dec 03, 2017 at 02:49:58PM +0100, Andrew Jones wrote:
+> On Fri, Dec 01, 2017 at 06:52:03PM +0100, Christoffer Dall wrote:
+> > On Tue, Nov 07, 2017 at 03:48:57PM +0100, Andrew Jones wrote:
+> > > On Thu, Oct 12, 2017 at 12:41:15PM +0200, Christoffer Dall wrote:
+> > > > Instead of having multiple calls from the world switch path to the debug
+> > > > logic, each figuring out if the dirty bit is set and if we should
+> > > > save/restore the debug registes, let's just provide two hooks to the
+> > > > debug save/restore functionality, one for switching to the guest
+> > > > context, and one for switching to the host context, and we get the
+> > > > benefit of only having to evaluate the dirty flag once on each path,
+> > > > plus we give the compiler some more room to inline some of this
+> > > > functionality.
+> > > > 
+> > > > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> > > > ---
+> > > >  arch/arm64/include/asm/kvm_hyp.h | 10 ++-----
+> > > >  arch/arm64/kvm/hyp/debug-sr.c    | 56 +++++++++++++++++++++++++++-------------
+> > > >  arch/arm64/kvm/hyp/switch.c      |  6 ++---
+> > > >  3 files changed, 42 insertions(+), 30 deletions(-)
+> > > > 
+> > > > diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> > > > index 08d3bb6..a0e5a70 100644
+> > > > --- a/arch/arm64/include/asm/kvm_hyp.h
+> > > > +++ b/arch/arm64/include/asm/kvm_hyp.h
+> > > > @@ -139,14 +139,8 @@ void __sysreg_restore_guest_state(struct kvm_cpu_context *ctxt);
+> > > >  void __sysreg32_save_state(struct kvm_vcpu *vcpu);
+> > > >  void __sysreg32_restore_state(struct kvm_vcpu *vcpu);
+> > > >  
+> > > > -void __debug_save_state(struct kvm_vcpu *vcpu,
+> > > > -			struct kvm_guest_debug_arch *dbg,
+> > > > -			struct kvm_cpu_context *ctxt);
+> > > > -void __debug_restore_state(struct kvm_vcpu *vcpu,
+> > > > -			   struct kvm_guest_debug_arch *dbg,
+> > > > -			   struct kvm_cpu_context *ctxt);
+> > > > -void __debug_cond_save_host_state(struct kvm_vcpu *vcpu);
+> > > > -void __debug_cond_restore_host_state(struct kvm_vcpu *vcpu);
+> > > > +void __debug_switch_to_guest(struct kvm_vcpu *vcpu);
+> > > > +void __debug_switch_to_host(struct kvm_vcpu *vcpu);
+> > > >  
+> > > >  void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
+> > > >  void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
+> > > > diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
+> > > > index a2291b6..b4cd8e0 100644
+> > > > --- a/arch/arm64/kvm/hyp/debug-sr.c
+> > > > +++ b/arch/arm64/kvm/hyp/debug-sr.c
+> > > > @@ -116,16 +116,13 @@ static void __hyp_text __debug_restore_spe(u64 pmscr_el1)
+> > > >  	write_sysreg_s(pmscr_el1, PMSCR_EL1);
+> > > >  }
+> > > >  
+> > > > -void __hyp_text __debug_save_state(struct kvm_vcpu *vcpu,
+> > > > -				   struct kvm_guest_debug_arch *dbg,
+> > > > -				   struct kvm_cpu_context *ctxt)
+> > > > +static void __hyp_text __debug_save_state(struct kvm_vcpu *vcpu,
+> > > > +					  struct kvm_guest_debug_arch *dbg,
+> > > > +					  struct kvm_cpu_context *ctxt)
+> > > >  {
+> > > >  	u64 aa64dfr0;
+> > > >  	int brps, wrps;
+> > > >  
+> > > > -	if (!(vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY))
+> > > > -		return;
+> > > > -
+> > > >  	aa64dfr0 = read_sysreg(id_aa64dfr0_el1);
+> > > >  	brps = (aa64dfr0 >> 12) & 0xf;
+> > > >  	wrps = (aa64dfr0 >> 20) & 0xf;
+> > > > @@ -138,16 +135,13 @@ void __hyp_text __debug_save_state(struct kvm_vcpu *vcpu,
+> > > >  	ctxt->sys_regs[MDCCINT_EL1] = read_sysreg(mdccint_el1);
+> > > >  }
+> > > >  
+> > > > -void __hyp_text __debug_restore_state(struct kvm_vcpu *vcpu,
+> > > > -				      struct kvm_guest_debug_arch *dbg,
+> > > > -				      struct kvm_cpu_context *ctxt)
+> > > > +static void __hyp_text __debug_restore_state(struct kvm_vcpu *vcpu,
+> > > > +					     struct kvm_guest_debug_arch *dbg,
+> > > > +					     struct kvm_cpu_context *ctxt)
+> > > >  {
+> > > >  	u64 aa64dfr0;
+> > > >  	int brps, wrps;
+> > > >  
+> > > > -	if (!(vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY))
+> > > > -		return;
+> > > > -
+> > > >  	aa64dfr0 = read_sysreg(id_aa64dfr0_el1);
+> > > >  
+> > > >  	brps = (aa64dfr0 >> 12) & 0xf;
+> > > > @@ -161,24 +155,50 @@ void __hyp_text __debug_restore_state(struct kvm_vcpu *vcpu,
+> > > >  	write_sysreg(ctxt->sys_regs[MDCCINT_EL1], mdccint_el1);
+> > > >  }
+> > > >  
+> > > > -void __hyp_text __debug_cond_save_host_state(struct kvm_vcpu *vcpu)
+> > > > +void __hyp_text __debug_switch_to_guest(struct kvm_vcpu *vcpu)
+> > > >  {
+> > > > -	__debug_save_state(vcpu, &vcpu->arch.host_debug_state.regs,
+> > > > -			   kern_hyp_va(vcpu->arch.host_cpu_context));
+> > > > +	struct kvm_cpu_context *__host_ctxt;
+> > > > +	struct kvm_cpu_context *__guest_ctxt;
+> > > > +	struct kvm_guest_debug_arch *__host_dbg;
+> > > > +	struct kvm_guest_debug_arch *__guest_dbg;
+> > > 
+> > > I caught in your reply to Marc that the __ prefix here is for hyp mode
+> > > accessible code and data, but do we also need to use it for stack data?
+> > > No big deal, but it's not very pretty.
+> > > 
+> > 
+> > sure.
+> > 
+> > > >  
+> > > >  	/* Non-VHE: Disable and flush SPE data generation
+> > > >  	 * VHE: The vcpu can run. but it can't hide. */
+> > > >  	if (!has_vhe())
+> > > >  		__debug_save_spe_nvhe(&vcpu->arch.host_debug_state.pmscr_el1);
+> > > > +
+> > > > +	if (!(vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY))
+> > > > +		return;
+> > > > +
+> > > > +	__host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> > > > +	__guest_ctxt = &vcpu->arch.ctxt;
+> > > > +	__host_dbg = &vcpu->arch.host_debug_state.regs;
+> > > > +	__guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
+> > > > +
+> > > > +	__debug_save_state(vcpu, __host_dbg, __host_ctxt);
+> > > > +	__debug_restore_state(vcpu, __guest_dbg, __guest_ctxt);
+> > > >  }
+> > > >  
+> > > > -void __hyp_text __debug_cond_restore_host_state(struct kvm_vcpu *vcpu)
+> > > > +void __hyp_text __debug_switch_to_host(struct kvm_vcpu *vcpu)
+> > > >  {
+> > > > +	struct kvm_cpu_context *__host_ctxt;
+> > > > +	struct kvm_cpu_context *__guest_ctxt;
+> > > > +	struct kvm_guest_debug_arch *__host_dbg;
+> > > > +	struct kvm_guest_debug_arch *__guest_dbg;
+> > > > +
+> > > >  	if (!has_vhe())
+> > > >  		__debug_restore_spe(vcpu->arch.host_debug_state.pmscr_el1);
+> > > >  
+> > > > -	__debug_restore_state(vcpu, &vcpu->arch.host_debug_state.regs,
+> > > > -			      kern_hyp_va(vcpu->arch.host_cpu_context));
+> > > > +	if (!(vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY))
+> > > > +		return;
+> > > > +
+> > > > +	__host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> > > > +	__guest_ctxt = &vcpu->arch.ctxt;
+> > > > +	__host_dbg = &vcpu->arch.host_debug_state.regs;
+> > > > +	__guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
+> > > > +
+> > > > +	__debug_save_state(vcpu, __guest_dbg, __guest_ctxt);
+> > > > +	__debug_restore_state(vcpu, __host_dbg, __host_ctxt);
+> > > >  
+> > > >  	vcpu->arch.debug_flags &= ~KVM_ARM64_DEBUG_DIRTY;
+> > > >  }
+> > > > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> > > > index ef05c59..e270cba 100644
+> > > > --- a/arch/arm64/kvm/hyp/switch.c
+> > > > +++ b/arch/arm64/kvm/hyp/switch.c
+> > > > @@ -271,7 +271,6 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+> > > >  	guest_ctxt = &vcpu->arch.ctxt;
+> > > >  
+> > > >  	__sysreg_save_host_state(host_ctxt);
+> > > > -	__debug_cond_save_host_state(vcpu);
+> > > >  
+> > > >  	__activate_traps(vcpu);
+> > > >  	__activate_vm(vcpu);
+> > > > @@ -285,7 +284,7 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+> > > >  	 */
+> > > >  	__sysreg32_restore_state(vcpu);
+> > > >  	__sysreg_restore_guest_state(guest_ctxt);
+> > > > -	__debug_restore_state(vcpu, kern_hyp_va(vcpu->arch.debug_ptr), guest_ctxt);
+> > > > +	__debug_switch_to_guest(vcpu);
+> > > >  
+> > > >  	/* Jump in the fire! */
+> > > >  again:
+> > > > @@ -353,12 +352,11 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+> > > >  
+> > > >  	__sysreg_restore_host_state(host_ctxt);
+> > > >  
+> > > > -	__debug_save_state(vcpu, kern_hyp_va(vcpu->arch.debug_ptr), guest_ctxt);
+> > > >  	/*
+> > > >  	 * This must come after restoring the host sysregs, since a non-VHE
+> > > >  	 * system may enable SPE here and make use of the TTBRs.
+> > > >  	 */
+> > > > -	__debug_cond_restore_host_state(vcpu);
+> > > > +	__debug_switch_to_host(vcpu);
+> > > >  
+> > > >  	return exit_code;
+> > > >  }
+> > > > -- 
+> > > > 2.9.0
+> > > >
+> > > 
+> > > This looks like a nice cleanup, but can you please add a note to the
+> > > commit message about why we don't need to use the
+> > > 
+> > >  save-host-state
+> > >  activate-traps-and-vm
+> > >  restore-guest-state
+> > > 
+> > > and the reverse, patterns for the debug registers? 
+> > 
+> > I think the current commit message motivates the change fine.
+> >
+> 
+> The motivation is obvious, the justification for an additional change
+> is not. How does it justify changing the sequence
+> 
+>  save-debug-host-state
+>  activate-debug-traps 		/* and other stuff in between */
+>  restore-debug-guest-state
+> 
+> to
+>  
+>  activate-debug-traps		/* and other stuff in between */
+>  save-debug-host-state
+>  restore-debug-guest-state
+> 
 
-On Thu, Nov 30, 2017 at 09:33:30PM +0300, Yury Norov wrote:
-> On Thu, Oct 12, 2017 at 12:41:41PM +0200, Christoffer Dall wrote:
-> > We can finally get completely rid of any calls to the VGICv3
-> > save/restore functions when the AP lists are empty on VHE systems.  This
-> > requires carefully factoring out trap configuration from saving and
-> > restoring state, and carefully choosing what to do on the VHE and
-> > non-VHE path.
-> > 
-> > One of the challenges is that we cannot save/restore the VMCR lazily
-> > because we can only write the VMCR when ICC_SRE_EL1.SRE is cleared when
-> > emulating a GICv2-on-GICv3, since otherwise all Group-0 interrupts end
-> > up being delivered as FIQ.
-> > 
-> > To solve this problem, and still provide fast performance in the fast
-> > path of exiting a VM when no interrupts are pending (which also
-> > optimized the latency for actually delivering virtual interrupts coming
-> > from physical interrupts), we orchestrate a dance of only doing the
-> > activate/deactivate traps in vgic load/put for VHE systems (which can
-> > have ICC_SRE_EL1.SRE cleared when running in the host), and doing the
-> > configuration on every round-trip on non-VHE systems.
-> > 
-> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> > ---
-> >  arch/arm/include/asm/kvm_hyp.h   |   2 +
-> >  arch/arm/kvm/hyp/switch.c        |   8 ++-
-> >  arch/arm64/include/asm/kvm_hyp.h |   2 +
-> >  arch/arm64/kvm/hyp/switch.c      |   8 ++-
-> >  virt/kvm/arm/hyp/vgic-v3-sr.c    | 116 +++++++++++++++++++++++++--------------
-> >  virt/kvm/arm/vgic/vgic-v3.c      |   6 ++
-> >  virt/kvm/arm/vgic/vgic.c         |   7 +--
-> >  7 files changed, 101 insertions(+), 48 deletions(-)
-> 
-> [...]
-> 
-> > diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
-> > index ed5da75..34d71d2 100644
-> > --- a/virt/kvm/arm/hyp/vgic-v3-sr.c
-> > +++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
-> > @@ -208,15 +208,15 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
-> >  {
-> >  	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
-> >  	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
-> > -	u64 val;
-> >  
-> >  	/*
-> >  	 * Make sure stores to the GIC via the memory mapped interface
-> > -	 * are now visible to the system register interface.
-> > +	 * are now visible to the system register interface when reading the
-> > +	 * LRs, and when reading back the VMCR on non-VHE systems.
-> >  	 */
-> > -	if (!cpu_if->vgic_sre) {
-> > -		dsb(st);
-> > -		cpu_if->vgic_vmcr = read_gicreg(ICH_VMCR_EL2);
-> > +	if (used_lrs || !has_vhe()) {
-> > +		if (!cpu_if->vgic_sre)
-> > +			dsb(st);
-> >  	}
-> 
-> Nit:
-> 	if ((used_lrs || !has_vhe()) && !cpu_if->vgic_sre)
-> 		dsb(st);
-> 
+It doesn't, and I don't think it has to.  The code is there, and I can't
+argue all possible interdependencies between all code lines in English
+and explain why it's safe, that requires looking at the code.  The
+commit message should motivate the change, not explain code which
+requires understanding the software and the architecture.
 
-I don't think that's easier to read and I'm not paying for vertical
-space, so I'm going to keep it as is.
+If there was a clear rule that we do 'save, activate, restore' for
+everything, it would make sense to explain why we can break that, but
+that is not how I see the implementation.   For example, there is no
+particular reason why we restore the vgic before the timer, or the vgic
+after we activate the stage 2 translation.  The key here is
+understanding the flexibility the architecture gives you.
+
+You can then argue that since this bothers you, I should just add
+something in the commit message, but I think that can be just as
+misleading, because it would imply a total order, which doesn't exist.
+Also, since you clearly understood the flow and what is going on, we're
+probably fine as it is.
 
 Thanks,
 -Christoffer
