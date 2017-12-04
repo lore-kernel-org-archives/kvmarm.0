@@ -1,22 +1,22 @@
 From: Steve Capper <steve.capper@arm.com>
-Subject: [PATCH 08/12] arm64: kasan: Switch to using KASAN_SHADOW_OFFSET
-Date: Mon,  4 Dec 2017 14:13:09 +0000
-Message-ID: <20171204141313.31604-9-steve.capper@arm.com>
+Subject: [PATCH 09/12] arm64: dump: Make kernel page table dumper dynamic again
+Date: Mon,  4 Dec 2017 14:13:10 +0000
+Message-ID: <20171204141313.31604-10-steve.capper@arm.com>
 References: <20171204141313.31604-1-steve.capper@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 52EF749D88
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 09:10:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3947D49D61
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 09:10:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8jBrfkkn2N1r for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Dec 2017 09:10:37 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D5F9849D80
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 09:10:36 -0500 (EST)
+ with ESMTP id DhdsKRpE2nmY for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Dec 2017 09:10:39 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CDF249D74
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 09:10:38 -0500 (EST)
 In-Reply-To: <20171204141313.31604-1-steve.capper@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,188 +31,99 @@ To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 Cc: catalin.marinas@arm.com, ard.biesheuvel@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-KASAN_SHADOW_OFFSET is a constant that is supplied to gcc as a command
-line argument and affects the codegen of the inline address sanetiser.
+The kernel page table dumper assumes that the placement of VA regions is
+constant and determined at compile time. As we are about to introduce
+variable VA logic, we need to be able to determine certain regions at
+boot time.
 
-Essentially, for an example memory access:
-	*ptr1 = val;
-The compiler will insert logic similar to the below:
-	shadowValue = *(ptr1 >> 3 + KASAN_SHADOW_OFFSET)
-	if (somethingWrong(shadowValue))
-		flagAnError();
-
-As this code sequence is inserted into many places, and
-KASAN_SHADOW_OFFSET is essentially baked into many places in the kernel
-.text, the only sane thing we can do at compile time is to check that
-the KASAN_SHADOW_OFFSET gives us a memory region that is valid,
-otherwise BUILD_BUG on a discrepancy.
-
-i.e. If we want to run a single kernel binary with multiple address
-spaces, then we need to do this with KASAN_SHADOW_OFFSET fixed.
-
-Thankfully, due to the way the KASAN_SHADOW_OFFSET is used to provide
-shadow addresses we know that the end of the shadow region is constant
-w.r.t. VA space size:
-	KASAN_SHADOW_END = ~0 >> 3 + KASAN_SHADOW_OFFSET
-
-This means that if we increase the size of the VA space, the KASAN
-region expands upwards into the new space that is provided.
-
-This patch removes the logic to compute the KASAN_SHADOW_OFFSET in the
-arm64 Makefile, and instead we adopt the approach used by x86 to supply
-offset values in kConfig. To help debug/develop future VA space changes,
-the Makefile logic has been preserved in a script file in the arm64
-Documentation folder.
+This patch adds logic to the kernel page table dumper s.t. these regions
+can be computed at boot time.
 
 Signed-off-by: Steve Capper <steve.capper@arm.com>
 ---
- Documentation/arm64/kasan-offsets.sh | 17 +++++++++++++++++
- arch/arm64/Kconfig                   | 10 ++++++++++
- arch/arm64/Makefile                  |  7 -------
- arch/arm64/include/asm/kasan.h       | 24 +++++++++++-------------
- arch/arm64/include/asm/pgtable.h     |  7 ++++++-
- arch/arm64/mm/kasan_init.c           |  1 -
- 6 files changed, 44 insertions(+), 22 deletions(-)
- create mode 100644 Documentation/arm64/kasan-offsets.sh
+ arch/arm64/mm/dump.c | 51 +++++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 43 insertions(+), 8 deletions(-)
 
-diff --git a/Documentation/arm64/kasan-offsets.sh b/Documentation/arm64/kasan-offsets.sh
-new file mode 100644
-index 000000000000..d07a95518770
---- /dev/null
-+++ b/Documentation/arm64/kasan-offsets.sh
-@@ -0,0 +1,17 @@
-+#!/bin/sh
-+
-+# Print out the KASAN_SHADOW_OFFSETS required to place the KASAN SHADOW
-+# start address at the mid-point of the kernel VA space
-+
-+print_kasan_offset () {
-+	printf "%02d\t" $1
-+	printf "0x%08x00000000\n" $(( (0xffffffff & (-1 << ($1 - 1 - 32))) \
-+			+ (1 << ($1 - 32 - 3)) \
-+			- (1 << (64 - 32 - 3)) ))
-+}
-+
-+printf "VABITS\tKASAN_SHADOW_OFFSET\n"
-+print_kasan_offset 48
-+print_kasan_offset 42
-+print_kasan_offset 39
-+print_kasan_offset 36
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index a93339f5178f..0fa430326825 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -272,6 +272,16 @@ config ARCH_SUPPORTS_UPROBES
- config ARCH_PROC_KCORE_TEXT
- 	def_bool y
- 
-+config KASAN_SHADOW_OFFSET
-+	hex
-+	depends on KASAN
-+	default 0xdfffa00000000000 if ARM64_VA_BITS_48
-+	default 0xdfffd00000000000 if ARM64_VA_BITS_47
-+	default 0xdffffe8000000000 if ARM64_VA_BITS_42
-+	default 0xdfffffd000000000 if ARM64_VA_BITS_39
-+	default 0xdffffffa00000000 if ARM64_VA_BITS_36
-+	default 0xffffffffffffffff
-+
- source "init/Kconfig"
- 
- source "kernel/Kconfig.freezer"
-diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
-index 7eaff48d2a39..13cc9311ef7d 100644
---- a/arch/arm64/Makefile
-+++ b/arch/arm64/Makefile
-@@ -97,13 +97,6 @@ else
- TEXT_OFFSET := 0x00080000
- endif
- 
--# KASAN_SHADOW_OFFSET = VA_START + (1 << (VA_BITS - 3)) - (1 << 61)
--# in 32-bit arithmetic
--KASAN_SHADOW_OFFSET := $(shell printf "0x%08x00000000\n" $$(( \
--			(0xffffffff & (-1 << ($(CONFIG_ARM64_VA_BITS) - 1 - 32))) \
--			+ (1 << ($(CONFIG_ARM64_VA_BITS) - 32 - 3)) \
--			- (1 << (64 - 32 - 3)) )) )
--
- export	TEXT_OFFSET GZFLAGS
- 
- core-y		+= arch/arm64/kernel/ arch/arm64/mm/
-diff --git a/arch/arm64/include/asm/kasan.h b/arch/arm64/include/asm/kasan.h
-index e266f80e45b7..28b9d9cb7795 100644
---- a/arch/arm64/include/asm/kasan.h
-+++ b/arch/arm64/include/asm/kasan.h
-@@ -10,24 +10,22 @@
- #include <asm/memory.h>
- #include <asm/pgtable-types.h>
- 
-+#define KASAN_SHADOW_OFFSET _AC(CONFIG_KASAN_SHADOW_OFFSET, UL)
-+
- /*
-  * KASAN_SHADOW_START: beginning of the kernel virtual addresses.
-  * KASAN_SHADOW_END: KASAN_SHADOW_START + 1/8 of kernel virtual addresses.
-- */
--#define KASAN_SHADOW_START      (VA_START)
--#define KASAN_SHADOW_END        (KASAN_SHADOW_START + KASAN_SHADOW_SIZE)
--
--/*
-- * This value is used to map an address to the corresponding shadow
-- * address by the following formula:
-- *     shadow_addr = (address >> 3) + KASAN_SHADOW_OFFSET;
-  *
-- * (1 << 61) shadow addresses - [KASAN_SHADOW_OFFSET,KASAN_SHADOW_END]
-- * cover all 64-bits of virtual addresses. So KASAN_SHADOW_OFFSET
-- * should satisfy the following equation:
-- *      KASAN_SHADOW_OFFSET = KASAN_SHADOW_END - (1ULL << 61)
-+ * We derive these values from KASAN_SHADOW_OFFSET and the size of the VA
-+ * space.
-+ *
-+ * KASAN shadow addresses are derived from the following formula:
-+ *	shadow_addr = (address >> 3) + KASAN_SHADOW_OFFSET;
-+ *
-  */
--#define KASAN_SHADOW_OFFSET     (KASAN_SHADOW_END - (1ULL << (64 - 3)))
-+#define KASAN_SHADOW_END	((1UL << 61) + KASAN_SHADOW_OFFSET)
-+#define _KASAN_SHADOW_START(va)	(KASAN_SHADOW_END - (1UL << ((va) - 3)))
-+#define KASAN_SHADOW_START      _KASAN_SHADOW_START(VA_BITS)
- 
- void kasan_init(void);
- void kasan_copy_shadow(pgd_t *pgdir);
-diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-index e8b4dcc11fed..5506f7d66bfa 100644
---- a/arch/arm64/include/asm/pgtable.h
-+++ b/arch/arm64/include/asm/pgtable.h
-@@ -19,6 +19,7 @@
- #include <asm/bug.h>
- #include <asm/proc-fns.h>
- 
-+#include <asm/kasan.h>
- #include <asm/memory.h>
+diff --git a/arch/arm64/mm/dump.c b/arch/arm64/mm/dump.c
+index e5d1b5f432fe..c50af666c407 100644
+--- a/arch/arm64/mm/dump.c
++++ b/arch/arm64/mm/dump.c
+@@ -29,18 +29,42 @@
  #include <asm/pgtable-hwdef.h>
- #include <asm/pgtable-prot.h>
-@@ -30,7 +31,11 @@
-  * VMALLOC_END: extends to the available space below vmmemmap, PCI I/O space
-  *	and fixed mappings
-  */
--#define VMALLOC_START		(VA_START + KASAN_SHADOW_SIZE)
-+#ifdef CONFIG_KASAN
-+#define VMALLOC_START		(KASAN_SHADOW_END)
-+#else
-+#define VMALLOC_START		(VA_START)
-+#endif
- #define VMALLOC_END		(FIXADDR_TOP - PUD_SIZE)
+ #include <asm/ptdump.h>
  
- #define vmemmap			((struct page *)VMEMMAP_START - (memstart_addr >> PAGE_SHIFT))
-diff --git a/arch/arm64/mm/kasan_init.c b/arch/arm64/mm/kasan_init.c
-index 5aef679e61c6..968535789d13 100644
---- a/arch/arm64/mm/kasan_init.c
-+++ b/arch/arm64/mm/kasan_init.c
-@@ -135,7 +135,6 @@ static void __init kasan_pgd_populate(unsigned long addr, unsigned long end,
- /* The early shadow maps everything to a single page of zeroes */
- asmlinkage void __init kasan_early_init(void)
+-static const struct addr_marker address_markers[] = {
+-	{ PAGE_OFFSET,			"Linear Mapping start" },
+-	{ VA_START,			"Linear Mapping end" },
++
++enum address_markers_idx {
++	PAGE_OFFSET_NR = 0,
++	VA_START_NR,
+ #ifdef CONFIG_KASAN
+-	{ KASAN_SHADOW_START,		"Kasan shadow start" },
++	KASAN_START_NR,
++	KASAN_END_NR,
++#endif
++	VMALLOC_START_NR,
++	VMALLOC_END_NR,
++#ifdef CONFIG_SPARSEMEM_VMEMMAP
++	VMEMMAP_START_NR,
++	VMEMMAP_END_NR,
++#endif
++	FIXADDR_START_NR,
++	FIXADDR_END_NR,
++	PCI_START_NR,
++	PCI_END_NR,
++	MODULES_START_NR,
++	MODULES_END_NR,
++	KIMAGE_NR,
++	END_NR
++};
++
++static struct addr_marker address_markers[] = {
++	{ 0 /* PAGE_OFFSET */,		"Linear Mapping start" },
++	{ 0 /* VA_START */,		"Linear Mapping end" },
++#ifdef CONFIG_KASAN
++	{ 0 /* KASAN_SHADOW_START */,	"Kasan shadow start" },
+ 	{ KASAN_SHADOW_END,		"Kasan shadow end" },
+ #endif
+-	{ VMALLOC_START,		"vmalloc() Area" },
++	{ 0 /* VMALLOC_START */,	"vmalloc() Area" },
+ 	{ VMALLOC_END,			"vmalloc() End" },
+ #ifdef CONFIG_SPARSEMEM_VMEMMAP
+-	{ VMEMMAP_START,		"vmemmap start" },
+-	{ VMEMMAP_START + VMEMMAP_SIZE,	"vmemmap end"},
++	{ 0 /* VMEMMAP_START */,		"vmemmap start" },
++	{ 0 /*VMEMMAP_START + VMEMMAP_SIZE */,	"vmemmap end"},
+ #endif
+ 	{ FIXADDR_START,		"Fixmap start" },
+ 	{ FIXADDR_TOP,			"Fixmap end" },
+@@ -377,7 +401,6 @@ static void ptdump_initialize(void)
+ static struct ptdump_info kernel_ptdump_info = {
+ 	.mm		= &init_mm,
+ 	.markers	= address_markers,
+-	.base_addr	= PAGE_OFFSET,
+ };
+ 
+ void ptdump_check_wx(void)
+@@ -403,6 +426,18 @@ void ptdump_check_wx(void)
+ static int ptdump_init(void)
  {
--	BUILD_BUG_ON(KASAN_SHADOW_OFFSET != KASAN_SHADOW_END - (1UL << 61));
- 	BUILD_BUG_ON(!IS_ALIGNED(KASAN_SHADOW_START, PGDIR_SIZE));
- 	BUILD_BUG_ON(!IS_ALIGNED(KASAN_SHADOW_END, PGDIR_SIZE));
- 	kasan_pgd_populate(KASAN_SHADOW_START, KASAN_SHADOW_END, NUMA_NO_NODE,
+ 	ptdump_initialize();
++	kernel_ptdump_info.base_addr = PAGE_OFFSET;
++	address_markers[PAGE_OFFSET_NR].start_address = PAGE_OFFSET;
++	address_markers[VA_START_NR].start_address = VA_START;
++#ifdef CONFIG_KASAN
++	address_markers[KASAN_START_NR].start_address = KASAN_SHADOW_START;
++#endif
++	address_markers[VMALLOC_START_NR].start_address = VMALLOC_START;
++#ifdef CONFIG_SPARSEMEM_VMEMMAP
++	address_markers[VMEMMAP_START_NR].start_address = VMEMMAP_START;
++	address_markers[VMEMMAP_END_NR].start_address = VMEMMAP_START
++							+ VMEMMAP_SIZE;
++#endif
+ 	return ptdump_debugfs_register(&kernel_ptdump_info,
+ 					"kernel_page_tables");
+ }
 -- 
 2.11.0
