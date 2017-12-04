@@ -1,112 +1,108 @@
-From: Shanker Donthineni <shankerd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-Subject: Re: [PATCH v4 2/2] arm64: Add software workaround for Falkor erratum
- 1041
-Date: Mon, 4 Dec 2017 14:09:50 -0600
-Message-ID: <07aa6edb-9634-a6b4-589e-8d58cf982f6d@codeaurora.org>
-References: <1511824680-16397-1-git-send-email-shankerd@codeaurora.org>
- <1511824680-16397-3-git-send-email-shankerd@codeaurora.org>
- <20171201112457.GE18083@arm.com>
- <12cb0f4a-577b-ffd5-21b7-26ce0e46505a@codeaurora.org>
-Reply-To: shankerd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org
+From: Christoffer Dall <cdall@kernel.org>
+Subject: [PATCH v3 00/16] Move vcpu_load and vcpu_put calls to arch code
+Date: Mon,  4 Dec 2017 21:35:22 +0100
+Message-ID: <20171204203538.8370-1-cdall@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <12cb0f4a-577b-ffd5-21b7-26ce0e46505a-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-Content-Language: en-US
-Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>
-Cc: linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Ard Biesheuvel <ard.biesheuvel-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Matt Fleming <matt-mF/unelCI9GS6iBeEJttW/XRex20P6io@public.gmane.org>, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, Robin Murphy <robin.murphy-5wv7dgnIgG8@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 212C749D14
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 15:32:42 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id lBxlG-4Hxt4T for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Dec 2017 15:32:41 -0500 (EST)
+Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F0CE9406D0
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 15:32:40 -0500 (EST)
+Received: by mail-wm0-f68.google.com with SMTP id 9so8173003wme.4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Dec 2017 12:35:49 -0800 (PST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvm@vger.kernel.org
+Cc: linux-mips@linux-mips.org, Marc Zyngier <marc.zyngier@arm.com>, James Hogan <jhogan@kernel.org>, Cornelia Huck <cohuck@redhat.com>, kvm-ppc@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>, Christian Borntraeger <borntraeger@de.ibm.com>, linux-arm-kernel@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>, linux-s390@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Will,
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
-On 12/03/2017 07:35 AM, Shanker Donthineni wrote:
-> Hi Will, thanks for your review comments.
-> 
-> On 12/01/2017 05:24 AM, Will Deacon wrote:
->> On Mon, Nov 27, 2017 at 05:18:00PM -0600, Shanker Donthineni wrote:
->>> The ARM architecture defines the memory locations that are permitted
->>> to be accessed as the result of a speculative instruction fetch from
->>> an exception level for which all stages of translation are disabled.
->>> Specifically, the core is permitted to speculatively fetch from the
->>> 4KB region containing the current program counter 4K and next 4K.
->>>
->>> When translation is changed from enabled to disabled for the running
->>> exception level (SCTLR_ELn[M] changed from a value of 1 to 0), the
->>> Falkor core may errantly speculatively access memory locations outside
->>> of the 4KB region permitted by the architecture. The errant memory
->>> access may lead to one of the following unexpected behaviors.
->>>
->>> 1) A System Error Interrupt (SEI) being raised by the Falkor core due
->>>    to the errant memory access attempting to access a region of memory
->>>    that is protected by a slave-side memory protection unit.
->>> 2) Unpredictable device behavior due to a speculative read from device
->>>    memory. This behavior may only occur if the instruction cache is
->>>    disabled prior to or coincident with translation being changed from
->>>    enabled to disabled.
->>>
->>> The conditions leading to this erratum will not occur when either of the
->>> following occur:
->>>  1) A higher exception level disables translation of a lower exception level
->>>    (e.g. EL2 changing SCTLR_EL1[M] from a value of 1 to 0).
->>>  2) An exception level disabling its stage-1 translation if its stage-2
->>>     translation is enabled (e.g. EL1 changing SCTLR_EL1[M] from a value of 1
->>>     to 0 when HCR_EL2[VM] has a value of 1).
->>>
->>> To avoid the errant behavior, software must execute an ISB immediately
->>> prior to executing the MSR that will change SCTLR_ELn[M] from 1 to 0.
->>>
->>> Signed-off-by: Shanker Donthineni <shankerd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
->>> ---
->>> Changes since v3:
->>>   Rebased to kernel v4.15-rc1.
->>> Changes since v2:
->>>   Repost the corrected patches.
->>> Changes since v1:
->>>   Apply the workaround where it's required.
->>>
->>>  Documentation/arm64/silicon-errata.txt |  1 +
->>>  arch/arm64/Kconfig                     | 12 +++++++++++-
->>>  arch/arm64/include/asm/assembler.h     | 19 +++++++++++++++++++
->>>  arch/arm64/include/asm/cpucaps.h       |  3 ++-
->>>  arch/arm64/kernel/cpu-reset.S          |  1 +
->>>  arch/arm64/kernel/cpu_errata.c         | 16 ++++++++++++++++
->>>  arch/arm64/kernel/efi-entry.S          |  2 ++
->>>  arch/arm64/kernel/head.S               |  1 +
->>>  arch/arm64/kernel/relocate_kernel.S    |  1 +
->>>  arch/arm64/kvm/hyp-init.S              |  1 +
->>
->> This is an awful lot of code just to add an ISB instruction prior to
->> disabling the MMU. Why do you need to go through the alternatives framework
->> for this? Just do it with an #ifdef; this isn't a fastpath.
->>
-> 
-> We can avoid changes to only two files cpu_errata.c and cpucaps.h without using
-> the alternatives framework. Even though it's in slow path, cpu-errata.c changes 
-> provides a nice debug message which indicates the erratum E1041 is applied. 
-> 
-> Erratum log information would be very useful to conform our customers using the
-> right kernel with E1014 patch by looking at dmesg. Other than that I don't have
-> any other strong opinion to avoid alternatives and handle using #idef.
-> 
-> Should I go ahead and post v5 patch without alternatives?
-> 
+Some architectures may decide to do different things during
+kvm_arch_vcpu_load depending on the ioctl being executed.  For example,
+arm64 is about to do significant work in vcpu load/put when running a
+vcpu, but it's problematic to do this for any other vcpu ioctl than
+KVM_RUN.
 
+Further, while it may be possible to call kvm_arch_vcpu_load() for a
+number of non-KVM_RUN ioctls, it makes the KVM/ARM code more difficult
+to reason about, especially after my optimization series, because a lot
+of things can now happen, where we have to consider if we're really in
+the process of running a vcpu or not.
 
-Please provide your thoughts on next step. We would like to merge this erratum
-to v4.15 kernel.
+This series will first move the vcpu_load() and vcpu_put() calls in the
+arch generic dispatch function into each case of the switch statement
+and then, one-by-one, pushed the calls down into the architecture
+specific code making the changes for each ioctl as required.
 
->> Will
->>
->> _______________________________________________
->> linux-arm-kernel mailing list
->> linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
->> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
->>
-> 
+Based on v4.15-rc1
+
+Patches also available at:
+git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git vcpu-load-put-v3
+
+Changes since v2:
+ - Clarified commit message on patch 1
+ - Initialized ret to -EINVAL at declaration on patch 9
+ - Added David Hildenbrand's reviewed-by tag
+
+Changes since v1:
+ - Fix PPC and S390 bugs from v1
+ - Take the mutex in the main disaptcher function and make vcpu_load a
+   void, which simplifies the patches overall.
+ - Add a patch that moves vcpu_load for arm/arm64 after the first-run
+   init function.
+
+Thanks,
+-Christoffer
+
+Christoffer Dall (16):
+  KVM: Take vcpu->mutex outside vcpu_load
+  KVM: Prepare for moving vcpu_load/vcpu_put into arch specific code
+  KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_run
+  KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_get_regs
+  KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_set_regs
+  KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_get_sregs
+  KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_set_sregs
+  KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_get_mpstate
+  KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_set_mpstate
+  KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_translate
+  KVM: Move vcpu_load to arch-specific
+    kvm_arch_vcpu_ioctl_set_guest_debug
+  KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_get_fpu
+  KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl_set_fpu
+  KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl
+  KVM: arm/arm64: Avoid vcpu_load for other vcpu ioctls than KVM_RUN
+  KVM: arm/arm64: Move vcpu_load call after kvm_vcpu_first_run_init
+
+ arch/arm64/kvm/guest.c        |  12 +++--
+ arch/mips/kvm/mips.c          |  58 +++++++++++++++--------
+ arch/powerpc/kvm/book3s.c     |  24 +++++++++-
+ arch/powerpc/kvm/booke.c      |  51 +++++++++++++++-----
+ arch/powerpc/kvm/powerpc.c    |  19 +++++---
+ arch/s390/kvm/kvm-s390.c      |  90 +++++++++++++++++++++++++++--------
+ arch/x86/kvm/vmx.c            |   4 +-
+ arch/x86/kvm/x86.c            | 106 ++++++++++++++++++++++++++++++------------
+ include/linux/kvm_host.h      |   2 +-
+ virt/kvm/arm/arch_timer.c     |   4 --
+ virt/kvm/arm/arm.c            |  68 ++++++++++++++++++---------
+ virt/kvm/arm/vgic/vgic-init.c |  11 -----
+ virt/kvm/kvm_main.c           |  17 ++-----
+ 13 files changed, 322 insertions(+), 144 deletions(-)
 
 -- 
-Shanker Donthineni
-Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
+2.14.2
