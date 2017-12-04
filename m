@@ -1,22 +1,22 @@
 From: Steve Capper <steve.capper@arm.com>
-Subject: [PATCH 07/12] arm64: mm: Place kImage at bottom of VA space
-Date: Mon,  4 Dec 2017 14:13:08 +0000
-Message-ID: <20171204141313.31604-8-steve.capper@arm.com>
+Subject: [PATCH 11/12] arm64: KVM: Add support for an alternative VA space
+Date: Mon,  4 Dec 2017 14:13:12 +0000
+Message-ID: <20171204141313.31604-12-steve.capper@arm.com>
 References: <20171204141313.31604-1-steve.capper@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 31AA649D74
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 09:10:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 78AD549D8C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 09:10:52 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id t3NwCOdp+nu9 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Dec 2017 09:10:37 -0500 (EST)
+ with ESMTP id tumOTmM6hcb7 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Dec 2017 09:10:51 -0500 (EST)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7302749D4E
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 09:10:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 76E5249D61
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 09:10:41 -0500 (EST)
 In-Reply-To: <20171204141313.31604-1-steve.capper@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,106 +31,202 @@ To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 Cc: catalin.marinas@arm.com, ard.biesheuvel@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Re-arrange the kernel memory map s.t. the kernel image resides in the
-bottom 514MB of memory. With the modules, fixed map, PCI IO space placed
-above it. At the very bottom of the memory map we set aside a 2MB guard
-region to prevent ambiguity with PTR_ERR/ERR_PTR.
+This patch adjusts the alternative patching logic for kern_hyp_va to
+take into account a change in virtual address space size on boot.
 
-Dynamically resizable objects such as KASAN shadow and sparsemem map
-are placed above the fixed size objects.
+Because the instructions in the alternatives regions have to be fixed at
+compile time, in order to make the logic depend on a dynamic VA size
+the predicates have to be adjusted.
 
-This means that kernel addresses are now no longer directly dependent on
-VA space size.
+The predicates used, follow the corresponding logic:
+ - ARM64_HAS_VIRT_HOST_EXTN, true if running with VHE
+ - ARM64_HYP_MAP_FLIP, true if !VHE and idmap is high and VA size is small.
+ - ARM64_HYP_RUNNING_ALT_VA, true if !VHE and VA size is big.
+ - ARM64_HYP_MAP_FLIP_ALT, true if !VHE and idmap is high and VA size is big.
+
+Using the above predicates means we have to add two instructions to
+kern_hyp_va.
 
 Signed-off-by: Steve Capper <steve.capper@arm.com>
 ---
- arch/arm64/include/asm/memory.h  | 17 +++++++++--------
- arch/arm64/include/asm/pgtable.h |  4 ++--
- arch/arm64/mm/dump.c             | 12 +++++++-----
- 3 files changed, 18 insertions(+), 15 deletions(-)
+ arch/arm64/Kconfig               |  4 ++++
+ arch/arm64/include/asm/cpucaps.h |  4 +++-
+ arch/arm64/include/asm/kvm_mmu.h | 47 ++++++++++++++++++++++++++++++++++++++++
+ arch/arm64/kernel/cpufeature.c   | 39 ++++++++++++++++++++++++++++++++-
+ 4 files changed, 92 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
-index 0a912eb3d74f..ba80561c6ed8 100644
---- a/arch/arm64/include/asm/memory.h
-+++ b/arch/arm64/include/asm/memory.h
-@@ -68,14 +68,15 @@
- #define PAGE_OFFSET		(UL(0xffffffffffffffff) - \
- 	(UL(1) << VA_BITS) + 1)
- #define PAGE_OFFSET_END		(VA_START)
--#define KIMAGE_VADDR		(MODULES_END)
--#define MODULES_END		(MODULES_VADDR + MODULES_VSIZE)
--#define MODULES_VADDR		(VA_START + KASAN_SHADOW_SIZE)
-+#define KIMAGE_VSIZE		(SZ_512M)
-+#define KIMAGE_VADDR		(UL(0) - SZ_2M - KIMAGE_VSIZE)
- #define MODULES_VSIZE		(SZ_128M)
--#define VMEMMAP_START		(-VMEMMAP_SIZE)
--#define PCI_IO_END		(VMEMMAP_START - SZ_2M)
-+#define MODULES_END		(KIMAGE_VADDR)
-+#define MODULES_VADDR		(MODULES_END - MODULES_VSIZE)
-+#define PCI_IO_END		(MODULES_VADDR - SZ_2M)
- #define PCI_IO_START		(PCI_IO_END - PCI_IO_SIZE)
--#define FIXADDR_TOP		(PCI_IO_START - SZ_2M)
-+#define FIXADDR_TOP		(PCI_IO_START - PGDIR_SIZE)
-+#define VMEMMAP_START		(FIXADDR_START - VMEMMAP_SIZE)
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 0fa430326825..143c453b06f1 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -656,6 +656,10 @@ config ARM64_VA_BITS
+ 	default 47 if ARM64_VA_BITS_47
+ 	default 48 if ARM64_VA_BITS_48
  
- #define KERNEL_START      _text
- #define KERNEL_END        _end
-@@ -292,10 +293,10 @@ static inline void *phys_to_virt(phys_addr_t x)
- #define _virt_addr_valid(kaddr)	pfn_valid(__pa(kaddr) >> PAGE_SHIFT)
- #else
- #define __virt_to_pgoff(kaddr)	(((u64)(kaddr) & ~PAGE_OFFSET) / PAGE_SIZE * sizeof(struct page))
--#define __page_to_voff(kaddr)	(((u64)(kaddr) & ~VMEMMAP_START) * PAGE_SIZE / sizeof(struct page))
-+#define __page_to_voff(kaddr)	(((u64)(kaddr) - VMEMMAP_START) * PAGE_SIZE / sizeof(struct page))
++config ARM64_VA_BITS_ALT
++	bool
++	default n
++
+ config CPU_BIG_ENDIAN
+        bool "Build big-endian kernel"
+        help
+diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+index 3de31a1010ee..955936adcf7a 100644
+--- a/arch/arm64/include/asm/cpucaps.h
++++ b/arch/arm64/include/asm/cpucaps.h
+@@ -41,7 +41,9 @@
+ #define ARM64_WORKAROUND_CAVIUM_30115		20
+ #define ARM64_HAS_DCPOP				21
+ #define ARM64_SVE				22
++#define ARM64_HYP_RUNNING_ALT_VA		23
++#define ARM64_HYP_MAP_FLIP_ALT			24
  
- #define page_to_virt(page)	((void *)((__page_to_voff(page)) | PAGE_OFFSET))
--#define virt_to_page(vaddr)	((struct page *)((__virt_to_pgoff(vaddr)) | VMEMMAP_START))
-+#define virt_to_page(vaddr)	((struct page *)((__virt_to_pgoff(vaddr)) + VMEMMAP_START))
+-#define ARM64_NCAPS				23
++#define ARM64_NCAPS				25
  
- #define _virt_addr_valid(kaddr)	pfn_valid((((u64)(kaddr) & ~PAGE_OFFSET) \
- 					   + PHYS_OFFSET) >> PAGE_SHIFT)
-diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-index 054b37143a50..e8b4dcc11fed 100644
---- a/arch/arm64/include/asm/pgtable.h
-+++ b/arch/arm64/include/asm/pgtable.h
-@@ -30,8 +30,8 @@
-  * VMALLOC_END: extends to the available space below vmmemmap, PCI I/O space
-  *	and fixed mappings
-  */
--#define VMALLOC_START		(MODULES_END)
--#define VMALLOC_END		(- PUD_SIZE - VMEMMAP_SIZE - SZ_64K)
-+#define VMALLOC_START		(VA_START + KASAN_SHADOW_SIZE)
-+#define VMALLOC_END		(FIXADDR_TOP - PUD_SIZE)
- 
- #define vmemmap			((struct page *)VMEMMAP_START - (memstart_addr >> PAGE_SHIFT))
- 
-diff --git a/arch/arm64/mm/dump.c b/arch/arm64/mm/dump.c
-index b7b09c0fc50d..e5d1b5f432fe 100644
---- a/arch/arm64/mm/dump.c
-+++ b/arch/arm64/mm/dump.c
-@@ -36,17 +36,19 @@ static const struct addr_marker address_markers[] = {
- 	{ KASAN_SHADOW_START,		"Kasan shadow start" },
- 	{ KASAN_SHADOW_END,		"Kasan shadow end" },
- #endif
--	{ MODULES_VADDR,		"Modules start" },
--	{ MODULES_END,			"Modules end" },
- 	{ VMALLOC_START,		"vmalloc() Area" },
- 	{ VMALLOC_END,			"vmalloc() End" },
-+#ifdef CONFIG_SPARSEMEM_VMEMMAP
-+	{ VMEMMAP_START,		"vmemmap start" },
-+	{ VMEMMAP_START + VMEMMAP_SIZE,	"vmemmap end"},
+ #endif /* __ASM_CPUCAPS_H */
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 5174fd7e5196..8de396764a11 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -73,6 +73,11 @@
+ #define _HYP_MAP_HIGH_BIT(va)		(UL(1) << ((va) - 1))
+ #define HYP_MAP_KERNEL_BITS	_HYP_MAP_KERNEL_BITS(VA_BITS_MIN)
+ #define HYP_MAP_HIGH_BIT	_HYP_MAP_HIGH_BIT(VA_BITS_MIN)
++#ifdef CONFIG_ARM64_VA_BITS_ALT
++#define HYP_MAP_KERNEL_BITS_ALT	(_HYP_MAP_KERNEL_BITS(VA_BITS_ALT) \
++				 ^ _HYP_MAP_KERNEL_BITS(VA_BITS_MIN))
++#define HYP_MAP_HIGH_BIT_ALT	_HYP_MAP_HIGH_BIT(VA_BITS_ALT)
 +#endif
- 	{ FIXADDR_START,		"Fixmap start" },
- 	{ FIXADDR_TOP,			"Fixmap end" },
- 	{ PCI_IO_START,			"PCI I/O start" },
- 	{ PCI_IO_END,			"PCI I/O end" },
--#ifdef CONFIG_SPARSEMEM_VMEMMAP
--	{ VMEMMAP_START,		"vmemmap" },
--#endif
-+	{ MODULES_VADDR,		"Modules start" },
-+	{ MODULES_END,			"Modules end" },
-+	{ KIMAGE_VADDR,			"kImage start"},
- 	{ -1,				NULL },
- };
  
+ #ifdef __ASSEMBLY__
+ 
+@@ -95,6 +100,27 @@
+  * - VHE:
+  *		nop
+  *		nop
++ *
++ * For cases where we are running with a variable address space size,
++ * two extra instructions are added, and the logic changes thusly:
++ *
++ * - Flip the kernel bits for the new VA:
++ *		eor x0, x0, #HYP_MAP_KERNEL_BITS
++ *		nop
++ *		eor x0, x0, #HYP_MAP_KERNEL_BITS_ALT
++ *		eor
++ *
++ * - Flip the kernel bits and upper HYP bit for new VA:
++ *		eor x0, x0, #HYP_MAP_KERNEL_BITS
++ *		nop
++ *		eor x0, x0, #HYP_MAP_KERNEL_BITS_ALT
++ *		eor x0, x0, #HYP_MAP_HIGH_BIT_ALT
++ *
++ * - VHE:
++ *		nop
++ *		nop
++ *		nop
++ *		nop
+  */
+ .macro kern_hyp_va	reg
+ alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
+@@ -103,6 +129,14 @@ alternative_else_nop_endif
+ alternative_if ARM64_HYP_MAP_FLIP
+ 	eor     \reg, \reg, #HYP_MAP_HIGH_BIT
+ alternative_else_nop_endif
++#ifdef CONFIG_ARM64_VA_BITS_ALT
++alternative_if ARM64_HYP_RUNNING_ALT_VA
++	eor	\reg, \reg, #HYP_MAP_KERNEL_BITS_ALT
++alternative_else_nop_endif
++alternative_if ARM64_HYP_MAP_FLIP_ALT
++	eor     \reg, \reg, #HYP_MAP_HIGH_BIT_ALT
++alternative_else_nop_endif
++#endif
+ .endm
+ 
+ #else
+@@ -125,6 +159,19 @@ static inline unsigned long __kern_hyp_va(unsigned long v)
+ 				 ARM64_HYP_MAP_FLIP)
+ 		     : "+r" (v)
+ 		     : "i" (HYP_MAP_HIGH_BIT));
++#ifdef CONFIG_ARM64_VA_BITS_ALT
++	asm volatile(ALTERNATIVE("nop",
++				 "eor %0, %0, %1",
++				 ARM64_HYP_RUNNING_ALT_VA)
++		     : "+r" (v)
++		     : "i" (HYP_MAP_KERNEL_BITS_ALT));
++	asm volatile(ALTERNATIVE("nop",
++				 "eor %0, %0, %1",
++				 ARM64_HYP_MAP_FLIP_ALT)
++		     : "+r" (v)
++		     : "i" (HYP_MAP_HIGH_BIT_ALT));
++#endif
++
+ 	return v;
+ }
+ 
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 31cfffa79fee..cd4bcd2d0942 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -834,7 +834,8 @@ static bool hyp_flip_space(const struct arm64_cpu_capabilities *entry,
+ 	 * - the idmap doesn't clash with it,
+ 	 * - the kernel is not running at EL2.
+ 	 */
+-	return idmap_addr <= GENMASK(VA_BITS_MIN - 2, 0) && !is_kernel_in_hyp_mode();
++	return (VA_BITS == VA_BITS_MIN) &&
++		idmap_addr <= GENMASK(VA_BITS_MIN - 2, 0) && !is_kernel_in_hyp_mode();
+ }
+ 
+ static bool has_no_fpsimd(const struct arm64_cpu_capabilities *entry, int __unused)
+@@ -845,6 +846,28 @@ static bool has_no_fpsimd(const struct arm64_cpu_capabilities *entry, int __unus
+ 					ID_AA64PFR0_FP_SHIFT) < 0;
+ }
+ 
++#ifdef CONFIG_ARM64_VA_BITS_ALT
++static bool hyp_using_large_va(const struct arm64_cpu_capabilities *entry,
++				int __unused)
++{
++	return (VA_BITS > VA_BITS_MIN) && !is_kernel_in_hyp_mode();
++}
++
++static bool hyp_flip_space_alt(const struct arm64_cpu_capabilities *entry,
++			   int __unused)
++{
++	phys_addr_t idmap_addr = __pa_symbol(__hyp_idmap_text_start);
++
++	/*
++	 * Activate the lower HYP offset only if:
++	 * - the idmap doesn't clash with it,
++	 * - the kernel is not running at EL2.
++	 */
++	return (VA_BITS > VA_BITS_MIN) &&
++		idmap_addr <= GENMASK(VA_BITS - 2, 0) && !is_kernel_in_hyp_mode();
++}
++#endif
++
+ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 	{
+ 		.desc = "GIC system register CPU interface",
+@@ -931,6 +954,20 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.def_scope = SCOPE_SYSTEM,
+ 		.matches = hyp_flip_space,
+ 	},
++#ifdef CONFIG_ARM64_VA_BITS_ALT
++	{
++		.desc = "HYP mapping using larger VA space",
++		.capability = ARM64_HYP_RUNNING_ALT_VA,
++		.def_scope = SCOPE_SYSTEM,
++		.matches = hyp_using_large_va,
++	},
++	{
++		.desc = "HYP mapping using flipped, larger VA space",
++		.capability = ARM64_HYP_MAP_FLIP_ALT,
++		.def_scope = SCOPE_SYSTEM,
++		.matches = hyp_flip_space_alt,
++	},
++#endif
+ 	{
+ 		/* FP/SIMD is not implemented */
+ 		.capability = ARM64_HAS_NO_FPSIMD,
 -- 
 2.11.0
