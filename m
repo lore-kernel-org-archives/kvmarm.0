@@ -1,25 +1,25 @@
 From: Christoffer Dall <cdall@kernel.org>
-Subject: [PULL 15/19] KVM: arm/arm64: Avoid attempting to load timer vgic
- state without a vgic
-Date: Mon,  4 Dec 2017 15:03:44 +0100
-Message-ID: <20171204140348.21965-13-cdall@kernel.org>
+Subject: [PULL 17/19] KVM: arm/arm64: Fix spinlock acquisition in
+ vgic_set_owner
+Date: Mon,  4 Dec 2017 15:03:46 +0100
+Message-ID: <20171204140348.21965-15-cdall@kernel.org>
 References: <20171204135637.21620-1-cdall@kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 143F249D95
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 09:01:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D75C249DB3
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 09:01:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dk9VS5S2-mlR for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Dec 2017 09:01:07 -0500 (EST)
-Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8596249D9B
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 09:01:01 -0500 (EST)
-Received: by mail-wm0-f68.google.com with SMTP id 9so5994418wme.4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Dec 2017 06:04:09 -0800 (PST)
+ with ESMTP id PckCXhFov0Zh for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Dec 2017 09:01:11 -0500 (EST)
+Received: from mail-wm0-f66.google.com (mail-wm0-f66.google.com [74.125.82.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D43CE49D70
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 09:01:03 -0500 (EST)
+Received: by mail-wm0-f66.google.com with SMTP id f9so14549220wmh.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Dec 2017 06:04:11 -0800 (PST)
 In-Reply-To: <20171204135637.21620-1-cdall@kernel.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,34 +34,50 @@ To: kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q
 Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
 
-The timer optimization patches inadvertendly changed the logic to always
-load the timer state as if we have a vgic, even if we don't have a vgic.
+vgic_set_owner acquires the irq lock without disabling interrupts,
+resulting in a lockdep splat (an interrupt could fire and result
+in the same lock being taken if the same virtual irq is to be
+injected).
 
-Fix this by doing the usual irqchip_in_kernel() check and call the
-appropriate load function.
+In practice, it is almost impossible to trigger this bug, but
+better safe than sorry. Convert the lock acquisition to a
+spin_lock_irqsave() and keep lockdep happy.
 
+Reported-by: James Morse <james.morse@arm.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/arch_timer.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ virt/kvm/arm/vgic/vgic.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 190c99ed1b73..f9555b1e7f15 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -835,7 +835,10 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
- no_vgic:
- 	preempt_disable();
- 	timer->enabled = 1;
--	kvm_timer_vcpu_load_vgic(vcpu);
-+	if (!irqchip_in_kernel(vcpu->kvm))
-+		kvm_timer_vcpu_load_user(vcpu);
-+	else
-+		kvm_timer_vcpu_load_vgic(vcpu);
- 	preempt_enable();
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 786cce7bd2ec..ecb8e25f5fe5 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -492,6 +492,7 @@ int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid)
+ int kvm_vgic_set_owner(struct kvm_vcpu *vcpu, unsigned int intid, void *owner)
+ {
+ 	struct vgic_irq *irq;
++	unsigned long flags;
+ 	int ret = 0;
  
- 	return 0;
+ 	if (!vgic_initialized(vcpu->kvm))
+@@ -502,12 +503,12 @@ int kvm_vgic_set_owner(struct kvm_vcpu *vcpu, unsigned int intid, void *owner)
+ 		return -EINVAL;
+ 
+ 	irq = vgic_get_irq(vcpu->kvm, vcpu, intid);
+-	spin_lock(&irq->irq_lock);
++	spin_lock_irqsave(&irq->irq_lock, flags);
+ 	if (irq->owner && irq->owner != owner)
+ 		ret = -EEXIST;
+ 	else
+ 		irq->owner = owner;
+-	spin_unlock(&irq->irq_lock);
++	spin_unlock_irqrestore(&irq->irq_lock, flags);
+ 
+ 	return ret;
+ }
 -- 
 2.14.2
