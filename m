@@ -1,136 +1,74 @@
 From: Christoffer Dall <cdall@kernel.org>
-Subject: [PULL 01/19] KVM: arm/arm64: Don't enable/disable physical timer access on VHE
-Date: Mon,  4 Dec 2017 14:56:19 +0100
-Message-ID: <20171204135637.21620-2-cdall@kernel.org>
+Subject: [PULL 02/19] KVM: arm/arm64: VGIC: extend !vgic_is_initialized guard
+Date: Mon,  4 Dec 2017 14:56:20 +0100
+Message-ID: <20171204135637.21620-3-cdall@kernel.org>
 References: <20171204135637.21620-1-cdall@kernel.org>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E374349D72
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 08:53:34 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id ZJL9LFPlGkD5 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Dec 2017 08:53:34 -0500 (EST)
+Received: from mail-wr0-f195.google.com (mail-wr0-f195.google.com
+ [209.85.128.195])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F038D49D4E
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 08:53:33 -0500 (EST)
+Received: by mail-wr0-f195.google.com with SMTP id a41so15514740wra.6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Dec 2017 05:56:41 -0800 (PST)
 In-Reply-To: <20171204135637.21620-1-cdall@kernel.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+From: Andre Przywara <andre.przywara@arm.com>
 
-After the timer optimization rework we accidentally end up calling
-physical timer enable/disable functions on VHE systems, which is neither
-needed nor correct, since the CNTHCTL_EL2 register format is
-different when HCR_EL2.E2H is set.
+Commit f39d16cbabf9 ("KVM: arm/arm64: Guard kvm_vgic_map_is_active against
+!vgic_initialized") introduced a check whether the VGIC has been
+initialized before accessing the spinlock and the VGIC data structure.
+However the vgic_get_irq() call in the variable declaration sneaked
+through the net, so lets make sure that this also gets called only after
+we actually allocated the arrays this function accesses.
 
-The CNTHCTL_EL2 is initialized when CPUs become online in
-kvm_timer_init_vhe() and we don't have to call these functions on VHE
-systems, which also allows us to inline the non-VHE functionality.
-
-Reported-by: Jintack Lim <jintack@cs.columbia.edu>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- include/kvm/arm_arch_timer.h |  3 ---
- virt/kvm/arm/arch_timer.c    |  6 ------
- virt/kvm/arm/hyp/timer-sr.c  | 48 ++++++++++++++++++--------------------------
- 3 files changed, 20 insertions(+), 37 deletions(-)
+ virt/kvm/arm/vgic/vgic.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index 01ee473517e2..6e45608b2399 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -93,7 +93,4 @@ void kvm_timer_init_vhe(void);
- #define vcpu_vtimer(v)	(&(v)->arch.timer_cpu.vtimer)
- #define vcpu_ptimer(v)	(&(v)->arch.timer_cpu.ptimer)
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index b168a328a9e0..786cce7bd2ec 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -823,13 +823,14 @@ void vgic_kick_vcpus(struct kvm *kvm)
  
--void enable_el1_phys_timer_access(void);
--void disable_el1_phys_timer_access(void);
--
- #endif
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 4151250ce8da..190c99ed1b73 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -479,9 +479,6 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
- 
- 	vtimer_restore_state(vcpu);
- 
--	if (has_vhe())
--		disable_el1_phys_timer_access();
--
- 	/* Set the background timer for the physical timer emulation. */
- 	phys_timer_emulate(vcpu);
- }
-@@ -510,9 +507,6 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
- 	if (unlikely(!timer->enabled))
- 		return;
- 
--	if (has_vhe())
--		enable_el1_phys_timer_access();
--
- 	vtimer_save_state(vcpu);
- 
- 	/*
-diff --git a/virt/kvm/arm/hyp/timer-sr.c b/virt/kvm/arm/hyp/timer-sr.c
-index f39861639f08..f24404b3c8df 100644
---- a/virt/kvm/arm/hyp/timer-sr.c
-+++ b/virt/kvm/arm/hyp/timer-sr.c
-@@ -27,42 +27,34 @@ void __hyp_text __kvm_timer_set_cntvoff(u32 cntvoff_low, u32 cntvoff_high)
- 	write_sysreg(cntvoff, cntvoff_el2);
- }
- 
--void __hyp_text enable_el1_phys_timer_access(void)
--{
--	u64 val;
--
--	/* Allow physical timer/counter access for the host */
--	val = read_sysreg(cnthctl_el2);
--	val |= CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN;
--	write_sysreg(val, cnthctl_el2);
--}
--
--void __hyp_text disable_el1_phys_timer_access(void)
--{
--	u64 val;
--
--	/*
--	 * Disallow physical timer access for the guest
--	 * Physical counter access is allowed
--	 */
--	val = read_sysreg(cnthctl_el2);
--	val &= ~CNTHCTL_EL1PCEN;
--	val |= CNTHCTL_EL1PCTEN;
--	write_sysreg(val, cnthctl_el2);
--}
--
- void __hyp_text __timer_disable_traps(struct kvm_vcpu *vcpu)
+ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int vintid)
  {
- 	/*
- 	 * We don't need to do this for VHE since the host kernel runs in EL2
- 	 * with HCR_EL2.TGE ==1, which makes those bits have no impact.
- 	 */
--	if (!has_vhe())
--		enable_el1_phys_timer_access();
-+	if (!has_vhe()) {
-+		u64 val;
-+
-+		/* Allow physical timer/counter access for the host */
-+		val = read_sysreg(cnthctl_el2);
-+		val |= CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN;
-+		write_sysreg(val, cnthctl_el2);
-+	}
- }
+-	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
++	struct vgic_irq *irq;
+ 	bool map_is_active;
+ 	unsigned long flags;
  
- void __hyp_text __timer_enable_traps(struct kvm_vcpu *vcpu)
- {
--	if (!has_vhe())
--		disable_el1_phys_timer_access();
-+	if (!has_vhe()) {
-+		u64 val;
-+
-+		/*
-+		 * Disallow physical timer access for the guest
-+		 * Physical counter access is allowed
-+		 */
-+		val = read_sysreg(cnthctl_el2);
-+		val &= ~CNTHCTL_EL1PCEN;
-+		val |= CNTHCTL_EL1PCTEN;
-+		write_sysreg(val, cnthctl_el2);
-+	}
- }
+ 	if (!vgic_initialized(vcpu->kvm))
+ 		return false;
+ 
++	irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
+ 	spin_lock_irqsave(&irq->irq_lock, flags);
+ 	map_is_active = irq->hw && irq->active;
+ 	spin_unlock_irqrestore(&irq->irq_lock, flags);
 -- 
 2.14.2
