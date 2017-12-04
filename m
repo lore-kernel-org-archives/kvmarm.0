@@ -1,98 +1,105 @@
 From: Christoffer Dall <cdall@kernel.org>
 Subject: [PULL 00/19] KVM/ARM Fixes for v4.15
-Date: Mon,  4 Dec 2017 14:56:03 +0100
-Message-ID: <20171204135622.21568-1-cdall@kernel.org>
+Date: Mon,  4 Dec 2017 14:56:18 +0100
+Message-ID: <20171204135637.21620-1-cdall@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 118B149D6C
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 08:53:21 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qlK3vpMUndCi for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Dec 2017 08:53:18 -0500 (EST)
-Received: from mail-wr0-f196.google.com (mail-wr0-f196.google.com
- [209.85.128.196])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B4F16406D0
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 08:53:18 -0500 (EST)
-Received: by mail-wr0-f196.google.com with SMTP id s66so17365727wrc.9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Dec 2017 05:56:26 -0800 (PST)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
 To: kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-RnJvbTogQ2hyaXN0b2ZmZXIgRGFsbCA8Y2hyaXN0b2ZmZXIuZGFsbEBsaW5hcm8ub3JnPgoKSGkg
-UGFvbG8gYW5kIFJhZGltLAoKSGVyZSdzIHRoZSBmaXJzdCByb3VuZCBvZiBmaXhlcyBmb3IgS1ZN
-L0FSTSBmb3IgdjQuMTUuICBUaGlzIGlzIGEgZmFpcmx5IGxhcmdlCnNldCBvZiBmaXhlcywgcGFy
-dGlhbGx5IGJlY2F1c2Ugd2Ugc3BvdHRlZCBhIGhhbmRmdWwgb2YgaXNzdWVzIGZyb20gcnVubmlu
-ZyB0aGUKU01BVENIIHN0YXRpYyBhbmFseXNpcyBvbiB0aGUgY29kZSAodGhhbmtzIHRvIEFLQVNI
-SSBUYWthaGlybykuCgpJbiBtb3JlIGRldGFpbHMsIHRoaXMgcHVsbCByZXF1ZXN0IGZpeGVzOgog
-LSBBIG51bWJlciBvZiBpc3N1ZXMgaW4gdGhlIHZnaWMgZGlzY292ZXJlZCB1c2luZyBTTUFUQ0gK
-IC0gQSBiaXQgb25lLW9mZiBjYWxjdWxhdGlvbiBpbiBvdXQgc3RhZ2UgYmFzZSBhZGRyZXNzIG1h
-c2sgKDMyLWJpdCBhbmQKICAgNjQtYml0KQogLSBGaXhlcyB0byBzaW5nbGUtc3RlcCBkZWJ1Z2dp
-bmcgaW5zdHJ1Y3Rpb25zIHRoYXQgdHJhcCBmb3Igb3RoZXIKICAgcmVhc29ucyBzdWNoIGFzIE1N
-TUlPIGFib3J0cwogLSBQcmludGluZyB1bmF2YWlsYWJsZSBoeXAgbW9kZSBhcyBlcnJvcgogLSBQ
-b3RlbnRpYWwgc3BpbmxvY2sgZGVhZGxvY2sgaW4gdGhlIHZnaWMKIC0gQXZvaWQgY2FsbGluZyB2
-Z2ljIHZjcHUgZnJlZSBtb3JlIHRoYW4gb25jZQogLSBCcm9rZW4gYml0IGNhbGN1bGF0aW9uIGZv
-ciBiaWcgZW5kaWFuIHN5c3RlbXMKCgpUaGUgZm9sbG93aW5nIGNoYW5nZXMgc2luY2UgY29tbWl0
-IDRmYmQ4ZDE5NGYwNmM4YTNmZDJhZjFjZTU2MGRkYjMxZjdlYzgzMjM6CgogIExpbnV4IDQuMTUt
-cmMxICgyMDE3LTExLTI2IDE2OjAxOjQ3IC0wODAwKQoKYXJlIGF2YWlsYWJsZSBpbiB0aGUgZ2l0
-IHJlcG9zaXRvcnkgYXQ6CgogIGdpdDovL2dpdC5rZXJuZWwub3JnL3B1Yi9zY20vbGludXgva2Vy
-bmVsL2dpdC9rdm1hcm0va3ZtYXJtLmdpdCB0YWdzL2t2bS1hcm0tZml4ZXMtZm9yLXY0LjE1LTEK
-CmZvciB5b3UgdG8gZmV0Y2ggY2hhbmdlcyB1cCB0byBmYzM5NmUwNjYzMThjMGEwMjIwOGMxZDNm
-MGI2Mjk1MGE3NzE0OTk5OgoKICBLVk06IGFybS9hcm02NDogRml4IGJyb2tlbiBHSUNIX0VMUlNS
-IGJpZyBlbmRpYW4gY29udmVyc2lvbiAoMjAxNy0xMi0wNCAxNDoyNTozMyArMDEwMCkKCgpUaGFu
-a3MsCi1DaHJpc3RvZmZlcgoKQWxleCBCZW5uw6llICg1KToKICBLVk06IGFybS9hcm02NDogZGVi
-dWc6IEludHJvZHVjZSBoZWxwZXIgZm9yIHNpbmdsZS1zdGVwCiAga3ZtOiBhcm02NDogaGFuZGxl
-IHNpbmdsZS1zdGVwcGluZyB0cmFwcGVkIGluc3RydWN0aW9ucwogIGt2bTogYXJtNjQ6IGhhbmRs
-ZSBzaW5nbGUtc3RlcCBvZiB1c2Vyc3BhY2UgbW1pbyBpbnN0cnVjdGlvbnMKICBrdm06IGFybTY0
-OiBoYW5kbGUgc2luZ2xlLXN0ZXAgZHVyaW5nIFNFcnJvciBleGNlcHRpb25zCiAga3ZtOiBhcm02
-NDogaGFuZGxlIHNpbmdsZS1zdGVwIG9mIGh5cCBlbXVsYXRlZCBtbWlvIGluc3RydWN0aW9ucwoK
-QW5kcmUgUHJ6eXdhcmEgKDEpOgogIEtWTTogYXJtL2FybTY0OiBWR0lDOiBleHRlbmQgIXZnaWNf
-aXNfaW5pdGlhbGl6ZWQgZ3VhcmQKCkFuZHJldyBKb25lcyAoMSk6CiAgS1ZNOiBhcm0vYXJtNjQ6
-IGt2bV9hcmNoX2Rlc3Ryb3lfdm0gY2xlYW51cHMKCkFyZCBCaWVzaGV1dmVsICgxKToKICBrdm06
-IGFybTogZG9uJ3QgdHJlYXQgdW5hdmFpbGFibGUgSFlQIG1vZGUgYXMgYW4gZXJyb3IKCkNocmlz
-dG9mZmVyIERhbGwgKDMpOgogIEtWTTogYXJtL2FybTY0OiBEb24ndCBlbmFibGUvZGlzYWJsZSBw
-aHlzaWNhbCB0aW1lciBhY2Nlc3Mgb24gVkhFCiAgS1ZNOiBhcm0vYXJtNjQ6IEF2b2lkIGF0dGVt
-cHRpbmcgdG8gbG9hZCB0aW1lciB2Z2ljIHN0YXRlIHdpdGhvdXQgYQogICAgdmdpYwogIEtWTTog
-YXJtL2FybTY0OiBGaXggYnJva2VuIEdJQ0hfRUxSU1IgYmlnIGVuZGlhbiBjb252ZXJzaW9uCgpL
-cmlzdGluYSBNYXJ0c2Vua28gKDEpOgogIGFybTY0OiBLVk06IGZpeCBWVFRCUl9CQUREUl9NQVNL
-IEJVR19PTiBvZmYtYnktb25lCgpNYXJjIFp5bmdpZXIgKDcpOgogIEtWTTogYXJtL2FybTY0OiB2
-Z2ljLWlycWZkOiBGaXggTVNJIGVudHJ5IGFsbG9jYXRpb24KICBLVk06IGFybS9hcm02NDogdmdp
-YzogUHJlc2VydmUgdGhlIHJldmlvdXMgcmVhZCBmcm9tIHRoZSBwZW5kaW5nIHRhYmxlCiAgS1ZN
-OiBhcm0vYXJtNjQ6IHZnaWMtaXRzOiBQcmVzZXJ2ZSB0aGUgcmV2aW91cyByZWFkIGZyb20gdGhl
-IHBlbmRpbmcKICAgIHRhYmxlCiAgS1ZNOiBhcm0vYXJtNjQ6IHZnaWMtaXRzOiBDaGVjayByZXN1
-bHQgb2YgYWxsb2NhdGlvbiBiZWZvcmUgdXNlCiAgS1ZNOiBhcm0vYXJtNjQ6IHZnaWMtdjQ6IE9u
-bHkgcGVyZm9ybSBhbiB1bm1hcCBmb3IgdmFsaWQgdkxQSXMKICBhcm06IEtWTTogRml4IFZUVEJS
-X0JBRERSX01BU0sgQlVHX09OIG9mZi1ieS1vbmUKICBLVk06IGFybS9hcm02NDogRml4IHNwaW5s
-b2NrIGFjcXVpc2l0aW9uIGluIHZnaWNfc2V0X293bmVyCgogYXJjaC9hcm0vaW5jbHVkZS9hc20v
-a3ZtX2FybS5oICAgIHwgIDMgKy0tCiBhcmNoL2FybS9pbmNsdWRlL2FzbS9rdm1faG9zdC5oICAg
-fCAgNSArKysrCiBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9hcm0uaCAgfCAgMyArLS0KIGFy
-Y2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaCB8ICAxICsKIGFyY2gvYXJtNjQva3ZtL2Rl
-YnVnLmMgICAgICAgICAgICB8IDIxICsrKysrKysrKysrKysrKwogYXJjaC9hcm02NC9rdm0vaGFu
-ZGxlX2V4aXQuYyAgICAgIHwgNTcgKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0t
-LS0tCiBhcmNoL2FybTY0L2t2bS9oeXAvc3dpdGNoLmMgICAgICAgfCAzNyArKysrKysrKysrKysr
-KysrKysrKy0tLS0tCiBpbmNsdWRlL2t2bS9hcm1fYXJjaF90aW1lci5oICAgICAgfCAgMyAtLS0K
-IHZpcnQva3ZtL2FybS9hcmNoX3RpbWVyLmMgICAgICAgICB8IDExICsrKy0tLS0tCiB2aXJ0L2t2
-bS9hcm0vYXJtLmMgICAgICAgICAgICAgICAgfCAgNyArKystLQogdmlydC9rdm0vYXJtL2h5cC90
-aW1lci1zci5jICAgICAgIHwgNDggKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0tCiB2
-aXJ0L2t2bS9hcm0vaHlwL3ZnaWMtdjItc3IuYyAgICAgfCAgNCAtLS0KIHZpcnQva3ZtL2FybS92
-Z2ljL3ZnaWMtaXJxZmQuYyAgICB8ICAzICstLQogdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1pdHMu
-YyAgICAgIHwgIDQgKystCiB2aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLXYzLmMgICAgICAgfCAgMiAr
-LQogdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy12NC5jICAgICAgIHwgIDYgKysrLS0KIHZpcnQva3Zt
-L2FybS92Z2ljL3ZnaWMuYyAgICAgICAgICB8ICA4ICsrKy0tLQogMTcgZmlsZXMgY2hhbmdlZCwg
-MTQ0IGluc2VydGlvbnMoKyksIDc5IGRlbGV0aW9ucygtKQoKLS0gCjIuMTQuMgoKX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlz
-dAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEu
-ZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+From: Christoffer Dall <christoffer.dall@linaro.org>
+
+Hi Paolo and Radim,
+
+Here's the first round of fixes for KVM/ARM for v4.15.  This is a fairly large
+set of fixes, partially because we spotted a handful of issues from running the
+SMATCH static analysis on the code (thanks to AKASHI Takahiro).
+
+In more details, this pull request fixes:
+ - A number of issues in the vgic discovered using SMATCH
+ - A bit one-off calculation in out stage base address mask (32-bit and
+   64-bit)
+ - Fixes to single-step debugging instructions that trap for other
+   reasons such as MMMIO aborts
+ - Printing unavailable hyp mode as error
+ - Potential spinlock deadlock in the vgic
+ - Avoid calling vgic vcpu free more than once
+ - Broken bit calculation for big endian systems
+
+
+The following changes since commit 4fbd8d194f06c8a3fd2af1ce560ddb31f7ec8323:
+
+  Linux 4.15-rc1 (2017-11-26 16:01:47 -0800)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-fixes-for-v4.15-1
+
+for you to fetch changes up to fc396e066318c0a02208c1d3f0b62950a7714999:
+
+  KVM: arm/arm64: Fix broken GICH_ELRSR big endian conversion (2017-12-04 14:25:33 +0100)
+
+
+Thanks,
+-Christoffer
+
+Alex Bennée (5):
+  KVM: arm/arm64: debug: Introduce helper for single-step
+  kvm: arm64: handle single-stepping trapped instructions
+  kvm: arm64: handle single-step of userspace mmio instructions
+  kvm: arm64: handle single-step during SError exceptions
+  kvm: arm64: handle single-step of hyp emulated mmio instructions
+
+Andre Przywara (1):
+  KVM: arm/arm64: VGIC: extend !vgic_is_initialized guard
+
+Andrew Jones (1):
+  KVM: arm/arm64: kvm_arch_destroy_vm cleanups
+
+Ard Biesheuvel (1):
+  kvm: arm: don't treat unavailable HYP mode as an error
+
+Christoffer Dall (3):
+  KVM: arm/arm64: Don't enable/disable physical timer access on VHE
+  KVM: arm/arm64: Avoid attempting to load timer vgic state without a
+    vgic
+  KVM: arm/arm64: Fix broken GICH_ELRSR big endian conversion
+
+Kristina Martsenko (1):
+  arm64: KVM: fix VTTBR_BADDR_MASK BUG_ON off-by-one
+
+Marc Zyngier (7):
+  KVM: arm/arm64: vgic-irqfd: Fix MSI entry allocation
+  KVM: arm/arm64: vgic: Preserve the revious read from the pending table
+  KVM: arm/arm64: vgic-its: Preserve the revious read from the pending
+    table
+  KVM: arm/arm64: vgic-its: Check result of allocation before use
+  KVM: arm/arm64: vgic-v4: Only perform an unmap for valid vLPIs
+  arm: KVM: Fix VTTBR_BADDR_MASK BUG_ON off-by-one
+  KVM: arm/arm64: Fix spinlock acquisition in vgic_set_owner
+
+ arch/arm/include/asm/kvm_arm.h    |  3 +--
+ arch/arm/include/asm/kvm_host.h   |  5 ++++
+ arch/arm64/include/asm/kvm_arm.h  |  3 +--
+ arch/arm64/include/asm/kvm_host.h |  1 +
+ arch/arm64/kvm/debug.c            | 21 +++++++++++++++
+ arch/arm64/kvm/handle_exit.c      | 57 ++++++++++++++++++++++++++++-----------
+ arch/arm64/kvm/hyp/switch.c       | 37 ++++++++++++++++++++-----
+ include/kvm/arm_arch_timer.h      |  3 ---
+ virt/kvm/arm/arch_timer.c         | 11 +++-----
+ virt/kvm/arm/arm.c                |  7 +++--
+ virt/kvm/arm/hyp/timer-sr.c       | 48 ++++++++++++++-------------------
+ virt/kvm/arm/hyp/vgic-v2-sr.c     |  4 ---
+ virt/kvm/arm/vgic/vgic-irqfd.c    |  3 +--
+ virt/kvm/arm/vgic/vgic-its.c      |  4 ++-
+ virt/kvm/arm/vgic/vgic-v3.c       |  2 +-
+ virt/kvm/arm/vgic/vgic-v4.c       |  6 +++--
+ virt/kvm/arm/vgic/vgic.c          |  8 +++---
+ 17 files changed, 144 insertions(+), 79 deletions(-)
+
+-- 
+2.14.2
