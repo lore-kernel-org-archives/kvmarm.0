@@ -1,134 +1,98 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH 3/3] arm64/sve: KVM: Avoid dereference of dead task during
- guest entry
-Date: Mon, 4 Dec 2017 13:53:21 +0000
-Message-ID: <CAKv+Gu_e3SKsreYHrZEBUMEME-pYtxTXW1P6xLUR6YMQfj0cZw@mail.gmail.com>
-References: <1512141582-17474-1-git-send-email-Dave.Martin@arm.com>
- <1512141582-17474-4-git-send-email-Dave.Martin@arm.com>
+From: Christoffer Dall <cdall@kernel.org>
+Subject: [PULL 00/19] KVM/ARM Fixes for v4.15
+Date: Mon,  4 Dec 2017 14:56:03 +0100
+Message-ID: <20171204135622.21568-1-cdall@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1512141582-17474-4-git-send-email-Dave.Martin@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <christoffer.dall@linaro.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 118B149D6C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 08:53:21 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id qlK3vpMUndCi for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Dec 2017 08:53:18 -0500 (EST)
+Received: from mail-wr0-f196.google.com (mail-wr0-f196.google.com
+ [209.85.128.196])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B4F16406D0
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 08:53:18 -0500 (EST)
+Received: by mail-wr0-f196.google.com with SMTP id s66so17365727wrc.9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Dec 2017 05:56:26 -0800 (PST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 1 December 2017 at 15:19, Dave Martin <Dave.Martin@arm.com> wrote:
-> When deciding whether to invalidate FPSIMD state cached in the cpu,
-> the backend function sve_flush_cpu_state() attempts to dereference
-> __this_cpu_read(fpsimd_last_state).  However, this is not safe:
-> there is no guarantee that the pointer is still valid, because the
-> task could have exited in the meantime.  For this reason, this
-> percpu pointer should only be assigned or compared, never
-> dereferenced.
->
-
-Doesn't that mean the pointer could also be pointing to the
-fpsimd_state of a newly created task that is completely unrelated?
-IOW, are you sure comparison is safe?
-
-> This means that we need another means to get the appropriate value
-> of TIF_SVE for the associated task.
->
-> This patch solves this issue by adding a cached copy of the TIF_SVE
-> flag in fpsimd_last_state, which we can check without dereferencing
-> the task pointer.
->
-> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> Cc: Christoffer Dall <christoffer.dall@linaro.org>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  arch/arm64/kernel/fpsimd.c | 28 ++++++++++++++++------------
->  1 file changed, 16 insertions(+), 12 deletions(-)
->
-> diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-> index 007140b..3dc8058 100644
-> --- a/arch/arm64/kernel/fpsimd.c
-> +++ b/arch/arm64/kernel/fpsimd.c
-> @@ -114,7 +114,12 @@
->   *   returned from the 2nd syscall yet, TIF_FOREIGN_FPSTATE is still set so
->   *   whatever is in the FPSIMD registers is not saved to memory, but discarded.
->   */
-> -static DEFINE_PER_CPU(struct fpsimd_state *, fpsimd_last_state);
-> +struct fpsimd_last_state_struct {
-> +       struct fpsimd_state *st;
-> +       bool sve_in_use;
-> +};
-> +
-> +static DEFINE_PER_CPU(struct fpsimd_last_state_struct, fpsimd_last_state);
->
->  /* Default VL for tasks that don't set it explicitly: */
->  static int sve_default_vl = -1;
-> @@ -905,7 +910,7 @@ void fpsimd_thread_switch(struct task_struct *next)
->                  */
->                 struct fpsimd_state *st = &next->thread.fpsimd_state;
->
-> -               if (__this_cpu_read(fpsimd_last_state) == st
-> +               if (__this_cpu_read(fpsimd_last_state.st) == st
->                     && st->cpu == smp_processor_id())
->                         clear_tsk_thread_flag(next, TIF_FOREIGN_FPSTATE);
->                 else
-> @@ -997,9 +1002,12 @@ void fpsimd_signal_preserve_current_state(void)
->   */
->  static void fpsimd_bind_to_cpu(void)
->  {
-> +       struct fpsimd_last_state_struct *last =
-> +               this_cpu_ptr(&fpsimd_last_state);
->         struct fpsimd_state *st = &current->thread.fpsimd_state;
->
-> -       __this_cpu_write(fpsimd_last_state, st);
-> +       last->st = st;
-> +       last->sve_in_use = test_thread_flag(TIF_SVE);
->         st->cpu = smp_processor_id();
->  }
->
-> @@ -1057,7 +1065,7 @@ void fpsimd_flush_task_state(struct task_struct *t)
->
->  static inline void fpsimd_flush_cpu_state(void)
->  {
-> -       __this_cpu_write(fpsimd_last_state, NULL);
-> +       __this_cpu_write(fpsimd_last_state.st, NULL);
->  }
->
->  /*
-> @@ -1070,14 +1078,10 @@ static inline void fpsimd_flush_cpu_state(void)
->  #ifdef CONFIG_ARM64_SVE
->  void sve_flush_cpu_state(void)
->  {
-> -       struct fpsimd_state *const fpstate = __this_cpu_read(fpsimd_last_state);
-> -       struct task_struct *tsk;
-> -
-> -       if (!fpstate)
-> -               return;
-> +       struct fpsimd_last_state_struct const *last =
-> +               this_cpu_ptr(&fpsimd_last_state);
->
-> -       tsk = container_of(fpstate, struct task_struct, thread.fpsimd_state);
-> -       if (test_tsk_thread_flag(tsk, TIF_SVE))
-> +       if (last->st && last->sve_in_use)
->                 fpsimd_flush_cpu_state();
->  }
->  #endif /* CONFIG_ARM64_SVE */
-> @@ -1272,7 +1276,7 @@ static inline void fpsimd_pm_init(void) { }
->  #ifdef CONFIG_HOTPLUG_CPU
->  static int fpsimd_cpu_dead(unsigned int cpu)
->  {
-> -       per_cpu(fpsimd_last_state, cpu) = NULL;
-> +       per_cpu(fpsimd_last_state.st, cpu) = NULL;
->         return 0;
->  }
->
-> --
-> 2.1.4
->
+RnJvbTogQ2hyaXN0b2ZmZXIgRGFsbCA8Y2hyaXN0b2ZmZXIuZGFsbEBsaW5hcm8ub3JnPgoKSGkg
+UGFvbG8gYW5kIFJhZGltLAoKSGVyZSdzIHRoZSBmaXJzdCByb3VuZCBvZiBmaXhlcyBmb3IgS1ZN
+L0FSTSBmb3IgdjQuMTUuICBUaGlzIGlzIGEgZmFpcmx5IGxhcmdlCnNldCBvZiBmaXhlcywgcGFy
+dGlhbGx5IGJlY2F1c2Ugd2Ugc3BvdHRlZCBhIGhhbmRmdWwgb2YgaXNzdWVzIGZyb20gcnVubmlu
+ZyB0aGUKU01BVENIIHN0YXRpYyBhbmFseXNpcyBvbiB0aGUgY29kZSAodGhhbmtzIHRvIEFLQVNI
+SSBUYWthaGlybykuCgpJbiBtb3JlIGRldGFpbHMsIHRoaXMgcHVsbCByZXF1ZXN0IGZpeGVzOgog
+LSBBIG51bWJlciBvZiBpc3N1ZXMgaW4gdGhlIHZnaWMgZGlzY292ZXJlZCB1c2luZyBTTUFUQ0gK
+IC0gQSBiaXQgb25lLW9mZiBjYWxjdWxhdGlvbiBpbiBvdXQgc3RhZ2UgYmFzZSBhZGRyZXNzIG1h
+c2sgKDMyLWJpdCBhbmQKICAgNjQtYml0KQogLSBGaXhlcyB0byBzaW5nbGUtc3RlcCBkZWJ1Z2dp
+bmcgaW5zdHJ1Y3Rpb25zIHRoYXQgdHJhcCBmb3Igb3RoZXIKICAgcmVhc29ucyBzdWNoIGFzIE1N
+TUlPIGFib3J0cwogLSBQcmludGluZyB1bmF2YWlsYWJsZSBoeXAgbW9kZSBhcyBlcnJvcgogLSBQ
+b3RlbnRpYWwgc3BpbmxvY2sgZGVhZGxvY2sgaW4gdGhlIHZnaWMKIC0gQXZvaWQgY2FsbGluZyB2
+Z2ljIHZjcHUgZnJlZSBtb3JlIHRoYW4gb25jZQogLSBCcm9rZW4gYml0IGNhbGN1bGF0aW9uIGZv
+ciBiaWcgZW5kaWFuIHN5c3RlbXMKCgpUaGUgZm9sbG93aW5nIGNoYW5nZXMgc2luY2UgY29tbWl0
+IDRmYmQ4ZDE5NGYwNmM4YTNmZDJhZjFjZTU2MGRkYjMxZjdlYzgzMjM6CgogIExpbnV4IDQuMTUt
+cmMxICgyMDE3LTExLTI2IDE2OjAxOjQ3IC0wODAwKQoKYXJlIGF2YWlsYWJsZSBpbiB0aGUgZ2l0
+IHJlcG9zaXRvcnkgYXQ6CgogIGdpdDovL2dpdC5rZXJuZWwub3JnL3B1Yi9zY20vbGludXgva2Vy
+bmVsL2dpdC9rdm1hcm0va3ZtYXJtLmdpdCB0YWdzL2t2bS1hcm0tZml4ZXMtZm9yLXY0LjE1LTEK
+CmZvciB5b3UgdG8gZmV0Y2ggY2hhbmdlcyB1cCB0byBmYzM5NmUwNjYzMThjMGEwMjIwOGMxZDNm
+MGI2Mjk1MGE3NzE0OTk5OgoKICBLVk06IGFybS9hcm02NDogRml4IGJyb2tlbiBHSUNIX0VMUlNS
+IGJpZyBlbmRpYW4gY29udmVyc2lvbiAoMjAxNy0xMi0wNCAxNDoyNTozMyArMDEwMCkKCgpUaGFu
+a3MsCi1DaHJpc3RvZmZlcgoKQWxleCBCZW5uw6llICg1KToKICBLVk06IGFybS9hcm02NDogZGVi
+dWc6IEludHJvZHVjZSBoZWxwZXIgZm9yIHNpbmdsZS1zdGVwCiAga3ZtOiBhcm02NDogaGFuZGxl
+IHNpbmdsZS1zdGVwcGluZyB0cmFwcGVkIGluc3RydWN0aW9ucwogIGt2bTogYXJtNjQ6IGhhbmRs
+ZSBzaW5nbGUtc3RlcCBvZiB1c2Vyc3BhY2UgbW1pbyBpbnN0cnVjdGlvbnMKICBrdm06IGFybTY0
+OiBoYW5kbGUgc2luZ2xlLXN0ZXAgZHVyaW5nIFNFcnJvciBleGNlcHRpb25zCiAga3ZtOiBhcm02
+NDogaGFuZGxlIHNpbmdsZS1zdGVwIG9mIGh5cCBlbXVsYXRlZCBtbWlvIGluc3RydWN0aW9ucwoK
+QW5kcmUgUHJ6eXdhcmEgKDEpOgogIEtWTTogYXJtL2FybTY0OiBWR0lDOiBleHRlbmQgIXZnaWNf
+aXNfaW5pdGlhbGl6ZWQgZ3VhcmQKCkFuZHJldyBKb25lcyAoMSk6CiAgS1ZNOiBhcm0vYXJtNjQ6
+IGt2bV9hcmNoX2Rlc3Ryb3lfdm0gY2xlYW51cHMKCkFyZCBCaWVzaGV1dmVsICgxKToKICBrdm06
+IGFybTogZG9uJ3QgdHJlYXQgdW5hdmFpbGFibGUgSFlQIG1vZGUgYXMgYW4gZXJyb3IKCkNocmlz
+dG9mZmVyIERhbGwgKDMpOgogIEtWTTogYXJtL2FybTY0OiBEb24ndCBlbmFibGUvZGlzYWJsZSBw
+aHlzaWNhbCB0aW1lciBhY2Nlc3Mgb24gVkhFCiAgS1ZNOiBhcm0vYXJtNjQ6IEF2b2lkIGF0dGVt
+cHRpbmcgdG8gbG9hZCB0aW1lciB2Z2ljIHN0YXRlIHdpdGhvdXQgYQogICAgdmdpYwogIEtWTTog
+YXJtL2FybTY0OiBGaXggYnJva2VuIEdJQ0hfRUxSU1IgYmlnIGVuZGlhbiBjb252ZXJzaW9uCgpL
+cmlzdGluYSBNYXJ0c2Vua28gKDEpOgogIGFybTY0OiBLVk06IGZpeCBWVFRCUl9CQUREUl9NQVNL
+IEJVR19PTiBvZmYtYnktb25lCgpNYXJjIFp5bmdpZXIgKDcpOgogIEtWTTogYXJtL2FybTY0OiB2
+Z2ljLWlycWZkOiBGaXggTVNJIGVudHJ5IGFsbG9jYXRpb24KICBLVk06IGFybS9hcm02NDogdmdp
+YzogUHJlc2VydmUgdGhlIHJldmlvdXMgcmVhZCBmcm9tIHRoZSBwZW5kaW5nIHRhYmxlCiAgS1ZN
+OiBhcm0vYXJtNjQ6IHZnaWMtaXRzOiBQcmVzZXJ2ZSB0aGUgcmV2aW91cyByZWFkIGZyb20gdGhl
+IHBlbmRpbmcKICAgIHRhYmxlCiAgS1ZNOiBhcm0vYXJtNjQ6IHZnaWMtaXRzOiBDaGVjayByZXN1
+bHQgb2YgYWxsb2NhdGlvbiBiZWZvcmUgdXNlCiAgS1ZNOiBhcm0vYXJtNjQ6IHZnaWMtdjQ6IE9u
+bHkgcGVyZm9ybSBhbiB1bm1hcCBmb3IgdmFsaWQgdkxQSXMKICBhcm06IEtWTTogRml4IFZUVEJS
+X0JBRERSX01BU0sgQlVHX09OIG9mZi1ieS1vbmUKICBLVk06IGFybS9hcm02NDogRml4IHNwaW5s
+b2NrIGFjcXVpc2l0aW9uIGluIHZnaWNfc2V0X293bmVyCgogYXJjaC9hcm0vaW5jbHVkZS9hc20v
+a3ZtX2FybS5oICAgIHwgIDMgKy0tCiBhcmNoL2FybS9pbmNsdWRlL2FzbS9rdm1faG9zdC5oICAg
+fCAgNSArKysrCiBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9hcm0uaCAgfCAgMyArLS0KIGFy
+Y2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaCB8ICAxICsKIGFyY2gvYXJtNjQva3ZtL2Rl
+YnVnLmMgICAgICAgICAgICB8IDIxICsrKysrKysrKysrKysrKwogYXJjaC9hcm02NC9rdm0vaGFu
+ZGxlX2V4aXQuYyAgICAgIHwgNTcgKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0t
+LS0tCiBhcmNoL2FybTY0L2t2bS9oeXAvc3dpdGNoLmMgICAgICAgfCAzNyArKysrKysrKysrKysr
+KysrKysrKy0tLS0tCiBpbmNsdWRlL2t2bS9hcm1fYXJjaF90aW1lci5oICAgICAgfCAgMyAtLS0K
+IHZpcnQva3ZtL2FybS9hcmNoX3RpbWVyLmMgICAgICAgICB8IDExICsrKy0tLS0tCiB2aXJ0L2t2
+bS9hcm0vYXJtLmMgICAgICAgICAgICAgICAgfCAgNyArKystLQogdmlydC9rdm0vYXJtL2h5cC90
+aW1lci1zci5jICAgICAgIHwgNDggKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0tCiB2
+aXJ0L2t2bS9hcm0vaHlwL3ZnaWMtdjItc3IuYyAgICAgfCAgNCAtLS0KIHZpcnQva3ZtL2FybS92
+Z2ljL3ZnaWMtaXJxZmQuYyAgICB8ICAzICstLQogdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1pdHMu
+YyAgICAgIHwgIDQgKystCiB2aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLXYzLmMgICAgICAgfCAgMiAr
+LQogdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy12NC5jICAgICAgIHwgIDYgKysrLS0KIHZpcnQva3Zt
+L2FybS92Z2ljL3ZnaWMuYyAgICAgICAgICB8ICA4ICsrKy0tLQogMTcgZmlsZXMgY2hhbmdlZCwg
+MTQ0IGluc2VydGlvbnMoKyksIDc5IGRlbGV0aW9ucygtKQoKLS0gCjIuMTQuMgoKX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlz
+dAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEu
+ZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
