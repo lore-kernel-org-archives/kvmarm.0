@@ -1,69 +1,57 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH 23/37] KVM: arm64: Prepare to handle traps on deferred VM
- sysregs
-Date: Mon, 4 Dec 2017 11:05:47 +0100
-Message-ID: <20171204100547.xe6yetr73luw356z@hawk.localdomain>
-References: <20171012104141.26902-1-christoffer.dall@linaro.org>
- <20171012104141.26902-24-christoffer.dall@linaro.org>
- <20171113175402.rw3on4vps2o24q4d@hawk.localdomain>
- <20171203195026.GI4218@cbox>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH] KVM: arm/arm64: Fix broken GICH_ELRSR big endian
+ conversion
+Date: Mon, 4 Dec 2017 10:05:51 +0000
+Message-ID: <ac6b4719-1867-af63-5243-614bd5bd3465@arm.com>
+References: <20171203230435.22021-1-cdall@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20171203195026.GI4218@cbox>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <cdall@linaro.org>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <20171203230435.22021-1-cdall@kernel.org>
+Content-Language: en-GB
+Sender: stable-owner@vger.kernel.org
+To: Christoffer Dall <cdall@kernel.org>, kvmarm@lists.cs.columbia.edu
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, stable@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sun, Dec 03, 2017 at 08:50:26PM +0100, Christoffer Dall wrote:
-> On Mon, Nov 13, 2017 at 06:54:02PM +0100, Andrew Jones wrote:
-...
-> > > +	}
-> > > +
-> > > +	vcpu_sys_reg(vcpu, reg) = val;
-> > > +}
-> > > +
-> > >  /*
-> > >   * Generic accessor for VM registers. Only called as long as HCR_TVM
-> > > + *
-
-just noticed this stray blank line added here
-
-> > >   * is set. If the guest enables the MMU, we stop trapping the VM
-> > >   * sys_regs and leave it in complete control of the caches.
-> > >   */
-> > > @@ -132,14 +182,14 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
-> > >  	if (!p->is_aarch32 || !p->is_32bit) {
-> > >  		val = p->regval;
-> > >  	} else {
-> > > -		val = vcpu_sys_reg(vcpu, reg);
-> > > +		val = read_deferrable_vm_reg(vcpu, reg);
-> > >  		if (r->reg % 2)
-> > >  			val = (p->regval << 32) | (u64)lower_32_bits(val);
-> > >  		else
-> > >  			val = ((u64)upper_32_bits(val) << 32) |
-> > >  				(u64)lower_32_bits(p->regval);
-> > >  	}
-> > > -	vcpu_sys_reg(vcpu, reg) = val;
-> > > +	write_deferrable_vm_reg(vcpu, reg, val);
-> > >  
-> > >  	kvm_toggle_cache(vcpu, was_enabled);
-> > >  	return true;
-> > > -- 
-> > > 2.9.0
-> > >
-> > 
-> > I read ahead and see other wrappers that check sysregs_loaded_on_cpu are
-> > added, but only write_deferrable_vm_reg() has 'deferrable' in its name.
-> > Should it just be named read/write_vm_reg?
-> > 
+On 03/12/17 23:04, Christoffer Dall wrote:
+> From: Christoffer Dall <christoffer.dall@linaro.org>
 > 
-> I chose this name to avoid implying that this function was universally
-> supported for all (current and future) VM registers.
+> We are incorrectly rearranging 32-bit words inside a 64-bit typed value
+> for big endian systems, which would result in never marking a virtual
+> interrupt as inactive on big endian systems (assuming 32 or fewer LRs on
+> the hardware).  Fix this by not doing any word order manipulation for
+> the typed values.
+> 
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> ---
+>  virt/kvm/arm/hyp/vgic-v2-sr.c | 4 ----
+>  1 file changed, 4 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
+> index a3f18d362366..d7fd46fe9efb 100644
+> --- a/virt/kvm/arm/hyp/vgic-v2-sr.c
+> +++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
+> @@ -34,11 +34,7 @@ static void __hyp_text save_elrsr(struct kvm_vcpu *vcpu, void __iomem *base)
+>  	else
+>  		elrsr1 = 0;
+>  
+> -#ifdef CONFIG_CPU_BIG_ENDIAN
+> -	cpu_if->vgic_elrsr = ((u64)elrsr0 << 32) | elrsr1;
+> -#else
+>  	cpu_if->vgic_elrsr = ((u64)elrsr1 << 32) | elrsr0;
+> -#endif
+>  }
+>  
+>  static void __hyp_text save_lrs(struct kvm_vcpu *vcpu, void __iomem *base)
+> 
 
-OK
+Duh!
 
-Thanks,
-drew
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
