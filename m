@@ -1,25 +1,25 @@
 From: Christoffer Dall <cdall@kernel.org>
-Subject: [PULL 19/19] KVM: arm/arm64: Fix broken GICH_ELRSR big endian
- conversion
-Date: Mon,  4 Dec 2017 15:03:48 +0100
-Message-ID: <20171204140348.21965-17-cdall@kernel.org>
+Subject: [PULL 14/19] kvm: arm64: handle single-step of hyp emulated mmio
+ instructions
+Date: Mon,  4 Dec 2017 15:03:43 +0100
+Message-ID: <20171204140348.21965-12-cdall@kernel.org>
 References: <20171204135637.21620-1-cdall@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CC3AF49DB5
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 09:01:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B581149DAD
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 09:01:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id G48-HSxkcE8e for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Dec 2017 09:01:15 -0500 (EST)
-Received: from mail-wm0-f66.google.com (mail-wm0-f66.google.com [74.125.82.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 93D3849D9D
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 09:01:06 -0500 (EST)
-Received: by mail-wm0-f66.google.com with SMTP id t8so6002397wmc.3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Dec 2017 06:04:14 -0800 (PST)
+ with ESMTP id zn7-onh9qb2P for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Dec 2017 09:01:06 -0500 (EST)
+Received: from mail-wm0-f67.google.com (mail-wm0-f67.google.com [74.125.82.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2FB4049D82
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 09:01:00 -0500 (EST)
+Received: by mail-wm0-f67.google.com with SMTP id b76so14540665wmg.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Dec 2017 06:04:07 -0800 (PST)
 In-Reply-To: <20171204135637.21620-1-cdall@kernel.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,39 +31,64 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, stable@vger.kernel.org, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
-
-We are incorrectly rearranging 32-bit words inside a 64-bit typed value
-for big endian systems, which would result in never marking a virtual
-interrupt as inactive on big endian systems (assuming 32 or fewer LRs on
-the hardware).  Fix this by not doing any word order manipulation for
-the typed values.
-
-Cc: <stable@vger.kernel.org>
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
- virt/kvm/arm/hyp/vgic-v2-sr.c | 4 ----
- 1 file changed, 4 deletions(-)
-
-diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
-index a3f18d362366..d7fd46fe9efb 100644
---- a/virt/kvm/arm/hyp/vgic-v2-sr.c
-+++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
-@@ -34,11 +34,7 @@ static void __hyp_text save_elrsr(struct kvm_vcpu *vcpu, void __iomem *base)
- 	else
- 		elrsr1 = 0;
- 
--#ifdef CONFIG_CPU_BIG_ENDIAN
--	cpu_if->vgic_elrsr = ((u64)elrsr0 << 32) | elrsr1;
--#else
- 	cpu_if->vgic_elrsr = ((u64)elrsr1 << 32) | elrsr0;
--#endif
- }
- 
- static void __hyp_text save_lrs(struct kvm_vcpu *vcpu, void __iomem *base)
--- 
-2.14.2
+RnJvbTogQWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgoKVGhlcmUgaXMgYSBm
+YXN0LXBhdGggb2YgTU1JTyBlbXVsYXRpb24gaW5zaWRlIGh5cCBtb2RlLiBUaGUgaGFuZGxpbmcK
+b2Ygc2luZ2xlLXN0ZXAgaXMgYnJvYWRseSB0aGUgc2FtZSBhcyBrdm1fYXJtX2hhbmRsZV9zdGVw
+X2RlYnVnKCkKZXhjZXB0IHdlIGp1c3Qgc2V0dXAgRVNSL0hTUiBzbyBoYW5kbGVfZXhpdCgpIGRv
+ZXMgdGhlIGNvcnJlY3QgdGhpbmcKYXMgd2UgZXhpdC4KCkZvciB0aGUgY2FzZSBvZiBhbiBlbXVs
+YXRlZCBpbGxlZ2FsIGFjY2VzcyBjYXVzaW5nIGFuIFNFcnJvciB3ZSB3aWxsCmV4aXQgdmlhIHRo
+ZSBBUk1fRVhDRVBUSU9OX0VMMV9TRVJST1IgcGF0aCBpbiBoYW5kbGVfZXhpdCgpLiBXZSBiZWhh
+dmUKYXMgd2Ugd291bGQgZHVyaW5nIGEgcmVhbCBTRXJyb3IgYW5kIGNsZWFyIHRoZSBEQkdfU1BT
+Ul9TUyBiaXQgZm9yIHRoZQplbXVsYXRlZCBpbnN0cnVjdGlvbi4KCkFja2VkLWJ5OiBNYXJjIFp5
+bmdpZXIgPG1hcmMuenluZ2llckBhcm0uY29tPgpSZXZpZXdlZC1ieTogQ2hyaXN0b2ZmZXIgRGFs
+bCA8Y2hyaXN0b2ZmZXIuZGFsbEBsaW5hcm8ub3JnPgpTaWduZWQtb2ZmLWJ5OiBBbGV4IEJlbm7D
+qWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+ClNpZ25lZC1vZmYtYnk6IENocmlzdG9mZmVyIERh
+bGwgPGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZz4KLS0tCiBhcmNoL2FybTY0L2t2bS9oeXAv
+c3dpdGNoLmMgfCAzNyArKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tCiAxIGZp
+bGUgY2hhbmdlZCwgMzAgaW5zZXJ0aW9ucygrKSwgNyBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQg
+YS9hcmNoL2FybTY0L2t2bS9oeXAvc3dpdGNoLmMgYi9hcmNoL2FybTY0L2t2bS9oeXAvc3dpdGNo
+LmMKaW5kZXggNTI1YzAxZjQ4ODY3Li5mN2M2NTFmM2E4YzAgMTAwNjQ0Ci0tLSBhL2FyY2gvYXJt
+NjQva3ZtL2h5cC9zd2l0Y2guYworKysgYi9hcmNoL2FybTY0L2t2bS9oeXAvc3dpdGNoLmMKQEAg
+LTIyLDYgKzIyLDcgQEAKICNpbmNsdWRlIDxhc20va3ZtX2VtdWxhdGUuaD4KICNpbmNsdWRlIDxh
+c20va3ZtX2h5cC5oPgogI2luY2x1ZGUgPGFzbS9mcHNpbWQuaD4KKyNpbmNsdWRlIDxhc20vZGVi
+dWctbW9uaXRvcnMuaD4KIAogc3RhdGljIGJvb2wgX19oeXBfdGV4dCBfX2Zwc2ltZF9lbmFibGVk
+X252aGUodm9pZCkKIHsKQEAgLTI2OSw3ICsyNzAsMTEgQEAgc3RhdGljIGJvb2wgX19oeXBfdGV4
+dCBfX3BvcHVsYXRlX2ZhdWx0X2luZm8oc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQogCXJldHVybiB0
+cnVlOwogfQogCi1zdGF0aWMgdm9pZCBfX2h5cF90ZXh0IF9fc2tpcF9pbnN0cihzdHJ1Y3Qga3Zt
+X3ZjcHUgKnZjcHUpCisvKiBTa2lwIGFuIGluc3RydWN0aW9uIHdoaWNoIGhhcyBiZWVuIGVtdWxh
+dGVkLiBSZXR1cm5zIHRydWUgaWYKKyAqIGV4ZWN1dGlvbiBjYW4gY29udGludWUgb3IgZmFsc2Ug
+aWYgd2UgbmVlZCB0byBleGl0IGh5cCBtb2RlIGJlY2F1c2UKKyAqIHNpbmdsZS1zdGVwIHdhcyBp
+biBlZmZlY3QuCisgKi8KK3N0YXRpYyBib29sIF9faHlwX3RleHQgX19za2lwX2luc3RyKHN0cnVj
+dCBrdm1fdmNwdSAqdmNwdSkKIHsKIAkqdmNwdV9wYyh2Y3B1KSA9IHJlYWRfc3lzcmVnX2VsMihl
+bHIpOwogCkBAIC0yODIsNiArMjg3LDE0IEBAIHN0YXRpYyB2b2lkIF9faHlwX3RleHQgX19za2lw
+X2luc3RyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKIAl9CiAKIAl3cml0ZV9zeXNyZWdfZWwyKCp2
+Y3B1X3BjKHZjcHUpLCBlbHIpOworCisJaWYgKHZjcHUtPmd1ZXN0X2RlYnVnICYgS1ZNX0dVRVNU
+REJHX1NJTkdMRVNURVApIHsKKwkJdmNwdS0+YXJjaC5mYXVsdC5lc3JfZWwyID0KKwkJCShFU1Jf
+RUx4X0VDX1NPRlRTVFBfTE9XIDw8IEVTUl9FTHhfRUNfU0hJRlQpIHwgMHgyMjsKKwkJcmV0dXJu
+IGZhbHNlOworCX0gZWxzZSB7CisJCXJldHVybiB0cnVlOworCX0KIH0KIAogaW50IF9faHlwX3Rl
+eHQgX19rdm1fdmNwdV9ydW4oc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQpAQCAtMzQyLDEzICszNTUs
+MjEgQEAgaW50IF9faHlwX3RleHQgX19rdm1fdmNwdV9ydW4oc3RydWN0IGt2bV92Y3B1ICp2Y3B1
+KQogCQkJaW50IHJldCA9IF9fdmdpY192Ml9wZXJmb3JtX2NwdWlmX2FjY2Vzcyh2Y3B1KTsKIAog
+CQkJaWYgKHJldCA9PSAxKSB7Ci0JCQkJX19za2lwX2luc3RyKHZjcHUpOwotCQkJCWdvdG8gYWdh
+aW47CisJCQkJaWYgKF9fc2tpcF9pbnN0cih2Y3B1KSkKKwkJCQkJZ290byBhZ2FpbjsKKwkJCQll
+bHNlCisJCQkJCWV4aXRfY29kZSA9IEFSTV9FWENFUFRJT05fVFJBUDsKIAkJCX0KIAogCQkJaWYg
+KHJldCA9PSAtMSkgewotCQkJCS8qIFByb21vdGUgYW4gaWxsZWdhbCBhY2Nlc3MgdG8gYW4gU0Vy
+cm9yICovCi0JCQkJX19za2lwX2luc3RyKHZjcHUpOworCQkJCS8qIFByb21vdGUgYW4gaWxsZWdh
+bCBhY2Nlc3MgdG8gYW4KKwkJCQkgKiBTRXJyb3IuIElmIHdlIHdvdWxkIGJlIHJldHVybmluZwor
+CQkJCSAqIGR1ZSB0byBzaW5nbGUtc3RlcCBjbGVhciB0aGUgU1MKKwkJCQkgKiBiaXQgc28gaGFu
+ZGxlX2V4aXQga25vd3Mgd2hhdCB0bworCQkJCSAqIGRvIGFmdGVyIGRlYWxpbmcgd2l0aCB0aGUg
+ZXJyb3IuCisJCQkJICovCisJCQkJaWYgKCFfX3NraXBfaW5zdHIodmNwdSkpCisJCQkJCSp2Y3B1
+X2Nwc3IodmNwdSkgJj0gfkRCR19TUFNSX1NTOwogCQkJCWV4aXRfY29kZSA9IEFSTV9FWENFUFRJ
+T05fRUwxX1NFUlJPUjsKIAkJCX0KIApAQCAtMzYzLDggKzM4NCwxMCBAQCBpbnQgX19oeXBfdGV4
+dCBfX2t2bV92Y3B1X3J1bihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCiAJCWludCByZXQgPSBfX3Zn
+aWNfdjNfcGVyZm9ybV9jcHVpZl9hY2Nlc3ModmNwdSk7CiAKIAkJaWYgKHJldCA9PSAxKSB7Ci0J
+CQlfX3NraXBfaW5zdHIodmNwdSk7Ci0JCQlnb3RvIGFnYWluOworCQkJaWYgKF9fc2tpcF9pbnN0
+cih2Y3B1KSkKKwkJCQlnb3RvIGFnYWluOworCQkJZWxzZQorCQkJCWV4aXRfY29kZSA9IEFSTV9F
+WENFUFRJT05fVFJBUDsKIAkJfQogCiAJCS8qIDAgZmFsbHMgdGhyb3VnaCB0byBiZSBoYW5kbGVk
+IG91dCBvZiBFTDIgKi8KLS0gCjIuMTQuMgoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29s
+dW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8v
+a3ZtYXJtCg==
