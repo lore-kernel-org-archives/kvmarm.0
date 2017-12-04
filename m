@@ -1,68 +1,161 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH 05/12] arm64: mm: Remove VMALLOC checks from
- update_mapping_prot(.)
-Date: Mon, 4 Dec 2017 16:01:09 +0000
-Message-ID: <CAKv+Gu80J1vGn6V6Z3eXajDos=sjY_fLhUQP=-n0A8MyunTfgQ@mail.gmail.com>
+Subject: Re: [PATCH 07/12] arm64: mm: Place kImage at bottom of VA space
+Date: Mon, 4 Dec 2017 16:25:18 +0000
+Message-ID: <CAKv+Gu_A-fAMpheWbKZ+prEVKHR58er7sXz0L93Af1XhJrGZeQ@mail.gmail.com>
 References: <20171204141313.31604-1-steve.capper@arm.com>
- <20171204141313.31604-6-steve.capper@arm.com>
+ <20171204141313.31604-8-steve.capper@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20171204141313.31604-6-steve.capper@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F80749D4F
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 11:22:13 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id k9HHB1h9IZJf for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Dec 2017 11:22:11 -0500 (EST)
+Received: from mail-it0-f68.google.com (mail-it0-f68.google.com
+ [209.85.214.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D3AB249D27
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 11:22:11 -0500 (EST)
+Received: by mail-it0-f68.google.com with SMTP id d137so7965547itc.2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Dec 2017 08:25:19 -0800 (PST)
+In-Reply-To: <20171204141313.31604-8-steve.capper@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Steve Capper <steve.capper@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "Suzuki K. Poulose" <Suzuki.Poulose@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On 4 December 2017 at 14:13, Steve Capper <steve.capper@arm.com> wrote:
-> update_mapping_prot assumes that it will be used on the VA for the
-> kernel .text section. (Via the check virt >= VMALLOC_START)
->
-> Recent kdump patches employ this function to modify the protection of
-> the direct linear mapping (which is strictly speaking outside of this
-> area), via mark_linear_text_alias_ro(.).
+> Re-arrange the kernel memory map s.t. the kernel image resides in the
+> bottom 514MB of memory.
+
+I guess this breaks KASLR entirely, no? Given that it adds an offset
+in the range [0 ... sizeof(VMALLOC_SPACE) /4 ].
+
+In any case, it makes sense to keep the kernel VA space adjacent to
+the VMALLOC space, rather than put stuff like PCI I/O and the fixmap
+in between.
+
+> With the modules, fixed map, PCI IO space placed
+> above it. At the very bottom of the memory map we set aside a 2MB guard
+> region to prevent ambiguity with PTR_ERR/ERR_PTR.
 >
 
-Isn't that a bug? Is it guaranteed that those protection attributes
-can be modified without splitting live page tables, and the resulting
-risk of TLB conflicts?
+Interesting. In another thread, we discussed whether it is necessary
+to prevent the linear map randomization code from allocating at the
+very top [bottom in Steve-speak] of the kernel virtual address space,
+and this is a thing I did not consider.
 
-> We "get away" with this as the direct linear mapping currently follows
-> the VA for the kernel text, so the check passes.
+> Dynamically resizable objects such as KASAN shadow and sparsemem map
+> are placed above the fixed size objects.
 >
-> This patch removes the check in update_mapping_prot allowing us to move
-> the kernel VA layout without spuriously firing the warning.
+
+The current placement of the sparsemem map was carefully chosen so
+that virt_to_page/page_to_virt translations are extremely cheap. Is
+that still the case?
+
+> This means that kernel addresses are now no longer directly dependent on
+> VA space size.
 >
 > Signed-off-by: Steve Capper <steve.capper@arm.com>
 > ---
->  arch/arm64/mm/mmu.c | 6 ------
->  1 file changed, 6 deletions(-)
+>  arch/arm64/include/asm/memory.h  | 17 +++++++++--------
+>  arch/arm64/include/asm/pgtable.h |  4 ++--
+>  arch/arm64/mm/dump.c             | 12 +++++++-----
+>  3 files changed, 18 insertions(+), 15 deletions(-)
 >
-> diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
-> index 58b1ed6fd7ec..c8f486384fe3 100644
-> --- a/arch/arm64/mm/mmu.c
-> +++ b/arch/arm64/mm/mmu.c
-> @@ -383,12 +383,6 @@ void __init create_pgd_mapping(struct mm_struct *mm, phys_addr_t phys,
->  static void update_mapping_prot(phys_addr_t phys, unsigned long virt,
->                                 phys_addr_t size, pgprot_t prot)
->  {
-> -       if (virt < VMALLOC_START) {
-> -               pr_warn("BUG: not updating mapping for %pa at 0x%016lx - outside kernel range\n",
-> -                       &phys, virt);
-> -               return;
-> -       }
-> -
->         __create_pgd_mapping(init_mm.pgd, phys, virt, size, prot, NULL,
->                              NO_CONT_MAPPINGS);
+> diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
+> index 0a912eb3d74f..ba80561c6ed8 100644
+> --- a/arch/arm64/include/asm/memory.h
+> +++ b/arch/arm64/include/asm/memory.h
+> @@ -68,14 +68,15 @@
+>  #define PAGE_OFFSET            (UL(0xffffffffffffffff) - \
+>         (UL(1) << VA_BITS) + 1)
+>  #define PAGE_OFFSET_END                (VA_START)
+> -#define KIMAGE_VADDR           (MODULES_END)
+> -#define MODULES_END            (MODULES_VADDR + MODULES_VSIZE)
+> -#define MODULES_VADDR          (VA_START + KASAN_SHADOW_SIZE)
+> +#define KIMAGE_VSIZE           (SZ_512M)
+> +#define KIMAGE_VADDR           (UL(0) - SZ_2M - KIMAGE_VSIZE)
+>  #define MODULES_VSIZE          (SZ_128M)
+> -#define VMEMMAP_START          (-VMEMMAP_SIZE)
+> -#define PCI_IO_END             (VMEMMAP_START - SZ_2M)
+> +#define MODULES_END            (KIMAGE_VADDR)
+> +#define MODULES_VADDR          (MODULES_END - MODULES_VSIZE)
+> +#define PCI_IO_END             (MODULES_VADDR - SZ_2M)
+>  #define PCI_IO_START           (PCI_IO_END - PCI_IO_SIZE)
+> -#define FIXADDR_TOP            (PCI_IO_START - SZ_2M)
+> +#define FIXADDR_TOP            (PCI_IO_START - PGDIR_SIZE)
+> +#define VMEMMAP_START          (FIXADDR_START - VMEMMAP_SIZE)
+>
+>  #define KERNEL_START      _text
+>  #define KERNEL_END        _end
+> @@ -292,10 +293,10 @@ static inline void *phys_to_virt(phys_addr_t x)
+>  #define _virt_addr_valid(kaddr)        pfn_valid(__pa(kaddr) >> PAGE_SHIFT)
+>  #else
+>  #define __virt_to_pgoff(kaddr) (((u64)(kaddr) & ~PAGE_OFFSET) / PAGE_SIZE * sizeof(struct page))
+> -#define __page_to_voff(kaddr)  (((u64)(kaddr) & ~VMEMMAP_START) * PAGE_SIZE / sizeof(struct page))
+> +#define __page_to_voff(kaddr)  (((u64)(kaddr) - VMEMMAP_START) * PAGE_SIZE / sizeof(struct page))
+>
+>  #define page_to_virt(page)     ((void *)((__page_to_voff(page)) | PAGE_OFFSET))
+> -#define virt_to_page(vaddr)    ((struct page *)((__virt_to_pgoff(vaddr)) | VMEMMAP_START))
+> +#define virt_to_page(vaddr)    ((struct page *)((__virt_to_pgoff(vaddr)) + VMEMMAP_START))
+>
+>  #define _virt_addr_valid(kaddr)        pfn_valid((((u64)(kaddr) & ~PAGE_OFFSET) \
+>                                            + PHYS_OFFSET) >> PAGE_SHIFT)
+> diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+> index 054b37143a50..e8b4dcc11fed 100644
+> --- a/arch/arm64/include/asm/pgtable.h
+> +++ b/arch/arm64/include/asm/pgtable.h
+> @@ -30,8 +30,8 @@
+>   * VMALLOC_END: extends to the available space below vmmemmap, PCI I/O space
+>   *     and fixed mappings
+>   */
+> -#define VMALLOC_START          (MODULES_END)
+> -#define VMALLOC_END            (- PUD_SIZE - VMEMMAP_SIZE - SZ_64K)
+> +#define VMALLOC_START          (VA_START + KASAN_SHADOW_SIZE)
+> +#define VMALLOC_END            (FIXADDR_TOP - PUD_SIZE)
+>
+>  #define vmemmap                        ((struct page *)VMEMMAP_START - (memstart_addr >> PAGE_SHIFT))
+>
+> diff --git a/arch/arm64/mm/dump.c b/arch/arm64/mm/dump.c
+> index b7b09c0fc50d..e5d1b5f432fe 100644
+> --- a/arch/arm64/mm/dump.c
+> +++ b/arch/arm64/mm/dump.c
+> @@ -36,17 +36,19 @@ static const struct addr_marker address_markers[] = {
+>         { KASAN_SHADOW_START,           "Kasan shadow start" },
+>         { KASAN_SHADOW_END,             "Kasan shadow end" },
+>  #endif
+> -       { MODULES_VADDR,                "Modules start" },
+> -       { MODULES_END,                  "Modules end" },
+>         { VMALLOC_START,                "vmalloc() Area" },
+>         { VMALLOC_END,                  "vmalloc() End" },
+> +#ifdef CONFIG_SPARSEMEM_VMEMMAP
+> +       { VMEMMAP_START,                "vmemmap start" },
+> +       { VMEMMAP_START + VMEMMAP_SIZE, "vmemmap end"},
+> +#endif
+>         { FIXADDR_START,                "Fixmap start" },
+>         { FIXADDR_TOP,                  "Fixmap end" },
+>         { PCI_IO_START,                 "PCI I/O start" },
+>         { PCI_IO_END,                   "PCI I/O end" },
+> -#ifdef CONFIG_SPARSEMEM_VMEMMAP
+> -       { VMEMMAP_START,                "vmemmap" },
+> -#endif
+> +       { MODULES_VADDR,                "Modules start" },
+> +       { MODULES_END,                  "Modules end" },
+> +       { KIMAGE_VADDR,                 "kImage start"},
+>         { -1,                           NULL },
+>  };
 >
 > --
 > 2.11.0
