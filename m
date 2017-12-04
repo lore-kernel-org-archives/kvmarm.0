@@ -1,7 +1,7 @@
 From: Christoffer Dall <cdall@kernel.org>
-Subject: [PULL 04/19] KVM: arm/arm64: vgic: Preserve the revious read from the pending table
-Date: Mon,  4 Dec 2017 15:03:33 +0100
-Message-ID: <20171204140348.21965-2-cdall@kernel.org>
+Subject: [PULL 09/19] arm: KVM: Fix VTTBR_BADDR_MASK BUG_ON off-by-one
+Date: Mon,  4 Dec 2017 15:03:38 +0100
+Message-ID: <20171204140348.21965-7-cdall@kernel.org>
 References: <20171204135637.21620-1-cdall@kernel.org>
 Return-path: <stable-owner@vger.kernel.org>
 In-Reply-To: <20171204135637.21620-1-cdall@kernel.org>
@@ -12,41 +12,37 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Marc Zyngier <marc.zyngier@arm.com>
 
-The current pending table parsing code assumes that we keep the
-previous read of the pending bits, but keep that variable in
-the current block, making sure it is discarded on each loop.
+VTTBR_BADDR_MASK is used to sanity check the size and alignment of the
+VTTBR address. It seems to currently be off by one, thereby only
+allowing up to 39-bit addresses (instead of 40-bit) and also
+insufficiently checking the alignment. This patch fixes it.
 
-We end-up using whatever is on the stack. Who knows, it might
-just be the right thing...
+This patch is the 32bit pendent of Kristina's arm64 fix, and
+she deserves the actual kudos for pinpointing that one.
 
-Fixes: 280771252c1ba ("KVM: arm64: vgic-v3: KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES")
-Cc: <stable@vger.kernel.org> # 4.12
-Reported-by: AKASHI Takahiro <takahiro.akashi@linaro.org>
+Fixes: f7ed45be3ba52 ("KVM: ARM: World-switch implementation")
+Cc: <stable@vger.kernel.org> # 3.9
+Reported-by: Kristina Martsenko <kristina.martsenko@arm.com>
 Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/vgic/vgic-v3.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm/include/asm/kvm_arm.h | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index 2f05f732d3fd..f47e8481fa45 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -327,13 +327,13 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
- 	int last_byte_offset = -1;
- 	struct vgic_irq *irq;
- 	int ret;
-+	u8 val;
+diff --git a/arch/arm/include/asm/kvm_arm.h b/arch/arm/include/asm/kvm_arm.h
+index c8781450905b..3ab8b3781bfe 100644
+--- a/arch/arm/include/asm/kvm_arm.h
++++ b/arch/arm/include/asm/kvm_arm.h
+@@ -161,8 +161,7 @@
+ #else
+ #define VTTBR_X		(5 - KVM_T0SZ)
+ #endif
+-#define VTTBR_BADDR_SHIFT (VTTBR_X - 1)
+-#define VTTBR_BADDR_MASK  (((_AC(1, ULL) << (40 - VTTBR_X)) - 1) << VTTBR_BADDR_SHIFT)
++#define VTTBR_BADDR_MASK  (((_AC(1, ULL) << (40 - VTTBR_X)) - 1) << VTTBR_X)
+ #define VTTBR_VMID_SHIFT  _AC(48, ULL)
+ #define VTTBR_VMID_MASK(size)	(_AT(u64, (1 << size) - 1) << VTTBR_VMID_SHIFT)
  
- 	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
- 		int byte_offset, bit_nr;
- 		struct kvm_vcpu *vcpu;
- 		gpa_t pendbase, ptr;
- 		bool stored;
--		u8 val;
- 
- 		vcpu = irq->target_vcpu;
- 		if (!vcpu)
 -- 
 2.14.2
