@@ -1,100 +1,112 @@
-From: Christoffer Dall <cdall@kernel.org>
-Subject: [PATCH v6 8/8] KVM: arm/arm64: Avoid work when userspace iqchips are
- not used
-Date: Mon,  4 Dec 2017 21:05:06 +0100
-Message-ID: <20171204200506.3224-9-cdall@kernel.org>
-References: <20171204200506.3224-1-cdall@kernel.org>
+From: Shanker Donthineni <shankerd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+Subject: Re: [PATCH v4 2/2] arm64: Add software workaround for Falkor erratum
+ 1041
+Date: Mon, 4 Dec 2017 14:09:50 -0600
+Message-ID: <07aa6edb-9634-a6b4-589e-8d58cf982f6d@codeaurora.org>
+References: <1511824680-16397-1-git-send-email-shankerd@codeaurora.org>
+ <1511824680-16397-3-git-send-email-shankerd@codeaurora.org>
+ <20171201112457.GE18083@arm.com>
+ <12cb0f4a-577b-ffd5-21b7-26ce0e46505a@codeaurora.org>
+Reply-To: shankerd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3597B49D72
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 15:02:14 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Zbb1wnJ0Bdmr for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Dec 2017 15:02:13 -0500 (EST)
-Received: from mail-wm0-f65.google.com (mail-wm0-f65.google.com [74.125.82.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D970F49D93
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 15:02:12 -0500 (EST)
-Received: by mail-wm0-f65.google.com with SMTP id f9so16571643wmh.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Dec 2017 12:05:21 -0800 (PST)
-In-Reply-To: <20171204200506.3224-1-cdall@kernel.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, linux-arm-kernel@lists.infradead.org
+Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <12cb0f4a-577b-ffd5-21b7-26ce0e46505a-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+Content-Language: en-US
+Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>
+Cc: linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Ard Biesheuvel <ard.biesheuvel-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Matt Fleming <matt-mF/unelCI9GS6iBeEJttW/XRex20P6io@public.gmane.org>, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, Robin Murphy <robin.murphy-5wv7dgnIgG8@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+Hi Will,
 
-We currently check if the VM has a userspace irqchip on every exit from
-the VCPU, and if so, we do some work to ensure correct timer behavior.
-This is unfortunate, as we could avoid doing any work entirely, if we
-didn't have to support irqchip in userspace.
+On 12/03/2017 07:35 AM, Shanker Donthineni wrote:
+> Hi Will, thanks for your review comments.
+> 
+> On 12/01/2017 05:24 AM, Will Deacon wrote:
+>> On Mon, Nov 27, 2017 at 05:18:00PM -0600, Shanker Donthineni wrote:
+>>> The ARM architecture defines the memory locations that are permitted
+>>> to be accessed as the result of a speculative instruction fetch from
+>>> an exception level for which all stages of translation are disabled.
+>>> Specifically, the core is permitted to speculatively fetch from the
+>>> 4KB region containing the current program counter 4K and next 4K.
+>>>
+>>> When translation is changed from enabled to disabled for the running
+>>> exception level (SCTLR_ELn[M] changed from a value of 1 to 0), the
+>>> Falkor core may errantly speculatively access memory locations outside
+>>> of the 4KB region permitted by the architecture. The errant memory
+>>> access may lead to one of the following unexpected behaviors.
+>>>
+>>> 1) A System Error Interrupt (SEI) being raised by the Falkor core due
+>>>    to the errant memory access attempting to access a region of memory
+>>>    that is protected by a slave-side memory protection unit.
+>>> 2) Unpredictable device behavior due to a speculative read from device
+>>>    memory. This behavior may only occur if the instruction cache is
+>>>    disabled prior to or coincident with translation being changed from
+>>>    enabled to disabled.
+>>>
+>>> The conditions leading to this erratum will not occur when either of the
+>>> following occur:
+>>>  1) A higher exception level disables translation of a lower exception level
+>>>    (e.g. EL2 changing SCTLR_EL1[M] from a value of 1 to 0).
+>>>  2) An exception level disabling its stage-1 translation if its stage-2
+>>>     translation is enabled (e.g. EL1 changing SCTLR_EL1[M] from a value of 1
+>>>     to 0 when HCR_EL2[VM] has a value of 1).
+>>>
+>>> To avoid the errant behavior, software must execute an ISB immediately
+>>> prior to executing the MSR that will change SCTLR_ELn[M] from 1 to 0.
+>>>
+>>> Signed-off-by: Shanker Donthineni <shankerd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+>>> ---
+>>> Changes since v3:
+>>>   Rebased to kernel v4.15-rc1.
+>>> Changes since v2:
+>>>   Repost the corrected patches.
+>>> Changes since v1:
+>>>   Apply the workaround where it's required.
+>>>
+>>>  Documentation/arm64/silicon-errata.txt |  1 +
+>>>  arch/arm64/Kconfig                     | 12 +++++++++++-
+>>>  arch/arm64/include/asm/assembler.h     | 19 +++++++++++++++++++
+>>>  arch/arm64/include/asm/cpucaps.h       |  3 ++-
+>>>  arch/arm64/kernel/cpu-reset.S          |  1 +
+>>>  arch/arm64/kernel/cpu_errata.c         | 16 ++++++++++++++++
+>>>  arch/arm64/kernel/efi-entry.S          |  2 ++
+>>>  arch/arm64/kernel/head.S               |  1 +
+>>>  arch/arm64/kernel/relocate_kernel.S    |  1 +
+>>>  arch/arm64/kvm/hyp-init.S              |  1 +
+>>
+>> This is an awful lot of code just to add an ISB instruction prior to
+>> disabling the MMU. Why do you need to go through the alternatives framework
+>> for this? Just do it with an #ifdef; this isn't a fastpath.
+>>
+> 
+> We can avoid changes to only two files cpu_errata.c and cpucaps.h without using
+> the alternatives framework. Even though it's in slow path, cpu-errata.c changes 
+> provides a nice debug message which indicates the erratum E1041 is applied. 
+> 
+> Erratum log information would be very useful to conform our customers using the
+> right kernel with E1014 patch by looking at dmesg. Other than that I don't have
+> any other strong opinion to avoid alternatives and handle using #idef.
+> 
+> Should I go ahead and post v5 patch without alternatives?
+> 
 
-Realizing the userspace irqchip on ARM is mostly a developer or hobby
-feature, and is unlikely to be used in servers or other scenarios where
-performance is a priority, we can use a refcounted static key to only
-check the irqchip configuration when we have at least one VM that uses
-an irqchip in userspace.
 
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
- virt/kvm/arm/arch_timer.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+Please provide your thoughts on next step. We would like to merge this erratum
+to v4.15 kernel.
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 82d4963f63b8..df21451e7654 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -51,6 +51,8 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
- 				 struct arch_timer_context *timer_ctx);
- static bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx);
- 
-+static DEFINE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
-+
- u64 kvm_phys_timer_read(void)
- {
- 	return timecounter->cc->read(timecounter->cc);
-@@ -569,7 +571,8 @@ static void unmask_vtimer_irq_user(struct kvm_vcpu *vcpu)
-  */
- void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
- {
--	unmask_vtimer_irq_user(vcpu);
-+	if (static_branch_unlikely(&userspace_irqchip_in_use))
-+		unmask_vtimer_irq_user(vcpu);
- }
- 
- int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
-@@ -774,6 +777,8 @@ void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu)
- 	soft_timer_cancel(&timer->bg_timer, &timer->expired);
- 	soft_timer_cancel(&timer->phys_timer, NULL);
- 	kvm_vgic_unmap_phys_irq(vcpu, vtimer->irq.irq);
-+	if (timer->enabled && !irqchip_in_kernel(vcpu->kvm))
-+		static_branch_dec(&userspace_irqchip_in_use);
- }
- 
- static bool timer_irqs_are_valid(struct kvm_vcpu *vcpu)
-@@ -826,8 +831,10 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
- 		return 0;
- 
- 	/* Without a VGIC we do not map virtual IRQs to physical IRQs */
--	if (!irqchip_in_kernel(vcpu->kvm))
-+	if (!irqchip_in_kernel(vcpu->kvm)) {
-+		static_branch_inc(&userspace_irqchip_in_use);
- 		goto no_vgic;
-+	}
- 
- 	if (!vgic_initialized(vcpu->kvm))
- 		return -ENODEV;
+>> Will
+>>
+>> _______________________________________________
+>> linux-arm-kernel mailing list
+>> linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+>> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+>>
+> 
+
 -- 
-2.14.2
+Shanker Donthineni
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
