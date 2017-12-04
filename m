@@ -1,108 +1,93 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCHv2 12/12] arm64: docs: document pointer authentication
-Date: Mon, 4 Dec 2017 13:49:31 +0100
-Message-ID: <20171204124931.wg3wmgvzedayprql@kamzik.brq.redhat.com>
-References: <20171127163806.31435-1-mark.rutland@arm.com>
- <20171127163806.31435-13-mark.rutland@arm.com>
- <20171128150726.xui5i23uigvfo52w@kamzik.brq.redhat.com>
- <20171204123932.pru4lw753xm7qlwb@lakrids.cambridge.arm.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH 2/3] arm64: fpsimd: Abstract out binding of task's fpsimd
+ context to the cpu.
+Date: Mon, 4 Dec 2017 13:46:57 +0000
+Message-ID: <CAKv+Gu8BzFrc1U7r7iURfZqGKRqpwHJVFM6hvHOX5xghrXojtA@mail.gmail.com>
+References: <1512141582-17474-1-git-send-email-Dave.Martin@arm.com>
+ <1512141582-17474-3-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-arch-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20171204123932.pru4lw753xm7qlwb@lakrids.cambridge.arm.com>
-Sender: linux-arch-owner@vger.kernel.org
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, cdall@linaro.org, arnd@arndb.de, marc.zyngier@arm.com, catalin.marinas@arm.com, yao.qi@arm.com, kernel-hardening@lists.openwall.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, awallis@codeaurora.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <1512141582-17474-3-git-send-email-Dave.Martin@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Dec 04, 2017 at 12:39:33PM +0000, Mark Rutland wrote:
-> On Tue, Nov 28, 2017 at 04:07:26PM +0100, Andrew Jones wrote:
-> > Hi Mark,
-> 
-> Hi Drew,
-> 
-> > On Mon, Nov 27, 2017 at 04:38:06PM +0000, Mark Rutland wrote:
-> > > +Architecture overview
-> > > +---------------------
-> > > +
-> > > +The ARMv8.3 Pointer Authentication extension adds primitives that can be
-> > > +used to mitigate certain classes of attack where an attacker can corrupt
-> > > +the contents of some memory (e.g. the stack).
-> > > +
-> > > +The extension uses a Pointer Authentication Code (PAC) to determine
-> > > +whether pointers have been modified unexpectedly. A PAC is derived from
-> > > +a pointer, another value (such as the stack pointer), and a secret key
-> > > +held in system registers.
-> > > +
-> > > +The extension adds instructions to insert a valid PAC into a pointer,
-> > > +and to verify/remove the PAC from a pointer. The PAC occupies a number
-> > > +of high-order bits of the pointer, which varies dependent on the
-> > > +configured virtual address size and whether pointer tagging is in use.
-> > > +
-> > > +A subset of these instructions have been allocated from the HINT
-> > > +encoding space. In the absence of the extension (or when disabled),
-> > > +these instructions behave as NOPs. Applications and libraries using
-> > > +these instructions operate correctly regardless of the presence of the
-> > > +extension.
-> > 
-> > Correctly, but obviously without the additional security. So I assume
-> > it's expected that applications that demand this security to probe for
-> > it themselves, presumably by the checking the HWCAP. Is that correct?
-> 
-> Yes. Applications which wish to mandate pointer authentication
-> (presumably using instructions outside of the HINT space) must check the
-> relevant HWCAP first.
-> 
-> [...]
-> 
-> > > +Virtualization
-> > > +--------------
-> > > +
-> > > +When CONFIG_ARM64_POINTER_AUTHENTICATION is selected, and uniform HW
-> > > +support is present, KVM will context switch all keys used by vCPUs.
-> > > +Otherwise, the feature is disabled. When disabled, accesses to keys, or
-> > > +use of instructions enabled within the guest will trap to EL2, and an
-> > > +UNDEFINED exception will be injected into the guest.
-> > 
-> > If host applications will just run, with the instructions behaving like
-> > NOPs, when the extension is either not present or not enabled, then
-> > shouldn't guest applications also just run?
-> 
-> The enabled/disabled wording is probably the confusing bit here.
-> 
-> At EL1 we have conditional enables for instructions using
-> AP{I,D}{A,B}Key, which behave as NOPs when disabled.
-> 
-> At EL2 we have a single conditional trap for all instructions using
-> pointer authentication, that traps to EL2 when instructions are not
-> NOP'd by EL1.
-> 
-> So "disabled by EL2" is actually "trapped by EL2", and "disabled by EL1"
-> is "NOP'd by EL1".
-> 
-> > I.e. instead of injecting UNDEF, just treat the instructions as NOPs.
-> > Or did I misunderstand the trapping?
-> 
-> I think the documentation explained it poorly. Did the above help?
+On 1 December 2017 at 15:19, Dave Martin <Dave.Martin@arm.com> wrote:
+> There is currently some duplicate logic to associate current's
+> FPSIMD context with the cpu when loading FPSIMD state into the cpu
+> regs.
+>
+> Subsequent patches will update that logic, so in order to ensure it
+> only needs to be done in one place, this patch factors the relevant
+> code out into a new function fpsimd_bind_to_cpu().
+>
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
+>  arch/arm64/kernel/fpsimd.c | 25 +++++++++++++++----------
+>  1 file changed, 15 insertions(+), 10 deletions(-)
+>
+> diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+> index 143b3e7..007140b 100644
+> --- a/arch/arm64/kernel/fpsimd.c
+> +++ b/arch/arm64/kernel/fpsimd.c
+> @@ -992,6 +992,18 @@ void fpsimd_signal_preserve_current_state(void)
+>  }
+>
+>  /*
+> + * Associate current's FPSIMD context with this cpu
+> + * Preemption must be disabled when calling this function.
+> + */
+> +static void fpsimd_bind_to_cpu(void)
+> +{
+> +       struct fpsimd_state *st = &current->thread.fpsimd_state;
+> +
+> +       __this_cpu_write(fpsimd_last_state, st);
+> +       st->cpu = smp_processor_id();
+> +}
+> +
+> +/*
+>   * Load the userland FPSIMD state of 'current' from memory, but only if the
+>   * FPSIMD state already held in the registers is /not/ the most recent FPSIMD
+>   * state of 'current'
+> @@ -1004,11 +1016,8 @@ void fpsimd_restore_current_state(void)
+>         local_bh_disable();
+>
+>         if (test_and_clear_thread_flag(TIF_FOREIGN_FPSTATE)) {
+> -               struct fpsimd_state *st = &current->thread.fpsimd_state;
+> -
+>                 task_fpsimd_load();
+> -               __this_cpu_write(fpsimd_last_state, st);
+> -               st->cpu = smp_processor_id();
+> +               fpsimd_bind_to_cpu();
+>         }
+>
+>         local_bh_enable();
+> @@ -1032,12 +1041,8 @@ void fpsimd_update_current_state(struct fpsimd_state *state)
+>         }
+>         task_fpsimd_load();
+>
+> -       if (test_and_clear_thread_flag(TIF_FOREIGN_FPSTATE)) {
+> -               struct fpsimd_state *st = &current->thread.fpsimd_state;
+> -
+> -               __this_cpu_write(fpsimd_last_state, st);
+> -               st->cpu = smp_processor_id();
+> -       }
+> +       if (test_and_clear_thread_flag(TIF_FOREIGN_FPSTATE))
+> +               fpsimd_bind_to_cpu();
+>
+>         local_bh_enable();
+>  }
 
-Yes, both the above and the below have helped me understand. Thanks for
-the clarification!
-
-drew
-
-> 
-> > Does use of the instructions at EL0 trap to EL1 or EL2?
-> 
-> If disabled by EL1, the instructions behave as NOPs (regardless of the
-> EL2 traps).
-> 
-> If enabled by EL1, but trapped by EL2, the instructions trap to EL2.
-> 
-> If enabled by EL1, and not trapped by EL2, the instructions work as
-> usual.
-> 
-> I'll see if I can document this better.
-> 
-> Thanks,
-> Mark.
+Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
