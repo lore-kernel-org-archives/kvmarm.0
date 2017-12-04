@@ -1,53 +1,68 @@
 From: Christoffer Dall <cdall@kernel.org>
-Subject: [PULL 05/19] KVM: arm/arm64: vgic-its: Preserve the revious read from the pending table
-Date: Mon,  4 Dec 2017 15:03:34 +0100
-Message-ID: <20171204140348.21965-3-cdall@kernel.org>
+Subject: [PULL 07/19] KVM: arm/arm64: vgic-v4: Only perform an unmap for valid
+ vLPIs
+Date: Mon,  4 Dec 2017 15:03:36 +0100
+Message-ID: <20171204140348.21965-5-cdall@kernel.org>
 References: <20171204135637.21620-1-cdall@kernel.org>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E05549D70
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 09:00:52 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id V61bPps5SYuJ for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Dec 2017 09:00:50 -0500 (EST)
+Received: from mail-wr0-f194.google.com (mail-wr0-f194.google.com
+ [209.85.128.194])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4985C49D46
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 09:00:50 -0500 (EST)
+Received: by mail-wr0-f194.google.com with SMTP id v22so17414676wrb.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Dec 2017 06:03:57 -0800 (PST)
 In-Reply-To: <20171204135637.21620-1-cdall@kernel.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, stable@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Marc Zyngier <marc.zyngier@arm.com>
 
-The current pending table parsing code assumes that we keep the
-previous read of the pending bits, but keep that variable in
-the current block, making sure it is discarded on each loop.
+Before performing an unmap, let's check that what we have was
+really mapped the first place.
 
-We end-up using whatever is on the stack. Who knows, it might
-just be the right thing...
-
-Fixes: 33d3bc9556a7d ("KVM: arm64: vgic-its: Read initial LPI pending table")
-Cc: <stable@vger.kernel.org> # 4.8
-Reported-by: AKASHI Takahiro <takahiro.akashi@linaro.org>
 Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/vgic/vgic-its.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ virt/kvm/arm/vgic/vgic-v4.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 1f761a9991e7..cb2d0a2dbe5a 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -421,6 +421,7 @@ static int its_sync_lpi_pending_table(struct kvm_vcpu *vcpu)
- 	u32 *intids;
- 	int nr_irqs, i;
- 	unsigned long flags;
-+	u8 pendmask;
+diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
+index 53c324aa44ef..4a37292855bc 100644
+--- a/virt/kvm/arm/vgic/vgic-v4.c
++++ b/virt/kvm/arm/vgic/vgic-v4.c
+@@ -337,8 +337,10 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int virq,
+ 		goto out;
  
- 	nr_irqs = vgic_copy_lpi_list(vcpu, &intids);
- 	if (nr_irqs < 0)
-@@ -428,7 +429,6 @@ static int its_sync_lpi_pending_table(struct kvm_vcpu *vcpu)
+ 	WARN_ON(!(irq->hw && irq->host_irq == virq));
+-	irq->hw = false;
+-	ret = its_unmap_vlpi(virq);
++	if (irq->hw) {
++		irq->hw = false;
++		ret = its_unmap_vlpi(virq);
++	}
  
- 	for (i = 0; i < nr_irqs; i++) {
- 		int byte_offset, bit_nr;
--		u8 pendmask;
- 
- 		byte_offset = intids[i] / BITS_PER_BYTE;
- 		bit_nr = intids[i] % BITS_PER_BYTE;
+ out:
+ 	mutex_unlock(&its->its_lock);
 -- 
 2.14.2
