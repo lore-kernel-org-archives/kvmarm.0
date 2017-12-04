@@ -1,90 +1,251 @@
 From: Christoffer Dall <cdall@kernel.org>
-Subject: [PATCH v6 3/8] KVM: arm/arm64: Don't cache the timer IRQ level
-Date: Mon,  4 Dec 2017 21:05:01 +0100
-Message-ID: <20171204200506.3224-4-cdall@kernel.org>
+Subject: [PATCH v6 4/8] KVM: arm/arm64: vgic: Support level-triggered mapped
+ interrupts
+Date: Mon,  4 Dec 2017 21:05:02 +0100
+Message-ID: <20171204200506.3224-5-cdall@kernel.org>
 References: <20171204200506.3224-1-cdall@kernel.org>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EFD749D61
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 15:02:09 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id xLqURxQ4ccJa for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Dec 2017 15:02:07 -0500 (EST)
+Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C0D3B49DA4
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 15:02:06 -0500 (EST)
+Received: by mail-wm0-f42.google.com with SMTP id 64so16445682wme.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Dec 2017 12:05:14 -0800 (PST)
 In-Reply-To: <20171204200506.3224-1-cdall@kernel.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, Eric Auger <eric.auger@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Christoffer Dall <christoffer.dall@linaro.org>
 
-The timer was modeled after a strict idea of modelling an interrupt line
-level in software, meaning that only transitions in the level needed to
-be reported to the VGIC.  This works well for the timer, because the
-arch timer code is in complete control of the device and can track the
-transitions of the line.
+Level-triggered mapped IRQs are special because we only observe rising
+edges as input to the VGIC, and we don't set the EOI flag and therefore
+are not told when the level goes down, so that we can re-queue a new
+interrupt when the level goes up.
 
-However, as we are about to support using the HW bit in the VGIC not
-just for the timer, but also for VFIO which cannot track transitions of
-the interrupt line, we have to decide on an interface for level
-triggered mapped interrupts to the GIC, which both the timer and VFIO
-can use.
+One way to solve this problem is to side-step the logic of the VGIC and
+special case the validation in the injection path, but it has the
+unfortunate drawback of having to peak into the physical GIC state
+whenever we want to know if the interrupt is pending on the virtual
+distributor.
 
-VFIO only sees an asserting transition of the physical interrupt line,
-and tells the VGIC when that happens.  That means that part of the
-interrupt flow is offloaded to the hardware.
+Instead, we can maintain the current semantics of a level triggered
+interrupt by sort of treating it as an edge-triggered interrupt,
+following from the fact that we only observe an asserting edge.  This
+requires us to be a bit careful when populating the LRs and when folding
+the state back in though:
 
-To use the same interface for VFIO devices and the timer, we therefore
-have to change the timer (we cannot change VFIO because it doesn't know
-the details of the device it is assigning to a VM).
+ * We lower the line level when populating the LR, so that when
+   subsequently observing an asserting edge, the VGIC will do the right
+   thing.
 
-Luckily, changing the timer is simple, we just need to stop 'caching'
-the line level, but instead let the VGIC know the state of the timer
-every time there is a potential change in the line level, and when the
-line level should be asserted from the timer ISR.  The VGIC can ignore
-extra notifications using its validate mechanism.
+ * If the guest never acked the interrupt while running (for example if
+   it had masked interrupts at the CPU level while running), we have
+   to preserve the pending state of the LR and move it back to the
+   line_level field of the struct irq when folding LR state.
 
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+   If the guest never acked the interrupt while running, but changed the
+   device state and lowered the line (again with interrupts masked) then
+   we need to observe this change in the line_level.
+
+   Both of the above situations are solved by sampling the physical line
+   and set the line level when folding the LR back.
+
+ * Finally, if the guest never acked the interrupt while running and
+   sampling the line reveals that the device state has changed and the
+   line has been lowered, we must clear the physical active state, since
+   we will otherwise never be told when the interrupt becomes asserted
+   again.
+
+This has the added benefit of making the timer optimization patches
+(https://lists.cs.columbia.edu/pipermail/kvmarm/2017-July/026343.html) a
+bit simpler, because the timer code doesn't have to clear the active
+state on the sync anymore.  It also potentially improves the performance
+of the timer implementation because the GIC knows the state or the LR
+and only needs to clear the
+active state when the pending bit in the LR is still set, where the
+timer has to always clear it when returning from running the guest with
+an injected timer interrupt.
+
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/arch_timer.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
+ virt/kvm/arm/vgic/vgic-v2.c | 29 +++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-v3.c | 29 +++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic.c    | 23 +++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic.h    |  7 +++++++
+ 4 files changed, 88 insertions(+)
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 4151250ce8da..dd5aca05c500 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -99,11 +99,9 @@ static irqreturn_t kvm_arch_timer_handler(int irq, void *dev_id)
+diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+index 80897102da26..c32d7b93ffd1 100644
+--- a/virt/kvm/arm/vgic/vgic-v2.c
++++ b/virt/kvm/arm/vgic/vgic-v2.c
+@@ -105,6 +105,26 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+ 				irq->pending_latch = false;
+ 		}
+ 
++		/*
++		 * Level-triggered mapped IRQs are special because we only
++		 * observe rising edges as input to the VGIC.
++		 *
++		 * If the guest never acked the interrupt we have to sample
++		 * the physical line and set the line level, because the
++		 * device state could have changed or we simply need to
++		 * process the still pending interrupt later.
++		 *
++		 * If this causes us to lower the level, we have to also clear
++		 * the physical active state, since we will otherwise never be
++		 * told when the interrupt becomes asserted again.
++		 */
++		if (vgic_irq_is_mapped_level(irq) && (val & GICH_LR_PENDING_BIT)) {
++			irq->line_level = vgic_get_phys_line_level(irq);
++
++			if (!irq->line_level)
++				vgic_irq_set_phys_active(irq, false);
++		}
++
+ 		spin_unlock_irqrestore(&irq->irq_lock, flags);
+ 		vgic_put_irq(vcpu->kvm, irq);
  	}
- 	vtimer = vcpu_vtimer(vcpu);
+@@ -162,6 +182,15 @@ void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
+ 			val |= GICH_LR_EOI;
+ 	}
  
--	if (!vtimer->irq.level) {
--		vtimer->cnt_ctl = read_sysreg_el0(cntv_ctl);
--		if (kvm_timer_irq_can_fire(vtimer))
--			kvm_timer_update_irq(vcpu, true, vtimer);
--	}
-+	vtimer->cnt_ctl = read_sysreg_el0(cntv_ctl);
-+	if (kvm_timer_irq_can_fire(vtimer))
-+		kvm_timer_update_irq(vcpu, true, vtimer);
- 
- 	if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
- 		kvm_vtimer_update_mask_user(vcpu);
-@@ -324,12 +322,20 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
- 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
-+	bool level;
- 
- 	if (unlikely(!timer->enabled))
- 		return;
- 
--	if (kvm_timer_should_fire(vtimer) != vtimer->irq.level)
--		kvm_timer_update_irq(vcpu, !vtimer->irq.level, vtimer);
 +	/*
-+	 * The vtimer virtual interrupt is a 'mapped' interrupt, meaning part
-+	 * of its lifecycle is offloaded to the hardware, and we therefore may
-+	 * not have lowered the irq.level value before having to signal a new
-+	 * interrupt, but have to signal an interrupt every time the level is
-+	 * asserted.
++	 * Level-triggered mapped IRQs are special because we only observe
++	 * rising edges as input to the VGIC.  We therefore lower the line
++	 * level here, so that we can take new virtual IRQs.  See
++	 * vgic_v2_fold_lr_state for more info.
 +	 */
-+	level = kvm_timer_should_fire(vtimer);
-+	kvm_timer_update_irq(vcpu, level, vtimer);
++	if (vgic_irq_is_mapped_level(irq) && (val & GICH_LR_PENDING_BIT))
++		irq->line_level = false;
++
+ 	/* The GICv2 LR only holds five bits of priority. */
+ 	val |= (irq->priority >> 3) << GICH_LR_PRIORITY_SHIFT;
  
- 	if (kvm_timer_should_fire(ptimer) != ptimer->irq.level)
- 		kvm_timer_update_irq(vcpu, !ptimer->irq.level, ptimer);
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index 2f05f732d3fd..a14423a0d383 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -96,6 +96,26 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ 				irq->pending_latch = false;
+ 		}
+ 
++		/*
++		 * Level-triggered mapped IRQs are special because we only
++		 * observe rising edges as input to the VGIC.
++		 *
++		 * If the guest never acked the interrupt we have to sample
++		 * the physical line and set the line level, because the
++		 * device state could have changed or we simply need to
++		 * process the still pending interrupt later.
++		 *
++		 * If this causes us to lower the level, we have to also clear
++		 * the physical active state, since we will otherwise never be
++		 * told when the interrupt becomes asserted again.
++		 */
++		if (vgic_irq_is_mapped_level(irq) && (val & ICH_LR_PENDING_BIT)) {
++			irq->line_level = vgic_get_phys_line_level(irq);
++
++			if (!irq->line_level)
++				vgic_irq_set_phys_active(irq, false);
++		}
++
+ 		spin_unlock_irqrestore(&irq->irq_lock, flags);
+ 		vgic_put_irq(vcpu->kvm, irq);
+ 	}
+@@ -145,6 +165,15 @@ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
+ 			val |= ICH_LR_EOI;
+ 	}
+ 
++	/*
++	 * Level-triggered mapped IRQs are special because we only observe
++	 * rising edges as input to the VGIC.  We therefore lower the line
++	 * level here, so that we can take new virtual IRQs.  See
++	 * vgic_v3_fold_lr_state for more info.
++	 */
++	if (vgic_irq_is_mapped_level(irq) && (val & ICH_LR_PENDING_BIT))
++		irq->line_level = false;
++
+ 	/*
+ 	 * We currently only support Group1 interrupts, which is a
+ 	 * known defect. This needs to be addressed at some point.
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index b168a328a9e0..607cbbc27a1c 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -144,6 +144,29 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
+ 	kfree(irq);
+ }
+ 
++/* Get the input level of a mapped IRQ directly from the physical GIC */
++bool vgic_get_phys_line_level(struct vgic_irq *irq)
++{
++	bool line_level;
++
++	BUG_ON(!irq->hw);
++
++	WARN_ON(irq_get_irqchip_state(irq->host_irq,
++				      IRQCHIP_STATE_PENDING,
++				      &line_level));
++	return line_level;
++}
++
++/* Set/Clear the physical active state */
++void vgic_irq_set_phys_active(struct vgic_irq *irq, bool active)
++{
++
++	BUG_ON(!irq->hw);
++	WARN_ON(irq_set_irqchip_state(irq->host_irq,
++				      IRQCHIP_STATE_ACTIVE,
++				      active));
++}
++
+ /**
+  * kvm_vgic_target_oracle - compute the target vcpu for an irq
+  *
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index efbcf8f96f9c..d0787983a357 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -104,6 +104,11 @@ static inline bool irq_is_pending(struct vgic_irq *irq)
+ 		return irq->pending_latch || irq->line_level;
+ }
+ 
++static inline bool vgic_irq_is_mapped_level(struct vgic_irq *irq)
++{
++	return irq->config == VGIC_CONFIG_LEVEL && irq->hw;
++}
++
+ /*
+  * This struct provides an intermediate representation of the fields contained
+  * in the GICH_VMCR and ICH_VMCR registers, such that code exporting the GIC
+@@ -140,6 +145,8 @@ vgic_get_mmio_region(struct kvm_vcpu *vcpu, struct vgic_io_device *iodev,
+ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
+ 			      u32 intid);
+ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq);
++bool vgic_get_phys_line_level(struct vgic_irq *irq);
++void vgic_irq_set_phys_active(struct vgic_irq *irq, bool active);
+ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
+ 			   unsigned long flags);
+ void vgic_kick_vcpus(struct kvm *kvm);
 -- 
 2.14.2
