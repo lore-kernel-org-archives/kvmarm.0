@@ -1,22 +1,22 @@
 From: Steve Capper <steve.capper@arm.com>
-Subject: [PATCH 02/12] arm64: KVM: Enforce injective kern_hyp_va mappings
-Date: Mon,  4 Dec 2017 14:13:03 +0000
-Message-ID: <20171204141313.31604-3-steve.capper@arm.com>
+Subject: [PATCH 06/12] arm64: mm: Flip kernel VA space
+Date: Mon,  4 Dec 2017 14:13:07 +0000
+Message-ID: <20171204141313.31604-7-steve.capper@arm.com>
 References: <20171204141313.31604-1-steve.capper@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D90440651
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 09:10:30 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 17F1249D8F
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 09:10:37 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HXn4RULuHCYk for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Dec 2017 09:10:27 -0500 (EST)
+ with ESMTP id puA8UUgUcwJc for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Dec 2017 09:10:34 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CB9E49D32
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 09:10:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C56C749D93
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 09:10:33 -0500 (EST)
 In-Reply-To: <20171204141313.31604-1-steve.capper@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,175 +31,177 @@ To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 Cc: catalin.marinas@arm.com, ard.biesheuvel@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-For systems that are not executing with VHE, we need to create page
-tables for HYP/EL2 mode in order to access data from the kernel running
-at EL1.
+Put the direct linear map in the top half of the VA space and then the
+kernel + everything else in the bottom half.
 
-In addition to parts of the kernel address space being mapped to EL2, we
-also need to make space for an identity mapping of the __hyp_idmap_text
-area (as this code is responsible for activating the EL2 MMU).
+We need to adjust:
+ *) KASAN shadow region placement logic,
+ *) KASAN_SHADOW_OFFSET computation logic,
+ *) virt_to_phys, phys_to_virt checks
+ *) page table dumper
+ *) KVM hyp map flip logic
 
-In order to create these pagetables, we need a mechanism to map from the
-address space pointed to by TTBR1_EL1 (addresses preceded by 0xFF...)
-to the one addressed by TTBR0_EL2 (addresses preceded by 0x00...).
+These are all small changes, that need to take place atomically, so they
+are bundled into this commit.
 
-There are two ways of performing this mapping depending upon the
-physical address of __hyp_idmap_text_start.
-
-If PA[VA_BITS - 2] == 0b:
-1) HYP_VA = KERN_VA & GENMASK(VA_BITS - 2, 0) - so we mask in the lower
-bits of the kernel address. This is a bijective mapping.
-
-If PA[VA_BITS - 2] == 1b:
-2) HYP_VA = KERN_VA & GENMASK(VA_BITS - 3, 0) - so the top bit of our HYP
-VA will always be zero. This mapping is no longer injective, each HYP VA
-can be obtained from two different kernel VAs.
-
-These mappings guarantee that kernel addresses in the direct linear
-mapping will not give a HYP VA that collides with the identity mapping
-for __hyp_idmap_text.
-
-Unfortunately, with the second mapping we run the risk of hyp VAs
-derived from kernel addresses in the direct linear map colliding with
-those derived from kernel addresses from ioremap.
-
-This patch addresses this issue by switching to the following logic:
-If PA[VA_BITS - 2] == 0b:
-3) HYP_VA = KERN_VA XOR GENMASK(63, VA_BITS - 1) - we toggle off the top
-bits from the kernel address rather than and in the bottom bits.
-
-If PA[VA_BITS - 2] == 1b:
-4) HYP_VA = KERN_VA XOR GENMASK(63, VA_BITS - 2) - no longer maps to a
-reduced address space, we have a bijective mapping.
-
-Now there is no possibility of collision between HYP VAs obtained from
-kernel addresses.
-
-Note that the new mappings are no longer idempotent, so the following
-code sequence will behave differently after this patch is applied:
-	testva = kern_hyp_va(kern_hyp_va(sourceva));
-
-Cc: James Morse <james.morse@arm.com>
 Signed-off-by: Steve Capper <steve.capper@arm.com>
 ---
- arch/arm64/include/asm/cpucaps.h |  2 +-
- arch/arm64/include/asm/kvm_mmu.h | 36 +++++++++++++++++-------------------
- arch/arm64/kernel/cpufeature.c   |  8 ++++----
- 3 files changed, 22 insertions(+), 24 deletions(-)
+ arch/arm64/Makefile              |  2 +-
+ arch/arm64/include/asm/memory.h  | 10 +++++-----
+ arch/arm64/include/asm/pgtable.h |  2 +-
+ arch/arm64/kernel/cpufeature.c   |  2 +-
+ arch/arm64/mm/dump.c             |  8 ++++----
+ arch/arm64/mm/init.c             |  9 +--------
+ arch/arm64/mm/kasan_init.c       |  4 ++--
+ 7 files changed, 15 insertions(+), 22 deletions(-)
 
-diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-index 2ff7c5e8efab..3de31a1010ee 100644
---- a/arch/arm64/include/asm/cpucaps.h
-+++ b/arch/arm64/include/asm/cpucaps.h
-@@ -32,7 +32,7 @@
- #define ARM64_HAS_VIRT_HOST_EXTN		11
- #define ARM64_WORKAROUND_CAVIUM_27456		12
- #define ARM64_HAS_32BIT_EL0			13
--#define ARM64_HYP_OFFSET_LOW			14
-+#define ARM64_HYP_MAP_FLIP			14
- #define ARM64_MISMATCHED_CACHE_LINE_SIZE	15
- #define ARM64_HAS_NO_FPSIMD			16
- #define ARM64_WORKAROUND_REPEAT_TLBI		17
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 672c8684d5c2..d74d5236c26c 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -69,8 +69,8 @@
-  * mappings, and none of this applies in that case.
+diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
+index b481b4a7c011..7eaff48d2a39 100644
+--- a/arch/arm64/Makefile
++++ b/arch/arm64/Makefile
+@@ -100,7 +100,7 @@ endif
+ # KASAN_SHADOW_OFFSET = VA_START + (1 << (VA_BITS - 3)) - (1 << 61)
+ # in 32-bit arithmetic
+ KASAN_SHADOW_OFFSET := $(shell printf "0x%08x00000000\n" $$(( \
+-			(0xffffffff & (-1 << ($(CONFIG_ARM64_VA_BITS) - 32))) \
++			(0xffffffff & (-1 << ($(CONFIG_ARM64_VA_BITS) - 1 - 32))) \
+ 			+ (1 << ($(CONFIG_ARM64_VA_BITS) - 32 - 3)) \
+ 			- (1 << (64 - 32 - 3)) )) )
+ 
+diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
+index 2dedc775d151..0a912eb3d74f 100644
+--- a/arch/arm64/include/asm/memory.h
++++ b/arch/arm64/include/asm/memory.h
+@@ -64,15 +64,15 @@
   */
- 
--#define HYP_PAGE_OFFSET_HIGH_MASK	((UL(1) << VA_BITS) - 1)
--#define HYP_PAGE_OFFSET_LOW_MASK	((UL(1) << (VA_BITS - 1)) - 1)
-+#define HYP_MAP_KERNEL_BITS	(UL(0xffffffffffffffff) << VA_BITS)
-+#define HYP_MAP_HIGH_BIT	(UL(1) << (VA_BITS - 1))
- 
- #ifdef __ASSEMBLY__
- 
-@@ -82,26 +82,24 @@
-  * reg: VA to be converted.
-  *
-  * This generates the following sequences:
-- * - High mask:
-- *		and x0, x0, #HYP_PAGE_OFFSET_HIGH_MASK
-+ *
-+ * - Flip the kernel bits:
-+ *		eor x0, x0, #HYP_MAP_KERNEL_BITS
-  *		nop
-- * - Low mask:
-- *		and x0, x0, #HYP_PAGE_OFFSET_HIGH_MASK
-- *		and x0, x0, #HYP_PAGE_OFFSET_LOW_MASK
-+ *
-+ * - Flip the kernel bits and upper HYP bit:
-+ *		eor x0, x0, #HYP_MAP_KERNEL_BITS
-+ *		eor x0, x0, #HYP_MAP_HIGH_BIT
-  * - VHE:
-  *		nop
-  *		nop
-- *
-- * The "low mask" version works because the mask is a strict subset of
-- * the "high mask", hence performing the first mask for nothing.
-- * Should be completely invisible on any viable CPU.
+ #define VA_BITS			(CONFIG_ARM64_VA_BITS)
+ #define VA_START		(UL(0xffffffffffffffff) - \
+-	(UL(1) << VA_BITS) + 1)
+-#define PAGE_OFFSET		(UL(0xffffffffffffffff) - \
+ 	(UL(1) << (VA_BITS - 1)) + 1)
+-#define PAGE_OFFSET_END		(~0UL)
++#define PAGE_OFFSET		(UL(0xffffffffffffffff) - \
++	(UL(1) << VA_BITS) + 1)
++#define PAGE_OFFSET_END		(VA_START)
+ #define KIMAGE_VADDR		(MODULES_END)
+ #define MODULES_END		(MODULES_VADDR + MODULES_VSIZE)
+ #define MODULES_VADDR		(VA_START + KASAN_SHADOW_SIZE)
+ #define MODULES_VSIZE		(SZ_128M)
+-#define VMEMMAP_START		(PAGE_OFFSET - VMEMMAP_SIZE)
++#define VMEMMAP_START		(-VMEMMAP_SIZE)
+ #define PCI_IO_END		(VMEMMAP_START - SZ_2M)
+ #define PCI_IO_START		(PCI_IO_END - PCI_IO_SIZE)
+ #define FIXADDR_TOP		(PCI_IO_START - SZ_2M)
+@@ -223,7 +223,7 @@ static inline unsigned long kaslr_offset(void)
+  * space. Testing the top bit for the start of the region is a
+  * sufficient check.
   */
- .macro kern_hyp_va	reg
- alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
--	and     \reg, \reg, #HYP_PAGE_OFFSET_HIGH_MASK
-+	eor     \reg, \reg, #HYP_MAP_KERNEL_BITS
- alternative_else_nop_endif
--alternative_if ARM64_HYP_OFFSET_LOW
--	and     \reg, \reg, #HYP_PAGE_OFFSET_LOW_MASK
-+alternative_if ARM64_HYP_MAP_FLIP
-+	eor     \reg, \reg, #HYP_MAP_HIGH_BIT
- alternative_else_nop_endif
- .endm
+-#define __is_lm_address(addr)	(!!((addr) & BIT(VA_BITS - 1)))
++#define __is_lm_address(addr)	(!((addr) & BIT(VA_BITS - 1)))
  
-@@ -115,16 +113,16 @@ alternative_else_nop_endif
+ #define __lm_to_phys(addr)	(((addr) & ~PAGE_OFFSET) + PHYS_OFFSET)
+ #define __kimg_to_phys(addr)	((addr) - kimage_voffset)
+diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+index 72cde7268cad..054b37143a50 100644
+--- a/arch/arm64/include/asm/pgtable.h
++++ b/arch/arm64/include/asm/pgtable.h
+@@ -31,7 +31,7 @@
+  *	and fixed mappings
+  */
+ #define VMALLOC_START		(MODULES_END)
+-#define VMALLOC_END		(PAGE_OFFSET - PUD_SIZE - VMEMMAP_SIZE - SZ_64K)
++#define VMALLOC_END		(- PUD_SIZE - VMEMMAP_SIZE - SZ_64K)
  
- static inline unsigned long __kern_hyp_va(unsigned long v)
- {
--	asm volatile(ALTERNATIVE("and %0, %0, %1",
-+	asm volatile(ALTERNATIVE("eor %0, %0, %1",
- 				 "nop",
- 				 ARM64_HAS_VIRT_HOST_EXTN)
- 		     : "+r" (v)
--		     : "i" (HYP_PAGE_OFFSET_HIGH_MASK));
-+		     : "i" (HYP_MAP_KERNEL_BITS));
- 	asm volatile(ALTERNATIVE("nop",
--				 "and %0, %0, %1",
--				 ARM64_HYP_OFFSET_LOW)
-+				 "eor %0, %0, %1",
-+				 ARM64_HYP_MAP_FLIP)
- 		     : "+r" (v)
--		     : "i" (HYP_PAGE_OFFSET_LOW_MASK));
-+		     : "i" (HYP_MAP_HIGH_BIT));
- 	return v;
- }
+ #define vmemmap			((struct page *)VMEMMAP_START - (memstart_addr >> PAGE_SHIFT))
  
 diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index c5ba0097887f..5a6e1f3611eb 100644
+index 5a6e1f3611eb..99b1d1ebe551 100644
 --- a/arch/arm64/kernel/cpufeature.c
 +++ b/arch/arm64/kernel/cpufeature.c
-@@ -824,7 +824,7 @@ static bool runs_at_el2(const struct arm64_cpu_capabilities *entry, int __unused
- 	return is_kernel_in_hyp_mode();
+@@ -834,7 +834,7 @@ static bool hyp_flip_space(const struct arm64_cpu_capabilities *entry,
+ 	 * - the idmap doesn't clash with it,
+ 	 * - the kernel is not running at EL2.
+ 	 */
+-	return idmap_addr > GENMASK(VA_BITS - 2, 0) && !is_kernel_in_hyp_mode();
++	return idmap_addr <= GENMASK(VA_BITS - 2, 0) && !is_kernel_in_hyp_mode();
  }
  
--static bool hyp_offset_low(const struct arm64_cpu_capabilities *entry,
-+static bool hyp_flip_space(const struct arm64_cpu_capabilities *entry,
- 			   int __unused)
+ static bool has_no_fpsimd(const struct arm64_cpu_capabilities *entry, int __unused)
+diff --git a/arch/arm64/mm/dump.c b/arch/arm64/mm/dump.c
+index ca74a2aace42..b7b09c0fc50d 100644
+--- a/arch/arm64/mm/dump.c
++++ b/arch/arm64/mm/dump.c
+@@ -30,6 +30,8 @@
+ #include <asm/ptdump.h>
+ 
+ static const struct addr_marker address_markers[] = {
++	{ PAGE_OFFSET,			"Linear Mapping start" },
++	{ VA_START,			"Linear Mapping end" },
+ #ifdef CONFIG_KASAN
+ 	{ KASAN_SHADOW_START,		"Kasan shadow start" },
+ 	{ KASAN_SHADOW_END,		"Kasan shadow end" },
+@@ -43,10 +45,8 @@ static const struct addr_marker address_markers[] = {
+ 	{ PCI_IO_START,			"PCI I/O start" },
+ 	{ PCI_IO_END,			"PCI I/O end" },
+ #ifdef CONFIG_SPARSEMEM_VMEMMAP
+-	{ VMEMMAP_START,		"vmemmap start" },
+-	{ VMEMMAP_START + VMEMMAP_SIZE,	"vmemmap end" },
++	{ VMEMMAP_START,		"vmemmap" },
+ #endif
+-	{ PAGE_OFFSET,			"Linear Mapping" },
+ 	{ -1,				NULL },
+ };
+ 
+@@ -375,7 +375,7 @@ static void ptdump_initialize(void)
+ static struct ptdump_info kernel_ptdump_info = {
+ 	.mm		= &init_mm,
+ 	.markers	= address_markers,
+-	.base_addr	= VA_START,
++	.base_addr	= PAGE_OFFSET,
+ };
+ 
+ void ptdump_check_wx(void)
+diff --git a/arch/arm64/mm/init.c b/arch/arm64/mm/init.c
+index 00e7b900ca41..230d78b75831 100644
+--- a/arch/arm64/mm/init.c
++++ b/arch/arm64/mm/init.c
+@@ -361,19 +361,12 @@ static void __init fdt_enforce_memory_region(void)
+ 
+ void __init arm64_memblock_init(void)
  {
- 	phys_addr_t idmap_addr = __pa_symbol(__hyp_idmap_text_start);
-@@ -926,10 +926,10 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.min_field_value = ID_AA64PFR0_EL0_32BIT_64BIT,
- 	},
- 	{
--		.desc = "Reduced HYP mapping offset",
--		.capability = ARM64_HYP_OFFSET_LOW,
-+		.desc = "HYP mapping flipped",
-+		.capability = ARM64_HYP_MAP_FLIP,
- 		.def_scope = SCOPE_SYSTEM,
--		.matches = hyp_offset_low,
-+		.matches = hyp_flip_space,
- 	},
- 	{
- 		/* FP/SIMD is not implemented */
+-	const s64 linear_region_size = -(s64)PAGE_OFFSET;
++	const s64 linear_region_size = BIT(VA_BITS - 1);
+ 
+ 	/* Handle linux,usable-memory-range property */
+ 	fdt_enforce_memory_region();
+ 
+ 	/*
+-	 * Ensure that the linear region takes up exactly half of the kernel
+-	 * virtual address space. This way, we can distinguish a linear address
+-	 * from a kernel/module/vmalloc address by testing a single bit.
+-	 */
+-	BUILD_BUG_ON(linear_region_size != BIT(VA_BITS - 1));
+-
+-	/*
+ 	 * Select a suitable value for the base of physical memory.
+ 	 */
+ 	memstart_addr = round_down(memblock_start_of_DRAM(),
+diff --git a/arch/arm64/mm/kasan_init.c b/arch/arm64/mm/kasan_init.c
+index acba49fb5aac..5aef679e61c6 100644
+--- a/arch/arm64/mm/kasan_init.c
++++ b/arch/arm64/mm/kasan_init.c
+@@ -205,10 +205,10 @@ void __init kasan_init(void)
+ 	kasan_map_populate(kimg_shadow_start, kimg_shadow_end,
+ 			   pfn_to_nid(virt_to_pfn(lm_alias(_text))));
+ 
+-	kasan_populate_zero_shadow((void *)KASAN_SHADOW_START,
++	kasan_populate_zero_shadow(kasan_mem_to_shadow((void *) VA_START),
+ 				   (void *)mod_shadow_start);
+ 	kasan_populate_zero_shadow((void *)kimg_shadow_end,
+-				   kasan_mem_to_shadow((void *)PAGE_OFFSET));
++				   (void *)KASAN_SHADOW_END);
+ 
+ 	if (kimg_shadow_start > mod_shadow_end)
+ 		kasan_populate_zero_shadow((void *)mod_shadow_end,
 -- 
 2.11.0
