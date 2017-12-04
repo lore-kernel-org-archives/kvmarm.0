@@ -1,95 +1,69 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH 3/3] arm64/sve: KVM: Avoid dereference of dead task
- during guest entry
-Date: Mon, 4 Dec 2017 15:36:50 +0000
-Message-ID: <20171204153648.GV22781@e103592.cambridge.arm.com>
-References: <1512141582-17474-1-git-send-email-Dave.Martin@arm.com>
- <1512141582-17474-4-git-send-email-Dave.Martin@arm.com>
- <CAKv+Gu_e3SKsreYHrZEBUMEME-pYtxTXW1P6xLUR6YMQfj0cZw@mail.gmail.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH 05/12] arm64: mm: Remove VMALLOC checks from
+ update_mapping_prot(.)
+Date: Mon, 4 Dec 2017 16:01:09 +0000
+Message-ID: <CAKv+Gu80J1vGn6V6Z3eXajDos=sjY_fLhUQP=-n0A8MyunTfgQ@mail.gmail.com>
+References: <20171204141313.31604-1-steve.capper@arm.com>
+ <20171204141313.31604-6-steve.capper@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 633DF406D0
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 10:33:48 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3IKIl2WdqsCC for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Dec 2017 10:33:47 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 36BCA40651
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Dec 2017 10:33:47 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <CAKv+Gu_e3SKsreYHrZEBUMEME-pYtxTXW1P6xLUR6YMQfj0cZw@mail.gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20171204141313.31604-6-steve.capper@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Steve Capper <steve.capper@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "Suzuki K. Poulose" <Suzuki.Poulose@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Dec 04, 2017 at 01:53:21PM +0000, Ard Biesheuvel wrote:
-> On 1 December 2017 at 15:19, Dave Martin <Dave.Martin@arm.com> wrote:
-> > When deciding whether to invalidate FPSIMD state cached in the cpu,
-> > the backend function sve_flush_cpu_state() attempts to dereference
-> > __this_cpu_read(fpsimd_last_state).  However, this is not safe:
-> > there is no guarantee that the pointer is still valid, because the
-> > task could have exited in the meantime.  For this reason, this
-> > percpu pointer should only be assigned or compared, never
-> > dereferenced.
-> >
-> 
-> Doesn't that mean the pointer could also be pointing to the
-> fpsimd_state of a newly created task that is completely unrelated?
-> IOW, are you sure comparison is safe?
+On 4 December 2017 at 14:13, Steve Capper <steve.capper@arm.com> wrote:
+> update_mapping_prot assumes that it will be used on the VA for the
+> kernel .text section. (Via the check virt >= VMALLOC_START)
+>
+> Recent kdump patches employ this function to modify the protection of
+> the direct linear mapping (which is strictly speaking outside of this
+> area), via mark_linear_text_alias_ro(.).
+>
 
-There are more conditions: the only place the determination is
-made is for next, in fpsimd_thread_switch(next).
+Isn't that a bug? Is it guaranteed that those protection attributes
+can be modified without splitting live page tables, and the resulting
+risk of TLB conflicts?
 
-
-However, I can see your concern and I'm not sure how/if it is
-resolved.
-
-For the worst case, let's assume that some child forks off but
-doesn't enter userspace yet, while another task round-robins
-across all CPUs, interspersed with tasks that don't enter userspace.
-
-So, we end up with
-
-All cpu < NR_CPUS . per_cpu(fpsimd_last_state, cpu) == T.
-
-Now, if T dies and a new task is allocated the same task_struct pointer,
-then the _new_ T is guaranteed to get scheduled in on a CPU whose
-per_cpu(fpsmid_last_state) == T.
-
-Thus, new T can pick up old T's regs _unless_ new T's fpsimd_state.cpu
-is invalid (i.e., NR_CPUS).
-
-This is a separate bug from the one addressed by this patch though.
-We can't go and harvest the bad pointers when old T exits, because
-this might race new T being scheduled for real -- in any case it
-would involve iterating over all CPUs which sounds racy and
-inefficient.
-
-
-So, I'd say we _must_ call fpsimd_flush_task_state() for every new
-task.  This may result in a redundant reload of the state, but this
-is what would happen anyway if the pointers did not alias.
-
-Does this sound real to you?  If so, I'll try to write something.
-
-And does this patch look reasonable to fix what it's trying to fix?
-
-
-I wonder whether arch/arm has the same bug actually, since the kernel-
-mode NEON logic was modelled from there IIUC (?)
-
-Cheers
----Dave
+> We "get away" with this as the direct linear mapping currently follows
+> the VA for the kernel text, so the check passes.
+>
+> This patch removes the check in update_mapping_prot allowing us to move
+> the kernel VA layout without spuriously firing the warning.
+>
+> Signed-off-by: Steve Capper <steve.capper@arm.com>
+> ---
+>  arch/arm64/mm/mmu.c | 6 ------
+>  1 file changed, 6 deletions(-)
+>
+> diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
+> index 58b1ed6fd7ec..c8f486384fe3 100644
+> --- a/arch/arm64/mm/mmu.c
+> +++ b/arch/arm64/mm/mmu.c
+> @@ -383,12 +383,6 @@ void __init create_pgd_mapping(struct mm_struct *mm, phys_addr_t phys,
+>  static void update_mapping_prot(phys_addr_t phys, unsigned long virt,
+>                                 phys_addr_t size, pgprot_t prot)
+>  {
+> -       if (virt < VMALLOC_START) {
+> -               pr_warn("BUG: not updating mapping for %pa at 0x%016lx - outside kernel range\n",
+> -                       &phys, virt);
+> -               return;
+> -       }
+> -
+>         __create_pgd_mapping(init_mm.pgd, phys, virt, size, prot, NULL,
+>                              NO_CONT_MAPPINGS);
+>
+> --
+> 2.11.0
+>
