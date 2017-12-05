@@ -1,28 +1,30 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 1/3] arm64: KVM: Move CPU ID reg trap setup off the world
- switch path
-Date: Tue, 5 Dec 2017 10:09:15 +0100
-Message-ID: <20171205090915.GI32397@cbox>
+Subject: Re: [PATCH 3/3] arm64/sve: KVM: Avoid dereference of dead task
+ during guest entry
+Date: Tue, 5 Dec 2017 10:43:50 +0100
+Message-ID: <20171205094350.GJ32397@cbox>
 References: <1512141582-17474-1-git-send-email-Dave.Martin@arm.com>
- <1512141582-17474-2-git-send-email-Dave.Martin@arm.com>
+ <1512141582-17474-4-git-send-email-Dave.Martin@arm.com>
+ <CAKv+Gu_e3SKsreYHrZEBUMEME-pYtxTXW1P6xLUR6YMQfj0cZw@mail.gmail.com>
+ <20171204153648.GV22781@e103592.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 01A1449DED
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Dec 2017 04:06:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C49F749DA9
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Dec 2017 04:40:43 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id c3bmbUOyUjpM for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 Dec 2017 04:06:06 -0500 (EST)
+ with ESMTP id S04X14No9uzu for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 Dec 2017 04:40:42 -0500 (EST)
 Received: from mail-wm0-f67.google.com (mail-wm0-f67.google.com [74.125.82.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 96E2449D1F
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Dec 2017 04:06:06 -0500 (EST)
-Received: by mail-wm0-f67.google.com with SMTP id i11so18897088wmf.4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 05 Dec 2017 01:09:16 -0800 (PST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8A27E49D2B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Dec 2017 04:40:42 -0500 (EST)
+Received: by mail-wm0-f67.google.com with SMTP id l141so74237wmg.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 05 Dec 2017 01:43:52 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <1512141582-17474-2-git-send-email-Dave.Martin@arm.com>
+In-Reply-To: <20171204153648.GV22781@e103592.cambridge.arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,86 +35,75 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Dave Martin <Dave.Martin@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Dec 01, 2017 at 03:19:40PM +0000, Dave Martin wrote:
-> The HCR_EL2.TID3 flag needs to be set when trapping guest access to
-> the CPU ID registers is required.  However, the decision about
-> whether to set this bit does not need to be repeated at every
-> switch to the guest.
-> 
-> Instead, it's sufficient to make this decision once and record the
-> outcome.
-> 
-> This patch moves the decision to vcpu_reset_hcr() and records the
-> choice made in vcpu->arch.hcr_el2.  The world switch code can then
-> load this directly when switching to the guest without the need for
-> conditional logic on the critical path.
-> 
-> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> Suggested-by: Christoffer Dall <christoffer.dall@linaro.org>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
+Hi Dave,
 
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+On Mon, Dec 04, 2017 at 03:36:50PM +0000, Dave Martin wrote:
+> On Mon, Dec 04, 2017 at 01:53:21PM +0000, Ard Biesheuvel wrote:
+> > On 1 December 2017 at 15:19, Dave Martin <Dave.Martin@arm.com> wrote:
+> > > When deciding whether to invalidate FPSIMD state cached in the cpu,
+> > > the backend function sve_flush_cpu_state() attempts to dereference
+> > > __this_cpu_read(fpsimd_last_state).  However, this is not safe:
+> > > there is no guarantee that the pointer is still valid, because the
+> > > task could have exited in the meantime.  For this reason, this
+> > > percpu pointer should only be assigned or compared, never
+> > > dereferenced.
+> > >
+> > 
+> > Doesn't that mean the pointer could also be pointing to the
+> > fpsimd_state of a newly created task that is completely unrelated?
+> > IOW, are you sure comparison is safe?
+> 
+> There are more conditions: the only place the determination is
+> made is for next, in fpsimd_thread_switch(next).
+> 
+> 
+> However, I can see your concern and I'm not sure how/if it is
+> resolved.
+> 
+> For the worst case, let's assume that some child forks off but
+> doesn't enter userspace yet, while another task round-robins
+> across all CPUs, interspersed with tasks that don't enter userspace.
+> 
+> So, we end up with
+> 
+> All cpu < NR_CPUS . per_cpu(fpsimd_last_state, cpu) == T.
+> 
+> Now, if T dies and a new task is allocated the same task_struct pointer,
+> then the _new_ T is guaranteed to get scheduled in on a CPU whose
+> per_cpu(fpsmid_last_state) == T.
+> 
+> Thus, new T can pick up old T's regs _unless_ new T's fpsimd_state.cpu
+> is invalid (i.e., NR_CPUS).
+> 
+> This is a separate bug from the one addressed by this patch though.
+> We can't go and harvest the bad pointers when old T exits, because
+> this might race new T being scheduled for real -- in any case it
+> would involve iterating over all CPUs which sounds racy and
+> inefficient.
+> 
+> 
+> So, I'd say we _must_ call fpsimd_flush_task_state() for every new
+> task.  This may result in a redundant reload of the state, but this
+> is what would happen anyway if the pointers did not alias.
+> 
+> Does this sound real to you?  If so, I'll try to write something.
+> 
+> And does this patch look reasonable to fix what it's trying to fix?
+> 
+> 
+> I wonder whether arch/arm has the same bug actually, since the kernel-
+> mode NEON logic was modelled from there IIUC (?)
+> 
+Isn't this the common kernel problem of pid reuse?
 
-> 
-> ---
-> 
-> Note to maintainers: this was discussed on-list [1] prior to the merge
-> window, but this patch implementing the agreed decision hasn't been
-> posted previously.
-> 
-> This should be considered a fix for v4.15.
+It seems holding a reference to a struct pid would solve your problems.
+See include/linux/pid.h.
 
-It's actually easier for me to apply this for v4.16 and base my VHE
-optimization patches on it.
+That might also make the code more intuitive and prevent future attempts
+of dereferencing potentially dead data structures.
 
 Thanks,
 -Christoffer
-
-> 
-> [1] [PATCH v3 02/28] arm64: KVM: Hide unsupported AArch64 CPU features from guests
-> http://lists.infradead.org/pipermail/linux-arm-kernel/2017-October/537420.html
-> ---
->  arch/arm64/include/asm/kvm_emulate.h | 8 ++++++++
->  arch/arm64/kvm/hyp/switch.c          | 4 ----
->  2 files changed, 8 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 5f28dfa..8ff5aef 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -52,6 +52,14 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
->  		vcpu->arch.hcr_el2 |= HCR_E2H;
->  	if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features))
->  		vcpu->arch.hcr_el2 &= ~HCR_RW;
-> +
-> +	/*
-> +	 * TID3: trap feature register accesses that we virtualise.
-> +	 * For now this is conditional, since no AArch32 feature regs
-> +	 * are currently virtualised.
-> +	 */
-> +	if (vcpu->arch.hcr_el2 & HCR_RW)
-> +		vcpu->arch.hcr_el2 |= HCR_TID3;
->  }
->  
->  static inline unsigned long vcpu_get_hcr(struct kvm_vcpu *vcpu)
-> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> index 525c01f..87fd590 100644
-> --- a/arch/arm64/kvm/hyp/switch.c
-> +++ b/arch/arm64/kvm/hyp/switch.c
-> @@ -86,10 +86,6 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
->  		write_sysreg(1 << 30, fpexc32_el2);
->  		isb();
->  	}
-> -
-> -	if (val & HCR_RW) /* for AArch64 only: */
-> -		val |= HCR_TID3; /* TID3: trap feature register accesses */
-> -
->  	write_sysreg(val, hcr_el2);
->  
->  	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
-> -- 
-> 2.1.4
-> 
