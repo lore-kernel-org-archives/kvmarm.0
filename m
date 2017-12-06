@@ -1,138 +1,43 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH 3/3] arm64/sve: Avoid dereference of dead task_struct in KVM
- guest entry
-Date: Wed,  6 Dec 2017 16:45:47 +0000
-Message-ID: <1512578747-4554-4-git-send-email-Dave.Martin@arm.com>
-References: <1512578747-4554-1-git-send-email-Dave.Martin@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BD3CE49D7F
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Dec 2017 11:42:46 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Qx44xWWxaTeU for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 Dec 2017 11:42:45 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AFD2449D80
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Dec 2017 11:42:43 -0500 (EST)
-In-Reply-To: <1512578747-4554-1-git-send-email-Dave.Martin@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu
+From: Julien Thierry <julien.thierry@arm.com>
+Subject: [PATCH] arm64: kvm: Prevent restoring stale PMSCR_EL1 for vcpu
+Date: Wed,  6 Dec 2017 17:09:49 +0000
+Message-ID: <1512580189-5921-1-git-send-email-julien.thierry@arm.com>
+Return-path: <stable-owner@vger.kernel.org>
+Sender: stable-owner@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: Julien Thierry <julien.thierry@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, stable@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When deciding whether to invalidate FPSIMD state cached in the cpu,
-the backend function sve_flush_cpu_state() attempts to dereference
-__this_cpu_read(fpsimd_last_state).  However, this is not safe:
-there is no guarantee that this task_struct pointer is still valid,
-because the task could have exited in the meantime.
+When VHE is not present, KVM needs to save and restores PMSCR_EL1 when
+possible. If SPE is used by the host, value of PMSCR_EL1 cannot be saved
+for the guest.
+If the host starts using SPE between two save+restore on the same vcpu,
+restore will write the value of PMSCR_EL1 read during the first save.
 
-This means that we need another means to get the appropriate value
-of TIF_SVE for the associated task.
+Make sure __debug_save_spe_nvhe clears the value of the saved PMSCR_EL1
+when the guest cannot use SPE.
 
-This patch solves this issue by adding a cached copy of the TIF_SVE
-flag in fpsimd_last_state, which we can check without dereferencing
-the task pointer.
-
-In particular, although this patch is not a KVM fix per se, this
-means that this check is now done safely in the KVM world switch
-path (which is currently the only user of this code).
-
-Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Signed-off-by: Julien Thierry <julien.thierry@arm.com>
 Cc: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
+Cc: <stable@vger.kernel.org>
 ---
- arch/arm64/kernel/fpsimd.c | 28 ++++++++++++++++------------
- 1 file changed, 16 insertions(+), 12 deletions(-)
+ arch/arm64/kvm/hyp/debug-sr.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index 007140b..3dc8058 100644
---- a/arch/arm64/kernel/fpsimd.c
-+++ b/arch/arm64/kernel/fpsimd.c
-@@ -114,7 +114,12 @@
-  *   returned from the 2nd syscall yet, TIF_FOREIGN_FPSTATE is still set so
-  *   whatever is in the FPSIMD registers is not saved to memory, but discarded.
-  */
--static DEFINE_PER_CPU(struct fpsimd_state *, fpsimd_last_state);
-+struct fpsimd_last_state_struct {
-+	struct fpsimd_state *st;
-+	bool sve_in_use;
-+};
+diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
+index 321c9c0..f4363d4 100644
+--- a/arch/arm64/kvm/hyp/debug-sr.c
++++ b/arch/arm64/kvm/hyp/debug-sr.c
+@@ -74,6 +74,9 @@ static void __hyp_text __debug_save_spe_nvhe(u64 *pmscr_el1)
+ {
+ 	u64 reg;
+
++	/* Clear pmscr in case of early return */
++	*pmscr_el1 = 0;
 +
-+static DEFINE_PER_CPU(struct fpsimd_last_state_struct, fpsimd_last_state);
- 
- /* Default VL for tasks that don't set it explicitly: */
- static int sve_default_vl = -1;
-@@ -905,7 +910,7 @@ void fpsimd_thread_switch(struct task_struct *next)
- 		 */
- 		struct fpsimd_state *st = &next->thread.fpsimd_state;
- 
--		if (__this_cpu_read(fpsimd_last_state) == st
-+		if (__this_cpu_read(fpsimd_last_state.st) == st
- 		    && st->cpu == smp_processor_id())
- 			clear_tsk_thread_flag(next, TIF_FOREIGN_FPSTATE);
- 		else
-@@ -997,9 +1002,12 @@ void fpsimd_signal_preserve_current_state(void)
-  */
- static void fpsimd_bind_to_cpu(void)
- {
-+	struct fpsimd_last_state_struct *last =
-+		this_cpu_ptr(&fpsimd_last_state);
- 	struct fpsimd_state *st = &current->thread.fpsimd_state;
- 
--	__this_cpu_write(fpsimd_last_state, st);
-+	last->st = st;
-+	last->sve_in_use = test_thread_flag(TIF_SVE);
- 	st->cpu = smp_processor_id();
- }
- 
-@@ -1057,7 +1065,7 @@ void fpsimd_flush_task_state(struct task_struct *t)
- 
- static inline void fpsimd_flush_cpu_state(void)
- {
--	__this_cpu_write(fpsimd_last_state, NULL);
-+	__this_cpu_write(fpsimd_last_state.st, NULL);
- }
- 
- /*
-@@ -1070,14 +1078,10 @@ static inline void fpsimd_flush_cpu_state(void)
- #ifdef CONFIG_ARM64_SVE
- void sve_flush_cpu_state(void)
- {
--	struct fpsimd_state *const fpstate = __this_cpu_read(fpsimd_last_state);
--	struct task_struct *tsk;
--
--	if (!fpstate)
--		return;
-+	struct fpsimd_last_state_struct const *last =
-+		this_cpu_ptr(&fpsimd_last_state);
- 
--	tsk = container_of(fpstate, struct task_struct, thread.fpsimd_state);
--	if (test_tsk_thread_flag(tsk, TIF_SVE))
-+	if (last->st && last->sve_in_use)
- 		fpsimd_flush_cpu_state();
- }
- #endif /* CONFIG_ARM64_SVE */
-@@ -1272,7 +1276,7 @@ static inline void fpsimd_pm_init(void) { }
- #ifdef CONFIG_HOTPLUG_CPU
- static int fpsimd_cpu_dead(unsigned int cpu)
- {
--	per_cpu(fpsimd_last_state, cpu) = NULL;
-+	per_cpu(fpsimd_last_state.st, cpu) = NULL;
- 	return 0;
- }
- 
--- 
-2.1.4
+ 	/* SPE present on this CPU? */
+ 	if (!cpuid_feature_extract_unsigned_field(read_sysreg(id_aa64dfr0_el1),
+ 						  ID_AA64DFR0_PMSVER_SHIFT))
