@@ -1,198 +1,54 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v6 7/8] KVM: arm/arm64: Provide a get_input_level for the
- arch timer
-Date: Wed, 6 Dec 2017 17:38:46 +0100
-Message-ID: <20171206163846.GN32397@cbox>
-References: <20171204200506.3224-1-cdall@kernel.org>
- <20171204200506.3224-8-cdall@kernel.org>
- <20171205152446.rcmkowdnuhkqbrdb@yury-thinkpad>
- <20171206105904.GM32397@cbox>
- <20171206141728.mmjp6x4ksyhdvjmv@yury-thinkpad>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: [PATCH v2 0/3] arm64: SVE fixes for v4.15-rc2
+Date: Wed,  6 Dec 2017 16:45:44 +0000
+Message-ID: <1512578747-4554-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20171206141728.mmjp6x4ksyhdvjmv@yury-thinkpad>
-Sender: kvm-owner@vger.kernel.org
-To: Yury Norov <ynorov@caviumnetworks.com>
-Cc: Christoffer Dall <cdall@kernel.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, Eric Auger <eric.auger@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C212040651
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Dec 2017 11:42:42 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id iOcOhEsz5EyJ for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Dec 2017 11:42:40 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 76F1749D4E
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Dec 2017 11:42:40 -0500 (EST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: linux-arm-kernel@lists.infradead.org
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Dec 06, 2017 at 05:17:28PM +0300, Yury Norov wrote:
-> On Wed, Dec 06, 2017 at 11:59:04AM +0100, Christoffer Dall wrote:
-> > On Tue, Dec 05, 2017 at 06:24:46PM +0300, Yury Norov wrote:
-> > > On Mon, Dec 04, 2017 at 09:05:05PM +0100, Christoffer Dall wrote:
-> > > > From: Christoffer Dall <christoffer.dall@linaro.org>
-> > > > 
-> > > > The VGIC can now support the life-cycle of mapped level-triggered
-> > > > interrupts, and we no longer have to read back the timer state on every
-> > > > exit from the VM if we had an asserted timer interrupt signal, because
-> > > > the VGIC already knows if we hit the unlikely case where the guest
-> > > > disables the timer without ACKing the virtual timer interrupt.
-> > > > 
-> > > > This means we rework a bit of the code to factor out the functionality
-> > > > to snapshot the timer state from vtimer_save_state(), and we can reuse
-> > > > this functionality in the sync path when we have an irqchip in
-> > > > userspace, and also to support our implementation of the
-> > > > get_input_level() function for the timer.
-> > > > 
-> > > > This change also means that we can no longer rely on the timer's view of
-> > > > the interrupt line to set the active state, because we no longer
-> > > > maintain this state for mapped interrupts when exiting from the guest.
-> > > > Instead, we only set the active state if the virtual interrupt is
-> > > > active, and otherwise we simply let the timer fire again and raise the
-> > > > virtual interrupt from the ISR.
-> > > > 
-> > > > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> > > > ---
-> > > >  include/kvm/arm_arch_timer.h |  2 ++
-> > > >  virt/kvm/arm/arch_timer.c    | 75 +++++++++++++++++++++-----------------------
-> > > >  2 files changed, 38 insertions(+), 39 deletions(-)
-> > > > 
-> > > > diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-> > > > index 01ee473517e2..f57f795d704c 100644
-> > > > --- a/include/kvm/arm_arch_timer.h
-> > > > +++ b/include/kvm/arm_arch_timer.h
-> > > > @@ -90,6 +90,8 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu);
-> > > >  
-> > > >  void kvm_timer_init_vhe(void);
-> > > >  
-> > > > +bool kvm_arch_timer_get_input_level(int vintid);
-> > > > +
-> > > >  #define vcpu_vtimer(v)	(&(v)->arch.timer_cpu.vtimer)
-> > > >  #define vcpu_ptimer(v)	(&(v)->arch.timer_cpu.ptimer)
-> > > >  
-> > > 
-> > > [...]
-> > > 
-> > > > +bool kvm_arch_timer_get_input_level(int vintid)
-> > > > +{
-> > > > +	struct kvm_vcpu *vcpu = kvm_arm_get_running_vcpu();
-> > > > +	struct arch_timer_context *timer;
-> > > > +
-> > > > +	if (vintid == vcpu_vtimer(vcpu)->irq.irq)
-> > > > +		timer = vcpu_vtimer(vcpu);
-> > > > +	else
-> > > > +		BUG() We only map the vtimer so far */
-> > > > +
-> > > > +	if (timer->loaded)
-> > > > +		__timer_snapshot_state(timer);
-> > > > +
-> > > > +	return kvm_timer_should_fire(timer);
-> > > > +}
-> > > 
-> > > I think it worth to reword to highlight your intention about BUG,
-> > > and save 1 call to vcpu_vtimer()
-> > > 
-> > > bool kvm_arch_timer_get_input_level(int vintid)
-> > > {
-> > > 	struct kvm_vcpu *vcpu = kvm_arm_get_running_vcpu();
-> > > 	struct arch_timer_context *timer = vcpu_vtimer(vcpu);
-> > > 
-> > >         /* We only map the vtimer so far */
-> > > 	BUG_ON(vintid != timer->irq.irq)
-> > > 
-> > > 	if (timer->loaded)
-> > > 		__timer_snapshot_state(timer);
-> > > 
-> > > 	return kvm_timer_should_fire(timer);
-> > > }
-> > > 
-> > 
-> > Besides the incredible bikesheding nature of your comments, I disagree.
-> > The current code suggests where to add functionality once we move to
-> > using the physical timer hardware to drive an EL1 physical timer on VHE
-> > systems, and is purposely written this way.
-> > 
-> > I'm sure we have real bugs and real issues in the code, perhaps you
-> > could spend your energy looking for those, and if you cannot find any,
-> > then provide a reviewed-by instead of these pointless cosmetic
-> > adjustments.
-> 
-> OK. I understood. Let me elaborate.
-> 
-> 0. As you say in patch 0, This series is based on 4.15-rc, so I decided that
-> the code above is assumed to be release version. You may change it in
-> future, or may not, but the code will exist as is in mainline kernel for
-> some time, right?
+This series contains a few fixes for known issues in the arm64 FPSIMD
+and SVE implementation.
 
-When the code is properly reviewed and nobody raises relevant
-objections, the maintainers of the subsystem can merge the code.
+This supersedes the previous posting. [1]
 
-> 
-> 1. BUG() is needed to kill system, and it really kills it. This is wrong
-> to kill system in else-branch of some minor helper due to unimplemented
-> feature. You should use pr_err() or WARN_ON() instead. The best - return
-> reasonable error and do everything possible on upper levels to keep system
-> alive. What's really wrong in my comment is that I didn't suggest you switch
-> to WARN_ON().
-> 
+Note that although patch 2 is not a fix, it provides refactoring that is
+used by the fix in patch 3.
 
-You're missing a key point.  If the system can reasonably recover from a
-failure or some condition, it's definitely preferred to use a print or a
-warning.
+[1] [PATCH 0/3] arm64: SVE fixes for v4.15-rc1
+http://lists.infradead.org/pipermail/linux-arm-kernel/2017-December/545126.html
 
-However, if an internal function is called with an unsupported value,
-when managing the operation of hardware, the most sane thing to do is to
-panic, because the system is in an enitrely unsupported state.
+Dave Martin (3):
+  arm64: fpsimd: Prevent registers leaking from dead tasks
+  arm64: fpsimd: Abstract out binding of task's fpsimd context to the
+    cpu.
+  arm64/sve: Avoid dereference of dead task_struct in KVM guest entry
 
-> 
-> 2. Calling the same function with the same argument twice in code path is
-> also an issue. Besides the nasty feeling of that code, it might be dangerous.
-> The most obvious scenario is when it returns different values due to change
-> of internal state. I realize that vcpu_vtimer() is just a pointer dereference.
-> But it may bite you painfully as well. I know it for sure because it bitten
-> me once. Consider racing scenario in this patch:
-> https://patchwork.kernel.org/patch/9974327/
+ arch/arm64/kernel/fpsimd.c  | 51 ++++++++++++++++++++++++++-------------------
+ arch/arm64/kernel/process.c |  9 ++++++++
+ 2 files changed, 39 insertions(+), 21 deletions(-)
 
-Seriously, what make you think I need a programming lesson from you?
-
-You are taking a specific lesson and generalizing it, and then applying
-it to a piece of code you admit to not understanding.  This is not
-helpful.
-
-I really don't care about your nasty feelings at this point, and
-claiming that calling the same function twice is in general a problem is
-a ridiculous statement.
-
-> 
-> It may never become the problem, or may become one day. But fix is
-> clear and obvious - why not taking it?
-
-I think I've answered this already, but that's because this function
-will eventually become:
-
-bool kvm_arch_timer_get_input_level(int vintid)
-{
-	struct kvm_vcpu *vcpu = kvm_arm_get_running_vcpu();
-	struct arch_timer_context *timer;
-
-	if (vintid == vcpu_vtimer(vcpu)->irq.irq)
-		timer = vcpu_vtimer(vcpu);
-	else
-		timer = vcpu_ptimer(vcpu);
-
-	if (timer->loaded)
-		__timer_snapshot_state(timer);
-
-	return kvm_timer_should_fire(timer);
-}
-
-> 
-> 3. I will be really happy to provide tested-by and reviewed-by. But
-> for doing that I need to actually test and review. It would be extremely
-> helpful if you share your testing modules and scripts. I have access
-> to several Cavium machines and can do before/after measurements. Right
-> now I have few tests, but kvm is very complex system, and I'm not sure I
-> measure what I'm actually going to. Guidance from KVM experts is what
-> really lacks. 
-> 
-
-If you don't understand what KVM is and how to use it, I'm afraid your
-input is not very valuable.
-
-Until you change your attitude and make some attempt to understand how
-we work, and try to actually understand the code you comment on, I'll be
-inclined to ignore future posting from you.
-
--Christoffer
+-- 
+2.1.4
