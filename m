@@ -1,82 +1,115 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 04/18] arm64: alternatives: Enforce alignment of struct
- alt_instr
-Date: Wed, 6 Dec 2017 15:39:23 +0000
-Message-ID: <280c1267-500c-fccd-bd33-50e27a01061b@arm.com>
-References: <20171206143839.29223-1-marc.zyngier@arm.com>
- <20171206143839.29223-5-marc.zyngier@arm.com>
- <20171206144847.GA28074@char.us.oracle.com>
- <dd8995ce-3065-3aba-2d93-9ed91de5cd50@arm.com>
- <20171206151856.GH28074@char.us.oracle.com>
+From: Jeff Kirsher <jeffrey.t.kirsher-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+Subject: Re: [Intel-wired-lan] [PATCH 1/1] timecounter: Make cyclecounter
+ struct part of timecounter struct
+Date: Wed, 06 Dec 2017 08:24:56 -0800
+Message-ID: <1512577496.8693.0.camel@intel.com>
+References: <1512189095-28654-1-git-send-email-sagar.a.kamble@intel.com>
+Reply-To: jeffrey.t.kirsher-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 60C8349D4E
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Dec 2017 10:36:16 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SeqWuGDZHfZ3 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 Dec 2017 10:36:15 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E41F406D0
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Dec 2017 10:36:15 -0500 (EST)
-In-Reply-To: <20171206151856.GH28074@char.us.oracle.com>
-Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Content-Type: multipart/signed; micalg="pgp-sha256";
+        protocol="application/pgp-signature"; boundary="=-AYN6I3A77kR9u855MsqY"
+Return-path: <linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1512189095-28654-1-git-send-email-sagar.a.kamble-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+Sender: linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Sagar Arun Kamble <sagar.a.kamble-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: alsa-devel-K7yf7f+aM1XWsZ/bQMPhNw@public.gmane.org, linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Richard Cochran <richardcochran-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Stephen Boyd <sboyd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>, Chris Wilson <chris-Y6uKTt2uX1cEflXRtASbqLVCufUGDwFn@public.gmane.org>, John Stultz <john.stultz-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, intel-wired-lan-qjLDD68F18P21nG7glBr7A@public.gmane.org, Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 06/12/17 15:18, Konrad Rzeszutek Wilk wrote:
-> On Wed, Dec 06, 2017 at 02:57:29PM +0000, Marc Zyngier wrote:
->> On 06/12/17 14:48, Konrad Rzeszutek Wilk wrote:
->>> On Wed, Dec 06, 2017 at 02:38:25PM +0000, Marc Zyngier wrote:
->>>> We're playing a dangerous game with struct alt_instr, as we produce
->>>> it using assembly tricks, but parse them using the C structure.
->>>> We just assume that the respective alignments of the two will
->>>> be the same.
->>>>
->>>> But as we add more fields to this structure, the alignment requirements
->>>> of the structure may change, and lead to all kind of funky bugs.
->>>>
->>>> TO solve this, let's move the definition of struct alt_instr to its
->>>> own file, and use this to generate the alignment constraint from
->>>> asm-offsets.c. The various macros are then patched to take the
->>>> alignment into account.
->>>
->>> Would it be better to use .p2align as on 32-bit ARM you must
->>> have it 4-byte aligned. Or at least have and BUILD_BUG_ON
->>> to make sure the size can be divided by four??
->>>
->>> Oh wait. You are not even touching ARM-32, how come? The alternative
->>> code can run on ARM-32 ...
->>
->> How? Given that I haven't written yet, I'd be grateful if you could
->> share your time machine...
-> 
-> Oh! I assumed it would be there as the Xen variant runs on ARM-32 and
-> it borrowed a bunch of code from Linux. 
 
-KVM definitely runs on 32bit, but doesn't have any alternative facility,
-at least not in the way arm64 does.
+--=-AYN6I3A77kR9u855MsqY
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> Please disregard my comment. I will go back to tweaking the time machine.
+On Sat, 2017-12-02 at 10:01 +0530, Sagar Arun Kamble wrote:
+> There is no real need for the users of timecounters to define
+> cyclecounter
+> and timecounter variables separately. Since timecounter will always
+> be
+> based on cyclecounter, have cyclecounter struct as member of
+> timecounter
+> struct.
+>=20
+> Suggested-by: Chris Wilson <chris-Y6uKTt2uX1cEflXRtASbqLVCufUGDwFn@public.gmane.org>
+> Signed-off-by: Sagar Arun Kamble <sagar.a.kamble-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+> Cc: Chris Wilson <chris-Y6uKTt2uX1cEflXRtASbqLVCufUGDwFn@public.gmane.org>
+> Cc: Richard Cochran <richardcochran-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> Cc: John Stultz <john.stultz-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+> Cc: Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>
+> Cc: Stephen Boyd <sboyd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+> Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> Cc: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+> Cc: netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> Cc: intel-wired-lan-qjLDD68F18P21nG7glBr7A@public.gmane.org
+> Cc: linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> Cc: alsa-devel-K7yf7f+aM1XWsZ/bQMPhNw@public.gmane.org
+> Cc: kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
 
-Let me know once you've debugged it, I have a couple of issues to
-address in the past...
+Acked-by: Jeff Kirsher <jeffrey.t.kirsher-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
 
-Thanks,
+For the changes to the Intel drivers.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+> ---
+>  arch/microblaze/kernel/timer.c                     | 20 ++++++------
+>  drivers/clocksource/arm_arch_timer.c               | 19 ++++++------
+>  drivers/net/ethernet/amd/xgbe/xgbe-dev.c           |  3 +-
+>  drivers/net/ethernet/amd/xgbe/xgbe-ptp.c           |  9 +++---
+>  drivers/net/ethernet/amd/xgbe/xgbe.h               |  1 -
+>  drivers/net/ethernet/broadcom/bnx2x/bnx2x.h        |  1 -
+>  drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c   | 20 ++++++------
+>  drivers/net/ethernet/freescale/fec.h               |  1 -
+>  drivers/net/ethernet/freescale/fec_ptp.c           | 30 +++++++++---
+> ------
+>  drivers/net/ethernet/intel/e1000e/e1000.h          |  1 -
+>  drivers/net/ethernet/intel/e1000e/netdev.c         | 27 ++++++++--
+> ------
+>  drivers/net/ethernet/intel/e1000e/ptp.c            |  2 +-
+>  drivers/net/ethernet/intel/igb/igb.h               |  1 -
+>  drivers/net/ethernet/intel/igb/igb_ptp.c           | 25 ++++++++--
+> -----
+>  drivers/net/ethernet/intel/ixgbe/ixgbe.h           |  1 -
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c       | 17 +++++-----
+>  drivers/net/ethernet/mellanox/mlx4/en_clock.c      | 28 ++++++++--
+> -------
+>  drivers/net/ethernet/mellanox/mlx4/mlx4_en.h       |  1 -
+>  .../net/ethernet/mellanox/mlx5/core/lib/clock.c    | 34 ++++++++++
+> ----------
+>  drivers/net/ethernet/qlogic/qede/qede_ptp.c        | 20 ++++++------
+>  drivers/net/ethernet/ti/cpts.c                     | 36
+> ++++++++++++----------
+>  drivers/net/ethernet/ti/cpts.h                     |  1 -
+>  include/linux/mlx5/driver.h                        |  1 -
+>  include/linux/timecounter.h                        |  4 +--
+>  include/sound/hdaudio.h                            |  1 -
+>  kernel/time/timecounter.c                          | 28 ++++++++--
+> -------
+>  sound/hda/hdac_stream.c                            |  7 +++--
+>  virt/kvm/arm/arch_timer.c                          |  6 ++--
+>  28 files changed, 163 insertions(+), 182 deletions(-)
+--=-AYN6I3A77kR9u855MsqY
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEiTyZWz+nnTrOJ1LZ5W/vlVpL7c4FAlooGdgACgkQ5W/vlVpL
+7c7J0Q/9HHk6upECLnqxfft9A4opsw2bj4joMDVrmj4+wvdSrNvrbzQAJPwEl3El
+fWwGBKNKmNyGjNa9dpEnactZ2xBtTLk9I9j1RvhdCS8JbQ8DYwxtlb9hAw6dk60z
+/gn5M+pcYi7is5wNvZqMA81Ocek0QSi8Egnz3TLh+voV5g5opi7u/VdlsiczBAUo
+fH+lqWPTSL4i19swopOjZdAYNKLqWMDeP40L8Zsbb5ZtNrib+8YAb82YuP1Tw+eQ
+6jbHZFp5iB+WBRHo8xZ3QzENh9XdHoTmcX3tAUPRcqy9dJozsmXdIEJiJk7qNjgz
+6XwtGJIle6jDXg9HOzkV8/2dv2v1J6CR0UAK0KsXQWhYKVBSN2Uj4gqxWuLczpcI
+mHJ7MKWU9QnvcQEcVfQwO1b2y+reSjGyz9ABz5J6VwnvT+8Pcn2oPAIsOuVvRuJs
+6tIRAinKealwOv8oRZ97zhoPTM+Sf4OC803GxHtwZ56jNRId6nSUbq2+qyJBwK1R
+a7QLLkNdDIN6nt2VP6yywd+HrYtBo9CtJgS+mVNm6QhsTC4/wHGNeMLnjZ5i0LEW
+J7gDCG78Wgrd6UoaZx6afq1S8rXvWBzFt9LEnHrcEezlMehbmYHdWajSWLZ6d7YD
+Bq+D+QpbdGhyKIWEfspq1unwyw8CNCPAzKvb6w+hEdebk0Ia9Fc=
+=rvB5
+-----END PGP SIGNATURE-----
+
+--=-AYN6I3A77kR9u855MsqY--
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-rdma" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
