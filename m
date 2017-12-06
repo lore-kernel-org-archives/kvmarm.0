@@ -1,50 +1,83 @@
-From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: Re: [PATCH v8 7/7] arm64: kvm: handle SError Interrupt by
- categorization
-Date: Wed, 6 Dec 2017 18:26:14 +0800
-Message-ID: <4af78739-99da-4056-4db1-f80bfe11081a@huawei.com>
-References: <1510343650-23659-1-git-send-email-gengdongjiu@huawei.com>
- <1510343650-23659-8-git-send-email-gengdongjiu@huawei.com>
- <5A0B1334.7060500@arm.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH 1/3] arm64: KVM: Move CPU ID reg trap setup off the world
+ switch path
+Date: Wed, 6 Dec 2017 11:55:01 +0000
+Message-ID: <20171206115501.GB22781@e103592.cambridge.arm.com>
+References: <1512141582-17474-1-git-send-email-Dave.Martin@arm.com>
+ <1512141582-17474-2-git-send-email-Dave.Martin@arm.com>
+ <20171205090915.GI32397@cbox>
+ <20171205123150.GX22781@e103592.cambridge.arm.com>
+ <20171206105300.GK32397@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-acpi-owner@vger.kernel.org>
-In-Reply-To: <5A0B1334.7060500@arm.com>
-Content-Language: en-US
-Sender: linux-acpi-owner@vger.kernel.org
-To: James Morse <james.morse@arm.com>
-Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, linux@armlinux.org.uk, bp@alien8.de, rjw@rjwysocki.net, pbonzini@redhat.com, rkrcmar@redhat.com, corbet@lwn.net, catalin.marinas@arm.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-acpi@vger.kernel.org, devel@acpica.org, huangshaoyu@huawei.com, wuquanming@huawei.com, linuxarm@huawei.com
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D07A49D28
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Dec 2017 06:51:54 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id fM0Zj90MKc+f for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Dec 2017 06:51:53 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 544C640651
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Dec 2017 06:51:53 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <20171206105300.GK32397@cbox>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-On 2017/11/15 0:00, James Morse wrote:
->> +		 * error has not been propagated
->> +		 */
->> +		run->exit_reason = KVM_EXIT_EXCEPTION;
->> +		run->ex.exception = ESR_ELx_EC_SERROR;
->> +		run->ex.error_code = KVM_SEI_SEV_RECOVERABLE;
->> +		return 0;
-> We should not pass RAS notifications to user space. The kernel either handles
-> them, or it panics(). User space shouldn't even know if the kernel supports RAS
-> until it gets an MCEERR signal.
+On Wed, Dec 06, 2017 at 11:53:00AM +0100, Christoffer Dall wrote:
+> On Tue, Dec 05, 2017 at 12:31:51PM +0000, Dave Martin wrote:
+> > On Tue, Dec 05, 2017 at 10:09:15AM +0100, Christoffer Dall wrote:
+> > > On Fri, Dec 01, 2017 at 03:19:40PM +0000, Dave Martin wrote:
+> > > > The HCR_EL2.TID3 flag needs to be set when trapping guest access to
+> > > > the CPU ID registers is required.  However, the decision about
+> > > > whether to set this bit does not need to be repeated at every
+> > > > switch to the guest.
+> > > > 
+> > > > Instead, it's sufficient to make this decision once and record the
+> > > > outcome.
+> > > > 
+> > > > This patch moves the decision to vcpu_reset_hcr() and records the
+> > > > choice made in vcpu->arch.hcr_el2.  The world switch code can then
+> > > > load this directly when switching to the guest without the need for
+> > > > conditional logic on the critical path.
+> > > > 
+> > > > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> > > > Suggested-by: Christoffer Dall <christoffer.dall@linaro.org>
+> > > > Cc: Marc Zyngier <marc.zyngier@arm.com>
+> > > 
+> > > Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+> > > 
+> > > > 
+> > > > ---
+> > > > 
+> > > > Note to maintainers: this was discussed on-list [1] prior to the merge
+> > > > window, but this patch implementing the agreed decision hasn't been
+> > > > posted previously.
+> > > > 
+> > > > This should be considered a fix for v4.15.
+> > > 
+> > > It's actually easier for me to apply this for v4.16 and base my VHE
+> > > optimization patches on it.
+> > 
+> > If you're happy for this optimisation to be missing for v4.15, I'm fine
+> > with that.
+> > 
+> > Can I leave it you to pick this up then?
 > 
-> You're making your firmware-first notification an EL3->EL0 signal, bypassing the OS.
-> 
-> If we get a RAS SError and there are no CPER records or values in the ERR nodes,
-> we should panic as it looks like the CPU/firmware is broken. (spurious RAS errors)
+> Yes, I applied it to our queue already.
 
-Hi james,
-  sorry to disturb you!
-
-  do you think whether we need to set the guest ESR by user space?  if need, I need to
-notify user space that there is a SError happen and need to set ESR for guest in some place of
-KVM. so here I return a error code to user space. you mean we should not pass RAS notifications
-to user space, so could you give some suggestion how to notify user space to set guest ESR.
-
-Thanks a lot in advance.
-
-
-> 
-> 
-
+OK, great, thanks
+---Dave
