@@ -1,7 +1,7 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 10/18] arm64; insn: Add encoder for the EXTR instruction
-Date: Wed,  6 Dec 2017 14:38:31 +0000
-Message-ID: <20171206143839.29223-11-marc.zyngier@arm.com>
+Subject: [PATCH 09/18] arm64: cpufeatures: Drop the ARM64_HYP_OFFSET_LOW feature flag
+Date: Wed,  6 Dec 2017 14:38:30 +0000
+Message-ID: <20171206143839.29223-10-marc.zyngier@arm.com>
 References: <20171206143839.29223-1-marc.zyngier@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20171206143839.29223-1-marc.zyngier@arm.com>
@@ -10,78 +10,65 @@ To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.c
 Cc: Christoffer Dall <christoffer.dall@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add an encoder for the EXTR instruction, which also implements the ROR
-variant (where Rn == Rm).
+Now that we can dynamically compute the kernek/hyp VA mask, there
+is need for a feature flag to trigger the alternative patching.
+Let's drop the flag and everything that depends on it.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/insn.h |  6 ++++++
- arch/arm64/kernel/insn.c      | 32 ++++++++++++++++++++++++++++++++
- 2 files changed, 38 insertions(+)
+ arch/arm64/include/asm/cpucaps.h |  2 +-
+ arch/arm64/kernel/cpufeature.c   | 19 -------------------
+ 2 files changed, 1 insertion(+), 20 deletions(-)
 
-diff --git a/arch/arm64/include/asm/insn.h b/arch/arm64/include/asm/insn.h
-index 815b35bc53ed..f62c56b1793f 100644
---- a/arch/arm64/include/asm/insn.h
-+++ b/arch/arm64/include/asm/insn.h
-@@ -319,6 +319,7 @@ __AARCH64_INSN_FUNCS(and_imm,	0x7F800000, 0x12000000)
- __AARCH64_INSN_FUNCS(orr_imm,	0x7F800000, 0x32000000)
- __AARCH64_INSN_FUNCS(eor_imm,	0x7F800000, 0x52000000)
- __AARCH64_INSN_FUNCS(ands_imm,	0x7F800000, 0x72000000)
-+__AARCH64_INSN_FUNCS(extr,	0x7FA00000, 0x13800000)
- __AARCH64_INSN_FUNCS(b,		0xFC000000, 0x14000000)
- __AARCH64_INSN_FUNCS(bl,	0xFC000000, 0x94000000)
- __AARCH64_INSN_FUNCS(cbz,	0x7F000000, 0x34000000)
-@@ -433,6 +434,11 @@ u32 aarch64_insn_gen_logical_immediate(enum aarch64_insn_logic_type type,
- 				       enum aarch64_insn_register Rn,
- 				       enum aarch64_insn_register Rd,
- 				       u64 imm);
-+u32 aarch64_insn_gen_extr(enum aarch64_insn_variant variant,
-+			  enum aarch64_insn_register Rm,
-+			  enum aarch64_insn_register Rn,
-+			  enum aarch64_insn_register Rd,
-+			  u8 lsb);
- u32 aarch64_insn_gen_prefetch(enum aarch64_insn_register base,
- 			      enum aarch64_insn_prfm_type type,
- 			      enum aarch64_insn_prfm_target target,
-diff --git a/arch/arm64/kernel/insn.c b/arch/arm64/kernel/insn.c
-index 326b17016485..af29fc3e09a9 100644
---- a/arch/arm64/kernel/insn.c
-+++ b/arch/arm64/kernel/insn.c
-@@ -1622,3 +1622,35 @@ u32 aarch64_insn_gen_logical_immediate(enum aarch64_insn_logic_type type,
- 	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RN, insn, Rn);
- 	return aarch64_encode_immediate(imm, variant, insn);
+diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+index 2ff7c5e8efab..f130f35dca3c 100644
+--- a/arch/arm64/include/asm/cpucaps.h
++++ b/arch/arm64/include/asm/cpucaps.h
+@@ -32,7 +32,7 @@
+ #define ARM64_HAS_VIRT_HOST_EXTN		11
+ #define ARM64_WORKAROUND_CAVIUM_27456		12
+ #define ARM64_HAS_32BIT_EL0			13
+-#define ARM64_HYP_OFFSET_LOW			14
++/* #define ARM64_UNALLOCATED_ENTRY			14 */
+ #define ARM64_MISMATCHED_CACHE_LINE_SIZE	15
+ #define ARM64_HAS_NO_FPSIMD			16
+ #define ARM64_WORKAROUND_REPEAT_TLBI		17
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index c5ba0097887f..9eabceaaf5fb 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -824,19 +824,6 @@ static bool runs_at_el2(const struct arm64_cpu_capabilities *entry, int __unused
+ 	return is_kernel_in_hyp_mode();
  }
-+
-+u32 aarch64_insn_gen_extr(enum aarch64_insn_variant variant,
-+			  enum aarch64_insn_register Rm,
-+			  enum aarch64_insn_register Rn,
-+			  enum aarch64_insn_register Rd,
-+			  u8 lsb)
-+{
-+	u32 insn;
-+
-+	insn = aarch64_insn_get_extr_value();
-+
-+	switch (variant) {
-+	case AARCH64_INSN_VARIANT_32BIT:
-+		if (lsb > 31)
-+			return AARCH64_BREAK_FAULT;
-+		break;
-+	case AARCH64_INSN_VARIANT_64BIT:
-+		if (lsb > 63)
-+			return AARCH64_BREAK_FAULT;
-+		insn |= AARCH64_INSN_SF_BIT;
-+		insn = aarch64_insn_encode_immediate(AARCH64_INSN_IMM_N, insn, 1);
-+		break;
-+	default:
-+		pr_err("%s: unknown variant encoding %d\n", __func__, variant);
-+		return AARCH64_BREAK_FAULT;
-+	}
-+
-+	insn = aarch64_insn_encode_immediate(AARCH64_INSN_IMM_S, insn, lsb);
-+	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RD, insn, Rd);
-+	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RN, insn, Rn);
-+	return aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RM, insn, Rm);
-+}
+ 
+-static bool hyp_offset_low(const struct arm64_cpu_capabilities *entry,
+-			   int __unused)
+-{
+-	phys_addr_t idmap_addr = __pa_symbol(__hyp_idmap_text_start);
+-
+-	/*
+-	 * Activate the lower HYP offset only if:
+-	 * - the idmap doesn't clash with it,
+-	 * - the kernel is not running at EL2.
+-	 */
+-	return idmap_addr > GENMASK(VA_BITS - 2, 0) && !is_kernel_in_hyp_mode();
+-}
+-
+ static bool has_no_fpsimd(const struct arm64_cpu_capabilities *entry, int __unused)
+ {
+ 	u64 pfr0 = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
+@@ -925,12 +912,6 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.field_pos = ID_AA64PFR0_EL0_SHIFT,
+ 		.min_field_value = ID_AA64PFR0_EL0_32BIT_64BIT,
+ 	},
+-	{
+-		.desc = "Reduced HYP mapping offset",
+-		.capability = ARM64_HYP_OFFSET_LOW,
+-		.def_scope = SCOPE_SYSTEM,
+-		.matches = hyp_offset_low,
+-	},
+ 	{
+ 		/* FP/SIMD is not implemented */
+ 		.capability = ARM64_HAS_NO_FPSIMD,
 -- 
 2.14.2
