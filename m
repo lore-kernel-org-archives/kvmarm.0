@@ -1,108 +1,108 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v8 7/7] arm64: kvm: handle SError Interrupt by categorization
-Date: Wed, 06 Dec 2017 19:04:06 +0000
-Message-ID: <5A283F26.3020507@arm.com>
-References: <1510343650-23659-1-git-send-email-gengdongjiu@huawei.com> <1510343650-23659-8-git-send-email-gengdongjiu@huawei.com> <5A0B1334.7060500@arm.com> <4af78739-99da-4056-4db1-f80bfe11081a@huawei.com>
+From: Kees Cook <keescook@chromium.org>
+Subject: Re: [PATCH v5 15/30] arm64/sve: Signal handling support
+Date: Wed, 6 Dec 2017 11:56:50 -0800
+Message-ID: <CAGXu5jJgsAg1VBMbx=mV3ep4hzs+1G46Sow4eeFqCK31b_sORA@mail.gmail.com>
+References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com> <1509465082-30427-16-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <4af78739-99da-4056-4db1-f80bfe11081a@huawei.com>
-Sender: kvm-owner@vger.kernel.org
-To: gengdongjiu <gengdongjiu@huawei.com>
-Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, linux@armlinux.org.uk, bp@alien8.de, rjw@rjwysocki.net, pbonzini@redhat.com, rkrcmar@redhat.com, corbet@lwn.net, catalin.marinas@arm.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-acpi@vger.kernel.org, devel@acpica.org, huangshaoyu@huawei.com, wuquanming@huawei.com, linuxarm@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Return-path: <linux-arch-owner@vger.kernel.org>
+In-Reply-To: <1509465082-30427-16-git-send-email-Dave.Martin@arm.com>
+Sender: linux-arch-owner@vger.kernel.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-arch <linux-arch@vger.kernel.org>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha <libc-alpha@sourceware.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi gengdongjiu,
+On Tue, Oct 31, 2017 at 8:51 AM, Dave Martin <Dave.Martin@arm.com> wrote:
+> This patch implements support for saving and restoring the SVE
+> registers around signals.
+>
+> A fixed-size header struct sve_context is always included in the
+> signal frame encoding the thread's vector length at the time of
+> signal delivery, optionally followed by a variable-layout structure
+> encoding the SVE registers.
+>
+> Because of the need to preserve backwards compatibility, the FPSIMD
+> view of the SVE registers is always dumped as a struct
+> fpsimd_context in the usual way, in addition to any sve_context.
+>
+> The SVE vector registers are dumped in full, including bits 127:0
+> of each register which alias the corresponding FPSIMD vector
+> registers in the hardware.  To avoid any ambiguity about which
+> alias to restore during sigreturn, the kernel always restores bits
+> 127:0 of each SVE vector register from the fpsimd_context in the
+> signal frame (which must be present): userspace needs to take this
+> into account if it wants to modify the SVE vector register contents
+> on return from a signal.
+>
+> FPSR and FPCR, which are used by both FPSIMD and SVE, are not
+> included in sve_context because they are always present in
+> fpsimd_context anyway.
+>
+> For signal delivery, a new helper
+> fpsimd_signal_preserve_current_state() is added to update _both_
+> the FPSIMD and SVE views in the task struct, to make it easier to
+> populate this information into the signal frame.  Because of the
+> redundancy between the two views of the state, only one is updated
+> otherwise.
+>
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Cc: Will Deacon <will.deacon@arm.com>
+>
+> ---
+>
+> **Dropped** Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> (Non-trivial changes.)
+>
+> Changes since v4
+> ----------------
+>
+> Requested by Will Deacon:
+>
+>  * Fix inconsistent return semantics in restore_sve_fpsimd_context().
+>
+>    Currently a nonzero return value from __copy_from_user() is passed
+>    back as-is to the caller or restore_sve_fpsimd_context(), rather than
+>    translating it do an error code as is done elsewhere.
+>
+>    Callers of restore_sve_fpsimd_context() only care whether the return
+>    value is 0 or not, so this isn't a big deal, but it is more
+>    consistent to return proper error codes on failure in case we grow a
+>    use for them later.
+>
+>    This patch returns -EFAULT in the __copy_from_user() error cases
+>    that weren't explicitly handled.
+>
+> Miscellaneous:
+>
+>  * Change inconsistent copy_to_user() calls to __copy_to_user() in
+>    preserve_sve_context().
+>
+>    There are already __put_user_error() calls here.
+>
+>    The whole extended signal frame is already checked for
+>    access_ok(VERIFY_WRITE) in get_sigframe().
 
-On 06/12/17 10:26, gengdongjiu wrote:
-> On 2017/11/15 0:00, James Morse wrote:
->>> +		 * error has not been propagated
->>> +		 */
->>> +		run->exit_reason = KVM_EXIT_EXCEPTION;
->>> +		run->ex.exception = ESR_ELx_EC_SERROR;
->>> +		run->ex.error_code = KVM_SEI_SEV_RECOVERABLE;
->>> +		return 0;
->> We should not pass RAS notifications to user space. The kernel either handles
->> them, or it panics(). User space shouldn't even know if the kernel supports RAS
->> until it gets an MCEERR signal.
->>
->> You're making your firmware-first notification an EL3->EL0 signal, bypassing the OS.
->>
->> If we get a RAS SError and there are no CPER records or values in the ERR nodes,
->> we should panic as it looks like the CPU/firmware is broken. (spurious RAS errors)
+Verifying all these __copy_to/from_user() calls is rather non-trivial.
+For example, I had to understand that the access_ok() check actually
+spans memory that both user->sigframe and user->next_frame point into.
+And it isn't clear to me that all users of apply_user_offset() are
+within this range too, along with other manually calculated offsets in
+setup_sigframe().
 
-> do you think whether we need to set the guest ESR by user space?  if need, I need to
-> notify user space that there is a SError happen and need to set ESR for guest in some place of
-> KVM.
+And it's not clear if parse_user_sigframe() is safe either. Are
+user->fpsimd and user->sve checked somewhere? It seems like it's
+safely contained by in sf->uc.uc_mcontext.__reserved, but it's hard to
+read, though I do see access_ok() checks against __reserved at the end
+of the while loop.
 
-I think you are still coming from a world where user-space gets raw RAS
-notifications via KVM. This should not happen because the notification method is
-private to firmware and the kernel. KVM is just in the way when a guest is running.
+Can we just drop all the __... calls for the fully checked
+copy_to/from_user() instead?
 
-Notifications reaching KVM should be plumbed into the APEI-firmware-first-code
-or eventually, a kernel-first mechanism if APEI doesn't 'claim' them.
+-Kees
 
-The kernel RAS code may signal user-space with the symptoms of the error, and
-user-space may decided to generate a new RAS notification for the guest.
-
-This should function in exactly the same way, regardless of which notification
-method is in use between the kernel and firmware. (its the only way to make this
-future-proof).
-
-Which notification user-space chooses to use entirely depends on what (if
-anything) it advertised to the guest in the HEST. User-space has to be in
-control of triggering any SError, not just overriding the ESR when KVM has
-decided it wants to kill the guest.
-
-
-> so here I return a error code to user space. you mean we should not pass RAS notifications
-> to user space, so could you give some suggestion how to notify user space to set guest ESR.
-
-KVM shouldn't give the guest an SError when it takes a RAS notification, it
-should pass the notification to the kernel RAS code. It only needs to 'fall
-through' to some default cause if both APEI and kernel-first deny-all-knowledge
-of this notification.
-
-
-The end-to-end flow is then (assuming no-VHE):
-(1)An error occurs, taking the CPU to EL3.
-EL3: triage the error, generate CPER, notify the OS
-EL2: KVM takes the notification, exits the guest, returns to host EL1.
-EL1: KVM handle_exit() calls APEI to handle the error.
-This is the end of KVMs involvement in RAS - its just plumbing.
-
-(2)APEI processes the CPER records and signals affected processes.
-If KVM's user-space is affected, KVM will spot the pending signal when it goes
-to re-enter the guest, and exit to user-space instead.
-Qemu takes the SIGBUS_MCEERR_A{O,R}.
-
-(3) Qemu decides it wants to hand the guest a RAS error, it populates the CPER
-records (in memory only Qemu knows about), then drives the KVM API to make the
-appropriate notification appear.
-
-
-(1) only happens if the guest was running when the error arrived. GHES has ~4
-flavours of IRQ which may be used to describe corruption in guest memory. Steps
-(2) and (3) are exactly the same in this case.
-
-Qemu may decide to trigger RAS errors all by itself, (probably for testing and
-debugging), in which case (1) and (2) don't happen, but (3), is exactly the same.
-
-
-This way platform-firmware/host-kernel can use kernel-first or firmware-first
-with any of the notifications, independently from Qemu/guest-kernel making a
-different kernel-first or firmware-first with different notifications.
-
-Passing information out of KVM breaks this, forcing Qemu to know about the
-mechanism platform-firmware is using.
-
-
-We need to tackle (1) and (3) separately. For (3) we need some API that lets
-Qemu _trigger_ an SError in the guest, with a specified ESR. But, we don't have
-a way of migrating pending SError yet... which is where I got stuck last time I
-was looking at this.
-
-
-
-James
+--=20
+Kees Cook
+Pixel Security
