@@ -1,22 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH 1/3] arm64: fpsimd: Prevent registers leaking from dead tasks
-Date: Wed,  6 Dec 2017 16:45:45 +0000
-Message-ID: <1512578747-4554-2-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH 2/3] arm64: fpsimd: Abstract out binding of task's fpsimd
+ context to the cpu.
+Date: Wed,  6 Dec 2017 16:45:46 +0000
+Message-ID: <1512578747-4554-3-git-send-email-Dave.Martin@arm.com>
 References: <1512578747-4554-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C79749D4F
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Dec 2017 11:42:42 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 004F040651
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Dec 2017 11:42:43 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DUS2j-ypOIzy for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 Dec 2017 11:42:41 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 47A2140651
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Dec 2017 11:42:41 -0500 (EST)
+ with ESMTP id kxT4giu5qje3 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Dec 2017 11:42:42 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A46649D7F
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Dec 2017 11:42:42 -0500 (EST)
 In-Reply-To: <1512578747-4554-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,89 +32,70 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Currently, loading of a task's fpsimd state into the CPU registers
-is skipped if that task's state is already present in the registers
-of that CPU.
+There is currently some duplicate logic to associate current's
+FPSIMD context with the cpu when loading FPSIMD state into the cpu
+regs.
 
-However, the code relies on the struct fpsimd_state * (and by
-extension struct task_struct *) to unambiguously identify a task.
+Subsequent patches will update that logic, so in order to ensure it
+only needs to be done in one place, this patch factors the relevant
+code out into a new function fpsimd_bind_to_cpu().
 
-There is a particular case in which this doesn't work reliably:
-when a task exits, its task_struct may be recycled to describe a
-new task.
-
-Consider the following scenario:
-
- 1) Task P loads its fpsimd state onto cpu C.
-        per_cpu(fpsimd_last_state, C) := P;
-        P->thread.fpsimd_state.cpu := C;
-
- 2) Task X is scheduled onto C and loads its fpsimd state on C.
-        per_cpu(fpsimd_last_state, C) := X;
-        X->thread.fpsimd_state.cpu := C;
-
- 3) X exits, causing X's task_struct to be freed.
-
- 4) P forks a new child T, which obtains X's recycled task_struct.
-	T == X.
-	T->thread.fpsimd_state.cpu == C (inherited from P).
-
- 5) T is scheduled on C.
-	T's fpsimd state is not loaded, because
-	per_cpu(fpsimd_last_state, C) == T (== X) &&
-	T->thread.fpsimd_state.cpu == C.
-
-        (This is the check performed by fpsimd_thread_switch().)
-
-So, T gets X's registers because the last registers loaded onto C
-were those of X, in (2).
-
-This patch fixes the problem by ensuring that the sched-in check
-fails in (5): fpsimd_flush_task_state(T) is called when T is
-forked, so that T->thread.fpsimd_state.cpu == C cannot be true.
-This relies on the fact that T is not schedulable until after
-copy_thread() completes.
-
-Once T's fpsimd state has been loaded on some CPU C there may still
-be other cpus D for which per_cpu(fpsimd_last_state, D) ==
-&X->thread.fpsimd_state.  But D is necessarily != C in this case,
-and the check in (5) must fail.
-
-An alternative fix would be to do refcounting on task_struct.  This
-would result in each CPU holding a reference to the last task whose
-fpsimd state was loaded there.  It's not clear whether this is
-preferable, and it involves higher overhead than the fix proposed
-in this patch.  It would also move all the task_struct freeing work
-into the context switch critical section, or otherwise some
-deferred cleanup mechanism would need to be introduced, neither of
-which seems obviously justified.
-
-Fixes: 005f78cd8849 ("arm64: defer reloading a task's FPSIMD state to userland resume")
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/kernel/process.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ arch/arm64/kernel/fpsimd.c | 25 +++++++++++++++----------
+ 1 file changed, 15 insertions(+), 10 deletions(-)
 
-diff --git a/arch/arm64/kernel/process.c b/arch/arm64/kernel/process.c
-index b2adcce..1ecf5cc 100644
---- a/arch/arm64/kernel/process.c
-+++ b/arch/arm64/kernel/process.c
-@@ -314,6 +314,15 @@ int copy_thread(unsigned long clone_flags, unsigned long stack_start,
- 	clear_tsk_thread_flag(p, TIF_SVE);
- 	p->thread.sve_state = NULL;
+diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+index 143b3e7..007140b 100644
+--- a/arch/arm64/kernel/fpsimd.c
++++ b/arch/arm64/kernel/fpsimd.c
+@@ -992,6 +992,18 @@ void fpsimd_signal_preserve_current_state(void)
+ }
  
-+	/*
-+	 * In case p was allocated the same task_struct pointer as some
-+	 * other recently-exited task, make sure p is disassociated from
-+	 * any cpu that may have run that such a task recently.
-+	 * Otherwise we could erroneously skip reloading the FPSIMD
-+	 * registers p.
-+	 */
-+	fpsimd_flush_task_state(p);
+ /*
++ * Associate current's FPSIMD context with this cpu
++ * Preemption must be disabled when calling this function.
++ */
++static void fpsimd_bind_to_cpu(void)
++{
++	struct fpsimd_state *st = &current->thread.fpsimd_state;
 +
- 	if (likely(!(p->flags & PF_KTHREAD))) {
- 		*childregs = *current_pt_regs();
- 		childregs->regs[0] = 0;
++	__this_cpu_write(fpsimd_last_state, st);
++	st->cpu = smp_processor_id();
++}
++
++/*
+  * Load the userland FPSIMD state of 'current' from memory, but only if the
+  * FPSIMD state already held in the registers is /not/ the most recent FPSIMD
+  * state of 'current'
+@@ -1004,11 +1016,8 @@ void fpsimd_restore_current_state(void)
+ 	local_bh_disable();
+ 
+ 	if (test_and_clear_thread_flag(TIF_FOREIGN_FPSTATE)) {
+-		struct fpsimd_state *st = &current->thread.fpsimd_state;
+-
+ 		task_fpsimd_load();
+-		__this_cpu_write(fpsimd_last_state, st);
+-		st->cpu = smp_processor_id();
++		fpsimd_bind_to_cpu();
+ 	}
+ 
+ 	local_bh_enable();
+@@ -1032,12 +1041,8 @@ void fpsimd_update_current_state(struct fpsimd_state *state)
+ 	}
+ 	task_fpsimd_load();
+ 
+-	if (test_and_clear_thread_flag(TIF_FOREIGN_FPSTATE)) {
+-		struct fpsimd_state *st = &current->thread.fpsimd_state;
+-
+-		__this_cpu_write(fpsimd_last_state, st);
+-		st->cpu = smp_processor_id();
+-	}
++	if (test_and_clear_thread_flag(TIF_FOREIGN_FPSTATE))
++		fpsimd_bind_to_cpu();
+ 
+ 	local_bh_enable();
+ }
 -- 
 2.1.4
