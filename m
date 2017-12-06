@@ -1,115 +1,198 @@
-From: Jeff Kirsher <jeffrey.t.kirsher-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Subject: Re: [Intel-wired-lan] [PATCH 1/1] timecounter: Make cyclecounter
- struct part of timecounter struct
-Date: Wed, 06 Dec 2017 08:24:56 -0800
-Message-ID: <1512577496.8693.0.camel@intel.com>
-References: <1512189095-28654-1-git-send-email-sagar.a.kamble@intel.com>
-Reply-To: jeffrey.t.kirsher-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v6 7/8] KVM: arm/arm64: Provide a get_input_level for the
+ arch timer
+Date: Wed, 6 Dec 2017 17:38:46 +0100
+Message-ID: <20171206163846.GN32397@cbox>
+References: <20171204200506.3224-1-cdall@kernel.org>
+ <20171204200506.3224-8-cdall@kernel.org>
+ <20171205152446.rcmkowdnuhkqbrdb@yury-thinkpad>
+ <20171206105904.GM32397@cbox>
+ <20171206141728.mmjp6x4ksyhdvjmv@yury-thinkpad>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg="pgp-sha256";
-        protocol="application/pgp-signature"; boundary="=-AYN6I3A77kR9u855MsqY"
-Return-path: <linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1512189095-28654-1-git-send-email-sagar.a.kamble-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Sender: linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Sagar Arun Kamble <sagar.a.kamble-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Cc: alsa-devel-K7yf7f+aM1XWsZ/bQMPhNw@public.gmane.org, linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Richard Cochran <richardcochran-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Stephen Boyd <sboyd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>, Chris Wilson <chris-Y6uKTt2uX1cEflXRtASbqLVCufUGDwFn@public.gmane.org>, John Stultz <john.stultz-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, intel-wired-lan-qjLDD68F18P21nG7glBr7A@public.gmane.org, Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20171206141728.mmjp6x4ksyhdvjmv@yury-thinkpad>
+Sender: kvm-owner@vger.kernel.org
+To: Yury Norov <ynorov@caviumnetworks.com>
+Cc: Christoffer Dall <cdall@kernel.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, Eric Auger <eric.auger@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On Wed, Dec 06, 2017 at 05:17:28PM +0300, Yury Norov wrote:
+> On Wed, Dec 06, 2017 at 11:59:04AM +0100, Christoffer Dall wrote:
+> > On Tue, Dec 05, 2017 at 06:24:46PM +0300, Yury Norov wrote:
+> > > On Mon, Dec 04, 2017 at 09:05:05PM +0100, Christoffer Dall wrote:
+> > > > From: Christoffer Dall <christoffer.dall@linaro.org>
+> > > > 
+> > > > The VGIC can now support the life-cycle of mapped level-triggered
+> > > > interrupts, and we no longer have to read back the timer state on every
+> > > > exit from the VM if we had an asserted timer interrupt signal, because
+> > > > the VGIC already knows if we hit the unlikely case where the guest
+> > > > disables the timer without ACKing the virtual timer interrupt.
+> > > > 
+> > > > This means we rework a bit of the code to factor out the functionality
+> > > > to snapshot the timer state from vtimer_save_state(), and we can reuse
+> > > > this functionality in the sync path when we have an irqchip in
+> > > > userspace, and also to support our implementation of the
+> > > > get_input_level() function for the timer.
+> > > > 
+> > > > This change also means that we can no longer rely on the timer's view of
+> > > > the interrupt line to set the active state, because we no longer
+> > > > maintain this state for mapped interrupts when exiting from the guest.
+> > > > Instead, we only set the active state if the virtual interrupt is
+> > > > active, and otherwise we simply let the timer fire again and raise the
+> > > > virtual interrupt from the ISR.
+> > > > 
+> > > > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> > > > ---
+> > > >  include/kvm/arm_arch_timer.h |  2 ++
+> > > >  virt/kvm/arm/arch_timer.c    | 75 +++++++++++++++++++++-----------------------
+> > > >  2 files changed, 38 insertions(+), 39 deletions(-)
+> > > > 
+> > > > diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+> > > > index 01ee473517e2..f57f795d704c 100644
+> > > > --- a/include/kvm/arm_arch_timer.h
+> > > > +++ b/include/kvm/arm_arch_timer.h
+> > > > @@ -90,6 +90,8 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu);
+> > > >  
+> > > >  void kvm_timer_init_vhe(void);
+> > > >  
+> > > > +bool kvm_arch_timer_get_input_level(int vintid);
+> > > > +
+> > > >  #define vcpu_vtimer(v)	(&(v)->arch.timer_cpu.vtimer)
+> > > >  #define vcpu_ptimer(v)	(&(v)->arch.timer_cpu.ptimer)
+> > > >  
+> > > 
+> > > [...]
+> > > 
+> > > > +bool kvm_arch_timer_get_input_level(int vintid)
+> > > > +{
+> > > > +	struct kvm_vcpu *vcpu = kvm_arm_get_running_vcpu();
+> > > > +	struct arch_timer_context *timer;
+> > > > +
+> > > > +	if (vintid == vcpu_vtimer(vcpu)->irq.irq)
+> > > > +		timer = vcpu_vtimer(vcpu);
+> > > > +	else
+> > > > +		BUG() We only map the vtimer so far */
+> > > > +
+> > > > +	if (timer->loaded)
+> > > > +		__timer_snapshot_state(timer);
+> > > > +
+> > > > +	return kvm_timer_should_fire(timer);
+> > > > +}
+> > > 
+> > > I think it worth to reword to highlight your intention about BUG,
+> > > and save 1 call to vcpu_vtimer()
+> > > 
+> > > bool kvm_arch_timer_get_input_level(int vintid)
+> > > {
+> > > 	struct kvm_vcpu *vcpu = kvm_arm_get_running_vcpu();
+> > > 	struct arch_timer_context *timer = vcpu_vtimer(vcpu);
+> > > 
+> > >         /* We only map the vtimer so far */
+> > > 	BUG_ON(vintid != timer->irq.irq)
+> > > 
+> > > 	if (timer->loaded)
+> > > 		__timer_snapshot_state(timer);
+> > > 
+> > > 	return kvm_timer_should_fire(timer);
+> > > }
+> > > 
+> > 
+> > Besides the incredible bikesheding nature of your comments, I disagree.
+> > The current code suggests where to add functionality once we move to
+> > using the physical timer hardware to drive an EL1 physical timer on VHE
+> > systems, and is purposely written this way.
+> > 
+> > I'm sure we have real bugs and real issues in the code, perhaps you
+> > could spend your energy looking for those, and if you cannot find any,
+> > then provide a reviewed-by instead of these pointless cosmetic
+> > adjustments.
+> 
+> OK. I understood. Let me elaborate.
+> 
+> 0. As you say in patch 0, This series is based on 4.15-rc, so I decided that
+> the code above is assumed to be release version. You may change it in
+> future, or may not, but the code will exist as is in mainline kernel for
+> some time, right?
 
---=-AYN6I3A77kR9u855MsqY
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+When the code is properly reviewed and nobody raises relevant
+objections, the maintainers of the subsystem can merge the code.
 
-On Sat, 2017-12-02 at 10:01 +0530, Sagar Arun Kamble wrote:
-> There is no real need for the users of timecounters to define
-> cyclecounter
-> and timecounter variables separately. Since timecounter will always
-> be
-> based on cyclecounter, have cyclecounter struct as member of
-> timecounter
-> struct.
->=20
-> Suggested-by: Chris Wilson <chris-Y6uKTt2uX1cEflXRtASbqLVCufUGDwFn@public.gmane.org>
-> Signed-off-by: Sagar Arun Kamble <sagar.a.kamble-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-> Cc: Chris Wilson <chris-Y6uKTt2uX1cEflXRtASbqLVCufUGDwFn@public.gmane.org>
-> Cc: Richard Cochran <richardcochran-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> Cc: John Stultz <john.stultz-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-> Cc: Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>
-> Cc: Stephen Boyd <sboyd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-> Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> Cc: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-> Cc: netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> Cc: intel-wired-lan-qjLDD68F18P21nG7glBr7A@public.gmane.org
-> Cc: linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> Cc: alsa-devel-K7yf7f+aM1XWsZ/bQMPhNw@public.gmane.org
-> Cc: kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
+> 
+> 1. BUG() is needed to kill system, and it really kills it. This is wrong
+> to kill system in else-branch of some minor helper due to unimplemented
+> feature. You should use pr_err() or WARN_ON() instead. The best - return
+> reasonable error and do everything possible on upper levels to keep system
+> alive. What's really wrong in my comment is that I didn't suggest you switch
+> to WARN_ON().
+> 
 
-Acked-by: Jeff Kirsher <jeffrey.t.kirsher-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+You're missing a key point.  If the system can reasonably recover from a
+failure or some condition, it's definitely preferred to use a print or a
+warning.
 
-For the changes to the Intel drivers.
+However, if an internal function is called with an unsupported value,
+when managing the operation of hardware, the most sane thing to do is to
+panic, because the system is in an enitrely unsupported state.
 
-> ---
->  arch/microblaze/kernel/timer.c                     | 20 ++++++------
->  drivers/clocksource/arm_arch_timer.c               | 19 ++++++------
->  drivers/net/ethernet/amd/xgbe/xgbe-dev.c           |  3 +-
->  drivers/net/ethernet/amd/xgbe/xgbe-ptp.c           |  9 +++---
->  drivers/net/ethernet/amd/xgbe/xgbe.h               |  1 -
->  drivers/net/ethernet/broadcom/bnx2x/bnx2x.h        |  1 -
->  drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c   | 20 ++++++------
->  drivers/net/ethernet/freescale/fec.h               |  1 -
->  drivers/net/ethernet/freescale/fec_ptp.c           | 30 +++++++++---
-> ------
->  drivers/net/ethernet/intel/e1000e/e1000.h          |  1 -
->  drivers/net/ethernet/intel/e1000e/netdev.c         | 27 ++++++++--
-> ------
->  drivers/net/ethernet/intel/e1000e/ptp.c            |  2 +-
->  drivers/net/ethernet/intel/igb/igb.h               |  1 -
->  drivers/net/ethernet/intel/igb/igb_ptp.c           | 25 ++++++++--
-> -----
->  drivers/net/ethernet/intel/ixgbe/ixgbe.h           |  1 -
->  drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c       | 17 +++++-----
->  drivers/net/ethernet/mellanox/mlx4/en_clock.c      | 28 ++++++++--
-> -------
->  drivers/net/ethernet/mellanox/mlx4/mlx4_en.h       |  1 -
->  .../net/ethernet/mellanox/mlx5/core/lib/clock.c    | 34 ++++++++++
-> ----------
->  drivers/net/ethernet/qlogic/qede/qede_ptp.c        | 20 ++++++------
->  drivers/net/ethernet/ti/cpts.c                     | 36
-> ++++++++++++----------
->  drivers/net/ethernet/ti/cpts.h                     |  1 -
->  include/linux/mlx5/driver.h                        |  1 -
->  include/linux/timecounter.h                        |  4 +--
->  include/sound/hdaudio.h                            |  1 -
->  kernel/time/timecounter.c                          | 28 ++++++++--
-> -------
->  sound/hda/hdac_stream.c                            |  7 +++--
->  virt/kvm/arm/arch_timer.c                          |  6 ++--
->  28 files changed, 163 insertions(+), 182 deletions(-)
---=-AYN6I3A77kR9u855MsqY
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
+> 
+> 2. Calling the same function with the same argument twice in code path is
+> also an issue. Besides the nasty feeling of that code, it might be dangerous.
+> The most obvious scenario is when it returns different values due to change
+> of internal state. I realize that vcpu_vtimer() is just a pointer dereference.
+> But it may bite you painfully as well. I know it for sure because it bitten
+> me once. Consider racing scenario in this patch:
+> https://patchwork.kernel.org/patch/9974327/
 
------BEGIN PGP SIGNATURE-----
+Seriously, what make you think I need a programming lesson from you?
 
-iQIzBAABCAAdFiEEiTyZWz+nnTrOJ1LZ5W/vlVpL7c4FAlooGdgACgkQ5W/vlVpL
-7c7J0Q/9HHk6upECLnqxfft9A4opsw2bj4joMDVrmj4+wvdSrNvrbzQAJPwEl3El
-fWwGBKNKmNyGjNa9dpEnactZ2xBtTLk9I9j1RvhdCS8JbQ8DYwxtlb9hAw6dk60z
-/gn5M+pcYi7is5wNvZqMA81Ocek0QSi8Egnz3TLh+voV5g5opi7u/VdlsiczBAUo
-fH+lqWPTSL4i19swopOjZdAYNKLqWMDeP40L8Zsbb5ZtNrib+8YAb82YuP1Tw+eQ
-6jbHZFp5iB+WBRHo8xZ3QzENh9XdHoTmcX3tAUPRcqy9dJozsmXdIEJiJk7qNjgz
-6XwtGJIle6jDXg9HOzkV8/2dv2v1J6CR0UAK0KsXQWhYKVBSN2Uj4gqxWuLczpcI
-mHJ7MKWU9QnvcQEcVfQwO1b2y+reSjGyz9ABz5J6VwnvT+8Pcn2oPAIsOuVvRuJs
-6tIRAinKealwOv8oRZ97zhoPTM+Sf4OC803GxHtwZ56jNRId6nSUbq2+qyJBwK1R
-a7QLLkNdDIN6nt2VP6yywd+HrYtBo9CtJgS+mVNm6QhsTC4/wHGNeMLnjZ5i0LEW
-J7gDCG78Wgrd6UoaZx6afq1S8rXvWBzFt9LEnHrcEezlMehbmYHdWajSWLZ6d7YD
-Bq+D+QpbdGhyKIWEfspq1unwyw8CNCPAzKvb6w+hEdebk0Ia9Fc=
-=rvB5
------END PGP SIGNATURE-----
+You are taking a specific lesson and generalizing it, and then applying
+it to a piece of code you admit to not understanding.  This is not
+helpful.
 
---=-AYN6I3A77kR9u855MsqY--
+I really don't care about your nasty feelings at this point, and
+claiming that calling the same function twice is in general a problem is
+a ridiculous statement.
 
---
-To unsubscribe from this list: send the line "unsubscribe linux-rdma" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+> It may never become the problem, or may become one day. But fix is
+> clear and obvious - why not taking it?
+
+I think I've answered this already, but that's because this function
+will eventually become:
+
+bool kvm_arch_timer_get_input_level(int vintid)
+{
+	struct kvm_vcpu *vcpu = kvm_arm_get_running_vcpu();
+	struct arch_timer_context *timer;
+
+	if (vintid == vcpu_vtimer(vcpu)->irq.irq)
+		timer = vcpu_vtimer(vcpu);
+	else
+		timer = vcpu_ptimer(vcpu);
+
+	if (timer->loaded)
+		__timer_snapshot_state(timer);
+
+	return kvm_timer_should_fire(timer);
+}
+
+> 
+> 3. I will be really happy to provide tested-by and reviewed-by. But
+> for doing that I need to actually test and review. It would be extremely
+> helpful if you share your testing modules and scripts. I have access
+> to several Cavium machines and can do before/after measurements. Right
+> now I have few tests, but kvm is very complex system, and I'm not sure I
+> measure what I'm actually going to. Guidance from KVM experts is what
+> really lacks. 
+> 
+
+If you don't understand what KVM is and how to use it, I'm afraid your
+input is not very valuable.
+
+Until you change your attitude and make some attempt to understand how
+we work, and try to actually understand the code you comment on, I'll be
+inclined to ignore future posting from you.
+
+-Christoffer
