@@ -1,62 +1,69 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v2 18/36] KVM: arm/arm64: Remove leftover comment from
- kvm_vcpu_run_vhe
-Date: Thu,  7 Dec 2017 18:06:12 +0100
-Message-ID: <20171207170630.592-19-christoffer.dall@linaro.org>
+Subject: [PATCH v2 16/36] KVM: arm64: Rewrite sysreg alternatives to static keys
+Date: Thu,  7 Dec 2017 18:06:10 +0100
+Message-ID: <20171207170630.592-17-christoffer.dall@linaro.org>
 References: <20171207170630.592-1-christoffer.dall@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0738C49DAD
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Dec 2017 12:03:56 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mvwtjJdITBlt for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 Dec 2017 12:03:55 -0500 (EST)
-Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9A8FF49D51
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Dec 2017 12:03:54 -0500 (EST)
-Received: by mail-wm0-f68.google.com with SMTP id b76so14241988wmg.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 07 Dec 2017 09:07:10 -0800 (PST)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20171207170630.592-1-christoffer.dall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The comment only applied to SPE on non-VHE systems, so we simply remove
-it.
+As we are about to move calls around in the sysreg save/restore logic,
+let's first rewrite the alternative function callers, because it is
+going to make the next patches much easier to read.
 
-Suggested-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/kvm/hyp/switch.c | 4 ----
- 1 file changed, 4 deletions(-)
+ arch/arm64/kvm/hyp/sysreg-sr.c | 17 ++++-------------
+ 1 file changed, 4 insertions(+), 13 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 13c990c6eb64..9e5bc490ef0f 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -382,10 +382,6 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index bbfb4d01af88..e747f2fd31be 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -22,9 +22,6 @@
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_hyp.h>
  
- 	sysreg_restore_host_state_vhe(host_ctxt);
+-/* Yes, this does nothing, on purpose */
+-static void __hyp_text __sysreg_do_nothing(struct kvm_cpu_context *ctxt) { }
+-
+ /*
+  * Non-VHE: Both host and guest must save everything.
+  *
+@@ -78,13 +75,10 @@ static void __hyp_text __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+ 	ctxt->gp_regs.regs.pstate	= read_sysreg_el2(spsr);
+ }
  
--	/*
--	 * This must come after restoring the host sysregs, since a non-VHE
--	 * system may enable SPE here and make use of the TTBRs.
--	 */
- 	__debug_switch_to_host(vcpu);
+-static hyp_alternate_select(__sysreg_call_save_host_state,
+-			    __sysreg_save_el1_state, __sysreg_do_nothing,
+-			    ARM64_HAS_VIRT_HOST_EXTN);
+-
+ void __hyp_text __sysreg_save_host_state(struct kvm_cpu_context *ctxt)
+ {
+-	__sysreg_call_save_host_state()(ctxt);
++	if (!has_vhe())
++		__sysreg_save_el1_state(ctxt);
+ 	__sysreg_save_common_state(ctxt);
+ 	__sysreg_save_user_state(ctxt);
+ }
+@@ -142,13 +136,10 @@ static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+ 	write_sysreg_el2(ctxt->gp_regs.regs.pstate,	spsr);
+ }
  
- 	return exit_code;
+-static hyp_alternate_select(__sysreg_call_restore_host_state,
+-			    __sysreg_restore_el1_state, __sysreg_do_nothing,
+-			    ARM64_HAS_VIRT_HOST_EXTN);
+-
+ void __hyp_text __sysreg_restore_host_state(struct kvm_cpu_context *ctxt)
+ {
+-	__sysreg_call_restore_host_state()(ctxt);
++	if (!has_vhe())
++		__sysreg_restore_el1_state(ctxt);
+ 	__sysreg_restore_common_state(ctxt);
+ 	__sysreg_restore_user_state(ctxt);
+ }
 -- 
 2.14.2
