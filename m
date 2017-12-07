@@ -1,219 +1,77 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v7 6/8] KVM: arm/arm64: Support VGIC dist pend/active changes for mapped IRQs
-Date: Thu,  7 Dec 2017 11:54:16 +0100
-Message-ID: <20171207105418.22428-7-christoffer.dall@linaro.org>
-References: <20171207105418.22428-1-christoffer.dall@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20171207105418.22428-1-christoffer.dall@linaro.org>
-Sender: kvm-owner@vger.kernel.org
-To: kvmarm@lists.cs.columbia.edu
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, Eric Auger <eric.auger@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH] KVM: arm/arm64: Fix HYP unmapping going off limits
+Date: Thu,  7 Dec 2017 11:45:45 +0000
+Message-ID: <20171207114545.23845-1-marc.zyngier@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 42A3D49D35
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Dec 2017 06:42:38 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id wm1an1cJecJV for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 Dec 2017 06:42:37 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A17449D20
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Dec 2017 06:42:37 -0500 (EST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Andre Przywara <Andre.Przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-For mapped IRQs (with the HW bit set in the LR) we have to follow some
-rules of the architecture.  One of these rules is that VM must not be
-allowed to deactivate a virtual interrupt with the HW bit set unless the
-physical interrupt is also active.
+When we unmap the HYP memory, we try to be clever and unmap one
+PGD at a time. If we start with a non-PGD aligned address and try
+to unmap a whole PGD, things go horribly wrong in unmap_hyp_range
+(addr and end can never match, and it all goes really badly as we
+keep incrementing pgd and parse random memory as page tables...).
 
-This works fine when injecting mapped interrupts, because we leave it up
-to the injector to either set EOImode==1 or manually set the active
-state of the physical interrupt.
+The obvious fix is to let unmap_hyp_range do what it does best,
+which is to iterate over a range.
 
-However, the guest can set virtual interrupt to be pending or active by
-writing to the virtual distributor, which could lead to deactivating a
-virtual interrupt with the HW bit set without the physical interrupt
-being active.
-
-We could set the physical interrupt to active whenever we are about to
-enter the VM with a HW interrupt either pending or active, but that
-would be really slow, especially on GICv2.  So we take the long way
-around and do the hard work when needed, which is expected to be
-extremely rare.
-
-When the VM sets the pending state for a HW interrupt on the virtual
-distributor we set the active state on the physical distributor, because
-the virtual interrupt can become active and then the guest can
-deactivate it.
-
-When the VM clears the pending state we also clear it on the physical
-side, because the injector might otherwise raise the interrupt.  We also
-clear the physical active state when the virtual interrupt is not
-active, since otherwise a SPEND/CPEND sequence from the guest would
-prevent signaling of future interrupts.
-
-Changing the state of mapped interrupts from userspace is not supported,
-and it's expected that userspace unmaps devices from VFIO before
-attempting to set the interrupt state, because the interrupt state is
-driven by hardware.
-
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: stable@vger.kernel.org
+Reported-by: Andre Przywara <andre.przywara@arm.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-mmio.c | 71 +++++++++++++++++++++++++++++++++++++++----
- virt/kvm/arm/vgic/vgic.c      |  7 +++++
- virt/kvm/arm/vgic/vgic.h      |  1 +
- 3 files changed, 73 insertions(+), 6 deletions(-)
+ virt/kvm/arm/mmu.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index fdad95f62fa3..83d82bd7dc4e 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -16,6 +16,7 @@
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
- #include <kvm/iodev.h>
-+#include <kvm/arm_arch_timer.h>
- #include <kvm/arm_vgic.h>
- 
- #include "vgic.h"
-@@ -143,10 +144,22 @@ static struct kvm_vcpu *vgic_get_mmio_requester_vcpu(void)
- 	return vcpu;
- }
- 
-+/* Must be called with irq->irq_lock held */
-+static void vgic_hw_irq_spending(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
-+				 bool is_uaccess)
-+{
-+	if (is_uaccess)
-+		return;
-+
-+	irq->pending_latch = true;
-+	vgic_irq_set_phys_active(irq, true);
-+}
-+
- void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
- 			      gpa_t addr, unsigned int len,
- 			      unsigned long val)
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index b36945d49986..b4b69c2d1012 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -509,8 +509,6 @@ static void unmap_hyp_range(pgd_t *pgdp, phys_addr_t start, u64 size)
+  */
+ void free_hyp_pgds(void)
  {
-+	bool is_uaccess = !vgic_get_mmio_requester_vcpu();
- 	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
- 	int i;
- 	unsigned long flags;
-@@ -155,17 +168,45 @@ void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
- 		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
- 
- 		spin_lock_irqsave(&irq->irq_lock, flags);
--		irq->pending_latch = true;
+-	unsigned long addr;
 -
-+		if (irq->hw)
-+			vgic_hw_irq_spending(vcpu, irq, is_uaccess);
-+		else
-+			irq->pending_latch = true;
- 		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
- 		vgic_put_irq(vcpu->kvm, irq);
- 	}
- }
+ 	mutex_lock(&kvm_hyp_pgd_mutex);
  
-+/* Must be called with irq->irq_lock held */
-+static void vgic_hw_irq_cpending(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
-+				 bool is_uaccess)
-+{
-+	if (is_uaccess)
-+		return;
-+
-+	irq->pending_latch = false;
-+
-+	/*
-+	 * We don't want the guest to effectively mask the physical
-+	 * interrupt by doing a write to SPENDR followed by a write to
-+	 * CPENDR for HW interrupts, so we clear the active state on
-+	 * the physical side if the virtual interrupt is not active.
-+	 * This may lead to taking an additional interrupt on the
-+	 * host, but that should not be a problem as the worst that
-+	 * can happen is an additional vgic injection.  We also clear
-+	 * the pending state to maintain proper semantics for edge HW
-+	 * interrupts.
-+	 */
-+	vgic_irq_set_phys_pending(irq, false);
-+	if (!irq->active)
-+		vgic_irq_set_phys_active(irq, false);
-+}
-+
- void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
- 			      gpa_t addr, unsigned int len,
- 			      unsigned long val)
- {
-+	bool is_uaccess = !vgic_get_mmio_requester_vcpu();
- 	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
- 	int i;
- 	unsigned long flags;
-@@ -175,7 +216,10 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
+ 	if (boot_hyp_pgd) {
+@@ -521,10 +519,10 @@ void free_hyp_pgds(void)
  
- 		spin_lock_irqsave(&irq->irq_lock, flags);
+ 	if (hyp_pgd) {
+ 		unmap_hyp_range(hyp_pgd, hyp_idmap_start, PAGE_SIZE);
+-		for (addr = PAGE_OFFSET; virt_addr_valid(addr); addr += PGDIR_SIZE)
+-			unmap_hyp_range(hyp_pgd, kern_hyp_va(addr), PGDIR_SIZE);
+-		for (addr = VMALLOC_START; is_vmalloc_addr((void*)addr); addr += PGDIR_SIZE)
+-			unmap_hyp_range(hyp_pgd, kern_hyp_va(addr), PGDIR_SIZE);
++		unmap_hyp_range(hyp_pgd, kern_hyp_va(PAGE_OFFSET),
++				(uintptr_t)high_memory - PAGE_OFFSET);
++		unmap_hyp_range(hyp_pgd, kern_hyp_va(VMALLOC_START),
++				VMALLOC_END - VMALLOC_START);
  
--		irq->pending_latch = false;
-+		if (irq->hw)
-+			vgic_hw_irq_cpending(vcpu, irq, is_uaccess);
-+		else
-+			irq->pending_latch = false;
- 
- 		spin_unlock_irqrestore(&irq->irq_lock, flags);
- 		vgic_put_irq(vcpu->kvm, irq);
-@@ -202,8 +246,19 @@ unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
- 	return value;
- }
- 
-+/* Must be called with irq->irq_lock held */
-+static void vgic_hw_irq_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
-+				      bool active, bool is_uaccess)
-+{
-+	if (is_uaccess)
-+		return;
-+
-+	irq->active = active;
-+	vgic_irq_set_phys_active(irq, active);
-+}
-+
- static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
--				    bool new_active_state)
-+				    bool active)
- {
- 	unsigned long flags;
- 	struct kvm_vcpu *requester_vcpu = vgic_get_mmio_requester_vcpu();
-@@ -231,8 +286,12 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
- 	       irq->vcpu->cpu != -1) /* VCPU thread is running */
- 		cond_resched_lock(&irq->irq_lock);
- 
--	irq->active = new_active_state;
--	if (new_active_state)
-+	if (irq->hw)
-+		vgic_hw_irq_change_active(vcpu, irq, active, !requester_vcpu);
-+	else
-+		irq->active = active;
-+
-+	if (irq->active)
- 		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
- 	else
- 		spin_unlock_irqrestore(&irq->irq_lock, flags);
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index eadabb249d2a..f4c92fae9cd3 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -144,6 +144,13 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
- 	kfree(irq);
- }
- 
-+void vgic_irq_set_phys_pending(struct vgic_irq *irq, bool pending)
-+{
-+	WARN_ON(irq_set_irqchip_state(irq->host_irq,
-+				      IRQCHIP_STATE_PENDING,
-+				      pending));
-+}
-+
- /* Get the input level of a mapped IRQ directly from the physical GIC */
- bool vgic_get_phys_line_level(struct vgic_irq *irq)
- {
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index d0787983a357..12c37b89f7a3 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -146,6 +146,7 @@ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
- 			      u32 intid);
- void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq);
- bool vgic_get_phys_line_level(struct vgic_irq *irq);
-+void vgic_irq_set_phys_pending(struct vgic_irq *irq, bool pending);
- void vgic_irq_set_phys_active(struct vgic_irq *irq, bool active);
- bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
- 			   unsigned long flags);
+ 		free_pages((unsigned long)hyp_pgd, hyp_pgd_order);
+ 		hyp_pgd = NULL;
 -- 
 2.14.2
