@@ -1,103 +1,76 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v2 34/36] KVM: arm/arm64: Handle VGICv3 save/restore from the
- main VGIC code on VHE
-Date: Thu,  7 Dec 2017 18:06:28 +0100
-Message-ID: <20171207170630.592-35-christoffer.dall@linaro.org>
-References: <20171207170630.592-1-christoffer.dall@linaro.org>
+From: Kees Cook <keescook@chromium.org>
+Subject: Re: [PATCH v5 15/30] arm64/sve: Signal handling support
+Date: Thu, 7 Dec 2017 10:50:38 -0800
+Message-ID: <CAGXu5jLO6tHm-mCPBo-csCw--+_jhLfGD_sHXCkFjmyvdame=g@mail.gmail.com>
+References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
+ <1509465082-30427-16-git-send-email-Dave.Martin@arm.com> <CAGXu5jJgsAg1VBMbx=mV3ep4hzs+1G46Sow4eeFqCK31b_sORA@mail.gmail.com>
+ <20171207104948.GE31900@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 42AF249DF9
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Dec 2017 12:04:22 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OEIqfU92Z9fv for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 Dec 2017 12:04:21 -0500 (EST)
-Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3B01049E07
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Dec 2017 12:04:20 -0500 (EST)
-Received: by mail-wm0-f68.google.com with SMTP id f140so14080682wmd.2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 07 Dec 2017 09:07:36 -0800 (PST)
-In-Reply-To: <20171207170630.592-1-christoffer.dall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Return-path: <linux-arch-owner@vger.kernel.org>
+In-Reply-To: <20171207104948.GE31900@arm.com>
+Sender: linux-arch-owner@vger.kernel.org
+To: Will Deacon <will.deacon@arm.com>
+Cc: Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org, linux-arch <linux-arch@vger.kernel.org>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha <libc-alpha@sourceware.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Just like we can program the GICv2 hypervisor control interface directly
-from the core vgic code, we can do the same for the GICv3 hypervisor
-control interface on VHE systems.
+On Thu, Dec 7, 2017 at 2:49 AM, Will Deacon <will.deacon@arm.com> wrote:
+> Hi Kees,
+>
+> On Wed, Dec 06, 2017 at 11:56:50AM -0800, Kees Cook wrote:
+>> On Tue, Oct 31, 2017 at 8:51 AM, Dave Martin <Dave.Martin@arm.com> wrote:
+>> > Miscellaneous:
+>> >
+>> >  * Change inconsistent copy_to_user() calls to __copy_to_user() in
+>> >    preserve_sve_context().
+>> >
+>> >    There are already __put_user_error() calls here.
+>> >
+>> >    The whole extended signal frame is already checked for
+>> >    access_ok(VERIFY_WRITE) in get_sigframe().
+>>
+>> Verifying all these __copy_to/from_user() calls is rather non-trivial.
+>> For example, I had to understand that the access_ok() check actually
+>> spans memory that both user->sigframe and user->next_frame point into.
+>
+> I don't think that's particularly difficult -- you just have to read the
+> four lines preceding the access_ok.
 
-We do this by simply calling the save/restore functions when we have VHE
-and we can then get rid of the save/restore function calls from the VHE
-world switch function.
+Sure, but someone working backward from finding the __copy_*, it's
+less obvious. :)
 
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
- arch/arm64/kvm/hyp/switch.c | 3 ---
- virt/kvm/arm/vgic/vgic.c    | 5 +++++
- 2 files changed, 5 insertions(+), 3 deletions(-)
+>> And it isn't clear to me that all users of apply_user_offset() are
+>> within this range too, along with other manually calculated offsets in
+>> setup_sigframe().
+>
+> The offsets passed into apply_user_offset are calculated by
+> setup_sigframe_layout as the stack is allocated, so they're correct by
+> construction. We could add a size check in apply_user_offset if you like?
+>
+>> And it's not clear if parse_user_sigframe() is safe either. Are
+>> user->fpsimd and user->sve checked somewhere? It seems like it's
+>> safely contained by in sf->uc.uc_mcontext.__reserved, but it's hard to
+>> read, though I do see access_ok() checks against __reserved at the end
+>> of the while loop.
+>
+> This one is certainly more difficult to follow, mainly because it's spread
+> about a bit and we have to check the extra context separately. However, the
+> main part of the frame is checked in sys_rt_sigreturn before calling
+> restore_sigframe, and the extra context is checked in parse_user_sigframe
+> if we find it.
+>
+> Dave, any thoughts on making this easier to understand?
 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index a7de1436a0e6..947684312079 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -386,8 +386,6 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 	activate_traps_vhe(vcpu);
- 	__activate_vm(vcpu->kvm);
- 
--	__vgic_restore_state(vcpu);
--
- 	sysreg_restore_guest_state_vhe(guest_ctxt);
- 	__debug_switch_to_guest(vcpu);
- 
-@@ -399,7 +397,6 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 	} while (fixup_guest_exit(vcpu, &exit_code));
- 
- 	sysreg_save_guest_state_vhe(guest_ctxt);
--	__vgic_save_state(vcpu);
- 
- 	deactivate_traps_vhe(vcpu);
- 
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index 5bf0804e79b4..636200cace55 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -19,6 +19,7 @@
- #include <linux/list_sort.h>
- #include <linux/interrupt.h>
- #include <linux/irq.h>
-+#include <asm/kvm_hyp.h>
- 
- #include "vgic.h"
- 
-@@ -754,6 +755,8 @@ static inline void vgic_save_state(struct kvm_vcpu *vcpu)
- {
- 	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
- 		vgic_v2_save_state(vcpu);
-+	else if (has_vhe())
-+		__vgic_v3_save_state(vcpu);
- }
- 
- /* Sync back the hardware VGIC state into our emulation after a guest's run. */
-@@ -778,6 +781,8 @@ static inline void vgic_restore_state(struct kvm_vcpu *vcpu)
- {
- 	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
- 		vgic_v2_restore_state(vcpu);
-+	else if (has_vhe())
-+		__vgic_v3_restore_state(vcpu);
- }
- 
- /* Flush our emulation state into the GIC hardware before entering the guest. */
+My question is mainly: why not just use copy_*() everywhere instead?
+Having these things so spread out makes it fragile, and there's very
+little performance benefit from using __copy_*() over copy_*().
+
+As far as I can see, everything looks correctly checked here, but it
+took a while to convince myself of it. Having Dave's description in
+the other reply certainly helped, though, thanks for that! :)
+
+-Kees
+
 -- 
-2.14.2
+Kees Cook
+Pixel Security
