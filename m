@@ -1,127 +1,92 @@
-From: Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>
-Subject: Re: [PATCH v5 08/16] arm64: Add vmap_stack header file
-Date: Thu, 7 Dec 2017 10:54:06 +0000
-Message-ID: <20171207105405.n2uxzi5dtbw2435e@lakrids.cambridge.arm.com>
-References: <20171206190142.9246-1-james.morse@arm.com>
- <20171206190142.9246-9-james.morse@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <20171206190142.9246-9-james.morse-5wv7dgnIgG8@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
-Cc: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Lorenzo Pieralisi <lorenzo.pieralisi-5wv7dgnIgG8@public.gmane.org>, Loc Ho <lho-qTEPVZfXA3Y@public.gmane.org>, Heyi Guo <guoheyi-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: [PATCH v7 0/8] Handle forwarded level-triggered interrupts
+Date: Thu,  7 Dec 2017 11:54:10 +0100
+Message-ID: <20171207105418.22428-1-christoffer.dall@linaro.org>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, Eric Auger <eric.auger@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi James,
+This series is an alternative approach to Eric Auger's direct EOI setup
+patches [1] in terms of the KVM VGIC support.
 
-On Wed, Dec 06, 2017 at 07:01:34PM +0000, James Morse wrote:
-> Today the arm64 arch code allocates an extra IRQ stack per-cpu. If we
-> also have SDEI and VMAP stacks we need two extra per-cpu VMAP stacks.
-> 
-> Move the VMAP stack allocation out to a helper in a new header file.
-> This avoids missing THREADINFO_GFP, or getting the all-important alignment
-> wrong.
-> 
-> Signed-off-by: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
-> Reviewed-by: Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>
-> ---
-> Changes since v4:
->  * Added gfp.h include
-> 
-> Changes since v3:
->  * Added BUILD_BUG() instead of a spooky link error
-> 
->  arch/arm64/include/asm/vmap_stack.h | 26 ++++++++++++++++++++++++++
->  arch/arm64/kernel/irq.c             | 13 ++-----------
->  2 files changed, 28 insertions(+), 11 deletions(-)
->  create mode 100644 arch/arm64/include/asm/vmap_stack.h
-> 
-> diff --git a/arch/arm64/include/asm/vmap_stack.h b/arch/arm64/include/asm/vmap_stack.h
-> new file mode 100644
-> index 000000000000..5465e4e65987
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/vmap_stack.h
-> @@ -0,0 +1,26 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +// Copyright (C) 2017 Arm Ltd.
-> +#ifndef __ASM_VMAP_STACK_H
-> +#define __ASM_VMAP_STACK_H
-> +
-> +#include <linux/gfp.h>
-> +#include <linux/vmalloc.h>
-> +#include <asm/memory.h>
-> +#include <asm/pgtable.h>
-> +#include <asm/thread_info.h>
+The idea is to maintain existing semantics for the VGIC for mapped
+level-triggered IRQs and also support the timer using mapped IRQs with
+the same VGIC support as VFIO interrupts.
 
-I think we also need:
+Based on v4.15-rc1.
 
-#include <linux/bug.h>		// for BUILD_BUG_ON()
-#incldue <linux/kconfig.h>	// for IS_ENABLED()
+Also available at:
+git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git level-mapped-v7
 
-Otherwise, this looks good to me. With those includes folded in:
+Changes since v6:
+ - Removed double semi-colon
+ - Changed another confusing conditional in patch 6
+ - Fixed typos in commit message and comments
 
-Reviewed-by: Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>
+Changes since v5:
+ - Rebased on v4.15-rc1
+ - Changed comment on preemption code as suggested by Andre
+ - Fixed white space and confusing conditionals as suggested by Drew
+
+Changes since v4:
+ - Rebased on the timer optimization series merged in the v4.15 merge
+   window, which caused a fair amount of modifications to patch 3.
+ - Added a static key to disable the sync operations when no VMs are
+   using userspace irqchips to further optimize the performance
+ - Fixed extra semicolon in vgic-mmio.c
+ - Added commentary as requested during review
+ - Dropped what was patch 4, because it was merged as part of GICv4
+   support.
+ - Factored out the VGIC input level function change as separate patch
+   (helps bisect and debugging), before providing a function for the
+   timer.
+
+Changes since v3:
+ - Added a number of patches and moved patches around a bit.
+ - Check for uaccesses in the mmio handler functions
+ - Fixed bugs in the mmio handler functions
+
+Changes since v2:
+ - Removed patch 5 from v2 and integrating the changes in what's now
+   patch 5 to make it easier to reuse code when adding VFIO integration.
+ - Changed the virtual distributor MMIO handling to use the
+   pending_latch and more closely match the semantics of SPENDR and
+   CPENDR for both level and edge mapped interrupts.
+
+Changes since v1:
+ - Added necessary changes to the timer (Patch 1)
+ - Added handling of guest MMIO accesses to the virtual distributor
+   (Patch 4)
+ - Addressed Marc's comments from the initial RFC (mostly renames)
 
 Thanks,
-Mark.
+-Christoffer
 
-> +
-> +/*
-> + * To ensure that VMAP'd stack overflow detection works correctly, all VMAP'd
-> + * stacks need to have the same alignment.
-> + */
-> +static inline unsigned long *arch_alloc_vmap_stack(size_t stack_size, int node)
-> +{
-> +	BUILD_BUG_ON(!IS_ENABLED(CONFIG_VMAP_STACK));
-> +
-> +	return __vmalloc_node_range(stack_size, THREAD_ALIGN,
-> +				    VMALLOC_START, VMALLOC_END,
-> +				    THREADINFO_GFP, PAGE_KERNEL, 0, node,
-> +				    __builtin_return_address(0));
-> +}
-> +
-> +#endif /* __ASM_VMAP_STACK_H */
-> diff --git a/arch/arm64/kernel/irq.c b/arch/arm64/kernel/irq.c
-> index 713561e5bcab..60e5fc661f74 100644
-> --- a/arch/arm64/kernel/irq.c
-> +++ b/arch/arm64/kernel/irq.c
-> @@ -29,6 +29,7 @@
->  #include <linux/irqchip.h>
->  #include <linux/seq_file.h>
->  #include <linux/vmalloc.h>
-> +#include <asm/vmap_stack.h>
->  
->  unsigned long irq_err_count;
->  
-> @@ -58,17 +59,7 @@ static void init_irq_stacks(void)
->  	unsigned long *p;
->  
->  	for_each_possible_cpu(cpu) {
-> -		/*
-> -		* To ensure that VMAP'd stack overflow detection works
-> -		* correctly, the IRQ stacks need to have the same
-> -		* alignment as other stacks.
-> -		*/
-> -		p = __vmalloc_node_range(IRQ_STACK_SIZE, THREAD_ALIGN,
-> -					 VMALLOC_START, VMALLOC_END,
-> -					 THREADINFO_GFP, PAGE_KERNEL,
-> -					 0, cpu_to_node(cpu),
-> -					 __builtin_return_address(0));
-> -
-> +		p = arch_alloc_vmap_stack(IRQ_STACK_SIZE, cpu_to_node(cpu));
->  		per_cpu(irq_stack_ptr, cpu) = p;
->  	}
->  }
-> -- 
-> 2.15.0
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe devicetree" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+[1]: https://lists.cs.columbia.edu/pipermail/kvmarm/2017-June/026072.html
+
+Christoffer Dall (8):
+  KVM: arm/arm64: Remove redundant preemptible checks
+  KVM: arm/arm64: Factor out functionality to get vgic mmio
+    requester_vcpu
+  KVM: arm/arm64: Don't cache the timer IRQ level
+  KVM: arm/arm64: vgic: Support level-triggered mapped interrupts
+  KVM: arm/arm64: Support a vgic interrupt line level sample function
+  KVM: arm/arm64: Support VGIC dist pend/active changes for mapped IRQs
+  KVM: arm/arm64: Provide a get_input_level for the arch timer
+  KVM: arm/arm64: Avoid work when userspace iqchips are not used
+
+ include/kvm/arm_arch_timer.h  |   2 +
+ include/kvm/arm_vgic.h        |  13 ++++-
+ virt/kvm/arm/arch_timer.c     | 105 +++++++++++++++++++++-----------------
+ virt/kvm/arm/arm.c            |   2 -
+ virt/kvm/arm/vgic/vgic-mmio.c | 115 ++++++++++++++++++++++++++++++++++--------
+ virt/kvm/arm/vgic/vgic-v2.c   |  29 +++++++++++
+ virt/kvm/arm/vgic/vgic-v3.c   |  29 +++++++++++
+ virt/kvm/arm/vgic/vgic.c      |  42 +++++++++++++--
+ virt/kvm/arm/vgic/vgic.h      |   8 +++
+ 9 files changed, 270 insertions(+), 75 deletions(-)
+
+-- 
+2.14.2
