@@ -1,61 +1,127 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH v5 15/30] arm64/sve: Signal handling support
-Date: Thu, 7 Dec 2017 10:49:48 +0000
-Message-ID: <20171207104948.GE31900@arm.com>
-References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
- <1509465082-30427-16-git-send-email-Dave.Martin@arm.com>
- <CAGXu5jJgsAg1VBMbx=mV3ep4hzs+1G46Sow4eeFqCK31b_sORA@mail.gmail.com>
+From: Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>
+Subject: Re: [PATCH v5 08/16] arm64: Add vmap_stack header file
+Date: Thu, 7 Dec 2017 10:54:06 +0000
+Message-ID: <20171207105405.n2uxzi5dtbw2435e@lakrids.cambridge.arm.com>
+References: <20171206190142.9246-1-james.morse@arm.com>
+ <20171206190142.9246-9-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-arch-owner@vger.kernel.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <CAGXu5jJgsAg1VBMbx=mV3ep4hzs+1G46Sow4eeFqCK31b_sORA@mail.gmail.com>
-Sender: linux-arch-owner@vger.kernel.org
-To: Kees Cook <keescook@chromium.org>
-Cc: Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org, linux-arch <linux-arch@vger.kernel.org>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha <libc-alpha@sourceware.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20171206190142.9246-9-james.morse-5wv7dgnIgG8@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+Cc: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Lorenzo Pieralisi <lorenzo.pieralisi-5wv7dgnIgG8@public.gmane.org>, Loc Ho <lho-qTEPVZfXA3Y@public.gmane.org>, Heyi Guo <guoheyi-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Kees,
+Hi James,
 
-On Wed, Dec 06, 2017 at 11:56:50AM -0800, Kees Cook wrote:
-> On Tue, Oct 31, 2017 at 8:51 AM, Dave Martin <Dave.Martin@arm.com> wrote:
-> > Miscellaneous:
-> >
-> >  * Change inconsistent copy_to_user() calls to __copy_to_user() in
-> >    preserve_sve_context().
-> >
-> >    There are already __put_user_error() calls here.
-> >
-> >    The whole extended signal frame is already checked for
-> >    access_ok(VERIFY_WRITE) in get_sigframe().
+On Wed, Dec 06, 2017 at 07:01:34PM +0000, James Morse wrote:
+> Today the arm64 arch code allocates an extra IRQ stack per-cpu. If we
+> also have SDEI and VMAP stacks we need two extra per-cpu VMAP stacks.
 > 
-> Verifying all these __copy_to/from_user() calls is rather non-trivial.
-> For example, I had to understand that the access_ok() check actually
-> spans memory that both user->sigframe and user->next_frame point into.
+> Move the VMAP stack allocation out to a helper in a new header file.
+> This avoids missing THREADINFO_GFP, or getting the all-important alignment
+> wrong.
+> 
+> Signed-off-by: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+> Reviewed-by: Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>
+> ---
+> Changes since v4:
+>  * Added gfp.h include
+> 
+> Changes since v3:
+>  * Added BUILD_BUG() instead of a spooky link error
+> 
+>  arch/arm64/include/asm/vmap_stack.h | 26 ++++++++++++++++++++++++++
+>  arch/arm64/kernel/irq.c             | 13 ++-----------
+>  2 files changed, 28 insertions(+), 11 deletions(-)
+>  create mode 100644 arch/arm64/include/asm/vmap_stack.h
+> 
+> diff --git a/arch/arm64/include/asm/vmap_stack.h b/arch/arm64/include/asm/vmap_stack.h
+> new file mode 100644
+> index 000000000000..5465e4e65987
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/vmap_stack.h
+> @@ -0,0 +1,26 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +// Copyright (C) 2017 Arm Ltd.
+> +#ifndef __ASM_VMAP_STACK_H
+> +#define __ASM_VMAP_STACK_H
+> +
+> +#include <linux/gfp.h>
+> +#include <linux/vmalloc.h>
+> +#include <asm/memory.h>
+> +#include <asm/pgtable.h>
+> +#include <asm/thread_info.h>
 
-I don't think that's particularly difficult -- you just have to read the
-four lines preceding the access_ok.
+I think we also need:
 
-> And it isn't clear to me that all users of apply_user_offset() are
-> within this range too, along with other manually calculated offsets in
-> setup_sigframe().
+#include <linux/bug.h>		// for BUILD_BUG_ON()
+#incldue <linux/kconfig.h>	// for IS_ENABLED()
 
-The offsets passed into apply_user_offset are calculated by
-setup_sigframe_layout as the stack is allocated, so they're correct by
-construction. We could add a size check in apply_user_offset if you like?
+Otherwise, this looks good to me. With those includes folded in:
 
-> And it's not clear if parse_user_sigframe() is safe either. Are
-> user->fpsimd and user->sve checked somewhere? It seems like it's
-> safely contained by in sf->uc.uc_mcontext.__reserved, but it's hard to
-> read, though I do see access_ok() checks against __reserved at the end
-> of the while loop.
+Reviewed-by: Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>
 
-This one is certainly more difficult to follow, mainly because it's spread
-about a bit and we have to check the extra context separately. However, the
-main part of the frame is checked in sys_rt_sigreturn before calling
-restore_sigframe, and the extra context is checked in parse_user_sigframe
-if we find it.
+Thanks,
+Mark.
 
-Dave, any thoughts on making this easier to understand?
-
-Will
+> +
+> +/*
+> + * To ensure that VMAP'd stack overflow detection works correctly, all VMAP'd
+> + * stacks need to have the same alignment.
+> + */
+> +static inline unsigned long *arch_alloc_vmap_stack(size_t stack_size, int node)
+> +{
+> +	BUILD_BUG_ON(!IS_ENABLED(CONFIG_VMAP_STACK));
+> +
+> +	return __vmalloc_node_range(stack_size, THREAD_ALIGN,
+> +				    VMALLOC_START, VMALLOC_END,
+> +				    THREADINFO_GFP, PAGE_KERNEL, 0, node,
+> +				    __builtin_return_address(0));
+> +}
+> +
+> +#endif /* __ASM_VMAP_STACK_H */
+> diff --git a/arch/arm64/kernel/irq.c b/arch/arm64/kernel/irq.c
+> index 713561e5bcab..60e5fc661f74 100644
+> --- a/arch/arm64/kernel/irq.c
+> +++ b/arch/arm64/kernel/irq.c
+> @@ -29,6 +29,7 @@
+>  #include <linux/irqchip.h>
+>  #include <linux/seq_file.h>
+>  #include <linux/vmalloc.h>
+> +#include <asm/vmap_stack.h>
+>  
+>  unsigned long irq_err_count;
+>  
+> @@ -58,17 +59,7 @@ static void init_irq_stacks(void)
+>  	unsigned long *p;
+>  
+>  	for_each_possible_cpu(cpu) {
+> -		/*
+> -		* To ensure that VMAP'd stack overflow detection works
+> -		* correctly, the IRQ stacks need to have the same
+> -		* alignment as other stacks.
+> -		*/
+> -		p = __vmalloc_node_range(IRQ_STACK_SIZE, THREAD_ALIGN,
+> -					 VMALLOC_START, VMALLOC_END,
+> -					 THREADINFO_GFP, PAGE_KERNEL,
+> -					 0, cpu_to_node(cpu),
+> -					 __builtin_return_address(0));
+> -
+> +		p = arch_alloc_vmap_stack(IRQ_STACK_SIZE, cpu_to_node(cpu));
+>  		per_cpu(irq_stack_ptr, cpu) = p;
+>  	}
+>  }
+> -- 
+> 2.15.0
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe devicetree" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
