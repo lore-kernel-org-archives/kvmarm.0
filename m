@@ -1,54 +1,61 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] arm64: kvm: Prevent restoring stale PMSCR_EL1 for vcpu
-Date: Thu, 7 Dec 2017 10:35:31 +0100
-Message-ID: <20171207093531.GO32397@cbox>
-References: <1512580189-5921-1-git-send-email-julien.thierry@arm.com>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH v5 15/30] arm64/sve: Signal handling support
+Date: Thu, 7 Dec 2017 10:49:48 +0000
+Message-ID: <20171207104948.GE31900@arm.com>
+References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
+ <1509465082-30427-16-git-send-email-Dave.Martin@arm.com>
+ <CAGXu5jJgsAg1VBMbx=mV3ep4hzs+1G46Sow4eeFqCK31b_sORA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Return-path: <stable-owner@vger.kernel.org>
+Return-path: <linux-arch-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1512580189-5921-1-git-send-email-julien.thierry@arm.com>
-Sender: stable-owner@vger.kernel.org
-To: Julien Thierry <julien.thierry@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, stable@vger.kernel.org
+In-Reply-To: <CAGXu5jJgsAg1VBMbx=mV3ep4hzs+1G46Sow4eeFqCK31b_sORA@mail.gmail.com>
+Sender: linux-arch-owner@vger.kernel.org
+To: Kees Cook <keescook@chromium.org>
+Cc: Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org, linux-arch <linux-arch@vger.kernel.org>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha <libc-alpha@sourceware.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Dec 06, 2017 at 05:09:49PM +0000, Julien Thierry wrote:
-> When VHE is not present, KVM needs to save and restores PMSCR_EL1 when
-> possible. If SPE is used by the host, value of PMSCR_EL1 cannot be saved
-> for the guest.
-> If the host starts using SPE between two save+restore on the same vcpu,
-> restore will write the value of PMSCR_EL1 read during the first save.
-> 
-> Make sure __debug_save_spe_nvhe clears the value of the saved PMSCR_EL1
-> when the guest cannot use SPE.
-> 
-> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
-> Cc: Christoffer Dall <christoffer.dall@linaro.org>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will.deacon@arm.com>
-> Cc: <stable@vger.kernel.org>
-> ---
->  arch/arm64/kvm/hyp/debug-sr.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
-> index 321c9c0..f4363d4 100644
-> --- a/arch/arm64/kvm/hyp/debug-sr.c
-> +++ b/arch/arm64/kvm/hyp/debug-sr.c
-> @@ -74,6 +74,9 @@ static void __hyp_text __debug_save_spe_nvhe(u64 *pmscr_el1)
->  {
->  	u64 reg;
-> 
-> +	/* Clear pmscr in case of early return */
-> +	*pmscr_el1 = 0;
-> +
->  	/* SPE present on this CPU? */
->  	if (!cpuid_feature_extract_unsigned_field(read_sysreg(id_aa64dfr0_el1),
->  						  ID_AA64DFR0_PMSVER_SHIFT))
-> --
-> 1.9.1
+Hi Kees,
 
-Applied, thanks.
--Christoffer
+On Wed, Dec 06, 2017 at 11:56:50AM -0800, Kees Cook wrote:
+> On Tue, Oct 31, 2017 at 8:51 AM, Dave Martin <Dave.Martin@arm.com> wrote:
+> > Miscellaneous:
+> >
+> >  * Change inconsistent copy_to_user() calls to __copy_to_user() in
+> >    preserve_sve_context().
+> >
+> >    There are already __put_user_error() calls here.
+> >
+> >    The whole extended signal frame is already checked for
+> >    access_ok(VERIFY_WRITE) in get_sigframe().
+> 
+> Verifying all these __copy_to/from_user() calls is rather non-trivial.
+> For example, I had to understand that the access_ok() check actually
+> spans memory that both user->sigframe and user->next_frame point into.
+
+I don't think that's particularly difficult -- you just have to read the
+four lines preceding the access_ok.
+
+> And it isn't clear to me that all users of apply_user_offset() are
+> within this range too, along with other manually calculated offsets in
+> setup_sigframe().
+
+The offsets passed into apply_user_offset are calculated by
+setup_sigframe_layout as the stack is allocated, so they're correct by
+construction. We could add a size check in apply_user_offset if you like?
+
+> And it's not clear if parse_user_sigframe() is safe either. Are
+> user->fpsimd and user->sve checked somewhere? It seems like it's
+> safely contained by in sf->uc.uc_mcontext.__reserved, but it's hard to
+> read, though I do see access_ok() checks against __reserved at the end
+> of the while loop.
+
+This one is certainly more difficult to follow, mainly because it's spread
+about a bit and we have to check the extra context separately. However, the
+main part of the frame is checked in sys_rt_sigreturn before calling
+restore_sigframe, and the extra context is checked in parse_user_sigframe
+if we find it.
+
+Dave, any thoughts on making this easier to understand?
+
+Will
