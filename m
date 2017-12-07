@@ -1,92 +1,70 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v7 0/8] Handle forwarded level-triggered interrupts
-Date: Thu,  7 Dec 2017 11:54:10 +0100
-Message-ID: <20171207105418.22428-1-christoffer.dall@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
-Sender: kvm-owner@vger.kernel.org
+Subject: [PATCH v7 1/8] KVM: arm/arm64: Remove redundant preemptible checks
+Date: Thu,  7 Dec 2017 11:54:11 +0100
+Message-ID: <20171207105418.22428-2-christoffer.dall@linaro.org>
+References: <20171207105418.22428-1-christoffer.dall@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D356F49D2B
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Dec 2017 05:51:15 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Z9xsXwJtBDIA for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 Dec 2017 05:51:14 -0500 (EST)
+Received: from mail-wm0-f67.google.com (mail-wm0-f67.google.com [74.125.82.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D07B449D71
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Dec 2017 05:51:13 -0500 (EST)
+Received: by mail-wm0-f67.google.com with SMTP id n138so12248253wmg.2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 07 Dec 2017 02:54:29 -0800 (PST)
+In-Reply-To: <20171207105418.22428-1-christoffer.dall@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, Eric Auger <eric.auger@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This series is an alternative approach to Eric Auger's direct EOI setup
-patches [1] in terms of the KVM VGIC support.
+The __this_cpu_read() and __this_cpu_write() functions already implement
+checks for the required preemption levels when using
+CONFIG_DEBUG_PREEMPT which gives you nice error messages and such.
+Therefore there is no need to explicitly check this using a BUG_ON() in
+the code (which we don't do for other uses of per cpu variables either).
 
-The idea is to maintain existing semantics for the VGIC for mapped
-level-triggered IRQs and also support the timer using mapped IRQs with
-the same VGIC support as VFIO interrupts.
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+---
+ virt/kvm/arm/arm.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-Based on v4.15-rc1.
-
-Also available at:
-git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git level-mapped-v7
-
-Changes since v6:
- - Removed double semi-colon
- - Changed another confusing conditional in patch 6
- - Fixed typos in commit message and comments
-
-Changes since v5:
- - Rebased on v4.15-rc1
- - Changed comment on preemption code as suggested by Andre
- - Fixed white space and confusing conditionals as suggested by Drew
-
-Changes since v4:
- - Rebased on the timer optimization series merged in the v4.15 merge
-   window, which caused a fair amount of modifications to patch 3.
- - Added a static key to disable the sync operations when no VMs are
-   using userspace irqchips to further optimize the performance
- - Fixed extra semicolon in vgic-mmio.c
- - Added commentary as requested during review
- - Dropped what was patch 4, because it was merged as part of GICv4
-   support.
- - Factored out the VGIC input level function change as separate patch
-   (helps bisect and debugging), before providing a function for the
-   timer.
-
-Changes since v3:
- - Added a number of patches and moved patches around a bit.
- - Check for uaccesses in the mmio handler functions
- - Fixed bugs in the mmio handler functions
-
-Changes since v2:
- - Removed patch 5 from v2 and integrating the changes in what's now
-   patch 5 to make it easier to reuse code when adding VFIO integration.
- - Changed the virtual distributor MMIO handling to use the
-   pending_latch and more closely match the semantics of SPENDR and
-   CPENDR for both level and edge mapped interrupts.
-
-Changes since v1:
- - Added necessary changes to the timer (Patch 1)
- - Added handling of guest MMIO accesses to the virtual distributor
-   (Patch 4)
- - Addressed Marc's comments from the initial RFC (mostly renames)
-
-Thanks,
--Christoffer
-
-[1]: https://lists.cs.columbia.edu/pipermail/kvmarm/2017-June/026072.html
-
-Christoffer Dall (8):
-  KVM: arm/arm64: Remove redundant preemptible checks
-  KVM: arm/arm64: Factor out functionality to get vgic mmio
-    requester_vcpu
-  KVM: arm/arm64: Don't cache the timer IRQ level
-  KVM: arm/arm64: vgic: Support level-triggered mapped interrupts
-  KVM: arm/arm64: Support a vgic interrupt line level sample function
-  KVM: arm/arm64: Support VGIC dist pend/active changes for mapped IRQs
-  KVM: arm/arm64: Provide a get_input_level for the arch timer
-  KVM: arm/arm64: Avoid work when userspace iqchips are not used
-
- include/kvm/arm_arch_timer.h  |   2 +
- include/kvm/arm_vgic.h        |  13 ++++-
- virt/kvm/arm/arch_timer.c     | 105 +++++++++++++++++++++-----------------
- virt/kvm/arm/arm.c            |   2 -
- virt/kvm/arm/vgic/vgic-mmio.c | 115 ++++++++++++++++++++++++++++++++++--------
- virt/kvm/arm/vgic/vgic-v2.c   |  29 +++++++++++
- virt/kvm/arm/vgic/vgic-v3.c   |  29 +++++++++++
- virt/kvm/arm/vgic/vgic.c      |  42 +++++++++++++--
- virt/kvm/arm/vgic/vgic.h      |   8 +++
- 9 files changed, 270 insertions(+), 75 deletions(-)
-
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index a6524ff27de4..859ff7e3a1eb 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -71,7 +71,6 @@ static DEFINE_PER_CPU(unsigned char, kvm_arm_hardware_enabled);
+ 
+ static void kvm_arm_set_running_vcpu(struct kvm_vcpu *vcpu)
+ {
+-	BUG_ON(preemptible());
+ 	__this_cpu_write(kvm_arm_running_vcpu, vcpu);
+ }
+ 
+@@ -81,7 +80,6 @@ static void kvm_arm_set_running_vcpu(struct kvm_vcpu *vcpu)
+  */
+ struct kvm_vcpu *kvm_arm_get_running_vcpu(void)
+ {
+-	BUG_ON(preemptible());
+ 	return __this_cpu_read(kvm_arm_running_vcpu);
+ }
+ 
 -- 
 2.14.2
