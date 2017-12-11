@@ -1,15 +1,15 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 26/36] KVM: arm64: Defer saving/restoring system
- registers to vcpu load/put on VHE
-Date: Mon, 11 Dec 2017 13:20:03 +0000
-Message-ID: <c45eaebe-57a1-7737-c515-111d497dd06e@arm.com>
+Subject: Re: [PATCH v2 27/36] KVM: arm64: Move common VHE/non-VHE trap config
+ in separate functions
+Date: Mon, 11 Dec 2017 13:53:00 +0000
+Message-ID: <838f808d-c367-be79-80ec-2fce2b6d55db@arm.com>
 References: <20171207170630.592-1-christoffer.dall@linaro.org>
- <20171207170630.592-27-christoffer.dall@linaro.org>
+ <20171207170630.592-28-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20171207170630.592-27-christoffer.dall@linaro.org>
+In-Reply-To: <20171207170630.592-28-christoffer.dall@linaro.org>
 Content-Language: en-GB
 Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
@@ -17,24 +17,14 @@ Cc: kvm@vger.kernel.org, Shih-Wei Li <shihwei@cs.columbia.edu>, Andrew Jones <dr
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On 07/12/17 17:06, Christoffer Dall wrote:
-> Some system registers do not affect the host kernel's execution and can
-> therefore be loaded when we are about to run a VCPU and we don't have to
-> restore the host state to the hardware before the time when we are
-> actually about to return to userspace or schedule out the VCPU thread.
+> As we are about to be more lazy with some of the trap configuration
+> register read/writes for VHE systems, move the logic that is currently
+> shared between VHE and non-VHE into a separate function which can be
+> called from either the world-switch path or from vcpu_load/vcpu_put.
 > 
-> The EL1 system registers and the userspace state registers, which only
-> affect EL0 execution, do not affect the host kernel's execution.
-> 
-> The 32-bit system registers are not used by a VHE host kernel and
-> therefore don't need to be saved/restored on every entry/exit to/from
-> the guest, but can be deferred to vcpu_load and vcpu_put, respectively.
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 
-Note that they are not used by the !VHE host kernel either, and I
-believe they could be deferred too, although that would imply a round
-trip to HYP to save/restore them. We already have such a hook there when
-configuring ICH_VMCR_EL2, so we may not need much of a new infrastructure.
-
-What do you think?
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 
 	M.
 -- 
