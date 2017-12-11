@@ -1,156 +1,93 @@
-From: Yury Norov <ynorov@caviumnetworks.com>
-Subject: Re: [PATCH v2 00/36] Optimize KVM/ARM for VHE systems
-Date: Mon, 11 Dec 2017 17:43:23 +0300
-Message-ID: <20171211144323.firshrsx4dbumgou@yury-thinkpad>
-References: <20171207170630.592-1-christoffer.dall@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CE5949D75
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Dec 2017 09:40:24 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WYBPljGAqreS for <kvmarm@lists.cs.columbia.edu>;
- Mon, 11 Dec 2017 09:40:23 -0500 (EST)
-Received: from NAM01-SN1-obe.outbound.protection.outlook.com
- (mail-sn1nam01on0041.outbound.protection.outlook.com [104.47.32.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2D5D349D69
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Dec 2017 09:40:23 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <20171207170630.592-1-christoffer.dall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Shih-Wei Li <shihwei@cs.columbia.edu>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH v2 00/19] KVM/arm64: Randomise EL2 mappings
+Date: Mon, 11 Dec 2017 14:49:18 +0000
+Message-ID: <20171211144937.4537-1-marc.zyngier@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>, Steve Capper <steve.capper@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
+Whilst KVM benefits from the kernel randomisation via KASLR, there is
+no additional randomisation when the kernel is running at EL1, as we
+directly use a fixed offset from the linear mapping. This is not
+necessarily a problem, but we could do a bit better by independently
+randomizing the HYP placement.
 
-On Thu, Dec 07, 2017 at 06:05:54PM +0100, Christoffer Dall wrote:
-> This series redesigns parts of KVM/ARM to optimize the performance on
-> VHE systems.  The general approach is to try to do as little work as
-> possible when transitioning between the VM and the hypervisor.  This has
-> the benefit of lower latency when waiting for interrupts and delivering
-> virtual interrupts, and reduces the overhead of emulating behavior and
-> I/O in the host kernel.
-> 
-> Patches 01 through 04 are not VHE specific, but rework parts of KVM/ARM
-> that can be generally improved.  We then add infrastructure to move more
-> logic into vcpu_load and vcpu_put, we improve handling of VFP and debug
-> registers.
-> 
-> We then introduce a new world-switch function for VHE systems, which we
-> can tweak and optimize for VHE systems.  To do that, we rework a lot of
-> the system register save/restore handling and emulation code that may
-> need access to system registers, so that we can defer as many system
-> register save/restore operations to vcpu_load and vcpu_put, and move
-> this logic out of the VHE world switch function.
-> 
-> We then optimize the configuration of traps.  On non-VHE systems, both
-> the host and VM kernels run in EL1, but because the host kernel should
-> have full access to the underlying hardware, but the VM kernel should
-> not, we essentially make the host kernel more privileged than the VM
-> kernel despite them both running at the same privilege level by enabling
-> VE traps when entering the VM and disabling those traps when exiting the
-> VM.  On VHE systems, the host kernel runs in EL2 and has full access to
-> the hardware (as much as allowed by secure side software), and is
-> unaffected by the trap configuration.  That means we can configure the
-> traps for VMs running in EL1 once, and don't have to switch them on and
-> off for every entry/exit to/from the VM.
-> 
-> Finally, we improve our VGIC handling by moving all save/restore logic
-> out of the VHE world-switch, and we make it possible to truly only
-> evaluate if the AP list is empty and not do *any* VGIC work if that is
-> the case, and only do the minimal amount of work required in the course
-> of the VGIC processing when we have virtual interrupts in flight.
-> 
-> The patches are based on v4.15-rc1 plus the fixes sent for v4.15-rc3
-> [1], the level-triggered mapped interrupts support series [2], and the
-> first five patches of James' SDEI series [3], a single SVE patch that
-> moves the CPU ID reg trap setup out of the world-switch path, and v3 of
-> my vcpu load/put series [4].
-> 
-> I've given the patches a fair amount of testing on Thunder-X, Mustang,
-> Seattle, and TC2 (32-bit) for non-VHE testing, and tested VHE
-> functionality on the Foundation model, running both 64-bit VMs and
-> 32-bit VMs side-by-side and using both GICv3-on-GICv3 and
-> GICv2-on-GICv3.
-> 
-> The patches are also available in the vhe-optimize-v2 branch on my
-> kernel.org repository [5].
-> 
-> Changes since v1:
->  - Rebased on v4.15-rc1 and newer versions of other dependencies,
->    including the vcpu load/put approach taken for KVM.
->  - Addressed review comments from v1 (detailed changelogs are in the
->    individual patches).
-> 
-> Thanks,
-> -Christoffer
-> 
-> [1]: git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm kvm-arm-fixes-for-v4.15-1
-> [2]: git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git level-mapped-v6
-> [3]: git://linux-arm.org/linux-jm.git sdei/v5/base
-> [4]: git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git vcpu-load-put-v3
-> [5]: git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git vhe-optimize-v2
+This series proposes to randomise the offset by inserting a few random
+bits between the MSB of the RAM linear mapping and the top of the HYP
+VA (VA_BITS - 2). That's not a lot of random bits (on my Mustang, I
+get 13 bits), but that's better than nothing.
 
-I just submitted the benchmark I used to test your v1 and v2 series':
-https://lkml.org/lkml/2017/12/11/364
+In order to achieve this, we need to be able to patch dynamic values
+in the kernel text. This results in a bunch of changes to the
+alternative framework, the insn library, and a few more hacks in KVM
+itself (we get a new way to map the GIC at EL2). This series used to
+depend on a number of cleanups in asm-offsets, which is not the case
+anymore. I'm still including them as I think they are still pretty
+useful.
 
-On ThunderX2, 112 online CPUs test results for v1 are like this:
+This has been tested on the FVP model, Seattle (both 39 and 48bit VA),
+Mustang and Thunder-X. I've also done a sanity check on 32bit (which
+is only impacted by the HYP IO VA stuff).
 
-Host, v4.14:
-Dry-run:          0         1
-Self-IPI:         9        18
-Normal IPI:      81       110
-Broadcast IPI:    0      2106
+Thanks,
 
-Guest, v4.14:
-Dry-run:          0         1
-Self-IPI:        10        18
-Normal IPI:     305       525
-Broadcast IPI:    0      9729
+	M.
 
-Guest, v4.14 + VHE:
-Dry-run:          0         1
-Self-IPI:         9        18
-Normal IPI:     176       343
-Broadcast IPI:    0      9885
+* From v1:
+  - Now works correctly with KASLR
+  - Dropped the callback field from alt_instr, and reuse one of the
+    existing fields to store an offset to the callback
+  - Fix HYP teardown path (depends on fixes previously posted)
+  - Dropped the VA offset macros
 
-And for v2.
+Marc Zyngier (19):
+  arm64: asm-offsets: Avoid clashing DMA definitions
+  arm64: asm-offsets: Remove unused definitions
+  arm64: asm-offsets: Remove potential circular dependency
+  arm64: alternatives: Enforce alignment of struct alt_instr
+  arm64: alternatives: Add dynamic patching feature
+  arm64: insn: Add N immediate encoding
+  arm64: insn: Add encoder for bitwise operations using litterals
+  arm64: KVM: Dynamically patch the kernel/hyp VA mask
+  arm64: cpufeatures: Drop the ARM64_HYP_OFFSET_LOW feature flag
+  KVM: arm/arm64: Do not use kern_hyp_va() with kvm_vgic_global_state
+  KVM: arm/arm64: Demote HYP VA range display to being a debug feature
+  KVM: arm/arm64: Move ioremap calls to create_hyp_io_mappings
+  KVM: arm/arm64: Keep GICv2 HYP VAs in kvm_vgic_global_state
+  KVM: arm/arm64: Move HYP IO VAs to the "idmap" range
+  arm64; insn: Add encoder for the EXTR instruction
+  arm64: insn: Allow ADD/SUB (immediate) with LSL #12
+  arm64: KVM: Dynamically compute the HYP VA mask
+  arm64: KVM: Introduce EL2 VA randomisation
+  arm64: Update the KVM memory map documentation
 
-Host, v4.15:                   
-Dry-run:          0         1
-Self-IPI:         9        18
-Normal IPI:      79       108
-Broadcast IPI:    0      2102
-                        
-Guest, v4.15-rc:
-Dry-run:          0         1
-Self-IPI:         9        18
-Normal IPI:     291       526
-Broadcast IPI:    0     10439
+ Documentation/arm64/memory.txt             |   8 +-
+ arch/arm/include/asm/kvm_hyp.h             |   6 +
+ arch/arm/include/asm/kvm_mmu.h             |   4 +-
+ arch/arm64/include/asm/alternative.h       |  53 +++++---
+ arch/arm64/include/asm/alternative_types.h |  16 +++
+ arch/arm64/include/asm/asm-offsets.h       |   2 +
+ arch/arm64/include/asm/cpucaps.h           |   2 +-
+ arch/arm64/include/asm/insn.h              |  16 +++
+ arch/arm64/include/asm/kvm_hyp.h           |   9 ++
+ arch/arm64/include/asm/kvm_mmu.h           |  54 ++++----
+ arch/arm64/kernel/alternative.c            |  14 ++-
+ arch/arm64/kernel/asm-offsets.c            |  17 +--
+ arch/arm64/kernel/cpufeature.c             |  19 ---
+ arch/arm64/kernel/insn.c                   | 191 ++++++++++++++++++++++++++++-
+ arch/arm64/kvm/Makefile                    |   2 +-
+ arch/arm64/kvm/haslr.c                     | 135 ++++++++++++++++++++
+ arch/arm64/mm/cache.S                      |   4 +-
+ include/kvm/arm_vgic.h                     |  12 +-
+ virt/kvm/arm/hyp/vgic-v2-sr.c              |  12 +-
+ virt/kvm/arm/mmu.c                         |  81 ++++++++----
+ virt/kvm/arm/vgic/vgic-init.c              |   6 -
+ virt/kvm/arm/vgic/vgic-v2.c                |  40 ++----
+ 22 files changed, 542 insertions(+), 161 deletions(-)
+ create mode 100644 arch/arm64/include/asm/alternative_types.h
+ create mode 100644 arch/arm64/kvm/haslr.c
 
-Guest, v4.15-rc + VHE:
-Dry-run:          0         2
-Self-IPI:        14        28
-Normal IPI:     370       569
-Broadcast IPI:    0     11688
-
-All times are normalized to v1 host dry-run time. Smaller - better.
-
-Results for v1 and v2 may vary because kernel version is changed. 
-What makes us worry is slowing down the "Normal IPI" test observed in 
-v2 series.
-
-Nevertheless, if you find test relevant, for v1 and v2,
-Tested-by: Yury Norov <ynorov@caviumnetworks.com>
+-- 
+2.14.2
