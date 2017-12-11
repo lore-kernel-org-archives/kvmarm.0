@@ -1,217 +1,35 @@
-From: Yury Norov <ynorov@caviumnetworks.com>
-Subject: Re: [PATCH v2 00/36] Optimize KVM/ARM for VHE systems
-Date: Mon, 11 Dec 2017 19:30:59 +0300
-Message-ID: <20171211163059.ogqngvy5e4f24hsw@yury-thinkpad>
-References: <20171207170630.592-1-christoffer.dall@linaro.org>
- <20171211144323.firshrsx4dbumgou@yury-thinkpad>
- <20171211153458.GK910@cbox>
+From: Kees Cook <keescook@chromium.org>
+Subject: Re: [PATCH v5 15/30] arm64/sve: Signal handling support
+Date: Mon, 11 Dec 2017 11:23:09 -0800
+Message-ID: <CAGXu5j+2MNOnAfstr8RyD0Orrt37ewL8uE2N8e3fL--fNPs3TQ@mail.gmail.com>
+References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
+ <1509465082-30427-16-git-send-email-Dave.Martin@arm.com> <CAGXu5jJgsAg1VBMbx=mV3ep4hzs+1G46Sow4eeFqCK31b_sORA@mail.gmail.com>
+ <20171207104948.GE31900@arm.com> <CAGXu5jLO6tHm-mCPBo-csCw--+_jhLfGD_sHXCkFjmyvdame=g@mail.gmail.com>
+ <20171211140720.GE2141@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B789949DBA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Dec 2017 11:28:00 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2MIYDpHfbQqx for <kvmarm@lists.cs.columbia.edu>;
- Mon, 11 Dec 2017 11:27:54 -0500 (EST)
-Received: from NAM03-CO1-obe.outbound.protection.outlook.com
- (mail-co1nam03on0076.outbound.protection.outlook.com [104.47.40.76])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 256F649D90
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Dec 2017 11:27:54 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <20171211153458.GK910@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Shih-Wei Li <shihwei@cs.columbia.edu>
+Content-Type: text/plain; charset="UTF-8"
+Return-path: <linux-arch-owner@vger.kernel.org>
+In-Reply-To: <20171211140720.GE2141@arm.com>
+Sender: linux-arch-owner@vger.kernel.org
+To: Will Deacon <will.deacon@arm.com>
+Cc: Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org, linux-arch <linux-arch@vger.kernel.org>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha <libc-alpha@sourceware.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Dec 11, 2017 at 04:34:58PM +0100, Christoffer Dall wrote:
-> Hi Yury,
-> 
-> On Mon, Dec 11, 2017 at 05:43:23PM +0300, Yury Norov wrote:
-> > 
-> > On Thu, Dec 07, 2017 at 06:05:54PM +0100, Christoffer Dall wrote:
-> > > This series redesigns parts of KVM/ARM to optimize the performance on
-> > > VHE systems.  The general approach is to try to do as little work as
-> > > possible when transitioning between the VM and the hypervisor.  This has
-> > > the benefit of lower latency when waiting for interrupts and delivering
-> > > virtual interrupts, and reduces the overhead of emulating behavior and
-> > > I/O in the host kernel.
-> > > 
-> > > Patches 01 through 04 are not VHE specific, but rework parts of KVM/ARM
-> > > that can be generally improved.  We then add infrastructure to move more
-> > > logic into vcpu_load and vcpu_put, we improve handling of VFP and debug
-> > > registers.
-> > > 
-> > > We then introduce a new world-switch function for VHE systems, which we
-> > > can tweak and optimize for VHE systems.  To do that, we rework a lot of
-> > > the system register save/restore handling and emulation code that may
-> > > need access to system registers, so that we can defer as many system
-> > > register save/restore operations to vcpu_load and vcpu_put, and move
-> > > this logic out of the VHE world switch function.
-> > > 
-> > > We then optimize the configuration of traps.  On non-VHE systems, both
-> > > the host and VM kernels run in EL1, but because the host kernel should
-> > > have full access to the underlying hardware, but the VM kernel should
-> > > not, we essentially make the host kernel more privileged than the VM
-> > > kernel despite them both running at the same privilege level by enabling
-> > > VE traps when entering the VM and disabling those traps when exiting the
-> > > VM.  On VHE systems, the host kernel runs in EL2 and has full access to
-> > > the hardware (as much as allowed by secure side software), and is
-> > > unaffected by the trap configuration.  That means we can configure the
-> > > traps for VMs running in EL1 once, and don't have to switch them on and
-> > > off for every entry/exit to/from the VM.
-> > > 
-> > > Finally, we improve our VGIC handling by moving all save/restore logic
-> > > out of the VHE world-switch, and we make it possible to truly only
-> > > evaluate if the AP list is empty and not do *any* VGIC work if that is
-> > > the case, and only do the minimal amount of work required in the course
-> > > of the VGIC processing when we have virtual interrupts in flight.
-> > > 
-> > > The patches are based on v4.15-rc1 plus the fixes sent for v4.15-rc3
-> > > [1], the level-triggered mapped interrupts support series [2], and the
-> > > first five patches of James' SDEI series [3], a single SVE patch that
-> > > moves the CPU ID reg trap setup out of the world-switch path, and v3 of
-> > > my vcpu load/put series [4].
-> > > 
-> > > I've given the patches a fair amount of testing on Thunder-X, Mustang,
-> > > Seattle, and TC2 (32-bit) for non-VHE testing, and tested VHE
-> > > functionality on the Foundation model, running both 64-bit VMs and
-> > > 32-bit VMs side-by-side and using both GICv3-on-GICv3 and
-> > > GICv2-on-GICv3.
-> > > 
-> > > The patches are also available in the vhe-optimize-v2 branch on my
-> > > kernel.org repository [5].
-> > > 
-> > > Changes since v1:
-> > >  - Rebased on v4.15-rc1 and newer versions of other dependencies,
-> > >    including the vcpu load/put approach taken for KVM.
-> > >  - Addressed review comments from v1 (detailed changelogs are in the
-> > >    individual patches).
-> > > 
-> > > Thanks,
-> > > -Christoffer
-> > > 
-> > > [1]: git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm kvm-arm-fixes-for-v4.15-1
-> > > [2]: git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git level-mapped-v6
-> > > [3]: git://linux-arm.org/linux-jm.git sdei/v5/base
-> > > [4]: git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git vcpu-load-put-v3
-> > > [5]: git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git vhe-optimize-v2
-> > 
-> > I just submitted the benchmark I used to test your v1 and v2 series':
-> > https://lkml.org/lkml/2017/12/11/364
-> > 
-> > On ThunderX2, 112 online CPUs test results for v1 are like this:
-> > 
-> > Host, v4.14:
-> > Dry-run:          0         1
-> > Self-IPI:         9        18
-> > Normal IPI:      81       110
-> > Broadcast IPI:    0      2106
-> > 
-> > Guest, v4.14:
-> > Dry-run:          0         1
-> > Self-IPI:        10        18
-> > Normal IPI:     305       525
-> > Broadcast IPI:    0      9729
-> > 
-> > Guest, v4.14 + VHE:
-> > Dry-run:          0         1
-> > Self-IPI:         9        18
-> > Normal IPI:     176       343
-> > Broadcast IPI:    0      9885
-> > 
-> > And for v2.
-> > 
-> > Host, v4.15:                   
-> > Dry-run:          0         1
-> > Self-IPI:         9        18
-> > Normal IPI:      79       108
-> > Broadcast IPI:    0      2102
-> >                         
-> > Guest, v4.15-rc:
-> > Dry-run:          0         1
-> > Self-IPI:         9        18
-> > Normal IPI:     291       526
-> > Broadcast IPI:    0     10439
-> > 
-> > Guest, v4.15-rc + VHE:
-> > Dry-run:          0         2
-> > Self-IPI:        14        28
-> > Normal IPI:     370       569
-> > Broadcast IPI:    0     11688
-> > 
-> > All times are normalized to v1 host dry-run time. Smaller - better.
-> > 
-> 
-> Thanks for running this.
-> 
-> > Results for v1 and v2 may vary because kernel version is changed. 
-> > What makes us worry is slowing down the "Normal IPI" test observed in 
-> > v2 series.
-> 
-> I'm wondering if this is not simply variability in your measurements.
-> How many times have you run this?  The 100,000 iterations for each run
-> is not a lot if you consider the cost of migrating threads.
+On Mon, Dec 11, 2017 at 6:07 AM, Will Deacon <will.deacon@arm.com> wrote:
+> On Thu, Dec 07, 2017 at 10:50:38AM -0800, Kees Cook wrote:
+>> My question is mainly: why not just use copy_*() everywhere instead?
+>> Having these things so spread out makes it fragile, and there's very
+>> little performance benefit from using __copy_*() over copy_*().
+>
+> I think that's more of a general question. Why not just remove the __
+> versions from the kernel entirely if they're not worth the perf?
 
-I ran it more than 100 times, maybe more than 200. Variablity exists,
-but ~5% at max, much less than observed changes. I can run 1M iterations
-version to handle this concern.
+That has been something Linus has strongly suggested in the past, so
+I've kind of been looking for easy places to drop the __copy_*
+versions. :)
 
-> Is this workload pinned to a single CPU?
+-Kees
 
-No. We are interested in test close to real usecases, so I didn't pin
-the test. Inside, sending IPI and waiting for acknowledge is pinned
-using {get,put}_cpu(). Tomorrow I'll run test pinned to some CPU. Are
-you OK with 'taskset -c 111 insmod ipi_benchmark.ko'?
-
-> Is the system otherwise idle (both host and guest)? 
-
-Yes, this machine is in my exclusive usage, and I don't run something
-heavy in background. And this is newly installed Ubuntu. 
-
-> If you run this during boot or during kernel module load, the results
-> may be skewed by that.
-
-Hmm... I do it at module load, but there are many tests that measure
-performance like this... Anyway, I'll check that.
-
-> Power management can greatly influence results as well.
-
-That's true. I'll check this also. But as you see, all host numbers,
-and guest dry-run and self-ipi numbers are stable, except v2 test...
-
-> Just so I'm sure we're reading these reults the same way, your "+ VHE"
-> notation means the VHE optimization series, but both the before and
-> after picture runs with VHE enabled, right?
-
-Yes.
-
-> Are you using the same guest kernel version and config for both your v1
-> and v2 results, and for both the before and after versions?
-
-I rebased v1 on 4.14. For v2 I ran make olddefconfig, the rest is same
-as on your branches. I used same kernel image for host and guest, ie 
-4.14 host + 4.14 guest for v1, and 4.15-rc host and guest for v2. I
-also tested host with and without this series - no difference for both
-versions.
-
-> I can't easily come up with a scneario that explains the slowdown on the
-> normal IPI test, beyond some unfortunate bug introduced in v2.
-> 
-> > 
-> > Nevertheless, if you find test relevant, for v1 and v2,
-> > Tested-by: Yury Norov <ynorov@caviumnetworks.com>
-> 
-> Thanks,
-> -Christoffer
+-- 
+Kees Cook
+Pixel Security
