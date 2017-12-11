@@ -1,31 +1,28 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 27/36] KVM: arm64: Move common VHE/non-VHE trap config
- in separate functions
-Date: Mon, 11 Dec 2017 13:53:00 +0000
-Message-ID: <838f808d-c367-be79-80ec-2fce2b6d55db@arm.com>
-References: <20171207170630.592-1-christoffer.dall@linaro.org>
- <20171207170630.592-28-christoffer.dall@linaro.org>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH v5 15/30] arm64/sve: Signal handling support
+Date: Mon, 11 Dec 2017 14:07:20 +0000
+Message-ID: <20171211140720.GE2141@arm.com>
+References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
+ <1509465082-30427-16-git-send-email-Dave.Martin@arm.com>
+ <CAGXu5jJgsAg1VBMbx=mV3ep4hzs+1G46Sow4eeFqCK31b_sORA@mail.gmail.com>
+ <20171207104948.GE31900@arm.com>
+ <CAGXu5jLO6tHm-mCPBo-csCw--+_jhLfGD_sHXCkFjmyvdame=g@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20171207170630.592-28-christoffer.dall@linaro.org>
-Content-Language: en-GB
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Shih-Wei Li <shihwei@cs.columbia.edu>, Andrew Jones <drjones@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-arch-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <CAGXu5jLO6tHm-mCPBo-csCw--+_jhLfGD_sHXCkFjmyvdame=g@mail.gmail.com>
+Sender: linux-arch-owner@vger.kernel.org
+To: Kees Cook <keescook@chromium.org>
+Cc: Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org, linux-arch <linux-arch@vger.kernel.org>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha <libc-alpha@sourceware.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 07/12/17 17:06, Christoffer Dall wrote:
-> As we are about to be more lazy with some of the trap configuration
-> register read/writes for VHE systems, move the logic that is currently
-> shared between VHE and non-VHE into a separate function which can be
-> called from either the world-switch path or from vcpu_load/vcpu_put.
-> 
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+On Thu, Dec 07, 2017 at 10:50:38AM -0800, Kees Cook wrote:
+> My question is mainly: why not just use copy_*() everywhere instead?
+> Having these things so spread out makes it fragile, and there's very
+> little performance benefit from using __copy_*() over copy_*().
 
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+I think that's more of a general question. Why not just remove the __
+versions from the kernel entirely if they're not worth the perf?
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Will
