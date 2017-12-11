@@ -1,67 +1,127 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [RESEND PATCH v4 2/2] arm64: Add software workaround for Falkor
- erratum 1041
-Date: Mon, 11 Dec 2017 10:45:59 +0000
-Message-ID: <20171211104558.pm3lijsdfg2xhj7h@lakrids.cambridge.arm.com>
-References: <1512957823-18064-1-git-send-email-shankerd@codeaurora.org>
- <1512957823-18064-2-git-send-email-shankerd@codeaurora.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v2 21/36] KVM: arm64: Change 32-bit handling of VM system
+ registers
+Date: Mon, 11 Dec 2017 10:57:18 +0000
+Message-ID: <cf0f58e9-96b0-c75d-a0ca-c6f15543fb1d@arm.com>
+References: <20171207170630.592-1-christoffer.dall@linaro.org>
+ <20171207170630.592-22-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1512957823-18064-2-git-send-email-shankerd@codeaurora.org>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Shanker Donthineni <shankerd@codeaurora.org>
-Cc: Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, linux-efi@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Matt Fleming <matt@codeblueprint.co.uk>, Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org, Robin Murphy <robin.murphy@arm.com>, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C05349D63
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Dec 2017 05:53:56 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id WobY+JsIrU8p for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 11 Dec 2017 05:53:55 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1584849D28
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Dec 2017 05:53:55 -0500 (EST)
+In-Reply-To: <20171207170630.592-22-christoffer.dall@linaro.org>
+Content-Language: en-GB
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+On 07/12/17 17:06, Christoffer Dall wrote:
+> We currently handle 32-bit accesses to trapped VM system registers using
+> the 32-bit index into the coproc array on the vcpu structure, which is a
+> union of the coproc array and the sysreg array.
+> 
+> Since all the 32-bit coproc indicies are created to correspond to the
 
-On Sun, Dec 10, 2017 at 08:03:43PM -0600, Shanker Donthineni wrote:
-> +/**
-> + * Errata workaround prior to disable MMU. Insert an ISB immediately prior
-> + * to executing the MSR that will change SCTLR_ELn[M] from a value of 1 to 0.
-> + */
-> +	.macro pre_disable_mmu_workaround
-> +#ifdef CONFIG_QCOM_FALKOR_ERRATUM_E1041
-> +alternative_if ARM64_WORKAROUND_QCOM_FALKOR_E1041
-> +	isb
-> +alternative_else_nop_endif
-> +#endif
-> +	.endm
+indices?
 
-There's really no need for this to be an alternative. It makes the
-kernel larger and more complex due to all the altinstr data and probing
-code.
-
-As Will suggested last time [1], please just use the ifdef, and always
-compile-in the extra ISB if CONFIG_QCOM_FALKOR_ERRATUM_E1041 is
-selected. Get rid of the alternatives and probing code.
-
-All you need here is:
-
-	/*
-	 * Some Falkor parts make errant speculative instruction fetches
-	 * when SCTLR_ELx.M is cleared. An ISB before the write to
-	 * SCTLR_ELx prevents this.
-	 */
-	.macro pre_disable_mmu_workaround
-#ifdef
-	isb
-#endif
-	.endm
-
+> architectural mapping between 64-bit system registers and 32-bit
+> coprocessor registers, and because the AArch64 system registers are the
+> double in size of the AArch32 coprocessor registers, we can always find
+> the system register entry that we must update by dividing the 32-bit
+> coproc index by 2.
+> 
+> This is going to make our lives much easier when we have to start
+> accessing system registers that use deferred save/restore and might
+> have to be read directly from the physical CPU.
+> 
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  8 --------
+>  arch/arm64/kvm/sys_regs.c         | 20 +++++++++++++++-----
+>  2 files changed, 15 insertions(+), 13 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index c841eeeeb5c5..de0d55b30b61 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -290,14 +290,6 @@ struct kvm_vcpu_arch {
+>  #define vcpu_cp14(v,r)		((v)->arch.ctxt.copro[(r)])
+>  #define vcpu_cp15(v,r)		((v)->arch.ctxt.copro[(r)])
+>  
+> -#ifdef CONFIG_CPU_BIG_ENDIAN
+> -#define vcpu_cp15_64_high(v,r)	vcpu_cp15((v),(r))
+> -#define vcpu_cp15_64_low(v,r)	vcpu_cp15((v),(r) + 1)
+> -#else
+> -#define vcpu_cp15_64_high(v,r)	vcpu_cp15((v),(r) + 1)
+> -#define vcpu_cp15_64_low(v,r)	vcpu_cp15((v),(r))
+> -#endif
+> -
+>  struct kvm_vm_stat {
+>  	ulong remote_tlb_flush;
+>  };
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 1830ebc227d1..62c12ab9e6c4 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -121,16 +121,26 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
+>  			  const struct sys_reg_desc *r)
+>  {
+>  	bool was_enabled = vcpu_has_cache_enabled(vcpu);
+> +	u64 val;
+> +	int reg = r->reg;
+>  
+>  	BUG_ON(!p->is_write);
+>  
+> -	if (!p->is_aarch32) {
+> -		vcpu_sys_reg(vcpu, r->reg) = p->regval;
+> +	/* See the 32bit mapping in kvm_host.h */
+> +	if (p->is_aarch32)
+> +		reg = r->reg / 2;
 > +
-> +	.macro pre_disable_mmu_early_workaround
-> +#ifdef CONFIG_QCOM_FALKOR_ERRATUM_E1041
-> +	isb
-> +#endif
-> +	.endm
-> +
+> +	if (!p->is_aarch32 || !p->is_32bit) {
+> +		val = p->regval;
+>  	} else {
+> -		if (!p->is_32bit)
+> -			vcpu_cp15_64_high(vcpu, r->reg) = upper_32_bits(p->regval);
+> -		vcpu_cp15_64_low(vcpu, r->reg) = lower_32_bits(p->regval);
+> +		val = vcpu_sys_reg(vcpu, reg);
+> +		if (r->reg % 2)
+> +			val = (p->regval << 32) | (u64)lower_32_bits(val);
+> +		else
+> +			val = ((u64)upper_32_bits(val) << 32) |
+> +				(u64)lower_32_bits(p->regval);
 
-... and we don't need a special early variant.
+Nit: the u64 casts on lower_32_bits are superfluous.
 
-Thanks,
-Mark.
+>  	}
+> +	vcpu_sys_reg(vcpu, reg) = val;
+>  
+>  	kvm_toggle_cache(vcpu, was_enabled);
+>  	return true;
+> 
 
-[1] https://lkml.kernel.org/r/20171201112457.GE18083@arm.com
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
