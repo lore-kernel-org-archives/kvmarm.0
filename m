@@ -1,27 +1,29 @@
-From: Yury Norov <ynorov@caviumnetworks.com>
-Subject: Re: [PATCH v2 00/36] Optimize KVM/ARM for VHE systems
-Date: Mon, 11 Dec 2017 18:14:33 +0300
-Message-ID: <20171211151433.3mmqiwau5wepknxl@yury-thinkpad>
-References: <20171207170630.592-1-christoffer.dall@linaro.org>
- <20171211144323.firshrsx4dbumgou@yury-thinkpad>
- <e238af17-d63c-52cd-c411-c2d3f3d86994@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v3 11/16] KVM: Move vcpu_load to arch-specific
+ kvm_arch_vcpu_ioctl_set_guest_debug
+Date: Mon, 11 Dec 2017 16:18:18 +0100
+Message-ID: <20171211151818.GI910@cbox>
+References: <20171204203538.8370-1-cdall@kernel.org>
+ <20171204203538.8370-12-cdall@kernel.org>
+ <20171211133943.236f18be.cohuck@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D878D49DCA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Dec 2017 10:11:31 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A8C1A49DCA
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Dec 2017 10:14:59 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DV4cbIYvL4dm for <kvmarm@lists.cs.columbia.edu>;
- Mon, 11 Dec 2017 10:11:28 -0500 (EST)
-Received: from NAM02-CY1-obe.outbound.protection.outlook.com
- (mail-cys01nam02on0045.outbound.protection.outlook.com [104.47.37.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3DD0849DC8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Dec 2017 10:11:28 -0500 (EST)
+ with ESMTP id sZMUMJA+RMRw for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 11 Dec 2017 10:14:58 -0500 (EST)
+Received: from mail-wm0-f65.google.com (mail-wm0-f65.google.com [74.125.82.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5CF4A49DC8
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Dec 2017 10:14:58 -0500 (EST)
+Received: by mail-wm0-f65.google.com with SMTP id n138so15115924wmg.2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Dec 2017 07:18:24 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <e238af17-d63c-52cd-c411-c2d3f3d86994@arm.com>
+In-Reply-To: <20171211133943.236f18be.cohuck@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,139 +33,105 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvm@vger.kernel.org, Shih-Wei Li <shihwei@cs.columbia.edu>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: linux-mips@linux-mips.org, Christoffer Dall <cdall@kernel.org>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, James Hogan <jhogan@kernel.org>, kvm-ppc@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, linux-s390@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Dec 11, 2017 at 02:56:01PM +0000, Marc Zyngier wrote:
-> On 11/12/17 14:43, Yury Norov wrote:
-> > Hi Christoffer,
+On Mon, Dec 11, 2017 at 01:39:43PM +0100, Cornelia Huck wrote:
+> On Mon,  4 Dec 2017 21:35:33 +0100
+> Christoffer Dall <cdall@kernel.org> wrote:
+> 
+> > From: Christoffer Dall <christoffer.dall@linaro.org>
 > > 
-> > On Thu, Dec 07, 2017 at 06:05:54PM +0100, Christoffer Dall wrote:
-> >> This series redesigns parts of KVM/ARM to optimize the performance on
-> >> VHE systems.  The general approach is to try to do as little work as
-> >> possible when transitioning between the VM and the hypervisor.  This has
-> >> the benefit of lower latency when waiting for interrupts and delivering
-> >> virtual interrupts, and reduces the overhead of emulating behavior and
-> >> I/O in the host kernel.
-> >>
-> >> Patches 01 through 04 are not VHE specific, but rework parts of KVM/ARM
-> >> that can be generally improved.  We then add infrastructure to move more
-> >> logic into vcpu_load and vcpu_put, we improve handling of VFP and debug
-> >> registers.
-> >>
-> >> We then introduce a new world-switch function for VHE systems, which we
-> >> can tweak and optimize for VHE systems.  To do that, we rework a lot of
-> >> the system register save/restore handling and emulation code that may
-> >> need access to system registers, so that we can defer as many system
-> >> register save/restore operations to vcpu_load and vcpu_put, and move
-> >> this logic out of the VHE world switch function.
-> >>
-> >> We then optimize the configuration of traps.  On non-VHE systems, both
-> >> the host and VM kernels run in EL1, but because the host kernel should
-> >> have full access to the underlying hardware, but the VM kernel should
-> >> not, we essentially make the host kernel more privileged than the VM
-> >> kernel despite them both running at the same privilege level by enabling
-> >> VE traps when entering the VM and disabling those traps when exiting the
-> >> VM.  On VHE systems, the host kernel runs in EL2 and has full access to
-> >> the hardware (as much as allowed by secure side software), and is
-> >> unaffected by the trap configuration.  That means we can configure the
-> >> traps for VMs running in EL1 once, and don't have to switch them on and
-> >> off for every entry/exit to/from the VM.
-> >>
-> >> Finally, we improve our VGIC handling by moving all save/restore logic
-> >> out of the VHE world-switch, and we make it possible to truly only
-> >> evaluate if the AP list is empty and not do *any* VGIC work if that is
-> >> the case, and only do the minimal amount of work required in the course
-> >> of the VGIC processing when we have virtual interrupts in flight.
-> >>
-> >> The patches are based on v4.15-rc1 plus the fixes sent for v4.15-rc3
-> >> [1], the level-triggered mapped interrupts support series [2], and the
-> >> first five patches of James' SDEI series [3], a single SVE patch that
-> >> moves the CPU ID reg trap setup out of the world-switch path, and v3 of
-> >> my vcpu load/put series [4].
-> >>
-> >> I've given the patches a fair amount of testing on Thunder-X, Mustang,
-> >> Seattle, and TC2 (32-bit) for non-VHE testing, and tested VHE
-> >> functionality on the Foundation model, running both 64-bit VMs and
-> >> 32-bit VMs side-by-side and using both GICv3-on-GICv3 and
-> >> GICv2-on-GICv3.
-> >>
-> >> The patches are also available in the vhe-optimize-v2 branch on my
-> >> kernel.org repository [5].
-> >>
-> >> Changes since v1:
-> >>  - Rebased on v4.15-rc1 and newer versions of other dependencies,
-> >>    including the vcpu load/put approach taken for KVM.
-> >>  - Addressed review comments from v1 (detailed changelogs are in the
-> >>    individual patches).
-> >>
-> >> Thanks,
-> >> -Christoffer
-> >>
-> >> [1]: git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm kvm-arm-fixes-for-v4.15-1
-> >> [2]: git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git level-mapped-v6
-> >> [3]: git://linux-arm.org/linux-jm.git sdei/v5/base
-> >> [4]: git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git vcpu-load-put-v3
-> >> [5]: git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git vhe-optimize-v2
+> > Move vcpu_load() and vcpu_put() into the architecture specific
+> > implementations of kvm_arch_vcpu_ioctl_set_guest_debug().
 > > 
-> > I just submitted the benchmark I used to test your v1 and v2 series':
-> > https://lkml.org/lkml/2017/12/11/364
+> > Reviewed-by: David Hildenbrand <david@redhat.com>
+> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> > ---
+> >  arch/arm64/kvm/guest.c    | 15 ++++++++++++---
+> >  arch/powerpc/kvm/book3s.c |  2 ++
+> >  arch/powerpc/kvm/booke.c  | 19 +++++++++++++------
+> >  arch/s390/kvm/kvm-s390.c  | 16 ++++++++++++----
+> >  arch/x86/kvm/x86.c        |  4 +++-
+> >  virt/kvm/kvm_main.c       |  2 --
+> >  6 files changed, 42 insertions(+), 16 deletions(-)
 > > 
-> > On ThunderX2, 112 online CPUs test results for v1 are like this:
-> > 
-> > Host, v4.14:
-> > Dry-run:          0         1
-> > Self-IPI:         9        18
-> > Normal IPI:      81       110
-> > Broadcast IPI:    0      2106
-> > 
-> > Guest, v4.14:
-> > Dry-run:          0         1
-> > Self-IPI:        10        18
-> > Normal IPI:     305       525
-> > Broadcast IPI:    0      9729
-> > 
-> > Guest, v4.14 + VHE:
-> > Dry-run:          0         1
-> > Self-IPI:         9        18
-> > Normal IPI:     176       343
-> > Broadcast IPI:    0      9885
-> > 
-> > And for v2.
-> > 
-> > Host, v4.15:                   
-> > Dry-run:          0         1
-> > Self-IPI:         9        18
-> > Normal IPI:      79       108
-> > Broadcast IPI:    0      2102
-> >                         
-> > Guest, v4.15-rc:
-> > Dry-run:          0         1
-> > Self-IPI:         9        18
-> > Normal IPI:     291       526
-> > Broadcast IPI:    0     10439
-> > 
-> > Guest, v4.15-rc + VHE:
-> > Dry-run:          0         2
-> > Self-IPI:        14        28
-> > Normal IPI:     370       569
-> > Broadcast IPI:    0     11688
-> > 
-> > All times are normalized to v1 host dry-run time. Smaller - better.
-> > 
-> > Results for v1 and v2 may vary because kernel version is changed. 
-> > What makes us worry is slowing down the "Normal IPI" test observed in 
-> > v2 series.
-> It'd be interesting if you could profile your system to find our where
-> you're spending time. My own tests, with a different benchmark, did show
-> a 40% reduction in the number of *cycles*.
+> 
+> > diff --git a/arch/powerpc/kvm/booke.c b/arch/powerpc/kvm/booke.c
+> > index 1b491b89cd43..7cb0e2677e60 100644
+> > --- a/arch/powerpc/kvm/booke.c
+> > +++ b/arch/powerpc/kvm/booke.c
+> > @@ -2018,12 +2018,15 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+> >  {
+> >  	struct debug_reg *dbg_reg;
+> >  	int n, b = 0, w = 0;
+> > +	int ret = 0;
+> > +
+> > +	vcpu_load(vcpu);
+> >  
+> >  	if (!(dbg->control & KVM_GUESTDBG_ENABLE)) {
+> >  		vcpu->arch.dbg_reg.dbcr0 = 0;
+> >  		vcpu->guest_debug = 0;
+> >  		kvm_guest_protect_msr(vcpu, MSR_DE, false);
+> > -		return 0;
+> > +		goto out;
+> >  	}
+> >  
+> >  	kvm_guest_protect_msr(vcpu, MSR_DE, true);
+> > @@ -2055,8 +2058,9 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+> >  #endif
+> >  
+> >  	if (!(vcpu->guest_debug & KVM_GUESTDBG_USE_HW_BP))
+> > -		return 0;
+> > +		goto out;
+> >  
+> > +	ret = -EINVAL;
+> >  	for (n = 0; n < (KVMPPC_BOOKE_IAC_NUM + KVMPPC_BOOKE_DAC_NUM); n++) {
+> >  		uint64_t addr = dbg->arch.bp[n].addr;
+> >  		uint32_t type = dbg->arch.bp[n].type;
+> > @@ -2067,21 +2071,24 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+> >  		if (type & ~(KVMPPC_DEBUG_WATCH_READ |
+> >  			     KVMPPC_DEBUG_WATCH_WRITE |
+> >  			     KVMPPC_DEBUG_BREAKPOINT))
+> > -			return -EINVAL;
+> > +			goto out;
+> >  
+> >  		if (type & KVMPPC_DEBUG_BREAKPOINT) {
+> >  			/* Setting H/W breakpoint */
+> >  			if (kvmppc_booke_add_breakpoint(dbg_reg, addr, b++))
+> > -				return -EINVAL;
+> > +				goto out;
+> >  		} else {
+> >  			/* Setting H/W watchpoint */
+> >  			if (kvmppc_booke_add_watchpoint(dbg_reg, addr,
+> >  							type, w++))
+> > -				return -EINVAL;
+> > +				goto out;
+> >  		}
+> >  	}
+> >  
+> > -	return 0;
+> > +	ret = 0;
+> 
+> I would probably set the -EINVAL in the individual branches (so it is
+> clear that something is wrong, and it is not just a benign exit as in
+> the cases above), but your code is correct as well.
 
-40% reduction is what I also observed for v1, to be specific - 42%.
-So I was surprised when found v2 slower than vanilla kernel. Did you
-observe 40% reduction for v2 or v1, or both?
+I think that's better as well actually.  I got probably got a little
+used to that pattern after looking the main dispatcher function for a
+while.  I'm happy to change it.
 
-I also think to switch to *cycles* as it (doubtly) might be CPU
-frequency scaling issue, and do some profiling.
+> > +out:
+> > +	vcpu_put(vcpu);
+> > +	return ret;
+> >  }
+> >  
+> >  void kvmppc_booke_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+> 
+> In any case,
+> 
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
-Yury
+Thanks!
+-Christoffer
