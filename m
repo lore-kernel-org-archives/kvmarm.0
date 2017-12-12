@@ -1,34 +1,29 @@
-From: Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH v5 15/30] arm64/sve: Signal handling support
-Date: Tue, 12 Dec 2017 11:36:18 -0800
-Message-ID: <CAGXu5j+Kxd9+QBKmFa0i34Xqygh45pE_zQ00VfW87+20m1pSjg@mail.gmail.com>
-References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
- <1509465082-30427-16-git-send-email-Dave.Martin@arm.com>
- <CAGXu5jJgsAg1VBMbx=mV3ep4hzs+1G46Sow4eeFqCK31b_sORA@mail.gmail.com>
- <20171207104948.GE31900@arm.com>
- <CAGXu5jLO6tHm-mCPBo-csCw--+_jhLfGD_sHXCkFjmyvdame=g@mail.gmail.com>
- <20171211140720.GE2141@arm.com>
- <CAGXu5j+2MNOnAfstr8RyD0Orrt37ewL8uE2N8e3fL--fNPs3TQ@mail.gmail.com>
- <20171212104030.GG28301@arm.com>
- <20171212111125.GL22781@e103592.cambridge.arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v7 3/8] KVM: arm/arm64: Don't cache the timer IRQ level
+Date: Tue, 12 Dec 2017 21:40:07 +0100
+Message-ID: <20171212204007.GP910@cbox>
+References: <20171207105418.22428-1-christoffer.dall@linaro.org>
+ <20171207105418.22428-4-christoffer.dall@linaro.org>
+ <24ae6f9e-8f83-6b95-a7a0-d900c37b4a7f@redhat.com>
+ <1604e8d6-5f9a-f91d-c199-57f323c09374@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 493A349D6A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Dec 2017 14:32:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E4EC149D46
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Dec 2017 15:36:44 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oAYrcmTGzPgQ for <kvmarm@lists.cs.columbia.edu>;
- Tue, 12 Dec 2017 14:32:50 -0500 (EST)
-Received: from mail-vk0-f68.google.com (mail-vk0-f68.google.com
- [209.85.213.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5D2DA40795
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Dec 2017 14:32:50 -0500 (EST)
-Received: by mail-vk0-f68.google.com with SMTP id y187so3330531vkd.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Dec 2017 11:36:20 -0800 (PST)
-In-Reply-To: <20171212111125.GL22781@e103592.cambridge.arm.com>
+ with ESMTP id WbORDpo9BRdC for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 12 Dec 2017 15:36:43 -0500 (EST)
+Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E05E840D25
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Dec 2017 15:36:42 -0500 (EST)
+Received: by mail-wm0-f42.google.com with SMTP id 9so1099809wme.4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Dec 2017 12:40:12 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <1604e8d6-5f9a-f91d-c199-57f323c09374@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -38,46 +33,68 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: linux-arch <linux-arch@vger.kernel.org>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha <libc-alpha@sourceware.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Dec 12, 2017 at 3:11 AM, Dave Martin <Dave.Martin@arm.com> wrote:
-> On Tue, Dec 12, 2017 at 10:40:30AM +0000, Will Deacon wrote:
->> On Mon, Dec 11, 2017 at 11:23:09AM -0800, Kees Cook wrote:
->> > On Mon, Dec 11, 2017 at 6:07 AM, Will Deacon <will.deacon@arm.com> wrote:
->> > > On Thu, Dec 07, 2017 at 10:50:38AM -0800, Kees Cook wrote:
->> > >> My question is mainly: why not just use copy_*() everywhere instead?
->> > >> Having these things so spread out makes it fragile, and there's very
->> > >> little performance benefit from using __copy_*() over copy_*().
->> > >
->> > > I think that's more of a general question. Why not just remove the __
->> > > versions from the kernel entirely if they're not worth the perf?
->> >
->> > That has been something Linus has strongly suggested in the past, so
->> > I've kind of been looking for easy places to drop the __copy_*
->> > versions. :)
->>
->> Tell you what then: I'll Ack the arm64 patch if it's part of a series
->> removing the thing entirely :p
->>
->> I guess we'd still want to the validation of the whole sigframe though,
->> so we don't end up pushing half a signal stack before running into an
->> access_ok failure?
->
-> That's an interesting question.  In many cases access_ok() might become
-> redundant, but for syscalls that you don't want to have side-effects
-> on user memory on failure it's still relevant.
->
-> In the signal case we'd still an encompassing access_ok() to prevent
-> stack guard overruns, because the signal frame can be large and isn't
-> written or read contiguously or in a well-defined order.
+On Tue, Dec 12, 2017 at 09:40:10AM +0100, Auger Eric wrote:
+> 
+> 
+> On 11/12/17 21:51, Auger Eric wrote:
+> > Hi Christoffer,
+> > On 07/12/17 11:54, Christoffer Dall wrote:
+> >> The timer was modeled after a strict idea of modelling an interrupt line
+> >> level in software, meaning that only transitions in the level needed to
+> >> be reported to the VGIC.  This works well for the timer, because the
+> >> arch timer code is in complete control of the device and can track the
+> >> transitions of the line.
+> >>
+> >> However, as we are about to support using the HW bit in the VGIC not
+> >> just for the timer, but also for VFIO which cannot track transitions of
+> >> the interrupt line, we have to decide on an interface for level
+> >> triggered mapped interrupts to the GIC, which both the timer and VFIO
+> >> can use.
+> >>
+> >> VFIO only sees an asserting transition of the physical interrupt line,
+> >> and tells the VGIC when that happens.  That means that part of the
+> >> interrupt flow is offloaded to the hardware.
+> >>
+> >> To use the same interface for VFIO devices and the timer, we therefore
+> >> have to change the timer (we cannot change VFIO because it doesn't know
+> >> the details of the device it is assigning to a VM).
+> >>
+> >> Luckily, changing the timer is simple, we just need to stop 'caching'
+> >> the line level, but instead let the VGIC know the state of the timer
+> >> every time there is a potential change in the line level, and when the
+> >> line level should be asserted from the timer ISR.  The VGIC can ignore
+> >> extra notifications using its validate mechanism.
+> > 
+> > I was confused by the fact we say we stop caching the line level but
+> > vtimer->irq.level still exists, is updated in the vtimer host ISR and
+> > kvm_timer_update_state() and read in many places.
+> > 
+> > I feel difficult to figure out if each time we use the vtimer->irq.level
+> > value it is safe to use it.
+> > 
+> > Also for the validate() to succeed we need the vgic irq->line_level to
+> > to be 0. I understand this is properly handled for mapped level irqs in
+> > next patch which does that on the populate_lr. However I currently fail
+> > to understand why the timer level sensitive mapped IRQ does not require
+> > the next patch to work.
+> OK reading again "[PATCH v7 7/8] KVM: arm/arm64: Provide a
+> get_input_level for the arch timer", I now understand it works because
+> we had the
+> kvm_timer_sync_hwstate toggling down the line on VM exit. After the
+> changes of next patch this can be safely removed.
 
-Yeah, I think bailing early is fine. I think the existing access_ok()
-checks are fine; I wouldn't want to drop those.
+Yes, but also note that this patch in isolation doesn't break anything,
+it just ensures that we notify the GIC of an asserted line more often.
 
--Kees
+> 
+> Not related to this patch but I noticed
+> Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt now is outdated.
 
--- 
-Kees Cook
-Pixel Security
+Good point, I have updated the docs and will include that in v8.
+
+Thanks,
+-Christoffer
