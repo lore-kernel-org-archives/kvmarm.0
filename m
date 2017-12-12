@@ -1,88 +1,54 @@
-From: Steve Capper <steve.capper@arm.com>
-Subject: Re: [PATCH 07/12] arm64: mm: Place kImage at bottom of VA space
-Date: Tue, 12 Dec 2017 11:03:54 +0000
-Message-ID: <20171212110354.e3h5r6zhh24osjn5@capper-debian.cambridge.arm.com>
-References: <20171204141313.31604-1-steve.capper@arm.com>
- <20171204141313.31604-8-steve.capper@arm.com>
- <CAKv+Gu_A-fAMpheWbKZ+prEVKHR58er7sXz0L93Af1XhJrGZeQ@mail.gmail.com>
- <20171204171809.wvrqfd435bh7i5r4@capper-debian.cambridge.arm.com>
- <CAKv+Gu9Mjd7f57ZZdv+1p70Vs-YD8p6-1P=pb4-KAUsxNVppGw@mail.gmail.com>
- <20171204181213.or2t24rdh6uwj3iu@capper-debian.cambridge.arm.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH v5 15/30] arm64/sve: Signal handling support
+Date: Tue, 12 Dec 2017 11:11:27 +0000
+Message-ID: <20171212111125.GL22781@e103592.cambridge.arm.com>
+References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
+ <1509465082-30427-16-git-send-email-Dave.Martin@arm.com>
+ <CAGXu5jJgsAg1VBMbx=mV3ep4hzs+1G46Sow4eeFqCK31b_sORA@mail.gmail.com>
+ <20171207104948.GE31900@arm.com>
+ <CAGXu5jLO6tHm-mCPBo-csCw--+_jhLfGD_sHXCkFjmyvdame=g@mail.gmail.com>
+ <20171211140720.GE2141@arm.com>
+ <CAGXu5j+2MNOnAfstr8RyD0Orrt37ewL8uE2N8e3fL--fNPs3TQ@mail.gmail.com>
+ <20171212104030.GG28301@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AADAD49D27
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Dec 2017 06:00:35 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uetqueHKBjTi for <kvmarm@lists.cs.columbia.edu>;
- Tue, 12 Dec 2017 06:00:33 -0500 (EST)
-Received: from EUR03-AM5-obe.outbound.protection.outlook.com
- (mail-eopbgr30069.outbound.protection.outlook.com [40.107.3.69])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6218E406D0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Dec 2017 06:00:33 -0500 (EST)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-arch-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20171204181213.or2t24rdh6uwj3iu@capper-debian.cambridge.arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, nd@arm.com, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+In-Reply-To: <20171212104030.GG28301@arm.com>
+Sender: linux-arch-owner@vger.kernel.org
+To: Will Deacon <will.deacon@arm.com>
+Cc: Kees Cook <keescook@chromium.org>, linux-arch <linux-arch@vger.kernel.org>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha <libc-alpha@sourceware.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Dec 04, 2017 at 06:12:13PM +0000, Steve Capper wrote:
-> On Mon, Dec 04, 2017 at 05:27:10PM +0000, Ard Biesheuvel wrote:
-> > On 4 December 2017 at 17:18, Steve Capper <steve.capper@arm.com> wrote:
-> > > Hi Ard,
+On Tue, Dec 12, 2017 at 10:40:30AM +0000, Will Deacon wrote:
+> On Mon, Dec 11, 2017 at 11:23:09AM -0800, Kees Cook wrote:
+> > On Mon, Dec 11, 2017 at 6:07 AM, Will Deacon <will.deacon@arm.com> wrote:
+> > > On Thu, Dec 07, 2017 at 10:50:38AM -0800, Kees Cook wrote:
+> > >> My question is mainly: why not just use copy_*() everywhere instead?
+> > >> Having these things so spread out makes it fragile, and there's very
+> > >> little performance benefit from using __copy_*() over copy_*().
 > > >
-> > > On Mon, Dec 04, 2017 at 04:25:18PM +0000, Ard Biesheuvel wrote:
-> > >> On 4 December 2017 at 14:13, Steve Capper <steve.capper@arm.com> wrote:
-> > >> > Re-arrange the kernel memory map s.t. the kernel image resides in the
-> > >> > bottom 514MB of memory.
-> > >>
-> > >> I guess this breaks KASLR entirely, no? Given that it adds an offset
-> > >> in the range [0 ... sizeof(VMALLOC_SPACE) /4 ].
-> > >
-> > > Yes, yes it does. Sorry about this. I had very carefully tested KASLR
-> > > with custom offsets... on my early page table code. I will have a think
-> > > about this.
-> > >
-> > > From a KASLR side, my (renewed) understanding is that a virtual address
-> > > as low as possible is desired for the kimage start as that affords the
-> > > most wiggle room?
-> > >
+> > > I think that's more of a general question. Why not just remove the __
+> > > versions from the kernel entirely if they're not worth the perf?
 > > 
-> > Well, the nice thing about the current arrangement is that the default
-> > is adjacent to the vmalloc space so any non-zero [bounded] offset
-> > produces a valid placement. Addition with subtraction is easy, so
-> > which side the default placement happens to be at does not really
-> > matter. Having to implement additional bounds checking in the early
-> > KASLR init code to stay clear of the PCI I/O or fixmap regions sounds
-> > a bit more cumbersome.
-> > 
+> > That has been something Linus has strongly suggested in the past, so
+> > I've kind of been looking for easy places to drop the __copy_*
+> > versions. :)
 > 
-> I *think* I can fix KASAN_SHADOW_END to be 0xFFFF200000000000 on both 48-bit
-> and 52-bit VA configurations. Thus I may be able to enable 52-bit VA with
-> minimal disruption to the layout of the VA space (i.e. no need to change
-> the layout) if I also depend on CONFIG_RELOCATABLE.
+> Tell you what then: I'll Ack the arm64 patch if it's part of a series
+> removing the thing entirely :p
 > 
+> I guess we'd still want to the validation of the whole sigframe though,
+> so we don't end up pushing half a signal stack before running into an
+> access_ok failure?
 
-Unfortunately, having KASAN_SHADOW_END at 0xFFFF2000000000000 doesn't
-work with 52-bit VAs as this would place it in the direct linear map
-area.
+That's an interesting question.  In many cases access_ok() might become
+redundant, but for syscalls that you don't want to have side-effects
+on user memory on failure it's still relevant.
 
-So I think we need to flip the two halves of the kernel address space in
-order to accommodate inline KASAN that operates under multiple VA space
-sizes (I couldn't figure out any way to patch the inline KASAN instrumentation).
+In the signal case we'd still an encompassing access_ok() to prevent
+stack guard overruns, because the signal frame can be large and isn't
+written or read contiguously or in a well-defined order.
 
-Cheers,
--- 
-Steve
+Cheers
+---Dave
