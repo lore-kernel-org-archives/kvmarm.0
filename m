@@ -1,23 +1,25 @@
-From: Shanker Donthineni <shankerd@codeaurora.org>
-Subject: [PATCH v5 2/2] arm64: Add software workaround for Falkor erratum 1041
-Date: Mon, 11 Dec 2017 16:42:32 -0600
-Message-ID: <1513032152-13211-2-git-send-email-shankerd@codeaurora.org>
-References: <1513032152-13211-1-git-send-email-shankerd@codeaurora.org>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v7 3/8] KVM: arm/arm64: Don't cache the timer IRQ level
+Date: Tue, 12 Dec 2017 09:40:10 +0100
+Message-ID: <1604e8d6-5f9a-f91d-c199-57f323c09374@redhat.com>
+References: <20171207105418.22428-1-christoffer.dall@linaro.org>
+ <20171207105418.22428-4-christoffer.dall@linaro.org>
+ <24ae6f9e-8f83-6b95-a7a0-d900c37b4a7f@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B62949DBA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Dec 2017 17:39:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D39BA49D9B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Dec 2017 03:36:47 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rVckOvlOJe+N for <kvmarm@lists.cs.columbia.edu>;
- Mon, 11 Dec 2017 17:39:11 -0500 (EST)
-Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 15A9649D90
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Dec 2017 17:39:11 -0500 (EST)
-In-Reply-To: <1513032152-13211-1-git-send-email-shankerd@codeaurora.org>
+ with ESMTP id YGvNRKWPexTl for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 12 Dec 2017 03:36:46 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B46FD49D90
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Dec 2017 03:36:46 -0500 (EST)
+In-Reply-To: <24ae6f9e-8f83-6b95-a7a0-d900c37b4a7f@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,188 +29,113 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: linux-efi@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Matt Fleming <matt@codeblueprint.co.uk>, Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org, Robin Murphy <robin.murphy@arm.com>, kvmarm@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The ARM architecture defines the memory locations that are permitted
-to be accessed as the result of a speculative instruction fetch from
-an exception level for which all stages of translation are disabled.
-Specifically, the core is permitted to speculatively fetch from the
-4KB region containing the current program counter 4K and next 4K.
 
-When translation is changed from enabled to disabled for the running
-exception level (SCTLR_ELn[M] changed from a value of 1 to 0), the
-Falkor core may errantly speculatively access memory locations outside
-of the 4KB region permitted by the architecture. The errant memory
-access may lead to one of the following unexpected behaviors.
 
-1) A System Error Interrupt (SEI) being raised by the Falkor core due
-   to the errant memory access attempting to access a region of memory
-   that is protected by a slave-side memory protection unit.
-2) Unpredictable device behavior due to a speculative read from device
-   memory. This behavior may only occur if the instruction cache is
-   disabled prior to or coincident with translation being changed from
-   enabled to disabled.
+On 11/12/17 21:51, Auger Eric wrote:
+> Hi Christoffer,
+> On 07/12/17 11:54, Christoffer Dall wrote:
+>> The timer was modeled after a strict idea of modelling an interrupt line
+>> level in software, meaning that only transitions in the level needed to
+>> be reported to the VGIC.  This works well for the timer, because the
+>> arch timer code is in complete control of the device and can track the
+>> transitions of the line.
+>>
+>> However, as we are about to support using the HW bit in the VGIC not
+>> just for the timer, but also for VFIO which cannot track transitions of
+>> the interrupt line, we have to decide on an interface for level
+>> triggered mapped interrupts to the GIC, which both the timer and VFIO
+>> can use.
+>>
+>> VFIO only sees an asserting transition of the physical interrupt line,
+>> and tells the VGIC when that happens.  That means that part of the
+>> interrupt flow is offloaded to the hardware.
+>>
+>> To use the same interface for VFIO devices and the timer, we therefore
+>> have to change the timer (we cannot change VFIO because it doesn't know
+>> the details of the device it is assigning to a VM).
+>>
+>> Luckily, changing the timer is simple, we just need to stop 'caching'
+>> the line level, but instead let the VGIC know the state of the timer
+>> every time there is a potential change in the line level, and when the
+>> line level should be asserted from the timer ISR.  The VGIC can ignore
+>> extra notifications using its validate mechanism.
+> 
+> I was confused by the fact we say we stop caching the line level but
+> vtimer->irq.level still exists, is updated in the vtimer host ISR and
+> kvm_timer_update_state() and read in many places.
+> 
+> I feel difficult to figure out if each time we use the vtimer->irq.level
+> value it is safe to use it.
+> 
+> Also for the validate() to succeed we need the vgic irq->line_level to
+> to be 0. I understand this is properly handled for mapped level irqs in
+> next patch which does that on the populate_lr. However I currently fail
+> to understand why the timer level sensitive mapped IRQ does not require
+> the next patch to work.
+OK reading again "[PATCH v7 7/8] KVM: arm/arm64: Provide a
+get_input_level for the arch timer", I now understand it works because
+we had the
+kvm_timer_sync_hwstate toggling down the line on VM exit. After the
+changes of next patch this can be safely removed.
 
-The conditions leading to this erratum will not occur when either of the
-following occur:
- 1) A higher exception level disables translation of a lower exception level
-   (e.g. EL2 changing SCTLR_EL1[M] from a value of 1 to 0).
- 2) An exception level disabling its stage-1 translation if its stage-2
-    translation is enabled (e.g. EL1 changing SCTLR_EL1[M] from a value of 1
-    to 0 when HCR_EL2[VM] has a value of 1).
-
-To avoid the errant behavior, software must execute an ISB immediately
-prior to executing the MSR that will change SCTLR_ELn[M] from 1 to 0.
-
-Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
----
-Changes since v3:
-  Rebased to kernel v4.15-rc3 and removed the alternatives.
-Changes since v3:
-  Rebased to kernel v4.15-rc1.
-Changes since v2:
-  Repost the corrected patches.
-Changes since v1:
-  Apply the workaround where it's required.
-
- Documentation/arm64/silicon-errata.txt |  1 +
- arch/arm64/Kconfig                     | 12 +++++++++++-
- arch/arm64/include/asm/assembler.h     | 10 ++++++++++
- arch/arm64/kernel/cpu-reset.S          |  1 +
- arch/arm64/kernel/efi-entry.S          |  2 ++
- arch/arm64/kernel/head.S               |  1 +
- arch/arm64/kernel/relocate_kernel.S    |  1 +
- arch/arm64/kvm/hyp-init.S              |  1 +
- 8 files changed, 28 insertions(+), 1 deletion(-)
-
-diff --git a/Documentation/arm64/silicon-errata.txt b/Documentation/arm64/silicon-errata.txt
-index 304bf22..fc1c884 100644
---- a/Documentation/arm64/silicon-errata.txt
-+++ b/Documentation/arm64/silicon-errata.txt
-@@ -75,3 +75,4 @@ stable kernels.
- | Qualcomm Tech. | Falkor v1       | E1003           | QCOM_FALKOR_ERRATUM_1003    |
- | Qualcomm Tech. | Falkor v1       | E1009           | QCOM_FALKOR_ERRATUM_1009    |
- | Qualcomm Tech. | QDF2400 ITS     | E0065           | QCOM_QDF2400_ERRATUM_0065   |
-+| Qualcomm Tech. | Falkor v{1,2}   | E1041           | QCOM_FALKOR_ERRATUM_1041    |
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index a93339f..c9a7e9e 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -557,7 +557,6 @@ config QCOM_QDF2400_ERRATUM_0065
- 
- 	  If unsure, say Y.
- 
--
- config SOCIONEXT_SYNQUACER_PREITS
- 	bool "Socionext Synquacer: Workaround for GICv3 pre-ITS"
- 	default y
-@@ -576,6 +575,17 @@ config HISILICON_ERRATUM_161600802
- 	  a 128kB offset to be applied to the target address in this commands.
- 
- 	  If unsure, say Y.
-+
-+config QCOM_FALKOR_ERRATUM_E1041
-+	bool "Falkor E1041: Speculative instruction fetches might cause errant memory access"
-+	default y
-+	help
-+	  Falkor CPU may speculatively fetch instructions from an improper
-+	  memory location when MMU translation is changed from SCTLR_ELn[M]=1
-+	  to SCTLR_ELn[M]=0. Prefix an ISB instruction to fix the problem.
-+
-+	  If unsure, say Y.
-+
- endmenu
- 
- 
-diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
-index aef72d8..8b16828 100644
---- a/arch/arm64/include/asm/assembler.h
-+++ b/arch/arm64/include/asm/assembler.h
-@@ -512,4 +512,14 @@
- #endif
- 	.endm
- 
-+/**
-+ * Errata workaround prior to disable MMU. Insert an ISB immediately prior
-+ * to executing the MSR that will change SCTLR_ELn[M] from a value of 1 to 0.
-+ */
-+	.macro pre_disable_mmu_workaround
-+#ifdef CONFIG_QCOM_FALKOR_ERRATUM_E1041
-+	isb
-+#endif
-+	.endm
-+
- #endif	/* __ASM_ASSEMBLER_H */
-diff --git a/arch/arm64/kernel/cpu-reset.S b/arch/arm64/kernel/cpu-reset.S
-index 65f42d2..2a752cb 100644
---- a/arch/arm64/kernel/cpu-reset.S
-+++ b/arch/arm64/kernel/cpu-reset.S
-@@ -37,6 +37,7 @@ ENTRY(__cpu_soft_restart)
- 	mrs	x12, sctlr_el1
- 	ldr	x13, =SCTLR_ELx_FLAGS
- 	bic	x12, x12, x13
-+	pre_disable_mmu_workaround
- 	msr	sctlr_el1, x12
- 	isb
- 
-diff --git a/arch/arm64/kernel/efi-entry.S b/arch/arm64/kernel/efi-entry.S
-index 4e6ad35..6b9736c 100644
---- a/arch/arm64/kernel/efi-entry.S
-+++ b/arch/arm64/kernel/efi-entry.S
-@@ -96,6 +96,7 @@ ENTRY(entry)
- 	mrs	x0, sctlr_el2
- 	bic	x0, x0, #1 << 0	// clear SCTLR.M
- 	bic	x0, x0, #1 << 2	// clear SCTLR.C
-+	pre_disable_mmu_workaround
- 	msr	sctlr_el2, x0
- 	isb
- 	b	2f
-@@ -103,6 +104,7 @@ ENTRY(entry)
- 	mrs	x0, sctlr_el1
- 	bic	x0, x0, #1 << 0	// clear SCTLR.M
- 	bic	x0, x0, #1 << 2	// clear SCTLR.C
-+	pre_disable_mmu_workaround
- 	msr	sctlr_el1, x0
- 	isb
- 2:
-diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
-index 67e86a0..e3cb9fb 100644
---- a/arch/arm64/kernel/head.S
-+++ b/arch/arm64/kernel/head.S
-@@ -750,6 +750,7 @@ __primary_switch:
- 	 * to take into account by discarding the current kernel mapping and
- 	 * creating a new one.
- 	 */
-+	pre_disable_mmu_workaround
- 	msr	sctlr_el1, x20			// disable the MMU
- 	isb
- 	bl	__create_page_tables		// recreate kernel mapping
-diff --git a/arch/arm64/kernel/relocate_kernel.S b/arch/arm64/kernel/relocate_kernel.S
-index ce704a4..f407e42 100644
---- a/arch/arm64/kernel/relocate_kernel.S
-+++ b/arch/arm64/kernel/relocate_kernel.S
-@@ -45,6 +45,7 @@ ENTRY(arm64_relocate_new_kernel)
- 	mrs	x0, sctlr_el2
- 	ldr	x1, =SCTLR_ELx_FLAGS
- 	bic	x0, x0, x1
-+	pre_disable_mmu_workaround
- 	msr	sctlr_el2, x0
- 	isb
- 1:
-diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp-init.S
-index 3f96155..870828c 100644
---- a/arch/arm64/kvm/hyp-init.S
-+++ b/arch/arm64/kvm/hyp-init.S
-@@ -151,6 +151,7 @@ reset:
- 	mrs	x5, sctlr_el2
- 	ldr	x6, =SCTLR_ELx_FLAGS
- 	bic	x5, x5, x6		// Clear SCTL_M and etc
-+	pre_disable_mmu_workaround
- 	msr	sctlr_el2, x5
- 	isb
- 
--- 
-Qualcomm Datacenter Technologies, Inc. on behalf of the Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
+Not related to this patch but I noticed
+Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt now is outdated.
+> 
+> Thanks
+> 
+> Eric
+> 
+>>
+>> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+>> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+>> ---
+>>  virt/kvm/arm/arch_timer.c | 20 +++++++++++++-------
+>>  1 file changed, 13 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+>> index 4151250ce8da..dd5aca05c500 100644
+>> --- a/virt/kvm/arm/arch_timer.c
+>> +++ b/virt/kvm/arm/arch_timer.c
+>> @@ -99,11 +99,9 @@ static irqreturn_t kvm_arch_timer_handler(int irq, void *dev_id)
+>>  	}
+>>  	vtimer = vcpu_vtimer(vcpu);
+>>  
+>> -	if (!vtimer->irq.level) {
+>> -		vtimer->cnt_ctl = read_sysreg_el0(cntv_ctl);
+>> -		if (kvm_timer_irq_can_fire(vtimer))
+>> -			kvm_timer_update_irq(vcpu, true, vtimer);
+>> -	}
+>> +	vtimer->cnt_ctl = read_sysreg_el0(cntv_ctl);
+>> +	if (kvm_timer_irq_can_fire(vtimer))
+>> +		kvm_timer_update_irq(vcpu, true, vtimer);
+>>  
+>>  	if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
+>>  		kvm_vtimer_update_mask_user(vcpu);
+>> @@ -324,12 +322,20 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
+>>  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+>>  	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+>>  	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+>> +	bool level;
+>>  
+>>  	if (unlikely(!timer->enabled))
+>>  		return;
+>>  
+>> -	if (kvm_timer_should_fire(vtimer) != vtimer->irq.level)
+>> -		kvm_timer_update_irq(vcpu, !vtimer->irq.level, vtimer);
+>> +	/*
+>> +	 * The vtimer virtual interrupt is a 'mapped' interrupt, meaning part
+>> +	 * of its lifecycle is offloaded to the hardware, and we therefore may
+>> +	 * not have lowered the irq.level value before having to signal a new
+>> +	 * interrupt, but have to signal an interrupt every time the level is
+>> +	 * asserted.
+>> +	 */
+>> +	level = kvm_timer_should_fire(vtimer);
+>> +	kvm_timer_update_irq(vcpu, level, vtimer);
+>>  
+>>  	if (kvm_timer_should_fire(ptimer) != ptimer->irq.level)
+>>  		kvm_timer_update_irq(vcpu, !ptimer->irq.level, ptimer);
+>>
