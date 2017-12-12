@@ -1,43 +1,67 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH v5 15/30] arm64/sve: Signal handling support
-Date: Tue, 12 Dec 2017 10:40:30 +0000
-Message-ID: <20171212104030.GG28301@arm.com>
-References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
- <1509465082-30427-16-git-send-email-Dave.Martin@arm.com>
- <CAGXu5jJgsAg1VBMbx=mV3ep4hzs+1G46Sow4eeFqCK31b_sORA@mail.gmail.com>
- <20171207104948.GE31900@arm.com>
- <CAGXu5jLO6tHm-mCPBo-csCw--+_jhLfGD_sHXCkFjmyvdame=g@mail.gmail.com>
- <20171211140720.GE2141@arm.com>
- <CAGXu5j+2MNOnAfstr8RyD0Orrt37ewL8uE2N8e3fL--fNPs3TQ@mail.gmail.com>
+From: Steve Capper <steve.capper@arm.com>
+Subject: Re: [PATCH 04/12] arm64: Initialise high_memory global variable
+ earlier
+Date: Tue, 12 Dec 2017 10:56:27 +0000
+Message-ID: <20171212105627.mtmk3x3dgbhsrtwc@capper-debian.cambridge.arm.com>
+References: <20171204141313.31604-1-steve.capper@arm.com>
+ <20171204141313.31604-5-steve.capper@arm.com>
+ <20171211120022.ujdc37dp3iawzrem@armageddon.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-arch-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A91F49D27
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Dec 2017 05:53:09 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id lYCNj14wt63B for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 12 Dec 2017 05:53:08 -0500 (EST)
+Received: from EUR03-AM5-obe.outbound.protection.outlook.com
+ (mail-eopbgr30066.outbound.protection.outlook.com [40.107.3.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 01068406D0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Dec 2017 05:53:07 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <CAGXu5j+2MNOnAfstr8RyD0Orrt37ewL8uE2N8e3fL--fNPs3TQ@mail.gmail.com>
-Sender: linux-arch-owner@vger.kernel.org
-To: Kees Cook <keescook@chromium.org>
-Cc: Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org, linux-arch <linux-arch@vger.kernel.org>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha <libc-alpha@sourceware.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20171211120022.ujdc37dp3iawzrem@armageddon.cambridge.arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: nd@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, ard.biesheuvel@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Dec 11, 2017 at 11:23:09AM -0800, Kees Cook wrote:
-> On Mon, Dec 11, 2017 at 6:07 AM, Will Deacon <will.deacon@arm.com> wrote:
-> > On Thu, Dec 07, 2017 at 10:50:38AM -0800, Kees Cook wrote:
-> >> My question is mainly: why not just use copy_*() everywhere instead?
-> >> Having these things so spread out makes it fragile, and there's very
-> >> little performance benefit from using __copy_*() over copy_*().
-> >
-> > I think that's more of a general question. Why not just remove the __
-> > versions from the kernel entirely if they're not worth the perf?
+On Mon, Dec 11, 2017 at 12:00:22PM +0000, Catalin Marinas wrote:
+> On Mon, Dec 04, 2017 at 02:13:05PM +0000, Steve Capper wrote:
+> > The high_memory global variable is used by
+> > cma_declare_contiguous(.) before it is defined.
+> > 
+> > We don't notice this as we compute __pa(high_memory - 1), and it looks
+> > like we're processing a VA from the direct linear map.
+> > 
+> > This problem becomes apparent when we flip the kernel virtual address
+> > space and the linear map is moved to the bottom of the kernel VA space.
+> > 
+> > This patch moves the initialisation of high_memory before it used.
+> > 
+> > Signed-off-by: Steve Capper <steve.capper@arm.com>
 > 
-> That has been something Linus has strongly suggested in the past, so
-> I've kind of been looking for easy places to drop the __copy_*
-> versions. :)
+> It looks like we've had this bug since 3.18 (f7426b983a6a, "mm: cma:
+> adjust address limit to avoid hitting low/high memory boundary"). It may
+> be worth adding a cc stable on this patch.
 
-Tell you what then: I'll Ack the arm64 patch if it's part of a series
-removing the thing entirely :p
+Thanks Catalin,
+Will add a fixes and cc stable.
 
-I guess we'd still want to the validation of the whole sigframe though,
-so we don't end up pushing half a signal stack before running into an
-access_ok failure?
+Cheers,
+-- 
+Steve
 
-Will
+> 
+> -- 
+> Catalin
