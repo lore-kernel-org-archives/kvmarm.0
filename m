@@ -1,26 +1,26 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [RFC v2] arm64: KVM: KVM API extensions for SVE
-Date: Wed, 13 Dec 2017 16:58:16 +0000
-Message-ID: <CAFEAcA-Rogf9m7GMPD3PKs7miEpx-bMMn72Y+2=eF4oiCdLqqw@mail.gmail.com>
-References: <20171213165543.GO22781@e103592.cambridge.arm.com>
+From: Vladimir Murzin <vladimir.murzin@arm.com>
+Subject: Re: [PATCH v2 1/3] arm64: mm: Support Common Not Private translations
+Date: Wed, 13 Dec 2017 16:59:42 +0000
+Message-ID: <e76e1b4f-e1df-928e-fece-4c8717d5aeab@arm.com>
+References: <1507724395-13735-1-git-send-email-vladimir.murzin@arm.com>
+ <1507724395-13735-2-git-send-email-vladimir.murzin@arm.com>
+ <5A313704.1090503@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 200A049D6C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 11:55:06 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DC7349D4C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 11:56:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5+4jZDXH3O25 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 13 Dec 2017 11:55:05 -0500 (EST)
-Received: from mail-ot0-f181.google.com (mail-ot0-f181.google.com
- [74.125.82.181])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2782040651
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 11:55:04 -0500 (EST)
-Received: by mail-ot0-f181.google.com with SMTP id i1so2517287oth.9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 08:58:36 -0800 (PST)
-In-Reply-To: <20171213165543.GO22781@e103592.cambridge.arm.com>
+ with ESMTP id pmaZe-+d3jfK for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 13 Dec 2017 11:56:14 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 490BD49D40
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 11:56:14 -0500 (EST)
+In-Reply-To: <5A313704.1090503@arm.com>
+Content-Language: en-GB
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,52 +30,70 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Libvirt <libvir-list@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+To: James Morse <james.morse@arm.com>
+Cc: marc.zyngier@arm.com, catalin.marinas@arm.com, kbuild-all@01.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 13 December 2017 at 16:55, Dave Martin <Dave.Martin@arm.com> wrote:
-> Vector length control:
->
-> Some means is needed to determine the set of vector lengths visible
-> to guest software running on a vcpu.
->
-> When a vcpu is created, the set would be defaulted to the maximal set
-> that can be supported while permitting each vcpu to run on any host
-> CPU.  SVE has some virtualisation quirks which mean that this set may
-> exclude some vector lengths that are available for host userspace
-> applications.  The common case should be that the sets are the same
-> however.
->
->  * New ioctl KVM_ARM_VCPU_{SET,GET}_SVE_VLS to set or retrieve the set of
->    vector lengths available to the guest.
->
->    Adding random vcpu ioctls
->
->    To configure a non-default set of vector lengths,
->    KVM_ARM_VCPU_SET_SVE_VLS can be called: this would only be permitted
->    before the vcpu is first run.
->
->    This is primarily intended for supporting migration, by providing a
->    robust check that the destination node will run the vcpu correctly.
->    In a cluster with non-uniform SVE implementation across nodes, this
->    also allows a specific set of VLs to be requested that the caller
->    knows is usable across the whole cluster.
->
->    For migration purposes, userspace would need to do
->    KVM_ARM_VCPU_GET_SVE_VLS at the origin node and store the returned
->    set as VM metadata: on the destination node,
->    KVM_ARM_VCPU_SET_SVE_VLS should be used to request that exact set of
->    VLs: if the destination node can't support that set of VLs, the call
->    will fail.
+Hi James,
 
-Can we just do this with the existing ONE_REG APIs? If you
-expose this via those, then QEMU doesn't need to do anything
-for migration at all. This is the same way we (intend to)
-check any optional-feature compatibility at each end, for
-instance features exposed in guest-visible ID registers.
-It's just that the "register" for the SVE vector-lengths case
-is one that's not visible to the guest.
+On 13/12/17 14:19, James Morse wrote:
+> Hi Vladimir,
+> 
+> On 11/10/17 13:19, Vladimir Murzin wrote:
+>> Common Not Private (CNP) is a feature of ARMv8.2 extension which
+>> allows translation table entries to be shared between different PEs in
+>> the same inner shareable domain, so the hardware can use this fact to
+>> optimise the caching of such entries in the TLB.
+>>
+>> CNP occupies one bit in TTBRx_ELy and VTTBR_EL2, which advertises to
+>> the hardware that the translation table entries pointed to by this
+>> TTBR are the same as every PE in the same inner shareable domain for
+>> which the equivalent TTBR also has CNP bit set. In case CNP bit is set
+>> but TTBR does not point at the same translation table entries or a
+>> given ASID and VMID, then the system is mis-configured, so the results
+>> of translations are UNPREDICTABLE.
+>>
+>> This patch adds support for Common Not Private translations on
+>> different exceptions levels:
+>>
+>> (1) For EL0 there are a few cases we need to care of changes in
+>>     TTBR0_EL1:
+>>     - a switch to idmap
+>>     - software emulated PAN
+>>     we rule out latter via Kconfig options and for the former we make
+>>     sure that CNP is set for non-zero ASIDs only.
+>>
+>> (2) For EL1 we postpone setting CNP till all cpus are up and rely on
+>>     cpufeature framework to 1) patch the code which is sensitive to
+>>     CNP and 2) update TTBR1_EL1 with CNP bit set. TTBR1_EL1 can be
+>>     reprogrammed as result of hibernation or cpuidle (via __enable_mmu).
+>>     cpuidle's path has been changed to restore CnP and for hibernation
+>>     the code has been changed to save raw TTBR1_EL1 and blindly restore
+>>     it on resume.
+> 
+> 
+> While I remember:
+> 
+> This feature is going to be fun for kdump, we may leave secondary CPUs running
+> if they don't take the IPI to crash-out of the kernel. Worse, if we don't have
+> PSCI they just spin in a loop while the surviving CPU brings up the crash kernel
+> and maybe-enables CNP...
+> 
+> I think the best fix for this is to refuse to enable CNP at all if we're a crash
+> kernel. There is stuff in the DT to indicate this... we should know about the
+> 'elfcorehdr' before cpufeature runs. (I don't think we should rely on the
+> cmdline option).
+> 
+> kexec is unaffected because it always powers-off the secondary CPUs before
+> leaving the old kernel. This behaves much more like a normal boot.
 
-thanks
--- PMM
+Thanks, I'll look into it.
+
+Vladimir 
+
+> 
+> 
+> Thanks,
+> 
+> James
+> 
