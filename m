@@ -1,30 +1,23 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] KVM: arm/arm64: don't set vtimer->cnt_ctl in
- kvm_arch_timer_handler
-Date: Wed, 13 Dec 2017 10:34:27 +0100
-Message-ID: <CAMJs5B_Ah3vS48Juri2hbGp46P8tY22S8F0NypAZ4FtHdDFM0g@mail.gmail.com>
-References: <1513148407-2611-1-git-send-email-hejianet@gmail.com>
- <b2d0234c-e763-d4c1-02f7-c50cd0914b13@arm.com>
- <f0252a5a-cb81-ce24-5d46-f19fce054b13@redhat.com>
- <daece017-50be-494f-4176-6e5f081edfa2@arm.com>
+Subject: [PATCH v8 0/9] Handle forwarded level-triggered interrupts
+Date: Wed, 13 Dec 2017 11:45:53 +0100
+Message-ID: <20171213104602.16383-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E721149D28
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 04:30:58 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0283B49D46
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 05:43:06 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JwjpTCsK3UEC for <kvmarm@lists.cs.columbia.edu>;
- Wed, 13 Dec 2017 04:30:58 -0500 (EST)
-Received: from mail-pf0-f196.google.com (mail-pf0-f196.google.com
- [209.85.192.196])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E0BF149D14
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 04:30:57 -0500 (EST)
-Received: by mail-pf0-f196.google.com with SMTP id v26so1086200pfl.7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 01:34:28 -0800 (PST)
-In-Reply-To: <daece017-50be-494f-4176-6e5f081edfa2@arm.com>
+ with ESMTP id KBw+F9463GqW for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 13 Dec 2017 05:43:04 -0500 (EST)
+Received: from mail-wm0-f66.google.com (mail-wm0-f66.google.com [74.125.82.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A429B40795
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 05:43:04 -0500 (EST)
+Received: by mail-wm0-f66.google.com with SMTP id n138so4066719wmg.2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 02:46:36 -0800 (PST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,77 +27,96 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Jia He <jia.he@hxt-semitech.com>, Jia He <hejianet@gmail.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Dec 13, 2017 at 10:27 AM, Marc Zyngier <marc.zyngier@arm.com> wrote:
-> On 13/12/17 09:08, Auger Eric wrote:
->> Marc,
->> On 13/12/17 09:56, Marc Zyngier wrote:
->>> Hi Jia,
->>>
->>> On 13/12/17 07:00, Jia He wrote:
->>>> In our Armv8a server (qualcomm Amberwing, non VHE), after applying
->>>> Christoffer's timer optimizing patchset(Optimize arch timer register
->>>> handling), the guest is hang during kernel booting.
->>>>
->>>> The error root cause might be as follows:
->>>> 1. in kvm_arch_timer_handler, it reset vtimer->cnt_ctl with current
->>>> cntv_ctl register value. And then it missed some cases to update timer's
->>>> irq (irq.level) when kvm_timer_irq_can_fire() is false
->>>> 2. It causes kvm_vcpu_check_block return 0 instead of -EINTR
->>>>     kvm_vcpu_check_block
->>>>             kvm_cpu_has_pending_timer
->>>>                     kvm_timer_is_pending
->>>>                             kvm_timer_should_fire
->>>> 3. Thus, the kvm hyp code can not break the loop in kvm_vcpu_block (halt
->>>> poll process) and the guest is hang forever
->>>>
->>>> Fixes: b103cc3f10c0 ("KVM: arm/arm64: Avoid timer save/restore in vcpu entry/exit")
->>>> Signed-off-by: Jia He <jia.he@hxt-semitech.com>
->>>> ---
->>>>  virt/kvm/arm/arch_timer.c | 1 -
->>>>  1 file changed, 1 deletion(-)
->>>>
->>>> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
->>>> index f9555b1..bb86433 100644
->>>> --- a/virt/kvm/arm/arch_timer.c
->>>> +++ b/virt/kvm/arm/arch_timer.c
->>>> @@ -100,7 +100,6 @@ static irqreturn_t kvm_arch_timer_handler(int irq, void *dev_id)
->>>>     vtimer = vcpu_vtimer(vcpu);
->>>>
->>>>     if (!vtimer->irq.level) {
->>>> -           vtimer->cnt_ctl = read_sysreg_el0(cntv_ctl);
->>>>             if (kvm_timer_irq_can_fire(vtimer))
->>>>                     kvm_timer_update_irq(vcpu, true, vtimer);
->>>>     }
->>>>
->>>
->>> Which patches are you looking at? The current code in mainline looks
->>> like this:
->>>
->>>      vtimer = vcpu_vtimer(vcpu);
->>>
->>>      vtimer->cnt_ctl = read_sysreg_el0(cntv_ctl);
->>>      if (kvm_timer_irq_can_fire(vtimer))
->>>              kvm_timer_update_irq(vcpu, true, vtimer);
->>>
->>> I'd suggest you use mainline and report if this doesn't work
->> the removal of if (!vtimer->irq.level) test happened in:
->> [PATCH v7 3/8] KVM: arm/arm64: Don't cache the timer IRQ level
->>
->> which is not upstream.
-> Ah, my bad (I have that series in my working tree already...).
->
-> I still think Jia's approach to this is not quite right. If you don't
-> update the status of the timer by reading the HW value, how can you
-> decide whether the timer can fire or not?
->
+This series is an alternative approach to Eric Auger's direct EOI setup
+patches [1] in terms of the KVM VGIC support.
 
-Exactly.  We need to know the exact kernel source, symptoms, how to
-reproduce, and then trace what's going on.  It may be needed to tweak
-kvm_timer_is_pending(), but I don't yet see a case where it breaks.
+The idea is to maintain existing semantics for the VGIC for mapped
+level-triggered IRQs and also support the timer using mapped IRQs with
+the same VGIC support as VFIO interrupts.
+
+Based on v4.15-rc1.
+
+Also available at:
+git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git level-mapped-v8
+
+Changes since v7:
+ - Cleanup stale commentary
+ - Updated documentation (patch 9/9 is new in this version)
+ - Added Eric's reviewed-by tags
+
+Changes since v6:
+ - Removed double semi-colon
+ - Changed another confusing conditional in patch 6
+ - Fixed typos in commit message and comments
+
+Changes since v5:
+ - Rebased on v4.15-rc1
+ - Changed comment on preemption code as suggested by Andre
+ - Fixed white space and confusing conditionals as suggested by Drew
+
+Changes since v4:
+ - Rebased on the timer optimization series merged in the v4.15 merge
+   window, which caused a fair amount of modifications to patch 3.
+ - Added a static key to disable the sync operations when no VMs are
+   using userspace irqchips to further optimize the performance
+ - Fixed extra semicolon in vgic-mmio.c
+ - Added commentary as requested during review
+ - Dropped what was patch 4, because it was merged as part of GICv4
+   support.
+ - Factored out the VGIC input level function change as separate patch
+   (helps bisect and debugging), before providing a function for the
+   timer.
+
+Changes since v3:
+ - Added a number of patches and moved patches around a bit.
+ - Check for uaccesses in the mmio handler functions
+ - Fixed bugs in the mmio handler functions
+
+Changes since v2:
+ - Removed patch 5 from v2 and integrating the changes in what's now
+   patch 5 to make it easier to reuse code when adding VFIO integration.
+ - Changed the virtual distributor MMIO handling to use the
+   pending_latch and more closely match the semantics of SPENDR and
+   CPENDR for both level and edge mapped interrupts.
+
+Changes since v1:
+ - Added necessary changes to the timer (Patch 1)
+ - Added handling of guest MMIO accesses to the virtual distributor
+   (Patch 4)
+ - Addressed Marc's comments from the initial RFC (mostly renames)
 
 Thanks,
 -Christoffer
+
+[1]: https://lists.cs.columbia.edu/pipermail/kvmarm/2017-June/026072.html
+
+Christoffer Dall (9):
+  KVM: arm/arm64: Remove redundant preemptible checks
+  KVM: arm/arm64: Factor out functionality to get vgic mmio
+    requester_vcpu
+  KVM: arm/arm64: Don't cache the timer IRQ level
+  KVM: arm/arm64: vgic: Support level-triggered mapped interrupts
+  KVM: arm/arm64: Support a vgic interrupt line level sample function
+  KVM: arm/arm64: Support VGIC dist pend/active changes for mapped IRQs
+  KVM: arm/arm64: Provide a get_input_level for the arch timer
+  KVM: arm/arm64: Avoid work when userspace iqchips are not used
+  KVM: arm/arm64: Update timer and forwarded irq documentation
+
+ Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt |  50 +++++----
+ include/kvm/arm_arch_timer.h                       |   2 +
+ include/kvm/arm_vgic.h                             |  13 ++-
+ virt/kvm/arm/arch_timer.c                          | 112 ++++++++++----------
+ virt/kvm/arm/arm.c                                 |   2 -
+ virt/kvm/arm/vgic/vgic-mmio.c                      | 115 +++++++++++++++++----
+ virt/kvm/arm/vgic/vgic-v2.c                        |  29 ++++++
+ virt/kvm/arm/vgic/vgic-v3.c                        |  29 ++++++
+ virt/kvm/arm/vgic/vgic.c                           |  41 +++++++-
+ virt/kvm/arm/vgic/vgic.h                           |   8 ++
+ 10 files changed, 292 insertions(+), 109 deletions(-)
+
+-- 
+2.14.2
