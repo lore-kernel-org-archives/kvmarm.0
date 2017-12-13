@@ -1,25 +1,25 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v8 7/9] KVM: arm/arm64: Provide a get_input_level for the arch
- timer
-Date: Wed, 13 Dec 2017 11:46:00 +0100
-Message-ID: <20171213104602.16383-8-christoffer.dall@linaro.org>
+Subject: [PATCH v8 9/9] KVM: arm/arm64: Update timer and forwarded irq
+ documentation
+Date: Wed, 13 Dec 2017 11:46:02 +0100
+Message-ID: <20171213104602.16383-10-christoffer.dall@linaro.org>
 References: <20171213104602.16383-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 598C949DC1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 05:43:16 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C9A040795
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 05:43:19 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iaDxKI3Cw1WC for <kvmarm@lists.cs.columbia.edu>;
- Wed, 13 Dec 2017 05:43:15 -0500 (EST)
-Received: from mail-wm0-f66.google.com (mail-wm0-f66.google.com [74.125.82.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2EE7F49DA4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 05:43:15 -0500 (EST)
-Received: by mail-wm0-f66.google.com with SMTP id b199so4111510wme.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 02:46:46 -0800 (PST)
+ with ESMTP id CqrVbuZrLiio for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 13 Dec 2017 05:43:18 -0500 (EST)
+Received: from mail-wm0-f67.google.com (mail-wm0-f67.google.com [74.125.82.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 345B349DB2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 05:43:18 -0500 (EST)
+Received: by mail-wm0-f67.google.com with SMTP id g130so21259731wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 02:46:49 -0800 (PST)
 In-Reply-To: <20171213104602.16383-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,181 +34,100 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The VGIC can now support the life-cycle of mapped level-triggered
-interrupts, and we no longer have to read back the timer state on every
-exit from the VM if we had an asserted timer interrupt signal, because
-the VGIC already knows if we hit the unlikely case where the guest
-disables the timer without ACKing the virtual timer interrupt.
+Now when we've reworked how mapped level-triggered interrupts are
+processed for the timer interrupts, we update the documentation
+correspondingly.
 
-This means we rework a bit of the code to factor out the functionality
-to snapshot the timer state from vtimer_save_state(), and we can reuse
-this functionality in the sync path when we have an irqchip in
-userspace, and also to support our implementation of the
-get_input_level() function for the timer.
-
-This change also means that we can no longer rely on the timer's view of
-the interrupt line to set the active state, because we no longer
-maintain this state for mapped interrupts when exiting from the guest.
-Instead, we only set the active state if the virtual interrupt is
-active, and otherwise we simply let the timer fire again and raise the
-virtual interrupt from the ISR.
-
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- include/kvm/arm_arch_timer.h |  2 ++
- virt/kvm/arm/arch_timer.c    | 82 +++++++++++++++++++-------------------------
- 2 files changed, 38 insertions(+), 46 deletions(-)
+ Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt | 50 ++++++++++------------
+ 1 file changed, 23 insertions(+), 27 deletions(-)
 
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index 01ee473517e2..f57f795d704c 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -90,6 +90,8 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu);
+diff --git a/Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt b/Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt
+index 38bca2835278..f68c7d95a341 100644
+--- a/Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt
++++ b/Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt
+@@ -7,9 +7,10 @@ allowing software to inject virtual interrupts to a VM, which the guest
+ OS sees as regular interrupts.  The code is famously known as the VGIC.
  
- void kvm_timer_init_vhe(void);
+ Some of these virtual interrupts, however, correspond to physical
+-interrupts from real physical devices.  One example could be the
+-architected timer, which itself supports virtualization, and therefore
+-lets a guest OS program the hardware device directly to raise an
++interrupts from real physical devices.  One example could be the ARM
++Generic Timers (also known as the "architected timers"), which are
++directly assigned to a VM while it's running, and therefore
++makes it possible for guest OSes to program the timers directly to raise an
+ interrupt at some point in time.  When such an interrupt is raised, the
+ host OS initially handles the interrupt and must somehow signal this
+ event as a virtual interrupt to the guest.  Another example could be a
+@@ -37,7 +38,7 @@ inactive.
  
-+bool kvm_arch_timer_get_input_level(int vintid);
-+
- #define vcpu_vtimer(v)	(&(v)->arch.timer_cpu.vtimer)
- #define vcpu_ptimer(v)	(&(v)->arch.timer_cpu.ptimer)
+ The LRs include an extra bit, called the HW bit.  When this bit is set,
+ KVM must also program an additional field in the LR, the physical IRQ
+-number, to link the virtual with the physical IRQ.
++number, to link the virtual and physical IRQs together.
  
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index e78ba5e20f74..f8d09665ddce 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -343,6 +343,12 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
- 	phys_timer_emulate(vcpu);
- }
+ When the HW bit is set, KVM must EITHER set the Pending OR the Active
+ bit, never both at the same time.
+@@ -59,21 +60,21 @@ The state of forwarded physical interrupts is managed in the following way:
+   - LR.Pending will stay set as long as the guest has not acked the interrupt.
+   - LR.Pending transitions to LR.Active on the guest read of the IAR, as
+     expected.
+-  - On guest EOI, the *physical distributor* active bit gets cleared,
++  - On guest deactivate, the *physical distributor* active bit gets cleared,
+     but the LR.Active is left untouched (set).
+   - KVM clears the LR on VM exits when the physical distributor
+     active state has been cleared.
  
-+static void __timer_snapshot_state(struct arch_timer_context *timer)
-+{
-+	timer->cnt_ctl = read_sysreg_el0(cntv_ctl);
-+	timer->cnt_cval = read_sysreg_el0(cntv_cval);
-+}
-+
- static void vtimer_save_state(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-@@ -354,10 +360,8 @@ static void vtimer_save_state(struct kvm_vcpu *vcpu)
- 	if (!vtimer->loaded)
- 		goto out;
+ (*): The host handling is slightly more complicated.  For some forwarded
+-interrupts (shared), KVM directly sets the active state on the physical
+-distributor before entering the guest, because the interrupt is never actually
+-handled on the host (see details on the timer as an example below).  For other
+-forwarded interrupts (non-shared) the host does not deactivate the interrupt
+-when the host ISR completes, but leaves the interrupt active until the guest
+-deactivates it.  Leaving the interrupt active is allowed, because Linux
+-configures the physical GIC with EOIMode=1, which causes EOI operations to
+-perform a priority drop allowing the GIC to receive other interrupts of the
+-default priority.
++interrupts (shared), in some cases, KVM directly sets the active state
++on the physical distributor before entering the guest, because the
++interrupt is never actually handled on the host (see details on the
++timer as an example below).  In other cases, the host does not
++deactivate the interrupt when the host ISR completes, but leaves the
++interrupt active until the guest deactivates it.  Leaving the interrupt
++active is allowed, because Linux configures the physical GIC with
++EOIMode=1, which causes EOI operations to perform a priority drop
++allowing the GIC to receive other interrupts of the default priority.
  
--	if (timer->enabled) {
--		vtimer->cnt_ctl = read_sysreg_el0(cntv_ctl);
--		vtimer->cnt_cval = read_sysreg_el0(cntv_cval);
--	}
-+	if (timer->enabled)
-+		__timer_snapshot_state(vtimer);
  
- 	/* Disable the virtual timer */
- 	write_sysreg_el0(0, cntv_ctl);
-@@ -454,8 +458,7 @@ static void kvm_timer_vcpu_load_vgic(struct kvm_vcpu *vcpu)
- 	bool phys_active;
- 	int ret;
+ Forwarded Edge and Level Triggered PPIs and SPIs
+@@ -170,18 +171,13 @@ instead:
  
--	phys_active = vtimer->irq.level ||
--		      kvm_vgic_map_is_active(vcpu, vtimer->irq.irq);
-+	phys_active = kvm_vgic_map_is_active(vcpu, vtimer->irq.irq);
- 
- 	ret = irq_set_irqchip_state(host_vtimer_irq,
- 				    IRQCHIP_STATE_ACTIVE,
-@@ -541,54 +544,25 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
- 	set_cntvoff(0);
- }
- 
--static void unmask_vtimer_irq(struct kvm_vcpu *vcpu)
-+/*
-+ * With a userspace irqchip we have to check if the guest de-asserted the
-+ * timer and if so, unmask the timer irq signal on the host interrupt
-+ * controller to ensure that we see future timer signals.
-+ */
-+static void unmask_vtimer_irq_user(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 
- 	if (unlikely(!irqchip_in_kernel(vcpu->kvm))) {
--		kvm_vtimer_update_mask_user(vcpu);
--		return;
--	}
+ 1.  KVM runs the VCPU
+ 2.  The guest programs the time to fire in T+100
+-4.  At T+100 the timer fires and a physical IRQ causes the VM to exit
++3.  At T+100 the timer fires and a physical IRQ causes the VM to exit
+     (note that this initially only traps to EL2 and does not run the host ISR
+     until KVM has returned to the host).
+-5.  With interrupts still disabled on the CPU coming back from the guest, KVM
+-    stores the virtual timer state to memory and disables the virtual hw timer.
+-6.  KVM looks at the timer state (in memory) and injects a forwarded physical
+-    interrupt because it concludes the timer has expired.
+-7.  KVM marks the timer interrupt as active on the physical distributor
+-7.  KVM enables the timer, enables interrupts, and runs the VCPU
 -
--	/*
--	 * If the guest disabled the timer without acking the interrupt, then
--	 * we must make sure the physical and virtual active states are in
--	 * sync by deactivating the physical interrupt, because otherwise we
--	 * wouldn't see the next timer interrupt in the host.
--	 */
--	if (!kvm_vgic_map_is_active(vcpu, vtimer->irq.irq)) {
--		int ret;
--		ret = irq_set_irqchip_state(host_vtimer_irq,
--					    IRQCHIP_STATE_ACTIVE,
--					    false);
--		WARN_ON(ret);
-+		__timer_snapshot_state(vtimer);
-+		if (!kvm_timer_should_fire(vtimer))
-+			kvm_vtimer_update_mask_user(vcpu);
- 	}
- }
- 
--/**
-- * kvm_timer_sync_hwstate - sync timer state from cpu
-- * @vcpu: The vcpu pointer
-- *
-- * Check if any of the timers have expired while we were running in the guest,
-- * and inject an interrupt if that was the case.
-- */
- void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
- {
--	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
--
--	/*
--	 * If we entered the guest with the vtimer output asserted we have to
--	 * check if the guest has modified the timer so that we should lower
--	 * the line at this point.
--	 */
--	if (vtimer->irq.level) {
--		vtimer->cnt_ctl = read_sysreg_el0(cntv_ctl);
--		vtimer->cnt_cval = read_sysreg_el0(cntv_cval);
--		if (!kvm_timer_should_fire(vtimer)) {
--			kvm_timer_update_irq(vcpu, false, vtimer);
--			unmask_vtimer_irq(vcpu);
--		}
--	}
-+	unmask_vtimer_irq_user(vcpu);
- }
- 
- int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
-@@ -819,6 +793,22 @@ static bool timer_irqs_are_valid(struct kvm_vcpu *vcpu)
- 	return true;
- }
- 
-+bool kvm_arch_timer_get_input_level(int vintid)
-+{
-+	struct kvm_vcpu *vcpu = kvm_arm_get_running_vcpu();
-+	struct arch_timer_context *timer;
-+
-+	if (vintid == vcpu_vtimer(vcpu)->irq.irq)
-+		timer = vcpu_vtimer(vcpu);
-+	else
-+		BUG(); /* We only map the vtimer so far */
-+
-+	if (timer->loaded)
-+		__timer_snapshot_state(timer);
-+
-+	return kvm_timer_should_fire(timer);
-+}
-+
- int kvm_timer_enable(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-@@ -841,7 +831,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
- 	}
- 
- 	ret = kvm_vgic_map_phys_irq(vcpu, host_vtimer_irq, vtimer->irq.irq,
--				    NULL);
-+				    kvm_arch_timer_get_input_level);
- 	if (ret)
- 		return ret;
- 
+-Notice that again the forwarded physical interrupt is injected to the
+-guest without having actually been handled on the host.  In this case it
+-is because the physical interrupt is never actually seen by the host because the
+-timer is disabled upon guest return, and the virtual forwarded interrupt is
+-injected on the KVM guest entry path.
++4.  When KVM returns to EL1 and enables interrupts, the timer interrupt
++    fires again, and the kvm arch timer ISR runs and injects a virtual
++    interrupt to the guest.
++5.  Because the timer interrupt has the vcpu affinity set, as the ISR
++    completes, the physical interrupt stays active on the physical
++    distributor.
++6.  KVM enables the timer, enables interrupts, and runs the VCPU
 -- 
 2.14.2
