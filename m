@@ -1,26 +1,24 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v8 8/9] KVM: arm/arm64: Avoid work when userspace iqchips are
- not used
-Date: Wed, 13 Dec 2017 11:46:01 +0100
-Message-ID: <20171213104602.16383-9-christoffer.dall@linaro.org>
-References: <20171213104602.16383-1-christoffer.dall@linaro.org>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v2 1/3] arm64: mm: Support Common Not Private translations
+Date: Wed, 13 Dec 2017 14:19:48 +0000
+Message-ID: <5A313704.1090503@arm.com>
+References: <1507724395-13735-1-git-send-email-vladimir.murzin@arm.com>
+ <1507724395-13735-2-git-send-email-vladimir.murzin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4062840795
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 05:43:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 15AEA49D6B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 09:18:22 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Kyb3RV6mGJ8Z for <kvmarm@lists.cs.columbia.edu>;
- Wed, 13 Dec 2017 05:43:18 -0500 (EST)
-Received: from mail-wm0-f66.google.com (mail-wm0-f66.google.com [74.125.82.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6A1BD49D80
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 05:43:16 -0500 (EST)
-Received: by mail-wm0-f66.google.com with SMTP id b199so4111629wme.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 02:46:47 -0800 (PST)
-In-Reply-To: <20171213104602.16383-1-christoffer.dall@linaro.org>
+ with ESMTP id hfsfOtPeE5w8 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 13 Dec 2017 09:18:21 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E321749D4F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 09:18:20 -0500 (EST)
+In-Reply-To: <1507724395-13735-2-git-send-email-vladimir.murzin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,70 +28,61 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvm@vger.kernel.org
+To: Vladimir Murzin <vladimir.murzin@arm.com>
+Cc: marc.zyngier@arm.com, catalin.marinas@arm.com, kbuild-all@01.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We currently check if the VM has a userspace irqchip on every exit from
-the VCPU, and if so, we do some work to ensure correct timer behavior.
-This is unfortunate, as we could avoid doing any work entirely, if we
-didn't have to support irqchip in userspace.
+Hi Vladimir,
 
-Realizing the userspace irqchip on ARM is mostly a developer or hobby
-feature, and is unlikely to be used in servers or other scenarios where
-performance is a priority, we can use a refcounted static key to only
-check the irqchip configuration when we have at least one VM that uses
-an irqchip in userspace.
+On 11/10/17 13:19, Vladimir Murzin wrote:
+> Common Not Private (CNP) is a feature of ARMv8.2 extension which
+> allows translation table entries to be shared between different PEs in
+> the same inner shareable domain, so the hardware can use this fact to
+> optimise the caching of such entries in the TLB.
+> 
+> CNP occupies one bit in TTBRx_ELy and VTTBR_EL2, which advertises to
+> the hardware that the translation table entries pointed to by this
+> TTBR are the same as every PE in the same inner shareable domain for
+> which the equivalent TTBR also has CNP bit set. In case CNP bit is set
+> but TTBR does not point at the same translation table entries or a
+> given ASID and VMID, then the system is mis-configured, so the results
+> of translations are UNPREDICTABLE.
+> 
+> This patch adds support for Common Not Private translations on
+> different exceptions levels:
+> 
+> (1) For EL0 there are a few cases we need to care of changes in
+>     TTBR0_EL1:
+>     - a switch to idmap
+>     - software emulated PAN
+>     we rule out latter via Kconfig options and for the former we make
+>     sure that CNP is set for non-zero ASIDs only.
+> 
+> (2) For EL1 we postpone setting CNP till all cpus are up and rely on
+>     cpufeature framework to 1) patch the code which is sensitive to
+>     CNP and 2) update TTBR1_EL1 with CNP bit set. TTBR1_EL1 can be
+>     reprogrammed as result of hibernation or cpuidle (via __enable_mmu).
+>     cpuidle's path has been changed to restore CnP and for hibernation
+>     the code has been changed to save raw TTBR1_EL1 and blindly restore
+>     it on resume.
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
- virt/kvm/arm/arch_timer.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index f8d09665ddce..73d262c4712b 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -51,6 +51,8 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
- 				 struct arch_timer_context *timer_ctx);
- static bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx);
- 
-+static DEFINE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
-+
- u64 kvm_phys_timer_read(void)
- {
- 	return timecounter->cc->read(timecounter->cc);
-@@ -562,7 +564,8 @@ static void unmask_vtimer_irq_user(struct kvm_vcpu *vcpu)
- 
- void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
- {
--	unmask_vtimer_irq_user(vcpu);
-+	if (static_branch_unlikely(&userspace_irqchip_in_use))
-+		unmask_vtimer_irq_user(vcpu);
- }
- 
- int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
-@@ -767,6 +770,8 @@ void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu)
- 	soft_timer_cancel(&timer->bg_timer, &timer->expired);
- 	soft_timer_cancel(&timer->phys_timer, NULL);
- 	kvm_vgic_unmap_phys_irq(vcpu, vtimer->irq.irq);
-+	if (timer->enabled && !irqchip_in_kernel(vcpu->kvm))
-+		static_branch_dec(&userspace_irqchip_in_use);
- }
- 
- static bool timer_irqs_are_valid(struct kvm_vcpu *vcpu)
-@@ -819,8 +824,10 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
- 		return 0;
- 
- 	/* Without a VGIC we do not map virtual IRQs to physical IRQs */
--	if (!irqchip_in_kernel(vcpu->kvm))
-+	if (!irqchip_in_kernel(vcpu->kvm)) {
-+		static_branch_inc(&userspace_irqchip_in_use);
- 		goto no_vgic;
-+	}
- 
- 	if (!vgic_initialized(vcpu->kvm))
- 		return -ENODEV;
--- 
-2.14.2
+While I remember:
+
+This feature is going to be fun for kdump, we may leave secondary CPUs running
+if they don't take the IPI to crash-out of the kernel. Worse, if we don't have
+PSCI they just spin in a loop while the surviving CPU brings up the crash kernel
+and maybe-enables CNP...
+
+I think the best fix for this is to refuse to enable CNP at all if we're a crash
+kernel. There is stuff in the DT to indicate this... we should know about the
+'elfcorehdr' before cpufeature runs. (I don't think we should rely on the
+cmdline option).
+
+kexec is unaffected because it always powers-off the secondary CPUs before
+leaving the old kernel. This behaves much more like a normal boot.
+
+
+Thanks,
+
+James
