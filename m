@@ -1,97 +1,151 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [RFC v2] arm64: KVM: KVM API extensions for SVE
-Date: Wed, 13 Dec 2017 17:11:01 +0000
-Message-ID: <20171213171101.GP22781@e103592.cambridge.arm.com>
-References: <20171213165543.GO22781@e103592.cambridge.arm.com>
- <CAFEAcA-Rogf9m7GMPD3PKs7miEpx-bMMn72Y+2=eF4oiCdLqqw@mail.gmail.com>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v2 05/19] arm64: alternatives: Add dynamic patching
+ feature
+Date: Wed, 13 Dec 2017 17:53:31 +0000
+Message-ID: <20171213175330.qlqay7ev7s6zra2n@armageddon.cambridge.arm.com>
+References: <20171211144937.4537-1-marc.zyngier@arm.com>
+ <20171211144937.4537-6-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E87BA406D0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 12:07:35 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yO5IrrVuoql4 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 13 Dec 2017 12:07:33 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7EE6B40651
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 12:07:33 -0500 (EST)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA-Rogf9m7GMPD3PKs7miEpx-bMMn72Y+2=eF4oiCdLqqw@mail.gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Libvirt <libvir-list@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+In-Reply-To: <20171211144937.4537-6-marc.zyngier@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Mark Rutland <mark.rutland@arm.com>, Steve Capper <steve.capper@arm.com>, Will Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Dec 13, 2017 at 04:58:16PM +0000, Peter Maydell wrote:
-> On 13 December 2017 at 16:55, Dave Martin <Dave.Martin@arm.com> wrote:
-> > Vector length control:
-> >
-> > Some means is needed to determine the set of vector lengths visible
-> > to guest software running on a vcpu.
-> >
-> > When a vcpu is created, the set would be defaulted to the maximal set
-> > that can be supported while permitting each vcpu to run on any host
-> > CPU.  SVE has some virtualisation quirks which mean that this set may
-> > exclude some vector lengths that are available for host userspace
-> > applications.  The common case should be that the sets are the same
-> > however.
-> >
-> >  * New ioctl KVM_ARM_VCPU_{SET,GET}_SVE_VLS to set or retrieve the set of
-> >    vector lengths available to the guest.
-> >
-> >    Adding random vcpu ioctls
-> >
-> >    To configure a non-default set of vector lengths,
-> >    KVM_ARM_VCPU_SET_SVE_VLS can be called: this would only be permitted
-> >    before the vcpu is first run.
-> >
-> >    This is primarily intended for supporting migration, by providing a
-> >    robust check that the destination node will run the vcpu correctly.
-> >    In a cluster with non-uniform SVE implementation across nodes, this
-> >    also allows a specific set of VLs to be requested that the caller
-> >    knows is usable across the whole cluster.
-> >
-> >    For migration purposes, userspace would need to do
-> >    KVM_ARM_VCPU_GET_SVE_VLS at the origin node and store the returned
-> >    set as VM metadata: on the destination node,
-> >    KVM_ARM_VCPU_SET_SVE_VLS should be used to request that exact set of
-> >    VLs: if the destination node can't support that set of VLs, the call
-> >    will fail.
+On Mon, Dec 11, 2017 at 02:49:23PM +0000, Marc Zyngier wrote:
+> We've so far relied on a patching infrastructure that only gave us
+> a single alternative, without any way to finely control what gets
+> patched. For a single feature, this is an all or nothing thing.
 > 
-> Can we just do this with the existing ONE_REG APIs? If you
-> expose this via those, then QEMU doesn't need to do anything
-> for migration at all. This is the same way we (intend to)
-> check any optional-feature compatibility at each end, for
-> instance features exposed in guest-visible ID registers.
-> It's just that the "register" for the SVE vector-lengths case
-> is one that's not visible to the guest.
+> It would be interesting to have a more fine grained way of patching
+> the kernel though, where we could dynamically tune the code that gets
+> injected.
+> 
+> In order to achive this, let's introduce a new form of alternative
+> that is associated with a callback. This callback gets the instruction
+> sequence number and the old instruction as a parameter, and returns
+> the new instruction. This callback is always called, as the patching
+> decision is now done at runtime (not patching is equivalent to returning
+> the same instruction).
+> 
+> Patching with a callback is declared with the new ALTERNATIVE_CB
+> and alternative_cb directives:
+> 
+> 	asm volatile(ALTERNATIVE_CB("mov %0, #0\n", callback)
+> 		     : "r" (v));
+> or
+> 	alternative_cb callback
+> 		mov	x0, #0
+> 	alternative_else_nop_endif
 
-Probably, but there are some things that are a bit nasty.
-For now, I suggested an ioctl as being minimally invasive on the
-kernel side, but I'm not committed to it.
+Could we have a new "alternative_cb_endif" instead of
+alternative_else_no_endif? IIUC, the nops generated in the
+.altinstr_replacement section wouldn't be used, so I think it makes the
+code clearer that there is no other alternative instruction set, just an
+update in-place of the given instruction.
 
+> diff --git a/arch/arm64/include/asm/alternative.h b/arch/arm64/include/asm/alternative.h
+> index 395befde7595..ce612e10a2c9 100644
+> --- a/arch/arm64/include/asm/alternative.h
+> +++ b/arch/arm64/include/asm/alternative.h
+[...]
+> -.macro altinstruction_entry orig_offset alt_offset feature orig_len alt_len
+> +.macro altinstruction_entry orig_offset, alt_offset, feature, orig_len, alt_len, cb = 0
+>  	.align ALTINSTR_ALIGN
+>  	.word \orig_offset - .
+> +	.if \cb == 0
+>  	.word \alt_offset - .
+> +	.else
+> +	.word \cb - .
+> +	.endif
+>  	.hword \feature
+>  	.byte \orig_len
+>  	.byte \alt_len
+>  .endm
+>  
+> -.macro alternative_insn insn1, insn2, cap, enable = 1
+> +.macro alternative_insn insn1, insn2, cap, enable = 1, cb = 0
+>  	.if \enable
+>  661:	\insn1
+>  662:	.pushsection .altinstructions, "a"
+> -	altinstruction_entry 661b, 663f, \cap, 662b-661b, 664f-663f
+> +	altinstruction_entry 661b, 663f, \cap, 662b-661b, 664f-663f, \cb
+>  	.popsection
+>  	.pushsection .altinstr_replacement, "ax"
+>  663:	\insn2
 
-The set of vector lengths is a not guest register in the usual sense,
-and modifying it at runtime makes no sense, so I would rather forbid
-it.  Do we have precedent for that?  I was getting pushback from
-Marc and/or Christoffer on exposing "ZCR_EL2" via the reg interface for
-similar reasons -- that turned out to be too simplistic for other
-reasons anyway.
+So here we could skip .pushsection .altinstr_replacement if cb. We could
+even pass \cb directly to altinstruction_entry instead of 663f so that
+we keep altinstruction_entry unmodified.
 
-Also, arranging things so that it doesn't matter which order the
-SVE regs and VL set are written with respect to one another may
-add significant complexity to KVM which I'd rather avoid.
+> @@ -109,10 +119,10 @@ void apply_alternatives(void *start, size_t length);
+>  /*
+>   * Begin an alternative code sequence.
+>   */
+> -.macro alternative_if_not cap
+> +.macro alternative_if_not cap, cb = 0
+>  	.set .Lasm_alt_mode, 0
+>  	.pushsection .altinstructions, "a"
+> -	altinstruction_entry 661f, 663f, \cap, 662f-661f, 664f-663f
+> +	altinstruction_entry 661f, 663f, \cap, 662f-661f, 664f-663f, \cb
+>  	.popsection
+>  661:
+>  .endm
+> @@ -120,13 +130,17 @@ void apply_alternatives(void *start, size_t length);
+>  .macro alternative_if cap
+>  	.set .Lasm_alt_mode, 1
+>  	.pushsection .altinstructions, "a"
+> -	altinstruction_entry 663f, 661f, \cap, 664f-663f, 662f-661f
+> +	altinstruction_entry 663f, 661f, \cap, 664f-663f, 662f-661f, 0
+>  	.popsection
+>  	.pushsection .altinstr_replacement, "ax"
+>  	.align 2	/* So GAS knows label 661 is suitably aligned */
+>  661:
+>  .endm
 
-Cheers
----Dave
+and here we wouldn't need this hunk for alternative_if.
+
+> --- a/arch/arm64/kernel/alternative.c
+> +++ b/arch/arm64/kernel/alternative.c
+> @@ -110,12 +110,15 @@ static void __apply_alternatives(void *alt_region, bool use_linear_alias)
+>  	struct alt_instr *alt;
+>  	struct alt_region *region = alt_region;
+>  	__le32 *origptr, *replptr, *updptr;
+> +	alternative_cb_t alt_cb;
+>  
+>  	for (alt = region->begin; alt < region->end; alt++) {
+>  		u32 insn;
+>  		int i, nr_inst;
+>  
+> -		if (!cpus_have_cap(alt->cpufeature))
+> +		/* Use ARM64_NCAPS as an unconditional patch */
+> +		if (alt->cpufeature != ARM64_NCAPS &&
+
+Nitpick (personal preference): alt->cpufeature < ARM64_NCAPS.
+
+> +		    !cpus_have_cap(alt->cpufeature))
+>  			continue;
+>  
+>  		BUG_ON(alt->alt_len != alt->orig_len);
+> @@ -124,11 +127,18 @@ static void __apply_alternatives(void *alt_region, bool use_linear_alias)
+>  
+>  		origptr = ALT_ORIG_PTR(alt);
+>  		replptr = ALT_REPL_PTR(alt);
+> +		alt_cb  = ALT_REPL_PTR(alt);
+>  		updptr = use_linear_alias ? lm_alias(origptr) : origptr;
+>  		nr_inst = alt->alt_len / sizeof(insn);
+>  
+>  		for (i = 0; i < nr_inst; i++) {
+> -			insn = get_alt_insn(alt, origptr + i, replptr + i);
+> +			if (alt->cpufeature == ARM64_NCAPS) {
+> +				insn = le32_to_cpu(updptr[i]);
+> +				insn = alt_cb(alt, i, insn);
+
+I wonder whether we'd need the origptr + i as well at some point (e.g.
+to generate some relative relocations).
+
+-- 
+Catalin
