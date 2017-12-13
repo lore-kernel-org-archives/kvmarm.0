@@ -1,25 +1,24 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v8 2/9] KVM: arm/arm64: Factor out functionality to get vgic
- mmio requester_vcpu
-Date: Wed, 13 Dec 2017 11:45:55 +0100
-Message-ID: <20171213104602.16383-3-christoffer.dall@linaro.org>
+Subject: [PATCH v8 1/9] KVM: arm/arm64: Remove redundant preemptible checks
+Date: Wed, 13 Dec 2017 11:45:54 +0100
+Message-ID: <20171213104602.16383-2-christoffer.dall@linaro.org>
 References: <20171213104602.16383-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5320340795
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 05:43:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B080049D46
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 05:43:06 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mlbGKc-aiMnq for <kvmarm@lists.cs.columbia.edu>;
- Wed, 13 Dec 2017 05:43:07 -0500 (EST)
+ with ESMTP id TDFUeRe9WVCa for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 13 Dec 2017 05:43:05 -0500 (EST)
 Received: from mail-wm0-f65.google.com (mail-wm0-f65.google.com [74.125.82.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5695F49D46
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 05:43:07 -0500 (EST)
-Received: by mail-wm0-f65.google.com with SMTP id 64so4113239wme.3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 02:46:38 -0800 (PST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6C1E949D4F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 05:43:05 -0500 (EST)
+Received: by mail-wm0-f65.google.com with SMTP id f9so4178568wmh.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 02:46:36 -0800 (PST)
 In-Reply-To: <20171213104602.16383-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,95 +33,38 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We are about to distinguish between userspace accesses and mmio traps
-for a number of the mmio handlers.  When the requester vcpu is NULL, it
-means we are handling a userspace access.
-
-Factor out the functionality to get the request vcpu into its own
-function, mostly so we have a common place to document the semantics of
-the return value.
-
-Also take the chance to move the functionality outside of holding a
-spinlock and instead explicitly disable and enable preemption.  This
-supports PREEMPT_RT kernels as well.
+The __this_cpu_read() and __this_cpu_write() functions already implement
+checks for the required preemption levels when using
+CONFIG_DEBUG_PREEMPT which gives you nice error messages and such.
+Therefore there is no need to explicitly check this using a BUG_ON() in
+the code (which we don't do for other uses of per cpu variables either).
 
 Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/vgic/vgic-mmio.c | 44 +++++++++++++++++++++++++++----------------
- 1 file changed, 28 insertions(+), 16 deletions(-)
+ virt/kvm/arm/arm.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index deb51ee16a3d..fdad95f62fa3 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -122,6 +122,27 @@ unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
- 	return value;
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index a6524ff27de4..859ff7e3a1eb 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -71,7 +71,6 @@ static DEFINE_PER_CPU(unsigned char, kvm_arm_hardware_enabled);
+ 
+ static void kvm_arm_set_running_vcpu(struct kvm_vcpu *vcpu)
+ {
+-	BUG_ON(preemptible());
+ 	__this_cpu_write(kvm_arm_running_vcpu, vcpu);
  }
  
-+/*
-+ * This function will return the VCPU that performed the MMIO access and
-+ * trapped from within the VM, and will return NULL if this is a userspace
-+ * access.
-+ *
-+ * We can disable preemption locally around accessing the per-CPU variable,
-+ * and use the resolved vcpu pointer after enabling preemption again, because
-+ * even if the current thread is migrated to another CPU, reading the per-CPU
-+ * value later will give us the same value as we update the per-CPU variable
-+ * in the preempt notifier handlers.
-+ */
-+static struct kvm_vcpu *vgic_get_mmio_requester_vcpu(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+
-+	preempt_disable();
-+	vcpu = kvm_arm_get_running_vcpu();
-+	preempt_enable();
-+	return vcpu;
-+}
-+
- void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
- 			      gpa_t addr, unsigned int len,
- 			      unsigned long val)
-@@ -184,24 +205,10 @@ unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
- static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
- 				    bool new_active_state)
+@@ -81,7 +80,6 @@ static void kvm_arm_set_running_vcpu(struct kvm_vcpu *vcpu)
+  */
+ struct kvm_vcpu *kvm_arm_get_running_vcpu(void)
  {
--	struct kvm_vcpu *requester_vcpu;
- 	unsigned long flags;
--	spin_lock_irqsave(&irq->irq_lock, flags);
-+	struct kvm_vcpu *requester_vcpu = vgic_get_mmio_requester_vcpu();
+-	BUG_ON(preemptible());
+ 	return __this_cpu_read(kvm_arm_running_vcpu);
+ }
  
--	/*
--	 * The vcpu parameter here can mean multiple things depending on how
--	 * this function is called; when handling a trap from the kernel it
--	 * depends on the GIC version, and these functions are also called as
--	 * part of save/restore from userspace.
--	 *
--	 * Therefore, we have to figure out the requester in a reliable way.
--	 *
--	 * When accessing VGIC state from user space, the requester_vcpu is
--	 * NULL, which is fine, because we guarantee that no VCPUs are running
--	 * when accessing VGIC state from user space so irq->vcpu->cpu is
--	 * always -1.
--	 */
--	requester_vcpu = kvm_arm_get_running_vcpu();
-+	spin_lock_irqsave(&irq->irq_lock, flags);
- 
- 	/*
- 	 * If this virtual IRQ was written into a list register, we
-@@ -213,6 +220,11 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
- 	 * vgic_change_active_prepare)  and still has to sync back this IRQ,
- 	 * so we release and re-acquire the spin_lock to let the other thread
- 	 * sync back the IRQ.
-+	 *
-+	 * When accessing VGIC state from user space, requester_vcpu is
-+	 * NULL, which is fine, because we guarantee that no VCPUs are running
-+	 * when accessing VGIC state from user space so irq->vcpu->cpu is
-+	 * always -1.
- 	 */
- 	while (irq->vcpu && /* IRQ may have state in an LR somewhere */
- 	       irq->vcpu != requester_vcpu && /* Current thread is not the VCPU thread */
 -- 
 2.14.2
