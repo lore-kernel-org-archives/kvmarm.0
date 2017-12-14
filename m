@@ -1,186 +1,166 @@
-From: Jia He <hejianet@gmail.com>
-Subject: Re: [PATCH] KVM: arm/arm64: don't set vtimer->cnt_ctl in
- kvm_arch_timer_handler
-Date: Thu, 14 Dec 2017 13:35:35 +0800
-Message-ID: <f9f5ee12-f0a4-71b0-f765-84b0d7c2d453@gmail.com>
-References: <1513148407-2611-1-git-send-email-hejianet@gmail.com>
- <20171213091803.GQ910@cbox> <dc95b58c-ee6c-e5c7-1f37-8f69c789a1fc@gmail.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v2 07/19] arm64: insn: Add encoder for bitwise operations
+ using litterals
+Date: Thu, 14 Dec 2017 08:40:27 +0000
+Message-ID: <c6bcef3c-6428-a1d8-0a40-14e0a3e75f2b@arm.com>
+References: <20171211144937.4537-1-marc.zyngier@arm.com>
+ <20171211144937.4537-8-marc.zyngier@arm.com> <5A3020DA.8010309@arm.com>
+ <07971a66-1b36-d2cd-e590-2b7b65d14b97@arm.com> <5A314AFF.60300@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <dc95b58c-ee6c-e5c7-1f37-8f69c789a1fc@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, Jia He <jia.he@hxt-semitech.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <5A314AFF.60300@arm.com>
+Content-Language: en-GB
+Sender: kvm-owner@vger.kernel.org
+To: James Morse <james.morse@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Steve Capper <steve.capper@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi
+On 13/12/17 15:45, James Morse wrote:
+> Hi Marc,
+> 
+> On 13/12/17 14:32, Marc Zyngier wrote:
+>> On 12/12/17 18:32, James Morse wrote:
+>>> On 11/12/17 14:49, Marc Zyngier wrote:
+>>>> We lack a way to encode operations such as AND, ORR, EOR that take
+>>>> an immediate value. Doing so is quite involved, and is all about
+>>>> reverse engineering the decoding algorithm described in the
+>>>> pseudocode function DecodeBitMasks().
+> 
+>>>> diff --git a/arch/arm64/kernel/insn.c b/arch/arm64/kernel/insn.c
+>>>> index 7e432662d454..326b17016485 100644
+>>>> --- a/arch/arm64/kernel/insn.c
+>>>> +++ b/arch/arm64/kernel/insn.c
+>>>
+>>>> +static u32 aarch64_encode_immediate(u64 imm,
+>>>> +				    enum aarch64_insn_variant variant,
+>>>> +				    u32 insn)
+>>>> +{
+>>>> +	unsigned int immr, imms, n, ones, ror, esz, tmp;
+>>>> +	u64 mask;
+>>>
+>>> [...]
+>>>
+>>>> +	/* Compute the rotation */
+>>>> +	if (range_of_ones(imm)) {
+>>>> +		/*
+>>>> +		 * Pattern: 0..01..10..0
+>>>> +		 *
+>>>> +		 * Compute how many rotate we need to align it right
+>>>> +		 */
+>>>> +		ror = ffs(imm) - 1;
+>>>
+>>> (how come range_of_ones() uses __ffs64() on the same value?)
+>>
+>> News flash: range_of_ones is completely buggy. It will fail on the 
+>> trivial value 1 (__ffs64(1) = 0; 0 - 1 = -1; val >> -1 is... ermmmm).
+>> I definitely got mixed up between the two.
+> 
+> They do different things!? Aaaaaahhhh....
+> 
+> [ ...]
+> 
+>>> Unless I've gone wrong, I think the 'Trim imm to the element size' code needs to
+>>> move up into the esz-reducing loop so it doesn't happen for a 64bit immediate.
+> 
+> 
+>> Yup. I've stashed the following patch:
+>>
+>> diff --git a/arch/arm64/kernel/insn.c b/arch/arm64/kernel/insn.c
+>> index b8fb2d89b3a6..e58be1c57f18 100644
+>> --- a/arch/arm64/kernel/insn.c
+>> +++ b/arch/arm64/kernel/insn.c
+>> @@ -1503,8 +1503,7 @@ pstate_check_t * const aarch32_opcode_cond_checks[16] = {
+>>  static bool range_of_ones(u64 val)
+>>  {
+>>  	/* Doesn't handle full ones or full zeroes */
+>> -	int x = __ffs64(val) - 1;
+>> -	u64 sval = val >> x;
+>> +	u64 sval = val >> __ffs64(val);
+>>  
+>>  	/* One of Sean Eron Anderson's bithack tricks */
+>>  	return ((sval + 1) & (sval)) == 0;
+>> @@ -1515,7 +1514,7 @@ static u32 aarch64_encode_immediate(u64 imm,
+>>  				    u32 insn)
+>>  {
+>>  	unsigned int immr, imms, n, ones, ror, esz, tmp;
+>> -	u64 mask;
+>> +	u64 mask = ~0UL;
+>>  
+>>  	/* Can't encode full zeroes or full ones */
+>>  	if (!imm || !~imm)
+>> @@ -1543,8 +1542,12 @@ static u32 aarch64_encode_immediate(u64 imm,
+>>  	for (tmp = esz; tmp > 2; tmp /= 2) {
+>>  		u64 emask = BIT(tmp / 2) - 1;
+>>  
+>> -		if ((imm & emask) != ((imm >> (tmp / 2)) & emask))
+>> +		if ((imm & emask) != ((imm >> (tmp / 2)) & emask)) {
+>> +			/* Trim imm to the element size */
+>> +			mask = BIT(esz - 1) - 1;
+>> +			imm &= mask;
+> 
+> Won't this still lose the top bit? It generates 0x7fffffff for esz=32, and for
+> esz=32 we run through here when the two 16bit values are different.
+> 
+> This still runs for a 64bit immediate. The 0xf80000000fffffff example compares
+> 0xf8000000 with 0fffffff then breaks here on the first iteration of this loop.
+> With this change it still attempts to generate a 64bit mask.
+> 
+> I was thinking of something like [0]. That only runs when we know the two
+> tmp:halves match, it just keeps the bottom tmp:half for the next run and never
+> runs for a 64bit immediate.
+> 
+> 
+>>  			break;
+>> +		}
+>>  
+>>  		esz = tmp;
+>>  	}
+>> @@ -1552,10 +1555,6 @@ static u32 aarch64_encode_immediate(u64 imm,
+>>  	/* N is only set if we're encoding a 64bit value */
+>>  	n = esz == 64;
+>>  
+>> -	/* Trim imm to the element size */
+>> -	mask = BIT(esz - 1) - 1;
+>> -	imm &= mask;
+>> -
+>>  	/* That's how many ones we need to encode */
+>>  	ones = hweight64(imm);
+>>  
+>> I really need to run this against gas in order to make sure
+>> I get the same parameters for all the possible values.
+> 
+> Sounds good,
+> 
+> 
+> Thanks,
+> 
+> James
+> 
+> 
+> [0] Not even built:
+> diff --git a/arch/arm64/kernel/insn.c b/arch/arm64/kernel/insn.c
+> index 12d3ec2154c2..d9fbdea7b18d 100644
+> --- a/arch/arm64/kernel/insn.c
+> +++ b/arch/arm64/kernel/insn.c
+> @@ -1529,15 +1529,15 @@ static u32 aarch64_encode_immediate(u64 imm,
+>                         break;
+> 
+>                 esz = tmp;
+> +
+> +               /* Trim imm to the element size */
+> +               mask = BIT(esz) - 1;
+> +               imm &= mask;
 
+This should go together with a small adjustment of the narrowing loop,
+as we never hit esz==2, which is a bit of a problem.
 
-On 12/14/2017 12:57 PM, Jia He Wrote:
-> Hi Christoffer
->
-> I have tried your newer level-mapped-v7 branch, but bug is still there.
->
-> There is no special load in both host and guest. The guest (kernel 
-> 4.14) is often hanging when booting
->
-> the guest kernel log
->
-> [ OK ] Reached target Remote File Systems.
-> Starting File System Check on /dev/mapper/fedora-root...
-> [ OK ] Started File System Check on /dev/mapper/fedora-root.
-> Mounting /sysroot...
-> [ 2.670764] SGI XFS with ACLs, security attributes, no debug enabled
-> [ 2.678180] XFS (dm-0): Mounting V5 Filesystem
-> [ 2.740364] XFS (dm-0): Ending clean mount
-> [ OK ] Mounted /sysroot.
-> [ OK ] Reached target Initrd Root File System.
-> Starting Reload Configuration from the Real Root...
-> [ 61.288215] INFO: rcu_sched detected stalls on CPUs/tasks:
-> [ 61.290791] 1-...!: (0 ticks this GP) idle=574/0/0 softirq=5/5 fqs=1
-> [ 61.293664] (detected by 0, t=6002 jiffies, g=-263, c=-264, q=39760)
-> [ 61.296480] Task dump for CPU 1:
-> [ 61.297938] swapper/1 R running task 0 0 1 0x00000020
-> [ 61.300643] Call trace:
-> [ 61.301260] __switch_to+0x6c/0x78
-> [ 61.302095] cpu_number+0x0/0x8
-> [ 61.302867] rcu_sched kthread starved for 6000 jiffies! 
-> g18446744073709551353 c18446744073709551352 f0x0 RCU_GP_WAIT_FQS(3) 
-> ->state=0x402 ->cpu=1
-> [ 61.305941] rcu_sched I 0 8 2 0x00000020
-> [ 61.307250] Call trace:
-> [ 61.307854] __switch_to+0x6c/0x78
-> [ 61.308693] __schedule+0x268/0x8f0
-> [ 61.309545] schedule+0x2c/0x88
-> [ 61.310325] schedule_timeout+0x84/0x3b8
-> [ 61.311278] rcu_gp_kthread+0x4d4/0x7d8
-> [ 61.312213] kthread+0x134/0x138
-> [ 61.313001] ret_from_fork+0x10/0x1c
->
-> Maybe my previous patch is not perfect enough, thanks for your comments.
->
-> I digged it futher more, do you think below code logic is possibly 
-> problematic?
->
->
-> vtimer_save_state           (vtimer->loaded = false, cntv_ctl is 0)
->
-> kvm_arch_timer_handler        (read cntv_ctl and set vtimer->cnt_ctl = 0)
->
-> vtimer_restore_state            (write vtimer->cnt_ctl to cntv_ctl, 
-> then cntv_ctl will
->
->                        be 0 forever)
-sorry, adjust the format, make it easy for reading:
+I now have a small test rig generating all the valid immediates and
+comparing the encodings with GAS, which helped figuring out the bugs.
 
-vtimer_save_state                   (vtimer->loaded = false, cntv_ctl is 0)
-kvm_arch_timer_handler        (read cntv_ctl and set vtimer->cnt_ctl = 0)
-vtimer_restore_state              (write vtimer->cnt_ctl to cntv_ctl, 
-then cntv_ctl will be 0 forever)
+Thanks,
 
+	M.
 -- 
-Cheers,
-Jia
-
->
->
-> If above analysis is reasonable, how about below patch? already tested 
-> in my arm64 server.
->
-> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-> index f9555b1..ee6dd3f 100644
-> --- a/virt/kvm/arm/arch_timer.c
-> +++ b/virt/kvm/arm/arch_timer.c
-> @@ -99,7 +99,7 @@ static irqreturn_t kvm_arch_timer_handler(int irq, 
-> void *dev_id)
->         }
->         vtimer = vcpu_vtimer(vcpu);
->
-> -       if (!vtimer->irq.level) {
-> +       if (vtimer->loaded && !vtimer->irq.level) {
->                 vtimer->cnt_ctl = read_sysreg_el0(cntv_ctl);
->                 if (kvm_timer_irq_can_fire(vtimer))
->                         kvm_timer_update_irq(vcpu, true, vtimer);
->
-> Cheers,
->
-> Jia
->
->
->
-> On 12/13/2017 5:18 PM, Christoffer Dall Wrote:
->> On Tue, Dec 12, 2017 at 11:00:07PM -0800, Jia He wrote:
->>> In our Armv8a server (qualcomm Amberwing, non VHE), after applying
->>> Christoffer's timer optimizing patchset(Optimize arch timer register
->>> handling), the guest is hang during kernel booting.
->>>
->>> The error root cause might be as follows:
->>> 1. in kvm_arch_timer_handler, it reset vtimer->cnt_ctl with current
->>> cntv_ctl register value. And then it missed some cases to update 
->>> timer's
->>> irq (irq.level) when kvm_timer_irq_can_fire() is false
->> Why should it set the irq level to true when the timer cannot fire?
->>
->>> 2. It causes kvm_vcpu_check_block return 0 instead of -EINTR
->>>     kvm_vcpu_check_block
->>>         kvm_cpu_has_pending_timer
->>>             kvm_timer_is_pending
->>>                 kvm_timer_should_fire
->>> 3. Thus, the kvm hyp code can not break the loop in kvm_vcpu_block 
->>> (halt
->>> poll process) and the guest is hang forever
->> This is just a polling loop which will expire after some time, so it
->> shouldn't halt the guest indefinitely, but merely slow it down for some
->> while, if we have a bug.  Is that the behavior you're seeing or are you
->> seeing the guest coming to a complete halt?
->>
->>> Fixes: b103cc3f10c0 ("KVM: arm/arm64: Avoid timer save/restore in 
->>> vcpu entry/exit")
->>> Signed-off-by: Jia He <jia.he@hxt-semitech.com>
->>> ---
->>>   virt/kvm/arm/arch_timer.c | 1 -
->>>   1 file changed, 1 deletion(-)
->>>
->>> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
->>> index f9555b1..bb86433 100644
->>> --- a/virt/kvm/arm/arch_timer.c
->>> +++ b/virt/kvm/arm/arch_timer.c
->>> @@ -100,7 +100,6 @@ static irqreturn_t kvm_arch_timer_handler(int 
->>> irq, void *dev_id)
->>>       vtimer = vcpu_vtimer(vcpu);
->>>         if (!vtimer->irq.level) {
->>> -        vtimer->cnt_ctl = read_sysreg_el0(cntv_ctl);
->> This fix is clearly not correct, as it would prevent forwarding timer
->> interrupts in some cases.
->>
->>>           if (kvm_timer_irq_can_fire(vtimer))
->>>               kvm_timer_update_irq(vcpu, true, vtimer);
->>>       }
->>> -- 
->>> 2.7.4
->>>
->> I actually don't see how the above scenario you painted can happen.
->>
->> If you're in the polling loop, that means that the timer state is loaded
->> on the vcpu, and that means you can take interrupts from the timer, and
->> when you take interrupts, you will set the irq.level.
->>
->> And here's the first bit of logic in kvm_timer_is_pending():
->>
->>     if (vtimer->irq.level || ptimer->irq.level)
->>         return true;
->>
->> So that would break the loop.
->>
->> I'm not able to reproduce on my side with a non-VHE platform.
->>
->> What is the workload you're running to reproduce this, and what is the
->> exact kernel tree and kernel configuration you're using?
->>
->> Thanks,
->> -Christoffer
->>
->>
->>
+Jazz is not dead. It just smells funny...
