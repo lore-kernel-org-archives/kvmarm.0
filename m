@@ -1,137 +1,186 @@
 From: Jia He <hejianet@gmail.com>
 Subject: Re: [PATCH] KVM: arm/arm64: don't set vtimer->cnt_ctl in
  kvm_arch_timer_handler
-Date: Thu, 14 Dec 2017 12:57:54 +0800
-Message-ID: <dc95b58c-ee6c-e5c7-1f37-8f69c789a1fc@gmail.com>
+Date: Thu, 14 Dec 2017 13:35:35 +0800
+Message-ID: <f9f5ee12-f0a4-71b0-f765-84b0d7c2d453@gmail.com>
 References: <1513148407-2611-1-git-send-email-hejianet@gmail.com>
- <20171213091803.GQ910@cbox>
+ <20171213091803.GQ910@cbox> <dc95b58c-ee6c-e5c7-1f37-8f69c789a1fc@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9012049D46
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 23:54:41 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Y2-zgqoSKPVb for <kvmarm@lists.cs.columbia.edu>;
- Wed, 13 Dec 2017 23:54:40 -0500 (EST)
-Received: from mail-pf0-f196.google.com (mail-pf0-f196.google.com
- [209.85.192.196])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5762D49D2B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 23:54:40 -0500 (EST)
-Received: by mail-pf0-f196.google.com with SMTP id v26so2859657pfl.7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Dec 2017 20:58:13 -0800 (PST)
-In-Reply-To: <20171213091803.GQ910@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <dc95b58c-ee6c-e5c7-1f37-8f69c789a1fc@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Jia He <jia.he@hxt-semitech.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, Jia He <jia.he@hxt-semitech.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGkgQ2hyaXN0b2ZmZXIKCkkgaGF2ZSB0cmllZCB5b3VyIG5ld2VyIGxldmVsLW1hcHBlZC12NyBi
-cmFuY2gsIGJ1dCBidWcgaXMgc3RpbGwgdGhlcmUuCgpUaGVyZSBpcyBubyBzcGVjaWFsIGxvYWQg
-aW4gYm90aCBob3N0IGFuZCBndWVzdC4gVGhlIGd1ZXN0IChrZXJuZWwgNC4xNCkgCmlzIG9mdGVu
-IGhhbmdpbmcgd2hlbiBib290aW5nCgp0aGUgZ3Vlc3Qga2VybmVsIGxvZwoKWyBPSyBdIFJlYWNo
-ZWQgdGFyZ2V0IFJlbW90ZSBGaWxlIFN5c3RlbXMuClN0YXJ0aW5nIEZpbGUgU3lzdGVtIENoZWNr
-IG9uIC9kZXYvbWFwcGVyL2ZlZG9yYS1yb290Li4uClsgT0sgXSBTdGFydGVkIEZpbGUgU3lzdGVt
-IENoZWNrIG9uIC9kZXYvbWFwcGVyL2ZlZG9yYS1yb290LgpNb3VudGluZyAvc3lzcm9vdC4uLgpb
-IDIuNjcwNzY0XSBTR0kgWEZTIHdpdGggQUNMcywgc2VjdXJpdHkgYXR0cmlidXRlcywgbm8gZGVi
-dWcgZW5hYmxlZApbIDIuNjc4MTgwXSBYRlMgKGRtLTApOiBNb3VudGluZyBWNSBGaWxlc3lzdGVt
-ClsgMi43NDAzNjRdIFhGUyAoZG0tMCk6IEVuZGluZyBjbGVhbiBtb3VudApbIE9LIF0gTW91bnRl
-ZCAvc3lzcm9vdC4KWyBPSyBdIFJlYWNoZWQgdGFyZ2V0IEluaXRyZCBSb290IEZpbGUgU3lzdGVt
-LgpTdGFydGluZyBSZWxvYWQgQ29uZmlndXJhdGlvbiBmcm9tIHRoZSBSZWFsIFJvb3QuLi4KWyA2
-MS4yODgyMTVdIElORk86IHJjdV9zY2hlZCBkZXRlY3RlZCBzdGFsbHMgb24gQ1BVcy90YXNrczoK
-WyA2MS4yOTA3OTFdIDEtLi4uITogKDAgdGlja3MgdGhpcyBHUCkgaWRsZT01NzQvMC8wIHNvZnRp
-cnE9NS81IGZxcz0xClsgNjEuMjkzNjY0XSAoZGV0ZWN0ZWQgYnkgMCwgdD02MDAyIGppZmZpZXMs
-IGc9LTI2MywgYz0tMjY0LCBxPTM5NzYwKQpbIDYxLjI5NjQ4MF0gVGFzayBkdW1wIGZvciBDUFUg
-MToKWyA2MS4yOTc5MzhdIHN3YXBwZXIvMSBSIHJ1bm5pbmcgdGFzayAwIDAgMSAweDAwMDAwMDIw
-ClsgNjEuMzAwNjQzXSBDYWxsIHRyYWNlOgpbIDYxLjMwMTI2MF0gX19zd2l0Y2hfdG8rMHg2Yy8w
-eDc4ClsgNjEuMzAyMDk1XSBjcHVfbnVtYmVyKzB4MC8weDgKWyA2MS4zMDI4NjddIHJjdV9zY2hl
-ZCBrdGhyZWFkIHN0YXJ2ZWQgZm9yIDYwMDAgamlmZmllcyEgCmcxODQ0Njc0NDA3MzcwOTU1MTM1
-MyBjMTg0NDY3NDQwNzM3MDk1NTEzNTIgZjB4MCBSQ1VfR1BfV0FJVF9GUVMoMykgCi0+c3RhdGU9
-MHg0MDIgLT5jcHU9MQpbIDYxLjMwNTk0MV0gcmN1X3NjaGVkIEkgMCA4IDIgMHgwMDAwMDAyMApb
-IDYxLjMwNzI1MF0gQ2FsbCB0cmFjZToKWyA2MS4zMDc4NTRdIF9fc3dpdGNoX3RvKzB4NmMvMHg3
-OApbIDYxLjMwODY5M10gX19zY2hlZHVsZSsweDI2OC8weDhmMApbIDYxLjMwOTU0NV0gc2NoZWR1
-bGUrMHgyYy8weDg4ClsgNjEuMzEwMzI1XSBzY2hlZHVsZV90aW1lb3V0KzB4ODQvMHgzYjgKWyA2
-MS4zMTEyNzhdIHJjdV9ncF9rdGhyZWFkKzB4NGQ0LzB4N2Q4ClsgNjEuMzEyMjEzXSBrdGhyZWFk
-KzB4MTM0LzB4MTM4ClsgNjEuMzEzMDAxXSByZXRfZnJvbV9mb3JrKzB4MTAvMHgxYwoKTWF5YmUg
-bXkgcHJldmlvdXMgcGF0Y2ggaXMgbm90IHBlcmZlY3QgZW5vdWdoLCB0aGFua3MgZm9yIHlvdXIg
-Y29tbWVudHMuCgpJIGRpZ2dlZCBpdCBmdXRoZXIgbW9yZSwgZG8geW91IHRoaW5rIGJlbG93IGNv
-ZGUgbG9naWMgaXMgcG9zc2libHkgCnByb2JsZW1hdGljPwoKCnZ0aW1lcl9zYXZlX3N0YXRlwqDC
-oMKgwqDCoMKgwqDCoMKgwqAgKHZ0aW1lci0+bG9hZGVkID0gZmFsc2UsIGNudHZfY3RsIGlzIDAp
-Cgprdm1fYXJjaF90aW1lcl9oYW5kbGVywqDCoMKgwqDCoMKgwqDCoChyZWFkIGNudHZfY3RsIGFu
-ZCBzZXQgdnRpbWVyLT5jbnRfY3RsID0gMCkKCnZ0aW1lcl9yZXN0b3JlX3N0YXRlIMKgIMKgIMKg
-IMKgIMKgwqAgKHdyaXRlIHZ0aW1lci0+Y250X2N0bCB0byBjbnR2X2N0bCwgdGhlbiAKY250dl9j
-dGwgd2lsbAoKIMKgwqDCoCDCoMKgwqAgwqDCoMKgIMKgwqDCoCDCoMKgIMKgIMKgIGJlIDAgZm9y
-ZXZlcikKCgpJZiBhYm92ZSBhbmFseXNpcyBpcyByZWFzb25hYmxlLCBob3cgYWJvdXQgYmVsb3cg
-cGF0Y2g/IGFscmVhZHkgdGVzdGVkIAppbiBteSBhcm02NCBzZXJ2ZXIuCgpkaWZmIC0tZ2l0IGEv
-dmlydC9rdm0vYXJtL2FyY2hfdGltZXIuYyBiL3ZpcnQva3ZtL2FybS9hcmNoX3RpbWVyLmMKaW5k
-ZXggZjk1NTViMS4uZWU2ZGQzZiAxMDA2NDQKLS0tIGEvdmlydC9rdm0vYXJtL2FyY2hfdGltZXIu
-YworKysgYi92aXJ0L2t2bS9hcm0vYXJjaF90aW1lci5jCkBAIC05OSw3ICs5OSw3IEBAIHN0YXRp
-YyBpcnFyZXR1cm5fdCBrdm1fYXJjaF90aW1lcl9oYW5kbGVyKGludCBpcnEsIAp2b2lkICpkZXZf
-aWQpCiDCoMKgwqDCoMKgwqDCoCB9CiDCoMKgwqDCoMKgwqDCoCB2dGltZXIgPSB2Y3B1X3Z0aW1l
-cih2Y3B1KTsKCi3CoMKgwqDCoMKgwqAgaWYgKCF2dGltZXItPmlycS5sZXZlbCkgeworwqDCoMKg
-wqDCoMKgIGlmICh2dGltZXItPmxvYWRlZCAmJiAhdnRpbWVyLT5pcnEubGV2ZWwpIHsKIMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB2dGltZXItPmNudF9jdGwgPSByZWFkX3N5c3JlZ19l
-bDAoY250dl9jdGwpOwogwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGlmIChrdm1fdGlt
-ZXJfaXJxX2Nhbl9maXJlKHZ0aW1lcikpCiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgIGt2bV90aW1lcl91cGRhdGVfaXJxKHZjcHUsIHRydWUsIHZ0aW1lcik7
-CgpDaGVlcnMsCgpKaWEKCgoKT24gMTIvMTMvMjAxNyA1OjE4IFBNLCBDaHJpc3RvZmZlciBEYWxs
-IFdyb3RlOgo+IE9uIFR1ZSwgRGVjIDEyLCAyMDE3IGF0IDExOjAwOjA3UE0gLTA4MDAsIEppYSBI
-ZSB3cm90ZToKPj4gSW4gb3VyIEFybXY4YSBzZXJ2ZXIgKHF1YWxjb21tIEFtYmVyd2luZywgbm9u
-IFZIRSksIGFmdGVyIGFwcGx5aW5nCj4+IENocmlzdG9mZmVyJ3MgdGltZXIgb3B0aW1pemluZyBw
-YXRjaHNldChPcHRpbWl6ZSBhcmNoIHRpbWVyIHJlZ2lzdGVyCj4+IGhhbmRsaW5nKSwgdGhlIGd1
-ZXN0IGlzIGhhbmcgZHVyaW5nIGtlcm5lbCBib290aW5nLgo+Pgo+PiBUaGUgZXJyb3Igcm9vdCBj
-YXVzZSBtaWdodCBiZSBhcyBmb2xsb3dzOgo+PiAxLiBpbiBrdm1fYXJjaF90aW1lcl9oYW5kbGVy
-LCBpdCByZXNldCB2dGltZXItPmNudF9jdGwgd2l0aCBjdXJyZW50Cj4+IGNudHZfY3RsIHJlZ2lz
-dGVyIHZhbHVlLiBBbmQgdGhlbiBpdCBtaXNzZWQgc29tZSBjYXNlcyB0byB1cGRhdGUgdGltZXIn
-cwo+PiBpcnEgKGlycS5sZXZlbCkgd2hlbiBrdm1fdGltZXJfaXJxX2Nhbl9maXJlKCkgaXMgZmFs
-c2UKPiBXaHkgc2hvdWxkIGl0IHNldCB0aGUgaXJxIGxldmVsIHRvIHRydWUgd2hlbiB0aGUgdGlt
-ZXIgY2Fubm90IGZpcmU/Cj4KPj4gMi4gSXQgY2F1c2VzIGt2bV92Y3B1X2NoZWNrX2Jsb2NrIHJl
-dHVybiAwIGluc3RlYWQgb2YgLUVJTlRSCj4+IAlrdm1fdmNwdV9jaGVja19ibG9jawo+PiAJCWt2
-bV9jcHVfaGFzX3BlbmRpbmdfdGltZXIKPj4gCQkJa3ZtX3RpbWVyX2lzX3BlbmRpbmcKPj4gCQkJ
-CWt2bV90aW1lcl9zaG91bGRfZmlyZQo+PiAzLiBUaHVzLCB0aGUga3ZtIGh5cCBjb2RlIGNhbiBu
-b3QgYnJlYWsgdGhlIGxvb3AgaW4ga3ZtX3ZjcHVfYmxvY2sgKGhhbHQKPj4gcG9sbCBwcm9jZXNz
-KSBhbmQgdGhlIGd1ZXN0IGlzIGhhbmcgZm9yZXZlcgo+IFRoaXMgaXMganVzdCBhIHBvbGxpbmcg
-bG9vcCB3aGljaCB3aWxsIGV4cGlyZSBhZnRlciBzb21lIHRpbWUsIHNvIGl0Cj4gc2hvdWxkbid0
-IGhhbHQgdGhlIGd1ZXN0IGluZGVmaW5pdGVseSwgYnV0IG1lcmVseSBzbG93IGl0IGRvd24gZm9y
-IHNvbWUKPiB3aGlsZSwgaWYgd2UgaGF2ZSBhIGJ1Zy4gIElzIHRoYXQgdGhlIGJlaGF2aW9yIHlv
-dSdyZSBzZWVpbmcgb3IgYXJlIHlvdQo+IHNlZWluZyB0aGUgZ3Vlc3QgY29taW5nIHRvIGEgY29t
-cGxldGUgaGFsdD8KPgo+PiBGaXhlczogYjEwM2NjM2YxMGMwICgiS1ZNOiBhcm0vYXJtNjQ6IEF2
-b2lkIHRpbWVyIHNhdmUvcmVzdG9yZSBpbiB2Y3B1IGVudHJ5L2V4aXQiKQo+PiBTaWduZWQtb2Zm
-LWJ5OiBKaWEgSGUgPGppYS5oZUBoeHQtc2VtaXRlY2guY29tPgo+PiAtLS0KPj4gICB2aXJ0L2t2
-bS9hcm0vYXJjaF90aW1lci5jIHwgMSAtCj4+ICAgMSBmaWxlIGNoYW5nZWQsIDEgZGVsZXRpb24o
-LSkKPj4KPj4gZGlmZiAtLWdpdCBhL3ZpcnQva3ZtL2FybS9hcmNoX3RpbWVyLmMgYi92aXJ0L2t2
-bS9hcm0vYXJjaF90aW1lci5jCj4+IGluZGV4IGY5NTU1YjEuLmJiODY0MzMgMTAwNjQ0Cj4+IC0t
-LSBhL3ZpcnQva3ZtL2FybS9hcmNoX3RpbWVyLmMKPj4gKysrIGIvdmlydC9rdm0vYXJtL2FyY2hf
-dGltZXIuYwo+PiBAQCAtMTAwLDcgKzEwMCw2IEBAIHN0YXRpYyBpcnFyZXR1cm5fdCBrdm1fYXJj
-aF90aW1lcl9oYW5kbGVyKGludCBpcnEsIHZvaWQgKmRldl9pZCkKPj4gICAJdnRpbWVyID0gdmNw
-dV92dGltZXIodmNwdSk7Cj4+ICAgCj4+ICAgCWlmICghdnRpbWVyLT5pcnEubGV2ZWwpIHsKPj4g
-LQkJdnRpbWVyLT5jbnRfY3RsID0gcmVhZF9zeXNyZWdfZWwwKGNudHZfY3RsKTsKPiBUaGlzIGZp
-eCBpcyBjbGVhcmx5IG5vdCBjb3JyZWN0LCBhcyBpdCB3b3VsZCBwcmV2ZW50IGZvcndhcmRpbmcg
-dGltZXIKPiBpbnRlcnJ1cHRzIGluIHNvbWUgY2FzZXMuCj4KPj4gICAJCWlmIChrdm1fdGltZXJf
-aXJxX2Nhbl9maXJlKHZ0aW1lcikpCj4+ICAgCQkJa3ZtX3RpbWVyX3VwZGF0ZV9pcnEodmNwdSwg
-dHJ1ZSwgdnRpbWVyKTsKPj4gICAJfQo+PiAtLSAKPj4gMi43LjQKPj4KPiBJIGFjdHVhbGx5IGRv
-bid0IHNlZSBob3cgdGhlIGFib3ZlIHNjZW5hcmlvIHlvdSBwYWludGVkIGNhbiBoYXBwZW4uCj4K
-PiBJZiB5b3UncmUgaW4gdGhlIHBvbGxpbmcgbG9vcCwgdGhhdCBtZWFucyB0aGF0IHRoZSB0aW1l
-ciBzdGF0ZSBpcyBsb2FkZWQKPiBvbiB0aGUgdmNwdSwgYW5kIHRoYXQgbWVhbnMgeW91IGNhbiB0
-YWtlIGludGVycnVwdHMgZnJvbSB0aGUgdGltZXIsIGFuZAo+IHdoZW4geW91IHRha2UgaW50ZXJy
-dXB0cywgeW91IHdpbGwgc2V0IHRoZSBpcnEubGV2ZWwuCj4KPiBBbmQgaGVyZSdzIHRoZSBmaXJz
-dCBiaXQgb2YgbG9naWMgaW4ga3ZtX3RpbWVyX2lzX3BlbmRpbmcoKToKPgo+IAlpZiAodnRpbWVy
-LT5pcnEubGV2ZWwgfHwgcHRpbWVyLT5pcnEubGV2ZWwpCj4gCQlyZXR1cm4gdHJ1ZTsKPgo+IFNv
-IHRoYXQgd291bGQgYnJlYWsgdGhlIGxvb3AuCj4KPiBJJ20gbm90IGFibGUgdG8gcmVwcm9kdWNl
-IG9uIG15IHNpZGUgd2l0aCBhIG5vbi1WSEUgcGxhdGZvcm0uCj4KPiBXaGF0IGlzIHRoZSB3b3Jr
-bG9hZCB5b3UncmUgcnVubmluZyB0byByZXByb2R1Y2UgdGhpcywgYW5kIHdoYXQgaXMgdGhlCj4g
-ZXhhY3Qga2VybmVsIHRyZWUgYW5kIGtlcm5lbCBjb25maWd1cmF0aW9uIHlvdSdyZSB1c2luZz8K
-Pgo+IFRoYW5rcywKPiAtQ2hyaXN0b2ZmZXIKPgo+Cj4KX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMu
-Y3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlz
-dGluZm8va3ZtYXJtCg==
+Hi
+
+
+On 12/14/2017 12:57 PM, Jia He Wrote:
+> Hi Christoffer
+>
+> I have tried your newer level-mapped-v7 branch, but bug is still there.
+>
+> There is no special load in both host and guest. The guest (kernel 
+> 4.14) is often hanging when booting
+>
+> the guest kernel log
+>
+> [ OK ] Reached target Remote File Systems.
+> Starting File System Check on /dev/mapper/fedora-root...
+> [ OK ] Started File System Check on /dev/mapper/fedora-root.
+> Mounting /sysroot...
+> [ 2.670764] SGI XFS with ACLs, security attributes, no debug enabled
+> [ 2.678180] XFS (dm-0): Mounting V5 Filesystem
+> [ 2.740364] XFS (dm-0): Ending clean mount
+> [ OK ] Mounted /sysroot.
+> [ OK ] Reached target Initrd Root File System.
+> Starting Reload Configuration from the Real Root...
+> [ 61.288215] INFO: rcu_sched detected stalls on CPUs/tasks:
+> [ 61.290791] 1-...!: (0 ticks this GP) idle=574/0/0 softirq=5/5 fqs=1
+> [ 61.293664] (detected by 0, t=6002 jiffies, g=-263, c=-264, q=39760)
+> [ 61.296480] Task dump for CPU 1:
+> [ 61.297938] swapper/1 R running task 0 0 1 0x00000020
+> [ 61.300643] Call trace:
+> [ 61.301260] __switch_to+0x6c/0x78
+> [ 61.302095] cpu_number+0x0/0x8
+> [ 61.302867] rcu_sched kthread starved for 6000 jiffies! 
+> g18446744073709551353 c18446744073709551352 f0x0 RCU_GP_WAIT_FQS(3) 
+> ->state=0x402 ->cpu=1
+> [ 61.305941] rcu_sched I 0 8 2 0x00000020
+> [ 61.307250] Call trace:
+> [ 61.307854] __switch_to+0x6c/0x78
+> [ 61.308693] __schedule+0x268/0x8f0
+> [ 61.309545] schedule+0x2c/0x88
+> [ 61.310325] schedule_timeout+0x84/0x3b8
+> [ 61.311278] rcu_gp_kthread+0x4d4/0x7d8
+> [ 61.312213] kthread+0x134/0x138
+> [ 61.313001] ret_from_fork+0x10/0x1c
+>
+> Maybe my previous patch is not perfect enough, thanks for your comments.
+>
+> I digged it futher more, do you think below code logic is possibly 
+> problematic?
+>
+>
+> vtimer_save_state           (vtimer->loaded = false, cntv_ctl is 0)
+>
+> kvm_arch_timer_handler        (read cntv_ctl and set vtimer->cnt_ctl = 0)
+>
+> vtimer_restore_state            (write vtimer->cnt_ctl to cntv_ctl, 
+> then cntv_ctl will
+>
+>                        be 0 forever)
+sorry, adjust the format, make it easy for reading:
+
+vtimer_save_state                   (vtimer->loaded = false, cntv_ctl is 0)
+kvm_arch_timer_handler        (read cntv_ctl and set vtimer->cnt_ctl = 0)
+vtimer_restore_state              (write vtimer->cnt_ctl to cntv_ctl, 
+then cntv_ctl will be 0 forever)
+
+-- 
+Cheers,
+Jia
+
+>
+>
+> If above analysis is reasonable, how about below patch? already tested 
+> in my arm64 server.
+>
+> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> index f9555b1..ee6dd3f 100644
+> --- a/virt/kvm/arm/arch_timer.c
+> +++ b/virt/kvm/arm/arch_timer.c
+> @@ -99,7 +99,7 @@ static irqreturn_t kvm_arch_timer_handler(int irq, 
+> void *dev_id)
+>         }
+>         vtimer = vcpu_vtimer(vcpu);
+>
+> -       if (!vtimer->irq.level) {
+> +       if (vtimer->loaded && !vtimer->irq.level) {
+>                 vtimer->cnt_ctl = read_sysreg_el0(cntv_ctl);
+>                 if (kvm_timer_irq_can_fire(vtimer))
+>                         kvm_timer_update_irq(vcpu, true, vtimer);
+>
+> Cheers,
+>
+> Jia
+>
+>
+>
+> On 12/13/2017 5:18 PM, Christoffer Dall Wrote:
+>> On Tue, Dec 12, 2017 at 11:00:07PM -0800, Jia He wrote:
+>>> In our Armv8a server (qualcomm Amberwing, non VHE), after applying
+>>> Christoffer's timer optimizing patchset(Optimize arch timer register
+>>> handling), the guest is hang during kernel booting.
+>>>
+>>> The error root cause might be as follows:
+>>> 1. in kvm_arch_timer_handler, it reset vtimer->cnt_ctl with current
+>>> cntv_ctl register value. And then it missed some cases to update 
+>>> timer's
+>>> irq (irq.level) when kvm_timer_irq_can_fire() is false
+>> Why should it set the irq level to true when the timer cannot fire?
+>>
+>>> 2. It causes kvm_vcpu_check_block return 0 instead of -EINTR
+>>>     kvm_vcpu_check_block
+>>>         kvm_cpu_has_pending_timer
+>>>             kvm_timer_is_pending
+>>>                 kvm_timer_should_fire
+>>> 3. Thus, the kvm hyp code can not break the loop in kvm_vcpu_block 
+>>> (halt
+>>> poll process) and the guest is hang forever
+>> This is just a polling loop which will expire after some time, so it
+>> shouldn't halt the guest indefinitely, but merely slow it down for some
+>> while, if we have a bug.  Is that the behavior you're seeing or are you
+>> seeing the guest coming to a complete halt?
+>>
+>>> Fixes: b103cc3f10c0 ("KVM: arm/arm64: Avoid timer save/restore in 
+>>> vcpu entry/exit")
+>>> Signed-off-by: Jia He <jia.he@hxt-semitech.com>
+>>> ---
+>>>   virt/kvm/arm/arch_timer.c | 1 -
+>>>   1 file changed, 1 deletion(-)
+>>>
+>>> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+>>> index f9555b1..bb86433 100644
+>>> --- a/virt/kvm/arm/arch_timer.c
+>>> +++ b/virt/kvm/arm/arch_timer.c
+>>> @@ -100,7 +100,6 @@ static irqreturn_t kvm_arch_timer_handler(int 
+>>> irq, void *dev_id)
+>>>       vtimer = vcpu_vtimer(vcpu);
+>>>         if (!vtimer->irq.level) {
+>>> -        vtimer->cnt_ctl = read_sysreg_el0(cntv_ctl);
+>> This fix is clearly not correct, as it would prevent forwarding timer
+>> interrupts in some cases.
+>>
+>>>           if (kvm_timer_irq_can_fire(vtimer))
+>>>               kvm_timer_update_irq(vcpu, true, vtimer);
+>>>       }
+>>> -- 
+>>> 2.7.4
+>>>
+>> I actually don't see how the above scenario you painted can happen.
+>>
+>> If you're in the polling loop, that means that the timer state is loaded
+>> on the vcpu, and that means you can take interrupts from the timer, and
+>> when you take interrupts, you will set the irq.level.
+>>
+>> And here's the first bit of logic in kvm_timer_is_pending():
+>>
+>>     if (vtimer->irq.level || ptimer->irq.level)
+>>         return true;
+>>
+>> So that would break the loop.
+>>
+>> I'm not able to reproduce on my side with a non-VHE platform.
+>>
+>> What is the workload you're running to reproduce this, and what is the
+>> exact kernel tree and kernel configuration you're using?
+>>
+>> Thanks,
+>> -Christoffer
+>>
+>>
+>>
