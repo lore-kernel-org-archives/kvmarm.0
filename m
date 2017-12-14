@@ -1,79 +1,109 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 08/19] arm64: KVM: Dynamically patch the kernel/hyp VA
- mask
-Date: Thu, 14 Dec 2017 13:27:45 +0000
-Message-ID: <c631e7fb-e277-04f0-34d7-72d5b50ec963@arm.com>
-References: <20171211144937.4537-1-marc.zyngier@arm.com>
- <20171211144937.4537-9-marc.zyngier@arm.com> <5A3279E8.2070507@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v2 20/36] KVM: arm64: Don't save the host ELR_EL2 and
+ SPSR_EL2 on VHE systems
+Date: Thu, 14 Dec 2017 14:46:20 +0100
+Message-ID: <20171214134620.GW910@cbox>
+References: <20171207170630.592-1-christoffer.dall@linaro.org>
+ <20171207170630.592-21-christoffer.dall@linaro.org>
+ <a5d687f6-478f-7436-58c0-932a4eaa466c@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <5A3279E8.2070507@arm.com>
-Content-Language: en-GB
+Content-Disposition: inline
+In-Reply-To: <a5d687f6-478f-7436-58c0-932a4eaa466c@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: James Morse <james.morse@arm.com>, kvmarm@lists.cs.columbia.edu
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Steve Capper <steve.capper@arm.com>
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Shih-Wei Li <shihwei@cs.columbia.edu>, Andrew Jones <drjones@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 14/12/17 13:17, James Morse wrote:
-> Hi Marc,
+On Mon, Dec 11, 2017 at 10:44:59AM +0000, Marc Zyngier wrote:
+> On 07/12/17 17:06, Christoffer Dall wrote:
+> > On non-VHE systems we need to save the ELR_EL2 and SPSR_EL2 so that we
+> > can return to the host in EL1 in the same state and location where we
+> > issued a hypercall to EL2, but these registers don't contain anything
+> > important on VHE, because all of the host runs in EL2.  Therefore,
 > 
-> On 11/12/17 14:49, Marc Zyngier wrote:
->> So far, we're using a complicated sequence of alternatives to
->> patch the kernel/hyp VA mask on non-VHE, and NOP out the
->> masking altogether when on VHE.
->>
->> THe newly introduced dynamic patching gives us the opportunity
->> to simplify that code by patching a single instruction with
->> the correct mask (instead of the mind bending cummulative masking
->> we have at the moment) or even a single NOP on VHE.
+> If I may refine the rational: ELR_EL2 and SPSR_EL2 are not useful here
+> because we never enter a guest as a result of an exception entry that
+> would be directly handled by KVM. The kernel entry code already saves
+> ELR_EL1/SPSR_EL1 on exception entry, which is enough.
 > 
-> (and just a single NOP on VHE?)
 
-Yes, much better. Thanks.
+Indeed, I was being a bit loosey-goosey here.
 
+> > factor out these registers into separate save/restore functions, making
+> > it easy to exclude them from the VHE world-switch path later on.
+> > 
+> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> > ---
+> >  arch/arm64/kvm/hyp/sysreg-sr.c | 13 +++++++++++++
+> >  1 file changed, 13 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+> > index a12112494f75..479de0f0dd07 100644
+> > --- a/arch/arm64/kvm/hyp/sysreg-sr.c
+> > +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+> > @@ -71,6 +71,10 @@ static void __hyp_text __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+> >  	ctxt->gp_regs.sp_el1		= read_sysreg(sp_el1);
+> >  	ctxt->gp_regs.elr_el1		= read_sysreg_el1(elr);
+> >  	ctxt->gp_regs.spsr[KVM_SPSR_EL1]= read_sysreg_el1(spsr);
+> > +}
+> > +
+> > +static void __hyp_text __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
+> > +{
+> >  	ctxt->gp_regs.regs.pc		= read_sysreg_el2(elr);
+> >  	ctxt->gp_regs.regs.pstate	= read_sysreg_el2(spsr);
+> >  }
+> > @@ -80,6 +84,7 @@ void __hyp_text __sysreg_save_state_nvhe(struct kvm_cpu_context *ctxt)
+> >  	__sysreg_save_el1_state(ctxt);
+> >  	__sysreg_save_common_state(ctxt);
+> >  	__sysreg_save_user_state(ctxt);
+> > +	__sysreg_save_el2_return_state(ctxt);
+> >  }
+> >  
+> >  void sysreg_save_host_state_vhe(struct kvm_cpu_context *ctxt)
+> > @@ -93,6 +98,7 @@ void sysreg_save_guest_state_vhe(struct kvm_cpu_context *ctxt)
+> >  	__sysreg_save_el1_state(ctxt);
+> >  	__sysreg_save_common_state(ctxt);
+> >  	__sysreg_save_user_state(ctxt);
+> > +	__sysreg_save_el2_return_state(ctxt);
+> >  }
+> >  
+> >  static void __hyp_text __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
+> > @@ -137,6 +143,11 @@ static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+> >  	write_sysreg(ctxt->gp_regs.sp_el1,		sp_el1);
+> >  	write_sysreg_el1(ctxt->gp_regs.elr_el1,		elr);
+> >  	write_sysreg_el1(ctxt->gp_regs.spsr[KVM_SPSR_EL1],spsr);
+> > +}
+> > +
+> > +static void __hyp_text
+> > +__sysreg_restore_el2_return_state(struct kvm_cpu_context *ctxt)
+> > +{
+> >  	write_sysreg_el2(ctxt->gp_regs.regs.pc,		elr);
+> >  	write_sysreg_el2(ctxt->gp_regs.regs.pstate,	spsr);
+> >  }
+> > @@ -146,6 +157,7 @@ void __hyp_text __sysreg_restore_state_nvhe(struct kvm_cpu_context *ctxt)
+> >  	__sysreg_restore_el1_state(ctxt);
+> >  	__sysreg_restore_common_state(ctxt);
+> >  	__sysreg_restore_user_state(ctxt);
+> > +	__sysreg_restore_el2_return_state(ctxt);
+> >  }
+> >  
+> >  void sysreg_restore_host_state_vhe(struct kvm_cpu_context *ctxt)
+> > @@ -159,6 +171,7 @@ void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt)
+> >  	__sysreg_restore_el1_state(ctxt);
+> >  	__sysreg_restore_common_state(ctxt);
+> >  	__sysreg_restore_user_state(ctxt);
+> > +	__sysreg_restore_el2_return_state(ctxt);
+> >  }
+> >  
+> >  static void __hyp_text __fpsimd32_save_state(struct kvm_cpu_context *ctxt)
+> > 
 > 
+> Otherwise:
 > 
->> diff --git a/arch/arm64/kvm/haslr.c b/arch/arm64/kvm/haslr.c
->> new file mode 100644
->> index 000000000000..5e1643a4e7bf
->> --- /dev/null
->> +++ b/arch/arm64/kvm/haslr.c
+> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 > 
->> +u32 __init kvm_update_va_mask(struct alt_instr *alt, int index, u32 oinsn)
->> +{
->> +	u32 rd, rn, insn;
->> +	u64 imm;
->> +
->> +	/* We only expect a 1 instruction sequence */
->> +	BUG_ON((alt->alt_len / sizeof(insn)) != 1);
->> +
->> +	/* VHE doesn't need any address translation, let's NOP everything */
->> +	if (has_vhe())
->> +		return aarch64_insn_gen_nop();
->> +
->> +	rd = aarch64_insn_decode_register(AARCH64_INSN_REGTYPE_RD, oinsn);
->> +	rn = aarch64_insn_decode_register(AARCH64_INSN_REGTYPE_RN, oinsn);
->> +
->> +	switch (index) {
->> +	default:
->> +		/* Something went wrong... */
->> +		insn = AARCH64_BREAK_FAULT;
->> +		break;
-> 
-> Can this happen? You bug-on alt->alt_len != 1-instruction above, and the loop in
-> __apply_alternatives() is calculated in the same way.
-> If it can, BUG_ON(index != 0) should catch both cases in one go.
-
-No, it cannot happen. Yes, I'm paranoid. I guess I should just
-initialise insn to AARCH64_BREAK_FAULT and achieve the same level of
-paranoia without that default clause.
-
-Oh, and it keeps GCC quiet.
 
 Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+-Christoffer
