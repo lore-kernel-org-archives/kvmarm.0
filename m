@@ -1,22 +1,23 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH v5 03/13] arm64: cpufeature: Detect CPU RAS Extentions
-Date: Fri, 15 Dec 2017 15:50:51 +0000
-Message-ID: <20171215155101.23505-4-james.morse@arm.com>
+Subject: [PATCH v5 04/13] arm64: kernel: Survive corrected RAS errors notified
+ by SError
+Date: Fri, 15 Dec 2017 15:50:52 +0000
+Message-ID: <20171215155101.23505-5-james.morse@arm.com>
 References: <20171215155101.23505-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C338249D8A
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Dec 2017 10:49:52 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FCC149D7D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Dec 2017 10:49:58 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ux9yzW1klmaI for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Dec 2017 10:49:51 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FFF6406D0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Dec 2017 10:49:51 -0500 (EST)
+ with ESMTP id 2xcS8oJuAAhH for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Dec 2017 10:49:56 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9562849DA4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Dec 2017 10:49:56 -0500 (EST)
 In-Reply-To: <20171215155101.23505-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,120 +32,209 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Xie XiuQi <xiexiuqi@huawei.com>
+Prior to v8.2, SError is an uncontainable fatal exception. The v8.2 RAS
+extensions use SError to notify software about RAS errors, these can be
+contained by the Error Syncronization Barrier.
 
-ARM's v8.2 Extentions add support for Reliability, Availability and
-Serviceability (RAS). On CPUs with these extensions system software
-can use additional barriers to isolate errors and determine if faults
-are pending. Add cpufeature detection.
+An ACPI system with firmware-first may use SError as its 'SEI'
+notification. Future patches may add code to 'claim' this SError as a
+notification.
 
-Platform level RAS support may require additional firmware support.
+Other systems can distinguish these RAS errors from the SError ESR and
+use the AET bits and additional data from RAS-Error registers to handle
+the error. Future patches may add this kernel-first handling.
 
-Signed-off-by: Xie XiuQi <xiexiuqi@huawei.com>
-[Rebased added config option, reworded commit message]
+Without support for either of these we will panic(), even if we received
+a corrected error. Add code to decode the severity of RAS errors. We can
+safely ignore contained errors where the CPU can continue to make
+progress. For all other errors we continue to panic().
+
 Signed-off-by: James Morse <james.morse@arm.com>
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 ---
 Changes since v4:
- * Removed barrier in context switch
+ * Reworded 'blocking' to 'fatal'.
+ * Added AET_SHIFT define
+ * Check local CPU caps to allow survivable contained SError on systems where
+   some CPUs have RAS support and some don't.
+ * Clarified where we are merging uncategorized and uncontained. Mostly
+   comments and swapping '0' for a macro defined as 0.
+   Note: These two share an encoding on aarch32.
+ * Removed preempt bodge, KVM now calls this from a non-preemtible location.
+ * Dropped Catalin's Reviewed-by
 
- arch/arm64/Kconfig               | 16 ++++++++++++++++
- arch/arm64/include/asm/cpucaps.h |  3 ++-
- arch/arm64/include/asm/sysreg.h  |  2 ++
- arch/arm64/kernel/cpufeature.c   | 13 +++++++++++++
- 4 files changed, 33 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/esr.h   | 13 ++++++++++
+ arch/arm64/include/asm/traps.h | 54 ++++++++++++++++++++++++++++++++++++++++++
+ arch/arm64/kernel/traps.c      | 51 +++++++++++++++++++++++++++++++++++----
+ 3 files changed, 113 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index a93339f5178f..f160e98b06bd 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -1011,6 +1011,22 @@ config ARM64_PMEM
- 	  operations if DC CVAP is not supported (following the behaviour of
- 	  DC CVAP itself if the system does not define a point of persistence).
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index 014d7d8edcf9..c367838700fa 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -86,6 +86,18 @@
+ #define ESR_ELx_WNR_SHIFT	(6)
+ #define ESR_ELx_WNR		(UL(1) << ESR_ELx_WNR_SHIFT)
  
-+config ARM64_RAS_EXTN
-+	bool "Enable support for RAS CPU Extensions"
-+	default y
-+	help
-+	  CPUs that support the Reliability, Availability and Serviceability
-+	  (RAS) Extensions, part of ARMv8.2 are able to track faults and
-+	  errors, classify them and report them to software.
++/* Asynchronous Error Type */
++#define ESR_ELx_IDS_SHIFT	(24)
++#define ESR_ELx_IDS		(UL(1) << ESR_ELx_IDS_SHIFT)
++#define ESR_ELx_AET_SHIFT	(10)
++#define ESR_ELx_AET		(UL(0x7) << ESR_ELx_AET_SHIFT)
 +
-+	  On CPUs with these extensions system software can use additional
-+	  barriers to determine if faults are pending and read the
-+	  classification from a new set of registers.
++#define ESR_ELx_AET_UC		(UL(0) << ESR_ELx_AET_SHIFT)
++#define ESR_ELx_AET_UEU		(UL(1) << ESR_ELx_AET_SHIFT)
++#define ESR_ELx_AET_UEO		(UL(2) << ESR_ELx_AET_SHIFT)
++#define ESR_ELx_AET_UER		(UL(3) << ESR_ELx_AET_SHIFT)
++#define ESR_ELx_AET_CE		(UL(6) << ESR_ELx_AET_SHIFT)
 +
-+	  Selecting this feature will allow the kernel to use these barriers
-+	  and access the new registers if the system supports the extension.
-+	  Platform RAS features may additionally depend on firmware support.
+ /* Shared ISS field definitions for Data/Instruction aborts */
+ #define ESR_ELx_SET_SHIFT	(11)
+ #define ESR_ELx_SET_MASK	(UL(3) << ESR_ELx_SET_SHIFT)
+@@ -100,6 +112,7 @@
+ #define ESR_ELx_FSC		(0x3F)
+ #define ESR_ELx_FSC_TYPE	(0x3C)
+ #define ESR_ELx_FSC_EXTABT	(0x10)
++#define ESR_ELx_FSC_SERROR	(0x11)
+ #define ESR_ELx_FSC_ACCESS	(0x08)
+ #define ESR_ELx_FSC_FAULT	(0x04)
+ #define ESR_ELx_FSC_PERM	(0x0C)
+diff --git a/arch/arm64/include/asm/traps.h b/arch/arm64/include/asm/traps.h
+index 1696f9de9359..178e338d2889 100644
+--- a/arch/arm64/include/asm/traps.h
++++ b/arch/arm64/include/asm/traps.h
+@@ -19,6 +19,7 @@
+ #define __ASM_TRAP_H
+ 
+ #include <linux/list.h>
++#include <asm/esr.h>
+ #include <asm/sections.h>
+ 
+ struct pt_regs;
+@@ -66,4 +67,57 @@ static inline int in_entry_text(unsigned long ptr)
+ 	return ptr >= (unsigned long)&__entry_text_start &&
+ 	       ptr < (unsigned long)&__entry_text_end;
+ }
 +
- endmenu
++/*
++ * CPUs with the RAS extensions have an Implementation-Defined-Syndrome bit
++ * to indicate whether this ESR has a RAS encoding. CPUs without this feature
++ * have a ISS-Valid bit in the same position.
++ * If this bit is set, we know its not a RAS SError.
++ * If its clear, we need to know if the CPU supports RAS. Uncategorized RAS
++ * errors share the same encoding as an all-zeros encoding from a CPU that
++ * doesn't support RAS.
++ */
++static inline bool arm64_is_ras_serror(u32 esr)
++{
++	WARN_ON(preemptible());
++
++	if (esr & ESR_ELx_IDS)
++		return false;
++
++	if (this_cpu_has_cap(ARM64_HAS_RAS_EXTN))
++		return true;
++	else
++		return false;
++}
++
++/*
++ * Return the AET bits from a RAS SError's ESR.
++ *
++ * It is implementation defined whether Uncategorized errors are containable.
++ * We treat them as Uncontainable.
++ * Non-RAS SError's are reported as Uncontained/Uncategorized.
++ */
++static inline u32 arm64_ras_serror_get_severity(u32 esr)
++{
++	u32 aet = esr & ESR_ELx_AET;
++
++	if (!arm64_is_ras_serror(esr)) {
++		/* Not a RAS error, we can't interpret the ESR. */
++		return ESR_ELx_AET_UC;
++	}
++
++	/*
++	 * AET is RES0 if 'the value returned in the DFSC field is not
++	 * [ESR_ELx_FSC_SERROR]'
++	 */
++	if ((esr & ESR_ELx_FSC) != ESR_ELx_FSC_SERROR) {
++		/* No severity information : Uncategorized */
++		return ESR_ELx_AET_UC;
++	}
++
++	return aet;
++}
++
++bool arm64_is_fatal_ras_serror(struct pt_regs *regs, unsigned int esr);
++void __noreturn arm64_serror_panic(struct pt_regs *regs, u32 esr);
+ #endif
+diff --git a/arch/arm64/kernel/traps.c b/arch/arm64/kernel/traps.c
+index 3d3588fcd1c7..bbb0fde2780e 100644
+--- a/arch/arm64/kernel/traps.c
++++ b/arch/arm64/kernel/traps.c
+@@ -662,17 +662,58 @@ asmlinkage void handle_bad_stack(struct pt_regs *regs)
+ }
+ #endif
  
- config ARM64_SVE
-diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-index 2ff7c5e8efab..ff9edaa07549 100644
---- a/arch/arm64/include/asm/cpucaps.h
-+++ b/arch/arm64/include/asm/cpucaps.h
-@@ -41,7 +41,8 @@
- #define ARM64_WORKAROUND_CAVIUM_30115		20
- #define ARM64_HAS_DCPOP				21
- #define ARM64_SVE				22
-+#define ARM64_HAS_RAS_EXTN			23
+-asmlinkage void do_serror(struct pt_regs *regs, unsigned int esr)
++void __noreturn arm64_serror_panic(struct pt_regs *regs, u32 esr)
+ {
+-	nmi_enter();
+-
+ 	console_verbose();
  
--#define ARM64_NCAPS				23
-+#define ARM64_NCAPS				24
+ 	pr_crit("SError Interrupt on CPU%d, code 0x%08x -- %s\n",
+ 		smp_processor_id(), esr, esr_get_class_string(esr));
+-	__show_regs(regs);
++	if (regs)
++		__show_regs(regs);
++
++	nmi_panic(regs, "Asynchronous SError Interrupt");
++
++	cpu_park_loop();
++	unreachable();
++}
++
++bool arm64_is_fatal_ras_serror(struct pt_regs *regs, unsigned int esr)
++{
++	u32 aet = arm64_ras_serror_get_severity(esr);
++
++	switch (aet) {
++	case ESR_ELx_AET_CE:	/* corrected error */
++	case ESR_ELx_AET_UEO:	/* restartable, not yet consumed */
++		/*
++		 * The CPU can make progress. We may take UEO again as
++		 * a more severe error.
++		 */
++		return false;
++
++	case ESR_ELx_AET_UEU:	/* Uncorrected Unrecoverable */
++	case ESR_ELx_AET_UER:	/* Uncorrected Recoverable */
++		/*
++		 * The CPU can't make progress. The exception may have
++		 * been imprecise.
++		 */
++		return true;
++
++	case ESR_ELx_AET_UC:	/* Uncontainable or Uncategorized error */
++	default:
++		/* Error has been silently propagated */
++		arm64_serror_panic(regs, esr);
++	}
++}
++
++asmlinkage void do_serror(struct pt_regs *regs, unsigned int esr)
++{
++	nmi_enter();
++
++	/* non-RAS errors are not containable */
++	if (!arm64_is_ras_serror(esr) || arm64_is_fatal_ras_serror(regs, esr))
++		arm64_serror_panic(regs, esr);
  
- #endif /* __ASM_CPUCAPS_H */
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 5cdc139267b6..2eca9e2368d9 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -495,6 +495,7 @@
+-	panic("Asynchronous SError Interrupt");
++	nmi_exit();
+ }
  
- /* id_aa64pfr0 */
- #define ID_AA64PFR0_SVE_SHIFT		32
-+#define ID_AA64PFR0_RAS_SHIFT		28
- #define ID_AA64PFR0_GIC_SHIFT		24
- #define ID_AA64PFR0_ASIMD_SHIFT		20
- #define ID_AA64PFR0_FP_SHIFT		16
-@@ -504,6 +505,7 @@
- #define ID_AA64PFR0_EL0_SHIFT		0
- 
- #define ID_AA64PFR0_SVE			0x1
-+#define ID_AA64PFR0_RAS_V1		0x1
- #define ID_AA64PFR0_FP_NI		0xf
- #define ID_AA64PFR0_FP_SUPPORTED	0x0
- #define ID_AA64PFR0_ASIMD_NI		0xf
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 68a49f7fb75c..cfc7588a380c 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -146,6 +146,7 @@ static const struct arm64_ftr_bits ftr_id_aa64isar1[] = {
- 
- static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_SVE_SHIFT, 4, 0),
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_RAS_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_GIC_SHIFT, 4, 0),
- 	S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_ASIMD_SHIFT, 4, ID_AA64PFR0_ASIMD_NI),
- 	S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_FP_SHIFT, 4, ID_AA64PFR0_FP_NI),
-@@ -962,6 +963,18 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.enable = sve_kernel_enable,
- 	},
- #endif /* CONFIG_ARM64_SVE */
-+#ifdef CONFIG_ARM64_RAS_EXTN
-+	{
-+		.desc = "RAS Extension Support",
-+		.capability = ARM64_HAS_RAS_EXTN,
-+		.def_scope = SCOPE_SYSTEM,
-+		.matches = has_cpuid_feature,
-+		.sys_reg = SYS_ID_AA64PFR0_EL1,
-+		.sign = FTR_UNSIGNED,
-+		.field_pos = ID_AA64PFR0_RAS_SHIFT,
-+		.min_field_value = ID_AA64PFR0_RAS_V1,
-+	},
-+#endif /* CONFIG_ARM64_RAS_EXTN */
- 	{},
- };
- 
+ void __pte_error(const char *file, int line, unsigned long val)
 -- 
 2.15.0
