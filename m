@@ -1,23 +1,22 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH v5 02/13] arm64: sysreg: Move to use definitions for all the
- SCTLR bits
-Date: Fri, 15 Dec 2017 15:50:50 +0000
-Message-ID: <20171215155101.23505-3-james.morse@arm.com>
+Subject: [PATCH v5 03/13] arm64: cpufeature: Detect CPU RAS Extentions
+Date: Fri, 15 Dec 2017 15:50:51 +0000
+Message-ID: <20171215155101.23505-4-james.morse@arm.com>
 References: <20171215155101.23505-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BA94B406D0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Dec 2017 10:49:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C338249D8A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Dec 2017 10:49:52 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KH176XOn3dS5 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Dec 2017 10:49:49 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EA2E149DA1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Dec 2017 10:49:48 -0500 (EST)
+ with ESMTP id Ux9yzW1klmaI for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Dec 2017 10:49:51 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FFF6406D0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Dec 2017 10:49:51 -0500 (EST)
 In-Reply-To: <20171215155101.23505-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,216 +31,120 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-__cpu_setup() configures SCTLR_EL1 using some hard coded hex masks,
-and el2_setup() duplicates some this when setting RES1 bits.
+From: Xie XiuQi <xiexiuqi@huawei.com>
 
-Lets make this the same as KVM's hyp_init, which uses named bits.
+ARM's v8.2 Extentions add support for Reliability, Availability and
+Serviceability (RAS). On CPUs with these extensions system software
+can use additional barriers to isolate errors and determine if faults
+are pending. Add cpufeature detection.
 
-First, we add definitions for all the SCTLR_EL{1,2} bits, the RES{1,0}
-bits, and those we want to set or clear.
+Platform level RAS support may require additional firmware support.
 
-Add a build_bug checks to ensures all bits are either set or clear.
-This means we don't need to preserve endian-ness configuration
-generated elsewhere.
-
-Finally, move the head.S and proc.S users of these hard-coded masks
-over to the macro versions.
-
+Signed-off-by: Xie XiuQi <xiexiuqi@huawei.com>
+[Rebased added config option, reworded commit message]
 Signed-off-by: James Morse <james.morse@arm.com>
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 ---
- arch/arm64/include/asm/sysreg.h | 65 +++++++++++++++++++++++++++++++++++++++--
- arch/arm64/kernel/head.S        | 13 ++-------
- arch/arm64/mm/proc.S            | 24 +--------------
- 3 files changed, 67 insertions(+), 35 deletions(-)
+Changes since v4:
+ * Removed barrier in context switch
 
+ arch/arm64/Kconfig               | 16 ++++++++++++++++
+ arch/arm64/include/asm/cpucaps.h |  3 ++-
+ arch/arm64/include/asm/sysreg.h  |  2 ++
+ arch/arm64/kernel/cpufeature.c   | 13 +++++++++++++
+ 4 files changed, 33 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index a93339f5178f..f160e98b06bd 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -1011,6 +1011,22 @@ config ARM64_PMEM
+ 	  operations if DC CVAP is not supported (following the behaviour of
+ 	  DC CVAP itself if the system does not define a point of persistence).
+ 
++config ARM64_RAS_EXTN
++	bool "Enable support for RAS CPU Extensions"
++	default y
++	help
++	  CPUs that support the Reliability, Availability and Serviceability
++	  (RAS) Extensions, part of ARMv8.2 are able to track faults and
++	  errors, classify them and report them to software.
++
++	  On CPUs with these extensions system software can use additional
++	  barriers to determine if faults are pending and read the
++	  classification from a new set of registers.
++
++	  Selecting this feature will allow the kernel to use these barriers
++	  and access the new registers if the system supports the extension.
++	  Platform RAS features may additionally depend on firmware support.
++
+ endmenu
+ 
+ config ARM64_SVE
+diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+index 2ff7c5e8efab..ff9edaa07549 100644
+--- a/arch/arm64/include/asm/cpucaps.h
++++ b/arch/arm64/include/asm/cpucaps.h
+@@ -41,7 +41,8 @@
+ #define ARM64_WORKAROUND_CAVIUM_30115		20
+ #define ARM64_HAS_DCPOP				21
+ #define ARM64_SVE				22
++#define ARM64_HAS_RAS_EXTN			23
+ 
+-#define ARM64_NCAPS				23
++#define ARM64_NCAPS				24
+ 
+ #endif /* __ASM_CPUCAPS_H */
 diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 08cc88574659..5cdc139267b6 100644
+index 5cdc139267b6..2eca9e2368d9 100644
 --- a/arch/arm64/include/asm/sysreg.h
 +++ b/arch/arm64/include/asm/sysreg.h
-@@ -20,6 +20,7 @@
- #ifndef __ASM_SYSREG_H
- #define __ASM_SYSREG_H
+@@ -495,6 +495,7 @@
  
-+#include <asm/compiler.h>
- #include <linux/stringify.h>
+ /* id_aa64pfr0 */
+ #define ID_AA64PFR0_SVE_SHIFT		32
++#define ID_AA64PFR0_RAS_SHIFT		28
+ #define ID_AA64PFR0_GIC_SHIFT		24
+ #define ID_AA64PFR0_ASIMD_SHIFT		20
+ #define ID_AA64PFR0_FP_SHIFT		16
+@@ -504,6 +505,7 @@
+ #define ID_AA64PFR0_EL0_SHIFT		0
  
- /*
-@@ -398,25 +399,81 @@
+ #define ID_AA64PFR0_SVE			0x1
++#define ID_AA64PFR0_RAS_V1		0x1
+ #define ID_AA64PFR0_FP_NI		0xf
+ #define ID_AA64PFR0_FP_SUPPORTED	0x0
+ #define ID_AA64PFR0_ASIMD_NI		0xf
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 68a49f7fb75c..cfc7588a380c 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -146,6 +146,7 @@ static const struct arm64_ftr_bits ftr_id_aa64isar1[] = {
  
- /* Common SCTLR_ELx flags. */
- #define SCTLR_ELx_EE    (1 << 25)
-+#define SCTLR_ELx_WXN	(1 << 19)
- #define SCTLR_ELx_I	(1 << 12)
- #define SCTLR_ELx_SA	(1 << 3)
- #define SCTLR_ELx_C	(1 << 2)
- #define SCTLR_ELx_A	(1 << 1)
- #define SCTLR_ELx_M	1
+ static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_SVE_SHIFT, 4, 0),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_RAS_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_GIC_SHIFT, 4, 0),
+ 	S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_ASIMD_SHIFT, 4, ID_AA64PFR0_ASIMD_NI),
+ 	S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_FP_SHIFT, 4, ID_AA64PFR0_FP_NI),
+@@ -962,6 +963,18 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.enable = sve_kernel_enable,
+ 	},
+ #endif /* CONFIG_ARM64_SVE */
++#ifdef CONFIG_ARM64_RAS_EXTN
++	{
++		.desc = "RAS Extension Support",
++		.capability = ARM64_HAS_RAS_EXTN,
++		.def_scope = SCOPE_SYSTEM,
++		.matches = has_cpuid_feature,
++		.sys_reg = SYS_ID_AA64PFR0_EL1,
++		.sign = FTR_UNSIGNED,
++		.field_pos = ID_AA64PFR0_RAS_SHIFT,
++		.min_field_value = ID_AA64PFR0_RAS_V1,
++	},
++#endif /* CONFIG_ARM64_RAS_EXTN */
+ 	{},
+ };
  
-+#define SCTLR_ELx_FLAGS	(SCTLR_ELx_M | SCTLR_ELx_A | SCTLR_ELx_C | \
-+			 SCTLR_ELx_SA | SCTLR_ELx_I)
-+
-+/* SCTLR_EL2 specific flags. */
- #define SCTLR_EL2_RES1	((1 << 4)  | (1 << 5)  | (1 << 11) | (1 << 16) | \
- 			 (1 << 18) | (1 << 22) | (1 << 23) | (1 << 28) | \
- 			 (1 << 29))
-+#define SCTLR_EL2_RES0	((1 << 6)  | (1 << 7)  | (1 << 8)  | (1 << 9)  | \
-+			 (1 << 10) | (1 << 13) | (1 << 14) | (1 << 15) | \
-+			 (1 << 17) | (1 << 20) | (1 << 21) | (1 << 24) | \
-+			 (1 << 26) | (1 << 27) | (1 << 30) | (1 << 31))
-+
-+#ifdef CONFIG_CPU_BIG_ENDIAN
-+#define ENDIAN_SET_EL2		SCTLR_ELx_EE
-+#define ENDIAN_CLEAR_EL2	0
-+#else
-+#define ENDIAN_SET_EL2		0
-+#define ENDIAN_CLEAR_EL2	SCTLR_ELx_EE
-+#endif
-+
-+/* SCTLR_EL2 value used for the hyp-stub */
-+#define SCTLR_EL2_SET	(ENDIAN_SET_EL2   | SCTLR_EL2_RES1)
-+#define SCTLR_EL2_CLEAR	(SCTLR_ELx_M      | SCTLR_ELx_A    | SCTLR_ELx_C   | \
-+			 SCTLR_ELx_SA     | SCTLR_ELx_I    | SCTLR_ELx_WXN | \
-+			 ENDIAN_CLEAR_EL2 | SCTLR_EL2_RES0)
-+
-+/* Check all the bits are accounted for */
-+#define SCTLR_EL2_BUILD_BUG_ON_MISSING_BITS	BUILD_BUG_ON((SCTLR_EL2_SET ^ SCTLR_EL2_CLEAR) != ~0)
- 
--#define SCTLR_ELx_FLAGS	(SCTLR_ELx_M | SCTLR_ELx_A | SCTLR_ELx_C | \
--			 SCTLR_ELx_SA | SCTLR_ELx_I)
- 
- /* SCTLR_EL1 specific flags. */
- #define SCTLR_EL1_UCI		(1 << 26)
-+#define SCTLR_EL1_E0E		(1 << 24)
- #define SCTLR_EL1_SPAN		(1 << 23)
-+#define SCTLR_EL1_NTWE		(1 << 18)
-+#define SCTLR_EL1_NTWI		(1 << 16)
- #define SCTLR_EL1_UCT		(1 << 15)
-+#define SCTLR_EL1_DZE		(1 << 14)
-+#define SCTLR_EL1_UMA		(1 << 9)
- #define SCTLR_EL1_SED		(1 << 8)
-+#define SCTLR_EL1_ITD		(1 << 7)
- #define SCTLR_EL1_CP15BEN	(1 << 5)
-+#define SCTLR_EL1_SA0		(1 << 4)
-+
-+#define SCTLR_EL1_RES1	((1 << 11) | (1 << 20) | (1 << 22) | (1 << 28) | \
-+			 (1 << 29))
-+#define SCTLR_EL1_RES0  ((1 << 6)  | (1 << 10) | (1 << 13) | (1 << 17) | \
-+			 (1 << 21) | (1 << 27) | (1 << 30) | (1 << 31))
-+
-+#ifdef CONFIG_CPU_BIG_ENDIAN
-+#define ENDIAN_SET_EL1		(SCTLR_EL1_E0E | SCTLR_ELx_EE)
-+#define ENDIAN_CLEAR_EL1	0
-+#else
-+#define ENDIAN_SET_EL1		0
-+#define ENDIAN_CLEAR_EL1	(SCTLR_EL1_E0E | SCTLR_ELx_EE)
-+#endif
-+
-+#define SCTLR_EL1_SET	(SCTLR_ELx_M    | SCTLR_ELx_C    | SCTLR_ELx_SA   |\
-+			 SCTLR_EL1_SA0  | SCTLR_EL1_SED  | SCTLR_ELx_I    |\
-+			 SCTLR_EL1_DZE  | SCTLR_EL1_UCT  | SCTLR_EL1_NTWI |\
-+			 SCTLR_EL1_NTWE | SCTLR_EL1_SPAN | ENDIAN_SET_EL1 |\
-+			 SCTLR_EL1_UCI  | SCTLR_EL1_RES1)
-+#define SCTLR_EL1_CLEAR	(SCTLR_ELx_A   | SCTLR_EL1_CP15BEN | SCTLR_EL1_ITD    |\
-+			 SCTLR_EL1_UMA | SCTLR_ELx_WXN     | ENDIAN_CLEAR_EL1 |\
-+			 SCTLR_EL1_RES0)
-+
-+/* Check all the bits are accounted for */
-+#define SCTLR_EL1_BUILD_BUG_ON_MISSING_BITS	BUILD_BUG_ON((SCTLR_EL1_SET ^ SCTLR_EL1_CLEAR) != ~0)
- 
- /* id_aa64isar0 */
- #define ID_AA64ISAR0_DP_SHIFT		44
-@@ -582,6 +639,7 @@
- 
- #else
- 
-+#include <linux/build_bug.h>
- #include <linux/types.h>
- 
- asm(
-@@ -638,6 +696,9 @@ static inline void config_sctlr_el1(u32 clear, u32 set)
- {
- 	u32 val;
- 
-+	SCTLR_EL2_BUILD_BUG_ON_MISSING_BITS;
-+	SCTLR_EL1_BUILD_BUG_ON_MISSING_BITS;
-+
- 	val = read_sysreg(sctlr_el1);
- 	val &= ~clear;
- 	val |= set;
-diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
-index 67e86a0f57ac..e35c9b14521d 100644
---- a/arch/arm64/kernel/head.S
-+++ b/arch/arm64/kernel/head.S
-@@ -388,17 +388,13 @@ ENTRY(el2_setup)
- 	mrs	x0, CurrentEL
- 	cmp	x0, #CurrentEL_EL2
- 	b.eq	1f
--	mrs	x0, sctlr_el1
--CPU_BE(	orr	x0, x0, #(3 << 24)	)	// Set the EE and E0E bits for EL1
--CPU_LE(	bic	x0, x0, #(3 << 24)	)	// Clear the EE and E0E bits for EL1
-+	mov_q	x0, (SCTLR_EL1_RES1 | ENDIAN_SET_EL1)
- 	msr	sctlr_el1, x0
- 	mov	w0, #BOOT_CPU_MODE_EL1		// This cpu booted in EL1
- 	isb
- 	ret
- 
--1:	mrs	x0, sctlr_el2
--CPU_BE(	orr	x0, x0, #(1 << 25)	)	// Set the EE bit for EL2
--CPU_LE(	bic	x0, x0, #(1 << 25)	)	// Clear the EE bit for EL2
-+1:	mov_q	x0, (SCTLR_EL2_RES1 | ENDIAN_SET_EL2)
- 	msr	sctlr_el2, x0
- 
- #ifdef CONFIG_ARM64_VHE
-@@ -514,10 +510,7 @@ install_el2_stub:
- 	 * requires no configuration, and all non-hyp-specific EL2 setup
- 	 * will be done via the _EL1 system register aliases in __cpu_setup.
- 	 */
--	/* sctlr_el1 */
--	mov	x0, #0x0800			// Set/clear RES{1,0} bits
--CPU_BE(	movk	x0, #0x33d0, lsl #16	)	// Set EE and E0E on BE systems
--CPU_LE(	movk	x0, #0x30d0, lsl #16	)	// Clear EE and E0E on LE systems
-+	mov_q	x0, (SCTLR_EL1_RES1 | ENDIAN_SET_EL1)
- 	msr	sctlr_el1, x0
- 
- 	/* Coprocessor traps. */
-diff --git a/arch/arm64/mm/proc.S b/arch/arm64/mm/proc.S
-index 95233dfc4c39..b94886aa8587 100644
---- a/arch/arm64/mm/proc.S
-+++ b/arch/arm64/mm/proc.S
-@@ -214,11 +214,7 @@ ENTRY(__cpu_setup)
- 	/*
- 	 * Prepare SCTLR
- 	 */
--	adr	x5, crval
--	ldp	w5, w6, [x5]
--	mrs	x0, sctlr_el1
--	bic	x0, x0, x5			// clear bits
--	orr	x0, x0, x6			// set bits
-+	mov_q	x0, SCTLR_EL1_SET
- 	/*
- 	 * Set/prepare TCR and TTBR. We use 512GB (39-bit) address range for
- 	 * both user and kernel.
-@@ -249,21 +245,3 @@ ENTRY(__cpu_setup)
- 	msr	tcr_el1, x10
- 	ret					// return to head.S
- ENDPROC(__cpu_setup)
--
--	/*
--	 * We set the desired value explicitly, including those of the
--	 * reserved bits. The values of bits EE & E0E were set early in
--	 * el2_setup, which are left untouched below.
--	 *
--	 *                 n n            T
--	 *       U E      WT T UD     US IHBS
--	 *       CE0      XWHW CZ     ME TEEA S
--	 * .... .IEE .... NEAI TE.I ..AD DEN0 ACAM
--	 * 0011 0... 1101 ..0. ..0. 10.. .0.. .... < hardware reserved
--	 * .... .1.. .... 01.1 11.1 ..01 0.01 1101 < software settings
--	 */
--	.type	crval, #object
--crval:
--	.word	0xfcffffff			// clear
--	.word	0x34d5d91d			// set
--	.popsection
 -- 
 2.15.0
