@@ -1,60 +1,48 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH 0/2] KVM: arm/arm64: Fix two problems with the arch timer
- introduced in v4.15-rc1
-Date: Fri, 15 Dec 2017 15:16:54 +0100
-Message-ID: <20171215141656.25815-1-christoffer.dall@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EBF3649D54
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Dec 2017 09:13:33 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UrGLUPV8P9Dv for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Dec 2017 09:13:33 -0500 (EST)
-Received: from mail-wm0-f65.google.com (mail-wm0-f65.google.com [74.125.82.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 137C949D36
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Dec 2017 09:13:33 -0500 (EST)
-Received: by mail-wm0-f65.google.com with SMTP id r78so17835787wme.5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Dec 2017 06:17:10 -0800 (PST)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Subject: [PATCH 2/2] KVM: arm/arm64: Fix timer enable flow
+Date: Fri, 15 Dec 2017 15:16:56 +0100
+Message-ID: <20171215141656.25815-3-christoffer.dall@linaro.org>
+References: <20171215141656.25815-1-christoffer.dall@linaro.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20171215141656.25815-1-christoffer.dall@linaro.org>
+Sender: kvm-owner@vger.kernel.org
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Jia He <hejianet@gmail.com>, kvm@vger.kernel.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Jia He <hejianet@gmail.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The first patch solves the problem with the spurious IRQ (which is not a
-problem at all and just an artifact of what Jia is writing about), and
-it solves the issue of accidentally overwriting the in-memory copy of
-the guest state with a disabled timer, leaving the VCPU in the weeds.
+When enabling the timer on the first run, we fail to ever restore the
+state and mark it as loaded.  That means, that in the initial entry to
+the VCPU ioctl, unless we exit to userspace for some reason such as a
+pending signal, if the guest programs a timer and blocks, we will wait
+forever, because we never read back the hardware state (the loaded flag
+is not set), and so we think the timer is disabled, and we never
+schedule a background soft timer.
 
-The second patch addresses addresses an issue identified when booting
-with kvmtool  The reason why we didn't see it with QEMU is that QEMU is
-so happy to signal its threads in the initial setup phase, that it hides
-the bug.
+The end result?  The VCPU blocks forever, and the only solution is to
+kill the thread.
 
-Jia, I'd appreciate your tested-by after having applied both patches on
-your platform.
+Fixes: 4a2c4da1250d ("arm/arm64: KVM: Load the timer state when enabling the timer")
+Reported-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+---
+ virt/kvm/arm/arch_timer.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-Thanks,
--Christoffer
-
-Christoffer Dall (2):
-  KVM: arm/arm64: Properly handle arch-timer IRQs after
-    vtimer_save_state
-  KVM: arm/arm64: Fix timer enable flow
-
- virt/kvm/arm/arch_timer.c | 27 ++++++++++++++++-----------
- 1 file changed, 16 insertions(+), 11 deletions(-)
-
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index 14c018f990a7..cc29a8148328 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -846,10 +846,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+ no_vgic:
+ 	preempt_disable();
+ 	timer->enabled = 1;
+-	if (!irqchip_in_kernel(vcpu->kvm))
+-		kvm_timer_vcpu_load_user(vcpu);
+-	else
+-		kvm_timer_vcpu_load_vgic(vcpu);
++	kvm_timer_vcpu_load(vcpu);
+ 	preempt_enable();
+ 
+ 	return 0;
 -- 
 2.14.2
