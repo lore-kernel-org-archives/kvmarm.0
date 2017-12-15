@@ -1,24 +1,26 @@
-From: James Morse <james.morse@arm.com>
-Subject: [PATCH v5 13/13] KVM: arm64: Emulate RAS error registers and set
- HCR_EL2's TERR & TEA
-Date: Fri, 15 Dec 2017 15:51:01 +0000
-Message-ID: <20171215155101.23505-14-james.morse@arm.com>
+From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Subject: Re: [PATCH v5 01/13] arm64: cpufeature: __this_cpu_has_cap()
+ shouldn't stop early
+Date: Fri, 15 Dec 2017 16:24:13 +0000
+Message-ID: <5bd2a296-d46b-5d84-191b-5dc2390f1eb9@arm.com>
 References: <20171215155101.23505-1-james.morse@arm.com>
+ <20171215155101.23505-2-james.morse@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EB63249DA7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Dec 2017 10:50:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 57F7340D25
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Dec 2017 11:20:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JeQibVM4y8I1 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Dec 2017 10:50:24 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E061949DAE
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Dec 2017 10:50:23 -0500 (EST)
-In-Reply-To: <20171215155101.23505-1-james.morse@arm.com>
+ with ESMTP id jBKSp9b7n+E1 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Dec 2017 11:20:40 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2CE4B40795
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Dec 2017 11:20:40 -0500 (EST)
+In-Reply-To: <20171215155101.23505-2-james.morse@arm.com>
+Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,106 +30,47 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org
+To: James Morse <james.morse@arm.com>, linux-arm-kernel@lists.infradead.org
 Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Dongjiu Geng <gengdongjiu@huawei.com>
+On 15/12/17 15:50, James Morse wrote:
+> this_cpu_has_cap() tests caps->desc not caps->matches, so it stops
+> walking the list when it finds a 'silent' feature, instead of
+> walking to the end of the list.
+> 
+> Prior to v4.6's 644c2ae198412 ("arm64: cpufeature: Test 'matches' pointer
+> to find the end of the list") we always tested desc to find the end of
+> a capability list. This was changed for dubious things like PAN_NOT_UAO.
+> v4.7's e3661b128e53e ("arm64: Allow a capability to be checked on
+> single CPU") added this_cpu_has_cap() using the old desc style test.
+> 
+> CC: Suzuki K Poulose <suzuki.poulose@arm.com>
+> CC: Marc Zyngier <marc.zyngier@arm.com>
+> Signed-off-by: James Morse <james.morse@arm.com>
+> ---
+> So far only ARM64_HAS_SYSREG_GIC_CPUIF and errata use this_cpu_has_cap(),
+> all the errata have descriptions, and the GIC_CPUIF feature is first in
+> the list, so its not possible to hit this with mainline. I don't think
+> this should go to stable - this is not intended as a fix.
+> 
+>   arch/arm64/kernel/cpufeature.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index c5ba0097887f..68a49f7fb75c 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -1236,8 +1236,8 @@ static bool __this_cpu_has_cap(const struct arm64_cpu_capabilities *cap_array,
+>   	if (WARN_ON(preemptible()))
+>   		return false;
+>   
+> -	for (caps = cap_array; caps->desc; caps++)
+> -		if (caps->capability == cap && caps->matches)
+> +	for (caps = cap_array; caps->matches; caps++)
+> +		if (caps->capability == cap)
+>   			return caps->matches(caps, SCOPE_LOCAL_CPU);
 
-ARMv8.2 adds a new bit HCR_EL2.TEA which routes synchronous external
-aborts to EL2, and adds a trap control bit HCR_EL2.TERR which traps
-all Non-secure EL1&0 error record accesses to EL2.
+Thanks for catching this !
 
-This patch enables the two bits for the guest OS, guaranteeing that
-KVM takes external aborts and traps attempts to access the physical
-error registers.
-
-ERRIDR_EL1 advertises the number of error records, we return
-zero meaning we can treat all the other registers as RAZ/WI too.
-
-Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-[removed specific emulation, use trap_raz_wi() directly for everything,
- rephrased parts of the commit message]
-Signed-off-by: James Morse <james.morse@arm.com>
----
- arch/arm64/include/asm/kvm_arm.h     |  2 ++
- arch/arm64/include/asm/kvm_emulate.h |  7 +++++++
- arch/arm64/include/asm/sysreg.h      | 10 ++++++++++
- arch/arm64/kvm/sys_regs.c            | 10 ++++++++++
- 4 files changed, 29 insertions(+)
-
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 715d395ef45b..b0c84171e6a3 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -23,6 +23,8 @@
- #include <asm/types.h>
- 
- /* Hyp Configuration Register (HCR) bits */
-+#define HCR_TEA		(UL(1) << 37)
-+#define HCR_TERR	(UL(1) << 36)
- #define HCR_E2H		(UL(1) << 34)
- #define HCR_ID		(UL(1) << 33)
- #define HCR_CD		(UL(1) << 32)
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index e002ab7f919a..413dc82b1e89 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -50,6 +50,13 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
- 	vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS;
- 	if (is_kernel_in_hyp_mode())
- 		vcpu->arch.hcr_el2 |= HCR_E2H;
-+	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN)) {
-+		/* route synchronous external abort exceptions to EL2 */
-+		vcpu->arch.hcr_el2 |= HCR_TEA;
-+		/* trap error record accesses */
-+		vcpu->arch.hcr_el2 |= HCR_TERR;
-+	}
-+
- 	if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features))
- 		vcpu->arch.hcr_el2 &= ~HCR_RW;
- }
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 1e5228024c7b..bf9a6f15b605 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -176,6 +176,16 @@
- #define SYS_AFSR0_EL1			sys_reg(3, 0, 5, 1, 0)
- #define SYS_AFSR1_EL1			sys_reg(3, 0, 5, 1, 1)
- #define SYS_ESR_EL1			sys_reg(3, 0, 5, 2, 0)
-+
-+#define SYS_ERRIDR_EL1			sys_reg(3, 0, 5, 3, 0)
-+#define SYS_ERRSELR_EL1			sys_reg(3, 0, 5, 3, 1)
-+#define SYS_ERXFR_EL1			sys_reg(3, 0, 5, 4, 0)
-+#define SYS_ERXCTLR_EL1			sys_reg(3, 0, 5, 4, 1)
-+#define SYS_ERXSTATUS_EL1		sys_reg(3, 0, 5, 4, 2)
-+#define SYS_ERXADDR_EL1			sys_reg(3, 0, 5, 4, 3)
-+#define SYS_ERXMISC0_EL1		sys_reg(3, 0, 5, 5, 0)
-+#define SYS_ERXMISC1_EL1		sys_reg(3, 0, 5, 5, 1)
-+
- #define SYS_FAR_EL1			sys_reg(3, 0, 6, 0, 0)
- #define SYS_PAR_EL1			sys_reg(3, 0, 7, 4, 0)
- 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 9edf4ac8a320..50a43c7b97ca 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1159,6 +1159,16 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_AFSR0_EL1), access_vm_reg, reset_unknown, AFSR0_EL1 },
- 	{ SYS_DESC(SYS_AFSR1_EL1), access_vm_reg, reset_unknown, AFSR1_EL1 },
- 	{ SYS_DESC(SYS_ESR_EL1), access_vm_reg, reset_unknown, ESR_EL1 },
-+
-+	{ SYS_DESC(SYS_ERRIDR_EL1), trap_raz_wi },
-+	{ SYS_DESC(SYS_ERRSELR_EL1), trap_raz_wi },
-+	{ SYS_DESC(SYS_ERXFR_EL1), trap_raz_wi },
-+	{ SYS_DESC(SYS_ERXCTLR_EL1), trap_raz_wi },
-+	{ SYS_DESC(SYS_ERXSTATUS_EL1), trap_raz_wi },
-+	{ SYS_DESC(SYS_ERXADDR_EL1), trap_raz_wi },
-+	{ SYS_DESC(SYS_ERXMISC0_EL1), trap_raz_wi },
-+	{ SYS_DESC(SYS_ERXMISC1_EL1), trap_raz_wi },
-+
- 	{ SYS_DESC(SYS_FAR_EL1), access_vm_reg, reset_unknown, FAR_EL1 },
- 	{ SYS_DESC(SYS_PAR_EL1), NULL, reset_unknown, PAR_EL1 },
- 
--- 
-2.15.0
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
