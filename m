@@ -1,139 +1,494 @@
-From: Steve Capper <steve.capper@arm.com>
-Subject: [PATCH V2 7/7] arm64: mm: Add 48/52-bit kernel VA support
-Date: Mon, 18 Dec 2017 21:47:36 +0000
-Message-ID: <20171218214736.13761-8-steve.capper@arm.com>
-References: <20171218214736.13761-1-steve.capper@arm.com>
+From: Shih-Wei Li <shihwei@cs.columbia.edu>
+Subject: Re: [kvm-unit-tests PATCH] arm64: add micro test
+Date: Mon, 18 Dec 2017 16:58:53 -0500
+Message-ID: <CAO+sbHGs9P76NLgzp_t5CbxtHMcsfDkV6xEKUOj08_0U8eNebg@mail.gmail.com>
+References: <1513372539-10180-1-git-send-email-shihwei@cs.columbia.edu>
+ <1513372539-10180-2-git-send-email-shihwei@cs.columbia.edu> <20171218191037.wjocr7jbf5ua2duj@hawk.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 521D249DB8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Dec 2017 16:44:18 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nOKvBe1l7T7l for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Dec 2017 16:44:17 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D68B949DB7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Dec 2017 16:44:16 -0500 (EST)
-In-Reply-To: <20171218214736.13761-1-steve.capper@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc: catalin.marinas@arm.com, ard.biesheuvel@linaro.org
+Content-Type: text/plain; charset="UTF-8"
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20171218191037.wjocr7jbf5ua2duj@hawk.localdomain>
+Sender: kvm-owner@vger.kernel.org
+To: Andrew Jones <drjones@redhat.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add the option to use 52-bit VA support upon availability at boot. We
-use the same KASAN_SHADOW_OFFSET for both 48 and 52 bit VA spaces as in
-both cases the start and end of the KASAN shadow region are PGD aligned.
+On Mon, Dec 18, 2017 at 2:10 PM, Andrew Jones <drjones@redhat.com> wrote:
+> On Fri, Dec 15, 2017 at 04:15:39PM -0500, Shih-Wei Li wrote:
+>> Here we provide the support for measuring various micro level
+>> operations on arm64. We iterate each of the tests for millions of
+>> times and output their average, minimum and maximum cost in timer
+>> counts. Instruction barriers are used before and after taking
+>> timestamps to avoid out-of-order execution or pipelining from
+>> skewing our measurements.
+>>
+>> The tests we currently support and measure are mostly
+>> straightforward by the function names and the respective comments.
+>> For IPI test, we measure the cost of sending IPI from a source
+>> VCPU to a target VCPU, until the target VCPU receives the IPI.
+>>
+>> Signed-off-by: Shih-Wei Li <shihwei@cs.columbia.edu>
+>> ---
+>>  arm/Makefile.common |   1 +
+>>  arm/micro-test.c    | 289 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  arm/unittests.cfg   |   6 ++
+>>  3 files changed, 296 insertions(+)
+>>  create mode 100644 arm/micro-test.c
+>>
+>> diff --git a/arm/Makefile.common b/arm/Makefile.common
+>> index 0a039cf..c7d5c27 100644
+>> --- a/arm/Makefile.common
+>> +++ b/arm/Makefile.common
+>> @@ -16,6 +16,7 @@ tests-common += $(TEST_DIR)/pmu.flat
+>>  tests-common += $(TEST_DIR)/gic.flat
+>>  tests-common += $(TEST_DIR)/psci.flat
+>>  tests-common += $(TEST_DIR)/sieve.flat
+>> +tests-common += $(TEST_DIR)/micro-test.flat
+>>
+>>  tests-all = $(tests-common) $(tests)
+>>  all: directories $(tests-all)
+>> diff --git a/arm/micro-test.c b/arm/micro-test.c
+>> new file mode 100644
+>> index 0000000..7df2272
+>> --- /dev/null
+>> +++ b/arm/micro-test.c
+>> @@ -0,0 +1,289 @@
+>
+> Please add the copyright and license header like we have in other files.
+>
+>> +#include <util.h>
+>> +#include <asm/gic.h>
+>> +
+>> +static volatile bool second_cpu_up;
+>> +static volatile bool first_cpu_ack;
+>> +static volatile bool ipi_acked;
+>> +static volatile bool ipi_received;
+>> +static volatile bool ipi_ready;
+>> +#define IPI_IRQ              1
+>> +
+>> +#define TIMEOUT (1U << 28)
+>> +
+>> +#define ARR_SIZE(_x) ((int)(sizeof(_x) / sizeof(_x[0])))
+>
+> We have this in libcflat already, ARRAY_SIZE()
+>
+>> +#define for_each_test(_iter, _tests, _tmp) \
+>> +     for (_tmp = 0, _iter = _tests; \
+>> +                     _tmp < ARR_SIZE(_tests); \
+>> +                     _tmp++, _iter++)
+>
+> One time used macro is probably not necessary and the tmp
+> var wouldn't be necessary if you make the last entry of
+> available_tests a null entry.
 
->From ID_AA64MMFR2, we check the LVA field on very early boot and set the
-VA size, PGDIR_SHIFT and TCR.T[01]SZ values which then influence how the
-rest of the memory system behaves.
+You're right. I'll look into this.
 
-Note that userspace addresses will still be capped out at 48-bit. More
-patches are needed to deal with scenarios where the user provides
-MMAP_FIXED hint and a high address to mmap.
+>
+>> +
+>> +#define CYCLE_COUNT(c1, c2) \
+>> +     (((c1) > (c2) || ((c1) == (c2))) ? 0 : (c2) - (c1))
+>> +
+>> +#define IPI_DEBUG 0
+>> +
+>> +#if IPI_DEBUG == 1
+>> +#define debug(fmt, ...) \
+>> +     printf("[cpu %d]: " fmt, smp_processor_id(),  ## __VA_ARGS__)
+>> +#else
+>> +#define debug(fmt, ...) {}
+>> +#endif
+>
+> We don't generally turn off print statements in kvm-unit-tests.
+> If the statement is really a temporary debug statement, then
+> maybe just remove it before posting the patch. If it's even just a
+> little helpful, then just leave it in and always print it. To promote
+> messages to a higher level of importance than printf use report_*
+> functions.
+>
 
-Signed-off-by: Steve Capper <steve.capper@arm.com>
----
- arch/arm64/Kconfig              |  8 ++++++++
- arch/arm64/include/asm/memory.h |  4 ++++
- arch/arm64/mm/proc.S            | 13 +++++++++++++
- 3 files changed, 25 insertions(+)
+Thanks. I'll look at it.
 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 5a42edc18718..3fa5342849dc 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -262,6 +262,7 @@ config PGTABLE_LEVELS
- 	default 2 if ARM64_16K_PAGES && ARM64_VA_BITS_36
- 	default 2 if ARM64_64K_PAGES && ARM64_VA_BITS_42
- 	default 3 if ARM64_64K_PAGES && ARM64_VA_BITS_48
-+	default 3 if ARM64_64K_PAGES && ARM64_VA_BITS_48_52
- 	default 3 if ARM64_4K_PAGES && ARM64_VA_BITS_39
- 	default 3 if ARM64_16K_PAGES && ARM64_VA_BITS_47
- 	default 4 if !ARM64_64K_PAGES && ARM64_VA_BITS_48
-@@ -275,6 +276,7 @@ config ARCH_PROC_KCORE_TEXT
- config KASAN_SHADOW_OFFSET
- 	hex
- 	depends on KASAN
-+	default 0xdfffa00000000000 if ARM64_VA_BITS_48_52
- 	default 0xdfffa00000000000 if ARM64_VA_BITS_48
- 	default 0xdfffd00000000000 if ARM64_VA_BITS_47
- 	default 0xdffffe8000000000 if ARM64_VA_BITS_42
-@@ -656,6 +658,10 @@ config ARM64_VA_BITS_47
- config ARM64_VA_BITS_48
- 	bool "48-bit"
- 
-+config ARM64_VA_BITS_48_52
-+	bool "48 or 52-bit (decided at boot time)"
-+	depends on ARM64_64K_PAGES
-+
- endchoice
- 
- config ARM64_VA_BITS
-@@ -665,9 +671,11 @@ config ARM64_VA_BITS
- 	default 42 if ARM64_VA_BITS_42
- 	default 47 if ARM64_VA_BITS_47
- 	default 48 if ARM64_VA_BITS_48
-+	default 48 if ARM64_VA_BITS_48_52
- 
- config ARM64_VA_BITS_ALT
- 	bool
-+	default y if ARM64_VA_BITS_48_52
- 	default n
- 
- config CPU_BIG_ENDIAN
-diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
-index 2c11df336109..417b70bb50be 100644
---- a/arch/arm64/include/asm/memory.h
-+++ b/arch/arm64/include/asm/memory.h
-@@ -75,6 +75,10 @@
- #define _VA_START(va)		(UL(0xffffffffffffffff) - \
- 				(UL(1) << ((va) - 1)) + 1)
- 
-+#ifdef CONFIG_ARM64_VA_BITS_48_52
-+#define VA_BITS_ALT		(52)
-+#endif
-+
- #define KERNEL_START      _text
- #define KERNEL_END        _end
- 
-diff --git a/arch/arm64/mm/proc.S b/arch/arm64/mm/proc.S
-index 16564324c957..42a91a4a1126 100644
---- a/arch/arm64/mm/proc.S
-+++ b/arch/arm64/mm/proc.S
-@@ -259,9 +259,22 @@ ENTRY(__cpu_setup)
- ENDPROC(__cpu_setup)
- 
- ENTRY(__setup_va_constants)
-+#ifdef CONFIG_ARM64_VA_BITS_48_52
-+	mrs_s	x5, SYS_ID_AA64MMFR2_EL1
-+	and	x5, x5, #0xf << ID_AA64MMFR2_LVA_SHIFT
-+	cmp	x5, #1 << ID_AA64MMFR2_LVA_SHIFT
-+	b.ne	1f
-+	mov	x0, #VA_BITS_ALT
-+	mov	x1, TCR_T0SZ(VA_BITS_ALT)
-+	mov	x2, #1 << (VA_BITS_ALT - PGDIR_SHIFT)
-+	b	2f
-+#endif
-+
-+1:
- 	mov	x0, #VA_BITS_MIN
- 	mov	x1, TCR_T0SZ(VA_BITS_MIN)
- 	mov	x2, #1 << (VA_BITS_MIN - PGDIR_SHIFT)
-+2:
- 	str_l	x0, vabits_actual, x5
- 	str_l	x1, idmap_t0sz, x5
- 	str_l	x2, ptrs_per_pgd, x5
--- 
-2.11.0
+>> +
+>> +static uint64_t read_cc(void)
+>> +{
+>> +     uint64_t cc;
+>> +     asm volatile(
+>> +             "isb\n"
+>> +             "mrs %0, CNTPCT_EL0\n"
+>> +             "isb\n"
+>> +             : [reg] "=r" (cc)
+>> +             ::
+>> +     );
+>> +     return cc;
+>> +}
+>> +
+>> +static void ipi_irq_handler(struct pt_regs *regs __unused)
+>> +{
+>> +     u32 ack;
+>> +     ipi_ready = false;
+>> +     ipi_received = true;
+>> +     ack = gic_read_iar();
+>> +     ipi_acked = true;
+>> +     gic_write_eoir(ack);
+>> +     ipi_ready = true;
+>> +}
+>> +
+>> +static void ipi_test_secondary_entry(void)
+>> +{
+>> +     unsigned int timeout = TIMEOUT;
+>> +
+>> +     debug("secondary core up\n");
+>> +
+>> +     enum vector v = EL1H_IRQ;
+>> +     install_irq_handler(v, ipi_irq_handler);
+>> +
+>> +     gic_enable_defaults();
+>> +
+>> +     second_cpu_up = true;
+>> +
+>> +     debug("secondary initialized vgic\n");
+>> +
+>> +     while (!first_cpu_ack && timeout--);
+>
+> cpu_relax() here will help get that first-cpu ack on TCG faster. That
+> said, this test doesn't make sense on TCG anyway, other than debugging
+> it. So you could just add 'accel = kvm' to it's unittests.cfg parameter
+> list.
+
+ok, thanks.
+
+>
+> I just tried on TCG now. It doesn't run. It gets
+>
+> Timer Frequency 62500000 Hz (Output in timer count)
+> Unhandled exception ec=0 (UNKNOWN)
+> Vector: 4 (el1h_sync)
+> ESR_EL1:         02000000, ec=0 (UNKNOWN)
+> FAR_EL1: 0000000000000000 (not valid)
+> Exception frame registers:
+> pc : [<0000000040080088>] lr : [<00000000400803e8>] pstate: 800003c5
+> sp : 00000000400aff90
+> x29: 0000000000000000 x28: 0000000000000000
+> x27: 0000000040090000 x26: 0000000040090c60
+> x25: 0000000040090000 x24: 000000001fffffff
+> x23: 0000000000000000 x22: 0000000000000000
+> x21: 0000000000000040 x20: 0000000000000000
+> x19: 0000000000000000 x18: 00000000400b0000
+> x17: 0000000000000000 x16: 0000000000000000
+> x15: 00000000400afe8c x14: 00000000400b0000
+> x13: 00000000400afecc x12: 0000000000001680
+> x11: 0000000000000000 x10: 6666666666666667
+> x9 : 0000000000000030 x8 : 0000000000000030
+> x7 : 00000000400af670 x6 : 00000000400af673
+> x5 : 00000000400af678 x4 : 00000000000007b7
+> x3 : 00000000400af6ec x2 : 0000000040090000
+> x1 : 000000000015909e x0 : 000000004b000000
+>
+> You don't need to get it to work on TCG if you add the 'accel = kvm'
+> parameter, but it's sometimes indicative of a bug in the unit test
+> when it doesn't run, so you might want to take a look.
+>
+> Also need to do s/timeout/tries/ or something, as it's not time related.
+>
+>> +     if (!first_cpu_ack) {
+>> +             debug("ipi_test: First CPU did not ack wake-up\n");
+>
+> I think you should drop the debug() macro completely, but in here
+> it should certainly be changed. Erroring out shouldn't be silent,
+> as it would be when out debug turned on.
+>
+>> +             exit(1);
+>> +     }
+>> +
+>> +     debug("detected first cpu ack\n");
+>> +
+>> +     local_irq_enable(); /* Enter small wait-loop */
+>> +     ipi_ready = true;
+>> +     while (true);
+>> +}
+>> +
+>> +static int test_init(void)
+>> +{
+>> +     int ret;
+>> +     unsigned int timeout = TIMEOUT;
+>> +
+>> +     ret = gic_init();
+>> +     if (!ret) {
+>> +             debug("No supported gic present, skipping tests...\n");
+>> +             goto out;
+>> +     }
+>> +
+>> +     ipi_ready = false;
+>> +
+>> +     gic_enable_defaults();
+>> +
+>> +     debug("starting second CPU\n");
+>> +     smp_boot_secondary(1, ipi_test_secondary_entry);
+>> +
+>> +     while (!second_cpu_up && timeout--); /* Wait for second CPU! */
+>> +
+>> +     if (!second_cpu_up) {
+>> +             debug("ipi_test: timeout waiting for secondary CPU\n");
+>> +             ret = 0;
+>> +             goto out;
+>> +     }
+>> +
+>> +     debug("detected secondary core up\n");
+>> +
+>> +     first_cpu_ack = true;
+>
+> I think you should be able to avoid most of this manual cpu
+> synchronization by using the on_cpu() call, which is the
+> recommended way to start secondaries anyway.
+
+I'll take a look.
+
+>
+>> +
+>> +     printf("Timer Frequency %d Hz (Output in timer count)\n", get_cntfrq());
+>> +
+>> +out:
+>> +     return ret;
+>> +}
+>> +
+>> +static unsigned long ipi_test(void)
+>> +{
+>> +     unsigned int timeout = TIMEOUT;
+>> +     unsigned long c1, c2;
+>> +
+>> +     while (!ipi_ready && timeout--);
+>> +     if (!ipi_ready) {
+>> +             debug("ipi_test: second core not ready for IPIs\n");
+>> +             exit(1);
+>> +     }
+>> +
+>> +     ipi_received = false;
+>> +
+>> +     c1 = read_cc();
+>> +
+>> +     gic_ipi_send_single(IPI_IRQ, 1);
+>> +
+>> +     timeout = TIMEOUT;
+>> +     while (!ipi_received && timeout--);
+>> +     if (!ipi_received) {
+>> +             debug("ipi_test: secondary core never received ipi\n");
+>> +             exit(1);
+>> +     }
+>> +
+>> +     c2 = read_cc();
+>> +     return CYCLE_COUNT(c1, c2);
+>> +}
+>> +
+>> +
+>> +static unsigned long hvc_test(void)
+>> +{
+>> +     unsigned long c1, c2;
+>> +
+>> +     c1 = read_cc();
+>> +     asm volatile("mov w0, #0x4b000000; hvc #0");
+>> +     c2 = read_cc();
+>> +     return CYCLE_COUNT(c1, c2);
+>> +}
+>> +
+>> +static void __noop(void)
+>> +{
+>> +}
+>> +
+>> +static unsigned long noop_guest(void)
+>> +{
+>> +     unsigned long c1, c2;
+>> +
+>> +     c1 = read_cc();
+>> +     __noop();
+>> +     c2 = read_cc();
+>> +     return CYCLE_COUNT(c1, c2);
+>> +}
+>> +
+>> +static unsigned long mmio_read_user(void)
+>> +{
+>> +     unsigned long c1, c2;
+>> +     void *mmio_read_user_addr = (void*) 0x0a000008;
+>
+> This is a virtio-mmio transport device-id address. It's harmless to
+> read it, as long as we don't change it. I've had plans to provide
+> mmio addresses with different read, write permissions and sizes through
+> extending a test-dev for quite a while. I should do that. For this patch
+> I guess this is fine, but please comment it with a big FIXME or TODO to
+> make sure we change it when we can someday.
+
+Thanks for pointing out. I'll take a look.
+
+>
+>> +
+>> +     /* Measure MMIO exit to QEMU in userspace */
+>> +     c1 = read_cc();
+>> +     readl(mmio_read_user_addr);
+>> +     c2 = read_cc();
+>> +     return CYCLE_COUNT(c1, c2);
+>> +}
+>> +
+>> +static unsigned long mmio_read_vgic(void)
+>> +{
+>> +     unsigned long c1, c2;
+>> +     int v = gic_version();
+>> +     void *vgic_dist_addr = NULL;
+>> +
+>> +     if (v == 2)
+>> +             vgic_dist_addr = gicv2_dist_base();
+>> +     else if (v == 3)
+>> +             vgic_dist_addr = gicv3_dist_base();
+>> +
+>> +     /* Measure MMIO exit to host kernel */
+>> +     c1 = read_cc();
+>> +     readl(vgic_dist_addr + 0x8); /* Read GICD_IIDR */
+>
+> You can add GICD_IIDR to lib/arm/asm/gic.h
+>
+>> +     c2 = read_cc();
+>> +     return CYCLE_COUNT(c1, c2);
+>> +}
+>> +
+>> +static unsigned long eoi_test(void)
+>> +{
+>> +     unsigned long c1, c2;
+>> +     int v = gic_version();
+>> +     void (*write_eoir)(u32 irqstat) = NULL;
+>> +
+>> +     u32 val = 1023; /* spurious IDs, writes to EOI are ignored */
+>> +
+>> +     if (v == 2)
+>> +             write_eoir = gicv2_write_eoir;
+>> +     else if (v == 3)
+>> +             write_eoir = gicv3_write_eoir;
+>
+> You don't need this, we have gic_write_eoir(), which you used above.
+
+Yes. I was thinking of calling EOI function directly to avoid the assert.
+
+>
+>> +
+>> +     c1 = read_cc();
+>> +     write_eoir(val);
+>> +     c2 = read_cc();
+>> +
+>> +     return CYCLE_COUNT(c1, c2);
+>> +}
+>> +
+>> +struct exit_test {
+>> +     const char *name;
+>> +     unsigned long (*test_fn)(void);
+>> +     bool run;
+>> +};
+>> +
+>> +static struct exit_test available_tests[] = {
+>> +     {"hvc",                hvc_test,           true},
+>> +     {"noop_guest",         noop_guest,         true},
+>> +     {"mmio_read_user",     mmio_read_user,     true},
+>> +     {"mmio_read_vgic",     mmio_read_vgic,     true},
+>> +     {"eoi",                eoi_test,           true},
+>> +     {"ipi",                ipi_test,           true},
+>> +};
+>> +
+>> +static void loop_test(struct exit_test *test)
+>> +{
+>> +     unsigned long i, iterations = 32;
+>> +     unsigned long sample, cycles;
+>> +     unsigned long long min = 0, max = 0;
+>> +     const unsigned long long goal = (1ULL << 29);
+>> +
+>> +     do {
+>> +             iterations *= 2;
+>> +             cycles = 0;
+>> +             for (i = 0; i < iterations; i++) {
+>> +                     sample = test->test_fn();
+>> +                     if (sample == 0) {
+>> +                             /*
+>> +                              * If something went wrong or we had an
+>> +                              * overflow, don't count that sample.
+>> +                              */
+>> +                             iterations--;
+>> +                             i--;
+>
+> I'd prefer incrementing a different counter after the sample==0 test /
+> continue, than to decrement both i and iterations.
+
+I'm not sure about the comment above. Could you please substantiate
+how a new counter should work here?
+
+>
+>> +                             debug("cycle count overflow: %lu\n", sample);
+>> +                             continue;
+>> +                     }
+>> +                     cycles += sample;
+>> +                     if (min == 0 || min > sample)
+>> +                             min = sample;
+>> +                     if (max < sample)
+>> +                             max = sample;
+>> +             }
+>> +     } while (cycles < goal);
+>> +     printf("%s:\t avg %lu\t min %llu\t max %llu\n",
+>> +             test->name, cycles / (iterations), min, max);
+>
+> No need for () around iterations.
+>
+>> +}
+>> +
+>> +void kvm_unit_test(void)
+>> +{
+>> +     int i=0;
+>> +     struct exit_test *test;
+>> +     for_each_test(test, available_tests, i) {
+>> +             if (!test->run)
+>> +                     continue;
+>> +             loop_test(test);
+>> +     }
+>> +
+>> +     return;
+>
+> pointless return
+>
+>> +}
+>
+> nit: no need for the above function, just inline it in main().
+
+Yes.
+
+>
+>> +
+>> +int main(int argc, char **argv)
+>> +{
+>> +     if (!test_init())
+>> +             exit(1);
+>
+> I think this and all exit(1)'s in this unit test could/should be
+> replaced with asserts.
+>
+>> +     kvm_unit_test();
+>> +     return 0;
+>> +}
+>> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+>> index 44b98cf..1d0c4ca 100644
+>> --- a/arm/unittests.cfg
+>> +++ b/arm/unittests.cfg
+>> @@ -116,3 +116,9 @@ file = timer.flat
+>>  groups = timer
+>>  timeout = 2s
+>>  arch = arm64
+>> +
+>> +# Exit tests
+>> +[micro-test]
+>> +file = micro-test.flat
+>> +smp = 2
+>> +groups = micro-test
+>> --
+>> 1.9.1
+>>
+>>
+>
+> Thanks again for contributing to kvm-unit-tests. I look forward to v2.
+
+Sure. Thank you for the feedback as well! I'll send out the patch asap.
+
+Shih-Wei
+
+>
+> drew
