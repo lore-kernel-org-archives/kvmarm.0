@@ -1,62 +1,53 @@
-From: Admin <anjukamra@iari.res.in>
-Subject: Read your 17 pending mesages
-Date: Sat, 16 Dec 2017 17:27:52 +0530 (IST)
-Message-ID: <1662352281.6092.1513425472222.JavaMail.zimbra@iari.res.in>
-Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============0060240524491951961=="
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4007A49D4F
- for <kvmarm@lists.cs.columbia.edu>; Sat, 16 Dec 2017 06:54:26 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RRFVIYPEYWWv for <kvmarm@lists.cs.columbia.edu>;
- Sat, 16 Dec 2017 06:54:22 -0500 (EST)
-Received: from mail.iari.res.in (mail.iari.res.in [14.139.224.93])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BD6149D4C
- for <kvmarm@lists.cs.columbia.edu>; Sat, 16 Dec 2017 06:54:22 -0500 (EST)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: [PULL 0/5] KVM/ARM Fixes for v4.15 - Round 2
+Date: Mon, 18 Dec 2017 11:00:52 +0100
+Message-ID: <20171218100057.7839-1-christoffer.dall@linaro.org>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
---===============0060240524491951961==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_6091_1377238121.1513425472219"
+Hi Paolo and Radim,
 
-------=_Part_6091_1377238121.1513425472219
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Here's another handful of fixes for KVM/ARM for v4.15.  They fix:
+ - A bug in our handling of SPE state for non-vhe systems
+ - A bug that causes hyp unmapping to go off limits and crash the system on
+   shutdown
+ - Three timer fixes that were introduced as part of the timer optimizations
+   for v4.15
 
 
+The following changes since commit 50c4c4e268a2d7a3e58ebb698ac74da0de40ae36:
+
+  Linux 4.15-rc3 (2017-12-10 17:56:26 -0800)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git kvm-arm-fixes-for-v4.15-2
+
+for you to fetch changes up to 0eb7c33cadf6b2f1a94e58ded8b0eb89b4eba382:
+
+  KVM: arm/arm64: Fix timer enable flow (2017-12-18 10:53:24 +0100)
 
 
-Hello,we want to inform you that due to our bad mail server withing the past few months, we have about 17 messages of yours that is still pending, for this reason we are providing you with our new alternative mail client to give you access to read this messages.Read Messages: HERE Thanks
-------=_Part_6091_1377238121.1513425472219
-Content-Type: text/html; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Thanks,
+-Christoffer
 
-<div></div>
-<div></div>
-<div></div>
-<div>Hello,<br /><br />we want to inform you that due to our bad mail server withing the past few months, we have about 17 messages of yours that is still pending, for this reason we are providing you with our new alternative mail client to give you access to read this messages.<br /><b><br /><a href="http://pensiunea-andutu.ro/rtzimb88990/">Read Messages: HERE </a></b><br /><br />Thanks</div>
-------=_Part_6091_1377238121.1513425472219--
+Christoffer Dall (2):
+      KVM: arm/arm64: Properly handle arch-timer IRQs after vtimer_save_state
+      KVM: arm/arm64: Fix timer enable flow
 
---===============0060240524491951961==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Julien Thierry (1):
+      arm64: kvm: Prevent restoring stale PMSCR_EL1 for vcpu
 
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+Marc Zyngier (2):
+      KVM: arm/arm64: Fix HYP unmapping going off limits
+      KVM: arm/arm64: timer: Don't set irq as forwarded if no usable GIC
 
---===============0060240524491951961==--
+ arch/arm64/kvm/hyp/debug-sr.c |  3 +++
+ include/kvm/arm_arch_timer.h  |  2 +-
+ virt/kvm/arm/arch_timer.c     | 40 ++++++++++++++++++++++++----------------
+ virt/kvm/arm/arm.c            |  2 +-
+ virt/kvm/arm/mmu.c            | 10 ++++------
+ 5 files changed, 33 insertions(+), 24 deletions(-)
