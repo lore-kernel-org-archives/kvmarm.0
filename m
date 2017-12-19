@@ -1,157 +1,112 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH] Support micro operation measurement on
- arm64
-Date: Tue, 19 Dec 2017 13:11:09 +0100
-Message-ID: <20171219121109.hxqbqjkdgt7k5jo6@hawk.localdomain>
-References: <1513372539-10180-1-git-send-email-shihwei@cs.columbia.edu>
- <20171218181440.yggldvw6lry6wsza@hawk.localdomain>
- <CAO+sbHGU6EUUHQynAaA33T-ThUwA=5f9yq_Uq2mLtXRcHN02Ew@mail.gmail.com>
- <20171219090620.GA31048@cbox>
+From: Steve Capper <steve.capper@arm.com>
+Subject: Re: [PATCH v3 05/19] arm64: alternatives: Add dynamic patching
+ feature
+Date: Tue, 19 Dec 2017 13:04:37 +0000
+Message-ID: <20171219130437.nna4hwxhbbnawbq2@capper-debian.cambridge.arm.com>
+References: <20171218173926.16911-1-marc.zyngier@arm.com>
+ <20171218173926.16911-6-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20171219090620.GA31048@cbox>
+In-Reply-To: <20171218173926.16911-6-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>, Peter Maydell <peter.maydell@linaro.org>nd@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Dec 19, 2017 at 10:06:20AM +0100, Christoffer Dall wrote:
-> On Mon, Dec 18, 2017 at 03:58:49PM -0500, Shih-Wei Li wrote:
-> > On Mon, Dec 18, 2017 at 1:14 PM, Andrew Jones <drjones@redhat.com> wrote:
-> > > Hi Shih-Wei,
-> > >
-> > > Thanks for doing this! Porting Christoffer's selftests to kvm-unit-tests
-> > > has been on the kvm-unit-tests' TODO list since it was first introduced.
-> > >
-> > > On Fri, Dec 15, 2017 at 04:15:38PM -0500, Shih-Wei Li wrote:
-> > >> The patch provides support for quantifying the cost of micro level
-> > >> operations on arm64 hardware. The supported operations include hypercall,
-> > >> mmio accesses, EOI virtual interrupt, and IPI send. Measurements are
-> > >> currently obtained using timer counters. Further modifications in KVM
-> > >> will be required to support timestamping using cycle counters, as KVM
-> > >> now disables accesses to the PMU counters from the VM.
-> > >
-> > > KVM only disables access when userspace tells it to, which it doesn't
-> > > do by default. Is there something else missing keeping the PMU counters
-> > > from being used?
-> > 
-> > Thanks for the feedback! What I meant by PMU counters here was for
-> > "CPU cycle counter" specifically. I'm not aware of a way to enable the
-> > PMU cycle counter from QEMU, did I miss something here?
-> > 
-> 
-> We always set MDSCR_EL2.TPM, meaning that you cannot reliably read a
-> cycle counter in the guest.
-> 
-> If userspace tells KVM to emulate a PMU, you will get an emulated result
-> when reading the cycle counter from a guest, instead of an undefined
-> exception, but you will never access the cycle counter directly.
+Hi Marc,
 
-Ah, of course. Real vs. emulated access makes a big difference here.
+On Mon, Dec 18, 2017 at 05:39:12PM +0000, Marc Zyngier wrote:
+> We've so far relied on a patching infrastructure that only gave us
+> a single alternative, without any way to finely control what gets
+> patched. For a single feature, this is an all or nothing thing.
+> 
+> It would be interesting to have a more fine grained way of patching
+> the kernel though, where we could dynamically tune the code that gets
+> injected.
+> 
+> In order to achive this, let's introduce a new form of alternative
+> that is associated with a callback. This callback gets the instruction
+> sequence number and the old instruction as a parameter, and returns
+> the new instruction. This callback is always called, as the patching
+> decision is now done at runtime (not patching is equivalent to returning
+> the same instruction).
+> 
+> Patching with a callback is declared with the new ALTERNATIVE_CB
+> and alternative_cb directives:
+> 
+> 	asm volatile(ALTERNATIVE_CB("mov %0, #0\n", callback)
+> 		     : "r" (v));
+> or
+> 	alternative_cb callback
+> 		mov	x0, #0
+> 	alternative_cb_end
+> 
+> where callback is the C function computing the alternative.
+> 
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm64/include/asm/alternative.h       | 36 ++++++++++++++++++++++++++----
+>  arch/arm64/include/asm/alternative_types.h |  3 +++
+>  arch/arm64/kernel/alternative.c            | 21 +++++++++++++----
+>  3 files changed, 52 insertions(+), 8 deletions(-)
+> 
 
-> 
-> Here we want to measure round-trip time from the VM through the
-> hypervisor, and we don't currently count cycles in EL2 with the PMU
-> emulation, and even if we did, we'd be counting additional round-trip
-> times, so if the goal is to get more precision than the arch counters,
-> this won't help you.
-> 
-> What we did for the papers was to hack KVM to not set the TPM bit and
-> jut read the cycle counter directly, but this isn't safe, as the guest
-> then gets full access to the PMU and can mess with the host.
-> 
-> If it's crucial to measure individual operations on a cycle-accurate
-> level, then our options are pretty much to either patch KVM when doing
-> so, or introduce a scary command line parameter, but I'm not thrilled
-> by the idea.
-> 
-> > >
-> > >>
-> > >> We iterate each of the tests for millions of times and output their
-> > >> average, minimum and maximum cost in timer counts. Instruction barriers
-> > >
-> > > Can we reduce the number of iterations and still get valid results? The
-> > > test takes so long that of all the platforms I tested it on timed out
-> > > before it completed, except seattle. The default timeout for kvm-unit-
-> > > tests is 90 seconds. I'd rather a unit test execute in much shorter time
-> > > than that too, in order to keep people encouraged to run them frequently.
-> > > If these tests must run a long time, then I think we should add them to
-> > > the nodefault group.
-> > 
-> > I think it's possible to reduce the timeout without losing accuracy. I
-> > can look into this further.
-> > 
-> 
-> I think just running them for 100,000 or maximum 1,000,000 times should
-> be sufficient.  Alternatively an option to run it for a long time could
-> be provided?
+[...]
 
-Providing a number of iterations option or something, that has a
-reasonable default, sounds good to me.
+> diff --git a/arch/arm64/kernel/alternative.c b/arch/arm64/kernel/alternative.c
+> index 6dd0a3a3e5c9..cd299af96c95 100644
+> --- a/arch/arm64/kernel/alternative.c
+> +++ b/arch/arm64/kernel/alternative.c
+> @@ -110,25 +110,38 @@ static void __apply_alternatives(void *alt_region, bool use_linear_alias)
+>  	struct alt_instr *alt;
+>  	struct alt_region *region = alt_region;
+>  	__le32 *origptr, *replptr, *updptr;
+> +	alternative_cb_t alt_cb;
+>  
+>  	for (alt = region->begin; alt < region->end; alt++) {
+>  		u32 insn;
+>  		int i, nr_inst;
+>  
+> -		if (!cpus_have_cap(alt->cpufeature))
+> +		/* Use ARM64_NCAPS as an unconditional patch */
+> +		if (alt->cpufeature < ARM64_NCAPS &&
+> +		    !cpus_have_cap(alt->cpufeature))
+>  			continue;
+>  
+> -		BUG_ON(alt->alt_len != alt->orig_len);
+> +		if (alt->cpufeature == ARM64_NCAPS)
+> +			BUG_ON(alt->alt_len != 0);
+> +		else
+> +			BUG_ON(alt->alt_len != alt->orig_len);
+>  
+>  		pr_info_once("patching kernel code\n");
+>  
+>  		origptr = ALT_ORIG_PTR(alt);
+>  		replptr = ALT_REPL_PTR(alt);
+> +		alt_cb  = ALT_REPL_PTR(alt);
+>  		updptr = use_linear_alias ? lm_alias(origptr) : origptr;
+> -		nr_inst = alt->alt_len / sizeof(insn);
+> +		nr_inst = alt->orig_len / sizeof(insn);
+>  
+>  		for (i = 0; i < nr_inst; i++) {
+> -			insn = get_alt_insn(alt, origptr + i, replptr + i);
+> +			if (alt->cpufeature == ARM64_NCAPS) {
+> +				insn = le32_to_cpu(updptr[i]);
+> +				insn = alt_cb(alt, i, insn);
+> +			} else {
+> +				insn = get_alt_insn(alt, origptr + i,
+> +						    replptr + i);
+> +			}
+>  			updptr[i] = cpu_to_le32(insn);
+>  		}
 
-> 
-> > >
-> > >> were used before and after taking timestamps to avoid out-of-order
-> > >> execution or pipelining from skewing our measurements.
-> > >>
-> > >> To improve precision in the measurements, one should consider pinning
-> > >> each VCPU to a specific physical CPU (PCPU) and ensure no other task
-> > >> could run on that PCPU to skew the results. This can be achieved by
-> > >> enabling QMP server in the QEMU command in unittest.cfg for micro test,
-> > >> allowing a client program to get the thread_id for each VCPU thread
-> > >> from the QMP server. Based on the information, the client program can
-> > >> then pin the corresponding VCPUs to dedicated PCPUs and isolate
-> > >> interrupts and tasks from those PCPUs.
-> > >
-> > > To isolate the CPUs one would need to boot the host with the isolcpus
-> > > kernel command line option. Pinning the VCPUs is pretty easy though,
-> > > so we could provide a script that does that in kvm-unit-tests and then
-> > > always use it for this test. The script could also warn if we're
-> > > pinning to CPUs that haven't been isolated.
-> > >
-> > 
-> > My intention was to support VCPU pinning as an optional feature,
-> > so the users that care about extra precision can add qmp option in
-> > QEMU config and run the script to pin VCPUs. Otherwise, the test can
-> > be conducted in a fashion similar to what's done in vmexit on x86.
-> > 
-> 
-> If we can script VCPU pinning, I think that's preferred.  In our
-> experiments we never actually saw measurable differences between
-> isolcpus and simple vcpu pinning when using a high enough number of
-> iterations, except when looking at things like jitter, which we don't do
-> for these tests.
-> 
-> That notwithstanding, I think it's an optional feature that can be added
-> later.
+Is it possible to call the callback only once per entry (rather than
+once per instruction)? That would allow one to retain some more
+execution state in the callback, which may be handy if things get more
+elaborate.
 
-Yeah, let's do it later, but I think doing it makes enough sense that
-it's worth writing more bash.
-
-> 
-> > >>
-> > >> The patch has been tested on arm64 hardware including AMD Seattle and
-> > >> ThunderX2, which has GICv2 and GICv3 respectively.
-> > >
-> > > I tried thunderx2, amberwing, mustang, and seattle. Only seattle
-> > > completed, the rest timed out.
-> > 
-> > I have only tested the code by invoking test directly using make
-> > standalone like the following. I did notice that it took ~90 seconds
-> > to finish the test itself.
-> > ./"tests/micro-cost"
-
-standalone still uses timeout with 90 seconds. So your hardware was just
-faster than mine, I guess :-)
-
-> > 
-> 
-> Let's try to bring this down for the next iteration.
-> 
-> Thanks,
-> -Christoffer
-
-Thanks,
-drew
+Cheers,
+-- 
+Steve
