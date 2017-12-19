@@ -1,30 +1,28 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [kvm-unit-tests PATCH] Support micro operation measurement on
- arm64
-Date: Tue, 19 Dec 2017 10:06:20 +0100
-Message-ID: <20171219090620.GA31048@cbox>
+Subject: Re: [kvm-unit-tests PATCH] arm64: add micro test
+Date: Tue, 19 Dec 2017 10:12:00 +0100
+Message-ID: <20171219091200.GB31048@cbox>
 References: <1513372539-10180-1-git-send-email-shihwei@cs.columbia.edu>
- <20171218181440.yggldvw6lry6wsza@hawk.localdomain>
- <CAO+sbHGU6EUUHQynAaA33T-ThUwA=5f9yq_Uq2mLtXRcHN02Ew@mail.gmail.com>
+ <1513372539-10180-2-git-send-email-shihwei@cs.columbia.edu>
+ <20171218173121.kmef47u2q7qa4eqb@yury-thinkpad>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BDD1D49DAC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Dec 2017 04:02:48 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 574DA49DAC
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Dec 2017 04:08:25 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EPnO-1Kue33L for <kvmarm@lists.cs.columbia.edu>;
- Tue, 19 Dec 2017 04:02:45 -0500 (EST)
-Received: from mail-wr0-f171.google.com (mail-wr0-f171.google.com
- [209.85.128.171])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 69B3349D40
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Dec 2017 04:02:45 -0500 (EST)
-Received: by mail-wr0-f171.google.com with SMTP id a41so18062861wra.6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Dec 2017 01:06:32 -0800 (PST)
+ with ESMTP id URnTneH4p8FQ for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 19 Dec 2017 04:08:24 -0500 (EST)
+Received: from mail-wm0-f67.google.com (mail-wm0-f67.google.com [74.125.82.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 49DB049D40
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Dec 2017 04:08:24 -0500 (EST)
+Received: by mail-wm0-f67.google.com with SMTP id f140so2102615wmd.2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Dec 2017 01:12:11 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <CAO+sbHGU6EUUHQynAaA33T-ThUwA=5f9yq_Uq2mLtXRcHN02Ew@mail.gmail.com>
+In-Reply-To: <20171218173121.kmef47u2q7qa4eqb@yury-thinkpad>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,126 +32,86 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Shih-Wei Li <shihwei@cs.columbia.edu>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Yury Norov <ynorov@caviumnetworks.com>
+Cc: "Goutham, Sunil" <Sunil.Goutham@cavium.com>, kvm@vger.kernel.org, marc.zyngier@arm.com, "Cherian, Linu" <Linu.Cherian@cavium.com>, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Dec 18, 2017 at 03:58:49PM -0500, Shih-Wei Li wrote:
-> On Mon, Dec 18, 2017 at 1:14 PM, Andrew Jones <drjones@redhat.com> wrote:
-> > Hi Shih-Wei,
-> >
-> > Thanks for doing this! Porting Christoffer's selftests to kvm-unit-tests
-> > has been on the kvm-unit-tests' TODO list since it was first introduced.
-> >
-> > On Fri, Dec 15, 2017 at 04:15:38PM -0500, Shih-Wei Li wrote:
-> >> The patch provides support for quantifying the cost of micro level
-> >> operations on arm64 hardware. The supported operations include hypercall,
-> >> mmio accesses, EOI virtual interrupt, and IPI send. Measurements are
-> >> currently obtained using timer counters. Further modifications in KVM
-> >> will be required to support timestamping using cycle counters, as KVM
-> >> now disables accesses to the PMU counters from the VM.
-> >
-> > KVM only disables access when userspace tells it to, which it doesn't
-> > do by default. Is there something else missing keeping the PMU counters
-> > from being used?
+On Mon, Dec 18, 2017 at 08:31:21PM +0300, Yury Norov wrote:
+> On Fri, Dec 15, 2017 at 04:15:39PM -0500, Shih-Wei Li wrote:
+> > Here we provide the support for measuring various micro level
+> > operations on arm64. We iterate each of the tests for millions of
+> > times and output their average, minimum and maximum cost in timer
+> > counts. Instruction barriers are used before and after taking
+> > timestamps to avoid out-of-order execution or pipelining from
+> > skewing our measurements.
+> > 
+> > The tests we currently support and measure are mostly
+> > straightforward by the function names and the respective comments.
+> > For IPI test, we measure the cost of sending IPI from a source
+> > VCPU to a target VCPU, until the target VCPU receives the IPI.
+> > 
+> > Signed-off-by: Shih-Wei Li <shihwei@cs.columbia.edu>
+> > ---
+> >  arm/Makefile.common |   1 +
+> >  arm/micro-test.c    | 289 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  arm/unittests.cfg   |   6 ++
+> >  3 files changed, 296 insertions(+)
+> >  create mode 100644 arm/micro-test.c
+> > 
+> > diff --git a/arm/Makefile.common b/arm/Makefile.common
+> > index 0a039cf..c7d5c27 100644
+> > --- a/arm/Makefile.common
+> > +++ b/arm/Makefile.common
+> > @@ -16,6 +16,7 @@ tests-common += $(TEST_DIR)/pmu.flat
+> >  tests-common += $(TEST_DIR)/gic.flat
+> >  tests-common += $(TEST_DIR)/psci.flat
+> >  tests-common += $(TEST_DIR)/sieve.flat
+> > +tests-common += $(TEST_DIR)/micro-test.flat
+> >  
+> >  tests-all = $(tests-common) $(tests)
+> >  all: directories $(tests-all)
+> > diff --git a/arm/micro-test.c b/arm/micro-test.c
+> > new file mode 100644
+> > index 0000000..7df2272
+> > --- /dev/null
+> > +++ b/arm/micro-test.c
+> > @@ -0,0 +1,289 @@
+> > +#include <util.h>
+> > +#include <asm/gic.h>
+> > +
+> > +static volatile bool second_cpu_up;
+> > +static volatile bool first_cpu_ack;
+> > +static volatile bool ipi_acked;
+> > +static volatile bool ipi_received;
+> > +static volatile bool ipi_ready;
+> > +#define IPI_IRQ		1
+> > +
+> > +#define TIMEOUT (1U << 28)
+> > +
+> > +#define ARR_SIZE(_x) ((int)(sizeof(_x) / sizeof(_x[0])))
+> > +#define for_each_test(_iter, _tests, _tmp) \
+> > +	for (_tmp = 0, _iter = _tests; \
+> > +			_tmp < ARR_SIZE(_tests); \
+> > +			_tmp++, _iter++)
+> > +
+> > +#define CYCLE_COUNT(c1, c2) \
+> > +	(((c1) > (c2) || ((c1) == (c2))) ? 0 : (c2) - (c1))
 > 
-> Thanks for the feedback! What I meant by PMU counters here was for
-> "CPU cycle counter" specifically. I'm not aware of a way to enable the
-> PMU cycle counter from QEMU, did I miss something here?
-> 
-
-We always set MDSCR_EL2.TPM, meaning that you cannot reliably read a
-cycle counter in the guest.
-
-If userspace tells KVM to emulate a PMU, you will get an emulated result
-when reading the cycle counter from a guest, instead of an undefined
-exception, but you will never access the cycle counter directly.
-
-Here we want to measure round-trip time from the VM through the
-hypervisor, and we don't currently count cycles in EL2 with the PMU
-emulation, and even if we did, we'd be counting additional round-trip
-times, so if the goal is to get more precision than the arch counters,
-this won't help you.
-
-What we did for the papers was to hack KVM to not set the TPM bit and
-jut read the cycle counter directly, but this isn't safe, as the guest
-then gets full access to the PMU and can mess with the host.
-
-If it's crucial to measure individual operations on a cycle-accurate
-level, then our options are pretty much to either patch KVM when doing
-so, or introduce a scary command line parameter, but I'm not thrilled
-by the idea.
-
-> >
-> >>
-> >> We iterate each of the tests for millions of times and output their
-> >> average, minimum and maximum cost in timer counts. Instruction barriers
-> >
-> > Can we reduce the number of iterations and still get valid results? The
-> > test takes so long that of all the platforms I tested it on timed out
-> > before it completed, except seattle. The default timeout for kvm-unit-
-> > tests is 90 seconds. I'd rather a unit test execute in much shorter time
-> > than that too, in order to keep people encouraged to run them frequently.
-> > If these tests must run a long time, then I think we should add them to
-> > the nodefault group.
-> 
-> I think it's possible to reduce the timeout without losing accuracy. I
-> can look into this further.
-> 
-
-I think just running them for 100,000 or maximum 1,000,000 times should
-be sufficient.  Alternatively an option to run it for a long time could
-be provided?
-
-> >
-> >> were used before and after taking timestamps to avoid out-of-order
-> >> execution or pipelining from skewing our measurements.
-> >>
-> >> To improve precision in the measurements, one should consider pinning
-> >> each VCPU to a specific physical CPU (PCPU) and ensure no other task
-> >> could run on that PCPU to skew the results. This can be achieved by
-> >> enabling QMP server in the QEMU command in unittest.cfg for micro test,
-> >> allowing a client program to get the thread_id for each VCPU thread
-> >> from the QMP server. Based on the information, the client program can
-> >> then pin the corresponding VCPUs to dedicated PCPUs and isolate
-> >> interrupts and tasks from those PCPUs.
-> >
-> > To isolate the CPUs one would need to boot the host with the isolcpus
-> > kernel command line option. Pinning the VCPUs is pretty easy though,
-> > so we could provide a script that does that in kvm-unit-tests and then
-> > always use it for this test. The script could also warn if we're
-> > pinning to CPUs that haven't been isolated.
-> >
-> 
-> My intention was to support VCPU pinning as an optional feature,
-> so the users that care about extra precision can add qmp option in
-> QEMU config and run the script to pin VCPUs. Otherwise, the test can
-> be conducted in a fashion similar to what's done in vmexit on x86.
+> Is my understanding correct that this is overflow protection?
+> c1 and c2 are 64-bit values. To overflow them you need 58 years
+> at 1G CPU freq.
 > 
 
-If we can script VCPU pinning, I think that's preferred.  In our
-experiments we never actually saw measurable differences between
-isolcpus and simple vcpu pinning when using a high enough number of
-iterations, except when looking at things like jitter, which we don't do
-for these tests.
+That's assuming your cycle counter starts at 0, and that nobody
+programmed it near the overflow value to get an overflow interrupt.
 
-That notwithstanding, I think it's an optional feature that can be added
-later.
+So if you get rid of this, you have to make sure the host never plays
+with the cycle counter behind your back, and that you've initialized it
+to zero.
 
-> >>
-> >> The patch has been tested on arm64 hardware including AMD Seattle and
-> >> ThunderX2, which has GICv2 and GICv3 respectively.
-> >
-> > I tried thunderx2, amberwing, mustang, and seattle. Only seattle
-> > completed, the rest timed out.
-> 
-> I have only tested the code by invoking test directly using make
-> standalone like the following. I did notice that it took ~90 seconds
-> to finish the test itself.
-> ./"tests/micro-cost"
-> 
-
-Let's try to bring this down for the next iteration.
+FWIW, when we first wrote some version of this code 5+ years ago in a
+different world, we actually saw overflow as a result of the way we ran
+this code.  That may have changed, but it's not as clear cut.
 
 Thanks,
 -Christoffer
