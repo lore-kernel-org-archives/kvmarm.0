@@ -1,144 +1,137 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 05/19] arm64: alternatives: Add dynamic patching feature
-Date: Tue, 19 Dec 2017 13:32:40 +0000
-Message-ID: <a5911baa-9b7f-a04b-7819-536dfade6da9@arm.com>
-References: <20171218173926.16911-1-marc.zyngier@arm.com>
- <20171218173926.16911-6-marc.zyngier@arm.com>
- <20171219130437.nna4hwxhbbnawbq2@capper-debian.cambridge.arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v8 8/9] KVM: arm/arm64: Avoid work when userspace iqchips
+ are not used
+Date: Tue, 19 Dec 2017 14:34:52 +0100
+Message-ID: <20171219133452.GA5380@cbox>
+References: <20171213104602.16383-1-christoffer.dall@linaro.org>
+ <20171213104602.16383-9-christoffer.dall@linaro.org>
+ <86fu8ewfzm.wl-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CDCB049D8A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Dec 2017 08:28:58 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fgkTYJUxierh for <kvmarm@lists.cs.columbia.edu>;
- Tue, 19 Dec 2017 08:28:57 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BA8549D36
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Dec 2017 08:28:57 -0500 (EST)
-In-Reply-To: <20171219130437.nna4hwxhbbnawbq2@capper-debian.cambridge.arm.com>
-Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Steve Capper <steve.capper@arm.com>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, nd@arm.com, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <86fu8ewfzm.wl-marc.zyngier@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, Eric Auger <eric.auger@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Steve,
+On Wed, Dec 13, 2017 at 08:05:33PM +0000, Marc Zyngier wrote:
+> On Wed, 13 Dec 2017 10:46:01 +0000,
+> Christoffer Dall wrote:
+> > 
+> > We currently check if the VM has a userspace irqchip on every exit from
+> > the VCPU, and if so, we do some work to ensure correct timer behavior.
+> > This is unfortunate, as we could avoid doing any work entirely, if we
+> > didn't have to support irqchip in userspace.
+> > 
+> > Realizing the userspace irqchip on ARM is mostly a developer or hobby
+> > feature, and is unlikely to be used in servers or other scenarios where
+> > performance is a priority, we can use a refcounted static key to only
+> > check the irqchip configuration when we have at least one VM that uses
+> > an irqchip in userspace.
+> > 
+> > Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> 
+> On its own, this doesn't seem to be that useful. As far as I can see,
+> it saves us a load from the kvm structure before giving up.
 
-On 19/12/17 13:04, Steve Capper wrote:
-> Hi Marc,
-> 
-> On Mon, Dec 18, 2017 at 05:39:12PM +0000, Marc Zyngier wrote:
->> We've so far relied on a patching infrastructure that only gave us
->> a single alternative, without any way to finely control what gets
->> patched. For a single feature, this is an all or nothing thing.
->>
->> It would be interesting to have a more fine grained way of patching
->> the kernel though, where we could dynamically tune the code that gets
->> injected.
->>
->> In order to achive this, let's introduce a new form of alternative
->> that is associated with a callback. This callback gets the instruction
->> sequence number and the old instruction as a parameter, and returns
->> the new instruction. This callback is always called, as the patching
->> decision is now done at runtime (not patching is equivalent to returning
->> the same instruction).
->>
->> Patching with a callback is declared with the new ALTERNATIVE_CB
->> and alternative_cb directives:
->>
->> 	asm volatile(ALTERNATIVE_CB("mov %0, #0\n", callback)
->> 		     : "r" (v));
->> or
->> 	alternative_cb callback
->> 		mov	x0, #0
->> 	alternative_cb_end
->>
->> where callback is the C function computing the alternative.
->>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  arch/arm64/include/asm/alternative.h       | 36 ++++++++++++++++++++++++++----
->>  arch/arm64/include/asm/alternative_types.h |  3 +++
->>  arch/arm64/kernel/alternative.c            | 21 +++++++++++++----
->>  3 files changed, 52 insertions(+), 8 deletions(-)
->>
-> 
-> [...]
-> 
->> diff --git a/arch/arm64/kernel/alternative.c b/arch/arm64/kernel/alternative.c
->> index 6dd0a3a3e5c9..cd299af96c95 100644
->> --- a/arch/arm64/kernel/alternative.c
->> +++ b/arch/arm64/kernel/alternative.c
->> @@ -110,25 +110,38 @@ static void __apply_alternatives(void *alt_region, bool use_linear_alias)
->>  	struct alt_instr *alt;
->>  	struct alt_region *region = alt_region;
->>  	__le32 *origptr, *replptr, *updptr;
->> +	alternative_cb_t alt_cb;
->>  
->>  	for (alt = region->begin; alt < region->end; alt++) {
->>  		u32 insn;
->>  		int i, nr_inst;
->>  
->> -		if (!cpus_have_cap(alt->cpufeature))
->> +		/* Use ARM64_NCAPS as an unconditional patch */
->> +		if (alt->cpufeature < ARM64_NCAPS &&
->> +		    !cpus_have_cap(alt->cpufeature))
->>  			continue;
->>  
->> -		BUG_ON(alt->alt_len != alt->orig_len);
->> +		if (alt->cpufeature == ARM64_NCAPS)
->> +			BUG_ON(alt->alt_len != 0);
->> +		else
->> +			BUG_ON(alt->alt_len != alt->orig_len);
->>  
->>  		pr_info_once("patching kernel code\n");
->>  
->>  		origptr = ALT_ORIG_PTR(alt);
->>  		replptr = ALT_REPL_PTR(alt);
->> +		alt_cb  = ALT_REPL_PTR(alt);
->>  		updptr = use_linear_alias ? lm_alias(origptr) : origptr;
->> -		nr_inst = alt->alt_len / sizeof(insn);
->> +		nr_inst = alt->orig_len / sizeof(insn);
->>  
->>  		for (i = 0; i < nr_inst; i++) {
->> -			insn = get_alt_insn(alt, origptr + i, replptr + i);
->> +			if (alt->cpufeature == ARM64_NCAPS) {
->> +				insn = le32_to_cpu(updptr[i]);
->> +				insn = alt_cb(alt, i, insn);
->> +			} else {
->> +				insn = get_alt_insn(alt, origptr + i,
->> +						    replptr + i);
->> +			}
->>  			updptr[i] = cpu_to_le32(insn);
->>  		}
-> 
-> Is it possible to call the callback only once per entry (rather than
-> once per instruction)? That would allow one to retain some more
-> execution state in the callback, which may be handy if things get more
-> elaborate.
-Yeah, it was something that Catalin suggested too. I guess the only
-thing that really annoys me about that is that we'd let the callback do
-the write to the kernel text, which I find a bit... meh.
+A load and a conditional.  But what I really wanted to also avoid was
+the function call from the main run loop, which I neglected as well.  I
+think I can achieve that with a static inline wrapper in the arch timer
+header file which first evaluates the static key and then calls into the
+arch timer code.
 
-But overall I agree that it would be more useful, and make the loop a
-bit less ugly.
 
-I'll work something out for the next round!
+> I think it
+> is more the cumulative effect of this load that could have an impact,
+> but you're only dealing with it at a single location.
+> 
+> How about making this a first class helper and redefine
+> irqchip_in_kernel as such:
+> 
+> static inline bool irqchip_in_kernel(struct kvm *kvm)
+> {
+> 	if (static_branch_unlikely(&userspace_irqchip_in_use) &&
+> 	    unlikely(!irqchip_in_kernel(kvm)))
+> 		return true;
+> 
+> 	return false;
+> }
+> 
+> and move that static key to a more central location?
+> 
+
+That's a neat idea.  The only problem is that creating a new VM would
+then flip the static key, and then we'd have to flip it back when a vgic
+is created on that VM, and I don't particularly like the idea of doing
+this too often.
+
+What I'd suggest then is to have two versions of the function:
+irqchip_in_kernel() which is what it is today, and then
+__irqchip_in_kernel() which can only be called from within the critical
+path of the run loop, so that we can increment the static key on
+kvm_vcpu_first_run_init() when we don't have a VGIC.
+
+How does that sound?
 
 Thanks,
+-Christoffer
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+
+> > ---
+> >  virt/kvm/arm/arch_timer.c | 11 +++++++++--
+> >  1 file changed, 9 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> > index f8d09665ddce..73d262c4712b 100644
+> > --- a/virt/kvm/arm/arch_timer.c
+> > +++ b/virt/kvm/arm/arch_timer.c
+> > @@ -51,6 +51,8 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+> >  				 struct arch_timer_context *timer_ctx);
+> >  static bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx);
+> >  
+> > +static DEFINE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+> > +
+> >  u64 kvm_phys_timer_read(void)
+> >  {
+> >  	return timecounter->cc->read(timecounter->cc);
+> > @@ -562,7 +564,8 @@ static void unmask_vtimer_irq_user(struct kvm_vcpu *vcpu)
+> >  
+> >  void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
+> >  {
+> > -	unmask_vtimer_irq_user(vcpu);
+> > +	if (static_branch_unlikely(&userspace_irqchip_in_use))
+> > +		unmask_vtimer_irq_user(vcpu);
+> >  }
+> >  
+> >  int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
+> > @@ -767,6 +770,8 @@ void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu)
+> >  	soft_timer_cancel(&timer->bg_timer, &timer->expired);
+> >  	soft_timer_cancel(&timer->phys_timer, NULL);
+> >  	kvm_vgic_unmap_phys_irq(vcpu, vtimer->irq.irq);
+> > +	if (timer->enabled && !irqchip_in_kernel(vcpu->kvm))
+> > +		static_branch_dec(&userspace_irqchip_in_use);
+> >  }
+> >  
+> >  static bool timer_irqs_are_valid(struct kvm_vcpu *vcpu)
+> > @@ -819,8 +824,10 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+> >  		return 0;
+> >  
+> >  	/* Without a VGIC we do not map virtual IRQs to physical IRQs */
+> > -	if (!irqchip_in_kernel(vcpu->kvm))
+> > +	if (!irqchip_in_kernel(vcpu->kvm)) {
+> > +		static_branch_inc(&userspace_irqchip_in_use);
+> >  		goto no_vgic;
+> > +	}
+> >  
+> >  	if (!vgic_initialized(vcpu->kvm))
+> >  		return -ENODEV;
+> > -- 
+> > 2.14.2
+> > 
+> 
+> Thanks,
+> 
+> 	M.
