@@ -1,128 +1,59 @@
-From: Steve Capper <steve.capper@arm.com>
-Subject: Re: [PATCH v3 14/19] KVM: arm/arm64: Move HYP IO VAs to the "idmap"
- range
-Date: Wed, 20 Dec 2017 13:16:24 +0000
-Message-ID: <20171220131624.xvewngmlrv5niwzb@capper-debian.cambridge.arm.com>
-References: <20171218173926.16911-1-marc.zyngier@arm.com>
- <20171218173926.16911-15-marc.zyngier@arm.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH] Support micro operation measurement on
+ arm64
+Date: Wed, 20 Dec 2017 17:22:54 +0100
+Message-ID: <20171220162254.dp5vok6lgbxyo5od@hawk.localdomain>
+References: <1513372539-10180-1-git-send-email-shihwei@cs.columbia.edu>
+ <20171218181440.yggldvw6lry6wsza@hawk.localdomain>
+ <CAO+sbHGU6EUUHQynAaA33T-ThUwA=5f9yq_Uq2mLtXRcHN02Ew@mail.gmail.com>
+ <20171219090620.GA31048@cbox>
+ <20171219121109.hxqbqjkdgt7k5jo6@hawk.localdomain>
+ <20171219130706.GD31048@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 08CF149D9C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Dec 2017 08:12:45 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 19tpl6KZA92I for <kvmarm@lists.cs.columbia.edu>;
- Wed, 20 Dec 2017 08:12:43 -0500 (EST)
-Received: from EUR01-HE1-obe.outbound.protection.outlook.com
- (mail-he1eur01on0066.outbound.protection.outlook.com [104.47.0.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 662DC49D40
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Dec 2017 08:12:43 -0500 (EST)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20171218173926.16911-15-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, nd@arm.com, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20171219130706.GD31048@cbox>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
-
-On Mon, Dec 18, 2017 at 05:39:21PM +0000, Marc Zyngier wrote:
-> We so far mapped our HYP IO (which is essencially the GICv2 control
-> registers) using the same method as for memory. It recently appeared
-> that is a bit unsafe:
+On Tue, Dec 19, 2017 at 02:07:06PM +0100, Christoffer Dall wrote:
+> On Tue, Dec 19, 2017 at 01:11:09PM +0100, Andrew Jones wrote:
+> > On Tue, Dec 19, 2017 at 10:06:20AM +0100, Christoffer Dall wrote:
+> > > On Mon, Dec 18, 2017 at 03:58:49PM -0500, Shih-Wei Li wrote:
+> > > > 
+> > > > I have only tested the code by invoking test directly using make
+> > > > standalone like the following. I did notice that it took ~90 seconds
+> > > > to finish the test itself.
+> > > > ./"tests/micro-cost"
+> > 
+> > standalone still uses timeout with 90 seconds. So your hardware was just
+> > faster than mine, I guess :-)
+> > 
 > 
-> we compute the HYP VA using the kern_hyp_va helper, but that helper
-> is only designed to deal with kernel VAs coming from the linear map,
-> and not from the vmalloc region... This could in turn cause some bad
-> aliasing between the two, amplified by the new VA randomisation.
+> [indentation confusion?]
+
+Actually I was just lazily replying to both you and Shih-Wei in the same
+mail.
+
 > 
-> A solution is to come up with our very own basic VA allocator for
-> MMIO. Since half of the HYP address space only contains a single
-> page (the idmap), we have plenty to borrow from. Let's use the idmap
-> as a base, and allocate downwards from it. GICv2 now lives on the
-> other side of the great VA barrier.
-> 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  virt/kvm/arm/mmu.c | 40 ++++++++++++++++++++++++++++------------
->  1 file changed, 28 insertions(+), 12 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 6192d45d1e1a..0597c9846f1a 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
+> You're responding to something Shih-Wei wrote here, but I didn't
+> understand Shih-Wei's answer, and I think he ran the work on Seattle, so
+> not sure what the difference was.
 
-[...]
+It turns out the problem was just the opposite of what I say above. My
+hardware must be faster. While testing v2 of the patch I still got
+timeouts, so I decided to actually try to figure out what's going on.
+The eoi_test() test is so fast that c1 always equals c2, so we always
+assume an overflow occurred and keep trying to get a better sample.
 
-> @@ -721,7 +728,8 @@ int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
->  			   void __iomem **kaddr,
->  			   void __iomem **haddr)
->  {
-> -	unsigned long start, end;
-> +	pgd_t *pgd = hyp_pgd;
-> +	unsigned long base;
->  	int ret;
->  
->  	*kaddr = ioremap(phys_addr, size);
-> @@ -733,19 +741,26 @@ int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
->  		return 0;
->  	}
->  
-> +	mutex_lock(&io_map_lock);
-> +
-> +	base = io_map_base - size;
-> +	base &= ~(size - 1);
-> +
+I guess we need two changes to the patch. We need to handle c1 == c2
+differently, probably just assume the measurement is smaller than the
+timer frequency and report 1 tick instead of zero. We should also
+have a way out of loop_test() when the test is constantly returning
+zero.
 
-Is it worth checking to see if we have "escaped" from our half of the
-HYP region?
-
-So something like?
-
-if (base ^ io_map_base & BIT(VA_BITS - 1))
-    allocationFailed...
-
-> +	if (__kvm_cpu_uses_extended_idmap())
-> +		pgd = boot_hyp_pgd;
->  
-> -	start = kern_hyp_va((unsigned long)*kaddr);
-> -	end = kern_hyp_va((unsigned long)*kaddr + size);
-> -	ret = __create_hyp_mappings(hyp_pgd, start, end,
-> +	ret = __create_hyp_mappings(pgd, base, base + size,
->  				     __phys_to_pfn(phys_addr), PAGE_HYP_DEVICE);
->  
->  	if (ret) {
->  		iounmap(*kaddr);
->  		*kaddr = NULL;
->  	} else {
-> -		*haddr = (void __iomem *)start;
-> +		*haddr = (void __iomem *)base;
-> +		io_map_base = base;
->  	}
->  
-> +	mutex_unlock(&io_map_lock);
->  	return ret;
->  }
->  
-> @@ -1826,6 +1841,7 @@ int kvm_mmu_init(void)
->  			goto out;
->  	}
->  
-> +	io_map_base = hyp_idmap_start;
->  	return 0;
->  out:
->  	free_hyp_pgds();
-> -- 
-> 2.14.2
-> 
+Thanks,
+drew
