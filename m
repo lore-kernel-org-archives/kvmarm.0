@@ -1,33 +1,70 @@
-From: Shih-Wei Li <shihwei@cs.columbia.edu>
-Subject: [kvm-unit-tests PATCH V2 1/2] arm/arm64: add GICD_IIDR definition
-Date: Tue, 19 Dec 2017 20:34:44 -0500
-Message-ID: <1513733685-32573-2-git-send-email-shihwei@cs.columbia.edu>
-References: <1513733685-32573-1-git-send-email-shihwei@cs.columbia.edu>
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1513733685-32573-1-git-send-email-shihwei@cs.columbia.edu>
-Sender: kvm-owner@vger.kernel.org
-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, drjones@redhat.com, pbonzini@redhat.com, Shih-Wei Li <shihwei@cs.columbia.edu>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: [PATCH v9 1/9] KVM: arm/arm64: Remove redundant preemptible checks
+Date: Wed, 20 Dec 2017 12:35:58 +0100
+Message-ID: <20171220113606.7030-2-christoffer.dall@linaro.org>
+References: <20171220113606.7030-1-christoffer.dall@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7013949D5E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Dec 2017 06:32:30 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id rJS9FRqgGSxi for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 20 Dec 2017 06:32:29 -0500 (EST)
+Received: from mail-wm0-f67.google.com (mail-wm0-f67.google.com [74.125.82.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7755F49D74
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Dec 2017 06:32:29 -0500 (EST)
+Received: by mail-wm0-f67.google.com with SMTP id g75so9323166wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Dec 2017 03:36:19 -0800 (PST)
+In-Reply-To: <20171220113606.7030-1-christoffer.dall@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Added the definition of GICD_IIDR for later use in micro test.
+The __this_cpu_read() and __this_cpu_write() functions already implement
+checks for the required preemption levels when using
+CONFIG_DEBUG_PREEMPT which gives you nice error messages and such.
+Therefore there is no need to explicitly check this using a BUG_ON() in
+the code (which we don't do for other uses of per cpu variables either).
 
-Signed-off-by: Shih-Wei Li <shihwei@cs.columbia.edu>
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- lib/arm/asm/gic.h | 1 +
- 1 file changed, 1 insertion(+)
+ virt/kvm/arm/arm.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
-index 2eb4af8..3b9982b 100644
---- a/lib/arm/asm/gic.h
-+++ b/lib/arm/asm/gic.h
-@@ -10,6 +10,7 @@
- /* Distributor registers */
- #define GICD_CTLR			0x0000
- #define GICD_TYPER			0x0004
-+#define GICD_IIDR			0x0008
- #define GICD_IGROUPR			0x0080
- #define GICD_ISENABLER			0x0100
- #define GICD_ISPENDR			0x0200
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 6b60c98a6e22..3610e132df8b 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -71,7 +71,6 @@ static DEFINE_PER_CPU(unsigned char, kvm_arm_hardware_enabled);
+ 
+ static void kvm_arm_set_running_vcpu(struct kvm_vcpu *vcpu)
+ {
+-	BUG_ON(preemptible());
+ 	__this_cpu_write(kvm_arm_running_vcpu, vcpu);
+ }
+ 
+@@ -81,7 +80,6 @@ static void kvm_arm_set_running_vcpu(struct kvm_vcpu *vcpu)
+  */
+ struct kvm_vcpu *kvm_arm_get_running_vcpu(void)
+ {
+-	BUG_ON(preemptible());
+ 	return __this_cpu_read(kvm_arm_running_vcpu);
+ }
+ 
 -- 
-1.9.1
+2.14.2
