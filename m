@@ -1,25 +1,25 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v9 5/9] KVM: arm/arm64: Support a vgic interrupt line level
- sample function
-Date: Wed, 20 Dec 2017 12:36:02 +0100
-Message-ID: <20171220113606.7030-6-christoffer.dall@linaro.org>
+Subject: [PATCH v9 8/9] KVM: arm/arm64: Avoid work when userspace iqchips are
+ not used
+Date: Wed, 20 Dec 2017 12:36:05 +0100
+Message-ID: <20171220113606.7030-9-christoffer.dall@linaro.org>
 References: <20171220113606.7030-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2AA5F49DAF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Dec 2017 06:32:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4239549DD4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Dec 2017 06:32:42 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AiaFPgu6TfJ7 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 20 Dec 2017 06:32:36 -0500 (EST)
+ with ESMTP id h337AY-tgUYO for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 20 Dec 2017 06:32:41 -0500 (EST)
 Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2B79449DAD
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Dec 2017 06:32:36 -0500 (EST)
-Received: by mail-wm0-f68.google.com with SMTP id f206so9080516wmf.5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Dec 2017 03:36:25 -0800 (PST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C35DE49DCC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Dec 2017 06:32:40 -0500 (EST)
+Received: by mail-wm0-f68.google.com with SMTP id f140so9122824wmd.2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Dec 2017 03:36:30 -0800 (PST)
 In-Reply-To: <20171220113606.7030-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,127 +34,185 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The GIC sometimes need to sample the physical line of a mapped
-interrupt.  As we know this to be notoriously slow, provide a callback
-function for devices (such as the timer) which can do this much faster
-than talking to the distributor, for example by comparing a few
-in-memory values.  Fall back to the good old method of poking the
-physical GIC if no callback is provided.
+We currently check if the VM has a userspace irqchip in several places
+along the critical path, and if so, we do some work which is only
+required for having an irqchip in userspace.  This is unfortunate, as we
+could avoid doing any work entirely, if we didn't have to support
+irqchip in userspace.
 
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Realizing the userspace irqchip on ARM is mostly a developer or hobby
+feature, and is unlikely to be used in servers or other scenarios where
+performance is a priority, we can use a refcounted static key to only
+check the irqchip configuration when we have at least one VM that uses
+an irqchip in userspace.
+
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- include/kvm/arm_vgic.h    | 13 ++++++++++++-
- virt/kvm/arm/arch_timer.c |  3 ++-
- virt/kvm/arm/vgic/vgic.c  | 13 +++++++++----
- 3 files changed, 23 insertions(+), 6 deletions(-)
+ arch/arm/include/asm/kvm_host.h   |  2 ++
+ arch/arm64/include/asm/kvm_host.h |  2 ++
+ virt/kvm/arm/arch_timer.c         |  6 ++--
+ virt/kvm/arm/arm.c                | 59 ++++++++++++++++++++++++++++-----------
+ 4 files changed, 50 insertions(+), 19 deletions(-)
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 8c896540a72c..cdbd142ca7f2 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -130,6 +130,17 @@ struct vgic_irq {
- 	u8 priority;
- 	enum vgic_irq_config config;	/* Level or edge */
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index a9f7d3f47134..6394fb99da7f 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -48,6 +48,8 @@
+ 	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+ #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
  
-+	/*
-+	 * Callback function pointer to in-kernel devices that can tell us the
-+	 * state of the input level of mapped level-triggered IRQ faster than
-+	 * peaking into the physical GIC.
-+	 *
-+	 * Always called in non-preemptible section and the functions can use
-+	 * kvm_arm_get_running_vcpu() to get the vcpu pointer for private
-+	 * IRQs.
-+	 */
-+	bool (*get_input_level)(int vintid);
++DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
 +
- 	void *owner;			/* Opaque pointer to reserve an interrupt
- 					   for in-kernel devices. */
- };
-@@ -331,7 +342,7 @@ void kvm_vgic_init_cpu_hardware(void);
- int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
- 			bool level, void *owner);
- int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
--			  u32 vintid);
-+			  u32 vintid, bool (*get_input_level)(int vindid));
- int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid);
- bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int vintid);
+ u32 *kvm_vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num, u32 mode);
+ int __attribute_const__ kvm_target_cpu(void);
+ int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index ea6cb5b24258..e7218cf7df2a 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -47,6 +47,8 @@
+ 	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+ #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
  
++DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
++
+ int __attribute_const__ kvm_target_cpu(void);
+ int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
+ int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext);
 diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 9376fe03bf2e..fb0533ed903d 100644
+index d845d67b7062..cfcd0323deab 100644
 --- a/virt/kvm/arm/arch_timer.c
 +++ b/virt/kvm/arm/arch_timer.c
-@@ -834,7 +834,8 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
- 		return -EINVAL;
+@@ -103,7 +103,8 @@ static irqreturn_t kvm_arch_timer_handler(int irq, void *dev_id)
+ 	if (kvm_timer_irq_can_fire(vtimer))
+ 		kvm_timer_update_irq(vcpu, true, vtimer);
+ 
+-	if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
++	if (static_branch_unlikely(&userspace_irqchip_in_use) &&
++	    unlikely(!irqchip_in_kernel(vcpu->kvm)))
+ 		kvm_vtimer_update_mask_user(vcpu);
+ 
+ 	return IRQ_HANDLED;
+@@ -284,7 +285,8 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+ 	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer_ctx->irq.irq,
+ 				   timer_ctx->irq.level);
+ 
+-	if (likely(irqchip_in_kernel(vcpu->kvm))) {
++	if (!static_branch_unlikely(&userspace_irqchip_in_use) &&
++	    likely(irqchip_in_kernel(vcpu->kvm))) {
+ 		ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
+ 					  timer_ctx->irq.irq,
+ 					  timer_ctx->irq.level,
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 3610e132df8b..0cf0459134ff 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -74,6 +74,8 @@ static void kvm_arm_set_running_vcpu(struct kvm_vcpu *vcpu)
+ 	__this_cpu_write(kvm_arm_running_vcpu, vcpu);
+ }
+ 
++DEFINE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
++
+ /**
+  * kvm_arm_get_running_vcpu - get the vcpu running on the current CPU.
+  * Must be called from non-preemptible context
+@@ -302,6 +304,8 @@ void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu)
+ 
+ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+ {
++	if (vcpu->arch.has_run_once && unlikely(!irqchip_in_kernel(vcpu->kvm)))
++		static_branch_dec(&userspace_irqchip_in_use);
+ 	kvm_arch_vcpu_free(vcpu);
+ }
+ 
+@@ -522,14 +526,22 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+ 
+ 	vcpu->arch.has_run_once = true;
+ 
+-	/*
+-	 * Map the VGIC hardware resources before running a vcpu the first
+-	 * time on this VM.
+-	 */
+-	if (unlikely(irqchip_in_kernel(kvm) && !vgic_ready(kvm))) {
+-		ret = kvm_vgic_map_resources(kvm);
+-		if (ret)
+-			return ret;
++	if (likely(irqchip_in_kernel(kvm))) {
++		/*
++		 * Map the VGIC hardware resources before running a vcpu the
++		 * first time on this VM.
++		 */
++		if (unlikely(!vgic_ready(kvm))) {
++			ret = kvm_vgic_map_resources(kvm);
++			if (ret)
++				return ret;
++		}
++	} else {
++		/*
++		 * Tell the rest of the code that there are userspace irqchip
++		 * VMs in the wild.
++		 */
++		static_branch_inc(&userspace_irqchip_in_use);
  	}
  
--	ret = kvm_vgic_map_phys_irq(vcpu, host_vtimer_irq, vtimer->irq.irq);
-+	ret = kvm_vgic_map_phys_irq(vcpu, host_vtimer_irq, vtimer->irq.irq,
-+				    NULL);
- 	if (ret)
- 		return ret;
+ 	ret = kvm_timer_enable(vcpu);
+@@ -664,18 +676,29 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		kvm_vgic_flush_hwstate(vcpu);
  
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index 4318e9edd075..d57b3bf8eb36 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -144,13 +144,15 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
- 	kfree(irq);
- }
+ 		/*
+-		 * If we have a singal pending, or need to notify a userspace
+-		 * irqchip about timer or PMU level changes, then we exit (and
+-		 * update the timer level state in kvm_timer_update_run
+-		 * below).
++		 * Exit if we have a singal pending so that we can deliver the
++		 * signal to user space.
+ 		 */
+-		if (signal_pending(current) ||
+-		    kvm_timer_should_notify_user(vcpu) ||
+-		    kvm_pmu_should_notify_user(vcpu)) {
++		if (signal_pending(current)) {
+ 			ret = -EINTR;
+ 			run->exit_reason = KVM_EXIT_INTR;
+ 		}
  
--/* Get the input level of a mapped IRQ directly from the physical GIC */
- bool vgic_get_phys_line_level(struct vgic_irq *irq)
- {
- 	bool line_level;
- 
- 	BUG_ON(!irq->hw);
- 
-+	if (irq->get_input_level)
-+		return irq->get_input_level(irq->intid);
++		/*
++		 * If we're using a userspace irqchip, then check if we need
++		 * to tell a userspace irqchip about timer or PMU level
++		 * changes and if so, exit to userspace (the actual level
++		 * state gets updated in kvm_timer_update_run and
++		 * kvm_pmu_update_run below.
++		 */
++		if (static_branch_unlikely(&userspace_irqchip_in_use)) {
++			if (kvm_timer_should_notify_user(vcpu) ||
++			    kvm_pmu_should_notify_user(vcpu)) {
++				ret = -EINTR;
++				run->exit_reason = KVM_EXIT_INTR;
++			}
++		}
 +
- 	WARN_ON(irq_get_irqchip_state(irq->host_irq,
- 				      IRQCHIP_STATE_PENDING,
- 				      &line_level));
-@@ -436,7 +438,8 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+ 		/*
+ 		 * Ensure we set mode to IN_GUEST_MODE after we disable
+ 		 * interrupts and before the final VCPU requests check.
+@@ -688,7 +711,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		    kvm_request_pending(vcpu)) {
+ 			vcpu->mode = OUTSIDE_GUEST_MODE;
+ 			kvm_pmu_sync_hwstate(vcpu);
+-			kvm_timer_sync_hwstate(vcpu);
++			if (static_branch_unlikely(&userspace_irqchip_in_use))
++				kvm_timer_sync_hwstate(vcpu);
+ 			kvm_vgic_sync_hwstate(vcpu);
+ 			local_irq_enable();
+ 			preempt_enable();
+@@ -732,7 +756,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		 * we don't want vtimer interrupts to race with syncing the
+ 		 * timer virtual interrupt state.
+ 		 */
+-		kvm_timer_sync_hwstate(vcpu);
++		if (static_branch_unlikely(&userspace_irqchip_in_use))
++			kvm_timer_sync_hwstate(vcpu);
  
- /* @irq->irq_lock must be held */
- static int kvm_vgic_map_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
--			    unsigned int host_irq)
-+			    unsigned int host_irq,
-+			    bool (*get_input_level)(int vindid))
- {
- 	struct irq_desc *desc;
- 	struct irq_data *data;
-@@ -456,6 +459,7 @@ static int kvm_vgic_map_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
- 	irq->hw = true;
- 	irq->host_irq = host_irq;
- 	irq->hwintid = data->hwirq;
-+	irq->get_input_level = get_input_level;
- 	return 0;
- }
- 
-@@ -464,10 +468,11 @@ static inline void kvm_vgic_unmap_irq(struct vgic_irq *irq)
- {
- 	irq->hw = false;
- 	irq->hwintid = 0;
-+	irq->get_input_level = NULL;
- }
- 
- int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
--			  u32 vintid)
-+			  u32 vintid, bool (*get_input_level)(int vindid))
- {
- 	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
- 	unsigned long flags;
-@@ -476,7 +481,7 @@ int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
- 	BUG_ON(!irq);
- 
- 	spin_lock_irqsave(&irq->irq_lock, flags);
--	ret = kvm_vgic_map_irq(vcpu, irq, host_irq);
-+	ret = kvm_vgic_map_irq(vcpu, irq, host_irq, get_input_level);
- 	spin_unlock_irqrestore(&irq->irq_lock, flags);
- 	vgic_put_irq(vcpu->kvm, irq);
- 
+ 		/*
+ 		 * We may have taken a host interrupt in HYP mode (ie
 -- 
 2.14.2
