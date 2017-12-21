@@ -1,165 +1,33 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] KVM: arm/arm64: don't set vtimer->cnt_ctl in
- kvm_arch_timer_handler
-Date: Thu, 21 Dec 2017 12:35:06 +0100
-Message-ID: <20171221113506.GD29301@cbox>
-References: <1513148407-2611-1-git-send-email-hejianet@gmail.com>
- <20171213091803.GQ910@cbox>
- <dc95b58c-ee6c-e5c7-1f37-8f69c789a1fc@gmail.com>
- <20171214130954.GV910@cbox>
- <5615f3e1-756e-0537-f0b6-20ae8626ac87@gmail.com>
- <20171214154518.GX910@cbox>
- <e5ccbf1c-6078-4c43-8aa3-fc226ed358f7@gmail.com>
- <20171215100451.GY910@cbox>
- <b38aaf58-ea00-f5ef-a307-56cdfd84bd64@gmail.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH] Support micro operation measurement on
+ arm64
+Date: Thu, 21 Dec 2017 15:32:18 +0100
+Message-ID: <20171221143218.rxuhe34xewzl3yaq@hawk.localdomain>
+References: <1513372539-10180-1-git-send-email-shihwei@cs.columbia.edu>
+ <20171218181440.yggldvw6lry6wsza@hawk.localdomain>
+ <CAO+sbHGU6EUUHQynAaA33T-ThUwA=5f9yq_Uq2mLtXRcHN02Ew@mail.gmail.com>
+ <20171219090620.GA31048@cbox>
+ <20171219121109.hxqbqjkdgt7k5jo6@hawk.localdomain>
+ <20171219130706.GD31048@cbox>
+ <20171220162254.dp5vok6lgbxyo5od@hawk.localdomain>
+ <20171221113150.GC29301@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <b38aaf58-ea00-f5ef-a307-56cdfd84bd64@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Jia He <hejianet@gmail.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, Jia He <jia.he@hxt-semitech.com>
+In-Reply-To: <20171221113150.GC29301@cbox>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Dec 21, 2017 at 05:16:48PM +0800, Jia He wrote:
-> 
-> Sorry for the late, I ever thought you would send out v2 with isb().
-> It seems not.
-> 
+On Thu, Dec 21, 2017 at 12:31:50PM +0100, Christoffer Dall wrote:
+> Perhaps we should just have an initial assert of "is this thing on"
+> which does something that should register a moving count on even a slow
+> clocked arch counter, and then only check for overflow in the general
+> case?
 
-I did:
-
-https://lists.cs.columbia.edu/pipermail/kvmarm/2017-December/029078.html
-
-> 
-> On 12/15/2017 6:04 PM, Christoffer Dall Wrote:
-> >On Fri, Dec 15, 2017 at 10:27:02AM +0800, Jia He wrote:
-> >
-> >[...]
-> [...]
-> >
-> >Meanwhile, I think I thought of a cleaner way to do this.  Could you
-> >test the following two patches on your platform as well?
-> >
-> >>From 3a594a3aa222bd64a86f6c6afcb209c9be20d5c5 Mon Sep 17 00:00:00 2001
-> >From: Christoffer Dall <christoffer.dall@linaro.org>
-> >Date: Thu, 14 Dec 2017 19:54:50 +0100
-> >Subject: [PATCH 1/2] KVM: arm/arm64: Properly handle arch-timer IRQs after
-> >  vtimer_save_state
-> >
-> >The recent timer rework was assuming that once the timer was disabled,
-> >we should no longer see any interrupts from the timer.  This assumption
-> >turns out to not be true, and instead we have to handle the case when
-> >the timer ISR runs even after the timer has been disabled.
-> >
-> >This requires a couple of changes:
-> >
-> >First, we should never overwrite the cached guest state of the timer
-> >control register when the ISR runs, because KVM may have disabled its
-> >timers when doing vcpu_put(), even though the guest still had the timer
-> >enabled.
-> >
-> >Second, we shouldn't assume that the timer is actually firing just
-> >because we see an ISR, but we should check the ISTATUS field of the
-> >timer control register to understand if the hardware timer is really
-> >firing or not.
-> >
-> >Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> 
-> Signed-off-by: Jia He <jia.he@hxt-semitech.com>
-> 
-
-Did you write parts of this patch and thus I should have had your
-signed-off-by ?
-
-Or did you mean to provide another tag.
-
-Anyway, these patches have been pulled already, so I hope we can live
-with the way they are.
-
-> >---
-> >  virt/kvm/arm/arch_timer.c | 19 ++++++++++++-------
-> >  1 file changed, 12 insertions(+), 7 deletions(-)
-> >
-> >diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-> >index aa9adfafe12b..792bcf6277b6 100644
-> >--- a/virt/kvm/arm/arch_timer.c
-> >+++ b/virt/kvm/arm/arch_timer.c
-> >@@ -92,16 +92,21 @@ static irqreturn_t kvm_arch_timer_handler(int irq, void *dev_id)
-> >  {
-> >  	struct kvm_vcpu *vcpu = *(struct kvm_vcpu **)dev_id;
-> >  	struct arch_timer_context *vtimer;
-> >+	u32 cnt_ctl;
-> >-	if (!vcpu) {
-> >-		pr_warn_once("Spurious arch timer IRQ on non-VCPU thread\n");
-> >-		return IRQ_NONE;
-> >-	}
-> >-	vtimer = vcpu_vtimer(vcpu);
-> >+	/*
-> >+	 * We may see a timer interrupt after vcpu_put() has been called which
-> >+	 * sets the CPU's vcpu pointer to NULL, because even though the timer
-> >+	 * has been disabled in vtimer_save_state(), the singal may not have
-> >+	 * been retired from the interrupt controller yet.
-> >+	 */
-> >+	if (!vcpu)
-> >+		return IRQ_HANDLED;
-> >+	vtimer = vcpu_vtimer(vcpu);
-> >  	if (!vtimer->irq.level) {
-> >-		vtimer->cnt_ctl = read_sysreg_el0(cntv_ctl);
-> >-		if (kvm_timer_irq_can_fire(vtimer))
-> >+		cnt_ctl = read_sysreg_el0(cntv_ctl);
-> >+		if (cnt_ctl & ARCH_TIMER_CTRL_IT_STAT)
-> >  			kvm_timer_update_irq(vcpu, true, vtimer);
-> >  	}
-> >
-> >
-> >>From ed96302b47d209024814df116994f64dc8f07c96 Mon Sep 17 00:00:00 2001
-> >From: Christoffer Dall <christoffer.dall@linaro.org>
-> >Date: Fri, 15 Dec 2017 00:30:12 +0100
-> >Subject: [PATCH 2/2] KVM: arm/arm64: Fix timer enable flow
-> >
-> >When enabling the timer on the first run, we fail to ever restore the
-> >state and mark it as loaded.  That means, that in the initial entry to
-> >the VCPU ioctl, unless we exit to userspace for some reason such as a
-> >pending signal, if the guest programs a timer and blocks, we will wait
-> >forever, because we never read back the hardware state (the loaded flag
-> >is not set), and so we think the timer is disabled, and we never
-> >schedule a background soft timer.
-> >
-> >The end result?  The VCPU blocks forever, and the only solution is to
-> >kill the thread.
-> >
-> >Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> >---
-> >  virt/kvm/arm/arch_timer.c | 5 +----
-> >  1 file changed, 1 insertion(+), 4 deletions(-)
-> >
-> >diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-> >index 792bcf6277b6..8869658e6983 100644
-> >--- a/virt/kvm/arm/arch_timer.c
-> >+++ b/virt/kvm/arm/arch_timer.c
-> >@@ -843,10 +843,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
-> >  no_vgic:
-> >  	preempt_disable();
-> >  	timer->enabled = 1;
-> >-	if (!irqchip_in_kernel(vcpu->kvm))
-> >-		kvm_timer_vcpu_load_user(vcpu);
-> >-	else
-> >-		kvm_timer_vcpu_load_vgic(vcpu);
-> >+	kvm_timer_vcpu_load(vcpu);
-> >  	preempt_enable();
-> >  	return 0;
-> >
-> >
-> >Thanks,
-> >-Christoffer
-> >
-> I have tested your 2 patches in my QDF2400 server for 10 times, the
-> guest can be boot up without any issues.
-> Without this patch, the guest will always hang in booting stages.
-> 
-Thanks for this, it's comforting to know.
+Yeah, that sounds good to me.
 
 Thanks,
--Christoffer
+drew
