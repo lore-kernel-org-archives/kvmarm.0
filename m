@@ -1,170 +1,69 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v4 14/19] KVM: arm/arm64: Move HYP IO VAs to the "idmap" range
-Date: Thu,  4 Jan 2018 18:43:29 +0000
-Message-ID: <20180104184334.16571-15-marc.zyngier@arm.com>
+Subject: [PATCH v4 16/19] arm64: insn: Allow ADD/SUB (immediate) with LSL #12
+Date: Thu,  4 Jan 2018 18:43:31 +0000
+Message-ID: <20180104184334.16571-17-marc.zyngier@arm.com>
 References: <20180104184334.16571-1-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 56BC449DA2
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jan 2018 13:39:50 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HICA6CjARWMJ for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Jan 2018 13:39:48 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CE53849DB8
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jan 2018 13:39:48 -0500 (EST)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20180104184334.16571-1-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>, Steve Capper <steve.capper@arm.com>, Peter Maydell <peter.maydell@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We so far mapped our HYP IO (which is essencially the GICv2 control
-registers) using the same method as for memory. It recently appeared
-that is a bit unsafe:
+The encoder for ADD/SUB (immediate) can only cope with 12bit
+immediates, while there is an encoding for a 12bit immediate shifted
+by 12 bits to the left.
 
-We compute the HYP VA using the kern_hyp_va helper, but that helper
-is only designed to deal with kernel VAs coming from the linear map,
-and not from the vmalloc region... This could in turn cause some bad
-aliasing between the two, amplified by the upcoming VA randomisation.
-
-A solution is to come up with our very own basic VA allocator for
-MMIO. Since half of the HYP address space only contains a single
-page (the idmap), we have plenty to borrow from. Let's use the idmap
-as a base, and allocate downwards from it. GICv2 now lives on the
-other side of the great VA barrier.
+Let's fix this small oversight by allowing the LSL_12 bit to be set.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/mmu.c | 56 +++++++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 43 insertions(+), 13 deletions(-)
+ arch/arm64/kernel/insn.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 6192d45d1e1a..14c5e5534f2f 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -43,6 +43,9 @@ static unsigned long hyp_idmap_start;
- static unsigned long hyp_idmap_end;
- static phys_addr_t hyp_idmap_vector;
+diff --git a/arch/arm64/kernel/insn.c b/arch/arm64/kernel/insn.c
+index 59669d7d4383..20655537cdd1 100644
+--- a/arch/arm64/kernel/insn.c
++++ b/arch/arm64/kernel/insn.c
+@@ -35,6 +35,7 @@
  
-+static DEFINE_MUTEX(io_map_lock);
-+static unsigned long io_map_base;
-+
- #define S2_PGD_SIZE	(PTRS_PER_S2_PGD * sizeof(pgd_t))
- #define hyp_pgd_order get_order(PTRS_PER_PGD * sizeof(pgd_t))
+ #define AARCH64_INSN_SF_BIT	BIT(31)
+ #define AARCH64_INSN_N_BIT	BIT(22)
++#define AARCH64_INSN_LSL_12	BIT(22)
  
-@@ -502,27 +505,31 @@ static void unmap_hyp_range(pgd_t *pgdp, phys_addr_t start, u64 size)
-  *
-  * Assumes hyp_pgd is a page table used strictly in Hyp-mode and
-  * therefore contains either mappings in the kernel memory area (above
-- * PAGE_OFFSET), or device mappings in the vmalloc range (from
-- * VMALLOC_START to VMALLOC_END).
-+ * PAGE_OFFSET), or device mappings in the idmap range.
-  *
-- * boot_hyp_pgd should only map two pages for the init code.
-+ * boot_hyp_pgd should only map the idmap range, and is only used in
-+ * the extended idmap case.
-  */
- void free_hyp_pgds(void)
- {
-+	pgd_t *id_pgd;
-+
- 	mutex_lock(&kvm_hyp_pgd_mutex);
- 
-+	id_pgd = boot_hyp_pgd ? boot_hyp_pgd : hyp_pgd;
-+
-+	if (id_pgd)
-+		unmap_hyp_range(id_pgd, io_map_base,
-+				hyp_idmap_start + PAGE_SIZE - io_map_base);
-+
- 	if (boot_hyp_pgd) {
--		unmap_hyp_range(boot_hyp_pgd, hyp_idmap_start, PAGE_SIZE);
- 		free_pages((unsigned long)boot_hyp_pgd, hyp_pgd_order);
- 		boot_hyp_pgd = NULL;
+ static int aarch64_insn_encoding_class[] = {
+ 	AARCH64_INSN_CLS_UNKNOWN,
+@@ -903,9 +904,18 @@ u32 aarch64_insn_gen_add_sub_imm(enum aarch64_insn_register dst,
+ 		return AARCH64_BREAK_FAULT;
  	}
  
- 	if (hyp_pgd) {
--		unmap_hyp_range(hyp_pgd, hyp_idmap_start, PAGE_SIZE);
- 		unmap_hyp_range(hyp_pgd, kern_hyp_va(PAGE_OFFSET),
- 				(uintptr_t)high_memory - PAGE_OFFSET);
--		unmap_hyp_range(hyp_pgd, kern_hyp_va(VMALLOC_START),
--				VMALLOC_END - VMALLOC_START);
- 
- 		free_pages((unsigned long)hyp_pgd, hyp_pgd_order);
- 		hyp_pgd = NULL;
-@@ -721,7 +728,8 @@ int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
- 			   void __iomem **kaddr,
- 			   void __iomem **haddr)
- {
--	unsigned long start, end;
-+	pgd_t *pgd = hyp_pgd;
-+	unsigned long base;
- 	int ret;
- 
- 	*kaddr = ioremap(phys_addr, size);
-@@ -733,17 +741,38 @@ int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
- 		return 0;
- 	}
- 
-+	mutex_lock(&io_map_lock);
-+
-+	base = io_map_base - size;
-+	base &= ~(size - 1);
- 
--	start = kern_hyp_va((unsigned long)*kaddr);
--	end = kern_hyp_va((unsigned long)*kaddr + size);
--	ret = __create_hyp_mappings(hyp_pgd, start, end,
-+	/*
-+	 * Verify that BIT(VA_BITS - 1) hasn't been flipped by
-+	 * allocating the new area, as it would indicate we've
-+	 * overflowed the idmap/IO address range.
-+	 */
-+	if ((base ^ io_map_base) & BIT(VA_BITS - 1)) {
-+		ret = -ENOMEM;
++	/* We can't encode more than a 24bit value (12bit + 12bit shift) */
++	if (imm & ~(BIT(24) - 1))
 +		goto out;
-+	}
 +
-+	if (__kvm_cpu_uses_extended_idmap())
-+		pgd = boot_hyp_pgd;
++	/* If we have something in the top 12 bits... */
+ 	if (imm & ~(SZ_4K - 1)) {
+-		pr_err("%s: invalid immediate encoding %d\n", __func__, imm);
+-		return AARCH64_BREAK_FAULT;
++		/* ... and in the low 12 bits -> error */
++		if (imm & (SZ_4K - 1))
++			goto out;
 +
-+	ret = __create_hyp_mappings(pgd, base, base + size,
- 				     __phys_to_pfn(phys_addr), PAGE_HYP_DEVICE);
++		imm >>= 12;
++		insn |= AARCH64_INSN_LSL_12;
+ 	}
  
-+	if (!ret) {
-+		*haddr = (void __iomem *)base;
-+		io_map_base = base;
-+	}
+ 	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RD, insn, dst);
+@@ -913,6 +923,10 @@ u32 aarch64_insn_gen_add_sub_imm(enum aarch64_insn_register dst,
+ 	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RN, insn, src);
+ 
+ 	return aarch64_insn_encode_immediate(AARCH64_INSN_IMM_12, insn, imm);
 +
 +out:
-+	mutex_unlock(&io_map_lock);
-+
- 	if (ret) {
- 		iounmap(*kaddr);
- 		*kaddr = NULL;
--	} else {
--		*haddr = (void __iomem *)start;
- 	}
++	pr_err("%s: invalid immediate encoding %d\n", __func__, imm);
++	return AARCH64_BREAK_FAULT;
+ }
  
- 	return ret;
-@@ -1826,6 +1855,7 @@ int kvm_mmu_init(void)
- 			goto out;
- 	}
- 
-+	io_map_base = hyp_idmap_start;
- 	return 0;
- out:
- 	free_hyp_pgds();
+ u32 aarch64_insn_gen_bitfield(enum aarch64_insn_register dst,
 -- 
 2.14.2
