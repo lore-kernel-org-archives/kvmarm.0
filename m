@@ -1,242 +1,215 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v4 05/19] arm64: alternatives: Add dynamic patching feature
-Date: Thu,  4 Jan 2018 18:43:20 +0000
-Message-ID: <20180104184334.16571-6-marc.zyngier@arm.com>
+Subject: [PATCH v4 08/19] arm64: KVM: Dynamically patch the kernel/hyp VA mask
+Date: Thu,  4 Jan 2018 18:43:23 +0000
+Message-ID: <20180104184334.16571-9-marc.zyngier@arm.com>
 References: <20180104184334.16571-1-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C7B1249DBE
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jan 2018 13:39:31 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gfcgSt+jQulC for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Jan 2018 13:39:30 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 48D8349D9D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jan 2018 13:39:30 -0500 (EST)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20180104184334.16571-1-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>, Steve Capper <steve.capper@arm.com>, Peter Maydell <peter.maydell@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We've so far relied on a patching infrastructure that only gave us
-a single alternative, without any way to finely control what gets
-patched. For a single feature, this is an all or nothing thing.
+So far, we're using a complicated sequence of alternatives to
+patch the kernel/hyp VA mask on non-VHE, and NOP out the
+masking altogether when on VHE.
 
-It would be interesting to have a more fine grained way of patching
-the kernel though, where we could dynamically tune the code that gets
-injected.
-
-In order to achive this, let's introduce a new form of alternative
-that is associated with a callback. This callback gets the instruction
-sequence number and the old instruction as a parameter, and returns
-the new instruction. This callback is always called, as the patching
-decision is now done at runtime (not patching is equivalent to returning
-the same instruction).
-
-Patching with a callback is declared with the new ALTERNATIVE_CB
-and alternative_cb directives:
-
-	asm volatile(ALTERNATIVE_CB("mov %0, #0\n", callback)
-		     : "r" (v));
-or
-	alternative_cb callback
-		mov	x0, #0
-	alternative_cb_end
-
-where callback is the C function computing the alternative.
+THe newly introduced dynamic patching gives us the opportunity
+to simplify that code by patching a single instruction with
+the correct mask (instead of the mind bending cummulative masking
+we have at the moment) or even a single NOP on VHE.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/alternative.h       | 36 ++++++++++++++++++++++---
- arch/arm64/include/asm/alternative_types.h |  4 +++
- arch/arm64/kernel/alternative.c            | 43 ++++++++++++++++++++++--------
- 3 files changed, 68 insertions(+), 15 deletions(-)
+ arch/arm64/include/asm/kvm_mmu.h | 45 ++++++--------------
+ arch/arm64/kvm/Makefile          |  2 +-
+ arch/arm64/kvm/va_layout.c       | 91 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 104 insertions(+), 34 deletions(-)
+ create mode 100644 arch/arm64/kvm/va_layout.c
 
-diff --git a/arch/arm64/include/asm/alternative.h b/arch/arm64/include/asm/alternative.h
-index 395befde7595..04f66f6173fc 100644
---- a/arch/arm64/include/asm/alternative.h
-+++ b/arch/arm64/include/asm/alternative.h
-@@ -18,10 +18,14 @@
- void __init apply_alternatives_all(void);
- void apply_alternatives(void *start, size_t length);
- 
--#define ALTINSTR_ENTRY(feature)						      \
-+#define ALTINSTR_ENTRY(feature,cb)					      \
- 	" .align " __stringify(ALTINSTR_ALIGN) "\n"			      \
- 	" .word 661b - .\n"				/* label           */ \
-+	" .if " __stringify(cb) " == 0\n"				      \
- 	" .word 663f - .\n"				/* new instruction */ \
-+	" .else\n"							      \
-+	" .word " __stringify(cb) "- .\n"		/* callback */	      \
-+	" .endif\n"							      \
- 	" .hword " __stringify(feature) "\n"		/* feature bit     */ \
- 	" .byte 662b-661b\n"				/* source len      */ \
- 	" .byte 664f-663f\n"				/* replacement len */
-@@ -39,15 +43,18 @@ void apply_alternatives(void *start, size_t length);
-  * but most assemblers die if insn1 or insn2 have a .inst. This should
-  * be fixed in a binutils release posterior to 2.25.51.0.2 (anything
-  * containing commit 4e4d08cf7399b606 or c1baaddf8861).
-+ *
-+ * Alternatives with callbacks do not generate replacement instructions.
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 672c8684d5c2..b0c3cbe9b513 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -69,9 +69,6 @@
+  * mappings, and none of this applies in that case.
   */
--#define __ALTERNATIVE_CFG(oldinstr, newinstr, feature, cfg_enabled)	\
-+#define __ALTERNATIVE_CFG(oldinstr, newinstr, feature, cfg_enabled, cb)	\
- 	".if "__stringify(cfg_enabled)" == 1\n"				\
- 	"661:\n\t"							\
- 	oldinstr "\n"							\
- 	"662:\n"							\
- 	".pushsection .altinstructions,\"a\"\n"				\
--	ALTINSTR_ENTRY(feature)						\
-+	ALTINSTR_ENTRY(feature,cb)					\
- 	".popsection\n"							\
-+	" .if " __stringify(cb) " == 0\n"				\
- 	".pushsection .altinstr_replacement, \"a\"\n"			\
- 	"663:\n\t"							\
- 	newinstr "\n"							\
-@@ -55,11 +62,17 @@ void apply_alternatives(void *start, size_t length);
- 	".popsection\n\t"						\
- 	".org	. - (664b-663b) + (662b-661b)\n\t"			\
- 	".org	. - (662b-661b) + (664b-663b)\n"			\
-+	".else\n\t"							\
-+	"663:\n\t"							\
-+	"664:\n\t"							\
-+	".endif\n"							\
- 	".endif\n"
  
- #define _ALTERNATIVE_CFG(oldinstr, newinstr, feature, cfg, ...)	\
--	__ALTERNATIVE_CFG(oldinstr, newinstr, feature, IS_ENABLED(cfg))
-+	__ALTERNATIVE_CFG(oldinstr, newinstr, feature, IS_ENABLED(cfg), 0)
+-#define HYP_PAGE_OFFSET_HIGH_MASK	((UL(1) << VA_BITS) - 1)
+-#define HYP_PAGE_OFFSET_LOW_MASK	((UL(1) << (VA_BITS - 1)) - 1)
+-
+ #ifdef __ASSEMBLY__
  
-+#define ALTERNATIVE_CB(oldinstr, cb) \
-+	__ALTERNATIVE_CFG(oldinstr, "NOT_AN_INSTRUCTION", ARM64_NCAPS, 1, cb)
+ #include <asm/alternative.h>
+@@ -81,28 +78,14 @@
+  * Convert a kernel VA into a HYP VA.
+  * reg: VA to be converted.
+  *
+- * This generates the following sequences:
+- * - High mask:
+- *		and x0, x0, #HYP_PAGE_OFFSET_HIGH_MASK
+- *		nop
+- * - Low mask:
+- *		and x0, x0, #HYP_PAGE_OFFSET_HIGH_MASK
+- *		and x0, x0, #HYP_PAGE_OFFSET_LOW_MASK
+- * - VHE:
+- *		nop
+- *		nop
+- *
+- * The "low mask" version works because the mask is a strict subset of
+- * the "high mask", hence performing the first mask for nothing.
+- * Should be completely invisible on any viable CPU.
++ * The actual code generation takes place in kvm_update_va_mask, and
++ * the instructions below are only there to reserve the space and
++ * perform the register allocation.
+  */
+ .macro kern_hyp_va	reg
+-alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
+-	and     \reg, \reg, #HYP_PAGE_OFFSET_HIGH_MASK
+-alternative_else_nop_endif
+-alternative_if ARM64_HYP_OFFSET_LOW
+-	and     \reg, \reg, #HYP_PAGE_OFFSET_LOW_MASK
+-alternative_else_nop_endif
++alternative_cb kvm_update_va_mask
++	and     \reg, \reg, #1
++alternative_cb_end
+ .endm
+ 
  #else
+@@ -113,18 +96,14 @@ alternative_else_nop_endif
+ #include <asm/mmu_context.h>
+ #include <asm/pgtable.h>
  
- #include <asm/assembler.h>
-@@ -127,6 +140,14 @@ void apply_alternatives(void *start, size_t length);
- 661:
- .endm
- 
-+.macro alternative_cb cb
-+	.set .Lasm_alt_mode, 0
-+	.pushsection .altinstructions, "a"
-+	altinstruction_entry 661f, \cb, ARM64_NCAPS, 662f-661f, 0
-+	.popsection
-+661:
-+.endm
++void kvm_update_va_mask(struct alt_instr *alt,
++			__le32 *origptr, __le32 *updptr, int nr_inst);
 +
- /*
-  * Provide the other half of the alternative code sequence.
-  */
-@@ -152,6 +173,13 @@ void apply_alternatives(void *start, size_t length);
- 	.org	. - (662b-661b) + (664b-663b)
- .endm
- 
-+/*
-+ * Callback-based alternative epilogue
-+ */
-+.macro alternative_cb_end
-+662:
-+.endm
-+
- /*
-  * Provides a trivial alternative or default sequence consisting solely
-  * of NOPs. The number of NOPs is chosen automatically to match the
-diff --git a/arch/arm64/include/asm/alternative_types.h b/arch/arm64/include/asm/alternative_types.h
-index 26cf76167f2d..e400b9061957 100644
---- a/arch/arm64/include/asm/alternative_types.h
-+++ b/arch/arm64/include/asm/alternative_types.h
-@@ -2,6 +2,10 @@
- #ifndef __ASM_ALTERNATIVE_TYPES_H
- #define __ASM_ALTERNATIVE_TYPES_H
- 
-+struct alt_instr;
-+typedef void (*alternative_cb_t)(struct alt_instr *alt,
-+				 __le32 *origptr, __le32 *updptr, int nr_inst);
-+
- struct alt_instr {
- 	s32 orig_offset;	/* offset to original instruction */
- 	s32 alt_offset;		/* offset to replacement instruction */
-diff --git a/arch/arm64/kernel/alternative.c b/arch/arm64/kernel/alternative.c
-index 6dd0a3a3e5c9..0f52627fbb29 100644
---- a/arch/arm64/kernel/alternative.c
-+++ b/arch/arm64/kernel/alternative.c
-@@ -105,32 +105,53 @@ static u32 get_alt_insn(struct alt_instr *alt, __le32 *insnptr, __le32 *altinsnp
- 	return insn;
+ static inline unsigned long __kern_hyp_va(unsigned long v)
+ {
+-	asm volatile(ALTERNATIVE("and %0, %0, %1",
+-				 "nop",
+-				 ARM64_HAS_VIRT_HOST_EXTN)
+-		     : "+r" (v)
+-		     : "i" (HYP_PAGE_OFFSET_HIGH_MASK));
+-	asm volatile(ALTERNATIVE("nop",
+-				 "and %0, %0, %1",
+-				 ARM64_HYP_OFFSET_LOW)
+-		     : "+r" (v)
+-		     : "i" (HYP_PAGE_OFFSET_LOW_MASK));
++	asm volatile(ALTERNATIVE_CB("and %0, %0, #1\n",
++				    kvm_update_va_mask)
++		     : "+r" (v));
+ 	return v;
  }
  
-+static void patch_alternative(struct alt_instr *alt,
-+			      __le32 *origptr, __le32 *updptr, int nr_inst)
+diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+index 87c4f7ae24de..93afff91cb7c 100644
+--- a/arch/arm64/kvm/Makefile
++++ b/arch/arm64/kvm/Makefile
+@@ -16,7 +16,7 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/e
+ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arm.o $(KVM)/arm/mmu.o $(KVM)/arm/mmio.o
+ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/psci.o $(KVM)/arm/perf.o
+ 
+-kvm-$(CONFIG_KVM_ARM_HOST) += inject_fault.o regmap.o
++kvm-$(CONFIG_KVM_ARM_HOST) += inject_fault.o regmap.o va_layout.o
+ kvm-$(CONFIG_KVM_ARM_HOST) += hyp.o hyp-init.o handle_exit.o
+ kvm-$(CONFIG_KVM_ARM_HOST) += guest.o debug.o reset.o sys_regs.o sys_regs_generic_v8.o
+ kvm-$(CONFIG_KVM_ARM_HOST) += vgic-sys-reg-v3.o
+diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
+new file mode 100644
+index 000000000000..aee758574e61
+--- /dev/null
++++ b/arch/arm64/kvm/va_layout.c
+@@ -0,0 +1,91 @@
++/*
++ * Copyright (C) 2017 ARM Ltd.
++ * Author: Marc Zyngier <marc.zyngier@arm.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include <linux/kvm_host.h>
++#include <asm/alternative.h>
++#include <asm/debug-monitors.h>
++#include <asm/insn.h>
++#include <asm/kvm_mmu.h>
++
++#define HYP_PAGE_OFFSET_HIGH_MASK	((UL(1) << VA_BITS) - 1)
++#define HYP_PAGE_OFFSET_LOW_MASK	((UL(1) << (VA_BITS - 1)) - 1)
++
++static u64 va_mask;
++
++static void compute_layout(void)
 +{
-+	__le32 *replptr;
++	phys_addr_t idmap_addr = __pa_symbol(__hyp_idmap_text_start);
++	unsigned long mask = HYP_PAGE_OFFSET_HIGH_MASK;
++
++	/*
++	 * Activate the lower HYP offset only if the idmap doesn't
++	 * clash with it,
++	 */
++	if (idmap_addr > HYP_PAGE_OFFSET_LOW_MASK)
++		mask = HYP_PAGE_OFFSET_HIGH_MASK;
++
++	va_mask = mask;
++}
++
++static u32 compute_instruction(int n, u32 rd, u32 rn)
++{
++	u32 insn = AARCH64_BREAK_FAULT;
++
++	switch (n) {
++	case 0:
++		insn = aarch64_insn_gen_logical_immediate(AARCH64_INSN_LOGIC_AND,
++							  AARCH64_INSN_VARIANT_64BIT,
++							  rn, rd, va_mask);
++		break;
++	}
++
++	return insn;
++}
++
++void __init kvm_update_va_mask(struct alt_instr *alt,
++			       __le32 *origptr, __le32 *updptr, int nr_inst)
++{
 +	int i;
 +
-+	replptr = ALT_REPL_PTR(alt);
-+	for (i = 0; i < nr_inst; i++) {
-+		u32 insn;
++	/* We only expect a 1 instruction sequence */
++	BUG_ON(nr_inst != 1);
 +
-+		insn = get_alt_insn(alt, origptr + i, replptr + i);
++	if (!has_vhe() && !va_mask)
++		compute_layout();
++
++	for (i = 0; i < nr_inst; i++) {
++		u32 rd, rn, insn, oinsn;
++
++		/*
++		 * VHE doesn't need any address translation, let's NOP
++		 * everything.
++		 */
++		if (has_vhe()) {
++			updptr[i] = aarch64_insn_gen_nop();
++			continue;
++		}
++
++		oinsn = le32_to_cpu(origptr[i]);
++		rd = aarch64_insn_decode_register(AARCH64_INSN_REGTYPE_RD, oinsn);
++		rn = aarch64_insn_decode_register(AARCH64_INSN_REGTYPE_RN, oinsn);
++
++		insn = compute_instruction(i, rd, rn);
++		BUG_ON(insn == AARCH64_BREAK_FAULT);
++
 +		updptr[i] = cpu_to_le32(insn);
 +	}
 +}
-+
- static void __apply_alternatives(void *alt_region, bool use_linear_alias)
- {
- 	struct alt_instr *alt;
- 	struct alt_region *region = alt_region;
--	__le32 *origptr, *replptr, *updptr;
-+	__le32 *origptr, *updptr;
-+	alternative_cb_t alt_cb;
- 
- 	for (alt = region->begin; alt < region->end; alt++) {
--		u32 insn;
--		int i, nr_inst;
-+		int nr_inst;
- 
--		if (!cpus_have_cap(alt->cpufeature))
-+		/* Use ARM64_NCAPS as an unconditional patch */
-+		if (alt->cpufeature < ARM64_NCAPS &&
-+		    !cpus_have_cap(alt->cpufeature))
- 			continue;
- 
--		BUG_ON(alt->alt_len != alt->orig_len);
-+		if (alt->cpufeature == ARM64_NCAPS)
-+			BUG_ON(alt->alt_len != 0);
-+		else
-+			BUG_ON(alt->alt_len != alt->orig_len);
- 
- 		pr_info_once("patching kernel code\n");
- 
- 		origptr = ALT_ORIG_PTR(alt);
--		replptr = ALT_REPL_PTR(alt);
- 		updptr = use_linear_alias ? lm_alias(origptr) : origptr;
--		nr_inst = alt->alt_len / sizeof(insn);
-+		nr_inst = alt->orig_len / AARCH64_INSN_SIZE;
- 
--		for (i = 0; i < nr_inst; i++) {
--			insn = get_alt_insn(alt, origptr + i, replptr + i);
--			updptr[i] = cpu_to_le32(insn);
--		}
-+		if (alt->cpufeature < ARM64_NCAPS)
-+			alt_cb = patch_alternative;
-+		else
-+			alt_cb  = ALT_REPL_PTR(alt);
-+
-+		alt_cb(alt, origptr, updptr, nr_inst);
- 
- 		flush_icache_range((uintptr_t)origptr,
- 				   (uintptr_t)(origptr + nr_inst));
 -- 
 2.14.2
