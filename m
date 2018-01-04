@@ -1,26 +1,22 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v4 10/21] arm64: entry.S: move SError handling into a
- C function for future expansion
-Date: Wed, 03 Jan 2018 16:00:55 +0000
-Message-ID: <5A4CFE37.3010002@arm.com>
-References: <20171019145807.23251-1-james.morse@arm.com>
- <20171019145807.23251-11-james.morse@arm.com>
- <b99e7738-f8dd-26bf-a050-f970c2f8d03b@codeaurora.org>
+From: Punit Agrawal <punit.agrawal@arm.com>
+Subject: [PATCH] KVM: arm/arm64: Check pagesize when allocating a hugepage at
+ Stage 2
+Date: Thu,  4 Jan 2018 18:24:33 +0000
+Message-ID: <20180104182433.3790-1-punit.agrawal@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E98AF49D14
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Jan 2018 10:58:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 02D9E49DBD
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jan 2018 13:20:17 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8RZ6lwFHzpca for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 Jan 2018 10:58:43 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AAC8E406D0
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Jan 2018 10:58:43 -0500 (EST)
-In-Reply-To: <b99e7738-f8dd-26bf-a050-f970c2f8d03b@codeaurora.org>
+ with ESMTP id CxW5bBe3RzBL for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Jan 2018 13:20:15 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CD17049D2B
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jan 2018 13:20:15 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,57 +26,41 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Adam Wallis <awallis@codeaurora.org>
-Cc: Jonathan.Zhang@cavium.com, Julien Thierry <julien.thierry@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu, Wang Xiongfeng <wangxiongfengi2@huawei.com>, wangxiongfeng2@huawei.com, linux-arm-kernel@lists.infradead.org
+To: kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Adam,
+KVM only supports PMD hugepages at stage 2 but doesn't actually check
+that the provided hugepage memory pagesize is PMD_SIZE before populating
+stage 2 entries.
 
-On 02/01/18 21:07, Adam Wallis wrote:
-> On 10/19/2017 10:57 AM, James Morse wrote:
-> [..]
->>  	kernel_ventry	el1_fiq_invalid			// FIQ EL1h
->> -	kernel_ventry	el1_error_invalid		// Error EL1h
->> +	kernel_ventry	el1_error			// Error EL1h
+In cases where the backing hugepage size is smaller than PMD_SIZE (such
+as when using contiguous hugepages), KVM can end up creating stage 2
+mappings that extend beyond the supplied memory.
 
->>  	kernel_ventry	el0_sync			// Synchronous 64-bit EL0
->>  	kernel_ventry	el0_irq				// IRQ 64-bit EL0
->>  	kernel_ventry	el0_fiq_invalid			// FIQ 64-bit EL0
->> -	kernel_ventry	el0_error_invalid		// Error 64-bit EL0
->> +	kernel_ventry	el0_error			// Error 64-bit EL0
->>  
->>  #ifdef CONFIG_COMPAT
->>  	kernel_ventry	el0_sync_compat			// Synchronous 32-bit EL0
->>  	kernel_ventry	el0_irq_compat			// IRQ 32-bit EL0
->>  	kernel_ventry	el0_fiq_invalid_compat		// FIQ 32-bit EL0
->> -	kernel_ventry	el0_error_invalid_compat	// Error 32-bit EL0
->> +	kernel_ventry	el0_error_compat		// Error 32-bit EL0
->>  #else
->>  	kernel_ventry	el0_sync_invalid		// Synchronous 32-bit EL0
->>  	kernel_ventry	el0_irq_invalid			// IRQ 32-bit EL0
->> @@ -455,10 +455,6 @@ ENDPROC(el0_error_invalid)
->>  el0_fiq_invalid_compat:
->>  	inv_entry 0, BAD_FIQ, 32
->>  ENDPROC(el0_fiq_invalid_compat)
->> -
->> -el0_error_invalid_compat:
->> -	inv_entry 0, BAD_ERROR, 32
->> -ENDPROC(el0_error_invalid_compat)
->>  #endif
+Fix this by checking for the pagesize of userspace vma before creating
+PMD hugepage at stage 2.
 
-> Perhaps I missed something quite obvious, but is there any reason to not also
-> remove el1_error_invalid, since SError handling now jumps to el1_error?
+Fixes: ad361f093c1e31d ("KVM: ARM: Support hugetlbfs backed huge pages")
+Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+---
+ virt/kvm/arm/mmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-There is still a caller for el1_error_invalid: depending on SPSel we are in
-thread or handler mode, which causes exceptions to use a different entry in the
-vectors. The kernel always uses handler mode, all the thread mode entries point
-at their '_invalid' versions.
-
-If we take an SError from EL1t, SPsel==0 then it uses vectors+0x180. (just cut
-off the top of this diff). The el1_error change above is for EL1h, SPsel==1,
-which uses vectors+0x380.
-
-
-Thanks for taking a look!
-
-James
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index b4b69c2d1012..9dea96380339 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -1310,7 +1310,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		return -EFAULT;
+ 	}
+ 
+-	if (is_vm_hugetlb_page(vma) && !logging_active) {
++	if (vma_kernel_pagesize(vma) == PMD_SIZE && !logging_active) {
+ 		hugetlb = true;
+ 		gfn = (fault_ipa & PMD_MASK) >> PAGE_SHIFT;
+ 	} else {
+-- 
+2.15.1
