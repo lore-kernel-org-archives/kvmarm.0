@@ -1,108 +1,155 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v4 15/19] arm64; insn: Add encoder for the EXTR instruction
-Date: Thu,  4 Jan 2018 18:43:30 +0000
-Message-ID: <20180104184334.16571-16-marc.zyngier@arm.com>
+Subject: [PATCH v4 12/19] KVM: arm/arm64: Move ioremap calls to create_hyp_io_mappings
+Date: Thu,  4 Jan 2018 18:43:27 +0000
+Message-ID: <20180104184334.16571-13-marc.zyngier@arm.com>
 References: <20180104184334.16571-1-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E955849D9D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jan 2018 13:39:51 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mGGkz5z8YJZE for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Jan 2018 13:39:50 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D9E4649DB4
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jan 2018 13:39:50 -0500 (EST)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20180104184334.16571-1-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>, Steve Capper <steve.capper@arm.com>, Peter Maydell <peter.maydell@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add an encoder for the EXTR instruction, which also implements the ROR
-variant (where Rn == Rm).
+Both HYP io mappings call ioremap, followed by create_hyp_io_mappings.
+Let's move the ioremap call into create_hyp_io_mappings itself, which
+simplifies the code a bit and allows for further refactoring.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/insn.h |  6 ++++++
- arch/arm64/kernel/insn.c      | 32 ++++++++++++++++++++++++++++++++
- 2 files changed, 38 insertions(+)
+ arch/arm/include/asm/kvm_mmu.h   |  3 ++-
+ arch/arm64/include/asm/kvm_mmu.h |  3 ++-
+ virt/kvm/arm/mmu.c               | 24 ++++++++++++++----------
+ virt/kvm/arm/vgic/vgic-v2.c      | 31 ++++++++-----------------------
+ 4 files changed, 26 insertions(+), 35 deletions(-)
 
-diff --git a/arch/arm64/include/asm/insn.h b/arch/arm64/include/asm/insn.h
-index 815b35bc53ed..f62c56b1793f 100644
---- a/arch/arm64/include/asm/insn.h
-+++ b/arch/arm64/include/asm/insn.h
-@@ -319,6 +319,7 @@ __AARCH64_INSN_FUNCS(and_imm,	0x7F800000, 0x12000000)
- __AARCH64_INSN_FUNCS(orr_imm,	0x7F800000, 0x32000000)
- __AARCH64_INSN_FUNCS(eor_imm,	0x7F800000, 0x52000000)
- __AARCH64_INSN_FUNCS(ands_imm,	0x7F800000, 0x72000000)
-+__AARCH64_INSN_FUNCS(extr,	0x7FA00000, 0x13800000)
- __AARCH64_INSN_FUNCS(b,		0xFC000000, 0x14000000)
- __AARCH64_INSN_FUNCS(bl,	0xFC000000, 0x94000000)
- __AARCH64_INSN_FUNCS(cbz,	0x7F000000, 0x34000000)
-@@ -433,6 +434,11 @@ u32 aarch64_insn_gen_logical_immediate(enum aarch64_insn_logic_type type,
- 				       enum aarch64_insn_register Rn,
- 				       enum aarch64_insn_register Rd,
- 				       u64 imm);
-+u32 aarch64_insn_gen_extr(enum aarch64_insn_variant variant,
-+			  enum aarch64_insn_register Rm,
-+			  enum aarch64_insn_register Rn,
-+			  enum aarch64_insn_register Rd,
-+			  u8 lsb);
- u32 aarch64_insn_gen_prefetch(enum aarch64_insn_register base,
- 			      enum aarch64_insn_prfm_type type,
- 			      enum aarch64_insn_prfm_target target,
-diff --git a/arch/arm64/kernel/insn.c b/arch/arm64/kernel/insn.c
-index 72cb1721c63f..59669d7d4383 100644
---- a/arch/arm64/kernel/insn.c
-+++ b/arch/arm64/kernel/insn.c
-@@ -1621,3 +1621,35 @@ u32 aarch64_insn_gen_logical_immediate(enum aarch64_insn_logic_type type,
- 	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RN, insn, Rn);
- 	return aarch64_encode_immediate(imm, variant, insn);
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index fa6f2174276b..cb3bef71ec9b 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -41,7 +41,8 @@
+ #include <asm/stage2_pgtable.h>
+ 
+ int create_hyp_mappings(void *from, void *to, pgprot_t prot);
+-int create_hyp_io_mappings(void *from, void *to, phys_addr_t);
++int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
++			   void __iomem **kaddr);
+ void free_hyp_pgds(void);
+ 
+ void stage2_unmap_vm(struct kvm *kvm);
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index b0c3cbe9b513..09a208014457 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -119,7 +119,8 @@ static inline unsigned long __kern_hyp_va(unsigned long v)
+ #include <asm/stage2_pgtable.h>
+ 
+ int create_hyp_mappings(void *from, void *to, pgprot_t prot);
+-int create_hyp_io_mappings(void *from, void *to, phys_addr_t);
++int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
++			   void __iomem **kaddr);
+ void free_hyp_pgds(void);
+ 
+ void stage2_unmap_vm(struct kvm *kvm);
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 84d09f1a44d4..38adbe0a016c 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -709,26 +709,30 @@ int create_hyp_mappings(void *from, void *to, pgprot_t prot)
  }
+ 
+ /**
+- * create_hyp_io_mappings - duplicate a kernel IO mapping into Hyp mode
+- * @from:	The kernel start VA of the range
+- * @to:		The kernel end VA of the range (exclusive)
++ * create_hyp_io_mappings - Map IO into both kernel and HYP
+  * @phys_addr:	The physical start address which gets mapped
++ * @size:	Size of the region being mapped
++ * @kaddr:	Kernel VA for this mapping
+  *
+  * The resulting HYP VA is the same as the kernel VA, modulo
+  * HYP_PAGE_OFFSET.
+  */
+-int create_hyp_io_mappings(void *from, void *to, phys_addr_t phys_addr)
++int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
++			   void __iomem **kaddr)
+ {
+-	unsigned long start = kern_hyp_va((unsigned long)from);
+-	unsigned long end = kern_hyp_va((unsigned long)to);
++	unsigned long start, end;
+ 
+-	if (is_kernel_in_hyp_mode())
++	*kaddr = ioremap(phys_addr, size);
++	if (!*kaddr)
++		return -ENOMEM;
 +
-+u32 aarch64_insn_gen_extr(enum aarch64_insn_variant variant,
-+			  enum aarch64_insn_register Rm,
-+			  enum aarch64_insn_register Rn,
-+			  enum aarch64_insn_register Rd,
-+			  u8 lsb)
-+{
-+	u32 insn;
-+
-+	insn = aarch64_insn_get_extr_value();
-+
-+	switch (variant) {
-+	case AARCH64_INSN_VARIANT_32BIT:
-+		if (lsb > 31)
-+			return AARCH64_BREAK_FAULT;
-+		break;
-+	case AARCH64_INSN_VARIANT_64BIT:
-+		if (lsb > 63)
-+			return AARCH64_BREAK_FAULT;
-+		insn |= AARCH64_INSN_SF_BIT;
-+		insn = aarch64_insn_encode_immediate(AARCH64_INSN_IMM_N, insn, 1);
-+		break;
-+	default:
-+		pr_err("%s: unknown variant encoding %d\n", __func__, variant);
-+		return AARCH64_BREAK_FAULT;
++	if (is_kernel_in_hyp_mode()) {
+ 		return 0;
 +	}
-+
-+	insn = aarch64_insn_encode_immediate(AARCH64_INSN_IMM_S, insn, lsb);
-+	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RD, insn, Rd);
-+	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RN, insn, Rn);
-+	return aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RM, insn, Rm);
-+}
+ 
+-	/* Check for a valid kernel IO mapping */
+-	if (!is_vmalloc_addr(from) || !is_vmalloc_addr(to - 1))
+-		return -EINVAL;
+ 
++	start = kern_hyp_va((unsigned long)*kaddr);
++	end = kern_hyp_va((unsigned long)*kaddr + size);
+ 	return __create_hyp_mappings(hyp_pgd, start, end,
+ 				     __phys_to_pfn(phys_addr), PAGE_HYP_DEVICE);
+ }
+diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+index 80897102da26..bc49d702f9f0 100644
+--- a/virt/kvm/arm/vgic/vgic-v2.c
++++ b/virt/kvm/arm/vgic/vgic-v2.c
+@@ -332,16 +332,10 @@ int vgic_v2_probe(const struct gic_kvm_info *info)
+ 	if (!PAGE_ALIGNED(info->vcpu.start) ||
+ 	    !PAGE_ALIGNED(resource_size(&info->vcpu))) {
+ 		kvm_info("GICV region size/alignment is unsafe, using trapping (reduced performance)\n");
+-		kvm_vgic_global_state.vcpu_base_va = ioremap(info->vcpu.start,
+-							     resource_size(&info->vcpu));
+-		if (!kvm_vgic_global_state.vcpu_base_va) {
+-			kvm_err("Cannot ioremap GICV\n");
+-			return -ENOMEM;
+-		}
+ 
+-		ret = create_hyp_io_mappings(kvm_vgic_global_state.vcpu_base_va,
+-					     kvm_vgic_global_state.vcpu_base_va + resource_size(&info->vcpu),
+-					     info->vcpu.start);
++		ret = create_hyp_io_mappings(info->vcpu.start,
++					     resource_size(&info->vcpu),
++					     &kvm_vgic_global_state.vcpu_base_va);
+ 		if (ret) {
+ 			kvm_err("Cannot map GICV into hyp\n");
+ 			goto out;
+@@ -350,26 +344,17 @@ int vgic_v2_probe(const struct gic_kvm_info *info)
+ 		static_branch_enable(&vgic_v2_cpuif_trap);
+ 	}
+ 
+-	kvm_vgic_global_state.vctrl_base = ioremap(info->vctrl.start,
+-						   resource_size(&info->vctrl));
+-	if (!kvm_vgic_global_state.vctrl_base) {
+-		kvm_err("Cannot ioremap GICH\n");
+-		ret = -ENOMEM;
++	ret = create_hyp_io_mappings(info->vctrl.start,
++				     resource_size(&info->vctrl),
++				     &kvm_vgic_global_state.vctrl_base);
++	if (ret) {
++		kvm_err("Cannot map VCTRL into hyp\n");
+ 		goto out;
+ 	}
+ 
+ 	vtr = readl_relaxed(kvm_vgic_global_state.vctrl_base + GICH_VTR);
+ 	kvm_vgic_global_state.nr_lr = (vtr & 0x3f) + 1;
+ 
+-	ret = create_hyp_io_mappings(kvm_vgic_global_state.vctrl_base,
+-				     kvm_vgic_global_state.vctrl_base +
+-					 resource_size(&info->vctrl),
+-				     info->vctrl.start);
+-	if (ret) {
+-		kvm_err("Cannot map VCTRL into hyp\n");
+-		goto out;
+-	}
+-
+ 	ret = kvm_register_vgic_device(KVM_DEV_TYPE_ARM_VGIC_V2);
+ 	if (ret) {
+ 		kvm_err("Cannot register GICv2 KVM device\n");
 -- 
 2.14.2
