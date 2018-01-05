@@ -1,77 +1,198 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v5 04/13] arm64: kernel: Survive corrected RAS errors
- notified by SError
-Date: Fri, 05 Jan 2018 18:28:46 +0000
-Message-ID: <5A4FC3DE.3010907@arm.com>
-References: <20171215155101.23505-1-james.morse@arm.com>
- <20171215155101.23505-5-james.morse@arm.com>
- <79ccc7df-802b-e25c-05cf-b1ecc7c05569@huawei.com>
- <720fa5cc-93a9-8844-c2f3-83116a724d1b@huawei.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D795049DAD
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Jan 2018 13:26:30 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hNHm90au+cKq for <kvmarm@lists.cs.columbia.edu>;
- Fri,  5 Jan 2018 13:26:29 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BE9C249D2B
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Jan 2018 13:26:29 -0500 (EST)
-In-Reply-To: <720fa5cc-93a9-8844-c2f3-83116a724d1b@huawei.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: gengdongjiu <gengdongjiu@huawei.com>, linux-arm-kernel@lists.infradead.org
-Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Linuxarm <linuxarm@huawei.com>, kvmarm@lists.cs.columbia.edu
+From: Shanker Donthineni <shankerd@codeaurora.org>
+Subject: [PATCH] arm64: Implement branch predictor hardening for Falkor
+Date: Fri,  5 Jan 2018 14:28:59 -0600
+Message-ID: <1515184139-23743-1-git-send-email-shankerd@codeaurora.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, linux-kernel <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Will Deacon <will.deacon@arm.com>, kvmarm <kvmarm@lists.cs.columbia.edu>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Vikram Sethi <vikrams@codeaurora.org>, Sean Campbell <scampbel@codeaurora.org>, Shanker Donthineni <shankerd@codeaurora.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGkgZ2VuZ2RvbmdqaXUsCgpPbiAxNi8xMi8xNyAwNDo1MSwgZ2VuZ2RvbmdqaXUgd3JvdGU6Cj4g
-T24gMjAxNy8xMi8xNiAxMjowOCwgZ2VuZ2RvbmdqaXUgd3JvdGU6Cj4+IE9uIDIwMTcvMTIvMTUg
-MjM6NTAsIEphbWVzIE1vcnNlIHdyb3RlOgo+Pj4gKwljYXNlIEVTUl9FTHhfQUVUX1VFUjoJLyog
-VW5jb3JyZWN0ZWQgUmVjb3ZlcmFibGUgKi8KPj4+ICsJCS8qCj4+PiArCQkgKiBUaGUgQ1BVIGNh
-bid0IG1ha2UgcHJvZ3Jlc3MuIFRoZSBleGNlcHRpb24gbWF5IGhhdmUKPj4+ICsJCSAqIGJlZW4g
-aW1wcmVjaXNlLgo+Pj4gKwkJICovCj4+PiArCQlyZXR1cm4gdHJ1ZTsKCj4+ICAgICAgICAgRm9y
-IFJlY292ZXJhYmxlIGVycm9yIChVRVIpLCB0aGUgZXJyb3IgaGFzIG5vdCBiZWVuICBzaWxlbnRs
-eSBwcm9wYWdhdGVkLAo+PiAgICAgICAgIGFuZCBoYXMgbm90IGJlZW4gYXJjaGl0ZWN0dXJhbGx5
-IGNvbnN1bWVkIGJ5IHRoZSBQRSwgYW5kCj4+ICAgICAgICAgVGhlIGV4Y2VwdGlvbiBpcyBwcmVj
-aXNlIGFuZCBQRSBjYW4gcmVjb3ZlciBleGVjdXRpb24gZnJvbSB0aGUgcHJlZmVycmVkIHJldHVy
-biBhZGRyZXNzIG9mIHRoZSBleGNlcHRpb24uCgo+PiAgICAgICAgIHNvIEkgZG8gbm90IHRoaW5r
-IGl0IHNob3VsZCBiZSBwYW5pYyBoZXJlIGlmIHRoZSBTRXJyb3IgY29tZSBmcm9tIHVzZXIgc3Bh
-Y2UgaW5zdGVhZCBvZiBjb21pbmcgZnJvbSBrZXJuZWwgc3BhY2UuCgonY29taW5nIGZyb20nIGRv
-ZXNuJ3QgbWVhbiBhbiBhd2Z1bCBsb3QgdW5sZXNzIHdlIGtub3cgd2hhdCB0aGUgZXJyb3IgaXMu
-ClRvIHJlcGVhdCB0aGUgZWFybGllciBleGFtcGxlcywgaXQgY291bGQgYmUgYSBmYXVsdCBpbiB0
-aGUgcGFnZSB0YWJsZXMsIG9yIHBhZ2VzCnNoYXJlZCBiZXR3ZWVuIHByb2Nlc3NlcywgZS5nLiB0
-aGUgdmRzbyBkYXRhIHBhZ2UuCgpJIGRvbid0IHdhbnQgdGhpcyBjcnVkZSBwYW5pYy9jb250aW51
-ZSB0byBjb25zaWRlciBhbnl0aGluZyBvdGhlciB0aGFuIHRoZSBFU1IuCkxldHMga2VlcCBpdCBj
-cnVkZSwgaXRzIGEgc3RvcC1nYXA6IGJvdGgga2VybmVsLWZpcnN0IGFuZCBmaXJtd2FyZS1maXJz
-dCBjYW4gZG8KYSBiZXR0ZXIgam9iIC0gdGhpcyBpcyBqdXN0IHNvbWUgZ2x1ZSB0byBob2xkIHRo
-aW5ncyB0b2dldGhlciB1bnRpbCB3ZSBoYXZlCm9uZS9ib3RoIGltcGxlbWVudGVkLgoKClsuLi5d
-Cgo+IFJlY292ZXJhYmxlIGVycm9yIChVRVIpCj4gVGhlIHN0YXRlIG9mIHRoZSBQRSBpcyBSZWNv
-dmVyYWJsZSBpZiBhbGwgb2YgdGhlIGZvbGxvd2luZyBhcmUgdHJ1ZToKPiDigJQgVGhlIGVycm9y
-IGhhcyBub3QgYmVlbiBzaWxlbnRseSBwcm9wYWdhdGVkLgo+IOKAlCBUaGUgZXJyb3IgaGFzIG5v
-dCBiZWVuIGFyY2hpdGVjdHVyYWxseSBjb25zdW1lZCBieSB0aGUgUEUuIChUaGUgUEUgYXJjaGl0
-ZWN0dXJhbCBzdGF0ZSBpcyBub3QgaW5mZWN0ZWQuKQo+IOKAlCBUaGUgZXhjZXB0aW9uIGlzIHBy
-ZWNpc2UgYW5kIFBFIGNhbiByZWNvdmVyIGV4ZWN1dGlvbiBmcm9tIHRoZSBwcmVmZXJyZWQgcmV0
-dXJuIGFkZHJlc3Mgb2YgdGhlIGV4Y2VwdGlvbiwgaWYgc29mdHdhcmUgbG9jYXRlcyBhbmQgcmVw
-YWlycyB0aGUgZXJyb3IuCgoKSXQncyB0aGlzIGJpdCB0aGF0IG1hZGUgbWUgZXJyIG9uIHRoZSBz
-aWRlIG9mIGNhdXRpb24vcGFuaWMoKToKCj4gVGhlIFBFIGNhbm5vdCBtYWtlIGNvcnJlY3QgcHJv
-Z3Jlc3Mgd2l0aG91dCBlaXRoZXIgY29uc3VtaW5nIHRoZSBlcnJvciBvcgo+IG90aGVyd2lzZSBt
-YWtpbmcgdGhlIGVycm9yIHVucmVjb3ZlcmFibGUuIFRoZSBlcnJvciByZW1haW5zIGxhdGVudCBp
-biB0aGUgc3lzdGVtLgoKV2l0aG91dCBmaXJtd2FyZS1maXJzdCBvciBrZXJuZWwtZmlyc3Qgd2Ug
-Y2FuJ3Qga25vdyB3aGVyZSB0aGUgZXJyb3IgaXMuIFdoYXQKc2hvdWxkIHdlIGRvPzoKCj4gSWYg
-c29mdHdhcmUgY2Fubm90IGxvY2F0ZSBhbmQgcmVwYWlyIHRoZSBlcnJvciwgZWl0aGVyIHRoZSBh
-cHBsaWNhdGlvbiBvciB0aGUKPiBWTSwgb3IgYm90aCwgbXVzdCBiZSBpc29sYXRlZCBieSBzb2Z0
-d2FyZS4KCgpUaGFua3MsCgpKYW1lcwpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJp
-YS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1h
-cm0K
+Falkor is susceptible to branch predictor aliasing and can
+theoretically be attacked by malicious code. This patch
+implements a mitigation for these attacks, preventing any
+malicious entries from affecting other victim contexts.
+
+Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
+---
+ This patch has been verified using tip of
+   https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git/log/?h=kpti
+        and
+   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/arch/arm64?h=v4.15-rc6&id=c622cc013cece073722592cff1ac6643a33b1622
+
+ arch/arm64/include/asm/cpucaps.h |  3 ++-
+ arch/arm64/include/asm/kvm_asm.h |  2 ++
+ arch/arm64/kernel/bpi.S          |  8 +++++++
+ arch/arm64/kernel/cpu_errata.c   | 49 ++++++++++++++++++++++++++++++++++++++--
+ arch/arm64/kvm/hyp/entry.S       | 12 ++++++++++
+ arch/arm64/kvm/hyp/switch.c      | 10 ++++++++
+ 6 files changed, 81 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+index 51616e7..7049b48 100644
+--- a/arch/arm64/include/asm/cpucaps.h
++++ b/arch/arm64/include/asm/cpucaps.h
+@@ -43,7 +43,8 @@
+ #define ARM64_SVE				22
+ #define ARM64_UNMAP_KERNEL_AT_EL0		23
+ #define ARM64_HARDEN_BRANCH_PREDICTOR		24
++#define ARM64_HARDEN_BP_POST_GUEST_EXIT		25
+ 
+-#define ARM64_NCAPS				25
++#define ARM64_NCAPS				26
+ 
+ #endif /* __ASM_CPUCAPS_H */
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index ab4d0a9..24961b7 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -68,6 +68,8 @@
+ 
+ extern u32 __init_stage2_translation(void);
+ 
++extern void __qcom_hyp_sanitize_btac_predictors(void);
++
+ #endif
+ 
+ #endif /* __ARM_KVM_ASM_H__ */
+diff --git a/arch/arm64/kernel/bpi.S b/arch/arm64/kernel/bpi.S
+index 2b10d52..44ffcda 100644
+--- a/arch/arm64/kernel/bpi.S
++++ b/arch/arm64/kernel/bpi.S
+@@ -77,3 +77,11 @@ ENTRY(__psci_hyp_bp_inval_start)
+ 	ldp	x2, x3, [sp], #16
+ 	ldp	x0, x1, [sp], #16
+ ENTRY(__psci_hyp_bp_inval_end)
++
++ENTRY(__qcom_hyp_sanitize_link_stack_start)
++	stp     x29, x30, [sp, #-16]!
++	.rept	16
++	bl	. + 4
++	.endr
++	ldp	x29, x30, [sp], #16
++ENTRY(__qcom_hyp_sanitize_link_stack_end)
+diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
+index cb0fb37..daf53a5 100644
+--- a/arch/arm64/kernel/cpu_errata.c
++++ b/arch/arm64/kernel/cpu_errata.c
+@@ -54,6 +54,8 @@ static int cpu_enable_trap_ctr_access(void *__unused)
+ 
+ #ifdef CONFIG_KVM
+ extern char __psci_hyp_bp_inval_start[], __psci_hyp_bp_inval_end[];
++extern char __qcom_hyp_sanitize_link_stack_start[];
++extern char __qcom_hyp_sanitize_link_stack_end[];
+ 
+ static void __copy_hyp_vect_bpi(int slot, const char *hyp_vecs_start,
+ 				const char *hyp_vecs_end)
+@@ -96,8 +98,10 @@ static void __install_bp_hardening_cb(bp_hardening_cb_t fn,
+ 	spin_unlock(&bp_lock);
+ }
+ #else
+-#define __psci_hyp_bp_inval_start	NULL
+-#define __psci_hyp_bp_inval_end		NULL
++#define __psci_hyp_bp_inval_start	   	NULL
++#define __psci_hyp_bp_inval_end			NULL
++#define __qcom_hyp_sanitize_link_stack_start	NULL
++#define __qcom_hyp_sanitize_link_stack_start	NULL
+ 
+ static void __install_bp_hardening_cb(bp_hardening_cb_t fn,
+ 				      const char *hyp_vecs_start,
+@@ -138,6 +142,29 @@ static int enable_psci_bp_hardening(void *data)
+ 
+ 	return 0;
+ }
++
++static void qcom_link_stack_sanitization(void)
++{
++	u64 tmp;
++
++	asm volatile("mov	%0, x30		\n"
++		     ".rept	16		\n"
++		     "bl	. + 4		\n"
++		     ".endr			\n"
++		     "mov	x30, %0		\n"
++		     : "=&r" (tmp));
++}
++
++static int qcom_enable_link_stack_sanitization(void *data)
++{
++	const struct arm64_cpu_capabilities *entry = data;
++
++	install_bp_hardening_cb(entry, qcom_link_stack_sanitization,
++				__qcom_hyp_sanitize_link_stack_start,
++				__qcom_hyp_sanitize_link_stack_end);
++
++	return 0;
++}
+ #endif	/* CONFIG_HARDEN_BRANCH_PREDICTOR */
+ 
+ #define MIDR_RANGE(model, min, max) \
+@@ -302,6 +329,24 @@ static int enable_psci_bp_hardening(void *data)
+ 		MIDR_ALL_VERSIONS(MIDR_CORTEX_A75),
+ 		.enable = enable_psci_bp_hardening,
+ 	},
++	{
++		.capability = ARM64_HARDEN_BRANCH_PREDICTOR,
++		MIDR_ALL_VERSIONS(MIDR_QCOM_FALKOR_V1),
++		.enable = qcom_enable_link_stack_sanitization,
++	},
++	{
++		.capability = ARM64_HARDEN_BRANCH_PREDICTOR,
++		MIDR_ALL_VERSIONS(MIDR_QCOM_FALKOR),
++		.enable = qcom_enable_link_stack_sanitization,
++	},
++	{
++		.capability = ARM64_HARDEN_BP_POST_GUEST_EXIT,
++		MIDR_ALL_VERSIONS(MIDR_QCOM_FALKOR_V1),
++	},
++	{
++		.capability = ARM64_HARDEN_BP_POST_GUEST_EXIT,
++		MIDR_ALL_VERSIONS(MIDR_QCOM_FALKOR),
++	},
+ #endif
+ 	{
+ 	}
+diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+index 12ee62d..9c45c6a 100644
+--- a/arch/arm64/kvm/hyp/entry.S
++++ b/arch/arm64/kvm/hyp/entry.S
+@@ -196,3 +196,15 @@ alternative_endif
+ 
+ 	eret
+ ENDPROC(__fpsimd_guest_restore)
++
++ENTRY(__qcom_hyp_sanitize_btac_predictors)
++	/**
++	 * Call SMC64 with Silicon provider serviceID 23<<8 (0xc2001700)
++	 * 0xC2000000-0xC200FFFF: assigned to SiP Service Calls
++	 * b15-b0: contains SiP functionID
++	 */
++	movz    x0, #0x1700
++	movk    x0, #0xc200, lsl #16
++	smc     #0
++	ret
++ENDPROC(__qcom_hyp_sanitize_btac_predictors)
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 4d273f6..7e37379 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -406,6 +406,16 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 		/* 0 falls through to be handled out of EL2 */
+ 	}
+ 
++	if (cpus_have_const_cap(ARM64_HARDEN_BP_POST_GUEST_EXIT)) {
++		u32 midr = read_cpuid_id();
++
++		/* Apply BTAC predictors mitigation to all Falkor chips */
++		if (((midr & MIDR_CPU_MODEL_MASK) == MIDR_QCOM_FALKOR) ||
++		    ((midr & MIDR_CPU_MODEL_MASK) == MIDR_QCOM_FALKOR_V1)) {
++			__qcom_hyp_sanitize_btac_predictors();
++		}
++	}
++
+ 	fp_enabled = __fpsimd_enabled();
+ 
+ 	__sysreg_save_guest_state(guest_ctxt);
+-- 
+Qualcomm Datacenter Technologies, Inc. on behalf of the Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
