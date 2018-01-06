@@ -1,23 +1,22 @@
 From: Dongjiu Geng <gengdongjiu@huawei.com>
-Subject: [PATCH v9 6/7] arm64: kvm: Set Virtual SError Exception Syndrome for
- guest
-Date: Sun, 7 Jan 2018 00:02:56 +0800
-Message-ID: <1515254577-6460-7-git-send-email-gengdongjiu@huawei.com>
+Subject: [PATCH v9 1/7] arm64: cpufeature: Detect CPU RAS Extentions
+Date: Sun, 7 Jan 2018 00:02:51 +0800
+Message-ID: <1515254577-6460-2-git-send-email-gengdongjiu@huawei.com>
 References: <1515254577-6460-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 936BC49DAC
- for <kvmarm@lists.cs.columbia.edu>; Sat,  6 Jan 2018 02:53:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C6F7349DAB
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  6 Jan 2018 02:53:34 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1CFcqbx2P4jy for <kvmarm@lists.cs.columbia.edu>;
- Sat,  6 Jan 2018 02:53:38 -0500 (EST)
-Received: from huawei.com (unknown [45.249.212.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6FDF649DD9
- for <kvmarm@lists.cs.columbia.edu>; Sat,  6 Jan 2018 02:53:37 -0500 (EST)
+ with ESMTP id pw4ebZp0Jlg8 for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  6 Jan 2018 02:53:33 -0500 (EST)
+Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 94E1F49DAE
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  6 Jan 2018 02:53:33 -0500 (EST)
 In-Reply-To: <1515254577-6460-1-git-send-email-gengdongjiu@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,169 +31,122 @@ To: christoffer.dall@linaro.org, marc.zyngier@arm.com, linux@armlinux.org.uk, ca
 Cc: huangshaoyu@huawei.com, gengdongjiu@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-RAS Extension add a VSESR_EL2 register which can provide
-the syndrome value reported to software on taking a virtual
-SError interrupt exception. This patch supports to specify
-this Syndrome.
+From: Xie XiuQi <xiexiuqi@huawei.com>
 
-In the RAS Extensions we can not set all-zero syndrome value
-for SError, which means 'RAS error: Uncategorized' instead of
-'no valid ISS'. So set it to IMPLEMENTATION DEFINED syndrome
-by default.
+ARM's v8.2 Extentions add support for Reliability, Availability and
+Serviceability (RAS). On CPUs with these extensions system software
+can use additional barriers to isolate errors and determine if faults
+are pending.
 
-We also need to support userspace to specify a valid syndrome
-value, Because in some case, the recovery is driven by userspace.
-This patch can support that userspace specify it.
+Add cpufeature detection and a barrier in the context-switch code.
+There is no need to use alternatives for this as CPUs that don't
+support this feature will treat the instruction as a nop.
 
-In the guest/host world switch, restore this value to VSESR_EL2
-only when HCR_EL2.VSE is set. This value no need to be saved
-because it is stale vale when guest exit.
+Platform level RAS support may require additional firmware support.
 
-Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-[Set an impdef ESR for Virtual-SError]
+Signed-off-by: Xie XiuQi <xiexiuqi@huawei.com>
+[Rebased added config option, reworded commit message]
 Signed-off-by: James Morse <james.morse@arm.com>
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 ---
- arch/arm64/include/asm/kvm_emulate.h | 10 ++++++++++
- arch/arm64/include/asm/kvm_host.h    |  1 +
- arch/arm64/include/asm/sysreg.h      |  3 +++
- arch/arm64/kvm/guest.c               | 11 ++++++++++-
- arch/arm64/kvm/hyp/switch.c          | 16 ++++++++++++++++
- arch/arm64/kvm/inject_fault.c        | 13 ++++++++++++-
- 6 files changed, 52 insertions(+), 2 deletions(-)
+ arch/arm64/Kconfig               | 16 ++++++++++++++++
+ arch/arm64/include/asm/cpucaps.h |  3 ++-
+ arch/arm64/include/asm/sysreg.h  |  2 ++
+ arch/arm64/kernel/cpufeature.c   | 13 +++++++++++++
+ 4 files changed, 33 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 555b28b..73c84d0 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -155,6 +155,16 @@ static inline u32 kvm_vcpu_get_hsr(const struct kvm_vcpu *vcpu)
- 	return vcpu->arch.fault.esr_el2;
- }
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 0df64a6..cc00d10 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -973,6 +973,22 @@ config ARM64_PMEM
+ 	  operations if DC CVAP is not supported (following the behaviour of
+ 	  DC CVAP itself if the system does not define a point of persistence).
  
-+static inline u32 kvm_vcpu_get_vsesr(const struct kvm_vcpu *vcpu)
-+{
-+	return vcpu->arch.fault.vsesr_el2;
-+}
++config ARM64_RAS_EXTN
++	bool "Enable support for RAS CPU Extensions"
++	default y
++	help
++	  CPUs that support the Reliability, Availability and Serviceability
++	  (RAS) Extensions, part of ARMv8.2 are able to track faults and
++	  errors, classify them and report them to software.
 +
-+static inline void kvm_vcpu_set_vsesr(struct kvm_vcpu *vcpu, unsigned long val)
-+{
-+	vcpu->arch.fault.vsesr_el2 = val;
-+}
++	  On CPUs with these extensions system software can use additional
++	  barriers to determine if faults are pending and read the
++	  classification from a new set of registers.
 +
- static inline int kvm_vcpu_get_condition(const struct kvm_vcpu *vcpu)
- {
- 	u32 esr = kvm_vcpu_get_hsr(vcpu);
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 769cc58..53d1d81 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -88,6 +88,7 @@ struct kvm_vcpu_fault_info {
- 	u32 esr_el2;		/* Hyp Syndrom Register */
- 	u64 far_el2;		/* Hyp Fault Address Register */
- 	u64 hpfar_el2;		/* Hyp IPA Fault Address Register */
-+	u32 vsesr_el2;          /* Virtual SError Exception Syndrome Register */
- };
++	  Selecting this feature will allow the kernel to use these barriers
++	  and access the new registers if the system supports the extension.
++	  Platform RAS features may additionally depend on firmware support.
++
+ endmenu
  
- /*
+ config ARM64_MODULE_CMODEL_LARGE
+diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+index 8da6216..4820d44 100644
+--- a/arch/arm64/include/asm/cpucaps.h
++++ b/arch/arm64/include/asm/cpucaps.h
+@@ -40,7 +40,8 @@
+ #define ARM64_WORKAROUND_858921			19
+ #define ARM64_WORKAROUND_CAVIUM_30115		20
+ #define ARM64_HAS_DCPOP				21
++#define ARM64_HAS_RAS_EXTN			22
+ 
+-#define ARM64_NCAPS				22
++#define ARM64_NCAPS				23
+ 
+ #endif /* __ASM_CPUCAPS_H */
 diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 47b967d..3b035cc 100644
+index f707fed..64e2a80 100644
 --- a/arch/arm64/include/asm/sysreg.h
 +++ b/arch/arm64/include/asm/sysreg.h
-@@ -86,6 +86,9 @@
- #define REG_PSTATE_PAN_IMM		sys_reg(0, 0, 4, 0, 4)
- #define REG_PSTATE_UAO_IMM		sys_reg(0, 0, 4, 0, 3)
+@@ -332,6 +332,7 @@
+ #define ID_AA64ISAR1_DPB_SHIFT		0
  
-+/* virtual SError exception syndrome register */
-+#define REG_VSESR_EL2                  sys_reg(3, 4, 5, 2, 3)
-+
- #define SET_PSTATE_PAN(x) __emit_inst(0xd5000000 | REG_PSTATE_PAN_IMM |	\
- 				      (!!x)<<8 | 0x1f)
- #define SET_PSTATE_UAO(x) __emit_inst(0xd5000000 | REG_PSTATE_UAO_IMM |	\
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 738ae90..ffad42b 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -279,7 +279,16 @@ int kvm_arch_vcpu_ioctl_set_sregs(struct kvm_vcpu *vcpu,
+ /* id_aa64pfr0 */
++#define ID_AA64PFR0_RAS_SHIFT		28
+ #define ID_AA64PFR0_GIC_SHIFT		24
+ #define ID_AA64PFR0_ASIMD_SHIFT		20
+ #define ID_AA64PFR0_FP_SHIFT		16
+@@ -340,6 +341,7 @@
+ #define ID_AA64PFR0_EL1_SHIFT		4
+ #define ID_AA64PFR0_EL0_SHIFT		0
  
- int kvm_arm_set_sei_esr(struct kvm_vcpu *vcpu, u32 *syndrome)
- {
--	return -EINVAL;
-+	u64 reg = *syndrome;
-+
-+	/* inject virtual system Error or asynchronous abort */
-+	kvm_inject_vabt(vcpu);
-+
-+	if (reg)
-+		/* set vsesr_el2[24:0] with value that user space specified */
-+		kvm_vcpu_set_vsesr(vcpu, reg & ESR_ELx_ISS_MASK);
-+
-+	return 0;
- }
++#define ID_AA64PFR0_RAS_V1		0x1
+ #define ID_AA64PFR0_FP_NI		0xf
+ #define ID_AA64PFR0_FP_SUPPORTED	0x0
+ #define ID_AA64PFR0_ASIMD_NI		0xf
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 21e2c95..4846974 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -125,6 +125,7 @@ static int __init register_cpu_hwcaps_dumper(void)
+ };
  
- int __attribute_const__ kvm_target_cpu(void)
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index fb5a538..7f08a5d 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -67,6 +67,14 @@ static hyp_alternate_select(__activate_traps_arch,
- 			    __activate_traps_nvhe, __activate_traps_vhe,
- 			    ARM64_HAS_VIRT_HOST_EXTN);
+ static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_EXACT, ID_AA64PFR0_RAS_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_EXACT, ID_AA64PFR0_GIC_SHIFT, 4, 0),
+ 	S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_ASIMD_SHIFT, 4, ID_AA64PFR0_ASIMD_NI),
+ 	S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_FP_SHIFT, 4, ID_AA64PFR0_FP_NI),
+@@ -900,6 +901,18 @@ static bool has_no_fpsimd(const struct arm64_cpu_capabilities *entry, int __unus
+ 		.min_field_value = 1,
+ 	},
+ #endif
++#ifdef CONFIG_ARM64_RAS_EXTN
++	{
++		.desc = "RAS Extension Support",
++		.capability = ARM64_HAS_RAS_EXTN,
++		.def_scope = SCOPE_SYSTEM,
++		.matches = has_cpuid_feature,
++		.sys_reg = SYS_ID_AA64PFR0_EL1,
++		.sign = FTR_UNSIGNED,
++		.field_pos = ID_AA64PFR0_RAS_SHIFT,
++		.min_field_value = ID_AA64PFR0_RAS_V1,
++	},
++#endif /* CONFIG_ARM64_RAS_EXTN */
+ 	{},
+ };
  
-+static void __hyp_text __sysreg_set_vsesr(struct kvm_vcpu *vcpu, u64 value)
-+{
-+	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN) &&
-+			       (value & HCR_VSE))
-+		write_sysreg_s(kvm_vcpu_get_vsesr(vcpu), REG_VSESR_EL2);
-+}
-+
-+
- static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
- {
- 	u64 val;
-@@ -86,6 +94,14 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
- 		isb();
- 	}
- 	write_sysreg(val, hcr_el2);
-+
-+	/*
-+	 * If the virtual SError interrupt is taken to EL1 using AArch64,
-+	 * then VSESR_EL2 provides the syndrome value reported in ISS field
-+	 * of ESR_EL1.
-+	 */
-+	__sysreg_set_vsesr(vcpu, val);
-+
- 	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
- 	write_sysreg(1 << 15, hstr_el2);
- 	/*
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index 3556715..fb94b5e 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -246,14 +246,25 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
- 		inject_undef64(vcpu);
- }
- 
-+static void pend_guest_serror(struct kvm_vcpu *vcpu, u64 esr)
-+{
-+	kvm_vcpu_set_vsesr(vcpu, esr);
-+	vcpu_set_hcr(vcpu, vcpu_get_hcr(vcpu) | HCR_VSE);
-+}
-+
- /**
-  * kvm_inject_vabt - inject an async abort / SError into the guest
-  * @vcpu: The VCPU to receive the exception
-  *
-  * It is assumed that this code is called from the VCPU thread and that the
-  * VCPU therefore is not currently executing guest code.
-+ *
-+ * Systems with the RAS Extensions specify an imp-def ESR (ISV/IDS = 1) with
-+ * the remaining ISS all-zeros so that this error is not interpreted as an
-+ * uncatagorized RAS error. Without the RAS Extensions we can't specify an ESR
-+ * value, so the CPU generates an imp-def value.
-  */
- void kvm_inject_vabt(struct kvm_vcpu *vcpu)
- {
--	vcpu_set_hcr(vcpu, vcpu_get_hcr(vcpu) | HCR_VSE);
-+	pend_guest_serror(vcpu, ESR_ELx_ISV);
- }
 -- 
 1.9.1
