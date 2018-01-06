@@ -1,88 +1,78 @@
-From: "Brown, Aaron F" <aaron.f.brown@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH 1/1] timecounter: Make cyclecounter
- struct part of timecounter struct
-Date: Sat, 6 Jan 2018 04:29:23 +0000
-Message-ID: <309B89C4C689E141A5FF6A0C5FB2118B8C731E65@ORSMSX101.amr.corp.intel.com>
-References: <1512189095-28654-1-git-send-email-sagar.a.kamble@intel.com>
- <1512577496.8693.0.camel@intel.com>
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+Subject: [PATCH v9 2/7] KVM: arm64: Save ESR_EL2 on guest SError
+Date: Sun, 7 Jan 2018 00:02:52 +0800
+Message-ID: <1515254577-6460-3-git-send-email-gengdongjiu@huawei.com>
+References: <1515254577-6460-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1512577496.8693.0.camel@intel.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: "Kirsher, Jeffrey T" <jeffrey.t.kirsher@intel.com>, "Kamble, Sagar A" <sagar.a.kamble@intel.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Cc: "alsa-devel@alsa-project.org" <alsa-devel@alsa-project.org>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Richard Cochran <richardcochran@gmail.com>, Stephen Boyd <sboyd@codeaurora.org>, Chris Wilson <chris@chris-wilson.co.uk>, John Stultz <john.stultz@linaro.org>, "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, Thomas Gleixner <tglx@linutronix.de>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3626A49DB3
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  6 Jan 2018 02:53:34 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id fNIrHF8hxYK6 for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  6 Jan 2018 02:53:33 -0500 (EST)
+Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D97C849D51
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  6 Jan 2018 02:53:32 -0500 (EST)
+In-Reply-To: <1515254577-6460-1-git-send-email-gengdongjiu@huawei.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: christoffer.dall@linaro.org, marc.zyngier@arm.com, linux@armlinux.org.uk, catalin.marinas@arm.com, rjw@rjwysocki.net, bp@alien8.de, robert.moore@intel.com, lv.zheng@intel.com, james.morse@arm.com, corbet@lwn.net, will.deacon@arm.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-acpi@vger.kernel.org, devel@acpica.org
+Cc: huangshaoyu@huawei.com, gengdongjiu@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-PiBGcm9tOiBJbnRlbC13aXJlZC1sYW4gW21haWx0bzppbnRlbC13aXJlZC1sYW4tYm91bmNlc0Bv
-c3Vvc2wub3JnXSBPbg0KPiBCZWhhbGYgT2YgSmVmZiBLaXJzaGVyDQo+IFNlbnQ6IFdlZG5lc2Rh
-eSwgRGVjZW1iZXIgNiwgMjAxNyA4OjI1IEFNDQo+IFRvOiBLYW1ibGUsIFNhZ2FyIEEgPHNhZ2Fy
-LmEua2FtYmxlQGludGVsLmNvbT47IGxpbnV4LQ0KPiBrZXJuZWxAdmdlci5rZXJuZWwub3JnDQo+
-IENjOiBhbHNhLWRldmVsQGFsc2EtcHJvamVjdC5vcmc7IGxpbnV4LXJkbWFAdmdlci5rZXJuZWwu
-b3JnOw0KPiBuZXRkZXZAdmdlci5rZXJuZWwub3JnOyBSaWNoYXJkIENvY2hyYW4gPHJpY2hhcmRj
-b2NocmFuQGdtYWlsLmNvbT47DQo+IFN0ZXBoZW4gQm95ZCA8c2JveWRAY29kZWF1cm9yYS5vcmc+
-OyBDaHJpcyBXaWxzb24gPGNocmlzQGNocmlzLQ0KPiB3aWxzb24uY28udWs+OyBKb2huIFN0dWx0
-eiA8am9obi5zdHVsdHpAbGluYXJvLm9yZz47IGludGVsLXdpcmVkLQ0KPiBsYW5AbGlzdHMub3N1
-b3NsLm9yZzsgVGhvbWFzIEdsZWl4bmVyIDx0Z2x4QGxpbnV0cm9uaXguZGU+Ow0KPiBrdm1hcm1A
-bGlzdHMuY3MuY29sdW1iaWEuZWR1OyBsaW51eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5v
-cmcNCj4gU3ViamVjdDogUmU6IFtJbnRlbC13aXJlZC1sYW5dIFtQQVRDSCAxLzFdIHRpbWVjb3Vu
-dGVyOiBNYWtlIGN5Y2xlY291bnRlcg0KPiBzdHJ1Y3QgcGFydCBvZiB0aW1lY291bnRlciBzdHJ1
-Y3QNCj4gDQo+IE9uIFNhdCwgMjAxNy0xMi0wMiBhdCAxMDowMSArMDUzMCwgU2FnYXIgQXJ1biBL
-YW1ibGUgd3JvdGU6DQo+ID4gVGhlcmUgaXMgbm8gcmVhbCBuZWVkIGZvciB0aGUgdXNlcnMgb2Yg
-dGltZWNvdW50ZXJzIHRvIGRlZmluZQ0KPiA+IGN5Y2xlY291bnRlcg0KPiA+IGFuZCB0aW1lY291
-bnRlciB2YXJpYWJsZXMgc2VwYXJhdGVseS4gU2luY2UgdGltZWNvdW50ZXIgd2lsbCBhbHdheXMN
-Cj4gPiBiZQ0KPiA+IGJhc2VkIG9uIGN5Y2xlY291bnRlciwgaGF2ZSBjeWNsZWNvdW50ZXIgc3Ry
-dWN0IGFzIG1lbWJlciBvZg0KPiA+IHRpbWVjb3VudGVyDQo+ID4gc3RydWN0Lg0KPiA+DQo+ID4g
-U3VnZ2VzdGVkLWJ5OiBDaHJpcyBXaWxzb24gPGNocmlzQGNocmlzLXdpbHNvbi5jby51az4NCj4g
-PiBTaWduZWQtb2ZmLWJ5OiBTYWdhciBBcnVuIEthbWJsZSA8c2FnYXIuYS5rYW1ibGVAaW50ZWwu
-Y29tPg0KPiA+IENjOiBDaHJpcyBXaWxzb24gPGNocmlzQGNocmlzLXdpbHNvbi5jby51az4NCj4g
-PiBDYzogUmljaGFyZCBDb2NocmFuIDxyaWNoYXJkY29jaHJhbkBnbWFpbC5jb20+DQo+ID4gQ2M6
-IEpvaG4gU3R1bHR6IDxqb2huLnN0dWx0ekBsaW5hcm8ub3JnPg0KPiA+IENjOiBUaG9tYXMgR2xl
-aXhuZXIgPHRnbHhAbGludXRyb25peC5kZT4NCj4gPiBDYzogU3RlcGhlbiBCb3lkIDxzYm95ZEBj
-b2RlYXVyb3JhLm9yZz4NCj4gPiBDYzogbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZw0KPiA+
-IENjOiBsaW51eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5vcmcNCj4gPiBDYzogbmV0ZGV2
-QHZnZXIua2VybmVsLm9yZw0KPiA+IENjOiBpbnRlbC13aXJlZC1sYW5AbGlzdHMub3N1b3NsLm9y
-Zw0KPiA+IENjOiBsaW51eC1yZG1hQHZnZXIua2VybmVsLm9yZw0KPiA+IENjOiBhbHNhLWRldmVs
-QGFsc2EtcHJvamVjdC5vcmcNCj4gPiBDYzoga3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQ0K
-PiANCj4gQWNrZWQtYnk6IEplZmYgS2lyc2hlciA8amVmZnJleS50LmtpcnNoZXJAaW50ZWwuY29t
-Pg0KPiANCg0KVGVzdGVkLWJ5OiBBYXJvbiBCcm93biA8YWFyb24uZi5icm93bkBpbnRlbC5jb20+
-DQoNCj4gRm9yIHRoZSBjaGFuZ2VzIHRvIHRoZSBJbnRlbCBkcml2ZXJzLg0KPiANCj4gPiAtLS0N
-Cj4gPiAgYXJjaC9taWNyb2JsYXplL2tlcm5lbC90aW1lci5jICAgICAgICAgICAgICAgICAgICAg
-fCAyMCArKysrKystLS0tLS0NCj4gPiAgZHJpdmVycy9jbG9ja3NvdXJjZS9hcm1fYXJjaF90aW1l
-ci5jICAgICAgICAgICAgICAgfCAxOSArKysrKystLS0tLS0NCj4gPiAgZHJpdmVycy9uZXQvZXRo
-ZXJuZXQvYW1kL3hnYmUveGdiZS1kZXYuYyAgICAgICAgICAgfCAgMyArLQ0KPiA+ICBkcml2ZXJz
-L25ldC9ldGhlcm5ldC9hbWQveGdiZS94Z2JlLXB0cC5jICAgICAgICAgICB8ICA5ICsrKy0tLQ0K
-PiA+ICBkcml2ZXJzL25ldC9ldGhlcm5ldC9hbWQveGdiZS94Z2JlLmggICAgICAgICAgICAgICB8
-ICAxIC0NCj4gPiAgZHJpdmVycy9uZXQvZXRoZXJuZXQvYnJvYWRjb20vYm54MngvYm54MnguaCAg
-ICAgICAgfCAgMSAtDQo+ID4gIGRyaXZlcnMvbmV0L2V0aGVybmV0L2Jyb2FkY29tL2JueDJ4L2Ju
-eDJ4X21haW4uYyAgIHwgMjAgKysrKysrLS0tLS0tDQo+ID4gIGRyaXZlcnMvbmV0L2V0aGVybmV0
-L2ZyZWVzY2FsZS9mZWMuaCAgICAgICAgICAgICAgIHwgIDEgLQ0KPiA+ICBkcml2ZXJzL25ldC9l
-dGhlcm5ldC9mcmVlc2NhbGUvZmVjX3B0cC5jICAgICAgICAgICB8IDMwICsrKysrKysrKy0tLQ0K
-PiA+IC0tLS0tLQ0KPiA+ICBkcml2ZXJzL25ldC9ldGhlcm5ldC9pbnRlbC9lMTAwMGUvZTEwMDAu
-aCAgICAgICAgICB8ICAxIC0NCj4gPiAgZHJpdmVycy9uZXQvZXRoZXJuZXQvaW50ZWwvZTEwMDBl
-L25ldGRldi5jICAgICAgICAgfCAyNyArKysrKysrKy0tDQo+ID4gLS0tLS0tDQo+ID4gIGRyaXZl
-cnMvbmV0L2V0aGVybmV0L2ludGVsL2UxMDAwZS9wdHAuYyAgICAgICAgICAgIHwgIDIgKy0NCj4g
-PiAgZHJpdmVycy9uZXQvZXRoZXJuZXQvaW50ZWwvaWdiL2lnYi5oICAgICAgICAgICAgICAgfCAg
-MSAtDQo+ID4gIGRyaXZlcnMvbmV0L2V0aGVybmV0L2ludGVsL2lnYi9pZ2JfcHRwLmMgICAgICAg
-ICAgIHwgMjUgKysrKysrKystLQ0KPiA+IC0tLS0tDQo+ID4gIGRyaXZlcnMvbmV0L2V0aGVybmV0
-L2ludGVsL2l4Z2JlL2l4Z2JlLmggICAgICAgICAgIHwgIDEgLQ0KPiA+ICBkcml2ZXJzL25ldC9l
-dGhlcm5ldC9pbnRlbC9peGdiZS9peGdiZV9wdHAuYyAgICAgICB8IDE3ICsrKysrLS0tLS0NCj4g
-PiAgZHJpdmVycy9uZXQvZXRoZXJuZXQvbWVsbGFub3gvbWx4NC9lbl9jbG9jay5jICAgICAgfCAy
-OCArKysrKysrKy0tDQo+ID4gLS0tLS0tLQ0KPiA+ICBkcml2ZXJzL25ldC9ldGhlcm5ldC9tZWxs
-YW5veC9tbHg0L21seDRfZW4uaCAgICAgICB8ICAxIC0NCj4gPiAgLi4uL25ldC9ldGhlcm5ldC9t
-ZWxsYW5veC9tbHg1L2NvcmUvbGliL2Nsb2NrLmMgICAgfCAzNCArKysrKysrKysrDQo+ID4gLS0t
-LS0tLS0tLQ0KPiA+ICBkcml2ZXJzL25ldC9ldGhlcm5ldC9xbG9naWMvcWVkZS9xZWRlX3B0cC5j
-ICAgICAgICB8IDIwICsrKysrKy0tLS0tLQ0KPiA+ICBkcml2ZXJzL25ldC9ldGhlcm5ldC90aS9j
-cHRzLmMgICAgICAgICAgICAgICAgICAgICB8IDM2DQo+ID4gKysrKysrKysrKysrLS0tLS0tLS0t
-LQ0KPiA+ICBkcml2ZXJzL25ldC9ldGhlcm5ldC90aS9jcHRzLmggICAgICAgICAgICAgICAgICAg
-ICB8ICAxIC0NCj4gPiAgaW5jbHVkZS9saW51eC9tbHg1L2RyaXZlci5oICAgICAgICAgICAgICAg
-ICAgICAgICAgfCAgMSAtDQo+ID4gIGluY2x1ZGUvbGludXgvdGltZWNvdW50ZXIuaCAgICAgICAg
-ICAgICAgICAgICAgICAgIHwgIDQgKy0tDQo+ID4gIGluY2x1ZGUvc291bmQvaGRhdWRpby5oICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDEgLQ0KPiA+ICBrZXJuZWwvdGltZS90aW1lY291
-bnRlci5jICAgICAgICAgICAgICAgICAgICAgICAgICB8IDI4ICsrKysrKysrLS0NCj4gPiAtLS0t
-LS0tDQo+ID4gIHNvdW5kL2hkYS9oZGFjX3N0cmVhbS5jICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIHwgIDcgKysrLS0NCj4gPiAgdmlydC9rdm0vYXJtL2FyY2hfdGltZXIuYyAgICAgICAgICAg
-ICAgICAgICAgICAgICAgfCAgNiArKy0tDQo+ID4gIDI4IGZpbGVzIGNoYW5nZWQsIDE2MyBpbnNl
-cnRpb25zKCspLCAxODIgZGVsZXRpb25zKC0pDQo=
+From: James Morse <james.morse@arm.com>
+
+When we exit a guest due to an SError the vcpu fault info isn't updated
+with the ESR. Today this is only done for traps.
+
+The v8.2 RAS Extensions define ISS values for SError. Update the vcpu's
+fault_info with the ESR on SError so that handle_exit() can determine
+if this was a RAS SError and decode its severity.
+
+Signed-off-by: James Morse <james.morse@arm.com>
+---
+ arch/arm64/kvm/hyp/switch.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 945e79c..fb5a538 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -228,11 +228,12 @@ static bool __hyp_text __translate_far_to_hpfar(u64 far, u64 *hpfar)
+ 
+ static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
+ {
+-	u64 esr = read_sysreg_el2(esr);
+-	u8 ec = ESR_ELx_EC(esr);
++	u8 ec;
++	u64 esr;
+ 	u64 hpfar, far;
+ 
+-	vcpu->arch.fault.esr_el2 = esr;
++	esr = vcpu->arch.fault.esr_el2;
++	ec = ESR_ELx_EC(esr);
+ 
+ 	if (ec != ESR_ELx_EC_DABT_LOW && ec != ESR_ELx_EC_IABT_LOW)
+ 		return true;
+@@ -313,6 +314,8 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 	exit_code = __guest_enter(vcpu, host_ctxt);
+ 	/* And we're baaack! */
+ 
++	if (ARM_EXCEPTION_CODE(exit_code) != ARM_EXCEPTION_IRQ)
++		vcpu->arch.fault.esr_el2 = read_sysreg_el2(esr);
+ 	/*
+ 	 * We're using the raw exception code in order to only process
+ 	 * the trap if no SError is pending. We will come back to the
+-- 
+1.9.1
