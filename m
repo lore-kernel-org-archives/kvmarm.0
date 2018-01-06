@@ -1,198 +1,88 @@
-From: Shanker Donthineni <shankerd@codeaurora.org>
-Subject: [PATCH] arm64: Implement branch predictor hardening for Falkor
-Date: Fri,  5 Jan 2018 14:28:59 -0600
-Message-ID: <1515184139-23743-1-git-send-email-shankerd@codeaurora.org>
+From: "Brown, Aaron F" <aaron.f.brown@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH 1/1] timecounter: Make cyclecounter
+ struct part of timecounter struct
+Date: Sat, 6 Jan 2018 04:29:23 +0000
+Message-ID: <309B89C4C689E141A5FF6A0C5FB2118B8C731E65@ORSMSX101.amr.corp.intel.com>
+References: <1512189095-28654-1-git-send-email-sagar.a.kamble@intel.com>
+ <1512577496.8693.0.camel@intel.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1512577496.8693.0.camel@intel.com>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, linux-kernel <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Will Deacon <will.deacon@arm.com>, kvmarm <kvmarm@lists.cs.columbia.edu>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Vikram Sethi <vikrams@codeaurora.org>, Sean Campbell <scampbel@codeaurora.org>, Shanker Donthineni <shankerd@codeaurora.org>
+To: "Kirsher, Jeffrey T" <jeffrey.t.kirsher@intel.com>, "Kamble, Sagar A" <sagar.a.kamble@intel.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Cc: "alsa-devel@alsa-project.org" <alsa-devel@alsa-project.org>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Richard Cochran <richardcochran@gmail.com>, Stephen Boyd <sboyd@codeaurora.org>, Chris Wilson <chris@chris-wilson.co.uk>, John Stultz <john.stultz@linaro.org>, "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, Thomas Gleixner <tglx@linutronix.de>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Falkor is susceptible to branch predictor aliasing and can
-theoretically be attacked by malicious code. This patch
-implements a mitigation for these attacks, preventing any
-malicious entries from affecting other victim contexts.
-
-Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
----
- This patch has been verified using tip of
-   https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git/log/?h=kpti
-        and
-   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/arch/arm64?h=v4.15-rc6&id=c622cc013cece073722592cff1ac6643a33b1622
-
- arch/arm64/include/asm/cpucaps.h |  3 ++-
- arch/arm64/include/asm/kvm_asm.h |  2 ++
- arch/arm64/kernel/bpi.S          |  8 +++++++
- arch/arm64/kernel/cpu_errata.c   | 49 ++++++++++++++++++++++++++++++++++++++--
- arch/arm64/kvm/hyp/entry.S       | 12 ++++++++++
- arch/arm64/kvm/hyp/switch.c      | 10 ++++++++
- 6 files changed, 81 insertions(+), 3 deletions(-)
-
-diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-index 51616e7..7049b48 100644
---- a/arch/arm64/include/asm/cpucaps.h
-+++ b/arch/arm64/include/asm/cpucaps.h
-@@ -43,7 +43,8 @@
- #define ARM64_SVE				22
- #define ARM64_UNMAP_KERNEL_AT_EL0		23
- #define ARM64_HARDEN_BRANCH_PREDICTOR		24
-+#define ARM64_HARDEN_BP_POST_GUEST_EXIT		25
- 
--#define ARM64_NCAPS				25
-+#define ARM64_NCAPS				26
- 
- #endif /* __ASM_CPUCAPS_H */
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index ab4d0a9..24961b7 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -68,6 +68,8 @@
- 
- extern u32 __init_stage2_translation(void);
- 
-+extern void __qcom_hyp_sanitize_btac_predictors(void);
-+
- #endif
- 
- #endif /* __ARM_KVM_ASM_H__ */
-diff --git a/arch/arm64/kernel/bpi.S b/arch/arm64/kernel/bpi.S
-index 2b10d52..44ffcda 100644
---- a/arch/arm64/kernel/bpi.S
-+++ b/arch/arm64/kernel/bpi.S
-@@ -77,3 +77,11 @@ ENTRY(__psci_hyp_bp_inval_start)
- 	ldp	x2, x3, [sp], #16
- 	ldp	x0, x1, [sp], #16
- ENTRY(__psci_hyp_bp_inval_end)
-+
-+ENTRY(__qcom_hyp_sanitize_link_stack_start)
-+	stp     x29, x30, [sp, #-16]!
-+	.rept	16
-+	bl	. + 4
-+	.endr
-+	ldp	x29, x30, [sp], #16
-+ENTRY(__qcom_hyp_sanitize_link_stack_end)
-diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-index cb0fb37..daf53a5 100644
---- a/arch/arm64/kernel/cpu_errata.c
-+++ b/arch/arm64/kernel/cpu_errata.c
-@@ -54,6 +54,8 @@ static int cpu_enable_trap_ctr_access(void *__unused)
- 
- #ifdef CONFIG_KVM
- extern char __psci_hyp_bp_inval_start[], __psci_hyp_bp_inval_end[];
-+extern char __qcom_hyp_sanitize_link_stack_start[];
-+extern char __qcom_hyp_sanitize_link_stack_end[];
- 
- static void __copy_hyp_vect_bpi(int slot, const char *hyp_vecs_start,
- 				const char *hyp_vecs_end)
-@@ -96,8 +98,10 @@ static void __install_bp_hardening_cb(bp_hardening_cb_t fn,
- 	spin_unlock(&bp_lock);
- }
- #else
--#define __psci_hyp_bp_inval_start	NULL
--#define __psci_hyp_bp_inval_end		NULL
-+#define __psci_hyp_bp_inval_start	   	NULL
-+#define __psci_hyp_bp_inval_end			NULL
-+#define __qcom_hyp_sanitize_link_stack_start	NULL
-+#define __qcom_hyp_sanitize_link_stack_start	NULL
- 
- static void __install_bp_hardening_cb(bp_hardening_cb_t fn,
- 				      const char *hyp_vecs_start,
-@@ -138,6 +142,29 @@ static int enable_psci_bp_hardening(void *data)
- 
- 	return 0;
- }
-+
-+static void qcom_link_stack_sanitization(void)
-+{
-+	u64 tmp;
-+
-+	asm volatile("mov	%0, x30		\n"
-+		     ".rept	16		\n"
-+		     "bl	. + 4		\n"
-+		     ".endr			\n"
-+		     "mov	x30, %0		\n"
-+		     : "=&r" (tmp));
-+}
-+
-+static int qcom_enable_link_stack_sanitization(void *data)
-+{
-+	const struct arm64_cpu_capabilities *entry = data;
-+
-+	install_bp_hardening_cb(entry, qcom_link_stack_sanitization,
-+				__qcom_hyp_sanitize_link_stack_start,
-+				__qcom_hyp_sanitize_link_stack_end);
-+
-+	return 0;
-+}
- #endif	/* CONFIG_HARDEN_BRANCH_PREDICTOR */
- 
- #define MIDR_RANGE(model, min, max) \
-@@ -302,6 +329,24 @@ static int enable_psci_bp_hardening(void *data)
- 		MIDR_ALL_VERSIONS(MIDR_CORTEX_A75),
- 		.enable = enable_psci_bp_hardening,
- 	},
-+	{
-+		.capability = ARM64_HARDEN_BRANCH_PREDICTOR,
-+		MIDR_ALL_VERSIONS(MIDR_QCOM_FALKOR_V1),
-+		.enable = qcom_enable_link_stack_sanitization,
-+	},
-+	{
-+		.capability = ARM64_HARDEN_BRANCH_PREDICTOR,
-+		MIDR_ALL_VERSIONS(MIDR_QCOM_FALKOR),
-+		.enable = qcom_enable_link_stack_sanitization,
-+	},
-+	{
-+		.capability = ARM64_HARDEN_BP_POST_GUEST_EXIT,
-+		MIDR_ALL_VERSIONS(MIDR_QCOM_FALKOR_V1),
-+	},
-+	{
-+		.capability = ARM64_HARDEN_BP_POST_GUEST_EXIT,
-+		MIDR_ALL_VERSIONS(MIDR_QCOM_FALKOR),
-+	},
- #endif
- 	{
- 	}
-diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-index 12ee62d..9c45c6a 100644
---- a/arch/arm64/kvm/hyp/entry.S
-+++ b/arch/arm64/kvm/hyp/entry.S
-@@ -196,3 +196,15 @@ alternative_endif
- 
- 	eret
- ENDPROC(__fpsimd_guest_restore)
-+
-+ENTRY(__qcom_hyp_sanitize_btac_predictors)
-+	/**
-+	 * Call SMC64 with Silicon provider serviceID 23<<8 (0xc2001700)
-+	 * 0xC2000000-0xC200FFFF: assigned to SiP Service Calls
-+	 * b15-b0: contains SiP functionID
-+	 */
-+	movz    x0, #0x1700
-+	movk    x0, #0xc200, lsl #16
-+	smc     #0
-+	ret
-+ENDPROC(__qcom_hyp_sanitize_btac_predictors)
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 4d273f6..7e37379 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -406,6 +406,16 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 		/* 0 falls through to be handled out of EL2 */
- 	}
- 
-+	if (cpus_have_const_cap(ARM64_HARDEN_BP_POST_GUEST_EXIT)) {
-+		u32 midr = read_cpuid_id();
-+
-+		/* Apply BTAC predictors mitigation to all Falkor chips */
-+		if (((midr & MIDR_CPU_MODEL_MASK) == MIDR_QCOM_FALKOR) ||
-+		    ((midr & MIDR_CPU_MODEL_MASK) == MIDR_QCOM_FALKOR_V1)) {
-+			__qcom_hyp_sanitize_btac_predictors();
-+		}
-+	}
-+
- 	fp_enabled = __fpsimd_enabled();
- 
- 	__sysreg_save_guest_state(guest_ctxt);
--- 
-Qualcomm Datacenter Technologies, Inc. on behalf of the Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
+PiBGcm9tOiBJbnRlbC13aXJlZC1sYW4gW21haWx0bzppbnRlbC13aXJlZC1sYW4tYm91bmNlc0Bv
+c3Vvc2wub3JnXSBPbg0KPiBCZWhhbGYgT2YgSmVmZiBLaXJzaGVyDQo+IFNlbnQ6IFdlZG5lc2Rh
+eSwgRGVjZW1iZXIgNiwgMjAxNyA4OjI1IEFNDQo+IFRvOiBLYW1ibGUsIFNhZ2FyIEEgPHNhZ2Fy
+LmEua2FtYmxlQGludGVsLmNvbT47IGxpbnV4LQ0KPiBrZXJuZWxAdmdlci5rZXJuZWwub3JnDQo+
+IENjOiBhbHNhLWRldmVsQGFsc2EtcHJvamVjdC5vcmc7IGxpbnV4LXJkbWFAdmdlci5rZXJuZWwu
+b3JnOw0KPiBuZXRkZXZAdmdlci5rZXJuZWwub3JnOyBSaWNoYXJkIENvY2hyYW4gPHJpY2hhcmRj
+b2NocmFuQGdtYWlsLmNvbT47DQo+IFN0ZXBoZW4gQm95ZCA8c2JveWRAY29kZWF1cm9yYS5vcmc+
+OyBDaHJpcyBXaWxzb24gPGNocmlzQGNocmlzLQ0KPiB3aWxzb24uY28udWs+OyBKb2huIFN0dWx0
+eiA8am9obi5zdHVsdHpAbGluYXJvLm9yZz47IGludGVsLXdpcmVkLQ0KPiBsYW5AbGlzdHMub3N1
+b3NsLm9yZzsgVGhvbWFzIEdsZWl4bmVyIDx0Z2x4QGxpbnV0cm9uaXguZGU+Ow0KPiBrdm1hcm1A
+bGlzdHMuY3MuY29sdW1iaWEuZWR1OyBsaW51eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5v
+cmcNCj4gU3ViamVjdDogUmU6IFtJbnRlbC13aXJlZC1sYW5dIFtQQVRDSCAxLzFdIHRpbWVjb3Vu
+dGVyOiBNYWtlIGN5Y2xlY291bnRlcg0KPiBzdHJ1Y3QgcGFydCBvZiB0aW1lY291bnRlciBzdHJ1
+Y3QNCj4gDQo+IE9uIFNhdCwgMjAxNy0xMi0wMiBhdCAxMDowMSArMDUzMCwgU2FnYXIgQXJ1biBL
+YW1ibGUgd3JvdGU6DQo+ID4gVGhlcmUgaXMgbm8gcmVhbCBuZWVkIGZvciB0aGUgdXNlcnMgb2Yg
+dGltZWNvdW50ZXJzIHRvIGRlZmluZQ0KPiA+IGN5Y2xlY291bnRlcg0KPiA+IGFuZCB0aW1lY291
+bnRlciB2YXJpYWJsZXMgc2VwYXJhdGVseS4gU2luY2UgdGltZWNvdW50ZXIgd2lsbCBhbHdheXMN
+Cj4gPiBiZQ0KPiA+IGJhc2VkIG9uIGN5Y2xlY291bnRlciwgaGF2ZSBjeWNsZWNvdW50ZXIgc3Ry
+dWN0IGFzIG1lbWJlciBvZg0KPiA+IHRpbWVjb3VudGVyDQo+ID4gc3RydWN0Lg0KPiA+DQo+ID4g
+U3VnZ2VzdGVkLWJ5OiBDaHJpcyBXaWxzb24gPGNocmlzQGNocmlzLXdpbHNvbi5jby51az4NCj4g
+PiBTaWduZWQtb2ZmLWJ5OiBTYWdhciBBcnVuIEthbWJsZSA8c2FnYXIuYS5rYW1ibGVAaW50ZWwu
+Y29tPg0KPiA+IENjOiBDaHJpcyBXaWxzb24gPGNocmlzQGNocmlzLXdpbHNvbi5jby51az4NCj4g
+PiBDYzogUmljaGFyZCBDb2NocmFuIDxyaWNoYXJkY29jaHJhbkBnbWFpbC5jb20+DQo+ID4gQ2M6
+IEpvaG4gU3R1bHR6IDxqb2huLnN0dWx0ekBsaW5hcm8ub3JnPg0KPiA+IENjOiBUaG9tYXMgR2xl
+aXhuZXIgPHRnbHhAbGludXRyb25peC5kZT4NCj4gPiBDYzogU3RlcGhlbiBCb3lkIDxzYm95ZEBj
+b2RlYXVyb3JhLm9yZz4NCj4gPiBDYzogbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZw0KPiA+
+IENjOiBsaW51eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5vcmcNCj4gPiBDYzogbmV0ZGV2
+QHZnZXIua2VybmVsLm9yZw0KPiA+IENjOiBpbnRlbC13aXJlZC1sYW5AbGlzdHMub3N1b3NsLm9y
+Zw0KPiA+IENjOiBsaW51eC1yZG1hQHZnZXIua2VybmVsLm9yZw0KPiA+IENjOiBhbHNhLWRldmVs
+QGFsc2EtcHJvamVjdC5vcmcNCj4gPiBDYzoga3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQ0K
+PiANCj4gQWNrZWQtYnk6IEplZmYgS2lyc2hlciA8amVmZnJleS50LmtpcnNoZXJAaW50ZWwuY29t
+Pg0KPiANCg0KVGVzdGVkLWJ5OiBBYXJvbiBCcm93biA8YWFyb24uZi5icm93bkBpbnRlbC5jb20+
+DQoNCj4gRm9yIHRoZSBjaGFuZ2VzIHRvIHRoZSBJbnRlbCBkcml2ZXJzLg0KPiANCj4gPiAtLS0N
+Cj4gPiAgYXJjaC9taWNyb2JsYXplL2tlcm5lbC90aW1lci5jICAgICAgICAgICAgICAgICAgICAg
+fCAyMCArKysrKystLS0tLS0NCj4gPiAgZHJpdmVycy9jbG9ja3NvdXJjZS9hcm1fYXJjaF90aW1l
+ci5jICAgICAgICAgICAgICAgfCAxOSArKysrKystLS0tLS0NCj4gPiAgZHJpdmVycy9uZXQvZXRo
+ZXJuZXQvYW1kL3hnYmUveGdiZS1kZXYuYyAgICAgICAgICAgfCAgMyArLQ0KPiA+ICBkcml2ZXJz
+L25ldC9ldGhlcm5ldC9hbWQveGdiZS94Z2JlLXB0cC5jICAgICAgICAgICB8ICA5ICsrKy0tLQ0K
+PiA+ICBkcml2ZXJzL25ldC9ldGhlcm5ldC9hbWQveGdiZS94Z2JlLmggICAgICAgICAgICAgICB8
+ICAxIC0NCj4gPiAgZHJpdmVycy9uZXQvZXRoZXJuZXQvYnJvYWRjb20vYm54MngvYm54MnguaCAg
+ICAgICAgfCAgMSAtDQo+ID4gIGRyaXZlcnMvbmV0L2V0aGVybmV0L2Jyb2FkY29tL2JueDJ4L2Ju
+eDJ4X21haW4uYyAgIHwgMjAgKysrKysrLS0tLS0tDQo+ID4gIGRyaXZlcnMvbmV0L2V0aGVybmV0
+L2ZyZWVzY2FsZS9mZWMuaCAgICAgICAgICAgICAgIHwgIDEgLQ0KPiA+ICBkcml2ZXJzL25ldC9l
+dGhlcm5ldC9mcmVlc2NhbGUvZmVjX3B0cC5jICAgICAgICAgICB8IDMwICsrKysrKysrKy0tLQ0K
+PiA+IC0tLS0tLQ0KPiA+ICBkcml2ZXJzL25ldC9ldGhlcm5ldC9pbnRlbC9lMTAwMGUvZTEwMDAu
+aCAgICAgICAgICB8ICAxIC0NCj4gPiAgZHJpdmVycy9uZXQvZXRoZXJuZXQvaW50ZWwvZTEwMDBl
+L25ldGRldi5jICAgICAgICAgfCAyNyArKysrKysrKy0tDQo+ID4gLS0tLS0tDQo+ID4gIGRyaXZl
+cnMvbmV0L2V0aGVybmV0L2ludGVsL2UxMDAwZS9wdHAuYyAgICAgICAgICAgIHwgIDIgKy0NCj4g
+PiAgZHJpdmVycy9uZXQvZXRoZXJuZXQvaW50ZWwvaWdiL2lnYi5oICAgICAgICAgICAgICAgfCAg
+MSAtDQo+ID4gIGRyaXZlcnMvbmV0L2V0aGVybmV0L2ludGVsL2lnYi9pZ2JfcHRwLmMgICAgICAg
+ICAgIHwgMjUgKysrKysrKystLQ0KPiA+IC0tLS0tDQo+ID4gIGRyaXZlcnMvbmV0L2V0aGVybmV0
+L2ludGVsL2l4Z2JlL2l4Z2JlLmggICAgICAgICAgIHwgIDEgLQ0KPiA+ICBkcml2ZXJzL25ldC9l
+dGhlcm5ldC9pbnRlbC9peGdiZS9peGdiZV9wdHAuYyAgICAgICB8IDE3ICsrKysrLS0tLS0NCj4g
+PiAgZHJpdmVycy9uZXQvZXRoZXJuZXQvbWVsbGFub3gvbWx4NC9lbl9jbG9jay5jICAgICAgfCAy
+OCArKysrKysrKy0tDQo+ID4gLS0tLS0tLQ0KPiA+ICBkcml2ZXJzL25ldC9ldGhlcm5ldC9tZWxs
+YW5veC9tbHg0L21seDRfZW4uaCAgICAgICB8ICAxIC0NCj4gPiAgLi4uL25ldC9ldGhlcm5ldC9t
+ZWxsYW5veC9tbHg1L2NvcmUvbGliL2Nsb2NrLmMgICAgfCAzNCArKysrKysrKysrDQo+ID4gLS0t
+LS0tLS0tLQ0KPiA+ICBkcml2ZXJzL25ldC9ldGhlcm5ldC9xbG9naWMvcWVkZS9xZWRlX3B0cC5j
+ICAgICAgICB8IDIwICsrKysrKy0tLS0tLQ0KPiA+ICBkcml2ZXJzL25ldC9ldGhlcm5ldC90aS9j
+cHRzLmMgICAgICAgICAgICAgICAgICAgICB8IDM2DQo+ID4gKysrKysrKysrKysrLS0tLS0tLS0t
+LQ0KPiA+ICBkcml2ZXJzL25ldC9ldGhlcm5ldC90aS9jcHRzLmggICAgICAgICAgICAgICAgICAg
+ICB8ICAxIC0NCj4gPiAgaW5jbHVkZS9saW51eC9tbHg1L2RyaXZlci5oICAgICAgICAgICAgICAg
+ICAgICAgICAgfCAgMSAtDQo+ID4gIGluY2x1ZGUvbGludXgvdGltZWNvdW50ZXIuaCAgICAgICAg
+ICAgICAgICAgICAgICAgIHwgIDQgKy0tDQo+ID4gIGluY2x1ZGUvc291bmQvaGRhdWRpby5oICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDEgLQ0KPiA+ICBrZXJuZWwvdGltZS90aW1lY291
+bnRlci5jICAgICAgICAgICAgICAgICAgICAgICAgICB8IDI4ICsrKysrKysrLS0NCj4gPiAtLS0t
+LS0tDQo+ID4gIHNvdW5kL2hkYS9oZGFjX3N0cmVhbS5jICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIHwgIDcgKysrLS0NCj4gPiAgdmlydC9rdm0vYXJtL2FyY2hfdGltZXIuYyAgICAgICAgICAg
+ICAgICAgICAgICAgICAgfCAgNiArKy0tDQo+ID4gIDI4IGZpbGVzIGNoYW5nZWQsIDE2MyBpbnNl
+cnRpb25zKCspLCAxODIgZGVsZXRpb25zKC0pDQo=
