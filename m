@@ -1,222 +1,84 @@
-From: Lorenzo Pieralisi <lorenzo.pieralisi-5wv7dgnIgG8@public.gmane.org>
-Subject: Re: [PATCH v6 11/16] firmware: arm_sdei: Add support for CPU and
- system power states
-Date: Mon, 8 Jan 2018 17:22:26 +0000
-Message-ID: <20180108172226.GC2530@red-moon>
-References: <20180108153818.22743-1-james.morse@arm.com>
- <20180108153818.22743-12-james.morse@arm.com>
+From: Shanker Donthineni <shankerd@codeaurora.org>
+Subject: Re: [PATCH] arm64: Implement branch predictor hardening for Falkor
+Date: Mon, 8 Jan 2018 11:22:53 -0600
+Message-ID: <53924fb5-e5d6-69d7-0042-3a7eb8febc32@codeaurora.org>
+References: <1515184139-23743-1-git-send-email-shankerd@codeaurora.org>
+ <20180108092849.alfqtsmaf2dqakkr@kamzik.brq.redhat.com>
+Reply-To: shankerd@codeaurora.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <20180108153818.22743-12-james.morse-5wv7dgnIgG8@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
-Cc: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Loc Ho <lho-qTEPVZfXA3Y@public.gmane.org>, Heyi Guo <guoheyi-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B45E549DD9
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jan 2018 12:18:18 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id RHxYJZuHnov6 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Jan 2018 12:18:17 -0500 (EST)
+Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C087B49DBD
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jan 2018 12:18:17 -0500 (EST)
+In-Reply-To: <20180108092849.alfqtsmaf2dqakkr@kamzik.brq.redhat.com>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>
+Cc: Sean Campbell <scampbel@codeaurora.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel <linux-kernel@vger.kernel.org>, kvmarm <kvmarm@lists.cs.columbia.edu>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jan 08, 2018 at 03:38:13PM +0000, James Morse wrote:
+Hi Andrew,
 
-[...]
-
-> +/* When entering idle, mask/unmask events for this cpu */
-
-Just mentioning (since I know you know), this notifier is called also
-through syscore_ops so it is not just idle (CPUidle or Suspend-to-idle).
-
-> +static int sdei_pm_notifier(struct notifier_block *nb, unsigned long action,
-> +			    void *data)
-> +{
-> +	int rv;
-> +
-> +	switch (action) {
-> +	case CPU_PM_ENTER:
-> +		rv = sdei_mask_local_cpu();
-> +		break;
-> +	case CPU_PM_EXIT:
-
-You should handle CPU_PM_ENTER_FAILED here for correctness,
-in case the notifier chain fails.
-
-Other than that:
-
-Reviewed-by: Lorenzo Pieralisi <lorenzo.pieralisi-5wv7dgnIgG8@public.gmane.org>
-
-> +		rv = sdei_unmask_local_cpu();
-> +		break;
-> +	default:
-> +		return NOTIFY_DONE;
-> +	}
-> +
-> +	if (rv)
-> +		return notifier_from_errno(rv);
-> +
-> +	return NOTIFY_OK;
-> +}
-> +
-> +static struct notifier_block sdei_pm_nb = {
-> +	.notifier_call = sdei_pm_notifier,
-> +};
-> +
-> +static int sdei_device_suspend(struct device *dev)
-> +{
-> +	on_each_cpu(_ipi_mask_cpu, NULL, true);
-> +
-> +	return 0;
-> +}
-> +
-> +static int sdei_device_resume(struct device *dev)
-> +{
-> +	on_each_cpu(_ipi_unmask_cpu, NULL, true);
-> +
-> +	return 0;
-> +}
-> +
-> +/*
-> + * We need all events to be reregistered when we resume from hibernate.
-> + *
-> + * The sequence is freeze->thaw. Reboot. freeze->restore. We unregister
-> + * events during freeze, then re-register and re-enable them during thaw
-> + * and restore.
-> + */
-> +static int sdei_device_freeze(struct device *dev)
-> +{
-> +	int err;
-> +
-> +	cpuhp_remove_state(CPUHP_AP_ARM_SDEI_STARTING);
-> +
-> +	err = sdei_unregister_shared();
-> +	if (err)
-> +		return err;
-> +
-> +	return 0;
-> +}
-> +
-> +static int sdei_device_thaw(struct device *dev)
-> +{
-> +	int err;
-> +
-> +	/* re-register shared events */
-> +	err = sdei_reregister_shared();
-> +	if (err) {
-> +		pr_warn("Failed to re-register shared events...\n");
-> +		sdei_mark_interface_broken();
-> +		return err;
-> +	}
-> +
-> +	err = cpuhp_setup_state(CPUHP_AP_ARM_SDEI_STARTING, "SDEI",
-> +				&sdei_cpuhp_up, &sdei_cpuhp_down);
-> +	if (err)
-> +		pr_warn("Failed to re-register CPU hotplug notifier...\n");
-> +
-> +	return err;
-> +}
-> +
-> +static int sdei_device_restore(struct device *dev)
-> +{
-> +	int err;
-> +
-> +	err = sdei_platform_reset();
-> +	if (err)
-> +		return err;
-> +
-> +	return sdei_device_thaw(dev);
-> +}
-> +
-> +static const struct dev_pm_ops sdei_pm_ops = {
-> +	.suspend = sdei_device_suspend,
-> +	.resume = sdei_device_resume,
-> +	.freeze = sdei_device_freeze,
-> +	.thaw = sdei_device_thaw,
-> +	.restore = sdei_device_restore,
-> +};
-> +
-> +/*
-> + * Mask all CPUs and unregister all events on panic, reboot or kexec.
-> + */
-> +static int sdei_reboot_notifier(struct notifier_block *nb, unsigned long action,
-> +				void *data)
-> +{
-> +	/*
-> +	 * We are going to reset the interface, after this there is no point
-> +	 * doing work when we take CPUs offline.
-> +	 */
-> +	cpuhp_remove_state(CPUHP_AP_ARM_SDEI_STARTING);
-> +
-> +	sdei_platform_reset();
-> +
-> +	return NOTIFY_OK;
-> +}
-> +
-> +static struct notifier_block sdei_reboot_nb = {
-> +	.notifier_call = sdei_reboot_notifier,
-> +};
-> +
->  static void sdei_smccc_smc(unsigned long function_id,
->  			   unsigned long arg0, unsigned long arg1,
->  			   unsigned long arg2, unsigned long arg3,
-> @@ -547,9 +772,36 @@ static int sdei_probe(struct platform_device *pdev)
->  		return 0;
->  	}
->  
-> -	on_each_cpu(&_ipi_unmask_cpu, NULL, false);
-> +	err = cpu_pm_register_notifier(&sdei_pm_nb);
-> +	if (err) {
-> +		pr_warn("Failed to register CPU PM notifier...\n");
-> +		goto error;
-> +	}
-> +
-> +	err = register_reboot_notifier(&sdei_reboot_nb);
-> +	if (err) {
-> +		pr_warn("Failed to register reboot notifier...\n");
-> +		goto remove_cpupm;
-> +	}
-> +
-> +	err = cpuhp_setup_state(CPUHP_AP_ARM_SDEI_STARTING, "SDEI",
-> +				&sdei_cpuhp_up, &sdei_cpuhp_down);
-> +	if (err) {
-> +		pr_warn("Failed to register CPU hotplug notifier...\n");
-> +		goto remove_reboot;
-> +	}
->  
->  	return 0;
-> +
-> +remove_reboot:
-> +	unregister_reboot_notifier(&sdei_reboot_nb);
-> +
-> +remove_cpupm:
-> +	cpu_pm_unregister_notifier(&sdei_pm_nb);
-> +
-> +error:
-> +	sdei_mark_interface_broken();
-> +	return err;
->  }
->  
->  static const struct of_device_id sdei_of_match[] = {
-> @@ -560,6 +812,7 @@ static const struct of_device_id sdei_of_match[] = {
->  static struct platform_driver sdei_driver = {
->  	.driver		= {
->  		.name			= "sdei",
-> +		.pm			= &sdei_pm_ops,
->  		.of_match_table		= sdei_of_match,
->  	},
->  	.probe		= sdei_probe,
-> diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
-> index 201ab7267986..87b505a48a94 100644
-> --- a/include/linux/cpuhotplug.h
-> +++ b/include/linux/cpuhotplug.h
-> @@ -109,6 +109,7 @@ enum cpuhp_state {
->  	CPUHP_AP_PERF_XTENSA_STARTING,
->  	CPUHP_AP_PERF_METAG_STARTING,
->  	CPUHP_AP_MIPS_OP_LOONGSON3_STARTING,
-> +	CPUHP_AP_ARM_SDEI_STARTING,
->  	CPUHP_AP_ARM_VFP_STARTING,
->  	CPUHP_AP_ARM64_DEBUG_MONITORS_STARTING,
->  	CPUHP_AP_PERF_ARM_HW_BREAKPOINT_STARTING,
-> -- 
-> 2.15.0
+On 01/08/2018 03:28 AM, Andrew Jones wrote:
+> Hi Shanker,
 > 
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> On Fri, Jan 05, 2018 at 02:28:59PM -0600, Shanker Donthineni wrote:
+> ...
+>> diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
+>> index cb0fb37..daf53a5 100644
+>> --- a/arch/arm64/kernel/cpu_errata.c
+>> +++ b/arch/arm64/kernel/cpu_errata.c
+>> @@ -54,6 +54,8 @@ static int cpu_enable_trap_ctr_access(void *__unused)
+>>  
+>>  #ifdef CONFIG_KVM
+>>  extern char __psci_hyp_bp_inval_start[], __psci_hyp_bp_inval_end[];
+>> +extern char __qcom_hyp_sanitize_link_stack_start[];
+>> +extern char __qcom_hyp_sanitize_link_stack_end[];
+>>  
+>>  static void __copy_hyp_vect_bpi(int slot, const char *hyp_vecs_start,
+>>  				const char *hyp_vecs_end)
+>> @@ -96,8 +98,10 @@ static void __install_bp_hardening_cb(bp_hardening_cb_t fn,
+>>  	spin_unlock(&bp_lock);
+>>  }
+>>  #else
+>> -#define __psci_hyp_bp_inval_start	NULL
+>> -#define __psci_hyp_bp_inval_end		NULL
+>> +#define __psci_hyp_bp_inval_start	   	NULL
+>> +#define __psci_hyp_bp_inval_end			NULL
+>> +#define __qcom_hyp_sanitize_link_stack_start	NULL
+>> +#define __qcom_hyp_sanitize_link_stack_start	NULL
+>                                           ^^ copy+paste error here
+
+Thanks for catching typo, I'll fix in v2 patch. 
+
+> 
+> Thanks,
+> drew
+> 
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+> 
+
+-- 
+Shanker Donthineni
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
