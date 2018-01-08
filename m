@@ -1,109 +1,154 @@
-From: Lorenzo Pieralisi <lorenzo.pieralisi-5wv7dgnIgG8@public.gmane.org>
-Subject: Re: [PATCH v6 14/16] firmware: arm_sdei: Discover SDEI support via
- ACPI
-Date: Mon, 8 Jan 2018 17:56:01 +0000
-Message-ID: <20180108175601.GD2530@red-moon>
-References: <20180108153818.22743-1-james.morse@arm.com>
- <20180108153818.22743-15-james.morse@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH] arm64: KVM: Hide PMU from guests when disabled
+Date: Mon, 8 Jan 2018 19:41:12 +0100
+Message-ID: <20180108184112.GB15307@cbox>
+References: <20171125174031.13117-1-drjones@redhat.com>
+ <20180108141815.GA15307@cbox>
+ <20180108145629.ctdcitinneq2kd74@kamzik.brq.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CB49149D6A
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jan 2018 13:36:37 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 8A892KgEHb4k for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Jan 2018 13:36:36 -0500 (EST)
+Received: from mail-wm0-f66.google.com (mail-wm0-f66.google.com [74.125.82.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7D5EA49D40
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jan 2018 13:36:35 -0500 (EST)
+Received: by mail-wm0-f66.google.com with SMTP id b141so16064483wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 08 Jan 2018 10:41:15 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <20180108153818.22743-15-james.morse-5wv7dgnIgG8@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
-Cc: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Loc Ho <lho-qTEPVZfXA3Y@public.gmane.org>, Heyi Guo <guoheyi-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <20180108145629.ctdcitinneq2kd74@kamzik.brq.redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>
+Cc: cdall@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, Dave.Martin@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jan 08, 2018 at 03:38:16PM +0000, James Morse wrote:
-> SDEI defines a new ACPI table to indicate the presence of the interface.
-> The conduit is discovered in the same way as PSCI.
+On Mon, Jan 08, 2018 at 03:56:29PM +0100, Andrew Jones wrote:
+> On Mon, Jan 08, 2018 at 03:18:15PM +0100, Christoffer Dall wrote:
+> > Hi Drew,
+> > 
+> > On Sat, Nov 25, 2017 at 06:40:31PM +0100, Andrew Jones wrote:
+> > > Since commit 93390c0a1b20 ("arm64: KVM: Hide unsupported AArch64 CPU
+> > > features from guests") we can hide cpu features from guests. Apply
+> > > this to a long standing issue where guests see a PMU available, but
+> > > it's not, because it was not enabled by KVM's userspace.
+> > > 
+> > > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > > ---
+> > >  arch/arm64/kvm/sys_regs.c | 35 +++++++++++++++++++++--------------
+> > >  1 file changed, 21 insertions(+), 14 deletions(-)
+> > > 
+> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > > index 1830ebc227d1..503144f13af0 100644
+> > > --- a/arch/arm64/kvm/sys_regs.c
+> > > +++ b/arch/arm64/kvm/sys_regs.c
+> > > @@ -881,18 +881,25 @@ static bool access_cntp_cval(struct kvm_vcpu *vcpu,
+> > >  }
+> > >  
+> > >  /* Read a sanitised cpufeature ID register by sys_reg_desc */
+> > > -static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
+> > > +static u64 read_id_reg(struct kvm_vcpu *vcpu,
+> > > +		       struct sys_reg_desc const *r,
+> > > +		       bool raz)
+> > >  {
+> > >  	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
+> > >  			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
+> > >  	u64 val = raz ? 0 : read_sanitised_ftr_reg(id);
+> > >  
+> > > -	if (id == SYS_ID_AA64PFR0_EL1) {
+> > > +	switch (id) {
+> > > +	case SYS_ID_AA64DFR0_EL1:
+> > > +		if (!kvm_arm_pmu_v3_ready(vcpu))
+> > > +			val &= ~(0xfUL << ID_AA64DFR0_PMUVER_SHIFT);
+> > 
+> > This is actually problematic, becuase it can break migration.  If
+> > user space reads the guest state at some point after the guest has been
+> > started with vPMU enabled, but then tries to restore the state before
+> > creating a pmu, then we get an error.  See below...
+> > 
+> > > +		break;
+> > > +	case SYS_ID_AA64PFR0_EL1:
+> > >  		if (val & (0xfUL << ID_AA64PFR0_SVE_SHIFT))
+> > >  			pr_err_once("kvm [%i]: SVE unsupported for guests, suppressing\n",
+> > >  				    task_pid_nr(current));
+> > > -
+> > >  		val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
+> > > +		break;
+> > >  	}
+> > >  
+> > >  	return val;
+> > > @@ -908,7 +915,7 @@ static bool __access_id_reg(struct kvm_vcpu *vcpu,
+> > >  	if (p->is_write)
+> > >  		return write_to_read_only(vcpu, p, r);
+> > >  
+> > > -	p->regval = read_id_reg(r, raz);
+> > > +	p->regval = read_id_reg(vcpu, r, raz);
+> > >  	return true;
+> > >  }
+> > >  
+> > > @@ -937,17 +944,17 @@ static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
+> > >   * are stored, and for set_id_reg() we don't allow the effective value
+> > >   * to be changed.
+> > >   */
+> > > -static int __get_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
+> > > -			bool raz)
+> > > +static int __get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> > > +			void __user *uaddr, bool raz)
+> > >  {
+> > >  	const u64 id = sys_reg_to_index(rd);
+> > > -	const u64 val = read_id_reg(rd, raz);
+> > > +	const u64 val = read_id_reg(vcpu, rd, raz);
+> > >  
+> > >  	return reg_to_user(uaddr, &val, id);
+> > >  }
+> > >  
+> > > -static int __set_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
+> > > -			bool raz)
+> > > +static int __set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> > > +			void __user *uaddr, bool raz)
+> > >  {
+> > >  	const u64 id = sys_reg_to_index(rd);
+> > >  	int err;
+> > > @@ -958,7 +965,7 @@ static int __set_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
+> > >  		return err;
+> > >  
+> > >  	/* This is what we mean by invariant: you can't change it. */
+> > > -	if (val != read_id_reg(rd, raz))
+> > > +	if (val != read_id_reg(vcpu, rd, raz))
+> > 
+> > So since we modified read_id_reg above for the PMU, we have now broken
+> > migration, because we've introduced an implicit ordering requirement for
+> > creating the PMU.
+> > 
+> > One way to handle this is to remove this check at this point and verify
+> > integrity when we're about to run a VCPU, but that changes behavior and
+> > we've been happy with the invariant checks so far.
+> > 
+> > Perhaps a better approach is to let userspace write ID register values
+> > that can be hidden, and then simply mask of features when the guest is
+> > running which would allow snapshotting the id register values any time
+> > before/after adding all features/peripherals to the VCPUs.
+> > 
+> > Thoughts?
+> > 
+> > I'll drop this patch from queue and next for now until we have a better
+> > solution.
 > 
-> For ACPI we need to create the platform device ourselves as SDEI doesn't
-> have an entry in the DSDT.
+> Argh, sorry about this. I'll revisit it soon.
 > 
-> The SDEI platform device should be created after ACPI has been initialised
-> so that we can parse the table, but before GHES devices are created, which
-> may register SDE events if they use SDEI as their notification type.
-> 
-> Signed-off-by: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
-> Acked-by: Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>
-> ---
->  drivers/firmware/arm_sdei.c | 41 ++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 40 insertions(+), 1 deletion(-)
+No worries.  Thanks for taking a look.
 
-Reviewed-by: Lorenzo Pieralisi <lorenzo.pieralisi-5wv7dgnIgG8@public.gmane.org>
-
-> diff --git a/drivers/firmware/arm_sdei.c b/drivers/firmware/arm_sdei.c
-> index 10a8bfa7339a..fb7caa3628b9 100644
-> --- a/drivers/firmware/arm_sdei.c
-> +++ b/drivers/firmware/arm_sdei.c
-> @@ -907,6 +907,14 @@ static int sdei_get_conduit(struct platform_device *pdev)
->  		}
->  
->  		pr_warn("invalid \"method\" property: %s\n", method);
-> +	} else if (IS_ENABLED(CONFIG_ACPI) && !acpi_disabled) {
-> +		if (acpi_psci_use_hvc()) {
-> +			sdei_firmware_call = &sdei_smccc_hvc;
-> +			return CONDUIT_HVC;
-> +		} else {
-> +			sdei_firmware_call = &sdei_smccc_smc;
-> +			return CONDUIT_SMC;
-> +		}
->  	}
->  
->  	return CONDUIT_INVALID;
-> @@ -1020,14 +1028,45 @@ static bool __init sdei_present_dt(void)
->  	return true;
->  }
->  
-> +static bool __init sdei_present_acpi(void)
-> +{
-> +	acpi_status status;
-> +	struct platform_device *pdev;
-> +	struct acpi_table_header *sdei_table_header;
-> +
-> +	if (acpi_disabled)
-> +		return false;
-> +
-> +	status = acpi_get_table(ACPI_SIG_SDEI, 0, &sdei_table_header);
-> +	if (ACPI_FAILURE(status) && status != AE_NOT_FOUND) {
-> +		const char *msg = acpi_format_exception(status);
-> +
-> +		pr_info("Failed to get ACPI:SDEI table, %s\n", msg);
-> +	}
-> +	if (ACPI_FAILURE(status))
-> +		return false;
-> +
-> +	pdev = platform_device_register_simple(sdei_driver.driver.name, 0, NULL,
-> +					       0);
-> +	if (IS_ERR(pdev))
-> +		return false;
-> +
-> +	return true;
-> +}
-> +
->  static int __init sdei_init(void)
->  {
-> -	if (sdei_present_dt())
-> +	if (sdei_present_dt() || sdei_present_acpi())
->  		platform_driver_register(&sdei_driver);
->  
->  	return 0;
->  }
->  
-> +/*
-> + * On an ACPI system SDEI needs to be ready before HEST:GHES tries to register
-> + * its events. ACPI is initialised from a subsys_initcall(), GHES is initialised
-> + * by device_initcall(). We want to be called in the middle.
-> + */
->  subsys_initcall_sync(sdei_init);
->  
->  int sdei_event_handler(struct pt_regs *regs,
-> -- 
-> 2.15.0
-> 
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+-Christoffer
