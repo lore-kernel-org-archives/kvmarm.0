@@ -1,84 +1,109 @@
-From: Shanker Donthineni <shankerd@codeaurora.org>
-Subject: Re: [PATCH] arm64: Implement branch predictor hardening for Falkor
-Date: Mon, 8 Jan 2018 11:22:53 -0600
-Message-ID: <53924fb5-e5d6-69d7-0042-3a7eb8febc32@codeaurora.org>
-References: <1515184139-23743-1-git-send-email-shankerd@codeaurora.org>
- <20180108092849.alfqtsmaf2dqakkr@kamzik.brq.redhat.com>
-Reply-To: shankerd@codeaurora.org
+From: Lorenzo Pieralisi <lorenzo.pieralisi-5wv7dgnIgG8@public.gmane.org>
+Subject: Re: [PATCH v6 14/16] firmware: arm_sdei: Discover SDEI support via
+ ACPI
+Date: Mon, 8 Jan 2018 17:56:01 +0000
+Message-ID: <20180108175601.GD2530@red-moon>
+References: <20180108153818.22743-1-james.morse@arm.com>
+ <20180108153818.22743-15-james.morse@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B45E549DD9
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jan 2018 12:18:18 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RHxYJZuHnov6 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Jan 2018 12:18:17 -0500 (EST)
-Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C087B49DBD
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jan 2018 12:18:17 -0500 (EST)
-In-Reply-To: <20180108092849.alfqtsmaf2dqakkr@kamzik.brq.redhat.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: Sean Campbell <scampbel@codeaurora.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel <linux-kernel@vger.kernel.org>, kvmarm <kvmarm@lists.cs.columbia.edu>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20180108153818.22743-15-james.morse-5wv7dgnIgG8@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+Cc: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Loc Ho <lho-qTEPVZfXA3Y@public.gmane.org>, Heyi Guo <guoheyi-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Andrew,
-
-On 01/08/2018 03:28 AM, Andrew Jones wrote:
-> Hi Shanker,
+On Mon, Jan 08, 2018 at 03:38:16PM +0000, James Morse wrote:
+> SDEI defines a new ACPI table to indicate the presence of the interface.
+> The conduit is discovered in the same way as PSCI.
 > 
-> On Fri, Jan 05, 2018 at 02:28:59PM -0600, Shanker Donthineni wrote:
-> ...
->> diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
->> index cb0fb37..daf53a5 100644
->> --- a/arch/arm64/kernel/cpu_errata.c
->> +++ b/arch/arm64/kernel/cpu_errata.c
->> @@ -54,6 +54,8 @@ static int cpu_enable_trap_ctr_access(void *__unused)
->>  
->>  #ifdef CONFIG_KVM
->>  extern char __psci_hyp_bp_inval_start[], __psci_hyp_bp_inval_end[];
->> +extern char __qcom_hyp_sanitize_link_stack_start[];
->> +extern char __qcom_hyp_sanitize_link_stack_end[];
->>  
->>  static void __copy_hyp_vect_bpi(int slot, const char *hyp_vecs_start,
->>  				const char *hyp_vecs_end)
->> @@ -96,8 +98,10 @@ static void __install_bp_hardening_cb(bp_hardening_cb_t fn,
->>  	spin_unlock(&bp_lock);
->>  }
->>  #else
->> -#define __psci_hyp_bp_inval_start	NULL
->> -#define __psci_hyp_bp_inval_end		NULL
->> +#define __psci_hyp_bp_inval_start	   	NULL
->> +#define __psci_hyp_bp_inval_end			NULL
->> +#define __qcom_hyp_sanitize_link_stack_start	NULL
->> +#define __qcom_hyp_sanitize_link_stack_start	NULL
->                                           ^^ copy+paste error here
-
-Thanks for catching typo, I'll fix in v2 patch. 
-
+> For ACPI we need to create the platform device ourselves as SDEI doesn't
+> have an entry in the DSDT.
 > 
-> Thanks,
-> drew
+> The SDEI platform device should be created after ACPI has been initialised
+> so that we can parse the table, but before GHES devices are created, which
+> may register SDE events if they use SDEI as their notification type.
 > 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
-> 
+> Signed-off-by: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+> Acked-by: Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>
+> ---
+>  drivers/firmware/arm_sdei.c | 41 ++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 40 insertions(+), 1 deletion(-)
 
--- 
-Shanker Donthineni
-Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
+Reviewed-by: Lorenzo Pieralisi <lorenzo.pieralisi-5wv7dgnIgG8@public.gmane.org>
+
+> diff --git a/drivers/firmware/arm_sdei.c b/drivers/firmware/arm_sdei.c
+> index 10a8bfa7339a..fb7caa3628b9 100644
+> --- a/drivers/firmware/arm_sdei.c
+> +++ b/drivers/firmware/arm_sdei.c
+> @@ -907,6 +907,14 @@ static int sdei_get_conduit(struct platform_device *pdev)
+>  		}
+>  
+>  		pr_warn("invalid \"method\" property: %s\n", method);
+> +	} else if (IS_ENABLED(CONFIG_ACPI) && !acpi_disabled) {
+> +		if (acpi_psci_use_hvc()) {
+> +			sdei_firmware_call = &sdei_smccc_hvc;
+> +			return CONDUIT_HVC;
+> +		} else {
+> +			sdei_firmware_call = &sdei_smccc_smc;
+> +			return CONDUIT_SMC;
+> +		}
+>  	}
+>  
+>  	return CONDUIT_INVALID;
+> @@ -1020,14 +1028,45 @@ static bool __init sdei_present_dt(void)
+>  	return true;
+>  }
+>  
+> +static bool __init sdei_present_acpi(void)
+> +{
+> +	acpi_status status;
+> +	struct platform_device *pdev;
+> +	struct acpi_table_header *sdei_table_header;
+> +
+> +	if (acpi_disabled)
+> +		return false;
+> +
+> +	status = acpi_get_table(ACPI_SIG_SDEI, 0, &sdei_table_header);
+> +	if (ACPI_FAILURE(status) && status != AE_NOT_FOUND) {
+> +		const char *msg = acpi_format_exception(status);
+> +
+> +		pr_info("Failed to get ACPI:SDEI table, %s\n", msg);
+> +	}
+> +	if (ACPI_FAILURE(status))
+> +		return false;
+> +
+> +	pdev = platform_device_register_simple(sdei_driver.driver.name, 0, NULL,
+> +					       0);
+> +	if (IS_ERR(pdev))
+> +		return false;
+> +
+> +	return true;
+> +}
+> +
+>  static int __init sdei_init(void)
+>  {
+> -	if (sdei_present_dt())
+> +	if (sdei_present_dt() || sdei_present_acpi())
+>  		platform_driver_register(&sdei_driver);
+>  
+>  	return 0;
+>  }
+>  
+> +/*
+> + * On an ACPI system SDEI needs to be ready before HEST:GHES tries to register
+> + * its events. ACPI is initialised from a subsys_initcall(), GHES is initialised
+> + * by device_initcall(). We want to be called in the middle.
+> + */
+>  subsys_initcall_sync(sdei_init);
+>  
+>  int sdei_event_handler(struct pt_regs *regs,
+> -- 
+> 2.15.0
+> 
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
