@@ -1,73 +1,125 @@
-From: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
-Subject: [PATCH v6 09/16] arm64: uaccess: Add PAN helper
-Date: Mon,  8 Jan 2018 15:38:11 +0000
-Message-ID: <20180108153818.22743-10-james.morse@arm.com>
+From: James Morse <james.morse@arm.com>
+Subject: [PATCH v6 08/16] arm64: Add vmap_stack header file
+Date: Mon,  8 Jan 2018 15:38:10 +0000
+Message-ID: <20180108153818.22743-9-james.morse@arm.com>
 References: <20180108153818.22743-1-james.morse@arm.com>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20180108153818.22743-1-james.morse-5wv7dgnIgG8@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-Cc: kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Lorenzo Pieralisi <lorenzo.pieralisi-5wv7dgnIgG8@public.gmane.org>, Loc Ho <lho-qTEPVZfXA3Y@public.gmane.org>, Heyi Guo <guoheyi-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 25A5149DB2
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jan 2018 10:36:28 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id TXlMQU8dka2x for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Jan 2018 10:36:27 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1450E49DF4
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jan 2018 10:36:27 -0500 (EST)
+In-Reply-To: <20180108153818.22743-1-james.morse@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: linux-arm-kernel@lists.infradead.org
+Cc: devicetree@vger.kernel.org, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Rob Herring <robh+dt@kernel.org>, Loc Ho <lho@apm.com>, Heyi Guo <guoheyi@huawei.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add __uaccess_{en,dis}able_hw_pan() helpers to set/clear the PSTATE.PAN
-bit.
+Today the arm64 arch code allocates an extra IRQ stack per-cpu. If we
+also have SDEI and VMAP stacks we need two extra per-cpu VMAP stacks.
 
-Signed-off-by: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+Move the VMAP stack allocation out to a helper in a new header file.
+This avoids missing THREADINFO_GFP, or getting the all-important alignment
+wrong.
+
+Signed-off-by: James Morse <james.morse@arm.com>
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+Reviewed-by: Mark Rutland <mark.rutland@arm.com>
 ---
- arch/arm64/include/asm/uaccess.h | 12 ++++++++++++
- arch/arm64/kernel/suspend.c      |  4 ++--
- 2 files changed, 14 insertions(+), 2 deletions(-)
+Changes since v5:
+ * Added two required header files
 
-diff --git a/arch/arm64/include/asm/uaccess.h b/arch/arm64/include/asm/uaccess.h
-index 6eadf55ebaf0..3821fab01d7d 100644
---- a/arch/arm64/include/asm/uaccess.h
-+++ b/arch/arm64/include/asm/uaccess.h
-@@ -168,6 +168,18 @@ static inline bool uaccess_ttbr0_enable(void)
+Changes since v4:
+ * Added gfp.h include
+
+Changes since v3:
+ * Added BUILD_BUG() instead of a spooky link error
+
+ arch/arm64/include/asm/vmap_stack.h | 28 ++++++++++++++++++++++++++++
+ arch/arm64/kernel/irq.c             | 13 ++-----------
+ 2 files changed, 30 insertions(+), 11 deletions(-)
+ create mode 100644 arch/arm64/include/asm/vmap_stack.h
+
+diff --git a/arch/arm64/include/asm/vmap_stack.h b/arch/arm64/include/asm/vmap_stack.h
+new file mode 100644
+index 000000000000..0b5ec6e08c10
+--- /dev/null
++++ b/arch/arm64/include/asm/vmap_stack.h
+@@ -0,0 +1,28 @@
++// SPDX-License-Identifier: GPL-2.0
++// Copyright (C) 2017 Arm Ltd.
++#ifndef __ASM_VMAP_STACK_H
++#define __ASM_VMAP_STACK_H
++
++#include <linux/bug.h>
++#include <linux/gfp.h>
++#include <linux/kconfig.h>
++#include <linux/vmalloc.h>
++#include <asm/memory.h>
++#include <asm/pgtable.h>
++#include <asm/thread_info.h>
++
++/*
++ * To ensure that VMAP'd stack overflow detection works correctly, all VMAP'd
++ * stacks need to have the same alignment.
++ */
++static inline unsigned long *arch_alloc_vmap_stack(size_t stack_size, int node)
++{
++	BUILD_BUG_ON(!IS_ENABLED(CONFIG_VMAP_STACK));
++
++	return __vmalloc_node_range(stack_size, THREAD_ALIGN,
++				    VMALLOC_START, VMALLOC_END,
++				    THREADINFO_GFP, PAGE_KERNEL, 0, node,
++				    __builtin_return_address(0));
++}
++
++#endif /* __ASM_VMAP_STACK_H */
+diff --git a/arch/arm64/kernel/irq.c b/arch/arm64/kernel/irq.c
+index 713561e5bcab..60e5fc661f74 100644
+--- a/arch/arm64/kernel/irq.c
++++ b/arch/arm64/kernel/irq.c
+@@ -29,6 +29,7 @@
+ #include <linux/irqchip.h>
+ #include <linux/seq_file.h>
+ #include <linux/vmalloc.h>
++#include <asm/vmap_stack.h>
+ 
+ unsigned long irq_err_count;
+ 
+@@ -58,17 +59,7 @@ static void init_irq_stacks(void)
+ 	unsigned long *p;
+ 
+ 	for_each_possible_cpu(cpu) {
+-		/*
+-		* To ensure that VMAP'd stack overflow detection works
+-		* correctly, the IRQ stacks need to have the same
+-		* alignment as other stacks.
+-		*/
+-		p = __vmalloc_node_range(IRQ_STACK_SIZE, THREAD_ALIGN,
+-					 VMALLOC_START, VMALLOC_END,
+-					 THREADINFO_GFP, PAGE_KERNEL,
+-					 0, cpu_to_node(cpu),
+-					 __builtin_return_address(0));
+-
++		p = arch_alloc_vmap_stack(IRQ_STACK_SIZE, cpu_to_node(cpu));
+ 		per_cpu(irq_stack_ptr, cpu) = p;
+ 	}
  }
- #endif
- 
-+static inline void __uaccess_disable_hw_pan(void)
-+{
-+	asm(ALTERNATIVE("nop", SET_PSTATE_PAN(0), ARM64_HAS_PAN,
-+			CONFIG_ARM64_PAN));
-+}
-+
-+static inline void __uaccess_enable_hw_pan(void)
-+{
-+	asm(ALTERNATIVE("nop", SET_PSTATE_PAN(1), ARM64_HAS_PAN,
-+			CONFIG_ARM64_PAN));
-+}
-+
- #define __uaccess_disable(alt)						\
- do {									\
- 	if (!uaccess_ttbr0_disable())					\
-diff --git a/arch/arm64/kernel/suspend.c b/arch/arm64/kernel/suspend.c
-index 3fe5ad884418..a307b9e13392 100644
---- a/arch/arm64/kernel/suspend.c
-+++ b/arch/arm64/kernel/suspend.c
-@@ -2,6 +2,7 @@
- #include <linux/ftrace.h>
- #include <linux/percpu.h>
- #include <linux/slab.h>
-+#include <linux/uaccess.h>
- #include <asm/alternative.h>
- #include <asm/cacheflush.h>
- #include <asm/cpufeature.h>
-@@ -51,8 +52,7 @@ void notrace __cpu_suspend_exit(void)
- 	 * PSTATE was not saved over suspend/resume, re-enable any detected
- 	 * features that might not have been set correctly.
- 	 */
--	asm(ALTERNATIVE("nop", SET_PSTATE_PAN(1), ARM64_HAS_PAN,
--			CONFIG_ARM64_PAN));
-+	__uaccess_enable_hw_pan();
- 	uao_thread_switch(current);
- 
- 	/*
 -- 
 2.15.0
-
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
