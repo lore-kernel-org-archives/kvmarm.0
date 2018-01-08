@@ -1,7 +1,7 @@
 From: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
-Subject: [PATCH v6 01/16] KVM: arm64: Store vcpu on the stack during __guest_enter()
-Date: Mon,  8 Jan 2018 15:38:03 +0000
-Message-ID: <20180108153818.22743-2-james.morse@arm.com>
+Subject: [PATCH v6 05/16] KVM: arm64: Stop save/restoring host tpidr_el1 on VHE
+Date: Mon,  8 Jan 2018 15:38:07 +0000
+Message-ID: <20180108153818.22743-6-james.morse@arm.com>
 References: <20180108153818.22743-1-james.morse@arm.com>
 Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <20180108153818.22743-1-james.morse-5wv7dgnIgG8@public.gmane.org>
@@ -10,97 +10,123 @@ To: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
 Cc: kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Lorenzo Pieralisi <lorenzo.pieralisi-5wv7dgnIgG8@public.gmane.org>, Loc Ho <lho-qTEPVZfXA3Y@public.gmane.org>, Heyi Guo <guoheyi-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-KVM uses tpidr_el2 as its private vcpu register, which makes sense for
-non-vhe world switch as only KVM can access this register. This means
-vhe Linux has to use tpidr_el1, which KVM has to save/restore as part
-of the host context.
+Now that a VHE host uses tpidr_el2 for the cpu offset we no longer
+need KVM to save/restore tpidr_el1. Move this from the 'common' code
+into the non-vhe code. While we're at it, on VHE we don't need to
+save the ELR or SPSR as kernel_entry in entry.S will have pushed these
+onto the kernel stack, and will restore them from there. Move these
+to the non-vhe code as we need them to get back to the host.
 
-If the SDEI handler code runs behind KVMs back, it mustn't access any
-per-cpu variables. To allow this on systems with vhe we need to make
-the host use tpidr_el2, saving KVM from save/restoring it.
-
-__guest_enter() stores the host_ctxt on the stack, do the same with
-the vcpu.
+Finally remove the always-copy-tpidr we hid in the stage2 setup
+code, cpufeature's enable callback will do this for VHE, we only
+need KVM to do it for non-vhe. Add the copy into kvm-init instead.
 
 Signed-off-by: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
 Reviewed-by: Christoffer Dall <cdall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
 ---
-Changes since v2:
- * Added middle paragraph of commit message.
+Changes since v1:
+ * Switched KVM<->arm64 in the subject.
 
- arch/arm64/kvm/hyp/entry.S     | 10 +++++++---
- arch/arm64/kvm/hyp/hyp-entry.S |  6 +++---
- 2 files changed, 10 insertions(+), 6 deletions(-)
+ arch/arm64/kvm/hyp-init.S      |  4 ++++
+ arch/arm64/kvm/hyp/s2-setup.c  |  3 ---
+ arch/arm64/kvm/hyp/sysreg-sr.c | 16 ++++++++--------
+ 3 files changed, 12 insertions(+), 11 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-index 12ee62d6d410..9a8ab5dddd9e 100644
---- a/arch/arm64/kvm/hyp/entry.S
-+++ b/arch/arm64/kvm/hyp/entry.S
-@@ -62,8 +62,8 @@ ENTRY(__guest_enter)
- 	// Store the host regs
- 	save_callee_saved_regs x1
+diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp-init.S
+index 3f9615582377..fbf259893f6a 100644
+--- a/arch/arm64/kvm/hyp-init.S
++++ b/arch/arm64/kvm/hyp-init.S
+@@ -122,6 +122,10 @@ CPU_BE(	orr	x4, x4, #SCTLR_ELx_EE)
+ 	kern_hyp_va	x2
+ 	msr	vbar_el2, x2
  
--	// Store the host_ctxt for use at exit time
--	str	x1, [sp, #-16]!
-+	// Store host_ctxt and vcpu for use at exit time
-+	stp	x1, x0, [sp, #-16]!
++	/* copy tpidr_el1 into tpidr_el2 for use by HYP */
++	mrs	x1, tpidr_el1
++	msr	tpidr_el2, x1
++
+ 	/* Hello, World! */
+ 	eret
+ ENDPROC(__kvm_hyp_init)
+diff --git a/arch/arm64/kvm/hyp/s2-setup.c b/arch/arm64/kvm/hyp/s2-setup.c
+index 7fb88274eba1..a81f5e10fc8c 100644
+--- a/arch/arm64/kvm/hyp/s2-setup.c
++++ b/arch/arm64/kvm/hyp/s2-setup.c
+@@ -84,8 +84,5 @@ u32 __hyp_text __init_stage2_translation(void)
  
- 	add	x18, x0, #VCPU_CONTEXT
+ 	write_sysreg(val, vtcr_el2);
  
-@@ -159,6 +159,10 @@ abort_guest_exit_end:
- ENDPROC(__guest_exit)
+-	/* copy tpidr_el1 into tpidr_el2 for use by HYP */
+-	write_sysreg(read_sysreg(tpidr_el1), tpidr_el2);
+-
+ 	return parange;
+ }
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index 934137647837..c54cc2afb92b 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -27,8 +27,8 @@ static void __hyp_text __sysreg_do_nothing(struct kvm_cpu_context *ctxt) { }
+ /*
+  * Non-VHE: Both host and guest must save everything.
+  *
+- * VHE: Host must save tpidr*_el[01], actlr_el1, mdscr_el1, sp0, pc,
+- * pstate, and guest must save everything.
++ * VHE: Host must save tpidr*_el0, actlr_el1, mdscr_el1, sp_el0,
++ * and guest must save everything.
+  */
  
- ENTRY(__fpsimd_guest_restore)
-+	// x0: esr
-+	// x1: vcpu
-+	// x2-x29,lr: vcpu regs
-+	// vcpu x0-x1 on the stack
- 	stp	x2, x3, [sp, #-16]!
- 	stp	x4, lr, [sp, #-16]!
+ static void __hyp_text __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
+@@ -36,11 +36,8 @@ static void __hyp_text __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
+ 	ctxt->sys_regs[ACTLR_EL1]	= read_sysreg(actlr_el1);
+ 	ctxt->sys_regs[TPIDR_EL0]	= read_sysreg(tpidr_el0);
+ 	ctxt->sys_regs[TPIDRRO_EL0]	= read_sysreg(tpidrro_el0);
+-	ctxt->sys_regs[TPIDR_EL1]	= read_sysreg(tpidr_el1);
+ 	ctxt->sys_regs[MDSCR_EL1]	= read_sysreg(mdscr_el1);
+ 	ctxt->gp_regs.regs.sp		= read_sysreg(sp_el0);
+-	ctxt->gp_regs.regs.pc		= read_sysreg_el2(elr);
+-	ctxt->gp_regs.regs.pstate	= read_sysreg_el2(spsr);
+ }
  
-@@ -173,7 +177,7 @@ alternative_else
- alternative_endif
- 	isb
+ static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
+@@ -62,10 +59,13 @@ static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
+ 	ctxt->sys_regs[AMAIR_EL1]	= read_sysreg_el1(amair);
+ 	ctxt->sys_regs[CNTKCTL_EL1]	= read_sysreg_el1(cntkctl);
+ 	ctxt->sys_regs[PAR_EL1]		= read_sysreg(par_el1);
++	ctxt->sys_regs[TPIDR_EL1]	= read_sysreg(tpidr_el1);
  
--	mrs	x3, tpidr_el2
-+	mov	x3, x1
+ 	ctxt->gp_regs.sp_el1		= read_sysreg(sp_el1);
+ 	ctxt->gp_regs.elr_el1		= read_sysreg_el1(elr);
+ 	ctxt->gp_regs.spsr[KVM_SPSR_EL1]= read_sysreg_el1(spsr);
++	ctxt->gp_regs.regs.pc		= read_sysreg_el2(elr);
++	ctxt->gp_regs.regs.pstate	= read_sysreg_el2(spsr);
+ }
  
- 	ldr	x0, [x3, #VCPU_HOST_CONTEXT]
- 	kern_hyp_va x0
-diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index 5170ce1021da..fce7cc507e0a 100644
---- a/arch/arm64/kvm/hyp/hyp-entry.S
-+++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -104,6 +104,7 @@ el1_trap:
- 	/*
- 	 * x0: ESR_EC
- 	 */
-+	ldr	x1, [sp, #16 + 8]	// vcpu stored by __guest_enter
+ static hyp_alternate_select(__sysreg_call_save_host_state,
+@@ -89,11 +89,8 @@ static void __hyp_text __sysreg_restore_common_state(struct kvm_cpu_context *ctx
+ 	write_sysreg(ctxt->sys_regs[ACTLR_EL1],	  actlr_el1);
+ 	write_sysreg(ctxt->sys_regs[TPIDR_EL0],	  tpidr_el0);
+ 	write_sysreg(ctxt->sys_regs[TPIDRRO_EL0], tpidrro_el0);
+-	write_sysreg(ctxt->sys_regs[TPIDR_EL1],	  tpidr_el1);
+ 	write_sysreg(ctxt->sys_regs[MDSCR_EL1],	  mdscr_el1);
+ 	write_sysreg(ctxt->gp_regs.regs.sp,	  sp_el0);
+-	write_sysreg_el2(ctxt->gp_regs.regs.pc,	  elr);
+-	write_sysreg_el2(ctxt->gp_regs.regs.pstate, spsr);
+ }
  
- 	/*
- 	 * We trap the first access to the FP/SIMD to save the host context
-@@ -116,19 +117,18 @@ alternative_if_not ARM64_HAS_NO_FPSIMD
- 	b.eq	__fpsimd_guest_restore
- alternative_else_nop_endif
+ static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
+@@ -115,10 +112,13 @@ static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
+ 	write_sysreg_el1(ctxt->sys_regs[AMAIR_EL1],	amair);
+ 	write_sysreg_el1(ctxt->sys_regs[CNTKCTL_EL1], 	cntkctl);
+ 	write_sysreg(ctxt->sys_regs[PAR_EL1],		par_el1);
++	write_sysreg(ctxt->sys_regs[TPIDR_EL1],		tpidr_el1);
  
--	mrs	x1, tpidr_el2
- 	mov	x0, #ARM_EXCEPTION_TRAP
- 	b	__guest_exit
+ 	write_sysreg(ctxt->gp_regs.sp_el1,		sp_el1);
+ 	write_sysreg_el1(ctxt->gp_regs.elr_el1,		elr);
+ 	write_sysreg_el1(ctxt->gp_regs.spsr[KVM_SPSR_EL1],spsr);
++	write_sysreg_el2(ctxt->gp_regs.regs.pc,		elr);
++	write_sysreg_el2(ctxt->gp_regs.regs.pstate,	spsr);
+ }
  
- el1_irq:
- 	stp     x0, x1, [sp, #-16]!
--	mrs	x1, tpidr_el2
-+	ldr	x1, [sp, #16 + 8]
- 	mov	x0, #ARM_EXCEPTION_IRQ
- 	b	__guest_exit
- 
- el1_error:
- 	stp     x0, x1, [sp, #-16]!
--	mrs	x1, tpidr_el2
-+	ldr	x1, [sp, #16 + 8]
- 	mov	x0, #ARM_EXCEPTION_EL1_SERROR
- 	b	__guest_exit
- 
+ static hyp_alternate_select(__sysreg_call_restore_host_state,
 -- 
 2.15.0
 
