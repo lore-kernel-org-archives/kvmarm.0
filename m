@@ -1,26 +1,25 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] arm64: KVM: Hide PMU from guests when disabled
-Date: Mon, 8 Jan 2018 15:18:15 +0100
-Message-ID: <20180108141815.GA15307@cbox>
-References: <20171125174031.13117-1-drjones@redhat.com>
+From: Yury Norov <ynorov@caviumnetworks.com>
+Subject: Re: [PATCH v5 00/30] ARM Scalable Vector Extension (SVE)
+Date: Mon, 8 Jan 2018 17:49:05 +0300
+Message-ID: <20180108144905.qu5qbmaaglcgwvwq@yury-thinkpad>
+References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E113449D36
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jan 2018 09:13:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4347649DB5
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jan 2018 09:44:43 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pZyob4Vz2E80 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Jan 2018 09:13:38 -0500 (EST)
-Received: from mail-wm0-f67.google.com (mail-wm0-f67.google.com [74.125.82.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BF71649D32
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jan 2018 09:13:38 -0500 (EST)
-Received: by mail-wm0-f67.google.com with SMTP id i11so14486378wmf.4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 08 Jan 2018 06:18:18 -0800 (PST)
+ with ESMTP id kw1kjmis7tCz for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Jan 2018 09:44:41 -0500 (EST)
+Received: from NAM01-BY2-obe.outbound.protection.outlook.com
+ (mail-by2nam01on0082.outbound.protection.outlook.com [104.47.34.82])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7C9BD49D32
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jan 2018 09:44:41 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <20171125174031.13117-1-drjones@redhat.com>
+In-Reply-To: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,118 +29,144 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: cdall@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, Dave.Martin@arm.com, kvmarm@lists.cs.columbia.edu
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, "H. Peter Anvin" <hpa@zytor.com>, kvmarm@lists.cs.columbia.edu, linux-arch@vger.kernel.org, Ingo Molnar <mingo@redhat.com>, Michael Kerrisk <mtk.manpages@gmail.com>, Alan Hayward <alan.hayward@arm.com>, "H . J . Lu" <hjl.tools@gmail.com>, Alexander Viro <viro@zeniv.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Dmitry Safonov <dsafonov@virtuozzo.com>, Oleg Nesterov <oleg@redhat.com>, linux-api@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Drew,
-
-On Sat, Nov 25, 2017 at 06:40:31PM +0100, Andrew Jones wrote:
-> Since commit 93390c0a1b20 ("arm64: KVM: Hide unsupported AArch64 CPU
-> features from guests") we can hide cpu features from guests. Apply
-> this to a long standing issue where guests see a PMU available, but
-> it's not, because it was not enabled by KVM's userspace.
+On Tue, Oct 31, 2017 at 03:50:52PM +0000, Dave Martin wrote:
+> This series implements Linux kernel support for the ARM Scalable Vector
+> Extension (SVE). [1]  It supersedes the previous v3: see [3] for link
+> and full cover letter.
 > 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  arch/arm64/kvm/sys_regs.c | 35 +++++++++++++++++++++--------------
->  1 file changed, 21 insertions(+), 14 deletions(-)
+> This is a minor update to v4, but does contain a couple of important
+> fixes.
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 1830ebc227d1..503144f13af0 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -881,18 +881,25 @@ static bool access_cntp_cval(struct kvm_vcpu *vcpu,
->  }
->  
->  /* Read a sanitised cpufeature ID register by sys_reg_desc */
-> -static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
-> +static u64 read_id_reg(struct kvm_vcpu *vcpu,
-> +		       struct sys_reg_desc const *r,
-> +		       bool raz)
->  {
->  	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
->  			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
->  	u64 val = raz ? 0 : read_sanitised_ftr_reg(id);
->  
-> -	if (id == SYS_ID_AA64PFR0_EL1) {
-> +	switch (id) {
-> +	case SYS_ID_AA64DFR0_EL1:
-> +		if (!kvm_arm_pmu_v3_ready(vcpu))
-> +			val &= ~(0xfUL << ID_AA64DFR0_PMUVER_SHIFT);
+> As in previous postings, the last two patches (here 29-30) are still
+> RFC and not proposed for merging at this time.
+> 
+> The patches apply on
+> git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git
+> for-next/core
+> d7b1d22d3821 ("arm64: uapi: Remove PSR_Q_BIT")
+> 
+> To reduce spam, some people may not been copied on the entire series.
+> For those who did not receive the whole series, it can be found in the
+> linux-arm-kernel archive. [2]
+> 
+> See the individual patches for details of changes.
+> 
+> For reviewer convenience, a git tree is available. [4]
+> 
+> Since there are some changes against already-reviewed patches, I've also
+> pushed an unsquashed fixes tree for people to take a look at if it
+> helps. [5]
+> 
+> 
+> Summary:
+> 
+>  * "regset: Add support for dynamically sized regsets" fixed to avoid
+>    x86 breakage;
+> 
+>  * one trival arm64 patch added to add asmlinkage annotations, and a
+>    corresponding minor change to the Core task context handling patch;
+> 
+>  * one new arm64 fix ("signal: Verify extra data is user-readable in
+>    sys_rt_sigreturn") to ensure that access_ok() checks are done for the
+>    whole extended signal frame, not just the base frame;
+> 
+>  * one minor fix to the SVE sigreturn code to return consistent
+>    intermediate error values (semantic correctness, non-functional
+>    change);
+> 
+>  * one minor change to call __copy_from_user() instead of
+>    copy_from_user() in a situation where there is already an access_ok()
+>    check;
+> 
+> 
+> [1] ARM Scalable Vector Extension
+> https://community.arm.com/groups/processors/blog/2016/08/22/technology-update-the-scalable-vector-extension-sve-for-the-armv8-a-architecture
+> 
+> [2] linux-arm-kernel October 2017 Archives by thread
+> http://lists.infradead.org/pipermail/linux-arm-kernel/2017-October/thread.html
+> 
+> [3] [PATCH v4 00/28] ARM Scalable Vector Extension (SVE)
+> http://lists.infradead.org/pipermail/linux-arm-kernel/2017-October/539414.html
+> 
+> [4] For review and testing only -- **do not pull**
+>     (This branch has review changelogs which should not form part of
+>     the final commits.)
+> 
+>     v5 series (this posting)
+> 
+>     http://linux-arm.org/git?p=linux-dm.git;a=shortlog;h=refs/heads/sve/v5
+>     git://linux-arm.org/linux-dm.git sve/v5
+> 
+> [5] For review and testing only -- **do not pull**
+>     (This branch has review changelogs which should not form part of
+>     the final commits.)
+> 
+>     v4 with unsquashed fixes
+> 
+>     http://linux-arm.org/git?p=linux-dm.git;a=shortlog;h=refs/heads/sve/v4%2Bfixes
+>     git://linux-arm.org/linux-dm.git sve/v4+fixes
 
-This is actually problematic, becuase it can break migration.  If
-user space reads the guest state at some point after the guest has been
-started with vPMU enabled, but then tries to restore the state before
-creating a pmu, then we get an error.  See below...
+Hi Dave,
 
-> +		break;
-> +	case SYS_ID_AA64PFR0_EL1:
->  		if (val & (0xfUL << ID_AA64PFR0_SVE_SHIFT))
->  			pr_err_once("kvm [%i]: SVE unsupported for guests, suppressing\n",
->  				    task_pid_nr(current));
-> -
->  		val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
-> +		break;
->  	}
->  
->  	return val;
-> @@ -908,7 +915,7 @@ static bool __access_id_reg(struct kvm_vcpu *vcpu,
->  	if (p->is_write)
->  		return write_to_read_only(vcpu, p, r);
->  
-> -	p->regval = read_id_reg(r, raz);
-> +	p->regval = read_id_reg(vcpu, r, raz);
->  	return true;
->  }
->  
-> @@ -937,17 +944,17 @@ static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
->   * are stored, and for set_id_reg() we don't allow the effective value
->   * to be changed.
->   */
-> -static int __get_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
-> -			bool raz)
-> +static int __get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> +			void __user *uaddr, bool raz)
->  {
->  	const u64 id = sys_reg_to_index(rd);
-> -	const u64 val = read_id_reg(rd, raz);
-> +	const u64 val = read_id_reg(vcpu, rd, raz);
->  
->  	return reg_to_user(uaddr, &val, id);
->  }
->  
-> -static int __set_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
-> -			bool raz)
-> +static int __set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> +			void __user *uaddr, bool raz)
->  {
->  	const u64 id = sys_reg_to_index(rd);
->  	int err;
-> @@ -958,7 +965,7 @@ static int __set_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
->  		return err;
->  
->  	/* This is what we mean by invariant: you can't change it. */
-> -	if (val != read_id_reg(rd, raz))
-> +	if (val != read_id_reg(vcpu, rd, raz))
+During rebase of my ILP32 series on 4.15 kernel I found that 
+ILP32 needs to be enabled with SVE support, like you do for 
+LP64 in this series.
 
-So since we modified read_id_reg above for the PMU, we have now broken
-migration, because we've introduced an implicit ordering requirement for
-creating the PMU.
+I did all rebase work on this draft branch:
+https://github.com/norov/linux/tree/ilp32-4.15-rc7
 
-One way to handle this is to remove this check at this point and verify
-integrity when we're about to run a VCPU, but that changes behavior and
-we've been happy with the invariant checks so far.
+But any ILP32 program I tried crash, and the message in dmesg looks
+like this:
+[   39.510667] CPU: 0 PID: 1857 Comm: mytime Not tainted 4.15.0-rc7-00028-g45e0659df4d9 #41
+[   39.510712] Hardware name: linux,dummy-virt (DT)
+[   39.510829] pstate: 00000000 (nzcv daif -PAN -UAO)
+[   39.511101] pc : 0x33488e28
+[   39.511125] lr : 0x33488e28
+[   39.511138] sp : 00000000fffef670
+[   39.511158] x29: 000000005a536c33 x28: 0000000000000000 
+[   39.511211] x27: 0000000000000000 x26: 0000000000000000 
+[   39.511235] x25: 0000000000000000 x24: 0000000000000000 
+[   39.511257] x23: 0000000000466000 x22: 0000000000000000 
+[   39.511278] x21: 0000000000000000 x20: 000000000047f2a8 
+[   39.511300] x19: 0000000000000000 x18: 0000000000000001 
+[   39.511321] x17: 0000000000001000 x16: 0000000000001030 
+[   39.511342] x15: 0000000000554e47 x14: 0000000000000001 
+[   39.511364] x13: 0000000000000004 x12: 000000000000003c 
+[   39.511385] x11: 0000100000000000 x10: 0800000000000000 
+[   39.511406] x9 : 0fffffffffffffff x8 : 000000000000007c 
+[   39.511427] x7 : 0000000000000077 x6 : 0000000000000041 
+[   39.511448] x5 : 0000000000000411 x4 : 00000000fbad2488 
+[   39.511468] x3 : 0000000000000001 x2 : 0000000000497950 
+[   39.511489] x1 : 0000000000497550 x0 : 0000000000000001
 
-Perhaps a better approach is to let userspace write ID register values
-that can be hidden, and then simply mask of features when the guest is
-running which would allow snapshotting the id register values any time
-before/after adding all features/peripherals to the VCPUs.
+(PC, LR and other registers may differ depending on test)
 
-Thoughts?
+I'm pretty sure that this is SVE-related issue because if I disable
+ARM64_SVE in config, everything becomes working.
 
-I'll drop this patch from queue and next for now until we have a better
-solution.
+I didn't get deep enough into this yet, and most probably there's
+some stupid reason for crashing apps on my side, but in mail list
+I found some sve-related patches that I cannot apply both on 4.15-rc
+and next-20180108. And according to patch names, it is important
+fixes, like this one:
+https://www.spinics.net/lists/arm-kernel/msg619548.html
+
+ILP32 code may spit some kernel issues from time to time, so there's
+minor chance that the problem is not in ILP32 itself - that's why I
+write this email to you.
+
+What I want to ask you, do you have some branch with the most recent
+SVE code that includes all fixes? Better if it would be 4.15-based
+series, because we don't support ILP32 on next-* kernels now.
+
+Also, if you have few minutes to take look at my series, I would
+kindly ask you do this, because I still think that this is my
+misunderstanding of how SVE should work for ILP32, and you as author
+may just catch the bug at a glance.
 
 Thanks,
--Christoffer
+Yury
