@@ -1,7 +1,7 @@
 From: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
-Subject: [PATCH v6 05/16] KVM: arm64: Stop save/restoring host tpidr_el1 on VHE
-Date: Mon,  8 Jan 2018 15:38:07 +0000
-Message-ID: <20180108153818.22743-6-james.morse@arm.com>
+Subject: [PATCH v6 04/16] arm64: alternatives: use tpidr_el2 on VHE hosts
+Date: Mon,  8 Jan 2018 15:38:06 +0000
+Message-ID: <20180108153818.22743-5-james.morse@arm.com>
 References: <20180108153818.22743-1-james.morse@arm.com>
 Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <20180108153818.22743-1-james.morse-5wv7dgnIgG8@public.gmane.org>
@@ -10,123 +10,207 @@ To: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
 Cc: kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Lorenzo Pieralisi <lorenzo.pieralisi-5wv7dgnIgG8@public.gmane.org>, Loc Ho <lho-qTEPVZfXA3Y@public.gmane.org>, Heyi Guo <guoheyi-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now that a VHE host uses tpidr_el2 for the cpu offset we no longer
-need KVM to save/restore tpidr_el1. Move this from the 'common' code
-into the non-vhe code. While we're at it, on VHE we don't need to
-save the ELR or SPSR as kernel_entry in entry.S will have pushed these
-onto the kernel stack, and will restore them from there. Move these
-to the non-vhe code as we need them to get back to the host.
-
-Finally remove the always-copy-tpidr we hid in the stage2 setup
-code, cpufeature's enable callback will do this for VHE, we only
-need KVM to do it for non-vhe. Add the copy into kvm-init instead.
+Now that KVM uses tpidr_el2 in the same way as Linux's cpu_offset in
+tpidr_el1, merge the two. This saves KVM from save/restoring tpidr_el1
+on VHE hosts, and allows future code to blindly access per-cpu variables
+without triggering world-switch.
 
 Signed-off-by: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
 Reviewed-by: Christoffer Dall <cdall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Reviewed-by: Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>
 ---
+Changes since v3:
+ * Moved 'alternatives_applied' test all into C,
+ * Made enable method static and dragged up before first-use.
+
 Changes since v1:
- * Switched KVM<->arm64 in the subject.
+ * cpu_copy_el2regs()'s 'have I been patched' test now always sets a register,
+   just in case the compiler optimises out part of the logic.
 
- arch/arm64/kvm/hyp-init.S      |  4 ++++
- arch/arm64/kvm/hyp/s2-setup.c  |  3 ---
- arch/arm64/kvm/hyp/sysreg-sr.c | 16 ++++++++--------
- 3 files changed, 12 insertions(+), 11 deletions(-)
+ arch/arm64/include/asm/alternative.h |  2 ++
+ arch/arm64/include/asm/assembler.h   |  8 ++++++++
+ arch/arm64/include/asm/percpu.h      | 11 +++++++++--
+ arch/arm64/kernel/alternative.c      |  9 +++++----
+ arch/arm64/kernel/cpufeature.c       | 17 +++++++++++++++++
+ arch/arm64/mm/proc.S                 |  8 ++++++++
+ 6 files changed, 49 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp-init.S
-index 3f9615582377..fbf259893f6a 100644
---- a/arch/arm64/kvm/hyp-init.S
-+++ b/arch/arm64/kvm/hyp-init.S
-@@ -122,6 +122,10 @@ CPU_BE(	orr	x4, x4, #SCTLR_ELx_EE)
- 	kern_hyp_va	x2
- 	msr	vbar_el2, x2
+diff --git a/arch/arm64/include/asm/alternative.h b/arch/arm64/include/asm/alternative.h
+index 4a85c6952a22..669028172fd6 100644
+--- a/arch/arm64/include/asm/alternative.h
++++ b/arch/arm64/include/asm/alternative.h
+@@ -12,6 +12,8 @@
+ #include <linux/stddef.h>
+ #include <linux/stringify.h>
  
-+	/* copy tpidr_el1 into tpidr_el2 for use by HYP */
-+	mrs	x1, tpidr_el1
-+	msr	tpidr_el2, x1
++extern int alternatives_applied;
 +
- 	/* Hello, World! */
- 	eret
- ENDPROC(__kvm_hyp_init)
-diff --git a/arch/arm64/kvm/hyp/s2-setup.c b/arch/arm64/kvm/hyp/s2-setup.c
-index 7fb88274eba1..a81f5e10fc8c 100644
---- a/arch/arm64/kvm/hyp/s2-setup.c
-+++ b/arch/arm64/kvm/hyp/s2-setup.c
-@@ -84,8 +84,5 @@ u32 __hyp_text __init_stage2_translation(void)
+ struct alt_instr {
+ 	s32 orig_offset;	/* offset to original instruction */
+ 	s32 alt_offset;		/* offset to replacement instruction */
+diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
+index cee60ce0da52..26ccee193d62 100644
+--- a/arch/arm64/include/asm/assembler.h
++++ b/arch/arm64/include/asm/assembler.h
+@@ -254,7 +254,11 @@ lr	.req	x30		// link register
+ #else
+ 	adr_l	\dst, \sym
+ #endif
++alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
+ 	mrs	\tmp, tpidr_el1
++alternative_else
++	mrs	\tmp, tpidr_el2
++alternative_endif
+ 	add	\dst, \dst, \tmp
+ 	.endm
  
- 	write_sysreg(val, vtcr_el2);
+@@ -265,7 +269,11 @@ lr	.req	x30		// link register
+ 	 */
+ 	.macro ldr_this_cpu dst, sym, tmp
+ 	adr_l	\dst, \sym
++alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
+ 	mrs	\tmp, tpidr_el1
++alternative_else
++	mrs	\tmp, tpidr_el2
++alternative_endif
+ 	ldr	\dst, [\dst, \tmp]
+ 	.endm
  
--	/* copy tpidr_el1 into tpidr_el2 for use by HYP */
--	write_sysreg(read_sysreg(tpidr_el1), tpidr_el2);
--
- 	return parange;
+diff --git a/arch/arm64/include/asm/percpu.h b/arch/arm64/include/asm/percpu.h
+index 3bd498e4de4c..43393208229e 100644
+--- a/arch/arm64/include/asm/percpu.h
++++ b/arch/arm64/include/asm/percpu.h
+@@ -16,11 +16,15 @@
+ #ifndef __ASM_PERCPU_H
+ #define __ASM_PERCPU_H
+ 
++#include <asm/alternative.h>
+ #include <asm/stack_pointer.h>
+ 
+ static inline void set_my_cpu_offset(unsigned long off)
+ {
+-	asm volatile("msr tpidr_el1, %0" :: "r" (off) : "memory");
++	asm volatile(ALTERNATIVE("msr tpidr_el1, %0",
++				 "msr tpidr_el2, %0",
++				 ARM64_HAS_VIRT_HOST_EXTN)
++			:: "r" (off) : "memory");
  }
-diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-index 934137647837..c54cc2afb92b 100644
---- a/arch/arm64/kvm/hyp/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-@@ -27,8 +27,8 @@ static void __hyp_text __sysreg_do_nothing(struct kvm_cpu_context *ctxt) { }
- /*
-  * Non-VHE: Both host and guest must save everything.
-  *
-- * VHE: Host must save tpidr*_el[01], actlr_el1, mdscr_el1, sp0, pc,
-- * pstate, and guest must save everything.
-+ * VHE: Host must save tpidr*_el0, actlr_el1, mdscr_el1, sp_el0,
-+ * and guest must save everything.
+ 
+ static inline unsigned long __my_cpu_offset(void)
+@@ -31,7 +35,10 @@ static inline unsigned long __my_cpu_offset(void)
+ 	 * We want to allow caching the value, so avoid using volatile and
+ 	 * instead use a fake stack read to hazard against barrier().
+ 	 */
+-	asm("mrs %0, tpidr_el1" : "=r" (off) :
++	asm(ALTERNATIVE("mrs %0, tpidr_el1",
++			"mrs %0, tpidr_el2",
++			ARM64_HAS_VIRT_HOST_EXTN)
++		: "=r" (off) :
+ 		"Q" (*(const unsigned long *)current_stack_pointer));
+ 
+ 	return off;
+diff --git a/arch/arm64/kernel/alternative.c b/arch/arm64/kernel/alternative.c
+index 6dd0a3a3e5c9..414288a558c8 100644
+--- a/arch/arm64/kernel/alternative.c
++++ b/arch/arm64/kernel/alternative.c
+@@ -32,6 +32,8 @@
+ #define ALT_ORIG_PTR(a)		__ALT_PTR(a, orig_offset)
+ #define ALT_REPL_PTR(a)		__ALT_PTR(a, alt_offset)
+ 
++int alternatives_applied;
++
+ struct alt_region {
+ 	struct alt_instr *begin;
+ 	struct alt_instr *end;
+@@ -143,7 +145,6 @@ static void __apply_alternatives(void *alt_region, bool use_linear_alias)
   */
+ static int __apply_alternatives_multi_stop(void *unused)
+ {
+-	static int patched = 0;
+ 	struct alt_region region = {
+ 		.begin	= (struct alt_instr *)__alt_instructions,
+ 		.end	= (struct alt_instr *)__alt_instructions_end,
+@@ -151,14 +152,14 @@ static int __apply_alternatives_multi_stop(void *unused)
  
- static void __hyp_text __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
-@@ -36,11 +36,8 @@ static void __hyp_text __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
- 	ctxt->sys_regs[ACTLR_EL1]	= read_sysreg(actlr_el1);
- 	ctxt->sys_regs[TPIDR_EL0]	= read_sysreg(tpidr_el0);
- 	ctxt->sys_regs[TPIDRRO_EL0]	= read_sysreg(tpidrro_el0);
--	ctxt->sys_regs[TPIDR_EL1]	= read_sysreg(tpidr_el1);
- 	ctxt->sys_regs[MDSCR_EL1]	= read_sysreg(mdscr_el1);
- 	ctxt->gp_regs.regs.sp		= read_sysreg(sp_el0);
--	ctxt->gp_regs.regs.pc		= read_sysreg_el2(elr);
--	ctxt->gp_regs.regs.pstate	= read_sysreg_el2(spsr);
- }
+ 	/* We always have a CPU 0 at this point (__init) */
+ 	if (smp_processor_id()) {
+-		while (!READ_ONCE(patched))
++		while (!READ_ONCE(alternatives_applied))
+ 			cpu_relax();
+ 		isb();
+ 	} else {
+-		BUG_ON(patched);
++		BUG_ON(alternatives_applied);
+ 		__apply_alternatives(&region, true);
+ 		/* Barriers provided by the cache flushing */
+-		WRITE_ONCE(patched, 1);
++		WRITE_ONCE(alternatives_applied, 1);
+ 	}
  
- static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
-@@ -62,10 +59,13 @@ static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
- 	ctxt->sys_regs[AMAIR_EL1]	= read_sysreg_el1(amair);
- 	ctxt->sys_regs[CNTKCTL_EL1]	= read_sysreg_el1(cntkctl);
- 	ctxt->sys_regs[PAR_EL1]		= read_sysreg(par_el1);
-+	ctxt->sys_regs[TPIDR_EL1]	= read_sysreg(tpidr_el1);
+ 	return 0;
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 9d4d82c11528..501cd1aff82c 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -885,6 +885,22 @@ static int __init parse_kpti(char *str)
+ __setup("kpti=", parse_kpti);
+ #endif	/* CONFIG_UNMAP_KERNEL_AT_EL0 */
  
- 	ctxt->gp_regs.sp_el1		= read_sysreg(sp_el1);
- 	ctxt->gp_regs.elr_el1		= read_sysreg_el1(elr);
- 	ctxt->gp_regs.spsr[KVM_SPSR_EL1]= read_sysreg_el1(spsr);
-+	ctxt->gp_regs.regs.pc		= read_sysreg_el2(elr);
-+	ctxt->gp_regs.regs.pstate	= read_sysreg_el2(spsr);
- }
++static int cpu_copy_el2regs(void *__unused)
++{
++	/*
++	 * Copy register values that aren't redirected by hardware.
++	 *
++	 * Before code patching, we only set tpidr_el1, all CPUs need to copy
++	 * this value to tpidr_el2 before we patch the code. Once we've done
++	 * that, freshly-onlined CPUs will set tpidr_el2, so we don't need to
++	 * do anything here.
++	 */
++	if (!alternatives_applied)
++		write_sysreg(read_sysreg(tpidr_el1), tpidr_el2);
++
++	return 0;
++}
++
+ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 	{
+ 		.desc = "GIC system register CPU interface",
+@@ -954,6 +970,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.capability = ARM64_HAS_VIRT_HOST_EXTN,
+ 		.def_scope = SCOPE_SYSTEM,
+ 		.matches = runs_at_el2,
++		.enable = cpu_copy_el2regs,
+ 	},
+ 	{
+ 		.desc = "32-bit EL0 Support",
+diff --git a/arch/arm64/mm/proc.S b/arch/arm64/mm/proc.S
+index 6affb68a9a14..f1635301c16e 100644
+--- a/arch/arm64/mm/proc.S
++++ b/arch/arm64/mm/proc.S
+@@ -70,7 +70,11 @@ ENTRY(cpu_do_suspend)
+ 	mrs	x8, mdscr_el1
+ 	mrs	x9, oslsr_el1
+ 	mrs	x10, sctlr_el1
++alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
+ 	mrs	x11, tpidr_el1
++alternative_else
++	mrs	x11, tpidr_el2
++alternative_endif
+ 	mrs	x12, sp_el0
+ 	stp	x2, x3, [x0]
+ 	stp	x4, xzr, [x0, #16]
+@@ -116,7 +120,11 @@ ENTRY(cpu_do_resume)
+ 	msr	mdscr_el1, x10
  
- static hyp_alternate_select(__sysreg_call_save_host_state,
-@@ -89,11 +89,8 @@ static void __hyp_text __sysreg_restore_common_state(struct kvm_cpu_context *ctx
- 	write_sysreg(ctxt->sys_regs[ACTLR_EL1],	  actlr_el1);
- 	write_sysreg(ctxt->sys_regs[TPIDR_EL0],	  tpidr_el0);
- 	write_sysreg(ctxt->sys_regs[TPIDRRO_EL0], tpidrro_el0);
--	write_sysreg(ctxt->sys_regs[TPIDR_EL1],	  tpidr_el1);
- 	write_sysreg(ctxt->sys_regs[MDSCR_EL1],	  mdscr_el1);
- 	write_sysreg(ctxt->gp_regs.regs.sp,	  sp_el0);
--	write_sysreg_el2(ctxt->gp_regs.regs.pc,	  elr);
--	write_sysreg_el2(ctxt->gp_regs.regs.pstate, spsr);
- }
- 
- static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
-@@ -115,10 +112,13 @@ static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
- 	write_sysreg_el1(ctxt->sys_regs[AMAIR_EL1],	amair);
- 	write_sysreg_el1(ctxt->sys_regs[CNTKCTL_EL1], 	cntkctl);
- 	write_sysreg(ctxt->sys_regs[PAR_EL1],		par_el1);
-+	write_sysreg(ctxt->sys_regs[TPIDR_EL1],		tpidr_el1);
- 
- 	write_sysreg(ctxt->gp_regs.sp_el1,		sp_el1);
- 	write_sysreg_el1(ctxt->gp_regs.elr_el1,		elr);
- 	write_sysreg_el1(ctxt->gp_regs.spsr[KVM_SPSR_EL1],spsr);
-+	write_sysreg_el2(ctxt->gp_regs.regs.pc,		elr);
-+	write_sysreg_el2(ctxt->gp_regs.regs.pstate,	spsr);
- }
- 
- static hyp_alternate_select(__sysreg_call_restore_host_state,
+ 	msr	sctlr_el1, x12
++alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
+ 	msr	tpidr_el1, x13
++alternative_else
++	msr	tpidr_el2, x13
++alternative_endif
+ 	msr	sp_el0, x14
+ 	/*
+ 	 * Restore oslsr_el1 by writing oslar_el1
 -- 
 2.15.0
 
