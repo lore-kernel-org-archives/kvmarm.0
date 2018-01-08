@@ -1,65 +1,76 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v5 13/13] KVM: arm64: Emulate RAS error registers and
- set HCR_EL2's TERR & TEA
-Date: Mon, 08 Jan 2018 16:27:13 +0000
-Message-ID: <5A539BE1.20003@arm.com>
-References: <20171215155101.23505-1-james.morse@arm.com>
- <20171215155101.23505-14-james.morse@arm.com>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH] arm64: Implement branch predictor hardening for Falkor
+Date: Mon, 8 Jan 2018 17:09:33 +0000
+Message-ID: <20180108170933.GU25869@arm.com>
+References: <1515184139-23743-1-git-send-email-shankerd@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E44C349DE6
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jan 2018 11:24:50 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6JuLiqwepWDD for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Jan 2018 11:24:49 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C427A49D27
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jan 2018 11:24:49 -0500 (EST)
-In-Reply-To: <20171215155101.23505-14-james.morse@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org
-Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1515184139-23743-1-git-send-email-shankerd@codeaurora.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Shanker Donthineni <shankerd@codeaurora.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, linux-kernel <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, kvmarm <kvmarm@lists.cs.columbia.edu>, Catalin Marinas <catalin.marinas@arm.com>, Vikram Sethi <vikrams@codeaurora.org>, Sean Campbell <scampbel@codeaurora.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+On Fri, Jan 05, 2018 at 02:28:59PM -0600, Shanker Donthineni wrote:
+> Falkor is susceptible to branch predictor aliasing and can
+> theoretically be attacked by malicious code. This patch
+> implements a mitigation for these attacks, preventing any
+> malicious entries from affecting other victim contexts.
 
-On 15/12/17 15:51, James Morse wrote:
-> From: Dongjiu Geng <gengdongjiu@huawei.com>
+Thanks, Shanker. I'll pick this up (fixing the typo pointed out by Drew).
+One comment below.
+
+> Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
+> ---
+>  This patch has been verified using tip of
+>    https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git/log/?h=kpti
+>         and
+>    https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/arch/arm64?h=v4.15-rc6&id=c622cc013cece073722592cff1ac6643a33b1622
 > 
-> ARMv8.2 adds a new bit HCR_EL2.TEA which routes synchronous external
-> aborts to EL2, and adds a trap control bit HCR_EL2.TERR which traps
-> all Non-secure EL1&0 error record accesses to EL2.
-> 
-> This patch enables the two bits for the guest OS, guaranteeing that
-> KVM takes external aborts and traps attempts to access the physical
-> error registers.
-> 
-> ERRIDR_EL1 advertises the number of error records, we return
-> zero meaning we can treat all the other registers as RAZ/WI too.
-> 
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> [removed specific emulation, use trap_raz_wi() directly for everything,
->  rephrased parts of the commit message]
-> Signed-off-by: James Morse <james.morse@arm.com>
+>  arch/arm64/include/asm/cpucaps.h |  3 ++-
+>  arch/arm64/include/asm/kvm_asm.h |  2 ++
+>  arch/arm64/kernel/bpi.S          |  8 +++++++
+>  arch/arm64/kernel/cpu_errata.c   | 49 ++++++++++++++++++++++++++++++++++++++--
+>  arch/arm64/kvm/hyp/entry.S       | 12 ++++++++++
+>  arch/arm64/kvm/hyp/switch.c      | 10 ++++++++
+>  6 files changed, 81 insertions(+), 3 deletions(-)
 
-v4 of this patch had a Reviewed-by Marc and Christoffer, which I didn't pick up
-because I'm an idiot:
+[...]
 
-https://patchwork.kernel.org/patch/10017537/
+> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+> index 12ee62d..9c45c6a 100644
+> --- a/arch/arm64/kvm/hyp/entry.S
+> +++ b/arch/arm64/kvm/hyp/entry.S
+> @@ -196,3 +196,15 @@ alternative_endif
+>  
+>  	eret
+>  ENDPROC(__fpsimd_guest_restore)
+> +
+> +ENTRY(__qcom_hyp_sanitize_btac_predictors)
+> +	/**
+> +	 * Call SMC64 with Silicon provider serviceID 23<<8 (0xc2001700)
+> +	 * 0xC2000000-0xC200FFFF: assigned to SiP Service Calls
+> +	 * b15-b0: contains SiP functionID
+> +	 */
+> +	movz    x0, #0x1700
+> +	movk    x0, #0xc200, lsl #16
+> +	smc     #0
+> +	ret
 
+As I mentioned to Jayachandran for the Cavium patches [1], using an
+unallocated SMC number like this may cause a problem for some platforms,
+such as qemu. Using the PSCI GET_VERSION call avoids this issue, so I'm
+relying on you to handle any breakage reports that arise from this change
+then.
 
-Thanks,
+FWIW: we're currently looking into extending PSCI/SMCCC so that a
+standardised mechanism can be implemented without the overhead of the
+current register stacking requirements.
 
-James
+Cheers,
+
+Will
+
+[1] http://lists.infradead.org/pipermail/linux-arm-kernel/2018-January/552511.html
