@@ -1,22 +1,23 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v1 13/16] kvm: arm64: Configure VTCR per VM
-Date: Tue,  9 Jan 2018 19:04:08 +0000
-Message-ID: <20180109190414.4017-14-suzuki.poulose@arm.com>
+Subject: [PATCH v1 16/16] vgic: its: Add support for 52bit guest physical
+ address
+Date: Tue,  9 Jan 2018 19:04:11 +0000
+Message-ID: <20180109190414.4017-17-suzuki.poulose@arm.com>
 References: <20180109190414.4017-1-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5392F49DB4
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Jan 2018 14:00:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 561CC49D62
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Jan 2018 14:00:52 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id brw+P6fIHOi0 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Jan 2018 14:00:42 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F73B49D6A
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Jan 2018 14:00:42 -0500 (EST)
+ with ESMTP id 86xaxsiOZB9u for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Jan 2018 14:00:51 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BE9DE49DA2
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Jan 2018 14:00:50 -0500 (EST)
 In-Reply-To: <20180109190414.4017-1-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,183 +32,142 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: ard.biesheuvel@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, Christoffer Dall <cdall@linaro.org>, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We set VTCR_EL2 very early during the stage2 init and don't
-touch it ever. This is fine as we had a fixed IPA size. This
-patch changes the behavior to set the VTCR for a given VM,
-depending on its stage2 table. The common configuration for
-VTCR is still performed during the early init. But the SL0
-and T0SZ are programmed for each VM and is cleared once we
-exit the VM.
+From: Kristina Martsenko <kristina.martsenko@arm.com>
+
+We only support 64K for the VGIC, which makes it easier to
+support the 52bit guest PA by simply removing the restriction
+that we put in to limit the bits to 48.
 
 Cc: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Christoffer Dall <cdall@linaro.org>
+Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
+[ Clean up macro usages, Add fixes for propbaser handling ]
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm64/include/asm/kvm_arm.h  | 16 ++++++----------
- arch/arm64/include/asm/kvm_asm.h  |  2 +-
- arch/arm64/include/asm/kvm_host.h |  8 +++++---
- arch/arm64/kvm/hyp/s2-setup.c     | 16 +---------------
- arch/arm64/kvm/hyp/switch.c       |  9 +++++++++
- 5 files changed, 22 insertions(+), 29 deletions(-)
+ virt/kvm/arm/vgic/vgic-its.c     | 36 ++++++++++--------------------------
+ virt/kvm/arm/vgic/vgic-mmio-v3.c |  1 -
+ 2 files changed, 10 insertions(+), 27 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index eb90d349e55f..d5c40816f073 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -115,9 +115,7 @@
- #define VTCR_EL2_IRGN0_WBWA	TCR_IRGN0_WBWA
- #define VTCR_EL2_SL0_SHIFT	6
- #define VTCR_EL2_SL0_MASK	(3 << VTCR_EL2_SL0_SHIFT)
--#define VTCR_EL2_SL0_LVL1	(1 << VTCR_EL2_SL0_SHIFT)
- #define VTCR_EL2_T0SZ_MASK	0x3f
--#define VTCR_EL2_T0SZ_40B	24
- #define VTCR_EL2_VS_SHIFT	19
- #define VTCR_EL2_VS_8BIT	(0 << VTCR_EL2_VS_SHIFT)
- #define VTCR_EL2_VS_16BIT	(1 << VTCR_EL2_VS_SHIFT)
-@@ -139,38 +137,36 @@
-  * D4-23 and D4-25 in ARM DDI 0487A.b.
-  */
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index 8e633bd9cc1e..60ab293ec542 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -233,13 +233,6 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
+ 	list_for_each_entry(dev, &(its)->device_list, dev_list) \
+ 		list_for_each_entry(ite, &(dev)->itt_head, ite_list)
  
--#define VTCR_EL2_T0SZ_IPA	VTCR_EL2_T0SZ_40B
- #define VTCR_EL2_COMMON_BITS	(VTCR_EL2_SH0_INNER | VTCR_EL2_ORGN0_WBWA | \
- 				 VTCR_EL2_IRGN0_WBWA | VTCR_EL2_RES1)
-+#define VTCR_EL2_PRIVATE_MASK	(VTCR_EL2_SL0_MASK | VTCR_EL2_T0SZ_MASK)
- 
- #ifdef CONFIG_ARM64_64K_PAGES
- /*
-  * Stage2 translation configuration:
-  * 64kB pages (TG0 = 1)
-- * 2 level page tables (SL = 1)
-  */
--#define VTCR_EL2_TGRAN_FLAGS		(VTCR_EL2_TG0_64K | VTCR_EL2_SL0_LVL1)
-+#define VTCR_EL2_TGRAN			VTCR_EL2_TG0_64K
- #define VTCR_EL2_TGRAN_SL0_BASE		3UL
- 
- #elif defined(CONFIG_ARM64_16K_PAGES)
- /*
-  * Stage2 translation configuration:
-  * 16kB pages (TG0 = 2)
-- * 2 level page tables (SL = 1)
-  */
--#define VTCR_EL2_TGRAN_FLAGS		(VTCR_EL2_TG0_16K | VTCR_EL2_SL0_LVL1)
-+#define VTCR_EL2_TGRAN			VTCR_EL2_TG0_16K
- #define VTCR_EL2_TGRAN_SL0_BASE		3UL
- #else	/* 4K */
- /*
-  * Stage2 translation configuration:
-  * 4kB pages (TG0 = 0)
-- * 3 level page tables (SL = 1)
-  */
--#define VTCR_EL2_TGRAN_FLAGS		(VTCR_EL2_TG0_4K | VTCR_EL2_SL0_LVL1)
-+#define VTCR_EL2_TGRAN			VTCR_EL2_TG0_4K
- #define VTCR_EL2_TGRAN_SL0_BASE		2UL
- #endif
- 
--#define VTCR_EL2_FLAGS			(VTCR_EL2_COMMON_BITS | VTCR_EL2_TGRAN_FLAGS)
-+#define VTCR_EL2_FLAGS		(VTCR_EL2_COMMON_BITS | VTCR_EL2_TGRAN)
-+
- /*
-  * VTCR_EL2:SL0 indicates the entry level for Stage2 translation.
-  * Interestingly, it depends on the page size.
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index ab4d0a926043..21cfd1fe692c 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -66,7 +66,7 @@ extern void __vgic_v3_init_lrs(void);
- 
- extern u32 __kvm_get_mdcr_el2(void);
- 
--extern u32 __init_stage2_translation(void);
-+extern void __init_stage2_translation(void);
- 
- #endif
- 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index ea6cb5b24258..9a9ddeb33c84 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -380,10 +380,12 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
- 
- static inline void __cpu_init_stage2(void)
- {
--	u32 parange = kvm_call_hyp(__init_stage2_translation);
-+	u32 ps;
- 
--	WARN_ONCE(parange < 40,
--		  "PARange is %d bits, unsupported configuration!", parange);
-+	kvm_call_hyp(__init_stage2_translation);
-+	ps = id_aa64mmfr0_parange_to_phys_shift(read_sysreg(id_aa64mmfr0_el1));
-+	WARN_ONCE(ps < 40,
-+		  "PARange is %d bits, unsupported configuration!", ps);
- }
- 
- /*
-diff --git a/arch/arm64/kvm/hyp/s2-setup.c b/arch/arm64/kvm/hyp/s2-setup.c
-index b1129c83c531..5c26ad4b8ac9 100644
---- a/arch/arm64/kvm/hyp/s2-setup.c
-+++ b/arch/arm64/kvm/hyp/s2-setup.c
-@@ -19,13 +19,11 @@
- #include <asm/kvm_arm.h>
- #include <asm/kvm_asm.h>
- #include <asm/kvm_hyp.h>
--#include <asm/cpufeature.h>
- 
--u32 __hyp_text __init_stage2_translation(void)
-+void __hyp_text __init_stage2_translation(void)
- {
- 	u64 val = VTCR_EL2_FLAGS;
- 	u64 parange;
--	u32 phys_shift;
- 	u64 tmp;
- 
- 	/*
-@@ -38,16 +36,6 @@ u32 __hyp_text __init_stage2_translation(void)
- 		parange = ID_AA64MMFR0_PARANGE_MAX;
- 	val |= parange << 16;
- 
--	/* Compute the actual PARange... */
--	phys_shift = id_aa64mmfr0_parange_to_phys_shift(parange);
+-/*
+- * We only implement 48 bits of PA at the moment, although the ITS
+- * supports more. Let's be restrictive here.
+- */
+-#define BASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 16))
+-#define CBASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 12))
 -
+ #define GIC_LPI_OFFSET 8192
+ 
+ #define VITS_TYPER_IDBITS 16
+@@ -769,7 +762,7 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
+ 		if (id >= (l1_tbl_size / esz))
+ 			return false;
+ 
+-		addr = BASER_ADDRESS(baser) + id * esz;
++		addr = GITS_BASER_ADDR64K_TO_PHYS(baser) + id * esz;
+ 		gfn = addr >> PAGE_SHIFT;
+ 
+ 		if (eaddr)
+@@ -784,7 +777,8 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
+ 
+ 	/* Each 1st level entry is represented by a 64-bit value. */
+ 	if (kvm_read_guest(its->dev->kvm,
+-			   BASER_ADDRESS(baser) + index * sizeof(indirect_ptr),
++			   GITS_BASER_ADDR64K_TO_PHYS(baser) +
++				 index * sizeof(indirect_ptr),
+ 			   &indirect_ptr, sizeof(indirect_ptr)))
+ 		return false;
+ 
+@@ -794,11 +788,7 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
+ 	if (!(indirect_ptr & BIT_ULL(63)))
+ 		return false;
+ 
 -	/*
--	 * ... and clamp it to 40 bits, unless we have some braindead
--	 * HW that implements less than that. In all cases, we'll
--	 * return that value for the rest of the kernel to decide what
--	 * to do.
+-	 * Mask the guest physical address and calculate the frame number.
+-	 * Any address beyond our supported 48 bits of PA will be caught
+-	 * by the actual check in the final step.
 -	 */
--	val |= 64 - (phys_shift > 40 ? 40 : phys_shift);
++	/* Mask the guest physical address and calculate the frame number. */
+ 	indirect_ptr &= GENMASK_ULL(51, 16);
  
- 	/*
- 	 * Check the availability of Hardware Access Flag / Dirty Bit
-@@ -67,6 +55,4 @@ u32 __hyp_text __init_stage2_translation(void)
- 			VTCR_EL2_VS_8BIT;
+ 	/* Find the address of the actual entry */
+@@ -1292,9 +1282,6 @@ static u64 vgic_sanitise_its_baser(u64 reg)
+ 				  GITS_BASER_OUTER_CACHEABILITY_SHIFT,
+ 				  vgic_sanitise_outer_cacheability);
  
- 	write_sysreg(val, vtcr_el2);
+-	/* Bits 15:12 contain bits 51:48 of the PA, which we don't support. */
+-	reg &= ~GENMASK_ULL(15, 12);
 -
--	return phys_shift;
- }
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index f7c651f3a8c0..523471f0af7b 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -157,11 +157,20 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
- static void __hyp_text __activate_vm(struct kvm_vcpu *vcpu)
- {
- 	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
-+	u64 vtcr = read_sysreg(vtcr_el2);
-+
-+	vtcr &= ~VTCR_EL2_PRIVATE_MASK;
-+	vtcr |= VTCR_EL2_SL0(stage2_pt_levels(kvm)) |
-+		VTCR_EL2_T0SZ(kvm_phys_shift(kvm));
-+	write_sysreg(vtcr, vtcr_el2);
- 	write_sysreg(kvm->arch.vttbr, vttbr_el2);
- }
+ 	/* We support only one (ITS) page size: 64K */
+ 	reg = (reg & ~GITS_BASER_PAGE_SIZE_MASK) | GITS_BASER_PAGE_SIZE_64K;
  
- static void __hyp_text __deactivate_vm(struct kvm_vcpu *vcpu)
+@@ -1313,11 +1300,8 @@ static u64 vgic_sanitise_its_cbaser(u64 reg)
+ 				  GITS_CBASER_OUTER_CACHEABILITY_SHIFT,
+ 				  vgic_sanitise_outer_cacheability);
+ 
+-	/*
+-	 * Sanitise the physical address to be 64k aligned.
+-	 * Also limit the physical addresses to 48 bits.
+-	 */
+-	reg &= ~(GENMASK_ULL(51, 48) | GENMASK_ULL(15, 12));
++	/* Sanitise the physical address to be 64k aligned. */
++	reg &= ~GENMASK_ULL(15, 12);
+ 
+ 	return reg;
+ }
+@@ -1363,7 +1347,7 @@ static void vgic_its_process_commands(struct kvm *kvm, struct vgic_its *its)
+ 	if (!its->enabled)
+ 		return;
+ 
+-	cbaser = CBASER_ADDRESS(its->cbaser);
++	cbaser = GITS_CBASER_ADDRESS(its->cbaser);
+ 
+ 	while (its->cwriter != its->creadr) {
+ 		int ret = kvm_read_guest(kvm, cbaser + its->creadr,
+@@ -2221,7 +2205,7 @@ static int vgic_its_restore_device_tables(struct vgic_its *its)
+ 	if (!(baser & GITS_BASER_VALID))
+ 		return 0;
+ 
+-	l1_gpa = BASER_ADDRESS(baser);
++	l1_gpa = GITS_BASER_ADDR64K_TO_PHYS(baser);
+ 
+ 	if (baser & GITS_BASER_INDIRECT) {
+ 		l1_esz = GITS_LVL1_ENTRY_SIZE;
+@@ -2293,7 +2277,7 @@ static int vgic_its_save_collection_table(struct vgic_its *its)
  {
-+	u64 vtcr = read_sysreg(vtcr_el2) & ~VTCR_EL2_PRIVATE_MASK;
-+
-+	write_sysreg(vtcr, vtcr_el2);
- 	write_sysreg(0, vttbr_el2);
+ 	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+ 	u64 baser = its->baser_coll_table;
+-	gpa_t gpa = BASER_ADDRESS(baser);
++	gpa_t gpa = GITS_BASER_ADDR64K_TO_PHYS(baser);
+ 	struct its_collection *collection;
+ 	u64 val;
+ 	size_t max_size, filled = 0;
+@@ -2342,7 +2326,7 @@ static int vgic_its_restore_collection_table(struct vgic_its *its)
+ 	if (!(baser & GITS_BASER_VALID))
+ 		return 0;
+ 
+-	gpa = BASER_ADDRESS(baser);
++	gpa = GITS_BASER_ADDR64K_TO_PHYS(baser);
+ 
+ 	max_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
+ 
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index 671fe81f8e1d..90f36d9c946b 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -351,7 +351,6 @@ static u64 vgic_sanitise_propbaser(u64 reg)
+ 				  vgic_sanitise_outer_cacheability);
+ 
+ 	reg &= ~PROPBASER_RES0_MASK;
+-	reg &= ~GENMASK_ULL(51, 48);
+ 	return reg;
  }
  
 -- 
