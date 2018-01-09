@@ -1,58 +1,56 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v1 07/16] kvm: arm/arm64: Remove spurious WARN_ON
-Date: Tue,  9 Jan 2018 19:04:02 +0000
-Message-ID: <20180109190414.4017-8-suzuki.poulose@arm.com>
+Subject: [PATCH v1 04/16] arm64: Refactor pud_huge for reusability
+Date: Tue,  9 Jan 2018 19:03:59 +0000
+Message-ID: <20180109190414.4017-5-suzuki.poulose@arm.com>
 References: <20180109190414.4017-1-suzuki.poulose@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E601B49DB4
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Jan 2018 14:00:25 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kJ5r2WgwmLHM for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Jan 2018 14:00:25 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 73E1549DDF
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Jan 2018 14:00:24 -0500 (EST)
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20180109190414.4017-1-suzuki.poulose@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: linux-kernel-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org
-Cc: ard.biesheuvel@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, Christoffer Dall <cdall@linaro.org>, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, peter.maydell@linaro.org, suzuki.poulose@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, will.deacon@arm.com, ard.biesheuvel@linaro.org, mark.rutland@arm.com, catalin.marinas@arm.com, Steve Capper <steve.capper@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On a 4-level page table pgd entry can be empty, unlike a 3-level
-page table. Remove the spurious WARN_ON() in stage_get_pud().
+Make pud_huge reusable for stage2 tables, independent
+of the stage1 levels.
 
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <cdall@linaro.org>
+Cc: Steve Capper <steve.capper@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- virt/kvm/arm/mmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm64/include/asm/pgtable.h | 5 +++++
+ arch/arm64/mm/hugetlbpage.c      | 2 +-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index e6548c85c495..78253fe00fc4 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -870,7 +870,7 @@ static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
- 	pud_t *pud;
+diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+index a5a5203b603d..a1c6e93a1a11 100644
+--- a/arch/arm64/include/asm/pgtable.h
++++ b/arch/arm64/include/asm/pgtable.h
+@@ -469,6 +469,11 @@ static inline phys_addr_t pmd_page_paddr(pmd_t pmd)
+ #define __raw_pud_bad(pud)		(!(pud_val((pud)) & PUD_TABLE_BIT))
+ #define __raw_pud_present(pud)	pte_present(pud_pte((pud)))
  
- 	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
--	if (WARN_ON(stage2_pgd_none(*pgd))) {
-+	if (stage2_pgd_none(*pgd)) {
- 		if (!cache)
- 			return NULL;
- 		pud = mmu_memory_cache_alloc(cache);
++static inline int __raw_pud_huge(pud_t pud)
++{
++	return pud_val(pud) && !(pud_val(pud) & PUD_TABLE_BIT);
++}
++
+ static inline void __raw_set_pud(pud_t *pudp, pud_t pud)
+ {
+ 	*pudp = pud;
+diff --git a/arch/arm64/mm/hugetlbpage.c b/arch/arm64/mm/hugetlbpage.c
+index 6cb0fa92a651..a6bd5cc3d88b 100644
+--- a/arch/arm64/mm/hugetlbpage.c
++++ b/arch/arm64/mm/hugetlbpage.c
+@@ -35,7 +35,7 @@ int pmd_huge(pmd_t pmd)
+ int pud_huge(pud_t pud)
+ {
+ #ifndef __PAGETABLE_PMD_FOLDED
+-	return pud_val(pud) && !(pud_val(pud) & PUD_TABLE_BIT);
++	return __raw_pud_huge(pud);
+ #else
+ 	return 0;
+ #endif
 -- 
 2.13.6
