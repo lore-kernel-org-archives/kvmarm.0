@@ -1,109 +1,114 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH 00/16] kvm: arm64: Support for dynamic IPA size
-Date: Tue,  9 Jan 2018 19:03:55 +0000
-Message-ID: <20180109190414.4017-1-suzuki.poulose@arm.com>
+Subject: [PATCH v1 01/16] virtio: Validate queue pfn for 32bit transports
+Date: Tue,  9 Jan 2018 19:03:56 +0000
+Message-ID: <20180109190414.4017-2-suzuki.poulose@arm.com>
+References: <20180109190414.4017-1-suzuki.poulose@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180109190414.4017-1-suzuki.poulose@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, peter.maydell@linaro.org, suzuki.poulose@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, will.deacon@arm.com, ard.biesheuvel@linaro.org, mark.rutland@arm.com, catalin.marinas@arm.com
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, peter.maydell@linaro.org, suzuki.poulose@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, will.deacon@arm.com, ard.biesheuvel@linaro.org, mark.rutland@arm.com, catalin.marinas@arm.com, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On arm64 we have a static limit of 40bits of physical address space
-for the VM with KVM. This series lifts the limitation and allows the
-VM to configure the physical address space upto 52bit on systems
-where it is supported. We retain the default and minimum size to 40bits
-to avoid breaking backward compatibility.
+virtio-mmio using virtio-v1 and virtio legacy pci use a 32bit PFN
+for the queue. If the queue pfn is too large to fit in 32bits, which
+we could hit on arm64 systems with 52bit physical addresses (even with
+64K page size), we simply miss out a proper link to the other side of
+the queue.
 
-The interface provided is an IOCTL on the VM fd. The guest can change
-only increase the limit from what is already configured, to prevent
-breaking the devices which may have already been configured with a
-particular guest PA. The guest can issue the request until something
-is actually mapped into the stage2 table (e.g, memory region or device).
-This also implies that we now have per VM configuration of stage2
-control registers (VTCR_EL2 bits).
+Add a check to validate the PFN, rather than silently breaking
+the devices.
 
-The arm64 page table level helpers are defined based on the page
-table levels used by the host VA. So, the accessors may not work
-if the guest uses more number of levels in stage2 than the stage1
-of the host. In order to provide an independent stage2 page table,
-we refactor the arm64 page table helpers to give us raw accessors
-for each level, which should only used when that level is present.
-And then, based on the VM, we make the decision of the stage2
-page table using the raw accessors.
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Christoffer Dall <cdall@linaro.org>
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+---
+ drivers/virtio/virtio_mmio.c       | 19 ++++++++++++++++---
+ drivers/virtio/virtio_pci_legacy.c | 11 +++++++++--
+ 2 files changed, 25 insertions(+), 5 deletions(-)
 
-
-The series also adds :
- - Support for handling 52bit IPA for vgic ITS.
- - Cleanup in virtio to handle errors when the PFN used in
-   the virtio transport doesn't fit in 32bit.
-
-Tested with
-  - Modified kvmtool, which can only be used for (patches included in
-    the series for reference / testing):
-    * with virtio-pci upto 44bit PA (Due to 4K page size for virtio-pci
-      legacy implemented by kvmtool)
-    * Upto 48bit PA with virtio-mmio, due to 32bit PFN limitation.
-  - Hacked Qemu (boot loader support for highmem, phys-shift support)
-    * with virtio-pci GIC-v3 ITS & MSI upto 52bit on Foundation model.
-
-The series applies on arm64 for-next/core tree with 52bit PA support patches.
-One would need the fix for virtio_mmio cleanup [1] on top of the arm64
-tree to remove the warnings from virtio.
-
-[1] https://marc.info/?l=linux-virtualization&m=151308636322117&w=2
-
-Kristina Martsenko (1):
-  vgic: its: Add support for 52bit guest physical address
-
-Suzuki K Poulose (15):
-  virtio: Validate queue pfn for 32bit transports
-  irqchip: gicv3-its: Add helpers for handling 52bit address
-  arm64: Make page table helpers reusable
-  arm64: Refactor pud_huge for reusability
-  arm64: Helper for parange to PASize
-  kvm: arm/arm64: Fix stage2_flush_memslot for 4 level page table
-  kvm: arm/arm64: Remove spurious WARN_ON
-  kvm: arm/arm64: Clean up stage2 pgd life time
-  kvm: arm/arm64: Delay stage2 page table allocation
-  kvm: arm/arm64: Prepare for VM specific stage2 translations
-  kvm: arm64: Make stage2 page table layout dynamic
-  kvm: arm64: Dynamic configuration of VTCR and VTTBR mask
-  kvm: arm64: Configure VTCR per VM
-  kvm: arm64: Switch to per VM IPA
-  kvm: arm64: Allow configuring physical address space size
-
- Documentation/virtual/kvm/api.txt             |  27 +++
- arch/arm/include/asm/kvm_arm.h                |   2 -
- arch/arm/include/asm/kvm_host.h               |   7 +
- arch/arm/include/asm/kvm_mmu.h                |  13 +-
- arch/arm/include/asm/stage2_pgtable.h         |  46 +++---
- arch/arm64/include/asm/cpufeature.h           |  16 ++
- arch/arm64/include/asm/kvm_arm.h              | 112 +++++++++++--
- arch/arm64/include/asm/kvm_asm.h              |   2 +-
- arch/arm64/include/asm/kvm_host.h             |  21 ++-
- arch/arm64/include/asm/kvm_mmu.h              |  83 ++++++++--
- arch/arm64/include/asm/pgalloc.h              |  32 +++-
- arch/arm64/include/asm/pgtable.h              |  61 ++++---
- arch/arm64/include/asm/stage2_pgtable-nopmd.h |  42 -----
- arch/arm64/include/asm/stage2_pgtable-nopud.h |  39 -----
- arch/arm64/include/asm/stage2_pgtable.h       | 211 ++++++++++++++++--------
- arch/arm64/kvm/hyp/s2-setup.c                 |  34 +---
- arch/arm64/kvm/hyp/switch.c                   |   8 +
- arch/arm64/kvm/reset.c                        |  28 ++++
- arch/arm64/mm/hugetlbpage.c                   |   2 +-
- drivers/irqchip/irq-gic-v3-its.c              |   2 +-
- drivers/virtio/virtio_mmio.c                  |  19 ++-
- drivers/virtio/virtio_pci_legacy.c            |  11 +-
- include/linux/irqchip/arm-gic-v3.h            |  32 +++-
- include/uapi/linux/kvm.h                      |   4 +
- virt/kvm/arm/arm.c                            |  25 ++-
- virt/kvm/arm/mmu.c                            | 228 +++++++++++++++-----------
- virt/kvm/arm/vgic/vgic-its.c                  |  36 ++--
- virt/kvm/arm/vgic/vgic-kvm-device.c           |   2 +-
- virt/kvm/arm/vgic/vgic-mmio-v3.c              |   1 -
- 29 files changed, 738 insertions(+), 408 deletions(-)
- delete mode 100644 arch/arm64/include/asm/stage2_pgtable-nopmd.h
- delete mode 100644 arch/arm64/include/asm/stage2_pgtable-nopud.h
-
+diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
+index a9192fe4f345..47109baf37f7 100644
+--- a/drivers/virtio/virtio_mmio.c
++++ b/drivers/virtio/virtio_mmio.c
+@@ -358,6 +358,7 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned index,
+ 	struct virtqueue *vq;
+ 	unsigned long flags;
+ 	unsigned int num;
++	u64 addr;
+ 	int err;
+ 
+ 	if (!name)
+@@ -394,16 +395,26 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned index,
+ 		goto error_new_virtqueue;
+ 	}
+ 
++	addr = virtqueue_get_desc_addr(vq);
++	/*
++	 * virtio-mmio v1 uses a 32bit QUEUE PFN. If we have something that
++	 * doesn't fit in 32bit, fail the setup rather than pretending to
++	 * be successful.
++	 */
++	if (vm_dev->version == 1 && (addr >> (PAGE_SHIFT + 32))) {
++		dev_err(&vdev->dev, "virtio-mmio: queue address too large\n");
++		err = -ENOMEM;
++		goto error_bad_pfn;
++	}
++
+ 	/* Activate the queue */
+ 	writel(virtqueue_get_vring_size(vq), vm_dev->base + VIRTIO_MMIO_QUEUE_NUM);
+ 	if (vm_dev->version == 1) {
+ 		writel(PAGE_SIZE, vm_dev->base + VIRTIO_MMIO_QUEUE_ALIGN);
+-		writel(virtqueue_get_desc_addr(vq) >> PAGE_SHIFT,
++		writel(addr >> PAGE_SHIFT,
+ 				vm_dev->base + VIRTIO_MMIO_QUEUE_PFN);
+ 	} else {
+-		u64 addr;
+ 
+-		addr = virtqueue_get_desc_addr(vq);
+ 		writel((u32)addr, vm_dev->base + VIRTIO_MMIO_QUEUE_DESC_LOW);
+ 		writel((u32)(addr >> 32),
+ 				vm_dev->base + VIRTIO_MMIO_QUEUE_DESC_HIGH);
+@@ -430,6 +441,8 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned index,
+ 
+ 	return vq;
+ 
++error_bad_pfn:
++	vring_del_virtqueue(vq);
+ error_new_virtqueue:
+ 	if (vm_dev->version == 1) {
+ 		writel(0, vm_dev->base + VIRTIO_MMIO_QUEUE_PFN);
+diff --git a/drivers/virtio/virtio_pci_legacy.c b/drivers/virtio/virtio_pci_legacy.c
+index 2780886e8ba3..099d2cfb47b3 100644
+--- a/drivers/virtio/virtio_pci_legacy.c
++++ b/drivers/virtio/virtio_pci_legacy.c
+@@ -122,6 +122,7 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+ 	struct virtqueue *vq;
+ 	u16 num;
+ 	int err;
++	u64 q_pfn;
+ 
+ 	/* Select the queue we're interested in */
+ 	iowrite16(index, vp_dev->ioaddr + VIRTIO_PCI_QUEUE_SEL);
+@@ -141,9 +142,15 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+ 	if (!vq)
+ 		return ERR_PTR(-ENOMEM);
+ 
++	q_pfn = virtqueue_get_desc_addr(vq) >> VIRTIO_PCI_QUEUE_ADDR_SHIFT;
++	if (q_pfn >> 32) {
++		dev_err(&vp_dev->pci_dev->dev, "virtio-pci queue PFN too large\n");
++		err = -ENOMEM;
++		goto out_deactivate;
++	}
++
+ 	/* activate the queue */
+-	iowrite32(virtqueue_get_desc_addr(vq) >> VIRTIO_PCI_QUEUE_ADDR_SHIFT,
+-		  vp_dev->ioaddr + VIRTIO_PCI_QUEUE_PFN);
++	iowrite32((u32)q_pfn, vp_dev->ioaddr + VIRTIO_PCI_QUEUE_PFN);
+ 
+ 	vq->priv = (void __force *)vp_dev->ioaddr + VIRTIO_PCI_QUEUE_NOTIFY;
+ 
 -- 
 2.13.6
