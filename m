@@ -1,115 +1,49 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [kvmtool hack 3/3] kvmtool: arm64: Switch memory layout
-Date: Tue,  9 Jan 2018 19:04:14 +0000
-Message-ID: <20180109190414.4017-20-suzuki.poulose@arm.com>
-References: <20180109190414.4017-1-suzuki.poulose@arm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180109190414.4017-1-suzuki.poulose@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, peter.maydell@linaro.org, suzuki.poulose@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, will.deacon@arm.com, ard.biesheuvel@linaro.org, mark.rutland@arm.com, catalin.marinas@arm.com
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH] arm64: mm: Add additional parameter to
+ uaccess_ttbr0_enable
+Date: Tue, 9 Jan 2018 20:26:55 +0100
+Message-ID: <20180109192655.GF15307@cbox>
+References: <20180109134326.17479-1-christoffer.dall@linaro.org>
+ <3e459188-f759-6f13-7ab4-1597c6da00a7@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <3e459188-f759-6f13-7ab4-1597c6da00a7@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-If the guest wants to use a larger physical address space place
-the RAM at upper half of the address space. Otherwise, it uses the
-default layout.
+On Tue, Jan 09, 2018 at 01:53:56PM +0000, Marc Zyngier wrote:
+> On 09/01/18 13:43, Christoffer Dall wrote:
+> > Add an extra temporary register parameter to uaccess_ttbr0_enable which
+> > is about to be required for arm64 PAN support.
+> > 
+> > This patch doesn't introduce any functional change but ensures that the
+> > kernel compiles once the KVM/ARM tree is merged with the arm64 tree by
+> > ensuring a trivially mergable conflict.
+> > 
+> > Cc: Will Deacon <will.deacon@arm.com>
+> > Cc: Catalin Marinas <catalin.marinas@arm.com>
+> > Cc: Marc Zyngier <marc.zyngier@arm.com>
+> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> 
+> Maybe worth adding that this matches
+> 27a921e75711d924617269e0ba4adb8bae9fd0d1 ("arm64: mm: Fix and re-enable
+> ARM64_SW_TTBR0_PAN")?
 
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
----
- arm/aarch32/include/kvm/kvm-arch.h |  1 +
- arm/aarch64/include/kvm/kvm-arch.h | 15 ++++++++++++---
- arm/include/arm-common/kvm-arch.h  | 11 ++++++-----
- arm/kvm.c                          |  2 +-
- 4 files changed, 20 insertions(+), 9 deletions(-)
+Yes, definitely.
 
-diff --git a/arm/aarch32/include/kvm/kvm-arch.h b/arm/aarch32/include/kvm/kvm-arch.h
-index cd31e72..2d62aab 100644
---- a/arm/aarch32/include/kvm/kvm-arch.h
-+++ b/arm/aarch32/include/kvm/kvm-arch.h
-@@ -4,6 +4,7 @@
- #define ARM_KERN_OFFSET(...)	0x8000
- 
- #define ARM_MAX_MEMORY(...)	ARM_LOMAP_MAX_MEMORY
-+#define ARM_MEMORY_AREA(...)	ARM32_MEMORY_AREA
- 
- #include "arm-common/kvm-arch.h"
- 
-diff --git a/arm/aarch64/include/kvm/kvm-arch.h b/arm/aarch64/include/kvm/kvm-arch.h
-index 9de623a..bad35b9 100644
---- a/arm/aarch64/include/kvm/kvm-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-arch.h
-@@ -1,14 +1,23 @@
- #ifndef KVM__KVM_ARCH_H
- #define KVM__KVM_ARCH_H
- 
-+#include "arm-common/kvm-arch.h"
-+
-+#define ARM64_MEMORY_AREA(phys_shift)	(1UL << (phys_shift - 1))
-+#define ARM64_MAX_MEMORY(phys_shift)	\
-+	((1ULL << (phys_shift)) - ARM64_MEMORY_AREA(phys_shift))
-+
-+#define ARM_MEMORY_AREA(kvm)	((kvm)->cfg.arch.aarch32_guest ?	\
-+				 ARM32_MEMORY_AREA		:	\
-+				 ARM64_MEMORY_AREA(kvm->cfg.arch.phys_shift))
-+
- #define ARM_KERN_OFFSET(kvm)	((kvm)->cfg.arch.aarch32_guest	?	\
- 				0x8000				:	\
- 				0x80000)
- 
- #define ARM_MAX_MEMORY(kvm)	((kvm)->cfg.arch.aarch32_guest	?	\
--				ARM_LOMAP_MAX_MEMORY		:	\
--				ARM_HIMAP_MAX_MEMORY)
-+				ARM32_MAX_MEMORY		:	\
-+				ARM64_MAX_MEMORY(kvm->cfg.arch.phys_shift))
- 
--#include "arm-common/kvm-arch.h"
- 
- #endif /* KVM__KVM_ARCH_H */
-diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
-index c83c45f..ca7ab0f 100644
---- a/arm/include/arm-common/kvm-arch.h
-+++ b/arm/include/arm-common/kvm-arch.h
-@@ -6,14 +6,15 @@
- #include <linux/types.h>
- 
- #include "arm-common/gic.h"
--
- #define ARM_IOPORT_AREA		_AC(0x0000000000000000, UL)
- #define ARM_MMIO_AREA		_AC(0x0000000000010000, UL)
- #define ARM_AXI_AREA		_AC(0x0000000040000000, UL)
--#define ARM_MEMORY_AREA		_AC(0x0000000080000000, UL)
- 
--#define ARM_LOMAP_MAX_MEMORY	((1ULL << 32) - ARM_MEMORY_AREA)
--#define ARM_HIMAP_MAX_MEMORY	((1ULL << 40) - ARM_MEMORY_AREA)
-+#define ARM32_MEMORY_AREA	_AC(0x0000000080000000, UL)
-+#define ARM32_MAX_MEMORY	((1ULL << 32) - ARM32_MEMORY_AREA)
-+
-+#define ARM_IOMEM_AREA_END	ARM32_MEMORY_AREA
-+
- 
- #define ARM_GIC_DIST_BASE	(ARM_AXI_AREA - ARM_GIC_DIST_SIZE)
- #define ARM_GIC_CPUI_BASE	(ARM_GIC_DIST_BASE - ARM_GIC_CPUI_SIZE)
-@@ -24,7 +25,7 @@
- #define ARM_IOPORT_SIZE		(ARM_MMIO_AREA - ARM_IOPORT_AREA)
- #define ARM_VIRTIO_MMIO_SIZE	(ARM_AXI_AREA - (ARM_MMIO_AREA + ARM_GIC_SIZE))
- #define ARM_PCI_CFG_SIZE	(1ULL << 24)
--#define ARM_PCI_MMIO_SIZE	(ARM_MEMORY_AREA - \
-+#define ARM_PCI_MMIO_SIZE	(ARM_IOMEM_AREA_END - \
- 				(ARM_AXI_AREA + ARM_PCI_CFG_SIZE))
- 
- #define KVM_IOPORT_AREA		ARM_IOPORT_AREA
-diff --git a/arm/kvm.c b/arm/kvm.c
-index 7573391..0f155c6 100644
---- a/arm/kvm.c
-+++ b/arm/kvm.c
-@@ -38,7 +38,7 @@ void kvm__init_ram(struct kvm *kvm)
- 	u64 phys_start, phys_size;
- 	void *host_mem;
- 
--	phys_start	= ARM_MEMORY_AREA;
-+	phys_start	= ARM_MEMORY_AREA(kvm);
- 	phys_size	= kvm->ram_size;
- 	host_mem	= kvm->ram_start;
- 
--- 
-2.13.6
+> 
+> Otherwise:
+> 
+> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+
+Thanks.
+
+I've pushed this to next.  If anyone finds that objectionable, we can
+always drop that patch again and pursue another resolution.
+
+Thanks,
+-Christoffer
