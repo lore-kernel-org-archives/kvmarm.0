@@ -1,133 +1,109 @@
-From: Yury Norov <ynorov@caviumnetworks.com>
-Subject: Re: [PATCH v5 00/30] ARM Scalable Vector Extension (SVE)
-Date: Tue, 9 Jan 2018 19:51:20 +0300
-Message-ID: <20180109165120.6ravt4stp3654374@yury-thinkpad>
-References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
- <20180108144905.qu5qbmaaglcgwvwq@yury-thinkpad>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-arch-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180108144905.qu5qbmaaglcgwvwq@yury-thinkpad>
-Sender: linux-arch-owner@vger.kernel.org
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, "H . J . Lu" <hjl.tools@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>, Will Deacon <will.deacon@arm.com>, Oleg Nesterov <oleg@redhat.com>, Dmitry Safonov <dsafonov@virtuozzo.com>, Ingo Molnar <mingo@redhat.com>, Alexander Viro <viro@zeniv.linux.org.uk>, Alan Hayward <alan.hayward@arm.com>, Thomas Gleixner <tglx@linutronix.de>, linux-api@vger.kernel.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu, Ch
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: [PATCH 00/16] kvm: arm64: Support for dynamic IPA size
+Date: Tue,  9 Jan 2018 19:03:55 +0000
+Message-ID: <20180109190414.4017-1-suzuki.poulose@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, peter.maydell@linaro.org, suzuki.poulose@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, will.deacon@arm.com, ard.biesheuvel@linaro.org, mark.rutland@arm.com, catalin.marinas@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jan 08, 2018 at 05:49:05PM +0300, Yury Norov wrote:
-> On Tue, Oct 31, 2017 at 03:50:52PM +0000, Dave Martin wrote:
-> > This series implements Linux kernel support for the ARM Scalable Vector
-> > Extension (SVE). [1]  It supersedes the previous v3: see [3] for link
-> > and full cover letter.
-> > 
-> > This is a minor update to v4, but does contain a couple of important
-> > fixes.
-> > 
-> > As in previous postings, the last two patches (here 29-30) are still
-> > RFC and not proposed for merging at this time.
-> > 
-> > The patches apply on
-> > git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git
-> > for-next/core
-> > d7b1d22d3821 ("arm64: uapi: Remove PSR_Q_BIT")
-> > 
-> > To reduce spam, some people may not been copied on the entire series.
-> > For those who did not receive the whole series, it can be found in the
-> > linux-arm-kernel archive. [2]
-> > 
-> > See the individual patches for details of changes.
-> > 
-> > For reviewer convenience, a git tree is available. [4]
-> > 
-> > Since there are some changes against already-reviewed patches, I've also
-> > pushed an unsquashed fixes tree for people to take a look at if it
-> > helps. [5]
-> > 
-> > 
-> > Summary:
-> > 
-> >  * "regset: Add support for dynamically sized regsets" fixed to avoid
-> >    x86 breakage;
-> > 
-> >  * one trival arm64 patch added to add asmlinkage annotations, and a
-> >    corresponding minor change to the Core task context handling patch;
-> > 
-> >  * one new arm64 fix ("signal: Verify extra data is user-readable in
-> >    sys_rt_sigreturn") to ensure that access_ok() checks are done for the
-> >    whole extended signal frame, not just the base frame;
-> > 
-> >  * one minor fix to the SVE sigreturn code to return consistent
-> >    intermediate error values (semantic correctness, non-functional
-> >    change);
-> > 
-> >  * one minor change to call __copy_from_user() instead of
-> >    copy_from_user() in a situation where there is already an access_ok()
-> >    check;
-> > 
-> > 
-> > [1] ARM Scalable Vector Extension
-> > https://community.arm.com/groups/processors/blog/2016/08/22/technology-update-the-scalable-vector-extension-sve-for-the-armv8-a-architecture
-> > 
-> > [2] linux-arm-kernel October 2017 Archives by thread
-> > http://lists.infradead.org/pipermail/linux-arm-kernel/2017-October/thread.html
-> > 
-> > [3] [PATCH v4 00/28] ARM Scalable Vector Extension (SVE)
-> > http://lists.infradead.org/pipermail/linux-arm-kernel/2017-October/539414.html
-> > 
-> > [4] For review and testing only -- **do not pull**
-> >     (This branch has review changelogs which should not form part of
-> >     the final commits.)
-> > 
-> >     v5 series (this posting)
-> > 
-> >     http://linux-arm.org/git?p=linux-dm.git;a=shortlog;h=refs/heads/sve/v5
-> >     git://linux-arm.org/linux-dm.git sve/v5
-> > 
-> > [5] For review and testing only -- **do not pull**
-> >     (This branch has review changelogs which should not form part of
-> >     the final commits.)
-> > 
-> >     v4 with unsquashed fixes
-> > 
-> >     http://linux-arm.org/git?p=linux-dm.git;a=shortlog;h=refs/heads/sve/v4%2Bfixes
-> >     git://linux-arm.org/linux-dm.git sve/v4+fixes
-> 
-> Hi Dave,
-> 
-> During rebase of my ILP32 series on 4.15 kernel I found that 
-> ILP32 needs to be enabled with SVE support, like you do for 
-> LP64 in this series.
-> 
-> I did all rebase work on this draft branch:
-> https://github.com/norov/linux/tree/ilp32-4.15-rc7
-> 
-> But any ILP32 program I tried crash, and the message in dmesg looks
-> like this:
-> [   39.510667] CPU: 0 PID: 1857 Comm: mytime Not tainted 4.15.0-rc7-00028-g45e0659df4d9 #41
-> [   39.510712] Hardware name: linux,dummy-virt (DT)
-> [   39.510829] pstate: 00000000 (nzcv daif -PAN -UAO)
-> [   39.511101] pc : 0x33488e28
-> [   39.511125] lr : 0x33488e28
-> [   39.511138] sp : 00000000fffef670
-> [   39.511158] x29: 000000005a536c33 x28: 0000000000000000 
-> [   39.511211] x27: 0000000000000000 x26: 0000000000000000 
-> [   39.511235] x25: 0000000000000000 x24: 0000000000000000 
-> [   39.511257] x23: 0000000000466000 x22: 0000000000000000 
-> [   39.511278] x21: 0000000000000000 x20: 000000000047f2a8 
-> [   39.511300] x19: 0000000000000000 x18: 0000000000000001 
-> [   39.511321] x17: 0000000000001000 x16: 0000000000001030 
-> [   39.511342] x15: 0000000000554e47 x14: 0000000000000001 
-> [   39.511364] x13: 0000000000000004 x12: 000000000000003c 
-> [   39.511385] x11: 0000100000000000 x10: 0800000000000000 
-> [   39.511406] x9 : 0fffffffffffffff x8 : 000000000000007c 
-> [   39.511427] x7 : 0000000000000077 x6 : 0000000000000041 
-> [   39.511448] x5 : 0000000000000411 x4 : 00000000fbad2488 
-> [   39.511468] x3 : 0000000000000001 x2 : 0000000000497950 
-> [   39.511489] x1 : 0000000000497550 x0 : 0000000000000001
+On arm64 we have a static limit of 40bits of physical address space
+for the VM with KVM. This series lifts the limitation and allows the
+VM to configure the physical address space upto 52bit on systems
+where it is supported. We retain the default and minimum size to 40bits
+to avoid breaking backward compatibility.
 
-Hi Dave,
+The interface provided is an IOCTL on the VM fd. The guest can change
+only increase the limit from what is already configured, to prevent
+breaking the devices which may have already been configured with a
+particular guest PA. The guest can issue the request until something
+is actually mapped into the stage2 table (e.g, memory region or device).
+This also implies that we now have per VM configuration of stage2
+control registers (VTCR_EL2 bits).
 
-I fixed the crash. It was my local problem.
+The arm64 page table level helpers are defined based on the page
+table levels used by the host VA. So, the accessors may not work
+if the guest uses more number of levels in stage2 than the stage1
+of the host. In order to provide an independent stage2 page table,
+we refactor the arm64 page table helpers to give us raw accessors
+for each level, which should only used when that level is present.
+And then, based on the VM, we make the decision of the stage2
+page table using the raw accessors.
 
-Thanks,
-Yury
+
+The series also adds :
+ - Support for handling 52bit IPA for vgic ITS.
+ - Cleanup in virtio to handle errors when the PFN used in
+   the virtio transport doesn't fit in 32bit.
+
+Tested with
+  - Modified kvmtool, which can only be used for (patches included in
+    the series for reference / testing):
+    * with virtio-pci upto 44bit PA (Due to 4K page size for virtio-pci
+      legacy implemented by kvmtool)
+    * Upto 48bit PA with virtio-mmio, due to 32bit PFN limitation.
+  - Hacked Qemu (boot loader support for highmem, phys-shift support)
+    * with virtio-pci GIC-v3 ITS & MSI upto 52bit on Foundation model.
+
+The series applies on arm64 for-next/core tree with 52bit PA support patches.
+One would need the fix for virtio_mmio cleanup [1] on top of the arm64
+tree to remove the warnings from virtio.
+
+[1] https://marc.info/?l=linux-virtualization&m=151308636322117&w=2
+
+Kristina Martsenko (1):
+  vgic: its: Add support for 52bit guest physical address
+
+Suzuki K Poulose (15):
+  virtio: Validate queue pfn for 32bit transports
+  irqchip: gicv3-its: Add helpers for handling 52bit address
+  arm64: Make page table helpers reusable
+  arm64: Refactor pud_huge for reusability
+  arm64: Helper for parange to PASize
+  kvm: arm/arm64: Fix stage2_flush_memslot for 4 level page table
+  kvm: arm/arm64: Remove spurious WARN_ON
+  kvm: arm/arm64: Clean up stage2 pgd life time
+  kvm: arm/arm64: Delay stage2 page table allocation
+  kvm: arm/arm64: Prepare for VM specific stage2 translations
+  kvm: arm64: Make stage2 page table layout dynamic
+  kvm: arm64: Dynamic configuration of VTCR and VTTBR mask
+  kvm: arm64: Configure VTCR per VM
+  kvm: arm64: Switch to per VM IPA
+  kvm: arm64: Allow configuring physical address space size
+
+ Documentation/virtual/kvm/api.txt             |  27 +++
+ arch/arm/include/asm/kvm_arm.h                |   2 -
+ arch/arm/include/asm/kvm_host.h               |   7 +
+ arch/arm/include/asm/kvm_mmu.h                |  13 +-
+ arch/arm/include/asm/stage2_pgtable.h         |  46 +++---
+ arch/arm64/include/asm/cpufeature.h           |  16 ++
+ arch/arm64/include/asm/kvm_arm.h              | 112 +++++++++++--
+ arch/arm64/include/asm/kvm_asm.h              |   2 +-
+ arch/arm64/include/asm/kvm_host.h             |  21 ++-
+ arch/arm64/include/asm/kvm_mmu.h              |  83 ++++++++--
+ arch/arm64/include/asm/pgalloc.h              |  32 +++-
+ arch/arm64/include/asm/pgtable.h              |  61 ++++---
+ arch/arm64/include/asm/stage2_pgtable-nopmd.h |  42 -----
+ arch/arm64/include/asm/stage2_pgtable-nopud.h |  39 -----
+ arch/arm64/include/asm/stage2_pgtable.h       | 211 ++++++++++++++++--------
+ arch/arm64/kvm/hyp/s2-setup.c                 |  34 +---
+ arch/arm64/kvm/hyp/switch.c                   |   8 +
+ arch/arm64/kvm/reset.c                        |  28 ++++
+ arch/arm64/mm/hugetlbpage.c                   |   2 +-
+ drivers/irqchip/irq-gic-v3-its.c              |   2 +-
+ drivers/virtio/virtio_mmio.c                  |  19 ++-
+ drivers/virtio/virtio_pci_legacy.c            |  11 +-
+ include/linux/irqchip/arm-gic-v3.h            |  32 +++-
+ include/uapi/linux/kvm.h                      |   4 +
+ virt/kvm/arm/arm.c                            |  25 ++-
+ virt/kvm/arm/mmu.c                            | 228 +++++++++++++++-----------
+ virt/kvm/arm/vgic/vgic-its.c                  |  36 ++--
+ virt/kvm/arm/vgic/vgic-kvm-device.c           |   2 +-
+ virt/kvm/arm/vgic/vgic-mmio-v3.c              |   1 -
+ 29 files changed, 738 insertions(+), 408 deletions(-)
+ delete mode 100644 arch/arm64/include/asm/stage2_pgtable-nopmd.h
+ delete mode 100644 arch/arm64/include/asm/stage2_pgtable-nopud.h
+
+-- 
+2.13.6
