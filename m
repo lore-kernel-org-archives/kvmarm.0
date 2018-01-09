@@ -1,155 +1,186 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v1 08/16] kvm: arm/arm64: Clean up stage2 pgd life time
-Date: Tue,  9 Jan 2018 19:04:03 +0000
-Message-ID: <20180109190414.4017-9-suzuki.poulose@arm.com>
+Subject: [PATCH v1 09/16] kvm: arm/arm64: Delay stage2 page table allocation
+Date: Tue,  9 Jan 2018 19:04:04 +0000
+Message-ID: <20180109190414.4017-10-suzuki.poulose@arm.com>
 References: <20180109190414.4017-1-suzuki.poulose@arm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C371949DBA
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Jan 2018 14:00:31 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 1LYr5I3XjKxI for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Jan 2018 14:00:30 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 47A8549D6F
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Jan 2018 14:00:30 -0500 (EST)
 In-Reply-To: <20180109190414.4017-1-suzuki.poulose@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, peter.maydell@linaro.org, suzuki.poulose@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, will.deacon@arm.com, ard.biesheuvel@linaro.org, mark.rutland@arm.com, catalin.marinas@arm.com, Christoffer Dall <cdall@linaro.org>
+Cc: ard.biesheuvel@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, Christoffer Dall <cdall@linaro.org>, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On arm/arm64 we pre-allocate the entry level page tables when
-a VM is created and is free'd when either all the mm users are
-gone or the KVM is about to get destroyed. i.e, kvm_free_stage2_pgd
-is triggered via kvm_arch_flush_shadow_all() which can be invoked
-from two different paths :
+We allocate the entry level page tables for stage2 when the
+VM is created. This doesn't give us the flexibility of configuring
+the physical address space size for a VM. In order to allow
+the VM to choose the required size, we delay the allocation of
+stage2 entry level tables until we really try to map something.
 
- 1) do_exit()-> .-> mmu_notifier->release()-> ..-> kvm_arch_flush_shadow_all()
-    OR
- 2) kvm_destroy_vm()-> mmu_notifier_unregister-> kvm_arch_flush_shadow_all()
-
-This has created lot of race conditions in the past as some of
-the VCPUs could be active when we free the stage2 via path (1).
-
-On a closer look, all we need to do with kvm_arch_flush_shadow_all() is,
-to ensure that the stage2 mappings are cleared. This doesn't mean we
-have to free up the stage2 entry level page tables yet, which could
-be delayed until the kvm is destroyed. This would avoid issues
-of use-after-free, as we don't free the page tables and anyone who
-tries to access the page table would find them in the appropriate
-state (mapped vs unmapped), as the page table modifications are
-serialised via kvm->mmu_lock. This will be later used for delaying
-the allocation of the stage2 entry level page tables until we really
-need to do something with it.
+This could be either when the VM creates a memory range or when
+it tries to map a device memory. So we add in a hook to these
+two places to make sure the tables are allocated. We use
+kvm->slots_lock to serialize the allocation entry point, since
+we add hooks to the arch specific call back with the mutex held.
 
 Cc: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Christoffer Dall <cdall@linaro.org>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- virt/kvm/arm/arm.c |  1 +
- virt/kvm/arm/mmu.c | 56 ++++++++++++++++++++++++++++--------------------------
- 2 files changed, 30 insertions(+), 27 deletions(-)
+ virt/kvm/arm/arm.c | 18 ++++++----------
+ virt/kvm/arm/mmu.c | 61 +++++++++++++++++++++++++++++++++++++++++++++---------
+ 2 files changed, 57 insertions(+), 22 deletions(-)
 
 diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index c8d49879307f..19b720ddedce 100644
+index 19b720ddedce..d06f00566664 100644
 --- a/virt/kvm/arm/arm.c
 +++ b/virt/kvm/arm/arm.c
-@@ -189,6 +189,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
- 		}
- 	}
- 	atomic_set(&kvm->online_vcpus, 0);
-+	kvm_free_stage2_pgd(kvm);
+@@ -127,13 +127,13 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	for_each_possible_cpu(cpu)
+ 		*per_cpu_ptr(kvm->arch.last_vcpu_ran, cpu) = -1;
+ 
+-	ret = kvm_alloc_stage2_pgd(kvm);
+-	if (ret)
+-		goto out_fail_alloc;
+-
+ 	ret = create_hyp_mappings(kvm, kvm + 1, PAGE_HYP);
+-	if (ret)
+-		goto out_free_stage2_pgd;
++	if (ret) {
++		free_percpu(kvm->arch.last_vcpu_ran);
++		kvm->arch.last_vcpu_ran = NULL;
++		return ret;
++	}
++
+ 
+ 	kvm_vgic_early_init(kvm);
+ 
+@@ -145,12 +145,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 				kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
+ 
+ 	return ret;
+-out_free_stage2_pgd:
+-	kvm_free_stage2_pgd(kvm);
+-out_fail_alloc:
+-	free_percpu(kvm->arch.last_vcpu_ran);
+-	kvm->arch.last_vcpu_ran = NULL;
+-	return ret;
  }
  
- int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ bool kvm_arch_has_vcpu_debugfs(void)
 diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 78253fe00fc4..c94c61ac38b9 100644
+index c94c61ac38b9..257f2a8ccfc7 100644
 --- a/virt/kvm/arm/mmu.c
 +++ b/virt/kvm/arm/mmu.c
-@@ -298,11 +298,10 @@ static void unmap_stage2_range(struct kvm *kvm, phys_addr_t start, u64 size)
- 	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
- 	do {
- 		/*
--		 * Make sure the page table is still active, as another thread
--		 * could have possibly freed the page table, while we released
--		 * the lock.
-+		 * The page table shouldn't be free'd as we still hold a reference
-+		 * to the KVM.
- 		 */
--		if (!READ_ONCE(kvm->arch.pgd))
-+		if (WARN_ON(!READ_ONCE(kvm->arch.pgd)))
- 			break;
- 		next = stage2_pgd_addr_end(addr, end);
- 		if (!stage2_pgd_none(*pgd))
-@@ -837,30 +836,33 @@ void stage2_unmap_vm(struct kvm *kvm)
- 	up_read(&current->mm->mmap_sem);
- 	srcu_read_unlock(&kvm->srcu, idx);
+@@ -1011,15 +1011,39 @@ static int stage2_pmdp_test_and_clear_young(pmd_t *pmd)
+ 	return stage2_ptep_test_and_clear_young((pte_t *)pmd);
  }
--
+ 
 -/**
-- * kvm_free_stage2_pgd - free all stage-2 tables
-- * @kvm:	The KVM struct pointer for the VM.
+- * kvm_phys_addr_ioremap - map a device range to guest IPA
 - *
-- * Walks the level-1 page table pointed to by kvm->arch.pgd and frees all
-- * underlying level-2 and level-3 tables before freeing the actual level-1 table
-- * and setting the struct pointer to NULL.
+- * @kvm:	The KVM pointer
+- * @guest_ipa:	The IPA at which to insert the mapping
+- * @pa:		The physical address of the device
+- * @size:	The size of the mapping
 +/*
-+ * kvm_flush_stage2_all: Unmap the entire stage2 mappings including
-+ * device and regular RAM backing memory.
++ * Finalise the stage2 page table layout. Must be called with kvm->slots_lock
++ * held.
   */
--void kvm_free_stage2_pgd(struct kvm *kvm)
-+static void kvm_flush_stage2_all(struct kvm *kvm)
- {
--	void *pgd = NULL;
--
- 	spin_lock(&kvm->mmu_lock);
--	if (kvm->arch.pgd) {
-+	if (kvm->arch.pgd)
- 		unmap_stage2_range(kvm, 0, KVM_PHYS_SIZE);
--		pgd = READ_ONCE(kvm->arch.pgd);
--		kvm->arch.pgd = NULL;
--	}
- 	spin_unlock(&kvm->mmu_lock);
-+}
- 
--	/* Free the HW pgd, one page at a time */
--	if (pgd)
--		free_pages_exact(pgd, S2_PGD_SIZE);
-+/**
-+ * kvm_free_stage2_pgd - Free the entry level page tables in stage-2.
-+ * This is called when all reference to the KVM has gone away and we
-+ * really don't need any protection in resetting the PGD. This also
-+ * means that nobody should be touching stage2 at this point, as we
-+ * have unmapped the entire stage2 already and all dynamic entities,
-+ * (VCPUs and devices) are no longer active.
-+ *
-+ * @kvm:	The KVM struct pointer for the VM.
-+ */
-+void kvm_free_stage2_pgd(struct kvm *kvm)
+-int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
++static int __kvm_init_stage2_table(struct kvm *kvm)
 +{
-+	kvm_flush_stage2_all(kvm);
-+	free_pages_exact(kvm->arch.pgd, S2_PGD_SIZE);
-+	kvm->arch.pgd = NULL;
- }
- 
- static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
-@@ -1189,12 +1191,12 @@ static void stage2_wp_range(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
- 		 * large. Otherwise, we may see kernel panics with
- 		 * CONFIG_DETECT_HUNG_TASK, CONFIG_LOCKUP_DETECTOR,
- 		 * CONFIG_LOCKDEP. Additionally, holding the lock too long
--		 * will also starve other vCPUs. We have to also make sure
--		 * that the page tables are not freed while we released
--		 * the lock.
-+		 * will also starve other vCPUs.
-+		 * The page tables shouldn't be free'd while we released the
-+		 * lock, since we hold a reference to the KVM.
- 		 */
- 		cond_resched_lock(&kvm->mmu_lock);
--		if (!READ_ONCE(kvm->arch.pgd))
-+		if (WARN_ON(!READ_ONCE(kvm->arch.pgd)))
- 			break;
- 		next = stage2_pgd_addr_end(addr, end);
- 		if (stage2_pgd_present(*pgd))
-@@ -1950,7 +1952,7 @@ void kvm_arch_memslots_updated(struct kvm *kvm, struct kvm_memslots *slots)
- 
- void kvm_arch_flush_shadow_all(struct kvm *kvm)
++	/* Double check if somebody has already allocated it */
++	if (likely(kvm->arch.pgd))
++		return 0;
++	return kvm_alloc_stage2_pgd(kvm);
++}
++
++static int kvm_init_stage2_table(struct kvm *kvm)
++{
++	int rc;
++
++	/*
++	 * Once allocated, the stage2 entry level tables are only
++	 * freed when the KVM instance is destroyed. So, if we see
++	 * something valid here, that guarantees that we have
++	 * done the one time allocation and it is something valid
++	 * and won't go away until the last reference to the KVM
++	 * is gone.
++	 */
++	if (likely(kvm->arch.pgd))
++		return 0;
++	mutex_lock(&kvm->slots_lock);
++	rc = __kvm_init_stage2_table(kvm);
++	mutex_unlock(&kvm->slots_lock);
++	return rc;
++}
++
++static int __kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ 			  phys_addr_t pa, unsigned long size, bool writable)
  {
--	kvm_free_stage2_pgd(kvm);
-+	kvm_flush_stage2_all(kvm);
+ 	phys_addr_t addr, end;
+@@ -1055,6 +1079,23 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ 	return ret;
  }
  
- void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
++/**
++ * kvm_phys_addr_ioremap - map a device range to guest IPA.
++ * Acquires kvm->slots_lock for making sure that the stage2 is initialized.
++ *
++ * @kvm:	The KVM pointer
++ * @guest_ipa:	The IPA at which to insert the mapping
++ * @pa:		The physical address of the device
++ * @size:	The size of the mapping
++ */
++int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
++			  phys_addr_t pa, unsigned long size, bool writable)
++{
++	if (unlikely(kvm_init_stage2_table(kvm)))
++		return -ENOMEM;
++	return __kvm_phys_addr_ioremap(kvm, guest_ipa, pa, size, writable);
++}
++
+ static bool transparent_hugepage_adjust(kvm_pfn_t *pfnp, phys_addr_t *ipap)
+ {
+ 	kvm_pfn_t pfn = *pfnp;
+@@ -1912,7 +1953,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 				goto out;
+ 			}
+ 
+-			ret = kvm_phys_addr_ioremap(kvm, gpa, pa,
++			ret = __kvm_phys_addr_ioremap(kvm, gpa, pa,
+ 						    vm_end - vm_start,
+ 						    writable);
+ 			if (ret)
+@@ -1943,7 +1984,7 @@ void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *free,
+ int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
+ 			    unsigned long npages)
+ {
+-	return 0;
++	return __kvm_init_stage2_table(kvm);
+ }
+ 
+ void kvm_arch_memslots_updated(struct kvm *kvm, struct kvm_memslots *slots)
 -- 
 2.13.6
