@@ -1,102 +1,89 @@
-From: Sagar Arun Kamble <sagar.a.kamble@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH 01/27] timecounter: Make
- cyclecounter struct part of timecounter struct
-Date: Tue, 9 Jan 2018 14:31:33 +0530
-Message-ID: <af2474d2-edf7-7db3-b14d-3587222daf79@intel.com>
-References: <1513323522-15021-1-git-send-email-sagar.a.kamble@intel.com>
- <1513323522-15021-2-git-send-email-sagar.a.kamble@intel.com>
- <309B89C4C689E141A5FF6A0C5FB2118B8C734DF8@ORSMSX101.amr.corp.intel.com>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH] arm64: Implement branch predictor hardening for Falkor
+Date: Tue, 9 Jan 2018 09:41:46 +0000
+Message-ID: <20180109094146.GB4297@arm.com>
+References: <1515184139-23743-1-git-send-email-shankerd@codeaurora.org>
+ <20180108170933.GU25869@arm.com> <20180108184446.GC13175@arm.com>
+ <01fe1f41-ac45-0c19-a502-77b915c48fcf@codeaurora.org>
+ <fa96f638-075e-10a0-d764-9c24b50fcf13@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <alsa-devel-bounces@alsa-project.org>
-In-Reply-To: <309B89C4C689E141A5FF6A0C5FB2118B8C734DF8@ORSMSX101.amr.corp.intel.com>
-Content-Language: en-US
-List-Unsubscribe: <http://mailman.alsa-project.org/mailman/options/alsa-devel>,
- <mailto:alsa-devel-request@alsa-project.org?subject=unsubscribe>
-List-Archive: <http://mailman.alsa-project.org/pipermail/alsa-devel/>
-List-Post: <mailto:alsa-devel@alsa-project.org>
-List-Help: <mailto:alsa-devel-request@alsa-project.org?subject=help>
-List-Subscribe: <http://mailman.alsa-project.org/mailman/listinfo/alsa-devel>,
- <mailto:alsa-devel-request@alsa-project.org?subject=subscribe>
-Errors-To: alsa-devel-bounces@alsa-project.org
-Sender: alsa-devel-bounces@alsa-project.org
-To: "Brown, Aaron F" <aaron.f.brown@intel.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Cc: "alsa-devel@alsa-project.org" <alsa-devel@alsa-project.org>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Richard Cochran <richardcochran@gmail.com>, Stephen Boyd <sboyd@codeaurora.org>, Chris Wilson <chris@chris-wilson.co.uk>, John Stultz <john.stultz@linaro.org>, "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, Thomas Gleixner <tglx@linutronix.de>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B59ED49D27
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Jan 2018 04:37:04 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id rtji2m6QSjsL for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Jan 2018 04:37:03 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 67C5A406D0
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Jan 2018 04:37:03 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <fa96f638-075e-10a0-d764-9c24b50fcf13@codeaurora.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Shanker Donthineni <shankerd@codeaurora.org>
+Cc: Sean Campbell <scampbel@codeaurora.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, linux-kernel <linux-kernel@vger.kernel.org>, kvmarm <kvmarm@lists.cs.columbia.edu>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Thanks Aaron.
+You'll need to send a fixup patch. for-next/core is non-rebasing.
 
-Regards,
-Sagar
+Will
 
-On 1/9/2018 3:50 AM, Brown, Aaron F wrote:
->> From: Intel-wired-lan [mailto:intel-wired-lan-bounces@osuosl.org] On
->> Behalf Of Sagar Arun Kamble
->> Sent: Thursday, December 14, 2017 11:38 PM
->> To: linux-kernel@vger.kernel.org
->> Cc: alsa-devel@alsa-project.org; linux-rdma@vger.kernel.org;
->> netdev@vger.kernel.org; Richard Cochran <richardcochran@gmail.com>;
->> Stephen Boyd <sboyd@codeaurora.org>; Chris Wilson <chris@chris-
->> wilson.co.uk>; John Stultz <john.stultz@linaro.org>; intel-wired-
->> lan@lists.osuosl.org; Thomas Gleixner <tglx@linutronix.de>; Kamble, Sagar A
->> <sagar.a.kamble@intel.com>; kvmarm@lists.cs.columbia.edu; linux-arm-
->> kernel@lists.infradead.org
->> Subject: [Intel-wired-lan] [PATCH 01/27] timecounter: Make cyclecounter
->> struct part of timecounter struct
->>
->> There is no real need for the users of timecounters to define cyclecounter
->> and timecounter variables separately. Since timecounter will always be
->> based on cyclecounter, have cyclecounter struct as member of timecounter
->> struct.
->>
->> v2: Rebase.
->>
->> Suggested-by: Chris Wilson <chris@chris-wilson.co.uk>
->> Signed-off-by: Sagar Arun Kamble <sagar.a.kamble@intel.com>
->> Cc: Chris Wilson <chris@chris-wilson.co.uk>
->> Cc: Richard Cochran <richardcochran@gmail.com>
->> Cc: John Stultz <john.stultz@linaro.org>
->> Cc: Thomas Gleixner <tglx@linutronix.de>
->> Cc: Stephen Boyd <sboyd@codeaurora.org>
->> Cc: linux-kernel@vger.kernel.org
->> Cc: linux-arm-kernel@lists.infradead.org
->> Cc: netdev@vger.kernel.org
->> Cc: intel-wired-lan@lists.osuosl.org
->> Cc: linux-rdma@vger.kernel.org
->> Cc: alsa-devel@alsa-project.org
->> Cc: kvmarm@lists.cs.columbia.edu
->> Acked-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com> (Intel drivers)
->> ---
->>   arch/microblaze/kernel/timer.c                     | 20 ++++++------
->>   drivers/clocksource/arm_arch_timer.c               | 19 ++++++------
->>   drivers/net/ethernet/amd/xgbe/xgbe-dev.c           |  3 +-
->>   drivers/net/ethernet/amd/xgbe/xgbe-ptp.c           |  9 +++---
->>   drivers/net/ethernet/amd/xgbe/xgbe.h               |  1 -
->>   drivers/net/ethernet/broadcom/bnx2x/bnx2x.h        |  1 -
->>   drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c   | 20 ++++++------
->>   drivers/net/ethernet/freescale/fec.h               |  1 -
->>   drivers/net/ethernet/freescale/fec_ptp.c           | 30 +++++++++---------
->>   drivers/net/ethernet/intel/e1000e/e1000.h          |  1 -
->>   drivers/net/ethernet/intel/e1000e/netdev.c         | 27 ++++++++--------
->>   drivers/net/ethernet/intel/e1000e/ptp.c            |  2 +-
->>   drivers/net/ethernet/intel/igb/igb.h               |  1 -
->>   drivers/net/ethernet/intel/igb/igb_ptp.c           | 25 ++++++++-------
->>   drivers/net/ethernet/intel/ixgbe/ixgbe.h           |  1 -
->>   drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c       | 17 +++++-----
->>   drivers/net/ethernet/mellanox/mlx4/en_clock.c      | 28 ++++++++---------
->>   drivers/net/ethernet/mellanox/mlx4/mlx4_en.h       |  1 -
->>   .../net/ethernet/mellanox/mlx5/core/lib/clock.c    | 34 ++++++++++----------
->>   drivers/net/ethernet/qlogic/qede/qede_ptp.c        | 20 ++++++------
->>   drivers/net/ethernet/ti/cpts.c                     | 36 ++++++++++++----------
->>   drivers/net/ethernet/ti/cpts.h                     |  1 -
->>   include/linux/mlx5/driver.h                        |  1 -
->>   include/linux/timecounter.h                        |  4 +--
->>   include/sound/hdaudio.h                            |  1 -
->>   kernel/time/timecounter.c                          | 28 ++++++++---------
->>   sound/hda/hdac_stream.c                            |  7 +++--
->>   virt/kvm/arm/arch_timer.c                          |  6 ++--
->>   28 files changed, 163 insertions(+), 182 deletions(-)
->>
-> For Intel e1000e and igb drivers:
-> Tested-by: Aaron Brown <aaron.f.brown@intel.com>
+On Mon, Jan 08, 2018 at 03:44:24PM -0600, Shanker Donthineni wrote:
+> Hi Will/Catalin,
+> 
+> Please drop https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git/commit/?h=kpti&id=79ad24ef6c260efa0614896b15e67f4829448e32 in which you've removed FALKOR MIDR change. I've posted
+> v2 patch series including typo fix & FALKOR MIDR patch which is already available in upstream v4.15-rc7
+> branch. Please merge v2 patch.
+> 
+> On 01/08/2018 01:10 PM, Shanker Donthineni wrote:
+> > Hi Will,
+> > 
+> > On 01/08/2018 12:44 PM, Will Deacon wrote:
+> >> On Mon, Jan 08, 2018 at 05:09:33PM +0000, Will Deacon wrote:
+> >>> On Fri, Jan 05, 2018 at 02:28:59PM -0600, Shanker Donthineni wrote:
+> >>>> Falkor is susceptible to branch predictor aliasing and can
+> >>>> theoretically be attacked by malicious code. This patch
+> >>>> implements a mitigation for these attacks, preventing any
+> >>>> malicious entries from affecting other victim contexts.
+> >>>
+> >>> Thanks, Shanker. I'll pick this up (fixing the typo pointed out by Drew).
+> >>
+> >> Note that MIDR_FALKOR doesn't exist in mainline, so I had to drop those
+> >> changes too. See the kpti branch for details.
+> >>
+> > 
+> > The FALKOR MIDR patch is already available in the upstream kernel v4.15-rc7
+> >     https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/arch/arm64?h=v4.15-rc7&id=c622cc013cece073722592cff1ac6643a33b1622
+> > 
+> > If you want I can resend the above patch in v2 series including typo fix.
+> > 
+> >> If you'd like anything else done here, please send additional patches to me
+> >> and Catalin that we can apply on top of what we currently have. Note that
+> >> I'm in the air tomorrow, so won't be picking up email.
+> >>
+> >> Cheers,
+> >>
+> >> Will
+> >>
+> >> _______________________________________________
+> >> linux-arm-kernel mailing list
+> >> linux-arm-kernel@lists.infradead.org
+> >> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+> >>
+> > 
+> 
+> -- 
+> Shanker Donthineni
+> Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
+> Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
