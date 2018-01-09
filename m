@@ -1,114 +1,126 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v1 01/16] virtio: Validate queue pfn for 32bit transports
-Date: Tue,  9 Jan 2018 19:03:56 +0000
-Message-ID: <20180109190414.4017-2-suzuki.poulose@arm.com>
+Subject: [PATCH v1 02/16] irqchip: gicv3-its: Add helpers for handling 52bit
+ address
+Date: Tue,  9 Jan 2018 19:03:57 +0000
+Message-ID: <20180109190414.4017-3-suzuki.poulose@arm.com>
 References: <20180109190414.4017-1-suzuki.poulose@arm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BFCA49DAD
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Jan 2018 14:00:11 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id L1yAR+vl3c6S for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Jan 2018 14:00:10 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0335049DB9
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Jan 2018 14:00:10 -0500 (EST)
 In-Reply-To: <20180109190414.4017-1-suzuki.poulose@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, peter.maydell@linaro.org, suzuki.poulose@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, will.deacon@arm.com, ard.biesheuvel@linaro.org, mark.rutland@arm.com, catalin.marinas@arm.com, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Christoffer Dall <cdall@linaro.org>
+Cc: ard.biesheuvel@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-virtio-mmio using virtio-v1 and virtio legacy pci use a 32bit PFN
-for the queue. If the queue pfn is too large to fit in 32bits, which
-we could hit on arm64 systems with 52bit physical addresses (even with
-64K page size), we simply miss out a proper link to the other side of
-the queue.
+Add helpers for encoding/decoding 52bit address in GICv3 ITS BASER
+register. When ITS uses 64K page size, the 52bits of physical address
+are encoded in BASER[47:12] as follows :
 
-Add a check to validate the PFN, rather than silently breaking
-the devices.
+ Bits[47:16] of the register => bits[47:16] of the physical address
+ Bits[15:12] of the register => bits[51:48] of the physical address
+                                bits[15:0] of the physical address are 0.
 
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>
+Also adds a mask for CBASER address. This will be used for adding 52bit
+support for VGIC ITS. More importantly ignore the upper bits if 52bit
+support is not enabled.
+
+Cc: Shanker Donthineni <shankerd@codeaurora.org>
 Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <cdall@linaro.org>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- drivers/virtio/virtio_mmio.c       | 19 ++++++++++++++++---
- drivers/virtio/virtio_pci_legacy.c | 11 +++++++++--
- 2 files changed, 25 insertions(+), 5 deletions(-)
+ drivers/irqchip/irq-gic-v3-its.c   |  2 +-
+ include/linux/irqchip/arm-gic-v3.h | 32 ++++++++++++++++++++++++++++++--
+ 2 files changed, 31 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
-index a9192fe4f345..47109baf37f7 100644
---- a/drivers/virtio/virtio_mmio.c
-+++ b/drivers/virtio/virtio_mmio.c
-@@ -358,6 +358,7 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned index,
- 	struct virtqueue *vq;
- 	unsigned long flags;
- 	unsigned int num;
-+	u64 addr;
- 	int err;
+diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+index 4039e64cd342..e6aa84f806f7 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -1615,7 +1615,7 @@ static int its_setup_baser(struct its_node *its, struct its_baser *baser,
+ 		}
  
- 	if (!name)
-@@ -394,16 +395,26 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned index,
- 		goto error_new_virtqueue;
+ 		/* Convert 52bit PA to 48bit field */
+-		baser_phys = GITS_BASER_PHYS_52_to_48(baser_phys);
++		baser_phys = GITS_BASER_ADDR64K_FROM_PHYS(baser_phys);
  	}
  
-+	addr = virtqueue_get_desc_addr(vq);
-+	/*
-+	 * virtio-mmio v1 uses a 32bit QUEUE PFN. If we have something that
-+	 * doesn't fit in 32bit, fail the setup rather than pretending to
-+	 * be successful.
-+	 */
-+	if (vm_dev->version == 1 && (addr >> (PAGE_SHIFT + 32))) {
-+		dev_err(&vdev->dev, "virtio-mmio: queue address too large\n");
-+		err = -ENOMEM;
-+		goto error_bad_pfn;
-+	}
+ retry_baser:
+diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+index c00c4c33e432..b880b6682fa6 100644
+--- a/include/linux/irqchip/arm-gic-v3.h
++++ b/include/linux/irqchip/arm-gic-v3.h
+@@ -320,6 +320,15 @@
+ #define GITS_IIDR_REV(r)		(((r) >> GITS_IIDR_REV_SHIFT) & 0xf)
+ #define GITS_IIDR_PRODUCTID_SHIFT	24
+ 
++#ifdef CONFIG_ARM64_PA_BITS_52
++#define GITS_PA_HI_MASK			(0xfULL)
++#define GITS_PA_SHIFT			52
++#else
++/* Do not use the bits [51-48] if we don't support 52bit */
++#define GITS_PA_HI_MASK			0
++#define GITS_PA_SHIFT			48
++#endif
 +
- 	/* Activate the queue */
- 	writel(virtqueue_get_vring_size(vq), vm_dev->base + VIRTIO_MMIO_QUEUE_NUM);
- 	if (vm_dev->version == 1) {
- 		writel(PAGE_SIZE, vm_dev->base + VIRTIO_MMIO_QUEUE_ALIGN);
--		writel(virtqueue_get_desc_addr(vq) >> PAGE_SHIFT,
-+		writel(addr >> PAGE_SHIFT,
- 				vm_dev->base + VIRTIO_MMIO_QUEUE_PFN);
- 	} else {
--		u64 addr;
+ #define GITS_CBASER_VALID			(1ULL << 63)
+ #define GITS_CBASER_SHAREABILITY_SHIFT		(10)
+ #define GITS_CBASER_INNER_CACHEABILITY_SHIFT	(59)
+@@ -343,6 +352,7 @@
+ #define GITS_CBASER_WaWb	GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, WaWb)
+ #define GITS_CBASER_RaWaWt	GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWaWt)
+ #define GITS_CBASER_RaWaWb	GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWaWb)
++#define GITS_CBASER_ADDRESS(x)	((x) & GENMASK_ULL(GITS_PA_SHIFT, 12))
  
--		addr = virtqueue_get_desc_addr(vq);
- 		writel((u32)addr, vm_dev->base + VIRTIO_MMIO_QUEUE_DESC_LOW);
- 		writel((u32)(addr >> 32),
- 				vm_dev->base + VIRTIO_MMIO_QUEUE_DESC_HIGH);
-@@ -430,6 +441,8 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned index,
+ #define GITS_BASER_NR_REGS		8
  
- 	return vq;
- 
-+error_bad_pfn:
-+	vring_del_virtqueue(vq);
- error_new_virtqueue:
- 	if (vm_dev->version == 1) {
- 		writel(0, vm_dev->base + VIRTIO_MMIO_QUEUE_PFN);
-diff --git a/drivers/virtio/virtio_pci_legacy.c b/drivers/virtio/virtio_pci_legacy.c
-index 2780886e8ba3..099d2cfb47b3 100644
---- a/drivers/virtio/virtio_pci_legacy.c
-+++ b/drivers/virtio/virtio_pci_legacy.c
-@@ -122,6 +122,7 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
- 	struct virtqueue *vq;
- 	u16 num;
- 	int err;
-+	u64 q_pfn;
- 
- 	/* Select the queue we're interested in */
- 	iowrite16(index, vp_dev->ioaddr + VIRTIO_PCI_QUEUE_SEL);
-@@ -141,9 +142,15 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
- 	if (!vq)
- 		return ERR_PTR(-ENOMEM);
- 
-+	q_pfn = virtqueue_get_desc_addr(vq) >> VIRTIO_PCI_QUEUE_ADDR_SHIFT;
-+	if (q_pfn >> 32) {
-+		dev_err(&vp_dev->pci_dev->dev, "virtio-pci queue PFN too large\n");
-+		err = -ENOMEM;
-+		goto out_deactivate;
-+	}
+@@ -373,8 +383,26 @@
+ #define GITS_BASER_ENTRY_SIZE_SHIFT		(48)
+ #define GITS_BASER_ENTRY_SIZE(r)	((((r) >> GITS_BASER_ENTRY_SIZE_SHIFT) & 0x1f) + 1)
+ #define GITS_BASER_ENTRY_SIZE_MASK	GENMASK_ULL(52, 48)
+-#define GITS_BASER_PHYS_52_to_48(phys)					\
+-	(((phys) & GENMASK_ULL(47, 16)) | (((phys) >> 48) & 0xf) << 12)
 +
- 	/* activate the queue */
--	iowrite32(virtqueue_get_desc_addr(vq) >> VIRTIO_PCI_QUEUE_ADDR_SHIFT,
--		  vp_dev->ioaddr + VIRTIO_PCI_QUEUE_PFN);
-+	iowrite32((u32)q_pfn, vp_dev->ioaddr + VIRTIO_PCI_QUEUE_PFN);
- 
- 	vq->priv = (void __force *)vp_dev->ioaddr + VIRTIO_PCI_QUEUE_NOTIFY;
- 
++/*
++ * With 64K page size, the physical address can be upto 52bit and
++ * uses the following encoding in the GITS_BASER[47:12]:
++ *
++ * Bits[47:16] of the register => bits[47:16] of the base physical address.
++ * Bits[15:12] of the register => bits[51:48] of the base physical address.
++ *                                bits[15:0] of the base physical address are 0.
++ * Clear the upper bits if the kernel doesn't support 52bits.
++ */
++#define GITS_BASER_ADDR64K_LO_MASK	GENMASK_ULL(47, 16)
++#define GITS_BASER_ADDR64K_HI_SHIFT	12
++#define GITS_BASER_ADDR64K_HI_MOVE	(48 - GITS_BASER_ADDR64K_HI_SHIFT)
++#define GITS_BASER_ADDR64K_HI_MASK	(GITS_PA_HI_MASK << GITS_BASER_ADDR64K_HI_SHIFT)
++#define GITS_BASER_ADDR64K_TO_PHYS(x)					\
++	(((x) & GITS_BASER_ADDR64K_LO_MASK) | 				\
++	 (((x) & GITS_BASER_ADDR64K_HI_MASK) << GITS_BASER_ADDR64K_HI_MOVE))
++#define GITS_BASER_ADDR64K_FROM_PHYS(p)					\
++	(((p) & GITS_BASER_ADDR64K_LO_MASK) | 				\
++	 (((p) >> GITS_BASER_ADDR64K_HI_MOVE) & GITS_BASER_ADDR64K_HI_MASK))
+ #define GITS_BASER_SHAREABILITY_SHIFT	(10)
+ #define GITS_BASER_InnerShareable					\
+ 	GIC_BASER_SHAREABILITY(GITS_BASER, InnerShareable)
 -- 
 2.13.6
