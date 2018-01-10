@@ -1,41 +1,49 @@
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v1 01/16] virtio: Validate queue pfn for 32bit transports
-Date: Wed, 10 Jan 2018 13:30:52 +0200
-Message-ID: <20180110132930-mutt-send-email-mst@kernel.org>
-References: <20180109190414.4017-1-suzuki.poulose@arm.com>
- <20180109190414.4017-2-suzuki.poulose@arm.com>
- <20180110012429-mutt-send-email-mst@kernel.org>
- <f53478fc-c0c1-7502-1b8c-c23e332cae9c@arm.com>
- <20180110130230-mutt-send-email-mst@kernel.org>
- <CAFEAcA9VJ41vPBOwYSVHmBGtjdA4jL2b2mHAUZ09aym_JynMzw@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Punit Agrawal <punit.agrawal@arm.com>
+Subject: [RFC 0/4] KVM: Support PUD hugepages at stage 2
+Date: Wed, 10 Jan 2018 19:07:25 +0000
+Message-ID: <20180110190729.18383-1-punit.agrawal@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9VJ41vPBOwYSVHmBGtjdA4jL2b2mHAUZ09aym_JynMzw@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Suzuki K Poulose <Suzuki.Poulose@arm.com>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, kvm-devel <kvm@vger.kernel.org>, kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, kristina.martsenko@arm.com, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Jason Wang <jasowang@redhat.com>, Christoffer Dall <cdall@linaro.org>
+To: kvmarm@lists.cs.columbia.edu
+Cc: Punit Agrawal <punit.agrawal@arm.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, suzuki.poulose@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jan 10, 2018 at 11:19:34AM +0000, Peter Maydell wrote:
-> On 10 January 2018 at 11:06, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > For virtio-mmio? I don't seem to see that code in
-> > hw/virtio/virtio-mmio.c
-> > For example I still see handling for VIRTIO_MMIO_QUEUE_PFN
-> > there, and no handling for VIRTIO_MMIO_QUEUE_DESC_LOW
-> > and such.
-> 
-> Are there uses that make it worthwhile to get virtio-1
-> support added to virtio-mmio, rather than just getting
-> people to move over to virtio-pci instead ?
-> 
-> thanks
-> -- PMM
+Hi,
 
-I keep getting these patches (like the one that started this thread) so
-I think yes. If nothing else the guest support will bit-rot without
-an open-source implementation.
+This patchset adds support for PUD hugepages at stage 2. This feature
+is useful on cores that have support for large sized TLB mappings
+(e.g., 1GB for 4K granule).
+
+The patchset is based on v4.15-rc7 and depends on a fix sent out
+earlier[0]. There patchset will conflict with Suzuki's work to
+dynamically set IPA size. I'll work with Suzuki to resolve this
+depending on the order the features are merged.
+
+The patches have been functionally tested on an A57 based system. To
+quantify the benefit, the patches need to be evaluated on cores
+supporting larger sized TLB mappings.
+
+I'm sending the patchset as RFC to get feedback on the code as well as
+allow evaluation on real systems.
+
+Thanks,
+Punit
+
+[0] https://patchwork.kernel.org/patch/10145339/
+
+Punit Agrawal (4):
+  arm64: Correct type for PUD macros
+  KVM: arm64: Support dirty page tracking for PUD hugepages
+  KVM: arm/arm64: Refactor Stage2 PMD hugepages support
+  KVM: arm64: Add support for PUD hugepages at stage 2
+
+ arch/arm/include/asm/kvm_mmu.h         | 19 +++++++
+ arch/arm/include/asm/pgtable-3level.h  |  2 +
+ arch/arm64/include/asm/kvm_mmu.h       | 29 +++++++++++
+ arch/arm64/include/asm/pgtable-hwdef.h |  8 +--
+ arch/arm64/include/asm/pgtable.h       |  4 ++
+ virt/kvm/arm/mmu.c                     | 91 +++++++++++++++++++++++++++++-----
+ 6 files changed, 137 insertions(+), 16 deletions(-)
 
 -- 
-MST
+2.15.1
