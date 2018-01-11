@@ -1,276 +1,67 @@
-From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: [RFC 4/4] KVM: arm64: Add support for PUD hugepages at stage 2
-Date: Wed, 10 Jan 2018 19:07:29 +0000
-Message-ID: <20180110190729.18383-5-punit.agrawal@arm.com>
-References: <20180110190729.18383-1-punit.agrawal@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH] KVM: arm/arm64: Check pagesize when allocating a
+ hugepage at Stage 2
+Date: Thu, 11 Jan 2018 13:15:42 +0100
+Message-ID: <20180111121542.GG15307@cbox>
+References: <20180104182433.3790-1-punit.agrawal@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2234249DAF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jan 2018 14:03:54 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aq47xu1Ahwx2 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Jan 2018 14:03:52 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A4F749D32
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jan 2018 14:03:52 -0500 (EST)
-In-Reply-To: <20180110190729.18383-1-punit.agrawal@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20180104182433.3790-1-punit.agrawal@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Punit Agrawal <punit.agrawal@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-KVM only supports PMD hugepages at stage 2. Extend the stage 2 fault
-handling to add support for PUD hugepages.
+On Thu, Jan 04, 2018 at 06:24:33PM +0000, Punit Agrawal wrote:
+> KVM only supports PMD hugepages at stage 2 but doesn't actually check
+> that the provided hugepage memory pagesize is PMD_SIZE before populating
+> stage 2 entries.
+> 
+> In cases where the backing hugepage size is smaller than PMD_SIZE (such
+> as when using contiguous hugepages),
 
-Addition of PUD hugpage support enables additional hugepage sizes (1G
-with 4K granule and 4TB with 64k granule) which can be useful on cores
-that have support for mapping larger block sizes in the TLB entries.
+what are contiguous hugepages and how are they created vs. a normal
+hugetlbfs?  Is this a kernel config thing, or how does it work?
 
-Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
----
- arch/arm/include/asm/kvm_mmu.h         | 10 +++++
- arch/arm/include/asm/pgtable-3level.h  |  2 +
- arch/arm64/include/asm/kvm_mmu.h       | 19 +++++++++
- arch/arm64/include/asm/pgtable-hwdef.h |  2 +
- arch/arm64/include/asm/pgtable.h       |  4 ++
- virt/kvm/arm/mmu.c                     | 72 +++++++++++++++++++++++++++++-----
- 6 files changed, 99 insertions(+), 10 deletions(-)
+> KVM can end up creating stage 2
+> mappings that extend beyond the supplied memory.
+> 
+> Fix this by checking for the pagesize of userspace vma before creating
+> PMD hugepage at stage 2.
+> 
+> Fixes: ad361f093c1e31d ("KVM: ARM: Support hugetlbfs backed huge pages")
+> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
+> Cc: Christoffer Dall <christoffer.dall@linaro.org>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  virt/kvm/arm/mmu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> index b4b69c2d1012..9dea96380339 100644
+> --- a/virt/kvm/arm/mmu.c
+> +++ b/virt/kvm/arm/mmu.c
+> @@ -1310,7 +1310,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  		return -EFAULT;
+>  	}
+>  
+> -	if (is_vm_hugetlb_page(vma) && !logging_active) {
+> +	if (vma_kernel_pagesize(vma) == PMD_SIZE && !logging_active) {
 
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index 3fbe919b9181..6e2e34348cb3 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -59,6 +59,10 @@ phys_addr_t kvm_get_idmap_vector(void);
- int kvm_mmu_init(void);
- void kvm_clear_hyp_idmap(void);
- 
-+static inline void kvm_set_pud(pud_t *pud, pud_t new_pud)
-+{
-+}
-+
- static inline void kvm_set_pmd(pmd_t *pmd, pmd_t new_pmd)
- {
- 	*pmd = new_pmd;
-@@ -230,6 +234,12 @@ static inline unsigned int kvm_get_vmid_bits(void)
- 	return 8;
- }
- 
-+static inline pud_t stage2_build_pud(kvm_pfn_t pfn, pgprot_t mem_type,
-+				     bool writable)
-+{
-+	return __pud(0);
-+}
-+
- #endif	/* !__ASSEMBLY__ */
- 
- #endif /* __ARM_KVM_MMU_H__ */
-diff --git a/arch/arm/include/asm/pgtable-3level.h b/arch/arm/include/asm/pgtable-3level.h
-index 1a7a17b2a1ba..97e04fdbfa85 100644
---- a/arch/arm/include/asm/pgtable-3level.h
-+++ b/arch/arm/include/asm/pgtable-3level.h
-@@ -249,6 +249,8 @@ PMD_BIT_FUNC(mkyoung,   |= PMD_SECT_AF);
- #define pfn_pmd(pfn,prot)	(__pmd(((phys_addr_t)(pfn) << PAGE_SHIFT) | pgprot_val(prot)))
- #define mk_pmd(page,prot)	pfn_pmd(page_to_pfn(page),prot)
- 
-+#define pud_pfn(pud)		(((pud_val(pud) & PUD_MASK) & PHYS_MASK) >> PAGE_SHIFT)
-+
- /* represent a notpresent pmd by faulting entry, this is used by pmdp_invalidate */
- static inline pmd_t pmd_mknotpresent(pmd_t pmd)
- {
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index dbfd18e08cfb..89eac3dbe123 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -160,6 +160,7 @@ void kvm_clear_hyp_idmap(void);
- 
- #define	kvm_set_pte(ptep, pte)		set_pte(ptep, pte)
- #define	kvm_set_pmd(pmdp, pmd)		set_pmd(pmdp, pmd)
-+#define kvm_set_pud(pudp, pud)		set_pud(pudp, pud)
- 
- static inline pte_t kvm_s2pte_mkwrite(pte_t pte)
- {
-@@ -173,6 +174,12 @@ static inline pmd_t kvm_s2pmd_mkwrite(pmd_t pmd)
- 	return pmd;
- }
- 
-+static inline pud_t kvm_s2pud_mkwrite(pud_t pud)
-+{
-+	pud_val(pud) |= PUD_S2_RDWR;
-+	return pud;
-+}
-+
- static inline void kvm_set_s2pte_readonly(pte_t *pte)
- {
- 	pteval_t old_pteval, pteval;
-@@ -319,5 +326,17 @@ static inline unsigned int kvm_get_vmid_bits(void)
- 	return (cpuid_feature_extract_unsigned_field(reg, ID_AA64MMFR1_VMIDBITS_SHIFT) == 2) ? 16 : 8;
- }
- 
-+static inline pud_t stage2_build_pud(kvm_pfn_t pfn, pgprot_t mem_type,
-+				     bool writable)
-+{
-+	pud_t pud = pfn_pud(pfn, mem_type);
-+
-+	pud = pud_mkhuge(pud);
-+	if (writable)
-+		pud = kvm_s2pud_mkwrite(pud);
-+
-+	return pud;
-+}
-+
- #endif /* __ASSEMBLY__ */
- #endif /* __ARM64_KVM_MMU_H__ */
-diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-index 40a998cdd399..a091a6192eee 100644
---- a/arch/arm64/include/asm/pgtable-hwdef.h
-+++ b/arch/arm64/include/asm/pgtable-hwdef.h
-@@ -181,6 +181,8 @@
- #define PMD_S2_RDONLY		(_AT(pmdval_t, 1) << 6)   /* HAP[2:1] */
- #define PMD_S2_RDWR		(_AT(pmdval_t, 3) << 6)   /* HAP[2:1] */
- 
-+#define PUD_S2_RDWR		(_AT(pudval_t, 3) << 6)   /* HAP[2:1] */
-+
- /*
-  * Memory Attribute override for Stage-2 (MemAttr[3:0])
-  */
-diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-index bdcc7f1c9d06..d5ffff4369d2 100644
---- a/arch/arm64/include/asm/pgtable.h
-+++ b/arch/arm64/include/asm/pgtable.h
-@@ -362,7 +362,11 @@ static inline int pmd_protnone(pmd_t pmd)
- #define mk_pmd(page,prot)	pfn_pmd(page_to_pfn(page),prot)
- 
- #define pud_write(pud)		pte_write(pud_pte(pud))
-+
-+#define pud_mkhuge(pud)		(__pud(pud_val(pud) & ~PUD_TABLE_BIT))
-+
- #define pud_pfn(pud)		(((pud_val(pud) & PUD_MASK) & PHYS_MASK) >> PAGE_SHIFT)
-+#define pfn_pud(pfn, prot)	(__pud(((phys_addr_t)(pfn) << PAGE_SHIFT) | pgprot_val(prot)))
- 
- #define set_pmd_at(mm, addr, pmdp, pmd)	set_pte_at(mm, addr, (pte_t *)pmdp, pmd_pte(pmd))
- 
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index f02219a91b19..5362de098768 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -872,6 +872,32 @@ static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
- 	return stage2_pud_offset(pgd, addr);
- }
- 
-+static int stage2_set_pud_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
-+			       *cache, phys_addr_t addr, const pud_t *new_pud)
-+{
-+	pud_t *pud, old_pud;
-+
-+	pud = stage2_get_pud(kvm, cache, addr);
-+	VM_BUG_ON(!pud);
-+
-+	/*
-+	 * Mapping in huge pages should only happen through a fault.
-+	 */
-+	VM_BUG_ON(stage2_pud_present(*pud) &&
-+		  pud_pfn(*pud) != pud_pfn(*new_pud));
-+
-+	old_pud = *pud;
-+	if (stage2_pud_present(old_pud)) {
-+		stage2_pud_clear(pud);
-+		kvm_tlb_flush_vmid_ipa(kvm, addr);
-+	} else {
-+		get_page(virt_to_page(pud));
-+	}
-+
-+	kvm_set_pud(pud, *new_pud);
-+	return 0;
-+}
-+
- static pmd_t *stage2_get_pmd(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
- 			     phys_addr_t addr)
- {
-@@ -1307,6 +1333,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	kvm_pfn_t pfn;
- 	pgprot_t mem_type = PAGE_S2;
- 	bool logging_active = memslot_is_logging(memslot);
-+	unsigned long vma_pagesize;
- 	unsigned long flags = 0;
- 
- 	write_fault = kvm_is_write_fault(vcpu);
-@@ -1324,9 +1351,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		return -EFAULT;
- 	}
- 
--	if (vma_kernel_pagesize(vma) == PMD_SIZE && !logging_active) {
-+	vma_pagesize = vma_kernel_pagesize(vma);
-+	if ((vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE) &&
-+	    !logging_active) {
-+		struct hstate *h = hstate_vma(vma);
-+
- 		hugetlb = true;
--		gfn = (fault_ipa & PMD_MASK) >> PAGE_SHIFT;
-+		gfn = (fault_ipa & huge_page_mask(h)) >> PAGE_SHIFT;
- 	} else {
- 		/*
- 		 * Pages belonging to memslots that don't have the same
-@@ -1393,17 +1424,38 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (mmu_notifier_retry(kvm, mmu_seq))
- 		goto out_unlock;
- 
--	if (!hugetlb && !force_pte)
-+	if (!hugetlb && !force_pte) {
-+		/*
-+		 * We only support PMD_SIZE transparent
-+		 * hugepages. This code will need updates if we enable
-+		 * other page sizes for THP.
-+		 */
- 		hugetlb = transparent_hugepage_adjust(&pfn, &fault_ipa);
-+		vma_pagesize = PMD_SIZE;
-+	}
- 
- 	if (hugetlb) {
--		pmd_t new_pmd = stage2_build_pmd(pfn, mem_type, writable);
--
--		if (writable)
--			kvm_set_pfn_dirty(pfn);
--
--		coherent_cache_guest_page(vcpu, pfn, PMD_SIZE);
--		ret = stage2_set_pmd_huge(kvm, memcache, fault_ipa, &new_pmd);
-+		if (vma_pagesize == PUD_SIZE) {
-+			pud_t new_pud;
-+
-+			new_pud = stage2_build_pud(pfn, mem_type, writable);
-+			if (writable)
-+				kvm_set_pfn_dirty(pfn);
-+
-+			coherent_cache_guest_page(vcpu, pfn, PUD_SIZE);
-+			ret = stage2_set_pud_huge(kvm, memcache,
-+						  fault_ipa, &new_pud);
-+		} else {
-+			pmd_t new_pmd;
-+
-+			new_pmd = stage2_build_pmd(pfn, mem_type, writable);
-+			if (writable)
-+				kvm_set_pfn_dirty(pfn);
-+
-+			coherent_cache_guest_page(vcpu, pfn, PMD_SIZE);
-+			ret = stage2_set_pmd_huge(kvm, memcache,
-+						  fault_ipa, &new_pmd);
-+		}
- 	} else {
- 		pte_t new_pte = pfn_pte(pfn, mem_type);
- 
--- 
-2.15.1
+Don't we need to also fix this in kvm_send_hwpoison_signal?
+
+(which probably implies this will then need a backport without that for
+older stable kernels.  Has this been an issue from the start or did we
+add contiguous hugepage support at some point?)
+
+>  		hugetlb = true;
+>  		gfn = (fault_ipa & PMD_MASK) >> PAGE_SHIFT;
+>  	} else {
+> -- 
+> 2.15.1
+> 
+
+Thanks,
+-Christoffer
