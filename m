@@ -1,25 +1,25 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v3 25/41] KVM: arm64: Rewrite system register accessors to
- read/write functions
-Date: Fri, 12 Jan 2018 13:07:31 +0100
-Message-ID: <20180112120747.27999-26-christoffer.dall@linaro.org>
+Subject: [PATCH v3 22/41] KVM: arm64: Unify non-VHE host/guest sysreg save and
+ restore functions
+Date: Fri, 12 Jan 2018 13:07:28 +0100
+Message-ID: <20180112120747.27999-23-christoffer.dall@linaro.org>
 References: <20180112120747.27999-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 186DC49DD5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 07:03:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F4B249DF1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 07:03:38 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZSpGJRO2eJUl for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Jan 2018 07:03:42 -0500 (EST)
-Received: from mail-wm0-f65.google.com (mail-wm0-f65.google.com [74.125.82.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E14BB49DE7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 07:03:39 -0500 (EST)
-Received: by mail-wm0-f65.google.com with SMTP id i186so11588268wmi.4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 04:08:30 -0800 (PST)
+ with ESMTP id FJLmWVVzpxBC for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Jan 2018 07:03:36 -0500 (EST)
+Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 49C2949DFD
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 07:03:35 -0500 (EST)
+Received: by mail-wm0-f68.google.com with SMTP id 141so11314482wme.3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 04:08:25 -0800 (PST)
 In-Reply-To: <20180112120747.27999-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,628 +31,125 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@cs.columbia.edu>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <cdall@cs.columbia.edu>
+There is no need to have multiple identical functions with different
+names for saving host and guest state.  When saving and restoring state
+for the host and guest, the state is the same for both contexts, and
+that's why we have the kvm_cpu_context structure.  Delete one
+version and rename the other into simply save/restore.
 
-Currently we access the system registers array via the vcpu_sys_reg()
-macro.  However, we are about to change the behavior to some times
-modify the register file directly, so let's change this to two
-primitives:
-
- * Accessor macros vcpu_write_sys_reg() and vcpu_read_sys_reg()
- * Direct array access macro __vcpu_sys_reg()
-
-The first primitive should be used in places where the code needs to
-access the currently loaded VCPU's state as observed by the guest.  For
-example, when trapping on cache related registers, a write to a system
-register should go directly to the VCPU version of the register.
-
-The second primitive can be used in places where the VCPU is known to
-never be running (for example userspace access) or for registers which
-are never context switched (for example all the PMU system registers).
-
-This rewrites all users of vcpu_sys_regs to one of the two primitives
-above.
-
-No functional change.
-
-Signed-off-by: Christoffer Dall <cdall@cs.columbia.edu>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/include/asm/kvm_emulate.h | 13 ++++---
- arch/arm64/include/asm/kvm_host.h    | 13 ++++++-
- arch/arm64/include/asm/kvm_mmu.h     |  2 +-
- arch/arm64/kvm/debug.c               | 27 +++++++++-----
- arch/arm64/kvm/inject_fault.c        |  8 ++--
- arch/arm64/kvm/sys_regs.c            | 71 ++++++++++++++++++------------------
- arch/arm64/kvm/sys_regs.h            |  4 +-
- arch/arm64/kvm/sys_regs_generic_v8.c |  4 +-
- virt/kvm/arm/pmu.c                   | 37 ++++++++++---------
- 9 files changed, 102 insertions(+), 77 deletions(-)
+ arch/arm64/include/asm/kvm_hyp.h |  6 ++----
+ arch/arm64/kvm/hyp/switch.c      | 10 +++++-----
+ arch/arm64/kvm/hyp/sysreg-sr.c   | 18 ++----------------
+ 3 files changed, 9 insertions(+), 25 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index e07bf463ac58..df1cb146750d 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -273,15 +273,18 @@ static inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index 998152da9b66..3f54c55f77a1 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -132,10 +132,8 @@ int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu);
+ void __timer_enable_traps(struct kvm_vcpu *vcpu);
+ void __timer_disable_traps(struct kvm_vcpu *vcpu);
  
- static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
- {
--	return vcpu_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
-+	return vcpu_read_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
- }
+-void __sysreg_save_host_state_nvhe(struct kvm_cpu_context *ctxt);
+-void __sysreg_restore_host_state_nvhe(struct kvm_cpu_context *ctxt);
+-void __sysreg_save_guest_state_nvhe(struct kvm_cpu_context *ctxt);
+-void __sysreg_restore_guest_state_nvhe(struct kvm_cpu_context *ctxt);
++void __sysreg_save_state_nvhe(struct kvm_cpu_context *ctxt);
++void __sysreg_restore_state_nvhe(struct kvm_cpu_context *ctxt);
+ void sysreg_save_host_state_vhe(struct kvm_cpu_context *ctxt);
+ void sysreg_restore_host_state_vhe(struct kvm_cpu_context *ctxt);
+ void sysreg_save_guest_state_vhe(struct kvm_cpu_context *ctxt);
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index b6edb6aaa298..2e04d404ac82 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -396,7 +396,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 	host_ctxt->__hyp_running_vcpu = vcpu;
+ 	guest_ctxt = &vcpu->arch.ctxt;
  
- static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
- {
--	if (vcpu_mode_is_32bit(vcpu))
-+	if (vcpu_mode_is_32bit(vcpu)) {
- 		*vcpu_cpsr(vcpu) |= COMPAT_PSR_E_BIT;
--	else
--		vcpu_sys_reg(vcpu, SCTLR_EL1) |= (1 << 25);
-+	} else {
-+		u64 sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
-+		sctlr |= (1 << 25);
-+		vcpu_write_sys_reg(vcpu, SCTLR_EL1, sctlr);
-+	}
- }
+-	__sysreg_save_host_state_nvhe(host_ctxt);
++	__sysreg_save_state_nvhe(host_ctxt);
  
- static inline bool kvm_vcpu_is_be(struct kvm_vcpu *vcpu)
-@@ -289,7 +292,7 @@ static inline bool kvm_vcpu_is_be(struct kvm_vcpu *vcpu)
- 	if (vcpu_mode_is_32bit(vcpu))
- 		return !!(*vcpu_cpsr(vcpu) & COMPAT_PSR_E_BIT);
+ 	__activate_traps(vcpu);
+ 	__activate_vm(kern_hyp_va(vcpu->kvm));
+@@ -409,7 +409,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 	 * to erratum #852523 (Cortex-A57) or #853709 (Cortex-A72).
+ 	 */
+ 	__sysreg32_restore_state(vcpu);
+-	__sysreg_restore_guest_state_nvhe(guest_ctxt);
++	__sysreg_restore_state_nvhe(guest_ctxt);
+ 	__debug_switch_to_guest(vcpu);
  
--	return !!(vcpu_sys_reg(vcpu, SCTLR_EL1) & (1 << 25));
-+	return !!(vcpu_read_sys_reg(vcpu, SCTLR_EL1) & (1 << 25));
- }
+ 	do {
+@@ -419,7 +419,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 		/* And we're baaack! */
+ 	} while (fixup_guest_exit(vcpu, &exit_code));
  
- static inline unsigned long vcpu_data_guest_to_host(struct kvm_vcpu *vcpu,
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 4a1b0bab6baf..91272c35cc36 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -284,7 +284,18 @@ struct kvm_vcpu_arch {
- };
+-	__sysreg_save_guest_state_nvhe(guest_ctxt);
++	__sysreg_save_state_nvhe(guest_ctxt);
+ 	__sysreg32_save_state(vcpu);
+ 	__timer_disable_traps(vcpu);
+ 	__vgic_save_state(vcpu);
+@@ -427,7 +427,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 	__deactivate_traps(vcpu);
+ 	__deactivate_vm(vcpu);
  
- #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.gp_regs)
--#define vcpu_sys_reg(v,r)	((v)->arch.ctxt.sys_regs[(r)])
-+
-+/*
-+ * Only use __vcpu_sys_reg if you know you want the memory backed version of a
-+ * register, and not the one most recently accessed by a runnning VCPU.  For
-+ * example, for userpace access or for system registers that are never context
-+ * switched, but only emulated.
-+ */
-+#define __vcpu_sys_reg(v,r)	((v)->arch.ctxt.sys_regs[(r)])
-+
-+#define vcpu_read_sys_reg(v,r)	__vcpu_sys_reg(v,r)
-+#define vcpu_write_sys_reg(v,r,n)	do { __vcpu_sys_reg(v,r) = n; } while (0)
-+
- /*
-  * CP14 and CP15 live in the same array, as they are backed by the
-  * same system registers.
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 672c8684d5c2..c50fcfed0165 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -227,7 +227,7 @@ struct kvm;
- 
- static inline bool vcpu_has_cache_enabled(struct kvm_vcpu *vcpu)
- {
--	return (vcpu_sys_reg(vcpu, SCTLR_EL1) & 0b101) == 0b101;
-+	return (vcpu_read_sys_reg(vcpu, SCTLR_EL1) & 0b101) == 0b101;
- }
- 
- static inline void __coherent_cache_guest_page(struct kvm_vcpu *vcpu,
-diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-index feedb877cff8..db32d10a56a1 100644
---- a/arch/arm64/kvm/debug.c
-+++ b/arch/arm64/kvm/debug.c
-@@ -46,7 +46,8 @@ static DEFINE_PER_CPU(u32, mdcr_el2);
-  */
- static void save_guest_debug_regs(struct kvm_vcpu *vcpu)
- {
--	vcpu->arch.guest_debug_preserved.mdscr_el1 = vcpu_sys_reg(vcpu, MDSCR_EL1);
-+	vcpu->arch.guest_debug_preserved.mdscr_el1 =
-+		vcpu_read_sys_reg(vcpu, MDSCR_EL1);
- 
- 	trace_kvm_arm_set_dreg32("Saved MDSCR_EL1",
- 				vcpu->arch.guest_debug_preserved.mdscr_el1);
-@@ -54,10 +55,11 @@ static void save_guest_debug_regs(struct kvm_vcpu *vcpu)
- 
- static void restore_guest_debug_regs(struct kvm_vcpu *vcpu)
- {
--	vcpu_sys_reg(vcpu, MDSCR_EL1) = vcpu->arch.guest_debug_preserved.mdscr_el1;
-+	vcpu_write_sys_reg(vcpu, MDSCR_EL1,
-+			   vcpu->arch.guest_debug_preserved.mdscr_el1);
- 
- 	trace_kvm_arm_set_dreg32("Restored MDSCR_EL1",
--				vcpu_sys_reg(vcpu, MDSCR_EL1));
-+				vcpu_read_sys_reg(vcpu, MDSCR_EL1));
- }
- 
- /**
-@@ -108,6 +110,7 @@ void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu)
- void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
- {
- 	bool trap_debug = !(vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY);
-+	unsigned long mdscr;
- 
- 	trace_kvm_arm_setup_debug(vcpu, vcpu->guest_debug);
- 
-@@ -152,9 +155,13 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
- 		 */
- 		if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
- 			*vcpu_cpsr(vcpu) |=  DBG_SPSR_SS;
--			vcpu_sys_reg(vcpu, MDSCR_EL1) |= DBG_MDSCR_SS;
-+			mdscr = vcpu_read_sys_reg(vcpu, MDSCR_EL1);
-+			mdscr |= DBG_MDSCR_SS;
-+			vcpu_write_sys_reg(vcpu, MDSCR_EL1, mdscr);
- 		} else {
--			vcpu_sys_reg(vcpu, MDSCR_EL1) &= ~DBG_MDSCR_SS;
-+			mdscr = vcpu_read_sys_reg(vcpu, MDSCR_EL1);
-+			mdscr &= ~DBG_MDSCR_SS;
-+			vcpu_write_sys_reg(vcpu, MDSCR_EL1, mdscr);
- 		}
- 
- 		trace_kvm_arm_set_dreg32("SPSR_EL2", *vcpu_cpsr(vcpu));
-@@ -170,7 +177,9 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
- 		 */
- 		if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW) {
- 			/* Enable breakpoints/watchpoints */
--			vcpu_sys_reg(vcpu, MDSCR_EL1) |= DBG_MDSCR_MDE;
-+			mdscr = vcpu_read_sys_reg(vcpu, MDSCR_EL1);
-+			mdscr |= DBG_MDSCR_MDE;
-+			vcpu_write_sys_reg(vcpu, MDSCR_EL1, mdscr);
- 
- 			vcpu->arch.debug_ptr = &vcpu->arch.external_debug_state;
- 			vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
-@@ -194,12 +203,12 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
- 		vcpu->arch.mdcr_el2 |= MDCR_EL2_TDA;
- 
- 	/* If KDE or MDE are set, perform a full save/restore cycle. */
--	if ((vcpu_sys_reg(vcpu, MDSCR_EL1) & DBG_MDSCR_KDE) ||
--	    (vcpu_sys_reg(vcpu, MDSCR_EL1) & DBG_MDSCR_MDE))
-+	if (vcpu_read_sys_reg(vcpu, MDSCR_EL1) & (DBG_MDSCR_KDE | DBG_MDSCR_MDE))
- 		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
- 
- 	trace_kvm_arm_set_dreg32("MDCR_EL2", vcpu->arch.mdcr_el2);
--	trace_kvm_arm_set_dreg32("MDSCR_EL1", vcpu_sys_reg(vcpu, MDSCR_EL1));
-+	trace_kvm_arm_set_dreg32("MDSCR_EL1",
-+				 vcpu_read_sys_reg(vcpu, MDSCR_EL1));
- }
- 
- void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index f4d35bb551e4..1e070943e7a6 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -58,7 +58,7 @@ static u64 get_except_vector(struct kvm_vcpu *vcpu, enum exception_type type)
- 		exc_offset = LOWER_EL_AArch32_VECTOR;
- 	}
- 
--	return vcpu_sys_reg(vcpu, VBAR_EL1) + exc_offset + type;
-+	return vcpu_read_sys_reg(vcpu, VBAR_EL1) + exc_offset + type;
- }
- 
- static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr)
-@@ -73,7 +73,7 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
- 	*vcpu_cpsr(vcpu) = PSTATE_FAULT_BITS_64;
- 	*vcpu_spsr(vcpu) = cpsr;
- 
--	vcpu_sys_reg(vcpu, FAR_EL1) = addr;
-+	vcpu_write_sys_reg(vcpu, FAR_EL1, addr);
+-	__sysreg_restore_host_state_nvhe(host_ctxt);
++	__sysreg_restore_state_nvhe(host_ctxt);
  
  	/*
- 	 * Build an {i,d}abort, depending on the level and the
-@@ -94,7 +94,7 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
- 	if (!is_iabt)
- 		esr |= ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT;
- 
--	vcpu_sys_reg(vcpu, ESR_EL1) = esr | ESR_ELx_FSC_EXTABT;
-+	vcpu_write_sys_reg(vcpu, ESR_EL1, esr | ESR_ELx_FSC_EXTABT);
- }
- 
- static void inject_undef64(struct kvm_vcpu *vcpu)
-@@ -115,7 +115,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
- 	if (kvm_vcpu_trap_il_is32bit(vcpu))
- 		esr |= ESR_ELx_IL;
- 
--	vcpu_sys_reg(vcpu, ESR_EL1) = esr;
-+	vcpu_write_sys_reg(vcpu, ESR_EL1, esr);
- }
- 
- /**
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index b20c26e0d6b9..96398d53b462 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -133,14 +133,14 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
- 	if (!p->is_aarch32 || !p->is_32bit) {
- 		val = p->regval;
- 	} else {
--		val = vcpu_sys_reg(vcpu, reg);
-+		val = vcpu_read_sys_reg(vcpu, reg);
- 		if (r->reg % 2)
- 			val = (p->regval << 32) | (u64)lower_32_bits(val);
- 		else
- 			val = ((u64)upper_32_bits(val) << 32) |
- 				lower_32_bits(p->regval);
+ 	 * This must come after restoring the host sysregs, since a non-VHE
+@@ -452,7 +452,7 @@ static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par,
+ 		__timer_disable_traps(vcpu);
+ 		__deactivate_traps(vcpu);
+ 		__deactivate_vm(vcpu);
+-		__sysreg_restore_host_state_nvhe(__host_ctxt);
++		__sysreg_restore_state_nvhe(__host_ctxt);
  	}
--	vcpu_sys_reg(vcpu, reg) = val;
-+	vcpu_write_sys_reg(vcpu, reg, val);
  
- 	kvm_toggle_cache(vcpu, was_enabled);
- 	return true;
-@@ -241,10 +241,10 @@ static bool trap_debug_regs(struct kvm_vcpu *vcpu,
- 			    const struct sys_reg_desc *r)
+ 	/*
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index 5cbde1016303..baa243a010b3 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -75,14 +75,7 @@ static void __hyp_text __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+ 	ctxt->gp_regs.regs.pstate	= read_sysreg_el2(spsr);
+ }
+ 
+-void __hyp_text __sysreg_save_host_state_nvhe(struct kvm_cpu_context *ctxt)
+-{
+-	__sysreg_save_el1_state(ctxt);
+-	__sysreg_save_common_state(ctxt);
+-	__sysreg_save_user_state(ctxt);
+-}
+-
+-void __hyp_text __sysreg_save_guest_state_nvhe(struct kvm_cpu_context *ctxt)
++void __hyp_text __sysreg_save_state_nvhe(struct kvm_cpu_context *ctxt)
  {
- 	if (p->is_write) {
--		vcpu_sys_reg(vcpu, r->reg) = p->regval;
-+		vcpu_write_sys_reg(vcpu, r->reg, p->regval);
- 		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
- 	} else {
--		p->regval = vcpu_sys_reg(vcpu, r->reg);
-+		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
- 	}
+ 	__sysreg_save_el1_state(ctxt);
+ 	__sysreg_save_common_state(ctxt);
+@@ -148,14 +141,7 @@ static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+ 	write_sysreg_el2(ctxt->gp_regs.regs.pstate,	spsr);
+ }
  
- 	trace_trap_reg(__func__, r->reg, p->is_write, p->regval);
-@@ -457,7 +457,8 @@ static void reset_wcr(struct kvm_vcpu *vcpu,
- 
- static void reset_amair_el1(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+-void __hyp_text __sysreg_restore_host_state_nvhe(struct kvm_cpu_context *ctxt)
+-{
+-	__sysreg_restore_el1_state(ctxt);
+-	__sysreg_restore_common_state(ctxt);
+-	__sysreg_restore_user_state(ctxt);
+-}
+-
+-void __hyp_text __sysreg_restore_guest_state_nvhe(struct kvm_cpu_context *ctxt)
++void __hyp_text __sysreg_restore_state_nvhe(struct kvm_cpu_context *ctxt)
  {
--	vcpu_sys_reg(vcpu, AMAIR_EL1) = read_sysreg(amair_el1);
-+	u64 amair = read_sysreg(amair_el1);
-+	vcpu_write_sys_reg(vcpu, AMAIR_EL1, amair);
- }
- 
- static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-@@ -474,7 +475,7 @@ static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- 	mpidr = (vcpu->vcpu_id & 0x0f) << MPIDR_LEVEL_SHIFT(0);
- 	mpidr |= ((vcpu->vcpu_id >> 4) & 0xff) << MPIDR_LEVEL_SHIFT(1);
- 	mpidr |= ((vcpu->vcpu_id >> 12) & 0xff) << MPIDR_LEVEL_SHIFT(2);
--	vcpu_sys_reg(vcpu, MPIDR_EL1) = (1ULL << 31) | mpidr;
-+	vcpu_write_sys_reg(vcpu, MPIDR_EL1, (1ULL << 31) | mpidr);
- }
- 
- static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-@@ -488,12 +489,12 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- 	 */
- 	val = ((pmcr & ~ARMV8_PMU_PMCR_MASK)
- 	       | (ARMV8_PMU_PMCR_MASK & 0xdecafbad)) & (~ARMV8_PMU_PMCR_E);
--	vcpu_sys_reg(vcpu, PMCR_EL0) = val;
-+	__vcpu_sys_reg(vcpu, PMCR_EL0) = val;
- }
- 
- static bool check_pmu_access_disabled(struct kvm_vcpu *vcpu, u64 flags)
- {
--	u64 reg = vcpu_sys_reg(vcpu, PMUSERENR_EL0);
-+	u64 reg = __vcpu_sys_reg(vcpu, PMUSERENR_EL0);
- 	bool enabled = (reg & flags) || vcpu_mode_priv(vcpu);
- 
- 	if (!enabled)
-@@ -535,14 +536,14 @@ static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 
- 	if (p->is_write) {
- 		/* Only update writeable bits of PMCR */
--		val = vcpu_sys_reg(vcpu, PMCR_EL0);
-+		val = __vcpu_sys_reg(vcpu, PMCR_EL0);
- 		val &= ~ARMV8_PMU_PMCR_MASK;
- 		val |= p->regval & ARMV8_PMU_PMCR_MASK;
--		vcpu_sys_reg(vcpu, PMCR_EL0) = val;
-+		__vcpu_sys_reg(vcpu, PMCR_EL0) = val;
- 		kvm_pmu_handle_pmcr(vcpu, val);
- 	} else {
- 		/* PMCR.P & PMCR.C are RAZ */
--		val = vcpu_sys_reg(vcpu, PMCR_EL0)
-+		val = __vcpu_sys_reg(vcpu, PMCR_EL0)
- 		      & ~(ARMV8_PMU_PMCR_P | ARMV8_PMU_PMCR_C);
- 		p->regval = val;
- 	}
-@@ -560,10 +561,10 @@ static bool access_pmselr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 		return false;
- 
- 	if (p->is_write)
--		vcpu_sys_reg(vcpu, PMSELR_EL0) = p->regval;
-+		__vcpu_sys_reg(vcpu, PMSELR_EL0) = p->regval;
- 	else
- 		/* return PMSELR.SEL field */
--		p->regval = vcpu_sys_reg(vcpu, PMSELR_EL0)
-+		p->regval = __vcpu_sys_reg(vcpu, PMSELR_EL0)
- 			    & ARMV8_PMU_COUNTER_MASK;
- 
- 	return true;
-@@ -596,7 +597,7 @@ static bool pmu_counter_idx_valid(struct kvm_vcpu *vcpu, u64 idx)
- {
- 	u64 pmcr, val;
- 
--	pmcr = vcpu_sys_reg(vcpu, PMCR_EL0);
-+	pmcr = __vcpu_sys_reg(vcpu, PMCR_EL0);
- 	val = (pmcr >> ARMV8_PMU_PMCR_N_SHIFT) & ARMV8_PMU_PMCR_N_MASK;
- 	if (idx >= val && idx != ARMV8_PMU_CYCLE_IDX) {
- 		kvm_inject_undefined(vcpu);
-@@ -621,7 +622,7 @@ static bool access_pmu_evcntr(struct kvm_vcpu *vcpu,
- 			if (pmu_access_event_counter_el0_disabled(vcpu))
- 				return false;
- 
--			idx = vcpu_sys_reg(vcpu, PMSELR_EL0)
-+			idx = __vcpu_sys_reg(vcpu, PMSELR_EL0)
- 			      & ARMV8_PMU_COUNTER_MASK;
- 		} else if (r->Op2 == 0) {
- 			/* PMCCNTR_EL0 */
-@@ -676,7 +677,7 @@ static bool access_pmu_evtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 
- 	if (r->CRn == 9 && r->CRm == 13 && r->Op2 == 1) {
- 		/* PMXEVTYPER_EL0 */
--		idx = vcpu_sys_reg(vcpu, PMSELR_EL0) & ARMV8_PMU_COUNTER_MASK;
-+		idx = __vcpu_sys_reg(vcpu, PMSELR_EL0) & ARMV8_PMU_COUNTER_MASK;
- 		reg = PMEVTYPER0_EL0 + idx;
- 	} else if (r->CRn == 14 && (r->CRm & 12) == 12) {
- 		idx = ((r->CRm & 3) << 3) | (r->Op2 & 7);
-@@ -694,9 +695,9 @@ static bool access_pmu_evtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 
- 	if (p->is_write) {
- 		kvm_pmu_set_counter_event_type(vcpu, p->regval, idx);
--		vcpu_sys_reg(vcpu, reg) = p->regval & ARMV8_PMU_EVTYPE_MASK;
-+		__vcpu_sys_reg(vcpu, reg) = p->regval & ARMV8_PMU_EVTYPE_MASK;
- 	} else {
--		p->regval = vcpu_sys_reg(vcpu, reg) & ARMV8_PMU_EVTYPE_MASK;
-+		p->regval = __vcpu_sys_reg(vcpu, reg) & ARMV8_PMU_EVTYPE_MASK;
- 	}
- 
- 	return true;
-@@ -718,15 +719,15 @@ static bool access_pmcnten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 		val = p->regval & mask;
- 		if (r->Op2 & 0x1) {
- 			/* accessing PMCNTENSET_EL0 */
--			vcpu_sys_reg(vcpu, PMCNTENSET_EL0) |= val;
-+			__vcpu_sys_reg(vcpu, PMCNTENSET_EL0) |= val;
- 			kvm_pmu_enable_counter(vcpu, val);
- 		} else {
- 			/* accessing PMCNTENCLR_EL0 */
--			vcpu_sys_reg(vcpu, PMCNTENSET_EL0) &= ~val;
-+			__vcpu_sys_reg(vcpu, PMCNTENSET_EL0) &= ~val;
- 			kvm_pmu_disable_counter(vcpu, val);
- 		}
- 	} else {
--		p->regval = vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask;
-+		p->regval = __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask;
- 	}
- 
- 	return true;
-@@ -750,12 +751,12 @@ static bool access_pminten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 
- 		if (r->Op2 & 0x1)
- 			/* accessing PMINTENSET_EL1 */
--			vcpu_sys_reg(vcpu, PMINTENSET_EL1) |= val;
-+			__vcpu_sys_reg(vcpu, PMINTENSET_EL1) |= val;
- 		else
- 			/* accessing PMINTENCLR_EL1 */
--			vcpu_sys_reg(vcpu, PMINTENSET_EL1) &= ~val;
-+			__vcpu_sys_reg(vcpu, PMINTENSET_EL1) &= ~val;
- 	} else {
--		p->regval = vcpu_sys_reg(vcpu, PMINTENSET_EL1) & mask;
-+		p->regval = __vcpu_sys_reg(vcpu, PMINTENSET_EL1) & mask;
- 	}
- 
- 	return true;
-@@ -775,12 +776,12 @@ static bool access_pmovs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	if (p->is_write) {
- 		if (r->CRm & 0x2)
- 			/* accessing PMOVSSET_EL0 */
--			vcpu_sys_reg(vcpu, PMOVSSET_EL0) |= (p->regval & mask);
-+			__vcpu_sys_reg(vcpu, PMOVSSET_EL0) |= (p->regval & mask);
- 		else
- 			/* accessing PMOVSCLR_EL0 */
--			vcpu_sys_reg(vcpu, PMOVSSET_EL0) &= ~(p->regval & mask);
-+			__vcpu_sys_reg(vcpu, PMOVSSET_EL0) &= ~(p->regval & mask);
- 	} else {
--		p->regval = vcpu_sys_reg(vcpu, PMOVSSET_EL0) & mask;
-+		p->regval = __vcpu_sys_reg(vcpu, PMOVSSET_EL0) & mask;
- 	}
- 
- 	return true;
-@@ -817,10 +818,10 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 			return false;
- 		}
- 
--		vcpu_sys_reg(vcpu, PMUSERENR_EL0) = p->regval
--						    & ARMV8_PMU_USERENR_MASK;
--	} else {
--		p->regval = vcpu_sys_reg(vcpu, PMUSERENR_EL0)
-+		__vcpu_sys_reg(vcpu, PMUSERENR_EL0) =
-+			       p->regval & ARMV8_PMU_USERENR_MASK;
-+	} else  {
-+		p->regval = __vcpu_sys_reg(vcpu, PMUSERENR_EL0)
- 			    & ARMV8_PMU_USERENR_MASK;
- 	}
- 
-@@ -2193,7 +2194,7 @@ int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
- 	if (r->get_user)
- 		return (r->get_user)(vcpu, r, reg, uaddr);
- 
--	return reg_to_user(uaddr, &vcpu_sys_reg(vcpu, r->reg), reg->id);
-+	return reg_to_user(uaddr, &__vcpu_sys_reg(vcpu, r->reg), reg->id);
- }
- 
- int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-@@ -2214,7 +2215,7 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
- 	if (r->set_user)
- 		return (r->set_user)(vcpu, r, reg, uaddr);
- 
--	return reg_from_user(&vcpu_sys_reg(vcpu, r->reg), uaddr, reg->id);
-+	return reg_from_user(&__vcpu_sys_reg(vcpu, r->reg), uaddr, reg->id);
- }
- 
- static unsigned int num_demux_regs(void)
-@@ -2420,6 +2421,6 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
- 	reset_sys_reg_descs(vcpu, table, num);
- 
- 	for (num = 1; num < NR_SYS_REGS; num++)
--		if (vcpu_sys_reg(vcpu, num) == 0x4242424242424242)
--			panic("Didn't reset vcpu_sys_reg(%zi)", num);
-+		if (__vcpu_sys_reg(vcpu, num) == 0x4242424242424242)
-+			panic("Didn't reset __vcpu_sys_reg(%zi)", num);
- }
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index 060f5348ef25..cd710f8b63e0 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -89,14 +89,14 @@ static inline void reset_unknown(struct kvm_vcpu *vcpu,
- {
- 	BUG_ON(!r->reg);
- 	BUG_ON(r->reg >= NR_SYS_REGS);
--	vcpu_sys_reg(vcpu, r->reg) = 0x1de7ec7edbadc0deULL;
-+	__vcpu_sys_reg(vcpu, r->reg) = 0x1de7ec7edbadc0deULL;
- }
- 
- static inline void reset_val(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- {
- 	BUG_ON(!r->reg);
- 	BUG_ON(r->reg >= NR_SYS_REGS);
--	vcpu_sys_reg(vcpu, r->reg) = r->val;
-+	__vcpu_sys_reg(vcpu, r->reg) = r->val;
- }
- 
- static inline int cmp_sys_reg(const struct sys_reg_desc *i1,
-diff --git a/arch/arm64/kvm/sys_regs_generic_v8.c b/arch/arm64/kvm/sys_regs_generic_v8.c
-index 969ade1d333d..ddb8497d18d6 100644
---- a/arch/arm64/kvm/sys_regs_generic_v8.c
-+++ b/arch/arm64/kvm/sys_regs_generic_v8.c
-@@ -38,13 +38,13 @@ static bool access_actlr(struct kvm_vcpu *vcpu,
- 	if (p->is_write)
- 		return ignore_write(vcpu, p);
- 
--	p->regval = vcpu_sys_reg(vcpu, ACTLR_EL1);
-+	p->regval = vcpu_read_sys_reg(vcpu, ACTLR_EL1);
- 	return true;
- }
- 
- static void reset_actlr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- {
--	vcpu_sys_reg(vcpu, ACTLR_EL1) = read_sysreg(actlr_el1);
-+	__vcpu_sys_reg(vcpu, ACTLR_EL1) = read_sysreg(actlr_el1);
- }
- 
- /*
-diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index 8a9c42366db7..29cb4a1ff26b 100644
---- a/virt/kvm/arm/pmu.c
-+++ b/virt/kvm/arm/pmu.c
-@@ -37,7 +37,7 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
- 
- 	reg = (select_idx == ARMV8_PMU_CYCLE_IDX)
- 	      ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + select_idx;
--	counter = vcpu_sys_reg(vcpu, reg);
-+	counter = __vcpu_sys_reg(vcpu, reg);
- 
- 	/* The real counter value is equal to the value of counter register plus
- 	 * the value perf event counts.
-@@ -61,7 +61,8 @@ void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val)
- 
- 	reg = (select_idx == ARMV8_PMU_CYCLE_IDX)
- 	      ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + select_idx;
--	vcpu_sys_reg(vcpu, reg) += (s64)val - kvm_pmu_get_counter_value(vcpu, select_idx);
-+	__vcpu_sys_reg(vcpu, reg) +=
-+		(s64)val - kvm_pmu_get_counter_value(vcpu, select_idx);
- }
- 
- /**
-@@ -78,7 +79,7 @@ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc)
- 		counter = kvm_pmu_get_counter_value(vcpu, pmc->idx);
- 		reg = (pmc->idx == ARMV8_PMU_CYCLE_IDX)
- 		       ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + pmc->idx;
--		vcpu_sys_reg(vcpu, reg) = counter;
-+		__vcpu_sys_reg(vcpu, reg) = counter;
- 		perf_event_disable(pmc->perf_event);
- 		perf_event_release_kernel(pmc->perf_event);
- 		pmc->perf_event = NULL;
-@@ -125,7 +126,7 @@ void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu)
- 
- u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
- {
--	u64 val = vcpu_sys_reg(vcpu, PMCR_EL0) >> ARMV8_PMU_PMCR_N_SHIFT;
-+	u64 val = __vcpu_sys_reg(vcpu, PMCR_EL0) >> ARMV8_PMU_PMCR_N_SHIFT;
- 
- 	val &= ARMV8_PMU_PMCR_N_MASK;
- 	if (val == 0)
-@@ -147,7 +148,7 @@ void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val)
- 	struct kvm_pmu *pmu = &vcpu->arch.pmu;
- 	struct kvm_pmc *pmc;
- 
--	if (!(vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E) || !val)
-+	if (!(__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E) || !val)
- 		return;
- 
- 	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++) {
-@@ -193,10 +194,10 @@ static u64 kvm_pmu_overflow_status(struct kvm_vcpu *vcpu)
- {
- 	u64 reg = 0;
- 
--	if ((vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E)) {
--		reg = vcpu_sys_reg(vcpu, PMOVSSET_EL0);
--		reg &= vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
--		reg &= vcpu_sys_reg(vcpu, PMINTENSET_EL1);
-+	if ((__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E)) {
-+		reg = __vcpu_sys_reg(vcpu, PMOVSSET_EL0);
-+		reg &= __vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
-+		reg &= __vcpu_sys_reg(vcpu, PMINTENSET_EL1);
- 		reg &= kvm_pmu_valid_counter_mask(vcpu);
- 	}
- 
-@@ -295,7 +296,7 @@ static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
- 	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
- 	int idx = pmc->idx;
- 
--	vcpu_sys_reg(vcpu, PMOVSSET_EL0) |= BIT(idx);
-+	__vcpu_sys_reg(vcpu, PMOVSSET_EL0) |= BIT(idx);
- 
- 	if (kvm_pmu_overflow_status(vcpu)) {
- 		kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
-@@ -316,19 +317,19 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val)
- 	if (val == 0)
- 		return;
- 
--	enable = vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
-+	enable = __vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
- 	for (i = 0; i < ARMV8_PMU_CYCLE_IDX; i++) {
- 		if (!(val & BIT(i)))
- 			continue;
--		type = vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + i)
-+		type = __vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + i)
- 		       & ARMV8_PMU_EVTYPE_EVENT;
- 		if ((type == ARMV8_PMUV3_PERFCTR_SW_INCR)
- 		    && (enable & BIT(i))) {
--			reg = vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) + 1;
-+			reg = __vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) + 1;
- 			reg = lower_32_bits(reg);
--			vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) = reg;
-+			__vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) = reg;
- 			if (!reg)
--				vcpu_sys_reg(vcpu, PMOVSSET_EL0) |= BIT(i);
-+				__vcpu_sys_reg(vcpu, PMOVSSET_EL0) |= BIT(i);
- 		}
- 	}
- }
-@@ -348,7 +349,7 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
- 	mask = kvm_pmu_valid_counter_mask(vcpu);
- 	if (val & ARMV8_PMU_PMCR_E) {
- 		kvm_pmu_enable_counter(vcpu,
--				vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask);
-+		       __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask);
- 	} else {
- 		kvm_pmu_disable_counter(vcpu, mask);
- 	}
-@@ -369,8 +370,8 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
- 
- static bool kvm_pmu_counter_is_enabled(struct kvm_vcpu *vcpu, u64 select_idx)
- {
--	return (vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E) &&
--	       (vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & BIT(select_idx));
-+	return (__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E) &&
-+	       (__vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & BIT(select_idx));
- }
- 
- /**
+ 	__sysreg_restore_el1_state(ctxt);
+ 	__sysreg_restore_common_state(ctxt);
 -- 
 2.14.2
