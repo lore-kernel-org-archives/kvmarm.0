@@ -1,25 +1,25 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v3 27/41] KVM: arm/arm64: Prepare to handle deferred
- save/restore of SPSR_EL1
-Date: Fri, 12 Jan 2018 13:07:33 +0100
-Message-ID: <20180112120747.27999-28-christoffer.dall@linaro.org>
+Subject: [PATCH v3 35/41] KVM: arm64: Separate activate_traps and
+ deactive_traps for VHE and non-VHE
+Date: Fri, 12 Jan 2018 13:07:41 +0100
+Message-ID: <20180112120747.27999-36-christoffer.dall@linaro.org>
 References: <20180112120747.27999-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E32949DF2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 07:03:45 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8448349DFB
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 07:03:57 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id d69coRIE2G37 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Jan 2018 07:03:44 -0500 (EST)
-Received: from mail-wm0-f65.google.com (mail-wm0-f65.google.com [74.125.82.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0C66B49E09
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 07:03:43 -0500 (EST)
-Received: by mail-wm0-f65.google.com with SMTP id b141so11740910wme.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 04:08:33 -0800 (PST)
+ with ESMTP id 6vouuw4ungXj for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Jan 2018 07:03:56 -0500 (EST)
+Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3D00249E0A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 07:03:55 -0500 (EST)
+Received: by mail-wm0-f68.google.com with SMTP id v123so2214238wmd.5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 04:08:45 -0800 (PST)
 In-Reply-To: <20180112120747.27999-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,156 +34,167 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SPSR_EL1 is not used by a VHE host kernel and can be deferred, but we
-need to rework the accesses to this register to access the latest value
-depending on whether or not guest system registers are loaded on the CPU
-or only reside in memory.
-
-The handling of accessing the various banked SPSRs for 32-bit VMs is a
-bit clunky, but this will be improved in following patches which will
-first prepare and subsequently implement deferred save/restore of the
-32-bit registers, including the 32-bit SPSRs.
+To make the code more readable and to avoid the overhead of a function
+call, let's get rid of a pair of the alternative function selectors and
+explicitly call the VHE and non-VHE functions instead, telling the
+compiler to try to inline the static function if it can.
 
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm/include/asm/kvm_emulate.h   | 12 ++++++++++-
- arch/arm/kvm/emulate.c               |  2 +-
- arch/arm64/include/asm/kvm_emulate.h | 41 +++++++++++++++++++++++++++++++-----
- arch/arm64/kvm/inject_fault.c        |  4 ++--
- virt/kvm/arm/aarch32.c               |  2 +-
- 5 files changed, 51 insertions(+), 10 deletions(-)
+ arch/arm64/kvm/hyp/switch.c | 78 +++++++++++++++++++++------------------------
+ 1 file changed, 37 insertions(+), 41 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
-index d5e1b8bf6422..db8a09e9a16f 100644
---- a/arch/arm/include/asm/kvm_emulate.h
-+++ b/arch/arm/include/asm/kvm_emulate.h
-@@ -41,7 +41,17 @@ static inline unsigned long *vcpu_reg32(struct kvm_vcpu *vcpu, u8 reg_num)
- 	return vcpu_reg(vcpu, reg_num);
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 6ff9fab4233e..53a137821ee9 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -103,9 +103,27 @@ void deactivate_traps_vhe_put(void)
+ 	write_sysreg(mdcr_el2, mdcr_el2);
  }
  
--unsigned long *vcpu_spsr(struct kvm_vcpu *vcpu);
-+unsigned long *__vcpu_spsr(struct kvm_vcpu *vcpu);
-+
-+static inline unsigned long vpcu_read_spsr(struct kvm_vcpu *vcpu)
-+{
-+	return *__vcpu_spsr(vcpu);
-+}
-+
-+static inline void vcpu_write_spsr(struct kvm_vcpu *vcpu, unsigned long v)
-+{
-+	*__vcpu_spsr(vcpu) = v;
-+}
- 
- static inline unsigned long vcpu_get_reg(struct kvm_vcpu *vcpu,
- 					 u8 reg_num)
-diff --git a/arch/arm/kvm/emulate.c b/arch/arm/kvm/emulate.c
-index fa501bf437f3..9046b53d87c1 100644
---- a/arch/arm/kvm/emulate.c
-+++ b/arch/arm/kvm/emulate.c
-@@ -142,7 +142,7 @@ unsigned long *vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num)
- /*
-  * Return the SPSR for the current mode of the virtual CPU.
-  */
--unsigned long *vcpu_spsr(struct kvm_vcpu *vcpu)
-+unsigned long *__vcpu_spsr(struct kvm_vcpu *vcpu)
+-static void __hyp_text __activate_traps_vhe(struct kvm_vcpu *vcpu)
++static inline void activate_traps_vhe(struct kvm_vcpu *vcpu)
  {
- 	unsigned long mode = *vcpu_cpsr(vcpu) & MODE_MASK;
- 	switch (mode) {
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index df1cb146750d..f0bc7c096fdc 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -26,6 +26,7 @@
- 
- #include <asm/esr.h>
- #include <asm/kvm_arm.h>
-+#include <asm/kvm_hyp.h>
- #include <asm/kvm_mmio.h>
- #include <asm/ptrace.h>
- #include <asm/cputype.h>
-@@ -131,13 +132,43 @@ static inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
- 		vcpu_gp_regs(vcpu)->regs.regs[reg_num] = val;
- }
- 
--/* Get vcpu SPSR for current mode */
--static inline unsigned long *vcpu_spsr(const struct kvm_vcpu *vcpu)
-+static inline unsigned long vcpu_read_spsr(const struct kvm_vcpu *vcpu)
- {
--	if (vcpu_mode_is_32bit(vcpu))
--		return vcpu_spsr32(vcpu);
-+	unsigned long *p = (unsigned long *)&vcpu_gp_regs(vcpu)->spsr[KVM_SPSR_EL1];
-+
-+	if (vcpu_mode_is_32bit(vcpu)) {
-+		unsigned long *p_32bit = vcpu_spsr32(vcpu);
-+
-+		/* KVM_SPSR_SVC aliases KVM_SPSR_EL1 */
-+		if (p_32bit != (unsigned long *)p)
-+			return *p_32bit;
-+	}
-+
-+	if (vcpu->arch.sysregs_loaded_on_cpu)
-+		return read_sysreg_el1(spsr);
-+	else
-+		return *p;
+-	write_sysreg(__kvm_hyp_vector, vbar_el1);
++	write_sysreg(vcpu->arch.hcr_el2, hcr_el2);
++	write_sysreg_el2(__kvm_hyp_vector, vbar);
 +}
- 
--	return (unsigned long *)&vcpu_gp_regs(vcpu)->spsr[KVM_SPSR_EL1];
-+static inline void vcpu_write_spsr(const struct kvm_vcpu *vcpu, unsigned long v)
++
++static inline void deactivate_traps_vhe(struct kvm_vcpu *vcpu)
 +{
-+	unsigned long *p = (unsigned long *)&vcpu_gp_regs(vcpu)->spsr[KVM_SPSR_EL1];
++	extern char vectors[];	/* kernel exception vectors */
 +
-+	/* KVM_SPSR_SVC aliases KVM_SPSR_EL1 */
-+	if (vcpu_mode_is_32bit(vcpu)) {
-+		unsigned long *p_32bit = vcpu_spsr32(vcpu);
++	/*
++	 * If we pended a virtual abort, preserve it until it gets
++	 * cleared. See D1.14.3 (Virtual Interrupts) for details, but
++	 * the crucial bit is "On taking a vSError interrupt,
++	 * HCR_EL2.VSE is cleared to 0."
++	 */
++	if (vcpu->arch.hcr_el2 & HCR_VSE)
++		vcpu->arch.hcr_el2 = read_sysreg(hcr_el2);
 +
-+		/* KVM_SPSR_SVC aliases KVM_SPSR_EL1 */
-+		if (p_32bit != (unsigned long *)p) {
-+			*p_32bit = v;
-+			return;
-+		}
-+	}
-+
-+	if (vcpu->arch.sysregs_loaded_on_cpu)
-+		write_sysreg_el1(v, spsr);
-+	else
-+		*p = v;
++	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
++	write_sysreg(vectors, vbar_el1);
  }
  
- static inline bool vcpu_mode_priv(const struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index 1e070943e7a6..c638593d305d 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -71,7 +71,7 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
- 	*vcpu_pc(vcpu) = get_except_vector(vcpu, except_type_sync);
+ void __hyp_text __activate_traps_nvhe_load(struct kvm_vcpu *vcpu)
+@@ -136,44 +154,15 @@ static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
+ {
+ 	/* Activate traps on impdef sysregs, PMU, and debug */
+ 	__activate_traps_common(vcpu);
+-}
  
- 	*vcpu_cpsr(vcpu) = PSTATE_FAULT_BITS_64;
--	*vcpu_spsr(vcpu) = cpsr;
-+	vcpu_write_spsr(vcpu, cpsr);
+-static hyp_alternate_select(__activate_traps_arch,
+-			    __activate_traps_nvhe, __activate_traps_vhe,
+-			    ARM64_HAS_VIRT_HOST_EXTN);
+-
+-static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+-{
+-	__activate_traps_arch()(vcpu);
++	/* Configure all other hypervisor traps and features */
+ 	write_sysreg(vcpu->arch.hcr_el2, hcr_el2);
+ }
  
- 	vcpu_write_sys_reg(vcpu, FAR_EL1, addr);
+-static void __hyp_text __deactivate_traps_vhe(void)
++static void __hyp_text __deactivate_traps_nvhe(struct kvm_vcpu *vcpu)
+ {
+-	extern char vectors[];	/* kernel exception vectors */
+-
+-	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
+-	write_sysreg(vectors, vbar_el1);
+-}
+-
+-static void __hyp_text __deactivate_traps_nvhe(void) {
+-	u64 mdcr_el2 = read_sysreg(mdcr_el2);
+-
+-	__deactivate_traps_common();
+-
+-	mdcr_el2 &= MDCR_EL2_HPMN_MASK;
+-	mdcr_el2 |= MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT;
+-
+-	write_sysreg(mdcr_el2, mdcr_el2);
+-	write_sysreg(HCR_RW, hcr_el2);
+-}
+-
+-static hyp_alternate_select(__deactivate_traps_arch,
+-			    __deactivate_traps_nvhe, __deactivate_traps_vhe,
+-			    ARM64_HAS_VIRT_HOST_EXTN);
++	u64 mdcr_el2;
  
-@@ -106,7 +106,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
- 	*vcpu_pc(vcpu) = get_except_vector(vcpu, except_type_sync);
- 
- 	*vcpu_cpsr(vcpu) = PSTATE_FAULT_BITS_64;
--	*vcpu_spsr(vcpu) = cpsr;
-+	vcpu_write_spsr(vcpu, cpsr);
- 
+-static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
+-{
  	/*
- 	 * Build an unknown exception, depending on the instruction
-diff --git a/virt/kvm/arm/aarch32.c b/virt/kvm/arm/aarch32.c
-index 8bc479fa37e6..efc84cbe8277 100644
---- a/virt/kvm/arm/aarch32.c
-+++ b/virt/kvm/arm/aarch32.c
-@@ -178,7 +178,7 @@ static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
- 	*vcpu_cpsr(vcpu) = cpsr;
+ 	 * If we pended a virtual abort, preserve it until it gets
+ 	 * cleared. See D1.14.3 (Virtual Interrupts) for details, but
+@@ -183,7 +172,14 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
+ 	if (vcpu->arch.hcr_el2 & HCR_VSE)
+ 		vcpu->arch.hcr_el2 = read_sysreg(hcr_el2);
  
- 	/* Note: These now point to the banked copies */
--	*vcpu_spsr(vcpu) = new_spsr_value;
-+	vcpu_write_spsr(vcpu, new_spsr_value);
- 	*vcpu_reg32(vcpu, 14) = *vcpu_pc(vcpu) + return_offset;
+-	__deactivate_traps_arch()();
++	__deactivate_traps_common();
++
++	mdcr_el2 = read_sysreg(mdcr_el2);
++	mdcr_el2 &= MDCR_EL2_HPMN_MASK;
++	mdcr_el2 |= MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT;
++
++	write_sysreg(mdcr_el2, mdcr_el2);
++	write_sysreg(HCR_RW, hcr_el2);
+ }
  
- 	/* Branch to exception vector */
+ static void __hyp_text __activate_vm(struct kvm *kvm)
+@@ -400,7 +396,7 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ 
+ 	sysreg_save_host_state_vhe(host_ctxt);
+ 
+-	__activate_traps(vcpu);
++	activate_traps_vhe(vcpu);
+ 	__activate_vm(vcpu->kvm);
+ 
+ 	__vgic_restore_state(vcpu);
+@@ -418,7 +414,7 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ 	sysreg_save_guest_state_vhe(guest_ctxt);
+ 	__vgic_save_state(vcpu);
+ 
+-	__deactivate_traps(vcpu);
++	deactivate_traps_vhe(vcpu);
+ 
+ 	sysreg_restore_host_state_vhe(host_ctxt);
+ 
+@@ -442,7 +438,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 
+ 	__sysreg_save_state_nvhe(host_ctxt);
+ 
+-	__activate_traps(vcpu);
++	__activate_traps_nvhe(vcpu);
+ 	__activate_vm(kern_hyp_va(vcpu->kvm));
+ 
+ 	__vgic_restore_state(vcpu);
+@@ -468,7 +464,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 	__timer_disable_traps(vcpu);
+ 	__vgic_save_state(vcpu);
+ 
+-	__deactivate_traps(vcpu);
++	__deactivate_traps_nvhe(vcpu);
+ 	__deactivate_vm(vcpu);
+ 
+ 	__sysreg_restore_state_nvhe(host_ctxt);
+@@ -494,7 +490,7 @@ static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par,
+ 
+ 	if (read_sysreg(vttbr_el2)) {
+ 		__timer_disable_traps(vcpu);
+-		__deactivate_traps(vcpu);
++		__deactivate_traps_nvhe(vcpu);
+ 		__deactivate_vm(vcpu);
+ 		__sysreg_restore_state_nvhe(__host_ctxt);
+ 	}
+@@ -518,7 +514,7 @@ static void __hyp_call_panic_vhe(u64 spsr, u64 elr, u64 par,
+ 	struct kvm_vcpu *vcpu;
+ 	vcpu = host_ctxt->__hyp_running_vcpu;
+ 
+-	__deactivate_traps(vcpu);
++	deactivate_traps_vhe(vcpu);
+ 	sysreg_restore_host_state_vhe(host_ctxt);
+ 
+ 	panic(__hyp_panic_string,
 -- 
 2.14.2
