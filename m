@@ -1,7 +1,7 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v3 38/41] KVM: arm/arm64: Move arm64-only vgic-v2-sr.c file to arm64
-Date: Fri, 12 Jan 2018 13:07:44 +0100
-Message-ID: <20180112120747.27999-39-christoffer.dall@linaro.org>
+Subject: [PATCH v3 34/41] KVM: arm64: Configure c15, PMU, and debug register traps on cpu load/put for VHE
+Date: Fri, 12 Jan 2018 13:07:40 +0100
+Message-ID: <20180112120747.27999-35-christoffer.dall@linaro.org>
 References: <20180112120747.27999-1-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20180112120747.27999-1-christoffer.dall@linaro.org>
@@ -10,68 +10,135 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The vgic-v2-sr.c file now only contains the logic to replay unaligned
-accesses to the virtual CPU interface on 16K and 64K page systems, which
-is only relevant on 64-bit platforms.  Therefore move this file to the
-arm64 KVM tree, remove the compile directive from the 32-bit side
-makefile, and remove the ifdef in the C file.
+We do not have to change the c15 trap setting on each switch to/from the
+guest on VHE systems, because this setting only affects EL0.
 
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+The PMU and debug trap configuration can also be done on vcpu load/put
+instead, because they don't affect how the host kernel can access the
+debug registers while executing KVM kernel code and KVM doesn't use
+floating point itself.
+
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm/kvm/hyp/Makefile                         | 1 -
- arch/arm64/kvm/hyp/Makefile                       | 2 +-
- {virt/kvm/arm => arch/arm64/kvm}/hyp/vgic-v2-sr.c | 2 --
- 3 files changed, 1 insertion(+), 4 deletions(-)
- rename {virt/kvm/arm => arch/arm64/kvm}/hyp/vgic-v2-sr.c (98%)
+ arch/arm64/kvm/hyp/switch.c | 37 +++++++++++++++++++++++++++----------
+ 1 file changed, 27 insertions(+), 10 deletions(-)
 
-diff --git a/arch/arm/kvm/hyp/Makefile b/arch/arm/kvm/hyp/Makefile
-index 5638ce0c9524..1964111c984a 100644
---- a/arch/arm/kvm/hyp/Makefile
-+++ b/arch/arm/kvm/hyp/Makefile
-@@ -7,7 +7,6 @@ ccflags-y += -fno-stack-protector -DDISABLE_BRANCH_PROFILING
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index d14ab9650f81..6ff9fab4233e 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -43,8 +43,6 @@ static void __hyp_text __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
  
- KVM=../../../../virt/kvm
- 
--obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v2-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v3-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/timer-sr.o
- 
-diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
-index f04400d494b7..7e8d41210288 100644
---- a/arch/arm64/kvm/hyp/Makefile
-+++ b/arch/arm64/kvm/hyp/Makefile
-@@ -7,10 +7,10 @@ ccflags-y += -fno-stack-protector -DDISABLE_BRANCH_PROFILING
- 
- KVM=../../../../virt/kvm
- 
--obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v2-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v3-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/timer-sr.o
- 
-+obj-$(CONFIG_KVM_ARM_HOST) += vgic-v2-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += sysreg-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += debug-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += entry.o
-diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/arch/arm64/kvm/hyp/vgic-v2-sr.c
-similarity index 98%
-rename from virt/kvm/arm/hyp/vgic-v2-sr.c
-rename to arch/arm64/kvm/hyp/vgic-v2-sr.c
-index b433257f4348..fcd7b4eff927 100644
---- a/virt/kvm/arm/hyp/vgic-v2-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v2-sr.c
-@@ -22,7 +22,6 @@
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_hyp.h>
- 
--#ifdef CONFIG_ARM64
- /*
-  * __vgic_v2_perform_cpuif_access -- perform a GICV access on behalf of the
-  *				     guest.
-@@ -76,4 +75,3 @@ int __hyp_text __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
- 
- 	return 1;
+ static void __hyp_text __activate_traps_common(struct kvm_vcpu *vcpu)
+ {
+-	write_sysreg(vcpu->arch.hcr_el2, hcr_el2);
+-
+ 	/* Trap on AArch32 cp15 c15 (impdef sysregs) accesses (EL1 or EL0) */
+ 	write_sysreg(1 << 15, hstr_el2);
+ 	/*
+@@ -64,12 +62,15 @@ static void __hyp_text __deactivate_traps_common(void)
+ 	write_sysreg(0, pmuserenr_el0);
  }
--#endif
+ 
++/* Activate the traps we can during vcpu_load with VHE */
+ void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
+ {
+ 	u64 val;
+ 
++	/* Make sure 32-bit guests trap VFP */
+ 	__activate_traps_fpsimd32(vcpu);
+ 
++	/* Trap VFP accesses on a VHE system */
+ 	val = read_sysreg(cpacr_el1);
+ 	val |= CPACR_EL1_TTA;
+ 	val &= ~CPACR_EL1_ZEN;
+@@ -78,11 +79,28 @@ void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
+ 	else
+ 		val &= ~CPACR_EL1_FPEN;
+ 	write_sysreg(val, cpacr_el1);
++
++	/* Activate traps on impdef sysregs, PMU, and debug */
++	__activate_traps_common(vcpu);
+ }
+ 
++/* Deactivate the traps we can during vcpu_put with VHE */
+ void deactivate_traps_vhe_put(void)
+ {
++	u64 mdcr_el2;
++
++	/* Re-enable host VFP and SVE access */
+ 	write_sysreg(CPACR_EL1_DEFAULT, cpacr_el1);
++
++	/* Re-enable host access to impdef sysregs and the PMU */
++	__deactivate_traps_common();
++
++	/* Re-enable host access to the debug regs */
++	mdcr_el2 = read_sysreg(mdcr_el2);
++	mdcr_el2 &= MDCR_EL2_HPMN_MASK |
++		    MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT |
++		    MDCR_EL2_TPMS;
++	write_sysreg(mdcr_el2, mdcr_el2);
+ }
+ 
+ static void __hyp_text __activate_traps_vhe(struct kvm_vcpu *vcpu)
+@@ -96,8 +114,10 @@ void __hyp_text __activate_traps_nvhe_load(struct kvm_vcpu *vcpu)
+ 
+ 	vcpu = kern_hyp_va(vcpu);
+ 
++	/* Make sure 32-bit guests trap VFP */
+ 	__activate_traps_fpsimd32(vcpu);
+ 
++	/* Trap VFP accesses on a non-VHE system */
+ 	val = CPTR_EL2_DEFAULT;
+ 	val |= CPTR_EL2_TTA | CPTR_EL2_TZ;
+ 	if (vcpu->arch.guest_vfp_loaded)
+@@ -114,6 +134,8 @@ void __hyp_text __deactivate_traps_nvhe_put(void)
+ 
+ static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
+ {
++	/* Activate traps on impdef sysregs, PMU, and debug */
++	__activate_traps_common(vcpu);
+ }
+ 
+ static hyp_alternate_select(__activate_traps_arch,
+@@ -122,20 +144,14 @@ static hyp_alternate_select(__activate_traps_arch,
+ 
+ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+ {
+-	__activate_traps_common(vcpu);
+ 	__activate_traps_arch()(vcpu);
++	write_sysreg(vcpu->arch.hcr_el2, hcr_el2);
+ }
+ 
+ static void __hyp_text __deactivate_traps_vhe(void)
+ {
+ 	extern char vectors[];	/* kernel exception vectors */
+-	u64 mdcr_el2 = read_sysreg(mdcr_el2);
+-
+-	mdcr_el2 &= MDCR_EL2_HPMN_MASK |
+-		    MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT |
+-		    MDCR_EL2_TPMS;
+ 
+-	write_sysreg(mdcr_el2, mdcr_el2);
+ 	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
+ 	write_sysreg(vectors, vbar_el1);
+ }
+@@ -143,6 +159,8 @@ static void __hyp_text __deactivate_traps_vhe(void)
+ static void __hyp_text __deactivate_traps_nvhe(void) {
+ 	u64 mdcr_el2 = read_sysreg(mdcr_el2);
+ 
++	__deactivate_traps_common();
++
+ 	mdcr_el2 &= MDCR_EL2_HPMN_MASK;
+ 	mdcr_el2 |= MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT;
+ 
+@@ -165,7 +183,6 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
+ 	if (vcpu->arch.hcr_el2 & HCR_VSE)
+ 		vcpu->arch.hcr_el2 = read_sysreg(hcr_el2);
+ 
+-	__deactivate_traps_common();
+ 	__deactivate_traps_arch()();
+ }
+ 
 -- 
 2.14.2
