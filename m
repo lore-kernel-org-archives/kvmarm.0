@@ -1,64 +1,56 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 2/2] KVM: arm64: Fix GICv4 init when called from vgic_its_create
-Date: Fri, 12 Jan 2018 13:33:34 +0100
-Message-ID: <20180112123334.28687-3-christoffer.dall@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PULL 0/2] KVM/ARM Fixes for v4.15 - Round 3
+Date: Fri, 12 Jan 2018 13:59:41 +0100
+Message-ID: <065527d6-960c-3f13-ffab-e907112a248e@redhat.com>
 References: <20180112123334.28687-1-christoffer.dall@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20180112123334.28687-1-christoffer.dall@linaro.org>
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
-To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>
+To: Christoffer Dall <christoffer.dall@linaro.org>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Commit 3d1ad640f8c94 ("KVM: arm/arm64: Fix GICv4 ITS initialization
-issues") moved the vgic_supports_direct_msis() check in vgic_v4_init().
-However when vgic_v4_init is called from vgic_its_create(), the has_its
-field is not yet set. Hence vgic_supports_direct_msis returns false and
-vgic_v4_init does nothing.
+On 12/01/2018 13:33, Christoffer Dall wrote:
+> Hi Paolo and Radim,
+> 
+> This is the third round of fixes for KVM/ARM for v4.15, including two more
+> fixes for v4.15 fixing incorrect huge page mappings on systems using the
+> contiguous hint for hugetlbfs and supporting an alternative GICv4 init
+> sequence.
+> 
+> The following changes since commit 0eb7c33cadf6b2f1a94e58ded8b0eb89b4eba382:
+> 
+>   KVM: arm/arm64: Fix timer enable flow (2017-12-18 10:53:24 +0100)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-fixes-for-v4.15-3
+> 
+> for you to fetch changes up to f8f85dc00b7427de6222ea3955c52512315d13cd:
+> 
+>   KVM: arm64: Fix GICv4 init when called from vgic_its_create (2018-01-12 11:40:21 +0100)
+> 
+> Thanks,
+> -Christoffer
+> 
+> Christoffer Dall (1):
+>       KVM: arm64: Fix GICv4 init when called from vgic_its_create
+> 
+> Punit Agrawal (1):
+>       KVM: arm/arm64: Check pagesize when allocating a hugepage at Stage 2
+> 
+>  virt/kvm/arm/mmu.c            | 2 +-
+>  virt/kvm/arm/vgic/vgic-init.c | 8 +++++---
+>  virt/kvm/arm/vgic/vgic-v4.c   | 2 +-
+>  3 files changed, 7 insertions(+), 5 deletions(-)
+> 
 
-The gic/its init sequence is a bit messy, so let's be specific about the
-prerequisite checks in the various call paths instead of relying on a
-common wrapper.
+Oops, missed this by a few minutes. :(
 
-Fixes: 3d1ad640f8c94 ("KVM: arm/arm64: Fix GICv4 ITS initialization issues")
-Reported-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
- virt/kvm/arm/vgic/vgic-init.c | 8 +++++---
- virt/kvm/arm/vgic/vgic-v4.c   | 2 +-
- 2 files changed, 6 insertions(+), 4 deletions(-)
+We'll send it next week.
 
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index 62310122ee78..743ca5cb05ef 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -285,9 +285,11 @@ int vgic_init(struct kvm *kvm)
- 	if (ret)
- 		goto out;
- 
--	ret = vgic_v4_init(kvm);
--	if (ret)
--		goto out;
-+	if (vgic_has_its(kvm)) {
-+		ret = vgic_v4_init(kvm);
-+		if (ret)
-+			goto out;
-+	}
- 
- 	kvm_for_each_vcpu(i, vcpu, kvm)
- 		kvm_vgic_vcpu_enable(vcpu);
-diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
-index 4a37292855bc..bc4265154bac 100644
---- a/virt/kvm/arm/vgic/vgic-v4.c
-+++ b/virt/kvm/arm/vgic/vgic-v4.c
-@@ -118,7 +118,7 @@ int vgic_v4_init(struct kvm *kvm)
- 	struct kvm_vcpu *vcpu;
- 	int i, nr_vcpus, ret;
- 
--	if (!vgic_supports_direct_msis(kvm))
-+	if (!kvm_vgic_global_state.has_gicv4)
- 		return 0; /* Nothing to see here... move along. */
- 
- 	if (dist->its_vm.vpes)
--- 
-2.14.2
+Paolo
