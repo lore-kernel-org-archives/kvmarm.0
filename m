@@ -1,24 +1,24 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v3 33/41] KVM: arm64: Configure FPSIMD traps on vcpu load/put
-Date: Fri, 12 Jan 2018 13:07:39 +0100
-Message-ID: <20180112120747.27999-34-christoffer.dall@linaro.org>
+Subject: [PATCH v3 36/41] KVM: arm/arm64: Get rid of vgic_elrsr
+Date: Fri, 12 Jan 2018 13:07:42 +0100
+Message-ID: <20180112120747.27999-37-christoffer.dall@linaro.org>
 References: <20180112120747.27999-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 91F9C49DB1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 07:03:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 584F249E19
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 07:04:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yrOB4HwiY3N7 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Jan 2018 07:03:54 -0500 (EST)
+ with ESMTP id I451xFPfQ-ag for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Jan 2018 07:04:00 -0500 (EST)
 Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1930649DD0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 07:03:52 -0500 (EST)
-Received: by mail-wm0-f68.google.com with SMTP id r78so11486253wme.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 04:08:42 -0800 (PST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 767E849E39
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 07:03:56 -0500 (EST)
+Received: by mail-wm0-f68.google.com with SMTP id t8so11614063wmc.3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 04:08:47 -0800 (PST)
 In-Reply-To: <20180112120747.27999-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,192 +33,155 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-There is no need to enable/disable traps to FP registers on every switch
-to/from the VM, because the host kernel does not use this resource
-without calling vcpu_put.  We can therefore move things around enough
-that we still always write FPEXC32_EL2 before programming CPTR_EL2 but
-only program these during vcpu load/put.
+There is really no need to store the vgic_elrsr on the VGIC data
+structures as the only need we have for the elrsr is to figure out if an
+LR is inactive when we save the VGIC state upon returning from the
+guest.  We can might as well store this in a temporary local variable.
+
+This also gets rid of the endianness conversion in the VGIC save
+function, which is completely unnecessary and would actually result in
+incorrect functionality on big-endian systems, because we are only using
+typed values here and not converting pointers and reading different
+types here.
 
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/include/asm/kvm_hyp.h |  6 +++++
- arch/arm64/kvm/hyp/switch.c      | 51 +++++++++++++++++++++++++++++-----------
- arch/arm64/kvm/hyp/sysreg-sr.c   | 12 ++++++++--
- 3 files changed, 53 insertions(+), 16 deletions(-)
+ include/kvm/arm_vgic.h        |  2 --
+ virt/kvm/arm/hyp/vgic-v2-sr.c | 28 +++++++---------------------
+ virt/kvm/arm/hyp/vgic-v3-sr.c |  6 +++---
+ virt/kvm/arm/vgic/vgic-v2.c   |  1 -
+ virt/kvm/arm/vgic/vgic-v3.c   |  1 -
+ 5 files changed, 10 insertions(+), 28 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index 3f54c55f77a1..ffd62e31f134 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -148,6 +148,12 @@ void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
- void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
- bool __fpsimd_enabled(void);
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index cdbd142ca7f2..ac98ae46bfb7 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -263,7 +263,6 @@ struct vgic_dist {
+ struct vgic_v2_cpu_if {
+ 	u32		vgic_hcr;
+ 	u32		vgic_vmcr;
+-	u64		vgic_elrsr;	/* Saved only */
+ 	u32		vgic_apr;
+ 	u32		vgic_lr[VGIC_V2_MAX_LRS];
+ };
+@@ -272,7 +271,6 @@ struct vgic_v3_cpu_if {
+ 	u32		vgic_hcr;
+ 	u32		vgic_vmcr;
+ 	u32		vgic_sre;	/* Restored only, change ignored */
+-	u32		vgic_elrsr;	/* Saved only */
+ 	u32		vgic_ap0r[4];
+ 	u32		vgic_ap1r[4];
+ 	u64		vgic_lr[VGIC_V3_MAX_LRS];
+diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
+index d7fd46fe9efb..c536e3d87942 100644
+--- a/virt/kvm/arm/hyp/vgic-v2-sr.c
++++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
+@@ -22,29 +22,19 @@
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_hyp.h>
  
-+void __activate_traps_nvhe_load(struct kvm_vcpu *vcpu);
-+void __deactivate_traps_nvhe_put(void);
-+
-+void activate_traps_vhe_load(struct kvm_vcpu *vcpu);
-+void deactivate_traps_vhe_put(void);
-+
- u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
- void __noreturn __hyp_do_panic(unsigned long, ...);
- 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index c01bcfc3fb52..d14ab9650f81 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -24,22 +24,25 @@
- #include <asm/fpsimd.h>
- #include <asm/debug-monitors.h>
- 
--static void __hyp_text __activate_traps_common(struct kvm_vcpu *vcpu)
-+static void __hyp_text __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
- {
- 	/*
--	 * We are about to set CPTR_EL2.TFP to trap all floating point
--	 * register accesses to EL2, however, the ARM ARM clearly states that
--	 * traps are only taken to EL2 if the operation would not otherwise
--	 * trap to EL1.  Therefore, always make sure that for 32-bit guests,
--	 * we set FPEXC.EN to prevent traps to EL1, when setting the TFP bit.
--	 * If FP/ASIMD is not implemented, FPEXC is UNDEFINED and any access to
--	 * it will cause an exception.
-+	 * We are about to trap all floating point register accesses to EL2,
-+	 * however, traps are only taken to EL2 if the operation would not
-+	 * otherwise trap to EL1.  Therefore, always make sure that for 32-bit
-+	 * guests, we set FPEXC.EN to prevent traps to EL1, when setting the
-+	 * TFP bit.  If FP/ASIMD is not implemented, FPEXC is UNDEFINED and
-+	 * any access to it will cause an exception.
- 	 */
- 	if (vcpu_el1_is_32bit(vcpu) && system_supports_fpsimd() &&
- 	    !vcpu->arch.guest_vfp_loaded) {
- 		write_sysreg(1 << 30, fpexc32_el2);
- 		isb();
- 	}
-+}
-+
-+static void __hyp_text __activate_traps_common(struct kvm_vcpu *vcpu)
-+{
- 	write_sysreg(vcpu->arch.hcr_el2, hcr_el2);
- 
- 	/* Trap on AArch32 cp15 c15 (impdef sysregs) accesses (EL1 or EL0) */
-@@ -61,10 +64,12 @@ static void __hyp_text __deactivate_traps_common(void)
- 	write_sysreg(0, pmuserenr_el0);
- }
- 
--static void __hyp_text __activate_traps_vhe(struct kvm_vcpu *vcpu)
-+void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
- {
- 	u64 val;
- 
-+	__activate_traps_fpsimd32(vcpu);
-+
- 	val = read_sysreg(cpacr_el1);
- 	val |= CPACR_EL1_TTA;
- 	val &= ~CPACR_EL1_ZEN;
-@@ -73,14 +78,26 @@ static void __hyp_text __activate_traps_vhe(struct kvm_vcpu *vcpu)
- 	else
- 		val &= ~CPACR_EL1_FPEN;
- 	write_sysreg(val, cpacr_el1);
-+}
- 
-+void deactivate_traps_vhe_put(void)
-+{
-+	write_sysreg(CPACR_EL1_DEFAULT, cpacr_el1);
-+}
-+
-+static void __hyp_text __activate_traps_vhe(struct kvm_vcpu *vcpu)
-+{
- 	write_sysreg(__kvm_hyp_vector, vbar_el1);
- }
- 
--static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
-+void __hyp_text __activate_traps_nvhe_load(struct kvm_vcpu *vcpu)
- {
- 	u64 val;
- 
-+	vcpu = kern_hyp_va(vcpu);
-+
-+	__activate_traps_fpsimd32(vcpu);
-+
- 	val = CPTR_EL2_DEFAULT;
- 	val |= CPTR_EL2_TTA | CPTR_EL2_TZ;
- 	if (vcpu->arch.guest_vfp_loaded)
-@@ -90,6 +107,15 @@ static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
- 	write_sysreg(val, cptr_el2);
- }
- 
-+void __hyp_text __deactivate_traps_nvhe_put(void)
-+{
-+	write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
-+}
-+
-+static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
-+{
-+}
-+
- static hyp_alternate_select(__activate_traps_arch,
- 			    __activate_traps_nvhe, __activate_traps_vhe,
- 			    ARM64_HAS_VIRT_HOST_EXTN);
-@@ -111,12 +137,10 @@ static void __hyp_text __deactivate_traps_vhe(void)
- 
- 	write_sysreg(mdcr_el2, mdcr_el2);
- 	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
--	write_sysreg(CPACR_EL1_DEFAULT, cpacr_el1);
- 	write_sysreg(vectors, vbar_el1);
- }
- 
--static void __hyp_text __deactivate_traps_nvhe(void)
+-static void __hyp_text save_elrsr(struct kvm_vcpu *vcpu, void __iomem *base)
 -{
-+static void __hyp_text __deactivate_traps_nvhe(void) {
- 	u64 mdcr_el2 = read_sysreg(mdcr_el2);
- 
- 	mdcr_el2 &= MDCR_EL2_HPMN_MASK;
-@@ -124,7 +148,6 @@ static void __hyp_text __deactivate_traps_nvhe(void)
- 
- 	write_sysreg(mdcr_el2, mdcr_el2);
- 	write_sysreg(HCR_RW, hcr_el2);
--	write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
- }
- 
- static hyp_alternate_select(__deactivate_traps_arch,
-diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-index d225f5797651..7943d5b4dbcb 100644
---- a/arch/arm64/kvm/hyp/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-@@ -237,8 +237,10 @@ void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu)
- 	struct kvm_cpu_context *host_ctxt = vcpu->arch.host_cpu_context;
- 	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
- 
--	if (!has_vhe())
-+	if (!has_vhe()) {
-+		kvm_call_hyp(__activate_traps_nvhe_load, vcpu);
- 		return;
-+	}
- 
- 	__sysreg_save_user_state(host_ctxt);
- 
-@@ -253,6 +255,8 @@ void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu)
- 	__sysreg_restore_el1_state(guest_ctxt);
- 
- 	vcpu->arch.sysregs_loaded_on_cpu = true;
+-	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+-	int nr_lr = (kern_hyp_va(&kvm_vgic_global_state))->nr_lr;
+-	u32 elrsr0, elrsr1;
+-
+-	elrsr0 = readl_relaxed(base + GICH_ELRSR0);
+-	if (unlikely(nr_lr > 32))
+-		elrsr1 = readl_relaxed(base + GICH_ELRSR1);
+-	else
+-		elrsr1 = 0;
+-
+-	cpu_if->vgic_elrsr = ((u64)elrsr1 << 32) | elrsr0;
+-}
+-
+ static void __hyp_text save_lrs(struct kvm_vcpu *vcpu, void __iomem *base)
+ {
+ 	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+-	int i;
+ 	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
++	u64 elrsr;
++	int i;
 +
-+	activate_traps_vhe_load(vcpu);
- }
++	elrsr = readl_relaxed(base + GICH_ELRSR0);
++	if (unlikely(used_lrs > 32))
++		elrsr |= ((u64)readl_relaxed(base + GICH_ELRSR1)) << 32;
  
- /**
-@@ -282,8 +286,12 @@ void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu)
- 		vcpu->arch.guest_vfp_loaded = 0;
+ 	for (i = 0; i < used_lrs; i++) {
+-		if (cpu_if->vgic_elrsr & (1UL << i))
++		if (elrsr & (1UL << i))
+ 			cpu_if->vgic_lr[i] &= ~GICH_LR_STATE;
+ 		else
+ 			cpu_if->vgic_lr[i] = readl_relaxed(base + GICH_LR0 + (i * 4));
+@@ -67,13 +57,9 @@ void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
+ 
+ 	if (used_lrs) {
+ 		cpu_if->vgic_apr = readl_relaxed(base + GICH_APR);
+-
+-		save_elrsr(vcpu, base);
+ 		save_lrs(vcpu, base);
+-
+ 		writel_relaxed(0, base + GICH_HCR);
+ 	} else {
+-		cpu_if->vgic_elrsr = ~0UL;
+ 		cpu_if->vgic_apr = 0;
  	}
+ }
+diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
+index f5c3d6d7019e..9abf2f3c12b5 100644
+--- a/virt/kvm/arm/hyp/vgic-v3-sr.c
++++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
+@@ -222,15 +222,16 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
+ 	if (used_lrs) {
+ 		int i;
+ 		u32 nr_pre_bits;
++		u32 elrsr;
  
--	if (!has_vhe())
-+	if (!has_vhe()) {
-+		kvm_call_hyp(__deactivate_traps_nvhe_put);
- 		return;
-+	}
-+
-+	deactivate_traps_vhe_put();
+-		cpu_if->vgic_elrsr = read_gicreg(ICH_ELSR_EL2);
++		elrsr = read_gicreg(ICH_ELSR_EL2);
  
- 	__sysreg_save_el1_state(guest_ctxt);
- 	__sysreg_save_user_state(guest_ctxt);
+ 		write_gicreg(0, ICH_HCR_EL2);
+ 		val = read_gicreg(ICH_VTR_EL2);
+ 		nr_pre_bits = vtr_to_nr_pre_bits(val);
+ 
+ 		for (i = 0; i < used_lrs; i++) {
+-			if (cpu_if->vgic_elrsr & (1 << i))
++			if (elrsr & (1 << i))
+ 				cpu_if->vgic_lr[i] &= ~ICH_LR_STATE;
+ 			else
+ 				cpu_if->vgic_lr[i] = __gic_v3_get_lr(i);
+@@ -262,7 +263,6 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
+ 		    cpu_if->its_vpe.its_vm)
+ 			write_gicreg(0, ICH_HCR_EL2);
+ 
+-		cpu_if->vgic_elrsr = 0xffff;
+ 		cpu_if->vgic_ap0r[0] = 0;
+ 		cpu_if->vgic_ap0r[1] = 0;
+ 		cpu_if->vgic_ap0r[2] = 0;
+diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+index c32d7b93ffd1..bb305d49cfdd 100644
+--- a/virt/kvm/arm/vgic/vgic-v2.c
++++ b/virt/kvm/arm/vgic/vgic-v2.c
+@@ -265,7 +265,6 @@ void vgic_v2_enable(struct kvm_vcpu *vcpu)
+ 	 * anyway.
+ 	 */
+ 	vcpu->arch.vgic_cpu.vgic_v2.vgic_vmcr = 0;
+-	vcpu->arch.vgic_cpu.vgic_v2.vgic_elrsr = ~0;
+ 
+ 	/* Get the show on the road... */
+ 	vcpu->arch.vgic_cpu.vgic_v2.vgic_hcr = GICH_HCR_EN;
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index 6b329414e57a..b76e21f3e6bd 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -267,7 +267,6 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
+ 	 * anyway.
+ 	 */
+ 	vgic_v3->vgic_vmcr = 0;
+-	vgic_v3->vgic_elrsr = ~0;
+ 
+ 	/*
+ 	 * If we are emulating a GICv3, we do it in an non-GICv2-compatible
 -- 
 2.14.2
