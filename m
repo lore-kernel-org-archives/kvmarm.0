@@ -1,25 +1,25 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v3 26/41] KVM: arm64: Introduce framework for accessing
- deferred sysregs
-Date: Fri, 12 Jan 2018 13:07:32 +0100
-Message-ID: <20180112120747.27999-27-christoffer.dall@linaro.org>
+Subject: [PATCH v3 20/41] KVM: arm64: Introduce separate VHE/non-VHE sysreg
+ save/restore functions
+Date: Fri, 12 Jan 2018 13:07:26 +0100
+Message-ID: <20180112120747.27999-21-christoffer.dall@linaro.org>
 References: <20180112120747.27999-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7854449E05
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 07:03:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2AFC849DBC
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 07:03:36 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lm2H6vtadcgY for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Jan 2018 07:03:42 -0500 (EST)
-Received: from mail-wm0-f65.google.com (mail-wm0-f65.google.com [74.125.82.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E449349E0B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 07:03:41 -0500 (EST)
-Received: by mail-wm0-f65.google.com with SMTP id i11so11332955wmf.4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 04:08:32 -0800 (PST)
+ with ESMTP id yIEBups-lAuO for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Jan 2018 07:03:35 -0500 (EST)
+Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6731049DDF
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 07:03:32 -0500 (EST)
+Received: by mail-wm0-f68.google.com with SMTP id 81so2108495wmb.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 04:08:23 -0800 (PST)
 In-Reply-To: <20180112120747.27999-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,237 +34,205 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We are about to defer saving and restoring some groups of system
-registers to vcpu_put and vcpu_load on supported systems.  This means
-that we need some infrastructure to access system registes which
-supports either accessing the memory backing of the register or directly
-accessing the system registers, depending on the state of the system
-when we access the register.
+As we are about to handle system registers quite differently between VHE
+and non-VHE systems.  In preparation for that, we need to split some of
+the handling functions between VHE and non-VHE functionality.
 
-We do this by defining a set of read/write accessors for each system
-register, and letting each system register be defined as "immediate" or
-"deferrable".  Immediate registers are always saved/restored in the
-world-switch path, but deferrable registers are only saved/restored in
-vcpu_put/vcpu_load when supported and sysregs_loaded_on_cpu will be set
-in that case.
+For now, we simply copy the non-VHE functions, but we do change the use
+of static keys for VHE and non-VHE functionality now that we have
+separate functions.
 
-Not that we don't use the deferred mechanism yet in this patch, but only
-introduce infrastructure.  This is to improve convenience of review in
-the subsequent patches where it is clear which registers become
-deferred.
-
- [ Most of this logic was contributed by Marc Zyngier ]
-
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/include/asm/kvm_host.h |   8 +-
- arch/arm64/kvm/sys_regs.c         | 160 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 166 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_hyp.h | 12 ++++++++----
+ arch/arm64/kvm/hyp/switch.c      | 20 ++++++++++----------
+ arch/arm64/kvm/hyp/sysreg-sr.c   | 40 ++++++++++++++++++++++++++++++++--------
+ 3 files changed, 50 insertions(+), 22 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 91272c35cc36..4b5ef82f6bdb 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -281,6 +281,10 @@ struct kvm_vcpu_arch {
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index a0e5a7038237..998152da9b66 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -132,10 +132,14 @@ int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu);
+ void __timer_enable_traps(struct kvm_vcpu *vcpu);
+ void __timer_disable_traps(struct kvm_vcpu *vcpu);
  
- 	/* Detect first run of a vcpu */
- 	bool has_run_once;
-+
-+	/* True when deferrable sysregs are loaded on the physical CPU,
-+	 * see kvm_vcpu_load_sysregs and kvm_vcpu_put_sysregs. */
-+	bool sysregs_loaded_on_cpu;
- };
+-void __sysreg_save_host_state(struct kvm_cpu_context *ctxt);
+-void __sysreg_restore_host_state(struct kvm_cpu_context *ctxt);
+-void __sysreg_save_guest_state(struct kvm_cpu_context *ctxt);
+-void __sysreg_restore_guest_state(struct kvm_cpu_context *ctxt);
++void __sysreg_save_host_state_nvhe(struct kvm_cpu_context *ctxt);
++void __sysreg_restore_host_state_nvhe(struct kvm_cpu_context *ctxt);
++void __sysreg_save_guest_state_nvhe(struct kvm_cpu_context *ctxt);
++void __sysreg_restore_guest_state_nvhe(struct kvm_cpu_context *ctxt);
++void sysreg_save_host_state_vhe(struct kvm_cpu_context *ctxt);
++void sysreg_restore_host_state_vhe(struct kvm_cpu_context *ctxt);
++void sysreg_save_guest_state_vhe(struct kvm_cpu_context *ctxt);
++void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt);
+ void __sysreg32_save_state(struct kvm_vcpu *vcpu);
+ void __sysreg32_restore_state(struct kvm_vcpu *vcpu);
  
- #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.gp_regs)
-@@ -293,8 +297,8 @@ struct kvm_vcpu_arch {
-  */
- #define __vcpu_sys_reg(v,r)	((v)->arch.ctxt.sys_regs[(r)])
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 6175fcb33ed2..42e0123ecd69 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -348,7 +348,7 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ 	host_ctxt->__hyp_running_vcpu = vcpu;
+ 	guest_ctxt = &vcpu->arch.ctxt;
  
--#define vcpu_read_sys_reg(v,r)	__vcpu_sys_reg(v,r)
--#define vcpu_write_sys_reg(v,r,n)	do { __vcpu_sys_reg(v,r) = n; } while (0)
-+u64 vcpu_read_sys_reg(struct kvm_vcpu *vcpu, int reg);
-+void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, int reg, u64 val);
+-	__sysreg_save_host_state(host_ctxt);
++	sysreg_save_host_state_vhe(host_ctxt);
  
- /*
-  * CP14 and CP15 live in the same array, as they are backed by the
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 96398d53b462..9d353a6a55c9 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -35,6 +35,7 @@
- #include <asm/kvm_coproc.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_host.h>
-+#include <asm/kvm_hyp.h>
- #include <asm/kvm_mmu.h>
- #include <asm/perf_event.h>
- #include <asm/sysreg.h>
-@@ -76,6 +77,165 @@ static bool write_to_read_only(struct kvm_vcpu *vcpu,
- 	return false;
+ 	__activate_traps(vcpu);
+ 	__activate_vm(vcpu->kvm);
+@@ -360,7 +360,7 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ 	 * to erratum #852523 (Cortex-A57) or #853709 (Cortex-A72).
+ 	 */
+ 	__sysreg32_restore_state(vcpu);
+-	__sysreg_restore_guest_state(guest_ctxt);
++	sysreg_restore_guest_state_vhe(guest_ctxt);
+ 	__debug_switch_to_guest(vcpu);
+ 
+ 	do {
+@@ -370,13 +370,13 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ 		/* And we're baaack! */
+ 	} while (fixup_guest_exit(vcpu, &exit_code));
+ 
+-	__sysreg_save_guest_state(guest_ctxt);
++	sysreg_save_guest_state_vhe(guest_ctxt);
+ 	__sysreg32_save_state(vcpu);
+ 	__vgic_save_state(vcpu);
+ 
+ 	__deactivate_traps(vcpu);
+ 
+-	__sysreg_restore_host_state(host_ctxt);
++	sysreg_restore_host_state_vhe(host_ctxt);
+ 
+ 	/*
+ 	 * This must come after restoring the host sysregs, since a non-VHE
+@@ -400,7 +400,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 	host_ctxt->__hyp_running_vcpu = vcpu;
+ 	guest_ctxt = &vcpu->arch.ctxt;
+ 
+-	__sysreg_save_host_state(host_ctxt);
++	__sysreg_save_host_state_nvhe(host_ctxt);
+ 
+ 	__activate_traps(vcpu);
+ 	__activate_vm(kern_hyp_va(vcpu->kvm));
+@@ -413,7 +413,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 	 * to erratum #852523 (Cortex-A57) or #853709 (Cortex-A72).
+ 	 */
+ 	__sysreg32_restore_state(vcpu);
+-	__sysreg_restore_guest_state(guest_ctxt);
++	__sysreg_restore_guest_state_nvhe(guest_ctxt);
+ 	__debug_switch_to_guest(vcpu);
+ 
+ 	do {
+@@ -423,7 +423,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 		/* And we're baaack! */
+ 	} while (fixup_guest_exit(vcpu, &exit_code));
+ 
+-	__sysreg_save_guest_state(guest_ctxt);
++	__sysreg_save_guest_state_nvhe(guest_ctxt);
+ 	__sysreg32_save_state(vcpu);
+ 	__timer_disable_traps(vcpu);
+ 	__vgic_save_state(vcpu);
+@@ -431,7 +431,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 	__deactivate_traps(vcpu);
+ 	__deactivate_vm(vcpu);
+ 
+-	__sysreg_restore_host_state(host_ctxt);
++	__sysreg_restore_host_state_nvhe(host_ctxt);
+ 
+ 	/*
+ 	 * This must come after restoring the host sysregs, since a non-VHE
+@@ -456,7 +456,7 @@ static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par,
+ 		__timer_disable_traps(vcpu);
+ 		__deactivate_traps(vcpu);
+ 		__deactivate_vm(vcpu);
+-		__sysreg_restore_host_state(__host_ctxt);
++		__sysreg_restore_host_state_nvhe(__host_ctxt);
+ 	}
+ 
+ 	/*
+@@ -479,7 +479,7 @@ static void __hyp_call_panic_vhe(u64 spsr, u64 elr, u64 par,
+ 	vcpu = host_ctxt->__hyp_running_vcpu;
+ 
+ 	__deactivate_traps(vcpu);
+-	__sysreg_restore_host_state(host_ctxt);
++	sysreg_restore_host_state_vhe(host_ctxt);
+ 
+ 	panic(__hyp_panic_string,
+ 	      spsr,  elr,
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index 72cdbc1f678b..5cbde1016303 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -75,15 +75,27 @@ static void __hyp_text __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+ 	ctxt->gp_regs.regs.pstate	= read_sysreg_el2(spsr);
  }
  
-+struct sys_reg_accessor {
-+	u64	(*rdsr)(struct kvm_vcpu *, int);
-+	void	(*wrsr)(struct kvm_vcpu *, int, u64);
-+};
-+
-+#define DECLARE_IMMEDIATE_SR(i)						\
-+	static u64 __##i##_read(struct kvm_vcpu *vcpu, int r)		\
-+	{								\
-+		return __vcpu_sys_reg(vcpu, r);				\
-+	}								\
-+									\
-+	static void __##i##_write(struct kvm_vcpu *vcpu, int r, u64 v)	\
-+	{								\
-+		__vcpu_sys_reg(vcpu, r) = v;				\
-+	}								\
-+
-+#define DECLARE_DEFERRABLE_SR(i, s)					\
-+	static u64 __##i##_read(struct kvm_vcpu *vcpu, int r)		\
-+	{								\
-+		if (vcpu->arch.sysregs_loaded_on_cpu) {			\
-+			WARN_ON(kvm_arm_get_running_vcpu() != vcpu);	\
-+			return read_sysreg_s((s));			\
-+		}							\
-+		return __vcpu_sys_reg(vcpu, r);				\
-+	}								\
-+									\
-+	static void __##i##_write(struct kvm_vcpu *vcpu, int r, u64 v)	\
-+	{								\
-+		if (vcpu->arch.sysregs_loaded_on_cpu) {			\
-+			WARN_ON(kvm_arm_get_running_vcpu() != vcpu);	\
-+			write_sysreg_s(v, (s));				\
-+		} else {						\
-+			__vcpu_sys_reg(vcpu, r) = v;			\
-+		}							\
-+	}								\
-+
-+
-+#define SR_HANDLER_RANGE(i,e)						\
-+	[i ... e] =  (struct sys_reg_accessor) {			\
-+		.rdsr = __##i##_read,					\
-+		.wrsr = __##i##_write,					\
-+	}
-+
-+#define SR_HANDLER(i)	SR_HANDLER_RANGE(i, i)
-+
-+static void bad_sys_reg(int reg)
+-void __hyp_text __sysreg_save_host_state(struct kvm_cpu_context *ctxt)
++void __hyp_text __sysreg_save_host_state_nvhe(struct kvm_cpu_context *ctxt)
 +{
-+	WARN_ONCE(1, "Bad system register access %d\n", reg);
++	__sysreg_save_el1_state(ctxt);
++	__sysreg_save_common_state(ctxt);
++	__sysreg_save_user_state(ctxt);
 +}
 +
-+static u64 __default_read_sys_reg(struct kvm_vcpu *vcpu, int reg)
++void __hyp_text __sysreg_save_guest_state_nvhe(struct kvm_cpu_context *ctxt)
 +{
-+	bad_sys_reg(reg);
-+	return 0;
++	__sysreg_save_el1_state(ctxt);
++	__sysreg_save_common_state(ctxt);
++	__sysreg_save_user_state(ctxt);
 +}
 +
-+static void __default_write_sys_reg(struct kvm_vcpu *vcpu, int reg, u64 val)
-+{
-+	bad_sys_reg(reg);
-+}
-+
-+/* Ordered as in enum vcpu_sysreg */
-+DECLARE_IMMEDIATE_SR(MPIDR_EL1);
-+DECLARE_IMMEDIATE_SR(CSSELR_EL1);
-+DECLARE_IMMEDIATE_SR(SCTLR_EL1);
-+DECLARE_IMMEDIATE_SR(ACTLR_EL1);
-+DECLARE_IMMEDIATE_SR(CPACR_EL1);
-+DECLARE_IMMEDIATE_SR(TTBR0_EL1);
-+DECLARE_IMMEDIATE_SR(TTBR1_EL1);
-+DECLARE_IMMEDIATE_SR(TCR_EL1);
-+DECLARE_IMMEDIATE_SR(ESR_EL1);
-+DECLARE_IMMEDIATE_SR(AFSR0_EL1);
-+DECLARE_IMMEDIATE_SR(AFSR1_EL1);
-+DECLARE_IMMEDIATE_SR(FAR_EL1);
-+DECLARE_IMMEDIATE_SR(MAIR_EL1);
-+DECLARE_IMMEDIATE_SR(VBAR_EL1);
-+DECLARE_IMMEDIATE_SR(CONTEXTIDR_EL1);
-+DECLARE_IMMEDIATE_SR(TPIDR_EL0);
-+DECLARE_IMMEDIATE_SR(TPIDRRO_EL0);
-+DECLARE_IMMEDIATE_SR(TPIDR_EL1);
-+DECLARE_IMMEDIATE_SR(AMAIR_EL1);
-+DECLARE_IMMEDIATE_SR(CNTKCTL_EL1);
-+DECLARE_IMMEDIATE_SR(PAR_EL1);
-+DECLARE_IMMEDIATE_SR(MDSCR_EL1);
-+DECLARE_IMMEDIATE_SR(MDCCINT_EL1);
-+DECLARE_IMMEDIATE_SR(PMCR_EL0);
-+DECLARE_IMMEDIATE_SR(PMSELR_EL0);
-+DECLARE_IMMEDIATE_SR(PMEVCNTR0_EL0);
-+/* PMEVCNTR30_EL0 */
-+DECLARE_IMMEDIATE_SR(PMCCNTR_EL0);
-+DECLARE_IMMEDIATE_SR(PMEVTYPER0_EL0);
-+/* PMEVTYPER30_EL0 */
-+DECLARE_IMMEDIATE_SR(PMCCFILTR_EL0);
-+DECLARE_IMMEDIATE_SR(PMCNTENSET_EL0);
-+DECLARE_IMMEDIATE_SR(PMINTENSET_EL1);
-+DECLARE_IMMEDIATE_SR(PMOVSSET_EL0);
-+DECLARE_IMMEDIATE_SR(PMSWINC_EL0);
-+DECLARE_IMMEDIATE_SR(PMUSERENR_EL0);
-+DECLARE_IMMEDIATE_SR(DACR32_EL2);
-+DECLARE_IMMEDIATE_SR(IFSR32_EL2);
-+DECLARE_IMMEDIATE_SR(FPEXC32_EL2);
-+DECLARE_IMMEDIATE_SR(DBGVCR32_EL2);
-+
-+static const struct sys_reg_accessor sys_reg_accessors[NR_SYS_REGS] = {
-+	[0 ... NR_SYS_REGS - 1] = {
-+		.rdsr = __default_read_sys_reg,
-+		.wrsr = __default_write_sys_reg,
-+	},
-+
-+	SR_HANDLER(MPIDR_EL1),
-+	SR_HANDLER(CSSELR_EL1),
-+	SR_HANDLER(SCTLR_EL1),
-+	SR_HANDLER(ACTLR_EL1),
-+	SR_HANDLER(CPACR_EL1),
-+	SR_HANDLER(TTBR0_EL1),
-+	SR_HANDLER(TTBR1_EL1),
-+	SR_HANDLER(TCR_EL1),
-+	SR_HANDLER(ESR_EL1),
-+	SR_HANDLER(AFSR0_EL1),
-+	SR_HANDLER(AFSR1_EL1),
-+	SR_HANDLER(FAR_EL1),
-+	SR_HANDLER(MAIR_EL1),
-+	SR_HANDLER(VBAR_EL1),
-+	SR_HANDLER(CONTEXTIDR_EL1),
-+	SR_HANDLER(TPIDR_EL0),
-+	SR_HANDLER(TPIDRRO_EL0),
-+	SR_HANDLER(TPIDR_EL1),
-+	SR_HANDLER(AMAIR_EL1),
-+	SR_HANDLER(CNTKCTL_EL1),
-+	SR_HANDLER(PAR_EL1),
-+	SR_HANDLER(MDSCR_EL1),
-+	SR_HANDLER(MDCCINT_EL1),
-+	SR_HANDLER(PMCR_EL0),
-+	SR_HANDLER(PMSELR_EL0),
-+	SR_HANDLER_RANGE(PMEVCNTR0_EL0, PMEVCNTR30_EL0),
-+	SR_HANDLER(PMCCNTR_EL0),
-+	SR_HANDLER_RANGE(PMEVTYPER0_EL0, PMEVTYPER30_EL0),
-+	SR_HANDLER(PMCCFILTR_EL0),
-+	SR_HANDLER(PMCNTENSET_EL0),
-+	SR_HANDLER(PMINTENSET_EL1),
-+	SR_HANDLER(PMOVSSET_EL0),
-+	SR_HANDLER(PMSWINC_EL0),
-+	SR_HANDLER(PMUSERENR_EL0),
-+	SR_HANDLER(DACR32_EL2),
-+	SR_HANDLER(IFSR32_EL2),
-+	SR_HANDLER(FPEXC32_EL2),
-+	SR_HANDLER(DBGVCR32_EL2),
-+};
-+
-+u64 vcpu_read_sys_reg(struct kvm_vcpu *vcpu, int reg)
-+{
-+	return sys_reg_accessors[reg].rdsr(vcpu, reg);
-+}
-+
-+void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, int reg, u64 val)
-+{
-+	sys_reg_accessors[reg].wrsr(vcpu, reg, val);
-+}
-+
- /* 3 bits per cache level, as per CLIDR, but non-existent caches always 0 */
- static u32 cache_levels;
++void sysreg_save_host_state_vhe(struct kvm_cpu_context *ctxt)
+ {
+-	if (!has_vhe())
+-		__sysreg_save_el1_state(ctxt);
+ 	__sysreg_save_common_state(ctxt);
+ 	__sysreg_save_user_state(ctxt);
+ }
  
+-void __hyp_text __sysreg_save_guest_state(struct kvm_cpu_context *ctxt)
++void sysreg_save_guest_state_vhe(struct kvm_cpu_context *ctxt)
+ {
+ 	__sysreg_save_el1_state(ctxt);
+ 	__sysreg_save_common_state(ctxt);
+@@ -136,15 +148,27 @@ static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+ 	write_sysreg_el2(ctxt->gp_regs.regs.pstate,	spsr);
+ }
+ 
+-void __hyp_text __sysreg_restore_host_state(struct kvm_cpu_context *ctxt)
++void __hyp_text __sysreg_restore_host_state_nvhe(struct kvm_cpu_context *ctxt)
++{
++	__sysreg_restore_el1_state(ctxt);
++	__sysreg_restore_common_state(ctxt);
++	__sysreg_restore_user_state(ctxt);
++}
++
++void __hyp_text __sysreg_restore_guest_state_nvhe(struct kvm_cpu_context *ctxt)
++{
++	__sysreg_restore_el1_state(ctxt);
++	__sysreg_restore_common_state(ctxt);
++	__sysreg_restore_user_state(ctxt);
++}
++
++void sysreg_restore_host_state_vhe(struct kvm_cpu_context *ctxt)
+ {
+-	if (!has_vhe())
+-		__sysreg_restore_el1_state(ctxt);
+ 	__sysreg_restore_common_state(ctxt);
+ 	__sysreg_restore_user_state(ctxt);
+ }
+ 
+-void __hyp_text __sysreg_restore_guest_state(struct kvm_cpu_context *ctxt)
++void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt)
+ {
+ 	__sysreg_restore_el1_state(ctxt);
+ 	__sysreg_restore_common_state(ctxt);
 -- 
 2.14.2
