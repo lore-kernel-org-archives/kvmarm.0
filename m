@@ -1,144 +1,42 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v3 34/41] KVM: arm64: Configure c15, PMU, and debug register traps on cpu load/put for VHE
-Date: Fri, 12 Jan 2018 13:07:40 +0100
-Message-ID: <20180112120747.27999-35-christoffer.dall@linaro.org>
-References: <20180112120747.27999-1-christoffer.dall@linaro.org>
+Subject: [PULL 0/2] KVM/ARM Fixes for v4.15 - Round 3
+Date: Fri, 12 Jan 2018 13:33:32 +0100
+Message-ID: <20180112123334.28687-1-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20180112120747.27999-1-christoffer.dall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We do not have to change the c15 trap setting on each switch to/from the
-guest on VHE systems, because this setting only affects EL0.
+Hi Paolo and Radim,
 
-The PMU and debug trap configuration can also be done on vcpu load/put
-instead, because they don't affect how the host kernel can access the
-debug registers while executing KVM kernel code and KVM doesn't use
-floating point itself.
+This is the third round of fixes for KVM/ARM for v4.15, including two more
+fixes for v4.15 fixing incorrect huge page mappings on systems using the
+contiguous hint for hugetlbfs and supporting an alternative GICv4 init
+sequence.
 
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
- arch/arm64/kvm/hyp/switch.c | 37 +++++++++++++++++++++++++++----------
- 1 file changed, 27 insertions(+), 10 deletions(-)
+The following changes since commit 0eb7c33cadf6b2f1a94e58ded8b0eb89b4eba382:
 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index d14ab9650f81..6ff9fab4233e 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -43,8 +43,6 @@ static void __hyp_text __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
- 
- static void __hyp_text __activate_traps_common(struct kvm_vcpu *vcpu)
- {
--	write_sysreg(vcpu->arch.hcr_el2, hcr_el2);
--
- 	/* Trap on AArch32 cp15 c15 (impdef sysregs) accesses (EL1 or EL0) */
- 	write_sysreg(1 << 15, hstr_el2);
- 	/*
-@@ -64,12 +62,15 @@ static void __hyp_text __deactivate_traps_common(void)
- 	write_sysreg(0, pmuserenr_el0);
- }
- 
-+/* Activate the traps we can during vcpu_load with VHE */
- void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
- {
- 	u64 val;
- 
-+	/* Make sure 32-bit guests trap VFP */
- 	__activate_traps_fpsimd32(vcpu);
- 
-+	/* Trap VFP accesses on a VHE system */
- 	val = read_sysreg(cpacr_el1);
- 	val |= CPACR_EL1_TTA;
- 	val &= ~CPACR_EL1_ZEN;
-@@ -78,11 +79,28 @@ void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
- 	else
- 		val &= ~CPACR_EL1_FPEN;
- 	write_sysreg(val, cpacr_el1);
-+
-+	/* Activate traps on impdef sysregs, PMU, and debug */
-+	__activate_traps_common(vcpu);
- }
- 
-+/* Deactivate the traps we can during vcpu_put with VHE */
- void deactivate_traps_vhe_put(void)
- {
-+	u64 mdcr_el2;
-+
-+	/* Re-enable host VFP and SVE access */
- 	write_sysreg(CPACR_EL1_DEFAULT, cpacr_el1);
-+
-+	/* Re-enable host access to impdef sysregs and the PMU */
-+	__deactivate_traps_common();
-+
-+	/* Re-enable host access to the debug regs */
-+	mdcr_el2 = read_sysreg(mdcr_el2);
-+	mdcr_el2 &= MDCR_EL2_HPMN_MASK |
-+		    MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT |
-+		    MDCR_EL2_TPMS;
-+	write_sysreg(mdcr_el2, mdcr_el2);
- }
- 
- static void __hyp_text __activate_traps_vhe(struct kvm_vcpu *vcpu)
-@@ -96,8 +114,10 @@ void __hyp_text __activate_traps_nvhe_load(struct kvm_vcpu *vcpu)
- 
- 	vcpu = kern_hyp_va(vcpu);
- 
-+	/* Make sure 32-bit guests trap VFP */
- 	__activate_traps_fpsimd32(vcpu);
- 
-+	/* Trap VFP accesses on a non-VHE system */
- 	val = CPTR_EL2_DEFAULT;
- 	val |= CPTR_EL2_TTA | CPTR_EL2_TZ;
- 	if (vcpu->arch.guest_vfp_loaded)
-@@ -114,6 +134,8 @@ void __hyp_text __deactivate_traps_nvhe_put(void)
- 
- static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
- {
-+	/* Activate traps on impdef sysregs, PMU, and debug */
-+	__activate_traps_common(vcpu);
- }
- 
- static hyp_alternate_select(__activate_traps_arch,
-@@ -122,20 +144,14 @@ static hyp_alternate_select(__activate_traps_arch,
- 
- static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
- {
--	__activate_traps_common(vcpu);
- 	__activate_traps_arch()(vcpu);
-+	write_sysreg(vcpu->arch.hcr_el2, hcr_el2);
- }
- 
- static void __hyp_text __deactivate_traps_vhe(void)
- {
- 	extern char vectors[];	/* kernel exception vectors */
--	u64 mdcr_el2 = read_sysreg(mdcr_el2);
--
--	mdcr_el2 &= MDCR_EL2_HPMN_MASK |
--		    MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT |
--		    MDCR_EL2_TPMS;
- 
--	write_sysreg(mdcr_el2, mdcr_el2);
- 	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
- 	write_sysreg(vectors, vbar_el1);
- }
-@@ -143,6 +159,8 @@ static void __hyp_text __deactivate_traps_vhe(void)
- static void __hyp_text __deactivate_traps_nvhe(void) {
- 	u64 mdcr_el2 = read_sysreg(mdcr_el2);
- 
-+	__deactivate_traps_common();
-+
- 	mdcr_el2 &= MDCR_EL2_HPMN_MASK;
- 	mdcr_el2 |= MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT;
- 
-@@ -165,7 +183,6 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
- 	if (vcpu->arch.hcr_el2 & HCR_VSE)
- 		vcpu->arch.hcr_el2 = read_sysreg(hcr_el2);
- 
--	__deactivate_traps_common();
- 	__deactivate_traps_arch()();
- }
- 
--- 
-2.14.2
+  KVM: arm/arm64: Fix timer enable flow (2017-12-18 10:53:24 +0100)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-fixes-for-v4.15-3
+
+for you to fetch changes up to f8f85dc00b7427de6222ea3955c52512315d13cd:
+
+  KVM: arm64: Fix GICv4 init when called from vgic_its_create (2018-01-12 11:40:21 +0100)
+
+Thanks,
+-Christoffer
+
+Christoffer Dall (1):
+      KVM: arm64: Fix GICv4 init when called from vgic_its_create
+
+Punit Agrawal (1):
+      KVM: arm/arm64: Check pagesize when allocating a hugepage at Stage 2
+
+ virt/kvm/arm/mmu.c            | 2 +-
+ virt/kvm/arm/vgic/vgic-init.c | 8 +++++---
+ virt/kvm/arm/vgic/vgic-v4.c   | 2 +-
+ 3 files changed, 7 insertions(+), 5 deletions(-)
