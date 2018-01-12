@@ -1,61 +1,133 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v1 01/16] virtio: Validate queue pfn for 32bit transports
-Date: Fri, 12 Jan 2018 10:21:48 +0000
-Message-ID: <CAFEAcA9KMWkTOd4w-QD8fsFs4UQJaNC4PMwPtHVS54ZLhHT72A@mail.gmail.com>
-References: <20180109190414.4017-1-suzuki.poulose@arm.com>
- <20180109190414.4017-2-suzuki.poulose@arm.com>
- <20180110012429-mutt-send-email-mst@kernel.org>
- <f53478fc-c0c1-7502-1b8c-c23e332cae9c@arm.com>
- <20180110130230-mutt-send-email-mst@kernel.org>
- <CAFEAcA9VJ41vPBOwYSVHmBGtjdA4jL2b2mHAUZ09aym_JynMzw@mail.gmail.com>
- <2aacb81b-0efb-87b9-f70c-a61e66dd0331@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v2] KVM: arm/arm64: vgic-its: Fix vgicv4 init
+Date: Fri, 12 Jan 2018 11:44:57 +0100
+Message-ID: <20180112104457.GB21403@cbox>
+References: <1515405174-21066-1-git-send-email-eric.auger@redhat.com>
+ <20180111185538.GI15307@cbox>
+ <5f4fbcc8-ad99-4d33-5a1a-9bac2fc40894@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FCDD49DB2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 05:17:20 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dKDPqGcnN4Fv for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Jan 2018 05:17:18 -0500 (EST)
-Received: from mail-ot0-f176.google.com (mail-ot0-f176.google.com
- [74.125.82.176])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B529949D62
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 05:17:18 -0500 (EST)
-Received: by mail-ot0-f176.google.com with SMTP id s3so4651576otc.9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 02:22:09 -0800 (PST)
-In-Reply-To: <2aacb81b-0efb-87b9-f70c-a61e66dd0331@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Cc: Christoffer Dall <cdall@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>, Catalin Marinas <Catalin.Marinas@arm.com>, Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Will Deacon <Will.Deacon@arm.com>, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, Kristina Martsenko <Kristina.Martsenko@arm.com>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, Paolo Bonzini <pbonzini@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <5f4fbcc8-ad99-4d33-5a1a-9bac2fc40894@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Auger Eric <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, cdall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 10 January 2018 at 11:25, Jean-Philippe Brucker
-<jean-philippe.brucker@arm.com> wrote:
-> Hi Peter,
->
-> On 10/01/18 11:19, Peter Maydell wrote:
->> Are there uses that make it worthwhile to get virtio-1
->> support added to virtio-mmio, rather than just getting
->> people to move over to virtio-pci instead ?
->
-> virtio-iommu uses virtio-mmio transport. It makes little sense to have an
-> IOMMU presented as a PCI endpoint.
+On Fri, Jan 12, 2018 at 08:45:31AM +0100, Auger Eric wrote:
+> Hi Christoffer
+> 
+> On 11/01/18 19:55, Christoffer Dall wrote:
+> > On Mon, Jan 08, 2018 at 10:52:54AM +0100, Eric Auger wrote:
+> >> Commit 3d1ad640f8c94 ("KVM: arm/arm64: Fix GICv4 ITS initialization
+> >> issues") moved the vgic_supports_direct_msis() check in vgic_v4_init().
+> >> However when vgic_v4_init is called from vgic_its_create(), the has_its
+> >> field is not yet set. Hence vgic_supports_direct_msis returns false and
+> >> vgic_v4_init does nothing.
+> >>
+> >> Let's move the check back to vgic_v4_init caller.
+> >>
+> >> Fixes: 3d1ad640f8c94 ("KVM: arm/arm64: Fix GICv4 ITS initialization issues")
+> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> >>
+> >> ---
+> >>
+> >> v1 -> v2:
+> >> - move the check to the caller
+> > 
+> > Why this change, I slightly preferred the first version of this patch,
+> > but I will admit that the "has_its = true; no_wait(); has_its = false;"
+> > things is pretty ugly...
+> 
+> I didn't find the 1st solution elegant either and reverted to how the
+> code looked like before your patch.
+> > 
+> >> - identify the right commit this patch fixes
+> >> ---
+> >>  virt/kvm/arm/vgic/vgic-init.c | 8 +++++---
+> >>  virt/kvm/arm/vgic/vgic-its.c  | 2 +-
+> >>  virt/kvm/arm/vgic/vgic-v4.c   | 3 ---
+> >>  3 files changed, 6 insertions(+), 7 deletions(-)
+> >>
+> >> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+> >> index 6231012..40be908 100644
+> >> --- a/virt/kvm/arm/vgic/vgic-init.c
+> >> +++ b/virt/kvm/arm/vgic/vgic-init.c
+> >> @@ -285,9 +285,11 @@ int vgic_init(struct kvm *kvm)
+> >>  	if (ret)
+> >>  		goto out;
+> >>  
+> >> -	ret = vgic_v4_init(kvm);
+> >> -	if (ret)
+> >> -		goto out;
+> >> +	if (vgic_supports_direct_msis(kvm)) {
+> >> +		ret = vgic_v4_init(kvm);
+> >> +		if (ret)
+> >> +			goto out;
+> >> +	}
+> >>  
+> >>  	kvm_for_each_vcpu(i, vcpu, kvm)
+> >>  		kvm_vgic_vcpu_enable(vcpu);
+> >> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> >> index 8e633bd..aebc88d 100644
+> >> --- a/virt/kvm/arm/vgic/vgic-its.c
+> >> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> >> @@ -1687,7 +1687,7 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
+> >>  	if (!its)
+> >>  		return -ENOMEM;
+> >>  
+> >> -	if (vgic_initialized(dev->kvm)) {
+> >> +	if (kvm_vgic_global_state.has_gicv4 && vgic_initialized(dev->kvm)) {
+> > 
+> > ... but now we're using vgic_supports_direct_msis() in one part of the
+> > init path and a half-open coded version of that in another path, which
+> > is not very pretty.
+> > 
+> > So I actually would suggest doing the init stuff more open-coded,
+> > because init of the gic/its/gicv4 is a mess anyway.
+> > 
+> > Something like this:
+> > 
+> > diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+> > index 62310122ee78..743ca5cb05ef 100644
+> > --- a/virt/kvm/arm/vgic/vgic-init.c
+> > +++ b/virt/kvm/arm/vgic/vgic-init.c
+> > @@ -285,9 +285,11 @@ int vgic_init(struct kvm *kvm)
+> >  	if (ret)
+> >  		goto out;
+> >  
+> > -	ret = vgic_v4_init(kvm);
+> > -	if (ret)
+> > -		goto out;
+> > +	if (vgic_has_its(kvm)) {
+> > +		ret = vgic_v4_init(kvm);
+> > +		if (ret)
+> > +			goto out;
+> > +	}
+> >  
+> >  	kvm_for_each_vcpu(i, vcpu, kvm)
+> >  		kvm_vgic_vcpu_enable(vcpu);
+> > diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
+> > index 4a37292855bc..bc4265154bac 100644
+> > --- a/virt/kvm/arm/vgic/vgic-v4.c
+> > +++ b/virt/kvm/arm/vgic/vgic-v4.c
+> > @@ -118,7 +118,7 @@ int vgic_v4_init(struct kvm *kvm)
+> >  	struct kvm_vcpu *vcpu;
+> >  	int i, nr_vcpus, ret;
+> >  
+> > -	if (!vgic_supports_direct_msis(kvm))
+> > +	if (!kvm_vgic_global_state.has_gicv4)
+> >  		return 0; /* Nothing to see here... move along. */
+> >  
+> >  	if (dist->its_vm.vpes)
+> > 
+> > Does that work?
+> Looks OK to me. Unfortunately I don't have access to this specific
+> machine anymore at the moment so I can't test it right now.
+> 
 
-Having an entire transport just for the IOMMU doesn't make
-a great deal of sense either though :-) If we didn't already
-have virtio-mmio kicking around would we really have designed
-it that way?
+ok, I've queued my version with your reported-by.
 
-thanks
--- PMM
+Thanks,
+-Christoffer
