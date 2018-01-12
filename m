@@ -1,74 +1,64 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 1/2] KVM: arm/arm64: Check pagesize when allocating a hugepage
- at Stage 2
-Date: Fri, 12 Jan 2018 13:33:33 +0100
-Message-ID: <20180112123334.28687-2-christoffer.dall@linaro.org>
+Subject: [PULL 2/2] KVM: arm64: Fix GICv4 init when called from vgic_its_create
+Date: Fri, 12 Jan 2018 13:33:34 +0100
+Message-ID: <20180112123334.28687-3-christoffer.dall@linaro.org>
 References: <20180112123334.28687-1-christoffer.dall@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 94F2949DD0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 07:28:51 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fqiwvbTf55CD for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Jan 2018 07:28:50 -0500 (EST)
-Received: from mail-wm0-f65.google.com (mail-wm0-f65.google.com [74.125.82.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B206849DB3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 07:28:50 -0500 (EST)
-Received: by mail-wm0-f65.google.com with SMTP id b141so11886056wme.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 04:33:41 -0800 (PST)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20180112123334.28687-1-christoffer.dall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, stable@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Punit Agrawal <punit.agrawal@arm.com>
+Commit 3d1ad640f8c94 ("KVM: arm/arm64: Fix GICv4 ITS initialization
+issues") moved the vgic_supports_direct_msis() check in vgic_v4_init().
+However when vgic_v4_init is called from vgic_its_create(), the has_its
+field is not yet set. Hence vgic_supports_direct_msis returns false and
+vgic_v4_init does nothing.
 
-KVM only supports PMD hugepages at stage 2 but doesn't actually check
-that the provided hugepage memory pagesize is PMD_SIZE before populating
-stage 2 entries.
+The gic/its init sequence is a bit messy, so let's be specific about the
+prerequisite checks in the various call paths instead of relying on a
+common wrapper.
 
-In cases where the backing hugepage size is smaller than PMD_SIZE (such
-as when using contiguous hugepages), KVM can end up creating stage 2
-mappings that extend beyond the supplied memory.
-
-Fix this by checking for the pagesize of userspace vma before creating
-PMD hugepage at stage 2.
-
-Fixes: 66b3923a1a0f77a ("arm64: hugetlb: add support for PTE contiguous bit")
-Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: <stable@vger.kernel.org> # v4.5+
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Fixes: 3d1ad640f8c94 ("KVM: arm/arm64: Fix GICv4 ITS initialization issues")
+Reported-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/mmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ virt/kvm/arm/vgic/vgic-init.c | 8 +++++---
+ virt/kvm/arm/vgic/vgic-v4.c   | 2 +-
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index b4b69c2d1012..9dea96380339 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -1310,7 +1310,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		return -EFAULT;
- 	}
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index 62310122ee78..743ca5cb05ef 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -285,9 +285,11 @@ int vgic_init(struct kvm *kvm)
+ 	if (ret)
+ 		goto out;
  
--	if (is_vm_hugetlb_page(vma) && !logging_active) {
-+	if (vma_kernel_pagesize(vma) == PMD_SIZE && !logging_active) {
- 		hugetlb = true;
- 		gfn = (fault_ipa & PMD_MASK) >> PAGE_SHIFT;
- 	} else {
+-	ret = vgic_v4_init(kvm);
+-	if (ret)
+-		goto out;
++	if (vgic_has_its(kvm)) {
++		ret = vgic_v4_init(kvm);
++		if (ret)
++			goto out;
++	}
+ 
+ 	kvm_for_each_vcpu(i, vcpu, kvm)
+ 		kvm_vgic_vcpu_enable(vcpu);
+diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
+index 4a37292855bc..bc4265154bac 100644
+--- a/virt/kvm/arm/vgic/vgic-v4.c
++++ b/virt/kvm/arm/vgic/vgic-v4.c
+@@ -118,7 +118,7 @@ int vgic_v4_init(struct kvm *kvm)
+ 	struct kvm_vcpu *vcpu;
+ 	int i, nr_vcpus, ret;
+ 
+-	if (!vgic_supports_direct_msis(kvm))
++	if (!kvm_vgic_global_state.has_gicv4)
+ 		return 0; /* Nothing to see here... move along. */
+ 
+ 	if (dist->its_vm.vpes)
 -- 
 2.14.2
