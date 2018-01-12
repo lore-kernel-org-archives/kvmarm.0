@@ -1,24 +1,24 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v3 04/41] KVM: arm64: Rework hyp_panic for VHE and non-VHE
-Date: Fri, 12 Jan 2018 13:07:10 +0100
-Message-ID: <20180112120747.27999-5-christoffer.dall@linaro.org>
+Subject: [PATCH v3 06/41] KVM: arm/arm64: Get rid of vcpu->arch.irq_lines
+Date: Fri, 12 Jan 2018 13:07:12 +0100
+Message-ID: <20180112120747.27999-7-christoffer.dall@linaro.org>
 References: <20180112120747.27999-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BCB7B49DA2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 07:03:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E212749D62
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 07:03:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dwhrMjsM8G6B for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Jan 2018 07:03:07 -0500 (EST)
+ with ESMTP id mfeNEmdSnxPC for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Jan 2018 07:03:12 -0500 (EST)
 Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 53EE949DB4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 07:03:07 -0500 (EST)
-Received: by mail-wm0-f68.google.com with SMTP id t8so11608508wmc.3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 04:07:57 -0800 (PST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0898E49DD5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 07:03:11 -0500 (EST)
+Received: by mail-wm0-f68.google.com with SMTP id r78so11482007wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jan 2018 04:08:01 -0800 (PST)
 In-Reply-To: <20180112120747.27999-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,104 +33,219 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VHE actually doesn't rely on clearing the VTTBR when returning to the
-host kernel, and that is the current key mechanism of hyp_panic to
-figure out how to attempt to return to a state good enough to print a
-panic statement.
-
-Therefore, we split the hyp_panic function into two functions, a VHE and
-a non-VHE, keeping the non-VHE version intact, but changing the VHE
-behavior.
-
-The vttbr_el2 check on VHE doesn't really make that much sense, because
-the only situation where we can get here on VHE is when the hypervisor
-assembly code actually called into hyp_panic, which only happens when
-VBAR_EL2 has been set to the KVM exception vectors.  On VHE, we can
-always safely disable the traps and restore the host registers at this
-point, so we simply do that unconditionally and call into the panic
-function directly.
+We currently have a separate read-modify-write of the HCR_EL2 on entry
+to the guest for the sole purpose of setting the VF and VI bits, if set.
+Since this is most rarely the case (only when using userspace IRQ chip
+and interrupts are in flight), let's get rid of this operation and
+instead modify the bits in the vcpu->arch.hcr[_el2] directly when
+needed.
 
 Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Julien Thierry <julien.thierry@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/kvm/hyp/switch.c | 42 +++++++++++++++++++++++-------------------
- 1 file changed, 23 insertions(+), 19 deletions(-)
+ arch/arm/include/asm/kvm_emulate.h   |  9 ++-------
+ arch/arm/include/asm/kvm_host.h      |  3 ---
+ arch/arm/kvm/emulate.c               |  2 +-
+ arch/arm/kvm/hyp/switch.c            |  2 +-
+ arch/arm64/include/asm/kvm_emulate.h |  9 ++-------
+ arch/arm64/include/asm/kvm_host.h    |  3 ---
+ arch/arm64/kvm/hyp/switch.c          |  6 ------
+ arch/arm64/kvm/inject_fault.c        |  2 +-
+ virt/kvm/arm/arm.c                   | 11 ++++++-----
+ virt/kvm/arm/mmu.c                   |  6 +++---
+ 10 files changed, 16 insertions(+), 37 deletions(-)
 
+diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
+index 3d22eb87f919..d5e1b8bf6422 100644
+--- a/arch/arm/include/asm/kvm_emulate.h
++++ b/arch/arm/include/asm/kvm_emulate.h
+@@ -92,14 +92,9 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.hcr = HCR_GUEST_MASK;
+ }
+ 
+-static inline unsigned long vcpu_get_hcr(const struct kvm_vcpu *vcpu)
++static inline unsigned long *vcpu_hcr(const struct kvm_vcpu *vcpu)
+ {
+-	return vcpu->arch.hcr;
+-}
+-
+-static inline void vcpu_set_hcr(struct kvm_vcpu *vcpu, unsigned long hcr)
+-{
+-	vcpu->arch.hcr = hcr;
++	return (unsigned long *)&vcpu->arch.hcr;
+ }
+ 
+ static inline bool vcpu_mode_is_32bit(const struct kvm_vcpu *vcpu)
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index 6394fb99da7f..7f96b3541939 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -155,9 +155,6 @@ struct kvm_vcpu_arch {
+ 	/* HYP trapping configuration */
+ 	u32 hcr;
+ 
+-	/* Interrupt related fields */
+-	u32 irq_lines;		/* IRQ and FIQ levels */
+-
+ 	/* Exception Information */
+ 	struct kvm_vcpu_fault_info fault;
+ 
+diff --git a/arch/arm/kvm/emulate.c b/arch/arm/kvm/emulate.c
+index cdff963f133a..fa501bf437f3 100644
+--- a/arch/arm/kvm/emulate.c
++++ b/arch/arm/kvm/emulate.c
+@@ -174,5 +174,5 @@ unsigned long *vcpu_spsr(struct kvm_vcpu *vcpu)
+  */
+ void kvm_inject_vabt(struct kvm_vcpu *vcpu)
+ {
+-	vcpu_set_hcr(vcpu, vcpu_get_hcr(vcpu) | HCR_VA);
++	*vcpu_hcr(vcpu) |= HCR_VA;
+ }
+diff --git a/arch/arm/kvm/hyp/switch.c b/arch/arm/kvm/hyp/switch.c
+index 330c9ce34ba5..c3b9799e2e13 100644
+--- a/arch/arm/kvm/hyp/switch.c
++++ b/arch/arm/kvm/hyp/switch.c
+@@ -43,7 +43,7 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu, u32 *fpexc_host)
+ 		isb();
+ 	}
+ 
+-	write_sysreg(vcpu->arch.hcr | vcpu->arch.irq_lines, HCR);
++	write_sysreg(vcpu->arch.hcr, HCR);
+ 	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
+ 	write_sysreg(HSTR_T(15), HSTR);
+ 	write_sysreg(HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11), HCPTR);
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 8ff5aef44656..b36aaa1fe332 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -62,14 +62,9 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+ 		vcpu->arch.hcr_el2 |= HCR_TID3;
+ }
+ 
+-static inline unsigned long vcpu_get_hcr(struct kvm_vcpu *vcpu)
++static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
+ {
+-	return vcpu->arch.hcr_el2;
+-}
+-
+-static inline void vcpu_set_hcr(struct kvm_vcpu *vcpu, unsigned long hcr)
+-{
+-	vcpu->arch.hcr_el2 = hcr;
++	return (unsigned long *)&vcpu->arch.hcr_el2;
+ }
+ 
+ static inline unsigned long *vcpu_pc(const struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 6ce0b428a4db..59150c75f9a5 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -269,9 +269,6 @@ struct kvm_vcpu_arch {
+ 	/* IO related fields */
+ 	struct kvm_decode mmio_decode;
+ 
+-	/* Interrupt related fields */
+-	u64 irq_lines;		/* IRQ and FIQ levels */
+-
+ 	/* Cache some mmu pages needed inside spinlock regions */
+ 	struct kvm_mmu_memory_cache mmu_page_cache;
+ 
 diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 6fcb37e220b5..71700ecee308 100644
+index f6189d08753e..11ec1c6f3b84 100644
 --- a/arch/arm64/kvm/hyp/switch.c
 +++ b/arch/arm64/kvm/hyp/switch.c
-@@ -419,10 +419,20 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- static const char __hyp_panic_string[] = "HYP panic:\nPS:%08llx PC:%016llx ESR:%08llx\nFAR:%016llx HPFAR:%016llx PAR:%016llx\nVCPU:%p\n";
+@@ -171,12 +171,6 @@ static void __hyp_text __vgic_save_state(struct kvm_vcpu *vcpu)
  
- static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par,
--					     struct kvm_vcpu *vcpu)
-+					     struct kvm_cpu_context *__host_ctxt)
+ static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
  {
-+	struct kvm_vcpu *vcpu;
- 	unsigned long str_va;
+-	u64 val;
+-
+-	val = read_sysreg(hcr_el2);
+-	val |= vcpu->arch.irq_lines;
+-	write_sysreg(val, hcr_el2);
+-
+ 	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+ 		__vgic_v3_restore_state(vcpu);
+ 	else
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index 8ecbcb40e317..2d38ede2eff0 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -173,5 +173,5 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
+  */
+ void kvm_inject_vabt(struct kvm_vcpu *vcpu)
+ {
+-	vcpu_set_hcr(vcpu, vcpu_get_hcr(vcpu) | HCR_VSE);
++	*vcpu_hcr(vcpu) |= HCR_VSE;
+ }
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 360df72692ee..46c125f1da56 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -419,7 +419,8 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+  */
+ int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
+ {
+-	return ((!!v->arch.irq_lines || kvm_vgic_vcpu_pending_irq(v))
++	bool irq_lines = *vcpu_hcr(v) & (HCR_VI | HCR_VF);
++	return ((irq_lines || kvm_vgic_vcpu_pending_irq(v))
+ 		&& !v->arch.power_off && !v->arch.pause);
+ }
  
-+	vcpu = __host_ctxt->__hyp_running_vcpu;
-+
-+	if (read_sysreg(vttbr_el2)) {
-+		__timer_disable_traps(vcpu);
-+		__deactivate_traps(vcpu);
-+		__deactivate_vm(vcpu);
-+		__sysreg_restore_host_state(__host_ctxt);
-+	}
-+
+@@ -806,18 +807,18 @@ static int vcpu_interrupt_line(struct kvm_vcpu *vcpu, int number, bool level)
+ {
+ 	int bit_index;
+ 	bool set;
+-	unsigned long *ptr;
++	unsigned long *hcr;
+ 
+ 	if (number == KVM_ARM_IRQ_CPU_IRQ)
+ 		bit_index = __ffs(HCR_VI);
+ 	else /* KVM_ARM_IRQ_CPU_FIQ */
+ 		bit_index = __ffs(HCR_VF);
+ 
+-	ptr = (unsigned long *)&vcpu->arch.irq_lines;
++	hcr = vcpu_hcr(vcpu);
+ 	if (level)
+-		set = test_and_set_bit(bit_index, ptr);
++		set = test_and_set_bit(bit_index, hcr);
+ 	else
+-		set = test_and_clear_bit(bit_index, ptr);
++		set = test_and_clear_bit(bit_index, hcr);
+ 
  	/*
- 	 * Force the panic string to be loaded from the literal pool,
- 	 * making sure it is a kernel address and not a PC-relative
-@@ -436,37 +446,31 @@ static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par,
- 		       read_sysreg(hpfar_el2), par, vcpu);
+ 	 * If we didn't change anything, no need to wake up or kick other CPUs
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index b36945d49986..d93d56d4cc5b 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -1987,7 +1987,7 @@ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+  */
+ void kvm_set_way_flush(struct kvm_vcpu *vcpu)
+ {
+-	unsigned long hcr = vcpu_get_hcr(vcpu);
++	unsigned long hcr = *vcpu_hcr(vcpu);
+ 
+ 	/*
+ 	 * If this is the first time we do a S/W operation
+@@ -2002,7 +2002,7 @@ void kvm_set_way_flush(struct kvm_vcpu *vcpu)
+ 		trace_kvm_set_way_flush(*vcpu_pc(vcpu),
+ 					vcpu_has_cache_enabled(vcpu));
+ 		stage2_flush_vm(vcpu->kvm);
+-		vcpu_set_hcr(vcpu, hcr | HCR_TVM);
++		*vcpu_hcr(vcpu) = hcr | HCR_TVM;
+ 	}
  }
  
--static void __hyp_text __hyp_call_panic_vhe(u64 spsr, u64 elr, u64 par,
--					    struct kvm_vcpu *vcpu)
-+static void __hyp_call_panic_vhe(u64 spsr, u64 elr, u64 par,
-+				 struct kvm_cpu_context *host_ctxt)
- {
-+	struct kvm_vcpu *vcpu;
-+	vcpu = host_ctxt->__hyp_running_vcpu;
-+
-+	__deactivate_traps(vcpu);
-+	__sysreg_restore_host_state(host_ctxt);
-+
- 	panic(__hyp_panic_string,
- 	      spsr,  elr,
- 	      read_sysreg_el2(esr),   read_sysreg_el2(far),
- 	      read_sysreg(hpfar_el2), par, vcpu);
- }
+@@ -2020,7 +2020,7 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled)
  
--static hyp_alternate_select(__hyp_call_panic,
--			    __hyp_call_panic_nvhe, __hyp_call_panic_vhe,
--			    ARM64_HAS_VIRT_HOST_EXTN);
--
- void __hyp_text __noreturn hyp_panic(struct kvm_cpu_context *host_ctxt)
- {
--	struct kvm_vcpu *vcpu = NULL;
--
- 	u64 spsr = read_sysreg_el2(spsr);
- 	u64 elr = read_sysreg_el2(elr);
- 	u64 par = read_sysreg(par_el1);
+ 	/* Caches are now on, stop trapping VM ops (until a S/W op) */
+ 	if (now_enabled)
+-		vcpu_set_hcr(vcpu, vcpu_get_hcr(vcpu) & ~HCR_TVM);
++		*vcpu_hcr(vcpu) &= ~HCR_TVM;
  
--	if (read_sysreg(vttbr_el2)) {
--		vcpu = host_ctxt->__hyp_running_vcpu;
--		__timer_disable_traps(vcpu);
--		__deactivate_traps(vcpu);
--		__deactivate_vm(vcpu);
--		__sysreg_restore_host_state(host_ctxt);
--	}
--
--	/* Call panic for real */
--	__hyp_call_panic()(spsr, elr, par, vcpu);
-+	if (!has_vhe())
-+		__hyp_call_panic_nvhe(spsr, elr, par, host_ctxt);
-+	else
-+		__hyp_call_panic_vhe(spsr, elr, par, host_ctxt);
- 
- 	unreachable();
+ 	trace_kvm_toggle_cache(*vcpu_pc(vcpu), was_enabled, now_enabled);
  }
 -- 
 2.14.2
