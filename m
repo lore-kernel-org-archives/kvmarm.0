@@ -1,7 +1,7 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v3 23/41] KVM: arm64: Don't save the host ELR_EL2 and SPSR_EL2 on VHE systems
-Date: Fri, 12 Jan 2018 13:07:29 +0100
-Message-ID: <20180112120747.27999-24-christoffer.dall@linaro.org>
+Subject: [PATCH v3 32/41] KVM: arm64: Move common VHE/non-VHE trap config in separate functions
+Date: Fri, 12 Jan 2018 13:07:38 +0100
+Message-ID: <20180112120747.27999-33-christoffer.dall@linaro.org>
 References: <20180112120747.27999-1-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20180112120747.27999-1-christoffer.dall@linaro.org>
@@ -10,79 +10,110 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On non-VHE systems we need to save the ELR_EL2 and SPSR_EL2 so that we can
-return to the host in EL1 in the same state and location where we issued a
-hypercall to EL2, but on VHE ELR_EL2 and SPSR_EL2 are not useful because we
-never enter a guest as a result of an exception entry that would be directly
-handled by KVM. The kernel entry code already saves ELR_EL1/SPSR_EL1 on
-exception entry, which is enough.  Therefore, factor out these registers into
-separate save/restore functions, making it easy to exclude them from the VHE
-world-switch path later on.
+As we are about to be more lazy with some of the trap configuration
+register read/writes for VHE systems, move the logic that is currently
+shared between VHE and non-VHE into a separate function which can be
+called from either the world-switch path or from vcpu_load/vcpu_put.
 
 Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/kvm/hyp/sysreg-sr.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ arch/arm64/kvm/hyp/switch.c | 68 ++++++++++++++++++++++++++-------------------
+ 1 file changed, 39 insertions(+), 29 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-index baa243a010b3..1f2d5e9343b0 100644
---- a/arch/arm64/kvm/hyp/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-@@ -71,6 +71,10 @@ static void __hyp_text __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
- 	ctxt->gp_regs.sp_el1		= read_sysreg(sp_el1);
- 	ctxt->gp_regs.elr_el1		= read_sysreg_el1(elr);
- 	ctxt->gp_regs.spsr[KVM_SPSR_EL1]= read_sysreg_el1(spsr);
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 05f266b505ce..c01bcfc3fb52 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -24,6 +24,43 @@
+ #include <asm/fpsimd.h>
+ #include <asm/debug-monitors.h>
+ 
++static void __hyp_text __activate_traps_common(struct kvm_vcpu *vcpu)
++{
++	/*
++	 * We are about to set CPTR_EL2.TFP to trap all floating point
++	 * register accesses to EL2, however, the ARM ARM clearly states that
++	 * traps are only taken to EL2 if the operation would not otherwise
++	 * trap to EL1.  Therefore, always make sure that for 32-bit guests,
++	 * we set FPEXC.EN to prevent traps to EL1, when setting the TFP bit.
++	 * If FP/ASIMD is not implemented, FPEXC is UNDEFINED and any access to
++	 * it will cause an exception.
++	 */
++	if (vcpu_el1_is_32bit(vcpu) && system_supports_fpsimd() &&
++	    !vcpu->arch.guest_vfp_loaded) {
++		write_sysreg(1 << 30, fpexc32_el2);
++		isb();
++	}
++	write_sysreg(vcpu->arch.hcr_el2, hcr_el2);
++
++	/* Trap on AArch32 cp15 c15 (impdef sysregs) accesses (EL1 or EL0) */
++	write_sysreg(1 << 15, hstr_el2);
++	/*
++	 * Make sure we trap PMU access from EL0 to EL2. Also sanitize
++	 * PMSELR_EL0 to make sure it never contains the cycle
++	 * counter, which could make a PMXEVCNTR_EL0 access UNDEF at
++	 * EL1 instead of being trapped to EL2.
++	 */
++	write_sysreg(0, pmselr_el0);
++	write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
++	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
 +}
 +
-+static void __hyp_text __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
++static void __hyp_text __deactivate_traps_common(void)
 +{
- 	ctxt->gp_regs.regs.pc		= read_sysreg_el2(elr);
- 	ctxt->gp_regs.regs.pstate	= read_sysreg_el2(spsr);
- }
-@@ -80,6 +84,7 @@ void __hyp_text __sysreg_save_state_nvhe(struct kvm_cpu_context *ctxt)
- 	__sysreg_save_el1_state(ctxt);
- 	__sysreg_save_common_state(ctxt);
- 	__sysreg_save_user_state(ctxt);
-+	__sysreg_save_el2_return_state(ctxt);
- }
- 
- void sysreg_save_host_state_vhe(struct kvm_cpu_context *ctxt)
-@@ -93,6 +98,7 @@ void sysreg_save_guest_state_vhe(struct kvm_cpu_context *ctxt)
- 	__sysreg_save_el1_state(ctxt);
- 	__sysreg_save_common_state(ctxt);
- 	__sysreg_save_user_state(ctxt);
-+	__sysreg_save_el2_return_state(ctxt);
- }
- 
- static void __hyp_text __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
-@@ -137,6 +143,11 @@ static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
- 	write_sysreg(ctxt->gp_regs.sp_el1,		sp_el1);
- 	write_sysreg_el1(ctxt->gp_regs.elr_el1,		elr);
- 	write_sysreg_el1(ctxt->gp_regs.spsr[KVM_SPSR_EL1],spsr);
++	write_sysreg(0, hstr_el2);
++	write_sysreg(0, pmuserenr_el0);
 +}
 +
-+static void __hyp_text
-+__sysreg_restore_el2_return_state(struct kvm_cpu_context *ctxt)
-+{
- 	write_sysreg_el2(ctxt->gp_regs.regs.pc,		elr);
- 	write_sysreg_el2(ctxt->gp_regs.regs.pstate,	spsr);
- }
-@@ -146,6 +157,7 @@ void __hyp_text __sysreg_restore_state_nvhe(struct kvm_cpu_context *ctxt)
- 	__sysreg_restore_el1_state(ctxt);
- 	__sysreg_restore_common_state(ctxt);
- 	__sysreg_restore_user_state(ctxt);
-+	__sysreg_restore_el2_return_state(ctxt);
+ static void __hyp_text __activate_traps_vhe(struct kvm_vcpu *vcpu)
+ {
+ 	u64 val;
+@@ -59,33 +96,7 @@ static hyp_alternate_select(__activate_traps_arch,
+ 
+ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+ {
+-	/*
+-	 * We are about to set CPTR_EL2.TFP to trap all floating point
+-	 * register accesses to EL2, however, the ARM ARM clearly states that
+-	 * traps are only taken to EL2 if the operation would not otherwise
+-	 * trap to EL1.  Therefore, always make sure that for 32-bit guests,
+-	 * we set FPEXC.EN to prevent traps to EL1, when setting the TFP bit.
+-	 * If FP/ASIMD is not implemented, FPEXC is UNDEFINED and any access to
+-	 * it will cause an exception.
+-	 */
+-	if (vcpu_el1_is_32bit(vcpu) && system_supports_fpsimd() &&
+-	    !vcpu->arch.guest_vfp_loaded) {
+-		write_sysreg(1 << 30, fpexc32_el2);
+-		isb();
+-	}
+-	write_sysreg(vcpu->arch.hcr_el2, hcr_el2);
+-
+-	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
+-	write_sysreg(1 << 15, hstr_el2);
+-	/*
+-	 * Make sure we trap PMU access from EL0 to EL2. Also sanitize
+-	 * PMSELR_EL0 to make sure it never contains the cycle
+-	 * counter, which could make a PMXEVCNTR_EL0 access UNDEF at
+-	 * EL1 instead of being trapped to EL2.
+-	 */
+-	write_sysreg(0, pmselr_el0);
+-	write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
+-	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
++	__activate_traps_common(vcpu);
+ 	__activate_traps_arch()(vcpu);
  }
  
- void sysreg_restore_host_state_vhe(struct kvm_cpu_context *ctxt)
-@@ -159,6 +171,7 @@ void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt)
- 	__sysreg_restore_el1_state(ctxt);
- 	__sysreg_restore_common_state(ctxt);
- 	__sysreg_restore_user_state(ctxt);
-+	__sysreg_restore_el2_return_state(ctxt);
+@@ -131,9 +142,8 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
+ 	if (vcpu->arch.hcr_el2 & HCR_VSE)
+ 		vcpu->arch.hcr_el2 = read_sysreg(hcr_el2);
+ 
++	__deactivate_traps_common();
+ 	__deactivate_traps_arch()();
+-	write_sysreg(0, hstr_el2);
+-	write_sysreg(0, pmuserenr_el0);
  }
  
- static void __hyp_text __fpsimd32_save_state(struct kvm_cpu_context *ctxt)
+ static void __hyp_text __activate_vm(struct kvm *kvm)
 -- 
 2.14.2
