@@ -1,28 +1,27 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v4 10/19] KVM: arm/arm64: Do not use kern_hyp_va() with
- kvm_vgic_global_state
-Date: Mon, 15 Jan 2018 16:36:32 +0100
-Message-ID: <20180115153632.GK21403@cbox>
-References: <20180104184334.16571-1-marc.zyngier@arm.com>
- <20180104184334.16571-11-marc.zyngier@arm.com>
+Subject: Re: [PATCH v3 00/41] Optimize KVM/ARM for VHE systems
+Date: Mon, 15 Jan 2018 16:50:36 +0100
+Message-ID: <20180115155036.GL21403@cbox>
+References: <20180112120747.27999-1-christoffer.dall@linaro.org>
+ <20180115141423.5qho7xvmikq27jvs@yury-thinkpad>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D0A3849DDE
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 10:31:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B15BF49DDD
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 10:45:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tvN5qU03HdKz for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 Jan 2018 10:31:36 -0500 (EST)
-Received: from mail-wm0-f67.google.com (mail-wm0-f67.google.com [74.125.82.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C061B49DDD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 10:31:36 -0500 (EST)
-Received: by mail-wm0-f67.google.com with SMTP id i11so2767984wmf.4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 07:36:35 -0800 (PST)
+ with ESMTP id BKflSIm6b-en for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Jan 2018 10:45:40 -0500 (EST)
+Received: from mail-wm0-f65.google.com (mail-wm0-f65.google.com [74.125.82.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 42E9849DB5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 10:45:40 -0500 (EST)
+Received: by mail-wm0-f65.google.com with SMTP id x4so13115356wmc.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 07:50:39 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <20180104184334.16571-11-marc.zyngier@arm.com>
+In-Reply-To: <20180115141423.5qho7xvmikq27jvs@yury-thinkpad>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,106 +31,185 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Yury Norov <ynorov@caviumnetworks.com>
+Cc: Sunil Goutham <Sunil.Goutham@cavium.com>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jan 04, 2018 at 06:43:25PM +0000, Marc Zyngier wrote:
-> kvm_vgic_global_state is part of the read-only section, and is
-> usually accessed using a PC-relative address generation (adrp + add).
+Hi Yury,
+
+On Mon, Jan 15, 2018 at 05:14:23PM +0300, Yury Norov wrote:
+> On Fri, Jan 12, 2018 at 01:07:06PM +0100, Christoffer Dall wrote:
+> > This series redesigns parts of KVM/ARM to optimize the performance on
+> > VHE systems.  The general approach is to try to do as little work as
+> > possible when transitioning between the VM and the hypervisor.  This has
+> > the benefit of lower latency when waiting for interrupts and delivering
+> > virtual interrupts, and reduces the overhead of emulating behavior and
+> > I/O in the host kernel.
+> > 
+> > Patches 01 through 06 are not VHE specific, but rework parts of KVM/ARM
+> > that can be generally improved.  We then add infrastructure to move more
+> > logic into vcpu_load and vcpu_put, we improve handling of VFP and debug
+> > registers.
+> > 
+> > We then introduce a new world-switch function for VHE systems, which we
+> > can tweak and optimize for VHE systems.  To do that, we rework a lot of
+> > the system register save/restore handling and emulation code that may
+> > need access to system registers, so that we can defer as many system
+> > register save/restore operations to vcpu_load and vcpu_put, and move
+> > this logic out of the VHE world switch function.
+> > 
+> > We then optimize the configuration of traps.  On non-VHE systems, both
+> > the host and VM kernels run in EL1, but because the host kernel should
+> > have full access to the underlying hardware, but the VM kernel should
+> > not, we essentially make the host kernel more privileged than the VM
+> > kernel despite them both running at the same privilege level by enabling
+> > VE traps when entering the VM and disabling those traps when exiting the
+> > VM.  On VHE systems, the host kernel runs in EL2 and has full access to
+> > the hardware (as much as allowed by secure side software), and is
+> > unaffected by the trap configuration.  That means we can configure the
+> > traps for VMs running in EL1 once, and don't have to switch them on and
+> > off for every entry/exit to/from the VM.
+> > 
+> > Finally, we improve our VGIC handling by moving all save/restore logic
+> > out of the VHE world-switch, and we make it possible to truly only
+> > evaluate if the AP list is empty and not do *any* VGIC work if that is
+> > the case, and only do the minimal amount of work required in the course
+> > of the VGIC processing when we have virtual interrupts in flight.
+> > 
+> > The patches are based on v4.15-rc3, v9 of the level-triggered mapped
+> > interrupts support series [1], and the first five patches of James' SDEI
+> > series [2].
+> > 
+> > I've given the patches a fair amount of testing on Thunder-X, Mustang,
+> > Seattle, and TC2 (32-bit) for non-VHE testing, and tested VHE
+> > functionality on the Foundation model, running both 64-bit VMs and
+> > 32-bit VMs side-by-side and using both GICv3-on-GICv3 and
+> > GICv2-on-GICv3.
+> > 
+> > The patches are also available in the vhe-optimize-v3 branch on my
+> > kernel.org repository [3].  The vhe-optimize-v3-base branch contains
+> > prerequisites of this series.
+> > 
+> > Changes since v2:
+> >  - Rebased on v4.15-rc3.
+> >  - Includes two additional patches that only does vcpu_load after
+> >    kvm_vcpu_first_run_init and only for KVM_RUN.
+> >  - Addressed review comments from v2 (detailed changelogs are in the
+> >    individual patches).
+> > 
+> > Thanks,
+> > -Christoffer
+> > 
+> > [1]: git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git level-mapped-v9
+> > [2]: git://linux-arm.org/linux-jm.git sdei/v5/base
+> > [3]: git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git vhe-optimize-v3
 > 
-> It is thus useless to use kern_hyp_va() on it, and actively problematic
-> if kern_hyp_va() becomes non-idempotent. On the other hand, there is
-> no way that the compiler is going to guarantee that such access is
-> always be PC relative.
+> I tested this v3 series on ThunderX2 with IPI benchmark:
+> https://lkml.org/lkml/2017/12/11/364
+> 
+> I tried to address your comments in discussion to v2, like pinning
+> the module to specific CPU (with taskset), increasing the number of
+> iterations, tuning governor to max performance. Results didn't change
+> much, and are pretty stable.
 
-nit: is always be
+Thanks for testing this.
+> 
+> Comparing to vanilla guest, Norml IPI delivery for v3 is 20% slower.
+> For v2 it was 27% slower, and for v1 - 42% faster. What's interesting,
+> the acknowledge time is much faster for v3, so overall time to
+> deliver and acknowledge IPI (2nd column) is less than vanilla
+> 4.15-rc3 kernel.
+
+I don't see this from your results.  It looks like an IPI cost increases
+from 289 to 347?
+
+Also, acknowledging the IPI should be a constant cost (handled directly
+by hardware), so that's definitely an indication something is wrong.
 
 > 
-> So let's bite the bullet and provide our own accessor.
+> Test setup is not changed since v2: ThunderX2, 112 online CPUs,
+> guest is running under qemu-kvm, emulating gic version 3.
 > 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  arch/arm/include/asm/kvm_hyp.h   | 6 ++++++
->  arch/arm64/include/asm/kvm_hyp.h | 9 +++++++++
->  virt/kvm/arm/hyp/vgic-v2-sr.c    | 4 ++--
->  3 files changed, 17 insertions(+), 2 deletions(-)
+> Below is test results for v1-3 normalized to host vanilla kernel
+> dry-run time.
+
+There must be some bug in this series, but I'm unsure where it is, as I
+cannot observe it on the hardware I have at hand.
+
+Perhaps we mistakenly enable the GICv3 CPU interface trapping with this
+series or there is some other flow around the GIC which is broken.
+
+It would be interesting if you could measure the base exit cost using
+the cycle counter from the VM to the hypervisor between the two
+platforms.  That does require changing the host kernel to clear
+MDCR_EL2.TPM when running a guest (unsafe), and ensuring the cycle
+counter runs across EL2/1/0 (for example by running KVM under perf) and
+running a micro test that exits using a hypercall that does nothing
+(like getting the PSCI version).
+
+I'll investigate this some more later in the week.
+
+
 > 
-> diff --git a/arch/arm/include/asm/kvm_hyp.h b/arch/arm/include/asm/kvm_hyp.h
-> index ab20ffa8b9e7..1d42d0aa2feb 100644
-> --- a/arch/arm/include/asm/kvm_hyp.h
-> +++ b/arch/arm/include/asm/kvm_hyp.h
-> @@ -26,6 +26,12 @@
->  
->  #define __hyp_text __section(.hyp.text) notrace
->  
-> +#define hyp_symbol_addr(s)						\
-> +	({								\
-> +		typeof(s) *addr = &(s);					\
-> +		addr;							\
-> +	})
-> +
->  #define __ACCESS_VFP(CRn)			\
->  	"mrc", "mcr", __stringify(p10, 7, %0, CRn, cr0, 0), u32
->  
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index 08d3bb66c8b7..a2d98c539023 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -25,6 +25,15 @@
->  
->  #define __hyp_text __section(.hyp.text) notrace
->  
-> +#define hyp_symbol_addr(s)						\
-> +	({								\
-> +		typeof(s) *addr;					\
-> +		asm volatile("adrp	%0, %1\n"			\
-> +			     "add	%0, %0, :lo12:%1\n"		\
-> +			     : "=r" (addr) : "S" (&s));			\
-
-Can't we use adr_l here?
-
-> +		addr;							\
-> +	})
-> +
-
-I don't fully appreciate the semantics of this macro going by its name
-only.  My understanding is that if you want to resolve a symbol to an
-address which is mapped in hyp, then use this.  Is this correct?
-
-If so, can we add a small comment (because I can't come up with a better
-name).
-
-
->  #define read_sysreg_elx(r,nvh,vh)					\
->  	({								\
->  		u64 reg;						\
-> diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
-> index d7fd46fe9efb..4573d0552af3 100644
-> --- a/virt/kvm/arm/hyp/vgic-v2-sr.c
-> +++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
-> @@ -25,7 +25,7 @@
->  static void __hyp_text save_elrsr(struct kvm_vcpu *vcpu, void __iomem *base)
->  {
->  	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
-> -	int nr_lr = (kern_hyp_va(&kvm_vgic_global_state))->nr_lr;
-> +	int nr_lr = hyp_symbol_addr(kvm_vgic_global_state)->nr_lr;
->  	u32 elrsr0, elrsr1;
->  
->  	elrsr0 = readl_relaxed(base + GICH_ELRSR0);
-> @@ -139,7 +139,7 @@ int __hyp_text __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
->  		return -1;
->  
->  	rd = kvm_vcpu_dabt_get_rd(vcpu);
-> -	addr  = kern_hyp_va((kern_hyp_va(&kvm_vgic_global_state))->vcpu_base_va);
-> +	addr  = kern_hyp_va(hyp_symbol_addr(kvm_vgic_global_state)->vcpu_base_va);
->  	addr += fault_ipa - vgic->vgic_cpu_base;
->  
->  	if (kvm_vcpu_dabt_iswrite(vcpu)) {
-> -- 
-> 2.14.2
+> Yury
 > 
-Otherwise looks good.
+> Host, v4.14:
+> Dry-run:          0         1
+> Self-IPI:         9        18
+> Normal IPI:      81       110
+> Broadcast IPI:    0      2106
+> 
+> Guest, v4.14:
+> Dry-run:          0         1
+> Self-IPI:        10        18
+> Normal IPI:     305       525
+> Broadcast IPI:    0      9729
+> 
+> Guest, v4.14 + VHE:
+> Dry-run:          0         1
+> Self-IPI:         9        18
+> Normal IPI:     176       343
+> Broadcast IPI:    0      9885
+> 
+> And for v2.
+> 
+> Host, v4.15:                   
+> Dry-run:          0         1
+> Self-IPI:         9        18
+> Normal IPI:      79       108
+> Broadcast IPI:    0      2102
+>                         
+> Guest, v4.15-rc:
+> Dry-run:          0         1
+> Self-IPI:         9        18
+> Normal IPI:     291       526
+> Broadcast IPI:    0     10439
+> 
+> Guest, v4.15-rc + VHE:
+> Dry-run:          0         2
+> Self-IPI:        14        28
+> Normal IPI:     370       569
+> Broadcast IPI:    0     11688
+> 
+> And for v3.
+> 
+> Host 4.15-rc3					
+> Dry-run:	  0	    1
+> Self-IPI:	  9	   18
+> Normal IPI:	 80	  110
+> Broadcast IPI:	  0	 2088
+> 		
+> Guest, 4.15-rc3	
+> Dry-run:	  0	    1
+> Self-IPI:	  9	   18
+> Normal IPI:	289	  497
+> Broadcast IPI:	  0	 9999
+> 		
+> Guest, 4.15-rc3	+ VHE
+> Dry-run:	  0	    2
+> Self-IPI:	 12	   24
+> Normal IPI:	347	  490
+> Broadcast IPI:	  0	11906
 
 Thanks,
 -Christoffer
