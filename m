@@ -1,92 +1,184 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v4 09/19] arm64: cpufeatures: Drop the
- ARM64_HYP_OFFSET_LOW feature flag
-Date: Mon, 15 Jan 2018 12:48:27 +0100
-Message-ID: <20180115114827.GJ21403@cbox>
-References: <20180104184334.16571-1-marc.zyngier@arm.com>
- <20180104184334.16571-10-marc.zyngier@arm.com>
+From: Yury Norov <ynorov@caviumnetworks.com>
+Subject: Re: [PATCH v3 00/41] Optimize KVM/ARM for VHE systems
+Date: Mon, 15 Jan 2018 17:14:23 +0300
+Message-ID: <20180115141423.5qho7xvmikq27jvs@yury-thinkpad>
+References: <20180112120747.27999-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C7E349E00
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 09:09:45 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id gfrSQbU4XGQ3 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Jan 2018 09:09:43 -0500 (EST)
+Received: from NAM01-BN3-obe.outbound.protection.outlook.com
+ (mail-bn3nam01on0073.outbound.protection.outlook.com [104.47.33.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B436E49DBF
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 09:09:43 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <20180104184334.16571-10-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>, Steve Capper <steve.capper@arm.com>, Peter Maydell <peter.maydell@linaro.org>
+In-Reply-To: <20180112120747.27999-1-christoffer.dall@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Sunil Goutham <Sunil.Goutham@cavium.com>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jan 04, 2018 at 06:43:24PM +0000, Marc Zyngier wrote:
-> Now that we can dynamically compute the kernek/hyp VA mask, there
+Hi Christoffer,
 
-nit: s/kernek/kernel/
+[CC Sunil Goutham <Sunil.Goutham@cavium.com>]
 
-> is need for a feature flag to trigger the alternative patching.
-
-is *no* need?
-
-> Let's drop the flag and everything that depends on it.
-
-Otherwise:
-
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
-
+On Fri, Jan 12, 2018 at 01:07:06PM +0100, Christoffer Dall wrote:
+> This series redesigns parts of KVM/ARM to optimize the performance on
+> VHE systems.  The general approach is to try to do as little work as
+> possible when transitioning between the VM and the hypervisor.  This has
+> the benefit of lower latency when waiting for interrupts and delivering
+> virtual interrupts, and reduces the overhead of emulating behavior and
+> I/O in the host kernel.
 > 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  arch/arm64/include/asm/cpucaps.h |  2 +-
->  arch/arm64/kernel/cpufeature.c   | 19 -------------------
->  2 files changed, 1 insertion(+), 20 deletions(-)
+> Patches 01 through 06 are not VHE specific, but rework parts of KVM/ARM
+> that can be generally improved.  We then add infrastructure to move more
+> logic into vcpu_load and vcpu_put, we improve handling of VFP and debug
+> registers.
 > 
-> diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-> index 2ff7c5e8efab..f130f35dca3c 100644
-> --- a/arch/arm64/include/asm/cpucaps.h
-> +++ b/arch/arm64/include/asm/cpucaps.h
-> @@ -32,7 +32,7 @@
->  #define ARM64_HAS_VIRT_HOST_EXTN		11
->  #define ARM64_WORKAROUND_CAVIUM_27456		12
->  #define ARM64_HAS_32BIT_EL0			13
-> -#define ARM64_HYP_OFFSET_LOW			14
-> +/* #define ARM64_UNALLOCATED_ENTRY			14 */
->  #define ARM64_MISMATCHED_CACHE_LINE_SIZE	15
->  #define ARM64_HAS_NO_FPSIMD			16
->  #define ARM64_WORKAROUND_REPEAT_TLBI		17
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index a73a5928f09b..b99f8b1688c3 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -825,19 +825,6 @@ static bool runs_at_el2(const struct arm64_cpu_capabilities *entry, int __unused
->  	return is_kernel_in_hyp_mode();
->  }
->  
-> -static bool hyp_offset_low(const struct arm64_cpu_capabilities *entry,
-> -			   int __unused)
-> -{
-> -	phys_addr_t idmap_addr = __pa_symbol(__hyp_idmap_text_start);
-> -
-> -	/*
-> -	 * Activate the lower HYP offset only if:
-> -	 * - the idmap doesn't clash with it,
-> -	 * - the kernel is not running at EL2.
-> -	 */
-> -	return idmap_addr > GENMASK(VA_BITS - 2, 0) && !is_kernel_in_hyp_mode();
-> -}
-> -
->  static bool has_no_fpsimd(const struct arm64_cpu_capabilities *entry, int __unused)
->  {
->  	u64 pfr0 = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
-> @@ -926,12 +913,6 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
->  		.field_pos = ID_AA64PFR0_EL0_SHIFT,
->  		.min_field_value = ID_AA64PFR0_EL0_32BIT_64BIT,
->  	},
-> -	{
-> -		.desc = "Reduced HYP mapping offset",
-> -		.capability = ARM64_HYP_OFFSET_LOW,
-> -		.def_scope = SCOPE_SYSTEM,
-> -		.matches = hyp_offset_low,
-> -	},
->  	{
->  		/* FP/SIMD is not implemented */
->  		.capability = ARM64_HAS_NO_FPSIMD,
-> -- 
-> 2.14.2
+> We then introduce a new world-switch function for VHE systems, which we
+> can tweak and optimize for VHE systems.  To do that, we rework a lot of
+> the system register save/restore handling and emulation code that may
+> need access to system registers, so that we can defer as many system
+> register save/restore operations to vcpu_load and vcpu_put, and move
+> this logic out of the VHE world switch function.
 > 
+> We then optimize the configuration of traps.  On non-VHE systems, both
+> the host and VM kernels run in EL1, but because the host kernel should
+> have full access to the underlying hardware, but the VM kernel should
+> not, we essentially make the host kernel more privileged than the VM
+> kernel despite them both running at the same privilege level by enabling
+> VE traps when entering the VM and disabling those traps when exiting the
+> VM.  On VHE systems, the host kernel runs in EL2 and has full access to
+> the hardware (as much as allowed by secure side software), and is
+> unaffected by the trap configuration.  That means we can configure the
+> traps for VMs running in EL1 once, and don't have to switch them on and
+> off for every entry/exit to/from the VM.
+> 
+> Finally, we improve our VGIC handling by moving all save/restore logic
+> out of the VHE world-switch, and we make it possible to truly only
+> evaluate if the AP list is empty and not do *any* VGIC work if that is
+> the case, and only do the minimal amount of work required in the course
+> of the VGIC processing when we have virtual interrupts in flight.
+> 
+> The patches are based on v4.15-rc3, v9 of the level-triggered mapped
+> interrupts support series [1], and the first five patches of James' SDEI
+> series [2].
+> 
+> I've given the patches a fair amount of testing on Thunder-X, Mustang,
+> Seattle, and TC2 (32-bit) for non-VHE testing, and tested VHE
+> functionality on the Foundation model, running both 64-bit VMs and
+> 32-bit VMs side-by-side and using both GICv3-on-GICv3 and
+> GICv2-on-GICv3.
+> 
+> The patches are also available in the vhe-optimize-v3 branch on my
+> kernel.org repository [3].  The vhe-optimize-v3-base branch contains
+> prerequisites of this series.
+> 
+> Changes since v2:
+>  - Rebased on v4.15-rc3.
+>  - Includes two additional patches that only does vcpu_load after
+>    kvm_vcpu_first_run_init and only for KVM_RUN.
+>  - Addressed review comments from v2 (detailed changelogs are in the
+>    individual patches).
+> 
+> Thanks,
+> -Christoffer
+> 
+> [1]: git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git level-mapped-v9
+> [2]: git://linux-arm.org/linux-jm.git sdei/v5/base
+> [3]: git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git vhe-optimize-v3
+
+I tested this v3 series on ThunderX2 with IPI benchmark:
+https://lkml.org/lkml/2017/12/11/364
+
+I tried to address your comments in discussion to v2, like pinning
+the module to specific CPU (with taskset), increasing the number of
+iterations, tuning governor to max performance. Results didn't change
+much, and are pretty stable.
+
+Comparing to vanilla guest, Norml IPI delivery for v3 is 20% slower.
+For v2 it was 27% slower, and for v1 - 42% faster. What's interesting,
+the acknowledge time is much faster for v3, so overall time to
+deliver and acknowledge IPI (2nd column) is less than vanilla
+4.15-rc3 kernel.
+
+Test setup is not changed since v2: ThunderX2, 112 online CPUs,
+guest is running under qemu-kvm, emulating gic version 3.
+
+Below is test results for v1-3 normalized to host vanilla kernel
+dry-run time.
+
+Yury
+
+Host, v4.14:
+Dry-run:          0         1
+Self-IPI:         9        18
+Normal IPI:      81       110
+Broadcast IPI:    0      2106
+
+Guest, v4.14:
+Dry-run:          0         1
+Self-IPI:        10        18
+Normal IPI:     305       525
+Broadcast IPI:    0      9729
+
+Guest, v4.14 + VHE:
+Dry-run:          0         1
+Self-IPI:         9        18
+Normal IPI:     176       343
+Broadcast IPI:    0      9885
+
+And for v2.
+
+Host, v4.15:                   
+Dry-run:          0         1
+Self-IPI:         9        18
+Normal IPI:      79       108
+Broadcast IPI:    0      2102
+                        
+Guest, v4.15-rc:
+Dry-run:          0         1
+Self-IPI:         9        18
+Normal IPI:     291       526
+Broadcast IPI:    0     10439
+
+Guest, v4.15-rc + VHE:
+Dry-run:          0         2
+Self-IPI:        14        28
+Normal IPI:     370       569
+Broadcast IPI:    0     11688
+
+And for v3.
+
+Host 4.15-rc3					
+Dry-run:	  0	    1
+Self-IPI:	  9	   18
+Normal IPI:	 80	  110
+Broadcast IPI:	  0	 2088
+		
+Guest, 4.15-rc3	
+Dry-run:	  0	    1
+Self-IPI:	  9	   18
+Normal IPI:	289	  497
+Broadcast IPI:	  0	 9999
+		
+Guest, 4.15-rc3	+ VHE
+Dry-run:	  0	    2
+Self-IPI:	 12	   24
+Normal IPI:	347	  490
+Broadcast IPI:	  0	11906
