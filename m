@@ -1,23 +1,22 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH v6 08/13] KVM: arm64: Set an impdef ESR for Virtual-SError
- using VSESR_EL2.
-Date: Mon, 15 Jan 2018 19:39:01 +0000
-Message-ID: <20180115193906.30053-9-james.morse@arm.com>
+Subject: [PATCH v6 07/13] KVM: arm/arm64: mask/unmask daif around VHE guests
+Date: Mon, 15 Jan 2018 19:39:00 +0000
+Message-ID: <20180115193906.30053-8-james.morse@arm.com>
 References: <20180115193906.30053-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CECB449E2F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 14:36:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F7BC49DFA
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 14:36:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id z4ipXgh0EbaX for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 Jan 2018 14:36:54 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 89A1349DFA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 14:36:54 -0500 (EST)
+ with ESMTP id SRNtmeUz1mcz for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Jan 2018 14:36:52 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0165949E19
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 14:36:52 -0500 (EST)
 In-Reply-To: <20180115193906.30053-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,129 +31,94 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Prior to v8.2's RAS Extensions, the HCR_EL2.VSE 'virtual SError' feature
-generated an SError with an implementation defined ESR_EL1.ISS, because we
-had no mechanism to specify the ESR value.
+Non-VHE systems take an exception to EL2 in order to world-switch into the
+guest. When returning from the guest KVM implicitly restores the DAIF
+flags when it returns to the kernel at EL1.
 
-On Juno this generates an all-zero ESR, the most significant bit 'ISV'
-is clear indicating the remainder of the ISS field is invalid.
+With VHE none of this exception-level jumping happens, so KVMs
+world-switch code is exposed to the host kernel's DAIF values, and KVM
+spills the guest-exit DAIF values back into the host kernel.
+On entry to a guest we have Debug and SError exceptions unmasked, KVM
+has switched VBAR but isn't prepared to handle these. On guest exit
+Debug exceptions are left disabled once we return to the host and will
+stay this way until we enter user space.
 
-With the RAS Extensions we have a mechanism to specify this value, and the
-most significant bit has a new meaning: 'IDS - Implementation Defined
-Syndrome'. An all-zero SError ESR now means: 'RAS error: Uncategorized'
-instead of 'no valid ISS'.
+Add a helper to mask/unmask DAIF around VHE guests. The unmask can only
+happen after the hosts VBAR value has been synchronised by the isb in
+__vhe_hyp_call (via kvm_call_hyp()). Masking could be as late as
+setting KVMs VBAR value, but is kept here for symmetry.
 
-Add KVM support for the VSESR_EL2 register to specify an ESR value when
-HCR_EL2.VSE generates a virtual SError. Change kvm_inject_vabt() to
-specify an implementation-defined value.
-
-We only need to restore the VSESR_EL2 value when HCR_EL2.VSE is set, KVM
-save/restores this bit during __{,de}activate_traps() and hardware clears the
-bit once the guest has consumed the virtual-SError.
-
-Future patches may add an API (or KVM CAP) to pend a virtual SError with
-a specified ESR.
-
-Cc: Dongjiu Geng <gengdongjiu@huawei.com>
 Signed-off-by: James Morse <james.morse@arm.com>
 Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
+This isn't backportable because of the 'daif' helpers, I will produce a
+backport once its merged.
+
 Changes since v4:
- * Fixed an uncatagorized typo
+ * Added empty declarations for 32bit. (how did I miss that?)
 
- arch/arm64/include/asm/kvm_emulate.h |  5 +++++
- arch/arm64/include/asm/kvm_host.h    |  3 +++
- arch/arm64/include/asm/sysreg.h      |  1 +
- arch/arm64/kvm/hyp/switch.c          |  3 +++
- arch/arm64/kvm/inject_fault.c        | 13 ++++++++++++-
- 5 files changed, 24 insertions(+), 1 deletion(-)
+v5 of this patch missed a Reviewed-by, which comes from here:
+https://patchwork.kernel.org/patch/10017467/
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 5f28dfa14cee..6d3614795197 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -64,6 +64,11 @@ static inline void vcpu_set_hcr(struct kvm_vcpu *vcpu, unsigned long hcr)
- 	vcpu->arch.hcr_el2 = hcr;
- }
+ arch/arm/include/asm/kvm_host.h   |  2 ++
+ arch/arm64/include/asm/kvm_host.h | 10 ++++++++++
+ virt/kvm/arm/arm.c                |  4 ++++
+ 3 files changed, 16 insertions(+)
+
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index a9f7d3f47134..b86fc4162539 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -301,4 +301,6 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+ /* All host FP/SIMD state is restored on guest exit, so nothing to save: */
+ static inline void kvm_fpsimd_flush_cpu_state(void) {}
  
-+static inline void vcpu_set_vsesr(struct kvm_vcpu *vcpu, u64 vsesr)
-+{
-+	vcpu->arch.vsesr_el2 = vsesr;
-+}
-+
- static inline unsigned long *vcpu_pc(const struct kvm_vcpu *vcpu)
- {
- 	return (unsigned long *)&vcpu_gp_regs(vcpu)->regs.pc;
++static inline void kvm_arm_vhe_guest_enter(void) {}
++static inline void kvm_arm_vhe_guest_exit(void) {}
+ #endif /* __ARM_KVM_HOST_H__ */
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index dcdd08edf5a5..3014b39b8fe2 100644
+index 7ee72b402907..dcdd08edf5a5 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -280,6 +280,9 @@ struct kvm_vcpu_arch {
- 
- 	/* Detect first run of a vcpu */
- 	bool has_run_once;
-+
-+	/* Virtual SError ESR to restore when HCR_EL2.VSE is set */
-+	u64 vsesr_el2;
- };
- 
- #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.gp_regs)
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 115b89aeec00..aec10f75a43c 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -355,6 +355,7 @@
- 
- #define SYS_DACR32_EL2			sys_reg(3, 4, 3, 0, 0)
- #define SYS_IFSR32_EL2			sys_reg(3, 4, 5, 0, 1)
-+#define SYS_VSESR_EL2			sys_reg(3, 4, 5, 2, 3)
- #define SYS_FPEXC32_EL2			sys_reg(3, 4, 5, 3, 0)
- 
- #define __SYS__AP0Rx_EL2(x)		sys_reg(3, 4, 12, 8, x)
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 324f4202cdd5..b425b8aab45b 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -94,6 +94,9 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
- 
- 	write_sysreg(val, hcr_el2);
- 
-+	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN) && (val & HCR_VSE))
-+		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
-+
- 	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
- 	write_sysreg(1 << 15, hstr_el2);
- 	/*
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index 8ecbcb40e317..60666a056944 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -164,14 +164,25 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
- 		inject_undef64(vcpu);
+@@ -25,6 +25,7 @@
+ #include <linux/types.h>
+ #include <linux/kvm_types.h>
+ #include <asm/cpufeature.h>
++#include <asm/daifflags.h>
+ #include <asm/fpsimd.h>
+ #include <asm/kvm.h>
+ #include <asm/kvm_asm.h>
+@@ -398,4 +399,13 @@ static inline void kvm_fpsimd_flush_cpu_state(void)
+ 		sve_flush_cpu_state();
  }
  
-+static void pend_guest_serror(struct kvm_vcpu *vcpu, u64 esr)
++static inline void kvm_arm_vhe_guest_enter(void)
 +{
-+	vcpu_set_vsesr(vcpu, esr);
-+	vcpu_set_hcr(vcpu, vcpu_get_hcr(vcpu) | HCR_VSE);
++	local_daif_mask();
 +}
 +
- /**
-  * kvm_inject_vabt - inject an async abort / SError into the guest
-  * @vcpu: The VCPU to receive the exception
-  *
-  * It is assumed that this code is called from the VCPU thread and that the
-  * VCPU therefore is not currently executing guest code.
-+ *
-+ * Systems with the RAS Extensions specify an imp-def ESR (ISV/IDS = 1) with
-+ * the remaining ISS all-zeros so that this error is not interpreted as an
-+ * uncategorized RAS error. Without the RAS Extensions we can't specify an ESR
-+ * value, so the CPU generates an imp-def value.
-  */
- void kvm_inject_vabt(struct kvm_vcpu *vcpu)
- {
--	vcpu_set_hcr(vcpu, vcpu_get_hcr(vcpu) | HCR_VSE);
-+	pend_guest_serror(vcpu, ESR_ELx_ISV);
- }
++static inline void kvm_arm_vhe_guest_exit(void)
++{
++	local_daif_restore(DAIF_PROCCTX_NOIRQ);
++}
+ #endif /* __ARM64_KVM_HOST_H__ */
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 2fc6009a766c..38e81631fc91 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -704,9 +704,13 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		 */
+ 		trace_kvm_entry(*vcpu_pc(vcpu));
+ 		guest_enter_irqoff();
++		if (has_vhe())
++			kvm_arm_vhe_guest_enter();
+ 
+ 		ret = kvm_call_hyp(__kvm_vcpu_run, vcpu);
+ 
++		if (has_vhe())
++			kvm_arm_vhe_guest_exit();
+ 		vcpu->mode = OUTSIDE_GUEST_MODE;
+ 		vcpu->stat.exits++;
+ 		/*
 -- 
 2.15.1
