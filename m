@@ -1,21 +1,24 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH v6 00/13] arm64/KVM: RAS & IESB for firmware first support
-Date: Mon, 15 Jan 2018 19:38:53 +0000
-Message-ID: <20180115193906.30053-1-james.morse@arm.com>
+Subject: [PATCH v6 01/13] arm64: cpufeature: __this_cpu_has_cap() shouldn't
+ stop early
+Date: Mon, 15 Jan 2018 19:38:54 +0000
+Message-ID: <20180115193906.30053-2-james.morse@arm.com>
+References: <20180115193906.30053-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C34049E06
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 14:36:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6112849E07
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 14:36:37 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QGQj3PAgakBE for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 Jan 2018 14:36:33 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A605149DE6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 14:36:33 -0500 (EST)
+ with ESMTP id Pzepp6Kngsnl for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Jan 2018 14:36:36 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 63EC449DE6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 14:36:36 -0500 (EST)
+In-Reply-To: <20180115193906.30053-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,104 +32,43 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hello,
+this_cpu_has_cap() tests caps->desc not caps->matches, so it stops
+walking the list when it finds a 'silent' feature, instead of
+walking to the end of the list.
 
-The aim of this series is to enable IESB to let us kick any pending RAS
-errors into firmware to be handled by firmware-first.
+Prior to v4.6's 644c2ae198412 ("arm64: cpufeature: Test 'matches' pointer
+to find the end of the list") we always tested desc to find the end of
+a capability list. This was changed for dubious things like PAN_NOT_UAO.
+v4.7's e3661b128e53e ("arm64: Allow a capability to be checked on
+single CPU") added this_cpu_has_cap() using the old desc style test.
 
-v6 is a rebase onto arm64's for-next/core branch to fix the conflicts.
+CC: Suzuki K Poulose <suzuki.poulose@arm.com>
+CC: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: James Morse <james.morse@arm.com>
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+---
+So far only ARM64_HAS_SYSREG_GIC_CPUIF and errata use this_cpu_has_cap(),
+all the errata have descriptions, and the GIC_CPUIF feature is first in
+the list, so its not possible to hit this with mainline. I don't think
+this should go to stable - this is not intended as a fix.
 
-I've picked up the Reviewed-by's from v4 that I missed on patches 7, 9 and 13,
-(they have the relevant patchwork links). Please call me names if I missed any
-more! (Dropped on patches 11 & 12 is deliberate due to handle_exit_early())
+ arch/arm64/kernel/cpufeature.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-
-Not all systems will have firmware support, so these RAS errors will become
-pending SErrors delivered to the kernel. The first part of the series adds
-some crude categorization for SErrors into 'fatal' or ignorable. This stops us
-panic()ing for corrected errors, but we make no attempt to handle the error.
-Proper kernel-first support will be able to do a much better job here.
-
-The second part of the series provides the same minimal handling for SError
-that interrupt KVM. KVM is currently unable to handle SErrors during
-world-switch, unless they occur during a magic single-instruction window,
-it hyp-panics. I suspect this will be easier to fix once the VHE world-switch
-is further optimised.
-
-KVMs kvm_inject_vabt() needs updating for v8.2 as now we can specify an ESR,
-and all-zeros has a RAS meaning.
-
-Until we have kernel-first support, containable RAS errors that interrupt a
-guest are considered by KVM using the same crude categorization the arch code
-uses. Fatal errors are treated as an impdef-SError, non-fatal errors are
-ignored. Again, proper kernel-first support will do better.
-(uncontained errors from a guest will always cause the host to panic)
-
-
-Known issues:
- * Synchronous external abort SET severity is not yet considered, all
-   synchronous-external-aborts are still considered fatal.
-
- * KVM-Migration: HCR_EL2.VSE and VSESR_EL2 cannot be migrated when the guest
-   has an SError pending. An API using {G,S}ET_EVENTS is on my todo list.
-
- * KVM unmasks SError and IRQ before calling handle_exit_early, we may take
-   interrupts while holding an uncontained ESR... (this is currently an
-   improvement on assuming its an impdef error we can blame on the guest)
-    * We need to fix this for APEI's SEI or kernel-first RAS, the guest-exit
-      SError handling will need to move to before kvm_arm_vhe_guest_exit(),
-      or at least into a region where SError and IRQ is still masked.
-
-Thanks,
-
-James
-
-
-Dongjiu Geng (1):
-  KVM: arm64: Emulate RAS error registers and set HCR_EL2's TERR & TEA
-
-James Morse (11):
-  arm64: cpufeature: __this_cpu_has_cap() shouldn't stop early
-  arm64: sysreg: Move to use definitions for all the SCTLR bits
-  arm64: kernel: Survive corrected RAS errors notified by SError
-  arm64: Unconditionally enable IESB on exception entry/return for
-    firmware-first
-  arm64: kernel: Prepare for a DISR user
-  KVM: arm/arm64: mask/unmask daif around VHE guests
-  KVM: arm64: Set an impdef ESR for Virtual-SError using VSESR_EL2.
-  KVM: arm64: Save/Restore guest DISR_EL1
-  KVM: arm64: Save ESR_EL2 on guest SError
-  KVM: arm64: Handle RAS SErrors from EL1 on guest exit
-  KVM: arm64: Handle RAS SErrors from EL2 on guest exit
-
-Xie XiuQi (1):
-  arm64: cpufeature: Detect CPU RAS Extentions
-
- arch/arm/include/asm/kvm_host.h      |  5 +++
- arch/arm64/Kconfig                   | 16 +++++++
- arch/arm64/include/asm/assembler.h   |  7 ++++
- arch/arm64/include/asm/cpucaps.h     |  3 +-
- arch/arm64/include/asm/esr.h         | 20 +++++++++
- arch/arm64/include/asm/exception.h   | 14 +++++++
- arch/arm64/include/asm/kvm_arm.h     |  2 +
- arch/arm64/include/asm/kvm_emulate.h | 17 ++++++++
- arch/arm64/include/asm/kvm_host.h    | 17 ++++++++
- arch/arm64/include/asm/processor.h   |  1 +
- arch/arm64/include/asm/sysreg.h      | 81 +++++++++++++++++++++++++++++++++++-
- arch/arm64/include/asm/traps.h       | 54 ++++++++++++++++++++++++
- arch/arm64/kernel/asm-offsets.c      |  1 +
- arch/arm64/kernel/cpufeature.c       | 26 +++++++++++-
- arch/arm64/kernel/head.S             | 13 ++----
- arch/arm64/kernel/traps.c            | 51 ++++++++++++++++++++---
- arch/arm64/kvm/handle_exit.c         | 32 +++++++++++++-
- arch/arm64/kvm/hyp/entry.S           | 13 ++++++
- arch/arm64/kvm/hyp/switch.c          | 12 ++++--
- arch/arm64/kvm/hyp/sysreg-sr.c       |  6 +++
- arch/arm64/kvm/inject_fault.c        | 13 +++++-
- arch/arm64/kvm/sys_regs.c            | 11 +++++
- arch/arm64/mm/proc.S                 | 29 +++----------
- virt/kvm/arm/arm.c                   |  7 ++++
- 24 files changed, 402 insertions(+), 49 deletions(-)
-
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 9ef84d0def9a..d88cd0e88606 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -1303,8 +1303,8 @@ static bool __this_cpu_has_cap(const struct arm64_cpu_capabilities *cap_array,
+ 	if (WARN_ON(preemptible()))
+ 		return false;
+ 
+-	for (caps = cap_array; caps->desc; caps++)
+-		if (caps->capability == cap && caps->matches)
++	for (caps = cap_array; caps->matches; caps++)
++		if (caps->capability == cap)
+ 			return caps->matches(caps, SCOPE_LOCAL_CPU);
+ 
+ 	return false;
 -- 
 2.15.1
