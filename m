@@ -1,22 +1,22 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH v6 07/13] KVM: arm/arm64: mask/unmask daif around VHE guests
-Date: Mon, 15 Jan 2018 19:39:00 +0000
-Message-ID: <20180115193906.30053-8-james.morse@arm.com>
+Subject: [PATCH v6 09/13] KVM: arm64: Save/Restore guest DISR_EL1
+Date: Mon, 15 Jan 2018 19:39:02 +0000
+Message-ID: <20180115193906.30053-10-james.morse@arm.com>
 References: <20180115193906.30053-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F7BC49DFA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 14:36:53 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8592449E19
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 14:36:59 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SRNtmeUz1mcz for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 Jan 2018 14:36:52 -0500 (EST)
+ with ESMTP id j-KGKXt+FtYh for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Jan 2018 14:36:58 -0500 (EST)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0165949E19
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 14:36:52 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2778D49DFA
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 14:36:57 -0500 (EST)
 In-Reply-To: <20180115193906.30053-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,94 +31,86 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Non-VHE systems take an exception to EL2 in order to world-switch into the
-guest. When returning from the guest KVM implicitly restores the DAIF
-flags when it returns to the kernel at EL1.
+If we deliver a virtual SError to the guest, the guest may defer it
+with an ESB instruction. The guest reads the deferred value via DISR_EL1,
+but the guests view of DISR_EL1 is re-mapped to VDISR_EL2 when HCR_EL2.AMO
+is set.
 
-With VHE none of this exception-level jumping happens, so KVMs
-world-switch code is exposed to the host kernel's DAIF values, and KVM
-spills the guest-exit DAIF values back into the host kernel.
-On entry to a guest we have Debug and SError exceptions unmasked, KVM
-has switched VBAR but isn't prepared to handle these. On guest exit
-Debug exceptions are left disabled once we return to the host and will
-stay this way until we enter user space.
-
-Add a helper to mask/unmask DAIF around VHE guests. The unmask can only
-happen after the hosts VBAR value has been synchronised by the isb in
-__vhe_hyp_call (via kvm_call_hyp()). Masking could be as late as
-setting KVMs VBAR value, but is kept here for symmetry.
+Add the KVM code to save/restore VDISR_EL2, and make it accessible to
+userspace as DISR_EL1.
 
 Signed-off-by: James Morse <james.morse@arm.com>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
-This isn't backportable because of the 'daif' helpers, I will produce a
-backport once its merged.
+v5 of this patch missed some Reviewed-bys, which came from here:
+https://patchwork.kernel.org/patch/10017465/
 
-Changes since v4:
- * Added empty declarations for 32bit. (how did I miss that?)
+ arch/arm64/include/asm/kvm_host.h | 1 +
+ arch/arm64/include/asm/sysreg.h   | 1 +
+ arch/arm64/kvm/hyp/sysreg-sr.c    | 6 ++++++
+ arch/arm64/kvm/sys_regs.c         | 1 +
+ 4 files changed, 9 insertions(+)
 
-v5 of this patch missed a Reviewed-by, which comes from here:
-https://patchwork.kernel.org/patch/10017467/
-
- arch/arm/include/asm/kvm_host.h   |  2 ++
- arch/arm64/include/asm/kvm_host.h | 10 ++++++++++
- virt/kvm/arm/arm.c                |  4 ++++
- 3 files changed, 16 insertions(+)
-
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index a9f7d3f47134..b86fc4162539 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -301,4 +301,6 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
- /* All host FP/SIMD state is restored on guest exit, so nothing to save: */
- static inline void kvm_fpsimd_flush_cpu_state(void) {}
- 
-+static inline void kvm_arm_vhe_guest_enter(void) {}
-+static inline void kvm_arm_vhe_guest_exit(void) {}
- #endif /* __ARM_KVM_HOST_H__ */
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 7ee72b402907..dcdd08edf5a5 100644
+index 3014b39b8fe2..84fcb2a896a1 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -25,6 +25,7 @@
- #include <linux/types.h>
- #include <linux/kvm_types.h>
- #include <asm/cpufeature.h>
-+#include <asm/daifflags.h>
- #include <asm/fpsimd.h>
- #include <asm/kvm.h>
- #include <asm/kvm_asm.h>
-@@ -398,4 +399,13 @@ static inline void kvm_fpsimd_flush_cpu_state(void)
- 		sve_flush_cpu_state();
+@@ -121,6 +121,7 @@ enum vcpu_sysreg {
+ 	PAR_EL1,	/* Physical Address Register */
+ 	MDSCR_EL1,	/* Monitor Debug System Control Register */
+ 	MDCCINT_EL1,	/* Monitor Debug Comms Channel Interrupt Enable Reg */
++	DISR_EL1,	/* Deferred Interrupt Status Register */
+ 
+ 	/* Performance Monitors Registers */
+ 	PMCR_EL0,	/* Control Register */
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index aec10f75a43c..e213bd92e998 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -358,6 +358,7 @@
+ #define SYS_VSESR_EL2			sys_reg(3, 4, 5, 2, 3)
+ #define SYS_FPEXC32_EL2			sys_reg(3, 4, 5, 3, 0)
+ 
++#define SYS_VDISR_EL2			sys_reg(3, 4, 12, 1,  1)
+ #define __SYS__AP0Rx_EL2(x)		sys_reg(3, 4, 12, 8, x)
+ #define SYS_ICH_AP0R0_EL2		__SYS__AP0Rx_EL2(0)
+ #define SYS_ICH_AP0R1_EL2		__SYS__AP0Rx_EL2(1)
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index c54cc2afb92b..2c17afd2be96 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -66,6 +66,9 @@ static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
+ 	ctxt->gp_regs.spsr[KVM_SPSR_EL1]= read_sysreg_el1(spsr);
+ 	ctxt->gp_regs.regs.pc		= read_sysreg_el2(elr);
+ 	ctxt->gp_regs.regs.pstate	= read_sysreg_el2(spsr);
++
++	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN))
++		ctxt->sys_regs[DISR_EL1] = read_sysreg_s(SYS_VDISR_EL2);
  }
  
-+static inline void kvm_arm_vhe_guest_enter(void)
-+{
-+	local_daif_mask();
-+}
+ static hyp_alternate_select(__sysreg_call_save_host_state,
+@@ -119,6 +122,9 @@ static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
+ 	write_sysreg_el1(ctxt->gp_regs.spsr[KVM_SPSR_EL1],spsr);
+ 	write_sysreg_el2(ctxt->gp_regs.regs.pc,		elr);
+ 	write_sysreg_el2(ctxt->gp_regs.regs.pstate,	spsr);
 +
-+static inline void kvm_arm_vhe_guest_exit(void)
-+{
-+	local_daif_restore(DAIF_PROCCTX_NOIRQ);
-+}
- #endif /* __ARM64_KVM_HOST_H__ */
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 2fc6009a766c..38e81631fc91 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -704,9 +704,13 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		 */
- 		trace_kvm_entry(*vcpu_pc(vcpu));
- 		guest_enter_irqoff();
-+		if (has_vhe())
-+			kvm_arm_vhe_guest_enter();
++	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN))
++		write_sysreg_s(ctxt->sys_regs[DISR_EL1], SYS_VDISR_EL2);
+ }
  
- 		ret = kvm_call_hyp(__kvm_vcpu_run, vcpu);
+ static hyp_alternate_select(__sysreg_call_restore_host_state,
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 1830ebc227d1..9edf4ac8a320 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1169,6 +1169,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_AMAIR_EL1), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
  
-+		if (has_vhe())
-+			kvm_arm_vhe_guest_exit();
- 		vcpu->mode = OUTSIDE_GUEST_MODE;
- 		vcpu->stat.exits++;
- 		/*
+ 	{ SYS_DESC(SYS_VBAR_EL1), NULL, reset_val, VBAR_EL1, 0 },
++	{ SYS_DESC(SYS_DISR_EL1), NULL, reset_val, DISR_EL1, 0 },
+ 
+ 	{ SYS_DESC(SYS_ICC_IAR0_EL1), write_to_read_only },
+ 	{ SYS_DESC(SYS_ICC_EOIR0_EL1), read_from_write_only },
 -- 
 2.15.1
