@@ -1,140 +1,195 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v5 00/30] ARM Scalable Vector Extension (SVE)
-Date: Mon, 15 Jan 2018 17:22:01 +0000
-Message-ID: <20180115172201.GW22781@e103592.cambridge.arm.com>
-References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
- <20180108144905.qu5qbmaaglcgwvwq@yury-thinkpad>
- <20180109165120.6ravt4stp3654374@yury-thinkpad>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v4 12/19] KVM: arm/arm64: Move ioremap calls to
+ create_hyp_io_mappings
+Date: Mon, 15 Jan 2018 19:07:28 +0100
+Message-ID: <20180115180728.GN21403@cbox>
+References: <20180104184334.16571-1-marc.zyngier@arm.com>
+ <20180104184334.16571-13-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-arch-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 564D149DC7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 13:02:33 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 3jsmnUSf49GQ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Jan 2018 13:02:32 -0500 (EST)
+Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1A84D49DC4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 13:02:32 -0500 (EST)
+Received: by mail-wm0-f68.google.com with SMTP id g1so3525374wmg.2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 10:07:31 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <20180109165120.6ravt4stp3654374@yury-thinkpad>
-Sender: linux-arch-owner@vger.kernel.org
-To: Yury Norov <ynorov@caviumnetworks.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, libc-alpha@sourceware.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Szabolcs Nagy <szabolcs.nagy@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, "H . J . Lu" <hjl.tools@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>, Will Deacon <will.deacon@arm.com>, Oleg Nesterov <oleg@redhat.com>, Dmitry Safonov <dsafonov@virtuozzo.com>, Ingo Molnar <mingo@redhat.com>, Alexander Viro <viro@zeniv.linux.org.uk>, Alan Hayward <alan.hayward@arm.com>, Thomas Gleixner <tglx@linutronix.de>, linux-api@vger.kernel.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu, Ch
+In-Reply-To: <20180104184334.16571-13-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Jan 09, 2018 at 07:51:20PM +0300, Yury Norov wrote:
-> On Mon, Jan 08, 2018 at 05:49:05PM +0300, Yury Norov wrote:
-> > On Tue, Oct 31, 2017 at 03:50:52PM +0000, Dave Martin wrote:
-> > > This series implements Linux kernel support for the ARM Scalable Vector
-> > > Extension (SVE). [1]  It supersedes the previous v3: see [3] for link
-> > > and full cover letter.
-> > > 
-> > > This is a minor update to v4, but does contain a couple of important
-> > > fixes.
-> > > 
-> > > As in previous postings, the last two patches (here 29-30) are still
-> > > RFC and not proposed for merging at this time.
-> > > 
-> > > The patches apply on
-> > > git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git
-> > > for-next/core
-> > > d7b1d22d3821 ("arm64: uapi: Remove PSR_Q_BIT")
-> > > 
-> > > To reduce spam, some people may not been copied on the entire series.
-> > > For those who did not receive the whole series, it can be found in the
-> > > linux-arm-kernel archive. [2]
-> > > 
-> > > See the individual patches for details of changes.
-> > > 
-> > > For reviewer convenience, a git tree is available. [4]
-> > > 
-> > > Since there are some changes against already-reviewed patches, I've also
-> > > pushed an unsquashed fixes tree for people to take a look at if it
-> > > helps. [5]
-> > > 
-> > > 
-> > > Summary:
-> > > 
-> > >  * "regset: Add support for dynamically sized regsets" fixed to avoid
-> > >    x86 breakage;
-> > > 
-> > >  * one trival arm64 patch added to add asmlinkage annotations, and a
-> > >    corresponding minor change to the Core task context handling patch;
-> > > 
-> > >  * one new arm64 fix ("signal: Verify extra data is user-readable in
-> > >    sys_rt_sigreturn") to ensure that access_ok() checks are done for the
-> > >    whole extended signal frame, not just the base frame;
-> > > 
-> > >  * one minor fix to the SVE sigreturn code to return consistent
-> > >    intermediate error values (semantic correctness, non-functional
-> > >    change);
-> > > 
-> > >  * one minor change to call __copy_from_user() instead of
-> > >    copy_from_user() in a situation where there is already an access_ok()
-> > >    check;
-> > > 
-> > > 
-> > > [1] ARM Scalable Vector Extension
-> > > https://community.arm.com/groups/processors/blog/2016/08/22/technology-update-the-scalable-vector-extension-sve-for-the-armv8-a-architecture
-> > > 
-> > > [2] linux-arm-kernel October 2017 Archives by thread
-> > > http://lists.infradead.org/pipermail/linux-arm-kernel/2017-October/thread.html
-> > > 
-> > > [3] [PATCH v4 00/28] ARM Scalable Vector Extension (SVE)
-> > > http://lists.infradead.org/pipermail/linux-arm-kernel/2017-October/539414.html
-> > > 
-> > > [4] For review and testing only -- **do not pull**
-> > >     (This branch has review changelogs which should not form part of
-> > >     the final commits.)
-> > > 
-> > >     v5 series (this posting)
-> > > 
-> > >     http://linux-arm.org/git?p=linux-dm.git;a=shortlog;h=refs/heads/sve/v5
-> > >     git://linux-arm.org/linux-dm.git sve/v5
-> > > 
-> > > [5] For review and testing only -- **do not pull**
-> > >     (This branch has review changelogs which should not form part of
-> > >     the final commits.)
-> > > 
-> > >     v4 with unsquashed fixes
-> > > 
-> > >     http://linux-arm.org/git?p=linux-dm.git;a=shortlog;h=refs/heads/sve/v4%2Bfixes
-> > >     git://linux-arm.org/linux-dm.git sve/v4+fixes
-> > 
-> > Hi Dave,
-> > 
-> > During rebase of my ILP32 series on 4.15 kernel I found that 
-> > ILP32 needs to be enabled with SVE support, like you do for 
-> > LP64 in this series.
-> > 
-> > I did all rebase work on this draft branch:
-> > https://github.com/norov/linux/tree/ilp32-4.15-rc7
-> > 
-> > But any ILP32 program I tried crash, and the message in dmesg looks
-> > like this:
-> > [   39.510667] CPU: 0 PID: 1857 Comm: mytime Not tainted 4.15.0-rc7-00028-g45e0659df4d9 #41
-> > [   39.510712] Hardware name: linux,dummy-virt (DT)
-> > [   39.510829] pstate: 00000000 (nzcv daif -PAN -UAO)
-> > [   39.511101] pc : 0x33488e28
-> > [   39.511125] lr : 0x33488e28
-> > [   39.511138] sp : 00000000fffef670
-> > [   39.511158] x29: 000000005a536c33 x28: 0000000000000000 
-> > [   39.511211] x27: 0000000000000000 x26: 0000000000000000 
-> > [   39.511235] x25: 0000000000000000 x24: 0000000000000000 
-> > [   39.511257] x23: 0000000000466000 x22: 0000000000000000 
-> > [   39.511278] x21: 0000000000000000 x20: 000000000047f2a8 
-> > [   39.511300] x19: 0000000000000000 x18: 0000000000000001 
-> > [   39.511321] x17: 0000000000001000 x16: 0000000000001030 
-> > [   39.511342] x15: 0000000000554e47 x14: 0000000000000001 
-> > [   39.511364] x13: 0000000000000004 x12: 000000000000003c 
-> > [   39.511385] x11: 0000100000000000 x10: 0800000000000000 
-> > [   39.511406] x9 : 0fffffffffffffff x8 : 000000000000007c 
-> > [   39.511427] x7 : 0000000000000077 x6 : 0000000000000041 
-> > [   39.511448] x5 : 0000000000000411 x4 : 00000000fbad2488 
-> > [   39.511468] x3 : 0000000000000001 x2 : 0000000000497950 
-> > [   39.511489] x1 : 0000000000497550 x0 : 0000000000000001
+On Thu, Jan 04, 2018 at 06:43:27PM +0000, Marc Zyngier wrote:
+> Both HYP io mappings call ioremap, followed by create_hyp_io_mappings.
+> Let's move the ioremap call into create_hyp_io_mappings itself, which
+> simplifies the code a bit and allows for further refactoring.
 > 
-> Hi Dave,
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm/include/asm/kvm_mmu.h   |  3 ++-
+>  arch/arm64/include/asm/kvm_mmu.h |  3 ++-
+>  virt/kvm/arm/mmu.c               | 24 ++++++++++++++----------
+>  virt/kvm/arm/vgic/vgic-v2.c      | 31 ++++++++-----------------------
+>  4 files changed, 26 insertions(+), 35 deletions(-)
 > 
-> I fixed the crash. It was my local problem.
+> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+> index fa6f2174276b..cb3bef71ec9b 100644
+> --- a/arch/arm/include/asm/kvm_mmu.h
+> +++ b/arch/arm/include/asm/kvm_mmu.h
+> @@ -41,7 +41,8 @@
+>  #include <asm/stage2_pgtable.h>
+>  
+>  int create_hyp_mappings(void *from, void *to, pgprot_t prot);
+> -int create_hyp_io_mappings(void *from, void *to, phys_addr_t);
+> +int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
+> +			   void __iomem **kaddr);
+>  void free_hyp_pgds(void);
+>  
+>  void stage2_unmap_vm(struct kvm *kvm);
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index b0c3cbe9b513..09a208014457 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -119,7 +119,8 @@ static inline unsigned long __kern_hyp_va(unsigned long v)
+>  #include <asm/stage2_pgtable.h>
+>  
+>  int create_hyp_mappings(void *from, void *to, pgprot_t prot);
+> -int create_hyp_io_mappings(void *from, void *to, phys_addr_t);
+> +int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
+> +			   void __iomem **kaddr);
+>  void free_hyp_pgds(void);
+>  
+>  void stage2_unmap_vm(struct kvm *kvm);
+> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> index 84d09f1a44d4..38adbe0a016c 100644
+> --- a/virt/kvm/arm/mmu.c
+> +++ b/virt/kvm/arm/mmu.c
+> @@ -709,26 +709,30 @@ int create_hyp_mappings(void *from, void *to, pgprot_t prot)
+>  }
+>  
+>  /**
+> - * create_hyp_io_mappings - duplicate a kernel IO mapping into Hyp mode
+> - * @from:	The kernel start VA of the range
+> - * @to:		The kernel end VA of the range (exclusive)
+> + * create_hyp_io_mappings - Map IO into both kernel and HYP
+>   * @phys_addr:	The physical start address which gets mapped
+> + * @size:	Size of the region being mapped
+> + * @kaddr:	Kernel VA for this mapping
+>   *
+>   * The resulting HYP VA is the same as the kernel VA, modulo
+>   * HYP_PAGE_OFFSET.
+>   */
+> -int create_hyp_io_mappings(void *from, void *to, phys_addr_t phys_addr)
+> +int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
+> +			   void __iomem **kaddr)
 
-Ah, right :)
+nit: you could make this return a "void __iomem *" and use ERR_PTR etc.
+as well, but it'll probably look worse on the calling side, so either
+way is fine with me.
 
-I'll take a look at your code anyway in case there's something
-else one of us didn't think of.
+>  {
+> -	unsigned long start = kern_hyp_va((unsigned long)from);
+> -	unsigned long end = kern_hyp_va((unsigned long)to);
+> +	unsigned long start, end;
+>  
+> -	if (is_kernel_in_hyp_mode())
+> +	*kaddr = ioremap(phys_addr, size);
+> +	if (!*kaddr)
+> +		return -ENOMEM;
+> +
+> +	if (is_kernel_in_hyp_mode()) {
+>  		return 0;
+> +	}
 
-Cheers
----Dave
+nit: we don't need the curly braces
+
+>  
+> -	/* Check for a valid kernel IO mapping */
+> -	if (!is_vmalloc_addr(from) || !is_vmalloc_addr(to - 1))
+> -		return -EINVAL;
+>  
+> +	start = kern_hyp_va((unsigned long)*kaddr);
+> +	end = kern_hyp_va((unsigned long)*kaddr + size);
+>  	return __create_hyp_mappings(hyp_pgd, start, end,
+>  				     __phys_to_pfn(phys_addr), PAGE_HYP_DEVICE);
+>  }
+> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+> index 80897102da26..bc49d702f9f0 100644
+> --- a/virt/kvm/arm/vgic/vgic-v2.c
+> +++ b/virt/kvm/arm/vgic/vgic-v2.c
+> @@ -332,16 +332,10 @@ int vgic_v2_probe(const struct gic_kvm_info *info)
+>  	if (!PAGE_ALIGNED(info->vcpu.start) ||
+>  	    !PAGE_ALIGNED(resource_size(&info->vcpu))) {
+>  		kvm_info("GICV region size/alignment is unsafe, using trapping (reduced performance)\n");
+> -		kvm_vgic_global_state.vcpu_base_va = ioremap(info->vcpu.start,
+> -							     resource_size(&info->vcpu));
+> -		if (!kvm_vgic_global_state.vcpu_base_va) {
+> -			kvm_err("Cannot ioremap GICV\n");
+> -			return -ENOMEM;
+> -		}
+>  
+> -		ret = create_hyp_io_mappings(kvm_vgic_global_state.vcpu_base_va,
+> -					     kvm_vgic_global_state.vcpu_base_va + resource_size(&info->vcpu),
+> -					     info->vcpu.start);
+> +		ret = create_hyp_io_mappings(info->vcpu.start,
+> +					     resource_size(&info->vcpu),
+> +					     &kvm_vgic_global_state.vcpu_base_va);
+>  		if (ret) {
+>  			kvm_err("Cannot map GICV into hyp\n");
+>  			goto out;
+> @@ -350,26 +344,17 @@ int vgic_v2_probe(const struct gic_kvm_info *info)
+>  		static_branch_enable(&vgic_v2_cpuif_trap);
+>  	}
+>  
+> -	kvm_vgic_global_state.vctrl_base = ioremap(info->vctrl.start,
+> -						   resource_size(&info->vctrl));
+> -	if (!kvm_vgic_global_state.vctrl_base) {
+> -		kvm_err("Cannot ioremap GICH\n");
+> -		ret = -ENOMEM;
+> +	ret = create_hyp_io_mappings(info->vctrl.start,
+> +				     resource_size(&info->vctrl),
+> +				     &kvm_vgic_global_state.vctrl_base);
+> +	if (ret) {
+> +		kvm_err("Cannot map VCTRL into hyp\n");
+>  		goto out;
+>  	}
+>  
+>  	vtr = readl_relaxed(kvm_vgic_global_state.vctrl_base + GICH_VTR);
+>  	kvm_vgic_global_state.nr_lr = (vtr & 0x3f) + 1;
+>  
+> -	ret = create_hyp_io_mappings(kvm_vgic_global_state.vctrl_base,
+> -				     kvm_vgic_global_state.vctrl_base +
+> -					 resource_size(&info->vctrl),
+> -				     info->vctrl.start);
+> -	if (ret) {
+> -		kvm_err("Cannot map VCTRL into hyp\n");
+> -		goto out;
+> -	}
+> -
+>  	ret = kvm_register_vgic_device(KVM_DEV_TYPE_ARM_VGIC_V2);
+>  	if (ret) {
+>  		kvm_err("Cannot register GICv2 KVM device\n");
+> -- 
+> 2.14.2
+> 
+
+Otherwise looks good:
+
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
