@@ -1,28 +1,23 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v4 12/19] KVM: arm/arm64: Move ioremap calls to
- create_hyp_io_mappings
-Date: Mon, 15 Jan 2018 19:07:28 +0100
-Message-ID: <20180115180728.GN21403@cbox>
-References: <20180104184334.16571-1-marc.zyngier@arm.com>
- <20180104184334.16571-13-marc.zyngier@arm.com>
+From: James Morse <james.morse@arm.com>
+Subject: [PATCH v6 03/13] arm64: cpufeature: Detect CPU RAS Extentions
+Date: Mon, 15 Jan 2018 19:38:56 +0000
+Message-ID: <20180115193906.30053-4-james.morse@arm.com>
+References: <20180115193906.30053-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 564D149DC7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 13:02:33 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6857249E14
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 14:36:43 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3jsmnUSf49GQ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 Jan 2018 13:02:32 -0500 (EST)
-Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1A84D49DC4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 13:02:32 -0500 (EST)
-Received: by mail-wm0-f68.google.com with SMTP id g1so3525374wmg.2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 10:07:31 -0800 (PST)
-Content-Disposition: inline
-In-Reply-To: <20180104184334.16571-13-marc.zyngier@arm.com>
+ with ESMTP id WBCoQnj2OFev for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Jan 2018 14:36:42 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BE4F949E0E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 14:36:41 -0500 (EST)
+In-Reply-To: <20180115193906.30053-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,164 +27,124 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: linux-arm-kernel@lists.infradead.org
+Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jan 04, 2018 at 06:43:27PM +0000, Marc Zyngier wrote:
-> Both HYP io mappings call ioremap, followed by create_hyp_io_mappings.
-> Let's move the ioremap call into create_hyp_io_mappings itself, which
-> simplifies the code a bit and allows for further refactoring.
-> 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  arch/arm/include/asm/kvm_mmu.h   |  3 ++-
->  arch/arm64/include/asm/kvm_mmu.h |  3 ++-
->  virt/kvm/arm/mmu.c               | 24 ++++++++++++++----------
->  virt/kvm/arm/vgic/vgic-v2.c      | 31 ++++++++-----------------------
->  4 files changed, 26 insertions(+), 35 deletions(-)
-> 
-> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-> index fa6f2174276b..cb3bef71ec9b 100644
-> --- a/arch/arm/include/asm/kvm_mmu.h
-> +++ b/arch/arm/include/asm/kvm_mmu.h
-> @@ -41,7 +41,8 @@
->  #include <asm/stage2_pgtable.h>
->  
->  int create_hyp_mappings(void *from, void *to, pgprot_t prot);
-> -int create_hyp_io_mappings(void *from, void *to, phys_addr_t);
-> +int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
-> +			   void __iomem **kaddr);
->  void free_hyp_pgds(void);
->  
->  void stage2_unmap_vm(struct kvm *kvm);
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index b0c3cbe9b513..09a208014457 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -119,7 +119,8 @@ static inline unsigned long __kern_hyp_va(unsigned long v)
->  #include <asm/stage2_pgtable.h>
->  
->  int create_hyp_mappings(void *from, void *to, pgprot_t prot);
-> -int create_hyp_io_mappings(void *from, void *to, phys_addr_t);
-> +int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
-> +			   void __iomem **kaddr);
->  void free_hyp_pgds(void);
->  
->  void stage2_unmap_vm(struct kvm *kvm);
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 84d09f1a44d4..38adbe0a016c 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -709,26 +709,30 @@ int create_hyp_mappings(void *from, void *to, pgprot_t prot)
->  }
->  
->  /**
-> - * create_hyp_io_mappings - duplicate a kernel IO mapping into Hyp mode
-> - * @from:	The kernel start VA of the range
-> - * @to:		The kernel end VA of the range (exclusive)
-> + * create_hyp_io_mappings - Map IO into both kernel and HYP
->   * @phys_addr:	The physical start address which gets mapped
-> + * @size:	Size of the region being mapped
-> + * @kaddr:	Kernel VA for this mapping
->   *
->   * The resulting HYP VA is the same as the kernel VA, modulo
->   * HYP_PAGE_OFFSET.
->   */
-> -int create_hyp_io_mappings(void *from, void *to, phys_addr_t phys_addr)
-> +int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
-> +			   void __iomem **kaddr)
+From: Xie XiuQi <xiexiuqi@huawei.com>
 
-nit: you could make this return a "void __iomem *" and use ERR_PTR etc.
-as well, but it'll probably look worse on the calling side, so either
-way is fine with me.
+ARM's v8.2 Extentions add support for Reliability, Availability and
+Serviceability (RAS). On CPUs with these extensions system software
+can use additional barriers to isolate errors and determine if faults
+are pending. Add cpufeature detection.
 
->  {
-> -	unsigned long start = kern_hyp_va((unsigned long)from);
-> -	unsigned long end = kern_hyp_va((unsigned long)to);
-> +	unsigned long start, end;
->  
-> -	if (is_kernel_in_hyp_mode())
-> +	*kaddr = ioremap(phys_addr, size);
-> +	if (!*kaddr)
-> +		return -ENOMEM;
-> +
-> +	if (is_kernel_in_hyp_mode()) {
->  		return 0;
-> +	}
+Platform level RAS support may require additional firmware support.
 
-nit: we don't need the curly braces
+Signed-off-by: Xie XiuQi <xiexiuqi@huawei.com>
+[Rebased added config option, reworded commit message]
+Signed-off-by: James Morse <james.morse@arm.com>
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+---
+Changes since v4:
+ * Removed barrier in context switch
 
->  
-> -	/* Check for a valid kernel IO mapping */
-> -	if (!is_vmalloc_addr(from) || !is_vmalloc_addr(to - 1))
-> -		return -EINVAL;
->  
-> +	start = kern_hyp_va((unsigned long)*kaddr);
-> +	end = kern_hyp_va((unsigned long)*kaddr + size);
->  	return __create_hyp_mappings(hyp_pgd, start, end,
->  				     __phys_to_pfn(phys_addr), PAGE_HYP_DEVICE);
->  }
-> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-> index 80897102da26..bc49d702f9f0 100644
-> --- a/virt/kvm/arm/vgic/vgic-v2.c
-> +++ b/virt/kvm/arm/vgic/vgic-v2.c
-> @@ -332,16 +332,10 @@ int vgic_v2_probe(const struct gic_kvm_info *info)
->  	if (!PAGE_ALIGNED(info->vcpu.start) ||
->  	    !PAGE_ALIGNED(resource_size(&info->vcpu))) {
->  		kvm_info("GICV region size/alignment is unsafe, using trapping (reduced performance)\n");
-> -		kvm_vgic_global_state.vcpu_base_va = ioremap(info->vcpu.start,
-> -							     resource_size(&info->vcpu));
-> -		if (!kvm_vgic_global_state.vcpu_base_va) {
-> -			kvm_err("Cannot ioremap GICV\n");
-> -			return -ENOMEM;
-> -		}
->  
-> -		ret = create_hyp_io_mappings(kvm_vgic_global_state.vcpu_base_va,
-> -					     kvm_vgic_global_state.vcpu_base_va + resource_size(&info->vcpu),
-> -					     info->vcpu.start);
-> +		ret = create_hyp_io_mappings(info->vcpu.start,
-> +					     resource_size(&info->vcpu),
-> +					     &kvm_vgic_global_state.vcpu_base_va);
->  		if (ret) {
->  			kvm_err("Cannot map GICV into hyp\n");
->  			goto out;
-> @@ -350,26 +344,17 @@ int vgic_v2_probe(const struct gic_kvm_info *info)
->  		static_branch_enable(&vgic_v2_cpuif_trap);
->  	}
->  
-> -	kvm_vgic_global_state.vctrl_base = ioremap(info->vctrl.start,
-> -						   resource_size(&info->vctrl));
-> -	if (!kvm_vgic_global_state.vctrl_base) {
-> -		kvm_err("Cannot ioremap GICH\n");
-> -		ret = -ENOMEM;
-> +	ret = create_hyp_io_mappings(info->vctrl.start,
-> +				     resource_size(&info->vctrl),
-> +				     &kvm_vgic_global_state.vctrl_base);
-> +	if (ret) {
-> +		kvm_err("Cannot map VCTRL into hyp\n");
->  		goto out;
->  	}
->  
->  	vtr = readl_relaxed(kvm_vgic_global_state.vctrl_base + GICH_VTR);
->  	kvm_vgic_global_state.nr_lr = (vtr & 0x3f) + 1;
->  
-> -	ret = create_hyp_io_mappings(kvm_vgic_global_state.vctrl_base,
-> -				     kvm_vgic_global_state.vctrl_base +
-> -					 resource_size(&info->vctrl),
-> -				     info->vctrl.start);
-> -	if (ret) {
-> -		kvm_err("Cannot map VCTRL into hyp\n");
-> -		goto out;
-> -	}
-> -
->  	ret = kvm_register_vgic_device(KVM_DEV_TYPE_ARM_VGIC_V2);
->  	if (ret) {
->  		kvm_err("Cannot register GICv2 KVM device\n");
-> -- 
-> 2.14.2
-> 
+ arch/arm64/Kconfig               | 16 ++++++++++++++++
+ arch/arm64/include/asm/cpucaps.h |  3 ++-
+ arch/arm64/include/asm/sysreg.h  |  2 ++
+ arch/arm64/kernel/cpufeature.c   | 13 +++++++++++++
+ 4 files changed, 33 insertions(+), 1 deletion(-)
 
-Otherwise looks good:
-
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 664fadc2aa2e..1d51c8edf34b 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -1062,6 +1062,22 @@ config ARM64_PMEM
+ 	  operations if DC CVAP is not supported (following the behaviour of
+ 	  DC CVAP itself if the system does not define a point of persistence).
+ 
++config ARM64_RAS_EXTN
++	bool "Enable support for RAS CPU Extensions"
++	default y
++	help
++	  CPUs that support the Reliability, Availability and Serviceability
++	  (RAS) Extensions, part of ARMv8.2 are able to track faults and
++	  errors, classify them and report them to software.
++
++	  On CPUs with these extensions system software can use additional
++	  barriers to determine if faults are pending and read the
++	  classification from a new set of registers.
++
++	  Selecting this feature will allow the kernel to use these barriers
++	  and access the new registers if the system supports the extension.
++	  Platform RAS features may additionally depend on firmware support.
++
+ endmenu
+ 
+ config ARM64_SVE
+diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+index 7049b4802587..bb263820de13 100644
+--- a/arch/arm64/include/asm/cpucaps.h
++++ b/arch/arm64/include/asm/cpucaps.h
+@@ -44,7 +44,8 @@
+ #define ARM64_UNMAP_KERNEL_AT_EL0		23
+ #define ARM64_HARDEN_BRANCH_PREDICTOR		24
+ #define ARM64_HARDEN_BP_POST_GUEST_EXIT		25
++#define ARM64_HAS_RAS_EXTN			26
+ 
+-#define ARM64_NCAPS				26
++#define ARM64_NCAPS				27
+ 
+ #endif /* __ASM_CPUCAPS_H */
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 1a8108f84932..321622e9f9c3 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -498,6 +498,7 @@
+ #define ID_AA64PFR0_CSV3_SHIFT		60
+ #define ID_AA64PFR0_CSV2_SHIFT		56
+ #define ID_AA64PFR0_SVE_SHIFT		32
++#define ID_AA64PFR0_RAS_SHIFT		28
+ #define ID_AA64PFR0_GIC_SHIFT		24
+ #define ID_AA64PFR0_ASIMD_SHIFT		20
+ #define ID_AA64PFR0_FP_SHIFT		16
+@@ -507,6 +508,7 @@
+ #define ID_AA64PFR0_EL0_SHIFT		0
+ 
+ #define ID_AA64PFR0_SVE			0x1
++#define ID_AA64PFR0_RAS_V1		0x1
+ #define ID_AA64PFR0_FP_NI		0xf
+ #define ID_AA64PFR0_FP_SUPPORTED	0x0
+ #define ID_AA64PFR0_ASIMD_NI		0xf
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index d88cd0e88606..0c0af18121e1 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -149,6 +149,7 @@ static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_CSV3_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_CSV2_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_SVE_SHIFT, 4, 0),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_RAS_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_GIC_SHIFT, 4, 0),
+ 	S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_ASIMD_SHIFT, 4, ID_AA64PFR0_ASIMD_NI),
+ 	S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_FP_SHIFT, 4, ID_AA64PFR0_FP_NI),
+@@ -1028,6 +1029,18 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.enable = sve_kernel_enable,
+ 	},
+ #endif /* CONFIG_ARM64_SVE */
++#ifdef CONFIG_ARM64_RAS_EXTN
++	{
++		.desc = "RAS Extension Support",
++		.capability = ARM64_HAS_RAS_EXTN,
++		.def_scope = SCOPE_SYSTEM,
++		.matches = has_cpuid_feature,
++		.sys_reg = SYS_ID_AA64PFR0_EL1,
++		.sign = FTR_UNSIGNED,
++		.field_pos = ID_AA64PFR0_RAS_SHIFT,
++		.min_field_value = ID_AA64PFR0_RAS_V1,
++	},
++#endif /* CONFIG_ARM64_RAS_EXTN */
+ 	{},
+ };
+ 
+-- 
+2.15.1
