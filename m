@@ -1,23 +1,21 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH v6 03/13] arm64: cpufeature: Detect CPU RAS Extentions
-Date: Mon, 15 Jan 2018 19:38:56 +0000
-Message-ID: <20180115193906.30053-4-james.morse@arm.com>
-References: <20180115193906.30053-1-james.morse@arm.com>
+Subject: [PATCH v6 00/13] arm64/KVM: RAS & IESB for firmware first support
+Date: Mon, 15 Jan 2018 19:38:53 +0000
+Message-ID: <20180115193906.30053-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6857249E14
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 14:36:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C34049E06
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 14:36:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WBCoQnj2OFev for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 Jan 2018 14:36:42 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BE4F949E0E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 14:36:41 -0500 (EST)
-In-Reply-To: <20180115193906.30053-1-james.morse@arm.com>
+ with ESMTP id QGQj3PAgakBE for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Jan 2018 14:36:33 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A605149DE6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jan 2018 14:36:33 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,120 +29,104 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Xie XiuQi <xiexiuqi@huawei.com>
+Hello,
 
-ARM's v8.2 Extentions add support for Reliability, Availability and
-Serviceability (RAS). On CPUs with these extensions system software
-can use additional barriers to isolate errors and determine if faults
-are pending. Add cpufeature detection.
+The aim of this series is to enable IESB to let us kick any pending RAS
+errors into firmware to be handled by firmware-first.
 
-Platform level RAS support may require additional firmware support.
+v6 is a rebase onto arm64's for-next/core branch to fix the conflicts.
 
-Signed-off-by: Xie XiuQi <xiexiuqi@huawei.com>
-[Rebased added config option, reworded commit message]
-Signed-off-by: James Morse <james.morse@arm.com>
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
----
-Changes since v4:
- * Removed barrier in context switch
+I've picked up the Reviewed-by's from v4 that I missed on patches 7, 9 and 13,
+(they have the relevant patchwork links). Please call me names if I missed any
+more! (Dropped on patches 11 & 12 is deliberate due to handle_exit_early())
 
- arch/arm64/Kconfig               | 16 ++++++++++++++++
- arch/arm64/include/asm/cpucaps.h |  3 ++-
- arch/arm64/include/asm/sysreg.h  |  2 ++
- arch/arm64/kernel/cpufeature.c   | 13 +++++++++++++
- 4 files changed, 33 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 664fadc2aa2e..1d51c8edf34b 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -1062,6 +1062,22 @@ config ARM64_PMEM
- 	  operations if DC CVAP is not supported (following the behaviour of
- 	  DC CVAP itself if the system does not define a point of persistence).
- 
-+config ARM64_RAS_EXTN
-+	bool "Enable support for RAS CPU Extensions"
-+	default y
-+	help
-+	  CPUs that support the Reliability, Availability and Serviceability
-+	  (RAS) Extensions, part of ARMv8.2 are able to track faults and
-+	  errors, classify them and report them to software.
-+
-+	  On CPUs with these extensions system software can use additional
-+	  barriers to determine if faults are pending and read the
-+	  classification from a new set of registers.
-+
-+	  Selecting this feature will allow the kernel to use these barriers
-+	  and access the new registers if the system supports the extension.
-+	  Platform RAS features may additionally depend on firmware support.
-+
- endmenu
- 
- config ARM64_SVE
-diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-index 7049b4802587..bb263820de13 100644
---- a/arch/arm64/include/asm/cpucaps.h
-+++ b/arch/arm64/include/asm/cpucaps.h
-@@ -44,7 +44,8 @@
- #define ARM64_UNMAP_KERNEL_AT_EL0		23
- #define ARM64_HARDEN_BRANCH_PREDICTOR		24
- #define ARM64_HARDEN_BP_POST_GUEST_EXIT		25
-+#define ARM64_HAS_RAS_EXTN			26
- 
--#define ARM64_NCAPS				26
-+#define ARM64_NCAPS				27
- 
- #endif /* __ASM_CPUCAPS_H */
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 1a8108f84932..321622e9f9c3 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -498,6 +498,7 @@
- #define ID_AA64PFR0_CSV3_SHIFT		60
- #define ID_AA64PFR0_CSV2_SHIFT		56
- #define ID_AA64PFR0_SVE_SHIFT		32
-+#define ID_AA64PFR0_RAS_SHIFT		28
- #define ID_AA64PFR0_GIC_SHIFT		24
- #define ID_AA64PFR0_ASIMD_SHIFT		20
- #define ID_AA64PFR0_FP_SHIFT		16
-@@ -507,6 +508,7 @@
- #define ID_AA64PFR0_EL0_SHIFT		0
- 
- #define ID_AA64PFR0_SVE			0x1
-+#define ID_AA64PFR0_RAS_V1		0x1
- #define ID_AA64PFR0_FP_NI		0xf
- #define ID_AA64PFR0_FP_SUPPORTED	0x0
- #define ID_AA64PFR0_ASIMD_NI		0xf
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index d88cd0e88606..0c0af18121e1 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -149,6 +149,7 @@ static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
- 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_CSV3_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_CSV2_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_SVE_SHIFT, 4, 0),
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_RAS_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_GIC_SHIFT, 4, 0),
- 	S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_ASIMD_SHIFT, 4, ID_AA64PFR0_ASIMD_NI),
- 	S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_FP_SHIFT, 4, ID_AA64PFR0_FP_NI),
-@@ -1028,6 +1029,18 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.enable = sve_kernel_enable,
- 	},
- #endif /* CONFIG_ARM64_SVE */
-+#ifdef CONFIG_ARM64_RAS_EXTN
-+	{
-+		.desc = "RAS Extension Support",
-+		.capability = ARM64_HAS_RAS_EXTN,
-+		.def_scope = SCOPE_SYSTEM,
-+		.matches = has_cpuid_feature,
-+		.sys_reg = SYS_ID_AA64PFR0_EL1,
-+		.sign = FTR_UNSIGNED,
-+		.field_pos = ID_AA64PFR0_RAS_SHIFT,
-+		.min_field_value = ID_AA64PFR0_RAS_V1,
-+	},
-+#endif /* CONFIG_ARM64_RAS_EXTN */
- 	{},
- };
- 
+Not all systems will have firmware support, so these RAS errors will become
+pending SErrors delivered to the kernel. The first part of the series adds
+some crude categorization for SErrors into 'fatal' or ignorable. This stops us
+panic()ing for corrected errors, but we make no attempt to handle the error.
+Proper kernel-first support will be able to do a much better job here.
+
+The second part of the series provides the same minimal handling for SError
+that interrupt KVM. KVM is currently unable to handle SErrors during
+world-switch, unless they occur during a magic single-instruction window,
+it hyp-panics. I suspect this will be easier to fix once the VHE world-switch
+is further optimised.
+
+KVMs kvm_inject_vabt() needs updating for v8.2 as now we can specify an ESR,
+and all-zeros has a RAS meaning.
+
+Until we have kernel-first support, containable RAS errors that interrupt a
+guest are considered by KVM using the same crude categorization the arch code
+uses. Fatal errors are treated as an impdef-SError, non-fatal errors are
+ignored. Again, proper kernel-first support will do better.
+(uncontained errors from a guest will always cause the host to panic)
+
+
+Known issues:
+ * Synchronous external abort SET severity is not yet considered, all
+   synchronous-external-aborts are still considered fatal.
+
+ * KVM-Migration: HCR_EL2.VSE and VSESR_EL2 cannot be migrated when the guest
+   has an SError pending. An API using {G,S}ET_EVENTS is on my todo list.
+
+ * KVM unmasks SError and IRQ before calling handle_exit_early, we may take
+   interrupts while holding an uncontained ESR... (this is currently an
+   improvement on assuming its an impdef error we can blame on the guest)
+    * We need to fix this for APEI's SEI or kernel-first RAS, the guest-exit
+      SError handling will need to move to before kvm_arm_vhe_guest_exit(),
+      or at least into a region where SError and IRQ is still masked.
+
+Thanks,
+
+James
+
+
+Dongjiu Geng (1):
+  KVM: arm64: Emulate RAS error registers and set HCR_EL2's TERR & TEA
+
+James Morse (11):
+  arm64: cpufeature: __this_cpu_has_cap() shouldn't stop early
+  arm64: sysreg: Move to use definitions for all the SCTLR bits
+  arm64: kernel: Survive corrected RAS errors notified by SError
+  arm64: Unconditionally enable IESB on exception entry/return for
+    firmware-first
+  arm64: kernel: Prepare for a DISR user
+  KVM: arm/arm64: mask/unmask daif around VHE guests
+  KVM: arm64: Set an impdef ESR for Virtual-SError using VSESR_EL2.
+  KVM: arm64: Save/Restore guest DISR_EL1
+  KVM: arm64: Save ESR_EL2 on guest SError
+  KVM: arm64: Handle RAS SErrors from EL1 on guest exit
+  KVM: arm64: Handle RAS SErrors from EL2 on guest exit
+
+Xie XiuQi (1):
+  arm64: cpufeature: Detect CPU RAS Extentions
+
+ arch/arm/include/asm/kvm_host.h      |  5 +++
+ arch/arm64/Kconfig                   | 16 +++++++
+ arch/arm64/include/asm/assembler.h   |  7 ++++
+ arch/arm64/include/asm/cpucaps.h     |  3 +-
+ arch/arm64/include/asm/esr.h         | 20 +++++++++
+ arch/arm64/include/asm/exception.h   | 14 +++++++
+ arch/arm64/include/asm/kvm_arm.h     |  2 +
+ arch/arm64/include/asm/kvm_emulate.h | 17 ++++++++
+ arch/arm64/include/asm/kvm_host.h    | 17 ++++++++
+ arch/arm64/include/asm/processor.h   |  1 +
+ arch/arm64/include/asm/sysreg.h      | 81 +++++++++++++++++++++++++++++++++++-
+ arch/arm64/include/asm/traps.h       | 54 ++++++++++++++++++++++++
+ arch/arm64/kernel/asm-offsets.c      |  1 +
+ arch/arm64/kernel/cpufeature.c       | 26 +++++++++++-
+ arch/arm64/kernel/head.S             | 13 ++----
+ arch/arm64/kernel/traps.c            | 51 ++++++++++++++++++++---
+ arch/arm64/kvm/handle_exit.c         | 32 +++++++++++++-
+ arch/arm64/kvm/hyp/entry.S           | 13 ++++++
+ arch/arm64/kvm/hyp/switch.c          | 12 ++++--
+ arch/arm64/kvm/hyp/sysreg-sr.c       |  6 +++
+ arch/arm64/kvm/inject_fault.c        | 13 +++++-
+ arch/arm64/kvm/sys_regs.c            | 11 +++++
+ arch/arm64/mm/proc.S                 | 29 +++----------
+ virt/kvm/arm/arm.c                   |  7 ++++
+ 24 files changed, 402 insertions(+), 49 deletions(-)
+
 -- 
 2.15.1
