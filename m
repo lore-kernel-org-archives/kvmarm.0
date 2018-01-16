@@ -1,26 +1,24 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL v2 2/3] KVM: arm64: Fix GICv4 init when called from
- vgic_its_create
-Date: Tue, 16 Jan 2018 18:02:32 +0100
-Message-ID: <20180116170233.7085-3-christoffer.dall@linaro.org>
-References: <20180116170233.7085-1-christoffer.dall@linaro.org>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v6 00/13] arm64/KVM: RAS & IESB for firmware first support
+Date: Tue, 16 Jan 2018 17:36:44 +0000
+Message-ID: <20180116173644.njykhr3jck46gofm@armageddon.cambridge.arm.com>
+References: <20180115193906.30053-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9912149DFE
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jan 2018 11:57:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 04E1349E0C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jan 2018 12:31:49 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fbFG0hu21Lxz for <kvmarm@lists.cs.columbia.edu>;
- Tue, 16 Jan 2018 11:57:39 -0500 (EST)
-Received: from mail-wm0-f66.google.com (mail-wm0-f66.google.com [74.125.82.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 97EE549DFB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jan 2018 11:57:39 -0500 (EST)
-Received: by mail-wm0-f66.google.com with SMTP id f3so10114639wmc.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jan 2018 09:02:41 -0800 (PST)
-In-Reply-To: <20180116170233.7085-1-christoffer.dall@linaro.org>
+ with ESMTP id 8uePXdl6qKD9 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 16 Jan 2018 12:31:48 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E5A9F49DDF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jan 2018 12:31:47 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <20180115193906.30053-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,59 +28,32 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+To: James Morse <james.morse@arm.com>
+Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Commit 3d1ad640f8c94 ("KVM: arm/arm64: Fix GICv4 ITS initialization
-issues") moved the vgic_supports_direct_msis() check in vgic_v4_init().
-However when vgic_v4_init is called from vgic_its_create(), the has_its
-field is not yet set. Hence vgic_supports_direct_msis returns false and
-vgic_v4_init does nothing.
+On Mon, Jan 15, 2018 at 07:38:53PM +0000, James Morse wrote:
+> Dongjiu Geng (1):
+>   KVM: arm64: Emulate RAS error registers and set HCR_EL2's TERR & TEA
+> 
+> James Morse (11):
+>   arm64: cpufeature: __this_cpu_has_cap() shouldn't stop early
+>   arm64: sysreg: Move to use definitions for all the SCTLR bits
+>   arm64: kernel: Survive corrected RAS errors notified by SError
+>   arm64: Unconditionally enable IESB on exception entry/return for
+>     firmware-first
+>   arm64: kernel: Prepare for a DISR user
+>   KVM: arm/arm64: mask/unmask daif around VHE guests
+>   KVM: arm64: Set an impdef ESR for Virtual-SError using VSESR_EL2.
+>   KVM: arm64: Save/Restore guest DISR_EL1
+>   KVM: arm64: Save ESR_EL2 on guest SError
+>   KVM: arm64: Handle RAS SErrors from EL1 on guest exit
+>   KVM: arm64: Handle RAS SErrors from EL2 on guest exit
+> 
+> Xie XiuQi (1):
+>   arm64: cpufeature: Detect CPU RAS Extentions
 
-The gic/its init sequence is a bit messy, so let's be specific about the
-prerequisite checks in the various call paths instead of relying on a
-common wrapper.
+Queued for 4.16. Thanks.
 
-Fixes: 3d1ad640f8c94 ("KVM: arm/arm64: Fix GICv4 ITS initialization issues")
-Reported-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
- virt/kvm/arm/vgic/vgic-init.c | 8 +++++---
- virt/kvm/arm/vgic/vgic-v4.c   | 2 +-
- 2 files changed, 6 insertions(+), 4 deletions(-)
-
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index 62310122ee78..743ca5cb05ef 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -285,9 +285,11 @@ int vgic_init(struct kvm *kvm)
- 	if (ret)
- 		goto out;
- 
--	ret = vgic_v4_init(kvm);
--	if (ret)
--		goto out;
-+	if (vgic_has_its(kvm)) {
-+		ret = vgic_v4_init(kvm);
-+		if (ret)
-+			goto out;
-+	}
- 
- 	kvm_for_each_vcpu(i, vcpu, kvm)
- 		kvm_vgic_vcpu_enable(vcpu);
-diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
-index 4a37292855bc..bc4265154bac 100644
---- a/virt/kvm/arm/vgic/vgic-v4.c
-+++ b/virt/kvm/arm/vgic/vgic-v4.c
-@@ -118,7 +118,7 @@ int vgic_v4_init(struct kvm *kvm)
- 	struct kvm_vcpu *vcpu;
- 	int i, nr_vcpus, ret;
- 
--	if (!vgic_supports_direct_msis(kvm))
-+	if (!kvm_vgic_global_state.has_gicv4)
- 		return 0; /* Nothing to see here... move along. */
- 
- 	if (dist->its_vm.vpes)
 -- 
-2.14.2
+Catalin
