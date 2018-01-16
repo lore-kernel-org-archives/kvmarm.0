@@ -1,51 +1,67 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCH v6 03/13] arm64: cpufeature: Detect CPU RAS Extentions
-Date: Tue, 16 Jan 2018 10:26:47 +0000
-Message-ID: <8bab61f5-828e-928e-f0af-a55f7871fa55@arm.com>
-References: <20180115193906.30053-1-james.morse@arm.com>
- <20180115193906.30053-4-james.morse@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH] arm64: KVM: Fix SMCCC handling of unimplemented SMC/HVC
+ calls
+Date: Tue, 16 Jan 2018 11:42:49 +0100
+Message-ID: <20180116104249.GO21403@cbox>
+References: <20180116102347.20892-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A042B49DFD
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jan 2018 05:21:54 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6-EtFoCee9nI for <kvmarm@lists.cs.columbia.edu>;
- Tue, 16 Jan 2018 05:21:53 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B3C649DDC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jan 2018 05:21:53 -0500 (EST)
-In-Reply-To: <20180115193906.30053-4-james.morse@arm.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: Jonathan.Zhang@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20180116102347.20892-1-marc.zyngier@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 15/01/18 19:38, James Morse wrote:
-> From: Xie XiuQi <xiexiuqi@huawei.com>
+On Tue, Jan 16, 2018 at 10:23:47AM +0000, Marc Zyngier wrote:
+> KVM doesn't follow the SMCCC when it comes to unimplemented calls,
+> and inject an UNDEF instead of returning an error. Since firmware
+> calls are now used for security mitigation, they are becoming more
+> common, and the undef is counter productive.
 > 
-> ARM's v8.2 Extentions add support for Reliability, Availability and
-> Serviceability (RAS). On CPUs with these extensions system software
-> can use additional barriers to isolate errors and determine if faults
-> are pending. Add cpufeature detection.
+> Instead, let's follow the SMCCC which states that -1 must be returned
+> to the caller when getting an unknown function number.
 > 
-> Platform level RAS support may require additional firmware support.
-> 
-> Signed-off-by: Xie XiuQi <xiexiuqi@huawei.com>
-> [Rebased added config option, reworded commit message]
-> Signed-off-by: James Morse <james.morse@arm.com>
-> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+
+And applied to kvmarm/master.  I'll attempt to herd this upstream asap.
+-Christoffer
+
+> ---
+> This has been identified as an issue when working on the Spectre issues,
+> as guest have to perform HVC/SMC calls to invalidate their branch predictors,
+> and need to perform some form of discovery. 32bit is affected too, but the
+> mitigation doesn't involve firmware, so we can fix it separately.
+> 
+>  arch/arm64/kvm/handle_exit.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index 304203fa9e33..e60494f1eef9 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -45,7 +45,7 @@ static int handle_hvc(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  
+>  	ret = kvm_psci_call(vcpu);
+>  	if (ret < 0) {
+> -		kvm_inject_undefined(vcpu);
+> +		vcpu_set_reg(vcpu, 0, ~0UL);
+>  		return 1;
+>  	}
+>  
+> @@ -54,7 +54,7 @@ static int handle_hvc(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  
+>  static int handle_smc(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  {
+> -	kvm_inject_undefined(vcpu);
+> +	vcpu_set_reg(vcpu, 0, ~0UL);
+>  	return 1;
+>  }
+>  
+> -- 
+> 2.14.2
+> 
