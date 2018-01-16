@@ -1,53 +1,88 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL v2 3/3] arm64: KVM: Fix SMCCC handling of unimplemented SMC/HVC calls
-Date: Tue, 16 Jan 2018 18:02:33 +0100
-Message-ID: <20180116170233.7085-4-christoffer.dall@linaro.org>
+Subject: [PULL v2 2/3] KVM: arm64: Fix GICv4 init when called from
+ vgic_its_create
+Date: Tue, 16 Jan 2018 18:02:32 +0100
+Message-ID: <20180116170233.7085-3-christoffer.dall@linaro.org>
 References: <20180116170233.7085-1-christoffer.dall@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9912149DFE
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jan 2018 11:57:40 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id fbFG0hu21Lxz for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 16 Jan 2018 11:57:39 -0500 (EST)
+Received: from mail-wm0-f66.google.com (mail-wm0-f66.google.com [74.125.82.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 97EE549DFB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jan 2018 11:57:39 -0500 (EST)
+Received: by mail-wm0-f66.google.com with SMTP id f3so10114639wmc.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jan 2018 09:02:41 -0800 (PST)
 In-Reply-To: <20180116170233.7085-1-christoffer.dall@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, stable@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Marc Zyngier <marc.zyngier@arm.com>
+Commit 3d1ad640f8c94 ("KVM: arm/arm64: Fix GICv4 ITS initialization
+issues") moved the vgic_supports_direct_msis() check in vgic_v4_init().
+However when vgic_v4_init is called from vgic_its_create(), the has_its
+field is not yet set. Hence vgic_supports_direct_msis returns false and
+vgic_v4_init does nothing.
 
-KVM doesn't follow the SMCCC when it comes to unimplemented calls,
-and inject an UNDEF instead of returning an error. Since firmware
-calls are now used for security mitigation, they are becoming more
-common, and the undef is counter productive.
+The gic/its init sequence is a bit messy, so let's be specific about the
+prerequisite checks in the various call paths instead of relying on a
+common wrapper.
 
-Instead, let's follow the SMCCC which states that -1 must be returned
-to the caller when getting an unknown function number.
-
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Fixes: 3d1ad640f8c94 ("KVM: arm/arm64: Fix GICv4 ITS initialization issues")
+Reported-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/kvm/handle_exit.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ virt/kvm/arm/vgic/vgic-init.c | 8 +++++---
+ virt/kvm/arm/vgic/vgic-v4.c   | 2 +-
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 304203fa9e33..e60494f1eef9 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -45,7 +45,7 @@ static int handle_hvc(struct kvm_vcpu *vcpu, struct kvm_run *run)
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index 62310122ee78..743ca5cb05ef 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -285,9 +285,11 @@ int vgic_init(struct kvm *kvm)
+ 	if (ret)
+ 		goto out;
  
- 	ret = kvm_psci_call(vcpu);
- 	if (ret < 0) {
--		kvm_inject_undefined(vcpu);
-+		vcpu_set_reg(vcpu, 0, ~0UL);
- 		return 1;
- 	}
+-	ret = vgic_v4_init(kvm);
+-	if (ret)
+-		goto out;
++	if (vgic_has_its(kvm)) {
++		ret = vgic_v4_init(kvm);
++		if (ret)
++			goto out;
++	}
  
-@@ -54,7 +54,7 @@ static int handle_hvc(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	kvm_for_each_vcpu(i, vcpu, kvm)
+ 		kvm_vgic_vcpu_enable(vcpu);
+diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
+index 4a37292855bc..bc4265154bac 100644
+--- a/virt/kvm/arm/vgic/vgic-v4.c
++++ b/virt/kvm/arm/vgic/vgic-v4.c
+@@ -118,7 +118,7 @@ int vgic_v4_init(struct kvm *kvm)
+ 	struct kvm_vcpu *vcpu;
+ 	int i, nr_vcpus, ret;
  
- static int handle_smc(struct kvm_vcpu *vcpu, struct kvm_run *run)
- {
--	kvm_inject_undefined(vcpu);
-+	vcpu_set_reg(vcpu, 0, ~0UL);
- 	return 1;
- }
+-	if (!vgic_supports_direct_msis(kvm))
++	if (!kvm_vgic_global_state.has_gicv4)
+ 		return 0; /* Nothing to see here... move along. */
  
+ 	if (dist->its_vm.vpes)
 -- 
 2.14.2
