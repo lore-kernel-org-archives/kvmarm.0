@@ -1,61 +1,68 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v6 07/13] KVM: arm/arm64: mask/unmask daif around VHE
- guests
-Date: Tue, 16 Jan 2018 10:01:28 +0000
-Message-ID: <2dddb720-de25-91d5-fe4d-f5d4758e98b8@arm.com>
+Subject: Re: [PATCH v6 08/13] KVM: arm64: Set an impdef ESR for Virtual-SError
+ using VSESR_EL2.
+Date: Tue, 16 Jan 2018 10:05:12 +0000
+Message-ID: <d070e8ad-f331-a08b-ccd6-ee13916a7798@arm.com>
 References: <20180115193906.30053-1-james.morse@arm.com>
- <20180115193906.30053-8-james.morse@arm.com>
+ <20180115193906.30053-9-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2632749DED
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jan 2018 04:56:37 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3eu5VaiXHXGD for <kvmarm@lists.cs.columbia.edu>;
- Tue, 16 Jan 2018 04:56:31 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 33A7049DE6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jan 2018 04:56:31 -0500 (EST)
-In-Reply-To: <20180115193906.30053-8-james.morse@arm.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20180115193906.30053-9-james.morse@arm.com>
 Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: James Morse <james.morse@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: Jonathan.Zhang@cavium.com, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu
+Cc: Jonathan.Zhang@cavium.com, Xie XiuQi <xiexiuqi@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On 15/01/18 19:39, James Morse wrote:
-> Non-VHE systems take an exception to EL2 in order to world-switch into the
-> guest. When returning from the guest KVM implicitly restores the DAIF
-> flags when it returns to the kernel at EL1.
+> Prior to v8.2's RAS Extensions, the HCR_EL2.VSE 'virtual SError' feature
+> generated an SError with an implementation defined ESR_EL1.ISS, because we
+> had no mechanism to specify the ESR value.
 > 
-> With VHE none of this exception-level jumping happens, so KVMs
-> world-switch code is exposed to the host kernel's DAIF values, and KVM
-> spills the guest-exit DAIF values back into the host kernel.
-> On entry to a guest we have Debug and SError exceptions unmasked, KVM
-> has switched VBAR but isn't prepared to handle these. On guest exit
-> Debug exceptions are left disabled once we return to the host and will
-> stay this way until we enter user space.
+> On Juno this generates an all-zero ESR, the most significant bit 'ISV'
+> is clear indicating the remainder of the ISS field is invalid.
 > 
-> Add a helper to mask/unmask DAIF around VHE guests. The unmask can only
-> happen after the hosts VBAR value has been synchronised by the isb in
-> __vhe_hyp_call (via kvm_call_hyp()). Masking could be as late as
-> setting KVMs VBAR value, but is kept here for symmetry.
+> With the RAS Extensions we have a mechanism to specify this value, and the
+> most significant bit has a new meaning: 'IDS - Implementation Defined
+> Syndrome'. An all-zero SError ESR now means: 'RAS error: Uncategorized'
+> instead of 'no valid ISS'.
 > 
+> Add KVM support for the VSESR_EL2 register to specify an ESR value when
+> HCR_EL2.VSE generates a virtual SError. Change kvm_inject_vabt() to
+> specify an implementation-defined value.
+> 
+> We only need to restore the VSESR_EL2 value when HCR_EL2.VSE is set, KVM
+> save/restores this bit during __{,de}activate_traps() and hardware clears the
+> bit once the guest has consumed the virtual-SError.
+> 
+> Future patches may add an API (or KVM CAP) to pend a virtual SError with
+> a specified ESR.
+> 
+> Cc: Dongjiu Geng <gengdongjiu@huawei.com>
 > Signed-off-by: James Morse <james.morse@arm.com>
 > Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+> ---
+> Changes since v4:
+>  * Fixed an uncatagorized typo
+> 
+>  arch/arm64/include/asm/kvm_emulate.h |  5 +++++
+>  arch/arm64/include/asm/kvm_host.h    |  3 +++
+>  arch/arm64/include/asm/sysreg.h      |  1 +
+>  arch/arm64/kvm/hyp/switch.c          |  3 +++
+>  arch/arm64/kvm/inject_fault.c        | 13 ++++++++++++-
+>  5 files changed, 24 insertions(+), 1 deletion(-)
 
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 
 	M.
 -- 
