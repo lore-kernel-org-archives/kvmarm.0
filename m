@@ -1,295 +1,152 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [RFC PATCH v2 3/5] iommu/virtio-iommu: Add event queue
-Date: Tue, 16 Jan 2018 11:10:46 +0100
-Message-ID: <3061e653-38bb-bffa-0f16-43047724a0ae@redhat.com>
-References: <20171117185211.32593-1-jean-philippe.brucker@arm.com>
- <20171117185211.32593-4-jean-philippe.brucker@arm.com>
+From: Yury Norov <ynorov-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>
+Subject: Re: [PATCH v5 00/30] ARM Scalable Vector Extension (SVE)
+Date: Tue, 16 Jan 2018 13:11:49 +0300
+Message-ID: <20180116101149.pyqbn3dkhnw5x2dv@yury-thinkpad>
+References: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
+ <20180108144905.qu5qbmaaglcgwvwq@yury-thinkpad>
+ <20180109165120.6ravt4stp3654374@yury-thinkpad>
+ <20180115172201.GW22781@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20171117185211.32593-4-jean-philippe.brucker@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, iommu@lists.linux-foundation.org, devel@acpica.org, linux-acpi@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, virtualization@lists.linux-foundation.org, virtio-dev@lists.oasis-open.org
-Cc: jasowang@redhat.com, mst@redhat.com, lv.zheng@intel.com, robert.moore@intel.com, joro@8bytes.org, alex.williamson@redhat.com, sudeep.holla@arm.com, hanjun.guo@linaro.org, lorenzo.pieralisi@arm.com, lenb@kernel.org, rjw@rjwysocki.net, marc.zyngier@arm.com, robin.murphy@arm.com, will.deacon@arm.com, bharat.bhushan@nxp.com, Jayachandran.Nair@cavium.com, ashok.raj@intel.com, peterx@redhat.com
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20180115172201.GW22781-M5GwZQ6tE7x5pKCnmE3YQBJ8xKzm50AiAL8bYrjMMd8@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Dave Martin <Dave.Martin-5wv7dgnIgG8@public.gmane.org>
+Cc: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-arch-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, Okamoto Takayuki <tokamoto-+CUm20s59erQFUHtdCDX3A@public.gmane.org>, libc-alpha-9JcytcrH/bA+uJoB2kUjGw@public.gmane.org, Ard Biesheuvel <ard.biesheuvel-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Szabolcs Nagy <szabolcs.nagy-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, "H . J . Lu" <hjl.tools-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, "H. Peter Anvin" <hpa-YMNOUZJC4hwAvxtiuMwx3w@public.gmane.org>, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Oleg Nesterov <oleg-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Dmitry Safonov <dsafonov-5HdwGun5lf+gSpxsJD1C4w@public.gmane.org>, Ingo Molnar <mingo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>, Alan Hayward <alan.hayward-5wv7dgnIgG8@public.gmane.org>, Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, Ch
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
-
-On 17/11/17 19:52, Jean-Philippe Brucker wrote:
-> The event queue offers a way for the device to report access faults from
-> devices.
-end points?
- It is implemented on virtqueue #1, whenever the host needs to
-> signal a fault it fills one of the buffers offered by the guest and
-> interrupts it.
+On Mon, Jan 15, 2018 at 05:22:01PM +0000, Dave Martin wrote:
+> On Tue, Jan 09, 2018 at 07:51:20PM +0300, Yury Norov wrote:
+> > On Mon, Jan 08, 2018 at 05:49:05PM +0300, Yury Norov wrote:
+> > > On Tue, Oct 31, 2017 at 03:50:52PM +0000, Dave Martin wrote:
+> > > > This series implements Linux kernel support for the ARM Scalable Vector
+> > > > Extension (SVE). [1]  It supersedes the previous v3: see [3] for link
+> > > > and full cover letter.
+> > > > 
+> > > > This is a minor update to v4, but does contain a couple of important
+> > > > fixes.
+> > > > 
+> > > > As in previous postings, the last two patches (here 29-30) are still
+> > > > RFC and not proposed for merging at this time.
+> > > > 
+> > > > The patches apply on
+> > > > git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git
+> > > > for-next/core
+> > > > d7b1d22d3821 ("arm64: uapi: Remove PSR_Q_BIT")
+> > > > 
+> > > > To reduce spam, some people may not been copied on the entire series.
+> > > > For those who did not receive the whole series, it can be found in the
+> > > > linux-arm-kernel archive. [2]
+> > > > 
+> > > > See the individual patches for details of changes.
+> > > > 
+> > > > For reviewer convenience, a git tree is available. [4]
+> > > > 
+> > > > Since there are some changes against already-reviewed patches, I've also
+> > > > pushed an unsquashed fixes tree for people to take a look at if it
+> > > > helps. [5]
+> > > > 
+> > > > 
+> > > > Summary:
+> > > > 
+> > > >  * "regset: Add support for dynamically sized regsets" fixed to avoid
+> > > >    x86 breakage;
+> > > > 
+> > > >  * one trival arm64 patch added to add asmlinkage annotations, and a
+> > > >    corresponding minor change to the Core task context handling patch;
+> > > > 
+> > > >  * one new arm64 fix ("signal: Verify extra data is user-readable in
+> > > >    sys_rt_sigreturn") to ensure that access_ok() checks are done for the
+> > > >    whole extended signal frame, not just the base frame;
+> > > > 
+> > > >  * one minor fix to the SVE sigreturn code to return consistent
+> > > >    intermediate error values (semantic correctness, non-functional
+> > > >    change);
+> > > > 
+> > > >  * one minor change to call __copy_from_user() instead of
+> > > >    copy_from_user() in a situation where there is already an access_ok()
+> > > >    check;
+> > > > 
+> > > > 
+> > > > [1] ARM Scalable Vector Extension
+> > > > https://community.arm.com/groups/processors/blog/2016/08/22/technology-update-the-scalable-vector-extension-sve-for-the-armv8-a-architecture
+> > > > 
+> > > > [2] linux-arm-kernel October 2017 Archives by thread
+> > > > http://lists.infradead.org/pipermail/linux-arm-kernel/2017-October/thread.html
+> > > > 
+> > > > [3] [PATCH v4 00/28] ARM Scalable Vector Extension (SVE)
+> > > > http://lists.infradead.org/pipermail/linux-arm-kernel/2017-October/539414.html
+> > > > 
+> > > > [4] For review and testing only -- **do not pull**
+> > > >     (This branch has review changelogs which should not form part of
+> > > >     the final commits.)
+> > > > 
+> > > >     v5 series (this posting)
+> > > > 
+> > > >     http://linux-arm.org/git?p=linux-dm.git;a=shortlog;h=refs/heads/sve/v5
+> > > >     git://linux-arm.org/linux-dm.git sve/v5
+> > > > 
+> > > > [5] For review and testing only -- **do not pull**
+> > > >     (This branch has review changelogs which should not form part of
+> > > >     the final commits.)
+> > > > 
+> > > >     v4 with unsquashed fixes
+> > > > 
+> > > >     http://linux-arm.org/git?p=linux-dm.git;a=shortlog;h=refs/heads/sve/v4%2Bfixes
+> > > >     git://linux-arm.org/linux-dm.git sve/v4+fixes
+> > > 
+> > > Hi Dave,
+> > > 
+> > > During rebase of my ILP32 series on 4.15 kernel I found that 
+> > > ILP32 needs to be enabled with SVE support, like you do for 
+> > > LP64 in this series.
+> > > 
+> > > I did all rebase work on this draft branch:
+> > > https://github.com/norov/linux/tree/ilp32-4.15-rc7
+> > > 
+> > > But any ILP32 program I tried crash, and the message in dmesg looks
+> > > like this:
+> > > [   39.510667] CPU: 0 PID: 1857 Comm: mytime Not tainted 4.15.0-rc7-00028-g45e0659df4d9 #41
+> > > [   39.510712] Hardware name: linux,dummy-virt (DT)
+> > > [   39.510829] pstate: 00000000 (nzcv daif -PAN -UAO)
+> > > [   39.511101] pc : 0x33488e28
+> > > [   39.511125] lr : 0x33488e28
+> > > [   39.511138] sp : 00000000fffef670
+> > > [   39.511158] x29: 000000005a536c33 x28: 0000000000000000 
+> > > [   39.511211] x27: 0000000000000000 x26: 0000000000000000 
+> > > [   39.511235] x25: 0000000000000000 x24: 0000000000000000 
+> > > [   39.511257] x23: 0000000000466000 x22: 0000000000000000 
+> > > [   39.511278] x21: 0000000000000000 x20: 000000000047f2a8 
+> > > [   39.511300] x19: 0000000000000000 x18: 0000000000000001 
+> > > [   39.511321] x17: 0000000000001000 x16: 0000000000001030 
+> > > [   39.511342] x15: 0000000000554e47 x14: 0000000000000001 
+> > > [   39.511364] x13: 0000000000000004 x12: 000000000000003c 
+> > > [   39.511385] x11: 0000100000000000 x10: 0800000000000000 
+> > > [   39.511406] x9 : 0fffffffffffffff x8 : 000000000000007c 
+> > > [   39.511427] x7 : 0000000000000077 x6 : 0000000000000041 
+> > > [   39.511448] x5 : 0000000000000411 x4 : 00000000fbad2488 
+> > > [   39.511468] x3 : 0000000000000001 x2 : 0000000000497950 
+> > > [   39.511489] x1 : 0000000000497550 x0 : 0000000000000001
+> > 
+> > Hi Dave,
+> > 
+> > I fixed the crash. It was my local problem.
 > 
-> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-> ---
->  drivers/iommu/virtio-iommu.c      | 138 ++++++++++++++++++++++++++++++++++----
->  include/uapi/linux/virtio_iommu.h |  18 +++++
->  2 files changed, 142 insertions(+), 14 deletions(-)
+> Ah, right :)
 > 
-> diff --git a/drivers/iommu/virtio-iommu.c b/drivers/iommu/virtio-iommu.c
-> index 79e0add94e05..fe0d449bf489 100644
-> --- a/drivers/iommu/virtio-iommu.c
-> +++ b/drivers/iommu/virtio-iommu.c
-> @@ -30,6 +30,12 @@
->  #define MSI_IOVA_BASE			0x8000000
->  #define MSI_IOVA_LENGTH			0x100000
->  
-> +enum viommu_vq_idx {
-> +	VIOMMU_REQUEST_VQ	= 0,
-> +	VIOMMU_EVENT_VQ		= 1,
-> +	VIOMMU_NUM_VQS		= 2,
-> +};
-> +
->  struct viommu_dev {
->  	struct iommu_device		iommu;
->  	struct device			*dev;
-> @@ -37,7 +43,7 @@ struct viommu_dev {
->  
->  	struct ida			domain_ids;
->  
-> -	struct virtqueue		*vq;
-> +	struct virtqueue		*vqs[VIOMMU_NUM_VQS];
->  	/* Serialize anything touching the request queue */
->  	spinlock_t			request_lock;
->  
-> @@ -84,6 +90,15 @@ struct viommu_request {
->  	struct list_head		list;
->  };
->  
-> +#define VIOMMU_FAULT_RESV_MASK		0xffffff00
-> +
-> +struct viommu_event {
-> +	union {
-> +		u32			head;
-> +		struct virtio_iommu_fault fault;
-> +	};
-> +};
-> +
->  #define to_viommu_domain(domain) container_of(domain, struct viommu_domain, domain)
->  
->  /* Virtio transport */
-> @@ -160,12 +175,13 @@ static int viommu_receive_resp(struct viommu_dev *viommu, int nr_sent,
->  	unsigned int len;
->  	int nr_received = 0;
->  	struct viommu_request *req, *pending;
-> +	struct virtqueue *vq = viommu->vqs[VIOMMU_REQUEST_VQ];
->  
->  	pending = list_first_entry_or_null(sent, struct viommu_request, list);
->  	if (WARN_ON(!pending))
->  		return 0;
->  
-> -	while ((req = virtqueue_get_buf(viommu->vq, &len)) != NULL) {
-> +	while ((req = virtqueue_get_buf(vq, &len)) != NULL) {
->  		if (req != pending) {
->  			dev_warn(viommu->dev, "discarding stale request\n");
->  			continue;
-> @@ -202,6 +218,7 @@ static int _viommu_send_reqs_sync(struct viommu_dev *viommu,
->  	 * dies.
->  	 */
->  	unsigned long timeout_ms = 1000;
-> +	struct virtqueue *vq = viommu->vqs[VIOMMU_REQUEST_VQ];
->  
->  	*nr_sent = 0;
->  
-> @@ -211,15 +228,14 @@ static int _viommu_send_reqs_sync(struct viommu_dev *viommu,
->  		sg[0] = &req->top;
->  		sg[1] = &req->bottom;
->  
-> -		ret = virtqueue_add_sgs(viommu->vq, sg, 1, 1, req,
-> -					GFP_ATOMIC);
-> +		ret = virtqueue_add_sgs(vq, sg, 1, 1, req, GFP_ATOMIC);
->  		if (ret)
->  			break;
->  
->  		list_add_tail(&req->list, &pending);
->  	}
->  
-> -	if (i && !virtqueue_kick(viommu->vq))
-> +	if (i && !virtqueue_kick(vq))
->  		return -EPIPE;
->  
->  	timeout = ktime_add_ms(ktime_get(), timeout_ms * i);
-> @@ -554,6 +570,70 @@ static int viommu_probe_endpoint(struct viommu_dev *viommu, struct device *dev)
->  	return 0;
->  }
->  
-> +static int viommu_fault_handler(struct viommu_dev *viommu,
-> +				struct virtio_iommu_fault *fault)
-> +{
-> +	char *reason_str;
-> +
-> +	u8 reason	= fault->reason;
-> +	u32 flags	= le32_to_cpu(fault->flags);
-> +	u32 endpoint	= le32_to_cpu(fault->endpoint);
-> +	u64 address	= le64_to_cpu(fault->address);
-> +
-> +	switch (reason) {
-> +	case VIRTIO_IOMMU_FAULT_R_DOMAIN:
-> +		reason_str = "domain";
-> +		break;
-> +	case VIRTIO_IOMMU_FAULT_R_MAPPING:
-> +		reason_str = "page";
-> +		break;
-> +	case VIRTIO_IOMMU_FAULT_R_UNKNOWN:
-> +	default:
-> +		reason_str = "unknown";
-> +		break;
-> +	}
-> +
-> +	/* TODO: find EP by ID and report_iommu_fault */
-> +	if (flags & VIRTIO_IOMMU_FAULT_F_ADDRESS)
-> +		dev_err_ratelimited(viommu->dev, "%s fault from EP %u at %#llx [%s%s%s]\n",
-> +				    reason_str, endpoint, address,
-> +				    flags & VIRTIO_IOMMU_FAULT_F_READ ? "R" : "",
-> +				    flags & VIRTIO_IOMMU_FAULT_F_WRITE ? "W" : "",
-> +				    flags & VIRTIO_IOMMU_FAULT_F_EXEC ? "X" : "");
-> +	else
-> +		dev_err_ratelimited(viommu->dev, "%s fault from EP %u\n",
-> +				    reason_str, endpoint);
-> +
-> +	return 0;
-> +}
-> +
-> +static void viommu_event_handler(struct virtqueue *vq)
-> +{
-> +	int ret;
-> +	unsigned int len;
-> +	struct scatterlist sg[1];
-> +	struct viommu_event *evt;
-> +	struct viommu_dev *viommu = vq->vdev->priv;
-> +
-> +	while ((evt = virtqueue_get_buf(vq, &len)) != NULL) {
-> +		if (len > sizeof(*evt)) {
-> +			dev_err(viommu->dev,
-> +				"invalid event buffer (len %u != %zu)\n",
-> +				len, sizeof(*evt));
-> +		} else if (!(evt->head & VIOMMU_FAULT_RESV_MASK)) {
-> +			viommu_fault_handler(viommu, &evt->fault);
-> +		}
-> +
-> +		sg_init_one(sg, evt, sizeof(*evt));
-in case of above error case, ie. len > sizeof(*evt), is it safe to push
-evt again?
-> +		ret = virtqueue_add_inbuf(vq, sg, 1, evt, GFP_ATOMIC);
-> +		if (ret)
-> +			dev_err(viommu->dev, "could not add event buffer\n");
-> +	}
-> +
-> +	if (!virtqueue_kick(vq))
-> +		dev_err(viommu->dev, "kick failed\n");
-> +}
-> +
->  /* IOMMU API */
->  
->  static bool viommu_capable(enum iommu_cap cap)
-> @@ -938,19 +1018,44 @@ static struct iommu_ops viommu_ops = {
->  	.put_resv_regions	= viommu_put_resv_regions,
->  };
->  
-> -static int viommu_init_vq(struct viommu_dev *viommu)
-> +static int viommu_init_vqs(struct viommu_dev *viommu)
->  {
->  	struct virtio_device *vdev = dev_to_virtio(viommu->dev);
-> -	const char *name = "request";
-> -	void *ret;
-> +	const char *names[] = { "request", "event" };
-> +	vq_callback_t *callbacks[] = {
-> +		NULL, /* No async requests */
-> +		viommu_event_handler,
-> +	};
-> +
-> +	return virtio_find_vqs(vdev, VIOMMU_NUM_VQS, viommu->vqs, callbacks,
-> +			       names, NULL);
-> +}
->  
-> -	ret = virtio_find_single_vq(vdev, NULL, name);
-> -	if (IS_ERR(ret)) {
-> -		dev_err(viommu->dev, "cannot find VQ\n");
-> -		return PTR_ERR(ret);
-> +static int viommu_fill_evtq(struct viommu_dev *viommu)
-> +{
-> +	int i, ret;
-> +	struct scatterlist sg[1];
-> +	struct viommu_event *evts;
-> +	struct virtqueue *vq = viommu->vqs[VIOMMU_EVENT_VQ];
-> +	size_t nr_evts = min_t(size_t, PAGE_SIZE / sizeof(struct viommu_event),
-> +			       viommu->vqs[VIOMMU_EVENT_VQ]->num_free);
-> +
-> +	evts = devm_kmalloc_array(viommu->dev, nr_evts, sizeof(*evts),
-> +				  GFP_KERNEL);
-> +	if (!evts)
-> +		return -ENOMEM;
-> +
-> +	for (i = 0; i < nr_evts; i++) {
-> +		sg_init_one(sg, &evts[i], sizeof(*evts));
-> +		ret = virtqueue_add_inbuf(vq, sg, 1, &evts[i], GFP_KERNEL);
-who does the deallocation of evts?
+> I'll take a look at your code anyway in case there's something
+> else one of us didn't think of.
 
-Thanks
+Thanks, Dave.
 
-Eric
-> +		if (ret)
-> +			return ret;
->  	}
->  
-> -	viommu->vq = ret;
-> +	if (!virtqueue_kick(vq))
-> +		return -EPIPE;
-> +
-> +	dev_info(viommu->dev, "%zu event buffers\n", nr_evts);
->  
->  	return 0;
->  }
-> @@ -973,7 +1078,7 @@ static int viommu_probe(struct virtio_device *vdev)
->  	viommu->dev = dev;
->  	viommu->vdev = vdev;
->  
-> -	ret = viommu_init_vq(viommu);
-> +	ret = viommu_init_vqs(viommu);
->  	if (ret)
->  		goto err_free_viommu;
->  
-> @@ -1014,6 +1119,11 @@ static int viommu_probe(struct virtio_device *vdev)
->  
->  	virtio_device_ready(vdev);
->  
-> +	/* Populate the event queue with buffers */
-> +	ret = viommu_fill_evtq(viommu);
-> +	if (ret)
-> +		goto err_free_viommu;
-> +
->  	ret = iommu_device_sysfs_add(&viommu->iommu, dev, NULL, "%s",
->  				     virtio_bus_name(vdev));
->  	if (ret)
-> diff --git a/include/uapi/linux/virtio_iommu.h b/include/uapi/linux/virtio_iommu.h
-> index eec90a2ab547..b57543b4145b 100644
-> --- a/include/uapi/linux/virtio_iommu.h
-> +++ b/include/uapi/linux/virtio_iommu.h
-> @@ -174,4 +174,22 @@ union virtio_iommu_req {
->  	struct virtio_iommu_req_probe		probe;
->  };
->  
-> +/* Fault types */
-> +#define VIRTIO_IOMMU_FAULT_R_UNKNOWN		0
-> +#define VIRTIO_IOMMU_FAULT_R_DOMAIN		1
-> +#define VIRTIO_IOMMU_FAULT_R_MAPPING		2
-> +
-> +#define VIRTIO_IOMMU_FAULT_F_READ		(1 << 0)
-> +#define VIRTIO_IOMMU_FAULT_F_WRITE		(1 << 1)
-> +#define VIRTIO_IOMMU_FAULT_F_EXEC		(1 << 2)
-> +#define VIRTIO_IOMMU_FAULT_F_ADDRESS		(1 << 8)
-> +
-> +struct virtio_iommu_fault {
-> +	__u8					reason;
-> +	__u8					padding[3];
-> +	__le32					flags;
-> +	__le32					endpoint;
-> +	__le64					address;
-> +} __packed;
-> +
->  #endif
-> 
+This is the branch:
+https://github.com/norov/linux/tree/ilp32-4.15-rc7
+
+SVE-related changes are mostly in patches:
+arm64: ilp32: introduce ilp32-specific handlers for sigframe and ucontext
+arm64: signal32: move ilp32 and aarch32 common code to separated file
+arm64: signal: share lp64 signal structures and routines to ilp32
+arm64: ilp32: add sys_ilp32.c and a separate table (in entry.S) to use it
+
+Yury
