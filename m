@@ -1,23 +1,26 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL v2 0/3] KVM/ARM Fixes for v4.15 - Round 3
-Date: Tue, 16 Jan 2018 18:02:30 +0100
-Message-ID: <20180116170233.7085-1-christoffer.dall@linaro.org>
+Subject: [PULL v2 1/3] KVM: arm/arm64: Check pagesize when allocating a
+ hugepage at Stage 2
+Date: Tue, 16 Jan 2018 18:02:31 +0100
+Message-ID: <20180116170233.7085-2-christoffer.dall@linaro.org>
+References: <20180116170233.7085-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D1A9949DFC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jan 2018 11:57:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1745749DFB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jan 2018 11:57:39 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id A-NT2VYrXjeB for <kvmarm@lists.cs.columbia.edu>;
- Tue, 16 Jan 2018 11:57:37 -0500 (EST)
-Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D577B49DDC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jan 2018 11:57:36 -0500 (EST)
-Received: by mail-wm0-f68.google.com with SMTP id v123so10075240wmd.5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jan 2018 09:02:38 -0800 (PST)
+ with ESMTP id wQOBLN1LnRQB for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 16 Jan 2018 11:57:38 -0500 (EST)
+Received: from mail-wm0-f67.google.com (mail-wm0-f67.google.com [74.125.82.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 09B9249DF8
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jan 2018 11:57:38 -0500 (EST)
+Received: by mail-wm0-f67.google.com with SMTP id v71so10106469wmv.2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jan 2018 09:02:39 -0800 (PST)
+In-Reply-To: <20180116170233.7085-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,40 +31,44 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, stable@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Paolo and Radim,
+From: Punit Agrawal <punit.agrawal@arm.com>
 
-This is v2 of the third round of fixes for KVM/ARM for v4.15, which now
-consists of three more fixes for v4.15 fixing incorrect huge page mappings on
-systems using the contigious hint for hugetlbfs; supporting an alternative
-GICv4 init sequence; and correctly implementing the ARM SMCC for HVC and SMC
-handling.
+KVM only supports PMD hugepages at stage 2 but doesn't actually check
+that the provided hugepage memory pagesize is PMD_SIZE before populating
+stage 2 entries.
 
-The following changes since commit 0eb7c33cadf6b2f1a94e58ded8b0eb89b4eba382:
+In cases where the backing hugepage size is smaller than PMD_SIZE (such
+as when using contiguous hugepages), KVM can end up creating stage 2
+mappings that extend beyond the supplied memory.
 
-  KVM: arm/arm64: Fix timer enable flow (2017-12-18 10:53:24 +0100)
+Fix this by checking for the pagesize of userspace vma before creating
+PMD hugepage at stage 2.
 
-are available in the git repository at:
+Fixes: 66b3923a1a0f77a ("arm64: hugetlb: add support for PTE contiguous bit")
+Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: <stable@vger.kernel.org> # v4.5+
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+---
+ virt/kvm/arm/mmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-fixes-for-v4.15-3-v2
-
-for you to fetch changes up to acfb3b883f6d6a4b5d27ad7fdded11f6a09ae6dd:
-
-  arm64: KVM: Fix SMCCC handling of unimplemented SMC/HVC calls (2018-01-16 17:58:51 +0100)
-
-Christoffer Dall (1):
-      KVM: arm64: Fix GICv4 init when called from vgic_its_create
-
-Marc Zyngier (1):
-      arm64: KVM: Fix SMCCC handling of unimplemented SMC/HVC calls
-
-Punit Agrawal (1):
-      KVM: arm/arm64: Check pagesize when allocating a hugepage at Stage 2
-
- arch/arm64/kvm/handle_exit.c  | 4 ++--
- virt/kvm/arm/mmu.c            | 2 +-
- virt/kvm/arm/vgic/vgic-init.c | 8 +++++---
- virt/kvm/arm/vgic/vgic-v4.c   | 2 +-
- 4 files changed, 9 insertions(+), 7 deletions(-)
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index b4b69c2d1012..9dea96380339 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -1310,7 +1310,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		return -EFAULT;
+ 	}
+ 
+-	if (is_vm_hugetlb_page(vma) && !logging_active) {
++	if (vma_kernel_pagesize(vma) == PMD_SIZE && !logging_active) {
+ 		hugetlb = true;
+ 		gfn = (fault_ipa & PMD_MASK) >> PAGE_SHIFT;
+ 	} else {
+-- 
+2.14.2
