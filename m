@@ -1,46 +1,71 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] arm64: mm: Add additional parameter to
- uaccess_ttbr0_disable
-Date: Wed, 17 Jan 2018 12:57:32 +0000
-Message-ID: <bd24a127-4215-d7a5-64f8-b79a05bc9a47@arm.com>
-References: <20180117113850.21949-1-christoffer.dall@linaro.org>
+From: Julien Thierry <julien.thierry@arm.com>
+Subject: Re: [PATCH v3 08/41] KVM: arm/arm64: Introduce vcpu_el1_is_32bit
+Date: Wed, 17 Jan 2018 14:44:32 +0000
+Message-ID: <4a3fa63c-5925-e406-26dd-da4e9765e7fa@arm.com>
+References: <20180112120747.27999-1-christoffer.dall@linaro.org>
+ <20180112120747.27999-9-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20180117113850.21949-1-christoffer.dall@linaro.org>
-Content-Language: en-GB
+In-Reply-To: <20180112120747.27999-9-christoffer.dall@linaro.org>
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc: kvm@vger.kernel.org, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>
+To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andrew Jones <drjones@redhat.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 17/01/18 11:38, Christoffer Dall wrote:
-> Add an extra temporary register parameter to uaccess_ttbr0_disable which
-> is about to be required for arm64 PAN support.
+Hi Christoffer,
+
+On 12/01/18 12:07, Christoffer Dall wrote:
+> We have numerous checks around that checks if the HCR_EL2 has the RW bit
+> set to figure out if we're running an AArch64 or AArch32 VM.  In some
+> cases, directly checking the RW bit (given its unintuitive name), is a
+> bit confusing, and that's not going to improve as we move logic around
+> for the following patches that optimize KVM on AArch64 hosts with VHE.
 > 
-> This patch doesn't introduce any functional change but ensures that the
-> kernel compiles once the KVM/ARM tree is merged with the arm64 tree by
-> ensuring a trivially mergable conflict with commit
-> 6b88a32c7af68895134872cdec3b6bfdb532d94e
-> ("arm64: kpti: Fix the interaction between ASID switching and software PAN").
+> Therefore, introduce a helper, vcpu_el1_is_32bit, and replace existing
+> direct checks of HCR_EL2.RW with the helper.
 > 
-> Cc: Will Deacon <will.deacon@arm.com>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
 > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 > ---
->  arch/arm64/include/asm/asm-uaccess.h | 8 ++++----
->  arch/arm64/lib/clear_user.S          | 2 +-
->  arch/arm64/lib/copy_from_user.S      | 2 +-
->  arch/arm64/lib/copy_in_user.S        | 2 +-
->  arch/arm64/lib/copy_to_user.S        | 2 +-
->  arch/arm64/mm/cache.S                | 4 ++--
->  arch/arm64/xen/hypercall.S           | 2 +-
->  7 files changed, 11 insertions(+), 11 deletions(-)
+>   arch/arm64/include/asm/kvm_emulate.h | 7 ++++++-
+>   arch/arm64/kvm/hyp/switch.c          | 8 ++------
+>   arch/arm64/kvm/hyp/sysreg-sr.c       | 5 +++--
+>   arch/arm64/kvm/inject_fault.c        | 6 +++---
+>   4 files changed, 14 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index b36aaa1fe332..e07bf463ac58 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -45,6 +45,11 @@ void kvm_inject_undef32(struct kvm_vcpu *vcpu);
+>   void kvm_inject_dabt32(struct kvm_vcpu *vcpu, unsigned long addr);
+>   void kvm_inject_pabt32(struct kvm_vcpu *vcpu, unsigned long addr);
+>   
+> +static inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
+> +{
+> +	return !(vcpu->arch.hcr_el2 & HCR_RW);
+> +}
+> +
 
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Just so I understand, the difference between this and vcpu_mode_is_32bit 
+is that vcpu_mode_is_32bit might return true because an 
+interrupt/exception occured while guest was executing 32bit EL0 but 
+guest EL1 is still 64bits, is that correct?
 
-	M.
+Also, it seems the process controlling KVM is supposed to provide the 
+information of whether the vcpu runs a 32bit el1, would it be better to do:
+
+	return test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features);
+
+instead of looking at the hcr? Or is there a case where those might differ?
+
+Otherwise:
+
+Reviewed-by: Julien Thierry <julien.thierry@arm.com>
+
+Cheers,
+
 -- 
-Jazz is not dead. It just smells funny...
+Julien Thierry
