@@ -1,375 +1,203 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [RFC PATCH v2 2/5] iommu/virtio-iommu: Add probe request
-Date: Wed, 17 Jan 2018 00:26:11 +0100
-Message-ID: <5b236aaa-4abb-2cac-1c74-f8137a0c2244@redhat.com>
-References: <20171117185211.32593-1-jean-philippe.brucker@arm.com>
- <20171117185211.32593-3-jean-philippe.brucker@arm.com>
+From: Yury Norov <ynorov@caviumnetworks.com>
+Subject: Re: [PATCH v3 00/41] Optimize KVM/ARM for VHE systems
+Date: Wed, 17 Jan 2018 11:34:54 +0300
+Message-ID: <20180117083454.6quojwn6qbaxxwoz@yury-thinkpad>
+References: <20180112120747.27999-1-christoffer.dall@linaro.org>
+ <20180115141423.5qho7xvmikq27jvs@yury-thinkpad>
+ <20180115155036.GL21403@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-acpi-owner@vger.kernel.org>
-In-Reply-To: <20171117185211.32593-3-jean-philippe.brucker@arm.com>
-Sender: linux-acpi-owner@vger.kernel.org
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, iommu@lists.linux-foundation.org, devel@acpica.org, linux-acpi@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, virtualization@lists.linux-foundation.org, virtio-dev@lists.oasis-open.org
-Cc: jasowang@redhat.com, mst@redhat.com, lv.zheng@intel.com, robert.moore@intel.com, joro@8bytes.org, alex.williamson@redhat.com, sudeep.holla@arm.com, hanjun.guo@linaro.org, lorenzo.pieralisi@arm.com, lenb@kernel.org, rjw@rjwysocki.net, marc.zyngier@arm.com, robin.murphy@arm.com, will.deacon@arm.com, bharat.bhushan@nxp.com, Jayachandran.Nair@cavium.com, ashok.raj@intel.com, peterx@redhat.com
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20180115155036.GL21403@cbox>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Andrew Jones <drjones@redhat.com>, Sunil Goutham <Sunil.Goutham@cavium.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Jean-Philippe,
-
-On 17/11/17 19:52, Jean-Philippe Brucker wrote:
-> When the device offers the probe feature, send a probe request for each
-> device managed by the IOMMU. Extract RESV_MEM information. When we
-> encounter a MSI doorbell region, set it up as a IOMMU_RESV_MSI region.
-> This will tell other subsystems that there is no need to map the MSI
-> doorbell in the virtio-iommu, because MSIs bypass it.
+On Mon, Jan 15, 2018 at 04:50:36PM +0100, Christoffer Dall wrote:
+> Hi Yury,
 > 
-> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-> ---
->  drivers/iommu/virtio-iommu.c      | 165 ++++++++++++++++++++++++++++++++++++--
->  include/uapi/linux/virtio_iommu.h |  37 +++++++++
->  2 files changed, 195 insertions(+), 7 deletions(-)
+> On Mon, Jan 15, 2018 at 05:14:23PM +0300, Yury Norov wrote:
+> > On Fri, Jan 12, 2018 at 01:07:06PM +0100, Christoffer Dall wrote:
+> > > This series redesigns parts of KVM/ARM to optimize the performance on
+> > > VHE systems.  The general approach is to try to do as little work as
+> > > possible when transitioning between the VM and the hypervisor.  This has
+> > > the benefit of lower latency when waiting for interrupts and delivering
+> > > virtual interrupts, and reduces the overhead of emulating behavior and
+> > > I/O in the host kernel.
+> > > 
+> > > Patches 01 through 06 are not VHE specific, but rework parts of KVM/ARM
+> > > that can be generally improved.  We then add infrastructure to move more
+> > > logic into vcpu_load and vcpu_put, we improve handling of VFP and debug
+> > > registers.
+> > > 
+> > > We then introduce a new world-switch function for VHE systems, which we
+> > > can tweak and optimize for VHE systems.  To do that, we rework a lot of
+> > > the system register save/restore handling and emulation code that may
+> > > need access to system registers, so that we can defer as many system
+> > > register save/restore operations to vcpu_load and vcpu_put, and move
+> > > this logic out of the VHE world switch function.
+> > > 
+> > > We then optimize the configuration of traps.  On non-VHE systems, both
+> > > the host and VM kernels run in EL1, but because the host kernel should
+> > > have full access to the underlying hardware, but the VM kernel should
+> > > not, we essentially make the host kernel more privileged than the VM
+> > > kernel despite them both running at the same privilege level by enabling
+> > > VE traps when entering the VM and disabling those traps when exiting the
+> > > VM.  On VHE systems, the host kernel runs in EL2 and has full access to
+> > > the hardware (as much as allowed by secure side software), and is
+> > > unaffected by the trap configuration.  That means we can configure the
+> > > traps for VMs running in EL1 once, and don't have to switch them on and
+> > > off for every entry/exit to/from the VM.
+> > > 
+> > > Finally, we improve our VGIC handling by moving all save/restore logic
+> > > out of the VHE world-switch, and we make it possible to truly only
+> > > evaluate if the AP list is empty and not do *any* VGIC work if that is
+> > > the case, and only do the minimal amount of work required in the course
+> > > of the VGIC processing when we have virtual interrupts in flight.
+> > > 
+> > > The patches are based on v4.15-rc3, v9 of the level-triggered mapped
+> > > interrupts support series [1], and the first five patches of James' SDEI
+> > > series [2].
+> > > 
+> > > I've given the patches a fair amount of testing on Thunder-X, Mustang,
+> > > Seattle, and TC2 (32-bit) for non-VHE testing, and tested VHE
+> > > functionality on the Foundation model, running both 64-bit VMs and
+> > > 32-bit VMs side-by-side and using both GICv3-on-GICv3 and
+> > > GICv2-on-GICv3.
+> > > 
+> > > The patches are also available in the vhe-optimize-v3 branch on my
+> > > kernel.org repository [3].  The vhe-optimize-v3-base branch contains
+> > > prerequisites of this series.
+> > > 
+> > > Changes since v2:
+> > >  - Rebased on v4.15-rc3.
+> > >  - Includes two additional patches that only does vcpu_load after
+> > >    kvm_vcpu_first_run_init and only for KVM_RUN.
+> > >  - Addressed review comments from v2 (detailed changelogs are in the
+> > >    individual patches).
+> > > 
+> > > Thanks,
+> > > -Christoffer
+> > > 
+> > > [1]: git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git level-mapped-v9
+> > > [2]: git://linux-arm.org/linux-jm.git sdei/v5/base
+> > > [3]: git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git vhe-optimize-v3
+> > 
+> > I tested this v3 series on ThunderX2 with IPI benchmark:
+> > https://lkml.org/lkml/2017/12/11/364
+> > 
+> > I tried to address your comments in discussion to v2, like pinning
+> > the module to specific CPU (with taskset), increasing the number of
+> > iterations, tuning governor to max performance. Results didn't change
+> > much, and are pretty stable.
 > 
-> diff --git a/drivers/iommu/virtio-iommu.c b/drivers/iommu/virtio-iommu.c
-> index feb8c8925c3a..79e0add94e05 100644
-> --- a/drivers/iommu/virtio-iommu.c
-> +++ b/drivers/iommu/virtio-iommu.c
-> @@ -45,6 +45,7 @@ struct viommu_dev {
->  	struct iommu_domain_geometry	geometry;
->  	u64				pgsize_bitmap;
->  	u8				domain_bits;
-> +	u32				probe_size;
->  };
->  
->  struct viommu_mapping {
-> @@ -72,6 +73,7 @@ struct viommu_domain {
->  struct viommu_endpoint {
->  	struct viommu_dev		*viommu;
->  	struct viommu_domain		*vdomain;
-> +	struct list_head		resv_regions;
->  };
->  
->  struct viommu_request {
-> @@ -139,6 +141,10 @@ static int viommu_get_req_size(struct viommu_dev *viommu,
->  	case VIRTIO_IOMMU_T_UNMAP:
->  		size = sizeof(r->unmap);
->  		break;
-> +	case VIRTIO_IOMMU_T_PROBE:
-> +		*bottom += viommu->probe_size;
-> +		size = sizeof(r->probe) + *bottom;
-> +		break;
->  	default:
->  		return -EINVAL;
->  	}
-> @@ -448,6 +454,106 @@ static int viommu_replay_mappings(struct viommu_domain *vdomain)
->  	return ret;
->  }
->  
-> +static int viommu_add_resv_mem(struct viommu_endpoint *vdev,
-> +			       struct virtio_iommu_probe_resv_mem *mem,
-> +			       size_t len)
-> +{
-> +	struct iommu_resv_region *region = NULL;
-> +	unsigned long prot = IOMMU_WRITE | IOMMU_NOEXEC | IOMMU_MMIO;
-> +
-> +	u64 addr = le64_to_cpu(mem->addr);
-> +	u64 size = le64_to_cpu(mem->size);
-> +
-> +	if (len < sizeof(*mem))
-> +		return -EINVAL;
-> +
-> +	switch (mem->subtype) {
-> +	case VIRTIO_IOMMU_RESV_MEM_T_MSI:
-> +		region = iommu_alloc_resv_region(addr, size, prot,
-> +						 IOMMU_RESV_MSI);
-if (!region)
-	return -ENOMEM;
-> +		break;
-> +	case VIRTIO_IOMMU_RESV_MEM_T_RESERVED:
-> +	default:
-> +		region = iommu_alloc_resv_region(addr, size, 0,
-> +						 IOMMU_RESV_RESERVED);
-same.
-
-There is another issue related to the exclusion of iovas belonging to
-reserved regions. Typically on x86, when attempting to run
-virtio-blk-pci with iommu I eventually saw the driver using iova
-belonging to the IOAPIC regions to map phys addr and this stalled qemu
-with a drown trace:
-
-"virtio: bogus descriptor or out of resources"
-
-those regions need to be excluded from the iova allocator. This was
-resolved by adding
-if (iommu_dma_init_domain(domain,
-			  vdev->viommu->geometry.aperture_start,
-			  vdev->viommu->geometry.aperture_end,
-			  dev))
-in viommu_attach_dev()
-
-Thanks
-
-Eric
-> +		break;
-> +	}
-> +
-> +	list_add(&vdev->resv_regions, &region->list);
-> +
-> +	if (mem->subtype != VIRTIO_IOMMU_RESV_MEM_T_RESERVED &&
-> +	    mem->subtype != VIRTIO_IOMMU_RESV_MEM_T_MSI) {
-> +		/* Please update your driver. */
-> +		pr_warn("unknown resv mem subtype 0x%x\n", mem->subtype);
-> +		return -EINVAL;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int viommu_probe_endpoint(struct viommu_dev *viommu, struct device *dev)
-> +{
-> +	int ret;
-> +	u16 type, len;
-> +	size_t cur = 0;
-> +	struct virtio_iommu_req_probe *probe;
-> +	struct virtio_iommu_probe_property *prop;
-> +	struct iommu_fwspec *fwspec = dev->iommu_fwspec;
-> +	struct viommu_endpoint *vdev = fwspec->iommu_priv;
-> +
-> +	if (!fwspec->num_ids)
-> +		/* Trouble ahead. */
-> +		return -EINVAL;
-> +
-> +	probe = kzalloc(sizeof(*probe) + viommu->probe_size +
-> +			sizeof(struct virtio_iommu_req_tail), GFP_KERNEL);
-> +	if (!probe)
-> +		return -ENOMEM;
-> +
-> +	probe->head.type = VIRTIO_IOMMU_T_PROBE;
-> +	/*
-> +	 * For now, assume that properties of an endpoint that outputs multiple
-> +	 * IDs are consistent. Only probe the first one.
-> +	 */
-> +	probe->endpoint = cpu_to_le32(fwspec->ids[0]);
-> +
-> +	ret = viommu_send_req_sync(viommu, probe);
-> +	if (ret) {
-> +		kfree(probe);
-> +		return ret;
-> +	}
-> +
-> +	prop = (void *)probe->properties;
-> +	type = le16_to_cpu(prop->type) & VIRTIO_IOMMU_PROBE_T_MASK;
-> +
-> +	while (type != VIRTIO_IOMMU_PROBE_T_NONE &&
-> +	       cur < viommu->probe_size) {
-> +		len = le16_to_cpu(prop->length);
-> +
-> +		switch (type) {
-> +		case VIRTIO_IOMMU_PROBE_T_RESV_MEM:
-> +			ret = viommu_add_resv_mem(vdev, (void *)prop->value, len);
-> +			break;
-> +		default:
-> +			dev_dbg(dev, "unknown viommu prop 0x%x\n", type);
-> +		}
-> +
-> +		if (ret)
-> +			dev_err(dev, "failed to parse viommu prop 0x%x\n", type);
-> +
-> +		cur += sizeof(*prop) + len;
-> +		if (cur >= viommu->probe_size)
-> +			break;
-> +
-> +		prop = (void *)probe->properties + cur;
-> +		type = le16_to_cpu(prop->type) & VIRTIO_IOMMU_PROBE_T_MASK;
-> +	}
-> +
-> +	kfree(probe);
-> +
-> +	return 0;
-> +}
-> +
->  /* IOMMU API */
->  
->  static bool viommu_capable(enum iommu_cap cap)
-> @@ -706,6 +812,7 @@ static struct viommu_dev *viommu_get_by_fwnode(struct fwnode_handle *fwnode)
->  
->  static int viommu_add_device(struct device *dev)
->  {
-> +	int ret;
->  	struct iommu_group *group;
->  	struct viommu_endpoint *vdev;
->  	struct viommu_dev *viommu = NULL;
-> @@ -723,8 +830,16 @@ static int viommu_add_device(struct device *dev)
->  		return -ENOMEM;
->  
->  	vdev->viommu = viommu;
-> +	INIT_LIST_HEAD(&vdev->resv_regions);
->  	fwspec->iommu_priv = vdev;
->  
-> +	if (viommu->probe_size) {
-> +		/* Get additional information for this endpoint */
-> +		ret = viommu_probe_endpoint(viommu, dev);
-> +		if (ret)
-> +			return ret;
-> +	}
-> +
->  	/*
->  	 * Last step creates a default domain and attaches to it. Everything
->  	 * must be ready.
-> @@ -738,7 +853,19 @@ static int viommu_add_device(struct device *dev)
->  
->  static void viommu_remove_device(struct device *dev)
->  {
-> -	kfree(dev->iommu_fwspec->iommu_priv);
-> +	struct viommu_endpoint *vdev;
-> +	struct iommu_resv_region *entry, *next;
-> +	struct iommu_fwspec *fwspec = dev->iommu_fwspec;
-> +
-> +	if (!fwspec || fwspec->ops != &viommu_ops)
-> +		return;
-> +
-> +	vdev = fwspec->iommu_priv;
-> +
-> +	list_for_each_entry_safe(entry, next, &vdev->resv_regions, list)
-> +		kfree(entry);
-> +
-> +	kfree(vdev);
->  }
->  
->  static struct iommu_group *viommu_device_group(struct device *dev)
-> @@ -756,15 +883,34 @@ static int viommu_of_xlate(struct device *dev, struct of_phandle_args *args)
->  
->  static void viommu_get_resv_regions(struct device *dev, struct list_head *head)
->  {
-> -	struct iommu_resv_region *region;
-> +	struct iommu_resv_region *entry, *new_entry, *msi = NULL;
-> +	struct viommu_endpoint *vdev = dev->iommu_fwspec->iommu_priv;
->  	int prot = IOMMU_WRITE | IOMMU_NOEXEC | IOMMU_MMIO;
->  
-> -	region = iommu_alloc_resv_region(MSI_IOVA_BASE, MSI_IOVA_LENGTH, prot,
-> -					 IOMMU_RESV_SW_MSI);
-> -	if (!region)
-> -		return;
-> +	list_for_each_entry(entry, &vdev->resv_regions, list) {
-> +		/*
-> +		 * If the device registered a bypass MSI windows, use it.
-> +		 * Otherwise add a software-mapped region
-> +		 */
-> +		if (entry->type == IOMMU_RESV_MSI)
-> +			msi = entry;
-> +
-> +		new_entry = kmemdup(entry, sizeof(*entry), GFP_KERNEL);
-> +		if (!new_entry)
-> +			return;
-> +		list_add_tail(&new_entry->list, head);
-> +	}
->  
-> -	list_add_tail(&region->list, head);
-> +	if (!msi) {
-> +		msi = iommu_alloc_resv_region(MSI_IOVA_BASE, MSI_IOVA_LENGTH,
-> +					      prot, IOMMU_RESV_SW_MSI);
-> +		if (!msi)
-> +			return;
-> +
-> +		list_add_tail(&msi->list, head);
-> +	}
-> +
-> +	iommu_dma_get_resv_regions(dev, head);
->  }
->  
->  static void viommu_put_resv_regions(struct device *dev, struct list_head *head)
-> @@ -854,6 +1000,10 @@ static int viommu_probe(struct virtio_device *vdev)
->  			     struct virtio_iommu_config, domain_bits,
->  			     &viommu->domain_bits);
->  
-> +	virtio_cread_feature(vdev, VIRTIO_IOMMU_F_PROBE,
-> +			     struct virtio_iommu_config, probe_size,
-> +			     &viommu->probe_size);
-> +
->  	viommu->geometry = (struct iommu_domain_geometry) {
->  		.aperture_start	= input_start,
->  		.aperture_end	= input_end,
-> @@ -931,6 +1081,7 @@ static unsigned int features[] = {
->  	VIRTIO_IOMMU_F_MAP_UNMAP,
->  	VIRTIO_IOMMU_F_DOMAIN_BITS,
->  	VIRTIO_IOMMU_F_INPUT_RANGE,
-> +	VIRTIO_IOMMU_F_PROBE,
->  };
->  
->  static struct virtio_device_id id_table[] = {
-> diff --git a/include/uapi/linux/virtio_iommu.h b/include/uapi/linux/virtio_iommu.h
-> index 2b4cd2042897..eec90a2ab547 100644
-> --- a/include/uapi/linux/virtio_iommu.h
-> +++ b/include/uapi/linux/virtio_iommu.h
-> @@ -38,6 +38,7 @@
->  #define VIRTIO_IOMMU_F_DOMAIN_BITS		1
->  #define VIRTIO_IOMMU_F_MAP_UNMAP		2
->  #define VIRTIO_IOMMU_F_BYPASS			3
-> +#define VIRTIO_IOMMU_F_PROBE			4
->  
->  struct virtio_iommu_config {
->  	/* Supported page sizes */
-> @@ -49,6 +50,9 @@ struct virtio_iommu_config {
->  	} input_range;
->  	/* Max domain ID size */
->  	__u8 					domain_bits;
-> +	__u8					padding[3];
-> +	/* Probe buffer size */
-> +	__u32					probe_size;
->  } __packed;
->  
->  /* Request types */
-> @@ -56,6 +60,7 @@ struct virtio_iommu_config {
->  #define VIRTIO_IOMMU_T_DETACH			0x02
->  #define VIRTIO_IOMMU_T_MAP			0x03
->  #define VIRTIO_IOMMU_T_UNMAP			0x04
-> +#define VIRTIO_IOMMU_T_PROBE			0x05
->  
->  /* Status types */
->  #define VIRTIO_IOMMU_S_OK			0x00
-> @@ -128,6 +133,37 @@ struct virtio_iommu_req_unmap {
->  	struct virtio_iommu_req_tail		tail;
->  } __packed;
->  
-> +#define VIRTIO_IOMMU_RESV_MEM_T_RESERVED	0
-> +#define VIRTIO_IOMMU_RESV_MEM_T_MSI		1
-> +
-> +struct virtio_iommu_probe_resv_mem {
-> +	__u8					subtype;
-> +	__u8					reserved[3];
-> +	__le64					addr;
-> +	__le64					size;
-> +} __packed;
-> +
-> +#define VIRTIO_IOMMU_PROBE_T_NONE		0
-> +#define VIRTIO_IOMMU_PROBE_T_RESV_MEM		1
-> +
-> +#define VIRTIO_IOMMU_PROBE_T_MASK		0xfff
-> +
-> +struct virtio_iommu_probe_property {
-> +	__le16					type;
-> +	__le16					length;
-> +	__u8					value[];
-> +} __packed;
-> +
-> +struct virtio_iommu_req_probe {
-> +	struct virtio_iommu_req_head		head;
-> +	__le32					endpoint;
-> +	__u8					reserved[64];
-> +
-> +	__u8					properties[];
-> +
-> +	/* Tail follows the variable-length properties array (no padding) */
-> +} __packed;
-> +
->  union virtio_iommu_req {
->  	struct virtio_iommu_req_head		head;
->  
-> @@ -135,6 +171,7 @@ union virtio_iommu_req {
->  	struct virtio_iommu_req_detach		detach;
->  	struct virtio_iommu_req_map		map;
->  	struct virtio_iommu_req_unmap		unmap;
-> +	struct virtio_iommu_req_probe		probe;
->  };
->  
->  #endif
+> Thanks for testing this.
+> > 
+> > Comparing to vanilla guest, Norml IPI delivery for v3 is 20% slower.
+> > For v2 it was 27% slower, and for v1 - 42% faster. What's interesting,
+> > the acknowledge time is much faster for v3, so overall time to
+> > deliver and acknowledge IPI (2nd column) is less than vanilla
+> > 4.15-rc3 kernel.
 > 
+> I don't see this from your results.  It looks like an IPI cost increases
+> from 289 to 347?
+
+I mean turnaround time - 497 without your patches and 490 with them.
+
+> Also, acknowledging the IPI should be a constant cost (handled directly
+> by hardware), so that's definitely an indication something is wrong.
+> 
+> > 
+> > Test setup is not changed since v2: ThunderX2, 112 online CPUs,
+> > guest is running under qemu-kvm, emulating gic version 3.
+> > 
+> > Below is test results for v1-3 normalized to host vanilla kernel
+> > dry-run time.
+> 
+> There must be some bug in this series, but I'm unsure where it is, as I
+> cannot observe it on the hardware I have at hand.
+> 
+> Perhaps we mistakenly enable the GICv3 CPU interface trapping with this
+> series or there is some other flow around the GIC which is broken.
+> 
+> It would be interesting if you could measure the base exit cost using
+> the cycle counter from the VM to the hypervisor between the two
+> platforms.  That does require changing the host kernel to clear
+> MDCR_EL2.TPM when running a guest (unsafe), and ensuring the cycle
+> counter runs across EL2/1/0 (for example by running KVM under perf) and
+> running a micro test that exits using a hypercall that does nothing
+> (like getting the PSCI version).
+
+
+I can do this, later this week, OK?
+
+Yury
+ 
+> I'll investigate this some more later in the week.
+> 
+> 
+> > 
+> > Yury
+> > 
+> > Host, v4.14:
+> > Dry-run:          0         1
+> > Self-IPI:         9        18
+> > Normal IPI:      81       110
+> > Broadcast IPI:    0      2106
+> > 
+> > Guest, v4.14:
+> > Dry-run:          0         1
+> > Self-IPI:        10        18
+> > Normal IPI:     305       525
+> > Broadcast IPI:    0      9729
+> > 
+> > Guest, v4.14 + VHE:
+> > Dry-run:          0         1
+> > Self-IPI:         9        18
+> > Normal IPI:     176       343
+> > Broadcast IPI:    0      9885
+> > 
+> > And for v2.
+> > 
+> > Host, v4.15:                   
+> > Dry-run:          0         1
+> > Self-IPI:         9        18
+> > Normal IPI:      79       108
+> > Broadcast IPI:    0      2102
+> >                         
+> > Guest, v4.15-rc:
+> > Dry-run:          0         1
+> > Self-IPI:         9        18
+> > Normal IPI:     291       526
+> > Broadcast IPI:    0     10439
+> > 
+> > Guest, v4.15-rc + VHE:
+> > Dry-run:          0         2
+> > Self-IPI:        14        28
+> > Normal IPI:     370       569
+> > Broadcast IPI:    0     11688
+> > 
+> > And for v3.
+> > 
+> > Host 4.15-rc3					
+> > Dry-run:	  0	    1
+> > Self-IPI:	  9	   18
+> > Normal IPI:	 80	  110
+> > Broadcast IPI:	  0	 2088
+> > 		
+> > Guest, 4.15-rc3	
+> > Dry-run:	  0	    1
+> > Self-IPI:	  9	   18
+> > Normal IPI:	289	  497
+> > Broadcast IPI:	  0	 9999
+> > 		
+> > Guest, 4.15-rc3	+ VHE
+> > Dry-run:	  0	    2
+> > Self-IPI:	 12	   24
+> > Normal IPI:	347	  490
+> > Broadcast IPI:	  0	11906
+> 
+> Thanks,
+> -Christoffer
