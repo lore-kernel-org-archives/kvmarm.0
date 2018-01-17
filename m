@@ -1,25 +1,25 @@
 From: Julien Thierry <julien.thierry@arm.com>
-Subject: Re: [PATCH v3 26/41] KVM: arm64: Introduce framework for accessing
- deferred sysregs
-Date: Wed, 17 Jan 2018 17:52:21 +0000
-Message-ID: <dce891ed-3e43-a136-9d7b-c7186fe2ff3c@arm.com>
+Subject: Re: [PATCH v3 30/41] KVM: arm64: Prepare to handle deferred
+ save/restore of 32-bit registers
+Date: Wed, 17 Jan 2018 18:22:29 +0000
+Message-ID: <9a2edac8-29aa-ffac-a845-ef6090e2226c@arm.com>
 References: <20180112120747.27999-1-christoffer.dall@linaro.org>
- <20180112120747.27999-27-christoffer.dall@linaro.org>
+ <20180112120747.27999-31-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B3EF749DFE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jan 2018 12:47:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E89D849DE2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jan 2018 13:17:29 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OnOTxqjdd1rF for <kvmarm@lists.cs.columbia.edu>;
- Wed, 17 Jan 2018 12:47:20 -0500 (EST)
+ with ESMTP id AirWYmhONomU for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 17 Jan 2018 13:17:28 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 13BA649DDD
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jan 2018 12:47:20 -0500 (EST)
-In-Reply-To: <20180112120747.27999-27-christoffer.dall@linaro.org>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B8F0F49DC0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jan 2018 13:17:28 -0500 (EST)
+In-Reply-To: <20180112120747.27999-31-christoffer.dall@linaro.org>
 Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,261 +34,116 @@ To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu
 Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
+Hi,
 
 On 12/01/18 12:07, Christoffer Dall wrote:
-> We are about to defer saving and restoring some groups of system
-> registers to vcpu_put and vcpu_load on supported systems.  This means
-> that we need some infrastructure to access system registes which
-> supports either accessing the memory backing of the register or directly
-> accessing the system registers, depending on the state of the system
-> when we access the register.
+> 32-bit registers are not used by a 64-bit host kernel and can be
+> deferred, but we need to rework the accesses to this register to access
+> the latest value depending on whether or not guest system registers are
+> loaded on the CPU or only reside in memory.
 > 
-> We do this by defining a set of read/write accessors for each system
-> register, and letting each system register be defined as "immediate" or
-> "deferrable".  Immediate registers are always saved/restored in the
-> world-switch path, but deferrable registers are only saved/restored in
-> vcpu_put/vcpu_load when supported and sysregs_loaded_on_cpu will be set
-> in that case.
-> 
-
-The patch is fine, however I'd suggest adding a comment in the pointing 
-out that the IMMEDIATE/DEFERRABLE apply to save/restore to the vcpu 
-struct. Instinctively I would expect the deferrable/immediate to apply 
-to the actual hardware register access, so a comment would prevent 
-people like me to get on the wrong track.
-
-> Not that we don't use the deferred mechanism yet in this patch, but only
-> introduce infrastructure.  This is to improve convenience of review in
-> the subsequent patches where it is clear which registers become
-> deferred.
-> 
->   [ Most of this logic was contributed by Marc Zyngier ]
-> 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 
 Reviewed-by: Julien Thierry <julien.thierry@arm.com>
 
 > ---
->   arch/arm64/include/asm/kvm_host.h |   8 +-
->   arch/arm64/kvm/sys_regs.c         | 160 ++++++++++++++++++++++++++++++++++++++
->   2 files changed, 166 insertions(+), 2 deletions(-)
+>   arch/arm64/include/asm/kvm_emulate.h | 32 +++++-------------
+>   arch/arm64/kvm/regmap.c              | 65 ++++++++++++++++++++++++++----------
+>   arch/arm64/kvm/sys_regs.c            |  6 ++--
+>   3 files changed, 60 insertions(+), 43 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 91272c35cc36..4b5ef82f6bdb 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -281,6 +281,10 @@ struct kvm_vcpu_arch {
->   
->   	/* Detect first run of a vcpu */
->   	bool has_run_once;
-> +
-> +	/* True when deferrable sysregs are loaded on the physical CPU,
-> +	 * see kvm_vcpu_load_sysregs and kvm_vcpu_put_sysregs. */
-> +	bool sysregs_loaded_on_cpu;
->   };
->   
->   #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.gp_regs)
-> @@ -293,8 +297,8 @@ struct kvm_vcpu_arch {
->    */
->   #define __vcpu_sys_reg(v,r)	((v)->arch.ctxt.sys_regs[(r)])
->   
-> -#define vcpu_read_sys_reg(v,r)	__vcpu_sys_reg(v,r)
-> -#define vcpu_write_sys_reg(v,r,n)	do { __vcpu_sys_reg(v,r) = n; } while (0)
-> +u64 vcpu_read_sys_reg(struct kvm_vcpu *vcpu, int reg);
-> +void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, int reg, u64 val);
->   
+
+[...]
+
+> diff --git a/arch/arm64/kvm/regmap.c b/arch/arm64/kvm/regmap.c
+> index bbc6ae32e4af..3f65098aff8d 100644
+> --- a/arch/arm64/kvm/regmap.c
+> +++ b/arch/arm64/kvm/regmap.c
+> @@ -141,28 +141,59 @@ unsigned long *vcpu_reg32(const struct kvm_vcpu *vcpu, u8 reg_num)
 >   /*
->    * CP14 and CP15 live in the same array, as they are backed by the
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 96398d53b462..9d353a6a55c9 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -35,6 +35,7 @@
->   #include <asm/kvm_coproc.h>
->   #include <asm/kvm_emulate.h>
->   #include <asm/kvm_host.h>
-> +#include <asm/kvm_hyp.h>
->   #include <asm/kvm_mmu.h>
->   #include <asm/perf_event.h>
->   #include <asm/sysreg.h>
-> @@ -76,6 +77,165 @@ static bool write_to_read_only(struct kvm_vcpu *vcpu,
->   	return false;
->   }
->   
-> +struct sys_reg_accessor {
-> +	u64	(*rdsr)(struct kvm_vcpu *, int);
-> +	void	(*wrsr)(struct kvm_vcpu *, int, u64);
-
-Nit:
-
-Why use a signed integer for the register index argument?
-
-> +};
-> +
-> +#define DECLARE_IMMEDIATE_SR(i)						\
-> +	static u64 __##i##_read(struct kvm_vcpu *vcpu, int r)		\
-> +	{								\
-> +		return __vcpu_sys_reg(vcpu, r);				\
-> +	}								\
-> +									\
-> +	static void __##i##_write(struct kvm_vcpu *vcpu, int r, u64 v)	\
-> +	{								\
-> +		__vcpu_sys_reg(vcpu, r) = v;				\
-> +	}								\
-> +
-> +#define DECLARE_DEFERRABLE_SR(i, s)					\
-> +	static u64 __##i##_read(struct kvm_vcpu *vcpu, int r)		\
-> +	{								\
-> +		if (vcpu->arch.sysregs_loaded_on_cpu) {			\
-> +			WARN_ON(kvm_arm_get_running_vcpu() != vcpu);	\
-> +			return read_sysreg_s((s));			\
-> +		}							\
-> +		return __vcpu_sys_reg(vcpu, r);				\
-> +	}								\
-> +									\
-> +	static void __##i##_write(struct kvm_vcpu *vcpu, int r, u64 v)	\
-> +	{								\
-> +		if (vcpu->arch.sysregs_loaded_on_cpu) {			\
-> +			WARN_ON(kvm_arm_get_running_vcpu() != vcpu);	\
-> +			write_sysreg_s(v, (s));				\
-> +		} else {						\
-> +			__vcpu_sys_reg(vcpu, r) = v;			\
-> +		}							\
-> +	}								\
-> +
-> +
-> +#define SR_HANDLER_RANGE(i,e)						\
-> +	[i ... e] =  (struct sys_reg_accessor) {			\
-> +		.rdsr = __##i##_read,					\
-> +		.wrsr = __##i##_write,					\
-
-Nit:
-Could we have __vcpu_##i##_read and __vcpu_##i##_write?
-
+>    * Return the SPSR for the current mode of the virtual CPU.
+>    */
+> -unsigned long *vcpu_spsr32(const struct kvm_vcpu *vcpu)
+> +static int vcpu_spsr32_mode(const struct kvm_vcpu *vcpu)
+>   {
+>   	unsigned long mode = *vcpu_cpsr(vcpu) & COMPAT_PSR_MODE_MASK;
+>   	switch (mode) {
+> -	case COMPAT_PSR_MODE_SVC:
+> -		mode = KVM_SPSR_SVC;
+> -		break;
+> -	case COMPAT_PSR_MODE_ABT:
+> -		mode = KVM_SPSR_ABT;
+> -		break;
+> -	case COMPAT_PSR_MODE_UND:
+> -		mode = KVM_SPSR_UND;
+> -		break;
+> -	case COMPAT_PSR_MODE_IRQ:
+> -		mode = KVM_SPSR_IRQ;
+> -		break;
+> -	case COMPAT_PSR_MODE_FIQ:
+> -		mode = KVM_SPSR_FIQ;
+> -		break;
+> +	case COMPAT_PSR_MODE_SVC: return KVM_SPSR_SVC;
+> +	case COMPAT_PSR_MODE_ABT: return KVM_SPSR_ABT;
+> +	case COMPAT_PSR_MODE_UND: return KVM_SPSR_UND;
+> +	case COMPAT_PSR_MODE_IRQ: return KVM_SPSR_IRQ;
+> +	case COMPAT_PSR_MODE_FIQ: return KVM_SPSR_FIQ;
+> +	default: BUG();
 > +	}
-> +
-> +#define SR_HANDLER(i)	SR_HANDLER_RANGE(i, i)
-> +
-> +static void bad_sys_reg(int reg)
-> +{
-> +	WARN_ONCE(1, "Bad system register access %d\n", reg);
 > +}
 > +
-> +static u64 __default_read_sys_reg(struct kvm_vcpu *vcpu, int reg)
+> +unsigned long vcpu_read_spsr32(const struct kvm_vcpu *vcpu)
 > +{
-> +	bad_sys_reg(reg);
-> +	return 0;
+> +	int spsr_idx = vcpu_spsr32_mode(vcpu);
+> +
+> +	if (!vcpu->arch.sysregs_loaded_on_cpu)
+> +		return vcpu_gp_regs(vcpu)->spsr[spsr_idx];
+> +
+> +	switch (spsr_idx) {
+> +	case KVM_SPSR_SVC:
+> +		return read_sysreg_el1(spsr);
+> +	case KVM_SPSR_ABT:
+> +		return read_sysreg(spsr_abt);
+> +	case KVM_SPSR_UND:
+> +		return read_sysreg(spsr_und);
+> +	case KVM_SPSR_IRQ:
+> +		return read_sysreg(spsr_irq);
+> +	case KVM_SPSR_FIQ:
+> +		return read_sysreg(spsr_fiq);
+>   	default:
+>   		BUG();
+
+Nit:
+
+Since the BUG() is in vcpu_spsr32_mode now, you can probably remove it 
+here (or add it to vcpu_write_sprsr32 for consistency).
+
+>   	}
 > +}
-> +
-> +static void __default_write_sys_reg(struct kvm_vcpu *vcpu, int reg, u64 val)
-> +{
-> +	bad_sys_reg(reg);
-> +}
-> +
-> +/* Ordered as in enum vcpu_sysreg */
-> +DECLARE_IMMEDIATE_SR(MPIDR_EL1);
-> +DECLARE_IMMEDIATE_SR(CSSELR_EL1);
-> +DECLARE_IMMEDIATE_SR(SCTLR_EL1);
-> +DECLARE_IMMEDIATE_SR(ACTLR_EL1);
-> +DECLARE_IMMEDIATE_SR(CPACR_EL1);
-> +DECLARE_IMMEDIATE_SR(TTBR0_EL1);
-> +DECLARE_IMMEDIATE_SR(TTBR1_EL1);
-> +DECLARE_IMMEDIATE_SR(TCR_EL1);
-> +DECLARE_IMMEDIATE_SR(ESR_EL1);
-> +DECLARE_IMMEDIATE_SR(AFSR0_EL1);
-> +DECLARE_IMMEDIATE_SR(AFSR1_EL1);
-> +DECLARE_IMMEDIATE_SR(FAR_EL1);
-> +DECLARE_IMMEDIATE_SR(MAIR_EL1);
-> +DECLARE_IMMEDIATE_SR(VBAR_EL1);
-> +DECLARE_IMMEDIATE_SR(CONTEXTIDR_EL1);
-> +DECLARE_IMMEDIATE_SR(TPIDR_EL0);
-> +DECLARE_IMMEDIATE_SR(TPIDRRO_EL0);
-> +DECLARE_IMMEDIATE_SR(TPIDR_EL1);
-> +DECLARE_IMMEDIATE_SR(AMAIR_EL1);
-> +DECLARE_IMMEDIATE_SR(CNTKCTL_EL1);
-> +DECLARE_IMMEDIATE_SR(PAR_EL1);
-> +DECLARE_IMMEDIATE_SR(MDSCR_EL1);
-> +DECLARE_IMMEDIATE_SR(MDCCINT_EL1);
-> +DECLARE_IMMEDIATE_SR(PMCR_EL0);
-> +DECLARE_IMMEDIATE_SR(PMSELR_EL0);
-> +DECLARE_IMMEDIATE_SR(PMEVCNTR0_EL0);
-> +/* PMEVCNTR30_EL0 */
-> +DECLARE_IMMEDIATE_SR(PMCCNTR_EL0);
-> +DECLARE_IMMEDIATE_SR(PMEVTYPER0_EL0);
-> +/* PMEVTYPER30_EL0 */
-> +DECLARE_IMMEDIATE_SR(PMCCFILTR_EL0);
-> +DECLARE_IMMEDIATE_SR(PMCNTENSET_EL0);
-> +DECLARE_IMMEDIATE_SR(PMINTENSET_EL1);
-> +DECLARE_IMMEDIATE_SR(PMOVSSET_EL0);
-> +DECLARE_IMMEDIATE_SR(PMSWINC_EL0);
-> +DECLARE_IMMEDIATE_SR(PMUSERENR_EL0);
-> +DECLARE_IMMEDIATE_SR(DACR32_EL2);
-> +DECLARE_IMMEDIATE_SR(IFSR32_EL2);
-> +DECLARE_IMMEDIATE_SR(FPEXC32_EL2);
-> +DECLARE_IMMEDIATE_SR(DBGVCR32_EL2);
-> +
-> +static const struct sys_reg_accessor sys_reg_accessors[NR_SYS_REGS] = {
-> +	[0 ... NR_SYS_REGS - 1] = {
-> +		.rdsr = __default_read_sys_reg,
-> +		.wrsr = __default_write_sys_reg,
-> +	},
-> +
-> +	SR_HANDLER(MPIDR_EL1),
-> +	SR_HANDLER(CSSELR_EL1),
-> +	SR_HANDLER(SCTLR_EL1),
-> +	SR_HANDLER(ACTLR_EL1),
-> +	SR_HANDLER(CPACR_EL1),
-> +	SR_HANDLER(TTBR0_EL1),
-> +	SR_HANDLER(TTBR1_EL1),
-> +	SR_HANDLER(TCR_EL1),
-> +	SR_HANDLER(ESR_EL1),
-> +	SR_HANDLER(AFSR0_EL1),
-> +	SR_HANDLER(AFSR1_EL1),
-> +	SR_HANDLER(FAR_EL1),
-> +	SR_HANDLER(MAIR_EL1),
-> +	SR_HANDLER(VBAR_EL1),
-> +	SR_HANDLER(CONTEXTIDR_EL1),
-> +	SR_HANDLER(TPIDR_EL0),
-> +	SR_HANDLER(TPIDRRO_EL0),
-> +	SR_HANDLER(TPIDR_EL1),
-> +	SR_HANDLER(AMAIR_EL1),
-> +	SR_HANDLER(CNTKCTL_EL1),
-> +	SR_HANDLER(PAR_EL1),
-> +	SR_HANDLER(MDSCR_EL1),
-> +	SR_HANDLER(MDCCINT_EL1),
-> +	SR_HANDLER(PMCR_EL0),
-> +	SR_HANDLER(PMSELR_EL0),
-> +	SR_HANDLER_RANGE(PMEVCNTR0_EL0, PMEVCNTR30_EL0),
-> +	SR_HANDLER(PMCCNTR_EL0),
-> +	SR_HANDLER_RANGE(PMEVTYPER0_EL0, PMEVTYPER30_EL0),
-> +	SR_HANDLER(PMCCFILTR_EL0),
-> +	SR_HANDLER(PMCNTENSET_EL0),
-> +	SR_HANDLER(PMINTENSET_EL1),
-> +	SR_HANDLER(PMOVSSET_EL0),
-> +	SR_HANDLER(PMSWINC_EL0),
-> +	SR_HANDLER(PMUSERENR_EL0),
-> +	SR_HANDLER(DACR32_EL2),
-> +	SR_HANDLER(IFSR32_EL2),
-> +	SR_HANDLER(FPEXC32_EL2),
-> +	SR_HANDLER(DBGVCR32_EL2),
-> +};
-> +
-> +u64 vcpu_read_sys_reg(struct kvm_vcpu *vcpu, int reg)
-> +{
-> +	return sys_reg_accessors[reg].rdsr(vcpu, reg);
-> +}
-> +
-> +void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, int reg, u64 val)
-> +{
-> +	sys_reg_accessors[reg].wrsr(vcpu, reg, val);
-> +}
-> +
->   /* 3 bits per cache level, as per CLIDR, but non-existent caches always 0 */
->   static u32 cache_levels;
 >   
-> 
+> -	return (unsigned long *)&vcpu_gp_regs(vcpu)->spsr[mode];
+> +void vcpu_write_spsr32(struct kvm_vcpu *vcpu, unsigned long v)
+> +{
+> +	int spsr_idx = vcpu_spsr32_mode(vcpu);
+> +
+> +	if (!vcpu->arch.sysregs_loaded_on_cpu)
+> +		vcpu_gp_regs(vcpu)->spsr[spsr_idx] = v;
+> +
+> +	switch (spsr_idx) {
+> +	case KVM_SPSR_SVC:
+> +		write_sysreg_el1(v, spsr);
+> +	case KVM_SPSR_ABT:
+> +		write_sysreg(v, spsr_abt);
+> +	case KVM_SPSR_UND:
+> +		write_sysreg(v, spsr_und);
+> +	case KVM_SPSR_IRQ:
+> +		write_sysreg(v, spsr_irq);
+> +	case KVM_SPSR_FIQ:
+> +		write_sysreg(v, spsr_fiq);
+> +	}
+>   }
+
+Cheers,
 
 -- 
 Julien Thierry
