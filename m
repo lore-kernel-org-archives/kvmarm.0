@@ -1,26 +1,38 @@
-From: Julien Thierry <julien.thierry@arm.com>
-Subject: Re: [PATCH v3 30/41] KVM: arm64: Prepare to handle deferred
- save/restore of 32-bit registers
-Date: Wed, 17 Jan 2018 18:22:29 +0000
-Message-ID: <9a2edac8-29aa-ffac-a845-ef6090e2226c@arm.com>
-References: <20180112120747.27999-1-christoffer.dall@linaro.org>
- <20180112120747.27999-31-christoffer.dall@linaro.org>
+From: Shih-Wei Li <shihwei@cs.columbia.edu>
+Subject: [PATCH v3 0/2] Support micro operation measurement on arm64
+Date: Wed, 17 Jan 2018 16:46:34 -0500
+Message-ID: <1516225596-27071-1-git-send-email-shihwei@cs.columbia.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E89D849DE2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jan 2018 13:17:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D53649E04
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jan 2018 16:41:08 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AirWYmhONomU for <kvmarm@lists.cs.columbia.edu>;
- Wed, 17 Jan 2018 13:17:28 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B8F0F49DC0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jan 2018 13:17:28 -0500 (EST)
-In-Reply-To: <20180112120747.27999-31-christoffer.dall@linaro.org>
-Content-Language: en-US
+ with ESMTP id FkvGuIhOQEtg for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 17 Jan 2018 16:41:07 -0500 (EST)
+Received: from outprodmail02.cc.columbia.edu (outprodmail02.cc.columbia.edu
+ [128.59.72.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3C12649DDF
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jan 2018 16:41:07 -0500 (EST)
+Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
+ by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id w0HLiDIm038298
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jan 2018 16:46:12 -0500
+Received: from hazelnut (localhost.localdomain [127.0.0.1])
+ by hazelnut (Postfix) with ESMTP id BB07D98
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jan 2018 16:46:12 -0500 (EST)
+Received: from sendprodmail04.cc.columbia.edu (sendprodmail04.cc.columbia.edu
+ [128.59.72.16]) by hazelnut (Postfix) with ESMTP id 850B4A2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jan 2018 16:46:12 -0500 (EST)
+Received: from mail-qt0-f198.google.com (mail-qt0-f198.google.com
+ [209.85.216.198])
+ by sendprodmail04.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id w0HLkBt4032119
+ (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jan 2018 16:46:11 -0500
+Received: by mail-qt0-f198.google.com with SMTP id o22so16500986qtb.17
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jan 2018 13:46:11 -0800 (PST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,120 +42,54 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, Shih-Wei Li <shihwei@cs.columbia.edu>
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: marc.zyngier@arm.com, pbonzini@redhat.com, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+The patch provides support for quantifying the cost of micro level
+operations on arm64 hardware. The supported operations include hypercall,
+mmio accesses, EOI virtual interrupt, and IPI send. Measurements are
+currently obtained using timer counters. Further modifications in KVM
+will be required to support timestamping using cycle counters, as KVM
+now disables accesses to the PMU counters from the VM. The micro test
+is currently non-default and can be used as a standalone test.
 
-On 12/01/18 12:07, Christoffer Dall wrote:
-> 32-bit registers are not used by a 64-bit host kernel and can be
-> deferred, but we need to rework the accesses to this register to access
-> the latest value depending on whether or not guest system registers are
-> loaded on the CPU or only reside in memory.
-> 
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+We iterate each of the tests for millions of times and output their
+average, minimum and maximum cost in timer counts. Instruction barriers
+were used before and after taking timestamps to avoid out-of-order
+execution or pipelining from skewing our measurements. We currently
+skip the test if its cost is smaller than a timer tick for 1000 times.
 
-Reviewed-by: Julien Thierry <julien.thierry@arm.com>
+To improve precision in the measurements, one should consider pinning
+each VCPU to a specific physical CPU (PCPU) and ensure no other task
+could run on that PCPU to skew the results. This can be achieved by
+enabling QMP server in the QEMU command in unittest.cfg for micro test,
+allowing a client program to get the thread_id for each VCPU thread
+from the QMP server. Based on the information, the client program can
+then pin the corresponding VCPUs to dedicated PCPUs and isolate
+interrupts and tasks from those PCPUs.
 
-> ---
->   arch/arm64/include/asm/kvm_emulate.h | 32 +++++-------------
->   arch/arm64/kvm/regmap.c              | 65 ++++++++++++++++++++++++++----------
->   arch/arm64/kvm/sys_regs.c            |  6 ++--
->   3 files changed, 60 insertions(+), 43 deletions(-)
-> 
+The patch has been tested on arm64 hardware including AMD Seattle and
+ThunderX2, which has GICv2 and GICv3 respectively.
 
-[...]
+Changes since v2:
+  - Rebased atop of 4a671159.
+  - Make microtest nondefault.
+  - Output the cost in microseconds.
+  - Added fail safe option to skip the test if the cost is consistently
+    smaller than a timer tick.
+  - Fixed nits from comments in v2.
 
-> diff --git a/arch/arm64/kvm/regmap.c b/arch/arm64/kvm/regmap.c
-> index bbc6ae32e4af..3f65098aff8d 100644
-> --- a/arch/arm64/kvm/regmap.c
-> +++ b/arch/arm64/kvm/regmap.c
-> @@ -141,28 +141,59 @@ unsigned long *vcpu_reg32(const struct kvm_vcpu *vcpu, u8 reg_num)
->   /*
->    * Return the SPSR for the current mode of the virtual CPU.
->    */
-> -unsigned long *vcpu_spsr32(const struct kvm_vcpu *vcpu)
-> +static int vcpu_spsr32_mode(const struct kvm_vcpu *vcpu)
->   {
->   	unsigned long mode = *vcpu_cpsr(vcpu) & COMPAT_PSR_MODE_MASK;
->   	switch (mode) {
-> -	case COMPAT_PSR_MODE_SVC:
-> -		mode = KVM_SPSR_SVC;
-> -		break;
-> -	case COMPAT_PSR_MODE_ABT:
-> -		mode = KVM_SPSR_ABT;
-> -		break;
-> -	case COMPAT_PSR_MODE_UND:
-> -		mode = KVM_SPSR_UND;
-> -		break;
-> -	case COMPAT_PSR_MODE_IRQ:
-> -		mode = KVM_SPSR_IRQ;
-> -		break;
-> -	case COMPAT_PSR_MODE_FIQ:
-> -		mode = KVM_SPSR_FIQ;
-> -		break;
-> +	case COMPAT_PSR_MODE_SVC: return KVM_SPSR_SVC;
-> +	case COMPAT_PSR_MODE_ABT: return KVM_SPSR_ABT;
-> +	case COMPAT_PSR_MODE_UND: return KVM_SPSR_UND;
-> +	case COMPAT_PSR_MODE_IRQ: return KVM_SPSR_IRQ;
-> +	case COMPAT_PSR_MODE_FIQ: return KVM_SPSR_FIQ;
-> +	default: BUG();
-> +	}
-> +}
-> +
-> +unsigned long vcpu_read_spsr32(const struct kvm_vcpu *vcpu)
-> +{
-> +	int spsr_idx = vcpu_spsr32_mode(vcpu);
-> +
-> +	if (!vcpu->arch.sysregs_loaded_on_cpu)
-> +		return vcpu_gp_regs(vcpu)->spsr[spsr_idx];
-> +
-> +	switch (spsr_idx) {
-> +	case KVM_SPSR_SVC:
-> +		return read_sysreg_el1(spsr);
-> +	case KVM_SPSR_ABT:
-> +		return read_sysreg(spsr_abt);
-> +	case KVM_SPSR_UND:
-> +		return read_sysreg(spsr_und);
-> +	case KVM_SPSR_IRQ:
-> +		return read_sysreg(spsr_irq);
-> +	case KVM_SPSR_FIQ:
-> +		return read_sysreg(spsr_fiq);
->   	default:
->   		BUG();
+Shih-Wei Li (2):
+  arm/arm64: add GICD_IIDR definition
+  arm64: add micro test
 
-Nit:
-
-Since the BUG() is in vcpu_spsr32_mode now, you can probably remove it 
-here (or add it to vcpu_write_sprsr32 for consistency).
-
->   	}
-> +}
->   
-> -	return (unsigned long *)&vcpu_gp_regs(vcpu)->spsr[mode];
-> +void vcpu_write_spsr32(struct kvm_vcpu *vcpu, unsigned long v)
-> +{
-> +	int spsr_idx = vcpu_spsr32_mode(vcpu);
-> +
-> +	if (!vcpu->arch.sysregs_loaded_on_cpu)
-> +		vcpu_gp_regs(vcpu)->spsr[spsr_idx] = v;
-> +
-> +	switch (spsr_idx) {
-> +	case KVM_SPSR_SVC:
-> +		write_sysreg_el1(v, spsr);
-> +	case KVM_SPSR_ABT:
-> +		write_sysreg(v, spsr_abt);
-> +	case KVM_SPSR_UND:
-> +		write_sysreg(v, spsr_und);
-> +	case KVM_SPSR_IRQ:
-> +		write_sysreg(v, spsr_irq);
-> +	case KVM_SPSR_FIQ:
-> +		write_sysreg(v, spsr_fiq);
-> +	}
->   }
-
-Cheers,
+ arm/Makefile.common |   1 +
+ arm/micro-test.c    | 252 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ arm/unittests.cfg   |   7 ++
+ lib/arm/asm/gic.h   |   1 +
+ 4 files changed, 261 insertions(+)
+ create mode 100644 arm/micro-test.c
 
 -- 
-Julien Thierry
+1.9.1
