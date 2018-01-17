@@ -1,71 +1,76 @@
 From: Julien Thierry <julien.thierry@arm.com>
-Subject: Re: [PATCH v3 08/41] KVM: arm/arm64: Introduce vcpu_el1_is_32bit
-Date: Wed, 17 Jan 2018 14:44:32 +0000
-Message-ID: <4a3fa63c-5925-e406-26dd-da4e9765e7fa@arm.com>
+Subject: Re: [PATCH v3 10/41] KVM: arm64: Move debug dirty flag calculation
+ out of world switch
+Date: Wed, 17 Jan 2018 15:11:33 +0000
+Message-ID: <a34bfed5-05d3-7835-57cc-84ae874741a9@arm.com>
 References: <20180112120747.27999-1-christoffer.dall@linaro.org>
- <20180112120747.27999-9-christoffer.dall@linaro.org>
+ <20180112120747.27999-11-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20180112120747.27999-9-christoffer.dall@linaro.org>
+In-Reply-To: <20180112120747.27999-11-christoffer.dall@linaro.org>
 Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Andrew Jones <drjones@redhat.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
+
 
 On 12/01/18 12:07, Christoffer Dall wrote:
-> We have numerous checks around that checks if the HCR_EL2 has the RW bit
-> set to figure out if we're running an AArch64 or AArch32 VM.  In some
-> cases, directly checking the RW bit (given its unintuitive name), is a
-> bit confusing, and that's not going to improve as we move logic around
-> for the following patches that optimize KVM on AArch64 hosts with VHE.
+> There is no need to figure out inside the world-switch if we should
+> save/restore the debug registers or not, we can might as well do that in
+
+Nit: -can*
+
+> the higher level debug setup code, making it easier to optimize down the
+> line.
 > 
-> Therefore, introduce a helper, vcpu_el1_is_32bit, and replace existing
-> direct checks of HCR_EL2.RW with the helper.
-> 
+> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> ---
->   arch/arm64/include/asm/kvm_emulate.h | 7 ++++++-
->   arch/arm64/kvm/hyp/switch.c          | 8 ++------
->   arch/arm64/kvm/hyp/sysreg-sr.c       | 5 +++--
->   arch/arm64/kvm/inject_fault.c        | 6 +++---
->   4 files changed, 14 insertions(+), 12 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index b36aaa1fe332..e07bf463ac58 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -45,6 +45,11 @@ void kvm_inject_undef32(struct kvm_vcpu *vcpu);
->   void kvm_inject_dabt32(struct kvm_vcpu *vcpu, unsigned long addr);
->   void kvm_inject_pabt32(struct kvm_vcpu *vcpu, unsigned long addr);
->   
-> +static inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
-> +{
-> +	return !(vcpu->arch.hcr_el2 & HCR_RW);
-> +}
-> +
-
-Just so I understand, the difference between this and vcpu_mode_is_32bit 
-is that vcpu_mode_is_32bit might return true because an 
-interrupt/exception occured while guest was executing 32bit EL0 but 
-guest EL1 is still 64bits, is that correct?
-
-Also, it seems the process controlling KVM is supposed to provide the 
-information of whether the vcpu runs a 32bit el1, would it be better to do:
-
-	return test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features);
-
-instead of looking at the hcr? Or is there a case where those might differ?
-
-Otherwise:
 
 Reviewed-by: Julien Thierry <julien.thierry@arm.com>
 
-Cheers,
+> ---
+>   arch/arm64/kvm/debug.c        | 5 +++++
+>   arch/arm64/kvm/hyp/debug-sr.c | 6 ------
+>   2 files changed, 5 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> index fa63b28c65e0..feedb877cff8 100644
+> --- a/arch/arm64/kvm/debug.c
+> +++ b/arch/arm64/kvm/debug.c
+> @@ -193,6 +193,11 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+>   	if (trap_debug)
+>   		vcpu->arch.mdcr_el2 |= MDCR_EL2_TDA;
+>   
+> +	/* If KDE or MDE are set, perform a full save/restore cycle. */
+> +	if ((vcpu_sys_reg(vcpu, MDSCR_EL1) & DBG_MDSCR_KDE) ||
+> +	    (vcpu_sys_reg(vcpu, MDSCR_EL1) & DBG_MDSCR_MDE))
+> +		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
+> +
+>   	trace_kvm_arm_set_dreg32("MDCR_EL2", vcpu->arch.mdcr_el2);
+>   	trace_kvm_arm_set_dreg32("MDSCR_EL1", vcpu_sys_reg(vcpu, MDSCR_EL1));
+>   }
+> diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
+> index 321c9c05dd9e..406829b6a43e 100644
+> --- a/arch/arm64/kvm/hyp/debug-sr.c
+> +++ b/arch/arm64/kvm/hyp/debug-sr.c
+> @@ -162,12 +162,6 @@ void __hyp_text __debug_restore_state(struct kvm_vcpu *vcpu,
+>   
+>   void __hyp_text __debug_cond_save_host_state(struct kvm_vcpu *vcpu)
+>   {
+> -	/* If any of KDE, MDE or KVM_ARM64_DEBUG_DIRTY is set, perform
+> -	 * a full save/restore cycle. */
+> -	if ((vcpu->arch.ctxt.sys_regs[MDSCR_EL1] & DBG_MDSCR_KDE) ||
+> -	    (vcpu->arch.ctxt.sys_regs[MDSCR_EL1] & DBG_MDSCR_MDE))
+> -		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
+> -
+>   	__debug_save_state(vcpu, &vcpu->arch.host_debug_state.regs,
+>   			   kern_hyp_va(vcpu->arch.host_cpu_context));
+>   	__debug_save_spe()(&vcpu->arch.host_debug_state.pmscr_el1);
+> 
 
 -- 
 Julien Thierry
