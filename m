@@ -1,27 +1,27 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v4 17/19] arm64: KVM: Dynamically compute the HYP VA mask
-Date: Thu, 18 Jan 2018 21:28:16 +0100
-Message-ID: <20180118202816.GE21802@cbox>
+Subject: Re: [PATCH v4 19/19] arm64: Update the KVM memory map documentation
+Date: Thu, 18 Jan 2018 21:28:31 +0100
+Message-ID: <20180118202831.GG21802@cbox>
 References: <20180104184334.16571-1-marc.zyngier@arm.com>
- <20180104184334.16571-18-marc.zyngier@arm.com>
+ <20180104184334.16571-20-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B342249E0E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jan 2018 15:23:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7318849E2B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jan 2018 15:23:27 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tBZFsIyTQ3T2 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 18 Jan 2018 15:23:11 -0500 (EST)
+ with ESMTP id JmyfsLEnZaWp for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 18 Jan 2018 15:23:26 -0500 (EST)
 Received: from mail-wm0-f66.google.com (mail-wm0-f66.google.com [74.125.82.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D9F9149DBE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jan 2018 15:23:10 -0500 (EST)
-Received: by mail-wm0-f66.google.com with SMTP id g1so24328529wmg.2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jan 2018 12:28:18 -0800 (PST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 971AC49E27
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jan 2018 15:23:26 -0500 (EST)
+Received: by mail-wm0-f66.google.com with SMTP id b21so292048wme.4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jan 2018 12:28:34 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <20180104184334.16571-18-marc.zyngier@arm.com>
+In-Reply-To: <20180104184334.16571-20-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,72 +35,37 @@ To: Marc Zyngier <marc.zyngier@arm.com>
 Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jan 04, 2018 at 06:43:32PM +0000, Marc Zyngier wrote:
-> As we're moving towards a much more dynamic way to compute our
-> HYP VA, let's express the mask in a slightly different way.
-> 
-> Instead of comparing the idmap position to the "low" VA mask,
-> we directly compute the mask by taking into account the idmap's
-> (VA_BIT-1) bit.
-> 
-> No functionnal change.
+On Thu, Jan 04, 2018 at 06:43:34PM +0000, Marc Zyngier wrote:
+> Update the documentation to reflect the new tricks we play on the
+> EL2 mappings...
 > 
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+
 > ---
->  arch/arm64/kvm/va_layout.c | 17 ++++++-----------
->  1 file changed, 6 insertions(+), 11 deletions(-)
+>  Documentation/arm64/memory.txt | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
-> index aee758574e61..75bb1c6772b0 100644
-> --- a/arch/arm64/kvm/va_layout.c
-> +++ b/arch/arm64/kvm/va_layout.c
-> @@ -21,24 +21,19 @@
->  #include <asm/insn.h>
->  #include <asm/kvm_mmu.h>
+> diff --git a/Documentation/arm64/memory.txt b/Documentation/arm64/memory.txt
+> index 671bc0639262..ea64e20037f6 100644
+> --- a/Documentation/arm64/memory.txt
+> +++ b/Documentation/arm64/memory.txt
+> @@ -86,9 +86,11 @@ Translation table lookup with 64KB pages:
+>   +-------------------------------------------------> [63] TTBR0/1
 >  
-> -#define HYP_PAGE_OFFSET_HIGH_MASK	((UL(1) << VA_BITS) - 1)
-> -#define HYP_PAGE_OFFSET_LOW_MASK	((UL(1) << (VA_BITS - 1)) - 1)
-> -
->  static u64 va_mask;
 >  
->  static void compute_layout(void)
->  {
->  	phys_addr_t idmap_addr = __pa_symbol(__hyp_idmap_text_start);
-> -	unsigned long mask = HYP_PAGE_OFFSET_HIGH_MASK;
-> +	u64 region;
-
-the naming here really confused me.  Would it make sense to call this
-'hyp_va_msb' or something like that instead?
-
+> -When using KVM without the Virtualization Host Extensions, the hypervisor
+> -maps kernel pages in EL2 at a fixed offset from the kernel VA. See the
+> -kern_hyp_va macro for more details.
+> +When using KVM without the Virtualization Host Extensions, the
+> +hypervisor maps kernel pages in EL2 at a fixed offset (modulo a random
+> +offset) from the linear mapping. See the kern_hyp_va macro and
+> +kvm_update_va_mask function for more details. MMIO devices such as
+> +GICv2 gets mapped next to the HYP idmap page.
 >  
-> -	/*
-> -	 * Activate the lower HYP offset only if the idmap doesn't
-> -	 * clash with it,
-> -	 */
-> -	if (idmap_addr > HYP_PAGE_OFFSET_LOW_MASK)
-> -		mask = HYP_PAGE_OFFSET_HIGH_MASK;
-
-Ah, the series was tested, it was just that this code only existed for a
-short while.  Amusingly, I think this ephemeral bug goes against the "No
-function change" statement in the commit message.
-
-> +	/* Where is my RAM region? */
-> +	region  = idmap_addr & BIT(VA_BITS - 1);
-> +	region ^= BIT(VA_BITS - 1);
->  
-> -	va_mask = mask;
-> +	va_mask  = BIT(VA_BITS - 1) - 1;
-
-nit: This could also be written as GENMASK_ULL(VA_BITS - 2, 0) --- and
-now I'm not sure which one I prefer.
-
-> +	va_mask |= region;
->  }
->  
->  static u32 compute_instruction(int n, u32 rd, u32 rn)
+>  When using KVM with the Virtualization Host Extensions, no additional
+>  mappings are created, since the host kernel runs directly in EL2.
 > -- 
 > 2.14.2
 > 
-Otherwise looks good:
-
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
