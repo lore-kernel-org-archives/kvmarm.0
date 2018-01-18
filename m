@@ -1,27 +1,28 @@
-From: Julien Thierry <julien.thierry@arm.com>
-Subject: Re: [PATCH v3 26/41] KVM: arm64: Introduce framework for accessing
- deferred sysregs
-Date: Thu, 18 Jan 2018 13:39:16 +0000
-Message-ID: <48d6c906-d3b3-5566-5be9-b4cbc99b202d@arm.com>
-References: <20180112120747.27999-1-christoffer.dall@linaro.org>
- <20180112120747.27999-27-christoffer.dall@linaro.org>
- <dce891ed-3e43-a136-9d7b-c7186fe2ff3c@arm.com> <20180118130823.GC27865@cbox>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v4 13/19] KVM: arm/arm64: Keep GICv2 HYP VAs in
+ kvm_vgic_global_state
+Date: Thu, 18 Jan 2018 15:39:49 +0100
+Message-ID: <20180118143949.GA21802@cbox>
+References: <20180104184334.16571-1-marc.zyngier@arm.com>
+ <20180104184334.16571-14-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 560ED49E1D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jan 2018 08:34:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 628C049E2D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jan 2018 09:34:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kgzoz6SiwUoP for <kvmarm@lists.cs.columbia.edu>;
- Thu, 18 Jan 2018 08:34:15 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BAB249E09
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jan 2018 08:34:15 -0500 (EST)
-In-Reply-To: <20180118130823.GC27865@cbox>
-Content-Language: en-US
+ with ESMTP id MGWGQZVJXstb for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 18 Jan 2018 09:34:45 -0500 (EST)
+Received: from mail-wm0-f66.google.com (mail-wm0-f66.google.com [74.125.82.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 10B3049E22
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jan 2018 09:34:45 -0500 (EST)
+Received: by mail-wm0-f66.google.com with SMTP id f3so23418334wmc.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jan 2018 06:39:51 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <20180104184334.16571-14-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,223 +32,255 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Shih-Wei Li <shihwei@cs.columbia.edu>
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 18/01/18 13:08, Christoffer Dall wrote:
-> On Wed, Jan 17, 2018 at 05:52:21PM +0000, Julien Thierry wrote:
->>
->>
->> On 12/01/18 12:07, Christoffer Dall wrote:
->>> We are about to defer saving and restoring some groups of system
->>> registers to vcpu_put and vcpu_load on supported systems.  This means
->>> that we need some infrastructure to access system registes which
->>> supports either accessing the memory backing of the register or directly
->>> accessing the system registers, depending on the state of the system
->>> when we access the register.
->>>
->>> We do this by defining a set of read/write accessors for each system
->>> register, and letting each system register be defined as "immediate" or
->>> "deferrable".  Immediate registers are always saved/restored in the
->>> world-switch path, but deferrable registers are only saved/restored in
->>> vcpu_put/vcpu_load when supported and sysregs_loaded_on_cpu will be set
->>> in that case.
->>>
->>
->> The patch is fine, however I'd suggest adding a comment in the pointing out
->> that the IMMEDIATE/DEFERRABLE apply to save/restore to the vcpu struct.
->> Instinctively I would expect the deferrable/immediate to apply to the actual
->> hardware register access, so a comment would prevent people like me to get
->> on the wrong track.
->>
+On Thu, Jan 04, 2018 at 06:43:28PM +0000, Marc Zyngier wrote:
+> As we're about to change the way we map devices at HYP, we need
+> to move away from kern_hyp_va on an IO address.
 > 
-> I tried to explain that a bit in the first sentence of the commit
-> message, but I can try to make it more clear that we introduce
-> terminology.
+> One way of achieving this is to store the VAs in kvm_vgic_global_state,
+> and use that directly from the HYP code. This requires a small change
+> to create_hyp_io_mappings so that it can also return a HYP VA.
+> 
+> We take this opportunity to nuke the vctrl_base field in the emulated
+> distributor, as it is not used anymore.
+> 
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm/include/asm/kvm_mmu.h   |  3 ++-
+>  arch/arm64/include/asm/kvm_mmu.h |  3 ++-
+>  include/kvm/arm_vgic.h           | 12 ++++++------
+>  virt/kvm/arm/hyp/vgic-v2-sr.c    | 10 +++-------
+>  virt/kvm/arm/mmu.c               | 20 ++++++++++++++++----
+>  virt/kvm/arm/vgic/vgic-init.c    |  6 ------
+>  virt/kvm/arm/vgic/vgic-v2.c      | 13 +++++++------
+>  7 files changed, 36 insertions(+), 31 deletions(-)
+> 
+> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+> index cb3bef71ec9b..feff24b34506 100644
+> --- a/arch/arm/include/asm/kvm_mmu.h
+> +++ b/arch/arm/include/asm/kvm_mmu.h
+> @@ -42,7 +42,8 @@
+>  
+>  int create_hyp_mappings(void *from, void *to, pgprot_t prot);
+>  int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
+> -			   void __iomem **kaddr);
+> +			   void __iomem **kaddr,
+> +			   void __iomem **haddr);
+>  void free_hyp_pgds(void);
+>  
+>  void stage2_unmap_vm(struct kvm *kvm);
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index 09a208014457..cc882e890bb1 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -120,7 +120,8 @@ static inline unsigned long __kern_hyp_va(unsigned long v)
+>  
+>  int create_hyp_mappings(void *from, void *to, pgprot_t prot);
+>  int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
+> -			   void __iomem **kaddr);
+> +			   void __iomem **kaddr,
+> +			   void __iomem **haddr);
+>  void free_hyp_pgds(void);
+>  
+>  void stage2_unmap_vm(struct kvm *kvm);
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index 8c896540a72c..8b3fbc03293b 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -57,11 +57,15 @@ struct vgic_global {
+>  	/* Physical address of vgic virtual cpu interface */
+>  	phys_addr_t		vcpu_base;
+>  
+> -	/* GICV mapping */
+> +	/* GICV mapping, kernel VA */
+>  	void __iomem		*vcpu_base_va;
+> +	/* GICV mapping, HYP VA */
+> +	void __iomem		*vcpu_hyp_va;
+>  
+> -	/* virtual control interface mapping */
+> +	/* virtual control interface mapping, kernel VA */
+>  	void __iomem		*vctrl_base;
+> +	/* virtual control interface mapping, HYP VA */
+> +	void __iomem		*vctrl_hyp;
+>  
+>  	/* Number of implemented list registers */
+>  	int			nr_lr;
+> @@ -198,10 +202,6 @@ struct vgic_dist {
+>  
+>  	int			nr_spis;
+>  
+> -	/* TODO: Consider moving to global state */
+
+yay!
+
+> -	/* Virtual control interface mapping */
+> -	void __iomem		*vctrl_base;
+> -
+>  	/* base addresses in guest physical address space: */
+>  	gpa_t			vgic_dist_base;		/* distributor */
+>  	union {
+> diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
+> index 4573d0552af3..dbd109f3a4ab 100644
+> --- a/virt/kvm/arm/hyp/vgic-v2-sr.c
+> +++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
+> @@ -56,10 +56,8 @@ static void __hyp_text save_lrs(struct kvm_vcpu *vcpu, void __iomem *base)
+>  /* vcpu is already in the HYP VA space */
+>  void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
+>  {
+> -	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+>  	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+> -	struct vgic_dist *vgic = &kvm->arch.vgic;
+> -	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
+> +	void __iomem *base = hyp_symbol_addr(kvm_vgic_global_state)->vctrl_hyp;
+>  	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
+>  
+>  	if (!base)
+> @@ -81,10 +79,8 @@ void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
+>  /* vcpu is already in the HYP VA space */
+>  void __hyp_text __vgic_v2_restore_state(struct kvm_vcpu *vcpu)
+>  {
+> -	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+>  	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+> -	struct vgic_dist *vgic = &kvm->arch.vgic;
+> -	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
+> +	void __iomem *base = hyp_symbol_addr(kvm_vgic_global_state)->vctrl_hyp;
+>  	int i;
+>  	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
+>  
+> @@ -139,7 +135,7 @@ int __hyp_text __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
+>  		return -1;
+>  
+>  	rd = kvm_vcpu_dabt_get_rd(vcpu);
+> -	addr  = kern_hyp_va(hyp_symbol_addr(kvm_vgic_global_state)->vcpu_base_va);
+> +	addr  = hyp_symbol_addr(kvm_vgic_global_state)->vcpu_hyp_va;
+>  	addr += fault_ipa - vgic->vgic_cpu_base;
+>  
+>  	if (kvm_vcpu_dabt_iswrite(vcpu)) {
+> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> index 38adbe0a016c..6192d45d1e1a 100644
+> --- a/virt/kvm/arm/mmu.c
+> +++ b/virt/kvm/arm/mmu.c
+> @@ -713,28 +713,40 @@ int create_hyp_mappings(void *from, void *to, pgprot_t prot)
+>   * @phys_addr:	The physical start address which gets mapped
+>   * @size:	Size of the region being mapped
+>   * @kaddr:	Kernel VA for this mapping
+> + * @haddr:	HYP VA for this mapping
+>   *
+> - * The resulting HYP VA is the same as the kernel VA, modulo
+> - * HYP_PAGE_OFFSET.
+> + * The resulting HYP VA is completely unrelated to the kernel VA.
+>   */
+>  int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
+> -			   void __iomem **kaddr)
+> +			   void __iomem **kaddr,
+> +			   void __iomem **haddr)
+>  {
+>  	unsigned long start, end;
+> +	int ret;
+>  
+>  	*kaddr = ioremap(phys_addr, size);
+>  	if (!*kaddr)
+>  		return -ENOMEM;
+>  
+>  	if (is_kernel_in_hyp_mode()) {
+> +		*haddr = *kaddr;
+>  		return 0;
+>  	}
+>  
+>  
+>  	start = kern_hyp_va((unsigned long)*kaddr);
+>  	end = kern_hyp_va((unsigned long)*kaddr + size);
+> -	return __create_hyp_mappings(hyp_pgd, start, end,
+> +	ret = __create_hyp_mappings(hyp_pgd, start, end,
+>  				     __phys_to_pfn(phys_addr), PAGE_HYP_DEVICE);
+> +
+> +	if (ret) {
+> +		iounmap(*kaddr);
+> +		*kaddr = NULL;
+> +	} else {
+> +		*haddr = (void __iomem *)start;
+> +	}
+
+potential waste-of-time nit: this could be written perhaps slightly more
+elegant as:
+
+	if (ret) {
+		iounmap(*kaddr);
+		*kaddr = NULL;
+		return ret;
+	}
+
+	*haddr = (void __iomem *)start
+	return 0;
+
+>  }
+>  
+>  /**
+> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+> index 62310122ee78..3f01b5975055 100644
+> --- a/virt/kvm/arm/vgic/vgic-init.c
+> +++ b/virt/kvm/arm/vgic/vgic-init.c
+> @@ -166,12 +166,6 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+>  	kvm->arch.vgic.in_kernel = true;
+>  	kvm->arch.vgic.vgic_model = type;
+>  
+> -	/*
+> -	 * kvm_vgic_global_state.vctrl_base is set on vgic probe (kvm_arch_init)
+> -	 * it is stored in distributor struct for asm save/restore purpose
+> -	 */
+> -	kvm->arch.vgic.vctrl_base = kvm_vgic_global_state.vctrl_base;
+> -
+>  	kvm->arch.vgic.vgic_dist_base = VGIC_ADDR_UNDEF;
+>  	kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
+>  	kvm->arch.vgic.vgic_redist_base = VGIC_ADDR_UNDEF;
+> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+> index bc49d702f9f0..f0f566e4494e 100644
+> --- a/virt/kvm/arm/vgic/vgic-v2.c
+> +++ b/virt/kvm/arm/vgic/vgic-v2.c
+> @@ -335,7 +335,8 @@ int vgic_v2_probe(const struct gic_kvm_info *info)
+>  
+>  		ret = create_hyp_io_mappings(info->vcpu.start,
+>  					     resource_size(&info->vcpu),
+> -					     &kvm_vgic_global_state.vcpu_base_va);
+> +					     &kvm_vgic_global_state.vcpu_base_va,
+> +					     &kvm_vgic_global_state.vcpu_hyp_va);
+>  		if (ret) {
+>  			kvm_err("Cannot map GICV into hyp\n");
+>  			goto out;
+> @@ -346,7 +347,8 @@ int vgic_v2_probe(const struct gic_kvm_info *info)
+>  
+>  	ret = create_hyp_io_mappings(info->vctrl.start,
+>  				     resource_size(&info->vctrl),
+> -				     &kvm_vgic_global_state.vctrl_base);
+> +				     &kvm_vgic_global_state.vctrl_base,
+> +				     &kvm_vgic_global_state.vctrl_hyp);
+>  	if (ret) {
+>  		kvm_err("Cannot map VCTRL into hyp\n");
+>  		goto out;
+> @@ -381,15 +383,14 @@ int vgic_v2_probe(const struct gic_kvm_info *info)
+>  void vgic_v2_load(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+> -	struct vgic_dist *vgic = &vcpu->kvm->arch.vgic;
+>  
+> -	writel_relaxed(cpu_if->vgic_vmcr, vgic->vctrl_base + GICH_VMCR);
+> +	writel_relaxed(cpu_if->vgic_vmcr,
+> +		       kvm_vgic_global_state.vctrl_base + GICH_VMCR);
+>  }
+>  
+>  void vgic_v2_put(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+> -	struct vgic_dist *vgic = &vcpu->kvm->arch.vgic;
+>  
+> -	cpu_if->vgic_vmcr = readl_relaxed(vgic->vctrl_base + GICH_VMCR);
+> +	cpu_if->vgic_vmcr = readl_relaxed(kvm_vgic_global_state.vctrl_base + GICH_VMCR);
+>  }
+> -- 
+> 2.14.2
 > 
 
-The commit message is fine, I just think it would be nice to have it in 
-the code so you don't have to look for the commit to understand.
-
->>> Not that we don't use the deferred mechanism yet in this patch, but only
->>> introduce infrastructure.  This is to improve convenience of review in
->>> the subsequent patches where it is clear which registers become
->>> deferred.
->>>
->>>   [ Most of this logic was contributed by Marc Zyngier ]
->>>
->>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->>> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
->>
->> Reviewed-by: Julien Thierry <julien.thierry@arm.com>
->>
->>> ---
->>>   arch/arm64/include/asm/kvm_host.h |   8 +-
->>>   arch/arm64/kvm/sys_regs.c         | 160 ++++++++++++++++++++++++++++++++++++++
->>>   2 files changed, 166 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->>> index 91272c35cc36..4b5ef82f6bdb 100644
->>> --- a/arch/arm64/include/asm/kvm_host.h
->>> +++ b/arch/arm64/include/asm/kvm_host.h
->>> @@ -281,6 +281,10 @@ struct kvm_vcpu_arch {
->>>   	/* Detect first run of a vcpu */
->>>   	bool has_run_once;
->>> +
->>> +	/* True when deferrable sysregs are loaded on the physical CPU,
->>> +	 * see kvm_vcpu_load_sysregs and kvm_vcpu_put_sysregs. */
->>> +	bool sysregs_loaded_on_cpu;
->>>   };
->>>   #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.gp_regs)
->>> @@ -293,8 +297,8 @@ struct kvm_vcpu_arch {
->>>    */
->>>   #define __vcpu_sys_reg(v,r)	((v)->arch.ctxt.sys_regs[(r)])
->>> -#define vcpu_read_sys_reg(v,r)	__vcpu_sys_reg(v,r)
->>> -#define vcpu_write_sys_reg(v,r,n)	do { __vcpu_sys_reg(v,r) = n; } while (0)
->>> +u64 vcpu_read_sys_reg(struct kvm_vcpu *vcpu, int reg);
->>> +void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, int reg, u64 val);
->>>   /*
->>>    * CP14 and CP15 live in the same array, as they are backed by the
->>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->>> index 96398d53b462..9d353a6a55c9 100644
->>> --- a/arch/arm64/kvm/sys_regs.c
->>> +++ b/arch/arm64/kvm/sys_regs.c
->>> @@ -35,6 +35,7 @@
->>>   #include <asm/kvm_coproc.h>
->>>   #include <asm/kvm_emulate.h>
->>>   #include <asm/kvm_host.h>
->>> +#include <asm/kvm_hyp.h>
->>>   #include <asm/kvm_mmu.h>
->>>   #include <asm/perf_event.h>
->>>   #include <asm/sysreg.h>
->>> @@ -76,6 +77,165 @@ static bool write_to_read_only(struct kvm_vcpu *vcpu,
->>>   	return false;
->>>   }
->>> +struct sys_reg_accessor {
->>> +	u64	(*rdsr)(struct kvm_vcpu *, int);
->>> +	void	(*wrsr)(struct kvm_vcpu *, int, u64);
->>
->> Nit:
->>
->> Why use a signed integer for the register index argument?
->>
-> 
-> The type name is short? ;)  No particular reason, could be an unsigned
-> int, but I don't think it matters here does it?
-> 
-
-Probably not, just personal preference I guess.
-
->>> +};
->>> +
->>> +#define DECLARE_IMMEDIATE_SR(i)						\
->>> +	static u64 __##i##_read(struct kvm_vcpu *vcpu, int r)		\
->>> +	{								\
->>> +		return __vcpu_sys_reg(vcpu, r);				\
->>> +	}								\
->>> +									\
->>> +	static void __##i##_write(struct kvm_vcpu *vcpu, int r, u64 v)	\
->>> +	{								\
->>> +		__vcpu_sys_reg(vcpu, r) = v;				\
->>> +	}								\
->>> +
->>> +#define DECLARE_DEFERRABLE_SR(i, s)					\
->>> +	static u64 __##i##_read(struct kvm_vcpu *vcpu, int r)		\
->>> +	{								\
->>> +		if (vcpu->arch.sysregs_loaded_on_cpu) {			\
->>> +			WARN_ON(kvm_arm_get_running_vcpu() != vcpu);	\
->>> +			return read_sysreg_s((s));			\
->>> +		}							\
->>> +		return __vcpu_sys_reg(vcpu, r);				\
->>> +	}								\
->>> +									\
->>> +	static void __##i##_write(struct kvm_vcpu *vcpu, int r, u64 v)	\
->>> +	{								\
->>> +		if (vcpu->arch.sysregs_loaded_on_cpu) {			\
->>> +			WARN_ON(kvm_arm_get_running_vcpu() != vcpu);	\
->>> +			write_sysreg_s(v, (s));				\
->>> +		} else {						\
->>> +			__vcpu_sys_reg(vcpu, r) = v;			\
->>> +		}							\
->>> +	}								\
->>> +
->>> +
->>> +#define SR_HANDLER_RANGE(i,e)						\
->>> +	[i ... e] =  (struct sys_reg_accessor) {			\
->>> +		.rdsr = __##i##_read,					\
->>> +		.wrsr = __##i##_write,					\
->>
->> Nit:
->> Could we have __vcpu_##i##_read and __vcpu_##i##_write?
->>
-> 
-> They don't necessarily read from the vcpu do they?
-> 
-
-Hmmm, from my understanding they do, but the action the vcpu can be 
-immediate or deferred. But from the semantics you give to 
-IMMEDIATE/DEFERRABLE, I'd say the actions are related to vcpu.
-
-I don't know if that makes sense.
-
-> Unrelated: I also thought about just having a single function a switch
-> statement instead, which may make it easier to follow the code as there
-> would be no macros generating functions, but it would be slightly less
-> declarative.
-> 
-> For example:
-> 
-> u64 vcpu_read_sys_reg(struct kvm_vcpu *vcpu, int reg)
-> {
-> 	if (!vcpu->arch.sysregs_loaded_on_cpu)
-> 		goto immediate_read;
-> 	
-> 	/*
-> 	 * All system registers listed in the switch are deferred
-> 	 * save/restored on VHE systems.
-> 	 */
-> 	switch (reg) {
-> 	case CSSELR_EL1:	return read_sysreg_s(SYS_CSSELR_EL1));
-> 	case SCTLR_EL1:		return read_sysreg_s(sctlr_EL12));
-> 	case ACTLR_EL1:		return read_sysreg_s(SYS_ACTLR_EL1));
-> 	case CPACR_EL1:		return read_sysreg_s(cpacr_EL12));
-> 	case TTBR0_EL1:		return read_sysreg_s(ttbr0_EL12));
-> 	case TTBR1_EL1:		return read_sysreg_s(ttbr1_EL12));
-> 	case TCR_EL1:		return read_sysreg_s(tcr_EL12));
-> 	case ESR_EL1:		return read_sysreg_s(esr_EL12));
-> 	case AFSR0_EL1:		return read_sysreg_s(afsr0_EL12));
-> 	case AFSR1_EL1:		return read_sysreg_s(afsr1_EL12));
-> 	case FAR_EL1:		return read_sysreg_s(far_EL12));
-> 	case MAIR_EL1:		return read_sysreg_s(mair_EL12));
-> 	case VBAR_EL1:		return read_sysreg_s(vbar_EL12));
-> 	case CONTEXTIDR_EL1:	return read_sysreg_s(contextidr_EL12));
-> 	case TPIDR_EL0:		return read_sysreg_s(SYS_TPIDR_EL0));
-> 	case TPIDRRO_EL0:	return read_sysreg_s(SYS_TPIDRRO_EL0));
-> 	case TPIDR_EL1:		return read_sysreg_s(SYS_TPIDR_EL1));
-> 	case AMAIR_EL1:		return read_sysreg_s(amair_EL12));
-> 	case CNTKCTL_EL1:	return read_sysreg_s(cntkctl_EL12));
-> 	case PAR_EL1:		return read_sysreg_s(SYS_PAR_EL1));
-> 	case DACR32_EL2:	return read_sysreg_s(SYS_DACR32_EL2));
-> 	case IFSR32_EL2:	return read_sysreg_s(SYS_IFSR32_EL2));
-> 	case DBGVCR32_EL2:	return read_sysreg_s(SYS_DBGVCR32_EL2));
-> 	}
-> 
-> immediate_read:
-> 	return __vcpu_sys_reg(vcpu, reg);
-> }
-> 
-> Since you're having a look at this, what are your thoughts?
-
-I like that suggestion, very easy to follow. Of course negative side is 
-that you'll need two of those switch... But yes I still prefer this new 
-suggestion.
-
-So if you go with this you can ignore my other comments ;) .
-
-Thanks,
-
--- 
-Julien Thierry
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
