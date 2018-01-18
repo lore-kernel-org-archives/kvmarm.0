@@ -1,240 +1,82 @@
-From: Yury Norov <ynorov@caviumnetworks.com>
-Subject: Re: [PATCH v3 00/41] Optimize KVM/ARM for VHE systems
-Date: Thu, 18 Jan 2018 15:18:21 +0300
-Message-ID: <20180118121821.gkfgvynco4b723nf@yury-thinkpad>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v3 08/41] KVM: arm/arm64: Introduce vcpu_el1_is_32bit
+Date: Thu, 18 Jan 2018 13:57:49 +0100
+Message-ID: <20180118125749.GB27865@cbox>
 References: <20180112120747.27999-1-christoffer.dall@linaro.org>
- <20180115141423.5qho7xvmikq27jvs@yury-thinkpad>
- <20180118111632.GA27865@cbox>
+ <20180112120747.27999-9-christoffer.dall@linaro.org>
+ <4a3fa63c-5925-e406-26dd-da4e9765e7fa@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E09549DF6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jan 2018 07:13:35 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id G+PQiwKqh79b for <kvmarm@lists.cs.columbia.edu>;
- Thu, 18 Jan 2018 07:13:34 -0500 (EST)
-Received: from NAM03-CO1-obe.outbound.protection.outlook.com
- (mail-co1nam03on0080.outbound.protection.outlook.com [104.47.40.80])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BEA0249DE4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jan 2018 07:13:33 -0500 (EST)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180118111632.GA27865@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Sunil Goutham <Sunil.Goutham@cavium.com>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Shih-Wei Li <shihwei@cs.columbia.edu>
+In-Reply-To: <4a3fa63c-5925-e406-26dd-da4e9765e7fa@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Julien Thierry <julien.thierry@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, Andrew Jones <drjones@redhat.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jan 18, 2018 at 12:16:32PM +0100, Christoffer Dall wrote:
-> Hi Yury,
+On Wed, Jan 17, 2018 at 02:44:32PM +0000, Julien Thierry wrote:
+> Hi Christoffer,
 > 
-> [cc'ing Alex Bennee who had some thoughts on this]
+> On 12/01/18 12:07, Christoffer Dall wrote:
+> >We have numerous checks around that checks if the HCR_EL2 has the RW bit
+> >set to figure out if we're running an AArch64 or AArch32 VM.  In some
+> >cases, directly checking the RW bit (given its unintuitive name), is a
+> >bit confusing, and that's not going to improve as we move logic around
+> >for the following patches that optimize KVM on AArch64 hosts with VHE.
+> >
+> >Therefore, introduce a helper, vcpu_el1_is_32bit, and replace existing
+> >direct checks of HCR_EL2.RW with the helper.
+> >
+> >Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> >---
+> >  arch/arm64/include/asm/kvm_emulate.h | 7 ++++++-
+> >  arch/arm64/kvm/hyp/switch.c          | 8 ++------
+> >  arch/arm64/kvm/hyp/sysreg-sr.c       | 5 +++--
+> >  arch/arm64/kvm/inject_fault.c        | 6 +++---
+> >  4 files changed, 14 insertions(+), 12 deletions(-)
+> >
+> >diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> >index b36aaa1fe332..e07bf463ac58 100644
+> >--- a/arch/arm64/include/asm/kvm_emulate.h
+> >+++ b/arch/arm64/include/asm/kvm_emulate.h
+> >@@ -45,6 +45,11 @@ void kvm_inject_undef32(struct kvm_vcpu *vcpu);
+> >  void kvm_inject_dabt32(struct kvm_vcpu *vcpu, unsigned long addr);
+> >  void kvm_inject_pabt32(struct kvm_vcpu *vcpu, unsigned long addr);
+> >+static inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
+> >+{
+> >+	return !(vcpu->arch.hcr_el2 & HCR_RW);
+> >+}
+> >+
 > 
-> On Mon, Jan 15, 2018 at 05:14:23PM +0300, Yury Norov wrote:
-> > On Fri, Jan 12, 2018 at 01:07:06PM +0100, Christoffer Dall wrote:
-> > > This series redesigns parts of KVM/ARM to optimize the performance on
-> > > VHE systems.  The general approach is to try to do as little work as
-> > > possible when transitioning between the VM and the hypervisor.  This has
-> > > the benefit of lower latency when waiting for interrupts and delivering
-> > > virtual interrupts, and reduces the overhead of emulating behavior and
-> > > I/O in the host kernel.
-> > > 
-> > > Patches 01 through 06 are not VHE specific, but rework parts of KVM/ARM
-> > > that can be generally improved.  We then add infrastructure to move more
-> > > logic into vcpu_load and vcpu_put, we improve handling of VFP and debug
-> > > registers.
-> > > 
-> > > We then introduce a new world-switch function for VHE systems, which we
-> > > can tweak and optimize for VHE systems.  To do that, we rework a lot of
-> > > the system register save/restore handling and emulation code that may
-> > > need access to system registers, so that we can defer as many system
-> > > register save/restore operations to vcpu_load and vcpu_put, and move
-> > > this logic out of the VHE world switch function.
-> > > 
-> > > We then optimize the configuration of traps.  On non-VHE systems, both
-> > > the host and VM kernels run in EL1, but because the host kernel should
-> > > have full access to the underlying hardware, but the VM kernel should
-> > > not, we essentially make the host kernel more privileged than the VM
-> > > kernel despite them both running at the same privilege level by enabling
-> > > VE traps when entering the VM and disabling those traps when exiting the
-> > > VM.  On VHE systems, the host kernel runs in EL2 and has full access to
-> > > the hardware (as much as allowed by secure side software), and is
-> > > unaffected by the trap configuration.  That means we can configure the
-> > > traps for VMs running in EL1 once, and don't have to switch them on and
-> > > off for every entry/exit to/from the VM.
-> > > 
-> > > Finally, we improve our VGIC handling by moving all save/restore logic
-> > > out of the VHE world-switch, and we make it possible to truly only
-> > > evaluate if the AP list is empty and not do *any* VGIC work if that is
-> > > the case, and only do the minimal amount of work required in the course
-> > > of the VGIC processing when we have virtual interrupts in flight.
-> > > 
-> > > The patches are based on v4.15-rc3, v9 of the level-triggered mapped
-> > > interrupts support series [1], and the first five patches of James' SDEI
-> > > series [2].
-> > > 
-> > > I've given the patches a fair amount of testing on Thunder-X, Mustang,
-> > > Seattle, and TC2 (32-bit) for non-VHE testing, and tested VHE
-> > > functionality on the Foundation model, running both 64-bit VMs and
-> > > 32-bit VMs side-by-side and using both GICv3-on-GICv3 and
-> > > GICv2-on-GICv3.
-> > > 
-> > > The patches are also available in the vhe-optimize-v3 branch on my
-> > > kernel.org repository [3].  The vhe-optimize-v3-base branch contains
-> > > prerequisites of this series.
-> > > 
-> > > Changes since v2:
-> > >  - Rebased on v4.15-rc3.
-> > >  - Includes two additional patches that only does vcpu_load after
-> > >    kvm_vcpu_first_run_init and only for KVM_RUN.
-> > >  - Addressed review comments from v2 (detailed changelogs are in the
-> > >    individual patches).
-> > > 
-> > > Thanks,
-> > > -Christoffer
-> > > 
-> > > [1]: git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git level-mapped-v9
-> > > [2]: git://linux-arm.org/linux-jm.git sdei/v5/base
-> > > [3]: git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git vhe-optimize-v3
-> > 
-> > I tested this v3 series on ThunderX2 with IPI benchmark:
-> > https://lkml.org/lkml/2017/12/11/364
-> > 
-> > I tried to address your comments in discussion to v2, like pinning
-> > the module to specific CPU (with taskset), increasing the number of
-> > iterations, tuning governor to max performance. Results didn't change
-> > much, and are pretty stable.
-> > 
-> > Comparing to vanilla guest, Norml IPI delivery for v3 is 20% slower.
-> > For v2 it was 27% slower, and for v1 - 42% faster. What's interesting,
-> > the acknowledge time is much faster for v3, so overall time to
-> > deliver and acknowledge IPI (2nd column) is less than vanilla
-> > 4.15-rc3 kernel.
-> > 
-> > Test setup is not changed since v2: ThunderX2, 112 online CPUs,
-> > guest is running under qemu-kvm, emulating gic version 3.
-> > 
-> > Below is test results for v1-3 normalized to host vanilla kernel
-> > dry-run time.
-> > 
-> > Yury
-> > 
-> > Host, v4.14:
-> > Dry-run:          0         1
-> > Self-IPI:         9        18
-> > Normal IPI:      81       110
-> > Broadcast IPI:    0      2106
-> > 
-> > Guest, v4.14:
-> > Dry-run:          0         1
-> > Self-IPI:        10        18
-> > Normal IPI:     305       525
-> > Broadcast IPI:    0      9729
-> > 
-> > Guest, v4.14 + VHE:
-> > Dry-run:          0         1
-> > Self-IPI:         9        18
-> > Normal IPI:     176       343
-> > Broadcast IPI:    0      9885
-> > 
-> > And for v2.
-> > 
-> > Host, v4.15:                   
-> > Dry-run:          0         1
-> > Self-IPI:         9        18
-> > Normal IPI:      79       108
-> > Broadcast IPI:    0      2102
-> >                         
-> > Guest, v4.15-rc:
-> > Dry-run:          0         1
-> > Self-IPI:         9        18
-> > Normal IPI:     291       526
-> > Broadcast IPI:    0     10439
-> > 
-> > Guest, v4.15-rc + VHE:
-> > Dry-run:          0         2
-> > Self-IPI:        14        28
-> > Normal IPI:     370       569
-> > Broadcast IPI:    0     11688
-> > 
-> > And for v3.
-> > 
-> > Host 4.15-rc3					
-> > Dry-run:	  0	    1
-> > Self-IPI:	  9	   18
-> > Normal IPI:	 80	  110
-> > Broadcast IPI:	  0	 2088
-> > 		
-> > Guest, 4.15-rc3	
-> > Dry-run:	  0	    1
-> > Self-IPI:	  9	   18
-> > Normal IPI:	289	  497
-> > Broadcast IPI:	  0	 9999
-> > 		
-> > Guest, 4.15-rc3	+ VHE
-> > Dry-run:	  0	    2
-> > Self-IPI:	 12	   24
-> > Normal IPI:	347	  490
-> > Broadcast IPI:	  0	11906
+> Just so I understand, the difference between this and vcpu_mode_is_32bit is
+> that vcpu_mode_is_32bit might return true because an interrupt/exception
+> occured while guest was executing 32bit EL0 but guest EL1 is still 64bits,
+> is that correct?
+
+Yes.
+
 > 
-> So, I had a look at your measurement code, and just want to make a
-> sanity check that I understand the measurements correctly.
+> Also, it seems the process controlling KVM is supposed to provide the
+> information of whether the vcpu runs a 32bit el1, would it be better to do:
 > 
-> Firstly, if we execute something 100,000 times and summarize the result
-> for each run, and get anything less than 100,000 (in this case ~300),
-> without scaling the value, doesn't that mean that in the vast majority
-> of cases, you are getting 0 as your measurement?
+> 	return test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features);
+> 
+> instead of looking at the hcr? Or is there a case where those might differ?
 
-I cannot report absolute numbers so I posted normalized values to dry-run
-case. 300 for IPI delivery means that it 300 times slower than no-op
-(dry-run case). Absolute numbers looks quite reasonable, few useconds
-for normal IPI.
+I think in the current implementation, both would work fine, and they
+shouldn't differ.  I prefer checking the HCR, because we then know we'll
+be consistent with what the hardware does, and the feature array is
+mostly there to negotiate between userspace and the kernel.  Also, we
+were already using the HCR.
 
-Let me know if you need absolute numbers.
-https://lkml.org/lkml/2017/12/13/301
- 
-> Secondly, are we sure all the required memory barriers are in place?
-> I know that the IPI send contains an smp_wmb(), but when you read back
-> the value in the caller, do you have the necessary smp_wmb() on the
-> handler side and a corresponding smp_rmb() on the sending side?  I'm not
-> sure what kind of effect missing barriers for a measurement framework
-> like this would have, but it's worth making sure we're not chasing red
-> herrings here.
+If there's an argument for checking the feature bits instead, I'm open
+to that idea, potentially as a separate patch explaining the rationale.
 
-I don't share memory between PMUs. Instead I completely rely on
-smp_call_function_single() which takes *info parameter to share
-data.
-
-Looking at generic_exec_single() code that makes work, for self-ipi
-things are trivial; and for normal ipi, there's detailed comment
-on cache visibility of *info. So I hope everything is right there.
-
-/*  
- * The list addition should be visible before sending the IPI
- * handler locks the list to pull the entry off it because of
- * normal cache coherency rules implied by spinlocks.
- *
- * If IPIs can go out of order to the cache coherency protocol
- * in an architecture, sufficient synchronisation should be added
- * to arch code to make it appear to obey cache coherency WRT
- * locking and barrier primitives.  Generic code isn't really
- * equipped to do the right thing...
- */
- 
-> That obviously doesn't change that the overall turnaround time is
-> improved more in the v1 case than in the v3 case, which I'd like to
-> explore/bisect in any case.
-
-So me. For any idea, let me know, I'll check it.
-
-Yury
+> 
+> Otherwise:
+> 
+> Reviewed-by: Julien Thierry <julien.thierry@arm.com>
+> 
+Thanks!
+-Christoffer
