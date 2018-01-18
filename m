@@ -1,233 +1,361 @@
-From: Julien Thierry <julien.thierry@arm.com>
-Subject: Re: [PATCH v3 33/41] KVM: arm64: Configure FPSIMD traps on vcpu
- load/put
-Date: Thu, 18 Jan 2018 09:31:08 +0000
-Message-ID: <4d830032-6510-7ce5-b9d3-436ac95a8c81@arm.com>
-References: <20180112120747.27999-1-christoffer.dall@linaro.org>
- <20180112120747.27999-34-christoffer.dall@linaro.org>
+From: Yury Norov <ynorov@caviumnetworks.com>
+Subject: Re: [PATCH v3 2/2] arm64: add micro test
+Date: Thu, 18 Jan 2018 13:09:58 +0300
+Message-ID: <20180118100958.j4iiq3ep2uruikss@yury-thinkpad>
+References: <1516225596-27071-1-git-send-email-shihwei@cs.columbia.edu>
+ <1516225596-27071-3-git-send-email-shihwei@cs.columbia.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6213C49E00
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jan 2018 04:26:08 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4lM6-YmKNUVU for <kvmarm@lists.cs.columbia.edu>;
- Thu, 18 Jan 2018 04:26:06 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 64F6749DDD
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jan 2018 04:26:05 -0500 (EST)
-In-Reply-To: <20180112120747.27999-34-christoffer.dall@linaro.org>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, Shih-Wei Li <shihwei@cs.columbia.edu>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1516225596-27071-3-git-send-email-shihwei@cs.columbia.edu>
+Sender: kvm-owner@vger.kernel.org
+To: Shih-Wei Li <shihwei@cs.columbia.edu>
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, drjones@redhat.com, pbonzini@redhat.com, Christoffer Dall <cdall@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 12/01/18 12:07, Christoffer Dall wrote:
-> There is no need to enable/disable traps to FP registers on every switch
-> to/from the VM, because the host kernel does not use this resource
-> without calling vcpu_put.  We can therefore move things around enough
-> that we still always write FPEXC32_EL2 before programming CPTR_EL2 but
-> only program these during vcpu load/put.
+On Wed, Jan 17, 2018 at 04:46:36PM -0500, Shih-Wei Li wrote:
+> Here we provide the support for measuring various micro level
+> operations on arm64. We iterate each of the tests and output
+> their average, minimum and maximum cost in microseconds.
+> Instruction barriers were used before taking timestamps to
+> avoid out-of-order execution or pipelining from skewing our
+> measurements.
 > 
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-
-Reviewed-by: Julien Thierry <julien.thierry@arm.com>
-
+> The operations we currently supported and measured are mostly
+> self-explanatory by their function name. For IPI, we measured the
+> cost of sending IPI from a source VCPU to a target VCPU, until the
+> target VCPU receives the IPI.
+> 
+> Signed-off-by: Shih-Wei Li <shihwei@cs.columbia.edu>
+> Signed-off-by: Christoffer Dall <cdall@cs.columbia.edu>
 > ---
->   arch/arm64/include/asm/kvm_hyp.h |  6 +++++
->   arch/arm64/kvm/hyp/switch.c      | 51 +++++++++++++++++++++++++++++-----------
->   arch/arm64/kvm/hyp/sysreg-sr.c   | 12 ++++++++--
->   3 files changed, 53 insertions(+), 16 deletions(-)
+>  arm/Makefile.common |   1 +
+>  arm/micro-test.c    | 252 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  arm/unittests.cfg   |   7 ++
+>  3 files changed, 260 insertions(+)
+>  create mode 100644 arm/micro-test.c
 > 
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index 3f54c55f77a1..ffd62e31f134 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -148,6 +148,12 @@ void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
->   void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
->   bool __fpsimd_enabled(void);
->   
-> +void __activate_traps_nvhe_load(struct kvm_vcpu *vcpu);
-> +void __deactivate_traps_nvhe_put(void);
+> diff --git a/arm/Makefile.common b/arm/Makefile.common
+> index 0a039cf..c7d5c27 100644
+> --- a/arm/Makefile.common
+> +++ b/arm/Makefile.common
+> @@ -16,6 +16,7 @@ tests-common += $(TEST_DIR)/pmu.flat
+>  tests-common += $(TEST_DIR)/gic.flat
+>  tests-common += $(TEST_DIR)/psci.flat
+>  tests-common += $(TEST_DIR)/sieve.flat
+> +tests-common += $(TEST_DIR)/micro-test.flat
+>  
+>  tests-all = $(tests-common) $(tests)
+>  all: directories $(tests-all)
+> diff --git a/arm/micro-test.c b/arm/micro-test.c
+> new file mode 100644
+> index 0000000..407ce8b
+> --- /dev/null
+> +++ b/arm/micro-test.c
+> @@ -0,0 +1,252 @@
+> +/*
+> + * Measure the cost of micro level operations.
+> + *
+> + * Copyright Columbia University
+> + * Author: Shih-Wei Li <shihwei@cs.columbia.edu>
+> + * Author: Christoffer Dall <cdall@cs.columbia.edu>
+> + *
+> + * This work is licensed under the terms of the GNU LGPL, version 2.
+> + */
+> +#include <asm/gic.h>
+> +#include "libcflat.h"
+> +#include <util.h>
+> +#include <limits.h>
 > +
-> +void activate_traps_vhe_load(struct kvm_vcpu *vcpu);
-> +void deactivate_traps_vhe_put(void);
-> +
->   u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
->   void __noreturn __hyp_do_panic(unsigned long, ...);
->   
-> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> index c01bcfc3fb52..d14ab9650f81 100644
-> --- a/arch/arm64/kvm/hyp/switch.c
-> +++ b/arch/arm64/kvm/hyp/switch.c
-> @@ -24,22 +24,25 @@
->   #include <asm/fpsimd.h>
->   #include <asm/debug-monitors.h>
->   
-> -static void __hyp_text __activate_traps_common(struct kvm_vcpu *vcpu)
-> +static void __hyp_text __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
->   {
->   	/*
-> -	 * We are about to set CPTR_EL2.TFP to trap all floating point
-> -	 * register accesses to EL2, however, the ARM ARM clearly states that
-> -	 * traps are only taken to EL2 if the operation would not otherwise
-> -	 * trap to EL1.  Therefore, always make sure that for 32-bit guests,
-> -	 * we set FPEXC.EN to prevent traps to EL1, when setting the TFP bit.
-> -	 * If FP/ASIMD is not implemented, FPEXC is UNDEFINED and any access to
-> -	 * it will cause an exception.
-> +	 * We are about to trap all floating point register accesses to EL2,
-> +	 * however, traps are only taken to EL2 if the operation would not
-> +	 * otherwise trap to EL1.  Therefore, always make sure that for 32-bit
-> +	 * guests, we set FPEXC.EN to prevent traps to EL1, when setting the
-> +	 * TFP bit.  If FP/ASIMD is not implemented, FPEXC is UNDEFINED and
-> +	 * any access to it will cause an exception.
->   	 */
->   	if (vcpu_el1_is_32bit(vcpu) && system_supports_fpsimd() &&
->   	    !vcpu->arch.guest_vfp_loaded) {
->   		write_sysreg(1 << 30, fpexc32_el2);
->   		isb();
->   	}
-> +}
-> +
-> +static void __hyp_text __activate_traps_common(struct kvm_vcpu *vcpu)
-> +{
->   	write_sysreg(vcpu->arch.hcr_el2, hcr_el2);
->   
->   	/* Trap on AArch32 cp15 c15 (impdef sysregs) accesses (EL1 or EL0) */
-> @@ -61,10 +64,12 @@ static void __hyp_text __deactivate_traps_common(void)
->   	write_sysreg(0, pmuserenr_el0);
->   }
->   
-> -static void __hyp_text __activate_traps_vhe(struct kvm_vcpu *vcpu)
-> +void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
->   {
->   	u64 val;
->   
-> +	__activate_traps_fpsimd32(vcpu);
-> +
->   	val = read_sysreg(cpacr_el1);
->   	val |= CPACR_EL1_TTA;
->   	val &= ~CPACR_EL1_ZEN;
-> @@ -73,14 +78,26 @@ static void __hyp_text __activate_traps_vhe(struct kvm_vcpu *vcpu)
->   	else
->   		val &= ~CPACR_EL1_FPEN;
->   	write_sysreg(val, cpacr_el1);
-> +}
->   
-> +void deactivate_traps_vhe_put(void)
-> +{
-> +	write_sysreg(CPACR_EL1_DEFAULT, cpacr_el1);
-> +}
-> +
-> +static void __hyp_text __activate_traps_vhe(struct kvm_vcpu *vcpu)
-> +{
->   	write_sysreg(__kvm_hyp_vector, vbar_el1);
->   }
->   
-> -static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
-> +void __hyp_text __activate_traps_nvhe_load(struct kvm_vcpu *vcpu)
->   {
->   	u64 val;
->   
-> +	vcpu = kern_hyp_va(vcpu);
-> +
-> +	__activate_traps_fpsimd32(vcpu);
-> +
->   	val = CPTR_EL2_DEFAULT;
->   	val |= CPTR_EL2_TTA | CPTR_EL2_TZ;
->   	if (vcpu->arch.guest_vfp_loaded)
-> @@ -90,6 +107,15 @@ static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
->   	write_sysreg(val, cptr_el2);
->   }
->   
-> +void __hyp_text __deactivate_traps_nvhe_put(void)
-> +{
-> +	write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
-> +}
-> +
-> +static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
-> +{
-> +}
-> +
->   static hyp_alternate_select(__activate_traps_arch,
->   			    __activate_traps_nvhe, __activate_traps_vhe,
->   			    ARM64_HAS_VIRT_HOST_EXTN);
-> @@ -111,12 +137,10 @@ static void __hyp_text __deactivate_traps_vhe(void)
->   
->   	write_sysreg(mdcr_el2, mdcr_el2);
->   	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
-> -	write_sysreg(CPACR_EL1_DEFAULT, cpacr_el1);
->   	write_sysreg(vectors, vbar_el1);
->   }
->   
-> -static void __hyp_text __deactivate_traps_nvhe(void)
-> -{
-> +static void __hyp_text __deactivate_traps_nvhe(void) {
->   	u64 mdcr_el2 = read_sysreg(mdcr_el2);
->   
->   	mdcr_el2 &= MDCR_EL2_HPMN_MASK;
-> @@ -124,7 +148,6 @@ static void __hyp_text __deactivate_traps_nvhe(void)
->   
->   	write_sysreg(mdcr_el2, mdcr_el2);
->   	write_sysreg(HCR_RW, hcr_el2);
-> -	write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
->   }
->   
->   static hyp_alternate_select(__deactivate_traps_arch,
-> diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-> index d225f5797651..7943d5b4dbcb 100644
-> --- a/arch/arm64/kvm/hyp/sysreg-sr.c
-> +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-> @@ -237,8 +237,10 @@ void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu)
->   	struct kvm_cpu_context *host_ctxt = vcpu->arch.host_cpu_context;
->   	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
->   
-> -	if (!has_vhe())
-> +	if (!has_vhe()) {
-> +		kvm_call_hyp(__activate_traps_nvhe_load, vcpu);
->   		return;
-> +	}
->   
->   	__sysreg_save_user_state(host_ctxt);
->   
-> @@ -253,6 +255,8 @@ void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu)
->   	__sysreg_restore_el1_state(guest_ctxt);
->   
->   	vcpu->arch.sysregs_loaded_on_cpu = true;
-> +
-> +	activate_traps_vhe_load(vcpu);
->   }
->   
->   /**
-> @@ -282,8 +286,12 @@ void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu)
->   		vcpu->arch.guest_vfp_loaded = 0;
->   	}
->   
-> -	if (!has_vhe())
-> +	if (!has_vhe()) {
-> +		kvm_call_hyp(__deactivate_traps_nvhe_put);
->   		return;
-> +	}
-> +
-> +	deactivate_traps_vhe_put();
->   
->   	__sysreg_save_el1_state(guest_ctxt);
->   	__sysreg_save_user_state(guest_ctxt);
-> 
+> +static volatile bool ipi_received;
+> +static volatile bool ipi_ready;
+> +static volatile unsigned int cntfrq;
+> +static volatile void *vgic_dist_addr;
 
--- 
-Julien Thierry
+Volatiles considered harmful for kernel code. I think it is also correct
+for your case:
+https://lwn.net/Articles/234017/
+
+I would prefer use readl/writel accessors for interprocessor
+communications which guaranties cache synchronization and proper
+ordering.
+
+Also, ipi_received and ipi_ready are looking like synchronization
+primitives. Did you consider using spinlocks instead?
+
+Also-also, cntfrq is written only once at init. What for you make it
+volatile?
+
+> +void (*write_eoir)(u32 irqstat);
+> +
+> +#define IPI_IRQ		1
+> +
+> +#define TRIES	(1U << 28)
+> +
+> +#define MAX_FAILURES	1000
+> +
+> +/*
+> + * The counter may not always start with zero, which means it could
+> + * overflow after some period of time.
+> + */
+> +#define COUNT(c1, c2) \
+> +	((c1) > (c2) ? 0 : (c2) - (c1))
+> +
+> +static uint64_t read_cc(void)
+> +{
+> +	isb();
+> +	return read_sysreg(cntpct_el0);
+> +}
+> +
+> +static void ipi_irq_handler(struct pt_regs *regs __unused)
+> +{
+> +	u32 ack;
+> +	ipi_ready = false;
+> +	ipi_received = true;
+> +	ack = gic_read_iar();
+> +	gic_write_eoir(ack);
+> +	ipi_ready = true;
+> +}
+> +
+> +static void ipi_test_secondary_entry(void *data __unused)
+> +{
+> +	enum vector v = EL1H_IRQ;
+> +	install_irq_handler(v, ipi_irq_handler);
+> +
+> +	gic_enable_defaults();
+> +
+> +	local_irq_enable(); /* Enter small wait-loop */
+> +	ipi_ready = true;
+> +	while (true);
+> +}
+> +
+> +static int test_init(void)
+> +{
+> +	int v;
+> +
+> +	v = gic_init();
+> +	if (v == 2) {
+> +		vgic_dist_addr = gicv2_dist_base();
+> +		write_eoir = gicv2_write_eoir;
+> +	} else if (v == 3) {
+> +		vgic_dist_addr = gicv3_dist_base();
+> +		write_eoir = gicv3_write_eoir;
+> +	} else {
+> +		printf("No supported gic present, skipping tests...\n");
+> +		return 0;
+> +	}
+> +
+> +	ipi_ready = false;
+> +
+> +	gic_enable_defaults();
+> +	on_cpu_async(1, ipi_test_secondary_entry, 0);
+> +
+> +	cntfrq = get_cntfrq();
+> +	printf("Timer Frequency %d Hz (Output in microseconds)\n", cntfrq);
+> +
+> +	return 1;
+> +}
+> +
+> +static unsigned long ipi_test(void)
+> +{
+> +	unsigned int tries = TRIES;
+> +	uint64_t c1, c2;
+> +
+> +	while (!ipi_ready && tries--);
+> +	assert(ipi_ready);
+> +
+> +	ipi_received = false;
+> +
+> +	c1 = read_cc();
+> +
+> +	gic_ipi_send_single(IPI_IRQ, 1);
+> +
+> +	tries = TRIES;
+> +	while (!ipi_received && tries--);
+> +	assert(ipi_received);
+> +
+> +	c2 = read_cc();
+> +	return COUNT(c1, c2);
+> +}
+> +
+> +static unsigned long hvc_test(void)
+> +{
+> +	uint64_t c1, c2;
+> +
+> +	c1 = read_cc();
+> +	asm volatile("mov w0, #0x4b000000; hvc #0" ::: "w0");
+> +	c2 = read_cc();
+> +	return COUNT(c1, c2);
+> +}
+> +
+> +static unsigned long mmio_read_user(void)
+> +{
+> +	uint64_t c1, c2;
+> +	/*
+> +	 * FIXME: Read device-id in virtio mmio here. This address
+> +	 * needs to be updated in the future if any relevent
+> +	 * changes in QEMU test-dev are made.
+> +	 */
+> +	void *mmio_read_user_addr = (void*) 0x0a000008;
+
+Again, could you rename it? device_id_ptr sounds much better.
+
+> +	c1 = read_cc();
+> +	readl(mmio_read_user_addr);
+> +	c2 = read_cc();
+> +	return COUNT(c1, c2);
+> +}
+> +
+> +static unsigned long mmio_read_vgic(void)
+> +{
+> +	uint64_t c1, c2;
+> +
+> +	c1 = read_cc();
+> +	readl(vgic_dist_addr + GICD_IIDR);
+> +	c2 = read_cc();
+> +	return COUNT(c1, c2);
+> +}
+> +
+> +static unsigned long eoi_test(void)
+> +{
+> +	uint64_t c1, c2;
+> +
+> +	u32 val = 1023; /* spurious IDs, writes to EOI are ignored */
+> +
+> +	/* Avoid measuring assert(..) in gic_write_eoir */
+> +	c1 = read_cc();
+> +	write_eoir(val);
+> +	c2 = read_cc();
+> +
+> +	return COUNT(c1, c2);
+> +}
+> +
+> +struct exit_test {
+> +	const char *name;
+> +	unsigned long (*test_fn)(void);
+> +	bool run;
+> +};
+> +
+> +static struct exit_test tests[] = {
+> +	{"hvc",                hvc_test,           true},
+> +	{"mmio_read_user",     mmio_read_user,     true},
+> +	{"mmio_read_vgic",     mmio_read_vgic,     true},
+> +	{"eoi",                eoi_test,           true},
+> +	{"ipi",                ipi_test,           true},
+> +};
+> +
+> +static void get_us_output(const char *name,
+> +			  unsigned long cycles)
+> +{
+> +	unsigned int ns_per_cycle = 10^9U / cntfrq;
+> +	unsigned int ns, us, us_frac;
+
+'^' is 'xor', you probably mean 1000*1000*1000. And anyway,
+ThunderX2 works at ~2GHz, so 10E9/get_cntfrq() is 0 for it.
+
+For CPUs working at 500...1000 MHz, ns_per_cycle is 1,
+For CPUs working at 1GHz+ it is 0. What's point in it?
+
+> +	ns =  cycles * ns_per_cycle;
+> +	us = ns / 1000;
+> +	us_frac = (ns % 1000) / 100;
+> +
+> +	printf("%s %10d.%d\t", name, us, us_frac);
+> +}
+> +
+> +static void output_result(const char *name,
+> +			  unsigned long avg_cycle,
+> +			  unsigned long min_cycle,
+> +			  unsigned long max_cycle)
+> +{
+> +	printf("%10s:\t", name);
+> +	get_us_output("avg", avg_cycle);
+> +	get_us_output("min", min_cycle);
+> +	get_us_output("max", max_cycle);
+> +	printf("\n");
+> +}
+> +
+> +static void loop_test(struct exit_test *test)
+> +{
+> +	unsigned long i, iterations = 32;
+> +	unsigned long sample, cycles;
+> +	unsigned long min = ULONG_MAX, max = 0;
+> +	const unsigned long goal = (1ULL << 26);
+> +	int failures = 0;
+> +
+> +	do {
+> +		iterations *= 2;
+> +		cycles = 0;
+> +		i = 0;
+> +		while (i < iterations) {
+> +			sample = test->test_fn();
+> +			if (sample == 0) {
+> +				if (failures++ > MAX_FAILURES) {
+> +				/*
+> +				 * If the cost is smaller than a cycle count for
+> +				 * over MAX_FAILURES of times, we simply ignore the test.
+> +				 */
+> +					printf("%s: Too many cycle count overflows\n",
+> +						test->name);
+
+Again, this is not overflow. Printed message does not correspond the
+comment. 
+
+Also, why do you think that sample == 0 means fail? I'd rather suspect my
+measurement procedure, or if everything is correct, simply take this
+result.
+
+Now sample == 0 indicates 2 different cases - too small cost and
+overflow. Could you introduce special error code to distinguish
+between them?
+
+> +					return;
+> +				}
+> +				continue;
+> +			}
+> +			cycles += sample;
+> +			if (min > sample)
+> +				min = sample;
+> +			if (max < sample)
+> +				max = sample;
+> +			++i;
+> +		}
+> +	} while (cycles < goal);
+> +
+> +	output_result(test->name, (cycles / iterations), min, max);	
+> +}
+> +
+> +int main(int argc, char **argv)
+> +{
+> +	int i, ret;
+> +
+> +	ret = test_init();
+> +	assert(ret);
+> +
+> +	for (i = 0; i < ARRAY_SIZE(tests); i++) {
+> +		if (!tests[i].run)
+> +			continue;
+> +		loop_test(&tests[i]);
+> +	}
+> +
+> +	return 0;
+> +}
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index 44b98cf..5759fa8 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -116,3 +116,10 @@ file = timer.flat
+>  groups = timer
+>  timeout = 2s
+>  arch = arm64
+> +
+> +# Exit tests
+> +[micro-test]
+> +file = micro-test.flat
+> +smp = 2
+> +groups = nodefault,micro-test
+> +accel = kvm
+> -- 
+> 1.9.1
+> 
