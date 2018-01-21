@@ -1,326 +1,199 @@
-From: Yury Norov <ynorov@caviumnetworks.com>
-Subject: Re: [PATCH v3 2/2] arm64: add micro test
-Date: Sat, 20 Jan 2018 14:26:31 +0300
-Message-ID: <20180120112229.3eomv6gpsjtzhzzg@yury-thinkpad>
-References: <1516225596-27071-1-git-send-email-shihwei@cs.columbia.edu>
- <1516225596-27071-3-git-send-email-shihwei@cs.columbia.edu>
- <20180118100958.j4iiq3ep2uruikss@yury-thinkpad>
- <20180118103737.jiwf5ly3up6w7f7r@kamzik.brq.redhat.com>
- <20180118112519.vzkfwkgqavvxqzdn@yury-thinkpad>
- <CAO+sbHHKyYHjGqmS5uM=C6bCnUQ2CbHmmFBTAb=WanQsWdLU2Q@mail.gmail.com>
+From: gengdongjiu <gengdj.1984@gmail.com>
+Subject: Re: [PATCH v8 7/7] arm64: kvm: handle SError Interrupt by categorization
+Date: Sun, 21 Jan 2018 10:45:36 +0800
+Message-ID: <CAMj-D2C5Bz3r-w9v3QasZKK-W2JBY7Mx9W=yCDBnPYyk99gGzA@mail.gmail.com>
+References: <1510343650-23659-1-git-send-email-gengdongjiu@huawei.com>
+ <1510343650-23659-8-git-send-email-gengdongjiu@huawei.com>
+ <5A0B1334.7060500@arm.com> <4af78739-99da-4056-4db1-f80bfe11081a@huawei.com>
+ <5A283F26.3020507@arm.com> <4b37e86d-eee3-c51e-eceb-5d0c7ad12886@huawei.com>
+ <506cd212-3d16-ba2a-518f-34982bc162fc@huawei.com> <5A58F8E3.5060002@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="UTF-8"
 Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAO+sbHHKyYHjGqmS5uM=C6bCnUQ2CbHmmFBTAb=WanQsWdLU2Q@mail.gmail.com>
+In-Reply-To: <5A58F8E3.5060002@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Shih-Wei Li <shihwei@cs.columbia.edu>
-Cc: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Christoffer Dall <cdall@cs.columbia.edu>
+To: James Morse <james.morse@arm.com>
+Cc: gengdongjiu <gengdongjiu@huawei.com>, wuquanming <wuquanming@huawei.com>, linux-doc@vger.kernel.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Jonathan Corbet <corbet@lwn.net>, rjw@rjwysocki.net, linux@armlinux.org.uk, linuxarm@huawei.com, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-acpi@vger.kernel.org, bp@alien8.de, arm-mail-list <linux-arm-kernel@lists.infradead.org>, Huangshaoyu <huangshaoyu@huawei.com>, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, devel@acpica.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jan 19, 2018 at 04:57:55PM -0500, Shih-Wei Li wrote:
-> Thanks for the feedback about the mistakes in math and some issues in
-> naming, print msg, and coding style. I'll be careful and try to avoid
-> the same problems the next patch set. Sorry for all of the confusion.
-> 
-> So we now skip the test when "sample == 0" happens over 1000 times.
-> This is only due to the case that "cost is < 1/cntfrq" since it's not
-> possible for the tick to overflow for that many times. Did I miss
-> something here? I do agree that we should output better msgs to tell
-> users that the cost of a certain test is constantly smaller than a
-> tick.
-> 
-> Also, because ticks overflow should rarely happen, I wonder if we can
-> simply ignore the data set if it happens? If not, any thoughts on how
-> to efficiently distinguish one case from the other?
+Hi James,
+   Sorry for my late response due to out of office recently.
 
-It was my very first suggestion for you - don't drop 0-cost samples 
-and ignore counter overflow.
+2018-01-13 2:05 GMT+08:00 James Morse <james.morse@arm.com>:
+> Hi gengdongjiu,
+>
+> On 15/12/17 03:30, gengdongjiu wrote:
+>> On 2017/12/7 14:37, gengdongjiu wrote:
+>>>> We need to tackle (1) and (3) separately. For (3) we need some API that lets
+>>>> Qemu _trigger_ an SError in the guest, with a specified ESR. But, we don't have
+>>>> a way of migrating pending SError yet... which is where I got stuck last time I
+>>>> was looking at this.
+>>> I understand you most idea.
+>>>
+>>> But In the Qemu one signal type can only correspond to one behavior, can not correspond to two behaviors,
+>>> otherwise Qemu will do not know how to do.
+>>>
+>>> For the Qemu, if it receives the SIGBUS_MCEERR_AR signal, it will populate the CPER
+>>> records and inject a SEA to guest through KVM IOCTL "KVM_SET_ONE_REG"; if receives the SIGBUS_MCEERR_AO
+>>> signal, it will record the CPER and trigger a IRQ to notify guest, as shown below:
+>>>
+>>> SIGBUS_MCEERR_AR trigger Synchronous External Abort.
+>>> SIGBUS_MCEERR_AO trigger GPIO IRQ.
+>>>
+>>> For the SIGBUS_MCEERR_AO and SIGBUS_MCEERR_AR, we have already specify trigger method, which all
+>>>
+>>> not involve _trigger_ an SError.
+>>>
+>>> so there is no chance for Qemu to trigger the SError when gets the SIGBUS_MCEERR_A{O,R}.
+>>
+>> As I explained above:
+>>
+>> If Qemu received SIGBUS_MCEERR_AR, it will record CPER and trigger Synchronous External Abort;
+>> If Qemu received SIGBUS_MCEERR_AO, it will record CPER and trigger GPIO IRQ;
+>
+>> So Qemu does not know when to _trigger_ an SError.
+>
+> There is no answer to this. How the CPU decides is specific to the CPU design.
+> How Qemu decides is going to be specific to the machine it emulates.
+>
+> My understanding is there is some overlap for which RAS errors are reported as
+> synchronous external abort, and which use SError. (Obviously the imprecise ones
+> are all SError). Which one the CPU uses depends on how the CPU is designed.
+>
+> When you take an SIGBUS_MCEERR_AR from KVM, its because KVM can't complete a
+> stage2 fault because the page is marked with PG_poisoned. These started out as a
+> synchronous exception, but you could still report these with SError.
 
-0-cost samples most probably indicate error in the test code.
-Numerous (more than 1) overflows are most probably caused by broken
-management of timer-counters on VM side. In both cases results of
-the test are not trustworthy.
+yes, I agree, it is policy choice.
 
-In case of broken timer-counter, too much things will get crazy, and
-if you suspect it, I think it's much-much more important to write
-separated test for timer counters.
- 
-> Thinking of the time granularity used in the output, given there's
-> likely difference in hardware implementation as previously mentioned,
-> should we output the cost in ticks (along with frequency) like I did
-> in v1 & v2 instead, allowing the users to do the translation to the exact
-> time based on the output?
+>
+> We don't have a way to signal user-space about imprecise exceptions, this isn't
+> a KVM specific problem.
+>
+>
+>> so here I "return a error" to Qemu if ghes_notify_sei() return failure in [1], if you opposed KVM "return error",
+>> do you have a better idea about it? thanks
+>
+> If ghes_notify_sei() fails to claim the error, we should drop through to
+> kernel-first-handling. We don't have that yet, just the stub that ignores errors
+> where we can make progress.
+>
+> If neither firmware-first nor kernel-first claim a RAS error, we're in trouble.
+> I'd like to panic() as we got a RAS notification but no description of the
+> error. We can't do this until we have kernel-first support, hence that stub.
+>
+>
+>> About the way of migrating pending SError, I think it is a separate case, because Qemu still does not know
+>> how and when to trigger the SError.
+>
+> I agree, but I think we should fix this first before we add another user of this
+> unmigratable hypervisor state.
+>
+> (I recall someone saying migration is needed for any new KVM/cpu features, but I
+> can't find the thread)
+>
+>
+>> [1]:
+>> static int kvm_handle_guest_sei(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>> {
+>>         .......................
+>> +       case ESR_ELx_AET_UER:   /* The error has not been propagated */
+>> +               /*
+>> +                * Userspace only handle the guest SError Interrupt(SEI) if the
+>> +                * error has not been propagated
+>> +                */
+>> +               run->exit_reason = KVM_EXIT_EXCEPTION;
+>> +               run->ex.exception = ESR_ELx_EC_SERROR;
+>
+> I'm against telling user space RAS errors ever happened, only the final
+> user-visible error when the kernel can't fix it.
 
-Whatever you prefer.
+thanks for the explanation.
+For the ESR_ELx_AET_UER, this exception is precise, closing the VM may
+be better[1].
+But if you think panic is better until we support kernel-first, it is
+also OK to me.
 
-Yury
 
-> Thanks again,
-> Shih-Wei
-> 
-> On Thu, Jan 18, 2018 at 6:39 AM, Yury Norov <ynorov@caviumnetworks.com> wrote:
-> > On Thu, Jan 18, 2018 at 11:37:37AM +0100, Andrew Jones wrote:
-> >> On Thu, Jan 18, 2018 at 01:09:58PM +0300, Yury Norov wrote:
-> >> > On Wed, Jan 17, 2018 at 04:46:36PM -0500, Shih-Wei Li wrote:
-> >> > > Here we provide the support for measuring various micro level
-> >> > > operations on arm64. We iterate each of the tests and output
-> >> > > their average, minimum and maximum cost in microseconds.
-> >> > > Instruction barriers were used before taking timestamps to
-> >> > > avoid out-of-order execution or pipelining from skewing our
-> >> > > measurements.
-> >> > >
-> >> > > The operations we currently supported and measured are mostly
-> >> > > self-explanatory by their function name. For IPI, we measured the
-> >> > > cost of sending IPI from a source VCPU to a target VCPU, until the
-> >> > > target VCPU receives the IPI.
-> >> > >
-> >> > > Signed-off-by: Shih-Wei Li <shihwei@cs.columbia.edu>
-> >> > > Signed-off-by: Christoffer Dall <cdall@cs.columbia.edu>
-> >> > > ---
-> >> > >  arm/Makefile.common |   1 +
-> >> > >  arm/micro-test.c    | 252 ++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >> > >  arm/unittests.cfg   |   7 ++
-> >> > >  3 files changed, 260 insertions(+)
-> >> > >  create mode 100644 arm/micro-test.c
-> >> > >
-> >> > > diff --git a/arm/Makefile.common b/arm/Makefile.common
-> >> > > index 0a039cf..c7d5c27 100644
-> >> > > --- a/arm/Makefile.common
-> >> > > +++ b/arm/Makefile.common
-> >> > > @@ -16,6 +16,7 @@ tests-common += $(TEST_DIR)/pmu.flat
-> >> > >  tests-common += $(TEST_DIR)/gic.flat
-> >> > >  tests-common += $(TEST_DIR)/psci.flat
-> >> > >  tests-common += $(TEST_DIR)/sieve.flat
-> >> > > +tests-common += $(TEST_DIR)/micro-test.flat
-> >> > >
-> >> > >  tests-all = $(tests-common) $(tests)
-> >> > >  all: directories $(tests-all)
-> >> > > diff --git a/arm/micro-test.c b/arm/micro-test.c
-> >> > > new file mode 100644
-> >> > > index 0000000..407ce8b
-> >> > > --- /dev/null
-> >> > > +++ b/arm/micro-test.c
-> >> > > @@ -0,0 +1,252 @@
-> >> > > +/*
-> >> > > + * Measure the cost of micro level operations.
-> >> > > + *
-> >> > > + * Copyright Columbia University
-> >> > > + * Author: Shih-Wei Li <shihwei@cs.columbia.edu>
-> >> > > + * Author: Christoffer Dall <cdall@cs.columbia.edu>
-> >> > > + *
-> >> > > + * This work is licensed under the terms of the GNU LGPL, version 2.
-> >> > > + */
-> >> > > +#include <asm/gic.h>
-> >> > > +#include "libcflat.h"
-> >> > > +#include <util.h>
-> >> > > +#include <limits.h>
-> >> > > +
-> >> > > +static volatile bool ipi_received;
-> >> > > +static volatile bool ipi_ready;
-> >> > > +static volatile unsigned int cntfrq;
-> >> > > +static volatile void *vgic_dist_addr;
-> >> >
-> >> > Volatiles considered harmful for kernel code. I think it is also correct
-> >> > for your case:
-> >> > https://lwn.net/Articles/234017/
-> >> >
-> >> > I would prefer use readl/writel accessors for interprocessor
-> >> > communications which guaranties cache synchronization and proper
-> >> > ordering.
-> >> >
-> >> > Also, ipi_received and ipi_ready are looking like synchronization
-> >> > primitives. Did you consider using spinlocks instead?
-> >> >
-> >> > Also-also, cntfrq is written only once at init. What for you make it
-> >> > volatile?
-> >>
-> >> We frequently take some shortcuts in kvm-unit-tests, using busy loops and
-> >> volatile globals for synchronization, trying to keep things as simple as
-> >> possible. I'm ok with the ipi_* synchronization variables being volatile,
-> >> but agree the other two don't need to be.
-> >>
-> >> >
-> >> > > +void (*write_eoir)(u32 irqstat);
-> >> > > +
-> >> > > +#define IPI_IRQ          1
-> >> > > +
-> >> > > +#define TRIES    (1U << 28)
-> >> > > +
-> >> > > +#define MAX_FAILURES     1000
-> >> > > +
-> >> > > +/*
-> >> > > + * The counter may not always start with zero, which means it could
-> >> > > + * overflow after some period of time.
-> >> > > + */
-> >> > > +#define COUNT(c1, c2) \
-> >> > > + ((c1) > (c2) ? 0 : (c2) - (c1))
-> >> > > +
-> >> > > +static uint64_t read_cc(void)
-> >> > > +{
-> >> > > + isb();
-> >> > > + return read_sysreg(cntpct_el0);
-> >> > > +}
-> >> > > +
-> >> > > +static void ipi_irq_handler(struct pt_regs *regs __unused)
-> >> > > +{
-> >> > > + u32 ack;
-> >> > > + ipi_ready = false;
-> >> > > + ipi_received = true;
-> >> > > + ack = gic_read_iar();
-> >> > > + gic_write_eoir(ack);
-> >> > > + ipi_ready = true;
-> >> > > +}
-> >> > > +
-> >> > > +static void ipi_test_secondary_entry(void *data __unused)
-> >> > > +{
-> >> > > + enum vector v = EL1H_IRQ;
-> >> > > + install_irq_handler(v, ipi_irq_handler);
-> >> > > +
-> >> > > + gic_enable_defaults();
-> >> > > +
-> >> > > + local_irq_enable(); /* Enter small wait-loop */
-> >> > > + ipi_ready = true;
-> >> > > + while (true);
-> >> > > +}
-> >> > > +
-> >> > > +static int test_init(void)
-> >> > > +{
-> >> > > + int v;
-> >> > > +
-> >> > > + v = gic_init();
-> >> > > + if (v == 2) {
-> >> > > +         vgic_dist_addr = gicv2_dist_base();
-> >> > > +         write_eoir = gicv2_write_eoir;
-> >> > > + } else if (v == 3) {
-> >> > > +         vgic_dist_addr = gicv3_dist_base();
-> >> > > +         write_eoir = gicv3_write_eoir;
-> >> > > + } else {
-> >> > > +         printf("No supported gic present, skipping tests...\n");
-> >> > > +         return 0;
-> >> > > + }
-> >> > > +
-> >> > > + ipi_ready = false;
-> >> > > +
-> >> > > + gic_enable_defaults();
-> >> > > + on_cpu_async(1, ipi_test_secondary_entry, 0);
-> >> > > +
-> >> > > + cntfrq = get_cntfrq();
-> >> > > + printf("Timer Frequency %d Hz (Output in microseconds)\n", cntfrq);
-> >> > > +
-> >> > > + return 1;
-> >> > > +}
-> >> > > +
-> >> > > +static unsigned long ipi_test(void)
-> >> > > +{
-> >> > > + unsigned int tries = TRIES;
-> >> > > + uint64_t c1, c2;
-> >> > > +
-> >> > > + while (!ipi_ready && tries--);
-> >> > > + assert(ipi_ready);
-> >> > > +
-> >> > > + ipi_received = false;
-> >> > > +
-> >> > > + c1 = read_cc();
-> >> > > +
-> >> > > + gic_ipi_send_single(IPI_IRQ, 1);
-> >> > > +
-> >> > > + tries = TRIES;
-> >> > > + while (!ipi_received && tries--);
-> >> > > + assert(ipi_received);
-> >> > > +
-> >> > > + c2 = read_cc();
-> >> > > + return COUNT(c1, c2);
-> >> > > +}
-> >> > > +
-> >> > > +static unsigned long hvc_test(void)
-> >> > > +{
-> >> > > + uint64_t c1, c2;
-> >> > > +
-> >> > > + c1 = read_cc();
-> >> > > + asm volatile("mov w0, #0x4b000000; hvc #0" ::: "w0");
-> >> > > + c2 = read_cc();
-> >> > > + return COUNT(c1, c2);
-> >> > > +}
-> >> > > +
-> >> > > +static unsigned long mmio_read_user(void)
-> >> > > +{
-> >> > > + uint64_t c1, c2;
-> >> > > + /*
-> >> > > +  * FIXME: Read device-id in virtio mmio here. This address
-> >> > > +  * needs to be updated in the future if any relevent
-> >> > > +  * changes in QEMU test-dev are made.
-> >> > > +  */
-> >> > > + void *mmio_read_user_addr = (void*) 0x0a000008;
-> >> >
-> >> > Again, could you rename it? device_id_ptr sounds much better.
-> >> >
-> >> > > + c1 = read_cc();
-> >> > > + readl(mmio_read_user_addr);
-> >> > > + c2 = read_cc();
-> >> > > + return COUNT(c1, c2);
-> >> > > +}
-> >> > > +
-> >> > > +static unsigned long mmio_read_vgic(void)
-> >> > > +{
-> >> > > + uint64_t c1, c2;
-> >> > > +
-> >> > > + c1 = read_cc();
-> >> > > + readl(vgic_dist_addr + GICD_IIDR);
-> >> > > + c2 = read_cc();
-> >> > > + return COUNT(c1, c2);
-> >> > > +}
-> >> > > +
-> >> > > +static unsigned long eoi_test(void)
-> >> > > +{
-> >> > > + uint64_t c1, c2;
-> >> > > +
-> >> > > + u32 val = 1023; /* spurious IDs, writes to EOI are ignored */
-> >> > > +
-> >> > > + /* Avoid measuring assert(..) in gic_write_eoir */
-> >> > > + c1 = read_cc();
-> >> > > + write_eoir(val);
-> >> > > + c2 = read_cc();
-> >> > > +
-> >> > > + return COUNT(c1, c2);
-> >> > > +}
-> >> > > +
-> >> > > +struct exit_test {
-> >> > > + const char *name;
-> >> > > + unsigned long (*test_fn)(void);
-> >> > > + bool run;
-> >> > > +};
-> >> > > +
-> >> > > +static struct exit_test tests[] = {
-> >> > > + {"hvc",                hvc_test,           true},
-> >> > > + {"mmio_read_user",     mmio_read_user,     true},
-> >> > > + {"mmio_read_vgic",     mmio_read_vgic,     true},
-> >> > > + {"eoi",                eoi_test,           true},
-> >> > > + {"ipi",                ipi_test,           true},
-> >> > > +};
-> >> > > +
-> >> > > +static void get_us_output(const char *name,
-> >> > > +                   unsigned long cycles)
-> >> > > +{
-> >> > > + unsigned int ns_per_cycle = 10^9U / cntfrq;
-> >> > > + unsigned int ns, us, us_frac;
-> >> >
-> >> > '^' is 'xor', you probably mean 1000*1000*1000. And anyway,
-> >> > ThunderX2 works at ~2GHz, so 10E9/get_cntfrq() is 0 for it.
-> >>
-> >> The counter (cntpct_el0) ticks that fast? We could start with picoseconds
-> >> if necessary.
-> >>
-> >> >
-> >> > For CPUs working at 500...1000 MHz, ns_per_cycle is 1,
-> >> > For CPUs working at 1GHz+ it is 0. What's point in it?
-> >>
-> >> We're not looking at the CPU cycles, we're looking at counter ticks.
-> >> Indeed we could rename cycles to ticks everywhere to make that more
-> >> explicit.
-> >
-> > Ah, I don't say that counter ticks at CPU frequency on TX2, or
-> > something like that. I was probably confused by name. But switching to
-> > picoseconds, or even femtoseconds sounds reasonable anyway.
-> >
-> > Yury
++static int kvm_handle_guest_sei(struct kvm_vcpu *vcpu, struct kvm_run *run)
++{
++     unsigned int esr = kvm_vcpu_get_hsr(vcpu);
++     bool impdef_syndrome =  esr & ESR_ELx_ISV; /* aka IDS */
++     unsigned int aet = esr & ESR_ELx_AET;
++
++     /*
++     * This is not RAS SError
++     */
++     if (!cpus_have_const_cap(ARM64_HAS_RAS_EXTN)) {
++         kvm_inject_vabt(vcpu);
++         return 1;
++     }
++
++     /* For RAS the host kernel may handle this abort. */
++     if (!handle_guest_sei())
++         return 1;
++
++     /*
++     * In below two conditions, it will directly inject the
++     * virtual SError:
++     * 1. The Syndrome is IMPLEMENTATION DEFINED
++     * 2. It is Uncategorized SEI
++     */
++     if (impdef_syndrome ||
++          ((esr & ESR_ELx_FSC) != ESR_ELx_FSC_SERROR)) {
++         kvm_inject_vabt(vcpu);
++         return 1;
++ }
++
++ switch (aet) {
++     case ESR_ELx_AET_CE: /* corrected error */
++     case ESR_ELx_AET_UEO: /* restartable error, not yet consumed */
++         return 1; /* continue processing the guest exit */
++     case ESR_ELx_AET_UER: /* recoverable error */
++         /*
++         * the exception is precise, not been silently propagated
++         * and not been consumed by the CPU, temporarily shut down
++         * the VM to isolated the error, hope not touch it again.
++         */
++     run->exit_reason = KVM_EXIT_EXCEPTION;
++     return 0;
++     default:
++     /*
++     * Until now, the CPU supports RAS, SError interrupt is fatal
++     * and host does not successfully handle it.
++     */
++     panic("This Asynchronous SError interrupt is dangerous, panic");
++    }
++
++     return 0;
++}
++
+
+>
+> This is inventing something new for RAS errors not claimed by firmware-first.
+> If we have kernel-first too, this will never happen. (unless your system is
+> losing the error description).
+In fact, if we have kernel-first, I think we still need to judge the
+error type by ESR, right?
+If the handle_guest_sei() , may be the system does not support firmware-first,
+so we judge the ESR value,
+
+>
+>
+> Your system has firmware-first, why isn't it claiming the notification?
+> If its not finding CPER records written by firmware, check firmware and the UEFI
+> memory map agree on the attributes to be used when read/writing that area.
+>
+>
+>> +               run->ex.error_code = KVM_SEI_SEV_RECOVERABLE;
+>> +               return 0;
+>
+>
+> Thanks,
+>
+> James
+>
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
