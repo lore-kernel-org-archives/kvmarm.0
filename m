@@ -1,350 +1,188 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v3 2/2] arm64: add micro test
-Date: Mon, 22 Jan 2018 09:48:18 +0100
-Message-ID: <20180122084818.l4tklutdrk45jgrx@kamzik.brq.redhat.com>
-References: <1516225596-27071-1-git-send-email-shihwei@cs.columbia.edu>
- <1516225596-27071-3-git-send-email-shihwei@cs.columbia.edu>
- <20180118100958.j4iiq3ep2uruikss@yury-thinkpad>
- <20180118103737.jiwf5ly3up6w7f7r@kamzik.brq.redhat.com>
- <20180118112519.vzkfwkgqavvxqzdn@yury-thinkpad>
- <CAO+sbHHKyYHjGqmS5uM=C6bCnUQ2CbHmmFBTAb=WanQsWdLU2Q@mail.gmail.com>
+From: Tomasz Nowicki <tn@semihalf.com>
+Subject: Re: [PATCH v9 7/9] KVM: arm/arm64: Provide a get_input_level for the
+ arch timer
+Date: Mon, 22 Jan 2018 13:32:57 +0100
+Message-ID: <e55af9ff-b597-3b14-8e46-216aa20ede24@semihalf.com>
+References: <20171220113606.7030-1-christoffer.dall@linaro.org>
+ <20171220113606.7030-8-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C48D549DB6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jan 2018 03:43:08 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GKPefkSN+ABc for <kvmarm@lists.cs.columbia.edu>;
- Mon, 22 Jan 2018 03:43:07 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3C6AC40EA6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jan 2018 03:43:06 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <CAO+sbHHKyYHjGqmS5uM=C6bCnUQ2CbHmmFBTAb=WanQsWdLU2Q@mail.gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Shih-Wei Li <shihwei@cs.columbia.edu>
-Cc: Christoffer Dall <cdall@cs.columbia.edu>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20171220113606.7030-8-christoffer.dall@linaro.org>
+Content-Language: en-GB
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jan 19, 2018 at 04:57:55PM -0500, Shih-Wei Li wrote:
-> Thanks for the feedback about the mistakes in math and some issues in
-> naming, print msg, and coding style. I'll be careful and try to avoid
-> the same problems the next patch set. Sorry for all of the confusion.
+Hello Christoffer,
+
+Please see my observations/comments below.
+
+On 20.12.2017 12:36, Christoffer Dall wrote:
+> The VGIC can now support the life-cycle of mapped level-triggered
+> interrupts, and we no longer have to read back the timer state on every
+> exit from the VM if we had an asserted timer interrupt signal, because
+> the VGIC already knows if we hit the unlikely case where the guest
+> disables the timer without ACKing the virtual timer interrupt.
 > 
-> So we now skip the test when "sample == 0" happens over 1000 times.
-> This is only due to the case that "cost is < 1/cntfrq" since it's not
-
-Since we know the reason it happens, then why don't we just print that
-message so the user can know it too?
-
-> possible for the tick to overflow for that many times. Did I miss
-> something here? I do agree that we should output better msgs to tell
-> users that the cost of a certain test is constantly smaller than a
-> tick.
-
-Yes
-
+> This means we rework a bit of the code to factor out the functionality
+> to snapshot the timer state from vtimer_save_state(), and we can reuse
+> this functionality in the sync path when we have an irqchip in
+> userspace, and also to support our implementation of the
+> get_input_level() function for the timer.
 > 
-> Also, because ticks overflow should rarely happen, I wonder if we can
-> simply ignore the data set if it happens? If not, any thoughts on how
-> to efficiently distinguish one case from the other?
-
-If we get tons of zeros, then the test is faster than 1/cntfrq, print it.
-If we just get one, possibly two zeros, then it was overflow, skip it.
-
+> This change also means that we can no longer rely on the timer's view of
+> the interrupt line to set the active state, because we no longer
+> maintain this state for mapped interrupts when exiting from the guest.
+> Instead, we only set the active state if the virtual interrupt is
+> active, and otherwise we simply let the timer fire again and raise the
+> virtual interrupt from the ISR.
 > 
-> Thinking of the time granularity used in the output, given there's
-> likely difference in hardware implementation as previously mentioned,
-> should we output the cost in ticks (along with frequency) like I did
-> in v1 & v2 instead, allowing the users to do the translation to the exact
-> time based on the output?
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> ---
+>   include/kvm/arm_arch_timer.h |  2 ++
+>   virt/kvm/arm/arch_timer.c    | 84 ++++++++++++++++++++------------------------
+>   2 files changed, 40 insertions(+), 46 deletions(-)
+> 
+> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+> index 6e45608b2399..b1dcfde0a3ef 100644
+> --- a/include/kvm/arm_arch_timer.h
+> +++ b/include/kvm/arm_arch_timer.h
+> @@ -90,6 +90,8 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu);
+>   
+>   void kvm_timer_init_vhe(void);
+>   
+> +bool kvm_arch_timer_get_input_level(int vintid);
+> +
+>   #define vcpu_vtimer(v)	(&(v)->arch.timer_cpu.vtimer)
+>   #define vcpu_ptimer(v)	(&(v)->arch.timer_cpu.ptimer)
+>   
+> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> index fb0533ed903d..d845d67b7062 100644
+> --- a/virt/kvm/arm/arch_timer.c
+> +++ b/virt/kvm/arm/arch_timer.c
+> @@ -343,6 +343,12 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
+>   	phys_timer_emulate(vcpu);
+>   }
+>   
+> +static void __timer_snapshot_state(struct arch_timer_context *timer)
+> +{
+> +	timer->cnt_ctl = read_sysreg_el0(cntv_ctl);
+> +	timer->cnt_cval = read_sysreg_el0(cntv_cval);
+> +}
+> +
+>   static void vtimer_save_state(struct kvm_vcpu *vcpu)
+>   {
+>   	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> @@ -354,10 +360,8 @@ static void vtimer_save_state(struct kvm_vcpu *vcpu)
+>   	if (!vtimer->loaded)
+>   		goto out;
+>   
+> -	if (timer->enabled) {
+> -		vtimer->cnt_ctl = read_sysreg_el0(cntv_ctl);
+> -		vtimer->cnt_cval = read_sysreg_el0(cntv_cval);
+> -	}
+> +	if (timer->enabled)
+> +		__timer_snapshot_state(vtimer);
+>   
+>   	/* Disable the virtual timer */
+>   	write_sysreg_el0(0, cntv_ctl);
+> @@ -454,8 +458,7 @@ static void kvm_timer_vcpu_load_vgic(struct kvm_vcpu *vcpu)
+>   	bool phys_active;
+>   	int ret;
+>   
+> -	phys_active = vtimer->irq.level ||
+> -		      kvm_vgic_map_is_active(vcpu, vtimer->irq.irq);
+> +	phys_active = kvm_vgic_map_is_active(vcpu, vtimer->irq.irq);
+>   
+>   	ret = irq_set_irqchip_state(host_vtimer_irq,
+>   				    IRQCHIP_STATE_ACTIVE,
+> @@ -535,54 +538,27 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
+>   	set_cntvoff(0);
+>   }
+>   
+> -static void unmask_vtimer_irq(struct kvm_vcpu *vcpu)
+> +/*
+> + * With a userspace irqchip we have to check if the guest de-asserted the
+> + * timer and if so, unmask the timer irq signal on the host interrupt
+> + * controller to ensure that we see future timer signals.
+> + */
+> +static void unmask_vtimer_irq_user(struct kvm_vcpu *vcpu)
+>   {
+>   	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+>   
+>   	if (unlikely(!irqchip_in_kernel(vcpu->kvm))) {
+> -		kvm_vtimer_update_mask_user(vcpu);
+> -		return;
+> -	}
+> -
+> -	/*
+> -	 * If the guest disabled the timer without acking the interrupt, then
+> -	 * we must make sure the physical and virtual active states are in
+> -	 * sync by deactivating the physical interrupt, because otherwise we
+> -	 * wouldn't see the next timer interrupt in the host.
+> -	 */
+> -	if (!kvm_vgic_map_is_active(vcpu, vtimer->irq.irq)) {
+> -		int ret;
+> -		ret = irq_set_irqchip_state(host_vtimer_irq,
+> -					    IRQCHIP_STATE_ACTIVE,
+> -					    false);
+> -		WARN_ON(ret);
+> +		__timer_snapshot_state(vtimer);
+> +		if (!kvm_timer_should_fire(vtimer)) {
+> +			kvm_timer_update_irq(vcpu, false, vtimer);
+> +			kvm_vtimer_update_mask_user(vcpu);
+> +		}
+>   	}
+>   }
+>   
+> -/**
+> - * kvm_timer_sync_hwstate - sync timer state from cpu
+> - * @vcpu: The vcpu pointer
+> - *
+> - * Check if any of the timers have expired while we were running in the guest,
+> - * and inject an interrupt if that was the case.
+> - */
+>   void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
+>   {
+> -	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+> -
+> -	/*
+> -	 * If we entered the guest with the vtimer output asserted we have to
+> -	 * check if the guest has modified the timer so that we should lower
+> -	 * the line at this point.
+> -	 */
+> -	if (vtimer->irq.level) {
+> -		vtimer->cnt_ctl = read_sysreg_el0(cntv_ctl);
+> -		vtimer->cnt_cval = read_sysreg_el0(cntv_cval);
+> -		if (!kvm_timer_should_fire(vtimer)) {
+> -			kvm_timer_update_irq(vcpu, false, vtimer);
+> -			unmask_vtimer_irq(vcpu);
+> -		}
+> -	}
+> +	unmask_vtimer_irq_user(vcpu);
+>   }
 
-Why? If it's possible for the user to do the math, then it's possible for
-the test to do the math. It's easy to do, so why put the burden on the
-user? People don't think in terms of timer ticks, they think in terms of
-time.
+While testing your VHE optimization series [1] I noticed massive WFI 
+exits on ThunderX2 so I bisected 'vhe-optimize-v3-with-fixes' branch of 
+[2] down to this commit.
+
+The host traps on WFI so that VCPU thread should be scheduled out for 
+some time. However, this is not happening because kvm_vcpu_block() -> 
+kvm_vcpu_check_block() gives negative value (vtimer->irq.level is 
+asserted) and VCPU is woken up immediately. Nobody takes care about 
+lowering the vtimer line in this case.
+
+I reverted shape of above kvm_timer_sync_hwstate() and things are good 
+now. Before I start digging I wanted to check with you. Can you please 
+check on your side?
+
+[1] https://www.spinics.net/lists/kvm/msg161941.html
+[2] git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git
 
 Thanks,
-drew
-
-> 
-> Thanks again,
-> Shih-Wei
-> 
-> On Thu, Jan 18, 2018 at 6:39 AM, Yury Norov <ynorov@caviumnetworks.com> wrote:
-> > On Thu, Jan 18, 2018 at 11:37:37AM +0100, Andrew Jones wrote:
-> >> On Thu, Jan 18, 2018 at 01:09:58PM +0300, Yury Norov wrote:
-> >> > On Wed, Jan 17, 2018 at 04:46:36PM -0500, Shih-Wei Li wrote:
-> >> > > Here we provide the support for measuring various micro level
-> >> > > operations on arm64. We iterate each of the tests and output
-> >> > > their average, minimum and maximum cost in microseconds.
-> >> > > Instruction barriers were used before taking timestamps to
-> >> > > avoid out-of-order execution or pipelining from skewing our
-> >> > > measurements.
-> >> > >
-> >> > > The operations we currently supported and measured are mostly
-> >> > > self-explanatory by their function name. For IPI, we measured the
-> >> > > cost of sending IPI from a source VCPU to a target VCPU, until the
-> >> > > target VCPU receives the IPI.
-> >> > >
-> >> > > Signed-off-by: Shih-Wei Li <shihwei@cs.columbia.edu>
-> >> > > Signed-off-by: Christoffer Dall <cdall@cs.columbia.edu>
-> >> > > ---
-> >> > >  arm/Makefile.common |   1 +
-> >> > >  arm/micro-test.c    | 252 ++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >> > >  arm/unittests.cfg   |   7 ++
-> >> > >  3 files changed, 260 insertions(+)
-> >> > >  create mode 100644 arm/micro-test.c
-> >> > >
-> >> > > diff --git a/arm/Makefile.common b/arm/Makefile.common
-> >> > > index 0a039cf..c7d5c27 100644
-> >> > > --- a/arm/Makefile.common
-> >> > > +++ b/arm/Makefile.common
-> >> > > @@ -16,6 +16,7 @@ tests-common += $(TEST_DIR)/pmu.flat
-> >> > >  tests-common += $(TEST_DIR)/gic.flat
-> >> > >  tests-common += $(TEST_DIR)/psci.flat
-> >> > >  tests-common += $(TEST_DIR)/sieve.flat
-> >> > > +tests-common += $(TEST_DIR)/micro-test.flat
-> >> > >
-> >> > >  tests-all = $(tests-common) $(tests)
-> >> > >  all: directories $(tests-all)
-> >> > > diff --git a/arm/micro-test.c b/arm/micro-test.c
-> >> > > new file mode 100644
-> >> > > index 0000000..407ce8b
-> >> > > --- /dev/null
-> >> > > +++ b/arm/micro-test.c
-> >> > > @@ -0,0 +1,252 @@
-> >> > > +/*
-> >> > > + * Measure the cost of micro level operations.
-> >> > > + *
-> >> > > + * Copyright Columbia University
-> >> > > + * Author: Shih-Wei Li <shihwei@cs.columbia.edu>
-> >> > > + * Author: Christoffer Dall <cdall@cs.columbia.edu>
-> >> > > + *
-> >> > > + * This work is licensed under the terms of the GNU LGPL, version 2.
-> >> > > + */
-> >> > > +#include <asm/gic.h>
-> >> > > +#include "libcflat.h"
-> >> > > +#include <util.h>
-> >> > > +#include <limits.h>
-> >> > > +
-> >> > > +static volatile bool ipi_received;
-> >> > > +static volatile bool ipi_ready;
-> >> > > +static volatile unsigned int cntfrq;
-> >> > > +static volatile void *vgic_dist_addr;
-> >> >
-> >> > Volatiles considered harmful for kernel code. I think it is also correct
-> >> > for your case:
-> >> > https://lwn.net/Articles/234017/
-> >> >
-> >> > I would prefer use readl/writel accessors for interprocessor
-> >> > communications which guaranties cache synchronization and proper
-> >> > ordering.
-> >> >
-> >> > Also, ipi_received and ipi_ready are looking like synchronization
-> >> > primitives. Did you consider using spinlocks instead?
-> >> >
-> >> > Also-also, cntfrq is written only once at init. What for you make it
-> >> > volatile?
-> >>
-> >> We frequently take some shortcuts in kvm-unit-tests, using busy loops and
-> >> volatile globals for synchronization, trying to keep things as simple as
-> >> possible. I'm ok with the ipi_* synchronization variables being volatile,
-> >> but agree the other two don't need to be.
-> >>
-> >> >
-> >> > > +void (*write_eoir)(u32 irqstat);
-> >> > > +
-> >> > > +#define IPI_IRQ          1
-> >> > > +
-> >> > > +#define TRIES    (1U << 28)
-> >> > > +
-> >> > > +#define MAX_FAILURES     1000
-> >> > > +
-> >> > > +/*
-> >> > > + * The counter may not always start with zero, which means it could
-> >> > > + * overflow after some period of time.
-> >> > > + */
-> >> > > +#define COUNT(c1, c2) \
-> >> > > + ((c1) > (c2) ? 0 : (c2) - (c1))
-> >> > > +
-> >> > > +static uint64_t read_cc(void)
-> >> > > +{
-> >> > > + isb();
-> >> > > + return read_sysreg(cntpct_el0);
-> >> > > +}
-> >> > > +
-> >> > > +static void ipi_irq_handler(struct pt_regs *regs __unused)
-> >> > > +{
-> >> > > + u32 ack;
-> >> > > + ipi_ready = false;
-> >> > > + ipi_received = true;
-> >> > > + ack = gic_read_iar();
-> >> > > + gic_write_eoir(ack);
-> >> > > + ipi_ready = true;
-> >> > > +}
-> >> > > +
-> >> > > +static void ipi_test_secondary_entry(void *data __unused)
-> >> > > +{
-> >> > > + enum vector v = EL1H_IRQ;
-> >> > > + install_irq_handler(v, ipi_irq_handler);
-> >> > > +
-> >> > > + gic_enable_defaults();
-> >> > > +
-> >> > > + local_irq_enable(); /* Enter small wait-loop */
-> >> > > + ipi_ready = true;
-> >> > > + while (true);
-> >> > > +}
-> >> > > +
-> >> > > +static int test_init(void)
-> >> > > +{
-> >> > > + int v;
-> >> > > +
-> >> > > + v = gic_init();
-> >> > > + if (v == 2) {
-> >> > > +         vgic_dist_addr = gicv2_dist_base();
-> >> > > +         write_eoir = gicv2_write_eoir;
-> >> > > + } else if (v == 3) {
-> >> > > +         vgic_dist_addr = gicv3_dist_base();
-> >> > > +         write_eoir = gicv3_write_eoir;
-> >> > > + } else {
-> >> > > +         printf("No supported gic present, skipping tests...\n");
-> >> > > +         return 0;
-> >> > > + }
-> >> > > +
-> >> > > + ipi_ready = false;
-> >> > > +
-> >> > > + gic_enable_defaults();
-> >> > > + on_cpu_async(1, ipi_test_secondary_entry, 0);
-> >> > > +
-> >> > > + cntfrq = get_cntfrq();
-> >> > > + printf("Timer Frequency %d Hz (Output in microseconds)\n", cntfrq);
-> >> > > +
-> >> > > + return 1;
-> >> > > +}
-> >> > > +
-> >> > > +static unsigned long ipi_test(void)
-> >> > > +{
-> >> > > + unsigned int tries = TRIES;
-> >> > > + uint64_t c1, c2;
-> >> > > +
-> >> > > + while (!ipi_ready && tries--);
-> >> > > + assert(ipi_ready);
-> >> > > +
-> >> > > + ipi_received = false;
-> >> > > +
-> >> > > + c1 = read_cc();
-> >> > > +
-> >> > > + gic_ipi_send_single(IPI_IRQ, 1);
-> >> > > +
-> >> > > + tries = TRIES;
-> >> > > + while (!ipi_received && tries--);
-> >> > > + assert(ipi_received);
-> >> > > +
-> >> > > + c2 = read_cc();
-> >> > > + return COUNT(c1, c2);
-> >> > > +}
-> >> > > +
-> >> > > +static unsigned long hvc_test(void)
-> >> > > +{
-> >> > > + uint64_t c1, c2;
-> >> > > +
-> >> > > + c1 = read_cc();
-> >> > > + asm volatile("mov w0, #0x4b000000; hvc #0" ::: "w0");
-> >> > > + c2 = read_cc();
-> >> > > + return COUNT(c1, c2);
-> >> > > +}
-> >> > > +
-> >> > > +static unsigned long mmio_read_user(void)
-> >> > > +{
-> >> > > + uint64_t c1, c2;
-> >> > > + /*
-> >> > > +  * FIXME: Read device-id in virtio mmio here. This address
-> >> > > +  * needs to be updated in the future if any relevent
-> >> > > +  * changes in QEMU test-dev are made.
-> >> > > +  */
-> >> > > + void *mmio_read_user_addr = (void*) 0x0a000008;
-> >> >
-> >> > Again, could you rename it? device_id_ptr sounds much better.
-> >> >
-> >> > > + c1 = read_cc();
-> >> > > + readl(mmio_read_user_addr);
-> >> > > + c2 = read_cc();
-> >> > > + return COUNT(c1, c2);
-> >> > > +}
-> >> > > +
-> >> > > +static unsigned long mmio_read_vgic(void)
-> >> > > +{
-> >> > > + uint64_t c1, c2;
-> >> > > +
-> >> > > + c1 = read_cc();
-> >> > > + readl(vgic_dist_addr + GICD_IIDR);
-> >> > > + c2 = read_cc();
-> >> > > + return COUNT(c1, c2);
-> >> > > +}
-> >> > > +
-> >> > > +static unsigned long eoi_test(void)
-> >> > > +{
-> >> > > + uint64_t c1, c2;
-> >> > > +
-> >> > > + u32 val = 1023; /* spurious IDs, writes to EOI are ignored */
-> >> > > +
-> >> > > + /* Avoid measuring assert(..) in gic_write_eoir */
-> >> > > + c1 = read_cc();
-> >> > > + write_eoir(val);
-> >> > > + c2 = read_cc();
-> >> > > +
-> >> > > + return COUNT(c1, c2);
-> >> > > +}
-> >> > > +
-> >> > > +struct exit_test {
-> >> > > + const char *name;
-> >> > > + unsigned long (*test_fn)(void);
-> >> > > + bool run;
-> >> > > +};
-> >> > > +
-> >> > > +static struct exit_test tests[] = {
-> >> > > + {"hvc",                hvc_test,           true},
-> >> > > + {"mmio_read_user",     mmio_read_user,     true},
-> >> > > + {"mmio_read_vgic",     mmio_read_vgic,     true},
-> >> > > + {"eoi",                eoi_test,           true},
-> >> > > + {"ipi",                ipi_test,           true},
-> >> > > +};
-> >> > > +
-> >> > > +static void get_us_output(const char *name,
-> >> > > +                   unsigned long cycles)
-> >> > > +{
-> >> > > + unsigned int ns_per_cycle = 10^9U / cntfrq;
-> >> > > + unsigned int ns, us, us_frac;
-> >> >
-> >> > '^' is 'xor', you probably mean 1000*1000*1000. And anyway,
-> >> > ThunderX2 works at ~2GHz, so 10E9/get_cntfrq() is 0 for it.
-> >>
-> >> The counter (cntpct_el0) ticks that fast? We could start with picoseconds
-> >> if necessary.
-> >>
-> >> >
-> >> > For CPUs working at 500...1000 MHz, ns_per_cycle is 1,
-> >> > For CPUs working at 1GHz+ it is 0. What's point in it?
-> >>
-> >> We're not looking at the CPU cycles, we're looking at counter ticks.
-> >> Indeed we could rename cycles to ticks everywhere to make that more
-> >> explicit.
-> >
-> > Ah, I don't say that counter ticks at CPU frequency on TX2, or
-> > something like that. I was probably confused by name. But switching to
-> > picoseconds, or even femtoseconds sounds reasonable anyway.
-> >
-> > Yury
-> 
+Tomasz
