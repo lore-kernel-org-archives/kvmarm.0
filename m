@@ -1,93 +1,46 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] KVM: arm/arm64: Handle CPU_PM_ENTER_FAILED
-Date: Tue, 23 Jan 2018 15:55:01 +0100
-Message-ID: <20180123145501.GM21802@cbox>
-References: <20180122181906.29333-1-james.morse@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8024249DB0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Jan 2018 09:49:46 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KFKPbIu2ufIM for <kvmarm@lists.cs.columbia.edu>;
- Tue, 23 Jan 2018 09:49:44 -0500 (EST)
-Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8006849DA2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Jan 2018 09:49:43 -0500 (EST)
-Received: by mail-wm0-f68.google.com with SMTP id i186so2375157wmi.4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Jan 2018 06:55:04 -0800 (PST)
-Content-Disposition: inline
-In-Reply-To: <20180122181906.29333-1-james.morse@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, kvmarm@lists.cs.columbia.edu
+From: Luis de Bethencourt <luisbg@kernel.org>
+Subject: [PATCH] KVM: arm/arm64: Fix trailing semicolon
+Date: Tue, 23 Jan 2018 15:11:14 +0000
+Message-ID: <20180123151114.18429-1-luisbg@kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Cc: Joe Perches <joe@perches.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Russell King <linux@armlinux.org.uk>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Luis de Bethencourt <luisbg@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jan 22, 2018 at 06:19:06PM +0000, James Morse wrote:
-> cpu_pm_enter() calls the pm notifier chain with CPU_PM_ENTER, then if
-> there is a failure: CPU_PM_ENTER_FAILED.
-> 
-> When KVM receives CPU_PM_ENTER it calls cpu_hyp_reset() which will
-> return us to the hyp-stub. If we subsequently get a CPU_PM_ENTER_FAILED,
-> KVM does nothing, leaving the CPU running with the hyp-stub, at odds
-> with kvm_arm_hardware_enabled.
-> 
-> Add CPU_PM_ENTER_FAILED as a fallthrough for CPU_PM_EXIT, this reloads
-> KVM based on kvm_arm_hardware_enabled. This is safe even if CPU_PM_ENTER
-> never gets as far as KVM, as cpu_hyp_reinit() calls cpu_hyp_reset()
-> to make sure the hyp-stub is loaded before reloading KVM.
-> 
-> CC: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
-> Signed-off-by: James Morse <james.morse@arm.com>
-> ---
-> Prior to 67f691976662 ("arm64: kvm: allows kvm cpu hotplug") KVM only
-> called cpu_hpy_reinit() when it got CPU_PM_EXIT, so KVM would stay
-> loaded in the above scenario. But, this patch doesn't apply that far
-> back as KVM moved from arch/arm to virt/kvm/arm.
+The trailing semicolon is an empty statement that does no operation.
+Removing it since it doesn't do anything.
 
-Ok, but this should still be cc'ed stable with #v4.7+ then and then we'd
-simply have to provide a backport for the versions where it doesn't
-apply, or am I missing something?
+Signed-off-by: Luis de Bethencourt <luisbg@kernel.org>
+---
 
-> 
-> Fixes: 67f691976662 ("arm64: kvm: allows kvm cpu hotplug")
+Hi,
 
-And I think this belongs in the main commit message, but I can fix that.
+After fixing the same thing in drivers/staging/rtl8723bs/, Joe Perches
+suggested I fix it treewide [0].
 
-Speaking of which, it's probably too late to try and get this in for
-v4.15, so unless there are objections, I'll just queue this for v4.16
-and cc stable.
+Best regards 
+Luis
 
 
-> 
->  virt/kvm/arm/arm.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index 15bf026eb182..0a1025f87909 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -1246,6 +1246,7 @@ static int hyp_init_cpu_pm_notifier(struct notifier_block *self,
->  			cpu_hyp_reset();
->  
->  		return NOTIFY_OK;
-> +	case CPU_PM_ENTER_FAILED:
->  	case CPU_PM_EXIT:
->  		if (__this_cpu_read(kvm_arm_hardware_enabled))
->  			/* The hardware was enabled before suspend. */
-> -- 
-> 2.15.1
-> 
+[0] http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/2018-January/115410.html
+[1] http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/2018-January/115390.html
 
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+ arch/arm/include/asm/kvm_emulate.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
+index 3d22eb87f919..9003bd19cb70 100644
+--- a/arch/arm/include/asm/kvm_emulate.h
++++ b/arch/arm/include/asm/kvm_emulate.h
+@@ -131,7 +131,7 @@ static inline bool mode_has_spsr(struct kvm_vcpu *vcpu)
+ static inline bool vcpu_mode_priv(struct kvm_vcpu *vcpu)
+ {
+ 	unsigned long cpsr_mode = vcpu->arch.ctxt.gp_regs.usr_regs.ARM_cpsr & MODE_MASK;
+-	return cpsr_mode > USR_MODE;;
++	return cpsr_mode > USR_MODE;
+ }
+ 
+ static inline u32 kvm_vcpu_get_hsr(const struct kvm_vcpu *vcpu)
+-- 
+2.15.1
