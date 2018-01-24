@@ -1,104 +1,84 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v3 2/2] arm64: add micro test
-Date: Wed, 24 Jan 2018 10:23:15 +0100
-Message-ID: <20180124092315.GA18960@cbox>
-References: <1516225596-27071-1-git-send-email-shihwei@cs.columbia.edu>
- <1516225596-27071-3-git-send-email-shihwei@cs.columbia.edu>
- <20180118100958.j4iiq3ep2uruikss@yury-thinkpad>
- <20180118103737.jiwf5ly3up6w7f7r@kamzik.brq.redhat.com>
- <20180118112519.vzkfwkgqavvxqzdn@yury-thinkpad>
- <CAO+sbHHKyYHjGqmS5uM=C6bCnUQ2CbHmmFBTAb=WanQsWdLU2Q@mail.gmail.com>
- <20180124081755.GO21802@cbox>
- <20180124083028.pb2zj6caaitscr3v@kamzik.brq.redhat.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Subject: Re: [PATCH v6 03/13] arm64: cpufeature: Detect CPU RAS Extentions
+Date: Wed, 24 Jan 2018 13:53:12 +0000
+Message-ID: <0184EA26B2509940AA629AE1405DD7F201A9CB3C@DGGEMA503-MBS.china.huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180124083028.pb2zj6caaitscr3v@kamzik.brq.redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andrew Jones <drjones@redhat.com>
-Cc: Shih-Wei Li <shihwei@cs.columbia.edu>, Yury Norov <ynorov@caviumnetworks.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Christoffer Dall <cdall@cs.columbia.edu>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6833E49D40
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Jan 2018 08:48:07 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id O6sGAtqzThRp for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 24 Jan 2018 08:48:05 -0500 (EST)
+Received: from huawei.com (unknown [45.249.212.255])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2D62049D19
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Jan 2018 08:48:05 -0500 (EST)
+Content-Language: zh-CN
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: James Morse <james.morse@arm.com>
+Cc: "Jonathan.Zhang@cavium.com" <Jonathan.Zhang@cavium.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jan 24, 2018 at 09:30:28AM +0100, Andrew Jones wrote:
-> On Wed, Jan 24, 2018 at 09:17:55AM +0100, Christoffer Dall wrote:
-> > Hi Shih-Wei,
-> > 
-> > On Fri, Jan 19, 2018 at 04:57:55PM -0500, Shih-Wei Li wrote:
-> > > Thanks for the feedback about the mistakes in math and some issues in
-> > > naming, print msg, and coding style. I'll be careful and try to avoid
-> > > the same problems the next patch set. Sorry for all of the confusion.
-> > > 
-> > > So we now skip the test when "sample == 0" happens over 1000 times.
-> > > This is only due to the case that "cost is < 1/cntfrq" since it's not
-> > > possible for the tick to overflow for that many times. Did I miss
-> > > something here? I do agree that we should output better msgs to tell
-> > > users that the cost of a certain test is constantly smaller than a
-> > > tick.
-> > > 
-> > 
-> > I think for things like vmexit counts, it's very likely that all the
-> > samples will result in 0 ticks on many systems (fast CPU and slow arch
-> > counter; the architecture doesn't give us any guarantees here).  For
-> > example, a system with a 2 GHz CPU and a 1 MHz counter will give you a
-> > granularity of 2000 cycles for each counter tick, which is not that
-> > useful for low-level tuning of KVM.
-> > 
-> > So what I thought we were going to do was:
-> > 
-> > main_test_function()
-> > {
-> > 	long ntimes = NTIMES;
-> > 	long cost, total_cost;
-> > 
-> > 	cnt1 = read_cnt();
-> > 	do {
-> > 		run_test();
-> > 	} while(ntimes--);
-> > 	cnt2 = read_cnt();
-> > 
-> > 	if (verify_sane_counter(cnt1, cnt2))
-> > 		return;
-> > 
-> > 	total_cost = to_nanoseconds(cnt2 - cnt1);
-> > 	cost = total_cost / NTIMES;
-> > 	printf("testname: %l (%l)\n", cost, total_cost);
-> > }
-> > 
-> > And in that way amortize the potential lack of precision over all the
-> > iterations.  Did I miss some prior discussion about why that was a bad
-> > idea?
+Hi James,
+   Thanks for this mail.
+
+> Hi gengdongjiu,
 > 
-> Not that I know of, but I missed the above proposal, which I completely
-> agree with.
+> On 23/01/18 09:06, gengdongjiu wrote:
+> > On 2018/1/23 3:32, James Morse wrote:
+> >>> it seems this "CONFIG_ARM64_RAS_EXTN" is not enabled in the
+> >>> "arch/arm64/configs/defconfig", if not, I want to enable this config to enable RAS feature in the defconfig. do you agree?
+> >> Sure. This series doesn't do a lot on its own, it expects
+> >> firmware-first or kernel-first support, which may in turn depend-on
+> >> this feature. It means we don't panic() when notified of corrected
+> >> errors, until we get the {firmware,kernel}-first support.
+> >>
+> >> Don't defconfig changes get collected by arm-soc? (I'm not sure how
+> >> these get picked up...)
+> >
+> > Now we should have supported firmware-first,
 > 
-> > 
-> > It would also be possible to have two functions, one that does the above
-> > and one that does a per-run measurement, in case the user wants to know
-> > min/max/stddev and is running on a system with sufficient precision.
-> > The method could be chosen via an argument.
+> For NOTIFY_SEI? We don't have that yet.
+
+For NOTIFY_SEI, it is not yet.
+I mean NOTIFY_SEA/ NOTIFY_GSIV/ NOTIFY_GPIO with firmware-first which have been enabled before.
+
+> This series was about the minimal handling for systems with neither firmware or kernel first handling. This stops us panic()ing on corrected
+> errors.
+> It also enables IESB which benefits firmware first handling using the notification types we already support. (SEA, POLL, IRQ etc)
 > 
-> We should be able to just make NTIMES variable, setting it to one when a
-> per-run measurement is desired, right? 
+> From here we can add KVM APIs, firmware-first notification support and kernel-first support as independent series.
 
-Not quite.  I think you'll get different results from starting up the
-whole test suite, doing a single measurement, and then shutting
-everything down again, versus a single startup, and then running
-everything for 100,000 times, measurig each time, and reporting
-min/max/avg/mean/etc.
+Yes, agree that. I added a KVM API which can be as independent series
 
-We found the latter metrics useful when analyzing things like key/value
-store workloads and benchmark results, where individual deviations can
-really skew overall results.
-
-
-> Anyway, I'm fine with having set
-> to a reasonable value, not variable / no argument, for initial merge.
 > 
+> 
+> > do you mean we do not enable "CONFIG_ARM64_RAS_EXTN" in the defconfig
+> > for ARM's SOC until kernel-first RAS is supported?
+> 
+> I've no idea if or when we will do kernel-first, when I bring it up, its so we don't build a hybrid model, and we consider how we going to add
+> kernel-first support if/when it comes along.
 
-I'd be absolutely fine with that as well, we can add the additional
-functionality in a separate patch, or later on, depending on how much
-time Shih-Wei has :)
+Understanding, frankly speaking, I think we mainly use the firmware-first solution for the ARM SOC.
 
-Thanks,
--Christoffer
+> 
+> If you want it turned on in defconfig please submit a patch to do that. I haven't because I don't know where they go!
+
+Ok, tomorrow I will submit a patch to turn on it so that it can benefit firmware first handling, KVM API is also dependent on this configuration.
+
+> 
+> 
+> Thanks,
+> 
+> James
