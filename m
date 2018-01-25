@@ -1,93 +1,123 @@
-From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: Re: [PATCH v9 5/7] arm64: kvm: Introduce KVM_ARM_SET_SERROR_ESR ioctl
-Date: Wed, 24 Jan 2018 20:06:15 +0000
-Message-ID: <0184EA26B2509940AA629AE1405DD7F201A9E8EA@DGGEMA503-MBS.china.huawei.com>
+From: Shih-Wei Li <shihwei@cs.columbia.edu>
+Subject: Re: [PATCH v3 2/2] arm64: add micro test
+Date: Wed, 24 Jan 2018 21:55:49 -0500
+Message-ID: <CAO+sbHF+y6G9TWa+Tit2YPuffibMRZ7KZfBURg6LQqcwxGhxVQ@mail.gmail.com>
+References: <1516225596-27071-1-git-send-email-shihwei@cs.columbia.edu>
+ <1516225596-27071-3-git-send-email-shihwei@cs.columbia.edu>
+ <20180118100958.j4iiq3ep2uruikss@yury-thinkpad> <20180118103737.jiwf5ly3up6w7f7r@kamzik.brq.redhat.com>
+ <20180118112519.vzkfwkgqavvxqzdn@yury-thinkpad> <CAO+sbHHKyYHjGqmS5uM=C6bCnUQ2CbHmmFBTAb=WanQsWdLU2Q@mail.gmail.com>
+ <20180124081755.GO21802@cbox> <20180124083028.pb2zj6caaitscr3v@kamzik.brq.redhat.com>
+ <20180124092315.GA18960@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C0CE949D6F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Jan 2018 15:01:02 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZEebblilGash for <kvmarm@lists.cs.columbia.edu>;
- Wed, 24 Jan 2018 15:01:01 -0500 (EST)
-Received: from huawei.com (szxga02-in.huawei.com [45.249.212.188])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5F38849D19
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Jan 2018 15:01:01 -0500 (EST)
-Content-Language: zh-CN
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "corbet@lwn.net" <corbet@lwn.net>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, "rjw@rjwysocki.net" <rjw@rjwysocki.net>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "will.deacon@arm.com" <will.deacon@arm.com>, "robert.moore@intel.com" <robert.moore@intel.com>, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>, "bp@alien8.de" <bp@alien8.de>, "lv.zheng@intel.com" <lv.zheng@intel.com>, Huangshaoyu <huangshaoyu@huawei.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "devel@acpica.org" <devel@acpica.org>
+Content-Type: text/plain; charset="UTF-8"
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20180124092315.GA18960@cbox>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Andrew Jones <drjones@redhat.com>, Yury Norov <ynorov@caviumnetworks.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Christoffer Dall <cdall@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi James,
-   Thanks a lot for your review and comments.
+Hi Christoffer,
 
-> 
-> Hi Dongjiu Geng,
-> 
-> On 06/01/18 16:02, Dongjiu Geng wrote:
-> > The ARM64 RAS SError Interrupt(SEI) syndrome value is specific to the
-> > guest and user space needs a way to tell KVM this value. So we add a
-> > new ioctl. Before user space specifies the Exception Syndrome Register
-> > ESR(ESR), it firstly checks that whether KVM has the capability to set
-> > the guest ESR, If has, will set it. Otherwise, nothing to do.
-> >
-> > For this ESR specifying, Only support for AArch64, not support AArch32.
-> 
-> After this patch user-space can trigger an SError in the guest. If it wants to migrate the guest, how does the pending SError get migrated?
-> 
-> I think we need to fix migration first. Andrew Jones suggested using
-> KVM_GET/SET_VCPU_EVENTS:
-> https://www.spinics.net/lists/arm-kernel/msg616846.html
-> 
-> Given KVM uses kvm_inject_vabt() on v8.0 hardware too, we should cover systems without the v8.2 RAS Extensions with the same API. I
-> think this means a bit to read/write whether SError is pending, and another to indicate the ESR should be set/read.
-> CPUs without the v8.2 RAS Extensions can reject pending-SError that had an ESR.
+In the previous patch, we did the avg and min/max altogether in a
+single function, in which we can skip the test (and output msg to tell
+the user about it) if its cost is smaller than 1 cnnfrq for more than
+X times.
 
-For the CPUs without the v8.2 RAS Extensions, its ESR is always 0, we only can inject a SError with ESR 0 to guest, cannot set its ESR.
-About how about to use the KVM_GET/SET_VCPU_EVENTS, I will check the code, and consider your suggestion at the same time. 
-The IOCTL KVM_GET/SET_VCPU_EVENTS has been used by X86.
+I think we can use two functions, one for "avg" and one for
+"minx_max_std" as you mentioned if it looks more straightforward. We
+can first run the avg() and check if the result can be valid, if yes,
+then we can proceed to do the min_max_std() test; otherwise, we just
+tell the users that we cannot get valid results from the targeted
+test. Is this close what you proposed earlier?
 
-> 
-> user-space can then use the 'for migration' calls to make a 'new' SError pending.
-> 
-> Now that the cpufeature bits are queued, I think this can be split up into two separate series for v4.16-rc1, one to tackle NOTIFY_SEI and
-> the associated plumbing. The second for the KVM 'make SError pending' API.
+And yes, I can set NTIMES in avg() (and min_max_std()) as a constant
+value for now.
 
-Ok, thanks for your suggestion, will split it.
+Thanks,
+Shih-Wei
 
-> 
-> 
-> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c index
-> > 5c7f657..738ae90 100644
-> > --- a/arch/arm64/kvm/guest.c
-> > +++ b/arch/arm64/kvm/guest.c
-> > @@ -277,6 +277,11 @@ int kvm_arch_vcpu_ioctl_set_sregs(struct kvm_vcpu *vcpu,
-> >  	return -EINVAL;
-> >  }
-> >
-> > +int kvm_arm_set_sei_esr(struct kvm_vcpu *vcpu, u32 *syndrome) {
-> > +	return -EINVAL;
-> > +}
-> 
-> Does nothing in the patch that adds the support? This is a bit odd.
-> (oh, its hiding in patch 6...)
-
-To make this patch simple and small, I add it in patch 6.
-
-> 
-> 
+On Wed, Jan 24, 2018 at 4:23 AM, Christoffer Dall
+<christoffer.dall@linaro.org> wrote:
+> On Wed, Jan 24, 2018 at 09:30:28AM +0100, Andrew Jones wrote:
+>> On Wed, Jan 24, 2018 at 09:17:55AM +0100, Christoffer Dall wrote:
+>> > Hi Shih-Wei,
+>> >
+>> > On Fri, Jan 19, 2018 at 04:57:55PM -0500, Shih-Wei Li wrote:
+>> > > Thanks for the feedback about the mistakes in math and some issues in
+>> > > naming, print msg, and coding style. I'll be careful and try to avoid
+>> > > the same problems the next patch set. Sorry for all of the confusion.
+>> > >
+>> > > So we now skip the test when "sample == 0" happens over 1000 times.
+>> > > This is only due to the case that "cost is < 1/cntfrq" since it's not
+>> > > possible for the tick to overflow for that many times. Did I miss
+>> > > something here? I do agree that we should output better msgs to tell
+>> > > users that the cost of a certain test is constantly smaller than a
+>> > > tick.
+>> > >
+>> >
+>> > I think for things like vmexit counts, it's very likely that all the
+>> > samples will result in 0 ticks on many systems (fast CPU and slow arch
+>> > counter; the architecture doesn't give us any guarantees here).  For
+>> > example, a system with a 2 GHz CPU and a 1 MHz counter will give you a
+>> > granularity of 2000 cycles for each counter tick, which is not that
+>> > useful for low-level tuning of KVM.
+>> >
+>> > So what I thought we were going to do was:
+>> >
+>> > main_test_function()
+>> > {
+>> >     long ntimes = NTIMES;
+>> >     long cost, total_cost;
+>> >
+>> >     cnt1 = read_cnt();
+>> >     do {
+>> >             run_test();
+>> >     } while(ntimes--);
+>> >     cnt2 = read_cnt();
+>> >
+>> >     if (verify_sane_counter(cnt1, cnt2))
+>> >             return;
+>> >
+>> >     total_cost = to_nanoseconds(cnt2 - cnt1);
+>> >     cost = total_cost / NTIMES;
+>> >     printf("testname: %l (%l)\n", cost, total_cost);
+>> > }
+>> >
+>> > And in that way amortize the potential lack of precision over all the
+>> > iterations.  Did I miss some prior discussion about why that was a bad
+>> > idea?
+>>
+>> Not that I know of, but I missed the above proposal, which I completely
+>> agree with.
+>>
+>> >
+>> > It would also be possible to have two functions, one that does the above
+>> > and one that does a per-run measurement, in case the user wants to know
+>> > min/max/stddev and is running on a system with sufficient precision.
+>> > The method could be chosen via an argument.
+>>
+>> We should be able to just make NTIMES variable, setting it to one when a
+>> per-run measurement is desired, right?
+>
+> Not quite.  I think you'll get different results from starting up the
+> whole test suite, doing a single measurement, and then shutting
+> everything down again, versus a single startup, and then running
+> everything for 100,000 times, measurig each time, and reporting
+> min/max/avg/mean/etc.
+>
+> We found the latter metrics useful when analyzing things like key/value
+> store workloads and benchmark results, where individual deviations can
+> really skew overall results.
+>
+>
+>> Anyway, I'm fine with having set
+>> to a reasonable value, not variable / no argument, for initial merge.
+>>
+>
+> I'd be absolutely fine with that as well, we can add the additional
+> functionality in a separate patch, or later on, depending on how much
+> time Shih-Wei has :)
+>
 > Thanks,
-> 
-> James
+> -Christoffer
