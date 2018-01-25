@@ -1,123 +1,157 @@
-From: Shih-Wei Li <shihwei@cs.columbia.edu>
-Subject: Re: [PATCH v3 2/2] arm64: add micro test
-Date: Wed, 24 Jan 2018 21:55:49 -0500
-Message-ID: <CAO+sbHF+y6G9TWa+Tit2YPuffibMRZ7KZfBURg6LQqcwxGhxVQ@mail.gmail.com>
-References: <1516225596-27071-1-git-send-email-shihwei@cs.columbia.edu>
- <1516225596-27071-3-git-send-email-shihwei@cs.columbia.edu>
- <20180118100958.j4iiq3ep2uruikss@yury-thinkpad> <20180118103737.jiwf5ly3up6w7f7r@kamzik.brq.redhat.com>
- <20180118112519.vzkfwkgqavvxqzdn@yury-thinkpad> <CAO+sbHHKyYHjGqmS5uM=C6bCnUQ2CbHmmFBTAb=WanQsWdLU2Q@mail.gmail.com>
- <20180124081755.GO21802@cbox> <20180124083028.pb2zj6caaitscr3v@kamzik.brq.redhat.com>
- <20180124092315.GA18960@cbox>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Subject: Re: [PATCH v9 6/7] arm64: kvm: Set Virtual SError Exception Syndrome
+ for guest
+Date: Thu, 25 Jan 2018 16:21:47 +0800
+Message-ID: <3f699ce3-a552-0c6c-3425-d45d0d788406@huawei.com>
+References: <1515254577-6460-1-git-send-email-gengdongjiu@huawei.com>
+ <1515254577-6460-7-git-send-email-gengdongjiu@huawei.com>
+ <5A678806.8030108@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20180124092315.GA18960@cbox>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Andrew Jones <drjones@redhat.com>, Yury Norov <ynorov@caviumnetworks.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Christoffer Dall <cdall@cs.columbia.edu>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-acpi-owner@vger.kernel.org>
+In-Reply-To: <5A678806.8030108@arm.com>
+Content-Language: en-US
+Sender: linux-acpi-owner@vger.kernel.org
+To: James Morse <james.morse@arm.com>
+Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, linux@armlinux.org.uk, catalin.marinas@arm.com, rjw@rjwysocki.net, bp@alien8.de, robert.moore@intel.com, lv.zheng@intel.com, corbet@lwn.net, will.deacon@arm.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-acpi@vger.kernel.org, devel@acpica.org, huangshaoyu@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
+Hi James,
+  thanks for the review.
 
-In the previous patch, we did the avg and min/max altogether in a
-single function, in which we can skip the test (and output msg to tell
-the user about it) if its cost is smaller than 1 cnnfrq for more than
-X times.
-
-I think we can use two functions, one for "avg" and one for
-"minx_max_std" as you mentioned if it looks more straightforward. We
-can first run the avg() and check if the result can be valid, if yes,
-then we can proceed to do the min_max_std() test; otherwise, we just
-tell the users that we cannot get valid results from the targeted
-test. Is this close what you proposed earlier?
-
-And yes, I can set NTIMES in avg() (and min_max_std()) as a constant
-value for now.
-
-Thanks,
-Shih-Wei
-
-On Wed, Jan 24, 2018 at 4:23 AM, Christoffer Dall
-<christoffer.dall@linaro.org> wrote:
-> On Wed, Jan 24, 2018 at 09:30:28AM +0100, Andrew Jones wrote:
->> On Wed, Jan 24, 2018 at 09:17:55AM +0100, Christoffer Dall wrote:
->> > Hi Shih-Wei,
->> >
->> > On Fri, Jan 19, 2018 at 04:57:55PM -0500, Shih-Wei Li wrote:
->> > > Thanks for the feedback about the mistakes in math and some issues in
->> > > naming, print msg, and coding style. I'll be careful and try to avoid
->> > > the same problems the next patch set. Sorry for all of the confusion.
->> > >
->> > > So we now skip the test when "sample == 0" happens over 1000 times.
->> > > This is only due to the case that "cost is < 1/cntfrq" since it's not
->> > > possible for the tick to overflow for that many times. Did I miss
->> > > something here? I do agree that we should output better msgs to tell
->> > > users that the cost of a certain test is constantly smaller than a
->> > > tick.
->> > >
->> >
->> > I think for things like vmexit counts, it's very likely that all the
->> > samples will result in 0 ticks on many systems (fast CPU and slow arch
->> > counter; the architecture doesn't give us any guarantees here).  For
->> > example, a system with a 2 GHz CPU and a 1 MHz counter will give you a
->> > granularity of 2000 cycles for each counter tick, which is not that
->> > useful for low-level tuning of KVM.
->> >
->> > So what I thought we were going to do was:
->> >
->> > main_test_function()
->> > {
->> >     long ntimes = NTIMES;
->> >     long cost, total_cost;
->> >
->> >     cnt1 = read_cnt();
->> >     do {
->> >             run_test();
->> >     } while(ntimes--);
->> >     cnt2 = read_cnt();
->> >
->> >     if (verify_sane_counter(cnt1, cnt2))
->> >             return;
->> >
->> >     total_cost = to_nanoseconds(cnt2 - cnt1);
->> >     cost = total_cost / NTIMES;
->> >     printf("testname: %l (%l)\n", cost, total_cost);
->> > }
->> >
->> > And in that way amortize the potential lack of precision over all the
->> > iterations.  Did I miss some prior discussion about why that was a bad
->> > idea?
+On 2018/1/24 3:07, James Morse wrote:
+> Hi Dongjiu Geng,
+> 
+> On 06/01/18 16:02, Dongjiu Geng wrote:
+>> RAS Extension add a VSESR_EL2 register which can provide
+>> the syndrome value reported to software on taking a virtual
+>> SError interrupt exception. This patch supports to specify
+>> this Syndrome.
 >>
->> Not that I know of, but I missed the above proposal, which I completely
->> agree with.
+>> In the RAS Extensions we can not set all-zero syndrome value
+>> for SError, which means 'RAS error: Uncategorized' instead of
+>> 'no valid ISS'. So set it to IMPLEMENTATION DEFINED syndrome
+>> by default.
 >>
->> >
->> > It would also be possible to have two functions, one that does the above
->> > and one that does a per-run measurement, in case the user wants to know
->> > min/max/stddev and is running on a system with sufficient precision.
->> > The method could be chosen via an argument.
+>> We also need to support userspace to specify a valid syndrome
+>> value, Because in some case, the recovery is driven by userspace.
+>> This patch can support that userspace specify it.
 >>
->> We should be able to just make NTIMES variable, setting it to one when a
->> per-run measurement is desired, right?
->
-> Not quite.  I think you'll get different results from starting up the
-> whole test suite, doing a single measurement, and then shutting
-> everything down again, versus a single startup, and then running
-> everything for 100,000 times, measurig each time, and reporting
-> min/max/avg/mean/etc.
->
-> We found the latter metrics useful when analyzing things like key/value
-> store workloads and benchmark results, where individual deviations can
-> really skew overall results.
->
->
->> Anyway, I'm fine with having set
->> to a reasonable value, not variable / no argument, for initial merge.
->>
->
-> I'd be absolutely fine with that as well, we can add the additional
-> functionality in a separate patch, or later on, depending on how much
-> time Shih-Wei has :)
->
+>> In the guest/host world switch, restore this value to VSESR_EL2
+>> only when HCR_EL2.VSE is set. This value no need to be saved
+>> because it is stale vale when guest exit.
+> 
+> A version of this patch has been queued by Catalin.
+yeah, I have seen that.
+
+> 
+> Now that the cpufeature bits are queued, I think this can be split up into two
+> separate series for v4.16-rc1, one to tackle NOTIFY_SEI and the associated
+> plumbing. The second for the KVM 'make SError pending' API.
+> 
+> 
+>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+>> [Set an impdef ESR for Virtual-SError]
+>> Signed-off-by: James Morse <james.morse@arm.com>
+> 
+> I didn't sign-off this patch. If you pick some bits from another version and
+> want to credit someone else you can 'CC:' them or just mention it in the
+> commit-message.
+
+I pick your modification of setting an impdef ESR for Virtual-SError, so add your name,
+I change it to 'CC'
+
+> 
+> 
+>> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+>> index 47b967d..3b035cc 100644
+>> --- a/arch/arm64/include/asm/sysreg.h
+>> +++ b/arch/arm64/include/asm/sysreg.h
+>> @@ -86,6 +86,9 @@
+>>  #define REG_PSTATE_PAN_IMM		sys_reg(0, 0, 4, 0, 4)
+>>  #define REG_PSTATE_UAO_IMM		sys_reg(0, 0, 4, 0, 3)
+>>  
+>> +/* virtual SError exception syndrome register */
+>> +#define REG_VSESR_EL2                  sys_reg(3, 4, 5, 2, 3)
+> 
+> Irrelevant-Nit: sys-regs usually have a 'SYS_' prefix, and are in instruction
+> encoding order lower down the file.
+will follow that.
+
+> 
+> (These PSTATE PAN things are a bit odd as they were used to generate and
+> instruction before the fancy {read,write}_sysreg() helpers were added).>
+> 
+>>  #define SET_PSTATE_PAN(x) __emit_inst(0xd5000000 | REG_PSTATE_PAN_IMM |	\
+>>  				      (!!x)<<8 | 0x1f)
+>>  #define SET_PSTATE_UAO(x) __emit_inst(0xd5000000 | REG_PSTATE_UAO_IMM |	\
+>> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+>> index 738ae90..ffad42b 100644
+>> --- a/arch/arm64/kvm/guest.c
+>> +++ b/arch/arm64/kvm/guest.c
+>> @@ -279,7 +279,16 @@ int kvm_arch_vcpu_ioctl_set_sregs(struct kvm_vcpu *vcpu,
+>>  
+>>  int kvm_arm_set_sei_esr(struct kvm_vcpu *vcpu, u32 *syndrome)
+> 
+> Bits of this are spread between patches 5 and 6. If you put them in the other
+> order this wouldn't happen.
+
+Ok, I will adjust that.
+
+> 
+> (but after a rebase most of this patch should disappear)
+> 
+>>  {
+>> -	return -EINVAL;
+>> +	u64 reg = *syndrome;
+>> +
+>> +	/* inject virtual system Error or asynchronous abort */
+>> +	kvm_inject_vabt(vcpu);
+> 
+> So this writes an impdef ESR, because its the existing code-path in KVM.
+> 
+> 
+>> +	if (reg)
+>> +		/* set vsesr_el2[24:0] with value that user space specified */
+>> +		kvm_vcpu_set_vsesr(vcpu, reg & ESR_ELx_ISS_MASK);
+> 
+> And then you overwrite it. Which is a bit odd as there is a helper to do both in
+> one go:
+thanks, I will directly call pend_guest_serror() in this function.
+
+> 
+> 
+>> +
+>> +	return 0;
+>>  }
+> 
+>>  int __attribute_const__ kvm_target_cpu(void)
+> 
+>> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+>> index 3556715..fb94b5e 100644
+>> --- a/arch/arm64/kvm/inject_fault.c
+>> +++ b/arch/arm64/kvm/inject_fault.c
+>> @@ -246,14 +246,25 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
+>>  		inject_undef64(vcpu);
+>>  }
+>>  
+>> +static void pend_guest_serror(struct kvm_vcpu *vcpu, u64 esr)
+>> +{
+>> +	kvm_vcpu_set_vsesr(vcpu, esr);
+>> +	vcpu_set_hcr(vcpu, vcpu_get_hcr(vcpu) | HCR_VSE);
+>> +}
+> 
+> How come you don't use this in kvm_arm_set_sei_esr()?
+thanks, I will call pend_guest_serror() in the kvm_arm_set_sei_esr().
+
+> 
+> 
+> 
 > Thanks,
-> -Christoffer
+> 
+> James
+> 
+> .
+> 
+
