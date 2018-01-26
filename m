@@ -1,308 +1,154 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v3 26/41] KVM: arm64: Introduce framework for accessing
- deferred sysregs
-Date: Thu, 25 Jan 2018 20:54:13 +0100
-Message-ID: <20180125195413.GT21802@cbox>
-References: <20180112120747.27999-1-christoffer.dall@linaro.org>
- <20180112120747.27999-27-christoffer.dall@linaro.org>
- <20180123160431.GA5862@e103592.cambridge.arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180123160431.GA5862@e103592.cambridge.arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH 03/14] arm/arm64: KVM: Consolidate the PSCI include files
+Date: Fri, 26 Jan 2018 14:28:36 +0000
+Message-ID: <20180126142847.31240-4-marc.zyngier@arm.com>
+References: <20180126142847.31240-1-marc.zyngier@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180126142847.31240-1-marc.zyngier@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Mark Rutland <mark.rutland@arm.com>, Jon Masters <jcm@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Jan 23, 2018 at 04:04:40PM +0000, Dave Martin wrote:
-> On Fri, Jan 12, 2018 at 01:07:32PM +0100, Christoffer Dall wrote:
-> > We are about to defer saving and restoring some groups of system
-> > registers to vcpu_put and vcpu_load on supported systems.  This means
-> > that we need some infrastructure to access system registes which
-> > supports either accessing the memory backing of the register or directly
-> > accessing the system registers, depending on the state of the system
-> > when we access the register.
-> > 
-> > We do this by defining a set of read/write accessors for each system
-> > register, and letting each system register be defined as "immediate" or
-> > "deferrable".  Immediate registers are always saved/restored in the
-> > world-switch path, but deferrable registers are only saved/restored in
-> > vcpu_put/vcpu_load when supported and sysregs_loaded_on_cpu will be set
-> > in that case.
-> > 
-> > Not that we don't use the deferred mechanism yet in this patch, but only
-> > introduce infrastructure.  This is to improve convenience of review in
-> > the subsequent patches where it is clear which registers become
-> > deferred.
-> 
-> Might this table-driven approach result in a lot of branch mispredicts,
-> particularly across load/put boundaries?
-> 
-> If we were to move the whole construct to a header, then it could get
-> constant-folded at the call site down to the individual reg accessed,
-> say:
-> 
-> 	if (sys_regs_loaded)
-> 		read_sysreg_s(TPIDR_EL0);
-> 	else
-> 		__vcpu_sys_reg(v, TPIDR_EL0);
-> 
-> Where multiple regs are accessed close to each other, the compiler
-> may be able to specialise the whole sequence for the loaded and !loaded
-> cases so that there is only one conditional branch.
-> 
+As we're about to update the PSCI support, and because I'm lazy,
+let's move the PSCI include file to include/kvm so that both
+ARM architectures can find it.
 
-That's an interesting thing to consider indeed.  I wasn't really sure
-how to put this in a header file which wouldn't look overly bloated for
-inclusion elsewhere, so we ended up with this.
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm/include/asm/psci.h                        | 25 ----------------------
+ arch/arm/kvm/handle_exit.c                         |  2 +-
+ arch/arm64/kvm/handle_exit.c                       |  3 ++-
+ .../asm/kvm_psci.h => include/kvm/arm_psci.h       |  6 +++---
+ virt/kvm/arm/arm.c                                 |  2 +-
+ virt/kvm/arm/psci.c                                |  3 ++-
+ 6 files changed, 9 insertions(+), 32 deletions(-)
+ delete mode 100644 arch/arm/include/asm/psci.h
+ rename arch/arm64/include/asm/kvm_psci.h => include/kvm/arm_psci.h (89%)
 
-I don't think the alternative suggestion that I discused with Julien on
-this patch changes this much, but since you've had a look at this, I'm
-curious which one of the two (lookup table vs. giant switch) you prefer?
-
-> 
-> The individual accessor functions also become unnecessary in this case,
-> because we wouldn't need to derive function pointers from them any
-> more.
-> 
-> I don't know how performance would compare in practice though.
-
-I don't know either.  But I will say that the whole idea behind put/load
-is that you do this rarely, and going to userspace from KVM is
-notriously expensive, also on x86.
-
-> 
-> I'm also assuming that all calls to these accessors are const-foldable.
-> If not, relying on inlining would bloat the generated code a lot.
-
-We have places where this is not the cae, access_vm_reg() for example.
-But if we really, really, wanted to, we could rewrite that to have a
-function for each register, but that's pretty horrid on its own.
-
-Thanks,
--Christoffer
-
-> 
-> > 
-> >  [ Most of this logic was contributed by Marc Zyngier ]
-> > 
-> > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h |   8 +-
-> >  arch/arm64/kvm/sys_regs.c         | 160 ++++++++++++++++++++++++++++++++++++++
-> >  2 files changed, 166 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 91272c35cc36..4b5ef82f6bdb 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -281,6 +281,10 @@ struct kvm_vcpu_arch {
-> >  
-> >  	/* Detect first run of a vcpu */
-> >  	bool has_run_once;
-> > +
-> > +	/* True when deferrable sysregs are loaded on the physical CPU,
-> > +	 * see kvm_vcpu_load_sysregs and kvm_vcpu_put_sysregs. */
-> > +	bool sysregs_loaded_on_cpu;
-> >  };
-> >  
-> >  #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.gp_regs)
-> > @@ -293,8 +297,8 @@ struct kvm_vcpu_arch {
-> >   */
-> >  #define __vcpu_sys_reg(v,r)	((v)->arch.ctxt.sys_regs[(r)])
-> >  
-> > -#define vcpu_read_sys_reg(v,r)	__vcpu_sys_reg(v,r)
-> > -#define vcpu_write_sys_reg(v,r,n)	do { __vcpu_sys_reg(v,r) = n; } while (0)
-> > +u64 vcpu_read_sys_reg(struct kvm_vcpu *vcpu, int reg);
-> > +void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, int reg, u64 val);
-> >  
-> >  /*
-> >   * CP14 and CP15 live in the same array, as they are backed by the
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 96398d53b462..9d353a6a55c9 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -35,6 +35,7 @@
-> >  #include <asm/kvm_coproc.h>
-> >  #include <asm/kvm_emulate.h>
-> >  #include <asm/kvm_host.h>
-> > +#include <asm/kvm_hyp.h>
-> >  #include <asm/kvm_mmu.h>
-> >  #include <asm/perf_event.h>
-> >  #include <asm/sysreg.h>
-> > @@ -76,6 +77,165 @@ static bool write_to_read_only(struct kvm_vcpu *vcpu,
-> >  	return false;
-> >  }
-> >  
-> > +struct sys_reg_accessor {
-> > +	u64	(*rdsr)(struct kvm_vcpu *, int);
-> > +	void	(*wrsr)(struct kvm_vcpu *, int, u64);
-> > +};
-> > +
-> > +#define DECLARE_IMMEDIATE_SR(i)						\
-> > +	static u64 __##i##_read(struct kvm_vcpu *vcpu, int r)		\
-> > +	{								\
-> > +		return __vcpu_sys_reg(vcpu, r);				\
-> > +	}								\
-> > +									\
-> > +	static void __##i##_write(struct kvm_vcpu *vcpu, int r, u64 v)	\
-> > +	{								\
-> > +		__vcpu_sys_reg(vcpu, r) = v;				\
-> > +	}								\
-> > +
-> > +#define DECLARE_DEFERRABLE_SR(i, s)					\
-> > +	static u64 __##i##_read(struct kvm_vcpu *vcpu, int r)		\
-> > +	{								\
-> > +		if (vcpu->arch.sysregs_loaded_on_cpu) {			\
-> > +			WARN_ON(kvm_arm_get_running_vcpu() != vcpu);	\
-> > +			return read_sysreg_s((s));			\
-> > +		}							\
-> > +		return __vcpu_sys_reg(vcpu, r);				\
-> > +	}								\
-> > +									\
-> > +	static void __##i##_write(struct kvm_vcpu *vcpu, int r, u64 v)	\
-> > +	{								\
-> > +		if (vcpu->arch.sysregs_loaded_on_cpu) {			\
-> > +			WARN_ON(kvm_arm_get_running_vcpu() != vcpu);	\
-> > +			write_sysreg_s(v, (s));				\
-> > +		} else {						\
-> > +			__vcpu_sys_reg(vcpu, r) = v;			\
-> > +		}							\
-> > +	}								\
-> > +
-> > +
-> > +#define SR_HANDLER_RANGE(i,e)						\
-> > +	[i ... e] =  (struct sys_reg_accessor) {			\
-> > +		.rdsr = __##i##_read,					\
-> > +		.wrsr = __##i##_write,					\
-> > +	}
-> > +
-> > +#define SR_HANDLER(i)	SR_HANDLER_RANGE(i, i)
-> > +
-> > +static void bad_sys_reg(int reg)
-> > +{
-> > +	WARN_ONCE(1, "Bad system register access %d\n", reg);
-> > +}
-> > +
-> > +static u64 __default_read_sys_reg(struct kvm_vcpu *vcpu, int reg)
-> > +{
-> > +	bad_sys_reg(reg);
-> > +	return 0;
-> > +}
-> > +
-> > +static void __default_write_sys_reg(struct kvm_vcpu *vcpu, int reg, u64 val)
-> > +{
-> > +	bad_sys_reg(reg);
-> > +}
-> > +
-> > +/* Ordered as in enum vcpu_sysreg */
-> > +DECLARE_IMMEDIATE_SR(MPIDR_EL1);
-> > +DECLARE_IMMEDIATE_SR(CSSELR_EL1);
-> > +DECLARE_IMMEDIATE_SR(SCTLR_EL1);
-> > +DECLARE_IMMEDIATE_SR(ACTLR_EL1);
-> > +DECLARE_IMMEDIATE_SR(CPACR_EL1);
-> > +DECLARE_IMMEDIATE_SR(TTBR0_EL1);
-> > +DECLARE_IMMEDIATE_SR(TTBR1_EL1);
-> > +DECLARE_IMMEDIATE_SR(TCR_EL1);
-> > +DECLARE_IMMEDIATE_SR(ESR_EL1);
-> > +DECLARE_IMMEDIATE_SR(AFSR0_EL1);
-> > +DECLARE_IMMEDIATE_SR(AFSR1_EL1);
-> > +DECLARE_IMMEDIATE_SR(FAR_EL1);
-> > +DECLARE_IMMEDIATE_SR(MAIR_EL1);
-> > +DECLARE_IMMEDIATE_SR(VBAR_EL1);
-> > +DECLARE_IMMEDIATE_SR(CONTEXTIDR_EL1);
-> > +DECLARE_IMMEDIATE_SR(TPIDR_EL0);
-> > +DECLARE_IMMEDIATE_SR(TPIDRRO_EL0);
-> > +DECLARE_IMMEDIATE_SR(TPIDR_EL1);
-> > +DECLARE_IMMEDIATE_SR(AMAIR_EL1);
-> > +DECLARE_IMMEDIATE_SR(CNTKCTL_EL1);
-> > +DECLARE_IMMEDIATE_SR(PAR_EL1);
-> > +DECLARE_IMMEDIATE_SR(MDSCR_EL1);
-> > +DECLARE_IMMEDIATE_SR(MDCCINT_EL1);
-> > +DECLARE_IMMEDIATE_SR(PMCR_EL0);
-> > +DECLARE_IMMEDIATE_SR(PMSELR_EL0);
-> > +DECLARE_IMMEDIATE_SR(PMEVCNTR0_EL0);
-> > +/* PMEVCNTR30_EL0 */
-> > +DECLARE_IMMEDIATE_SR(PMCCNTR_EL0);
-> > +DECLARE_IMMEDIATE_SR(PMEVTYPER0_EL0);
-> > +/* PMEVTYPER30_EL0 */
-> > +DECLARE_IMMEDIATE_SR(PMCCFILTR_EL0);
-> > +DECLARE_IMMEDIATE_SR(PMCNTENSET_EL0);
-> > +DECLARE_IMMEDIATE_SR(PMINTENSET_EL1);
-> > +DECLARE_IMMEDIATE_SR(PMOVSSET_EL0);
-> > +DECLARE_IMMEDIATE_SR(PMSWINC_EL0);
-> > +DECLARE_IMMEDIATE_SR(PMUSERENR_EL0);
-> > +DECLARE_IMMEDIATE_SR(DACR32_EL2);
-> > +DECLARE_IMMEDIATE_SR(IFSR32_EL2);
-> > +DECLARE_IMMEDIATE_SR(FPEXC32_EL2);
-> > +DECLARE_IMMEDIATE_SR(DBGVCR32_EL2);
-> > +
-> > +static const struct sys_reg_accessor sys_reg_accessors[NR_SYS_REGS] = {
-> > +	[0 ... NR_SYS_REGS - 1] = {
-> > +		.rdsr = __default_read_sys_reg,
-> > +		.wrsr = __default_write_sys_reg,
-> > +	},
-> > +
-> > +	SR_HANDLER(MPIDR_EL1),
-> > +	SR_HANDLER(CSSELR_EL1),
-> > +	SR_HANDLER(SCTLR_EL1),
-> > +	SR_HANDLER(ACTLR_EL1),
-> > +	SR_HANDLER(CPACR_EL1),
-> > +	SR_HANDLER(TTBR0_EL1),
-> > +	SR_HANDLER(TTBR1_EL1),
-> > +	SR_HANDLER(TCR_EL1),
-> > +	SR_HANDLER(ESR_EL1),
-> > +	SR_HANDLER(AFSR0_EL1),
-> > +	SR_HANDLER(AFSR1_EL1),
-> > +	SR_HANDLER(FAR_EL1),
-> > +	SR_HANDLER(MAIR_EL1),
-> > +	SR_HANDLER(VBAR_EL1),
-> > +	SR_HANDLER(CONTEXTIDR_EL1),
-> > +	SR_HANDLER(TPIDR_EL0),
-> > +	SR_HANDLER(TPIDRRO_EL0),
-> > +	SR_HANDLER(TPIDR_EL1),
-> > +	SR_HANDLER(AMAIR_EL1),
-> > +	SR_HANDLER(CNTKCTL_EL1),
-> > +	SR_HANDLER(PAR_EL1),
-> > +	SR_HANDLER(MDSCR_EL1),
-> > +	SR_HANDLER(MDCCINT_EL1),
-> > +	SR_HANDLER(PMCR_EL0),
-> > +	SR_HANDLER(PMSELR_EL0),
-> > +	SR_HANDLER_RANGE(PMEVCNTR0_EL0, PMEVCNTR30_EL0),
-> > +	SR_HANDLER(PMCCNTR_EL0),
-> > +	SR_HANDLER_RANGE(PMEVTYPER0_EL0, PMEVTYPER30_EL0),
-> > +	SR_HANDLER(PMCCFILTR_EL0),
-> > +	SR_HANDLER(PMCNTENSET_EL0),
-> > +	SR_HANDLER(PMINTENSET_EL1),
-> > +	SR_HANDLER(PMOVSSET_EL0),
-> > +	SR_HANDLER(PMSWINC_EL0),
-> > +	SR_HANDLER(PMUSERENR_EL0),
-> > +	SR_HANDLER(DACR32_EL2),
-> > +	SR_HANDLER(IFSR32_EL2),
-> > +	SR_HANDLER(FPEXC32_EL2),
-> > +	SR_HANDLER(DBGVCR32_EL2),
-> > +};
-> > +
-> > +u64 vcpu_read_sys_reg(struct kvm_vcpu *vcpu, int reg)
-> > +{
-> > +	return sys_reg_accessors[reg].rdsr(vcpu, reg);
-> > +}
-> > +
-> > +void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, int reg, u64 val)
-> > +{
-> > +	sys_reg_accessors[reg].wrsr(vcpu, reg, val);
-> > +}
-> > +
-> >  /* 3 bits per cache level, as per CLIDR, but non-existent caches always 0 */
-> >  static u32 cache_levels;
-> >  
-> > -- 
-> > 2.14.2
-> > 
-> > _______________________________________________
-> > kvmarm mailing list
-> > kvmarm@lists.cs.columbia.edu
-> > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+diff --git a/arch/arm/include/asm/psci.h b/arch/arm/include/asm/psci.h
+deleted file mode 100644
+index e1b825dfab23..000000000000
+--- a/arch/arm/include/asm/psci.h
++++ /dev/null
+@@ -1,25 +0,0 @@
+-/*
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License version 2 as
+- * published by the Free Software Foundation.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * Copyright (C) 2012 ARM Limited
+- */
+-
+-#ifndef __ASM_ARM_PSCI_H
+-#define __ASM_ARM_PSCI_H
+-
+-extern const struct smp_operations psci_smp_ops;
+-
+-#if defined(CONFIG_SMP) && defined(CONFIG_ARM_PSCI)
+-bool psci_smp_available(void);
+-#else
+-static inline bool psci_smp_available(void) { return false; }
+-#endif
+-
+-#endif /* __ASM_ARM_PSCI_H */
+diff --git a/arch/arm/kvm/handle_exit.c b/arch/arm/kvm/handle_exit.c
+index d15ac772d186..e020cc82c4b1 100644
+--- a/arch/arm/kvm/handle_exit.c
++++ b/arch/arm/kvm/handle_exit.c
+@@ -21,7 +21,7 @@
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_coproc.h>
+ #include <asm/kvm_mmu.h>
+-#include <asm/kvm_psci.h>
++#include <kvm/arm_psci.h>
+ #include <trace/events/kvm.h>
+ 
+ #include "trace.h"
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 520b0dad3c62..97e8d64a203d 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -22,13 +22,14 @@
+ #include <linux/kvm.h>
+ #include <linux/kvm_host.h>
+ 
++#include <kvm/arm_psci.h>
++
+ #include <asm/esr.h>
+ #include <asm/exception.h>
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_coproc.h>
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_mmu.h>
+-#include <asm/kvm_psci.h>
+ #include <asm/debug-monitors.h>
+ #include <asm/traps.h>
+ 
+diff --git a/arch/arm64/include/asm/kvm_psci.h b/include/kvm/arm_psci.h
+similarity index 89%
+rename from arch/arm64/include/asm/kvm_psci.h
+rename to include/kvm/arm_psci.h
+index bc39e557c56c..2042bb909474 100644
+--- a/arch/arm64/include/asm/kvm_psci.h
++++ b/include/kvm/arm_psci.h
+@@ -15,8 +15,8 @@
+  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  */
+ 
+-#ifndef __ARM64_KVM_PSCI_H__
+-#define __ARM64_KVM_PSCI_H__
++#ifndef __KVM_ARM_PSCI_H__
++#define __KVM_ARM_PSCI_H__
+ 
+ #define KVM_ARM_PSCI_0_1	1
+ #define KVM_ARM_PSCI_0_2	2
+@@ -24,4 +24,4 @@
+ int kvm_psci_version(struct kvm_vcpu *vcpu);
+ int kvm_psci_call(struct kvm_vcpu *vcpu);
+ 
+-#endif /* __ARM64_KVM_PSCI_H__ */
++#endif /* __KVM_ARM_PSCI_H__ */
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 15bf026eb182..af3e98fc377e 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -31,6 +31,7 @@
+ #include <linux/irqbypass.h>
+ #include <trace/events/kvm.h>
+ #include <kvm/arm_pmu.h>
++#include <kvm/arm_psci.h>
+ 
+ #define CREATE_TRACE_POINTS
+ #include "trace.h"
+@@ -46,7 +47,6 @@
+ #include <asm/kvm_mmu.h>
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_coproc.h>
+-#include <asm/kvm_psci.h>
+ #include <asm/sections.h>
+ 
+ #ifdef REQUIRES_VIRT
+diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
+index f1e363bab5e8..b322e46fd142 100644
+--- a/virt/kvm/arm/psci.c
++++ b/virt/kvm/arm/psci.c
+@@ -21,9 +21,10 @@
+ 
+ #include <asm/cputype.h>
+ #include <asm/kvm_emulate.h>
+-#include <asm/kvm_psci.h>
+ #include <asm/kvm_host.h>
+ 
++#include <kvm/arm_psci.h>
++
+ #include <uapi/linux/psci.h>
+ 
+ /*
+-- 
+2.14.2
