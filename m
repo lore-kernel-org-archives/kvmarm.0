@@ -1,154 +1,119 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 03/14] arm/arm64: KVM: Consolidate the PSCI include files
-Date: Fri, 26 Jan 2018 14:28:36 +0000
-Message-ID: <20180126142847.31240-4-marc.zyngier@arm.com>
+Subject: [PATCH 06/14] arm/arm64: KVM: Implement PSCI 1.0 support
+Date: Fri, 26 Jan 2018 14:28:39 +0000
+Message-ID: <20180126142847.31240-7-marc.zyngier@arm.com>
 References: <20180126142847.31240-1-marc.zyngier@arm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 55D2449D32
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jan 2018 09:23:46 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id NqXUce2J1TTi for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 26 Jan 2018 09:23:45 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C16749DAA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jan 2018 09:23:45 -0500 (EST)
 In-Reply-To: <20180126142847.31240-1-marc.zyngier@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Mark Rutland <mark.rutland@arm.com>, Jon Masters <jcm@redhat.com>
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Jon Masters <jcm@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As we're about to update the PSCI support, and because I'm lazy,
-let's move the PSCI include file to include/kvm so that both
-ARM architectures can find it.
+PSCI 1.0 can be trivially implemented by having PSCI 0.2 and
+the FEATURES call. Of, and returning 1.0 as the PSCI version.
+
+We happily ignore everything else, as it is optional.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/psci.h                        | 25 ----------------------
- arch/arm/kvm/handle_exit.c                         |  2 +-
- arch/arm64/kvm/handle_exit.c                       |  3 ++-
- .../asm/kvm_psci.h => include/kvm/arm_psci.h       |  6 +++---
- virt/kvm/arm/arm.c                                 |  2 +-
- virt/kvm/arm/psci.c                                |  3 ++-
- 6 files changed, 9 insertions(+), 32 deletions(-)
- delete mode 100644 arch/arm/include/asm/psci.h
- rename arch/arm64/include/asm/kvm_psci.h => include/kvm/arm_psci.h (89%)
+ include/kvm/arm_psci.h |  1 +
+ virt/kvm/arm/psci.c    | 43 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 44 insertions(+)
 
-diff --git a/arch/arm/include/asm/psci.h b/arch/arm/include/asm/psci.h
-deleted file mode 100644
-index e1b825dfab23..000000000000
---- a/arch/arm/include/asm/psci.h
-+++ /dev/null
-@@ -1,25 +0,0 @@
--/*
-- * This program is free software; you can redistribute it and/or modify
-- * it under the terms of the GNU General Public License version 2 as
-- * published by the Free Software Foundation.
-- *
-- * This program is distributed in the hope that it will be useful,
-- * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-- *
-- * Copyright (C) 2012 ARM Limited
-- */
--
--#ifndef __ASM_ARM_PSCI_H
--#define __ASM_ARM_PSCI_H
--
--extern const struct smp_operations psci_smp_ops;
--
--#if defined(CONFIG_SMP) && defined(CONFIG_ARM_PSCI)
--bool psci_smp_available(void);
--#else
--static inline bool psci_smp_available(void) { return false; }
--#endif
--
--#endif /* __ASM_ARM_PSCI_H */
-diff --git a/arch/arm/kvm/handle_exit.c b/arch/arm/kvm/handle_exit.c
-index d15ac772d186..e020cc82c4b1 100644
---- a/arch/arm/kvm/handle_exit.c
-+++ b/arch/arm/kvm/handle_exit.c
-@@ -21,7 +21,7 @@
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_coproc.h>
- #include <asm/kvm_mmu.h>
--#include <asm/kvm_psci.h>
-+#include <kvm/arm_psci.h>
- #include <trace/events/kvm.h>
- 
- #include "trace.h"
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 520b0dad3c62..97e8d64a203d 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -22,13 +22,14 @@
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
- 
-+#include <kvm/arm_psci.h>
-+
- #include <asm/esr.h>
- #include <asm/exception.h>
- #include <asm/kvm_asm.h>
- #include <asm/kvm_coproc.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_mmu.h>
--#include <asm/kvm_psci.h>
- #include <asm/debug-monitors.h>
- #include <asm/traps.h>
- 
-diff --git a/arch/arm64/include/asm/kvm_psci.h b/include/kvm/arm_psci.h
-similarity index 89%
-rename from arch/arm64/include/asm/kvm_psci.h
-rename to include/kvm/arm_psci.h
-index bc39e557c56c..2042bb909474 100644
---- a/arch/arm64/include/asm/kvm_psci.h
+diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
+index 3a408c846c09..e7f69c0dc249 100644
+--- a/include/kvm/arm_psci.h
 +++ b/include/kvm/arm_psci.h
-@@ -15,8 +15,8 @@
-  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  */
+@@ -21,6 +21,7 @@
+ #define PSCI_VERSION(x,y)	((((x) & 0x7fff) << 16) | ((y) & 0xffff))
+ #define KVM_ARM_PSCI_0_1	PSCI_VERSION(0, 1)
+ #define KVM_ARM_PSCI_0_2	PSCI_VERSION(0, 2)
++#define KVM_ARM_PSCI_1_0	PSCI_VERSION(1, 0)
  
--#ifndef __ARM64_KVM_PSCI_H__
--#define __ARM64_KVM_PSCI_H__
-+#ifndef __KVM_ARM_PSCI_H__
-+#define __KVM_ARM_PSCI_H__
- 
- #define KVM_ARM_PSCI_0_1	1
- #define KVM_ARM_PSCI_0_2	2
-@@ -24,4 +24,4 @@
  int kvm_psci_version(struct kvm_vcpu *vcpu);
  int kvm_psci_call(struct kvm_vcpu *vcpu);
- 
--#endif /* __ARM64_KVM_PSCI_H__ */
-+#endif /* __KVM_ARM_PSCI_H__ */
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 15bf026eb182..af3e98fc377e 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -31,6 +31,7 @@
- #include <linux/irqbypass.h>
- #include <trace/events/kvm.h>
- #include <kvm/arm_pmu.h>
-+#include <kvm/arm_psci.h>
- 
- #define CREATE_TRACE_POINTS
- #include "trace.h"
-@@ -46,7 +47,6 @@
- #include <asm/kvm_mmu.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_coproc.h>
--#include <asm/kvm_psci.h>
- #include <asm/sections.h>
- 
- #ifdef REQUIRES_VIRT
 diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
-index f1e363bab5e8..b322e46fd142 100644
+index 053654082bd4..6299501f7664 100644
 --- a/virt/kvm/arm/psci.c
 +++ b/virt/kvm/arm/psci.c
-@@ -21,9 +21,10 @@
+@@ -315,6 +315,47 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
+ 	return ret;
+ }
  
- #include <asm/cputype.h>
- #include <asm/kvm_emulate.h>
--#include <asm/kvm_psci.h>
- #include <asm/kvm_host.h>
- 
-+#include <kvm/arm_psci.h>
++static int kvm_psci_1_0_call(struct kvm_vcpu *vcpu)
++{
++	u32 psci_fn = smccc_get_function(vcpu);
++	u32 feature;
++	unsigned long val;
++	int ret = 1;
 +
- #include <uapi/linux/psci.h>
- 
- /*
++	switch(psci_fn) {
++	case PSCI_0_2_FN_PSCI_VERSION:
++		val = KVM_ARM_PSCI_1_0;
++		break;
++	case PSCI_1_0_FN_PSCI_FEATURES:
++		feature = smccc_get_arg1(vcpu);
++		switch(feature) {
++		case PSCI_0_2_FN_PSCI_VERSION:
++		case PSCI_0_2_FN_CPU_SUSPEND:
++		case PSCI_0_2_FN64_CPU_SUSPEND:
++		case PSCI_0_2_FN_CPU_OFF:
++		case PSCI_0_2_FN_CPU_ON:
++		case PSCI_0_2_FN64_CPU_ON:
++		case PSCI_0_2_FN_AFFINITY_INFO:
++		case PSCI_0_2_FN64_AFFINITY_INFO:
++		case PSCI_0_2_FN_MIGRATE_INFO_TYPE:
++		case PSCI_0_2_FN_SYSTEM_OFF:
++		case PSCI_0_2_FN_SYSTEM_RESET:
++		case PSCI_1_0_FN_PSCI_FEATURES:
++			val = 0;
++			break;
++		default:
++			val = PSCI_RET_NOT_SUPPORTED;
++			break;
++		}
++		break;
++	default:
++		return kvm_psci_0_2_call(vcpu);
++	}
++
++	smccc_set_retval(vcpu, val, 0, 0, 0);
++	return ret;
++}
++
+ static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm *kvm = vcpu->kvm;
+@@ -357,6 +398,8 @@ static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
+ int kvm_psci_call(struct kvm_vcpu *vcpu)
+ {
+ 	switch (kvm_psci_version(vcpu)) {
++	case KVM_ARM_PSCI_1_0:
++		return kvm_psci_1_0_call(vcpu);
+ 	case KVM_ARM_PSCI_0_2:
+ 		return kvm_psci_0_2_call(vcpu);
+ 	case KVM_ARM_PSCI_0_1:
 -- 
 2.14.2
