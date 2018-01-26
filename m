@@ -1,7 +1,7 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 09/14] arm/arm64: KVM: Turn kvm_psci_version into a static inline
-Date: Fri, 26 Jan 2018 14:28:42 +0000
-Message-ID: <20180126142847.31240-10-marc.zyngier@arm.com>
+Subject: [PATCH 14/14] arm64: Add ARM_SMCCC_ARCH_WORKAROUND_1 BP hardening support
+Date: Fri, 26 Jan 2018 14:28:47 +0000
+Message-ID: <20180126142847.31240-15-marc.zyngier@arm.com>
 References: <20180126142847.31240-1-marc.zyngier@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20180126142847.31240-1-marc.zyngier@arm.com>
@@ -10,147 +10,155 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Mark Rutland <mark.rutland@arm.com>, Jon Masters <jcm@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We're about to need kvm_psci_version in HYP too. So let's turn it
-into a static inline, and pass the kvm structure as a second
-parameter (so that HYP can do a kern_hyp_va on it).
+Add the detection and runtime code for ARM_SMCCC_ARCH_WORKAROUND_1.
+It is lovely. Really.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp/switch.c | 20 ++++++++++++--------
- include/kvm/arm_psci.h      | 27 ++++++++++++++++++++++++++-
- virt/kvm/arm/psci.c         | 23 ++---------------------
- 3 files changed, 40 insertions(+), 30 deletions(-)
+ arch/arm64/kernel/bpi.S        | 20 ++++++++++++
+ arch/arm64/kernel/cpu_errata.c | 71 +++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 90 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 036e1f3d77a6..408c04d789a5 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -19,6 +19,8 @@
- #include <linux/jump_label.h>
- #include <uapi/linux/psci.h>
+diff --git a/arch/arm64/kernel/bpi.S b/arch/arm64/kernel/bpi.S
+index 76225c2611ea..add7e08a018d 100644
+--- a/arch/arm64/kernel/bpi.S
++++ b/arch/arm64/kernel/bpi.S
+@@ -17,6 +17,7 @@
+  */
  
-+#include <kvm/arm_psci.h>
-+
- #include <asm/kvm_asm.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_hyp.h>
-@@ -350,14 +352,16 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ #include <linux/linkage.h>
++#include <linux/arm-smccc.h>
  
- 	if (exit_code == ARM_EXCEPTION_TRAP &&
- 	    (kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_HVC64 ||
--	     kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_HVC32) &&
--	    vcpu_get_reg(vcpu, 0) == PSCI_0_2_FN_PSCI_VERSION) {
--		u64 val = PSCI_RET_NOT_SUPPORTED;
--		if (test_bit(KVM_ARM_VCPU_PSCI_0_2, vcpu->arch.features))
--			val = 2;
--
--		vcpu_set_reg(vcpu, 0, val);
--		goto again;
-+	     kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_HVC32)) {
-+		u32 val = vcpu_get_reg(vcpu, 0);
+ .macro ventry target
+ 	.rept 31
+@@ -85,3 +86,22 @@ ENTRY(__qcom_hyp_sanitize_link_stack_start)
+ 	.endr
+ 	ldp	x29, x30, [sp], #16
+ ENTRY(__qcom_hyp_sanitize_link_stack_end)
 +
-+		if (val == PSCI_0_2_FN_PSCI_VERSION) {
-+			val = kvm_psci_version(vcpu, kern_hyp_va(vcpu->kvm));
-+			if (unlikely(val == KVM_ARM_PSCI_0_1))
-+				val = PSCI_RET_NOT_SUPPORTED;
-+			vcpu_set_reg(vcpu, 0, val);
-+			goto again;
-+		}
- 	}
++.macro smccc_workaround_1 inst
++	sub	sp, sp, #(8 * 4)
++	stp	x2, x3, [sp, #(16 * 0)]
++	stp	x0, x1, [sp, #(16 * 1)]
++	orr	w0, wzr, #ARM_SMCCC_ARCH_WORKAROUND_1
++	\inst	#0
++	ldp	x2, x3, [sp, #(16 * 0)]
++	ldp	x0, x1, [sp, #(16 * 1)]
++	add	sp, sp, #(8 * 4)
++.endm
++
++ENTRY(__smccc_workaround_1_smc_start)
++	smccc_workaround_1	smc
++ENTRY(__smccc_workaround_1_smc_end)
++
++ENTRY(__smccc_workaround_1_hvc_start)
++	smccc_workaround_1	hvc
++ENTRY(__smccc_workaround_1_hvc_end)
+diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
+index ed6881882231..f1501873f2e4 100644
+--- a/arch/arm64/kernel/cpu_errata.c
++++ b/arch/arm64/kernel/cpu_errata.c
+@@ -70,6 +70,10 @@ DEFINE_PER_CPU_READ_MOSTLY(struct bp_hardening_data, bp_hardening_data);
+ extern char __psci_hyp_bp_inval_start[], __psci_hyp_bp_inval_end[];
+ extern char __qcom_hyp_sanitize_link_stack_start[];
+ extern char __qcom_hyp_sanitize_link_stack_end[];
++extern char __smccc_workaround_1_smc_start[];
++extern char __smccc_workaround_1_smc_end[];
++extern char __smccc_workaround_1_hvc_start[];
++extern char __smccc_workaround_1_hvc_end[];
  
- 	if (static_branch_unlikely(&vgic_v2_cpuif_trap) &&
-diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
-index 4876bfac2195..32978b578002 100644
---- a/include/kvm/arm_psci.h
-+++ b/include/kvm/arm_psci.h
-@@ -18,6 +18,8 @@
- #ifndef __KVM_ARM_PSCI_H__
- #define __KVM_ARM_PSCI_H__
+ static void __copy_hyp_vect_bpi(int slot, const char *hyp_vecs_start,
+ 				const char *hyp_vecs_end)
+@@ -116,6 +120,10 @@ static void __install_bp_hardening_cb(bp_hardening_cb_t fn,
+ #define __psci_hyp_bp_inval_end			NULL
+ #define __qcom_hyp_sanitize_link_stack_start	NULL
+ #define __qcom_hyp_sanitize_link_stack_end	NULL
++#define __smccc_workaround_1_smc_start		NULL
++#define __smccc_workaround_1_smc_end		NULL
++#define __smccc_workaround_1_hvc_start		NULL
++#define __smccc_workaround_1_hvc_end		NULL
  
-+#include <linux/kvm_host.h>
-+
- #define PSCI_VERSION(x,y)	((((x) & 0x7fff) << 16) | ((y) & 0xffff))
- #define KVM_ARM_PSCI_0_1	PSCI_VERSION(0, 1)
- #define KVM_ARM_PSCI_0_2	PSCI_VERSION(0, 2)
-@@ -25,7 +27,30 @@
- 
- #define KVM_ARM_PSCI_LATEST	KVM_ARM_PSCI_1_0
- 
--int kvm_psci_version(struct kvm_vcpu *vcpu);
-+/*
-+ * We need the KVM pointer independently from the vcpu as we can call
-+ * this from HYP, and need to apply kern_hyp_va on it...
-+ */
-+static inline int kvm_psci_version(struct kvm_vcpu *vcpu, struct kvm *kvm)
-+{
-+	/*
-+	 * Our PSCI implementation stays the same across versions from
-+	 * v0.2 onward, only adding the few mandatory functions (such
-+	 * as FEATURES with 1.0) that are required by newer
-+	 * revisions. It is thus safe to return the latest, unless
-+	 * userspace has instructed us otherwise.
-+	 */
-+	if (test_bit(KVM_ARM_VCPU_PSCI_0_2, vcpu->arch.features)) {
-+		if (kvm->arch.psci_version)
-+			return kvm->arch.psci_version;
-+
-+		return KVM_ARM_PSCI_LATEST;
-+	}
-+
-+	return KVM_ARM_PSCI_0_1;
-+}
-+
-+
- int kvm_hvc_call_handler(struct kvm_vcpu *vcpu);
- 
- struct kvm_one_reg;
-diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
-index 3bb336ac7d7d..a021b62ed762 100644
---- a/virt/kvm/arm/psci.c
-+++ b/virt/kvm/arm/psci.c
-@@ -126,7 +126,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
- 	if (!vcpu)
- 		return PSCI_RET_INVALID_PARAMS;
- 	if (!vcpu->arch.power_off) {
--		if (kvm_psci_version(source_vcpu) != KVM_ARM_PSCI_0_1)
-+		if (kvm_psci_version(source_vcpu, kvm) != KVM_ARM_PSCI_0_1)
- 			return PSCI_RET_ALREADY_ON;
- 		else
- 			return PSCI_RET_INVALID_PARAMS;
-@@ -235,25 +235,6 @@ static void kvm_psci_system_reset(struct kvm_vcpu *vcpu)
- 	kvm_prepare_system_event(vcpu, KVM_SYSTEM_EVENT_RESET);
+ static void __install_bp_hardening_cb(bp_hardening_cb_t fn,
+ 				      const char *hyp_vecs_start,
+@@ -142,17 +150,78 @@ static void  install_bp_hardening_cb(const struct arm64_cpu_capabilities *entry,
+ 	__install_bp_hardening_cb(fn, hyp_vecs_start, hyp_vecs_end);
  }
  
--int kvm_psci_version(struct kvm_vcpu *vcpu)
--{
--	/*
--	 * Our PSCI implementation stays the same across versions from
--	 * v0.2 onward, only adding the few mandatory functions (such
--	 * as FEATURES with 1.0) that are required by newer
--	 * revisions. It is thus safe to return the latest, unless
--	 * userspace has instructed us otherwise.
--	 */
--	if (test_bit(KVM_ARM_VCPU_PSCI_0_2, vcpu->arch.features)) {
--		if (vcpu->kvm->arch.psci_version)
--			return vcpu->kvm->arch.psci_version;
--
--		return KVM_ARM_PSCI_LATEST;
--	}
--
--	return KVM_ARM_PSCI_0_1;
--}
--
- static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
++#include <uapi/linux/psci.h>
++#include <linux/arm-smccc.h>
+ #include <linux/psci.h>
+ 
++static void call_smc_arch_workaround_1(void)
++{
++	register int w0 asm("w0") = ARM_SMCCC_ARCH_WORKAROUND_1;
++	asm volatile("smc	#0\n"
++		     : "+r" (w0));
++}
++
++static void call_hvc_arch_workaround_1(void)
++{
++	register int w0 asm("w0") = ARM_SMCCC_ARCH_WORKAROUND_1;
++	asm volatile("hvc	#0\n"
++		     : "+r" (w0));
++}
++
++static bool check_smccc_arch_workaround_1(const struct arm64_cpu_capabilities *entry)
++{
++	bp_hardening_cb_t cb;
++	void *smccc_start, *smccc_end;
++	struct arm_smccc_res res;
++
++	if (psci_ops.variant == SMCCC_VARIANT_1_0)
++		return false;
++
++	switch (psci_ops.conduit) {
++	case PSCI_CONDUIT_HVC:
++		arm_smccc_hvc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
++			      ARM_SMCCC_ARCH_WORKAROUND_1, 0, 0, 0, 0, 0, 0,
++			      &res);
++		if (res.a0)
++			return false;
++		cb = call_hvc_arch_workaround_1;
++		smccc_start = __smccc_workaround_1_hvc_start;
++		smccc_end = __smccc_workaround_1_hvc_end;
++		break;
++
++	case PSCI_CONDUIT_SMC:
++		arm_smccc_smc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
++			      ARM_SMCCC_ARCH_WORKAROUND_1, 0, 0, 0, 0, 0, 0,
++			      &res);
++		if (res.a0)
++			return false;
++		cb = call_smc_arch_workaround_1;
++		smccc_start = __smccc_workaround_1_smc_start;
++		smccc_end = __smccc_workaround_1_smc_end;
++		break;
++
++	default:
++		return false;
++	}
++
++	install_bp_hardening_cb(entry, cb, smccc_start, smccc_end);
++
++	return true;
++}
++
+ static int enable_psci_bp_hardening(void *data)
  {
- 	struct kvm *kvm = vcpu->kvm;
-@@ -411,7 +392,7 @@ static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
-  */
- static int kvm_psci_call(struct kvm_vcpu *vcpu)
- {
--	switch (kvm_psci_version(vcpu)) {
-+	switch (kvm_psci_version(vcpu, vcpu->kvm)) {
- 	case KVM_ARM_PSCI_1_0:
- 		return kvm_psci_1_0_call(vcpu);
- 	case KVM_ARM_PSCI_0_2:
+ 	const struct arm64_cpu_capabilities *entry = data;
+ 
+-	if (psci_ops.get_version)
++	if (psci_ops.get_version) {
++		if (check_smccc_arch_workaround_1(entry))
++			return 0;
++
+ 		install_bp_hardening_cb(entry,
+ 				       (bp_hardening_cb_t)psci_ops.get_version,
+ 				       __psci_hyp_bp_inval_start,
+ 				       __psci_hyp_bp_inval_end);
++	}
+ 
+ 	return 0;
+ }
 -- 
 2.14.2
