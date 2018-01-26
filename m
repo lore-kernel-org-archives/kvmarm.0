@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 12/14] firmware/psci: Expose PSCI conduit
-Date: Fri, 26 Jan 2018 14:28:45 +0000
-Message-ID: <20180126142847.31240-13-marc.zyngier@arm.com>
+Subject: [PATCH 10/14] arm64: KVM: Report SMCCC_ARCH_WORKAROUND_1 BP hardening
+ support
+Date: Fri, 26 Jan 2018 14:28:43 +0000
+Message-ID: <20180126142847.31240-11-marc.zyngier@arm.com>
 References: <20180126142847.31240-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DC0649D2B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jan 2018 09:24:00 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6838B49DE1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jan 2018 09:23:55 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Z+eEdL8POe2w for <kvmarm@lists.cs.columbia.edu>;
- Fri, 26 Jan 2018 09:23:58 -0500 (EST)
+ with ESMTP id DcK0kyr3w0he for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 26 Jan 2018 09:23:54 -0500 (EST)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A645249DF7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jan 2018 09:23:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9004249E1C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jan 2018 09:23:53 -0500 (EST)
 In-Reply-To: <20180126142847.31240-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,100 +32,69 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Jon Masters <jcm@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In order to call into the firmware to apply workarounds, it is
-useful to find out whether we're using HVC or SMC. Let's expose
-this through the psci_ops.
+A new feature of SMCCC 1.1 is that it offers firmware-based CPU
+workarounds. In particular, SMCCC_ARCH_WORKAROUND_1 provides
+BP hardening for CVE-2017-5715.
+
+If the host has some mitigation for this issue, report that
+we deal with it using SMCCC_ARCH_WORKAROUND_1, as we apply the
+host workaround on every guest exit.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/firmware/psci.c | 26 +++++++++++++++++++++-----
- include/linux/psci.h    |  7 +++++++
- 2 files changed, 28 insertions(+), 5 deletions(-)
+ include/linux/arm-smccc.h |  5 +++++
+ virt/kvm/arm/psci.c       | 17 +++++++++++++++--
+ 2 files changed, 20 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/firmware/psci.c b/drivers/firmware/psci.c
-index 8b25d31e8401..570187e5d084 100644
---- a/drivers/firmware/psci.c
-+++ b/drivers/firmware/psci.c
-@@ -59,7 +59,9 @@ bool psci_tos_resident_on(int cpu)
- 	return cpu == resident_cpu;
- }
+diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+index dc68aa5a7261..e1ef944ef1da 100644
+--- a/include/linux/arm-smccc.h
++++ b/include/linux/arm-smccc.h
+@@ -73,6 +73,11 @@
+ 			   ARM_SMCCC_SMC_32,				\
+ 			   0, 1)
  
--struct psci_operations psci_ops;
-+struct psci_operations psci_ops = {
-+	.conduit = PSCI_CONDUIT_NONE,
-+};
- 
- typedef unsigned long (psci_fn)(unsigned long, unsigned long,
- 				unsigned long, unsigned long);
-@@ -210,6 +212,20 @@ static unsigned long psci_migrate_info_up_cpu(void)
- 			      0, 0, 0);
- }
- 
-+static void set_conduit(enum psci_conduit conduit)
-+{
-+	switch (conduit) {
-+	case PSCI_CONDUIT_HVC:
-+		invoke_psci_fn = __invoke_psci_fn_hvc;
-+		break;
-+	case PSCI_CONDUIT_SMC:
-+		invoke_psci_fn = __invoke_psci_fn_smc;
-+		break;
-+	}
++#define ARM_SMCCC_ARCH_WORKAROUND_1					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_32,				\
++			   0, 0x8000)
 +
-+	psci_ops.conduit = conduit;
-+}
-+
- static int get_set_conduit_method(struct device_node *np)
+ #ifndef __ASSEMBLY__
+ 
+ #include <linux/linkage.h>
+diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
+index a021b62ed762..5677d16abc71 100644
+--- a/virt/kvm/arm/psci.c
++++ b/virt/kvm/arm/psci.c
+@@ -407,14 +407,27 @@ static int kvm_psci_call(struct kvm_vcpu *vcpu)
+ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
  {
- 	const char *method;
-@@ -222,9 +238,9 @@ static int get_set_conduit_method(struct device_node *np)
- 	}
+ 	u32 func_id = smccc_get_function(vcpu);
+-	u32 val;
++	u32 val, feature;
  
- 	if (!strcmp("hvc", method)) {
--		invoke_psci_fn = __invoke_psci_fn_hvc;
-+		set_conduit(PSCI_CONDUIT_HVC);
- 	} else if (!strcmp("smc", method)) {
--		invoke_psci_fn = __invoke_psci_fn_smc;
-+		set_conduit(PSCI_CONDUIT_SMC);
- 	} else {
- 		pr_warn("invalid \"method\" property: %s\n", method);
- 		return -EINVAL;
-@@ -654,9 +670,9 @@ int __init psci_acpi_init(void)
- 	pr_info("probing for conduit method from ACPI.\n");
- 
- 	if (acpi_psci_use_hvc())
--		invoke_psci_fn = __invoke_psci_fn_hvc;
-+		set_conduit(PSCI_CONDUIT_HVC);
- 	else
--		invoke_psci_fn = __invoke_psci_fn_smc;
-+		set_conduit(PSCI_CONDUIT_SMC);
- 
- 	return psci_probe();
- }
-diff --git a/include/linux/psci.h b/include/linux/psci.h
-index f724fd8c78e8..f2679e5faa4f 100644
---- a/include/linux/psci.h
-+++ b/include/linux/psci.h
-@@ -25,6 +25,12 @@ bool psci_tos_resident_on(int cpu);
- int psci_cpu_init_idle(unsigned int cpu);
- int psci_cpu_suspend_enter(unsigned long index);
- 
-+enum psci_conduit {
-+	PSCI_CONDUIT_NONE,
-+	PSCI_CONDUIT_SMC,
-+	PSCI_CONDUIT_HVC,
-+};
-+
- struct psci_operations {
- 	u32 (*get_version)(void);
- 	int (*cpu_suspend)(u32 state, unsigned long entry_point);
-@@ -34,6 +40,7 @@ struct psci_operations {
- 	int (*affinity_info)(unsigned long target_affinity,
- 			unsigned long lowest_affinity_level);
- 	int (*migrate_info_type)(void);
-+	enum psci_conduit conduit;
- };
- 
- extern struct psci_operations psci_ops;
+ 	switch (func_id) {
+ 	case ARM_SMCCC_VERSION_FUNC_ID:
+ 		val = ARM_SMCCC_VERSION_1_1;
+ 		break;
+ 	case ARM_SMCCC_ARCH_FEATURES_FUNC_ID:
+-		val = -1;	/* Nothing supported yet */
++		feature = smccc_get_arg1(vcpu);
++		switch(feature) {
++#ifdef CONFIG_ARM64
++		case ARM_SMCCC_ARCH_WORKAROUND_1:
++			if (cpus_have_const_cap(ARM64_HARDEN_BRANCH_PREDICTOR))
++				val = 0;
++			else
++				val = -1;
++			break;
++#endif
++		default:
++			val = -1;
++			break;
++		}
+ 		break;
+ 	default:
+ 		return kvm_psci_call(vcpu);
 -- 
 2.14.2
