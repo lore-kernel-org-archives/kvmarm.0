@@ -1,90 +1,195 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 03/14] arm/arm64: KVM: Consolidate the PSCI include files
-Date: Fri, 26 Jan 2018 18:10:23 +0000
-Message-ID: <94c9a057-cb41-a92a-aaca-8b8e95676a32@arm.com>
-References: <20180126142847.31240-1-marc.zyngier@arm.com>
- <20180126142847.31240-4-marc.zyngier@arm.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH 14/14] arm64: Add ARM_SMCCC_ARCH_WORKAROUND_1 BP hardening support
+Date: Sun, 28 Jan 2018 23:08:44 +0000
+Message-ID: <CAKv+Gu_1=Z=KaiW=Ltj4a31A5a-XFzPfc0SMk0E5PAwdGDAhMg@mail.gmail.com>
+References: <20180126142847.31240-1-marc.zyngier@arm.com> <20180126142847.31240-15-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BFF949DB5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jan 2018 13:05:00 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uAUBoRY2vuXS for <kvmarm@lists.cs.columbia.edu>;
- Fri, 26 Jan 2018 13:04:59 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F7FD49D66
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jan 2018 13:04:59 -0500 (EST)
-In-Reply-To: <20180126142847.31240-4-marc.zyngier@arm.com>
-Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Jon Masters <jcm@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180126142847.31240-15-marc.zyngier@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, kvmarm <kvmarm@lists.cs.columbia.edu>, Mark Rutland <mark.rutland@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Jon Masters <jcm@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 26/01/18 14:28, Marc Zyngier wrote:
-> As we're about to update the PSCI support, and because I'm lazy,
-> let's move the PSCI include file to include/kvm so that both
-> ARM architectures can find it.
-> 
+On 26 January 2018 at 14:28, Marc Zyngier <marc.zyngier@arm.com> wrote:
+> Add the detection and runtime code for ARM_SMCCC_ARCH_WORKAROUND_1.
+> It is lovely. Really.
+>
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
->  arch/arm/include/asm/psci.h                        | 25 ----------------------
->  arch/arm/kvm/handle_exit.c                         |  2 +-
->  arch/arm64/kvm/handle_exit.c                       |  3 ++-
->  .../asm/kvm_psci.h => include/kvm/arm_psci.h       |  6 +++---
->  virt/kvm/arm/arm.c                                 |  2 +-
->  virt/kvm/arm/psci.c                                |  3 ++-
->  6 files changed, 9 insertions(+), 32 deletions(-)
->  delete mode 100644 arch/arm/include/asm/psci.h
->  rename arch/arm64/include/asm/kvm_psci.h => include/kvm/arm_psci.h (89%)
-> 
-> diff --git a/arch/arm/include/asm/psci.h b/arch/arm/include/asm/psci.h
-> deleted file mode 100644
-> index e1b825dfab23..000000000000
-> --- a/arch/arm/include/asm/psci.h
-> +++ /dev/null
-> @@ -1,25 +0,0 @@
-> -/*
-> - * This program is free software; you can redistribute it and/or modify
-> - * it under the terms of the GNU General Public License version 2 as
-> - * published by the Free Software Foundation.
-> - *
-> - * This program is distributed in the hope that it will be useful,
-> - * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> - * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> - * GNU General Public License for more details.
-> - *
-> - * Copyright (C) 2012 ARM Limited
-> - */
-> -
-> -#ifndef __ASM_ARM_PSCI_H
-> -#define __ASM_ARM_PSCI_H
-> -
-> -extern const struct smp_operations psci_smp_ops;
-> -
-> -#if defined(CONFIG_SMP) && defined(CONFIG_ARM_PSCI)
-> -bool psci_smp_available(void);
-> -#else
-> -static inline bool psci_smp_available(void) { return false; }
-> -#endif
-> -
-> -#endif /* __ASM_ARM_PSCI_H */
+>  arch/arm64/kernel/bpi.S        | 20 ++++++++++++
+>  arch/arm64/kernel/cpu_errata.c | 71 +++++++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 90 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/kernel/bpi.S b/arch/arm64/kernel/bpi.S
+> index 76225c2611ea..add7e08a018d 100644
+> --- a/arch/arm64/kernel/bpi.S
+> +++ b/arch/arm64/kernel/bpi.S
+> @@ -17,6 +17,7 @@
+>   */
+>
+>  #include <linux/linkage.h>
+> +#include <linux/arm-smccc.h>
+>
+>  .macro ventry target
+>         .rept 31
+> @@ -85,3 +86,22 @@ ENTRY(__qcom_hyp_sanitize_link_stack_start)
+>         .endr
+>         ldp     x29, x30, [sp], #16
+>  ENTRY(__qcom_hyp_sanitize_link_stack_end)
+> +
+> +.macro smccc_workaround_1 inst
+> +       sub     sp, sp, #(8 * 4)
+> +       stp     x2, x3, [sp, #(16 * 0)]
+> +       stp     x0, x1, [sp, #(16 * 1)]
+> +       orr     w0, wzr, #ARM_SMCCC_ARCH_WORKAROUND_1
+> +       \inst   #0
+> +       ldp     x2, x3, [sp, #(16 * 0)]
+> +       ldp     x0, x1, [sp, #(16 * 1)]
+> +       add     sp, sp, #(8 * 4)
+> +.endm
+> +
+> +ENTRY(__smccc_workaround_1_smc_start)
+> +       smccc_workaround_1      smc
+> +ENTRY(__smccc_workaround_1_smc_end)
+> +
+> +ENTRY(__smccc_workaround_1_hvc_start)
+> +       smccc_workaround_1      hvc
+> +ENTRY(__smccc_workaround_1_hvc_end)
+> diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
+> index ed6881882231..f1501873f2e4 100644
+> --- a/arch/arm64/kernel/cpu_errata.c
+> +++ b/arch/arm64/kernel/cpu_errata.c
+> @@ -70,6 +70,10 @@ DEFINE_PER_CPU_READ_MOSTLY(struct bp_hardening_data, bp_hardening_data);
+>  extern char __psci_hyp_bp_inval_start[], __psci_hyp_bp_inval_end[];
+>  extern char __qcom_hyp_sanitize_link_stack_start[];
+>  extern char __qcom_hyp_sanitize_link_stack_end[];
+> +extern char __smccc_workaround_1_smc_start[];
+> +extern char __smccc_workaround_1_smc_end[];
+> +extern char __smccc_workaround_1_hvc_start[];
+> +extern char __smccc_workaround_1_hvc_end[];
+>
+>  static void __copy_hyp_vect_bpi(int slot, const char *hyp_vecs_start,
+>                                 const char *hyp_vecs_end)
+> @@ -116,6 +120,10 @@ static void __install_bp_hardening_cb(bp_hardening_cb_t fn,
+>  #define __psci_hyp_bp_inval_end                        NULL
+>  #define __qcom_hyp_sanitize_link_stack_start   NULL
+>  #define __qcom_hyp_sanitize_link_stack_end     NULL
+> +#define __smccc_workaround_1_smc_start         NULL
+> +#define __smccc_workaround_1_smc_end           NULL
+> +#define __smccc_workaround_1_hvc_start         NULL
+> +#define __smccc_workaround_1_hvc_end           NULL
+>
+>  static void __install_bp_hardening_cb(bp_hardening_cb_t fn,
+>                                       const char *hyp_vecs_start,
+> @@ -142,17 +150,78 @@ static void  install_bp_hardening_cb(const struct arm64_cpu_capabilities *entry,
+>         __install_bp_hardening_cb(fn, hyp_vecs_start, hyp_vecs_end);
+>  }
+>
+> +#include <uapi/linux/psci.h>
+> +#include <linux/arm-smccc.h>
+>  #include <linux/psci.h>
+>
+> +static void call_smc_arch_workaround_1(void)
+> +{
+> +       register int w0 asm("w0") = ARM_SMCCC_ARCH_WORKAROUND_1;
+> +       asm volatile("smc       #0\n"
+> +                    : "+r" (w0));
+> +}
+> +
+> +static void call_hvc_arch_workaround_1(void)
+> +{
+> +       register int w0 asm("w0") = ARM_SMCCC_ARCH_WORKAROUND_1;
+> +       asm volatile("hvc       #0\n"
+> +                    : "+r" (w0));
+> +}
+> +
+> +static bool check_smccc_arch_workaround_1(const struct arm64_cpu_capabilities *entry)
+> +{
+> +       bp_hardening_cb_t cb;
+> +       void *smccc_start, *smccc_end;
+> +       struct arm_smccc_res res;
+> +
+> +       if (psci_ops.variant == SMCCC_VARIANT_1_0)
+> +               return false;
+> +
+> +       switch (psci_ops.conduit) {
+> +       case PSCI_CONDUIT_HVC:
+> +               arm_smccc_hvc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
+> +                             ARM_SMCCC_ARCH_WORKAROUND_1, 0, 0, 0, 0, 0, 0,
+> +                             &res);
+> +               if (res.a0)
+> +                       return false;
+> +               cb = call_hvc_arch_workaround_1;
+> +               smccc_start = __smccc_workaround_1_hvc_start;
+> +               smccc_end = __smccc_workaround_1_hvc_end;
+> +               break;
+> +
+> +       case PSCI_CONDUIT_SMC:
+> +               arm_smccc_smc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
+> +                             ARM_SMCCC_ARCH_WORKAROUND_1, 0, 0, 0, 0, 0, 0,
+> +                             &res);
 
-Doh. I deleted the wrong file. That was supposed to be kvm_psci.h, and
-not psci.h. Not sure how I managed that one...
+This compiles to
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+ 4a8:   928fffe1        mov     x1, #0xffffffffffff8000         // #-32768
+ 4ac:   b26187e0        mov     x0, #0xffffffff80000001         // #-2147483647
+ 4b0:   d2800007        mov     x7, #0x0                        // #0
+ 4b4:   d2800006        mov     x6, #0x0                        // #0
+ 4b8:   d2800005        mov     x5, #0x0                        // #0
+ 4bc:   d2800004        mov     x4, #0x0                        // #0
+ 4c0:   d2800003        mov     x3, #0x0                        // #0
+ 4c4:   d2800002        mov     x2, #0x0                        // #0
+ 4c8:   f2b00001        movk    x1, #0x8000, lsl #16
+ 4cc:   94000000        bl      0 <__arm_smccc_smc>
+
+so it seems we're missing a UL suffix somewhere.
+
+Also, adding some printks here reveals that this function is called 32
+times in total, i.e., 4 times per CPU on my Overdrive. This is with
+the patches applied onto v4.15-rc9, so perhaps the rework takes care
+of this?
+
+
+> +               if (res.a0)
+> +                       return false;
+> +               cb = call_smc_arch_workaround_1;
+> +               smccc_start = __smccc_workaround_1_smc_start;
+> +               smccc_end = __smccc_workaround_1_smc_end;
+> +               break;
+> +
+> +       default:
+> +               return false;
+> +       }
+> +
+> +       install_bp_hardening_cb(entry, cb, smccc_start, smccc_end);
+> +
+> +       return true;
+> +}
+> +
+>  static int enable_psci_bp_hardening(void *data)
+>  {
+>         const struct arm64_cpu_capabilities *entry = data;
+>
+> -       if (psci_ops.get_version)
+> +       if (psci_ops.get_version) {
+> +               if (check_smccc_arch_workaround_1(entry))
+> +                       return 0;
+> +
+>                 install_bp_hardening_cb(entry,
+>                                        (bp_hardening_cb_t)psci_ops.get_version,
+>                                        __psci_hyp_bp_inval_start,
+>                                        __psci_hyp_bp_inval_end);
+> +       }
+>
+>         return 0;
+>  }
+> --
+> 2.14.2
+>
+>
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
