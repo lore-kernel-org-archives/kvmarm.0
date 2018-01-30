@@ -1,90 +1,101 @@
 From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v9 5/7] arm64: kvm: Introduce KVM_ARM_SET_SERROR_ESR ioctl
-Date: Tue, 30 Jan 2018 19:21:04 +0000
-Message-ID: <5A70C5A0.1050600@arm.com>
-References: <0184EA26B2509940AA629AE1405DD7F201A9E8EA@DGGEMA503-MBS.china.huawei.com>
+Subject: Re: [PATCH v9 3/7] acpi: apei: Add SEI notification type support
+ for ARMv8
+Date: Tue, 30 Jan 2018 19:39:40 +0000
+Message-ID: <5A70C9FC.5080100@arm.com>
+References: <1515254577-6460-1-git-send-email-gengdongjiu@huawei.com> <1515254577-6460-4-git-send-email-gengdongjiu@huawei.com> <5A663DEC.8080804@arm.com> <168c3f61-0d11-13a4-c383-1f6a97d0ef37@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-doc-owner@vger.kernel.org>
-In-Reply-To: <0184EA26B2509940AA629AE1405DD7F201A9E8EA@DGGEMA503-MBS.china.huawei.com>
-Sender: linux-doc-owner@vger.kernel.org
+Return-path: <linux-acpi-owner@vger.kernel.org>
+In-Reply-To: <168c3f61-0d11-13a4-c383-1f6a97d0ef37@huawei.com>
+Sender: linux-acpi-owner@vger.kernel.org
 To: gengdongjiu <gengdongjiu@huawei.com>
-Cc: "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "rjw@rjwysocki.net" <rjw@rjwysocki.net>, "bp@alien8.de" <bp@alien8.de>, "robert.moore@intel.com" <robert.moore@intel.com>, "lv.zheng@intel.com" <lv.zheng@intel.com>, "corbet@lwn.net" <corbet@lwn.net>, "will.deacon@arm.com" <will.deacon@arm.com>, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>
+Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, linux@armlinux.org.uk, catalin.marinas@arm.com, rjw@rjwysocki.net, bp@alien8.de, robert.moore@intel.com, lv.zheng@intel.com, corbet@lwn.net, will.deacon@arm.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-acpi@vger.kernel.org, devel@acpica.org, huangshaoyu@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi gengdongjiu,
 
-On 24/01/18 20:06, gengdongjiu wrote:
->> On 06/01/18 16:02, Dongjiu Geng wrote:
->>> The ARM64 RAS SError Interrupt(SEI) syndrome value is specific to the
->>> guest and user space needs a way to tell KVM this value. So we add a
->>> new ioctl. Before user space specifies the Exception Syndrome Register
->>> ESR(ESR), it firstly checks that whether KVM has the capability to set
->>> the guest ESR, If has, will set it. Otherwise, nothing to do.
->>>
->>> For this ESR specifying, Only support for AArch64, not support AArch32.
+On 23/01/18 09:23, gengdongjiu wrote:
+> On 2018/1/23 3:39, James Morse wrote:
+>> gengdongjiu wrote:
+>>> This error source parsing and handling method
+>>> is similar with the SEA.
 >>
->> After this patch user-space can trigger an SError in the guest. If it wants to migrate the guest, how does the pending SError get migrated?
+>> There are problems with doing this:
 >>
->> I think we need to fix migration first. Andrew Jones suggested using
->> KVM_GET/SET_VCPU_EVENTS:
->> https://www.spinics.net/lists/arm-kernel/msg616846.html
+>> Oct. 18, 2017, 10:26 a.m. James Morse wrote:
+>> | How do SEA and SEI interact?
+>> |
+>> | As far as I can see they can both interrupt each other, which isn't something
+>> | the single in_nmi() path in APEI can handle. I thinks we should fix this
+>> | first.
 >>
->> Given KVM uses kvm_inject_vabt() on v8.0 hardware too, we should cover systems without the v8.2 RAS Extensions with the same API. I
->> think this means a bit to read/write whether SError is pending, and another to indicate the ESR should be set/read.
->> CPUs without the v8.2 RAS Extensions can reject pending-SError that had an ESR.
-> 
-> For the CPUs without the v8.2 RAS Extensions, its ESR is always 0, 
-> we only can inject a SError with ESR 0 to guest, cannot set its ESR.
-
-0? It's always implementation-defined. On Juno it seems to be always-0, but
-other systems may behave differently. (Juno may generate another ESR value when
-I'm not watching it...)
-
-Just because we can't control the ESR doesn't mean injecting an SError isn't
-something user-space may want to do.
-If we tackle migration of pending-SError first, I think that will give us the
-API to create a new pending SError with/without an ESR as appropriate.
-
-
-> About how about to use the KVM_GET/SET_VCPU_EVENTS, I will check the code, and
-> consider your suggestion at the same time.
-
-(Not my suggestion, It was Andrew Jones idea.)
-
-> The IOCTL KVM_GET/SET_VCPU_EVENTS has been used by X86.
-
-We would be re-using the struct to have values with slightly different meanings.
-But for migration the upshot is the same, call KVM_GET_VCPU_EVENTS on one
-system, and pass the struct to KVM_SET_VCPU_EVENTS on the new system. If we're
-lucky Qemu may be able to do this in shared x86/arm64 code.
-
-
->>> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c index
->>> 5c7f657..738ae90 100644
->>> --- a/arch/arm64/kvm/guest.c
->>> +++ b/arch/arm64/kvm/guest.c
->>> @@ -277,6 +277,11 @@ int kvm_arch_vcpu_ioctl_set_sregs(struct kvm_vcpu *vcpu,
->>>  	return -EINVAL;
->>>  }
->>>
->>> +int kvm_arm_set_sei_esr(struct kvm_vcpu *vcpu, u32 *syndrome) {
->>> +	return -EINVAL;
->>> +}
+>> [..]
 >>
->> Does nothing in the patch that adds the support? This is a bit odd.
->> (oh, its hiding in patch 6...)
-> 
-> To make this patch simple and small, I add it in patch 6.
+>> | SEA gets away with a lot of things because its synchronous. SEI isn't. Xie
+>> | XiuQi pointed to the memory_failure_queue() code. We can use this directly
+>> | from SEA, but not SEI. (what happens if an SError arrives while we are
+>> | queueing memory_failure work from an IRQ).
+>> |
+>> | The one that scares me is the trace-point reporting stuff. What happens if an
+>> | SError arrives while we are enabling a trace point? (these are static-keys
+>> | right?)
+>> |
+>> |  I don't think we can just plumb SEI in like this and be done with it.
+>> |  (I'm looking at teasing out the estatus cache code from being x86:NMI only.
+>> |  This way we solve the same 'cant do this from NMI context' with the same
+>> |  code'.)
+>>
+>>
+>> I will post what I've got for this estatus-cache thing as an RFC, its not ready
+>> to be considered yet.
 
-But that made the functionality of this patch: A new API to return -EINVAL from
-the kernel.
+> Yes, I know you are dong that. Your serial's patch will consider all above things, right?
 
-Swapping the patches round would have avoided this.
-Regardless, I think this will fold out in a rebase.
+Assuming I got it right, yes. It currently makes the race Xie XiuQi spotted
+worse, which I want to fix too. (details on the cover letter)
+
+
+> If your patch can be consider that, this patch can based on your patchset. thanks.
+
+I'd like to pick these patches onto the end of that series, but first I want to
+know what NOTIFY_SEI means for any OS. The ACPI spec doesn't say, and because
+its asynchronous, route-able and mask-able, there are many more corners than
+NOTFIY_SEA.
+
+This thing is a notification using an emulated SError exception. (emulated
+because physical-SError must be routed to EL3 for firmware-first, and
+virtual-SError belongs to EL2).
+
+Does your firmware emulate SError exactly as the TakeException() pseudo code in
+the Arm-Arm?
+Is the emulated SError routed following the routing rules for HCR_EL2.{AMO, TGE}?
+What does your firmware do when it wants to emulate SError but its masked?
+(e.g.1: The physical-SError interrupted EL2 and the SPSR shows EL2 had PSTATE.A
+ set.
+ e.g.2: The physical-SError interrupted EL2 but HCR_EL2 indicates the emulated
+ SError should go to EL1. This effectively masks SError.)
+
+
+Answers to these let us determine whether a bug is in the firmware or the
+kernel. If firmware is expecting the OS to do something special, I'd like to
+know about it from the beginning!
+
+
+>>> Expose API ghes_notify_sei() to external users. External
+>>> modules can call this exposed API to parse APEI table and
+>>> handle the SEI notification.
+>>
+>> external modules? You mean called by the arch code when it gets this NOTIFY_SEI?
+
+> yes, called by kernel ARCH code, such as below, I remember I have discussed with you.
+
+Sure. The phrase 'external modules' usually means the '.ko' files that live in
+/lib/modules, nothing outside the kernel tree should be doing this stuff.
 
 
 Thanks,
 
 James
+
