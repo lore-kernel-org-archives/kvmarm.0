@@ -1,144 +1,116 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 00/28] KVM/ARM Changes for v4.16
-Date: Wed, 31 Jan 2018 10:34:39 +0100
-Message-ID: <20180131093507.22219-1-christoffer.dall@linaro.org>
+Subject: [PULL 04/28] KVM: arm/arm64: Factor out functionality to get vgic
+ mmio requester_vcpu
+Date: Wed, 31 Jan 2018 10:34:43 +0100
+Message-ID: <20180131093507.22219-5-christoffer.dall@linaro.org>
+References: <20180131093507.22219-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B356F49DF3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 31 Jan 2018 04:29:55 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bg0swia4SSNo for <kvmarm@lists.cs.columbia.edu>;
- Wed, 31 Jan 2018 04:29:34 -0500 (EST)
-Received: from mail-wm0-f66.google.com (mail-wm0-f66.google.com [74.125.82.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2BB4B49D14
- for <kvmarm@lists.cs.columbia.edu>; Wed, 31 Jan 2018 04:29:33 -0500 (EST)
-Received: by mail-wm0-f66.google.com with SMTP id b21so6583132wme.4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 31 Jan 2018 01:35:14 -0800 (PST)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20180131093507.22219-1-christoffer.dall@linaro.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Paolo and Radim,
+We are about to distinguish between userspace accesses and mmio traps
+for a number of the mmio handlers.  When the requester vcpu is NULL, it
+means we are handling a userspace access.
 
-Apologies for getting this pull request to you rather late; there were a
-number of issues that I wanted to make sure we could fix properly before
-including some of the changes in this pull request.
+Factor out the functionality to get the request vcpu into its own
+function, mostly so we have a common place to document the semantics of
+the return value.
 
-The changes for this version include icache invalidation optimizations
-(improving VM startup time), support for forwarded level-triggered
-interrupts (improved performance for timers and passthrough platform
-devices), a small fix for power-management notifiers, and some cosmetic
-changes.
+Also take the chance to move the functionality outside of holding a
+spinlock and instead explicitly disable and enable preemption.  This
+supports PREEMPT_RT kernels as well.
 
-The following changes since commit 50c4c4e268a2d7a3e58ebb698ac74da0de40ae36:
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+---
+ virt/kvm/arm/vgic/vgic-mmio.c | 44 +++++++++++++++++++++++++++----------------
+ 1 file changed, 28 insertions(+), 16 deletions(-)
 
-  Linux 4.15-rc3 (2017-12-10 17:56:26 -0800)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git kvm-arm-for-v4.16
-
-for you to fetch changes up to cd15d2050c044ca9525ba165e9073ac8e036b8d0:
-
-  KVM: arm/arm64: Fixup userspace irqchip static key optimization (2018-01-31 10:10:49 +0100)
-
-Thanks,
--Christoffer
-
-Andrew Jones (1):
-  arm64: KVM: Hide PMU from guests when disabled
-
-Christoffer Dall (15):
-  KVM: arm/arm64: Remove redundant preemptible checks
-  KVM: arm/arm64: Factor out functionality to get vgic mmio
-    requester_vcpu
-  KVM: arm/arm64: Don't cache the timer IRQ level
-  KVM: arm/arm64: vgic: Support level-triggered mapped interrupts
-  KVM: arm/arm64: Support a vgic interrupt line level sample function
-  KVM: arm/arm64: Support VGIC dist pend/active changes for mapped IRQs
-  KVM: arm/arm64: Provide a get_input_level for the arch timer
-  KVM: arm/arm64: Avoid work when userspace iqchips are not used
-  KVM: arm/arm64: Delete outdated forwarded irq documentation
-  Revert "arm64: KVM: Hide PMU from guests when disabled"
-  arm64: mm: Add additional parameter to uaccess_ttbr0_enable
-  arm64: mm: Add additional parameter to uaccess_ttbr0_disable
-  KVM: arm/arm64: Fix incorrect timer_is_pending logic
-  KVM: arm/arm64: Fix userspace_irqchip_in_use counting
-  KVM: arm/arm64: Fixup userspace irqchip static key optimization
-
-James Morse (1):
-  KVM: arm/arm64: Handle CPU_PM_ENTER_FAILED
-
-Luis de Bethencourt (1):
-  KVM: arm/arm64: Fix trailing semicolon
-
-Marc Zyngier (9):
-  KVM: arm/arm64: Detangle kvm_mmu.h from kvm_hyp.h
-  KVM: arm/arm64: Split dcache/icache flushing
-  arm64: KVM: Add invalidate_icache_range helper
-  arm: KVM: Add optimized PIPT icache flushing
-  arm64: KVM: PTE/PMD S2 XN bit definition
-  KVM: arm/arm64: Limit icache invalidation to prefetch aborts
-  KVM: arm/arm64: Only clean the dcache on translation fault
-  KVM: arm/arm64: Preserve Exec permission across R/W permission faults
-  KVM: arm/arm64: Drop vcpu parameter from guest cache maintenance
-    operartions
-
-Vasyl Gomonovych (1):
-  KVM: arm: Use PTR_ERR_OR_ZERO()
-
- Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt | 187 ---------------------
- arch/arm/include/asm/kvm_emulate.h                 |   2 +-
- arch/arm/include/asm/kvm_host.h                    |   2 +
- arch/arm/include/asm/kvm_hyp.h                     |   3 +-
- arch/arm/include/asm/kvm_mmu.h                     |  99 +++++++++--
- arch/arm/include/asm/pgtable.h                     |   4 +-
- arch/arm/kvm/hyp/switch.c                          |   1 +
- arch/arm/kvm/hyp/tlb.c                             |   1 +
- arch/arm64/include/asm/asm-uaccess.h               |  12 +-
- arch/arm64/include/asm/assembler.h                 |  21 +++
- arch/arm64/include/asm/cacheflush.h                |   7 +
- arch/arm64/include/asm/kvm_host.h                  |   2 +
- arch/arm64/include/asm/kvm_hyp.h                   |   1 -
- arch/arm64/include/asm/kvm_mmu.h                   |  36 +++-
- arch/arm64/include/asm/pgtable-hwdef.h             |   2 +
- arch/arm64/include/asm/pgtable-prot.h              |   4 +-
- arch/arm64/kvm/hyp/debug-sr.c                      |   1 +
- arch/arm64/kvm/hyp/switch.c                        |   1 +
- arch/arm64/kvm/hyp/tlb.c                           |   1 +
- arch/arm64/lib/clear_user.S                        |   2 +-
- arch/arm64/lib/copy_from_user.S                    |   2 +-
- arch/arm64/lib/copy_in_user.S                      |   2 +-
- arch/arm64/lib/copy_to_user.S                      |   2 +-
- arch/arm64/mm/cache.S                              |  36 ++--
- arch/arm64/xen/hypercall.S                         |   4 +-
- include/kvm/arm_arch_timer.h                       |   2 +
- include/kvm/arm_vgic.h                             |  13 +-
- virt/kvm/arm/arch_timer.c                          | 137 ++++++++-------
- virt/kvm/arm/arm.c                                 |  63 ++++---
- virt/kvm/arm/hyp/vgic-v2-sr.c                      |   1 +
- virt/kvm/arm/mmu.c                                 |  64 ++++++-
- virt/kvm/arm/vgic/vgic-its.c                       |   4 +-
- virt/kvm/arm/vgic/vgic-mmio.c                      | 115 ++++++++++---
- virt/kvm/arm/vgic/vgic-v2.c                        |  29 ++++
- virt/kvm/arm/vgic/vgic-v3.c                        |  29 ++++
- virt/kvm/arm/vgic/vgic.c                           |  41 ++++-
- virt/kvm/arm/vgic/vgic.h                           |   8 +
- 37 files changed, 579 insertions(+), 362 deletions(-)
- delete mode 100644 Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt
-
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+index deb51ee16a3d..fdad95f62fa3 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.c
++++ b/virt/kvm/arm/vgic/vgic-mmio.c
+@@ -122,6 +122,27 @@ unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
+ 	return value;
+ }
+ 
++/*
++ * This function will return the VCPU that performed the MMIO access and
++ * trapped from within the VM, and will return NULL if this is a userspace
++ * access.
++ *
++ * We can disable preemption locally around accessing the per-CPU variable,
++ * and use the resolved vcpu pointer after enabling preemption again, because
++ * even if the current thread is migrated to another CPU, reading the per-CPU
++ * value later will give us the same value as we update the per-CPU variable
++ * in the preempt notifier handlers.
++ */
++static struct kvm_vcpu *vgic_get_mmio_requester_vcpu(void)
++{
++	struct kvm_vcpu *vcpu;
++
++	preempt_disable();
++	vcpu = kvm_arm_get_running_vcpu();
++	preempt_enable();
++	return vcpu;
++}
++
+ void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
+ 			      gpa_t addr, unsigned int len,
+ 			      unsigned long val)
+@@ -184,24 +205,10 @@ unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
+ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+ 				    bool new_active_state)
+ {
+-	struct kvm_vcpu *requester_vcpu;
+ 	unsigned long flags;
+-	spin_lock_irqsave(&irq->irq_lock, flags);
++	struct kvm_vcpu *requester_vcpu = vgic_get_mmio_requester_vcpu();
+ 
+-	/*
+-	 * The vcpu parameter here can mean multiple things depending on how
+-	 * this function is called; when handling a trap from the kernel it
+-	 * depends on the GIC version, and these functions are also called as
+-	 * part of save/restore from userspace.
+-	 *
+-	 * Therefore, we have to figure out the requester in a reliable way.
+-	 *
+-	 * When accessing VGIC state from user space, the requester_vcpu is
+-	 * NULL, which is fine, because we guarantee that no VCPUs are running
+-	 * when accessing VGIC state from user space so irq->vcpu->cpu is
+-	 * always -1.
+-	 */
+-	requester_vcpu = kvm_arm_get_running_vcpu();
++	spin_lock_irqsave(&irq->irq_lock, flags);
+ 
+ 	/*
+ 	 * If this virtual IRQ was written into a list register, we
+@@ -213,6 +220,11 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+ 	 * vgic_change_active_prepare)  and still has to sync back this IRQ,
+ 	 * so we release and re-acquire the spin_lock to let the other thread
+ 	 * sync back the IRQ.
++	 *
++	 * When accessing VGIC state from user space, requester_vcpu is
++	 * NULL, which is fine, because we guarantee that no VCPUs are running
++	 * when accessing VGIC state from user space so irq->vcpu->cpu is
++	 * always -1.
+ 	 */
+ 	while (irq->vcpu && /* IRQ may have state in an LR somewhere */
+ 	       irq->vcpu != requester_vcpu && /* Current thread is not the VCPU thread */
 -- 
 2.14.2
