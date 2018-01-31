@@ -1,47 +1,131 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 03/28] KVM: arm/arm64: Remove redundant preemptible checks
-Date: Wed, 31 Jan 2018 10:34:42 +0100
-Message-ID: <20180131093507.22219-4-christoffer.dall@linaro.org>
+Subject: [PULL 01/28] arm64: KVM: Hide PMU from guests when disabled
+Date: Wed, 31 Jan 2018 10:34:40 +0100
+Message-ID: <20180131093507.22219-2-christoffer.dall@linaro.org>
 References: <20180131093507.22219-1-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20180131093507.22219-1-christoffer.dall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The __this_cpu_read() and __this_cpu_write() functions already implement
-checks for the required preemption levels when using
-CONFIG_DEBUG_PREEMPT which gives you nice error messages and such.
-Therefore there is no need to explicitly check this using a BUG_ON() in
-the code (which we don't do for other uses of per cpu variables either).
+From: Andrew Jones <drjones@redhat.com>
 
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+Since commit 93390c0a1b20 ("arm64: KVM: Hide unsupported AArch64 CPU
+features from guests") we can hide cpu features from guests. Apply
+this to a long standing issue where guests see a PMU available, but
+it's not, because it was not enabled by KVM's userspace.
+
+Signed-off-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/arm.c | 2 --
- 1 file changed, 2 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 35 +++++++++++++++++++++--------------
+ 1 file changed, 21 insertions(+), 14 deletions(-)
 
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 6b60c98a6e22..3610e132df8b 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -71,7 +71,6 @@ static DEFINE_PER_CPU(unsigned char, kvm_arm_hardware_enabled);
- 
- static void kvm_arm_set_running_vcpu(struct kvm_vcpu *vcpu)
- {
--	BUG_ON(preemptible());
- 	__this_cpu_write(kvm_arm_running_vcpu, vcpu);
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 1830ebc227d1..503144f13af0 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -881,18 +881,25 @@ static bool access_cntp_cval(struct kvm_vcpu *vcpu,
  }
  
-@@ -81,7 +80,6 @@ static void kvm_arm_set_running_vcpu(struct kvm_vcpu *vcpu)
+ /* Read a sanitised cpufeature ID register by sys_reg_desc */
+-static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
++static u64 read_id_reg(struct kvm_vcpu *vcpu,
++		       struct sys_reg_desc const *r,
++		       bool raz)
+ {
+ 	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
+ 			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
+ 	u64 val = raz ? 0 : read_sanitised_ftr_reg(id);
+ 
+-	if (id == SYS_ID_AA64PFR0_EL1) {
++	switch (id) {
++	case SYS_ID_AA64DFR0_EL1:
++		if (!kvm_arm_pmu_v3_ready(vcpu))
++			val &= ~(0xfUL << ID_AA64DFR0_PMUVER_SHIFT);
++		break;
++	case SYS_ID_AA64PFR0_EL1:
+ 		if (val & (0xfUL << ID_AA64PFR0_SVE_SHIFT))
+ 			pr_err_once("kvm [%i]: SVE unsupported for guests, suppressing\n",
+ 				    task_pid_nr(current));
+-
+ 		val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
++		break;
+ 	}
+ 
+ 	return val;
+@@ -908,7 +915,7 @@ static bool __access_id_reg(struct kvm_vcpu *vcpu,
+ 	if (p->is_write)
+ 		return write_to_read_only(vcpu, p, r);
+ 
+-	p->regval = read_id_reg(r, raz);
++	p->regval = read_id_reg(vcpu, r, raz);
+ 	return true;
+ }
+ 
+@@ -937,17 +944,17 @@ static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
+  * are stored, and for set_id_reg() we don't allow the effective value
+  * to be changed.
   */
- struct kvm_vcpu *kvm_arm_get_running_vcpu(void)
+-static int __get_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
+-			bool raz)
++static int __get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
++			void __user *uaddr, bool raz)
  {
--	BUG_ON(preemptible());
- 	return __this_cpu_read(kvm_arm_running_vcpu);
+ 	const u64 id = sys_reg_to_index(rd);
+-	const u64 val = read_id_reg(rd, raz);
++	const u64 val = read_id_reg(vcpu, rd, raz);
+ 
+ 	return reg_to_user(uaddr, &val, id);
  }
  
+-static int __set_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
+-			bool raz)
++static int __set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
++			void __user *uaddr, bool raz)
+ {
+ 	const u64 id = sys_reg_to_index(rd);
+ 	int err;
+@@ -958,7 +965,7 @@ static int __set_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
+ 		return err;
+ 
+ 	/* This is what we mean by invariant: you can't change it. */
+-	if (val != read_id_reg(rd, raz))
++	if (val != read_id_reg(vcpu, rd, raz))
+ 		return -EINVAL;
+ 
+ 	return 0;
+@@ -967,25 +974,25 @@ static int __set_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
+ static int get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 		      const struct kvm_one_reg *reg, void __user *uaddr)
+ {
+-	return __get_id_reg(rd, uaddr, false);
++	return __get_id_reg(vcpu, rd, uaddr, false);
+ }
+ 
+ static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 		      const struct kvm_one_reg *reg, void __user *uaddr)
+ {
+-	return __set_id_reg(rd, uaddr, false);
++	return __set_id_reg(vcpu, rd, uaddr, false);
+ }
+ 
+ static int get_raz_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 			  const struct kvm_one_reg *reg, void __user *uaddr)
+ {
+-	return __get_id_reg(rd, uaddr, true);
++	return __get_id_reg(vcpu, rd, uaddr, true);
+ }
+ 
+ static int set_raz_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 			  const struct kvm_one_reg *reg, void __user *uaddr)
+ {
+-	return __set_id_reg(rd, uaddr, true);
++	return __set_id_reg(vcpu, rd, uaddr, true);
+ }
+ 
+ /* sys_reg_desc initialiser for known cpufeature ID registers */
 -- 
 2.14.2
