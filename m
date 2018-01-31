@@ -1,165 +1,144 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 18/28] KVM: arm/arm64: Limit icache invalidation to prefetch aborts
-Date: Wed, 31 Jan 2018 10:34:57 +0100
-Message-ID: <20180131093507.22219-19-christoffer.dall@linaro.org>
-References: <20180131093507.22219-1-christoffer.dall@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20180131093507.22219-1-christoffer.dall@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+Subject: [PULL 00/28] KVM/ARM Changes for v4.16
+Date: Wed, 31 Jan 2018 10:34:39 +0100
+Message-ID: <20180131093507.22219-1-christoffer.dall@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B356F49DF3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 31 Jan 2018 04:29:55 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id bg0swia4SSNo for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 31 Jan 2018 04:29:34 -0500 (EST)
+Received: from mail-wm0-f66.google.com (mail-wm0-f66.google.com [74.125.82.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2BB4B49D14
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 31 Jan 2018 04:29:33 -0500 (EST)
+Received: by mail-wm0-f66.google.com with SMTP id b21so6583132wme.4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 31 Jan 2018 01:35:14 -0800 (PST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Marc Zyngier <marc.zyngier@arm.com>
+Hi Paolo and Radim,
 
-We've so far eagerly invalidated the icache, no matter how
-the page was faulted in (data or prefetch abort).
+Apologies for getting this pull request to you rather late; there were a
+number of issues that I wanted to make sure we could fix properly before
+including some of the changes in this pull request.
 
-But we can easily track execution by setting the XN bits
-in the S2 page tables, get the prefetch abort at HYP and
-perform the icache invalidation at that time only.
+The changes for this version include icache invalidation optimizations
+(improving VM startup time), support for forwarded level-triggered
+interrupts (improved performance for timers and passthrough platform
+devices), a small fix for power-management notifiers, and some cosmetic
+changes.
 
-As for most VMs, the instruction working set is pretty
-small compared to the data set, this is likely to save
-some traffic (specially as the invalidation is broadcast).
+The following changes since commit 50c4c4e268a2d7a3e58ebb698ac74da0de40ae36:
 
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
- arch/arm/include/asm/kvm_mmu.h        | 12 ++++++++++++
- arch/arm/include/asm/pgtable.h        |  4 ++--
- arch/arm64/include/asm/kvm_mmu.h      | 12 ++++++++++++
- arch/arm64/include/asm/pgtable-prot.h |  4 ++--
- virt/kvm/arm/mmu.c                    | 19 +++++++++++++++----
- 5 files changed, 43 insertions(+), 8 deletions(-)
+  Linux 4.15-rc3 (2017-12-10 17:56:26 -0800)
 
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index bc8d21e76637..4d7a54cbb3ab 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -85,6 +85,18 @@ static inline pmd_t kvm_s2pmd_mkwrite(pmd_t pmd)
- 	return pmd;
- }
- 
-+static inline pte_t kvm_s2pte_mkexec(pte_t pte)
-+{
-+	pte_val(pte) &= ~L_PTE_XN;
-+	return pte;
-+}
-+
-+static inline pmd_t kvm_s2pmd_mkexec(pmd_t pmd)
-+{
-+	pmd_val(pmd) &= ~PMD_SECT_XN;
-+	return pmd;
-+}
-+
- static inline void kvm_set_s2pte_readonly(pte_t *pte)
- {
- 	pte_val(*pte) = (pte_val(*pte) & ~L_PTE_S2_RDWR) | L_PTE_S2_RDONLY;
-diff --git a/arch/arm/include/asm/pgtable.h b/arch/arm/include/asm/pgtable.h
-index 150ece66ddf3..a757401129f9 100644
---- a/arch/arm/include/asm/pgtable.h
-+++ b/arch/arm/include/asm/pgtable.h
-@@ -102,8 +102,8 @@ extern pgprot_t		pgprot_s2_device;
- #define PAGE_HYP_EXEC		_MOD_PROT(pgprot_kernel, L_PTE_HYP | L_PTE_RDONLY)
- #define PAGE_HYP_RO		_MOD_PROT(pgprot_kernel, L_PTE_HYP | L_PTE_RDONLY | L_PTE_XN)
- #define PAGE_HYP_DEVICE		_MOD_PROT(pgprot_hyp_device, L_PTE_HYP)
--#define PAGE_S2			_MOD_PROT(pgprot_s2, L_PTE_S2_RDONLY)
--#define PAGE_S2_DEVICE		_MOD_PROT(pgprot_s2_device, L_PTE_S2_RDONLY)
-+#define PAGE_S2			_MOD_PROT(pgprot_s2, L_PTE_S2_RDONLY | L_PTE_XN)
-+#define PAGE_S2_DEVICE		_MOD_PROT(pgprot_s2_device, L_PTE_S2_RDONLY | L_PTE_XN)
- 
- #define __PAGE_NONE		__pgprot(_L_PTE_DEFAULT | L_PTE_RDONLY | L_PTE_XN | L_PTE_NONE)
- #define __PAGE_SHARED		__pgprot(_L_PTE_DEFAULT | L_PTE_USER | L_PTE_XN)
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 56b3e03c85e7..1e1b20cb348f 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -173,6 +173,18 @@ static inline pmd_t kvm_s2pmd_mkwrite(pmd_t pmd)
- 	return pmd;
- }
- 
-+static inline pte_t kvm_s2pte_mkexec(pte_t pte)
-+{
-+	pte_val(pte) &= ~PTE_S2_XN;
-+	return pte;
-+}
-+
-+static inline pmd_t kvm_s2pmd_mkexec(pmd_t pmd)
-+{
-+	pmd_val(pmd) &= ~PMD_S2_XN;
-+	return pmd;
-+}
-+
- static inline void kvm_set_s2pte_readonly(pte_t *pte)
- {
- 	pteval_t old_pteval, pteval;
-diff --git a/arch/arm64/include/asm/pgtable-prot.h b/arch/arm64/include/asm/pgtable-prot.h
-index 0a5635fb0ef9..4e12dabd342b 100644
---- a/arch/arm64/include/asm/pgtable-prot.h
-+++ b/arch/arm64/include/asm/pgtable-prot.h
-@@ -60,8 +60,8 @@
- #define PAGE_HYP_RO		__pgprot(_PAGE_DEFAULT | PTE_HYP | PTE_RDONLY | PTE_HYP_XN)
- #define PAGE_HYP_DEVICE		__pgprot(PROT_DEVICE_nGnRE | PTE_HYP)
- 
--#define PAGE_S2			__pgprot(PROT_DEFAULT | PTE_S2_MEMATTR(MT_S2_NORMAL) | PTE_S2_RDONLY)
--#define PAGE_S2_DEVICE		__pgprot(PROT_DEFAULT | PTE_S2_MEMATTR(MT_S2_DEVICE_nGnRE) | PTE_S2_RDONLY | PTE_UXN)
-+#define PAGE_S2			__pgprot(PROT_DEFAULT | PTE_S2_MEMATTR(MT_S2_NORMAL) | PTE_S2_RDONLY | PTE_S2_XN)
-+#define PAGE_S2_DEVICE		__pgprot(PROT_DEFAULT | PTE_S2_MEMATTR(MT_S2_DEVICE_nGnRE) | PTE_S2_RDONLY | PTE_S2_XN)
- 
- #define PAGE_NONE		__pgprot(((_PAGE_DEFAULT) & ~PTE_VALID) | PTE_PROT_NONE | PTE_RDONLY | PTE_PXN | PTE_UXN)
- #define PAGE_SHARED		__pgprot(_PAGE_DEFAULT | PTE_USER | PTE_NG | PTE_PXN | PTE_UXN | PTE_WRITE)
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 2174244f6317..0417c8e2a81c 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -1292,7 +1292,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 			  unsigned long fault_status)
- {
- 	int ret;
--	bool write_fault, writable, hugetlb = false, force_pte = false;
-+	bool write_fault, exec_fault, writable, hugetlb = false, force_pte = false;
- 	unsigned long mmu_seq;
- 	gfn_t gfn = fault_ipa >> PAGE_SHIFT;
- 	struct kvm *kvm = vcpu->kvm;
-@@ -1304,7 +1304,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	unsigned long flags = 0;
- 
- 	write_fault = kvm_is_write_fault(vcpu);
--	if (fault_status == FSC_PERM && !write_fault) {
-+	exec_fault = kvm_vcpu_trap_is_iabt(vcpu);
-+	VM_BUG_ON(write_fault && exec_fault);
-+
-+	if (fault_status == FSC_PERM && !write_fault && !exec_fault) {
- 		kvm_err("Unexpected L2 read permission error\n");
- 		return -EFAULT;
- 	}
-@@ -1398,7 +1401,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 			kvm_set_pfn_dirty(pfn);
- 		}
- 		clean_dcache_guest_page(vcpu, pfn, PMD_SIZE);
--		invalidate_icache_guest_page(vcpu, pfn, PMD_SIZE);
-+
-+		if (exec_fault) {
-+			new_pmd = kvm_s2pmd_mkexec(new_pmd);
-+			invalidate_icache_guest_page(vcpu, pfn, PMD_SIZE);
-+		}
- 
- 		ret = stage2_set_pmd_huge(kvm, memcache, fault_ipa, &new_pmd);
- 	} else {
-@@ -1410,7 +1417,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 			mark_page_dirty(kvm, gfn);
- 		}
- 		clean_dcache_guest_page(vcpu, pfn, PAGE_SIZE);
--		invalidate_icache_guest_page(vcpu, pfn, PAGE_SIZE);
-+
-+		if (exec_fault) {
-+			new_pte = kvm_s2pte_mkexec(new_pte);
-+			invalidate_icache_guest_page(vcpu, pfn, PAGE_SIZE);
-+		}
- 
- 		ret = stage2_set_pte(kvm, memcache, fault_ipa, &new_pte, flags);
- 	}
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git kvm-arm-for-v4.16
+
+for you to fetch changes up to cd15d2050c044ca9525ba165e9073ac8e036b8d0:
+
+  KVM: arm/arm64: Fixup userspace irqchip static key optimization (2018-01-31 10:10:49 +0100)
+
+Thanks,
+-Christoffer
+
+Andrew Jones (1):
+  arm64: KVM: Hide PMU from guests when disabled
+
+Christoffer Dall (15):
+  KVM: arm/arm64: Remove redundant preemptible checks
+  KVM: arm/arm64: Factor out functionality to get vgic mmio
+    requester_vcpu
+  KVM: arm/arm64: Don't cache the timer IRQ level
+  KVM: arm/arm64: vgic: Support level-triggered mapped interrupts
+  KVM: arm/arm64: Support a vgic interrupt line level sample function
+  KVM: arm/arm64: Support VGIC dist pend/active changes for mapped IRQs
+  KVM: arm/arm64: Provide a get_input_level for the arch timer
+  KVM: arm/arm64: Avoid work when userspace iqchips are not used
+  KVM: arm/arm64: Delete outdated forwarded irq documentation
+  Revert "arm64: KVM: Hide PMU from guests when disabled"
+  arm64: mm: Add additional parameter to uaccess_ttbr0_enable
+  arm64: mm: Add additional parameter to uaccess_ttbr0_disable
+  KVM: arm/arm64: Fix incorrect timer_is_pending logic
+  KVM: arm/arm64: Fix userspace_irqchip_in_use counting
+  KVM: arm/arm64: Fixup userspace irqchip static key optimization
+
+James Morse (1):
+  KVM: arm/arm64: Handle CPU_PM_ENTER_FAILED
+
+Luis de Bethencourt (1):
+  KVM: arm/arm64: Fix trailing semicolon
+
+Marc Zyngier (9):
+  KVM: arm/arm64: Detangle kvm_mmu.h from kvm_hyp.h
+  KVM: arm/arm64: Split dcache/icache flushing
+  arm64: KVM: Add invalidate_icache_range helper
+  arm: KVM: Add optimized PIPT icache flushing
+  arm64: KVM: PTE/PMD S2 XN bit definition
+  KVM: arm/arm64: Limit icache invalidation to prefetch aborts
+  KVM: arm/arm64: Only clean the dcache on translation fault
+  KVM: arm/arm64: Preserve Exec permission across R/W permission faults
+  KVM: arm/arm64: Drop vcpu parameter from guest cache maintenance
+    operartions
+
+Vasyl Gomonovych (1):
+  KVM: arm: Use PTR_ERR_OR_ZERO()
+
+ Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt | 187 ---------------------
+ arch/arm/include/asm/kvm_emulate.h                 |   2 +-
+ arch/arm/include/asm/kvm_host.h                    |   2 +
+ arch/arm/include/asm/kvm_hyp.h                     |   3 +-
+ arch/arm/include/asm/kvm_mmu.h                     |  99 +++++++++--
+ arch/arm/include/asm/pgtable.h                     |   4 +-
+ arch/arm/kvm/hyp/switch.c                          |   1 +
+ arch/arm/kvm/hyp/tlb.c                             |   1 +
+ arch/arm64/include/asm/asm-uaccess.h               |  12 +-
+ arch/arm64/include/asm/assembler.h                 |  21 +++
+ arch/arm64/include/asm/cacheflush.h                |   7 +
+ arch/arm64/include/asm/kvm_host.h                  |   2 +
+ arch/arm64/include/asm/kvm_hyp.h                   |   1 -
+ arch/arm64/include/asm/kvm_mmu.h                   |  36 +++-
+ arch/arm64/include/asm/pgtable-hwdef.h             |   2 +
+ arch/arm64/include/asm/pgtable-prot.h              |   4 +-
+ arch/arm64/kvm/hyp/debug-sr.c                      |   1 +
+ arch/arm64/kvm/hyp/switch.c                        |   1 +
+ arch/arm64/kvm/hyp/tlb.c                           |   1 +
+ arch/arm64/lib/clear_user.S                        |   2 +-
+ arch/arm64/lib/copy_from_user.S                    |   2 +-
+ arch/arm64/lib/copy_in_user.S                      |   2 +-
+ arch/arm64/lib/copy_to_user.S                      |   2 +-
+ arch/arm64/mm/cache.S                              |  36 ++--
+ arch/arm64/xen/hypercall.S                         |   4 +-
+ include/kvm/arm_arch_timer.h                       |   2 +
+ include/kvm/arm_vgic.h                             |  13 +-
+ virt/kvm/arm/arch_timer.c                          | 137 ++++++++-------
+ virt/kvm/arm/arm.c                                 |  63 ++++---
+ virt/kvm/arm/hyp/vgic-v2-sr.c                      |   1 +
+ virt/kvm/arm/mmu.c                                 |  64 ++++++-
+ virt/kvm/arm/vgic/vgic-its.c                       |   4 +-
+ virt/kvm/arm/vgic/vgic-mmio.c                      | 115 ++++++++++---
+ virt/kvm/arm/vgic/vgic-v2.c                        |  29 ++++
+ virt/kvm/arm/vgic/vgic-v3.c                        |  29 ++++
+ virt/kvm/arm/vgic/vgic.c                           |  41 ++++-
+ virt/kvm/arm/vgic/vgic.h                           |   8 +
+ 37 files changed, 579 insertions(+), 362 deletions(-)
+ delete mode 100644 Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt
+
 -- 
 2.14.2
