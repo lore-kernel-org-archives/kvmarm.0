@@ -1,130 +1,238 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 13/28] KVM: arm/arm64: Detangle kvm_mmu.h from kvm_hyp.h
-Date: Wed, 31 Jan 2018 10:34:52 +0100
-Message-ID: <20180131093507.22219-14-christoffer.dall@linaro.org>
+Subject: [PULL 06/28] KVM: arm/arm64: vgic: Support level-triggered mapped
+ interrupts
+Date: Wed, 31 Jan 2018 10:34:45 +0100
+Message-ID: <20180131093507.22219-7-christoffer.dall@linaro.org>
 References: <20180131093507.22219-1-christoffer.dall@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <20180131093507.22219-1-christoffer.dall@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Marc Zyngier <marc.zyngier@arm.com>
+Level-triggered mapped IRQs are special because we only observe rising
+edges as input to the VGIC, and we don't set the EOI flag and therefore
+are not told when the level goes down, so that we can re-queue a new
+interrupt when the level goes up.
 
-kvm_hyp.h has an odd dependency on kvm_mmu.h, which makes the
-opposite inclusion impossible. Let's start with breaking that
-useless dependency.
+One way to solve this problem is to side-step the logic of the VGIC and
+special case the validation in the injection path, but it has the
+unfortunate drawback of having to peak into the physical GIC state
+whenever we want to know if the interrupt is pending on the virtual
+distributor.
 
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Instead, we can maintain the current semantics of a level triggered
+interrupt by sort of treating it as an edge-triggered interrupt,
+following from the fact that we only observe an asserting edge.  This
+requires us to be a bit careful when populating the LRs and when folding
+the state back in though:
+
+ * We lower the line level when populating the LR, so that when
+   subsequently observing an asserting edge, the VGIC will do the right
+   thing.
+
+ * If the guest never acked the interrupt while running (for example if
+   it had masked interrupts at the CPU level while running), we have
+   to preserve the pending state of the LR and move it back to the
+   line_level field of the struct irq when folding LR state.
+
+   If the guest never acked the interrupt while running, but changed the
+   device state and lowered the line (again with interrupts masked) then
+   we need to observe this change in the line_level.
+
+   Both of the above situations are solved by sampling the physical line
+   and set the line level when folding the LR back.
+
+ * Finally, if the guest never acked the interrupt while running and
+   sampling the line reveals that the device state has changed and the
+   line has been lowered, we must clear the physical active state, since
+   we will otherwise never be told when the interrupt becomes asserted
+   again.
+
+This has the added benefit of making the timer optimization patches
+(https://lists.cs.columbia.edu/pipermail/kvmarm/2017-July/026343.html) a
+bit simpler, because the timer code doesn't have to clear the active
+state on the sync anymore.  It also potentially improves the performance
+of the timer implementation because the GIC knows the state or the LR
+and only needs to clear the
+active state when the pending bit in the LR is still set, where the
+timer has to always clear it when returning from running the guest with
+an injected timer interrupt.
+
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm/include/asm/kvm_hyp.h   | 1 -
- arch/arm/kvm/hyp/switch.c        | 1 +
- arch/arm/kvm/hyp/tlb.c           | 1 +
- arch/arm64/include/asm/kvm_hyp.h | 1 -
- arch/arm64/kvm/hyp/debug-sr.c    | 1 +
- arch/arm64/kvm/hyp/switch.c      | 1 +
- arch/arm64/kvm/hyp/tlb.c         | 1 +
- virt/kvm/arm/hyp/vgic-v2-sr.c    | 1 +
- 8 files changed, 6 insertions(+), 2 deletions(-)
+ virt/kvm/arm/vgic/vgic-v2.c | 29 +++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-v3.c | 29 +++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic.c    | 23 +++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic.h    |  7 +++++++
+ 4 files changed, 88 insertions(+)
 
-diff --git a/arch/arm/include/asm/kvm_hyp.h b/arch/arm/include/asm/kvm_hyp.h
-index ab20ffa8b9e7..76368de7237b 100644
---- a/arch/arm/include/asm/kvm_hyp.h
-+++ b/arch/arm/include/asm/kvm_hyp.h
-@@ -21,7 +21,6 @@
- #include <linux/compiler.h>
- #include <linux/kvm_host.h>
- #include <asm/cp15.h>
--#include <asm/kvm_mmu.h>
- #include <asm/vfp.h>
+diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+index 80897102da26..c32d7b93ffd1 100644
+--- a/virt/kvm/arm/vgic/vgic-v2.c
++++ b/virt/kvm/arm/vgic/vgic-v2.c
+@@ -105,6 +105,26 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+ 				irq->pending_latch = false;
+ 		}
  
- #define __hyp_text __section(.hyp.text) notrace
-diff --git a/arch/arm/kvm/hyp/switch.c b/arch/arm/kvm/hyp/switch.c
-index 330c9ce34ba5..ae45ae96aac2 100644
---- a/arch/arm/kvm/hyp/switch.c
-+++ b/arch/arm/kvm/hyp/switch.c
-@@ -18,6 +18,7 @@
++		/*
++		 * Level-triggered mapped IRQs are special because we only
++		 * observe rising edges as input to the VGIC.
++		 *
++		 * If the guest never acked the interrupt we have to sample
++		 * the physical line and set the line level, because the
++		 * device state could have changed or we simply need to
++		 * process the still pending interrupt later.
++		 *
++		 * If this causes us to lower the level, we have to also clear
++		 * the physical active state, since we will otherwise never be
++		 * told when the interrupt becomes asserted again.
++		 */
++		if (vgic_irq_is_mapped_level(irq) && (val & GICH_LR_PENDING_BIT)) {
++			irq->line_level = vgic_get_phys_line_level(irq);
++
++			if (!irq->line_level)
++				vgic_irq_set_phys_active(irq, false);
++		}
++
+ 		spin_unlock_irqrestore(&irq->irq_lock, flags);
+ 		vgic_put_irq(vcpu->kvm, irq);
+ 	}
+@@ -162,6 +182,15 @@ void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
+ 			val |= GICH_LR_EOI;
+ 	}
  
- #include <asm/kvm_asm.h>
- #include <asm/kvm_hyp.h>
-+#include <asm/kvm_mmu.h>
++	/*
++	 * Level-triggered mapped IRQs are special because we only observe
++	 * rising edges as input to the VGIC.  We therefore lower the line
++	 * level here, so that we can take new virtual IRQs.  See
++	 * vgic_v2_fold_lr_state for more info.
++	 */
++	if (vgic_irq_is_mapped_level(irq) && (val & GICH_LR_PENDING_BIT))
++		irq->line_level = false;
++
+ 	/* The GICv2 LR only holds five bits of priority. */
+ 	val |= (irq->priority >> 3) << GICH_LR_PRIORITY_SHIFT;
  
- __asm__(".arch_extension     virt");
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index f47e8481fa45..6b329414e57a 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -96,6 +96,26 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ 				irq->pending_latch = false;
+ 		}
  
-diff --git a/arch/arm/kvm/hyp/tlb.c b/arch/arm/kvm/hyp/tlb.c
-index 6d810af2d9fd..c0edd450e104 100644
---- a/arch/arm/kvm/hyp/tlb.c
-+++ b/arch/arm/kvm/hyp/tlb.c
-@@ -19,6 +19,7 @@
-  */
++		/*
++		 * Level-triggered mapped IRQs are special because we only
++		 * observe rising edges as input to the VGIC.
++		 *
++		 * If the guest never acked the interrupt we have to sample
++		 * the physical line and set the line level, because the
++		 * device state could have changed or we simply need to
++		 * process the still pending interrupt later.
++		 *
++		 * If this causes us to lower the level, we have to also clear
++		 * the physical active state, since we will otherwise never be
++		 * told when the interrupt becomes asserted again.
++		 */
++		if (vgic_irq_is_mapped_level(irq) && (val & ICH_LR_PENDING_BIT)) {
++			irq->line_level = vgic_get_phys_line_level(irq);
++
++			if (!irq->line_level)
++				vgic_irq_set_phys_active(irq, false);
++		}
++
+ 		spin_unlock_irqrestore(&irq->irq_lock, flags);
+ 		vgic_put_irq(vcpu->kvm, irq);
+ 	}
+@@ -145,6 +165,15 @@ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
+ 			val |= ICH_LR_EOI;
+ 	}
  
- #include <asm/kvm_hyp.h>
-+#include <asm/kvm_mmu.h>
++	/*
++	 * Level-triggered mapped IRQs are special because we only observe
++	 * rising edges as input to the VGIC.  We therefore lower the line
++	 * level here, so that we can take new virtual IRQs.  See
++	 * vgic_v3_fold_lr_state for more info.
++	 */
++	if (vgic_irq_is_mapped_level(irq) && (val & ICH_LR_PENDING_BIT))
++		irq->line_level = false;
++
+ 	/*
+ 	 * We currently only support Group1 interrupts, which is a
+ 	 * known defect. This needs to be addressed at some point.
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index ecb8e25f5fe5..4318e9edd075 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -144,6 +144,29 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
+ 	kfree(irq);
+ }
  
++/* Get the input level of a mapped IRQ directly from the physical GIC */
++bool vgic_get_phys_line_level(struct vgic_irq *irq)
++{
++	bool line_level;
++
++	BUG_ON(!irq->hw);
++
++	WARN_ON(irq_get_irqchip_state(irq->host_irq,
++				      IRQCHIP_STATE_PENDING,
++				      &line_level));
++	return line_level;
++}
++
++/* Set/Clear the physical active state */
++void vgic_irq_set_phys_active(struct vgic_irq *irq, bool active)
++{
++
++	BUG_ON(!irq->hw);
++	WARN_ON(irq_set_irqchip_state(irq->host_irq,
++				      IRQCHIP_STATE_ACTIVE,
++				      active));
++}
++
  /**
-  * Flush per-VMID TLBs
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index 08d3bb66c8b7..f26f9cd70c72 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -20,7 +20,6 @@
+  * kvm_vgic_target_oracle - compute the target vcpu for an irq
+  *
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index efbcf8f96f9c..d0787983a357 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -104,6 +104,11 @@ static inline bool irq_is_pending(struct vgic_irq *irq)
+ 		return irq->pending_latch || irq->line_level;
+ }
  
- #include <linux/compiler.h>
- #include <linux/kvm_host.h>
--#include <asm/kvm_mmu.h>
- #include <asm/sysreg.h>
- 
- #define __hyp_text __section(.hyp.text) notrace
-diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
-index 321c9c05dd9e..360455f86346 100644
---- a/arch/arm64/kvm/hyp/debug-sr.c
-+++ b/arch/arm64/kvm/hyp/debug-sr.c
-@@ -21,6 +21,7 @@
- #include <asm/debug-monitors.h>
- #include <asm/kvm_asm.h>
- #include <asm/kvm_hyp.h>
-+#include <asm/kvm_mmu.h>
- 
- #define read_debug(r,n)		read_sysreg(r##n##_el1)
- #define write_debug(v,r,n)	write_sysreg(v, r##n##_el1)
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index f7c651f3a8c0..f3d8bed096f5 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -21,6 +21,7 @@
- #include <asm/kvm_asm.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_hyp.h>
-+#include <asm/kvm_mmu.h>
- #include <asm/fpsimd.h>
- #include <asm/debug-monitors.h>
- 
-diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
-index 73464a96c365..131c7772703c 100644
---- a/arch/arm64/kvm/hyp/tlb.c
-+++ b/arch/arm64/kvm/hyp/tlb.c
-@@ -16,6 +16,7 @@
-  */
- 
- #include <asm/kvm_hyp.h>
-+#include <asm/kvm_mmu.h>
- #include <asm/tlbflush.h>
- 
- static void __hyp_text __tlb_switch_to_guest_vhe(struct kvm *kvm)
-diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
-index d7fd46fe9efb..4fe6e797e8b3 100644
---- a/virt/kvm/arm/hyp/vgic-v2-sr.c
-+++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
-@@ -21,6 +21,7 @@
- 
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_hyp.h>
-+#include <asm/kvm_mmu.h>
- 
- static void __hyp_text save_elrsr(struct kvm_vcpu *vcpu, void __iomem *base)
- {
++static inline bool vgic_irq_is_mapped_level(struct vgic_irq *irq)
++{
++	return irq->config == VGIC_CONFIG_LEVEL && irq->hw;
++}
++
+ /*
+  * This struct provides an intermediate representation of the fields contained
+  * in the GICH_VMCR and ICH_VMCR registers, such that code exporting the GIC
+@@ -140,6 +145,8 @@ vgic_get_mmio_region(struct kvm_vcpu *vcpu, struct vgic_io_device *iodev,
+ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
+ 			      u32 intid);
+ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq);
++bool vgic_get_phys_line_level(struct vgic_irq *irq);
++void vgic_irq_set_phys_active(struct vgic_irq *irq, bool active);
+ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
+ 			   unsigned long flags);
+ void vgic_kick_vcpus(struct kvm *kvm);
 -- 
 2.14.2
