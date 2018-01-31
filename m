@@ -1,7 +1,7 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 19/28] KVM: arm/arm64: Only clean the dcache on translation fault
-Date: Wed, 31 Jan 2018 10:34:58 +0100
-Message-ID: <20180131093507.22219-20-christoffer.dall@linaro.org>
+Subject: [PULL 20/28] KVM: arm/arm64: Preserve Exec permission across R/W permission faults
+Date: Wed, 31 Jan 2018 10:34:59 +0100
+Message-ID: <20180131093507.22219-21-christoffer.dall@linaro.org>
 References: <20180131093507.22219-1-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20180131093507.22219-1-christoffer.dall@linaro.org>
@@ -12,43 +12,135 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Marc Zyngier <marc.zyngier@arm.com>
 
-The only case where we actually need to perform a dcache maintenance
-is when we map the page for the first time, and subsequent permission
-faults do not require cache maintenance. Let's make it conditional
-on not being a permission fault (and thus a translation fault).
+So far, we loose the Exec property whenever we take permission
+faults, as we always reconstruct the PTE/PMD from scratch. This
+can be counter productive as we can end-up with the following
+fault sequence:
+
+	X -> RO -> ROX -> RW -> RWX
+
+Instead, we can lookup the existing PTE/PMD and clear the XN bit in the
+new entry if it was already cleared in the old one, leadig to a much
+nicer fault sequence:
+
+	X -> ROX -> RWX
 
 Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/mmu.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ arch/arm/include/asm/kvm_mmu.h   | 10 ++++++++++
+ arch/arm64/include/asm/kvm_mmu.h | 10 ++++++++++
+ virt/kvm/arm/mmu.c               | 27 +++++++++++++++++++++++++++
+ 3 files changed, 47 insertions(+)
 
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index 4d7a54cbb3ab..aab64fe52146 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -107,6 +107,11 @@ static inline bool kvm_s2pte_readonly(pte_t *pte)
+ 	return (pte_val(*pte) & L_PTE_S2_RDWR) == L_PTE_S2_RDONLY;
+ }
+ 
++static inline bool kvm_s2pte_exec(pte_t *pte)
++{
++	return !(pte_val(*pte) & L_PTE_XN);
++}
++
+ static inline void kvm_set_s2pmd_readonly(pmd_t *pmd)
+ {
+ 	pmd_val(*pmd) = (pmd_val(*pmd) & ~L_PMD_S2_RDWR) | L_PMD_S2_RDONLY;
+@@ -117,6 +122,11 @@ static inline bool kvm_s2pmd_readonly(pmd_t *pmd)
+ 	return (pmd_val(*pmd) & L_PMD_S2_RDWR) == L_PMD_S2_RDONLY;
+ }
+ 
++static inline bool kvm_s2pmd_exec(pmd_t *pmd)
++{
++	return !(pmd_val(*pmd) & PMD_SECT_XN);
++}
++
+ static inline bool kvm_page_empty(void *ptr)
+ {
+ 	struct page *ptr_page = virt_to_page(ptr);
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 1e1b20cb348f..126abefffe7f 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -203,6 +203,11 @@ static inline bool kvm_s2pte_readonly(pte_t *pte)
+ 	return (pte_val(*pte) & PTE_S2_RDWR) == PTE_S2_RDONLY;
+ }
+ 
++static inline bool kvm_s2pte_exec(pte_t *pte)
++{
++	return !(pte_val(*pte) & PTE_S2_XN);
++}
++
+ static inline void kvm_set_s2pmd_readonly(pmd_t *pmd)
+ {
+ 	kvm_set_s2pte_readonly((pte_t *)pmd);
+@@ -213,6 +218,11 @@ static inline bool kvm_s2pmd_readonly(pmd_t *pmd)
+ 	return kvm_s2pte_readonly((pte_t *)pmd);
+ }
+ 
++static inline bool kvm_s2pmd_exec(pmd_t *pmd)
++{
++	return !(pmd_val(*pmd) & PMD_S2_XN);
++}
++
+ static inline bool kvm_page_empty(void *ptr)
+ {
+ 	struct page *ptr_page = virt_to_page(ptr);
 diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 0417c8e2a81c..f956efbd933d 100644
+index f956efbd933d..b83b5a8442bb 100644
 --- a/virt/kvm/arm/mmu.c
 +++ b/virt/kvm/arm/mmu.c
-@@ -1400,7 +1400,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 			new_pmd = kvm_s2pmd_mkwrite(new_pmd);
- 			kvm_set_pfn_dirty(pfn);
- 		}
--		clean_dcache_guest_page(vcpu, pfn, PMD_SIZE);
-+
-+		if (fault_status != FSC_PERM)
-+			clean_dcache_guest_page(vcpu, pfn, PMD_SIZE);
+@@ -926,6 +926,25 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
+ 	return 0;
+ }
  
++static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr)
++{
++	pmd_t *pmdp;
++	pte_t *ptep;
++
++	pmdp = stage2_get_pmd(kvm, NULL, addr);
++	if (!pmdp || pmd_none(*pmdp) || !pmd_present(*pmdp))
++		return false;
++
++	if (pmd_thp_or_huge(*pmdp))
++		return kvm_s2pmd_exec(pmdp);
++
++	ptep = pte_offset_kernel(pmdp, addr);
++	if (!ptep || pte_none(*ptep) || !pte_present(*ptep))
++		return false;
++
++	return kvm_s2pte_exec(ptep);
++}
++
+ static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
+ 			  phys_addr_t addr, const pte_t *new_pte,
+ 			  unsigned long flags)
+@@ -1407,6 +1426,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
  		if (exec_fault) {
  			new_pmd = kvm_s2pmd_mkexec(new_pmd);
-@@ -1416,7 +1418,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 			kvm_set_pfn_dirty(pfn);
- 			mark_page_dirty(kvm, gfn);
+ 			invalidate_icache_guest_page(vcpu, pfn, PMD_SIZE);
++		} else if (fault_status == FSC_PERM) {
++			/* Preserve execute if XN was already cleared */
++			if (stage2_is_exec(kvm, fault_ipa))
++				new_pmd = kvm_s2pmd_mkexec(new_pmd);
  		}
--		clean_dcache_guest_page(vcpu, pfn, PAGE_SIZE);
-+
-+		if (fault_status != FSC_PERM)
-+			clean_dcache_guest_page(vcpu, pfn, PAGE_SIZE);
  
+ 		ret = stage2_set_pmd_huge(kvm, memcache, fault_ipa, &new_pmd);
+@@ -1425,6 +1448,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
  		if (exec_fault) {
  			new_pte = kvm_s2pte_mkexec(new_pte);
+ 			invalidate_icache_guest_page(vcpu, pfn, PAGE_SIZE);
++		} else if (fault_status == FSC_PERM) {
++			/* Preserve execute if XN was already cleared */
++			if (stage2_is_exec(kvm, fault_ipa))
++				new_pte = kvm_s2pte_mkexec(new_pte);
+ 		}
+ 
+ 		ret = stage2_set_pte(kvm, memcache, fault_ipa, &new_pte, flags);
 -- 
 2.14.2
