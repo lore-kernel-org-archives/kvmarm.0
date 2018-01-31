@@ -1,146 +1,51 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 20/28] KVM: arm/arm64: Preserve Exec permission across R/W permission faults
-Date: Wed, 31 Jan 2018 10:34:59 +0100
-Message-ID: <20180131093507.22219-21-christoffer.dall@linaro.org>
+Subject: [PULL 24/28] KVM: arm/arm64: Handle CPU_PM_ENTER_FAILED
+Date: Wed, 31 Jan 2018 10:35:03 +0100
+Message-ID: <20180131093507.22219-25-christoffer.dall@linaro.org>
 References: <20180131093507.22219-1-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20180131093507.22219-1-christoffer.dall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, James Morse <james.morse@arm.com>, stable@vger.kernel.org, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Marc Zyngier <marc.zyngier@arm.com>
+From: James Morse <james.morse@arm.com>
 
-So far, we loose the Exec property whenever we take permission
-faults, as we always reconstruct the PTE/PMD from scratch. This
-can be counter productive as we can end-up with the following
-fault sequence:
+cpu_pm_enter() calls the pm notifier chain with CPU_PM_ENTER, then if
+there is a failure: CPU_PM_ENTER_FAILED.
 
-	X -> RO -> ROX -> RW -> RWX
+When KVM receives CPU_PM_ENTER it calls cpu_hyp_reset() which will
+return us to the hyp-stub. If we subsequently get a CPU_PM_ENTER_FAILED,
+KVM does nothing, leaving the CPU running with the hyp-stub, at odds
+with kvm_arm_hardware_enabled.
 
-Instead, we can lookup the existing PTE/PMD and clear the XN bit in the
-new entry if it was already cleared in the old one, leadig to a much
-nicer fault sequence:
+Add CPU_PM_ENTER_FAILED as a fallthrough for CPU_PM_EXIT, this reloads
+KVM based on kvm_arm_hardware_enabled. This is safe even if CPU_PM_ENTER
+never gets as far as KVM, as cpu_hyp_reinit() calls cpu_hyp_reset()
+to make sure the hyp-stub is loaded before reloading KVM.
 
-	X -> ROX -> RWX
-
+Fixes: 67f691976662 ("arm64: kvm: allows kvm cpu hotplug")
+Cc: <stable@vger.kernel.org> # v4.7+
+CC: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
 Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: James Morse <james.morse@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm/include/asm/kvm_mmu.h   | 10 ++++++++++
- arch/arm64/include/asm/kvm_mmu.h | 10 ++++++++++
- virt/kvm/arm/mmu.c               | 27 +++++++++++++++++++++++++++
- 3 files changed, 47 insertions(+)
+ virt/kvm/arm/arm.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index 4d7a54cbb3ab..aab64fe52146 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -107,6 +107,11 @@ static inline bool kvm_s2pte_readonly(pte_t *pte)
- 	return (pte_val(*pte) & L_PTE_S2_RDWR) == L_PTE_S2_RDONLY;
- }
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 59d8e04c19fa..639dca0c0560 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -1262,6 +1262,7 @@ static int hyp_init_cpu_pm_notifier(struct notifier_block *self,
+ 			cpu_hyp_reset();
  
-+static inline bool kvm_s2pte_exec(pte_t *pte)
-+{
-+	return !(pte_val(*pte) & L_PTE_XN);
-+}
-+
- static inline void kvm_set_s2pmd_readonly(pmd_t *pmd)
- {
- 	pmd_val(*pmd) = (pmd_val(*pmd) & ~L_PMD_S2_RDWR) | L_PMD_S2_RDONLY;
-@@ -117,6 +122,11 @@ static inline bool kvm_s2pmd_readonly(pmd_t *pmd)
- 	return (pmd_val(*pmd) & L_PMD_S2_RDWR) == L_PMD_S2_RDONLY;
- }
- 
-+static inline bool kvm_s2pmd_exec(pmd_t *pmd)
-+{
-+	return !(pmd_val(*pmd) & PMD_SECT_XN);
-+}
-+
- static inline bool kvm_page_empty(void *ptr)
- {
- 	struct page *ptr_page = virt_to_page(ptr);
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 1e1b20cb348f..126abefffe7f 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -203,6 +203,11 @@ static inline bool kvm_s2pte_readonly(pte_t *pte)
- 	return (pte_val(*pte) & PTE_S2_RDWR) == PTE_S2_RDONLY;
- }
- 
-+static inline bool kvm_s2pte_exec(pte_t *pte)
-+{
-+	return !(pte_val(*pte) & PTE_S2_XN);
-+}
-+
- static inline void kvm_set_s2pmd_readonly(pmd_t *pmd)
- {
- 	kvm_set_s2pte_readonly((pte_t *)pmd);
-@@ -213,6 +218,11 @@ static inline bool kvm_s2pmd_readonly(pmd_t *pmd)
- 	return kvm_s2pte_readonly((pte_t *)pmd);
- }
- 
-+static inline bool kvm_s2pmd_exec(pmd_t *pmd)
-+{
-+	return !(pmd_val(*pmd) & PMD_S2_XN);
-+}
-+
- static inline bool kvm_page_empty(void *ptr)
- {
- 	struct page *ptr_page = virt_to_page(ptr);
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index f956efbd933d..b83b5a8442bb 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -926,6 +926,25 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
- 	return 0;
- }
- 
-+static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr)
-+{
-+	pmd_t *pmdp;
-+	pte_t *ptep;
-+
-+	pmdp = stage2_get_pmd(kvm, NULL, addr);
-+	if (!pmdp || pmd_none(*pmdp) || !pmd_present(*pmdp))
-+		return false;
-+
-+	if (pmd_thp_or_huge(*pmdp))
-+		return kvm_s2pmd_exec(pmdp);
-+
-+	ptep = pte_offset_kernel(pmdp, addr);
-+	if (!ptep || pte_none(*ptep) || !pte_present(*ptep))
-+		return false;
-+
-+	return kvm_s2pte_exec(ptep);
-+}
-+
- static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
- 			  phys_addr_t addr, const pte_t *new_pte,
- 			  unsigned long flags)
-@@ -1407,6 +1426,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		if (exec_fault) {
- 			new_pmd = kvm_s2pmd_mkexec(new_pmd);
- 			invalidate_icache_guest_page(vcpu, pfn, PMD_SIZE);
-+		} else if (fault_status == FSC_PERM) {
-+			/* Preserve execute if XN was already cleared */
-+			if (stage2_is_exec(kvm, fault_ipa))
-+				new_pmd = kvm_s2pmd_mkexec(new_pmd);
- 		}
- 
- 		ret = stage2_set_pmd_huge(kvm, memcache, fault_ipa, &new_pmd);
-@@ -1425,6 +1448,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		if (exec_fault) {
- 			new_pte = kvm_s2pte_mkexec(new_pte);
- 			invalidate_icache_guest_page(vcpu, pfn, PAGE_SIZE);
-+		} else if (fault_status == FSC_PERM) {
-+			/* Preserve execute if XN was already cleared */
-+			if (stage2_is_exec(kvm, fault_ipa))
-+				new_pte = kvm_s2pte_mkexec(new_pte);
- 		}
- 
- 		ret = stage2_set_pte(kvm, memcache, fault_ipa, &new_pte, flags);
+ 		return NOTIFY_OK;
++	case CPU_PM_ENTER_FAILED:
+ 	case CPU_PM_EXIT:
+ 		if (__this_cpu_read(kvm_arm_hardware_enabled))
+ 			/* The hardware was enabled before suspend. */
 -- 
 2.14.2
