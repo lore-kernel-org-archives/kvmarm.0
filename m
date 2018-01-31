@@ -1,156 +1,130 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 23/28] arm64: mm: Add additional parameter to uaccess_ttbr0_disable
-Date: Wed, 31 Jan 2018 10:35:02 +0100
-Message-ID: <20180131093507.22219-24-christoffer.dall@linaro.org>
+Subject: [PULL 26/28] KVM: arm/arm64: Fix incorrect timer_is_pending logic
+Date: Wed, 31 Jan 2018 10:35:05 +0100
+Message-ID: <20180131093507.22219-27-christoffer.dall@linaro.org>
 References: <20180131093507.22219-1-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20180131093507.22219-1-christoffer.dall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Will Deacon <will.deacon@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add an extra temporary register parameter to uaccess_ttbr0_disable which
-is about to be required for arm64 PAN support.
+After the recently introduced support for level-triggered mapped
+interrupt, I accidentally left the VCPU thread busily going back and
+forward between the guest and the hypervisor whenever the guest was
+blocking, because I would always incorrectly report that a timer
+interrupt was pending.
 
-This patch doesn't introduce any functional change but ensures that the
-kernel compiles once the KVM/ARM tree is merged with the arm64 tree by
-ensuring a trivially mergable conflict with commit
-6b88a32c7af68895134872cdec3b6bfdb532d94e
-("arm64: kpti: Fix the interaction between ASID switching and software PAN").
+This is because the timer->irq.level field is not valid for mapped
+interrupts, where we offload the level state to the hardware, and as a
+result this field is always true.
 
-Cc: Will Deacon <will.deacon@arm.com>
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Luckily the problem can be relatively easily solved by not checking the
+cached signal state of either timer in kvm_timer_should_fire() but
+instead compute the timer state on the fly, which we do already if the
+cached signal state wasn't high.  In fact, the only reason for checking
+the cached signal state was a tiny optimization which would only be
+potentially faster when the polling loop detects a pending timer
+interrupt, which is quite unlikely.
+
+Instead of duplicating the logic from kvm_arch_timer_handler(), we
+enlighten kvm_timer_should_fire() to report something valid when the
+timer state is loaded onto the hardware.  We can then call this from
+kvm_arch_timer_handler() as well and avoid the call to
+__timer_snapshot_state() in kvm_arch_timer_get_input_level().
+
+Reported-by: Tomasz Nowicki <tn@semihalf.com>
+Tested-by: Tomasz Nowicki <tn@semihalf.com>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/include/asm/asm-uaccess.h | 8 ++++----
- arch/arm64/lib/clear_user.S          | 2 +-
- arch/arm64/lib/copy_from_user.S      | 2 +-
- arch/arm64/lib/copy_in_user.S        | 2 +-
- arch/arm64/lib/copy_to_user.S        | 2 +-
- arch/arm64/mm/cache.S                | 4 ++--
- arch/arm64/xen/hypercall.S           | 2 +-
- 7 files changed, 11 insertions(+), 11 deletions(-)
+ virt/kvm/arm/arch_timer.c | 36 +++++++++++++++++-------------------
+ 1 file changed, 17 insertions(+), 19 deletions(-)
 
-diff --git a/arch/arm64/include/asm/asm-uaccess.h b/arch/arm64/include/asm/asm-uaccess.h
-index b67563d2024c..03064261ee0b 100644
---- a/arch/arm64/include/asm/asm-uaccess.h
-+++ b/arch/arm64/include/asm/asm-uaccess.h
-@@ -25,7 +25,7 @@
- 	isb
- 	.endm
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index cfcd0323deab..63cf828f3c4f 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -97,10 +97,9 @@ static irqreturn_t kvm_arch_timer_handler(int irq, void *dev_id)
+ 		pr_warn_once("Spurious arch timer IRQ on non-VCPU thread\n");
+ 		return IRQ_NONE;
+ 	}
+-	vtimer = vcpu_vtimer(vcpu);
  
--	.macro	uaccess_ttbr0_disable, tmp1
-+	.macro	uaccess_ttbr0_disable, tmp1, tmp2
- alternative_if_not ARM64_HAS_PAN
- 	__uaccess_ttbr0_disable \tmp1
- alternative_else_nop_endif
-@@ -39,7 +39,7 @@ alternative_if_not ARM64_HAS_PAN
- alternative_else_nop_endif
- 	.endm
- #else
--	.macro	uaccess_ttbr0_disable, tmp1
-+	.macro	uaccess_ttbr0_disable, tmp1, tmp2
- 	.endm
+-	vtimer->cnt_ctl = read_sysreg_el0(cntv_ctl);
+-	if (kvm_timer_irq_can_fire(vtimer))
++	vtimer = vcpu_vtimer(vcpu);
++	if (kvm_timer_should_fire(vtimer))
+ 		kvm_timer_update_irq(vcpu, true, vtimer);
  
- 	.macro	uaccess_ttbr0_enable, tmp1, tmp2, tmp3
-@@ -49,8 +49,8 @@ alternative_else_nop_endif
- /*
-  * These macros are no-ops when UAO is present.
-  */
--	.macro	uaccess_disable_not_uao, tmp1
--	uaccess_ttbr0_disable \tmp1
-+	.macro	uaccess_disable_not_uao, tmp1, tmp2
-+	uaccess_ttbr0_disable \tmp1, \tmp2
- alternative_if ARM64_ALT_PAN_NOT_UAO
- 	SET_PSTATE_PAN(1)
- alternative_else_nop_endif
-diff --git a/arch/arm64/lib/clear_user.S b/arch/arm64/lib/clear_user.S
-index e88fb99c1561..8932e5f7a6f3 100644
---- a/arch/arm64/lib/clear_user.S
-+++ b/arch/arm64/lib/clear_user.S
-@@ -50,7 +50,7 @@ uao_user_alternative 9f, strh, sttrh, wzr, x0, 2
- 	b.mi	5f
- uao_user_alternative 9f, strb, sttrb, wzr, x0, 0
- 5:	mov	x0, #0
--	uaccess_disable_not_uao x2
-+	uaccess_disable_not_uao x2, x3
- 	ret
- ENDPROC(__clear_user)
+ 	if (static_branch_unlikely(&userspace_irqchip_in_use) &&
+@@ -230,6 +229,16 @@ static bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
+ {
+ 	u64 cval, now;
  
-diff --git a/arch/arm64/lib/copy_from_user.S b/arch/arm64/lib/copy_from_user.S
-index 4b5d826895ff..bc108634992c 100644
---- a/arch/arm64/lib/copy_from_user.S
-+++ b/arch/arm64/lib/copy_from_user.S
-@@ -67,7 +67,7 @@ ENTRY(__arch_copy_from_user)
- 	uaccess_enable_not_uao x3, x4
- 	add	end, x0, x2
- #include "copy_template.S"
--	uaccess_disable_not_uao x3
-+	uaccess_disable_not_uao x3, x4
- 	mov	x0, #0				// Nothing to copy
- 	ret
- ENDPROC(__arch_copy_from_user)
-diff --git a/arch/arm64/lib/copy_in_user.S b/arch/arm64/lib/copy_in_user.S
-index b24a830419ad..e6dd59dd4053 100644
---- a/arch/arm64/lib/copy_in_user.S
-+++ b/arch/arm64/lib/copy_in_user.S
-@@ -68,7 +68,7 @@ ENTRY(raw_copy_in_user)
- 	uaccess_enable_not_uao x3, x4
- 	add	end, x0, x2
- #include "copy_template.S"
--	uaccess_disable_not_uao x3
-+	uaccess_disable_not_uao x3, x4
- 	mov	x0, #0
- 	ret
- ENDPROC(raw_copy_in_user)
-diff --git a/arch/arm64/lib/copy_to_user.S b/arch/arm64/lib/copy_to_user.S
-index 351f0766f7a6..bd20f9f7dd84 100644
---- a/arch/arm64/lib/copy_to_user.S
-+++ b/arch/arm64/lib/copy_to_user.S
-@@ -66,7 +66,7 @@ ENTRY(__arch_copy_to_user)
- 	uaccess_enable_not_uao x3, x4
- 	add	end, x0, x2
- #include "copy_template.S"
--	uaccess_disable_not_uao x3
-+	uaccess_disable_not_uao x3, x4
- 	mov	x0, #0
- 	ret
- ENDPROC(__arch_copy_to_user)
-diff --git a/arch/arm64/mm/cache.S b/arch/arm64/mm/cache.S
-index 5a52811f47e9..758bde7e2fa6 100644
---- a/arch/arm64/mm/cache.S
-+++ b/arch/arm64/mm/cache.S
-@@ -63,7 +63,7 @@ user_alt 9f, "dc cvau, x4",  "dc civac, x4",  ARM64_WORKAROUND_CLEAN_CACHE
- 	invalidate_icache_by_line x0, x1, x2, x3, 9f
- 	mov	x0, #0
- 1:
--	uaccess_ttbr0_disable x1
-+	uaccess_ttbr0_disable x1, x2
- 	ret
- 9:
- 	mov	x0, #-EFAULT
-@@ -85,7 +85,7 @@ ENTRY(invalidate_icache_range)
- 	invalidate_icache_by_line x0, x1, x2, x3, 2f
- 	mov	x0, xzr
- 1:
--	uaccess_ttbr0_disable x1
-+	uaccess_ttbr0_disable x1, x2
- 	ret
- 2:
- 	mov	x0, #-EFAULT
-diff --git a/arch/arm64/xen/hypercall.S b/arch/arm64/xen/hypercall.S
-index acdbd2c9e899..c5f05c4a4d00 100644
---- a/arch/arm64/xen/hypercall.S
-+++ b/arch/arm64/xen/hypercall.S
-@@ -107,6 +107,6 @@ ENTRY(privcmd_call)
- 	/*
- 	 * Disable userspace access from kernel once the hyp call completed.
- 	 */
--	uaccess_ttbr0_disable x6
-+	uaccess_ttbr0_disable x6, x7
- 	ret
- ENDPROC(privcmd_call);
++	if (timer_ctx->loaded) {
++		u32 cnt_ctl;
++
++		/* Only the virtual timer can be loaded so far */
++		cnt_ctl = read_sysreg_el0(cntv_ctl);
++		return  (cnt_ctl & ARCH_TIMER_CTRL_ENABLE) &&
++		        (cnt_ctl & ARCH_TIMER_CTRL_IT_STAT) &&
++		       !(cnt_ctl & ARCH_TIMER_CTRL_IT_MASK);
++	}
++
+ 	if (!kvm_timer_irq_can_fire(timer_ctx))
+ 		return false;
+ 
+@@ -244,15 +253,7 @@ bool kvm_timer_is_pending(struct kvm_vcpu *vcpu)
+ 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+ 	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+ 
+-	if (vtimer->irq.level || ptimer->irq.level)
+-		return true;
+-
+-	/*
+-	 * When this is called from withing the wait loop of kvm_vcpu_block(),
+-	 * the software view of the timer state is up to date (timer->loaded
+-	 * is false), and so we can simply check if the timer should fire now.
+-	 */
+-	if (!vtimer->loaded && kvm_timer_should_fire(vtimer))
++	if (kvm_timer_should_fire(vtimer))
+ 		return true;
+ 
+ 	return kvm_timer_should_fire(ptimer);
+@@ -270,9 +271,9 @@ void kvm_timer_update_run(struct kvm_vcpu *vcpu)
+ 	/* Populate the device bitmap with the timer states */
+ 	regs->device_irq_level &= ~(KVM_ARM_DEV_EL1_VTIMER |
+ 				    KVM_ARM_DEV_EL1_PTIMER);
+-	if (vtimer->irq.level)
++	if (kvm_timer_should_fire(vtimer))
+ 		regs->device_irq_level |= KVM_ARM_DEV_EL1_VTIMER;
+-	if (ptimer->irq.level)
++	if (kvm_timer_should_fire(ptimer))
+ 		regs->device_irq_level |= KVM_ARM_DEV_EL1_PTIMER;
+ }
+ 
+@@ -507,8 +508,8 @@ bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu)
+ 	vlevel = sregs->device_irq_level & KVM_ARM_DEV_EL1_VTIMER;
+ 	plevel = sregs->device_irq_level & KVM_ARM_DEV_EL1_PTIMER;
+ 
+-	return vtimer->irq.level != vlevel ||
+-	       ptimer->irq.level != plevel;
++	return kvm_timer_should_fire(vtimer) != vlevel ||
++	       kvm_timer_should_fire(ptimer) != plevel;
+ }
+ 
+ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
+@@ -801,9 +802,6 @@ bool kvm_arch_timer_get_input_level(int vintid)
+ 	else
+ 		BUG(); /* We only map the vtimer so far */
+ 
+-	if (timer->loaded)
+-		__timer_snapshot_state(timer);
+-
+ 	return kvm_timer_should_fire(timer);
+ }
+ 
 -- 
 2.14.2
