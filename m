@@ -1,38 +1,49 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 25/28] KVM: arm/arm64: Fix trailing semicolon
-Date: Wed, 31 Jan 2018 10:35:04 +0100
-Message-ID: <20180131093507.22219-26-christoffer.dall@linaro.org>
+Subject: [PULL 27/28] KVM: arm/arm64: Fix userspace_irqchip_in_use counting
+Date: Wed, 31 Jan 2018 10:35:06 +0100
+Message-ID: <20180131093507.22219-28-christoffer.dall@linaro.org>
 References: <20180131093507.22219-1-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20180131093507.22219-1-christoffer.dall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Luis de Bethencourt <luisbg@kernel.org>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Luis de Bethencourt <luisbg@kernel.org>
+We were not decrementing the static key count in the right location.
+kvm_arch_vcpu_destroy() is only called to clean up after a failed
+VCPU create attempt, whereas kvm_arch_vcpu_free() is called on teardown
+of the VM as well.  Move the static key decrement call to
+kvm_arch_vcpu_free().
 
-The trailing semicolon is an empty statement that does no operation.
-Removing it since it doesn't do anything.
-
-Signed-off-by: Luis de Bethencourt <luisbg@kernel.org>
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm/include/asm/kvm_emulate.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ virt/kvm/arm/arm.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
-index 3d22eb87f919..9003bd19cb70 100644
---- a/arch/arm/include/asm/kvm_emulate.h
-+++ b/arch/arm/include/asm/kvm_emulate.h
-@@ -131,7 +131,7 @@ static inline bool mode_has_spsr(struct kvm_vcpu *vcpu)
- static inline bool vcpu_mode_priv(struct kvm_vcpu *vcpu)
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 639dca0c0560..04ee7a327870 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -295,6 +295,9 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
+ 
+ void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu)
  {
- 	unsigned long cpsr_mode = vcpu->arch.ctxt.gp_regs.usr_regs.ARM_cpsr & MODE_MASK;
--	return cpsr_mode > USR_MODE;;
-+	return cpsr_mode > USR_MODE;
++	if (vcpu->arch.has_run_once && unlikely(!irqchip_in_kernel(vcpu->kvm)))
++		static_branch_dec(&userspace_irqchip_in_use);
++
+ 	kvm_mmu_free_memory_caches(vcpu);
+ 	kvm_timer_vcpu_terminate(vcpu);
+ 	kvm_pmu_vcpu_destroy(vcpu);
+@@ -304,8 +307,6 @@ void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu)
+ 
+ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+ {
+-	if (vcpu->arch.has_run_once && unlikely(!irqchip_in_kernel(vcpu->kvm)))
+-		static_branch_dec(&userspace_irqchip_in_use);
+ 	kvm_arch_vcpu_free(vcpu);
  }
  
- static inline u32 kvm_vcpu_get_hsr(const struct kvm_vcpu *vcpu)
 -- 
 2.14.2
