@@ -1,131 +1,136 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 01/28] arm64: KVM: Hide PMU from guests when disabled
-Date: Wed, 31 Jan 2018 10:34:40 +0100
-Message-ID: <20180131093507.22219-2-christoffer.dall@linaro.org>
+Subject: [PULL 07/28] KVM: arm/arm64: Support a vgic interrupt line level sample function
+Date: Wed, 31 Jan 2018 10:34:46 +0100
+Message-ID: <20180131093507.22219-8-christoffer.dall@linaro.org>
 References: <20180131093507.22219-1-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20180131093507.22219-1-christoffer.dall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Andrew Jones <drjones@redhat.com>
+The GIC sometimes need to sample the physical line of a mapped
+interrupt.  As we know this to be notoriously slow, provide a callback
+function for devices (such as the timer) which can do this much faster
+than talking to the distributor, for example by comparing a few
+in-memory values.  Fall back to the good old method of poking the
+physical GIC if no callback is provided.
 
-Since commit 93390c0a1b20 ("arm64: KVM: Hide unsupported AArch64 CPU
-features from guests") we can hide cpu features from guests. Apply
-this to a long standing issue where guests see a PMU available, but
-it's not, because it was not enabled by KVM's userspace.
-
-Signed-off-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/kvm/sys_regs.c | 35 +++++++++++++++++++++--------------
- 1 file changed, 21 insertions(+), 14 deletions(-)
+ include/kvm/arm_vgic.h    | 13 ++++++++++++-
+ virt/kvm/arm/arch_timer.c |  3 ++-
+ virt/kvm/arm/vgic/vgic.c  | 13 +++++++++----
+ 3 files changed, 23 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 1830ebc227d1..503144f13af0 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -881,18 +881,25 @@ static bool access_cntp_cval(struct kvm_vcpu *vcpu,
- }
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 8c896540a72c..cdbd142ca7f2 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -130,6 +130,17 @@ struct vgic_irq {
+ 	u8 priority;
+ 	enum vgic_irq_config config;	/* Level or edge */
  
- /* Read a sanitised cpufeature ID register by sys_reg_desc */
--static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
-+static u64 read_id_reg(struct kvm_vcpu *vcpu,
-+		       struct sys_reg_desc const *r,
-+		       bool raz)
- {
- 	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
- 			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
- 	u64 val = raz ? 0 : read_sanitised_ftr_reg(id);
++	/*
++	 * Callback function pointer to in-kernel devices that can tell us the
++	 * state of the input level of mapped level-triggered IRQ faster than
++	 * peaking into the physical GIC.
++	 *
++	 * Always called in non-preemptible section and the functions can use
++	 * kvm_arm_get_running_vcpu() to get the vcpu pointer for private
++	 * IRQs.
++	 */
++	bool (*get_input_level)(int vintid);
++
+ 	void *owner;			/* Opaque pointer to reserve an interrupt
+ 					   for in-kernel devices. */
+ };
+@@ -331,7 +342,7 @@ void kvm_vgic_init_cpu_hardware(void);
+ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+ 			bool level, void *owner);
+ int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
+-			  u32 vintid);
++			  u32 vintid, bool (*get_input_level)(int vindid));
+ int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid);
+ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int vintid);
  
--	if (id == SYS_ID_AA64PFR0_EL1) {
-+	switch (id) {
-+	case SYS_ID_AA64DFR0_EL1:
-+		if (!kvm_arm_pmu_v3_ready(vcpu))
-+			val &= ~(0xfUL << ID_AA64DFR0_PMUVER_SHIFT);
-+		break;
-+	case SYS_ID_AA64PFR0_EL1:
- 		if (val & (0xfUL << ID_AA64PFR0_SVE_SHIFT))
- 			pr_err_once("kvm [%i]: SVE unsupported for guests, suppressing\n",
- 				    task_pid_nr(current));
--
- 		val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
-+		break;
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index 9376fe03bf2e..fb0533ed903d 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -834,7 +834,8 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+ 		return -EINVAL;
  	}
  
- 	return val;
-@@ -908,7 +915,7 @@ static bool __access_id_reg(struct kvm_vcpu *vcpu,
- 	if (p->is_write)
- 		return write_to_read_only(vcpu, p, r);
+-	ret = kvm_vgic_map_phys_irq(vcpu, host_vtimer_irq, vtimer->irq.irq);
++	ret = kvm_vgic_map_phys_irq(vcpu, host_vtimer_irq, vtimer->irq.irq,
++				    NULL);
+ 	if (ret)
+ 		return ret;
  
--	p->regval = read_id_reg(r, raz);
-+	p->regval = read_id_reg(vcpu, r, raz);
- 	return true;
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 4318e9edd075..d57b3bf8eb36 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -144,13 +144,15 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
+ 	kfree(irq);
  }
  
-@@ -937,17 +944,17 @@ static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
-  * are stored, and for set_id_reg() we don't allow the effective value
-  * to be changed.
-  */
--static int __get_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
--			bool raz)
-+static int __get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-+			void __user *uaddr, bool raz)
+-/* Get the input level of a mapped IRQ directly from the physical GIC */
+ bool vgic_get_phys_line_level(struct vgic_irq *irq)
  {
- 	const u64 id = sys_reg_to_index(rd);
--	const u64 val = read_id_reg(rd, raz);
-+	const u64 val = read_id_reg(vcpu, rd, raz);
+ 	bool line_level;
  
- 	return reg_to_user(uaddr, &val, id);
- }
+ 	BUG_ON(!irq->hw);
  
--static int __set_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
--			bool raz)
-+static int __set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-+			void __user *uaddr, bool raz)
++	if (irq->get_input_level)
++		return irq->get_input_level(irq->intid);
++
+ 	WARN_ON(irq_get_irqchip_state(irq->host_irq,
+ 				      IRQCHIP_STATE_PENDING,
+ 				      &line_level));
+@@ -436,7 +438,8 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+ 
+ /* @irq->irq_lock must be held */
+ static int kvm_vgic_map_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+-			    unsigned int host_irq)
++			    unsigned int host_irq,
++			    bool (*get_input_level)(int vindid))
  {
- 	const u64 id = sys_reg_to_index(rd);
- 	int err;
-@@ -958,7 +965,7 @@ static int __set_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
- 		return err;
- 
- 	/* This is what we mean by invariant: you can't change it. */
--	if (val != read_id_reg(rd, raz))
-+	if (val != read_id_reg(vcpu, rd, raz))
- 		return -EINVAL;
- 
+ 	struct irq_desc *desc;
+ 	struct irq_data *data;
+@@ -456,6 +459,7 @@ static int kvm_vgic_map_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+ 	irq->hw = true;
+ 	irq->host_irq = host_irq;
+ 	irq->hwintid = data->hwirq;
++	irq->get_input_level = get_input_level;
  	return 0;
-@@ -967,25 +974,25 @@ static int __set_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
- static int get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 		      const struct kvm_one_reg *reg, void __user *uaddr)
- {
--	return __get_id_reg(rd, uaddr, false);
-+	return __get_id_reg(vcpu, rd, uaddr, false);
  }
  
- static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 		      const struct kvm_one_reg *reg, void __user *uaddr)
+@@ -464,10 +468,11 @@ static inline void kvm_vgic_unmap_irq(struct vgic_irq *irq)
  {
--	return __set_id_reg(rd, uaddr, false);
-+	return __set_id_reg(vcpu, rd, uaddr, false);
+ 	irq->hw = false;
+ 	irq->hwintid = 0;
++	irq->get_input_level = NULL;
  }
  
- static int get_raz_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 			  const struct kvm_one_reg *reg, void __user *uaddr)
+ int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
+-			  u32 vintid)
++			  u32 vintid, bool (*get_input_level)(int vindid))
  {
--	return __get_id_reg(rd, uaddr, true);
-+	return __get_id_reg(vcpu, rd, uaddr, true);
- }
+ 	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
+ 	unsigned long flags;
+@@ -476,7 +481,7 @@ int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
+ 	BUG_ON(!irq);
  
- static int set_raz_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 			  const struct kvm_one_reg *reg, void __user *uaddr)
- {
--	return __set_id_reg(rd, uaddr, true);
-+	return __set_id_reg(vcpu, rd, uaddr, true);
- }
+ 	spin_lock_irqsave(&irq->irq_lock, flags);
+-	ret = kvm_vgic_map_irq(vcpu, irq, host_irq);
++	ret = kvm_vgic_map_irq(vcpu, irq, host_irq, get_input_level);
+ 	spin_unlock_irqrestore(&irq->irq_lock, flags);
+ 	vgic_put_irq(vcpu->kvm, irq);
  
- /* sys_reg_desc initialiser for known cpufeature ID registers */
 -- 
 2.14.2
