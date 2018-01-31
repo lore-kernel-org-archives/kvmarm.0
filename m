@@ -1,21 +1,29 @@
 From: Tomasz Nowicki <tn@semihalf.com>
 Subject: Re: [PATCH v9 7/9] KVM: arm/arm64: Provide a get_input_level for the
  arch timer
-Date: Wed, 31 Jan 2018 09:32:33 +0100
-Message-ID: <eb0e23cb-2170-f429-d008-839eb050a8a6@semihalf.com>
+Date: Wed, 31 Jan 2018 09:32:26 +0100
+Message-ID: <3c84d061-3ce3-8fb3-a387-699f89b7ee0b@semihalf.com>
 References: <20171220113606.7030-1-christoffer.dall@linaro.org>
  <20171220113606.7030-8-christoffer.dall@linaro.org>
  <e55af9ff-b597-3b14-8e46-216aa20ede24@semihalf.com>
  <20180130124947.GX21802@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <20180130124947.GX21802@cbox>
 Content-Language: en-GB
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvm@vger.kernel.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi Christoffer,
