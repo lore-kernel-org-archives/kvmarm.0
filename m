@@ -1,238 +1,130 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 06/28] KVM: arm/arm64: vgic: Support level-triggered mapped
- interrupts
-Date: Wed, 31 Jan 2018 10:34:45 +0100
-Message-ID: <20180131093507.22219-7-christoffer.dall@linaro.org>
+Subject: [PULL 12/28] Revert "arm64: KVM: Hide PMU from guests when disabled"
+Date: Wed, 31 Jan 2018 10:34:51 +0100
+Message-ID: <20180131093507.22219-13-christoffer.dall@linaro.org>
 References: <20180131093507.22219-1-christoffer.dall@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20180131093507.22219-1-christoffer.dall@linaro.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Level-triggered mapped IRQs are special because we only observe rising
-edges as input to the VGIC, and we don't set the EOI flag and therefore
-are not told when the level goes down, so that we can re-queue a new
-interrupt when the level goes up.
+Commit 0c0543a128bd1c6a4c8610d0d9d869053fa2fbf5 breaks migration and
+introduces a regression with existing userspace because it introduces an
+ordering requirement of setting up all VCPU features before writing ID
+registers which we didn't have before.
 
-One way to solve this problem is to side-step the logic of the VGIC and
-special case the validation in the injection path, but it has the
-unfortunate drawback of having to peak into the physical GIC state
-whenever we want to know if the interrupt is pending on the virtual
-distributor.
+Revert this commit for now until we have a proper fix.
 
-Instead, we can maintain the current semantics of a level triggered
-interrupt by sort of treating it as an edge-triggered interrupt,
-following from the fact that we only observe an asserting edge.  This
-requires us to be a bit careful when populating the LRs and when folding
-the state back in though:
-
- * We lower the line level when populating the LR, so that when
-   subsequently observing an asserting edge, the VGIC will do the right
-   thing.
-
- * If the guest never acked the interrupt while running (for example if
-   it had masked interrupts at the CPU level while running), we have
-   to preserve the pending state of the LR and move it back to the
-   line_level field of the struct irq when folding LR state.
-
-   If the guest never acked the interrupt while running, but changed the
-   device state and lowered the line (again with interrupts masked) then
-   we need to observe this change in the line_level.
-
-   Both of the above situations are solved by sampling the physical line
-   and set the line level when folding the LR back.
-
- * Finally, if the guest never acked the interrupt while running and
-   sampling the line reveals that the device state has changed and the
-   line has been lowered, we must clear the physical active state, since
-   we will otherwise never be told when the interrupt becomes asserted
-   again.
-
-This has the added benefit of making the timer optimization patches
-(https://lists.cs.columbia.edu/pipermail/kvmarm/2017-July/026343.html) a
-bit simpler, because the timer code doesn't have to clear the active
-state on the sync anymore.  It also potentially improves the performance
-of the timer implementation because the GIC knows the state or the LR
-and only needs to clear the
-active state when the pending bit in the LR is still set, where the
-timer has to always clear it when returning from running the guest with
-an injected timer interrupt.
-
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/vgic/vgic-v2.c | 29 +++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic-v3.c | 29 +++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic.c    | 23 +++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic.h    |  7 +++++++
- 4 files changed, 88 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 35 ++++++++++++++---------------------
+ 1 file changed, 14 insertions(+), 21 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-index 80897102da26..c32d7b93ffd1 100644
---- a/virt/kvm/arm/vgic/vgic-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-v2.c
-@@ -105,6 +105,26 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
- 				irq->pending_latch = false;
- 		}
- 
-+		/*
-+		 * Level-triggered mapped IRQs are special because we only
-+		 * observe rising edges as input to the VGIC.
-+		 *
-+		 * If the guest never acked the interrupt we have to sample
-+		 * the physical line and set the line level, because the
-+		 * device state could have changed or we simply need to
-+		 * process the still pending interrupt later.
-+		 *
-+		 * If this causes us to lower the level, we have to also clear
-+		 * the physical active state, since we will otherwise never be
-+		 * told when the interrupt becomes asserted again.
-+		 */
-+		if (vgic_irq_is_mapped_level(irq) && (val & GICH_LR_PENDING_BIT)) {
-+			irq->line_level = vgic_get_phys_line_level(irq);
-+
-+			if (!irq->line_level)
-+				vgic_irq_set_phys_active(irq, false);
-+		}
-+
- 		spin_unlock_irqrestore(&irq->irq_lock, flags);
- 		vgic_put_irq(vcpu->kvm, irq);
- 	}
-@@ -162,6 +182,15 @@ void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
- 			val |= GICH_LR_EOI;
- 	}
- 
-+	/*
-+	 * Level-triggered mapped IRQs are special because we only observe
-+	 * rising edges as input to the VGIC.  We therefore lower the line
-+	 * level here, so that we can take new virtual IRQs.  See
-+	 * vgic_v2_fold_lr_state for more info.
-+	 */
-+	if (vgic_irq_is_mapped_level(irq) && (val & GICH_LR_PENDING_BIT))
-+		irq->line_level = false;
-+
- 	/* The GICv2 LR only holds five bits of priority. */
- 	val |= (irq->priority >> 3) << GICH_LR_PRIORITY_SHIFT;
- 
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index f47e8481fa45..6b329414e57a 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -96,6 +96,26 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
- 				irq->pending_latch = false;
- 		}
- 
-+		/*
-+		 * Level-triggered mapped IRQs are special because we only
-+		 * observe rising edges as input to the VGIC.
-+		 *
-+		 * If the guest never acked the interrupt we have to sample
-+		 * the physical line and set the line level, because the
-+		 * device state could have changed or we simply need to
-+		 * process the still pending interrupt later.
-+		 *
-+		 * If this causes us to lower the level, we have to also clear
-+		 * the physical active state, since we will otherwise never be
-+		 * told when the interrupt becomes asserted again.
-+		 */
-+		if (vgic_irq_is_mapped_level(irq) && (val & ICH_LR_PENDING_BIT)) {
-+			irq->line_level = vgic_get_phys_line_level(irq);
-+
-+			if (!irq->line_level)
-+				vgic_irq_set_phys_active(irq, false);
-+		}
-+
- 		spin_unlock_irqrestore(&irq->irq_lock, flags);
- 		vgic_put_irq(vcpu->kvm, irq);
- 	}
-@@ -145,6 +165,15 @@ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
- 			val |= ICH_LR_EOI;
- 	}
- 
-+	/*
-+	 * Level-triggered mapped IRQs are special because we only observe
-+	 * rising edges as input to the VGIC.  We therefore lower the line
-+	 * level here, so that we can take new virtual IRQs.  See
-+	 * vgic_v3_fold_lr_state for more info.
-+	 */
-+	if (vgic_irq_is_mapped_level(irq) && (val & ICH_LR_PENDING_BIT))
-+		irq->line_level = false;
-+
- 	/*
- 	 * We currently only support Group1 interrupts, which is a
- 	 * known defect. This needs to be addressed at some point.
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index ecb8e25f5fe5..4318e9edd075 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -144,6 +144,29 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
- 	kfree(irq);
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 503144f13af0..1830ebc227d1 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -881,25 +881,18 @@ static bool access_cntp_cval(struct kvm_vcpu *vcpu,
  }
  
-+/* Get the input level of a mapped IRQ directly from the physical GIC */
-+bool vgic_get_phys_line_level(struct vgic_irq *irq)
-+{
-+	bool line_level;
+ /* Read a sanitised cpufeature ID register by sys_reg_desc */
+-static u64 read_id_reg(struct kvm_vcpu *vcpu,
+-		       struct sys_reg_desc const *r,
+-		       bool raz)
++static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
+ {
+ 	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
+ 			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
+ 	u64 val = raz ? 0 : read_sanitised_ftr_reg(id);
+ 
+-	switch (id) {
+-	case SYS_ID_AA64DFR0_EL1:
+-		if (!kvm_arm_pmu_v3_ready(vcpu))
+-			val &= ~(0xfUL << ID_AA64DFR0_PMUVER_SHIFT);
+-		break;
+-	case SYS_ID_AA64PFR0_EL1:
++	if (id == SYS_ID_AA64PFR0_EL1) {
+ 		if (val & (0xfUL << ID_AA64PFR0_SVE_SHIFT))
+ 			pr_err_once("kvm [%i]: SVE unsupported for guests, suppressing\n",
+ 				    task_pid_nr(current));
 +
-+	BUG_ON(!irq->hw);
-+
-+	WARN_ON(irq_get_irqchip_state(irq->host_irq,
-+				      IRQCHIP_STATE_PENDING,
-+				      &line_level));
-+	return line_level;
-+}
-+
-+/* Set/Clear the physical active state */
-+void vgic_irq_set_phys_active(struct vgic_irq *irq, bool active)
-+{
-+
-+	BUG_ON(!irq->hw);
-+	WARN_ON(irq_set_irqchip_state(irq->host_irq,
-+				      IRQCHIP_STATE_ACTIVE,
-+				      active));
-+}
-+
- /**
-  * kvm_vgic_target_oracle - compute the target vcpu for an irq
-  *
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index efbcf8f96f9c..d0787983a357 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -104,6 +104,11 @@ static inline bool irq_is_pending(struct vgic_irq *irq)
- 		return irq->pending_latch || irq->line_level;
+ 		val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
+-		break;
+ 	}
+ 
+ 	return val;
+@@ -915,7 +908,7 @@ static bool __access_id_reg(struct kvm_vcpu *vcpu,
+ 	if (p->is_write)
+ 		return write_to_read_only(vcpu, p, r);
+ 
+-	p->regval = read_id_reg(vcpu, r, raz);
++	p->regval = read_id_reg(r, raz);
+ 	return true;
  }
  
-+static inline bool vgic_irq_is_mapped_level(struct vgic_irq *irq)
-+{
-+	return irq->config == VGIC_CONFIG_LEVEL && irq->hw;
-+}
-+
- /*
-  * This struct provides an intermediate representation of the fields contained
-  * in the GICH_VMCR and ICH_VMCR registers, such that code exporting the GIC
-@@ -140,6 +145,8 @@ vgic_get_mmio_region(struct kvm_vcpu *vcpu, struct vgic_io_device *iodev,
- struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
- 			      u32 intid);
- void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq);
-+bool vgic_get_phys_line_level(struct vgic_irq *irq);
-+void vgic_irq_set_phys_active(struct vgic_irq *irq, bool active);
- bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
- 			   unsigned long flags);
- void vgic_kick_vcpus(struct kvm *kvm);
+@@ -944,17 +937,17 @@ static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
+  * are stored, and for set_id_reg() we don't allow the effective value
+  * to be changed.
+  */
+-static int __get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+-			void __user *uaddr, bool raz)
++static int __get_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
++			bool raz)
+ {
+ 	const u64 id = sys_reg_to_index(rd);
+-	const u64 val = read_id_reg(vcpu, rd, raz);
++	const u64 val = read_id_reg(rd, raz);
+ 
+ 	return reg_to_user(uaddr, &val, id);
+ }
+ 
+-static int __set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+-			void __user *uaddr, bool raz)
++static int __set_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
++			bool raz)
+ {
+ 	const u64 id = sys_reg_to_index(rd);
+ 	int err;
+@@ -965,7 +958,7 @@ static int __set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 		return err;
+ 
+ 	/* This is what we mean by invariant: you can't change it. */
+-	if (val != read_id_reg(vcpu, rd, raz))
++	if (val != read_id_reg(rd, raz))
+ 		return -EINVAL;
+ 
+ 	return 0;
+@@ -974,25 +967,25 @@ static int __set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ static int get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 		      const struct kvm_one_reg *reg, void __user *uaddr)
+ {
+-	return __get_id_reg(vcpu, rd, uaddr, false);
++	return __get_id_reg(rd, uaddr, false);
+ }
+ 
+ static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 		      const struct kvm_one_reg *reg, void __user *uaddr)
+ {
+-	return __set_id_reg(vcpu, rd, uaddr, false);
++	return __set_id_reg(rd, uaddr, false);
+ }
+ 
+ static int get_raz_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 			  const struct kvm_one_reg *reg, void __user *uaddr)
+ {
+-	return __get_id_reg(vcpu, rd, uaddr, true);
++	return __get_id_reg(rd, uaddr, true);
+ }
+ 
+ static int set_raz_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 			  const struct kvm_one_reg *reg, void __user *uaddr)
+ {
+-	return __set_id_reg(vcpu, rd, uaddr, true);
++	return __set_id_reg(rd, uaddr, true);
+ }
+ 
+ /* sys_reg_desc initialiser for known cpufeature ID registers */
 -- 
 2.14.2
