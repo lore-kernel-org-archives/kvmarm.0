@@ -1,8 +1,7 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 08/28] KVM: arm/arm64: Support VGIC dist pend/active changes
- for mapped IRQs
-Date: Wed, 31 Jan 2018 10:34:47 +0100
-Message-ID: <20180131093507.22219-9-christoffer.dall@linaro.org>
+Subject: [PULL 14/28] KVM: arm/arm64: Split dcache/icache flushing
+Date: Wed, 31 Jan 2018 10:34:53 +0100
+Message-ID: <20180131093507.22219-15-christoffer.dall@linaro.org>
 References: <20180131093507.22219-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -22,211 +21,187 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-For mapped IRQs (with the HW bit set in the LR) we have to follow some
-rules of the architecture.  One of these rules is that VM must not be
-allowed to deactivate a virtual interrupt with the HW bit set unless the
-physical interrupt is also active.
+From: Marc Zyngier <marc.zyngier@arm.com>
 
-This works fine when injecting mapped interrupts, because we leave it up
-to the injector to either set EOImode==1 or manually set the active
-state of the physical interrupt.
+As we're about to introduce opportunistic invalidation of the icache,
+let's split dcache and icache flushing.
 
-However, the guest can set virtual interrupt to be pending or active by
-writing to the virtual distributor, which could lead to deactivating a
-virtual interrupt with the HW bit set without the physical interrupt
-being active.
-
-We could set the physical interrupt to active whenever we are about to
-enter the VM with a HW interrupt either pending or active, but that
-would be really slow, especially on GICv2.  So we take the long way
-around and do the hard work when needed, which is expected to be
-extremely rare.
-
-When the VM sets the pending state for a HW interrupt on the virtual
-distributor we set the active state on the physical distributor, because
-the virtual interrupt can become active and then the guest can
-deactivate it.
-
-When the VM clears the pending state we also clear it on the physical
-side, because the injector might otherwise raise the interrupt.  We also
-clear the physical active state when the virtual interrupt is not
-active, since otherwise a SPEND/CPEND sequence from the guest would
-prevent signaling of future interrupts.
-
-Changing the state of mapped interrupts from userspace is not supported,
-and it's expected that userspace unmaps devices from VFIO before
-attempting to set the interrupt state, because the interrupt state is
-driven by hardware.
-
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Acked-by: Christoffer Dall <cdall@linaro.org>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/vgic/vgic-mmio.c | 71 +++++++++++++++++++++++++++++++++++++++----
- virt/kvm/arm/vgic/vgic.c      |  7 +++++
- virt/kvm/arm/vgic/vgic.h      |  1 +
- 3 files changed, 73 insertions(+), 6 deletions(-)
+ arch/arm/include/asm/kvm_mmu.h   | 60 ++++++++++++++++++++++++++++------------
+ arch/arm64/include/asm/kvm_mmu.h | 13 +++++++--
+ virt/kvm/arm/mmu.c               | 20 ++++++++++----
+ 3 files changed, 67 insertions(+), 26 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index fdad95f62fa3..83d82bd7dc4e 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -16,6 +16,7 @@
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
- #include <kvm/iodev.h>
-+#include <kvm/arm_arch_timer.h>
- #include <kvm/arm_vgic.h>
- 
- #include "vgic.h"
-@@ -143,10 +144,22 @@ static struct kvm_vcpu *vgic_get_mmio_requester_vcpu(void)
- 	return vcpu;
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index fa6f2174276b..9fa4b2520974 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -126,21 +126,12 @@ static inline bool vcpu_has_cache_enabled(struct kvm_vcpu *vcpu)
+ 	return (vcpu_cp15(vcpu, c1_SCTLR) & 0b101) == 0b101;
  }
  
-+/* Must be called with irq->irq_lock held */
-+static void vgic_hw_irq_spending(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
-+				 bool is_uaccess)
+-static inline void __coherent_cache_guest_page(struct kvm_vcpu *vcpu,
+-					       kvm_pfn_t pfn,
+-					       unsigned long size)
++static inline void __clean_dcache_guest_page(struct kvm_vcpu *vcpu,
++					     kvm_pfn_t pfn,
++					     unsigned long size)
+ {
+ 	/*
+-	 * If we are going to insert an instruction page and the icache is
+-	 * either VIPT or PIPT, there is a potential problem where the host
+-	 * (or another VM) may have used the same page as this guest, and we
+-	 * read incorrect data from the icache.  If we're using a PIPT cache,
+-	 * we can invalidate just that page, but if we are using a VIPT cache
+-	 * we need to invalidate the entire icache - damn shame - as written
+-	 * in the ARM ARM (DDI 0406C.b - Page B3-1393).
+-	 *
+-	 * VIVT caches are tagged using both the ASID and the VMID and doesn't
+-	 * need any kind of flushing (DDI 0406C.b - Page B3-1392).
++	 * Clean the dcache to the Point of Coherency.
+ 	 *
+ 	 * We need to do this through a kernel mapping (using the
+ 	 * user-space mapping has proved to be the wrong
+@@ -155,19 +146,52 @@ static inline void __coherent_cache_guest_page(struct kvm_vcpu *vcpu,
+ 
+ 		kvm_flush_dcache_to_poc(va, PAGE_SIZE);
+ 
+-		if (icache_is_pipt())
+-			__cpuc_coherent_user_range((unsigned long)va,
+-						   (unsigned long)va + PAGE_SIZE);
+-
+ 		size -= PAGE_SIZE;
+ 		pfn++;
+ 
+ 		kunmap_atomic(va);
+ 	}
++}
+ 
+-	if (!icache_is_pipt() && !icache_is_vivt_asid_tagged()) {
++static inline void __invalidate_icache_guest_page(struct kvm_vcpu *vcpu,
++						  kvm_pfn_t pfn,
++						  unsigned long size)
 +{
-+	if (is_uaccess)
++	/*
++	 * If we are going to insert an instruction page and the icache is
++	 * either VIPT or PIPT, there is a potential problem where the host
++	 * (or another VM) may have used the same page as this guest, and we
++	 * read incorrect data from the icache.  If we're using a PIPT cache,
++	 * we can invalidate just that page, but if we are using a VIPT cache
++	 * we need to invalidate the entire icache - damn shame - as written
++	 * in the ARM ARM (DDI 0406C.b - Page B3-1393).
++	 *
++	 * VIVT caches are tagged using both the ASID and the VMID and doesn't
++	 * need any kind of flushing (DDI 0406C.b - Page B3-1392).
++	 */
++
++	VM_BUG_ON(size & ~PAGE_MASK);
++
++	if (icache_is_vivt_asid_tagged())
 +		return;
 +
-+	irq->pending_latch = true;
-+	vgic_irq_set_phys_active(irq, true);
-+}
++	if (!icache_is_pipt()) {
+ 		/* any kind of VIPT cache */
+ 		__flush_icache_all();
++		return;
++	}
 +
- void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
- 			      gpa_t addr, unsigned int len,
- 			      unsigned long val)
- {
-+	bool is_uaccess = !vgic_get_mmio_requester_vcpu();
- 	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
- 	int i;
- 	unsigned long flags;
-@@ -155,17 +168,45 @@ void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
- 		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
- 
- 		spin_lock_irqsave(&irq->irq_lock, flags);
--		irq->pending_latch = true;
--
-+		if (irq->hw)
-+			vgic_hw_irq_spending(vcpu, irq, is_uaccess);
-+		else
-+			irq->pending_latch = true;
- 		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
- 		vgic_put_irq(vcpu->kvm, irq);
++	/* PIPT cache. As for the d-side, use a temporary kernel mapping. */
++	while (size) {
++		void *va = kmap_atomic_pfn(pfn);
++
++		__cpuc_coherent_user_range((unsigned long)va,
++					   (unsigned long)va + PAGE_SIZE);
++
++		size -= PAGE_SIZE;
++		pfn++;
++
++		kunmap_atomic(va);
  	}
  }
  
-+/* Must be called with irq->irq_lock held */
-+static void vgic_hw_irq_cpending(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
-+				 bool is_uaccess)
-+{
-+	if (is_uaccess)
-+		return;
-+
-+	irq->pending_latch = false;
-+
-+	/*
-+	 * We don't want the guest to effectively mask the physical
-+	 * interrupt by doing a write to SPENDR followed by a write to
-+	 * CPENDR for HW interrupts, so we clear the active state on
-+	 * the physical side if the virtual interrupt is not active.
-+	 * This may lead to taking an additional interrupt on the
-+	 * host, but that should not be a problem as the worst that
-+	 * can happen is an additional vgic injection.  We also clear
-+	 * the pending state to maintain proper semantics for edge HW
-+	 * interrupts.
-+	 */
-+	vgic_irq_set_phys_pending(irq, false);
-+	if (!irq->active)
-+		vgic_irq_set_phys_active(irq, false);
-+}
-+
- void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
- 			      gpa_t addr, unsigned int len,
- 			      unsigned long val)
- {
-+	bool is_uaccess = !vgic_get_mmio_requester_vcpu();
- 	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
- 	int i;
- 	unsigned long flags;
-@@ -175,7 +216,10 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
- 
- 		spin_lock_irqsave(&irq->irq_lock, flags);
- 
--		irq->pending_latch = false;
-+		if (irq->hw)
-+			vgic_hw_irq_cpending(vcpu, irq, is_uaccess);
-+		else
-+			irq->pending_latch = false;
- 
- 		spin_unlock_irqrestore(&irq->irq_lock, flags);
- 		vgic_put_irq(vcpu->kvm, irq);
-@@ -202,8 +246,19 @@ unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
- 	return value;
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 672c8684d5c2..8034b96fb3a4 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -230,19 +230,26 @@ static inline bool vcpu_has_cache_enabled(struct kvm_vcpu *vcpu)
+ 	return (vcpu_sys_reg(vcpu, SCTLR_EL1) & 0b101) == 0b101;
  }
  
-+/* Must be called with irq->irq_lock held */
-+static void vgic_hw_irq_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
-+				      bool active, bool is_uaccess)
-+{
-+	if (is_uaccess)
-+		return;
-+
-+	irq->active = active;
-+	vgic_irq_set_phys_active(irq, active);
-+}
-+
- static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
--				    bool new_active_state)
-+				    bool active)
+-static inline void __coherent_cache_guest_page(struct kvm_vcpu *vcpu,
+-					       kvm_pfn_t pfn,
+-					       unsigned long size)
++static inline void __clean_dcache_guest_page(struct kvm_vcpu *vcpu,
++					     kvm_pfn_t pfn,
++					     unsigned long size)
  {
- 	unsigned long flags;
- 	struct kvm_vcpu *requester_vcpu = vgic_get_mmio_requester_vcpu();
-@@ -231,8 +286,12 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
- 	       irq->vcpu->cpu != -1) /* VCPU thread is running */
- 		cond_resched_lock(&irq->irq_lock);
+ 	void *va = page_address(pfn_to_page(pfn));
  
--	irq->active = new_active_state;
--	if (new_active_state)
-+	if (irq->hw)
-+		vgic_hw_irq_change_active(vcpu, irq, active, !requester_vcpu);
-+	else
-+		irq->active = active;
+ 	kvm_flush_dcache_to_poc(va, size);
++}
+ 
++static inline void __invalidate_icache_guest_page(struct kvm_vcpu *vcpu,
++						  kvm_pfn_t pfn,
++						  unsigned long size)
++{
+ 	if (icache_is_aliasing()) {
+ 		/* any kind of VIPT cache */
+ 		__flush_icache_all();
+ 	} else if (is_kernel_in_hyp_mode() || !icache_is_vpipt()) {
+ 		/* PIPT or VPIPT at EL2 (see comment in __kvm_tlb_flush_vmid_ipa) */
++		void *va = page_address(pfn_to_page(pfn));
 +
-+	if (irq->active)
- 		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
- 	else
- 		spin_unlock_irqrestore(&irq->irq_lock, flags);
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index d57b3bf8eb36..c7c5ef190afa 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -144,6 +144,13 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
- 	kfree(irq);
+ 		flush_icache_range((unsigned long)va,
+ 				   (unsigned long)va + size);
+ 	}
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index b36945d49986..2174244f6317 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -1257,10 +1257,16 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+ 	kvm_mmu_write_protect_pt_masked(kvm, slot, gfn_offset, mask);
  }
  
-+void vgic_irq_set_phys_pending(struct vgic_irq *irq, bool pending)
-+{
-+	WARN_ON(irq_set_irqchip_state(irq->host_irq,
-+				      IRQCHIP_STATE_PENDING,
-+				      pending));
+-static void coherent_cache_guest_page(struct kvm_vcpu *vcpu, kvm_pfn_t pfn,
+-				      unsigned long size)
++static void clean_dcache_guest_page(struct kvm_vcpu *vcpu, kvm_pfn_t pfn,
++				    unsigned long size)
+ {
+-	__coherent_cache_guest_page(vcpu, pfn, size);
++	__clean_dcache_guest_page(vcpu, pfn, size);
 +}
 +
- bool vgic_get_phys_line_level(struct vgic_irq *irq)
- {
- 	bool line_level;
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index d0787983a357..12c37b89f7a3 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -146,6 +146,7 @@ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
- 			      u32 intid);
- void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq);
- bool vgic_get_phys_line_level(struct vgic_irq *irq);
-+void vgic_irq_set_phys_pending(struct vgic_irq *irq, bool pending);
- void vgic_irq_set_phys_active(struct vgic_irq *irq, bool active);
- bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
- 			   unsigned long flags);
++static void invalidate_icache_guest_page(struct kvm_vcpu *vcpu, kvm_pfn_t pfn,
++					 unsigned long size)
++{
++	__invalidate_icache_guest_page(vcpu, pfn, size);
+ }
+ 
+ static void kvm_send_hwpoison_signal(unsigned long address,
+@@ -1391,7 +1397,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 			new_pmd = kvm_s2pmd_mkwrite(new_pmd);
+ 			kvm_set_pfn_dirty(pfn);
+ 		}
+-		coherent_cache_guest_page(vcpu, pfn, PMD_SIZE);
++		clean_dcache_guest_page(vcpu, pfn, PMD_SIZE);
++		invalidate_icache_guest_page(vcpu, pfn, PMD_SIZE);
++
+ 		ret = stage2_set_pmd_huge(kvm, memcache, fault_ipa, &new_pmd);
+ 	} else {
+ 		pte_t new_pte = pfn_pte(pfn, mem_type);
+@@ -1401,7 +1409,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 			kvm_set_pfn_dirty(pfn);
+ 			mark_page_dirty(kvm, gfn);
+ 		}
+-		coherent_cache_guest_page(vcpu, pfn, PAGE_SIZE);
++		clean_dcache_guest_page(vcpu, pfn, PAGE_SIZE);
++		invalidate_icache_guest_page(vcpu, pfn, PAGE_SIZE);
++
+ 		ret = stage2_set_pte(kvm, memcache, fault_ipa, &new_pte, flags);
+ 	}
+ 
 -- 
 2.14.2
