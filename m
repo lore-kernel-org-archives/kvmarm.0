@@ -1,40 +1,42 @@
-From: Andrew Jones <drjones@redhat.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
 Subject: Re: [PULL 01/28] arm64: KVM: Hide PMU from guests when disabled
-Date: Wed, 31 Jan 2018 11:54:31 +0100
-Message-ID: <20180131105431.fsvyaeffujzwh2lu@kamzik.brq.redhat.com>
+Date: Wed, 31 Jan 2018 12:00:14 +0100
+Message-ID: <CAMJs5B_C6m7bx13j7fJnGERTsTnpu3wEda9gsJy5_2_fzY4YeQ@mail.gmail.com>
 References: <20180131093507.22219-1-christoffer.dall@linaro.org>
- <20180131093507.22219-2-christoffer.dall@linaro.org>
+ <20180131093507.22219-2-christoffer.dall@linaro.org> <20180131105431.fsvyaeffujzwh2lu@kamzik.brq.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="UTF-8"
 Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180131093507.22219-2-christoffer.dall@linaro.org>
+In-Reply-To: <20180131105431.fsvyaeffujzwh2lu@kamzik.brq.redhat.com>
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>
+To: Andrew Jones <drjones@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jan 31, 2018 at 10:34:40AM +0100, Christoffer Dall wrote:
-> From: Andrew Jones <drjones@redhat.com>
-> 
-> Since commit 93390c0a1b20 ("arm64: KVM: Hide unsupported AArch64 CPU
-> features from guests") we can hide cpu features from guests. Apply
-> this to a long standing issue where guests see a PMU available, but
-> it's not, because it was not enabled by KVM's userspace.
-> 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> ---
->  arch/arm64/kvm/sys_regs.c | 35 +++++++++++++++++++++--------------
->  1 file changed, 21 insertions(+), 14 deletions(-)
+Hi Drew,
+
+On Wed, Jan 31, 2018 at 11:54 AM, Andrew Jones <drjones@redhat.com> wrote:
+> On Wed, Jan 31, 2018 at 10:34:40AM +0100, Christoffer Dall wrote:
+>> From: Andrew Jones <drjones@redhat.com>
+>>
+>> Since commit 93390c0a1b20 ("arm64: KVM: Hide unsupported AArch64 CPU
+>> features from guests") we can hide cpu features from guests. Apply
+>> this to a long standing issue where guests see a PMU available, but
+>> it's not, because it was not enabled by KVM's userspace.
+>>
+>> Signed-off-by: Andrew Jones <drjones@redhat.com>
+>> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+>> ---
+>>  arch/arm64/kvm/sys_regs.c | 35 +++++++++++++++++++++--------------
+>>  1 file changed, 21 insertions(+), 14 deletions(-)
+>>
+>
+> I think this patch got into the PULL by mistake, because you pointed out
+> to me a while back that it broke migration.
 >
 
-Hi Christoffer,
-
-I think this patch got into the PULL by mistake, because you pointed out
-to me a while back that it broke migration.
-
-Thanks for the reminder to go and try to fix it though!
+Patch 12 reverts the patch - I didn't feel like rebasing next with all
+the other things that are going on for this merge window.
 
 Thanks,
-drew
+-Christoffer
