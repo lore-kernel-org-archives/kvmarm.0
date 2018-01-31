@@ -1,101 +1,144 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v9 3/7] acpi: apei: Add SEI notification type support
- for ARMv8
-Date: Tue, 30 Jan 2018 19:39:40 +0000
-Message-ID: <5A70C9FC.5080100@arm.com>
-References: <1515254577-6460-1-git-send-email-gengdongjiu@huawei.com> <1515254577-6460-4-git-send-email-gengdongjiu@huawei.com> <5A663DEC.8080804@arm.com> <168c3f61-0d11-13a4-c383-1f6a97d0ef37@huawei.com>
+From: Tomasz Nowicki <tn@semihalf.com>
+Subject: Re: [PATCH 1/3] KVM: arm/arm64: Fix incorrect timer_is_pending logic
+Date: Wed, 31 Jan 2018 09:26:06 +0100
+Message-ID: <2cb9cd4a-e69d-6f5c-b751-fdac49ec8b7a@semihalf.com>
+References: <20180130124206.12262-1-christoffer.dall@linaro.org>
+ <20180130124206.12262-2-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-acpi-owner@vger.kernel.org>
-In-Reply-To: <168c3f61-0d11-13a4-c383-1f6a97d0ef37@huawei.com>
-Sender: linux-acpi-owner@vger.kernel.org
-To: gengdongjiu <gengdongjiu@huawei.com>
-Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, linux@armlinux.org.uk, catalin.marinas@arm.com, rjw@rjwysocki.net, bp@alien8.de, robert.moore@intel.com, lv.zheng@intel.com, corbet@lwn.net, will.deacon@arm.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-acpi@vger.kernel.org, devel@acpica.org, huangshaoyu@huawei.com
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20180130124206.12262-2-christoffer.dall@linaro.org>
+Content-Language: en-GB
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi gengdongjiu,
+Hi Christoffer,
 
-On 23/01/18 09:23, gengdongjiu wrote:
-> On 2018/1/23 3:39, James Morse wrote:
->> gengdongjiu wrote:
->>> This error source parsing and handling method
->>> is similar with the SEA.
->>
->> There are problems with doing this:
->>
->> Oct. 18, 2017, 10:26 a.m. James Morse wrote:
->> | How do SEA and SEI interact?
->> |
->> | As far as I can see they can both interrupt each other, which isn't something
->> | the single in_nmi() path in APEI can handle. I thinks we should fix this
->> | first.
->>
->> [..]
->>
->> | SEA gets away with a lot of things because its synchronous. SEI isn't. Xie
->> | XiuQi pointed to the memory_failure_queue() code. We can use this directly
->> | from SEA, but not SEI. (what happens if an SError arrives while we are
->> | queueing memory_failure work from an IRQ).
->> |
->> | The one that scares me is the trace-point reporting stuff. What happens if an
->> | SError arrives while we are enabling a trace point? (these are static-keys
->> | right?)
->> |
->> |  I don't think we can just plumb SEI in like this and be done with it.
->> |  (I'm looking at teasing out the estatus cache code from being x86:NMI only.
->> |  This way we solve the same 'cant do this from NMI context' with the same
->> |  code'.)
->>
->>
->> I will post what I've got for this estatus-cache thing as an RFC, its not ready
->> to be considered yet.
+I confirm the patch fixes the issue I saw before. I do not see 
+unnecessary WFI trap storm any more, hence:
 
-> Yes, I know you are dong that. Your serial's patch will consider all above things, right?
+Tested-by: Tomasz Nowicki <tn@semihalf.com>
 
-Assuming I got it right, yes. It currently makes the race Xie XiuQi spotted
-worse, which I want to fix too. (details on the cover letter)
+Thank you for fixing this.
 
+Tomasz
 
-> If your patch can be consider that, this patch can based on your patchset. thanks.
-
-I'd like to pick these patches onto the end of that series, but first I want to
-know what NOTIFY_SEI means for any OS. The ACPI spec doesn't say, and because
-its asynchronous, route-able and mask-able, there are many more corners than
-NOTFIY_SEA.
-
-This thing is a notification using an emulated SError exception. (emulated
-because physical-SError must be routed to EL3 for firmware-first, and
-virtual-SError belongs to EL2).
-
-Does your firmware emulate SError exactly as the TakeException() pseudo code in
-the Arm-Arm?
-Is the emulated SError routed following the routing rules for HCR_EL2.{AMO, TGE}?
-What does your firmware do when it wants to emulate SError but its masked?
-(e.g.1: The physical-SError interrupted EL2 and the SPSR shows EL2 had PSTATE.A
- set.
- e.g.2: The physical-SError interrupted EL2 but HCR_EL2 indicates the emulated
- SError should go to EL1. This effectively masks SError.)
-
-
-Answers to these let us determine whether a bug is in the firmware or the
-kernel. If firmware is expecting the OS to do something special, I'd like to
-know about it from the beginning!
-
-
->>> Expose API ghes_notify_sei() to external users. External
->>> modules can call this exposed API to parse APEI table and
->>> handle the SEI notification.
->>
->> external modules? You mean called by the arch code when it gets this NOTIFY_SEI?
-
-> yes, called by kernel ARCH code, such as below, I remember I have discussed with you.
-
-Sure. The phrase 'external modules' usually means the '.ko' files that live in
-/lib/modules, nothing outside the kernel tree should be doing this stuff.
-
-
-Thanks,
-
-James
-
+On 30.01.2018 13:42, Christoffer Dall wrote:
+> After the recently introduced support for level-triggered mapped
+> interrupt, I accidentally left the VCPU thread busily going back and
+> forward between the guest and the hypervisor whenever the guest was
+> blocking, because I would always incorrectly report that a timer
+> interrupt was pending.
+> 
+> This is because the timer->irq.level field is not valid for mapped
+> interrupts, where we offload the level state to the hardware, and as a
+> result this field is always true.
+> 
+> Luckily the problem can be relatively easily solved by not checking the
+> cached signal state of either timer in kvm_timer_should_fire() but
+> instead compute the timer state on the fly, which we do already if the
+> cached signal state wasn't high.  In fact, the only reason for checking
+> the cached signal state was a tiny optimization which would only be
+> potentially faster when the polling loop detects a pending timer
+> interrupt, which is quite unlikely.
+> 
+> Instead of duplicating the logic from kvm_arch_timer_handler(), we
+> enlighten kvm_timer_should_fire() to report something valid when the
+> timer state is loaded onto the hardware.  We can then call this from
+> kvm_arch_timer_handler() as well and avoid the call to
+> __timer_snapshot_state() in kvm_arch_timer_get_input_level().
+> 
+> Reported-by: Tomasz Nowicki <tn@semihalf.com>
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> ---
+>   virt/kvm/arm/arch_timer.c | 36 +++++++++++++++++-------------------
+>   1 file changed, 17 insertions(+), 19 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> index cfcd0323deab..63cf828f3c4f 100644
+> --- a/virt/kvm/arm/arch_timer.c
+> +++ b/virt/kvm/arm/arch_timer.c
+> @@ -97,10 +97,9 @@ static irqreturn_t kvm_arch_timer_handler(int irq, void *dev_id)
+>   		pr_warn_once("Spurious arch timer IRQ on non-VCPU thread\n");
+>   		return IRQ_NONE;
+>   	}
+> -	vtimer = vcpu_vtimer(vcpu);
+>   
+> -	vtimer->cnt_ctl = read_sysreg_el0(cntv_ctl);
+> -	if (kvm_timer_irq_can_fire(vtimer))
+> +	vtimer = vcpu_vtimer(vcpu);
+> +	if (kvm_timer_should_fire(vtimer))
+>   		kvm_timer_update_irq(vcpu, true, vtimer);
+>   
+>   	if (static_branch_unlikely(&userspace_irqchip_in_use) &&
+> @@ -230,6 +229,16 @@ static bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
+>   {
+>   	u64 cval, now;
+>   
+> +	if (timer_ctx->loaded) {
+> +		u32 cnt_ctl;
+> +
+> +		/* Only the virtual timer can be loaded so far */
+> +		cnt_ctl = read_sysreg_el0(cntv_ctl);
+> +		return  (cnt_ctl & ARCH_TIMER_CTRL_ENABLE) &&
+> +		        (cnt_ctl & ARCH_TIMER_CTRL_IT_STAT) &&
+> +		       !(cnt_ctl & ARCH_TIMER_CTRL_IT_MASK);
+> +	}
+> +
+>   	if (!kvm_timer_irq_can_fire(timer_ctx))
+>   		return false;
+>   
+> @@ -244,15 +253,7 @@ bool kvm_timer_is_pending(struct kvm_vcpu *vcpu)
+>   	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+>   	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+>   
+> -	if (vtimer->irq.level || ptimer->irq.level)
+> -		return true;
+> -
+> -	/*
+> -	 * When this is called from withing the wait loop of kvm_vcpu_block(),
+> -	 * the software view of the timer state is up to date (timer->loaded
+> -	 * is false), and so we can simply check if the timer should fire now.
+> -	 */
+> -	if (!vtimer->loaded && kvm_timer_should_fire(vtimer))
+> +	if (kvm_timer_should_fire(vtimer))
+>   		return true;
+>   
+>   	return kvm_timer_should_fire(ptimer);
+> @@ -270,9 +271,9 @@ void kvm_timer_update_run(struct kvm_vcpu *vcpu)
+>   	/* Populate the device bitmap with the timer states */
+>   	regs->device_irq_level &= ~(KVM_ARM_DEV_EL1_VTIMER |
+>   				    KVM_ARM_DEV_EL1_PTIMER);
+> -	if (vtimer->irq.level)
+> +	if (kvm_timer_should_fire(vtimer))
+>   		regs->device_irq_level |= KVM_ARM_DEV_EL1_VTIMER;
+> -	if (ptimer->irq.level)
+> +	if (kvm_timer_should_fire(ptimer))
+>   		regs->device_irq_level |= KVM_ARM_DEV_EL1_PTIMER;
+>   }
+>   
+> @@ -507,8 +508,8 @@ bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu)
+>   	vlevel = sregs->device_irq_level & KVM_ARM_DEV_EL1_VTIMER;
+>   	plevel = sregs->device_irq_level & KVM_ARM_DEV_EL1_PTIMER;
+>   
+> -	return vtimer->irq.level != vlevel ||
+> -	       ptimer->irq.level != plevel;
+> +	return kvm_timer_should_fire(vtimer) != vlevel ||
+> +	       kvm_timer_should_fire(ptimer) != plevel;
+>   }
+>   
+>   void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
+> @@ -801,9 +802,6 @@ bool kvm_arch_timer_get_input_level(int vintid)
+>   	else
+>   		BUG(); /* We only map the vtimer so far */
+>   
+> -	if (timer->loaded)
+> -		__timer_snapshot_state(timer);
+> -
+>   	return kvm_timer_should_fire(timer);
+>   }
+>   
+> 
