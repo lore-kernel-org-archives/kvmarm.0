@@ -1,7 +1,7 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 13/18] firmware/psci: Expose PSCI conduit
-Date: Thu,  1 Feb 2018 11:46:52 +0000
-Message-ID: <20180201114657.7323-14-marc.zyngier@arm.com>
+Subject: [PATCH v3 18/18] arm64: Kill PSCI_GET_VERSION as a variant-2 workaround
+Date: Thu,  1 Feb 2018 11:46:57 +0000
+Message-ID: <20180201114657.7323-19-marc.zyngier@arm.com>
 References: <20180201114657.7323-1-marc.zyngier@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20180201114657.7323-1-marc.zyngier@arm.com>
@@ -10,103 +10,205 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Mark Rutland <mark.rutland@arm.com>, Robin Murphy <robin.murphy@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andrew Jones <drjones@redhat.com>, Hanjun Guo <guohanjun@huawei.com>, Jayachandran C <jnair@caviumnetworks.com>, Jon Masters <jcm@redhat.com>, Russell King - ARM Linux <linux@armlinux.org.uk>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In order to call into the firmware to apply workarounds, it is
-useful to find out whether we're using HVC or SMC. Let's expose
-this through the psci_ops.
+Now that we've standardised on SMCCC v1.1 to perform the branch
+prediction invalidation, let's drop the previous band-aid.
+If vendors haven't updated their firmware to do SMCCC 1.1, they
+haven't updated PSCI either, so we don't loose anything.
 
-Acked-by: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/firmware/psci.c | 28 +++++++++++++++++++++++-----
- include/linux/psci.h    |  7 +++++++
- 2 files changed, 30 insertions(+), 5 deletions(-)
+ arch/arm64/kernel/bpi.S        | 24 -----------------------
+ arch/arm64/kernel/cpu_errata.c | 43 ++++++++++++------------------------------
+ arch/arm64/kvm/hyp/switch.c    | 14 --------------
+ 3 files changed, 12 insertions(+), 69 deletions(-)
 
-diff --git a/drivers/firmware/psci.c b/drivers/firmware/psci.c
-index 8b25d31e8401..e9493da2b111 100644
---- a/drivers/firmware/psci.c
-+++ b/drivers/firmware/psci.c
-@@ -59,7 +59,9 @@ bool psci_tos_resident_on(int cpu)
- 	return cpu == resident_cpu;
+diff --git a/arch/arm64/kernel/bpi.S b/arch/arm64/kernel/bpi.S
+index fdeed629f2c6..e5de33513b5d 100644
+--- a/arch/arm64/kernel/bpi.S
++++ b/arch/arm64/kernel/bpi.S
+@@ -54,30 +54,6 @@ ENTRY(__bp_harden_hyp_vecs_start)
+ 	vectors __kvm_hyp_vector
+ 	.endr
+ ENTRY(__bp_harden_hyp_vecs_end)
+-ENTRY(__psci_hyp_bp_inval_start)
+-	sub	sp, sp, #(8 * 18)
+-	stp	x16, x17, [sp, #(16 * 0)]
+-	stp	x14, x15, [sp, #(16 * 1)]
+-	stp	x12, x13, [sp, #(16 * 2)]
+-	stp	x10, x11, [sp, #(16 * 3)]
+-	stp	x8, x9, [sp, #(16 * 4)]
+-	stp	x6, x7, [sp, #(16 * 5)]
+-	stp	x4, x5, [sp, #(16 * 6)]
+-	stp	x2, x3, [sp, #(16 * 7)]
+-	stp	x0, x1, [sp, #(16 * 8)]
+-	mov	x0, #0x84000000
+-	smc	#0
+-	ldp	x16, x17, [sp, #(16 * 0)]
+-	ldp	x14, x15, [sp, #(16 * 1)]
+-	ldp	x12, x13, [sp, #(16 * 2)]
+-	ldp	x10, x11, [sp, #(16 * 3)]
+-	ldp	x8, x9, [sp, #(16 * 4)]
+-	ldp	x6, x7, [sp, #(16 * 5)]
+-	ldp	x4, x5, [sp, #(16 * 6)]
+-	ldp	x2, x3, [sp, #(16 * 7)]
+-	ldp	x0, x1, [sp, #(16 * 8)]
+-	add	sp, sp, #(8 * 18)
+-ENTRY(__psci_hyp_bp_inval_end)
+ 
+ ENTRY(__qcom_hyp_sanitize_link_stack_start)
+ 	stp     x29, x30, [sp, #-16]!
+diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
+index 9e77809a3b23..b8279a11f57b 100644
+--- a/arch/arm64/kernel/cpu_errata.c
++++ b/arch/arm64/kernel/cpu_errata.c
+@@ -67,7 +67,6 @@ static int cpu_enable_trap_ctr_access(void *__unused)
+ DEFINE_PER_CPU_READ_MOSTLY(struct bp_hardening_data, bp_hardening_data);
+ 
+ #ifdef CONFIG_KVM
+-extern char __psci_hyp_bp_inval_start[], __psci_hyp_bp_inval_end[];
+ extern char __qcom_hyp_sanitize_link_stack_start[];
+ extern char __qcom_hyp_sanitize_link_stack_end[];
+ extern char __smccc_workaround_1_smc_start[];
+@@ -116,8 +115,6 @@ static void __install_bp_hardening_cb(bp_hardening_cb_t fn,
+ 	spin_unlock(&bp_lock);
+ }
+ #else
+-#define __psci_hyp_bp_inval_start		NULL
+-#define __psci_hyp_bp_inval_end			NULL
+ #define __qcom_hyp_sanitize_link_stack_start	NULL
+ #define __qcom_hyp_sanitize_link_stack_end	NULL
+ #define __smccc_workaround_1_smc_start		NULL
+@@ -164,14 +161,15 @@ static void call_hvc_arch_workaround_1(void)
+ 	arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_WORKAROUND_1, NULL);
  }
  
--struct psci_operations psci_ops;
-+struct psci_operations psci_ops = {
-+	.conduit = PSCI_CONDUIT_NONE,
-+};
- 
- typedef unsigned long (psci_fn)(unsigned long, unsigned long,
- 				unsigned long, unsigned long);
-@@ -210,6 +212,22 @@ static unsigned long psci_migrate_info_up_cpu(void)
- 			      0, 0, 0);
- }
- 
-+static void set_conduit(enum psci_conduit conduit)
-+{
-+	switch (conduit) {
-+	case PSCI_CONDUIT_HVC:
-+		invoke_psci_fn = __invoke_psci_fn_hvc;
-+		break;
-+	case PSCI_CONDUIT_SMC:
-+		invoke_psci_fn = __invoke_psci_fn_smc;
-+		break;
-+	default:
-+		WARN(1, "Unexpected PSCI conduit %d\n", conduit);
-+	}
-+
-+	psci_ops.conduit = conduit;
-+}
-+
- static int get_set_conduit_method(struct device_node *np)
+-static bool check_smccc_arch_workaround_1(const struct arm64_cpu_capabilities *entry)
++static int smccc_arch_workaround_1(void *data)
  {
- 	const char *method;
-@@ -222,9 +240,9 @@ static int get_set_conduit_method(struct device_node *np)
++	const struct arm64_cpu_capabilities *entry = data;
+ 	bp_hardening_cb_t cb;
+ 	void *smccc_start, *smccc_end;
+ 	struct arm_smccc_res res;
+ 
+ 	if (!entry->matches(entry, SCOPE_LOCAL_CPU))
+-		return false;
++		return 0;
+ 
+ 	if (psci_ops.smccc_version == SMCCC_VERSION_1_0)
+ 		return false;
+@@ -181,7 +179,7 @@ static bool check_smccc_arch_workaround_1(const struct arm64_cpu_capabilities *e
+ 		arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
+ 				  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
+ 		if (res.a0)
+-			return false;
++			return 0;
+ 		cb = call_hvc_arch_workaround_1;
+ 		smccc_start = __smccc_workaround_1_hvc_start;
+ 		smccc_end = __smccc_workaround_1_hvc_end;
+@@ -191,35 +189,18 @@ static bool check_smccc_arch_workaround_1(const struct arm64_cpu_capabilities *e
+ 		arm_smccc_1_1_smc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
+ 				  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
+ 		if (res.a0)
+-			return false;
++			return 0;
+ 		cb = call_smc_arch_workaround_1;
+ 		smccc_start = __smccc_workaround_1_smc_start;
+ 		smccc_end = __smccc_workaround_1_smc_end;
+ 		break;
+ 
+ 	default:
+-		return false;
++		return 0;
  	}
  
- 	if (!strcmp("hvc", method)) {
--		invoke_psci_fn = __invoke_psci_fn_hvc;
-+		set_conduit(PSCI_CONDUIT_HVC);
- 	} else if (!strcmp("smc", method)) {
--		invoke_psci_fn = __invoke_psci_fn_smc;
-+		set_conduit(PSCI_CONDUIT_SMC);
- 	} else {
- 		pr_warn("invalid \"method\" property: %s\n", method);
- 		return -EINVAL;
-@@ -654,9 +672,9 @@ int __init psci_acpi_init(void)
- 	pr_info("probing for conduit method from ACPI.\n");
+ 	install_bp_hardening_cb(entry, cb, smccc_start, smccc_end);
  
- 	if (acpi_psci_use_hvc())
--		invoke_psci_fn = __invoke_psci_fn_hvc;
-+		set_conduit(PSCI_CONDUIT_HVC);
- 	else
--		invoke_psci_fn = __invoke_psci_fn_smc;
-+		set_conduit(PSCI_CONDUIT_SMC);
- 
- 	return psci_probe();
+-	return true;
+-}
+-
+-static int enable_psci_bp_hardening(void *data)
+-{
+-	const struct arm64_cpu_capabilities *entry = data;
+-
+-	if (psci_ops.get_version) {
+-		if (check_smccc_arch_workaround_1(entry))
+-			return 0;
+-
+-		install_bp_hardening_cb(entry,
+-				       (bp_hardening_cb_t)psci_ops.get_version,
+-				       __psci_hyp_bp_inval_start,
+-				       __psci_hyp_bp_inval_end);
+-	}
+-
+ 	return 0;
  }
-diff --git a/include/linux/psci.h b/include/linux/psci.h
-index f724fd8c78e8..f2679e5faa4f 100644
---- a/include/linux/psci.h
-+++ b/include/linux/psci.h
-@@ -25,6 +25,12 @@ bool psci_tos_resident_on(int cpu);
- int psci_cpu_init_idle(unsigned int cpu);
- int psci_cpu_suspend_enter(unsigned long index);
  
-+enum psci_conduit {
-+	PSCI_CONDUIT_NONE,
-+	PSCI_CONDUIT_SMC,
-+	PSCI_CONDUIT_HVC,
-+};
-+
- struct psci_operations {
- 	u32 (*get_version)(void);
- 	int (*cpu_suspend)(u32 state, unsigned long entry_point);
-@@ -34,6 +40,7 @@ struct psci_operations {
- 	int (*affinity_info)(unsigned long target_affinity,
- 			unsigned long lowest_affinity_level);
- 	int (*migrate_info_type)(void);
-+	enum psci_conduit conduit;
- };
+@@ -399,22 +380,22 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
+ 	{
+ 		.capability = ARM64_HARDEN_BRANCH_PREDICTOR,
+ 		MIDR_ALL_VERSIONS(MIDR_CORTEX_A57),
+-		.enable = enable_psci_bp_hardening,
++		.enable = smccc_arch_workaround_1,
+ 	},
+ 	{
+ 		.capability = ARM64_HARDEN_BRANCH_PREDICTOR,
+ 		MIDR_ALL_VERSIONS(MIDR_CORTEX_A72),
+-		.enable = enable_psci_bp_hardening,
++		.enable = smccc_arch_workaround_1,
+ 	},
+ 	{
+ 		.capability = ARM64_HARDEN_BRANCH_PREDICTOR,
+ 		MIDR_ALL_VERSIONS(MIDR_CORTEX_A73),
+-		.enable = enable_psci_bp_hardening,
++		.enable = smccc_arch_workaround_1,
+ 	},
+ 	{
+ 		.capability = ARM64_HARDEN_BRANCH_PREDICTOR,
+ 		MIDR_ALL_VERSIONS(MIDR_CORTEX_A75),
+-		.enable = enable_psci_bp_hardening,
++		.enable = smccc_arch_workaround_1,
+ 	},
+ 	{
+ 		.capability = ARM64_HARDEN_BRANCH_PREDICTOR,
+@@ -428,12 +409,12 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
+ 	{
+ 		.capability = ARM64_HARDEN_BRANCH_PREDICTOR,
+ 		MIDR_ALL_VERSIONS(MIDR_BRCM_VULCAN),
+-		.enable = enable_psci_bp_hardening,
++		.enable = smccc_arch_workaround_1,
+ 	},
+ 	{
+ 		.capability = ARM64_HARDEN_BRANCH_PREDICTOR,
+ 		MIDR_ALL_VERSIONS(MIDR_CAVIUM_THUNDERX2),
+-		.enable = enable_psci_bp_hardening,
++		.enable = smccc_arch_workaround_1,
+ 	},
+ #endif
+ 	{
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 408c04d789a5..cac6a0500162 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -350,20 +350,6 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 	if (exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
+ 		goto again;
  
- extern struct psci_operations psci_ops;
+-	if (exit_code == ARM_EXCEPTION_TRAP &&
+-	    (kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_HVC64 ||
+-	     kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_HVC32)) {
+-		u32 val = vcpu_get_reg(vcpu, 0);
+-
+-		if (val == PSCI_0_2_FN_PSCI_VERSION) {
+-			val = kvm_psci_version(vcpu, kern_hyp_va(vcpu->kvm));
+-			if (unlikely(val == KVM_ARM_PSCI_0_1))
+-				val = PSCI_RET_NOT_SUPPORTED;
+-			vcpu_set_reg(vcpu, 0, val);
+-			goto again;
+-		}
+-	}
+-
+ 	if (static_branch_unlikely(&vgic_v2_cpuif_trap) &&
+ 	    exit_code == ARM_EXCEPTION_TRAP) {
+ 		bool valid;
 -- 
 2.14.2
