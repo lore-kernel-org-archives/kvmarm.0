@@ -1,77 +1,215 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] irqchip/gic-v3: Use wmb() instead of smb_wmb() in
- gic_raise_softirq()
-Date: Thu, 1 Feb 2018 13:24:06 +0000
-Message-ID: <5cb5eccf-8edd-bdcc-844a-56bd94355747@arm.com>
-References: <1517443422-30693-1-git-send-email-shankerd@codeaurora.org>
- <20180201103337.GA13705@arm.com>
- <88d418ff-db83-c690-618e-69df3e3bb272@codeaurora.org>
+From: Robin Murphy <robin.murphy@arm.com>
+Subject: Re: [PATCH v3 16/18] arm/arm64: smccc: Implement SMCCC v1.1 inline
+ primitive
+Date: Thu, 1 Feb 2018 13:34:50 +0000
+Message-ID: <6082f2bf-58be-8493-013e-e27f5a0d2570@arm.com>
+References: <20180201114657.7323-1-marc.zyngier@arm.com>
+ <20180201114657.7323-17-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <88d418ff-db83-c690-618e-69df3e3bb272@codeaurora.org>
+In-Reply-To: <20180201114657.7323-17-marc.zyngier@arm.com>
 Content-Language: en-GB
 Sender: linux-kernel-owner@vger.kernel.org
-To: shankerd@codeaurora.org, Will Deacon <will.deacon@arm.com>
-Cc: linux-kernel <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, kvmarm <kvmarm@lists.cs.columbia.edu>, Thomas Gleixner <tglx@linutronix.de>, Vikram Sethi <vikrams@codeaurora.org>, Sean Campbell <scampbel@codeaurora.org>, Thomas Speier <tspeier@codeaurora.org>
+To: Marc Zyngier <marc.zyngier@arm.com>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Mark Rutland <mark.rutland@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andrew Jones <drjones@redhat.com>, Hanjun Guo <guohanjun@huawei.com>, Jayachandran C <jnair@caviumnetworks.com>, Jon Masters <jcm@redhat.com>, Russell King - ARM Linux <linux@armlinux.org.uk>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 01/02/18 12:55, Shanker Donthineni wrote:
-> Hi Will, Thanks for your quick reply.
+On 01/02/18 11:46, Marc Zyngier wrote:
+> One of the major improvement of SMCCC v1.1 is that it only clobbers
+> the first 4 registers, both on 32 and 64bit. This means that it
+> becomes very easy to provide an inline version of the SMC call
+> primitive, and avoid performing a function call to stash the
+> registers that would otherwise be clobbered by SMCCC v1.0.
 > 
-> On 02/01/2018 04:33 AM, Will Deacon wrote:
->> Hi Shanker,
->>
->> On Wed, Jan 31, 2018 at 06:03:42PM -0600, Shanker Donthineni wrote:
->>> A DMB instruction can be used to ensure the relative order of only
->>> memory accesses before and after the barrier. Since writes to system
->>> registers are not memory operations, barrier DMB is not sufficient
->>> for observability of memory accesses that occur before ICC_SGI1R_EL1
->>> writes.
->>>
->>> A DSB instruction ensures that no instructions that appear in program
->>> order after the DSB instruction, can execute until the DSB instruction
->>> has completed.
->>>
->>> Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
->>> ---
->>>  drivers/irqchip/irq-gic-v3.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
->>> index b56c3e2..980ae8e 100644
->>> --- a/drivers/irqchip/irq-gic-v3.c
->>> +++ b/drivers/irqchip/irq-gic-v3.c
->>> @@ -688,7 +688,7 @@ static void gic_raise_softirq(const struct cpumask *mask, unsigned int irq)
->>>  	 * Ensure that stores to Normal memory are visible to the
->>>  	 * other CPUs before issuing the IPI.
->>>  	 */
->>> -	smp_wmb();
->>> +	wmb();
->>
->> I think this is the right thing to do and the smp_wmb() was accidentally
->> pulled in here as a copy-paste from the GICv2 driver where it is sufficient
->> in practice.
->>
->> Did you spot this by code inspection, or did the DMB actually cause
->> observable failures? (trying to figure out whether or not this need to go
->> to -stable).
->>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>   include/linux/arm-smccc.h | 143 ++++++++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 143 insertions(+)
 > 
-> We've inspected the code because kernel was causing failures in scheduler/IPI_RESCHDULE.
-> After some time of debugging, we landed in GIC driver and found that the issue was due
-> to the DMB barrier. 
+> diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+> index dd44d8458c04..575aabe85905 100644
+> --- a/include/linux/arm-smccc.h
+> +++ b/include/linux/arm-smccc.h
+> @@ -150,5 +150,148 @@ asmlinkage void __arm_smccc_hvc(unsigned long a0, unsigned long a1,
+>   
+>   #define arm_smccc_hvc_quirk(...) __arm_smccc_hvc(__VA_ARGS__)
+>   
+> +/* SMCCC v1.1 implementation madness follows */
+> +#ifdef CONFIG_ARM64
+> +
+> +#define SMCCC_SMC_INST	"smc	#0"
+> +#define SMCCC_HVC_INST	"hvc	#0"
 
-OK. I've applied this with a cc: stable and Will's Ack.
+Nit: Maybe the argument can go in the template and we just define the 
+instruction mnemonics here?
 
-> Side note, we're also missing synchronization barriers in GIC driver after writing some
-> of the ICC_XXX system registers. I'm planning to post those changes for comments.
+> +
+> +#endif
+> +
+> +#ifdef CONFIG_ARM
+
+#elif ?
+
+> +#include <asm/opcodes-sec.h>
+> +#include <asm/opcodes-virt.h>
+> +
+> +#define SMCCC_SMC_INST	__SMC(0)
+> +#define SMCCC_HVC_INST	__HVC(0)
+
+Oh, I see, it was to line up with this :(
+
+I do wonder if we could just embed an asm(".arch armv7-a+virt\n") (if 
+even necessary) for ARM, then take advantage of the common mnemonics for 
+all 3 instruction sets instead of needing manual encoding tricks? I 
+don't think we should ever be pulling this file in for non-v7 builds.
+
+I suppose that strictly that appears to need binutils 2.21 rather than 
+the offical supported minimum of 2.20, but are people going to be 
+throwing SMCCC configs at antique toolchains in practice?
+
+> +
+> +#endif
+> +
+> +#define ___count_args(_0, _1, _2, _3, _4, _5, _6, _7, _8, x, ...) x
+> +
+> +#define __count_args(...)						\
+> +	___count_args(__VA_ARGS__, 7, 6, 5, 4, 3, 2, 1, 0)
+> +
+> +#define __constraint_write_0						\
+> +	"+r" (r0), "=&r" (r1), "=&r" (r2), "=&r" (r3)
+> +#define __constraint_write_1						\
+> +	"+r" (r0), "+r" (r1), "=&r" (r2), "=&r" (r3)
+> +#define __constraint_write_2						\
+> +	"+r" (r0), "+r" (r1), "+r" (r2), "=&r" (r3)
+> +#define __constraint_write_3						\
+> +	"+r" (r0), "+r" (r1), "+r" (r2), "+r" (r3)
+> +#define __constraint_write_4	__constraint_write_3
+> +#define __constraint_write_5	__constraint_write_4
+> +#define __constraint_write_6	__constraint_write_5
+> +#define __constraint_write_7	__constraint_write_6
+> +
+> +#define __constraint_read_0
+> +#define __constraint_read_1
+> +#define __constraint_read_2
+> +#define __constraint_read_3
+> +#define __constraint_read_4	"r" (r4)
+> +#define __constraint_read_5	__constraint_read_4, "r" (r5)
+> +#define __constraint_read_6	__constraint_read_5, "r" (r6)
+> +#define __constraint_read_7	__constraint_read_6, "r" (r7)
+> +
+> +#define __declare_arg_0(a0, res)					\
+> +	struct arm_smccc_res   *___res = res;				\
+
+Looks like the declaration of ___res could simply be factored out to the 
+template...
+
+> +	register u32           r0 asm("r0") = a0;			\
+> +	register unsigned long r1 asm("r1");				\
+> +	register unsigned long r2 asm("r2");				\
+> +	register unsigned long r3 asm("r3")
+> +
+> +#define __declare_arg_1(a0, a1, res)					\
+> +	struct arm_smccc_res   *___res = res;				\
+> +	register u32           r0 asm("r0") = a0;			\
+> +	register typeof(a1)    r1 asm("r1") = a1;			\
+> +	register unsigned long r2 asm("r2");				\
+> +	register unsigned long r3 asm("r3")
+> +
+> +#define __declare_arg_2(a0, a1, a2, res)				\
+> +	struct arm_smccc_res   *___res = res;				\
+> +	register u32           r0 asm("r0") = a0;			\
+> +	register typeof(a1)    r1 asm("r1") = a1;			\
+> +	register typeof(a2)    r2 asm("r2") = a2;			\
+> +	register unsigned long r3 asm("r3")
+> +
+> +#define __declare_arg_3(a0, a1, a2, a3, res)				\
+> +	struct arm_smccc_res   *___res = res;				\
+> +	register u32           r0 asm("r0") = a0;			\
+> +	register typeof(a1)    r1 asm("r1") = a1;			\
+> +	register typeof(a2)    r2 asm("r2") = a2;			\
+> +	register typeof(a3)    r3 asm("r3") = a3
+> +
+> +#define __declare_arg_4(a0, a1, a2, a3, a4, res)			\
+> +	__declare_arg_3(a0, a1, a2, a3, res);				\
+> +	register typeof(a4) r4 asm("r4") = a4
+> +
+> +#define __declare_arg_5(a0, a1, a2, a3, a4, a5, res)			\
+> +	__declare_arg_4(a0, a1, a2, a3, a4, res);			\
+> +	register typeof(a5) r5 asm("r5") = a5
+> +
+> +#define __declare_arg_6(a0, a1, a2, a3, a4, a5, a6, res)		\
+> +	__declare_arg_5(a0, a1, a2, a3, a4, a5, res);			\
+> +	register typeof(a6) r6 asm("r6") = a6
+> +
+> +#define __declare_arg_7(a0, a1, a2, a3, a4, a5, a6, a7, res)		\
+> +	__declare_arg_6(a0, a1, a2, a3, a4, a5, a6, res);		\
+> +	register typeof(a7) r7 asm("r7") = a7
+> +
+> +#define ___declare_args(count, ...) __declare_arg_ ## count(__VA_ARGS__)
+> +#define __declare_args(count, ...)  ___declare_args(count, __VA_ARGS__)
+> +
+> +#define ___constraints(count)						\
+> +	: __constraint_write_ ## count					\
+> +	: __constraint_read_ ## count					\
+> +	: "memory"
+> +#define __constraints(count)	___constraints(count)
+> +
+> +/*
+> + * We have an output list that is not necessarily used, and GCC feels
+> + * entitled to optimise the whole sequence away. "volatile" is what
+> + * makes it stick.
+> + */
+> +#define __arm_smccc_1_1(inst, ...)					\
+> +	do {								\
+> +		__declare_args(__count_args(__VA_ARGS__), __VA_ARGS__);	\
+> +		asm volatile(inst "\n"					\
+> +			     __constraints(__count_args(__VA_ARGS__)));	\
+> +		if (___res)						\
+> +			*___res = (typeof(*___res)){r0, r1, r2, r3};	\
+
+...especially since there's no obvious indication of where it comes from 
+when you're looking here.
+
+Otherwise, though, this has already turned out pretty sleek;
+
+Reviewed-by: Robin Murphy <robin.murphy@arm.com>
+
+> +	} while (0)
+> +
+> +/*
+> + * arm_smccc_1_1_smc() - make an SMCCC v1.1 compliant SMC call
+> + *
+> + * This is a variadic macro taking one to eight source arguments, and
+> + * an optional return structure.
+> + *
+> + * @a0-a7: arguments passed in registers 0 to 7
+> + * @res: result values from registers 0 to 3
+> + *
+> + * This macro is used to make SMC calls following SMC Calling Convention v1.1.
+> + * The content of the supplied param are copied to registers 0 to 7 prior
+> + * to the SMC instruction. The return values are updated with the content
+> + * from register 0 to 3 on return from the SMC instruction if not NULL.
+> + */
+> +#define arm_smccc_1_1_smc(...)	__arm_smccc_1_1(SMCCC_SMC_INST, __VA_ARGS__)
+> +
+> +/*
+> + * arm_smccc_1_1_hvc() - make an SMCCC v1.1 compliant HVC call
+> + *
+> + * This is a variadic macro taking one to eight source arguments, and
+> + * an optional return structure.
+> + *
+> + * @a0-a7: arguments passed in registers 0 to 7
+> + * @res: result values from registers 0 to 3
+> + *
+> + * This macro is used to make HVC calls following SMC Calling Convention v1.1.
+> + * The content of the supplied param are copied to registers 0 to 7 prior
+> + * to the HVC instruction. The return values are updated with the content
+> + * from register 0 to 3 on return from the HVC instruction if not NULL.
+> + */
+> +#define arm_smccc_1_1_hvc(...)	__arm_smccc_1_1(SMCCC_HVC_INST, __VA_ARGS__)
+> +
+>   #endif /*__ASSEMBLY__*/
+>   #endif /*__LINUX_ARM_SMCCC_H*/
 > 
-> e.g: gic_write_sgi1r(val) and gic_write_eoir(irqnr);
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
