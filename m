@@ -1,89 +1,93 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 05/18] arm/arm64: KVM: Add PSCI_VERSION helper
-Date: Thu,  1 Feb 2018 11:46:44 +0000
-Message-ID: <20180201114657.7323-6-marc.zyngier@arm.com>
+Subject: [PATCH v3 14/18] firmware/psci: Expose SMCCC version through psci_ops
+Date: Thu,  1 Feb 2018 11:46:53 +0000
+Message-ID: <20180201114657.7323-15-marc.zyngier@arm.com>
 References: <20180201114657.7323-1-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20180201114657.7323-1-marc.zyngier@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Sender: linux-kernel-owner@vger.kernel.org
 To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc: Mark Rutland <mark.rutland@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Jon Masters <jcm@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Russell King - ARM Linux <linux@armlinux.org.uk>, Jayachandran C <jnair@caviumnetworks.com>, Hanjun Guo <guohanjun@huawei.com>, Robin Murphy <robin.murphy@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Mark Rutland <mark.rutland@arm.com>, Robin Murphy <robin.murphy@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andrew Jones <drjones@redhat.com>, Hanjun Guo <guohanjun@huawei.com>, Jayachandran C <jnair@caviumnetworks.com>, Jon Masters <jcm@redhat.com>, Russell King - ARM Linux <linux@armlinux.org.uk>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As we're about to trigger a PSCI version explosion, it doesn't
-hurt to introduce a PSCI_VERSION helper that is going to be
-used everywhere.
+Since PSCI 1.0 allows the SMCCC version to be (indirectly) probed,
+let's do that at boot time, and expose the version of the calling
+convention as part of the psci_ops structure.
 
+Acked-by: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- include/kvm/arm_psci.h    | 6 ++++--
- include/uapi/linux/psci.h | 3 +++
- virt/kvm/arm/psci.c       | 4 +---
- 3 files changed, 8 insertions(+), 5 deletions(-)
+ drivers/firmware/psci.c | 19 +++++++++++++++++++
+ include/linux/psci.h    |  6 ++++++
+ 2 files changed, 25 insertions(+)
 
-diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
-index 2042bb909474..5659343580a3 100644
---- a/include/kvm/arm_psci.h
-+++ b/include/kvm/arm_psci.h
-@@ -18,8 +18,10 @@
- #ifndef __KVM_ARM_PSCI_H__
- #define __KVM_ARM_PSCI_H__
+diff --git a/drivers/firmware/psci.c b/drivers/firmware/psci.c
+index e9493da2b111..8631906c414c 100644
+--- a/drivers/firmware/psci.c
++++ b/drivers/firmware/psci.c
+@@ -61,6 +61,7 @@ bool psci_tos_resident_on(int cpu)
  
--#define KVM_ARM_PSCI_0_1	1
--#define KVM_ARM_PSCI_0_2	2
-+#include <uapi/linux/psci.h>
+ struct psci_operations psci_ops = {
+ 	.conduit = PSCI_CONDUIT_NONE,
++	.smccc_version = SMCCC_VERSION_1_0,
+ };
+ 
+ typedef unsigned long (psci_fn)(unsigned long, unsigned long,
+@@ -511,6 +512,23 @@ static void __init psci_init_migrate(void)
+ 	pr_info("Trusted OS resident on physical CPU 0x%lx\n", cpuid);
+ }
+ 
++static void __init psci_init_smccc(u32 ver)
++{
++	int feature;
 +
-+#define KVM_ARM_PSCI_0_1	PSCI_VERSION(0, 1)
-+#define KVM_ARM_PSCI_0_2	PSCI_VERSION(0, 2)
++	feature = psci_features(ARM_SMCCC_VERSION_FUNC_ID);
++
++	if (feature != PSCI_RET_NOT_SUPPORTED) {
++		ver = invoke_psci_fn(ARM_SMCCC_VERSION_FUNC_ID, 0, 0, 0);
++		if (ver != ARM_SMCCC_VERSION_1_1)
++			psci_ops.smccc_version = SMCCC_VERSION_1_0;
++		else
++			psci_ops.smccc_version = SMCCC_VERSION_1_1;
++	}
++
++	pr_info("SMC Calling Convention v1.%d\n", psci_ops.smccc_version);
++}
++
+ static void __init psci_0_2_set_functions(void)
+ {
+ 	pr_info("Using standard PSCI v0.2 function IDs\n");
+@@ -559,6 +577,7 @@ static int __init psci_probe(void)
+ 	psci_init_migrate();
  
- int kvm_psci_version(struct kvm_vcpu *vcpu);
- int kvm_psci_call(struct kvm_vcpu *vcpu);
-diff --git a/include/uapi/linux/psci.h b/include/uapi/linux/psci.h
-index 760e52a9640f..b3bcabe380da 100644
---- a/include/uapi/linux/psci.h
-+++ b/include/uapi/linux/psci.h
-@@ -88,6 +88,9 @@
- 		(((ver) & PSCI_VERSION_MAJOR_MASK) >> PSCI_VERSION_MAJOR_SHIFT)
- #define PSCI_VERSION_MINOR(ver)			\
- 		((ver) & PSCI_VERSION_MINOR_MASK)
-+#define PSCI_VERSION(maj, min)						\
-+	((((maj) << PSCI_VERSION_MAJOR_SHIFT) & PSCI_VERSION_MAJOR_MASK) | \
-+	 ((min) & PSCI_VERSION_MINOR_MASK))
+ 	if (PSCI_VERSION_MAJOR(ver) >= 1) {
++		psci_init_smccc(ver);
+ 		psci_init_cpu_suspend();
+ 		psci_init_system_suspend();
+ 	}
+diff --git a/include/linux/psci.h b/include/linux/psci.h
+index f2679e5faa4f..8b1b3b5935ab 100644
+--- a/include/linux/psci.h
++++ b/include/linux/psci.h
+@@ -31,6 +31,11 @@ enum psci_conduit {
+ 	PSCI_CONDUIT_HVC,
+ };
  
- /* PSCI features decoding (>=1.0) */
- #define PSCI_1_0_FEATURES_CPU_SUSPEND_PF_SHIFT	1
-diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
-index b322e46fd142..999f94d6bb98 100644
---- a/virt/kvm/arm/psci.c
-+++ b/virt/kvm/arm/psci.c
-@@ -25,8 +25,6 @@
++enum smccc_version {
++	SMCCC_VERSION_1_0,
++	SMCCC_VERSION_1_1,
++};
++
+ struct psci_operations {
+ 	u32 (*get_version)(void);
+ 	int (*cpu_suspend)(u32 state, unsigned long entry_point);
+@@ -41,6 +46,7 @@ struct psci_operations {
+ 			unsigned long lowest_affinity_level);
+ 	int (*migrate_info_type)(void);
+ 	enum psci_conduit conduit;
++	enum smccc_version smccc_version;
+ };
  
- #include <kvm/arm_psci.h>
- 
--#include <uapi/linux/psci.h>
--
- /*
-  * This is an implementation of the Power State Coordination Interface
-  * as described in ARM document number ARM DEN 0022A.
-@@ -222,7 +220,7 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
- 		 * Bits[31:16] = Major Version = 0
- 		 * Bits[15:0] = Minor Version = 2
- 		 */
--		val = 2;
-+		val = KVM_ARM_PSCI_0_2;
- 		break;
- 	case PSCI_0_2_FN_CPU_SUSPEND:
- 	case PSCI_0_2_FN64_CPU_SUSPEND:
+ extern struct psci_operations psci_ops;
 -- 
 2.14.2
