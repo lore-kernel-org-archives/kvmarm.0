@@ -1,7 +1,7 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 11/18] arm64: KVM: Report SMCCC_ARCH_WORKAROUND_1 BP hardening support
-Date: Thu,  1 Feb 2018 11:46:50 +0000
-Message-ID: <20180201114657.7323-12-marc.zyngier@arm.com>
+Subject: [PATCH v3 17/18] arm64: Add ARM_SMCCC_ARCH_WORKAROUND_1 BP hardening support
+Date: Thu,  1 Feb 2018 11:46:56 +0000
+Message-ID: <20180201114657.7323-18-marc.zyngier@arm.com>
 References: <20180201114657.7323-1-marc.zyngier@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20180201114657.7323-1-marc.zyngier@arm.com>
@@ -10,94 +10,152 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Mark Rutland <mark.rutland@arm.com>, Robin Murphy <robin.murphy@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andrew Jones <drjones@redhat.com>, Hanjun Guo <guohanjun@huawei.com>, Jayachandran C <jnair@caviumnetworks.com>, Jon Masters <jcm@redhat.com>, Russell King - ARM Linux <linux@armlinux.org.uk>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-A new feature of SMCCC 1.1 is that it offers firmware-based CPU
-workarounds. In particular, SMCCC_ARCH_WORKAROUND_1 provides
-BP hardening for CVE-2017-5715.
-
-If the host has some mitigation for this issue, report that
-we deal with it using SMCCC_ARCH_WORKAROUND_1, as we apply the
-host workaround on every guest exit.
+Add the detection and runtime code for ARM_SMCCC_ARCH_WORKAROUND_1.
+It is lovely. Really.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/kvm_host.h   | 7 +++++++
- arch/arm64/include/asm/kvm_host.h | 6 ++++++
- include/linux/arm-smccc.h         | 5 +++++
- virt/kvm/arm/psci.c               | 9 ++++++++-
- 4 files changed, 26 insertions(+), 1 deletion(-)
+ arch/arm64/kernel/bpi.S        | 20 +++++++++++++
+ arch/arm64/kernel/cpu_errata.c | 68 +++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 87 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index e9d57060d88c..6c05e3b13081 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -309,4 +309,11 @@ static inline void kvm_fpsimd_flush_cpu_state(void) {}
- 
- static inline void kvm_arm_vhe_guest_enter(void) {}
- static inline void kvm_arm_vhe_guest_exit(void) {}
-+
-+static inline bool kvm_arm_harden_branch_predictor(void)
-+{
-+	/* No way to detect it yet, pretend it is not there. */
-+	return false;
-+}
-+
- #endif /* __ARM_KVM_HOST_H__ */
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 10af386642c6..448d3b9a58cb 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -418,4 +418,10 @@ static inline void kvm_arm_vhe_guest_exit(void)
- {
- 	local_daif_restore(DAIF_PROCCTX_NOIRQ);
- }
-+
-+static inline bool kvm_arm_harden_branch_predictor(void)
-+{
-+	return cpus_have_const_cap(ARM64_HARDEN_BRANCH_PREDICTOR);
-+}
-+
- #endif /* __ARM64_KVM_HOST_H__ */
-diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
-index dc68aa5a7261..e1ef944ef1da 100644
---- a/include/linux/arm-smccc.h
-+++ b/include/linux/arm-smccc.h
-@@ -73,6 +73,11 @@
- 			   ARM_SMCCC_SMC_32,				\
- 			   0, 1)
- 
-+#define ARM_SMCCC_ARCH_WORKAROUND_1					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-+			   ARM_SMCCC_SMC_32,				\
-+			   0, 0x8000)
-+
- #ifndef __ASSEMBLY__
+diff --git a/arch/arm64/kernel/bpi.S b/arch/arm64/kernel/bpi.S
+index 76225c2611ea..fdeed629f2c6 100644
+--- a/arch/arm64/kernel/bpi.S
++++ b/arch/arm64/kernel/bpi.S
+@@ -17,6 +17,7 @@
+  */
  
  #include <linux/linkage.h>
-diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
-index 2efacbe7b1a2..22c24561d07d 100644
---- a/virt/kvm/arm/psci.c
-+++ b/virt/kvm/arm/psci.c
-@@ -406,13 +406,20 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
- {
- 	u32 func_id = smccc_get_function(vcpu);
- 	u32 val = PSCI_RET_NOT_SUPPORTED;
-+	u32 feature;
++#include <linux/arm-smccc.h>
  
- 	switch (func_id) {
- 	case ARM_SMCCC_VERSION_FUNC_ID:
- 		val = ARM_SMCCC_VERSION_1_1;
- 		break;
- 	case ARM_SMCCC_ARCH_FEATURES_FUNC_ID:
--		/* Nothing supported yet */
-+		feature = smccc_get_arg1(vcpu);
-+		switch(feature) {
-+		case ARM_SMCCC_ARCH_WORKAROUND_1:
-+			if (kvm_arm_harden_branch_predictor())
-+				val = 0;
-+			break;
-+		}
- 		break;
- 	default:
- 		return kvm_psci_call(vcpu);
+ .macro ventry target
+ 	.rept 31
+@@ -85,3 +86,22 @@ ENTRY(__qcom_hyp_sanitize_link_stack_start)
+ 	.endr
+ 	ldp	x29, x30, [sp], #16
+ ENTRY(__qcom_hyp_sanitize_link_stack_end)
++
++.macro smccc_workaround_1 inst
++	sub	sp, sp, #(8 * 4)
++	stp	x2, x3, [sp, #(8 * 0)]
++	stp	x0, x1, [sp, #(8 * 2)]
++	mov	w0, #ARM_SMCCC_ARCH_WORKAROUND_1
++	\inst	#0
++	ldp	x2, x3, [sp, #(8 * 0)]
++	ldp	x0, x1, [sp, #(8 * 2)]
++	add	sp, sp, #(8 * 4)
++.endm
++
++ENTRY(__smccc_workaround_1_smc_start)
++	smccc_workaround_1	smc
++ENTRY(__smccc_workaround_1_smc_end)
++
++ENTRY(__smccc_workaround_1_hvc_start)
++	smccc_workaround_1	hvc
++ENTRY(__smccc_workaround_1_hvc_end)
+diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
+index ed6881882231..9e77809a3b23 100644
+--- a/arch/arm64/kernel/cpu_errata.c
++++ b/arch/arm64/kernel/cpu_errata.c
+@@ -70,6 +70,10 @@ DEFINE_PER_CPU_READ_MOSTLY(struct bp_hardening_data, bp_hardening_data);
+ extern char __psci_hyp_bp_inval_start[], __psci_hyp_bp_inval_end[];
+ extern char __qcom_hyp_sanitize_link_stack_start[];
+ extern char __qcom_hyp_sanitize_link_stack_end[];
++extern char __smccc_workaround_1_smc_start[];
++extern char __smccc_workaround_1_smc_end[];
++extern char __smccc_workaround_1_hvc_start[];
++extern char __smccc_workaround_1_hvc_end[];
+ 
+ static void __copy_hyp_vect_bpi(int slot, const char *hyp_vecs_start,
+ 				const char *hyp_vecs_end)
+@@ -116,6 +120,10 @@ static void __install_bp_hardening_cb(bp_hardening_cb_t fn,
+ #define __psci_hyp_bp_inval_end			NULL
+ #define __qcom_hyp_sanitize_link_stack_start	NULL
+ #define __qcom_hyp_sanitize_link_stack_end	NULL
++#define __smccc_workaround_1_smc_start		NULL
++#define __smccc_workaround_1_smc_end		NULL
++#define __smccc_workaround_1_hvc_start		NULL
++#define __smccc_workaround_1_hvc_end		NULL
+ 
+ static void __install_bp_hardening_cb(bp_hardening_cb_t fn,
+ 				      const char *hyp_vecs_start,
+@@ -142,17 +150,75 @@ static void  install_bp_hardening_cb(const struct arm64_cpu_capabilities *entry,
+ 	__install_bp_hardening_cb(fn, hyp_vecs_start, hyp_vecs_end);
+ }
+ 
++#include <uapi/linux/psci.h>
++#include <linux/arm-smccc.h>
+ #include <linux/psci.h>
+ 
++static void call_smc_arch_workaround_1(void)
++{
++	arm_smccc_1_1_smc(ARM_SMCCC_ARCH_WORKAROUND_1, NULL);
++}
++
++static void call_hvc_arch_workaround_1(void)
++{
++	arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_WORKAROUND_1, NULL);
++}
++
++static bool check_smccc_arch_workaround_1(const struct arm64_cpu_capabilities *entry)
++{
++	bp_hardening_cb_t cb;
++	void *smccc_start, *smccc_end;
++	struct arm_smccc_res res;
++
++	if (!entry->matches(entry, SCOPE_LOCAL_CPU))
++		return false;
++
++	if (psci_ops.smccc_version == SMCCC_VERSION_1_0)
++		return false;
++
++	switch (psci_ops.conduit) {
++	case PSCI_CONDUIT_HVC:
++		arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
++				  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
++		if (res.a0)
++			return false;
++		cb = call_hvc_arch_workaround_1;
++		smccc_start = __smccc_workaround_1_hvc_start;
++		smccc_end = __smccc_workaround_1_hvc_end;
++		break;
++
++	case PSCI_CONDUIT_SMC:
++		arm_smccc_1_1_smc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
++				  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
++		if (res.a0)
++			return false;
++		cb = call_smc_arch_workaround_1;
++		smccc_start = __smccc_workaround_1_smc_start;
++		smccc_end = __smccc_workaround_1_smc_end;
++		break;
++
++	default:
++		return false;
++	}
++
++	install_bp_hardening_cb(entry, cb, smccc_start, smccc_end);
++
++	return true;
++}
++
+ static int enable_psci_bp_hardening(void *data)
+ {
+ 	const struct arm64_cpu_capabilities *entry = data;
+ 
+-	if (psci_ops.get_version)
++	if (psci_ops.get_version) {
++		if (check_smccc_arch_workaround_1(entry))
++			return 0;
++
+ 		install_bp_hardening_cb(entry,
+ 				       (bp_hardening_cb_t)psci_ops.get_version,
+ 				       __psci_hyp_bp_inval_start,
+ 				       __psci_hyp_bp_inval_end);
++	}
+ 
+ 	return 0;
+ }
 -- 
 2.14.2
