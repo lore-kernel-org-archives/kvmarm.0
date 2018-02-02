@@ -1,165 +1,149 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v3 04/18] arm/arm64: KVM: Consolidate the PSCI include
- files
-Date: Fri, 2 Feb 2018 13:33:09 +0100
-Message-ID: <20180202123309.GG21802@cbox>
+Subject: Re: [PATCH v3 06/18] arm/arm64: KVM: Add smccc accessors to PSCI code
+Date: Fri, 2 Feb 2018 13:33:19 +0100
+Message-ID: <20180202123319.GI21802@cbox>
 References: <20180201114657.7323-1-marc.zyngier@arm.com>
- <20180201114657.7323-5-marc.zyngier@arm.com>
+ <20180201114657.7323-7-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180201114657.7323-5-marc.zyngier@arm.com>
+In-Reply-To: <20180201114657.7323-7-marc.zyngier@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>
 Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Mark Rutland <mark.rutland@arm.com>, Robin Murphy <robin.murphy@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andrew Jones <drjones@redhat.com>, Hanjun Guo <guohanjun@huawei.com>, Jayachandran C <jnair@caviumnetworks.com>, Jon Masters <jcm@redhat.com>, Russell King - ARM Linux <linux@armlinux.org.uk>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Feb 01, 2018 at 11:46:43AM +0000, Marc Zyngier wrote:
-> As we're about to update the PSCI support, and because I'm lazy,
-> let's move the PSCI include file to include/kvm so that both
-> ARM architectures can find it.
+On Thu, Feb 01, 2018 at 11:46:45AM +0000, Marc Zyngier wrote:
+> Instead of open coding the accesses to the various registers,
+> let's add explicit SMCCC accessors.
 > 
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
->  arch/arm/include/asm/kvm_psci.h                    | 27 ----------------------
->  arch/arm/kvm/handle_exit.c                         |  2 +-
->  arch/arm64/kvm/handle_exit.c                       |  3 ++-
->  .../asm/kvm_psci.h => include/kvm/arm_psci.h       |  6 ++---
->  virt/kvm/arm/arm.c                                 |  2 +-
->  virt/kvm/arm/psci.c                                |  3 ++-
->  6 files changed, 9 insertions(+), 34 deletions(-)
->  delete mode 100644 arch/arm/include/asm/kvm_psci.h
->  rename arch/arm64/include/asm/kvm_psci.h => include/kvm/arm_psci.h (89%)
+>  virt/kvm/arm/psci.c | 52 ++++++++++++++++++++++++++++++++++++++++++----------
+>  1 file changed, 42 insertions(+), 10 deletions(-)
 > 
-> diff --git a/arch/arm/include/asm/kvm_psci.h b/arch/arm/include/asm/kvm_psci.h
-> deleted file mode 100644
-> index 6bda945d31fa..000000000000
-> --- a/arch/arm/include/asm/kvm_psci.h
-> +++ /dev/null
-> @@ -1,27 +0,0 @@
-> -/*
-> - * Copyright (C) 2012 - ARM Ltd
-> - * Author: Marc Zyngier <marc.zyngier@arm.com>
-> - *
-> - * This program is free software; you can redistribute it and/or modify
-> - * it under the terms of the GNU General Public License version 2 as
-> - * published by the Free Software Foundation.
-> - *
-> - * This program is distributed in the hope that it will be useful,
-> - * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> - * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> - * GNU General Public License for more details.
-> - *
-> - * You should have received a copy of the GNU General Public License
-> - * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> - */
-> -
-> -#ifndef __ARM_KVM_PSCI_H__
-> -#define __ARM_KVM_PSCI_H__
-> -
-> -#define KVM_ARM_PSCI_0_1	1
-> -#define KVM_ARM_PSCI_0_2	2
-> -
-> -int kvm_psci_version(struct kvm_vcpu *vcpu);
-> -int kvm_psci_call(struct kvm_vcpu *vcpu);
-> -
-> -#endif /* __ARM_KVM_PSCI_H__ */
-> diff --git a/arch/arm/kvm/handle_exit.c b/arch/arm/kvm/handle_exit.c
-> index a4bf0f6f024a..230ae4079108 100644
-> --- a/arch/arm/kvm/handle_exit.c
-> +++ b/arch/arm/kvm/handle_exit.c
-> @@ -21,7 +21,7 @@
->  #include <asm/kvm_emulate.h>
->  #include <asm/kvm_coproc.h>
->  #include <asm/kvm_mmu.h>
-> -#include <asm/kvm_psci.h>
-> +#include <kvm/arm_psci.h>
->  #include <trace/events/kvm.h>
->  
->  #include "trace.h"
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index 5493bbefbd0d..588f910632a7 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -22,13 +22,14 @@
->  #include <linux/kvm.h>
->  #include <linux/kvm_host.h>
->  
-> +#include <kvm/arm_psci.h>
-> +
->  #include <asm/esr.h>
->  #include <asm/exception.h>
->  #include <asm/kvm_asm.h>
->  #include <asm/kvm_coproc.h>
->  #include <asm/kvm_emulate.h>
->  #include <asm/kvm_mmu.h>
-> -#include <asm/kvm_psci.h>
->  #include <asm/debug-monitors.h>
->  #include <asm/traps.h>
->  
-> diff --git a/arch/arm64/include/asm/kvm_psci.h b/include/kvm/arm_psci.h
-> similarity index 89%
-> rename from arch/arm64/include/asm/kvm_psci.h
-> rename to include/kvm/arm_psci.h
-> index bc39e557c56c..2042bb909474 100644
-> --- a/arch/arm64/include/asm/kvm_psci.h
-> +++ b/include/kvm/arm_psci.h
-> @@ -15,8 +15,8 @@
->   * along with this program.  If not, see <http://www.gnu.org/licenses/>.
->   */
->  
-> -#ifndef __ARM64_KVM_PSCI_H__
-> -#define __ARM64_KVM_PSCI_H__
-> +#ifndef __KVM_ARM_PSCI_H__
-> +#define __KVM_ARM_PSCI_H__
->  
->  #define KVM_ARM_PSCI_0_1	1
->  #define KVM_ARM_PSCI_0_2	2
-> @@ -24,4 +24,4 @@
->  int kvm_psci_version(struct kvm_vcpu *vcpu);
->  int kvm_psci_call(struct kvm_vcpu *vcpu);
->  
-> -#endif /* __ARM64_KVM_PSCI_H__ */
-> +#endif /* __KVM_ARM_PSCI_H__ */
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index 15bf026eb182..af3e98fc377e 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -31,6 +31,7 @@
->  #include <linux/irqbypass.h>
->  #include <trace/events/kvm.h>
->  #include <kvm/arm_pmu.h>
-> +#include <kvm/arm_psci.h>
->  
->  #define CREATE_TRACE_POINTS
->  #include "trace.h"
-> @@ -46,7 +47,6 @@
->  #include <asm/kvm_mmu.h>
->  #include <asm/kvm_emulate.h>
->  #include <asm/kvm_coproc.h>
-> -#include <asm/kvm_psci.h>
->  #include <asm/sections.h>
->  
->  #ifdef REQUIRES_VIRT
 > diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
-> index f1e363bab5e8..b322e46fd142 100644
+> index 999f94d6bb98..c41553d35110 100644
 > --- a/virt/kvm/arm/psci.c
 > +++ b/virt/kvm/arm/psci.c
-> @@ -21,9 +21,10 @@
+> @@ -32,6 +32,38 @@
 >  
->  #include <asm/cputype.h>
->  #include <asm/kvm_emulate.h>
-> -#include <asm/kvm_psci.h>
->  #include <asm/kvm_host.h>
+>  #define AFFINITY_MASK(level)	~((0x1UL << ((level) * MPIDR_LEVEL_BITS)) - 1)
 >  
-> +#include <kvm/arm_psci.h>
+> +static u32 smccc_get_function(struct kvm_vcpu *vcpu)
+> +{
+> +	return vcpu_get_reg(vcpu, 0);
+> +}
 > +
->  #include <uapi/linux/psci.h>
+> +static unsigned long smccc_get_arg1(struct kvm_vcpu *vcpu)
+> +{
+> +	return vcpu_get_reg(vcpu, 1);
+> +}
+> +
+> +static unsigned long smccc_get_arg2(struct kvm_vcpu *vcpu)
+> +{
+> +	return vcpu_get_reg(vcpu, 2);
+> +}
+> +
+> +static unsigned long smccc_get_arg3(struct kvm_vcpu *vcpu)
+> +{
+> +	return vcpu_get_reg(vcpu, 3);
+> +}
+> +
+> +static void smccc_set_retval(struct kvm_vcpu *vcpu,
+> +			     unsigned long a0,
+> +			     unsigned long a1,
+> +			     unsigned long a2,
+> +			     unsigned long a3)
+> +{
+> +	vcpu_set_reg(vcpu, 0, a0);
+> +	vcpu_set_reg(vcpu, 1, a1);
+> +	vcpu_set_reg(vcpu, 2, a2);
+> +	vcpu_set_reg(vcpu, 3, a3);
+> +}
+> +
+>  static unsigned long psci_affinity_mask(unsigned long affinity_level)
+>  {
+>  	if (affinity_level <= 3)
+> @@ -77,7 +109,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>  	unsigned long context_id;
+>  	phys_addr_t target_pc;
 >  
->  /*
+> -	cpu_id = vcpu_get_reg(source_vcpu, 1) & MPIDR_HWID_BITMASK;
+> +	cpu_id = smccc_get_arg1(source_vcpu) & MPIDR_HWID_BITMASK;
+>  	if (vcpu_mode_is_32bit(source_vcpu))
+>  		cpu_id &= ~((u32) 0);
+>  
+> @@ -96,8 +128,8 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>  			return PSCI_RET_INVALID_PARAMS;
+>  	}
+>  
+> -	target_pc = vcpu_get_reg(source_vcpu, 2);
+> -	context_id = vcpu_get_reg(source_vcpu, 3);
+> +	target_pc = smccc_get_arg2(source_vcpu);
+> +	context_id = smccc_get_arg3(source_vcpu);
+>  
+>  	kvm_reset_vcpu(vcpu);
+>  
+> @@ -116,7 +148,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>  	 * NOTE: We always update r0 (or x0) because for PSCI v0.1
+>  	 * the general puspose registers are undefined upon CPU_ON.
+>  	 */
+> -	vcpu_set_reg(vcpu, 0, context_id);
+> +	smccc_set_retval(vcpu, context_id, 0, 0, 0);
+>  	vcpu->arch.power_off = false;
+>  	smp_mb();		/* Make sure the above is visible */
+>  
+> @@ -136,8 +168,8 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
+>  	struct kvm *kvm = vcpu->kvm;
+>  	struct kvm_vcpu *tmp;
+>  
+> -	target_affinity = vcpu_get_reg(vcpu, 1);
+> -	lowest_affinity_level = vcpu_get_reg(vcpu, 2);
+> +	target_affinity = smccc_get_arg1(vcpu);
+> +	lowest_affinity_level = smccc_get_arg2(vcpu);
+>  
+>  	/* Determine target affinity mask */
+>  	target_affinity_mask = psci_affinity_mask(lowest_affinity_level);
+> @@ -210,7 +242,7 @@ int kvm_psci_version(struct kvm_vcpu *vcpu)
+>  static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm *kvm = vcpu->kvm;
+> -	unsigned long psci_fn = vcpu_get_reg(vcpu, 0) & ~((u32) 0);
+> +	u32 psci_fn = smccc_get_function(vcpu);
+>  	unsigned long val;
+>  	int ret = 1;
+>  
+> @@ -277,14 +309,14 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
+>  		break;
+>  	}
+>  
+> -	vcpu_set_reg(vcpu, 0, val);
+> +	smccc_set_retval(vcpu, val, 0, 0, 0);
+>  	return ret;
+>  }
+>  
+>  static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm *kvm = vcpu->kvm;
+> -	unsigned long psci_fn = vcpu_get_reg(vcpu, 0) & ~((u32) 0);
+> +	u32 psci_fn = smccc_get_function(vcpu);
+>  	unsigned long val;
+>  
+>  	switch (psci_fn) {
+> @@ -302,7 +334,7 @@ static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
+>  		break;
+>  	}
+>  
+> -	vcpu_set_reg(vcpu, 0, val);
+> +	smccc_set_retval(vcpu, val, 0, 0, 0);
+>  	return 1;
+>  }
+>  
 > -- 
 > 2.14.2
 > 
