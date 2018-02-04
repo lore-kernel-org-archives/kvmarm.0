@@ -1,92 +1,106 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v3 12/18] arm64: KVM: Add SMCCC_ARCH_WORKAROUND_1 fast
- handling
-Date: Sun, 4 Feb 2018 19:39:07 +0100
-Message-ID: <20180204183907.GP21802@cbox>
-References: <20180201114657.7323-1-marc.zyngier@arm.com>
- <20180201114657.7323-13-marc.zyngier@arm.com>
+Subject: Re: [PATCH 1/2] ARM: kvm: fix building with gcc-8
+Date: Sun, 4 Feb 2018 19:45:17 +0100
+Message-ID: <20180204184517.GQ21802@cbox>
+References: <20180202150756.420422-1-arnd@arndb.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180201114657.7323-13-marc.zyngier@arm.com>
+In-Reply-To: <20180202150756.420422-1-arnd@arndb.de>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Mark Rutland <mark.rutland@arm.com>, Robin Murphy <robin.murphy@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andrew Jones <drjones@redhat.com>, Hanjun Guo <guohanjun@huawei.com>, Jayachandran C <jnair@caviumnetworks.com>, Jon Masters <jcm@redhat.com>, Russell King - ARM Linux <linux@armlinux.org.uk>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Russell King <linux@armlinux.org.uk>, Nicolas Pitre <nico@linaro.org>, Andi Kleen <ak@linux.intel.com>, Richard Earnshaw <rearnsha@gcc.gnu.org>, Tamar Christina <tnfchris@gcc.gnu.org>, stable@vger.kernel.org, Julien Thierry <julien.thierry@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Feb 01, 2018 at 11:46:51AM +0000, Marc Zyngier wrote:
-> We want SMCCC_ARCH_WORKAROUND_1 to be fast. As fast as possible.
-> So let's intercept it as early as we can by testing for the
-> function call number as soon as we've identified a HVC call
-> coming from the guest.
+Hi Arnd,
 
-Hmmm.  How often is this expected to happen and what is the expected
-extra cost of doing the early-exit handling in the C code vs. here?
+On Fri, Feb 02, 2018 at 04:07:34PM +0100, Arnd Bergmann wrote:
+> In banked-sr.c, we use a top-level '__asm__(".arch_extension virt")'
+> statement to allow compilation of a multi-CPU kernel for ARMv6
+> and older ARMv7-A that don't normally support access to the banked
+> registers.
+> 
+> This is considered to be a programming error by the gcc developers
+> and will no longer work in gcc-8, where we now get a build error:
+> 
+> /tmp/cc4Qy7GR.s:34: Error: Banked registers are not available with this architecture. -- `mrs r3,SP_usr'
+> /tmp/cc4Qy7GR.s:41: Error: Banked registers are not available with this architecture. -- `mrs r3,ELR_hyp'
+> /tmp/cc4Qy7GR.s:55: Error: Banked registers are not available with this architecture. -- `mrs r3,SP_svc'
+> /tmp/cc4Qy7GR.s:62: Error: Banked registers are not available with this architecture. -- `mrs r3,LR_svc'
+> /tmp/cc4Qy7GR.s:69: Error: Banked registers are not available with this architecture. -- `mrs r3,SPSR_svc'
+> /tmp/cc4Qy7GR.s:76: Error: Banked registers are not available with this architecture. -- `mrs r3,SP_abt'
+> 
+> Passign the '-march-armv7ve' flag to gcc works, and is ok here, because
+> we know the functions won't ever be called on pre-ARMv7VE machines.
+> Unfortunately, older compiler versions (4.8 and earlier) do not understand
+> that flag, so we still need to keep the asm around.
 
-I think we'd be better off if we only had a single early-exit path (and
-we should move the FP/SIMD trap to that path as well), but if there's a
-measurable benefit of having this logic in assembly as opposed to in the
-C code, then I'm ok with this as well.
+Does "not understand" mean "ignores" or do we get an error?
 
-The code in this patch looks fine otherwise.
+> 
+> Backporting to stable kernels (4.6+) is needed to allow those to be built
+> with future compilers as well.
+
+This builds on the toolchains I have on my machine, so:
+
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+
+Are you applying this via a tree with other fixes or would you like me
+to carry it in the kvmarm tree?
 
 Thanks,
 -Christoffer
 
 > 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=84129
+> Fixes: 33280b4cd1dc ("ARM: KVM: Add banked registers save/restore")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 > ---
->  arch/arm64/kvm/hyp/hyp-entry.S | 20 ++++++++++++++++++--
->  1 file changed, 18 insertions(+), 2 deletions(-)
+>  arch/arm/kvm/hyp/Makefile    | 5 +++++
+>  arch/arm/kvm/hyp/banked-sr.c | 4 ++++
+>  2 files changed, 9 insertions(+)
 > 
-> diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-> index e4f37b9dd47c..f36464bd57c5 100644
-> --- a/arch/arm64/kvm/hyp/hyp-entry.S
-> +++ b/arch/arm64/kvm/hyp/hyp-entry.S
-> @@ -15,6 +15,7 @@
->   * along with this program.  If not, see <http://www.gnu.org/licenses/>.
->   */
+> diff --git a/arch/arm/kvm/hyp/Makefile b/arch/arm/kvm/hyp/Makefile
+> index 5638ce0c9524..63d6b404d88e 100644
+> --- a/arch/arm/kvm/hyp/Makefile
+> +++ b/arch/arm/kvm/hyp/Makefile
+> @@ -7,6 +7,8 @@ ccflags-y += -fno-stack-protector -DDISABLE_BRANCH_PROFILING
 >  
-> +#include <linux/arm-smccc.h>
->  #include <linux/linkage.h>
+>  KVM=../../../../virt/kvm
 >  
->  #include <asm/alternative.h>
-> @@ -64,10 +65,11 @@ alternative_endif
->  	lsr	x0, x1, #ESR_ELx_EC_SHIFT
->  
->  	cmp	x0, #ESR_ELx_EC_HVC64
-> +	ccmp	x0, #ESR_ELx_EC_HVC32, #4, ne
->  	b.ne	el1_trap
->  
-> -	mrs	x1, vttbr_el2		// If vttbr is valid, the 64bit guest
-> -	cbnz	x1, el1_trap		// called HVC
-> +	mrs	x1, vttbr_el2		// If vttbr is valid, the guest
-> +	cbnz	x1, el1_hvc_guest	// called HVC
->  
->  	/* Here, we're pretty sure the host called HVC. */
->  	ldp	x0, x1, [sp], #16
-> @@ -100,6 +102,20 @@ alternative_endif
->  
->  	eret
->  
-> +el1_hvc_guest:
-> +	/*
-> +	 * Fastest possible path for ARM_SMCCC_ARCH_WORKAROUND_1.
-> +	 * The workaround has already been applied on the host,
-> +	 * so let's quickly get back to the guest. We don't bother
-> +	 * restoring x1, as it can be clobbered anyway.
-> +	 */
-> +	ldr	x1, [sp]				// Guest's x0
-> +	eor	w1, w1, #ARM_SMCCC_ARCH_WORKAROUND_1
-> +	cbnz	w1, el1_trap
-> +	mov	x0, x1
-> +	add	sp, sp, #16
-> +	eret
+> +CFLAGS_ARMV7VE		   :=$(call cc-option, -march=armv7ve)
 > +
->  el1_trap:
->  	/*
->  	 * x0: ESR_EC
+>  obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v2-sr.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v3-sr.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/timer-sr.o
+> @@ -15,7 +17,10 @@ obj-$(CONFIG_KVM_ARM_HOST) += tlb.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += cp15-sr.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += vfp.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += banked-sr.o
+> +CFLAGS_banked-sr.o	   += $(CFLAGS_ARMV7VE)
+> +
+>  obj-$(CONFIG_KVM_ARM_HOST) += entry.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += hyp-entry.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += switch.o
+> +CFLAGS_switch.o		   += $(CFLAGS_ARMV7VE)
+>  obj-$(CONFIG_KVM_ARM_HOST) += s2-setup.o
+> diff --git a/arch/arm/kvm/hyp/banked-sr.c b/arch/arm/kvm/hyp/banked-sr.c
+> index 111bda8cdebd..be4b8b0a40ad 100644
+> --- a/arch/arm/kvm/hyp/banked-sr.c
+> +++ b/arch/arm/kvm/hyp/banked-sr.c
+> @@ -20,6 +20,10 @@
+>  
+>  #include <asm/kvm_hyp.h>
+>  
+> +/*
+> + * gcc before 4.9 doesn't understand -march=armv7ve, so we have to
+> + * trick the assembler.
+> + */
+>  __asm__(".arch_extension     virt");
+>  
+>  void __hyp_text __banked_save_state(struct kvm_cpu_context *ctxt)
 > -- 
-> 2.14.2
+> 2.9.0
 > 
