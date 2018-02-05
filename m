@@ -1,68 +1,92 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 08/18] arm/arm64: KVM: Add PSCI version selection API
-Date: Mon, 5 Feb 2018 11:08:50 +0000
-Message-ID: <3089d003-5904-94a2-c62a-e2c0f512e803@arm.com>
-References: <20180201114657.7323-1-marc.zyngier@arm.com>
- <20180201114657.7323-9-marc.zyngier@arm.com>
- <20180202201706.dj6jmff7lh7bleze@kamzik.brq.redhat.com>
- <20180203115932.24c4bcfb@why.wild-wind.fr.eu.org>
- <20180204123701.GK21802@cbox> <6b0d5f23-950c-b2a6-3cc8-63c3145893b4@arm.com>
- <20180205095823.r5vlfkovrgksykxh@hawk.localdomain>
- <7eb71dd4-c06b-9680-0280-03569925283b@arm.com> <20180205105031.GV21802@cbox>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Subject: Re: [PATCH v9 3/7] acpi: apei: Add SEI notification type support
+ for ARMv8
+Date: Mon, 5 Feb 2018 11:24:26 +0000
+Message-ID: <0184EA26B2509940AA629AE1405DD7F201AC71DE@DGGEMA503-MBS.china.huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180205105031.GV21802@cbox>
-Content-Language: en-GB
-Sender: linux-kernel-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Andrew Jones <drjones@redhat.com>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Mark Rutland <mark.rutland@arm.com>, Robin Murphy <robin.murphy@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Hanjun Guo <guohanjun@huawei.com>, Jayachandran C <jnair@caviumnetworks.com>, Jon Masters <jcm@redhat.com>, Russell King - ARM Linux <linux@armlinux.org.uk>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Return-path: <linux-doc-owner@vger.kernel.org>
+Content-Language: zh-CN
+Sender: linux-doc-owner@vger.kernel.org
+To: James Morse <james.morse@arm.com>
+Cc: "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "rjw@rjwysocki.net" <rjw@rjwysocki.net>, "bp@alien8.de" <bp@alien8.de>, "robert.moore@intel.com" <robert.moore@intel.com>, "lv.zheng@intel.com" <lv.zheng@intel.com>, "corbet@lwn.net" <corbet@lwn.net>, "will.deacon@arm.com" <will.deacon@arm.com>, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 05/02/18 10:50, Christoffer Dall wrote:
-> On Mon, Feb 05, 2018 at 10:42:44AM +0000, Marc Zyngier wrote:
->> On 05/02/18 09:58, Andrew Jones wrote:
->>> On Mon, Feb 05, 2018 at 09:24:33AM +0000, Marc Zyngier wrote:
->>>> On 04/02/18 12:37, Christoffer Dall wrote:
->>
->> [...]
->>
->>>>> Given the urgency of adding mitigation towards variant 2 which is the
->>>>> driver for this work, I think we should drop the compat functionality in
->>>>> this series and work this out later on if needed.  I think we can just
->>>>> tweak the previous patch to enable PSCI 1.0 by default and drop this
->>>>> patch for the current merge window.
->>>>
->>>> I'd be fine with that, as long as we have a clear agreement on the
->>>> impact of such a move.
->>>
->>> Yeah, that's what I was trying to figure out with my fancy tables. I might
->>> be coming around more to your approach now, though. Ensuring the new->old
->>> migration fails is a nice feature of this series. It would be good if
->>> we could preserve that behavior without committing to a new userspace
->>> interface, but I'm not sure how. Maybe I should just apologize for the
->>> noise, and this patch be left as is...
->>
->> How about we don't decide now?
->>
->> I can remove this patch from the series so that the core stuff can make
->> it into the arm64 tree ASAP (I think Catalin wants to queue something
->> early this week so that it can hit Linus' tree before the end of the
->> merge window), and then repost this single patch on its own (with fixes
->> for the things that Christoffer found in his review) after -rc1.
->>
->> It leaves us time to haggle over the userspace ABI (which is
->> realistically not going to affect anyone), and we get the core stuff in
->> place for SoC vendors to start updating their firmware.
->>
-> I agree, that's what I tried to suggest in my e-mail as well.  Just
-> remember to tweak the previous patch to actually enable PSCI 1.0 by
-> default.
+[...]
+> 
+> > Yes, I know you are dong that. Your serial's patch will consider all above
+> things, right?
+> 
+> Assuming I got it right, yes. It currently makes the race Xie XiuQi spotted worse,
+> which I want to fix too. (details on the cover letter)
 
-Yup. I'll move the KVM_ARM_PSCI_LATEST hunk to that patch, and return it
-unconditionally from kvm_psci_version.
+Ok.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+> 
+> 
+> > If your patch can be consider that, this patch can based on your patchset.
+> thanks.
+> 
+> I'd like to pick these patches onto the end of that series, but first I want to
+> know what NOTIFY_SEI means for any OS. The ACPI spec doesn't say, and
+> because its asynchronous, route-able and mask-able, there are many more
+> corners than NOTFIY_SEA.
+> 
+> This thing is a notification using an emulated SError exception. (emulated
+> because physical-SError must be routed to EL3 for firmware-first, and
+> virtual-SError belongs to EL2).
+> 
+> Does your firmware emulate SError exactly as the TakeException() pseudo code
+> in the Arm-Arm?
+
+Yes, it is.
+
+> Is the emulated SError routed following the routing rules for HCR_EL2.{AMO,
+> TGE}?
+
+Yes, it is.
+
+> What does your firmware do when it wants to emulate SError but its masked?
+> (e.g.1: The physical-SError interrupted EL2 and the SPSR shows EL2 had
+> PSTATE.A  set.
+>  e.g.2: The physical-SError interrupted EL2 but HCR_EL2 indicates the
+> emulated  SError should go to EL1. This effectively masks SError.)
+
+Currently we does not consider much about the mask status(SPSR).
+I remember that you ever suggested firmware should reboot if the mask status is set(SPSR), right?
+I ever suggest our firmware team to evaluate that, but there is no response.
+
+I CC "liu jun" <liujun88@hisilicon.com> who is our UEFI firmware Architect, if you have firmware requirements, you can
+raise again.
+
+> 
+> Answers to these let us determine whether a bug is in the firmware or the
+> kernel. If firmware is expecting the OS to do something special, I'd like to know
+> about it from the beginning!
+
+I know your meaning, thanks for raising it again.
+
+> 
+> 
+> >>> Expose API ghes_notify_sei() to external users. External modules can
+> >>> call this exposed API to parse APEI table and handle the SEI
+> >>> notification.
+> >>
+> >> external modules? You mean called by the arch code when it gets this
+> NOTIFY_SEI?
+> 
+> > yes, called by kernel ARCH code, such as below, I remember I have discussed
+> with you.
+> 
+> Sure. The phrase 'external modules' usually means the '.ko' files that live in
+> /lib/modules, nothing outside the kernel tree should be doing this stuff.
+
+I will rename 'external modules' to other name. Thanks.
+
+> 
+> 
+> Thanks,
+> 
+> James
+
