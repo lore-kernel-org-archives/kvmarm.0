@@ -1,434 +1,278 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
+From: Andrew Jones <drjones@redhat.com>
 Subject: Re: [PATCH v3 08/18] arm/arm64: KVM: Add PSCI version selection API
-Date: Mon, 5 Feb 2018 09:30:45 +0000
-Message-ID: <bcfc18af-242b-31c0-3410-965268e94dc2@arm.com>
+Date: Mon, 5 Feb 2018 10:47:42 +0100
+Message-ID: <20180205094742.dxcejlvmpndwcupg@hawk.localdomain>
 References: <20180201114657.7323-1-marc.zyngier@arm.com>
- <20180201114657.7323-9-marc.zyngier@arm.com> <20180204123830.GL21802@cbox>
+ <20180201114657.7323-9-marc.zyngier@arm.com>
+ <20180202201706.dj6jmff7lh7bleze@kamzik.brq.redhat.com>
+ <20180203115932.24c4bcfb@why.wild-wind.fr.eu.org>
+ <20180204123701.GK21802@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180204123830.GL21802@cbox>
-Content-Language: en-GB
-Sender: linux-kernel-owner@vger.kernel.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <20180204123701.GK21802@cbox>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Mark Rutland <mark.rutland@arm.com>, Robin Murphy <robin.murphy@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andrew Jones <drjones@redhat.com>, Hanjun Guo <guohanjun@huawei.com>, Jayachandran C <jnair@caviumnetworks.com>, Jon Masters <jcm@redhat.com>, Russell King - ARM Linux <linux@armlinux.org.uk>
+Cc: Mark Rutland <mark.rutland@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Jon Masters <jcm@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, Russell King - ARM Linux <linux@armlinux.org.uk>, Jayachandran C <jnair@caviumnetworks.com>, Hanjun Guo <guohanjun@huawei.com>, Robin Murphy <robin.murphy@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 04/02/18 12:38, Christoffer Dall wrote:
-> Hi Marc,
+On Sun, Feb 04, 2018 at 01:37:01PM +0100, Christoffer Dall wrote:
+> On Sat, Feb 03, 2018 at 11:59:32AM +0000, Marc Zyngier wrote:
+> > On Fri, 2 Feb 2018 21:17:06 +0100
+> > Andrew Jones <drjones@redhat.com> wrote:
+> > 
+> > > On Thu, Feb 01, 2018 at 11:46:47AM +0000, Marc Zyngier wrote:
+> > > > Although we've implemented PSCI 1.0 and 1.1, nothing can select them
+> > > > Since all the new PSCI versions are backward compatible, we decide to
+> > > > default to the latest version of the PSCI implementation. This is no
+> > > > different from doing a firmware upgrade on KVM.
+> > > > 
+> > > > But in order to give a chance to hypothetical badly implemented guests
+> > > > that would have a fit by discovering something other than PSCI 0.2,
+> > > > let's provide a new API that allows userspace to pick one particular
+> > > > version of the API.
+> > > > 
+> > > > This is implemented as a new class of "firmware" registers, where
+> > > > we expose the PSCI version. This allows the PSCI version to be
+> > > > save/restored as part of a guest migration, and also set to
+> > > > any supported version if the guest requires it.
+> > > > 
+> > > > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> > > > ---
+> > > >  Documentation/virtual/kvm/api.txt      |  3 +-
+> > > >  Documentation/virtual/kvm/arm/psci.txt | 30 +++++++++++++++
+> > > >  arch/arm/include/asm/kvm_host.h        |  3 ++
+> > > >  arch/arm/include/uapi/asm/kvm.h        |  6 +++
+> > > >  arch/arm/kvm/guest.c                   | 13 +++++++
+> > > >  arch/arm64/include/asm/kvm_host.h      |  3 ++
+> > > >  arch/arm64/include/uapi/asm/kvm.h      |  6 +++
+> > > >  arch/arm64/kvm/guest.c                 | 14 ++++++-
+> > > >  include/kvm/arm_psci.h                 |  9 +++++
+> > > >  virt/kvm/arm/psci.c                    | 68 +++++++++++++++++++++++++++++++++-
+> > > >  10 files changed, 151 insertions(+), 4 deletions(-)
+> > > >  create mode 100644 Documentation/virtual/kvm/arm/psci.txt
+> > > > 
+> > > > diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+> > > > index 57d3ee9e4bde..334905202141 100644
+> > > > --- a/Documentation/virtual/kvm/api.txt
+> > > > +++ b/Documentation/virtual/kvm/api.txt
+> > > > @@ -2493,7 +2493,8 @@ Possible features:
+> > > >  	  and execute guest code when KVM_RUN is called.
+> > > >  	- KVM_ARM_VCPU_EL1_32BIT: Starts the CPU in a 32bit mode.
+> > > >  	  Depends on KVM_CAP_ARM_EL1_32BIT (arm64 only).
+> > > > -	- KVM_ARM_VCPU_PSCI_0_2: Emulate PSCI v0.2 for the CPU.
+> > > > +	- KVM_ARM_VCPU_PSCI_0_2: Emulate PSCI v0.2 (or a future revision
+> > > > +          backward compatible with v0.2) for the CPU.
+> > > >  	  Depends on KVM_CAP_ARM_PSCI_0_2.
+> > > >  	- KVM_ARM_VCPU_PMU_V3: Emulate PMUv3 for the CPU.
+> > > >  	  Depends on KVM_CAP_ARM_PMU_V3.
+> > > > diff --git a/Documentation/virtual/kvm/arm/psci.txt b/Documentation/virtual/kvm/arm/psci.txt
+> > > > new file mode 100644
+> > > > index 000000000000..aafdab887b04
+> > > > --- /dev/null
+> > > > +++ b/Documentation/virtual/kvm/arm/psci.txt
+> > > > @@ -0,0 +1,30 @@
+> > > > +KVM implements the PSCI (Power State Coordination Interface)
+> > > > +specification in order to provide services such as CPU on/off, reset
+> > > > +and power-off to the guest.
+> > > > +
+> > > > +The PSCI specification is regularly updated to provide new features,
+> > > > +and KVM implements these updates if they make sense from a virtualization
+> > > > +point of view.
+> > > > +
+> > > > +This means that a guest booted on two different versions of KVM can
+> > > > +observe two different "firmware" revisions. This could cause issues if
+> > > > +a given guest is tied to a particular PSCI revision (unlikely), or if
+> > > > +a migration causes a different PSCI version to be exposed out of the
+> > > > +blue to an unsuspecting guest.
+> > > > +
+> > > > +In order to remedy this situation, KVM exposes a set of "firmware
+> > > > +pseudo-registers" that can be manipulated using the GET/SET_ONE_REG
+> > > > +interface. These registers can be saved/restored by userspace, and set
+> > > > +to a convenient value if required.
+> > > > +
+> > > > +The following register is defined:
+> > > > +
+> > > > +* KVM_REG_ARM_PSCI_VERSION:
+> > > > +
+> > > > +  - Only valid if the vcpu has the KVM_ARM_VCPU_PSCI_0_2 feature set
+> > > > +    (and thus has already been initialized)
+> > > > +  - Returns the current PSCI version on GET_ONE_REG (defaulting to the
+> > > > +    highest PSCI version implemented by KVM and compatible with v0.2)
+> > > > +  - Allows any PSCI version implemented by KVM and compatible with
+> > > > +    v0.2 to be set with SET_ONE_REG
+> > > > +  - Affects the whole VM (even if the register view is per-vcpu)  
+> > > 
+> > 
+> > Hi Drew,
+> > 
+> > Thanks for looking into this, and for the exhaustive data.
+> > 
+> > > 
+> > > I've put some more thought and experimentation into this. I think we
+> > > should change to a vcpu feature bit. The feature bit would be used to
+> > > force compat mode, v0.2, so KVM would still enable the new PSCI
+> > > version by default. Below are two tables describing why I think we
+> > > should switch to something other than a new sysreg, and below those
+> > > tables are notes as to why I think we should use a vcpu feature. The
+> > > asterisks in the tables point out behaviors that aren't what we want.
+> > > While both tables have an asterisk, the sysreg approach's issue is
+> > > bug. The vcpu feature approach's issue is risk incurred from an
+> > > unsupported migration, albeit one that is hard to detect without a
+> > > new machine type.
+> > > 
+> > >  +-----------------------------------------------------------------------+
+> > >  |                          sysreg approach                              |
+> > >  +------------------+-----------+-------+--------------------------------+
+> > >  | migration        | userspace | works |             notes              |
+> > >  |                  |  change   |       |                                |
+> > >  +------------------+-----------+-------+--------------------------------+
+> > >  | new    -> new    |   NO      |  YES  | Expected                       |
+> > >  +------------------+-----------+-------+--------------------------------+
+> > >  | old    -> new    |   NO      |  YES  | PSCI 1.0 is backward compatible|
+> > >  +------------------+-----------+-------+--------------------------------+
+> > >  | new    -> old    |   NO      |  NO   | Migration fails due to the new |
+> > >  |                  |           |       | sysreg. Migration shouldn't    |
+> > >  |                  |           |       | have been attempted, but no    |
+> > >  |                  |           |       | way to know without a new      |
+> > >  |                  |           |       | machine type.                  |
+> > >  +------------------+-----------+-------+--------------------------------+
+> > >  | compat -> old    |   YES     |  NO*  | Even when setting PSCI version |
+> > >  |                  |           |       | to 0.2, we add a new sysreg,   |
+> > >  |                  |           |       | so migration will still fail.  |
+> > >  +------------------+-----------+-------+--------------------------------+
+> > >  | old    -> compat |   YES     |  YES  | It's OK for the destination to |
+> > >  |                  |           |       | support more sysregs than the  |
+> > >  |                  |           |       | source sends.                  |
+> > >  +------------------+-----------+-------+--------------------------------+
+> > >  
+> > >  
+> > >  +-----------------------------------------------------------------------+
+> > >  |                        vcpu feature approach                          |
+> > >  +------------------+-----------+-------+--------------------------------+
+> > >  | migration        | userspace | works |             notes              |
+> > >  |                  |  change   |       |                                |
+> > >  +------------------+-----------+-------+--------------------------------+
+> > >  | new    -> new    |   NO      |  YES  | Expected                       |
+> > >  +------------------+-----------+-------+--------------------------------+
+> > >  | old    -> new    |   NO      |  YES  | PSCI 1.0 is backward compatible|
+> > >  +------------------+-----------+-------+--------------------------------+
+> > >  | new    -> old    |   NO      |  YES* | Migrates, but it's not safe    |
+> > >  |                  |           |       | for the guest kernel, and no   |
+> > >  |                  |           |       | way to know without a new      |
+> > >  |                  |           |       | machine type.                  |
+> > >  +------------------+-----------+-------+--------------------------------+
+> > >  | compat -> old    |   YES     |  YES  | Expected                       |
+> > >  +------------------+-----------+-------+--------------------------------+
+> > >  | old    -> compat |   YES     |  YES  | Expected                       |
+> > >  +------------------+-----------+-------+--------------------------------+
+> > > 
+> > > 
+> > > Notes as to why the vcpu feature approach was selected:
+> > > 
+> > > 1) While this is VM state, and thus a VM control would be a more natural
+> > >    fit, a new vcpu feature bit would be much less new code. We also
+> > >    already have a PSCI vcpu feature bit, so a new one will actually fit
+> > >    quite well.
+> > > 
+> > > 2) No new state needs to be migrated, as we already migrate the feature
+> > >    bitmap. Unlike, KVM, QEMU doesn't track the max number of features,
+> > >    so bumping it one more in KVM doesn't require a QEMU change.
+> > > 
+> > > 
+> > > If we switch to a vcpu feature bit, then I think this patch can be
+> > > replaced with something like this
+> > 
+> > A couple of remarks:
+> > 
+> > - My worry with this feature bit  is that it is a point fix, and it
+> >   doesn't scale. Come PSCI 1.2 and WORKAROUND_2, what do we do? Add
+> >   another feature bit that says "force to 1.0"? I'd really like
+> >   something we can live with in the long run, and "KVM as firmware"
+> >   needs to be able to evolve without requiring a new userspace
+> >   interface each time we rev it.
+> > 
+> > - The "compat->old" entry in your sysreg table is not quite fair. In
+> >   the feature table, you teach userspace about the new feature bit. You
+> >   could just as well teach userspace about the new sysreg. Yes, things
+> >   may be different in QEMU, but that's not what we're talking about
+> >   here.
+> > 
+> > - Allowing a guest to migrate in an unsafe way seems worse than failing
+> >   a migration unexpectedly. Or at least not any better.
+> > 
+> > To be clear: I'm not dismissing the idea at all, but I want to make sure
+> > we're not cornering ourselves into an uncomfortable place.
+> > 
+> > Christoffer, Peter, what are your thoughts on this?
+> > 
 > 
-> [ I know we're discussing the overall approach in parallel, but here are
->   some comments on the specifics of this patch, should it end up being
->   used in some capacity ]
+> Taking a step back, the only reasons why this patch isn't simply
+> enabling PSCI v1.0 by default (without any selection method) are that we
+> (1) want to support guests that complain about PSCI_VERSION != 0.2
+> (which isn't completely outside the realm of a reasonable implementation
+> if you read the description of PSCI_VERSION in the 0.2 spec) and (2) to
+> provide migration support for guests that call
+> PSCI_1_0_FN_PSCI_FEATURES.
 > 
-> On Thu, Feb 01, 2018 at 11:46:47AM +0000, Marc Zyngier wrote:
->> Although we've implemented PSCI 1.0 and 1.1, nothing can select them
->> Since all the new PSCI versions are backward compatible, we decide to
->> default to the latest version of the PSCI implementation. This is no
->> different from doing a firmware upgrade on KVM.
->>
->> But in order to give a chance to hypothetical badly implemented guests
->> that would have a fit by discovering something other than PSCI 0.2,
->> let's provide a new API that allows userspace to pick one particular
->> version of the API.
->>
->> This is implemented as a new class of "firmware" registers, where
->> we expose the PSCI version. This allows the PSCI version to be
->> save/restored as part of a guest migration, and also set to
->> any supported version if the guest requires it.
->>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  Documentation/virtual/kvm/api.txt      |  3 +-
->>  Documentation/virtual/kvm/arm/psci.txt | 30 +++++++++++++++
->>  arch/arm/include/asm/kvm_host.h        |  3 ++
->>  arch/arm/include/uapi/asm/kvm.h        |  6 +++
->>  arch/arm/kvm/guest.c                   | 13 +++++++
->>  arch/arm64/include/asm/kvm_host.h      |  3 ++
->>  arch/arm64/include/uapi/asm/kvm.h      |  6 +++
->>  arch/arm64/kvm/guest.c                 | 14 ++++++-
->>  include/kvm/arm_psci.h                 |  9 +++++
->>  virt/kvm/arm/psci.c                    | 68 +++++++++++++++++++++++++++++++++-
->>  10 files changed, 151 insertions(+), 4 deletions(-)
->>  create mode 100644 Documentation/virtual/kvm/arm/psci.txt
->>
->> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
->> index 57d3ee9e4bde..334905202141 100644
->> --- a/Documentation/virtual/kvm/api.txt
->> +++ b/Documentation/virtual/kvm/api.txt
->> @@ -2493,7 +2493,8 @@ Possible features:
->>    and execute guest code when KVM_RUN is called.
->>   - KVM_ARM_VCPU_EL1_32BIT: Starts the CPU in a 32bit mode.
->>    Depends on KVM_CAP_ARM_EL1_32BIT (arm64 only).
->> - - KVM_ARM_VCPU_PSCI_0_2: Emulate PSCI v0.2 for the CPU.
->> + - KVM_ARM_VCPU_PSCI_0_2: Emulate PSCI v0.2 (or a future revision
->> +          backward compatible with v0.2) for the CPU.
->>    Depends on KVM_CAP_ARM_PSCI_0_2.
->>   - KVM_ARM_VCPU_PMU_V3: Emulate PMUv3 for the CPU.
->>    Depends on KVM_CAP_ARM_PMU_V3.
+> If we ignore (1) because we don't know of any guests where this is an
+> issue, then it's all about (2), migration from "new -> old".
 > 
-> Can we add this to api.txt as well ?:
+> As far as I can tell, the use case we are worried about here is updating
+> the kernel (and not QEMU) on half of your data center and then trying to
+> migrate from the upgraded kernel machine to a legacy (and potentially
+> variant 2 vulnerable) machine.  For this specific move from PSCI 0.2 to
+> 1.0 with the included mitigation, I don't really think this is an
+> important use case to support.
 > 
-> --------8><----------
-> 
-> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-> index fc3ae951bc07..c88aa04bcbe8 100644
-> --- a/Documentation/virtual/kvm/api.txt
-> +++ b/Documentation/virtual/kvm/api.txt
-> @@ -1959,6 +1959,8 @@ arm64 CCSIDR registers are demultiplexed by CSSELR value:
->  arm64 system registers have the following id bit patterns:
->    0x6030 0000 0013 <op0:2> <op1:3> <crn:4> <crm:4> <op2:3>
->  
-> +ARM/arm64 firmware pseudo-registers have the following bit pattern:
-> +  0x4030 0000 0014 <regno:16>
->  
->  MIPS registers are mapped using the lower 32 bits.  The upper 16 of that is
->  the register group type:
-> 
-> --------8><----------
+> In terms of the more general approach to "KVM firmware upgrades" and
+> migration, I think something like the proposed FW register interface
+> here should work, but I'm concerned about the lack of opportunity from
+> userspace to predict a migration failure.  But I don't understand why
+> this requires a new machine type?  Why can't we simply provide a KVM
+> capability that libvirt etc. can query for?
 
-Ah, I never realised we actually documented this. Neat!
-
-> 
->> diff --git a/Documentation/virtual/kvm/arm/psci.txt b/Documentation/virtual/kvm/arm/psci.txt
->> new file mode 100644
->> index 000000000000..aafdab887b04
->> --- /dev/null
->> +++ b/Documentation/virtual/kvm/arm/psci.txt
->> @@ -0,0 +1,30 @@
->> +KVM implements the PSCI (Power State Coordination Interface)
->> +specification in order to provide services such as CPU on/off, reset
->> +and power-off to the guest.
->> +
->> +The PSCI specification is regularly updated to provide new features,
->> +and KVM implements these updates if they make sense from a virtualization
->> +point of view.
->> +
->> +This means that a guest booted on two different versions of KVM can
->> +observe two different "firmware" revisions. This could cause issues if
->> +a given guest is tied to a particular PSCI revision (unlikely), or if
->> +a migration causes a different PSCI version to be exposed out of the
->> +blue to an unsuspecting guest.
->> +
->> +In order to remedy this situation, KVM exposes a set of "firmware
->> +pseudo-registers" that can be manipulated using the GET/SET_ONE_REG
->> +interface. These registers can be saved/restored by userspace, and set
->> +to a convenient value if required.
->> +
->> +The following register is defined:
->> +
->> +* KVM_REG_ARM_PSCI_VERSION:
->> +
->> +  - Only valid if the vcpu has the KVM_ARM_VCPU_PSCI_0_2 feature set
->> +    (and thus has already been initialized)
->> +  - Returns the current PSCI version on GET_ONE_REG (defaulting to the
->> +    highest PSCI version implemented by KVM and compatible with v0.2)
->> +  - Allows any PSCI version implemented by KVM and compatible with
->> +    v0.2 to be set with SET_ONE_REG
->> +  - Affects the whole VM (even if the register view is per-vcpu)
->> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
->> index acbf9ec7b396..e9d57060d88c 100644
->> --- a/arch/arm/include/asm/kvm_host.h
->> +++ b/arch/arm/include/asm/kvm_host.h
->> @@ -75,6 +75,9 @@ struct kvm_arch {
->>   /* Interrupt controller */
->>   struct vgic_dist vgic;
->>   int max_vcpus;
->> +
->> + /* Mandated version of PSCI */
->> + u32 psci_version;
->>  };
->>  
->>  #define KVM_NR_MEM_OBJS     40
->> diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
->> index 6edd177bb1c7..47dfc99f5cd0 100644
->> --- a/arch/arm/include/uapi/asm/kvm.h
->> +++ b/arch/arm/include/uapi/asm/kvm.h
->> @@ -186,6 +186,12 @@ struct kvm_arch_memory_slot {
->>  #define KVM_REG_ARM_VFP_FPINST 0x1009
->>  #define KVM_REG_ARM_VFP_FPINST2 0x100A
->>  
->> +/* KVM-as-firmware specific pseudo-registers */
->> +#define KVM_REG_ARM_FW (0x0014 << KVM_REG_ARM_COPROC_SHIFT)
->> +#define KVM_REG_ARM_FW_REG(r) (KVM_REG_ARM | KVM_REG_SIZE_U64 | \
->> + KVM_REG_ARM_FW | ((r) & 0xffff))
->> +#define KVM_REG_ARM_PSCI_VERSION KVM_REG_ARM_FW_REG(0)
->> +
->>  /* Device Control API: ARM VGIC */
->>  #define KVM_DEV_ARM_VGIC_GRP_ADDR 0
->>  #define KVM_DEV_ARM_VGIC_GRP_DIST_REGS 1
->> diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
->> index 1e0784ebbfd6..a18f33edc471 100644
->> --- a/arch/arm/kvm/guest.c
->> +++ b/arch/arm/kvm/guest.c
->> @@ -22,6 +22,7 @@
->>  #include <linux/module.h>
->>  #include <linux/vmalloc.h>
->>  #include <linux/fs.h>
->> +#include <kvm/arm_psci.h>
->>  #include <asm/cputype.h>
->>  #include <linux/uaccess.h>
->>  #include <asm/kvm.h>
->> @@ -176,6 +177,7 @@ static unsigned long num_core_regs(void)
->>  unsigned long kvm_arm_num_regs(struct kvm_vcpu *vcpu)
->>  {
->>   return num_core_regs() + kvm_arm_num_coproc_regs(vcpu)
->> + + kvm_arm_get_fw_num_regs(vcpu)
->>   + NUM_TIMER_REGS;
->>  }
->>  
->> @@ -196,6 +198,11 @@ int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
->>   uindices++;
->>   }
->>  
->> + ret = kvm_arm_copy_fw_reg_indices(vcpu, uindices);
->> + if (ret)
->> + return ret;
->> + uindices += kvm_arm_get_fw_num_regs(vcpu);
->> +
->>   ret = copy_timer_indices(vcpu, uindices);
->>   if (ret)
->>   return ret;
->> @@ -214,6 +221,9 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->>   if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_CORE)
->>   return get_core_reg(vcpu, reg);
->>  
->> + if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_FW)
->> + return kvm_arm_get_fw_reg(vcpu, reg);
->> +
->>   if (is_timer_reg(reg->id))
->>   return get_timer_reg(vcpu, reg);
->>  
->> @@ -230,6 +240,9 @@ int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->>   if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_CORE)
->>   return set_core_reg(vcpu, reg);
->>  
->> + if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_FW)
->> + return kvm_arm_set_fw_reg(vcpu, reg);
->> +
->>   if (is_timer_reg(reg->id))
->>   return set_timer_reg(vcpu, reg);
->>  
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index 4485ae8e98de..10af386642c6 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -73,6 +73,9 @@ struct kvm_arch {
->>  
->>   /* Interrupt controller */
->>   struct vgic_dist vgic;
->> +
->> + /* Mandated version of PSCI */
->> + u32 psci_version;
->>  };
->>  
->>  #define KVM_NR_MEM_OBJS     40
->> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
->> index 9abbf3044654..04b3256f8e6d 100644
->> --- a/arch/arm64/include/uapi/asm/kvm.h
->> +++ b/arch/arm64/include/uapi/asm/kvm.h
->> @@ -206,6 +206,12 @@ struct kvm_arch_memory_slot {
->>  #define KVM_REG_ARM_TIMER_CNT ARM64_SYS_REG(3, 3, 14, 3, 2)
->>  #define KVM_REG_ARM_TIMER_CVAL ARM64_SYS_REG(3, 3, 14, 0, 2)
->>  
->> +/* KVM-as-firmware specific pseudo-registers */
->> +#define KVM_REG_ARM_FW (0x0014 << KVM_REG_ARM_COPROC_SHIFT)
->> +#define KVM_REG_ARM_FW_REG(r) (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
->> + KVM_REG_ARM_FW | ((r) & 0xffff))
->> +#define KVM_REG_ARM_PSCI_VERSION KVM_REG_ARM_FW_REG(0)
->> +
->>  /* Device Control API: ARM VGIC */
->>  #define KVM_DEV_ARM_VGIC_GRP_ADDR 0
->>  #define KVM_DEV_ARM_VGIC_GRP_DIST_REGS 1
->> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
->> index 5c7f657dd207..811f04c5760e 100644
->> --- a/arch/arm64/kvm/guest.c
->> +++ b/arch/arm64/kvm/guest.c
->> @@ -25,6 +25,7 @@
->>  #include <linux/module.h>
->>  #include <linux/vmalloc.h>
->>  #include <linux/fs.h>
->> +#include <kvm/arm_psci.h>
->>  #include <asm/cputype.h>
->>  #include <linux/uaccess.h>
->>  #include <asm/kvm.h>
->> @@ -205,7 +206,7 @@ static int get_timer_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->>  unsigned long kvm_arm_num_regs(struct kvm_vcpu *vcpu)
->>  {
->>   return num_core_regs() + kvm_arm_num_sys_reg_descs(vcpu)
->> -                + NUM_TIMER_REGS;
->> + + kvm_arm_get_fw_num_regs(vcpu) + NUM_TIMER_REGS;
->>  }
->>  
->>  /**
->> @@ -225,6 +226,11 @@ int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
->>   uindices++;
->>   }
->>  
->> + ret = kvm_arm_copy_fw_reg_indices(vcpu, uindices);
->> + if (ret)
->> + return ret;
->> + uindices += kvm_arm_get_fw_num_regs(vcpu);
->> +
->>   ret = copy_timer_indices(vcpu, uindices);
->>   if (ret)
->>   return ret;
->> @@ -243,6 +249,9 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->>   if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_CORE)
->>   return get_core_reg(vcpu, reg);
->>  
->> + if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_FW)
->> + return kvm_arm_get_fw_reg(vcpu, reg);
->> +
->>   if (is_timer_reg(reg->id))
->>   return get_timer_reg(vcpu, reg);
->>  
->> @@ -259,6 +268,9 @@ int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->>   if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_CORE)
->>   return set_core_reg(vcpu, reg);
->>  
->> + if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_FW)
->> + return kvm_arm_set_fw_reg(vcpu, reg);
->> +
->>   if (is_timer_reg(reg->id))
->>   return set_timer_reg(vcpu, reg);
->>  
->> diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
->> index 5446435457c2..4ee098c39e01 100644
->> --- a/include/kvm/arm_psci.h
->> +++ b/include/kvm/arm_psci.h
->> @@ -24,7 +24,16 @@
->>  #define KVM_ARM_PSCI_0_2 PSCI_VERSION(0, 2)
->>  #define KVM_ARM_PSCI_1_0 PSCI_VERSION(1, 0)
->>  
->> +#define KVM_ARM_PSCI_LATEST KVM_ARM_PSCI_1_0
->> +
->>  int kvm_psci_version(struct kvm_vcpu *vcpu);
->>  int kvm_psci_call(struct kvm_vcpu *vcpu);
->>  
->> +struct kvm_one_reg;
->> +
->> +int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu);
->> +int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
->> +int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
->> +int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
->> +
->>  #endif /* __KVM_ARM_PSCI_H__ */
->> diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
->> index 291874cff85e..5c8366b71639 100644
->> --- a/virt/kvm/arm/psci.c
->> +++ b/virt/kvm/arm/psci.c
->> @@ -17,6 +17,7 @@
->>  
->>  #include <linux/preempt.h>
->>  #include <linux/kvm_host.h>
->> +#include <linux/uaccess.h>
->>  #include <linux/wait.h>
->>  
->>  #include <asm/cputype.h>
->> @@ -233,8 +234,19 @@ static void kvm_psci_system_reset(struct kvm_vcpu *vcpu)
->>  
->>  int kvm_psci_version(struct kvm_vcpu *vcpu)
->>  {
->> - if (test_bit(KVM_ARM_VCPU_PSCI_0_2, vcpu->arch.features))
->> - return KVM_ARM_PSCI_0_2;
->> + /*
->> + * Our PSCI implementation stays the same across versions from
->> + * v0.2 onward, only adding the few mandatory functions (such
->> + * as FEATURES with 1.0) that are required by newer
->> + * revisions. It is thus safe to return the latest, unless
->> + * userspace has instructed us otherwise.
->> + */
->> + if (test_bit(KVM_ARM_VCPU_PSCI_0_2, vcpu->arch.features)) {
->> + if (vcpu->kvm->arch.psci_version)
->> + return vcpu->kvm->arch.psci_version;
->> +
->> + return KVM_ARM_PSCI_LATEST;
->> + }
->>  
->>   return KVM_ARM_PSCI_0_1;
->>  }
->> @@ -406,3 +418,55 @@ int kvm_psci_call(struct kvm_vcpu *vcpu)
->>   return -EINVAL;
->>   };
->>  }
->> +
->> +int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
->> +{
->> + return 1; /* PSCI version */
->> +}
->> +
->> +int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
->> +{
->> + if (put_user(KVM_REG_ARM_PSCI_VERSION, uindices))
->> + return -EFAULT;
->> +
->> + return 0;
->> +}
->> +
->> +int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->> +{
->> + if (reg->id == KVM_REG_ARM_PSCI_VERSION) {
->> + void __user *uaddr = (void __user *)(long)reg->addr;
->> + u64 val;
->> +
->> + val = kvm_psci_version(vcpu);
->> + if (val == KVM_ARM_PSCI_0_1)
->> + return -EINVAL;
-> 
-> Doesn't this potentially break userspace that doesn't set
-> KVM_ARM_VCPU_PSCI_0_2 which does KVM_GET_REG_LIST followed by
-> KVM_GET_ONE_REG ?
-
-Ouch. Yes, well spotted.
-
-> What is the rationale for not simply allowing PSCI v0.1 (terribly
-> outdated as it may be) be exposed via this firmware reg?
-
-The rational was that PSCI_GET_VERSION didn't exist in 0.1, hence there
-was no reason of exposing a version number if you didn't want at least
-0.2. But as you made it obvious above, this is broken. That register
-needs to be either exposed all the time, or only be exposed if
-KVM_ARM_VCPU_PSCI_0_2 is set. Given that the latter feels pretty
-fragile, I'll choose the former.
+Right, just exposing (or not) a property (which will become a libvirt
+capability) should work for the management layers to determine if a
+migration will fail, and then not attempt it. We just tend to avoid
+allowing new properties from appearing in old machine types, and thus
+new machine types would be the only ones exposing it. I'm not sure if
+we need to be so strict though.
 
 > 
->> + if (copy_to_user(uaddr, &val, KVM_REG_SIZE(reg->id)))
->> + return -EFAULT;
->> +
->> + return 0;
->> + }
->> +
->> + return -EINVAL;
->> +}
->> +
->> +int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->> +{
->> + if (reg->id == KVM_REG_ARM_PSCI_VERSION &&
->> +    test_bit(KVM_ARM_VCPU_PSCI_0_2, vcpu->arch.features)) {
->> + void __user *uaddr = (void __user *)(long)reg->addr;
->> + u64 val;
->> +
->> + if (copy_from_user(&val, uaddr, KVM_REG_SIZE(reg->id)))
->> + return -EFAULT;
->> +
->> + switch (val) {
->> + case KVM_ARM_PSCI_0_2:
->> + case KVM_ARM_PSCI_1_0:
->> + vcpu->kvm->arch.psci_version = val;
->> + return 0;
->> + }
-> 
-> Then here we could change the check so that setting KVM_ARM_PSCI_0_1
-> when also having set KVM_ARM_VCPU_PSCI_0_2 returns an error, and
-> similarly trying to set KVM_ARM_PSCI_0_2+ without having set the feature
-> bit, returns an error.
+> Also, is it generally true that we can't expose any additional system
+> registers from KVM without breaking migration and we don't have any
+> method to deal with that in userspace and upper layers?  If that's true,
+> that's a bigger problem in general and something we should work on
+> trying to solve.  If it's not true, then there should be some method to
+> deal with the FW register already (like capabilities).
 
-Yes, that's a good suggestion.
+Capabilities can certainly be added for anything that need them, including
+a new sysreg. QEMU just currently manages the sysregs as an array,
+without concern for which ones are old and which ones are new. Of course
+that can be changed. It may not even be that difficult to do, we just
+need to filter registers before adding the array to the migration
+stream.
+
+> 
+> Given the urgency of adding mitigation towards variant 2 which is the
+> driver for this work, I think we should drop the compat functionality in
+> this series and work this out later on if needed.  I think we can just
+> tweak the previous patch to enable PSCI 1.0 by default and drop this
+> patch for the current merge window.
+
+I agree. Without planning to wait for the userspace changes, then I
+guess we don't need to wait for a decision on how to do them yet either.
 
 Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+drew
