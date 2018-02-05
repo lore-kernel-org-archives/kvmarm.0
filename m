@@ -1,67 +1,67 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 1/2] ARM: kvm: fix building with gcc-8
-Date: Mon, 5 Feb 2018 09:33:16 +0100
-Message-ID: <20180205083316.GR21802@cbox>
-References: <20180202150756.420422-1-arnd@arndb.de>
- <20180204184517.GQ21802@cbox>
- <CAK8P3a2EFdTcM6U4TU6EZz9vzGKK=hE=8yQ-1eTTxjGMRs5SKQ@mail.gmail.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v3 12/18] arm64: KVM: Add SMCCC_ARCH_WORKAROUND_1 fast
+ handling
+Date: Mon, 5 Feb 2018 09:08:31 +0000
+Message-ID: <1d30fe51-22dd-6938-2f8f-c823858a3bbd@arm.com>
+References: <20180201114657.7323-1-marc.zyngier@arm.com>
+ <20180201114657.7323-13-marc.zyngier@arm.com> <20180204183907.GP21802@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <stable-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAK8P3a2EFdTcM6U4TU6EZz9vzGKK=hE=8yQ-1eTTxjGMRs5SKQ@mail.gmail.com>
-Sender: stable-owner@vger.kernel.org
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Russell King <linux@armlinux.org.uk>, Nicolas Pitre <nico@linaro.org>, Andi Kleen <ak@linux.intel.com>, Richard Earnshaw <rearnsha@gcc.gnu.org>, Tamar Christina <tnfchris@gcc.gnu.org>, "# 3.4.x" <stable@vger.kernel.org>, Julien Thierry <julien.thierry@arm.com>, Linux ARM <linux-arm-kernel@lists.infradead.org>, kvmarm@lists.cs.columbia.edu, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20180204183907.GP21802@cbox>
+Content-Language: en-GB
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Mark Rutland <mark.rutland@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Jon Masters <jcm@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, Russell King - ARM Linux <linux@armlinux.org.uk>, Jayachandran C <jnair@caviumnetworks.com>, Hanjun Guo <guohanjun@huawei.com>, Robin Murphy <robin.murphy@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sun, Feb 04, 2018 at 09:57:49PM +0100, Arnd Bergmann wrote:
-> On Sun, Feb 4, 2018 at 7:45 PM, Christoffer Dall
-> <christoffer.dall@linaro.org> wrote:
-> > Hi Arnd,
-> >
-> > On Fri, Feb 02, 2018 at 04:07:34PM +0100, Arnd Bergmann wrote:
-> >> In banked-sr.c, we use a top-level '__asm__(".arch_extension virt")'
-> >> statement to allow compilation of a multi-CPU kernel for ARMv6
-> >> and older ARMv7-A that don't normally support access to the banked
-> >> registers.
-> >>
-> >> This is considered to be a programming error by the gcc developers
-> >> and will no longer work in gcc-8, where we now get a build error:
-> >>
-> >> /tmp/cc4Qy7GR.s:34: Error: Banked registers are not available with this architecture. -- `mrs r3,SP_usr'
-> >> /tmp/cc4Qy7GR.s:41: Error: Banked registers are not available with this architecture. -- `mrs r3,ELR_hyp'
-> >> /tmp/cc4Qy7GR.s:55: Error: Banked registers are not available with this architecture. -- `mrs r3,SP_svc'
-> >> /tmp/cc4Qy7GR.s:62: Error: Banked registers are not available with this architecture. -- `mrs r3,LR_svc'
-> >> /tmp/cc4Qy7GR.s:69: Error: Banked registers are not available with this architecture. -- `mrs r3,SPSR_svc'
-> >> /tmp/cc4Qy7GR.s:76: Error: Banked registers are not available with this architecture. -- `mrs r3,SP_abt'
-> >>
-> >> Passign the '-march-armv7ve' flag to gcc works, and is ok here, because
-> >> we know the functions won't ever be called on pre-ARMv7VE machines.
-> >> Unfortunately, older compiler versions (4.8 and earlier) do not understand
-> >> that flag, so we still need to keep the asm around.
-> >
-> > Does "not understand" mean "ignores" or do we get an error?
+On 04/02/18 18:39, Christoffer Dall wrote:
+> On Thu, Feb 01, 2018 at 11:46:51AM +0000, Marc Zyngier wrote:
+>> We want SMCCC_ARCH_WORKAROUND_1 to be fast. As fast as possible.
+>> So let's intercept it as early as we can by testing for the
+>> function call number as soon as we've identified a HVC call
+>> coming from the guest.
 > 
-> We get an error, which is why I used the $(call cc-option) Makefile
-> helper to check if the compiler supports it.
-> 
+> Hmmm.  How often is this expected to happen and what is the expected
+> extra cost of doing the early-exit handling in the C code vs. here?
 
-Right.
+Pretty often. On each context switch of a Linux guest, for example. It
+is almost as bad as if we were trapping all VM ops. Moving it to C is
+definitely visible on something like hackbench (I remember something
+like a 10-12% degradation on Seattle, but I'd need to rerun the tests to
+give you something accurate). It is the whole GPR save/restore dance
+that costs us a lot (31 registers for the guest, 12 for the host), plus
+some the extra SError synchronization that doesn't come for free either.
 
-> >> Backporting to stable kernels (4.6+) is needed to allow those to be built
-> >> with future compilers as well.
-> >
-> > This builds on the toolchains I have on my machine, so:
-> >
-> > Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
-> >
-> > Are you applying this via a tree with other fixes or would you like me
-> > to carry it in the kvmarm tree?
-> 
-> Please pick it up in your tree.
-> 
-Will do.
+> I think we'd be better off if we only had a single early-exit path (and
+> we should move the FP/SIMD trap to that path as well), but if there's a
+> measurable benefit of having this logic in assembly as opposed to in the
+> C code, then I'm ok with this as well.
+
+I agree that the multiplication of "earlier than early" paths is
+becoming annoying. Moving the FP/SIMD stuff to C would be less
+problematic, as we have patches to move some of that to load/put, and
+we'd only take the trap once per time slice (as opposed to once per
+entry at the moment).
+
+Here, we're trying hard to do exactly nothing, because each instruction
+is just an extra overhead (we've already nuked the BP). I even
+considered inserting that code as part of the per-CPU-type vectors (and
+leave the rest of the KVM code alone), but it felt like a step too far.
+
+> The code in this patch looks fine otherwise.
 
 Thanks,
--Christoffer
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
