@@ -1,92 +1,46 @@
-From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: Re: [PATCH v9 3/7] acpi: apei: Add SEI notification type support
- for ARMv8
-Date: Mon, 5 Feb 2018 11:24:26 +0000
-Message-ID: <0184EA26B2509940AA629AE1405DD7F201AC71DE@DGGEMA503-MBS.china.huawei.com>
+From: Julien Grall <julien.grall@arm.com>
+Subject: Re: [PATCH v3 01/41] KVM: arm/arm64: Avoid vcpu_load for other vcpu
+ ioctls than KVM_RUN
+Date: Mon, 5 Feb 2018 12:32:33 +0000
+Message-ID: <f4e5f966-24bb-630d-9d3f-907850d7e29d@arm.com>
+References: <20180112120747.27999-1-christoffer.dall@linaro.org>
+ <20180112120747.27999-2-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Return-path: <linux-doc-owner@vger.kernel.org>
-Content-Language: zh-CN
-Sender: linux-doc-owner@vger.kernel.org
-To: James Morse <james.morse@arm.com>
-Cc: "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "rjw@rjwysocki.net" <rjw@rjwysocki.net>, "bp@alien8.de" <bp@alien8.de>, "robert.moore@intel.com" <robert.moore@intel.com>, "lv.zheng@intel.com" <lv.zheng@intel.com>, "corbet@lwn.net" <corbet@lwn.net>, "will.deacon@arm.com" <will.deacon@arm.com>, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20180112120747.27999-2-christoffer.dall@linaro.org>
+Content-Language: en-US
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-[...]
-> 
-> > Yes, I know you are dong that. Your serial's patch will consider all above
-> things, right?
-> 
-> Assuming I got it right, yes. It currently makes the race Xie XiuQi spotted worse,
-> which I want to fix too. (details on the cover letter)
+Hi Christoffer,
 
-Ok.
-
+On 12/01/18 12:07, Christoffer Dall wrote:
+> Calling vcpu_load() registers preempt notifiers for this vcpu and calls
+> kvm_arch_vcpu_load().  The latter will soon be doing a lot of heavy
+> lifting on arm/arm64 and will try to do things such as enabling the
+> virtual timer and setting us up to handle interrupts from the timer
+> hardware.
 > 
+> Loading state onto hardware registers and enabling hardware to signal
+> interrupts can be problematic when we're not actually about to run the
+> VCPU, because it makes it difficult to establish the right context when
+> handling interrupts from the timer, and it makes the register access
+> code difficult to reason about.
 > 
-> > If your patch can be consider that, this patch can based on your patchset.
-> thanks.
+> Luckily, now when we call vcpu_load in each ioctl implementation, we can
+> simply remove the call from the non-KVM_RUN vcpu ioctls, and our
+> kvm_arch_vcpu_load() is only used for loading vcpu content to the
+> physical CPU when we're actually going to run the vcpu.
 > 
-> I'd like to pick these patches onto the end of that series, but first I want to
-> know what NOTIFY_SEI means for any OS. The ACPI spec doesn't say, and
-> because its asynchronous, route-able and mask-able, there are many more
-> corners than NOTFIY_SEA.
-> 
-> This thing is a notification using an emulated SError exception. (emulated
-> because physical-SError must be routed to EL3 for firmware-first, and
-> virtual-SError belongs to EL2).
-> 
-> Does your firmware emulate SError exactly as the TakeException() pseudo code
-> in the Arm-Arm?
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 
-Yes, it is.
+Reviewed-by: Julien Grall <julien.grall@arm.com>
 
-> Is the emulated SError routed following the routing rules for HCR_EL2.{AMO,
-> TGE}?
+Cheers,
 
-Yes, it is.
-
-> What does your firmware do when it wants to emulate SError but its masked?
-> (e.g.1: The physical-SError interrupted EL2 and the SPSR shows EL2 had
-> PSTATE.A  set.
->  e.g.2: The physical-SError interrupted EL2 but HCR_EL2 indicates the
-> emulated  SError should go to EL1. This effectively masks SError.)
-
-Currently we does not consider much about the mask status(SPSR).
-I remember that you ever suggested firmware should reboot if the mask status is set(SPSR), right?
-I ever suggest our firmware team to evaluate that, but there is no response.
-
-I CC "liu jun" <liujun88@hisilicon.com> who is our UEFI firmware Architect, if you have firmware requirements, you can
-raise again.
-
-> 
-> Answers to these let us determine whether a bug is in the firmware or the
-> kernel. If firmware is expecting the OS to do something special, I'd like to know
-> about it from the beginning!
-
-I know your meaning, thanks for raising it again.
-
-> 
-> 
-> >>> Expose API ghes_notify_sei() to external users. External modules can
-> >>> call this exposed API to parse APEI table and handle the SEI
-> >>> notification.
-> >>
-> >> external modules? You mean called by the arch code when it gets this
-> NOTIFY_SEI?
-> 
-> > yes, called by kernel ARCH code, such as below, I remember I have discussed
-> with you.
-> 
-> Sure. The phrase 'external modules' usually means the '.ko' files that live in
-> /lib/modules, nothing outside the kernel tree should be doing this stuff.
-
-I will rename 'external modules' to other name. Thanks.
-
-> 
-> 
-> Thanks,
-> 
-> James
-
+-- 
+Julien Grall
