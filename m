@@ -1,153 +1,218 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v4 06/17] arm/arm64: KVM: Add smccc accessors to PSCI code
-Date: Tue,  6 Feb 2018 17:56:10 +0000
-Message-ID: <20180206175621.929-7-marc.zyngier@arm.com>
+Subject: [PATCH v4 17/17] arm64: Kill PSCI_GET_VERSION as a variant-2 workaround
+Date: Tue,  6 Feb 2018 17:56:21 +0000
+Message-ID: <20180206175621.929-18-marc.zyngier@arm.com>
 References: <20180206175621.929-1-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20180206175621.929-1-marc.zyngier@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Sender: linux-kernel-owner@vger.kernel.org
 To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc: Mark Rutland <mark.rutland@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Jon Masters <jcm@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Russell King - ARM Linux <linux@armlinux.org.uk>, Jayachandran C <jnair@caviumnetworks.com>, Hanjun Guo <guohanjun@huawei.com>, Robin Murphy <robin.murphy@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Mark Rutland <mark.rutland@arm.com>, Robin Murphy <robin.murphy@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andrew Jones <drjones@redhat.com>, Hanjun Guo <guohanjun@huawei.com>, Jayachandran C <jnair@caviumnetworks.com>, Jon Masters <jcm@redhat.com>, Russell King - ARM Linux <linux@armlinux.org.uk>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Instead of open coding the accesses to the various registers,
-let's add explicit SMCCC accessors.
+Now that we've standardised on SMCCC v1.1 to perform the branch
+prediction invalidation, let's drop the previous band-aid.
+If vendors haven't updated their firmware to do SMCCC 1.1, they
+haven't updated PSCI either, so we don't loose anything.
 
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Tested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/psci.c | 52 ++++++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 42 insertions(+), 10 deletions(-)
+ arch/arm64/kernel/bpi.S        | 24 ----------------------
+ arch/arm64/kernel/cpu_errata.c | 45 ++++++++++++------------------------------
+ arch/arm64/kvm/hyp/switch.c    | 14 -------------
+ 3 files changed, 13 insertions(+), 70 deletions(-)
 
-diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
-index 999f94d6bb98..c41553d35110 100644
---- a/virt/kvm/arm/psci.c
-+++ b/virt/kvm/arm/psci.c
-@@ -32,6 +32,38 @@
+diff --git a/arch/arm64/kernel/bpi.S b/arch/arm64/kernel/bpi.S
+index fdeed629f2c6..e5de33513b5d 100644
+--- a/arch/arm64/kernel/bpi.S
++++ b/arch/arm64/kernel/bpi.S
+@@ -54,30 +54,6 @@ ENTRY(__bp_harden_hyp_vecs_start)
+ 	vectors __kvm_hyp_vector
+ 	.endr
+ ENTRY(__bp_harden_hyp_vecs_end)
+-ENTRY(__psci_hyp_bp_inval_start)
+-	sub	sp, sp, #(8 * 18)
+-	stp	x16, x17, [sp, #(16 * 0)]
+-	stp	x14, x15, [sp, #(16 * 1)]
+-	stp	x12, x13, [sp, #(16 * 2)]
+-	stp	x10, x11, [sp, #(16 * 3)]
+-	stp	x8, x9, [sp, #(16 * 4)]
+-	stp	x6, x7, [sp, #(16 * 5)]
+-	stp	x4, x5, [sp, #(16 * 6)]
+-	stp	x2, x3, [sp, #(16 * 7)]
+-	stp	x0, x1, [sp, #(16 * 8)]
+-	mov	x0, #0x84000000
+-	smc	#0
+-	ldp	x16, x17, [sp, #(16 * 0)]
+-	ldp	x14, x15, [sp, #(16 * 1)]
+-	ldp	x12, x13, [sp, #(16 * 2)]
+-	ldp	x10, x11, [sp, #(16 * 3)]
+-	ldp	x8, x9, [sp, #(16 * 4)]
+-	ldp	x6, x7, [sp, #(16 * 5)]
+-	ldp	x4, x5, [sp, #(16 * 6)]
+-	ldp	x2, x3, [sp, #(16 * 7)]
+-	ldp	x0, x1, [sp, #(16 * 8)]
+-	add	sp, sp, #(8 * 18)
+-ENTRY(__psci_hyp_bp_inval_end)
  
- #define AFFINITY_MASK(level)	~((0x1UL << ((level) * MPIDR_LEVEL_BITS)) - 1)
+ ENTRY(__qcom_hyp_sanitize_link_stack_start)
+ 	stp     x29, x30, [sp, #-16]!
+diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
+index 9e77809a3b23..07823595b7f0 100644
+--- a/arch/arm64/kernel/cpu_errata.c
++++ b/arch/arm64/kernel/cpu_errata.c
+@@ -67,7 +67,6 @@ static int cpu_enable_trap_ctr_access(void *__unused)
+ DEFINE_PER_CPU_READ_MOSTLY(struct bp_hardening_data, bp_hardening_data);
  
-+static u32 smccc_get_function(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu_get_reg(vcpu, 0);
-+}
-+
-+static unsigned long smccc_get_arg1(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu_get_reg(vcpu, 1);
-+}
-+
-+static unsigned long smccc_get_arg2(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu_get_reg(vcpu, 2);
-+}
-+
-+static unsigned long smccc_get_arg3(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu_get_reg(vcpu, 3);
-+}
-+
-+static void smccc_set_retval(struct kvm_vcpu *vcpu,
-+			     unsigned long a0,
-+			     unsigned long a1,
-+			     unsigned long a2,
-+			     unsigned long a3)
-+{
-+	vcpu_set_reg(vcpu, 0, a0);
-+	vcpu_set_reg(vcpu, 1, a1);
-+	vcpu_set_reg(vcpu, 2, a2);
-+	vcpu_set_reg(vcpu, 3, a3);
-+}
-+
- static unsigned long psci_affinity_mask(unsigned long affinity_level)
- {
- 	if (affinity_level <= 3)
-@@ -77,7 +109,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
- 	unsigned long context_id;
- 	phys_addr_t target_pc;
- 
--	cpu_id = vcpu_get_reg(source_vcpu, 1) & MPIDR_HWID_BITMASK;
-+	cpu_id = smccc_get_arg1(source_vcpu) & MPIDR_HWID_BITMASK;
- 	if (vcpu_mode_is_32bit(source_vcpu))
- 		cpu_id &= ~((u32) 0);
- 
-@@ -96,8 +128,8 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
- 			return PSCI_RET_INVALID_PARAMS;
- 	}
- 
--	target_pc = vcpu_get_reg(source_vcpu, 2);
--	context_id = vcpu_get_reg(source_vcpu, 3);
-+	target_pc = smccc_get_arg2(source_vcpu);
-+	context_id = smccc_get_arg3(source_vcpu);
- 
- 	kvm_reset_vcpu(vcpu);
- 
-@@ -116,7 +148,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
- 	 * NOTE: We always update r0 (or x0) because for PSCI v0.1
- 	 * the general puspose registers are undefined upon CPU_ON.
- 	 */
--	vcpu_set_reg(vcpu, 0, context_id);
-+	smccc_set_retval(vcpu, context_id, 0, 0, 0);
- 	vcpu->arch.power_off = false;
- 	smp_mb();		/* Make sure the above is visible */
- 
-@@ -136,8 +168,8 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
- 	struct kvm *kvm = vcpu->kvm;
- 	struct kvm_vcpu *tmp;
- 
--	target_affinity = vcpu_get_reg(vcpu, 1);
--	lowest_affinity_level = vcpu_get_reg(vcpu, 2);
-+	target_affinity = smccc_get_arg1(vcpu);
-+	lowest_affinity_level = smccc_get_arg2(vcpu);
- 
- 	/* Determine target affinity mask */
- 	target_affinity_mask = psci_affinity_mask(lowest_affinity_level);
-@@ -210,7 +242,7 @@ int kvm_psci_version(struct kvm_vcpu *vcpu)
- static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
- {
- 	struct kvm *kvm = vcpu->kvm;
--	unsigned long psci_fn = vcpu_get_reg(vcpu, 0) & ~((u32) 0);
-+	u32 psci_fn = smccc_get_function(vcpu);
- 	unsigned long val;
- 	int ret = 1;
- 
-@@ -277,14 +309,14 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
- 		break;
- 	}
- 
--	vcpu_set_reg(vcpu, 0, val);
-+	smccc_set_retval(vcpu, val, 0, 0, 0);
- 	return ret;
+ #ifdef CONFIG_KVM
+-extern char __psci_hyp_bp_inval_start[], __psci_hyp_bp_inval_end[];
+ extern char __qcom_hyp_sanitize_link_stack_start[];
+ extern char __qcom_hyp_sanitize_link_stack_end[];
+ extern char __smccc_workaround_1_smc_start[];
+@@ -116,8 +115,6 @@ static void __install_bp_hardening_cb(bp_hardening_cb_t fn,
+ 	spin_unlock(&bp_lock);
+ }
+ #else
+-#define __psci_hyp_bp_inval_start		NULL
+-#define __psci_hyp_bp_inval_end			NULL
+ #define __qcom_hyp_sanitize_link_stack_start	NULL
+ #define __qcom_hyp_sanitize_link_stack_end	NULL
+ #define __smccc_workaround_1_smc_start		NULL
+@@ -164,24 +161,25 @@ static void call_hvc_arch_workaround_1(void)
+ 	arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_WORKAROUND_1, NULL);
  }
  
- static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
+-static bool check_smccc_arch_workaround_1(const struct arm64_cpu_capabilities *entry)
++static int enable_smccc_arch_workaround_1(void *data)
  {
- 	struct kvm *kvm = vcpu->kvm;
--	unsigned long psci_fn = vcpu_get_reg(vcpu, 0) & ~((u32) 0);
-+	u32 psci_fn = smccc_get_function(vcpu);
- 	unsigned long val;
++	const struct arm64_cpu_capabilities *entry = data;
+ 	bp_hardening_cb_t cb;
+ 	void *smccc_start, *smccc_end;
+ 	struct arm_smccc_res res;
  
- 	switch (psci_fn) {
-@@ -302,7 +334,7 @@ static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
+ 	if (!entry->matches(entry, SCOPE_LOCAL_CPU))
+-		return false;
++		return 0;
+ 
+ 	if (psci_ops.smccc_version == SMCCC_VERSION_1_0)
+-		return false;
++		return 0;
+ 
+ 	switch (psci_ops.conduit) {
+ 	case PSCI_CONDUIT_HVC:
+ 		arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
+ 				  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
+ 		if (res.a0)
+-			return false;
++			return 0;
+ 		cb = call_hvc_arch_workaround_1;
+ 		smccc_start = __smccc_workaround_1_hvc_start;
+ 		smccc_end = __smccc_workaround_1_hvc_end;
+@@ -191,35 +189,18 @@ static bool check_smccc_arch_workaround_1(const struct arm64_cpu_capabilities *e
+ 		arm_smccc_1_1_smc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
+ 				  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
+ 		if (res.a0)
+-			return false;
++			return 0;
+ 		cb = call_smc_arch_workaround_1;
+ 		smccc_start = __smccc_workaround_1_smc_start;
+ 		smccc_end = __smccc_workaround_1_smc_end;
  		break;
+ 
+ 	default:
+-		return false;
++		return 0;
  	}
  
--	vcpu_set_reg(vcpu, 0, val);
-+	smccc_set_retval(vcpu, val, 0, 0, 0);
- 	return 1;
+ 	install_bp_hardening_cb(entry, cb, smccc_start, smccc_end);
+ 
+-	return true;
+-}
+-
+-static int enable_psci_bp_hardening(void *data)
+-{
+-	const struct arm64_cpu_capabilities *entry = data;
+-
+-	if (psci_ops.get_version) {
+-		if (check_smccc_arch_workaround_1(entry))
+-			return 0;
+-
+-		install_bp_hardening_cb(entry,
+-				       (bp_hardening_cb_t)psci_ops.get_version,
+-				       __psci_hyp_bp_inval_start,
+-				       __psci_hyp_bp_inval_end);
+-	}
+-
+ 	return 0;
  }
  
+@@ -399,22 +380,22 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
+ 	{
+ 		.capability = ARM64_HARDEN_BRANCH_PREDICTOR,
+ 		MIDR_ALL_VERSIONS(MIDR_CORTEX_A57),
+-		.enable = enable_psci_bp_hardening,
++		.enable = enable_smccc_arch_workaround_1,
+ 	},
+ 	{
+ 		.capability = ARM64_HARDEN_BRANCH_PREDICTOR,
+ 		MIDR_ALL_VERSIONS(MIDR_CORTEX_A72),
+-		.enable = enable_psci_bp_hardening,
++		.enable = enable_smccc_arch_workaround_1,
+ 	},
+ 	{
+ 		.capability = ARM64_HARDEN_BRANCH_PREDICTOR,
+ 		MIDR_ALL_VERSIONS(MIDR_CORTEX_A73),
+-		.enable = enable_psci_bp_hardening,
++		.enable = enable_smccc_arch_workaround_1,
+ 	},
+ 	{
+ 		.capability = ARM64_HARDEN_BRANCH_PREDICTOR,
+ 		MIDR_ALL_VERSIONS(MIDR_CORTEX_A75),
+-		.enable = enable_psci_bp_hardening,
++		.enable = enable_smccc_arch_workaround_1,
+ 	},
+ 	{
+ 		.capability = ARM64_HARDEN_BRANCH_PREDICTOR,
+@@ -428,12 +409,12 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
+ 	{
+ 		.capability = ARM64_HARDEN_BRANCH_PREDICTOR,
+ 		MIDR_ALL_VERSIONS(MIDR_BRCM_VULCAN),
+-		.enable = enable_psci_bp_hardening,
++		.enable = enable_smccc_arch_workaround_1,
+ 	},
+ 	{
+ 		.capability = ARM64_HARDEN_BRANCH_PREDICTOR,
+ 		MIDR_ALL_VERSIONS(MIDR_CAVIUM_THUNDERX2),
+-		.enable = enable_psci_bp_hardening,
++		.enable = enable_smccc_arch_workaround_1,
+ 	},
+ #endif
+ 	{
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 408c04d789a5..cac6a0500162 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -350,20 +350,6 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 	if (exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
+ 		goto again;
+ 
+-	if (exit_code == ARM_EXCEPTION_TRAP &&
+-	    (kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_HVC64 ||
+-	     kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_HVC32)) {
+-		u32 val = vcpu_get_reg(vcpu, 0);
+-
+-		if (val == PSCI_0_2_FN_PSCI_VERSION) {
+-			val = kvm_psci_version(vcpu, kern_hyp_va(vcpu->kvm));
+-			if (unlikely(val == KVM_ARM_PSCI_0_1))
+-				val = PSCI_RET_NOT_SUPPORTED;
+-			vcpu_set_reg(vcpu, 0, val);
+-			goto again;
+-		}
+-	}
+-
+ 	if (static_branch_unlikely(&vgic_v2_cpuif_trap) &&
+ 	    exit_code == ARM_EXCEPTION_TRAP) {
+ 		bool valid;
 -- 
 2.14.2
