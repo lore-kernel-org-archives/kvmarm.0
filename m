@@ -1,60 +1,39 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v4 02/17] arm: KVM: Fix SMCCC handling of unimplemented
- SMC/HVC calls
-Date: Tue,  6 Feb 2018 17:56:06 +0000
-Message-ID: <20180206175621.929-3-marc.zyngier@arm.com>
+Subject: [PATCH v4 03/17] arm64: KVM: Increment PC after handling an SMC trap
+Date: Tue,  6 Feb 2018 17:56:07 +0000
+Message-ID: <20180206175621.929-4-marc.zyngier@arm.com>
 References: <20180206175621.929-1-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20180206175621.929-1-marc.zyngier@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Sender: linux-kernel-owner@vger.kernel.org
 To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc: Mark Rutland <mark.rutland@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Jon Masters <jcm@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Russell King - ARM Linux <linux@armlinux.org.uk>, Jayachandran C <jnair@caviumnetworks.com>, Hanjun Guo <guohanjun@huawei.com>, Robin Murphy <robin.murphy@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Mark Rutland <mark.rutland@arm.com>, Robin Murphy <robin.murphy@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andrew Jones <drjones@redhat.com>, Hanjun Guo <guohanjun@huawei.com>, Jayachandran C <jnair@caviumnetworks.com>, Jon Masters <jcm@redhat.com>, Russell King - ARM Linux <linux@armlinux.org.uk>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-KVM doesn't follow the SMCCC when it comes to unimplemented calls,
-and inject an UNDEF instead of returning an error. Since firmware
-calls are now used for security mitigation, they are becoming more
-common, and the undef is counter productive.
+When handling an SMC trap, the "preferred return address" is set
+to that of the SMC, and not the next PC (which is a departure from
+the behaviour of an SMC that isn't trapped).
 
-Instead, let's follow the SMCCC which states that -1 must be returned
-to the caller when getting an unknown function number.
+Increment PC in the handler, as the guest is otherwise forever
+stuck...
 
-Cc: <stable@vger.kernel.org>
+Cc: stable@vger.kernel.org
+Fixes: acfb3b883f6d ("arm64: KVM: Fix SMCCC handling of unimplemented SMC/HVC calls")
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Tested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/handle_exit.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/handle_exit.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/arch/arm/kvm/handle_exit.c b/arch/arm/kvm/handle_exit.c
-index cf8bf6bf87c4..a4bf0f6f024a 100644
---- a/arch/arm/kvm/handle_exit.c
-+++ b/arch/arm/kvm/handle_exit.c
-@@ -38,7 +38,7 @@ static int handle_hvc(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 
- 	ret = kvm_psci_call(vcpu);
- 	if (ret < 0) {
--		kvm_inject_undefined(vcpu);
-+		vcpu_set_reg(vcpu, 0, ~0UL);
- 		return 1;
- 	}
- 
-@@ -47,7 +47,16 @@ static int handle_hvc(struct kvm_vcpu *vcpu, struct kvm_run *run)
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 520b0dad3c62..5493bbefbd0d 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -62,7 +62,16 @@ static int handle_hvc(struct kvm_vcpu *vcpu, struct kvm_run *run)
  
  static int handle_smc(struct kvm_vcpu *vcpu, struct kvm_run *run)
  {
--	kvm_inject_undefined(vcpu);
 +	/*
 +	 * "If an SMC instruction executed at Non-secure EL1 is
 +	 * trapped to EL2 because HCR_EL2.TSC is 1, the exception is a
@@ -63,7 +42,7 @@ index cf8bf6bf87c4..a4bf0f6f024a 100644
 +	 * We need to advance the PC after the trap, as it would
 +	 * otherwise return to the same address...
 +	 */
-+	vcpu_set_reg(vcpu, 0, ~0UL);
+ 	vcpu_set_reg(vcpu, 0, ~0UL);
 +	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
  	return 1;
  }
