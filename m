@@ -1,7 +1,7 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v4 07/17] arm/arm64: KVM: Implement PSCI 1.0 support
-Date: Tue,  6 Feb 2018 17:56:11 +0000
-Message-ID: <20180206175621.929-8-marc.zyngier@arm.com>
+Subject: [PATCH v4 09/17] arm/arm64: KVM: Turn kvm_psci_version into a static inline
+Date: Tue,  6 Feb 2018 17:56:13 +0000
+Message-ID: <20180206175621.929-10-marc.zyngier@arm.com>
 References: <20180206175621.929-1-marc.zyngier@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20180206175621.929-1-marc.zyngier@arm.com>
@@ -10,106 +10,132 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Mark Rutland <mark.rutland@arm.com>, Robin Murphy <robin.murphy@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andrew Jones <drjones@redhat.com>, Hanjun Guo <guohanjun@huawei.com>, Jayachandran C <jnair@caviumnetworks.com>, Jon Masters <jcm@redhat.com>, Russell King - ARM Linux <linux@armlinux.org.uk>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-PSCI 1.0 can be trivially implemented by providing the FEATURES
-call on top of PSCI 0.2 and returning 1.0 as the PSCI version.
+We're about to need kvm_psci_version in HYP too. So let's turn it
+into a static inline, and pass the kvm structure as a second
+parameter (so that HYP can do a kern_hyp_va on it).
 
-We happily ignore everything else, as they are either optional or
-are clarifications that do not require any additional change.
-
-PSCI 1.0 is now the default until we decide to add a userspace
-selection API.
-
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Tested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- include/kvm/arm_psci.h |  3 +++
- virt/kvm/arm/psci.c    | 45 ++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 47 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/switch.c | 20 ++++++++++++--------
+ include/kvm/arm_psci.h      | 21 ++++++++++++++++++++-
+ virt/kvm/arm/psci.c         | 12 ++----------
+ 3 files changed, 34 insertions(+), 19 deletions(-)
 
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 036e1f3d77a6..408c04d789a5 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -19,6 +19,8 @@
+ #include <linux/jump_label.h>
+ #include <uapi/linux/psci.h>
+ 
++#include <kvm/arm_psci.h>
++
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_hyp.h>
+@@ -350,14 +352,16 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 
+ 	if (exit_code == ARM_EXCEPTION_TRAP &&
+ 	    (kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_HVC64 ||
+-	     kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_HVC32) &&
+-	    vcpu_get_reg(vcpu, 0) == PSCI_0_2_FN_PSCI_VERSION) {
+-		u64 val = PSCI_RET_NOT_SUPPORTED;
+-		if (test_bit(KVM_ARM_VCPU_PSCI_0_2, vcpu->arch.features))
+-			val = 2;
+-
+-		vcpu_set_reg(vcpu, 0, val);
+-		goto again;
++	     kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_HVC32)) {
++		u32 val = vcpu_get_reg(vcpu, 0);
++
++		if (val == PSCI_0_2_FN_PSCI_VERSION) {
++			val = kvm_psci_version(vcpu, kern_hyp_va(vcpu->kvm));
++			if (unlikely(val == KVM_ARM_PSCI_0_1))
++				val = PSCI_RET_NOT_SUPPORTED;
++			vcpu_set_reg(vcpu, 0, val);
++			goto again;
++		}
+ 	}
+ 
+ 	if (static_branch_unlikely(&vgic_v2_cpuif_trap) &&
 diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
-index 5659343580a3..32360432cff5 100644
+index ed1dd8088f1c..e518e4e3dfb5 100644
 --- a/include/kvm/arm_psci.h
 +++ b/include/kvm/arm_psci.h
-@@ -22,6 +22,9 @@
+@@ -18,6 +18,7 @@
+ #ifndef __KVM_ARM_PSCI_H__
+ #define __KVM_ARM_PSCI_H__
+ 
++#include <linux/kvm_host.h>
+ #include <uapi/linux/psci.h>
  
  #define KVM_ARM_PSCI_0_1	PSCI_VERSION(0, 1)
- #define KVM_ARM_PSCI_0_2	PSCI_VERSION(0, 2)
-+#define KVM_ARM_PSCI_1_0	PSCI_VERSION(1, 0)
-+
-+#define KVM_ARM_PSCI_LATEST	KVM_ARM_PSCI_1_0
+@@ -26,7 +27,25 @@
  
- int kvm_psci_version(struct kvm_vcpu *vcpu);
- int kvm_psci_call(struct kvm_vcpu *vcpu);
-diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
-index c41553d35110..3e7c63e15f04 100644
---- a/virt/kvm/arm/psci.c
-+++ b/virt/kvm/arm/psci.c
-@@ -234,7 +234,7 @@ static void kvm_psci_system_reset(struct kvm_vcpu *vcpu)
- int kvm_psci_version(struct kvm_vcpu *vcpu)
- {
- 	if (test_bit(KVM_ARM_VCPU_PSCI_0_2, vcpu->arch.features))
--		return KVM_ARM_PSCI_0_2;
-+		return KVM_ARM_PSCI_LATEST;
+ #define KVM_ARM_PSCI_LATEST	KVM_ARM_PSCI_1_0
  
- 	return KVM_ARM_PSCI_0_1;
- }
-@@ -313,6 +313,47 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
- 	return ret;
- }
- 
-+static int kvm_psci_1_0_call(struct kvm_vcpu *vcpu)
+-int kvm_psci_version(struct kvm_vcpu *vcpu);
++/*
++ * We need the KVM pointer independently from the vcpu as we can call
++ * this from HYP, and need to apply kern_hyp_va on it...
++ */
++static inline int kvm_psci_version(struct kvm_vcpu *vcpu, struct kvm *kvm)
 +{
-+	u32 psci_fn = smccc_get_function(vcpu);
-+	u32 feature;
-+	unsigned long val;
-+	int ret = 1;
++	/*
++	 * Our PSCI implementation stays the same across versions from
++	 * v0.2 onward, only adding the few mandatory functions (such
++	 * as FEATURES with 1.0) that are required by newer
++	 * revisions. It is thus safe to return the latest.
++	 */
++	if (test_bit(KVM_ARM_VCPU_PSCI_0_2, vcpu->arch.features))
++		return KVM_ARM_PSCI_LATEST;
 +
-+	switch(psci_fn) {
-+	case PSCI_0_2_FN_PSCI_VERSION:
-+		val = KVM_ARM_PSCI_1_0;
-+		break;
-+	case PSCI_1_0_FN_PSCI_FEATURES:
-+		feature = smccc_get_arg1(vcpu);
-+		switch(feature) {
-+		case PSCI_0_2_FN_PSCI_VERSION:
-+		case PSCI_0_2_FN_CPU_SUSPEND:
-+		case PSCI_0_2_FN64_CPU_SUSPEND:
-+		case PSCI_0_2_FN_CPU_OFF:
-+		case PSCI_0_2_FN_CPU_ON:
-+		case PSCI_0_2_FN64_CPU_ON:
-+		case PSCI_0_2_FN_AFFINITY_INFO:
-+		case PSCI_0_2_FN64_AFFINITY_INFO:
-+		case PSCI_0_2_FN_MIGRATE_INFO_TYPE:
-+		case PSCI_0_2_FN_SYSTEM_OFF:
-+		case PSCI_0_2_FN_SYSTEM_RESET:
-+		case PSCI_1_0_FN_PSCI_FEATURES:
-+			val = 0;
-+			break;
-+		default:
-+			val = PSCI_RET_NOT_SUPPORTED;
-+			break;
-+		}
-+		break;
-+	default:
-+		return kvm_psci_0_2_call(vcpu);
-+	}
-+
-+	smccc_set_retval(vcpu, val, 0, 0, 0);
-+	return ret;
++	return KVM_ARM_PSCI_0_1;
 +}
 +
- static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
++
+ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu);
+ 
+ #endif /* __KVM_ARM_PSCI_H__ */
+diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
+index 46a98fee3ef5..e105c1153794 100644
+--- a/virt/kvm/arm/psci.c
++++ b/virt/kvm/arm/psci.c
+@@ -123,7 +123,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+ 	if (!vcpu)
+ 		return PSCI_RET_INVALID_PARAMS;
+ 	if (!vcpu->arch.power_off) {
+-		if (kvm_psci_version(source_vcpu) != KVM_ARM_PSCI_0_1)
++		if (kvm_psci_version(source_vcpu, kvm) != KVM_ARM_PSCI_0_1)
+ 			return PSCI_RET_ALREADY_ON;
+ 		else
+ 			return PSCI_RET_INVALID_PARAMS;
+@@ -232,14 +232,6 @@ static void kvm_psci_system_reset(struct kvm_vcpu *vcpu)
+ 	kvm_prepare_system_event(vcpu, KVM_SYSTEM_EVENT_RESET);
+ }
+ 
+-int kvm_psci_version(struct kvm_vcpu *vcpu)
+-{
+-	if (test_bit(KVM_ARM_VCPU_PSCI_0_2, vcpu->arch.features))
+-		return KVM_ARM_PSCI_LATEST;
+-
+-	return KVM_ARM_PSCI_0_1;
+-}
+-
+ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
  {
  	struct kvm *kvm = vcpu->kvm;
-@@ -355,6 +396,8 @@ static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
- int kvm_psci_call(struct kvm_vcpu *vcpu)
+@@ -397,7 +389,7 @@ static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
+  */
+ static int kvm_psci_call(struct kvm_vcpu *vcpu)
  {
- 	switch (kvm_psci_version(vcpu)) {
-+	case KVM_ARM_PSCI_1_0:
-+		return kvm_psci_1_0_call(vcpu);
+-	switch (kvm_psci_version(vcpu)) {
++	switch (kvm_psci_version(vcpu, vcpu->kvm)) {
+ 	case KVM_ARM_PSCI_1_0:
+ 		return kvm_psci_1_0_call(vcpu);
  	case KVM_ARM_PSCI_0_2:
- 		return kvm_psci_0_2_call(vcpu);
- 	case KVM_ARM_PSCI_0_1:
 -- 
 2.14.2
