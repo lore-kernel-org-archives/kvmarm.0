@@ -1,217 +1,379 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [RFC v2 REPOST] arm64: KVM: KVM API extensions for SVE
-Date: Tue, 6 Feb 2018 11:43:16 +0000
-Message-ID: <20180206114313.GQ5862@e103592.cambridge.arm.com>
-References: <20180126172849.GX5862@e103592.cambridge.arm.com>
- <20180205161308.GW21802@cbox>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCHv2 10/12] arm64/kvm: context-switch ptrauth registers
+Date: Tue, 6 Feb 2018 13:38:47 +0100
+Message-ID: <20180206123847.GY21802@cbox>
+References: <20171127163806.31435-1-mark.rutland@arm.com>
+ <20171127163806.31435-11-mark.rutland@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-arch-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180205161308.GW21802@cbox>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, libvir-list@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20171127163806.31435-11-mark.rutland@arm.com>
+Sender: linux-arch-owner@vger.kernel.org
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, arnd@arndb.de, catalin.marinas@arm.com, cdall@linaro.org, kvmarm@lists.cs.columbia.edu, linux-arch@vger.kernel.org, marc.zyngier@arm.com, suzuki.poulose@arm.com, will.deacon@arm.com, yao.qi@arm.com, kernel-hardening@lists.openwall.com, linux-kernel@vger.kernel.org, awallis@codeaurora.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Feb 05, 2018 at 05:13:08PM +0100, Christoffer Dall wrote:
-> Hi Dave,
+On Mon, Nov 27, 2017 at 04:38:04PM +0000, Mark Rutland wrote:
+> When pointer authentication is supported, a guest may wish to use it.
+> This patch adds the necessary KVM infrastructure for this to work, with
+> a semi-lazy context switch of the pointer auth state.
 > 
-> On Fri, Jan 26, 2018 at 05:28:49PM +0000, Dave Martin wrote:
-> > New feature KVM_ARM_VCPU_SVE:
-> > 
-> >  * enables exposure of SVE to the guest
-> > 
-> >  * enables visibility of / access to KVM_REG_ARM_SVE_*() via KVM reg
-> >    ioctls.  The main purposes of this are a) is to allow userspace to hide
-> >    weird-sized registers that it doesn't understand how to deal with,
-> >    and b) allow SVE to be hidden from the VM so that it can migrate to
-> >    nodes that don't support SVE.
-> > 
-> >    ZCR_EL1 is not specifically hidden, since it is "just a system register"
-> >    and does not have a weird size or semantics etc.
+> When we schedule a vcpu, 
+
+That's not quite what the code does, the code only does this when we
+schedule back a preempted or blocked vcpu thread.
+
+> we disable guest usage of pointer
+> authentication instructions and accesses to the keys. While these are
+> disabled, we avoid context-switching the keys. When we trap the guest
+> trying to use pointer authentication functionality, we change to eagerly
+> context-switching the keys, and enable the feature. The next time the
+> vcpu is scheduled out/in, we start again.
 > 
-> I think you want to hide ZCR_EL1 if SVE is not enabled, since presenting
-> it to a legacy userspace will prevent migration onto a non-SVE enabled
-> kernel/machine.
-
-On reflection, I think you're right here.  It makes no sense to half-
-expose SVE.
-
-> > Registers:
-> > 
-> >  * A new register size is defined KVM_REG_SIZE_U2048 (which can be
-> >    encoded sensibly using the next unused value for the reg size field
-> >    in the reg ID) (grep KVM_REG_SIZE_).
-> > 
-> >  * Reg IDs for the SVE regs will be defined as "coproc" 0x14
-> >    (i.e., 0x14 << KVM_REG_ARM_COPROC_SHIFT)
-> > 
-> >    KVM_REG_ARM_SVE_Z(n, i) is slice i of Zn (each slice is 2048 bits)
-> >    KVM_REG_ARM_SVE_P(n, i) is slice i of Pn (each slice is 256 bits)
-> >    KVM_REG_ARM_FFR(i) is slice i of FFR (each slice is 256 bits)
-> > 
+> Pointer authentication consists of address authentication and generic
+> authentication, and CPUs in a system might have varied support for
+> either. Where support for either feature is not uniform, it is hidden
+> from guests via ID register emulation, as a result of the cpufeature
+> framework in the host.
 > 
-> Just so I understand; slice 0 covers all the SVE state as the SVE spec
-> is today.  Additional slices is something we can use in the future in
-> case the SVE spec is expanded to allow even larger vector lengths?  In
-> which case, for a hypothetical 4096 bits register, slice 0 of Zn will be
-> the lower 2048 bits and slice 1 will be the upper 2048 bits?
+> Unfortunately, address authentication and generic authentication cannot
+> be trapped separately, as the architecture provides a single EL2 trap
+> covering both. If we wish to expose one without the other, we cannot
+> prevent a (badly-written) guest from intermittently using a feature
+> which is not uniformly supported (when scheduled on a physical CPU which
+> supports the relevant feature). 
 
-Yes.  The architecture leaves the decision about future expansion open.
-It may never happen, but I'm aiming for a design that will accommodate
-it if it does happen.
+We could choose to always trap and emulate in software in this case,
+couldn't we?  (not saying we should though).
 
-Exposing variable-size regs directly through the ioctl interface,
-or growing the ioctl view of the regs much beyond 2048 bits seems
-impractical, so the sliced view seemed reasonable.  In practice, we
-might never need more than one slice anyway.
+Also, this patch doesn't let userspace decide if we should hide or
+expose the feature to guests, and will expose new system registers to
+userspace.  That means that on hardware supporting pointer
+authentication, with this patch, it's not possible to migrate to a
+machine which doesn't have the support.  That's probably a good thing
+(false sense of security etc.), but I wonder if we should have a
+mechanism for userspace to ask for pointer authentication in the guest
+and only if that's enabled, do we expose the feature to the guest and in
+the system register list to user space as well?
 
-> >    The slice sizes allow each register to be read/written in exactly
-> >    one slice for SVE.
-> > 
-> >    Surplus bits (beyond the maximum VL supported by the vcpu) will
-> >    be read-as-zero write-ignore.
+> When the guest is scheduled on a
+> physical CPU lacking the feature, these atetmps will result in an UNDEF
+
+attempts
+
+> being taken by the guest.
 > 
-> This implies that there are some ordering fun to be had between
-> accessing SVE registers and changing the maximum vector length for the
-> vcpu.  Why not loosen the API slightly and say that anything written to
-> the surplus bits is not guaranteed to be preserved when read back?  (In
-> other words, we make no guarantees).
-
-I'm happy enough to say that, since it may remove some burden from the
-implementation; though only memzeroing so perhaps not too exciting.
-
-> >    Reading/writing surplus slices will probably be forbidden, and the
-> >    surplus slices would not be reported via KVM_GET_REG_LIST.
-> >    (We could make these RAZ/WI too, but I'm not sure if it's worth it,
-> >    or why it would be useful.)
-> > 
-> >    Future extensions to the architecture might grow the registers up
-> >    to 32 slices: this may or may not actually happen, but SVE keeps the
-> >    possibilty open.  I've tried to design for it.
-> > 
-> >  * KVM_REG_ARM_SVE_Z(n, 0) bits [127:0] alias Vn in
-> >    KVM_REG_ARM_CORE(fp_regs.v[n]) .. KVM_REG_ARM_CORE(fp_regs.v[n])+3.
+> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+> Cc: Christoffer Dall <cdall@linaro.org>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: kvmarm@lists.cs.columbia.edu
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 23 +++++++++-
+>  arch/arm64/include/asm/kvm_hyp.h  |  7 +++
+>  arch/arm64/kvm/handle_exit.c      | 21 +++++++++
+>  arch/arm64/kvm/hyp/Makefile       |  1 +
+>  arch/arm64/kvm/hyp/ptrauth-sr.c   | 91 +++++++++++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/hyp/switch.c       |  4 ++
+>  arch/arm64/kvm/sys_regs.c         | 32 ++++++++++++++
+>  7 files changed, 178 insertions(+), 1 deletion(-)
+>  create mode 100644 arch/arm64/kvm/hyp/ptrauth-sr.c
 > 
-> nit: KVM_REG_ARM_CORE_REG doesn't specify the size, so I think this
-> would be more clearly stated as
-> "aliases KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE(fp_regs.vregs[n])" or as
-> "aliases kvm_regs.regs.fp_regs.vregs[n]".
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 39184aa3e2f2..2fc21a2a75a7 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -136,6 +136,18 @@ enum vcpu_sysreg {
+>  	PMSWINC_EL0,	/* Software Increment Register */
+>  	PMUSERENR_EL0,	/* User Enable Register */
+>  
+> +	/* Pointer Authentication Registers */
+> +	APIAKEYLO_EL1,
+> +	APIAKEYHI_EL1,
+> +	APIBKEYLO_EL1,
+> +	APIBKEYHI_EL1,
+> +	APDAKEYLO_EL1,
+> +	APDAKEYHI_EL1,
+> +	APDBKEYLO_EL1,
+> +	APDBKEYHI_EL1,
+> +	APGAKEYLO_EL1,
+> +	APGAKEYHI_EL1,
+> +
+>  	/* 32bit specific registers. Keep them at the end of the range */
+>  	DACR32_EL2,	/* Domain Access Control Register */
+>  	IFSR32_EL2,	/* Instruction Fault Status Register */
+> @@ -363,10 +375,19 @@ static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr,
+>  	__kvm_call_hyp((void *)pgd_ptr, hyp_stack_ptr, vector_ptr);
+>  }
+>  
+> +void kvm_arm_vcpu_ptrauth_enable(struct kvm_vcpu *vcpu);
+> +void kvm_arm_vcpu_ptrauth_disable(struct kvm_vcpu *vcpu);
+> +void kvm_arm_vcpu_ptrauth_trap(struct kvm_vcpu *vcpu);
+> +
+>  static inline void kvm_arch_hardware_unsetup(void) {}
+>  static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+>  static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
+> -static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
+> +
+> +static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu)
+> +{
+> +	kvm_arm_vcpu_ptrauth_disable(vcpu);
+> +}
+> +
 
-I thought the size was effectively hard-coded to be 64 bits for
-KVM_REG_ARM_CORE().  Or did I misunderstand?
+I still find this decision to begin trapping again quite arbitrary, and
+would at least prefer this to be in vcpu_load (which would make the
+behavior match the commit text as well).
 
-> >    It's simplest for userspace if the two views always appear to be
-> >    in sync, but it's unclear whether this is really useful.  Perhaps
-> >    this can be relaxed if it's a big deal for the KVM implementation;
-> >    I don't know yet.
+My expectation would be that if a guest is running software with pointer
+authentication enabled, then it's likely to either keep using the
+feature, or not use it at all, so I would make this a one-time flag.
+
+
+Thanks,
+-Christoffer
+
+>  static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
+>  
+>  void kvm_arm_init_debug(void);
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index 08d3bb66c8b7..d0dd924cb175 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -152,6 +152,13 @@ void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
+>  void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
+>  bool __fpsimd_enabled(void);
+>  
+> +void __ptrauth_switch_to_guest(struct kvm_vcpu *vcpu,
+> +			       struct kvm_cpu_context *host_ctxt,
+> +			       struct kvm_cpu_context *guest_ctxt);
+> +void __ptrauth_switch_to_host(struct kvm_vcpu *vcpu,
+> +			      struct kvm_cpu_context *host_ctxt,
+> +			      struct kvm_cpu_context *guest_ctxt);
+> +
+>  u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
+>  void __noreturn __hyp_do_panic(unsigned long, ...);
+>  
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index b71247995469..d9aff3c86551 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -136,6 +136,26 @@ static int kvm_handle_guest_debug(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  	return ret;
+>  }
+>  
+> +/*
+> + * Handle the guest trying to use a ptrauth instruction, or trying to access a
+> + * ptrauth register.
+> + */
+> +void kvm_arm_vcpu_ptrauth_trap(struct kvm_vcpu *vcpu)
+> +{
+> +	if (cpus_have_const_cap(ARM64_HAS_ADDRESS_AUTH) ||
+> +	    cpus_have_const_cap(ARM64_HAS_GENERIC_AUTH)) {
+> +		kvm_arm_vcpu_ptrauth_enable(vcpu);
+> +	} else {
+> +		kvm_inject_undefined(vcpu);
+> +	}
+> +}
+> +
+> +static int kvm_handle_ptrauth(struct kvm_vcpu *vcpu, struct kvm_run *run)
+> +{
+> +	kvm_arm_vcpu_ptrauth_trap(vcpu);
+> +	return 1;
+> +}
+> +
+>  static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  {
+>  	u32 hsr = kvm_vcpu_get_hsr(vcpu);
+> @@ -176,6 +196,7 @@ static exit_handle_fn arm_exit_handlers[] = {
+>  	[ESR_ELx_EC_BKPT32]	= kvm_handle_guest_debug,
+>  	[ESR_ELx_EC_BRK64]	= kvm_handle_guest_debug,
+>  	[ESR_ELx_EC_FP_ASIMD]	= handle_no_fpsimd,
+> +	[ESR_ELx_EC_PAC]	= kvm_handle_ptrauth,
+>  };
+>  
+>  static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
+> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+> index f04400d494b7..2c2c3bd90cc0 100644
+> --- a/arch/arm64/kvm/hyp/Makefile
+> +++ b/arch/arm64/kvm/hyp/Makefile
+> @@ -19,6 +19,7 @@ obj-$(CONFIG_KVM_ARM_HOST) += fpsimd.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += tlb.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += hyp-entry.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += s2-setup.o
+> +obj-$(CONFIG_KVM_ARM_HOST) += ptrauth-sr.o
+>  
+>  # KVM code is run at a different exception code with a different map, so
+>  # compiler instrumentation that inserts callbacks or checks into the code may
+> diff --git a/arch/arm64/kvm/hyp/ptrauth-sr.c b/arch/arm64/kvm/hyp/ptrauth-sr.c
+> new file mode 100644
+> index 000000000000..2784fb373296
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/ptrauth-sr.c
+> @@ -0,0 +1,91 @@
+> +/*
+> + * Copyright (C) 2017 ARM Ltd
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include <linux/compiler.h>
+> +#include <linux/kvm_host.h>
+> +
+> +#include <asm/cpucaps.h>
+> +#include <asm/cpufeature.h>
+> +#include <asm/kvm_asm.h>
+> +#include <asm/kvm_hyp.h>
+> +
+> +static bool __hyp_text __ptrauth_is_enabled(struct kvm_vcpu *vcpu)
+> +{
+> +	return vcpu->arch.hcr_el2 & (HCR_API | HCR_APK);
+> +}
+> +
+> +#define __ptrauth_save_key(regs, key)						\
+> +({										\
+> +	regs[key ## KEYLO_EL1] = read_sysreg_s(SYS_ ## key ## KEYLO_EL1);	\
+> +	regs[key ## KEYHI_EL1] = read_sysreg_s(SYS_ ## key ## KEYHI_EL1);	\
+> +})
+> +
+> +static void __hyp_text __ptrauth_save_state(struct kvm_cpu_context *ctxt)
+> +{
+> +	if (cpus_have_const_cap(ARM64_HAS_ADDRESS_AUTH)) {
+> +		__ptrauth_save_key(ctxt->sys_regs, APIA);
+> +		__ptrauth_save_key(ctxt->sys_regs, APIB);
+> +		__ptrauth_save_key(ctxt->sys_regs, APDA);
+> +		__ptrauth_save_key(ctxt->sys_regs, APDB);
+> +	}
+> +
+> +	if (cpus_have_const_cap(ARM64_HAS_GENERIC_AUTH)) {
+> +		__ptrauth_save_key(ctxt->sys_regs, APGA);
+> +	}
+> +}
+> +
+> +#define __ptrauth_restore_key(regs, key) 					\
+> +({										\
+> +	write_sysreg_s(regs[key ## KEYLO_EL1], SYS_ ## key ## KEYLO_EL1);	\
+> +	write_sysreg_s(regs[key ## KEYHI_EL1], SYS_ ## key ## KEYHI_EL1);	\
+> +})
+> +
+> +static void __hyp_text __ptrauth_restore_state(struct kvm_cpu_context *ctxt)
+> +{
+> +
+> +	if (cpus_have_const_cap(ARM64_HAS_ADDRESS_AUTH)) {
+> +		__ptrauth_restore_key(ctxt->sys_regs, APIA);
+> +		__ptrauth_restore_key(ctxt->sys_regs, APIB);
+> +		__ptrauth_restore_key(ctxt->sys_regs, APDA);
+> +		__ptrauth_restore_key(ctxt->sys_regs, APDB);
+> +	}
+> +
+> +	if (cpus_have_const_cap(ARM64_HAS_GENERIC_AUTH)) {
+> +		__ptrauth_restore_key(ctxt->sys_regs, APGA);
+> +	}
+> +}
+> +
+> +void __hyp_text __ptrauth_switch_to_guest(struct kvm_vcpu *vcpu,
+> +					  struct kvm_cpu_context *host_ctxt,
+> +					  struct kvm_cpu_context *guest_ctxt)
+> +{
+> +	if (!__ptrauth_is_enabled(vcpu))
+> +		return;
+> +
+> +	__ptrauth_save_state(host_ctxt);
+> +	__ptrauth_restore_state(guest_ctxt);
+> +}
+> +
+> +void __hyp_text __ptrauth_switch_to_host(struct kvm_vcpu *vcpu,
+> +					 struct kvm_cpu_context *host_ctxt,
+> +					 struct kvm_cpu_context *guest_ctxt)
+> +{
+> +	if (!__ptrauth_is_enabled(vcpu))
+> +		return;
+> +
+> +	__ptrauth_save_state(guest_ctxt);
+> +	__ptrauth_restore_state(host_ctxt);
+> +}
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index 2205f0be3ced..d9be2762ac1a 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -315,6 +315,8 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  	__sysreg_restore_guest_state(guest_ctxt);
+>  	__debug_restore_state(vcpu, kern_hyp_va(vcpu->arch.debug_ptr), guest_ctxt);
+>  
+> +	__ptrauth_switch_to_guest(vcpu, host_ctxt, guest_ctxt);
+> +
+>  	/* Jump in the fire! */
+>  again:
+>  	exit_code = __guest_enter(vcpu, host_ctxt);
+> @@ -373,6 +375,8 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  
+>  	fp_enabled = __fpsimd_enabled();
+>  
+> +	__ptrauth_switch_to_host(vcpu, host_ctxt, guest_ctxt);
+> +
+>  	__sysreg_save_guest_state(guest_ctxt);
+>  	__sysreg32_save_state(vcpu);
+>  	__timer_disable_traps(vcpu);
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 1830ebc227d1..5fe3b2588bec 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -838,6 +838,32 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  	{ SYS_DESC(SYS_PMEVTYPERn_EL0(n)),					\
+>  	  access_pmu_evtyper, reset_unknown, (PMEVTYPER0_EL0 + n), }
+>  
+> +
+> +void kvm_arm_vcpu_ptrauth_enable(struct kvm_vcpu *vcpu)
+> +{
+> +	vcpu->arch.hcr_el2 |= (HCR_API | HCR_APK);
+> +}
+> +
+> +void kvm_arm_vcpu_ptrauth_disable(struct kvm_vcpu *vcpu)
+> +{
+> +	vcpu->arch.hcr_el2 &= ~(HCR_API | HCR_APK);
+> +}
+> +
+> +static bool trap_ptrauth(struct kvm_vcpu *vcpu,
+> +			 struct sys_reg_params *p,
+> +			 const struct sys_reg_desc *rd)
+> +{
+> +	kvm_arm_vcpu_ptrauth_trap(vcpu);
+> +	return false;
+> +}
+> +
+> +#define __PTRAUTH_KEY(k)						\
+> +	{ SYS_DESC(SYS_## k), trap_ptrauth, reset_unknown, k }
+> +
+> +#define PTRAUTH_KEY(k)							\
+> +	__PTRAUTH_KEY(k ## KEYLO_EL1),					\
+> +	__PTRAUTH_KEY(k ## KEYHI_EL1)
+> +
+>  static bool access_cntp_tval(struct kvm_vcpu *vcpu,
+>  		struct sys_reg_params *p,
+>  		const struct sys_reg_desc *r)
+> @@ -1156,6 +1182,12 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	{ SYS_DESC(SYS_TTBR1_EL1), access_vm_reg, reset_unknown, TTBR1_EL1 },
+>  	{ SYS_DESC(SYS_TCR_EL1), access_vm_reg, reset_val, TCR_EL1, 0 },
+>  
+> +	PTRAUTH_KEY(APIA),
+> +	PTRAUTH_KEY(APIB),
+> +	PTRAUTH_KEY(APDA),
+> +	PTRAUTH_KEY(APDB),
+> +	PTRAUTH_KEY(APGA),
+> +
+>  	{ SYS_DESC(SYS_AFSR0_EL1), access_vm_reg, reset_unknown, AFSR0_EL1 },
+>  	{ SYS_DESC(SYS_AFSR1_EL1), access_vm_reg, reset_unknown, AFSR1_EL1 },
+>  	{ SYS_DESC(SYS_ESR_EL1), access_vm_reg, reset_unknown, ESR_EL1 },
+> -- 
+> 2.11.0
 > 
-> It's not going to be a big deal, and it's the only sensible thing to do;
-> otherwise we'll have no clear semantics of where the values are.  If KVM
-> chooses to duplicate the 128 bits of state in memory, then it must also
-> know how to syncrhonize that duplicated state when running the guest,
-> and therefore can also do this in software on SET/GET.
-
-I tried to remember my full rationale and describe what the rules
-would be if the two views are allowed to be incoherent ... and
-concluded that you are probably correct.  This also matches the
-architectural view of the registers, which is what users would
-naturally expect.
-
-Software intentionally modifying the registers would need to know
-about this aliasing, but since software is explicitly required to
-enable the KVM_ARM_VCPU_SVE feature, this shouldn't pose problems
-for backwards compatibility.
-
-> > Vector length control:
-> > 
-> > Some means is needed to determine the set of vector lengths visible
-> > to guest software running on a vcpu.
-> > 
-> > When a vcpu is created, the set would be defaulted to the maximal set
-> > that can be supported while permitting each vcpu to run on any host
-> > CPU.  SVE has some virtualisation quirks which mean that this set may
-> > exclude some vector lengths that are available for host userspace
-> > applications.  The common case should be that the sets are the same
-> > however.
-> > 
-> >  * New ioctl KVM_ARM_VCPU_{SET,GET}_SVE_VLS to set or retrieve the set of
-> >    vector lengths available to the guest.
-> > 
-> >    Adding random vcpu ioctls
-> > 
-> >    To configure a non-default set of vector lengths,
-> >    KVM_ARM_VCPU_SET_SVE_VLS can be called: this would only be permitted
-> >    before the vcpu is first run.
-> > 
-> >    This is primarily intended for supporting migration, by providing a
-> >    robust check that the destination node will run the vcpu correctly.
-> >    In a cluster with non-uniform SVE implementation across nodes, this
-> >    also allows a specific set of VLs to be requested that the caller
-> >    knows is usable across the whole cluster.
-> > 
-> >    For migration purposes, userspace would need to do
-> >    KVM_ARM_VCPU_GET_SVE_VLS at the origin node and store the returned
-> >    set as VM metadata: on the destination node,
-> >    KVM_ARM_VCPU_SET_SVE_VLS should be used to request that exact set of
-> >    VLs: if the destination node can't support that set of VLs, the call
-> >    will fail.
-> > 
-> >    The interface would look something like:
-> > 
-> >    ioctl(vcpu_fd, KVM_ARM_SVE_SET_VLS, __u64 vqs[SVE_VQ_MAX / 64]);
-> 
-> I don't understand the proposed semantics here.  What is the vqs array
-> and how should the values be set?
-
-vqs is a bitmap, where bit (n - 1) indicates support for VL = 128n bits.
-
-Since the hardware is not required to support all possible vector
-lengths up to the maximum, a bitmap seemed the most straightforward way
-of representing the possibly sparse set of supported VLs.
-
-Calling it vq_bitmap[] would make this clearer.
-
-Describing only the maximum supported vl turns out to be insufficient.
-
-[...]
-
-> >    At present, other than initialising each vcpu to the maximum
-> >    supportable set of VLs, I don't propose having a way to probe for
-> >    what sets of VLs are supportable: the above call either succeeds or
-> >    fails.
-> > 
-> 
-> I think we should have such a way.  Libvirt can do things like figure
-> out compatible features across nodes, and trying to set all possible
-> vector lengths doesn't seem like a great approach.
-> 
-> How about creating the interface based on a bitmap of all the possible
-> lengths, and setting the bits for all lengths, and reading back the
-> value returns the actual supported lengths?
-
-Would it be sufficient for an initial call to KVM_ARM_VCPU_GET_SVE_VLS
-to return the default (i.e., maximum supported) set?
-
-This would mean that once KVM_ARM_VCPU_SET_SVE_VLS has been called to
-set a different set, it would no longer be possible to find out the
-maximum set.  I'm not sure this would matter, though.
-
-> My comments above are really in the details so I think you can safely
-> start putting together a full implementation, assuming this is still
-> your plan.
-
-Absolutely... and thanks for the feedback.
-
-Cheers
----Dave
