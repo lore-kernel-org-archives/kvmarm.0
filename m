@@ -1,178 +1,134 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v4 15/17] arm/arm64: smccc: Implement SMCCC v1.1 inline primitive
-Date: Tue,  6 Feb 2018 17:56:19 +0000
-Message-ID: <20180206175621.929-16-marc.zyngier@arm.com>
-References: <20180206175621.929-1-marc.zyngier@arm.com>
+From: Punit Agrawal <punit.agrawal@arm.com>
+Subject: Re: [RFC 4/4] KVM: arm64: Add support for PUD hugepages at stage 2
+Date: Tue, 06 Feb 2018 18:13:38 +0000
+Message-ID: <87bmh2htpp.fsf@e105922-lin.cambridge.arm.com>
+References: <20180110190729.18383-1-punit.agrawal@arm.com>
+        <20180110190729.18383-5-punit.agrawal@arm.com>
+        <20180206145501.GB23160@cbox>
+Mime-Version: 1.0
+Content-Type: text/plain
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180206175621.929-1-marc.zyngier@arm.com>
+In-Reply-To: <20180206145501.GB23160@cbox> (Christoffer Dall's message of
+        "Tue, 6 Feb 2018 15:55:01 +0100")
 Sender: linux-kernel-owner@vger.kernel.org
-To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Mark Rutland <mark.rutland@arm.com>, Robin Murphy <robin.murphy@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andrew Jones <drjones@redhat.com>, Hanjun Guo <guohanjun@huawei.com>, Jayachandran C <jnair@caviumnetworks.com>, Jon Masters <jcm@redhat.com>, Russell King - ARM Linux <linux@armlinux.org.uk>
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, suzuki.poulose@arm.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-One of the major improvement of SMCCC v1.1 is that it only clobbers
-the first 4 registers, both on 32 and 64bit. This means that it
-becomes very easy to provide an inline version of the SMC call
-primitive, and avoid performing a function call to stash the
-registers that would otherwise be clobbered by SMCCC v1.0.
+Christoffer Dall <christoffer.dall@linaro.org> writes:
 
-Reviewed-by: Robin Murphy <robin.murphy@arm.com>
-Tested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- include/linux/arm-smccc.h | 141 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 141 insertions(+)
+> On Wed, Jan 10, 2018 at 07:07:29PM +0000, Punit Agrawal wrote:
+>> KVM only supports PMD hugepages at stage 2. Extend the stage 2 fault
+>> handling to add support for PUD hugepages.
+>> 
+>> Addition of PUD hugpage support enables additional hugepage sizes (1G
+>
+>                  *hugepage
+>
+>> with 4K granule and 4TB with 64k granule) which can be useful on cores
+>> that have support for mapping larger block sizes in the TLB entries.
+>> 
+>> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
+>> Cc: Marc Zyngier <marc.zyngier@arm.com>
+>> Cc: Christoffer Dall <christoffer.dall@linaro.org>
+>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>> ---
+>>  arch/arm/include/asm/kvm_mmu.h         | 10 +++++
+>>  arch/arm/include/asm/pgtable-3level.h  |  2 +
+>>  arch/arm64/include/asm/kvm_mmu.h       | 19 +++++++++
+>>  arch/arm64/include/asm/pgtable-hwdef.h |  2 +
+>>  arch/arm64/include/asm/pgtable.h       |  4 ++
+>>  virt/kvm/arm/mmu.c                     | 72 +++++++++++++++++++++++++++++-----
+>>  6 files changed, 99 insertions(+), 10 deletions(-)
+>> 
 
-diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
-index dd44d8458c04..a031897fca76 100644
---- a/include/linux/arm-smccc.h
-+++ b/include/linux/arm-smccc.h
-@@ -150,5 +150,146 @@ asmlinkage void __arm_smccc_hvc(unsigned long a0, unsigned long a1,
- 
- #define arm_smccc_hvc_quirk(...) __arm_smccc_hvc(__VA_ARGS__)
- 
-+/* SMCCC v1.1 implementation madness follows */
-+#ifdef CONFIG_ARM64
-+
-+#define SMCCC_SMC_INST	"smc	#0"
-+#define SMCCC_HVC_INST	"hvc	#0"
-+
-+#elif defined(CONFIG_ARM)
-+#include <asm/opcodes-sec.h>
-+#include <asm/opcodes-virt.h>
-+
-+#define SMCCC_SMC_INST	__SMC(0)
-+#define SMCCC_HVC_INST	__HVC(0)
-+
-+#endif
-+
-+#define ___count_args(_0, _1, _2, _3, _4, _5, _6, _7, _8, x, ...) x
-+
-+#define __count_args(...)						\
-+	___count_args(__VA_ARGS__, 7, 6, 5, 4, 3, 2, 1, 0)
-+
-+#define __constraint_write_0						\
-+	"+r" (r0), "=&r" (r1), "=&r" (r2), "=&r" (r3)
-+#define __constraint_write_1						\
-+	"+r" (r0), "+r" (r1), "=&r" (r2), "=&r" (r3)
-+#define __constraint_write_2						\
-+	"+r" (r0), "+r" (r1), "+r" (r2), "=&r" (r3)
-+#define __constraint_write_3						\
-+	"+r" (r0), "+r" (r1), "+r" (r2), "+r" (r3)
-+#define __constraint_write_4	__constraint_write_3
-+#define __constraint_write_5	__constraint_write_4
-+#define __constraint_write_6	__constraint_write_5
-+#define __constraint_write_7	__constraint_write_6
-+
-+#define __constraint_read_0
-+#define __constraint_read_1
-+#define __constraint_read_2
-+#define __constraint_read_3
-+#define __constraint_read_4	"r" (r4)
-+#define __constraint_read_5	__constraint_read_4, "r" (r5)
-+#define __constraint_read_6	__constraint_read_5, "r" (r6)
-+#define __constraint_read_7	__constraint_read_6, "r" (r7)
-+
-+#define __declare_arg_0(a0, res)					\
-+	struct arm_smccc_res   *___res = res;				\
-+	register u32           r0 asm("r0") = a0;			\
-+	register unsigned long r1 asm("r1");				\
-+	register unsigned long r2 asm("r2");				\
-+	register unsigned long r3 asm("r3")
-+
-+#define __declare_arg_1(a0, a1, res)					\
-+	struct arm_smccc_res   *___res = res;				\
-+	register u32           r0 asm("r0") = a0;			\
-+	register typeof(a1)    r1 asm("r1") = a1;			\
-+	register unsigned long r2 asm("r2");				\
-+	register unsigned long r3 asm("r3")
-+
-+#define __declare_arg_2(a0, a1, a2, res)				\
-+	struct arm_smccc_res   *___res = res;				\
-+	register u32           r0 asm("r0") = a0;			\
-+	register typeof(a1)    r1 asm("r1") = a1;			\
-+	register typeof(a2)    r2 asm("r2") = a2;			\
-+	register unsigned long r3 asm("r3")
-+
-+#define __declare_arg_3(a0, a1, a2, a3, res)				\
-+	struct arm_smccc_res   *___res = res;				\
-+	register u32           r0 asm("r0") = a0;			\
-+	register typeof(a1)    r1 asm("r1") = a1;			\
-+	register typeof(a2)    r2 asm("r2") = a2;			\
-+	register typeof(a3)    r3 asm("r3") = a3
-+
-+#define __declare_arg_4(a0, a1, a2, a3, a4, res)			\
-+	__declare_arg_3(a0, a1, a2, a3, res);				\
-+	register typeof(a4) r4 asm("r4") = a4
-+
-+#define __declare_arg_5(a0, a1, a2, a3, a4, a5, res)			\
-+	__declare_arg_4(a0, a1, a2, a3, a4, res);			\
-+	register typeof(a5) r5 asm("r5") = a5
-+
-+#define __declare_arg_6(a0, a1, a2, a3, a4, a5, a6, res)		\
-+	__declare_arg_5(a0, a1, a2, a3, a4, a5, res);			\
-+	register typeof(a6) r6 asm("r6") = a6
-+
-+#define __declare_arg_7(a0, a1, a2, a3, a4, a5, a6, a7, res)		\
-+	__declare_arg_6(a0, a1, a2, a3, a4, a5, a6, res);		\
-+	register typeof(a7) r7 asm("r7") = a7
-+
-+#define ___declare_args(count, ...) __declare_arg_ ## count(__VA_ARGS__)
-+#define __declare_args(count, ...)  ___declare_args(count, __VA_ARGS__)
-+
-+#define ___constraints(count)						\
-+	: __constraint_write_ ## count					\
-+	: __constraint_read_ ## count					\
-+	: "memory"
-+#define __constraints(count)	___constraints(count)
-+
-+/*
-+ * We have an output list that is not necessarily used, and GCC feels
-+ * entitled to optimise the whole sequence away. "volatile" is what
-+ * makes it stick.
-+ */
-+#define __arm_smccc_1_1(inst, ...)					\
-+	do {								\
-+		__declare_args(__count_args(__VA_ARGS__), __VA_ARGS__);	\
-+		asm volatile(inst "\n"					\
-+			     __constraints(__count_args(__VA_ARGS__)));	\
-+		if (___res)						\
-+			*___res = (typeof(*___res)){r0, r1, r2, r3};	\
-+	} while (0)
-+
-+/*
-+ * arm_smccc_1_1_smc() - make an SMCCC v1.1 compliant SMC call
-+ *
-+ * This is a variadic macro taking one to eight source arguments, and
-+ * an optional return structure.
-+ *
-+ * @a0-a7: arguments passed in registers 0 to 7
-+ * @res: result values from registers 0 to 3
-+ *
-+ * This macro is used to make SMC calls following SMC Calling Convention v1.1.
-+ * The content of the supplied param are copied to registers 0 to 7 prior
-+ * to the SMC instruction. The return values are updated with the content
-+ * from register 0 to 3 on return from the SMC instruction if not NULL.
-+ */
-+#define arm_smccc_1_1_smc(...)	__arm_smccc_1_1(SMCCC_SMC_INST, __VA_ARGS__)
-+
-+/*
-+ * arm_smccc_1_1_hvc() - make an SMCCC v1.1 compliant HVC call
-+ *
-+ * This is a variadic macro taking one to eight source arguments, and
-+ * an optional return structure.
-+ *
-+ * @a0-a7: arguments passed in registers 0 to 7
-+ * @res: result values from registers 0 to 3
-+ *
-+ * This macro is used to make HVC calls following SMC Calling Convention v1.1.
-+ * The content of the supplied param are copied to registers 0 to 7 prior
-+ * to the HVC instruction. The return values are updated with the content
-+ * from register 0 to 3 on return from the HVC instruction if not NULL.
-+ */
-+#define arm_smccc_1_1_hvc(...)	__arm_smccc_1_1(SMCCC_HVC_INST, __VA_ARGS__)
-+
- #endif /*__ASSEMBLY__*/
- #endif /*__LINUX_ARM_SMCCC_H*/
--- 
-2.14.2
+[...]
+
+>> diff --git a/arch/arm/include/asm/pgtable-3level.h b/arch/arm/include/asm/pgtable-3level.h
+>> index 1a7a17b2a1ba..97e04fdbfa85 100644
+>> --- a/arch/arm/include/asm/pgtable-3level.h
+>> +++ b/arch/arm/include/asm/pgtable-3level.h
+>> @@ -249,6 +249,8 @@ PMD_BIT_FUNC(mkyoung,   |= PMD_SECT_AF);
+>>  #define pfn_pmd(pfn,prot)	(__pmd(((phys_addr_t)(pfn) << PAGE_SHIFT) | pgprot_val(prot)))
+>>  #define mk_pmd(page,prot)	pfn_pmd(page_to_pfn(page),prot)
+>>  
+>> +#define pud_pfn(pud)		(((pud_val(pud) & PUD_MASK) & PHYS_MASK) >> PAGE_SHIFT)
+>> +
+>
+> does this make sense on 32-bit arm?  Is this ever going to get called
+> and return something meaningful in that case?
+
+This macro should never get called as there are no PUD_SIZE hugepages on
+arm.
+
+Ideally we want to fold the pud to fallback to pgd like in the rest of
+the code. I'll have another go at this.
+
+>
+>>  /* represent a notpresent pmd by faulting entry, this is used by pmdp_invalidate */
+>>  static inline pmd_t pmd_mknotpresent(pmd_t pmd)
+>>  {
+
+[...]
+
+
+>> @@ -1393,17 +1424,38 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>  	if (mmu_notifier_retry(kvm, mmu_seq))
+>>  		goto out_unlock;
+>>  
+>> -	if (!hugetlb && !force_pte)
+>> +	if (!hugetlb && !force_pte) {
+>> +		/*
+>> +		 * We only support PMD_SIZE transparent
+>> +		 * hugepages. This code will need updates if we enable
+>> +		 * other page sizes for THP.
+>> +		 */
+>>  		hugetlb = transparent_hugepage_adjust(&pfn, &fault_ipa);
+>> +		vma_pagesize = PMD_SIZE;
+>> +	}
+>>  
+>>  	if (hugetlb) {
+>> -		pmd_t new_pmd = stage2_build_pmd(pfn, mem_type, writable);
+>> -
+>> -		if (writable)
+>> -			kvm_set_pfn_dirty(pfn);
+>> -
+>> -		coherent_cache_guest_page(vcpu, pfn, PMD_SIZE);
+>> -		ret = stage2_set_pmd_huge(kvm, memcache, fault_ipa, &new_pmd);
+>> +		if (vma_pagesize == PUD_SIZE) {
+>> +			pud_t new_pud;
+>> +
+>> +			new_pud = stage2_build_pud(pfn, mem_type, writable);
+>> +			if (writable)
+>> +				kvm_set_pfn_dirty(pfn);
+>> +
+>> +			coherent_cache_guest_page(vcpu, pfn, PUD_SIZE);
+>> +			ret = stage2_set_pud_huge(kvm, memcache,
+>> +						  fault_ipa, &new_pud);
+>> +		} else {
+>> +			pmd_t new_pmd;
+>> +
+>> +			new_pmd = stage2_build_pmd(pfn, mem_type, writable);
+>> +			if (writable)
+>> +				kvm_set_pfn_dirty(pfn);
+>> +
+>> +			coherent_cache_guest_page(vcpu, pfn, PMD_SIZE);
+>> +			ret = stage2_set_pmd_huge(kvm, memcache,
+>> +						  fault_ipa, &new_pmd);
+>> +		}
+>
+> This stuff needs rebasing onto v4.16-rc1 when we get there, and it will
+> clash with Marc's icache optimizations.
+
+Thanks for the heads up.
+
+>
+> But, you should be able to move kvm_set_pfn_dirty() out of the
+> size-conditional section and also call the cache maintenance functions
+> using vma_pagesize as parameter.
+
+Agreed - I'll roll these suggestions into the next version.
+
+Thanks a lot for the review.
+
+Punit
