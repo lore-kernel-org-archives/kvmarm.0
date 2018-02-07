@@ -1,129 +1,106 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v1 02/16] irqchip: gicv3-its: Add helpers for handling
- 52bit address
-Date: Wed, 7 Feb 2018 16:10:23 +0100
-Message-ID: <20180207151023.GD29286@cbox>
-References: <20180109190414.4017-1-suzuki.poulose@arm.com>
- <20180109190414.4017-3-suzuki.poulose@arm.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [RFC v2 REPOST] arm64: KVM: KVM API extensions for SVE
+Date: Wed, 7 Feb 2018 15:34:03 +0000
+Message-ID: <20180207153402.GR5862@e103592.cambridge.arm.com>
+References: <20180126172849.GX5862@e103592.cambridge.arm.com>
+ <20180205161308.GW21802@cbox>
+ <20180206114313.GQ5862@e103592.cambridge.arm.com>
+ <20180206131757.GA23160@cbox>
+ <20180207113327.GN5862@e103592.cambridge.arm.com>
+ <20180207145831.GC29286@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <20180109190414.4017-3-suzuki.poulose@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, peter.maydell@linaro.org, pbonzini@redhat.com, rkrcmar@redhat.com, will.deacon@arm.com, ard.biesheuvel@linaro.org, mark.rutland@arm.com, catalin.marinas@arm.com, Shanker Donthineni <shankerd@codeaurora.org>
+In-Reply-To: <20180207145831.GC29286@cbox>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, libvir-list@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Suzuki,
+On Wed, Feb 07, 2018 at 03:58:31PM +0100, Christoffer Dall wrote:
+> On Wed, Feb 07, 2018 at 11:33:28AM +0000, Dave Martin wrote:
 
-On Tue, Jan 09, 2018 at 07:03:57PM +0000, Suzuki K Poulose wrote:
-> Add helpers for encoding/decoding 52bit address in GICv3 ITS BASER
-> register. When ITS uses 64K page size, the 52bits of physical address
-> are encoded in BASER[47:12] as follows :
+[...]
+
+> > What if KVM_ARM_SVE_SET_VLS() were to yield 0 if the exact requested set
+> > of VLs was configured, -ERANGE if some subset was configured successfully
+> > (but not exactly the set requested), and the usual -EINVAL/-EIO/whatever
+> > if the set of VLs couldn't be configured at all?
 > 
->  Bits[47:16] of the register => bits[47:16] of the physical address
->  Bits[15:12] of the register => bits[51:48] of the physical address
->                                 bits[15:0] of the physical address are 0.
+> Sounds good to me.
 > 
-> Also adds a mask for CBASER address. This will be used for adding 52bit
-> support for VGIC ITS. More importantly ignore the upper bits if 52bit
-> support is not enabled.
+> > 
+> > Then the probe would go like this:
+> > 
+> > 	__u64 vqs[SVE_VQ_MAX / 64] = { [0 ... SVE_VQ_MAX / 64 - 1] = ~(u64)0 };
+> > 	if (ioctl(vcpu_fd, KVM_ARM_SVE_SET_VLS, vqs) && errno != ERANGE))
+> > 		goto error;
+> > 
+> > 	ioctl(vcpu_fd, KVM_ARM_SVE_GET_VLS, vqs);
+> > 
+> > 	/* ... */
+> > 
+> > Another option would be for SVE_ARM_SVE_SET_VLS to write the resulting
+> > set back to its argument, possibly with the same 0/ERANGE/EINVAL semantics.
+> > 
+> > 
+> > Alternatively, userspace would be require to do a KVM_ARM_SVE_GET_VLS,
+> > and check the resulting set:
+> > 
+> > 	/* ... */
+> > 	
+> > 	__u64 newvqs[SVE_VQ_MAX / 64];
+> > 	ioctl(vcpu_fd, KVM_ARM_SVE_GET_VLS, newvqs);
+> > 
+> > 	if (memcmp(vqs, newvqs, sizeof vqs))
+> > 		goto mismatch;
+> > 
+> > vcpu restore would need to treat any mismatch as an error:
+> > the exact requested set but be configurable, or the VM may go wrong.
 > 
-> Cc: Shanker Donthineni <shankerd@codeaurora.org>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
->  drivers/irqchip/irq-gic-v3-its.c   |  2 +-
->  include/linux/irqchip/arm-gic-v3.h | 32 ++++++++++++++++++++++++++++++--
->  2 files changed, 31 insertions(+), 3 deletions(-)
+> I'm not sure I can parse this sentence or extract the meaning?
+
+That was lazy language on my part.  I'll try to explain it better:
+
+When the saved state of a migrating vcpu is being loaded into a
+newly-created vcpu on the target node, userspace needs a way to
+ensure that the set of VLs that vcpu will see when it runs is
+_exactly_ the same set it could see before migration.
+
+I called this out separately because it's different from the
+case of creating a brand-new VM: in the latter case, we can't the
+kernel to provide the best set of VLs possible, but it is not an
+error not to get every VL we asked for.
+
+> > Any opinion on which approach is best?
 > 
-> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-> index 4039e64cd342..e6aa84f806f7 100644
-> --- a/drivers/irqchip/irq-gic-v3-its.c
-> +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -1615,7 +1615,7 @@ static int its_setup_baser(struct its_node *its, struct its_baser *baser,
->  		}
->  
->  		/* Convert 52bit PA to 48bit field */
-> -		baser_phys = GITS_BASER_PHYS_52_to_48(baser_phys);
-> +		baser_phys = GITS_BASER_ADDR64K_FROM_PHYS(baser_phys);
->  	}
->  
->  retry_baser:
-> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-> index c00c4c33e432..b880b6682fa6 100644
-> --- a/include/linux/irqchip/arm-gic-v3.h
-> +++ b/include/linux/irqchip/arm-gic-v3.h
-> @@ -320,6 +320,15 @@
->  #define GITS_IIDR_REV(r)		(((r) >> GITS_IIDR_REV_SHIFT) & 0xf)
->  #define GITS_IIDR_PRODUCTID_SHIFT	24
->  
-> +#ifdef CONFIG_ARM64_PA_BITS_52
-> +#define GITS_PA_HI_MASK			(0xfULL)
-> +#define GITS_PA_SHIFT			52
-> +#else
-> +/* Do not use the bits [51-48] if we don't support 52bit */
-> +#define GITS_PA_HI_MASK			0
-> +#define GITS_PA_SHIFT			48
-> +#endif
-> +
->  #define GITS_CBASER_VALID			(1ULL << 63)
->  #define GITS_CBASER_SHAREABILITY_SHIFT		(10)
->  #define GITS_CBASER_INNER_CACHEABILITY_SHIFT	(59)
-> @@ -343,6 +352,7 @@
->  #define GITS_CBASER_WaWb	GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, WaWb)
->  #define GITS_CBASER_RaWaWt	GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWaWt)
->  #define GITS_CBASER_RaWaWb	GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWaWb)
-> +#define GITS_CBASER_ADDRESS(x)	((x) & GENMASK_ULL(GITS_PA_SHIFT, 12))
->  
->  #define GITS_BASER_NR_REGS		8
->  
-> @@ -373,8 +383,26 @@
->  #define GITS_BASER_ENTRY_SIZE_SHIFT		(48)
->  #define GITS_BASER_ENTRY_SIZE(r)	((((r) >> GITS_BASER_ENTRY_SIZE_SHIFT) & 0x1f) + 1)
->  #define GITS_BASER_ENTRY_SIZE_MASK	GENMASK_ULL(52, 48)
-> -#define GITS_BASER_PHYS_52_to_48(phys)					\
-> -	(((phys) & GENMASK_ULL(47, 16)) | (((phys) >> 48) & 0xf) << 12)
-> +
-> +/*
-> + * With 64K page size, the physical address can be upto 52bit and
-> + * uses the following encoding in the GITS_BASER[47:12]:
-> + *
-> + * Bits[47:16] of the register => bits[47:16] of the base physical address.
-> + * Bits[15:12] of the register => bits[51:48] of the base physical address.
-> + *                                bits[15:0] of the base physical address are 0.
-> + * Clear the upper bits if the kernel doesn't support 52bits.
-> + */
-> +#define GITS_BASER_ADDR64K_LO_MASK	GENMASK_ULL(47, 16)
-> +#define GITS_BASER_ADDR64K_HI_SHIFT	12
-> +#define GITS_BASER_ADDR64K_HI_MOVE	(48 - GITS_BASER_ADDR64K_HI_SHIFT)
-> +#define GITS_BASER_ADDR64K_HI_MASK	(GITS_PA_HI_MASK << GITS_BASER_ADDR64K_HI_SHIFT)
-> +#define GITS_BASER_ADDR64K_TO_PHYS(x)					\
-> +	(((x) & GITS_BASER_ADDR64K_LO_MASK) | 				\
-> +	 (((x) & GITS_BASER_ADDR64K_HI_MASK) << GITS_BASER_ADDR64K_HI_MOVE))
-> +#define GITS_BASER_ADDR64K_FROM_PHYS(p)					\
-> +	(((p) & GITS_BASER_ADDR64K_LO_MASK) | 				\
-> +	 (((p) >> GITS_BASER_ADDR64K_HI_MOVE) & GITS_BASER_ADDR64K_HI_MASK))
-
-I don't understand why you need this masking logic embedded in these
-macros?  Isn't it strictly an error if anyone passes a physical address
-with any of bits [51:48] set to the ITS on a system that doesn't support
-52 bit PAs, and just silently masking off those bits could lead to some
-interesting cases.
-
-This is also notably more difficult to read than the existing macro.
-
-If anything, I think it would be more useful to have
-GITS_BASER_TO_PHYS(x) and GITS_PHYS_TO_BASER(x) which takes into account
-CONFIG_ARM64_64K_PAGES.
-
->  #define GITS_BASER_SHAREABILITY_SHIFT	(10)
->  #define GITS_BASER_InnerShareable					\
->  	GIC_BASER_SHAREABILITY(GITS_BASER, InnerShareable)
-> -- 
-> 2.13.6
+> I think I prefer letting KVM_ARM_SVE_SET_VLS change the supplied vqs,
+> since having it be two separate ioctls always potentially leaves room
+> for some other thread having modified the set in the meantime (or making
+> a programmer doubt if this can be the case) where a single ioctl() will
+> look atomic.
 > 
+> The user can always call KVM_ARM_SVE_GET_VLS afterwards and should get
+> the same result.
 
-Thanks,
--Christoffer
+OK, I'll go with changing the supplied vqs for KVM_ARM_SVE_SET_VLS,
+but I'll retain the -ERANGE semantics (even if technically redundant)
+since that's harder to forget to check.
+
+> I think it's worth trying to write this up as patches to the KVM
+> documentation and to the kernel and see what people say on that.
+
+OK.  Thanks for the input.
+
+Cheers
+---Dave
