@@ -1,199 +1,221 @@
-From: =?UTF-8?B?SsOpcsOpbXkgRmFuZ3XDqGRl?= <j.fanguede@virtualopensystems.com>
-Subject: Re: [PATCH] KVM: arm64: Enable the EL1 physical timer for AArch32
- guests
-Date: Thu, 8 Feb 2018 15:10:16 +0100
-Message-ID: <CAGE1QJqJ15zNDU-DVj8zwNL210Lo_iz5qOFm=5CEOQhKx0tfhA@mail.gmail.com>
-References: <1518091039-17356-1-git-send-email-j.fanguede@virtualopensystems.com>
- <51fa6f87-4d4d-0c14-9fb0-6ce0d2808ce3@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v3 00/41] Optimize KVM/ARM for VHE systems
+Date: Thu, 8 Feb 2018 16:47:39 +0100
+Message-ID: <20180208154739.GR29286@cbox>
+References: <20180112120747.27999-1-christoffer.dall@linaro.org>
+ <f886a2fd-e0f0-3252-9f6e-00422d895e9f@semihalf.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============1469012785053975140=="
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DC8449DFA
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Feb 2018 09:05:06 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lS1bKsDVGOvJ for <kvmarm@lists.cs.columbia.edu>;
- Thu,  8 Feb 2018 09:04:45 -0500 (EST)
-Received: from mail-ot0-f177.google.com (mail-ot0-f177.google.com
- [74.125.82.177])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 448DB49DE6
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Feb 2018 09:04:45 -0500 (EST)
-Received: by mail-ot0-f177.google.com with SMTP id a2so4431417otf.2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 08 Feb 2018 06:10:47 -0800 (PST)
-In-Reply-To: <51fa6f87-4d4d-0c14-9fb0-6ce0d2808ce3@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, VirtualOpenSystems Technical Team <tech@virtualopensystems.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <f886a2fd-e0f0-3252-9f6e-00422d895e9f@semihalf.com>
+Sender: kvm-owner@vger.kernel.org
+To: Tomasz Nowicki <tn@semihalf.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
---===============1469012785053975140==
-Content-Type: multipart/alternative; boundary="94eb2c1924f474fbd70564b3fa72"
+Hi Tomasz,
 
---94eb2c1924f474fbd70564b3fa72
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Thu, Feb 01, 2018 at 02:57:59PM +0100, Tomasz Nowicki wrote:
+> 
+> I created simple module for VM kernel. It is spinning on PSCI version
+> hypercall to measure the base exit cost as you suggested. Also, I measured
+> CPU cycles for each loop and here are my results:
+> 
+> My setup:
+> 1-socket ThunderX2 running VM - 1VCPU
+> 
+> Tested baselines:
+> a) host kernel v4.15-rc3 and VM kernel v4.15-rc3
+> b) host kernel v4.15-rc3 + vhe-optimize-v3-with-fixes and VM kernel
+> v4.15-rc3
+> 
+> Module was loaded from VM and the results are presented in [%] relative to
+> average CPU cycles spending on PSCI version hypercall for vanilla VHE host
+> kernel v4.15-rc3:
+> 
+>              VHE  |  nVHE
+> =========================
+> baseline a)  100% |  130%
+> =========================
+> baseline a)  36%  |  123%
+> 
+> So I confirm significant performance improvement, especially for VHE case.
+> Additionally,
 
-Hi Marc,
+Thanks for this.  Good to know the exit cost is still reduced.
 
-On Thu, Feb 8, 2018 at 1:08 PM, Marc Zyngier <marc.zyngier@arm.com> wrote:
+> I run network throughput tests with vhost-net but for that
+> case no differences.
+> 
 
-> On 08/02/18 11:57, J=C3=A9r=C3=A9my Fangu=C3=A8de wrote:
-> > Some 32bits guest OS can use the CNTP timer, however KVM does not
-> > handle the accesses, injecting a fault instead.
+Throughput on vhost-net wouldn't be affected, because its protocol is
+specifically designed around avoiding exits.  But if you measure latency
+with TCP_RR or another latency sensitive benchmark like memcached, you
+should see real-world performance benefits here as well.
+
+Thanks,
+-Christoffer
+
+> 
+> On 12.01.2018 13:07, Christoffer Dall wrote:
+> >This series redesigns parts of KVM/ARM to optimize the performance on
+> >VHE systems.  The general approach is to try to do as little work as
+> >possible when transitioning between the VM and the hypervisor.  This has
+> >the benefit of lower latency when waiting for interrupts and delivering
+> >virtual interrupts, and reduces the overhead of emulating behavior and
+> >I/O in the host kernel.
 > >
-> > Use the proper handlers to emulate the EL1 Physical Timer (CNTP)
-> > register accesses of AArch32 guests.
+> >Patches 01 through 06 are not VHE specific, but rework parts of KVM/ARM
+> >that can be generally improved.  We then add infrastructure to move more
+> >logic into vcpu_load and vcpu_put, we improve handling of VFP and debug
+> >registers.
 > >
-> > Signed-off-by: J=C3=A9r=C3=A9my Fangu=C3=A8de <j.fanguede@virtualopensy=
-stems.com>
-> > Signed-off-by: Alvise Rigo <a.rigo@virtualopensystems.com>
-> > ---
-> >  arch/arm64/kvm/sys_regs.c | 6 ++++++
-> >  1 file changed, 6 insertions(+)
+> >We then introduce a new world-switch function for VHE systems, which we
+> >can tweak and optimize for VHE systems.  To do that, we rework a lot of
+> >the system register save/restore handling and emulation code that may
+> >need access to system registers, so that we can defer as many system
+> >register save/restore operations to vcpu_load and vcpu_put, and move
+> >this logic out of the VHE world switch function.
 > >
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 50a43c7..c0ab4f7 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -1545,6 +1545,11 @@ static const struct sys_reg_desc cp15_regs[] =3D=
- {
+> >We then optimize the configuration of traps.  On non-VHE systems, both
+> >the host and VM kernels run in EL1, but because the host kernel should
+> >have full access to the underlying hardware, but the VM kernel should
+> >not, we essentially make the host kernel more privileged than the VM
+> >kernel despite them both running at the same privilege level by enabling
+> >VE traps when entering the VM and disabling those traps when exiting the
+> >VM.  On VHE systems, the host kernel runs in EL2 and has full access to
+> >the hardware (as much as allowed by secure side software), and is
+> >unaffected by the trap configuration.  That means we can configure the
+> >traps for VMs running in EL1 once, and don't have to switch them on and
+> >off for every entry/exit to/from the VM.
 > >
-> >       { Op1( 0), CRn(13), CRm( 0), Op2( 1), access_vm_reg, NULL, c13_CI=
-D
-> },
+> >Finally, we improve our VGIC handling by moving all save/restore logic
+> >out of the VHE world-switch, and we make it possible to truly only
+> >evaluate if the AP list is empty and not do *any* VGIC work if that is
+> >the case, and only do the minimal amount of work required in the course
+> >of the VGIC processing when we have virtual interrupts in flight.
 > >
-> > +     /* CNTP_TVAL */
-> > +     { Op1( 0), CRn(14), CRm( 2), Op2( 0), access_cntp_tval },
-> > +     /* CNTP_CTL */
-> > +     { Op1( 0), CRn(14), CRm( 2), Op2( 1), access_cntp_ctl },
-> > +
-> >       /* PMEVCNTRn */
-> >       PMU_PMEVCNTR(0),
-> >       PMU_PMEVCNTR(1),
-> > @@ -1618,6 +1623,7 @@ static const struct sys_reg_desc cp15_64_regs[] =
-=3D {
-> >       { Op1( 0), CRn( 0), CRm( 9), Op2( 0), access_pmu_evcntr },
-> >       { Op1( 0), CRn( 0), CRm(12), Op2( 0), access_gic_sgi },
-> >       { Op1( 1), CRn( 0), CRm( 2), Op2( 0), access_vm_reg, NULL,
-> c2_TTBR1 },
-> > +     { Op1( 2), CRn( 0), CRm(14), Op2( 0), access_cntp_cval },
-> >  };
+> >The patches are based on v4.15-rc3, v9 of the level-triggered mapped
+> >interrupts support series [1], and the first five patches of James' SDEI
+> >series [2].
 > >
-> >  /* Target specific emulation tables */
+> >I've given the patches a fair amount of testing on Thunder-X, Mustang,
+> >Seattle, and TC2 (32-bit) for non-VHE testing, and tested VHE
+> >functionality on the Foundation model, running both 64-bit VMs and
+> >32-bit VMs side-by-side and using both GICv3-on-GICv3 and
+> >GICv2-on-GICv3.
 > >
->
-> Seems OK to me. Can you please update the corresponding 32bit code while
-> you're at it?
->
-I'm working on it, I'll send soon the arm 32bit version, once tested.
-
-Jeremy
-
->
-> Thanks,
->
->         M.
-> --
-> Jazz is not dead. It just smells funny...
->
-
---94eb2c1924f474fbd70564b3fa72
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">Hi Marc,<br><div><div class=3D"gmail_extra"><br><div class=
-=3D"gmail_quote">On Thu, Feb 8, 2018 at 1:08 PM, Marc Zyngier <span dir=3D"=
-ltr">&lt;<a href=3D"mailto:marc.zyngier@arm.com" target=3D"_blank">marc.zyn=
-gier@arm.com</a>&gt;</span> wrote:<br><blockquote class=3D"gmail_quote" sty=
-le=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"><div c=
-lass=3D"m_5950063223294626919m_6811923720026052507m_-4744201811796511766HOE=
-nZb"><div class=3D"m_5950063223294626919m_6811923720026052507m_-47442018117=
-96511766h5">On 08/02/18 11:57, J=C3=A9r=C3=A9my Fangu=C3=A8de wrote:<br>
-&gt; Some 32bits guest OS can use the CNTP timer, however KVM does not<br>
-&gt; handle the accesses, injecting a fault instead.<br>
-&gt;<br>
-&gt; Use the proper handlers to emulate the EL1 Physical Timer (CNTP)<br>
-&gt; register accesses of AArch32 guests.<br>
-&gt;<br>
-&gt; Signed-off-by: J=C3=A9r=C3=A9my Fangu=C3=A8de &lt;<a href=3D"mailto:j.=
-fanguede@virtualopensystems.com" target=3D"_blank">j.fanguede@virtualopensy=
-stems<wbr>.com</a>&gt;<br>
-&gt; Signed-off-by: Alvise Rigo &lt;<a href=3D"mailto:a.rigo@virtualopensys=
-tems.com" target=3D"_blank">a.rigo@virtualopensystems.com</a><wbr>&gt;<br>
-&gt; ---<br>
-&gt;=C2=A0 arch/arm64/kvm/sys_regs.c | 6 ++++++<br>
-&gt;=C2=A0 1 file changed, 6 insertions(+)<br>
-&gt;<br>
-&gt; diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c<br>
-&gt; index 50a43c7..c0ab4f7 100644<br>
-&gt; --- a/arch/arm64/kvm/sys_regs.c<br>
-&gt; +++ b/arch/arm64/kvm/sys_regs.c<br>
-&gt; @@ -1545,6 +1545,11 @@ static const struct sys_reg_desc cp15_regs[] =
-=3D {<br>
-&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0{ Op1( 0), CRn(13), CRm( 0), Op2( 1), access=
-_vm_reg, NULL, c13_CID },<br>
-&gt;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0/* CNTP_TVAL */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0{ Op1( 0), CRn(14), CRm( 2), Op2( 0), access_cntp=
-_tval },<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0/* CNTP_CTL */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0{ Op1( 0), CRn(14), CRm( 2), Op2( 1), access_cntp=
-_ctl },<br>
-&gt; +<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0/* PMEVCNTRn */<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0PMU_PMEVCNTR(0),<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0PMU_PMEVCNTR(1),<br>
-&gt; @@ -1618,6 +1623,7 @@ static const struct sys_reg_desc cp15_64_regs[] =
-=3D {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0{ Op1( 0), CRn( 0), CRm( 9), Op2( 0), access=
-_pmu_evcntr },<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0{ Op1( 0), CRn( 0), CRm(12), Op2( 0), access=
-_gic_sgi },<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0{ Op1( 1), CRn( 0), CRm( 2), Op2( 0), access=
-_vm_reg, NULL, c2_TTBR1 },<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0{ Op1( 2), CRn( 0), CRm(14), Op2( 0), access_cntp=
-_cval },<br>
-&gt;=C2=A0 };<br>
-&gt;<br>
-&gt;=C2=A0 /* Target specific emulation tables */<br>
-&gt;<br>
-<br>
-</div></div>Seems OK to me. Can you please update the corresponding 32bit c=
-ode while<br>
-you&#39;re at it?<br></blockquote><div>I&#39;m working on it, I&#39;ll send=
- soon the arm 32bit version, once tested.<br><br></div><div>Jeremy<br></div=
-><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1=
-px #ccc solid;padding-left:1ex">
-<br>
-Thanks,<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 M.<br>
-<span class=3D"m_5950063223294626919m_6811923720026052507m_-474420181179651=
-1766HOEnZb"><font color=3D"#888888">--<br>
-Jazz is not dead. It just smells funny...<br>
-</font></span></blockquote></div><br></div></div></div>
-
---94eb2c1924f474fbd70564b3fa72--
-
---===============1469012785053975140==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============1469012785053975140==--
+> >The patches are also available in the vhe-optimize-v3 branch on my
+> >kernel.org repository [3].  The vhe-optimize-v3-base branch contains
+> >prerequisites of this series.
+> >
+> >Changes since v2:
+> >  - Rebased on v4.15-rc3.
+> >  - Includes two additional patches that only does vcpu_load after
+> >    kvm_vcpu_first_run_init and only for KVM_RUN.
+> >  - Addressed review comments from v2 (detailed changelogs are in the
+> >    individual patches).
+> >
+> >Thanks,
+> >-Christoffer
+> >
+> >[1]: git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git level-mapped-v9
+> >[2]: git://linux-arm.org/linux-jm.git sdei/v5/base
+> >[3]: git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git vhe-optimize-v3
+> >
+> >Christoffer Dall (40):
+> >   KVM: arm/arm64: Avoid vcpu_load for other vcpu ioctls than KVM_RUN
+> >   KVM: arm/arm64: Move vcpu_load call after kvm_vcpu_first_run_init
+> >   KVM: arm64: Avoid storing the vcpu pointer on the stack
+> >   KVM: arm64: Rework hyp_panic for VHE and non-VHE
+> >   KVM: arm/arm64: Get rid of vcpu->arch.irq_lines
+> >   KVM: arm/arm64: Add kvm_vcpu_load_sysregs and kvm_vcpu_put_sysregs
+> >   KVM: arm/arm64: Introduce vcpu_el1_is_32bit
+> >   KVM: arm64: Defer restoring host VFP state to vcpu_put
+> >   KVM: arm64: Move debug dirty flag calculation out of world switch
+> >   KVM: arm64: Slightly improve debug save/restore functions
+> >   KVM: arm64: Improve debug register save/restore flow
+> >   KVM: arm64: Factor out fault info population and gic workarounds
+> >   KVM: arm64: Introduce VHE-specific kvm_vcpu_run
+> >   KVM: arm64: Remove kern_hyp_va() use in VHE switch function
+> >   KVM: arm64: Don't deactivate VM on VHE systems
+> >   KVM: arm64: Remove noop calls to timer save/restore from VHE switch
+> >   KVM: arm64: Move userspace system registers into separate function
+> >   KVM: arm64: Rewrite sysreg alternatives to static keys
+> >   KVM: arm64: Introduce separate VHE/non-VHE sysreg save/restore
+> >     functions
+> >   KVM: arm/arm64: Remove leftover comment from kvm_vcpu_run_vhe
+> >   KVM: arm64: Unify non-VHE host/guest sysreg save and restore functions
+> >   KVM: arm64: Don't save the host ELR_EL2 and SPSR_EL2 on VHE systems
+> >   KVM: arm64: Change 32-bit handling of VM system registers
+> >   KVM: arm64: Rewrite system register accessors to read/write functions
+> >   KVM: arm64: Introduce framework for accessing deferred sysregs
+> >   KVM: arm/arm64: Prepare to handle deferred save/restore of SPSR_EL1
+> >   KVM: arm64: Prepare to handle deferred save/restore of ELR_EL1
+> >   KVM: arm64: Defer saving/restoring 64-bit sysregs to vcpu load/put on
+> >     VHE
+> >   KVM: arm64: Prepare to handle deferred save/restore of 32-bit
+> >     registers
+> >   KVM: arm64: Defer saving/restoring 32-bit sysregs to vcpu load/put
+> >   KVM: arm64: Move common VHE/non-VHE trap config in separate functions
+> >   KVM: arm64: Configure FPSIMD traps on vcpu load/put
+> >   KVM: arm64: Configure c15, PMU, and debug register traps on cpu
+> >     load/put for VHE
+> >   KVM: arm64: Separate activate_traps and deactive_traps for VHE and
+> >     non-VHE
+> >   KVM: arm/arm64: Get rid of vgic_elrsr
+> >   KVM: arm/arm64: Handle VGICv2 save/restore from the main VGIC code
+> >   KVM: arm/arm64: Move arm64-only vgic-v2-sr.c file to arm64
+> >   KVM: arm/arm64: Handle VGICv3 save/restore from the main VGIC code on
+> >     VHE
+> >   KVM: arm/arm64: Move VGIC APR save/restore to vgic put/load
+> >   KVM: arm/arm64: Avoid VGICv3 save/restore on VHE with no IRQs
+> >
+> >Shih-Wei Li (1):
+> >   KVM: arm64: Move HCR_INT_OVERRIDE to default HCR_EL2 guest flag
+> >
+> >  arch/arm/include/asm/kvm_asm.h                    |   5 +-
+> >  arch/arm/include/asm/kvm_emulate.h                |  21 +-
+> >  arch/arm/include/asm/kvm_host.h                   |   6 +-
+> >  arch/arm/include/asm/kvm_hyp.h                    |   4 +
+> >  arch/arm/kvm/emulate.c                            |   4 +-
+> >  arch/arm/kvm/hyp/Makefile                         |   1 -
+> >  arch/arm/kvm/hyp/switch.c                         |  16 +-
+> >  arch/arm64/include/asm/kvm_arm.h                  |   4 +-
+> >  arch/arm64/include/asm/kvm_asm.h                  |  18 +-
+> >  arch/arm64/include/asm/kvm_emulate.h              |  74 +++-
+> >  arch/arm64/include/asm/kvm_host.h                 |  49 ++-
+> >  arch/arm64/include/asm/kvm_hyp.h                  |  32 +-
+> >  arch/arm64/include/asm/kvm_mmu.h                  |   2 +-
+> >  arch/arm64/kernel/asm-offsets.c                   |   2 +
+> >  arch/arm64/kvm/debug.c                            |  28 +-
+> >  arch/arm64/kvm/guest.c                            |   3 -
+> >  arch/arm64/kvm/hyp/Makefile                       |   2 +-
+> >  arch/arm64/kvm/hyp/debug-sr.c                     |  88 +++--
+> >  arch/arm64/kvm/hyp/entry.S                        |   9 +-
+> >  arch/arm64/kvm/hyp/hyp-entry.S                    |  41 +--
+> >  arch/arm64/kvm/hyp/switch.c                       | 404 +++++++++++++---------
+> >  arch/arm64/kvm/hyp/sysreg-sr.c                    | 192 ++++++++--
+> >  {virt/kvm/arm => arch/arm64/kvm}/hyp/vgic-v2-sr.c |  81 -----
+> >  arch/arm64/kvm/inject_fault.c                     |  24 +-
+> >  arch/arm64/kvm/regmap.c                           |  65 +++-
+> >  arch/arm64/kvm/sys_regs.c                         | 247 +++++++++++--
+> >  arch/arm64/kvm/sys_regs.h                         |   4 +-
+> >  arch/arm64/kvm/sys_regs_generic_v8.c              |   4 +-
+> >  include/kvm/arm_vgic.h                            |   2 -
+> >  virt/kvm/arm/aarch32.c                            |   2 +-
+> >  virt/kvm/arm/arch_timer.c                         |   7 -
+> >  virt/kvm/arm/arm.c                                |  50 ++-
+> >  virt/kvm/arm/hyp/timer-sr.c                       |  44 +--
+> >  virt/kvm/arm/hyp/vgic-v3-sr.c                     | 244 +++++++------
+> >  virt/kvm/arm/mmu.c                                |   6 +-
+> >  virt/kvm/arm/pmu.c                                |  37 +-
+> >  virt/kvm/arm/vgic/vgic-init.c                     |  11 -
+> >  virt/kvm/arm/vgic/vgic-v2.c                       |  61 +++-
+> >  virt/kvm/arm/vgic/vgic-v3.c                       |  12 +-
+> >  virt/kvm/arm/vgic/vgic.c                          |  21 ++
+> >  virt/kvm/arm/vgic/vgic.h                          |   3 +
+> >  41 files changed, 1229 insertions(+), 701 deletions(-)
+> >  rename {virt/kvm/arm => arch/arm64/kvm}/hyp/vgic-v2-sr.c (50%)
+> >
