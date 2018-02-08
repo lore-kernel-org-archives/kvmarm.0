@@ -1,56 +1,136 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] KVM: arm64: Enable the EL1 physical timer for AArch32
- guests
-Date: Thu, 8 Feb 2018 12:08:10 +0000
-Message-ID: <51fa6f87-4d4d-0c14-9fb0-6ce0d2808ce3@arm.com>
-References: <1518091039-17356-1-git-send-email-j.fanguede@virtualopensystems.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v3 04/41] KVM: arm64: Rework hyp_panic for VHE and non-VHE
+Date: Thu, 8 Feb 2018 14:24:16 +0100
+Message-ID: <20180208132416.GP29286@cbox>
+References: <20180112120747.27999-1-christoffer.dall@linaro.org>
+ <20180112120747.27999-5-christoffer.dall@linaro.org>
+ <be470bdb-258e-6b4d-b409-e230d2d90888@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1518091039-17356-1-git-send-email-j.fanguede@virtualopensystems.com>
-Content-Language: en-GB
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: =?UTF-8?B?SsOpcsOpbXkgRmFuZ3XDqGRl?= <j.fanguede@virtualopensystems.com>, Christoffer Dall <christoffer.dall@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
-Cc: tech@virtualopensystems.com, Alvise Rigo <a.rigo@virtualopensystems.com>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <be470bdb-258e-6b4d-b409-e230d2d90888@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Julien Grall <julien.grall@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMDgvMDIvMTggMTE6NTcsIErDqXLDqW15IEZhbmd1w6hkZSB3cm90ZToKPiBTb21lIDMyYml0
-cyBndWVzdCBPUyBjYW4gdXNlIHRoZSBDTlRQIHRpbWVyLCBob3dldmVyIEtWTSBkb2VzIG5vdAo+
-IGhhbmRsZSB0aGUgYWNjZXNzZXMsIGluamVjdGluZyBhIGZhdWx0IGluc3RlYWQuCj4gCj4gVXNl
-IHRoZSBwcm9wZXIgaGFuZGxlcnMgdG8gZW11bGF0ZSB0aGUgRUwxIFBoeXNpY2FsIFRpbWVyIChD
-TlRQKQo+IHJlZ2lzdGVyIGFjY2Vzc2VzIG9mIEFBcmNoMzIgZ3Vlc3RzLgo+IAo+IFNpZ25lZC1v
-ZmYtYnk6IErDqXLDqW15IEZhbmd1w6hkZSA8ai5mYW5ndWVkZUB2aXJ0dWFsb3BlbnN5c3RlbXMu
-Y29tPgo+IFNpZ25lZC1vZmYtYnk6IEFsdmlzZSBSaWdvIDxhLnJpZ29AdmlydHVhbG9wZW5zeXN0
-ZW1zLmNvbT4KPiAtLS0KPiAgYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuYyB8IDYgKysrKysrCj4g
-IDEgZmlsZSBjaGFuZ2VkLCA2IGluc2VydGlvbnMoKykKPiAKPiBkaWZmIC0tZ2l0IGEvYXJjaC9h
-cm02NC9rdm0vc3lzX3JlZ3MuYyBiL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmMKPiBpbmRleCA1
-MGE0M2M3Li5jMGFiNGY3IDEwMDY0NAo+IC0tLSBhL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmMK
-PiArKysgYi9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jCj4gQEAgLTE1NDUsNiArMTU0NSwxMSBA
-QCBzdGF0aWMgY29uc3Qgc3RydWN0IHN5c19yZWdfZGVzYyBjcDE1X3JlZ3NbXSA9IHsKPiAgCj4g
-IAl7IE9wMSggMCksIENSbigxMyksIENSbSggMCksIE9wMiggMSksIGFjY2Vzc192bV9yZWcsIE5V
-TEwsIGMxM19DSUQgfSwKPiAgCj4gKwkvKiBDTlRQX1RWQUwgKi8KPiArCXsgT3AxKCAwKSwgQ1Ju
-KDE0KSwgQ1JtKCAyKSwgT3AyKCAwKSwgYWNjZXNzX2NudHBfdHZhbCB9LAo+ICsJLyogQ05UUF9D
-VEwgKi8KPiArCXsgT3AxKCAwKSwgQ1JuKDE0KSwgQ1JtKCAyKSwgT3AyKCAxKSwgYWNjZXNzX2Nu
-dHBfY3RsIH0sCj4gKwo+ICAJLyogUE1FVkNOVFJuICovCj4gIAlQTVVfUE1FVkNOVFIoMCksCj4g
-IAlQTVVfUE1FVkNOVFIoMSksCj4gQEAgLTE2MTgsNiArMTYyMyw3IEBAIHN0YXRpYyBjb25zdCBz
-dHJ1Y3Qgc3lzX3JlZ19kZXNjIGNwMTVfNjRfcmVnc1tdID0gewo+ICAJeyBPcDEoIDApLCBDUm4o
-IDApLCBDUm0oIDkpLCBPcDIoIDApLCBhY2Nlc3NfcG11X2V2Y250ciB9LAo+ICAJeyBPcDEoIDAp
-LCBDUm4oIDApLCBDUm0oMTIpLCBPcDIoIDApLCBhY2Nlc3NfZ2ljX3NnaSB9LAo+ICAJeyBPcDEo
-IDEpLCBDUm4oIDApLCBDUm0oIDIpLCBPcDIoIDApLCBhY2Nlc3Nfdm1fcmVnLCBOVUxMLCBjMl9U
-VEJSMSB9LAo+ICsJeyBPcDEoIDIpLCBDUm4oIDApLCBDUm0oMTQpLCBPcDIoIDApLCBhY2Nlc3Nf
-Y250cF9jdmFsIH0sCj4gIH07Cj4gIAo+ICAvKiBUYXJnZXQgc3BlY2lmaWMgZW11bGF0aW9uIHRh
-YmxlcyAqLwo+IAoKU2VlbXMgT0sgdG8gbWUuIENhbiB5b3UgcGxlYXNlIHVwZGF0ZSB0aGUgY29y
-cmVzcG9uZGluZyAzMmJpdCBjb2RlIHdoaWxlCnlvdSdyZSBhdCBpdD8KClRoYW5rcywKCglNLgot
-LSAKSmF6eiBpcyBub3QgZGVhZC4gSXQganVzdCBzbWVsbHMgZnVubnkuLi4KCl9fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmxpbnV4LWFybS1rZXJuZWwgbWFp
-bGluZyBsaXN0CmxpbnV4LWFybS1rZXJuZWxAbGlzdHMuaW5mcmFkZWFkLm9yZwpodHRwOi8vbGlz
-dHMuaW5mcmFkZWFkLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2xpbnV4LWFybS1rZXJuZWwK
+Hi Julien,
+
+On Mon, Feb 05, 2018 at 06:04:25PM +0000, Julien Grall wrote:
+> On 12/01/18 12:07, Christoffer Dall wrote:
+> >VHE actually doesn't rely on clearing the VTTBR when returning to the
+> >host kernel, and that is the current key mechanism of hyp_panic to
+> >figure out how to attempt to return to a state good enough to print a
+> >panic statement.
+> >
+> >Therefore, we split the hyp_panic function into two functions, a VHE and
+> >a non-VHE, keeping the non-VHE version intact, but changing the VHE
+> >behavior.
+> >
+> >The vttbr_el2 check on VHE doesn't really make that much sense, because
+> >the only situation where we can get here on VHE is when the hypervisor
+> >assembly code actually called into hyp_panic, which only happens when
+> >VBAR_EL2 has been set to the KVM exception vectors.  On VHE, we can
+> >always safely disable the traps and restore the host registers at this
+> >point, so we simply do that unconditionally and call into the panic
+> >function directly.
+> >
+> >Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+> >Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> >---
+> >  arch/arm64/kvm/hyp/switch.c | 42 +++++++++++++++++++++++-------------------
+> >  1 file changed, 23 insertions(+), 19 deletions(-)
+> >
+> >diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> >index 6fcb37e220b5..71700ecee308 100644
+> >--- a/arch/arm64/kvm/hyp/switch.c
+> >+++ b/arch/arm64/kvm/hyp/switch.c
+> >@@ -419,10 +419,20 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+> >  static const char __hyp_panic_string[] = "HYP panic:\nPS:%08llx PC:%016llx ESR:%08llx\nFAR:%016llx HPFAR:%016llx PAR:%016llx\nVCPU:%p\n";
+> >  static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par,
+> >-					     struct kvm_vcpu *vcpu)
+> >+					     struct kvm_cpu_context *__host_ctxt)
+> >  {
+> >+	struct kvm_vcpu *vcpu;
+> >  	unsigned long str_va;
+> >+	vcpu = __host_ctxt->__hyp_running_vcpu;
+> >+
+> >+	if (read_sysreg(vttbr_el2)) {
+> >+		__timer_disable_traps(vcpu);
+> >+		__deactivate_traps(vcpu);
+> >+		__deactivate_vm(vcpu);
+> >+		__sysreg_restore_host_state(__host_ctxt);
+> >+	}
+> >+
+> >  	/*
+> >  	 * Force the panic string to be loaded from the literal pool,
+> >  	 * making sure it is a kernel address and not a PC-relative
+> >@@ -436,37 +446,31 @@ static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par,
+> >  		       read_sysreg(hpfar_el2), par, vcpu);
+> >  }
+> >-static void __hyp_text __hyp_call_panic_vhe(u64 spsr, u64 elr, u64 par,
+> >-					    struct kvm_vcpu *vcpu)
+> >+static void __hyp_call_panic_vhe(u64 spsr, u64 elr, u64 par,
+> >+				 struct kvm_cpu_context *host_ctxt)
+> >  {
+> >+	struct kvm_vcpu *vcpu;
+> >+	vcpu = host_ctxt->__hyp_running_vcpu;
+> >+
+> >+	__deactivate_traps(vcpu);
+> >+	__sysreg_restore_host_state(host_ctxt);
+> 
+> I was about to ask why you keep this function around as it does nothing in
+> VHE case. But I see that this will actually restore some values in a later
+> patch.
+> 
+> >+
+> >  	panic(__hyp_panic_string,
+> >  	      spsr,  elr,
+> >  	      read_sysreg_el2(esr),   read_sysreg_el2(far),
+> >  	      read_sysreg(hpfar_el2), par, vcpu);
+> >  }
+> >-static hyp_alternate_select(__hyp_call_panic,
+> >-			    __hyp_call_panic_nvhe, __hyp_call_panic_vhe,
+> >-			    ARM64_HAS_VIRT_HOST_EXTN);
+> 
+> Out of interest, any specific rather to remove hyp_alternate_select and
+> "open-code" it?
+> 
+
+Not sure I understand your question.
+
+Are you asking why I replace the hyp alternatives with the has_vhe()?
+If so, has_vhe() uses a static key and should therefore have the same
+performance characteristics, but I find the has_vhe() version below much
+more readable.
+
+> >-
+> >  void __hyp_text __noreturn hyp_panic(struct kvm_cpu_context *host_ctxt)
+> >  {
+> >-	struct kvm_vcpu *vcpu = NULL;
+> >-
+> >  	u64 spsr = read_sysreg_el2(spsr);
+> >  	u64 elr = read_sysreg_el2(elr);
+> >  	u64 par = read_sysreg(par_el1);
+> >-	if (read_sysreg(vttbr_el2)) {
+> >-		vcpu = host_ctxt->__hyp_running_vcpu;
+> >-		__timer_disable_traps(vcpu);
+> >-		__deactivate_traps(vcpu);
+> >-		__deactivate_vm(vcpu);
+> >-		__sysreg_restore_host_state(host_ctxt);
+> >-	}
+> >-
+> >-	/* Call panic for real */
+> >-	__hyp_call_panic()(spsr, elr, par, vcpu);
+> >+	if (!has_vhe())
+> >+		__hyp_call_panic_nvhe(spsr, elr, par, host_ctxt);
+> >+	else
+> >+		__hyp_call_panic_vhe(spsr, elr, par, host_ctxt);
+> >  	unreachable();
+> >  }
+> >
+> 
+
+Thanks,
+-Christoffer
