@@ -1,75 +1,171 @@
 From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCH v1 14/16] kvm: arm64: Switch to per VM IPA
-Date: Thu, 8 Feb 2018 17:22:29 +0000
-Message-ID: <94aae952-d6c0-0a69-955f-81885ddb2f06@arm.com>
+Subject: Re: [PATCH v1 15/16] kvm: arm64: Allow configuring physical address
+ space size
+Date: Thu, 8 Feb 2018 17:53:17 +0000
+Message-ID: <31e5bf40-4fcb-934e-6036-ff2670f793df@arm.com>
 References: <20180109190414.4017-1-suzuki.poulose@arm.com>
- <20180109190414.4017-15-suzuki.poulose@arm.com> <20180208110035.GG29286@cbox>
+ <20180109190414.4017-16-suzuki.poulose@arm.com> <20180208111414.GM29286@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180208110035.GG29286@cbox>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180208111414.GM29286@cbox>
 Content-Language: en-US
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Sender: linux-kernel-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: mark.rutland@arm.com, peter.maydell@linaro.org, kvm@vger.kernel.org, rkrcmar@redhat.com, marc.zyngier@arm.com, catalin.marinas@arm.com, ard.biesheuvel@linaro.org, will.deacon@arm.com, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, Christoffer Dall <cdall@linaro.org>, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, peter.maydell@linaro.org, pbonzini@redhat.com, rkrcmar@redhat.com, will.deacon@arm.com, ard.biesheuvel@linaro.org, mark.rutland@arm.com, catalin.marinas@arm.com, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 08/02/18 11:00, Christoffer Dall wrote:
-> On Tue, Jan 09, 2018 at 07:04:09PM +0000, Suzuki K Poulose wrote:
->> Now that we can manage the stage2 page table per VM, switch the
->> configuration details to per VM instance. We keep track of the
->> IPA bits, number of page table levels and the VTCR bits (which
->> depends on the IPA and the number of levels).
+On 08/02/18 11:14, Christoffer Dall wrote:
+> On Tue, Jan 09, 2018 at 07:04:10PM +0000, Suzuki K Poulose wrote:
+>> Allow the guests to choose a larger physical address space size.
+>> The default and minimum size is 40bits. A guest can change this
+>> right after the VM creation, but before the stage2 entry page
+>> tables are allocated (i.e, before it registers a memory range
+>> or maps a device address). The size is restricted to the maximum
+>> supported by the host. Also, the guest can only increase the PA size,
+>> from the existing value, as reducing it could break the devices which
+>> may have verified their physical address for validity and may do a
+>> lazy mapping(e.g, VGIC).
 >>
 >> Cc: Marc Zyngier <marc.zyngier@arm.com>
 >> Cc: Christoffer Dall <cdall@linaro.org>
+>> Cc: Peter Maydell <peter.maydell@linaro.org>
 >> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 >> ---
->>   arch/arm/include/asm/kvm_mmu.h          |  1 +
->>   arch/arm64/include/asm/kvm_host.h       | 12 ++++++++++++
->>   arch/arm64/include/asm/kvm_mmu.h        | 22 ++++++++++++++++++++--
->>   arch/arm64/include/asm/stage2_pgtable.h |  1 -
->>   arch/arm64/kvm/hyp/switch.c             |  3 +--
->>   virt/kvm/arm/arm.c                      |  2 +-
->>   6 files changed, 35 insertions(+), 6 deletions(-)
+>>   Documentation/virtual/kvm/api.txt | 27 ++++++++++++++++++++++++++
+>>   arch/arm/include/asm/kvm_host.h   |  7 +++++++
+>>   arch/arm64/include/asm/kvm_host.h |  1 +
+>>   arch/arm64/include/asm/kvm_mmu.h  | 41 ++++++++++++++++++++++++++++++---------
+>>   arch/arm64/kvm/reset.c            | 28 ++++++++++++++++++++++++++
+>>   include/uapi/linux/kvm.h          |  4 ++++
+>>   virt/kvm/arm/arm.c                |  2 +-
+>>   7 files changed, 100 insertions(+), 10 deletions(-)
 >>
->> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
->> index 440c80589453..dd592fe45660 100644
->> --- a/arch/arm/include/asm/kvm_mmu.h
->> +++ b/arch/arm/include/asm/kvm_mmu.h
->> @@ -48,6 +48,7 @@
->>   #define kvm_vttbr_baddr_mask(kvm)	VTTBR_BADDR_MASK
+>> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+>> index 57d3ee9e4bde..a203faf768c4 100644
+>> --- a/Documentation/virtual/kvm/api.txt
+>> +++ b/Documentation/virtual/kvm/api.txt
+>> @@ -3403,6 +3403,33 @@ invalid, if invalid pages are written to (e.g. after the end of memory)
+>>   or if no page table is present for the addresses (e.g. when using
+>>   hugepages).
 >>   
->>   #define stage2_pgd_size(kvm)	(PTRS_PER_S2_PGD * sizeof(pgd_t))
->> +#define kvm_init_stage2_config(kvm)	do { } while (0)
->>   int create_hyp_mappings(void *from, void *to, pgprot_t prot);
->>   int create_hyp_io_mappings(void *from, void *to, phys_addr_t);
->>   void free_hyp_pgds(void);
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index 9a9ddeb33c84..1e66e5ab3dde 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -64,6 +64,18 @@ struct kvm_arch {
->>   	/* VTTBR value associated with above pgd and vmid */
->>   	u64    vttbr;
->>   
->> +	/* Private bits of VTCR_EL2 for this VM */
->> +	u64    vtcr_private;
+>> +4.109 KVM_ARM_GET_PHYS_SHIFT
+>> +
+>> +Capability: KVM_CAP_ARM_CONFIG_PHYS_SHIFT
+>> +Architectures: arm64
+>> +Type: vm ioctl
+>> +Parameters: __u32 (out)
+>> +Returns: 0 on success, a negative value on error
+>> +
+>> +This ioctl is used to get the current maximum physical address size for
+>> +the VM. The value is Log2(Maximum_Physical_Address). This is neither the
+>> + amount of physical memory assigned to the VM nor the maximum physical address
+>> +that a real CPU on the host can handle. Rather, this is the upper limit of the
+>> +guest physical address that can be used by the VM.
 > 
-> As to my comments in the previous patch, why isn't this simply u64 vtcr;
+> What is the point of this?  Presumably if userspace has set the size, it
+> already knows the size?
 
-nit: I haven't received your response to the previous patch.
+This can help the userspace know, what the "default" limit is. As such I am
+not particular about keeping this around.
 
-We could. I thought this gives a bit more clarity on what changes per-VM.
+> 
+>> +
+>> +4.109 KVM_ARM_SET_PHYS_SHIFT
+>> +
+>> +Capability: KVM_CAP_ARM_CONFIG_PHYS_SHIFT
+>> +Architectures: arm64
+>> +Type: vm ioctl
+>> +Parameters: __u32 (in)
+>> +Returns: 0 on success, a negative value on error
+>> +
+>> +This ioctl is used to set the maximum physical address size for
+>> +the VM. The value is Log2(Maximum_Physical_Address). The value can only
+>> +be increased from the existing setting. The value cannot be changed
+>> +after the stage-2 page tables are allocated and will return an error.
+>> +
+> 
+> Is there a way for userspace to discover what the underlying hardware
+> can actually support, beyond trial-and-error on this ioctl?
 
-Thanks
+Unfortunately, there is none. We don't expose ID_AA64MMFR0 via mrs emulation.
+
+>> +static inline int kvm_reconfig_stage2(struct kvm *kvm, u32 phys_shift)
+>> +{
+>> +	int rc = 0;
+>> +	unsigned int pa_max, parange;
+>> +
+>> +	parange = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1) & 7;
+>> +	pa_max = id_aa64mmfr0_parange_to_phys_shift(parange);
+>> +	/* Raise it to 40bits for backward compatibility */
+>> +	pa_max = (pa_max < 40) ? 40 : pa_max;
+>> +	/* Make sure the size is supported/available */
+>> +	if (phys_shift > PHYS_MASK_SHIFT || phys_shift > pa_max)
+>> +		return -EINVAL;
+>> +	/*
+>> +	 * The stage2 PGD is dependent on the settings we initialise here
+>> +	 * and should be allocated only after this step. We cannot allow
+>> +	 * down sizing the IPA size as there could be devices or memory
+>> +	 * regions, that depend on the previous size.
+>> +	 */
+>> +	mutex_lock(&kvm->slots_lock);
+>> +	if (kvm->arch.pgd || phys_shift < kvm->arch.phys_shift) {
+>> +		rc = -EPERM;
+>> +	} else if (phys_shift > kvm->arch.phys_shift) {
+>> +		kvm->arch.phys_shift = phys_shift;
+>> +		kvm->arch.s2_levels = stage2_pt_levels(kvm->arch.phys_shift);
+>> +		kvm->arch.vtcr_private = VTCR_EL2_SL0(kvm->arch.s2_levels) |
+>> +					 TCR_T0SZ(kvm->arch.phys_shift);
+>> +	}
+> 
+> I think you can rework the above to make it more obvious what's going on
+> in this way:
+> 
+> 	rc = -EPERM;
+> 	if (kvm->arch.pgd || phys_shift < kvm->arch.phys_shift)
+> 		goto out_unlock;
+> 
+> 	rc = 0;
+> 	if (phys_shift == kvm->arch.phys_shift)
+> 		goto out_unlock;
+> 
+> 	kvm->arch.phys_shift = phys_shift;
+> 	kvm->arch.s2_levels = stage2_pt_levels(kvm->arch.phys_shift);
+> 	kvm->arch.vtcr_private = VTCR_EL2_SL0(kvm->arch.s2_levels) |
+> 				 TCR_T0SZ(kvm->arch.phys_shift);
+> 
+> out_unlock:
+> 
+
+Sure.
+
+
+
+>> --- a/virt/kvm/arm/arm.c
+>> +++ b/virt/kvm/arm/arm.c
+>> @@ -1136,7 +1136,7 @@ long kvm_arch_vm_ioctl(struct file *filp,
+>>   		return 0;
+>>   	}
+>>   	default:
+>> -		return -EINVAL;
+>> +		return kvm_arch_dev_vm_ioctl(kvm, ioctl, arg);
+>>   	}
+>>   }
+>>   
+>> -- 
+>> 2.13.6
+>>
+> 
+> Have you considered making this capability a generic capability and
+> encoding this in the 'type' argument to KVM_CREATE_VM?  This would
+> significantly simplify all the above and would allow you to drop patch 8
+> and 9 I think.
+
+No. I will take a look. Btw, there were patches flying around to support
+"userspace" requesting specific values for ID feature registers. But even that
+doesn't help with the detection part. May be that is another way to configure
+the size, but not sure about the current status of that work.
+
+Cheers
 Suzuki
