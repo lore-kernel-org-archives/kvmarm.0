@@ -1,173 +1,159 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v3 09/41] KVM: arm64: Defer restoring host VFP state to
- vcpu_put
-Date: Wed, 7 Feb 2018 18:56:44 +0100
-Message-ID: <20180207175644.GF29286@cbox>
-References: <20180112120747.27999-1-christoffer.dall@linaro.org>
- <20180112120747.27999-10-christoffer.dall@linaro.org>
- <20180122173326.GO22781@e103592.cambridge.arm.com>
- <20180125194653.GR21802@cbox>
- <20180207164955.GT5862@e103592.cambridge.arm.com>
+Subject: Re: [PATCH v1 14/16] kvm: arm64: Switch to per VM IPA
+Date: Thu, 8 Feb 2018 12:00:35 +0100
+Message-ID: <20180208110035.GG29286@cbox>
+References: <20180109190414.4017-1-suzuki.poulose@arm.com>
+ <20180109190414.4017-15-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180207164955.GT5862@e103592.cambridge.arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+In-Reply-To: <20180109190414.4017-15-suzuki.poulose@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, peter.maydell@linaro.org, pbonzini@redhat.com, rkrcmar@redhat.com, will.deacon@arm.com, ard.biesheuvel@linaro.org, mark.rutland@arm.com, catalin.marinas@arm.com, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Feb 07, 2018 at 04:49:55PM +0000, Dave Martin wrote:
-> On Thu, Jan 25, 2018 at 08:46:53PM +0100, Christoffer Dall wrote:
-> > On Mon, Jan 22, 2018 at 05:33:28PM +0000, Dave Martin wrote:
-> > > On Fri, Jan 12, 2018 at 01:07:15PM +0100, Christoffer Dall wrote:
-> > > > Avoid saving the guest VFP registers and restoring the host VFP
-> > > > registers on every exit from the VM.  Only when we're about to run
-> > > > userspace or other threads in the kernel do we really have to switch the
-> > > > state back to the host state.
-> > > > 
-> > > > We still initially configure the VFP registers to trap when entering the
-> > > > VM, but the difference is that we now leave the guest state in the
-> > > > hardware registers as long as we're running this VCPU, even if we
-> > > > occasionally trap to the host, and we only restore the host state when
-> > > > we return to user space or when scheduling another thread.
-> > > > 
-> > > > Reviewed-by: Andrew Jones <drjones@redhat.com>
-> > > > Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-> > > > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> > > 
-> > > [...]
-> > > 
-> > > > diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-> > > > index 883a6383cd36..848a46eb33bf 100644
-> > > > --- a/arch/arm64/kvm/hyp/sysreg-sr.c
-> > > > +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-> > > 
-> > > [...]
-> > > 
-> > > > @@ -213,6 +215,19 @@ void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu)
-> > > >   */
-> > > >  void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu)
-> > > >  {
-> > > > +	struct kvm_cpu_context *host_ctxt = vcpu->arch.host_cpu_context;
-> > > > +	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
-> > > > +
-> > > > +	/* Restore host FP/SIMD state */
-> > > > +	if (vcpu->arch.guest_vfp_loaded) {
-> > > > +		if (vcpu_el1_is_32bit(vcpu)) {
-> > > > +			kvm_call_hyp(__fpsimd32_save_state,
-> > > > +				     kern_hyp_va(guest_ctxt));
-> > > > +		}
-> > > > +		__fpsimd_save_state(&guest_ctxt->gp_regs.fp_regs);
-> > > > +		__fpsimd_restore_state(&host_ctxt->gp_regs.fp_regs);
-> > > > +		vcpu->arch.guest_vfp_loaded = 0;
-> > > 
-> > > Provided we've already marked the host FPSIMD state as dirty on the way
-> > > in, we probably don't need to restore it here.
-> > > 
-> > > In v4.15, the kvm_fpsimd_flush_cpu_state() call in
-> > > kvm_arch_vcpu_ioctl_run() is supposed to do this marking: currently
-> > > it's only done for SVE, since KVM was previously restoring the host
-> > > FPSIMD subset of the state anyway, but it could be made unconditional.
-> > > 
-> > > For a returning run ioctl, this would have the effect of deferring the
-> > > host FPSIMD reload until we return to userspace, which is probably
-> > > no more costly since the kernel must check whether to do this in
-> > > ret_to_user anyway; OTOH if the vcpu thread was preempted by some
-> > > other thread we save the cost of restoring the host state entirely here
-> > > ... I think.
-> > 
-> > Yes, I agree.  However, currently the low-level logic in
-> > arch/arm64/kvm/hyp/entry.S:__fpsimd_guest_restore which saves the host
-> > state into vcpu->arch.host_cpu_context->gp_regs.fp_regs (where
-> > host_cpu_context is a KVM-specific per-cpu variable).  I think means
-> > that simply marking the state as invalid would cause the kernel to
-> > restore some potentially stale values when returning to userspace.  Am I
-> > missing something?
+On Tue, Jan 09, 2018 at 07:04:09PM +0000, Suzuki K Poulose wrote:
+> Now that we can manage the stage2 page table per VM, switch the
+> configuration details to per VM instance. We keep track of the
+> IPA bits, number of page table levels and the VTCR bits (which
+> depends on the IPA and the number of levels).
 > 
-> I think my point was that there would be no need for the low-level
-> save of the host fpsimd state currently done by hyp.  At all.  The
-> state would already have been saved off to thread_struct before
-> entering the guest.
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Christoffer Dall <cdall@linaro.org>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> ---
+>  arch/arm/include/asm/kvm_mmu.h          |  1 +
+>  arch/arm64/include/asm/kvm_host.h       | 12 ++++++++++++
+>  arch/arm64/include/asm/kvm_mmu.h        | 22 ++++++++++++++++++++--
+>  arch/arm64/include/asm/stage2_pgtable.h |  1 -
+>  arch/arm64/kvm/hyp/switch.c             |  3 +--
+>  virt/kvm/arm/arm.c                      |  2 +-
+>  6 files changed, 35 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+> index 440c80589453..dd592fe45660 100644
+> --- a/arch/arm/include/asm/kvm_mmu.h
+> +++ b/arch/arm/include/asm/kvm_mmu.h
+> @@ -48,6 +48,7 @@
+>  #define kvm_vttbr_baddr_mask(kvm)	VTTBR_BADDR_MASK
+>  
+>  #define stage2_pgd_size(kvm)	(PTRS_PER_S2_PGD * sizeof(pgd_t))
+> +#define kvm_init_stage2_config(kvm)	do { } while (0)
+>  int create_hyp_mappings(void *from, void *to, pgprot_t prot);
+>  int create_hyp_io_mappings(void *from, void *to, phys_addr_t);
+>  void free_hyp_pgds(void);
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 9a9ddeb33c84..1e66e5ab3dde 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -64,6 +64,18 @@ struct kvm_arch {
+>  	/* VTTBR value associated with above pgd and vmid */
+>  	u64    vttbr;
+>  
+> +	/* Private bits of VTCR_EL2 for this VM */
+> +	u64    vtcr_private;
 
-Ah, so if userspace touched any FPSIMD state, then we always save that
-state when entering the kernel, even if we're just going to return to
-the same userspace process anyway?  (For any system call etc.?)
-
-> 
-> This would result in a redundant save, but only when the host fpsimd
-> state is dirty and the guest vcpu doesn't touch fpsimd before trapping
-> back to the host.
-> 
-> For the host, the fpsimd state is only dirty after entering the kernel
-> from userspace (or after certain other things like sigreturn or ptrace).
-> So this approach would still avoid repeated save/restore when cycling
-> between the guest and the kvm code in the host.
-> 
-
-I see.
-
-> > It might very well be possible to change the logic so that we store the
-> > host logic the same place where task_fpsimd_save() would have, and I
-> > think that would make what you suggest possible.
-> 
-> That's certainly possible, but I viewed that as harder.  It would be
-> necessary to map the host thread_struct into hyp etc. etc.
-> 
-
-And even then, unnecessary because it would duplicate the existing state
-save, IIUC above.
-
-> > I'd like to make that a separate change from this patch though, as we're
-> > already changing quite a bit with this series, so I'm trying to make any
-> > logical change as contained per patch as possible, so that problems can
-> > be spotted by bisecting.
-> 
-> Yes, I think that's wise.
-> 
-
-ok, I'll try to incorporate this as a separate patch for the next
-revision.
-
-> > > Ultimately I'd like to go one better and actually treat a vcpu as a
-> > > first-class fpsimd context, so that taking an interrupt to the host
-> > > and then reentering the guest doesn't cause any reload at all.  
-> > 
-> > That should be the case already; kvm_vcpu_put_sysregs() is only called
-> > when you run another thread (preemptively or voluntarily), or when you
-> > return to user space, but making the vcpu fpsimd context a first-class
-> > citizen fpsimd context would mean that you can run another thread (and
-> > maybe run userspace if it doesn't use fpsimd?) without having to
-> > save/restore anything.  Am I getting this right?
-> 
-> Yes (except that if a return to userspace happens then FPSIMD will be
-> restored at that point: there is no laziness there -- it _could_
-> be lazy, but it's deemed unlikely to be a performance win due to the
-> fact that the compiler can and does generate FPSIMD code quite
-> liberally by default).
-> 
-> For the case of being preempted within the kernel with no ret_to_user,
-> you are correct.
-> 
-
-ok, that would indeed also be useful for things like switching to a
-vhost thread and returning to the vcpu thread.
-
-> > 
-> > > But
-> > > that feels like too big a step for this series, and there are likely
-> > > side-issues I've not thought about yet.
-> > > 
-> > 
-> > It should definitely be in separate patches, but I would be optn to
-> > tagging something on to the end of this series if we can stabilize this
-> > series early after -rc1 is out.
-> 
-> I haven't fully got my head around it, but we can see where we get to.
-> Best not to rush into it if there's any doubt...
-> 
-Agreed, we can always add things later.
+As to my comments in the previous patch, why isn't this simply u64 vtcr;
 
 Thanks,
 -Christoffer
+
+> +	/* Size of the PA size for this guest */
+> +	u8     phys_shift;
+> +	/*
+> +	 * Number of levels in page table. We could always calculate
+> +	 * it from phys_shift above. We cache it for faster switches
+> +	 * in stage2 page table helpers.
+> +	 */
+> +	u8     s2_levels;
+> +
+> +
+>  	/* The last vcpu id that ran on each physical CPU */
+>  	int __percpu *last_vcpu_ran;
+>  
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index 483185ed2ecd..ab6a8b905065 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -134,11 +134,12 @@ static inline unsigned long __kern_hyp_va(unsigned long v)
+>  /*
+>   * We currently only support a 40bit IPA.
+>   */
+> -#define KVM_PHYS_SHIFT	(40)
+> +#define KVM_PHYS_SHIFT_DEFAULT	(40)
+>  
+> -#define kvm_phys_shift(kvm)		KVM_PHYS_SHIFT
+> +#define kvm_phys_shift(kvm)		(kvm->arch.phys_shift)
+>  #define kvm_phys_size(kvm)		(_AC(1, ULL) << kvm_phys_shift(kvm))
+>  #define kvm_phys_mask(kvm)		(kvm_phys_size(kvm) - _AC(1, ULL))
+> +#define kvm_stage2_levels(kvm)		(kvm->arch.s2_levels)
+>  
+>  static inline bool kvm_page_empty(void *ptr)
+>  {
+> @@ -346,5 +347,22 @@ static inline u64 kvm_vttbr_baddr_mask(struct kvm *kvm)
+>  	return GENMASK_ULL(PHYS_MASK_SHIFT - 1, x);
+>  }
+>  
+> +/*
+> + * kvm_init_stage2_config: Initialise the VM specific stage2 page table
+> + * details to default IPA size.
+> + */
+> +static inline void kvm_init_stage2_config(struct kvm *kvm)
+> +{
+> +	/*
+> +	 * The stage2 PGD is dependent on the settings we initialise here
+> +	 * and should be allocated only after this step.
+> +	 */
+> +	VM_BUG_ON(kvm->arch.pgd != NULL);
+> +	kvm->arch.phys_shift = KVM_PHYS_SHIFT_DEFAULT;
+> +	kvm->arch.s2_levels = stage2_pt_levels(kvm->arch.phys_shift);
+> +	kvm->arch.vtcr_private = VTCR_EL2_SL0(kvm->arch.s2_levels) |
+> +				 TCR_T0SZ(kvm->arch.phys_shift);
+> +}
+> +
+>  #endif /* __ASSEMBLY__ */
+>  #endif /* __ARM64_KVM_MMU_H__ */
+> diff --git a/arch/arm64/include/asm/stage2_pgtable.h b/arch/arm64/include/asm/stage2_pgtable.h
+> index 33e8ebb25037..9b75b83da643 100644
+> --- a/arch/arm64/include/asm/stage2_pgtable.h
+> +++ b/arch/arm64/include/asm/stage2_pgtable.h
+> @@ -44,7 +44,6 @@
+>   */
+>  #define __s2_pgd_ptrs(pa, lvls)	(1 << ((pa) - pt_levels_pgdir_shift((lvls))))
+>  
+> -#define kvm_stage2_levels(kvm)		stage2_pt_levels(kvm_phys_shift(kvm))
+>  #define stage2_pgdir_shift(kvm)	\
+>  		pt_levels_pgdir_shift(kvm_stage2_levels(kvm))
+>  #define stage2_pgdir_size(kvm)		(_AC(1, UL) << stage2_pgdir_shift((kvm)))
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index 523471f0af7b..d0725562ee3f 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -160,8 +160,7 @@ static void __hyp_text __activate_vm(struct kvm_vcpu *vcpu)
+>  	u64 vtcr = read_sysreg(vtcr_el2);
+>  
+>  	vtcr &= ~VTCR_EL2_PRIVATE_MASK;
+> -	vtcr |= VTCR_EL2_SL0(stage2_pt_levels(kvm)) |
+> -		VTCR_EL2_T0SZ(kvm_phys_shift(kvm));
+> +	vtcr |= kvm->arch.vtcr_private;
+>  	write_sysreg(vtcr, vtcr_el2);
+>  	write_sysreg(kvm->arch.vttbr, vttbr_el2);
+>  }
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index 8564ed907b18..e0bf8d19fcfe 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -143,7 +143,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  	/* The maximum number of VCPUs is limited by the host's GIC model */
+>  	kvm->arch.max_vcpus = vgic_present ?
+>  				kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
+> -
+> +	kvm_init_stage2_config(kvm);
+>  	return ret;
+>  }
+>  
+> -- 
+> 2.13.6
+> 
