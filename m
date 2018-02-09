@@ -1,109 +1,173 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v3 26/41] KVM: arm64: Introduce framework for accessing
- deferred sysregs
-Date: Fri, 9 Feb 2018 16:17:39 +0000
-Message-ID: <20180209161739.GE5862@e103592.cambridge.arm.com>
+From: Julien Grall <julien.grall@arm.com>
+Subject: Re: [PATCH v3 14/41] KVM: arm64: Introduce VHE-specific kvm_vcpu_run
+Date: Fri, 9 Feb 2018 17:34:05 +0000
+Message-ID: <ddfccffb-b8ee-7601-1c19-e3a01bf9b75f@arm.com>
 References: <20180112120747.27999-1-christoffer.dall@linaro.org>
- <20180112120747.27999-27-christoffer.dall@linaro.org>
- <20180123160431.GA5862@e103592.cambridge.arm.com>
- <20180125195413.GT21802@cbox>
+ <20180112120747.27999-15-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180125195413.GT21802@cbox>
+In-Reply-To: <20180112120747.27999-15-christoffer.dall@linaro.org>
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jan 25, 2018 at 08:54:13PM +0100, Christoffer Dall wrote:
-> On Tue, Jan 23, 2018 at 04:04:40PM +0000, Dave Martin wrote:
-> > On Fri, Jan 12, 2018 at 01:07:32PM +0100, Christoffer Dall wrote:
-> > > We are about to defer saving and restoring some groups of system
-> > > registers to vcpu_put and vcpu_load on supported systems.  This means
-> > > that we need some infrastructure to access system registes which
-> > > supports either accessing the memory backing of the register or directly
-> > > accessing the system registers, depending on the state of the system
-> > > when we access the register.
-> > > 
-> > > We do this by defining a set of read/write accessors for each system
-> > > register, and letting each system register be defined as "immediate" or
-> > > "deferrable".  Immediate registers are always saved/restored in the
-> > > world-switch path, but deferrable registers are only saved/restored in
-> > > vcpu_put/vcpu_load when supported and sysregs_loaded_on_cpu will be set
-> > > in that case.
-> > > 
-> > > Not that we don't use the deferred mechanism yet in this patch, but only
-> > > introduce infrastructure.  This is to improve convenience of review in
-> > > the subsequent patches where it is clear which registers become
-> > > deferred.
-> > 
-> > Might this table-driven approach result in a lot of branch mispredicts,
-> > particularly across load/put boundaries?
-> > 
-> > If we were to move the whole construct to a header, then it could get
-> > constant-folded at the call site down to the individual reg accessed,
-> > say:
-> > 
-> > 	if (sys_regs_loaded)
-> > 		read_sysreg_s(TPIDR_EL0);
-> > 	else
-> > 		__vcpu_sys_reg(v, TPIDR_EL0);
-> > 
-> > Where multiple regs are accessed close to each other, the compiler
-> > may be able to specialise the whole sequence for the loaded and !loaded
-> > cases so that there is only one conditional branch.
-> > 
+Hi Christoffer,
+
+On 01/12/2018 12:07 PM, Christoffer Dall wrote:
+> So far this is just a copy of the legacy non-VHE switch function, but we
+> will start reworking these functions in separate directions to work on
+> VHE and non-VHE in the most optimal way in later patches.
 > 
-> That's an interesting thing to consider indeed.  I wasn't really sure
-> how to put this in a header file which wouldn't look overly bloated for
-> inclusion elsewhere, so we ended up with this.
+> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> ---
+>   arch/arm/include/asm/kvm_asm.h   |  5 +++-
+>   arch/arm/kvm/hyp/switch.c        |  2 +-
+>   arch/arm64/include/asm/kvm_asm.h |  4 ++-
+>   arch/arm64/kvm/hyp/switch.c      | 58 +++++++++++++++++++++++++++++++++++++++-
+>   virt/kvm/arm/arm.c               |  5 +++-
+>   5 files changed, 69 insertions(+), 5 deletions(-)
 > 
-> I don't think the alternative suggestion that I discused with Julien on
-> this patch changes this much, but since you've had a look at this, I'm
-> curious which one of the two (lookup table vs. giant switch) you prefer?
+> diff --git a/arch/arm/include/asm/kvm_asm.h b/arch/arm/include/asm/kvm_asm.h
+> index 36dd2962a42d..4ac717276543 100644
+> --- a/arch/arm/include/asm/kvm_asm.h
+> +++ b/arch/arm/include/asm/kvm_asm.h
+> @@ -70,7 +70,10 @@ extern void __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu);
+>   
+>   extern void __kvm_timer_set_cntvoff(u32 cntvoff_low, u32 cntvoff_high);
+>   
+> -extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+> +/* no VHE on 32-bit :( */
+> +static inline int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu) { return 0; }
 
-The giant switch approach has the advantage that it is likely to be
-folded down to a single case when the switch control expression is
-const-foldable; the flipside is that when that fails the entire
-switch would be inlined.
+Should we return an error or add a BUG() to catch potential use of this 
+function?
 
-> > The individual accessor functions also become unnecessary in this case,
-> > because we wouldn't need to derive function pointers from them any
-> > more.
-> > 
-> > I don't know how performance would compare in practice though.
+> +
+> +extern int __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu);
+>   
+>   extern void __init_stage2_translation(void);
+>   
+> diff --git a/arch/arm/kvm/hyp/switch.c b/arch/arm/kvm/hyp/switch.c
+> index c3b9799e2e13..7b2bd25e3b10 100644
+> --- a/arch/arm/kvm/hyp/switch.c
+> +++ b/arch/arm/kvm/hyp/switch.c
+> @@ -153,7 +153,7 @@ static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
+>   	return true;
+>   }
+>   
+> -int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+> +int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+>   {
+>   	struct kvm_cpu_context *host_ctxt;
+>   	struct kvm_cpu_context *guest_ctxt;
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index 6c7599b5cb40..fb91e728207b 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -58,7 +58,9 @@ extern void __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu);
+>   
+>   extern void __kvm_timer_set_cntvoff(u32 cntvoff_low, u32 cntvoff_high);
+>   
+> -extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+> +extern int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu);
+> +
+> +extern int __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu);
+>   
+>   extern u64 __vgic_v3_get_ich_vtr_el2(void);
+>   extern u64 __vgic_v3_read_vmcr(void);
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index 55ca2e3d42eb..accfe9a016f9 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -338,7 +338,63 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+>   	return false;
+>   }
+>   
+> -int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+> +/* Switch to the guest for VHE systems running in EL2 */
+> +int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_cpu_context *host_ctxt;
+> +	struct kvm_cpu_context *guest_ctxt;
+> +	u64 exit_code;
+> +
+> +	vcpu = kern_hyp_va(vcpu);
+> +
+> +	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> +	host_ctxt->__hyp_running_vcpu = vcpu;
+> +	guest_ctxt = &vcpu->arch.ctxt;
+> +
+> +	__sysreg_save_host_state(host_ctxt);
+> +
+> +	__activate_traps(vcpu);
+> +	__activate_vm(vcpu);
+> +
+> +	__vgic_restore_state(vcpu);
+> +	__timer_enable_traps(vcpu);
+> +
+> +	/*
+> +	 * We must restore the 32-bit state before the sysregs, thanks
+> +	 * to erratum #852523 (Cortex-A57) or #853709 (Cortex-A72).
+> +	 */
+> +	__sysreg32_restore_state(vcpu);
+> +	__sysreg_restore_guest_state(guest_ctxt);
+> +	__debug_switch_to_guest(vcpu);
+> +
+> +	do {
+> +		/* Jump in the fire! */
+> +		exit_code = __guest_enter(vcpu, host_ctxt);
+> +
+> +		/* And we're baaack! */
+> +	} while (fixup_guest_exit(vcpu, &exit_code));
+> +
+> +	__sysreg_save_guest_state(guest_ctxt);
+> +	__sysreg32_save_state(vcpu);
+> +	__timer_disable_traps(vcpu);
+> +	__vgic_save_state(vcpu);
+> +
+> +	__deactivate_traps(vcpu);
+> +	__deactivate_vm(vcpu);
+> +
+> +	__sysreg_restore_host_state(host_ctxt);
+> +
+> +	/*
+> +	 * This must come after restoring the host sysregs, since a non-VHE
+> +	 * system may enable SPE here and make use of the TTBRs.
+> +	 */
+> +	__debug_switch_to_host(vcpu);
+> +
+> +	return exit_code;
+> +}
+> +
+> +/* Switch to the guest for legacy non-VHE systems */
+> +int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+>   {
+>   	struct kvm_cpu_context *host_ctxt;
+>   	struct kvm_cpu_context *guest_ctxt;
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index 5b1487bd91e8..6bce8f9c55db 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -733,7 +733,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>   		trace_kvm_entry(*vcpu_pc(vcpu));
+>   		guest_enter_irqoff();
+>   
+> -		ret = kvm_call_hyp(__kvm_vcpu_run, vcpu);
+> +		if (has_vhe())
+> +			ret = kvm_vcpu_run_vhe(vcpu);
+> +		else
+> +			ret = kvm_call_hyp(__kvm_vcpu_run_nvhe, vcpu);
+>   
+>   		vcpu->mode = OUTSIDE_GUEST_MODE;
+>   		vcpu->stat.exits++;
 > 
-> I don't know either.  But I will say that the whole idea behind put/load
-> is that you do this rarely, and going to userspace from KVM is
-> notriously expensive, also on x86.
 
-I guess that makes sense.  I'm still a bit hazy on the big picture
-for KVM.
+Cheers,
 
-> > I'm also assuming that all calls to these accessors are const-foldable.
-> > If not, relying on inlining would bloat the generated code a lot.
-> 
-> We have places where this is not the cae, access_vm_reg() for example.
-> But if we really, really, wanted to, we could rewrite that to have a
-> function for each register, but that's pretty horrid on its own.
-
-That might not be too bad if there is only one giant inline expansion
-and the rest are folded down.
-
-
-I guess this is something to revisit _if_ we suspect a performance
-bottleneck later on.
-
-For now, I was lacking some understanding regarding how this code gets
-run, so I was guessing about potential issues rather then proven
-issues.
-
-As you might guess, I'm still at the "stupid questions" stage for
-this series :)
-
-[...]
-
-Cheers
----Dave
+-- 
+Julien Grall
