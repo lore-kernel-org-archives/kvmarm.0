@@ -1,227 +1,74 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v1 08/16] kvm: arm/arm64: Clean up stage2 pgd life time
-Date: Fri, 9 Feb 2018 09:11:41 +0100
-Message-ID: <20180209081141.GA7339@cbox>
+Subject: Re: [PATCH v1 14/16] kvm: arm64: Switch to per VM IPA
+Date: Fri, 9 Feb 2018 09:12:44 +0100
+Message-ID: <20180209081244.GB7339@cbox>
 References: <20180109190414.4017-1-suzuki.poulose@arm.com>
- <20180109190414.4017-9-suzuki.poulose@arm.com>
- <20180208110059.GK29286@cbox>
- <4b31c124-ccb2-b794-c2b2-350975b8a1cc@arm.com>
+ <20180109190414.4017-15-suzuki.poulose@arm.com>
+ <20180208110035.GG29286@cbox>
+ <94aae952-d6c0-0a69-955f-81885ddb2f06@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <4b31c124-ccb2-b794-c2b2-350975b8a1cc@arm.com>
+In-Reply-To: <94aae952-d6c0-0a69-955f-81885ddb2f06@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
 To: Suzuki K Poulose <Suzuki.Poulose@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, peter.maydell@linaro.org, pbonzini@redhat.com, rkrcmar@redhat.com, will.deacon@arm.com, ard.biesheuvel@linaro.org, mark.rutland@arm.com, catalin.marinas@arm.com, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Feb 08, 2018 at 05:19:22PM +0000, Suzuki K Poulose wrote:
+On Thu, Feb 08, 2018 at 05:22:29PM +0000, Suzuki K Poulose wrote:
 > On 08/02/18 11:00, Christoffer Dall wrote:
-> >On Tue, Jan 09, 2018 at 07:04:03PM +0000, Suzuki K Poulose wrote:
-> >>On arm/arm64 we pre-allocate the entry level page tables when
-> >>a VM is created and is free'd when either all the mm users are
-> >>gone or the KVM is about to get destroyed. i.e, kvm_free_stage2_pgd
-> >>is triggered via kvm_arch_flush_shadow_all() which can be invoked
-> >>from two different paths :
+> >On Tue, Jan 09, 2018 at 07:04:09PM +0000, Suzuki K Poulose wrote:
+> >>Now that we can manage the stage2 page table per VM, switch the
+> >>configuration details to per VM instance. We keep track of the
+> >>IPA bits, number of page table levels and the VTCR bits (which
+> >>depends on the IPA and the number of levels).
 > >>
-> >>  1) do_exit()-> .-> mmu_notifier->release()-> ..-> kvm_arch_flush_shadow_all()
-> >>     OR
-> >>  2) kvm_destroy_vm()-> mmu_notifier_unregister-> kvm_arch_flush_shadow_all()
+> >>Cc: Marc Zyngier <marc.zyngier@arm.com>
+> >>Cc: Christoffer Dall <cdall@linaro.org>
+> >>Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> >>---
+> >>  arch/arm/include/asm/kvm_mmu.h          |  1 +
+> >>  arch/arm64/include/asm/kvm_host.h       | 12 ++++++++++++
+> >>  arch/arm64/include/asm/kvm_mmu.h        | 22 ++++++++++++++++++++--
+> >>  arch/arm64/include/asm/stage2_pgtable.h |  1 -
+> >>  arch/arm64/kvm/hyp/switch.c             |  3 +--
+> >>  virt/kvm/arm/arm.c                      |  2 +-
+> >>  6 files changed, 35 insertions(+), 6 deletions(-)
 > >>
-> >>This has created lot of race conditions in the past as some of
-> >>the VCPUs could be active when we free the stage2 via path (1).
+> >>diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+> >>index 440c80589453..dd592fe45660 100644
+> >>--- a/arch/arm/include/asm/kvm_mmu.h
+> >>+++ b/arch/arm/include/asm/kvm_mmu.h
+> >>@@ -48,6 +48,7 @@
+> >>  #define kvm_vttbr_baddr_mask(kvm)	VTTBR_BADDR_MASK
+> >>  #define stage2_pgd_size(kvm)	(PTRS_PER_S2_PGD * sizeof(pgd_t))
+> >>+#define kvm_init_stage2_config(kvm)	do { } while (0)
+> >>  int create_hyp_mappings(void *from, void *to, pgprot_t prot);
+> >>  int create_hyp_io_mappings(void *from, void *to, phys_addr_t);
+> >>  void free_hyp_pgds(void);
+> >>diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> >>index 9a9ddeb33c84..1e66e5ab3dde 100644
+> >>--- a/arch/arm64/include/asm/kvm_host.h
+> >>+++ b/arch/arm64/include/asm/kvm_host.h
+> >>@@ -64,6 +64,18 @@ struct kvm_arch {
+> >>  	/* VTTBR value associated with above pgd and vmid */
+> >>  	u64    vttbr;
+> >>+	/* Private bits of VTCR_EL2 for this VM */
+> >>+	u64    vtcr_private;
 > >
-> >How??  mmu_notifier->release() is called via __mput->exit_mmap(), which
-> >is only called if mm_users == 0, which means there are no more threads
-> >left than the one currently doing exit().
+> >As to my comments in the previous patch, why isn't this simply u64 vtcr;
 > 
-> IIRC, if the process is sent a fatal signal, that could cause all the threads
-> to exit, leaving the "last" thread to do the clean up. The files could still
-> be open, implying that the KVM fds are still active, without a stage2, even
-> though we are not going to run anything. (The race was fixed by moving the
-> stage2 teardown to mmu_notifier->release()).
+> nit: I haven't received your response to the previous patch.
+
+It got stuck in my drafts folder somehow, hopefully you received it now.
+
 > 
+> We could. I thought this gives a bit more clarity on what changes per-VM.
 > 
 
-Hmm, if the last thread is do_exit(), by definition there can't be any
-other VCPU thread (because then it wouldn't be the last one) and
-therefore only this last exiting thread can have the fd open, and since
-it's in the middle of do_exit(), it will close the fds before anything
-will have chance to run.
+Since there's a performance issue involved, I think it's cleaner to just
+calculate the vtcr once per VM and store it.
 
-> >
-> >>
-> >>On a closer look, all we need to do with kvm_arch_flush_shadow_all() is,
-> >>to ensure that the stage2 mappings are cleared. This doesn't mean we
-> >>have to free up the stage2 entry level page tables yet, which could
-> >>be delayed until the kvm is destroyed. This would avoid issues
-> >>of use-after-free,
-> >
-> >do we have any of those left?
-> 
-> None that we know of.
-> 
-
-Then I think this commit text is misleading and pretty confusing.  If
-we have a correct implementation, but we want to clean something up,
-then this commit message shouldn't talk about races or use-after-free,
-it should just say that we rearrange code to change the flow, and
-describe why/how.
-
-> >
-> >>This will be later used for delaying
-> >>the allocation of the stage2 entry level page tables until we really
-> >>need to do something with it.
-> >
-> >Fine, but you don't actually explain why this change of flow is
-> >necessary for what you're trying to do later?
-> 
-> This patch is not mandatory for the series. But, since we are delaying
-> the "allocation" stage2 tables anyway later, I thought it would be
-> good to clean up the "free" path.
-> 
-
-Hmm, I'm not really sure it is a cleanup.  In any case, the motivation
-for this change should be clear.  I do like the idea of getting read of
-the kvm->arch.pgd checks in the various stage2 manipulation functions.
-
-> >>  int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-> >>diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> >>index 78253fe00fc4..c94c61ac38b9 100644
-> >>--- a/virt/kvm/arm/mmu.c
-> >>+++ b/virt/kvm/arm/mmu.c
-> >>@@ -298,11 +298,10 @@ static void unmap_stage2_range(struct kvm *kvm, phys_addr_t start, u64 size)
-> >>  	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
-> >>  	do {
-> >>  		/*
-> >>-		 * Make sure the page table is still active, as another thread
-> >>-		 * could have possibly freed the page table, while we released
-> >>-		 * the lock.
-> >>+		 * The page table shouldn't be free'd as we still hold a reference
-> >>+		 * to the KVM.
-> >
-> >To avoid confusion about references to the kernel module KVM and a
-> >specific KVM VM instance, please s/KVM/VM/.
-> 
-> ok.
-> 
-> >
-> >>  		 */
-> >>-		if (!READ_ONCE(kvm->arch.pgd))
-> >>+		if (WARN_ON(!READ_ONCE(kvm->arch.pgd)))
-> >
-> >This reads a lot like a defensive implementation now, and I think for
-> >this patch to make sense, we shouldn't try to handle a buggy super-racy
-> >implementation gracefully, but rather have VM_BUG_ON() (if we care about
-> >performance of the check) or simply BUG_ON().
-> >
-> >The rationale being that if we've gotten this flow incorrect and freed
-> >the pgd at the wrong time, we don't want to leave a ticking bomb to blow
-> >up somewhere else randomly (which it will!), but instead crash and burn.
-> 
-> Ok.
-> 
-> >
-> >>  			break;
-> >>  		next = stage2_pgd_addr_end(addr, end);
-> >>  		if (!stage2_pgd_none(*pgd))
-> >>@@ -837,30 +836,33 @@ void stage2_unmap_vm(struct kvm *kvm)
-> >>  	up_read(&current->mm->mmap_sem);
-> >>  	srcu_read_unlock(&kvm->srcu, idx);
-> >>  }
-> >>-
-> >>-/**
-> >>- * kvm_free_stage2_pgd - free all stage-2 tables
-> >>- * @kvm:	The KVM struct pointer for the VM.
-> >>- *
-> >>- * Walks the level-1 page table pointed to by kvm->arch.pgd and frees all
-> >>- * underlying level-2 and level-3 tables before freeing the actual level-1 table
-> >>- * and setting the struct pointer to NULL.
-> >>+/*
-> >>+ * kvm_flush_stage2_all: Unmap the entire stage2 mappings including
-> >>+ * device and regular RAM backing memory.
-> >>   */
-> >>-void kvm_free_stage2_pgd(struct kvm *kvm)
-> >>+static void kvm_flush_stage2_all(struct kvm *kvm)
-> >>  {
-> >>-	void *pgd = NULL;
-> >>-
-> >>  	spin_lock(&kvm->mmu_lock);
-> >>-	if (kvm->arch.pgd) {
-> >>+	if (kvm->arch.pgd)
-> >>  		unmap_stage2_range(kvm, 0, KVM_PHYS_SIZE);
-> >>-		pgd = READ_ONCE(kvm->arch.pgd);
-> >>-		kvm->arch.pgd = NULL;
-> >>-	}
-> >>  	spin_unlock(&kvm->mmu_lock);
-> >>+}
-> >>-	/* Free the HW pgd, one page at a time */
-> >>-	if (pgd)
-> >>-		free_pages_exact(pgd, S2_PGD_SIZE);
-> >>+/**
-> >>+ * kvm_free_stage2_pgd - Free the entry level page tables in stage-2.
-> >
-> >nit: you should put the parameter description here and leave a blank
-> >line before the lengthy discussion.
-> >
-> >>+ * This is called when all reference to the KVM has gone away and we
-> >>+ * really don't need any protection in resetting the PGD. This also
-> >
-> >I don't think I understand the last part of this sentence.
-> 
-> i.e, we don't have to use the spin_lock to reset the PGD.
-> 
-
-Ah, then I think it should say
-
-"We can set kvm->arch.pgd = NULL without holding a spinlock because this
-function is only called when the exiting thread is the only process
-holding a refernce to the struct kvm."
-
-> >This function is pretty self-explanatory really, and I think we can
-> >either drop the documentation all together or simply say that this
-> >function clears all stage 2 page table entries to release the memory of
-> >the lower-level page tables themselves and then frees the pgd in the
-> >end.  The VM is known to go away and no more VCPUs exist at this point.
-> >
-> 
-> Ok.
-> 
-> >>+ * means that nobody should be touching stage2 at this point, as we
-> >>+ * have unmapped the entire stage2 already and all dynamic entities,
-> >>+ * (VCPUs and devices) are no longer active.
-> >>+ *
-> >>+ * @kvm:	The KVM struct pointer for the VM.
-> >>+ */
-> >>+void kvm_free_stage2_pgd(struct kvm *kvm)
-> >>+{
-> >>+	kvm_flush_stage2_all(kvm);
-> >>+	free_pages_exact(kvm->arch.pgd, S2_PGD_SIZE);
-> >>+	kvm->arch.pgd = NULL;
-> >>  }
-> >>  static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
-> >>@@ -1189,12 +1191,12 @@ static void stage2_wp_range(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
-> >>  		 * large. Otherwise, we may see kernel panics with
-> >>  		 * CONFIG_DETECT_HUNG_TASK, CONFIG_LOCKUP_DETECTOR,
-> >>  		 * CONFIG_LOCKDEP. Additionally, holding the lock too long
-> >>-		 * will also starve other vCPUs. We have to also make sure
-> >>-		 * that the page tables are not freed while we released
-> >>-		 * the lock.
-> >>+		 * will also starve other vCPUs.
-> >>+		 * The page tables shouldn't be free'd while we released the
-> >
-> >s/shouldn't/can't/
-> >
-> 
-> ok
-> >>+		 * lock, since we hold a reference to the KVM.
-> >
-> >s/KVM/VM/
-> >
-> 
-> ok.
-> 
-> 
 Thanks,
 -Christoffer
