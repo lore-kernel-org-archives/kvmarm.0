@@ -1,142 +1,128 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v9 5/7] arm64: kvm: Introduce KVM_ARM_SET_SERROR_ESR ioctl
-Date: Fri, 09 Feb 2018 17:44:14 +0000
-Message-ID: <5A7DDDEE.9050306@arm.com>
-References: <0184EA26B2509940AA629AE1405DD7F201A9E8EA@DGGEMA503-MBS.china.huawei.com> <5A70C5A0.1050600@arm.com> <d1b17dae-9d9c-970a-d164-a41c618d449b@huawei.com>
+From: Julien Grall <julien.grall@arm.com>
+Subject: Re: [PATCH v3 17/41] KVM: arm64: Remove noop calls to timer
+ save/restore from VHE switch
+Date: Fri, 9 Feb 2018 17:53:43 +0000
+Message-ID: <20074994-caac-2be0-6eaa-83115c616756@arm.com>
+References: <20180112120747.27999-1-christoffer.dall@linaro.org>
+ <20180112120747.27999-18-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-doc-owner@vger.kernel.org>
-In-Reply-To: <d1b17dae-9d9c-970a-d164-a41c618d449b@huawei.com>
-Sender: linux-doc-owner@vger.kernel.org
-To: gengdongjiu <gengdongjiu@huawei.com>
-Cc: "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "rjw@rjwysocki.net" <rjw@rjwysocki.net>, "bp@alien8.de" <bp@alien8.de>, "robert.moore@intel.com" <robert.moore@intel.com>, "lv.zheng@intel.com" <lv.zheng@intel.com>, "corbet@lwn.net" <corbet@lwn.net>, "will.deacon@arm.com" <will.deacon@arm.com>, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20180112120747.27999-18-christoffer.dall@linaro.org>
+Content-Language: en-US
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi gengdongjiu,
+Hi Christoffer,
 
-On 05/02/18 06:19, gengdongjiu wrote:
-> On 2018/1/31 3:21, James Morse wrote:
->> On 24/01/18 20:06, gengdongjiu wrote:
->>>> On 06/01/18 16:02, Dongjiu Geng wrote:
->>>>> The ARM64 RAS SError Interrupt(SEI) syndrome value is specific to the
->>>>> guest and user space needs a way to tell KVM this value. So we add a
->>>>> new ioctl. Before user space specifies the Exception Syndrome Register
->>>>> ESR(ESR), it firstly checks that whether KVM has the capability to set
->>>>> the guest ESR, If has, will set it. Otherwise, nothing to do.
->>>>>
->>>>> For this ESR specifying, Only support for AArch64, not support AArch32.
->>>>
->>>> After this patch user-space can trigger an SError in the guest. If it wants to migrate the guest, how does the pending SError get migrated?
->>>>
->>>> I think we need to fix migration first. Andrew Jones suggested using
->>>> KVM_GET/SET_VCPU_EVENTS:
->>>> https://www.spinics.net/lists/arm-kernel/msg616846.html
->>>>
->>>> Given KVM uses kvm_inject_vabt() on v8.0 hardware too, we should cover systems without the v8.2 RAS Extensions with the same API. I
->>>> think this means a bit to read/write whether SError is pending, and another to indicate the ESR should be set/read.
->>>> CPUs without the v8.2 RAS Extensions can reject pending-SError that had an ESR.
->>>
->>> For the CPUs without the v8.2 RAS Extensions, its ESR is always 0, 
->>> we only can inject a SError with ESR 0 to guest, cannot set its ESR.
->>
->> 0? It's always implementation-defined. On Juno it seems to be always-0, but
->> other systems may behave differently. (Juno may generate another ESR value when
->> I'm not watching it...)
-
-> For the armv8.0 cpu without RAS Extensions, it does not have vsesr_el2, so when
-> guest take a virtual SError,
-
-> its ESR is 0, can not control the virtual SError's syndrom value, it does not have
-> such registers to control that.
-
-My point was its more nuanced than this: the ARM-ARM's
-TakeVirtualSErrorException() pseudo-code lets virtual-SError have an
-implementation defined syndrome. I've never seen Juno generate anything other
-than '0', but it might do something different on a thursday.
-
-The point? We can't know what a CPU without the RAS extensions puts in there.
-
-Why Does this matter? When migrating a pending SError we have to know the
-difference between 'use this 64bit value', and 'the CPU will generate it'.
-If I make an SError pending with ESR=0 on a CPU with VSESR, I can't migrated to
-a system that generates an impdef SError-ESR, because I can't know it will be 0.
-
-
-> Does Juno not have RAS Extension? 
-
-It's two types of v8.0 CPU, no RAS extensions.
-
-
-> if yes, I think we can only inject an SError, but can not change its ESR value,
-> because it does not have vsesr_el2.
-
-I agree, this means we need to be able to tell the difference between 'pending'
-and 'pending with this ESR'.
-
-
->> Just because we can't control the ESR doesn't mean injecting an SError isn't
->> something user-space may want to do.
-
-> yes, we may need to support user-space injects an SError even through CPU does not have RAS Extension.
+On 01/12/2018 12:07 PM, Christoffer Dall wrote:
+> The VHE switch function calls __timer_enable_traps and
+> __timer_disable_traps which don't do anything on VHE systems.
+> Therefore, simply remove these calls from the VHE switch function and
+> make the functions non-conditional as they are now only called from the
+> non-VHE switch path.
 > 
->> If we tackle migration of pending-SError first, I think that will give us the
->> API to create a new pending SError with/without an ESR as appropriate.
+> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> ---
+>   arch/arm64/kvm/hyp/switch.c |  2 --
+>   virt/kvm/arm/hyp/timer-sr.c | 44 ++++++++++++++++++++++----------------------
+>   2 files changed, 22 insertions(+), 24 deletions(-)
 > 
-> sure, we should. Last week, I checked the KVM_GET/SET_VCPU_EVENTS IOCTL, it should meet our
-> migration requirements
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index 9aadef6966bf..6175fcb33ed2 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -354,7 +354,6 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+>   	__activate_vm(vcpu->kvm);
+>   
+>   	__vgic_restore_state(vcpu);
+> -	__timer_enable_traps(vcpu);
+>   
+>   	/*
+>   	 * We must restore the 32-bit state before the sysregs, thanks
+> @@ -373,7 +372,6 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+>   
+>   	__sysreg_save_guest_state(guest_ctxt);
+>   	__sysreg32_save_state(vcpu);
+> -	__timer_disable_traps(vcpu);
+>   	__vgic_save_state(vcpu);
+>   
+>   	__deactivate_traps(vcpu);
+> diff --git a/virt/kvm/arm/hyp/timer-sr.c b/virt/kvm/arm/hyp/timer-sr.c
+> index f24404b3c8df..77754a62eb0c 100644
+> --- a/virt/kvm/arm/hyp/timer-sr.c
+> +++ b/virt/kvm/arm/hyp/timer-sr.c
+> @@ -27,34 +27,34 @@ void __hyp_text __kvm_timer_set_cntvoff(u32 cntvoff_low, u32 cntvoff_high)
+>   	write_sysreg(cntvoff, cntvoff_el2);
+>   }
+>   
+> +/*
+> + * Should only be called on non-VHE systems.
+> + * VHE systems use EL2 timers and configure EL1 timers in kvm_timer_init_vhe().
+> + */
+>   void __hyp_text __timer_disable_traps(struct kvm_vcpu *vcpu)
 
-Great!
+Would it be worth to suffix the function with nvhe? So it would be clear 
+that it should not be called for VHE system?
 
+>   {
+> -	/*
+> -	 * We don't need to do this for VHE since the host kernel runs in EL2
+> -	 * with HCR_EL2.TGE ==1, which makes those bits have no impact.
+> -	 */
+> -	if (!has_vhe()) {
+> -		u64 val;
+> +	u64 val;
+>   
+> -		/* Allow physical timer/counter access for the host */
+> -		val = read_sysreg(cnthctl_el2);
+> -		val |= CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN;
+> -		write_sysreg(val, cnthctl_el2);
+> -	}
+> +	/* Allow physical timer/counter access for the host */
+> +	val = read_sysreg(cnthctl_el2);
+> +	val |= CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN;
+> +	write_sysreg(val, cnthctl_el2);
+>   }
+>   
+> +/*
+> + * Should only be called on non-VHE systems.
+> + * VHE systems use EL2 timers and configure EL1 timers in kvm_timer_init_vhe().
+> + */
+>   void __hyp_text __timer_enable_traps(struct kvm_vcpu *vcpu)
 
-Thanks,
+Same here.
 
-James
-
-
-
->>> The IOCTL KVM_GET/SET_VCPU_EVENTS has been used by X86.
->>
->> We would be re-using the struct to have values with slightly different meanings.
->> But for migration the upshot is the same, call KVM_GET_VCPU_EVENTS on one
->> system, and pass the struct to KVM_SET_VCPU_EVENTS on the new system. If we're
->> lucky Qemu may be able to do this in shared x86/arm64 code.
->>
-> Thanks for the reminder, I know your meaning.
-> In the x86, the kvm_vcpu_events includes exception/interrupt/nmi/smi. For the RAS, we
-> only involves the exception, so Qemu handling logic is different. Anyway, I will try to
-> share code for the two platform in Qemu.
+>   {
+> -	if (!has_vhe()) {
+> -		u64 val;
+> +	u64 val;
+>   
+> -		/*
+> -		 * Disallow physical timer access for the guest
+> -		 * Physical counter access is allowed
+> -		 */
+> -		val = read_sysreg(cnthctl_el2);
+> -		val &= ~CNTHCTL_EL1PCEN;
+> -		val |= CNTHCTL_EL1PCTEN;
+> -		write_sysreg(val, cnthctl_el2);
+> -	}
+> +	/*
+> +	 * Disallow physical timer access for the guest
+> +	 * Physical counter access is allowed
+> +	 */
+> +	val = read_sysreg(cnthctl_el2);
+> +	val &= ~CNTHCTL_EL1PCEN;
+> +	val |= CNTHCTL_EL1PCTEN;
+> +	write_sysreg(val, cnthctl_el2);
+>   }
 > 
-> 
-> /* for KVM_GET/SET_VCPU_EVENTS */
-> struct kvm_vcpu_events {
-> 	struct {
-> 		__u8 injected;
-> 		__u8 nr;
-> 		__u8 has_error_code;
-> 		__u8 pad;
-> 		__u32 error_code;
-> 	} exception;
-> 	struct {
-> 		__u8 injected;
-> 		__u8 nr;
-> 		__u8 soft;
-> 		__u8 shadow;
-> 	} interrupt;
-> 	struct {
-> 		__u8 injected;
-> 		__u8 pending;
-> 		__u8 masked;
-> 		__u8 pad;
-> 	} nmi;
-> 	__u32 sipi_vector;
-> 	__u32 flags;
-> 	struct {
-> 		__u8 smm;
-> 		__u8 pending;
-> 		__u8 smm_inside_nmi;
-> 		__u8 latched_init;
-> 	} smi;
-> 	__u32 reserved[9];
-> };
-> 
+
+Cheers,
+
+-- 
+Julien Grall
