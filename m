@@ -1,209 +1,227 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v1 13/16] kvm: arm64: Configure VTCR per VM
-Date: Thu, 8 Feb 2018 19:04:14 +0100
-Message-ID: <CAMJs5B_yvM8XNT=g8uN63G1G6uwGQcYF_0dxbC1Gaeb+j6UvpQ@mail.gmail.com>
-References: <20180109190414.4017-1-suzuki.poulose@arm.com> <20180109190414.4017-14-suzuki.poulose@arm.com>
+Subject: Re: [PATCH v1 08/16] kvm: arm/arm64: Clean up stage2 pgd life time
+Date: Fri, 9 Feb 2018 09:11:41 +0100
+Message-ID: <20180209081141.GA7339@cbox>
+References: <20180109190414.4017-1-suzuki.poulose@arm.com>
+ <20180109190414.4017-9-suzuki.poulose@arm.com>
+ <20180208110059.GK29286@cbox>
+ <4b31c124-ccb2-b794-c2b2-350975b8a1cc@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180109190414.4017-14-suzuki.poulose@arm.com>
+Content-Disposition: inline
+In-Reply-To: <4b31c124-ccb2-b794-c2b2-350975b8a1cc@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Linux ARM <linux-arm-kernel@lists.infradead.org>, KVM <kvm@vger.kernel.org>, kvmarm@lists.cs.columbia.edu, Marc Zyngier <marc.zyngier@arm.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Kristina Martsenko <kristina.martsenko@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <cdall@linaro.org>
+To: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, peter.maydell@linaro.org, pbonzini@redhat.com, rkrcmar@redhat.com, will.deacon@arm.com, ard.biesheuvel@linaro.org, mark.rutland@arm.com, catalin.marinas@arm.com, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Jan 09, 2018 at 07:04:08PM +0000, Suzuki K Poulose wrote:
-> We set VTCR_EL2 very early during the stage2 init and don't
-> touch it ever. This is fine as we had a fixed IPA size. This
-> patch changes the behavior to set the VTCR for a given VM,
-> depending on its stage2 table. The common configuration for
-> VTCR is still performed during the early init. But the SL0
-> and T0SZ are programmed for each VM and is cleared once we
-> exit the VM.
->
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Christoffer Dall <cdall@linaro.org>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_arm.h  | 16 ++++++----------
->  arch/arm64/include/asm/kvm_asm.h  |  2 +-
->  arch/arm64/include/asm/kvm_host.h |  8 +++++---
->  arch/arm64/kvm/hyp/s2-setup.c     | 16 +---------------
->  arch/arm64/kvm/hyp/switch.c       |  9 +++++++++
->  5 files changed, 22 insertions(+), 29 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index eb90d349e55f..d5c40816f073 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -115,9 +115,7 @@
->  #define VTCR_EL2_IRGN0_WBWA TCR_IRGN0_WBWA
->  #define VTCR_EL2_SL0_SHIFT 6
->  #define VTCR_EL2_SL0_MASK (3 << VTCR_EL2_SL0_SHIFT)
-> -#define VTCR_EL2_SL0_LVL1 (1 << VTCR_EL2_SL0_SHIFT)
->  #define VTCR_EL2_T0SZ_MASK 0x3f
-> -#define VTCR_EL2_T0SZ_40B 24
->  #define VTCR_EL2_VS_SHIFT 19
->  #define VTCR_EL2_VS_8BIT (0 << VTCR_EL2_VS_SHIFT)
->  #define VTCR_EL2_VS_16BIT (1 << VTCR_EL2_VS_SHIFT)
-> @@ -139,38 +137,36 @@
->   * D4-23 and D4-25 in ARM DDI 0487A.b.
->   */
->
-> -#define VTCR_EL2_T0SZ_IPA VTCR_EL2_T0SZ_40B
->  #define VTCR_EL2_COMMON_BITS (VTCR_EL2_SH0_INNER | VTCR_EL2_ORGN0_WBWA | \
->   VTCR_EL2_IRGN0_WBWA | VTCR_EL2_RES1)
-> +#define VTCR_EL2_PRIVATE_MASK (VTCR_EL2_SL0_MASK | VTCR_EL2_T0SZ_MASK)
->
->  #ifdef CONFIG_ARM64_64K_PAGES
->  /*
->   * Stage2 translation configuration:
->   * 64kB pages (TG0 = 1)
-> - * 2 level page tables (SL = 1)
->   */
-> -#define VTCR_EL2_TGRAN_FLAGS (VTCR_EL2_TG0_64K | VTCR_EL2_SL0_LVL1)
-> +#define VTCR_EL2_TGRAN VTCR_EL2_TG0_64K
->  #define VTCR_EL2_TGRAN_SL0_BASE 3UL
->
->  #elif defined(CONFIG_ARM64_16K_PAGES)
->  /*
->   * Stage2 translation configuration:
->   * 16kB pages (TG0 = 2)
-> - * 2 level page tables (SL = 1)
->   */
-> -#define VTCR_EL2_TGRAN_FLAGS (VTCR_EL2_TG0_16K | VTCR_EL2_SL0_LVL1)
-> +#define VTCR_EL2_TGRAN VTCR_EL2_TG0_16K
->  #define VTCR_EL2_TGRAN_SL0_BASE 3UL
->  #else /* 4K */
->  /*
->   * Stage2 translation configuration:
->   * 4kB pages (TG0 = 0)
-> - * 3 level page tables (SL = 1)
->   */
-> -#define VTCR_EL2_TGRAN_FLAGS (VTCR_EL2_TG0_4K | VTCR_EL2_SL0_LVL1)
-> +#define VTCR_EL2_TGRAN VTCR_EL2_TG0_4K
->  #define VTCR_EL2_TGRAN_SL0_BASE 2UL
->  #endif
->
-> -#define VTCR_EL2_FLAGS (VTCR_EL2_COMMON_BITS | VTCR_EL2_TGRAN_FLAGS)
-> +#define VTCR_EL2_FLAGS (VTCR_EL2_COMMON_BITS | VTCR_EL2_TGRAN)
-> +
->  /*
->   * VTCR_EL2:SL0 indicates the entry level for Stage2 translation.
->   * Interestingly, it depends on the page size.
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index ab4d0a926043..21cfd1fe692c 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -66,7 +66,7 @@ extern void __vgic_v3_init_lrs(void);
->
->  extern u32 __kvm_get_mdcr_el2(void);
->
-> -extern u32 __init_stage2_translation(void);
-> +extern void __init_stage2_translation(void);
->
->  #endif
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index ea6cb5b24258..9a9ddeb33c84 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -380,10 +380,12 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
->
->  static inline void __cpu_init_stage2(void)
->  {
-> - u32 parange = kvm_call_hyp(__init_stage2_translation);
-> + u32 ps;
->
-> - WARN_ONCE(parange < 40,
-> -  "PARange is %d bits, unsupported configuration!", parange);
-> + kvm_call_hyp(__init_stage2_translation);
-> + ps = id_aa64mmfr0_parange_to_phys_shift(read_sysreg(id_aa64mmfr0_el1));
-> + WARN_ONCE(ps < 40,
-> +  "PARange is %d bits, unsupported configuration!", ps);
->  }
->
->  /*
-> diff --git a/arch/arm64/kvm/hyp/s2-setup.c b/arch/arm64/kvm/hyp/s2-setup.c
-> index b1129c83c531..5c26ad4b8ac9 100644
-> --- a/arch/arm64/kvm/hyp/s2-setup.c
-> +++ b/arch/arm64/kvm/hyp/s2-setup.c
-> @@ -19,13 +19,11 @@
->  #include <asm/kvm_arm.h>
->  #include <asm/kvm_asm.h>
->  #include <asm/kvm_hyp.h>
-> -#include <asm/cpufeature.h>
->
-> -u32 __hyp_text __init_stage2_translation(void)
-> +void __hyp_text __init_stage2_translation(void)
->  {
->   u64 val = VTCR_EL2_FLAGS;
->   u64 parange;
-> - u32 phys_shift;
->   u64 tmp;
->
->   /*
-> @@ -38,16 +36,6 @@ u32 __hyp_text __init_stage2_translation(void)
->   parange = ID_AA64MMFR0_PARANGE_MAX;
->   val |= parange << 16;
->
-> - /* Compute the actual PARange... */
-> - phys_shift = id_aa64mmfr0_parange_to_phys_shift(parange);
-> -
-> - /*
-> - * ... and clamp it to 40 bits, unless we have some braindead
-> - * HW that implements less than that. In all cases, we'll
-> - * return that value for the rest of the kernel to decide what
-> - * to do.
-> - */
-> - val |= 64 - (phys_shift > 40 ? 40 : phys_shift);
->
->   /*
->   * Check the availability of Hardware Access Flag / Dirty Bit
-> @@ -67,6 +55,4 @@ u32 __hyp_text __init_stage2_translation(void)
->   VTCR_EL2_VS_8BIT;
->
->   write_sysreg(val, vtcr_el2);
-> -
-> - return phys_shift;
->  }
-> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> index f7c651f3a8c0..523471f0af7b 100644
-> --- a/arch/arm64/kvm/hyp/switch.c
-> +++ b/arch/arm64/kvm/hyp/switch.c
-> @@ -157,11 +157,20 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
->  static void __hyp_text __activate_vm(struct kvm_vcpu *vcpu)
->  {
->   struct kvm *kvm = kern_hyp_va(vcpu->kvm);
-> + u64 vtcr = read_sysreg(vtcr_el2);
-> +
-> + vtcr &= ~VTCR_EL2_PRIVATE_MASK;
-> + vtcr |= VTCR_EL2_SL0(stage2_pt_levels(kvm)) |
-> + VTCR_EL2_T0SZ(kvm_phys_shift(kvm));
-> + write_sysreg(vtcr, vtcr_el2);
+On Thu, Feb 08, 2018 at 05:19:22PM +0000, Suzuki K Poulose wrote:
+> On 08/02/18 11:00, Christoffer Dall wrote:
+> >On Tue, Jan 09, 2018 at 07:04:03PM +0000, Suzuki K Poulose wrote:
+> >>On arm/arm64 we pre-allocate the entry level page tables when
+> >>a VM is created and is free'd when either all the mm users are
+> >>gone or the KVM is about to get destroyed. i.e, kvm_free_stage2_pgd
+> >>is triggered via kvm_arch_flush_shadow_all() which can be invoked
+> >>from two different paths :
+> >>
+> >>  1) do_exit()-> .-> mmu_notifier->release()-> ..-> kvm_arch_flush_shadow_all()
+> >>     OR
+> >>  2) kvm_destroy_vm()-> mmu_notifier_unregister-> kvm_arch_flush_shadow_all()
+> >>
+> >>This has created lot of race conditions in the past as some of
+> >>the VCPUs could be active when we free the stage2 via path (1).
+> >
+> >How??  mmu_notifier->release() is called via __mput->exit_mmap(), which
+> >is only called if mm_users == 0, which means there are no more threads
+> >left than the one currently doing exit().
+> 
+> IIRC, if the process is sent a fatal signal, that could cause all the threads
+> to exit, leaving the "last" thread to do the clean up. The files could still
+> be open, implying that the KVM fds are still active, without a stage2, even
+> though we are not going to run anything. (The race was fixed by moving the
+> stage2 teardown to mmu_notifier->release()).
+> 
+> 
 
-If we're writing VTCR_EL2 on each entry, do we really need to read the
-value back first and calculate things on every entry to the VM?  It
-seems to me we should be able to compute the vtcr_el2 and store it on
-struct kvm, and simply restore that per-VM value upon entering the VM?
+Hmm, if the last thread is do_exit(), by definition there can't be any
+other VCPU thread (because then it wouldn't be the last one) and
+therefore only this last exiting thread can have the fd open, and since
+it's in the middle of do_exit(), it will close the fds before anything
+will have chance to run.
 
->   write_sysreg(kvm->arch.vttbr, vttbr_el2);
->  }
->
->  static void __hyp_text __deactivate_vm(struct kvm_vcpu *vcpu)
->  {
-> + u64 vtcr = read_sysreg(vtcr_el2) & ~VTCR_EL2_PRIVATE_MASK;
-> +
-> + write_sysreg(vtcr, vtcr_el2);
+> >
+> >>
+> >>On a closer look, all we need to do with kvm_arch_flush_shadow_all() is,
+> >>to ensure that the stage2 mappings are cleared. This doesn't mean we
+> >>have to free up the stage2 entry level page tables yet, which could
+> >>be delayed until the kvm is destroyed. This would avoid issues
+> >>of use-after-free,
+> >
+> >do we have any of those left?
+> 
+> None that we know of.
+> 
 
-Why do we need to care about restoring VTCR when returning to the host?
+Then I think this commit text is misleading and pretty confusing.  If
+we have a correct implementation, but we want to clean something up,
+then this commit message shouldn't talk about races or use-after-free,
+it should just say that we rearrange code to change the flow, and
+describe why/how.
 
->   write_sysreg(0, vttbr_el2);
->  }
->
-> --
-> 2.13.6
->
+> >
+> >>This will be later used for delaying
+> >>the allocation of the stage2 entry level page tables until we really
+> >>need to do something with it.
+> >
+> >Fine, but you don't actually explain why this change of flow is
+> >necessary for what you're trying to do later?
+> 
+> This patch is not mandatory for the series. But, since we are delaying
+> the "allocation" stage2 tables anyway later, I thought it would be
+> good to clean up the "free" path.
+> 
 
+Hmm, I'm not really sure it is a cleanup.  In any case, the motivation
+for this change should be clear.  I do like the idea of getting read of
+the kvm->arch.pgd checks in the various stage2 manipulation functions.
+
+> >>  int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+> >>diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> >>index 78253fe00fc4..c94c61ac38b9 100644
+> >>--- a/virt/kvm/arm/mmu.c
+> >>+++ b/virt/kvm/arm/mmu.c
+> >>@@ -298,11 +298,10 @@ static void unmap_stage2_range(struct kvm *kvm, phys_addr_t start, u64 size)
+> >>  	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
+> >>  	do {
+> >>  		/*
+> >>-		 * Make sure the page table is still active, as another thread
+> >>-		 * could have possibly freed the page table, while we released
+> >>-		 * the lock.
+> >>+		 * The page table shouldn't be free'd as we still hold a reference
+> >>+		 * to the KVM.
+> >
+> >To avoid confusion about references to the kernel module KVM and a
+> >specific KVM VM instance, please s/KVM/VM/.
+> 
+> ok.
+> 
+> >
+> >>  		 */
+> >>-		if (!READ_ONCE(kvm->arch.pgd))
+> >>+		if (WARN_ON(!READ_ONCE(kvm->arch.pgd)))
+> >
+> >This reads a lot like a defensive implementation now, and I think for
+> >this patch to make sense, we shouldn't try to handle a buggy super-racy
+> >implementation gracefully, but rather have VM_BUG_ON() (if we care about
+> >performance of the check) or simply BUG_ON().
+> >
+> >The rationale being that if we've gotten this flow incorrect and freed
+> >the pgd at the wrong time, we don't want to leave a ticking bomb to blow
+> >up somewhere else randomly (which it will!), but instead crash and burn.
+> 
+> Ok.
+> 
+> >
+> >>  			break;
+> >>  		next = stage2_pgd_addr_end(addr, end);
+> >>  		if (!stage2_pgd_none(*pgd))
+> >>@@ -837,30 +836,33 @@ void stage2_unmap_vm(struct kvm *kvm)
+> >>  	up_read(&current->mm->mmap_sem);
+> >>  	srcu_read_unlock(&kvm->srcu, idx);
+> >>  }
+> >>-
+> >>-/**
+> >>- * kvm_free_stage2_pgd - free all stage-2 tables
+> >>- * @kvm:	The KVM struct pointer for the VM.
+> >>- *
+> >>- * Walks the level-1 page table pointed to by kvm->arch.pgd and frees all
+> >>- * underlying level-2 and level-3 tables before freeing the actual level-1 table
+> >>- * and setting the struct pointer to NULL.
+> >>+/*
+> >>+ * kvm_flush_stage2_all: Unmap the entire stage2 mappings including
+> >>+ * device and regular RAM backing memory.
+> >>   */
+> >>-void kvm_free_stage2_pgd(struct kvm *kvm)
+> >>+static void kvm_flush_stage2_all(struct kvm *kvm)
+> >>  {
+> >>-	void *pgd = NULL;
+> >>-
+> >>  	spin_lock(&kvm->mmu_lock);
+> >>-	if (kvm->arch.pgd) {
+> >>+	if (kvm->arch.pgd)
+> >>  		unmap_stage2_range(kvm, 0, KVM_PHYS_SIZE);
+> >>-		pgd = READ_ONCE(kvm->arch.pgd);
+> >>-		kvm->arch.pgd = NULL;
+> >>-	}
+> >>  	spin_unlock(&kvm->mmu_lock);
+> >>+}
+> >>-	/* Free the HW pgd, one page at a time */
+> >>-	if (pgd)
+> >>-		free_pages_exact(pgd, S2_PGD_SIZE);
+> >>+/**
+> >>+ * kvm_free_stage2_pgd - Free the entry level page tables in stage-2.
+> >
+> >nit: you should put the parameter description here and leave a blank
+> >line before the lengthy discussion.
+> >
+> >>+ * This is called when all reference to the KVM has gone away and we
+> >>+ * really don't need any protection in resetting the PGD. This also
+> >
+> >I don't think I understand the last part of this sentence.
+> 
+> i.e, we don't have to use the spin_lock to reset the PGD.
+> 
+
+Ah, then I think it should say
+
+"We can set kvm->arch.pgd = NULL without holding a spinlock because this
+function is only called when the exiting thread is the only process
+holding a refernce to the struct kvm."
+
+> >This function is pretty self-explanatory really, and I think we can
+> >either drop the documentation all together or simply say that this
+> >function clears all stage 2 page table entries to release the memory of
+> >the lower-level page tables themselves and then frees the pgd in the
+> >end.  The VM is known to go away and no more VCPUs exist at this point.
+> >
+> 
+> Ok.
+> 
+> >>+ * means that nobody should be touching stage2 at this point, as we
+> >>+ * have unmapped the entire stage2 already and all dynamic entities,
+> >>+ * (VCPUs and devices) are no longer active.
+> >>+ *
+> >>+ * @kvm:	The KVM struct pointer for the VM.
+> >>+ */
+> >>+void kvm_free_stage2_pgd(struct kvm *kvm)
+> >>+{
+> >>+	kvm_flush_stage2_all(kvm);
+> >>+	free_pages_exact(kvm->arch.pgd, S2_PGD_SIZE);
+> >>+	kvm->arch.pgd = NULL;
+> >>  }
+> >>  static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
+> >>@@ -1189,12 +1191,12 @@ static void stage2_wp_range(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
+> >>  		 * large. Otherwise, we may see kernel panics with
+> >>  		 * CONFIG_DETECT_HUNG_TASK, CONFIG_LOCKUP_DETECTOR,
+> >>  		 * CONFIG_LOCKDEP. Additionally, holding the lock too long
+> >>-		 * will also starve other vCPUs. We have to also make sure
+> >>-		 * that the page tables are not freed while we released
+> >>-		 * the lock.
+> >>+		 * will also starve other vCPUs.
+> >>+		 * The page tables shouldn't be free'd while we released the
+> >
+> >s/shouldn't/can't/
+> >
+> 
+> ok
+> >>+		 * lock, since we hold a reference to the KVM.
+> >
+> >s/KVM/VM/
+> >
+> 
+> ok.
+> 
+> 
 Thanks,
 -Christoffer
