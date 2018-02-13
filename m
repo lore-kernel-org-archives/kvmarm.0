@@ -1,45 +1,73 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v3 05/41] KVM: arm64: Move HCR_INT_OVERRIDE to default
- HCR_EL2 guest flag
-Date: Tue, 13 Feb 2018 22:47:54 +0100
-Message-ID: <20180213214754.GJ23189@cbox>
+Subject: Re: [PATCH v3 17/41] KVM: arm64: Remove noop calls to timer
+ save/restore from VHE switch
+Date: Tue, 13 Feb 2018 23:31:34 +0100
+Message-ID: <20180213223134.GK23189@cbox>
 References: <20180112120747.27999-1-christoffer.dall@linaro.org>
- <20180112120747.27999-6-christoffer.dall@linaro.org>
- <ffb7df11-b304-25f7-f3f4-b55cb106b747@arm.com>
+ <20180112120747.27999-18-christoffer.dall@linaro.org>
+ <20074994-caac-2be0-6eaa-83115c616756@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <ffb7df11-b304-25f7-f3f4-b55cb106b747@arm.com>
+In-Reply-To: <20074994-caac-2be0-6eaa-83115c616756@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Julien Grall <julien.grall@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Feb 09, 2018 at 11:38:50AM +0000, Julien Grall wrote:
-> Hi,
+On Fri, Feb 09, 2018 at 05:53:43PM +0000, Julien Grall wrote:
+> Hi Christoffer,
 > 
 > On 01/12/2018 12:07 PM, Christoffer Dall wrote:
-> >From: Shih-Wei Li <shihwei@cs.columbia.edu>
+> >The VHE switch function calls __timer_enable_traps and
+> >__timer_disable_traps which don't do anything on VHE systems.
+> >Therefore, simply remove these calls from the VHE switch function and
+> >make the functions non-conditional as they are now only called from the
+> >non-VHE switch path.
 > >
-> >We always set the IMO and FMO bits in the HCR_EL2 when running the
-> >guest, regardless if we use the vgic or not.  By moving these flags to
-> >HCR_GUEST_FLAGS we can avoid one of the extra save/restore operations of
-> >HCR_EL2 in the world switch code, and we can also soon get rid of the
-> >other one.
+> >Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+> >Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> >---
+> >  arch/arm64/kvm/hyp/switch.c |  2 --
+> >  virt/kvm/arm/hyp/timer-sr.c | 44 ++++++++++++++++++++++----------------------
+> >  2 files changed, 22 insertions(+), 24 deletions(-)
 > >
-> >This is safe, because even though the IMO and FMO bits control both
-> >taking the interrupts to EL2 and remapping ICC_*_EL1 to ICV_*_EL1
-> >executed at EL1, as long as we ensure that these bits are clear when
-> >running the EL1 host, as defined in the HCR_HOST_[VHE_]FLAGS, we're OK.
+> >diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> >index 9aadef6966bf..6175fcb33ed2 100644
+> >--- a/arch/arm64/kvm/hyp/switch.c
+> >+++ b/arch/arm64/kvm/hyp/switch.c
+> >@@ -354,7 +354,6 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+> >  	__activate_vm(vcpu->kvm);
+> >  	__vgic_restore_state(vcpu);
+> >-	__timer_enable_traps(vcpu);
+> >  	/*
+> >  	 * We must restore the 32-bit state before the sysregs, thanks
+> >@@ -373,7 +372,6 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+> >  	__sysreg_save_guest_state(guest_ctxt);
+> >  	__sysreg32_save_state(vcpu);
+> >-	__timer_disable_traps(vcpu);
+> >  	__vgic_save_state(vcpu);
+> >  	__deactivate_traps(vcpu);
+> >diff --git a/virt/kvm/arm/hyp/timer-sr.c b/virt/kvm/arm/hyp/timer-sr.c
+> >index f24404b3c8df..77754a62eb0c 100644
+> >--- a/virt/kvm/arm/hyp/timer-sr.c
+> >+++ b/virt/kvm/arm/hyp/timer-sr.c
+> >@@ -27,34 +27,34 @@ void __hyp_text __kvm_timer_set_cntvoff(u32 cntvoff_low, u32 cntvoff_high)
+> >  	write_sysreg(cntvoff, cntvoff_el2);
+> >  }
+> >+/*
+> >+ * Should only be called on non-VHE systems.
+> >+ * VHE systems use EL2 timers and configure EL1 timers in kvm_timer_init_vhe().
+> >+ */
+> >  void __hyp_text __timer_disable_traps(struct kvm_vcpu *vcpu)
 > 
-> NIT: I was a bit confused by the end of the sentence because HCR_HOST_FLAGS
-> define does not seem to exist.
+> Would it be worth to suffix the function with nvhe? So it would be clear
+> that it should not be called for VHE system?
 > 
-
-True, that was nonsense.
-
-I have reworded it slightly.
+Actually, I decided against this, because it's also called from the
+32-bit code and it looks a little strange there, and it's not like we
+have an equivalent _vhe version.
 
 Thanks,
 -Christoffer
