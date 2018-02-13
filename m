@@ -1,115 +1,108 @@
-From: =?UTF-8?q?J=C3=A9r=C3=A9my=20Fangu=C3=A8de?=
-        <j.fanguede@virtualopensystems.com>
-Subject: [PATCH] KVM: arm: Enable emulation of the physical timer
-Date: Tue, 13 Feb 2018 11:41:16 +0100
-Message-ID: <1518518476-26645-1-git-send-email-j.fanguede@virtualopensystems.com>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH] arm64/kvm: Prohibit guest LOR accesses
+Date: Tue, 13 Feb 2018 12:39:37 +0000
+Message-ID: <20180213123022.zidr5oztavixe2p5@lakrids.cambridge.arm.com>
+References: <20180212111424.39248-1-mark.rutland@arm.com>
+ <20180213102742.GG23189@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
-Cc: tech@virtualopensystems.com, =?UTF-8?q?J=C3=A9r=C3=A9my=20Fangu=C3=A8de?= <j.fanguede@virtualopensystems.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <20180213102742.GG23189@cbox>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Set the handlers to emulate read and write operations for CNTP_CTL,
-CNTP_CVAL and CNTP_TVAL registers in such a way that VMs can use the
-physical timer.
+On Tue, Feb 13, 2018 at 11:27:42AM +0100, Christoffer Dall wrote:
+> Hi Mark,
 
-Signed-off-by: Jérémy Fanguède <j.fanguede@virtualopensystems.com>
----
+Hi Christoffer,
 
-This patch is the equivalent of this one: [1], but for arm 32bits
-instead of ARMv8 aarch32.
+> On Mon, Feb 12, 2018 at 11:14:24AM +0000, Mark Rutland wrote:
+> > We don't currently limit guest accesses to the LOR registers, which we
+> > neither virtualize nor context-switch. As such, guests are provided with
+> > unusable information/controls, and are not isolated from each other (or
+> > the host).
+> > 
+> > To prevent these issues, we can trap register accesses and present the
+> > illusion that no LORegions are implemented.
+> 
+> Shouldn't we then also hide this from the ID register similar to what we
+> do for SVE at the moment, using something like this (untested):
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index a828a209716f..b7ee414aee67 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1064,6 +1064,12 @@ static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
+>  				    task_pid_nr(current));
+>  
+>  		val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
+> +	} else if (id == SYS_ID_AA64MMFR1_EL) {
+> +		if (val & (0xfUL << ID_AA64MMFR1_LOR_SHIFT))
+> +			pr_err_once("kvm [%i]: LORegions unsupported for guests, suppressing\n",
+> +				    task_pid_nr(current));
+> +
+> +		val &= ~(0xfUL << ID_AA64MMFR1_LOR_SHIFT);
+>  	}
+>  
+>  	return val;
 
-[1] https://patchwork.kernel.org/patch/10207019/
+Sure. With that, it would make sense for the trapped LOR* register
+accesses to UNDEF, as they logically shouldn't exist.
 
----
- arch/arm/kvm/coproc.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 61 insertions(+)
+[...]
 
-diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
-index 6d1d2e2..3a02e76 100644
---- a/arch/arm/kvm/coproc.c
-+++ b/arch/arm/kvm/coproc.c
-@@ -270,6 +270,60 @@ static bool access_gic_sre(struct kvm_vcpu *vcpu,
- 	return true;
- }
- 
-+static bool access_cntp_tval(struct kvm_vcpu *vcpu,
-+			     const struct coproc_params *p,
-+			     const struct coproc_reg *r)
-+{
-+	u64 now = kvm_phys_timer_read();
-+	u64 val;
-+
-+	if (p->is_write) {
-+		val = *vcpu_reg(vcpu, p->Rt1);
-+		kvm_arm_timer_set_reg(vcpu, KVM_REG_ARM_PTIMER_CVAL, val + now);
-+	} else {
-+		val = kvm_arm_timer_get_reg(vcpu, KVM_REG_ARM_PTIMER_CVAL);
-+		*vcpu_reg(vcpu, p->Rt1) = val - now;
-+	}
-+
-+	return true;
-+}
-+
-+static bool access_cntp_ctl(struct kvm_vcpu *vcpu,
-+			    const struct coproc_params *p,
-+			    const struct coproc_reg *r)
-+{
-+	u32 val;
-+
-+	if (p->is_write) {
-+		val = *vcpu_reg(vcpu, p->Rt1);
-+		kvm_arm_timer_set_reg(vcpu, KVM_REG_ARM_PTIMER_CTL, val);
-+	} else {
-+		val = kvm_arm_timer_get_reg(vcpu, KVM_REG_ARM_PTIMER_CTL);
-+		*vcpu_reg(vcpu, p->Rt1) = val;
-+	}
-+
-+	return true;
-+}
-+
-+static bool access_cntp_cval(struct kvm_vcpu *vcpu,
-+			     const struct coproc_params *p,
-+			     const struct coproc_reg *r)
-+{
-+	u64 val;
-+
-+	if (p->is_write) {
-+		val = (u64)*vcpu_reg(vcpu, p->Rt2) << 32;
-+		val |= *vcpu_reg(vcpu, p->Rt1);
-+		kvm_arm_timer_set_reg(vcpu, KVM_REG_ARM_PTIMER_CVAL, val);
-+	} else {
-+		val = kvm_arm_timer_get_reg(vcpu, KVM_REG_ARM_PTIMER_CVAL);
-+		*vcpu_reg(vcpu, p->Rt1) = val;
-+		*vcpu_reg(vcpu, p->Rt2) = val >> 32;
-+	}
-+
-+	return true;
-+}
-+
- /*
-  * We could trap ID_DFR0 and tell the guest we don't support performance
-  * monitoring.  Unfortunately the patch to make the kernel check ID_DFR0 was
-@@ -423,10 +477,17 @@ static const struct coproc_reg cp15_regs[] = {
- 	{ CRn(13), CRm( 0), Op1( 0), Op2( 4), is32,
- 			NULL, reset_unknown, c13_TID_PRIV },
- 
-+	/* CNTP */
-+	{ CRm64(14), Op1( 2), is64, access_cntp_cval},
-+
- 	/* CNTKCTL: swapped by interrupt.S. */
- 	{ CRn(14), CRm( 1), Op1( 0), Op2( 0), is32,
- 			NULL, reset_val, c14_CNTKCTL, 0x00000000 },
- 
-+	/* CNTP */
-+	{ CRn(14), CRm( 2), Op1( 0), Op2( 0), is32, access_cntp_tval },
-+	{ CRn(14), CRm( 2), Op1( 0), Op2( 1), is32, access_cntp_ctl },
-+
- 	/* The Configuration Base Address Register. */
- 	{ CRn(15), CRm( 0), Op1( 4), Op2( 0), is32, access_cbar},
- };
--- 
-2.7.4
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 50a43c7b97ca..67b10b7a07bf 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -175,6 +175,17 @@ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
+> >  		return read_zero(vcpu, p);
+> >  }
+> >  
+> > +static bool trap_raz_ro(struct kvm_vcpu *vcpu,
+> > +			struct sys_reg_params *p,
+> > +			const struct sys_reg_desc *r)
+> > +{
+> > +	if (!p->is_write)
+> > +		return read_zero(vcpu, p);
+> > +
+> > +	kvm_inject_undefined(vcpu);
+> > +	return false;
+> > +}
+> > +
+> 
+> I'm a little unclear if this is stricly the right thing to do.  I can't
+> seem to find anything specific about writes to this register (which has
+> some text about RW fields but only specifies it can be *read* with an
+> MRS instruction), so it seems to me that this should either be
+> trap_raz_wi(), or call write_to_read_only() if we expect a write to
+> undef at EL1 rather than trap to EL2.  On the other hand, if the
+> architecture is unclear, then we're at least enforcing one
+> interpretation here I suppose.
+
+Having looked at the ARM ARM, I think write_to_read_only() is the right
+thing to do.
+
+It's not clear to me whether HCR_EL2.TLOR traps writes to LORID_EL1, or
+leaves these UNDEFINED at EL1. In the description of traps and enables
+it's stated that HCR_EL2.TLOR traps "Non-secure accesses to this
+register from EL1", which could be read to mean either. I'll see if I
+can get to the bottom of that.
+
+I don't think trap_raz_wi(), as LORID_EL1 is never RW at EL1, and a
+write wound UNDEF were HCR_EL2.TLOR clear.
+
+Thanks,
+Mark.
