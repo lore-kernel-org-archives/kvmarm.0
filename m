@@ -1,59 +1,59 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCHv2] arm64/kvm: Prohibit guest LOR accesses
-Date: Wed, 14 Feb 2018 11:52:06 +0100
-Message-ID: <20180214105206.GM23189@cbox>
-References: <20180213133923.40002-1-mark.rutland@arm.com>
+Subject: Re: [PATCH v3 18/41] KVM: arm64: Move userspace system registers
+ into separate function
+Date: Wed, 14 Feb 2018 12:22:32 +0100
+Message-ID: <20180214112232.GN23189@cbox>
+References: <20180112120747.27999-1-christoffer.dall@linaro.org>
+ <20180112120747.27999-19-christoffer.dall@linaro.org>
+ <a51ef563-df38-771a-0b54-5e77d4f34911@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180213133923.40002-1-mark.rutland@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: Vladimir Murzin <vladimir.murzin@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <a51ef563-df38-771a-0b54-5e77d4f34911@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Julien Grall <julien.grall@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Feb 13, 2018 at 01:39:23PM +0000, Mark Rutland wrote:
-> We don't currently limit guest accesses to the LOR registers, which we
-> neither virtualize nor context-switch. As such, guests are provided with
-> unusable information/controls, and are not isolated from each other (or
-> the host).
+On Fri, Feb 09, 2018 at 06:50:14PM +0000, Julien Grall wrote:
+> Hi Christoffer,
 > 
-> To prevent these issues, we can trap register accesses and present the
-> illusion LORegions are unssupported by the CPU. To do this, we mask
-> ID_AA64MMFR1.LO, and set HCR_EL2.TLOR to trap accesses to the following
-> registers:
+> On 01/12/2018 12:07 PM, Christoffer Dall wrote:
+> >There's a semantic difference between the EL1 registers that control
+> >operation of a kernel running in EL1 and EL1 registers that only control
+> >userspace execution in EL0.  Since we can defer saving/restoring the
+> >latter, move them into their own function.
+> >
+> >We also take this chance to rename the function saving/restoring the
+> >remaining system register to make it clear this function deals with
+> >the EL1 system registers.
+> >
+> >No functional change.
+> >
+> >Reviewed-by: Andrew Jones <drjones@redhat.com>
+> >Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> >---
+> >  arch/arm64/kvm/hyp/sysreg-sr.c | 46 +++++++++++++++++++++++++++++++-----------
+> >  1 file changed, 34 insertions(+), 12 deletions(-)
+> >
+> >diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+> >index 848a46eb33bf..99dd50ce483b 100644
+> >--- a/arch/arm64/kvm/hyp/sysreg-sr.c
+> >+++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+> >@@ -34,18 +34,27 @@ static void __hyp_text __sysreg_do_nothing(struct kvm_cpu_context *ctxt) { }
+> >  static void __hyp_text __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
+> >  {
+> >-	ctxt->sys_regs[ACTLR_EL1]	= read_sysreg(actlr_el1);
 > 
-> * LORC_EL1
-> * LOREA_EL1
-> * LORID_EL1
-> * LORN_EL1
-> * LORSA_EL1
+> I am a bit confused, the comment on top of the function says the host must
+> save ACTLR_EL1 in the VHE case. But AFAICT, after this patch the register
+> will not get saved in the host context. Did I miss anything?
 > 
-> ... when trapped, we inject an UNDEFINED exception to EL1, simulating
-> their non-existence.
-> 
-> As noted in D7.2.67, when no LORegions are implemented, LoadLOAcquire
-> and StoreLORelease must behave as LoadAcquire and StoreRelease
-> respectively. We can ensure this by clearing LORC_EL1.EN when a CPU's
-> EL2 is first initialized, as the host kernel will not modify this.
-> 
-> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-> Cc: Vladimir Murzin <vladimir.murzin@arm.com>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Christoffer Dall <christoffer.dall@linaro.org>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Will Deacon <will.deacon@arm.com>
-> Cc: kvmarm@lists.cs.columbia.edu
+You're right, there is indeed a functional change here, introduced in
+v2.
 
-Applied, thanks.
+I have adjusted the commentary and the patch description.
+
+Thanks,
 -Christoffer
