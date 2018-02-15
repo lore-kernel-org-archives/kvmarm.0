@@ -1,191 +1,253 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v3 09/41] KVM: arm64: Defer restoring host VFP state to
- vcpu_put
-Date: Thu, 15 Feb 2018 09:51:26 +0000
-Message-ID: <20180215095114.GA11612@e103592.cambridge.arm.com>
-References: <20180122173326.GO22781@e103592.cambridge.arm.com>
- <20180125194653.GR21802@cbox>
- <20180207164955.GT5862@e103592.cambridge.arm.com>
- <20180207175644.GF29286@cbox>
- <20180209155930.GD5862@e103592.cambridge.arm.com>
- <20180213085130.GB23189@cbox>
- <20180213140843.GN5862@e103592.cambridge.arm.com>
- <20180214101554.GL23189@cbox>
- <20180214144242.GA11748@e103592.cambridge.arm.com>
- <20180214173811.GO23189@cbox>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v4 08/19] arm64: KVM: Dynamically patch the kernel/hyp VA
+ mask
+Date: Thu, 15 Feb 2018 13:11:02 +0000
+Message-ID: <a663a509-f7e3-bf7f-959d-191ab723c7e2@arm.com>
+References: <20180104184334.16571-1-marc.zyngier@arm.com>
+ <20180104184334.16571-9-marc.zyngier@arm.com> <20180115114719.GI21403@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180214173811.GO23189@cbox>
+In-Reply-To: <20180115114719.GI21403@cbox>
+Content-Language: en-GB
 Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Shih-Wei Li <shihwei@cs.columbia.edu>
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>, Steve Capper <steve.capper@arm.com>, Peter Maydell <peter.maydell@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Feb 14, 2018 at 06:38:11PM +0100, Christoffer Dall wrote:
-> On Wed, Feb 14, 2018 at 02:43:42PM +0000, Dave Martin wrote:
-> > [CC Ard, in case he has a view on how much we care about softirq NEON
-> > performance regressions ... and whether my suggestions make sense]
-> > 
-> > On Wed, Feb 14, 2018 at 11:15:54AM +0100, Christoffer Dall wrote:
-> > > On Tue, Feb 13, 2018 at 02:08:47PM +0000, Dave Martin wrote:
-> > > > On Tue, Feb 13, 2018 at 09:51:30AM +0100, Christoffer Dall wrote:
-> > > > > On Fri, Feb 09, 2018 at 03:59:30PM +0000, Dave Martin wrote:
+On 15/01/18 11:47, Christoffer Dall wrote:
+> On Thu, Jan 04, 2018 at 06:43:23PM +0000, Marc Zyngier wrote:
+>> So far, we're using a complicated sequence of alternatives to
+>> patch the kernel/hyp VA mask on non-VHE, and NOP out the
+>> masking altogether when on VHE.
+>>
+>> THe newly introduced dynamic patching gives us the opportunity
 > 
-> [...]
+> nit: s/THe/The/
 > 
-> > > > 
-> > > > kvm_fpsimd_flush_cpu_state() is just an invalidation.  No state is
-> > > > actually saved today because we explicitly don't care about preserving
-> > > > the SVE state, because the syscall ABI throws the SVE regs away as
-> > > > a side effect any syscall including ioctl(KVM_RUN); also (currently) KVM
-> > > > ensures that the non-SVE FPSIMD bits _are_ restored by itself.
-> > > > 
-> > > > I think my proposal is that this hook might take on the role of
-> > > > actually saving the state too, if we move that out of the KVM host
-> > > > context save/restore code.
-> > > > 
-> > > > Perhaps we could even replace
-> > > > 
-> > > > 	preempt_disable();
-> > > > 	kvm_fpsimd_flush_cpu_state();
-> > > > 	/* ... */
-> > > > 	preempt_enable();
-> > > > 
-> > > > with
-> > > > 
-> > > > 	kernel_neon_begin();
-> > > > 	/* ... */
-> > > > 	kernel_neon_end();
-> > > 
-> > > I'm not entirely sure where the begin and end points would be in the
-> > > context of KVM?
-> > 
-> > Hmmm, actually there's a bug in your VHE changes now I look more
-> > closely in this area:
-> > 
-> > You assume that the only way for the FPSIMD regs to get unexpectedly
-> > dirtied is through a context switch, but actually this is not the case:
-> > a softirq can use kernel-mode NEON any time that softirqs are enabled.
-> > 
-> > This means that in between kvm_arch_vcpu_load() and _put() (whether via
-> > preempt notification or not), the guest's FPSIMD state in the regs may
-> > be trashed by a softirq.
+>> to simplify that code by patching a single instruction with
+>> the correct mask (instead of the mind bending cummulative masking
+>> we have at the moment) or even a single NOP on VHE.
+>>
+>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>> ---
+>>  arch/arm64/include/asm/kvm_mmu.h | 45 ++++++--------------
+>>  arch/arm64/kvm/Makefile          |  2 +-
+>>  arch/arm64/kvm/va_layout.c       | 91 ++++++++++++++++++++++++++++++++++++++++
+>>  3 files changed, 104 insertions(+), 34 deletions(-)
+>>  create mode 100644 arch/arm64/kvm/va_layout.c
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+>> index 672c8684d5c2..b0c3cbe9b513 100644
+>> --- a/arch/arm64/include/asm/kvm_mmu.h
+>> +++ b/arch/arm64/include/asm/kvm_mmu.h
+>> @@ -69,9 +69,6 @@
+>>   * mappings, and none of this applies in that case.
+>>   */
+>>  
+>> -#define HYP_PAGE_OFFSET_HIGH_MASK	((UL(1) << VA_BITS) - 1)
+>> -#define HYP_PAGE_OFFSET_LOW_MASK	((UL(1) << (VA_BITS - 1)) - 1)
+>> -
+>>  #ifdef __ASSEMBLY__
+>>  
+>>  #include <asm/alternative.h>
+>> @@ -81,28 +78,14 @@
+>>   * Convert a kernel VA into a HYP VA.
+>>   * reg: VA to be converted.
+>>   *
+>> - * This generates the following sequences:
+>> - * - High mask:
+>> - *		and x0, x0, #HYP_PAGE_OFFSET_HIGH_MASK
+>> - *		nop
+>> - * - Low mask:
+>> - *		and x0, x0, #HYP_PAGE_OFFSET_HIGH_MASK
+>> - *		and x0, x0, #HYP_PAGE_OFFSET_LOW_MASK
+>> - * - VHE:
+>> - *		nop
+>> - *		nop
+>> - *
+>> - * The "low mask" version works because the mask is a strict subset of
+>> - * the "high mask", hence performing the first mask for nothing.
+>> - * Should be completely invisible on any viable CPU.
+>> + * The actual code generation takes place in kvm_update_va_mask, and
+>> + * the instructions below are only there to reserve the space and
+>> + * perform the register allocation.
 > 
-> ouch.
+> Not just register allocation, but also to tell the generating code which
+> registers to use for its operands, right?
+
+That's what I meant by register allocation.
+
 > 
-> > 
-> > The simplest fix is to disable softirqs and preemption for that whole
-> > region, but since we can stay in it indefinitely that's obviously not
-> > the right approach.  Putting kernel_neon_begin() in _load() and
-> > kernel_neon_end() in _put() achieves the same without disabling
-> > softirq, but preemption is still disabled throughout, which is bad.
-> > This effectively makes the run ioctl nonpreemptible...
-> > 
-> > A better fix would be to set the cpu's kernel_neon_busy flag, which
-> > makes softirq code use non-NEON fallback code.
-> > 
-> > We could expose an interface from fpsimd.c to support that.
-> > 
-> > It still comes at a cost though: due to the switching from NEON to
-> > fallback code in softirq handlers, we may get a big performance
-> > regression in setups that rely heavily on NEON in softirq for
-> > performance.
-> > 
+>>   */
+>>  .macro kern_hyp_va	reg
+>> -alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
+>> -	and     \reg, \reg, #HYP_PAGE_OFFSET_HIGH_MASK
+>> -alternative_else_nop_endif
+>> -alternative_if ARM64_HYP_OFFSET_LOW
+>> -	and     \reg, \reg, #HYP_PAGE_OFFSET_LOW_MASK
+>> -alternative_else_nop_endif
+>> +alternative_cb kvm_update_va_mask
+>> +	and     \reg, \reg, #1
+>> +alternative_cb_end
+>>  .endm
+>>  
+>>  #else
+>> @@ -113,18 +96,14 @@ alternative_else_nop_endif
+>>  #include <asm/mmu_context.h>
+>>  #include <asm/pgtable.h>
+>>  
+>> +void kvm_update_va_mask(struct alt_instr *alt,
+>> +			__le32 *origptr, __le32 *updptr, int nr_inst);
+>> +
+>>  static inline unsigned long __kern_hyp_va(unsigned long v)
+>>  {
+>> -	asm volatile(ALTERNATIVE("and %0, %0, %1",
+>> -				 "nop",
+>> -				 ARM64_HAS_VIRT_HOST_EXTN)
+>> -		     : "+r" (v)
+>> -		     : "i" (HYP_PAGE_OFFSET_HIGH_MASK));
+>> -	asm volatile(ALTERNATIVE("nop",
+>> -				 "and %0, %0, %1",
+>> -				 ARM64_HYP_OFFSET_LOW)
+>> -		     : "+r" (v)
+>> -		     : "i" (HYP_PAGE_OFFSET_LOW_MASK));
+>> +	asm volatile(ALTERNATIVE_CB("and %0, %0, #1\n",
+>> +				    kvm_update_va_mask)
+>> +		     : "+r" (v));
+>>  	return v;
+>>  }
+>>  
+>> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+>> index 87c4f7ae24de..93afff91cb7c 100644
+>> --- a/arch/arm64/kvm/Makefile
+>> +++ b/arch/arm64/kvm/Makefile
+>> @@ -16,7 +16,7 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/e
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arm.o $(KVM)/arm/mmu.o $(KVM)/arm/mmio.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/psci.o $(KVM)/arm/perf.o
+>>  
+>> -kvm-$(CONFIG_KVM_ARM_HOST) += inject_fault.o regmap.o
+>> +kvm-$(CONFIG_KVM_ARM_HOST) += inject_fault.o regmap.o va_layout.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += hyp.o hyp-init.o handle_exit.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += guest.o debug.o reset.o sys_regs.o sys_regs_generic_v8.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += vgic-sys-reg-v3.o
+>> diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
+>> new file mode 100644
+>> index 000000000000..aee758574e61
+>> --- /dev/null
+>> +++ b/arch/arm64/kvm/va_layout.c
+>> @@ -0,0 +1,91 @@
+>> +/*
+>> + * Copyright (C) 2017 ARM Ltd.
+>> + * Author: Marc Zyngier <marc.zyngier@arm.com>
+>> + *
+>> + * This program is free software; you can redistribute it and/or modify
+>> + * it under the terms of the GNU General Public License version 2 as
+>> + * published by the Free Software Foundation.
+>> + *
+>> + * This program is distributed in the hope that it will be useful,
+>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>> + * GNU General Public License for more details.
+>> + *
+>> + * You should have received a copy of the GNU General Public License
+>> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+>> + */
+>> +
+>> +#include <linux/kvm_host.h>
+>> +#include <asm/alternative.h>
+>> +#include <asm/debug-monitors.h>
+>> +#include <asm/insn.h>
+>> +#include <asm/kvm_mmu.h>
+>> +
+>> +#define HYP_PAGE_OFFSET_HIGH_MASK	((UL(1) << VA_BITS) - 1)
+>> +#define HYP_PAGE_OFFSET_LOW_MASK	((UL(1) << (VA_BITS - 1)) - 1)
+>> +
+>> +static u64 va_mask;
+>> +
+>> +static void compute_layout(void)
+>> +{
+>> +	phys_addr_t idmap_addr = __pa_symbol(__hyp_idmap_text_start);
+>> +	unsigned long mask = HYP_PAGE_OFFSET_HIGH_MASK;
+>> +
+>> +	/*
+>> +	 * Activate the lower HYP offset only if the idmap doesn't
+>> +	 * clash with it,
+>> +	 */
 > 
-> I wasn't aware that softirqs would use fpsimd.
+> The commentary is a bit strange given the logic below...
 > 
-> > 
-> > Alternatively we could do something like the following, but it's a
-> > rather gross abstraction violation:
-> > 
-> > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> > index 2e43f9d..6a1ff3a 100644
-> > --- a/virt/kvm/arm/arm.c
-> > +++ b/virt/kvm/arm/arm.c
-> > @@ -746,9 +746,24 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> >  		 * the effect of taking the interrupt again, in SVC
-> >  		 * mode this time.
-> >  		 */
-> > +		local_bh_disable();
-> >  		local_irq_enable();
-> >  
-> >  		/*
-> > +		 * If we exited due to one or mode pending interrupts, they
-> > +		 * have now been handled.  If such an interrupt pended a
-> > +		 * softirq, we shouldn't prevent that softirq from using
-> > +		 * kernel-mode NEON indefinitely: instead, give FPSIMD back to
-> > +		 * the host to manage as it likes.  We'll grab it again on the
-> > +		 * next FPSIMD trap from the guest (if any).
-> > +		 */
-> > +		if (local_softirq_pending() && FPSIMD untrapped for guest) {
-> > +			/* save vcpu FPSIMD context */
-> > +			/* enable FPSIMD trap for guest */
-> > +		}
-> > +		local_bh_enable();
-> > +
-> > +		/*
-> >  		 * We do local_irq_enable() before calling guest_exit() so
-> >  		 * that if a timer interrupt hits while running the guest we
-> >  		 * account that tick as being spent in the guest.  We enable
-> > 
-> > [...]
-> > 
+>> +	if (idmap_addr > HYP_PAGE_OFFSET_LOW_MASK)
+>> +		mask = HYP_PAGE_OFFSET_HIGH_MASK;
 > 
-> I can't see this working, what if an IRQ comes in and a softirq gets
-> pending immediately after local_bh_enable() above?
+> ... was the initialization supposed to be LOW_MASK?
+> 
+> (and does this imply that this was never tested on a system that
+> actually used the low mask?)
 
-Sorry, I missed a crucial bit of information here.
+I must has messed up with a later refactoring, as that code gets
+replaced pretty quickly in the series. The full series was definitely
+tested on Seattle with 39bit VAs, which is the only configuration I have
+that triggers the low mask.
 
-For context: here's the remainder of my argument.  This is not a
-recommendation...
+> 
+>> +
+>> +	va_mask = mask;
+>> +}
+>> +
+>> +static u32 compute_instruction(int n, u32 rd, u32 rn)
+>> +{
+>> +	u32 insn = AARCH64_BREAK_FAULT;
+>> +
+>> +	switch (n) {
+>> +	case 0:
+> 
+> hmmm, wonder why we need this n==0 check...
 
+Makes patch splitting a bit easier. I can rework that if that helps.
 
---8<--
+> 
+>> +		insn = aarch64_insn_gen_logical_immediate(AARCH64_INSN_LOGIC_AND,
+>> +							  AARCH64_INSN_VARIANT_64BIT,
+>> +							  rn, rd, va_mask);
+>> +		break;
+>> +	}
+>> +
+>> +	return insn;
+>> +}
+>> +
+>> +void __init kvm_update_va_mask(struct alt_instr *alt,
+>> +			       __le32 *origptr, __le32 *updptr, int nr_inst)
+>> +{
+>> +	int i;
+>> +
+>> +	/* We only expect a 1 instruction sequence */
+> 
+> nit: wording is a bit strange, how about
+> "We only expect a single instruction in the alternative sequence"
 
-We can inhibit softirqs from trashing the FPSIMD regs by setting the
-per-cpu kernel_neon_busy flag: that's forces softirq code to use
-non-NEON fallback code without actually disabling softirq.
+Sure.
 
-I'd come up with a local hack
+> 
+>> +	BUG_ON(nr_inst != 1);
+>> +
+>> +	if (!has_vhe() && !va_mask)
+>> +		compute_layout();
+>> +
+>> +	for (i = 0; i < nr_inst; i++) {
+> 
+> It's a bit funny to have a loop with the above BUG_ON.
+> 
+> (I'm beginning to wonder if a future patch expands on this single
+> instruction thing, in which case a hint in the commit message would have
+> been nice.)
 
- * kernel_neon_grab();
+That's indeed what is happening. A further patch expands the single
+instruction to a 5 instruction sequence. I'll add a comment to that effect.
 
-	to set the flag, which would happen in vcpu_load().
+Thanks,
 
- * kernel_neon_ungrab();
-
-	to clear the flag, which would happen as above and in
-	vcpu_put().
-
-It would be up to the caller to ensure that preemption cannot occur
-between those calls (satisfied by use of a preempt notifier here), and
-to save the host context when needed.
-
-This would bound the kernel-mode NEON blackout to the time KVM spends
-in the host kernel only: the above conditional relinquishing of the
-FPSIMD regs ensures that a softirq trigger event occuring during the
-(unbounded) guest execution time _does_ get to use NEON.
-
--->8--
-
-> And as you say, it's really not pretty.
-
-Agreed!
-
-> This is really making me think that I'll drop this part of the
-> optimization and when we do optimize fpsimd handling, we do it properly
-> by integrating it with the kernel tracking.
-
-Since I will be hacking at this area as part of the SVE KVM support
-anyway, I will sooner or later end up working on it -- at that point it
-will likely be worth unifying the two mechanisms, at least for the VHE
-case (SVE architecturally required v8.2, so VHE can be assumed in that
-case).
-
-It would be interesting to know what the numbers look like without
-the FPSIMD optimisation.
-
-Cheers
----Dave
+	M.
+-- 
+Jazz is not dead. It just smells funny...
