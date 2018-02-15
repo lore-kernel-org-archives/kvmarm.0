@@ -1,125 +1,92 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v4 02/40] KVM: arm/arm64: Move vcpu_load call after
- kvm_vcpu_first_run_init
-Date: Thu, 15 Feb 2018 22:02:54 +0100
-Message-ID: <20180215210332.8648-3-christoffer.dall@linaro.org>
+Subject: [PATCH v4 23/40] KVM: arm64: Change 32-bit handling of VM system registers
+Date: Thu, 15 Feb 2018 22:03:15 +0100
+Message-ID: <20180215210332.8648-24-christoffer.dall@linaro.org>
 References: <20180215210332.8648-1-christoffer.dall@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20180215210332.8648-1-christoffer.dall@linaro.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Sender: kvm-owner@vger.kernel.org
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Tomasz Nowicki <tn@semihalf.com>, Julien Grall <julien.grall@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, Christoffer Dall <christoffer.dall@linaro.org>, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
+Cc: kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Andrew Jones <drjones@redhat.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Dave Martin <Dave.Martin@arm.com>, Julien Grall <julien.grall@arm.com>, Tomasz Nowicki <tn@semihalf.com>, Yury Norov <ynorov@caviumnetworks.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Moving the call to vcpu_load() in kvm_arch_vcpu_ioctl_run() to after
-we've called kvm_vcpu_first_run_init() simplifies some of the vgic and
-there is also no need to do vcpu_load() for things such as handling the
-immediate_exit flag.
+We currently handle 32-bit accesses to trapped VM system registers using
+the 32-bit index into the coproc array on the vcpu structure, which is a
+union of the coproc array and the sysreg array.
 
-Reviewed-by: Julien Grall <julien.grall@arm.com>
+Since all the 32-bit coproc indices are created to correspond to the
+architectural mapping between 64-bit system registers and 32-bit
+coprocessor registers, and because the AArch64 system registers are the
+double in size of the AArch32 coprocessor registers, we can always find
+the system register entry that we must update by dividing the 32-bit
+coproc index by 2.
+
+This is going to make our lives much easier when we have to start
+accessing system registers that use deferred save/restore and might
+have to be read directly from the physical CPU.
+
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/arch_timer.c     |  4 ----
- virt/kvm/arm/arm.c            | 22 ++++++++--------------
- virt/kvm/arm/vgic/vgic-init.c | 11 -----------
- 3 files changed, 8 insertions(+), 29 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  8 --------
+ arch/arm64/kvm/sys_regs.c         | 20 +++++++++++++++-----
+ 2 files changed, 15 insertions(+), 13 deletions(-)
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 70f4c30918eb..b744e6935a3f 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -852,11 +852,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
- 		return ret;
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index c30fc96992df..f2a6f39aec87 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -295,14 +295,6 @@ struct kvm_vcpu_arch {
+ #define vcpu_cp14(v,r)		((v)->arch.ctxt.copro[(r)])
+ #define vcpu_cp15(v,r)		((v)->arch.ctxt.copro[(r)])
  
- no_vgic:
--	preempt_disable();
- 	timer->enabled = 1;
--	kvm_timer_vcpu_load(vcpu);
--	preempt_enable();
+-#ifdef CONFIG_CPU_BIG_ENDIAN
+-#define vcpu_cp15_64_high(v,r)	vcpu_cp15((v),(r))
+-#define vcpu_cp15_64_low(v,r)	vcpu_cp15((v),(r) + 1)
+-#else
+-#define vcpu_cp15_64_high(v,r)	vcpu_cp15((v),(r) + 1)
+-#define vcpu_cp15_64_low(v,r)	vcpu_cp15((v),(r))
+-#endif
 -
- 	return 0;
- }
+ struct kvm_vm_stat {
+ 	ulong remote_tlb_flush;
+ };
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 50a43c7b97ca..b48af790615e 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -121,16 +121,26 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
+ 			  const struct sys_reg_desc *r)
+ {
+ 	bool was_enabled = vcpu_has_cache_enabled(vcpu);
++	u64 val;
++	int reg = r->reg;
  
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 53572304843b..932e61858c55 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -632,27 +632,22 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	if (unlikely(!kvm_vcpu_initialized(vcpu)))
- 		return -ENOEXEC;
+ 	BUG_ON(!p->is_write);
  
--	vcpu_load(vcpu);
--
- 	ret = kvm_vcpu_first_run_init(vcpu);
- 	if (ret)
--		goto out;
-+		return ret;
- 
- 	if (run->exit_reason == KVM_EXIT_MMIO) {
- 		ret = kvm_handle_mmio_return(vcpu, vcpu->run);
- 		if (ret)
--			goto out;
--		if (kvm_arm_handle_step_debug(vcpu, vcpu->run)) {
--			ret = 0;
--			goto out;
--		}
--
-+			return ret;
-+		if (kvm_arm_handle_step_debug(vcpu, vcpu->run))
-+			return 0;
- 	}
- 
--	if (run->immediate_exit) {
--		ret = -EINTR;
--		goto out;
--	}
-+	if (run->immediate_exit)
-+		return -EINTR;
+-	if (!p->is_aarch32) {
+-		vcpu_sys_reg(vcpu, r->reg) = p->regval;
++	/* See the 32bit mapping in kvm_host.h */
++	if (p->is_aarch32)
++		reg = r->reg / 2;
 +
-+	vcpu_load(vcpu);
++	if (!p->is_aarch32 || !p->is_32bit) {
++		val = p->regval;
+ 	} else {
+-		if (!p->is_32bit)
+-			vcpu_cp15_64_high(vcpu, r->reg) = upper_32_bits(p->regval);
+-		vcpu_cp15_64_low(vcpu, r->reg) = lower_32_bits(p->regval);
++		val = vcpu_sys_reg(vcpu, reg);
++		if (r->reg % 2)
++			val = (p->regval << 32) | (u64)lower_32_bits(val);
++		else
++			val = ((u64)upper_32_bits(val) << 32) |
++				lower_32_bits(p->regval);
+ 	}
++	vcpu_sys_reg(vcpu, reg) = val;
  
- 	kvm_sigset_activate(vcpu);
- 
-@@ -811,7 +806,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 
- 	kvm_sigset_deactivate(vcpu);
- 
--out:
- 	vcpu_put(vcpu);
- 	return ret;
- }
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index 743ca5cb05ef..3e8209a07585 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -302,17 +302,6 @@ int vgic_init(struct kvm *kvm)
- 
- 	dist->initialized = true;
- 
--	/*
--	 * If we're initializing GICv2 on-demand when first running the VCPU
--	 * then we need to load the VGIC state onto the CPU.  We can detect
--	 * this easily by checking if we are in between vcpu_load and vcpu_put
--	 * when we just initialized the VGIC.
--	 */
--	preempt_disable();
--	vcpu = kvm_arm_get_running_vcpu();
--	if (vcpu)
--		kvm_vgic_load(vcpu);
--	preempt_enable();
- out:
- 	return ret;
- }
+ 	kvm_toggle_cache(vcpu, was_enabled);
+ 	return true;
 -- 
 2.14.2
