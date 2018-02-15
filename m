@@ -1,7 +1,7 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v4 28/40] KVM: arm64: Defer saving/restoring 64-bit sysregs to vcpu load/put on VHE
-Date: Thu, 15 Feb 2018 22:03:20 +0100
-Message-ID: <20180215210332.8648-29-christoffer.dall@linaro.org>
+Subject: [PATCH v4 35/40] KVM: arm/arm64: Get rid of vgic_elrsr
+Date: Thu, 15 Feb 2018 22:03:27 +0100
+Message-ID: <20180215210332.8648-36-christoffer.dall@linaro.org>
 References: <20180215210332.8648-1-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20180215210332.8648-1-christoffer.dall@linaro.org>
@@ -10,184 +10,161 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Andrew Jones <drjones@redhat.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Dave Martin <Dave.Martin@arm.com>, Julien Grall <julien.grall@arm.com>, Tomasz Nowicki <tn@semihalf.com>, Yury Norov <ynorov@caviumnetworks.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Some system registers do not affect the host kernel's execution and can
-therefore be loaded when we are about to run a VCPU and we don't have to
-restore the host state to the hardware before the time when we are
-actually about to return to userspace or schedule out the VCPU thread.
+There is really no need to store the vgic_elrsr on the VGIC data
+structures as the only need we have for the elrsr is to figure out if an
+LR is inactive when we save the VGIC state upon returning from the
+guest.  We can might as well store this in a temporary local variable.
 
-The EL1 system registers and the userspace state registers only
-affecting EL0 execution do not need to be saved and restored on every
-switch between the VM and the host, because they don't affect the host
-kernel's execution.
-
-We mark all registers which are now deffered as such in the
-vcpu_{read,write}_sys_reg accessors in sys-regs.c to ensure the most
-up-to-date copy is always accessed.
-
-Note MPIDR_EL1 (controlled via VMPIDR_EL2) is accessed from other vcpu
-threads, for example via the GIC emulation, and therefore must be
-declared as immediate, which is fine as the guest cannot modify this
-value.
-
-The 32-bit sysregs can also be deferred but we do this in a separate
-patch as it requires a bit more infrastructure.
+This also gets rid of the endianness conversion in the VGIC save
+function, which is completely unnecessary and would actually result in
+incorrect functionality on big-endian systems, because we are only using
+typed values here and not converting pointers and reading different
+types here.
 
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
 
 Notes:
-    Changes since v3:
-     - Changed to switch-based sysreg approach
+    Changes since v1:
+     - Moved patch up the queue before we start moving code around to avoid moving
+       potentially broken code.
 
- arch/arm64/kvm/hyp/sysreg-sr.c | 39 +++++++++++++++++++++++++++++++--------
- arch/arm64/kvm/sys_regs.c      | 40 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 71 insertions(+), 8 deletions(-)
+ include/kvm/arm_vgic.h        |  2 --
+ virt/kvm/arm/hyp/vgic-v2-sr.c | 28 +++++++---------------------
+ virt/kvm/arm/hyp/vgic-v3-sr.c |  6 +++---
+ virt/kvm/arm/vgic/vgic-v2.c   |  1 -
+ virt/kvm/arm/vgic/vgic-v3.c   |  1 -
+ 5 files changed, 10 insertions(+), 28 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-index 906606dc4e2c..9c60b8062724 100644
---- a/arch/arm64/kvm/hyp/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-@@ -25,8 +25,12 @@
- /*
-  * Non-VHE: Both host and guest must save everything.
-  *
-- * VHE: Host must save tpidr*_el0, mdscr_el1, sp_el0,
-- * and guest must save everything.
-+ * VHE: Host and guest must save mdscr_el1 and sp_el0 (and the PC and pstate,
-+ * which are handled as part of the el2 return state) on every switch.
-+ * tpidr_el0 and tpidrro_el0 only need to be switched when going
-+ * to host userspace or a different VCPU.  EL1 registers only need to be
-+ * switched when potentially going to run a different VCPU.  The latter two
-+ * classes are handled as part of kvm_arch_vcpu_load and kvm_arch_vcpu_put.
-  */
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index cdbd142ca7f2..ac98ae46bfb7 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -263,7 +263,6 @@ struct vgic_dist {
+ struct vgic_v2_cpu_if {
+ 	u32		vgic_hcr;
+ 	u32		vgic_vmcr;
+-	u64		vgic_elrsr;	/* Saved only */
+ 	u32		vgic_apr;
+ 	u32		vgic_lr[VGIC_V2_MAX_LRS];
+ };
+@@ -272,7 +271,6 @@ struct vgic_v3_cpu_if {
+ 	u32		vgic_hcr;
+ 	u32		vgic_vmcr;
+ 	u32		vgic_sre;	/* Restored only, change ignored */
+-	u32		vgic_elrsr;	/* Saved only */
+ 	u32		vgic_ap0r[4];
+ 	u32		vgic_ap1r[4];
+ 	u64		vgic_lr[VGIC_V3_MAX_LRS];
+diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
+index 4fe6e797e8b3..a91b0d2b9249 100644
+--- a/virt/kvm/arm/hyp/vgic-v2-sr.c
++++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
+@@ -23,29 +23,19 @@
+ #include <asm/kvm_hyp.h>
+ #include <asm/kvm_mmu.h>
  
- static void __hyp_text __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
-@@ -93,14 +97,11 @@ void __hyp_text __sysreg_save_state_nvhe(struct kvm_cpu_context *ctxt)
- void sysreg_save_host_state_vhe(struct kvm_cpu_context *ctxt)
+-static void __hyp_text save_elrsr(struct kvm_vcpu *vcpu, void __iomem *base)
+-{
+-	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+-	int nr_lr = (kern_hyp_va(&kvm_vgic_global_state))->nr_lr;
+-	u32 elrsr0, elrsr1;
+-
+-	elrsr0 = readl_relaxed(base + GICH_ELRSR0);
+-	if (unlikely(nr_lr > 32))
+-		elrsr1 = readl_relaxed(base + GICH_ELRSR1);
+-	else
+-		elrsr1 = 0;
+-
+-	cpu_if->vgic_elrsr = ((u64)elrsr1 << 32) | elrsr0;
+-}
+-
+ static void __hyp_text save_lrs(struct kvm_vcpu *vcpu, void __iomem *base)
  {
- 	__sysreg_save_common_state(ctxt);
--	__sysreg_save_user_state(ctxt);
- }
+ 	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+-	int i;
+ 	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
++	u64 elrsr;
++	int i;
++
++	elrsr = readl_relaxed(base + GICH_ELRSR0);
++	if (unlikely(used_lrs > 32))
++		elrsr |= ((u64)readl_relaxed(base + GICH_ELRSR1)) << 32;
  
- void sysreg_save_guest_state_vhe(struct kvm_cpu_context *ctxt)
- {
--	__sysreg_save_el1_state(ctxt);
- 	__sysreg_save_common_state(ctxt);
--	__sysreg_save_user_state(ctxt);
- 	__sysreg_save_el2_return_state(ctxt);
- }
+ 	for (i = 0; i < used_lrs; i++) {
+-		if (cpu_if->vgic_elrsr & (1UL << i))
++		if (elrsr & (1UL << i))
+ 			cpu_if->vgic_lr[i] &= ~GICH_LR_STATE;
+ 		else
+ 			cpu_if->vgic_lr[i] = readl_relaxed(base + GICH_LR0 + (i * 4));
+@@ -68,13 +58,9 @@ void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
  
-@@ -169,14 +170,11 @@ void __hyp_text __sysreg_restore_state_nvhe(struct kvm_cpu_context *ctxt)
- void sysreg_restore_host_state_vhe(struct kvm_cpu_context *ctxt)
- {
- 	__sysreg_restore_common_state(ctxt);
--	__sysreg_restore_user_state(ctxt);
- }
- 
- void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt)
- {
--	__sysreg_restore_el1_state(ctxt);
- 	__sysreg_restore_common_state(ctxt);
--	__sysreg_restore_user_state(ctxt);
- 	__sysreg_restore_el2_return_state(ctxt);
- }
- 
-@@ -240,6 +238,18 @@ void __hyp_text __sysreg32_restore_state(struct kvm_vcpu *vcpu)
-  */
- void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu)
- {
-+	struct kvm_cpu_context *host_ctxt = vcpu->arch.host_cpu_context;
-+	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
-+
-+	if (!has_vhe())
-+		return;
-+
-+	__sysreg_save_user_state(host_ctxt);
-+
-+	__sysreg_restore_user_state(guest_ctxt);
-+	__sysreg_restore_el1_state(guest_ctxt);
-+
-+	vcpu->arch.sysregs_loaded_on_cpu = true;
- }
- 
- /**
-@@ -255,6 +265,19 @@ void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu)
-  */
- void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu)
- {
-+	struct kvm_cpu_context *host_ctxt = vcpu->arch.host_cpu_context;
-+	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
-+
-+	if (!has_vhe())
-+		return;
-+
-+	__sysreg_save_el1_state(guest_ctxt);
-+	__sysreg_save_user_state(guest_ctxt);
-+
-+	/* Restore host user state */
-+	__sysreg_restore_user_state(host_ctxt);
-+
-+	vcpu->arch.sysregs_loaded_on_cpu = false;
- }
- 
- void __hyp_text __kvm_set_tpidr_el2(u64 tpidr_el2)
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index b3c3f014aa61..f060309337aa 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -87,6 +87,26 @@ u64 vcpu_read_sys_reg(struct kvm_vcpu *vcpu, int reg)
- 	 * exit from the guest but are only saved on vcpu_put.
- 	 */
- 	switch (reg) {
-+	case CSSELR_EL1:	return read_sysreg_s(SYS_CSSELR_EL1);
-+	case SCTLR_EL1:		return read_sysreg_s(sctlr_EL12);
-+	case ACTLR_EL1:		return read_sysreg_s(SYS_ACTLR_EL1);
-+	case CPACR_EL1:		return read_sysreg_s(cpacr_EL12);
-+	case TTBR0_EL1:		return read_sysreg_s(ttbr0_EL12);
-+	case TTBR1_EL1:		return read_sysreg_s(ttbr1_EL12);
-+	case TCR_EL1:		return read_sysreg_s(tcr_EL12);
-+	case ESR_EL1:		return read_sysreg_s(esr_EL12);
-+	case AFSR0_EL1:		return read_sysreg_s(afsr0_EL12);
-+	case AFSR1_EL1:		return read_sysreg_s(afsr1_EL12);
-+	case FAR_EL1:		return read_sysreg_s(far_EL12);
-+	case MAIR_EL1:		return read_sysreg_s(mair_EL12);
-+	case VBAR_EL1:		return read_sysreg_s(vbar_EL12);
-+	case CONTEXTIDR_EL1:	return read_sysreg_s(contextidr_EL12);
-+	case TPIDR_EL0:		return read_sysreg_s(SYS_TPIDR_EL0);
-+	case TPIDRRO_EL0:	return read_sysreg_s(SYS_TPIDRRO_EL0);
-+	case TPIDR_EL1:		return read_sysreg_s(SYS_TPIDR_EL1);
-+	case AMAIR_EL1:		return read_sysreg_s(amair_EL12);
-+	case CNTKCTL_EL1:	return read_sysreg_s(cntkctl_EL12);
-+	case PAR_EL1:		return read_sysreg_s(SYS_PAR_EL1);
+ 	if (used_lrs) {
+ 		cpu_if->vgic_apr = readl_relaxed(base + GICH_APR);
+-
+-		save_elrsr(vcpu, base);
+ 		save_lrs(vcpu, base);
+-
+ 		writel_relaxed(0, base + GICH_HCR);
+ 	} else {
+-		cpu_if->vgic_elrsr = ~0UL;
+ 		cpu_if->vgic_apr = 0;
  	}
+ }
+diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
+index f5c3d6d7019e..9abf2f3c12b5 100644
+--- a/virt/kvm/arm/hyp/vgic-v3-sr.c
++++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
+@@ -222,15 +222,16 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
+ 	if (used_lrs) {
+ 		int i;
+ 		u32 nr_pre_bits;
++		u32 elrsr;
  
- immediate_read:
-@@ -103,6 +123,26 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, int reg, u64 val)
- 	 * entry to the guest but are only restored on vcpu_load.
+-		cpu_if->vgic_elrsr = read_gicreg(ICH_ELSR_EL2);
++		elrsr = read_gicreg(ICH_ELSR_EL2);
+ 
+ 		write_gicreg(0, ICH_HCR_EL2);
+ 		val = read_gicreg(ICH_VTR_EL2);
+ 		nr_pre_bits = vtr_to_nr_pre_bits(val);
+ 
+ 		for (i = 0; i < used_lrs; i++) {
+-			if (cpu_if->vgic_elrsr & (1 << i))
++			if (elrsr & (1 << i))
+ 				cpu_if->vgic_lr[i] &= ~ICH_LR_STATE;
+ 			else
+ 				cpu_if->vgic_lr[i] = __gic_v3_get_lr(i);
+@@ -262,7 +263,6 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
+ 		    cpu_if->its_vpe.its_vm)
+ 			write_gicreg(0, ICH_HCR_EL2);
+ 
+-		cpu_if->vgic_elrsr = 0xffff;
+ 		cpu_if->vgic_ap0r[0] = 0;
+ 		cpu_if->vgic_ap0r[1] = 0;
+ 		cpu_if->vgic_ap0r[2] = 0;
+diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+index c32d7b93ffd1..bb305d49cfdd 100644
+--- a/virt/kvm/arm/vgic/vgic-v2.c
++++ b/virt/kvm/arm/vgic/vgic-v2.c
+@@ -265,7 +265,6 @@ void vgic_v2_enable(struct kvm_vcpu *vcpu)
+ 	 * anyway.
  	 */
- 	switch (reg) {
-+	case CSSELR_EL1:	write_sysreg_s(val, SYS_CSSELR_EL1);	return;
-+	case SCTLR_EL1:		write_sysreg_s(val, sctlr_EL12);	return;
-+	case ACTLR_EL1:		write_sysreg_s(val, SYS_ACTLR_EL1);	return;
-+	case CPACR_EL1:		write_sysreg_s(val, cpacr_EL12);	return;
-+	case TTBR0_EL1:		write_sysreg_s(val, ttbr0_EL12);	return;
-+	case TTBR1_EL1:		write_sysreg_s(val, ttbr1_EL12);	return;
-+	case TCR_EL1:		write_sysreg_s(val, tcr_EL12);		return;
-+	case ESR_EL1:		write_sysreg_s(val, esr_EL12);		return;
-+	case AFSR0_EL1:		write_sysreg_s(val, afsr0_EL12);	return;
-+	case AFSR1_EL1:		write_sysreg_s(val, afsr1_EL12);	return;
-+	case FAR_EL1:		write_sysreg_s(val, far_EL12);		return;
-+	case MAIR_EL1:		write_sysreg_s(val, mair_EL12);		return;
-+	case VBAR_EL1:		write_sysreg_s(val, vbar_EL12);		return;
-+	case CONTEXTIDR_EL1:	write_sysreg_s(val, contextidr_EL12);	return;
-+	case TPIDR_EL0:		write_sysreg_s(val, SYS_TPIDR_EL0);	return;
-+	case TPIDRRO_EL0:	write_sysreg_s(val, SYS_TPIDRRO_EL0);	return;
-+	case TPIDR_EL1:		write_sysreg_s(val, SYS_TPIDR_EL1);	return;
-+	case AMAIR_EL1:		write_sysreg_s(val, amair_EL12);	return;
-+	case CNTKCTL_EL1:	write_sysreg_s(val, cntkctl_EL12);	return;
-+	case PAR_EL1:		write_sysreg_s(val, SYS_PAR_EL1);	return;
- 	}
+ 	vcpu->arch.vgic_cpu.vgic_v2.vgic_vmcr = 0;
+-	vcpu->arch.vgic_cpu.vgic_v2.vgic_elrsr = ~0;
  
- immediate_write:
+ 	/* Get the show on the road... */
+ 	vcpu->arch.vgic_cpu.vgic_v2.vgic_hcr = GICH_HCR_EN;
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index 6b329414e57a..b76e21f3e6bd 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -267,7 +267,6 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
+ 	 * anyway.
+ 	 */
+ 	vgic_v3->vgic_vmcr = 0;
+-	vgic_v3->vgic_elrsr = ~0;
+ 
+ 	/*
+ 	 * If we are emulating a GICv3, we do it in an non-GICv2-compatible
 -- 
 2.14.2
