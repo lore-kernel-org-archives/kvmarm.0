@@ -1,7 +1,7 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v4 15/40] KVM: arm64: Don't deactivate VM on VHE systems
-Date: Thu, 15 Feb 2018 22:03:07 +0100
-Message-ID: <20180215210332.8648-16-christoffer.dall@linaro.org>
+Subject: [PATCH v4 09/40] KVM: arm64: Move debug dirty flag calculation out of world switch
+Date: Thu, 15 Feb 2018 22:03:01 +0100
+Message-ID: <20180215210332.8648-10-christoffer.dall@linaro.org>
 References: <20180215210332.8648-1-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20180215210332.8648-1-christoffer.dall@linaro.org>
@@ -10,63 +10,51 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Andrew Jones <drjones@redhat.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Dave Martin <Dave.Martin@arm.com>, Julien Grall <julien.grall@arm.com>, Tomasz Nowicki <tn@semihalf.com>, Yury Norov <ynorov@caviumnetworks.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-There is no need to reset the VTTBR to zero when exiting the guest on
-VHE systems.  VHE systems don't use stage 2 translations for the EL2&0
-translation regime used by the host.
+There is no need to figure out inside the world-switch if we should
+save/restore the debug registers or not, we might as well do that in the
+higher level debug setup code, making it easier to optimize down the
+line.
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Julien Thierry <julien.thierry@arm.com>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
+ arch/arm64/kvm/debug.c        | 5 +++++
+ arch/arm64/kvm/hyp/debug-sr.c | 6 ------
+ 2 files changed, 5 insertions(+), 6 deletions(-)
 
-Notes:
-    Changes since v1:
-     - Changed __activate_vm to take a kvm pointer
-     - No longer adding inline attributes to functions
-
- arch/arm64/kvm/hyp/switch.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
-
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 85dae7b94a0f..734dac7f808f 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -156,9 +156,8 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
- 	write_sysreg(0, pmuserenr_el0);
- }
+diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+index fa63b28c65e0..feedb877cff8 100644
+--- a/arch/arm64/kvm/debug.c
++++ b/arch/arm64/kvm/debug.c
+@@ -193,6 +193,11 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+ 	if (trap_debug)
+ 		vcpu->arch.mdcr_el2 |= MDCR_EL2_TDA;
  
--static void __hyp_text __activate_vm(struct kvm_vcpu *vcpu)
-+static void __hyp_text __activate_vm(struct kvm *kvm)
++	/* If KDE or MDE are set, perform a full save/restore cycle. */
++	if ((vcpu_sys_reg(vcpu, MDSCR_EL1) & DBG_MDSCR_KDE) ||
++	    (vcpu_sys_reg(vcpu, MDSCR_EL1) & DBG_MDSCR_MDE))
++		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
++
+ 	trace_kvm_arm_set_dreg32("MDCR_EL2", vcpu->arch.mdcr_el2);
+ 	trace_kvm_arm_set_dreg32("MDSCR_EL1", vcpu_sys_reg(vcpu, MDSCR_EL1));
+ }
+diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
+index dabb5cc7b087..d958cd63a547 100644
+--- a/arch/arm64/kvm/hyp/debug-sr.c
++++ b/arch/arm64/kvm/hyp/debug-sr.c
+@@ -166,12 +166,6 @@ void __hyp_text __debug_restore_state(struct kvm_vcpu *vcpu,
+ 
+ void __hyp_text __debug_cond_save_host_state(struct kvm_vcpu *vcpu)
  {
--	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
- 	write_sysreg(kvm->arch.vttbr, vttbr_el2);
- }
- 
-@@ -377,7 +376,7 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 	__sysreg_save_host_state(host_ctxt);
- 
- 	__activate_traps(vcpu);
--	__activate_vm(vcpu);
-+	__activate_vm(vcpu->kvm);
- 
- 	__vgic_restore_state(vcpu);
- 	__timer_enable_traps(vcpu);
-@@ -405,7 +404,6 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 	__vgic_save_state(vcpu);
- 
- 	__deactivate_traps(vcpu);
--	__deactivate_vm(vcpu);
- 
- 	__sysreg_restore_host_state(host_ctxt);
- 
-@@ -440,7 +438,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- 	__sysreg_save_host_state(host_ctxt);
- 
- 	__activate_traps(vcpu);
--	__activate_vm(vcpu);
-+	__activate_vm(kern_hyp_va(vcpu->kvm));
- 
- 	__vgic_restore_state(vcpu);
- 	__timer_enable_traps(vcpu);
+-	/* If any of KDE, MDE or KVM_ARM64_DEBUG_DIRTY is set, perform
+-	 * a full save/restore cycle. */
+-	if ((vcpu->arch.ctxt.sys_regs[MDSCR_EL1] & DBG_MDSCR_KDE) ||
+-	    (vcpu->arch.ctxt.sys_regs[MDSCR_EL1] & DBG_MDSCR_MDE))
+-		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
+-
+ 	__debug_save_state(vcpu, &vcpu->arch.host_debug_state.regs,
+ 			   kern_hyp_va(vcpu->arch.host_cpu_context));
+ 	__debug_save_spe()(&vcpu->arch.host_debug_state.pmscr_el1);
 -- 
 2.14.2
