@@ -1,7 +1,7 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v4 32/40] KVM: arm64: Directly call VHE and non-VHE FPSIMD enabled functions
-Date: Thu, 15 Feb 2018 22:03:24 +0100
-Message-ID: <20180215210332.8648-33-christoffer.dall@linaro.org>
+Subject: [PATCH v4 37/40] KVM: arm/arm64: Move arm64-only vgic-v2-sr.c file to arm64
+Date: Thu, 15 Feb 2018 22:03:29 +0100
+Message-ID: <20180215210332.8648-38-christoffer.dall@linaro.org>
 References: <20180215210332.8648-1-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20180215210332.8648-1-christoffer.dall@linaro.org>
@@ -10,64 +10,68 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Andrew Jones <drjones@redhat.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Dave Martin <Dave.Martin@arm.com>, Julien Grall <julien.grall@arm.com>, Tomasz Nowicki <tn@semihalf.com>, Yury Norov <ynorov@caviumnetworks.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-There is no longer a need for an alternative to choose the right
-function to tell us whether or not FPSIMD was enabled for the VM,
-because we can simply cann the appropriate functions directly fromwithin
-the _vhe and _nvhe run functions.
+The vgic-v2-sr.c file now only contains the logic to replay unaligned
+accesses to the virtual CPU interface on 16K and 64K page systems, which
+is only relevant on 64-bit platforms.  Therefore move this file to the
+arm64 KVM tree, remove the compile directive from the 32-bit side
+makefile, and remove the ifdef in the C file.
 
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
+ arch/arm/kvm/hyp/Makefile                         | 1 -
+ arch/arm64/kvm/hyp/Makefile                       | 2 +-
+ {virt/kvm/arm => arch/arm64/kvm}/hyp/vgic-v2-sr.c | 2 --
+ 3 files changed, 1 insertion(+), 4 deletions(-)
+ rename {virt/kvm/arm => arch/arm64/kvm}/hyp/vgic-v2-sr.c (98%)
 
-Notes:
-    Changes since v3:
-     - New patch since we no longer defer FPSIMD handling to load/put
-
- arch/arm64/kvm/hyp/switch.c | 15 +++------------
- 1 file changed, 3 insertions(+), 12 deletions(-)
-
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 17e3c6f26a34..9c40e203bd09 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -33,20 +33,11 @@ static bool __hyp_text __fpsimd_enabled_nvhe(void)
- 	return !(read_sysreg(cptr_el2) & CPTR_EL2_TFP);
+diff --git a/arch/arm/kvm/hyp/Makefile b/arch/arm/kvm/hyp/Makefile
+index 5638ce0c9524..1964111c984a 100644
+--- a/arch/arm/kvm/hyp/Makefile
++++ b/arch/arm/kvm/hyp/Makefile
+@@ -7,7 +7,6 @@ ccflags-y += -fno-stack-protector -DDISABLE_BRANCH_PROFILING
+ 
+ KVM=../../../../virt/kvm
+ 
+-obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v2-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v3-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/timer-sr.o
+ 
+diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+index f04400d494b7..7e8d41210288 100644
+--- a/arch/arm64/kvm/hyp/Makefile
++++ b/arch/arm64/kvm/hyp/Makefile
+@@ -7,10 +7,10 @@ ccflags-y += -fno-stack-protector -DDISABLE_BRANCH_PROFILING
+ 
+ KVM=../../../../virt/kvm
+ 
+-obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v2-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v3-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/timer-sr.o
+ 
++obj-$(CONFIG_KVM_ARM_HOST) += vgic-v2-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) += sysreg-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) += debug-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) += entry.o
+diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/arch/arm64/kvm/hyp/vgic-v2-sr.c
+similarity index 98%
+rename from virt/kvm/arm/hyp/vgic-v2-sr.c
+rename to arch/arm64/kvm/hyp/vgic-v2-sr.c
+index 0bbafdfd4adb..97f357ea9c72 100644
+--- a/virt/kvm/arm/hyp/vgic-v2-sr.c
++++ b/arch/arm64/kvm/hyp/vgic-v2-sr.c
+@@ -23,7 +23,6 @@
+ #include <asm/kvm_hyp.h>
+ #include <asm/kvm_mmu.h>
+ 
+-#ifdef CONFIG_ARM64
+ /*
+  * __vgic_v2_perform_cpuif_access -- perform a GICV access on behalf of the
+  *				     guest.
+@@ -77,4 +76,3 @@ int __hyp_text __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
+ 
+ 	return 1;
  }
- 
--static bool __hyp_text __fpsimd_enabled_vhe(void)
-+static bool fpsimd_enabled_vhe(void)
- {
- 	return !!(read_sysreg(cpacr_el1) & CPACR_EL1_FPEN);
- }
- 
--static hyp_alternate_select(__fpsimd_is_enabled,
--			    __fpsimd_enabled_nvhe, __fpsimd_enabled_vhe,
--			    ARM64_HAS_VIRT_HOST_EXTN);
--
--bool __hyp_text __fpsimd_enabled(void)
--{
--	return __fpsimd_is_enabled()();
--}
--
- /* Save the 32-bit only FPSIMD system register state */
- static inline void __hyp_text __fpsimd_save_fpexc32(struct kvm_vcpu *vcpu)
- {
-@@ -413,7 +404,7 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 		/* And we're baaack! */
- 	} while (fixup_guest_exit(vcpu, &exit_code));
- 
--	fp_enabled = __fpsimd_enabled();
-+	fp_enabled = fpsimd_enabled_vhe();
- 
- 	sysreg_save_guest_state_vhe(guest_ctxt);
- 	__vgic_save_state(vcpu);
-@@ -478,7 +469,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- 			__qcom_hyp_sanitize_btac_predictors();
- 	}
- 
--	fp_enabled = __fpsimd_enabled();
-+	fp_enabled = __fpsimd_enabled_nvhe();
- 
- 	__sysreg_save_state_nvhe(guest_ctxt);
- 	__sysreg32_save_state(vcpu);
+-#endif
 -- 
 2.14.2
