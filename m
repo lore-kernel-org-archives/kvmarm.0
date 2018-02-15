@@ -1,7 +1,7 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v4 38/40] KVM: arm/arm64: Handle VGICv3 save/restore from the main VGIC code on VHE
-Date: Thu, 15 Feb 2018 22:03:30 +0100
-Message-ID: <20180215210332.8648-39-christoffer.dall@linaro.org>
+Subject: [PATCH v4 19/40] KVM: arm64: Introduce separate VHE/non-VHE sysreg save/restore functions
+Date: Thu, 15 Feb 2018 22:03:11 +0100
+Message-ID: <20180215210332.8648-20-christoffer.dall@linaro.org>
 References: <20180215210332.8648-1-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20180215210332.8648-1-christoffer.dall@linaro.org>
@@ -10,96 +10,205 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Andrew Jones <drjones@redhat.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Dave Martin <Dave.Martin@arm.com>, Julien Grall <julien.grall@arm.com>, Tomasz Nowicki <tn@semihalf.com>, Yury Norov <ynorov@caviumnetworks.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Just like we can program the GICv2 hypervisor control interface directly
-from the core vgic code, we can do the same for the GICv3 hypervisor
-control interface on VHE systems.
+As we are about to handle system registers quite differently between VHE
+and non-VHE systems.  In preparation for that, we need to split some of
+the handling functions between VHE and non-VHE functionality.
 
-We do this by simply calling the save/restore functions when we have VHE
-and we can then get rid of the save/restore function calls from the VHE
-world switch function.
+For now, we simply copy the non-VHE functions, but we do change the use
+of static keys for VHE and non-VHE functionality now that we have
+separate functions.
 
-One caveat is that we now write GICv3 system register state before the
-potential early exit path in the run loop, and because we sync back
-state in the early exit path, we have to ensure that we read a
-consistent GIC state from the sync path, even though we have never
-actually run the guest with the newly written GIC state.  We solve this
-by inserting an ISB in the early exit path.
-
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
+ arch/arm64/include/asm/kvm_hyp.h | 12 ++++++++----
+ arch/arm64/kvm/hyp/switch.c      | 20 ++++++++++----------
+ arch/arm64/kvm/hyp/sysreg-sr.c   | 40 ++++++++++++++++++++++++++++++++--------
+ 3 files changed, 50 insertions(+), 22 deletions(-)
 
-Notes:
-    Changes since v2:
-     - Added ISB in the early exit path in the run loop as explained
-       in the commit message.
-
- arch/arm64/kvm/hyp/switch.c | 3 ---
- virt/kvm/arm/arm.c          | 1 +
- virt/kvm/arm/vgic/vgic.c    | 5 +++++
- 3 files changed, 6 insertions(+), 3 deletions(-)
-
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index aeda2a777365..23c09d9af343 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -131,10 +131,14 @@ int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu);
+ void __timer_enable_traps(struct kvm_vcpu *vcpu);
+ void __timer_disable_traps(struct kvm_vcpu *vcpu);
+ 
+-void __sysreg_save_host_state(struct kvm_cpu_context *ctxt);
+-void __sysreg_restore_host_state(struct kvm_cpu_context *ctxt);
+-void __sysreg_save_guest_state(struct kvm_cpu_context *ctxt);
+-void __sysreg_restore_guest_state(struct kvm_cpu_context *ctxt);
++void __sysreg_save_host_state_nvhe(struct kvm_cpu_context *ctxt);
++void __sysreg_restore_host_state_nvhe(struct kvm_cpu_context *ctxt);
++void __sysreg_save_guest_state_nvhe(struct kvm_cpu_context *ctxt);
++void __sysreg_restore_guest_state_nvhe(struct kvm_cpu_context *ctxt);
++void sysreg_save_host_state_vhe(struct kvm_cpu_context *ctxt);
++void sysreg_restore_host_state_vhe(struct kvm_cpu_context *ctxt);
++void sysreg_save_guest_state_vhe(struct kvm_cpu_context *ctxt);
++void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt);
+ void __sysreg32_save_state(struct kvm_vcpu *vcpu);
+ void __sysreg32_restore_state(struct kvm_vcpu *vcpu);
+ 
 diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index cbafc27a617b..466cfcdbcaf3 100644
+index f0fae320edc0..717c8f5c6be7 100644
 --- a/arch/arm64/kvm/hyp/switch.c
 +++ b/arch/arm64/kvm/hyp/switch.c
-@@ -399,8 +399,6 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+@@ -373,7 +373,7 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ 	host_ctxt->__hyp_running_vcpu = vcpu;
+ 	guest_ctxt = &vcpu->arch.ctxt;
+ 
+-	__sysreg_save_host_state(host_ctxt);
++	sysreg_save_host_state_vhe(host_ctxt);
+ 
  	__activate_traps(vcpu);
  	__activate_vm(vcpu->kvm);
- 
--	__vgic_restore_state(vcpu);
--
- 	sysreg_restore_guest_state_vhe(guest_ctxt);
+@@ -385,7 +385,7 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ 	 * to erratum #852523 (Cortex-A57) or #853709 (Cortex-A72).
+ 	 */
+ 	__sysreg32_restore_state(vcpu);
+-	__sysreg_restore_guest_state(guest_ctxt);
++	sysreg_restore_guest_state_vhe(guest_ctxt);
  	__debug_switch_to_guest(vcpu);
  
-@@ -414,7 +412,6 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 	fp_enabled = fpsimd_enabled_vhe();
+ 	do {
+@@ -397,13 +397,13 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
  
- 	sysreg_save_guest_state_vhe(guest_ctxt);
--	__vgic_save_state(vcpu);
+ 	fp_enabled = __fpsimd_enabled();
+ 
+-	__sysreg_save_guest_state(guest_ctxt);
++	sysreg_save_guest_state_vhe(guest_ctxt);
+ 	__sysreg32_save_state(vcpu);
+ 	__vgic_save_state(vcpu);
  
  	__deactivate_traps(vcpu);
  
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 5bd879c78951..6de7641f3ff2 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -717,6 +717,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm) ||
- 		    kvm_request_pending(vcpu)) {
- 			vcpu->mode = OUTSIDE_GUEST_MODE;
-+			isb(); /* Ensure work in x_flush_hwstate is committed */
- 			kvm_pmu_sync_hwstate(vcpu);
- 			if (static_branch_unlikely(&userspace_irqchip_in_use))
- 				kvm_timer_sync_hwstate(vcpu);
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index 12e2a28f437e..d0a19a8c196a 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -19,6 +19,7 @@
- #include <linux/list_sort.h>
- #include <linux/interrupt.h>
- #include <linux/irq.h>
-+#include <asm/kvm_hyp.h>
+-	__sysreg_restore_host_state(host_ctxt);
++	sysreg_restore_host_state_vhe(host_ctxt);
  
- #include "vgic.h"
+ 	if (fp_enabled) {
+ 		__fpsimd_save_state(&guest_ctxt->gp_regs.fp_regs);
+@@ -433,7 +433,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 	host_ctxt->__hyp_running_vcpu = vcpu;
+ 	guest_ctxt = &vcpu->arch.ctxt;
  
-@@ -753,6 +754,8 @@ static inline void vgic_save_state(struct kvm_vcpu *vcpu)
- {
- 	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
- 		vgic_v2_save_state(vcpu);
-+	else if (has_vhe())
-+		__vgic_v3_save_state(vcpu);
+-	__sysreg_save_host_state(host_ctxt);
++	__sysreg_save_host_state_nvhe(host_ctxt);
+ 
+ 	__activate_traps(vcpu);
+ 	__activate_vm(kern_hyp_va(vcpu->kvm));
+@@ -446,7 +446,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 	 * to erratum #852523 (Cortex-A57) or #853709 (Cortex-A72).
+ 	 */
+ 	__sysreg32_restore_state(vcpu);
+-	__sysreg_restore_guest_state(guest_ctxt);
++	__sysreg_restore_guest_state_nvhe(guest_ctxt);
+ 	__debug_switch_to_guest(vcpu);
+ 
+ 	do {
+@@ -466,7 +466,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 
+ 	fp_enabled = __fpsimd_enabled();
+ 
+-	__sysreg_save_guest_state(guest_ctxt);
++	__sysreg_save_guest_state_nvhe(guest_ctxt);
+ 	__sysreg32_save_state(vcpu);
+ 	__timer_disable_traps(vcpu);
+ 	__vgic_save_state(vcpu);
+@@ -474,7 +474,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 	__deactivate_traps(vcpu);
+ 	__deactivate_vm(vcpu);
+ 
+-	__sysreg_restore_host_state(host_ctxt);
++	__sysreg_restore_host_state_nvhe(host_ctxt);
+ 
+ 	if (fp_enabled) {
+ 		__fpsimd_save_state(&guest_ctxt->gp_regs.fp_regs);
+@@ -504,7 +504,7 @@ static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par,
+ 		__timer_disable_traps(vcpu);
+ 		__deactivate_traps(vcpu);
+ 		__deactivate_vm(vcpu);
+-		__sysreg_restore_host_state(__host_ctxt);
++		__sysreg_restore_host_state_nvhe(__host_ctxt);
+ 	}
+ 
+ 	/*
+@@ -527,7 +527,7 @@ static void __hyp_call_panic_vhe(u64 spsr, u64 elr, u64 par,
+ 	vcpu = host_ctxt->__hyp_running_vcpu;
+ 
+ 	__deactivate_traps(vcpu);
+-	__sysreg_restore_host_state(host_ctxt);
++	sysreg_restore_host_state_vhe(host_ctxt);
+ 
+ 	panic(__hyp_panic_string,
+ 	      spsr,  elr,
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index 51b557226170..18801ab56e8b 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -78,15 +78,27 @@ static void __hyp_text __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+ 		ctxt->sys_regs[DISR_EL1] = read_sysreg_s(SYS_VDISR_EL2);
  }
  
- /* Sync back the hardware VGIC state into our emulation after a guest's run. */
-@@ -777,6 +780,8 @@ static inline void vgic_restore_state(struct kvm_vcpu *vcpu)
+-void __hyp_text __sysreg_save_host_state(struct kvm_cpu_context *ctxt)
++void __hyp_text __sysreg_save_host_state_nvhe(struct kvm_cpu_context *ctxt)
++{
++	__sysreg_save_el1_state(ctxt);
++	__sysreg_save_common_state(ctxt);
++	__sysreg_save_user_state(ctxt);
++}
++
++void __hyp_text __sysreg_save_guest_state_nvhe(struct kvm_cpu_context *ctxt)
++{
++	__sysreg_save_el1_state(ctxt);
++	__sysreg_save_common_state(ctxt);
++	__sysreg_save_user_state(ctxt);
++}
++
++void sysreg_save_host_state_vhe(struct kvm_cpu_context *ctxt)
  {
- 	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
- 		vgic_v2_restore_state(vcpu);
-+	else if (has_vhe())
-+		__vgic_v3_restore_state(vcpu);
+-	if (!has_vhe())
+-		__sysreg_save_el1_state(ctxt);
+ 	__sysreg_save_common_state(ctxt);
+ 	__sysreg_save_user_state(ctxt);
  }
  
- /* Flush our emulation state into the GIC hardware before entering the guest. */
+-void __hyp_text __sysreg_save_guest_state(struct kvm_cpu_context *ctxt)
++void sysreg_save_guest_state_vhe(struct kvm_cpu_context *ctxt)
+ {
+ 	__sysreg_save_el1_state(ctxt);
+ 	__sysreg_save_common_state(ctxt);
+@@ -142,15 +154,27 @@ static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+ 		write_sysreg_s(ctxt->sys_regs[DISR_EL1], SYS_VDISR_EL2);
+ }
+ 
+-void __hyp_text __sysreg_restore_host_state(struct kvm_cpu_context *ctxt)
++void __hyp_text __sysreg_restore_host_state_nvhe(struct kvm_cpu_context *ctxt)
++{
++	__sysreg_restore_el1_state(ctxt);
++	__sysreg_restore_common_state(ctxt);
++	__sysreg_restore_user_state(ctxt);
++}
++
++void __hyp_text __sysreg_restore_guest_state_nvhe(struct kvm_cpu_context *ctxt)
++{
++	__sysreg_restore_el1_state(ctxt);
++	__sysreg_restore_common_state(ctxt);
++	__sysreg_restore_user_state(ctxt);
++}
++
++void sysreg_restore_host_state_vhe(struct kvm_cpu_context *ctxt)
+ {
+-	if (!has_vhe())
+-		__sysreg_restore_el1_state(ctxt);
+ 	__sysreg_restore_common_state(ctxt);
+ 	__sysreg_restore_user_state(ctxt);
+ }
+ 
+-void __hyp_text __sysreg_restore_guest_state(struct kvm_cpu_context *ctxt)
++void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt)
+ {
+ 	__sysreg_restore_el1_state(ctxt);
+ 	__sysreg_restore_common_state(ctxt);
 -- 
 2.14.2
