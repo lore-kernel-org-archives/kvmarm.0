@@ -1,33 +1,112 @@
-From: Jon Masters <jcm@redhat.com>
-Subject: Re: [PATCH v4 00/17] arm64: Add SMCCC v1.1 support and CVE-2017-5715
- (Spectre variant 2) mitigation
-Date: Thu, 15 Feb 2018 15:59:29 -0500
-Message-ID: <e9df17e7-86ee-2f7a-b8e2-d78ac0358fc3@redhat.com>
-References: <20180206175621.929-1-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180206175621.929-1-marc.zyngier@arm.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Mark Rutland <mark.rutland@arm.com>, Robin Murphy <robin.murphy@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andrew Jones <drjones@redhat.com>, Hanjun Guo <guohanjun@huawei.com>, Jayachandran C <jnair@caviumnetworks.com>, Jon Masters <jcm@redhat.com>, Russell King - ARM Linux <linux@armlinux.org.uk>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: [PATCH v4 01/40] KVM: arm/arm64: Avoid vcpu_load for other vcpu ioctls than KVM_RUN
+Date: Thu, 15 Feb 2018 22:02:53 +0100
+Message-ID: <20180215210332.8648-2-christoffer.dall@linaro.org>
+References: <20180215210332.8648-1-christoffer.dall@linaro.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20180215210332.8648-1-christoffer.dall@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Andrew Jones <drjones@redhat.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Dave Martin <Dave.Martin@arm.com>, Julien Grall <julien.grall@arm.com>, Tomasz Nowicki <tn@semihalf.com>, Yury Norov <ynorov@caviumnetworks.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc, all,
+Calling vcpu_load() registers preempt notifiers for this vcpu and calls
+kvm_arch_vcpu_load().  The latter will soon be doing a lot of heavy
+lifting on arm/arm64 and will try to do things such as enabling the
+virtual timer and setting us up to handle interrupts from the timer
+hardware.
 
-On 02/06/2018 12:56 PM, Marc Zyngier wrote:
-> ARM has recently published a SMC Calling Convention (SMCCC)
-> specification update[1] that provides an optimised calling convention
-> and optional, discoverable support for mitigating CVE-2017-5715. ARM
-> Trusted Firmware (ATF) has already gained such an implementation[2].
+Loading state onto hardware registers and enabling hardware to signal
+interrupts can be problematic when we're not actually about to run the
+VCPU, because it makes it difficult to establish the right context when
+handling interrupts from the timer, and it makes the register access
+code difficult to reason about.
 
-I'm probably just missing something, but does this end up reported
-somewhere conveniently user visible? In particular, if the new SMC is
-*not* provided, does the user end up easily seeing this?
+Luckily, now when we call vcpu_load in each ioctl implementation, we can
+simply remove the call from the non-KVM_RUN vcpu ioctls, and our
+kvm_arch_vcpu_load() is only used for loading vcpu content to the
+physical CPU when we're actually going to run the vcpu.
 
-Jon.
+Reviewed-by: Julien Grall <julien.grall@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+---
+ arch/arm64/kvm/guest.c | 3 ---
+ virt/kvm/arm/arm.c     | 9 ---------
+ 2 files changed, 12 deletions(-)
 
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index d7e3299a7734..959e50d2588c 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -363,8 +363,6 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+ {
+ 	int ret = 0;
+ 
+-	vcpu_load(vcpu);
+-
+ 	trace_kvm_set_guest_debug(vcpu, dbg->control);
+ 
+ 	if (dbg->control & ~KVM_GUESTDBG_VALID_MASK) {
+@@ -386,7 +384,6 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+ 	}
+ 
+ out:
+-	vcpu_put(vcpu);
+ 	return ret;
+ }
+ 
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 86941f6181bb..53572304843b 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -384,14 +384,11 @@ static void vcpu_power_off(struct kvm_vcpu *vcpu)
+ int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
+ 				    struct kvm_mp_state *mp_state)
+ {
+-	vcpu_load(vcpu);
+-
+ 	if (vcpu->arch.power_off)
+ 		mp_state->mp_state = KVM_MP_STATE_STOPPED;
+ 	else
+ 		mp_state->mp_state = KVM_MP_STATE_RUNNABLE;
+ 
+-	vcpu_put(vcpu);
+ 	return 0;
+ }
+ 
+@@ -400,8 +397,6 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+ {
+ 	int ret = 0;
+ 
+-	vcpu_load(vcpu);
+-
+ 	switch (mp_state->mp_state) {
+ 	case KVM_MP_STATE_RUNNABLE:
+ 		vcpu->arch.power_off = false;
+@@ -413,7 +408,6 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+ 		ret = -EINVAL;
+ 	}
+ 
+-	vcpu_put(vcpu);
+ 	return ret;
+ }
+ 
+@@ -1036,8 +1030,6 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 	struct kvm_device_attr attr;
+ 	long r;
+ 
+-	vcpu_load(vcpu);
+-
+ 	switch (ioctl) {
+ 	case KVM_ARM_VCPU_INIT: {
+ 		struct kvm_vcpu_init init;
+@@ -1114,7 +1106,6 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 		r = -EINVAL;
+ 	}
+ 
+-	vcpu_put(vcpu);
+ 	return r;
+ }
+ 
 -- 
-Computer Architect | Sent from my Fedora powered laptop
+2.14.2
