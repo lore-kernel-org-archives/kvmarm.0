@@ -1,7 +1,7 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v4 34/40] KVM: arm64: Cleanup __activate_traps and __deactive_traps for VHE and non-VHE
-Date: Thu, 15 Feb 2018 22:03:26 +0100
-Message-ID: <20180215210332.8648-35-christoffer.dall@linaro.org>
+Subject: [PATCH v4 12/40] KVM: arm64: Factor out fault info population and gic workarounds
+Date: Thu, 15 Feb 2018 22:03:04 +0100
+Message-ID: <20180215210332.8648-13-christoffer.dall@linaro.org>
 References: <20180215210332.8648-1-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20180215210332.8648-1-christoffer.dall@linaro.org>
@@ -10,101 +10,181 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Andrew Jones <drjones@redhat.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Dave Martin <Dave.Martin@arm.com>, Julien Grall <julien.grall@arm.com>, Tomasz Nowicki <tn@semihalf.com>, Yury Norov <ynorov@caviumnetworks.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-To make the code more readable and to avoid the overhead of a function
-call, let's get rid of a pair of the alternative function selectors and
-explicitly call the VHE and non-VHE functions using the has_vhe() static
-key based selector instead, telling the compiler to try to inline the
-static function if it can.
+The current world-switch function has functionality to detect a number
+of cases where we need to fixup some part of the exit condition and
+possibly run the guest again, before having restored the host state.
 
+This includes populating missing fault info, emulating GICv2 CPU
+interface accesses when mapped at unaligned addresses, and emulating
+the GICv3 CPU interface on systems that need it.
+
+As we are about to have an alternative switch function for VHE systems,
+but VHE systems still need the same early fixup logic, factor out this
+logic into a separate function that can be shared by both switch
+functions.
+
+No functional change.
+
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/kvm/hyp/switch.c | 30 ++++++++++++++----------------
- 1 file changed, 14 insertions(+), 16 deletions(-)
+ arch/arm64/kvm/hyp/switch.c | 104 ++++++++++++++++++++++++--------------------
+ 1 file changed, 57 insertions(+), 47 deletions(-)
 
 diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 5e94955b89ea..0e54fe2aab1c 100644
+index 0c80d6a577ca..d2c0b1ae3216 100644
 --- a/arch/arm64/kvm/hyp/switch.c
 +++ b/arch/arm64/kvm/hyp/switch.c
-@@ -85,7 +85,7 @@ static void __hyp_text __deactivate_traps_common(void)
- 	write_sysreg(0, pmuserenr_el0);
+@@ -291,53 +291,27 @@ static bool __hyp_text __skip_instr(struct kvm_vcpu *vcpu)
+ 	}
  }
  
--static void __hyp_text __activate_traps_vhe(struct kvm_vcpu *vcpu)
-+static inline void activate_traps_vhe(struct kvm_vcpu *vcpu)
+-int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
++/*
++ * Return true when we were able to fixup the guest exit and should return to
++ * the guest, false when we should restore the host state and return to the
++ * main run loop.
++ */
++static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
  {
- 	u64 val;
- 
-@@ -97,7 +97,7 @@ static void __hyp_text __activate_traps_vhe(struct kvm_vcpu *vcpu)
- 	write_sysreg(kvm_get_hyp_vector(), vbar_el1);
- }
- 
--static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
-+static inline void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
- {
- 	u64 val;
- 
-@@ -108,11 +108,7 @@ static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
- 	write_sysreg(val, cptr_el2);
- }
- 
--static hyp_alternate_select(__activate_traps_arch,
--			    __activate_traps_nvhe, __activate_traps_vhe,
--			    ARM64_HAS_VIRT_HOST_EXTN);
+-	struct kvm_cpu_context *host_ctxt;
+-	struct kvm_cpu_context *guest_ctxt;
+-	bool fp_enabled;
+-	u64 exit_code;
 -
--static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
-+static inline void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
- {
- 	u64 hcr = vcpu->arch.hcr_el2;
- 
-@@ -122,10 +118,13 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
- 		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
- 
- 	__activate_traps_fpsimd32(vcpu);
--	__activate_traps_arch()(vcpu);
-+	if (has_vhe())
-+		activate_traps_vhe(vcpu);
-+	else
-+		__activate_traps_nvhe(vcpu);
- }
- 
--static void __hyp_text __deactivate_traps_vhe(void)
-+static inline void deactivate_traps_vhe(void)
- {
- 	extern char vectors[];	/* kernel exception vectors */
- 	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
-@@ -133,7 +132,7 @@ static void __hyp_text __deactivate_traps_vhe(void)
- 	write_sysreg(vectors, vbar_el1);
- }
- 
--static void __hyp_text __deactivate_traps_nvhe(void)
-+static inline void __hyp_text __deactivate_traps_nvhe(void)
- {
- 	u64 mdcr_el2 = read_sysreg(mdcr_el2);
- 
-@@ -147,11 +146,7 @@ static void __hyp_text __deactivate_traps_nvhe(void)
- 	write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
- }
- 
--static hyp_alternate_select(__deactivate_traps_arch,
--			    __deactivate_traps_nvhe, __deactivate_traps_vhe,
--			    ARM64_HAS_VIRT_HOST_EXTN);
+-	vcpu = kern_hyp_va(vcpu);
 -
--static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
-+static inline void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
- {
+-	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+-	host_ctxt->__hyp_running_vcpu = vcpu;
+-	guest_ctxt = &vcpu->arch.ctxt;
+-
+-	__sysreg_save_host_state(host_ctxt);
+-
+-	__activate_traps(vcpu);
+-	__activate_vm(vcpu);
+-
+-	__vgic_restore_state(vcpu);
+-	__timer_enable_traps(vcpu);
+-
+-	/*
+-	 * We must restore the 32-bit state before the sysregs, thanks
+-	 * to erratum #852523 (Cortex-A57) or #853709 (Cortex-A72).
+-	 */
+-	__sysreg32_restore_state(vcpu);
+-	__sysreg_restore_guest_state(guest_ctxt);
+-	__debug_switch_to_guest(vcpu);
+-
+-	/* Jump in the fire! */
+-again:
+-	exit_code = __guest_enter(vcpu, host_ctxt);
+-	/* And we're baaack! */
+-
+-	if (ARM_EXCEPTION_CODE(exit_code) != ARM_EXCEPTION_IRQ)
++	if (ARM_EXCEPTION_CODE(*exit_code) != ARM_EXCEPTION_IRQ)
+ 		vcpu->arch.fault.esr_el2 = read_sysreg_el2(esr);
++
  	/*
- 	 * If we pended a virtual abort, preserve it until it gets
-@@ -162,7 +157,10 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
- 	if (vcpu->arch.hcr_el2 & HCR_VSE)
- 		vcpu->arch.hcr_el2 = read_sysreg(hcr_el2);
+ 	 * We're using the raw exception code in order to only process
+ 	 * the trap if no SError is pending. We will come back to the
+ 	 * same PC once the SError has been injected, and replay the
+ 	 * trapping instruction.
+ 	 */
+-	if (exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
+-		goto again;
++	if (*exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
++		return true;
  
--	__deactivate_traps_arch()();
-+	if (has_vhe())
-+		deactivate_traps_vhe();
-+	else
-+		__deactivate_traps_nvhe();
- }
+ 	if (static_branch_unlikely(&vgic_v2_cpuif_trap) &&
+-	    exit_code == ARM_EXCEPTION_TRAP) {
++	    *exit_code == ARM_EXCEPTION_TRAP) {
+ 		bool valid;
  
- void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
+ 		valid = kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_DABT_LOW &&
+@@ -351,9 +325,9 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 
+ 			if (ret == 1) {
+ 				if (__skip_instr(vcpu))
+-					goto again;
++					return true;
+ 				else
+-					exit_code = ARM_EXCEPTION_TRAP;
++					*exit_code = ARM_EXCEPTION_TRAP;
+ 			}
+ 
+ 			if (ret == -1) {
+@@ -365,29 +339,65 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 				 */
+ 				if (!__skip_instr(vcpu))
+ 					*vcpu_cpsr(vcpu) &= ~DBG_SPSR_SS;
+-				exit_code = ARM_EXCEPTION_EL1_SERROR;
++				*exit_code = ARM_EXCEPTION_EL1_SERROR;
+ 			}
+-
+-			/* 0 falls through to be handler out of EL2 */
+ 		}
+ 	}
+ 
+ 	if (static_branch_unlikely(&vgic_v3_cpuif_trap) &&
+-	    exit_code == ARM_EXCEPTION_TRAP &&
++	    *exit_code == ARM_EXCEPTION_TRAP &&
+ 	    (kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_SYS64 ||
+ 	     kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_CP15_32)) {
+ 		int ret = __vgic_v3_perform_cpuif_access(vcpu);
+ 
+ 		if (ret == 1) {
+ 			if (__skip_instr(vcpu))
+-				goto again;
++				return true;
+ 			else
+-				exit_code = ARM_EXCEPTION_TRAP;
++				*exit_code = ARM_EXCEPTION_TRAP;
+ 		}
+-
+-		/* 0 falls through to be handled out of EL2 */
+ 	}
+ 
++	/* Return to the host kernel and handle the exit */
++	return false;
++}
++
++int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
++{
++	struct kvm_cpu_context *host_ctxt;
++	struct kvm_cpu_context *guest_ctxt;
++	bool fp_enabled;
++	u64 exit_code;
++
++	vcpu = kern_hyp_va(vcpu);
++
++	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
++	host_ctxt->__hyp_running_vcpu = vcpu;
++	guest_ctxt = &vcpu->arch.ctxt;
++
++	__sysreg_save_host_state(host_ctxt);
++
++	__activate_traps(vcpu);
++	__activate_vm(vcpu);
++
++	__vgic_restore_state(vcpu);
++	__timer_enable_traps(vcpu);
++
++	/*
++	 * We must restore the 32-bit state before the sysregs, thanks
++	 * to erratum #852523 (Cortex-A57) or #853709 (Cortex-A72).
++	 */
++	__sysreg32_restore_state(vcpu);
++	__sysreg_restore_guest_state(guest_ctxt);
++	__debug_switch_to_guest(vcpu);
++
++	do {
++		/* Jump in the fire! */
++		exit_code = __guest_enter(vcpu, host_ctxt);
++
++		/* And we're baaack! */
++	} while (fixup_guest_exit(vcpu, &exit_code));
++
+ 	if (cpus_have_const_cap(ARM64_HARDEN_BP_POST_GUEST_EXIT)) {
+ 		u32 midr = read_cpuid_id();
+ 
 -- 
 2.14.2
