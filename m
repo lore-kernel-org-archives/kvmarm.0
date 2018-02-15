@@ -1,7 +1,7 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH 11/11] arm64: acpi: Make apei_claim_sea() synchronise with APEI's irq work
-Date: Thu, 15 Feb 2018 18:56:06 +0000
-Message-ID: <20180215185606.26736-12-james.morse@arm.com>
+Subject: [PATCH 08/11] firmware: arm_sdei: Add ACPI GHES registration helper
+Date: Thu, 15 Feb 2018 18:56:03 +0000
+Message-ID: <20180215185606.26736-9-james.morse@arm.com>
 References: <20180215185606.26736-1-james.morse@arm.com>
 Return-path: <owner-linux-mm@kvack.org>
 In-Reply-To: <20180215185606.26736-1-james.morse@arm.com>
@@ -10,94 +10,154 @@ To: linux-acpi@vger.kernel.org
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org, Borislav Petkov <bp@alien8.de>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, Rafael Wysocki <rjw@rjwysocki.net>, Len Brown <lenb@kernel.org>, Tony Luck <tony.luck@intel.com>, Tyler Baicar <tbaicar@codeaurora.org>, Dongjiu Geng <gengdongjiu@huawei.com>, Xie XiuQi <xiexiuqi@huawei.com>, Punit Agrawal <punit.agrawal@arm.com>, James Morse <james.morse@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-APEI is unable to do all of its error handling work in nmi-context, so
-it defers non-fatal work onto the irq_work queue. arch_irq_work_raise()
-sends an IPI to the calling cpu, but we can't guarantee this will be
-taken before we return.
+APEI's Generic Hardware Error Source structures do not describe
+whether the SDEI event is shared or private, as this information is
+discoverable via the API.
 
-Unless we interrupted a context with irqs-masked, we can call
-irq_work_run() to do the work now. Otherwise return -EINPROGRESS to
-indicate ghes_notify_sea() found some work to do, but it hasn't
-finished yet.
+GHES needs to know whether an event is normal or critical to avoid
+sharing locks or fixmap entries.
 
-With this we can take apei_claim_sea() returning '0' to mean this
-external-abort was also notification of a firmware-first RAS error,
-and that APEI has processed the CPER records.
+Add a helper to ask firmware for this information so it can initialise
+the struct ghes and register then enable the event.
 
 Signed-off-by: James Morse <james.morse@arm.com>
 ---
- arch/arm64/kernel/acpi.c | 19 +++++++++++++++++++
- arch/arm64/mm/fault.c    |  9 ++++-----
- 2 files changed, 23 insertions(+), 5 deletions(-)
+ arch/arm64/include/asm/fixmap.h |  4 +++
+ drivers/firmware/arm_sdei.c     | 75 +++++++++++++++++++++++++++++++++++++++++
+ include/linux/arm_sdei.h        |  5 +++
+ 3 files changed, 84 insertions(+)
 
-diff --git a/arch/arm64/kernel/acpi.c b/arch/arm64/kernel/acpi.c
-index 6a4823a3eb5e..a51a7abd98e0 100644
---- a/arch/arm64/kernel/acpi.c
-+++ b/arch/arm64/kernel/acpi.c
-@@ -22,6 +22,7 @@
- #include <linux/init.h>
- #include <linux/irq.h>
- #include <linux/irqdomain.h>
-+#include <linux/irq_work.h>
- #include <linux/memblock.h>
- #include <linux/of_fdt.h>
- #include <linux/smp.h>
-@@ -275,10 +276,14 @@ int apei_claim_sea(struct pt_regs *regs)
- {
- 	int err = -ENOENT;
- 	unsigned long current_flags = arch_local_save_flags();
-+	unsigned long interrupted_flags = current_flags;
+diff --git a/arch/arm64/include/asm/fixmap.h b/arch/arm64/include/asm/fixmap.h
+index c3974517c2cb..e2b423a5feaf 100644
+--- a/arch/arm64/include/asm/fixmap.h
++++ b/arch/arm64/include/asm/fixmap.h
+@@ -58,6 +58,10 @@ enum fixed_addresses {
+ #ifdef CONFIG_ACPI_APEI_SEA
+ 	FIX_APEI_GHES_SEA,
+ #endif
++#ifdef CONFIG_ARM_SDE_INTERFACE
++	FIX_APEI_GHES_SDEI_NORMAL,
++	FIX_APEI_GHES_SDEI_CRITICAL,
++#endif
+ #endif /* CONFIG_ACPI_APEI_GHES */
  
- 	if (!IS_ENABLED(CONFIG_ACPI_APEI_SEA))
- 		return err;
+ #ifdef CONFIG_UNMAP_KERNEL_AT_EL0
+diff --git a/drivers/firmware/arm_sdei.c b/drivers/firmware/arm_sdei.c
+index 1ea71640fdc2..9b6e140cf6cb 100644
+--- a/drivers/firmware/arm_sdei.c
++++ b/drivers/firmware/arm_sdei.c
+@@ -2,6 +2,7 @@
+ // Copyright (C) 2017 Arm Ltd.
+ #define pr_fmt(fmt) "sdei: " fmt
  
-+	if (regs)
-+		interrupted_flags = regs->pstate;
++#include <acpi/ghes.h>
+ #include <linux/acpi.h>
+ #include <linux/arm_sdei.h>
+ #include <linux/arm-smccc.h>
+@@ -887,6 +888,80 @@ static void sdei_smccc_hvc(unsigned long function_id,
+ 	arm_smccc_hvc(function_id, arg0, arg1, arg2, arg3, arg4, 0, 0, res);
+ }
+ 
++#ifdef CONFIG_ACPI
++/* These stop private notifications using the fixmap entries simultaneously */
++static DEFINE_RAW_SPINLOCK(sdei_ghes_fixmap_lock_normal);
++static DEFINE_RAW_SPINLOCK(sdei_ghes_fixmap_lock_critical);
 +
- 	/*
- 	 * APEI expects an NMI-like notification to always be called
- 	 * in NMI context.
-@@ -287,6 +292,20 @@ int apei_claim_sea(struct pt_regs *regs)
- 	nmi_enter();
- 	err = ghes_notify_sea();
- 	nmi_exit();
++int sdei_register_ghes(struct ghes *ghes, sdei_event_callback *cb)
++{
++	int err;
++	u32 event_num;
++	u64 result;
 +
-+	/*
-+	 * APEI NMI-like notifications are deferred to irq_work. Unless
-+	 * we interrupted irqs-masked code, we can do that now.
-+	 */
-+	if (!err) {
-+		if (!arch_irqs_disabled_flags(interrupted_flags)) {
-+			local_daif_restore(DAIF_PROCCTX_NOIRQ);
-+			irq_work_run();
-+		} else {
-+			err = -EINPROGRESS;
-+		}
++	if (acpi_disabled)
++		return -EOPNOTSUPP;
++
++	event_num = ghes->generic->notify.vector;
++	if (event_num == 0) {
++		/*
++		 * Event 0 is the reserved by the specification for
++		 * SDEI_EVENT_SIGNAL.
++		 */
++		return -EINVAL;
 +	}
 +
- 	local_daif_restore(current_flags);
++	err = sdei_api_event_get_info(event_num, SDEI_EVENT_INFO_EV_PRIORITY,
++				      &result);
++	if (err)
++		return err;
++
++	if (result == SDEI_EVENT_PRIORITY_CRITICAL) {
++		ghes->nmi_fixmap_lock = &sdei_ghes_fixmap_lock_critical;
++		ghes->fixmap_idx = FIX_APEI_GHES_SDEI_CRITICAL;
++	} else {
++		ghes->nmi_fixmap_lock = &sdei_ghes_fixmap_lock_normal;
++		ghes->fixmap_idx = FIX_APEI_GHES_SDEI_NORMAL;
++	}
++
++	err = sdei_event_register(event_num, cb, ghes);
++	if (!err)
++		err = sdei_event_enable(event_num);
++
++	return err;
++}
++
++int sdei_unregister_ghes(struct ghes *ghes)
++{
++	int i;
++	int err;
++	u32 event_num = ghes->generic->notify.vector;
++
++	might_sleep();
++
++	if (acpi_disabled)
++		return -EOPNOTSUPP;
++
++	/*
++	 * The event may be running on another CPU. Disable it
++	 * to stop new events, then try to unregister a few times.
++	 */
++	err = sdei_event_disable(event_num);
++	if (err)
++		return err;
++
++	for (i = 0; i < 3; i++) {
++		err = sdei_event_unregister(event_num);
++		if (err != -EINPROGRESS)
++			break;
++
++		schedule();
++	}
++
++	return err;
++}
++#endif /* CONFIG_ACPI */
++
+ static int sdei_get_conduit(struct platform_device *pdev)
+ {
+ 	const char *method;
+diff --git a/include/linux/arm_sdei.h b/include/linux/arm_sdei.h
+index 942afbd544b7..5fdf799be026 100644
+--- a/include/linux/arm_sdei.h
++++ b/include/linux/arm_sdei.h
+@@ -11,6 +11,7 @@ enum sdei_conduit_types {
+ 	CONDUIT_HVC,
+ };
  
- 	return err;
-diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-index 8cbbd9a5ec7d..e218e291a17a 100644
---- a/arch/arm64/mm/fault.c
-+++ b/arch/arm64/mm/fault.c
-@@ -580,11 +580,10 @@ static int do_sea(unsigned long addr, unsigned int esr, struct pt_regs *regs)
- 		inf->name, esr, addr);
++#include <acpi/ghes.h>
+ #include <asm/sdei.h>
  
- 	if (IS_ENABLED(CONFIG_ACPI_APEI_SEA)) {
--		/*
--		 * Return value ignored as we rely on signal merging.
--		 * Future patches will make this more robust.
--		 */
--	       apei_claim_sea(regs);
-+		if (apei_claim_sea(regs) == 0) {
-+			/* APEI claimed this as a firmware-first notification */
-+			return 0;
-+		}
- 	}
+ /* Arch code should override this to set the entry point from firmware... */
+@@ -39,6 +40,10 @@ int sdei_event_unregister(u32 event_num);
+ int sdei_event_enable(u32 event_num);
+ int sdei_event_disable(u32 event_num);
  
- 	info.si_signo = SIGBUS;
++/* GHES register/unregister helpers */
++int sdei_register_ghes(struct ghes *ghes, sdei_event_callback *cb);
++int sdei_unregister_ghes(struct ghes *ghes);
++
+ #ifdef CONFIG_ARM_SDE_INTERFACE
+ /* For use by arch code when CPU hotplug notifiers are not appropriate. */
+ int sdei_mask_local_cpu(void);
 -- 
 2.15.1
 
