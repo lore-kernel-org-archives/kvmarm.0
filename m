@@ -1,7 +1,7 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v4 09/40] KVM: arm64: Move debug dirty flag calculation out of world switch
-Date: Thu, 15 Feb 2018 22:03:01 +0100
-Message-ID: <20180215210332.8648-10-christoffer.dall@linaro.org>
+Subject: [PATCH v4 04/40] KVM: arm64: Rework hyp_panic for VHE and non-VHE
+Date: Thu, 15 Feb 2018 22:02:56 +0100
+Message-ID: <20180215210332.8648-5-christoffer.dall@linaro.org>
 References: <20180215210332.8648-1-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20180215210332.8648-1-christoffer.dall@linaro.org>
@@ -10,51 +10,111 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Andrew Jones <drjones@redhat.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Dave Martin <Dave.Martin@arm.com>, Julien Grall <julien.grall@arm.com>, Tomasz Nowicki <tn@semihalf.com>, Yury Norov <ynorov@caviumnetworks.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-There is no need to figure out inside the world-switch if we should
-save/restore the debug registers or not, we might as well do that in the
-higher level debug setup code, making it easier to optimize down the
-line.
+VHE actually doesn't rely on clearing the VTTBR when returning to the
+host kernel, and that is the current key mechanism of hyp_panic to
+figure out how to attempt to return to a state good enough to print a
+panic statement.
 
-Reviewed-by: Julien Thierry <julien.thierry@arm.com>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Therefore, we split the hyp_panic function into two functions, a VHE and
+a non-VHE, keeping the non-VHE version intact, but changing the VHE
+behavior.
+
+The vttbr_el2 check on VHE doesn't really make that much sense, because
+the only situation where we can get here on VHE is when the hypervisor
+assembly code actually called into hyp_panic, which only happens when
+VBAR_EL2 has been set to the KVM exception vectors.  On VHE, we can
+always safely disable the traps and restore the host registers at this
+point, so we simply do that unconditionally and call into the panic
+function directly.
+
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/kvm/debug.c        | 5 +++++
- arch/arm64/kvm/hyp/debug-sr.c | 6 ------
- 2 files changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-index fa63b28c65e0..feedb877cff8 100644
---- a/arch/arm64/kvm/debug.c
-+++ b/arch/arm64/kvm/debug.c
-@@ -193,6 +193,11 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
- 	if (trap_debug)
- 		vcpu->arch.mdcr_el2 |= MDCR_EL2_TDA;
+Notes:
+    Changes since v1:
+     - Fixed typos in the commit message
+     - Still use the generic __deactivte_traps() function in the hyp panic
+       code until we rework that logic later.
+
+ arch/arm64/kvm/hyp/switch.c | 42 +++++++++++++++++++++++-------------------
+ 1 file changed, 23 insertions(+), 19 deletions(-)
+
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index d1749fa0bfc3..079bb5243f0c 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -437,10 +437,20 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ static const char __hyp_panic_string[] = "HYP panic:\nPS:%08llx PC:%016llx ESR:%08llx\nFAR:%016llx HPFAR:%016llx PAR:%016llx\nVCPU:%p\n";
  
-+	/* If KDE or MDE are set, perform a full save/restore cycle. */
-+	if ((vcpu_sys_reg(vcpu, MDSCR_EL1) & DBG_MDSCR_KDE) ||
-+	    (vcpu_sys_reg(vcpu, MDSCR_EL1) & DBG_MDSCR_MDE))
-+		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
-+
- 	trace_kvm_arm_set_dreg32("MDCR_EL2", vcpu->arch.mdcr_el2);
- 	trace_kvm_arm_set_dreg32("MDSCR_EL1", vcpu_sys_reg(vcpu, MDSCR_EL1));
- }
-diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
-index dabb5cc7b087..d958cd63a547 100644
---- a/arch/arm64/kvm/hyp/debug-sr.c
-+++ b/arch/arm64/kvm/hyp/debug-sr.c
-@@ -166,12 +166,6 @@ void __hyp_text __debug_restore_state(struct kvm_vcpu *vcpu,
- 
- void __hyp_text __debug_cond_save_host_state(struct kvm_vcpu *vcpu)
+ static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par,
+-					     struct kvm_vcpu *vcpu)
++					     struct kvm_cpu_context *__host_ctxt)
  {
--	/* If any of KDE, MDE or KVM_ARM64_DEBUG_DIRTY is set, perform
--	 * a full save/restore cycle. */
--	if ((vcpu->arch.ctxt.sys_regs[MDSCR_EL1] & DBG_MDSCR_KDE) ||
--	    (vcpu->arch.ctxt.sys_regs[MDSCR_EL1] & DBG_MDSCR_MDE))
--		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
++	struct kvm_vcpu *vcpu;
+ 	unsigned long str_va;
+ 
++	vcpu = __host_ctxt->__hyp_running_vcpu;
++
++	if (read_sysreg(vttbr_el2)) {
++		__timer_disable_traps(vcpu);
++		__deactivate_traps(vcpu);
++		__deactivate_vm(vcpu);
++		__sysreg_restore_host_state(__host_ctxt);
++	}
++
+ 	/*
+ 	 * Force the panic string to be loaded from the literal pool,
+ 	 * making sure it is a kernel address and not a PC-relative
+@@ -454,37 +464,31 @@ static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par,
+ 		       read_sysreg(hpfar_el2), par, vcpu);
+ }
+ 
+-static void __hyp_text __hyp_call_panic_vhe(u64 spsr, u64 elr, u64 par,
+-					    struct kvm_vcpu *vcpu)
++static void __hyp_call_panic_vhe(u64 spsr, u64 elr, u64 par,
++				 struct kvm_cpu_context *host_ctxt)
+ {
++	struct kvm_vcpu *vcpu;
++	vcpu = host_ctxt->__hyp_running_vcpu;
++
++	__deactivate_traps(vcpu);
++	__sysreg_restore_host_state(host_ctxt);
++
+ 	panic(__hyp_panic_string,
+ 	      spsr,  elr,
+ 	      read_sysreg_el2(esr),   read_sysreg_el2(far),
+ 	      read_sysreg(hpfar_el2), par, vcpu);
+ }
+ 
+-static hyp_alternate_select(__hyp_call_panic,
+-			    __hyp_call_panic_nvhe, __hyp_call_panic_vhe,
+-			    ARM64_HAS_VIRT_HOST_EXTN);
 -
- 	__debug_save_state(vcpu, &vcpu->arch.host_debug_state.regs,
- 			   kern_hyp_va(vcpu->arch.host_cpu_context));
- 	__debug_save_spe()(&vcpu->arch.host_debug_state.pmscr_el1);
+ void __hyp_text __noreturn hyp_panic(struct kvm_cpu_context *host_ctxt)
+ {
+-	struct kvm_vcpu *vcpu = NULL;
+-
+ 	u64 spsr = read_sysreg_el2(spsr);
+ 	u64 elr = read_sysreg_el2(elr);
+ 	u64 par = read_sysreg(par_el1);
+ 
+-	if (read_sysreg(vttbr_el2)) {
+-		vcpu = host_ctxt->__hyp_running_vcpu;
+-		__timer_disable_traps(vcpu);
+-		__deactivate_traps(vcpu);
+-		__deactivate_vm(vcpu);
+-		__sysreg_restore_host_state(host_ctxt);
+-	}
+-
+-	/* Call panic for real */
+-	__hyp_call_panic()(spsr, elr, par, vcpu);
++	if (!has_vhe())
++		__hyp_call_panic_nvhe(spsr, elr, par, host_ctxt);
++	else
++		__hyp_call_panic_vhe(spsr, elr, par, host_ctxt);
+ 
+ 	unreachable();
+ }
 -- 
 2.14.2
