@@ -1,7 +1,7 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v4 33/40] KVM: arm64: Configure c15, PMU, and debug register traps on cpu load/put for VHE
-Date: Thu, 15 Feb 2018 22:03:25 +0100
-Message-ID: <20180215210332.8648-34-christoffer.dall@linaro.org>
+Subject: [PATCH v4 17/40] KVM: arm64: Move userspace system registers into separate function
+Date: Thu, 15 Feb 2018 22:03:09 +0100
+Message-ID: <20180215210332.8648-18-christoffer.dall@linaro.org>
 References: <20180215210332.8648-1-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20180215210332.8648-1-christoffer.dall@linaro.org>
@@ -10,127 +10,156 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Andrew Jones <drjones@redhat.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Dave Martin <Dave.Martin@arm.com>, Julien Grall <julien.grall@arm.com>, Tomasz Nowicki <tn@semihalf.com>, Yury Norov <ynorov@caviumnetworks.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We do not have to change the c15 trap setting on each switch to/from the
-guest on VHE systems, because this setting only affects EL0.
+There's a semantic difference between the EL1 registers that control
+operation of a kernel running in EL1 and EL1 registers that only control
+userspace execution in EL0.  Since we can defer saving/restoring the
+latter, move them into their own function.
 
-The PMU and debug trap configuration can also be done on vcpu load/put
-instead, because they don't affect how the host kernel can access the
-debug registers while executing KVM kernel code.
+ACTLR_EL1 is not used by a VHE host, so we can move this register into
+the EL1 state which is not saved/restored for a VHE host.
 
+We also take this chance to rename the function saving/restoring the
+remaining system register to make it clear this function deals with
+the EL1 system registers.
+
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/include/asm/kvm_hyp.h |  3 +++
- arch/arm64/kvm/hyp/switch.c      | 31 ++++++++++++++++++++++---------
- arch/arm64/kvm/hyp/sysreg-sr.c   |  4 ++++
- 3 files changed, 29 insertions(+), 9 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index 2b1fda90dde4..949f2e77ae58 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -147,6 +147,9 @@ void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
- void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
- bool __fpsimd_enabled(void);
- 
-+void activate_traps_vhe_load(struct kvm_vcpu *vcpu);
-+void deactivate_traps_vhe_put(void);
-+
- u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
- void __noreturn __hyp_do_panic(unsigned long, ...);
- 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 9c40e203bd09..5e94955b89ea 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -101,6 +101,8 @@ static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
- {
- 	u64 val;
- 
-+	__activate_traps_common(vcpu);
-+
- 	val = CPTR_EL2_DEFAULT;
- 	val |= CPTR_EL2_TTA | CPTR_EL2_TFP | CPTR_EL2_TZ;
- 	write_sysreg(val, cptr_el2);
-@@ -120,20 +122,12 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
- 		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
- 
- 	__activate_traps_fpsimd32(vcpu);
--	__activate_traps_common(vcpu);
- 	__activate_traps_arch()(vcpu);
- }
- 
- static void __hyp_text __deactivate_traps_vhe(void)
- {
- 	extern char vectors[];	/* kernel exception vectors */
--	u64 mdcr_el2 = read_sysreg(mdcr_el2);
--
--	mdcr_el2 &= MDCR_EL2_HPMN_MASK |
--		    MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT |
--		    MDCR_EL2_TPMS;
--
--	write_sysreg(mdcr_el2, mdcr_el2);
- 	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
- 	write_sysreg(CPACR_EL1_DEFAULT, cpacr_el1);
- 	write_sysreg(vectors, vbar_el1);
-@@ -143,6 +137,8 @@ static void __hyp_text __deactivate_traps_nvhe(void)
- {
- 	u64 mdcr_el2 = read_sysreg(mdcr_el2);
- 
-+	__deactivate_traps_common();
-+
- 	mdcr_el2 &= MDCR_EL2_HPMN_MASK;
- 	mdcr_el2 |= MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT;
- 
-@@ -166,10 +162,27 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
- 	if (vcpu->arch.hcr_el2 & HCR_VSE)
- 		vcpu->arch.hcr_el2 = read_sysreg(hcr_el2);
- 
--	__deactivate_traps_common();
- 	__deactivate_traps_arch()();
- }
- 
-+void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
-+{
-+	__activate_traps_common(vcpu);
-+}
-+
-+void deactivate_traps_vhe_put(void)
-+{
-+	u64 mdcr_el2 = read_sysreg(mdcr_el2);
-+
-+	mdcr_el2 &= MDCR_EL2_HPMN_MASK |
-+		    MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT |
-+		    MDCR_EL2_TPMS;
-+
-+	write_sysreg(mdcr_el2, mdcr_el2);
-+
-+	__deactivate_traps_common();
-+}
-+
- static void __hyp_text __activate_vm(struct kvm *kvm)
- {
- 	write_sysreg(kvm->arch.vttbr, vttbr_el2);
+Notes:
+    Changes since v3:
+     - Correct the comment about ACTLR_EL1 and adjust commit text.
+    
+    Changes since v2:
+     - Save restore ACTLR_EL1 as part of the EL1 registers state instead of
+       the user register state, as ACTLR_EL1 can't affect the host's execution
+       on VHE systems.
+    
+    Changes since v1:
+     - Added comment about sp_el0 to common save sysreg save/restore functions
+
+ arch/arm64/kvm/hyp/sysreg-sr.c | 48 ++++++++++++++++++++++++++++++------------
+ 1 file changed, 35 insertions(+), 13 deletions(-)
+
 diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-index aacba4636871..b3894df6bf1a 100644
+index 99fc60516103..d5a5145b4e7c 100644
 --- a/arch/arm64/kvm/hyp/sysreg-sr.c
 +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-@@ -254,6 +254,8 @@ void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu)
- 	__sysreg_restore_el1_state(guest_ctxt);
+@@ -28,24 +28,33 @@ static void __hyp_text __sysreg_do_nothing(struct kvm_cpu_context *ctxt) { }
+ /*
+  * Non-VHE: Both host and guest must save everything.
+  *
+- * VHE: Host must save tpidr*_el0, actlr_el1, mdscr_el1, sp_el0,
++ * VHE: Host must save tpidr*_el0, mdscr_el1, sp_el0,
+  * and guest must save everything.
+  */
  
- 	vcpu->arch.sysregs_loaded_on_cpu = true;
+ static void __hyp_text __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
+ {
+-	ctxt->sys_regs[ACTLR_EL1]	= read_sysreg(actlr_el1);
+-	ctxt->sys_regs[TPIDR_EL0]	= read_sysreg(tpidr_el0);
+-	ctxt->sys_regs[TPIDRRO_EL0]	= read_sysreg(tpidrro_el0);
+ 	ctxt->sys_regs[MDSCR_EL1]	= read_sysreg(mdscr_el1);
 +
-+	activate_traps_vhe_load(vcpu);
++	/*
++	 * The host arm64 Linux uses sp_el0 to point to 'current' and it must
++	 * therefore be saved/restored on every entry/exit to/from the guest.
++	 */
+ 	ctxt->gp_regs.regs.sp		= read_sysreg(sp_el0);
  }
  
- /**
-@@ -275,6 +277,8 @@ void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu)
- 	if (!has_vhe())
- 		return;
- 
-+	deactivate_traps_vhe_put();
+-static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
++static void __hyp_text __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
++{
++	ctxt->sys_regs[TPIDR_EL0]	= read_sysreg(tpidr_el0);
++	ctxt->sys_regs[TPIDRRO_EL0]	= read_sysreg(tpidrro_el0);
++}
 +
- 	__sysreg_save_el1_state(guest_ctxt);
- 	__sysreg_save_user_state(guest_ctxt);
- 	__sysreg32_save_state(vcpu);
++static void __hyp_text __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+ {
+ 	ctxt->sys_regs[MPIDR_EL1]	= read_sysreg(vmpidr_el2);
+ 	ctxt->sys_regs[CSSELR_EL1]	= read_sysreg(csselr_el1);
+ 	ctxt->sys_regs[SCTLR_EL1]	= read_sysreg_el1(sctlr);
++	ctxt->sys_regs[ACTLR_EL1]	= read_sysreg(actlr_el1);
+ 	ctxt->sys_regs[CPACR_EL1]	= read_sysreg_el1(cpacr);
+ 	ctxt->sys_regs[TTBR0_EL1]	= read_sysreg_el1(ttbr0);
+ 	ctxt->sys_regs[TTBR1_EL1]	= read_sysreg_el1(ttbr1);
+@@ -73,35 +82,46 @@ static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
+ }
+ 
+ static hyp_alternate_select(__sysreg_call_save_host_state,
+-			    __sysreg_save_state, __sysreg_do_nothing,
++			    __sysreg_save_el1_state, __sysreg_do_nothing,
+ 			    ARM64_HAS_VIRT_HOST_EXTN);
+ 
+ void __hyp_text __sysreg_save_host_state(struct kvm_cpu_context *ctxt)
+ {
+ 	__sysreg_call_save_host_state()(ctxt);
+ 	__sysreg_save_common_state(ctxt);
++	__sysreg_save_user_state(ctxt);
+ }
+ 
+ void __hyp_text __sysreg_save_guest_state(struct kvm_cpu_context *ctxt)
+ {
+-	__sysreg_save_state(ctxt);
++	__sysreg_save_el1_state(ctxt);
+ 	__sysreg_save_common_state(ctxt);
++	__sysreg_save_user_state(ctxt);
+ }
+ 
+ static void __hyp_text __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
+ {
+-	write_sysreg(ctxt->sys_regs[ACTLR_EL1],	  actlr_el1);
+-	write_sysreg(ctxt->sys_regs[TPIDR_EL0],	  tpidr_el0);
+-	write_sysreg(ctxt->sys_regs[TPIDRRO_EL0], tpidrro_el0);
+ 	write_sysreg(ctxt->sys_regs[MDSCR_EL1],	  mdscr_el1);
++
++	/*
++	 * The host arm64 Linux uses sp_el0 to point to 'current' and it must
++	 * therefore be saved/restored on every entry/exit to/from the guest.
++	 */
+ 	write_sysreg(ctxt->gp_regs.regs.sp,	  sp_el0);
+ }
+ 
+-static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
++static void __hyp_text __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
++{
++	write_sysreg(ctxt->sys_regs[TPIDR_EL0],	  	tpidr_el0);
++	write_sysreg(ctxt->sys_regs[TPIDRRO_EL0], 	tpidrro_el0);
++}
++
++static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+ {
+ 	write_sysreg(ctxt->sys_regs[MPIDR_EL1],		vmpidr_el2);
+ 	write_sysreg(ctxt->sys_regs[CSSELR_EL1],	csselr_el1);
+ 	write_sysreg_el1(ctxt->sys_regs[SCTLR_EL1],	sctlr);
++	write_sysreg(ctxt->sys_regs[ACTLR_EL1],	  	actlr_el1);
+ 	write_sysreg_el1(ctxt->sys_regs[CPACR_EL1],	cpacr);
+ 	write_sysreg_el1(ctxt->sys_regs[TTBR0_EL1],	ttbr0);
+ 	write_sysreg_el1(ctxt->sys_regs[TTBR1_EL1],	ttbr1);
+@@ -129,19 +149,21 @@ static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
+ }
+ 
+ static hyp_alternate_select(__sysreg_call_restore_host_state,
+-			    __sysreg_restore_state, __sysreg_do_nothing,
++			    __sysreg_restore_el1_state, __sysreg_do_nothing,
+ 			    ARM64_HAS_VIRT_HOST_EXTN);
+ 
+ void __hyp_text __sysreg_restore_host_state(struct kvm_cpu_context *ctxt)
+ {
+ 	__sysreg_call_restore_host_state()(ctxt);
+ 	__sysreg_restore_common_state(ctxt);
++	__sysreg_restore_user_state(ctxt);
+ }
+ 
+ void __hyp_text __sysreg_restore_guest_state(struct kvm_cpu_context *ctxt)
+ {
+-	__sysreg_restore_state(ctxt);
++	__sysreg_restore_el1_state(ctxt);
+ 	__sysreg_restore_common_state(ctxt);
++	__sysreg_restore_user_state(ctxt);
+ }
+ 
+ void __hyp_text __sysreg32_save_state(struct kvm_vcpu *vcpu)
 -- 
 2.14.2
