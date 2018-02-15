@@ -1,173 +1,96 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 14/19] KVM: arm/arm64: Move HYP IO VAs to the "idmap"
- range
-Date: Thu, 15 Feb 2018 13:52:05 +0000
-Message-ID: <1015096b-f9e5-9389-a2d9-1bc511e27f6b@arm.com>
+Subject: Re: [PATCH v4 17/19] arm64: KVM: Dynamically compute the HYP VA mask
+Date: Thu, 15 Feb 2018 13:58:11 +0000
+Message-ID: <5fcb0d2f-30e7-2163-bfeb-beceb069ff8b@arm.com>
 References: <20180104184334.16571-1-marc.zyngier@arm.com>
- <20180104184334.16571-15-marc.zyngier@arm.com> <20180118143953.GB21802@cbox>
+ <20180104184334.16571-18-marc.zyngier@arm.com> <20180118202816.GE21802@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20180118143953.GB21802@cbox>
+In-Reply-To: <20180118202816.GE21802@cbox>
 Content-Language: en-GB
 Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>, Steve Capper <steve.capper@arm.com>, Peter Maydell <peter.maydell@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 18/01/18 14:39, Christoffer Dall wrote:
-> On Thu, Jan 04, 2018 at 06:43:29PM +0000, Marc Zyngier wrote:
->> We so far mapped our HYP IO (which is essencially the GICv2 control
->> registers) using the same method as for memory. It recently appeared
->> that is a bit unsafe:
+On 18/01/18 20:28, Christoffer Dall wrote:
+> On Thu, Jan 04, 2018 at 06:43:32PM +0000, Marc Zyngier wrote:
+>> As we're moving towards a much more dynamic way to compute our
+>> HYP VA, let's express the mask in a slightly different way.
 >>
->> We compute the HYP VA using the kern_hyp_va helper, but that helper
->> is only designed to deal with kernel VAs coming from the linear map,
->> and not from the vmalloc region... This could in turn cause some bad
->> aliasing between the two, amplified by the upcoming VA randomisation.
+>> Instead of comparing the idmap position to the "low" VA mask,
+>> we directly compute the mask by taking into account the idmap's
+>> (VA_BIT-1) bit.
 >>
->> A solution is to come up with our very own basic VA allocator for
->> MMIO. Since half of the HYP address space only contains a single
->> page (the idmap), we have plenty to borrow from. Let's use the idmap
->> as a base, and allocate downwards from it. GICv2 now lives on the
->> other side of the great VA barrier.
+>> No functionnal change.
 >>
 >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 >> ---
->>  virt/kvm/arm/mmu.c | 56 +++++++++++++++++++++++++++++++++++++++++-------------
->>  1 file changed, 43 insertions(+), 13 deletions(-)
+>>  arch/arm64/kvm/va_layout.c | 17 ++++++-----------
+>>  1 file changed, 6 insertions(+), 11 deletions(-)
 >>
->> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->> index 6192d45d1e1a..14c5e5534f2f 100644
->> --- a/virt/kvm/arm/mmu.c
->> +++ b/virt/kvm/arm/mmu.c
->> @@ -43,6 +43,9 @@ static unsigned long hyp_idmap_start;
->>  static unsigned long hyp_idmap_end;
->>  static phys_addr_t hyp_idmap_vector;
+>> diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
+>> index aee758574e61..75bb1c6772b0 100644
+>> --- a/arch/arm64/kvm/va_layout.c
+>> +++ b/arch/arm64/kvm/va_layout.c
+>> @@ -21,24 +21,19 @@
+>>  #include <asm/insn.h>
+>>  #include <asm/kvm_mmu.h>
 >>  
->> +static DEFINE_MUTEX(io_map_lock);
->> +static unsigned long io_map_base;
->> +
->>  #define S2_PGD_SIZE	(PTRS_PER_S2_PGD * sizeof(pgd_t))
->>  #define hyp_pgd_order get_order(PTRS_PER_PGD * sizeof(pgd_t))
+>> -#define HYP_PAGE_OFFSET_HIGH_MASK	((UL(1) << VA_BITS) - 1)
+>> -#define HYP_PAGE_OFFSET_LOW_MASK	((UL(1) << (VA_BITS - 1)) - 1)
+>> -
+>>  static u64 va_mask;
 >>  
->> @@ -502,27 +505,31 @@ static void unmap_hyp_range(pgd_t *pgdp, phys_addr_t start, u64 size)
->>   *
->>   * Assumes hyp_pgd is a page table used strictly in Hyp-mode and
->>   * therefore contains either mappings in the kernel memory area (above
->> - * PAGE_OFFSET), or device mappings in the vmalloc range (from
->> - * VMALLOC_START to VMALLOC_END).
->> + * PAGE_OFFSET), or device mappings in the idmap range.
->>   *
->> - * boot_hyp_pgd should only map two pages for the init code.
->> + * boot_hyp_pgd should only map the idmap range, and is only used in
->> + * the extended idmap case.
->>   */
->>  void free_hyp_pgds(void)
+>>  static void compute_layout(void)
 >>  {
->> +	pgd_t *id_pgd;
->> +
->>  	mutex_lock(&kvm_hyp_pgd_mutex);
->>  
->> +	id_pgd = boot_hyp_pgd ? boot_hyp_pgd : hyp_pgd;
->> +
->> +	if (id_pgd)
->> +		unmap_hyp_range(id_pgd, io_map_base,
->> +				hyp_idmap_start + PAGE_SIZE - io_map_base);
->> +
->>  	if (boot_hyp_pgd) {
->> -		unmap_hyp_range(boot_hyp_pgd, hyp_idmap_start, PAGE_SIZE);
->>  		free_pages((unsigned long)boot_hyp_pgd, hyp_pgd_order);
->>  		boot_hyp_pgd = NULL;
->>  	}
->>  
->>  	if (hyp_pgd) {
->> -		unmap_hyp_range(hyp_pgd, hyp_idmap_start, PAGE_SIZE);
->>  		unmap_hyp_range(hyp_pgd, kern_hyp_va(PAGE_OFFSET),
->>  				(uintptr_t)high_memory - PAGE_OFFSET);
->> -		unmap_hyp_range(hyp_pgd, kern_hyp_va(VMALLOC_START),
->> -				VMALLOC_END - VMALLOC_START);
->>  
->>  		free_pages((unsigned long)hyp_pgd, hyp_pgd_order);
->>  		hyp_pgd = NULL;
->> @@ -721,7 +728,8 @@ int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
->>  			   void __iomem **kaddr,
->>  			   void __iomem **haddr)
->>  {
->> -	unsigned long start, end;
->> +	pgd_t *pgd = hyp_pgd;
->> +	unsigned long base;
->>  	int ret;
->>  
->>  	*kaddr = ioremap(phys_addr, size);
->> @@ -733,17 +741,38 @@ int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
->>  		return 0;
->>  	}
->>  
->> +	mutex_lock(&io_map_lock);
->> +
->> +	base = io_map_base - size;
+>>  	phys_addr_t idmap_addr = __pa_symbol(__hyp_idmap_text_start);
+>> -	unsigned long mask = HYP_PAGE_OFFSET_HIGH_MASK;
+>> +	u64 region;
 > 
-> are we guaranteed that hyp_idmap_start (and therefore io_map_base) is
-> sufficiently greater than 0 ?  I suppose that even if RAM starts at 0,
-> and the kernel was loaded at 0, the idmap page for Hyp would be at some
-> reasonable offset from the start of the kernel image?
-
-On my kernel image:
-ffff000008080000 t _head
-ffff000008cc6000 T __hyp_idmap_text_start
-ffff000009aaa000 B swapper_pg_end
-
-_hyp_idmap_text_start is about 12MB from the beginning of the image, and
-about 14MB from the end. Yes, it is a big kernel. But we're only mapping
-a few pages there, even with my upcoming crazy vector remapping crap. So
-the likeliness of this failing is close to zero.
-
-Now, close to zero is not necessarily close enough. What I could do is
-to switch the allocator around on failure, so that if we can't allocate
-on one side, we can at least try to allocate on the other side. I'm
-pretty sure we'll never trigger that code, but I can implement it if you
-think that's worth it.
-
-> 
->> +	base &= ~(size - 1);
-> 
-> I'm not sure I understand this line.  Wouldn't it make more sense to use
-> PAGE_SIZE here?
-
-This is trying to align the base of the allocation to its natural size
-(8kB aligned on an 8kB boundary, for example), which is what other
-allocators in the kernel do. I've now added a roundup_pow_of_two(size)
-so that we're guaranteed to deal with those.
-
+> the naming here really confused me.  Would it make sense to call this
+> 'hyp_va_msb' or something like that instead?
 > 
 >>  
->> -	start = kern_hyp_va((unsigned long)*kaddr);
->> -	end = kern_hyp_va((unsigned long)*kaddr + size);
->> -	ret = __create_hyp_mappings(hyp_pgd, start, end,
->> +	/*
->> +	 * Verify that BIT(VA_BITS - 1) hasn't been flipped by
->> +	 * allocating the new area, as it would indicate we've
->> +	 * overflowed the idmap/IO address range.
->> +	 */
->> +	if ((base ^ io_map_base) & BIT(VA_BITS - 1)) {
->> +		ret = -ENOMEM;
->> +		goto out;
->> +	}
->> +
->> +	if (__kvm_cpu_uses_extended_idmap())
->> +		pgd = boot_hyp_pgd;
->> +
+>> -	/*
+>> -	 * Activate the lower HYP offset only if the idmap doesn't
+>> -	 * clash with it,
+>> -	 */
+>> -	if (idmap_addr > HYP_PAGE_OFFSET_LOW_MASK)
+>> -		mask = HYP_PAGE_OFFSET_HIGH_MASK;
 > 
-> I don't understand why you can change the pgd used for mappings here,
-> perhaps a patch splitting issue?
+> Ah, the series was tested, it was just that this code only existed for a
+> short while.  Amusingly, I think this ephemeral bug goes against the "No
+> function change" statement in the commit message.
+> 
+>> +	/* Where is my RAM region? */
+>> +	region  = idmap_addr & BIT(VA_BITS - 1);
+>> +	region ^= BIT(VA_BITS - 1);
+>>  
+>> -	va_mask = mask;
+>> +	va_mask  = BIT(VA_BITS - 1) - 1;
+> 
+> nit: This could also be written as GENMASK_ULL(VA_BITS - 2, 0) --- and
+> now I'm not sure which one I prefer.
 
-No, that's absolutely required. If you use an extended idmap, you cannot
-reach the idmap from the main PGD. You can only reach it either from the
-merged_hyp_pgd (which is not usable because it has an extra level), or
-from the idmap_pgd itself. See for example how kvm_map_idmap_text() is
-used at boot time.
+Good point. I think GENMASK makes it clearer what the intent is, and
+assigning a mask to a mask has certain degree of consistency (/me fondly
+remembers dimensional analysis...).
+
+> 
+>> +	va_mask |= region;
+>>  }
+>>  
+>>  static u32 compute_instruction(int n, u32 rd, u32 rn)
+>> -- 
+>> 2.14.2
+>>
+> Otherwise looks good:
+> 
+> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+> 
 
 Thanks,
 
