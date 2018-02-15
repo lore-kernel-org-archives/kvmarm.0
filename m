@@ -1,7 +1,7 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v4 30/40] KVM: arm64: Defer saving/restoring 32-bit sysregs to vcpu load/put
-Date: Thu, 15 Feb 2018 22:03:22 +0100
-Message-ID: <20180215210332.8648-31-christoffer.dall@linaro.org>
+Subject: [PATCH v4 34/40] KVM: arm64: Cleanup __activate_traps and __deactive_traps for VHE and non-VHE
+Date: Thu, 15 Feb 2018 22:03:26 +0100
+Message-ID: <20180215210332.8648-35-christoffer.dall@linaro.org>
 References: <20180215210332.8648-1-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20180215210332.8648-1-christoffer.dall@linaro.org>
@@ -10,138 +10,101 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Andrew Jones <drjones@redhat.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Dave Martin <Dave.Martin@arm.com>, Julien Grall <julien.grall@arm.com>, Tomasz Nowicki <tn@semihalf.com>, Yury Norov <ynorov@caviumnetworks.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When running a 32-bit VM (EL1 in AArch32), the AArch32 system registers
-can be deferred to vcpu load/put on VHE systems because neither
-the host kernel nor host userspace uses these registers.
-
-Note that we can not defer saving DBGVCR32_EL2 conditionally based
-on the state of the debug dirty flag on VHE, but since we do the
-load/put pretty rarely, this comes out as a win anyway.
-
-We can also not defer saving FPEXC32_32 because this register only holds
-a guest-valid value for 32-bit guests during the exit path when the
-guest has used FPSIMD registers and restored the register in the early
-assembly handler from taking the EL2 fault, and therefore we have to
-check if fpsimd is enabled for the guest in the exit path and save the
-register then, for both VHE and non-VHE guests.
+To make the code more readable and to avoid the overhead of a function
+call, let's get rid of a pair of the alternative function selectors and
+explicitly call the VHE and non-VHE functions using the has_vhe() static
+key based selector instead, telling the compiler to try to inline the
+static function if it can.
 
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
-
-Notes:
-    Changes since v3:
-     - Rework the FPEXC32 save/restore logic to no longer attempt to
-       save/restore this register lazily.
-    
-    Changes since v2:
-     - New patch (deferred register handling has been reworked)
-
- arch/arm64/kvm/hyp/switch.c    | 17 +++++++++++------
- arch/arm64/kvm/hyp/sysreg-sr.c | 15 ++++++++++-----
- 2 files changed, 21 insertions(+), 11 deletions(-)
+ arch/arm64/kvm/hyp/switch.c | 30 ++++++++++++++----------------
+ 1 file changed, 14 insertions(+), 16 deletions(-)
 
 diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 22e77deb8e2e..909aa3fe9196 100644
+index 5e94955b89ea..0e54fe2aab1c 100644
 --- a/arch/arm64/kvm/hyp/switch.c
 +++ b/arch/arm64/kvm/hyp/switch.c
-@@ -47,6 +47,15 @@ bool __hyp_text __fpsimd_enabled(void)
- 	return __fpsimd_is_enabled()();
+@@ -85,7 +85,7 @@ static void __hyp_text __deactivate_traps_common(void)
+ 	write_sysreg(0, pmuserenr_el0);
  }
  
-+/* Save the 32-bit only FPSIMD system register state */
-+static inline void __hyp_text __fpsimd_save_fpexc32(struct kvm_vcpu *vcpu)
-+{
-+	if (!vcpu_el1_is_32bit(vcpu))
-+		return;
-+
-+	vcpu->arch.ctxt.sys_regs[FPEXC32_EL2] = read_sysreg(fpexc32_el2);
-+}
-+
- static void __hyp_text __activate_traps_vhe(void)
+-static void __hyp_text __activate_traps_vhe(struct kvm_vcpu *vcpu)
++static inline void activate_traps_vhe(struct kvm_vcpu *vcpu)
  {
  	u64 val;
-@@ -380,11 +389,6 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
  
- 	__vgic_restore_state(vcpu);
+@@ -97,7 +97,7 @@ static void __hyp_text __activate_traps_vhe(struct kvm_vcpu *vcpu)
+ 	write_sysreg(kvm_get_hyp_vector(), vbar_el1);
+ }
  
--	/*
--	 * We must restore the 32-bit state before the sysregs, thanks
--	 * to erratum #852523 (Cortex-A57) or #853709 (Cortex-A72).
--	 */
--	__sysreg32_restore_state(vcpu);
- 	sysreg_restore_guest_state_vhe(guest_ctxt);
- 	__debug_switch_to_guest(vcpu);
+-static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
++static inline void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
+ {
+ 	u64 val;
  
-@@ -398,7 +402,6 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 	fp_enabled = __fpsimd_enabled();
+@@ -108,11 +108,7 @@ static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
+ 	write_sysreg(val, cptr_el2);
+ }
  
- 	sysreg_save_guest_state_vhe(guest_ctxt);
--	__sysreg32_save_state(vcpu);
- 	__vgic_save_state(vcpu);
- 
- 	__deactivate_traps(vcpu);
-@@ -408,6 +411,7 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 	if (fp_enabled) {
- 		__fpsimd_save_state(&guest_ctxt->gp_regs.fp_regs);
- 		__fpsimd_restore_state(&host_ctxt->gp_regs.fp_regs);
-+		__fpsimd_save_fpexc32(vcpu);
- 	}
- 
- 	__debug_switch_to_host(vcpu);
-@@ -475,6 +479,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- 	if (fp_enabled) {
- 		__fpsimd_save_state(&guest_ctxt->gp_regs.fp_regs);
- 		__fpsimd_restore_state(&host_ctxt->gp_regs.fp_regs);
-+		__fpsimd_save_fpexc32(vcpu);
- 	}
- 
- 	/*
-diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-index 9c60b8062724..aacba4636871 100644
---- a/arch/arm64/kvm/hyp/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-@@ -196,10 +196,7 @@ void __hyp_text __sysreg32_save_state(struct kvm_vcpu *vcpu)
- 	sysreg[DACR32_EL2] = read_sysreg(dacr32_el2);
- 	sysreg[IFSR32_EL2] = read_sysreg(ifsr32_el2);
- 
--	if (__fpsimd_enabled())
--		sysreg[FPEXC32_EL2] = read_sysreg(fpexc32_el2);
+-static hyp_alternate_select(__activate_traps_arch,
+-			    __activate_traps_nvhe, __activate_traps_vhe,
+-			    ARM64_HAS_VIRT_HOST_EXTN);
 -
--	if (vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY)
-+	if (has_vhe() || vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY)
- 		sysreg[DBGVCR32_EL2] = read_sysreg(dbgvcr32_el2);
+-static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
++static inline void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+ {
+ 	u64 hcr = vcpu->arch.hcr_el2;
+ 
+@@ -122,10 +118,13 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+ 		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
+ 
+ 	__activate_traps_fpsimd32(vcpu);
+-	__activate_traps_arch()(vcpu);
++	if (has_vhe())
++		activate_traps_vhe(vcpu);
++	else
++		__activate_traps_nvhe(vcpu);
  }
  
-@@ -221,7 +218,7 @@ void __hyp_text __sysreg32_restore_state(struct kvm_vcpu *vcpu)
- 	write_sysreg(sysreg[DACR32_EL2], dacr32_el2);
- 	write_sysreg(sysreg[IFSR32_EL2], ifsr32_el2);
- 
--	if (vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY)
-+	if (has_vhe() || vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY)
- 		write_sysreg(sysreg[DBGVCR32_EL2], dbgvcr32_el2);
+-static void __hyp_text __deactivate_traps_vhe(void)
++static inline void deactivate_traps_vhe(void)
+ {
+ 	extern char vectors[];	/* kernel exception vectors */
+ 	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
+@@ -133,7 +132,7 @@ static void __hyp_text __deactivate_traps_vhe(void)
+ 	write_sysreg(vectors, vbar_el1);
  }
  
-@@ -246,6 +243,13 @@ void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu)
+-static void __hyp_text __deactivate_traps_nvhe(void)
++static inline void __hyp_text __deactivate_traps_nvhe(void)
+ {
+ 	u64 mdcr_el2 = read_sysreg(mdcr_el2);
  
- 	__sysreg_save_user_state(host_ctxt);
+@@ -147,11 +146,7 @@ static void __hyp_text __deactivate_traps_nvhe(void)
+ 	write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
+ }
  
-+	/*
-+	 * Load guest EL1 and user state
-+	 *
-+	 * We must restore the 32-bit state before the sysregs, thanks
-+	 * to erratum #852523 (Cortex-A57) or #853709 (Cortex-A72).
-+	 */
-+	__sysreg32_restore_state(vcpu);
- 	__sysreg_restore_user_state(guest_ctxt);
- 	__sysreg_restore_el1_state(guest_ctxt);
+-static hyp_alternate_select(__deactivate_traps_arch,
+-			    __deactivate_traps_nvhe, __deactivate_traps_vhe,
+-			    ARM64_HAS_VIRT_HOST_EXTN);
+-
+-static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
++static inline void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
+ {
+ 	/*
+ 	 * If we pended a virtual abort, preserve it until it gets
+@@ -162,7 +157,10 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
+ 	if (vcpu->arch.hcr_el2 & HCR_VSE)
+ 		vcpu->arch.hcr_el2 = read_sysreg(hcr_el2);
  
-@@ -273,6 +277,7 @@ void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu)
+-	__deactivate_traps_arch()();
++	if (has_vhe())
++		deactivate_traps_vhe();
++	else
++		__deactivate_traps_nvhe();
+ }
  
- 	__sysreg_save_el1_state(guest_ctxt);
- 	__sysreg_save_user_state(guest_ctxt);
-+	__sysreg32_save_state(vcpu);
- 
- 	/* Restore host user state */
- 	__sysreg_restore_user_state(host_ctxt);
+ void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
 -- 
 2.14.2
