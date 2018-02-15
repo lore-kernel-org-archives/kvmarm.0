@@ -1,139 +1,63 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 10/19] KVM: arm/arm64: Do not use kern_hyp_va() with
- kvm_vgic_global_state
-Date: Thu, 15 Feb 2018 13:22:56 +0000
-Message-ID: <af5ddd03-ddaa-0fe9-51ec-4946b5adfe1c@arm.com>
-References: <20180104184334.16571-1-marc.zyngier@arm.com>
- <20180104184334.16571-11-marc.zyngier@arm.com> <20180115153632.GK21403@cbox>
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Subject: Re: [PATCH 4/4] vfio: Allow type-1 IOMMU instantiation with a
+ virtio-iommu
+Date: Thu, 15 Feb 2018 13:53:20 +0000
+Message-ID: <7cd2a302-b3ba-8c77-c721-d54938f2568a@arm.com>
+References: <20180214145340.1223-1-jean-philippe.brucker@arm.com>
+ <20180214145340.1223-5-jean-philippe.brucker@arm.com>
+ <20180214082639.54556efb@w520.home>
+ <9f98aa85-3160-e285-cacd-2f429c58a775@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20180115153632.GK21403@cbox>
-Content-Language: en-GB
+Content-Disposition: inline
+In-Reply-To: <9f98aa85-3160-e285-cacd-2f429c58a775@arm.com>
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>, Steve Capper <steve.capper@arm.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Robin Murphy <Robin.Murphy@arm.com>, Alex Williamson <alex.williamson@redhat.com>
+Cc: "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "joro@8bytes.org" <joro@8bytes.org>, "mst@redhat.com" <mst@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>, Marc Zyngier <Marc.Zyngier@arm.com>, Will Deacon <Will.Deacon@arm.com>, Lorenzo Pieralisi <Lorenzo.Pieralisi@arm.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peterx@redhat.com" <peterx@redhat.com>, "bharat.bhushan@nxp.com" <bharat.bhushan@nxp.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 15/01/18 15:36, Christoffer Dall wrote:
-> On Thu, Jan 04, 2018 at 06:43:25PM +0000, Marc Zyngier wrote:
->> kvm_vgic_global_state is part of the read-only section, and is
->> usually accessed using a PC-relative address generation (adrp + add).
+On 14/02/18 15:35, Robin Murphy wrote:
+> On 14/02/18 15:26, Alex Williamson wrote:
+>> On Wed, 14 Feb 2018 14:53:40 +0000
+>> Jean-Philippe Brucker <jean-philippe.brucker@arm.com> wrote:
 >>
->> It is thus useless to use kern_hyp_va() on it, and actively problematic
->> if kern_hyp_va() becomes non-idempotent. On the other hand, there is
->> no way that the compiler is going to guarantee that such access is
->> always be PC relative.
-> 
-> nit: is always be
-> 
+>>> When enabling both VFIO and VIRTIO_IOMMU modules, automatically select
+>>> VFIO_IOMMU_TYPE1 as well.
+>>>
+>>> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+>>> ---
+>>>   drivers/vfio/Kconfig | 2 +-
+>>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig
+>>> index c84333eb5eb5..65a1e691110c 100644
+>>> --- a/drivers/vfio/Kconfig
+>>> +++ b/drivers/vfio/Kconfig
+>>> @@ -21,7 +21,7 @@ config VFIO_VIRQFD
+>>>   menuconfig VFIO
+>>>   	tristate "VFIO Non-Privileged userspace driver framework"
+>>>   	depends on IOMMU_API
+>>> -	select VFIO_IOMMU_TYPE1 if (X86 || S390 || ARM_SMMU || ARM_SMMU_V3)
+>>> +	select VFIO_IOMMU_TYPE1 if (X86 || S390 || ARM_SMMU || ARM_SMMU_V3 || VIRTIO_IOMMU)
+>>>   	select ANON_INODES
+>>>   	help
+>>>   	  VFIO provides a framework for secure userspace device drivers.
 >>
->> So let's bite the bullet and provide our own accessor.
->>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  arch/arm/include/asm/kvm_hyp.h   | 6 ++++++
->>  arch/arm64/include/asm/kvm_hyp.h | 9 +++++++++
->>  virt/kvm/arm/hyp/vgic-v2-sr.c    | 4 ++--
->>  3 files changed, 17 insertions(+), 2 deletions(-)
->>
->> diff --git a/arch/arm/include/asm/kvm_hyp.h b/arch/arm/include/asm/kvm_hyp.h
->> index ab20ffa8b9e7..1d42d0aa2feb 100644
->> --- a/arch/arm/include/asm/kvm_hyp.h
->> +++ b/arch/arm/include/asm/kvm_hyp.h
->> @@ -26,6 +26,12 @@
->>  
->>  #define __hyp_text __section(.hyp.text) notrace
->>  
->> +#define hyp_symbol_addr(s)						\
->> +	({								\
->> +		typeof(s) *addr = &(s);					\
->> +		addr;							\
->> +	})
->> +
->>  #define __ACCESS_VFP(CRn)			\
->>  	"mrc", "mcr", __stringify(p10, 7, %0, CRn, cr0, 0), u32
->>  
->> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
->> index 08d3bb66c8b7..a2d98c539023 100644
->> --- a/arch/arm64/include/asm/kvm_hyp.h
->> +++ b/arch/arm64/include/asm/kvm_hyp.h
->> @@ -25,6 +25,15 @@
->>  
->>  #define __hyp_text __section(.hyp.text) notrace
->>  
->> +#define hyp_symbol_addr(s)						\
->> +	({								\
->> +		typeof(s) *addr;					\
->> +		asm volatile("adrp	%0, %1\n"			\
->> +			     "add	%0, %0, :lo12:%1\n"		\
->> +			     : "=r" (addr) : "S" (&s));			\
+>> Why are we basing this on specific IOMMU drivers in the first place?
+>> Only ARM is doing that.  Shouldn't IOMMU_API only be enabled for ARM
+>> targets that support it and therefore we can forget about the specific
+>> IOMMU drivers?  Thanks,
 > 
-> Can't we use adr_l here?
+> Makes sense - the majority of ARM systems (and mobile/embedded ARM64 
+> ones) making use of IOMMU_API won't actually support VFIO, but it can't 
+> hurt to allow them to select the type 1 driver regardless. Especially as 
+> multiplatform configs are liable to be pulling in the SMMU driver(s) anyway.
 
-Unfortunately not. All the asm/assembler.h macros are unavailable to
-inline assembly. We could start introducing equivalent macros for that
-purpose, but that's starting to be outside of the scope of this series.
+Cool, then I'll change that line to:
 
-> 
->> +		addr;							\
->> +	})
->> +
-> 
-> I don't fully appreciate the semantics of this macro going by its name
-> only.  My understanding is that if you want to resolve a symbol to an
-> address which is mapped in hyp, then use this.  Is this correct?
-
-The goal of this macro is to return a symbol's address based on a
-PC-relative computation, as opposed to a loading the VA from a constant
-pool or something similar. This works well for HYP, as an absolute VA is
-guaranteed to be wrong.
-
-> 
-> If so, can we add a small comment (because I can't come up with a better
-> name).
-
-I'll add the above if that works for you.
-
-> 
-> 
->>  #define read_sysreg_elx(r,nvh,vh)					\
->>  	({								\
->>  		u64 reg;						\
->> diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
->> index d7fd46fe9efb..4573d0552af3 100644
->> --- a/virt/kvm/arm/hyp/vgic-v2-sr.c
->> +++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
->> @@ -25,7 +25,7 @@
->>  static void __hyp_text save_elrsr(struct kvm_vcpu *vcpu, void __iomem *base)
->>  {
->>  	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
->> -	int nr_lr = (kern_hyp_va(&kvm_vgic_global_state))->nr_lr;
->> +	int nr_lr = hyp_symbol_addr(kvm_vgic_global_state)->nr_lr;
->>  	u32 elrsr0, elrsr1;
->>  
->>  	elrsr0 = readl_relaxed(base + GICH_ELRSR0);
->> @@ -139,7 +139,7 @@ int __hyp_text __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
->>  		return -1;
->>  
->>  	rd = kvm_vcpu_dabt_get_rd(vcpu);
->> -	addr  = kern_hyp_va((kern_hyp_va(&kvm_vgic_global_state))->vcpu_base_va);
->> +	addr  = kern_hyp_va(hyp_symbol_addr(kvm_vgic_global_state)->vcpu_base_va);
->>  	addr += fault_ipa - vgic->vgic_cpu_base;
->>  
->>  	if (kvm_vcpu_dabt_iswrite(vcpu)) {
->> -- 
->> 2.14.2
->>
-> Otherwise looks good.
-> 
-> Thanks,
-> -Christoffer
-> 
++	select VFIO_IOMMU_TYPE1 if (X86 || S390 || ARM || ARM64)
 
 Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Jean
