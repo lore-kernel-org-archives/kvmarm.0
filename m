@@ -1,159 +1,368 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v4 14/19] KVM: arm/arm64: Move HYP IO VAs to the "idmap"
- range
-Date: Fri, 16 Feb 2018 10:25:43 +0100
-Message-ID: <20180216092543.GD10440@cbox>
+Subject: Re: [PATCH v4 18/19] arm64: KVM: Introduce EL2 VA randomisation
+Date: Fri, 16 Feb 2018 10:33:18 +0100
+Message-ID: <20180216093318.GE10440@cbox>
 References: <20180104184334.16571-1-marc.zyngier@arm.com>
- <20180104184334.16571-15-marc.zyngier@arm.com>
- <20180118143953.GB21802@cbox>
- <1015096b-f9e5-9389-a2d9-1bc511e27f6b@arm.com>
+ <20180104184334.16571-19-marc.zyngier@arm.com>
+ <20180118202824.GF21802@cbox>
+ <c695d034-8352-abc1-ecf7-e166085b531a@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1015096b-f9e5-9389-a2d9-1bc511e27f6b@arm.com>
+In-Reply-To: <c695d034-8352-abc1-ecf7-e166085b531a@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>, Steve Capper <steve.capper@arm.com>, Peter Maydell <peter.maydell@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Feb 15, 2018 at 01:52:05PM +0000, Marc Zyngier wrote:
-> On 18/01/18 14:39, Christoffer Dall wrote:
-> > On Thu, Jan 04, 2018 at 06:43:29PM +0000, Marc Zyngier wrote:
-> >> We so far mapped our HYP IO (which is essencially the GICv2 control
-> >> registers) using the same method as for memory. It recently appeared
-> >> that is a bit unsafe:
+On Thu, Feb 15, 2018 at 03:32:52PM +0000, Marc Zyngier wrote:
+> On 18/01/18 20:28, Christoffer Dall wrote:
+> > On Thu, Jan 04, 2018 at 06:43:33PM +0000, Marc Zyngier wrote:
+> >> The main idea behind randomising the EL2 VA is that we usually have
+> >> a few spare bits between the most significant bit of the VA mask
+> >> and the most significant bit of the linear mapping.
 > >>
-> >> We compute the HYP VA using the kern_hyp_va helper, but that helper
-> >> is only designed to deal with kernel VAs coming from the linear map,
-> >> and not from the vmalloc region... This could in turn cause some bad
-> >> aliasing between the two, amplified by the upcoming VA randomisation.
+> >> Those bits could be a bunch of zeroes, and could be useful
+> >> to move things around a bit. Of course, the more memory you have,
+> >> the less randomisation you get...
 > >>
-> >> A solution is to come up with our very own basic VA allocator for
-> >> MMIO. Since half of the HYP address space only contains a single
-> >> page (the idmap), we have plenty to borrow from. Let's use the idmap
-> >> as a base, and allocate downwards from it. GICv2 now lives on the
-> >> other side of the great VA barrier.
+> >> Alternatively, these bits could be the result of KASLR, in which
+> >> case they are already random. But it would be nice to have a
+> >> *different* randomization, just to make the job of a potential
+> >> attacker a bit more difficult.
+> >>
+> >> Inserting these random bits is a bit involved. We don't have a spare
+> >> register (short of rewriting all the kern_hyp_va call sites), and
+> >> the immediate we want to insert is too random to be used with the
+> >> ORR instruction. The best option I could come up with is the following
+> >> sequence:
+> >>
+> >> 	and x0, x0, #va_mask
+> > 
+> > So if I get this right, you want to insert an arbitrary random value
+> > without an extra register in bits [(VA_BITS-1):first_random_bit] and
+> > BIT(VA_BITS-1) is always set in the input because it's a kernel address.
+> 
+> Correct.
+> 
+> > 
+> >> 	ror x0, x0, #first_random_bit
+> > 
+> > Then you rotate so that the random bits become the LSBs and the random
+> > value should be inserted into bits [NR_RAND_BITS-1:0] in x0 ?
+> 
+> Correct again. The important thing to notice is that the bottom bits are
+> guaranteed to be zero, making sure that the subsequent adds act as ors.
+> 
+> > 
+> >> 	add x0, x0, #(random & 0xfff)
+> > 
+> > So you do this via two rounds, first the lower 12 bits
+> > 
+> >> 	add x0, x0, #(random >> 12), lsl #12
+> > 
+> > Then the upper 12 bits (permitting a maximum of 24 randomized bits)
+> 
+> Still correct. It is debatable whether allowing more than 12 bits is
+> really useful, as only platforms with very little memory will be able to
+> reach past 12 bits of entropy.
+> 
+> > 
+> >> 	ror x0, x0, #(63 - first_random_bit)
+> > 
+> > And then you rotate things back into their place.
+> > 
+> > Only, I don't understand why this isn't then (64 - first_random_bit) ?
+> 
+> That looks like a typo.
+> 
+> > 
+> >>
+> >> making it a fairly long sequence, but one that a decent CPU should
+> >> be able to execute without breaking a sweat. It is of course NOPed
+> >> out on VHE. The last 4 instructions can also be turned into NOPs
+> >> if it appears that there is no free bits to use.
 > >>
 > >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > >> ---
-> >>  virt/kvm/arm/mmu.c | 56 +++++++++++++++++++++++++++++++++++++++++-------------
-> >>  1 file changed, 43 insertions(+), 13 deletions(-)
+> >>  arch/arm64/include/asm/kvm_mmu.h | 10 +++++-
+> >>  arch/arm64/kvm/va_layout.c       | 68 +++++++++++++++++++++++++++++++++++++---
+> >>  virt/kvm/arm/mmu.c               |  2 +-
+> >>  3 files changed, 73 insertions(+), 7 deletions(-)
 > >>
+> >> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> >> index cc882e890bb1..4fca6ddadccc 100644
+> >> --- a/arch/arm64/include/asm/kvm_mmu.h
+> >> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> >> @@ -85,6 +85,10 @@
+> >>  .macro kern_hyp_va	reg
+> >>  alternative_cb kvm_update_va_mask
+> >>  	and     \reg, \reg, #1
+> >> +	ror	\reg, \reg, #1
+> >> +	add	\reg, \reg, #0
+> >> +	add	\reg, \reg, #0
+> >> +	ror	\reg, \reg, #63
+> >>  alternative_cb_end
+> >>  .endm
+> >>  
+> >> @@ -101,7 +105,11 @@ void kvm_update_va_mask(struct alt_instr *alt,
+> >>  
+> >>  static inline unsigned long __kern_hyp_va(unsigned long v)
+> >>  {
+> >> -	asm volatile(ALTERNATIVE_CB("and %0, %0, #1\n",
+> >> +	asm volatile(ALTERNATIVE_CB("and %0, %0, #1\n"
+> >> +				    "ror %0, %0, #1\n"
+> >> +				    "add %0, %0, #0\n"
+> >> +				    "add %0, %0, #0\n"
+> >> +				    "ror %0, %0, #63\n",
+> > 
+> > This now sort of serves as the documentation if you don't have the
+> > commit message, so I think you should annotate each line like the commit
+> > message does.
+> > 
+> > Alternative, since you're duplicating a bunch of code which will be
+> > replaced at runtime anyway, you could make all of these "and %0, %0, #1"
+> > and then copy the documentation assembly code as a comment to
+> > compute_instruction() and put a comment reference here.
+> 
+> I found that adding something that looks a bit like the generated code
+> helps a lot. I'll add some documentation there.
+> 
+
+The annotation in the commit message was quite nice.
+
+> > 
+> >>  				    kvm_update_va_mask)
+> >>  		     : "+r" (v));
+> >>  	return v;
+> >> diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
+> >> index 75bb1c6772b0..bf0d6bdf5f14 100644
+> >> --- a/arch/arm64/kvm/va_layout.c
+> >> +++ b/arch/arm64/kvm/va_layout.c
+> >> @@ -16,11 +16,15 @@
+> >>   */
+> >>  
+> >>  #include <linux/kvm_host.h>
+> >> +#include <linux/random.h>
+> >> +#include <linux/memblock.h>
+> >>  #include <asm/alternative.h>
+> >>  #include <asm/debug-monitors.h>
+> >>  #include <asm/insn.h>
+> >>  #include <asm/kvm_mmu.h>
+> >>  
+> > 
+> > It would be nice to have a comment on these, something like:
+> > 
+> > /* The LSB of the random hyp VA tag or 0 if no randomization is used. */
+> >> +static u8 tag_lsb;
+> > /* The random hyp VA tag value with the region bit, if hyp randomization is used */
+> >> +static u64 tag_val;
+> 
+> Sure.
+> 
+> > 
+> > 
+> >>  static u64 va_mask;
+> >>  
+> >>  static void compute_layout(void)
+> >> @@ -32,8 +36,31 @@ static void compute_layout(void)
+> >>  	region  = idmap_addr & BIT(VA_BITS - 1);
+> >>  	region ^= BIT(VA_BITS - 1);
+> >>  
+> >> -	va_mask  = BIT(VA_BITS - 1) - 1;
+> >> -	va_mask |= region;
+> >> +	tag_lsb = fls64((u64)phys_to_virt(memblock_start_of_DRAM()) ^
+> >> +			(u64)(high_memory - 1));
+> >> +
+> >> +	if (tag_lsb == (VA_BITS - 1)) {
+> >> +		/*
+> >> +		 * No space in the address, let's compute the mask so
+> >> +		 * that it covers (VA_BITS - 1) bits, and the region
+> >> +		 * bit. The tag is set to zero.
+> >> +		 */
+> >> +		tag_lsb = tag_val = 0;
+> > 
+> > tag_val should already be 0, right?
+> > 
+> > and wouldn't it be slightly nicer to have a temporary variable and only
+> > set tag_lsb when needed, called something like linear_bits ?
+> 
+> OK.
+> 
+> > 
+> >> +		va_mask  = BIT(VA_BITS - 1) - 1;
+> >> +		va_mask |= region;
+> >> +	} else {
+> >> +		/*
+> >> +		 * We do have some free bits. Let's have the mask to
+> >> +		 * cover the low bits of the VA, and the tag to
+> >> +		 * contain the random stuff plus the region bit.
+> >> +		 */
+> > 
+> > Since you have two masks below this comment is a bit hard to parse, how
+> > about explaining what makes up a Hyp address from a kernel linear
+> > address instead, something like:
+> > 
+> > 		/*
+> > 		 * We do have some free bits to insert a random tag.
+> > 		 * Hyp VAs are now created from kernel linear map VAs
+> > 		 * using the following formula (with V == VA_BITS):
+> > 		 *
+> > 		 *  63 ... V |   V-1  | V-2 ... tag_lsb | tag_lsb - 1 ... 0
+> > 		 *  -------------------------------------------------------
+> > 		 * | 0000000 | region |    random tag   |  kern linear VA  |
+> > 		 */
+> > 
+> > (assuming I got this vaguely correct).
+> 
+> /me copy-pastes...
+> 
+> > 
+> >> +		u64 mask = GENMASK_ULL(VA_BITS - 2, tag_lsb);
+> > 
+> > for consistency it would be nicer to use GENMASK_ULL(VA_BITS - 2, 0)
+> > above as suggested in the other patch then.  And we could also call this
+> > tag_mask to be super explicit.
+> > 
+> >> +
+> >> +		va_mask = BIT(tag_lsb) - 1;
+> > 
+> > and here, GENMASK_ULL(tag_lsb - 1, 0).
+> 
+> Yup.
+> 
+> > 
+> >> +		tag_val  = get_random_long() & mask;
+> >> +		tag_val |= region;
+> > 
+> > it's actually unclear to me why you need the region bit included in
+> > tag_val?
+> 
+> Because the initial masking strips it from the VA, and we need to add it
+> back. storing it as part of the tag makes it easy to ORR in.
+> 
+
+Right, ok, it just slightly ticked my OCD to have a separate notion of a
+tag and a region, and then merge them in a variabled named 'tag_val'.
+But with the comment above, I think I can still manage to sleep at
+night.
+
+> > 
+> >> +		tag_val >>= tag_lsb;
+> >> +	}
+> >>  }
+> >>  
+> >>  static u32 compute_instruction(int n, u32 rd, u32 rn)
+> >> @@ -46,6 +73,33 @@ static u32 compute_instruction(int n, u32 rd, u32 rn)
+> >>  							  AARCH64_INSN_VARIANT_64BIT,
+> >>  							  rn, rd, va_mask);
+> >>  		break;
+> >> +
+> >> +	case 1:
+> >> +		/* ROR is a variant of EXTR with Rm = Rn */
+> >> +		insn = aarch64_insn_gen_extr(AARCH64_INSN_VARIANT_64BIT,
+> >> +					     rn, rn, rd,
+> >> +					     tag_lsb);
+> >> +		break;
+> >> +
+> >> +	case 2:
+> >> +		insn = aarch64_insn_gen_add_sub_imm(rd, rn,
+> >> +						    tag_val & (SZ_4K - 1),
+> >> +						    AARCH64_INSN_VARIANT_64BIT,
+> >> +						    AARCH64_INSN_ADSB_ADD);
+> >> +		break;
+> >> +
+> >> +	case 3:
+> >> +		insn = aarch64_insn_gen_add_sub_imm(rd, rn,
+> >> +						    tag_val & GENMASK(23, 12),
+> >> +						    AARCH64_INSN_VARIANT_64BIT,
+> >> +						    AARCH64_INSN_ADSB_ADD);
+> >> +		break;
+> >> +
+> >> +	case 4:
+> >> +		/* ROR is a variant of EXTR with Rm = Rn */
+> >> +		insn = aarch64_insn_gen_extr(AARCH64_INSN_VARIANT_64BIT,
+> >> +					     rn, rn, rd, 64 - tag_lsb);
+> > 
+> > Ah, you do use 64 - first_rand in the code.  Well, I approve of this
+> > line of code then.
+> > 
+> >> +		break;
+> >>  	}
+> >>  
+> >>  	return insn;
+> >> @@ -56,8 +110,8 @@ void __init kvm_update_va_mask(struct alt_instr *alt,
+> >>  {
+> >>  	int i;
+> >>  
+> >> -	/* We only expect a 1 instruction sequence */
+> >> -	BUG_ON(nr_inst != 1);
+> >> +	/* We only expect a 5 instruction sequence */
+> > 
+> > Still sounds strange to me, just drop the comment I think if we keep the
+> > BUG_ON.
+> 
+> Sure.
+> 
+> > 
+> >> +	BUG_ON(nr_inst != 5);
+> >>  
+> >>  	if (!has_vhe() && !va_mask)
+> >>  		compute_layout();
+> >> @@ -68,8 +122,12 @@ void __init kvm_update_va_mask(struct alt_instr *alt,
+> >>  		/*
+> >>  		 * VHE doesn't need any address translation, let's NOP
+> >>  		 * everything.
+> >> +		 *
+> >> +		 * Alternatively, if we don't have any spare bits in
+> >> +		 * the address, NOP everything after masking tha
+> > 
+> > s/tha/the/
+> > 
+> >> +		 * kernel VA.
+> >>  		 */
+> >> -		if (has_vhe()) {
+> >> +		if (has_vhe() || (!tag_lsb && i > 1)) {
+> >>  			updptr[i] = aarch64_insn_gen_nop();
+> >>  			continue;
+> >>  		}
 > >> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> >> index 6192d45d1e1a..14c5e5534f2f 100644
+> >> index 14c5e5534f2f..d01c7111b1f7 100644
 > >> --- a/virt/kvm/arm/mmu.c
 > >> +++ b/virt/kvm/arm/mmu.c
-> >> @@ -43,6 +43,9 @@ static unsigned long hyp_idmap_start;
-> >>  static unsigned long hyp_idmap_end;
-> >>  static phys_addr_t hyp_idmap_vector;
+> >> @@ -1811,7 +1811,7 @@ int kvm_mmu_init(void)
+> >>  		  kern_hyp_va((unsigned long)high_memory - 1));
 > >>  
-> >> +static DEFINE_MUTEX(io_map_lock);
-> >> +static unsigned long io_map_base;
-> >> +
-> >>  #define S2_PGD_SIZE	(PTRS_PER_S2_PGD * sizeof(pgd_t))
-> >>  #define hyp_pgd_order get_order(PTRS_PER_PGD * sizeof(pgd_t))
-> >>  
-> >> @@ -502,27 +505,31 @@ static void unmap_hyp_range(pgd_t *pgdp, phys_addr_t start, u64 size)
-> >>   *
-> >>   * Assumes hyp_pgd is a page table used strictly in Hyp-mode and
-> >>   * therefore contains either mappings in the kernel memory area (above
-> >> - * PAGE_OFFSET), or device mappings in the vmalloc range (from
-> >> - * VMALLOC_START to VMALLOC_END).
-> >> + * PAGE_OFFSET), or device mappings in the idmap range.
-> >>   *
-> >> - * boot_hyp_pgd should only map two pages for the init code.
-> >> + * boot_hyp_pgd should only map the idmap range, and is only used in
-> >> + * the extended idmap case.
-> >>   */
-> >>  void free_hyp_pgds(void)
-> >>  {
-> >> +	pgd_t *id_pgd;
-> >> +
-> >>  	mutex_lock(&kvm_hyp_pgd_mutex);
-> >>  
-> >> +	id_pgd = boot_hyp_pgd ? boot_hyp_pgd : hyp_pgd;
-> >> +
-> >> +	if (id_pgd)
-> >> +		unmap_hyp_range(id_pgd, io_map_base,
-> >> +				hyp_idmap_start + PAGE_SIZE - io_map_base);
-> >> +
-> >>  	if (boot_hyp_pgd) {
-> >> -		unmap_hyp_range(boot_hyp_pgd, hyp_idmap_start, PAGE_SIZE);
-> >>  		free_pages((unsigned long)boot_hyp_pgd, hyp_pgd_order);
-> >>  		boot_hyp_pgd = NULL;
-> >>  	}
-> >>  
-> >>  	if (hyp_pgd) {
-> >> -		unmap_hyp_range(hyp_pgd, hyp_idmap_start, PAGE_SIZE);
-> >>  		unmap_hyp_range(hyp_pgd, kern_hyp_va(PAGE_OFFSET),
-> >>  				(uintptr_t)high_memory - PAGE_OFFSET);
-> >> -		unmap_hyp_range(hyp_pgd, kern_hyp_va(VMALLOC_START),
-> >> -				VMALLOC_END - VMALLOC_START);
-> >>  
-> >>  		free_pages((unsigned long)hyp_pgd, hyp_pgd_order);
-> >>  		hyp_pgd = NULL;
-> >> @@ -721,7 +728,8 @@ int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
-> >>  			   void __iomem **kaddr,
-> >>  			   void __iomem **haddr)
-> >>  {
-> >> -	unsigned long start, end;
-> >> +	pgd_t *pgd = hyp_pgd;
-> >> +	unsigned long base;
-> >>  	int ret;
-> >>  
-> >>  	*kaddr = ioremap(phys_addr, size);
-> >> @@ -733,17 +741,38 @@ int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
-> >>  		return 0;
-> >>  	}
-> >>  
-> >> +	mutex_lock(&io_map_lock);
-> >> +
-> >> +	base = io_map_base - size;
+> >>  	if (hyp_idmap_start >= kern_hyp_va(PAGE_OFFSET) &&
+> >> -	    hyp_idmap_start <  kern_hyp_va(~0UL) &&
+> >> +	    hyp_idmap_start <  kern_hyp_va((unsigned long)high_memory - 1) &&
 > > 
-> > are we guaranteed that hyp_idmap_start (and therefore io_map_base) is
-> > sufficiently greater than 0 ?  I suppose that even if RAM starts at 0,
-> > and the kernel was loaded at 0, the idmap page for Hyp would be at some
-> > reasonable offset from the start of the kernel image?
+> > Is this actually required for this patch or are we just trying to be
+> > nice?
 > 
-> On my kernel image:
-> ffff000008080000 t _head
-> ffff000008cc6000 T __hyp_idmap_text_start
-> ffff000009aaa000 B swapper_pg_end
-> 
-> _hyp_idmap_text_start is about 12MB from the beginning of the image, and
-> about 14MB from the end. Yes, it is a big kernel. But we're only mapping
-> a few pages there, even with my upcoming crazy vector remapping crap. So
-> the likeliness of this failing is close to zero.
-> 
-> Now, close to zero is not necessarily close enough. What I could do is
-> to switch the allocator around on failure, so that if we can't allocate
-> on one side, we can at least try to allocate on the other side. I'm
-> pretty sure we'll never trigger that code, but I can implement it if you
-> think that's worth it.
-> 
+> You really need something like that. Remember that we compute the tag
+> based on the available memory, so something that goes beyond that is not
+> a valid input to kern_hyp_va anymore.
 
-I don't think we should necessarily implement it, my main concern is
-when reading the code, the reader has to concince himself/herself why
-this is always safe (and not just very likely to be safe).  I'm fine
-with adding a comment that explains this instead of implementing
-complicated logic though.  What do you think?
+ah right.
 
 > > 
-> >> +	base &= ~(size - 1);
-> > 
-> > I'm not sure I understand this line.  Wouldn't it make more sense to use
-> > PAGE_SIZE here?
+> > I'm actually not sure I remember what this is about beyond the VA=idmap
+> > for everything on 32-bit case; I thought we chose the hyp address space
+> > exactly so that it wouldn't overlap with the idmap?
 > 
-> This is trying to align the base of the allocation to its natural size
-> (8kB aligned on an 8kB boundary, for example), which is what other
-> allocators in the kernel do. I've now added a roundup_pow_of_two(size)
-> so that we're guaranteed to deal with those.
+> This is just a sanity check that kern_hyp_va returns the right thing
+> with respect to the idmap (i.e. we cannot hit the idmap by feeding
+> something to the macro). Is that clear enough (I'm not sure it is...)?
 > 
 
-Ah right, it's just that I wasn't thinking of the size in terms of
-always being page aligned, so couldn't you here attempt two 4K
-allocations on a 64K page system, where one would overwrite the other?
+It feels a bit like defensive coding, which we don't normally do, so I
+was confused if this was something we actually expected to encounter in
+some cases, or if we were just covering out backs.  If it's the latter,
+then it makes perfect sense to me, and I'd rather catch an error here
+than see the world explode later.
+
 
 Thanks,
 -Christoffer
