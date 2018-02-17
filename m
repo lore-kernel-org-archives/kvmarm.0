@@ -1,177 +1,301 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: [RFC PATCH 0.9/2] arm64: fpsimd: Expose CPU / FPSIMD state
- association helpers
-Date: Fri, 16 Feb 2018 18:39:30 +0000
-Message-ID: <1518806370-15697-1-git-send-email-Dave.Martin@arm.com>
-References: <1518805771-15346-1-git-send-email-Dave.Martin@arm.com>
+From: Shanker Donthineni <shankerd@codeaurora.org>
+Subject: [PATCH] arm64: Add support for new control bits CTR_EL0.IDC and
+ CTR_EL0.IDC
+Date: Fri, 16 Feb 2018 18:57:46 -0600
+Message-ID: <1518829066-3558-1-git-send-email-shankerd@codeaurora.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F37BF402DB
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Feb 2018 13:33:34 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sbzi3L9crykI for <kvmarm@lists.cs.columbia.edu>;
- Fri, 16 Feb 2018 13:33:13 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9EF6A401AB
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Feb 2018 13:33:13 -0500 (EST)
-In-Reply-To: <1518805771-15346-1-git-send-email-Dave.Martin@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
-Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Will Deacon <will.deacon@arm.com>, linux-kernel <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm <kvmarm@lists.cs.columbia.edu>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Philip Elcan <pelcan@codeaurora.org>, Shanker Donthineni <shankerd@codeaurora.org>, Vikram Sethi <vikrams@codeaurora.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Oops, forgot to post this patch that goes before patch 1 in the series.
+Two point of unification cache maintenance operations 'DC CVAU' and
+'IC IVAU' are optional for implementors as per ARMv8 specification.
+This patch parses the updated CTR_EL0 register definition and adds
+the required changes to skip POU operations if the hardware reports
+CTR_EL0.IDC and/or CTR_EL0.IDC.
 
---8<--
+CTR_EL0.DIC: Instruction cache invalidation requirements for
+ instruction to data coherence. The meaning of this bit[29].
+  0: Instruction cache invalidation to the point of unification
+     is required for instruction to data coherence.
+  1: Instruction cache cleaning to the point of unification is
+      not required for instruction to data coherence.
 
-Expose an interface for associating an FPSIMD context with a CPU and
-checking the association, for use by KVM.
+CTR_EL0.IDC: Data cache clean requirements for instruction to data
+ coherence. The meaning of this bit[28].
+  0: Data cache clean to the point of unification is required for
+     instruction to data coherence, unless CLIDR_EL1.LoC == 0b000
+     or (CLIDR_EL1.LoUIS == 0b000 && CLIDR_EL1.LoUU == 0b000).
+  1: Data cache clean to the point of unification is not required
+     for instruction to data coherence.
 
-Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+Signed-off-by: Philip Elcan <pelcan@codeaurora.org>
+Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
 ---
- arch/arm64/include/asm/fpsimd.h |  5 +++++
- arch/arm64/kernel/fpsimd.c      | 42 +++++++++++++++++++++++++++++------------
- 2 files changed, 35 insertions(+), 12 deletions(-)
+ arch/arm64/include/asm/assembler.h | 48 ++++++++++++++++++++++++--------------
+ arch/arm64/include/asm/cache.h     |  2 ++
+ arch/arm64/kernel/cpufeature.c     |  2 ++
+ arch/arm64/mm/cache.S              | 26 ++++++++++++++-------
+ 4 files changed, 51 insertions(+), 27 deletions(-)
 
-diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
-index 8857a0f..f4ce4d6 100644
---- a/arch/arm64/include/asm/fpsimd.h
-+++ b/arch/arm64/include/asm/fpsimd.h
-@@ -23,6 +23,7 @@
+diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
+index 3c78835..9eaa948 100644
+--- a/arch/arm64/include/asm/assembler.h
++++ b/arch/arm64/include/asm/assembler.h
+@@ -30,6 +30,7 @@
+ #include <asm/pgtable-hwdef.h>
+ #include <asm/ptrace.h>
+ #include <asm/thread_info.h>
++#include <asm/cache.h>
  
- #include <linux/cache.h>
- #include <linux/stddef.h>
-+#include <linux/types.h>
- 
- /*
-  * FP/SIMD storage area has:
-@@ -62,6 +63,8 @@ struct fpsimd_state {
- 
- struct task_struct;
- 
-+extern bool fpsimd_foreign_fpstate(struct fpsimd_state const *state);
-+
- extern void fpsimd_save_state(struct fpsimd_state *state);
- extern void fpsimd_load_state(struct fpsimd_state *state);
- 
-@@ -76,6 +79,8 @@ extern void fpsimd_update_current_state(struct user_fpsimd_state const *state);
- extern void fpsimd_flush_task_state(struct task_struct *target);
- extern void sve_flush_cpu_state(void);
- 
-+extern void fpsimd_bind_state_to_cpu(struct fpsimd_state *state);
-+
- /* Maximum VL that SVE VL-agnostic software can transparently support */
- #define SVE_VL_ARCH_MAX 0x100
- 
-diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index e7226c4..138efaf 100644
---- a/arch/arm64/kernel/fpsimd.c
-+++ b/arch/arm64/kernel/fpsimd.c
-@@ -38,6 +38,7 @@
- #include <linux/signal.h>
- #include <linux/slab.h>
- #include <linux/sysctl.h>
-+#include <linux/types.h>
- 
- #include <asm/fpsimd.h>
- #include <asm/cputype.h>
-@@ -121,6 +122,14 @@ struct fpsimd_last_state_struct {
- 
- static DEFINE_PER_CPU(struct fpsimd_last_state_struct, fpsimd_last_state);
- 
-+bool fpsimd_foreign_fpstate(struct fpsimd_state const *st)
-+{
-+	WARN_ON(!in_softirq() && !irqs_disabled());
-+
-+	return st->cpu != smp_processor_id() ||
-+		st != __this_cpu_read(fpsimd_last_state.st);
-+}
-+
- /* Default VL for tasks that don't set it explicitly: */
- static int sve_default_vl = -1;
- 
-@@ -908,13 +917,10 @@ void fpsimd_thread_switch(struct task_struct *next)
- 		 * the TIF_FOREIGN_FPSTATE flag so the state will be loaded
- 		 * upon the next return to userland.
- 		 */
--		struct fpsimd_state *st = &next->thread.fpsimd_state;
--
--		if (__this_cpu_read(fpsimd_last_state.st) == st
--		    && st->cpu == smp_processor_id())
--			clear_tsk_thread_flag(next, TIF_FOREIGN_FPSTATE);
--		else
-+		if (fpsimd_foreign_fpstate(&current->thread.fpsimd_state))
- 			set_tsk_thread_flag(next, TIF_FOREIGN_FPSTATE);
-+		else
-+			clear_tsk_thread_flag(next, TIF_FOREIGN_FPSTATE);
- 	}
- }
- 
-@@ -996,19 +1002,31 @@ void fpsimd_signal_preserve_current_state(void)
- 		sve_to_fpsimd(current);
- }
- 
-+static void __fpsimd_bind_to_cpu(struct fpsimd_last_state_struct *last,
-+				 struct fpsimd_state *st)
-+{
-+	WARN_ON(!in_softirq() || !irqs_disabled());
-+
-+	last->st = st;
-+	st->cpu = smp_processor_id();
-+}
-+
-+void fpsimd_bind_state_to_cpu(struct fpsimd_state *st)
-+{
-+	__fpsimd_bind_to_cpu(this_cpu_ptr(&fpsimd_last_state), st);
-+}
-+
- /*
-  * Associate current's FPSIMD context with this cpu
-  * Preemption must be disabled when calling this function.
+ 	.macro save_and_disable_daif, flags
+ 	mrs	\flags, daif
+@@ -334,9 +335,9 @@
+  * raw_dcache_line_size - get the minimum D-cache line size on this CPU
+  * from the CTR register.
   */
--static void fpsimd_bind_to_cpu(void)
-+static void fpsimd_bind_task_to_cpu(void)
- {
- 	struct fpsimd_last_state_struct *last =
- 		this_cpu_ptr(&fpsimd_last_state);
--	struct fpsimd_state *st = &current->thread.fpsimd_state;
- 
--	last->st = st;
-+	__fpsimd_bind_to_cpu(last, &current->thread.fpsimd_state);
- 	last->sve_in_use = test_thread_flag(TIF_SVE);
--	st->cpu = smp_processor_id();
- }
+-	.macro	raw_dcache_line_size, reg, tmp
+-	mrs	\tmp, ctr_el0			// read CTR
+-	ubfm	\tmp, \tmp, #16, #19		// cache line size encoding
++	.macro	raw_dcache_line_size, reg, tmp, ctr
++	mrs	\ctr, ctr_el0			// read CTR
++	ubfm	\tmp, \ctr, #16, #19		// cache line size encoding
+ 	mov	\reg, #4			// bytes per word
+ 	lsl	\reg, \reg, \tmp		// actual cache line size
+ 	.endm
+@@ -344,9 +345,9 @@
+ /*
+  * dcache_line_size - get the safe D-cache line size across all CPUs
+  */
+-	.macro	dcache_line_size, reg, tmp
+-	read_ctr	\tmp
+-	ubfm		\tmp, \tmp, #16, #19	// cache line size encoding
++	.macro	dcache_line_size, reg, tmp, ctr
++	read_ctr	\ctr
++	ubfm		\tmp, \ctr, #16, #19	// cache line size encoding
+ 	mov		\reg, #4		// bytes per word
+ 	lsl		\reg, \reg, \tmp	// actual cache line size
+ 	.endm
+@@ -355,9 +356,9 @@
+  * raw_icache_line_size - get the minimum I-cache line size on this CPU
+  * from the CTR register.
+  */
+-	.macro	raw_icache_line_size, reg, tmp
+-	mrs	\tmp, ctr_el0			// read CTR
+-	and	\tmp, \tmp, #0xf		// cache line size encoding
++	.macro	raw_icache_line_size, reg, tmp, ctr
++	mrs	\ctr, ctr_el0			// read CTR
++	and	\tmp, \ctr, #0xf		// cache line size encoding
+ 	mov	\reg, #4			// bytes per word
+ 	lsl	\reg, \reg, \tmp		// actual cache line size
+ 	.endm
+@@ -365,9 +366,9 @@
+ /*
+  * icache_line_size - get the safe I-cache line size across all CPUs
+  */
+-	.macro	icache_line_size, reg, tmp
+-	read_ctr	\tmp
+-	and		\tmp, \tmp, #0xf	// cache line size encoding
++	.macro	icache_line_size, reg, tmp, ctr
++	read_ctr	\ctr
++	and		\tmp, \ctr, #0xf	// cache line size encoding
+ 	mov		\reg, #4		// bytes per word
+ 	lsl		\reg, \reg, \tmp	// actual cache line size
+ 	.endm
+@@ -408,13 +409,21 @@
+  * 	size:		size of the region
+  * 	Corrupts:	kaddr, size, tmp1, tmp2
+  */
+-	.macro dcache_by_line_op op, domain, kaddr, size, tmp1, tmp2
+-	dcache_line_size \tmp1, \tmp2
++	.macro dcache_by_line_op op, domain, kaddr, size, tmp1, tmp2, tmp3
++	dcache_line_size \tmp1, \tmp2, \tmp3
+ 	add	\size, \kaddr, \size
+ 	sub	\tmp2, \tmp1, #1
+ 	bic	\kaddr, \kaddr, \tmp2
+ 9998:
+-	.if	(\op == cvau || \op == cvac)
++	.if	(\op == cvau)
++alternative_if_not ARM64_WORKAROUND_CLEAN_CACHE
++	tbnz	\tmp3, #CTR_IDC_SHIFT, 9997f
++	dc	cvau, \kaddr
++alternative_else
++	dc	civac, \kaddr
++	nop
++alternative_endif
++	.elseif (\op == cvac)
+ alternative_if_not ARM64_WORKAROUND_CLEAN_CACHE
+ 	dc	\op, \kaddr
+ alternative_else
+@@ -433,6 +442,7 @@
+ 	cmp	\kaddr, \size
+ 	b.lo	9998b
+ 	dsb	\domain
++9997:
+ 	.endm
  
  /*
-@@ -1025,7 +1043,7 @@ void fpsimd_restore_current_state(void)
+@@ -441,10 +451,11 @@
+  *
+  * 	start, end:	virtual addresses describing the region
+  *	label:		A label to branch to on user fault.
+- * 	Corrupts:	tmp1, tmp2
++ * 	Corrupts:	tmp1, tmp2, tmp3
+  */
+-	.macro invalidate_icache_by_line start, end, tmp1, tmp2, label
+-	icache_line_size \tmp1, \tmp2
++	.macro invalidate_icache_by_line start, end, tmp1, tmp2, tmp3, label
++	icache_line_size \tmp1, \tmp2, \tmp3
++	tbnz    \tmp3, #CTR_DIC_SHIFT, 9996f
+ 	sub	\tmp2, \tmp1, #1
+ 	bic	\tmp2, \start, \tmp2
+ 9997:
+@@ -454,6 +465,7 @@
+ 	b.lo	9997b
+ 	dsb	ish
+ 	isb
++9996:
+ 	.endm
  
- 	if (test_and_clear_thread_flag(TIF_FOREIGN_FPSTATE)) {
- 		task_fpsimd_load();
--		fpsimd_bind_to_cpu();
-+		fpsimd_bind_task_to_cpu();
- 	}
+ /*
+diff --git a/arch/arm64/include/asm/cache.h b/arch/arm64/include/asm/cache.h
+index ea9bb4e..aea533b 100644
+--- a/arch/arm64/include/asm/cache.h
++++ b/arch/arm64/include/asm/cache.h
+@@ -22,6 +22,8 @@
+ #define CTR_L1IP_MASK		3
+ #define CTR_CWG_SHIFT		24
+ #define CTR_CWG_MASK		15
++#define CTR_IDC_SHIFT		28
++#define CTR_DIC_SHIFT		29
  
- 	local_bh_enable();
-@@ -1050,7 +1068,7 @@ void fpsimd_update_current_state(struct user_fpsimd_state const *state)
- 	task_fpsimd_load();
+ #define CTR_L1IP(ctr)		(((ctr) >> CTR_L1IP_SHIFT) & CTR_L1IP_MASK)
  
- 	if (test_and_clear_thread_flag(TIF_FOREIGN_FPSTATE))
--		fpsimd_bind_to_cpu();
-+		fpsimd_bind_task_to_cpu();
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 29b1f87..f42bb5a 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -200,6 +200,8 @@ static int __init register_cpu_hwcaps_dumper(void)
  
- 	local_bh_enable();
- }
+ static const struct arm64_ftr_bits ftr_ctr[] = {
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_EXACT, 31, 1, 1),	/* RAO */
++	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, CTR_DIC_SHIFT, 1, 0),	/* DIC */
++	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, CTR_IDC_SHIFT, 1, 0),	/* IDC */
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_HIGHER_SAFE, 24, 4, 0),	/* CWG */
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, 20, 4, 0),	/* ERG */
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, 16, 4, 1),	/* DminLine */
+diff --git a/arch/arm64/mm/cache.S b/arch/arm64/mm/cache.S
+index 758bde7..5764af8 100644
+--- a/arch/arm64/mm/cache.S
++++ b/arch/arm64/mm/cache.S
+@@ -24,6 +24,7 @@
+ #include <asm/cpufeature.h>
+ #include <asm/alternative.h>
+ #include <asm/asm-uaccess.h>
++#include <asm/cache.h>
+ 
+ /*
+  *	flush_icache_range(start,end)
+@@ -50,7 +51,12 @@ ENTRY(flush_icache_range)
+  */
+ ENTRY(__flush_cache_user_range)
+ 	uaccess_ttbr0_enable x2, x3, x4
+-	dcache_line_size x2, x3
++	dcache_line_size x2, x3, x4
++alternative_if_not ARM64_WORKAROUND_CLEAN_CACHE
++	tbnz    x4, #CTR_IDC_SHIFT, 8f
++alternative_else
++	nop
++alternative_endif
+ 	sub	x3, x2, #1
+ 	bic	x4, x0, x3
+ 1:
+@@ -60,7 +66,9 @@ user_alt 9f, "dc cvau, x4",  "dc civac, x4",  ARM64_WORKAROUND_CLEAN_CACHE
+ 	b.lo	1b
+ 	dsb	ish
+ 
+-	invalidate_icache_by_line x0, x1, x2, x3, 9f
++8:
++	invalidate_icache_by_line x0, x1, x2, x3, x4, 9f
++
+ 	mov	x0, #0
+ 1:
+ 	uaccess_ttbr0_disable x1, x2
+@@ -82,7 +90,7 @@ ENDPROC(__flush_cache_user_range)
+ ENTRY(invalidate_icache_range)
+ 	uaccess_ttbr0_enable x2, x3, x4
+ 
+-	invalidate_icache_by_line x0, x1, x2, x3, 2f
++	invalidate_icache_by_line x0, x1, x2, x3, x4, 2f
+ 	mov	x0, xzr
+ 1:
+ 	uaccess_ttbr0_disable x1, x2
+@@ -102,7 +110,7 @@ ENDPROC(invalidate_icache_range)
+  *	- size    - size in question
+  */
+ ENTRY(__flush_dcache_area)
+-	dcache_by_line_op civac, sy, x0, x1, x2, x3
++	dcache_by_line_op civac, sy, x0, x1, x2, x3, x4
+ 	ret
+ ENDPIPROC(__flush_dcache_area)
+ 
+@@ -116,7 +124,7 @@ ENDPIPROC(__flush_dcache_area)
+  *	- size    - size in question
+  */
+ ENTRY(__clean_dcache_area_pou)
+-	dcache_by_line_op cvau, ish, x0, x1, x2, x3
++	dcache_by_line_op cvau, ish, x0, x1, x2, x3, x4
+ 	ret
+ ENDPROC(__clean_dcache_area_pou)
+ 
+@@ -140,7 +148,7 @@ ENTRY(__inval_dcache_area)
+  */
+ __dma_inv_area:
+ 	add	x1, x1, x0
+-	dcache_line_size x2, x3
++	dcache_line_size x2, x3, x4
+ 	sub	x3, x2, #1
+ 	tst	x1, x3				// end cache line aligned?
+ 	bic	x1, x1, x3
+@@ -178,7 +186,7 @@ ENTRY(__clean_dcache_area_poc)
+  *	- size    - size in question
+  */
+ __dma_clean_area:
+-	dcache_by_line_op cvac, sy, x0, x1, x2, x3
++	dcache_by_line_op cvac, sy, x0, x1, x2, x3, x4
+ 	ret
+ ENDPIPROC(__clean_dcache_area_poc)
+ ENDPROC(__dma_clean_area)
+@@ -193,7 +201,7 @@ ENDPROC(__dma_clean_area)
+  *	- size    - size in question
+  */
+ ENTRY(__clean_dcache_area_pop)
+-	dcache_by_line_op cvap, sy, x0, x1, x2, x3
++	dcache_by_line_op cvap, sy, x0, x1, x2, x3, x4
+ 	ret
+ ENDPIPROC(__clean_dcache_area_pop)
+ 
+@@ -206,7 +214,7 @@ ENDPIPROC(__clean_dcache_area_pop)
+  *	- size    - size in question
+  */
+ ENTRY(__dma_flush_area)
+-	dcache_by_line_op civac, sy, x0, x1, x2, x3
++	dcache_by_line_op civac, sy, x0, x1, x2, x3, x4
+ 	ret
+ ENDPIPROC(__dma_flush_area)
+ 
 -- 
-2.1.4
+Qualcomm Datacenter Technologies, Inc. on behalf of the Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
