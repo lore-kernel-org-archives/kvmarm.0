@@ -1,25 +1,26 @@
 From: Julien Grall <julien.grall@arm.com>
-Subject: Re: [PATCH v4 03/40] KVM: arm64: Avoid storing the vcpu pointer on
- the stack
-Date: Mon, 19 Feb 2018 15:50:20 +0000
-Message-ID: <d00629e8-da68-a536-dc22-b8c26e962b85@arm.com>
-References: <20180215210332.8648-1-christoffer.dall@linaro.org>
- <20180215210332.8648-4-christoffer.dall@linaro.org>
+Subject: Re: [PATCH v3 17/41] KVM: arm64: Remove noop calls to timer
+ save/restore from VHE switch
+Date: Mon, 19 Feb 2018 16:30:01 +0000
+Message-ID: <591b3937-7a53-afb3-7f2f-e859d3e46601@arm.com>
+References: <20180112120747.27999-1-christoffer.dall@linaro.org>
+ <20180112120747.27999-18-christoffer.dall@linaro.org>
+ <20074994-caac-2be0-6eaa-83115c616756@arm.com> <20180213223134.GK23189@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1120149DE1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Feb 2018 10:44:18 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B54840480
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Feb 2018 11:23:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xze0dCEZnj0a for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Feb 2018 10:43:56 -0500 (EST)
+ with ESMTP id MOdUGLcqcZBc for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Feb 2018 11:23:32 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CC4144030D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Feb 2018 10:43:56 -0500 (EST)
-In-Reply-To: <20180215210332.8648-4-christoffer.dall@linaro.org>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E1F98403FE
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Feb 2018 11:23:31 -0500 (EST)
+In-Reply-To: <20180213223134.GK23189@cbox>
 Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -30,36 +31,73 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi Christoffer,
 
-On 15/02/18 21:02, Christoffer Dall wrote:
-> We already have the percpu area for the host cpu state, which points to
-> the VCPU, so there's no need to store the VCPU pointer on the stack on
-> every context switch.  We can be a little more clever and just use
-> tpidr_el2 for the percpu offset and load the VCPU pointer from the host
-> context.
-> 
-> This does require us to calculate the percpu offset without including
-> the offset from the kernel mapping of the percpu array to the linear
-> mapping of the array (which is what we store in tpidr_el1), because a
-> PC-relative generated address in EL2 is already giving us the hyp alias
-> of the linear mapping of a kernel address.  We do this in
-> __cpu_init_hyp_mode() by using kvm_ksym_ref().
-> 
-> This change also requires us to have a scratch register, so we take the
-> chance to rearrange some of the el1_sync code to only look at the
-> vttbr_el2 to determine if this is a trap from the guest or an HVC from
-> the host.  We do add an extra check to call the panic code if the kernel
-> is configured with debugging enabled and we saw a trap from the host
-> which wasn't an HVC, indicating that we left some EL2 trap configured by
-> mistake.
+Sorry for the late reply.
 
-You might want to remove this paragraph as you don't seem to have rework 
-that part of the code in this version.
+On 13/02/18 22:31, Christoffer Dall wrote:
+> On Fri, Feb 09, 2018 at 05:53:43PM +0000, Julien Grall wrote:
+>> Hi Christoffer,
+>>
+>> On 01/12/2018 12:07 PM, Christoffer Dall wrote:
+>>> The VHE switch function calls __timer_enable_traps and
+>>> __timer_disable_traps which don't do anything on VHE systems.
+>>> Therefore, simply remove these calls from the VHE switch function and
+>>> make the functions non-conditional as they are now only called from the
+>>> non-VHE switch path.
+>>>
+>>> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+>>> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+>>> ---
+>>>   arch/arm64/kvm/hyp/switch.c |  2 --
+>>>   virt/kvm/arm/hyp/timer-sr.c | 44 ++++++++++++++++++++++----------------------
+>>>   2 files changed, 22 insertions(+), 24 deletions(-)
+>>>
+>>> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+>>> index 9aadef6966bf..6175fcb33ed2 100644
+>>> --- a/arch/arm64/kvm/hyp/switch.c
+>>> +++ b/arch/arm64/kvm/hyp/switch.c
+>>> @@ -354,7 +354,6 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+>>>   	__activate_vm(vcpu->kvm);
+>>>   	__vgic_restore_state(vcpu);
+>>> -	__timer_enable_traps(vcpu);
+>>>   	/*
+>>>   	 * We must restore the 32-bit state before the sysregs, thanks
+>>> @@ -373,7 +372,6 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+>>>   	__sysreg_save_guest_state(guest_ctxt);
+>>>   	__sysreg32_save_state(vcpu);
+>>> -	__timer_disable_traps(vcpu);
+>>>   	__vgic_save_state(vcpu);
+>>>   	__deactivate_traps(vcpu);
+>>> diff --git a/virt/kvm/arm/hyp/timer-sr.c b/virt/kvm/arm/hyp/timer-sr.c
+>>> index f24404b3c8df..77754a62eb0c 100644
+>>> --- a/virt/kvm/arm/hyp/timer-sr.c
+>>> +++ b/virt/kvm/arm/hyp/timer-sr.c
+>>> @@ -27,34 +27,34 @@ void __hyp_text __kvm_timer_set_cntvoff(u32 cntvoff_low, u32 cntvoff_high)
+>>>   	write_sysreg(cntvoff, cntvoff_el2);
+>>>   }
+>>> +/*
+>>> + * Should only be called on non-VHE systems.
+>>> + * VHE systems use EL2 timers and configure EL1 timers in kvm_timer_init_vhe().
+>>> + */
+>>>   void __hyp_text __timer_disable_traps(struct kvm_vcpu *vcpu)
+>>
+>> Would it be worth to suffix the function with nvhe? So it would be clear
+>> that it should not be called for VHE system?
+>>
+> Actually, I decided against this, because it's also called from the
+> 32-bit code and it looks a little strange there, and it's not like we
+> have an equivalent _vhe version.
+
+The main goal was to provide a naming that would prevent someone to use 
+it in VHE case. This would have also  been inline with other patches 
+where you rename some helpers to nvhe/vhe even in arm32 code.
+
+Anyway, I guess the reviewers will be careful enough to spot that :).
 
 Cheers,
 
