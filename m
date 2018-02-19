@@ -1,15 +1,18 @@
-From: Julien Grall <julien.grall@arm.com>
-Subject: Re: [PATCH v4 24/40] KVM: arm64: Rewrite system register accessors to
- read/write functions
-Date: Mon, 19 Feb 2018 18:12:29 +0000
-Message-ID: <f1b3498d-754e-f8cf-0dd8-1c43a7b507e9@arm.com>
-References: <20180215210332.8648-1-christoffer.dall@linaro.org>
- <20180215210332.8648-25-christoffer.dall@linaro.org>
+From: Shanker Donthineni <shankerd@codeaurora.org>
+Subject: Re: [PATCH] arm64: Add support for new control bits CTR_EL0.IDC and
+ CTR_EL0.IDC
+Date: Mon, 19 Feb 2018 12:30:46 -0600
+Message-ID: <da2b54da-cb05-b478-ce61-eeb3308de672@codeaurora.org>
+References: <1518829066-3558-1-git-send-email-shankerd@codeaurora.org>
+ <20180219143820.5oxc2kendvq4bbtt@armageddon.cambridge.arm.com>
+ <92836754-2ab3-d5db-f0be-7ee3e10f368f@codeaurora.org>
+ <20180219171852.jsbzawbsyv7v5yi7@armageddon.cambridge.arm.com>
+Reply-To: shankerd@codeaurora.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180215210332.8648-25-christoffer.dall@linaro.org>
+In-Reply-To: <20180219171852.jsbzawbsyv7v5yi7@armageddon.cambridge.arm.com>
 Content-Language: en-US
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
@@ -20,106 +23,42 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Christoffer Dall <cdall@cs.columbia.edu>, Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Tomasz Nowicki <tn@semihalf.com>, Yury Norov <ynorov@caviumnetworks.com>, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Philip Elcan <pelcan@codeaurora.org>, Vikram Sethi <vikrams@codeaurora.org>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel <linux-kernel@vger.kernel.org>, kvmarm <kvmarm@lists.cs.columbia.edu>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
+Thanks Catalin for your comments.
 
-On 15/02/18 21:03, Christoffer Dall wrote:
-> From: Christoffer Dall <cdall@cs.columbia.edu>
+On 02/19/2018 11:18 AM, Catalin Marinas wrote:
+> On Mon, Feb 19, 2018 at 10:35:30AM -0600, Shanker Donthineni wrote:
+>> On 02/19/2018 08:38 AM, Catalin Marinas wrote:
+>>> On the patch, I'd rather have an alternative framework entry for no VAU
+>>> cache maint required and some ret instruction at the beginning of the
+>>> cache maint function rather than jumping out of the loop somewhere
+>>> inside the cache maintenance code, penalising the CPUs that do require
+>>> it.
+>>
+>> Alternative framework might break things in case of CPU hotplug. I need one
+>> more confirmation from you on incorporating alternative framework.     
 > 
-> Currently we access the system registers array via the vcpu_sys_reg()
-> macro.  However, we are about to change the behavior to some times
-> modify the register file directly, so let's change this to two
-> primitives:
+> CPU hotplug can be an issue but it should be handled like other similar
+> cases: if a CPU comes online late and its features are incompatible, it
+> should not be brought online. The cpufeature code handles this.
 > 
->   * Accessor macros vcpu_write_sys_reg() and vcpu_read_sys_reg()
->   * Direct array access macro __vcpu_sys_reg()
+> With Will's patch for CTR_EL0, we handle different CPU features during
+> boot, defaulting to the lowest value for the IDC/DIC bits.
 > 
-> The first primitive should be used in places where the code needs to
-> access the currently loaded VCPU's state as observed by the guest.  For
-> example, when trapping on cache related registers, a write to a system
-> register should go directly to the VCPU version of the register.
+> I suggest you add new ARM64_HAS_* feature bits and enable them based on
+> CTR_EL0.IDC and DIC. You could check for both being 1 with a single
+> feature bit but I guess an implementation is allowed to have these
+> different (e.g. DIC == 0 and IDC == 1).
 > 
-> The second primitive can be used in places where the VCPU is known to
 
-"second primitive" is a bit confusing here. I count 3 primitives above: 
-(vcpu_write_sys_reg(), vcpu_read_sys_reg() and __vcpu_sys_reg(). From 
-the description, I would say to refer to the latter (i.e third one).
-
-> never be running (for example userspace access) or for registers which
-> are never context switched (for example all the PMU system registers).
-> 
-> This rewrites all users of vcpu_sys_regs to one of the two primitives
-> above.
-> 
-> No functional change.
-> 
-> Signed-off-by: Christoffer Dall <cdall@cs.columbia.edu>
-
-[...]
-
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index f2a6f39aec87..68398bf7882f 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -287,7 +287,18 @@ struct kvm_vcpu_arch {
->   };
->   
->   #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.gp_regs)
-> -#define vcpu_sys_reg(v,r)	((v)->arch.ctxt.sys_regs[(r)])
-> +
-> +/*
-> + * Only use __vcpu_sys_reg if you know you want the memory backed version of a
-> + * register, and not the one most recently accessed by a runnning VCPU.  For
-
-NIT: s/runnning/running/
-
-> + * example, for userpace access or for system registers that are never context
-
-NIT: s/userpace/userspace/
-
-> + * switched, but only emulated.
-> + */
-> +#define __vcpu_sys_reg(v,r)	((v)->arch.ctxt.sys_regs[(r)])
-> +
-> +#define vcpu_read_sys_reg(v,r)	__vcpu_sys_reg(v,r)
-> +#define vcpu_write_sys_reg(v,r,n)	do { __vcpu_sys_reg(v,r) = n; } while (0)
-> +
->   /*
->    * CP14 and CP15 live in the same array, as they are backed by the
->    * same system registers.
-
-[...]
-
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index b48af790615e..a05d2c01c786 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-
-[...]
-
-> @@ -817,10 +818,10 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->   			return false;
->   		}
->   
-> -		vcpu_sys_reg(vcpu, PMUSERENR_EL0) = p->regval
-> -						    & ARMV8_PMU_USERENR_MASK;
-> -	} else {
-> -		p->regval = vcpu_sys_reg(vcpu, PMUSERENR_EL0)
-> +		__vcpu_sys_reg(vcpu, PMUSERENR_EL0) =
-> +			       p->regval & ARMV8_PMU_USERENR_MASK;
-> +	} else  {
-
-NIT: There is a double space between else and {.
-
-> +		p->regval = __vcpu_sys_reg(vcpu, PMUSERENR_EL0)
->   			    & ARMV8_PMU_USERENR_MASK;
->   	}
->   
-
-Cheers,
+I'll add two new features ARM64_HAS_DIC and ARM64_HAS_IDC to support
+all implementations. Unfortunately QCOM server chips supports IDC not DIC.
+ 
 
 -- 
-Julien Grall
+Shanker Donthineni
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
