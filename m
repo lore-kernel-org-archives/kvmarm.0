@@ -1,109 +1,50 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH] arm64: Add support for new control bits CTR_EL0.IDC and
- CTR_EL0.IDC
-Date: Mon, 19 Feb 2018 14:43:46 +0000
-Message-ID: <20180219144346.GF30394@arm.com>
-References: <1518829066-3558-1-git-send-email-shankerd@codeaurora.org>
+From: Shanker Donthineni <shankerd@codeaurora.org>
+Subject: [PATCH] KVM: arm/arm64: No need to zero CNTVOFF in
+ kvm_timer_vcpu_put() for VHE
+Date: Mon, 19 Feb 2018 09:38:07 -0600
+Message-ID: <1519054687-14405-1-git-send-email-shankerd@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3308E402B8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Feb 2018 09:37:28 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tcuwI+D7LsIO for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Feb 2018 09:37:06 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7524640259
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Feb 2018 09:37:06 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <1518829066-3558-1-git-send-email-shankerd@codeaurora.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Shanker Donthineni <shankerd@codeaurora.org>
-Cc: Philip Elcan <pelcan@codeaurora.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, linux-kernel <linux-kernel@vger.kernel.org>, kvmarm <kvmarm@lists.cs.columbia.edu>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, linux-kernel <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, kvmarm <kvmarm@lists.cs.columbia.edu>
+Cc: Shanker Donthineni <shankerd@codeaurora.org>, Vikram Sethi <vikrams@codeaurora.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Shanker,
-
-On Fri, Feb 16, 2018 at 06:57:46PM -0600, Shanker Donthineni wrote:
-> Two point of unification cache maintenance operations 'DC CVAU' and
-> 'IC IVAU' are optional for implementors as per ARMv8 specification.
-> This patch parses the updated CTR_EL0 register definition and adds
-> the required changes to skip POU operations if the hardware reports
-> CTR_EL0.IDC and/or CTR_EL0.IDC.
-> 
-> CTR_EL0.DIC: Instruction cache invalidation requirements for
->  instruction to data coherence. The meaning of this bit[29].
->   0: Instruction cache invalidation to the point of unification
->      is required for instruction to data coherence.
->   1: Instruction cache cleaning to the point of unification is
->       not required for instruction to data coherence.
-> 
-> CTR_EL0.IDC: Data cache clean requirements for instruction to data
->  coherence. The meaning of this bit[28].
->   0: Data cache clean to the point of unification is required for
->      instruction to data coherence, unless CLIDR_EL1.LoC == 0b000
->      or (CLIDR_EL1.LoUIS == 0b000 && CLIDR_EL1.LoUU == 0b000).
->   1: Data cache clean to the point of unification is not required
->      for instruction to data coherence.
-> 
-> Signed-off-by: Philip Elcan <pelcan@codeaurora.org>
-> Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
-> ---
->  arch/arm64/include/asm/assembler.h | 48 ++++++++++++++++++++++++--------------
->  arch/arm64/include/asm/cache.h     |  2 ++
->  arch/arm64/kernel/cpufeature.c     |  2 ++
->  arch/arm64/mm/cache.S              | 26 ++++++++++++++-------
->  4 files changed, 51 insertions(+), 27 deletions(-)
-
-I was looking at our CTR_EL0 code last week but forgot to post the patch I
-wrote fixing up some of the fields. I just send it now, so please can
-you rebase on top of:
-
-http://lists.infradead.org/pipermail/linux-arm-kernel/2018-February/560488.html
-
-Also:
-
-> diff --git a/arch/arm64/include/asm/cache.h b/arch/arm64/include/asm/cache.h
-> index ea9bb4e..aea533b 100644
-> --- a/arch/arm64/include/asm/cache.h
-> +++ b/arch/arm64/include/asm/cache.h
-> @@ -22,6 +22,8 @@
->  #define CTR_L1IP_MASK		3
->  #define CTR_CWG_SHIFT		24
->  #define CTR_CWG_MASK		15
-> +#define CTR_IDC_SHIFT		28
-> +#define CTR_DIC_SHIFT		29
->  
->  #define CTR_L1IP(ctr)		(((ctr) >> CTR_L1IP_SHIFT) & CTR_L1IP_MASK)
->  
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 29b1f87..f42bb5a 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -200,6 +200,8 @@ static int __init register_cpu_hwcaps_dumper(void)
->  
->  static const struct arm64_ftr_bits ftr_ctr[] = {
->  	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_EXACT, 31, 1, 1),	/* RAO */
-> +	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, CTR_DIC_SHIFT, 1, 0),	/* DIC */
-> +	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, CTR_IDC_SHIFT, 1, 0),	/* IDC */
->  	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_HIGHER_SAFE, 24, 4, 0),	/* CWG */
->  	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, 20, 4, 0),	/* ERG */
->  	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, 16, 4, 1),	/* DminLine */
-
-Could you update the other table entries here to use the CTR_*_SHIFT values
-as well?
-
-Thanks,
-
-Will
+SW4gQUFyY2g2NC9BQXJjaDMyLCB0aGUgdmlydHVhbCBjb3VudGVyIHVzZXMgYSBmaXhlZCB2aXJ0
+dWFsIG9mZnNldApvZiB6ZXJvIGluIHRoZSBmb2xsb3dpbmcgc2l0dWF0aW9ucyBhcyBwZXIgQVJN
+djggc3BlY2lmaWNhdGlvbnM6CgoxKSBIQ1JfRUwyLkUySCBpcyAxLCBhbmQgQ05UVkNUX0VMMC9D
+TlRWQ1QgYXJlIHJlYWQgZnJvbSBFTDIuCjIpIEhDUl9FTDIue0UySCwgVEdFfSBpcyB7MSwgMX0s
+IGFuZCBlaXRoZXI6CiAgIOKAlCBDTlRWQ1RfRUwwIGlzIHJlYWQgZnJvbSBOb24tc2VjdXJlIEVM
+MCBvciBFTDIuCiAgIOKAlCBDTlRWQ1QgaXMgcmVhZCBmcm9tIE5vbi1zZWN1cmUgRUwwLgoKU28s
+IG5vIG5lZWQgdG8gemVybyBDTlRWT0ZGX0VMMi9DTlRWT0ZGIGZvciBWSEUgY2FzZS4KClNpZ25l
+ZC1vZmYtYnk6IFNoYW5rZXIgRG9udGhpbmVuaSA8c2hhbmtlcmRAY29kZWF1cm9yYS5vcmc+Ci0t
+LQogdmlydC9rdm0vYXJtL2FyY2hfdGltZXIuYyB8IDYgKysrKy0tCiAxIGZpbGUgY2hhbmdlZCwg
+NCBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL3ZpcnQva3ZtL2Fy
+bS9hcmNoX3RpbWVyLmMgYi92aXJ0L2t2bS9hcm0vYXJjaF90aW1lci5jCmluZGV4IDcwMjY4YzAu
+Ljg2ZWNhMzI0IDEwMDY0NAotLS0gYS92aXJ0L2t2bS9hcm0vYXJjaF90aW1lci5jCisrKyBiL3Zp
+cnQva3ZtL2FybS9hcmNoX3RpbWVyLmMKQEAgLTU0MSw5ICs1NDEsMTEgQEAgdm9pZCBrdm1fdGlt
+ZXJfdmNwdV9wdXQoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQogCSAqIFRoZSBrZXJuZWwgbWF5IGRl
+Y2lkZSB0byBydW4gdXNlcnNwYWNlIGFmdGVyIGNhbGxpbmcgdmNwdV9wdXQsIHNvCiAJICogd2Ug
+cmVzZXQgY250dm9mZiB0byAwIHRvIGVuc3VyZSBhIGNvbnNpc3RlbnQgcmVhZCBiZXR3ZWVuIHVz
+ZXIKIAkgKiBhY2Nlc3NlcyB0byB0aGUgdmlydHVhbCBjb3VudGVyIGFuZCBrZXJuZWwgYWNjZXNz
+IHRvIHRoZSBwaHlzaWNhbAotCSAqIGNvdW50ZXIuCisJICogY291bnRlciBvZiBub24tVkhFIGNh
+c2UuIEZvciBWSEUsIHRoZSB2aXJ0dWFsIGNvdW50ZXIgdXNlcyBhIGZpeGVkCisJICogdmlydHVh
+bCBvZmZzZXQgb2YgemVybywgc28gbm8gbmVlZCB0byB6ZXJvIENOVFZPRkZfRUwyIHJlZ2lzdGVy
+LgogCSAqLwotCXNldF9jbnR2b2ZmKDApOworCWlmICghaGFzX3ZoZSgpKQorCQlzZXRfY250dm9m
+ZigwKTsKIH0KIAogLyoKLS0gClF1YWxjb21tIERhdGFjZW50ZXIgVGVjaG5vbG9naWVzLCBJbmMu
+IG9uIGJlaGFsZiBvZiB0aGUgUXVhbGNvbW0gVGVjaG5vbG9naWVzLCBJbmMuClF1YWxjb21tIFRl
+Y2hub2xvZ2llcywgSW5jLiBpcyBhIG1lbWJlciBvZiB0aGUgQ29kZSBBdXJvcmEgRm9ydW0sIGEg
+TGludXggRm91bmRhdGlvbiBDb2xsYWJvcmF0aXZlIFByb2plY3QuCgoKX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KbGludXgtYXJtLWtlcm5lbCBtYWlsaW5n
+IGxpc3QKbGludXgtYXJtLWtlcm5lbEBsaXN0cy5pbmZyYWRlYWQub3JnCmh0dHA6Ly9saXN0cy5p
+bmZyYWRlYWQub3JnL21haWxtYW4vbGlzdGluZm8vbGludXgtYXJtLWtlcm5lbAo=
