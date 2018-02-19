@@ -1,301 +1,349 @@
-From: Shanker Donthineni <shankerd@codeaurora.org>
-Subject: [PATCH] arm64: Add support for new control bits CTR_EL0.IDC and
- CTR_EL0.IDC
-Date: Fri, 16 Feb 2018 18:57:46 -0600
-Message-ID: <1518829066-3558-1-git-send-email-shankerd@codeaurora.org>
+From: Tomasz Nowicki <tn-nYOzD4b6Jr9Wk0Htik3J/w@public.gmane.org>
+Subject: Re: [PATCH 1/4] iommu: Add virtio-iommu driver
+Date: Mon, 19 Feb 2018 13:23:55 +0100
+Message-ID: <417e1617-e5ff-7b13-64e3-a8a98d30bcb9@semihalf.com>
+References: <20180214145340.1223-1-jean-philippe.brucker@arm.com>
+	<20180214145340.1223-2-jean-philippe.brucker@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Will Deacon <will.deacon@arm.com>, linux-kernel <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm <kvmarm@lists.cs.columbia.edu>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Philip Elcan <pelcan@codeaurora.org>, Shanker Donthineni <shankerd@codeaurora.org>, Vikram Sethi <vikrams@codeaurora.org>
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <20180214145340.1223-2-jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
+Content-Language: en-GB
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, virtio-dev-sDuHXQ4OtrM4h7I2RyI4rWD2FQJk+8+b@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
+Cc: jayachandran.nair-YGCgFSpz5w/QT0dZR+AlfA@public.gmane.org, tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, jintack-eQaUEPhvms7ENvBUuze7eA@public.gmane.org, eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Two point of unification cache maintenance operations 'DC CVAU' and
-'IC IVAU' are optional for implementors as per ARMv8 specification.
-This patch parses the updated CTR_EL0 register definition and adds
-the required changes to skip POU operations if the hardware reports
-CTR_EL0.IDC and/or CTR_EL0.IDC.
+Hi Jean,
 
-CTR_EL0.DIC: Instruction cache invalidation requirements for
- instruction to data coherence. The meaning of this bit[29].
-  0: Instruction cache invalidation to the point of unification
-     is required for instruction to data coherence.
-  1: Instruction cache cleaning to the point of unification is
-      not required for instruction to data coherence.
+On 14.02.2018 15:53, Jean-Philippe Brucker wrote:
+> The virtio IOMMU is a para-virtualized device, allowing to send IOMMU
+> requests such as map/unmap over virtio-mmio transport without emulating
+> page tables. This implementation handles ATTACH, DETACH, MAP and UNMAP
+> requests.
+> 
+> The bulk of the code transforms calls coming from the IOMMU API into
+> corresponding virtio requests. Mappings are kept in an interval tree
+> instead of page tables.
+> 
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
+> ---
+>   MAINTAINERS                       |   6 +
+>   drivers/iommu/Kconfig             |  11 +
+>   drivers/iommu/Makefile            |   1 +
+>   drivers/iommu/virtio-iommu.c      | 960 ++++++++++++++++++++++++++++++++++++++
+>   include/uapi/linux/virtio_ids.h   |   1 +
+>   include/uapi/linux/virtio_iommu.h | 116 +++++
+>   6 files changed, 1095 insertions(+)
+>   create mode 100644 drivers/iommu/virtio-iommu.c
+>   create mode 100644 include/uapi/linux/virtio_iommu.h
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 3bdc260e36b7..2a181924d420 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -14818,6 +14818,12 @@ S:	Maintained
+>   F:	drivers/virtio/virtio_input.c
+>   F:	include/uapi/linux/virtio_input.h
+>   
+> +VIRTIO IOMMU DRIVER
+> +M:	Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
+> +S:	Maintained
+> +F:	drivers/iommu/virtio-iommu.c
+> +F:	include/uapi/linux/virtio_iommu.h
+> +
+>   VIRTUAL BOX GUEST DEVICE DRIVER
+>   M:	Hans de Goede <hdegoede-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>   M:	Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
+> diff --git a/drivers/iommu/Kconfig b/drivers/iommu/Kconfig
+> index f3a21343e636..1ea0ec74524f 100644
+> --- a/drivers/iommu/Kconfig
+> +++ b/drivers/iommu/Kconfig
+> @@ -381,4 +381,15 @@ config QCOM_IOMMU
+>   	help
+>   	  Support for IOMMU on certain Qualcomm SoCs.
+>   
+> +config VIRTIO_IOMMU
+> +	bool "Virtio IOMMU driver"
+> +	depends on VIRTIO_MMIO
+> +	select IOMMU_API
+> +	select INTERVAL_TREE
+> +	select ARM_DMA_USE_IOMMU if ARM
+> +	help
+> +	  Para-virtualised IOMMU driver with virtio.
+> +
+> +	  Say Y here if you intend to run this kernel as a guest.
+> +
+>   endif # IOMMU_SUPPORT
+> diff --git a/drivers/iommu/Makefile b/drivers/iommu/Makefile
+> index 1fb695854809..9c68be1365e1 100644
+> --- a/drivers/iommu/Makefile
+> +++ b/drivers/iommu/Makefile
+> @@ -29,3 +29,4 @@ obj-$(CONFIG_EXYNOS_IOMMU) += exynos-iommu.o
+>   obj-$(CONFIG_FSL_PAMU) += fsl_pamu.o fsl_pamu_domain.o
+>   obj-$(CONFIG_S390_IOMMU) += s390-iommu.o
+>   obj-$(CONFIG_QCOM_IOMMU) += qcom_iommu.o
+> +obj-$(CONFIG_VIRTIO_IOMMU) += virtio-iommu.o
+> diff --git a/drivers/iommu/virtio-iommu.c b/drivers/iommu/virtio-iommu.c
+> new file mode 100644
+> index 000000000000..a9c9245e8ba2
+> --- /dev/null
+> +++ b/drivers/iommu/virtio-iommu.c
+> @@ -0,0 +1,960 @@
+> +/*
+> + * Virtio driver for the paravirtualized IOMMU
+> + *
+> + * Copyright (C) 2018 ARM Limited
+> + * Author: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
+> + *
+> + * SPDX-License-Identifier: GPL-2.0
+> + */
+> +
+> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+> +
+> +#include <linux/amba/bus.h>
+> +#include <linux/delay.h>
+> +#include <linux/dma-iommu.h>
+> +#include <linux/freezer.h>
+> +#include <linux/interval_tree.h>
+> +#include <linux/iommu.h>
+> +#include <linux/module.h>
+> +#include <linux/of_iommu.h>
+> +#include <linux/of_platform.h>
+> +#include <linux/pci.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/virtio.h>
+> +#include <linux/virtio_config.h>
+> +#include <linux/virtio_ids.h>
+> +#include <linux/wait.h>
+> +
+> +#include <uapi/linux/virtio_iommu.h>
+> +
+> +#define MSI_IOVA_BASE			0x8000000
+> +#define MSI_IOVA_LENGTH			0x100000
+> +
+> +struct viommu_dev {
+> +	struct iommu_device		iommu;
+> +	struct device			*dev;
+> +	struct virtio_device		*vdev;
+> +
+> +	struct ida			domain_ids;
+> +
+> +	struct virtqueue		*vq;
+> +	/* Serialize anything touching the request queue */
+> +	spinlock_t			request_lock;
+> +
+> +	/* Device configuration */
+> +	struct iommu_domain_geometry	geometry;
+> +	u64				pgsize_bitmap;
+> +	u8				domain_bits;
+> +};
+> +
+> +struct viommu_mapping {
+> +	phys_addr_t			paddr;
+> +	struct interval_tree_node	iova;
+> +	union {
+> +		struct virtio_iommu_req_map map;
+> +		struct virtio_iommu_req_unmap unmap;
+> +	} req;
+> +};
+> +
+> +struct viommu_domain {
+> +	struct iommu_domain		domain;
+> +	struct viommu_dev		*viommu;
+> +	struct mutex			mutex;
+> +	unsigned int			id;
+> +
+> +	spinlock_t			mappings_lock;
+> +	struct rb_root_cached		mappings;
+> +
+> +	/* Number of endpoints attached to this domain */
+> +	unsigned long			endpoints;
+> +};
+> +
+> +struct viommu_endpoint {
+> +	struct viommu_dev		*viommu;
+> +	struct viommu_domain		*vdomain;
+> +};
+> +
+> +struct viommu_request {
+> +	struct scatterlist		top;
+> +	struct scatterlist		bottom;
+> +
+> +	int				written;
+> +	struct list_head		list;
+> +};
+> +
+> +#define to_viommu_domain(domain)	\
+> +	container_of(domain, struct viommu_domain, domain)
+> +
+> +/* Virtio transport */
+> +
+> +static int viommu_status_to_errno(u8 status)
+> +{
+> +	switch (status) {
+> +	case VIRTIO_IOMMU_S_OK:
+> +		return 0;
+> +	case VIRTIO_IOMMU_S_UNSUPP:
+> +		return -ENOSYS;
+> +	case VIRTIO_IOMMU_S_INVAL:
+> +		return -EINVAL;
+> +	case VIRTIO_IOMMU_S_RANGE:
+> +		return -ERANGE;
+> +	case VIRTIO_IOMMU_S_NOENT:
+> +		return -ENOENT;
+> +	case VIRTIO_IOMMU_S_FAULT:
+> +		return -EFAULT;
+> +	case VIRTIO_IOMMU_S_IOERR:
+> +	case VIRTIO_IOMMU_S_DEVERR:
+> +	default:
+> +		return -EIO;
+> +	}
+> +}
+> +
+> +/*
+> + * viommu_get_req_size - compute request size
+> + *
+> + * A virtio-iommu request is split into one device-read-only part (top) and one
+> + * device-write-only part (bottom). Given a request, return the sizes of the two
+> + * parts in @top and @bottom.
+> + *
+> + * Return 0 on success, or an error when the request seems invalid.
+> + */
+> +static int viommu_get_req_size(struct viommu_dev *viommu,
+> +			       struct virtio_iommu_req_head *req, size_t *top,
+> +			       size_t *bottom)
+> +{
+> +	size_t size;
+> +	union virtio_iommu_req *r = (void *)req;
+> +
+> +	*bottom = sizeof(struct virtio_iommu_req_tail);
+> +
+> +	switch (req->type) {
+> +	case VIRTIO_IOMMU_T_ATTACH:
+> +		size = sizeof(r->attach);
+> +		break;
+> +	case VIRTIO_IOMMU_T_DETACH:
+> +		size = sizeof(r->detach);
+> +		break;
+> +	case VIRTIO_IOMMU_T_MAP:
+> +		size = sizeof(r->map);
+> +		break;
+> +	case VIRTIO_IOMMU_T_UNMAP:
+> +		size = sizeof(r->unmap);
+> +		break;
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +
+> +	*top = size - *bottom;
+> +	return 0;
+> +}
+> +
+> +static int viommu_receive_resp(struct viommu_dev *viommu, int nr_sent,
+> +			       struct list_head *sent)
+> +{
+> +
+> +	unsigned int len;
+> +	int nr_received = 0;
+> +	struct viommu_request *req, *pending;
+> +
+> +	pending = list_first_entry_or_null(sent, struct viommu_request, list);
+> +	if (WARN_ON(!pending))
+> +		return 0;
+> +
+> +	while ((req = virtqueue_get_buf(viommu->vq, &len)) != NULL) {
+> +		if (req != pending) {
+> +			dev_warn(viommu->dev, "discarding stale request\n");
+> +			continue;
+> +		}
+> +
+> +		pending->written = len;
+> +
+> +		if (++nr_received == nr_sent) {
+> +			WARN_ON(!list_is_last(&pending->list, sent));
+> +			break;
+> +		} else if (WARN_ON(list_is_last(&pending->list, sent))) {
+> +			break;
+> +		}
+> +
+> +		pending = list_next_entry(pending, list);
 
-CTR_EL0.IDC: Data cache clean requirements for instruction to data
- coherence. The meaning of this bit[28].
-  0: Data cache clean to the point of unification is required for
-     instruction to data coherence, unless CLIDR_EL1.LoC == 0b000
-     or (CLIDR_EL1.LoUIS == 0b000 && CLIDR_EL1.LoUU == 0b000).
-  1: Data cache clean to the point of unification is not required
-     for instruction to data coherence.
+We should remove current element from the pending list. There is no 
+guarantee we get response for each while loop so when we get back for 
+more the _viommu_send_reqs_sync() caller will pass pointer to the out of 
+date head next time.
 
-Signed-off-by: Philip Elcan <pelcan@codeaurora.org>
-Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
----
- arch/arm64/include/asm/assembler.h | 48 ++++++++++++++++++++++++--------------
- arch/arm64/include/asm/cache.h     |  2 ++
- arch/arm64/kernel/cpufeature.c     |  2 ++
- arch/arm64/mm/cache.S              | 26 ++++++++++++++-------
- 4 files changed, 51 insertions(+), 27 deletions(-)
+> +	}
+> +
+> +	return nr_received;
+> +}
+> +
+> +static int _viommu_send_reqs_sync(struct viommu_dev *viommu,
+> +				  struct viommu_request *req, int nr,
+> +				  int *nr_sent)
+> +{
+> +	int i, ret;
+> +	ktime_t timeout;
+> +	LIST_HEAD(pending);
+> +	int nr_received = 0;
+> +	struct scatterlist *sg[2];
+> +	/*
+> +	 * The timeout is chosen arbitrarily. It's only here to prevent locking
+> +	 * up the CPU in case of a device bug.
+> +	 */
+> +	unsigned long timeout_ms = 1000;
+> +
+> +	*nr_sent = 0;
+> +
+> +	for (i = 0; i < nr; i++, req++) {
+> +		req->written = 0;
+> +
+> +		sg[0] = &req->top;
+> +		sg[1] = &req->bottom;
+> +
+> +		ret = virtqueue_add_sgs(viommu->vq, sg, 1, 1, req,
+> +					GFP_ATOMIC);
+> +		if (ret)
+> +			break;
+> +
+> +		list_add_tail(&req->list, &pending);
+> +	}
+> +
+> +	if (i && !virtqueue_kick(viommu->vq))
+> +		return -EPIPE;
+> +
+> +	timeout = ktime_add_ms(ktime_get(), timeout_ms * i);
+> +	while (nr_received < i && ktime_before(ktime_get(), timeout)) {
+> +		nr_received += viommu_receive_resp(viommu, i - nr_received,
+> +						   &pending);
+> +		if (nr_received < i)
+> +			cpu_relax();
+> +	}
+> +
+> +	if (nr_received != i)
+> +		ret = -ETIMEDOUT;
+> +
+> +	if (ret == -ENOSPC && nr_received)
+> +		/*
+> +		 * We've freed some space since virtio told us that the ring is
+> +		 * full, tell the caller to come back for more.
+> +		 */
+> +		ret = -EAGAIN;
+> +
+> +	*nr_sent = nr_received;
+> +
+> +	return ret;
+> +}
 
-diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
-index 3c78835..9eaa948 100644
---- a/arch/arm64/include/asm/assembler.h
-+++ b/arch/arm64/include/asm/assembler.h
-@@ -30,6 +30,7 @@
- #include <asm/pgtable-hwdef.h>
- #include <asm/ptrace.h>
- #include <asm/thread_info.h>
-+#include <asm/cache.h>
- 
- 	.macro save_and_disable_daif, flags
- 	mrs	\flags, daif
-@@ -334,9 +335,9 @@
-  * raw_dcache_line_size - get the minimum D-cache line size on this CPU
-  * from the CTR register.
-  */
--	.macro	raw_dcache_line_size, reg, tmp
--	mrs	\tmp, ctr_el0			// read CTR
--	ubfm	\tmp, \tmp, #16, #19		// cache line size encoding
-+	.macro	raw_dcache_line_size, reg, tmp, ctr
-+	mrs	\ctr, ctr_el0			// read CTR
-+	ubfm	\tmp, \ctr, #16, #19		// cache line size encoding
- 	mov	\reg, #4			// bytes per word
- 	lsl	\reg, \reg, \tmp		// actual cache line size
- 	.endm
-@@ -344,9 +345,9 @@
- /*
-  * dcache_line_size - get the safe D-cache line size across all CPUs
-  */
--	.macro	dcache_line_size, reg, tmp
--	read_ctr	\tmp
--	ubfm		\tmp, \tmp, #16, #19	// cache line size encoding
-+	.macro	dcache_line_size, reg, tmp, ctr
-+	read_ctr	\ctr
-+	ubfm		\tmp, \ctr, #16, #19	// cache line size encoding
- 	mov		\reg, #4		// bytes per word
- 	lsl		\reg, \reg, \tmp	// actual cache line size
- 	.endm
-@@ -355,9 +356,9 @@
-  * raw_icache_line_size - get the minimum I-cache line size on this CPU
-  * from the CTR register.
-  */
--	.macro	raw_icache_line_size, reg, tmp
--	mrs	\tmp, ctr_el0			// read CTR
--	and	\tmp, \tmp, #0xf		// cache line size encoding
-+	.macro	raw_icache_line_size, reg, tmp, ctr
-+	mrs	\ctr, ctr_el0			// read CTR
-+	and	\tmp, \ctr, #0xf		// cache line size encoding
- 	mov	\reg, #4			// bytes per word
- 	lsl	\reg, \reg, \tmp		// actual cache line size
- 	.endm
-@@ -365,9 +366,9 @@
- /*
-  * icache_line_size - get the safe I-cache line size across all CPUs
-  */
--	.macro	icache_line_size, reg, tmp
--	read_ctr	\tmp
--	and		\tmp, \tmp, #0xf	// cache line size encoding
-+	.macro	icache_line_size, reg, tmp, ctr
-+	read_ctr	\ctr
-+	and		\tmp, \ctr, #0xf	// cache line size encoding
- 	mov		\reg, #4		// bytes per word
- 	lsl		\reg, \reg, \tmp	// actual cache line size
- 	.endm
-@@ -408,13 +409,21 @@
-  * 	size:		size of the region
-  * 	Corrupts:	kaddr, size, tmp1, tmp2
-  */
--	.macro dcache_by_line_op op, domain, kaddr, size, tmp1, tmp2
--	dcache_line_size \tmp1, \tmp2
-+	.macro dcache_by_line_op op, domain, kaddr, size, tmp1, tmp2, tmp3
-+	dcache_line_size \tmp1, \tmp2, \tmp3
- 	add	\size, \kaddr, \size
- 	sub	\tmp2, \tmp1, #1
- 	bic	\kaddr, \kaddr, \tmp2
- 9998:
--	.if	(\op == cvau || \op == cvac)
-+	.if	(\op == cvau)
-+alternative_if_not ARM64_WORKAROUND_CLEAN_CACHE
-+	tbnz	\tmp3, #CTR_IDC_SHIFT, 9997f
-+	dc	cvau, \kaddr
-+alternative_else
-+	dc	civac, \kaddr
-+	nop
-+alternative_endif
-+	.elseif (\op == cvac)
- alternative_if_not ARM64_WORKAROUND_CLEAN_CACHE
- 	dc	\op, \kaddr
- alternative_else
-@@ -433,6 +442,7 @@
- 	cmp	\kaddr, \size
- 	b.lo	9998b
- 	dsb	\domain
-+9997:
- 	.endm
- 
- /*
-@@ -441,10 +451,11 @@
-  *
-  * 	start, end:	virtual addresses describing the region
-  *	label:		A label to branch to on user fault.
-- * 	Corrupts:	tmp1, tmp2
-+ * 	Corrupts:	tmp1, tmp2, tmp3
-  */
--	.macro invalidate_icache_by_line start, end, tmp1, tmp2, label
--	icache_line_size \tmp1, \tmp2
-+	.macro invalidate_icache_by_line start, end, tmp1, tmp2, tmp3, label
-+	icache_line_size \tmp1, \tmp2, \tmp3
-+	tbnz    \tmp3, #CTR_DIC_SHIFT, 9996f
- 	sub	\tmp2, \tmp1, #1
- 	bic	\tmp2, \start, \tmp2
- 9997:
-@@ -454,6 +465,7 @@
- 	b.lo	9997b
- 	dsb	ish
- 	isb
-+9996:
- 	.endm
- 
- /*
-diff --git a/arch/arm64/include/asm/cache.h b/arch/arm64/include/asm/cache.h
-index ea9bb4e..aea533b 100644
---- a/arch/arm64/include/asm/cache.h
-+++ b/arch/arm64/include/asm/cache.h
-@@ -22,6 +22,8 @@
- #define CTR_L1IP_MASK		3
- #define CTR_CWG_SHIFT		24
- #define CTR_CWG_MASK		15
-+#define CTR_IDC_SHIFT		28
-+#define CTR_DIC_SHIFT		29
- 
- #define CTR_L1IP(ctr)		(((ctr) >> CTR_L1IP_SHIFT) & CTR_L1IP_MASK)
- 
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 29b1f87..f42bb5a 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -200,6 +200,8 @@ static int __init register_cpu_hwcaps_dumper(void)
- 
- static const struct arm64_ftr_bits ftr_ctr[] = {
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_EXACT, 31, 1, 1),	/* RAO */
-+	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, CTR_DIC_SHIFT, 1, 0),	/* DIC */
-+	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, CTR_IDC_SHIFT, 1, 0),	/* IDC */
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_HIGHER_SAFE, 24, 4, 0),	/* CWG */
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, 20, 4, 0),	/* ERG */
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, 16, 4, 1),	/* DminLine */
-diff --git a/arch/arm64/mm/cache.S b/arch/arm64/mm/cache.S
-index 758bde7..5764af8 100644
---- a/arch/arm64/mm/cache.S
-+++ b/arch/arm64/mm/cache.S
-@@ -24,6 +24,7 @@
- #include <asm/cpufeature.h>
- #include <asm/alternative.h>
- #include <asm/asm-uaccess.h>
-+#include <asm/cache.h>
- 
- /*
-  *	flush_icache_range(start,end)
-@@ -50,7 +51,12 @@ ENTRY(flush_icache_range)
-  */
- ENTRY(__flush_cache_user_range)
- 	uaccess_ttbr0_enable x2, x3, x4
--	dcache_line_size x2, x3
-+	dcache_line_size x2, x3, x4
-+alternative_if_not ARM64_WORKAROUND_CLEAN_CACHE
-+	tbnz    x4, #CTR_IDC_SHIFT, 8f
-+alternative_else
-+	nop
-+alternative_endif
- 	sub	x3, x2, #1
- 	bic	x4, x0, x3
- 1:
-@@ -60,7 +66,9 @@ user_alt 9f, "dc cvau, x4",  "dc civac, x4",  ARM64_WORKAROUND_CLEAN_CACHE
- 	b.lo	1b
- 	dsb	ish
- 
--	invalidate_icache_by_line x0, x1, x2, x3, 9f
-+8:
-+	invalidate_icache_by_line x0, x1, x2, x3, x4, 9f
-+
- 	mov	x0, #0
- 1:
- 	uaccess_ttbr0_disable x1, x2
-@@ -82,7 +90,7 @@ ENDPROC(__flush_cache_user_range)
- ENTRY(invalidate_icache_range)
- 	uaccess_ttbr0_enable x2, x3, x4
- 
--	invalidate_icache_by_line x0, x1, x2, x3, 2f
-+	invalidate_icache_by_line x0, x1, x2, x3, x4, 2f
- 	mov	x0, xzr
- 1:
- 	uaccess_ttbr0_disable x1, x2
-@@ -102,7 +110,7 @@ ENDPROC(invalidate_icache_range)
-  *	- size    - size in question
-  */
- ENTRY(__flush_dcache_area)
--	dcache_by_line_op civac, sy, x0, x1, x2, x3
-+	dcache_by_line_op civac, sy, x0, x1, x2, x3, x4
- 	ret
- ENDPIPROC(__flush_dcache_area)
- 
-@@ -116,7 +124,7 @@ ENDPIPROC(__flush_dcache_area)
-  *	- size    - size in question
-  */
- ENTRY(__clean_dcache_area_pou)
--	dcache_by_line_op cvau, ish, x0, x1, x2, x3
-+	dcache_by_line_op cvau, ish, x0, x1, x2, x3, x4
- 	ret
- ENDPROC(__clean_dcache_area_pou)
- 
-@@ -140,7 +148,7 @@ ENTRY(__inval_dcache_area)
-  */
- __dma_inv_area:
- 	add	x1, x1, x0
--	dcache_line_size x2, x3
-+	dcache_line_size x2, x3, x4
- 	sub	x3, x2, #1
- 	tst	x1, x3				// end cache line aligned?
- 	bic	x1, x1, x3
-@@ -178,7 +186,7 @@ ENTRY(__clean_dcache_area_poc)
-  *	- size    - size in question
-  */
- __dma_clean_area:
--	dcache_by_line_op cvac, sy, x0, x1, x2, x3
-+	dcache_by_line_op cvac, sy, x0, x1, x2, x3, x4
- 	ret
- ENDPIPROC(__clean_dcache_area_poc)
- ENDPROC(__dma_clean_area)
-@@ -193,7 +201,7 @@ ENDPROC(__dma_clean_area)
-  *	- size    - size in question
-  */
- ENTRY(__clean_dcache_area_pop)
--	dcache_by_line_op cvap, sy, x0, x1, x2, x3
-+	dcache_by_line_op cvap, sy, x0, x1, x2, x3, x4
- 	ret
- ENDPIPROC(__clean_dcache_area_pop)
- 
-@@ -206,7 +214,7 @@ ENDPIPROC(__clean_dcache_area_pop)
-  *	- size    - size in question
-  */
- ENTRY(__dma_flush_area)
--	dcache_by_line_op civac, sy, x0, x1, x2, x3
-+	dcache_by_line_op civac, sy, x0, x1, x2, x3, x4
- 	ret
- ENDPIPROC(__dma_flush_area)
- 
--- 
-Qualcomm Datacenter Technologies, Inc. on behalf of the Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
+Thanks,
+Tomasz
