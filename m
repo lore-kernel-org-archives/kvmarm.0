@@ -1,64 +1,62 @@
-From: Shanker Donthineni <shankerd@codeaurora.org>
-Subject: Re: [PATCH] arm64: Add support for new control bits CTR_EL0.IDC and
- CTR_EL0.IDC
-Date: Mon, 19 Feb 2018 12:30:46 -0600
-Message-ID: <da2b54da-cb05-b478-ce61-eeb3308de672@codeaurora.org>
-References: <1518829066-3558-1-git-send-email-shankerd@codeaurora.org>
- <20180219143820.5oxc2kendvq4bbtt@armageddon.cambridge.arm.com>
- <92836754-2ab3-d5db-f0be-7ee3e10f368f@codeaurora.org>
- <20180219171852.jsbzawbsyv7v5yi7@armageddon.cambridge.arm.com>
-Reply-To: shankerd@codeaurora.org
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Subject: Re: [PATCH 1/4] iommu: Add virtio-iommu driver
+Date: Tue, 20 Feb 2018 11:30:41 +0000
+Message-ID: <ab5bf4f1-9564-9dc6-fefe-5c96352da1be@arm.com>
+References: <20180214145340.1223-1-jean-philippe.brucker@arm.com>
+ <20180214145340.1223-2-jean-philippe.brucker@arm.com>
+ <417e1617-e5ff-7b13-64e3-a8a98d30bcb9@semihalf.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180219171852.jsbzawbsyv7v5yi7@armageddon.cambridge.arm.com>
+Return-path: <virtio-dev-return-3240-gcvd-virtio-dev=m.gmane.org@lists.oasis-open.org>
+Sender: <virtio-dev@lists.oasis-open.org>
+List-Post: <mailto:virtio-dev@lists.oasis-open.org>
+List-Help: <mailto:virtio-dev-help@lists.oasis-open.org>
+List-Unsubscribe: <mailto:virtio-dev-unsubscribe@lists.oasis-open.org>
+List-Subscribe: <mailto:virtio-dev-subscribe@lists.oasis-open.org>
+In-Reply-To: <417e1617-e5ff-7b13-64e3-a8a98d30bcb9@semihalf.com>
 Content-Language: en-US
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Philip Elcan <pelcan@codeaurora.org>, Vikram Sethi <vikrams@codeaurora.org>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel <linux-kernel@vger.kernel.org>, kvmarm <kvmarm@lists.cs.columbia.edu>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+To: Tomasz Nowicki <tn@semihalf.com>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Cc: "joro@8bytes.org" <joro@8bytes.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>, Marc Zyngier <Marc.Zyngier@arm.com>, Robin Murphy <Robin.Murphy@arm.com>, Will Deacon <Will.Deacon@arm.com>, Lorenzo Pieralisi <Lorenzo.Pieralisi@arm.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peterx@redhat.com" <peterx@redhat.com>, "bharat.bhushan@nxp.com" <bharat.bhushan@nxp.com>, "tnowicki@caviumnetworks.com" <tnowicki@caviumnetworks.com>, "jayachandran.nair@cavium.com" <jayachandran.nair@cavium.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "jintack@cs.columbia.edu" <jintack@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Thanks Catalin for your comments.
+On 19/02/18 12:23, Tomasz Nowicki wrote:
+[...]
+>> +static int viommu_receive_resp(struct viommu_dev *viommu, int nr_sent,
+>> +			       struct list_head *sent)
+>> +{
+>> +
+>> +	unsigned int len;
+>> +	int nr_received = 0;
+>> +	struct viommu_request *req, *pending;
+>> +
+>> +	pending = list_first_entry_or_null(sent, struct viommu_request, list);
+>> +	if (WARN_ON(!pending))
+>> +		return 0;
+>> +
+>> +	while ((req = virtqueue_get_buf(viommu->vq, &len)) != NULL) {
+>> +		if (req != pending) {
+>> +			dev_warn(viommu->dev, "discarding stale request\n");
+>> +			continue;
+>> +		}
+>> +
+>> +		pending->written = len;
+>> +
+>> +		if (++nr_received == nr_sent) {
+>> +			WARN_ON(!list_is_last(&pending->list, sent));
+>> +			break;
+>> +		} else if (WARN_ON(list_is_last(&pending->list, sent))) {
+>> +			break;
+>> +		}
+>> +
+>> +		pending = list_next_entry(pending, list);
+> 
+> We should remove current element from the pending list. There is no 
+> guarantee we get response for each while loop so when we get back for 
+> more the _viommu_send_reqs_sync() caller will pass pointer to the out of 
+> date head next time.
 
-On 02/19/2018 11:18 AM, Catalin Marinas wrote:
-> On Mon, Feb 19, 2018 at 10:35:30AM -0600, Shanker Donthineni wrote:
->> On 02/19/2018 08:38 AM, Catalin Marinas wrote:
->>> On the patch, I'd rather have an alternative framework entry for no VAU
->>> cache maint required and some ret instruction at the beginning of the
->>> cache maint function rather than jumping out of the loop somewhere
->>> inside the cache maintenance code, penalising the CPUs that do require
->>> it.
->>
->> Alternative framework might break things in case of CPU hotplug. I need one
->> more confirmation from you on incorporating alternative framework.     
-> 
-> CPU hotplug can be an issue but it should be handled like other similar
-> cases: if a CPU comes online late and its features are incompatible, it
-> should not be brought online. The cpufeature code handles this.
-> 
-> With Will's patch for CTR_EL0, we handle different CPU features during
-> boot, defaulting to the lowest value for the IDC/DIC bits.
-> 
-> I suggest you add new ARM64_HAS_* feature bits and enable them based on
-> CTR_EL0.IDC and DIC. You could check for both being 1 with a single
-> feature bit but I guess an implementation is allowed to have these
-> different (e.g. DIC == 0 and IDC == 1).
-> 
+Right, I'll fix this
 
-I'll add two new features ARM64_HAS_DIC and ARM64_HAS_IDC to support
-all implementations. Unfortunately QCOM server chips supports IDC not DIC.
- 
-
--- 
-Shanker Donthineni
-Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
+Thanks,
+Jean
