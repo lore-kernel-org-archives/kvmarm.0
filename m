@@ -1,166 +1,107 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 10/19] KVM: arm/arm64: Do not use kern_hyp_va() with
- kvm_vgic_global_state
-Date: Tue, 20 Feb 2018 11:40:02 +0000
-Message-ID: <3b8c1304-704a-9db6-2215-ec9439b30ae6@arm.com>
-References: <20180104184334.16571-1-marc.zyngier@arm.com>
- <20180104184334.16571-11-marc.zyngier@arm.com> <20180115153632.GK21403@cbox>
- <af5ddd03-ddaa-0fe9-51ec-4946b5adfe1c@arm.com> <20180216090543.GC10440@cbox>
- <3b5ec8d7-01b0-86ce-f709-185821e68d47@arm.com> <20180219143941.GA16779@cbox>
+From: Punit Agrawal <punit.agrawal@arm.com>
+Subject: Re: [PATCH 01/11] ACPI / APEI: Move the estatus queue code up,
+ and under its own ifdef
+Date: Tue, 20 Feb 2018 18:26:10 +0000
+Message-ID: <87zi43zfel.fsf@e105922-lin.cambridge.arm.com>
+References: <20180215185606.26736-1-james.morse@arm.com>
+ <20180215185606.26736-2-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180219143941.GA16779@cbox>
-Content-Language: en-GB
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Mark Rutland <mark.rutland@arm.com>, Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org, Steve Capper <steve.capper@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5409E40805
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Feb 2018 13:19:59 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id pN-hXyStsbPP for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Feb 2018 13:19:38 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 050D94070F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Feb 2018 13:19:38 -0500 (EST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: James Morse <james.morse@arm.com>
+Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Borislav Petkov <bp@alien8.de>, linux-arm-kernel@lists.infradead.org, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 19/02/18 14:39, Christoffer Dall wrote:
-> On Fri, Feb 16, 2018 at 09:33:39AM +0000, Marc Zyngier wrote:
->> On 16/02/18 09:05, Christoffer Dall wrote:
->>> On Thu, Feb 15, 2018 at 01:22:56PM +0000, Marc Zyngier wrote:
->>>> On 15/01/18 15:36, Christoffer Dall wrote:
->>>>> On Thu, Jan 04, 2018 at 06:43:25PM +0000, Marc Zyngier wrote:
->>>>>> kvm_vgic_global_state is part of the read-only section, and is
->>>>>> usually accessed using a PC-relative address generation (adrp + add).
->>>>>>
->>>>>> It is thus useless to use kern_hyp_va() on it, and actively problematic
->>>>>> if kern_hyp_va() becomes non-idempotent. On the other hand, there is
->>>>>> no way that the compiler is going to guarantee that such access is
->>>>>> always be PC relative.
->>>>>
->>>>> nit: is always be
->>>>>
->>>>>>
->>>>>> So let's bite the bullet and provide our own accessor.
->>>>>>
->>>>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->>>>>> ---
->>>>>>  arch/arm/include/asm/kvm_hyp.h   | 6 ++++++
->>>>>>  arch/arm64/include/asm/kvm_hyp.h | 9 +++++++++
->>>>>>  virt/kvm/arm/hyp/vgic-v2-sr.c    | 4 ++--
->>>>>>  3 files changed, 17 insertions(+), 2 deletions(-)
->>>>>>
->>>>>> diff --git a/arch/arm/include/asm/kvm_hyp.h b/arch/arm/include/asm/kvm_hyp.h
->>>>>> index ab20ffa8b9e7..1d42d0aa2feb 100644
->>>>>> --- a/arch/arm/include/asm/kvm_hyp.h
->>>>>> +++ b/arch/arm/include/asm/kvm_hyp.h
->>>>>> @@ -26,6 +26,12 @@
->>>>>>  
->>>>>>  #define __hyp_text __section(.hyp.text) notrace
->>>>>>  
->>>>>> +#define hyp_symbol_addr(s)						\
->>>>>> +	({								\
->>>>>> +		typeof(s) *addr = &(s);					\
->>>>>> +		addr;							\
->>>>>> +	})
->>>>>> +
->>>>>>  #define __ACCESS_VFP(CRn)			\
->>>>>>  	"mrc", "mcr", __stringify(p10, 7, %0, CRn, cr0, 0), u32
->>>>>>  
->>>>>> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
->>>>>> index 08d3bb66c8b7..a2d98c539023 100644
->>>>>> --- a/arch/arm64/include/asm/kvm_hyp.h
->>>>>> +++ b/arch/arm64/include/asm/kvm_hyp.h
->>>>>> @@ -25,6 +25,15 @@
->>>>>>  
->>>>>>  #define __hyp_text __section(.hyp.text) notrace
->>>>>>  
->>>>>> +#define hyp_symbol_addr(s)						\
->>>>>> +	({								\
->>>>>> +		typeof(s) *addr;					\
->>>>>> +		asm volatile("adrp	%0, %1\n"			\
->>>>>> +			     "add	%0, %0, :lo12:%1\n"		\
->>>>>> +			     : "=r" (addr) : "S" (&s));			\
->>>>>
->>>>> Can't we use adr_l here?
->>>>
->>>> Unfortunately not. All the asm/assembler.h macros are unavailable to
->>>> inline assembly. We could start introducing equivalent macros for that
->>>> purpose, but that's starting to be outside of the scope of this series.
->>>>
->>>
->>> Absolutely.  Forget I asked.
->>>
->>>>>
->>>>>> +		addr;							\
->>>>>> +	})
->>>>>> +
->>>>>
->>>>> I don't fully appreciate the semantics of this macro going by its name
->>>>> only.  My understanding is that if you want to resolve a symbol to an
->>>>> address which is mapped in hyp, then use this.  Is this correct?
->>>>
->>>> The goal of this macro is to return a symbol's address based on a
->>>> PC-relative computation, as opposed to a loading the VA from a constant
->>>> pool or something similar. This works well for HYP, as an absolute VA is
->>>> guaranteed to be wrong.
->>>>
->>>>>
->>>>> If so, can we add a small comment (because I can't come up with a better
->>>>> name).
->>>>
->>>> I'll add the above if that works for you.
->>>>
->>>
->>> Yes it does.  The only thing that remains a bit unclear is what the
->>> difference between this and kern_hyp_va is, and when you'd choose to use
->>> one over the other.  Perhaps we need a single place which documents our
->>> primitives and tells us what to use when.  At least, I'm for sure not
->>> going to be able to figure this out later on.
->>
->> Let me try to explain that:
->>
->> The two primitives work on different "objects". kern_hyp_va() works on
->> an address. If what you have is a pointer, then kern_hyp_va is your
->> friend. On the contrary, if what you have is a symbol instead of the
->> address of that object (and thus not something we obtain by reading a
->> variable), then hyp_symbol_addr is probably what you need.
->>
->> Of course, a symbol can also be a variable, which makes things a bit
->> harder. The asm constraint are such as compilation will break if you try
->> to treat a local variable as a symbol (the 'S' constraint is defined as
->> "An absolute symbolic address or a label reference", and the '&s' makes
->> it pretty hard to fool).
->>
->> I've tried to make it make it foolproof, but who knows... ;-)
->>
-> ok, so what exactly is this macro doing different then simply using the
-> symbol directly?  Only ensuring that the generated code is using
-> PC-relative addressing?  If so, should we be using this macro everywhere
-> in Hyp code where we dereference a symbol?
+Hi James,
 
-I think we should. We so far rely on the fact that the compiler won't be
-stupid enough to generate a constant pool load to compute an address
-that it can reach using PC-relative addressing, but you never know.
+A couple of nitpicks below.
 
-> What is it about hyp code that makes us need this when it's not needed
-> for the kernel itself, and both support address space randomization?  Is
-> that because the main kernel is properly relocated after deciding on the
-> randomization, but Hyp is not?
+James Morse <james.morse@arm.com> writes:
 
-The issue is that the kernel is linked at a particular VA, and we run it
-at another. This hasn't much to do with randomization.
+> To support asynchronous NMI-like notifications on arm64 we need to use
+> the estatus-queue. These patches refactor it to allow multiple APEI
+> notification types to use it.
+>
+> First we move the estatus-queue code higher in the file so that any
+> notify_foo() handler can make user of it.
+                                ^
+                                use
 
-> It may be worth trying to put hyp_symbol_addr and kern_hyp_va in the
-> same header file and have something explaining when to use what and why
-> in that single place, but if that breaks the world, then never mind...
+>
+> This patch moves code around ... and makes the following trivial change:
+> Freshen the dated comment above ghes_estatus_llist. printk() is no
+> longer the issue, its the helpers like memory_failure_queue() that
+> still aren't nmi safe.
+>
+> Signed-off-by: James Morse <james.morse@arm.com>
+> ---
+>  drivers/acpi/apei/ghes.c | 267 ++++++++++++++++++++++++-----------------------
+>  1 file changed, 139 insertions(+), 128 deletions(-)
+>
+> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+> index 1efefe919555..e42b587c509b 100644
+> --- a/drivers/acpi/apei/ghes.c
+> +++ b/drivers/acpi/apei/ghes.c
+> @@ -545,6 +545,16 @@ static int ghes_print_estatus(const char *pfx,
+>  	return 0;
+>  }
+>  
+> +static void __ghes_panic(struct ghes *ghes)
+> +{
+> +	__ghes_print_estatus(KERN_EMERG, ghes->generic, ghes->estatus);
+> +
+> +	/* reboot to log the error! */
+> +	if (!panic_timeout)
+> +		panic_timeout = ghes_panic_timeout;
+> +	panic("Fatal hardware error!");
+> +}
+> +
+>  /*
+>   * GHES error status reporting throttle, to report more kinds of
+>   * errors, instead of just most frequently occurred errors.
+> @@ -672,6 +682,135 @@ static void ghes_estatus_cache_add(
+>  	rcu_read_unlock();
+>  }
+>  
+> +#ifdef CONFIG_HAVE_ACPI_APEI_NMI
+> +/*
+> + * While printk() now has an in_nmi() path, the handling for CPER records
+> + * does not. For example, memory_failure_queue() takes spinlocks and calls
+> + * schedule_work_on().
+> + *
+> + * So in any NMI-like handler, we allocate required memory from lock-less
+> + * memory allocator (ghes_estatus_pool), save estatus into it, put them into
+> + * lock-less list (ghes_estatus_llist), then delay printk into IRQ context via
+> + * irq_work (ghes_proc_irq_work).  ghes_estatus_size_request record
+> + * required pool size by all NMI error source.
 
-Seems sensible.
+I am not sure it is worth keeping specific references to printk
+around. As you're refreshing the comment, I'd suggest replacing the
+above reference with "...processing of error status reported by the
+NMI..." or something similar.
 
 Thanks,
+Punit
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+
+[...]
