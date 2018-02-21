@@ -1,15 +1,15 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v4 04/40] KVM: arm64: Rework hyp_panic for VHE and non-VHE
-Date: Wed, 21 Feb 2018 18:32:44 +0100
-Message-ID: <20180221173244.bszvzbs7whmr5p3x@kamzik.brq.redhat.com>
+Subject: Re: [PATCH v4 08/40] KVM: arm/arm64: Introduce vcpu_el1_is_32bit
+Date: Wed, 21 Feb 2018 18:34:43 +0100
+Message-ID: <20180221173443.rr2vgn4xqnmeikqz@kamzik.brq.redhat.com>
 References: <20180215210332.8648-1-christoffer.dall@linaro.org>
- <20180215210332.8648-5-christoffer.dall@linaro.org>
+ <20180215210332.8648-9-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <20180215210332.8648-5-christoffer.dall@linaro.org>
+In-Reply-To: <20180215210332.8648-9-christoffer.dall@linaro.org>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -23,36 +23,33 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Tomasz Nowicki <tn@semihalf.com>, kvmarm@lists.cs.columbia.edu, Julien Grall <julien.grall@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, linux-arm-kernel@lists.infradead.org, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Feb 15, 2018 at 10:02:56PM +0100, Christoffer Dall wrote:
-> VHE actually doesn't rely on clearing the VTTBR when returning to the
-> host kernel, and that is the current key mechanism of hyp_panic to
-> figure out how to attempt to return to a state good enough to print a
-> panic statement.
+On Thu, Feb 15, 2018 at 10:03:00PM +0100, Christoffer Dall wrote:
+> We have numerous checks around that checks if the HCR_EL2 has the RW bit
+> set to figure out if we're running an AArch64 or AArch32 VM.  In some
+> cases, directly checking the RW bit (given its unintuitive name), is a
+> bit confusing, and that's not going to improve as we move logic around
+> for the following patches that optimize KVM on AArch64 hosts with VHE.
 > 
-> Therefore, we split the hyp_panic function into two functions, a VHE and
-> a non-VHE, keeping the non-VHE version intact, but changing the VHE
-> behavior.
+> Therefore, introduce a helper, vcpu_el1_is_32bit, and replace existing
+> direct checks of HCR_EL2.RW with the helper.
 > 
-> The vttbr_el2 check on VHE doesn't really make that much sense, because
-> the only situation where we can get here on VHE is when the hypervisor
-> assembly code actually called into hyp_panic, which only happens when
-> VBAR_EL2 has been set to the KVM exception vectors.  On VHE, we can
-> always safely disable the traps and restore the host registers at this
-> point, so we simply do that unconditionally and call into the panic
-> function directly.
-> 
-> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+> Reviewed-by: Julien Grall <julien.grall@arm.com>
+> Reviewed-by: Julien Thierry <julien.thierry@arm.com>
 > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 > ---
 > 
 > Notes:
+>     Changes since v2:
+>      - New patch
+>     
 >     Changes since v1:
->      - Fixed typos in the commit message
->      - Still use the generic __deactivte_traps() function in the hyp panic
->        code until we rework that logic later.
+>      - Reworded comments as suggested by Drew
 > 
->  arch/arm64/kvm/hyp/switch.c | 42 +++++++++++++++++++++++-------------------
->  1 file changed, 23 insertions(+), 19 deletions(-)
+>  arch/arm64/include/asm/kvm_emulate.h |  7 ++++++-
+>  arch/arm64/kvm/hyp/switch.c          | 11 +++++------
+>  arch/arm64/kvm/hyp/sysreg-sr.c       |  5 +++--
+>  arch/arm64/kvm/inject_fault.c        |  6 +++---
+>  4 files changed, 17 insertions(+), 12 deletions(-)
 >
 
 Reviewed-by: Andrew Jones <drjones@redhat.com>
