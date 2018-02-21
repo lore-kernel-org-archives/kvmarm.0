@@ -1,122 +1,63 @@
-From: Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [PATCH v3] arm64: Add support for new control bits CTR_EL0.DIC
- and CTR_EL0.IDC
-Date: Wed, 21 Feb 2018 16:51:40 +0000
-Message-ID: <0eb2d23b-cf96-c7ff-9820-16ed113f4862@arm.com>
-References: <1519220946-13901-1-git-send-email-shankerd@codeaurora.org>
- <20180221150929.hkvtwu4fgfeis5cy@salmiak>
- <5be4684b-e2d8-1b3b-4c96-03c7dae0b619@codeaurora.org>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH v4 01/40] KVM: arm/arm64: Avoid vcpu_load for other vcpu
+ ioctls than KVM_RUN
+Date: Wed, 21 Feb 2018 18:05:02 +0100
+Message-ID: <20180221170502.5czjqewvmmprp4bm@kamzik.brq.redhat.com>
+References: <20180215210332.8648-1-christoffer.dall@linaro.org>
+ <20180215210332.8648-2-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <5be4684b-e2d8-1b3b-4c96-03c7dae0b619@codeaurora.org>
-Content-Language: en-GB
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: shankerd@codeaurora.org, Mark Rutland <mark.rutland@arm.com>
-Cc: Philip Elcan <pelcan@codeaurora.org>, Vikram Sethi <vikrams@codeaurora.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel <linux-kernel@vger.kernel.org>, kvmarm <kvmarm@lists.cs.columbia.edu>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EC4EE402DB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Feb 2018 11:58:50 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id flqmzCEqdKmR for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 21 Feb 2018 11:58:29 -0500 (EST)
+Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A944D402D6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Feb 2018 11:58:29 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <20180215210332.8648-2-christoffer.dall@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, Yury Norov <ynorov@caviumnetworks.com>, linux-arm-kernel@lists.infradead.org, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 21/02/18 16:14, Shanker Donthineni wrote:
-[...]
->>> @@ -1100,6 +1114,20 @@ static int cpu_copy_el2regs(void *__unused)
->>>   		.enable = cpu_clear_disr,
->>>   	},
->>>   #endif /* CONFIG_ARM64_RAS_EXTN */
->>> +#ifdef CONFIG_ARM64_SKIP_CACHE_POU
->>> +	{
->>> +		.desc = "DCache clean to POU",
->>
->> This description is confusing, and sounds like it's describing DC CVAU, rather
->> than the ability to ellide it. How about:
->>
+On Thu, Feb 15, 2018 at 10:02:53PM +0100, Christoffer Dall wrote:
+> Calling vcpu_load() registers preempt notifiers for this vcpu and calls
+> kvm_arch_vcpu_load().  The latter will soon be doing a lot of heavy
+> lifting on arm/arm64 and will try to do things such as enabling the
+> virtual timer and setting us up to handle interrupts from the timer
+> hardware.
 > 
-> Sure, I'll take your suggestion.
-
-Can we at least spell "elision" correctly please? ;)
-
-Personally I read DIC and IDC as "D-cache to I-cache coherency" and 
-"I-cache to D-cache coherency" respectively (just my interpretation, 
-I've not looked into the spec work for any hints of rationale), but out 
-loud those do sound so poorly-defined that keeping things in terms of 
-the required maintenance probably is better.
-
->> 		.desc = "D-cache maintenance ellision (IDC)"
->>
->>> +		.capability = ARM64_HAS_CACHE_IDC,
->>> +		.def_scope = SCOPE_SYSTEM,
->>> +		.matches = has_cache_idc,
->>> +	},
->>> +	{
->>> +		.desc = "ICache invalidation to POU",
->>
->> ... and correspondingly:
->>
->> 		.desc = "I-cache maintenance ellision (DIC)"
->>
->>> +		.capability = ARM64_HAS_CACHE_DIC,
->>> +		.def_scope = SCOPE_SYSTEM,
->>> +		.matches = has_cache_dic,
->>> +	},
->>> +#endif /* CONFIG_ARM64_CACHE_DIC */
->>>   	{},
->>>   };
-[...]
->>> +alternative_if ARM64_HAS_CACHE_DIC
->>> +	isb
->>
->> Why have we gained an ISB here if DIC is set?
->>
+> Loading state onto hardware registers and enabling hardware to signal
+> interrupts can be problematic when we're not actually about to run the
+> VCPU, because it makes it difficult to establish the right context when
+> handling interrupts from the timer, and it makes the register access
+> code difficult to reason about.
 > 
-> I believe synchronization barrier (ISB) is required here to support self-modifying/jump-labels
-> code.
->    
->> This is for a user address, and I can't see why DIC would imply we need an
->> extra ISB kernel-side.
->>
+> Luckily, now when we call vcpu_load in each ioctl implementation, we can
+> simply remove the call from the non-KVM_RUN vcpu ioctls, and our
+> kvm_arch_vcpu_load() is only used for loading vcpu content to the
+> physical CPU when we're actually going to run the vcpu.
 > 
-> This is for user and kernel addresses, alternatives and jumplabel patching logic
-> calls flush_icache_range().
+> Reviewed-by: Julien Grall <julien.grall@arm.com>
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> ---
+>  arch/arm64/kvm/guest.c | 3 ---
+>  virt/kvm/arm/arm.c     | 9 ---------
+>  2 files changed, 12 deletions(-)
+>
 
-There's an ISB hidden in invalidate_icache_by_line(), so it probably 
-would be unsafe to start implicitly skipping that.
-
->>> +	b	8f
->>> +alternative_else_nop_endif
->>>   	invalidate_icache_by_line x0, x1, x2, x3, 9f
->>> -	mov	x0, #0
->>> +8:	mov	x0, #0
->>>   1:
->>>   	uaccess_ttbr0_disable x1, x2
->>>   	ret
->>> @@ -80,6 +87,12 @@ ENDPROC(__flush_cache_user_range)
->>>    *	- end     - virtual end address of region
->>>    */
->>>   ENTRY(invalidate_icache_range)
->>> +alternative_if ARM64_HAS_CACHE_DIC
->>> +	mov	x0, xzr
->>> +	dsb	ish
->>
->> Do we actually need a DSB in this case?
->>
-> 
-> I'll remove if everyone agree.
-> 
-> Will, Can you comment on this?
-> 
->> As-is, this function *only* invalidates the I-cache, so we already assume that
->> the data is visible at the PoU at this point. I don't see what extra gaurantee
->> we'd need the DSB for.
-
-If so, then ditto for the existing invalidate_icache_by_line() code 
-presumably.
-
-Robin.
+Reviewed-by: Andrew Jones <drjones@redhat.com>
