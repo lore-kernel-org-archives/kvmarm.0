@@ -1,67 +1,44 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v4 20/40] KVM: arm/arm64: Remove leftover comment from
- kvm_vcpu_run_vhe
-Date: Wed, 21 Feb 2018 18:47:31 +0100
-Message-ID: <20180221174731.mrykgulbdjesyz4m@kamzik.brq.redhat.com>
+Subject: Re: [PATCH v4 22/40] KVM: arm64: Don't save the host ELR_EL2 and
+ SPSR_EL2 on VHE systems
+Date: Wed, 21 Feb 2018 18:49:24 +0100
+Message-ID: <20180221174924.lazhs44fi4qmvend@kamzik.brq.redhat.com>
 References: <20180215210332.8648-1-christoffer.dall@linaro.org>
- <20180215210332.8648-21-christoffer.dall@linaro.org>
+ <20180215210332.8648-23-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 730C34070F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Feb 2018 12:41:18 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Z3Vc9TquoV6x for <kvmarm@lists.cs.columbia.edu>;
- Wed, 21 Feb 2018 12:40:58 -0500 (EST)
-Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F01524047F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Feb 2018 12:40:57 -0500 (EST)
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <20180215210332.8648-21-christoffer.dall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+In-Reply-To: <20180215210332.8648-23-christoffer.dall@linaro.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, Yury Norov <ynorov@caviumnetworks.com>, linux-arm-kernel@lists.infradead.org, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Tomasz Nowicki <tn@semihalf.com>, kvmarm@lists.cs.columbia.edu, Julien Grall <julien.grall@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, linux-arm-kernel@lists.infradead.org, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Feb 15, 2018 at 10:03:12PM +0100, Christoffer Dall wrote:
-> The comment only applied to SPE on non-VHE systems, so we simply remove
-> it.
+On Thu, Feb 15, 2018 at 10:03:14PM +0100, Christoffer Dall wrote:
+> On non-VHE systems we need to save the ELR_EL2 and SPSR_EL2 so that we can
+> return to the host in EL1 in the same state and location where we issued a
+> hypercall to EL2, but on VHE ELR_EL2 and SPSR_EL2 are not useful because we
+> never enter a guest as a result of an exception entry that would be directly
+> handled by KVM. The kernel entry code already saves ELR_EL1/SPSR_EL1 on
+> exception entry, which is enough.  Therefore, factor out these registers into
+> separate save/restore functions, making it easy to exclude them from the VHE
+> world-switch path later on.
 > 
-> Suggested-by: Andrew Jones <drjones@redhat.com>
-> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 > ---
->  arch/arm64/kvm/hyp/switch.c | 4 ----
->  1 file changed, 4 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> index 717c8f5c6be7..a99224996e33 100644
-> --- a/arch/arm64/kvm/hyp/switch.c
-> +++ b/arch/arm64/kvm/hyp/switch.c
-> @@ -410,10 +410,6 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
->  		__fpsimd_restore_state(&host_ctxt->gp_regs.fp_regs);
->  	}
->  
-> -	/*
-> -	 * This must come after restoring the host sysregs, since a non-VHE
-> -	 * system may enable SPE here and make use of the TTBRs.
-> -	 */
->  	__debug_switch_to_host(vcpu);
->  
->  	return exit_code;
-> -- 
-> 2.14.2
+>  arch/arm64/kvm/hyp/sysreg-sr.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
 >
 
 Reviewed-by: Andrew Jones <drjones@redhat.com>
