@@ -1,17 +1,16 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v4 31/40] KVM: arm64: Move common VHE/non-VHE trap config
- in separate functions
-Date: Thu, 22 Feb 2018 19:17:19 +0100
-Message-ID: <20180222181719.GV29376@cbox>
+From: Julien Grall <julien.grall@arm.com>
+Subject: Re: [PATCH v4 28/40] KVM: arm64: Defer saving/restoring 64-bit
+ sysregs to vcpu load/put on VHE
+Date: Thu, 22 Feb 2018 18:30:11 +0000
+Message-ID: <ece29cf2-4c60-dc3d-b2a9-e7e06380f860@arm.com>
 References: <20180215210332.8648-1-christoffer.dall@linaro.org>
- <20180215210332.8648-32-christoffer.dall@linaro.org>
- <86zi42jkae.wl-marc.zyngier@arm.com>
+ <20180215210332.8648-29-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <86zi42jkae.wl-marc.zyngier@arm.com>
+In-Reply-To: <20180215210332.8648-29-christoffer.dall@linaro.org>
+Content-Language: en-US
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -21,164 +20,106 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, Tomasz Nowicki <tn@semihalf.com>, kvmarm@lists.cs.columbia.edu, Julien Grall <julien.grall@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, linux-arm-kernel@lists.infradead.org, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
+To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Tomasz Nowicki <tn@semihalf.com>, Yury Norov <ynorov@caviumnetworks.com>, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Feb 21, 2018 at 05:59:37PM +0000, Marc Zyngier wrote:
-> On Thu, 15 Feb 2018 21:03:23 +0000,
-> Christoffer Dall wrote:
-> > 
-> > As we are about to be more lazy with some of the trap configuration
-> > register read/writes for VHE systems, move the logic that is currently
-> > shared between VHE and non-VHE into a separate function which can be
-> > called from either the world-switch path or from vcpu_load/vcpu_put.
-> > 
-> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> > ---
-> > 
-> > Notes:
-> >     Changes since v3:
-> >      - Separate fpsimd32 trap configuration into a separate function
-> >        which is still called from __activate_traps, because we no longer
-> >        defer saving/restoring of VFP registers to load/put.
-> > 
-> >  arch/arm64/kvm/hyp/switch.c | 76 +++++++++++++++++++++++++++------------------
-> >  1 file changed, 45 insertions(+), 31 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> > index 909aa3fe9196..17e3c6f26a34 100644
-> > --- a/arch/arm64/kvm/hyp/switch.c
-> > +++ b/arch/arm64/kvm/hyp/switch.c
-> > @@ -56,7 +56,45 @@ static inline void __hyp_text __fpsimd_save_fpexc32(struct kvm_vcpu *vcpu)
-> >  	vcpu->arch.ctxt.sys_regs[FPEXC32_EL2] = read_sysreg(fpexc32_el2);
-> >  }
-> >  
-> > -static void __hyp_text __activate_traps_vhe(void)
-> > +static void __hyp_text __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
-> > +{
-> > +	/*
-> > +	 * We are about to set CPTR_EL2.TFP to trap all floating point
-> > +	 * register accesses to EL2, however, the ARM ARM clearly states that
-> > +	 * traps are only taken to EL2 if the operation would not otherwise
-> > +	 * trap to EL1.  Therefore, always make sure that for 32-bit guests,
-> > +	 * we set FPEXC.EN to prevent traps to EL1, when setting the TFP bit.
-> > +	 * If FP/ASIMD is not implemented, FPEXC is UNDEFINED and any access to
-> > +	 * it will cause an exception.
-> > +	 */
-> > +	if (vcpu_el1_is_32bit(vcpu) && system_supports_fpsimd()) {
-> > +		write_sysreg(1 << 30, fpexc32_el2);
-> > +		isb();
-> > +	}
-> > +}
-> > +
-> > +static void __hyp_text __activate_traps_common(struct kvm_vcpu *vcpu)
-> > +{
-> > +	/* Trap on AArch32 cp15 c15 (impdef sysregs) accesses (EL1 or EL0) */
-> > +	write_sysreg(1 << 15, hstr_el2);
-> > +	/*
-> > +	 * Make sure we trap PMU access from EL0 to EL2. Also sanitize
-> > +	 * PMSELR_EL0 to make sure it never contains the cycle
-> > +	 * counter, which could make a PMXEVCNTR_EL0 access UNDEF at
-> > +	 * EL1 instead of being trapped to EL2.
-> > +	 */
-> > +	write_sysreg(0, pmselr_el0);
-> > +	write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
-> > +	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
-> > +}
-> > +
-> > +static void __hyp_text __deactivate_traps_common(void)
-> > +{
-> > +	write_sysreg(0, hstr_el2);
-> > +	write_sysreg(0, pmuserenr_el0);
-> > +}
-> > +
-> > +static void __hyp_text __activate_traps_vhe(struct kvm_vcpu *vcpu)
-> >  {
-> >  	u64 val;
-> >  
-> > @@ -68,7 +106,7 @@ static void __hyp_text __activate_traps_vhe(void)
-> >  	write_sysreg(kvm_get_hyp_vector(), vbar_el1);
-> >  }
-> >  
-> > -static void __hyp_text __activate_traps_nvhe(void)
-> > +static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
+Hi Christoffer,
+
+On 15/02/18 21:03, Christoffer Dall wrote:
+> Some system registers do not affect the host kernel's execution and can
+> therefore be loaded when we are about to run a VCPU and we don't have to
+> restore the host state to the hardware before the time when we are
+> actually about to return to userspace or schedule out the VCPU thread.
 > 
-> I have the ugly feeling that this hunk should not be in this
-> patch. Have you tried bisecting the compilation of this series?
+> The EL1 system registers and the userspace state registers only
+> affecting EL0 execution do not need to be saved and restored on every
+> switch between the VM and the host, because they don't affect the host
+> kernel's execution.
+> 
+> We mark all registers which are now deffered as such in the
+
+NIT: s/deffered/deferred/ I think.
+
+> vcpu_{read,write}_sys_reg accessors in sys-regs.c to ensure the most
+> up-to-date copy is always accessed.
+> 
+> Note MPIDR_EL1 (controlled via VMPIDR_EL2) is accessed from other vcpu
+> threads, for example via the GIC emulation, and therefore must be
+> declared as immediate, which is fine as the guest cannot modify this
+> value.
+> 
+> The 32-bit sysregs can also be deferred but we do this in a separate
+> patch as it requires a bit more infrastructure.
+
+
+[...]
+
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index b3c3f014aa61..f060309337aa 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -87,6 +87,26 @@ u64 vcpu_read_sys_reg(struct kvm_vcpu *vcpu, int reg)
+>   	 * exit from the guest but are only saved on vcpu_put.
+>   	 */
+>   	switch (reg) {
+> +	case CSSELR_EL1:	return read_sysreg_s(SYS_CSSELR_EL1);
+> +	case SCTLR_EL1:		return read_sysreg_s(sctlr_EL12);
+> +	case ACTLR_EL1:		return read_sysreg_s(SYS_ACTLR_EL1);
+> +	case CPACR_EL1:		return read_sysreg_s(cpacr_EL12);
+> +	case TTBR0_EL1:		return read_sysreg_s(ttbr0_EL12);
+> +	case TTBR1_EL1:		return read_sysreg_s(ttbr1_EL12);
+> +	case TCR_EL1:		return read_sysreg_s(tcr_EL12);
+> +	case ESR_EL1:		return read_sysreg_s(esr_EL12);
+> +	case AFSR0_EL1:		return read_sysreg_s(afsr0_EL12);
+> +	case AFSR1_EL1:		return read_sysreg_s(afsr1_EL12);
+> +	case FAR_EL1:		return read_sysreg_s(far_EL12);
+> +	case MAIR_EL1:		return read_sysreg_s(mair_EL12);
+> +	case VBAR_EL1:		return read_sysreg_s(vbar_EL12);
+> +	case CONTEXTIDR_EL1:	return read_sysreg_s(contextidr_EL12);
+> +	case TPIDR_EL0:		return read_sysreg_s(SYS_TPIDR_EL0);
+> +	case TPIDRRO_EL0:	return read_sysreg_s(SYS_TPIDRRO_EL0);
+
+I find a bit confusing to have some EL0 registers in the middle of EL1 
+ones. Is it because they are listed by encoding?
+
+> +	case TPIDR_EL1:		return read_sysreg_s(SYS_TPIDR_EL1);
+> +	case AMAIR_EL1:		return read_sysreg_s(amair_EL12);
+> +	case CNTKCTL_EL1:	return read_sysreg_s(cntkctl_EL12);
+> +	case PAR_EL1:		return read_sysreg_s(SYS_PAR_EL1);
+>   	}
+>   
+>   immediate_read:
+> @@ -103,6 +123,26 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, int reg, u64 val)
+>   	 * entry to the guest but are only restored on vcpu_load.
+>   	 */
+>   	switch (reg) {
+> +	case CSSELR_EL1:	write_sysreg_s(val, SYS_CSSELR_EL1);	return;
+> +	case SCTLR_EL1:		write_sysreg_s(val, sctlr_EL12);	return;
+> +	case ACTLR_EL1:		write_sysreg_s(val, SYS_ACTLR_EL1);	return;
+> +	case CPACR_EL1:		write_sysreg_s(val, cpacr_EL12);	return;
+> +	case TTBR0_EL1:		write_sysreg_s(val, ttbr0_EL12);	return;
+> +	case TTBR1_EL1:		write_sysreg_s(val, ttbr1_EL12);	return;
+> +	case TCR_EL1:		write_sysreg_s(val, tcr_EL12);		return;
+> +	case ESR_EL1:		write_sysreg_s(val, esr_EL12);		return;
+> +	case AFSR0_EL1:		write_sysreg_s(val, afsr0_EL12);	return;
+> +	case AFSR1_EL1:		write_sysreg_s(val, afsr1_EL12);	return;
+> +	case FAR_EL1:		write_sysreg_s(val, far_EL12);		return;
+> +	case MAIR_EL1:		write_sysreg_s(val, mair_EL12);		return;
+> +	case VBAR_EL1:		write_sysreg_s(val, vbar_EL12);		return;
+> +	case CONTEXTIDR_EL1:	write_sysreg_s(val, contextidr_EL12);	return;
+> +	case TPIDR_EL0:		write_sysreg_s(val, SYS_TPIDR_EL0);	return;
+> +	case TPIDRRO_EL0:	write_sysreg_s(val, SYS_TPIDRRO_EL0);	return;
+> +	case TPIDR_EL1:		write_sysreg_s(val, SYS_TPIDR_EL1);	return;
+> +	case AMAIR_EL1:		write_sysreg_s(val, amair_EL12);	return;
+> +	case CNTKCTL_EL1:	write_sysreg_s(val, cntkctl_EL12);	return;
+> +	case PAR_EL1:		write_sysreg_s(val, SYS_PAR_EL1);	return;
+>   	}
+>   
+>   immediate_write:
 > 
 
-I have, and I seem to remember catching this one during that exact
-exercise, but I probably committed the change to the wrong patch.  Duh.
+Cheers,
 
-Thanks for spotting.
--Christoffer
-
-> >  {
-> >  	u64 val;
-> >  
-> > @@ -85,37 +123,14 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
-> >  {
-> >  	u64 hcr = vcpu->arch.hcr_el2;
-> >  
-> > -	/*
-> > -	 * We are about to set CPTR_EL2.TFP to trap all floating point
-> > -	 * register accesses to EL2, however, the ARM ARM clearly states that
-> > -	 * traps are only taken to EL2 if the operation would not otherwise
-> > -	 * trap to EL1.  Therefore, always make sure that for 32-bit guests,
-> > -	 * we set FPEXC.EN to prevent traps to EL1, when setting the TFP bit.
-> > -	 * If FP/ASIMD is not implemented, FPEXC is UNDEFINED and any access to
-> > -	 * it will cause an exception.
-> > -	 */
-> > -	if (vcpu_el1_is_32bit(vcpu) && system_supports_fpsimd()) {
-> > -		write_sysreg(1 << 30, fpexc32_el2);
-> > -		isb();
-> > -	}
-> > +	write_sysreg(hcr, hcr_el2);
-> >  
-> >  	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN) && (hcr & HCR_VSE))
-> >  		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
-> >  
-> > -	write_sysreg(hcr, hcr_el2);
-> > -
-> > -	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
-> > -	write_sysreg(1 << 15, hstr_el2);
-> > -	/*
-> > -	 * Make sure we trap PMU access from EL0 to EL2. Also sanitize
-> > -	 * PMSELR_EL0 to make sure it never contains the cycle
-> > -	 * counter, which could make a PMXEVCNTR_EL0 access UNDEF at
-> > -	 * EL1 instead of being trapped to EL2.
-> > -	 */
-> > -	write_sysreg(0, pmselr_el0);
-> > -	write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
-> > -	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
-> > -	__activate_traps_arch()();
-> > +	__activate_traps_fpsimd32(vcpu);
-> > +	__activate_traps_common(vcpu);
-> > +	__activate_traps_arch()(vcpu);
-> >  }
-> >  
-> >  static void __hyp_text __deactivate_traps_vhe(void)
-> > @@ -160,9 +175,8 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
-> >  	if (vcpu->arch.hcr_el2 & HCR_VSE)
-> >  		vcpu->arch.hcr_el2 = read_sysreg(hcr_el2);
-> >  
-> > +	__deactivate_traps_common();
-> >  	__deactivate_traps_arch()();
-> > -	write_sysreg(0, hstr_el2);
-> > -	write_sysreg(0, pmuserenr_el0);
-> >  }
-> >  
-> >  static void __hyp_text __activate_vm(struct kvm *kvm)
-> > -- 
-> > 2.14.2
-> > 
-> 
-> Otherwise:
-> 
-> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-> 
-> 	M.
-> 
-> -- 
-> Jazz is not dead, it just smell funny.
+-- 
+Julien Grall
