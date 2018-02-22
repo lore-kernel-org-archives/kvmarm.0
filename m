@@ -1,134 +1,110 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 38/40] KVM: arm/arm64: Handle VGICv3 save/restore from
- the main VGIC code on VHE
-Date: Thu, 22 Feb 2018 12:32:11 +0000
-Message-ID: <3de7e88c-e7a2-f9b5-41f7-3b6886459806@arm.com>
+Subject: Re: [PATCH v4 37/40] KVM: arm/arm64: Move arm64-only vgic-v2-sr.c
+ file to arm64
+Date: Thu, 22 Feb 2018 12:33:20 +0000
+Message-ID: <3d76ca96-f8c1-0965-f166-ba10fb5b2b08@arm.com>
 References: <20180215210332.8648-1-christoffer.dall@linaro.org>
- <20180215210332.8648-39-christoffer.dall@linaro.org>
+ <20180215210332.8648-38-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180215210332.8648-39-christoffer.dall@linaro.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 393564056B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Feb 2018 07:27:06 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Xn6WJH44v5f3 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 22 Feb 2018 07:26:44 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C13F49E7B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Feb 2018 07:26:44 -0500 (EST)
+In-Reply-To: <20180215210332.8648-38-christoffer.dall@linaro.org>
 Content-Language: en-GB
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, Tomasz Nowicki <tn@semihalf.com>, Julien Grall <julien.grall@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
+Cc: kvm@vger.kernel.org, Yury Norov <ynorov@caviumnetworks.com>, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On 15/02/18 21:03, Christoffer Dall wrote:
-> Just like we can program the GICv2 hypervisor control interface directly
-> from the core vgic code, we can do the same for the GICv3 hypervisor
-> control interface on VHE systems.
+> The vgic-v2-sr.c file now only contains the logic to replay unaligned
+> accesses to the virtual CPU interface on 16K and 64K page systems, which
+> is only relevant on 64-bit platforms.  Therefore move this file to the
+> arm64 KVM tree, remove the compile directive from the 32-bit side
+> makefile, and remove the ifdef in the C file.
 > 
-> We do this by simply calling the save/restore functions when we have VHE
-> and we can then get rid of the save/restore function calls from the VHE
-> world switch function.
-> 
-> One caveat is that we now write GICv3 system register state before the
-> potential early exit path in the run loop, and because we sync back
-> state in the early exit path, we have to ensure that we read a
-> consistent GIC state from the sync path, even though we have never
-> actually run the guest with the newly written GIC state.  We solve this
-> by inserting an ISB in the early exit path.
-> 
+> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 > ---
+>  arch/arm/kvm/hyp/Makefile                         | 1 -
+>  arch/arm64/kvm/hyp/Makefile                       | 2 +-
+>  {virt/kvm/arm => arch/arm64/kvm}/hyp/vgic-v2-sr.c | 2 --
+>  3 files changed, 1 insertion(+), 4 deletions(-)
+>  rename {virt/kvm/arm => arch/arm64/kvm}/hyp/vgic-v2-sr.c (98%)
 > 
-> Notes:
->     Changes since v2:
->      - Added ISB in the early exit path in the run loop as explained
->        in the commit message.
-> 
->  arch/arm64/kvm/hyp/switch.c | 3 ---
->  virt/kvm/arm/arm.c          | 1 +
->  virt/kvm/arm/vgic/vgic.c    | 5 +++++
->  3 files changed, 6 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> index cbafc27a617b..466cfcdbcaf3 100644
-> --- a/arch/arm64/kvm/hyp/switch.c
-> +++ b/arch/arm64/kvm/hyp/switch.c
-> @@ -399,8 +399,6 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
->  	__activate_traps(vcpu);
->  	__activate_vm(vcpu->kvm);
+> diff --git a/arch/arm/kvm/hyp/Makefile b/arch/arm/kvm/hyp/Makefile
+> index 5638ce0c9524..1964111c984a 100644
+> --- a/arch/arm/kvm/hyp/Makefile
+> +++ b/arch/arm/kvm/hyp/Makefile
+> @@ -7,7 +7,6 @@ ccflags-y += -fno-stack-protector -DDISABLE_BRANCH_PROFILING
 >  
-> -	__vgic_restore_state(vcpu);
-> -
->  	sysreg_restore_guest_state_vhe(guest_ctxt);
->  	__debug_switch_to_guest(vcpu);
+>  KVM=../../../../virt/kvm
 >  
-> @@ -414,7 +412,6 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
->  	fp_enabled = fpsimd_enabled_vhe();
+> -obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v2-sr.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v3-sr.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/timer-sr.o
 >  
->  	sysreg_save_guest_state_vhe(guest_ctxt);
-> -	__vgic_save_state(vcpu);
+> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+> index f04400d494b7..7e8d41210288 100644
+> --- a/arch/arm64/kvm/hyp/Makefile
+> +++ b/arch/arm64/kvm/hyp/Makefile
+> @@ -7,10 +7,10 @@ ccflags-y += -fno-stack-protector -DDISABLE_BRANCH_PROFILING
 >  
->  	__deactivate_traps(vcpu);
+>  KVM=../../../../virt/kvm
 >  
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index 5bd879c78951..6de7641f3ff2 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -717,6 +717,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm) ||
->  		    kvm_request_pending(vcpu)) {
->  			vcpu->mode = OUTSIDE_GUEST_MODE;
-> +			isb(); /* Ensure work in x_flush_hwstate is committed */
->  			kvm_pmu_sync_hwstate(vcpu);
->  			if (static_branch_unlikely(&userspace_irqchip_in_use))
->  				kvm_timer_sync_hwstate(vcpu);
-> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> index 12e2a28f437e..d0a19a8c196a 100644
-> --- a/virt/kvm/arm/vgic/vgic.c
-> +++ b/virt/kvm/arm/vgic/vgic.c
-> @@ -19,6 +19,7 @@
->  #include <linux/list_sort.h>
->  #include <linux/interrupt.h>
->  #include <linux/irq.h>
-> +#include <asm/kvm_hyp.h>
+> -obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v2-sr.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v3-sr.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/timer-sr.o
 >  
->  #include "vgic.h"
+> +obj-$(CONFIG_KVM_ARM_HOST) += vgic-v2-sr.o
+
+How about renaming the file to vgic-v2-cpuif-proxy.c? It doesn't have
+anything to do with save/restore anymore...
+
+>  obj-$(CONFIG_KVM_ARM_HOST) += sysreg-sr.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += debug-sr.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += entry.o
+> diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/arch/arm64/kvm/hyp/vgic-v2-sr.c
+> similarity index 98%
+> rename from virt/kvm/arm/hyp/vgic-v2-sr.c
+> rename to arch/arm64/kvm/hyp/vgic-v2-sr.c
+> index 0bbafdfd4adb..97f357ea9c72 100644
+> --- a/virt/kvm/arm/hyp/vgic-v2-sr.c
+> +++ b/arch/arm64/kvm/hyp/vgic-v2-sr.c
+> @@ -23,7 +23,6 @@
+>  #include <asm/kvm_hyp.h>
+>  #include <asm/kvm_mmu.h>
 >  
-> @@ -753,6 +754,8 @@ static inline void vgic_save_state(struct kvm_vcpu *vcpu)
->  {
->  	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
->  		vgic_v2_save_state(vcpu);
-> +	else if (has_vhe())
-> +		__vgic_v3_save_state(vcpu);
+> -#ifdef CONFIG_ARM64
+>  /*
+>   * __vgic_v2_perform_cpuif_access -- perform a GICV access on behalf of the
+>   *				     guest.
+> @@ -77,4 +76,3 @@ int __hyp_text __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
+>  
+>  	return 1;
 >  }
->  
->  /* Sync back the hardware VGIC state into our emulation after a guest's run. */
-> @@ -777,6 +780,8 @@ static inline void vgic_restore_state(struct kvm_vcpu *vcpu)
->  {
->  	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
->  		vgic_v2_restore_state(vcpu);
-> +	else if (has_vhe())
-> +		__vgic_v3_restore_state(vcpu);
->  }
->  
->  /* Flush our emulation state into the GIC hardware before entering the guest. */
+> -#endif
 > 
 
-I'm slowly wrapping my brain around this thing again. If I grasp the
-general idea, we end up with two cases:
-
-(1) The GIC is accessible from the kernel, and we save/restore it
-outside of the HYP code.
-
-(2) The GIC is only accessible from the HYP code, and we do it there.
-
-Maybe we should bite the bullet and introduce that primitive instead?
-
-Thanks,
+Otherwise looks good.
 
 	M.
 -- 
