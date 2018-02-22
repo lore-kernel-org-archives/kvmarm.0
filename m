@@ -1,12 +1,17 @@
-From: Shanker Donthineni <shankerd@codeaurora.org>
-Subject: [PATCH v4] arm64: Add support for new control bits CTR_EL0.DIC and
- CTR_EL0.IDC
-Date: Thu, 22 Feb 2018 08:51:30 -0600
-Message-ID: <1519311090-19998-1-git-send-email-shankerd@codeaurora.org>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v4 25/40] KVM: arm64: Introduce framework for accessing
+ deferred sysregs
+Date: Thu, 22 Feb 2018 15:56:09 +0100
+Message-ID: <20180222145609.GQ29376@cbox>
+References: <20180215210332.8648-1-christoffer.dall@linaro.org>
+ <20180215210332.8648-26-christoffer.dall@linaro.org>
+ <20180222134052.fej4yyf5fq57kk3g@kamzik.brq.redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <20180222134052.fej4yyf5fq57kk3g@kamzik.brq.redhat.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -16,243 +21,149 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Will Deacon <will.deacon@arm.com>, linux-kernel <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm <kvmarm@lists.cs.columbia.edu>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Philip Elcan <pelcan@codeaurora.org>, Shanker Donthineni <shankerd@codeaurora.org>, Vikram Sethi <vikrams@codeaurora.org>
+To: Andrew Jones <drjones@redhat.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Tomasz Nowicki <tn@semihalf.com>, kvmarm@lists.cs.columbia.edu, Julien Grall <julien.grall@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, linux-arm-kernel@lists.infradead.org, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The DCache clean & ICache invalidation requirements for instructions
-to be data coherence are discoverable through new fields in CTR_EL0.
-The following two control bits DIC and IDC were defined for this
-purpose. No need to perform point of unification cache maintenance
-operations from software on systems where CPU caches are transparent.
+On Thu, Feb 22, 2018 at 02:40:52PM +0100, Andrew Jones wrote:
+> On Thu, Feb 15, 2018 at 10:03:17PM +0100, Christoffer Dall wrote:
+> > We are about to defer saving and restoring some groups of system
+> > registers to vcpu_put and vcpu_load on supported systems.  This means
+> > that we need some infrastructure to access system registes which
+> > supports either accessing the memory backing of the register or directly
+> > accessing the system registers, depending on the state of the system
+> > when we access the register.
+> > 
+> > We do this by defining read/write accessor functions, which can handle
+> > both "immediate" and "deferrable" system registers.  Immediate registers
+> > are always saved/restored in the world-switch path, but deferrable
+> > registers are only saved/restored in vcpu_put/vcpu_load when supported
+> > and sysregs_loaded_on_cpu will be set in that case.
+> > 
+> > Note that we don't use the deferred mechanism yet in this patch, but only
+> > introduce infrastructure.  This is to improve convenience of review in
+> > the subsequent patches where it is clear which registers become
+> > deferred.
+> > 
+> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> > ---
+> > 
+> > Notes:
+> >     Changes since v3:
+> >      - Changed to a switch-statement based approach to improve
+> >        readability.
+> >     
+> >     Changes since v2:
+> >      - New patch (deferred register handling has been reworked)
+> > 
+> >  arch/arm64/include/asm/kvm_host.h |  8 ++++++--
+> >  arch/arm64/kvm/sys_regs.c         | 33 +++++++++++++++++++++++++++++++++
+> >  2 files changed, 39 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 68398bf7882f..b463b5e28959 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -284,6 +284,10 @@ struct kvm_vcpu_arch {
+> >  
+> >  	/* Virtual SError ESR to restore when HCR_EL2.VSE is set */
+> >  	u64 vsesr_el2;
+> > +
+> > +	/* True when deferrable sysregs are loaded on the physical CPU,
+> > +	 * see kvm_vcpu_load_sysregs and kvm_vcpu_put_sysregs. */
+> > +	bool sysregs_loaded_on_cpu;
+> >  };
+> >  
+> >  #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.gp_regs)
+> > @@ -296,8 +300,8 @@ struct kvm_vcpu_arch {
+> >   */
+> >  #define __vcpu_sys_reg(v,r)	((v)->arch.ctxt.sys_regs[(r)])
+> >  
+> > -#define vcpu_read_sys_reg(v,r)	__vcpu_sys_reg(v,r)
+> > -#define vcpu_write_sys_reg(v,r,n)	do { __vcpu_sys_reg(v,r) = n; } while (0)
+> > +u64 vcpu_read_sys_reg(struct kvm_vcpu *vcpu, int reg);
+> > +void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, int reg, u64 val);
+> >  
+> >  /*
+> >   * CP14 and CP15 live in the same array, as they are backed by the
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index a05d2c01c786..b3c3f014aa61 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -35,6 +35,7 @@
+> >  #include <asm/kvm_coproc.h>
+> >  #include <asm/kvm_emulate.h>
+> >  #include <asm/kvm_host.h>
+> > +#include <asm/kvm_hyp.h>
+> >  #include <asm/kvm_mmu.h>
+> >  #include <asm/perf_event.h>
+> >  #include <asm/sysreg.h>
+> > @@ -76,6 +77,38 @@ static bool write_to_read_only(struct kvm_vcpu *vcpu,
+> >  	return false;
+> >  }
+> >  
+> > +u64 vcpu_read_sys_reg(struct kvm_vcpu *vcpu, int reg)
+> > +{
+> > +	if (!vcpu->arch.sysregs_loaded_on_cpu)
+> > +		goto immediate_read;
+> > +
+> > +	/*
+> > +	 * All system registers listed in the switch are not saved on every
+> > +	 * exit from the guest but are only saved on vcpu_put.
+> 
+> The "All ... are not" doesn't flow well for me. How about
+> 
+>  /*
+>   * None of the system registers listed in the switch are saved on guest
+>   * exit. These registers are only saved on vcpu_put.
+>   */
+> 
+> > +	 */
+> > +	switch (reg) {
+> > +	}
+> > +
+> > +immediate_read:
+> > +	return __vcpu_sys_reg(vcpu, reg);
+> > +}
+> > +
+> > +void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, int reg, u64 val)
+> > +{
+> > +	if (!vcpu->arch.sysregs_loaded_on_cpu)
+> > +		goto immediate_write;
+> > +
+> > +	/*
+> > +	 * All system registers listed in the switch are not restored on every
+> > +	 * entry to the guest but are only restored on vcpu_load.
+> > +	 */
+> 
+>  /*
+>   * None of the system registers listed in the switch are restored on
+>   * guest entry. If these registers were saved due to a vcpu_put, then
+>   * they will be restored by vcpu_load.
+>   */
+> 
 
-This patch optimize the three functions __flush_cache_user_range(),
-clean_dcache_area_pou() and invalidate_icache_range() if the hardware
-reports CTR_EL0.IDC and/or CTR_EL0.IDC. Basically it skips the two
-instructions 'DC CVAU' and 'IC IVAU', and the associated loop logic
-in order to avoid the unnecessary overhead.
+Hmmm, not sure the last sentence helps here.
 
-CTR_EL0.DIC: Instruction cache invalidation requirements for
- instruction to data coherence. The meaning of this bit[29].
-  0: Instruction cache invalidation to the point of unification
-     is required for instruction to data coherence.
-  1: Instruction cache cleaning to the point of unification is
-      not required for instruction to data coherence.
+I'll think about some nicer wording for you for the next version.
 
-CTR_EL0.IDC: Data cache clean requirements for instruction to data
- coherence. The meaning of this bit[28].
-  0: Data cache clean to the point of unification is required for
-     instruction to data coherence, unless CLIDR_EL1.LoC == 0b000
-     or (CLIDR_EL1.LoUIS == 0b000 && CLIDR_EL1.LoUU == 0b000).
-  1: Data cache clean to the point of unification is not required
-     for instruction to data coherence.
+> > +	switch (reg) {
+> > +	}
+> > +
+> > +immediate_write:
+> > +	 __vcpu_sys_reg(vcpu, reg) = val;
+> > +}
+> > +
+> >  /* 3 bits per cache level, as per CLIDR, but non-existent caches always 0 */
+> >  static u32 cache_levels;
+> >  
+> > -- 
+> > 2.14.2
+> >
+> 
+> Otherwise
+> 
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
 
-Signed-off-by: Philip Elcan <pelcan@codeaurora.org>
-Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
----
-Changes since v3:
-  -Added preprocessor guard CONFIG_xxx to code snippets in cache.S
-  -Changed barrier attributes from ISH to ISHST.
-
-Changes since v2:
-  -Included barriers, DSB/ISB with DIC set, and DSB with IDC set.
-  -Single Kconfig option.
-
-Changes since v1:
-  -Reworded commit text.
-  -Used the alternatives framework as Catalin suggested.
-  -Rebased on top of https://patchwork.kernel.org/patch/10227927/
-
- arch/arm64/Kconfig               | 12 ++++++++++++
- arch/arm64/include/asm/cache.h   |  5 +++++
- arch/arm64/include/asm/cpucaps.h |  4 +++-
- arch/arm64/kernel/cpufeature.c   | 40 ++++++++++++++++++++++++++++++++++------
- arch/arm64/mm/cache.S            | 29 ++++++++++++++++++++++++++++-
- 5 files changed, 82 insertions(+), 8 deletions(-)
-
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index f55fe5b..82b8053 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -1095,6 +1095,18 @@ config ARM64_RAS_EXTN
- 	  and access the new registers if the system supports the extension.
- 	  Platform RAS features may additionally depend on firmware support.
- 
-+config ARM64_SKIP_CACHE_POU
-+	bool "Enable support to skip cache POU operations"
-+	default y
-+	help
-+	  Explicit point of unification cache operations can be eliminated
-+	  in software if the hardware handles transparently. The new bits in
-+	  CTR_EL0, CTR_EL0.DIC and CTR_EL0.IDC indicates the hardware
-+	  capabilities of ICache and DCache POU requirements.
-+
-+	  Selecting this feature will allow the kernel to optimize the POU
-+	  cache maintaince operations where it requires 'D{I}C C{I}VAU'
-+
- endmenu
- 
- config ARM64_SVE
-diff --git a/arch/arm64/include/asm/cache.h b/arch/arm64/include/asm/cache.h
-index ea9bb4e..e22178b 100644
---- a/arch/arm64/include/asm/cache.h
-+++ b/arch/arm64/include/asm/cache.h
-@@ -20,8 +20,13 @@
- 
- #define CTR_L1IP_SHIFT		14
- #define CTR_L1IP_MASK		3
-+#define CTR_DMLINE_SHIFT	16
-+#define CTR_ERG_SHIFT		20
- #define CTR_CWG_SHIFT		24
- #define CTR_CWG_MASK		15
-+#define CTR_IDC_SHIFT		28
-+#define CTR_DIC_SHIFT		29
-+#define CTR_B31_SHIFT		31
- 
- #define CTR_L1IP(ctr)		(((ctr) >> CTR_L1IP_SHIFT) & CTR_L1IP_MASK)
- 
-diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-index bb26382..8dd42ae 100644
---- a/arch/arm64/include/asm/cpucaps.h
-+++ b/arch/arm64/include/asm/cpucaps.h
-@@ -45,7 +45,9 @@
- #define ARM64_HARDEN_BRANCH_PREDICTOR		24
- #define ARM64_HARDEN_BP_POST_GUEST_EXIT		25
- #define ARM64_HAS_RAS_EXTN			26
-+#define ARM64_HAS_CACHE_IDC			27
-+#define ARM64_HAS_CACHE_DIC			28
- 
--#define ARM64_NCAPS				27
-+#define ARM64_NCAPS				29
- 
- #endif /* __ASM_CPUCAPS_H */
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index ff8a6e9..c0b0db0 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -199,12 +199,12 @@ static int __init register_cpu_hwcaps_dumper(void)
- };
- 
- static const struct arm64_ftr_bits ftr_ctr[] = {
--	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_EXACT, 31, 1, 1),		/* RES1 */
--	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, 29, 1, 1),	/* DIC */
--	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, 28, 1, 1),	/* IDC */
--	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_HIGHER_SAFE, 24, 4, 0),	/* CWG */
--	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_HIGHER_SAFE, 20, 4, 0),	/* ERG */
--	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, 16, 4, 1),	/* DminLine */
-+	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_EXACT, CTR_B31_SHIFT, 1, 1),         /* RES1 */
-+	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, CTR_DIC_SHIFT, 1, 1),    /* DIC */
-+	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, CTR_IDC_SHIFT, 1, 1),    /* IDC */
-+	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_HIGHER_SAFE, CTR_CWG_SHIFT, 4, 0),   /* CWG */
-+	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_HIGHER_SAFE, CTR_ERG_SHIFT, 4, 0),   /* ERG */
-+	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, CTR_DMLINE_SHIFT, 4, 1), /* DminLine */
- 	/*
- 	 * Linux can handle differing I-cache policies. Userspace JITs will
- 	 * make use of *minLine.
-@@ -864,6 +864,20 @@ static bool has_no_fpsimd(const struct arm64_cpu_capabilities *entry, int __unus
- 					ID_AA64PFR0_FP_SHIFT) < 0;
- }
- 
-+#ifdef CONFIG_ARM64_SKIP_CACHE_POU
-+static bool has_cache_idc(const struct arm64_cpu_capabilities *entry,
-+			  int __unused)
-+{
-+	return (read_sanitised_ftr_reg(SYS_CTR_EL0) & (1UL << CTR_IDC_SHIFT));
-+}
-+
-+static bool has_cache_dic(const struct arm64_cpu_capabilities *entry,
-+			  int __unused)
-+{
-+	return (read_sanitised_ftr_reg(SYS_CTR_EL0) & (1UL << CTR_DIC_SHIFT));
-+}
-+#endif
-+
- #ifdef CONFIG_UNMAP_KERNEL_AT_EL0
- static int __kpti_forced; /* 0: not forced, >0: forced on, <0: forced off */
- 
-@@ -1100,6 +1114,20 @@ static int cpu_copy_el2regs(void *__unused)
- 		.enable = cpu_clear_disr,
- 	},
- #endif /* CONFIG_ARM64_RAS_EXTN */
-+#ifdef CONFIG_ARM64_SKIP_CACHE_POU
-+	{
-+		.desc = "Skip D-Cache maintenance 'CVAU' (CTR_EL0.IDC=1)",
-+		.capability = ARM64_HAS_CACHE_IDC,
-+		.def_scope = SCOPE_SYSTEM,
-+		.matches = has_cache_idc,
-+	},
-+	{
-+		.desc = "Skip I-Cache maintenance 'IVAU' (CTR_EL0.DIC=1)",
-+		.capability = ARM64_HAS_CACHE_DIC,
-+		.def_scope = SCOPE_SYSTEM,
-+		.matches = has_cache_dic,
-+	},
-+#endif /* CONFIG_ARM64_SKIP_CACHE_POU */
- 	{},
- };
- 
-diff --git a/arch/arm64/mm/cache.S b/arch/arm64/mm/cache.S
-index 758bde7..ffba5cc 100644
---- a/arch/arm64/mm/cache.S
-+++ b/arch/arm64/mm/cache.S
-@@ -50,6 +50,12 @@ ENTRY(flush_icache_range)
-  */
- ENTRY(__flush_cache_user_range)
- 	uaccess_ttbr0_enable x2, x3, x4
-+#ifdef CONFIG_ARM64_SKIP_CACHE_POU
-+alternative_if ARM64_HAS_CACHE_IDC
-+	dsb	ishst
-+	b	7f
-+alternative_else_nop_endif
-+#endif
- 	dcache_line_size x2, x3
- 	sub	x3, x2, #1
- 	bic	x4, x0, x3
-@@ -60,8 +66,15 @@ user_alt 9f, "dc cvau, x4",  "dc civac, x4",  ARM64_WORKAROUND_CLEAN_CACHE
- 	b.lo	1b
- 	dsb	ish
- 
-+7:
-+#ifdef CONFIG_ARM64_SKIP_CACHE_POU
-+alternative_if ARM64_HAS_CACHE_DIC
-+	isb
-+	b	8f
-+alternative_else_nop_endif
-+#endif
- 	invalidate_icache_by_line x0, x1, x2, x3, 9f
--	mov	x0, #0
-+8:	mov	x0, #0
- 1:
- 	uaccess_ttbr0_disable x1, x2
- 	ret
-@@ -80,6 +93,14 @@ ENDPROC(__flush_cache_user_range)
-  *	- end     - virtual end address of region
-  */
- ENTRY(invalidate_icache_range)
-+#ifdef CONFIG_ARM64_SKIP_CACHE_POU
-+alternative_if ARM64_HAS_CACHE_DIC
-+	mov	x0, xzr
-+	dsb	ishst
-+	isb
-+	ret
-+alternative_else_nop_endif
-+#endif
- 	uaccess_ttbr0_enable x2, x3, x4
- 
- 	invalidate_icache_by_line x0, x1, x2, x3, 2f
-@@ -116,6 +137,12 @@ ENDPIPROC(__flush_dcache_area)
-  *	- size    - size in question
-  */
- ENTRY(__clean_dcache_area_pou)
-+#ifdef CONFIG_ARM64_SKIP_CACHE_POU
-+alternative_if ARM64_HAS_CACHE_IDC
-+	dsb	ishst
-+	ret
-+alternative_else_nop_endif
-+#endif
- 	dcache_by_line_op cvau, ish, x0, x1, x2, x3
- 	ret
- ENDPROC(__clean_dcache_area_pou)
--- 
-Qualcomm Datacenter Technologies, Inc. on behalf of the Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
+Thanks,
+-Christoffer
