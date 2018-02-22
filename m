@@ -1,17 +1,16 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v4 03/40] KVM: arm64: Avoid storing the vcpu pointer on
- the stack
-Date: Thu, 22 Feb 2018 10:10:34 +0100
-Message-ID: <20180222091034.GD29376@cbox>
+Subject: Re: [PATCH v4 08/40] KVM: arm/arm64: Introduce vcpu_el1_is_32bit
+Date: Thu, 22 Feb 2018 10:11:39 +0100
+Message-ID: <20180222091139.GE29376@cbox>
 References: <20180215210332.8648-1-christoffer.dall@linaro.org>
- <20180215210332.8648-4-christoffer.dall@linaro.org>
- <20180221173200.6vfv6a4hytibos3p@kamzik.brq.redhat.com>
+ <20180215210332.8648-9-christoffer.dall@linaro.org>
+ <86d10ylf94.wl-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <20180221173200.6vfv6a4hytibos3p@kamzik.brq.redhat.com>
+In-Reply-To: <86d10ylf94.wl-marc.zyngier@arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -21,100 +20,178 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Andrew Jones <drjones@redhat.com>
-Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Tomasz Nowicki <tn@semihalf.com>, kvmarm@lists.cs.columbia.edu, Julien Grall <julien.grall@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, linux-arm-kernel@lists.infradead.org, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, Tomasz Nowicki <tn@semihalf.com>, kvmarm@lists.cs.columbia.edu, Julien Grall <julien.grall@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, linux-arm-kernel@lists.infradead.org, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Feb 21, 2018 at 06:32:00PM +0100, Andrew Jones wrote:
-> On Thu, Feb 15, 2018 at 10:02:55PM +0100, Christoffer Dall wrote:
-> > We already have the percpu area for the host cpu state, which points to
-> > the VCPU, so there's no need to store the VCPU pointer on the stack on
-> > every context switch.  We can be a little more clever and just use
-> > tpidr_el2 for the percpu offset and load the VCPU pointer from the host
-> > context.
+On Wed, Feb 21, 2018 at 12:05:27PM +0000, Marc Zyngier wrote:
+> On Thu, 15 Feb 2018 21:03:00 +0000,
+> Christoffer Dall wrote:
 > > 
-> > This does require us to calculate the percpu offset without including
-> > the offset from the kernel mapping of the percpu array to the linear
-> > mapping of the array (which is what we store in tpidr_el1), because a
-> > PC-relative generated address in EL2 is already giving us the hyp alias
-> > of the linear mapping of a kernel address.  We do this in
-> > __cpu_init_hyp_mode() by using kvm_ksym_ref().
+> > We have numerous checks around that checks if the HCR_EL2 has the RW bit
+> > set to figure out if we're running an AArch64 or AArch32 VM.  In some
+> > cases, directly checking the RW bit (given its unintuitive name), is a
+> > bit confusing, and that's not going to improve as we move logic around
+> > for the following patches that optimize KVM on AArch64 hosts with VHE.
 > > 
-> > This change also requires us to have a scratch register, so we take the
-> > chance to rearrange some of the el1_sync code to only look at the
-> > vttbr_el2 to determine if this is a trap from the guest or an HVC from
-> > the host.  We do add an extra check to call the panic code if the kernel
-> > is configured with debugging enabled and we saw a trap from the host
-> > which wasn't an HVC, indicating that we left some EL2 trap configured by
-> > mistake.
+> > Therefore, introduce a helper, vcpu_el1_is_32bit, and replace existing
+> > direct checks of HCR_EL2.RW with the helper.
 > > 
-> > The code that accesses ESR_EL2 was previously using an alternative to
-> > use the _EL1 accessor on VHE systems, but this was actually unnecessary
-> > as the _EL1 accessor aliases the ESR_EL2 register on VHE, and the _EL2
-> > accessor does the same thing on both systems.
-> > 
-> > Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> > Reviewed-by: Julien Grall <julien.grall@arm.com>
+> > Reviewed-by: Julien Thierry <julien.thierry@arm.com>
 > > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 > > ---
 > > 
 > > Notes:
-> >     Changes since v3:
-> >      - Reworked the assembly part of the patch after rebasing on v4.16-rc1
-> >        which created a conflict with the variant 2 mitigations.
-> >      - Removed Marc's reviewed-by due to the rework.
-> >      - Removed unneeded extern keyword in declaration in header file
+> >     Changes since v2:
+> >      - New patch
 > >     
 > >     Changes since v1:
-> >      - Use PC-relative addressing to access per-cpu variables instead of
-> >        using a load from the literal pool.
-> >      - Remove stale comments as pointed out by Marc
-> >      - Reworded the commit message as suggested by Drew
+> >      - Reworded comments as suggested by Drew
 > > 
-> >  arch/arm64/include/asm/kvm_asm.h  | 14 ++++++++++++++
-> >  arch/arm64/include/asm/kvm_host.h | 15 +++++++++++++++
-> >  arch/arm64/kernel/asm-offsets.c   |  1 +
-> >  arch/arm64/kvm/hyp/entry.S        |  6 +-----
-> >  arch/arm64/kvm/hyp/hyp-entry.S    | 31 +++++++++++++------------------
-> >  arch/arm64/kvm/hyp/switch.c       |  5 +----
-> >  arch/arm64/kvm/hyp/sysreg-sr.c    |  5 +++++
-> >  7 files changed, 50 insertions(+), 27 deletions(-)
+> >  arch/arm64/include/asm/kvm_emulate.h |  7 ++++++-
+> >  arch/arm64/kvm/hyp/switch.c          | 11 +++++------
+> >  arch/arm64/kvm/hyp/sysreg-sr.c       |  5 +++--
+> >  arch/arm64/kvm/inject_fault.c        |  6 +++---
+> >  4 files changed, 17 insertions(+), 12 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> > index 9ee316b962c8..3cc535591bdf 100644
+> > --- a/arch/arm64/include/asm/kvm_emulate.h
+> > +++ b/arch/arm64/include/asm/kvm_emulate.h
+> > @@ -45,6 +45,11 @@ void kvm_inject_undef32(struct kvm_vcpu *vcpu);
+> >  void kvm_inject_dabt32(struct kvm_vcpu *vcpu, unsigned long addr);
+> >  void kvm_inject_pabt32(struct kvm_vcpu *vcpu, unsigned long addr);
+> >  
+> > +static inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
+> > +{
+> > +	return !(vcpu->arch.hcr_el2 & HCR_RW);
+> > +}
+> > +
+> >  static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+> >  {
+> >  	vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS;
+> > @@ -65,7 +70,7 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+> >  	 * For now this is conditional, since no AArch32 feature regs
+> >  	 * are currently virtualised.
+> >  	 */
+> > -	if (vcpu->arch.hcr_el2 & HCR_RW)
+> > +	if (!vcpu_el1_is_32bit(vcpu))
+> >  		vcpu->arch.hcr_el2 |= HCR_TID3;
+> >  }
+> >  
+> > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> > index b51638490d85..fbab9752a9f4 100644
+> > --- a/arch/arm64/kvm/hyp/switch.c
+> > +++ b/arch/arm64/kvm/hyp/switch.c
+> > @@ -74,7 +74,7 @@ static hyp_alternate_select(__activate_traps_arch,
+> >  
+> >  static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+> >  {
+> > -	u64 val;
+> > +	u64 hcr = vcpu->arch.hcr_el2;
+> >  
+> >  	/*
+> >  	 * We are about to set CPTR_EL2.TFP to trap all floating point
+> > @@ -85,17 +85,16 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+> >  	 * If FP/ASIMD is not implemented, FPEXC is UNDEFINED and any access to
+> >  	 * it will cause an exception.
+> >  	 */
+> > -	val = vcpu->arch.hcr_el2;
+> > -
+> > -	if (!(val & HCR_RW) && system_supports_fpsimd()) {
+> > +	if (vcpu_el1_is_32bit(vcpu) && system_supports_fpsimd()) {
+> >  		write_sysreg(1 << 30, fpexc32_el2);
+> >  		isb();
+> >  	}
+> > -	write_sysreg(val, hcr_el2);
+> >  
+> > -	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN) && (val & HCR_VSE))
+> > +	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN) && (hcr & HCR_VSE))
+> >  		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
+> >  
+> > +	write_sysreg(hcr, hcr_el2);
+> > +
+> >  	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
+> >  	write_sysreg(1 << 15, hstr_el2);
+> >  	/*
+> > diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+> > index 434f0fc9cfb3..99fc60516103 100644
+> > --- a/arch/arm64/kvm/hyp/sysreg-sr.c
+> > +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+> > @@ -19,6 +19,7 @@
+> >  #include <linux/kvm_host.h>
+> >  
+> >  #include <asm/kvm_asm.h>
+> > +#include <asm/kvm_emulate.h>
+> >  #include <asm/kvm_hyp.h>
+> >  
+> >  /* Yes, this does nothing, on purpose */
+> > @@ -147,7 +148,7 @@ void __hyp_text __sysreg32_save_state(struct kvm_vcpu *vcpu)
+> >  {
+> >  	u64 *spsr, *sysreg;
+> >  
+> > -	if (read_sysreg(hcr_el2) & HCR_RW)
+> > +	if (!vcpu_el1_is_32bit(vcpu))
+> >  		return;
+> >  
+> >  	spsr = vcpu->arch.ctxt.gp_regs.spsr;
+> > @@ -172,7 +173,7 @@ void __hyp_text __sysreg32_restore_state(struct kvm_vcpu *vcpu)
+> >  {
+> >  	u64 *spsr, *sysreg;
+> >  
+> > -	if (read_sysreg(hcr_el2) & HCR_RW)
+> > +	if (!vcpu_el1_is_32bit(vcpu))
+> >  		return;
+> >  
+> >  	spsr = vcpu->arch.ctxt.gp_regs.spsr;
+> > diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+> > index c1e179d34e6a..30a3f58cdb7b 100644
+> > --- a/arch/arm64/kvm/inject_fault.c
+> > +++ b/arch/arm64/kvm/inject_fault.c
+> > @@ -128,7 +128,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
+> >   */
+> >  void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr)
+> >  {
+> > -	if (!(vcpu->arch.hcr_el2 & HCR_RW))
+> > +	if (vcpu_el1_is_32bit(vcpu))
+> >  		kvm_inject_dabt32(vcpu, addr);
+> >  	else
+> >  		inject_abt64(vcpu, false, addr);
+> > @@ -144,7 +144,7 @@ void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr)
+> >   */
+> >  void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
+> >  {
+> > -	if (!(vcpu->arch.hcr_el2 & HCR_RW))
+> > +	if (vcpu_el1_is_32bit(vcpu))
+> >  		kvm_inject_pabt32(vcpu, addr);
+> >  	else
+> >  		inject_abt64(vcpu, true, addr);
+> > @@ -158,7 +158,7 @@ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
+> >   */
+> >  void kvm_inject_undefined(struct kvm_vcpu *vcpu)
+> >  {
+> > -	if (!(vcpu->arch.hcr_el2 & HCR_RW))
+> > +	if (vcpu_el1_is_32bit(vcpu))
+> >  		kvm_inject_undef32(vcpu);
+> >  	else
+> >  		inject_undef64(vcpu);
+> > -- 
+> > 2.14.2
 > > 
 > 
-> I'm not clear on the motivation for this patch. I assumed it enabled
-> simpler patches later in the series, but I did a bit of reading ahead
-> and didn't see anything obvious. I doubt it gives a speedup, so is it
-> just to avoid stack use? Making it easier to maintain these assembly
-> functions that span a couple files? If so, should it be posted separately
-> from this series? If not, could you please add some more text to the
-> commit message helping me better understand the full motivation?
-
-In the past we've had difficulties debugging things where we messed up
-the stack because we couldn't get back to the normal world with no
-reliable way to get the vcpu pointer.  That was the rationale for
-storing the vcpu in a register as opposed to on the stack before.
-
-We only recently changed that so that we could use tpidr_el2 to access
-per-CPU variables.  Given that the vcpu pointer can already be found via
-per-CPU variables, it makes sense to do that.
-
-In terms of performance, your argument can be applied in isolation to
-most patches in this series, and that was the initial approach I took in
-the optimization work, only optimizing things that appeared significant
-and would likely result in significant changes.  The results were
-disappointing.  It was only when I included every micro-optimization for
-the critical path that I could think of, that we were able to observe
-order of magnitude improvements for some workloads.  Subsequent
-measurements confirmed this, it was hard to measure individual benefits
-from each patch, but overall the changes matter.
-
-> 
-> Besides my confusion on motivation, it looks good to me
+> nit: not strictly necessary, but would it be worth adding a similar
+> (and trivial) version of this predicate to the 32bit code? Just to
+> keep things in sync?
 > 
 
-In that case, unless there's an argument that the code has become too
-hard to understand, ...
+I could, but wouldn't that add unused code to the kernel at no immediate
+benefit?
 
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> Otherwise,
 > 
-...then thanks!
+> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+> 
+
+Thanks,
 -Christoffer
