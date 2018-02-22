@@ -1,15 +1,16 @@
 From: Julien Grall <julien.grall@arm.com>
 Subject: Re: [PATCH v4 28/40] KVM: arm64: Defer saving/restoring 64-bit
  sysregs to vcpu load/put on VHE
-Date: Thu, 22 Feb 2018 18:30:11 +0000
-Message-ID: <ece29cf2-4c60-dc3d-b2a9-e7e06380f860@arm.com>
+Date: Thu, 22 Feb 2018 18:31:08 +0000
+Message-ID: <40a10d77-85c8-9c74-c94c-57e4f8854fef@arm.com>
 References: <20180215210332.8648-1-christoffer.dall@linaro.org>
  <20180215210332.8648-29-christoffer.dall@linaro.org>
+ <ece29cf2-4c60-dc3d-b2a9-e7e06380f860@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Transfer-Encoding: base64
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180215210332.8648-29-christoffer.dall@linaro.org>
+In-Reply-To: <ece29cf2-4c60-dc3d-b2a9-e7e06380f860@arm.com>
 Content-Language: en-US
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
@@ -24,102 +25,104 @@ To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu
 Cc: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Tomasz Nowicki <tn@semihalf.com>, Yury Norov <ynorov@caviumnetworks.com>, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
-
-On 15/02/18 21:03, Christoffer Dall wrote:
-> Some system registers do not affect the host kernel's execution and can
-> therefore be loaded when we are about to run a VCPU and we don't have to
-> restore the host state to the hardware before the time when we are
-> actually about to return to userspace or schedule out the VCPU thread.
-> 
-> The EL1 system registers and the userspace state registers only
-> affecting EL0 execution do not need to be saved and restored on every
-> switch between the VM and the host, because they don't affect the host
-> kernel's execution.
-> 
-> We mark all registers which are now deffered as such in the
-
-NIT: s/deffered/deferred/ I think.
-
-> vcpu_{read,write}_sys_reg accessors in sys-regs.c to ensure the most
-> up-to-date copy is always accessed.
-> 
-> Note MPIDR_EL1 (controlled via VMPIDR_EL2) is accessed from other vcpu
-> threads, for example via the GIC emulation, and therefore must be
-> declared as immediate, which is fine as the guest cannot modify this
-> value.
-> 
-> The 32-bit sysregs can also be deferred but we do this in a separate
-> patch as it requires a bit more infrastructure.
-
-
-[...]
-
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index b3c3f014aa61..f060309337aa 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -87,6 +87,26 @@ u64 vcpu_read_sys_reg(struct kvm_vcpu *vcpu, int reg)
->   	 * exit from the guest but are only saved on vcpu_put.
->   	 */
->   	switch (reg) {
-> +	case CSSELR_EL1:	return read_sysreg_s(SYS_CSSELR_EL1);
-> +	case SCTLR_EL1:		return read_sysreg_s(sctlr_EL12);
-> +	case ACTLR_EL1:		return read_sysreg_s(SYS_ACTLR_EL1);
-> +	case CPACR_EL1:		return read_sysreg_s(cpacr_EL12);
-> +	case TTBR0_EL1:		return read_sysreg_s(ttbr0_EL12);
-> +	case TTBR1_EL1:		return read_sysreg_s(ttbr1_EL12);
-> +	case TCR_EL1:		return read_sysreg_s(tcr_EL12);
-> +	case ESR_EL1:		return read_sysreg_s(esr_EL12);
-> +	case AFSR0_EL1:		return read_sysreg_s(afsr0_EL12);
-> +	case AFSR1_EL1:		return read_sysreg_s(afsr1_EL12);
-> +	case FAR_EL1:		return read_sysreg_s(far_EL12);
-> +	case MAIR_EL1:		return read_sysreg_s(mair_EL12);
-> +	case VBAR_EL1:		return read_sysreg_s(vbar_EL12);
-> +	case CONTEXTIDR_EL1:	return read_sysreg_s(contextidr_EL12);
-> +	case TPIDR_EL0:		return read_sysreg_s(SYS_TPIDR_EL0);
-> +	case TPIDRRO_EL0:	return read_sysreg_s(SYS_TPIDRRO_EL0);
-
-I find a bit confusing to have some EL0 registers in the middle of EL1 
-ones. Is it because they are listed by encoding?
-
-> +	case TPIDR_EL1:		return read_sysreg_s(SYS_TPIDR_EL1);
-> +	case AMAIR_EL1:		return read_sysreg_s(amair_EL12);
-> +	case CNTKCTL_EL1:	return read_sysreg_s(cntkctl_EL12);
-> +	case PAR_EL1:		return read_sysreg_s(SYS_PAR_EL1);
->   	}
->   
->   immediate_read:
-> @@ -103,6 +123,26 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, int reg, u64 val)
->   	 * entry to the guest but are only restored on vcpu_load.
->   	 */
->   	switch (reg) {
-> +	case CSSELR_EL1:	write_sysreg_s(val, SYS_CSSELR_EL1);	return;
-> +	case SCTLR_EL1:		write_sysreg_s(val, sctlr_EL12);	return;
-> +	case ACTLR_EL1:		write_sysreg_s(val, SYS_ACTLR_EL1);	return;
-> +	case CPACR_EL1:		write_sysreg_s(val, cpacr_EL12);	return;
-> +	case TTBR0_EL1:		write_sysreg_s(val, ttbr0_EL12);	return;
-> +	case TTBR1_EL1:		write_sysreg_s(val, ttbr1_EL12);	return;
-> +	case TCR_EL1:		write_sysreg_s(val, tcr_EL12);		return;
-> +	case ESR_EL1:		write_sysreg_s(val, esr_EL12);		return;
-> +	case AFSR0_EL1:		write_sysreg_s(val, afsr0_EL12);	return;
-> +	case AFSR1_EL1:		write_sysreg_s(val, afsr1_EL12);	return;
-> +	case FAR_EL1:		write_sysreg_s(val, far_EL12);		return;
-> +	case MAIR_EL1:		write_sysreg_s(val, mair_EL12);		return;
-> +	case VBAR_EL1:		write_sysreg_s(val, vbar_EL12);		return;
-> +	case CONTEXTIDR_EL1:	write_sysreg_s(val, contextidr_EL12);	return;
-> +	case TPIDR_EL0:		write_sysreg_s(val, SYS_TPIDR_EL0);	return;
-> +	case TPIDRRO_EL0:	write_sysreg_s(val, SYS_TPIDRRO_EL0);	return;
-> +	case TPIDR_EL1:		write_sysreg_s(val, SYS_TPIDR_EL1);	return;
-> +	case AMAIR_EL1:		write_sysreg_s(val, amair_EL12);	return;
-> +	case CNTKCTL_EL1:	write_sysreg_s(val, cntkctl_EL12);	return;
-> +	case PAR_EL1:		write_sysreg_s(val, SYS_PAR_EL1);	return;
->   	}
->   
->   immediate_write:
-> 
-
-Cheers,
-
--- 
-Julien Grall
+CgpPbiAyMi8wMi8xOCAxODozMCwgSnVsaWVuIEdyYWxsIHdyb3RlOgo+IEhpIENocmlzdG9mZmVy
+LAo+IAo+IE9uIDE1LzAyLzE4IDIxOjAzLCBDaHJpc3RvZmZlciBEYWxsIHdyb3RlOgo+PiBTb21l
+IHN5c3RlbSByZWdpc3RlcnMgZG8gbm90IGFmZmVjdCB0aGUgaG9zdCBrZXJuZWwncyBleGVjdXRp
+b24gYW5kIGNhbgo+PiB0aGVyZWZvcmUgYmUgbG9hZGVkIHdoZW4gd2UgYXJlIGFib3V0IHRvIHJ1
+biBhIFZDUFUgYW5kIHdlIGRvbid0IGhhdmUgdG8KPj4gcmVzdG9yZSB0aGUgaG9zdCBzdGF0ZSB0
+byB0aGUgaGFyZHdhcmUgYmVmb3JlIHRoZSB0aW1lIHdoZW4gd2UgYXJlCj4+IGFjdHVhbGx5IGFi
+b3V0IHRvIHJldHVybiB0byB1c2Vyc3BhY2Ugb3Igc2NoZWR1bGUgb3V0IHRoZSBWQ1BVIHRocmVh
+ZC4KPj4KPj4gVGhlIEVMMSBzeXN0ZW0gcmVnaXN0ZXJzIGFuZCB0aGUgdXNlcnNwYWNlIHN0YXRl
+IHJlZ2lzdGVycyBvbmx5Cj4+IGFmZmVjdGluZyBFTDAgZXhlY3V0aW9uIGRvIG5vdCBuZWVkIHRv
+IGJlIHNhdmVkIGFuZCByZXN0b3JlZCBvbiBldmVyeQo+PiBzd2l0Y2ggYmV0d2VlbiB0aGUgVk0g
+YW5kIHRoZSBob3N0LCBiZWNhdXNlIHRoZXkgZG9uJ3QgYWZmZWN0IHRoZSBob3N0Cj4+IGtlcm5l
+bCdzIGV4ZWN1dGlvbi4KPj4KPj4gV2UgbWFyayBhbGwgcmVnaXN0ZXJzIHdoaWNoIGFyZSBub3cg
+ZGVmZmVyZWQgYXMgc3VjaCBpbiB0aGUKPiAKPiBOSVQ6IHMvZGVmZmVyZWQvZGVmZXJyZWQvIEkg
+dGhpbmsuCj4gCj4+IHZjcHVfe3JlYWQsd3JpdGV9X3N5c19yZWcgYWNjZXNzb3JzIGluIHN5cy1y
+ZWdzLmMgdG8gZW5zdXJlIHRoZSBtb3N0Cj4+IHVwLXRvLWRhdGUgY29weSBpcyBhbHdheXMgYWNj
+ZXNzZWQuCj4+Cj4+IE5vdGUgTVBJRFJfRUwxIChjb250cm9sbGVkIHZpYSBWTVBJRFJfRUwyKSBp
+cyBhY2Nlc3NlZCBmcm9tIG90aGVyIHZjcHUKPj4gdGhyZWFkcywgZm9yIGV4YW1wbGUgdmlhIHRo
+ZSBHSUMgZW11bGF0aW9uLCBhbmQgdGhlcmVmb3JlIG11c3QgYmUKPj4gZGVjbGFyZWQgYXMgaW1t
+ZWRpYXRlLCB3aGljaCBpcyBmaW5lIGFzIHRoZSBndWVzdCBjYW5ub3QgbW9kaWZ5IHRoaXMKPj4g
+dmFsdWUuCgpJIGZvcmdvdCB0byBjb21tZW50IG9uIHRoaXMuIEkgbWlzc2VkIHRoaXMgcGFyYWdy
+YXBoIGF0IHRoZSBmaXJzdCByZWFkIAphbmQgd2FzIHdvbmRlcmluZyB3aHkgTVBJRFJfRUwxIHdh
+cyBub3QgYWNjZXNzZWQgdXNpbmcgc3lzcmVnIGluIAp2Y3B1X3tyZWFkLHdyaXRlfV9zeXNfcmVn
+LiBJdCBtaWdodCBiZSB3b3J0aCBjb25zaWRlcmluZyBhIGNvbW1lbnQgaW4gCnRob3NlIGZ1bmN0
+aW9ucy4KCj4+Cj4+IFRoZSAzMi1iaXQgc3lzcmVncyBjYW4gYWxzbyBiZSBkZWZlcnJlZCBidXQg
+d2UgZG8gdGhpcyBpbiBhIHNlcGFyYXRlCj4+IHBhdGNoIGFzIGl0IHJlcXVpcmVzIGEgYml0IG1v
+cmUgaW5mcmFzdHJ1Y3R1cmUuCj4gCj4gCj4gWy4uLl0KPiAKPj4gZGlmZiAtLWdpdCBhL2FyY2gv
+YXJtNjQva3ZtL3N5c19yZWdzLmMgYi9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jCj4+IGluZGV4
+IGIzYzNmMDE0YWE2MS4uZjA2MDMwOTMzN2FhIDEwMDY0NAo+PiAtLS0gYS9hcmNoL2FybTY0L2t2
+bS9zeXNfcmVncy5jCj4+ICsrKyBiL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmMKPj4gQEAgLTg3
+LDYgKzg3LDI2IEBAIHU2NCB2Y3B1X3JlYWRfc3lzX3JlZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUs
+IGludCByZWcpCj4+IMKgwqDCoMKgwqDCoCAqIGV4aXQgZnJvbSB0aGUgZ3Vlc3QgYnV0IGFyZSBv
+bmx5IHNhdmVkIG9uIHZjcHVfcHV0Lgo+PiDCoMKgwqDCoMKgwqAgKi8KPj4gwqDCoMKgwqDCoCBz
+d2l0Y2ggKHJlZykgewo+PiArwqDCoMKgIGNhc2UgQ1NTRUxSX0VMMTrCoMKgwqAgcmV0dXJuIHJl
+YWRfc3lzcmVnX3MoU1lTX0NTU0VMUl9FTDEpOwo+PiArwqDCoMKgIGNhc2UgU0NUTFJfRUwxOsKg
+wqDCoMKgwqDCoMKgIHJldHVybiByZWFkX3N5c3JlZ19zKHNjdGxyX0VMMTIpOwo+PiArwqDCoMKg
+IGNhc2UgQUNUTFJfRUwxOsKgwqDCoMKgwqDCoMKgIHJldHVybiByZWFkX3N5c3JlZ19zKFNZU19B
+Q1RMUl9FTDEpOwo+PiArwqDCoMKgIGNhc2UgQ1BBQ1JfRUwxOsKgwqDCoMKgwqDCoMKgIHJldHVy
+biByZWFkX3N5c3JlZ19zKGNwYWNyX0VMMTIpOwo+PiArwqDCoMKgIGNhc2UgVFRCUjBfRUwxOsKg
+wqDCoMKgwqDCoMKgIHJldHVybiByZWFkX3N5c3JlZ19zKHR0YnIwX0VMMTIpOwo+PiArwqDCoMKg
+IGNhc2UgVFRCUjFfRUwxOsKgwqDCoMKgwqDCoMKgIHJldHVybiByZWFkX3N5c3JlZ19zKHR0YnIx
+X0VMMTIpOwo+PiArwqDCoMKgIGNhc2UgVENSX0VMMTrCoMKgwqDCoMKgwqDCoCByZXR1cm4gcmVh
+ZF9zeXNyZWdfcyh0Y3JfRUwxMik7Cj4+ICvCoMKgwqAgY2FzZSBFU1JfRUwxOsKgwqDCoMKgwqDC
+oMKgIHJldHVybiByZWFkX3N5c3JlZ19zKGVzcl9FTDEyKTsKPj4gK8KgwqDCoCBjYXNlIEFGU1Iw
+X0VMMTrCoMKgwqDCoMKgwqDCoCByZXR1cm4gcmVhZF9zeXNyZWdfcyhhZnNyMF9FTDEyKTsKPj4g
+K8KgwqDCoCBjYXNlIEFGU1IxX0VMMTrCoMKgwqDCoMKgwqDCoCByZXR1cm4gcmVhZF9zeXNyZWdf
+cyhhZnNyMV9FTDEyKTsKPj4gK8KgwqDCoCBjYXNlIEZBUl9FTDE6wqDCoMKgwqDCoMKgwqAgcmV0
+dXJuIHJlYWRfc3lzcmVnX3MoZmFyX0VMMTIpOwo+PiArwqDCoMKgIGNhc2UgTUFJUl9FTDE6wqDC
+oMKgwqDCoMKgwqAgcmV0dXJuIHJlYWRfc3lzcmVnX3MobWFpcl9FTDEyKTsKPj4gK8KgwqDCoCBj
+YXNlIFZCQVJfRUwxOsKgwqDCoMKgwqDCoMKgIHJldHVybiByZWFkX3N5c3JlZ19zKHZiYXJfRUwx
+Mik7Cj4+ICvCoMKgwqAgY2FzZSBDT05URVhUSURSX0VMMTrCoMKgwqAgcmV0dXJuIHJlYWRfc3lz
+cmVnX3MoY29udGV4dGlkcl9FTDEyKTsKPj4gK8KgwqDCoCBjYXNlIFRQSURSX0VMMDrCoMKgwqDC
+oMKgwqDCoCByZXR1cm4gcmVhZF9zeXNyZWdfcyhTWVNfVFBJRFJfRUwwKTsKPj4gK8KgwqDCoCBj
+YXNlIFRQSURSUk9fRUwwOsKgwqDCoCByZXR1cm4gcmVhZF9zeXNyZWdfcyhTWVNfVFBJRFJST19F
+TDApOwo+IAo+IEkgZmluZCBhIGJpdCBjb25mdXNpbmcgdG8gaGF2ZSBzb21lIEVMMCByZWdpc3Rl
+cnMgaW4gdGhlIG1pZGRsZSBvZiBFTDEgCj4gb25lcy4gSXMgaXQgYmVjYXVzZSB0aGV5IGFyZSBs
+aXN0ZWQgYnkgZW5jb2Rpbmc/Cj4gCj4+ICvCoMKgwqAgY2FzZSBUUElEUl9FTDE6wqDCoMKgwqDC
+oMKgwqAgcmV0dXJuIHJlYWRfc3lzcmVnX3MoU1lTX1RQSURSX0VMMSk7Cj4+ICvCoMKgwqAgY2Fz
+ZSBBTUFJUl9FTDE6wqDCoMKgwqDCoMKgwqAgcmV0dXJuIHJlYWRfc3lzcmVnX3MoYW1haXJfRUwx
+Mik7Cj4+ICvCoMKgwqAgY2FzZSBDTlRLQ1RMX0VMMTrCoMKgwqAgcmV0dXJuIHJlYWRfc3lzcmVn
+X3MoY250a2N0bF9FTDEyKTsKPj4gK8KgwqDCoCBjYXNlIFBBUl9FTDE6wqDCoMKgwqDCoMKgwqAg
+cmV0dXJuIHJlYWRfc3lzcmVnX3MoU1lTX1BBUl9FTDEpOwo+PiDCoMKgwqDCoMKgIH0KPj4gwqAg
+aW1tZWRpYXRlX3JlYWQ6Cj4+IEBAIC0xMDMsNiArMTIzLDI2IEBAIHZvaWQgdmNwdV93cml0ZV9z
+eXNfcmVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgCj4+IGludCByZWcsIHU2NCB2YWwpCj4+IMKg
+wqDCoMKgwqDCoCAqIGVudHJ5IHRvIHRoZSBndWVzdCBidXQgYXJlIG9ubHkgcmVzdG9yZWQgb24g
+dmNwdV9sb2FkLgo+PiDCoMKgwqDCoMKgwqAgKi8KPj4gwqDCoMKgwqDCoCBzd2l0Y2ggKHJlZykg
+ewo+PiArwqDCoMKgIGNhc2UgQ1NTRUxSX0VMMTrCoMKgwqAgd3JpdGVfc3lzcmVnX3ModmFsLCBT
+WVNfQ1NTRUxSX0VMMSk7wqDCoMKgIHJldHVybjsKPj4gK8KgwqDCoCBjYXNlIFNDVExSX0VMMTrC
+oMKgwqDCoMKgwqDCoCB3cml0ZV9zeXNyZWdfcyh2YWwsIHNjdGxyX0VMMTIpO8KgwqDCoCByZXR1
+cm47Cj4+ICvCoMKgwqAgY2FzZSBBQ1RMUl9FTDE6wqDCoMKgwqDCoMKgwqAgd3JpdGVfc3lzcmVn
+X3ModmFsLCBTWVNfQUNUTFJfRUwxKTsgICAgCj4+IHJldHVybjsKPj4gK8KgwqDCoCBjYXNlIENQ
+QUNSX0VMMTrCoMKgwqDCoMKgwqDCoCB3cml0ZV9zeXNyZWdfcyh2YWwsIGNwYWNyX0VMMTIpO8Kg
+wqDCoCByZXR1cm47Cj4+ICvCoMKgwqAgY2FzZSBUVEJSMF9FTDE6wqDCoMKgwqDCoMKgwqAgd3Jp
+dGVfc3lzcmVnX3ModmFsLCB0dGJyMF9FTDEyKTvCoMKgwqAgcmV0dXJuOwo+PiArwqDCoMKgIGNh
+c2UgVFRCUjFfRUwxOsKgwqDCoMKgwqDCoMKgIHdyaXRlX3N5c3JlZ19zKHZhbCwgdHRicjFfRUwx
+Mik7wqDCoMKgIHJldHVybjsKPj4gK8KgwqDCoCBjYXNlIFRDUl9FTDE6wqDCoMKgwqDCoMKgwqAg
+d3JpdGVfc3lzcmVnX3ModmFsLCB0Y3JfRUwxMik7wqDCoMKgwqDCoMKgwqAgcmV0dXJuOwo+PiAr
+wqDCoMKgIGNhc2UgRVNSX0VMMTrCoMKgwqDCoMKgwqDCoCB3cml0ZV9zeXNyZWdfcyh2YWwsIGVz
+cl9FTDEyKTvCoMKgwqDCoMKgwqDCoCByZXR1cm47Cj4+ICvCoMKgwqAgY2FzZSBBRlNSMF9FTDE6
+wqDCoMKgwqDCoMKgwqAgd3JpdGVfc3lzcmVnX3ModmFsLCBhZnNyMF9FTDEyKTvCoMKgwqAgcmV0
+dXJuOwo+PiArwqDCoMKgIGNhc2UgQUZTUjFfRUwxOsKgwqDCoMKgwqDCoMKgIHdyaXRlX3N5c3Jl
+Z19zKHZhbCwgYWZzcjFfRUwxMik7wqDCoMKgIHJldHVybjsKPj4gK8KgwqDCoCBjYXNlIEZBUl9F
+TDE6wqDCoMKgwqDCoMKgwqAgd3JpdGVfc3lzcmVnX3ModmFsLCBmYXJfRUwxMik7wqDCoMKgwqDC
+oMKgwqAgcmV0dXJuOwo+PiArwqDCoMKgIGNhc2UgTUFJUl9FTDE6wqDCoMKgwqDCoMKgwqAgd3Jp
+dGVfc3lzcmVnX3ModmFsLCBtYWlyX0VMMTIpO8KgwqDCoMKgwqDCoMKgIHJldHVybjsKPj4gK8Kg
+wqDCoCBjYXNlIFZCQVJfRUwxOsKgwqDCoMKgwqDCoMKgIHdyaXRlX3N5c3JlZ19zKHZhbCwgdmJh
+cl9FTDEyKTvCoMKgwqDCoMKgwqDCoCByZXR1cm47Cj4+ICvCoMKgwqAgY2FzZSBDT05URVhUSURS
+X0VMMTrCoMKgwqAgd3JpdGVfc3lzcmVnX3ModmFsLCBjb250ZXh0aWRyX0VMMTIpOyAgICAKPj4g
+cmV0dXJuOwo+PiArwqDCoMKgIGNhc2UgVFBJRFJfRUwwOsKgwqDCoMKgwqDCoMKgIHdyaXRlX3N5
+c3JlZ19zKHZhbCwgU1lTX1RQSURSX0VMMCk7ICAgIAo+PiByZXR1cm47Cj4+ICvCoMKgwqAgY2Fz
+ZSBUUElEUlJPX0VMMDrCoMKgwqAgd3JpdGVfc3lzcmVnX3ModmFsLCBTWVNfVFBJRFJST19FTDAp
+OyAgICAKPj4gcmV0dXJuOwo+PiArwqDCoMKgIGNhc2UgVFBJRFJfRUwxOsKgwqDCoMKgwqDCoMKg
+IHdyaXRlX3N5c3JlZ19zKHZhbCwgU1lTX1RQSURSX0VMMSk7ICAgIAo+PiByZXR1cm47Cj4+ICvC
+oMKgwqAgY2FzZSBBTUFJUl9FTDE6wqDCoMKgwqDCoMKgwqAgd3JpdGVfc3lzcmVnX3ModmFsLCBh
+bWFpcl9FTDEyKTvCoMKgwqAgcmV0dXJuOwo+PiArwqDCoMKgIGNhc2UgQ05US0NUTF9FTDE6wqDC
+oMKgIHdyaXRlX3N5c3JlZ19zKHZhbCwgY250a2N0bF9FTDEyKTvCoMKgwqAgcmV0dXJuOwo+PiAr
+wqDCoMKgIGNhc2UgUEFSX0VMMTrCoMKgwqDCoMKgwqDCoCB3cml0ZV9zeXNyZWdfcyh2YWwsIFNZ
+U19QQVJfRUwxKTvCoMKgwqAgcmV0dXJuOwo+PiDCoMKgwqDCoMKgIH0KPj4gwqAgaW1tZWRpYXRl
+X3dyaXRlOgo+Pgo+IAo+IENoZWVycywKPiAKCi0tIApKdWxpZW4gR3JhbGwKCl9fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmxpbnV4LWFybS1rZXJuZWwgbWFp
+bGluZyBsaXN0CmxpbnV4LWFybS1rZXJuZWxAbGlzdHMuaW5mcmFkZWFkLm9yZwpodHRwOi8vbGlz
+dHMuaW5mcmFkZWFkLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2xpbnV4LWFybS1rZXJuZWwK
