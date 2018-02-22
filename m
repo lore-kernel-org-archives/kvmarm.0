@@ -1,18 +1,15 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v4 10/40] KVM: arm64: Slightly improve debug save/restore
- functions
-Date: Thu, 22 Feb 2018 09:05:25 +0100
-Message-ID: <20180222080525.jjqtggrpyjdsltic@kamzik.brq.redhat.com>
-References: <20180215210332.8648-1-christoffer.dall@linaro.org>
- <20180215210332.8648-11-christoffer.dall@linaro.org>
- <20180221173903.xlpwnlrnjlpatm5s@kamzik.brq.redhat.com>
- <37712e4f-7f47-2101-71f5-d024a7993f13@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH] KVM: arm/arm64: No need to zero CNTVOFF in
+ kvm_timer_vcpu_put() for VHE
+Date: Thu, 22 Feb 2018 09:42:31 +0100
+Message-ID: <20180222084231.GA29376@cbox>
+References: <1519054687-14405-1-git-send-email-shankerd@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <37712e4f-7f47-2101-71f5-d024a7993f13@arm.com>
+In-Reply-To: <1519054687-14405-1-git-send-email-shankerd@codeaurora.org>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -22,62 +19,37 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvm@vger.kernel.org, Tomasz Nowicki <tn@semihalf.com>, Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, Julien Grall <julien.grall@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
+To: Shanker Donthineni <shankerd@codeaurora.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Vikram Sethi <vikrams@codeaurora.org>, linux-kernel <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, kvmarm <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Feb 21, 2018 at 05:52:41PM +0000, Marc Zyngier wrote:
-> On 21/02/18 17:39, Andrew Jones wrote:
-> > On Thu, Feb 15, 2018 at 10:03:02PM +0100, Christoffer Dall wrote:
-> >> The debug save/restore functions can be improved by using the has_vhe()
-> >> static key instead of the instruction alternative.  Using the static key
-> >> uses the same paradigm as we're going to use elsewhere, it makes the
-> >> code more readable, and it generates slightly better code (no
-> >> stack setups and function calls unless necessary).
-> >>
-> >> We also use a static key on the restore path, because it will be
-> >> marginally faster than loading a value from memory.
-> >>
-> >> Finally, we don't have to conditionally clear the debug dirty flag if
-> >> it's set, we can just clear it.
-> >>
-> >> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-> >> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> >> ---
-> >>
-> >> Notes:
-> >>     Changes since v1:
-> >>      - Change dot to comma in comment
-> >>      - Rename __debug_restore_spe to __debug_restore_spe_nvhe
-> >>
-> >>  arch/arm64/kvm/hyp/debug-sr.c | 26 ++++++++++++--------------
-> >>  1 file changed, 12 insertions(+), 14 deletions(-)
-> >>
-> > 
-> > Maybe after this series is merged, if there are any hyp_alternate_select's
-> > left, we can replace all the remaining ones with has_vhe() and then just
-> > completely remove hyp_alternate_select.
-> 
-> Note that older compilers (such as GCC 4.8) will generate horrible code
-> with static keys, as they do not support "asm goto". Not that I want to
-> preserve the home brew hyp_alternate_select mechanism, but I just want
-> to make it plain that some distros will definitely suffer from the
-> transition.
-
-Yeah, I've seen that. I even wrote some patches to try and deal with
-it once, because RHEL currently has gcc 4.8, and static keys are now
-used in kernel hot paths for kpti, and I knew this series was coming.
-My patches didn't seem like something usptream would care about, so
-I never posted them. Indeed, I see here[*] that at least x86 is saying
-that at some point (soon?) asm-goto will be a hard requirement.
-
-I just checked Christoffer's branch. The only hyp_alternate_select,
-that couldn't be changed to a has_vhe is __check_arm_834220, but
-that one can just be changed to
-cpus_have_const_cap(ARM64_WORKAROUND_834220), since it's just acting
-as a boolean anyway.
-
-Thanks,
-drew
-
-[*] https://lkml.org/lkml/2018/2/20/51
+SGkgU2hhbmtlciwKCk9uIE1vbiwgRmViIDE5LCAyMDE4IGF0IDA5OjM4OjA3QU0gLTA2MDAsIFNo
+YW5rZXIgRG9udGhpbmVuaSB3cm90ZToKPiBJbiBBQXJjaDY0L0FBcmNoMzIsIHRoZSB2aXJ0dWFs
+IGNvdW50ZXIgdXNlcyBhIGZpeGVkIHZpcnR1YWwgb2Zmc2V0Cj4gb2YgemVybyBpbiB0aGUgZm9s
+bG93aW5nIHNpdHVhdGlvbnMgYXMgcGVyIEFSTXY4IHNwZWNpZmljYXRpb25zOgo+IAo+IDEpIEhD
+Ul9FTDIuRTJIIGlzIDEsIGFuZCBDTlRWQ1RfRUwwL0NOVFZDVCBhcmUgcmVhZCBmcm9tIEVMMi4K
+PiAyKSBIQ1JfRUwyLntFMkgsIFRHRX0gaXMgezEsIDF9LCBhbmQgZWl0aGVyOgo+ICAgIOKAlCBD
+TlRWQ1RfRUwwIGlzIHJlYWQgZnJvbSBOb24tc2VjdXJlIEVMMCBvciBFTDIuCj4gICAg4oCUIENO
+VFZDVCBpcyByZWFkIGZyb20gTm9uLXNlY3VyZSBFTDAuCj4gCj4gU28sIG5vIG5lZWQgdG8gemVy
+byBDTlRWT0ZGX0VMMi9DTlRWT0ZGIGZvciBWSEUgY2FzZS4KPiAKPiBTaWduZWQtb2ZmLWJ5OiBT
+aGFua2VyIERvbnRoaW5lbmkgPHNoYW5rZXJkQGNvZGVhdXJvcmEub3JnPgo+IC0tLQo+ICB2aXJ0
+L2t2bS9hcm0vYXJjaF90aW1lci5jIHwgNiArKysrLS0KPiAgMSBmaWxlIGNoYW5nZWQsIDQgaW5z
+ZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkKPiAKPiBkaWZmIC0tZ2l0IGEvdmlydC9rdm0vYXJt
+L2FyY2hfdGltZXIuYyBiL3ZpcnQva3ZtL2FybS9hcmNoX3RpbWVyLmMKPiBpbmRleCA3MDI2OGMw
+Li44NmVjYTMyNCAxMDA2NDQKPiAtLS0gYS92aXJ0L2t2bS9hcm0vYXJjaF90aW1lci5jCj4gKysr
+IGIvdmlydC9rdm0vYXJtL2FyY2hfdGltZXIuYwo+IEBAIC01NDEsOSArNTQxLDExIEBAIHZvaWQg
+a3ZtX3RpbWVyX3ZjcHVfcHV0KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKPiAgCSAqIFRoZSBrZXJu
+ZWwgbWF5IGRlY2lkZSB0byBydW4gdXNlcnNwYWNlIGFmdGVyIGNhbGxpbmcgdmNwdV9wdXQsIHNv
+Cj4gIAkgKiB3ZSByZXNldCBjbnR2b2ZmIHRvIDAgdG8gZW5zdXJlIGEgY29uc2lzdGVudCByZWFk
+IGJldHdlZW4gdXNlcgo+ICAJICogYWNjZXNzZXMgdG8gdGhlIHZpcnR1YWwgY291bnRlciBhbmQg
+a2VybmVsIGFjY2VzcyB0byB0aGUgcGh5c2ljYWwKPiAtCSAqIGNvdW50ZXIuCj4gKwkgKiBjb3Vu
+dGVyIG9mIG5vbi1WSEUgY2FzZS4gRm9yIFZIRSwgdGhlIHZpcnR1YWwgY291bnRlciB1c2VzIGEg
+Zml4ZWQKPiArCSAqIHZpcnR1YWwgb2Zmc2V0IG9mIHplcm8sIHNvIG5vIG5lZWQgdG8gemVybyBD
+TlRWT0ZGX0VMMiByZWdpc3Rlci4KPiAgCSAqLwo+IC0Jc2V0X2NudHZvZmYoMCk7Cj4gKwlpZiAo
+IWhhc192aGUoKSkKPiArCQlzZXRfY250dm9mZigwKTsKPiAgfQo+ICAKPiAgLyoKCkknbSBva2F5
+IHdpdGggdGhpcyBjaGFuZ2UuICBJIGRvbid0IHRoaW5rIHRoZXJlJ3MgYSBodWdlIGdhaW4gaGVy
+ZQp0aG91Z2guCgpNYXJjLCBhbnkgdGhvdWdodHMgb3IgY29uY2VybnM/CgpUaGFua3MsCi1DaHJp
+c3RvZmZlcgoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18K
+bGludXgtYXJtLWtlcm5lbCBtYWlsaW5nIGxpc3QKbGludXgtYXJtLWtlcm5lbEBsaXN0cy5pbmZy
+YWRlYWQub3JnCmh0dHA6Ly9saXN0cy5pbmZyYWRlYWQub3JnL21haWxtYW4vbGlzdGluZm8vbGlu
+dXgtYXJtLWtlcm5lbAo=
