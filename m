@@ -1,17 +1,12 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v4 39/40] KVM: arm/arm64: Move VGIC APR save/restore to
- vgic put/load
-Date: Thu, 22 Feb 2018 15:44:43 +0100
-Message-ID: <20180222144443.GP29376@cbox>
-References: <20180215210332.8648-1-christoffer.dall@linaro.org>
- <20180215210332.8648-40-christoffer.dall@linaro.org>
- <3f2f60ba-2269-7ebd-872c-b50dc2ca3e3b@arm.com>
+From: Shanker Donthineni <shankerd@codeaurora.org>
+Subject: [PATCH v4] arm64: Add support for new control bits CTR_EL0.DIC and
+ CTR_EL0.IDC
+Date: Thu, 22 Feb 2018 08:51:30 -0600
+Message-ID: <1519311090-19998-1-git-send-email-shankerd@codeaurora.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <3f2f60ba-2269-7ebd-872c-b50dc2ca3e3b@arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -21,337 +16,243 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, Tomasz Nowicki <tn@semihalf.com>, kvmarm@lists.cs.columbia.edu, Julien Grall <julien.grall@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, linux-arm-kernel@lists.infradead.org, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
+To: Will Deacon <will.deacon@arm.com>, linux-kernel <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm <kvmarm@lists.cs.columbia.edu>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Philip Elcan <pelcan@codeaurora.org>, Shanker Donthineni <shankerd@codeaurora.org>, Vikram Sethi <vikrams@codeaurora.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Feb 22, 2018 at 01:11:55PM +0000, Marc Zyngier wrote:
-> On 15/02/18 21:03, Christoffer Dall wrote:
-> > The APRs can only have bits set when the guest acknowledges an interrupt
-> > in the LR and can only have a bit cleared when the guest EOIs an
-> > interrupt in the LR.  Therefore, if we have no LRs with any
-> > pending/active interrupts, the APR cannot change value and there is no
-> > need to clear it on every exit from the VM (hint: it will have already
-> > been cleared when we exited the guest the last time with the LRs all
-> > EOIed).
-> > 
-> > The only case we need to take care of is when we migrate the VCPU away
-> > from a CPU or migrate a new VCPU onto a CPU, or when we return to
-> > userspace to capture the state of the VCPU for migration.  To make sure
-> > this works, factor out the APR save/restore functionality into separate
-> > functions called from the VCPU (and by extension VGIC) put/load hooks.
-> > 
-> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> > ---
-> >  arch/arm/include/asm/kvm_hyp.h   |   2 +
-> >  arch/arm64/include/asm/kvm_hyp.h |   2 +
-> >  virt/kvm/arm/hyp/vgic-v3-sr.c    | 124 +++++++++++++++++++++------------------
-> >  virt/kvm/arm/vgic/vgic-v2.c      |   7 +--
-> >  virt/kvm/arm/vgic/vgic-v3.c      |   5 ++
-> >  5 files changed, 78 insertions(+), 62 deletions(-)
-> > 
-> > diff --git a/arch/arm/include/asm/kvm_hyp.h b/arch/arm/include/asm/kvm_hyp.h
-> > index 1ab8329e9ff7..530a3c1cfe6f 100644
-> > --- a/arch/arm/include/asm/kvm_hyp.h
-> > +++ b/arch/arm/include/asm/kvm_hyp.h
-> > @@ -110,6 +110,8 @@ void __sysreg_restore_state(struct kvm_cpu_context *ctxt);
-> >  
-> >  void __vgic_v3_save_state(struct kvm_vcpu *vcpu);
-> >  void __vgic_v3_restore_state(struct kvm_vcpu *vcpu);
-> > +void __vgic_v3_save_aprs(struct kvm_vcpu *vcpu);
-> > +void __vgic_v3_restore_aprs(struct kvm_vcpu *vcpu);
-> >  
-> >  asmlinkage void __vfp_save_state(struct vfp_hard_struct *vfp);
-> >  asmlinkage void __vfp_restore_state(struct vfp_hard_struct *vfp);
-> > diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> > index febe417b8b4e..6f3929b2fcf7 100644
-> > --- a/arch/arm64/include/asm/kvm_hyp.h
-> > +++ b/arch/arm64/include/asm/kvm_hyp.h
-> > @@ -124,6 +124,8 @@ int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu);
-> >  
-> >  void __vgic_v3_save_state(struct kvm_vcpu *vcpu);
-> >  void __vgic_v3_restore_state(struct kvm_vcpu *vcpu);
-> > +void __vgic_v3_save_aprs(struct kvm_vcpu *vcpu);
-> > +void __vgic_v3_restore_aprs(struct kvm_vcpu *vcpu);
-> >  int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu);
-> >  
-> >  void __timer_enable_traps(struct kvm_vcpu *vcpu);
-> > diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
-> > index 9abf2f3c12b5..437d7af08683 100644
-> > --- a/virt/kvm/arm/hyp/vgic-v3-sr.c
-> > +++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
-> > @@ -21,6 +21,7 @@
-> >  
-> >  #include <asm/kvm_emulate.h>
-> >  #include <asm/kvm_hyp.h>
-> > +#include <asm/kvm_mmu.h>
-> >  
-> >  #define vtr_to_max_lr_idx(v)		((v) & 0xf)
-> >  #define vtr_to_nr_pre_bits(v)		((((u32)(v) >> 26) & 7) + 1)
-> > @@ -221,14 +222,11 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
-> >  
-> >  	if (used_lrs) {
-> >  		int i;
-> > -		u32 nr_pre_bits;
-> >  		u32 elrsr;
-> >  
-> >  		elrsr = read_gicreg(ICH_ELSR_EL2);
-> >  
-> >  		write_gicreg(0, ICH_HCR_EL2);
-> > -		val = read_gicreg(ICH_VTR_EL2);
-> > -		nr_pre_bits = vtr_to_nr_pre_bits(val);
-> >  
-> >  		for (i = 0; i < used_lrs; i++) {
-> >  			if (elrsr & (1 << i))
-> > @@ -238,39 +236,10 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
-> >  
-> >  			__gic_v3_set_lr(0, i);
-> >  		}
-> > -
-> > -		switch (nr_pre_bits) {
-> > -		case 7:
-> > -			cpu_if->vgic_ap0r[3] = __vgic_v3_read_ap0rn(3);
-> > -			cpu_if->vgic_ap0r[2] = __vgic_v3_read_ap0rn(2);
-> > -		case 6:
-> > -			cpu_if->vgic_ap0r[1] = __vgic_v3_read_ap0rn(1);
-> > -		default:
-> > -			cpu_if->vgic_ap0r[0] = __vgic_v3_read_ap0rn(0);
-> > -		}
-> > -
-> > -		switch (nr_pre_bits) {
-> > -		case 7:
-> > -			cpu_if->vgic_ap1r[3] = __vgic_v3_read_ap1rn(3);
-> > -			cpu_if->vgic_ap1r[2] = __vgic_v3_read_ap1rn(2);
-> > -		case 6:
-> > -			cpu_if->vgic_ap1r[1] = __vgic_v3_read_ap1rn(1);
-> > -		default:
-> > -			cpu_if->vgic_ap1r[0] = __vgic_v3_read_ap1rn(0);
-> > -		}
-> >  	} else {
-> >  		if (static_branch_unlikely(&vgic_v3_cpuif_trap) ||
-> >  		    cpu_if->its_vpe.its_vm)
-> >  			write_gicreg(0, ICH_HCR_EL2);
-> > -
-> > -		cpu_if->vgic_ap0r[0] = 0;
-> > -		cpu_if->vgic_ap0r[1] = 0;
-> > -		cpu_if->vgic_ap0r[2] = 0;
-> > -		cpu_if->vgic_ap0r[3] = 0;
-> > -		cpu_if->vgic_ap1r[0] = 0;
-> > -		cpu_if->vgic_ap1r[1] = 0;
-> > -		cpu_if->vgic_ap1r[2] = 0;
-> > -		cpu_if->vgic_ap1r[3] = 0;
-> >  	}
-> >  
-> >  	val = read_gicreg(ICC_SRE_EL2);
-> > @@ -287,8 +256,6 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
-> >  {
-> >  	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
-> >  	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
-> > -	u64 val;
-> > -	u32 nr_pre_bits;
-> >  	int i;
-> >  
-> >  	/*
-> > @@ -306,32 +273,9 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
-> >  		write_gicreg(cpu_if->vgic_vmcr, ICH_VMCR_EL2);
-> >  	}
-> >  
-> > -	val = read_gicreg(ICH_VTR_EL2);
-> > -	nr_pre_bits = vtr_to_nr_pre_bits(val);
-> > -
-> >  	if (used_lrs) {
-> >  		write_gicreg(cpu_if->vgic_hcr, ICH_HCR_EL2);
-> >  
-> > -		switch (nr_pre_bits) {
-> > -		case 7:
-> > -			__vgic_v3_write_ap0rn(cpu_if->vgic_ap0r[3], 3);
-> > -			__vgic_v3_write_ap0rn(cpu_if->vgic_ap0r[2], 2);
-> > -		case 6:
-> > -			__vgic_v3_write_ap0rn(cpu_if->vgic_ap0r[1], 1);
-> > -		default:
-> > -			__vgic_v3_write_ap0rn(cpu_if->vgic_ap0r[0], 0);
-> > -		}
-> > -
-> > -		switch (nr_pre_bits) {
-> > -		case 7:
-> > -			__vgic_v3_write_ap1rn(cpu_if->vgic_ap1r[3], 3);
-> > -			__vgic_v3_write_ap1rn(cpu_if->vgic_ap1r[2], 2);
-> > -		case 6:
-> > -			__vgic_v3_write_ap1rn(cpu_if->vgic_ap1r[1], 1);
-> > -		default:
-> > -			__vgic_v3_write_ap1rn(cpu_if->vgic_ap1r[0], 0);
-> > -		}
-> > -
-> >  		for (i = 0; i < used_lrs; i++)
-> >  			__gic_v3_set_lr(cpu_if->vgic_lr[i], i);
-> >  	} else {
-> > @@ -364,6 +308,72 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
-> >  		     ICC_SRE_EL2);
-> >  }
-> >  
-> > +void __hyp_text __vgic_v3_save_aprs(struct kvm_vcpu *vcpu)
-> > +{
-> > +	struct vgic_v3_cpu_if *cpu_if;
-> > +	u64 val;
-> > +	u32 nr_pre_bits;
-> > +
-> > +	vcpu = kern_hyp_va(vcpu);
-> > +	cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
-> > +
-> > +	val = read_gicreg(ICH_VTR_EL2);
-> > +	nr_pre_bits = vtr_to_nr_pre_bits(val);
-> > +
-> > +	switch (nr_pre_bits) {
-> > +	case 7:
-> > +		cpu_if->vgic_ap0r[3] = __vgic_v3_read_ap0rn(3);
-> > +		cpu_if->vgic_ap0r[2] = __vgic_v3_read_ap0rn(2);
-> > +	case 6:
-> > +		cpu_if->vgic_ap0r[1] = __vgic_v3_read_ap0rn(1);
-> > +	default:
-> > +		cpu_if->vgic_ap0r[0] = __vgic_v3_read_ap0rn(0);
-> > +	}
-> > +
-> > +	switch (nr_pre_bits) {
-> > +	case 7:
-> > +		cpu_if->vgic_ap1r[3] = __vgic_v3_read_ap1rn(3);
-> > +		cpu_if->vgic_ap1r[2] = __vgic_v3_read_ap1rn(2);
-> > +	case 6:
-> > +		cpu_if->vgic_ap1r[1] = __vgic_v3_read_ap1rn(1);
-> > +	default:
-> > +		cpu_if->vgic_ap1r[0] = __vgic_v3_read_ap1rn(0);
-> > +	}
-> > +}
-> > +
-> > +void __hyp_text __vgic_v3_restore_aprs(struct kvm_vcpu *vcpu)
-> > +{
-> > +	struct vgic_v3_cpu_if *cpu_if;
-> > +	u64 val;
-> > +	u32 nr_pre_bits;
-> > +
-> > +	vcpu = kern_hyp_va(vcpu);
-> > +	cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
-> > +
-> > +	val = read_gicreg(ICH_VTR_EL2);
-> > +	nr_pre_bits = vtr_to_nr_pre_bits(val);
-> > +
-> > +	switch (nr_pre_bits) {
-> > +	case 7:
-> > +		__vgic_v3_write_ap0rn(cpu_if->vgic_ap0r[3], 3);
-> > +		__vgic_v3_write_ap0rn(cpu_if->vgic_ap0r[2], 2);
-> > +	case 6:
-> > +		__vgic_v3_write_ap0rn(cpu_if->vgic_ap0r[1], 1);
-> > +	default:
-> > +		__vgic_v3_write_ap0rn(cpu_if->vgic_ap0r[0], 0);
-> > +	}
-> > +
-> > +	switch (nr_pre_bits) {
-> > +	case 7:
-> > +		__vgic_v3_write_ap1rn(cpu_if->vgic_ap1r[3], 3);
-> > +		__vgic_v3_write_ap1rn(cpu_if->vgic_ap1r[2], 2);
-> > +	case 6:
-> > +		__vgic_v3_write_ap1rn(cpu_if->vgic_ap1r[1], 1);
-> > +	default:
-> > +		__vgic_v3_write_ap1rn(cpu_if->vgic_ap1r[0], 0);
-> > +	}
-> > +}
-> > +
-> >  void __hyp_text __vgic_v3_init_lrs(void)
-> >  {
-> >  	int max_lr_idx = vtr_to_max_lr_idx(read_gicreg(ICH_VTR_EL2));
-> > diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-> > index 1e5f3eb6973d..ca7cfee9f353 100644
-> > --- a/virt/kvm/arm/vgic/vgic-v2.c
-> > +++ b/virt/kvm/arm/vgic/vgic-v2.c
-> > @@ -446,7 +446,6 @@ void vgic_v2_save_state(struct kvm_vcpu *vcpu)
-> >  {
-> >  	struct kvm *kvm = vcpu->kvm;
-> >  	struct vgic_dist *vgic = &kvm->arch.vgic;
-> > -	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
-> >  	void __iomem *base = vgic->vctrl_base;
-> >  	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
-> >  
-> > @@ -454,11 +453,8 @@ void vgic_v2_save_state(struct kvm_vcpu *vcpu)
-> >  		return;
-> >  
-> >  	if (used_lrs) {
-> > -		cpu_if->vgic_apr = readl_relaxed(base + GICH_APR);
-> >  		save_lrs(vcpu, base);
-> >  		writel_relaxed(0, base + GICH_HCR);
-> > -	} else {
-> > -		cpu_if->vgic_apr = 0;
-> >  	}
-> >  }
-> >  
-> > @@ -476,7 +472,6 @@ void vgic_v2_restore_state(struct kvm_vcpu *vcpu)
-> >  
-> >  	if (used_lrs) {
-> >  		writel_relaxed(cpu_if->vgic_hcr, base + GICH_HCR);
-> > -		writel_relaxed(cpu_if->vgic_apr, base + GICH_APR);
-> >  		for (i = 0; i < used_lrs; i++) {
-> >  			writel_relaxed(cpu_if->vgic_lr[i],
-> >  				       base + GICH_LR0 + (i * 4));
-> > @@ -490,6 +485,7 @@ void vgic_v2_load(struct kvm_vcpu *vcpu)
-> >  	struct vgic_dist *vgic = &vcpu->kvm->arch.vgic;
-> >  
-> >  	writel_relaxed(cpu_if->vgic_vmcr, vgic->vctrl_base + GICH_VMCR);
-> > +	writel_relaxed(cpu_if->vgic_apr, vgic->vctrl_base + GICH_APR);
-> >  }
-> >  
-> >  void vgic_v2_put(struct kvm_vcpu *vcpu)
-> > @@ -498,4 +494,5 @@ void vgic_v2_put(struct kvm_vcpu *vcpu)
-> >  	struct vgic_dist *vgic = &vcpu->kvm->arch.vgic;
-> >  
-> >  	cpu_if->vgic_vmcr = readl_relaxed(vgic->vctrl_base + GICH_VMCR);
-> > +	cpu_if->vgic_apr = readl_relaxed(vgic->vctrl_base + GICH_APR);
-> >  }
-> > diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> > index b76e21f3e6bd..4bafcd1e6bb8 100644
-> > --- a/virt/kvm/arm/vgic/vgic-v3.c
-> > +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> > @@ -16,6 +16,7 @@
-> >  #include <linux/kvm.h>
-> >  #include <linux/kvm_host.h>
-> >  #include <kvm/arm_vgic.h>
-> > +#include <asm/kvm_hyp.h>
-> >  #include <asm/kvm_mmu.h>
-> >  #include <asm/kvm_asm.h>
-> >  
-> > @@ -587,6 +588,8 @@ void vgic_v3_load(struct kvm_vcpu *vcpu)
-> >  	 */
-> >  	if (likely(cpu_if->vgic_sre))
-> >  		kvm_call_hyp(__vgic_v3_write_vmcr, cpu_if->vgic_vmcr);
-> > +
-> > +	kvm_call_hyp(__vgic_v3_restore_aprs, vcpu);
-> >  }
-> >  
-> >  void vgic_v3_put(struct kvm_vcpu *vcpu)
-> > @@ -595,4 +598,6 @@ void vgic_v3_put(struct kvm_vcpu *vcpu)
-> >  
-> >  	if (likely(cpu_if->vgic_sre))
-> >  		cpu_if->vgic_vmcr = kvm_call_hyp(__vgic_v3_read_vmcr);
-> > +
-> > +	kvm_call_hyp(__vgic_v3_save_aprs, vcpu);
-> >  }
-> > 
-> 
-> An unfortunate consequence of the save/restore de-aggregation process in
-> this series is that we end-up doing quite a few EL2 calls in the !VHE
-> case. We should probably think of consolidating those behind a single
-> EL2 call if they have a measurable impact.
+The DCache clean & ICache invalidation requirements for instructions
+to be data coherence are discoverable through new fields in CTR_EL0.
+The following two control bits DIC and IDC were defined for this
+purpose. No need to perform point of unification cache maintenance
+operations from software on systems where CPU caches are transparent.
 
-We could, but the trap to EL2 (without saving all GP regs beyond the
-normal calling convention) is really cheap, so I don't think it *is*
-that bad, but it *feels* bad.  Also, few of these are in the criticial
-path, right?
+This patch optimize the three functions __flush_cache_user_range(),
+clean_dcache_area_pou() and invalidate_icache_range() if the hardware
+reports CTR_EL0.IDC and/or CTR_EL0.IDC. Basically it skips the two
+instructions 'DC CVAU' and 'IC IVAU', and the associated loop logic
+in order to avoid the unnecessary overhead.
 
-I'll admit that I haven't measured non-VHE GICv3 impact of this series
-(only non-VHE GICv2 which saw a small improvement).
+CTR_EL0.DIC: Instruction cache invalidation requirements for
+ instruction to data coherence. The meaning of this bit[29].
+  0: Instruction cache invalidation to the point of unification
+     is required for instruction to data coherence.
+  1: Instruction cache cleaning to the point of unification is
+      not required for instruction to data coherence.
 
-> 
-> In the meantime:
-> 
-> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-> 
+CTR_EL0.IDC: Data cache clean requirements for instruction to data
+ coherence. The meaning of this bit[28].
+  0: Data cache clean to the point of unification is required for
+     instruction to data coherence, unless CLIDR_EL1.LoC == 0b000
+     or (CLIDR_EL1.LoUIS == 0b000 && CLIDR_EL1.LoUU == 0b000).
+  1: Data cache clean to the point of unification is not required
+     for instruction to data coherence.
 
-Thanks,
--Christoffer
+Signed-off-by: Philip Elcan <pelcan@codeaurora.org>
+Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
+---
+Changes since v3:
+  -Added preprocessor guard CONFIG_xxx to code snippets in cache.S
+  -Changed barrier attributes from ISH to ISHST.
+
+Changes since v2:
+  -Included barriers, DSB/ISB with DIC set, and DSB with IDC set.
+  -Single Kconfig option.
+
+Changes since v1:
+  -Reworded commit text.
+  -Used the alternatives framework as Catalin suggested.
+  -Rebased on top of https://patchwork.kernel.org/patch/10227927/
+
+ arch/arm64/Kconfig               | 12 ++++++++++++
+ arch/arm64/include/asm/cache.h   |  5 +++++
+ arch/arm64/include/asm/cpucaps.h |  4 +++-
+ arch/arm64/kernel/cpufeature.c   | 40 ++++++++++++++++++++++++++++++++++------
+ arch/arm64/mm/cache.S            | 29 ++++++++++++++++++++++++++++-
+ 5 files changed, 82 insertions(+), 8 deletions(-)
+
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index f55fe5b..82b8053 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -1095,6 +1095,18 @@ config ARM64_RAS_EXTN
+ 	  and access the new registers if the system supports the extension.
+ 	  Platform RAS features may additionally depend on firmware support.
+ 
++config ARM64_SKIP_CACHE_POU
++	bool "Enable support to skip cache POU operations"
++	default y
++	help
++	  Explicit point of unification cache operations can be eliminated
++	  in software if the hardware handles transparently. The new bits in
++	  CTR_EL0, CTR_EL0.DIC and CTR_EL0.IDC indicates the hardware
++	  capabilities of ICache and DCache POU requirements.
++
++	  Selecting this feature will allow the kernel to optimize the POU
++	  cache maintaince operations where it requires 'D{I}C C{I}VAU'
++
+ endmenu
+ 
+ config ARM64_SVE
+diff --git a/arch/arm64/include/asm/cache.h b/arch/arm64/include/asm/cache.h
+index ea9bb4e..e22178b 100644
+--- a/arch/arm64/include/asm/cache.h
++++ b/arch/arm64/include/asm/cache.h
+@@ -20,8 +20,13 @@
+ 
+ #define CTR_L1IP_SHIFT		14
+ #define CTR_L1IP_MASK		3
++#define CTR_DMLINE_SHIFT	16
++#define CTR_ERG_SHIFT		20
+ #define CTR_CWG_SHIFT		24
+ #define CTR_CWG_MASK		15
++#define CTR_IDC_SHIFT		28
++#define CTR_DIC_SHIFT		29
++#define CTR_B31_SHIFT		31
+ 
+ #define CTR_L1IP(ctr)		(((ctr) >> CTR_L1IP_SHIFT) & CTR_L1IP_MASK)
+ 
+diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+index bb26382..8dd42ae 100644
+--- a/arch/arm64/include/asm/cpucaps.h
++++ b/arch/arm64/include/asm/cpucaps.h
+@@ -45,7 +45,9 @@
+ #define ARM64_HARDEN_BRANCH_PREDICTOR		24
+ #define ARM64_HARDEN_BP_POST_GUEST_EXIT		25
+ #define ARM64_HAS_RAS_EXTN			26
++#define ARM64_HAS_CACHE_IDC			27
++#define ARM64_HAS_CACHE_DIC			28
+ 
+-#define ARM64_NCAPS				27
++#define ARM64_NCAPS				29
+ 
+ #endif /* __ASM_CPUCAPS_H */
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index ff8a6e9..c0b0db0 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -199,12 +199,12 @@ static int __init register_cpu_hwcaps_dumper(void)
+ };
+ 
+ static const struct arm64_ftr_bits ftr_ctr[] = {
+-	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_EXACT, 31, 1, 1),		/* RES1 */
+-	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, 29, 1, 1),	/* DIC */
+-	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, 28, 1, 1),	/* IDC */
+-	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_HIGHER_SAFE, 24, 4, 0),	/* CWG */
+-	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_HIGHER_SAFE, 20, 4, 0),	/* ERG */
+-	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, 16, 4, 1),	/* DminLine */
++	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_EXACT, CTR_B31_SHIFT, 1, 1),         /* RES1 */
++	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, CTR_DIC_SHIFT, 1, 1),    /* DIC */
++	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, CTR_IDC_SHIFT, 1, 1),    /* IDC */
++	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_HIGHER_SAFE, CTR_CWG_SHIFT, 4, 0),   /* CWG */
++	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_HIGHER_SAFE, CTR_ERG_SHIFT, 4, 0),   /* ERG */
++	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, CTR_DMLINE_SHIFT, 4, 1), /* DminLine */
+ 	/*
+ 	 * Linux can handle differing I-cache policies. Userspace JITs will
+ 	 * make use of *minLine.
+@@ -864,6 +864,20 @@ static bool has_no_fpsimd(const struct arm64_cpu_capabilities *entry, int __unus
+ 					ID_AA64PFR0_FP_SHIFT) < 0;
+ }
+ 
++#ifdef CONFIG_ARM64_SKIP_CACHE_POU
++static bool has_cache_idc(const struct arm64_cpu_capabilities *entry,
++			  int __unused)
++{
++	return (read_sanitised_ftr_reg(SYS_CTR_EL0) & (1UL << CTR_IDC_SHIFT));
++}
++
++static bool has_cache_dic(const struct arm64_cpu_capabilities *entry,
++			  int __unused)
++{
++	return (read_sanitised_ftr_reg(SYS_CTR_EL0) & (1UL << CTR_DIC_SHIFT));
++}
++#endif
++
+ #ifdef CONFIG_UNMAP_KERNEL_AT_EL0
+ static int __kpti_forced; /* 0: not forced, >0: forced on, <0: forced off */
+ 
+@@ -1100,6 +1114,20 @@ static int cpu_copy_el2regs(void *__unused)
+ 		.enable = cpu_clear_disr,
+ 	},
+ #endif /* CONFIG_ARM64_RAS_EXTN */
++#ifdef CONFIG_ARM64_SKIP_CACHE_POU
++	{
++		.desc = "Skip D-Cache maintenance 'CVAU' (CTR_EL0.IDC=1)",
++		.capability = ARM64_HAS_CACHE_IDC,
++		.def_scope = SCOPE_SYSTEM,
++		.matches = has_cache_idc,
++	},
++	{
++		.desc = "Skip I-Cache maintenance 'IVAU' (CTR_EL0.DIC=1)",
++		.capability = ARM64_HAS_CACHE_DIC,
++		.def_scope = SCOPE_SYSTEM,
++		.matches = has_cache_dic,
++	},
++#endif /* CONFIG_ARM64_SKIP_CACHE_POU */
+ 	{},
+ };
+ 
+diff --git a/arch/arm64/mm/cache.S b/arch/arm64/mm/cache.S
+index 758bde7..ffba5cc 100644
+--- a/arch/arm64/mm/cache.S
++++ b/arch/arm64/mm/cache.S
+@@ -50,6 +50,12 @@ ENTRY(flush_icache_range)
+  */
+ ENTRY(__flush_cache_user_range)
+ 	uaccess_ttbr0_enable x2, x3, x4
++#ifdef CONFIG_ARM64_SKIP_CACHE_POU
++alternative_if ARM64_HAS_CACHE_IDC
++	dsb	ishst
++	b	7f
++alternative_else_nop_endif
++#endif
+ 	dcache_line_size x2, x3
+ 	sub	x3, x2, #1
+ 	bic	x4, x0, x3
+@@ -60,8 +66,15 @@ user_alt 9f, "dc cvau, x4",  "dc civac, x4",  ARM64_WORKAROUND_CLEAN_CACHE
+ 	b.lo	1b
+ 	dsb	ish
+ 
++7:
++#ifdef CONFIG_ARM64_SKIP_CACHE_POU
++alternative_if ARM64_HAS_CACHE_DIC
++	isb
++	b	8f
++alternative_else_nop_endif
++#endif
+ 	invalidate_icache_by_line x0, x1, x2, x3, 9f
+-	mov	x0, #0
++8:	mov	x0, #0
+ 1:
+ 	uaccess_ttbr0_disable x1, x2
+ 	ret
+@@ -80,6 +93,14 @@ ENDPROC(__flush_cache_user_range)
+  *	- end     - virtual end address of region
+  */
+ ENTRY(invalidate_icache_range)
++#ifdef CONFIG_ARM64_SKIP_CACHE_POU
++alternative_if ARM64_HAS_CACHE_DIC
++	mov	x0, xzr
++	dsb	ishst
++	isb
++	ret
++alternative_else_nop_endif
++#endif
+ 	uaccess_ttbr0_enable x2, x3, x4
+ 
+ 	invalidate_icache_by_line x0, x1, x2, x3, 2f
+@@ -116,6 +137,12 @@ ENDPIPROC(__flush_dcache_area)
+  *	- size    - size in question
+  */
+ ENTRY(__clean_dcache_area_pou)
++#ifdef CONFIG_ARM64_SKIP_CACHE_POU
++alternative_if ARM64_HAS_CACHE_IDC
++	dsb	ishst
++	ret
++alternative_else_nop_endif
++#endif
+ 	dcache_by_line_op cvau, ish, x0, x1, x2, x3
+ 	ret
+ ENDPROC(__clean_dcache_area_pou)
+-- 
+Qualcomm Datacenter Technologies, Inc. on behalf of the Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
