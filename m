@@ -1,16 +1,17 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v4 08/40] KVM: arm/arm64: Introduce vcpu_el1_is_32bit
-Date: Thu, 22 Feb 2018 10:11:39 +0100
-Message-ID: <20180222091139.GE29376@cbox>
+Subject: Re: [PATCH v4 13/40] KVM: arm64: Introduce VHE-specific kvm_vcpu_run
+Date: Thu, 22 Feb 2018 10:16:48 +0100
+Message-ID: <20180222091648.GF29376@cbox>
 References: <20180215210332.8648-1-christoffer.dall@linaro.org>
- <20180215210332.8648-9-christoffer.dall@linaro.org>
- <86d10ylf94.wl-marc.zyngier@arm.com>
+ <20180215210332.8648-14-christoffer.dall@linaro.org>
+ <20180221174300.74lxks5gb6qzny75@kamzik.brq.redhat.com>
+ <20180221181832.i5c46evx6y3h635k@kamzik.brq.redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <86d10ylf94.wl-marc.zyngier@arm.com>
+In-Reply-To: <20180221181832.i5c46evx6y3h635k@kamzik.brq.redhat.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -20,178 +21,82 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, Tomasz Nowicki <tn@semihalf.com>, kvmarm@lists.cs.columbia.edu, Julien Grall <julien.grall@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, linux-arm-kernel@lists.infradead.org, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
+To: Andrew Jones <drjones@redhat.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Tomasz Nowicki <tn@semihalf.com>, kvmarm@lists.cs.columbia.edu, Julien Grall <julien.grall@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, linux-arm-kernel@lists.infradead.org, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Feb 21, 2018 at 12:05:27PM +0000, Marc Zyngier wrote:
-> On Thu, 15 Feb 2018 21:03:00 +0000,
-> Christoffer Dall wrote:
+On Wed, Feb 21, 2018 at 07:18:32PM +0100, Andrew Jones wrote:
+> On Wed, Feb 21, 2018 at 06:43:00PM +0100, Andrew Jones wrote:
+> > On Thu, Feb 15, 2018 at 10:03:05PM +0100, Christoffer Dall wrote:
+> > > So far this is mostly (see below) a copy of the legacy non-VHE switch
+> > > function, but we will start reworking these functions in separate
+> > > directions to work on VHE and non-VHE in the most optimal way in later
+> > > patches.
+> > > 
+> > > The only difference after this patch between the VHE and non-VHE run
+> > > functions is that we omit the branch-predictor variant-2 hardening for
+> > > QC Falkor CPUs, because this workaround is specific to a series of
+> > > non-VHE ARMv8.0 CPUs.
+> > > 
+> > > Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+> > > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> > > ---
+> > > 
+> > > Notes:
+> > >     Changes since v3:
+> > >      - Added BUG() to 32-bit ARM VHE run function
+> > >      - Omitted QC Falkor BP Hardening functionality from VHE-specific
+> > >        function
+> > >     
+> > >     Changes since v2:
+> > >      - Reworded commit message
+> > >     
+> > >     Changes since v1:
+> > >      - Rename kvm_vcpu_run to kvm_vcpu_run_vhe and rename __kvm_vcpu_run to
+> > >        __kvm_vcpu_run_nvhe
+> > >      - Removed stray whitespace line
+> > > 
+> > >  arch/arm/include/asm/kvm_asm.h   |  5 ++-
+> > >  arch/arm/kvm/hyp/switch.c        |  2 +-
+> > >  arch/arm64/include/asm/kvm_asm.h |  4 ++-
+> > >  arch/arm64/kvm/hyp/switch.c      | 66 +++++++++++++++++++++++++++++++++++++++-
+> > >  virt/kvm/arm/arm.c               |  5 ++-
+> > >  5 files changed, 77 insertions(+), 5 deletions(-)
+> > > 
 > > 
-> > We have numerous checks around that checks if the HCR_EL2 has the RW bit
-> > set to figure out if we're running an AArch64 or AArch32 VM.  In some
-> > cases, directly checking the RW bit (given its unintuitive name), is a
-> > bit confusing, and that's not going to improve as we move logic around
-> > for the following patches that optimize KVM on AArch64 hosts with VHE.
+> > ...
 > > 
-> > Therefore, introduce a helper, vcpu_el1_is_32bit, and replace existing
-> > direct checks of HCR_EL2.RW with the helper.
+> > > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> > > index 2062d9357971..5bd879c78951 100644
+> > > --- a/virt/kvm/arm/arm.c
+> > > +++ b/virt/kvm/arm/arm.c
+> > > @@ -736,7 +736,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+> > >  		if (has_vhe())
+> > >  			kvm_arm_vhe_guest_enter();
+> > >  
+> > > -		ret = kvm_call_hyp(__kvm_vcpu_run, vcpu);
+> > > +		if (has_vhe())
+> > > +			ret = kvm_vcpu_run_vhe(vcpu);
+> > > +		else
+> > > +			ret = kvm_call_hyp(__kvm_vcpu_run_nvhe, vcpu);
+> > >  
+> > >  		if (has_vhe())
+> > >  			kvm_arm_vhe_guest_exit();
 > > 
-> > Reviewed-by: Julien Grall <julien.grall@arm.com>
-> > Reviewed-by: Julien Thierry <julien.thierry@arm.com>
-> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> > ---
+> > We can combine these has_vhe()'s
 > > 
-> > Notes:
-> >     Changes since v2:
-> >      - New patch
-> >     
-> >     Changes since v1:
-> >      - Reworded comments as suggested by Drew
-> > 
-> >  arch/arm64/include/asm/kvm_emulate.h |  7 ++++++-
-> >  arch/arm64/kvm/hyp/switch.c          | 11 +++++------
-> >  arch/arm64/kvm/hyp/sysreg-sr.c       |  5 +++--
-> >  arch/arm64/kvm/inject_fault.c        |  6 +++---
-> >  4 files changed, 17 insertions(+), 12 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> > index 9ee316b962c8..3cc535591bdf 100644
-> > --- a/arch/arm64/include/asm/kvm_emulate.h
-> > +++ b/arch/arm64/include/asm/kvm_emulate.h
-> > @@ -45,6 +45,11 @@ void kvm_inject_undef32(struct kvm_vcpu *vcpu);
-> >  void kvm_inject_dabt32(struct kvm_vcpu *vcpu, unsigned long addr);
-> >  void kvm_inject_pabt32(struct kvm_vcpu *vcpu, unsigned long addr);
-> >  
-> > +static inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
-> > +{
-> > +	return !(vcpu->arch.hcr_el2 & HCR_RW);
-> > +}
-> > +
-> >  static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
-> >  {
-> >  	vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS;
-> > @@ -65,7 +70,7 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
-> >  	 * For now this is conditional, since no AArch32 feature regs
-> >  	 * are currently virtualised.
-> >  	 */
-> > -	if (vcpu->arch.hcr_el2 & HCR_RW)
-> > +	if (!vcpu_el1_is_32bit(vcpu))
-> >  		vcpu->arch.hcr_el2 |= HCR_TID3;
-> >  }
-> >  
-> > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> > index b51638490d85..fbab9752a9f4 100644
-> > --- a/arch/arm64/kvm/hyp/switch.c
-> > +++ b/arch/arm64/kvm/hyp/switch.c
-> > @@ -74,7 +74,7 @@ static hyp_alternate_select(__activate_traps_arch,
-> >  
-> >  static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
-> >  {
-> > -	u64 val;
-> > +	u64 hcr = vcpu->arch.hcr_el2;
-> >  
-> >  	/*
-> >  	 * We are about to set CPTR_EL2.TFP to trap all floating point
-> > @@ -85,17 +85,16 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
-> >  	 * If FP/ASIMD is not implemented, FPEXC is UNDEFINED and any access to
-> >  	 * it will cause an exception.
-> >  	 */
-> > -	val = vcpu->arch.hcr_el2;
-> > -
-> > -	if (!(val & HCR_RW) && system_supports_fpsimd()) {
-> > +	if (vcpu_el1_is_32bit(vcpu) && system_supports_fpsimd()) {
-> >  		write_sysreg(1 << 30, fpexc32_el2);
-> >  		isb();
-> >  	}
-> > -	write_sysreg(val, hcr_el2);
-> >  
-> > -	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN) && (val & HCR_VSE))
-> > +	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN) && (hcr & HCR_VSE))
-> >  		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
-> >  
-> > +	write_sysreg(hcr, hcr_el2);
-> > +
-> >  	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
-> >  	write_sysreg(1 << 15, hstr_el2);
-> >  	/*
-> > diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-> > index 434f0fc9cfb3..99fc60516103 100644
-> > --- a/arch/arm64/kvm/hyp/sysreg-sr.c
-> > +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-> > @@ -19,6 +19,7 @@
-> >  #include <linux/kvm_host.h>
-> >  
-> >  #include <asm/kvm_asm.h>
-> > +#include <asm/kvm_emulate.h>
-> >  #include <asm/kvm_hyp.h>
-> >  
-> >  /* Yes, this does nothing, on purpose */
-> > @@ -147,7 +148,7 @@ void __hyp_text __sysreg32_save_state(struct kvm_vcpu *vcpu)
-> >  {
-> >  	u64 *spsr, *sysreg;
-> >  
-> > -	if (read_sysreg(hcr_el2) & HCR_RW)
-> > +	if (!vcpu_el1_is_32bit(vcpu))
-> >  		return;
-> >  
-> >  	spsr = vcpu->arch.ctxt.gp_regs.spsr;
-> > @@ -172,7 +173,7 @@ void __hyp_text __sysreg32_restore_state(struct kvm_vcpu *vcpu)
-> >  {
-> >  	u64 *spsr, *sysreg;
-> >  
-> > -	if (read_sysreg(hcr_el2) & HCR_RW)
-> > +	if (!vcpu_el1_is_32bit(vcpu))
-> >  		return;
-> >  
-> >  	spsr = vcpu->arch.ctxt.gp_regs.spsr;
-> > diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-> > index c1e179d34e6a..30a3f58cdb7b 100644
-> > --- a/arch/arm64/kvm/inject_fault.c
-> > +++ b/arch/arm64/kvm/inject_fault.c
-> > @@ -128,7 +128,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
-> >   */
-> >  void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr)
-> >  {
-> > -	if (!(vcpu->arch.hcr_el2 & HCR_RW))
-> > +	if (vcpu_el1_is_32bit(vcpu))
-> >  		kvm_inject_dabt32(vcpu, addr);
-> >  	else
-> >  		inject_abt64(vcpu, false, addr);
-> > @@ -144,7 +144,7 @@ void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr)
-> >   */
-> >  void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
-> >  {
-> > -	if (!(vcpu->arch.hcr_el2 & HCR_RW))
-> > +	if (vcpu_el1_is_32bit(vcpu))
-> >  		kvm_inject_pabt32(vcpu, addr);
-> >  	else
-> >  		inject_abt64(vcpu, true, addr);
-> > @@ -158,7 +158,7 @@ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
-> >   */
-> >  void kvm_inject_undefined(struct kvm_vcpu *vcpu)
-> >  {
-> > -	if (!(vcpu->arch.hcr_el2 & HCR_RW))
-> > +	if (vcpu_el1_is_32bit(vcpu))
-> >  		kvm_inject_undef32(vcpu);
-> >  	else
-> >  		inject_undef64(vcpu);
-> > -- 
-> > 2.14.2
-> > 
+> >  if (has_vhe()) {
+> >     kvm_arm_vhe_guest_enter();
+> >     ret = kvm_vcpu_run_vhe(vcpu);
+> >     kvm_arm_vhe_guest_exit();
+> >  } else
+> >     ret = kvm_call_hyp(__kvm_vcpu_run_nvhe, vcpu);
 > 
-> nit: not strictly necessary, but would it be worth adding a similar
-> (and trivial) version of this predicate to the 32bit code? Just to
-> keep things in sync?
+> Maybe even do a cleanup patch that removes
+> kvm_arm_vhe_guest_enter/exit by putting the daif
+> masking/restoring directly into kvm_vcpu_run_vhe()?
 > 
-
-I could, but wouldn't that add unused code to the kernel at no immediate
-benefit?
-
-> Otherwise,
-> 
-> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-> 
+Yes, indeed.  This is a blind rebasing result on my part.
 
 Thanks,
 -Christoffer
