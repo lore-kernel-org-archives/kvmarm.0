@@ -1,20 +1,17 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v4 38/40] KVM: arm/arm64: Handle VGICv3 save/restore from
- the main VGIC code on VHE
-Date: Thu, 22 Feb 2018 20:28:37 +0100
-Message-ID: <20180222192837.GY29376@cbox>
+Subject: Re: [PATCH v4 28/40] KVM: arm64: Defer saving/restoring 64-bit
+ sysregs to vcpu load/put on VHE
+Date: Thu, 22 Feb 2018 20:48:31 +0100
+Message-ID: <20180222194831.GZ29376@cbox>
 References: <20180215210332.8648-1-christoffer.dall@linaro.org>
- <20180215210332.8648-39-christoffer.dall@linaro.org>
- <3de7e88c-e7a2-f9b5-41f7-3b6886459806@arm.com>
- <20180222144227.GO29376@cbox> <86o9khjcg2.wl-marc.zyngier@arm.com>
- <20180222160200.GT29376@cbox>
- <8075943d-9519-bba3-9a8c-5f622f3e81d3@arm.com>
+ <20180215210332.8648-29-christoffer.dall@linaro.org>
+ <ece29cf2-4c60-dc3d-b2a9-e7e06380f860@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <8075943d-9519-bba3-9a8c-5f622f3e81d3@arm.com>
+In-Reply-To: <ece29cf2-4c60-dc3d-b2a9-e7e06380f860@arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -24,186 +21,108 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, Tomasz Nowicki <tn@semihalf.com>, kvmarm@lists.cs.columbia.edu, Julien Grall <julien.grall@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, linux-arm-kernel@lists.infradead.org, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
+To: Julien Grall <julien.grall@arm.com>
+Cc: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Tomasz Nowicki <tn@semihalf.com>, Dave Martin <Dave.Martin@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Feb 22, 2018 at 05:21:20PM +0000, Marc Zyngier wrote:
-> On 22/02/18 16:02, Christoffer Dall wrote:
-> > On Thu, Feb 22, 2018 at 03:01:17PM +0000, Marc Zyngier wrote:
-> >> On Thu, 22 Feb 2018 14:42:27 +0000,
-> >> Christoffer Dall wrote:
-> >>>
-> >>> On Thu, Feb 22, 2018 at 12:32:11PM +0000, Marc Zyngier wrote:
-> >>>> On 15/02/18 21:03, Christoffer Dall wrote:
-> >>>>> Just like we can program the GICv2 hypervisor control interface directly
-> >>>>> from the core vgic code, we can do the same for the GICv3 hypervisor
-> >>>>> control interface on VHE systems.
-> >>>>>
-> >>>>> We do this by simply calling the save/restore functions when we have VHE
-> >>>>> and we can then get rid of the save/restore function calls from the VHE
-> >>>>> world switch function.
-> >>>>>
-> >>>>> One caveat is that we now write GICv3 system register state before the
-> >>>>> potential early exit path in the run loop, and because we sync back
-> >>>>> state in the early exit path, we have to ensure that we read a
-> >>>>> consistent GIC state from the sync path, even though we have never
-> >>>>> actually run the guest with the newly written GIC state.  We solve this
-> >>>>> by inserting an ISB in the early exit path.
-> >>>>>
-> >>>>> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> >>>>> ---
-> >>>>>
-> >>>>> Notes:
-> >>>>>     Changes since v2:
-> >>>>>      - Added ISB in the early exit path in the run loop as explained
-> >>>>>        in the commit message.
-> >>>>>
-> >>>>>  arch/arm64/kvm/hyp/switch.c | 3 ---
-> >>>>>  virt/kvm/arm/arm.c          | 1 +
-> >>>>>  virt/kvm/arm/vgic/vgic.c    | 5 +++++
-> >>>>>  3 files changed, 6 insertions(+), 3 deletions(-)
-> >>>>>
-> >>>>> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> >>>>> index cbafc27a617b..466cfcdbcaf3 100644
-> >>>>> --- a/arch/arm64/kvm/hyp/switch.c
-> >>>>> +++ b/arch/arm64/kvm/hyp/switch.c
-> >>>>> @@ -399,8 +399,6 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
-> >>>>>  	__activate_traps(vcpu);
-> >>>>>  	__activate_vm(vcpu->kvm);
-> >>>>>  
-> >>>>> -	__vgic_restore_state(vcpu);
-> >>>>> -
-> >>>>>  	sysreg_restore_guest_state_vhe(guest_ctxt);
-> >>>>>  	__debug_switch_to_guest(vcpu);
-> >>>>>  
-> >>>>> @@ -414,7 +412,6 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
-> >>>>>  	fp_enabled = fpsimd_enabled_vhe();
-> >>>>>  
-> >>>>>  	sysreg_save_guest_state_vhe(guest_ctxt);
-> >>>>> -	__vgic_save_state(vcpu);
-> >>>>>  
-> >>>>>  	__deactivate_traps(vcpu);
-> >>>>>  
-> >>>>> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> >>>>> index 5bd879c78951..6de7641f3ff2 100644
-> >>>>> --- a/virt/kvm/arm/arm.c
-> >>>>> +++ b/virt/kvm/arm/arm.c
-> >>>>> @@ -717,6 +717,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> >>>>>  		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm) ||
-> >>>>>  		    kvm_request_pending(vcpu)) {
-> >>>>>  			vcpu->mode = OUTSIDE_GUEST_MODE;
-> >>>>> +			isb(); /* Ensure work in x_flush_hwstate is committed */
-> >>>>>  			kvm_pmu_sync_hwstate(vcpu);
-> >>>>>  			if (static_branch_unlikely(&userspace_irqchip_in_use))
-> >>>>>  				kvm_timer_sync_hwstate(vcpu);
-> >>>>> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> >>>>> index 12e2a28f437e..d0a19a8c196a 100644
-> >>>>> --- a/virt/kvm/arm/vgic/vgic.c
-> >>>>> +++ b/virt/kvm/arm/vgic/vgic.c
-> >>>>> @@ -19,6 +19,7 @@
-> >>>>>  #include <linux/list_sort.h>
-> >>>>>  #include <linux/interrupt.h>
-> >>>>>  #include <linux/irq.h>
-> >>>>> +#include <asm/kvm_hyp.h>
-> >>>>>  
-> >>>>>  #include "vgic.h"
-> >>>>>  
-> >>>>> @@ -753,6 +754,8 @@ static inline void vgic_save_state(struct kvm_vcpu *vcpu)
-> >>>>>  {
-> >>>>>  	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
-> >>>>>  		vgic_v2_save_state(vcpu);
-> >>>>> +	else if (has_vhe())
-> >>>>> +		__vgic_v3_save_state(vcpu);
-> >>>>>  }
-> >>>>>  
-> >>>>>  /* Sync back the hardware VGIC state into our emulation after a guest's run. */
-> >>>>> @@ -777,6 +780,8 @@ static inline void vgic_restore_state(struct kvm_vcpu *vcpu)
-> >>>>>  {
-> >>>>>  	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
-> >>>>>  		vgic_v2_restore_state(vcpu);
-> >>>>> +	else if (has_vhe())
-> >>>>> +		__vgic_v3_restore_state(vcpu);
-> >>>>>  }
-> >>>>>  
-> >>>>>  /* Flush our emulation state into the GIC hardware before entering the guest. */
-> >>>>>
-> >>>>
-> >>>> I'm slowly wrapping my brain around this thing again. If I grasp the
-> >>>> general idea, we end up with two cases:
-> >>>>
-> >>>> (1) The GIC is accessible from the kernel, and we save/restore it
-> >>>> outside of the HYP code.
-> >>>>
-> >>>> (2) The GIC is only accessible from the HYP code, and we do it there.
-> >>>>
-> >>>> Maybe we should bite the bullet and introduce that primitive instead?
-> >>>>
-> >>>
-> >>> You mean something the following?
-> >>>
-> >>> static inline bool can_access_vgic_from_kernel(void)
-> >>> {
-> >>> 	/*
-> >>> 	 * GICv2 can always be accessed from the kernel because it is
-> >>> 	 * memory-mapped, and VHE systems can access GICv3 EL2 system
-> >>> 	 * registers.
-> >>> 	 */
-> >>> 	return !static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif) || has_vhe();
-> >>> }
-> >>
-> >> Yes. I think this would go a long way in making this code easy to
-> >> understand. 
-> > 
-> > I'll give it a go on the next respin.
-> > 
-> >> It also mean that we can have a unified save/restore
-> >> function that picks the right GIC back-end, resulting in less
-> >> code duplication.
-> >>
-> > Not sure I understand hat you mean here?
+On Thu, Feb 22, 2018 at 06:30:11PM +0000, Julien Grall wrote:
+> Hi Christoffer,
 > 
-> We now have:
+> On 15/02/18 21:03, Christoffer Dall wrote:
+> >Some system registers do not affect the host kernel's execution and can
+> >therefore be loaded when we are about to run a VCPU and we don't have to
+> >restore the host state to the hardware before the time when we are
+> >actually about to return to userspace or schedule out the VCPU thread.
+> >
+> >The EL1 system registers and the userspace state registers only
+> >affecting EL0 execution do not need to be saved and restored on every
+> >switch between the VM and the host, because they don't affect the host
+> >kernel's execution.
+> >
+> >We mark all registers which are now deffered as such in the
 > 
-> static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
-> {
->         if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif)) {
->                 __vgic_v3_activate_traps(vcpu);
->                 __vgic_v3_restore_state(vcpu);
->         }
-> }
+> NIT: s/deffered/deferred/ I think.
 > 
-> and 
+> >vcpu_{read,write}_sys_reg accessors in sys-regs.c to ensure the most
+> >up-to-date copy is always accessed.
+> >
+> >Note MPIDR_EL1 (controlled via VMPIDR_EL2) is accessed from other vcpu
+> >threads, for example via the GIC emulation, and therefore must be
+> >declared as immediate, which is fine as the guest cannot modify this
+> >value.
+> >
+> >The 32-bit sysregs can also be deferred but we do this in a separate
+> >patch as it requires a bit more infrastructure.
 > 
-> static inline void vgic_restore_state(struct kvm_vcpu *vcpu)
-> {
->         if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
->                 vgic_v2_restore_state(vcpu);
->         else if (has_vhe())
->                 __vgic_v3_restore_state(vcpu);
-> }
 > 
-> I have the feeling that we could reconcile them in a nice way, but
-> I'm not completely sure now...
+> [...]
 > 
-Hmm, yeah, so we have the VHE GICv3 flow:
+> >diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> >index b3c3f014aa61..f060309337aa 100644
+> >--- a/arch/arm64/kvm/sys_regs.c
+> >+++ b/arch/arm64/kvm/sys_regs.c
+> >@@ -87,6 +87,26 @@ u64 vcpu_read_sys_reg(struct kvm_vcpu *vcpu, int reg)
+> >  	 * exit from the guest but are only saved on vcpu_put.
+> >  	 */
+> >  	switch (reg) {
+> >+	case CSSELR_EL1:	return read_sysreg_s(SYS_CSSELR_EL1);
+> >+	case SCTLR_EL1:		return read_sysreg_s(sctlr_EL12);
+> >+	case ACTLR_EL1:		return read_sysreg_s(SYS_ACTLR_EL1);
+> >+	case CPACR_EL1:		return read_sysreg_s(cpacr_EL12);
+> >+	case TTBR0_EL1:		return read_sysreg_s(ttbr0_EL12);
+> >+	case TTBR1_EL1:		return read_sysreg_s(ttbr1_EL12);
+> >+	case TCR_EL1:		return read_sysreg_s(tcr_EL12);
+> >+	case ESR_EL1:		return read_sysreg_s(esr_EL12);
+> >+	case AFSR0_EL1:		return read_sysreg_s(afsr0_EL12);
+> >+	case AFSR1_EL1:		return read_sysreg_s(afsr1_EL12);
+> >+	case FAR_EL1:		return read_sysreg_s(far_EL12);
+> >+	case MAIR_EL1:		return read_sysreg_s(mair_EL12);
+> >+	case VBAR_EL1:		return read_sysreg_s(vbar_EL12);
+> >+	case CONTEXTIDR_EL1:	return read_sysreg_s(contextidr_EL12);
+> >+	case TPIDR_EL0:		return read_sysreg_s(SYS_TPIDR_EL0);
+> >+	case TPIDRRO_EL0:	return read_sysreg_s(SYS_TPIDRRO_EL0);
+> 
+> I find a bit confusing to have some EL0 registers in the middle of EL1 ones.
+> Is it because they are listed by encoding?
+> 
 
-vcpu_load -> vgic_v3_load -> __vgic_v3_activate_traps
-   KVM_RUN -> kvm_vgic_flush_hwstate -> vgic_restore_state ->
-              __vgic_v3_restore_state (if we have irqs)
+They are sorted in the same way as the sysreg array defines.  I can add
+that to the commentary.
 
-Then we have the non-VHE GICv3 flow:
-   KVM_RUN -> __kvm_vcpu_run_nvhe -> __vgic_restore_state ->
-     __vgic_v3_activate_traps
-     __vgic_v3_restore_state
-
-Then we have the GICv2 flow:
-   KVM_RUN -> kvm_vgic_flush_hwstate -> vgic_restore_state ->
-              __vgic_v2_restore_state (if we have irqs)
-
-We could at least rename __vgic_restore_state to
-__vgic_hyp_restore_state.  Do you see further room for making this less
-complicated?
+> >+	case TPIDR_EL1:		return read_sysreg_s(SYS_TPIDR_EL1);
+> >+	case AMAIR_EL1:		return read_sysreg_s(amair_EL12);
+> >+	case CNTKCTL_EL1:	return read_sysreg_s(cntkctl_EL12);
+> >+	case PAR_EL1:		return read_sysreg_s(SYS_PAR_EL1);
+> >  	}
+> >  immediate_read:
+> >@@ -103,6 +123,26 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, int reg, u64 val)
+> >  	 * entry to the guest but are only restored on vcpu_load.
+> >  	 */
+> >  	switch (reg) {
+> >+	case CSSELR_EL1:	write_sysreg_s(val, SYS_CSSELR_EL1);	return;
+> >+	case SCTLR_EL1:		write_sysreg_s(val, sctlr_EL12);	return;
+> >+	case ACTLR_EL1:		write_sysreg_s(val, SYS_ACTLR_EL1);	return;
+> >+	case CPACR_EL1:		write_sysreg_s(val, cpacr_EL12);	return;
+> >+	case TTBR0_EL1:		write_sysreg_s(val, ttbr0_EL12);	return;
+> >+	case TTBR1_EL1:		write_sysreg_s(val, ttbr1_EL12);	return;
+> >+	case TCR_EL1:		write_sysreg_s(val, tcr_EL12);		return;
+> >+	case ESR_EL1:		write_sysreg_s(val, esr_EL12);		return;
+> >+	case AFSR0_EL1:		write_sysreg_s(val, afsr0_EL12);	return;
+> >+	case AFSR1_EL1:		write_sysreg_s(val, afsr1_EL12);	return;
+> >+	case FAR_EL1:		write_sysreg_s(val, far_EL12);		return;
+> >+	case MAIR_EL1:		write_sysreg_s(val, mair_EL12);		return;
+> >+	case VBAR_EL1:		write_sysreg_s(val, vbar_EL12);		return;
+> >+	case CONTEXTIDR_EL1:	write_sysreg_s(val, contextidr_EL12);	return;
+> >+	case TPIDR_EL0:		write_sysreg_s(val, SYS_TPIDR_EL0);	return;
+> >+	case TPIDRRO_EL0:	write_sysreg_s(val, SYS_TPIDRRO_EL0);	return;
+> >+	case TPIDR_EL1:		write_sysreg_s(val, SYS_TPIDR_EL1);	return;
+> >+	case AMAIR_EL1:		write_sysreg_s(val, amair_EL12);	return;
+> >+	case CNTKCTL_EL1:	write_sysreg_s(val, cntkctl_EL12);	return;
+> >+	case PAR_EL1:		write_sysreg_s(val, SYS_PAR_EL1);	return;
+> >  	}
+> >  immediate_write:
+> >
+> 
 
 Thanks,
 -Christoffer
