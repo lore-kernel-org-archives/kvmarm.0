@@ -1,15 +1,17 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] KVM: arm/arm64: No need to zero CNTVOFF in
- kvm_timer_vcpu_put() for VHE
-Date: Thu, 22 Feb 2018 09:42:31 +0100
-Message-ID: <20180222084231.GA29376@cbox>
-References: <1519054687-14405-1-git-send-email-shankerd@codeaurora.org>
+Subject: Re: [PATCH v4 03/40] KVM: arm64: Avoid storing the vcpu pointer on
+ the stack
+Date: Thu, 22 Feb 2018 09:43:21 +0100
+Message-ID: <20180222084321.GB29376@cbox>
+References: <20180215210332.8648-1-christoffer.dall@linaro.org>
+ <20180215210332.8648-4-christoffer.dall@linaro.org>
+ <d00629e8-da68-a536-dc22-b8c26e962b85@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <1519054687-14405-1-git-send-email-shankerd@codeaurora.org>
+In-Reply-To: <d00629e8-da68-a536-dc22-b8c26e962b85@arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -19,37 +21,39 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Shanker Donthineni <shankerd@codeaurora.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Vikram Sethi <vikrams@codeaurora.org>, linux-kernel <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, kvmarm <kvmarm@lists.cs.columbia.edu>
+To: Julien Grall <julien.grall@arm.com>
+Cc: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Tomasz Nowicki <tn@semihalf.com>, Dave Martin <Dave.Martin@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGkgU2hhbmtlciwKCk9uIE1vbiwgRmViIDE5LCAyMDE4IGF0IDA5OjM4OjA3QU0gLTA2MDAsIFNo
-YW5rZXIgRG9udGhpbmVuaSB3cm90ZToKPiBJbiBBQXJjaDY0L0FBcmNoMzIsIHRoZSB2aXJ0dWFs
-IGNvdW50ZXIgdXNlcyBhIGZpeGVkIHZpcnR1YWwgb2Zmc2V0Cj4gb2YgemVybyBpbiB0aGUgZm9s
-bG93aW5nIHNpdHVhdGlvbnMgYXMgcGVyIEFSTXY4IHNwZWNpZmljYXRpb25zOgo+IAo+IDEpIEhD
-Ul9FTDIuRTJIIGlzIDEsIGFuZCBDTlRWQ1RfRUwwL0NOVFZDVCBhcmUgcmVhZCBmcm9tIEVMMi4K
-PiAyKSBIQ1JfRUwyLntFMkgsIFRHRX0gaXMgezEsIDF9LCBhbmQgZWl0aGVyOgo+ICAgIOKAlCBD
-TlRWQ1RfRUwwIGlzIHJlYWQgZnJvbSBOb24tc2VjdXJlIEVMMCBvciBFTDIuCj4gICAg4oCUIENO
-VFZDVCBpcyByZWFkIGZyb20gTm9uLXNlY3VyZSBFTDAuCj4gCj4gU28sIG5vIG5lZWQgdG8gemVy
-byBDTlRWT0ZGX0VMMi9DTlRWT0ZGIGZvciBWSEUgY2FzZS4KPiAKPiBTaWduZWQtb2ZmLWJ5OiBT
-aGFua2VyIERvbnRoaW5lbmkgPHNoYW5rZXJkQGNvZGVhdXJvcmEub3JnPgo+IC0tLQo+ICB2aXJ0
-L2t2bS9hcm0vYXJjaF90aW1lci5jIHwgNiArKysrLS0KPiAgMSBmaWxlIGNoYW5nZWQsIDQgaW5z
-ZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkKPiAKPiBkaWZmIC0tZ2l0IGEvdmlydC9rdm0vYXJt
-L2FyY2hfdGltZXIuYyBiL3ZpcnQva3ZtL2FybS9hcmNoX3RpbWVyLmMKPiBpbmRleCA3MDI2OGMw
-Li44NmVjYTMyNCAxMDA2NDQKPiAtLS0gYS92aXJ0L2t2bS9hcm0vYXJjaF90aW1lci5jCj4gKysr
-IGIvdmlydC9rdm0vYXJtL2FyY2hfdGltZXIuYwo+IEBAIC01NDEsOSArNTQxLDExIEBAIHZvaWQg
-a3ZtX3RpbWVyX3ZjcHVfcHV0KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKPiAgCSAqIFRoZSBrZXJu
-ZWwgbWF5IGRlY2lkZSB0byBydW4gdXNlcnNwYWNlIGFmdGVyIGNhbGxpbmcgdmNwdV9wdXQsIHNv
-Cj4gIAkgKiB3ZSByZXNldCBjbnR2b2ZmIHRvIDAgdG8gZW5zdXJlIGEgY29uc2lzdGVudCByZWFk
-IGJldHdlZW4gdXNlcgo+ICAJICogYWNjZXNzZXMgdG8gdGhlIHZpcnR1YWwgY291bnRlciBhbmQg
-a2VybmVsIGFjY2VzcyB0byB0aGUgcGh5c2ljYWwKPiAtCSAqIGNvdW50ZXIuCj4gKwkgKiBjb3Vu
-dGVyIG9mIG5vbi1WSEUgY2FzZS4gRm9yIFZIRSwgdGhlIHZpcnR1YWwgY291bnRlciB1c2VzIGEg
-Zml4ZWQKPiArCSAqIHZpcnR1YWwgb2Zmc2V0IG9mIHplcm8sIHNvIG5vIG5lZWQgdG8gemVybyBD
-TlRWT0ZGX0VMMiByZWdpc3Rlci4KPiAgCSAqLwo+IC0Jc2V0X2NudHZvZmYoMCk7Cj4gKwlpZiAo
-IWhhc192aGUoKSkKPiArCQlzZXRfY250dm9mZigwKTsKPiAgfQo+ICAKPiAgLyoKCkknbSBva2F5
-IHdpdGggdGhpcyBjaGFuZ2UuICBJIGRvbid0IHRoaW5rIHRoZXJlJ3MgYSBodWdlIGdhaW4gaGVy
-ZQp0aG91Z2guCgpNYXJjLCBhbnkgdGhvdWdodHMgb3IgY29uY2VybnM/CgpUaGFua3MsCi1DaHJp
-c3RvZmZlcgoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18K
-bGludXgtYXJtLWtlcm5lbCBtYWlsaW5nIGxpc3QKbGludXgtYXJtLWtlcm5lbEBsaXN0cy5pbmZy
-YWRlYWQub3JnCmh0dHA6Ly9saXN0cy5pbmZyYWRlYWQub3JnL21haWxtYW4vbGlzdGluZm8vbGlu
-dXgtYXJtLWtlcm5lbAo=
+On Mon, Feb 19, 2018 at 03:50:20PM +0000, Julien Grall wrote:
+> Hi Christoffer,
+> 
+> On 15/02/18 21:02, Christoffer Dall wrote:
+> >We already have the percpu area for the host cpu state, which points to
+> >the VCPU, so there's no need to store the VCPU pointer on the stack on
+> >every context switch.  We can be a little more clever and just use
+> >tpidr_el2 for the percpu offset and load the VCPU pointer from the host
+> >context.
+> >
+> >This does require us to calculate the percpu offset without including
+> >the offset from the kernel mapping of the percpu array to the linear
+> >mapping of the array (which is what we store in tpidr_el1), because a
+> >PC-relative generated address in EL2 is already giving us the hyp alias
+> >of the linear mapping of a kernel address.  We do this in
+> >__cpu_init_hyp_mode() by using kvm_ksym_ref().
+> >
+> >This change also requires us to have a scratch register, so we take the
+> >chance to rearrange some of the el1_sync code to only look at the
+> >vttbr_el2 to determine if this is a trap from the guest or an HVC from
+> >the host.  We do add an extra check to call the panic code if the kernel
+> >is configured with debugging enabled and we saw a trap from the host
+> >which wasn't an HVC, indicating that we left some EL2 trap configured by
+> >mistake.
+> 
+> You might want to remove this paragraph as you don't seem to have rework
+> that part of the code in this version.
+> 
+Yes, will do.
+
+Thanks,
+-Christoffer
