@@ -1,17 +1,17 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v4 33/40] KVM: arm64: Configure c15, PMU, and debug
- register traps on cpu load/put for VHE
-Date: Thu, 22 Feb 2018 19:57:13 +0100
-Message-ID: <20180222185713.GW29376@cbox>
+Subject: Re: [PATCH v4 34/40] KVM: arm64: Cleanup __activate_traps and
+ __deactive_traps for VHE and non-VHE
+Date: Thu, 22 Feb 2018 20:04:03 +0100
+Message-ID: <20180222190403.GX29376@cbox>
 References: <20180215210332.8648-1-christoffer.dall@linaro.org>
- <20180215210332.8648-34-christoffer.dall@linaro.org>
- <86woz6jjax.wl-marc.zyngier@arm.com>
+ <20180215210332.8648-35-christoffer.dall@linaro.org>
+ <86vaeqjj1c.wl-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <86woz6jjax.wl-marc.zyngier@arm.com>
+In-Reply-To: <86vaeqjj1c.wl-marc.zyngier@arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -25,175 +25,135 @@ To: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, Tomasz Nowicki <tn@semihalf.com>, kvmarm@lists.cs.columbia.edu, Julien Grall <julien.grall@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, linux-arm-kernel@lists.infradead.org, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Feb 21, 2018 at 06:20:54PM +0000, Marc Zyngier wrote:
-> On Thu, 15 Feb 2018 21:03:25 +0000,
+On Wed, Feb 21, 2018 at 06:26:39PM +0000, Marc Zyngier wrote:
+> On Thu, 15 Feb 2018 21:03:26 +0000,
 > Christoffer Dall wrote:
 > > 
-> > We do not have to change the c15 trap setting on each switch to/from the
-> > guest on VHE systems, because this setting only affects EL0.
-> 
-> Did you mean EL1 instead?
-> 
-
-Not sure what I meant, but HSTR_EL2 appears to affect EL1 and EL0, and
-the PMU configuration we can do on vcpu_load on VHE systems is only
-about EL0 as far as I can tell.
-
-> > 
-> > The PMU and debug trap configuration can also be done on vcpu load/put
-> > instead, because they don't affect how the host kernel can access the
-> > debug registers while executing KVM kernel code.
+> > To make the code more readable and to avoid the overhead of a function
+> > call, let's get rid of a pair of the alternative function selectors and
+> > explicitly call the VHE and non-VHE functions using the has_vhe() static
+> > key based selector instead, telling the compiler to try to inline the
+> > static function if it can.
 > > 
 > > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 > > ---
-> >  arch/arm64/include/asm/kvm_hyp.h |  3 +++
-> >  arch/arm64/kvm/hyp/switch.c      | 31 ++++++++++++++++++++++---------
-> >  arch/arm64/kvm/hyp/sysreg-sr.c   |  4 ++++
-> >  3 files changed, 29 insertions(+), 9 deletions(-)
+> >  arch/arm64/kvm/hyp/switch.c | 30 ++++++++++++++----------------
+> >  1 file changed, 14 insertions(+), 16 deletions(-)
 > > 
-> > diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> > index 2b1fda90dde4..949f2e77ae58 100644
-> > --- a/arch/arm64/include/asm/kvm_hyp.h
-> > +++ b/arch/arm64/include/asm/kvm_hyp.h
-> > @@ -147,6 +147,9 @@ void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
-> >  void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
-> >  bool __fpsimd_enabled(void);
-> >  
-> > +void activate_traps_vhe_load(struct kvm_vcpu *vcpu);
-> > +void deactivate_traps_vhe_put(void);
-> > +
-> >  u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
-> >  void __noreturn __hyp_do_panic(unsigned long, ...);
-> >  
 > > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> > index 9c40e203bd09..5e94955b89ea 100644
+> > index 5e94955b89ea..0e54fe2aab1c 100644
 > > --- a/arch/arm64/kvm/hyp/switch.c
 > > +++ b/arch/arm64/kvm/hyp/switch.c
-> > @@ -101,6 +101,8 @@ static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
+> > @@ -85,7 +85,7 @@ static void __hyp_text __deactivate_traps_common(void)
+> >  	write_sysreg(0, pmuserenr_el0);
+> >  }
+> >  
+> > -static void __hyp_text __activate_traps_vhe(struct kvm_vcpu *vcpu)
+> > +static inline void activate_traps_vhe(struct kvm_vcpu *vcpu)
 > >  {
 > >  	u64 val;
 > >  
-> > +	__activate_traps_common(vcpu);
-> > +
-> >  	val = CPTR_EL2_DEFAULT;
-> >  	val |= CPTR_EL2_TTA | CPTR_EL2_TFP | CPTR_EL2_TZ;
+> > @@ -97,7 +97,7 @@ static void __hyp_text __activate_traps_vhe(struct kvm_vcpu *vcpu)
+> >  	write_sysreg(kvm_get_hyp_vector(), vbar_el1);
+> >  }
+> >  
+> > -static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
+> > +static inline void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
+> 
+> Having both inline and __hyp_text does not make much sense (the
+> function will be emitted in the section defined by the caller).
+
+Is that true even if the function is not inlined?
+
+> I
+> suggest you drop the inline and let the compiler do its magic.
+> 
+
+We were using an older compiler (I believe GCC 4.8) when doing some of
+the initial experiements, and saw that some of these small functions
+weren't inlined without the inline hint.  However, this doesn't seem to
+be an issue on any of the compilers I'm using today.  So I'll remove
+the inline.
+
+Thanks,
+-Christoffer
+
+> >  {
+> >  	u64 val;
+> >  
+> > @@ -108,11 +108,7 @@ static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
 > >  	write_sysreg(val, cptr_el2);
-> > @@ -120,20 +122,12 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+> >  }
+> >  
+> > -static hyp_alternate_select(__activate_traps_arch,
+> > -			    __activate_traps_nvhe, __activate_traps_vhe,
+> > -			    ARM64_HAS_VIRT_HOST_EXTN);
+> > -
+> > -static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+> > +static inline void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+> 
+> Same here, and in other spots in this file.
+> 
+> >  {
+> >  	u64 hcr = vcpu->arch.hcr_el2;
+> >  
+> > @@ -122,10 +118,13 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
 > >  		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
 > >  
 > >  	__activate_traps_fpsimd32(vcpu);
-> > -	__activate_traps_common(vcpu);
-> >  	__activate_traps_arch()(vcpu);
+> > -	__activate_traps_arch()(vcpu);
+> > +	if (has_vhe())
+> > +		activate_traps_vhe(vcpu);
+> > +	else
+> > +		__activate_traps_nvhe(vcpu);
 > >  }
 > >  
-> >  static void __hyp_text __deactivate_traps_vhe(void)
+> > -static void __hyp_text __deactivate_traps_vhe(void)
+> > +static inline void deactivate_traps_vhe(void)
 > >  {
 > >  	extern char vectors[];	/* kernel exception vectors */
-> > -	u64 mdcr_el2 = read_sysreg(mdcr_el2);
-> > -
-> > -	mdcr_el2 &= MDCR_EL2_HPMN_MASK |
-> > -		    MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT |
-> > -		    MDCR_EL2_TPMS;
-> > -
-> > -	write_sysreg(mdcr_el2, mdcr_el2);
 > >  	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
-> >  	write_sysreg(CPACR_EL1_DEFAULT, cpacr_el1);
+> > @@ -133,7 +132,7 @@ static void __hyp_text __deactivate_traps_vhe(void)
 > >  	write_sysreg(vectors, vbar_el1);
-> > @@ -143,6 +137,8 @@ static void __hyp_text __deactivate_traps_nvhe(void)
+> >  }
+> >  
+> > -static void __hyp_text __deactivate_traps_nvhe(void)
+> > +static inline void __hyp_text __deactivate_traps_nvhe(void)
 > >  {
 > >  	u64 mdcr_el2 = read_sysreg(mdcr_el2);
 > >  
-> > +	__deactivate_traps_common();
-> > +
-> >  	mdcr_el2 &= MDCR_EL2_HPMN_MASK;
-> >  	mdcr_el2 |= MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT;
+> > @@ -147,11 +146,7 @@ static void __hyp_text __deactivate_traps_nvhe(void)
+> >  	write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
+> >  }
 > >  
-> > @@ -166,10 +162,27 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
+> > -static hyp_alternate_select(__deactivate_traps_arch,
+> > -			    __deactivate_traps_nvhe, __deactivate_traps_vhe,
+> > -			    ARM64_HAS_VIRT_HOST_EXTN);
+> > -
+> > -static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
+> > +static inline void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
+> >  {
+> >  	/*
+> >  	 * If we pended a virtual abort, preserve it until it gets
+> > @@ -162,7 +157,10 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
 > >  	if (vcpu->arch.hcr_el2 & HCR_VSE)
 > >  		vcpu->arch.hcr_el2 = read_sysreg(hcr_el2);
 > >  
-> > -	__deactivate_traps_common();
-> >  	__deactivate_traps_arch()();
+> > -	__deactivate_traps_arch()();
+> > +	if (has_vhe())
+> > +		deactivate_traps_vhe();
+> > +	else
+> > +		__deactivate_traps_nvhe();
 > >  }
 > >  
-> > +void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
-> > +{
-> > +	__activate_traps_common(vcpu);
-> > +}
-> > +
-> > +void deactivate_traps_vhe_put(void)
-> > +{
-> > +	u64 mdcr_el2 = read_sysreg(mdcr_el2);
-> > +
-> > +	mdcr_el2 &= MDCR_EL2_HPMN_MASK |
-> > +		    MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT |
-> > +		    MDCR_EL2_TPMS;
-> > +
-> > +	write_sysreg(mdcr_el2, mdcr_el2);
-> > +
-> > +	__deactivate_traps_common();
-> > +}
-> > +
-> >  static void __hyp_text __activate_vm(struct kvm *kvm)
-> >  {
-> >  	write_sysreg(kvm->arch.vttbr, vttbr_el2);
-> > diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-> > index aacba4636871..b3894df6bf1a 100644
-> > --- a/arch/arm64/kvm/hyp/sysreg-sr.c
-> > +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-> > @@ -254,6 +254,8 @@ void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu)
-> >  	__sysreg_restore_el1_state(guest_ctxt);
-> >  
-> >  	vcpu->arch.sysregs_loaded_on_cpu = true;
-> > +
-> > +	activate_traps_vhe_load(vcpu);
-> >  }
-> >  
-> >  /**
-> > @@ -275,6 +277,8 @@ void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu)
-> >  	if (!has_vhe())
-> >  		return;
-> >  
-> > +	deactivate_traps_vhe_put();
-> > +
-> >  	__sysreg_save_el1_state(guest_ctxt);
-> >  	__sysreg_save_user_state(guest_ctxt);
-> >  	__sysreg32_save_state(vcpu);
+> >  void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
 > > -- 
 > > 2.14.2
 > > 
 > 
-> I must admit that I find these two layers of trap configuration mildly
-> confusing. I can see why it is done like this (there is hardly any
-> other way), but still...
-
-Perhaps the naming could be improved.
-
-Right now we have:
-
-_traps_common:        Same code for non-VHE/VHE.  Called:
-                         non-VHE: on every switch.
-		         VHE: on load/put.
-_traps:               Same code for non-VHE/VHE.  Called:
-                         VHE/non-VHE: On every switch.
-_traps_nvhe:          Code specific to non-VHE system.  Called:
-                         non-VHE: on every switch
-_traps_vhe:           Code specific to VHE system.  Called:
-                         VHE: on every switch
-_traps_vhe_load/put:  Code  specific to VHE system.  Called:
-                         VHE: on vcpu load/put
-
-We could simplify this at the cost of code duplication to:
-
-_traps_nvhe
-_traps_vhe
-_traps_vhe_load/put
-
-Thoughts?
-
+> Thanks,
 > 
-> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+> 	M.
 > 
-
-Thanks,
--Christoffer
+> -- 
+> Jazz is not dead, it just smell funny.
