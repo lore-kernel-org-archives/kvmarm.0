@@ -1,16 +1,16 @@
-From: Julien Grall <julien.grall@arm.com>
-Subject: Re: [PATCH v4 25/40] KVM: arm64: Introduce framework for accessing
- deferred sysregs
-Date: Thu, 22 Feb 2018 17:40:48 +0000
-Message-ID: <b9edba7e-bc31-b101-5bcc-8233547e731a@arm.com>
-References: <20180215210332.8648-1-christoffer.dall@linaro.org>
- <20180215210332.8648-26-christoffer.dall@linaro.org>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH 06/11] ACPI / APEI: Make the fixmap_idx per-ghes to allow
+ multiple in_nmi() users
+Date: Thu, 22 Feb 2018 17:47:28 +0000
+Message-ID: <5A8F0230.1080007@arm.com>
+References: <20180215185606.26736-1-james.morse@arm.com>
+ <20180215185606.26736-7-james.morse@arm.com>
+ <879ab426-c6a9-b881-e3d5-a605cfad5f97@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180215210332.8648-26-christoffer.dall@linaro.org>
-Content-Language: en-US
+In-Reply-To: <879ab426-c6a9-b881-e3d5-a605cfad5f97@codeaurora.org>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -20,70 +20,72 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Tomasz Nowicki <tn@semihalf.com>, Yury Norov <ynorov@caviumnetworks.com>, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
+To: Tyler Baicar <tbaicar@codeaurora.org>
+Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Punit Agrawal <punit.agrawal@arm.com>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Xie XiuQi <xiexiuqi@huawei.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Borislav Petkov <bp@alien8.de>, linux-arm-kernel@lists.infradead.org, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
+Hi Tyler
 
-On 15/02/18 21:03, Christoffer Dall wrote:
-> We are about to defer saving and restoring some groups of system
-> registers to vcpu_put and vcpu_load on supported systems.  This means
-> that we need some infrastructure to access system registes which
+Thanks for taking a look!
 
-NIT: s/registes/registers/
 
-> supports either accessing the memory backing of the register or directly
-> accessing the system registers, depending on the state of the system
-> when we access the register.
-> 
-> We do this by defining read/write accessor functions, which can handle
-> both "immediate" and "deferrable" system registers.  Immediate registers
-> are always saved/restored in the world-switch path, but deferrable
-> registers are only saved/restored in vcpu_put/vcpu_load when supported
-> and sysregs_loaded_on_cpu will be set in that case.
-> 
-> Note that we don't use the deferred mechanism yet in this patch, but only
-> introduce infrastructure.  This is to improve convenience of review in
+On 20/02/18 21:18, Tyler Baicar wrote:
+> On 2/15/2018 1:56 PM, James Morse wrote:
+>> Arm64 has multiple NMI-like notifications, but GHES only has one
+>> in_nmi() path. The interactions between these multiple NMI-like
+>> notifications is, unclear.
+>>
+>> Split this single path up by moving the fixmap idx and lock into
+>> the struct ghes. Each notification's init function can consider
+>> which other notifications it masks and can share a fixmap_idx with.
+>> This lets us merge the two ghes_ioremap_pfn_* flavours.
+>>
+>> Two lock pointers are provided, but only one will be used by
+>> ghes_copy_tofrom_phys(), depending on in_nmi(). This means any
+>> notification that might arrive as an NMI must always be wrapped in
+>> nmi_enter()/nmi_exit().
+>>
+>> The double-underscore version of fix_to_virt() is used because
+>> the index to be mapped can't be tested against the end of the
+>> enum at compile time.
 
-NIT: double space after the period.
+>> @@ -303,13 +278,11 @@ static void ghes_copy_tofrom_phys(void *buffer, u64
+>> paddr, u32 len,
+>>         while (len > 0) {
+>>           offset = paddr - (paddr & PAGE_MASK);
+>> -        if (in_nmi) {
+>> -            raw_spin_lock(&ghes_ioremap_lock_nmi);
+>> -            vaddr = ghes_ioremap_pfn_nmi(paddr >> PAGE_SHIFT);
+>> -        } else {
+>> -            spin_lock_irqsave(&ghes_ioremap_lock_irq, flags);
+>> -            vaddr = ghes_ioremap_pfn_irq(paddr >> PAGE_SHIFT);
+>> -        }
+>> +        if (in_nmi)
+>> +            raw_spin_lock(ghes->nmi_fixmap_lock);
+>> +        else
+>> +            spin_lock_irqsave(ghes->fixmap_lock, flags);
 
-> the subsequent patches where it is clear which registers become
-> deferred.
-> 
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> ---
-> 
-> Notes:
->      Changes since v3:
->       - Changed to a switch-statement based approach to improve
->         readability.
->      
->      Changes since v2:
->       - New patch (deferred register handling has been reworked)
-> 
->   arch/arm64/include/asm/kvm_host.h |  8 ++++++--
->   arch/arm64/kvm/sys_regs.c         | 33 +++++++++++++++++++++++++++++++++
->   2 files changed, 39 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 68398bf7882f..b463b5e28959 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -284,6 +284,10 @@ struct kvm_vcpu_arch {
->   
->   	/* Virtual SError ESR to restore when HCR_EL2.VSE is set */
->   	u64 vsesr_el2;
-> +
-> +	/* True when deferrable sysregs are loaded on the physical CPU,
-> +	 * see kvm_vcpu_load_sysregs and kvm_vcpu_put_sysregs. */
+> This locking is resulting in a NULL pointer dereference for me during boot time.
+> I removed the ghes_proc() call
+> from ghes_probe() and then when triggering errors and going through ghes_proc()
+> the NULL pointer dereference
+> no longer happens. That makes me think that this is dependent on something that
+> is not setup before
+> ghes_probe() is happening. Any ideas?
 
-NIT: I think the preferred style comment is
-/*
-  * Foo
-  */
+Gah, One of the things I've tried to enforce is that notifications that happen
+in_nmi() always happen in_nmi(): but that isn't the case for this first
+ghes_proc() call, which always happens in process context.
 
-Cheers,
+Why didn't this happen to me? I'm assuming your GHES has work to do prior to
+probing, but I waited for it to finish booting before generating test events.
 
--- 
-Julien Grall
+The smallest fix is to have an irq/nmi fixmap and lock. This probe time call
+would always use the irq fixmap and lock, and can be safely interrupted by an
+NMI. Its only the NMI notifications interacting that we need to worry about as
+they can't be masked.
+
+
+Thanks!
+
+James
