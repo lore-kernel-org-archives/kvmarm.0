@@ -1,49 +1,175 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH v4] arm64: Add support for new control bits CTR_EL0.DIC
- and CTR_EL0.IDC
-Date: Thu, 22 Feb 2018 15:22:44 +0000
-Message-ID: <20180222152244.zozx2tlptgnnfu6b@lakrids.cambridge.arm.com>
-References: <1519311090-19998-1-git-send-email-shankerd@codeaurora.org>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH v4 31/40] KVM: arm64: Move common VHE/non-VHE trap config
+ in separate functions
+Date: Thu, 22 Feb 2018 16:34:55 +0100
+Message-ID: <20180222153455.y6e4kbtfyhgbs3ud@kamzik.brq.redhat.com>
+References: <20180215210332.8648-1-christoffer.dall@linaro.org>
+ <20180215210332.8648-32-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2848349F87
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Feb 2018 10:28:41 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id O-q5Dy6jhSti for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 22 Feb 2018 10:28:19 -0500 (EST)
+Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 39E1749F86
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Feb 2018 10:28:19 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <1519311090-19998-1-git-send-email-shankerd@codeaurora.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Shanker Donthineni <shankerd@codeaurora.org>
-Cc: Philip Elcan <pelcan@codeaurora.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel <linux-kernel@vger.kernel.org>, kvmarm <kvmarm@lists.cs.columbia.edu>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+In-Reply-To: <20180215210332.8648-32-christoffer.dall@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, Yury Norov <ynorov@caviumnetworks.com>, linux-arm-kernel@lists.infradead.org, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Feb 22, 2018 at 08:51:30AM -0600, Shanker Donthineni wrote:
-> +#define CTR_B31_SHIFT		31
+On Thu, Feb 15, 2018 at 10:03:23PM +0100, Christoffer Dall wrote:
+> As we are about to be more lazy with some of the trap configuration
+> register read/writes for VHE systems, move the logic that is currently
+> shared between VHE and non-VHE into a separate function which can be
+> called from either the world-switch path or from vcpu_load/vcpu_put.
+> 
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> ---
+> 
+> Notes:
+>     Changes since v3:
+>      - Separate fpsimd32 trap configuration into a separate function
+>        which is still called from __activate_traps, because we no longer
+>        defer saving/restoring of VFP registers to load/put.
+> 
+>  arch/arm64/kvm/hyp/switch.c | 76 +++++++++++++++++++++++++++------------------
+>  1 file changed, 45 insertions(+), 31 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index 909aa3fe9196..17e3c6f26a34 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -56,7 +56,45 @@ static inline void __hyp_text __fpsimd_save_fpexc32(struct kvm_vcpu *vcpu)
+>  	vcpu->arch.ctxt.sys_regs[FPEXC32_EL2] = read_sysreg(fpexc32_el2);
+>  }
+>  
+> -static void __hyp_text __activate_traps_vhe(void)
+> +static void __hyp_text __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
+> +{
+> +	/*
+> +	 * We are about to set CPTR_EL2.TFP to trap all floating point
+> +	 * register accesses to EL2, however, the ARM ARM clearly states that
+> +	 * traps are only taken to EL2 if the operation would not otherwise
+> +	 * trap to EL1.  Therefore, always make sure that for 32-bit guests,
+> +	 * we set FPEXC.EN to prevent traps to EL1, when setting the TFP bit.
+> +	 * If FP/ASIMD is not implemented, FPEXC is UNDEFINED and any access to
+> +	 * it will cause an exception.
+> +	 */
+> +	if (vcpu_el1_is_32bit(vcpu) && system_supports_fpsimd()) {
+> +		write_sysreg(1 << 30, fpexc32_el2);
+> +		isb();
+> +	}
+> +}
+> +
+> +static void __hyp_text __activate_traps_common(struct kvm_vcpu *vcpu)
+> +{
+> +	/* Trap on AArch32 cp15 c15 (impdef sysregs) accesses (EL1 or EL0) */
+> +	write_sysreg(1 << 15, hstr_el2);
 
-Since this is just a RES1 bit, I think we don't need a mnemonic for it,
-but I'll defer to Will and Catalin on that.
+Could use a blank line here.
 
->  ENTRY(invalidate_icache_range)
-> +#ifdef CONFIG_ARM64_SKIP_CACHE_POU
-> +alternative_if ARM64_HAS_CACHE_DIC
-> +	mov	x0, xzr
-> +	dsb	ishst
-> +	isb
-> +	ret
-> +alternative_else_nop_endif
-> +#endif
+> +	/*
+> +	 * Make sure we trap PMU access from EL0 to EL2. Also sanitize
+> +	 * PMSELR_EL0 to make sure it never contains the cycle
+> +	 * counter, which could make a PMXEVCNTR_EL0 access UNDEF at
+> +	 * EL1 instead of being trapped to EL2.
+> +	 */
+> +	write_sysreg(0, pmselr_el0);
+> +	write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
+> +	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+> +}
+> +
+> +static void __hyp_text __deactivate_traps_common(void)
+> +{
+> +	write_sysreg(0, hstr_el2);
+> +	write_sysreg(0, pmuserenr_el0);
+> +}
+> +
+> +static void __hyp_text __activate_traps_vhe(struct kvm_vcpu *vcpu)
+>  {
+>  	u64 val;
+>  
+> @@ -68,7 +106,7 @@ static void __hyp_text __activate_traps_vhe(void)
+>  	write_sysreg(kvm_get_hyp_vector(), vbar_el1);
+>  }
+>  
+> -static void __hyp_text __activate_traps_nvhe(void)
+> +static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
+>  {
+>  	u64 val;
+>  
+> @@ -85,37 +123,14 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+>  {
+>  	u64 hcr = vcpu->arch.hcr_el2;
+>  
+> -	/*
+> -	 * We are about to set CPTR_EL2.TFP to trap all floating point
+> -	 * register accesses to EL2, however, the ARM ARM clearly states that
+> -	 * traps are only taken to EL2 if the operation would not otherwise
+> -	 * trap to EL1.  Therefore, always make sure that for 32-bit guests,
+> -	 * we set FPEXC.EN to prevent traps to EL1, when setting the TFP bit.
+> -	 * If FP/ASIMD is not implemented, FPEXC is UNDEFINED and any access to
+> -	 * it will cause an exception.
+> -	 */
+> -	if (vcpu_el1_is_32bit(vcpu) && system_supports_fpsimd()) {
+> -		write_sysreg(1 << 30, fpexc32_el2);
+> -		isb();
+> -	}
+> +	write_sysreg(hcr, hcr_el2);
+>  
+>  	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN) && (hcr & HCR_VSE))
+>  		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
+>  
+> -	write_sysreg(hcr, hcr_el2);
+> -
+> -	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
+> -	write_sysreg(1 << 15, hstr_el2);
+> -	/*
+> -	 * Make sure we trap PMU access from EL0 to EL2. Also sanitize
+> -	 * PMSELR_EL0 to make sure it never contains the cycle
+> -	 * counter, which could make a PMXEVCNTR_EL0 access UNDEF at
+> -	 * EL1 instead of being trapped to EL2.
+> -	 */
+> -	write_sysreg(0, pmselr_el0);
+> -	write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
+> -	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+> -	__activate_traps_arch()();
+> +	__activate_traps_fpsimd32(vcpu);
+> +	__activate_traps_common(vcpu);
+> +	__activate_traps_arch()(vcpu);
+>  }
+>  
+>  static void __hyp_text __deactivate_traps_vhe(void)
+> @@ -160,9 +175,8 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
+>  	if (vcpu->arch.hcr_el2 & HCR_VSE)
+>  		vcpu->arch.hcr_el2 = read_sysreg(hcr_el2);
+>  
+> +	__deactivate_traps_common();
+>  	__deactivate_traps_arch()();
+> -	write_sysreg(0, hstr_el2);
+> -	write_sysreg(0, pmuserenr_el0);
+>  }
+>  
+>  static void __hyp_text __activate_vm(struct kvm *kvm)
+> -- 
+> 2.14.2
+>
 
-As commented on v3, I don't believe you need the DSB here. If prior
-stores haven't been completed at this point, the existing implementation
-would not work correctly here.
-
-Otherwise, this looks ok to me.
-
-Thanks,
-Mark.
+Reviewed-by: Andrew Jones <drjones@redhat.com>
