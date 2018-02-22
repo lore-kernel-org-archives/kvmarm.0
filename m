@@ -1,17 +1,17 @@
-From: Julien Grall <julien.grall@arm.com>
-Subject: Re: [PATCH v4 28/40] KVM: arm64: Defer saving/restoring 64-bit
- sysregs to vcpu load/put on VHE
-Date: Thu, 22 Feb 2018 18:31:08 +0000
-Message-ID: <40a10d77-85c8-9c74-c94c-57e4f8854fef@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v4 33/40] KVM: arm64: Configure c15, PMU, and debug
+ register traps on cpu load/put for VHE
+Date: Thu, 22 Feb 2018 19:57:13 +0100
+Message-ID: <20180222185713.GW29376@cbox>
 References: <20180215210332.8648-1-christoffer.dall@linaro.org>
- <20180215210332.8648-29-christoffer.dall@linaro.org>
- <ece29cf2-4c60-dc3d-b2a9-e7e06380f860@arm.com>
+ <20180215210332.8648-34-christoffer.dall@linaro.org>
+ <86woz6jjax.wl-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <ece29cf2-4c60-dc3d-b2a9-e7e06380f860@arm.com>
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <86woz6jjax.wl-marc.zyngier@arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -21,108 +21,179 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Tomasz Nowicki <tn@semihalf.com>, Yury Norov <ynorov@caviumnetworks.com>, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, Tomasz Nowicki <tn@semihalf.com>, kvmarm@lists.cs.columbia.edu, Julien Grall <julien.grall@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, linux-arm-kernel@lists.infradead.org, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CgpPbiAyMi8wMi8xOCAxODozMCwgSnVsaWVuIEdyYWxsIHdyb3RlOgo+IEhpIENocmlzdG9mZmVy
-LAo+IAo+IE9uIDE1LzAyLzE4IDIxOjAzLCBDaHJpc3RvZmZlciBEYWxsIHdyb3RlOgo+PiBTb21l
-IHN5c3RlbSByZWdpc3RlcnMgZG8gbm90IGFmZmVjdCB0aGUgaG9zdCBrZXJuZWwncyBleGVjdXRp
-b24gYW5kIGNhbgo+PiB0aGVyZWZvcmUgYmUgbG9hZGVkIHdoZW4gd2UgYXJlIGFib3V0IHRvIHJ1
-biBhIFZDUFUgYW5kIHdlIGRvbid0IGhhdmUgdG8KPj4gcmVzdG9yZSB0aGUgaG9zdCBzdGF0ZSB0
-byB0aGUgaGFyZHdhcmUgYmVmb3JlIHRoZSB0aW1lIHdoZW4gd2UgYXJlCj4+IGFjdHVhbGx5IGFi
-b3V0IHRvIHJldHVybiB0byB1c2Vyc3BhY2Ugb3Igc2NoZWR1bGUgb3V0IHRoZSBWQ1BVIHRocmVh
-ZC4KPj4KPj4gVGhlIEVMMSBzeXN0ZW0gcmVnaXN0ZXJzIGFuZCB0aGUgdXNlcnNwYWNlIHN0YXRl
-IHJlZ2lzdGVycyBvbmx5Cj4+IGFmZmVjdGluZyBFTDAgZXhlY3V0aW9uIGRvIG5vdCBuZWVkIHRv
-IGJlIHNhdmVkIGFuZCByZXN0b3JlZCBvbiBldmVyeQo+PiBzd2l0Y2ggYmV0d2VlbiB0aGUgVk0g
-YW5kIHRoZSBob3N0LCBiZWNhdXNlIHRoZXkgZG9uJ3QgYWZmZWN0IHRoZSBob3N0Cj4+IGtlcm5l
-bCdzIGV4ZWN1dGlvbi4KPj4KPj4gV2UgbWFyayBhbGwgcmVnaXN0ZXJzIHdoaWNoIGFyZSBub3cg
-ZGVmZmVyZWQgYXMgc3VjaCBpbiB0aGUKPiAKPiBOSVQ6IHMvZGVmZmVyZWQvZGVmZXJyZWQvIEkg
-dGhpbmsuCj4gCj4+IHZjcHVfe3JlYWQsd3JpdGV9X3N5c19yZWcgYWNjZXNzb3JzIGluIHN5cy1y
-ZWdzLmMgdG8gZW5zdXJlIHRoZSBtb3N0Cj4+IHVwLXRvLWRhdGUgY29weSBpcyBhbHdheXMgYWNj
-ZXNzZWQuCj4+Cj4+IE5vdGUgTVBJRFJfRUwxIChjb250cm9sbGVkIHZpYSBWTVBJRFJfRUwyKSBp
-cyBhY2Nlc3NlZCBmcm9tIG90aGVyIHZjcHUKPj4gdGhyZWFkcywgZm9yIGV4YW1wbGUgdmlhIHRo
-ZSBHSUMgZW11bGF0aW9uLCBhbmQgdGhlcmVmb3JlIG11c3QgYmUKPj4gZGVjbGFyZWQgYXMgaW1t
-ZWRpYXRlLCB3aGljaCBpcyBmaW5lIGFzIHRoZSBndWVzdCBjYW5ub3QgbW9kaWZ5IHRoaXMKPj4g
-dmFsdWUuCgpJIGZvcmdvdCB0byBjb21tZW50IG9uIHRoaXMuIEkgbWlzc2VkIHRoaXMgcGFyYWdy
-YXBoIGF0IHRoZSBmaXJzdCByZWFkIAphbmQgd2FzIHdvbmRlcmluZyB3aHkgTVBJRFJfRUwxIHdh
-cyBub3QgYWNjZXNzZWQgdXNpbmcgc3lzcmVnIGluIAp2Y3B1X3tyZWFkLHdyaXRlfV9zeXNfcmVn
-LiBJdCBtaWdodCBiZSB3b3J0aCBjb25zaWRlcmluZyBhIGNvbW1lbnQgaW4gCnRob3NlIGZ1bmN0
-aW9ucy4KCj4+Cj4+IFRoZSAzMi1iaXQgc3lzcmVncyBjYW4gYWxzbyBiZSBkZWZlcnJlZCBidXQg
-d2UgZG8gdGhpcyBpbiBhIHNlcGFyYXRlCj4+IHBhdGNoIGFzIGl0IHJlcXVpcmVzIGEgYml0IG1v
-cmUgaW5mcmFzdHJ1Y3R1cmUuCj4gCj4gCj4gWy4uLl0KPiAKPj4gZGlmZiAtLWdpdCBhL2FyY2gv
-YXJtNjQva3ZtL3N5c19yZWdzLmMgYi9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jCj4+IGluZGV4
-IGIzYzNmMDE0YWE2MS4uZjA2MDMwOTMzN2FhIDEwMDY0NAo+PiAtLS0gYS9hcmNoL2FybTY0L2t2
-bS9zeXNfcmVncy5jCj4+ICsrKyBiL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmMKPj4gQEAgLTg3
-LDYgKzg3LDI2IEBAIHU2NCB2Y3B1X3JlYWRfc3lzX3JlZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUs
-IGludCByZWcpCj4+IMKgwqDCoMKgwqDCoCAqIGV4aXQgZnJvbSB0aGUgZ3Vlc3QgYnV0IGFyZSBv
-bmx5IHNhdmVkIG9uIHZjcHVfcHV0Lgo+PiDCoMKgwqDCoMKgwqAgKi8KPj4gwqDCoMKgwqDCoCBz
-d2l0Y2ggKHJlZykgewo+PiArwqDCoMKgIGNhc2UgQ1NTRUxSX0VMMTrCoMKgwqAgcmV0dXJuIHJl
-YWRfc3lzcmVnX3MoU1lTX0NTU0VMUl9FTDEpOwo+PiArwqDCoMKgIGNhc2UgU0NUTFJfRUwxOsKg
-wqDCoMKgwqDCoMKgIHJldHVybiByZWFkX3N5c3JlZ19zKHNjdGxyX0VMMTIpOwo+PiArwqDCoMKg
-IGNhc2UgQUNUTFJfRUwxOsKgwqDCoMKgwqDCoMKgIHJldHVybiByZWFkX3N5c3JlZ19zKFNZU19B
-Q1RMUl9FTDEpOwo+PiArwqDCoMKgIGNhc2UgQ1BBQ1JfRUwxOsKgwqDCoMKgwqDCoMKgIHJldHVy
-biByZWFkX3N5c3JlZ19zKGNwYWNyX0VMMTIpOwo+PiArwqDCoMKgIGNhc2UgVFRCUjBfRUwxOsKg
-wqDCoMKgwqDCoMKgIHJldHVybiByZWFkX3N5c3JlZ19zKHR0YnIwX0VMMTIpOwo+PiArwqDCoMKg
-IGNhc2UgVFRCUjFfRUwxOsKgwqDCoMKgwqDCoMKgIHJldHVybiByZWFkX3N5c3JlZ19zKHR0YnIx
-X0VMMTIpOwo+PiArwqDCoMKgIGNhc2UgVENSX0VMMTrCoMKgwqDCoMKgwqDCoCByZXR1cm4gcmVh
-ZF9zeXNyZWdfcyh0Y3JfRUwxMik7Cj4+ICvCoMKgwqAgY2FzZSBFU1JfRUwxOsKgwqDCoMKgwqDC
-oMKgIHJldHVybiByZWFkX3N5c3JlZ19zKGVzcl9FTDEyKTsKPj4gK8KgwqDCoCBjYXNlIEFGU1Iw
-X0VMMTrCoMKgwqDCoMKgwqDCoCByZXR1cm4gcmVhZF9zeXNyZWdfcyhhZnNyMF9FTDEyKTsKPj4g
-K8KgwqDCoCBjYXNlIEFGU1IxX0VMMTrCoMKgwqDCoMKgwqDCoCByZXR1cm4gcmVhZF9zeXNyZWdf
-cyhhZnNyMV9FTDEyKTsKPj4gK8KgwqDCoCBjYXNlIEZBUl9FTDE6wqDCoMKgwqDCoMKgwqAgcmV0
-dXJuIHJlYWRfc3lzcmVnX3MoZmFyX0VMMTIpOwo+PiArwqDCoMKgIGNhc2UgTUFJUl9FTDE6wqDC
-oMKgwqDCoMKgwqAgcmV0dXJuIHJlYWRfc3lzcmVnX3MobWFpcl9FTDEyKTsKPj4gK8KgwqDCoCBj
-YXNlIFZCQVJfRUwxOsKgwqDCoMKgwqDCoMKgIHJldHVybiByZWFkX3N5c3JlZ19zKHZiYXJfRUwx
-Mik7Cj4+ICvCoMKgwqAgY2FzZSBDT05URVhUSURSX0VMMTrCoMKgwqAgcmV0dXJuIHJlYWRfc3lz
-cmVnX3MoY29udGV4dGlkcl9FTDEyKTsKPj4gK8KgwqDCoCBjYXNlIFRQSURSX0VMMDrCoMKgwqDC
-oMKgwqDCoCByZXR1cm4gcmVhZF9zeXNyZWdfcyhTWVNfVFBJRFJfRUwwKTsKPj4gK8KgwqDCoCBj
-YXNlIFRQSURSUk9fRUwwOsKgwqDCoCByZXR1cm4gcmVhZF9zeXNyZWdfcyhTWVNfVFBJRFJST19F
-TDApOwo+IAo+IEkgZmluZCBhIGJpdCBjb25mdXNpbmcgdG8gaGF2ZSBzb21lIEVMMCByZWdpc3Rl
-cnMgaW4gdGhlIG1pZGRsZSBvZiBFTDEgCj4gb25lcy4gSXMgaXQgYmVjYXVzZSB0aGV5IGFyZSBs
-aXN0ZWQgYnkgZW5jb2Rpbmc/Cj4gCj4+ICvCoMKgwqAgY2FzZSBUUElEUl9FTDE6wqDCoMKgwqDC
-oMKgwqAgcmV0dXJuIHJlYWRfc3lzcmVnX3MoU1lTX1RQSURSX0VMMSk7Cj4+ICvCoMKgwqAgY2Fz
-ZSBBTUFJUl9FTDE6wqDCoMKgwqDCoMKgwqAgcmV0dXJuIHJlYWRfc3lzcmVnX3MoYW1haXJfRUwx
-Mik7Cj4+ICvCoMKgwqAgY2FzZSBDTlRLQ1RMX0VMMTrCoMKgwqAgcmV0dXJuIHJlYWRfc3lzcmVn
-X3MoY250a2N0bF9FTDEyKTsKPj4gK8KgwqDCoCBjYXNlIFBBUl9FTDE6wqDCoMKgwqDCoMKgwqAg
-cmV0dXJuIHJlYWRfc3lzcmVnX3MoU1lTX1BBUl9FTDEpOwo+PiDCoMKgwqDCoMKgIH0KPj4gwqAg
-aW1tZWRpYXRlX3JlYWQ6Cj4+IEBAIC0xMDMsNiArMTIzLDI2IEBAIHZvaWQgdmNwdV93cml0ZV9z
-eXNfcmVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgCj4+IGludCByZWcsIHU2NCB2YWwpCj4+IMKg
-wqDCoMKgwqDCoCAqIGVudHJ5IHRvIHRoZSBndWVzdCBidXQgYXJlIG9ubHkgcmVzdG9yZWQgb24g
-dmNwdV9sb2FkLgo+PiDCoMKgwqDCoMKgwqAgKi8KPj4gwqDCoMKgwqDCoCBzd2l0Y2ggKHJlZykg
-ewo+PiArwqDCoMKgIGNhc2UgQ1NTRUxSX0VMMTrCoMKgwqAgd3JpdGVfc3lzcmVnX3ModmFsLCBT
-WVNfQ1NTRUxSX0VMMSk7wqDCoMKgIHJldHVybjsKPj4gK8KgwqDCoCBjYXNlIFNDVExSX0VMMTrC
-oMKgwqDCoMKgwqDCoCB3cml0ZV9zeXNyZWdfcyh2YWwsIHNjdGxyX0VMMTIpO8KgwqDCoCByZXR1
-cm47Cj4+ICvCoMKgwqAgY2FzZSBBQ1RMUl9FTDE6wqDCoMKgwqDCoMKgwqAgd3JpdGVfc3lzcmVn
-X3ModmFsLCBTWVNfQUNUTFJfRUwxKTsgICAgCj4+IHJldHVybjsKPj4gK8KgwqDCoCBjYXNlIENQ
-QUNSX0VMMTrCoMKgwqDCoMKgwqDCoCB3cml0ZV9zeXNyZWdfcyh2YWwsIGNwYWNyX0VMMTIpO8Kg
-wqDCoCByZXR1cm47Cj4+ICvCoMKgwqAgY2FzZSBUVEJSMF9FTDE6wqDCoMKgwqDCoMKgwqAgd3Jp
-dGVfc3lzcmVnX3ModmFsLCB0dGJyMF9FTDEyKTvCoMKgwqAgcmV0dXJuOwo+PiArwqDCoMKgIGNh
-c2UgVFRCUjFfRUwxOsKgwqDCoMKgwqDCoMKgIHdyaXRlX3N5c3JlZ19zKHZhbCwgdHRicjFfRUwx
-Mik7wqDCoMKgIHJldHVybjsKPj4gK8KgwqDCoCBjYXNlIFRDUl9FTDE6wqDCoMKgwqDCoMKgwqAg
-d3JpdGVfc3lzcmVnX3ModmFsLCB0Y3JfRUwxMik7wqDCoMKgwqDCoMKgwqAgcmV0dXJuOwo+PiAr
-wqDCoMKgIGNhc2UgRVNSX0VMMTrCoMKgwqDCoMKgwqDCoCB3cml0ZV9zeXNyZWdfcyh2YWwsIGVz
-cl9FTDEyKTvCoMKgwqDCoMKgwqDCoCByZXR1cm47Cj4+ICvCoMKgwqAgY2FzZSBBRlNSMF9FTDE6
-wqDCoMKgwqDCoMKgwqAgd3JpdGVfc3lzcmVnX3ModmFsLCBhZnNyMF9FTDEyKTvCoMKgwqAgcmV0
-dXJuOwo+PiArwqDCoMKgIGNhc2UgQUZTUjFfRUwxOsKgwqDCoMKgwqDCoMKgIHdyaXRlX3N5c3Jl
-Z19zKHZhbCwgYWZzcjFfRUwxMik7wqDCoMKgIHJldHVybjsKPj4gK8KgwqDCoCBjYXNlIEZBUl9F
-TDE6wqDCoMKgwqDCoMKgwqAgd3JpdGVfc3lzcmVnX3ModmFsLCBmYXJfRUwxMik7wqDCoMKgwqDC
-oMKgwqAgcmV0dXJuOwo+PiArwqDCoMKgIGNhc2UgTUFJUl9FTDE6wqDCoMKgwqDCoMKgwqAgd3Jp
-dGVfc3lzcmVnX3ModmFsLCBtYWlyX0VMMTIpO8KgwqDCoMKgwqDCoMKgIHJldHVybjsKPj4gK8Kg
-wqDCoCBjYXNlIFZCQVJfRUwxOsKgwqDCoMKgwqDCoMKgIHdyaXRlX3N5c3JlZ19zKHZhbCwgdmJh
-cl9FTDEyKTvCoMKgwqDCoMKgwqDCoCByZXR1cm47Cj4+ICvCoMKgwqAgY2FzZSBDT05URVhUSURS
-X0VMMTrCoMKgwqAgd3JpdGVfc3lzcmVnX3ModmFsLCBjb250ZXh0aWRyX0VMMTIpOyAgICAKPj4g
-cmV0dXJuOwo+PiArwqDCoMKgIGNhc2UgVFBJRFJfRUwwOsKgwqDCoMKgwqDCoMKgIHdyaXRlX3N5
-c3JlZ19zKHZhbCwgU1lTX1RQSURSX0VMMCk7ICAgIAo+PiByZXR1cm47Cj4+ICvCoMKgwqAgY2Fz
-ZSBUUElEUlJPX0VMMDrCoMKgwqAgd3JpdGVfc3lzcmVnX3ModmFsLCBTWVNfVFBJRFJST19FTDAp
-OyAgICAKPj4gcmV0dXJuOwo+PiArwqDCoMKgIGNhc2UgVFBJRFJfRUwxOsKgwqDCoMKgwqDCoMKg
-IHdyaXRlX3N5c3JlZ19zKHZhbCwgU1lTX1RQSURSX0VMMSk7ICAgIAo+PiByZXR1cm47Cj4+ICvC
-oMKgwqAgY2FzZSBBTUFJUl9FTDE6wqDCoMKgwqDCoMKgwqAgd3JpdGVfc3lzcmVnX3ModmFsLCBh
-bWFpcl9FTDEyKTvCoMKgwqAgcmV0dXJuOwo+PiArwqDCoMKgIGNhc2UgQ05US0NUTF9FTDE6wqDC
-oMKgIHdyaXRlX3N5c3JlZ19zKHZhbCwgY250a2N0bF9FTDEyKTvCoMKgwqAgcmV0dXJuOwo+PiAr
-wqDCoMKgIGNhc2UgUEFSX0VMMTrCoMKgwqDCoMKgwqDCoCB3cml0ZV9zeXNyZWdfcyh2YWwsIFNZ
-U19QQVJfRUwxKTvCoMKgwqAgcmV0dXJuOwo+PiDCoMKgwqDCoMKgIH0KPj4gwqAgaW1tZWRpYXRl
-X3dyaXRlOgo+Pgo+IAo+IENoZWVycywKPiAKCi0tIApKdWxpZW4gR3JhbGwKCl9fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmxpbnV4LWFybS1rZXJuZWwgbWFp
-bGluZyBsaXN0CmxpbnV4LWFybS1rZXJuZWxAbGlzdHMuaW5mcmFkZWFkLm9yZwpodHRwOi8vbGlz
-dHMuaW5mcmFkZWFkLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2xpbnV4LWFybS1rZXJuZWwK
+On Wed, Feb 21, 2018 at 06:20:54PM +0000, Marc Zyngier wrote:
+> On Thu, 15 Feb 2018 21:03:25 +0000,
+> Christoffer Dall wrote:
+> > 
+> > We do not have to change the c15 trap setting on each switch to/from the
+> > guest on VHE systems, because this setting only affects EL0.
+> 
+> Did you mean EL1 instead?
+> 
+
+Not sure what I meant, but HSTR_EL2 appears to affect EL1 and EL0, and
+the PMU configuration we can do on vcpu_load on VHE systems is only
+about EL0 as far as I can tell.
+
+> > 
+> > The PMU and debug trap configuration can also be done on vcpu load/put
+> > instead, because they don't affect how the host kernel can access the
+> > debug registers while executing KVM kernel code.
+> > 
+> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_hyp.h |  3 +++
+> >  arch/arm64/kvm/hyp/switch.c      | 31 ++++++++++++++++++++++---------
+> >  arch/arm64/kvm/hyp/sysreg-sr.c   |  4 ++++
+> >  3 files changed, 29 insertions(+), 9 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> > index 2b1fda90dde4..949f2e77ae58 100644
+> > --- a/arch/arm64/include/asm/kvm_hyp.h
+> > +++ b/arch/arm64/include/asm/kvm_hyp.h
+> > @@ -147,6 +147,9 @@ void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
+> >  void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
+> >  bool __fpsimd_enabled(void);
+> >  
+> > +void activate_traps_vhe_load(struct kvm_vcpu *vcpu);
+> > +void deactivate_traps_vhe_put(void);
+> > +
+> >  u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
+> >  void __noreturn __hyp_do_panic(unsigned long, ...);
+> >  
+> > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> > index 9c40e203bd09..5e94955b89ea 100644
+> > --- a/arch/arm64/kvm/hyp/switch.c
+> > +++ b/arch/arm64/kvm/hyp/switch.c
+> > @@ -101,6 +101,8 @@ static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
+> >  {
+> >  	u64 val;
+> >  
+> > +	__activate_traps_common(vcpu);
+> > +
+> >  	val = CPTR_EL2_DEFAULT;
+> >  	val |= CPTR_EL2_TTA | CPTR_EL2_TFP | CPTR_EL2_TZ;
+> >  	write_sysreg(val, cptr_el2);
+> > @@ -120,20 +122,12 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+> >  		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
+> >  
+> >  	__activate_traps_fpsimd32(vcpu);
+> > -	__activate_traps_common(vcpu);
+> >  	__activate_traps_arch()(vcpu);
+> >  }
+> >  
+> >  static void __hyp_text __deactivate_traps_vhe(void)
+> >  {
+> >  	extern char vectors[];	/* kernel exception vectors */
+> > -	u64 mdcr_el2 = read_sysreg(mdcr_el2);
+> > -
+> > -	mdcr_el2 &= MDCR_EL2_HPMN_MASK |
+> > -		    MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT |
+> > -		    MDCR_EL2_TPMS;
+> > -
+> > -	write_sysreg(mdcr_el2, mdcr_el2);
+> >  	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
+> >  	write_sysreg(CPACR_EL1_DEFAULT, cpacr_el1);
+> >  	write_sysreg(vectors, vbar_el1);
+> > @@ -143,6 +137,8 @@ static void __hyp_text __deactivate_traps_nvhe(void)
+> >  {
+> >  	u64 mdcr_el2 = read_sysreg(mdcr_el2);
+> >  
+> > +	__deactivate_traps_common();
+> > +
+> >  	mdcr_el2 &= MDCR_EL2_HPMN_MASK;
+> >  	mdcr_el2 |= MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT;
+> >  
+> > @@ -166,10 +162,27 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
+> >  	if (vcpu->arch.hcr_el2 & HCR_VSE)
+> >  		vcpu->arch.hcr_el2 = read_sysreg(hcr_el2);
+> >  
+> > -	__deactivate_traps_common();
+> >  	__deactivate_traps_arch()();
+> >  }
+> >  
+> > +void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
+> > +{
+> > +	__activate_traps_common(vcpu);
+> > +}
+> > +
+> > +void deactivate_traps_vhe_put(void)
+> > +{
+> > +	u64 mdcr_el2 = read_sysreg(mdcr_el2);
+> > +
+> > +	mdcr_el2 &= MDCR_EL2_HPMN_MASK |
+> > +		    MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT |
+> > +		    MDCR_EL2_TPMS;
+> > +
+> > +	write_sysreg(mdcr_el2, mdcr_el2);
+> > +
+> > +	__deactivate_traps_common();
+> > +}
+> > +
+> >  static void __hyp_text __activate_vm(struct kvm *kvm)
+> >  {
+> >  	write_sysreg(kvm->arch.vttbr, vttbr_el2);
+> > diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+> > index aacba4636871..b3894df6bf1a 100644
+> > --- a/arch/arm64/kvm/hyp/sysreg-sr.c
+> > +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+> > @@ -254,6 +254,8 @@ void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu)
+> >  	__sysreg_restore_el1_state(guest_ctxt);
+> >  
+> >  	vcpu->arch.sysregs_loaded_on_cpu = true;
+> > +
+> > +	activate_traps_vhe_load(vcpu);
+> >  }
+> >  
+> >  /**
+> > @@ -275,6 +277,8 @@ void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu)
+> >  	if (!has_vhe())
+> >  		return;
+> >  
+> > +	deactivate_traps_vhe_put();
+> > +
+> >  	__sysreg_save_el1_state(guest_ctxt);
+> >  	__sysreg_save_user_state(guest_ctxt);
+> >  	__sysreg32_save_state(vcpu);
+> > -- 
+> > 2.14.2
+> > 
+> 
+> I must admit that I find these two layers of trap configuration mildly
+> confusing. I can see why it is done like this (there is hardly any
+> other way), but still...
+
+Perhaps the naming could be improved.
+
+Right now we have:
+
+_traps_common:        Same code for non-VHE/VHE.  Called:
+                         non-VHE: on every switch.
+		         VHE: on load/put.
+_traps:               Same code for non-VHE/VHE.  Called:
+                         VHE/non-VHE: On every switch.
+_traps_nvhe:          Code specific to non-VHE system.  Called:
+                         non-VHE: on every switch
+_traps_vhe:           Code specific to VHE system.  Called:
+                         VHE: on every switch
+_traps_vhe_load/put:  Code  specific to VHE system.  Called:
+                         VHE: on vcpu load/put
+
+We could simplify this at the cost of code duplication to:
+
+_traps_nvhe
+_traps_vhe
+_traps_vhe_load/put
+
+Thoughts?
+
+> 
+> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+> 
+
+Thanks,
+-Christoffer
