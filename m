@@ -1,17 +1,17 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v4 13/40] KVM: arm64: Introduce VHE-specific kvm_vcpu_run
-Date: Thu, 22 Feb 2018 10:16:48 +0100
-Message-ID: <20180222091648.GF29376@cbox>
+Subject: Re: [PATCH v4 17/40] KVM: arm64: Move userspace system registers
+ into separate function
+Date: Thu, 22 Feb 2018 10:18:09 +0100
+Message-ID: <20180222091809.GG29376@cbox>
 References: <20180215210332.8648-1-christoffer.dall@linaro.org>
- <20180215210332.8648-14-christoffer.dall@linaro.org>
- <20180221174300.74lxks5gb6qzny75@kamzik.brq.redhat.com>
- <20180221181832.i5c46evx6y3h635k@kamzik.brq.redhat.com>
+ <20180215210332.8648-18-christoffer.dall@linaro.org>
+ <411af987-97f8-03a4-60ce-6f271e042983@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <20180221181832.i5c46evx6y3h635k@kamzik.brq.redhat.com>
+In-Reply-To: <411af987-97f8-03a4-60ce-6f271e042983@arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -21,82 +21,33 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Andrew Jones <drjones@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Tomasz Nowicki <tn@semihalf.com>, kvmarm@lists.cs.columbia.edu, Julien Grall <julien.grall@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, linux-arm-kernel@lists.infradead.org, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
+To: Julien Grall <julien.grall@arm.com>
+Cc: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Tomasz Nowicki <tn@semihalf.com>, Dave Martin <Dave.Martin@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Feb 21, 2018 at 07:18:32PM +0100, Andrew Jones wrote:
-> On Wed, Feb 21, 2018 at 06:43:00PM +0100, Andrew Jones wrote:
-> > On Thu, Feb 15, 2018 at 10:03:05PM +0100, Christoffer Dall wrote:
-> > > So far this is mostly (see below) a copy of the legacy non-VHE switch
-> > > function, but we will start reworking these functions in separate
-> > > directions to work on VHE and non-VHE in the most optimal way in later
-> > > patches.
-> > > 
-> > > The only difference after this patch between the VHE and non-VHE run
-> > > functions is that we omit the branch-predictor variant-2 hardening for
-> > > QC Falkor CPUs, because this workaround is specific to a series of
-> > > non-VHE ARMv8.0 CPUs.
-> > > 
-> > > Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-> > > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> > > ---
-> > > 
-> > > Notes:
-> > >     Changes since v3:
-> > >      - Added BUG() to 32-bit ARM VHE run function
-> > >      - Omitted QC Falkor BP Hardening functionality from VHE-specific
-> > >        function
-> > >     
-> > >     Changes since v2:
-> > >      - Reworded commit message
-> > >     
-> > >     Changes since v1:
-> > >      - Rename kvm_vcpu_run to kvm_vcpu_run_vhe and rename __kvm_vcpu_run to
-> > >        __kvm_vcpu_run_nvhe
-> > >      - Removed stray whitespace line
-> > > 
-> > >  arch/arm/include/asm/kvm_asm.h   |  5 ++-
-> > >  arch/arm/kvm/hyp/switch.c        |  2 +-
-> > >  arch/arm64/include/asm/kvm_asm.h |  4 ++-
-> > >  arch/arm64/kvm/hyp/switch.c      | 66 +++++++++++++++++++++++++++++++++++++++-
-> > >  virt/kvm/arm/arm.c               |  5 ++-
-> > >  5 files changed, 77 insertions(+), 5 deletions(-)
-> > > 
-> > 
-> > ...
-> > 
-> > > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> > > index 2062d9357971..5bd879c78951 100644
-> > > --- a/virt/kvm/arm/arm.c
-> > > +++ b/virt/kvm/arm/arm.c
-> > > @@ -736,7 +736,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> > >  		if (has_vhe())
-> > >  			kvm_arm_vhe_guest_enter();
-> > >  
-> > > -		ret = kvm_call_hyp(__kvm_vcpu_run, vcpu);
-> > > +		if (has_vhe())
-> > > +			ret = kvm_vcpu_run_vhe(vcpu);
-> > > +		else
-> > > +			ret = kvm_call_hyp(__kvm_vcpu_run_nvhe, vcpu);
-> > >  
-> > >  		if (has_vhe())
-> > >  			kvm_arm_vhe_guest_exit();
-> > 
-> > We can combine these has_vhe()'s
-> > 
-> >  if (has_vhe()) {
-> >     kvm_arm_vhe_guest_enter();
-> >     ret = kvm_vcpu_run_vhe(vcpu);
-> >     kvm_arm_vhe_guest_exit();
-> >  } else
-> >     ret = kvm_call_hyp(__kvm_vcpu_run_nvhe, vcpu);
+On Mon, Feb 19, 2018 at 05:21:17PM +0000, Julien Grall wrote:
+> Hi Christoffer,
 > 
-> Maybe even do a cleanup patch that removes
-> kvm_arm_vhe_guest_enter/exit by putting the daif
-> masking/restoring directly into kvm_vcpu_run_vhe()?
+> On 15/02/18 21:03, Christoffer Dall wrote:
+> >There's a semantic difference between the EL1 registers that control
+> >operation of a kernel running in EL1 and EL1 registers that only control
+> >userspace execution in EL0.  Since we can defer saving/restoring the
+> >latter, move them into their own function.
+> >
+> >ACTLR_EL1 is not used by a VHE host, so we can move this register into
+> >the EL1 state which is not saved/restored for a VHE host.
 > 
-Yes, indeed.  This is a blind rebasing result on my part.
+> Looking at D10.2.1 (ARM DDI 0487C.a), the statement regarding the use of
+> ACTLR_EL1 seems to be less strong than what you state here. It looks like it
+> would be possible to have hardware where ACTLR_EL1 would still have an
+> effect on host EL0. I also read the comments on the version 2 of this patch
+> but I wasn't able to find what I missing.
+> 
+As Marc points out, I'll add a reference to the spec that says that Arm
+recommends ACTLR_EL1 not having an effect on VHE host EL0.  While
+potentially possible, it's unlikely, and we can fix that later if anyone
+builds a platform with VHE that we care about that uses ACTLR_EL1 for
+VHE host EL0.
 
 Thanks,
 -Christoffer
