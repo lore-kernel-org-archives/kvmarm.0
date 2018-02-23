@@ -1,273 +1,111 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 1/2] KVM: arm/arm64: Fix arch timers with userspace irqchips
-Date: Fri, 23 Feb 2018 19:00:23 +0100
-Message-ID: <20180223180024.8846-2-christoffer.dall@linaro.org>
+Subject: [PULL 2/2] ARM: kvm: fix building with gcc-8
+Date: Fri, 23 Feb 2018 19:00:24 +0100
+Message-ID: <20180223180024.8846-3-christoffer.dall@linaro.org>
 References: <20180223180024.8846-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 00C7D40387
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Feb 2018 12:54:13 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Bv8MeJTa-FQi for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 23 Feb 2018 12:53:50 -0500 (EST)
+Received: from mail-wm0-f67.google.com (mail-wm0-f67.google.com [74.125.82.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9EF324043C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Feb 2018 12:53:50 -0500 (EST)
+Received: by mail-wm0-f67.google.com with SMTP id z81so6184034wmb.4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Feb 2018 10:00:33 -0800 (PST)
 In-Reply-To: <20180223180024.8846-1-christoffer.dall@linaro.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Alexander Graf <agraf@suse.de>, stable@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, Marc Zyngier <marc.zyngier@arm.com>, stable@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When introducing support for irqchip in userspace we needed a way to
-mask the timer signal to prevent the guest continuously exiting due to a
-screaming timer.
+From: Arnd Bergmann <arnd@arndb.de>
 
-We did this by disabling the corresponding percpu interrupt on the
-host interrupt controller, because we cannot rely on the host system
-having a GIC, and therefore cannot make any assumptions about having an
-active state to hide the timer signal.
+In banked-sr.c, we use a top-level '__asm__(".arch_extension virt")'
+statement to allow compilation of a multi-CPU kernel for ARMv6
+and older ARMv7-A that don't normally support access to the banked
+registers.
 
-Unfortunately, when introducing this feature, it became entirely
-possible that a VCPU which belongs to a VM that has a userspace irqchip
-can disable the vtimer irq on the host on some physical CPU, and then go
-away without ever enabling the vtimer irq on that physical CPU again.
+This is considered to be a programming error by the gcc developers
+and will no longer work in gcc-8, where we now get a build error:
 
-This means that using irqchips in userspace on a system that also
-supports running VMs with an in-kernel GIC can prevent forward progress
-from in-kernel GIC VMs.
+/tmp/cc4Qy7GR.s:34: Error: Banked registers are not available with this architecture. -- `mrs r3,SP_usr'
+/tmp/cc4Qy7GR.s:41: Error: Banked registers are not available with this architecture. -- `mrs r3,ELR_hyp'
+/tmp/cc4Qy7GR.s:55: Error: Banked registers are not available with this architecture. -- `mrs r3,SP_svc'
+/tmp/cc4Qy7GR.s:62: Error: Banked registers are not available with this architecture. -- `mrs r3,LR_svc'
+/tmp/cc4Qy7GR.s:69: Error: Banked registers are not available with this architecture. -- `mrs r3,SPSR_svc'
+/tmp/cc4Qy7GR.s:76: Error: Banked registers are not available with this architecture. -- `mrs r3,SP_abt'
 
-Later on, when we started taking virtual timer interrupts in the arch
-timer code, we would also leave this timer state active for userspace
-irqchip VMs, because we leave it up to a VGIC-enabled guest to
-deactivate the hardware IRQ using the HW bit in the LR.
+Passign the '-march-armv7ve' flag to gcc works, and is ok here, because
+we know the functions won't ever be called on pre-ARMv7VE machines.
+Unfortunately, older compiler versions (4.8 and earlier) do not understand
+that flag, so we still need to keep the asm around.
 
-Both issues are solved by only using the enable/disable trick on systems
-that do not have a host GIC which supports the active state, because all
-VMs on such systems must use irqchips in userspace.  Systems that have a
-working GIC with support for an active state use the active state to
-mask the timer signal for both userspace and in-kernel irqchips.
+Backporting to stable kernels (4.6+) is needed to allow those to be built
+with future compilers as well.
 
-Cc: Alexander Graf <agraf@suse.de>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-Cc: <stable@vger.kernel.org> # v4.12+
-Fixes: d9e139778376 ("KVM: arm/arm64: Support arch timers with a userspace gic")
+Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=84129
+Fixes: 33280b4cd1dc ("ARM: KVM: Add banked registers save/restore")
+Cc: stable@vger.kernel.org
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/arch_timer.c | 116 +++++++++++++++++++++++++---------------------
- 1 file changed, 64 insertions(+), 52 deletions(-)
+ arch/arm/kvm/hyp/Makefile    | 5 +++++
+ arch/arm/kvm/hyp/banked-sr.c | 4 ++++
+ 2 files changed, 9 insertions(+)
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 70268c0bec79..70f4c30918eb 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -36,6 +36,8 @@ static struct timecounter *timecounter;
- static unsigned int host_vtimer_irq;
- static u32 host_vtimer_irq_flags;
+diff --git a/arch/arm/kvm/hyp/Makefile b/arch/arm/kvm/hyp/Makefile
+index 5638ce0c9524..63d6b404d88e 100644
+--- a/arch/arm/kvm/hyp/Makefile
++++ b/arch/arm/kvm/hyp/Makefile
+@@ -7,6 +7,8 @@ ccflags-y += -fno-stack-protector -DDISABLE_BRANCH_PROFILING
  
-+static DEFINE_STATIC_KEY_FALSE(has_gic_active_state);
+ KVM=../../../../virt/kvm
+ 
++CFLAGS_ARMV7VE		   :=$(call cc-option, -march=armv7ve)
 +
- static const struct kvm_irq_level default_ptimer_irq = {
- 	.irq	= 30,
- 	.level	= 1,
-@@ -56,6 +58,12 @@ u64 kvm_phys_timer_read(void)
- 	return timecounter->cc->read(timecounter->cc);
- }
- 
-+static inline bool userspace_irqchip(struct kvm *kvm)
-+{
-+	return static_branch_unlikely(&userspace_irqchip_in_use) &&
-+		unlikely(!irqchip_in_kernel(kvm));
-+}
+ obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v2-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v3-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/timer-sr.o
+@@ -15,7 +17,10 @@ obj-$(CONFIG_KVM_ARM_HOST) += tlb.o
+ obj-$(CONFIG_KVM_ARM_HOST) += cp15-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) += vfp.o
+ obj-$(CONFIG_KVM_ARM_HOST) += banked-sr.o
++CFLAGS_banked-sr.o	   += $(CFLAGS_ARMV7VE)
 +
- static void soft_timer_start(struct hrtimer *hrt, u64 ns)
- {
- 	hrtimer_start(hrt, ktime_add_ns(ktime_get(), ns),
-@@ -69,25 +77,6 @@ static void soft_timer_cancel(struct hrtimer *hrt, struct work_struct *work)
- 		cancel_work_sync(work);
- }
+ obj-$(CONFIG_KVM_ARM_HOST) += entry.o
+ obj-$(CONFIG_KVM_ARM_HOST) += hyp-entry.o
+ obj-$(CONFIG_KVM_ARM_HOST) += switch.o
++CFLAGS_switch.o		   += $(CFLAGS_ARMV7VE)
+ obj-$(CONFIG_KVM_ARM_HOST) += s2-setup.o
+diff --git a/arch/arm/kvm/hyp/banked-sr.c b/arch/arm/kvm/hyp/banked-sr.c
+index 111bda8cdebd..be4b8b0a40ad 100644
+--- a/arch/arm/kvm/hyp/banked-sr.c
++++ b/arch/arm/kvm/hyp/banked-sr.c
+@@ -20,6 +20,10 @@
  
--static void kvm_vtimer_update_mask_user(struct kvm_vcpu *vcpu)
--{
--	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
--
--	/*
--	 * When using a userspace irqchip with the architected timers, we must
--	 * prevent continuously exiting from the guest, and therefore mask the
--	 * physical interrupt by disabling it on the host interrupt controller
--	 * when the virtual level is high, such that the guest can make
--	 * forward progress.  Once we detect the output level being
--	 * de-asserted, we unmask the interrupt again so that we exit from the
--	 * guest when the timer fires.
--	 */
--	if (vtimer->irq.level)
--		disable_percpu_irq(host_vtimer_irq);
--	else
--		enable_percpu_irq(host_vtimer_irq, 0);
--}
--
- static irqreturn_t kvm_arch_timer_handler(int irq, void *dev_id)
- {
- 	struct kvm_vcpu *vcpu = *(struct kvm_vcpu **)dev_id;
-@@ -106,9 +95,9 @@ static irqreturn_t kvm_arch_timer_handler(int irq, void *dev_id)
- 	if (kvm_timer_should_fire(vtimer))
- 		kvm_timer_update_irq(vcpu, true, vtimer);
+ #include <asm/kvm_hyp.h>
  
--	if (static_branch_unlikely(&userspace_irqchip_in_use) &&
--	    unlikely(!irqchip_in_kernel(vcpu->kvm)))
--		kvm_vtimer_update_mask_user(vcpu);
-+	if (userspace_irqchip(vcpu->kvm) &&
-+	    !static_branch_unlikely(&has_gic_active_state))
-+		disable_percpu_irq(host_vtimer_irq);
++/*
++ * gcc before 4.9 doesn't understand -march=armv7ve, so we have to
++ * trick the assembler.
++ */
+ __asm__(".arch_extension     virt");
  
- 	return IRQ_HANDLED;
- }
-@@ -290,8 +279,7 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
- 	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer_ctx->irq.irq,
- 				   timer_ctx->irq.level);
- 
--	if (!static_branch_unlikely(&userspace_irqchip_in_use) ||
--	    likely(irqchip_in_kernel(vcpu->kvm))) {
-+	if (!userspace_irqchip(vcpu->kvm)) {
- 		ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
- 					  timer_ctx->irq.irq,
- 					  timer_ctx->irq.level,
-@@ -350,12 +338,6 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
- 	phys_timer_emulate(vcpu);
- }
- 
--static void __timer_snapshot_state(struct arch_timer_context *timer)
--{
--	timer->cnt_ctl = read_sysreg_el0(cntv_ctl);
--	timer->cnt_cval = read_sysreg_el0(cntv_cval);
--}
--
- static void vtimer_save_state(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-@@ -367,8 +349,10 @@ static void vtimer_save_state(struct kvm_vcpu *vcpu)
- 	if (!vtimer->loaded)
- 		goto out;
- 
--	if (timer->enabled)
--		__timer_snapshot_state(vtimer);
-+	if (timer->enabled) {
-+		vtimer->cnt_ctl = read_sysreg_el0(cntv_ctl);
-+		vtimer->cnt_cval = read_sysreg_el0(cntv_cval);
-+	}
- 
- 	/* Disable the virtual timer */
- 	write_sysreg_el0(0, cntv_ctl);
-@@ -460,23 +444,43 @@ static void set_cntvoff(u64 cntvoff)
- 	kvm_call_hyp(__kvm_timer_set_cntvoff, low, high);
- }
- 
--static void kvm_timer_vcpu_load_vgic(struct kvm_vcpu *vcpu)
-+static inline void set_vtimer_irq_phys_active(struct kvm_vcpu *vcpu, bool active)
-+{
-+	int r;
-+	r = irq_set_irqchip_state(host_vtimer_irq, IRQCHIP_STATE_ACTIVE, active);
-+	WARN_ON(r);
-+}
-+
-+static void kvm_timer_vcpu_load_gic(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 	bool phys_active;
--	int ret;
- 
--	phys_active = kvm_vgic_map_is_active(vcpu, vtimer->irq.irq);
--
--	ret = irq_set_irqchip_state(host_vtimer_irq,
--				    IRQCHIP_STATE_ACTIVE,
--				    phys_active);
--	WARN_ON(ret);
-+	if (irqchip_in_kernel(vcpu->kvm))
-+		phys_active = kvm_vgic_map_is_active(vcpu, vtimer->irq.irq);
-+	else
-+		phys_active = vtimer->irq.level;
-+	set_vtimer_irq_phys_active(vcpu, phys_active);
- }
- 
--static void kvm_timer_vcpu_load_user(struct kvm_vcpu *vcpu)
-+static void kvm_timer_vcpu_load_nogic(struct kvm_vcpu *vcpu)
- {
--	kvm_vtimer_update_mask_user(vcpu);
-+	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
-+
-+	/*
-+	 * When using a userspace irqchip with the architected timers and a
-+	 * host interrupt controller that doesn't support an active state, we
-+	 * must still prevent continuously exiting from the guest, and
-+	 * therefore mask the physical interrupt by disabling it on the host
-+	 * interrupt controller when the virtual level is high, such that the
-+	 * guest can make forward progress.  Once we detect the output level
-+	 * being de-asserted, we unmask the interrupt again so that we exit
-+	 * from the guest when the timer fires.
-+	 */
-+	if (vtimer->irq.level)
-+		disable_percpu_irq(host_vtimer_irq);
-+	else
-+		enable_percpu_irq(host_vtimer_irq, host_vtimer_irq_flags);
- }
- 
- void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
-@@ -487,10 +491,10 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
- 	if (unlikely(!timer->enabled))
- 		return;
- 
--	if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
--		kvm_timer_vcpu_load_user(vcpu);
-+	if (static_branch_likely(&has_gic_active_state))
-+		kvm_timer_vcpu_load_gic(vcpu);
- 	else
--		kvm_timer_vcpu_load_vgic(vcpu);
-+		kvm_timer_vcpu_load_nogic(vcpu);
- 
- 	set_cntvoff(vtimer->cntvoff);
- 
-@@ -555,18 +559,24 @@ static void unmask_vtimer_irq_user(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 
--	if (unlikely(!irqchip_in_kernel(vcpu->kvm))) {
--		__timer_snapshot_state(vtimer);
--		if (!kvm_timer_should_fire(vtimer)) {
--			kvm_timer_update_irq(vcpu, false, vtimer);
--			kvm_vtimer_update_mask_user(vcpu);
--		}
-+	if (!kvm_timer_should_fire(vtimer)) {
-+		kvm_timer_update_irq(vcpu, false, vtimer);
-+		if (static_branch_likely(&has_gic_active_state))
-+			set_vtimer_irq_phys_active(vcpu, false);
-+		else
-+			enable_percpu_irq(host_vtimer_irq, host_vtimer_irq_flags);
- 	}
- }
- 
- void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
- {
--	unmask_vtimer_irq_user(vcpu);
-+	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-+
-+	if (unlikely(!timer->enabled))
-+		return;
-+
-+	if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
-+		unmask_vtimer_irq_user(vcpu);
- }
- 
- int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
-@@ -753,6 +763,8 @@ int kvm_timer_hyp_init(bool has_gic)
- 			kvm_err("kvm_arch_timer: error setting vcpu affinity\n");
- 			goto out_free_irq;
- 		}
-+
-+		static_branch_enable(&has_gic_active_state);
- 	}
- 
- 	kvm_info("virtual timer IRQ%d\n", host_vtimer_irq);
+ void __hyp_text __banked_save_state(struct kvm_cpu_context *ctxt)
 -- 
 2.14.2
