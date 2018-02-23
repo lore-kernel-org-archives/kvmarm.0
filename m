@@ -1,15 +1,15 @@
 From: Julien Grall <julien.grall@arm.com>
-Subject: Re: [PATCH v4 29/40] KVM: arm64: Prepare to handle deferred
- save/restore of 32-bit registers
-Date: Fri, 23 Feb 2018 11:35:38 +0000
-Message-ID: <f3f85dcd-1b78-dda3-3efe-c688b6c711b2@arm.com>
+Subject: Re: [PATCH v4 31/40] KVM: arm64: Move common VHE/non-VHE trap config
+ in separate functions
+Date: Fri, 23 Feb 2018 14:30:54 +0000
+Message-ID: <833c8ef7-dfd8-6b01-cab5-c97c86b705f3@arm.com>
 References: <20180215210332.8648-1-christoffer.dall@linaro.org>
- <20180215210332.8648-30-christoffer.dall@linaro.org>
+ <20180215210332.8648-32-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180215210332.8648-30-christoffer.dall@linaro.org>
+In-Reply-To: <20180215210332.8648-32-christoffer.dall@linaro.org>
 Content-Language: en-US
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
@@ -27,204 +27,62 @@ List-Id: kvmarm@lists.cs.columbia.edu
 Hi Christoffer,
 
 On 15/02/18 21:03, Christoffer Dall wrote:
-> 32-bit registers are not used by a 64-bit host kernel and can be
-> deferred, but we need to rework the accesses to this register to access
-> the latest value depending on whether or not guest system registers are
-> loaded on the CPU or only reside in memory.
-
-I realize that you explain in the new patch why FPEXC32_EL2 is not 
-directly accessed below. But I think it might be worth to explain it 
-here as well because the commit message implies all 32-bit registers 
-could be deferred.
-
-> 
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> ---
-> 
-> Notes:
->      Changes since v3:
->       - Don't also try to write hardware spsr when sysregs are not loaded
->       - Adapted patch to use switch-based sysreg save/restore approach
->       - (Kept additional BUG_ON() in vcpu_read_spsr32() to keep the compiler happy)
->      
->      Changes since v2:
->       - New patch (deferred register handling has been reworked)
-> 
->   arch/arm64/include/asm/kvm_emulate.h | 32 +++++------------
->   arch/arm64/kvm/regmap.c              | 67 +++++++++++++++++++++++++++---------
->   arch/arm64/kvm/sys_regs.c            |  6 ++++
->   3 files changed, 65 insertions(+), 40 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 9cb13b23c7a1..23b33e8ea03a 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -33,7 +33,8 @@
->   #include <asm/virt.h>
->   
->   unsigned long *vcpu_reg32(const struct kvm_vcpu *vcpu, u8 reg_num);
-> -unsigned long *vcpu_spsr32(const struct kvm_vcpu *vcpu);
-> +unsigned long vcpu_read_spsr32(const struct kvm_vcpu *vcpu);
-> +void vcpu_write_spsr32(struct kvm_vcpu *vcpu, unsigned long v);
->   
->   bool kvm_condition_valid32(const struct kvm_vcpu *vcpu);
->   void kvm_skip_instr32(struct kvm_vcpu *vcpu, bool is_wide_instr);
-> @@ -162,41 +163,26 @@ static inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
->   
->   static inline unsigned long vcpu_read_spsr(const struct kvm_vcpu *vcpu)
+> @@ -85,37 +123,14 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
 >   {
-> -	unsigned long *p = (unsigned long *)&vcpu_gp_regs(vcpu)->spsr[KVM_SPSR_EL1];
-> -
-> -	if (vcpu_mode_is_32bit(vcpu)) {
-> -		unsigned long *p_32bit = vcpu_spsr32(vcpu);
-> -
-> -		/* KVM_SPSR_SVC aliases KVM_SPSR_EL1 */
-> -		if (p_32bit != (unsigned long *)p)
-> -			return *p_32bit;
+>   	u64 hcr = vcpu->arch.hcr_el2;
+>   
+> -	/*
+> -	 * We are about to set CPTR_EL2.TFP to trap all floating point
+> -	 * register accesses to EL2, however, the ARM ARM clearly states that
+> -	 * traps are only taken to EL2 if the operation would not otherwise
+> -	 * trap to EL1.  Therefore, always make sure that for 32-bit guests,
+> -	 * we set FPEXC.EN to prevent traps to EL1, when setting the TFP bit.
+> -	 * If FP/ASIMD is not implemented, FPEXC is UNDEFINED and any access to
+> -	 * it will cause an exception.
+> -	 */
+> -	if (vcpu_el1_is_32bit(vcpu) && system_supports_fpsimd()) {
+> -		write_sysreg(1 << 30, fpexc32_el2);
+> -		isb();
 > -	}
-> +	if (vcpu_mode_is_32bit(vcpu))
-> +		return vcpu_read_spsr32(vcpu);
+> +	write_sysreg(hcr, hcr_el2);
 >   
->   	if (vcpu->arch.sysregs_loaded_on_cpu)
->   		return read_sysreg_el1(spsr);
->   	else
-> -		return *p;
-> +		return vcpu_gp_regs(vcpu)->spsr[KVM_SPSR_EL1];
->   }
+>   	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN) && (hcr & HCR_VSE))
+>   		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
 >   
-> -static inline void vcpu_write_spsr(const struct kvm_vcpu *vcpu, unsigned long v)
-> +static inline void vcpu_write_spsr(struct kvm_vcpu *vcpu, unsigned long v)
->   {
-> -	unsigned long *p = (unsigned long *)&vcpu_gp_regs(vcpu)->spsr[KVM_SPSR_EL1];
+> -	write_sysreg(hcr, hcr_el2);
+
+OOI, any reason to move the write to HCR_EL2 just before the if?
+
 > -
-> -	/* KVM_SPSR_SVC aliases KVM_SPSR_EL1 */
->   	if (vcpu_mode_is_32bit(vcpu)) {
-> -		unsigned long *p_32bit = vcpu_spsr32(vcpu);
-> -
-> -		/* KVM_SPSR_SVC aliases KVM_SPSR_EL1 */
-> -		if (p_32bit != (unsigned long *)p) {
-> -			*p_32bit = v;
-> -			return;
-> -		}
-> +		vcpu_write_spsr32(vcpu, v);
-> +		return;
->   	}
->   
->   	if (vcpu->arch.sysregs_loaded_on_cpu)
->   		write_sysreg_el1(v, spsr);
->   	else
-> -		*p = v;
-> +		vcpu_gp_regs(vcpu)->spsr[KVM_SPSR_EL1] = v;
+> -	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
+> -	write_sysreg(1 << 15, hstr_el2);
+> -	/*
+> -	 * Make sure we trap PMU access from EL0 to EL2. Also sanitize
+> -	 * PMSELR_EL0 to make sure it never contains the cycle
+> -	 * counter, which could make a PMXEVCNTR_EL0 access UNDEF at
+> -	 * EL1 instead of being trapped to EL2.
+> -	 */
+> -	write_sysreg(0, pmselr_el0);
+> -	write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
+> -	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+> -	__activate_traps_arch()();
+> +	__activate_traps_fpsimd32(vcpu);
+> +	__activate_traps_common(vcpu);
+> +	__activate_traps_arch()(vcpu);
 >   }
 >   
->   static inline bool vcpu_mode_priv(const struct kvm_vcpu *vcpu)
-> diff --git a/arch/arm64/kvm/regmap.c b/arch/arm64/kvm/regmap.c
-> index bbc6ae32e4af..eefe403a2e63 100644
-> --- a/arch/arm64/kvm/regmap.c
-> +++ b/arch/arm64/kvm/regmap.c
-> @@ -141,28 +141,61 @@ unsigned long *vcpu_reg32(const struct kvm_vcpu *vcpu, u8 reg_num)
->   /*
->    * Return the SPSR for the current mode of the virtual CPU.
->    */
-> -unsigned long *vcpu_spsr32(const struct kvm_vcpu *vcpu)
-> +static int vcpu_spsr32_mode(const struct kvm_vcpu *vcpu)
->   {
->   	unsigned long mode = *vcpu_cpsr(vcpu) & COMPAT_PSR_MODE_MASK;
->   	switch (mode) {
-> -	case COMPAT_PSR_MODE_SVC:
-> -		mode = KVM_SPSR_SVC;
-> -		break;
-> -	case COMPAT_PSR_MODE_ABT:
-> -		mode = KVM_SPSR_ABT;
-> -		break;
-> -	case COMPAT_PSR_MODE_UND:
-> -		mode = KVM_SPSR_UND;
-> -		break;
-> -	case COMPAT_PSR_MODE_IRQ:
-> -		mode = KVM_SPSR_IRQ;
-> -		break;
-> -	case COMPAT_PSR_MODE_FIQ:
-> -		mode = KVM_SPSR_FIQ;
-> -		break;
-> +	case COMPAT_PSR_MODE_SVC: return KVM_SPSR_SVC;
-> +	case COMPAT_PSR_MODE_ABT: return KVM_SPSR_ABT;
-> +	case COMPAT_PSR_MODE_UND: return KVM_SPSR_UND;
-> +	case COMPAT_PSR_MODE_IRQ: return KVM_SPSR_IRQ;
-> +	case COMPAT_PSR_MODE_FIQ: return KVM_SPSR_FIQ;
-> +	default: BUG();
-> +	}
-> +}
-> +
-> +unsigned long vcpu_read_spsr32(const struct kvm_vcpu *vcpu)
-> +{
-> +	int spsr_idx = vcpu_spsr32_mode(vcpu);
-> +
-> +	if (!vcpu->arch.sysregs_loaded_on_cpu)
-> +		return vcpu_gp_regs(vcpu)->spsr[spsr_idx];
-> +
-> +	switch (spsr_idx) {
-> +	case KVM_SPSR_SVC:
-> +		return read_sysreg_el1(spsr);
-> +	case KVM_SPSR_ABT:
-> +		return read_sysreg(spsr_abt);
-> +	case KVM_SPSR_UND:
-> +		return read_sysreg(spsr_und);
-> +	case KVM_SPSR_IRQ:
-> +		return read_sysreg(spsr_irq);
-> +	case KVM_SPSR_FIQ:
-> +		return read_sysreg(spsr_fiq);
->   	default:
->   		BUG();
->   	}
-> +}
-> +
-> +void vcpu_write_spsr32(struct kvm_vcpu *vcpu, unsigned long v)
-> +{
-> +	int spsr_idx = vcpu_spsr32_mode(vcpu);
-> +
-> +	if (!vcpu->arch.sysregs_loaded_on_cpu) {
-> +		vcpu_gp_regs(vcpu)->spsr[spsr_idx] = v;
-> +		return;
-> +	}
+>   static void __hyp_text __deactivate_traps_vhe(void)
+> @@ -160,9 +175,8 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
+>   	if (vcpu->arch.hcr_el2 & HCR_VSE)
+>   		vcpu->arch.hcr_el2 = read_sysreg(hcr_el2);
 >   
-> -	return (unsigned long *)&vcpu_gp_regs(vcpu)->spsr[mode];
-> +	switch (spsr_idx) {
-> +	case KVM_SPSR_SVC:
-> +		write_sysreg_el1(v, spsr);
-> +	case KVM_SPSR_ABT:
-> +		write_sysreg(v, spsr_abt);
-> +	case KVM_SPSR_UND:
-> +		write_sysreg(v, spsr_und);
-> +	case KVM_SPSR_IRQ:
-> +		write_sysreg(v, spsr_irq);
-> +	case KVM_SPSR_FIQ:
-> +		write_sysreg(v, spsr_fiq);
-> +	}
+> +	__deactivate_traps_common();
+>   	__deactivate_traps_arch()();
+> -	write_sysreg(0, hstr_el2);
+> -	write_sysreg(0, pmuserenr_el0);
 >   }
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index f060309337aa..d2324560c9f5 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -107,6 +107,9 @@ u64 vcpu_read_sys_reg(struct kvm_vcpu *vcpu, int reg)
->   	case AMAIR_EL1:		return read_sysreg_s(amair_EL12);
->   	case CNTKCTL_EL1:	return read_sysreg_s(cntkctl_EL12);
->   	case PAR_EL1:		return read_sysreg_s(SYS_PAR_EL1);
-> +	case DACR32_EL2:	return read_sysreg_s(SYS_DACR32_EL2);
-> +	case IFSR32_EL2:	return read_sysreg_s(SYS_IFSR32_EL2);
-> +	case DBGVCR32_EL2:	return read_sysreg_s(SYS_DBGVCR32_EL2);
->   	}
 >   
->   immediate_read:
-> @@ -143,6 +146,9 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, int reg, u64 val)
->   	case AMAIR_EL1:		write_sysreg_s(val, amair_EL12);	return;
->   	case CNTKCTL_EL1:	write_sysreg_s(val, cntkctl_EL12);	return;
->   	case PAR_EL1:		write_sysreg_s(val, SYS_PAR_EL1);	return;
-> +	case DACR32_EL2:	write_sysreg_s(val, SYS_DACR32_EL2);	return;
-> +	case IFSR32_EL2:	write_sysreg_s(val, SYS_IFSR32_EL2);	return;
-> +	case DBGVCR32_EL2:	write_sysreg_s(val, SYS_DBGVCR32_EL2);	return;
->   	}
->   
->   immediate_write:
+>   static void __hyp_text __activate_vm(struct kvm *kvm)
 > 
 
 Cheers,
