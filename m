@@ -1,16 +1,11 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v4 35/40] KVM: arm/arm64: Get rid of vgic_elrsr
-Date: Fri, 23 Feb 2018 18:50:16 +0100
-Message-ID: <20180223175016.GD7396@cbox>
-References: <20180215210332.8648-1-christoffer.dall@linaro.org>
- <20180215210332.8648-36-christoffer.dall@linaro.org>
- <b15dda97-a860-0ed5-79d0-4c011f7e3b84@arm.com>
+Subject: [PULL 0/2] KVM/ARM Fixes for v4.16
+Date: Fri, 23 Feb 2018 19:00:22 +0100
+Message-ID: <20180223180024.8846-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <b15dda97-a860-0ed5-79d0-4c011f7e3b84@arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -20,33 +15,42 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Julien Grall <julien.grall@arm.com>
-Cc: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Tomasz Nowicki <tn@semihalf.com>, Dave Martin <Dave.Martin@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Shih-Wei Li <shihwei@cs.columbia.edu>
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Feb 23, 2018 at 02:44:30PM +0000, Julien Grall wrote:
-> Hi Christoffer,
-> 
-> On 15/02/18 21:03, Christoffer Dall wrote:
-> >There is really no need to store the vgic_elrsr on the VGIC data
-> >structures as the only need we have for the elrsr is to figure out if an
-> >LR is inactive when we save the VGIC state upon returning from the
-> >guest.  We can might as well store this in a temporary local variable.
-> >
-> >This also gets rid of the endianness conversion in the VGIC save
-> >function, which is completely unnecessary and would actually result in
-> >incorrect functionality on big-endian systems, because we are only using
-> >typed values here and not converting pointers and reading different
-> >types here.
-> 
-> I can't find any endianness code removed in this code. What did I miss?
-> 
+Hi Paolo and Radim,
 
-Ah, good find, we ended up fixing this in a separate commit:
+Here's the first round of KVM/ARM fixes for v4.16.
 
-fc396e066318, "KVM: arm/arm64: Fix broken GICH_ELRSR big endian conversion", 2017-12-03
+Not much in here; we fix the interaction of userspace irqchip VMs with in-kernel
+irqchip VMs and make sure we can build 32-bit KVM/ARM with gcc-8.
 
-I'll adjust the commit message.
+The following changes since commit 7928b2cbe55b2a410a0f5c1f154610059c57b1b2:
+
+  Linux 4.16-rc1 (2018-02-11 15:04:29 -0800)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-fixes-for-v4.16-1
+
+for you to fetch changes up to 67870eb1204223598ea6d8a4467b482e9f5875b5:
+
+  ARM: kvm: fix building with gcc-8 (2018-02-15 20:58:36 +0100)
 
 Thanks,
 -Christoffer
+
+Arnd Bergmann (1):
+  ARM: kvm: fix building with gcc-8
+
+Christoffer Dall (1):
+  KVM: arm/arm64: Fix arch timers with userspace irqchips
+
+ arch/arm/kvm/hyp/Makefile    |   5 ++
+ arch/arm/kvm/hyp/banked-sr.c |   4 ++
+ virt/kvm/arm/arch_timer.c    | 116 ++++++++++++++++++++++++-------------------
+ 3 files changed, 73 insertions(+), 52 deletions(-)
+
+-- 
+2.14.2
