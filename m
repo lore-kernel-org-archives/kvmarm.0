@@ -1,25 +1,24 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 2/2] ARM: kvm: fix building with gcc-8
-Date: Fri, 23 Feb 2018 19:00:24 +0100
-Message-ID: <20180223180024.8846-3-christoffer.dall@linaro.org>
-References: <20180223180024.8846-1-christoffer.dall@linaro.org>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH] arm64: rename the function arm64_is_ras_serror() to avoid
+ confusion
+Date: Fri, 23 Feb 2018 17:58:22 +0000
+Message-ID: <5A90563E.4020608@arm.com>
+References: <1519322552-7374-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 00C7D40387
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Feb 2018 12:54:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C374249D36
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Feb 2018 12:55:00 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Bv8MeJTa-FQi for <kvmarm@lists.cs.columbia.edu>;
- Fri, 23 Feb 2018 12:53:50 -0500 (EST)
-Received: from mail-wm0-f67.google.com (mail-wm0-f67.google.com [74.125.82.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9EF324043C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Feb 2018 12:53:50 -0500 (EST)
-Received: by mail-wm0-f67.google.com with SMTP id z81so6184034wmb.4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Feb 2018 10:00:33 -0800 (PST)
-In-Reply-To: <20180223180024.8846-1-christoffer.dall@linaro.org>
+ with ESMTP id o06NvsgBOQbL for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 23 Feb 2018 12:54:36 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DA4C140332
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Feb 2018 12:54:11 -0500 (EST)
+In-Reply-To: <1519322552-7374-1-git-send-email-gengdongjiu@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,83 +28,54 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, Marc Zyngier <marc.zyngier@arm.com>, stable@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Dongjiu Geng <gengdongjiu@huawei.com>
+Cc: marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, huangshaoyu@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Arnd Bergmann <arnd@arndb.de>
+Hi Dongjiu Geng,
 
-In banked-sr.c, we use a top-level '__asm__(".arch_extension virt")'
-statement to allow compilation of a multi-CPU kernel for ARMv6
-and older ARMv7-A that don't normally support access to the banked
-registers.
+On 22/02/18 18:02, Dongjiu Geng wrote:
+> The RAS SError Syndrome can be Implementation-Defined,
+> arm64_is_ras_serror() is used to judge whether it is RAS SError,
+> but arm64_is_ras_serror() does not include this judgement. In order
+> to avoid function name confusion, we rename the arm64_is_ras_serror()
+> to arm64_is_categorized_ras_serror(), this function is used to
+> judge whether it is categorized RAS Serror.
 
-This is considered to be a programming error by the gcc developers
-and will no longer work in gcc-8, where we now get a build error:
+I don't see how 'categorized' is relevant. The most significant ISS bit is used
+to determine if this is an IMP-DEF ESR, or one that uses the architected layout.
 
-/tmp/cc4Qy7GR.s:34: Error: Banked registers are not available with this architecture. -- `mrs r3,SP_usr'
-/tmp/cc4Qy7GR.s:41: Error: Banked registers are not available with this architecture. -- `mrs r3,ELR_hyp'
-/tmp/cc4Qy7GR.s:55: Error: Banked registers are not available with this architecture. -- `mrs r3,SP_svc'
-/tmp/cc4Qy7GR.s:62: Error: Banked registers are not available with this architecture. -- `mrs r3,LR_svc'
-/tmp/cc4Qy7GR.s:69: Error: Banked registers are not available with this architecture. -- `mrs r3,SPSR_svc'
-/tmp/cc4Qy7GR.s:76: Error: Banked registers are not available with this architecture. -- `mrs r3,SP_abt'
+DFSC of zero means uncategorised. What should we do with an uncategorised SError?
 
-Passign the '-march-armv7ve' flag to gcc works, and is ok here, because
-we know the functions won't ever be called on pre-ARMv7VE machines.
-Unfortunately, older compiler versions (4.8 and earlier) do not understand
-that flag, so we still need to keep the asm around.
+>From 2.4.3 "ESB and other physical errors" of [0]
+| It is IMPLEMENTATION DEFINED whether [..]uncategorized SError interrupts
+| are containable or Uncontainable, and whether they can be synchronized by an
+| Error Synchronization Barrier.
 
-Backporting to stable kernels (4.6+) is needed to allow those to be built
-with future compilers as well.
+We treat uncategorized as uncontainable as that's the worst thing it could be.
 
-Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=84129
-Fixes: 33280b4cd1dc ("ARM: KVM: Add banked registers save/restore")
-Cc: stable@vger.kernel.org
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
- arch/arm/kvm/hyp/Makefile    | 5 +++++
- arch/arm/kvm/hyp/banked-sr.c | 4 ++++
- 2 files changed, 9 insertions(+)
+On aarch32 uncontainable and uncategorized even share an encoding.
+(AET:00 in G7.2.43 "DFSR, Data Fault Status Register", 'state of the PE after
+taking the SError interrupt exception')
 
-diff --git a/arch/arm/kvm/hyp/Makefile b/arch/arm/kvm/hyp/Makefile
-index 5638ce0c9524..63d6b404d88e 100644
---- a/arch/arm/kvm/hyp/Makefile
-+++ b/arch/arm/kvm/hyp/Makefile
-@@ -7,6 +7,8 @@ ccflags-y += -fno-stack-protector -DDISABLE_BRANCH_PROFILING
- 
- KVM=../../../../virt/kvm
- 
-+CFLAGS_ARMV7VE		   :=$(call cc-option, -march=armv7ve)
-+
- obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v2-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v3-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/timer-sr.o
-@@ -15,7 +17,10 @@ obj-$(CONFIG_KVM_ARM_HOST) += tlb.o
- obj-$(CONFIG_KVM_ARM_HOST) += cp15-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += vfp.o
- obj-$(CONFIG_KVM_ARM_HOST) += banked-sr.o
-+CFLAGS_banked-sr.o	   += $(CFLAGS_ARMV7VE)
-+
- obj-$(CONFIG_KVM_ARM_HOST) += entry.o
- obj-$(CONFIG_KVM_ARM_HOST) += hyp-entry.o
- obj-$(CONFIG_KVM_ARM_HOST) += switch.o
-+CFLAGS_switch.o		   += $(CFLAGS_ARMV7VE)
- obj-$(CONFIG_KVM_ARM_HOST) += s2-setup.o
-diff --git a/arch/arm/kvm/hyp/banked-sr.c b/arch/arm/kvm/hyp/banked-sr.c
-index 111bda8cdebd..be4b8b0a40ad 100644
---- a/arch/arm/kvm/hyp/banked-sr.c
-+++ b/arch/arm/kvm/hyp/banked-sr.c
-@@ -20,6 +20,10 @@
- 
- #include <asm/kvm_hyp.h>
- 
-+/*
-+ * gcc before 4.9 doesn't understand -march=armv7ve, so we have to
-+ * trick the assembler.
-+ */
- __asm__(".arch_extension     virt");
- 
- void __hyp_text __banked_save_state(struct kvm_cpu_context *ctxt)
--- 
-2.14.2
+
+> Change some code notes, unrecoverable RAS errors is imprecise, but
+> Recoverable RAS errors is precise.
+
+Unrecoverable and Recoverable (but we don't know where it is) are both grouped
+into 'can't make progress'. The comment says:
+| The exception may have been imprecise.
+because one of those two is imprecise.
+
+If anyone cares which one is which, they can read the spec.
+
+I expect this code will one day be replaced with proper kernel-first support,
+its only here to avoid panic()ing due to corrected errors.
+
+
+Thanks,
+
+James
+
+[0]
+https://static.docs.arm.com/ddi0587/a/RAS%20Extension-release%20candidate_march_29.pdf
