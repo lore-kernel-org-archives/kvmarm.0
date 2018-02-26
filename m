@@ -1,214 +1,184 @@
 From: Alex Shi <alex.shi@linaro.org>
-Subject: [PATCH 45/52] arm64: Kill PSCI_GET_VERSION as a variant-2 workaround
-Date: Mon, 26 Feb 2018 16:20:19 +0800
-Message-ID: <1519633227-29832-46-git-send-email-alex.shi@linaro.org>
+Subject: [PATCH 48/52] arm: KVM: Invalidate BTB on guest exit for Cortex-A12/A17
+Date: Mon, 26 Feb 2018 16:20:22 +0800
+Message-ID: <1519633227-29832-49-git-send-email-alex.shi@linaro.org>
 References: <1519633227-29832-1-git-send-email-alex.shi@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1519633227-29832-1-git-send-email-alex.shi@linaro.org>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, stable@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, "moderated list:ARM64 PORT
-        AARCH64 ARCHITECTURE" <linux-arm-kernel@lists.infradead.org>, open list <linux-kernel@vger.kernel.org>, "open list:KERNEL VIRTUAL MACHINE FOR
-        ARM64 KVM/arm64" <kvmarm@lists.cs.columbia.edu>, "open list:KERNEL VIRTUAL MACHINE KVM" <kvm@vger.kernel.org>
+To: Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, stable@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Russell King <linux@armlinux.org.uk>, "open list:KERNEL VIRTUAL MACHINE KVM" <kvm@vger.kernel.org>, "moderated list:KERNEL VIRTUAL
+        MACHINE KVM FOR ARM" <linux-arm-kernel@lists.infradead.org>, "open list:KERNEL VIRTUAL MACHINE KVM
+        FOR ARM" <kvmarm@lists.cs.columbia.edu>, open list <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Marc Zyngier <marc.zyngier@arm.com>
 
-commit 3a0a397ff5ff upstream.
+** Not yet queued for inclusion in mainline **
 
-Now that we've standardised on SMCCC v1.1 to perform the branch
-prediction invalidation, let's drop the previous band-aid.
-If vendors haven't updated their firmware to do SMCCC 1.1, they
-haven't updated PSCI either, so we don't loose anything.
+In order to avoid aliasing attacks against the branch predictor,
+let's invalidate the BTB on guest exit. This is made complicated
+by the fact that we cannot take a branch before invalidating the
+BTB.
 
-Tested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+We only apply this to A12 and A17, which are the only two ARM
+cores on which this useful.
+
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
 Signed-off-by: Will Deacon <will.deacon@arm.com>
 Signed-off-by: Alex Shi <alex.shi@linaro.org>
 
 Conflicts:
-	no falkor/thunderx2/vulcan in arch/arm64/kernel/cpu_errata.c
+	no hvc stub in hyp_hvc in arch/arm/kvm/hyp/hyp-entry.S
 ---
- arch/arm64/kernel/bpi.S        | 24 ------------------------
- arch/arm64/kernel/cpu_errata.c | 41 +++++++++++------------------------------
- arch/arm64/kvm/hyp/switch.c    | 14 --------------
- 3 files changed, 11 insertions(+), 68 deletions(-)
+ arch/arm/include/asm/kvm_asm.h |  2 --
+ arch/arm/include/asm/kvm_mmu.h | 18 ++++++++++-
+ arch/arm/kvm/hyp/hyp-entry.S   | 71 ++++++++++++++++++++++++++++++++++++++++--
+ 3 files changed, 86 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/kernel/bpi.S b/arch/arm64/kernel/bpi.S
-index c72f261..dc4eb15 100644
---- a/arch/arm64/kernel/bpi.S
-+++ b/arch/arm64/kernel/bpi.S
-@@ -54,30 +54,6 @@ ENTRY(__bp_harden_hyp_vecs_start)
- 	vectors __kvm_hyp_vector
- 	.endr
- ENTRY(__bp_harden_hyp_vecs_end)
--ENTRY(__psci_hyp_bp_inval_start)
--	sub	sp, sp, #(8 * 18)
--	stp	x16, x17, [sp, #(16 * 0)]
--	stp	x14, x15, [sp, #(16 * 1)]
--	stp	x12, x13, [sp, #(16 * 2)]
--	stp	x10, x11, [sp, #(16 * 3)]
--	stp	x8, x9, [sp, #(16 * 4)]
--	stp	x6, x7, [sp, #(16 * 5)]
--	stp	x4, x5, [sp, #(16 * 6)]
--	stp	x2, x3, [sp, #(16 * 7)]
--	stp	x0, x1, [sp, #(16 * 8)]
--	mov	x0, #0x84000000
--	smc	#0
--	ldp	x16, x17, [sp, #(16 * 0)]
--	ldp	x14, x15, [sp, #(16 * 1)]
--	ldp	x12, x13, [sp, #(16 * 2)]
--	ldp	x10, x11, [sp, #(16 * 3)]
--	ldp	x8, x9, [sp, #(16 * 4)]
--	ldp	x6, x7, [sp, #(16 * 5)]
--	ldp	x4, x5, [sp, #(16 * 6)]
--	ldp	x2, x3, [sp, #(16 * 7)]
--	ldp	x0, x1, [sp, #(16 * 8)]
--	add	sp, sp, #(8 * 18)
--ENTRY(__psci_hyp_bp_inval_end)
+diff --git a/arch/arm/include/asm/kvm_asm.h b/arch/arm/include/asm/kvm_asm.h
+index 8ef0538..24f3ec7 100644
+--- a/arch/arm/include/asm/kvm_asm.h
++++ b/arch/arm/include/asm/kvm_asm.h
+@@ -61,8 +61,6 @@ struct kvm_vcpu;
+ extern char __kvm_hyp_init[];
+ extern char __kvm_hyp_init_end[];
  
- .macro smccc_workaround_1 inst
- 	sub	sp, sp, #(8 * 4)
-diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-index 9632319..8b74f80 100644
---- a/arch/arm64/kernel/cpu_errata.c
-+++ b/arch/arm64/kernel/cpu_errata.c
-@@ -53,7 +53,6 @@ static int cpu_enable_trap_ctr_access(void *__unused)
- DEFINE_PER_CPU_READ_MOSTLY(struct bp_hardening_data, bp_hardening_data);
+-extern char __kvm_hyp_vector[];
+-
+ extern void __kvm_flush_vm_context(void);
+ extern void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
+ extern void __kvm_tlb_flush_vmid(struct kvm *kvm);
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index d10e362..2887129 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -37,6 +37,7 @@
  
- #ifdef CONFIG_KVM
--extern char __psci_hyp_bp_inval_start[], __psci_hyp_bp_inval_end[];
- extern char __smccc_workaround_1_smc_start[];
- extern char __smccc_workaround_1_smc_end[];
- extern char __smccc_workaround_1_hvc_start[];
-@@ -100,8 +99,6 @@ static void __install_bp_hardening_cb(bp_hardening_cb_t fn,
- 	spin_unlock(&bp_lock);
- }
- #else
--#define __psci_hyp_bp_inval_start		NULL
--#define __psci_hyp_bp_inval_end			NULL
- #define __smccc_workaround_1_smc_start		NULL
- #define __smccc_workaround_1_smc_end		NULL
- #define __smccc_workaround_1_hvc_start		NULL
-@@ -146,24 +143,25 @@ static void call_hvc_arch_workaround_1(void)
- 	arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_WORKAROUND_1, NULL);
- }
+ #include <linux/highmem.h>
+ #include <asm/cacheflush.h>
++#include <asm/cputype.h>
+ #include <asm/pgalloc.h>
+ #include <asm/stage2_pgtable.h>
  
--static bool check_smccc_arch_workaround_1(const struct arm64_cpu_capabilities *entry)
-+static int enable_smccc_arch_workaround_1(void *data)
+@@ -225,7 +226,22 @@ static inline unsigned int kvm_get_vmid_bits(void)
+ 
+ static inline void *kvm_get_hyp_vector(void)
  {
-+	const struct arm64_cpu_capabilities *entry = data;
- 	bp_hardening_cb_t cb;
- 	void *smccc_start, *smccc_end;
- 	struct arm_smccc_res res;
- 
- 	if (!entry->matches(entry, SCOPE_LOCAL_CPU))
--		return false;
-+		return 0;
- 
- 	if (psci_ops.smccc_version == SMCCC_VERSION_1_0)
--		return false;
-+		return 0;
- 
- 	switch (psci_ops.conduit) {
- 	case PSCI_CONDUIT_HVC:
- 		arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
- 				  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
- 		if (res.a0)
--			return false;
-+			return 0;
- 		cb = call_hvc_arch_workaround_1;
- 		smccc_start = __smccc_workaround_1_hvc_start;
- 		smccc_end = __smccc_workaround_1_hvc_end;
-@@ -173,35 +171,18 @@ static bool check_smccc_arch_workaround_1(const struct arm64_cpu_capabilities *e
- 		arm_smccc_1_1_smc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
- 				  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
- 		if (res.a0)
--			return false;
-+			return 0;
- 		cb = call_smc_arch_workaround_1;
- 		smccc_start = __smccc_workaround_1_smc_start;
- 		smccc_end = __smccc_workaround_1_smc_end;
- 		break;
- 
- 	default:
--		return false;
-+		return 0;
- 	}
- 
- 	install_bp_hardening_cb(entry, cb, smccc_start, smccc_end);
- 
--	return true;
--}
--
--static int enable_psci_bp_hardening(void *data)
--{
--	const struct arm64_cpu_capabilities *entry = data;
--
--	if (psci_ops.get_version) {
--		if (check_smccc_arch_workaround_1(entry))
--			return 0;
--
--		install_bp_hardening_cb(entry,
--				       (bp_hardening_cb_t)psci_ops.get_version,
--				       __psci_hyp_bp_inval_start,
--				       __psci_hyp_bp_inval_end);
--	}
--
- 	return 0;
+-	return kvm_ksym_ref(__kvm_hyp_vector);
++	switch(read_cpuid_part()) {
++#ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
++	case ARM_CPU_PART_CORTEX_A12:
++	case ARM_CPU_PART_CORTEX_A17:
++	{
++		extern char __kvm_hyp_vector_bp_inv[];
++		return kvm_ksym_ref(__kvm_hyp_vector_bp_inv);
++	}
++
++#endif
++	default:
++	{
++		extern char __kvm_hyp_vector[];
++		return kvm_ksym_ref(__kvm_hyp_vector);
++	}
++	}
  }
- #endif	/* CONFIG_HARDEN_BRANCH_PREDICTOR */
-@@ -301,22 +282,22 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
- 	{
- 		.capability = ARM64_HARDEN_BRANCH_PREDICTOR,
- 		MIDR_ALL_VERSIONS(MIDR_CORTEX_A57),
--		.enable = enable_psci_bp_hardening,
-+		.enable = enable_smccc_arch_workaround_1,
- 	},
- 	{
- 		.capability = ARM64_HARDEN_BRANCH_PREDICTOR,
- 		MIDR_ALL_VERSIONS(MIDR_CORTEX_A72),
--		.enable = enable_psci_bp_hardening,
-+		.enable = enable_smccc_arch_workaround_1,
- 	},
- 	{
- 		.capability = ARM64_HARDEN_BRANCH_PREDICTOR,
- 		MIDR_ALL_VERSIONS(MIDR_CORTEX_A73),
--		.enable = enable_psci_bp_hardening,
-+		.enable = enable_smccc_arch_workaround_1,
- 	},
- 	{
- 		.capability = ARM64_HARDEN_BRANCH_PREDICTOR,
- 		MIDR_ALL_VERSIONS(MIDR_CORTEX_A75),
--		.enable = enable_psci_bp_hardening,
-+		.enable = enable_smccc_arch_workaround_1,
- 	},
- #endif
- 	{
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 996328e..154b471 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -311,20 +311,6 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	if (exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
- 		goto again;
  
--	if (exit_code == ARM_EXCEPTION_TRAP &&
--	    (kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_HVC64 ||
--	     kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_HVC32)) {
--		u32 val = vcpu_get_reg(vcpu, 0);
--
--		if (val == PSCI_0_2_FN_PSCI_VERSION) {
--			val = kvm_psci_version(vcpu, kern_hyp_va(vcpu->kvm));
--			if (unlikely(val == KVM_ARM_PSCI_0_1))
--				val = PSCI_RET_NOT_SUPPORTED;
--			vcpu_set_reg(vcpu, 0, val);
--			goto again;
--		}
--	}
--
- 	if (static_branch_unlikely(&vgic_v2_cpuif_trap) &&
- 	    exit_code == ARM_EXCEPTION_TRAP) {
- 		bool valid;
+ static inline int kvm_map_vectors(void)
+diff --git a/arch/arm/kvm/hyp/hyp-entry.S b/arch/arm/kvm/hyp/hyp-entry.S
+index 96beb53..b6b8cb1 100644
+--- a/arch/arm/kvm/hyp/hyp-entry.S
++++ b/arch/arm/kvm/hyp/hyp-entry.S
+@@ -71,6 +71,66 @@ __kvm_hyp_vector:
+ 	W(b)	hyp_irq
+ 	W(b)	hyp_fiq
+ 
++#ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
++	.align 5
++__kvm_hyp_vector_bp_inv:
++	.global __kvm_hyp_vector_bp_inv
++
++	/*
++	 * We encode the exception entry in the bottom 3 bits of
++	 * SP, and we have to guarantee to be 8 bytes aligned.
++	 */
++	W(add)	sp, sp, #1	/* Reset 	  7 */
++	W(add)	sp, sp, #1	/* Undef	  6 */
++	W(add)	sp, sp, #1	/* Syscall	  5 */
++	W(add)	sp, sp, #1	/* Prefetch abort 4 */
++	W(add)	sp, sp, #1	/* Data abort	  3 */
++	W(add)	sp, sp, #1	/* HVC		  2 */
++	W(add)	sp, sp, #1	/* IRQ		  1 */
++	W(nop)			/* FIQ		  0 */
++
++	mcr	p15, 0, r0, c7, c5, 6	/* BPIALL */
++	isb
++
++#ifdef CONFIG_THUMB2_KERNEL
++	/*
++	 * Yet another silly hack: Use VPIDR as a temp register.
++	 * Thumb2 is really a pain, as SP cannot be used with most
++	 * of the bitwise instructions. The vect_br macro ensures
++	 * things gets cleaned-up.
++	 */
++	mcr	p15, 4, r0, c0, c0, 0	/* VPIDR */
++	mov	r0, sp
++	and	r0, r0, #7
++	sub	sp, sp, r0
++	push	{r1, r2}
++	mov	r1, r0
++	mrc	p15, 4, r0, c0, c0, 0	/* VPIDR */
++	mrc	p15, 0, r2, c0, c0, 0	/* MIDR  */
++	mcr	p15, 4, r2, c0, c0, 0	/* VPIDR */
++#endif
++
++.macro vect_br val, targ
++ARM(	eor	sp, sp, #\val	)
++ARM(	tst	sp, #7		)
++ARM(	eorne	sp, sp, #\val	)
++
++THUMB(	cmp	r1, #\val	)
++THUMB(	popeq	{r1, r2}	)
++
++	beq	\targ
++.endm
++
++	vect_br	0, hyp_fiq
++	vect_br	1, hyp_irq
++	vect_br	2, hyp_hvc
++	vect_br	3, hyp_dabt
++	vect_br	4, hyp_pabt
++	vect_br	5, hyp_svc
++	vect_br	6, hyp_undef
++	vect_br	7, hyp_reset
++#endif
++
+ .macro invalid_vector label, cause
+ 	.align
+ \label:	mov	r0, #\cause
+@@ -131,7 +191,14 @@ hyp_hvc:
+ 	mrceq	p15, 4, r0, c12, c0, 0	@ get HVBAR
+ 	beq	1f
+ 
+-	push	{lr}
++	/*
++	 * Pushing r2 here is just a way of keeping the stack aligned to
++	 * 8 bytes on any path that can trigger a HYP exception. Here,
++	 * we may well be about to jump into the guest, and the guest
++	 * exit would otherwise be badly decoded by our fancy
++	 * "decode-exception-without-a-branch" code...
++	 */
++	push    {r2, lr}
+ 
+ 	mov	lr, r0
+ 	mov	r0, r1
+@@ -141,7 +208,7 @@ hyp_hvc:
+ THUMB(	orr	lr, #1)
+ 	blx	lr			@ Call the HYP function
+ 
+-	pop	{lr}
++	pop	{r2, lr}
+ 1:	eret
+ 
+ guest_trap:
 -- 
 2.7.4
