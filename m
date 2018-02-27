@@ -1,334 +1,248 @@
 From: Christoffer Dall <cdall@kernel.org>
-Subject: [PATCH v5 39/40] KVM: arm/arm64: Move VGIC APR save/restore to vgic
- put/load
-Date: Tue, 27 Feb 2018 12:34:28 +0100
-Message-ID: <20180227113429.637-40-cdall@kernel.org>
+Subject: [PATCH v5 13/40] KVM: arm64: Introduce VHE-specific kvm_vcpu_run
+Date: Tue, 27 Feb 2018 12:34:02 +0100
+Message-ID: <20180227113429.637-14-cdall@kernel.org>
 References: <20180227113429.637-1-cdall@kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BE8049F7B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 06:28:32 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id ByfIKY4pQHrV for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 27 Feb 2018 06:28:08 -0500 (EST)
+Received: from mail-wm0-f67.google.com (mail-wm0-f67.google.com [74.125.82.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D9F6749E05
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 06:27:58 -0500 (EST)
+Received: by mail-wm0-f67.google.com with SMTP id t3so23399366wmc.2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 03:34:52 -0800 (PST)
 In-Reply-To: <20180227113429.637-1-cdall@kernel.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Tomasz Nowicki <tn@semihalf.com>, Julien Grall <julien.grall@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Christoffer Dall <christoffer.dall@linaro.org>
 
-The APRs can only have bits set when the guest acknowledges an interrupt
-in the LR and can only have a bit cleared when the guest EOIs an
-interrupt in the LR.  Therefore, if we have no LRs with any
-pending/active interrupts, the APR cannot change value and there is no
-need to clear it on every exit from the VM (hint: it will have already
-been cleared when we exited the guest the last time with the LRs all
-EOIed).
+So far this is mostly (see below) a copy of the legacy non-VHE switch
+function, but we will start reworking these functions in separate
+directions to work on VHE and non-VHE in the most optimal way in later
+patches.
 
-The only case we need to take care of is when we migrate the VCPU away
-from a CPU or migrate a new VCPU onto a CPU, or when we return to
-userspace to capture the state of the VCPU for migration.  To make sure
-this works, factor out the APR save/restore functionality into separate
-functions called from the VCPU (and by extension VGIC) put/load hooks.
+The only difference after this patch between the VHE and non-VHE run
+functions is that we omit the branch-predictor variant-2 hardening for
+QC Falkor CPUs, because this workaround is specific to a series of
+non-VHE ARMv8.0 CPUs.
 
 Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm/include/asm/kvm_hyp.h   |   2 +
- arch/arm64/include/asm/kvm_hyp.h |   2 +
- virt/kvm/arm/hyp/vgic-v3-sr.c    | 124 +++++++++++++++++++++------------------
- virt/kvm/arm/vgic/vgic-v2.c      |   7 +--
- virt/kvm/arm/vgic/vgic-v3.c      |   5 ++
- 5 files changed, 78 insertions(+), 62 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_hyp.h b/arch/arm/include/asm/kvm_hyp.h
-index 1ab8329e9ff7..530a3c1cfe6f 100644
---- a/arch/arm/include/asm/kvm_hyp.h
-+++ b/arch/arm/include/asm/kvm_hyp.h
-@@ -110,6 +110,8 @@ void __sysreg_restore_state(struct kvm_cpu_context *ctxt);
+Notes:
+    Changes since v4:
+     - Unified has_vhe() conditional calls in kvm_arch_vcpu_ioctl_run
+     - Added isb() on exit path of VHE-specific kvm_vcpu_run(), because
+       otherwise 32-bit guests can crash the system on reentry to the
+       guest, because writes to FPEXC32_EL2 will cause a trap at EL2
+       which leads to a hyp panic.  This can be observed on the model
+       where writing FPEN to CPACR_EL1 on guest exit doesn't take effect
+       prior to entering the guest again.
+    
+    Changes since v3:
+     - Added BUG() to 32-bit ARM VHE run function
+     - Omitted QC Falkor BP Hardening functionality from VHE-specific
+       function
+    
+    Changes since v2:
+     - Reworded commit message
+    
+    Changes since v1:
+     - Rename kvm_vcpu_run to kvm_vcpu_run_vhe and rename __kvm_vcpu_run to
+       __kvm_vcpu_run_nvhe
+     - Removed stray whitespace line
+
+ arch/arm/include/asm/kvm_asm.h    |  5 ++-
+ arch/arm/kvm/hyp/switch.c         |  2 +-
+ arch/arm64/include/asm/kvm_asm.h  |  4 ++-
+ arch/arm64/include/asm/kvm_host.h |  7 +++++
+ arch/arm64/kvm/hyp/switch.c       | 66 ++++++++++++++++++++++++++++++++++++++-
+ virt/kvm/arm/arm.c                | 12 ++++---
+ 6 files changed, 87 insertions(+), 9 deletions(-)
+
+diff --git a/arch/arm/include/asm/kvm_asm.h b/arch/arm/include/asm/kvm_asm.h
+index 36dd2962a42d..5a953ecb0d78 100644
+--- a/arch/arm/include/asm/kvm_asm.h
++++ b/arch/arm/include/asm/kvm_asm.h
+@@ -70,7 +70,10 @@ extern void __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu);
  
- void __vgic_v3_save_state(struct kvm_vcpu *vcpu);
- void __vgic_v3_restore_state(struct kvm_vcpu *vcpu);
-+void __vgic_v3_save_aprs(struct kvm_vcpu *vcpu);
-+void __vgic_v3_restore_aprs(struct kvm_vcpu *vcpu);
+ extern void __kvm_timer_set_cntvoff(u32 cntvoff_low, u32 cntvoff_high);
  
- asmlinkage void __vfp_save_state(struct vfp_hard_struct *vfp);
- asmlinkage void __vfp_restore_state(struct vfp_hard_struct *vfp);
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index febe417b8b4e..6f3929b2fcf7 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -124,6 +124,8 @@ int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu);
+-extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
++/* no VHE on 32-bit :( */
++static inline int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu) { BUG(); return 0; }
++
++extern int __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu);
  
- void __vgic_v3_save_state(struct kvm_vcpu *vcpu);
- void __vgic_v3_restore_state(struct kvm_vcpu *vcpu);
-+void __vgic_v3_save_aprs(struct kvm_vcpu *vcpu);
-+void __vgic_v3_restore_aprs(struct kvm_vcpu *vcpu);
- int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu);
+ extern void __init_stage2_translation(void);
  
- void __timer_enable_traps(struct kvm_vcpu *vcpu);
-diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
-index 9abf2f3c12b5..437d7af08683 100644
---- a/virt/kvm/arm/hyp/vgic-v3-sr.c
-+++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
-@@ -21,6 +21,7 @@
- 
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_hyp.h>
-+#include <asm/kvm_mmu.h>
- 
- #define vtr_to_max_lr_idx(v)		((v) & 0xf)
- #define vtr_to_nr_pre_bits(v)		((((u32)(v) >> 26) & 7) + 1)
-@@ -221,14 +222,11 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
- 
- 	if (used_lrs) {
- 		int i;
--		u32 nr_pre_bits;
- 		u32 elrsr;
- 
- 		elrsr = read_gicreg(ICH_ELSR_EL2);
- 
- 		write_gicreg(0, ICH_HCR_EL2);
--		val = read_gicreg(ICH_VTR_EL2);
--		nr_pre_bits = vtr_to_nr_pre_bits(val);
- 
- 		for (i = 0; i < used_lrs; i++) {
- 			if (elrsr & (1 << i))
-@@ -238,39 +236,10 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
- 
- 			__gic_v3_set_lr(0, i);
- 		}
--
--		switch (nr_pre_bits) {
--		case 7:
--			cpu_if->vgic_ap0r[3] = __vgic_v3_read_ap0rn(3);
--			cpu_if->vgic_ap0r[2] = __vgic_v3_read_ap0rn(2);
--		case 6:
--			cpu_if->vgic_ap0r[1] = __vgic_v3_read_ap0rn(1);
--		default:
--			cpu_if->vgic_ap0r[0] = __vgic_v3_read_ap0rn(0);
--		}
--
--		switch (nr_pre_bits) {
--		case 7:
--			cpu_if->vgic_ap1r[3] = __vgic_v3_read_ap1rn(3);
--			cpu_if->vgic_ap1r[2] = __vgic_v3_read_ap1rn(2);
--		case 6:
--			cpu_if->vgic_ap1r[1] = __vgic_v3_read_ap1rn(1);
--		default:
--			cpu_if->vgic_ap1r[0] = __vgic_v3_read_ap1rn(0);
--		}
- 	} else {
- 		if (static_branch_unlikely(&vgic_v3_cpuif_trap) ||
- 		    cpu_if->its_vpe.its_vm)
- 			write_gicreg(0, ICH_HCR_EL2);
--
--		cpu_if->vgic_ap0r[0] = 0;
--		cpu_if->vgic_ap0r[1] = 0;
--		cpu_if->vgic_ap0r[2] = 0;
--		cpu_if->vgic_ap0r[3] = 0;
--		cpu_if->vgic_ap1r[0] = 0;
--		cpu_if->vgic_ap1r[1] = 0;
--		cpu_if->vgic_ap1r[2] = 0;
--		cpu_if->vgic_ap1r[3] = 0;
- 	}
- 
- 	val = read_gicreg(ICC_SRE_EL2);
-@@ -287,8 +256,6 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
- 	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
--	u64 val;
--	u32 nr_pre_bits;
- 	int i;
- 
- 	/*
-@@ -306,32 +273,9 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
- 		write_gicreg(cpu_if->vgic_vmcr, ICH_VMCR_EL2);
- 	}
- 
--	val = read_gicreg(ICH_VTR_EL2);
--	nr_pre_bits = vtr_to_nr_pre_bits(val);
--
- 	if (used_lrs) {
- 		write_gicreg(cpu_if->vgic_hcr, ICH_HCR_EL2);
- 
--		switch (nr_pre_bits) {
--		case 7:
--			__vgic_v3_write_ap0rn(cpu_if->vgic_ap0r[3], 3);
--			__vgic_v3_write_ap0rn(cpu_if->vgic_ap0r[2], 2);
--		case 6:
--			__vgic_v3_write_ap0rn(cpu_if->vgic_ap0r[1], 1);
--		default:
--			__vgic_v3_write_ap0rn(cpu_if->vgic_ap0r[0], 0);
--		}
--
--		switch (nr_pre_bits) {
--		case 7:
--			__vgic_v3_write_ap1rn(cpu_if->vgic_ap1r[3], 3);
--			__vgic_v3_write_ap1rn(cpu_if->vgic_ap1r[2], 2);
--		case 6:
--			__vgic_v3_write_ap1rn(cpu_if->vgic_ap1r[1], 1);
--		default:
--			__vgic_v3_write_ap1rn(cpu_if->vgic_ap1r[0], 0);
--		}
--
- 		for (i = 0; i < used_lrs; i++)
- 			__gic_v3_set_lr(cpu_if->vgic_lr[i], i);
- 	} else {
-@@ -364,6 +308,72 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
- 		     ICC_SRE_EL2);
+diff --git a/arch/arm/kvm/hyp/switch.c b/arch/arm/kvm/hyp/switch.c
+index e86679daddff..aac025783ee8 100644
+--- a/arch/arm/kvm/hyp/switch.c
++++ b/arch/arm/kvm/hyp/switch.c
+@@ -154,7 +154,7 @@ static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
+ 	return true;
  }
  
-+void __hyp_text __vgic_v3_save_aprs(struct kvm_vcpu *vcpu)
+-int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
++int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_cpu_context *host_ctxt;
+ 	struct kvm_cpu_context *guest_ctxt;
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 7149f1520382..d53d40704416 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -58,7 +58,9 @@ extern void __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu);
+ 
+ extern void __kvm_timer_set_cntvoff(u32 cntvoff_low, u32 cntvoff_high);
+ 
+-extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
++extern int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu);
++
++extern int __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu);
+ 
+ extern u64 __vgic_v3_get_ich_vtr_el2(void);
+ extern u64 __vgic_v3_read_vmcr(void);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index c30fc96992df..87abc94fb591 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -428,6 +428,13 @@ static inline void kvm_arm_vhe_guest_enter(void)
+ static inline void kvm_arm_vhe_guest_exit(void)
+ {
+ 	local_daif_restore(DAIF_PROCCTX_NOIRQ);
++
++	/*
++	 * When we exit from the guest we change a number of CPU configuration
++	 * parameters, such as traps.  Make sure these changes take effect
++	 * before running the host or additional guests.
++	 */
++	isb();
+ }
+ 
+ static inline bool kvm_arm_harden_branch_predictor(void)
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index b055111df1a1..1b94ac6a85e6 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -362,7 +362,71 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	return false;
+ }
+ 
+-int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
++/* Switch to the guest for VHE systems running in EL2 */
++int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
 +{
-+	struct vgic_v3_cpu_if *cpu_if;
-+	u64 val;
-+	u32 nr_pre_bits;
++	struct kvm_cpu_context *host_ctxt;
++	struct kvm_cpu_context *guest_ctxt;
++	bool fp_enabled;
++	u64 exit_code;
 +
 +	vcpu = kern_hyp_va(vcpu);
-+	cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
 +
-+	val = read_gicreg(ICH_VTR_EL2);
-+	nr_pre_bits = vtr_to_nr_pre_bits(val);
++	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
++	host_ctxt->__hyp_running_vcpu = vcpu;
++	guest_ctxt = &vcpu->arch.ctxt;
 +
-+	switch (nr_pre_bits) {
-+	case 7:
-+		cpu_if->vgic_ap0r[3] = __vgic_v3_read_ap0rn(3);
-+		cpu_if->vgic_ap0r[2] = __vgic_v3_read_ap0rn(2);
-+	case 6:
-+		cpu_if->vgic_ap0r[1] = __vgic_v3_read_ap0rn(1);
-+	default:
-+		cpu_if->vgic_ap0r[0] = __vgic_v3_read_ap0rn(0);
++	__sysreg_save_host_state(host_ctxt);
++
++	__activate_traps(vcpu);
++	__activate_vm(vcpu);
++
++	__vgic_restore_state(vcpu);
++	__timer_enable_traps(vcpu);
++
++	/*
++	 * We must restore the 32-bit state before the sysregs, thanks
++	 * to erratum #852523 (Cortex-A57) or #853709 (Cortex-A72).
++	 */
++	__sysreg32_restore_state(vcpu);
++	__sysreg_restore_guest_state(guest_ctxt);
++	__debug_switch_to_guest(vcpu);
++
++	do {
++		/* Jump in the fire! */
++		exit_code = __guest_enter(vcpu, host_ctxt);
++
++		/* And we're baaack! */
++	} while (fixup_guest_exit(vcpu, &exit_code));
++
++	fp_enabled = __fpsimd_enabled();
++
++	__sysreg_save_guest_state(guest_ctxt);
++	__sysreg32_save_state(vcpu);
++	__timer_disable_traps(vcpu);
++	__vgic_save_state(vcpu);
++
++	__deactivate_traps(vcpu);
++	__deactivate_vm(vcpu);
++
++	__sysreg_restore_host_state(host_ctxt);
++
++	if (fp_enabled) {
++		__fpsimd_save_state(&guest_ctxt->gp_regs.fp_regs);
++		__fpsimd_restore_state(&host_ctxt->gp_regs.fp_regs);
 +	}
 +
-+	switch (nr_pre_bits) {
-+	case 7:
-+		cpu_if->vgic_ap1r[3] = __vgic_v3_read_ap1rn(3);
-+		cpu_if->vgic_ap1r[2] = __vgic_v3_read_ap1rn(2);
-+	case 6:
-+		cpu_if->vgic_ap1r[1] = __vgic_v3_read_ap1rn(1);
-+	default:
-+		cpu_if->vgic_ap1r[0] = __vgic_v3_read_ap1rn(0);
-+	}
++	/*
++	 * This must come after restoring the host sysregs, since a non-VHE
++	 * system may enable SPE here and make use of the TTBRs.
++	 */
++	__debug_switch_to_host(vcpu);
++
++	return exit_code;
 +}
 +
-+void __hyp_text __vgic_v3_restore_aprs(struct kvm_vcpu *vcpu)
-+{
-+	struct vgic_v3_cpu_if *cpu_if;
-+	u64 val;
-+	u32 nr_pre_bits;
-+
-+	vcpu = kern_hyp_va(vcpu);
-+	cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
-+
-+	val = read_gicreg(ICH_VTR_EL2);
-+	nr_pre_bits = vtr_to_nr_pre_bits(val);
-+
-+	switch (nr_pre_bits) {
-+	case 7:
-+		__vgic_v3_write_ap0rn(cpu_if->vgic_ap0r[3], 3);
-+		__vgic_v3_write_ap0rn(cpu_if->vgic_ap0r[2], 2);
-+	case 6:
-+		__vgic_v3_write_ap0rn(cpu_if->vgic_ap0r[1], 1);
-+	default:
-+		__vgic_v3_write_ap0rn(cpu_if->vgic_ap0r[0], 0);
-+	}
-+
-+	switch (nr_pre_bits) {
-+	case 7:
-+		__vgic_v3_write_ap1rn(cpu_if->vgic_ap1r[3], 3);
-+		__vgic_v3_write_ap1rn(cpu_if->vgic_ap1r[2], 2);
-+	case 6:
-+		__vgic_v3_write_ap1rn(cpu_if->vgic_ap1r[1], 1);
-+	default:
-+		__vgic_v3_write_ap1rn(cpu_if->vgic_ap1r[0], 0);
-+	}
-+}
-+
- void __hyp_text __vgic_v3_init_lrs(void)
++/* Switch to the guest for legacy non-VHE systems */
++int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
  {
- 	int max_lr_idx = vtr_to_max_lr_idx(read_gicreg(ICH_VTR_EL2));
-diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-index 1e5f3eb6973d..ca7cfee9f353 100644
---- a/virt/kvm/arm/vgic/vgic-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-v2.c
-@@ -446,7 +446,6 @@ void vgic_v2_save_state(struct kvm_vcpu *vcpu)
- {
- 	struct kvm *kvm = vcpu->kvm;
- 	struct vgic_dist *vgic = &kvm->arch.vgic;
--	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
- 	void __iomem *base = vgic->vctrl_base;
- 	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
+ 	struct kvm_cpu_context *host_ctxt;
+ 	struct kvm_cpu_context *guest_ctxt;
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 2062d9357971..09dbee56ed8f 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -733,13 +733,15 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		 */
+ 		trace_kvm_entry(*vcpu_pc(vcpu));
+ 		guest_enter_irqoff();
+-		if (has_vhe())
+-			kvm_arm_vhe_guest_enter();
+-
+-		ret = kvm_call_hyp(__kvm_vcpu_run, vcpu);
  
-@@ -454,11 +453,8 @@ void vgic_v2_save_state(struct kvm_vcpu *vcpu)
- 		return;
- 
- 	if (used_lrs) {
--		cpu_if->vgic_apr = readl_relaxed(base + GICH_APR);
- 		save_lrs(vcpu, base);
- 		writel_relaxed(0, base + GICH_HCR);
--	} else {
--		cpu_if->vgic_apr = 0;
- 	}
- }
- 
-@@ -476,7 +472,6 @@ void vgic_v2_restore_state(struct kvm_vcpu *vcpu)
- 
- 	if (used_lrs) {
- 		writel_relaxed(cpu_if->vgic_hcr, base + GICH_HCR);
--		writel_relaxed(cpu_if->vgic_apr, base + GICH_APR);
- 		for (i = 0; i < used_lrs; i++) {
- 			writel_relaxed(cpu_if->vgic_lr[i],
- 				       base + GICH_LR0 + (i * 4));
-@@ -490,6 +485,7 @@ void vgic_v2_load(struct kvm_vcpu *vcpu)
- 	struct vgic_dist *vgic = &vcpu->kvm->arch.vgic;
- 
- 	writel_relaxed(cpu_if->vgic_vmcr, vgic->vctrl_base + GICH_VMCR);
-+	writel_relaxed(cpu_if->vgic_apr, vgic->vctrl_base + GICH_APR);
- }
- 
- void vgic_v2_put(struct kvm_vcpu *vcpu)
-@@ -498,4 +494,5 @@ void vgic_v2_put(struct kvm_vcpu *vcpu)
- 	struct vgic_dist *vgic = &vcpu->kvm->arch.vgic;
- 
- 	cpu_if->vgic_vmcr = readl_relaxed(vgic->vctrl_base + GICH_VMCR);
-+	cpu_if->vgic_apr = readl_relaxed(vgic->vctrl_base + GICH_APR);
- }
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index b76e21f3e6bd..4bafcd1e6bb8 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -16,6 +16,7 @@
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
- #include <kvm/arm_vgic.h>
-+#include <asm/kvm_hyp.h>
- #include <asm/kvm_mmu.h>
- #include <asm/kvm_asm.h>
- 
-@@ -587,6 +588,8 @@ void vgic_v3_load(struct kvm_vcpu *vcpu)
- 	 */
- 	if (likely(cpu_if->vgic_sre))
- 		kvm_call_hyp(__vgic_v3_write_vmcr, cpu_if->vgic_vmcr);
+-		if (has_vhe())
++		if (has_vhe()) {
++			kvm_arm_vhe_guest_enter();
++			ret = kvm_vcpu_run_vhe(vcpu);
+ 			kvm_arm_vhe_guest_exit();
++		} else {
++			ret = kvm_call_hyp(__kvm_vcpu_run_nvhe, vcpu);
++		}
 +
-+	kvm_call_hyp(__vgic_v3_restore_aprs, vcpu);
- }
- 
- void vgic_v3_put(struct kvm_vcpu *vcpu)
-@@ -595,4 +598,6 @@ void vgic_v3_put(struct kvm_vcpu *vcpu)
- 
- 	if (likely(cpu_if->vgic_sre))
- 		cpu_if->vgic_vmcr = kvm_call_hyp(__vgic_v3_read_vmcr);
-+
-+	kvm_call_hyp(__vgic_v3_save_aprs, vcpu);
- }
+ 		vcpu->mode = OUTSIDE_GUEST_MODE;
+ 		vcpu->stat.exits++;
+ 		/*
 -- 
 2.14.2
