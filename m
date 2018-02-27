@@ -1,110 +1,176 @@
-From: gengdongjiu <gengdj.1984@gmail.com>
-Subject: Re: [PATCH] arm64: rename the function arm64_is_ras_serror() to avoid confusion
-Date: Tue, 27 Feb 2018 00:13:03 +0800
-Message-ID: <CAMj-D2Cd7_fCwMuHKr-UQ3i4LEDkktxcg_GtO-QCqnj52mHyKA@mail.gmail.com>
-References: <1519322552-7374-1-git-send-email-gengdongjiu@huawei.com> <5A90563E.4020608@arm.com>
+From: <bthakur@codeaurora.org>
+Subject: VCPU hotplug on KVM/ARM
+Date: Tue, 27 Feb 2018 15:01:17 +0530
+Message-ID: <000e01d3afad$b9a13830$2ce3a890$@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <5A90563E.4020608@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: James Morse <james.morse@arm.com>
-Cc: Dongjiu Geng <gengdongjiu@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, kvmarm@lists.cs.columbia.edu, Huangshaoyu <huangshaoyu@huawei.com>
+Content-Type: multipart/mixed; boundary="===============1094332515934909775=="
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EA0340257
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 04:24:50 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id sBOpmd+3B0IA for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 27 Feb 2018 04:24:29 -0500 (EST)
+Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 070B1401CD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 04:24:29 -0500 (EST)
+Received: from BTHAKUR (blr-bdr-fw-01_globalnat_allzones-outside.qualcomm.com
+ [103.229.18.19])
+ (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ (Authenticated sender: bthakur@codeaurora.org)
+ by smtp.codeaurora.org (Postfix) with ESMTPSA id DEB8C6024C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 09:31:19 +0000 (UTC)
+Content-Language: en-us
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi James,
-   Thanks a lot for your review.
+This is a multipart message in MIME format.
 
-2018-02-24 1:58 GMT+08:00 James Morse <james.morse@arm.com>:
-> Hi Dongjiu Geng,
->
-> On 22/02/18 18:02, Dongjiu Geng wrote:
->> The RAS SError Syndrome can be Implementation-Defined,
->> arm64_is_ras_serror() is used to judge whether it is RAS SError,
->> but arm64_is_ras_serror() does not include this judgement. In order
->> to avoid function name confusion, we rename the arm64_is_ras_serror()
->> to arm64_is_categorized_ras_serror(), this function is used to
->> judge whether it is categorized RAS Serror.
->
-> I don't see how 'categorized' is relevant. The most significant ISS bit is used
-> to determine if this is an IMP-DEF ESR, or one that uses the architected layout.
+--===============1094332515934909775==
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_000F_01D3AFDB.D359E960"
+Content-Language: en-us
 
->From the name arm64_is_ras_serror(), it used to judge whether this is
-RAS Serror,
-but arm64_is_ras_serror() think the IMP-DEF SError is not RAS SError,
-as shown the code note
-and code in[1]. In fact the IMP-DEF SError is also RAS SError, so when
-I read the code, it looks like
-confusion, so I rename it to arm64_is_categorized_ras_serror(), then
-this function is only used to
-judge whether this is categorized RAS SError,
-if it is categorized, the code will continue judge its Asynchronous Error Type.
-if it is uncategorized, the code will panic(this is the original code
-logic) or not panic when we support kernel-first or can isolate the
-SError
+This is a multipart message in MIME format.
 
-[1]:
- /*
-  *  ...................................................
-   *CPUs with the RAS extensions have an Implementation-Defined-Syndrome bit
-- * If this bit is set, we know its not a RAS SError.
-  * ...............................................................................
-  */
-static inline bool arm64_is_ras_serror(u32 esr)
- {
-        WARN_ON(preemptible());
+------=_NextPart_000_000F_01D3AFDB.D359E960
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 
-        if (esr & ESR_ELx_IDS)
-                return false;
-        .........................
-}
+Hi,
 
->
-> DFSC of zero means uncategorised. What should we do with an uncategorised SError?
+ 
 
-yes, so it returns false because it is uncategorised.
+I hope it is the right forum to post my query.
 
->
-> From 2.4.3 "ESB and other physical errors" of [0]
-> | It is IMPLEMENTATION DEFINED whether [..]uncategorized SError interrupts
-> | are containable or Uncontainable, and whether they can be synchronized by an
-> | Error Synchronization Barrier.
->
-> We treat uncategorized as uncontainable as that's the worst thing it could be.
+ 
 
-in original code, system will panic if it is uncategorized, I do not
-change this logic.
- I only rename this function name to make it less confusion
-it no need to panic for uncontainable if we can isolate this error.
+I am currently looking at the possibility of adding a new VCPU to a running
+guest VM in KVM/ARM. I see that currently, it is not allowed to add a new
+VCPU to a guest VM, if it is already initialized. The first check in
+kvm_arch_vcpu_create() returns failure if it is already initialized.
+
+ 
+
+There was some work done in QEMU to add support for VCPU hotplug:
+https://lists.gnu.org/archive/html/qemu-arm/2017-05/msg00404.html
+
+ 
+
+But I am looking at the KVM side for enabling adding a new VCPU. If you can
+point me to any relevant work/resources, which I can refer to then it will
+help me.
+
+ 
+
+Thanks.
+
+ 
+
+Regards,
+
+Bhupinder
 
 
->
-> On aarch32 uncontainable and uncategorized even share an encoding.
-> (AET:00 in G7.2.43 "DFSR, Data Fault Status Register", 'state of the PE after
-> taking the SError interrupt exception')
->
->
->> Change some code notes, unrecoverable RAS errors is imprecise, but
->> Recoverable RAS errors is precise.
->
-> Unrecoverable and Recoverable (but we don't know where it is) are both grouped
-> into 'can't make progress'. The comment says:
-> | The exception may have been imprecise.
-> because one of those two is imprecise.
->
-> If anyone cares which one is which, they can read the spec.
->
-> I expect this code will one day be replaced with proper kernel-first support,
-> its only here to avoid panic()ing due to corrected errors.
+------=_NextPart_000_000F_01D3AFDB.D359E960
+Content-Type: text/html;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-Ok, thanks for the explanation.
+<html xmlns:v=3D"urn:schemas-microsoft-com:vml" =
+xmlns:o=3D"urn:schemas-microsoft-com:office:office" =
+xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
+xmlns:m=3D"http://schemas.microsoft.com/office/2004/12/omml" =
+xmlns=3D"http://www.w3.org/TR/REC-html40"><head><meta =
+http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Dus-ascii"><meta name=3DGenerator content=3D"Microsoft Word 15 =
+(filtered medium)"><style><!--
+/* Font Definitions */
+@font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+/* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0in;
+	margin-bottom:.0001pt;
+	font-size:11.0pt;
+	font-family:"Calibri",sans-serif;}
+a:link, span.MsoHyperlink
+	{mso-style-priority:99;
+	color:#0563C1;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{mso-style-priority:99;
+	color:#954F72;
+	text-decoration:underline;}
+span.EmailStyle17
+	{mso-style-type:personal-compose;
+	font-family:"Calibri",sans-serif;
+	color:windowtext;}
+.MsoChpDefault
+	{mso-style-type:export-only;
+	font-family:"Calibri",sans-serif;}
+@page WordSection1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.0in 1.0in 1.0in;}
+div.WordSection1
+	{page:WordSection1;}
+--></style><!--[if gte mso 9]><xml>
+<o:shapedefaults v:ext=3D"edit" spidmax=3D"1026" />
+</xml><![endif]--><!--[if gte mso 9]><xml>
+<o:shapelayout v:ext=3D"edit">
+<o:idmap v:ext=3D"edit" data=3D"1" />
+</o:shapelayout></xml><![endif]--></head><body lang=3DEN-US =
+link=3D"#0563C1" vlink=3D"#954F72"><div class=3DWordSection1><p =
+class=3DMsoNormal>Hi,<o:p></o:p></p><p =
+class=3DMsoNormal><o:p>&nbsp;</o:p></p><p class=3DMsoNormal>I hope it is =
+the right forum to post my query.<o:p></o:p></p><p =
+class=3DMsoNormal><o:p>&nbsp;</o:p></p><p class=3DMsoNormal>I am =
+currently looking at the possibility of adding a new VCPU to a running =
+guest VM in KVM/ARM. I see that currently, it is not allowed to add a =
+new VCPU to a guest VM, if it is already initialized. The first check in =
+kvm_arch_vcpu_create() returns failure if it is already =
+initialized.<o:p></o:p></p><p class=3DMsoNormal><o:p>&nbsp;</o:p></p><p =
+class=3DMsoNormal>There was some work done in QEMU to add support for =
+VCPU hotplug: <a =
+href=3D"https://lists.gnu.org/archive/html/qemu-arm/2017-05/msg00404.html=
+">https://lists.gnu.org/archive/html/qemu-arm/2017-05/msg00404.html</a><o=
+:p></o:p></p><p class=3DMsoNormal><o:p>&nbsp;</o:p></p><p =
+class=3DMsoNormal>But I am looking at the KVM side for enabling adding a =
+new VCPU. If you can point me to any relevant work/resources, which I =
+can refer to then it will help me.<o:p></o:p></p><p =
+class=3DMsoNormal><o:p>&nbsp;</o:p></p><p =
+class=3DMsoNormal>Thanks.<o:p></o:p></p><p =
+class=3DMsoNormal><o:p>&nbsp;</o:p></p><p =
+class=3DMsoNormal>Regards,<o:p></o:p></p><p =
+class=3DMsoNormal>Bhupinder<o:p></o:p></p></div></body></html>
+------=_NextPart_000_000F_01D3AFDB.D359E960--
 
 
->
->
-> Thanks,
->
-> James
->
-> [0]
-> https://static.docs.arm.com/ddi0587/a/RAS%20Extension-release%20candidate_march_29.pdf
+--===============1094332515934909775==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============1094332515934909775==--
