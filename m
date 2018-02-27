@@ -1,104 +1,75 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: Re: VCPU hotplug on KVM/ARM
-Date: Tue, 27 Feb 2018 14:21:31 +0100
-Message-ID: <20180227132131.fipafmnb56a7fj76@kamzik.brq.redhat.com>
-References: <000e01d3afad$b9a13830$2ce3a890$@codeaurora.org>
- <20180227104708.GA11391@cbox>
- <ac329e1b1f5265a805916ab4f8708f9d@codeaurora.org>
- <20180227124604.GA2373@cbox>
+Subject: Re: [PATCH v5 13/40] KVM: arm64: Introduce VHE-specific kvm_vcpu_run
+Date: Tue, 27 Feb 2018 14:35:27 +0100
+Message-ID: <20180227133527.efdcaqtpdjpz7gul@kamzik.brq.redhat.com>
+References: <20180227113429.637-1-cdall@kernel.org>
+ <20180227113429.637-14-cdall@kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CA1C040257
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 08:15:13 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fiMPRccqtpAD for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Feb 2018 08:14:48 -0500 (EST)
-Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 38EB84047F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 08:14:48 -0500 (EST)
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <20180227124604.GA2373@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+In-Reply-To: <20180227113429.637-14-cdall@kernel.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: Christoffer Dall <cdall@kernel.org>
-Cc: Christoffer Dall <cdall@cs.columbia.edu>, qemu-devel@nongnu.org, Christoffer Dall <christofferdall@christofferdall.dk>, qemu-arm@nongnu.org, imammedo@redhat.com, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Tomasz Nowicki <tn@semihalf.com>, kvmarm@lists.cs.columbia.edu, Julien Grall <julien.grall@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, linux-arm-kernel@lists.infradead.org, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Feb 27, 2018 at 01:46:04PM +0100, Christoffer Dall wrote:
-> On Tue, Feb 27, 2018 at 05:34:28PM +0530, bthakur@codeaurora.org wrote:
-> > Hi Christoffer,
-> > 
-> > Thanks for your reply.
-> > 
-> > On 2018-02-27 16:17, Christoffer Dall wrote:
-> > >Hi Bhupinder,
-> > >
-> > >On Tue, Feb 27, 2018 at 03:01:17PM +0530, bthakur@codeaurora.org wrote:
-> > >>I hope it is the right forum to post my query.
-> > >>
-> > >>
-> > >>
-> > >>I am currently looking at the possibility of adding a new VCPU to a
-> > >>running
-> > >>guest VM in KVM/ARM. I see that currently, it is not allowed to add a
-> > >>new
-> > >>VCPU to a guest VM, if it is already initialized. The first check in
-> > >>kvm_arch_vcpu_create() returns failure if it is already initialized.
-> > >>
-> > >
-> > >This would require a major rework of a lot of logic surrounding the GIC
-> > >and other parts of KVM initialization.
-> > >
-> > >>
-> > >>
-> > >>There was some work done in QEMU to add support for VCPU hotplug:
-> > >>https://lists.gnu.org/archive/html/qemu-arm/2017-05/msg00404.html
-> > >>
-> > >>
-> > >>
-> > >>But I am looking at the KVM side for enabling adding a new VCPU. If you
-> > >>can
-> > >>point me to any relevant work/resources, which I can refer to then it
-> > >>will
-> > >>help me.
-> > >>
-> > >
-> > >I don't have any specific pointers, but I was always told that the way
-> > >we were going to do CPU hotplug would be to instantiate a large number
-> > >of VCPUs, and hotplug would be equivalent to turning on a VCPU which was
-> > >previously powered off.
-> > >
-> > >Is this not still a feasible solution?
-> > It should be a feasible solution provided the guest VM is not able to
-> > control the onlining/offlining of VCPUs. It should be controlled by the
-> > Host.
-> > 
+On Tue, Feb 27, 2018 at 12:34:02PM +0100, Christoffer Dall wrote:
+> From: Christoffer Dall <christoffer.dall@linaro.org>
 > 
-> KVM could simply refuse to turn on some of the CPUs unless given
-> permission from host userspace.
+> So far this is mostly (see below) a copy of the legacy non-VHE switch
+> function, but we will start reworking these functions in separate
+> directions to work on VHE and non-VHE in the most optimal way in later
+> patches.
 > 
-> > >
-> > >How does VCPU hotplug work on x86?
-> > On x86, you can add a vcpu through libvirt setvcpu command and it shows up
-> > in the guest VM as a new CPU if you do lscpu.
-> > 
+> The only difference after this patch between the VHE and non-VHE run
+> functions is that we omit the branch-predictor variant-2 hardening for
+> QC Falkor CPUs, because this workaround is specific to a series of
+> non-VHE ARMv8.0 CPUs.
 > 
-> Sure, but what is the mechanism, does x86 qemu actually call
-> KVM_CREATE_VCPU, or is this also a question of turning on already
-> created vcpus ?
+> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> ---
+> 
+> Notes:
+>     Changes since v4:
+>      - Unified has_vhe() conditional calls in kvm_arch_vcpu_ioctl_run
+>      - Added isb() on exit path of VHE-specific kvm_vcpu_run(), because
+>        otherwise 32-bit guests can crash the system on reentry to the
+>        guest, because writes to FPEXC32_EL2 will cause a trap at EL2
+>        which leads to a hyp panic.  This can be observed on the model
+>        where writing FPEN to CPACR_EL1 on guest exit doesn't take effect
+>        prior to entering the guest again.
+>     
+>     Changes since v3:
+>      - Added BUG() to 32-bit ARM VHE run function
+>      - Omitted QC Falkor BP Hardening functionality from VHE-specific
+>        function
+>     
+>     Changes since v2:
+>      - Reworded commit message
+>     
+>     Changes since v1:
+>      - Rename kvm_vcpu_run to kvm_vcpu_run_vhe and rename __kvm_vcpu_run to
+>        __kvm_vcpu_run_nvhe
+>      - Removed stray whitespace line
+> 
+>  arch/arm/include/asm/kvm_asm.h    |  5 ++-
+>  arch/arm/kvm/hyp/switch.c         |  2 +-
+>  arch/arm64/include/asm/kvm_asm.h  |  4 ++-
+>  arch/arm64/include/asm/kvm_host.h |  7 +++++
+>  arch/arm64/kvm/hyp/switch.c       | 66 ++++++++++++++++++++++++++++++++++++++-
+>  virt/kvm/arm/arm.c                | 12 ++++---
+>  6 files changed, 87 insertions(+), 9 deletions(-)
 >
 
-CC'ing Igor and qemu-devel
-
-drew
+Reviewed-by: Andrew Jones <drjones@redhat.com>
