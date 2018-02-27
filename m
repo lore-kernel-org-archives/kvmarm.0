@@ -1,217 +1,202 @@
 From: Christoffer Dall <cdall@kernel.org>
-Subject: [PATCH v5 12/40] KVM: arm64: Factor out fault info population and gic
- workarounds
-Date: Tue, 27 Feb 2018 12:34:01 +0100
-Message-ID: <20180227113429.637-13-cdall@kernel.org>
+Subject: [PATCH v5 29/40] KVM: arm64: Prepare to handle deferred save/restore
+ of 32-bit registers
+Date: Tue, 27 Feb 2018 12:34:18 +0100
+Message-ID: <20180227113429.637-30-cdall@kernel.org>
 References: <20180227113429.637-1-cdall@kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AA35349DF7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 06:28:28 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IQB69EBbJZvA for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Feb 2018 06:28:06 -0500 (EST)
-Received: from mail-wm0-f65.google.com (mail-wm0-f65.google.com [74.125.82.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 61E5C49E02
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 06:27:57 -0500 (EST)
-Received: by mail-wm0-f65.google.com with SMTP id q83so23500122wme.5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 03:34:50 -0800 (PST)
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <20180227113429.637-1-cdall@kernel.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
+Cc: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Tomasz Nowicki <tn@semihalf.com>, Julien Grall <julien.grall@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Christoffer Dall <christoffer.dall@linaro.org>
 
-The current world-switch function has functionality to detect a number
-of cases where we need to fixup some part of the exit condition and
-possibly run the guest again, before having restored the host state.
-
-This includes populating missing fault info, emulating GICv2 CPU
-interface accesses when mapped at unaligned addresses, and emulating
-the GICv3 CPU interface on systems that need it.
-
-As we are about to have an alternative switch function for VHE systems,
-but VHE systems still need the same early fixup logic, factor out this
-logic into a separate function that can be shared by both switch
-functions.
-
-No functional change.
+32-bit registers are not used by a 64-bit host kernel and can be
+deferred, but we need to rework the accesses to these register to access
+the latest values depending on whether or not guest system registers are
+loaded on the CPU or only reside in memory.
 
 Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 Reviewed-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/kvm/hyp/switch.c | 104 ++++++++++++++++++++++++--------------------
- 1 file changed, 57 insertions(+), 47 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 35f3bbe17084..b055111df1a1 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -291,53 +291,27 @@ static bool __hyp_text __skip_instr(struct kvm_vcpu *vcpu)
- 	}
+Notes:
+    Changes since v4:
+     - Fixed typos in commit message
+     - Moved change to read/write sysreg to the following patch as
+       suggested by Drew
+    
+    Changes since v3:
+     - Don't also try to write hardware spsr when sysregs are not loaded
+     - Adapted patch to use switch-based sysreg save/restore approach
+     - (Kept additional BUG_ON() in vcpu_read_spsr32() to keep the compiler happy)
+    
+    Changes since v2:
+     - New patch (deferred register handling has been reworked)
+
+ arch/arm64/include/asm/kvm_emulate.h | 32 +++++------------
+ arch/arm64/kvm/regmap.c              | 67 +++++++++++++++++++++++++++---------
+ 2 files changed, 59 insertions(+), 40 deletions(-)
+
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 6ed18ce0d638..23b33e8ea03a 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -33,7 +33,8 @@
+ #include <asm/virt.h>
+ 
+ unsigned long *vcpu_reg32(const struct kvm_vcpu *vcpu, u8 reg_num);
+-unsigned long *vcpu_spsr32(const struct kvm_vcpu *vcpu);
++unsigned long vcpu_read_spsr32(const struct kvm_vcpu *vcpu);
++void vcpu_write_spsr32(struct kvm_vcpu *vcpu, unsigned long v);
+ 
+ bool kvm_condition_valid32(const struct kvm_vcpu *vcpu);
+ void kvm_skip_instr32(struct kvm_vcpu *vcpu, bool is_wide_instr);
+@@ -162,41 +163,26 @@ static inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
+ 
+ static inline unsigned long vcpu_read_spsr(const struct kvm_vcpu *vcpu)
+ {
+-	unsigned long *p = (unsigned long *)&vcpu_gp_regs(vcpu)->spsr[KVM_SPSR_EL1];
+-
+-	if (vcpu_mode_is_32bit(vcpu)) {
+-		unsigned long *p_32bit = vcpu_spsr32(vcpu);
+-
+-		/* KVM_SPSR_SVC aliases KVM_SPSR_EL1 */
+-		if (p_32bit != p)
+-			return *p_32bit;
+-	}
++	if (vcpu_mode_is_32bit(vcpu))
++		return vcpu_read_spsr32(vcpu);
+ 
+ 	if (vcpu->arch.sysregs_loaded_on_cpu)
+ 		return read_sysreg_el1(spsr);
+ 	else
+-		return *p;
++		return vcpu_gp_regs(vcpu)->spsr[KVM_SPSR_EL1];
  }
  
--int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
-+/*
-+ * Return true when we were able to fixup the guest exit and should return to
-+ * the guest, false when we should restore the host state and return to the
-+ * main run loop.
-+ */
-+static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+-static inline void vcpu_write_spsr(const struct kvm_vcpu *vcpu, unsigned long v)
++static inline void vcpu_write_spsr(struct kvm_vcpu *vcpu, unsigned long v)
  {
--	struct kvm_cpu_context *host_ctxt;
--	struct kvm_cpu_context *guest_ctxt;
--	bool fp_enabled;
--	u64 exit_code;
+-	unsigned long *p = (unsigned long *)&vcpu_gp_regs(vcpu)->spsr[KVM_SPSR_EL1];
 -
--	vcpu = kern_hyp_va(vcpu);
+-	/* KVM_SPSR_SVC aliases KVM_SPSR_EL1 */
+ 	if (vcpu_mode_is_32bit(vcpu)) {
+-		unsigned long *p_32bit = vcpu_spsr32(vcpu);
 -
--	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
--	host_ctxt->__hyp_running_vcpu = vcpu;
--	guest_ctxt = &vcpu->arch.ctxt;
--
--	__sysreg_save_host_state(host_ctxt);
--
--	__activate_traps(vcpu);
--	__activate_vm(vcpu);
--
--	__vgic_restore_state(vcpu);
--	__timer_enable_traps(vcpu);
--
--	/*
--	 * We must restore the 32-bit state before the sysregs, thanks
--	 * to erratum #852523 (Cortex-A57) or #853709 (Cortex-A72).
--	 */
--	__sysreg32_restore_state(vcpu);
--	__sysreg_restore_guest_state(guest_ctxt);
--	__debug_switch_to_guest(vcpu);
--
--	/* Jump in the fire! */
--again:
--	exit_code = __guest_enter(vcpu, host_ctxt);
--	/* And we're baaack! */
--
--	if (ARM_EXCEPTION_CODE(exit_code) != ARM_EXCEPTION_IRQ)
-+	if (ARM_EXCEPTION_CODE(*exit_code) != ARM_EXCEPTION_IRQ)
- 		vcpu->arch.fault.esr_el2 = read_sysreg_el2(esr);
-+
- 	/*
- 	 * We're using the raw exception code in order to only process
- 	 * the trap if no SError is pending. We will come back to the
- 	 * same PC once the SError has been injected, and replay the
- 	 * trapping instruction.
- 	 */
--	if (exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
--		goto again;
-+	if (*exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
-+		return true;
- 
- 	if (static_branch_unlikely(&vgic_v2_cpuif_trap) &&
--	    exit_code == ARM_EXCEPTION_TRAP) {
-+	    *exit_code == ARM_EXCEPTION_TRAP) {
- 		bool valid;
- 
- 		valid = kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_DABT_LOW &&
-@@ -351,9 +325,9 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 
- 			if (ret == 1) {
- 				if (__skip_instr(vcpu))
--					goto again;
-+					return true;
- 				else
--					exit_code = ARM_EXCEPTION_TRAP;
-+					*exit_code = ARM_EXCEPTION_TRAP;
- 			}
- 
- 			if (ret == -1) {
-@@ -365,29 +339,65 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 				 */
- 				if (!__skip_instr(vcpu))
- 					*vcpu_cpsr(vcpu) &= ~DBG_SPSR_SS;
--				exit_code = ARM_EXCEPTION_EL1_SERROR;
-+				*exit_code = ARM_EXCEPTION_EL1_SERROR;
- 			}
--
--			/* 0 falls through to be handler out of EL2 */
- 		}
+-		/* KVM_SPSR_SVC aliases KVM_SPSR_EL1 */
+-		if (p_32bit != p) {
+-			*p_32bit = v;
+-			return;
+-		}
++		vcpu_write_spsr32(vcpu, v);
++		return;
  	}
  
- 	if (static_branch_unlikely(&vgic_v3_cpuif_trap) &&
--	    exit_code == ARM_EXCEPTION_TRAP &&
-+	    *exit_code == ARM_EXCEPTION_TRAP &&
- 	    (kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_SYS64 ||
- 	     kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_CP15_32)) {
- 		int ret = __vgic_v3_perform_cpuif_access(vcpu);
+ 	if (vcpu->arch.sysregs_loaded_on_cpu)
+ 		write_sysreg_el1(v, spsr);
+ 	else
+-		*p = v;
++		vcpu_gp_regs(vcpu)->spsr[KVM_SPSR_EL1] = v;
+ }
  
- 		if (ret == 1) {
- 			if (__skip_instr(vcpu))
--				goto again;
-+				return true;
- 			else
--				exit_code = ARM_EXCEPTION_TRAP;
-+				*exit_code = ARM_EXCEPTION_TRAP;
- 		}
--
--		/* 0 falls through to be handled out of EL2 */
- 	}
- 
-+	/* Return to the host kernel and handle the exit */
-+	return false;
+ static inline bool vcpu_mode_priv(const struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/regmap.c b/arch/arm64/kvm/regmap.c
+index bbc6ae32e4af..eefe403a2e63 100644
+--- a/arch/arm64/kvm/regmap.c
++++ b/arch/arm64/kvm/regmap.c
+@@ -141,28 +141,61 @@ unsigned long *vcpu_reg32(const struct kvm_vcpu *vcpu, u8 reg_num)
+ /*
+  * Return the SPSR for the current mode of the virtual CPU.
+  */
+-unsigned long *vcpu_spsr32(const struct kvm_vcpu *vcpu)
++static int vcpu_spsr32_mode(const struct kvm_vcpu *vcpu)
+ {
+ 	unsigned long mode = *vcpu_cpsr(vcpu) & COMPAT_PSR_MODE_MASK;
+ 	switch (mode) {
+-	case COMPAT_PSR_MODE_SVC:
+-		mode = KVM_SPSR_SVC;
+-		break;
+-	case COMPAT_PSR_MODE_ABT:
+-		mode = KVM_SPSR_ABT;
+-		break;
+-	case COMPAT_PSR_MODE_UND:
+-		mode = KVM_SPSR_UND;
+-		break;
+-	case COMPAT_PSR_MODE_IRQ:
+-		mode = KVM_SPSR_IRQ;
+-		break;
+-	case COMPAT_PSR_MODE_FIQ:
+-		mode = KVM_SPSR_FIQ;
+-		break;
++	case COMPAT_PSR_MODE_SVC: return KVM_SPSR_SVC;
++	case COMPAT_PSR_MODE_ABT: return KVM_SPSR_ABT;
++	case COMPAT_PSR_MODE_UND: return KVM_SPSR_UND;
++	case COMPAT_PSR_MODE_IRQ: return KVM_SPSR_IRQ;
++	case COMPAT_PSR_MODE_FIQ: return KVM_SPSR_FIQ;
++	default: BUG();
++	}
 +}
 +
-+int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
++unsigned long vcpu_read_spsr32(const struct kvm_vcpu *vcpu)
 +{
-+	struct kvm_cpu_context *host_ctxt;
-+	struct kvm_cpu_context *guest_ctxt;
-+	bool fp_enabled;
-+	u64 exit_code;
++	int spsr_idx = vcpu_spsr32_mode(vcpu);
 +
-+	vcpu = kern_hyp_va(vcpu);
++	if (!vcpu->arch.sysregs_loaded_on_cpu)
++		return vcpu_gp_regs(vcpu)->spsr[spsr_idx];
 +
-+	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-+	host_ctxt->__hyp_running_vcpu = vcpu;
-+	guest_ctxt = &vcpu->arch.ctxt;
++	switch (spsr_idx) {
++	case KVM_SPSR_SVC:
++		return read_sysreg_el1(spsr);
++	case KVM_SPSR_ABT:
++		return read_sysreg(spsr_abt);
++	case KVM_SPSR_UND:
++		return read_sysreg(spsr_und);
++	case KVM_SPSR_IRQ:
++		return read_sysreg(spsr_irq);
++	case KVM_SPSR_FIQ:
++		return read_sysreg(spsr_fiq);
+ 	default:
+ 		BUG();
+ 	}
++}
 +
-+	__sysreg_save_host_state(host_ctxt);
++void vcpu_write_spsr32(struct kvm_vcpu *vcpu, unsigned long v)
++{
++	int spsr_idx = vcpu_spsr32_mode(vcpu);
 +
-+	__activate_traps(vcpu);
-+	__activate_vm(vcpu);
-+
-+	__vgic_restore_state(vcpu);
-+	__timer_enable_traps(vcpu);
-+
-+	/*
-+	 * We must restore the 32-bit state before the sysregs, thanks
-+	 * to erratum #852523 (Cortex-A57) or #853709 (Cortex-A72).
-+	 */
-+	__sysreg32_restore_state(vcpu);
-+	__sysreg_restore_guest_state(guest_ctxt);
-+	__debug_switch_to_guest(vcpu);
-+
-+	do {
-+		/* Jump in the fire! */
-+		exit_code = __guest_enter(vcpu, host_ctxt);
-+
-+		/* And we're baaack! */
-+	} while (fixup_guest_exit(vcpu, &exit_code));
-+
- 	if (cpus_have_const_cap(ARM64_HARDEN_BP_POST_GUEST_EXIT)) {
- 		u32 midr = read_cpuid_id();
++	if (!vcpu->arch.sysregs_loaded_on_cpu) {
++		vcpu_gp_regs(vcpu)->spsr[spsr_idx] = v;
++		return;
++	}
  
+-	return (unsigned long *)&vcpu_gp_regs(vcpu)->spsr[mode];
++	switch (spsr_idx) {
++	case KVM_SPSR_SVC:
++		write_sysreg_el1(v, spsr);
++	case KVM_SPSR_ABT:
++		write_sysreg(v, spsr_abt);
++	case KVM_SPSR_UND:
++		write_sysreg(v, spsr_und);
++	case KVM_SPSR_IRQ:
++		write_sysreg(v, spsr_irq);
++	case KVM_SPSR_FIQ:
++		write_sysreg(v, spsr_fiq);
++	}
+ }
 -- 
 2.14.2
