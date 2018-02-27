@@ -1,25 +1,25 @@
 From: Christoffer Dall <cdall@kernel.org>
-Subject: [PATCH v5 05/40] KVM: arm64: Move HCR_INT_OVERRIDE to default HCR_EL2
- guest flag
-Date: Tue, 27 Feb 2018 12:33:54 +0100
-Message-ID: <20180227113429.637-6-cdall@kernel.org>
+Subject: [PATCH v5 09/40] KVM: arm64: Move debug dirty flag calculation out of
+ world switch
+Date: Tue, 27 Feb 2018 12:33:58 +0100
+Message-ID: <20180227113429.637-10-cdall@kernel.org>
 References: <20180227113429.637-1-cdall@kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 16EC14085B
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 29D7340257
  for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 06:28:26 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id frOoJ82XueB8 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Feb 2018 06:28:02 -0500 (EST)
-Received: from mail-wm0-f65.google.com (mail-wm0-f65.google.com [74.125.82.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4AE3849DE2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 06:27:47 -0500 (EST)
-Received: by mail-wm0-f65.google.com with SMTP id z81so23371261wmb.4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 03:34:40 -0800 (PST)
+ with ESMTP id SuL+FBs7MlJK for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 27 Feb 2018 06:28:04 -0500 (EST)
+Received: from mail-wm0-f66.google.com (mail-wm0-f66.google.com [74.125.82.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2E91249DFD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 06:27:53 -0500 (EST)
+Received: by mail-wm0-f66.google.com with SMTP id 188so22534744wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 03:34:46 -0800 (PST)
 In-Reply-To: <20180227113429.637-1-cdall@kernel.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,69 +34,54 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Shih-Wei Li <shihwei@cs.columbia.edu>
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
-We always set the IMO and FMO bits in the HCR_EL2 when running the
-guest, regardless if we use the vgic or not.  By moving these flags to
-HCR_GUEST_FLAGS we can avoid one of the extra save/restore operations of
-HCR_EL2 in the world switch code, and we can also soon get rid of the
-other one.
+There is no need to figure out inside the world-switch if we should
+save/restore the debug registers or not, we might as well do that in the
+higher level debug setup code, making it easier to optimize down the
+line.
 
-This is safe, because even though the IMO and FMO bits control both
-taking the interrupts to EL2 and remapping ICC_*_EL1 to ICV_*_EL1 when
-executed at EL1, as long as we ensure that these bits are clear when
-running the EL1 host, we're OK, because we reset the HCR_EL2 to only
-have the HCR_RW bit set when returning to EL1 on non-VHE systems.
-
+Reviewed-by: Julien Thierry <julien.thierry@arm.com>
 Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Shih-Wei Li <shihwei@cs.columbia.edu>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
+ arch/arm64/kvm/debug.c        | 5 +++++
+ arch/arm64/kvm/hyp/debug-sr.c | 6 ------
+ 2 files changed, 5 insertions(+), 6 deletions(-)
 
-Notes:
-    Changes since v3:
-     - Slightly reworded the commit message
-
- arch/arm64/include/asm/kvm_arm.h | 4 ++--
- arch/arm64/kvm/hyp/switch.c      | 3 ---
- 2 files changed, 2 insertions(+), 5 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 1b438c334463..6dd285e979c9 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -83,9 +83,9 @@
-  */
- #define HCR_GUEST_FLAGS (HCR_TSC | HCR_TSW | HCR_TWE | HCR_TWI | HCR_VM | \
- 			 HCR_TVM | HCR_BSU_IS | HCR_FB | HCR_TAC | \
--			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR)
-+			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
-+			 HCR_FMO | HCR_IMO)
- #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
--#define HCR_INT_OVERRIDE   (HCR_FMO | HCR_IMO)
- #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
+diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+index fa63b28c65e0..feedb877cff8 100644
+--- a/arch/arm64/kvm/debug.c
++++ b/arch/arm64/kvm/debug.c
+@@ -193,6 +193,11 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+ 	if (trap_debug)
+ 		vcpu->arch.mdcr_el2 |= MDCR_EL2_TDA;
  
- /* TCR_EL2 Registers bits */
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 579d9a263853..4117717548b0 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -174,8 +174,6 @@ static void __hyp_text __vgic_save_state(struct kvm_vcpu *vcpu)
- 		__vgic_v3_save_state(vcpu);
- 	else
- 		__vgic_v2_save_state(vcpu);
--
--	write_sysreg(read_sysreg(hcr_el2) & ~HCR_INT_OVERRIDE, hcr_el2);
++	/* If KDE or MDE are set, perform a full save/restore cycle. */
++	if ((vcpu_sys_reg(vcpu, MDSCR_EL1) & DBG_MDSCR_KDE) ||
++	    (vcpu_sys_reg(vcpu, MDSCR_EL1) & DBG_MDSCR_MDE))
++		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
++
+ 	trace_kvm_arm_set_dreg32("MDCR_EL2", vcpu->arch.mdcr_el2);
+ 	trace_kvm_arm_set_dreg32("MDSCR_EL1", vcpu_sys_reg(vcpu, MDSCR_EL1));
  }
+diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
+index dabb5cc7b087..d958cd63a547 100644
+--- a/arch/arm64/kvm/hyp/debug-sr.c
++++ b/arch/arm64/kvm/hyp/debug-sr.c
+@@ -166,12 +166,6 @@ void __hyp_text __debug_restore_state(struct kvm_vcpu *vcpu,
  
- static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
-@@ -183,7 +181,6 @@ static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
- 	u64 val;
- 
- 	val = read_sysreg(hcr_el2);
--	val |= 	HCR_INT_OVERRIDE;
- 	val |= vcpu->arch.irq_lines;
- 	write_sysreg(val, hcr_el2);
- 
+ void __hyp_text __debug_cond_save_host_state(struct kvm_vcpu *vcpu)
+ {
+-	/* If any of KDE, MDE or KVM_ARM64_DEBUG_DIRTY is set, perform
+-	 * a full save/restore cycle. */
+-	if ((vcpu->arch.ctxt.sys_regs[MDSCR_EL1] & DBG_MDSCR_KDE) ||
+-	    (vcpu->arch.ctxt.sys_regs[MDSCR_EL1] & DBG_MDSCR_MDE))
+-		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
+-
+ 	__debug_save_state(vcpu, &vcpu->arch.host_debug_state.regs,
+ 			   kern_hyp_va(vcpu->arch.host_cpu_context));
+ 	__debug_save_spe()(&vcpu->arch.host_debug_state.pmscr_el1);
 -- 
 2.14.2
