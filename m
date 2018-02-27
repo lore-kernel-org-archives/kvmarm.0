@@ -1,26 +1,24 @@
-From: Christoffer Dall <cdall@kernel.org>
-Subject: [PATCH v5 37/40] KVM: arm/arm64: Move arm64-only vgic-v2-sr.c file to
- arm64
-Date: Tue, 27 Feb 2018 12:34:26 +0100
-Message-ID: <20180227113429.637-38-cdall@kernel.org>
-References: <20180227113429.637-1-cdall@kernel.org>
+From: bthakur@codeaurora.org
+Subject: Re: VCPU hotplug on KVM/ARM
+Date: Tue, 27 Feb 2018 17:34:28 +0530
+Message-ID: <ac329e1b1f5265a805916ab4f8708f9d@codeaurora.org>
+References: <000e01d3afad$b9a13830$2ce3a890$@codeaurora.org>
+ <20180227104708.GA11391@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F290649DFB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 06:34:06 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A7E2540257
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 06:57:58 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id s1YEjnqS6bTe for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Feb 2018 06:33:29 -0500 (EST)
-Received: from mail-wm0-f67.google.com (mail-wm0-f67.google.com [74.125.82.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BE4F449DE2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 06:28:31 -0500 (EST)
-Received: by mail-wm0-f67.google.com with SMTP id q83so23503695wme.5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 03:35:25 -0800 (PST)
-In-Reply-To: <20180227113429.637-1-cdall@kernel.org>
+ with ESMTP id anE79hWLht2h for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 27 Feb 2018 06:57:37 -0500 (EST)
+Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4EC224017F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 06:57:37 -0500 (EST)
+In-Reply-To: <20180227104708.GA11391@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,83 +28,66 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
+To: Christoffer Dall <cdall@cs.columbia.edu>
+Cc: Christoffer Dall <christofferdall@christofferdall.dk>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+Hi Christoffer,
 
-The vgic-v2-sr.c file now only contains the logic to replay unaligned
-accesses to the virtual CPU interface on 16K and 64K page systems, which
-is only relevant on 64-bit platforms.  Therefore move this file to the
-arm64 KVM tree, remove the compile directive from the 32-bit side
-makefile, and remove the ifdef in the C file.
+Thanks for your reply.
 
-Since this file also no longer saves/restores anything, rename the file
-to vgic-v2-cpuif-proxy.c to more accurately describe the logic in this
-file.
+On 2018-02-27 16:17, Christoffer Dall wrote:
+> Hi Bhupinder,
+> 
+> On Tue, Feb 27, 2018 at 03:01:17PM +0530, bthakur@codeaurora.org wrote:
+>> I hope it is the right forum to post my query.
+>> 
+>> 
+>> 
+>> I am currently looking at the possibility of adding a new VCPU to a 
+>> running
+>> guest VM in KVM/ARM. I see that currently, it is not allowed to add a 
+>> new
+>> VCPU to a guest VM, if it is already initialized. The first check in
+>> kvm_arch_vcpu_create() returns failure if it is already initialized.
+>> 
+> 
+> This would require a major rework of a lot of logic surrounding the GIC
+> and other parts of KVM initialization.
+> 
+>> 
+>> 
+>> There was some work done in QEMU to add support for VCPU hotplug:
+>> https://lists.gnu.org/archive/html/qemu-arm/2017-05/msg00404.html
+>> 
+>> 
+>> 
+>> But I am looking at the KVM side for enabling adding a new VCPU. If 
+>> you can
+>> point me to any relevant work/resources, which I can refer to then it 
+>> will
+>> help me.
+>> 
+> 
+> I don't have any specific pointers, but I was always told that the way
+> we were going to do CPU hotplug would be to instantiate a large number
+> of VCPUs, and hotplug would be equivalent to turning on a VCPU which 
+> was
+> previously powered off.
+> 
+> Is this not still a feasible solution?
+It should be a feasible solution provided the guest VM is not able to 
+control the onlining/offlining of VCPUs. It should be controlled by the 
+Host.
 
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
+> 
+> How does VCPU hotplug work on x86?
+On x86, you can add a vcpu through libvirt setvcpu command and it shows 
+up in the guest VM as a new CPU if you do lscpu.
 
-Notes:
-    Changes since v4:
-     - Renamed file to vgic-v2-cpuif-proxy.c as suggested by Marc.
+> 
+> Thanks,
+> -Christoffer
 
- arch/arm/kvm/hyp/Makefile                                               | 1 -
- arch/arm64/kvm/hyp/Makefile                                             | 2 +-
- .../arm/hyp/vgic-v2-sr.c => arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c    | 2 --
- 3 files changed, 1 insertion(+), 4 deletions(-)
- rename virt/kvm/arm/hyp/vgic-v2-sr.c => arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c (98%)
-
-diff --git a/arch/arm/kvm/hyp/Makefile b/arch/arm/kvm/hyp/Makefile
-index 5638ce0c9524..1964111c984a 100644
---- a/arch/arm/kvm/hyp/Makefile
-+++ b/arch/arm/kvm/hyp/Makefile
-@@ -7,7 +7,6 @@ ccflags-y += -fno-stack-protector -DDISABLE_BRANCH_PROFILING
- 
- KVM=../../../../virt/kvm
- 
--obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v2-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v3-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/timer-sr.o
- 
-diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
-index f04400d494b7..4313f7475333 100644
---- a/arch/arm64/kvm/hyp/Makefile
-+++ b/arch/arm64/kvm/hyp/Makefile
-@@ -7,10 +7,10 @@ ccflags-y += -fno-stack-protector -DDISABLE_BRANCH_PROFILING
- 
- KVM=../../../../virt/kvm
- 
--obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v2-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v3-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/timer-sr.o
- 
-+obj-$(CONFIG_KVM_ARM_HOST) += vgic-v2-cpuif-proxy.o
- obj-$(CONFIG_KVM_ARM_HOST) += sysreg-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += debug-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += entry.o
-diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-similarity index 98%
-rename from virt/kvm/arm/hyp/vgic-v2-sr.c
-rename to arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-index 0bbafdfd4adb..97f357ea9c72 100644
---- a/virt/kvm/arm/hyp/vgic-v2-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-@@ -23,7 +23,6 @@
- #include <asm/kvm_hyp.h>
- #include <asm/kvm_mmu.h>
- 
--#ifdef CONFIG_ARM64
- /*
-  * __vgic_v2_perform_cpuif_access -- perform a GICV access on behalf of the
-  *				     guest.
-@@ -77,4 +76,3 @@ int __hyp_text __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
- 
- 	return 1;
- }
--#endif
--- 
-2.14.2
+Regards,
+Bhupinder
