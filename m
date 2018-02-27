@@ -1,75 +1,84 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v5 13/40] KVM: arm64: Introduce VHE-specific kvm_vcpu_run
-Date: Tue, 27 Feb 2018 14:35:27 +0100
-Message-ID: <20180227133527.efdcaqtpdjpz7gul@kamzik.brq.redhat.com>
-References: <20180227113429.637-1-cdall@kernel.org>
- <20180227113429.637-14-cdall@kernel.org>
+From: "Michael S. Tsirkin" <mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 1/4] iommu: Add virtio-iommu driver
+Date: Tue, 27 Feb 2018 16:47:22 +0200
+Message-ID: <20180227164510-mutt-send-email-mst@kernel.org>
+References: <20180214145340.1223-2-jean-philippe.brucker@arm.com>
+	<201802220455.lMEb6LLi%fengguang.wu@intel.com>
+	<e5ffc52f-4510-f757-aa83-2a99af3ae06b@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <20180227113429.637-14-cdall@kernel.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Christoffer Dall <cdall@kernel.org>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Tomasz Nowicki <tn@semihalf.com>, kvmarm@lists.cs.columbia.edu, Julien Grall <julien.grall@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, linux-arm-kernel@lists.infradead.org, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
+In-Reply-To: <e5ffc52f-4510-f757-aa83-2a99af3ae06b-5wv7dgnIgG8@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
+Cc: "kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Will Deacon <Will.Deacon-5wv7dgnIgG8@public.gmane.org>, "virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, "tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org" <tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>, "jintack-eQaUEPhvms7ENvBUuze7eA@public.gmane.org" <jintack-eQaUEPhvms7ENvBUuze7eA@public.gmane.org>, "eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org" <eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, "virtio-dev-sDuHXQ4OtrM4h7I2RyI4rWD2FQJk+8+b@public.gmane.org" <virtio-dev-sDuHXQ4OtrM4h7I2RyI4rWD2FQJk+8+b@public.gmane.org>, "jayachandran.nair-YGCgFSpz5w/QT0dZR+AlfA@public.gmane.org" <jayachandran.nair-YGCgFSpz5w/QT0dZR+AlfA@public.gmane.org>, kbuild test robot <lkp-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, "kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org" <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>, Marc Zyngier <Marc.Zyngier-5wv7dgnIgG8@public.gmane.org>, "iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, "kbuild-all-JC7UmRfGjtg@public.gmane.org" <kbuild-all-JC7UmRfGjtg@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Feb 27, 2018 at 12:34:02PM +0100, Christoffer Dall wrote:
-> From: Christoffer Dall <christoffer.dall@linaro.org>
+On Thu, Feb 22, 2018 at 11:04:30AM +0000, Jean-Philippe Brucker wrote:
+> On 21/02/18 20:12, kbuild test robot wrote:
+> [...]
+> > config: arm64-allmodconfig (attached as .config)
+> [...]
+> >    aarch64-linux-gnu-ld: arch/arm64/kernel/head.o: relocation R_AARCH64_ABS32 against `_kernel_offset_le_lo32' can not be used when making a shared object
+> >    arch/arm64/kernel/head.o: In function `kimage_vaddr':
+> >    (.idmap.text+0x0): dangerous relocation: unsupported relocation
 > 
-> So far this is mostly (see below) a copy of the legacy non-VHE switch
-> function, but we will start reworking these functions in separate
-> directions to work on VHE and non-VHE in the most optimal way in later
-> patches.
+> Is this related?
 > 
-> The only difference after this patch between the VHE and non-VHE run
-> functions is that we omit the branch-predictor variant-2 hardening for
-> QC Falkor CPUs, because this workaround is specific to a series of
-> non-VHE ARMv8.0 CPUs.
+> >    arch/arm64/kernel/head.o: In function `__primary_switch':
+> >    (.idmap.text+0x340): dangerous relocation: unsupported relocation
+> >    (.idmap.text+0x348): dangerous relocation: unsupported relocation
+> >    drivers/iommu/virtio-iommu.o: In function `viommu_probe':
+> >    virtio-iommu.c:(.text+0xbdc): undefined reference to `virtio_check_driver_offered_feature'
+> >    virtio-iommu.c:(.text+0xcfc): undefined reference to `virtio_check_driver_offered_feature'
+> >    virtio-iommu.c:(.text+0xe10): undefined reference to `virtio_check_driver_offered_feature'
+> >    drivers/iommu/virtio-iommu.o: In function `viommu_send_reqs_sync':
+> >    virtio-iommu.c:(.text+0x130c): undefined reference to `virtqueue_add_sgs'
+> >    virtio-iommu.c:(.text+0x1398): undefined reference to `virtqueue_kick'
+> >    virtio-iommu.c:(.text+0x14d4): undefined reference to `virtqueue_get_buf'
+> >    drivers/iommu/virtio-iommu.o: In function `virtio_iommu_drv_init':
+> >    virtio-iommu.c:(.init.text+0x1c): undefined reference to `register_virtio_driver'
+> >    drivers/iommu/virtio-iommu.o: In function `virtio_iommu_drv_exit':
+> >>> virtio-iommu.c:(.exit.text+0x14): undefined reference to `unregister_virtio_driver'
 > 
-> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> ---
+> Right. At the moment CONFIG_VIRTIO_IOMMU is a bool instead of tristate,
+> because the IOMMU subsystem isn't entirely ready to have IOMMU drivers
+> built as modules. In addition to exporting symbols it would also needs to
+> hold off probing endpoints behind the IOMMU until the IOMMU driver is
+> loaded. At the moment (I think) it gives up once userspace is reached (see
+> of_iommu_driver_present).
 > 
-> Notes:
->     Changes since v4:
->      - Unified has_vhe() conditional calls in kvm_arch_vcpu_ioctl_run
->      - Added isb() on exit path of VHE-specific kvm_vcpu_run(), because
->        otherwise 32-bit guests can crash the system on reentry to the
->        guest, because writes to FPEXC32_EL2 will cause a trap at EL2
->        which leads to a hyp panic.  This can be observed on the model
->        where writing FPEN to CPACR_EL1 on guest exit doesn't take effect
->        prior to entering the guest again.
->     
->     Changes since v3:
->      - Added BUG() to 32-bit ARM VHE run function
->      - Omitted QC Falkor BP Hardening functionality from VHE-specific
->        function
->     
->     Changes since v2:
->      - Reworded commit message
->     
->     Changes since v1:
->      - Rename kvm_vcpu_run to kvm_vcpu_run_vhe and rename __kvm_vcpu_run to
->        __kvm_vcpu_run_nvhe
->      - Removed stray whitespace line
+> The above report is due to VIRTIO=m and VIRTIO_IOMMU=y. To solve it we could:
 > 
->  arch/arm/include/asm/kvm_asm.h    |  5 ++-
->  arch/arm/kvm/hyp/switch.c         |  2 +-
->  arch/arm64/include/asm/kvm_asm.h  |  4 ++-
->  arch/arm64/include/asm/kvm_host.h |  7 +++++
->  arch/arm64/kvm/hyp/switch.c       | 66 ++++++++++++++++++++++++++++++++++++++-
->  virt/kvm/arm/arm.c                | 12 ++++---
->  6 files changed, 87 insertions(+), 9 deletions(-)
->
+> a) Allow VIRTIO_IOMMU to be built as module by exporting a dozen IOMMU
+> symbols. It would be a lie. The driver wouldn't be usable because of the
+> probe issue discussed above, but it would build.
+> 
+> b) Actually make any IOMMU driver work as module. Whilst it would
+> certainly be a nice feature, it's a bigger problem and I don't think it
+> has its place in this series.
+> 
+> c) Make VIRTIO_IOMMU depend on VIRTIO_MMIO=y instead of VIRTIO_MMIO, which
+> I think is the sanest for now (and does work), even though distro kernels
+> probably all have VIRTIO=m.
+> 
+> I prefer doing c) now and experiment with b) once I got some time.
+> 
+> Thanks,
+> Jean
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+It kind of means it's a toy for now though. So fine as long
+as it's out of tree.
+
+-- 
+MST
