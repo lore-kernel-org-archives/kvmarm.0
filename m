@@ -1,24 +1,24 @@
 From: Christoffer Dall <cdall@kernel.org>
-Subject: [PATCH v5 06/40] KVM: arm/arm64: Get rid of vcpu->arch.irq_lines
-Date: Tue, 27 Feb 2018 12:33:55 +0100
-Message-ID: <20180227113429.637-7-cdall@kernel.org>
+Subject: [PATCH v5 08/40] KVM: arm/arm64: Introduce vcpu_el1_is_32bit
+Date: Tue, 27 Feb 2018 12:33:57 +0100
+Message-ID: <20180227113429.637-9-cdall@kernel.org>
 References: <20180227113429.637-1-cdall@kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 02A4349F62
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1840649DF7
  for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 06:28:25 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id k4W+liKaXY7f for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id yPBAlINezdJX for <kvmarm@lists.cs.columbia.edu>;
  Tue, 27 Feb 2018 06:28:02 -0500 (EST)
-Received: from mail-wm0-f67.google.com (mail-wm0-f67.google.com [74.125.82.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D0C0449DF7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 06:27:48 -0500 (EST)
-Received: by mail-wm0-f67.google.com with SMTP id t3so23398372wmc.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 03:34:42 -0800 (PST)
+Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B43A049DFC
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 06:27:51 -0500 (EST)
+Received: by mail-wm0-f68.google.com with SMTP id z9so23017040wmb.3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 03:34:44 -0800 (PST)
 In-Reply-To: <20180227113429.637-1-cdall@kernel.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,221 +35,155 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Christoffer Dall <christoffer.dall@linaro.org>
 
-We currently have a separate read-modify-write of the HCR_EL2 on entry
-to the guest for the sole purpose of setting the VF and VI bits, if set.
-Since this is most rarely the case (only when using userspace IRQ chip
-and interrupts are in flight), let's get rid of this operation and
-instead modify the bits in the vcpu->arch.hcr[_el2] directly when
-needed.
+We have numerous checks around that checks if the HCR_EL2 has the RW bit
+set to figure out if we're running an AArch64 or AArch32 VM.  In some
+cases, directly checking the RW bit (given its unintuitive name), is a
+bit confusing, and that's not going to improve as we move logic around
+for the following patches that optimize KVM on AArch64 hosts with VHE.
 
+Therefore, introduce a helper, vcpu_el1_is_32bit, and replace existing
+direct checks of HCR_EL2.RW with the helper.
+
+Reviewed-by: Julien Grall <julien.grall@arm.com>
+Reviewed-by: Julien Thierry <julien.thierry@arm.com>
 Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 Reviewed-by: Andrew Jones <drjones@redhat.com>
-Reviewed-by: Julien Thierry <julien.thierry@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm/include/asm/kvm_emulate.h   |  9 ++-------
- arch/arm/include/asm/kvm_host.h      |  3 ---
- arch/arm/kvm/emulate.c               |  2 +-
- arch/arm/kvm/hyp/switch.c            |  2 +-
- arch/arm64/include/asm/kvm_emulate.h |  9 ++-------
- arch/arm64/include/asm/kvm_host.h    |  3 ---
- arch/arm64/kvm/hyp/switch.c          |  6 ------
- arch/arm64/kvm/inject_fault.c        |  2 +-
- virt/kvm/arm/arm.c                   | 11 ++++++-----
- virt/kvm/arm/mmu.c                   |  6 +++---
- 10 files changed, 16 insertions(+), 37 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
-index 9003bd19cb70..e27caa4b47a1 100644
---- a/arch/arm/include/asm/kvm_emulate.h
-+++ b/arch/arm/include/asm/kvm_emulate.h
-@@ -92,14 +92,9 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
- 	vcpu->arch.hcr = HCR_GUEST_MASK;
- }
- 
--static inline unsigned long vcpu_get_hcr(const struct kvm_vcpu *vcpu)
-+static inline unsigned long *vcpu_hcr(const struct kvm_vcpu *vcpu)
- {
--	return vcpu->arch.hcr;
--}
--
--static inline void vcpu_set_hcr(struct kvm_vcpu *vcpu, unsigned long hcr)
--{
--	vcpu->arch.hcr = hcr;
-+	return (unsigned long *)&vcpu->arch.hcr;
- }
- 
- static inline bool vcpu_mode_is_32bit(const struct kvm_vcpu *vcpu)
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 248b930563e5..6137195ab815 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -155,9 +155,6 @@ struct kvm_vcpu_arch {
- 	/* HYP trapping configuration */
- 	u32 hcr;
- 
--	/* Interrupt related fields */
--	u32 irq_lines;		/* IRQ and FIQ levels */
--
- 	/* Exception Information */
- 	struct kvm_vcpu_fault_info fault;
- 
-diff --git a/arch/arm/kvm/emulate.c b/arch/arm/kvm/emulate.c
-index cdff963f133a..fa501bf437f3 100644
---- a/arch/arm/kvm/emulate.c
-+++ b/arch/arm/kvm/emulate.c
-@@ -174,5 +174,5 @@ unsigned long *vcpu_spsr(struct kvm_vcpu *vcpu)
-  */
- void kvm_inject_vabt(struct kvm_vcpu *vcpu)
- {
--	vcpu_set_hcr(vcpu, vcpu_get_hcr(vcpu) | HCR_VA);
-+	*vcpu_hcr(vcpu) |= HCR_VA;
- }
-diff --git a/arch/arm/kvm/hyp/switch.c b/arch/arm/kvm/hyp/switch.c
-index ae45ae96aac2..e86679daddff 100644
---- a/arch/arm/kvm/hyp/switch.c
-+++ b/arch/arm/kvm/hyp/switch.c
-@@ -44,7 +44,7 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu, u32 *fpexc_host)
- 		isb();
- 	}
- 
--	write_sysreg(vcpu->arch.hcr | vcpu->arch.irq_lines, HCR);
-+	write_sysreg(vcpu->arch.hcr, HCR);
- 	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
- 	write_sysreg(HSTR_T(15), HSTR);
- 	write_sysreg(HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11), HCPTR);
+Notes:
+    Changes since v2:
+     - New patch
+    
+    Changes since v1:
+     - Reworded comments as suggested by Drew
+
+ arch/arm64/include/asm/kvm_emulate.h |  7 ++++++-
+ arch/arm64/kvm/hyp/switch.c          | 11 +++++------
+ arch/arm64/kvm/hyp/sysreg-sr.c       |  5 +++--
+ arch/arm64/kvm/inject_fault.c        |  6 +++---
+ 4 files changed, 17 insertions(+), 12 deletions(-)
+
 diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 4610bc818097..9ee316b962c8 100644
+index 9ee316b962c8..3cc535591bdf 100644
 --- a/arch/arm64/include/asm/kvm_emulate.h
 +++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -69,14 +69,9 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+@@ -45,6 +45,11 @@ void kvm_inject_undef32(struct kvm_vcpu *vcpu);
+ void kvm_inject_dabt32(struct kvm_vcpu *vcpu, unsigned long addr);
+ void kvm_inject_pabt32(struct kvm_vcpu *vcpu, unsigned long addr);
+ 
++static inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
++{
++	return !(vcpu->arch.hcr_el2 & HCR_RW);
++}
++
+ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+ {
+ 	vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS;
+@@ -65,7 +70,7 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+ 	 * For now this is conditional, since no AArch32 feature regs
+ 	 * are currently virtualised.
+ 	 */
+-	if (vcpu->arch.hcr_el2 & HCR_RW)
++	if (!vcpu_el1_is_32bit(vcpu))
  		vcpu->arch.hcr_el2 |= HCR_TID3;
  }
  
--static inline unsigned long vcpu_get_hcr(struct kvm_vcpu *vcpu)
-+static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
- {
--	return vcpu->arch.hcr_el2;
--}
--
--static inline void vcpu_set_hcr(struct kvm_vcpu *vcpu, unsigned long hcr)
--{
--	vcpu->arch.hcr_el2 = hcr;
-+	return (unsigned long *)&vcpu->arch.hcr_el2;
- }
- 
- static inline void vcpu_set_vsesr(struct kvm_vcpu *vcpu, u64 vsesr)
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 618cfee7206a..b027a7f025d4 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -272,9 +272,6 @@ struct kvm_vcpu_arch {
- 	/* IO related fields */
- 	struct kvm_decode mmio_decode;
- 
--	/* Interrupt related fields */
--	u64 irq_lines;		/* IRQ and FIQ levels */
--
- 	/* Cache some mmu pages needed inside spinlock regions */
- 	struct kvm_mmu_memory_cache mmu_page_cache;
- 
 diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 4117717548b0..80bf38ccc8a4 100644
+index 80bf38ccc8a4..c3e88ba81e26 100644
 --- a/arch/arm64/kvm/hyp/switch.c
 +++ b/arch/arm64/kvm/hyp/switch.c
-@@ -178,12 +178,6 @@ static void __hyp_text __vgic_save_state(struct kvm_vcpu *vcpu)
+@@ -74,7 +74,7 @@ static hyp_alternate_select(__activate_traps_arch,
  
- static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
+ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
  {
 -	u64 val;
++	u64 hcr = vcpu->arch.hcr_el2;
+ 
+ 	/*
+ 	 * We are about to set CPTR_EL2.TFP to trap all floating point
+@@ -85,17 +85,16 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+ 	 * If FP/ASIMD is not implemented, FPEXC is UNDEFINED and any access to
+ 	 * it will cause an exception.
+ 	 */
+-	val = vcpu->arch.hcr_el2;
 -
--	val = read_sysreg(hcr_el2);
--	val |= vcpu->arch.irq_lines;
+-	if (!(val & HCR_RW) && system_supports_fpsimd()) {
++	if (vcpu_el1_is_32bit(vcpu) && system_supports_fpsimd()) {
+ 		write_sysreg(1 << 30, fpexc32_el2);
+ 		isb();
+ 	}
 -	write_sysreg(val, hcr_el2);
--
- 	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
- 		__vgic_v3_restore_state(vcpu);
- 	else
+ 
+-	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN) && (val & HCR_VSE))
++	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN) && (hcr & HCR_VSE))
+ 		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
+ 
++	write_sysreg(hcr, hcr_el2);
++
+ 	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
+ 	write_sysreg(1 << 15, hstr_el2);
+ 	/*
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index 434f0fc9cfb3..99fc60516103 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -19,6 +19,7 @@
+ #include <linux/kvm_host.h>
+ 
+ #include <asm/kvm_asm.h>
++#include <asm/kvm_emulate.h>
+ #include <asm/kvm_hyp.h>
+ 
+ /* Yes, this does nothing, on purpose */
+@@ -147,7 +148,7 @@ void __hyp_text __sysreg32_save_state(struct kvm_vcpu *vcpu)
+ {
+ 	u64 *spsr, *sysreg;
+ 
+-	if (read_sysreg(hcr_el2) & HCR_RW)
++	if (!vcpu_el1_is_32bit(vcpu))
+ 		return;
+ 
+ 	spsr = vcpu->arch.ctxt.gp_regs.spsr;
+@@ -172,7 +173,7 @@ void __hyp_text __sysreg32_restore_state(struct kvm_vcpu *vcpu)
+ {
+ 	u64 *spsr, *sysreg;
+ 
+-	if (read_sysreg(hcr_el2) & HCR_RW)
++	if (!vcpu_el1_is_32bit(vcpu))
+ 		return;
+ 
+ 	spsr = vcpu->arch.ctxt.gp_regs.spsr;
 diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index 60666a056944..c1e179d34e6a 100644
+index c1e179d34e6a..30a3f58cdb7b 100644
 --- a/arch/arm64/kvm/inject_fault.c
 +++ b/arch/arm64/kvm/inject_fault.c
-@@ -167,7 +167,7 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
- static void pend_guest_serror(struct kvm_vcpu *vcpu, u64 esr)
- {
- 	vcpu_set_vsesr(vcpu, esr);
--	vcpu_set_hcr(vcpu, vcpu_get_hcr(vcpu) | HCR_VSE);
-+	*vcpu_hcr(vcpu) |= HCR_VSE;
- }
- 
- /**
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 932e61858c55..49d13510e9c2 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -420,7 +420,8 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+@@ -128,7 +128,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
   */
- int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
+ void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr)
  {
--	return ((!!v->arch.irq_lines || kvm_vgic_vcpu_pending_irq(v))
-+	bool irq_lines = *vcpu_hcr(v) & (HCR_VI | HCR_VF);
-+	return ((irq_lines || kvm_vgic_vcpu_pending_irq(v))
- 		&& !v->arch.power_off && !v->arch.pause);
- }
- 
-@@ -814,18 +815,18 @@ static int vcpu_interrupt_line(struct kvm_vcpu *vcpu, int number, bool level)
- {
- 	int bit_index;
- 	bool set;
--	unsigned long *ptr;
-+	unsigned long *hcr;
- 
- 	if (number == KVM_ARM_IRQ_CPU_IRQ)
- 		bit_index = __ffs(HCR_VI);
- 	else /* KVM_ARM_IRQ_CPU_FIQ */
- 		bit_index = __ffs(HCR_VF);
- 
--	ptr = (unsigned long *)&vcpu->arch.irq_lines;
-+	hcr = vcpu_hcr(vcpu);
- 	if (level)
--		set = test_and_set_bit(bit_index, ptr);
-+		set = test_and_set_bit(bit_index, hcr);
+-	if (!(vcpu->arch.hcr_el2 & HCR_RW))
++	if (vcpu_el1_is_32bit(vcpu))
+ 		kvm_inject_dabt32(vcpu, addr);
  	else
--		set = test_and_clear_bit(bit_index, ptr);
-+		set = test_and_clear_bit(bit_index, hcr);
- 
- 	/*
- 	 * If we didn't change anything, no need to wake up or kick other CPUs
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index ec62d1cccab7..9ebff8e530f9 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -2035,7 +2035,7 @@ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+ 		inject_abt64(vcpu, false, addr);
+@@ -144,7 +144,7 @@ void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr)
   */
- void kvm_set_way_flush(struct kvm_vcpu *vcpu)
+ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
  {
--	unsigned long hcr = vcpu_get_hcr(vcpu);
-+	unsigned long hcr = *vcpu_hcr(vcpu);
- 
- 	/*
- 	 * If this is the first time we do a S/W operation
-@@ -2050,7 +2050,7 @@ void kvm_set_way_flush(struct kvm_vcpu *vcpu)
- 		trace_kvm_set_way_flush(*vcpu_pc(vcpu),
- 					vcpu_has_cache_enabled(vcpu));
- 		stage2_flush_vm(vcpu->kvm);
--		vcpu_set_hcr(vcpu, hcr | HCR_TVM);
-+		*vcpu_hcr(vcpu) = hcr | HCR_TVM;
- 	}
- }
- 
-@@ -2068,7 +2068,7 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled)
- 
- 	/* Caches are now on, stop trapping VM ops (until a S/W op) */
- 	if (now_enabled)
--		vcpu_set_hcr(vcpu, vcpu_get_hcr(vcpu) & ~HCR_TVM);
-+		*vcpu_hcr(vcpu) &= ~HCR_TVM;
- 
- 	trace_kvm_toggle_cache(*vcpu_pc(vcpu), was_enabled, now_enabled);
- }
+-	if (!(vcpu->arch.hcr_el2 & HCR_RW))
++	if (vcpu_el1_is_32bit(vcpu))
+ 		kvm_inject_pabt32(vcpu, addr);
+ 	else
+ 		inject_abt64(vcpu, true, addr);
+@@ -158,7 +158,7 @@ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
+  */
+ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
+ {
+-	if (!(vcpu->arch.hcr_el2 & HCR_RW))
++	if (vcpu_el1_is_32bit(vcpu))
+ 		kvm_inject_undef32(vcpu);
+ 	else
+ 		inject_undef64(vcpu);
 -- 
 2.14.2
