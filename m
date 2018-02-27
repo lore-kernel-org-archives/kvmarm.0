@@ -1,197 +1,201 @@
 From: Christoffer Dall <cdall@kernel.org>
-Subject: [PATCH v5 38/40] KVM: arm/arm64: Handle VGICv3 save/restore from the
- main VGIC code on VHE
-Date: Tue, 27 Feb 2018 12:34:27 +0100
-Message-ID: <20180227113429.637-39-cdall@kernel.org>
+Subject: [PATCH v5 26/40] KVM: arm/arm64: Prepare to handle deferred
+ save/restore of SPSR_EL1
+Date: Tue, 27 Feb 2018 12:34:15 +0100
+Message-ID: <20180227113429.637-27-cdall@kernel.org>
 References: <20180227113429.637-1-cdall@kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C6D7E49E07
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 06:30:46 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id knVS5lq7+Flx for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 27 Feb 2018 06:30:23 -0500 (EST)
+Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B781149EA4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 06:28:16 -0500 (EST)
+Received: by mail-wm0-f68.google.com with SMTP id a20so21246516wmd.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 03:35:09 -0800 (PST)
 In-Reply-To: <20180227113429.637-1-cdall@kernel.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Tomasz Nowicki <tn@semihalf.com>, Julien Grall <julien.grall@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Christoffer Dall <christoffer.dall@linaro.org>
 
-Just like we can program the GICv2 hypervisor control interface directly
-from the core vgic code, we can do the same for the GICv3 hypervisor
-control interface on VHE systems.
+SPSR_EL1 is not used by a VHE host kernel and can be deferred, but we
+need to rework the accesses to this register to access the latest value
+depending on whether or not guest system registers are loaded on the CPU
+or only reside in memory.
 
-We do this by simply calling the save/restore functions when we have VHE
-and we can then get rid of the save/restore function calls from the VHE
-world switch function.
+The handling of accessing the various banked SPSRs for 32-bit VMs is a
+bit clunky, but this will be improved in following patches which will
+first prepare and subsequently implement deferred save/restore of the
+32-bit registers, including the 32-bit SPSRs.
 
-One caveat is that we now write GICv3 system register state before the
-potential early exit path in the run loop, and because we sync back
-state in the early exit path, we have to ensure that we read a
-consistent GIC state from the sync path, even though we have never
-actually run the guest with the newly written GIC state.  We solve this
-by inserting an ISB in the early exit path.
-
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
 
 Notes:
     Changes since v4:
-     - Added can_access_vgic_from_kernel() primitive to make the
-       save/restore flow from the main vgic code slightly easier to
-       understand.
-     - Also added a __hyp prefix to the non-VHE world-switch
-       save/restore functions for GICv3 to avoid confusion with the
-       save/restore functions in the main VGIC code.
+     - Dropped unnecessary cast
     
     Changes since v2:
-     - Added ISB in the early exit path in the run loop as explained
-       in the commit message.
+     - New patch (deferred register handling has been reworked)
 
- arch/arm64/kvm/hyp/switch.c | 13 ++++++-------
- virt/kvm/arm/arm.c          |  1 +
- virt/kvm/arm/vgic/vgic.c    | 21 +++++++++++++++++++--
- 3 files changed, 26 insertions(+), 9 deletions(-)
+ arch/arm/include/asm/kvm_emulate.h   | 12 ++++++++++-
+ arch/arm/kvm/emulate.c               |  2 +-
+ arch/arm64/include/asm/kvm_emulate.h | 41 +++++++++++++++++++++++++++++++-----
+ arch/arm64/kvm/inject_fault.c        |  4 ++--
+ virt/kvm/arm/aarch32.c               |  2 +-
+ 5 files changed, 51 insertions(+), 10 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 31badf6e91e8..86abbee40d3f 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -192,13 +192,15 @@ static void __hyp_text __deactivate_vm(struct kvm_vcpu *vcpu)
- 	write_sysreg(0, vttbr_el2);
+diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
+index e27caa4b47a1..6493bd479ddc 100644
+--- a/arch/arm/include/asm/kvm_emulate.h
++++ b/arch/arm/include/asm/kvm_emulate.h
+@@ -41,7 +41,17 @@ static inline unsigned long *vcpu_reg32(struct kvm_vcpu *vcpu, u8 reg_num)
+ 	return vcpu_reg(vcpu, reg_num);
  }
  
--static void __hyp_text __vgic_save_state(struct kvm_vcpu *vcpu)
-+/* Save VGICv3 state on non-VHE systems */
-+static void __hyp_text __hyp_vgic_save_state(struct kvm_vcpu *vcpu)
- {
- 	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
- 		__vgic_v3_save_state(vcpu);
- }
- 
--static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
-+/* Restore VGICv3 state on non_VEH systems */
-+static void __hyp_text __hyp_vgic_restore_state(struct kvm_vcpu *vcpu)
- {
- 	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
- 		__vgic_v3_restore_state(vcpu);
-@@ -400,8 +402,6 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 	__activate_traps(vcpu);
- 	__activate_vm(vcpu->kvm);
- 
--	__vgic_restore_state(vcpu);
--
- 	sysreg_restore_guest_state_vhe(guest_ctxt);
- 	__debug_switch_to_guest(vcpu);
- 
-@@ -415,7 +415,6 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 	fp_enabled = fpsimd_enabled_vhe();
- 
- 	sysreg_save_guest_state_vhe(guest_ctxt);
--	__vgic_save_state(vcpu);
- 
- 	__deactivate_traps(vcpu);
- 
-@@ -451,7 +450,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- 	__activate_traps(vcpu);
- 	__activate_vm(kern_hyp_va(vcpu->kvm));
- 
--	__vgic_restore_state(vcpu);
-+	__hyp_vgic_restore_state(vcpu);
- 	__timer_enable_traps(vcpu);
- 
- 	/*
-@@ -484,7 +483,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- 	__sysreg_save_state_nvhe(guest_ctxt);
- 	__sysreg32_save_state(vcpu);
- 	__timer_disable_traps(vcpu);
--	__vgic_save_state(vcpu);
-+	__hyp_vgic_save_state(vcpu);
- 
- 	__deactivate_traps(vcpu);
- 	__deactivate_vm(vcpu);
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 09dbee56ed8f..dba629c5f8ac 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -717,6 +717,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm) ||
- 		    kvm_request_pending(vcpu)) {
- 			vcpu->mode = OUTSIDE_GUEST_MODE;
-+			isb(); /* Ensure work in x_flush_hwstate is committed */
- 			kvm_pmu_sync_hwstate(vcpu);
- 			if (static_branch_unlikely(&userspace_irqchip_in_use))
- 				kvm_timer_sync_hwstate(vcpu);
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index 12e2a28f437e..eaab4a616ecf 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -19,6 +19,7 @@
- #include <linux/list_sort.h>
- #include <linux/interrupt.h>
- #include <linux/irq.h>
-+#include <asm/kvm_hyp.h>
- 
- #include "vgic.h"
- 
-@@ -749,10 +750,22 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
- 		vgic_clear_lr(vcpu, count);
- }
- 
-+static inline bool can_access_vgic_from_kernel(void)
+-unsigned long *vcpu_spsr(struct kvm_vcpu *vcpu);
++unsigned long *__vcpu_spsr(struct kvm_vcpu *vcpu);
++
++static inline unsigned long vpcu_read_spsr(struct kvm_vcpu *vcpu)
 +{
-+	/*
-+	 * GICv2 can always be accessed from the kernel because it is
-+	 * memory-mapped, and VHE systems can access GICv3 EL2 system
-+	 * registers.
-+	 */
-+	return !static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif) || has_vhe();
++	return *__vcpu_spsr(vcpu);
 +}
 +
- static inline void vgic_save_state(struct kvm_vcpu *vcpu)
++static inline void vcpu_write_spsr(struct kvm_vcpu *vcpu, unsigned long v)
++{
++	*__vcpu_spsr(vcpu) = v;
++}
+ 
+ static inline unsigned long vcpu_get_reg(struct kvm_vcpu *vcpu,
+ 					 u8 reg_num)
+diff --git a/arch/arm/kvm/emulate.c b/arch/arm/kvm/emulate.c
+index fa501bf437f3..9046b53d87c1 100644
+--- a/arch/arm/kvm/emulate.c
++++ b/arch/arm/kvm/emulate.c
+@@ -142,7 +142,7 @@ unsigned long *vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num)
+ /*
+  * Return the SPSR for the current mode of the virtual CPU.
+  */
+-unsigned long *vcpu_spsr(struct kvm_vcpu *vcpu)
++unsigned long *__vcpu_spsr(struct kvm_vcpu *vcpu)
  {
- 	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
- 		vgic_v2_save_state(vcpu);
+ 	unsigned long mode = *vcpu_cpsr(vcpu) & MODE_MASK;
+ 	switch (mode) {
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index d313aaae5c38..f32640132e26 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -26,6 +26,7 @@
+ 
+ #include <asm/esr.h>
+ #include <asm/kvm_arm.h>
++#include <asm/kvm_hyp.h>
+ #include <asm/kvm_mmio.h>
+ #include <asm/ptrace.h>
+ #include <asm/cputype.h>
+@@ -143,13 +144,43 @@ static inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
+ 		vcpu_gp_regs(vcpu)->regs.regs[reg_num] = val;
+ }
+ 
+-/* Get vcpu SPSR for current mode */
+-static inline unsigned long *vcpu_spsr(const struct kvm_vcpu *vcpu)
++static inline unsigned long vcpu_read_spsr(const struct kvm_vcpu *vcpu)
+ {
+-	if (vcpu_mode_is_32bit(vcpu))
+-		return vcpu_spsr32(vcpu);
++	unsigned long *p = (unsigned long *)&vcpu_gp_regs(vcpu)->spsr[KVM_SPSR_EL1];
++
++	if (vcpu_mode_is_32bit(vcpu)) {
++		unsigned long *p_32bit = vcpu_spsr32(vcpu);
++
++		/* KVM_SPSR_SVC aliases KVM_SPSR_EL1 */
++		if (p_32bit != p)
++			return *p_32bit;
++	}
++
++	if (vcpu->arch.sysregs_loaded_on_cpu)
++		return read_sysreg_el1(spsr);
 +	else
-+		__vgic_v3_save_state(vcpu);
- }
++		return *p;
++}
  
- /* Sync back the hardware VGIC state into our emulation after a guest's run. */
-@@ -760,7 +773,8 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
- 
--	vgic_save_state(vcpu);
-+	if (can_access_vgic_from_kernel())
-+		vgic_save_state(vcpu);
- 
- 	WARN_ON(vgic_v4_sync_hwstate(vcpu));
- 
-@@ -777,6 +791,8 @@ static inline void vgic_restore_state(struct kvm_vcpu *vcpu)
- {
- 	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
- 		vgic_v2_restore_state(vcpu);
+-	return (unsigned long *)&vcpu_gp_regs(vcpu)->spsr[KVM_SPSR_EL1];
++static inline void vcpu_write_spsr(const struct kvm_vcpu *vcpu, unsigned long v)
++{
++	unsigned long *p = (unsigned long *)&vcpu_gp_regs(vcpu)->spsr[KVM_SPSR_EL1];
++
++	/* KVM_SPSR_SVC aliases KVM_SPSR_EL1 */
++	if (vcpu_mode_is_32bit(vcpu)) {
++		unsigned long *p_32bit = vcpu_spsr32(vcpu);
++
++		/* KVM_SPSR_SVC aliases KVM_SPSR_EL1 */
++		if (p_32bit != p) {
++			*p_32bit = v;
++			return;
++		}
++	}
++
++	if (vcpu->arch.sysregs_loaded_on_cpu)
++		write_sysreg_el1(v, spsr);
 +	else
-+		__vgic_v3_restore_state(vcpu);
++		*p = v;
  }
  
- /* Flush our emulation state into the GIC hardware before entering the guest. */
-@@ -803,7 +819,8 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
- 	spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
+ static inline bool vcpu_mode_priv(const struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index 63dba401fc7d..7f8d2a4e420f 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -71,7 +71,7 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
+ 	*vcpu_pc(vcpu) = get_except_vector(vcpu, except_type_sync);
  
- out:
--	vgic_restore_state(vcpu);
-+	if (can_access_vgic_from_kernel())
-+		vgic_restore_state(vcpu);
- }
+ 	*vcpu_cpsr(vcpu) = PSTATE_FAULT_BITS_64;
+-	*vcpu_spsr(vcpu) = cpsr;
++	vcpu_write_spsr(vcpu, cpsr);
  
- void kvm_vgic_load(struct kvm_vcpu *vcpu)
+ 	vcpu_write_sys_reg(vcpu, addr, FAR_EL1);
+ 
+@@ -106,7 +106,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
+ 	*vcpu_pc(vcpu) = get_except_vector(vcpu, except_type_sync);
+ 
+ 	*vcpu_cpsr(vcpu) = PSTATE_FAULT_BITS_64;
+-	*vcpu_spsr(vcpu) = cpsr;
++	vcpu_write_spsr(vcpu, cpsr);
+ 
+ 	/*
+ 	 * Build an unknown exception, depending on the instruction
+diff --git a/virt/kvm/arm/aarch32.c b/virt/kvm/arm/aarch32.c
+index 8bc479fa37e6..efc84cbe8277 100644
+--- a/virt/kvm/arm/aarch32.c
++++ b/virt/kvm/arm/aarch32.c
+@@ -178,7 +178,7 @@ static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+ 	*vcpu_cpsr(vcpu) = cpsr;
+ 
+ 	/* Note: These now point to the banked copies */
+-	*vcpu_spsr(vcpu) = new_spsr_value;
++	vcpu_write_spsr(vcpu, new_spsr_value);
+ 	*vcpu_reg32(vcpu, 14) = *vcpu_pc(vcpu) + return_offset;
+ 
+ 	/* Branch to exception vector */
 -- 
 2.14.2
