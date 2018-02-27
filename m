@@ -1,87 +1,165 @@
 From: Christoffer Dall <cdall@kernel.org>
-Subject: [PATCH v5 09/40] KVM: arm64: Move debug dirty flag calculation out of
- world switch
-Date: Tue, 27 Feb 2018 12:33:58 +0100
-Message-ID: <20180227113429.637-10-cdall@kernel.org>
+Subject: [PATCH v5 31/40] KVM: arm64: Move common VHE/non-VHE trap config in
+ separate functions
+Date: Tue, 27 Feb 2018 12:34:20 +0100
+Message-ID: <20180227113429.637-32-cdall@kernel.org>
 References: <20180227113429.637-1-cdall@kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 29D7340257
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 06:28:26 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SuL+FBs7MlJK for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Feb 2018 06:28:04 -0500 (EST)
-Received: from mail-wm0-f66.google.com (mail-wm0-f66.google.com [74.125.82.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2E91249DFD
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 06:27:53 -0500 (EST)
-Received: by mail-wm0-f66.google.com with SMTP id 188so22534744wme.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Feb 2018 03:34:46 -0800 (PST)
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <20180227113429.637-1-cdall@kernel.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
+Cc: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Tomasz Nowicki <tn@semihalf.com>, Julien Grall <julien.grall@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Christoffer Dall <christoffer.dall@linaro.org>
 
-There is no need to figure out inside the world-switch if we should
-save/restore the debug registers or not, we might as well do that in the
-higher level debug setup code, making it easier to optimize down the
-line.
+As we are about to be more lazy with some of the trap configuration
+register read/writes for VHE systems, move the logic that is currently
+shared between VHE and non-VHE into a separate function which can be
+called from either the world-switch path or from vcpu_load/vcpu_put.
 
-Reviewed-by: Julien Thierry <julien.thierry@arm.com>
 Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 Reviewed-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/kvm/debug.c        | 5 +++++
- arch/arm64/kvm/hyp/debug-sr.c | 6 ------
- 2 files changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-index fa63b28c65e0..feedb877cff8 100644
---- a/arch/arm64/kvm/debug.c
-+++ b/arch/arm64/kvm/debug.c
-@@ -193,6 +193,11 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
- 	if (trap_debug)
- 		vcpu->arch.mdcr_el2 |= MDCR_EL2_TDA;
- 
-+	/* If KDE or MDE are set, perform a full save/restore cycle. */
-+	if ((vcpu_sys_reg(vcpu, MDSCR_EL1) & DBG_MDSCR_KDE) ||
-+	    (vcpu_sys_reg(vcpu, MDSCR_EL1) & DBG_MDSCR_MDE))
-+		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
-+
- 	trace_kvm_arm_set_dreg32("MDCR_EL2", vcpu->arch.mdcr_el2);
- 	trace_kvm_arm_set_dreg32("MDSCR_EL1", vcpu_sys_reg(vcpu, MDSCR_EL1));
+Notes:
+    Changes since v4:
+     - Added blank newline to separate logic blocks in
+       __activate_traps_common.
+    
+    Changes since v3:
+     - Separate fpsimd32 trap configuration into a separate function
+       which is still called from __activate_traps, because we no longer
+       defer saving/restoring of VFP registers to load/put.
+
+ arch/arm64/kvm/hyp/switch.c | 77 +++++++++++++++++++++++++++------------------
+ 1 file changed, 46 insertions(+), 31 deletions(-)
+
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 9b0380d3c9c3..9d90bda3c2cc 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -56,7 +56,46 @@ static void __hyp_text __fpsimd_save_fpexc32(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.ctxt.sys_regs[FPEXC32_EL2] = read_sysreg(fpexc32_el2);
  }
-diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
-index dabb5cc7b087..d958cd63a547 100644
---- a/arch/arm64/kvm/hyp/debug-sr.c
-+++ b/arch/arm64/kvm/hyp/debug-sr.c
-@@ -166,12 +166,6 @@ void __hyp_text __debug_restore_state(struct kvm_vcpu *vcpu,
  
- void __hyp_text __debug_cond_save_host_state(struct kvm_vcpu *vcpu)
+-static void __hyp_text __activate_traps_vhe(void)
++static void __hyp_text __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
++{
++	/*
++	 * We are about to set CPTR_EL2.TFP to trap all floating point
++	 * register accesses to EL2, however, the ARM ARM clearly states that
++	 * traps are only taken to EL2 if the operation would not otherwise
++	 * trap to EL1.  Therefore, always make sure that for 32-bit guests,
++	 * we set FPEXC.EN to prevent traps to EL1, when setting the TFP bit.
++	 * If FP/ASIMD is not implemented, FPEXC is UNDEFINED and any access to
++	 * it will cause an exception.
++	 */
++	if (vcpu_el1_is_32bit(vcpu) && system_supports_fpsimd()) {
++		write_sysreg(1 << 30, fpexc32_el2);
++		isb();
++	}
++}
++
++static void __hyp_text __activate_traps_common(struct kvm_vcpu *vcpu)
++{
++	/* Trap on AArch32 cp15 c15 (impdef sysregs) accesses (EL1 or EL0) */
++	write_sysreg(1 << 15, hstr_el2);
++
++	/*
++	 * Make sure we trap PMU access from EL0 to EL2. Also sanitize
++	 * PMSELR_EL0 to make sure it never contains the cycle
++	 * counter, which could make a PMXEVCNTR_EL0 access UNDEF at
++	 * EL1 instead of being trapped to EL2.
++	 */
++	write_sysreg(0, pmselr_el0);
++	write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
++	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
++}
++
++static void __hyp_text __deactivate_traps_common(void)
++{
++	write_sysreg(0, hstr_el2);
++	write_sysreg(0, pmuserenr_el0);
++}
++
++static void __hyp_text __activate_traps_vhe(struct kvm_vcpu *vcpu)
  {
--	/* If any of KDE, MDE or KVM_ARM64_DEBUG_DIRTY is set, perform
--	 * a full save/restore cycle. */
--	if ((vcpu->arch.ctxt.sys_regs[MDSCR_EL1] & DBG_MDSCR_KDE) ||
--	    (vcpu->arch.ctxt.sys_regs[MDSCR_EL1] & DBG_MDSCR_MDE))
--		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
+ 	u64 val;
+ 
+@@ -68,7 +107,7 @@ static void __hyp_text __activate_traps_vhe(void)
+ 	write_sysreg(kvm_get_hyp_vector(), vbar_el1);
+ }
+ 
+-static void __hyp_text __activate_traps_nvhe(void)
++static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
+ {
+ 	u64 val;
+ 
+@@ -85,37 +124,14 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+ {
+ 	u64 hcr = vcpu->arch.hcr_el2;
+ 
+-	/*
+-	 * We are about to set CPTR_EL2.TFP to trap all floating point
+-	 * register accesses to EL2, however, the ARM ARM clearly states that
+-	 * traps are only taken to EL2 if the operation would not otherwise
+-	 * trap to EL1.  Therefore, always make sure that for 32-bit guests,
+-	 * we set FPEXC.EN to prevent traps to EL1, when setting the TFP bit.
+-	 * If FP/ASIMD is not implemented, FPEXC is UNDEFINED and any access to
+-	 * it will cause an exception.
+-	 */
+-	if (vcpu_el1_is_32bit(vcpu) && system_supports_fpsimd()) {
+-		write_sysreg(1 << 30, fpexc32_el2);
+-		isb();
+-	}
++	write_sysreg(hcr, hcr_el2);
+ 
+ 	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN) && (hcr & HCR_VSE))
+ 		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
+ 
+-	write_sysreg(hcr, hcr_el2);
 -
- 	__debug_save_state(vcpu, &vcpu->arch.host_debug_state.regs,
- 			   kern_hyp_va(vcpu->arch.host_cpu_context));
- 	__debug_save_spe()(&vcpu->arch.host_debug_state.pmscr_el1);
+-	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
+-	write_sysreg(1 << 15, hstr_el2);
+-	/*
+-	 * Make sure we trap PMU access from EL0 to EL2. Also sanitize
+-	 * PMSELR_EL0 to make sure it never contains the cycle
+-	 * counter, which could make a PMXEVCNTR_EL0 access UNDEF at
+-	 * EL1 instead of being trapped to EL2.
+-	 */
+-	write_sysreg(0, pmselr_el0);
+-	write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
+-	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+-	__activate_traps_arch()();
++	__activate_traps_fpsimd32(vcpu);
++	__activate_traps_common(vcpu);
++	__activate_traps_arch()(vcpu);
+ }
+ 
+ static void __hyp_text __deactivate_traps_vhe(void)
+@@ -160,9 +176,8 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
+ 	if (vcpu->arch.hcr_el2 & HCR_VSE)
+ 		vcpu->arch.hcr_el2 = read_sysreg(hcr_el2);
+ 
++	__deactivate_traps_common();
+ 	__deactivate_traps_arch()();
+-	write_sysreg(0, hstr_el2);
+-	write_sysreg(0, pmuserenr_el0);
+ }
+ 
+ static void __hyp_text __activate_vm(struct kvm *kvm)
 -- 
 2.14.2
