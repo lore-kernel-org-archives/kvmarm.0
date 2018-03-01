@@ -1,253 +1,112 @@
-From: Shanker Donthineni <shankerd@codeaurora.org>
-Subject: [PATCH v6] arm64: Add support for new control bits CTR_EL0.DIC and CTR_EL0.IDC
-Date: Wed, 28 Feb 2018 22:14:00 -0600
-Message-ID: <1519877640-11944-1-git-send-email-shankerd@codeaurora.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Will Deacon <will.deacon@arm.com>, Robin Murphy <robin.murphy@arm.com>, Mark Rutland <mark.rutland@arm.com>, linux-kernel <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm <kvmarm@lists.cs.columbia.edu>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Vikram Sethi <vikrams@codeaurora.org>, Philip Elcan <pelcan@codeaurora.org>, Shanker Donthineni <shankerd@codeaurora.org>
+From: Igor Mammedov <imammedo@redhat.com>
+Subject: Re: [Qemu-devel] VCPU hotplug on KVM/ARM
+Date: Thu, 1 Mar 2018 10:50:30 +0100
+Message-ID: <20180301105030.2b716e68@redhat.com>
+References: <000e01d3afad$b9a13830$2ce3a890$@codeaurora.org>
+ <20180227104708.GA11391@cbox>
+ <ac329e1b1f5265a805916ab4f8708f9d@codeaurora.org>
+ <20180227124604.GA2373@cbox>
+ <20180227132131.fipafmnb56a7fj76@kamzik.brq.redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 75C6F49E00
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Mar 2018 04:44:04 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Huqq4Z1R6DbD for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Mar 2018 04:43:42 -0500 (EST)
+Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4BA5642121
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Mar 2018 04:43:41 -0500 (EST)
+In-Reply-To: <20180227132131.fipafmnb56a7fj76@kamzik.brq.redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>
+Cc: Christoffer Dall <cdall@cs.columbia.edu>, qemu-devel@nongnu.org, Christoffer Dall <christofferdall@christofferdall.dk>, qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The DCache clean & ICache invalidation requirements for instructions
-to be data coherence are discoverable through new fields in CTR_EL0.
-The following two control bits DIC and IDC were defined for this
-purpose. No need to perform point of unification cache maintenance
-operations from software on systems where CPU caches are transparent.
+On Tue, 27 Feb 2018 14:21:31 +0100
+Andrew Jones <drjones@redhat.com> wrote:
 
-This patch optimize the three functions __flush_cache_user_range(),
-clean_dcache_area_pou() and invalidate_icache_range() if the hardware
-reports CTR_EL0.IDC and/or CTR_EL0.IDC. Basically it skips the two
-instructions 'DC CVAU' and 'IC IVAU', and the associated loop logic
-in order to avoid the unnecessary overhead.
+> On Tue, Feb 27, 2018 at 01:46:04PM +0100, Christoffer Dall wrote:
+> > On Tue, Feb 27, 2018 at 05:34:28PM +0530, bthakur@codeaurora.org wrote:  
+> > > Hi Christoffer,
+> > > 
+> > > Thanks for your reply.
+> > > 
+> > > On 2018-02-27 16:17, Christoffer Dall wrote:  
+> > > >Hi Bhupinder,
+> > > >
+> > > >On Tue, Feb 27, 2018 at 03:01:17PM +0530, bthakur@codeaurora.org wrote:  
+> > > >>I hope it is the right forum to post my query.
+> > > >>
+> > > >>
+> > > >>
+> > > >>I am currently looking at the possibility of adding a new VCPU to a
+> > > >>running
+> > > >>guest VM in KVM/ARM. I see that currently, it is not allowed to add a
+> > > >>new
+> > > >>VCPU to a guest VM, if it is already initialized. The first check in
+> > > >>kvm_arch_vcpu_create() returns failure if it is already initialized.
+> > > >>  
+> > > >
+> > > >This would require a major rework of a lot of logic surrounding the GIC
+> > > >and other parts of KVM initialization.
+> > > >  
+> > > >>
+> > > >>
+> > > >>There was some work done in QEMU to add support for VCPU hotplug:
+> > > >>https://lists.gnu.org/archive/html/qemu-arm/2017-05/msg00404.html
+> > > >>
+> > > >>
+> > > >>
+> > > >>But I am looking at the KVM side for enabling adding a new VCPU. If you
+> > > >>can
+> > > >>point me to any relevant work/resources, which I can refer to then it
+> > > >>will
+> > > >>help me.
+> > > >>  
+> > > >
+> > > >I don't have any specific pointers, but I was always told that the way
+> > > >we were going to do CPU hotplug would be to instantiate a large number
+> > > >of VCPUs, and hotplug would be equivalent to turning on a VCPU which was
+> > > >previously powered off.
+> > > >
+> > > >Is this not still a feasible solution?  
+> > > It should be a feasible solution provided the guest VM is not able to
+> > > control the onlining/offlining of VCPUs. It should be controlled by the
+> > > Host.
+> > >   
+> > 
+> > KVM could simply refuse to turn on some of the CPUs unless given
+> > permission from host userspace.
+> >   
+> > > >
+> > > >How does VCPU hotplug work on x86?  
+> > > On x86, you can add a vcpu through libvirt setvcpu command and it shows up
+> > > in the guest VM as a new CPU if you do lscpu.
+> > >   
+> > 
+> > Sure, but what is the mechanism, does x86 qemu actually call
+> > KVM_CREATE_VCPU, or is this also a question of turning on already
+> > created vcpus ?
+In QEMU on x86 (and I think ppc, s390 as well), we create vCPUs on demand.
 
-CTR_EL0.DIC: Instruction cache invalidation requirements for
- instruction to data coherence. The meaning of this bit[29].
-  0: Instruction cache invalidation to the point of unification
-     is required for instruction to data coherence.
-  1: Instruction cache cleaning to the point of unification is
-      not required for instruction to data coherence.
+It would be nice if ARM would be able to do that too,
+so that it could take advantage of the same code.
 
-CTR_EL0.IDC: Data cache clean requirements for instruction to data
- coherence. The meaning of this bit[28].
-  0: Data cache clean to the point of unification is required for
-     instruction to data coherence, unless CLIDR_EL1.LoC == 0b000
-     or (CLIDR_EL1.LoUIS == 0b000 && CLIDR_EL1.LoUU == 0b000).
-  1: Data cache clean to the point of unification is not required
-     for instruction to data coherence.
-
-Co-authored-by: Philip Elcan <pelcan@codeaurora.org>
-Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
----
-Changes since v5:
-  -Addressed Mark's review comments.
-
-Changes since v4:
-  -Moved patching ARM64_HAS_CACHE_DIC inside invalidate_icache_by_line
-  -Removed 'dsb	ishst' for ARM64_HAS_CACHE_DIC as Mark suggested.
-
-Changes since v3:
-  -Added preprocessor guard CONFIG_xxx to code snippets in cache.S
-  -Changed barrier attributes from ISH to ISHST.
-
-Changes since v2:
-  -Included barriers, DSB/ISB with DIC set, and DSB with IDC set.
-  -Single Kconfig option.
-
-Changes since v1:
-  -Reworded commit text.
-  -Used the alternatives framework as Catalin suggested.
-  -Rebased on top of https://patchwork.kernel.org/patch/10227927/
-
- arch/arm64/Kconfig                 | 12 ++++++++++++
- arch/arm64/include/asm/assembler.h |  6 ++++++
- arch/arm64/include/asm/cache.h     |  4 ++++
- arch/arm64/include/asm/cpucaps.h   |  4 +++-
- arch/arm64/kernel/cpufeature.c     | 40 ++++++++++++++++++++++++++++++++------
- arch/arm64/mm/cache.S              | 13 +++++++++++++
- 6 files changed, 72 insertions(+), 7 deletions(-)
-
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 7381eeb..41af850 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -1091,6 +1091,18 @@ config ARM64_RAS_EXTN
- 	  and access the new registers if the system supports the extension.
- 	  Platform RAS features may additionally depend on firmware support.
  
-+config ARM64_SKIP_CACHE_POU
-+	bool "Enable support to skip cache PoU operations"
-+	default y
-+	help
-+	  Explicit point of unification cache operations can be eliminated
-+	  in software if the hardware handles transparently. The new bits in
-+	  CTR_EL0, CTR_EL0.DIC and CTR_EL0.IDC indicates the hardware
-+	  capabilities of ICache and DCache PoU requirements.
-+
-+	  Selecting this feature will allow the kernel to optimize cache
-+	  maintenance to the PoU.
-+
- endmenu
- 
- config ARM64_SVE
-diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
-index 3c78835..39f2274 100644
---- a/arch/arm64/include/asm/assembler.h
-+++ b/arch/arm64/include/asm/assembler.h
-@@ -444,6 +444,11 @@
-  * 	Corrupts:	tmp1, tmp2
-  */
- 	.macro invalidate_icache_by_line start, end, tmp1, tmp2, label
-+#ifdef CONFIG_ARM64_SKIP_CACHE_POU
-+alternative_if ARM64_HAS_CACHE_DIC
-+	b	9996f
-+alternative_else_nop_endif
-+#endif
- 	icache_line_size \tmp1, \tmp2
- 	sub	\tmp2, \tmp1, #1
- 	bic	\tmp2, \start, \tmp2
-@@ -453,6 +458,7 @@
- 	cmp	\tmp2, \end
- 	b.lo	9997b
- 	dsb	ish
-+9996:
- 	isb
- 	.endm
- 
-diff --git a/arch/arm64/include/asm/cache.h b/arch/arm64/include/asm/cache.h
-index ea9bb4e..d460e9f 100644
---- a/arch/arm64/include/asm/cache.h
-+++ b/arch/arm64/include/asm/cache.h
-@@ -20,8 +20,12 @@
- 
- #define CTR_L1IP_SHIFT		14
- #define CTR_L1IP_MASK		3
-+#define CTR_DMLINE_SHIFT	16
-+#define CTR_ERG_SHIFT		20
- #define CTR_CWG_SHIFT		24
- #define CTR_CWG_MASK		15
-+#define CTR_IDC_SHIFT		28
-+#define CTR_DIC_SHIFT		29
- 
- #define CTR_L1IP(ctr)		(((ctr) >> CTR_L1IP_SHIFT) & CTR_L1IP_MASK)
- 
-diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-index bb26382..8dd42ae 100644
---- a/arch/arm64/include/asm/cpucaps.h
-+++ b/arch/arm64/include/asm/cpucaps.h
-@@ -45,7 +45,9 @@
- #define ARM64_HARDEN_BRANCH_PREDICTOR		24
- #define ARM64_HARDEN_BP_POST_GUEST_EXIT		25
- #define ARM64_HAS_RAS_EXTN			26
-+#define ARM64_HAS_CACHE_IDC			27
-+#define ARM64_HAS_CACHE_DIC			28
- 
--#define ARM64_NCAPS				27
-+#define ARM64_NCAPS				29
- 
- #endif /* __ASM_CPUCAPS_H */
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 2985a06..0b64b55 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -199,12 +199,12 @@ static int __init register_cpu_hwcaps_dumper(void)
- };
- 
- static const struct arm64_ftr_bits ftr_ctr[] = {
--	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_EXACT, 31, 1, 1),		/* RES1 */
--	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, 29, 1, 1),	/* DIC */
--	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, 28, 1, 1),	/* IDC */
--	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_HIGHER_SAFE, 24, 4, 0),	/* CWG */
--	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_HIGHER_SAFE, 20, 4, 0),	/* ERG */
--	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, 16, 4, 1),	/* DminLine */
-+	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_EXACT, 31, 1, 1),                    /* RES1 */
-+	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, CTR_DIC_SHIFT, 1, 1),    /* DIC */
-+	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, CTR_IDC_SHIFT, 1, 1),    /* IDC */
-+	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_HIGHER_SAFE, CTR_CWG_SHIFT, 4, 0),   /* CWG */
-+	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_HIGHER_SAFE, CTR_ERG_SHIFT, 4, 0),   /* ERG */
-+	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, CTR_DMLINE_SHIFT, 4, 1), /* DminLine */
- 	/*
- 	 * Linux can handle differing I-cache policies. Userspace JITs will
- 	 * make use of *minLine.
-@@ -852,6 +852,20 @@ static bool has_no_fpsimd(const struct arm64_cpu_capabilities *entry, int __unus
- 					ID_AA64PFR0_FP_SHIFT) < 0;
- }
- 
-+#ifdef CONFIG_ARM64_SKIP_CACHE_POU
-+static bool has_cache_idc(const struct arm64_cpu_capabilities *entry,
-+			  int __unused)
-+{
-+	return read_sanitised_ftr_reg(SYS_CTR_EL0) & BIT(CTR_IDC_SHIFT);
-+}
-+
-+static bool has_cache_dic(const struct arm64_cpu_capabilities *entry,
-+			  int __unused)
-+{
-+	return read_sanitised_ftr_reg(SYS_CTR_EL0) & BIT(CTR_DIC_SHIFT);
-+}
-+#endif
-+
- #ifdef CONFIG_UNMAP_KERNEL_AT_EL0
- static int __kpti_forced; /* 0: not forced, >0: forced on, <0: forced off */
- 
-@@ -1088,6 +1102,20 @@ static int cpu_copy_el2regs(void *__unused)
- 		.enable = cpu_clear_disr,
- 	},
- #endif /* CONFIG_ARM64_RAS_EXTN */
-+#ifdef CONFIG_ARM64_SKIP_CACHE_POU
-+	{
-+		.desc = "Skip D-Cache maintenance 'DC CVAU' (CTR_EL0.IDC=1)",
-+		.capability = ARM64_HAS_CACHE_IDC,
-+		.def_scope = SCOPE_SYSTEM,
-+		.matches = has_cache_idc,
-+	},
-+	{
-+		.desc = "Skip I-Cache maintenance 'IC IVAU' (CTR_EL0.DIC=1)",
-+		.capability = ARM64_HAS_CACHE_DIC,
-+		.def_scope = SCOPE_SYSTEM,
-+		.matches = has_cache_dic,
-+	},
-+#endif /* CONFIG_ARM64_SKIP_CACHE_POU */
- 	{},
- };
- 
-diff --git a/arch/arm64/mm/cache.S b/arch/arm64/mm/cache.S
-index 758bde7..d8d7a32 100644
---- a/arch/arm64/mm/cache.S
-+++ b/arch/arm64/mm/cache.S
-@@ -50,6 +50,12 @@ ENTRY(flush_icache_range)
-  */
- ENTRY(__flush_cache_user_range)
- 	uaccess_ttbr0_enable x2, x3, x4
-+#ifdef CONFIG_ARM64_SKIP_CACHE_POU
-+alternative_if ARM64_HAS_CACHE_IDC
-+	dsb	ishst
-+	b	8f
-+alternative_else_nop_endif
-+#endif
- 	dcache_line_size x2, x3
- 	sub	x3, x2, #1
- 	bic	x4, x0, x3
-@@ -60,6 +66,7 @@ user_alt 9f, "dc cvau, x4",  "dc civac, x4",  ARM64_WORKAROUND_CLEAN_CACHE
- 	b.lo	1b
- 	dsb	ish
- 
-+8:
- 	invalidate_icache_by_line x0, x1, x2, x3, 9f
- 	mov	x0, #0
- 1:
-@@ -116,6 +123,12 @@ ENDPIPROC(__flush_dcache_area)
-  *	- size    - size in question
-  */
- ENTRY(__clean_dcache_area_pou)
-+#ifdef CONFIG_ARM64_SKIP_CACHE_POU
-+alternative_if ARM64_HAS_CACHE_IDC
-+	dsb	ishst
-+	ret
-+alternative_else_nop_endif
-+#endif
- 	dcache_by_line_op cvau, ish, x0, x1, x2, x3
- 	ret
- ENDPROC(__clean_dcache_area_pou)
--- 
-Qualcomm Datacenter Technologies, Inc. on behalf of the Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
+> CC'ing Igor and qemu-devel
+> 
+> drew
+> 
