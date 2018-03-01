@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v5 13/23] arm64: KVM: Dynamically compute the HYP VA mask
-Date: Thu,  1 Mar 2018 15:55:28 +0000
-Message-ID: <20180301155538.26860-14-marc.zyngier@arm.com>
+Subject: [PATCH v5 14/23] arm64: KVM: Introduce EL2 VA randomisation
+Date: Thu,  1 Mar 2018 15:55:29 +0000
+Message-ID: <20180301155538.26860-15-marc.zyngier@arm.com>
 References: <20180301155538.26860-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A52C49E76
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Mar 2018 10:50:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0ABDC49E56
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Mar 2018 10:50:42 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6IPCvIRYYshx for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Mar 2018 10:50:00 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C629A49E67
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Mar 2018 10:49:13 -0500 (EST)
+ with ESMTP id EoA+bf4fslRR for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Mar 2018 10:50:19 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D151049DF1
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Mar 2018 10:49:15 -0500 (EST)
 In-Reply-To: <20180301155538.26860-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,55 +31,212 @@ To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.c
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As we're moving towards a much more dynamic way to compute our
-HYP VA, let's express the mask in a slightly different way.
+The main idea behind randomising the EL2 VA is that we usually have
+a few spare bits between the most significant bit of the VA mask
+and the most significant bit of the linear mapping.
 
-Instead of comparing the idmap position to the "low" VA mask,
-we directly compute the mask by taking into account the idmap's
-(VA_BIT-1) bit.
+Those bits could be a bunch of zeroes, and could be useful
+to move things around a bit. Of course, the more memory you have,
+the less randomisation you get...
 
-No functionnal change.
+Alternatively, these bits could be the result of KASLR, in which
+case they are already random. But it would be nice to have a
+*different* randomization, just to make the job of a potential
+attacker a bit more difficult.
 
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Inserting these random bits is a bit involved. We don't have a spare
+register (short of rewriting all the kern_hyp_va call sites), and
+the immediate we want to insert is too random to be used with the
+ORR instruction. The best option I could come up with is the following
+sequence:
+
+	and x0, x0, #va_mask
+	ror x0, x0, #first_random_bit
+	add x0, x0, #(random & 0xfff)
+	add x0, x0, #(random >> 12), lsl #12
+	ror x0, x0, #(63 - first_random_bit)
+
+making it a fairly long sequence, but one that a decent CPU should
+be able to execute without breaking a sweat. It is of course NOPed
+out on VHE. The last 4 instructions can also be turned into NOPs
+if it appears that there is no free bits to use.
+
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/va_layout.c | 17 ++++++-----------
- 1 file changed, 6 insertions(+), 11 deletions(-)
+ arch/arm64/include/asm/kvm_mmu.h | 12 +++++--
+ arch/arm64/kvm/va_layout.c       | 78 +++++++++++++++++++++++++++++++++++++---
+ virt/kvm/arm/mmu.c               |  2 +-
+ 3 files changed, 84 insertions(+), 8 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index c4934470403b..a5e0fc900de8 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -85,7 +85,11 @@
+  */
+ .macro kern_hyp_va	reg
+ alternative_cb kvm_update_va_mask
+-	and     \reg, \reg, #1
++	and     \reg, \reg, #1		/* mask with va_mask */
++	ror	\reg, \reg, #1		/* rotate to the first tag bit */
++	add	\reg, \reg, #0		/* insert the low 12 bits of the tag */
++	add	\reg, \reg, #0, lsl 12	/* insert the top 12 bits of the tag */
++	ror	\reg, \reg, #63		/* rotate back */
+ alternative_cb_end
+ .endm
+ 
+@@ -102,7 +106,11 @@ void kvm_update_va_mask(struct alt_instr *alt,
+ 
+ static inline unsigned long __kern_hyp_va(unsigned long v)
+ {
+-	asm volatile(ALTERNATIVE_CB("and %0, %0, #1\n",
++	asm volatile(ALTERNATIVE_CB("and %0, %0, #1\n"
++				    "ror %0, %0, #1\n"
++				    "add %0, %0, #0\n"
++				    "add %0, %0, #0, lsl 12\n"
++				    "ror %0, %0, #63\n",
+ 				    kvm_update_va_mask)
+ 		     : "+r" (v));
+ 	return v;
 diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
-index 45e7802328d4..2bcbc1d33b64 100644
+index 2bcbc1d33b64..a73e47804972 100644
 --- a/arch/arm64/kvm/va_layout.c
 +++ b/arch/arm64/kvm/va_layout.c
-@@ -21,24 +21,19 @@
+@@ -16,24 +16,62 @@
+  */
+ 
+ #include <linux/kvm_host.h>
++#include <linux/random.h>
++#include <linux/memblock.h>
+ #include <asm/alternative.h>
+ #include <asm/debug-monitors.h>
  #include <asm/insn.h>
  #include <asm/kvm_mmu.h>
  
--#define HYP_PAGE_OFFSET_HIGH_MASK	((UL(1) << VA_BITS) - 1)
--#define HYP_PAGE_OFFSET_LOW_MASK	((UL(1) << (VA_BITS - 1)) - 1)
--
++/*
++ * The LSB of the random hyp VA tag or 0 if no randomization is used.
++ */
++static u8 tag_lsb;
++/*
++ * The random hyp VA tag value with the region bit if hyp randomization is used
++ */
++static u64 tag_val;
  static u64 va_mask;
  
  static void compute_layout(void)
  {
  	phys_addr_t idmap_addr = __pa_symbol(__hyp_idmap_text_start);
--	unsigned long mask = HYP_PAGE_OFFSET_HIGH_MASK;
-+	u64 hyp_va_msb;
+ 	u64 hyp_va_msb;
++	int kva_msb;
  
--	/*
--	 * Activate the lower HYP offset only if the idmap doesn't
--	 * clash with it,
--	 */
--	if (idmap_addr > HYP_PAGE_OFFSET_LOW_MASK)
--		mask = HYP_PAGE_OFFSET_LOW_MASK;
-+	/* Where is my RAM region? */
-+	hyp_va_msb  = idmap_addr & BIT(VA_BITS - 1);
-+	hyp_va_msb ^= BIT(VA_BITS - 1);
+ 	/* Where is my RAM region? */
+ 	hyp_va_msb  = idmap_addr & BIT(VA_BITS - 1);
+ 	hyp_va_msb ^= BIT(VA_BITS - 1);
  
--	va_mask = mask;
-+	va_mask  = GENMASK_ULL(VA_BITS - 2, 0);
-+	va_mask |= hyp_va_msb;
+-	va_mask  = GENMASK_ULL(VA_BITS - 2, 0);
+-	va_mask |= hyp_va_msb;
++	kva_msb = fls64((u64)phys_to_virt(memblock_start_of_DRAM()) ^
++			(u64)(high_memory - 1));
++
++	if (kva_msb == (VA_BITS - 1)) {
++		/*
++		 * No space in the address, let's compute the mask so
++		 * that it covers (VA_BITS - 1) bits, and the region
++		 * bit. The tag stays set to zero.
++		 */
++		va_mask  = BIT(VA_BITS - 1) - 1;
++		va_mask |= hyp_va_msb;
++	} else {
++		/*
++		 * We do have some free bits to insert a random tag.
++		 * Hyp VAs are now created from kernel linear map VAs
++		 * using the following formula (with V == VA_BITS):
++		 *
++		 *  63 ... V |     V-1    | V-2 .. tag_lsb | tag_lsb - 1 .. 0
++		 *  ---------------------------------------------------------
++		 * | 0000000 | hyp_va_msb |    random tag  |  kern linear VA |
++		 */
++		u64 mask = GENMASK_ULL(VA_BITS - 2, tag_lsb);
++
++		tag_lsb = kva_msb;
++		va_mask = GENMASK_ULL(tag_lsb - 1, 0);
++		tag_val  = get_random_long() & mask;
++		tag_val |= hyp_va_msb;
++		tag_val >>= tag_lsb;
++	}
  }
  
  static u32 compute_instruction(int n, u32 rd, u32 rn)
+@@ -46,6 +84,33 @@ static u32 compute_instruction(int n, u32 rd, u32 rn)
+ 							  AARCH64_INSN_VARIANT_64BIT,
+ 							  rn, rd, va_mask);
+ 		break;
++
++	case 1:
++		/* ROR is a variant of EXTR with Rm = Rn */
++		insn = aarch64_insn_gen_extr(AARCH64_INSN_VARIANT_64BIT,
++					     rn, rn, rd,
++					     tag_lsb);
++		break;
++
++	case 2:
++		insn = aarch64_insn_gen_add_sub_imm(rd, rn,
++						    tag_val & (SZ_4K - 1),
++						    AARCH64_INSN_VARIANT_64BIT,
++						    AARCH64_INSN_ADSB_ADD);
++		break;
++
++	case 3:
++		insn = aarch64_insn_gen_add_sub_imm(rd, rn,
++						    tag_val & GENMASK(23, 12),
++						    AARCH64_INSN_VARIANT_64BIT,
++						    AARCH64_INSN_ADSB_ADD);
++		break;
++
++	case 4:
++		/* ROR is a variant of EXTR with Rm = Rn */
++		insn = aarch64_insn_gen_extr(AARCH64_INSN_VARIANT_64BIT,
++					     rn, rn, rd, 64 - tag_lsb);
++		break;
+ 	}
+ 
+ 	return insn;
+@@ -56,8 +121,7 @@ void __init kvm_update_va_mask(struct alt_instr *alt,
+ {
+ 	int i;
+ 
+-	/* We only expect a single instruction in the alternative sequence */
+-	BUG_ON(nr_inst != 1);
++	BUG_ON(nr_inst != 5);
+ 
+ 	if (!has_vhe() && !va_mask)
+ 		compute_layout();
+@@ -68,8 +132,12 @@ void __init kvm_update_va_mask(struct alt_instr *alt,
+ 		/*
+ 		 * VHE doesn't need any address translation, let's NOP
+ 		 * everything.
++		 *
++		 * Alternatively, if we don't have any spare bits in
++		 * the address, NOP everything after masking that
++		 * kernel VA.
+ 		 */
+-		if (has_vhe()) {
++		if (has_vhe() || (!tag_lsb && i > 1)) {
+ 			updptr[i] = aarch64_insn_gen_nop();
+ 			continue;
+ 		}
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 3074544940dc..e2de45db0af2 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -1868,7 +1868,7 @@ int kvm_mmu_init(void)
+ 		  kern_hyp_va((unsigned long)high_memory - 1));
+ 
+ 	if (hyp_idmap_start >= kern_hyp_va(PAGE_OFFSET) &&
+-	    hyp_idmap_start <  kern_hyp_va(~0UL) &&
++	    hyp_idmap_start <  kern_hyp_va((unsigned long)high_memory - 1) &&
+ 	    hyp_idmap_start != (unsigned long)__hyp_idmap_text_start) {
+ 		/*
+ 		 * The idmap page is intersecting with the VA space,
 -- 
 2.14.2
