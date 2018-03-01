@@ -1,23 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v5 16/23] arm64: KVM: Move vector offsetting from hyp-init.S
- to kvm_get_hyp_vector
-Date: Thu,  1 Mar 2018 15:55:31 +0000
-Message-ID: <20180301155538.26860-17-marc.zyngier@arm.com>
+Subject: [PATCH v5 17/23] arm64: KVM: Move stashing of x0/x1 into the vector
+ code itself
+Date: Thu,  1 Mar 2018 15:55:32 +0000
+Message-ID: <20180301155538.26860-18-marc.zyngier@arm.com>
 References: <20180301155538.26860-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9568649E56
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Mar 2018 10:51:33 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 92F6049E96
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Mar 2018 10:51:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aYe2jEGuqgEY for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id WLezV-ks7vkY for <kvmarm@lists.cs.columbia.edu>;
  Thu,  1 Mar 2018 10:51:10 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E55D649F64
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Mar 2018 10:49:19 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EEE1849F70
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Mar 2018 10:49:21 -0500 (EST)
 In-Reply-To: <20180301155538.26860-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,51 +32,115 @@ To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.c
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We currently provide the hyp-init code with a kernel VA, and expect
-it to turn it into a HYP va by itself. As we're about to provide
-the hypervisor with mappings that are not necessarily in the memory
-range, let's move the kern_hyp_va macro to kvm_get_hyp_vector.
+All our useful entry points into the hypervisor are starting by
+saving x0 and x1 on the stack. Let's move those into the vectors
+by introducing macros that annotate whether a vector is valid or
+not, thus indicating whether we want to stash registers or not.
 
-No functionnal change.
+The only drawback is that we now also stash registers for el2_error,
+but this should never happen, and we pop them back right at the
+start of the handling sequence.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/kvm_mmu.h | 3 ++-
- arch/arm64/kvm/hyp-init.S        | 1 -
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/hyp-entry.S | 56 ++++++++++++++++++++++++------------------
+ 1 file changed, 32 insertions(+), 24 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index a5e0fc900de8..bfb81e73da06 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -374,6 +374,7 @@ static inline void *kvm_get_hyp_vector(void)
- 			vect = lm_alias(vect);
- 	}
+diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+index f36464bd57c5..0f62b5f76aa5 100644
+--- a/arch/arm64/kvm/hyp/hyp-entry.S
++++ b/arch/arm64/kvm/hyp/hyp-entry.S
+@@ -55,7 +55,6 @@ ENTRY(__vhe_hyp_call)
+ ENDPROC(__vhe_hyp_call)
  
-+	vect = kern_hyp_va(vect);
- 	return vect;
- }
+ el1_sync:				// Guest trapped into EL2
+-	stp	x0, x1, [sp, #-16]!
  
-@@ -387,7 +388,7 @@ static inline int kvm_map_vectors(void)
- #else
- static inline void *kvm_get_hyp_vector(void)
- {
--	return kvm_ksym_ref(__kvm_hyp_vector);
-+	return kern_hyp_va(kvm_ksym_ref(__kvm_hyp_vector));
- }
+ alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
+ 	mrs	x1, esr_el2
+@@ -137,18 +136,18 @@ alternative_else_nop_endif
+ 	b	__guest_exit
  
- static inline int kvm_map_vectors(void)
-diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp-init.S
-index 5aa9ccf6db99..6fd91b31a131 100644
---- a/arch/arm64/kvm/hyp-init.S
-+++ b/arch/arm64/kvm/hyp-init.S
-@@ -117,7 +117,6 @@ CPU_BE(	orr	x4, x4, #SCTLR_ELx_EE)
- 	/* Set the stack and new vectors */
- 	kern_hyp_va	x1
- 	mov	sp, x1
--	kern_hyp_va	x2
- 	msr	vbar_el2, x2
+ el1_irq:
+-	stp     x0, x1, [sp, #-16]!
+ 	ldr	x1, [sp, #16 + 8]
+ 	mov	x0, #ARM_EXCEPTION_IRQ
+ 	b	__guest_exit
  
- 	/* copy tpidr_el1 into tpidr_el2 for use by HYP */
+ el1_error:
+-	stp     x0, x1, [sp, #-16]!
+ 	ldr	x1, [sp, #16 + 8]
+ 	mov	x0, #ARM_EXCEPTION_EL1_SERROR
+ 	b	__guest_exit
+ 
+ el2_error:
++	ldp	x0, x1, [sp], #16
++
+ 	/*
+ 	 * Only two possibilities:
+ 	 * 1) Either we come from the exit path, having just unmasked
+@@ -206,32 +205,41 @@ ENDPROC(\label)
+ 	invalid_vector	el2h_sync_invalid
+ 	invalid_vector	el2h_irq_invalid
+ 	invalid_vector	el2h_fiq_invalid
+-	invalid_vector	el1_sync_invalid
+-	invalid_vector	el1_irq_invalid
+ 	invalid_vector	el1_fiq_invalid
+ 
+ 	.ltorg
+ 
+ 	.align 11
+ 
++.macro valid_vect target
++	.align 7
++	stp	x0, x1, [sp, #-16]!
++	b	\target
++.endm
++
++.macro invalid_vect target
++	.align 7
++	b	\target
++.endm
++
+ ENTRY(__kvm_hyp_vector)
+-	ventry	el2t_sync_invalid		// Synchronous EL2t
+-	ventry	el2t_irq_invalid		// IRQ EL2t
+-	ventry	el2t_fiq_invalid		// FIQ EL2t
+-	ventry	el2t_error_invalid		// Error EL2t
+-
+-	ventry	el2h_sync_invalid		// Synchronous EL2h
+-	ventry	el2h_irq_invalid		// IRQ EL2h
+-	ventry	el2h_fiq_invalid		// FIQ EL2h
+-	ventry	el2_error			// Error EL2h
+-
+-	ventry	el1_sync			// Synchronous 64-bit EL1
+-	ventry	el1_irq				// IRQ 64-bit EL1
+-	ventry	el1_fiq_invalid			// FIQ 64-bit EL1
+-	ventry	el1_error			// Error 64-bit EL1
+-
+-	ventry	el1_sync			// Synchronous 32-bit EL1
+-	ventry	el1_irq				// IRQ 32-bit EL1
+-	ventry	el1_fiq_invalid			// FIQ 32-bit EL1
+-	ventry	el1_error			// Error 32-bit EL1
++	invalid_vect	el2t_sync_invalid	// Synchronous EL2t
++	invalid_vect	el2t_irq_invalid	// IRQ EL2t
++	invalid_vect	el2t_fiq_invalid	// FIQ EL2t
++	invalid_vect	el2t_error_invalid	// Error EL2t
++
++	invalid_vect	el2h_sync_invalid	// Synchronous EL2h
++	invalid_vect	el2h_irq_invalid	// IRQ EL2h
++	invalid_vect	el2h_fiq_invalid	// FIQ EL2h
++	valid_vect	el2_error		// Error EL2h
++
++	valid_vect	el1_sync		// Synchronous 64-bit EL1
++	valid_vect	el1_irq			// IRQ 64-bit EL1
++	invalid_vect	el1_fiq_invalid		// FIQ 64-bit EL1
++	valid_vect	el1_error		// Error 64-bit EL1
++
++	valid_vect	el1_sync		// Synchronous 32-bit EL1
++	valid_vect	el1_irq			// IRQ 32-bit EL1
++	invalid_vect	el1_fiq_invalid		// FIQ 32-bit EL1
++	valid_vect	el1_error		// Error 32-bit EL1
+ ENDPROC(__kvm_hyp_vector)
 -- 
 2.14.2
