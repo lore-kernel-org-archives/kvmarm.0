@@ -1,71 +1,59 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v5 23/23] arm64: Enable ARM64_HARDEN_EL2_VECTORS on Cortex-A57
- and A72
-Date: Thu,  1 Mar 2018 15:55:38 +0000
-Message-ID: <20180301155538.26860-24-marc.zyngier@arm.com>
-References: <20180301155538.26860-1-marc.zyngier@arm.com>
+From: Punit Agrawal <punit.agrawal@arm.com>
+Subject: Re: [PATCH 02/11] ACPI / APEI: Generalise the estatus queue's
+ add/remove and notify code
+Date: Thu, 01 Mar 2018 18:06:59 +0000
+Message-ID: <87sh9jbrgc.fsf@e105922-lin.cambridge.arm.com>
+References: <20180215185606.26736-1-james.morse@arm.com>
+ <20180215185606.26736-3-james.morse@arm.com>
+ <20180301150144.GA4215@pd.tnic>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D00549F7B
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Mar 2018 10:52:21 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LMYiiCB6TpiV for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Mar 2018 10:51:58 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 38FDA49F7F
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Mar 2018 10:49:34 -0500 (EST)
-In-Reply-To: <20180301155538.26860-1-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20180301150144.GA4215@pd.tnic> (Borislav Petkov's message of
+ "Thu, 1 Mar 2018 16:01:44 +0100")
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Borislav Petkov <bp@alien8.de>
+Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Xie XiuQi <xiexiuqi@huawei.com>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, James Morse <james.morse@arm.com>, linux-arm-kernel@lists.infradead.org, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Cortex-A57 and A72 are vulnerable to the so-called "variant 3a" of
-Meltdown, where an attacker can speculatively obtain the value
-of a privileged system register.
+Hi Borislav,
 
-By enabling ARM64_HARDEN_EL2_VECTORS on these CPUs, obtaining
-VBAR_EL2 is not disclosing the hypervisor mappings anymore.
+Borislav Petkov <bp@alien8.de> writes:
 
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm64/kernel/cpu_errata.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+> On Thu, Feb 15, 2018 at 06:55:57PM +0000, James Morse wrote:
+>> Keep the oops_begin() call for x86,
+>
+> That oops_begin() in generic code is such a layering violation, grrr.
+>
+>> arm64 doesn't have one of these,
+>> and APEI is the only thing outside arch code calling this..
+>
+> So looking at:
+>
+> arch/arm/kernel/traps.c:die()
+>
+> it does call oops_begin() ... oops_end() just like the x86 version of
+> die().
 
-diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-index 8cf6b60a085a..aacdc118c4c9 100644
---- a/arch/arm64/kernel/cpu_errata.c
-+++ b/arch/arm64/kernel/cpu_errata.c
-@@ -424,6 +424,18 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
- 		MIDR_ALL_VERSIONS(MIDR_CAVIUM_THUNDERX2),
- 		.enable = enable_smccc_arch_workaround_1,
- 	},
-+#endif
-+#ifdef CONFIG_HARDEN_EL2_VECTORS
-+	{
-+		.desc = "Cortex-A57 EL2 vector hardening",
-+		.capability = ARM64_HARDEN_EL2_VECTORS,
-+		MIDR_ALL_VERSIONS(MIDR_CORTEX_A57),
-+	},
-+	{
-+		.desc = "Cortex-A72 EL2 vector hardening",
-+		.capability = ARM64_HARDEN_EL2_VECTORS,
-+		MIDR_ALL_VERSIONS(MIDR_CORTEX_A72),
-+	},
- #endif
- 	{
- 	}
--- 
-2.14.2
+You're looking at support for the 32-bit ARM systems. The 64-bit support
+lives in arch/arm64 and the die() there doesn't contain an
+oops_begin()/oops_end(). But the lack of oops_begin() on arm64 doesn't
+really matter here.
+
+>
+> I'm wondering if we could move the code to do die() in a prepatch? My
+> assumption is that all the arches should have die()... A quick grep does
+> show a bunch of other arches having die()...
+
+One issue I see with calling die() is that it is defined in different
+includes across various architectures, (e.g., include/asm/kdebug.h for
+x86, include/asm/system_misc.h in arm64, etc.)
