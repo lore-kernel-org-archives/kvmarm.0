@@ -1,64 +1,50 @@
-From: David Hildenbrand <david@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-arm] VCPU hotplug on KVM/ARM
-Date: Thu, 1 Mar 2018 14:32:39 +0100
-Message-ID: <b049a501-cd5e-8c22-9c62-88c950e01b1b@redhat.com>
-References: <000e01d3afad$b9a13830$2ce3a890$@codeaurora.org>
- <20180227104708.GA11391@cbox>
- <ac329e1b1f5265a805916ab4f8708f9d@codeaurora.org>
- <20180227124604.GA2373@cbox>
- <20180227132131.fipafmnb56a7fj76@kamzik.brq.redhat.com>
- <20180301105030.2b716e68@redhat.com>
- <CAFEAcA9yaU745Asy--jM0nu8FDJ62CEXSH_TKa-ZZfC16qye6w@mail.gmail.com>
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH 02/11] ACPI / APEI: Generalise the estatus queue's
+ add/remove and notify code
+Date: Thu, 1 Mar 2018 16:01:44 +0100
+Message-ID: <20180301150144.GA4215@pd.tnic>
+References: <20180215185606.26736-1-james.morse@arm.com>
+ <20180215185606.26736-3-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B9DF402D3
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Mar 2018 08:26:09 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vz+5W1+VvrcG for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Mar 2018 08:25:42 -0500 (EST)
-Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D6D7D402C7
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Mar 2018 08:25:42 -0500 (EST)
-In-Reply-To: <CAFEAcA9yaU745Asy--jM0nu8FDJ62CEXSH_TKa-ZZfC16qye6w@mail.gmail.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>
-Cc: Christoffer Dall <cdall@cs.columbia.edu>, QEMU Developers <qemu-devel@nongnu.org>, Christoffer Dall <christofferdall@christofferdall.dk>, qemu-arm <qemu-arm@nongnu.org>, kvmarm@lists.cs.columbia.edu
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <20180215185606.26736-3-james.morse@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: James Morse <james.morse@arm.com>
+Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Xie XiuQi <xiexiuqi@huawei.com>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Punit Agrawal <punit.agrawal@arm.com>, linux-arm-kernel@lists.infradead.org, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 01.03.2018 11:05, Peter Maydell wrote:
-> On 1 March 2018 at 09:50, Igor Mammedov <imammedo@redhat.com> wrote:
->> In QEMU on x86 (and I think ppc, s390 as well), we create vCPUs on demand.>>
->> It would be nice if ARM would be able to do that too,
->> so that it could take advantage of the same code.
-> 
-> It's not clear to me how that would work, given that for
-> instance the interrupt controller wants to know up-front
-> how many CPUs it has to deal with.
->
+On Thu, Feb 15, 2018 at 06:55:57PM +0000, James Morse wrote:
+> Keep the oops_begin() call for x86,
 
-So how is cpu hotplug handled in HW? Or doesn't it even exist there?
+That oops_begin() in generic code is such a layering violation, grrr.
 
-(we have max_cpus for the interrupt controller, but not sure if that is
-what we want)
+> arm64 doesn't have one of these,
+> and APEI is the only thing outside arch code calling this..
 
-> thanks
-> -- PMM
-> 
+So looking at:
+
+arch/arm/kernel/traps.c:die()
+
+it does call oops_begin() ... oops_end() just like the x86 version of
+die().
+
+I'm wondering if we could move the code to do die() in a prepatch? My
+assumption is that all the arches should have die()... A quick grep does
+show a bunch of other arches having die()...
+
 -- 
+Regards/Gruss,
+    Boris.
 
-Thanks,
-
-David / dhildenb
+Good mailing practices for 400: avoid top-posting and trim the reply.
