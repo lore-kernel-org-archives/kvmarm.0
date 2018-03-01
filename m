@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v5 17/23] arm64: KVM: Move stashing of x0/x1 into the vector
- code itself
-Date: Thu,  1 Mar 2018 15:55:32 +0000
-Message-ID: <20180301155538.26860-18-marc.zyngier@arm.com>
+Subject: [PATCH v5 18/23] arm64: KVM: Add epilogue branching to the vector code
+Date: Thu,  1 Mar 2018 15:55:33 +0000
+Message-ID: <20180301155538.26860-19-marc.zyngier@arm.com>
 References: <20180301155538.26860-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 92F6049E96
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B0A9E49E95
  for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Mar 2018 10:51:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WLezV-ks7vkY for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Mar 2018 10:51:10 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EEE1849F70
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Mar 2018 10:49:21 -0500 (EST)
+ with ESMTP id hiYEt0unn1kg for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Mar 2018 10:51:11 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0612249F71
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Mar 2018 10:49:24 -0500 (EST)
 In-Reply-To: <20180301155538.26860-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,115 +31,134 @@ To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.c
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-All our useful entry points into the hypervisor are starting by
-saving x0 and x1 on the stack. Let's move those into the vectors
-by introducing macros that annotate whether a vector is valid or
-not, thus indicating whether we want to stash registers or not.
+We are soon going to have to do some extra work in the BP hardening
+vector slots. Instead of doing that work in the vectors themselves
+(which would massively reduce the space available to deal with
+Spectre v2), let's branch to an epilogue where we can do "stuff".
 
-The only drawback is that we now also stash registers for el2_error,
-but this should never happen, and we pop them back right at the
-start of the handling sequence.
+This has a number of consequences:
+- We need some free registers, so we're spilling x0 and x1 on the
+  stack
+- In order to counterbalance this, we branch to the *second* instruction
+  in the vectors, avoiding the initial store that is already there
+  (or loading the registers back if we've branched to a panic vector)
+
+This is all controlled by a new capability (ARM64_HARDEN_EL2_VECTORS)
+which doesn't get enabled yet.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp/hyp-entry.S | 56 ++++++++++++++++++++++++------------------
- 1 file changed, 32 insertions(+), 24 deletions(-)
+ arch/arm64/include/asm/cpucaps.h |  2 +-
+ arch/arm64/kernel/bpi.S          | 57 +++++++++++++++++++++++++---------------
+ arch/arm64/kvm/hyp/hyp-entry.S   |  2 ++
+ 3 files changed, 39 insertions(+), 22 deletions(-)
 
+diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+index 76a43a17449a..d4cc54ed0656 100644
+--- a/arch/arm64/include/asm/cpucaps.h
++++ b/arch/arm64/include/asm/cpucaps.h
+@@ -32,7 +32,7 @@
+ #define ARM64_HAS_VIRT_HOST_EXTN		11
+ #define ARM64_WORKAROUND_CAVIUM_27456		12
+ #define ARM64_HAS_32BIT_EL0			13
+-/* #define ARM64_UNALLOCATED_ENTRY			14 */
++#define ARM64_HARDEN_EL2_VECTORS		14
+ #define ARM64_MISMATCHED_CACHE_LINE_SIZE	15
+ #define ARM64_HAS_NO_FPSIMD			16
+ #define ARM64_WORKAROUND_REPEAT_TLBI		17
+diff --git a/arch/arm64/kernel/bpi.S b/arch/arm64/kernel/bpi.S
+index e5de33513b5d..e000cb390618 100644
+--- a/arch/arm64/kernel/bpi.S
++++ b/arch/arm64/kernel/bpi.S
+@@ -19,40 +19,55 @@
+ #include <linux/linkage.h>
+ #include <linux/arm-smccc.h>
+ 
+-.macro ventry target
+-	.rept 31
++.macro hyp_ventry offset
++	.align 7
++	.rept 29
+ 	nop
+ 	.endr
+-	b	\target
++alternative_if ARM64_HARDEN_EL2_VECTORS
++	stp	x0, x1, [sp, #-16]!
++	mov	x0, #(\offset + 4)
++	b	__kvm_enter_vectors
++alternative_else
++	b	__kvm_hyp_vector + \offset
++	nop
++	nop
++alternative_endif
+ .endm
+ 
+-.macro vectors target
+-	ventry \target + 0x000
+-	ventry \target + 0x080
+-	ventry \target + 0x100
+-	ventry \target + 0x180
++.macro generate_vectors
++	hyp_ventry 0x000
++	hyp_ventry 0x080
++	hyp_ventry 0x100
++	hyp_ventry 0x180
+ 
+-	ventry \target + 0x200
+-	ventry \target + 0x280
+-	ventry \target + 0x300
+-	ventry \target + 0x380
++	hyp_ventry 0x200
++	hyp_ventry 0x280
++	hyp_ventry 0x300
++	hyp_ventry 0x380
+ 
+-	ventry \target + 0x400
+-	ventry \target + 0x480
+-	ventry \target + 0x500
+-	ventry \target + 0x580
++	hyp_ventry 0x400
++	hyp_ventry 0x480
++	hyp_ventry 0x500
++	hyp_ventry 0x580
+ 
+-	ventry \target + 0x600
+-	ventry \target + 0x680
+-	ventry \target + 0x700
+-	ventry \target + 0x780
++	hyp_ventry 0x600
++	hyp_ventry 0x680
++	hyp_ventry 0x700
++	hyp_ventry 0x780
+ .endm
+ 
+ 	.align	11
+ ENTRY(__bp_harden_hyp_vecs_start)
+ 	.rept 4
+-	vectors __kvm_hyp_vector
++	generate_vectors
+ 	.endr
++
++__kvm_enter_vectors:
++
++	adr_l	x1, __kvm_hyp_vector
++	add	x0, x1, x0
++	br	x0
+ ENTRY(__bp_harden_hyp_vecs_end)
+ 
+ ENTRY(__qcom_hyp_sanitize_link_stack_start)
 diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index f36464bd57c5..0f62b5f76aa5 100644
+index 0f62b5f76aa5..fc6a1006cc08 100644
 --- a/arch/arm64/kvm/hyp/hyp-entry.S
 +++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -55,7 +55,6 @@ ENTRY(__vhe_hyp_call)
- ENDPROC(__vhe_hyp_call)
- 
- el1_sync:				// Guest trapped into EL2
--	stp	x0, x1, [sp, #-16]!
- 
- alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
- 	mrs	x1, esr_el2
-@@ -137,18 +136,18 @@ alternative_else_nop_endif
- 	b	__guest_exit
- 
- el1_irq:
--	stp     x0, x1, [sp, #-16]!
- 	ldr	x1, [sp, #16 + 8]
- 	mov	x0, #ARM_EXCEPTION_IRQ
- 	b	__guest_exit
- 
- el1_error:
--	stp     x0, x1, [sp, #-16]!
- 	ldr	x1, [sp, #16 + 8]
- 	mov	x0, #ARM_EXCEPTION_EL1_SERROR
- 	b	__guest_exit
- 
- el2_error:
+@@ -220,6 +220,8 @@ ENDPROC(\label)
+ .macro invalid_vect target
+ 	.align 7
+ 	b	\target
 +	ldp	x0, x1, [sp], #16
-+
- 	/*
- 	 * Only two possibilities:
- 	 * 1) Either we come from the exit path, having just unmasked
-@@ -206,32 +205,41 @@ ENDPROC(\label)
- 	invalid_vector	el2h_sync_invalid
- 	invalid_vector	el2h_irq_invalid
- 	invalid_vector	el2h_fiq_invalid
--	invalid_vector	el1_sync_invalid
--	invalid_vector	el1_irq_invalid
- 	invalid_vector	el1_fiq_invalid
- 
- 	.ltorg
- 
- 	.align 11
- 
-+.macro valid_vect target
-+	.align 7
-+	stp	x0, x1, [sp, #-16]!
 +	b	\target
-+.endm
-+
-+.macro invalid_vect target
-+	.align 7
-+	b	\target
-+.endm
-+
+ .endm
+ 
  ENTRY(__kvm_hyp_vector)
--	ventry	el2t_sync_invalid		// Synchronous EL2t
--	ventry	el2t_irq_invalid		// IRQ EL2t
--	ventry	el2t_fiq_invalid		// FIQ EL2t
--	ventry	el2t_error_invalid		// Error EL2t
--
--	ventry	el2h_sync_invalid		// Synchronous EL2h
--	ventry	el2h_irq_invalid		// IRQ EL2h
--	ventry	el2h_fiq_invalid		// FIQ EL2h
--	ventry	el2_error			// Error EL2h
--
--	ventry	el1_sync			// Synchronous 64-bit EL1
--	ventry	el1_irq				// IRQ 64-bit EL1
--	ventry	el1_fiq_invalid			// FIQ 64-bit EL1
--	ventry	el1_error			// Error 64-bit EL1
--
--	ventry	el1_sync			// Synchronous 32-bit EL1
--	ventry	el1_irq				// IRQ 32-bit EL1
--	ventry	el1_fiq_invalid			// FIQ 32-bit EL1
--	ventry	el1_error			// Error 32-bit EL1
-+	invalid_vect	el2t_sync_invalid	// Synchronous EL2t
-+	invalid_vect	el2t_irq_invalid	// IRQ EL2t
-+	invalid_vect	el2t_fiq_invalid	// FIQ EL2t
-+	invalid_vect	el2t_error_invalid	// Error EL2t
-+
-+	invalid_vect	el2h_sync_invalid	// Synchronous EL2h
-+	invalid_vect	el2h_irq_invalid	// IRQ EL2h
-+	invalid_vect	el2h_fiq_invalid	// FIQ EL2h
-+	valid_vect	el2_error		// Error EL2h
-+
-+	valid_vect	el1_sync		// Synchronous 64-bit EL1
-+	valid_vect	el1_irq			// IRQ 64-bit EL1
-+	invalid_vect	el1_fiq_invalid		// FIQ 64-bit EL1
-+	valid_vect	el1_error		// Error 64-bit EL1
-+
-+	valid_vect	el1_sync		// Synchronous 32-bit EL1
-+	valid_vect	el1_irq			// IRQ 32-bit EL1
-+	invalid_vect	el1_fiq_invalid		// FIQ 32-bit EL1
-+	valid_vect	el1_error		// Error 32-bit EL1
- ENDPROC(__kvm_hyp_vector)
 -- 
 2.14.2
