@@ -1,140 +1,240 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v5 00/23] KVM/arm64: Randomise EL2 mappings (variant 3a
- mitigation)
-Date: Thu,  1 Mar 2018 15:55:15 +0000
-Message-ID: <20180301155538.26860-1-marc.zyngier@arm.com>
+Subject: [PATCH v5 01/23] arm64: alternatives: Add dynamic patching feature
+Date: Thu,  1 Mar 2018 15:55:16 +0000
+Message-ID: <20180301155538.26860-2-marc.zyngier@arm.com>
+References: <20180301155538.26860-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7224649E67
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Mar 2018 10:49:11 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 1-6rFZ3U2N0C for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Mar 2018 10:48:49 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3292B4048A
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Mar 2018 10:48:49 -0500 (EST)
+In-Reply-To: <20180301155538.26860-1-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: Mark Rutland <mark.rutland@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Christoffer Dall <cdall@kernel.org>, Steve Capper <steve.capper@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Whilst KVM benefits from the kernel randomisation via KASLR, there is
-no additional randomisation when the kernel is running at EL1, as we
-directly use a fixed offset from the linear mapping. This is not
-necessarily a problem, but we could do a bit better by independently
-randomizing the HYP placement.
+We've so far relied on a patching infrastructure that only gave us
+a single alternative, without any way to provide a range of potential
+replacement instructions. For a single feature, this is an all or
+nothing thing.
 
-This series proposes to randomise the offset by inserting a few random
-bits between the MSB of the RAM linear mapping and the top of the HYP
-VA (VA_BITS - 2). That's not a lot of random bits (on my Mustang, I
-get 13 bits), but that's better than nothing.
+It would be interesting to have a more flexible grained way of patching
+the kernel though, where we could dynamically tune the code that gets
+injected.
 
-In order to achieve this, we need to be able to patch dynamic values
-in the kernel text. This results in a bunch of changes to the
-alternative framework, the insn library, and a few more hacks in KVM
-itself (we get a new way to map the GIC at EL2).
+In order to achive this, let's introduce a new form of dynamic patching,
+assiciating a callback to a patching site. This callback gets source and
+target locations of the patching request, as well as the number of
+instructions to be patched.
 
-Another (and more recent) goal of this series is to work around what
-has been described as "variant 3a", which covers speculative reads of
-privileged system registers. Randomizing the location of the
-hypervisor would be pointless if one could simply obtain VBAR_EL2. In
-order to work around this, we place the vectors at a fairly static
-location (next to the idmap), independently of the hypervisor's own
-mappings. This ensures that we can leak VBAR_EL2 without disclosing
-much about HYP itself (and is similar to what the rest of the kernel
-does with KPTI). This is only enabled at runtime for Cortex-A57 and
-Cortex-A72.
+Dynamic patching is declared with the new ALTERNATIVE_CB and alternative_cb
+directives:
 
-This has been tested on the FVP model, Seattle (both 39 and 48bit VA),
-Mustang and Thunder-X. I've also done a sanity check on 32bit (which
-is only impacted by the HYP IO VA stuff).
+	asm volatile(ALTERNATIVE_CB("mov %0, #0\n", callback)
+		     : "r" (v));
+or
+	alternative_cb callback
+		mov	x0, #0
+	alternative_cb_end
 
-Thanks,
+where callback is the C function computing the alternative.
 
-	M.
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm64/include/asm/alternative.h | 41 ++++++++++++++++++++++++++++++----
+ arch/arm64/kernel/alternative.c      | 43 +++++++++++++++++++++++++++---------
+ 2 files changed, 69 insertions(+), 15 deletions(-)
 
-* From v4:
-  - Added some more patches to work around speculative reads of
-    VBAR_EL2
-  - Bunch of cleanups and clarifications thanks to Christoffer's review
-  - Dropped the initial asm-offsets rework on which this series
-    didn't really rely anymore
-
-* From v3:
-  - Reworked the alternative code to leave the actual patching to
-    the callback function. This should allow for more flexibility
-    should someone or something require it
-  - Now detects underflows in the IOVA allocator
-  - Moved the VA patching code to va_layout.c
-
-* From v2:
-  - Fixed a crapload of bugs in the immediate generation patch
-    I now have a test harness for it, making sure it generates the
-    same thing as GAS...
-  - Fixed a bug in the asm-offsets.h exclusion patch
-  - Reworked the alternative_cb code to be nicer and avoid generating
-    pointless nops
-
-* From v1:
-  - Now works correctly with KASLR
-  - Dropped the callback field from alt_instr, and reuse one of the
-    existing fields to store an offset to the callback
-  - Fix HYP teardown path (depends on fixes previously posted)
-  - Dropped the VA offset macros
-
-Marc Zyngier (23):
-  arm64: alternatives: Add dynamic patching feature
-  arm64: insn: Add N immediate encoding
-  arm64: insn: Add encoder for bitwise operations using literals
-  arm64: KVM: Dynamically patch the kernel/hyp VA mask
-  arm64: cpufeatures: Drop the ARM64_HYP_OFFSET_LOW feature flag
-  KVM: arm/arm64: Do not use kern_hyp_va() with kvm_vgic_global_state
-  KVM: arm/arm64: Demote HYP VA range display to being a debug feature
-  KVM: arm/arm64: Move ioremap calls to create_hyp_io_mappings
-  KVM: arm/arm64: Keep GICv2 HYP VAs in kvm_vgic_global_state
-  KVM: arm/arm64: Move HYP IO VAs to the "idmap" range
-  arm64; insn: Add encoder for the EXTR instruction
-  arm64: insn: Allow ADD/SUB (immediate) with LSL #12
-  arm64: KVM: Dynamically compute the HYP VA mask
-  arm64: KVM: Introduce EL2 VA randomisation
-  arm64: Update the KVM memory map documentation
-  arm64: KVM: Move vector offsetting from hyp-init.S to
-    kvm_get_hyp_vector
-  arm64: KVM: Move stashing of x0/x1 into the vector code itself
-  arm64: KVM: Add epilogue branching to the vector code
-  arm64: KVM: Allow far branches from vector slots to the main vectors
-  arm/arm64: KVM: Introduce EL2-specific executable mappings
-  arm64: Make BP hardening slot counter available
-  arm64: KVM: Allow mapping of vectors outside of the RAM region
-  arm64: Enable ARM64_HARDEN_EL2_VECTORS on Cortex-A57 and A72
-
- Documentation/arm64/memory.txt       |   9 +-
- arch/arm/include/asm/kvm_mmu.h       |  16 ++-
- arch/arm64/Kconfig                   |  16 +++
- arch/arm64/include/asm/alternative.h |  41 +++++++-
- arch/arm64/include/asm/cpucaps.h     |   2 +-
- arch/arm64/include/asm/insn.h        |  16 +++
- arch/arm64/include/asm/kvm_mmu.h     | 162 ++++++++++++++++++++---------
- arch/arm64/include/asm/mmu.h         |   8 +-
- arch/arm64/kernel/Makefile           |   4 +-
- arch/arm64/kernel/alternative.c      |  43 ++++++--
- arch/arm64/kernel/bpi.S              |  69 +++++++++----
- arch/arm64/kernel/cpu_errata.c       |  21 +++-
- arch/arm64/kernel/cpufeature.c       |  19 ----
- arch/arm64/kernel/insn.c             | 190 ++++++++++++++++++++++++++++++++++-
- arch/arm64/kvm/Makefile              |   2 +-
- arch/arm64/kvm/hyp-init.S            |   1 -
- arch/arm64/kvm/hyp/hyp-entry.S       |  58 ++++++-----
- arch/arm64/kvm/va_layout.c           | 184 +++++++++++++++++++++++++++++++++
- include/kvm/arm_vgic.h               |  12 +--
- virt/kvm/arm/hyp/vgic-v2-sr.c        |  12 +--
- virt/kvm/arm/mmu.c                   | 144 +++++++++++++++++++++-----
- virt/kvm/arm/vgic/vgic-init.c        |   6 --
- virt/kvm/arm/vgic/vgic-v2.c          |  40 +++-----
- 23 files changed, 859 insertions(+), 216 deletions(-)
- create mode 100644 arch/arm64/kvm/va_layout.c
-
+diff --git a/arch/arm64/include/asm/alternative.h b/arch/arm64/include/asm/alternative.h
+index 669028172fd6..a91933b1e2e6 100644
+--- a/arch/arm64/include/asm/alternative.h
++++ b/arch/arm64/include/asm/alternative.h
+@@ -5,6 +5,8 @@
+ #include <asm/cpucaps.h>
+ #include <asm/insn.h>
+ 
++#define ARM64_CB_PATCH ARM64_NCAPS
++
+ #ifndef __ASSEMBLY__
+ 
+ #include <linux/init.h>
+@@ -22,12 +24,19 @@ struct alt_instr {
+ 	u8  alt_len;		/* size of new instruction(s), <= orig_len */
+ };
+ 
++typedef void (*alternative_cb_t)(struct alt_instr *alt,
++				 __le32 *origptr, __le32 *updptr, int nr_inst);
++
+ void __init apply_alternatives_all(void);
+ void apply_alternatives(void *start, size_t length);
+ 
+-#define ALTINSTR_ENTRY(feature)						      \
++#define ALTINSTR_ENTRY(feature,cb)					      \
+ 	" .word 661b - .\n"				/* label           */ \
++	" .if " __stringify(cb) " == 0\n"				      \
+ 	" .word 663f - .\n"				/* new instruction */ \
++	" .else\n"							      \
++	" .word " __stringify(cb) "- .\n"		/* callback */	      \
++	" .endif\n"							      \
+ 	" .hword " __stringify(feature) "\n"		/* feature bit     */ \
+ 	" .byte 662b-661b\n"				/* source len      */ \
+ 	" .byte 664f-663f\n"				/* replacement len */
+@@ -45,15 +54,18 @@ void apply_alternatives(void *start, size_t length);
+  * but most assemblers die if insn1 or insn2 have a .inst. This should
+  * be fixed in a binutils release posterior to 2.25.51.0.2 (anything
+  * containing commit 4e4d08cf7399b606 or c1baaddf8861).
++ *
++ * Alternatives with callbacks do not generate replacement instructions.
+  */
+-#define __ALTERNATIVE_CFG(oldinstr, newinstr, feature, cfg_enabled)	\
++#define __ALTERNATIVE_CFG(oldinstr, newinstr, feature, cfg_enabled, cb)	\
+ 	".if "__stringify(cfg_enabled)" == 1\n"				\
+ 	"661:\n\t"							\
+ 	oldinstr "\n"							\
+ 	"662:\n"							\
+ 	".pushsection .altinstructions,\"a\"\n"				\
+-	ALTINSTR_ENTRY(feature)						\
++	ALTINSTR_ENTRY(feature,cb)					\
+ 	".popsection\n"							\
++	" .if " __stringify(cb) " == 0\n"				\
+ 	".pushsection .altinstr_replacement, \"a\"\n"			\
+ 	"663:\n\t"							\
+ 	newinstr "\n"							\
+@@ -61,11 +73,17 @@ void apply_alternatives(void *start, size_t length);
+ 	".popsection\n\t"						\
+ 	".org	. - (664b-663b) + (662b-661b)\n\t"			\
+ 	".org	. - (662b-661b) + (664b-663b)\n"			\
++	".else\n\t"							\
++	"663:\n\t"							\
++	"664:\n\t"							\
++	".endif\n"							\
+ 	".endif\n"
+ 
+ #define _ALTERNATIVE_CFG(oldinstr, newinstr, feature, cfg, ...)	\
+-	__ALTERNATIVE_CFG(oldinstr, newinstr, feature, IS_ENABLED(cfg))
++	__ALTERNATIVE_CFG(oldinstr, newinstr, feature, IS_ENABLED(cfg), 0)
+ 
++#define ALTERNATIVE_CB(oldinstr, cb) \
++	__ALTERNATIVE_CFG(oldinstr, "NOT_AN_INSTRUCTION", ARM64_CB_PATCH, 1, cb)
+ #else
+ 
+ #include <asm/assembler.h>
+@@ -132,6 +150,14 @@ void apply_alternatives(void *start, size_t length);
+ 661:
+ .endm
+ 
++.macro alternative_cb cb
++	.set .Lasm_alt_mode, 0
++	.pushsection .altinstructions, "a"
++	altinstruction_entry 661f, \cb, ARM64_CB_PATCH, 662f-661f, 0
++	.popsection
++661:
++.endm
++
+ /*
+  * Provide the other half of the alternative code sequence.
+  */
+@@ -157,6 +183,13 @@ void apply_alternatives(void *start, size_t length);
+ 	.org	. - (662b-661b) + (664b-663b)
+ .endm
+ 
++/*
++ * Callback-based alternative epilogue
++ */
++.macro alternative_cb_end
++662:
++.endm
++
+ /*
+  * Provides a trivial alternative or default sequence consisting solely
+  * of NOPs. The number of NOPs is chosen automatically to match the
+diff --git a/arch/arm64/kernel/alternative.c b/arch/arm64/kernel/alternative.c
+index 414288a558c8..5c4bce4ac381 100644
+--- a/arch/arm64/kernel/alternative.c
++++ b/arch/arm64/kernel/alternative.c
+@@ -107,32 +107,53 @@ static u32 get_alt_insn(struct alt_instr *alt, __le32 *insnptr, __le32 *altinsnp
+ 	return insn;
+ }
+ 
++static void patch_alternative(struct alt_instr *alt,
++			      __le32 *origptr, __le32 *updptr, int nr_inst)
++{
++	__le32 *replptr;
++	int i;
++
++	replptr = ALT_REPL_PTR(alt);
++	for (i = 0; i < nr_inst; i++) {
++		u32 insn;
++
++		insn = get_alt_insn(alt, origptr + i, replptr + i);
++		updptr[i] = cpu_to_le32(insn);
++	}
++}
++
+ static void __apply_alternatives(void *alt_region, bool use_linear_alias)
+ {
+ 	struct alt_instr *alt;
+ 	struct alt_region *region = alt_region;
+-	__le32 *origptr, *replptr, *updptr;
++	__le32 *origptr, *updptr;
++	alternative_cb_t alt_cb;
+ 
+ 	for (alt = region->begin; alt < region->end; alt++) {
+-		u32 insn;
+-		int i, nr_inst;
++		int nr_inst;
+ 
+-		if (!cpus_have_cap(alt->cpufeature))
++		/* Use ARM64_CB_PATCH as an unconditional patch */
++		if (alt->cpufeature < ARM64_CB_PATCH &&
++		    !cpus_have_cap(alt->cpufeature))
+ 			continue;
+ 
+-		BUG_ON(alt->alt_len != alt->orig_len);
++		if (alt->cpufeature == ARM64_CB_PATCH)
++			BUG_ON(alt->alt_len != 0);
++		else
++			BUG_ON(alt->alt_len != alt->orig_len);
+ 
+ 		pr_info_once("patching kernel code\n");
+ 
+ 		origptr = ALT_ORIG_PTR(alt);
+-		replptr = ALT_REPL_PTR(alt);
+ 		updptr = use_linear_alias ? lm_alias(origptr) : origptr;
+-		nr_inst = alt->alt_len / sizeof(insn);
++		nr_inst = alt->orig_len / AARCH64_INSN_SIZE;
+ 
+-		for (i = 0; i < nr_inst; i++) {
+-			insn = get_alt_insn(alt, origptr + i, replptr + i);
+-			updptr[i] = cpu_to_le32(insn);
+-		}
++		if (alt->cpufeature < ARM64_CB_PATCH)
++			alt_cb = patch_alternative;
++		else
++			alt_cb  = ALT_REPL_PTR(alt);
++
++		alt_cb(alt, origptr, updptr, nr_inst);
+ 
+ 		flush_icache_range((uintptr_t)origptr,
+ 				   (uintptr_t)(origptr + nr_inst));
 -- 
 2.14.2
