@@ -1,7 +1,7 @@
 From: Dongjiu Geng <gengdongjiu@huawei.com>
-Subject: [PATCH v10 1/5] arm64: KVM: Prepare set virtual SEI syndrome value
-Date: Sun, 4 Mar 2018 00:09:36 +0800
-Message-ID: <1520093380-42577-2-git-send-email-gengdongjiu@huawei.com>
+Subject: [PATCH v10 2/5] arm64: KVM: export the capability to set guest SError syndrome
+Date: Sun, 4 Mar 2018 00:09:37 +0800
+Message-ID: <1520093380-42577-3-git-send-email-gengdongjiu@huawei.com>
 References: <1520093380-42577-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -12,57 +12,61 @@ To: rkrcmar@redhat.com, corbet@lwn.net, christoffer.dall@linaro.org, marc.zyngie
 Cc: gengdongjiu@huawei.com, huangshaoyu@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Export one API to specify virtual SEI syndrome value
-for guest, and add a helper to get the VSESR_EL2 value.
+Before user space injects a SError, it needs to know whether it can
+specify the guest Exception Syndrome, so KVM should tell user space
+whether it has such capability.
 
 Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 ---
- arch/arm64/include/asm/kvm_emulate.h | 5 +++++
- arch/arm64/include/asm/kvm_host.h    | 2 ++
- arch/arm64/kvm/inject_fault.c        | 5 +++++
- 3 files changed, 12 insertions(+)
+ Documentation/virtual/kvm/api.txt | 11 +++++++++++
+ arch/arm64/kvm/reset.c            |  3 +++
+ include/uapi/linux/kvm.h          |  1 +
+ 3 files changed, 15 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 413dc82..3294885 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -71,6 +71,11 @@ static inline void vcpu_set_hcr(struct kvm_vcpu *vcpu, unsigned long hcr)
- 	vcpu->arch.hcr_el2 = hcr;
- }
- 
-+static inline unsigned long vcpu_get_vsesr(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu->arch.vsesr_el2;
-+}
+diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+index fc3ae95..8a3d708 100644
+--- a/Documentation/virtual/kvm/api.txt
++++ b/Documentation/virtual/kvm/api.txt
+@@ -4415,3 +4415,14 @@ Parameters: none
+ This capability indicates if the flic device will be able to get/set the
+ AIS states for migration via the KVM_DEV_FLIC_AISM_ALL attribute and allows
+ to discover this without having to create a flic device.
 +
- static inline void vcpu_set_vsesr(struct kvm_vcpu *vcpu, u64 vsesr)
- {
- 	vcpu->arch.vsesr_el2 = vsesr;
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index a73f63a..3dc49b7 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -354,6 +354,8 @@ void handle_exit_early(struct kvm_vcpu *vcpu, struct kvm_run *run,
- int kvm_perf_init(void);
- int kvm_perf_teardown(void);
- 
-+void kvm_set_sei_esr(struct kvm_vcpu *vcpu, u64 syndrome);
++8.14 KVM_CAP_ARM_SET_SERROR_ESR
 +
- struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
- 
- static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr,
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index 60666a0..78ecb28 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -186,3 +186,8 @@ void kvm_inject_vabt(struct kvm_vcpu *vcpu)
- {
- 	pend_guest_serror(vcpu, ESR_ELx_ISV);
- }
++Architectures: arm, arm64
 +
-+void kvm_set_sei_esr(struct kvm_vcpu *vcpu, u64 syndrome)
-+{
-+	pend_guest_serror(vcpu, syndrome & ESR_ELx_ISS_MASK);
-+}
++This capability indicates that userspace can specify syndrome value reported to
++guest OS when guest takes a virtual SError interrupt exception.
++If KVM has this capability, userspace can only specify the ISS field for the ESR
++syndrome, can not specify the EC field which is not under control by KVM.
++If this virtual SError is taken to EL1 using AArch64, this value will be reported
++into ISS filed of ESR_EL1.
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 3256b92..38c8a64 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -77,6 +77,9 @@ int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_ARM_PMU_V3:
+ 		r = kvm_arm_support_pmu_v3();
+ 		break;
++	case KVM_CAP_ARM_INJECT_SERROR_ESR:
++		r = cpus_have_const_cap(ARM64_HAS_RAS_EXTN);
++		break;
+ 	case KVM_CAP_SET_GUEST_DEBUG:
+ 	case KVM_CAP_VCPU_ATTRIBUTES:
+ 		r = 1;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 8fb90a0..3587b33 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -934,6 +934,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_S390_AIS_MIGRATION 150
+ #define KVM_CAP_PPC_GET_CPU_CHAR 151
+ #define KVM_CAP_S390_BPB 152
++#define KVM_CAP_ARM_INJECT_SERROR_ESR 153
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
 -- 
 1.9.1
