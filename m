@@ -1,95 +1,113 @@
-From: Dongjiu Geng <gengdongjiu@huawei.com>
-Subject: [PATCH v10 5/5] arm64: handle NOTIFY_SEI notification by the APEI
- driver
-Date: Sun, 4 Mar 2018 00:09:40 +0800
-Message-ID: <1520093380-42577-6-git-send-email-gengdongjiu@huawei.com>
-References: <1520093380-42577-1-git-send-email-gengdongjiu@huawei.com>
+From: Christoffer Dall <cdall@kernel.org>
+Subject: [PATCH] KVM: arm/arm64: Reset mapped IRQs on VM reset
+Date: Mon,  5 Mar 2018 11:36:38 +0100
+Message-ID: <20180305103638.1633-1-cdall@kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F2478405A5
- for <kvmarm@lists.cs.columbia.edu>; Sat,  3 Mar 2018 02:57:09 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3Cj4Lreezvan for <kvmarm@lists.cs.columbia.edu>;
- Sat,  3 Mar 2018 02:56:48 -0500 (EST)
-Received: from huawei.com (unknown [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6178949E07
- for <kvmarm@lists.cs.columbia.edu>; Sat,  3 Mar 2018 02:56:48 -0500 (EST)
-In-Reply-To: <1520093380-42577-1-git-send-email-gengdongjiu@huawei.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: rkrcmar@redhat.com, corbet@lwn.net, christoffer.dall@linaro.org, marc.zyngier@arm.com, james.morse@arm.com, linux@armlinux.org.uk, catalin.marinas@arm.com, rjw@rjwysocki.net, bp@alien8.de, lenb@kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-acpi@vger.kernel.org, devel@acpica.org
-Cc: huangshaoyu@huawei.com, gengdongjiu@huawei.com
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@kernel.org>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add a helper to handle the NOTIFY_SEI notification, when kernel
-gets the NOTIFY_SEI notification, call this helper and let APEI
-driver to handle this notification.
+We currently don't allow resetting mapped IRQs from userspace, because
+their state is controlled by the hardware.  But we do need to reset the
+state when the VM is reset, so we provide a function for the 'owner' of
+the mapped interrupt to reset the interrupt state.
 
-Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+Currently only the timer uses mapped interrupts, so we call this
+function from the timer reset logic.
+
+Signed-off-by: Christoffer Dall <cdall@kernel.org>
 ---
- arch/arm64/include/asm/system_misc.h |  1 +
- arch/arm64/kernel/traps.c            |  4 ++++
- arch/arm64/mm/fault.c                | 10 ++++++++++
- 3 files changed, 15 insertions(+)
+This depends on "KVM: arm/arm64: Avoid vcpu_load for other vcpu ioctls
+than KVM_RUN" from the VHE optimization series so that the reset doesn't
+get called while vtimer->loaded is true.
 
-diff --git a/arch/arm64/include/asm/system_misc.h b/arch/arm64/include/asm/system_misc.h
-index 07aa8e3..9ee13ad 100644
---- a/arch/arm64/include/asm/system_misc.h
-+++ b/arch/arm64/include/asm/system_misc.h
-@@ -57,6 +57,7 @@ void hook_debug_fault_code(int nr, int (*fn)(unsigned long, unsigned int,
- })
+ include/kvm/arm_vgic.h    |  1 +
+ virt/kvm/arm/arch_timer.c |  4 ++++
+ virt/kvm/arm/vgic/vgic.c  | 26 ++++++++++++++++++++++++++
+ 3 files changed, 31 insertions(+)
+
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index cdbd142ca7f2..02924ae2527e 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -360,6 +360,7 @@ void kvm_vgic_put(struct kvm_vcpu *vcpu);
+ bool kvm_vcpu_has_pending_irqs(struct kvm_vcpu *vcpu);
+ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu);
+ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu);
++void kvm_vgic_reset_mapped_irq(struct kvm_vcpu *vcpu, u32 vintid);
  
- int handle_guest_sea(phys_addr_t addr, unsigned int esr);
-+int handle_guest_sei(void);
+ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
  
- #endif	/* __ASSEMBLY__ */
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index 70268c0bec79..09890a5268d1 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -571,6 +571,7 @@ void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
  
-diff --git a/arch/arm64/kernel/traps.c b/arch/arm64/kernel/traps.c
-index e88096a..6cb280f 100644
---- a/arch/arm64/kernel/traps.c
-+++ b/arch/arm64/kernel/traps.c
-@@ -681,6 +681,10 @@ bool arm64_is_fatal_ras_serror(struct pt_regs *regs, unsigned int esr)
+ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
  {
- 	u32 aet = arm64_ras_serror_get_severity(esr);
++	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+ 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+ 	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
  
-+	/* The APEI driver may handle this RAS error. */
-+	if (!handle_guest_sei())
-+		return false;
+@@ -584,6 +585,9 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
+ 	ptimer->cnt_ctl = 0;
+ 	kvm_timer_update_state(vcpu);
+ 
++	if (timer->enabled && irqchip_in_kernel(vcpu->kvm))
++		kvm_vgic_reset_mapped_irq(vcpu, vtimer->irq.irq);
 +
- 	switch (aet) {
- 	case ESR_ELx_AET_CE:	/* corrected error */
- 	case ESR_ELx_AET_UEO:	/* restartable, not yet consumed */
-diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-index f76bb2c..8f29bd8 100644
---- a/arch/arm64/mm/fault.c
-+++ b/arch/arm64/mm/fault.c
-@@ -683,6 +683,16 @@ int handle_guest_sea(phys_addr_t addr, unsigned int esr)
+ 	return 0;
+ }
+ 
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index c7c5ef190afa..0001858a2c23 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -495,6 +495,32 @@ int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
  	return ret;
  }
  
-+int handle_guest_sei(void)
++/**
++ * kvm_vgic_reset_mapped_irq - Reset a mapped IRQ
++ * @vcpu: The VCPU pointer
++ * @vintid: The INTID of the interrupt
++ *
++ * Reset the active and pending states of a mapped interrupt.  Kernel
++ * subsystems injecting mapped interrupts should reset their interrupt lines
++ * when we are doing a reset of the VM.
++ */
++void kvm_vgic_reset_mapped_irq(struct kvm_vcpu *vcpu, u32 vintid)
 +{
-+	int ret = -ENOENT;
++	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
++	unsigned long flags;
 +
-+	if (IS_ENABLED(CONFIG_ACPI_APEI_SEI))
-+		ret = ghes_notify_sei();
++	if (!irq->hw)
++		goto out;
 +
-+	return ret;
++	spin_lock_irqsave(&irq->irq_lock, flags);
++	irq->active = false;
++	irq->pending_latch = false;
++	irq->line_level = false;
++	spin_unlock_irqrestore(&irq->irq_lock, flags);
++out:
++	vgic_put_irq(vcpu->kvm, irq);
 +}
 +
- asmlinkage void __exception do_mem_abort(unsigned long addr, unsigned int esr,
- 					 struct pt_regs *regs)
+ int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid)
  {
+ 	struct vgic_irq *irq;
 -- 
-1.9.1
+2.14.2
