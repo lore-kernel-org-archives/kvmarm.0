@@ -1,17 +1,16 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [RFC PATCH 2/2] KVM: arm64: Eliminate most redundant FPSIMD
- saves and restores
-Date: Mon, 5 Mar 2018 11:54:37 +0000
-Message-ID: <20180305115433.GI32331@e103592.cambridge.arm.com>
-References: <1518805771-15346-1-git-send-email-Dave.Martin@arm.com>
- <1518805771-15346-3-git-send-email-Dave.Martin@arm.com>
- <20180223170844.GB7396@cbox>
+From: Julien Grall <julien.grall@arm.com>
+Subject: Re: [PATCH v5 17/40] KVM: arm64: Move userspace system registers into
+ separate function
+Date: Mon, 5 Mar 2018 12:59:18 +0000
+Message-ID: <af723cc8-dc68-e649-16eb-c7312330725d@arm.com>
+References: <20180227113429.637-1-cdall@kernel.org>
+ <20180227113429.637-18-cdall@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <20180223170844.GB7396@cbox>
+In-Reply-To: <20180227113429.637-18-cdall@kernel.org>
+Content-Language: en-US
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -21,83 +20,178 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Christoffer Dall <cdall@kernel.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: Christoffer Dall <cdall@kernel.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Tomasz Nowicki <tn@semihalf.com>, Yury Norov <ynorov@caviumnetworks.com>, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Feb 23, 2018 at 06:08:44PM +0100, Christoffer Dall wrote:
-> Hi Dave,
+Hi Christoffer,
+
+On 27/02/18 11:34, Christoffer Dall wrote:
+> From: Christoffer Dall <christoffer.dall@linaro.org>
 > 
-> On Fri, Feb 16, 2018 at 06:29:31PM +0000, Dave Martin wrote:
-> > Currently, KVM doesn't know how host tasks interact with the cpu
-> > FPSIMD regs, and the host doesn't knoe how vcpus interact with the
-> > regs.  As a result, KVM must currently switch the FPSIMD state
-> > rather defensively in order to avoid anybody's state getting
-> > corrupted: in particular, the host and guest FPSIMD state must be
-> > fully swapped on each iteration of the run loop.
-> > 
-> > This patch integrates KVM more closely with the host FPSIMD context
-> > switch machinery, to enable better tracking of whose state is in
-> > the FPSIMD regs.  This brings some advantages: KVM can tell whether
-> > the host has any live state in the regs and can avoid saving them
-> > if not; also, KVM can tell when and if the host clobbers the vcpu
-> > state in the regs, to avoid reloading them before reentering the
-> > guest.
-> > 
-> > As well as avoiding the host state being unecessarily saved, this
-> > should also mean that the vcpu state can survive context switch
-> > when there is no kernel-mode NEON use and no entry to userspace,
-> > such as when ancillary kernel threads preempt a vcpu.
-> > 
-> > This patch cannot eliminate the need to save the guest context
-> > eefore enabling interrupts, becuase softirqs may use kernel- mode
-> > NEON and trash the vcpu regs.  However, provding that doesn't
-> > happen the reload cost is at least saved on the next run loop
-> > iteration.
-> > 
-> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> > 
-> > ---
-> > 
-> > Caveat: this does *not* currently deal properly with host SVE state,
-> > though supporting that shouldn't be drastically different.
+> There's a semantic difference between the EL1 registers that control
+> operation of a kernel running in EL1 and EL1 registers that only control
+> userspace execution in EL0.  Since we can defer saving/restoring the
+> latter, move them into their own function.
 > 
-> It's a bit outside the capacity of my brain to think about that a well
-> for the moment, but if we can agree on the overall approach of doing
-> FPSIMD first, then hopefully I can understand the SVE challenge later.
+> The ARMv8 ARM (ARM DDI 0487C.a) Section D10.2.1 recommends that
+> ACTLR_EL1 has no effect on the processor when running the VHE host, and
+> we can therefore move this register into the EL1 state which is only
+> saved/restored on vcpu_put/load for a VHE host.
 > 
-> > ---
-
-[...]
-
-> commit 6bb55488489d69885b51819add3690da523be12a (HEAD -> kvm-vfp-integration-rfc)
-> Author: Christoffer Dall <christoffer.dall@linaro.org>
-> Date:   Fri Feb 23 17:58:17 2018 +0100
+> We also take this chance to rename the function saving/restoring the
+> remaining system register to make it clear this function deals with
+> the EL1 system registers.
 > 
->     KVM: arm64: Be more lazy with switching KVM guest FPSIMD state
->     
->     We currently save the FPSIMD state back from the CPU on every exit, when
->     the guest has touched the FPSIMD state.
->     
->     We can try to avoid this by changing the state that is tracked by the
->     kernel FPSIMD mechanism to the KVM guest state, and keep track of this
->     using additional thread flag.  Whenever we go back to userspace from the
->     KVM_RUN ioctl, we check if we switched to the KVM state, and make sure
->     the state is copied back.
->     
->     Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 
-[...]
+Reviewed-by: Julien Grall <julien.grall@arm.com>
 
-Hmmm, on reflection I think we still have the same underlying problem
-here, which is that pulling fpsimd save/restore outside the
-local_irq_disable() region exposes us to softirqs that can trash the
-state.  Long-term blocking of softirq or kernel-mode NEON could fix
-this, but the impact on kernel-mode NEON client code would probably
-be unacceptable (recalling discussions we had with Ard).
+Cheers,
 
-I don't see a straightforward way around this that doesn't involve
-adding logic in the kvm run/loop and fpsimd hyp trap code...
+> ---
+> 
+> Notes:
+>      Changes since v4:
+>       - Clarified rationale for deferring ACTLR_EL1 in the commit message.
+>      
+>      Changes since v3:
+>       - Correct the comment about ACTLR_EL1 and adjust commit text.
+>      
+>      Changes since v2:
+>       - Save restore ACTLR_EL1 as part of the EL1 registers state instead of
+>         the user register state, as ACTLR_EL1 can't affect the host's execution
+>         on VHE systems.
+>      
+>      Changes since v1:
+>       - Added comment about sp_el0 to common save sysreg save/restore functions
+> 
+>   arch/arm64/kvm/hyp/sysreg-sr.c | 48 ++++++++++++++++++++++++++++++------------
+>   1 file changed, 35 insertions(+), 13 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+> index 99fc60516103..d5a5145b4e7c 100644
+> --- a/arch/arm64/kvm/hyp/sysreg-sr.c
+> +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+> @@ -28,24 +28,33 @@ static void __hyp_text __sysreg_do_nothing(struct kvm_cpu_context *ctxt) { }
+>   /*
+>    * Non-VHE: Both host and guest must save everything.
+>    *
+> - * VHE: Host must save tpidr*_el0, actlr_el1, mdscr_el1, sp_el0,
+> + * VHE: Host must save tpidr*_el0, mdscr_el1, sp_el0,
+>    * and guest must save everything.
+>    */
+>   
+>   static void __hyp_text __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
+>   {
+> -	ctxt->sys_regs[ACTLR_EL1]	= read_sysreg(actlr_el1);
+> -	ctxt->sys_regs[TPIDR_EL0]	= read_sysreg(tpidr_el0);
+> -	ctxt->sys_regs[TPIDRRO_EL0]	= read_sysreg(tpidrro_el0);
+>   	ctxt->sys_regs[MDSCR_EL1]	= read_sysreg(mdscr_el1);
+> +
+> +	/*
+> +	 * The host arm64 Linux uses sp_el0 to point to 'current' and it must
+> +	 * therefore be saved/restored on every entry/exit to/from the guest.
+> +	 */
+>   	ctxt->gp_regs.regs.sp		= read_sysreg(sp_el0);
+>   }
+>   
+> -static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
+> +static void __hyp_text __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
+> +{
+> +	ctxt->sys_regs[TPIDR_EL0]	= read_sysreg(tpidr_el0);
+> +	ctxt->sys_regs[TPIDRRO_EL0]	= read_sysreg(tpidrro_el0);
+> +}
+> +
+> +static void __hyp_text __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+>   {
+>   	ctxt->sys_regs[MPIDR_EL1]	= read_sysreg(vmpidr_el2);
+>   	ctxt->sys_regs[CSSELR_EL1]	= read_sysreg(csselr_el1);
+>   	ctxt->sys_regs[SCTLR_EL1]	= read_sysreg_el1(sctlr);
+> +	ctxt->sys_regs[ACTLR_EL1]	= read_sysreg(actlr_el1);
+>   	ctxt->sys_regs[CPACR_EL1]	= read_sysreg_el1(cpacr);
+>   	ctxt->sys_regs[TTBR0_EL1]	= read_sysreg_el1(ttbr0);
+>   	ctxt->sys_regs[TTBR1_EL1]	= read_sysreg_el1(ttbr1);
+> @@ -73,35 +82,46 @@ static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
+>   }
+>   
+>   static hyp_alternate_select(__sysreg_call_save_host_state,
+> -			    __sysreg_save_state, __sysreg_do_nothing,
+> +			    __sysreg_save_el1_state, __sysreg_do_nothing,
+>   			    ARM64_HAS_VIRT_HOST_EXTN);
+>   
+>   void __hyp_text __sysreg_save_host_state(struct kvm_cpu_context *ctxt)
+>   {
+>   	__sysreg_call_save_host_state()(ctxt);
+>   	__sysreg_save_common_state(ctxt);
+> +	__sysreg_save_user_state(ctxt);
+>   }
+>   
+>   void __hyp_text __sysreg_save_guest_state(struct kvm_cpu_context *ctxt)
+>   {
+> -	__sysreg_save_state(ctxt);
+> +	__sysreg_save_el1_state(ctxt);
+>   	__sysreg_save_common_state(ctxt);
+> +	__sysreg_save_user_state(ctxt);
+>   }
+>   
+>   static void __hyp_text __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
+>   {
+> -	write_sysreg(ctxt->sys_regs[ACTLR_EL1],	  actlr_el1);
+> -	write_sysreg(ctxt->sys_regs[TPIDR_EL0],	  tpidr_el0);
+> -	write_sysreg(ctxt->sys_regs[TPIDRRO_EL0], tpidrro_el0);
+>   	write_sysreg(ctxt->sys_regs[MDSCR_EL1],	  mdscr_el1);
+> +
+> +	/*
+> +	 * The host arm64 Linux uses sp_el0 to point to 'current' and it must
+> +	 * therefore be saved/restored on every entry/exit to/from the guest.
+> +	 */
+>   	write_sysreg(ctxt->gp_regs.regs.sp,	  sp_el0);
+>   }
+>   
+> -static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
+> +static void __hyp_text __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
+> +{
+> +	write_sysreg(ctxt->sys_regs[TPIDR_EL0],	  	tpidr_el0);
+> +	write_sysreg(ctxt->sys_regs[TPIDRRO_EL0], 	tpidrro_el0);
+> +}
+> +
+> +static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+>   {
+>   	write_sysreg(ctxt->sys_regs[MPIDR_EL1],		vmpidr_el2);
+>   	write_sysreg(ctxt->sys_regs[CSSELR_EL1],	csselr_el1);
+>   	write_sysreg_el1(ctxt->sys_regs[SCTLR_EL1],	sctlr);
+> +	write_sysreg(ctxt->sys_regs[ACTLR_EL1],	  	actlr_el1);
+>   	write_sysreg_el1(ctxt->sys_regs[CPACR_EL1],	cpacr);
+>   	write_sysreg_el1(ctxt->sys_regs[TTBR0_EL1],	ttbr0);
+>   	write_sysreg_el1(ctxt->sys_regs[TTBR1_EL1],	ttbr1);
+> @@ -129,19 +149,21 @@ static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
+>   }
+>   
+>   static hyp_alternate_select(__sysreg_call_restore_host_state,
+> -			    __sysreg_restore_state, __sysreg_do_nothing,
+> +			    __sysreg_restore_el1_state, __sysreg_do_nothing,
+>   			    ARM64_HAS_VIRT_HOST_EXTN);
+>   
+>   void __hyp_text __sysreg_restore_host_state(struct kvm_cpu_context *ctxt)
+>   {
+>   	__sysreg_call_restore_host_state()(ctxt);
+>   	__sysreg_restore_common_state(ctxt);
+> +	__sysreg_restore_user_state(ctxt);
+>   }
+>   
+>   void __hyp_text __sysreg_restore_guest_state(struct kvm_cpu_context *ctxt)
+>   {
+> -	__sysreg_restore_state(ctxt);
+> +	__sysreg_restore_el1_state(ctxt);
+>   	__sysreg_restore_common_state(ctxt);
+> +	__sysreg_restore_user_state(ctxt);
+>   }
+>   
+>   void __hyp_text __sysreg32_save_state(struct kvm_vcpu *vcpu)
+> 
 
-Cheers
----Dave
+-- 
+Julien Grall
