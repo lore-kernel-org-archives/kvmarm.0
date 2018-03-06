@@ -1,140 +1,62 @@
-From: Shanker Donthineni <shankerd@codeaurora.org>
-Subject: Re: [PATCH v6] arm64: Add support for new control bits CTR_EL0.DIC
- and CTR_EL0.IDC
-Date: Tue, 6 Mar 2018 13:33:00 -0600
-Message-ID: <dbc6e162-d245-a685-8bfe-f506d18e19e3@codeaurora.org>
-References: <1519877640-11944-1-git-send-email-shankerd@codeaurora.org>
- <20180306134405.GB18080@arm.com>
- <d6182273-c23a-c4fa-ce40-c87055bfb338@codeaurora.org>
- <20180306152318.GE17454@arm.com>
- <cbdce6fd-a1db-4f12-ccea-adfe9fe7c057@codeaurora.org>
-Reply-To: shankerd@codeaurora.org
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: [PATCH v2] KVM: arm: reserve bit in KVM_REG_ARM encoding for
+ secure/nonsecure
+Date: Tue,  6 Mar 2018 19:47:41 +0000
+Message-ID: <20180306194741.30395-1-peter.maydell@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <cbdce6fd-a1db-4f12-ccea-adfe9fe7c057@codeaurora.org>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Will Deacon <will.deacon@arm.com>
-Cc: Philip Elcan <pelcan@codeaurora.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, linux-kernel <linux-kernel@vger.kernel.org>, Robin Murphy <robin.murphy@arm.com>, kvmarm <kvmarm@lists.cs.columbia.edu>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@kernel.org>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Will,
+We have a KVM_REG_ARM encoding that we use to expose KVM guest registers
+to userspace. Define that bit 28 in this encoding indicates secure vs
+nonsecure, so we can distinguish the secure and nonsecure banked versions
+of a banked AArch32 register.
 
-On 03/06/2018 12:48 PM, Shanker Donthineni wrote:
-> Hi Will,
-> 
-> On 03/06/2018 09:23 AM, Will Deacon wrote:
->> Hi Shanker,
->>
->> On Tue, Mar 06, 2018 at 08:47:27AM -0600, Shanker Donthineni wrote:
->>> On 03/06/2018 07:44 AM, Will Deacon wrote:
->>>> I think this is a slight asymmetry with the code for the I-side. On the
->>>> I-side, you hook into invalidate_icache_by_line, whereas on the D-side you
->>>> hook into the callers of dcache_by_line_op. Why is that?
->>>>
->>>
->>> There is no particular reason other than complexity of the macro with another 
->>> alternative. I tried to avoid this change by updating __clean_dcache_area_pou().
->>> I can change if you're interested to see both I-Side and D-Side changes are
->>> symmetric some thing like this...
->>>
->>>  .macro dcache_by_line_op op, domain, kaddr, size, tmp1, tmp2
->>>   
->>>   .if	(\op == cvau)
->>>   alternative_if ARM64_HAS_CACHE_IDC
->>>         dsb	ishst
->>>         b       9997f
->>>   alternative_else_nop_endif
->>>   .endif
->>>
->>> 	dcache_line_size \tmp1, \tmp2
->>> 	add	\size, \kaddr, \size
->>> 	sub	\tmp2, \tmp1, #1
->>> 	bic	\kaddr, \kaddr, \tmp2
->>>  9998:
->>> 	.if	(\op == cvau || \op == cvac)
->>>  alternative_if_not ARM64_WORKAROUND_CLEAN_CACHE
->>> 	dc	\op, \kaddr
->>>  alternative_else
->>> 	dc	civac, \kaddr
->>>  alternative_endif
->>> 	.elseif	(\op == cvap)
->>>  alternative_if ARM64_HAS_DCPOP
->>> 	sys 3, c7, c12, 1, \kaddr	// dc cvap
->>>  alternative_else
->>> 	dc	cvac, \kaddr
->>>  alternative_endif
->>> 	.else
->>> 	dc	\op, \kaddr
->>> 	.endif
->>> 	add	\kaddr, \kaddr, \tmp1
->>> 	cmp	\kaddr, \size
->>> 	b.lo	9998b
->>> 	dsb	\domain
->>> 9997:
->>> 	.endm
->>
->> I think it would be cleaner the other way round, actually -- move the check
->> out of invalidate_icache_by_line and into its two callers.
->>
-> 
-> Sure, I'll send out the next patch with your suggestions.
-> 
->>>> I notice that the only user other than
->>>> flush_icache_range/__flush_cache_user_range or invalidate_icache_by_line
->>>> is in KVM, via invalidate_icache_range. If you want to hook in there, why
->>>> aren't you also patching __flush_icache_all? If so, I'd rather have the
->>>> I-side code consistent with the D-side code and do this in the handful of
->>>> callers. We might even be able to elide a branch or two that way.
->>>>
->>>
->>> Agree with you, it saves function calls overhead. I'll do this change...
->>>
->>> static void invalidate_icache_guest_page(kvm_pfn_t pfn, unsigned long size)
->>> {
->>> 	if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC)
->>> 	    __invalidate_icache_guest_page(pfn, size);
->>> }
->>>
->>>
->>>> I'm going to assume that I-cache aliases are all coherent if DIC=1, so it's
->>>> safe to elide our alias sync code.
->>>>
->>>
->>> I'm not sure about I-cache whether aliases are all coherent if DIC=1 ot not.
->>> Unfortunately I don't have any hardware to test DIC=1. I've verified IDC=1.
->>
->> I checked with our architects and aliases don't pose a problem here, so you
->> can ignore me :)
->>
-> 
-> I also confirmed with Thomas Speier, we can skip __flush_icache_all() if DIC=1.
-> 
->  
-Planning to patch __flush_icache_all() itself instead of changing the callers. This
-way we can avoid "ic ialluis" completely. Is this okay for you? 
+For KVM currently, all guest registers are nonsecure, but defining
+the bit is useful for userspace. In particular, QEMU uses this
+encoding as part of its on-the-wire migration format, and needs to be
+able to describe secure-bank registers when it is migrating (fully
+emulated) EL3-enabled CPUs.
 
-static inline void __flush_icache_all(void)
-{
-       /* Instruction cache invalidation is not required for I/D coherence? */
-      if (!cpus_have_const_cap(ARM64_HAS_CACHE_DIC)) {
-               asm("ic ialluis");
-               dsb(ish);
-       }
-}
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+v1->v2: expanded comment
+---
+ arch/arm/include/uapi/asm/kvm.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
->> Will
->>
->> _______________________________________________
->> linux-arm-kernel mailing list
->> linux-arm-kernel@lists.infradead.org
->> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
->>
-> 
-
+diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+index 6edd177bb1c7..2ba95d6fe852 100644
+--- a/arch/arm/include/uapi/asm/kvm.h
++++ b/arch/arm/include/uapi/asm/kvm.h
+@@ -135,6 +135,15 @@ struct kvm_arch_memory_slot {
+ #define KVM_REG_ARM_CRM_SHIFT		7
+ #define KVM_REG_ARM_32_CRN_MASK		0x0000000000007800
+ #define KVM_REG_ARM_32_CRN_SHIFT	11
++/*
++ * For KVM currently all guest registers are nonsecure, but we reserve a bit
++ * in the encoding to distinguish secure from nonsecure for AArch32 system
++ * registers that are banked by security. This is 1 for the secure banked
++ * register, and 0 for the nonsecure banked register or if the register is
++ * not banked by security.
++ */
++#define KVM_REG_ARM_SECURE_MASK	0x0000000010000000
++#define KVM_REG_ARM_SECURE_SHIFT	28
+ 
+ #define ARM_CP15_REG_SHIFT_MASK(x,n) \
+ 	(((x) << KVM_REG_ARM_ ## n ## _SHIFT) & KVM_REG_ARM_ ## n ## _MASK)
 -- 
-Shanker Donthineni
-Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
+2.16.2
