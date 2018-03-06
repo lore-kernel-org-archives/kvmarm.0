@@ -1,62 +1,347 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: can we define a KVM_REG_ARM encoding bit for NonSecure/Secure ?
-Date: Tue, 6 Mar 2018 14:28:08 +0000
-Message-ID: <d4ab9fb5-4a19-697c-8851-58ed38fcff1c@arm.com>
-References: <CAFEAcA8MEp0Uw3NFUVfy7wm--wpTZ591SsjhRgVjrPST47f5Wg@mail.gmail.com>
- <6ee3ff1c-7324-6fcf-651d-bc3404613330@arm.com>
- <CAFEAcA9gocsZU+rirJrTbhpeK5P9A8Ep4YB9899Yue8UqxgN1Q@mail.gmail.com>
+From: Shanker Donthineni <shankerd@codeaurora.org>
+Subject: Re: [PATCH v6] arm64: Add support for new control bits CTR_EL0.DIC
+ and CTR_EL0.IDC
+Date: Tue, 6 Mar 2018 08:47:27 -0600
+Message-ID: <d6182273-c23a-c4fa-ce40-c87055bfb338@codeaurora.org>
+References: <1519877640-11944-1-git-send-email-shankerd@codeaurora.org>
+ <20180306134405.GB18080@arm.com>
+Reply-To: shankerd@codeaurora.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D629402D6
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Mar 2018 09:21:20 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bUQx+TIUezxz for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Mar 2018 09:20:58 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AA3A340192
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Mar 2018 09:20:58 -0500 (EST)
-In-Reply-To: <CAFEAcA9gocsZU+rirJrTbhpeK5P9A8Ep4YB9899Yue8UqxgN1Q@mail.gmail.com>
-Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180306134405.GB18080@arm.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Will Deacon <will.deacon@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>, Philip Elcan <pelcan@codeaurora.org>, Vikram Sethi <vikrams@codeaurora.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, linux-kernel <linux-kernel@vger.kernel.org>, Robin Murphy <robin.murphy@arm.com>, kvmarm <kvmarm@lists.cs.columbia.edu>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 06/03/18 14:09, Peter Maydell wrote:
-> On 6 March 2018 at 13:59, Marc Zyngier <marc.zyngier@arm.com> wrote:
->> On 05/03/18 14:01, Peter Maydell wrote:
->>> #define KVM_REG_ARM_SECURE_MASK 0x0000000010000000
->>>
->>> in arch/arm/include/uapi/asm/kvm.h
->>>
->>> Does this seem like a good idea? (We could alternatively steal a bit
->>> from the top of the rather-over-specified 12 bit field for copro
->>> number, but AFAIK bit 28 isn't used currently so is free.)
->>
->> I guess that'd be fine. If we ever have KVM running in S-EL2 on a v8.4
->> core, we'd be able to make use of this bit. Let's hope it never happens
->> though.
->>
->> Would you be able to write a patch for this please?
+Hi Will
+
+On 03/06/2018 07:44 AM, Will Deacon wrote:
+> Hi Shanker,
 > 
-> Sure. It's been a long time since I wrote a kernel patch: what
-> git tree should I base it on ?
-Any recent release tag in Linus' tree would do, such as v4.15.
+> On Wed, Feb 28, 2018 at 10:14:00PM -0600, Shanker Donthineni wrote:
+>> The DCache clean & ICache invalidation requirements for instructions
+>> to be data coherence are discoverable through new fields in CTR_EL0.
+>> The following two control bits DIC and IDC were defined for this
+>> purpose. No need to perform point of unification cache maintenance
+>> operations from software on systems where CPU caches are transparent.
+>>
+>> This patch optimize the three functions __flush_cache_user_range(),
+>> clean_dcache_area_pou() and invalidate_icache_range() if the hardware
+>> reports CTR_EL0.IDC and/or CTR_EL0.IDC. Basically it skips the two
+>> instructions 'DC CVAU' and 'IC IVAU', and the associated loop logic
+>> in order to avoid the unnecessary overhead.
+>>
+>> CTR_EL0.DIC: Instruction cache invalidation requirements for
+>>  instruction to data coherence. The meaning of this bit[29].
+>>   0: Instruction cache invalidation to the point of unification
+>>      is required for instruction to data coherence.
+>>   1: Instruction cache cleaning to the point of unification is
+>>       not required for instruction to data coherence.
+>>
+>> CTR_EL0.IDC: Data cache clean requirements for instruction to data
+>>  coherence. The meaning of this bit[28].
+>>   0: Data cache clean to the point of unification is required for
+>>      instruction to data coherence, unless CLIDR_EL1.LoC == 0b000
+>>      or (CLIDR_EL1.LoUIS == 0b000 && CLIDR_EL1.LoUU == 0b000).
+>>   1: Data cache clean to the point of unification is not required
+>>      for instruction to data coherence.
+>>
+>> Co-authored-by: Philip Elcan <pelcan@codeaurora.org>
+>> Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
+>> ---
+>> Changes since v5:
+>>   -Addressed Mark's review comments.
+> 
+> This mostly looks good now. Just a few comments inline.
+> 
+>> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+>> index 7381eeb..41af850 100644
+>> --- a/arch/arm64/Kconfig
+>> +++ b/arch/arm64/Kconfig
+>> @@ -1091,6 +1091,18 @@ config ARM64_RAS_EXTN
+>>  	  and access the new registers if the system supports the extension.
+>>  	  Platform RAS features may additionally depend on firmware support.
+>>  
+>> +config ARM64_SKIP_CACHE_POU
+>> +	bool "Enable support to skip cache PoU operations"
+>> +	default y
+>> +	help
+>> +	  Explicit point of unification cache operations can be eliminated
+>> +	  in software if the hardware handles transparently. The new bits in
+>> +	  CTR_EL0, CTR_EL0.DIC and CTR_EL0.IDC indicates the hardware
+>> +	  capabilities of ICache and DCache PoU requirements.
+>> +
+>> +	  Selecting this feature will allow the kernel to optimize cache
+>> +	  maintenance to the PoU.
+>> +
+>>  endmenu
+> 
+> Let's not bother with a Kconfig option. I think the extra couple of NOPs
+> this introduces for CPUs that don't implement the new features isn't going
+> to hurt anybody.
+> 
 
-Thanks,
+Okay, I'll get rid of Kconfig option.
 
-	M.
+>> diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
+>> index 3c78835..39f2274 100644
+>> --- a/arch/arm64/include/asm/assembler.h
+>> +++ b/arch/arm64/include/asm/assembler.h
+>> @@ -444,6 +444,11 @@
+>>   * 	Corrupts:	tmp1, tmp2
+>>   */
+>>  	.macro invalidate_icache_by_line start, end, tmp1, tmp2, label
+>> +#ifdef CONFIG_ARM64_SKIP_CACHE_POU
+>> +alternative_if ARM64_HAS_CACHE_DIC
+>> +	b	9996f
+>> +alternative_else_nop_endif
+>> +#endif
+>>  	icache_line_size \tmp1, \tmp2
+>>  	sub	\tmp2, \tmp1, #1
+>>  	bic	\tmp2, \start, \tmp2
+>> @@ -453,6 +458,7 @@
+>>  	cmp	\tmp2, \end
+>>  	b.lo	9997b
+>>  	dsb	ish
+>> +9996:
+>>  	isb
+>>  	.endm
+>>  
+>> diff --git a/arch/arm64/include/asm/cache.h b/arch/arm64/include/asm/cache.h
+>> index ea9bb4e..d460e9f 100644
+>> --- a/arch/arm64/include/asm/cache.h
+>> +++ b/arch/arm64/include/asm/cache.h
+>> @@ -20,8 +20,12 @@
+>>  
+>>  #define CTR_L1IP_SHIFT		14
+>>  #define CTR_L1IP_MASK		3
+>> +#define CTR_DMLINE_SHIFT	16
+> 
+> This should be "CTR_DMINLINE_SHIFT"
+> 
+
+I'll change it.
+
+>> +#define CTR_ERG_SHIFT		20
+>>  #define CTR_CWG_SHIFT		24
+>>  #define CTR_CWG_MASK		15
+>> +#define CTR_IDC_SHIFT		28
+>> +#define CTR_DIC_SHIFT		29
+>>  
+>>  #define CTR_L1IP(ctr)		(((ctr) >> CTR_L1IP_SHIFT) & CTR_L1IP_MASK)
+>>  
+>> diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+>> index bb26382..8dd42ae 100644
+>> --- a/arch/arm64/include/asm/cpucaps.h
+>> +++ b/arch/arm64/include/asm/cpucaps.h
+>> @@ -45,7 +45,9 @@
+>>  #define ARM64_HARDEN_BRANCH_PREDICTOR		24
+>>  #define ARM64_HARDEN_BP_POST_GUEST_EXIT		25
+>>  #define ARM64_HAS_RAS_EXTN			26
+>> +#define ARM64_HAS_CACHE_IDC			27
+>> +#define ARM64_HAS_CACHE_DIC			28
+>>  
+>> -#define ARM64_NCAPS				27
+>> +#define ARM64_NCAPS				29
+>>  
+>>  #endif /* __ASM_CPUCAPS_H */
+>> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+>> index 2985a06..0b64b55 100644
+>> --- a/arch/arm64/kernel/cpufeature.c
+>> +++ b/arch/arm64/kernel/cpufeature.c
+>> @@ -199,12 +199,12 @@ static int __init register_cpu_hwcaps_dumper(void)
+>>  };
+>>  
+>>  static const struct arm64_ftr_bits ftr_ctr[] = {
+>> -	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_EXACT, 31, 1, 1),		/* RES1 */
+>> -	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, 29, 1, 1),	/* DIC */
+>> -	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, 28, 1, 1),	/* IDC */
+>> -	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_HIGHER_SAFE, 24, 4, 0),	/* CWG */
+>> -	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_HIGHER_SAFE, 20, 4, 0),	/* ERG */
+>> -	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, 16, 4, 1),	/* DminLine */
+>> +	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_EXACT, 31, 1, 1),                    /* RES1 */
+>> +	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, CTR_DIC_SHIFT, 1, 1),    /* DIC */
+>> +	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, CTR_IDC_SHIFT, 1, 1),    /* IDC */
+>> +	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_HIGHER_SAFE, CTR_CWG_SHIFT, 4, 0),   /* CWG */
+>> +	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_HIGHER_SAFE, CTR_ERG_SHIFT, 4, 0),   /* ERG */
+>> +	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, CTR_DMLINE_SHIFT, 4, 1), /* DminLine */
+>>  	/*
+>>  	 * Linux can handle differing I-cache policies. Userspace JITs will
+>>  	 * make use of *minLine.
+>> @@ -852,6 +852,20 @@ static bool has_no_fpsimd(const struct arm64_cpu_capabilities *entry, int __unus
+>>  					ID_AA64PFR0_FP_SHIFT) < 0;
+>>  }
+>>  
+>> +#ifdef CONFIG_ARM64_SKIP_CACHE_POU
+>> +static bool has_cache_idc(const struct arm64_cpu_capabilities *entry,
+>> +			  int __unused)
+>> +{
+>> +	return read_sanitised_ftr_reg(SYS_CTR_EL0) & BIT(CTR_IDC_SHIFT);
+>> +}
+>> +
+>> +static bool has_cache_dic(const struct arm64_cpu_capabilities *entry,
+>> +			  int __unused)
+>> +{
+>> +	return read_sanitised_ftr_reg(SYS_CTR_EL0) & BIT(CTR_DIC_SHIFT);
+>> +}
+>> +#endif
+>> +
+>>  #ifdef CONFIG_UNMAP_KERNEL_AT_EL0
+>>  static int __kpti_forced; /* 0: not forced, >0: forced on, <0: forced off */
+>>  
+>> @@ -1088,6 +1102,20 @@ static int cpu_copy_el2regs(void *__unused)
+>>  		.enable = cpu_clear_disr,
+>>  	},
+>>  #endif /* CONFIG_ARM64_RAS_EXTN */
+>> +#ifdef CONFIG_ARM64_SKIP_CACHE_POU
+>> +	{
+>> +		.desc = "Skip D-Cache maintenance 'DC CVAU' (CTR_EL0.IDC=1)",
+> 
+> Can we stick a bit closer to the architectural text here, please? How about:
+> 
+> "Data cache clean to the PoU not required for I/D coherence"
+> 
+
+I'll take your suggestion.
+
+>> +		.capability = ARM64_HAS_CACHE_IDC,
+>> +		.def_scope = SCOPE_SYSTEM,
+>> +		.matches = has_cache_idc,
+>> +	},
+>> +	{
+>> +		.desc = "Skip I-Cache maintenance 'IC IVAU' (CTR_EL0.DIC=1)",
+> 
+> "Instruction cache invalidation not required for I/D coherence"
+> 
+
+Same here.
+
+>> +		.capability = ARM64_HAS_CACHE_DIC,
+>> +		.def_scope = SCOPE_SYSTEM,
+>> +		.matches = has_cache_dic,
+>> +	},
+>> +#endif /* CONFIG_ARM64_SKIP_CACHE_POU */
+>>  	{},
+>>  };
+>>  
+>> diff --git a/arch/arm64/mm/cache.S b/arch/arm64/mm/cache.S
+>> index 758bde7..d8d7a32 100644
+>> --- a/arch/arm64/mm/cache.S
+>> +++ b/arch/arm64/mm/cache.S
+>> @@ -50,6 +50,12 @@ ENTRY(flush_icache_range)
+>>   */
+>>  ENTRY(__flush_cache_user_range)
+>>  	uaccess_ttbr0_enable x2, x3, x4
+>> +#ifdef CONFIG_ARM64_SKIP_CACHE_POU
+>> +alternative_if ARM64_HAS_CACHE_IDC
+>> +	dsb	ishst
+>> +	b	8f
+>> +alternative_else_nop_endif
+>> +#endif
+>>  	dcache_line_size x2, x3
+>>  	sub	x3, x2, #1
+>>  	bic	x4, x0, x3
+>> @@ -60,6 +66,7 @@ user_alt 9f, "dc cvau, x4",  "dc civac, x4",  ARM64_WORKAROUND_CLEAN_CACHE
+>>  	b.lo	1b
+>>  	dsb	ish
+>>  
+>> +8:
+>>  	invalidate_icache_by_line x0, x1, x2, x3, 9f
+>>  	mov	x0, #0
+>>  1:
+>> @@ -116,6 +123,12 @@ ENDPIPROC(__flush_dcache_area)
+>>   *	- size    - size in question
+>>   */
+>>  ENTRY(__clean_dcache_area_pou)
+>> +#ifdef CONFIG_ARM64_SKIP_CACHE_POU
+>> +alternative_if ARM64_HAS_CACHE_IDC
+>> +	dsb	ishst
+>> +	ret
+>> +alternative_else_nop_endif
+> 
+> I think this is a slight asymmetry with the code for the I-side. On the
+> I-side, you hook into invalidate_icache_by_line, whereas on the D-side you
+> hook into the callers of dcache_by_line_op. Why is that?
+> 
+
+There is no particular reason other than complexity of the macro with another 
+alternative. I tried to avoid this change by updating __clean_dcache_area_pou().
+I can change if you're interested to see both I-Side and D-Side changes are
+symmetric some this like this...
+
+ .macro dcache_by_line_op op, domain, kaddr, size, tmp1, tmp2
+  
+  .if	(\op == cvau)
+  alternative_if ARM64_HAS_CACHE_IDC
+        dsb	ishst
+        b       9997f
+  alternative_else_nop_endif
+  .endif
+
+	dcache_line_size \tmp1, \tmp2
+	add	\size, \kaddr, \size
+	sub	\tmp2, \tmp1, #1
+	bic	\kaddr, \kaddr, \tmp2
+ 9998:
+	.if	(\op == cvau || \op == cvac)
+ alternative_if_not ARM64_WORKAROUND_CLEAN_CACHE
+	dc	\op, \kaddr
+ alternative_else
+	dc	civac, \kaddr
+ alternative_endif
+	.elseif	(\op == cvap)
+ alternative_if ARM64_HAS_DCPOP
+	sys 3, c7, c12, 1, \kaddr	// dc cvap
+ alternative_else
+	dc	cvac, \kaddr
+ alternative_endif
+	.else
+	dc	\op, \kaddr
+	.endif
+	add	\kaddr, \kaddr, \tmp1
+	cmp	\kaddr, \size
+	b.lo	9998b
+	dsb	\domain
+9997:
+	.endm
+
+> I notice that the only user other than
+> flush_icache_range/__flush_cache_user_range or invalidate_icache_by_line
+> is in KVM, via invalidate_icache_range. If you want to hook in there, why
+> aren't you also patching __flush_icache_all? If so, I'd rather have the
+> I-side code consistent with the D-side code and do this in the handful of
+> callers. We might even be able to elide a branch or two that way.
+> 
+
+Agree with you, it saves function calls overhead. I'll do this change...
+
+static void invalidate_icache_guest_page(kvm_pfn_t pfn, unsigned long size)
+{
+	if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC)
+	    __invalidate_icache_guest_page(pfn, size);
+}
+
+
+> I'm going to assume that I-cache aliases are all coherent if DIC=1, so it's
+> safe to elide our alias sync code.
+> 
+
+I'm not sure about I-cache whether aliases are all coherent if DIC=1 ot nor.
+Unfortunately I don't have any hardware to test DIC=1. I've verified IDC=1.
+
+> Will
+> 
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+> 
+
 -- 
-Jazz is not dead. It just smells funny...
+Shanker Donthineni
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
