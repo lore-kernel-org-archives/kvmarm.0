@@ -1,66 +1,71 @@
-From: Auger Eric <eric.auger@redhat.com>
+From: Andrew Jones <drjones@redhat.com>
 Subject: Re: [REPOST PATCH] arm/arm64: KVM: Add PSCI version selection API
-Date: Mon, 5 Mar 2018 21:37:08 +0100
-Message-ID: <a1579f14-a5fe-11bc-a831-f729cead25ba@redhat.com>
+Date: Tue, 6 Mar 2018 10:21:34 +0100
+Message-ID: <20180306092134.4bfbz34yhqfrfdlf@kamzik.brq.redhat.com>
 References: <20180215175803.6870-1-marc.zyngier@arm.com>
  <db215c1e-0ce8-32e4-d131-e790bebf353e@redhat.com>
  <86o9k63f7a.wl-marc.zyngier@arm.com>
- <40c74835-da24-485f-14bb-a0c357c7e79b@redhat.com>
- <CAFEAcA9=YpNngKqeOXiO7QDvL=1ZaQEW8fh3XHjwD+i8qQm9wg@mail.gmail.com>
+ <CAFEAcA8XYV=oSX81ON4CGDt0kfG1cgROqj30OC2Ov=bYhLSYig@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAFEAcA9=YpNngKqeOXiO7QDvL=1ZaQEW8fh3XHjwD+i8qQm9wg@mail.gmail.com>
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8XYV=oSX81ON4CGDt0kfG1cgROqj30OC2Ov=bYhLSYig@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: Marc Zyngier <marc.zyngier@arm.com>, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Peter,
-
-On 05/03/18 17:31, Peter Maydell wrote:
-> On 2 March 2018 at 12:26, Auger Eric <eric.auger@redhat.com> wrote:
->> Hi Marc,
->> On 02/03/18 12:11, Marc Zyngier wrote:
->>> On Fri, 02 Mar 2018 10:44:48 +0000,
->>> Auger Eric wrote:
->>>> I understand the get/set is called as part of the migration process.
->>>> So my understanding is the benefit of this series is migration fails in
->>>> those cases:
->>>>
->>>>> =0.2 source -> 0.1 destination
->>>> 0.1 source -> >=0.2 destination
->>>
->>> It also fails in the case where you migrate a 1.0 guest to something
->>> that cannot support it.
->>
->> That's because on the destination, the number of regs is less than on
->> source, right?
+On Mon, Mar 05, 2018 at 04:47:55PM +0000, Peter Maydell wrote:
+> On 2 March 2018 at 11:11, Marc Zyngier <marc.zyngier@arm.com> wrote:
+> > On Fri, 02 Mar 2018 10:44:48 +0000,
+> > Auger Eric wrote:
+> >> I understand the get/set is called as part of the migration process.
+> >> So my understanding is the benefit of this series is migration fails in
+> >> those cases:
+> >>
+> >> >=0.2 source -> 0.1 destination
+> >> 0.1 source -> >=0.2 destination
+> >
+> > It also fails in the case where you migrate a 1.0 guest to something
+> > that cannot support it.
 > 
-> I think it fails because the KVM_REG_ARM_PSCI_VERSION register will be
-> in the migration state but not in the destination's list of registers:
-> the code in QEMU's target/arm/machine.c:cpu_post_load() function that
-> checks "register in their list but not ours: fail migration" will
-> catch this.
-
-Thank you for the pointer. Yes at the time I reviewed the patch and just
-focusing on the kernel code, this was not immediate to me.
-
+> I think it would be useful if we could write out the various
+> combinations of source, destination and what we expect/want to
+> have happen. My gut feeling here is that we're sacrificing
+> exact migration compatibility in favour of having the guest
+> automatically get the variant-2 mitigations, but it's not clear
+> to me exactly which migration combinations that's intended to
+> happen for. Marc?
 > 
-> That also means that we will fail migration from a new kernel where
-> we've specifically asked for PSCI 0.2 to an old PSCI-0.2-only kernel
-> (because the KVM_REG_ARM_PSCI_VERSION reg will appear in the migration
-> stream even if its value is the one value that matches the old kernel
-> behaviour). I don't know if we care about that.
+> If this wasn't a mitigation issue the desired behaviour would be
+> straightforward:
+>  * kernel should default to 0.2 on the basis that
+>    that's what it did before
+>  * new QEMU version should enable 1.0 by default for virt-2.12
+>    and 0.2 for virt-2.11 and earlier
+>  * PSCI version info shouldn't appear in migration stream unless
+>    it's something other than 0.2
+> But that would leave some setups (which?) unnecessarily without the
+> mitigation, so we're not doing that. The question is, exactly
+> what *are* we aiming for?
 
-Do you know when are we likely to force PSCI 0.2 on a new kernel? At
-which layer is the decision supposed to be made and on which criteria?
+The reason Marc dropped this patch from the series it was first introduced
+in was because we didn't have the aim 100% understood. We want the
+mitigation by default, but also to have the least chance of migration
+failure, and when we must fail (because we're not doing the
+straightforward approach listed above, which would prevent failures), then
+we want to fail with the least amount of damage to the user.
 
-Thanks
+I experimented with a couple different approaches and provided tables[1]
+with my results. I even recommended an approach, but I may have changed
+my mind after reading Marc's follow-up[2]. The thread continues from
+there as well with follow-ups from Christoffer, Marc, and myself. Anyway,
+Marc did this repost for us to debate it and work out the best approach
+here.
 
-Eric
-> 
-> thanks
-> -- PMM
-> 
+Thanks,
+drew
+
+[1] https://www.spinics.net/lists/arm-kernel/msg632355.html
+[2] https://www.spinics.net/lists/arm-kernel/msg632385.html
