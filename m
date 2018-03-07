@@ -1,140 +1,94 @@
-From: "Yang, Shunyong" <shunyong.yang@hxt-semitech.com>
-Subject: =?utf-8?B?UmU6IFvmraTpgq7ku7blj6/og73lrZjlnKjpo47pmaldICBSZTogW1JGQyBQ?=
- =?utf-8?B?QVRDSF0gS1ZNOiBhcm0vYXJtNjQ6IHZnaWM6IGNoYW5nZSBjb25kaXRpb24g?=
- =?utf-8?Q?for_level_interrupt_resampling?=
-Date: Thu, 8 Mar 2018 09:31:36 +0000
-Message-ID: <1520501495.2583.19.camel@hxt-semitech.com>
-References: <1520492490-7943-1-git-send-email-shunyong.yang@hxt-semitech.com>
-         <9b3763f2-1dfa-5506-d7f2-93389647111c@redhat.com>
+From: Christoffer Dall <cdall@kernel.org>
+Subject: Re: [PATCH 1/2] KVM: arm/arm64: vgic: Don't populate multiple LRs
+ with the same vintid
+Date: Wed, 7 Mar 2018 23:34:17 +0000
+Message-ID: <CAEDV+gJoamQJX_hcwCNBo1gc7-NUT+m-N9n=00wCJ=_TD82EkQ@mail.gmail.com>
+References: <20180307124055.13800-1-marc.zyngier@arm.com>
+ <20180307124055.13800-2-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <9b3763f2-1dfa-5506-d7f2-93389647111c@redhat.com>
-Content-Language: en-US
-Content-ID: <C1D13CDF0C82D54E9A24F79F60D2A4EC@hxt-semitech.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: "eric.auger@redhat.com" <eric.auger@redhat.com>, "cdall@kernel.org" <cdall@kernel.org>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "ard.biesheuvel@linaro.org" <ard.biesheuvel@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "Zheng, Joey" <yu.zheng@hxt-semitech.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "david.daney@cavium.com" <david.daney@cavium.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6138D401AB
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Mar 2018 18:27:25 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id QV-EB4omdiGo for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  7 Mar 2018 18:27:03 -0500 (EST)
+Received: from mail-lf0-f65.google.com (mail-lf0-f65.google.com
+ [209.85.215.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A6E7E4017F
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Mar 2018 18:27:03 -0500 (EST)
+Received: by mail-lf0-f65.google.com with SMTP id 37-v6so5764001lfs.7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 07 Mar 2018 15:34:19 -0800 (PST)
+In-Reply-To: <20180307124055.13800-2-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Andre Przywara <Andre.Przywara@arm.com>, kvmarm@lists.cs.columbia.edu, KVM General <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGksIEVyaWMsDQoNCkZpcnN0LCBwbGVhc2UgbGV0IG1lIGNoYW5nZcKgQ2hyaXN0b2ZmZXIncyBl
-bWFpbCB0b8KgY2RhbGxAa2VybmVsLm9yZy4gSQ0KYWRkIG1vcmUgaW5mb3JtYXRpb24gYWJvdXQg
-bXkgdGVzdCBiZWxvdywgcGxlYXNlIGNoZWNrLg0KDQpPbiBUaHUsIDIwMTgtMDMtMDggYXQgMDk6
-NTcgKzAxMDAsIEF1Z2VyIEVyaWMgd3JvdGU6DQo+IEhpLA0KPiANCj4gT24gMDgvMDMvMTggMDg6
-MDEsIFNodW55b25nIFlhbmcgd3JvdGU6DQo+ID4gDQo+ID4gV2hlbiByZXNhbXBsaW5nIGlycWZk
-cyBpcyBlbmFibGVkLCBsZXZlbCBpbnRlcnJ1cHQgc2hvdWxkIGJlDQo+ID4gZGUtYXNzZXJ0ZWQg
-d2hlbiByZXNhbXBsaW5nIGhhcHBlbnMuIE9uIHBhZ2UgNC00NyBvZiBHSUMgdjMNCj4gPiBzcGVj
-aWZpY2F0aW9uIElISTAwNjlELCBpdCBzYWlkLA0KPiA+ICJXaGVuIHRoZSBQRSBhY2tub3dsZWRn
-ZXMgYW4gU0dJLCBhIFBQSSwgb3IgYW4gU1BJIGF0IHRoZSBDUFUNCj4gPiBpbnRlcmZhY2UsIHRo
-ZSBJUkkgY2hhbmdlcyB0aGUgc3RhdHVzIG9mIHRoZSBpbnRlcnJ1cHQgdG8gYWN0aXZlDQo+ID4g
-YW5kIHBlbmRpbmcgaWY6DQo+ID4g4oCiIEl0IGlzIGFuIGVkZ2UtdHJpZ2dlcmVkIGludGVycnVw
-dCwgYW5kIGFub3RoZXIgZWRnZSBoYXMgYmVlbg0KPiA+IGRldGVjdGVkIHNpbmNlIHRoZSBpbnRl
-cnJ1cHQgd2FzIGFja25vd2xlZGdlZC4NCj4gPiDigKIgSXQgaXMgYSBsZXZlbC1zZW5zaXRpdmUg
-aW50ZXJydXB0LCBhbmQgdGhlIGxldmVsIGhhcyBub3QgYmVlbg0KPiA+IGRlYXNzZXJ0ZWQgc2lu
-Y2UgdGhlIGludGVycnVwdCB3YXMgYWNrbm93bGVkZ2VkLiINCj4gPiANCj4gPiBHSUMgdjIgc3Bl
-Y2lmaWNhdGlvbiBJSEkwMDQ4Qi5iIGhhcyBzaW1pbGFyIGRlc2NyaXB0aW9uIG9uIHBhZ2UNCj4g
-PiAzLTQyIGZvciBzdGF0ZSBtYWNoaW5lIHRyYW5zaXRpb24uDQo+ID4gDQo+ID4gV2hlbiBzb21l
-IFZGSU8gZGV2aWNlLCBsaWtlIG10dHkoODI1MCBWRklPIG1kZXYgZW11bGF0aW9uIGRyaXZlcg0K
-PiA+IGluIHNhbXBsZXMvdmZpby1tZGV2KSB0cmlnZ2VycyBhIGxldmVsIGludGVycnVwdCwgdGhl
-IHN0YXR1cw0KPiA+IHRyYW5zaXRpb24gaW4gTFIgaXMgcGVuZGluZy0tPmFjdGl2ZS0tPmFjdGl2
-ZSBhbmQgcGVuZGluZy4NCj4gPiBUaGVuIGl0IHdpbGwgd2FpdCByZXNhbXBsaW5nIHRvIGRlLWFz
-c2VydCB0aGUgaW50ZXJydXB0Lg0KPiA+IA0KPiA+IEN1cnJlbnQgZGVzaWduIG9mIGxyX3NpZ25h
-bHNfZW9pX21pKCkgd2lsbCByZXR1cm4gZmFsc2UgaWYgc3RhdGUNCj4gPiBpbiBMUiBpcyBub3Qg
-aW52YWxpZChJbmFjdGl2ZSkuIEl0IGNhdXNlcyByZXNhbXBsaW5nIHdpbGwgbm90DQo+ID4gaGFw
-cGVuDQo+ID4gaW4gbXR0eSBjYXNlLg0KPiA+IA0KPiA+IFRoaXMgd2lsbCBjYXVzZSBpbnRlcnJ1
-cHQgZmlyZWQgY29udGludW91c2x5IHRvIGd1ZXN0IGV2ZW4gODI1MCBJSVINCj4gPiBoYXMgbm8g
-aW50ZXJydXB0LiBXaGVuIDgyNTAncyBpbnRlcnJ1cHQgaXMgY29uZmlndXJlZCBpbiBzaGFyZWQN
-Cj4gPiBtb2RlLA0KPiA+IGl0IHdpbGwgcGFzcyBpbnRlcnJ1cHQgdG8gb3RoZXIgZHJpdmVycyB0
-byBoYW5kbGUuIEhvd2V2ZXIsIHRoZXJlDQo+ID4gaXMgbm8gb3RoZXIgZHJpdmVyIGludm9sdmVk
-LiBUaGVuLCBhICJub2JvZHkgY2FyZWQiIGtlcm5lbA0KPiA+IGNvbXBsYWludA0KPiA+IG9jY3Vy
-cy4NCj4gPiANCj4gPiAvICMgY2F0IC9kZXYvdHR5UzANCj4gPiBbwqDCoMKgwqA0LjgyNjgzNl0g
-cmFuZG9tOiBjcm5nIGluaXQgZG9uZQ0KPiA+IFvCoMKgwqDCoDYuMzczNjIwXSBpcnEgNDE6IG5v
-Ym9keSBjYXJlZCAodHJ5IGJvb3Rpbmcgd2l0aCB0aGUgImlycXBvbGwiDQo+ID4gb3B0aW9uKQ0K
-PiA+IFvCoMKgwqDCoDYuMzc2NDE0XSBDUFU6IDAgUElEOiAxMzA3IENvbW06IGNhdCBOb3QgdGFp
-bnRlZCA0LjE2LjAtcmM0ICM0DQo+ID4gW8KgwqDCoMKgNi4zNzg5MjddIEhhcmR3YXJlIG5hbWU6
-IGxpbnV4LGR1bW15LXZpcnQgKERUKQ0KPiA+IFvCoMKgwqDCoDYuMzgwODc2XSBDYWxsIHRyYWNl
-Og0KPiA+IFvCoMKgwqDCoDYuMzgxOTM3XcKgwqBkdW1wX2JhY2t0cmFjZSsweDAvMHgxODANCj4g
-PiBbwqDCoMKgwqA2LjM4MzQ5NV3CoMKgc2hvd19zdGFjaysweDE0LzB4MWMNCj4gPiBbwqDCoMKg
-wqA2LjM4NDkwMl3CoMKgZHVtcF9zdGFjaysweDkwLzB4YjQNCj4gPiBbwqDCoMKgwqA2LjM4NjMx
-Ml3CoMKgX19yZXBvcnRfYmFkX2lycSsweDM4LzB4ZTANCj4gPiBbwqDCoMKgwqA2LjM4Nzk0NF3C
-oMKgbm90ZV9pbnRlcnJ1cHQrMHgxZjQvMHgyYjgNCj4gPiBbwqDCoMKgwqA2LjM4OTU2OF3CoMKg
-aGFuZGxlX2lycV9ldmVudF9wZXJjcHUrMHg1NC8weDdjDQo+ID4gW8KgwqDCoMKgNi4zOTE0MzNd
-wqDCoGhhbmRsZV9pcnFfZXZlbnQrMHg0NC8weDc0DQo+ID4gW8KgwqDCoMKgNi4zOTMwNTZdwqDC
-oGhhbmRsZV9mYXN0ZW9pX2lycSsweDljLzB4MTU0DQo+ID4gW8KgwqDCoMKgNi4zOTQ3ODRdwqDC
-oGdlbmVyaWNfaGFuZGxlX2lycSsweDI0LzB4MzgNCj4gPiBbwqDCoMKgwqA2LjM5NjQ4M13CoMKg
-X19oYW5kbGVfZG9tYWluX2lycSsweDYwLzB4YjQNCj4gPiBbwqDCoMKgwqA2LjM5ODIwN13CoMKg
-Z2ljX2hhbmRsZV9pcnErMHg5OC8weDFiMA0KPiA+IFvCoMKgwqDCoDYuMzk5Nzk2XcKgwqBlbDFf
-aXJxKzB4YjAvMHgxMjgNCj4gPiBbwqDCoMKgwqA2LjQwMTEzOF3CoMKgX3Jhd19zcGluX3VubG9j
-a19pcnFyZXN0b3JlKzB4MTgvMHg0MA0KPiA+IFvCoMKgwqDCoDYuNDAzMTQ5XcKgwqBfX3NldHVw
-X2lycSsweDQxYy8weDY3OA0KPiA+IFvCoMKgwqDCoDYuNDA0NjY5XcKgwqByZXF1ZXN0X3RocmVh
-ZGVkX2lycSsweGUwLzB4MTkwDQo+ID4gW8KgwqDCoMKgNi40MDY0NzRdwqDCoHVuaXY4MjUwX3Nl
-dHVwX2lycSsweDIwOC8weDIzNA0KPiA+IFvCoMKgwqDCoDYuNDA4MjUwXcKgwqBzZXJpYWw4MjUw
-X2RvX3N0YXJ0dXArMHgxYjQvMHg3NTQNCj4gPiBbwqDCoMKgwqA2LjQxMDEyM13CoMKgc2VyaWFs
-ODI1MF9zdGFydHVwKzB4MjAvMHgyOA0KPiA+IFvCoMKgwqDCoDYuNDExODI2XcKgwqB1YXJ0X3N0
-YXJ0dXAucGFydC4yMSsweDc4LzB4MTQ0DQo+ID4gW8KgwqDCoMKgNi40MTM2MzNdwqDCoHVhcnRf
-cG9ydF9hY3RpdmF0ZSsweDUwLzB4NjgNCj4gPiBbwqDCoMKgwqA2LjQxNTMyOF3CoMKgdHR5X3Bv
-cnRfb3BlbisweDg0LzB4ZDQNCj4gPiBbwqDCoMKgwqA2LjQxNjg1MV3CoMKgdWFydF9vcGVuKzB4
-MzQvMHg0NA0KPiA+IFvCoMKgwqDCoDYuNDE4MjI5XcKgwqB0dHlfb3BlbisweGVjLzB4M2M4DQo+
-ID4gW8KgwqDCoMKgNi40MTk2MTBdwqDCoGNocmRldl9vcGVuKzB4YjAvMHgxOTgNCj4gPiBbwqDC
-oMKgwqA2LjQyMTA5M13CoMKgZG9fZGVudHJ5X29wZW4rMHgyMDAvMHgzMTANCj4gPiBbwqDCoMKg
-wqA2LjQyMjcxNF3CoMKgdmZzX29wZW4rMHg1NC8weDg0DQo+ID4gW8KgwqDCoMKgNi40MjQwNTRd
-wqDCoHBhdGhfb3BlbmF0KzB4MmRjLzB4ZjA0DQo+ID4gW8KgwqDCoMKgNi40MjU1NjldwqDCoGRv
-X2ZpbHBfb3BlbisweDY4LzB4ZDgNCj4gPiBbwqDCoMKgwqA2LjQyNzA0NF3CoMKgZG9fc3lzX29w
-ZW4rMHgxNmMvMHgyMjQNCj4gPiBbwqDCoMKgwqA2LjQyODU2M13CoMKgU3lTX29wZW5hdCsweDEw
-LzB4MTgNCj4gPiBbwqDCoMKgwqA2LjQyOTk3Ml3CoMKgZWwwX3N2Y19uYWtlZCsweDMwLzB4MzQN
-Cj4gPiBbwqDCoMKgwqA2LjQzMTQ5NF0gaGFuZGxlcnM6DQo+ID4gW8KgwqDCoMKgNi40MzI0Nzld
-IFs8MDAwMDAwMDAwZTlmYjRiYj5dIHNlcmlhbDgyNTBfaW50ZXJydXB0DQo+ID4gW8KgwqDCoMKg
-Ni40MzQ1OTddIERpc2FibGluZyBJUlEgIzQxDQo+ID4gDQo+ID4gVGhpcyBwYXRjaCBjaGFuZ2Vz
-IHRoZSBsciBzdGF0ZSBjb25kaXRpb24gaW4gbHJfc2lnbmFsc19lb2lfbWkoKQ0KPiA+IGZyb20N
-Cj4gPiBpbnZhbGlkKEluYWN0aXZlKSB0byBhY3RpdmUgYW5kIHBlbmRpbmcgdG8gYXZvaWQgdGhp
-cy4NCj4gPiANCj4gPiBJIGFtIG5vdCBzdXJlIGFib3V0IHRoZSBvcmlnaW5hbCBkZXNpZ24gb2Yg
-dGhlIGNvbmRpdGlvbiBvZg0KPiA+IGludmFsaWQoYWN0aXZlKS4gU28sIFRoaXMgUkZDIGlzIHNl
-bnQgb3V0IGZvciBjb21tZW50cy4NCj4gPiANCj4gPiBDYzogSm9leSBaaGVuZyA8eXUuemhlbmdA
-aHh0LXNlbWl0ZWNoLmNvbT4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBTaHVueW9uZyBZYW5nIDxzaHVu
-eW9uZy55YW5nQGh4dC1zZW1pdGVjaC5jb20+DQo+ID4gLS0tDQo+ID4gwqB2aXJ0L2t2bS9hcm0v
-dmdpYy92Z2ljLXYyLmMgfCA0ICsrLS0NCj4gPiDCoHZpcnQva3ZtL2FybS92Z2ljL3ZnaWMtdjMu
-YyB8IDQgKystLQ0KPiA+IMKgMiBmaWxlcyBjaGFuZ2VkLCA0IGluc2VydGlvbnMoKyksIDQgZGVs
-ZXRpb25zKC0pDQo+ID4gDQo+ID4gZGlmZiAtLWdpdCBhL3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMt
-djIuYyBiL3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMtDQo+ID4gdjIuYw0KPiA+IGluZGV4IGU5ZDg0
-MGE3NWU3Yi4uNzQwZWU5YTVmNTUxIDEwMDY0NA0KPiA+IC0tLSBhL3ZpcnQva3ZtL2FybS92Z2lj
-L3ZnaWMtdjIuYw0KPiA+ICsrKyBiL3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMtdjIuYw0KPiA+IEBA
-IC00Niw4ICs0Niw4IEBAIHZvaWQgdmdpY192Ml9zZXRfdW5kZXJmbG93KHN0cnVjdCBrdm1fdmNw
-dSAqdmNwdSkNCj4gPiDCoA0KPiA+IMKgc3RhdGljIGJvb2wgbHJfc2lnbmFsc19lb2lfbWkodTMy
-IGxyX3ZhbCkNCj4gPiDCoHsNCj4gPiAtCXJldHVybiAhKGxyX3ZhbCAmIEdJQ0hfTFJfU1RBVEUp
-ICYmIChscl92YWwgJiBHSUNIX0xSX0VPSSkNCj4gPiAmJg0KPiA+IC0JwqDCoMKgwqDCoMKgwqAh
-KGxyX3ZhbCAmIEdJQ0hfTFJfSFcpOw0KPiA+ICsJcmV0dXJuICEoKGxyX3ZhbCAmIEdJQ0hfTFJf
-U1RBVEUpIF4gR0lDSF9MUl9TVEFURSkgJiYNCj4gPiArCcKgwqDCoMKgwqDCoMKgKGxyX3ZhbCAm
-IEdJQ0hfTFJfRU9JKSAmJiAhKGxyX3ZhbCAmIEdJQ0hfTFJfSFcpOw0KPiA+IMKgfQ0KPiA+IMKg
-DQo+ID4gwqAvKg0KPiA+IGRpZmYgLS1naXQgYS92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLXYzLmMg
-Yi92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLQ0KPiA+IHYzLmMNCj4gPiBpbmRleCA2YjMyOTQxNGU1
-N2EuLjQzMTExYmJhN2FmOSAxMDA2NDQNCj4gPiAtLS0gYS92aXJ0L2t2bS9hcm0vdmdpYy92Z2lj
-LXYzLmMNCj4gPiArKysgYi92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLXYzLmMNCj4gPiBAQCAtMzUs
-OCArMzUsOCBAQCB2b2lkIHZnaWNfdjNfc2V0X3VuZGVyZmxvdyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZj
-cHUpDQo+ID4gwqANCj4gPiDCoHN0YXRpYyBib29sIGxyX3NpZ25hbHNfZW9pX21pKHU2NCBscl92
-YWwpDQo+ID4gwqB7DQo+ID4gLQlyZXR1cm4gIShscl92YWwgJiBJQ0hfTFJfU1RBVEUpICYmIChs
-cl92YWwgJiBJQ0hfTFJfRU9JKQ0KPiA+ICYmDQo+ID4gLQnCoMKgwqDCoMKgwqDCoCEobHJfdmFs
-ICYgSUNIX0xSX0hXKTsNCj4gPiArCXJldHVybiAhKChscl92YWwgJiBJQ0hfTFJfU1RBVEUpIF4g
-SUNIX0xSX1NUQVRFKSAmJg0KPiA+ICsJwqDCoMKgwqDCoMKgwqAobHJfdmFsICYgSUNIX0xSX0VP
-SSkgJiYgIShscl92YWwgJiBJQ0hfTFJfSFcpOw0KPiANCj4gSW4gZ2VuZXJhbCBkb24ndCB3ZSBo
-YXZlIHRoaXMgc3RhdGUgdHJhbnNpdGlvbg0KPiANCj4gaW5hY3RpdmUgLT4gcGVuZGluZyAtPiBw
-ZW5kaW5nICsgYWN0aXZlICgxKSAtPiBhY3RpdmUgLT4gaW5hY3RpdmUuDQo+IA0KPiBJbiB0aGF0
-IGNhc2Ugd29uJ3Qgd2UgbG93ZXIgdGhlIHZpcnQgaXJxIGxldmVsIHdoZW4gZm9sZGluZyB0aGUg
-TFIgb24NCj4gUGVuZGluZyArIEFjdGl2ZSBzdGF0ZSwgd2hpY2ggaXMgbm90IHdhcyB3ZSB3YW50
-Pw0KPiANCj4gVGhhbmtzDQo+IA0KPiBFcmljDQoNCkluIGN1cnJlbnQgY29kZSwgaW4gbXkgdGVz
-dCwgd2hlbiBJIG91dHB1dCBMUiB2YWx1ZSBvZiB0aGUgbXR0eSBJUlEgNDENCihod2lycSA9IDM2
-KSBpbsKgdmdpY192M19mb2xkX2xyX3N0YXRlKCkuIFRoZSBMUidzIHRyYW5zaXRpb24gc3RhcnRz
-DQpsaWtlIGZvbGxvd2luZywNCg0KMC0tPjUwYTAwMjAwMDAwMDAwMjQtLT45MGEwMDIwMDAwMDAw
-MDI0LS0+ZDBhMDAyMDAwMDAwMDAyNA0KDQpUaGF0IGlzIGluYWN0aXZlLS0+cGVuZGluZy0tPmFj
-dGl2ZS0tPnBlbmRpbmcgKyBhY3RpdmUuDQpUaGVuIGl0IGtlZXAgcnVubmluZyBjeWNsaWMgcGVu
-ZGluZy0tPmFjdGl2ZS0tPnBlbmRpbmcgKyBhY3RpdmUuDQoNClRoZSBsZXZlbCBpbnRlcnJ1cHQg
-ZGUtYXNzZXJ0IHNob3VsZCBoYXBwZW4gaW4gZm9sbG93aW5nIGNvZGUNCi8qIE5vdGlmeSBmZHMg
-d2hlbiB0aGUgZ3Vlc3QgRU9JJ2VkIGEgbGV2ZWwtdHJpZ2dlcmVkIElSUSAqLw0KCWlmIChscl9z
-aWduYWxzX2VvaV9taSh2YWwpICYmIHZnaWNfdmFsaWRfc3BpKHZjcHUtPmt2bSwgaW50aWQpKQ0K
-CQlrdm1fbm90aWZ5X2Fja2VkX2lycSh2Y3B1LT5rdm0sIDAsDQoJCQkJwqDCoMKgwqDCoGludGlk
-IC0gVkdJQ19OUl9QUklWQVRFX0lSUVMpOw0KDQpCdXQgYXMgYWRkcmVzc2VkIGluIGNvbW1pdCBt
-ZXNzYWdlLCBscl9zaWduYWxzX2VvaV9taSgpIHdpbGwgcmV0dXJuDQpmYWxzZSBpZiBzdGF0ZSBp
-biBMUiBpcyBub3QgaW52YWxpZChpbmFjdGl2ZSksIHNvIGl0IGhhcyBubyBjaGFuY2UgdG8NCmRl
-LWFzc2VydCB0aGUgbGV2ZWwgaW50ZXJydXB0IGluIG15IHRlc3QuwqANCg0KVGhhbmtzLg0KU2h1
-bnlvbmcuDQoNCj4gDQo+ID4gDQo+ID4gwqB9DQo+ID4gwqANCj4gPiDCoHZvaWQgdmdpY192M19m
-b2xkX2xyX3N0YXRlKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkNCj4gPiANCg==
+On Wed, Mar 7, 2018 at 12:40 PM, Marc Zyngier <marc.zyngier@arm.com> wrote:
+> The vgic code is trying to be clever when injecting GICv2 SGIs,
+> and will happily populate LRs with the same interrupt number if
+> they come from multiple vcpus (after all, they are distinct
+> interrupt sources).
+>
+> Unfortunately, this is against the letter of the architecture,
+> and the GICv2 architecture spec says "Each valid interrupt stored
+> in the List registers must have a unique VirtualID for that
+> virtual CPU interface.". GICv3 has similar (although slightly
+> ambiguous) restrictions.
+>
+> This results in guests locking up when using GICv2-on-GICv3, for
+> example. The obvious fix is to stop trying so hard, and inject
+> a single vcpu per SGI per guest entry. After all, pending SGIs
+> with multiple source vcpus are pretty rare, and are mostly seen
+> in scenario where the physical CPUs are severely overcomitted.
+>
+> Cc: stable@vger.kernel.org
+> Fixes: 0919e84c0fc1 ("KVM: arm/arm64: vgic-new: Add IRQ sync/flush framework")
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  virt/kvm/arm/vgic/vgic.c | 11 +----------
+>  1 file changed, 1 insertion(+), 10 deletions(-)
+>
+> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> index c7c5ef190afa..1f7ff175f47b 100644
+> --- a/virt/kvm/arm/vgic/vgic.c
+> +++ b/virt/kvm/arm/vgic/vgic.c
+> @@ -720,18 +720,9 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+>         list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
+>                 spin_lock(&irq->irq_lock);
+>
+> -               if (unlikely(vgic_target_oracle(irq) != vcpu))
+> -                       goto next;
+> -
+> -               /*
+> -                * If we get an SGI with multiple sources, try to get
+> -                * them in all at once.
+> -                */
+> -               do {
+> +               if (likely(vgic_target_oracle(irq) == vcpu))
+>                         vgic_populate_lr(vcpu, irq, count++);
+
+I think we need to change vgic_populate_lr to set the EOI maintenance
+interrupt flag so that when the interrupt is deactivated, if there are
+additional pending sources, we exit the guest and pick up the
+interrupt.
+
+An alternative would be to set the underflow interrupt, but I don't
+think that would be correct for multiple priorities, because the SGI
+could have a higher priority than other pending interrupts we put in
+the LR.
+
+Thanks,
+Christoffer
