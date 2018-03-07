@@ -1,51 +1,35 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] KVM: arm/arm64: Reset mapped IRQs on VM reset
-Date: Wed, 7 Mar 2018 13:02:07 +0000
-Message-ID: <a5dbae97-7ab8-4f60-723f-d3599297f396@arm.com>
-References: <20180305103638.1633-1-cdall@kernel.org>
+Subject: Re: [PATCH] KVM: arm/arm64: VGIC MMIO: add missing irq_lock
+Date: Wed, 7 Mar 2018 13:09:16 +0000
+Message-ID: <20a9983c-6e66-1fc6-6901-1748fcc3226e@arm.com>
+References: <20180306092106.13044-1-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D1B242121
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Mar 2018 07:55:17 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id i0oswn-pLxAE for <kvmarm@lists.cs.columbia.edu>;
- Wed,  7 Mar 2018 07:54:54 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BE5E340805
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Mar 2018 07:54:54 -0500 (EST)
-In-Reply-To: <20180305103638.1633-1-cdall@kernel.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20180306092106.13044-1-andre.przywara@arm.com>
 Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc: kvm@vger.kernel.org
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <cdall@kernel.org>
+Cc: Eric Auger <eric.auger@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 05/03/18 10:36, Christoffer Dall wrote:
-> We currently don't allow resetting mapped IRQs from userspace, because
-> their state is controlled by the hardware.  But we do need to reset the
-> state when the VM is reset, so we provide a function for the 'owner' of
-> the mapped interrupt to reset the interrupt state.
+On 06/03/18 09:21, Andre Przywara wrote:
+> Our irq_is_pending() helper function accesses multiple members of the
+> vgic_irq struct, so we need to hold the lock when calling it.
+> Add that requirement as a comment to the definition and take the lock
+> around the call in vgic_mmio_read_pending(), where we were missing it
+> before.
 > 
-> Currently only the timer uses mapped interrupts, so we call this
-> function from the timer reset logic.
-> 
-> Signed-off-by: Christoffer Dall <cdall@kernel.org>
-> ---
-> This depends on "KVM: arm/arm64: Avoid vcpu_load for other vcpu ioctls
-> than KVM_RUN" from the VHE optimization series so that the reset doesn't
-> get called while vtimer->loaded is true.
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 
 Queued for 4.16-rc5.
 
