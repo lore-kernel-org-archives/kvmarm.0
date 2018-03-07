@@ -1,49 +1,84 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 0/2] KVM: arm/arm64: GICv2-on-v3 fixes
-Date: Wed,  7 Mar 2018 12:40:53 +0000
-Message-ID: <20180307124055.13800-1-marc.zyngier@arm.com>
+Subject: [PATCH 1/2] KVM: arm/arm64: vgic: Don't populate multiple LRs with
+ the same vintid
+Date: Wed,  7 Mar 2018 12:40:54 +0000
+Message-ID: <20180307124055.13800-2-marc.zyngier@arm.com>
+References: <20180307124055.13800-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B6F9402B8
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Mar 2018 07:34:19 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id CWGWD8N9HxZW for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  7 Mar 2018 07:33:58 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BBD740259
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Mar 2018 07:33:58 -0500 (EST)
+In-Reply-To: <20180307124055.13800-1-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Andre Przywara <Andre.Przywara@arm.com>, Christoffer Dall <cdall@kernel.org>, Eric Auger <eric.auger@redhat.com>
+Cc: Andre Przywara <Andre.Przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-I've been trying to run VMs on a GICv3-based system that offers the
-GICv2 compatibility feature, and noticed that they would tend to
-slowly die under load.
+The vgic code is trying to be clever when injecting GICv2 SGIs,
+and will happily populate LRs with the same interrupt number if
+they come from multiple vcpus (after all, they are distinct
+interrupt sources).
 
-It turned out that this is due to KVM not being exactly true to the
-architecture, and ends up injecting multiple SGI with the same vintid,
-which the architecture clearly outlines as a "don't do that". This bug
-has been there since the first days of the "new vgic".
+Unfortunately, this is against the letter of the architecture,
+and the GICv2 architecture spec says "Each valid interrupt stored
+in the List registers must have a unique VirtualID for that
+virtual CPU interface.". GICv3 has similar (although slightly
+ambiguous) restrictions.
 
-Another issue is that we don't use the right barriers when exiting
-from the guest, as we only synchronize stores, while the architecture
-requires to synchronize both loads and stores. And we miss an isb to
-force execution of the previous dsb.
+This results in guests locking up when using GICv2-on-GICv3, for
+example. The obvious fix is to stop trying so hard, and inject
+a single vcpu per SGI per guest entry. After all, pending SGIs
+with multiple source vcpus are pretty rare, and are mostly seen
+in scenario where the physical CPUs are severely overcomitted.
 
-Unless someone shouts, I'm planning to take these patches into 4.16 as
-they directly affect my laptop (yes, I'm biased).
+Cc: stable@vger.kernel.org
+Fixes: 0919e84c0fc1 ("KVM: arm/arm64: vgic-new: Add IRQ sync/flush framework")
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ virt/kvm/arm/vgic/vgic.c | 11 +----------
+ 1 file changed, 1 insertion(+), 10 deletions(-)
 
-Marc Zyngier (2):
-  KVM: arm/arm64: vgic: Don't populate multiple LRs with the same vintid
-  kvm: arm/arm64: vgic-v3: Tighten synchronization for guests using v2
-    on v3
-
- virt/kvm/arm/hyp/vgic-v3-sr.c |  3 ++-
- virt/kvm/arm/vgic/vgic.c      | 11 +----------
- 2 files changed, 3 insertions(+), 11 deletions(-)
-
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index c7c5ef190afa..1f7ff175f47b 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -720,18 +720,9 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+ 	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
+ 		spin_lock(&irq->irq_lock);
+ 
+-		if (unlikely(vgic_target_oracle(irq) != vcpu))
+-			goto next;
+-
+-		/*
+-		 * If we get an SGI with multiple sources, try to get
+-		 * them in all at once.
+-		 */
+-		do {
++		if (likely(vgic_target_oracle(irq) == vcpu))
+ 			vgic_populate_lr(vcpu, irq, count++);
+-		} while (irq->source && count < kvm_vgic_global_state.nr_lr);
+ 
+-next:
+ 		spin_unlock(&irq->irq_lock);
+ 
+ 		if (count == kvm_vgic_global_state.nr_lr) {
 -- 
 2.14.2
