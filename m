@@ -1,25 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v5 01/40] KVM: arm/arm64: Avoid vcpu_load for other vcpu
- ioctls than KVM_RUN
-Date: Wed, 7 Mar 2018 13:01:21 +0000
-Message-ID: <2031649b-1327-861c-0086-cb7ac9ab640d@arm.com>
-References: <20180227113429.637-1-cdall@kernel.org>
- <20180227113429.637-2-cdall@kernel.org>
+Subject: Re: [PATCH] KVM: arm/arm64: Reset mapped IRQs on VM reset
+Date: Wed, 7 Mar 2018 13:02:07 +0000
+Message-ID: <a5dbae97-7ab8-4f60-723f-d3599297f396@arm.com>
+References: <20180305103638.1633-1-cdall@kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E44649D6B
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Mar 2018 07:54:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D1B242121
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Mar 2018 07:55:17 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PimXTQ95YwOO for <kvmarm@lists.cs.columbia.edu>;
- Wed,  7 Mar 2018 07:54:11 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2557E401AB
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Mar 2018 07:54:11 -0500 (EST)
-In-Reply-To: <20180227113429.637-2-cdall@kernel.org>
+ with ESMTP id i0oswn-pLxAE for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  7 Mar 2018 07:54:54 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BE5E340805
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Mar 2018 07:54:54 -0500 (EST)
+In-Reply-To: <20180305103638.1633-1-cdall@kernel.org>
 Content-Language: en-GB
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -30,35 +28,26 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@kernel.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Yury Norov <ynorov@caviumnetworks.com>, Dave Martin <Dave.Martin@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
+To: Christoffer Dall <cdall@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 27/02/18 11:33, Christoffer Dall wrote:
-> From: Christoffer Dall <christoffer.dall@linaro.org>
+On 05/03/18 10:36, Christoffer Dall wrote:
+> We currently don't allow resetting mapped IRQs from userspace, because
+> their state is controlled by the hardware.  But we do need to reset the
+> state when the VM is reset, so we provide a function for the 'owner' of
+> the mapped interrupt to reset the interrupt state.
 > 
-> Calling vcpu_load() registers preempt notifiers for this vcpu and calls
-> kvm_arch_vcpu_load().  The latter will soon be doing a lot of heavy
-> lifting on arm/arm64 and will try to do things such as enabling the
-> virtual timer and setting us up to handle interrupts from the timer
-> hardware.
+> Currently only the timer uses mapped interrupts, so we call this
+> function from the timer reset logic.
 > 
-> Loading state onto hardware registers and enabling hardware to signal
-> interrupts can be problematic when we're not actually about to run the
-> VCPU, because it makes it difficult to establish the right context when
-> handling interrupts from the timer, and it makes the register access
-> code difficult to reason about.
-> 
-> Luckily, now when we call vcpu_load in each ioctl implementation, we can
-> simply remove the call from the non-KVM_RUN vcpu ioctls, and our
-> kvm_arch_vcpu_load() is only used for loading vcpu content to the
-> physical CPU when we're actually going to run the vcpu.
-> 
-> Reviewed-by: Julien Grall <julien.grall@arm.com>
-> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-I've queued this patch for 4.16-rc5 as part of the reset fix.
+> Signed-off-by: Christoffer Dall <cdall@kernel.org>
+> ---
+> This depends on "KVM: arm/arm64: Avoid vcpu_load for other vcpu ioctls
+> than KVM_RUN" from the VHE optimization series so that the reset doesn't
+> get called while vtimer->loaded is true.
+
+Queued for 4.16-rc5.
 
 Thanks,
 
