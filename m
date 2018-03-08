@@ -1,317 +1,254 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [RFC PATCH] KVM: arm/arm64: vgic: change condition for level
- interrupt resampling
-Date: Thu, 8 Mar 2018 11:54:27 +0000
-Message-ID: <0a15633d-8944-cb9b-3e6b-b08ee5ec42b9@arm.com>
-References: <1520492490-7943-1-git-send-email-shunyong.yang@hxt-semitech.com>
- <9ad47673-068e-f732-d2ca-9c76a8fbdfbc@arm.com>
+Subject: Re: [PATCH 1/2] KVM: arm/arm64: vgic: Don't populate multiple LRs
+ with the same vintid
+Date: Thu, 8 Mar 2018 13:40:09 +0000
+Message-ID: <b353bdde-36c8-78e9-70f1-df3f29be1edf@arm.com>
+References: <20180307124055.13800-1-marc.zyngier@arm.com>
+ <20180307124055.13800-2-marc.zyngier@arm.com>
+ <CAEDV+gJoamQJX_hcwCNBo1gc7-NUT+m-N9n=00wCJ=_TD82EkQ@mail.gmail.com>
+ <8e873168-110f-6781-506c-4ca89b7a4e0d@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <9ad47673-068e-f732-d2ca-9c76a8fbdfbc@arm.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <8e873168-110f-6781-506c-4ca89b7a4e0d@arm.com>
 Content-Language: en-GB
-Sender: linux-kernel-owner@vger.kernel.org
-To: Shunyong Yang <shunyong.yang@hxt-semitech.com>
-Cc: ard.biesheuvel@linaro.org, will.deacon@arm.com, eric.auger@redhat.com, david.daney@cavium.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, Joey Zheng <yu.zheng@hxt-semitech.com>, Christoffer Dall <cdall@kernel.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Christoffer Dall <cdall@kernel.org>
+Cc: linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Andre Przywara <Andre.Przywara@arm.com>, kvmarm@lists.cs.columbia.edu, KVM General <kvm@vger.kernel.org>, Eric Auger <eric.auger@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 08/03/18 09:49, Marc Zyngier wrote:
-> [updated Christoffer's email address]
-> 
-> Hi Shunyong,
-> 
-> On 08/03/18 07:01, Shunyong Yang wrote:
->> When resampling irqfds is enabled, level interrupt should be
->> de-asserted when resampling happens. On page 4-47 of GIC v3
->> specification IHI0069D, it said,
->> "When the PE acknowledges an SGI, a PPI, or an SPI at the CPU
->> interface, the IRI changes the status of the interrupt to active
->> and pending if:
->> • It is an edge-triggered interrupt, and another edge has been
->> detected since the interrupt was acknowledged.
->> • It is a level-sensitive interrupt, and the level has not been
->> deasserted since the interrupt was acknowledged."
+On 08/03/18 10:19, Marc Zyngier wrote:
+> On 07/03/18 23:34, Christoffer Dall wrote:
+>> On Wed, Mar 7, 2018 at 12:40 PM, Marc Zyngier <marc.zyngier@arm.com> wrote:
+>>> The vgic code is trying to be clever when injecting GICv2 SGIs,
+>>> and will happily populate LRs with the same interrupt number if
+>>> they come from multiple vcpus (after all, they are distinct
+>>> interrupt sources).
+>>>
+>>> Unfortunately, this is against the letter of the architecture,
+>>> and the GICv2 architecture spec says "Each valid interrupt stored
+>>> in the List registers must have a unique VirtualID for that
+>>> virtual CPU interface.". GICv3 has similar (although slightly
+>>> ambiguous) restrictions.
+>>>
+>>> This results in guests locking up when using GICv2-on-GICv3, for
+>>> example. The obvious fix is to stop trying so hard, and inject
+>>> a single vcpu per SGI per guest entry. After all, pending SGIs
+>>> with multiple source vcpus are pretty rare, and are mostly seen
+>>> in scenario where the physical CPUs are severely overcomitted.
+>>>
+>>> Cc: stable@vger.kernel.org
+>>> Fixes: 0919e84c0fc1 ("KVM: arm/arm64: vgic-new: Add IRQ sync/flush framework")
+>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>>> ---
+>>>  virt/kvm/arm/vgic/vgic.c | 11 +----------
+>>>  1 file changed, 1 insertion(+), 10 deletions(-)
+>>>
+>>> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+>>> index c7c5ef190afa..1f7ff175f47b 100644
+>>> --- a/virt/kvm/arm/vgic/vgic.c
+>>> +++ b/virt/kvm/arm/vgic/vgic.c
+>>> @@ -720,18 +720,9 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+>>>         list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
+>>>                 spin_lock(&irq->irq_lock);
+>>>
+>>> -               if (unlikely(vgic_target_oracle(irq) != vcpu))
+>>> -                       goto next;
+>>> -
+>>> -               /*
+>>> -                * If we get an SGI with multiple sources, try to get
+>>> -                * them in all at once.
+>>> -                */
+>>> -               do {
+>>> +               if (likely(vgic_target_oracle(irq) == vcpu))
+>>>                         vgic_populate_lr(vcpu, irq, count++);
 >>
->> GIC v2 specification IHI0048B.b has similar description on page
->> 3-42 for state machine transition.
->>
->> When some VFIO device, like mtty(8250 VFIO mdev emulation driver
->> in samples/vfio-mdev) triggers a level interrupt, the status
->> transition in LR is pending-->active-->active and pending.
->> Then it will wait resampling to de-assert the interrupt.
->>
->> Current design of lr_signals_eoi_mi() will return false if state
->> in LR is not invalid(Inactive). It causes resampling will not happen
->> in mtty case.
+>> I think we need to change vgic_populate_lr to set the EOI maintenance
+>> interrupt flag so that when the interrupt is deactivated, if there are
+>> additional pending sources, we exit the guest and pick up the
+>> interrupt.
 > 
-> Let me rephrase this, and tell me if I understood it correctly:
+> Potentially. We need to be careful about about the semantics of EOI MI
+> with non-level interrupts (see the other thread about EOI signalling).
 > 
-> - A level interrupt is injected, activated by the guest (LR state=active)
-> - guest exits, re-enters, (LR state=pending+active)
-> - guest EOIs the interrupt (LR state=pending)
-> - maintenance interrupt
-> - we don't signal the resampling because we're not in an invalid state
+>> An alternative would be to set the underflow interrupt, but I don't
+>> think that would be correct for multiple priorities, because the SGI
+>> could have a higher priority than other pending interrupts we put in
+>> the LR.
 > 
-> Is that correct?
+> I don't think priorities are the issue (after all, we already sort the
+> irqs in order of priority). My worry is that underflow is allowed to
+> fire if there is one interrupt pending, which implies that you could
+> end-up in a livelock scenario if you only have one SGI pending with
+> multiple sources.
 > 
-> That's an interesting case, because it seems to invalidate some of the 
-> optimization that went in over a year ago.
+> Another possibility would be to use ICH_HCR_EL2.NPIE (GICH_HCR.NPIE on
+> GICv2), which delivers a a MI if no pending interrupts are present. Once
+> the SGI has been activated, we're guaranteed to be able to inject a new
+> pending one.
 > 
-> 096f31c4360f KVM: arm/arm64: vgic: Get rid of MISR and EISR fields
-> b6095b084d87 KVM: arm/arm64: vgic: Get rid of unnecessary save_maint_int_state
-> af0614991ab6 KVM: arm/arm64: vgic: Get rid of unnecessary process_maintenance operation
-> 
-> We could compare the value of the LR before the guest entry with
-> the value at exit time, but we still could miss it if we have a
-> transition such as P+A -> P -> A and assume a long enough propagation
-> delay for the maintenance interrupt (which is very likely).
-> 
-> In essence, we have lost the benefit of EISR, which was to give us a
-> way to deal with asynchronous signalling.
-> 
->>
->> This will cause interrupt fired continuously to guest even 8250 IIR
->> has no interrupt. When 8250's interrupt is configured in shared mode,
->> it will pass interrupt to other drivers to handle. However, there
->> is no other driver involved. Then, a "nobody cared" kernel complaint
->> occurs.
->>
->> / # cat /dev/ttyS0
->> [    4.826836] random: crng init done
->> [    6.373620] irq 41: nobody cared (try booting with the "irqpoll"
->> option)
->> [    6.376414] CPU: 0 PID: 1307 Comm: cat Not tainted 4.16.0-rc4 #4
->> [    6.378927] Hardware name: linux,dummy-virt (DT)
->> [    6.380876] Call trace:
->> [    6.381937]  dump_backtrace+0x0/0x180
->> [    6.383495]  show_stack+0x14/0x1c
->> [    6.384902]  dump_stack+0x90/0xb4
->> [    6.386312]  __report_bad_irq+0x38/0xe0
->> [    6.387944]  note_interrupt+0x1f4/0x2b8
->> [    6.389568]  handle_irq_event_percpu+0x54/0x7c
->> [    6.391433]  handle_irq_event+0x44/0x74
->> [    6.393056]  handle_fasteoi_irq+0x9c/0x154
->> [    6.394784]  generic_handle_irq+0x24/0x38
->> [    6.396483]  __handle_domain_irq+0x60/0xb4
->> [    6.398207]  gic_handle_irq+0x98/0x1b0
->> [    6.399796]  el1_irq+0xb0/0x128
->> [    6.401138]  _raw_spin_unlock_irqrestore+0x18/0x40
->> [    6.403149]  __setup_irq+0x41c/0x678
->> [    6.404669]  request_threaded_irq+0xe0/0x190
->> [    6.406474]  univ8250_setup_irq+0x208/0x234
->> [    6.408250]  serial8250_do_startup+0x1b4/0x754
->> [    6.410123]  serial8250_startup+0x20/0x28
->> [    6.411826]  uart_startup.part.21+0x78/0x144
->> [    6.413633]  uart_port_activate+0x50/0x68
->> [    6.415328]  tty_port_open+0x84/0xd4
->> [    6.416851]  uart_open+0x34/0x44
->> [    6.418229]  tty_open+0xec/0x3c8
->> [    6.419610]  chrdev_open+0xb0/0x198
->> [    6.421093]  do_dentry_open+0x200/0x310
->> [    6.422714]  vfs_open+0x54/0x84
->> [    6.424054]  path_openat+0x2dc/0xf04
->> [    6.425569]  do_filp_open+0x68/0xd8
->> [    6.427044]  do_sys_open+0x16c/0x224
->> [    6.428563]  SyS_openat+0x10/0x18
->> [    6.429972]  el0_svc_naked+0x30/0x34
->> [    6.431494] handlers:
->> [    6.432479] [<000000000e9fb4bb>] serial8250_interrupt
->> [    6.434597] Disabling IRQ #41
->>
->> This patch changes the lr state condition in lr_signals_eoi_mi() from
->> invalid(Inactive) to active and pending to avoid this.
->>
->> I am not sure about the original design of the condition of
->> invalid(active). So, This RFC is sent out for comments.
->>
->> Cc: Joey Zheng <yu.zheng@hxt-semitech.com>
->> Signed-off-by: Shunyong Yang <shunyong.yang@hxt-semitech.com>
->> ---
->>  virt/kvm/arm/vgic/vgic-v2.c | 4 ++--
->>  virt/kvm/arm/vgic/vgic-v3.c | 4 ++--
->>  2 files changed, 4 insertions(+), 4 deletions(-)
->>
->> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
->> index e9d840a75e7b..740ee9a5f551 100644
->> --- a/virt/kvm/arm/vgic/vgic-v2.c
->> +++ b/virt/kvm/arm/vgic/vgic-v2.c
->> @@ -46,8 +46,8 @@ void vgic_v2_set_underflow(struct kvm_vcpu *vcpu)
->>  
->>  static bool lr_signals_eoi_mi(u32 lr_val)
->>  {
->> -	return !(lr_val & GICH_LR_STATE) && (lr_val & GICH_LR_EOI) &&
->> -	       !(lr_val & GICH_LR_HW);
->> +	return !((lr_val & GICH_LR_STATE) ^ GICH_LR_STATE) &&
-> 
-> That feels very wrong. You're now signalling the resampling in both
-> invalid and pending+active, and the latter state doesn't mean you've
-> EOIed anything. You're now over-signalling, and signalling the
-> wrong event.
-> 
->> +	       (lr_val & GICH_LR_EOI) && !(lr_val & GICH_LR_HW);
->>  }
->>  
->>  /*
->> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
->> index 6b329414e57a..43111bba7af9 100644
->> --- a/virt/kvm/arm/vgic/vgic-v3.c
->> +++ b/virt/kvm/arm/vgic/vgic-v3.c
->> @@ -35,8 +35,8 @@ void vgic_v3_set_underflow(struct kvm_vcpu *vcpu)
->>  
->>  static bool lr_signals_eoi_mi(u64 lr_val)
->>  {
->> -	return !(lr_val & ICH_LR_STATE) && (lr_val & ICH_LR_EOI) &&
->> -	       !(lr_val & ICH_LR_HW);
->> +	return !((lr_val & ICH_LR_STATE) ^ ICH_LR_STATE) &&
->> +	       (lr_val & ICH_LR_EOI) && !(lr_val & ICH_LR_HW);
->>  }
->>  
->>  void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
->>
-> 
-> Assuming I understand the issue correctly, I cannot really see how
-> to solve this without reintroducing EISR, which sucks majorly.
-> 
-> I'll try to cook something shortly and we can all have a good
-> fight about how crap this is.
+> I like the latter, because it doesn't overload the rest of the code with
+> new semantics. Thoughts?
+To illustrate what I mean, here's a quickly hacked patch that implements
+this idea:
 
-Here's what I came up with. I don't really like it, but that's
-the least invasive this I could come up with. Please let me
-know if that helps with your test case. Note that I have only
-boot-tested this on a sample of 1 machine, so I don't expect this
-to be perfect.
-
-Also, any guideline on how to reproduce this would be much appreciated.
-I never used this mdev/mtty thing, so please bear with me.
+diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+index c00c4c33e432..b26eccc78fb1 100644
+--- a/include/linux/irqchip/arm-gic-v3.h
++++ b/include/linux/irqchip/arm-gic-v3.h
+@@ -503,6 +503,7 @@
+ 
+ #define ICH_HCR_EN			(1 << 0)
+ #define ICH_HCR_UIE			(1 << 1)
++#define ICH_HCR_NPIE			(1 << 3)
+ #define ICH_HCR_TC			(1 << 10)
+ #define ICH_HCR_TALL0			(1 << 11)
+ #define ICH_HCR_TALL1			(1 << 12)
+diff --git a/include/linux/irqchip/arm-gic.h b/include/linux/irqchip/arm-gic.h
+index d3453ee072fc..68d8b1f73682 100644
+--- a/include/linux/irqchip/arm-gic.h
++++ b/include/linux/irqchip/arm-gic.h
+@@ -84,6 +84,7 @@
+ 
+ #define GICH_HCR_EN			(1 << 0)
+ #define GICH_HCR_UIE			(1 << 1)
++#define GICH_HCR_NPIE			(1 << 3)
+ 
+ #define GICH_LR_VIRTUALID		(0x3ff << 0)
+ #define GICH_LR_PHYSID_CPUID_SHIFT	(10)
+diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+index 0be616e4ee29..9a22b74f1550 100644
+--- a/virt/kvm/arm/vgic/vgic-v2.c
++++ b/virt/kvm/arm/vgic/vgic-v2.c
+@@ -37,6 +37,13 @@ void vgic_v2_init_lrs(void)
+ 		vgic_v2_write_lr(i, 0);
+ }
+ 
++void vgic_v2_set_npie(struct kvm_vcpu *vcpu)
++{
++	struct vgic_v2_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v2;
++
++	cpuif->vgic_hcr |= GICH_HCR_NPIE;
++}
++
+ void vgic_v2_set_underflow(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_v2_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v2;
+@@ -63,7 +70,7 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+ 	int lr;
+ 	unsigned long flags;
+ 
+-	cpuif->vgic_hcr &= ~GICH_HCR_UIE;
++	cpuif->vgic_hcr &= ~(GICH_HCR_UIE | GICH_HCR_NPIE);
+ 
+ 	for (lr = 0; lr < vgic_cpu->used_lrs; lr++) {
+ 		u32 val = cpuif->vgic_lr[lr];
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index c68352b8ed28..749da7624fba 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -26,6 +26,13 @@ static bool group1_trap;
+ static bool common_trap;
+ static bool gicv4_enable;
+ 
++void vgic_v3_set_npie(struct kvm_vcpu *vcpu)
++{
++	struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
++
++	cpuif->vgic_hcr |= ICH_HCR_NPIE;
++}
++
+ void vgic_v3_set_underflow(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
+@@ -46,7 +53,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ 	int lr;
+ 	unsigned long flags;
+ 
+-	cpuif->vgic_hcr &= ~ICH_HCR_UIE;
++	cpuif->vgic_hcr &= ~(ICH_HCR_UIE | ICH_HCR_NPIE);
+ 
+ 	for (lr = 0; lr < vgic_cpu->used_lrs; lr++) {
+ 		u64 val = cpuif->vgic_lr[lr];
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 07126a3b1908..2cd458fa8c12 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -710,6 +710,14 @@ static inline void vgic_set_underflow(struct kvm_vcpu *vcpu)
+ 		vgic_v3_set_underflow(vcpu);
+ }
+ 
++static inline void vgic_set_npie(struct kvm_vcpu *vcpu)
++{
++	if (kvm_vgic_global_state.type == VGIC_V2)
++		vgic_v2_set_npie(vcpu);
++	else
++		vgic_v3_set_npie(vcpu);
++}
++
+ /* Requires the ap_list_lock to be held. */
+ static int compute_ap_list_depth(struct kvm_vcpu *vcpu)
+ {
+@@ -737,6 +745,7 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+ 	struct vgic_irq *irq;
+ 	int count = 0;
++	bool npie = false;
+ 
+ 	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&vgic_cpu->ap_list_lock));
+ 
+@@ -749,6 +758,9 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+ 		if (likely(vgic_target_oracle(irq) == vcpu))
+ 			vgic_populate_lr(vcpu, irq, count++);
+ 
++		if (irq->source)
++			npie = true;
++
+ 		spin_unlock(&irq->irq_lock);
+ 
+ 		if (count == kvm_vgic_global_state.nr_lr) {
+@@ -759,6 +771,9 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+ 		}
+ 	}
+ 
++	if (npie)
++		vgic_set_npie(vcpu);
++
+ 	vcpu->arch.vgic_cpu.used_lrs = count;
+ 
+ 	/* Nuke remaining LRs */
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index 5b11859a1a1e..f5b8519e5546 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -160,6 +160,7 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu);
+ void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
+ void vgic_v2_clear_lr(struct kvm_vcpu *vcpu, int lr);
+ void vgic_v2_set_underflow(struct kvm_vcpu *vcpu);
++void vgic_v2_set_npie(struct kvm_vcpu *vcpu);
+ int vgic_v2_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr);
+ int vgic_v2_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+ 			 int offset, u32 *val);
+@@ -189,6 +190,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu);
+ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
+ void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr);
+ void vgic_v3_set_underflow(struct kvm_vcpu *vcpu);
++void vgic_v3_set_npie(struct kvm_vcpu *vcpu);
+ void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+ void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+ void vgic_v3_enable(struct kvm_vcpu *vcpu);
 
 Thanks,
 
 	M.
-
->From 66a7c4cfc1029b0169dd771e196e2876ba3f17b1 Mon Sep 17 00:00:00 2001
-From: Marc Zyngier <marc.zyngier@arm.com>
-Date: Thu, 8 Mar 2018 11:14:06 +0000
-Subject: [PATCH] KVM: arm/arm64: Do not rely on LR state to guess EOI MI
- status
-
-We so far rely on the LR state to decide whether the guest has
-EOI'd a level interrupt or not. While this looks like a good
-idea on the surface, it leads to a couple of annoying corner
-cases:
-
-Example 1: (P = Pending, A = Active, MI = Maintenance Interrupt)
-P -> guest IAR -> A -> exit/entry -> P+A -> guest EOI -> P -> MI
-
-The state is now pending, we've really EOI'd the interrupt, and
-yet lr_signals_eoi_mi() returns false, since the state is not 0.
-The result is that we won't signal anything on the corresponding
-irqfd, which people complain about. Meh.
-
-Example 2:
-P+A -> guest EOI -> P -> delayed MI -> guest IAR -> A -> MI fires
-
-Same issue: state isn't 0, and nothing happens.
-
-The core of the problem is that we can't decide on whether an
-interrupt has been EOId by just looking at the LR if we ever
-want to support the P+A state, as things do change behind our back.
-
-An alternative to dropping P+A is to bring back our friend EISR,
-which indicates which LRs have generated a MI. Instead of dragging
-the state around like we used to do, use it to clear the EOI bit
-from the in-memory copy, and use that as a predicate to find out
-if it fired or not.
-
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- virt/kvm/arm/hyp/vgic-v2-sr.c | 8 ++++++++
- virt/kvm/arm/hyp/vgic-v3-sr.c | 6 ++++++
- virt/kvm/arm/vgic/vgic-v2.c   | 3 +--
- virt/kvm/arm/vgic/vgic-v3.c   | 3 +--
- 4 files changed, 16 insertions(+), 4 deletions(-)
-
-diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
-index 4fe6e797e8b3..475cb2d7fd33 100644
---- a/virt/kvm/arm/hyp/vgic-v2-sr.c
-+++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
-@@ -43,6 +43,11 @@ static void __hyp_text save_lrs(struct kvm_vcpu *vcpu, void __iomem *base)
- 	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
- 	int i;
- 	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
-+	u64 eisr;
-+
-+	eisr = readl_relaxed(base + GICH_EISR0);
-+	if (unlikely(used_lrs > 32))
-+		eisr |= (u64)readl_relaxed(base + GICH_EISR1) << 32;
- 
- 	for (i = 0; i < used_lrs; i++) {
- 		if (cpu_if->vgic_elrsr & (1UL << i))
-@@ -50,6 +55,9 @@ static void __hyp_text save_lrs(struct kvm_vcpu *vcpu, void __iomem *base)
- 		else
- 			cpu_if->vgic_lr[i] = readl_relaxed(base + GICH_LR0 + (i * 4));
- 
-+		if ((cpu_if->vgic_lr[i] & GICH_LR_EOI) && !(eisr & (1UL << i)))
-+			cpu_if->vgic_lr[i] &= ~GICH_LR_EOI;
-+
- 		writel_relaxed(0, base + GICH_LR0 + (i * 4));
- 	}
- }
-diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
-index b89ce5432214..2ce63d6740b0 100644
---- a/virt/kvm/arm/hyp/vgic-v3-sr.c
-+++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
-@@ -223,8 +223,10 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
- 	if (used_lrs) {
- 		int i;
- 		u32 nr_pre_bits;
-+		u32 eisr;
- 
- 		cpu_if->vgic_elrsr = read_gicreg(ICH_ELSR_EL2);
-+		eisr = read_gicreg(ICH_EISR_EL2);
- 
- 		write_gicreg(0, ICH_HCR_EL2);
- 		val = read_gicreg(ICH_VTR_EL2);
-@@ -236,6 +238,10 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
- 			else
- 				cpu_if->vgic_lr[i] = __gic_v3_get_lr(i);
- 
-+			if ((cpu_if->vgic_lr[i] & ICH_LR_EOI) &&
-+			    !(eisr & (1 << i)))
-+				cpu_if->vgic_lr[i] &= ~ICH_LR_EOI;
-+
- 			__gic_v3_set_lr(0, i);
- 		}
- 
-diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-index e9d840a75e7b..0be616e4ee29 100644
---- a/virt/kvm/arm/vgic/vgic-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-v2.c
-@@ -46,8 +46,7 @@ void vgic_v2_set_underflow(struct kvm_vcpu *vcpu)
- 
- static bool lr_signals_eoi_mi(u32 lr_val)
- {
--	return !(lr_val & GICH_LR_STATE) && (lr_val & GICH_LR_EOI) &&
--	       !(lr_val & GICH_LR_HW);
-+	return (lr_val & GICH_LR_EOI) && !(lr_val & GICH_LR_HW);
- }
- 
- /*
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index 6b329414e57a..c68352b8ed28 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -35,8 +35,7 @@ void vgic_v3_set_underflow(struct kvm_vcpu *vcpu)
- 
- static bool lr_signals_eoi_mi(u64 lr_val)
- {
--	return !(lr_val & ICH_LR_STATE) && (lr_val & ICH_LR_EOI) &&
--	       !(lr_val & ICH_LR_HW);
-+	return (lr_val & ICH_LR_EOI) && !(lr_val & ICH_LR_HW);
- }
- 
- void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
--- 
-2.14.2
 -- 
 Jazz is not dead. It just smells funny...
