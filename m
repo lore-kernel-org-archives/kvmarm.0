@@ -1,112 +1,59 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 1/2] KVM: arm/arm64: vgic: Don't populate multiple LRs
- with the same vintid
-Date: Thu, 8 Mar 2018 10:19:49 +0000
-Message-ID: <8e873168-110f-6781-506c-4ca89b7a4e0d@arm.com>
-References: <20180307124055.13800-1-marc.zyngier@arm.com>
- <20180307124055.13800-2-marc.zyngier@arm.com>
- <CAEDV+gJoamQJX_hcwCNBo1gc7-NUT+m-N9n=00wCJ=_TD82EkQ@mail.gmail.com>
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH 02/11] ACPI / APEI: Generalise the estatus queue's
+ add/remove and notify code
+Date: Thu, 8 Mar 2018 11:44:08 +0100
+Message-ID: <20180308104408.GB21166@pd.tnic>
+References: <20180215185606.26736-1-james.morse@arm.com>
+ <20180215185606.26736-3-james.morse@arm.com>
+ <20180301150144.GA4215@pd.tnic>
+ <87sh9jbrgc.fsf@e105922-lin.cambridge.arm.com>
+ <20180301223529.GA28811@pd.tnic> <5AA02C26.10803@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 57C9240257
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Mar 2018 05:12:57 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qj8wbPdAiFNY for <kvmarm@lists.cs.columbia.edu>;
- Thu,  8 Mar 2018 05:12:35 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 52A1640259
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Mar 2018 05:12:35 -0500 (EST)
-In-Reply-To: <CAEDV+gJoamQJX_hcwCNBo1gc7-NUT+m-N9n=00wCJ=_TD82EkQ@mail.gmail.com>
-Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@kernel.org>
-Cc: linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Andre Przywara <Andre.Przywara@arm.com>, kvmarm@lists.cs.columbia.edu, KVM General <kvm@vger.kernel.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <5AA02C26.10803@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: James Morse <james.morse@arm.com>
+Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Xie XiuQi <xiexiuqi@huawei.com>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, Will Deacon <will.deacon@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 07/03/18 23:34, Christoffer Dall wrote:
-> On Wed, Mar 7, 2018 at 12:40 PM, Marc Zyngier <marc.zyngier@arm.com> wrote:
->> The vgic code is trying to be clever when injecting GICv2 SGIs,
->> and will happily populate LRs with the same interrupt number if
->> they come from multiple vcpus (after all, they are distinct
->> interrupt sources).
->>
->> Unfortunately, this is against the letter of the architecture,
->> and the GICv2 architecture spec says "Each valid interrupt stored
->> in the List registers must have a unique VirtualID for that
->> virtual CPU interface.". GICv3 has similar (although slightly
->> ambiguous) restrictions.
->>
->> This results in guests locking up when using GICv2-on-GICv3, for
->> example. The obvious fix is to stop trying so hard, and inject
->> a single vcpu per SGI per guest entry. After all, pending SGIs
->> with multiple source vcpus are pretty rare, and are mostly seen
->> in scenario where the physical CPUs are severely overcomitted.
->>
->> Cc: stable@vger.kernel.org
->> Fixes: 0919e84c0fc1 ("KVM: arm/arm64: vgic-new: Add IRQ sync/flush framework")
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  virt/kvm/arm/vgic/vgic.c | 11 +----------
->>  1 file changed, 1 insertion(+), 10 deletions(-)
->>
->> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
->> index c7c5ef190afa..1f7ff175f47b 100644
->> --- a/virt/kvm/arm/vgic/vgic.c
->> +++ b/virt/kvm/arm/vgic/vgic.c
->> @@ -720,18 +720,9 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
->>         list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
->>                 spin_lock(&irq->irq_lock);
->>
->> -               if (unlikely(vgic_target_oracle(irq) != vcpu))
->> -                       goto next;
->> -
->> -               /*
->> -                * If we get an SGI with multiple sources, try to get
->> -                * them in all at once.
->> -                */
->> -               do {
->> +               if (likely(vgic_target_oracle(irq) == vcpu))
->>                         vgic_populate_lr(vcpu, irq, count++);
-> 
-> I think we need to change vgic_populate_lr to set the EOI maintenance
-> interrupt flag so that when the interrupt is deactivated, if there are
-> additional pending sources, we exit the guest and pick up the
-> interrupt.
+On Wed, Mar 07, 2018 at 06:15:02PM +0000, James Morse wrote:
+> Today its just x86 and arm64. arm64 doesn't have a hook to do this. I'm happy to
+> add an empty declaration or leave it under an ifdef until someone complains
+> about any behaviour I missed!
 
-Potentially. We need to be careful about about the semantics of EOI MI
-with non-level interrupts (see the other thread about EOI signalling).
+So I did some more staring at the code and I think oops_begin() is
+needed mainly, as you point out, to prevent two oops messages from
+interleaving. And yap, the other stuff with printk() is not true anymore
+because the commit which added oops_begin():
 
-> An alternative would be to set the underflow interrupt, but I don't
-> think that would be correct for multiple priorities, because the SGI
-> could have a higher priority than other pending interrupts we put in
-> the LR.
+  81e88fdc432a ("ACPI, APEI, Generic Hardware Error Source POLL/IRQ/NMI notification type support")
 
-I don't think priorities are the issue (after all, we already sort the
-irqs in order of priority). My worry is that underflow is allowed to
-fire if there is one interrupt pending, which implies that you could
-end-up in a livelock scenario if you only have one SGI pending with
-multiple sources.
+still saw an NMI-unsafe printk. Which is long taken care of now.
 
-Another possibility would be to use ICH_HCR_EL2.NPIE (GICH_HCR.NPIE on
-GICv2), which delivers a a MI if no pending interrupts are present. Once
-the SGI has been activated, we're guaranteed to be able to inject a new
-pending one.
+So only the interleaving issue remains.
 
-I like the latter, because it doesn't overload the rest of the code with
-new semantics. Thoughts?
+Which begs the question: how are you guys preventing the interleaving on
+arm64? Because arch/arm64/kernel/traps.c:200 grabs the die_lock too, so
+interleaving can happen on arm64 too, AFAICT.
 
-	M.
+And by that logic, you should technically grab that lock here too in
+_in_nmi_notify_one().
+
+Or?
+
 -- 
-Jazz is not dead. It just smells funny...
+Regards/Gruss,
+    Boris.
+
+Good mailing practices for 400: avoid top-posting and trim the reply.
