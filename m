@@ -1,122 +1,194 @@
-From: gengdongjiu <gengdj.1984@gmail.com>
-Subject: Re: [PATCH v9 5/7] arm64: kvm: Introduce KVM_ARM_SET_SERROR_ESR ioctl
-Date: Thu, 8 Mar 2018 14:18:02 +0800
-Message-ID: <CAMj-D2COh4xDKreZXPHeiJK34mrPqDbHszDWY-fz_SfxTRaHQA@mail.gmail.com>
-References: <0184EA26B2509940AA629AE1405DD7F201A9E8EA@DGGEMA503-MBS.china.huawei.com>
- <5A70C5A0.1050600@arm.com> <d1b17dae-9d9c-970a-d164-a41c618d449b@huawei.com>
- <5A7DDDEE.9050306@arm.com> <93d07d3e-8388-7814-d674-538071d84e2a@huawei.com> <5A85C974.70500@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: =?UTF-8?B?UmU6IFvmraTpgq7ku7blj6/og73lrZjlnKjpo47pmaldIFJlOiBbUkZD?=
+ =?UTF-8?Q?_PATCH]_KVM:_arm/arm64:_vgic:_change_condition_for_level_interrup?=
+ =?UTF-8?Q?t_resampling?=
+Date: Thu, 8 Mar 2018 11:01:16 +0000
+Message-ID: <9fa18b3f-61c5-eb1c-5d9f-5e872d88a6e5@arm.com>
+References: <1520492490-7943-1-git-send-email-shunyong.yang@hxt-semitech.com>
+ <9b3763f2-1dfa-5506-d7f2-93389647111c@redhat.com>
+ <1520501495.2583.19.camel@hxt-semitech.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <5A85C974.70500@arm.com>
+In-Reply-To: <1520501495.2583.19.camel@hxt-semitech.com>
+Content-Language: en-GB
 Sender: linux-kernel-owner@vger.kernel.org
-To: James Morse <james.morse@arm.com>, drjones@redhat.com
-Cc: gengdongjiu <gengdongjiu@huawei.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "corbet@lwn.net" <corbet@lwn.net>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, "rjw@rjwysocki.net" <rjw@rjwysocki.net>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "will.deacon@arm.com" <will.deacon@arm.com>, "robert.moore@intel.com" <robert.moore@intel.com>, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>, "bp@alien8.de" <bp@alien8.de>, "lv.zheng@intel.com" <lv.zheng@intel.com>, Huangshaoyu <huangshaoyu@huawei.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm>
+To: "Yang, Shunyong" <shunyong.yang@hxt-semitech.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>, "cdall@kernel.org" <cdall@kernel.org>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "ard.biesheuvel@linaro.org" <ard.biesheuvel@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "Zheng, Joey" <yu.zheng@hxt-semitech.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "david.daney@cavium.com" <david.daney@cavium.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi James,
-   sorry for my late response due to chines new year.
-
-2018-02-16 1:55 GMT+08:00 James Morse <james.morse@arm.com>:
-> Hi gengdongjiu,
->
-> On 12/02/18 10:19, gengdongjiu wrote:
->> On 2018/2/10 1:44, James Morse wrote:
->>> The point? We can't know what a CPU without the RAS extensions puts in there.
+On 08/03/18 09:31, Yang, Shunyong wrote:
+> Hi, Eric,
+> 
+> First, please let me change Christoffer's email to cdall@kernel.org. I
+> add more information about my test below, please check.
+> 
+> On Thu, 2018-03-08 at 09:57 +0100, Auger Eric wrote:
+>> Hi,
+>>
+>> On 08/03/18 08:01, Shunyong Yang wrote:
 >>>
->>> Why Does this matter? When migrating a pending SError we have to know the
->>> difference between 'use this 64bit value', and 'the CPU will generate it'.
->>> If I make an SError pending with ESR=0 on a CPU with VSESR, I can't migrated to
->>> a system that generates an impdef SError-ESR, because I can't know it will be 0.
->
->> For the target system, before taking the SError, no one can know whether its syndrome value
->> is IMPLEMENTATION DEFINED or architecturally defined.
->
-> For a virtual-SError, the hypervisor knows what it generated. (do I have
-> VSESR_EL2? What did I put in there?).
->
->
->> when the virtual SError is taken, the ESR_ELx.IDS will be updated, then we can know
->> whether the ESR value is impdef or architecturally defined.
->
-> True, the guest can't know anything about a pending virtual SError until it
-> takes it. Why is this a problem?
->
->
->> It seems migration is only allowed only when target system and source system all support
->> RAS extension, because we do not know whether its syndrome is IMPLEMENTATION DEFINED or
->> architecturally defined.
->
-> I don't think Qemu allows migration between hosts with differing guest-ID
-> registers. But we shouldn't depend on this, and we may want to hide the v8.2 RAS
-> features from the guest's ID register, but still use them from the host.
->
-> The way I imagined it working was we would pack the following information into
-> that events struct:
-> {
->         bool serror_pending;
->         bool serror_has_esr;
->         u64  serror_esr;
-> }
+>>> When resampling irqfds is enabled, level interrupt should be
+>>> de-asserted when resampling happens. On page 4-47 of GIC v3
+>>> specification IHI0069D, it said,
+>>> "When the PE acknowledges an SGI, a PPI, or an SPI at the CPU
+>>> interface, the IRI changes the status of the interrupt to active
+>>> and pending if:
+>>> • It is an edge-triggered interrupt, and another edge has been
+>>> detected since the interrupt was acknowledged.
+>>> • It is a level-sensitive interrupt, and the level has not been
+>>> deasserted since the interrupt was acknowledged."
+>>>
+>>> GIC v2 specification IHI0048B.b has similar description on page
+>>> 3-42 for state machine transition.
+>>>
+>>> When some VFIO device, like mtty(8250 VFIO mdev emulation driver
+>>> in samples/vfio-mdev) triggers a level interrupt, the status
+>>> transition in LR is pending-->active-->active and pending.
+>>> Then it will wait resampling to de-assert the interrupt.
+>>>
+>>> Current design of lr_signals_eoi_mi() will return false if state
+>>> in LR is not invalid(Inactive). It causes resampling will not
+>>> happen
+>>> in mtty case.
+>>>
+>>> This will cause interrupt fired continuously to guest even 8250 IIR
+>>> has no interrupt. When 8250's interrupt is configured in shared
+>>> mode,
+>>> it will pass interrupt to other drivers to handle. However, there
+>>> is no other driver involved. Then, a "nobody cared" kernel
+>>> complaint
+>>> occurs.
+>>>
+>>> / # cat /dev/ttyS0
+>>> [    4.826836] random: crng init done
+>>> [    6.373620] irq 41: nobody cared (try booting with the "irqpoll"
+>>> option)
+>>> [    6.376414] CPU: 0 PID: 1307 Comm: cat Not tainted 4.16.0-rc4 #4
+>>> [    6.378927] Hardware name: linux,dummy-virt (DT)
+>>> [    6.380876] Call trace:
+>>> [    6.381937]  dump_backtrace+0x0/0x180
+>>> [    6.383495]  show_stack+0x14/0x1c
+>>> [    6.384902]  dump_stack+0x90/0xb4
+>>> [    6.386312]  __report_bad_irq+0x38/0xe0
+>>> [    6.387944]  note_interrupt+0x1f4/0x2b8
+>>> [    6.389568]  handle_irq_event_percpu+0x54/0x7c
+>>> [    6.391433]  handle_irq_event+0x44/0x74
+>>> [    6.393056]  handle_fasteoi_irq+0x9c/0x154
+>>> [    6.394784]  generic_handle_irq+0x24/0x38
+>>> [    6.396483]  __handle_domain_irq+0x60/0xb4
+>>> [    6.398207]  gic_handle_irq+0x98/0x1b0
+>>> [    6.399796]  el1_irq+0xb0/0x128
+>>> [    6.401138]  _raw_spin_unlock_irqrestore+0x18/0x40
+>>> [    6.403149]  __setup_irq+0x41c/0x678
+>>> [    6.404669]  request_threaded_irq+0xe0/0x190
+>>> [    6.406474]  univ8250_setup_irq+0x208/0x234
+>>> [    6.408250]  serial8250_do_startup+0x1b4/0x754
+>>> [    6.410123]  serial8250_startup+0x20/0x28
+>>> [    6.411826]  uart_startup.part.21+0x78/0x144
+>>> [    6.413633]  uart_port_activate+0x50/0x68
+>>> [    6.415328]  tty_port_open+0x84/0xd4
+>>> [    6.416851]  uart_open+0x34/0x44
+>>> [    6.418229]  tty_open+0xec/0x3c8
+>>> [    6.419610]  chrdev_open+0xb0/0x198
+>>> [    6.421093]  do_dentry_open+0x200/0x310
+>>> [    6.422714]  vfs_open+0x54/0x84
+>>> [    6.424054]  path_openat+0x2dc/0xf04
+>>> [    6.425569]  do_filp_open+0x68/0xd8
+>>> [    6.427044]  do_sys_open+0x16c/0x224
+>>> [    6.428563]  SyS_openat+0x10/0x18
+>>> [    6.429972]  el0_svc_naked+0x30/0x34
+>>> [    6.431494] handlers:
+>>> [    6.432479] [<000000000e9fb4bb>] serial8250_interrupt
+>>> [    6.434597] Disabling IRQ #41
+>>>
+>>> This patch changes the lr state condition in lr_signals_eoi_mi()
+>>> from
+>>> invalid(Inactive) to active and pending to avoid this.
+>>>
+>>> I am not sure about the original design of the condition of
+>>> invalid(active). So, This RFC is sent out for comments.
+>>>
+>>> Cc: Joey Zheng <yu.zheng@hxt-semitech.com>
+>>> Signed-off-by: Shunyong Yang <shunyong.yang@hxt-semitech.com>
+>>> ---
+>>>  virt/kvm/arm/vgic/vgic-v2.c | 4 ++--
+>>>  virt/kvm/arm/vgic/vgic-v3.c | 4 ++--
+>>>  2 files changed, 4 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-
+>>> v2.c
+>>> index e9d840a75e7b..740ee9a5f551 100644
+>>> --- a/virt/kvm/arm/vgic/vgic-v2.c
+>>> +++ b/virt/kvm/arm/vgic/vgic-v2.c
+>>> @@ -46,8 +46,8 @@ void vgic_v2_set_underflow(struct kvm_vcpu *vcpu)
+>>>  
+>>>  static bool lr_signals_eoi_mi(u32 lr_val)
+>>>  {
+>>> -	return !(lr_val & GICH_LR_STATE) && (lr_val & GICH_LR_EOI)
+>>> &&
+>>> -	       !(lr_val & GICH_LR_HW);
+>>> +	return !((lr_val & GICH_LR_STATE) ^ GICH_LR_STATE) &&
+>>> +	       (lr_val & GICH_LR_EOI) && !(lr_val & GICH_LR_HW);
+>>>  }
+>>>  
+>>>  /*
+>>> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-
+>>> v3.c
+>>> index 6b329414e57a..43111bba7af9 100644
+>>> --- a/virt/kvm/arm/vgic/vgic-v3.c
+>>> +++ b/virt/kvm/arm/vgic/vgic-v3.c
+>>> @@ -35,8 +35,8 @@ void vgic_v3_set_underflow(struct kvm_vcpu *vcpu)
+>>>  
+>>>  static bool lr_signals_eoi_mi(u64 lr_val)
+>>>  {
+>>> -	return !(lr_val & ICH_LR_STATE) && (lr_val & ICH_LR_EOI)
+>>> &&
+>>> -	       !(lr_val & ICH_LR_HW);
+>>> +	return !((lr_val & ICH_LR_STATE) ^ ICH_LR_STATE) &&
+>>> +	       (lr_val & ICH_LR_EOI) && !(lr_val & ICH_LR_HW);
+>>
+>> In general don't we have this state transition
+>>
+>> inactive -> pending -> pending + active (1) -> active -> inactive.
+>>
+>> In that case won't we lower the virt irq level when folding the LR on
+>> Pending + Active state, which is not was we want?
+>>
+>> Thanks
+>>
+>> Eric
+> 
+> In current code, in my test, when I output LR value of the mtty IRQ 41
+> (hwirq = 36) in vgic_v3_fold_lr_state(). The LR's transition starts
+> like following,
+> 
+> 0-->50a0020000000024-->90a0020000000024-->d0a0020000000024
+> 
+> That is inactive-->pending-->active-->pending + active.
+> Then it keep running cyclic pending-->active-->pending + active.
+> 
+> The level interrupt de-assert should happen in following code
+> /* Notify fds when the guest EOI'ed a level-triggered IRQ */
+> 	if (lr_signals_eoi_mi(val) && vgic_valid_spi(vcpu->kvm, intid))
+> 		kvm_notify_acked_irq(vcpu->kvm, 0,
+> 				     intid - VGIC_NR_PRIVATE_IRQS);
+> 
+> But as addressed in commit message, lr_signals_eoi_mi() will return
+> false if state in LR is not invalid(inactive), so it has no chance to
+> de-assert the level interrupt in my test. 
 
-I have used your suggestion struct
+The problem is that pending+active is not an indication that the guest
+has actually EOI'd anything. In only indicates that it has been activated.
 
->
-> The problem I was trying to describe is because there is no value of serror_esr
-> we can use to mean 'Ignore this, I'm a v8.0 CPU'. VSESR_EL2 is a 64bit register,
-> any bits we abuse may get a meaning we want to use in the future.
->
-> When it comes to migration, v8.{0,1} systems can only GET/SET events where
-> serror_has_esr == false, they can't use the serror_esr. On v8.2 systems we
-> should require serror_has_esr to be true.
-yes, I agreed.
+Note that there is a bit of vocabulary discrepancy between KVM and the
+ARM architecture: KVM uses "acked" where ARM uses EOI. ARM uses "ACK" or
+"Activate" for something entirely different. Maybe the confusion stems
+from this difference.
 
->
-> If we need to support migration from v8.{0,1} to v8.2, we can make up an impdef
-> serror_esr.
+Thanks,
 
-For the Qemu migration, I need to check more the QEMU code.
-
-
-Hi Andrew,
-      I use KVM_GET/SET_VCPU_EVENTS IOCTL to migrate the Serror
-exception status of VM,
-The even struct is shown below:
-
-{
-      bool serror_pending;
-      bool serror_has_esr;
-     u64  serror_esr;
-}
-
-Only when the target machine is armv8.2, it needs to set the
-serror_esr(SError Exception Syndrome Register).
-for the armv8.0,  software can not set the serror_esr(SError Exception
-Syndrome Register).
-so when migration from v8.{0,1} to v8.2, QEMU should make up an impdef
-serror_esr for the v8.2 target.
-can you give me some suggestion how to set that register in the QEMU?
-I do not familar with the QEMU migration.
-Thanks very much.
-
->
-> We will need to decide what KVM does when SET is called but an SError was
-> already pending. 2.5.3 "Multiple SError interrupts" of [0] has something to say.
-
-how about KVM set again to the same VCPU?
-
->
->
-> Happy new year,
-thanks!
-
->
-> James
->
->
-> [0]
-> https://static.docs.arm.com/ddi0587/a/RAS%20Extension-release%20candidate_march_29.pdf
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+	M.
+-- 
+Jazz is not dead. It just smells funny...
