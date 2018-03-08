@@ -1,94 +1,122 @@
-From: Christoffer Dall <cdall@kernel.org>
-Subject: Re: [PATCH 1/2] KVM: arm/arm64: vgic: Don't populate multiple LRs
- with the same vintid
-Date: Wed, 7 Mar 2018 23:34:17 +0000
-Message-ID: <CAEDV+gJoamQJX_hcwCNBo1gc7-NUT+m-N9n=00wCJ=_TD82EkQ@mail.gmail.com>
-References: <20180307124055.13800-1-marc.zyngier@arm.com>
- <20180307124055.13800-2-marc.zyngier@arm.com>
+From: gengdongjiu <gengdj.1984@gmail.com>
+Subject: Re: [PATCH v9 5/7] arm64: kvm: Introduce KVM_ARM_SET_SERROR_ESR ioctl
+Date: Thu, 8 Mar 2018 14:18:02 +0800
+Message-ID: <CAMj-D2COh4xDKreZXPHeiJK34mrPqDbHszDWY-fz_SfxTRaHQA@mail.gmail.com>
+References: <0184EA26B2509940AA629AE1405DD7F201A9E8EA@DGGEMA503-MBS.china.huawei.com>
+ <5A70C5A0.1050600@arm.com> <d1b17dae-9d9c-970a-d164-a41c618d449b@huawei.com>
+ <5A7DDDEE.9050306@arm.com> <93d07d3e-8388-7814-d674-538071d84e2a@huawei.com> <5A85C974.70500@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6138D401AB
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Mar 2018 18:27:25 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QV-EB4omdiGo for <kvmarm@lists.cs.columbia.edu>;
- Wed,  7 Mar 2018 18:27:03 -0500 (EST)
-Received: from mail-lf0-f65.google.com (mail-lf0-f65.google.com
- [209.85.215.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A6E7E4017F
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Mar 2018 18:27:03 -0500 (EST)
-Received: by mail-lf0-f65.google.com with SMTP id 37-v6so5764001lfs.7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 07 Mar 2018 15:34:19 -0800 (PST)
-In-Reply-To: <20180307124055.13800-2-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Andre Przywara <Andre.Przywara@arm.com>, kvmarm@lists.cs.columbia.edu, KVM General <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <5A85C974.70500@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: James Morse <james.morse@arm.com>, drjones@redhat.com
+Cc: gengdongjiu <gengdongjiu@huawei.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "corbet@lwn.net" <corbet@lwn.net>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, "rjw@rjwysocki.net" <rjw@rjwysocki.net>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "will.deacon@arm.com" <will.deacon@arm.com>, "robert.moore@intel.com" <robert.moore@intel.com>, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>, "bp@alien8.de" <bp@alien8.de>, "lv.zheng@intel.com" <lv.zheng@intel.com>, Huangshaoyu <huangshaoyu@huawei.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Mar 7, 2018 at 12:40 PM, Marc Zyngier <marc.zyngier@arm.com> wrote:
-> The vgic code is trying to be clever when injecting GICv2 SGIs,
-> and will happily populate LRs with the same interrupt number if
-> they come from multiple vcpus (after all, they are distinct
-> interrupt sources).
->
-> Unfortunately, this is against the letter of the architecture,
-> and the GICv2 architecture spec says "Each valid interrupt stored
-> in the List registers must have a unique VirtualID for that
-> virtual CPU interface.". GICv3 has similar (although slightly
-> ambiguous) restrictions.
->
-> This results in guests locking up when using GICv2-on-GICv3, for
-> example. The obvious fix is to stop trying so hard, and inject
-> a single vcpu per SGI per guest entry. After all, pending SGIs
-> with multiple source vcpus are pretty rare, and are mostly seen
-> in scenario where the physical CPUs are severely overcomitted.
->
-> Cc: stable@vger.kernel.org
-> Fixes: 0919e84c0fc1 ("KVM: arm/arm64: vgic-new: Add IRQ sync/flush framework")
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  virt/kvm/arm/vgic/vgic.c | 11 +----------
->  1 file changed, 1 insertion(+), 10 deletions(-)
->
-> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> index c7c5ef190afa..1f7ff175f47b 100644
-> --- a/virt/kvm/arm/vgic/vgic.c
-> +++ b/virt/kvm/arm/vgic/vgic.c
-> @@ -720,18 +720,9 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
->         list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
->                 spin_lock(&irq->irq_lock);
->
-> -               if (unlikely(vgic_target_oracle(irq) != vcpu))
-> -                       goto next;
-> -
-> -               /*
-> -                * If we get an SGI with multiple sources, try to get
-> -                * them in all at once.
-> -                */
-> -               do {
-> +               if (likely(vgic_target_oracle(irq) == vcpu))
->                         vgic_populate_lr(vcpu, irq, count++);
+Hi James,
+   sorry for my late response due to chines new year.
 
-I think we need to change vgic_populate_lr to set the EOI maintenance
-interrupt flag so that when the interrupt is deactivated, if there are
-additional pending sources, we exit the guest and pick up the
-interrupt.
+2018-02-16 1:55 GMT+08:00 James Morse <james.morse@arm.com>:
+> Hi gengdongjiu,
+>
+> On 12/02/18 10:19, gengdongjiu wrote:
+>> On 2018/2/10 1:44, James Morse wrote:
+>>> The point? We can't know what a CPU without the RAS extensions puts in there.
+>>>
+>>> Why Does this matter? When migrating a pending SError we have to know the
+>>> difference between 'use this 64bit value', and 'the CPU will generate it'.
+>>> If I make an SError pending with ESR=0 on a CPU with VSESR, I can't migrated to
+>>> a system that generates an impdef SError-ESR, because I can't know it will be 0.
+>
+>> For the target system, before taking the SError, no one can know whether its syndrome value
+>> is IMPLEMENTATION DEFINED or architecturally defined.
+>
+> For a virtual-SError, the hypervisor knows what it generated. (do I have
+> VSESR_EL2? What did I put in there?).
+>
+>
+>> when the virtual SError is taken, the ESR_ELx.IDS will be updated, then we can know
+>> whether the ESR value is impdef or architecturally defined.
+>
+> True, the guest can't know anything about a pending virtual SError until it
+> takes it. Why is this a problem?
+>
+>
+>> It seems migration is only allowed only when target system and source system all support
+>> RAS extension, because we do not know whether its syndrome is IMPLEMENTATION DEFINED or
+>> architecturally defined.
+>
+> I don't think Qemu allows migration between hosts with differing guest-ID
+> registers. But we shouldn't depend on this, and we may want to hide the v8.2 RAS
+> features from the guest's ID register, but still use them from the host.
+>
+> The way I imagined it working was we would pack the following information into
+> that events struct:
+> {
+>         bool serror_pending;
+>         bool serror_has_esr;
+>         u64  serror_esr;
+> }
 
-An alternative would be to set the underflow interrupt, but I don't
-think that would be correct for multiple priorities, because the SGI
-could have a higher priority than other pending interrupts we put in
-the LR.
+I have used your suggestion struct
 
-Thanks,
-Christoffer
+>
+> The problem I was trying to describe is because there is no value of serror_esr
+> we can use to mean 'Ignore this, I'm a v8.0 CPU'. VSESR_EL2 is a 64bit register,
+> any bits we abuse may get a meaning we want to use in the future.
+>
+> When it comes to migration, v8.{0,1} systems can only GET/SET events where
+> serror_has_esr == false, they can't use the serror_esr. On v8.2 systems we
+> should require serror_has_esr to be true.
+yes, I agreed.
+
+>
+> If we need to support migration from v8.{0,1} to v8.2, we can make up an impdef
+> serror_esr.
+
+For the Qemu migration, I need to check more the QEMU code.
+
+
+Hi Andrew,
+      I use KVM_GET/SET_VCPU_EVENTS IOCTL to migrate the Serror
+exception status of VM,
+The even struct is shown below:
+
+{
+      bool serror_pending;
+      bool serror_has_esr;
+     u64  serror_esr;
+}
+
+Only when the target machine is armv8.2, it needs to set the
+serror_esr(SError Exception Syndrome Register).
+for the armv8.0,  software can not set the serror_esr(SError Exception
+Syndrome Register).
+so when migration from v8.{0,1} to v8.2, QEMU should make up an impdef
+serror_esr for the v8.2 target.
+can you give me some suggestion how to set that register in the QEMU?
+I do not familar with the QEMU migration.
+Thanks very much.
+
+>
+> We will need to decide what KVM does when SET is called but an SError was
+> already pending. 2.5.3 "Multiple SError interrupts" of [0] has something to say.
+
+how about KVM set again to the same VCPU?
+
+>
+>
+> Happy new year,
+thanks!
+
+>
+> James
+>
+>
+> [0]
+> https://static.docs.arm.com/ddi0587/a/RAS%20Extension-release%20candidate_march_29.pdf
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
