@@ -1,147 +1,151 @@
-From: Auger Eric <eric.auger@redhat.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
 Subject: Re: [RFC PATCH] KVM: arm/arm64: vgic: change condition for level
  interrupt resampling
-Date: Thu, 8 Mar 2018 09:57:37 +0100
-Message-ID: <9b3763f2-1dfa-5506-d7f2-93389647111c@redhat.com>
+Date: Thu, 8 Mar 2018 09:49:43 +0000
+Message-ID: <9ad47673-068e-f732-d2ca-9c76a8fbdfbc@arm.com>
 References: <1520492490-7943-1-git-send-email-shunyong.yang@hxt-semitech.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9584B4029E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Mar 2018 04:42:54 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id QNg616GX8lqb for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  8 Mar 2018 04:42:31 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D687401CD
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Mar 2018 04:42:31 -0500 (EST)
 In-Reply-To: <1520492490-7943-1-git-send-email-shunyong.yang@hxt-semitech.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Shunyong Yang <shunyong.yang@hxt-semitech.com>, christoffer.dall@linaro.org
-Cc: david.daney@cavium.com, marc.zyngier@arm.com, ard.biesheuvel@linaro.org, will.deacon@arm.com, linux-kernel@vger.kernel.org, Joey Zheng <yu.zheng@hxt-semitech.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Language: en-GB
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Shunyong Yang <shunyong.yang@hxt-semitech.com>
+Cc: david.daney@cavium.com, ard.biesheuvel@linaro.org, will.deacon@arm.com, linux-kernel@vger.kernel.org, Joey Zheng <yu.zheng@hxt-semitech.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
-
-On 08/03/18 08:01, Shunyong Yang wrote:
-> When resampling irqfds is enabled, level interrupt should be
-> de-asserted when resampling happens. On page 4-47 of GIC v3
-> specification IHI0069D, it said,
-> "When the PE acknowledges an SGI, a PPI, or an SPI at the CPU
-> interface, the IRI changes the status of the interrupt to active
-> and pending if:
-> • It is an edge-triggered interrupt, and another edge has been
-> detected since the interrupt was acknowledged.
-> • It is a level-sensitive interrupt, and the level has not been
-> deasserted since the interrupt was acknowledged."
-> 
-> GIC v2 specification IHI0048B.b has similar description on page
-> 3-42 for state machine transition.
-> 
-> When some VFIO device, like mtty(8250 VFIO mdev emulation driver
-> in samples/vfio-mdev) triggers a level interrupt, the status
-> transition in LR is pending-->active-->active and pending.
-> Then it will wait resampling to de-assert the interrupt.
-> 
-> Current design of lr_signals_eoi_mi() will return false if state
-> in LR is not invalid(Inactive). It causes resampling will not happen
-> in mtty case.
-> 
-> This will cause interrupt fired continuously to guest even 8250 IIR
-> has no interrupt. When 8250's interrupt is configured in shared mode,
-> it will pass interrupt to other drivers to handle. However, there
-> is no other driver involved. Then, a "nobody cared" kernel complaint
-> occurs.
-> 
-> / # cat /dev/ttyS0
-> [    4.826836] random: crng init done
-> [    6.373620] irq 41: nobody cared (try booting with the "irqpoll"
-> option)
-> [    6.376414] CPU: 0 PID: 1307 Comm: cat Not tainted 4.16.0-rc4 #4
-> [    6.378927] Hardware name: linux,dummy-virt (DT)
-> [    6.380876] Call trace:
-> [    6.381937]  dump_backtrace+0x0/0x180
-> [    6.383495]  show_stack+0x14/0x1c
-> [    6.384902]  dump_stack+0x90/0xb4
-> [    6.386312]  __report_bad_irq+0x38/0xe0
-> [    6.387944]  note_interrupt+0x1f4/0x2b8
-> [    6.389568]  handle_irq_event_percpu+0x54/0x7c
-> [    6.391433]  handle_irq_event+0x44/0x74
-> [    6.393056]  handle_fasteoi_irq+0x9c/0x154
-> [    6.394784]  generic_handle_irq+0x24/0x38
-> [    6.396483]  __handle_domain_irq+0x60/0xb4
-> [    6.398207]  gic_handle_irq+0x98/0x1b0
-> [    6.399796]  el1_irq+0xb0/0x128
-> [    6.401138]  _raw_spin_unlock_irqrestore+0x18/0x40
-> [    6.403149]  __setup_irq+0x41c/0x678
-> [    6.404669]  request_threaded_irq+0xe0/0x190
-> [    6.406474]  univ8250_setup_irq+0x208/0x234
-> [    6.408250]  serial8250_do_startup+0x1b4/0x754
-> [    6.410123]  serial8250_startup+0x20/0x28
-> [    6.411826]  uart_startup.part.21+0x78/0x144
-> [    6.413633]  uart_port_activate+0x50/0x68
-> [    6.415328]  tty_port_open+0x84/0xd4
-> [    6.416851]  uart_open+0x34/0x44
-> [    6.418229]  tty_open+0xec/0x3c8
-> [    6.419610]  chrdev_open+0xb0/0x198
-> [    6.421093]  do_dentry_open+0x200/0x310
-> [    6.422714]  vfs_open+0x54/0x84
-> [    6.424054]  path_openat+0x2dc/0xf04
-> [    6.425569]  do_filp_open+0x68/0xd8
-> [    6.427044]  do_sys_open+0x16c/0x224
-> [    6.428563]  SyS_openat+0x10/0x18
-> [    6.429972]  el0_svc_naked+0x30/0x34
-> [    6.431494] handlers:
-> [    6.432479] [<000000000e9fb4bb>] serial8250_interrupt
-> [    6.434597] Disabling IRQ #41
-> 
-> This patch changes the lr state condition in lr_signals_eoi_mi() from
-> invalid(Inactive) to active and pending to avoid this.
-> 
-> I am not sure about the original design of the condition of
-> invalid(active). So, This RFC is sent out for comments.
-> 
-> Cc: Joey Zheng <yu.zheng@hxt-semitech.com>
-> Signed-off-by: Shunyong Yang <shunyong.yang@hxt-semitech.com>
-> ---
->  virt/kvm/arm/vgic/vgic-v2.c | 4 ++--
->  virt/kvm/arm/vgic/vgic-v3.c | 4 ++--
->  2 files changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-> index e9d840a75e7b..740ee9a5f551 100644
-> --- a/virt/kvm/arm/vgic/vgic-v2.c
-> +++ b/virt/kvm/arm/vgic/vgic-v2.c
-> @@ -46,8 +46,8 @@ void vgic_v2_set_underflow(struct kvm_vcpu *vcpu)
->  
->  static bool lr_signals_eoi_mi(u32 lr_val)
->  {
-> -	return !(lr_val & GICH_LR_STATE) && (lr_val & GICH_LR_EOI) &&
-> -	       !(lr_val & GICH_LR_HW);
-> +	return !((lr_val & GICH_LR_STATE) ^ GICH_LR_STATE) &&
-> +	       (lr_val & GICH_LR_EOI) && !(lr_val & GICH_LR_HW);
->  }
->  
->  /*
-> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> index 6b329414e57a..43111bba7af9 100644
-> --- a/virt/kvm/arm/vgic/vgic-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> @@ -35,8 +35,8 @@ void vgic_v3_set_underflow(struct kvm_vcpu *vcpu)
->  
->  static bool lr_signals_eoi_mi(u64 lr_val)
->  {
-> -	return !(lr_val & ICH_LR_STATE) && (lr_val & ICH_LR_EOI) &&
-> -	       !(lr_val & ICH_LR_HW);
-> +	return !((lr_val & ICH_LR_STATE) ^ ICH_LR_STATE) &&
-> +	       (lr_val & ICH_LR_EOI) && !(lr_val & ICH_LR_HW);
-
-
-In general don't we have this state transition
-
-inactive -> pending -> pending + active (1) -> active -> inactive.
-
-In that case won't we lower the virt irq level when folding the LR on
-Pending + Active state, which is not was we want?
-
-Thanks
-
-Eric
-
->  }
->  
->  void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
-> 
+W3VwZGF0ZWQgQ2hyaXN0b2ZmZXIncyBlbWFpbCBhZGRyZXNzXQoKSGkgU2h1bnlvbmcsCgpPbiAw
+OC8wMy8xOCAwNzowMSwgU2h1bnlvbmcgWWFuZyB3cm90ZToKPiBXaGVuIHJlc2FtcGxpbmcgaXJx
+ZmRzIGlzIGVuYWJsZWQsIGxldmVsIGludGVycnVwdCBzaG91bGQgYmUKPiBkZS1hc3NlcnRlZCB3
+aGVuIHJlc2FtcGxpbmcgaGFwcGVucy4gT24gcGFnZSA0LTQ3IG9mIEdJQyB2Mwo+IHNwZWNpZmlj
+YXRpb24gSUhJMDA2OUQsIGl0IHNhaWQsCj4gIldoZW4gdGhlIFBFIGFja25vd2xlZGdlcyBhbiBT
+R0ksIGEgUFBJLCBvciBhbiBTUEkgYXQgdGhlIENQVQo+IGludGVyZmFjZSwgdGhlIElSSSBjaGFu
+Z2VzIHRoZSBzdGF0dXMgb2YgdGhlIGludGVycnVwdCB0byBhY3RpdmUKPiBhbmQgcGVuZGluZyBp
+ZjoKPiDigKIgSXQgaXMgYW4gZWRnZS10cmlnZ2VyZWQgaW50ZXJydXB0LCBhbmQgYW5vdGhlciBl
+ZGdlIGhhcyBiZWVuCj4gZGV0ZWN0ZWQgc2luY2UgdGhlIGludGVycnVwdCB3YXMgYWNrbm93bGVk
+Z2VkLgo+IOKAoiBJdCBpcyBhIGxldmVsLXNlbnNpdGl2ZSBpbnRlcnJ1cHQsIGFuZCB0aGUgbGV2
+ZWwgaGFzIG5vdCBiZWVuCj4gZGVhc3NlcnRlZCBzaW5jZSB0aGUgaW50ZXJydXB0IHdhcyBhY2tu
+b3dsZWRnZWQuIgo+IAo+IEdJQyB2MiBzcGVjaWZpY2F0aW9uIElISTAwNDhCLmIgaGFzIHNpbWls
+YXIgZGVzY3JpcHRpb24gb24gcGFnZQo+IDMtNDIgZm9yIHN0YXRlIG1hY2hpbmUgdHJhbnNpdGlv
+bi4KPiAKPiBXaGVuIHNvbWUgVkZJTyBkZXZpY2UsIGxpa2UgbXR0eSg4MjUwIFZGSU8gbWRldiBl
+bXVsYXRpb24gZHJpdmVyCj4gaW4gc2FtcGxlcy92ZmlvLW1kZXYpIHRyaWdnZXJzIGEgbGV2ZWwg
+aW50ZXJydXB0LCB0aGUgc3RhdHVzCj4gdHJhbnNpdGlvbiBpbiBMUiBpcyBwZW5kaW5nLS0+YWN0
+aXZlLS0+YWN0aXZlIGFuZCBwZW5kaW5nLgo+IFRoZW4gaXQgd2lsbCB3YWl0IHJlc2FtcGxpbmcg
+dG8gZGUtYXNzZXJ0IHRoZSBpbnRlcnJ1cHQuCj4gCj4gQ3VycmVudCBkZXNpZ24gb2YgbHJfc2ln
+bmFsc19lb2lfbWkoKSB3aWxsIHJldHVybiBmYWxzZSBpZiBzdGF0ZQo+IGluIExSIGlzIG5vdCBp
+bnZhbGlkKEluYWN0aXZlKS4gSXQgY2F1c2VzIHJlc2FtcGxpbmcgd2lsbCBub3QgaGFwcGVuCj4g
+aW4gbXR0eSBjYXNlLgoKTGV0IG1lIHJlcGhyYXNlIHRoaXMsIGFuZCB0ZWxsIG1lIGlmIEkgdW5k
+ZXJzdG9vZCBpdCBjb3JyZWN0bHk6CgotIEEgbGV2ZWwgaW50ZXJydXB0IGlzIGluamVjdGVkLCBh
+Y3RpdmF0ZWQgYnkgdGhlIGd1ZXN0IChMUiBzdGF0ZT1hY3RpdmUpCi0gZ3Vlc3QgZXhpdHMsIHJl
+LWVudGVycywgKExSIHN0YXRlPXBlbmRpbmcrYWN0aXZlKQotIGd1ZXN0IEVPSXMgdGhlIGludGVy
+cnVwdCAoTFIgc3RhdGU9cGVuZGluZykKLSBtYWludGVuYW5jZSBpbnRlcnJ1cHQKLSB3ZSBkb24n
+dCBzaWduYWwgdGhlIHJlc2FtcGxpbmcgYmVjYXVzZSB3ZSdyZSBub3QgaW4gYW4gaW52YWxpZCBz
+dGF0ZQoKSXMgdGhhdCBjb3JyZWN0PwoKVGhhdCdzIGFuIGludGVyZXN0aW5nIGNhc2UsIGJlY2F1
+c2UgaXQgc2VlbXMgdG8gaW52YWxpZGF0ZSBzb21lIG9mIHRoZSAKb3B0aW1pemF0aW9uIHRoYXQg
+d2VudCBpbiBvdmVyIGEgeWVhciBhZ28uCgowOTZmMzFjNDM2MGYgS1ZNOiBhcm0vYXJtNjQ6IHZn
+aWM6IEdldCByaWQgb2YgTUlTUiBhbmQgRUlTUiBmaWVsZHMKYjYwOTViMDg0ZDg3IEtWTTogYXJt
+L2FybTY0OiB2Z2ljOiBHZXQgcmlkIG9mIHVubmVjZXNzYXJ5IHNhdmVfbWFpbnRfaW50X3N0YXRl
+CmFmMDYxNDk5MWFiNiBLVk06IGFybS9hcm02NDogdmdpYzogR2V0IHJpZCBvZiB1bm5lY2Vzc2Fy
+eSBwcm9jZXNzX21haW50ZW5hbmNlIG9wZXJhdGlvbgoKV2UgY291bGQgY29tcGFyZSB0aGUgdmFs
+dWUgb2YgdGhlIExSIGJlZm9yZSB0aGUgZ3Vlc3QgZW50cnkgd2l0aAp0aGUgdmFsdWUgYXQgZXhp
+dCB0aW1lLCBidXQgd2Ugc3RpbGwgY291bGQgbWlzcyBpdCBpZiB3ZSBoYXZlIGEKdHJhbnNpdGlv
+biBzdWNoIGFzIFArQSAtPiBQIC0+IEEgYW5kIGFzc3VtZSBhIGxvbmcgZW5vdWdoIHByb3BhZ2F0
+aW9uCmRlbGF5IGZvciB0aGUgbWFpbnRlbmFuY2UgaW50ZXJydXB0ICh3aGljaCBpcyB2ZXJ5IGxp
+a2VseSkuCgpJbiBlc3NlbmNlLCB3ZSBoYXZlIGxvc3QgdGhlIGJlbmVmaXQgb2YgRUlTUiwgd2hp
+Y2ggd2FzIHRvIGdpdmUgdXMgYQp3YXkgdG8gZGVhbCB3aXRoIGFzeW5jaHJvbm91cyBzaWduYWxs
+aW5nLgoKPiAKPiBUaGlzIHdpbGwgY2F1c2UgaW50ZXJydXB0IGZpcmVkIGNvbnRpbnVvdXNseSB0
+byBndWVzdCBldmVuIDgyNTAgSUlSCj4gaGFzIG5vIGludGVycnVwdC4gV2hlbiA4MjUwJ3MgaW50
+ZXJydXB0IGlzIGNvbmZpZ3VyZWQgaW4gc2hhcmVkIG1vZGUsCj4gaXQgd2lsbCBwYXNzIGludGVy
+cnVwdCB0byBvdGhlciBkcml2ZXJzIHRvIGhhbmRsZS4gSG93ZXZlciwgdGhlcmUKPiBpcyBubyBv
+dGhlciBkcml2ZXIgaW52b2x2ZWQuIFRoZW4sIGEgIm5vYm9keSBjYXJlZCIga2VybmVsIGNvbXBs
+YWludAo+IG9jY3Vycy4KPiAKPiAvICMgY2F0IC9kZXYvdHR5UzAKPiBbICAgIDQuODI2ODM2XSBy
+YW5kb206IGNybmcgaW5pdCBkb25lCj4gWyAgICA2LjM3MzYyMF0gaXJxIDQxOiBub2JvZHkgY2Fy
+ZWQgKHRyeSBib290aW5nIHdpdGggdGhlICJpcnFwb2xsIgo+IG9wdGlvbikKPiBbICAgIDYuMzc2
+NDE0XSBDUFU6IDAgUElEOiAxMzA3IENvbW06IGNhdCBOb3QgdGFpbnRlZCA0LjE2LjAtcmM0ICM0
+Cj4gWyAgICA2LjM3ODkyN10gSGFyZHdhcmUgbmFtZTogbGludXgsZHVtbXktdmlydCAoRFQpCj4g
+WyAgICA2LjM4MDg3Nl0gQ2FsbCB0cmFjZToKPiBbICAgIDYuMzgxOTM3XSAgZHVtcF9iYWNrdHJh
+Y2UrMHgwLzB4MTgwCj4gWyAgICA2LjM4MzQ5NV0gIHNob3dfc3RhY2srMHgxNC8weDFjCj4gWyAg
+ICA2LjM4NDkwMl0gIGR1bXBfc3RhY2srMHg5MC8weGI0Cj4gWyAgICA2LjM4NjMxMl0gIF9fcmVw
+b3J0X2JhZF9pcnErMHgzOC8weGUwCj4gWyAgICA2LjM4Nzk0NF0gIG5vdGVfaW50ZXJydXB0KzB4
+MWY0LzB4MmI4Cj4gWyAgICA2LjM4OTU2OF0gIGhhbmRsZV9pcnFfZXZlbnRfcGVyY3B1KzB4NTQv
+MHg3Ywo+IFsgICAgNi4zOTE0MzNdICBoYW5kbGVfaXJxX2V2ZW50KzB4NDQvMHg3NAo+IFsgICAg
+Ni4zOTMwNTZdICBoYW5kbGVfZmFzdGVvaV9pcnErMHg5Yy8weDE1NAo+IFsgICAgNi4zOTQ3ODRd
+ICBnZW5lcmljX2hhbmRsZV9pcnErMHgyNC8weDM4Cj4gWyAgICA2LjM5NjQ4M10gIF9faGFuZGxl
+X2RvbWFpbl9pcnErMHg2MC8weGI0Cj4gWyAgICA2LjM5ODIwN10gIGdpY19oYW5kbGVfaXJxKzB4
+OTgvMHgxYjAKPiBbICAgIDYuMzk5Nzk2XSAgZWwxX2lycSsweGIwLzB4MTI4Cj4gWyAgICA2LjQw
+MTEzOF0gIF9yYXdfc3Bpbl91bmxvY2tfaXJxcmVzdG9yZSsweDE4LzB4NDAKPiBbICAgIDYuNDAz
+MTQ5XSAgX19zZXR1cF9pcnErMHg0MWMvMHg2NzgKPiBbICAgIDYuNDA0NjY5XSAgcmVxdWVzdF90
+aHJlYWRlZF9pcnErMHhlMC8weDE5MAo+IFsgICAgNi40MDY0NzRdICB1bml2ODI1MF9zZXR1cF9p
+cnErMHgyMDgvMHgyMzQKPiBbICAgIDYuNDA4MjUwXSAgc2VyaWFsODI1MF9kb19zdGFydHVwKzB4
+MWI0LzB4NzU0Cj4gWyAgICA2LjQxMDEyM10gIHNlcmlhbDgyNTBfc3RhcnR1cCsweDIwLzB4MjgK
+PiBbICAgIDYuNDExODI2XSAgdWFydF9zdGFydHVwLnBhcnQuMjErMHg3OC8weDE0NAo+IFsgICAg
+Ni40MTM2MzNdICB1YXJ0X3BvcnRfYWN0aXZhdGUrMHg1MC8weDY4Cj4gWyAgICA2LjQxNTMyOF0g
+IHR0eV9wb3J0X29wZW4rMHg4NC8weGQ0Cj4gWyAgICA2LjQxNjg1MV0gIHVhcnRfb3BlbisweDM0
+LzB4NDQKPiBbICAgIDYuNDE4MjI5XSAgdHR5X29wZW4rMHhlYy8weDNjOAo+IFsgICAgNi40MTk2
+MTBdICBjaHJkZXZfb3BlbisweGIwLzB4MTk4Cj4gWyAgICA2LjQyMTA5M10gIGRvX2RlbnRyeV9v
+cGVuKzB4MjAwLzB4MzEwCj4gWyAgICA2LjQyMjcxNF0gIHZmc19vcGVuKzB4NTQvMHg4NAo+IFsg
+ICAgNi40MjQwNTRdICBwYXRoX29wZW5hdCsweDJkYy8weGYwNAo+IFsgICAgNi40MjU1NjldICBk
+b19maWxwX29wZW4rMHg2OC8weGQ4Cj4gWyAgICA2LjQyNzA0NF0gIGRvX3N5c19vcGVuKzB4MTZj
+LzB4MjI0Cj4gWyAgICA2LjQyODU2M10gIFN5U19vcGVuYXQrMHgxMC8weDE4Cj4gWyAgICA2LjQy
+OTk3Ml0gIGVsMF9zdmNfbmFrZWQrMHgzMC8weDM0Cj4gWyAgICA2LjQzMTQ5NF0gaGFuZGxlcnM6
+Cj4gWyAgICA2LjQzMjQ3OV0gWzwwMDAwMDAwMDBlOWZiNGJiPl0gc2VyaWFsODI1MF9pbnRlcnJ1
+cHQKPiBbICAgIDYuNDM0NTk3XSBEaXNhYmxpbmcgSVJRICM0MQo+IAo+IFRoaXMgcGF0Y2ggY2hh
+bmdlcyB0aGUgbHIgc3RhdGUgY29uZGl0aW9uIGluIGxyX3NpZ25hbHNfZW9pX21pKCkgZnJvbQo+
+IGludmFsaWQoSW5hY3RpdmUpIHRvIGFjdGl2ZSBhbmQgcGVuZGluZyB0byBhdm9pZCB0aGlzLgo+
+IAo+IEkgYW0gbm90IHN1cmUgYWJvdXQgdGhlIG9yaWdpbmFsIGRlc2lnbiBvZiB0aGUgY29uZGl0
+aW9uIG9mCj4gaW52YWxpZChhY3RpdmUpLiBTbywgVGhpcyBSRkMgaXMgc2VudCBvdXQgZm9yIGNv
+bW1lbnRzLgo+IAo+IENjOiBKb2V5IFpoZW5nIDx5dS56aGVuZ0BoeHQtc2VtaXRlY2guY29tPgo+
+IFNpZ25lZC1vZmYtYnk6IFNodW55b25nIFlhbmcgPHNodW55b25nLnlhbmdAaHh0LXNlbWl0ZWNo
+LmNvbT4KPiAtLS0KPiAgdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy12Mi5jIHwgNCArKy0tCj4gIHZp
+cnQva3ZtL2FybS92Z2ljL3ZnaWMtdjMuYyB8IDQgKystLQo+ICAyIGZpbGVzIGNoYW5nZWQsIDQg
+aW5zZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkKPiAKPiBkaWZmIC0tZ2l0IGEvdmlydC9rdm0v
+YXJtL3ZnaWMvdmdpYy12Mi5jIGIvdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy12Mi5jCj4gaW5kZXgg
+ZTlkODQwYTc1ZTdiLi43NDBlZTlhNWY1NTEgMTAwNjQ0Cj4gLS0tIGEvdmlydC9rdm0vYXJtL3Zn
+aWMvdmdpYy12Mi5jCj4gKysrIGIvdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy12Mi5jCj4gQEAgLTQ2
+LDggKzQ2LDggQEAgdm9pZCB2Z2ljX3YyX3NldF91bmRlcmZsb3coc3RydWN0IGt2bV92Y3B1ICp2
+Y3B1KQo+ICAKPiAgc3RhdGljIGJvb2wgbHJfc2lnbmFsc19lb2lfbWkodTMyIGxyX3ZhbCkKPiAg
+ewo+IC0JcmV0dXJuICEobHJfdmFsICYgR0lDSF9MUl9TVEFURSkgJiYgKGxyX3ZhbCAmIEdJQ0hf
+TFJfRU9JKSAmJgo+IC0JICAgICAgICEobHJfdmFsICYgR0lDSF9MUl9IVyk7Cj4gKwlyZXR1cm4g
+ISgobHJfdmFsICYgR0lDSF9MUl9TVEFURSkgXiBHSUNIX0xSX1NUQVRFKSAmJgoKVGhhdCBmZWVs
+cyB2ZXJ5IHdyb25nLiBZb3UncmUgbm93IHNpZ25hbGxpbmcgdGhlIHJlc2FtcGxpbmcgaW4gYm90
+aAppbnZhbGlkIGFuZCBwZW5kaW5nK2FjdGl2ZSwgYW5kIHRoZSBsYXR0ZXIgc3RhdGUgZG9lc24n
+dCBtZWFuIHlvdSd2ZQpFT0llZCBhbnl0aGluZy4gWW91J3JlIG5vdyBvdmVyLXNpZ25hbGxpbmcs
+IGFuZCBzaWduYWxsaW5nIHRoZQp3cm9uZyBldmVudC4KCj4gKwkgICAgICAgKGxyX3ZhbCAmIEdJ
+Q0hfTFJfRU9JKSAmJiAhKGxyX3ZhbCAmIEdJQ0hfTFJfSFcpOwo+ICB9Cj4gIAo+ICAvKgo+IGRp
+ZmYgLS1naXQgYS92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLXYzLmMgYi92aXJ0L2t2bS9hcm0vdmdp
+Yy92Z2ljLXYzLmMKPiBpbmRleCA2YjMyOTQxNGU1N2EuLjQzMTExYmJhN2FmOSAxMDA2NDQKPiAt
+LS0gYS92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLXYzLmMKPiArKysgYi92aXJ0L2t2bS9hcm0vdmdp
+Yy92Z2ljLXYzLmMKPiBAQCAtMzUsOCArMzUsOCBAQCB2b2lkIHZnaWNfdjNfc2V0X3VuZGVyZmxv
+dyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4gIAo+ICBzdGF0aWMgYm9vbCBscl9zaWduYWxzX2Vv
+aV9taSh1NjQgbHJfdmFsKQo+ICB7Cj4gLQlyZXR1cm4gIShscl92YWwgJiBJQ0hfTFJfU1RBVEUp
+ICYmIChscl92YWwgJiBJQ0hfTFJfRU9JKSAmJgo+IC0JICAgICAgICEobHJfdmFsICYgSUNIX0xS
+X0hXKTsKPiArCXJldHVybiAhKChscl92YWwgJiBJQ0hfTFJfU1RBVEUpIF4gSUNIX0xSX1NUQVRF
+KSAmJgo+ICsJICAgICAgIChscl92YWwgJiBJQ0hfTFJfRU9JKSAmJiAhKGxyX3ZhbCAmIElDSF9M
+Ul9IVyk7Cj4gIH0KPiAgCj4gIHZvaWQgdmdpY192M19mb2xkX2xyX3N0YXRlKHN0cnVjdCBrdm1f
+dmNwdSAqdmNwdSkKPiAKCkFzc3VtaW5nIEkgdW5kZXJzdGFuZCB0aGUgaXNzdWUgY29ycmVjdGx5
+LCBJIGNhbm5vdCByZWFsbHkgc2VlIGhvdwp0byBzb2x2ZSB0aGlzIHdpdGhvdXQgcmVpbnRyb2R1
+Y2luZyBFSVNSLCB3aGljaCBzdWNrcyBtYWpvcmx5LgoKSSdsbCB0cnkgdG8gY29vayBzb21ldGhp
+bmcgc2hvcnRseSBhbmQgd2UgY2FuIGFsbCBoYXZlIGEgZ29vZApmaWdodCBhYm91dCBob3cgY3Jh
+cCB0aGlzIGlzLgoKVGhhbmtzLAoKCU0uCi0tIApKYXp6IGlzIG5vdCBkZWFkLiBJdCBqdXN0IHNt
+ZWxscyBmdW5ueS4uLgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0
+cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
