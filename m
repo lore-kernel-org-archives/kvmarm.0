@@ -1,43 +1,32 @@
 From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH v2] arm64: KVM: Use SMCCC_ARCH_WORKAROUND_1 for Falkor BP
- hardening
-Date: Fri, 9 Mar 2018 13:48:09 +0000
-Message-ID: <20180309134809.GC15537@arm.com>
-References: <1520269603-2900-1-git-send-email-shankerd@codeaurora.org>
+Subject: Re: [PATCH v7] arm64: Add support for new control bits CTR_EL0.DIC
+ and CTR_EL0.IDC
+Date: Fri, 9 Mar 2018 13:48:13 +0000
+Message-ID: <20180309134813.GD15537@arm.com>
+References: <1520434808-29703-1-git-send-email-shankerd@codeaurora.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1520269603-2900-1-git-send-email-shankerd@codeaurora.org>
+In-Reply-To: <1520434808-29703-1-git-send-email-shankerd@codeaurora.org>
 Sender: linux-kernel-owner@vger.kernel.org
 To: Shanker Donthineni <shankerd@codeaurora.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-kernel <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm <kvmarm@lists.cs.columbia.edu>, Christoffer Dall <cdall@kernel.org>, Vikram Sethi <vikrams@codeaurora.org>, Sean Campbell <scampbel@codeaurora.org>, Thomas Speier <tspeier@codeaurora.org>
+Cc: Robin Murphy <robin.murphy@arm.com>, Mark Rutland <mark.rutland@arm.com>, linux-kernel <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <marc.zyngier@arm.com>, Vikram Sethi <vikrams@codeaurora.org>, Philip Elcan <pelcan@codeaurora.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi SHanker,
-
-On Mon, Mar 05, 2018 at 11:06:43AM -0600, Shanker Donthineni wrote:
-> The function SMCCC_ARCH_WORKAROUND_1 was introduced as part of SMC
-> V1.1 Calling Convention to mitigate CVE-2017-5715. This patch uses
-> the standard call SMCCC_ARCH_WORKAROUND_1 for Falkor chips instead
-> of Silicon provider service ID 0xC2001700.
+On Wed, Mar 07, 2018 at 09:00:08AM -0600, Shanker Donthineni wrote:
+> The DCache clean & ICache invalidation requirements for instructions
+> to be data coherence are discoverable through new fields in CTR_EL0.
+> The following two control bits DIC and IDC were defined for this
+> purpose. No need to perform point of unification cache maintenance
+> operations from software on systems where CPU caches are transparent.
 > 
-> Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
-> ---
-> Chnages since v1:
->   - Trivial change in cpucaps.h (refresh after removing ARM64_HARDEN_BP_POST_GUEST_EXIT)
-> 
->  arch/arm64/include/asm/cpucaps.h |  5 ++--
->  arch/arm64/include/asm/kvm_asm.h |  2 --
->  arch/arm64/kernel/bpi.S          |  8 ------
->  arch/arm64/kernel/cpu_errata.c   | 55 ++++++++++++++--------------------------
->  arch/arm64/kvm/hyp/entry.S       | 12 ---------
->  arch/arm64/kvm/hyp/switch.c      | 10 --------
->  6 files changed, 21 insertions(+), 71 deletions(-)
+> This patch optimize the three functions __flush_cache_user_range(),
+> clean_dcache_area_pou() and invalidate_icache_range() if the hardware
+> reports CTR_EL0.IDC and/or CTR_EL0.IDC. Basically it skips the two
+> instructions 'DC CVAU' and 'IC IVAU', and the associated loop logic
+> in order to avoid the unnecessary overhead.
 
-Could you reply to my outstanding question on the last version of this patch
-please?
-
-http://lists.infradead.org/pipermail/linux-arm-kernel/2018-March/564194.html
+Cheers, I've queued this for 4.17.
 
 Will
