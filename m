@@ -1,32 +1,46 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH v7] arm64: Add support for new control bits CTR_EL0.DIC
- and CTR_EL0.IDC
-Date: Fri, 9 Mar 2018 13:48:13 +0000
-Message-ID: <20180309134813.GD15537@arm.com>
-References: <1520434808-29703-1-git-send-email-shankerd@codeaurora.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Peng Hao <peng.hao2@zte.com.cn>
+Subject: [PATCH] KVM:arm/arm64: dcache need be coherent unconditionally
+Date: Sat, 10 Mar 2018 06:15:03 +0800
+Message-ID: <1520633703-15121-1-git-send-email-peng.hao2@zte.com.cn>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1520434808-29703-1-git-send-email-shankerd@codeaurora.org>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Shanker Donthineni <shankerd@codeaurora.org>
-Cc: Robin Murphy <robin.murphy@arm.com>, Mark Rutland <mark.rutland@arm.com>, linux-kernel <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <marc.zyngier@arm.com>, Vikram Sethi <vikrams@codeaurora.org>, Philip Elcan <pelcan@codeaurora.org>
+To: christoffer.dall@linaro.org, marc.zyngier@arm.com
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, Peng Hao <peng.hao2@zte.com.cn>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Mar 07, 2018 at 09:00:08AM -0600, Shanker Donthineni wrote:
-> The DCache clean & ICache invalidation requirements for instructions
-> to be data coherence are discoverable through new fields in CTR_EL0.
-> The following two control bits DIC and IDC were defined for this
-> purpose. No need to perform point of unification cache maintenance
-> operations from software on systems where CPU caches are transparent.
-> 
-> This patch optimize the three functions __flush_cache_user_range(),
-> clean_dcache_area_pou() and invalidate_icache_range() if the hardware
-> reports CTR_EL0.IDC and/or CTR_EL0.IDC. Basically it skips the two
-> instructions 'DC CVAU' and 'IC IVAU', and the associated loop logic
-> in order to avoid the unnecessary overhead.
+For emulation devices just like vga, keeping coherent dcache between
+guest and host timely is needed.
+Now the display of vnc-viewer will not update continuously and the
+patch can fix up.
 
-Cheers, I've queued this for 4.17.
+Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+---
+ virt/kvm/arm/mmu.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-Will
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index ec62d1c..4a28395e 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -1416,8 +1416,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 			kvm_set_pfn_dirty(pfn);
+ 		}
+ 
+-		if (fault_status != FSC_PERM)
+-			clean_dcache_guest_page(pfn, PMD_SIZE);
++		clean_dcache_guest_page(pfn, PMD_SIZE);
+ 
+ 		if (exec_fault) {
+ 			new_pmd = kvm_s2pmd_mkexec(new_pmd);
+@@ -1438,8 +1437,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 			mark_page_dirty(kvm, gfn);
+ 		}
+ 
+-		if (fault_status != FSC_PERM)
+-			clean_dcache_guest_page(pfn, PAGE_SIZE);
++		clean_dcache_guest_page(pfn, PAGE_SIZE);
+ 
+ 		if (exec_fault) {
+ 			new_pte = kvm_s2pte_mkexec(new_pte);
+-- 
+1.8.3.1
