@@ -1,77 +1,155 @@
 From: Christoffer Dall <cdall@kernel.org>
-Subject: Re: [RFC PATCH] KVM: arm/arm64: vgic: change condition for level
- interrupt resampling
-Date: Fri, 9 Mar 2018 13:36:12 -0800
-Message-ID: <20180309213612.GD1917@lvm>
-References: <1520492490-7943-1-git-send-email-shunyong.yang@hxt-semitech.com>
- <9ad47673-068e-f732-d2ca-9c76a8fbdfbc@arm.com>
- <0a15633d-8944-cb9b-3e6b-b08ee5ec42b9@arm.com>
- <20180308161900.GC1917@lvm>
- <86r2oubho3.wl-marc.zyngier@arm.com>
+Subject: Re: [PATCH 1/2] KVM: arm/arm64: vgic: Don't populate multiple LRs
+ with the same vintid
+Date: Fri, 9 Mar 2018 13:39:31 -0800
+Message-ID: <20180309213931.GE1917@lvm>
+References: <20180307124055.13800-1-marc.zyngier@arm.com>
+ <20180307124055.13800-2-marc.zyngier@arm.com>
+ <CAEDV+gJoamQJX_hcwCNBo1gc7-NUT+m-N9n=00wCJ=_TD82EkQ@mail.gmail.com>
+ <8e873168-110f-6781-506c-4ca89b7a4e0d@arm.com>
+ <20180308160242.GA1917@lvm> <86tvtqbis9.wl-marc.zyngier@arm.com>
+ <86o9jybeef.wl-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <86r2oubho3.wl-marc.zyngier@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <86o9jybeef.wl-marc.zyngier@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Shunyong Yang <shunyong.yang@hxt-semitech.com>, ard.biesheuvel@linaro.org, will.deacon@arm.com, eric.auger@redhat.com, david.daney@cavium.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, Joey Zheng <yu.zheng@hxt-semitech.com>
+Cc: linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Andre Przywara <Andre.Przywara@arm.com>, kvmarm@lists.cs.columbia.edu, KVM General <kvm@vger.kernel.org>, Eric Auger <eric.auger@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Mar 08, 2018 at 05:28:44PM +0000, Marc Zyngier wrote:
-> On Thu, 08 Mar 2018 16:19:00 +0000,
-> Christoffer Dall wrote:
+On Thu, Mar 08, 2018 at 06:39:20PM +0000, Marc Zyngier wrote:
+> On Thu, 08 Mar 2018 17:04:38 +0000,
+> Marc Zyngier wrote:
 > > 
-> > On Thu, Mar 08, 2018 at 11:54:27AM +0000, Marc Zyngier wrote:
-> > > On 08/03/18 09:49, Marc Zyngier wrote:
-
-[...]
-
-> > > The state is now pending, we've really EOI'd the interrupt, and
-> > > yet lr_signals_eoi_mi() returns false, since the state is not 0.
-> > > The result is that we won't signal anything on the corresponding
-> > > irqfd, which people complain about. Meh.
+> > On Thu, 08 Mar 2018 16:02:42 +0000,
+> > Christoffer Dall wrote:
+> > > 
+> > > On Thu, Mar 08, 2018 at 10:19:49AM +0000, Marc Zyngier wrote:
+> > > > On 07/03/18 23:34, Christoffer Dall wrote:
+> > > > > On Wed, Mar 7, 2018 at 12:40 PM, Marc Zyngier <marc.zyngier@arm.com> wrote:
+> > > > >> The vgic code is trying to be clever when injecting GICv2 SGIs,
+> > > > >> and will happily populate LRs with the same interrupt number if
+> > > > >> they come from multiple vcpus (after all, they are distinct
+> > > > >> interrupt sources).
+> > > > >>
+> > > > >> Unfortunately, this is against the letter of the architecture,
+> > > > >> and the GICv2 architecture spec says "Each valid interrupt stored
+> > > > >> in the List registers must have a unique VirtualID for that
+> > > > >> virtual CPU interface.". GICv3 has similar (although slightly
+> > > > >> ambiguous) restrictions.
+> > > > >>
+> > > > >> This results in guests locking up when using GICv2-on-GICv3, for
+> > > > >> example. The obvious fix is to stop trying so hard, and inject
+> > > > >> a single vcpu per SGI per guest entry. After all, pending SGIs
+> > > > >> with multiple source vcpus are pretty rare, and are mostly seen
+> > > > >> in scenario where the physical CPUs are severely overcomitted.
+> > > > >>
+> > > > >> Cc: stable@vger.kernel.org
+> > > > >> Fixes: 0919e84c0fc1 ("KVM: arm/arm64: vgic-new: Add IRQ sync/flush framework")
+> > > > >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> > > > >> ---
+> > > > >>  virt/kvm/arm/vgic/vgic.c | 11 +----------
+> > > > >>  1 file changed, 1 insertion(+), 10 deletions(-)
+> > > > >>
+> > > > >> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> > > > >> index c7c5ef190afa..1f7ff175f47b 100644
+> > > > >> --- a/virt/kvm/arm/vgic/vgic.c
+> > > > >> +++ b/virt/kvm/arm/vgic/vgic.c
+> > > > >> @@ -720,18 +720,9 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+> > > > >>         list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
+> > > > >>                 spin_lock(&irq->irq_lock);
+> > > > >>
+> > > > >> -               if (unlikely(vgic_target_oracle(irq) != vcpu))
+> > > > >> -                       goto next;
+> > > > >> -
+> > > > >> -               /*
+> > > > >> -                * If we get an SGI with multiple sources, try to get
+> > > > >> -                * them in all at once.
+> > > > >> -                */
+> > > > >> -               do {
+> > > > >> +               if (likely(vgic_target_oracle(irq) == vcpu))
+> > > > >>                         vgic_populate_lr(vcpu, irq, count++);
+> > > > > 
+> > > > > I think we need to change vgic_populate_lr to set the EOI maintenance
+> > > > > interrupt flag so that when the interrupt is deactivated, if there are
+> > > > > additional pending sources, we exit the guest and pick up the
+> > > > > interrupt.
+> > > > 
+> > > > Potentially. We need to be careful about about the semantics of EOI MI
+> > > > with non-level interrupts (see the other thread about EOI signalling).
+> > > 
+> > > I'll have a look.
+> > > 
+> > > > 
+> > > > > An alternative would be to set the underflow interrupt, but I don't
+> > > > > think that would be correct for multiple priorities, because the SGI
+> > > > > could have a higher priority than other pending interrupts we put in
+> > > > > the LR.
+> > > > 
+> > > > I don't think priorities are the issue (after all, we already sort the
+> > > > irqs in order of priority). 
+> > > 
+> > > Yes, but assume you have three pending interrupts, one SGI from two
+> > > sources, and one SPI, and assume that the SGI has priority 1 and SPI
+> > > priority 2 (lower means higher priority), then I think with underflow or
+> > > the no-pending interrupt flag, we'll deliver the SGI from the first
+> > > source, and then the SPI, and then exiting to pick up the last SGI from
+> > > the other source.  That's not how I understand the GIC architecture is
+> > > supposed to work.  Am I missing something?
 > > 
-> > So the core of the problem is that when we've entered the guest with
-> > PENDING+ACTIVE and when we exit (for some reason) we don't signal the
-> > resamplefd, right?  The solution seems to me that we don't ever do
-> > PENDING+ACTIVE if you need to resample after each deactivate.  What
-> > would be the point of appending a pending state that you only know to be
-> > valid after a resample anyway?
-> 
-> The question is then to identify that a given source needs to be
-> signalled back to VFIO. Calling into the eventfd code on the hot path
-> is pretty horrid (I'm not sure if we can really call into this with
-> interrupts disabled, for example).
-> 
-
-This feels like a bad layering violation to me as well.
-
+> > No, you do have a point here. I'm so glad this is a v2 only thing.
 > > 
 > > > 
-> > > Example 2:
-> > > P+A -> guest EOI -> P -> delayed MI -> guest IAR -> A -> MI fires
-> > 
-> > We could be more clever and do the following calculation on every exit:
-> > 
-> > If you enter with P, and exit with either A or 0, then signal.
-> > 
-> > If you enter with P+A, and you exit with either P, A, or 0, then signal.
-> > 
-> > Wouldn't that also solve it?  (Although I have a feeling you'd miss some
-> > exits in this case).
+> > > > My worry is that underflow is allowed to
+> > > > fire if there is one interrupt pending, which implies that you could
+> > > > end-up in a livelock scenario if you only have one SGI pending with
+> > > > multiple sources.
+> > > 
+> > > Yes, doesn't work, so I think it should be a maintenance interrupt on
+> > > EOI.
 > 
-> I'd be more confident if we did forbid P+A for such interrupts
-> altogether, as they really feel like another kind of HW interrupt.
+> Thinking of it a bit more: MI on EOI doesn't offer much more guarantee
+> in the way of priority ordering. Taking your example above: Even if
+> you generate a MI when EOIing the SGI, there is no guarantee that
+> you'll take the MI before you've acked the SPI.
 
-How about a slightly bigger hammer:  Can we avoid doing P+A for level
-interrupts completely?  I don't think that really makes much sense, and
-I think we simply everything if we just come back out and resample the
-line.  For an edge, something like a network card, there's a potential
-performance win to appending a new pending state, but I doubt that this
-is the case for level interrupts.
+There's no guarantee, but at least you're attempting at processing the
+SGIs in first.  It's the best we can do, but not completely correct,
+kinda thing...
 
-The timer would be unaffected, because it's a HW interrupt.
+> 
+> If you really want to offer that absolute guarantee that all the
+> multi-source SGIs of higher priority are delivered before anything
+> else, then you must make sure that only the SGIs are present in the
+> LRs, excluding any other interrupt on lower priority until you've
+> queued them all.
+
+Yes, that sucks!  Might not be too hard to implement, it's basically an
+early out of the loop traversing the AP list, but just an annoying
+complication.
+
+> 
+> At that stage, I wonder if there is a point in doing anything at
+> all. The GICv2 architecture is too rubbish for words.
+> 
+
+The case we do need to worry about is the guest processing all its
+interrupts and not exiting while there is actually still an SGI pending.
+At that point, we can either do it with the "no interrupts pending
+maintenance interrupt" or with the "EOI maintenance interrupt", and I
+think the latter at least gets us slightly closer to the architecture
+for a non-virtualized system.
 
 Thanks,
 -Christoffer
