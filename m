@@ -1,20 +1,11 @@
-From: Christoffer Dall <cdall@kernel.org>
-Subject: Re: [PATCH 1/2] KVM: arm/arm64: vgic: Don't populate multiple LRs
- with the same vintid
-Date: Fri, 9 Mar 2018 13:39:31 -0800
-Message-ID: <20180309213931.GE1917@lvm>
-References: <20180307124055.13800-1-marc.zyngier@arm.com>
- <20180307124055.13800-2-marc.zyngier@arm.com>
- <CAEDV+gJoamQJX_hcwCNBo1gc7-NUT+m-N9n=00wCJ=_TD82EkQ@mail.gmail.com>
- <8e873168-110f-6781-506c-4ca89b7a4e0d@arm.com>
- <20180308160242.GA1917@lvm> <86tvtqbis9.wl-marc.zyngier@arm.com>
- <86o9jybeef.wl-marc.zyngier@arm.com>
+From: <peng.hao2@zte.com.cn>
+Subject: =?UTF-8?B?UmU6IFJlOiBbUEFUQ0hdIEtWTTphcm0vYXJtNjQ6IGRjYWNoZSBuZWVkIGJlIGNvaGVyZW50IHVuY29uZGl0aW9uYWxseQ==?=
+Date: Sat, 10 Mar 2018 11:48:12 +0800 (CST)
+Message-ID: <201803101148125935444@zte.com.cn>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed;
+	boundary="=====_001_next====="
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <86o9jybeef.wl-marc.zyngier@arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -24,132 +15,77 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Andre Przywara <Andre.Przywara@arm.com>, kvmarm@lists.cs.columbia.edu, KVM General <kvm@vger.kernel.org>, Eric Auger <eric.auger@redhat.com>
+To: marc.zyngier@arm.com
+Cc: cdall@kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Mar 08, 2018 at 06:39:20PM +0000, Marc Zyngier wrote:
-> On Thu, 08 Mar 2018 17:04:38 +0000,
-> Marc Zyngier wrote:
-> > 
-> > On Thu, 08 Mar 2018 16:02:42 +0000,
-> > Christoffer Dall wrote:
-> > > 
-> > > On Thu, Mar 08, 2018 at 10:19:49AM +0000, Marc Zyngier wrote:
-> > > > On 07/03/18 23:34, Christoffer Dall wrote:
-> > > > > On Wed, Mar 7, 2018 at 12:40 PM, Marc Zyngier <marc.zyngier@arm.com> wrote:
-> > > > >> The vgic code is trying to be clever when injecting GICv2 SGIs,
-> > > > >> and will happily populate LRs with the same interrupt number if
-> > > > >> they come from multiple vcpus (after all, they are distinct
-> > > > >> interrupt sources).
-> > > > >>
-> > > > >> Unfortunately, this is against the letter of the architecture,
-> > > > >> and the GICv2 architecture spec says "Each valid interrupt stored
-> > > > >> in the List registers must have a unique VirtualID for that
-> > > > >> virtual CPU interface.". GICv3 has similar (although slightly
-> > > > >> ambiguous) restrictions.
-> > > > >>
-> > > > >> This results in guests locking up when using GICv2-on-GICv3, for
-> > > > >> example. The obvious fix is to stop trying so hard, and inject
-> > > > >> a single vcpu per SGI per guest entry. After all, pending SGIs
-> > > > >> with multiple source vcpus are pretty rare, and are mostly seen
-> > > > >> in scenario where the physical CPUs are severely overcomitted.
-> > > > >>
-> > > > >> Cc: stable@vger.kernel.org
-> > > > >> Fixes: 0919e84c0fc1 ("KVM: arm/arm64: vgic-new: Add IRQ sync/flush framework")
-> > > > >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> > > > >> ---
-> > > > >>  virt/kvm/arm/vgic/vgic.c | 11 +----------
-> > > > >>  1 file changed, 1 insertion(+), 10 deletions(-)
-> > > > >>
-> > > > >> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> > > > >> index c7c5ef190afa..1f7ff175f47b 100644
-> > > > >> --- a/virt/kvm/arm/vgic/vgic.c
-> > > > >> +++ b/virt/kvm/arm/vgic/vgic.c
-> > > > >> @@ -720,18 +720,9 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
-> > > > >>         list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
-> > > > >>                 spin_lock(&irq->irq_lock);
-> > > > >>
-> > > > >> -               if (unlikely(vgic_target_oracle(irq) != vcpu))
-> > > > >> -                       goto next;
-> > > > >> -
-> > > > >> -               /*
-> > > > >> -                * If we get an SGI with multiple sources, try to get
-> > > > >> -                * them in all at once.
-> > > > >> -                */
-> > > > >> -               do {
-> > > > >> +               if (likely(vgic_target_oracle(irq) == vcpu))
-> > > > >>                         vgic_populate_lr(vcpu, irq, count++);
-> > > > > 
-> > > > > I think we need to change vgic_populate_lr to set the EOI maintenance
-> > > > > interrupt flag so that when the interrupt is deactivated, if there are
-> > > > > additional pending sources, we exit the guest and pick up the
-> > > > > interrupt.
-> > > > 
-> > > > Potentially. We need to be careful about about the semantics of EOI MI
-> > > > with non-level interrupts (see the other thread about EOI signalling).
-> > > 
-> > > I'll have a look.
-> > > 
-> > > > 
-> > > > > An alternative would be to set the underflow interrupt, but I don't
-> > > > > think that would be correct for multiple priorities, because the SGI
-> > > > > could have a higher priority than other pending interrupts we put in
-> > > > > the LR.
-> > > > 
-> > > > I don't think priorities are the issue (after all, we already sort the
-> > > > irqs in order of priority). 
-> > > 
-> > > Yes, but assume you have three pending interrupts, one SGI from two
-> > > sources, and one SPI, and assume that the SGI has priority 1 and SPI
-> > > priority 2 (lower means higher priority), then I think with underflow or
-> > > the no-pending interrupt flag, we'll deliver the SGI from the first
-> > > source, and then the SPI, and then exiting to pick up the last SGI from
-> > > the other source.  That's not how I understand the GIC architecture is
-> > > supposed to work.  Am I missing something?
-> > 
-> > No, you do have a point here. I'm so glad this is a v2 only thing.
-> > 
-> > > 
-> > > > My worry is that underflow is allowed to
-> > > > fire if there is one interrupt pending, which implies that you could
-> > > > end-up in a livelock scenario if you only have one SGI pending with
-> > > > multiple sources.
-> > > 
-> > > Yes, doesn't work, so I think it should be a maintenance interrupt on
-> > > EOI.
-> 
-> Thinking of it a bit more: MI on EOI doesn't offer much more guarantee
-> in the way of priority ordering. Taking your example above: Even if
-> you generate a MI when EOIing the SGI, there is no guarantee that
-> you'll take the MI before you've acked the SPI.
 
-There's no guarantee, but at least you're attempting at processing the
-SGIs in first.  It's the best we can do, but not completely correct,
-kinda thing...
 
-> 
-> If you really want to offer that absolute guarantee that all the
-> multi-source SGIs of higher priority are delivered before anything
-> else, then you must make sure that only the SGIs are present in the
-> LRs, excluding any other interrupt on lower priority until you've
-> queued them all.
+--=====_001_next=====
+Content-Type: multipart/alternative;
+	boundary="=====_003_next====="
 
-Yes, that sucks!  Might not be too hard to implement, it's basically an
-early out of the loop traversing the AP list, but just an annoying
-complication.
 
-> 
-> At that stage, I wonder if there is a point in doing anything at
-> all. The GICv2 architecture is too rubbish for words.
-> 
+--=====_003_next=====
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
 
-The case we do need to worry about is the guest processing all its
-interrupts and not exiting while there is actually still an SGI pending.
-At that point, we can either do it with the "no interrupts pending
-maintenance interrupt" or with the "EOI maintenance interrupt", and I
-think the latter at least gets us slightly closer to the architecture
-for a non-virtualized system.
+Pk9uIDA5LzAzLzE4IDIyOjE1LCBQZW5nIEhhbyB3cm90ZToKPj4gRm9yIGVtdWxhdGlvbiBkZXZp
+Y2VzIGp1c3QgbGlrZSB2Z2EsIGtlZXBpbmcgY29oZXJlbnQgZGNhY2hlIGJldHdlZW4KPj4gZ3Vl
+c3QgYW5kIGhvc3QgdGltZWx5IGlzIG5lZWRlZC4KPj4gTm93IHRoZSBkaXNwbGF5IG9mIHZuYy12
+aWV3ZXIgd2lsbCBub3QgdXBkYXRlIGNvbnRpbnVvdXNseSBhbmQgdGhlCj4+IHBhdGNoIGNhbiBm
+aXggdXAuCj4+IAo+PiBTaWduZWQtb2ZmLWJ5OiBQZW5nIEhhbyA8cGVuZy5oYW8yQHp0ZS5jb20u
+Y24+Cj4+IC0tLQo+PiAgdmlydC9rdm0vYXJtL21tdS5jIHwgNiArKy0tLS0KPj4gIDEgZmlsZSBj
+aGFuZ2VkLCAyIGluc2VydGlvbnMoKyksIDQgZGVsZXRpb25zKC0pCj4+IAo+PiBkaWZmIC0tZ2l0
+IGEvdmlydC9rdm0vYXJtL21tdS5jIGIvdmlydC9rdm0vYXJtL21tdS5jCj4+IGluZGV4IGVjNjJk
+MWMuLjRhMjgzOTVlIDEwMDY0NAo+PiAtLS0gYS92aXJ0L2t2bS9hcm0vbW11LmMKPj4gKysrIGIv
+dmlydC9rdm0vYXJtL21tdS5jCj4+IEBAIC0xNDE2LDggKzE0MTYsNyBAQCBzdGF0aWMgaW50IHVz
+ZXJfbWVtX2Fib3J0KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgcGh5c19hZGRyX3QgZmF1bHRfaXBh
+LAo+PiAgICAgICAgICAgICAga3ZtX3NldF9wZm5fZGlydHkocGZuKTsKPj4gICAgICAgICAgfQo+
+PiAgCj4+IC0gICAgICAgIGlmIChmYXVsdF9zdGF0dXMgIT0gRlNDX1BFUk0pCj4+IC0gICAgICAg
+ICAgICBjbGVhbl9kY2FjaGVfZ3Vlc3RfcGFnZShwZm4sIFBNRF9TSVpFKTsKPj4gKyAgICAgICAg
+Y2xlYW5fZGNhY2hlX2d1ZXN0X3BhZ2UocGZuLCBQTURfU0laRSk7Cj4+ICAKPj4gICAgICAgICAg
+aWYgKGV4ZWNfZmF1bHQpIHsKPj4gICAgICAgICAgICAgIG5ld19wbWQgPSBrdm1fczJwbWRfbWtl
+eGVjKG5ld19wbWQpOwo+PiBAQCAtMTQzOCw4ICsxNDM3LDcgQEAgc3RhdGljIGludCB1c2VyX21l
+bV9hYm9ydChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHBoeXNfYWRkcl90IGZhdWx0X2lwYSwKPj4g
+ICAgICAgICAgICAgIG1hcmtfcGFnZV9kaXJ0eShrdm0sIGdmbik7Cj4+ICAgICAgICAgIH0KPj4g
+IAo+PiAtICAgICAgICBpZiAoZmF1bHRfc3RhdHVzICE9IEZTQ19QRVJNKQo+PiAtICAgICAgICAg
+ICAgY2xlYW5fZGNhY2hlX2d1ZXN0X3BhZ2UocGZuLCBQQUdFX1NJWkUpOwo+PiArICAgICAgICBj
+bGVhbl9kY2FjaGVfZ3Vlc3RfcGFnZShwZm4sIFBBR0VfU0laRSk7Cj4+ICAKPj4gICAgICAgICAg
+aWYgKGV4ZWNfZmF1bHQpIHsKPj4gICAgICAgICAgICAgIG5ld19wdGUgPSBrdm1fczJwdGVfbWtl
+eGVjKG5ld19wdGUpOwo+PiAKCj5JJ20gc29ycnksIGJ1dCBJIGhhdmUgdG8gTkFLIHRoaXMuCgo+
+WW91J3JlIHBhcGVyaW5nIG92ZXIgdGhlIGZ1bmRhbWVudGFsIGlzc3VlIHRoYXQgeW91J3JlIGFj
+Y2Vzc2luZyBhCj5jYWNoZWFibGUgYWxpYXMgb2YgYSBub24gY2FjaGVhYmxlIG1lbW9yeS4gVGhl
+IGFyY2hpdGVjdHVyZSBpcyB2ZXJ5Cj5jbGVhciBhYm91dCB3aHkgdGhpcyBkb2Vzbid0IHdvcmss
+IGFuZCBLVk0gaW1wbGVtZW50cyB0aGUgYXJjaGl0ZWN0dXJlLgoKSSBmaW5kIHRoYXQgSSAganVz
+dCBlbmNvdW50ZXIgdGhlIHByb2JsZW0gYWZ0ZXIgIHRoZSBjb21taXQgJzE1MzAzYmE1ZDFjZDli
+MjhkMDNhOTgwNDU2YzA5NzhjMGVhM2IyMDggIiAuClRoZSBjb21taXQgY29udGFpbnMgImljYWNo
+ZSBpbnZhbGlkYXRpb24gb3B0aW1pemF0aW9ucywgaW1wcm92aW5nIFZNIHN0YXJ0dXAgdGltZSIs
+aXQgY2hhbmdlcwpmcm9tIHVuY29uZGl0aW9uYWxseSBjYWxsaW5nIGNvaGVyZW50X2NhY2hlX2d1
+ZXN0X3BhZ2UoaW5jbHVkaW5nIGRjYWNoZSBoYW5kbGUpIHRvIGNvbmRpdGlvbmFsbHkgY2FsbGlu
+ZyBjbGVhbl9kY2FjaGVfZ3Vlc3RfcGFnZS4KIEkgdHJhY2UgdGhlIGRpc3BsYXkgb2Ygdm5jIGFi
+bm9ybWFsbHkgYW5kIGZpbmQgaXQgZ2VuZXJhdGUgZGF0YSBhYm9ydCBpbiB2Z2EKYWRkcmVzcyBy
+ZWdpb24gd2l0aCBGU0NfUEVSTSxhbmQgaXQgd2lsbCBub3QgY2FsbCBjbGVhbl9kY2FjaGVfZ3Vl
+c3RfcGFnZSAuIFNvIEkgdGhpbmsgIHNob3VsZCByZWNvdmVyIHRvIHVuY29udGlvbmFsbHkgY2Fs
+bGluZyBjbGVhbl9kY2FjaGVfZ3Vlc3RfcGFnZS4KClRoYW5rcy4KPklmIHlvdSB3YW50IHRoaXMg
+dG8gd29yaywgbWFwIHlvdXIgVkdBIGRldmljZSBhcyBjYWNoZWFibGUsIGFkZCBjYWNoZQo+bWFp
+bnRlbmFuY2UgdG8gUUVNVSwgb3IgdXNlIGFub3RoZXIgZnJhbWUtYnVmZmVyIGVtdWxhdGlvbiB0
+aGF0IGRvZXNuJ3QKPnJlcXVpcmUgc3VjaCBhIGdhY2suCgo+VGhhbmtzLAoKPiAgICBNLgo+LS0g
+Cj5KYXp6IGlzIG5vdCBkZWFkLiBJdCBqdXN0IHNtZWxscyBmdW5ueS4uLg==
 
-Thanks,
--Christoffer
+
+--=====_003_next=====--
+
+--=====_001_next=====
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+linux-arm-kernel mailing list
+linux-arm-kernel@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+
+--=====_001_next=====--
