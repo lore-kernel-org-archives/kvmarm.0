@@ -1,246 +1,87 @@
-From: <peng.hao2@zte.com.cn>
-Subject: =?UTF-8?B?UmU6IFJlOiBbUEFUQ0hdIEtWTTphcm0vYXJtNjQ6IGRjYWNoZSBuZWVkIGJlIGNvaGVyZW50IHVuY29uZGl0aW9uYWxseQ==?=
-Date: Sat, 10 Mar 2018 11:23:18 +0800 (CST)
-Message-ID: <201803101123186035154@zte.com.cn>
-References: <90dba814-2aa3-e0e3-9021-4c349c9f9165@arm.com>
+From: Shanker Donthineni <shankerd@codeaurora.org>
+Subject: Re: [PATCH] arm64: KVM: Use SMCCC_ARCH_WORKAROUND_1 for Falkor BP
+ hardening
+Date: Sat, 10 Mar 2018 12:25:43 -0600
+Message-ID: <e0c6d403-beab-395b-ae19-766deeb867aa@codeaurora.org>
+References: <1520027418-10646-1-git-send-email-shankerd@codeaurora.org>
+ <20180305155614.GG6618@arm.com>
+ <05c25982-4939-593f-ad30-bf496e879885@codeaurora.org>
+ <20180305171529.GA12869@arm.com>
+ <770bb422-7a53-06b9-a136-4e38a0a4bed2@codeaurora.org>
+ <20180306152540.GC18477@arm.com>
+Reply-To: shankerd@codeaurora.org
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="=====_001_next====="
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 42B8E405D1
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Mar 2018 22:16:25 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UlRxccaLXWsZ for <kvmarm@lists.cs.columbia.edu>;
- Fri,  9 Mar 2018 22:16:03 -0500 (EST)
-Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [63.217.80.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 342514028A
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Mar 2018 22:16:03 -0500 (EST)
-In-Reply-To: <90dba814-2aa3-e0e3-9021-4c349c9f9165@arm.com>
-References: 1520633703-15121-1-git-send-email-peng.hao2@zte.com.cn,
- 90dba814-2aa3-e0e3-9021-4c349c9f9165@arm.com
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: marc.zyngier@arm.com
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180306152540.GC18477@arm.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Will Deacon <will.deacon@arm.com>
+Cc: Thomas Speier <tspeier@codeaurora.org>, Vikram Sethi <vikrams@codeaurora.org>, Sean Campbell <scampbel@codeaurora.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, linux-kernel <linux-kernel@vger.kernel.org>, Christoffer Dall <christoffer.dall@linaro.org>, kvmarm <kvmarm@lists.cs.columbia.edu>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+Hi Will,
 
+On 03/06/2018 09:25 AM, Will Deacon wrote:
+> On Mon, Mar 05, 2018 at 12:03:33PM -0600, Shanker Donthineni wrote:
+>> On 03/05/2018 11:15 AM, Will Deacon wrote:
+>>> On Mon, Mar 05, 2018 at 10:57:58AM -0600, Shanker Donthineni wrote:
+>>>> On 03/05/2018 09:56 AM, Will Deacon wrote:
+>>>>> On Fri, Mar 02, 2018 at 03:50:18PM -0600, Shanker Donthineni wrote:
+>>>>>> @@ -199,33 +208,15 @@ static int enable_smccc_arch_workaround_1(void *data)
+>>>>>>  		return 0;
+>>>>>>  	}
+>>>>>>  
+>>>>>> +	if (((midr & MIDR_CPU_MODEL_MASK) == MIDR_QCOM_FALKOR) ||
+>>>>>> +	    ((midr & MIDR_CPU_MODEL_MASK) == MIDR_QCOM_FALKOR_V1))
+>>>>>> +		cb = qcom_link_stack_sanitization;
+>>>>>
+>>>>> Is this just a performance thing? Do you actually see an advantage over
+>>>>> always making the firmware call? We've seen minimal impact in our testing.
+>>>>>
+>>>>
+>>>> Yes, we've couple of advantages using the standard SMCCC_ARCH_WOKAROUND_1 framework. 
+>>>>   - Improves the code readability.
+>>>>   - Avoid the unnecessary MIDR checks on each vCPU exit.
+>>>>   - Validates ID_AA64PFR0_CVS2 feature for Falkor chips.
+>>>>   - Avoids the 2nd link stack sanitization workaround in firmware.
+>>>
+>>> What I mean is, can we drop qcom_link_stack_sanitization altogether and
+>>> use the SMCCC interface for everything?
+>>>
+>>
+>> No, We would like to keep it qcom_link_stack_sanitization for host kernel
+>> since it takes a few CPU cycles instead of heavyweight SMCCC call.
+> 
+> Is that something that you can actually measure in the workloads and
+> benchmarks that you care about? If so, fine, but that doesn't seem to be the
+> case for the Cortex cores we've looked at internally and it would be nice to
+> avoid having different workarounds in the kernel just because the SMCCC
+> interface wasn't baked in time, rather than because there's a meaningful
+> performance difference.
+>
 
---=====_001_next=====
-Content-Type: multipart/related;
-	boundary="=====_002_next====="
+We've seen noticeable performance improvement with the microbench workloads,
+ans also some of our customers have observed improvements on heavy workloads. 
+Unfortunately I can't share those specific results here. SMCCC call overhead 
+is much higher as compared to link stack workaround on Falkor, ~99X.
 
+Host kernel workaround takes less than ~20 CPU cycles, whereas SMCCC_ARCH_WOKAROUND_1
+consumes thousands of CPU cycles to sanitize the branch prediction on Falkor.  
 
---=====_002_next=====
-Content-Type: multipart/alternative;
-	boundary="=====_003_next====="
+Especially workloads inside virtual machines provides much better results because
+no KVM involvement is required whenever guest calls qcom_link_stack_sanitization().            
+ 
+> Will
+> 
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+> 
 
-
---=====_003_next=====
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
-
-Pk9uIDA5LzAzLzE4IDIyOjE1LCBQZW5nIEhhbyB3cm90ZToNCg0KDQoNCg0KDQoNCj4+IEZvciBl
-bXVsYXRpb24gZGV2aWNlcyBqdXN0IGxpa2UgdmdhLCBrZWVwaW5nIGNvaGVyZW50IGRjYWNoZSBi
-ZXR3ZWVuDQo+PiBndWVzdCBhbmQgaG9zdCB0aW1lbHkgaXMgbmVlZGVkLg0KPj4gTm93IHRoZSBk
-aXNwbGF5IG9mIHZuYy12aWV3ZXIgd2lsbCBub3QgdXBkYXRlIGNvbnRpbnVvdXNseSBhbmQgdGhl
-DQo+PiBwYXRjaCBjYW4gZml4IHVwLg0KPj4gDQo+PiBTaWduZWQtb2ZmLWJ5OiBQZW5nIEhhbyA8
-cGVuZy5oYW8yQHp0ZS5jb20uY24+DQo+PiAtLS0NCj4+ICB2aXJ0L2t2bS9hcm0vbW11LmMgfCA2
-ICsrLS0tLQ0KPj4gIDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKyksIDQgZGVsZXRpb25z
-KC0pDQo+PiANCj4+IGRpZmYgLS1naXQgYS92aXJ0L2t2bS9hcm0vbW11LmMgYi92aXJ0L2t2bS9h
-cm0vbW11LmMNCj4+IGluZGV4IGVjNjJkMWMuLjRhMjgzOTVlIDEwMDY0NA0KPj4gLS0tIGEvdmly
-dC9rdm0vYXJtL21tdS5jDQo+PiArKysgYi92aXJ0L2t2bS9hcm0vbW11LmMNCj4+IEBAIC0xNDE2
-LDggKzE0MTYsNyBAQCBzdGF0aWMgaW50IHVzZXJfbWVtX2Fib3J0KHN0cnVjdCBrdm1fdmNwdSAq
-dmNwdSwgcGh5c19hZGRyX3QgZmF1bHRfaXBhLA0KPj4gICAgICAgICAgICAgIGt2bV9zZXRfcGZu
-X2RpcnR5KHBmbik7DQo+PiAgICAgICAgICB9DQo+PiAgDQo+PiAtICAgICAgICBpZiAoZmF1bHRf
-c3RhdHVzICE9IEZTQ19QRVJNKQ0KPj4gLSAgICAgICAgICAgIGNsZWFuX2RjYWNoZV9ndWVzdF9w
-YWdlKHBmbiwgUE1EX1NJWkUpOw0KPj4gKyAgICAgICAgY2xlYW5fZGNhY2hlX2d1ZXN0X3BhZ2Uo
-cGZuLCBQTURfU0laRSk7DQo+PiAgDQo+PiAgICAgICAgICBpZiAoZXhlY19mYXVsdCkgew0KPj4g
-ICAgICAgICAgICAgIG5ld19wbWQgPSBrdm1fczJwbWRfbWtleGVjKG5ld19wbWQpOw0KPj4gQEAg
-LTE0MzgsOCArMTQzNyw3IEBAIHN0YXRpYyBpbnQgdXNlcl9tZW1fYWJvcnQoc3RydWN0IGt2bV92
-Y3B1ICp2Y3B1LCBwaHlzX2FkZHJfdCBmYXVsdF9pcGEsDQo+PiAgICAgICAgICAgICAgbWFya19w
-YWdlX2RpcnR5KGt2bSwgZ2ZuKTsNCj4+ICAgICAgICAgIH0NCj4+ICANCj4+IC0gICAgICAgIGlm
-IChmYXVsdF9zdGF0dXMgIT0gRlNDX1BFUk0pDQo+PiAtICAgICAgICAgICAgY2xlYW5fZGNhY2hl
-X2d1ZXN0X3BhZ2UocGZuLCBQQUdFX1NJWkUpOw0KPj4gKyAgICAgICAgY2xlYW5fZGNhY2hlX2d1
-ZXN0X3BhZ2UocGZuLCBQQUdFX1NJWkUpOw0KPj4gIA0KPj4gICAgICAgICAgaWYgKGV4ZWNfZmF1
-bHQpIHsNCj4+ICAgICAgICAgICAgICBuZXdfcHRlID0ga3ZtX3MycHRlX21rZXhlYyhuZXdfcHRl
-KTsNCj4+IA0KDQo+SSdtIHNvcnJ5LCBidXQgSSBoYXZlIHRvIE5BSyB0aGlzLg0KDQo+WW91J3Jl
-IHBhcGVyaW5nIG92ZXIgdGhlIGZ1bmRhbWVudGFsIGlzc3VlIHRoYXQgeW91J3JlIGFjY2Vzc2lu
-ZyBhDQo+Y2FjaGVhYmxlIGFsaWFzIG9mIGEgbm9uIGNhY2hlYWJsZSBtZW1vcnkuIFRoZSBhcmNo
-aXRlY3R1cmUgaXMgdmVyeQ0KPmNsZWFyIGFib3V0IHdoeSB0aGlzIGRvZXNuJ3Qgd29yaywgYW5k
-IEtWTSBpbXBsZW1lbnRzIHRoZSBhcmNoaXRlY3R1cmUuDQoNCg0KDQpJIGZpbmQgdGhhdCBJICBq
-dXN0IGVuY291bnRlciB0aGUgcHJvYmxlbSBhZnRlciAgdGhlIGNvbW1pdCAnMTUzMDNiYTVkMWNk
-OWIyOGQwM2E5ODA0NTZjMDk3OGMwZWEzYjIwOCAiIC4NCg0KVGhlIGNvbW1pdCBjb250YWlucyAi
-aWNhY2hlIGludmFsaWRhdGlvbiBvcHRpbWl6YXRpb25zLCBpbXByb3ZpbmcgVk0gc3RhcnR1cCB0
-aW1lIixpdCBjaGFuZ2VzDQoNCmZyb20gdW5jb25kaXRpb25hbGx5IGNhbGxpbmcgY29oZXJlbnRf
-Y2FjaGVfZ3Vlc3RfcGFnZShpbmNsdWRpbmcgZGNhY2hlIGhhbmRsZSkgdG8gY29uZGl0aW9uYWxs
-eSBjYWxsaW5nIGNsZWFuX2RjYWNoZV9ndWVzdF9wYWdlLg0KDQogSSB0cmFjZSB0aGUgZGlzcGxh
-eSBvZiB2bmMgYWJub3JtYWxseSBhbmQgZmluZCBpdCBnZW5lcmF0ZSBkYXRhIGFib3J0IGluIHZn
-YQ0KDQphZGRyZXNzIHJlZ2lvbiB3aXRoIEZTQ19QRVJNLGFuZCBpdCB3aWxsIG5vdCBjYWxsIGNs
-ZWFuX2RjYWNoZV9ndWVzdF9wYWdlIC4gU28gSSB0aGluayAgc2hvdWxkIHJlY292ZXIgdG8gdW5j
-b250aW9uYWxseSBjYWxsaW5nIGNsZWFuX2RjYWNoZV9ndWVzdF9wYWdlLg0KDQoNCg0KDQpUaGFu
-a3MuDQoNCj5JZiB5b3Ugd2FudCB0aGlzIHRvIHdvcmssIG1hcCB5b3VyIFZHQSBkZXZpY2UgYXMg
-Y2FjaGVhYmxlLCBhZGQgY2FjaGUNCg0KPm1haW50ZW5hbmNlIHRvIFFFTVUsIG9yIHVzZSBhbm90
-aGVyIGZyYW1lLWJ1ZmZlciBlbXVsYXRpb24gdGhhdCBkb2Vzbid0DQo+cmVxdWlyZSBzdWNoIGEg
-Z2Fjay4NCg0KPlRoYW5rcywNCg0KPiAgICBNLg0KPi0tIA0KPkphenogaXMgbm90IGRlYWQuIEl0
-IGp1c3Qgc21lbGxzIGZ1bm55Li4u
-
-
---=====_003_next=====
-Content-Type: text/html ;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
-
-PGRpdiBjbGFzcz0iemNvbnRlbnRSb3ciPjxwIHN0eWxlPSJmb250LXNpemU6MTRweDtmb250LWZh
-bWlseTphcmlhbDsiPjxzcGFuIHN0eWxlPSJmb250LWZhbWlseTogc2Fucy1zZXJpZjsiPjxzcGFu
-IHN0eWxlPSJsaW5lLWhlaWdodDogMjFweDsiPiZndDs8L3NwYW4+T24mbmJzcDswOS8wMy8xOCZu
-YnNwOzIyOjE1LCZuYnNwO1BlbmcmbmJzcDtIYW8mbmJzcDt3cm90ZTo8L3NwYW4+PGJyPjwvcD48
-ZGl2PjxkaXYgY2xhc3M9InpoaXN0b3J5Um93IiBzdHlsZT0iZGlzcGxheTpibG9jayI+PGRpdiBp
-ZD0iendyaXRlSGlzdG9yeUNvbnRhaW5lciI+PGRpdiBjbGFzcz0iY29udHJvbC1ncm91cCB6aGlz
-dG9yeVBhbmVsIj48ZGl2IGNsYXNzPSJ6aGlzdG9yeUNvbnRlbnQiPjxzcGFuIHN0eWxlPSJsaW5l
-LWhlaWdodDogMjFweDsiPiZndDs8L3NwYW4+Jmd0OyZuYnNwO0ZvciZuYnNwO2VtdWxhdGlvbiZu
-YnNwO2RldmljZXMmbmJzcDtqdXN0Jm5ic3A7bGlrZSZuYnNwO3ZnYSwmbmJzcDtrZWVwaW5nJm5i
-c3A7Y29oZXJlbnQmbmJzcDtkY2FjaGUmbmJzcDtiZXR3ZWVuPGJyPjxzcGFuIHN0eWxlPSJsaW5l
-LWhlaWdodDogMjFweDsiPiZndDs8L3NwYW4+Jmd0OyZuYnNwO2d1ZXN0Jm5ic3A7YW5kJm5ic3A7
-aG9zdCZuYnNwO3RpbWVseSZuYnNwO2lzJm5ic3A7bmVlZGVkLjxicj48c3BhbiBzdHlsZT0ibGlu
-ZS1oZWlnaHQ6IDIxcHg7Ij4mZ3Q7PC9zcGFuPiZndDsmbmJzcDtOb3cmbmJzcDt0aGUmbmJzcDtk
-aXNwbGF5Jm5ic3A7b2YmbmJzcDt2bmMtdmlld2VyJm5ic3A7d2lsbCZuYnNwO25vdCZuYnNwO3Vw
-ZGF0ZSZuYnNwO2NvbnRpbnVvdXNseSZuYnNwO2FuZCZuYnNwO3RoZTxicj48c3BhbiBzdHlsZT0i
-bGluZS1oZWlnaHQ6IDIxcHg7Ij4mZ3Q7PC9zcGFuPiZndDsmbmJzcDtwYXRjaCZuYnNwO2NhbiZu
-YnNwO2ZpeCZuYnNwO3VwLjxicj48c3BhbiBzdHlsZT0ibGluZS1oZWlnaHQ6IDIxcHg7Ij4mZ3Q7
-PC9zcGFuPiZndDsmbmJzcDs8YnI+PHNwYW4gc3R5bGU9ImxpbmUtaGVpZ2h0OiAyMXB4OyI+Jmd0
-Ozwvc3Bhbj4mZ3Q7Jm5ic3A7U2lnbmVkLW9mZi1ieTombmJzcDtQZW5nJm5ic3A7SGFvJm5ic3A7
-Jmx0O3BlbmcuaGFvMkB6dGUuY29tLmNuJmd0Ozxicj48c3BhbiBzdHlsZT0ibGluZS1oZWlnaHQ6
-IDIxcHg7Ij4mZ3Q7PC9zcGFuPiZndDsmbmJzcDstLS08YnI+PHNwYW4gc3R5bGU9ImxpbmUtaGVp
-Z2h0OiAyMXB4OyI+Jmd0Ozwvc3Bhbj4mZ3Q7Jm5ic3A7Jm5ic3A7dmlydC9rdm0vYXJtL21tdS5j
-Jm5ic3A7fCZuYnNwOzYmbmJzcDsrKy0tLS08YnI+PHNwYW4gc3R5bGU9ImxpbmUtaGVpZ2h0OiAy
-MXB4OyI+Jmd0Ozwvc3Bhbj4mZ3Q7Jm5ic3A7Jm5ic3A7MSZuYnNwO2ZpbGUmbmJzcDtjaGFuZ2Vk
-LCZuYnNwOzImbmJzcDtpbnNlcnRpb25zKCspLCZuYnNwOzQmbmJzcDtkZWxldGlvbnMoLSk8YnI+
-PHNwYW4gc3R5bGU9ImxpbmUtaGVpZ2h0OiAyMXB4OyI+Jmd0Ozwvc3Bhbj4mZ3Q7Jm5ic3A7PGJy
-PjxzcGFuIHN0eWxlPSJsaW5lLWhlaWdodDogMjFweDsiPiZndDs8L3NwYW4+Jmd0OyZuYnNwO2Rp
-ZmYmbmJzcDstLWdpdCZuYnNwO2EvdmlydC9rdm0vYXJtL21tdS5jJm5ic3A7Yi92aXJ0L2t2bS9h
-cm0vbW11LmM8YnI+PHNwYW4gc3R5bGU9ImxpbmUtaGVpZ2h0OiAyMXB4OyI+Jmd0Ozwvc3Bhbj4m
-Z3Q7Jm5ic3A7aW5kZXgmbmJzcDtlYzYyZDFjLi40YTI4Mzk1ZSZuYnNwOzEwMDY0NDxicj48c3Bh
-biBzdHlsZT0ibGluZS1oZWlnaHQ6IDIxcHg7Ij4mZ3Q7PC9zcGFuPiZndDsmbmJzcDstLS0mbmJz
-cDthL3ZpcnQva3ZtL2FybS9tbXUuYzxicj48c3BhbiBzdHlsZT0ibGluZS1oZWlnaHQ6IDIxcHg7
-Ij4mZ3Q7PC9zcGFuPiZndDsmbmJzcDsrKysmbmJzcDtiL3ZpcnQva3ZtL2FybS9tbXUuYzxicj48
-c3BhbiBzdHlsZT0ibGluZS1oZWlnaHQ6IDIxcHg7Ij4mZ3Q7PC9zcGFuPiZndDsmbmJzcDtAQCZu
-YnNwOy0xNDE2LDgmbmJzcDsrMTQxNiw3Jm5ic3A7QEAmbmJzcDtzdGF0aWMmbmJzcDtpbnQmbmJz
-cDt1c2VyX21lbV9hYm9ydChzdHJ1Y3QmbmJzcDtrdm1fdmNwdSZuYnNwOyp2Y3B1LCZuYnNwO3Bo
-eXNfYWRkcl90Jm5ic3A7ZmF1bHRfaXBhLDxicj48c3BhbiBzdHlsZT0ibGluZS1oZWlnaHQ6IDIx
-cHg7Ij4mZ3Q7PC9zcGFuPiZndDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDtrdm1fc2V0X3Bm
-bl9kaXJ0eShwZm4pOzxicj48c3BhbiBzdHlsZT0ibGluZS1oZWlnaHQ6IDIxcHg7Ij4mZ3Q7PC9z
-cGFuPiZndDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDt9PGJyPjxzcGFuIHN0eWxlPSJsaW5lLWhlaWdodDogMjFweDsiPiZndDs8L3Nw
-YW4+Jmd0OyZuYnNwOyZuYnNwOzxicj48c3BhbiBzdHlsZT0ibGluZS1oZWlnaHQ6IDIxcHg7Ij4m
-Z3Q7PC9zcGFuPiZndDsmbmJzcDstJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7aWYmbmJzcDsoZmF1bHRfc3RhdHVzJm5ic3A7IT0mbmJzcDtGU0NfUEVSTSk8
-YnI+PHNwYW4gc3R5bGU9ImxpbmUtaGVpZ2h0OiAyMXB4OyI+Jmd0Ozwvc3Bhbj4mZ3Q7Jm5ic3A7
-LSZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
-YnNwOyZuYnNwOyZuYnNwO2NsZWFuX2RjYWNoZV9ndWVzdF9wYWdlKHBmbiwmbmJzcDtQTURfU0la
-RSk7PGJyPjxzcGFuIHN0eWxlPSJsaW5lLWhlaWdodDogMjFweDsiPiZndDs8L3NwYW4+Jmd0OyZu
-YnNwOysmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDtjbGVh
-bl9kY2FjaGVfZ3Vlc3RfcGFnZShwZm4sJm5ic3A7UE1EX1NJWkUpOzxicj48c3BhbiBzdHlsZT0i
-bGluZS1oZWlnaHQ6IDIxcHg7Ij4mZ3Q7PC9zcGFuPiZndDsmbmJzcDsmbmJzcDs8YnI+PHNwYW4g
-c3R5bGU9ImxpbmUtaGVpZ2h0OiAyMXB4OyI+Jmd0Ozwvc3Bhbj4mZ3Q7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7aWYmbmJzcDsoZXhl
-Y19mYXVsdCkmbmJzcDt7PGJyPjxzcGFuIHN0eWxlPSJsaW5lLWhlaWdodDogMjFweDsiPiZndDs8
-L3NwYW4+Jmd0OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwO25ld19wbWQmbmJzcDs9Jm5ic3A7
-a3ZtX3MycG1kX21rZXhlYyhuZXdfcG1kKTs8YnI+PHNwYW4gc3R5bGU9ImxpbmUtaGVpZ2h0OiAy
-MXB4OyI+Jmd0Ozwvc3Bhbj4mZ3Q7Jm5ic3A7QEAmbmJzcDstMTQzOCw4Jm5ic3A7KzE0MzcsNyZu
-YnNwO0BAJm5ic3A7c3RhdGljJm5ic3A7aW50Jm5ic3A7dXNlcl9tZW1fYWJvcnQoc3RydWN0Jm5i
-c3A7a3ZtX3ZjcHUmbmJzcDsqdmNwdSwmbmJzcDtwaHlzX2FkZHJfdCZuYnNwO2ZhdWx0X2lwYSw8
-YnI+PHNwYW4gc3R5bGU9ImxpbmUtaGVpZ2h0OiAyMXB4OyI+Jmd0Ozwvc3Bhbj4mZ3Q7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7bWFya19wYWdlX2RpcnR5KGt2bSwmbmJzcDtnZm4pOzxicj48
-c3BhbiBzdHlsZT0ibGluZS1oZWlnaHQ6IDIxcHg7Ij4mZ3Q7PC9zcGFuPiZndDsmbmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDt9PGJyPjxz
-cGFuIHN0eWxlPSJsaW5lLWhlaWdodDogMjFweDsiPiZndDs8L3NwYW4+Jmd0OyZuYnNwOyZuYnNw
-Ozxicj48c3BhbiBzdHlsZT0ibGluZS1oZWlnaHQ6IDIxcHg7Ij4mZ3Q7PC9zcGFuPiZndDsmbmJz
-cDstJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7aWYmbmJz
-cDsoZmF1bHRfc3RhdHVzJm5ic3A7IT0mbmJzcDtGU0NfUEVSTSk8YnI+PHNwYW4gc3R5bGU9Imxp
-bmUtaGVpZ2h0OiAyMXB4OyI+Jmd0Ozwvc3Bhbj4mZ3Q7Jm5ic3A7LSZuYnNwOyZuYnNwOyZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwO2Ns
-ZWFuX2RjYWNoZV9ndWVzdF9wYWdlKHBmbiwmbmJzcDtQQUdFX1NJWkUpOzxicj48c3BhbiBzdHls
-ZT0ibGluZS1oZWlnaHQ6IDIxcHg7Ij4mZ3Q7PC9zcGFuPiZndDsmbmJzcDsrJm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Y2xlYW5fZGNhY2hlX2d1ZXN0X3Bh
-Z2UocGZuLCZuYnNwO1BBR0VfU0laRSk7PGJyPjxzcGFuIHN0eWxlPSJsaW5lLWhlaWdodDogMjFw
-eDsiPiZndDs8L3NwYW4+Jmd0OyZuYnNwOyZuYnNwOzxicj48c3BhbiBzdHlsZT0ibGluZS1oZWln
-aHQ6IDIxcHg7Ij4mZ3Q7PC9zcGFuPiZndDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDtpZiZuYnNwOyhleGVjX2ZhdWx0KSZuYnNwO3s8
-YnI+PHNwYW4gc3R5bGU9ImxpbmUtaGVpZ2h0OiAyMXB4OyI+Jmd0Ozwvc3Bhbj4mZ3Q7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7bmV3X3B0ZSZuYnNwOz0mbmJzcDtrdm1fczJwdGVfbWtleGVj
-KG5ld19wdGUpOzxicj48c3BhbiBzdHlsZT0ibGluZS1oZWlnaHQ6IDIxcHg7Ij4mZ3Q7PC9zcGFu
-PiZndDsmbmJzcDs8YnI+PGJyPjxzcGFuIHN0eWxlPSJsaW5lLWhlaWdodDogMjFweDsiPiZndDs8
-L3NwYW4+SSdtJm5ic3A7c29ycnksJm5ic3A7YnV0Jm5ic3A7SSZuYnNwO2hhdmUmbmJzcDt0byZu
-YnNwO05BSyZuYnNwO3RoaXMuPGJyPjxicj48c3BhbiBzdHlsZT0ibGluZS1oZWlnaHQ6IDIxcHg7
-Ij4mZ3Q7PC9zcGFuPllvdSdyZSZuYnNwO3BhcGVyaW5nJm5ic3A7b3ZlciZuYnNwO3RoZSZuYnNw
-O2Z1bmRhbWVudGFsJm5ic3A7aXNzdWUmbmJzcDt0aGF0Jm5ic3A7eW91J3JlJm5ic3A7YWNjZXNz
-aW5nJm5ic3A7YTxicj48c3BhbiBzdHlsZT0ibGluZS1oZWlnaHQ6IDIxcHg7Ij4mZ3Q7PC9zcGFu
-PmNhY2hlYWJsZSZuYnNwO2FsaWFzJm5ic3A7b2YmbmJzcDthJm5ic3A7bm9uJm5ic3A7Y2FjaGVh
-YmxlJm5ic3A7bWVtb3J5LiZuYnNwO1RoZSZuYnNwO2FyY2hpdGVjdHVyZSZuYnNwO2lzJm5ic3A7
-dmVyeTxicj48c3BhbiBzdHlsZT0ibGluZS1oZWlnaHQ6IDIxcHg7Ij4mZ3Q7PC9zcGFuPmNsZWFy
-Jm5ic3A7YWJvdXQmbmJzcDt3aHkmbmJzcDt0aGlzJm5ic3A7ZG9lc24ndCZuYnNwO3dvcmssJm5i
-c3A7YW5kJm5ic3A7S1ZNJm5ic3A7aW1wbGVtZW50cyZuYnNwO3RoZSZuYnNwO2FyY2hpdGVjdHVy
-ZS48YnI+PHA+PGJyPjwvcD48cD5JIGZpbmQgdGhhdCBJICZuYnNwO2p1c3QgZW5jb3VudGVyIHRo
-ZSBwcm9ibGVtIGFmdGVyICZuYnNwO3RoZSBjb21taXQgJzxhIGhyZWY9Imh0dHBzOi8vZ2l0Lmtl
-cm5lbC5vcmcvcHViL3NjbS92aXJ0L2t2bS9rdm0uZ2l0L2NvbW1pdC8/aWQ9MTUzMDNiYTVkMWNk
-OWIyOGQwM2E5ODA0NTZjMDk3OGMwZWEzYjIwOCI+MTUzMDNiYTVkMWNkOWIyOGQwM2E5ODA0NTZj
-MDk3OGMwZWEzYjIwODwvYT4mbmJzcDsiJm5ic3A7LjwvcD48cD5UaGUgY29tbWl0IGNvbnRhaW5z
-ICJpY2FjaGUgaW52YWxpZGF0aW9uIG9wdGltaXphdGlvbnMsIGltcHJvdmluZyBWTSBzdGFydHVw
-IHRpbWUiLGl0IGNoYW5nZXM8L3A+PHA+ZnJvbSB1bmNvbmRpdGlvbmFsbHkgY2FsbGluZyZuYnNw
-O2NvaGVyZW50X2NhY2hlX2d1ZXN0X3BhZ2UoaW5jbHVkaW5nIGRjYWNoZSBoYW5kbGUpIHRvIGNv
-bmRpdGlvbmFsbHkgY2FsbGluZyZuYnNwO2NsZWFuX2RjYWNoZV9ndWVzdF9wYWdlLjwvcD48cD4m
-bmJzcDtJIHRyYWNlIHRoZSBkaXNwbGF5IG9mIHZuYyBhYm5vcm1hbGx5IGFuZCBmaW5kIGl0IGdl
-bmVyYXRlIGRhdGEgYWJvcnQgaW4gdmdhPC9wPjxwPmFkZHJlc3MgcmVnaW9uIHdpdGggRlNDX1BF
-Uk0sYW5kIGl0IHdpbGwgbm90IGNhbGwgPHNwYW4gc3R5bGU9ImxpbmUtaGVpZ2h0OiAyMXB4OyI+
-Y2xlYW5fZGNhY2hlX2d1ZXN0X3BhZ2U8L3NwYW4+Jm5ic3A7LiBTbyBJIHRoaW5rICZuYnNwO3No
-b3VsZCByZWNvdmVyIHRvIHVuY29udGlvbmFsbHkgY2FsbGluZyZuYnNwOzxzcGFuIHN0eWxlPSJs
-aW5lLWhlaWdodDogMjFweDsiPmNsZWFuX2RjYWNoZV9ndWVzdF9wYWdlLjwvc3Bhbj48L3A+PHA+
-PHNwYW4gc3R5bGU9ImxpbmUtaGVpZ2h0OiAyMXB4OyI+PGJyPjwvc3Bhbj48L3A+PHA+PHNwYW4g
-c3R5bGU9ImxpbmUtaGVpZ2h0OiAyMXB4OyI+VGhhbmtzLjwvc3Bhbj48L3A+PHA+PHNwYW4gc3R5
-bGU9ImxpbmUtaGVpZ2h0OiAyMXB4OyI+Jmd0Ozwvc3Bhbj5JZiZuYnNwO3lvdSZuYnNwO3dhbnQm
-bmJzcDt0aGlzJm5ic3A7dG8mbmJzcDt3b3JrLCZuYnNwO21hcCZuYnNwO3lvdXImbmJzcDtWR0Em
-bmJzcDtkZXZpY2UmbmJzcDthcyZuYnNwO2NhY2hlYWJsZSwmbmJzcDthZGQmbmJzcDtjYWNoZTwv
-cD48c3BhbiBzdHlsZT0ibGluZS1oZWlnaHQ6IDIxcHg7Ij4mZ3Q7PC9zcGFuPm1haW50ZW5hbmNl
-Jm5ic3A7dG8mbmJzcDtRRU1VLCZuYnNwO29yJm5ic3A7dXNlJm5ic3A7YW5vdGhlciZuYnNwO2Zy
-YW1lLWJ1ZmZlciZuYnNwO2VtdWxhdGlvbiZuYnNwO3RoYXQmbmJzcDtkb2Vzbid0PGJyPjxzcGFu
-IHN0eWxlPSJsaW5lLWhlaWdodDogMjFweDsiPiZndDs8L3NwYW4+cmVxdWlyZSZuYnNwO3N1Y2gm
-bmJzcDthJm5ic3A7Z2Fjay48YnI+PGJyPjxzcGFuIHN0eWxlPSJsaW5lLWhlaWdodDogMjFweDsi
-PiZndDs8L3NwYW4+VGhhbmtzLDxicj48YnI+PHNwYW4gc3R5bGU9ImxpbmUtaGVpZ2h0OiAyMXB4
-OyI+Jmd0Ozwvc3Bhbj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDtNLjxicj48c3BhbiBzdHlsZT0i
-bGluZS1oZWlnaHQ6IDIxcHg7Ij4mZ3Q7PC9zcGFuPi0tJm5ic3A7PGJyPjxzcGFuIHN0eWxlPSJs
-aW5lLWhlaWdodDogMjFweDsiPiZndDs8L3NwYW4+SmF6eiZuYnNwO2lzJm5ic3A7bm90Jm5ic3A7
-ZGVhZC4mbmJzcDtJdCZuYnNwO2p1c3QmbmJzcDtzbWVsbHMmbmJzcDtmdW5ueS4uLjwvZGl2Pjwv
-ZGl2PjwvZGl2PjwvZGl2PjwvZGl2PjxwPjxicj48L3A+PC9kaXY+
-
-
---=====_003_next=====--
-
---=====_002_next=====--
-
---=====_001_next=====
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---=====_001_next=====--
+-- 
+Shanker Donthineni
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
