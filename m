@@ -1,67 +1,117 @@
-From: Shanker Donthineni <shankerd@codeaurora.org>
-Subject: Re: [PATCH v2] arm64: KVM: Use SMCCC_ARCH_WORKAROUND_1 for Falkor BP
- hardening
-Date: Sat, 10 Mar 2018 12:40:45 -0600
-Message-ID: <92763e2b-ffba-8247-c403-bcd1d331a872@codeaurora.org>
-References: <1520269603-2900-1-git-send-email-shankerd@codeaurora.org>
- <20180309134809.GC15537@arm.com>
-Reply-To: shankerd@codeaurora.org
+From: Christoffer Dall <cdall@kernel.org>
+Subject: Re: [PATCH 1/2] KVM: arm/arm64: vgic: Don't populate multiple LRs
+ with the same vintid
+Date: Sun, 11 Mar 2018 01:51:56 +0000
+Message-ID: <CAEDV+gJsDtCSJrtWVe+sLUY=doH2X38ggfjswnurP3jDhqJ15A@mail.gmail.com>
+References: <20180307124055.13800-1-marc.zyngier@arm.com>
+ <20180307124055.13800-2-marc.zyngier@arm.com>
+ <CAEDV+gJoamQJX_hcwCNBo1gc7-NUT+m-N9n=00wCJ=_TD82EkQ@mail.gmail.com>
+ <8e873168-110f-6781-506c-4ca89b7a4e0d@arm.com> <20180308160242.GA1917@lvm>
+ <86tvtqbis9.wl-marc.zyngier@arm.com> <86o9jybeef.wl-marc.zyngier@arm.com>
+ <20180309213931.GE1917@lvm> <86ina4av88.wl-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180309134809.GC15537@arm.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Will Deacon <will.deacon@arm.com>
-Cc: Thomas Speier <tspeier@codeaurora.org>, Christoffer Dall <cdall@kernel.org>, Vikram Sethi <vikrams@codeaurora.org>, Sean Campbell <scampbel@codeaurora.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, linux-kernel <linux-kernel@vger.kernel.org>, kvmarm <kvmarm@lists.cs.columbia.edu>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <86ina4av88.wl-marc.zyngier@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Andre Przywara <Andre.Przywara@arm.com>, kvmarm@lists.cs.columbia.edu, KVM General <kvm@vger.kernel.org>, Eric Auger <eric.auger@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Will,
-
-On 03/09/2018 07:48 AM, Will Deacon wrote:
-> Hi SHanker,
-> 
-> On Mon, Mar 05, 2018 at 11:06:43AM -0600, Shanker Donthineni wrote:
->> The function SMCCC_ARCH_WORKAROUND_1 was introduced as part of SMC
->> V1.1 Calling Convention to mitigate CVE-2017-5715. This patch uses
->> the standard call SMCCC_ARCH_WORKAROUND_1 for Falkor chips instead
->> of Silicon provider service ID 0xC2001700.
+On Sat, Mar 10, 2018 at 1:57 PM, Marc Zyngier <marc.zyngier@arm.com> wrote:
+> Hi Christoffer,
+>
+> On Fri, 09 Mar 2018 21:39:31 +0000,
+> Christoffer Dall wrote:
 >>
->> Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
->> ---
->> Chnages since v1:
->>   - Trivial change in cpucaps.h (refresh after removing ARM64_HARDEN_BP_POST_GUEST_EXIT)
+>> On Thu, Mar 08, 2018 at 06:39:20PM +0000, Marc Zyngier wrote:
+>> > Thinking of it a bit more: MI on EOI doesn't offer much more guarantee
+>> > in the way of priority ordering. Taking your example above: Even if
+>> > you generate a MI when EOIing the SGI, there is no guarantee that
+>> > you'll take the MI before you've acked the SPI.
 >>
->>  arch/arm64/include/asm/cpucaps.h |  5 ++--
->>  arch/arm64/include/asm/kvm_asm.h |  2 --
->>  arch/arm64/kernel/bpi.S          |  8 ------
->>  arch/arm64/kernel/cpu_errata.c   | 55 ++++++++++++++--------------------------
->>  arch/arm64/kvm/hyp/entry.S       | 12 ---------
->>  arch/arm64/kvm/hyp/switch.c      | 10 --------
->>  6 files changed, 21 insertions(+), 71 deletions(-)
-> 
-> Could you reply to my outstanding question on the last version of this patch
-> please?
-> 
+>> There's no guarantee, but at least you're attempting at processing the
+>> SGIs in first.  It's the best we can do, but not completely correct,
+>> kinda thing...
+>>
+>> >
+>> > If you really want to offer that absolute guarantee that all the
+>> > multi-source SGIs of higher priority are delivered before anything
+>> > else, then you must make sure that only the SGIs are present in the
+>> > LRs, excluding any other interrupt on lower priority until you've
+>> > queued them all.
+>>
+>> Yes, that sucks!  Might not be too hard to implement, it's basically an
+>> early out of the loop traversing the AP list, but just an annoying
+>> complication.
+>
+> Yeah, it is a bit gross. The way I implemented it is by forcing the AP
+> list to be sorted if there is any multi-SGI in the pipeline, and early
+> out as soon as we see an interrupt of a lower priority than the first
+> multi-SGI. That way, we only have an overhead in the case that
+> combines multi-SGI and lower priority interrupts.
+>
 
-I replied to your comments. This patch contents have been discussed with QCOM CPU
-architecture and design team. Their recommendation was to keep two variants of
-variant2 mitigation in order to take advantage of Falkor hardware and avoid the
-unnecessary overhead by calling SMMCC always.
+yes, that's what I had in mind as well.
 
+>> > At that stage, I wonder if there is a point in doing anything at
+>> > all. The GICv2 architecture is too rubbish for words.
+>> >
+>>
+>> The case we do need to worry about is the guest processing all its
+>> interrupts and not exiting while there is actually still an SGI pending.
+>> At that point, we can either do it with the "no interrupts pending
+>> maintenance interrupt" or with the "EOI maintenance interrupt", and I
+>> think the latter at least gets us slightly closer to the architecture
+>> for a non-virtualized system.
+>
+> I think that this is where we disagree.
 
-> http://lists.infradead.org/pipermail/linux-arm-kernel/2018-March/564194.html
-> 
-> Will
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
-> 
+I don't think we disagree, I must have expressed myself poorly...
 
--- 
-Shanker Donthineni
-Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
+> I don't see anything in the
+> architecture that mandates that we should present the SGIs before
+> anything else.
+
+Neither do I.
+
+> All we need to do is to ensure that interrupts of
+> higher priority are presented before anything else.
+
+Agreed.
+
+> It is perfectly
+> acceptable for an implementation to deliver SGI0, then SPI3, and SGI0
+> (from another CPU) after that, as long as SPI3 isn't of lesser
+> priority than SGI0.
+
+Yes, but what we cannot do is let the guest deliver SGI0, then SPI3,
+and then loop forever without delivering SGI0 from another CPU.
+That's why I said "the guest processing all its interrupts and not
+exiting while there is actually still an SGI pending" and said that we
+could use either the EOI or the NPIE trick.
+
+>
+> Another thing I dislike about using EOI for that is forces us to
+> propagate the knowledge of the multi-SGI horror further down the
+> stack, down to both implementations of vgic_populate_lr. NPIE allows
+> us to keep that knowledge local. But that's an orthogonal issue, and
+> we can further argue/bikeshed about the respective merits of both
+> solutions once we have something that fits the sorry state of the
+> GICv2 architecture ;-).
+>
+
+Yeah, I don't care deeply.  If NPIE is prettier in the
+implementations, let's do that.
+
+Thanks,
+-Christoffer
