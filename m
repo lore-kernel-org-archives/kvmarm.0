@@ -1,120 +1,217 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [RFC PATCH] KVM: arm/arm64: vgic: change condition for level
- interrupt resampling
-Date: Mon, 12 Mar 2018 10:09:01 +0000
-Message-ID: <103f560a-d7ad-ba6c-e129-eda172312576@arm.com>
-References: <1520492490-7943-1-git-send-email-shunyong.yang@hxt-semitech.com>
- <9ad47673-068e-f732-d2ca-9c76a8fbdfbc@arm.com>
- <0a15633d-8944-cb9b-3e6b-b08ee5ec42b9@arm.com> <20180308161900.GC1917@lvm>
- <86r2oubho3.wl-marc.zyngier@arm.com> <20180309213612.GD1917@lvm>
- <86k1ukazr0.wl-marc.zyngier@arm.com>
- <CAEDV+g+29ZK6QQEn=2h_77dMZC7wmw+d4MZC-GU-CqeaK_xhMg@mail.gmail.com>
- <20180311121733.643fb1a5@why.wild-wind.fr.eu.org>
- <1520822024.2985.12.camel@hxt-semitech.com>
+Subject: Re: [PATCH v5 10/23] KVM: arm/arm64: Move HYP IO VAs to the "idmap"
+ range
+Date: Mon, 12 Mar 2018 14:02:09 +0000
+Message-ID: <89ded6ea-5b08-e296-3595-08776704f847@arm.com>
+References: <20180301155538.26860-1-marc.zyngier@arm.com>
+ <20180301155538.26860-11-marc.zyngier@arm.com> <5AA2D97C.70503@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1520822024.2985.12.camel@hxt-semitech.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F76F40192
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Mar 2018 09:55:12 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id A+1lPIZrx+sp for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 12 Mar 2018 09:54:45 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BD73B402E7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Mar 2018 09:54:45 -0400 (EDT)
+In-Reply-To: <5AA2D97C.70503@arm.com>
 Content-Language: en-GB
-Sender: linux-kernel-owner@vger.kernel.org
-To: "Yang, Shunyong" <shunyong.yang@hxt-semitech.com>, "cdall@kernel.org" <cdall@kernel.org>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "ard.biesheuvel@linaro.org" <ard.biesheuvel@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "Zheng, Joey" <yu.zheng@hxt-semitech.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "david.daney@cavium.com" <david.daney@cavium.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: James Morse <james.morse@arm.com>
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <Kristina.Martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 12/03/18 02:33, Yang, Shunyong wrote:
-> Hi, Marc,
-> 
-> On Sun, 2018-03-11 at 12:17 +0000, Marc Zyngier wrote:
->> On Sun, 11 Mar 2018 01:55:08 +0000
->> Christoffer Dall <cdall@kernel.org> wrote:
->>
->>>
->>> On Sat, Mar 10, 2018 at 12:20 PM, Marc Zyngier <marc.zyngier@arm.co
->>> m> wrote:
->>>>
->>>> On Fri, 09 Mar 2018 21:36:12 +0000,
->>>> Christoffer Dall wrote:  
->>>>>
->>>>>
->>>>> On Thu, Mar 08, 2018 at 05:28:44PM +0000, Marc Zyngier wrote:  
->>>>>>
->>>>>> I'd be more confident if we did forbid P+A for such
->>>>>> interrupts
->>>>>> altogether, as they really feel like another kind of HW
->>>>>> interrupt.  
->>>>> How about a slightly bigger hammer:  Can we avoid doing P+A for
->>>>> level
->>>>> interrupts completely?  I don't think that really makes much
->>>>> sense, and
->>>>> I think we simply everything if we just come back out and
->>>>> resample the
->>>>> line.  For an edge, something like a network card, there's a
->>>>> potential
->>>>> performance win to appending a new pending state, but I doubt
->>>>> that this
->>>>> is the case for level interrupts.  
->>>> I started implementing the same thing yesterday. Somehow, it
->>>> feels
->>>> slightly better to have the same flow for all level interrupts,
->>>> including the timer, and we only use the MI on EOI as a way to
->>>> trigger
->>>> the next state of injection. Still testing, but looking good so
->>>> far.
->>>>
->>>> I'm still puzzled that we have this level-but-not-quite behaviour
->>>> for
->>>> VFIO interrupts. At some point, it is going to bite us badly.
->>>>  
->>> Where is the departure from level-triggered behavior with VFIO?  As
->>> far as I can tell, the GIC flow of the interrupts will be just a
->>> level
->>> interrupt, 
->> The GIC is fine, I believe. What is not exactly fine is the
->> signalling
->> from the device, which will never be dropped until the EOI has been
->> detected.
->>
->>>
->>> but we just need to make sure the resamplefd mechanism is
->>> supported for both types of interrupts.  Whether or not that's a
->>> decent mechanism seems orthogonal to me, but that's a discussion
->>> for
->>> another day I think.
->> Given that VFIO is built around this mechanism, I don't think we have
->> a
->> choice but to support it. Anyway, I came up with the following patch,
->> which I tested on Seattle with mtty. It also survived my usual
->> hammering of cyclictest, hackbench  and bulk VM installs.
->>
->> Shunyong, could you please give it a go?
->>
->> Thanks,
->>
->> 	M.
->>
-> 
-> I have tested the patch. It works on QDF2400 platform
-> and kvm_notify_acked_irq() is called when state is idle.
+[+Kristina for the extended idmap stuff]
 
-Thanks a lot for testing.
+Hi James,
+
+On 09/03/18 18:59, James Morse wrote:
+> Hi Marc,
+> 
+> On 01/03/18 15:55, Marc Zyngier wrote:
+>> We so far mapped our HYP IO (which is essencially the GICv2 control
+> 
+> (Nit: essentially)
+> 
+> 
+>> registers) using the same method as for memory. It recently appeared
+>> that is a bit unsafe:
+>>
+>> We compute the HYP VA using the kern_hyp_va helper, but that helper
+>> is only designed to deal with kernel VAs coming from the linear map,
+>> and not from the vmalloc region... This could in turn cause some bad
+>> aliasing between the two, amplified by the upcoming VA randomisation.
+>>
+>> A solution is to come up with our very own basic VA allocator for
+>> MMIO. Since half of the HYP address space only contains a single
+>> page (the idmap), we have plenty to borrow from. Let's use the idmap
+>> as a base, and allocate downwards from it. GICv2 now lives on the
+>> other side of the great VA barrier.
+> 
+>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+>> index 0e5cfffb4c21..3074544940dc 100644
+>> --- a/virt/kvm/arm/mmu.c
+>> +++ b/virt/kvm/arm/mmu.c
+>> @@ -502,27 +505,31 @@ static void unmap_hyp_range(pgd_t *pgdp, phys_addr_t start, u64 size)
+>>   *
+>>   * Assumes hyp_pgd is a page table used strictly in Hyp-mode and
+>>   * therefore contains either mappings in the kernel memory area (above
+>> - * PAGE_OFFSET), or device mappings in the vmalloc range (from
+>> - * VMALLOC_START to VMALLOC_END).
+>> + * PAGE_OFFSET), or device mappings in the idmap range.
+>>   *
+>> - * boot_hyp_pgd should only map two pages for the init code.
+>> + * boot_hyp_pgd should only map the idmap range, and is only used in
+>> + * the extended idmap case.
+>>   */
+>>  void free_hyp_pgds(void)
+>>  {
+>> +	pgd_t *id_pgd;
+>> +
+>>  	mutex_lock(&kvm_hyp_pgd_mutex);
+>>  
+>> +	id_pgd = boot_hyp_pgd ? boot_hyp_pgd : hyp_pgd;
+> 
+>> +
+>> +	if (id_pgd)
+>> +		unmap_hyp_range(id_pgd, io_map_base,
+>> +				hyp_idmap_start + PAGE_SIZE - io_map_base);
+> 
+> Even if kvm_mmu_init() fails before it sets io_map_base, this will still unmap
+> the idmap. It just starts from 0, so it may take out the flipped PAGE_OFFSET
+> range too...
+
+Yup, definitely worth fixing.
 
 > 
-> BTW, I have following questions when I was debugging the issue.
-> Coud you please give me some help?
-> 1)what does "mi" mean in gic code? such as lr_signals_eoi_mi();
+> (using io_map_base without taking io_map_lock makes me nervous ... in practice,
+> its fine)
 
-MI stands for Maintenance Interrupts. Life is too short to write that
-all the time ;-)
+I'm not too worried about that, as we only have a single CPU performing
+the teardown. But better safe than sorry, so I'll take it anyway.
 
-> 2)In some __hyp_text code where printk() will cause "HYP panic:", such
-> as in __kvm_vcpu_run(). How can I output debug information?
+> 
+> 
+>> +
+>>  	if (boot_hyp_pgd) {
+>> -		unmap_hyp_range(boot_hyp_pgd, hyp_idmap_start, PAGE_SIZE);
+>>  		free_pages((unsigned long)boot_hyp_pgd, hyp_pgd_order);
+>>  		boot_hyp_pgd = NULL;
+>>  	}
+>>  
+>>  	if (hyp_pgd) {
+>> -		unmap_hyp_range(hyp_pgd, hyp_idmap_start, PAGE_SIZE);
+>>  		unmap_hyp_range(hyp_pgd, kern_hyp_va(PAGE_OFFSET),
+>>  				(uintptr_t)high_memory - PAGE_OFFSET);
+>> -		unmap_hyp_range(hyp_pgd, kern_hyp_va(VMALLOC_START),
+>> -				VMALLOC_END - VMALLOC_START);
+>>  
+>>  		free_pages((unsigned long)hyp_pgd, hyp_pgd_order);
+>>  		hyp_pgd = NULL;
+>> @@ -719,7 +726,8 @@ int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
+>>  			   void __iomem **kaddr,
+>>  			   void __iomem **haddr)
+>>  {
+>> -	unsigned long start, end;
+>> +	pgd_t *pgd = hyp_pgd;
+>> +	unsigned long base;
+>>  	int ret;
+>>  
+>>  	*kaddr = ioremap(phys_addr, size);
+>> @@ -731,11 +739,42 @@ int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
+>>  		return 0;
+>>  	}
+>>  
+>> +	mutex_lock(&io_map_lock);
+>> +
+>> +	/*
+>> +	 * This assumes that we we have enough space below the idmap
+>> +	 * page to allocate our VAs. If not, the check below will
+>> +	 * kick. A potential alternative would be to detect that
+>> +	 * overflow and switch to an allocation above the idmap.
+>> +	 */
+>> +	size = max(PAGE_SIZE, roundup_pow_of_two(size));
+>> +	base = io_map_base - size;
+>> +	base &= ~(size - 1);
+>>  
+>> -	start = kern_hyp_va((unsigned long)*kaddr);
+>> -	end = kern_hyp_va((unsigned long)*kaddr + size);
+>> -	ret = __create_hyp_mappings(hyp_pgd, PTRS_PER_PGD, start, end,
+>> -				     __phys_to_pfn(phys_addr), PAGE_HYP_DEVICE);
+>> +	/*
+>> +	 * Verify that BIT(VA_BITS - 1) hasn't been flipped by
+>> +	 * allocating the new area, as it would indicate we've
+>> +	 * overflowed the idmap/IO address range.
+>> +	 */
+>> +	if ((base ^ io_map_base) & BIT(VA_BITS - 1)) {
+>> +		ret = -ENOMEM;
+>> +		goto out;
+>> +	}
+>> +
+>> +	if (__kvm_cpu_uses_extended_idmap())
+>> +		pgd = boot_hyp_pgd;
+>> +
+>> +	ret = __create_hyp_mappings(pgd, __kvm_idmap_ptrs_per_pgd(),
+>> +				    base, base + size,
+>> +				    __phys_to_pfn(phys_addr), PAGE_HYP_DEVICE);
+> 
+> (/me winces, that's subtle....)
+> This __kvm_idmap_ptrs_per_pgd() change is because the hyp_pgd
+> extended-idmap top-level page may be a pgd bigger than the 64-entries that linux
+> believes it has for 64K/48bit VA?
 
-You can't. None of the kernel is mapped at EL2 on pre-VHE hardware.
-You'll need to find indirect ways of outputting information (store data
-in memory, and output it once you're back to EL1).
+Yes, together with the 52bit PA madness.
 
-Thanks again,
+> Doesn't unmap_hyp_range() need to know about this too? Otherwise its
+> pgd_index(hyp_idmap_start) is going to mask out too much of the address, and
+> pgd_addr_end() will never reach the end address we provided...
+
+Hmmm, that's a good point. Kristina, what do you think?
+
+> Trying to boot a 64K config, and forcing it into teardown_hyp_mode() leads to
+> some fireworks: It looks like an unaligned end address is getting into
+> unmap_hyp_ptes() and its escaping the loop to kvm_set_pte() other kernel data...
+> 
+> My local changes are below [0], the config is defconfig + 64K pages, this is on
+> Juno. 4K pages is quite happy with this 'force teardown_hyp_mode()' debug hack.
+> 
+> Bisects to patch 4: "arm64: KVM: Dynamically patch the kernel/hyp VA mask"
+> 
+> I'll keep digging on Monday,
+
+Nice one! I've reproduced it on a model. It turns out that we only
+mandate a 4kB alignment for the idmap, whilst we assume page alignment
+everywhere in the code... Not great. I've fixed it as such:
+
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 7059c4f34c37..ae4eabd2005d 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -1891,7 +1891,9 @@ int kvm_mmu_init(void)
+ 	int err;
+
+ 	hyp_idmap_start = kvm_virt_to_phys(__hyp_idmap_text_start);
++	hyp_idmap_start = ALIGN_DOWN(hyp_idmap_start, PAGE_SIZE);
+ 	hyp_idmap_end = kvm_virt_to_phys(__hyp_idmap_text_end);
++	hyp_idmap_end = ALIGN(hyp_idmap_end, PAGE_SIZE);
+ 	hyp_idmap_vector = kvm_virt_to_phys(__kvm_hyp_init);
+
+ 	/*
+
+Thanks,
 
 	M.
 -- 
