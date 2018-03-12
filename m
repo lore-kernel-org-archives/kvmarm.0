@@ -1,215 +1,93 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v5 10/23] KVM: arm/arm64: Move HYP IO VAs to the "idmap"
- range
-Date: Mon, 12 Mar 2018 14:02:09 +0000
-Message-ID: <89ded6ea-5b08-e296-3595-08776704f847@arm.com>
+Subject: Re: [PATCH v5 22/23] arm64: KVM: Allow mapping of vectors outside of
+ the RAM region
+Date: Mon, 12 Mar 2018 14:23:08 +0000
+Message-ID: <264a1a57-e71a-6319-ffe6-ba43768062bf@arm.com>
 References: <20180301155538.26860-1-marc.zyngier@arm.com>
- <20180301155538.26860-11-marc.zyngier@arm.com> <5AA2D97C.70503@arm.com>
+ <20180301155538.26860-23-marc.zyngier@arm.com> <5AA2D984.5030901@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F76F40192
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Mar 2018 09:55:12 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id A+1lPIZrx+sp for <kvmarm@lists.cs.columbia.edu>;
- Mon, 12 Mar 2018 09:54:45 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BD73B402E7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Mar 2018 09:54:45 -0400 (EDT)
-In-Reply-To: <5AA2D97C.70503@arm.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <5AA2D984.5030901@arm.com>
 Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: James Morse <james.morse@arm.com>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <Kristina.Martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Mark Rutland <mark.rutland@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Christoffer Dall <cdall@kernel.org>, kvm@vger.kernel.org, Steve Capper <steve.capper@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
-
-[+Kristina for the extended idmap stuff]
-
-Hi James,
 
 On 09/03/18 18:59, James Morse wrote:
 > Hi Marc,
 > 
 > On 01/03/18 15:55, Marc Zyngier wrote:
->> We so far mapped our HYP IO (which is essencially the GICv2 control
-> 
-> (Nit: essentially)
-> 
-> 
->> registers) using the same method as for memory. It recently appeared
->> that is a bit unsafe:
+>> We're now ready to map our vectors in weird and wonderful locations.
+>> On enabling ARM64_HARDEN_EL2_VECTORS, a vector slots gets allocated
+>> if this hasn't been already done via ARM64_HARDEN_BRANCH_PREDICTOR
+>> and gets mapped outside of the normal RAM region, next to the
+>> idmap.
 >>
->> We compute the HYP VA using the kern_hyp_va helper, but that helper
->> is only designed to deal with kernel VAs coming from the linear map,
->> and not from the vmalloc region... This could in turn cause some bad
->> aliasing between the two, amplified by the upcoming VA randomisation.
->>
->> A solution is to come up with our very own basic VA allocator for
->> MMIO. Since half of the HYP address space only contains a single
->> page (the idmap), we have plenty to borrow from. Let's use the idmap
->> as a base, and allocate downwards from it. GICv2 now lives on the
->> other side of the great VA barrier.
+>> That way, being able to obtain VBAR_EL2 doesn't reveal the mapping
+>> of the rest of the hypervisor code.
 > 
->> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->> index 0e5cfffb4c21..3074544940dc 100644
->> --- a/virt/kvm/arm/mmu.c
->> +++ b/virt/kvm/arm/mmu.c
->> @@ -502,27 +505,31 @@ static void unmap_hyp_range(pgd_t *pgdp, phys_addr_t start, u64 size)
->>   *
->>   * Assumes hyp_pgd is a page table used strictly in Hyp-mode and
->>   * therefore contains either mappings in the kernel memory area (above
->> - * PAGE_OFFSET), or device mappings in the vmalloc range (from
->> - * VMALLOC_START to VMALLOC_END).
->> + * PAGE_OFFSET), or device mappings in the idmap range.
->>   *
->> - * boot_hyp_pgd should only map two pages for the init code.
->> + * boot_hyp_pgd should only map the idmap range, and is only used in
->> + * the extended idmap case.
->>   */
->>  void free_hyp_pgds(void)
+>> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+>> index 3da9e5aea936..433d13d0c271 100644
+>> --- a/arch/arm64/include/asm/kvm_mmu.h
+>> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> 
+> [..]
+> 
+>>  
+>> +/*  This is only called on a !VHE system */
+>>  static inline int kvm_map_vectors(void)
 >>  {
->> +	pgd_t *id_pgd;
->> +
->>  	mutex_lock(&kvm_hyp_pgd_mutex);
->>  
->> +	id_pgd = boot_hyp_pgd ? boot_hyp_pgd : hyp_pgd;
+>> -	return create_hyp_mappings(kvm_ksym_ref(__bp_harden_hyp_vecs_start),
+>> -				   kvm_ksym_ref(__bp_harden_hyp_vecs_end),
+>> -				   PAGE_HYP_EXEC);
+>> -}
+>> +	phys_addr_t vect_pa = virt_to_phys(__bp_harden_hyp_vecs_start);
 > 
->> +
->> +	if (id_pgd)
->> +		unmap_hyp_range(id_pgd, io_map_base,
->> +				hyp_idmap_start + PAGE_SIZE - io_map_base);
+> __pa_symbol()?
 > 
-> Even if kvm_mmu_init() fails before it sets io_map_base, this will still unmap
-> the idmap. It just starts from 0, so it may take out the flipped PAGE_OFFSET
-> range too...
-
-Yup, definitely worth fixing.
-
+> A gift from CONFIG_DEBUG_VIRTUAL:
 > 
-> (using io_map_base without taking io_map_lock makes me nervous ... in practice,
-> its fine)
-
-I'm not too worried about that, as we only have a single CPU performing
-the teardown. But better safe than sorry, so I'll take it anyway.
-
+> [    3.479878] kvm [1]: 8-bit VMID
+> [    3.500761] ------------[ cut here ]------------
+> [    3.505608] virt_to_phys used for non-linear address: 000000006fa7ae39
+> (__bp_harden_hyp_vecs_start+0x0/0x2000)
+> [    3.515907] WARNING: CPU: 3 PID: 1 at ../arch/arm64/mm/physaddr.c:15
+> __virt_to_phys+0x48/0x68
+> [    3.524614] Modules linked in:
+> [    3.527782] CPU: 3 PID: 1 Comm: swapper/0 Not tainted
+> 4.16.0-rc4-00024-gf6f4460e41ba-dirty #9396
+> [    3.536751] Hardware name: ARM Juno development board (r1) (DT)
+> [    3.542806] pstate: 80400005 (Nzcv daif +PAN -UAO)
+> [    3.547716] pc : __virt_to_phys+0x48/0x68
+> [    3.551832] lr : __virt_to_phys+0x48/0x68
 > 
-> 
->> +
->>  	if (boot_hyp_pgd) {
->> -		unmap_hyp_range(boot_hyp_pgd, hyp_idmap_start, PAGE_SIZE);
->>  		free_pages((unsigned long)boot_hyp_pgd, hyp_pgd_order);
->>  		boot_hyp_pgd = NULL;
->>  	}
->>  
->>  	if (hyp_pgd) {
->> -		unmap_hyp_range(hyp_pgd, hyp_idmap_start, PAGE_SIZE);
->>  		unmap_hyp_range(hyp_pgd, kern_hyp_va(PAGE_OFFSET),
->>  				(uintptr_t)high_memory - PAGE_OFFSET);
->> -		unmap_hyp_range(hyp_pgd, kern_hyp_va(VMALLOC_START),
->> -				VMALLOC_END - VMALLOC_START);
->>  
->>  		free_pages((unsigned long)hyp_pgd, hyp_pgd_order);
->>  		hyp_pgd = NULL;
->> @@ -719,7 +726,8 @@ int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
->>  			   void __iomem **kaddr,
->>  			   void __iomem **haddr)
->>  {
->> -	unsigned long start, end;
->> +	pgd_t *pgd = hyp_pgd;
->> +	unsigned long base;
->>  	int ret;
->>  
->>  	*kaddr = ioremap(phys_addr, size);
->> @@ -731,11 +739,42 @@ int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
->>  		return 0;
->>  	}
->>  
->> +	mutex_lock(&io_map_lock);
->> +
->> +	/*
->> +	 * This assumes that we we have enough space below the idmap
->> +	 * page to allocate our VAs. If not, the check below will
->> +	 * kick. A potential alternative would be to detect that
->> +	 * overflow and switch to an allocation above the idmap.
->> +	 */
->> +	size = max(PAGE_SIZE, roundup_pow_of_two(size));
->> +	base = io_map_base - size;
->> +	base &= ~(size - 1);
->>  
->> -	start = kern_hyp_va((unsigned long)*kaddr);
->> -	end = kern_hyp_va((unsigned long)*kaddr + size);
->> -	ret = __create_hyp_mappings(hyp_pgd, PTRS_PER_PGD, start, end,
->> -				     __phys_to_pfn(phys_addr), PAGE_HYP_DEVICE);
->> +	/*
->> +	 * Verify that BIT(VA_BITS - 1) hasn't been flipped by
->> +	 * allocating the new area, as it would indicate we've
->> +	 * overflowed the idmap/IO address range.
->> +	 */
->> +	if ((base ^ io_map_base) & BIT(VA_BITS - 1)) {
->> +		ret = -ENOMEM;
->> +		goto out;
->> +	}
->> +
->> +	if (__kvm_cpu_uses_extended_idmap())
->> +		pgd = boot_hyp_pgd;
->> +
->> +	ret = __create_hyp_mappings(pgd, __kvm_idmap_ptrs_per_pgd(),
->> +				    base, base + size,
->> +				    __phys_to_pfn(phys_addr), PAGE_HYP_DEVICE);
-> 
-> (/me winces, that's subtle....)
-> This __kvm_idmap_ptrs_per_pgd() change is because the hyp_pgd
-> extended-idmap top-level page may be a pgd bigger than the 64-entries that linux
-> believes it has for 64K/48bit VA?
-
-Yes, together with the 52bit PA madness.
-
-> Doesn't unmap_hyp_range() need to know about this too? Otherwise its
-> pgd_index(hyp_idmap_start) is going to mask out too much of the address, and
-> pgd_addr_end() will never reach the end address we provided...
-
-Hmmm, that's a good point. Kristina, what do you think?
-
-> Trying to boot a 64K config, and forcing it into teardown_hyp_mode() leads to
-> some fireworks: It looks like an unaligned end address is getting into
-> unmap_hyp_ptes() and its escaping the loop to kvm_set_pte() other kernel data...
-> 
-> My local changes are below [0], the config is defconfig + 64K pages, this is on
-> Juno. 4K pages is quite happy with this 'force teardown_hyp_mode()' debug hack.
-> 
-> Bisects to patch 4: "arm64: KVM: Dynamically patch the kernel/hyp VA mask"
-> 
-> I'll keep digging on Monday,
-
-Nice one! I've reproduced it on a model. It turns out that we only
-mandate a 4kB alignment for the idmap, whilst we assume page alignment
-everywhere in the code... Not great. I've fixed it as such:
-
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 7059c4f34c37..ae4eabd2005d 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -1891,7 +1891,9 @@ int kvm_mmu_init(void)
- 	int err;
-
- 	hyp_idmap_start = kvm_virt_to_phys(__hyp_idmap_text_start);
-+	hyp_idmap_start = ALIGN_DOWN(hyp_idmap_start, PAGE_SIZE);
- 	hyp_idmap_end = kvm_virt_to_phys(__hyp_idmap_text_end);
-+	hyp_idmap_end = ALIGN(hyp_idmap_end, PAGE_SIZE);
- 	hyp_idmap_vector = kvm_virt_to_phys(__kvm_hyp_init);
-
- 	/*
+> [    3.641447] Call trace:
+> [    3.643975]  __virt_to_phys+0x48/0x68
+> [    3.647739]  kvm_arch_init+0x2fc/0x734
+> [    3.651589]  kvm_init+0x28/0x2b0
+> [    3.654910]  arm_init+0x1c/0x24
+> [    3.658143]  do_one_initcall+0x38/0x11c
+> [    3.662083]  kernel_init_freeable+0x1e0/0x27c
+> [    3.666552]  kernel_init+0x10/0xfc
+> [    3.670049]  ret_from_fork+0x10/0x18
+> [    3.673731] ---[ end trace d4ef061e4bf05fc6 ]---
+> [    3.678870] kvm [1]: vgic-v2@2c04f000
+> [    3.683424] kvm [1]: vgic interrupt IRQ1
+> [    3.687675] kvm [1]: virtual timer IRQ5
+> [    3.692375] kvm [1]: Hyp mode initialized successfully
+> [    3.718640] Initialise system trusted keyrings
+Nice catch. Fixed locally.
 
 Thanks,
 
