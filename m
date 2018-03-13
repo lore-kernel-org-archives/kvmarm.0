@@ -1,16 +1,16 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v5 19/23] arm64: KVM: Allow far branches from vector slots
- to the main vectors
-Date: Mon, 12 Mar 2018 19:43:30 +0000
-Message-ID: <5f76d3c3-ab68-8f46-7ffe-b3dea21c123c@arm.com>
-References: <20180301155538.26860-1-marc.zyngier@arm.com>
- <20180301155538.26860-20-marc.zyngier@arm.com> <5AA6C674.90607@arm.com>
+From: Christoffer Dall <cdall@kernel.org>
+Subject: Re: [PATCH v2 1/2] KVM: arm/arm64: vgic: Don't populate multiple LRs
+ with the same vintid
+Date: Mon, 12 Mar 2018 17:44:09 -0700
+Message-ID: <20180313004409.GA16740@lvm>
+References: <20180311124956.7683-1-marc.zyngier@arm.com>
+ <20180311124956.7683-2-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <5AA6C674.90607@arm.com>
-Content-Language: en-GB
+Content-Disposition: inline
+In-Reply-To: <20180311124956.7683-2-marc.zyngier@arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -20,73 +20,275 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: James Morse <james.morse@arm.com>
-Cc: Mark Rutland <mark.rutland@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Christoffer Dall <cdall@kernel.org>, kvm@vger.kernel.org, Steve Capper <steve.capper@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, Eric Auger <eric.auger@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Andre Przywara <Andre.Przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi James,
-
-On 12/03/18 18:27, James Morse wrote:
-> Hi Marc,
+On Sun, Mar 11, 2018 at 12:49:55PM +0000, Marc Zyngier wrote:
+> The vgic code is trying to be clever when injecting GICv2 SGIs,
+> and will happily populate LRs with the same interrupt number if
+> they come from multiple vcpus (after all, they are distinct
+> interrupt sources).
 > 
-> On 01/03/18 15:55, Marc Zyngier wrote:
->> So far, the branch from the vector slots to the main vectors can at
->> most be 4GB from the main vectors (the reach of ADRP), and this
->> distance is known at compile time. If we were to remap the slots
->> to an unrelated VA, things would break badly.
->>
->> A way to achieve VA independence would be to load the absolute
->> address of the vectors (__kvm_hyp_vector), either using a constant
->> pool or a series of movs, followed by an indirect branch.
->>
->> This patches implements the latter solution, using another instance
->> of a patching callback.
+> Unfortunately, this is against the letter of the architecture,
+> and the GICv2 architecture spec says "Each valid interrupt stored
+> in the List registers must have a unique VirtualID for that
+> virtual CPU interface.". GICv3 has similar (although slightly
+> ambiguous) restrictions.
 > 
->> diff --git a/arch/arm64/kernel/bpi.S b/arch/arm64/kernel/bpi.S
->> index e000cb390618..e8d997788ad0 100644
->> --- a/arch/arm64/kernel/bpi.S
->> +++ b/arch/arm64/kernel/bpi.S
->> @@ -19,6 +19,9 @@
->>  #include <linux/linkage.h>
->>  #include <linux/arm-smccc.h>
->>  
->> +#include <asm/alternative.h>
->> +#include <asm/kvm_mmu.h>
->> +
->>  .macro hyp_ventry offset
->>  	.align 7
->>  	.rept 29
->> @@ -64,9 +67,15 @@ ENTRY(__bp_harden_hyp_vecs_start)
->>  	.endr
->>  
->>  __kvm_enter_vectors:
->> +alternative_cb	kvm_patch_vector_branch
->> +	movz	x1, #0
->> +	movk	x1, #0, lsl #16
->> +	movk	x1, #0, lsl #32
->> +	movk	x1, #0, lsl #48
->> +alternative_cb_end
->>  
->> -	adr_l	x1, __kvm_hyp_vector
->>  	add	x0, x1, x0
->> +	kern_hyp_va x0
+> This results in guests locking up when using GICv2-on-GICv3, for
+> example. The obvious fix is to stop trying so hard, and inject
+> a single vcpu per SGI per guest entry. After all, pending SGIs
+> with multiple source vcpus are pretty rare, and are mostly seen
+> in scenario where the physical CPUs are severely overcomitted.
 > 
-> Can't you patch the kern_hyp_va address into the movk block directly?
-> Obviously you can't call kern_hyp_va, but you could generate the layout and have
-> some slow __kern_hyp_va() to generate the value. This would avoid generating a
-> value, to then throw half of it away and patch something else in.
+> But as we now only inject a single instance of a multi-source SGI per
+> vcpu entry, we may delay those interrupts for longer than strictly
+> necessary, and run the risk of injecting lower priority interrupts
+> in the meantime.
+> 
+> In order to address this, we adopt a three stage strategy:
+> - If we encounter a multi-source SGI in the AP list while computing
+>   its depth, we force the list to be sorted
+> - When populating the LRs, we prevent the injection of any interrupt
+>   of lower priority than that of the first multi-source SGI we've
+>   injected.
+> - Finally, the injection of a multi-source SGI triggers the request
+>   of a maintenance interrupt when there will be no pending interrupt
+>   in the LRs (HCR_NPIE).
+> 
+> At the point where the last pending interrupt in the LRs switches
+> from Pending to Active, the maintenance interrupt will be delivered,
+> allowing us to add the remaining SGIs using the same process.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: 0919e84c0fc1 ("KVM: arm/arm64: vgic-new: Add IRQ sync/flush framework")
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 
-Hmmm. That's pretty twisted. Actually, this is utterly terrifying. And
-thus absolutely mandatory. Irk. I really like it.
+The fact that we have to do this is really annoying, but I see not other
+way around it.  It will get slightly better if we move to insertion sort
+based on priorities when injecting interrupts as discussed with Andre,
+though.
 
-> Does this code run for VHE systems too? (it not, is the x<<48 movk needed?)
+Acked-by: Christoffer Dall <cdall@kernel.org>
 
-This is indeed VHE only, and if/when I adopt your suggestion, we'll be
-able to drop the last movk, effectively getting rid of 6 instructions on
-the exception path. Awesome!
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+> ---
+>  include/linux/irqchip/arm-gic-v3.h |  1 +
+>  include/linux/irqchip/arm-gic.h    |  1 +
+>  virt/kvm/arm/vgic/vgic-v2.c        |  9 +++++-
+>  virt/kvm/arm/vgic/vgic-v3.c        |  9 +++++-
+>  virt/kvm/arm/vgic/vgic.c           | 61 +++++++++++++++++++++++++++++---------
+>  virt/kvm/arm/vgic/vgic.h           |  2 ++
+>  6 files changed, 67 insertions(+), 16 deletions(-)
+> 
+> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+> index c00c4c33e432..b26eccc78fb1 100644
+> --- a/include/linux/irqchip/arm-gic-v3.h
+> +++ b/include/linux/irqchip/arm-gic-v3.h
+> @@ -503,6 +503,7 @@
+>  
+>  #define ICH_HCR_EN			(1 << 0)
+>  #define ICH_HCR_UIE			(1 << 1)
+> +#define ICH_HCR_NPIE			(1 << 3)
+>  #define ICH_HCR_TC			(1 << 10)
+>  #define ICH_HCR_TALL0			(1 << 11)
+>  #define ICH_HCR_TALL1			(1 << 12)
+> diff --git a/include/linux/irqchip/arm-gic.h b/include/linux/irqchip/arm-gic.h
+> index d3453ee072fc..68d8b1f73682 100644
+> --- a/include/linux/irqchip/arm-gic.h
+> +++ b/include/linux/irqchip/arm-gic.h
+> @@ -84,6 +84,7 @@
+>  
+>  #define GICH_HCR_EN			(1 << 0)
+>  #define GICH_HCR_UIE			(1 << 1)
+> +#define GICH_HCR_NPIE			(1 << 3)
+>  
+>  #define GICH_LR_VIRTUALID		(0x3ff << 0)
+>  #define GICH_LR_PHYSID_CPUID_SHIFT	(10)
+> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+> index c32d7b93ffd1..44264d11be02 100644
+> --- a/virt/kvm/arm/vgic/vgic-v2.c
+> +++ b/virt/kvm/arm/vgic/vgic-v2.c
+> @@ -37,6 +37,13 @@ void vgic_v2_init_lrs(void)
+>  		vgic_v2_write_lr(i, 0);
+>  }
+>  
+> +void vgic_v2_set_npie(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vgic_v2_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v2;
+> +
+> +	cpuif->vgic_hcr |= GICH_HCR_NPIE;
+> +}
+> +
+>  void vgic_v2_set_underflow(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vgic_v2_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v2;
+> @@ -64,7 +71,7 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+>  	int lr;
+>  	unsigned long flags;
+>  
+> -	cpuif->vgic_hcr &= ~GICH_HCR_UIE;
+> +	cpuif->vgic_hcr &= ~(GICH_HCR_UIE | GICH_HCR_NPIE);
+>  
+>  	for (lr = 0; lr < vgic_cpu->used_lrs; lr++) {
+>  		u32 val = cpuif->vgic_lr[lr];
+> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+> index 6b329414e57a..0ff2006f3781 100644
+> --- a/virt/kvm/arm/vgic/vgic-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-v3.c
+> @@ -26,6 +26,13 @@ static bool group1_trap;
+>  static bool common_trap;
+>  static bool gicv4_enable;
+>  
+> +void vgic_v3_set_npie(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
+> +
+> +	cpuif->vgic_hcr |= ICH_HCR_NPIE;
+> +}
+> +
+>  void vgic_v3_set_underflow(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
+> @@ -47,7 +54,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+>  	int lr;
+>  	unsigned long flags;
+>  
+> -	cpuif->vgic_hcr &= ~ICH_HCR_UIE;
+> +	cpuif->vgic_hcr &= ~(ICH_HCR_UIE | ICH_HCR_NPIE);
+>  
+>  	for (lr = 0; lr < vgic_cpu->used_lrs; lr++) {
+>  		u64 val = cpuif->vgic_lr[lr];
+> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> index c7c5ef190afa..859cf88657d5 100644
+> --- a/virt/kvm/arm/vgic/vgic.c
+> +++ b/virt/kvm/arm/vgic/vgic.c
+> @@ -684,22 +684,37 @@ static inline void vgic_set_underflow(struct kvm_vcpu *vcpu)
+>  		vgic_v3_set_underflow(vcpu);
+>  }
+>  
+> +static inline void vgic_set_npie(struct kvm_vcpu *vcpu)
+> +{
+> +	if (kvm_vgic_global_state.type == VGIC_V2)
+> +		vgic_v2_set_npie(vcpu);
+> +	else
+> +		vgic_v3_set_npie(vcpu);
+> +}
+> +
+>  /* Requires the ap_list_lock to be held. */
+> -static int compute_ap_list_depth(struct kvm_vcpu *vcpu)
+> +static int compute_ap_list_depth(struct kvm_vcpu *vcpu,
+> +				 bool *multi_sgi)
+>  {
+>  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+>  	struct vgic_irq *irq;
+>  	int count = 0;
+>  
+> +	*multi_sgi = false;
+> +
+>  	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&vgic_cpu->ap_list_lock));
+>  
+>  	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
+>  		spin_lock(&irq->irq_lock);
+>  		/* GICv2 SGIs can count for more than one... */
+> -		if (vgic_irq_is_sgi(irq->intid) && irq->source)
+> -			count += hweight8(irq->source);
+> -		else
+> +		if (vgic_irq_is_sgi(irq->intid) && irq->source) {
+> +			int w = hweight8(irq->source);
+> +
+> +			count += w;
+> +			*multi_sgi |= (w > 1);
+> +		} else {
+>  			count++;
+> +		}
+>  		spin_unlock(&irq->irq_lock);
+>  	}
+>  	return count;
+> @@ -710,28 +725,43 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+>  	struct vgic_irq *irq;
+> -	int count = 0;
+> +	int count;
+> +	bool npie = false;
+> +	bool multi_sgi;
+> +	u8 prio = 0xff;
+>  
+>  	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&vgic_cpu->ap_list_lock));
+>  
+> -	if (compute_ap_list_depth(vcpu) > kvm_vgic_global_state.nr_lr)
+> +	count = compute_ap_list_depth(vcpu, &multi_sgi);
+> +	if (count > kvm_vgic_global_state.nr_lr || multi_sgi)
+>  		vgic_sort_ap_list(vcpu);
+>  
+> +	count = 0;
+> +
+>  	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
+>  		spin_lock(&irq->irq_lock);
+>  
+> -		if (unlikely(vgic_target_oracle(irq) != vcpu))
+> -			goto next;
+> -
+>  		/*
+> -		 * If we get an SGI with multiple sources, try to get
+> -		 * them in all at once.
+> +		 * If we have multi-SGIs in the pipeline, we need to
+> +		 * guarantee that they are all seen before any IRQ of
+> +		 * lower priority. In that case, we need to filter out
+> +		 * these interrupts by exiting early. This is easy as
+> +		 * the AP list has been sorted already.
+>  		 */
+> -		do {
+> +		if (multi_sgi && irq->priority > prio) {
+> +			spin_unlock(&irq->irq_lock);
+> +			break;
+> +		}
+> +
+> +		if (likely(vgic_target_oracle(irq) == vcpu)) {
+>  			vgic_populate_lr(vcpu, irq, count++);
+> -		} while (irq->source && count < kvm_vgic_global_state.nr_lr);
+>  
+> -next:
+> +			if (irq->source) {
+> +				npie = true;
+> +				prio = irq->priority;
+> +			}
+> +		}
+> +
+>  		spin_unlock(&irq->irq_lock);
+>  
+>  		if (count == kvm_vgic_global_state.nr_lr) {
+> @@ -742,6 +772,9 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+>  		}
+>  	}
+>  
+> +	if (npie)
+> +		vgic_set_npie(vcpu);
+> +
+>  	vcpu->arch.vgic_cpu.used_lrs = count;
+>  
+>  	/* Nuke remaining LRs */
+> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+> index 12c37b89f7a3..91f37c05e817 100644
+> --- a/virt/kvm/arm/vgic/vgic.h
+> +++ b/virt/kvm/arm/vgic/vgic.h
+> @@ -159,6 +159,7 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu);
+>  void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
+>  void vgic_v2_clear_lr(struct kvm_vcpu *vcpu, int lr);
+>  void vgic_v2_set_underflow(struct kvm_vcpu *vcpu);
+> +void vgic_v2_set_npie(struct kvm_vcpu *vcpu);
+>  int vgic_v2_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr);
+>  int vgic_v2_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+>  			 int offset, u32 *val);
+> @@ -188,6 +189,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu);
+>  void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
+>  void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr);
+>  void vgic_v3_set_underflow(struct kvm_vcpu *vcpu);
+> +void vgic_v3_set_npie(struct kvm_vcpu *vcpu);
+>  void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+>  void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+>  void vgic_v3_enable(struct kvm_vcpu *vcpu);
+> -- 
+> 2.14.2
+> 
