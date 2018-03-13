@@ -1,188 +1,123 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v5 14/23] arm64: KVM: Introduce EL2 VA randomisation
-Date: Tue, 13 Mar 2018 11:48:38 +0000
-Message-ID: <5AA7BA96.1030908@arm.com>
-References: <20180301155538.26860-1-marc.zyngier@arm.com>
- <20180301155538.26860-15-marc.zyngier@arm.com> <5AA7B6A0.3000905@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <5AA7B6A0.3000905@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: marc.zyngier@arm.com
-Cc: Mark Rutland <mark.rutland@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Christoffer Dall <cdall@kernel.org>, kvm@vger.kernel.org, Steve Capper <steve.capper@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+From: Peng Hao <peng.hao2@zte.com.cn>
+Subject: [PATCH] KVM: arm/arm64: replacing per-VM's per-CPU variable
+Date: Wed, 14 Mar 2018 05:03:13 +0800
+Message-ID: <1520974993-40423-1-git-send-email-peng.hao2@zte.com.cn>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: marc.zyngier@arm.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, cdall@kernel.org
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, Peng Hao <peng.hao2@zte.com.cn>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-[Resending with Marc's email address fixed, looks like I miss-operated the mouse
-and pasted some stray text in the address...]
+Using a global per-CPU variable instead of per-VM's per-CPU variable.
 
-Hi Marc,
+Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+---
+ arch/arm/include/asm/kvm_host.h   |  3 ---
+ arch/arm64/include/asm/kvm_host.h |  3 ---
+ virt/kvm/arm/arm.c                | 26 ++++++--------------------
+ 3 files changed, 6 insertions(+), 26 deletions(-)
 
-On 01/03/18 15:55, Marc Zyngier wrote:
-> The main idea behind randomising the EL2 VA is that we usually have
-> a few spare bits between the most significant bit of the VA mask
-> and the most significant bit of the linear mapping.
->
-> Those bits could be a bunch of zeroes, and could be useful
-> to move things around a bit. Of course, the more memory you have,
-> the less randomisation you get...
->
-> Alternatively, these bits could be the result of KASLR, in which
-> case they are already random. But it would be nice to have a
-> *different* randomization, just to make the job of a potential
-> attacker a bit more difficult.
->
-> Inserting these random bits is a bit involved. We don't have a spare
-> register (short of rewriting all the kern_hyp_va call sites), and
-> the immediate we want to insert is too random to be used with the
-> ORR instruction. The best option I could come up with is the following
-> sequence:
->
-> 	and x0, x0, #va_mask
-> 	ror x0, x0, #first_random_bit
-> 	add x0, x0, #(random & 0xfff)
-> 	add x0, x0, #(random >> 12), lsl #12
-> 	ror x0, x0, #(63 - first_random_bit)
->
-> making it a fairly long sequence, but one that a decent CPU should
-> be able to execute without breaking a sweat. It is of course NOPed
-> out on VHE. The last 4 instructions can also be turned into NOPs
-> if it appears that there is no free bits to use.
-
-> diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
-> index 2bcbc1d33b64..a73e47804972 100644
-> --- a/arch/arm64/kvm/va_layout.c
-> +++ b/arch/arm64/kvm/va_layout.c
-> @@ -16,24 +16,62 @@
->   */
->  
->  #include <linux/kvm_host.h>
-> +#include <linux/random.h>
-> +#include <linux/memblock.h>
->  #include <asm/alternative.h>
->  #include <asm/debug-monitors.h>
->  #include <asm/insn.h>
->  #include <asm/kvm_mmu.h>
->  
-> +/*
-> + * The LSB of the random hyp VA tag or 0 if no randomization is used.
-> + */
-> +static u8 tag_lsb;
-> +/*
-> + * The random hyp VA tag value with the region bit if hyp randomization is used
-> + */
-> +static u64 tag_val;
->  static u64 va_mask;
->  
->  static void compute_layout(void)
->  {
->  	phys_addr_t idmap_addr = __pa_symbol(__hyp_idmap_text_start);
->  	u64 hyp_va_msb;
-> +	int kva_msb;
->  
->  	/* Where is my RAM region? */
->  	hyp_va_msb  = idmap_addr & BIT(VA_BITS - 1);
->  	hyp_va_msb ^= BIT(VA_BITS - 1);
->  
-> -	va_mask  = GENMASK_ULL(VA_BITS - 2, 0);
-> -	va_mask |= hyp_va_msb;
-> +	kva_msb = fls64((u64)phys_to_virt(memblock_start_of_DRAM()) ^
-> +			(u64)(high_memory - 1));
-> +	if (kva_msb == (VA_BITS - 1)) {
-> +		/*
-> +		 * No space in the address, let's compute the mask so
-> +		 * that it covers (VA_BITS - 1) bits, and the region
-> +		 * bit. The tag stays set to zero.
-> +		 */
-> +		va_mask  = BIT(VA_BITS - 1) - 1;
-> +		va_mask |= hyp_va_msb;
-> +	} else {
-> +		/*
-> +		 * We do have some free bits to insert a random tag.
-> +		 * Hyp VAs are now created from kernel linear map VAs
-> +		 * using the following formula (with V == VA_BITS):
-> +		 *
-> +		 *  63 ... V |     V-1    | V-2 .. tag_lsb | tag_lsb - 1 .. 0
-> +		 *  ---------------------------------------------------------
-> +		 * | 0000000 | hyp_va_msb |    random tag  |  kern linear VA |
-> +		 */
-> +		u64 mask = GENMASK_ULL(VA_BITS - 2, tag_lsb);
-
-(tag_lsb is 0 at this point, but you shift out the bits you didn't want later)
-
-
-> +
-> +		tag_lsb = kva_msb;
-> +		va_mask = GENMASK_ULL(tag_lsb - 1, 0);
-> +		tag_val  = get_random_long() & mask;
-> +		tag_val |= hyp_va_msb;
-> +		tag_val >>= tag_lsb;
-> +	}
->  }
-
->  static u32 compute_instruction(int n, u32 rd, u32 rn)
-> @@ -46,6 +84,33 @@ static u32 compute_instruction(int n, u32 rd, u32 rn)
->  							  AARCH64_INSN_VARIANT_64BIT,
->  							  rn, rd, va_mask);
->  		break;
-> +
-> +	case 1:
-> +		/* ROR is a variant of EXTR with Rm = Rn */
-> +		insn = aarch64_insn_gen_extr(AARCH64_INSN_VARIANT_64BIT,
-> +					     rn, rn, rd,
-> +					     tag_lsb);
-> +		break;
-> +
-> +	case 2:
-> +		insn = aarch64_insn_gen_add_sub_imm(rd, rn,
-> +						    tag_val & (SZ_4K - 1),
-> +						    AARCH64_INSN_VARIANT_64BIT,
-> +						    AARCH64_INSN_ADSB_ADD);
-> +		break;
-> +
-> +	case 3:
-> +		insn = aarch64_insn_gen_add_sub_imm(rd, rn,
-> +						    tag_val & GENMASK(23, 12),
-> +						    AARCH64_INSN_VARIANT_64BIT,
-> +						    AARCH64_INSN_ADSB_ADD);
-> +		break;
-
-(This mix of GENMASK() and (SZ_4K - 1) feels a bit odd)
-
-
-> @@ -68,8 +132,12 @@ void __init kvm_update_va_mask(struct alt_instr *alt,
->  		/*
->  		 * VHE doesn't need any address translation, let's NOP
->  		 * everything.
-> +		 *
-> +		 * Alternatively, if we don't have any spare bits in
-> +		 * the address, NOP everything after masking that
-> +		 * kernel VA.
->  		 */
-
-> -		if (has_vhe()) {
-> +		if (has_vhe() || (!tag_lsb && i > 1)) {
->  			updptr[i] = aarch64_insn_gen_nop();
->  			continue;
->  		}
-
-Typo? Won't this keep the first ror too, instead of just the 'and'?
-| (!tag_lsb && i > 0)
-
-(I agree 'ROR #0' is still a NOP)
-
-Reviewed-by: James Morse <james.morse@arm.com>
-
-
-Thanks,
-
-James
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index 248b930..4224f3b 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -59,9 +59,6 @@ struct kvm_arch {
+ 	/* VTTBR value associated with below pgd and vmid */
+ 	u64    vttbr;
+ 
+-	/* The last vcpu id that ran on each physical CPU */
+-	int __percpu *last_vcpu_ran;
+-
+ 	/*
+ 	 * Anything that is not used directly from assembly code goes
+ 	 * here.
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 596f8e4..5035a08 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -67,9 +67,6 @@ struct kvm_arch {
+ 	/* VTTBR value associated with above pgd and vmid */
+ 	u64    vttbr;
+ 
+-	/* The last vcpu id that ran on each physical CPU */
+-	int __percpu *last_vcpu_ran;
+-
+ 	/* The maximum number of vCPUs depends on the used GIC model */
+ 	int max_vcpus;
+ 
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 86941f6..a67ffb0 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -59,6 +59,8 @@
+ /* Per-CPU variable containing the currently running vcpu. */
+ static DEFINE_PER_CPU(struct kvm_vcpu *, kvm_arm_running_vcpu);
+ 
++static DEFINE_PER_CPU(struct kvm_vcpu *, kvm_last_ran_vcpu);
++
+ /* The VMID used in the VTTBR */
+ static atomic64_t kvm_vmid_gen = ATOMIC64_INIT(1);
+ static u32 kvm_next_vmid;
+@@ -115,18 +117,11 @@ void kvm_arch_check_processor_compat(void *rtn)
+  */
+ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ {
+-	int ret, cpu;
++	int ret;
+ 
+ 	if (type)
+ 		return -EINVAL;
+ 
+-	kvm->arch.last_vcpu_ran = alloc_percpu(typeof(*kvm->arch.last_vcpu_ran));
+-	if (!kvm->arch.last_vcpu_ran)
+-		return -ENOMEM;
+-
+-	for_each_possible_cpu(cpu)
+-		*per_cpu_ptr(kvm->arch.last_vcpu_ran, cpu) = -1;
+-
+ 	ret = kvm_alloc_stage2_pgd(kvm);
+ 	if (ret)
+ 		goto out_fail_alloc;
+@@ -147,9 +142,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	return ret;
+ out_free_stage2_pgd:
+ 	kvm_free_stage2_pgd(kvm);
+-out_fail_alloc:
+-	free_percpu(kvm->arch.last_vcpu_ran);
+-	kvm->arch.last_vcpu_ran = NULL;
++out_fail_alloc:
+ 	return ret;
+ }
+ 
+@@ -179,9 +172,6 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+ 
+ 	kvm_vgic_destroy(kvm);
+ 
+-	free_percpu(kvm->arch.last_vcpu_ran);
+-	kvm->arch.last_vcpu_ran = NULL;
+-
+ 	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
+ 		if (kvm->vcpus[i]) {
+ 			kvm_arch_vcpu_free(kvm->vcpus[i]);
+@@ -343,17 +333,13 @@ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
+ 
+ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ {
+-	int *last_ran;
+-
+-	last_ran = this_cpu_ptr(vcpu->kvm->arch.last_vcpu_ran);
+-
+ 	/*
+ 	 * We might get preempted before the vCPU actually runs, but
+ 	 * over-invalidation doesn't affect correctness.
+ 	 */
+-	if (*last_ran != vcpu->vcpu_id) {
++	if (per_cpu(kvm_last_ran_vcpu, cpu) != vcpu) {
+ 		kvm_call_hyp(__kvm_tlb_flush_local_vmid, vcpu);
+-		*last_ran = vcpu->vcpu_id;
++		per_cpu(kvm_last_ran_vcpu, cpu) = vcpu;
+ 	}
+ 
+ 	vcpu->cpu = cpu;
+-- 
+1.8.3.1
