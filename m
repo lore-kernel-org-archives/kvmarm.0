@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v6 18/26] arm64: KVM: Move vector offsetting from hyp-init.S
- to kvm_get_hyp_vector
-Date: Wed, 14 Mar 2018 16:50:41 +0000
-Message-ID: <20180314165049.30105-19-marc.zyngier@arm.com>
+Subject: [PATCH v6 17/26] arm64: Update the KVM memory map documentation
+Date: Wed, 14 Mar 2018 16:50:40 +0000
+Message-ID: <20180314165049.30105-18-marc.zyngier@arm.com>
 References: <20180314165049.30105-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 56E474A037
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 81F9C4A035
  for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Mar 2018 12:46:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cvPnaKjP6rbH for <kvmarm@lists.cs.columbia.edu>;
- Wed, 14 Mar 2018 12:45:55 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AD74849FEF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Mar 2018 12:44:11 -0400 (EDT)
+ with ESMTP id waBybAhW9KrE for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 14 Mar 2018 12:45:54 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B9B549FED
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Mar 2018 12:44:09 -0400 (EDT)
 In-Reply-To: <20180314165049.30105-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,51 +31,33 @@ To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.c
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We currently provide the hyp-init code with a kernel VA, and expect
-it to turn it into a HYP va by itself. As we're about to provide
-the hypervisor with mappings that are not necessarily in the memory
-range, let's move the kern_hyp_va macro to kvm_get_hyp_vector.
+Update the documentation to reflect the new tricks we play on the
+EL2 mappings...
 
-No functionnal change.
-
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/kvm_mmu.h | 3 ++-
- arch/arm64/kvm/hyp-init.S        | 1 -
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ Documentation/arm64/memory.txt | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index a5e0fc900de8..bfb81e73da06 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -374,6 +374,7 @@ static inline void *kvm_get_hyp_vector(void)
- 			vect = lm_alias(vect);
- 	}
+diff --git a/Documentation/arm64/memory.txt b/Documentation/arm64/memory.txt
+index 671bc0639262..c58cc5dbe667 100644
+--- a/Documentation/arm64/memory.txt
++++ b/Documentation/arm64/memory.txt
+@@ -86,9 +86,11 @@ Translation table lookup with 64KB pages:
+  +-------------------------------------------------> [63] TTBR0/1
  
-+	vect = kern_hyp_va(vect);
- 	return vect;
- }
  
-@@ -387,7 +388,7 @@ static inline int kvm_map_vectors(void)
- #else
- static inline void *kvm_get_hyp_vector(void)
- {
--	return kvm_ksym_ref(__kvm_hyp_vector);
-+	return kern_hyp_va(kvm_ksym_ref(__kvm_hyp_vector));
- }
+-When using KVM without the Virtualization Host Extensions, the hypervisor
+-maps kernel pages in EL2 at a fixed offset from the kernel VA. See the
+-kern_hyp_va macro for more details.
++When using KVM without the Virtualization Host Extensions, the
++hypervisor maps kernel pages in EL2 at a fixed (and potentially
++random) offset from the linear mapping. See the kern_hyp_va macro and
++kvm_update_va_mask function for more details. MMIO devices such as
++GICv2 gets mapped next to the HYP idmap page.
  
- static inline int kvm_map_vectors(void)
-diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp-init.S
-index 5aa9ccf6db99..6fd91b31a131 100644
---- a/arch/arm64/kvm/hyp-init.S
-+++ b/arch/arm64/kvm/hyp-init.S
-@@ -117,7 +117,6 @@ CPU_BE(	orr	x4, x4, #SCTLR_ELx_EE)
- 	/* Set the stack and new vectors */
- 	kern_hyp_va	x1
- 	mov	sp, x1
--	kern_hyp_va	x2
- 	msr	vbar_el2, x2
- 
- 	/* copy tpidr_el1 into tpidr_el2 for use by HYP */
+ When using KVM with the Virtualization Host Extensions, no additional
+ mappings are created, since the host kernel runs directly in EL2.
 -- 
 2.14.2
