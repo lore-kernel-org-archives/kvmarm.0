@@ -1,23 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v6 20/26] arm64: KVM: Move BP hardening vectors into .hyp.text
- section
-Date: Wed, 14 Mar 2018 16:50:43 +0000
-Message-ID: <20180314165049.30105-21-marc.zyngier@arm.com>
+Subject: [PATCH v6 21/26] arm64: KVM: Reserve 4 additional instructions in the
+ BPI template
+Date: Wed, 14 Mar 2018 16:50:44 +0000
+Message-ID: <20180314165049.30105-22-marc.zyngier@arm.com>
 References: <20180314165049.30105-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E08C49FEF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Mar 2018 12:47:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A41C049F94
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Mar 2018 12:47:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nImyK66UpNiq for <kvmarm@lists.cs.columbia.edu>;
- Wed, 14 Mar 2018 12:46:39 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6053F49FA9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Mar 2018 12:44:16 -0400 (EDT)
+ with ESMTP id 0sh-JkoTnQAY for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 14 Mar 2018 12:47:00 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B238C49FB3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Mar 2018 12:44:18 -0400 (EDT)
 In-Reply-To: <20180314165049.30105-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,87 +32,79 @@ To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.c
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-There is no reason why the BP hardening vectors shouldn't be part
-of the HYP text at compile time, rather than being mapped at runtime.
+So far, we only reserve a single instruction in the BPI template in
+order to branch to the vectors. As we're going to stuff a few more
+instructions there, let's reserve a total of 5 instructions, which
+we're going to patch later on as required.
 
-Also introduce a new config symbol that controls the compilation
-of bpi.S.
+We also introduce a small refactor of the vectors themselves, so that
+we stop carrying the target branch around.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/kvm_mmu.h | 4 +---
- arch/arm64/kernel/Makefile       | 4 +---
- arch/arm64/kernel/bpi.S          | 6 ++++++
- arch/arm64/kvm/Kconfig           | 3 +++
- 4 files changed, 11 insertions(+), 6 deletions(-)
+ arch/arm64/kernel/bpi.S | 39 +++++++++++++++------------------------
+ 1 file changed, 15 insertions(+), 24 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index bfb81e73da06..c2beb2d25170 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -380,9 +380,7 @@ static inline void *kvm_get_hyp_vector(void)
- 
- static inline int kvm_map_vectors(void)
- {
--	return create_hyp_mappings(kvm_ksym_ref(__bp_harden_hyp_vecs_start),
--				   kvm_ksym_ref(__bp_harden_hyp_vecs_end),
--				   PAGE_HYP_EXEC);
-+	return 0;
- }
- 
- #else
-diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
-index b87541360f43..93bce17109a6 100644
---- a/arch/arm64/kernel/Makefile
-+++ b/arch/arm64/kernel/Makefile
-@@ -54,9 +54,7 @@ arm64-reloc-test-y := reloc_test_core.o reloc_test_syms.o
- arm64-obj-$(CONFIG_CRASH_DUMP)		+= crash_dump.o
- arm64-obj-$(CONFIG_ARM_SDE_INTERFACE)	+= sdei.o
- 
--ifeq ($(CONFIG_KVM),y)
--arm64-obj-$(CONFIG_HARDEN_BRANCH_PREDICTOR)	+= bpi.o
--endif
-+arm64-obj-$(CONFIG_KVM_INDIRECT_VECTORS)+= bpi.o
- 
- obj-y					+= $(arm64-obj-y) vdso/ probes/
- obj-m					+= $(arm64-obj-m)
 diff --git a/arch/arm64/kernel/bpi.S b/arch/arm64/kernel/bpi.S
-index e5de33513b5d..447188e2a664 100644
+index 447188e2a664..ce1cfe3b24e6 100644
 --- a/arch/arm64/kernel/bpi.S
 +++ b/arch/arm64/kernel/bpi.S
-@@ -48,6 +48,10 @@
- 	ventry \target + 0x780
+@@ -19,33 +19,24 @@
+ #include <linux/linkage.h>
+ #include <linux/arm-smccc.h>
+ 
+-.macro ventry target
+-	.rept 31
++.macro hyp_ventry
++	.align 7
++1:	.rept 27
+ 	nop
+ 	.endr
+-	b	\target
++	b	__kvm_hyp_vector + (1b - 0b)
++	nop
++	nop
++	nop
++	nop
  .endm
  
-+
-+	.text
-+	.pushsection	.hyp.text, "ax"
-+
+-.macro vectors target
+-	ventry \target + 0x000
+-	ventry \target + 0x080
+-	ventry \target + 0x100
+-	ventry \target + 0x180
+-
+-	ventry \target + 0x200
+-	ventry \target + 0x280
+-	ventry \target + 0x300
+-	ventry \target + 0x380
+-
+-	ventry \target + 0x400
+-	ventry \target + 0x480
+-	ventry \target + 0x500
+-	ventry \target + 0x580
+-
+-	ventry \target + 0x600
+-	ventry \target + 0x680
+-	ventry \target + 0x700
+-	ventry \target + 0x780
++.macro generate_vectors
++0:
++	.rept 16
++	hyp_ventry
++	.endr
++	.org 0b + SZ_2K		// Safety measure
+ .endm
+ 
+ 
+@@ -55,7 +46,7 @@
  	.align	11
  ENTRY(__bp_harden_hyp_vecs_start)
  	.rept 4
-@@ -55,6 +59,8 @@ ENTRY(__bp_harden_hyp_vecs_start)
+-	vectors __kvm_hyp_vector
++	generate_vectors
  	.endr
  ENTRY(__bp_harden_hyp_vecs_end)
  
-+	.popsection
-+
- ENTRY(__qcom_hyp_sanitize_link_stack_start)
- 	stp     x29, x30, [sp, #-16]!
- 	.rept	16
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index 2257dfcc44cc..bd8cc03d7522 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -57,6 +57,9 @@ config KVM_ARM_PMU
- 	  Adds support for a virtual Performance Monitoring Unit (PMU) in
- 	  virtual machines.
- 
-+config KVM_INDIRECT_VECTORS
-+       def_bool KVM && HARDEN_BRANCH_PREDICTOR
-+
- source drivers/vhost/Kconfig
- 
- endif # VIRTUALIZATION
 -- 
 2.14.2
