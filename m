@@ -1,7 +1,7 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v6 04/26] arm64: KVM: Dynamically patch the kernel/hyp VA mask
-Date: Wed, 14 Mar 2018 16:50:27 +0000
-Message-ID: <20180314165049.30105-5-marc.zyngier@arm.com>
+Subject: [PATCH v6 14/26] arm64: insn: Allow ADD/SUB (immediate) with LSL #12
+Date: Wed, 14 Mar 2018 16:50:37 +0000
+Message-ID: <20180314165049.30105-15-marc.zyngier@arm.com>
 References: <20180314165049.30105-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -21,210 +21,62 @@ To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.c
 Cc: Mark Rutland <mark.rutland@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Christoffer Dall <cdall@kernel.org>, Steve Capper <steve.capper@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, James Morse <james.morse@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-So far, we're using a complicated sequence of alternatives to
-patch the kernel/hyp VA mask on non-VHE, and NOP out the
-masking altogether when on VHE.
+The encoder for ADD/SUB (immediate) can only cope with 12bit
+immediates, while there is an encoding for a 12bit immediate shifted
+by 12 bits to the left.
 
-The newly introduced dynamic patching gives us the opportunity
-to simplify that code by patching a single instruction with
-the correct mask (instead of the mind bending cummulative masking
-we have at the moment) or even a single NOP on VHE. This also
-adds some initial code that will allow the patching callback
-to switch to a more complex patching.
+Let's fix this small oversight by allowing the LSL_12 bit to be set.
 
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/kvm_mmu.h | 46 ++++++--------------
- arch/arm64/kvm/Makefile          |  2 +-
- arch/arm64/kvm/va_layout.c       | 91 ++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 105 insertions(+), 34 deletions(-)
- create mode 100644 arch/arm64/kvm/va_layout.c
+ arch/arm64/kernel/insn.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 7faed6e48b46..e3bc1d0a5e93 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -69,9 +69,6 @@
-  * mappings, and none of this applies in that case.
-  */
+diff --git a/arch/arm64/kernel/insn.c b/arch/arm64/kernel/insn.c
+index 2929adaad587..816d03c4c913 100644
+--- a/arch/arm64/kernel/insn.c
++++ b/arch/arm64/kernel/insn.c
+@@ -35,6 +35,7 @@
  
--#define HYP_PAGE_OFFSET_HIGH_MASK	((UL(1) << VA_BITS) - 1)
--#define HYP_PAGE_OFFSET_LOW_MASK	((UL(1) << (VA_BITS - 1)) - 1)
--
- #ifdef __ASSEMBLY__
+ #define AARCH64_INSN_SF_BIT	BIT(31)
+ #define AARCH64_INSN_N_BIT	BIT(22)
++#define AARCH64_INSN_LSL_12	BIT(22)
  
- #include <asm/alternative.h>
-@@ -81,28 +78,15 @@
-  * Convert a kernel VA into a HYP VA.
-  * reg: VA to be converted.
-  *
-- * This generates the following sequences:
-- * - High mask:
-- *		and x0, x0, #HYP_PAGE_OFFSET_HIGH_MASK
-- *		nop
-- * - Low mask:
-- *		and x0, x0, #HYP_PAGE_OFFSET_HIGH_MASK
-- *		and x0, x0, #HYP_PAGE_OFFSET_LOW_MASK
-- * - VHE:
-- *		nop
-- *		nop
-- *
-- * The "low mask" version works because the mask is a strict subset of
-- * the "high mask", hence performing the first mask for nothing.
-- * Should be completely invisible on any viable CPU.
-+ * The actual code generation takes place in kvm_update_va_mask, and
-+ * the instructions below are only there to reserve the space and
-+ * perform the register allocation (kvm_update_va_mask uses the
-+ * specific registers encoded in the instructions).
-  */
- .macro kern_hyp_va	reg
--alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
--	and     \reg, \reg, #HYP_PAGE_OFFSET_HIGH_MASK
--alternative_else_nop_endif
--alternative_if ARM64_HYP_OFFSET_LOW
--	and     \reg, \reg, #HYP_PAGE_OFFSET_LOW_MASK
--alternative_else_nop_endif
-+alternative_cb kvm_update_va_mask
-+	and     \reg, \reg, #1
-+alternative_cb_end
- .endm
+ static int aarch64_insn_encoding_class[] = {
+ 	AARCH64_INSN_CLS_UNKNOWN,
+@@ -903,9 +904,18 @@ u32 aarch64_insn_gen_add_sub_imm(enum aarch64_insn_register dst,
+ 		return AARCH64_BREAK_FAULT;
+ 	}
  
- #else
-@@ -113,18 +97,14 @@ alternative_else_nop_endif
- #include <asm/mmu_context.h>
- #include <asm/pgtable.h>
- 
-+void kvm_update_va_mask(struct alt_instr *alt,
-+			__le32 *origptr, __le32 *updptr, int nr_inst);
++	/* We can't encode more than a 24bit value (12bit + 12bit shift) */
++	if (imm & ~(BIT(24) - 1))
++		goto out;
 +
- static inline unsigned long __kern_hyp_va(unsigned long v)
- {
--	asm volatile(ALTERNATIVE("and %0, %0, %1",
--				 "nop",
--				 ARM64_HAS_VIRT_HOST_EXTN)
--		     : "+r" (v)
--		     : "i" (HYP_PAGE_OFFSET_HIGH_MASK));
--	asm volatile(ALTERNATIVE("nop",
--				 "and %0, %0, %1",
--				 ARM64_HYP_OFFSET_LOW)
--		     : "+r" (v)
--		     : "i" (HYP_PAGE_OFFSET_LOW_MASK));
-+	asm volatile(ALTERNATIVE_CB("and %0, %0, #1\n",
-+				    kvm_update_va_mask)
-+		     : "+r" (v));
- 	return v;
++	/* If we have something in the top 12 bits... */
+ 	if (imm & ~(SZ_4K - 1)) {
+-		pr_err("%s: invalid immediate encoding %d\n", __func__, imm);
+-		return AARCH64_BREAK_FAULT;
++		/* ... and in the low 12 bits -> error */
++		if (imm & (SZ_4K - 1))
++			goto out;
++
++		imm >>= 12;
++		insn |= AARCH64_INSN_LSL_12;
+ 	}
+ 
+ 	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RD, insn, dst);
+@@ -913,6 +923,10 @@ u32 aarch64_insn_gen_add_sub_imm(enum aarch64_insn_register dst,
+ 	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RN, insn, src);
+ 
+ 	return aarch64_insn_encode_immediate(AARCH64_INSN_IMM_12, insn, imm);
++
++out:
++	pr_err("%s: invalid immediate encoding %d\n", __func__, imm);
++	return AARCH64_BREAK_FAULT;
  }
  
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index 87c4f7ae24de..93afff91cb7c 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -16,7 +16,7 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/e
- kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arm.o $(KVM)/arm/mmu.o $(KVM)/arm/mmio.o
- kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/psci.o $(KVM)/arm/perf.o
- 
--kvm-$(CONFIG_KVM_ARM_HOST) += inject_fault.o regmap.o
-+kvm-$(CONFIG_KVM_ARM_HOST) += inject_fault.o regmap.o va_layout.o
- kvm-$(CONFIG_KVM_ARM_HOST) += hyp.o hyp-init.o handle_exit.o
- kvm-$(CONFIG_KVM_ARM_HOST) += guest.o debug.o reset.o sys_regs.o sys_regs_generic_v8.o
- kvm-$(CONFIG_KVM_ARM_HOST) += vgic-sys-reg-v3.o
-diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
-new file mode 100644
-index 000000000000..45e7802328d4
---- /dev/null
-+++ b/arch/arm64/kvm/va_layout.c
-@@ -0,0 +1,91 @@
-+/*
-+ * Copyright (C) 2017 ARM Ltd.
-+ * Author: Marc Zyngier <marc.zyngier@arm.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include <linux/kvm_host.h>
-+#include <asm/alternative.h>
-+#include <asm/debug-monitors.h>
-+#include <asm/insn.h>
-+#include <asm/kvm_mmu.h>
-+
-+#define HYP_PAGE_OFFSET_HIGH_MASK	((UL(1) << VA_BITS) - 1)
-+#define HYP_PAGE_OFFSET_LOW_MASK	((UL(1) << (VA_BITS - 1)) - 1)
-+
-+static u64 va_mask;
-+
-+static void compute_layout(void)
-+{
-+	phys_addr_t idmap_addr = __pa_symbol(__hyp_idmap_text_start);
-+	unsigned long mask = HYP_PAGE_OFFSET_HIGH_MASK;
-+
-+	/*
-+	 * Activate the lower HYP offset only if the idmap doesn't
-+	 * clash with it,
-+	 */
-+	if (idmap_addr > HYP_PAGE_OFFSET_LOW_MASK)
-+		mask = HYP_PAGE_OFFSET_LOW_MASK;
-+
-+	va_mask = mask;
-+}
-+
-+static u32 compute_instruction(int n, u32 rd, u32 rn)
-+{
-+	u32 insn = AARCH64_BREAK_FAULT;
-+
-+	switch (n) {
-+	case 0:
-+		insn = aarch64_insn_gen_logical_immediate(AARCH64_INSN_LOGIC_AND,
-+							  AARCH64_INSN_VARIANT_64BIT,
-+							  rn, rd, va_mask);
-+		break;
-+	}
-+
-+	return insn;
-+}
-+
-+void __init kvm_update_va_mask(struct alt_instr *alt,
-+			       __le32 *origptr, __le32 *updptr, int nr_inst)
-+{
-+	int i;
-+
-+	/* We only expect a single instruction in the alternative sequence */
-+	BUG_ON(nr_inst != 1);
-+
-+	if (!has_vhe() && !va_mask)
-+		compute_layout();
-+
-+	for (i = 0; i < nr_inst; i++) {
-+		u32 rd, rn, insn, oinsn;
-+
-+		/*
-+		 * VHE doesn't need any address translation, let's NOP
-+		 * everything.
-+		 */
-+		if (has_vhe()) {
-+			updptr[i] = aarch64_insn_gen_nop();
-+			continue;
-+		}
-+
-+		oinsn = le32_to_cpu(origptr[i]);
-+		rd = aarch64_insn_decode_register(AARCH64_INSN_REGTYPE_RD, oinsn);
-+		rn = aarch64_insn_decode_register(AARCH64_INSN_REGTYPE_RN, oinsn);
-+
-+		insn = compute_instruction(i, rd, rn);
-+		BUG_ON(insn == AARCH64_BREAK_FAULT);
-+
-+		updptr[i] = cpu_to_le32(insn);
-+	}
-+}
+ u32 aarch64_insn_gen_bitfield(enum aarch64_insn_register dst,
 -- 
 2.14.2
