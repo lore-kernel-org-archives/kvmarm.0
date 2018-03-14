@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v6 12/26] KVM: arm/arm64: Move HYP IO VAs to the "idmap" range
-Date: Wed, 14 Mar 2018 16:50:35 +0000
-Message-ID: <20180314165049.30105-13-marc.zyngier@arm.com>
+Subject: [PATCH v6 13/26] arm64; insn: Add encoder for the EXTR instruction
+Date: Wed, 14 Mar 2018 16:50:36 +0000
+Message-ID: <20180314165049.30105-14-marc.zyngier@arm.com>
 References: <20180314165049.30105-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C57849FA2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Mar 2018 12:45:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CE46049F9E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Mar 2018 12:45:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Sm4Cqaly7QHV for <kvmarm@lists.cs.columbia.edu>;
- Wed, 14 Mar 2018 12:44:40 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A43F049F94
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Mar 2018 12:43:57 -0400 (EDT)
+ with ESMTP id dybqPk938mTb for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 14 Mar 2018 12:45:21 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 04BCD49FC8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Mar 2018 12:44:00 -0400 (EDT)
 In-Reply-To: <20180314165049.30105-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,173 +31,80 @@ To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.c
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We so far mapped our HYP IO (which is essentially the GICv2 control
-registers) using the same method as for memory. It recently appeared
-that is a bit unsafe:
+Add an encoder for the EXTR instruction, which also implements the ROR
+variant (where Rn == Rm).
 
-We compute the HYP VA using the kern_hyp_va helper, but that helper
-is only designed to deal with kernel VAs coming from the linear map,
-and not from the vmalloc region... This could in turn cause some bad
-aliasing between the two, amplified by the upcoming VA randomisation.
-
-A solution is to come up with our very own basic VA allocator for
-MMIO. Since half of the HYP address space only contains a single
-page (the idmap), we have plenty to borrow from. Let's use the idmap
-as a base, and allocate downwards from it. GICv2 now lives on the
-other side of the great VA barrier.
-
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/kvm_mmu.h |  3 ++
- virt/kvm/arm/mmu.c             | 72 ++++++++++++++++++++++++++++++++++--------
- 2 files changed, 62 insertions(+), 13 deletions(-)
+ arch/arm64/include/asm/insn.h |  6 ++++++
+ arch/arm64/kernel/insn.c      | 32 ++++++++++++++++++++++++++++++++
+ 2 files changed, 38 insertions(+)
 
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index 5b12a3d2755e..26eb6b1cec9b 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -49,6 +49,9 @@
- #include <asm/pgalloc.h>
- #include <asm/stage2_pgtable.h>
- 
-+/* Ensure compatibility with arm64 */
-+#define VA_BITS			32
-+
- int create_hyp_mappings(void *from, void *to, pgprot_t prot);
- int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
- 			   void __iomem **kaddr,
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 9946f8a38b26..a9577ecc3e6a 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -43,6 +43,9 @@ static unsigned long hyp_idmap_start;
- static unsigned long hyp_idmap_end;
- static phys_addr_t hyp_idmap_vector;
- 
-+static DEFINE_MUTEX(io_map_lock);
-+static unsigned long io_map_base;
-+
- #define S2_PGD_SIZE	(PTRS_PER_S2_PGD * sizeof(pgd_t))
- #define hyp_pgd_order get_order(PTRS_PER_PGD * sizeof(pgd_t))
- 
-@@ -518,27 +521,37 @@ static void unmap_hyp_idmap_range(pgd_t *pgdp, phys_addr_t start, u64 size)
-  *
-  * Assumes hyp_pgd is a page table used strictly in Hyp-mode and
-  * therefore contains either mappings in the kernel memory area (above
-- * PAGE_OFFSET), or device mappings in the vmalloc range (from
-- * VMALLOC_START to VMALLOC_END).
-+ * PAGE_OFFSET), or device mappings in the idmap range.
-  *
-- * boot_hyp_pgd should only map two pages for the init code.
-+ * boot_hyp_pgd should only map the idmap range, and is only used in
-+ * the extended idmap case.
-  */
- void free_hyp_pgds(void)
- {
-+	pgd_t *id_pgd;
-+
- 	mutex_lock(&kvm_hyp_pgd_mutex);
- 
-+	id_pgd = boot_hyp_pgd ? boot_hyp_pgd : hyp_pgd;
-+
-+	if (id_pgd) {
-+		mutex_lock(&io_map_lock);
-+		/* In case we never called hyp_mmu_init() */
-+		if (!io_map_base)
-+			io_map_base = hyp_idmap_start;
-+		unmap_hyp_idmap_range(id_pgd, io_map_base,
-+				      hyp_idmap_start + PAGE_SIZE - io_map_base);
-+		mutex_unlock(&io_map_lock);
-+	}
-+
- 	if (boot_hyp_pgd) {
--		unmap_hyp_idmap_range(boot_hyp_pgd, hyp_idmap_start, PAGE_SIZE);
- 		free_pages((unsigned long)boot_hyp_pgd, hyp_pgd_order);
- 		boot_hyp_pgd = NULL;
- 	}
- 
- 	if (hyp_pgd) {
--		unmap_hyp_idmap_range(hyp_pgd, hyp_idmap_start, PAGE_SIZE);
- 		unmap_hyp_range(hyp_pgd, kern_hyp_va(PAGE_OFFSET),
- 				(uintptr_t)high_memory - PAGE_OFFSET);
--		unmap_hyp_range(hyp_pgd, kern_hyp_va(VMALLOC_START),
--				VMALLOC_END - VMALLOC_START);
- 
- 		free_pages((unsigned long)hyp_pgd, hyp_pgd_order);
- 		hyp_pgd = NULL;
-@@ -735,7 +748,8 @@ int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
- 			   void __iomem **kaddr,
- 			   void __iomem **haddr)
- {
--	unsigned long start, end;
-+	pgd_t *pgd = hyp_pgd;
-+	unsigned long base;
- 	int ret;
- 
- 	*kaddr = ioremap(phys_addr, size);
-@@ -747,11 +761,43 @@ int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
- 		return 0;
- 	}
- 
-+	mutex_lock(&io_map_lock);
- 
--	start = kern_hyp_va((unsigned long)*kaddr);
--	end = kern_hyp_va((unsigned long)*kaddr + size);
--	ret = __create_hyp_mappings(hyp_pgd, PTRS_PER_PGD, start, end,
--				     __phys_to_pfn(phys_addr), PAGE_HYP_DEVICE);
-+	/*
-+	 * This assumes that we we have enough space below the idmap
-+	 * page to allocate our VAs. If not, the check below will
-+	 * kick. A potential alternative would be to detect that
-+	 * overflow and switch to an allocation above the idmap.
-+	 *
-+	 * The allocated size is always a multiple of PAGE_SIZE.
-+	 */
-+	size = PAGE_ALIGN(size + offset_in_page(phys_addr));
-+	base = io_map_base - size;
-+
-+	/*
-+	 * Verify that BIT(VA_BITS - 1) hasn't been flipped by
-+	 * allocating the new area, as it would indicate we've
-+	 * overflowed the idmap/IO address range.
-+	 */
-+	if ((base ^ io_map_base) & BIT(VA_BITS - 1)) {
-+		ret = -ENOMEM;
-+		goto out;
-+	}
-+
-+	if (__kvm_cpu_uses_extended_idmap())
-+		pgd = boot_hyp_pgd;
-+
-+	ret = __create_hyp_mappings(pgd, __kvm_idmap_ptrs_per_pgd(),
-+				    base, base + size,
-+				    __phys_to_pfn(phys_addr), PAGE_HYP_DEVICE);
-+	if (ret)
-+		goto out;
-+
-+	*haddr = (void __iomem *)base + offset_in_page(phys_addr);
-+	io_map_base = base;
-+
-+out:
-+	mutex_unlock(&io_map_lock);
- 
- 	if (ret) {
- 		iounmap(*kaddr);
-@@ -759,7 +805,6 @@ int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
- 		return ret;
- 	}
- 
--	*haddr = (void __iomem *)start;
- 	return 0;
+diff --git a/arch/arm64/include/asm/insn.h b/arch/arm64/include/asm/insn.h
+index 815b35bc53ed..f62c56b1793f 100644
+--- a/arch/arm64/include/asm/insn.h
++++ b/arch/arm64/include/asm/insn.h
+@@ -319,6 +319,7 @@ __AARCH64_INSN_FUNCS(and_imm,	0x7F800000, 0x12000000)
+ __AARCH64_INSN_FUNCS(orr_imm,	0x7F800000, 0x32000000)
+ __AARCH64_INSN_FUNCS(eor_imm,	0x7F800000, 0x52000000)
+ __AARCH64_INSN_FUNCS(ands_imm,	0x7F800000, 0x72000000)
++__AARCH64_INSN_FUNCS(extr,	0x7FA00000, 0x13800000)
+ __AARCH64_INSN_FUNCS(b,		0xFC000000, 0x14000000)
+ __AARCH64_INSN_FUNCS(bl,	0xFC000000, 0x94000000)
+ __AARCH64_INSN_FUNCS(cbz,	0x7F000000, 0x34000000)
+@@ -433,6 +434,11 @@ u32 aarch64_insn_gen_logical_immediate(enum aarch64_insn_logic_type type,
+ 				       enum aarch64_insn_register Rn,
+ 				       enum aarch64_insn_register Rd,
+ 				       u64 imm);
++u32 aarch64_insn_gen_extr(enum aarch64_insn_variant variant,
++			  enum aarch64_insn_register Rm,
++			  enum aarch64_insn_register Rn,
++			  enum aarch64_insn_register Rd,
++			  u8 lsb);
+ u32 aarch64_insn_gen_prefetch(enum aarch64_insn_register base,
+ 			      enum aarch64_insn_prfm_type type,
+ 			      enum aarch64_insn_prfm_target target,
+diff --git a/arch/arm64/kernel/insn.c b/arch/arm64/kernel/insn.c
+index e87d6dcd7c82..2929adaad587 100644
+--- a/arch/arm64/kernel/insn.c
++++ b/arch/arm64/kernel/insn.c
+@@ -1621,3 +1621,35 @@ u32 aarch64_insn_gen_logical_immediate(enum aarch64_insn_logic_type type,
+ 	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RN, insn, Rn);
+ 	return aarch64_encode_immediate(imm, variant, insn);
  }
- 
-@@ -1892,6 +1937,7 @@ int kvm_mmu_init(void)
- 			goto out;
- 	}
- 
-+	io_map_base = hyp_idmap_start;
- 	return 0;
- out:
- 	free_hyp_pgds();
++
++u32 aarch64_insn_gen_extr(enum aarch64_insn_variant variant,
++			  enum aarch64_insn_register Rm,
++			  enum aarch64_insn_register Rn,
++			  enum aarch64_insn_register Rd,
++			  u8 lsb)
++{
++	u32 insn;
++
++	insn = aarch64_insn_get_extr_value();
++
++	switch (variant) {
++	case AARCH64_INSN_VARIANT_32BIT:
++		if (lsb > 31)
++			return AARCH64_BREAK_FAULT;
++		break;
++	case AARCH64_INSN_VARIANT_64BIT:
++		if (lsb > 63)
++			return AARCH64_BREAK_FAULT;
++		insn |= AARCH64_INSN_SF_BIT;
++		insn = aarch64_insn_encode_immediate(AARCH64_INSN_IMM_N, insn, 1);
++		break;
++	default:
++		pr_err("%s: unknown variant encoding %d\n", __func__, variant);
++		return AARCH64_BREAK_FAULT;
++	}
++
++	insn = aarch64_insn_encode_immediate(AARCH64_INSN_IMM_S, insn, lsb);
++	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RD, insn, Rd);
++	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RN, insn, Rn);
++	return aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RM, insn, Rm);
++}
 -- 
 2.14.2
