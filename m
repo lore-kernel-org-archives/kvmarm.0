@@ -1,82 +1,124 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v6 14/26] arm64: insn: Allow ADD/SUB (immediate) with LSL #12
-Date: Wed, 14 Mar 2018 16:50:37 +0000
-Message-ID: <20180314165049.30105-15-marc.zyngier@arm.com>
+Subject: [PATCH v6 06/26] KVM: arm/arm64: Do not use kern_hyp_va() with
+ kvm_vgic_global_state
+Date: Wed, 14 Mar 2018 16:50:29 +0000
+Message-ID: <20180314165049.30105-7-marc.zyngier@arm.com>
 References: <20180314165049.30105-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9860B49FF2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Mar 2018 12:44:14 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 2CgP6U3RxMFi for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 14 Mar 2018 12:43:52 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7479549FA9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Mar 2018 12:43:43 -0400 (EDT)
 In-Reply-To: <20180314165049.30105-1-marc.zyngier@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: Mark Rutland <mark.rutland@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Christoffer Dall <cdall@kernel.org>, Steve Capper <steve.capper@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, James Morse <james.morse@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The encoder for ADD/SUB (immediate) can only cope with 12bit
-immediates, while there is an encoding for a 12bit immediate shifted
-by 12 bits to the left.
+kvm_vgic_global_state is part of the read-only section, and is
+usually accessed using a PC-relative address generation (adrp + add).
 
-Let's fix this small oversight by allowing the LSL_12 bit to be set.
+It is thus useless to use kern_hyp_va() on it, and actively problematic
+if kern_hyp_va() becomes non-idempotent. On the other hand, there is
+no way that the compiler is going to guarantee that such access is
+always PC relative.
 
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+So let's bite the bullet and provide our own accessor.
+
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kernel/insn.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
+ arch/arm/include/asm/kvm_mmu.h   |  7 +++++++
+ arch/arm64/include/asm/kvm_mmu.h | 20 ++++++++++++++++++++
+ virt/kvm/arm/hyp/vgic-v2-sr.c    |  4 ++--
+ 3 files changed, 29 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kernel/insn.c b/arch/arm64/kernel/insn.c
-index 2929adaad587..816d03c4c913 100644
---- a/arch/arm64/kernel/insn.c
-+++ b/arch/arm64/kernel/insn.c
-@@ -35,6 +35,7 @@
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index de1b919404e4..a6808d2869f5 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -28,6 +28,13 @@
+  */
+ #define kern_hyp_va(kva)	(kva)
  
- #define AARCH64_INSN_SF_BIT	BIT(31)
- #define AARCH64_INSN_N_BIT	BIT(22)
-+#define AARCH64_INSN_LSL_12	BIT(22)
- 
- static int aarch64_insn_encoding_class[] = {
- 	AARCH64_INSN_CLS_UNKNOWN,
-@@ -903,9 +904,18 @@ u32 aarch64_insn_gen_add_sub_imm(enum aarch64_insn_register dst,
- 		return AARCH64_BREAK_FAULT;
- 	}
- 
-+	/* We can't encode more than a 24bit value (12bit + 12bit shift) */
-+	if (imm & ~(BIT(24) - 1))
-+		goto out;
++/* Resolving symbol addresses in a PC-relative way is easy... */
++#define hyp_symbol_addr(s)						\
++	({								\
++		typeof(s) *addr = &(s);					\
++		addr;							\
++	})
 +
-+	/* If we have something in the top 12 bits... */
- 	if (imm & ~(SZ_4K - 1)) {
--		pr_err("%s: invalid immediate encoding %d\n", __func__, imm);
--		return AARCH64_BREAK_FAULT;
-+		/* ... and in the low 12 bits -> error */
-+		if (imm & (SZ_4K - 1))
-+			goto out;
+ /*
+  * KVM_MMU_CACHE_MIN_PAGES is the number of stage2 page table translation levels.
+  */
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index e3bc1d0a5e93..7120bf3f22c7 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -110,6 +110,26 @@ static inline unsigned long __kern_hyp_va(unsigned long v)
+ 
+ #define kern_hyp_va(v) 	((typeof(v))(__kern_hyp_va((unsigned long)(v))))
+ 
++/*
++ * Obtain the PC-relative address of a kernel symbol
++ * s: symbol
++ *
++ * The goal of this macro is to return a symbol's address based on a
++ * PC-relative computation, as opposed to a loading the VA from a
++ * constant pool or something similar. This works well for HYP, as an
++ * absolute VA is guaranteed to be wrong. Only use this if trying to
++ * obtain the address of a symbol (i.e. not something you obtained by
++ * following a pointer).
++ */
++#define hyp_symbol_addr(s)						\
++	({								\
++		typeof(s) *addr;					\
++		asm volatile("adrp	%0, %1\n"			\
++			     "add	%0, %0, :lo12:%1\n"		\
++			     : "=r" (addr) : "S" (&s));			\
++		addr;							\
++	})
 +
-+		imm >>= 12;
-+		insn |= AARCH64_INSN_LSL_12;
- 	}
+ /*
+  * We currently only support a 40bit IPA.
+  */
+diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
+index 4fe6e797e8b3..a6ca049d9651 100644
+--- a/virt/kvm/arm/hyp/vgic-v2-sr.c
++++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
+@@ -26,7 +26,7 @@
+ static void __hyp_text save_elrsr(struct kvm_vcpu *vcpu, void __iomem *base)
+ {
+ 	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+-	int nr_lr = (kern_hyp_va(&kvm_vgic_global_state))->nr_lr;
++	int nr_lr = hyp_symbol_addr(kvm_vgic_global_state)->nr_lr;
+ 	u32 elrsr0, elrsr1;
  
- 	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RD, insn, dst);
-@@ -913,6 +923,10 @@ u32 aarch64_insn_gen_add_sub_imm(enum aarch64_insn_register dst,
- 	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RN, insn, src);
+ 	elrsr0 = readl_relaxed(base + GICH_ELRSR0);
+@@ -140,7 +140,7 @@ int __hyp_text __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
+ 		return -1;
  
- 	return aarch64_insn_encode_immediate(AARCH64_INSN_IMM_12, insn, imm);
-+
-+out:
-+	pr_err("%s: invalid immediate encoding %d\n", __func__, imm);
-+	return AARCH64_BREAK_FAULT;
- }
+ 	rd = kvm_vcpu_dabt_get_rd(vcpu);
+-	addr  = kern_hyp_va((kern_hyp_va(&kvm_vgic_global_state))->vcpu_base_va);
++	addr  = kern_hyp_va(hyp_symbol_addr(kvm_vgic_global_state)->vcpu_base_va);
+ 	addr += fault_ipa - vgic->vgic_cpu_base;
  
- u32 aarch64_insn_gen_bitfield(enum aarch64_insn_register dst,
+ 	if (kvm_vcpu_dabt_iswrite(vcpu)) {
 -- 
 2.14.2
