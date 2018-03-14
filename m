@@ -1,23 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v6 06/26] KVM: arm/arm64: Do not use kern_hyp_va() with
- kvm_vgic_global_state
-Date: Wed, 14 Mar 2018 16:50:29 +0000
-Message-ID: <20180314165049.30105-7-marc.zyngier@arm.com>
+Subject: [PATCH v6 05/26] arm64: cpufeatures: Drop the ARM64_HYP_OFFSET_LOW
+ feature flag
+Date: Wed, 14 Mar 2018 16:50:28 +0000
+Message-ID: <20180314165049.30105-6-marc.zyngier@arm.com>
 References: <20180314165049.30105-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9860B49FF2
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B4AF949FA9
  for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Mar 2018 12:44:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2CgP6U3RxMFi for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id Qo0vOQUCgEwc for <kvmarm@lists.cs.columbia.edu>;
  Wed, 14 Mar 2018 12:43:52 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7479549FA9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Mar 2018 12:43:43 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 214B949FA7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Mar 2018 12:43:41 -0400 (EDT)
 In-Reply-To: <20180314165049.30105-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,93 +32,68 @@ To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.c
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-kvm_vgic_global_state is part of the read-only section, and is
-usually accessed using a PC-relative address generation (adrp + add).
+Now that we can dynamically compute the kernek/hyp VA mask, there
+is no need for a feature flag to trigger the alternative patching.
+Let's drop the flag and everything that depends on it.
 
-It is thus useless to use kern_hyp_va() on it, and actively problematic
-if kern_hyp_va() becomes non-idempotent. On the other hand, there is
-no way that the compiler is going to guarantee that such access is
-always PC relative.
-
-So let's bite the bullet and provide our own accessor.
-
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/kvm_mmu.h   |  7 +++++++
- arch/arm64/include/asm/kvm_mmu.h | 20 ++++++++++++++++++++
- virt/kvm/arm/hyp/vgic-v2-sr.c    |  4 ++--
- 3 files changed, 29 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/cpucaps.h |  2 +-
+ arch/arm64/kernel/cpufeature.c   | 19 -------------------
+ 2 files changed, 1 insertion(+), 20 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index de1b919404e4..a6808d2869f5 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -28,6 +28,13 @@
-  */
- #define kern_hyp_va(kva)	(kva)
+diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+index bb263820de13..76a43a17449a 100644
+--- a/arch/arm64/include/asm/cpucaps.h
++++ b/arch/arm64/include/asm/cpucaps.h
+@@ -32,7 +32,7 @@
+ #define ARM64_HAS_VIRT_HOST_EXTN		11
+ #define ARM64_WORKAROUND_CAVIUM_27456		12
+ #define ARM64_HAS_32BIT_EL0			13
+-#define ARM64_HYP_OFFSET_LOW			14
++/* #define ARM64_UNALLOCATED_ENTRY			14 */
+ #define ARM64_MISMATCHED_CACHE_LINE_SIZE	15
+ #define ARM64_HAS_NO_FPSIMD			16
+ #define ARM64_WORKAROUND_REPEAT_TLBI		17
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 2985a067fc13..5b25d56bccfd 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -831,19 +831,6 @@ static bool runs_at_el2(const struct arm64_cpu_capabilities *entry, int __unused
+ 	return is_kernel_in_hyp_mode();
+ }
  
-+/* Resolving symbol addresses in a PC-relative way is easy... */
-+#define hyp_symbol_addr(s)						\
-+	({								\
-+		typeof(s) *addr = &(s);					\
-+		addr;							\
-+	})
-+
- /*
-  * KVM_MMU_CACHE_MIN_PAGES is the number of stage2 page table translation levels.
-  */
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index e3bc1d0a5e93..7120bf3f22c7 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -110,6 +110,26 @@ static inline unsigned long __kern_hyp_va(unsigned long v)
- 
- #define kern_hyp_va(v) 	((typeof(v))(__kern_hyp_va((unsigned long)(v))))
- 
-+/*
-+ * Obtain the PC-relative address of a kernel symbol
-+ * s: symbol
-+ *
-+ * The goal of this macro is to return a symbol's address based on a
-+ * PC-relative computation, as opposed to a loading the VA from a
-+ * constant pool or something similar. This works well for HYP, as an
-+ * absolute VA is guaranteed to be wrong. Only use this if trying to
-+ * obtain the address of a symbol (i.e. not something you obtained by
-+ * following a pointer).
-+ */
-+#define hyp_symbol_addr(s)						\
-+	({								\
-+		typeof(s) *addr;					\
-+		asm volatile("adrp	%0, %1\n"			\
-+			     "add	%0, %0, :lo12:%1\n"		\
-+			     : "=r" (addr) : "S" (&s));			\
-+		addr;							\
-+	})
-+
- /*
-  * We currently only support a 40bit IPA.
-  */
-diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
-index 4fe6e797e8b3..a6ca049d9651 100644
---- a/virt/kvm/arm/hyp/vgic-v2-sr.c
-+++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
-@@ -26,7 +26,7 @@
- static void __hyp_text save_elrsr(struct kvm_vcpu *vcpu, void __iomem *base)
+-static bool hyp_offset_low(const struct arm64_cpu_capabilities *entry,
+-			   int __unused)
+-{
+-	phys_addr_t idmap_addr = __pa_symbol(__hyp_idmap_text_start);
+-
+-	/*
+-	 * Activate the lower HYP offset only if:
+-	 * - the idmap doesn't clash with it,
+-	 * - the kernel is not running at EL2.
+-	 */
+-	return idmap_addr > GENMASK(VA_BITS - 2, 0) && !is_kernel_in_hyp_mode();
+-}
+-
+ static bool has_no_fpsimd(const struct arm64_cpu_capabilities *entry, int __unused)
  {
- 	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
--	int nr_lr = (kern_hyp_va(&kvm_vgic_global_state))->nr_lr;
-+	int nr_lr = hyp_symbol_addr(kvm_vgic_global_state)->nr_lr;
- 	u32 elrsr0, elrsr1;
- 
- 	elrsr0 = readl_relaxed(base + GICH_ELRSR0);
-@@ -140,7 +140,7 @@ int __hyp_text __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
- 		return -1;
- 
- 	rd = kvm_vcpu_dabt_get_rd(vcpu);
--	addr  = kern_hyp_va((kern_hyp_va(&kvm_vgic_global_state))->vcpu_base_va);
-+	addr  = kern_hyp_va(hyp_symbol_addr(kvm_vgic_global_state)->vcpu_base_va);
- 	addr += fault_ipa - vgic->vgic_cpu_base;
- 
- 	if (kvm_vcpu_dabt_iswrite(vcpu)) {
+ 	u64 pfr0 = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
+@@ -1029,12 +1016,6 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.field_pos = ID_AA64PFR0_EL0_SHIFT,
+ 		.min_field_value = ID_AA64PFR0_EL0_32BIT_64BIT,
+ 	},
+-	{
+-		.desc = "Reduced HYP mapping offset",
+-		.capability = ARM64_HYP_OFFSET_LOW,
+-		.def_scope = SCOPE_SYSTEM,
+-		.matches = hyp_offset_low,
+-	},
+ #ifdef CONFIG_UNMAP_KERNEL_AT_EL0
+ 	{
+ 		.desc = "Kernel page table isolation (KPTI)",
 -- 
 2.14.2
