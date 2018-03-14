@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v6 13/26] arm64; insn: Add encoder for the EXTR instruction
-Date: Wed, 14 Mar 2018 16:50:36 +0000
-Message-ID: <20180314165049.30105-14-marc.zyngier@arm.com>
+Subject: [PATCH v6 15/26] arm64: KVM: Dynamically compute the HYP VA mask
+Date: Wed, 14 Mar 2018 16:50:38 +0000
+Message-ID: <20180314165049.30105-16-marc.zyngier@arm.com>
 References: <20180314165049.30105-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CE46049F9E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Mar 2018 12:45:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C94040357
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Mar 2018 12:46:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dybqPk938mTb for <kvmarm@lists.cs.columbia.edu>;
- Wed, 14 Mar 2018 12:45:21 -0400 (EDT)
+ with ESMTP id a40HjyBm+QNR for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 14 Mar 2018 12:45:51 -0400 (EDT)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 04BCD49FC8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Mar 2018 12:44:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AB11949FDE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Mar 2018 12:44:04 -0400 (EDT)
 In-Reply-To: <20180314165049.30105-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,80 +31,55 @@ To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.c
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add an encoder for the EXTR instruction, which also implements the ROR
-variant (where Rn == Rm).
+As we're moving towards a much more dynamic way to compute our
+HYP VA, let's express the mask in a slightly different way.
 
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Instead of comparing the idmap position to the "low" VA mask,
+we directly compute the mask by taking into account the idmap's
+(VA_BIT-1) bit.
+
+No functionnal change.
+
 Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/insn.h |  6 ++++++
- arch/arm64/kernel/insn.c      | 32 ++++++++++++++++++++++++++++++++
- 2 files changed, 38 insertions(+)
+ arch/arm64/kvm/va_layout.c | 17 ++++++-----------
+ 1 file changed, 6 insertions(+), 11 deletions(-)
 
-diff --git a/arch/arm64/include/asm/insn.h b/arch/arm64/include/asm/insn.h
-index 815b35bc53ed..f62c56b1793f 100644
---- a/arch/arm64/include/asm/insn.h
-+++ b/arch/arm64/include/asm/insn.h
-@@ -319,6 +319,7 @@ __AARCH64_INSN_FUNCS(and_imm,	0x7F800000, 0x12000000)
- __AARCH64_INSN_FUNCS(orr_imm,	0x7F800000, 0x32000000)
- __AARCH64_INSN_FUNCS(eor_imm,	0x7F800000, 0x52000000)
- __AARCH64_INSN_FUNCS(ands_imm,	0x7F800000, 0x72000000)
-+__AARCH64_INSN_FUNCS(extr,	0x7FA00000, 0x13800000)
- __AARCH64_INSN_FUNCS(b,		0xFC000000, 0x14000000)
- __AARCH64_INSN_FUNCS(bl,	0xFC000000, 0x94000000)
- __AARCH64_INSN_FUNCS(cbz,	0x7F000000, 0x34000000)
-@@ -433,6 +434,11 @@ u32 aarch64_insn_gen_logical_immediate(enum aarch64_insn_logic_type type,
- 				       enum aarch64_insn_register Rn,
- 				       enum aarch64_insn_register Rd,
- 				       u64 imm);
-+u32 aarch64_insn_gen_extr(enum aarch64_insn_variant variant,
-+			  enum aarch64_insn_register Rm,
-+			  enum aarch64_insn_register Rn,
-+			  enum aarch64_insn_register Rd,
-+			  u8 lsb);
- u32 aarch64_insn_gen_prefetch(enum aarch64_insn_register base,
- 			      enum aarch64_insn_prfm_type type,
- 			      enum aarch64_insn_prfm_target target,
-diff --git a/arch/arm64/kernel/insn.c b/arch/arm64/kernel/insn.c
-index e87d6dcd7c82..2929adaad587 100644
---- a/arch/arm64/kernel/insn.c
-+++ b/arch/arm64/kernel/insn.c
-@@ -1621,3 +1621,35 @@ u32 aarch64_insn_gen_logical_immediate(enum aarch64_insn_logic_type type,
- 	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RN, insn, Rn);
- 	return aarch64_encode_immediate(imm, variant, insn);
+diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
+index 45e7802328d4..2bcbc1d33b64 100644
+--- a/arch/arm64/kvm/va_layout.c
++++ b/arch/arm64/kvm/va_layout.c
+@@ -21,24 +21,19 @@
+ #include <asm/insn.h>
+ #include <asm/kvm_mmu.h>
+ 
+-#define HYP_PAGE_OFFSET_HIGH_MASK	((UL(1) << VA_BITS) - 1)
+-#define HYP_PAGE_OFFSET_LOW_MASK	((UL(1) << (VA_BITS - 1)) - 1)
+-
+ static u64 va_mask;
+ 
+ static void compute_layout(void)
+ {
+ 	phys_addr_t idmap_addr = __pa_symbol(__hyp_idmap_text_start);
+-	unsigned long mask = HYP_PAGE_OFFSET_HIGH_MASK;
++	u64 hyp_va_msb;
+ 
+-	/*
+-	 * Activate the lower HYP offset only if the idmap doesn't
+-	 * clash with it,
+-	 */
+-	if (idmap_addr > HYP_PAGE_OFFSET_LOW_MASK)
+-		mask = HYP_PAGE_OFFSET_LOW_MASK;
++	/* Where is my RAM region? */
++	hyp_va_msb  = idmap_addr & BIT(VA_BITS - 1);
++	hyp_va_msb ^= BIT(VA_BITS - 1);
+ 
+-	va_mask = mask;
++	va_mask  = GENMASK_ULL(VA_BITS - 2, 0);
++	va_mask |= hyp_va_msb;
  }
-+
-+u32 aarch64_insn_gen_extr(enum aarch64_insn_variant variant,
-+			  enum aarch64_insn_register Rm,
-+			  enum aarch64_insn_register Rn,
-+			  enum aarch64_insn_register Rd,
-+			  u8 lsb)
-+{
-+	u32 insn;
-+
-+	insn = aarch64_insn_get_extr_value();
-+
-+	switch (variant) {
-+	case AARCH64_INSN_VARIANT_32BIT:
-+		if (lsb > 31)
-+			return AARCH64_BREAK_FAULT;
-+		break;
-+	case AARCH64_INSN_VARIANT_64BIT:
-+		if (lsb > 63)
-+			return AARCH64_BREAK_FAULT;
-+		insn |= AARCH64_INSN_SF_BIT;
-+		insn = aarch64_insn_encode_immediate(AARCH64_INSN_IMM_N, insn, 1);
-+		break;
-+	default:
-+		pr_err("%s: unknown variant encoding %d\n", __func__, variant);
-+		return AARCH64_BREAK_FAULT;
-+	}
-+
-+	insn = aarch64_insn_encode_immediate(AARCH64_INSN_IMM_S, insn, lsb);
-+	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RD, insn, Rd);
-+	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RN, insn, Rn);
-+	return aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RM, insn, Rm);
-+}
+ 
+ static u32 compute_instruction(int n, u32 rd, u32 rn)
 -- 
 2.14.2
