@@ -1,187 +1,125 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v6 23/26] arm/arm64: KVM: Introduce EL2-specific executable
- mappings
-Date: Wed, 14 Mar 2018 16:50:46 +0000
-Message-ID: <20180314165049.30105-24-marc.zyngier@arm.com>
+Subject: [PATCH v6 24/26] arm64: Make BP hardening slot counter available
+Date: Wed, 14 Mar 2018 16:50:47 +0000
+Message-ID: <20180314165049.30105-25-marc.zyngier@arm.com>
 References: <20180314165049.30105-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2890B4043C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Mar 2018 12:48:35 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id iWs8hY-0a7CQ for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 14 Mar 2018 12:48:12 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B1E2D49FA0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Mar 2018 12:44:25 -0400 (EDT)
 In-Reply-To: <20180314165049.30105-1-marc.zyngier@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: Mark Rutland <mark.rutland@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Christoffer Dall <cdall@kernel.org>, Steve Capper <steve.capper@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, James Morse <james.morse@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Until now, all EL2 executable mappings were derived from their
-EL1 VA. Since we want to decouple the vectors mapping from
-the rest of the hypervisor, we need to be able to map some
-text somewhere else.
+We're about to need to allocate hardening slots from other parts
+of the kernel (in order to support ARM64_HARDEN_EL2_VECTORS).
 
-The "idmap" region (for lack of a better name) is ideally suited
-for this, as we have a huge range that hardly has anything in it.
-
-Let's extend the IO allocator to also deal with executable mappings,
-thus providing the required feature.
+Turn the counter into an atomic_t and make it available to the
+rest of the kernel. Also add BP_HARDEN_EL2_SLOTS as the number of
+slots instead of the hardcoded 4...
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/kvm_mmu.h   |  2 +
- arch/arm64/include/asm/kvm_mmu.h |  2 +
- virt/kvm/arm/mmu.c               | 80 +++++++++++++++++++++++++++++-----------
- 3 files changed, 63 insertions(+), 21 deletions(-)
+ arch/arm64/include/asm/mmu.h   | 3 +++
+ arch/arm64/kernel/bpi.S        | 3 ++-
+ arch/arm64/kernel/cpu_errata.c | 9 ++++-----
+ 3 files changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index 26eb6b1cec9b..1b7f592eae57 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -56,6 +56,8 @@ int create_hyp_mappings(void *from, void *to, pgprot_t prot);
- int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
- 			   void __iomem **kaddr,
- 			   void __iomem **haddr);
-+int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
-+			     void **haddr);
- void free_hyp_pgds(void);
+diff --git a/arch/arm64/include/asm/mmu.h b/arch/arm64/include/asm/mmu.h
+index a050d4f3615d..3baf010fe883 100644
+--- a/arch/arm64/include/asm/mmu.h
++++ b/arch/arm64/include/asm/mmu.h
+@@ -21,6 +21,8 @@
+ #define USER_ASID_FLAG	(UL(1) << USER_ASID_BIT)
+ #define TTBR_ASID_MASK	(UL(0xffff) << 48)
  
- void stage2_unmap_vm(struct kvm *kvm);
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index c2beb2d25170..97af11065bbd 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -151,6 +151,8 @@ int create_hyp_mappings(void *from, void *to, pgprot_t prot);
- int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
- 			   void __iomem **kaddr,
- 			   void __iomem **haddr);
-+int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
-+			     void **haddr);
- void free_hyp_pgds(void);
++#define BP_HARDEN_EL2_SLOTS 4
++
+ #ifndef __ASSEMBLY__
  
- void stage2_unmap_vm(struct kvm *kvm);
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index b4d1948c8dd6..554ad5493e7d 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -737,30 +737,13 @@ int create_hyp_mappings(void *from, void *to, pgprot_t prot)
+ typedef struct {
+@@ -51,6 +53,7 @@ struct bp_hardening_data {
+ 
+ #ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
+ extern char __bp_harden_hyp_vecs_start[], __bp_harden_hyp_vecs_end[];
++extern atomic_t arm64_el2_vector_last_slot;
+ 
+ DECLARE_PER_CPU_READ_MOSTLY(struct bp_hardening_data, bp_hardening_data);
+ 
+diff --git a/arch/arm64/kernel/bpi.S b/arch/arm64/kernel/bpi.S
+index dc51ef2ce98a..bb0b67722e86 100644
+--- a/arch/arm64/kernel/bpi.S
++++ b/arch/arm64/kernel/bpi.S
+@@ -20,6 +20,7 @@
+ #include <linux/arm-smccc.h>
+ 
+ #include <asm/alternative.h>
++#include <asm/mmu.h>
+ 
+ .macro hyp_ventry
+ 	.align 7
+@@ -66,7 +67,7 @@ alternative_cb_end
+ 
+ 	.align	11
+ ENTRY(__bp_harden_hyp_vecs_start)
+-	.rept 4
++	.rept BP_HARDEN_EL2_SLOTS
+ 	generate_vectors
+ 	.endr
+ ENTRY(__bp_harden_hyp_vecs_end)
+diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
+index 52f15cd896e1..8cf6b60a085a 100644
+--- a/arch/arm64/kernel/cpu_errata.c
++++ b/arch/arm64/kernel/cpu_errata.c
+@@ -60,6 +60,8 @@ static int cpu_enable_trap_ctr_access(void *__unused)
  	return 0;
  }
  
--/**
-- * create_hyp_io_mappings - Map IO into both kernel and HYP
-- * @phys_addr:	The physical start address which gets mapped
-- * @size:	Size of the region being mapped
-- * @kaddr:	Kernel VA for this mapping
-- * @haddr:	HYP VA for this mapping
-- */
--int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
--			   void __iomem **kaddr,
--			   void __iomem **haddr)
-+static int __create_hyp_private_mapping(phys_addr_t phys_addr, size_t size,
-+					unsigned long *haddr, pgprot_t prot)
++atomic_t arm64_el2_vector_last_slot = ATOMIC_INIT(-1);
++
+ #ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
+ #include <asm/mmu_context.h>
+ #include <asm/cacheflush.h>
+@@ -90,7 +92,6 @@ static void __install_bp_hardening_cb(bp_hardening_cb_t fn,
+ 				      const char *hyp_vecs_start,
+ 				      const char *hyp_vecs_end)
  {
- 	pgd_t *pgd = hyp_pgd;
- 	unsigned long base;
- 	int ret;
+-	static int last_slot = -1;
+ 	static DEFINE_SPINLOCK(bp_lock);
+ 	int cpu, slot = -1;
  
--	*kaddr = ioremap(phys_addr, size);
--	if (!*kaddr)
--		return -ENOMEM;
--
--	if (is_kernel_in_hyp_mode()) {
--		*haddr = *kaddr;
--		return 0;
--	}
--
- 	mutex_lock(&io_map_lock);
- 
- 	/*
-@@ -789,22 +772,77 @@ int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
- 
- 	ret = __create_hyp_mappings(pgd, __kvm_idmap_ptrs_per_pgd(),
- 				    base, base + size,
--				    __phys_to_pfn(phys_addr), PAGE_HYP_DEVICE);
-+				    __phys_to_pfn(phys_addr), prot);
- 	if (ret)
- 		goto out;
- 
--	*haddr = (void __iomem *)base + offset_in_page(phys_addr);
-+	*haddr = base + offset_in_page(phys_addr);
- 	io_map_base = base;
- 
- out:
- 	mutex_unlock(&io_map_lock);
- 
-+	return ret;
-+}
-+
-+/**
-+ * create_hyp_io_mappings - Map IO into both kernel and HYP
-+ * @phys_addr:	The physical start address which gets mapped
-+ * @size:	Size of the region being mapped
-+ * @kaddr:	Kernel VA for this mapping
-+ * @haddr:	HYP VA for this mapping
-+ */
-+int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
-+			   void __iomem **kaddr,
-+			   void __iomem **haddr)
-+{
-+	unsigned long addr;
-+	int ret;
-+
-+	*kaddr = ioremap(phys_addr, size);
-+	if (!*kaddr)
-+		return -ENOMEM;
-+
-+	if (is_kernel_in_hyp_mode()) {
-+		*haddr = *kaddr;
-+		return 0;
-+	}
-+
-+	ret = __create_hyp_private_mapping(phys_addr, size,
-+					   &addr, PAGE_HYP_DEVICE);
- 	if (ret) {
- 		iounmap(*kaddr);
- 		*kaddr = NULL;
-+		*haddr = NULL;
-+		return ret;
-+	}
-+
-+	*haddr = (void __iomem *)addr;
-+	return 0;
-+}
-+
-+/**
-+ * create_hyp_exec_mappings - Map an executable range into into HYP
-+ * @phys_addr:	The physical start address which gets mapped
-+ * @size:	Size of the region being mapped
-+ * @haddr:	HYP VA for this mapping
-+ */
-+int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
-+			     void **haddr)
-+{
-+	unsigned long addr;
-+	int ret;
-+
-+	BUG_ON(is_kernel_in_hyp_mode());
-+
-+	ret = __create_hyp_private_mapping(phys_addr, size,
-+					   &addr, PAGE_HYP_EXEC);
-+	if (ret) {
-+		*haddr = NULL;
- 		return ret;
+@@ -103,10 +104,8 @@ static void __install_bp_hardening_cb(bp_hardening_cb_t fn,
  	}
  
-+	*haddr = (void *)addr;
- 	return 0;
- }
+ 	if (slot == -1) {
+-		last_slot++;
+-		BUG_ON(((__bp_harden_hyp_vecs_end - __bp_harden_hyp_vecs_start)
+-			/ SZ_2K) <= last_slot);
+-		slot = last_slot;
++		slot = atomic_inc_return(&arm64_el2_vector_last_slot);
++		BUG_ON(slot >= BP_HARDEN_EL2_SLOTS);
+ 		__copy_hyp_vect_bpi(slot, hyp_vecs_start, hyp_vecs_end);
+ 	}
  
 -- 
 2.14.2
