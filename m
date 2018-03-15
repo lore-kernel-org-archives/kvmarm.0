@@ -1,74 +1,237 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCH v1 13/16] kvm: arm64: Configure VTCR per VM
-Date: Thu, 15 Mar 2018 15:24:58 +0000
-Message-ID: <514dda83-dd08-3318-b5a2-6c41fc1c992d@arm.com>
-References: <20180109190414.4017-1-suzuki.poulose@arm.com>
- <20180109190414.4017-14-suzuki.poulose@arm.com>
- <CAMJs5B_yvM8XNT=g8uN63G1G6uwGQcYF_0dxbC1Gaeb+j6UvpQ@mail.gmail.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v6 23/26] arm/arm64: KVM: Introduce EL2-specific
+ executable mappings
+Date: Thu, 15 Mar 2018 15:53:44 +0000
+Message-ID: <1adb50ba-da20-9418-3143-b13d18526b49@arm.com>
+References: <20180314165049.30105-1-marc.zyngier@arm.com>
+ <20180314165049.30105-24-marc.zyngier@arm.com>
+ <20180315150320.tfx35o6yaaln4rzg@kamzik.brq.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAMJs5B_yvM8XNT=g8uN63G1G6uwGQcYF_0dxbC1Gaeb+j6UvpQ@mail.gmail.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Christoffer Dall <cdall@kernel.org>
-Cc: Linux ARM <linux-arm-kernel@lists.infradead.org>, KVM <kvm@vger.kernel.org>, kvmarm@lists.cs.columbia.edu, Marc Zyngier <marc.zyngier@arm.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Kristina Martsenko <kristina.martsenko@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <cdall@linaro.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B7BB49D6B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Mar 2018 11:46:34 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id CYlhjuAmelOo for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 15 Mar 2018 11:46:12 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 821DB402D6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Mar 2018 11:46:12 -0400 (EDT)
+In-Reply-To: <20180315150320.tfx35o6yaaln4rzg@kamzik.brq.redhat.com>
+Content-Language: en-GB
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-Hi Christoffer,
-
-On 08/02/18 18:04, Christoffer Dall wrote:
-> On Tue, Jan 09, 2018 at 07:04:08PM +0000, Suzuki K Poulose wrote:
->> We set VTCR_EL2 very early during the stage2 init and don't
->> touch it ever. This is fine as we had a fixed IPA size. This
->> patch changes the behavior to set the VTCR for a given VM,
->> depending on its stage2 table. The common configuration for
->> VTCR is still performed during the early init. But the SL0
->> and T0SZ are programmed for each VM and is cleared once we
->> exit the VM.
+On 15/03/18 15:03, Andrew Jones wrote:
+> On Wed, Mar 14, 2018 at 04:50:46PM +0000, Marc Zyngier wrote:
+>> Until now, all EL2 executable mappings were derived from their
+>> EL1 VA. Since we want to decouple the vectors mapping from
+>> the rest of the hypervisor, we need to be able to map some
+>> text somewhere else.
 >>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Christoffer Dall <cdall@linaro.org>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-
->> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
->> index f7c651f3a8c0..523471f0af7b 100644
->> --- a/arch/arm64/kvm/hyp/switch.c
->> +++ b/arch/arm64/kvm/hyp/switch.c
->> @@ -157,11 +157,20 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
->>   static void __hyp_text __activate_vm(struct kvm_vcpu *vcpu)
->>   {
->>    struct kvm *kvm = kern_hyp_va(vcpu->kvm);
->> + u64 vtcr = read_sysreg(vtcr_el2);
->> +
->> + vtcr &= ~VTCR_EL2_PRIVATE_MASK;
->> + vtcr |= VTCR_EL2_SL0(stage2_pt_levels(kvm)) |
->> + VTCR_EL2_T0SZ(kvm_phys_shift(kvm));
->> + write_sysreg(vtcr, vtcr_el2);
-> 
-> If we're writing VTCR_EL2 on each entry, do we really need to read the
-> value back first and calculate things on every entry to the VM?  It
-> seems to me we should be able to compute the vtcr_el2 and store it on
-> struct kvm, and simply restore that per-VM value upon entering the VM?
-
-I took a look at this and we need to do this to make sure we retain the
-Hardware update of Access flags for stage2 (VTCR_EL2_HA) bits on the CPUs
-that has it and it is safe to run a mix of CPUs with and without the feature.
-
->>    write_sysreg(kvm->arch.vttbr, vttbr_el2);
->>   }
+>> The "idmap" region (for lack of a better name) is ideally suited
+>> for this, as we have a huge range that hardly has anything in it.
 >>
->>   static void __hyp_text __deactivate_vm(struct kvm_vcpu *vcpu)
->>   {
->> + u64 vtcr = read_sysreg(vtcr_el2) & ~VTCR_EL2_PRIVATE_MASK;
+>> Let's extend the IO allocator to also deal with executable mappings,
+>> thus providing the required feature.
+>>
+>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>> ---
+>>  arch/arm/include/asm/kvm_mmu.h   |  2 +
+>>  arch/arm64/include/asm/kvm_mmu.h |  2 +
+>>  virt/kvm/arm/mmu.c               | 80 +++++++++++++++++++++++++++++-----------
+>>  3 files changed, 63 insertions(+), 21 deletions(-)
+>>
+>> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+>> index 26eb6b1cec9b..1b7f592eae57 100644
+>> --- a/arch/arm/include/asm/kvm_mmu.h
+>> +++ b/arch/arm/include/asm/kvm_mmu.h
+>> @@ -56,6 +56,8 @@ int create_hyp_mappings(void *from, void *to, pgprot_t prot);
+>>  int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
+>>  			   void __iomem **kaddr,
+>>  			   void __iomem **haddr);
+>> +int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
+>> +			     void **haddr);
+>>  void free_hyp_pgds(void);
+>>  
+>>  void stage2_unmap_vm(struct kvm *kvm);
+>> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+>> index c2beb2d25170..97af11065bbd 100644
+>> --- a/arch/arm64/include/asm/kvm_mmu.h
+>> +++ b/arch/arm64/include/asm/kvm_mmu.h
+>> @@ -151,6 +151,8 @@ int create_hyp_mappings(void *from, void *to, pgprot_t prot);
+>>  int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
+>>  			   void __iomem **kaddr,
+>>  			   void __iomem **haddr);
+>> +int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
+>> +			     void **haddr);
+>>  void free_hyp_pgds(void);
+>>  
+>>  void stage2_unmap_vm(struct kvm *kvm);
+>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+>> index b4d1948c8dd6..554ad5493e7d 100644
+>> --- a/virt/kvm/arm/mmu.c
+>> +++ b/virt/kvm/arm/mmu.c
+>> @@ -737,30 +737,13 @@ int create_hyp_mappings(void *from, void *to, pgprot_t prot)
+>>  	return 0;
+>>  }
+>>  
+>> -/**
+>> - * create_hyp_io_mappings - Map IO into both kernel and HYP
+>> - * @phys_addr:	The physical start address which gets mapped
+>> - * @size:	Size of the region being mapped
+>> - * @kaddr:	Kernel VA for this mapping
+>> - * @haddr:	HYP VA for this mapping
+>> - */
+>> -int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
+>> -			   void __iomem **kaddr,
+>> -			   void __iomem **haddr)
+>> +static int __create_hyp_private_mapping(phys_addr_t phys_addr, size_t size,
+>> +					unsigned long *haddr, pgprot_t prot)
+>>  {
+>>  	pgd_t *pgd = hyp_pgd;
+>>  	unsigned long base;
+>>  	int ret;
+>>  
+>> -	*kaddr = ioremap(phys_addr, size);
+>> -	if (!*kaddr)
+>> -		return -ENOMEM;
+>> -
+>> -	if (is_kernel_in_hyp_mode()) {
+>> -		*haddr = *kaddr;
+>> -		return 0;
+>> -	}
+>> -
+>>  	mutex_lock(&io_map_lock);
+>>  
+>>  	/*
+>> @@ -789,22 +772,77 @@ int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
+>>  
+>>  	ret = __create_hyp_mappings(pgd, __kvm_idmap_ptrs_per_pgd(),
+>>  				    base, base + size,
+>> -				    __phys_to_pfn(phys_addr), PAGE_HYP_DEVICE);
+>> +				    __phys_to_pfn(phys_addr), prot);
+>>  	if (ret)
+>>  		goto out;
+>>  
+>> -	*haddr = (void __iomem *)base + offset_in_page(phys_addr);
+>> +	*haddr = base + offset_in_page(phys_addr);
+>>  	io_map_base = base;
+>>  
+>>  out:
+>>  	mutex_unlock(&io_map_lock);
+>>  
+>> +	return ret;
+>> +}
 >> +
->> + write_sysreg(vtcr, vtcr_el2);
+>> +/**
+>> + * create_hyp_io_mappings - Map IO into both kernel and HYP
+>> + * @phys_addr:	The physical start address which gets mapped
+>> + * @size:	Size of the region being mapped
+>> + * @kaddr:	Kernel VA for this mapping
+>> + * @haddr:	HYP VA for this mapping
+>> + */
+>> +int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
+>> +			   void __iomem **kaddr,
+>> +			   void __iomem **haddr)
+>> +{
+>> +	unsigned long addr;
+>> +	int ret;
+>> +
+>> +	*kaddr = ioremap(phys_addr, size);
+>> +	if (!*kaddr)
+>> +		return -ENOMEM;
+>> +
+>> +	if (is_kernel_in_hyp_mode()) {
+>> +		*haddr = *kaddr;
+>> +		return 0;
+>> +	}
+>> +
+>> +	ret = __create_hyp_private_mapping(phys_addr, size,
+>> +					   &addr, PAGE_HYP_DEVICE);
+>>  	if (ret) {
+>>  		iounmap(*kaddr);
+>>  		*kaddr = NULL;
+>> +		*haddr = NULL;
+>> +		return ret;
+>> +	}
+>> +
+>> +	*haddr = (void __iomem *)addr;
+>> +	return 0;
+>> +}
+>> +
+>> +/**
+>> + * create_hyp_exec_mappings - Map an executable range into into HYP
 > 
-> Why do we need to care about restoring VTCR when returning to the host?
+> s/into into/into/
+> 
+>> + * @phys_addr:	The physical start address which gets mapped
+>> + * @size:	Size of the region being mapped
+>> + * @haddr:	HYP VA for this mapping
+>> + */
+>> +int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
+>> +			     void **haddr)
+>> +{
+>> +	unsigned long addr;
+>> +	int ret;
+>> +
+>> +	BUG_ON(is_kernel_in_hyp_mode());
+> 
+> Why BUG_ON instead of just giving the caller the same address, similar
+> to what create_hyp_io_mappings() does?
 
-Yes, this can be skipped.
+Because we just don't have that information on VHE:
 
-Cheers
-Suzuki
+- create_hyp_io_mapping does an ioremap, and return the same address for
+both
+- create_hyp_exec_mapping doesn't have a mapping at all to return. It
+just has a PA. We could convert it to a VA, but then which one? Linear
+mapping, or kernel mapping?
+
+The real problem is that this makes no sense on VHE, because we don't
+have an alternative address space similar to !VHE. And if you call this
+on VHE, you're doing something very wrong.
+
+In all honesty, the real issue is create_hyp_io_mapping(), because it
+gives you a false sense of security and hides the distinction between
+VHE and !VHE.
+
+> 
+>> +
+>> +	ret = __create_hyp_private_mapping(phys_addr, size,
+>> +					   &addr, PAGE_HYP_EXEC);
+>> +	if (ret) {
+>> +		*haddr = NULL;
+>>  		return ret;
+>>  	}
+>>  
+>> +	*haddr = (void *)addr;
+>>  	return 0;
+>>  }
+>>  
+>> -- 
+>> 2.14.2
+>>
+> 
+> Otherwise
+> 
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+
+Thanks!
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
