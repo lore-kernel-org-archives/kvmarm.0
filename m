@@ -1,122 +1,68 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [REPOST PATCH] arm/arm64: KVM: Add PSCI version selection API
-Date: Thu, 15 Mar 2018 19:26:48 +0000
-Message-ID: <86169dc0-b13c-fab9-eaca-363d3873ad10@arm.com>
-References: <20180215175803.6870-1-marc.zyngier@arm.com>
- <db215c1e-0ce8-32e4-d131-e790bebf353e@redhat.com>
- <86o9k63f7a.wl-marc.zyngier@arm.com>
- <CAFEAcA8XYV=oSX81ON4CGDt0kfG1cgROqj30OC2Ov=bYhLSYig@mail.gmail.com>
- <20180306092134.4bfbz34yhqfrfdlf@kamzik.brq.redhat.com>
- <8042f946-49bf-5fc1-f513-4b76ccd5f7d6@arm.com>
- <CAFEAcA-t1QvjW6eFQ4U+8odj0p_01F8sktpvN9KrZ1Kc-FhtnQ@mail.gmail.com>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH] arm64: rename the function arm64_is_ras_serror() to avoid
+ confusion
+Date: Thu, 15 Mar 2018 19:52:17 +0000
+Message-ID: <5AAACEF1.1060701@arm.com>
+References: <1519322552-7374-1-git-send-email-gengdongjiu@huawei.com> <5A90563E.4020608@arm.com> <CAMj-D2Cd7_fCwMuHKr-UQ3i4LEDkktxcg_GtO-QCqnj52mHyKA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAFEAcA-t1QvjW6eFQ4U+8odj0p_01F8sktpvN9KrZ1Kc-FhtnQ@mail.gmail.com>
-Content-Language: en-GB
+In-Reply-To: <CAMj-D2Cd7_fCwMuHKr-UQ3i4LEDkktxcg_GtO-QCqnj52mHyKA@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Andrew Jones <drjones@redhat.com>, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, kvmarm@lists.cs.columbia.edu
+To: gengdongjiu <gengdj.1984@gmail.com>
+Cc: Dongjiu Geng <gengdongjiu@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, kvmarm@lists.cs.columbia.edu, Huangshaoyu <huangshaoyu@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 15/03/18 19:13, Peter Maydell wrote:
-> On 15 March 2018 at 19:00, Marc Zyngier <marc.zyngier@arm.com> wrote:
->> On 06/03/18 09:21, Andrew Jones wrote:
->>> On Mon, Mar 05, 2018 at 04:47:55PM +0000, Peter Maydell wrote:
->>>> On 2 March 2018 at 11:11, Marc Zyngier <marc.zyngier@arm.com> wrote:
->>>>> On Fri, 02 Mar 2018 10:44:48 +0000,
->>>>> Auger Eric wrote:
->>>>>> I understand the get/set is called as part of the migration process.
->>>>>> So my understanding is the benefit of this series is migration fails in
->>>>>> those cases:
->>>>>>
->>>>>>> =0.2 source -> 0.1 destination
->>>>>> 0.1 source -> >=0.2 destination
->>>>>
->>>>> It also fails in the case where you migrate a 1.0 guest to something
->>>>> that cannot support it.
->>>>
->>>> I think it would be useful if we could write out the various
->>>> combinations of source, destination and what we expect/want to
->>>> have happen. My gut feeling here is that we're sacrificing
->>>> exact migration compatibility in favour of having the guest
->>>> automatically get the variant-2 mitigations, but it's not clear
->>>> to me exactly which migration combinations that's intended to
->>>> happen for. Marc?
->>>>
->>>> If this wasn't a mitigation issue the desired behaviour would be
->>>> straightforward:
->>>>  * kernel should default to 0.2 on the basis that
->>>>    that's what it did before
->>>>  * new QEMU version should enable 1.0 by default for virt-2.12
->>>>    and 0.2 for virt-2.11 and earlier
->>>>  * PSCI version info shouldn't appear in migration stream unless
->>>>    it's something other than 0.2
->>>> But that would leave some setups (which?) unnecessarily without the
->>>> mitigation, so we're not doing that. The question is, exactly
->>>> what *are* we aiming for?
->>>
->>> The reason Marc dropped this patch from the series it was first introduced
->>> in was because we didn't have the aim 100% understood. We want the
->>> mitigation by default, but also to have the least chance of migration
->>> failure, and when we must fail (because we're not doing the
->>> straightforward approach listed above, which would prevent failures), then
->>> we want to fail with the least amount of damage to the user.
->>>
->>> I experimented with a couple different approaches and provided tables[1]
->>> with my results. I even recommended an approach, but I may have changed
->>> my mind after reading Marc's follow-up[2]. The thread continues from
->>> there as well with follow-ups from Christoffer, Marc, and myself. Anyway,
->>> Marc did this repost for us to debate it and work out the best approach
->>> here.
->> It doesn't look like we've made much progress on this, which makes me
->> think that we probably don't need anything of the like.
+Hi gengdongjiu,
+
+On 26/02/18 16:13, gengdongjiu wrote:
+> 2018-02-24 1:58 GMT+08:00 James Morse <james.morse@arm.com>:
+>> On 22/02/18 18:02, Dongjiu Geng wrote:
+>>> The RAS SError Syndrome can be Implementation-Defined,
+>>> arm64_is_ras_serror() is used to judge whether it is RAS SError,
+>>> but arm64_is_ras_serror() does not include this judgement. In order
+>>> to avoid function name confusion, we rename the arm64_is_ras_serror()
+>>> to arm64_is_categorized_ras_serror(), this function is used to
+>>> judge whether it is categorized RAS Serror.
+>>
+>> I don't see how 'categorized' is relevant. The most significant ISS bit is used
+>> to determine if this is an IMP-DEF ESR, or one that uses the architected layout.
 > 
-> I was waiting for a better explanation from you of what we're trying to
-> achieve. If you want to take the "do nothing" approach then a list
-> also of what migrations succeed/fail/break in that case would also
-> be useful.
-> 
-> (I am somewhat lazily trying to avoid having to spend time reverse
-> engineering the "what are we trying to do and what effects are
-> we accepting" parts from the patch and the code that's already gone
-> into the kernel.)
+> From the name arm64_is_ras_serror(), it used to judge whether this is
+> RAS Serror,
+> but arm64_is_ras_serror() think the IMP-DEF SError is not RAS SError,
+> as shown the code note and code in[1].
 
-OK, let me (re)state the problem:
+> In fact the IMP-DEF SError is also RAS SError, so when I read the
+> code, it looks like
 
-For a guest that requests PSCI 0.2 (i.e. all guests from the past 4 or 5
-years), we now silently upgrade the PSCI version to 1.0 allowing the new
-SMCCC to be discovered, and the ARCH_WORKAROUND_1 service to be called.
+This is just you then. No-one else has your imp-def:RAS error ESR values.
 
-Things get funny, specially with migration (and the way QEMU works).
+This would be like me adding some impdef branch instruction, then claiming
+aarch64_insn_is_branch() doesn't take account of my private additions.
 
-If we "do nothing":
+I agree the name is assuming all architected ESR are RAS-errors, and that impdef
+ESR are just that: impdef, that's all we know about them. Unless this causes us
+to do the wrong thing, I don't think it matters.
+Obviously we would need to change it if a new architected ESR is added.
 
-(1) A guest migrating from an "old" host to a "new" host will silently
-see its PSCI version upgraded. Not a big deal in my opinion, as 1.0 is a
-strict superset of 0.2 (apart from the version number...).
 
-(2) A guest migrating from a "new" host to an "old" host will silently
-loose its Spectre v2 mitigation. That's quite a big deal.
+> confusion, so I rename it to arm64_is_categorized_ras_serror(), then
 
-(3, not related to migration) A guest having a hardcoded knowledge of
-PSCI 0.2 will se that we've changed something, and may decide to catch
-fire. Oh well.
+This is actually worse, because there is an architected ESR for 'uncategorized',
+that the helper papers-over and treats as uncontained. Calling it 'categorized'
+means we now have three states, not two.
 
-If we take this patch:
 
-(1) still exists
+> this function is only used to
+> judge whether this is categorized RAS SError,
+> if it is categorized, the code will continue judge its Asynchronous Error Type.
+> if it is uncategorized, the code will panic(this is the original code
+> logic) or not panic when we support kernel-first or can isolate the
+> SError
 
-(2) will now fail to migrate. I see this as a feature.
-
-(3) can be worked around by setting the "PSCI version pseudo register"
-to 0.2.
-
-These are the main things I can think of at the moment.
 
 Thanks,
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+James
