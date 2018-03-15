@@ -1,104 +1,122 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v6 06/26] KVM: arm/arm64: Do not use kern_hyp_va() with
- kvm_vgic_global_state
-Date: Thu, 15 Mar 2018 19:16:14 +0000
-Message-ID: <5AAAC67E.4010002@arm.com>
-References: <20180314165049.30105-1-marc.zyngier@arm.com>
- <20180314165049.30105-7-marc.zyngier@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [REPOST PATCH] arm/arm64: KVM: Add PSCI version selection API
+Date: Thu, 15 Mar 2018 19:26:48 +0000
+Message-ID: <86169dc0-b13c-fab9-eaca-363d3873ad10@arm.com>
+References: <20180215175803.6870-1-marc.zyngier@arm.com>
+ <db215c1e-0ce8-32e4-d131-e790bebf353e@redhat.com>
+ <86o9k63f7a.wl-marc.zyngier@arm.com>
+ <CAFEAcA8XYV=oSX81ON4CGDt0kfG1cgROqj30OC2Ov=bYhLSYig@mail.gmail.com>
+ <20180306092134.4bfbz34yhqfrfdlf@kamzik.brq.redhat.com>
+ <8042f946-49bf-5fc1-f513-4b76ccd5f7d6@arm.com>
+ <CAFEAcA-t1QvjW6eFQ4U+8odj0p_01F8sktpvN9KrZ1Kc-FhtnQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180314165049.30105-7-marc.zyngier@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu
-Cc: Mark Rutland <mark.rutland@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Christoffer Dall <cdall@kernel.org>, kvm@vger.kernel.org, Steve Capper <steve.capper@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, linux-arm-kernel@lists.infradead.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CAFEAcA-t1QvjW6eFQ4U+8odj0p_01F8sktpvN9KrZ1Kc-FhtnQ@mail.gmail.com>
+Content-Language: en-GB
+Sender: linux-kernel-owner@vger.kernel.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Andrew Jones <drjones@redhat.com>, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
-
-On 14/03/18 16:50, Marc Zyngier wrote:
-> kvm_vgic_global_state is part of the read-only section, and is
-> usually accessed using a PC-relative address generation (adrp + add).
+On 15/03/18 19:13, Peter Maydell wrote:
+> On 15 March 2018 at 19:00, Marc Zyngier <marc.zyngier@arm.com> wrote:
+>> On 06/03/18 09:21, Andrew Jones wrote:
+>>> On Mon, Mar 05, 2018 at 04:47:55PM +0000, Peter Maydell wrote:
+>>>> On 2 March 2018 at 11:11, Marc Zyngier <marc.zyngier@arm.com> wrote:
+>>>>> On Fri, 02 Mar 2018 10:44:48 +0000,
+>>>>> Auger Eric wrote:
+>>>>>> I understand the get/set is called as part of the migration process.
+>>>>>> So my understanding is the benefit of this series is migration fails in
+>>>>>> those cases:
+>>>>>>
+>>>>>>> =0.2 source -> 0.1 destination
+>>>>>> 0.1 source -> >=0.2 destination
+>>>>>
+>>>>> It also fails in the case where you migrate a 1.0 guest to something
+>>>>> that cannot support it.
+>>>>
+>>>> I think it would be useful if we could write out the various
+>>>> combinations of source, destination and what we expect/want to
+>>>> have happen. My gut feeling here is that we're sacrificing
+>>>> exact migration compatibility in favour of having the guest
+>>>> automatically get the variant-2 mitigations, but it's not clear
+>>>> to me exactly which migration combinations that's intended to
+>>>> happen for. Marc?
+>>>>
+>>>> If this wasn't a mitigation issue the desired behaviour would be
+>>>> straightforward:
+>>>>  * kernel should default to 0.2 on the basis that
+>>>>    that's what it did before
+>>>>  * new QEMU version should enable 1.0 by default for virt-2.12
+>>>>    and 0.2 for virt-2.11 and earlier
+>>>>  * PSCI version info shouldn't appear in migration stream unless
+>>>>    it's something other than 0.2
+>>>> But that would leave some setups (which?) unnecessarily without the
+>>>> mitigation, so we're not doing that. The question is, exactly
+>>>> what *are* we aiming for?
+>>>
+>>> The reason Marc dropped this patch from the series it was first introduced
+>>> in was because we didn't have the aim 100% understood. We want the
+>>> mitigation by default, but also to have the least chance of migration
+>>> failure, and when we must fail (because we're not doing the
+>>> straightforward approach listed above, which would prevent failures), then
+>>> we want to fail with the least amount of damage to the user.
+>>>
+>>> I experimented with a couple different approaches and provided tables[1]
+>>> with my results. I even recommended an approach, but I may have changed
+>>> my mind after reading Marc's follow-up[2]. The thread continues from
+>>> there as well with follow-ups from Christoffer, Marc, and myself. Anyway,
+>>> Marc did this repost for us to debate it and work out the best approach
+>>> here.
+>> It doesn't look like we've made much progress on this, which makes me
+>> think that we probably don't need anything of the like.
 > 
-> It is thus useless to use kern_hyp_va() on it, and actively problematic
-> if kern_hyp_va() becomes non-idempotent. On the other hand, there is
-> no way that the compiler is going to guarantee that such access is
-> always PC relative.
+> I was waiting for a better explanation from you of what we're trying to
+> achieve. If you want to take the "do nothing" approach then a list
+> also of what migrations succeed/fail/break in that case would also
+> be useful.
 > 
-> So let's bite the bullet and provide our own accessor.
+> (I am somewhat lazily trying to avoid having to spend time reverse
+> engineering the "what are we trying to do and what effects are
+> we accepting" parts from the patch and the code that's already gone
+> into the kernel.)
 
+OK, let me (re)state the problem:
 
-> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-> index de1b919404e4..a6808d2869f5 100644
-> --- a/arch/arm/include/asm/kvm_mmu.h
-> +++ b/arch/arm/include/asm/kvm_mmu.h
-> @@ -28,6 +28,13 @@
->   */
->  #define kern_hyp_va(kva)	(kva)
->  
-> +/* Resolving symbol addresses in a PC-relative way is easy... */
+For a guest that requests PSCI 0.2 (i.e. all guests from the past 4 or 5
+years), we now silently upgrade the PSCI version to 1.0 allowing the new
+SMCCC to be discovered, and the ARCH_WORKAROUND_1 service to be called.
 
-(So this is guaranteed on 32bit? I thought this was because 32bit uses the
-kernel-VA's at HYP, so any way the compiler generates the address will work.)
+Things get funny, specially with migration (and the way QEMU works).
 
+If we "do nothing":
 
-> +#define hyp_symbol_addr(s)						\
-> +	({								\
-> +		typeof(s) *addr = &(s);					\
-> +		addr;							\
-> +	})
-> +
->  /*
->   * KVM_MMU_CACHE_MIN_PAGES is the number of stage2 page table translation levels.
->   */
+(1) A guest migrating from an "old" host to a "new" host will silently
+see its PSCI version upgraded. Not a big deal in my opinion, as 1.0 is a
+strict superset of 0.2 (apart from the version number...).
 
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index e3bc1d0a5e93..7120bf3f22c7 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -110,6 +110,26 @@ static inline unsigned long __kern_hyp_va(unsigned long v)
->  
->  #define kern_hyp_va(v) 	((typeof(v))(__kern_hyp_va((unsigned long)(v))))
->  
-> +/*
-> + * Obtain the PC-relative address of a kernel symbol
-> + * s: symbol
-> + *
-> + * The goal of this macro is to return a symbol's address based on a
-> + * PC-relative computation, as opposed to a loading the VA from a
-> + * constant pool or something similar. This works well for HYP, as an
-> + * absolute VA is guaranteed to be wrong. Only use this if trying to
-> + * obtain the address of a symbol (i.e. not something you obtained by
-> + * following a pointer).
-> + */
-> +#define hyp_symbol_addr(s)						\
-> +	({								\
-> +		typeof(s) *addr;					\
-> +		asm volatile("adrp	%0, %1\n"			\
-> +			     "add	%0, %0, :lo12:%1\n"		\
-> +			     : "=r" (addr) : "S" (&s));			\
-> +		addr;							\
-> +	})
+(2) A guest migrating from a "new" host to an "old" host will silently
+loose its Spectre v2 mitigation. That's quite a big deal.
 
-Why does this need to be volatile? I see gcc v4.9 generate this sequence twice
-in __vgic_v2_save_state(). Can't it cache and reorder this sequence as it likes?
+(3, not related to migration) A guest having a hardcoded knowledge of
+PSCI 0.2 will se that we've changed something, and may decide to catch
+fire. Oh well.
 
-Either-way:
-Reviewed-by: James Morse <james.morse@arm.com>
+If we take this patch:
 
+(1) still exists
 
-(I had a go at using 'Ush', to let the compiler schedule the adrp, but couldn't
-get it to work.)
+(2) will now fail to migrate. I see this as a feature.
+
+(3) can be worked around by setting the "PSCI version pseudo register"
+to 0.2.
+
+These are the main things I can think of at the moment.
 
 Thanks,
 
-James
+	M.
+-- 
+Jazz is not dead. It just smells funny...
