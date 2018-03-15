@@ -1,21 +1,24 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 0/6] KVM/ARM fixes for 4.16-rc6
-Date: Thu, 15 Mar 2018 17:16:42 +0000
-Message-ID: <20180315171648.19501-1-marc.zyngier@arm.com>
+Subject: [PATCH v2 1/6] KVM: arm/arm64: vgic: Add missing irq_lock to
+ vgic_mmio_read_pending
+Date: Thu, 15 Mar 2018 17:16:43 +0000
+Message-ID: <20180315171648.19501-2-marc.zyngier@arm.com>
+References: <20180315171648.19501-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C77C249FB4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Mar 2018 13:09:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C73AE49FB4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Mar 2018 13:09:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UWrk9K4abw5q for <kvmarm@lists.cs.columbia.edu>;
- Thu, 15 Mar 2018 13:09:30 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FB7B405D1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Mar 2018 13:09:30 -0400 (EDT)
+ with ESMTP id jv6dvWJNsieO for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 15 Mar 2018 13:09:32 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E8E949F81
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Mar 2018 13:09:32 -0400 (EDT)
+In-Reply-To: <20180315171648.19501-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,64 +32,50 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Radim, Paolo,
+From: Andre Przywara <andre.przywara@arm.com>
 
-Heres a handful of fixes that I've collected over the past couple of
-weeks. A number of them are -stable candidates, and address funny
-regressions (some which have been there for quite a while).
+Our irq_is_pending() helper function accesses multiple members of the
+vgic_irq struct, so we need to hold the lock when calling it.
+Add that requirement as a comment to the definition and take the lock
+around the call in vgic_mmio_read_pending(), where we were missing it
+before.
 
-Please pull.
+Fixes: 96b298000db4 ("KVM: arm/arm64: vgic-new: Add PENDING registers handlers")
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ virt/kvm/arm/vgic/vgic-mmio.c | 3 +++
+ virt/kvm/arm/vgic/vgic.h      | 1 +
+ 2 files changed, 4 insertions(+)
 
-	M.
-
-
-The following changes since commit 67870eb1204223598ea6d8a4467b482e9f5875b5:
-
-  ARM: kvm: fix building with gcc-8 (2018-02-15 20:58:36 +0100)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-fixes-for-v4.16-2
-
-for you to fetch changes up to 27e91ad1e746e341ca2312f29bccb9736be7b476:
-
-  kvm: arm/arm64: vgic-v3: Tighten synchronization for guests using v2 on v3 (2018-03-14 18:31:26 +0000)
-
-----------------------------------------------------------------
-kvm/arm fixes for 4.16, take 2
-
-- Peace of mind locking fix in vgic_mmio_read_pending
-- Allow hw-mapped interrupts to be reset when the VM resets
-- Fix GICv2 multi-source SGI injection
-- Fix MMIO synchronization for GICv2 on v3 emulation
-- Remove excess verbosity on the console
-
-----------------------------------------------------------------
-Andre Przywara (1):
-      KVM: arm/arm64: vgic: Add missing irq_lock to vgic_mmio_read_pending
-
-Ard Biesheuvel (1):
-      KVM: arm/arm64: Reduce verbosity of KVM init log
-
-Christoffer Dall (2):
-      KVM: arm/arm64: Avoid vcpu_load for other vcpu ioctls than KVM_RUN
-      KVM: arm/arm64: Reset mapped IRQs on VM reset
-
-Marc Zyngier (2):
-      KVM: arm/arm64: vgic: Don't populate multiple LRs with the same vintid
-      kvm: arm/arm64: vgic-v3: Tighten synchronization for guests using v2 on v3
-
- arch/arm64/kvm/guest.c             |  3 --
- include/kvm/arm_vgic.h             |  1 +
- include/linux/irqchip/arm-gic-v3.h |  1 +
- include/linux/irqchip/arm-gic.h    |  1 +
- virt/kvm/arm/arch_timer.c          |  6 ++-
- virt/kvm/arm/arm.c                 |  9 ----
- virt/kvm/arm/hyp/vgic-v3-sr.c      |  3 +-
- virt/kvm/arm/mmu.c                 |  6 +--
- virt/kvm/arm/vgic/vgic-mmio.c      |  3 ++
- virt/kvm/arm/vgic/vgic-v2.c        | 11 ++++-
- virt/kvm/arm/vgic/vgic-v3.c        |  9 +++-
- virt/kvm/arm/vgic/vgic.c           | 87 ++++++++++++++++++++++++++++++++------
- virt/kvm/arm/vgic/vgic.h           |  3 ++
- 13 files changed, 109 insertions(+), 34 deletions(-)
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+index 83d82bd7dc4e..dbe99d635c80 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.c
++++ b/virt/kvm/arm/vgic/vgic-mmio.c
+@@ -113,9 +113,12 @@ unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
+ 	/* Loop over all IRQs affected by this read */
+ 	for (i = 0; i < len * 8; i++) {
+ 		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
++		unsigned long flags;
+ 
++		spin_lock_irqsave(&irq->irq_lock, flags);
+ 		if (irq_is_pending(irq))
+ 			value |= (1U << i);
++		spin_unlock_irqrestore(&irq->irq_lock, flags);
+ 
+ 		vgic_put_irq(vcpu->kvm, irq);
+ 	}
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index 12c37b89f7a3..5b11859a1a1e 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -96,6 +96,7 @@
+ /* we only support 64 kB translation table page size */
+ #define KVM_ITS_L1E_ADDR_MASK		GENMASK_ULL(51, 16)
+ 
++/* Requires the irq_lock to be held by the caller. */
+ static inline bool irq_is_pending(struct vgic_irq *irq)
+ {
+ 	if (irq->config == VGIC_CONFIG_EDGE)
+-- 
+2.14.2
