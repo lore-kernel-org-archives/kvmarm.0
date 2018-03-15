@@ -1,127 +1,168 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH] KVM: arm/arm64: VGIC MMIO: add missing irq_lock
-Date: Thu, 15 Mar 2018 10:06:23 +0000
-Message-ID: <d0453520-a27b-7efe-83ee-ad96ac16d061@arm.com>
-References: <20180306092106.13044-1-andre.przywara@arm.com>
- <20180313010045.GC16740@lvm>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH] KVM: arm/arm64: vgic: Disallow Active+Pending for level
+ interrupts
+Date: Thu, 15 Mar 2018 11:24:18 +0100
+Message-ID: <7bd9dd38-f3a6-aef4-7fcd-015ef79a49ae@redhat.com>
+References: <20180314183744.30889-1-marc.zyngier@arm.com>
+ <c0ac2636-4143-98d3-5eb3-1e9098d0e056@redhat.com>
+ <64703cb4-96c8-abd0-8e75-6e65b6721e5c@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180313010045.GC16740@lvm>
-Content-Language: en-GB
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Christoffer Dall <cdall@kernel.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 61BD6403FE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Mar 2018 06:17:13 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 6t1zsqxgNywo for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 15 Mar 2018 06:16:51 -0400 (EDT)
+Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A9F47402D6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Mar 2018 06:16:51 -0400 (EDT)
+In-Reply-To: <64703cb4-96c8-abd0-8e75-6e65b6721e5c@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Andre Przywara <Andre.Przywara@arm.com>, Shunyong Yang <shunyong.yang@hxt-semitech.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+Hi Marc,
 
-(sorry for the delay, forgot this in my draft folder)
-
-On 13/03/18 01:00, Christoffer Dall wrote:
-> On Tue, Mar 06, 2018 at 09:21:06AM +0000, Andre Przywara wrote:
->> Our irq_is_pending() helper function accesses multiple members of the
->> vgic_irq struct, so we need to hold the lock when calling it.
+On 15/03/18 11:01, Marc Zyngier wrote:
+> Hi Eric,
 > 
-> For the record I don't think this is necessarily a completely valid
-> conclusion.  The fact that you access multiple members of a struct is a
-> good indication that it might be a good idea to hold a lock, but it's
-> not as simple as that.
+> On 15/03/18 09:31, Auger Eric wrote:
+>> Hi Marc,
+>> On 14/03/18 19:37, Marc Zyngier wrote:
+>>> It was recently reported that VFIO mediated devices, and anything
+>>> that VFIO exposes as level interrupts, do no strictly follow the
+>>> expected logic of such interrupts as it only lowers the input
+>>> line when the guest has EOId the interrupt at the GIC level, rather
+>>> than when it Acked the interrupt at the device level.
+>>>
+>>> THe GIC's Active+Pending state is fundamentally incompatible with
+>>> this behaviour, as it prevents KVM from observing the EOI, and in
+>>> turn results in VFIO never dropping the line. This results in an
+>>> interrupt storm in the guest, which it really never expected.
+>>>
+>>> As we cannot really change VFIO to follow the strict rules of level
+>>> signalling, let's forbid the A+P state altogether, as it is in the
+>>> end only an optimization. It ensures that we will transition via
+>>> an invalid state, which we can use to notify VFIO of the EOI.
+>>>
+>>> Reported-by: Shunyong Yang <shunyong.yang@hxt-semitech.com>
+>>> Tested-by: Shunyong Yang <shunyong.yang@hxt-semitech.com>
+>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>>> ---
+>>>  virt/kvm/arm/vgic/vgic-v2.c | 47 +++++++++++++++++++++++++++------------------
+>>>  virt/kvm/arm/vgic/vgic-v3.c | 47 +++++++++++++++++++++++++++------------------
+>>>  2 files changed, 56 insertions(+), 38 deletions(-)
+>>>
+>>> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+>>> index 29556f71b691..9356d749da1d 100644
+>>> --- a/virt/kvm/arm/vgic/vgic-v2.c
+>>> +++ b/virt/kvm/arm/vgic/vgic-v2.c
+>>> @@ -153,8 +153,35 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+>>>  void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
+>>>  {
+>>>  	u32 val = irq->intid;
+>>> +	bool allow_pending = true;
+>>>  
+>>> -	if (irq_is_pending(irq)) {
+>>> +	if (irq->active)
+>>> +		val |= GICH_LR_ACTIVE_BIT;
+>>> +
+>>> +	if (irq->hw) {
+>>> +		val |= GICH_LR_HW;
+>>> +		val |= irq->hwintid << GICH_LR_PHYSID_CPUID_SHIFT;
+>>> +		/*
+>>> +		 * Never set pending+active on a HW interrupt, as the
+>>> +		 * pending state is kept at the physical distributor
+>>> +		 * level.
+>>> +		 */
+>>> +		if (irq->active)
+>>> +			allow_pending = false;
+>>> +	} else {
+>>> +		if (irq->config == VGIC_CONFIG_LEVEL) {
+>>> +			val |= GICH_LR_EOI;
+>>> +
+>>> +			/*
+>>> +			 * Software resampling doesn't work very well
+>>> +			 * if we allow P+A, so let's not do that.
+>>> +			 */
+>>> +			if (irq->active)
+>>> +				allow_pending = false;
+>>> +		}
+>>> +	}
+>>> +
+>>> +	if (allow_pending && irq_is_pending(irq)) {
+>>>  		val |= GICH_LR_PENDING_BIT;
+>> Can't we have this no luck unlikely scenario where soft_pending and LR
+>> state A on flush? In such case, on fold we are going to reset the
+>> pending_latch as we considered disappearance of LR P meant the
+>> soft_pending was acked. But P now is no more logged in LR concurrently
+>> with A.
 > 
-> I think the only thing that could happen here is that a caller
-> mistakenly evaluates line_level when it shouldn't, but that would only
-> happen when changing the configuration of an irq from level to edge,
-> while the line_level is high, expecting the line_level to go down, and
-> the pending state to be subsequently reported as false, but we only
-> support changing the configuration of an interrupt when it's disabled,
-> and as a result this can only affect reads of the PENDR registers.
+> Good point. We can now only clear the latch when we're back to an
+> invalid state. How about this (untested):
+
 > 
->> Add that requirement as a comment to the definition and take the lock
->> around the call in vgic_mmio_read_pending(), where we were missing it
->> before.
->>
->> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+> index 9356d749da1d..8427586760fc 100644
+> --- a/virt/kvm/arm/vgic/vgic-v2.c
+> +++ b/virt/kvm/arm/vgic/vgic-v2.c
+> @@ -105,12 +105,9 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+>  
+>  		/*
+>  		 * Clear soft pending state when level irqs have been acked.
+> -		 * Always regenerate the pending state.
+>  		 */
+> -		if (irq->config == VGIC_CONFIG_LEVEL) {
+> -			if (!(val & GICH_LR_PENDING_BIT))
+> -				irq->pending_latch = false;
+> -		}
+> +		if (irq->config == VGIC_CONFIG_LEVEL && !(val & GICH_LR_STATE))
+> +			irq->pending_latch = false;
+>  
+>  		/*
+>  		 * Level-triggered mapped IRQs are special because we only
+> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+> index 6b484575cafb..dd984f726805 100644
+> --- a/virt/kvm/arm/vgic/vgic-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-v3.c
+> @@ -96,12 +96,9 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+>  
+>  		/*
+>  		 * Clear soft pending state when level irqs have been acked.
+> -		 * Always regenerate the pending state.
+>  		 */
+> -		if (irq->config == VGIC_CONFIG_LEVEL) {
+> -			if (!(val & ICH_LR_PENDING_BIT))
+> -				irq->pending_latch = false;
+> -		}
+> +		if (irq->config == VGIC_CONFIG_LEVEL && !(val & ICH_LR_STATE))
+> +			irq->pending_latch = false;
+when deactivating the IRQ, we both lower the line and remove the A state
+at the same time. However isn't the pending_latch supposed to stay,
+independently on the line level, as long as we don't CPENDR or handle
+its P->A->invalid usual cycle?
+
+Thanks
+
+Eric
+>  
+>  		/*
+>  		 * Level-triggered mapped IRQs are special because we only
 > 
-> Note, I'm fine with this change, but I don't agree with the rationale.
-> The rationale is to take the lock on every use for consistency and to
-> make the code easier to reason about, but it's possible that some future
-> analysis in the future would relax this requirement if essential for
-> performance.
-
-  ^^^^^^^^^^^   vgic_mmio_read_pending  ;-)
-
-So while I agree that one can build a case on why the *current* code
-might be actually safe without the lock, I think this is a very fragile
-approach. As documented, the lock protects the consistency of the
-members of the data structure. Full stop. So whenever we access
-multiple members, we should take the lock.
-If - and only if - we:
-- get a lot of contention on the lock, and
-- we care about this, and
-- we can prove that it's safe without the lock
-*then* it would be fine to remove this. And it would need to be heavily
-documented, possibly even with BUG()s.
-
-Everything else looks like premature optimisation that even might break
-in the future once we for instance extend irq_is_pending() for whatever
-reason. Even today I am not sure that just reading
-"irq->pending_latch || irq->line_level" is safe without a lock,
-regardless of the configuration state.
-
-In this particular case all other users take the lock, so this looked
-like a case where we have just forgotten this.
-And as hinted above, ISPENDR in a guest is probably not a frequently
-accessed register.
-
-I believe we don't disagree on the matter, actually, but I'd be cautious
-and rather take the lock than avoid it, if in doubt.
-
-Cheers,
-Andre.
-
->> ---
->>  virt/kvm/arm/vgic/vgic-mmio.c | 3 +++
->>  virt/kvm/arm/vgic/vgic.h      | 1 +
->>  2 files changed, 4 insertions(+)
->>
->> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
->> index 83d82bd7dc4e..dbe99d635c80 100644
->> --- a/virt/kvm/arm/vgic/vgic-mmio.c
->> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
->> @@ -113,9 +113,12 @@ unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
->>  	/* Loop over all IRQs affected by this read */
->>  	for (i = 0; i < len * 8; i++) {
->>  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
->> +		unsigned long flags;
->>  
->> +		spin_lock_irqsave(&irq->irq_lock, flags);
->>  		if (irq_is_pending(irq))
->>  			value |= (1U << i);
->> +		spin_unlock_irqrestore(&irq->irq_lock, flags);
->>  
->>  		vgic_put_irq(vcpu->kvm, irq);
->>  	}
->> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
->> index 12c37b89f7a3..5b11859a1a1e 100644
->> --- a/virt/kvm/arm/vgic/vgic.h
->> +++ b/virt/kvm/arm/vgic/vgic.h
->> @@ -96,6 +96,7 @@
->>  /* we only support 64 kB translation table page size */
->>  #define KVM_ITS_L1E_ADDR_MASK		GENMASK_ULL(51, 16)
->>  
->> +/* Requires the irq_lock to be held by the caller. */
->>  static inline bool irq_is_pending(struct vgic_irq *irq)
->>  {
->>  	if (irq->config == VGIC_CONFIG_EDGE)
->> -- 
->> 2.14.1
->>
+> Thanks,
+> 
+> 	M.
+> 
