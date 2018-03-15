@@ -1,24 +1,27 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 6/6] kvm: arm/arm64: vgic-v3: Tighten synchronization for
- guests using v2 on v3
-Date: Thu, 15 Mar 2018 17:16:48 +0000
-Message-ID: <20180315171648.19501-7-marc.zyngier@arm.com>
-References: <20180315171648.19501-1-marc.zyngier@arm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v2] KVM: arm: reserve bit in KVM_REG_ARM encoding for
+ secure/nonsecure
+Date: Thu, 15 Mar 2018 17:57:23 +0000
+Message-ID: <CAFEAcA-p-N6eF4LpDVfXOM4niBZTEyZi+Xg6RnjM7a5RQk+WCw@mail.gmail.com>
+References: <20180306194741.30395-1-peter.maydell@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CEAC49F88
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Mar 2018 13:10:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 38ED04029E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Mar 2018 13:50:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id s+Hfr+tndKO1 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 15 Mar 2018 13:09:51 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F0F349FB2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Mar 2018 13:09:43 -0400 (EDT)
-In-Reply-To: <20180315171648.19501-1-marc.zyngier@arm.com>
+ with ESMTP id s6fcTpIM2VMr for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 15 Mar 2018 13:50:08 -0400 (EDT)
+Received: from mail-ot0-f196.google.com (mail-ot0-f196.google.com
+ [74.125.82.196])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6D913402D3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Mar 2018 13:50:08 -0400 (EDT)
+Received: by mail-ot0-f196.google.com with SMTP id r30-v6so7786585otr.2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Mar 2018 10:57:44 -0700 (PDT)
+In-Reply-To: <20180306194741.30395-1-peter.maydell@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,46 +31,54 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On guest exit, and when using GICv2 on GICv3, we use a dsb(st) to
-force synchronization between the memory-mapped guest view and
-the system-register view that the hypervisor uses.
+On 6 March 2018 at 19:47, Peter Maydell <peter.maydell@linaro.org> wrote:
+> We have a KVM_REG_ARM encoding that we use to expose KVM guest registers
+> to userspace. Define that bit 28 in this encoding indicates secure vs
+> nonsecure, so we can distinguish the secure and nonsecure banked versions
+> of a banked AArch32 register.
+>
+> For KVM currently, all guest registers are nonsecure, but defining
+> the bit is useful for userspace. In particular, QEMU uses this
+> encoding as part of its on-the-wire migration format, and needs to be
+> able to describe secure-bank registers when it is migrating (fully
+> emulated) EL3-enabled CPUs.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> v1->v2: expanded comment
 
-This is incorrect, as the spec calls out the need for "a DSB whose
-required access type is both loads and stores with any Shareability
-attribute", while we're only synchronizing stores.
+Ping -- is this version OK, Marc?
 
-We also lack an isb after the dsb to ensure that the latter has
-actually been executed before we start reading stuff from the sysregs.
+> ---
+>  arch/arm/include/uapi/asm/kvm.h | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>
+> diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+> index 6edd177bb1c7..2ba95d6fe852 100644
+> --- a/arch/arm/include/uapi/asm/kvm.h
+> +++ b/arch/arm/include/uapi/asm/kvm.h
+> @@ -135,6 +135,15 @@ struct kvm_arch_memory_slot {
+>  #define KVM_REG_ARM_CRM_SHIFT          7
+>  #define KVM_REG_ARM_32_CRN_MASK                0x0000000000007800
+>  #define KVM_REG_ARM_32_CRN_SHIFT       11
+> +/*
+> + * For KVM currently all guest registers are nonsecure, but we reserve a bit
+> + * in the encoding to distinguish secure from nonsecure for AArch32 system
+> + * registers that are banked by security. This is 1 for the secure banked
+> + * register, and 0 for the nonsecure banked register or if the register is
+> + * not banked by security.
+> + */
+> +#define KVM_REG_ARM_SECURE_MASK        0x0000000010000000
+> +#define KVM_REG_ARM_SECURE_SHIFT       28
+>
+>  #define ARM_CP15_REG_SHIFT_MASK(x,n) \
+>         (((x) << KVM_REG_ARM_ ## n ## _SHIFT) & KVM_REG_ARM_ ## n ## _MASK)
+> --
+> 2.16.2
 
-The fix is pretty easy: turn dsb(st) into dsb(sy), and slap an isb()
-just after.
-
-Cc: stable@vger.kernel.org
-Fixes: f68d2b1b73cc ("arm64: KVM: Implement vgic-v3 save/restore")
-Acked-by: Christoffer Dall <cdall@kernel.org>
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- virt/kvm/arm/hyp/vgic-v3-sr.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
-index f5c3d6d7019e..b89ce5432214 100644
---- a/virt/kvm/arm/hyp/vgic-v3-sr.c
-+++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
-@@ -215,7 +215,8 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
- 	 * are now visible to the system register interface.
- 	 */
- 	if (!cpu_if->vgic_sre) {
--		dsb(st);
-+		dsb(sy);
-+		isb();
- 		cpu_if->vgic_vmcr = read_gicreg(ICH_VMCR_EL2);
- 	}
- 
--- 
-2.14.2
+thanks
+-- PMM
