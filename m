@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 3/6] KVM: arm/arm64: Reset mapped IRQs on VM reset
-Date: Thu, 15 Mar 2018 17:16:45 +0000
-Message-ID: <20180315171648.19501-4-marc.zyngier@arm.com>
+Subject: [PATCH v2 4/6] KVM: arm/arm64: Reduce verbosity of KVM init log
+Date: Thu, 15 Mar 2018 17:16:46 +0000
+Message-ID: <20180315171648.19501-5-marc.zyngier@arm.com>
 References: <20180315171648.19501-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C47F49FC8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Mar 2018 13:09:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D1C1849FC8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Mar 2018 13:10:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nfVeC7ZNJFrK for <kvmarm@lists.cs.columbia.edu>;
- Thu, 15 Mar 2018 13:09:36 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B62BE49F9E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Mar 2018 13:09:36 -0400 (EDT)
+ with ESMTP id wjPB7bJywoda for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 15 Mar 2018 13:09:40 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D8B5849FAC
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Mar 2018 13:09:38 -0400 (EDT)
 In-Reply-To: <20180315171648.19501-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,96 +31,81 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <cdall@kernel.org>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-We currently don't allow resetting mapped IRQs from userspace, because
-their state is controlled by the hardware.  But we do need to reset the
-state when the VM is reset, so we provide a function for the 'owner' of
-the mapped interrupt to reset the interrupt state.
+On my GICv3 system, the following is printed to the kernel log at boot:
 
-Currently only the timer uses mapped interrupts, so we call this
-function from the timer reset logic.
+   kvm [1]: 8-bit VMID
+   kvm [1]: IDMAP page: d20e35000
+   kvm [1]: HYP VA range: 800000000000:ffffffffffff
+   kvm [1]: vgic-v2@2c020000
+   kvm [1]: GIC system register CPU interface enabled
+   kvm [1]: vgic interrupt IRQ1
+   kvm [1]: virtual timer IRQ4
+   kvm [1]: Hyp mode initialized successfully
 
-Cc: stable@vger.kernel.org
-Fixes: 4c60e360d6df ("KVM: arm/arm64: Provide a get_input_level for the arch timer")
-Signed-off-by: Christoffer Dall <cdall@kernel.org>
+The KVM IDMAP is a mapping of a statically allocated kernel structure,
+and so printing its physical address leaks the physical placement of
+the kernel when physical KASLR in effect. So change the kvm_info() to
+kvm_debug() to remove it from the log output.
+
+While at it, trim the output a bit more: IRQ numbers can be found in
+/proc/interrupts, and the HYP VA and vgic-v2 lines are not highly
+informational either.
+
+Cc: <stable@vger.kernel.org>
+Acked-by: Will Deacon <will.deacon@arm.com>
+Acked-by: Christoffer Dall <cdall@kernel.org>
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- include/kvm/arm_vgic.h    |  1 +
- virt/kvm/arm/arch_timer.c |  4 ++++
- virt/kvm/arm/vgic/vgic.c  | 26 ++++++++++++++++++++++++++
- 3 files changed, 31 insertions(+)
+ virt/kvm/arm/arch_timer.c   | 2 +-
+ virt/kvm/arm/mmu.c          | 6 +++---
+ virt/kvm/arm/vgic/vgic-v2.c | 2 +-
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index cdbd142ca7f2..02924ae2527e 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -360,6 +360,7 @@ void kvm_vgic_put(struct kvm_vcpu *vcpu);
- bool kvm_vcpu_has_pending_irqs(struct kvm_vcpu *vcpu);
- void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu);
- void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu);
-+void kvm_vgic_reset_mapped_irq(struct kvm_vcpu *vcpu, u32 vintid);
- 
- void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
- 
 diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 70f4c30918eb..3945021510a9 100644
+index 3945021510a9..282389eb204f 100644
 --- a/virt/kvm/arm/arch_timer.c
 +++ b/virt/kvm/arm/arch_timer.c
-@@ -581,6 +581,7 @@ void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
+@@ -771,7 +771,7 @@ int kvm_timer_hyp_init(bool has_gic)
+ 		static_branch_enable(&has_gic_active_state);
+ 	}
  
- int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
- {
-+	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
- 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+-	kvm_info("virtual timer IRQ%d\n", host_vtimer_irq);
++	kvm_debug("virtual timer IRQ%d\n", host_vtimer_irq);
  
-@@ -594,6 +595,9 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
- 	ptimer->cnt_ctl = 0;
- 	kvm_timer_update_state(vcpu);
+ 	cpuhp_setup_state(CPUHP_AP_KVM_ARM_TIMER_STARTING,
+ 			  "kvm/arm/timer:starting", kvm_timer_starting_cpu,
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index ec62d1cccab7..b960acdd0c05 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -1810,9 +1810,9 @@ int kvm_mmu_init(void)
+ 	 */
+ 	BUG_ON((hyp_idmap_start ^ (hyp_idmap_end - 1)) & PAGE_MASK);
  
-+	if (timer->enabled && irqchip_in_kernel(vcpu->kvm))
-+		kvm_vgic_reset_mapped_irq(vcpu, vtimer->irq.irq);
-+
+-	kvm_info("IDMAP page: %lx\n", hyp_idmap_start);
+-	kvm_info("HYP VA range: %lx:%lx\n",
+-		 kern_hyp_va(PAGE_OFFSET), kern_hyp_va(~0UL));
++	kvm_debug("IDMAP page: %lx\n", hyp_idmap_start);
++	kvm_debug("HYP VA range: %lx:%lx\n",
++		  kern_hyp_va(PAGE_OFFSET), kern_hyp_va(~0UL));
+ 
+ 	if (hyp_idmap_start >= kern_hyp_va(PAGE_OFFSET) &&
+ 	    hyp_idmap_start <  kern_hyp_va(~0UL) &&
+diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+index c32d7b93ffd1..e9d840a75e7b 100644
+--- a/virt/kvm/arm/vgic/vgic-v2.c
++++ b/virt/kvm/arm/vgic/vgic-v2.c
+@@ -410,7 +410,7 @@ int vgic_v2_probe(const struct gic_kvm_info *info)
+ 	kvm_vgic_global_state.type = VGIC_V2;
+ 	kvm_vgic_global_state.max_gic_vcpus = VGIC_V2_MAX_CPUS;
+ 
+-	kvm_info("vgic-v2@%llx\n", info->vctrl.start);
++	kvm_debug("vgic-v2@%llx\n", info->vctrl.start);
+ 
  	return 0;
- }
- 
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index c7c5ef190afa..0001858a2c23 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -495,6 +495,32 @@ int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
- 	return ret;
- }
- 
-+/**
-+ * kvm_vgic_reset_mapped_irq - Reset a mapped IRQ
-+ * @vcpu: The VCPU pointer
-+ * @vintid: The INTID of the interrupt
-+ *
-+ * Reset the active and pending states of a mapped interrupt.  Kernel
-+ * subsystems injecting mapped interrupts should reset their interrupt lines
-+ * when we are doing a reset of the VM.
-+ */
-+void kvm_vgic_reset_mapped_irq(struct kvm_vcpu *vcpu, u32 vintid)
-+{
-+	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
-+	unsigned long flags;
-+
-+	if (!irq->hw)
-+		goto out;
-+
-+	spin_lock_irqsave(&irq->irq_lock, flags);
-+	irq->active = false;
-+	irq->pending_latch = false;
-+	irq->line_level = false;
-+	spin_unlock_irqrestore(&irq->irq_lock, flags);
-+out:
-+	vgic_put_irq(vcpu->kvm, irq);
-+}
-+
- int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid)
- {
- 	struct vgic_irq *irq;
+ out:
 -- 
 2.14.2
