@@ -1,34 +1,53 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: arm64 kvm built with clang doesn't boot
-Date: Fri, 16 Mar 2018 15:00:38 +0000
-Message-ID: <2e84a842-96e8-aec4-8b85-9ee879bb323a@arm.com>
-References: <CAAeHK+xjnXnrG0p06r-QRcUucYi5vcTJOn3mSS-JVxX9_TYg4w@mail.gmail.com>
- <26a25069-ea1d-5fb3-549c-ab653f454a30@arm.com>
- <CAAeHK+zq4-mw3pCNf3nob3gN-s+aWVq7vUy1p8yY4bU4QYNNMg@mail.gmail.com>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v6 11/26] KVM: arm64: Fix HYP idmap unmap when using
+ 52bit PA
+Date: Fri, 16 Mar 2018 16:07:10 +0000
+Message-ID: <20180316160710.pwa2nnh2ptebpjvd@armageddon.cambridge.arm.com>
+References: <20180314165049.30105-1-marc.zyngier@arm.com>
+ <20180314165049.30105-12-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAAeHK+zq4-mw3pCNf3nob3gN-s+aWVq7vUy1p8yY4bU4QYNNMg@mail.gmail.com>
-Content-Language: en-GB
-Sender: linux-kernel-owner@vger.kernel.org
-To: Andrey Konovalov <andreyknvl@google.com>
-Cc: Nick Desaulniers <ndesaulniers@google.com>, Stephen Hines <srhines@google.com>, Greg Hackmann <ghackmann@google.com>, Christoffer Dall <christoffer.dall@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Linux ARM <linux-arm-kernel@lists.infradead.org>, kvmarm@lists.cs.columbia.edu, LKML <linux-kernel@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, kernel-dynamic-tools <kernel-dynamic-tools@google.com>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D7AA949F7F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Mar 2018 11:59:58 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id KxapbBgJFXLM for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 16 Mar 2018 11:59:37 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B4AD402D3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Mar 2018 11:59:37 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <20180314165049.30105-12-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvm@vger.kernel.org, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 16/03/18 14:53, Andrey Konovalov wrote:
-> On Fri, Mar 16, 2018 at 3:13 PM, Marc Zyngier <marc.zyngier@arm.com> wrote:
->> I wasn't aware of that discussion, but this is indeed quite annoying.
->> Note that you should be able to restrict this to arch/arm64/kvm/hyp/*
->> and virt/kvm/arm/hyp/*.
+On Wed, Mar 14, 2018 at 04:50:34PM +0000, Marc Zyngier wrote:
+> Unmapping the idmap range using 52bit PA is quite broken, as we
+> don't take into account the right number of PGD entries, and rely
+> on PTRS_PER_PGD. The result is that pgd_index() truncates the
+> address, and we end-up in the weed.
 > 
-> That works as well (tried it, the kernel boots). I've also tried
-> compiling without the flag for virt/kvm/arm/hyp/*, it boots as well.
+> Let's introduce a new unmap_hyp_idmap_range() that knows about this,
+> together with a kvm_pgd_index() helper, which hides a bit of the
+> complexity of the issue.
+> 
+> Fixes: 98732d1b189b ("KVM: arm/arm64: fix HYP ID map extension to 52 bits")
+> Reported-by: James Morse <james.morse@arm.com>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 
-That's just luck. Anything in a hyp/ directory has the potential to be
-executed at EL2, and thus could be generating these jump tables. It
-could blow up at a later time, once you start running VMs...
+It looks fine to me:
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
