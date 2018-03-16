@@ -1,29 +1,34 @@
-From: Andrey Konovalov <andreyknvl@google.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
 Subject: Re: arm64 kvm built with clang doesn't boot
-Date: Fri, 16 Mar 2018 15:55:16 +0100
-Message-ID: <CAAeHK+z12AhRNQMVL5Xza+U=E-7NL3YA3VZmvrN2pGx8O-+a5Q@mail.gmail.com>
+Date: Fri, 16 Mar 2018 15:00:38 +0000
+Message-ID: <2e84a842-96e8-aec4-8b85-9ee879bb323a@arm.com>
 References: <CAAeHK+xjnXnrG0p06r-QRcUucYi5vcTJOn3mSS-JVxX9_TYg4w@mail.gmail.com>
- <20180316141313.q5vjmj627rv7r7kf@lakrids.cambridge.arm.com> <20180316143119.cdjw4dhm6crcjyrd@lakrids.cambridge.arm.com>
+ <26a25069-ea1d-5fb3-549c-ab653f454a30@arm.com>
+ <CAAeHK+zq4-mw3pCNf3nob3gN-s+aWVq7vUy1p8yY4bU4QYNNMg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180316143119.cdjw4dhm6crcjyrd@lakrids.cambridge.arm.com>
+In-Reply-To: <CAAeHK+zq4-mw3pCNf3nob3gN-s+aWVq7vUy1p8yY4bU4QYNNMg@mail.gmail.com>
+Content-Language: en-GB
 Sender: linux-kernel-owner@vger.kernel.org
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: Nick Desaulniers <ndesaulniers@google.com>, Stephen Hines <srhines@google.com>, Greg Hackmann <ghackmann@google.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Linux ARM <linux-arm-kernel@lists.infradead.org>, kvmarm@lists.cs.columbia.edu, LKML <linux-kernel@vger.kernel.org>, kernel-dynamic-tools <kernel-dynamic-tools@google.com>
+To: Andrey Konovalov <andreyknvl@google.com>
+Cc: Nick Desaulniers <ndesaulniers@google.com>, Stephen Hines <srhines@google.com>, Greg Hackmann <ghackmann@google.com>, Christoffer Dall <christoffer.dall@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Linux ARM <linux-arm-kernel@lists.infradead.org>, kvmarm@lists.cs.columbia.edu, LKML <linux-kernel@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, kernel-dynamic-tools <kernel-dynamic-tools@google.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Mar 16, 2018 at 3:31 PM, Mark Rutland <mark.rutland@arm.com> wrote:
->
-> FWIW, with that same compiler and patch applied atop of v4.16-rc4, and
-> some bodges around clang not liking the rX register naming in the SMCCC
-> code, I get a kernel that boots on my Juno, though I immediately hit a
-> KASAN splat:
->
-> [    8.476766] ==================================================================
-> [    8.483990] BUG: KASAN: slab-out-of-bounds in __d_lookup_rcu+0x350/0x400
-> [    8.490664] Read of size 8 at addr ffff8009336e2a30 by task init/1
+On 16/03/18 14:53, Andrey Konovalov wrote:
+> On Fri, Mar 16, 2018 at 3:13 PM, Marc Zyngier <marc.zyngier@arm.com> wrote:
+>> I wasn't aware of that discussion, but this is indeed quite annoying.
+>> Note that you should be able to restrict this to arch/arm64/kvm/hyp/*
+>> and virt/kvm/arm/hyp/*.
+> 
+> That works as well (tried it, the kernel boots). I've also tried
+> compiling without the flag for virt/kvm/arm/hyp/*, it boots as well.
 
-I see this as well, I'm looking into it. It seems that
-__no_sanitize_address is not defined for clang (defining it doesn't
-help though, so the issue might be deeper).
+That's just luck. Anything in a hyp/ directory has the potential to be
+executed at EL2, and thus could be generating these jump tables. It
+could blow up at a later time, once you start running VMs...
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
