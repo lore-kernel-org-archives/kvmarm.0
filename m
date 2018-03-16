@@ -1,15 +1,15 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v6 12/26] KVM: arm/arm64: Move HYP IO VAs to the "idmap"
- range
-Date: Fri, 16 Mar 2018 08:44:40 +0000
-Message-ID: <c08d1000-51ff-62e0-40f6-b7ef16342250@arm.com>
+Subject: Re: [PATCH v6 04/26] arm64: KVM: Dynamically patch the kernel/hyp VA
+ mask
+Date: Fri, 16 Mar 2018 08:52:14 +0000
+Message-ID: <141abcdc-f926-2599-3f68-87c9b8f3c634@arm.com>
 References: <20180314165049.30105-1-marc.zyngier@arm.com>
- <20180314165049.30105-13-marc.zyngier@arm.com> <5AAAC4F8.9050608@arm.com>
+ <20180314165049.30105-5-marc.zyngier@arm.com> <5AAAC659.70403@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <5AAAC4F8.9050608@arm.com>
+In-Reply-To: <5AAAC659.70403@arm.com>
 Content-Language: en-GB
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
@@ -24,154 +24,98 @@ To: James Morse <james.morse@arm.com>
 Cc: Mark Rutland <mark.rutland@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Christoffer Dall <cdall@kernel.org>, kvm@vger.kernel.org, Steve Capper <steve.capper@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi James,
-
-On 15/03/18 19:09, James Morse wrote:
+On 15/03/18 19:15, James Morse wrote:
 > Hi Marc,
 > 
 > On 14/03/18 16:50, Marc Zyngier wrote:
->> We so far mapped our HYP IO (which is essentially the GICv2 control
->> registers) using the same method as for memory. It recently appeared
->> that is a bit unsafe:
+>> So far, we're using a complicated sequence of alternatives to
+>> patch the kernel/hyp VA mask on non-VHE, and NOP out the
+>> masking altogether when on VHE.
 >>
->> We compute the HYP VA using the kern_hyp_va helper, but that helper
->> is only designed to deal with kernel VAs coming from the linear map,
->> and not from the vmalloc region... This could in turn cause some bad
->> aliasing between the two, amplified by the upcoming VA randomisation.
->>
->> A solution is to come up with our very own basic VA allocator for
->> MMIO. Since half of the HYP address space only contains a single
->> page (the idmap), we have plenty to borrow from. Let's use the idmap
->> as a base, and allocate downwards from it. GICv2 now lives on the
->> other side of the great VA barrier.
+>> The newly introduced dynamic patching gives us the opportunity
+>> to simplify that code by patching a single instruction with
+>> the correct mask (instead of the mind bending cummulative masking
 > 
->> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->> index 9946f8a38b26..a9577ecc3e6a 100644
->> --- a/virt/kvm/arm/mmu.c
->> +++ b/virt/kvm/arm/mmu.c
->> @@ -43,6 +43,9 @@ static unsigned long hyp_idmap_start;
->>  static unsigned long hyp_idmap_end;
->>  static phys_addr_t hyp_idmap_vector;
->>  
->> +static DEFINE_MUTEX(io_map_lock);
->> +static unsigned long io_map_base;
+> (Nit: cumulative)
+> 
+> (so this series removes mind bending code?)
+
+Absolutely. And replaces it with... erm... (/me shuts up).
+
+> 
+>> we have at the moment) or even a single NOP on VHE. This also
+>> adds some initial code that will allow the patching callback
+>> to switch to a more complex patching.
+> 
+>> diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
+>> new file mode 100644
+>> index 000000000000..45e7802328d4
+>> --- /dev/null
+>> +++ b/arch/arm64/kvm/va_layout.c
+> 
+>> +void __init kvm_update_va_mask(struct alt_instr *alt,
+>> +			       __le32 *origptr, __le32 *updptr, int nr_inst)
+>> +{
+>> +	int i;
 >> +
->>  #define S2_PGD_SIZE	(PTRS_PER_S2_PGD * sizeof(pgd_t))
->>  #define hyp_pgd_order get_order(PTRS_PER_PGD * sizeof(pgd_t))
->>  
->> @@ -518,27 +521,37 @@ static void unmap_hyp_idmap_range(pgd_t *pgdp, phys_addr_t start, u64 size)
->>   *
->>   * Assumes hyp_pgd is a page table used strictly in Hyp-mode and
->>   * therefore contains either mappings in the kernel memory area (above
->> - * PAGE_OFFSET), or device mappings in the vmalloc range (from
->> - * VMALLOC_START to VMALLOC_END).
->> + * PAGE_OFFSET), or device mappings in the idmap range.
->>   *
->> - * boot_hyp_pgd should only map two pages for the init code.
->> + * boot_hyp_pgd should only map the idmap range, and is only used in
->> + * the extended idmap case.
->>   */
->>  void free_hyp_pgds(void)
->>  {
->> +	pgd_t *id_pgd;
+>> +	/* We only expect a single instruction in the alternative sequence */
+>> +	BUG_ON(nr_inst != 1);
 >> +
->>  	mutex_lock(&kvm_hyp_pgd_mutex);
->>  
->> +	id_pgd = boot_hyp_pgd ? boot_hyp_pgd : hyp_pgd;
+>> +	if (!has_vhe() && !va_mask)
+>> +		compute_layout();
 >> +
->> +	if (id_pgd) {
->> +		mutex_lock(&io_map_lock);
+>> +	for (i = 0; i < nr_inst; i++) {
+>> +		u32 rd, rn, insn, oinsn;
+>> +
+>> +		/*
+>> +		 * VHE doesn't need any address translation, let's NOP
+>> +		 * everything.
+>> +		 */
+>> +		if (has_vhe()) {
+>> +			updptr[i] = aarch64_insn_gen_nop();
 > 
-> This takes kvm_hyp_pgd_mutex then io_map_lock ...
+> cpu_to_le32()? (I'm not going to try an boot a BE VHE model...)
+
+You're missing out. Let's make BE big again.
+
+> 
+> aarch64_insn_gen_nop() returns:
+> | aarch64_insn_get_hint_value() | AARCH64_INSN_HINT_NOP;
+> 
+> It doesn't look like these aarch64_insn_get_XXX_value() helpers are forcing a
+> particular endianness. ftrace uses this, via ftrace_modify_code() ->
+> aarch64_insn_patch_text_nosync() -> aarch64_insn_write(), which does:
+> | return  __aarch64_insn_write(addr, cpu_to_le32(insn));
+> 
+> So it looks like the conversion is required. Patch 16 looks fine for this.
+
+Absolutely correct, I'm missing the byte swap. Now fixed.
+
+> (and, I ran the teardown code on Juno big-endian...)
+
+Wow. You *the* user!!!! ;-)
+
 > 
 > 
->> +		/* In case we never called hyp_mmu_init() */
->> +		if (!io_map_base)
->> +			io_map_base = hyp_idmap_start;
->> +		unmap_hyp_idmap_range(id_pgd, io_map_base,
->> +				      hyp_idmap_start + PAGE_SIZE - io_map_base);
->> +		mutex_unlock(&io_map_lock);
+>> +			continue;
+>> +		}
+>> +
+>> +		oinsn = le32_to_cpu(origptr[i]);
+>> +		rd = aarch64_insn_decode_register(AARCH64_INSN_REGTYPE_RD, oinsn);
+>> +		rn = aarch64_insn_decode_register(AARCH64_INSN_REGTYPE_RN, oinsn);
+>> +
+>> +		insn = compute_instruction(i, rd, rn);
+>> +		BUG_ON(insn == AARCH64_BREAK_FAULT);
+>> +
+>> +		updptr[i] = cpu_to_le32(insn);
 >> +	}
->> +
->>  	if (boot_hyp_pgd) {
->> -		unmap_hyp_idmap_range(boot_hyp_pgd, hyp_idmap_start, PAGE_SIZE);
->>  		free_pages((unsigned long)boot_hyp_pgd, hyp_pgd_order);
->>  		boot_hyp_pgd = NULL;
->>  	}
->>  
->>  	if (hyp_pgd) {
->> -		unmap_hyp_idmap_range(hyp_pgd, hyp_idmap_start, PAGE_SIZE);
->>  		unmap_hyp_range(hyp_pgd, kern_hyp_va(PAGE_OFFSET),
->>  				(uintptr_t)high_memory - PAGE_OFFSET);
->> -		unmap_hyp_range(hyp_pgd, kern_hyp_va(VMALLOC_START),
->> -				VMALLOC_END - VMALLOC_START);
->>  
->>  		free_pages((unsigned long)hyp_pgd, hyp_pgd_order);
->>  		hyp_pgd = NULL;
+>> +}
 > 
->> @@ -747,11 +761,43 @@ int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
->>  		return 0;
->>  	}
+> With that,
 > 
->> +	mutex_lock(&io_map_lock);
-> 
->> -	start = kern_hyp_va((unsigned long)*kaddr);
->> -	end = kern_hyp_va((unsigned long)*kaddr + size);
->> -	ret = __create_hyp_mappings(hyp_pgd, PTRS_PER_PGD, start, end,
->> -				     __phys_to_pfn(phys_addr), PAGE_HYP_DEVICE);
->> +	/*
->> +	 * This assumes that we we have enough space below the idmap
->> +	 * page to allocate our VAs. If not, the check below will
->> +	 * kick. A potential alternative would be to detect that
->> +	 * overflow and switch to an allocation above the idmap.
->> +	 *
->> +	 * The allocated size is always a multiple of PAGE_SIZE.
->> +	 */
->> +	size = PAGE_ALIGN(size + offset_in_page(phys_addr));
->> +	base = io_map_base - size;
->> +
->> +	/*
->> +	 * Verify that BIT(VA_BITS - 1) hasn't been flipped by
->> +	 * allocating the new area, as it would indicate we've
->> +	 * overflowed the idmap/IO address range.
->> +	 */
->> +	if ((base ^ io_map_base) & BIT(VA_BITS - 1)) {
->> +		ret = -ENOMEM;
->> +		goto out;
->> +	}
->> +
->> +	if (__kvm_cpu_uses_extended_idmap())
->> +		pgd = boot_hyp_pgd;
->> +
->> +	ret = __create_hyp_mappings(pgd, __kvm_idmap_ptrs_per_pgd(),
->> +				    base, base + size,
->> +				    __phys_to_pfn(phys_addr), PAGE_HYP_DEVICE);
-> 
-> And here we have io_map_lock, but __create_hyp_mappings takes kvm_hyp_pgd_mutex.
-> 
-> There is another example of this in create_hyp_exec_mappings, I think making
-> this the required order makes sense: if you are mapping to the KVM-IO region,
-> you take the io_map_lock before taking the pgd lock to write in your allocated
-> location. (free_hyp_pgds() is always going to need to take both).
-> 
-> Never going to happen, but it generates a lockdep splat[1].
-> Fixup diff[0] below fixes it for me.
+> Reviewed-by: James Morse <james.morse@arm.com>
 
-Thanks for noticing this.
-
-In the end, I wonder if there is an actual need for this io_map_lock at
-all. We can perfectly take the the pgd lock to allocate the IOVA area,
-commit the allocation, drop the lock and call __create_hyp_mapping,
-which is going to take it again.
-
-What if the mapping fails? We end-up having committed the IOVA
-allocation, and having dropped the lock makes it nigh impossibly to roll
-it back. But failing a HYP mapping that early is pretty fatal anyway,
-and we're going to tear down the whole of HYP, never mind the IOVA
-allocator. So I'm more than tempted to do away with that extra lock, and
-rely on the existing one. This isn't exactly a fast path anyway...
-
-Thanks,
+Thanks a lot,
 
 	M.
 -- 
