@@ -1,36 +1,59 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: arm64 kvm built with clang doesn't boot
-Date: Fri, 16 Mar 2018 17:18:13 +0000
-Message-ID: <38b3c636-38cd-2cc5-79d0-8ccf234e2b26@arm.com>
-References: <CAAeHK+xjnXnrG0p06r-QRcUucYi5vcTJOn3mSS-JVxX9_TYg4w@mail.gmail.com>
- <26a25069-ea1d-5fb3-549c-ab653f454a30@arm.com>
- <CAAeHK+zq4-mw3pCNf3nob3gN-s+aWVq7vUy1p8yY4bU4QYNNMg@mail.gmail.com>
- <2e84a842-96e8-aec4-8b85-9ee879bb323a@arm.com>
- <CAKwvOd=-TeLJn9=V_Dmj-X+qcRBcfH8tcktbm33xAx671VCYUw@mail.gmail.com>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v6 00/26] KVM/arm64: Randomise EL2 mappings (variant 3a
+ mitigation)
+Date: Fri, 16 Mar 2018 17:46:45 +0000
+Message-ID: <20180316174644.klbpmuhyod5qea3r@armageddon.cambridge.arm.com>
+References: <20180314165049.30105-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAKwvOd=-TeLJn9=V_Dmj-X+qcRBcfH8tcktbm33xAx671VCYUw@mail.gmail.com>
-Content-Language: en-GB
-Sender: linux-kernel-owner@vger.kernel.org
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Andrey Konovalov <andreyknvl@google.com>, Stephen Hines <srhines@google.com>, Greg Hackmann <ghackmann@google.com>, christoffer.dall@linaro.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, LKML <linux-kernel@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Sami Tolvanen <samitolvanen@google.com>, takahiro.akashi@linaro.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D5D0F40672
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Mar 2018 13:39:32 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id iacvcIIIU1hc for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 16 Mar 2018 13:39:11 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 34E49405D1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Mar 2018 13:39:11 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <20180314165049.30105-1-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvm@vger.kernel.org, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 16/03/18 16:52, Nick Desaulniers wrote:
+On Wed, Mar 14, 2018 at 04:50:23PM +0000, Marc Zyngier wrote:
+> Whilst KVM benefits from the kernel randomisation via KASLR, there is
+> no additional randomisation when the kernel is running at EL1, as we
+> directly use a fixed offset from the linear mapping. This is not
+> necessarily a problem, but we could do a bit better by independently
+> randomizing the HYP placement.
 
-[dropping kernel-dynamic-tools@google.com which keeps bouncing]
+For the rest of the patches in this series:
 
-> Is this in regards to: commit "arm64: Add ARM_SMCCC_ARCH_WORKAROUND_1 BP
-> hardening support"? Has anyone tried to upstream a fix for this?  We
-> probably want to be very explicit with register widths here.
-What do you mean? The current code is as strict as it gets, and
-explicitly tells the compiler to use the right register width, based on
-the SMC call parameter types.
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 
-Thanks,
+Some points for a future series:
 
-	M.
+- in bpi.S, drop the __smccc_workaround_1_hvc_start/end as HVC PSCI
+  conduit for hyp doesn't make much sense (could pass NULL instead to
+  __install_bp_hardening_cb())
+
+- maybe move bpi.S under arch/arm64/kvm/ if it doesn't cause other
+  dependency issues in cpu_errata.c
+
+Thanks.
+
 -- 
-Jazz is not dead. It just smells funny...
+Catalin
