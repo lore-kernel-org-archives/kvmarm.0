@@ -1,66 +1,47 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v6 00/26] KVM/arm64: Randomise EL2 mappings (variant 3a
- mitigation)
-Date: Fri, 16 Mar 2018 18:05:59 +0000
-Message-ID: <a91ea637-1d20-2d9a-7da9-16fd695497a6@arm.com>
-References: <20180314165049.30105-1-marc.zyngier@arm.com>
- <20180316174644.klbpmuhyod5qea3r@armageddon.cambridge.arm.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: arm64 kvm built with clang doesn't boot
+Date: Sat, 17 Mar 2018 10:19:12 +0000
+Message-ID: <CAKv+Gu-eBHaoyqO_Vs0ZWahj9pkWWo6kP+9svtMoqcFMjKVd7A@mail.gmail.com>
+References: <CAAeHK+xjnXnrG0p06r-QRcUucYi5vcTJOn3mSS-JVxX9_TYg4w@mail.gmail.com>
+ <26a25069-ea1d-5fb3-549c-ab653f454a30@arm.com> <CAAeHK+zq4-mw3pCNf3nob3gN-s+aWVq7vUy1p8yY4bU4QYNNMg@mail.gmail.com>
+ <2e84a842-96e8-aec4-8b85-9ee879bb323a@arm.com> <CAKwvOd=-TeLJn9=V_Dmj-X+qcRBcfH8tcktbm33xAx671VCYUw@mail.gmail.com>
+ <20180316171349.fodlraapz2sq2hhs@lakrids.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E7B2D401AB
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Mar 2018 13:58:46 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WDAdFaP3D4Ns for <kvmarm@lists.cs.columbia.edu>;
- Fri, 16 Mar 2018 13:58:24 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 98FD04029E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Mar 2018 13:58:24 -0400 (EDT)
-In-Reply-To: <20180316174644.klbpmuhyod5qea3r@armageddon.cambridge.arm.com>
-Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: kvm@vger.kernel.org, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180316171349.fodlraapz2sq2hhs@lakrids.cambridge.arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Mark Rutland <mark.rutland@arm.com>, Thomas Garnier <thgarnie@google.com>
+Cc: Nick Desaulniers <ndesaulniers@google.com>, kernel-dynamic-tools <kernel-dynamic-tools@google.com>, Sami Tolvanen <samitolvanen@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Andrey Konovalov <andreyknvl@google.com>, Will Deacon <will.deacon@arm.com>, LKML <linux-kernel@vger.kernel.org>, Greg Hackmann <ghackmann@google.com>, AKASHI Takahiro <takahiro.akashi@linaro.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Stephen Hines <srhines@google.com>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm <kvmarm@lists.cs.columbia.edu>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 16/03/18 17:46, Catalin Marinas wrote:
-> On Wed, Mar 14, 2018 at 04:50:23PM +0000, Marc Zyngier wrote:
->> Whilst KVM benefits from the kernel randomisation via KASLR, there is
->> no additional randomisation when the kernel is running at EL1, as we
->> directly use a fixed offset from the linear mapping. This is not
->> necessarily a problem, but we could do a bit better by independently
->> randomizing the HYP placement.
-> 
-> For the rest of the patches in this series:
-> 
-> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+(+ Thomas)
 
-Thanks for that.
+On 16 March 2018 at 17:13, Mark Rutland <mark.rutland@arm.com> wrote:
+> On Fri, Mar 16, 2018 at 04:52:08PM +0000, Nick Desaulniers wrote:
+>> + Sami (Google), Takahiro (Linaro)
+>>
+>> Just so I fully understand the problem enough to articulate it, we'd be
+>> looking for the compiler to keep the jump tables for speed (I would guess
+>> -fno-jump-tables would emit an if-else chain) but only emit relative jumps
+>> (not absolute jumps)?
+>
+> Our main concern is that there is no absolute addressing. If that rules
+> out using a relative jump table, that's ok.
+>
+> We want to avoid the fragility of collecting -f-no-* options as future
+> compiler transformations end up introducing absolute addressing.
+>
 
-> Some points for a future series:
-> 
-> - in bpi.S, drop the __smccc_workaround_1_hvc_start/end as HVC PSCI
->   conduit for hyp doesn't make much sense (could pass NULL instead to
->   __install_bp_hardening_cb())
-> 
-> - maybe move bpi.S under arch/arm64/kvm/ if it doesn't cause other
->   dependency issues in cpu_errata.c
+This all comes back to the assumptions made by the compiler when
+building PIC/PIE code, i.e., that symbols should be preemptible and
+thus all references should be indirected via GOT entries, and that
+text relocations should be avoided.
 
-Sure. I'll have a look at a bit of a post-paranoia cleanup next week.
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+If we had a way to tell the compiler that these concerns do not apply
+for us, we could use -fpic/-fpie in the kernel and be done with it.
+-fvisibility=hidden *almost* gives us what we need, but in practice,
+only the #pragma variant (#pragma GCC visibility push (hidden)) makes
+-fpic behave in a sensible way for freestanding builds, and gets rid
+of absolute references where possible (note that statically
+initialized pointer variables always involve absolute relocations)
