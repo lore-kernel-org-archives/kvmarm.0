@@ -1,47 +1,45 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: arm64 kvm built with clang doesn't boot
-Date: Sat, 17 Mar 2018 10:19:12 +0000
-Message-ID: <CAKv+Gu-eBHaoyqO_Vs0ZWahj9pkWWo6kP+9svtMoqcFMjKVd7A@mail.gmail.com>
-References: <CAAeHK+xjnXnrG0p06r-QRcUucYi5vcTJOn3mSS-JVxX9_TYg4w@mail.gmail.com>
- <26a25069-ea1d-5fb3-549c-ab653f454a30@arm.com> <CAAeHK+zq4-mw3pCNf3nob3gN-s+aWVq7vUy1p8yY4bU4QYNNMg@mail.gmail.com>
- <2e84a842-96e8-aec4-8b85-9ee879bb323a@arm.com> <CAKwvOd=-TeLJn9=V_Dmj-X+qcRBcfH8tcktbm33xAx671VCYUw@mail.gmail.com>
- <20180316171349.fodlraapz2sq2hhs@lakrids.cambridge.arm.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Subject: Re: [PATCH] arm64: rename the function arm64_is_ras_serror() to
+ avoid confusion
+Date: Sun, 18 Mar 2018 05:00:10 +0000
+Message-ID: <0184EA26B2509940AA629AE1405DD7F201B6C1B2@DGGEMA503-MBS.china.huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180316171349.fodlraapz2sq2hhs@lakrids.cambridge.arm.com>
+Content-Language: zh-CN
 Sender: linux-kernel-owner@vger.kernel.org
-To: Mark Rutland <mark.rutland@arm.com>, Thomas Garnier <thgarnie@google.com>
-Cc: Nick Desaulniers <ndesaulniers@google.com>, kernel-dynamic-tools <kernel-dynamic-tools@google.com>, Sami Tolvanen <samitolvanen@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Andrey Konovalov <andreyknvl@google.com>, Will Deacon <will.deacon@arm.com>, LKML <linux-kernel@vger.kernel.org>, Greg Hackmann <ghackmann@google.com>, AKASHI Takahiro <takahiro.akashi@linaro.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Stephen Hines <srhines@google.com>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm <kvmarm@lists.cs.columbia.edu>, Christoffer Dall <christoffer.dall@linaro.org>
+To: James Morse <james.morse@arm.com>, gengdongjiu <gengdj.1984@gmail.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "Huangshaoyu (Shawn)" <huangshaoyu@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-(+ Thomas)
-
-On 16 March 2018 at 17:13, Mark Rutland <mark.rutland@arm.com> wrote:
-> On Fri, Mar 16, 2018 at 04:52:08PM +0000, Nick Desaulniers wrote:
->> + Sami (Google), Takahiro (Linaro)
->>
->> Just so I fully understand the problem enough to articulate it, we'd be
->> looking for the compiler to keep the jump tables for speed (I would guess
->> -fno-jump-tables would emit an if-else chain) but only emit relative jumps
->> (not absolute jumps)?
->
-> Our main concern is that there is no absolute addressing. If that rules
-> out using a relative jump table, that's ok.
->
-> We want to avoid the fragility of collecting -f-no-* options as future
-> compiler transformations end up introducing absolute addressing.
->
-
-This all comes back to the assumptions made by the compiler when
-building PIC/PIE code, i.e., that symbols should be preemptible and
-thus all references should be indirected via GOT entries, and that
-text relocations should be avoided.
-
-If we had a way to tell the compiler that these concerns do not apply
-for us, we could use -fpic/-fpie in the kernel and be done with it.
--fvisibility=hidden *almost* gives us what we need, but in practice,
-only the #pragma variant (#pragma GCC visibility push (hidden)) makes
--fpic behave in a sensible way for freestanding builds, and gets rid
-of absolute references where possible (note that statically
-initialized pointer variables always involve absolute relocations)
+SGkgSmFtZXMsDQoNCj4gSGkgZ2VuZ2RvbmdqaXUsDQo+IA0KPiBPbiAyNi8wMi8xOCAxNjoxMywg
+Z2VuZ2RvbmdqaXUgd3JvdGU6DQo+ID4gMjAxOC0wMi0yNCAxOjU4IEdNVCswODowMCBKYW1lcyBN
+b3JzZSA8amFtZXMubW9yc2VAYXJtLmNvbT46DQo+ID4+IE9uIDIyLzAyLzE4IDE4OjAyLCBEb25n
+aml1IEdlbmcgd3JvdGU6DQo+ID4+PiBUaGUgUkFTIFNFcnJvciBTeW5kcm9tZSBjYW4gYmUgSW1w
+bGVtZW50YXRpb24tRGVmaW5lZCwNCj4gPj4+IGFybTY0X2lzX3Jhc19zZXJyb3IoKSBpcyB1c2Vk
+IHRvIGp1ZGdlIHdoZXRoZXIgaXQgaXMgUkFTIFNFcnJvciwgYnV0DQo+ID4+PiBhcm02NF9pc19y
+YXNfc2Vycm9yKCkgZG9lcyBub3QgaW5jbHVkZSB0aGlzIGp1ZGdlbWVudC4gSW4gb3JkZXIgdG8N
+Cj4gPj4+IGF2b2lkIGZ1bmN0aW9uIG5hbWUgY29uZnVzaW9uLCB3ZSByZW5hbWUgdGhlIGFybTY0
+X2lzX3Jhc19zZXJyb3IoKQ0KPiA+Pj4gdG8gYXJtNjRfaXNfY2F0ZWdvcml6ZWRfcmFzX3NlcnJv
+cigpLCB0aGlzIGZ1bmN0aW9uIGlzIHVzZWQgdG8ganVkZ2UNCj4gPj4+IHdoZXRoZXIgaXQgaXMg
+Y2F0ZWdvcml6ZWQgUkFTIFNlcnJvci4NCj4gPj4NCj4gPj4gSSBkb24ndCBzZWUgaG93ICdjYXRl
+Z29yaXplZCcgaXMgcmVsZXZhbnQuIFRoZSBtb3N0IHNpZ25pZmljYW50IElTUw0KPiA+PiBiaXQg
+aXMgdXNlZCB0byBkZXRlcm1pbmUgaWYgdGhpcyBpcyBhbiBJTVAtREVGIEVTUiwgb3Igb25lIHRo
+YXQgdXNlcyB0aGUgYXJjaGl0ZWN0ZWQgbGF5b3V0Lg0KPiA+DQo+ID4gRnJvbSB0aGUgbmFtZSBh
+cm02NF9pc19yYXNfc2Vycm9yKCksIGl0IHVzZWQgdG8ganVkZ2Ugd2hldGhlciB0aGlzIGlzDQo+
+ID4gUkFTIFNlcnJvciwgYnV0IGFybTY0X2lzX3Jhc19zZXJyb3IoKSB0aGluayB0aGUgSU1QLURF
+RiBTRXJyb3IgaXMgbm90DQo+ID4gUkFTIFNFcnJvciwgYXMgc2hvd24gdGhlIGNvZGUgbm90ZSBh
+bmQgY29kZSBpblsxXS4NCj4gDQo+ID4gSW4gZmFjdCB0aGUgSU1QLURFRiBTRXJyb3IgaXMgYWxz
+byBSQVMgU0Vycm9yLCBzbyB3aGVuIEkgcmVhZCB0aGUNCj4gPiBjb2RlLCBpdCBsb29rcyBsaWtl
+DQo+IA0KPiBUaGlzIGlzIGp1c3QgeW91IHRoZW4uIE5vLW9uZSBlbHNlIGhhcyB5b3VyIGltcC1k
+ZWY6UkFTIGVycm9yIEVTUiB2YWx1ZXMuDQo+IA0KPiBUaGlzIHdvdWxkIGJlIGxpa2UgbWUgYWRk
+aW5nIHNvbWUgaW1wZGVmIGJyYW5jaCBpbnN0cnVjdGlvbiwgdGhlbiBjbGFpbWluZw0KPiBhYXJj
+aDY0X2luc25faXNfYnJhbmNoKCkgZG9lc24ndCB0YWtlIGFjY291bnQgb2YgbXkgcHJpdmF0ZSBh
+ZGRpdGlvbnMuDQo+IA0KPiBJIGFncmVlIHRoZSBuYW1lIGlzIGFzc3VtaW5nIGFsbCBhcmNoaXRl
+Y3RlZCBFU1IgYXJlIFJBUy1lcnJvcnMsIGFuZCB0aGF0IGltcGRlZiBFU1IgYXJlIGp1c3QgdGhh
+dDogaW1wZGVmLCB0aGF0J3MgYWxsIHdlIGtub3cgYWJvdXQgdGhlbS4NCj4gVW5sZXNzIHRoaXMg
+Y2F1c2VzIHVzIHRvIGRvIHRoZSB3cm9uZyB0aGluZywgSSBkb24ndCB0aGluayBpdCBtYXR0ZXJz
+Lg0KPiBPYnZpb3VzbHkgd2Ugd291bGQgbmVlZCB0byBjaGFuZ2UgaXQgaWYgYSBuZXcgYXJjaGl0
+ZWN0ZWQgRVNSIGlzIGFkZGVkLg0KDQpPaywgbGV0IHVzIGtlZXAgdGhlIGN1cnJlbnQgY29kZSBh
+bmQgbm90IGNoYW5nZSBpdCB1bnRpbCBhIG5ldyBhcmNoaXRlY3RlZCBFU1IgaXMgYWRkZWQNCg==
