@@ -1,45 +1,85 @@
 From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: Re: [PATCH] arm64: rename the function arm64_is_ras_serror() to
- avoid confusion
-Date: Sun, 18 Mar 2018 05:00:10 +0000
-Message-ID: <0184EA26B2509940AA629AE1405DD7F201B6C1B2@DGGEMA503-MBS.china.huawei.com>
+Subject: Re: [PATCH v10 1/5] arm64: KVM: Prepare set virtual SEI syndrome
+ value
+Date: Sun, 18 Mar 2018 05:17:22 +0000
+Message-ID: <0184EA26B2509940AA629AE1405DD7F201B6C1D7@DGGEMA503-MBS.china.huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Language: zh-CN
 Sender: linux-kernel-owner@vger.kernel.org
-To: James Morse <james.morse@arm.com>, gengdongjiu <gengdj.1984@gmail.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "Huangshaoyu (Shawn)" <huangshaoyu@huawei.com>
+To: James Morse <james.morse@arm.com>
+Cc: "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "rjw@rjwysocki.net" <rjw@rjwysocki.net>, "bp@alien8.de" <bp@alien8.de>, "lenb@kernel.org" <lenb@kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>, devel@acpic
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGkgSmFtZXMsDQoNCj4gSGkgZ2VuZ2RvbmdqaXUsDQo+IA0KPiBPbiAyNi8wMi8xOCAxNjoxMywg
-Z2VuZ2RvbmdqaXUgd3JvdGU6DQo+ID4gMjAxOC0wMi0yNCAxOjU4IEdNVCswODowMCBKYW1lcyBN
-b3JzZSA8amFtZXMubW9yc2VAYXJtLmNvbT46DQo+ID4+IE9uIDIyLzAyLzE4IDE4OjAyLCBEb25n
-aml1IEdlbmcgd3JvdGU6DQo+ID4+PiBUaGUgUkFTIFNFcnJvciBTeW5kcm9tZSBjYW4gYmUgSW1w
-bGVtZW50YXRpb24tRGVmaW5lZCwNCj4gPj4+IGFybTY0X2lzX3Jhc19zZXJyb3IoKSBpcyB1c2Vk
-IHRvIGp1ZGdlIHdoZXRoZXIgaXQgaXMgUkFTIFNFcnJvciwgYnV0DQo+ID4+PiBhcm02NF9pc19y
-YXNfc2Vycm9yKCkgZG9lcyBub3QgaW5jbHVkZSB0aGlzIGp1ZGdlbWVudC4gSW4gb3JkZXIgdG8N
-Cj4gPj4+IGF2b2lkIGZ1bmN0aW9uIG5hbWUgY29uZnVzaW9uLCB3ZSByZW5hbWUgdGhlIGFybTY0
-X2lzX3Jhc19zZXJyb3IoKQ0KPiA+Pj4gdG8gYXJtNjRfaXNfY2F0ZWdvcml6ZWRfcmFzX3NlcnJv
-cigpLCB0aGlzIGZ1bmN0aW9uIGlzIHVzZWQgdG8ganVkZ2UNCj4gPj4+IHdoZXRoZXIgaXQgaXMg
-Y2F0ZWdvcml6ZWQgUkFTIFNlcnJvci4NCj4gPj4NCj4gPj4gSSBkb24ndCBzZWUgaG93ICdjYXRl
-Z29yaXplZCcgaXMgcmVsZXZhbnQuIFRoZSBtb3N0IHNpZ25pZmljYW50IElTUw0KPiA+PiBiaXQg
-aXMgdXNlZCB0byBkZXRlcm1pbmUgaWYgdGhpcyBpcyBhbiBJTVAtREVGIEVTUiwgb3Igb25lIHRo
-YXQgdXNlcyB0aGUgYXJjaGl0ZWN0ZWQgbGF5b3V0Lg0KPiA+DQo+ID4gRnJvbSB0aGUgbmFtZSBh
-cm02NF9pc19yYXNfc2Vycm9yKCksIGl0IHVzZWQgdG8ganVkZ2Ugd2hldGhlciB0aGlzIGlzDQo+
-ID4gUkFTIFNlcnJvciwgYnV0IGFybTY0X2lzX3Jhc19zZXJyb3IoKSB0aGluayB0aGUgSU1QLURF
-RiBTRXJyb3IgaXMgbm90DQo+ID4gUkFTIFNFcnJvciwgYXMgc2hvd24gdGhlIGNvZGUgbm90ZSBh
-bmQgY29kZSBpblsxXS4NCj4gDQo+ID4gSW4gZmFjdCB0aGUgSU1QLURFRiBTRXJyb3IgaXMgYWxz
-byBSQVMgU0Vycm9yLCBzbyB3aGVuIEkgcmVhZCB0aGUNCj4gPiBjb2RlLCBpdCBsb29rcyBsaWtl
-DQo+IA0KPiBUaGlzIGlzIGp1c3QgeW91IHRoZW4uIE5vLW9uZSBlbHNlIGhhcyB5b3VyIGltcC1k
-ZWY6UkFTIGVycm9yIEVTUiB2YWx1ZXMuDQo+IA0KPiBUaGlzIHdvdWxkIGJlIGxpa2UgbWUgYWRk
-aW5nIHNvbWUgaW1wZGVmIGJyYW5jaCBpbnN0cnVjdGlvbiwgdGhlbiBjbGFpbWluZw0KPiBhYXJj
-aDY0X2luc25faXNfYnJhbmNoKCkgZG9lc24ndCB0YWtlIGFjY291bnQgb2YgbXkgcHJpdmF0ZSBh
-ZGRpdGlvbnMuDQo+IA0KPiBJIGFncmVlIHRoZSBuYW1lIGlzIGFzc3VtaW5nIGFsbCBhcmNoaXRl
-Y3RlZCBFU1IgYXJlIFJBUy1lcnJvcnMsIGFuZCB0aGF0IGltcGRlZiBFU1IgYXJlIGp1c3QgdGhh
-dDogaW1wZGVmLCB0aGF0J3MgYWxsIHdlIGtub3cgYWJvdXQgdGhlbS4NCj4gVW5sZXNzIHRoaXMg
-Y2F1c2VzIHVzIHRvIGRvIHRoZSB3cm9uZyB0aGluZywgSSBkb24ndCB0aGluayBpdCBtYXR0ZXJz
-Lg0KPiBPYnZpb3VzbHkgd2Ugd291bGQgbmVlZCB0byBjaGFuZ2UgaXQgaWYgYSBuZXcgYXJjaGl0
-ZWN0ZWQgRVNSIGlzIGFkZGVkLg0KDQpPaywgbGV0IHVzIGtlZXAgdGhlIGN1cnJlbnQgY29kZSBh
-bmQgbm90IGNoYW5nZSBpdCB1bnRpbCBhIG5ldyBhcmNoaXRlY3RlZCBFU1IgaXMgYWRkZWQNCg==
+Hi James,
+
+> 
+> Hi Dongjiu Geng,
+> 
+> On 03/03/18 16:09, Dongjiu Geng wrote:
+> > Export one API to specify virtual SEI syndrome value for guest, and
+> > add a helper to get the VSESR_EL2 value.
+> 
+> This patch adds two helpers that nothing calls... its not big, please merge it with the patch that uses these.
+
+OK, thanks, I will merge them.
+
+> 
+> 
+> > diff --git a/arch/arm64/include/asm/kvm_emulate.h
+> > b/arch/arm64/include/asm/kvm_emulate.h
+> > index 413dc82..3294885 100644
+> > --- a/arch/arm64/include/asm/kvm_emulate.h
+> > +++ b/arch/arm64/include/asm/kvm_emulate.h
+> > @@ -71,6 +71,11 @@ static inline void vcpu_set_hcr(struct kvm_vcpu *vcpu, unsigned long hcr)
+> >  	vcpu->arch.hcr_el2 = hcr;
+> >  }
+> >
+> > +static inline unsigned long vcpu_get_vsesr(struct kvm_vcpu *vcpu) {
+> > +	return vcpu->arch.vsesr_el2;
+> > +}
+> > +
+> >  static inline void vcpu_set_vsesr(struct kvm_vcpu *vcpu, u64 vsesr)
+> > {
+> >  	vcpu->arch.vsesr_el2 = vsesr;
+> > diff --git a/arch/arm64/include/asm/kvm_host.h
+> > b/arch/arm64/include/asm/kvm_host.h
+> > index a73f63a..3dc49b7 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -354,6 +354,8 @@ void handle_exit_early(struct kvm_vcpu *vcpu,
+> > struct kvm_run *run,  int kvm_perf_init(void);  int
+> > kvm_perf_teardown(void);
+> >
+> > +void kvm_set_sei_esr(struct kvm_vcpu *vcpu, u64 syndrome);
+> > +
+> >  struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long
+> > mpidr);
+> >
+> >  static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr, diff
+> > --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+> > index 60666a0..78ecb28 100644
+> > --- a/arch/arm64/kvm/inject_fault.c
+> > +++ b/arch/arm64/kvm/inject_fault.c
+> > @@ -186,3 +186,8 @@ void kvm_inject_vabt(struct kvm_vcpu *vcpu)  {
+> >  	pend_guest_serror(vcpu, ESR_ELx_ISV);  }
+> > +
+> > +void kvm_set_sei_esr(struct kvm_vcpu *vcpu, u64 syndrome) {
+> > +	pend_guest_serror(vcpu, syndrome & ESR_ELx_ISS_MASK);
+> 
+> If you move the ISS_MASK into pend_guest_serror(), you wouldn't need this at all.
+> 
+> It would be better if any validation were in the user-space helpers so we can check user-space hasn't put something funny in the top bits.
+
+Yes, I agree your idea, thanks for the good suggestion.
+
+> 
+> > +}
+> >
+> 
+> 
+> Thanks,
+> 
+> James
