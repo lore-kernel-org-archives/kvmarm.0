@@ -1,16 +1,15 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [RFC 02/12] KVM: arm/arm64: Document
- KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
-Date: Mon, 19 Mar 2018 21:56:06 +0100
-Message-ID: <93b3cb3b-6ceb-0277-154e-14bfa5b8f0e6@redhat.com>
+Subject: Re: [RFC 03/12] KVM: arm/arm64: Record RDIST Last bit at registration
+Date: Mon, 19 Mar 2018 22:06:24 +0100
+Message-ID: <f6126707-45b7-309e-4cc9-16833e7d27d4@redhat.com>
 References: <1521451220-27754-1-git-send-email-eric.auger@redhat.com>
- <1521451220-27754-3-git-send-email-eric.auger@redhat.com>
- <f00d314f-7f16-1785-b0e2-6d4d815514dc@arm.com>
+ <1521451220-27754-4-git-send-email-eric.auger@redhat.com>
+ <3943c306-5204-3a2b-0e06-7c8a4298c9fc@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <f00d314f-7f16-1785-b0e2-6d4d815514dc@arm.com>
+In-Reply-To: <3943c306-5204-3a2b-0e06-7c8a4298c9fc@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>, eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, cdall@kernel.org, peter.maydell@linaro.org
 Cc: andre.przywara@arm.com, drjones@redhat.com, wei@redhat.com
@@ -18,75 +17,100 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi Marc,
 
-On 19/03/18 15:15, Marc Zyngier wrote:
+On 19/03/18 16:57, Marc Zyngier wrote:
 > On 19/03/18 09:20, Eric Auger wrote:
->> We introduce a new KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION attribute in
->> KVM_DEV_ARM_VGIC_GRP_ADDR group. It allows userspace to provide the
->> base address and size of a redistributor region
+>> To prepare for multiple RDIST regions, let's record the RDIST
+>> Last bit field when registering the IO device.
 >>
->> Compared to KVM_VGIC_V3_ADDR_TYPE_REDIST, this new attribute allows
->> to declare several separate redistributor regions.
+>> As a reminder the Last bit indicates whether the redistributor
+>> is the highest one in a series of contiguous redistributor pages.
 >>
->> So the whole redist space does not need to be contiguous anymore.
+>> Since at the moment KVM only supports a single redist region,
+>> the RDIST tagged with the last bit set to true corresponds to the
+>> highest vCPU one.
 >>
 >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 >> ---
->>  Documentation/virtual/kvm/devices/arm-vgic-v3.txt | 12 ++++++++++++
->>  1 file changed, 12 insertions(+)
+>>  include/kvm/arm_vgic.h           | 1 +
+>>  virt/kvm/arm/vgic/vgic-mmio-v3.c | 6 +++++-
+>>  2 files changed, 6 insertions(+), 1 deletion(-)
 >>
->> diff --git a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
->> index 9293b45..2c0bedf 100644
->> --- a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
->> +++ b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
->> @@ -27,6 +27,18 @@ Groups:
->>        VCPU and all of the redistributor pages are contiguous.
->>        Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
->>        This address needs to be 64K aligned.
->> +
->> +    KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION (rw, 64-bit)
->> +      The attr field of kvm_device_attr encodes 3 values:
->> +      bits:     | 63   ....  52  |  51   ....   12 |11 - 0
->> +      values:   |     pfns       |       base      | index
->> +      - index encodes the unique redistibutor region index
->> +      - base field encodes bits [51:12] the guest physical base address
->> +        of the first redistributor in the region. There are two 64K pages
->> +        for each VCPU and all of the redistributor pages are contiguous
->> +        within the redistributor region.
+>> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+>> index cdbd142..1c8c0ff 100644
+>> --- a/include/kvm/arm_vgic.h
+>> +++ b/include/kvm/arm_vgic.h
+>> @@ -312,6 +312,7 @@ struct vgic_cpu {
+>>  	 */
+>>  	struct vgic_io_device	rd_iodev;
+>>  	struct vgic_io_device	sgi_iodev;
+>> +	bool rdist_last; /* Is the RDIST the last one of the RDIST region? */
+>>  
+>>  	/* Contains the attributes and gpa of the LPI pending tables. */
+>>  	u64 pendbaser;
+>> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>> index 671fe81..75fe689 100644
+>> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>> @@ -184,12 +184,13 @@ static unsigned long vgic_mmio_read_v3r_typer(struct kvm_vcpu *vcpu,
+>>  					      gpa_t addr, unsigned int len)
+>>  {
+>>  	unsigned long mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
+>> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+>>  	int target_vcpu_id = vcpu->vcpu_id;
+>>  	u64 value;
+>>  
+>>  	value = (u64)(mpidr & GENMASK(23, 0)) << 32;
+>>  	value |= ((target_vcpu_id & 0xffff) << 8);
+>> -	if (target_vcpu_id == atomic_read(&vcpu->kvm->online_vcpus) - 1)
+>> +	if (vgic_cpu->rdist_last)
+>>  		value |= GICR_TYPER_LAST;
+>>  	if (vgic_has_its(vcpu->kvm))
+>>  		value |= GICR_TYPER_PLPIS;
+>> @@ -580,6 +581,7 @@ int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
+>>  {
+>>  	struct kvm *kvm = vcpu->kvm;
+>>  	struct vgic_dist *vgic = &kvm->arch.vgic;
+>> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+>>  	struct vgic_io_device *rd_dev = &vcpu->arch.vgic_cpu.rd_iodev;
+>>  	struct vgic_io_device *sgi_dev = &vcpu->arch.vgic_cpu.sgi_iodev;
+>>  	gpa_t rd_base, sgi_base;
+>> @@ -632,6 +634,8 @@ int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
+>>  	}
+>>  
+>>  	vgic->vgic_redist_free_offset += 2 * SZ_64K;
+>> +	vgic_cpu->rdist_last =
+>> +		(vcpu->vcpu_id == atomic_read(&vcpu->kvm->online_vcpus) - 1);
+>>  out:
+>>  	mutex_unlock(&kvm->slots_lock);
+>>  	return ret;
+>>
 > 
-> Why does base have to include bits [15:12] of the IPA? If it is 64kB
-> aligned (as it should), these bits are guaranteed to be 0. This also
-> avoid having to return -EINVAL in case of alignment problems.
-Agreed. I hesitated but saw addresses were generally described  with
-bits[51:12] in regs such as PROPBASER/PENDBASER and I did not really
-need the spare bits.
+> I don't really like the idea of keeping this "Last" bit around, because
+> it doesn't have much to do with the state of a redistributor, and has
+> more to do with its position in the region.
+agreed. What about putting it in vgic_io_device then?.
 > 
->> +      - pfns encodes the size of the region in 64kB pages.
->> +      Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
+> What is wrong with the current approach of dynamically computing the
+> Last bit? If you have multiple regions, all you need to know is which
+> region this redistributor belongs to. From that point (and assuming you
+> know how many redistributors have been instantiated in that region, you
+> can know whether the Last bit is set or not.
+Well, looked to me more natural to compute the information once when
+registering the rdist into its region instead of each time we read the
+RDIST TYPER. Especially because at that moment we map the redist, we
+need to know anyway if we have sufficient space to put it.
 > 
-> "pfns" a bit of an odd name, and is a bit unnatural. Why don't we
-> instead encode the number of redistributors? You've already imposed that
-> a redistributor has 2 64kB pages,
-I copied the description in KVM_VGIC_V3_ADDR_TYPE_REDIST ;-) I knew that
-for GICv4 the number of 64kB pages per redist is different so I thought
-it was more generic. But I don't have a strong opinion.
- so let's take advantage of this by
-> saving yet another bit.
-> 
-> You could dedicate a couple of these bits as a selector for the ITS
-> version (v3, v4 or whatever comes after that, if ever...). Just make 0
-> the only valid version for the time being.
-OK
+> One of the issue is that the current code works in term of "target cpu",
+> while we really want is to use the addr parameter to work out if the
+> Last bit is set or not. I'd be a lot more confident if we emulate it
+> like that (which is how the HW would generate it too).
+Sorry I don't understand your comment above.
 
 Thanks
 
 Eric
 > 
->>    Errors:
->>      -E2BIG:  Address outside of addressable IPA range
->>      -EINVAL: Incorrectly aligned address
->>
-> 
-> Thanks,
+> What do you think?
 > 
 > 	M.
 > 
