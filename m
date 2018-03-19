@@ -1,60 +1,54 @@
-From: Dmitry Vyukov <dvyukov@google.com>
-Subject: Re: [PATCH v2 0/7] KASan for arm
-Date: Mon, 19 Mar 2018 09:43:48 +0100
-Message-ID: <CACT4Y+bec8x8AZOneZ57bnxei=gBGGKG2_VUiqyMaa1OPzov2g@mail.gmail.com>
-References: <B8AC3E80E903784988AB3003E3E97330C0076FFD@dggemm510-mbs.china.huawei.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <B8AC3E80E903784988AB3003E3E97330C0076FFD@dggemm510-mbs.china.huawei.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: "Liuwenliang (Abbott Liu)" <liuwenliang@huawei.com>
-Cc: "kstewart@linuxfoundation.org" <kstewart@linuxfoundation.org>, "nicolas.pitre@linaro.org" <nicolas.pitre@linaro.org>, "grygorii.strashko@linaro.org" <grygorii.strashko@linaro.org>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "tixy@linaro.org" <tixy@linaro.org>, "linux@rasmusvillemoes.dk" <linux@rasmusvillemoes.dk>, "dhowells@redhat.com" <dhowells@redhat.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "glider@google.com" <glider@google.com>, "mark.rutland@arm.com" <mark.rutland@arm.com>, "afzal.mohd.ma@gmail.com" <afzal.mohd.ma@gmail.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Florian Fainelli <f.fainelli@gmail.com>, "mawilcox@microsoft.com" <mawilcox@microsoft.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "kasan-dev@googlegroups.com" <kasan-dev@googlegroups.com>, "geert@linux-m68k.org" <geert@linux-m68k.org>, zhichao.huang
+From: Eric Auger <eric.auger@redhat.com>
+Subject: [RFC 09/12] KVM: arm/arm64: Check vcpu redist base before registering an iodev
+Date: Mon, 19 Mar 2018 10:20:17 +0100
+Message-ID: <1521451220-27754-10-git-send-email-eric.auger@redhat.com>
+References: <1521451220-27754-1-git-send-email-eric.auger@redhat.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1521451220-27754-1-git-send-email-eric.auger@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, cdall@kernel.org, peter.maydell@linaro.org
+Cc: andre.przywara@arm.com, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Mar 19, 2018 at 2:56 AM, Liuwenliang (Abbott Liu)
-<liuwenliang@huawei.com> wrote:
-> On 03/19/2018 09:23 AM, Florian Fainelli wrote:
->>On 03/18/2018 06:20 PM, Liuwenliang (Abbott Liu) wrote:
->>> On 03/19/2018 03:14 AM, Florian Fainelli wrote:
->>>> Thanks for posting these patches! Just FWIW, you cannot quite add
->>>> someone's Tested-by for a patch series that was just resubmitted given
->>>> the differences with v1. I just gave it a spin on a Cortex-A5 (no LPAE)
->>>> and it looks like test_kasan.ko is passing, great job!
->>>
->>> I'm sorry.
->>> Thanks for your testing very much!
->>> I forget to add Tested-by in cover letter patch file. But I have alreadly added
->>> Tested-by in some of following patch.
->>> In the next version I am going to add Tested-by in all patches.
->>
->>This is not exactly what I meant. When you submit a v2 of your patches,
->>you must wait for people to give you their test results. The Tested-by
->>applied to v1, and so much has changed it is no longer valid for v2
->>unless someone tells you they tested v2. Hope this is clearer.
->
-> Ok, I understand now. thank you for your explanation.
+As we are going to register several redist regions,
+vgic_register_all_redist_iodevs() may be called several times. We need
+to register a redist_iodev for a given vcpu only once. So let's
+check if the base address has already been set. Initialize this latter
+in kvm_vgic_vcpu_early_init().
 
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+---
+ virt/kvm/arm/vgic/vgic-init.c    | 3 +++
+ virt/kvm/arm/vgic/vgic-mmio-v3.c | 3 +++
+ 2 files changed, 6 insertions(+)
 
-Hi Abbott,
-
-I've skimmed through the changes and they generally look good to me. I
-am not an expect in arm, so I did not look too closely on these parts
-(which is actually most of the changes).
-
-FWIW
-Acked-by: Dmitry Vyukov <dvyukov@google.com>
-
-Please also update set of supported archs at the top of
-Documentation/dev-tools/kasan.rst
-
-Thanks for working on upstreaming this!
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index b6b4db0..03f97ce 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -82,6 +82,9 @@ void kvm_vgic_vcpu_early_init(struct kvm_vcpu *vcpu)
+ 	INIT_LIST_HEAD(&vgic_cpu->ap_list_head);
+ 	spin_lock_init(&vgic_cpu->ap_list_lock);
+ 
++	vgic_cpu->rd_iodev.base_addr = VGIC_ADDR_UNDEF;
++	vgic_cpu->sgi_iodev.base_addr = VGIC_ADDR_UNDEF;
++
+ 	/*
+ 	 * Enable and configure all SGIs to be edge-triggered and
+ 	 * configure all PPIs as level-triggered.
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index f139382..ea34412 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -589,6 +589,9 @@ int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
+ 	uint32_t free_pfn_offset;
+ 	int ret;
+ 
++	if (!IS_VGIC_ADDR_UNDEF(vgic_cpu->rd_iodev.base_addr))
++		return 0;
++
+ 	/*
+ 	 * We may be creating VCPUs before having set the base address for the
+ 	 * redistributor region, in which case we will come back to this
+-- 
+2.5.5
