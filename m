@@ -1,119 +1,64 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [RFC 12/12] KVM: arm/arm64: Implement KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
-Date: Mon, 19 Mar 2018 10:20:20 +0100
-Message-ID: <1521451220-27754-13-git-send-email-eric.auger@redhat.com>
+Subject: [RFC 01/12] KVM: arm/arm64: Avoid multiple dist->spis kfree
+Date: Mon, 19 Mar 2018 10:20:09 +0100
+Message-ID: <1521451220-27754-2-git-send-email-eric.auger@redhat.com>
 References: <1521451220-27754-1-git-send-email-eric.auger@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DAFD649FB1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Mar 2018 05:13:09 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id anV1pcqLUKaT for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Mar 2018 05:12:48 -0400 (EDT)
+Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 42BC049EB8
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Mar 2018 05:12:48 -0400 (EDT)
 In-Reply-To: <1521451220-27754-1-git-send-email-eric.auger@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, cdall@kernel.org, peter.maydell@linaro.org
-Cc: andre.przywara@arm.com, drjones@redhat.com, wei@redhat.com
+Cc: andre.przywara@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now all the internals are ready to handle multiple redistributor
-regions, let's allow the userspace to register them.
+in case kvm_vgic_map_resources() fails, typically if the vgic
+distributor is not defined, __kvm_vgic_destroy will be called
+several times. Indeed kvm_vgic_map_resources() is called on
+first vcpu run. As a result dist->spis is freeed twice and on
+the second time it causes a "kernel BUG at mm/slub.c:3912!"
+
+This patch avoids freeing dist->spis twice.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- virt/kvm/arm/vgic/vgic-kvm-device.c | 34 +++++++++++++++++++++++++++++++++-
- virt/kvm/arm/vgic/vgic-mmio-v3.c    |  4 ++--
- virt/kvm/arm/vgic/vgic.h            |  7 ++++++-
- 3 files changed, 41 insertions(+), 4 deletions(-)
+ virt/kvm/arm/vgic/vgic-init.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
-index e7b5a86..6a7f8ee 100644
---- a/virt/kvm/arm/vgic/vgic-kvm-device.c
-+++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
-@@ -92,7 +92,7 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
- 		if (r)
- 			break;
- 		if (write) {
--			r = vgic_v3_set_redist_base(kvm, *addr);
-+			r = vgic_v3_set_redist_base(kvm, 0, *addr, 0);
- 			goto out;
- 		}
- 		rdreg = list_first_entry(&vgic->rd_regions,
-@@ -103,6 +103,38 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
- 			addr_ptr = &rdreg->base;
- 		break;
- 	}
-+	case KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION:
-+	{
-+		struct vgic_redist_region *rdreg;
-+		uint8_t index;
-+
-+		r = vgic_check_type(kvm, KVM_DEV_TYPE_ARM_VGIC_V3);
-+		if (r)
-+			break;
-+
-+		index = *addr & KVM_VGIC_V3_RDIST_INDEX_MASK;
-+
-+		if (write) {
-+			gpa_t base = *addr & KVM_VGIC_V3_RDIST_BASE_MASK;
-+			uint32_t pfns = (*addr & KVM_VGIC_V3_RDIST_PFNS_MASK)
-+					>> KVM_VGIC_V3_RDIST_PFNS_SHIFT;
-+
-+			if (!pfns)
-+				r = -EINVAL;
-+			else
-+				r = vgic_v3_set_redist_base(kvm, index,
-+							    base, pfns);
-+			goto out;
-+		}
-+
-+		rdreg = vgic_v3_rdist_region_from_index(kvm, index);
-+		if (!rdreg)
-+			r = -ENODEV;
-+
-+		*addr_ptr = rdreg->base & index &
-+			(uint64_t)rdreg->pfns << KVM_VGIC_V3_RDIST_PFNS_SHIFT;
-+		break;
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index 743ca5c..38fd5f1 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -324,7 +324,10 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
+ 	dist->ready = false;
+ 	dist->initialized = false;
+ 
+-	kfree(dist->spis);
++	if (dist->spis) {
++		kfree(dist->spis);
++		dist->spis = NULL;
 +	}
- 	default:
- 		r = -ENODEV;
- 	}
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index ea34412..8fa6c08 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -763,11 +763,11 @@ static int vgic_v3_insert_redist_region(struct kvm *kvm, uint32_t index,
- 	return ret;
- }
+ 	dist->nr_spis = 0;
  
--int vgic_v3_set_redist_base(struct kvm *kvm, u64 addr)
-+int vgic_v3_set_redist_base(struct kvm *kvm, u32 index, u64 addr, u32 pfns)
- {
- 	int ret;
- 
--	ret = vgic_v3_insert_redist_region(kvm, 0, addr, 0);
-+	ret = vgic_v3_insert_redist_region(kvm, index, addr, pfns);
- 	if (ret)
- 		return ret;
- 
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index dcf43c7..57165fe 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -96,6 +96,11 @@
- /* we only support 64 kB translation table page size */
- #define KVM_ITS_L1E_ADDR_MASK		GENMASK_ULL(51, 16)
- 
-+#define KVM_VGIC_V3_RDIST_INDEX_MASK	GENMASK_ULL(1, 0)
-+#define KVM_VGIC_V3_RDIST_BASE_MASK	GENMASK_ULL(51, 12)
-+#define KVM_VGIC_V3_RDIST_PFNS_MASK	GENMASK_ULL(63, 52)
-+#define KVM_VGIC_V3_RDIST_PFNS_SHIFT	52
-+
- static inline bool irq_is_pending(struct vgic_irq *irq)
- {
- 	if (irq->config == VGIC_CONFIG_EDGE)
-@@ -195,7 +200,7 @@ int vgic_v3_probe(const struct gic_kvm_info *info);
- int vgic_v3_map_resources(struct kvm *kvm);
- int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq);
- int vgic_v3_save_pending_tables(struct kvm *kvm);
--int vgic_v3_set_redist_base(struct kvm *kvm, u64 addr);
-+int vgic_v3_set_redist_base(struct kvm *kvm, u32 index, u64 addr, u32 pfns);
- int vgic_register_redist_iodev(struct kvm_vcpu *vcpu);
- bool vgic_v3_check_base(struct kvm *kvm);
- 
+ 	if (vgic_supports_direct_msis(kvm))
 -- 
 2.5.5
