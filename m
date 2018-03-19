@@ -1,22 +1,23 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [RFC 01/12] KVM: arm/arm64: Avoid multiple dist->spis kfree
-Date: Mon, 19 Mar 2018 10:20:09 +0100
-Message-ID: <1521451220-27754-2-git-send-email-eric.auger@redhat.com>
+Subject: [RFC 02/12] KVM: arm/arm64: Document
+ KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+Date: Mon, 19 Mar 2018 10:20:10 +0100
+Message-ID: <1521451220-27754-3-git-send-email-eric.auger@redhat.com>
 References: <1521451220-27754-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DAFD649FB1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Mar 2018 05:13:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DC49B49FBB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Mar 2018 05:13:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id anV1pcqLUKaT for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Mar 2018 05:12:48 -0400 (EDT)
+ with ESMTP id 1c24xU0z7-11 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Mar 2018 05:12:50 -0400 (EDT)
 Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 42BC049EB8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Mar 2018 05:12:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8827B49F88
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Mar 2018 05:12:50 -0400 (EDT)
 In-Reply-To: <1521451220-27754-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,34 +32,42 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.or
 Cc: andre.przywara@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-in case kvm_vgic_map_resources() fails, typically if the vgic
-distributor is not defined, __kvm_vgic_destroy will be called
-several times. Indeed kvm_vgic_map_resources() is called on
-first vcpu run. As a result dist->spis is freeed twice and on
-the second time it causes a "kernel BUG at mm/slub.c:3912!"
+We introduce a new KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION attribute in
+KVM_DEV_ARM_VGIC_GRP_ADDR group. It allows userspace to provide the
+base address and size of a redistributor region
 
-This patch avoids freeing dist->spis twice.
+Compared to KVM_VGIC_V3_ADDR_TYPE_REDIST, this new attribute allows
+to declare several separate redistributor regions.
+
+So the whole redist space does not need to be contiguous anymore.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- virt/kvm/arm/vgic/vgic-init.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ Documentation/virtual/kvm/devices/arm-vgic-v3.txt | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index 743ca5c..38fd5f1 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -324,7 +324,10 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
- 	dist->ready = false;
- 	dist->initialized = false;
- 
--	kfree(dist->spis);
-+	if (dist->spis) {
-+		kfree(dist->spis);
-+		dist->spis = NULL;
-+	}
- 	dist->nr_spis = 0;
- 
- 	if (vgic_supports_direct_msis(kvm))
+diff --git a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+index 9293b45..2c0bedf 100644
+--- a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
++++ b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+@@ -27,6 +27,18 @@ Groups:
+       VCPU and all of the redistributor pages are contiguous.
+       Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
+       This address needs to be 64K aligned.
++
++    KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION (rw, 64-bit)
++      The attr field of kvm_device_attr encodes 3 values:
++      bits:     | 63   ....  52  |  51   ....   12 |11 - 0
++      values:   |     pfns       |       base      | index
++      - index encodes the unique redistibutor region index
++      - base field encodes bits [51:12] the guest physical base address
++        of the first redistributor in the region. There are two 64K pages
++        for each VCPU and all of the redistributor pages are contiguous
++        within the redistributor region.
++      - pfns encodes the size of the region in 64kB pages.
++      Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
+   Errors:
+     -E2BIG:  Address outside of addressable IPA range
+     -EINVAL: Incorrectly aligned address
 -- 
 2.5.5
