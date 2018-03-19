@@ -1,70 +1,81 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [RFC 08/12] KVM: arm/arm64: Adapt vgic_v3_check_base to multiple rdist regions
-Date: Mon, 19 Mar 2018 10:20:16 +0100
-Message-ID: <1521451220-27754-9-git-send-email-eric.auger@redhat.com>
+Subject: [RFC 06/12] KVM: arm/arm64: Helper to detect whether an RDIST is the
+ last one
+Date: Mon, 19 Mar 2018 10:20:14 +0100
+Message-ID: <1521451220-27754-7-git-send-email-eric.auger@redhat.com>
 References: <1521451220-27754-1-git-send-email-eric.auger@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D70F949F88
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Mar 2018 05:13:29 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id eHnL2e7KncP0 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Mar 2018 05:13:08 -0400 (EDT)
+Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D89DF49FA7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Mar 2018 05:13:03 -0400 (EDT)
 In-Reply-To: <1521451220-27754-1-git-send-email-eric.auger@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, cdall@kernel.org, peter.maydell@linaro.org
-Cc: andre.przywara@arm.com, drjones@redhat.com, wei@redhat.com
+Cc: andre.przywara@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We introduce a new helper to check there is no overlap between
-dist region (if set) and registered rdist regions. This both
-handles the case of legacy single rdist region (implicitly sized
-with the number of online vcpus) and the new case of multiple
-explicitly sized rdist regions.
+The TYPER of an redistributor needs to reflect whether the rdist is
+the last one of the redistributor region. With a single region we compared
+the vcpu id against the number of online vcpus. With multiple regions,
+we also need to check the region is not full.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- virt/kvm/arm/vgic/vgic-v3.c | 26 +++++++++-----------------
- 1 file changed, 9 insertions(+), 17 deletions(-)
+ virt/kvm/arm/vgic/vgic-mmio-v3.c | 3 +--
+ virt/kvm/arm/vgic/vgic.h         | 9 +++++++++
+ 2 files changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index c6ec636..547fab6 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -419,31 +419,23 @@ bool vgic_v3_rdist_overlap(struct kvm *kvm, gpa_t base, size_t size)
- bool vgic_v3_check_base(struct kvm *kvm)
- {
- 	struct vgic_dist *d = &kvm->arch.vgic;
--	gpa_t redist_size = KVM_VGIC_V3_REDIST_SIZE;
--	struct vgic_redist_region *rdreg =
--		list_first_entry(&d->rd_regions,
--				 struct vgic_redist_region, list);
--
--	redist_size *= atomic_read(&kvm->online_vcpus);
-+	struct vgic_redist_region *rdreg;
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index 227b8b6..5768034 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -637,8 +637,7 @@ int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
+ 	}
  
- 	if (!IS_VGIC_ADDR_UNDEF(d->vgic_dist_base) &&
- 	    d->vgic_dist_base + KVM_VGIC_V3_DIST_SIZE < d->vgic_dist_base)
- 		return false;
- 
--	if (rdreg && (rdreg->base + redist_size < rdreg->base))
--		return false;
--
--	/* Both base addresses must be set to check if they overlap */
--	if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base) || !rdreg)
--		return true;
--
--	if (d->vgic_dist_base + KVM_VGIC_V3_DIST_SIZE <= rdreg->base)
--		return true;
-+	list_for_each_entry(rdreg, &d->rd_regions, list) {
-+		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) <
-+			rdreg->base)
-+			return false;
-+	}
- 
--	if (rdreg->base + redist_size <= d->vgic_dist_base)
-+	if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base))
- 		return true;
- 
--	return false;
-+	return !vgic_v3_rdist_overlap(kvm, d->vgic_dist_base,
-+				      KVM_VGIC_V3_DIST_SIZE);
+ 	rdreg->free_pfn_offset += 2;
+-	vgic_cpu->rdist_last =
+-		(vcpu->vcpu_id == atomic_read(&vcpu->kvm->online_vcpus) - 1);
++	vgic_cpu->rdist_last = vgic_v3_last_rdist(vcpu, rdreg);
+ out:
+ 	mutex_unlock(&kvm->slots_lock);
+ 	return ret;
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index 38b2406..04456d3 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -254,6 +254,15 @@ vgic_v3_redist_region_full(struct vgic_redist_region *region)
+ 	return (region->free_pfn_offset > region->pfns - 2);
  }
  
- /**
++static inline bool
++vgic_v3_last_rdist(struct kvm_vcpu *vcpu, struct vgic_redist_region *region)
++{
++	if (vcpu->vcpu_id == atomic_read(&vcpu->kvm->online_vcpus) - 1)
++		return true;
++
++	return vgic_v3_redist_region_full(region);
++}
++
+ struct vgic_redist_region *vgic_v3_rdist_free_slot(struct list_head *rd_regions,
+ 						   uint32_t *free_pfn_offset);
+ 
 -- 
 2.5.5
