@@ -1,81 +1,101 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [RFC 06/12] KVM: arm/arm64: Helper to detect whether an RDIST is the
- last one
-Date: Mon, 19 Mar 2018 10:20:14 +0100
-Message-ID: <1521451220-27754-7-git-send-email-eric.auger@redhat.com>
+Subject: [RFC 05/12] KVM: arm/arm64: Helper to locate free rdist space
+Date: Mon, 19 Mar 2018 10:20:13 +0100
+Message-ID: <1521451220-27754-6-git-send-email-eric.auger@redhat.com>
 References: <1521451220-27754-1-git-send-email-eric.auger@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D70F949F88
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Mar 2018 05:13:29 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eHnL2e7KncP0 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Mar 2018 05:13:08 -0400 (EDT)
-Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D89DF49FA7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Mar 2018 05:13:03 -0400 (EDT)
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1521451220-27754-1-git-send-email-eric.auger@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: linux-kernel-owner@vger.kernel.org
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, cdall@kernel.org, peter.maydell@linaro.org
-Cc: andre.przywara@arm.com
+Cc: andre.przywara@arm.com, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The TYPER of an redistributor needs to reflect whether the rdist is
-the last one of the redistributor region. With a single region we compared
-the vcpu id against the number of online vcpus. With multiple regions,
-we also need to check the region is not full.
+We introduce vgic_v3_rdist_free_slot to help identifying
+where we can place a new 2x64KB redistributor.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- virt/kvm/arm/vgic/vgic-mmio-v3.c | 3 +--
- virt/kvm/arm/vgic/vgic.h         | 9 +++++++++
- 2 files changed, 10 insertions(+), 2 deletions(-)
+ virt/kvm/arm/vgic/vgic-mmio-v3.c |  4 ++--
+ virt/kvm/arm/vgic/vgic-v3.c      | 21 +++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic.h         | 12 ++++++++++++
+ 3 files changed, 35 insertions(+), 2 deletions(-)
 
 diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index 227b8b6..5768034 100644
+index c9dc08f..227b8b6 100644
 --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
 +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -637,8 +637,7 @@ int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
- 	}
+@@ -586,6 +586,7 @@ int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
+ 	struct vgic_io_device *sgi_dev = &vcpu->arch.vgic_cpu.sgi_iodev;
+ 	struct vgic_redist_region *rdreg;
+ 	gpa_t rd_base, sgi_base;
++	uint32_t free_pfn_offset;
+ 	int ret;
  
- 	rdreg->free_pfn_offset += 2;
--	vgic_cpu->rdist_last =
--		(vcpu->vcpu_id == atomic_read(&vcpu->kvm->online_vcpus) - 1);
-+	vgic_cpu->rdist_last = vgic_v3_last_rdist(vcpu, rdreg);
- out:
- 	mutex_unlock(&kvm->slots_lock);
- 	return ret;
+ 	/*
+@@ -594,8 +595,7 @@ int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
+ 	 * function for all VCPUs when the base address is set.  Just return
+ 	 * without doing any work for now.
+ 	 */
+-	rdreg = list_first_entry(&vgic->rd_regions,
+-				 struct vgic_redist_region, list);
++	rdreg = vgic_v3_rdist_free_slot(&vgic->rd_regions, &free_pfn_offset);
+ 	if (!rdreg)
+ 		return 0;
+ 
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index 14dabda..68cae0e 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -431,6 +431,27 @@ bool vgic_v3_check_base(struct kvm *kvm)
+ 	return false;
+ }
+ 
++/**
++ * vgic_v3_rdist_free_slot - Lookup registered rdist regions and identify one
++ * which has free space to put a new rdist regions
++ *
++ * If any, return this redist region handle and the pfn offset to the free slot.
++ * Otherwise, returns NULL.
++ */
++struct vgic_redist_region *vgic_v3_rdist_free_slot(struct list_head *rd_regions,
++						   uint32_t *free_pfn_offset)
++{
++	struct vgic_redist_region *rdreg;
++
++	list_for_each_entry(rdreg, rd_regions, list) {
++		if (!vgic_v3_redist_region_full(rdreg)) {
++			*free_pfn_offset = rdreg->free_pfn_offset;
++			return rdreg;
++		}
++	}
++	return NULL;
++}
++
+ int vgic_v3_map_resources(struct kvm *kvm)
+ {
+ 	int ret = 0;
 diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index 38b2406..04456d3 100644
+index 12c37b8..38b2406 100644
 --- a/virt/kvm/arm/vgic/vgic.h
 +++ b/virt/kvm/arm/vgic/vgic.h
-@@ -254,6 +254,15 @@ vgic_v3_redist_region_full(struct vgic_redist_region *region)
- 	return (region->free_pfn_offset > region->pfns - 2);
+@@ -245,6 +245,18 @@ static inline int vgic_v3_max_apr_idx(struct kvm_vcpu *vcpu)
+ 	}
  }
  
 +static inline bool
-+vgic_v3_last_rdist(struct kvm_vcpu *vcpu, struct vgic_redist_region *region)
++vgic_v3_redist_region_full(struct vgic_redist_region *region)
 +{
-+	if (vcpu->vcpu_id == atomic_read(&vcpu->kvm->online_vcpus) - 1)
-+		return true;
++	if (!region->pfns)
++		return false;
 +
-+	return vgic_v3_redist_region_full(region);
++	return (region->free_pfn_offset > region->pfns - 2);
 +}
 +
- struct vgic_redist_region *vgic_v3_rdist_free_slot(struct list_head *rd_regions,
- 						   uint32_t *free_pfn_offset);
- 
++struct vgic_redist_region *vgic_v3_rdist_free_slot(struct list_head *rd_regions,
++						   uint32_t *free_pfn_offset);
++
+ int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
+ 			 u32 devid, u32 eventid, struct vgic_irq **irq);
+ struct vgic_its *vgic_msi_to_its(struct kvm *kvm, struct kvm_msi *msi);
 -- 
 2.5.5
