@@ -1,54 +1,88 @@
-From: "Liuwenliang (Abbott Liu)" <liuwenliang@huawei.com>
-Subject: Re: [PATCH 1/7] 2 1-byte checks more safer for memory_is_poisoned_16
-Date: Mon, 19 Mar 2018 01:02:34 +0000
-Message-ID: <B8AC3E80E903784988AB3003E3E97330C0076F8D@dggemm510-mbs.china.huawei.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 3/7] Disable instrumentation for some code
+Date: Mon, 19 Mar 2018 08:38:04 +0000
+Message-ID: <5ec51db8-196e-fd3d-8cce-2bdaccc52424@arm.com>
+References: <20180318125342.4278-1-liuwenliang@huawei.com>
+ <20180318125342.4278-4-liuwenliang@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BC68E405D1
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Mar 2018 20:56:45 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id edURJCw2x8TE for <kvmarm@lists.cs.columbia.edu>;
- Sun, 18 Mar 2018 20:56:24 -0400 (EDT)
-Received: from huawei.com (szxga02-in.huawei.com [45.249.212.188])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 23669402D6
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Mar 2018 20:56:16 -0400 (EDT)
-Content-Language: zh-CN
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Russell King - ARM Linux <linux@armlinux.org.uk>
-Cc: "kstewart@linuxfoundation.org" <kstewart@linuxfoundation.org>, "nicolas.pitre@linaro.org" <nicolas.pitre@linaro.org>, "grygorii.strashko@linaro.org" <grygorii.strashko@linaro.org>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "tixy@linaro.org" <tixy@linaro.org>, "linux@rasmusvillemoes.dk" <linux@rasmusvillemoes.dk>, "dhowells@redhat.com" <dhowells@redhat.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "glider@google.com" <glider@google.com>, "afzal.mohd.ma@gmail.com" <afzal.mohd.ma@gmail.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "f.fainelli@gmail.com" <f.fainelli@gmail.com>, "mawilcox@microsoft.com" <mawilcox@microsoft.com>, "kasan-dev@googlegroups.com" <kasan-dev@googlegroups.com>, "geert@linux-m68k.org" <geert@linux-m68k.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, zhichao.huang@linaro.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180318125342.4278-4-liuwenliang@huawei.com>
+Content-Language: en-GB
+Sender: linux-kernel-owner@vger.kernel.org
+To: Abbott Liu <liuwenliang@huawei.com>, linux@armlinux.org.uk, aryabinin@virtuozzo.com, kstewart@linuxfoundation.org, gregkh@linuxfoundation.org, f.fainelli@gmail.com, akpm@linux-foundation.org, afzal.mohd.ma@gmail.com, alexander.levin@verizon.com
+Cc: glider@google.com, dvyukov@google.com, christoffer.dall@linaro.org, linux@rasmusvillemoes.dk, mawilcox@microsoft.com, pombredanne@nexb.com, ard.biesheuvel@linaro.org, vladimir.murzin@arm.com, nicolas.pitre@linaro.org, tglx@linutronix.de, thgarnie@google.com, dhowells@redhat.com, keescook@chromium.org, arnd@arndb.de, geert@linux-m68k.org, tixy@linaro.org, mark.rutland@arm.com, james.morse@arm.com, zhichao.huang@linaro.org, jinb.park7@gmail.com, labbott@redhat.com, philip@cog.systems, grygorii.strashko@linaro.org, catalin.marinas@arm.com, opendmb@gmail.com, kirill.shutemov@linux.intel.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com, kvmarm@lists.cs.columbia.edu, linux-mm@kvack.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sun, Mar 18, 2018 at 21:21:20PM +0800, Russell King wrote:
->On Sun, Mar 18, 2018 at 08:53:36PM +0800, Abbott Liu wrote:
->> Because in some architecture(eg. arm) instruction set, non-aligned
->> access support is not very well, so 2 1-byte checks is more
->> safer than 1 2-byte check. The impact on performance is small
->> because 16-byte accesses are not too common.
->
->This is unnecessary:
->
->1. a load of a 16-bit quantity will work as desired on modern ARMs.
->2. Networking already relies on unaligned loads to work as per x86
->   (iow, an unaligned 32-bit load loads the 32-bits at the address
->   even if it's not naturally aligned, and that also goes for 16-bit
->   accesses.)
->
->If these are rare (which you say above - "not too common") then it's
->much better to leave the code as-is, because it will most likely be
->faster on modern CPUs, and the impact for older generation CPUs is
->likely to be low.
+On 18/03/18 12:53, Abbott Liu wrote:
+> From: Andrey Ryabinin <a.ryabinin@samsung.com>
+> 
+> Disable instrumentation for arch/arm/boot/compressed/*
+> and arch/arm/vdso/* because those code won't linkd with
+> kernel image.
+> 
+> Disable kasan check in the function unwind_pop_register
+> because it doesn't matter that kasan checks failed when
+> unwind_pop_register read stack memory of task.
+> 
+> Reviewed-by: Russell King - ARM Linux <linux@armlinux.org.uk>
+> Reviewed-by: Florian Fainelli <f.fainelli@gmail.com>
+> Tested-by: Florian Fainelli <f.fainelli@gmail.com>
+> Signed-off-by: Abbott Liu <liuwenliang@huawei.com>
+> ---
+>  arch/arm/boot/compressed/Makefile | 1 +
+>  arch/arm/kernel/unwind.c          | 3 ++-
+>  arch/arm/vdso/Makefile            | 2 ++
+>  3 files changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm/boot/compressed/Makefile b/arch/arm/boot/compressed/Makefile
+> index 45a6b9b..966103e 100644
+> --- a/arch/arm/boot/compressed/Makefile
+> +++ b/arch/arm/boot/compressed/Makefile
+> @@ -24,6 +24,7 @@ OBJS		+= hyp-stub.o
+>  endif
+>  
+>  GCOV_PROFILE		:= n
+> +KASAN_SANITIZE		:= n
+>  
+>  #
+>  # Architecture dependencies
+> diff --git a/arch/arm/kernel/unwind.c b/arch/arm/kernel/unwind.c
+> index 0bee233..2e55c7d 100644
+> --- a/arch/arm/kernel/unwind.c
+> +++ b/arch/arm/kernel/unwind.c
+> @@ -249,7 +249,8 @@ static int unwind_pop_register(struct unwind_ctrl_block *ctrl,
+>  		if (*vsp >= (unsigned long *)ctrl->sp_high)
+>  			return -URC_FAILURE;
+>  
+> -	ctrl->vrs[reg] = *(*vsp)++;
+> +	ctrl->vrs[reg] = READ_ONCE_NOCHECK(*(*vsp));
+> +	(*vsp)++;
+>  	return URC_OK;
+>  }
+>  
+> diff --git a/arch/arm/vdso/Makefile b/arch/arm/vdso/Makefile
+> index bb411821..87abbb7 100644
+> --- a/arch/arm/vdso/Makefile
+> +++ b/arch/arm/vdso/Makefile
+> @@ -30,6 +30,8 @@ CFLAGS_vgettimeofday.o = -O2
+>  # Disable gcov profiling for VDSO code
+>  GCOV_PROFILE := n
+>  
+> +KASAN_SANITIZE := n
+> +
+>  # Force dependency
+>  $(obj)/vdso.o : $(obj)/vdso.so
+>  
+> 
 
-Thanks for your review.
-OK, I am going to remove this patch in the next version.
+You need to extend this at least to arch/arm/kvm/hyp/Makefile, as the
+KASAN shadow region won't be mapped in HYP. See commit a6cdf1c08cbfe for
+more details (all the arm64 comments in this patch apply to 32bit as well).
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
