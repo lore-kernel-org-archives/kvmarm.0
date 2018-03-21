@@ -1,23 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [RFC PATCH 2/4] KVM: arm64: Convert lazy FPSIMD context switch trap
- to C
-Date: Wed, 21 Mar 2018 17:47:31 +0000
-Message-ID: <1521654453-3837-3-git-send-email-Dave.Martin@arm.com>
+Subject: [RFC PATCH 3/4] arm64: fpsimd: Split cpu field out from struct
+ fpsimd_state
+Date: Wed, 21 Mar 2018 17:47:32 +0000
+Message-ID: <1521654453-3837-4-git-send-email-Dave.Martin@arm.com>
 References: <1521654453-3837-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CDFA04A046
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Mar 2018 13:40:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B7064A03B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Mar 2018 13:40:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 571GmF9lkwq6 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 21 Mar 2018 13:39:50 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D3E344A001
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Mar 2018 13:39:49 -0400 (EDT)
+ with ESMTP id EzW+kxQ-rrXN for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 21 Mar 2018 13:39:51 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F30BD4A027
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Mar 2018 13:39:50 -0400 (EDT)
 In-Reply-To: <1521654453-3837-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,126 +32,321 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-To make the lazt FPSIMD context switch trap code easier to hack on,
-this patch converts it to C.
+In preparation for using a common representation of the FPSIMD
+state for tasks and KVM vcpus, this patch separates out the "cpu"
+field that is used to track the cpu on which the state was most
+recently loaded.
 
-This is not amazingly efficient, but the trap should typically only
-be taken once per host context switch.
+This will allow common code to operate on task and vcpu contexts
+without requiring the cpu field to be stored at the same offset
+from the FPSIMD register data in both cases.  This should avoid the
+need for messing with the definition of those parts of struct
+vcpu_arch that are exposed in the KVM user ABI.
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-
 ---
+ arch/arm64/include/asm/fpsimd.h    | 29 ++------------------------
+ arch/arm64/include/asm/processor.h |  4 ++--
+ arch/arm64/kernel/fpsimd.c         | 42 +++++++++++++++++++++-----------------
+ arch/arm64/kernel/ptrace.c         | 10 ++++-----
+ arch/arm64/kernel/signal.c         |  3 +--
+ arch/arm64/kernel/signal32.c       |  3 +--
+ 6 files changed, 34 insertions(+), 57 deletions(-)
 
-This patch adds the missing ! to ensure that the hyp stack pointer
-is actually moved down when pushing regs in preparation for calling
-__hyp_switch_fpsimd.  Without this, bad things happen...
----
- arch/arm64/kvm/hyp/entry.S  | 57 +++++++++++++++++----------------------------
- arch/arm64/kvm/hyp/switch.c | 24 +++++++++++++++++++
- 2 files changed, 46 insertions(+), 35 deletions(-)
-
-diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-index fdd1068..47c6a78 100644
---- a/arch/arm64/kvm/hyp/entry.S
-+++ b/arch/arm64/kvm/hyp/entry.S
-@@ -176,41 +176,28 @@ ENTRY(__fpsimd_guest_restore)
- 	// x1: vcpu
- 	// x2-x29,lr: vcpu regs
- 	// vcpu x0-x1 on the stack
--	stp	x2, x3, [sp, #-16]!
--	stp	x4, lr, [sp, #-16]!
--
--alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
--	mrs	x2, cptr_el2
--	bic	x2, x2, #CPTR_EL2_TFP
--	msr	cptr_el2, x2
--alternative_else
--	mrs	x2, cpacr_el1
--	orr	x2, x2, #CPACR_EL1_FPEN
--	msr	cpacr_el1, x2
--alternative_endif
--	isb
--
--	mov	x3, x1
--
--	ldr	x0, [x3, #VCPU_HOST_CONTEXT]
--	kern_hyp_va x0
--	add	x0, x0, #CPU_GP_REG_OFFSET(CPU_FP_REGS)
--	bl	__fpsimd_save_state
--
--	add	x2, x3, #VCPU_CONTEXT
--	add	x0, x2, #CPU_GP_REG_OFFSET(CPU_FP_REGS)
--	bl	__fpsimd_restore_state
--
--	// Skip restoring fpexc32 for AArch64 guests
--	mrs	x1, hcr_el2
--	tbnz	x1, #HCR_RW_SHIFT, 1f
--	ldr	x4, [x3, #VCPU_FPEXC32_EL2]
--	msr	fpexc32_el2, x4
--1:
--	ldp	x4, lr, [sp], #16
--	ldp	x2, x3, [sp], #16
--	ldp	x0, x1, [sp], #16
--
-+	stp	x2, x3, [sp, #-144]!
-+	stp	x4, x5, [sp, #16]
-+	stp	x6, x7, [sp, #32]
-+	stp	x8, x9, [sp, #48]
-+	stp	x10, x11, [sp, #64]
-+	stp	x12, x13, [sp, #80]
-+	stp	x14, x15, [sp, #96]
-+	stp	x16, x17, [sp, #112]
-+	stp	x18, lr, [sp, #128]
-+
-+	bl	__hyp_switch_fpsimd
-+
-+	ldp	x4, x5, [sp, #16]
-+	ldp	x6, x7, [sp, #32]
-+	ldp	x8, x9, [sp, #48]
-+	ldp	x10, x11, [sp, #64]
-+	ldp	x12, x13, [sp, #80]
-+	ldp	x14, x15, [sp, #96]
-+	ldp	x16, x17, [sp, #112]
-+	ldp	x18, lr, [sp, #128]
-+	ldp	x0, x1, [sp, #144]
-+	ldp	x2, x3, [sp], #160
- 	eret
- ENDPROC(__fpsimd_guest_restore)
+diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
+index 8857a0f..1bfc920 100644
+--- a/arch/arm64/include/asm/fpsimd.h
++++ b/arch/arm64/include/asm/fpsimd.h
+@@ -24,31 +24,6 @@
+ #include <linux/cache.h>
+ #include <linux/stddef.h>
  
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 24f52fe..01e4254 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -436,6 +436,30 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	return exit_code;
+-/*
+- * FP/SIMD storage area has:
+- *  - FPSR and FPCR
+- *  - 32 128-bit data registers
+- *
+- * Note that user_fpsimd forms a prefix of this structure, which is
+- * relied upon in the ptrace FP/SIMD accessors.
+- */
+-struct fpsimd_state {
+-	union {
+-		struct user_fpsimd_state user_fpsimd;
+-		struct {
+-			__uint128_t vregs[32];
+-			u32 fpsr;
+-			u32 fpcr;
+-			/*
+-			 * For ptrace compatibility, pad to next 128-bit
+-			 * boundary here if extending this struct.
+-			 */
+-		};
+-	};
+-	/* the id of the last cpu to have restored this state */
+-	unsigned int cpu;
+-};
+-
+ #if defined(__KERNEL__) && defined(CONFIG_COMPAT)
+ /* Masks for extracting the FPSR and FPCR from the FPSCR */
+ #define VFP_FPSCR_STAT_MASK	0xf800009f
+@@ -62,8 +37,8 @@ struct fpsimd_state {
+ 
+ struct task_struct;
+ 
+-extern void fpsimd_save_state(struct fpsimd_state *state);
+-extern void fpsimd_load_state(struct fpsimd_state *state);
++extern void fpsimd_save_state(struct user_fpsimd_state *state);
++extern void fpsimd_load_state(struct user_fpsimd_state *state);
+ 
+ extern void fpsimd_thread_switch(struct task_struct *next);
+ extern void fpsimd_flush_thread(void);
+diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
+index fce604e..4a04535 100644
+--- a/arch/arm64/include/asm/processor.h
++++ b/arch/arm64/include/asm/processor.h
+@@ -37,7 +37,6 @@
+ #include <linux/string.h>
+ 
+ #include <asm/alternative.h>
+-#include <asm/fpsimd.h>
+ #include <asm/hw_breakpoint.h>
+ #include <asm/lse.h>
+ #include <asm/pgtable-hwdef.h>
+@@ -107,7 +106,8 @@ struct thread_struct {
+ #ifdef CONFIG_COMPAT
+ 	unsigned long		tp2_value;
+ #endif
+-	struct fpsimd_state	fpsimd_state;
++	struct user_fpsimd_state fpsimd_state;
++	unsigned int		fpsimd_cpu;
+ 	void			*sve_state;	/* SVE registers, if any */
+ 	unsigned int		sve_vl;		/* SVE vector length */
+ 	unsigned int		sve_vl_onexec;	/* SVE vl after next exec */
+diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+index e7226c4..c4be311 100644
+--- a/arch/arm64/kernel/fpsimd.c
++++ b/arch/arm64/kernel/fpsimd.c
+@@ -64,7 +64,7 @@
+  *     been loaded into its FPSIMD registers most recently, or whether it has
+  *     been used to perform kernel mode NEON in the meantime.
+  *
+- * For (a), we add a 'cpu' field to struct fpsimd_state, which gets updated to
++ * For (a), we add a fpsimd_cpu field to thread_struct, which gets updated to
+  * the id of the current CPU every time the state is loaded onto a CPU. For (b),
+  * we add the per-cpu variable 'fpsimd_last_state' (below), which contains the
+  * address of the userland FPSIMD state of the task that was loaded onto the CPU
+@@ -73,7 +73,7 @@
+  * With this in place, we no longer have to restore the next FPSIMD state right
+  * when switching between tasks. Instead, we can defer this check to userland
+  * resume, at which time we verify whether the CPU's fpsimd_last_state and the
+- * task's fpsimd_state.cpu are still mutually in sync. If this is the case, we
++ * task's fpsimd_cpu are still mutually in sync. If this is the case, we
+  * can omit the FPSIMD restore.
+  *
+  * As an optimization, we use the thread_info flag TIF_FOREIGN_FPSTATE to
+@@ -90,14 +90,14 @@
+  * flag with local_bh_disable() unless softirqs are already masked.
+  *
+  * For a certain task, the sequence may look something like this:
+- * - the task gets scheduled in; if both the task's fpsimd_state.cpu field
++ * - the task gets scheduled in; if both the task's fpsimd_cpu field
+  *   contains the id of the current CPU, and the CPU's fpsimd_last_state per-cpu
+  *   variable points to the task's fpsimd_state, the TIF_FOREIGN_FPSTATE flag is
+  *   cleared, otherwise it is set;
+  *
+  * - the task returns to userland; if TIF_FOREIGN_FPSTATE is set, the task's
+  *   userland FPSIMD state is copied from memory to the registers, the task's
+- *   fpsimd_state.cpu field is set to the id of the current CPU, the current
++ *   fpsimd_cpu field is set to the id of the current CPU, the current
+  *   CPU's fpsimd_last_state pointer is set to this task's fpsimd_state and the
+  *   TIF_FOREIGN_FPSTATE flag is cleared;
+  *
+@@ -115,7 +115,7 @@
+  *   whatever is in the FPSIMD registers is not saved to memory, but discarded.
+  */
+ struct fpsimd_last_state_struct {
+-	struct fpsimd_state *st;
++	struct user_fpsimd_state *st;
+ 	bool sve_in_use;
+ };
+ 
+@@ -417,7 +417,7 @@ static void fpsimd_to_sve(struct task_struct *task)
+ {
+ 	unsigned int vq;
+ 	void *sst = task->thread.sve_state;
+-	struct fpsimd_state const *fst = &task->thread.fpsimd_state;
++	struct user_fpsimd_state const *fst = &task->thread.fpsimd_state;
+ 	unsigned int i;
+ 
+ 	if (!system_supports_sve())
+@@ -443,7 +443,7 @@ static void sve_to_fpsimd(struct task_struct *task)
+ {
+ 	unsigned int vq;
+ 	void const *sst = task->thread.sve_state;
+-	struct fpsimd_state *fst = &task->thread.fpsimd_state;
++	struct user_fpsimd_state *fst = &task->thread.fpsimd_state;
+ 	unsigned int i;
+ 
+ 	if (!system_supports_sve())
+@@ -539,7 +539,7 @@ void sve_sync_from_fpsimd_zeropad(struct task_struct *task)
+ {
+ 	unsigned int vq;
+ 	void *sst = task->thread.sve_state;
+-	struct fpsimd_state const *fst = &task->thread.fpsimd_state;
++	struct user_fpsimd_state const *fst = &task->thread.fpsimd_state;
+ 	unsigned int i;
+ 
+ 	if (!test_tsk_thread_flag(task, TIF_SVE))
+@@ -908,10 +908,9 @@ void fpsimd_thread_switch(struct task_struct *next)
+ 		 * the TIF_FOREIGN_FPSTATE flag so the state will be loaded
+ 		 * upon the next return to userland.
+ 		 */
+-		struct fpsimd_state *st = &next->thread.fpsimd_state;
+-
+-		if (__this_cpu_read(fpsimd_last_state.st) == st
+-		    && st->cpu == smp_processor_id())
++		if (__this_cpu_read(fpsimd_last_state.st) ==
++			&next->thread.fpsimd_state
++		    && next->thread.fpsimd_cpu == smp_processor_id())
+ 			clear_tsk_thread_flag(next, TIF_FOREIGN_FPSTATE);
+ 		else
+ 			set_tsk_thread_flag(next, TIF_FOREIGN_FPSTATE);
+@@ -927,7 +926,8 @@ void fpsimd_flush_thread(void)
+ 
+ 	local_bh_disable();
+ 
+-	memset(&current->thread.fpsimd_state, 0, sizeof(struct fpsimd_state));
++	memset(&current->thread.fpsimd_state, 0,
++	       sizeof current->thread.fpsimd_state);
+ 	fpsimd_flush_task_state(current);
+ 
+ 	if (system_supports_sve()) {
+@@ -1004,11 +1004,10 @@ static void fpsimd_bind_to_cpu(void)
+ {
+ 	struct fpsimd_last_state_struct *last =
+ 		this_cpu_ptr(&fpsimd_last_state);
+-	struct fpsimd_state *st = &current->thread.fpsimd_state;
+ 
+-	last->st = st;
++	last->st = &current->thread.fpsimd_state;
+ 	last->sve_in_use = test_thread_flag(TIF_SVE);
+-	st->cpu = smp_processor_id();
++	current->thread.fpsimd_cpu = smp_processor_id();
  }
  
-+void __hyp_text __hyp_switch_fpsimd(u64 esr __always_unused,
-+				    struct kvm_vcpu *vcpu)
+ /*
+@@ -1043,7 +1042,7 @@ void fpsimd_update_current_state(struct user_fpsimd_state const *state)
+ 
+ 	local_bh_disable();
+ 
+-	current->thread.fpsimd_state.user_fpsimd = *state;
++	current->thread.fpsimd_state = *state;
+ 	if (system_supports_sve() && test_thread_flag(TIF_SVE))
+ 		fpsimd_to_sve(current);
+ 
+@@ -1055,12 +1054,17 @@ void fpsimd_update_current_state(struct user_fpsimd_state const *state)
+ 	local_bh_enable();
+ }
+ 
++void fpsimd_flush_state(unsigned int *cpu)
 +{
-+	kvm_cpu_context_t *host_ctxt;
-+
-+	if (has_vhe())
-+		write_sysreg(read_sysreg(cpacr_el1) | CPACR_EL1_FPEN,
-+			     cpacr_el1);
-+	else
-+		write_sysreg(read_sysreg(cptr_el2) & ~(u64)CPTR_EL2_TFP,
-+			     cptr_el2);
-+
-+	isb();
-+
-+	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-+	__fpsimd_save_state(&host_ctxt->gp_regs.fp_regs);
-+	__fpsimd_restore_state(&vcpu->arch.ctxt.gp_regs.fp_regs);
-+
-+	/* Skip restoring fpexc32 for AArch64 guests */
-+	if (!(read_sysreg(hcr_el2) & HCR_RW))
-+		write_sysreg(vcpu->arch.ctxt.sys_regs[FPEXC32_EL2],
-+			     fpexc32_el2);
++	*cpu = NR_CPUS;
 +}
 +
- static const char __hyp_panic_string[] = "HYP panic:\nPS:%08llx PC:%016llx ESR:%08llx\nFAR:%016llx HPFAR:%016llx PAR:%016llx\nVCPU:%p\n";
+ /*
+  * Invalidate live CPU copies of task t's FPSIMD state
+  */
+ void fpsimd_flush_task_state(struct task_struct *t)
+ {
+-	t->thread.fpsimd_state.cpu = NR_CPUS;
++	fpsimd_flush_state(&t->thread.fpsimd_cpu);
+ }
  
- static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par,
+ static inline void fpsimd_flush_cpu_state(void)
+@@ -1159,7 +1163,7 @@ EXPORT_SYMBOL(kernel_neon_end);
+ 
+ #ifdef CONFIG_EFI
+ 
+-static DEFINE_PER_CPU(struct fpsimd_state, efi_fpsimd_state);
++static DEFINE_PER_CPU(struct user_fpsimd_state, efi_fpsimd_state);
+ static DEFINE_PER_CPU(bool, efi_fpsimd_state_used);
+ static DEFINE_PER_CPU(bool, efi_sve_state_used);
+ 
+diff --git a/arch/arm64/kernel/ptrace.c b/arch/arm64/kernel/ptrace.c
+index 9ae31f7..fdeaba0de 100644
+--- a/arch/arm64/kernel/ptrace.c
++++ b/arch/arm64/kernel/ptrace.c
+@@ -629,7 +629,7 @@ static int __fpr_get(struct task_struct *target,
+ 
+ 	sve_sync_to_fpsimd(target);
+ 
+-	uregs = &target->thread.fpsimd_state.user_fpsimd;
++	uregs = &target->thread.fpsimd_state;
+ 
+ 	return user_regset_copyout(&pos, &count, &kbuf, &ubuf, uregs,
+ 				   start_pos, start_pos + sizeof(*uregs));
+@@ -660,14 +660,14 @@ static int __fpr_set(struct task_struct *target,
+ 	 */
+ 	sve_sync_to_fpsimd(target);
+ 
+-	newstate = target->thread.fpsimd_state.user_fpsimd;
++	newstate = target->thread.fpsimd_state;
+ 
+ 	ret = user_regset_copyin(&pos, &count, &kbuf, &ubuf, &newstate,
+ 				 start_pos, start_pos + sizeof(newstate));
+ 	if (ret)
+ 		return ret;
+ 
+-	target->thread.fpsimd_state.user_fpsimd = newstate;
++	target->thread.fpsimd_state = newstate;
+ 
+ 	return ret;
+ }
+@@ -1169,7 +1169,7 @@ static int compat_vfp_get(struct task_struct *target,
+ 	compat_ulong_t fpscr;
+ 	int ret, vregs_end_pos;
+ 
+-	uregs = &target->thread.fpsimd_state.user_fpsimd;
++	uregs = &target->thread.fpsimd_state;
+ 
+ 	if (target == current)
+ 		fpsimd_preserve_current_state();
+@@ -1202,7 +1202,7 @@ static int compat_vfp_set(struct task_struct *target,
+ 	compat_ulong_t fpscr;
+ 	int ret, vregs_end_pos;
+ 
+-	uregs = &target->thread.fpsimd_state.user_fpsimd;
++	uregs = &target->thread.fpsimd_state;
+ 
+ 	vregs_end_pos = VFP_STATE_SIZE - sizeof(compat_ulong_t);
+ 	ret = user_regset_copyin(&pos, &count, &kbuf, &ubuf, uregs, 0,
+diff --git a/arch/arm64/kernel/signal.c b/arch/arm64/kernel/signal.c
+index f60c052..d026615 100644
+--- a/arch/arm64/kernel/signal.c
++++ b/arch/arm64/kernel/signal.c
+@@ -178,8 +178,7 @@ static void __user *apply_user_offset(
+ 
+ static int preserve_fpsimd_context(struct fpsimd_context __user *ctx)
+ {
+-	struct user_fpsimd_state const *fpsimd =
+-		&current->thread.fpsimd_state.user_fpsimd;
++	struct user_fpsimd_state const *fpsimd = &current->thread.fpsimd_state;
+ 	int err;
+ 
+ 	/* copy the FP and status/control registers */
+diff --git a/arch/arm64/kernel/signal32.c b/arch/arm64/kernel/signal32.c
+index 79feb86..4ea38d3 100644
+--- a/arch/arm64/kernel/signal32.c
++++ b/arch/arm64/kernel/signal32.c
+@@ -148,8 +148,7 @@ union __fpsimd_vreg {
+ 
+ static int compat_preserve_vfp_context(struct compat_vfp_sigframe __user *frame)
+ {
+-	struct user_fpsimd_state const *fpsimd =
+-		&current->thread.fpsimd_state.user_fpsimd;
++	struct user_fpsimd_state const *fpsimd = &current->thread.fpsimd_state;
+ 	compat_ulong_t magic = VFP_MAGIC;
+ 	compat_ulong_t size = VFP_STORAGE_SIZE;
+ 	compat_ulong_t fpscr, fpexc;
 -- 
 2.1.4
