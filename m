@@ -1,142 +1,49 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [RFC 03/12] KVM: arm/arm64: Record RDIST Last bit at registration
-Date: Wed, 21 Mar 2018 11:35:39 +0000
-Message-ID: <5b06bcd9-5a7c-3d69-8b5e-82210fdb5bee@arm.com>
-References: <1521451220-27754-1-git-send-email-eric.auger@redhat.com>
- <1521451220-27754-4-git-send-email-eric.auger@redhat.com>
- <3943c306-5204-3a2b-0e06-7c8a4298c9fc@arm.com>
- <f6126707-45b7-309e-4cc9-16833e7d27d4@redhat.com>
+From: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
+Subject: Re: [PATCH 1/4] iommu: Add virtio-iommu driver
+Date: Wed, 21 Mar 2018 13:14:04 +0000
+Message-ID: <a11f1b52-c031-014c-8c23-1732f3d4666c@arm.com>
+References: <20180214145340.1223-1-jean-philippe.brucker@arm.com>
+	<20180214145340.1223-2-jean-philippe.brucker@arm.com>
+	<AADFC41AFE54684AB9EE6CBC0274A5D19108B0FE@SHSMSX101.ccr.corp.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <f6126707-45b7-309e-4cc9-16833e7d27d4@redhat.com>
-Content-Language: en-GB
-Sender: linux-kernel-owner@vger.kernel.org
-To: Auger Eric <eric.auger@redhat.com>, eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, cdall@kernel.org, peter.maydell@linaro.org
-Cc: andre.przywara@arm.com, drjones@redhat.com, wei@redhat.com
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19108B0FE-0J0gbvR4kThpB2pF5aRoyrfspsVTdybXVpNB7YpNyf8@public.gmane.org>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: "Tian, Kevin" <kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, "iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, "kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, "virtio-dev-sDuHXQ4OtrM4h7I2RyI4rWD2FQJk+8+b@public.gmane.org" <virtio-dev-sDuHXQ4OtrM4h7I2RyI4rWD2FQJk+8+b@public.gmane.org>, "kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org" <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>
+Cc: "jayachandran.nair-YGCgFSpz5w/QT0dZR+AlfA@public.gmane.org" <jayachandran.nair-YGCgFSpz5w/QT0dZR+AlfA@public.gmane.org>, "tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org" <tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>, "mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Marc Zyngier <Marc.Zyngier-5wv7dgnIgG8@public.gmane.org>, "jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Will Deacon <Will.Deacon-5wv7dgnIgG8@public.gmane.org>, "jintack-eQaUEPhvms7ENvBUuze7eA@public.gmane.org" <jintack-eQaUEPhvms7ENvBUuze7eA@public.gmane.org>, "eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org" <eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 19/03/18 21:06, Auger Eric wrote:
-> Hi Marc,
+On 21/03/18 06:43, Tian, Kevin wrote:
+[...]
+>> +
+>> +#include <uapi/linux/virtio_iommu.h>
+>> +
+>> +#define MSI_IOVA_BASE			0x8000000
+>> +#define MSI_IOVA_LENGTH			0x100000
 > 
-> On 19/03/18 16:57, Marc Zyngier wrote:
->> On 19/03/18 09:20, Eric Auger wrote:
->>> To prepare for multiple RDIST regions, let's record the RDIST
->>> Last bit field when registering the IO device.
->>>
->>> As a reminder the Last bit indicates whether the redistributor
->>> is the highest one in a series of contiguous redistributor pages.
->>>
->>> Since at the moment KVM only supports a single redist region,
->>> the RDIST tagged with the last bit set to true corresponds to the
->>> highest vCPU one.
->>>
->>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>> ---
->>>  include/kvm/arm_vgic.h           | 1 +
->>>  virt/kvm/arm/vgic/vgic-mmio-v3.c | 6 +++++-
->>>  2 files changed, 6 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
->>> index cdbd142..1c8c0ff 100644
->>> --- a/include/kvm/arm_vgic.h
->>> +++ b/include/kvm/arm_vgic.h
->>> @@ -312,6 +312,7 @@ struct vgic_cpu {
->>>  	 */
->>>  	struct vgic_io_device	rd_iodev;
->>>  	struct vgic_io_device	sgi_iodev;
->>> +	bool rdist_last; /* Is the RDIST the last one of the RDIST region? */
->>>  
->>>  	/* Contains the attributes and gpa of the LPI pending tables. */
->>>  	u64 pendbaser;
->>> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
->>> index 671fe81..75fe689 100644
->>> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
->>> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
->>> @@ -184,12 +184,13 @@ static unsigned long vgic_mmio_read_v3r_typer(struct kvm_vcpu *vcpu,
->>>  					      gpa_t addr, unsigned int len)
->>>  {
->>>  	unsigned long mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
->>> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
->>>  	int target_vcpu_id = vcpu->vcpu_id;
->>>  	u64 value;
->>>  
->>>  	value = (u64)(mpidr & GENMASK(23, 0)) << 32;
->>>  	value |= ((target_vcpu_id & 0xffff) << 8);
->>> -	if (target_vcpu_id == atomic_read(&vcpu->kvm->online_vcpus) - 1)
->>> +	if (vgic_cpu->rdist_last)
->>>  		value |= GICR_TYPER_LAST;
->>>  	if (vgic_has_its(vcpu->kvm))
->>>  		value |= GICR_TYPER_PLPIS;
->>> @@ -580,6 +581,7 @@ int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
->>>  {
->>>  	struct kvm *kvm = vcpu->kvm;
->>>  	struct vgic_dist *vgic = &kvm->arch.vgic;
->>> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
->>>  	struct vgic_io_device *rd_dev = &vcpu->arch.vgic_cpu.rd_iodev;
->>>  	struct vgic_io_device *sgi_dev = &vcpu->arch.vgic_cpu.sgi_iodev;
->>>  	gpa_t rd_base, sgi_base;
->>> @@ -632,6 +634,8 @@ int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
->>>  	}
->>>  
->>>  	vgic->vgic_redist_free_offset += 2 * SZ_64K;
->>> +	vgic_cpu->rdist_last =
->>> +		(vcpu->vcpu_id == atomic_read(&vcpu->kvm->online_vcpus) - 1);
->>>  out:
->>>  	mutex_unlock(&kvm->slots_lock);
->>>  	return ret;
->>>
->>
->> I don't really like the idea of keeping this "Last" bit around, because
->> it doesn't have much to do with the state of a redistributor, and has
->> more to do with its position in the region.
->
-> agreed. What about putting it in vgic_io_device then?.
+> this is ARM specific, and according to virtio-iommu spec isn't it
+> better probed on the endpoint instead of hard-coding here?
 
-I'm not sure either. See below.
+These values are arbitrary, not really ARM-specific even if ARM is the
+only user yet: we're just reserving a random IOVA region for mapping MSIs.
+It is hard-coded because of the way iommu-dma.c works, but I don't quite
+remember why that allocation isn't dynamic.
 
->>
->> What is wrong with the current approach of dynamically computing the
->> Last bit? If you have multiple regions, all you need to know is which
->> region this redistributor belongs to. From that point (and assuming you
->> know how many redistributors have been instantiated in that region, you
->> can know whether the Last bit is set or not.
->
-> Well, looked to me more natural to compute the information once when
-> registering the rdist into its region instead of each time we read the
-> RDIST TYPER.
-
-That's a trade-off (memory vs time). Reading GICR_TYPER is a rare thing
-(as for all MMIO), and comparing two addresses is cheap. On the other
-hand, adding immutable state to each vcpu seems a bit strange.
-
-> Especially because at that moment we map the redist, we
-> need to know anyway if we have sufficient space to put it.
-
-What do you mean by that? Is that related to the way we currently map
-redistributors?
-
->>
->> One of the issue is that the current code works in term of "target cpu",
->> while we really want is to use the addr parameter to work out if the
->> Last bit is set or not. I'd be a lot more confident if we emulate it
->> like that (which is how the HW would generate it too).
->
-> Sorry I don't understand your comment above.
-
-What I mean is that the current code would be better written as
-
-	if (addr = redist_base + 128K * (nr_vcpus -1) + GICR_TYPER)
-		value |= GICR_TYPER_LAST;
-
-rather than considering the vcpu_id of the target redistributor
-associated vcpu (which I find crazy complicated). This check is the way
-a HW implementation would perform it, not by storing some extra state.
-You can easily expand this to multiple rdist banks.
+As said on the v0.6 spec thread, I'm not sure allocating the IOVA range in
+the host is preferable. With nested translation the guest has to map it
+anyway, and I believe dealing with IOVA allocation should be left to the
+guest when possible.
 
 Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Jean
