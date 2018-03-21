@@ -1,160 +1,85 @@
-From: "Yang, Shunyong" <shunyong.yang@hxt-semitech.com>
-Subject: =?utf-8?B?UmU6IFvmraTpgq7ku7blj6/og73lrZjlnKjpo47pmaldICBSZTogW1BBVENI?=
- =?utf-8?B?IHYyXSBLVk06IGFybS9hcm02NDogdmdpYzogRGlzYWxsb3cgQWN0aXZlK1Bl?=
- =?utf-8?Q?nding_for_level_interrupts?=
-Date: Wed, 21 Mar 2018 01:20:07 +0000
-Message-ID: <1521595206.3326.8.camel@hxt-semitech.com>
-References: <20180316143015.32055-1-marc.zyngier@arm.com>
- <4be5cde8-ce15-a6e5-385d-b30288f51e5c@redhat.com>
+From: "Tian, Kevin" <kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+Subject: RE: [PATCH 1/4] iommu: Add virtio-iommu driver
+Date: Wed, 21 Mar 2018 06:43:35 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19108B0FE@SHSMSX101.ccr.corp.intel.com>
+References: <20180214145340.1223-1-jean-philippe.brucker@arm.com>
+	<20180214145340.1223-2-jean-philippe.brucker@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <4be5cde8-ce15-a6e5-385d-b30288f51e5c@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <20180214145340.1223-2-jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
 Content-Language: en-US
-Content-ID: <B1B8A01F29224E4FA476D642F34AC26F@hxt-semitech.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: "eric.auger@redhat.com" <eric.auger@redhat.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
-Cc: "Andre.Przywara@arm.com" <Andre.Przywara@arm.com>, "cdall@kernel.org" <cdall@kernel.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>, "iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, "kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, "virtio-dev-sDuHXQ4OtrM4h7I2RyI4rWD2FQJk+8+b@public.gmane.org" <virtio-dev-sDuHXQ4OtrM4h7I2RyI4rWD2FQJk+8+b@public.gmane.org>, "kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org" <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>
+Cc: "jayachandran.nair-YGCgFSpz5w/QT0dZR+AlfA@public.gmane.org" <jayachandran.nair-YGCgFSpz5w/QT0dZR+AlfA@public.gmane.org>, "tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org" <tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>, "mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, "marc.zyngier-5wv7dgnIgG8@public.gmane.org" <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, "jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, "will.deacon-5wv7dgnIgG8@public.gmane.org" <will.deacon-5wv7dgnIgG8@public.gmane.org>, "jintack-eQaUEPhvms7ENvBUuze7eA@public.gmane.org" <jintack-eQaUEPhvms7ENvBUuze7eA@public.gmane.org>, "eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org" <eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGksIE1hcmMsDQoNCk9uIFR1ZSwgMjAxOC0wMy0yMCBhdCAxNToyNSArMDEwMCwgQXVnZXIgRXJp
-YyB3cm90ZToNCj4gSGkgTWFyYywNCj4gDQo+IE9uIDE2LzAzLzE4IDE1OjMwLCBNYXJjIFp5bmdp
-ZXIgd3JvdGU6DQo+ID4gDQo+ID4gSXQgd2FzIHJlY2VudGx5IHJlcG9ydGVkIHRoYXQgVkZJTyBt
-ZWRpYXRlZCBkZXZpY2VzLCBhbmQgYW55dGhpbmcNCj4gPiB0aGF0IFZGSU8gZXhwb3NlcyBhcyBs
-ZXZlbCBpbnRlcnJ1cHRzLCBkbyBubyBzdHJpY3RseSBmb2xsb3cgdGhlDQo+ID4gZXhwZWN0ZWQg
-bG9naWMgb2Ygc3VjaCBpbnRlcnJ1cHRzIGFzIGl0IG9ubHkgbG93ZXJzIHRoZSBpbnB1dA0KPiA+
-IGxpbmUgd2hlbiB0aGUgZ3Vlc3QgaGFzIEVPSWQgdGhlIGludGVycnVwdCBhdCB0aGUgR0lDIGxl
-dmVsLCByYXRoZXINCj4gPiB0aGFuIHdoZW4gaXQgQWNrZWQgdGhlIGludGVycnVwdCBhdCB0aGUg
-ZGV2aWNlIGxldmVsLg0KPiA+IA0KPiA+IFRIZSBHSUMncyBBY3RpdmUrUGVuZGluZyBzdGF0ZSBp
-cyBmdW5kYW1lbnRhbGx5IGluY29tcGF0aWJsZSB3aXRoDQo+ID4gdGhpcyBiZWhhdmlvdXIsIGFz
-IGl0IHByZXZlbnRzIEtWTSBmcm9tIG9ic2VydmluZyB0aGUgRU9JLCBhbmQgaW4NCj4gPiB0dXJu
-IHJlc3VsdHMgaW4gVkZJTyBuZXZlciBkcm9wcGluZyB0aGUgbGluZS4gVGhpcyByZXN1bHRzIGlu
-IGFuDQo+ID4gaW50ZXJydXB0IHN0b3JtIGluIHRoZSBndWVzdCwgd2hpY2ggaXQgcmVhbGx5IG5l
-dmVyIGV4cGVjdGVkLg0KPiA+IA0KPiA+IEFzIHdlIGNhbm5vdCByZWFsbHkgY2hhbmdlIFZGSU8g
-dG8gZm9sbG93IHRoZSBzdHJpY3QgcnVsZXMgb2YgbGV2ZWwNCj4gPiBzaWduYWxsaW5nLCBsZXQn
-cyBmb3JiaWQgdGhlIEErUCBzdGF0ZSBhbHRvZ2V0aGVyLCBhcyBpdCBpcyBpbiB0aGUNCj4gPiBl
-bmQgb25seSBhbiBvcHRpbWl6YXRpb24uIEl0IGVuc3VyZXMgdGhhdCB3ZSB3aWxsIHRyYW5zaXRp
-b24gdmlhDQo+ID4gYW4gaW52YWxpZCBzdGF0ZSwgd2hpY2ggd2UgY2FuIHVzZSB0byBub3RpZnkg
-VkZJTyBvZiB0aGUgRU9JLg0KPiA+IA0KPiA+IFNpZ25lZC1vZmYtYnk6IE1hcmMgWnluZ2llciA8
-bWFyYy56eW5naWVyQGFybS5jb20+DQo+IFJldmlld2VkLWJ5OiBFcmljIEF1Z2VyIDxlcmljLmF1
-Z2VyQHJlZGhhdC5jb20+DQo+IFRlc3RlZC1ieTogRXJpYyBBdWdlciA8ZXJpYy5hdWdlckByZWRo
-YXQuY29tPg0KPiB3aXRoIG1kZXYgdHR5IGRldmljZQ0KPiANCj4gVGhhbmtzDQo+IA0KPiBFcmlj
-DQoNClRlc3RlZC1ieTogU2h1bnlvbmcgWWFuZyA8c2h1bnlvbmcueWFuZ0BoeHQtc2VtaXRlY2gu
-Y29tPg0KDQpUaGFua3MuDQpTaHVueW9uZy4NCg0KPiA+IA0KPiA+IC0tLQ0KPiA+IC0gRnJvbSB2
-MToNCj4gPiDCoCAqIE9ubHkgY2xlYXIgdGhlIGxhdGNoIHdoZW4gZ29pbmcgdmlhIGFuIGludmFs
-aWQgc3RhdGUNCj4gPiANCj4gPiDCoHZpcnQva3ZtL2FybS92Z2ljL3ZnaWMtdjIuYyB8IDU0ICsr
-KysrKysrKysrKysrKysrKysrKysrKystLS0tLS0NCj4gPiAtLS0tLS0tLS0tLS0tLQ0KPiA+IMKg
-dmlydC9rdm0vYXJtL3ZnaWMvdmdpYy12My5jIHwgNTQgKysrKysrKysrKysrKysrKysrKysrKysr
-Ky0tLS0tLQ0KPiA+IC0tLS0tLS0tLS0tLS0tDQo+ID4gwqAyIGZpbGVzIGNoYW5nZWQsIDYwIGlu
-c2VydGlvbnMoKyksIDQ4IGRlbGV0aW9ucygtKQ0KPiA+IA0KPiA+IGRpZmYgLS1naXQgYS92aXJ0
-L2t2bS9hcm0vdmdpYy92Z2ljLXYyLmMgYi92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLQ0KPiA+IHYy
-LmMNCj4gPiBpbmRleCAyOTU1NmY3MWI2OTEuLjg0Mjc1ODY3NjBmYyAxMDA2NDQNCj4gPiAtLS0g
-YS92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLXYyLmMNCj4gPiArKysgYi92aXJ0L2t2bS9hcm0vdmdp
-Yy92Z2ljLXYyLmMNCj4gPiBAQCAtMTA1LDEyICsxMDUsOSBAQCB2b2lkIHZnaWNfdjJfZm9sZF9s
-cl9zdGF0ZShzdHJ1Y3Qga3ZtX3ZjcHUNCj4gPiAqdmNwdSkNCj4gPiDCoA0KPiA+IMKgCQkvKg0K
-PiA+IMKgCQnCoCogQ2xlYXIgc29mdCBwZW5kaW5nIHN0YXRlIHdoZW4gbGV2ZWwgaXJxcyBoYXZl
-DQo+ID4gYmVlbiBhY2tlZC4NCj4gPiAtCQnCoCogQWx3YXlzIHJlZ2VuZXJhdGUgdGhlIHBlbmRp
-bmcgc3RhdGUuDQo+ID4gwqAJCcKgKi8NCj4gPiAtCQlpZiAoaXJxLT5jb25maWcgPT0gVkdJQ19D
-T05GSUdfTEVWRUwpIHsNCj4gPiAtCQkJaWYgKCEodmFsICYgR0lDSF9MUl9QRU5ESU5HX0JJVCkp
-DQo+ID4gLQkJCQlpcnEtPnBlbmRpbmdfbGF0Y2ggPSBmYWxzZTsNCj4gPiAtCQl9DQo+ID4gKwkJ
-aWYgKGlycS0+Y29uZmlnID09IFZHSUNfQ09ORklHX0xFVkVMICYmICEodmFsICYNCj4gPiBHSUNI
-X0xSX1NUQVRFKSkNCj4gPiArCQkJaXJxLT5wZW5kaW5nX2xhdGNoID0gZmFsc2U7DQo+ID4gwqAN
-Cj4gPiDCoAkJLyoNCj4gPiDCoAkJwqAqIExldmVsLXRyaWdnZXJlZCBtYXBwZWQgSVJRcyBhcmUg
-c3BlY2lhbCBiZWNhdXNlDQo+ID4gd2Ugb25seQ0KPiA+IEBAIC0xNTMsOCArMTUwLDM1IEBAIHZv
-aWQgdmdpY192Ml9mb2xkX2xyX3N0YXRlKHN0cnVjdCBrdm1fdmNwdQ0KPiA+ICp2Y3B1KQ0KPiA+
-IMKgdm9pZCB2Z2ljX3YyX3BvcHVsYXRlX2xyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgc3RydWN0
-IHZnaWNfaXJxDQo+ID4gKmlycSwgaW50IGxyKQ0KPiA+IMKgew0KPiA+IMKgCXUzMiB2YWwgPSBp
-cnEtPmludGlkOw0KPiA+ICsJYm9vbCBhbGxvd19wZW5kaW5nID0gdHJ1ZTsNCj4gPiArDQo+ID4g
-KwlpZiAoaXJxLT5hY3RpdmUpDQo+ID4gKwkJdmFsIHw9IEdJQ0hfTFJfQUNUSVZFX0JJVDsNCj4g
-PiArDQo+ID4gKwlpZiAoaXJxLT5odykgew0KPiA+ICsJCXZhbCB8PSBHSUNIX0xSX0hXOw0KPiA+
-ICsJCXZhbCB8PSBpcnEtPmh3aW50aWQgPDwgR0lDSF9MUl9QSFlTSURfQ1BVSURfU0hJRlQ7DQo+
-ID4gKwkJLyoNCj4gPiArCQnCoCogTmV2ZXIgc2V0IHBlbmRpbmcrYWN0aXZlIG9uIGEgSFcgaW50
-ZXJydXB0LCBhcw0KPiA+IHRoZQ0KPiA+ICsJCcKgKiBwZW5kaW5nIHN0YXRlIGlzIGtlcHQgYXQg
-dGhlIHBoeXNpY2FsDQo+ID4gZGlzdHJpYnV0b3INCj4gPiArCQnCoCogbGV2ZWwuDQo+ID4gKwkJ
-wqAqLw0KPiA+ICsJCWlmIChpcnEtPmFjdGl2ZSkNCj4gPiArCQkJYWxsb3dfcGVuZGluZyA9IGZh
-bHNlOw0KPiA+ICsJfSBlbHNlIHsNCj4gPiArCQlpZiAoaXJxLT5jb25maWcgPT0gVkdJQ19DT05G
-SUdfTEVWRUwpIHsNCj4gPiArCQkJdmFsIHw9IEdJQ0hfTFJfRU9JOw0KPiA+IMKgDQo+ID4gLQlp
-ZiAoaXJxX2lzX3BlbmRpbmcoaXJxKSkgew0KPiA+ICsJCQkvKg0KPiA+ICsJCQnCoCogU29mdHdh
-cmUgcmVzYW1wbGluZyBkb2Vzbid0IHdvcmsgdmVyeQ0KPiA+IHdlbGwNCj4gPiArCQkJwqAqIGlm
-IHdlIGFsbG93IFArQSwgc28gbGV0J3Mgbm90IGRvIHRoYXQuDQo+ID4gKwkJCcKgKi8NCj4gPiAr
-CQkJaWYgKGlycS0+YWN0aXZlKQ0KPiA+ICsJCQkJYWxsb3dfcGVuZGluZyA9IGZhbHNlOw0KPiA+
-ICsJCX0NCj4gPiArCX0NCj4gPiArDQo+ID4gKwlpZiAoYWxsb3dfcGVuZGluZyAmJiBpcnFfaXNf
-cGVuZGluZyhpcnEpKSB7DQo+ID4gwqAJCXZhbCB8PSBHSUNIX0xSX1BFTkRJTkdfQklUOw0KPiA+
-IMKgDQo+ID4gwqAJCWlmIChpcnEtPmNvbmZpZyA9PSBWR0lDX0NPTkZJR19FREdFKQ0KPiA+IEBA
-IC0xNzEsMjQgKzE5NSw2IEBAIHZvaWQgdmdpY192Ml9wb3B1bGF0ZV9scihzdHJ1Y3Qga3ZtX3Zj
-cHUNCj4gPiAqdmNwdSwgc3RydWN0IHZnaWNfaXJxICppcnEsIGludCBscikNCj4gPiDCoAkJfQ0K
-PiA+IMKgCX0NCj4gPiDCoA0KPiA+IC0JaWYgKGlycS0+YWN0aXZlKQ0KPiA+IC0JCXZhbCB8PSBH
-SUNIX0xSX0FDVElWRV9CSVQ7DQo+ID4gLQ0KPiA+IC0JaWYgKGlycS0+aHcpIHsNCj4gPiAtCQl2
-YWwgfD0gR0lDSF9MUl9IVzsNCj4gPiAtCQl2YWwgfD0gaXJxLT5od2ludGlkIDw8IEdJQ0hfTFJf
-UEhZU0lEX0NQVUlEX1NISUZUOw0KPiA+IC0JCS8qDQo+ID4gLQkJwqAqIE5ldmVyIHNldCBwZW5k
-aW5nK2FjdGl2ZSBvbiBhIEhXIGludGVycnVwdCwgYXMNCj4gPiB0aGUNCj4gPiAtCQnCoCogcGVu
-ZGluZyBzdGF0ZSBpcyBrZXB0IGF0IHRoZSBwaHlzaWNhbA0KPiA+IGRpc3RyaWJ1dG9yDQo+ID4g
-LQkJwqAqIGxldmVsLg0KPiA+IC0JCcKgKi8NCj4gPiAtCQlpZiAoaXJxLT5hY3RpdmUgJiYgaXJx
-X2lzX3BlbmRpbmcoaXJxKSkNCj4gPiAtCQkJdmFsICY9IH5HSUNIX0xSX1BFTkRJTkdfQklUOw0K
-PiA+IC0JfSBlbHNlIHsNCj4gPiAtCQlpZiAoaXJxLT5jb25maWcgPT0gVkdJQ19DT05GSUdfTEVW
-RUwpDQo+ID4gLQkJCXZhbCB8PSBHSUNIX0xSX0VPSTsNCj4gPiAtCX0NCj4gPiAtDQo+ID4gwqAJ
-LyoNCj4gPiDCoAnCoCogTGV2ZWwtdHJpZ2dlcmVkIG1hcHBlZCBJUlFzIGFyZSBzcGVjaWFsIGJl
-Y2F1c2Ugd2Ugb25seQ0KPiA+IG9ic2VydmUNCj4gPiDCoAnCoCogcmlzaW5nIGVkZ2VzIGFzIGlu
-cHV0IHRvIHRoZSBWR0lDLsKgwqBXZSB0aGVyZWZvcmUgbG93ZXINCj4gPiB0aGUgbGluZQ0KPiA+
-IGRpZmYgLS1naXQgYS92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLXYzLmMgYi92aXJ0L2t2bS9hcm0v
-dmdpYy92Z2ljLQ0KPiA+IHYzLmMNCj4gPiBpbmRleCAwZmYyMDA2ZjM3ODEuLmRkOTg0ZjcyNjgw
-NSAxMDA2NDQNCj4gPiAtLS0gYS92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLXYzLmMNCj4gPiArKysg
-Yi92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLXYzLmMNCj4gPiBAQCAtOTYsMTIgKzk2LDkgQEAgdm9p
-ZCB2Z2ljX3YzX2ZvbGRfbHJfc3RhdGUoc3RydWN0IGt2bV92Y3B1DQo+ID4gKnZjcHUpDQo+ID4g
-wqANCj4gPiDCoAkJLyoNCj4gPiDCoAkJwqAqIENsZWFyIHNvZnQgcGVuZGluZyBzdGF0ZSB3aGVu
-IGxldmVsIGlycXMgaGF2ZQ0KPiA+IGJlZW4gYWNrZWQuDQo+ID4gLQkJwqAqIEFsd2F5cyByZWdl
-bmVyYXRlIHRoZSBwZW5kaW5nIHN0YXRlLg0KPiA+IMKgCQnCoCovDQo+ID4gLQkJaWYgKGlycS0+
-Y29uZmlnID09IFZHSUNfQ09ORklHX0xFVkVMKSB7DQo+ID4gLQkJCWlmICghKHZhbCAmIElDSF9M
-Ul9QRU5ESU5HX0JJVCkpDQo+ID4gLQkJCQlpcnEtPnBlbmRpbmdfbGF0Y2ggPSBmYWxzZTsNCj4g
-PiAtCQl9DQo+ID4gKwkJaWYgKGlycS0+Y29uZmlnID09IFZHSUNfQ09ORklHX0xFVkVMICYmICEo
-dmFsICYNCj4gPiBJQ0hfTFJfU1RBVEUpKQ0KPiA+ICsJCQlpcnEtPnBlbmRpbmdfbGF0Y2ggPSBm
-YWxzZTsNCj4gPiDCoA0KPiA+IMKgCQkvKg0KPiA+IMKgCQnCoCogTGV2ZWwtdHJpZ2dlcmVkIG1h
-cHBlZCBJUlFzIGFyZSBzcGVjaWFsIGJlY2F1c2UNCj4gPiB3ZSBvbmx5DQo+ID4gQEAgLTEzNSw4
-ICsxMzIsMzUgQEAgdm9pZCB2Z2ljX3YzX3BvcHVsYXRlX2xyKHN0cnVjdCBrdm1fdmNwdQ0KPiA+
-ICp2Y3B1LCBzdHJ1Y3QgdmdpY19pcnEgKmlycSwgaW50IGxyKQ0KPiA+IMKgew0KPiA+IMKgCXUz
-MiBtb2RlbCA9IHZjcHUtPmt2bS0+YXJjaC52Z2ljLnZnaWNfbW9kZWw7DQo+ID4gwqAJdTY0IHZh
-bCA9IGlycS0+aW50aWQ7DQo+ID4gKwlib29sIGFsbG93X3BlbmRpbmcgPSB0cnVlOw0KPiA+ICsN
-Cj4gPiArCWlmIChpcnEtPmFjdGl2ZSkNCj4gPiArCQl2YWwgfD0gSUNIX0xSX0FDVElWRV9CSVQ7
-DQo+ID4gKw0KPiA+ICsJaWYgKGlycS0+aHcpIHsNCj4gPiArCQl2YWwgfD0gSUNIX0xSX0hXOw0K
-PiA+ICsJCXZhbCB8PSAoKHU2NClpcnEtPmh3aW50aWQpIDw8DQo+ID4gSUNIX0xSX1BIWVNfSURf
-U0hJRlQ7DQo+ID4gKwkJLyoNCj4gPiArCQnCoCogTmV2ZXIgc2V0IHBlbmRpbmcrYWN0aXZlIG9u
-IGEgSFcgaW50ZXJydXB0LCBhcw0KPiA+IHRoZQ0KPiA+ICsJCcKgKiBwZW5kaW5nIHN0YXRlIGlz
-IGtlcHQgYXQgdGhlIHBoeXNpY2FsDQo+ID4gZGlzdHJpYnV0b3INCj4gPiArCQnCoCogbGV2ZWwu
-DQo+ID4gKwkJwqAqLw0KPiA+ICsJCWlmIChpcnEtPmFjdGl2ZSkNCj4gPiArCQkJYWxsb3dfcGVu
-ZGluZyA9IGZhbHNlOw0KPiA+ICsJfSBlbHNlIHsNCj4gPiArCQlpZiAoaXJxLT5jb25maWcgPT0g
-VkdJQ19DT05GSUdfTEVWRUwpIHsNCj4gPiArCQkJdmFsIHw9IElDSF9MUl9FT0k7DQo+ID4gwqAN
-Cj4gPiAtCWlmIChpcnFfaXNfcGVuZGluZyhpcnEpKSB7DQo+ID4gKwkJCS8qDQo+ID4gKwkJCcKg
-KiBTb2Z0d2FyZSByZXNhbXBsaW5nIGRvZXNuJ3Qgd29yayB2ZXJ5DQo+ID4gd2VsbA0KPiA+ICsJ
-CQnCoCogaWYgd2UgYWxsb3cgUCtBLCBzbyBsZXQncyBub3QgZG8gdGhhdC4NCj4gPiArCQkJwqAq
-Lw0KPiA+ICsJCQlpZiAoaXJxLT5hY3RpdmUpDQo+ID4gKwkJCQlhbGxvd19wZW5kaW5nID0gZmFs
-c2U7DQo+ID4gKwkJfQ0KPiA+ICsJfQ0KPiA+ICsNCj4gPiArCWlmIChhbGxvd19wZW5kaW5nICYm
-IGlycV9pc19wZW5kaW5nKGlycSkpIHsNCj4gPiDCoAkJdmFsIHw9IElDSF9MUl9QRU5ESU5HX0JJ
-VDsNCj4gPiDCoA0KPiA+IMKgCQlpZiAoaXJxLT5jb25maWcgPT0gVkdJQ19DT05GSUdfRURHRSkN
-Cj4gPiBAQCAtMTU0LDI0ICsxNzgsNiBAQCB2b2lkIHZnaWNfdjNfcG9wdWxhdGVfbHIoc3RydWN0
-IGt2bV92Y3B1DQo+ID4gKnZjcHUsIHN0cnVjdCB2Z2ljX2lycSAqaXJxLCBpbnQgbHIpDQo+ID4g
-wqAJCX0NCj4gPiDCoAl9DQo+ID4gwqANCj4gPiAtCWlmIChpcnEtPmFjdGl2ZSkNCj4gPiAtCQl2
-YWwgfD0gSUNIX0xSX0FDVElWRV9CSVQ7DQo+ID4gLQ0KPiA+IC0JaWYgKGlycS0+aHcpIHsNCj4g
-PiAtCQl2YWwgfD0gSUNIX0xSX0hXOw0KPiA+IC0JCXZhbCB8PSAoKHU2NClpcnEtPmh3aW50aWQp
-IDw8DQo+ID4gSUNIX0xSX1BIWVNfSURfU0hJRlQ7DQo+ID4gLQkJLyoNCj4gPiAtCQnCoCogTmV2
-ZXIgc2V0IHBlbmRpbmcrYWN0aXZlIG9uIGEgSFcgaW50ZXJydXB0LCBhcw0KPiA+IHRoZQ0KPiA+
-IC0JCcKgKiBwZW5kaW5nIHN0YXRlIGlzIGtlcHQgYXQgdGhlIHBoeXNpY2FsDQo+ID4gZGlzdHJp
-YnV0b3INCj4gPiAtCQnCoCogbGV2ZWwuDQo+ID4gLQkJwqAqLw0KPiA+IC0JCWlmIChpcnEtPmFj
-dGl2ZSAmJiBpcnFfaXNfcGVuZGluZyhpcnEpKQ0KPiA+IC0JCQl2YWwgJj0gfklDSF9MUl9QRU5E
-SU5HX0JJVDsNCj4gPiAtCX0gZWxzZSB7DQo+ID4gLQkJaWYgKGlycS0+Y29uZmlnID09IFZHSUNf
-Q09ORklHX0xFVkVMKQ0KPiA+IC0JCQl2YWwgfD0gSUNIX0xSX0VPSTsNCj4gPiAtCX0NCj4gPiAt
-DQo+ID4gwqAJLyoNCj4gPiDCoAnCoCogTGV2ZWwtdHJpZ2dlcmVkIG1hcHBlZCBJUlFzIGFyZSBz
-cGVjaWFsIGJlY2F1c2Ugd2Ugb25seQ0KPiA+IG9ic2VydmUNCj4gPiDCoAnCoCogcmlzaW5nIGVk
-Z2VzIGFzIGlucHV0IHRvIHRoZSBWR0lDLsKgwqBXZSB0aGVyZWZvcmUgbG93ZXINCj4gPiB0aGUg
-bGluZQ0KPiA+IApfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-XwpsaW51eC1hcm0ta2VybmVsIG1haWxpbmcgbGlzdApsaW51eC1hcm0ta2VybmVsQGxpc3RzLmlu
-ZnJhZGVhZC5vcmcKaHR0cDovL2xpc3RzLmluZnJhZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9s
-aW51eC1hcm0ta2VybmVsCg==
+> From: Jean-Philippe Brucker [mailto:jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org]
+> Sent: Wednesday, February 14, 2018 10:54 PM
+> 
+> The virtio IOMMU is a para-virtualized device, allowing to send IOMMU
+> requests such as map/unmap over virtio-mmio transport without
+> emulating
+> page tables. This implementation handles ATTACH, DETACH, MAP and
+> UNMAP
+> requests.
+> 
+> The bulk of the code transforms calls coming from the IOMMU API into
+> corresponding virtio requests. Mappings are kept in an interval tree
+> instead of page tables.
+> 
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
+
+[...]
+> diff --git a/drivers/iommu/virtio-iommu.c b/drivers/iommu/virtio-iommu.c
+> new file mode 100644
+> index 000000000000..a9c9245e8ba2
+> --- /dev/null
+> +++ b/drivers/iommu/virtio-iommu.c
+> @@ -0,0 +1,960 @@
+> +/*
+> + * Virtio driver for the paravirtualized IOMMU
+> + *
+> + * Copyright (C) 2018 ARM Limited
+> + * Author: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
+> + *
+> + * SPDX-License-Identifier: GPL-2.0
+> + */
+> +
+> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+> +
+> +#include <linux/amba/bus.h>
+> +#include <linux/delay.h>
+> +#include <linux/dma-iommu.h>
+> +#include <linux/freezer.h>
+> +#include <linux/interval_tree.h>
+> +#include <linux/iommu.h>
+> +#include <linux/module.h>
+> +#include <linux/of_iommu.h>
+> +#include <linux/of_platform.h>
+> +#include <linux/pci.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/virtio.h>
+> +#include <linux/virtio_config.h>
+> +#include <linux/virtio_ids.h>
+> +#include <linux/wait.h>
+> +
+> +#include <uapi/linux/virtio_iommu.h>
+> +
+> +#define MSI_IOVA_BASE			0x8000000
+> +#define MSI_IOVA_LENGTH			0x100000
+
+this is ARM specific, and according to virtio-iommu spec isn't it
+better probed on the endpoint instead of hard-coding here?
+
+Thanks
+Kevin
