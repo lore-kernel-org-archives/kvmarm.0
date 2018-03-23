@@ -1,230 +1,353 @@
-From: Peng Hao <peng.hao2@zte.com.cn>
-Subject: [PATCH v3] KVM: arm/arm64 : add lpi info in vgic-debug
-Date: Sat, 24 Mar 2018 08:42:41 +0800
-Message-ID: <1521852161-67603-1-git-send-email-peng.hao2@zte.com.cn>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-To: cdall@kernel.org, marc.zyngier@arm.com
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Peng Hao <peng.hao2@zte.com.cn>
+From: Andrey Konovalov <andreyknvl@google.com>
+Subject: [RFC PATCH v2 01/15] khwasan, mm: change kasan hooks signatures
+Date: Fri, 23 Mar 2018 19:05:37 +0100
+Message-ID: <c88fd6894c2e17be5b1f20f6d6feca3a8dda8d32.1521828273.git.andreyknvl@google.com>
+References: <cover.1521828273.git.andreyknvl@google.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 30E6C49DAB
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Mar 2018 14:13:38 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id CIewRAHyS7wU for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 23 Mar 2018 14:13:13 -0400 (EDT)
+Received: from mail-wm0-f67.google.com (mail-wm0-f67.google.com [74.125.82.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 715CD49F9E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Mar 2018 13:58:03 -0400 (EDT)
+Received: by mail-wm0-f67.google.com with SMTP id l16so5094902wmh.3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Mar 2018 11:06:01 -0700 (PDT)
+In-Reply-To: <cover.1521828273.git.andreyknvl@google.com>
+In-Reply-To: <cover.1521828273.git.andreyknvl@google.com>
+References: <cover.1521828273.git.andreyknvl@google.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Jonathan Corbet <corbet@lwn.net>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Christopher Li <sparse@chrisli.org>, Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Andrew Morton <akpm@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, "GitAuthor : Andrey Konovalov" <andreyknvl@google.com>, Mark Rutland <mark.rutland@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Yury Norov <ynorov@caviumnetworks.com>, Nick Desaulniers <ndesaulniers@google.com>, Suzuki K Poulose <suzuki.po>
+Cc: Kees Cook <keescook@google.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Lee Smith <Lee.Smith@arm.com>, Kostya Serebryany <kcc@google.com>, Mark Brand <markbrand@google.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Evgeniy Stepanov <eugenis@google.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add lpi debug info to vgic-stat.
-The printed info like this:
-    SPI  287      0 000001        0        0   0 160      -1
-    LPI 8192      2 000100        0        0   0 160      -1
+KHWASAN will change the value of the top byte of pointers returned from the
+kernel allocation functions (such as kmalloc). This patch updates KASAN
+hooks signatures and their usage in SLAB and SLUB code to reflect that.
 
-Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
 ---
- virt/kvm/arm/vgic/vgic-debug.c | 59 ++++++++++++++++++++++++++++++++++++++----
- virt/kvm/arm/vgic/vgic-its.c   | 16 ++++++------
- virt/kvm/arm/vgic/vgic.h       |  1 +
- 3 files changed, 63 insertions(+), 13 deletions(-)
+ include/linux/kasan.h | 34 +++++++++++++++++++++++-----------
+ mm/kasan/kasan.c      | 24 ++++++++++++++----------
+ mm/slab.c             | 12 ++++++------
+ mm/slab.h             |  2 +-
+ mm/slab_common.c      |  4 ++--
+ mm/slub.c             | 16 ++++++++--------
+ 6 files changed, 54 insertions(+), 38 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-debug.c b/virt/kvm/arm/vgic/vgic-debug.c
-index 10b3817..ddac6bd 100644
---- a/virt/kvm/arm/vgic/vgic-debug.c
-+++ b/virt/kvm/arm/vgic/vgic-debug.c
-@@ -36,9 +36,12 @@
- struct vgic_state_iter {
- 	int nr_cpus;
- 	int nr_spis;
-+	int nr_lpis;
- 	int dist_id;
- 	int vcpu_id;
- 	int intid;
-+	int lpi_print_count;
-+	struct vgic_irq **lpi_irqs;
- };
+diff --git a/include/linux/kasan.h b/include/linux/kasan.h
+index adc13474a53b..3bfebcf7ad2b 100644
+--- a/include/linux/kasan.h
++++ b/include/linux/kasan.h
+@@ -53,14 +53,14 @@ void kasan_unpoison_object_data(struct kmem_cache *cache, void *object);
+ void kasan_poison_object_data(struct kmem_cache *cache, void *object);
+ void kasan_init_slab_obj(struct kmem_cache *cache, const void *object);
  
- static void iter_next(struct vgic_state_iter *iter)
-@@ -52,6 +55,39 @@ static void iter_next(struct vgic_state_iter *iter)
- 	if (iter->intid == VGIC_NR_PRIVATE_IRQS &&
- 	    ++iter->vcpu_id < iter->nr_cpus)
- 		iter->intid = 0;
-+
-+	if (iter->intid >= VGIC_NR_PRIVATE_IRQS + iter->nr_spis) {
-+		if (iter->lpi_print_count < iter->nr_lpis)
-+			iter->intid = iter->lpi_irqs[iter->lpi_print_count]->intid;
-+		iter->lpi_print_count++;
-+	}
-+}
-+
-+static void vgic_debug_get_lpis(struct kvm *kvm, struct vgic_state_iter *iter)
+-void kasan_kmalloc_large(const void *ptr, size_t size, gfp_t flags);
++void *kasan_kmalloc_large(const void *ptr, size_t size, gfp_t flags);
+ void kasan_kfree_large(void *ptr, unsigned long ip);
+ void kasan_poison_kfree(void *ptr, unsigned long ip);
+-void kasan_kmalloc(struct kmem_cache *s, const void *object, size_t size,
++void *kasan_kmalloc(struct kmem_cache *s, const void *object, size_t size,
+ 		  gfp_t flags);
+-void kasan_krealloc(const void *object, size_t new_size, gfp_t flags);
++void *kasan_krealloc(const void *object, size_t new_size, gfp_t flags);
+ 
+-void kasan_slab_alloc(struct kmem_cache *s, void *object, gfp_t flags);
++void *kasan_slab_alloc(struct kmem_cache *s, void *object, gfp_t flags);
+ bool kasan_slab_free(struct kmem_cache *s, void *object, unsigned long ip);
+ 
+ struct kasan_cache {
+@@ -105,16 +105,28 @@ static inline void kasan_poison_object_data(struct kmem_cache *cache,
+ static inline void kasan_init_slab_obj(struct kmem_cache *cache,
+ 				const void *object) {}
+ 
+-static inline void kasan_kmalloc_large(void *ptr, size_t size, gfp_t flags) {}
++static inline void *kasan_kmalloc_large(void *ptr, size_t size, gfp_t flags)
 +{
-+	u32 *intids;
-+	int i, irq_count;
-+	struct vgic_irq *irq = NULL, **lpi_irqs;
-+
-+	iter->nr_lpis = 0;
-+	irq_count = vgic_copy_lpi_list(kvm, NULL, &intids);
-+	if (irq_count < 0)
-+		return;
-+
-+	lpi_irqs = kmalloc_array(irq_count, sizeof(irq), GFP_KERNEL);
-+	if (!lpi_irqs) {
-+		kfree(intids);
-+		return;
-+	}
-+
-+	for (i = 0; i < irq_count; i++) {
-+		irq = vgic_get_irq(kvm, NULL, intids[i]);
-+		if (!irq)
-+			continue;
-+		lpi_irqs[iter->nr_lpis++] = irq;
-+	}
-+	iter->lpi_irqs = lpi_irqs;
-+	kfree(intids);
++	return ptr;
++}
+ static inline void kasan_kfree_large(void *ptr, unsigned long ip) {}
+ static inline void kasan_poison_kfree(void *ptr, unsigned long ip) {}
+-static inline void kasan_kmalloc(struct kmem_cache *s, const void *object,
+-				size_t size, gfp_t flags) {}
+-static inline void kasan_krealloc(const void *object, size_t new_size,
+-				 gfp_t flags) {}
++static inline void *kasan_kmalloc(struct kmem_cache *s, const void *object,
++				size_t size, gfp_t flags)
++{
++	return (void *)object;
++}
++static inline void *kasan_krealloc(const void *object, size_t new_size,
++				 gfp_t flags)
++{
++	return (void *)object;
++}
+ 
+-static inline void kasan_slab_alloc(struct kmem_cache *s, void *object,
+-				   gfp_t flags) {}
++static inline void *kasan_slab_alloc(struct kmem_cache *s, void *object,
++				   gfp_t flags)
++{
++	return object;
++}
+ static inline bool kasan_slab_free(struct kmem_cache *s, void *object,
+ 				   unsigned long ip)
+ {
+diff --git a/mm/kasan/kasan.c b/mm/kasan/kasan.c
+index e13d911251e7..d8cb63bd1ecc 100644
+--- a/mm/kasan/kasan.c
++++ b/mm/kasan/kasan.c
+@@ -484,9 +484,9 @@ void kasan_init_slab_obj(struct kmem_cache *cache, const void *object)
+ 	__memset(alloc_info, 0, sizeof(*alloc_info));
  }
  
- static void iter_init(struct kvm *kvm, struct vgic_state_iter *iter,
-@@ -64,6 +100,8 @@ static void iter_init(struct kvm *kvm, struct vgic_state_iter *iter,
- 	iter->nr_cpus = nr_cpus;
- 	iter->nr_spis = kvm->arch.vgic.nr_spis;
- 
-+	if (vgic_supports_direct_msis(kvm) && !pos)
-+		vgic_debug_get_lpis(kvm, iter);
- 	/* Fast forward to the right position if needed */
- 	while (pos--)
- 		iter_next(iter);
-@@ -73,7 +111,9 @@ static bool end_of_vgic(struct vgic_state_iter *iter)
+-void kasan_slab_alloc(struct kmem_cache *cache, void *object, gfp_t flags)
++void *kasan_slab_alloc(struct kmem_cache *cache, void *object, gfp_t flags)
  {
- 	return iter->dist_id > 0 &&
- 		iter->vcpu_id == iter->nr_cpus &&
--		(iter->intid - VGIC_NR_PRIVATE_IRQS) == iter->nr_spis;
-+		(iter->intid - VGIC_NR_PRIVATE_IRQS) >= iter->nr_spis &&
-+		((iter->nr_lpis == 0) ||
-+		(iter->lpi_print_count == iter->nr_lpis + 1));
+-	kasan_kmalloc(cache, object, cache->object_size, flags);
++	return kasan_kmalloc(cache, object, cache->object_size, flags);
  }
  
- static void *vgic_debug_start(struct seq_file *s, loff_t *pos)
-@@ -130,6 +170,7 @@ static void vgic_debug_stop(struct seq_file *s, void *v)
+ static bool __kasan_slab_free(struct kmem_cache *cache, void *object,
+@@ -527,7 +527,7 @@ bool kasan_slab_free(struct kmem_cache *cache, void *object, unsigned long ip)
+ 	return __kasan_slab_free(cache, object, ip, true);
+ }
  
- 	mutex_lock(&kvm->lock);
- 	iter = kvm->arch.vgic.iter;
-+	kfree(iter->lpi_irqs);
- 	kfree(iter);
- 	kvm->arch.vgic.iter = NULL;
- 	mutex_unlock(&kvm->lock);
-@@ -154,7 +195,7 @@ static void print_header(struct seq_file *s, struct vgic_irq *irq,
- 			 struct kvm_vcpu *vcpu)
+-void kasan_kmalloc(struct kmem_cache *cache, const void *object, size_t size,
++void *kasan_kmalloc(struct kmem_cache *cache, const void *object, size_t size,
+ 		   gfp_t flags)
  {
- 	int id = 0;
--	char *hdr = "SPI ";
-+	char *hdr = "Global";
+ 	unsigned long redzone_start;
+@@ -537,7 +537,7 @@ void kasan_kmalloc(struct kmem_cache *cache, const void *object, size_t size,
+ 		quarantine_reduce();
  
- 	if (vcpu) {
- 		hdr = "VCPU";
-@@ -162,7 +203,10 @@ static void print_header(struct seq_file *s, struct vgic_irq *irq,
+ 	if (unlikely(object == NULL))
+-		return;
++		return NULL;
+ 
+ 	redzone_start = round_up((unsigned long)(object + size),
+ 				KASAN_SHADOW_SCALE_SIZE);
+@@ -550,10 +550,12 @@ void kasan_kmalloc(struct kmem_cache *cache, const void *object, size_t size,
+ 
+ 	if (cache->flags & SLAB_KASAN)
+ 		set_track(&get_alloc_info(cache, object)->alloc_track, flags);
++
++	return (void *)object;
+ }
+ EXPORT_SYMBOL(kasan_kmalloc);
+ 
+-void kasan_kmalloc_large(const void *ptr, size_t size, gfp_t flags)
++void *kasan_kmalloc_large(const void *ptr, size_t size, gfp_t flags)
+ {
+ 	struct page *page;
+ 	unsigned long redzone_start;
+@@ -563,7 +565,7 @@ void kasan_kmalloc_large(const void *ptr, size_t size, gfp_t flags)
+ 		quarantine_reduce();
+ 
+ 	if (unlikely(ptr == NULL))
+-		return;
++		return NULL;
+ 
+ 	page = virt_to_page(ptr);
+ 	redzone_start = round_up((unsigned long)(ptr + size),
+@@ -573,21 +575,23 @@ void kasan_kmalloc_large(const void *ptr, size_t size, gfp_t flags)
+ 	kasan_unpoison_shadow(ptr, size);
+ 	kasan_poison_shadow((void *)redzone_start, redzone_end - redzone_start,
+ 		KASAN_PAGE_REDZONE);
++
++	return (void *)ptr;
+ }
+ 
+-void kasan_krealloc(const void *object, size_t size, gfp_t flags)
++void *kasan_krealloc(const void *object, size_t size, gfp_t flags)
+ {
+ 	struct page *page;
+ 
+ 	if (unlikely(object == ZERO_SIZE_PTR))
+-		return;
++		return ZERO_SIZE_PTR;
+ 
+ 	page = virt_to_head_page(object);
+ 
+ 	if (unlikely(!PageSlab(page)))
+-		kasan_kmalloc_large(object, size, flags);
++		return kasan_kmalloc_large(object, size, flags);
+ 	else
+-		kasan_kmalloc(page->slab_cache, object, size, flags);
++		return kasan_kmalloc(page->slab_cache, object, size, flags);
+ }
+ 
+ void kasan_poison_kfree(void *ptr, unsigned long ip)
+diff --git a/mm/slab.c b/mm/slab.c
+index 324446621b3e..ec6a9e8696ab 100644
+--- a/mm/slab.c
++++ b/mm/slab.c
+@@ -3538,7 +3538,7 @@ void *kmem_cache_alloc(struct kmem_cache *cachep, gfp_t flags)
+ {
+ 	void *ret = slab_alloc(cachep, flags, _RET_IP_);
+ 
+-	kasan_slab_alloc(cachep, ret, flags);
++	ret = kasan_slab_alloc(cachep, ret, flags);
+ 	trace_kmem_cache_alloc(_RET_IP_, ret,
+ 			       cachep->object_size, cachep->size, flags);
+ 
+@@ -3604,7 +3604,7 @@ kmem_cache_alloc_trace(struct kmem_cache *cachep, gfp_t flags, size_t size)
+ 
+ 	ret = slab_alloc(cachep, flags, _RET_IP_);
+ 
+-	kasan_kmalloc(cachep, ret, size, flags);
++	ret = kasan_kmalloc(cachep, ret, size, flags);
+ 	trace_kmalloc(_RET_IP_, ret,
+ 		      size, cachep->size, flags);
+ 	return ret;
+@@ -3628,7 +3628,7 @@ void *kmem_cache_alloc_node(struct kmem_cache *cachep, gfp_t flags, int nodeid)
+ {
+ 	void *ret = slab_alloc_node(cachep, flags, nodeid, _RET_IP_);
+ 
+-	kasan_slab_alloc(cachep, ret, flags);
++	ret = kasan_slab_alloc(cachep, ret, flags);
+ 	trace_kmem_cache_alloc_node(_RET_IP_, ret,
+ 				    cachep->object_size, cachep->size,
+ 				    flags, nodeid);
+@@ -3647,7 +3647,7 @@ void *kmem_cache_alloc_node_trace(struct kmem_cache *cachep,
+ 
+ 	ret = slab_alloc_node(cachep, flags, nodeid, _RET_IP_);
+ 
+-	kasan_kmalloc(cachep, ret, size, flags);
++	ret = kasan_kmalloc(cachep, ret, size, flags);
+ 	trace_kmalloc_node(_RET_IP_, ret,
+ 			   size, cachep->size,
+ 			   flags, nodeid);
+@@ -3666,7 +3666,7 @@ __do_kmalloc_node(size_t size, gfp_t flags, int node, unsigned long caller)
+ 	if (unlikely(ZERO_OR_NULL_PTR(cachep)))
+ 		return cachep;
+ 	ret = kmem_cache_alloc_node_trace(cachep, flags, node, size);
+-	kasan_kmalloc(cachep, ret, size, flags);
++	ret = kasan_kmalloc(cachep, ret, size, flags);
+ 
+ 	return ret;
+ }
+@@ -3702,7 +3702,7 @@ static __always_inline void *__do_kmalloc(size_t size, gfp_t flags,
+ 		return cachep;
+ 	ret = slab_alloc(cachep, flags, caller);
+ 
+-	kasan_kmalloc(cachep, ret, size, flags);
++	ret = kasan_kmalloc(cachep, ret, size, flags);
+ 	trace_kmalloc(caller, ret,
+ 		      size, cachep->size, flags);
+ 
+diff --git a/mm/slab.h b/mm/slab.h
+index 51813236e773..8a588d9d89a0 100644
+--- a/mm/slab.h
++++ b/mm/slab.h
+@@ -440,7 +440,7 @@ static inline void slab_post_alloc_hook(struct kmem_cache *s, gfp_t flags,
+ 
+ 		kmemleak_alloc_recursive(object, s->object_size, 1,
+ 					 s->flags, flags);
+-		kasan_slab_alloc(s, object, flags);
++		p[i] = kasan_slab_alloc(s, object, flags);
  	}
  
- 	seq_printf(s, "\n");
--	seq_printf(s, "%s%2d TYP   ID TGT_ID PLAEHC     HWID   TARGET SRC PRI VCPU_ID\n", hdr, id);
-+	if (vcpu)
-+		seq_printf(s, "%s%2d TYP   ID TGT_ID PLAEHC     HWID   TARGET SRC PRI VCPU_ID\n", hdr, id);
-+	else
-+		seq_printf(s, "%s TYP   ID TGT_ID PLAEHC     HWID   TARGET SRC PRI VCPU_ID\n", hdr);
- 	seq_printf(s, "---------------------------------------------------------------\n");
+ 	if (memcg_kmem_enabled())
+diff --git a/mm/slab_common.c b/mm/slab_common.c
+index 10f127b2de7c..a33e61315ca6 100644
+--- a/mm/slab_common.c
++++ b/mm/slab_common.c
+@@ -1164,7 +1164,7 @@ void *kmalloc_order(size_t size, gfp_t flags, unsigned int order)
+ 	page = alloc_pages(flags, order);
+ 	ret = page ? page_address(page) : NULL;
+ 	kmemleak_alloc(ret, size, 1, flags);
+-	kasan_kmalloc_large(ret, size, flags);
++	ret = kasan_kmalloc_large(ret, size, flags);
+ 	return ret;
  }
+ EXPORT_SYMBOL(kmalloc_order);
+@@ -1442,7 +1442,7 @@ static __always_inline void *__do_krealloc(const void *p, size_t new_size,
+ 		ks = ksize(p);
  
-@@ -174,8 +218,10 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
- 		type = "SGI";
- 	else if (irq->intid < VGIC_NR_PRIVATE_IRQS)
- 		type = "PPI";
--	else
-+	else if (irq->intid < VGIC_MAX_SPI)
- 		type = "SPI";
-+	else if (irq->intid >= VGIC_MIN_LPI)
-+		type = "LPI";
+ 	if (ks >= new_size) {
+-		kasan_krealloc((void *)p, new_size, flags);
++		p = kasan_krealloc((void *)p, new_size, flags);
+ 		return (void *)p;
+ 	}
  
- 	if (irq->intid ==0 || irq->intid == VGIC_NR_PRIVATE_IRQS)
- 		print_header(s, irq, vcpu);
-@@ -220,7 +266,9 @@ static int vgic_debug_show(struct seq_file *s, void *v)
- 	if (!kvm->arch.vgic.initialized)
- 		return 0;
- 
--	if (iter->vcpu_id < iter->nr_cpus) {
-+	if (iter->intid >= VGIC_MIN_LPI)
-+		irq = iter->lpi_irqs[iter->lpi_print_count - 1];
-+	else if (iter->vcpu_id < iter->nr_cpus) {
- 		vcpu = kvm_get_vcpu(kvm, iter->vcpu_id);
- 		irq = &vcpu->arch.vgic_cpu.private_irqs[iter->intid];
- 	} else {
-@@ -230,6 +278,7 @@ static int vgic_debug_show(struct seq_file *s, void *v)
- 	spin_lock(&irq->irq_lock);
- 	print_irq_state(s, irq, vcpu);
- 	spin_unlock(&irq->irq_lock);
-+	vgic_put_irq(kvm, irq);
- 
- 	return 0;
- }
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 4650953..3e8a47d 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -307,13 +307,13 @@ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
- }
- 
- /*
-- * Create a snapshot of the current LPIs targeting @vcpu, so that we can
-- * enumerate those LPIs without holding any lock.
-+ * Create a snapshot of the current LPIs targeting @vcpu if @vcpu!=NULL or all
-+ * LPIs, so that we can enumerate those LPIs without holding any lock.
-  * Returns their number and puts the kmalloc'ed array into intid_ptr.
+diff --git a/mm/slub.c b/mm/slub.c
+index f111c2a908b9..4a856512f225 100644
+--- a/mm/slub.c
++++ b/mm/slub.c
+@@ -1350,10 +1350,10 @@ static inline void dec_slabs_node(struct kmem_cache *s, int node,
+  * Hooks for other subsystems that check memory allocations. In a typical
+  * production configuration these hooks all should produce no code at all.
   */
--static int vgic_copy_lpi_list(struct kvm_vcpu *vcpu, u32 **intid_ptr)
-+int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr)
+-static inline void kmalloc_large_node_hook(void *ptr, size_t size, gfp_t flags)
++static inline void kmalloc_large_node_hook(void **ptr, size_t size, gfp_t flags)
  {
--	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-+	struct vgic_dist *dist = &kvm->arch.vgic;
- 	struct vgic_irq *irq;
- 	u32 *intids;
- 	int irq_count = dist->lpi_list_count, i = 0;
-@@ -332,7 +332,7 @@ static int vgic_copy_lpi_list(struct kvm_vcpu *vcpu, u32 **intid_ptr)
- 	spin_lock(&dist->lpi_list_lock);
- 	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
- 		/* We don't need to "get" the IRQ, as we hold the list lock. */
--		if (irq->target_vcpu != vcpu)
-+		if (vcpu && irq->target_vcpu != vcpu)
- 			continue;
- 		intids[i++] = irq->intid;
- 	}
-@@ -423,7 +423,7 @@ static int its_sync_lpi_pending_table(struct kvm_vcpu *vcpu)
- 	unsigned long flags;
- 	u8 pendmask;
+-	kmemleak_alloc(ptr, size, 1, flags);
+-	kasan_kmalloc_large(ptr, size, flags);
++	kmemleak_alloc(*ptr, size, 1, flags);
++	*ptr = kasan_kmalloc_large(*ptr, size, flags);
+ }
  
--	nr_irqs = vgic_copy_lpi_list(vcpu, &intids);
-+	nr_irqs = vgic_copy_lpi_list(vcpu->kvm, vcpu, &intids);
- 	if (nr_irqs < 0)
- 		return nr_irqs;
+ static __always_inline void kfree_hook(void *x)
+@@ -2758,7 +2758,7 @@ void *kmem_cache_alloc_trace(struct kmem_cache *s, gfp_t gfpflags, size_t size)
+ {
+ 	void *ret = slab_alloc(s, gfpflags, _RET_IP_);
+ 	trace_kmalloc(_RET_IP_, ret, size, s->size, gfpflags);
+-	kasan_kmalloc(s, ret, size, gfpflags);
++	ret = kasan_kmalloc(s, ret, size, gfpflags);
+ 	return ret;
+ }
+ EXPORT_SYMBOL(kmem_cache_alloc_trace);
+@@ -2786,7 +2786,7 @@ void *kmem_cache_alloc_node_trace(struct kmem_cache *s,
+ 	trace_kmalloc_node(_RET_IP_, ret,
+ 			   size, s->size, gfpflags, node);
  
-@@ -1147,7 +1147,7 @@ static int vgic_its_cmd_handle_invall(struct kvm *kvm, struct vgic_its *its,
+-	kasan_kmalloc(s, ret, size, gfpflags);
++	ret = kasan_kmalloc(s, ret, size, gfpflags);
+ 	return ret;
+ }
+ EXPORT_SYMBOL(kmem_cache_alloc_node_trace);
+@@ -3767,7 +3767,7 @@ void *__kmalloc(size_t size, gfp_t flags)
  
- 	vcpu = kvm_get_vcpu(kvm, collection->target_addr);
+ 	trace_kmalloc(_RET_IP_, ret, size, s->size, flags);
  
--	irq_count = vgic_copy_lpi_list(vcpu, &intids);
-+	irq_count = vgic_copy_lpi_list(kvm, vcpu, &intids);
- 	if (irq_count < 0)
- 		return irq_count;
+-	kasan_kmalloc(s, ret, size, flags);
++	ret = kasan_kmalloc(s, ret, size, flags);
  
-@@ -1195,7 +1195,7 @@ static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
- 	vcpu1 = kvm_get_vcpu(kvm, target1_addr);
- 	vcpu2 = kvm_get_vcpu(kvm, target2_addr);
+ 	return ret;
+ }
+@@ -3784,7 +3784,7 @@ static void *kmalloc_large_node(size_t size, gfp_t flags, int node)
+ 	if (page)
+ 		ptr = page_address(page);
  
--	irq_count = vgic_copy_lpi_list(vcpu1, &intids);
-+	irq_count = vgic_copy_lpi_list(kvm, vcpu1, &intids);
- 	if (irq_count < 0)
- 		return irq_count;
+-	kmalloc_large_node_hook(ptr, size, flags);
++	kmalloc_large_node_hook(&ptr, size, flags);
+ 	return ptr;
+ }
  
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index f5b8519..68b5ed2 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -257,5 +257,6 @@ int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
- void vgic_v4_teardown(struct kvm *kvm);
- int vgic_v4_sync_hwstate(struct kvm_vcpu *vcpu);
- int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu);
-+int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr);
+@@ -3812,7 +3812,7 @@ void *__kmalloc_node(size_t size, gfp_t flags, int node)
  
- #endif
+ 	trace_kmalloc_node(_RET_IP_, ret, size, s->size, flags, node);
+ 
+-	kasan_kmalloc(s, ret, size, flags);
++	ret = kasan_kmalloc(s, ret, size, flags);
+ 
+ 	return ret;
+ }
 -- 
-1.8.3.1
+2.17.0.rc0.231.g781580f067-goog
