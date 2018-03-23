@@ -1,90 +1,85 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH] KVM: arm/arm64: vgic-its: Fix potential overrun in
- vgic_copy_lpi_list
-Date: Fri, 23 Mar 2018 15:21:12 +0000
-Message-ID: <20180323152112.19054-1-marc.zyngier@arm.com>
+Subject: Re: [PATCH v2] KVM: arm/arm64 : add lpi info in vgic-debug
+Date: Fri, 23 Mar 2018 15:27:09 +0000
+Message-ID: <a1148944-ef9c-7ef5-640b-2f20ce0efffd@arm.com>
+References: <1521846074-66914-1-git-send-email-peng.hao2@zte.com.cn>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: Eric Auger <eric.auger@redhat.com>, Christoffer Dall <cdall@kernel.org>, Andre Przywara <Andre.Przywara@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1521846074-66914-1-git-send-email-peng.hao2@zte.com.cn>
+Content-Language: en-GB
+Sender: linux-kernel-owner@vger.kernel.org
+To: Peng Hao <peng.hao2@zte.com.cn>, Christoffer Dall <cdall@kernel.org>
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-vgic_copy_lpi_list() parses the LPI list and picks LPIs targetting
-a given vcpu. We allocate the array containing the intids before taking
-the lpi_list_lock, which means we can have an array size that is not
-equal to the number of LPIs.
+On 23/03/18 23:01, Peng Hao wrote:
+> Add lpi debug info to vgic-stat.
+> the printed info like this:
+>     SPI  287      0 000001        0        0   0 160      -1
+>     LPI 8192      2 000100        0        0   0 160      -1
+> 
+> Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+> ---
+>  virt/kvm/arm/vgic/vgic-debug.c | 56 ++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 51 insertions(+), 5 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-debug.c b/virt/kvm/arm/vgic/vgic-debug.c
+> index 10b3817..cb85550 100644
+> --- a/virt/kvm/arm/vgic/vgic-debug.c
+> +++ b/virt/kvm/arm/vgic/vgic-debug.c
+> @@ -36,9 +36,12 @@
+>  struct vgic_state_iter {
+>  	int nr_cpus;
+>  	int nr_spis;
+> +	int nr_lpis;
+>  	int dist_id;
+>  	int vcpu_id;
+>  	int intid;
+> +	int lpi_print_count;
+> +	struct vgic_irq **lpi_irqs;
+>  };
+>  
+>  static void iter_next(struct vgic_state_iter *iter)
+> @@ -52,6 +55,35 @@ static void iter_next(struct vgic_state_iter *iter)
+>  	if (iter->intid == VGIC_NR_PRIVATE_IRQS &&
+>  	    ++iter->vcpu_id < iter->nr_cpus)
+>  		iter->intid = 0;
+> +
+> +	if (iter->intid >= VGIC_NR_PRIVATE_IRQS + iter->nr_spis) {
+> +		if (iter->lpi_print_count < iter->nr_lpis)
+> +			iter->intid = iter->lpi_irqs[iter->lpi_print_count]->intid;
+> +		iter->lpi_print_count++;
+> +	}
+> +}
+> +
+> +static void vgic_debug_get_lpis(struct kvm *kvm, struct vgic_state_iter *iter)
+> +{
+> +	struct vgic_dist *dist = &kvm->arch.vgic;
+> +	int i = 0;
+> +	struct vgic_irq *irq = NULL, **lpi_irqs;
+> +
+> +	iter->nr_lpis = dist->lpi_list_count;
+> +	lpi_irqs = kmalloc_array(iter->nr_lpis, sizeof(irq), GFP_KERNEL);
+> +	if (!lpi_irqs) {
+> +		iter->nr_lpis = 0;
+> +		return;
+> +	}
+> +	spin_lock(&dist->lpi_list_lock);
+> +	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
+> +		vgic_get_irq_kref(irq);
+> +		if (i < iter->nr_lpis)
+> +			lpi_irqs[i++] = irq;
+> +	}
+> +	iter->nr_lpis = i;
+> +	spin_unlock(&dist->lpi_list_lock);
+> +	iter->lpi_irqs = lpi_irqs;
 
-This is particularily obvious when looking at the path coming from
-vgic_enable_lpis, which is not a command, and thus can run in parallel
-with commands:
+I've already explained why I didn't like this construct.
 
-vcpu 0:                                        vcpu 1:
-vgic_enable_lpis
-  its_sync_lpi_pending_table
-    vgic_copy_lpi_list
-      intids = kmalloc_array(irq_count)
-                                               MAPI(lpi targeting vcpu 0)
-      list_for_each_entry(lpi_list_head)
-        intids[i++] = irq->intid;
+I still don't like it.
 
-At that stage, we will happily overrun the intids array. Boo. An easy
-fix is is to break once the array is full. The MAPI command will update
-the config anyway, and we won't miss a thing. We also make sure that
-lpi_list_count is read exactly once, so that further updates of that
-value will not affect the array bound check.
-
-Cc: stable@vger.kernel.org
-Fixes: ccb1d791ab9e ("KVM: arm64: vgic-its: Fix pending table sync")
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- virt/kvm/arm/vgic/vgic-its.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
-
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 465095355666..44ee2f336440 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -316,21 +316,24 @@ static int vgic_copy_lpi_list(struct kvm_vcpu *vcpu, u32 **intid_ptr)
- 	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
- 	struct vgic_irq *irq;
- 	u32 *intids;
--	int irq_count = dist->lpi_list_count, i = 0;
-+	int irq_count, i = 0;
- 
- 	/*
--	 * We use the current value of the list length, which may change
--	 * after the kmalloc. We don't care, because the guest shouldn't
--	 * change anything while the command handling is still running,
--	 * and in the worst case we would miss a new IRQ, which one wouldn't
--	 * expect to be covered by this command anyway.
-+	 * There is an obvious race between allocating the array and LPIs
-+	 * being mapped/unmapped. If we ended up here as a result of a
-+	 * command, we're safe (locks are held, preventing another
-+	 * command). If coming from another path (such as enabling LPIs),
-+	 * we must be carefull not to overrun the array.
- 	 */
-+	irq_count = READ_ONCE(dist->lpi_list_count);
- 	intids = kmalloc_array(irq_count, sizeof(intids[0]), GFP_KERNEL);
- 	if (!intids)
- 		return -ENOMEM;
- 
- 	spin_lock(&dist->lpi_list_lock);
- 	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
-+		if (i == irq_count)
-+			break;
- 		/* We don't need to "get" the IRQ, as we hold the list lock. */
- 		if (irq->target_vcpu != vcpu)
- 			continue;
+	M.
 -- 
-2.14.2
+Jazz is not dead. It just smells funny...
