@@ -1,25 +1,25 @@
 From: Andrey Konovalov <andreyknvl@google.com>
-Subject: [RFC PATCH v2 08/15] khwasan: add tag related helper functions
-Date: Fri, 23 Mar 2018 19:05:44 +0100
-Message-ID: <b79947167d09478d3f61d2ec8de37322c0e1fe92.1521828274.git.andreyknvl@google.com>
+Subject: [RFC PATCH v2 09/15] khwasan, kvm: untag pointers in kern_hyp_va
+Date: Fri, 23 Mar 2018 19:05:45 +0100
+Message-ID: <0e4b9cc6f99e2aabc8df77773c3d7e9649a6f2b7.1521828274.git.andreyknvl@google.com>
 References: <cover.1521828273.git.andreyknvl@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F0B64A012
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AACDC49FFE
  for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Mar 2018 14:13:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id J40BO0+cB+1C for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id 0Ydx5yyvMnsD for <kvmarm@lists.cs.columbia.edu>;
  Fri, 23 Mar 2018 14:13:33 -0400 (EDT)
 Received: from mail-wr0-f194.google.com (mail-wr0-f194.google.com
  [209.85.128.194])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 043C349FFE
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Mar 2018 13:58:18 -0400 (EDT)
-Received: by mail-wr0-f194.google.com with SMTP id o8so12997740wra.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Mar 2018 11:06:15 -0700 (PDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 398B44A00F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Mar 2018 13:58:20 -0400 (EDT)
+Received: by mail-wr0-f194.google.com with SMTP id l8so13002124wrg.5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Mar 2018 11:06:18 -0700 (PDT)
 In-Reply-To: <cover.1521828273.git.andreyknvl@google.com>
 In-Reply-To: <cover.1521828273.git.andreyknvl@google.com>
 References: <cover.1521828273.git.andreyknvl@google.com>
@@ -36,89 +36,89 @@ To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@googl
 Cc: Kees Cook <keescook@google.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Lee Smith <Lee.Smith@arm.com>, Kostya Serebryany <kcc@google.com>, Mark Brand <markbrand@google.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Evgeniy Stepanov <eugenis@google.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VGhpcyBjb21taXQgYWRkcyBhIGZldyBoZWxwZXIgZnVuY3Rpb25zLCB0aGF0IGFyZSBtZWFudCB0
-byBiZSB1c2VkIHRvCndvcmsgd2l0aCB0YWdzIGVtYmVkZGVkIGluIHRoZSB0b3AgYnl0ZSBvZiBr
-ZXJuZWwgcG9pbnRlcnM6IHRvIHNldCwgdG8KZ2V0IG9yIHRvIHJlc2V0IChzZXQgdG8gMHhmZikg
-dGhlIHRvcCBieXRlLgoKU2lnbmVkLW9mZi1ieTogQW5kcmV5IEtvbm92YWxvdiA8YW5kcmV5a252
-bEBnb29nbGUuY29tPgotLS0KIGFyY2gvYXJtNjQvbW0va2FzYW5faW5pdC5jIHwgIDIgKysKIGlu
-Y2x1ZGUvbGludXgva2FzYW4uaCAgICAgIHwgMjMgKysrKysrKysrKysrKysrKysKIG1tL2thc2Fu
-L2thc2FuLmggICAgICAgICAgIHwgMjkgKysrKysrKysrKysrKysrKysrKysrKwogbW0va2FzYW4v
-a2h3YXNhbi5jICAgICAgICAgfCA1MSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKwogNCBmaWxlcyBjaGFuZ2VkLCAxMDUgaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdpdCBhL2Fy
-Y2gvYXJtNjQvbW0va2FzYW5faW5pdC5jIGIvYXJjaC9hcm02NC9tbS9rYXNhbl9pbml0LmMKaW5k
-ZXggZDRiY2ViYTYwMDEwLi43ZmQ5YWVlODgwNjkgMTAwNjQ0Ci0tLSBhL2FyY2gvYXJtNjQvbW0v
-a2FzYW5faW5pdC5jCisrKyBiL2FyY2gvYXJtNjQvbW0va2FzYW5faW5pdC5jCkBAIC0yNDcsNiAr
-MjQ3LDggQEAgdm9pZCBfX2luaXQga2FzYW5faW5pdCh2b2lkKQogCW1lbXNldChrYXNhbl96ZXJv
-X3BhZ2UsIEtBU0FOX1NIQURPV19JTklULCBQQUdFX1NJWkUpOwogCWNwdV9yZXBsYWNlX3R0YnIx
-KGxtX2FsaWFzKHN3YXBwZXJfcGdfZGlyKSk7CiAKKwlraHdhc2FuX2luaXQoKTsKKwogCS8qIEF0
-IHRoaXMgcG9pbnQga2FzYW4gaXMgZnVsbHkgaW5pdGlhbGl6ZWQuIEVuYWJsZSBlcnJvciBtZXNz
-YWdlcyAqLwogCWluaXRfdGFzay5rYXNhbl9kZXB0aCA9IDA7CiAJcHJfaW5mbygiS2VybmVsQWRk
-cmVzc1Nhbml0aXplciBpbml0aWFsaXplZFxuIik7CmRpZmYgLS1naXQgYS9pbmNsdWRlL2xpbnV4
-L2thc2FuLmggYi9pbmNsdWRlL2xpbnV4L2thc2FuLmgKaW5kZXggNzAwNzM0ZGZmMjE4Li5hMjg2
-OTQ2NGE4YmUgMTAwNjQ0Ci0tLSBhL2luY2x1ZGUvbGludXgva2FzYW4uaAorKysgYi9pbmNsdWRl
-L2xpbnV4L2thc2FuLmgKQEAgLTE1NSw2ICsxNTUsMjkgQEAgc3RhdGljIGlubGluZSB2b2lkIGth
-c2FuX2NhY2hlX3NodXRkb3duKHN0cnVjdCBrbWVtX2NhY2hlICpjYWNoZSkge30KIAogI2RlZmlu
-ZSBLQVNBTl9TSEFET1dfSU5JVCAweEZGCiAKK3ZvaWQga2h3YXNhbl9pbml0KHZvaWQpOworCit2
-b2lkICpraHdhc2FuX3NldF90YWcoY29uc3Qgdm9pZCAqYWRkciwgdTggdGFnKTsKK3U4IGtod2Fz
-YW5fZ2V0X3RhZyhjb25zdCB2b2lkICphZGRyKTsKK3ZvaWQgKmtod2FzYW5fcmVzZXRfdGFnKGNv
-bnN0IHZvaWQgKnB0cik7CisKKyNlbHNlIC8qIENPTkZJR19LQVNBTl9UQUdTICovCisKK3N0YXRp
-YyBpbmxpbmUgdm9pZCBraHdhc2FuX2luaXQodm9pZCkgeyB9CisKK3N0YXRpYyBpbmxpbmUgdm9p
-ZCAqa2h3YXNhbl9zZXRfdGFnKGNvbnN0IHZvaWQgKmFkZHIsIHU4IHRhZykKK3sKKwlyZXR1cm4g
-KHZvaWQgKilhZGRyOworfQorc3RhdGljIGlubGluZSB1OCBraHdhc2FuX2dldF90YWcoY29uc3Qg
-dm9pZCAqYWRkcikKK3sKKwlyZXR1cm4gMHhGRjsKK30KK3N0YXRpYyBpbmxpbmUgdm9pZCAqa2h3
-YXNhbl9yZXNldF90YWcoY29uc3Qgdm9pZCAqcHRyKQoreworCXJldHVybiAodm9pZCAqKXB0cjsK
-K30KKwogI2VuZGlmIC8qIENPTkZJR19LQVNBTl9UQUdTICovCiAKICNlbmRpZiAvKiBMSU5VWF9L
-QVNBTl9IICovCmRpZmYgLS1naXQgYS9tbS9rYXNhbi9rYXNhbi5oIGIvbW0va2FzYW4va2FzYW4u
-aAppbmRleCAyYmUzMTc1NDI3OGUuLmM3MTViNDRjNDc4MCAxMDA2NDQKLS0tIGEvbW0va2FzYW4v
-a2FzYW4uaAorKysgYi9tbS9rYXNhbi9rYXNhbi5oCkBAIC0xMTMsNiArMTEzLDM1IEBAIHZvaWQg
-a2FzYW5fcmVwb3J0KHVuc2lnbmVkIGxvbmcgYWRkciwgc2l6ZV90IHNpemUsCiAJCWJvb2wgaXNf
-d3JpdGUsIHVuc2lnbmVkIGxvbmcgaXApOwogdm9pZCBrYXNhbl9yZXBvcnRfaW52YWxpZF9mcmVl
-KHZvaWQgKm9iamVjdCwgdW5zaWduZWQgbG9uZyBpcCk7CiAKKyNkZWZpbmUgS0hXQVNBTl9UQUdf
-S0VSTkVMCTB4RkYgLyogbmF0aXZlIGtlcm5lbCBwb2ludGVycyB0YWcgKi8KKyNkZWZpbmUgS0hX
-QVNBTl9UQUdfSU5WQUxJRAkweEZFIC8qIHJlZHpvbmUgb3IgZnJlZSBtZW1vcnkgdGFnICovCisj
-ZGVmaW5lIEtIV0FTQU5fVEFHX01BWAkJMHhGRCAvKiBtYXhpbXVtIHZhbHVlIGZvciByYW5kb20g
-dGFncyAqLworCisjZGVmaW5lIEtIV0FTQU5fVEFHX1NISUZUIDU2CisjZGVmaW5lIEtIV0FTQU5f
-VEFHX01BU0sgKDB4RkZVTCA8PCBLSFdBU0FOX1RBR19TSElGVCkKKworc3RhdGljIGlubGluZSB2
-b2lkICpzZXRfdGFnKGNvbnN0IHZvaWQgKmFkZHIsIHU4IHRhZykKK3sKKwl1NjQgYSA9ICh1NjQp
-YWRkcjsKKworCWEgJj0gfktIV0FTQU5fVEFHX01BU0s7CisJYSB8PSAoKHU2NCl0YWcgPDwgS0hX
-QVNBTl9UQUdfU0hJRlQpOworCisJcmV0dXJuICh2b2lkICopYTsKK30KKworc3RhdGljIGlubGlu
-ZSB1OCBnZXRfdGFnKGNvbnN0IHZvaWQgKmFkZHIpCit7CisJcmV0dXJuICh1OCkoKHU2NClhZGRy
-ID4+IEtIV0FTQU5fVEFHX1NISUZUKTsKK30KKworc3RhdGljIGlubGluZSB2b2lkICpyZXNldF90
-YWcoY29uc3Qgdm9pZCAqYWRkcikKK3sKKwlyZXR1cm4gc2V0X3RhZyhhZGRyLCBLSFdBU0FOX1RB
-R19LRVJORUwpOworfQorCit2b2lkIGtod2FzYW5fcmVwb3J0X2ludmFsaWRfZnJlZSh2b2lkICpv
-YmplY3QsIHVuc2lnbmVkIGxvbmcgaXApOworCiAjaWYgZGVmaW5lZChDT05GSUdfU0xBQikgfHwg
-ZGVmaW5lZChDT05GSUdfU0xVQikKIHZvaWQgcXVhcmFudGluZV9wdXQoc3RydWN0IGthc2FuX2Zy
-ZWVfbWV0YSAqaW5mbywgc3RydWN0IGttZW1fY2FjaGUgKmNhY2hlKTsKIHZvaWQgcXVhcmFudGlu
-ZV9yZWR1Y2Uodm9pZCk7CmRpZmYgLS1naXQgYS9tbS9rYXNhbi9raHdhc2FuLmMgYi9tbS9rYXNh
-bi9raHdhc2FuLmMKaW5kZXggMjRkNzUyNDVlOWQwLi5kYTRiMTc5OTdjNzEgMTAwNjQ0Ci0tLSBh
-L21tL2thc2FuL2tod2FzYW4uYworKysgYi9tbS9rYXNhbi9raHdhc2FuLmMKQEAgLTM5LDYgKzM5
-LDU3IEBACiAjaW5jbHVkZSAia2FzYW4uaCIKICNpbmNsdWRlICIuLi9zbGFiLmgiCiAKK2ludCBr
-aHdhc2FuX2VuYWJsZWQ7CisKK3N0YXRpYyBERUZJTkVfUEVSX0NQVSh1MzIsIHBybmdfc3RhdGUp
-OworCit2b2lkIGtod2FzYW5faW5pdCh2b2lkKQoreworCWludCBjcHU7CisKKwlmb3JfZWFjaF9w
-b3NzaWJsZV9jcHUoY3B1KSB7CisJCXBlcl9jcHUocHJuZ19zdGF0ZSwgY3B1KSA9IGdldF9yYW5k
-b21fdTMyKCk7CisJfQorCVdSSVRFX09OQ0Uoa2h3YXNhbl9lbmFibGVkLCAxKTsKK30KKworLyoK
-KyAqIElmIGEgcHJlZW1wdGlvbiBoYXBwZW5zIGJldHdlZW4gdGhpc19jcHVfcmVhZCBhbmQgdGhp
-c19jcHVfd3JpdGUsIHRoZSBvbmx5CisgKiBzaWRlIGVmZmVjdCBpcyB0aGF0IHdlJ2xsIGdpdmUg
-YSBmZXcgYWxsb2NhdGVkIGluIGRpZmZlcmVudCBjb250ZXh0cyBvYmplY3RzCisgKiB0aGUgc2Ft
-ZSB0YWcuIFNpbmNlIEtIV0FTQU4gaXMgbWVhbnQgdG8gYmUgdXNlZCBhIHByb2JhYmlsaXN0aWMg
-YnVnLWRldGVjdGlvbgorICogZGVidWcgZmVhdHVyZSwgdGhpcyBkb2VzbuKAmXQgaGF2ZSBzaWdu
-aWZpY2FudCBuZWdhdGl2ZSBpbXBhY3QuCisgKgorICogSWRlYWxseSB0aGUgdGFncyB1c2Ugc3Ry
-b25nIHJhbmRvbW5lc3MgdG8gcHJldmVudCBhbnkgYXR0ZW1wdHMgdG8gcHJlZGljdAorICogdGhl
-bSBkdXJpbmcgZXhwbGljaXQgZXhwbG9pdCBhdHRlbXB0cy4gQnV0IHN0cm9uZyByYW5kb21uZXNz
-IGlzIGV4cGVuc2l2ZSwKKyAqIGFuZCB3ZSBkaWQgYW4gaW50ZW50aW9uYWwgdHJhZGUtb2ZmIHRv
-IHVzZSBhIFBSTkcuIFRoaXMgbm9uLWF0b21pYyBSTVcKKyAqIHNlcXVlbmNlIGhhcyBpbiBmYWN0
-IHBvc2l0aXZlIGVmZmVjdCwgc2luY2UgaW50ZXJydXB0cyB0aGF0IHJhbmRvbWx5IHNrZXcKKyAq
-IFBSTkcgYXQgdW5wcmVkaWN0YWJsZSBwb2ludHMgZG8gb25seSBnb29kLgorICovCitzdGF0aWMg
-aW5saW5lIHU4IGtod2FzYW5fcmFuZG9tX3RhZyh2b2lkKQoreworCXUzMiBzdGF0ZSA9IHRoaXNf
-Y3B1X3JlYWQocHJuZ19zdGF0ZSk7CisKKwlzdGF0ZSA9IDE2NjQ1MjUgKiBzdGF0ZSArIDEwMTM5
-MDQyMjM7CisJdGhpc19jcHVfd3JpdGUocHJuZ19zdGF0ZSwgc3RhdGUpOworCisJcmV0dXJuICh1
-OClzdGF0ZSAlIChLSFdBU0FOX1RBR19NQVggKyAxKTsKK30KKwordm9pZCAqa2h3YXNhbl9zZXRf
-dGFnKGNvbnN0IHZvaWQgKmFkZHIsIHU4IHRhZykKK3sKKwlyZXR1cm4gc2V0X3RhZyhhZGRyLCB0
-YWcpOworfQorCit1OCBraHdhc2FuX2dldF90YWcoY29uc3Qgdm9pZCAqYWRkcikKK3sKKwlyZXR1
-cm4gZ2V0X3RhZyhhZGRyKTsKK30KKwordm9pZCAqa2h3YXNhbl9yZXNldF90YWcoY29uc3Qgdm9p
-ZCAqYWRkcikKK3sKKwlyZXR1cm4gcmVzZXRfdGFnKGFkZHIpOworfQorCiB2b2lkIGthc2FuX3Vu
-cG9pc29uX3NoYWRvdyhjb25zdCB2b2lkICphZGRyZXNzLCBzaXplX3Qgc2l6ZSkKIHsKIH0KLS0g
-CjIuMTcuMC5yYzAuMjMxLmc3ODE1ODBmMDY3LWdvb2cKCl9fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3Rz
-LmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xp
-c3RpbmZvL2t2bWFybQo=
+kern_hyp_va that converts kernel VA into a HYP VA relies on the top byte
+of kernel pointers being 0xff. Untag pointers passed to it with KHWASAN
+enabled.
+
+Also fix create_hyp_mappings() and create_hyp_io_mappings(), to use the
+untagged kernel pointers for address computations.
+
+Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+---
+ arch/arm64/include/asm/kvm_mmu.h |  8 ++++++++
+ virt/kvm/arm/mmu.c               | 20 +++++++++++++++-----
+ 2 files changed, 23 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 7faed6e48b46..5149ff83b4c4 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -97,6 +97,9 @@
+  * Should be completely invisible on any viable CPU.
+  */
+ .macro kern_hyp_va	reg
++#ifdef CONFIG_KASAN_TAGS
++	orr	\reg, \reg, #KASAN_PTR_TAG_MASK
++#endif
+ alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
+ 	and     \reg, \reg, #HYP_PAGE_OFFSET_HIGH_MASK
+ alternative_else_nop_endif
+@@ -115,6 +118,11 @@ alternative_else_nop_endif
+ 
+ static inline unsigned long __kern_hyp_va(unsigned long v)
+ {
++#ifdef CONFIG_KASAN_TAGS
++	asm volatile("orr %0, %0, %1"
++		     : "+r" (v)
++		     : "i" (KASAN_PTR_TAG_MASK));
++#endif
+ 	asm volatile(ALTERNATIVE("and %0, %0, %1",
+ 				 "nop",
+ 				 ARM64_HAS_VIRT_HOST_EXTN)
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index b960acdd0c05..3dba9b60e0a0 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -21,6 +21,7 @@
+ #include <linux/io.h>
+ #include <linux/hugetlb.h>
+ #include <linux/sched/signal.h>
++#include <linux/kasan.h>
+ #include <trace/events/kvm.h>
+ #include <asm/pgalloc.h>
+ #include <asm/cacheflush.h>
+@@ -683,9 +684,13 @@ static phys_addr_t kvm_kaddr_to_phys(void *kaddr)
+ int create_hyp_mappings(void *from, void *to, pgprot_t prot)
+ {
+ 	phys_addr_t phys_addr;
+-	unsigned long virt_addr;
+-	unsigned long start = kern_hyp_va((unsigned long)from);
+-	unsigned long end = kern_hyp_va((unsigned long)to);
++	unsigned long virt_addr, start, end;
++
++	from = khwasan_reset_tag(from);
++	to = khwasan_reset_tag(to);
++
++	start = kern_hyp_va((unsigned long)from);
++	end = kern_hyp_va((unsigned long)to);
+ 
+ 	if (is_kernel_in_hyp_mode())
+ 		return 0;
+@@ -719,8 +724,13 @@ int create_hyp_mappings(void *from, void *to, pgprot_t prot)
+  */
+ int create_hyp_io_mappings(void *from, void *to, phys_addr_t phys_addr)
+ {
+-	unsigned long start = kern_hyp_va((unsigned long)from);
+-	unsigned long end = kern_hyp_va((unsigned long)to);
++	unsigned long start, end;
++
++	from = khwasan_reset_tag(from);
++	to = khwasan_reset_tag(to);
++
++	start = kern_hyp_va((unsigned long)from);
++	end = kern_hyp_va((unsigned long)to);
+ 
+ 	if (is_kernel_in_hyp_mode())
+ 		return 0;
+-- 
+2.17.0.rc0.231.g781580f067-goog
