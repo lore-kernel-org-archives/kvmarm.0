@@ -1,102 +1,161 @@
-From: James Morse <james.morse@arm.com>
-Subject: [PATCH v2 10/11] mm/memory-failure: increase queued recovery work's
- priority
-Date: Thu, 22 Mar 2018 18:14:44 +0000
-Message-ID: <20180322181445.23298-11-james.morse@arm.com>
-References: <20180322181445.23298-1-james.morse@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 930ED4A082
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Mar 2018 14:11:59 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ONDN-Krnz1Vl for <kvmarm@lists.cs.columbia.edu>;
- Thu, 22 Mar 2018 14:11:36 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D8A24A070
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Mar 2018 14:10:21 -0400 (EDT)
-In-Reply-To: <20180322181445.23298-1-james.morse@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-acpi@vger.kernel.org
-Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Punit Agrawal <punit.agrawal@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
+From: Peng Hao <peng.hao2@zte.com.cn>
+Subject: [PATCH] KVM: arm/arm64 : add lpi info in vgic-debug
+Date: Fri, 23 Mar 2018 18:36:05 +0800
+Message-ID: <1521801365-63266-1-git-send-email-peng.hao2@zte.com.cn>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: christoffer.dall@linaro.org, marc.zyngier@arm.com
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Peng Hao <peng.hao2@zte.com.cn>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-arm64 can take an NMI-like error notification when user-space steps in
-some corrupt memory. APEI's GHES code will call memory_failure_queue()
-to schedule the recovery work. We then return to user-space, possibly
-taking the fault again.
+Add lpi debug info to vgic-stat.
+the printed info like this:
+     SPI  287      0 000001        0        0   0 160      -1
+     LPI 8192      2 000100        0        0   0 160      -1
 
-Currently the arch code unconditionally signals user-space from this
-path, so we don't get stuck in this loop, but the affected process
-never benefits from memory_failure()s recovery work. To fix this we
-need to know the recovery work will run before we get back to user-space.
-
-Increase the priority of the recovery work by scheduling it on the
-system_highpri_wq, then try to bump the current task off this CPU
-so that the recover work starts immediately.
-
-Reported-by: Xie XiuQi <xiexiuqi@huawei.com>
-Signed-off-by: James Morse <james.morse@arm.com>
-Reviewed-by: Punit Agrawal <punit.agrawal@arm.com>
-CC: Xie XiuQi <xiexiuqi@huawei.com>
-CC: gengdongjiu <gengdongjiu@huawei.com>
+Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
 ---
-It is possible that the task will migrate to another CPU which will take
-RAS error again until memory_failure() has completed its work. I don't
-think this is any different from a process being scheduled while
-memory_failure() is running, which we should tackle separately.
+ virt/kvm/arm/vgic/vgic-debug.c | 61 ++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 56 insertions(+), 5 deletions(-)
 
- mm/memory-failure.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
-
-diff --git a/mm/memory-failure.c b/mm/memory-failure.c
-index 4b80ccee4535..14f44d841e8b 100644
---- a/mm/memory-failure.c
-+++ b/mm/memory-failure.c
-@@ -55,6 +55,7 @@
- #include <linux/hugetlb.h>
- #include <linux/memory_hotplug.h>
- #include <linux/mm_inline.h>
-+#include <linux/preempt.h>
- #include <linux/kfifo.h>
- #include <linux/ratelimit.h>
- #include "internal.h"
-@@ -1319,6 +1320,7 @@ static DEFINE_PER_CPU(struct memory_failure_cpu, memory_failure_cpu);
-  */
- void memory_failure_queue(unsigned long pfn, int flags)
- {
-+	int cpu = smp_processor_id();
- 	struct memory_failure_cpu *mf_cpu;
- 	unsigned long proc_flags;
- 	struct memory_failure_entry entry = {
-@@ -1328,11 +1330,14 @@ void memory_failure_queue(unsigned long pfn, int flags)
+diff --git a/virt/kvm/arm/vgic/vgic-debug.c b/virt/kvm/arm/vgic/vgic-debug.c
+index 10b3817..444115e 100644
+--- a/virt/kvm/arm/vgic/vgic-debug.c
++++ b/virt/kvm/arm/vgic/vgic-debug.c
+@@ -36,9 +36,12 @@
+ struct vgic_state_iter {
+ 	int nr_cpus;
+ 	int nr_spis;
++	int nr_lpis;
+ 	int dist_id;
+ 	int vcpu_id;
+ 	int intid;
++	int lpi_print_count;
++	struct vgic_irq **lpi_irqs;
+ };
  
- 	mf_cpu = &get_cpu_var(memory_failure_cpu);
- 	spin_lock_irqsave(&mf_cpu->lock, proc_flags);
--	if (kfifo_put(&mf_cpu->fifo, entry))
--		schedule_work_on(smp_processor_id(), &mf_cpu->work);
--	else
-+	if (kfifo_put(&mf_cpu->fifo, entry)) {
-+		queue_work_on(cpu, system_highpri_wq, &mf_cpu->work);
-+		set_tsk_need_resched(current);
-+		preempt_set_need_resched();
-+	} else {
- 		pr_err("Memory failure: buffer overflow when queuing memory failure at %#lx\n",
- 		       pfn);
+ static void iter_next(struct vgic_state_iter *iter)
+@@ -52,6 +55,40 @@ static void iter_next(struct vgic_state_iter *iter)
+ 	if (iter->intid == VGIC_NR_PRIVATE_IRQS &&
+ 	    ++iter->vcpu_id < iter->nr_cpus)
+ 		iter->intid = 0;
++
++	if (iter->intid >= VGIC_NR_PRIVATE_IRQS + iter->nr_spis) {
++		if (iter->lpi_print_count < iter->nr_lpis)
++			iter->intid = iter->lpi_irqs[iter->lpi_print_count]->intid;
++		iter->lpi_print_count++;
 +	}
- 	spin_unlock_irqrestore(&mf_cpu->lock, proc_flags);
- 	put_cpu_var(memory_failure_cpu);
++}
++
++static void vgic_debug_get_lpis(struct kvm *kvm, struct vgic_state_iter *iter)
++{
++	struct vgic_dist *dist = &kvm->arch.vgic;
++	int i = 0;
++	struct vgic_irq *irq = NULL, **lpi_irqs;
++
++again:
++	iter->nr_lpis = dist->lpi_list_count;
++	lpi_irqs = kmalloc_array(iter->nr_lpis, sizeof(irq), GFP_KERNEL);
++	if (!lpi_irqs) {
++		iter->nr_lpis = 0;
++		return;
++	}
++	spin_lock(&dist->lpi_list_lock);
++	if (iter->nr_lpis != dist->lpi_list_count) {
++		kfree(lpi_irqs);
++		spin_unlock(&dist->lpi_list_lock);
++		goto again;
++	}
++
++	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
++		vgic_get_irq_kref(irq);
++		lpi_irqs[i++] = irq;
++	}
++	spin_unlock(&dist->lpi_list_lock);
++	iter->lpi_irqs = lpi_irqs;
+ }
+ 
+ static void iter_init(struct kvm *kvm, struct vgic_state_iter *iter,
+@@ -64,6 +101,8 @@ static void iter_init(struct kvm *kvm, struct vgic_state_iter *iter,
+ 	iter->nr_cpus = nr_cpus;
+ 	iter->nr_spis = kvm->arch.vgic.nr_spis;
+ 
++	if (vgic_supports_direct_msis(kvm) && !pos)
++		vgic_debug_get_lpis(kvm, iter);
+ 	/* Fast forward to the right position if needed */
+ 	while (pos--)
+ 		iter_next(iter);
+@@ -73,7 +112,9 @@ static bool end_of_vgic(struct vgic_state_iter *iter)
+ {
+ 	return iter->dist_id > 0 &&
+ 		iter->vcpu_id == iter->nr_cpus &&
+-		(iter->intid - VGIC_NR_PRIVATE_IRQS) == iter->nr_spis;
++		(iter->intid - VGIC_NR_PRIVATE_IRQS) >= iter->nr_spis &&
++		((iter->nr_lpis == 0) ||
++		(iter->lpi_print_count == iter->nr_lpis + 1));
+ }
+ 
+ static void *vgic_debug_start(struct seq_file *s, loff_t *pos)
+@@ -130,6 +171,7 @@ static void vgic_debug_stop(struct seq_file *s, void *v)
+ 
+ 	mutex_lock(&kvm->lock);
+ 	iter = kvm->arch.vgic.iter;
++	kfree(iter->lpi_irqs);
+ 	kfree(iter);
+ 	kvm->arch.vgic.iter = NULL;
+ 	mutex_unlock(&kvm->lock);
+@@ -154,7 +196,7 @@ static void print_header(struct seq_file *s, struct vgic_irq *irq,
+ 			 struct kvm_vcpu *vcpu)
+ {
+ 	int id = 0;
+-	char *hdr = "SPI ";
++	char *hdr = "S/LPI ";
+ 
+ 	if (vcpu) {
+ 		hdr = "VCPU";
+@@ -162,7 +204,10 @@ static void print_header(struct seq_file *s, struct vgic_irq *irq,
+ 	}
+ 
+ 	seq_printf(s, "\n");
+-	seq_printf(s, "%s%2d TYP   ID TGT_ID PLAEHC     HWID   TARGET SRC PRI VCPU_ID\n", hdr, id);
++	if (vcpu)
++		seq_printf(s, "%s%2d TYP   ID TGT_ID PLAEHC     HWID   TARGET SRC PRI VCPU_ID\n", hdr, id);
++	else
++		seq_printf(s, "%s TYP   ID TGT_ID PLAEHC     HWID   TARGET SRC PRI VCPU_ID\n", hdr);
+ 	seq_printf(s, "---------------------------------------------------------------\n");
+ }
+ 
+@@ -174,8 +219,10 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
+ 		type = "SGI";
+ 	else if (irq->intid < VGIC_NR_PRIVATE_IRQS)
+ 		type = "PPI";
+-	else
++	else if (irq->intid < VGIC_MAX_SPI)
+ 		type = "SPI";
++	else if (irq->intid >= VGIC_MIN_LPI)
++		type = "LPI";
+ 
+ 	if (irq->intid ==0 || irq->intid == VGIC_NR_PRIVATE_IRQS)
+ 		print_header(s, irq, vcpu);
+@@ -220,7 +267,9 @@ static int vgic_debug_show(struct seq_file *s, void *v)
+ 	if (!kvm->arch.vgic.initialized)
+ 		return 0;
+ 
+-	if (iter->vcpu_id < iter->nr_cpus) {
++	if (iter->intid >= VGIC_MIN_LPI)
++		irq = iter->lpi_irqs[iter->lpi_print_count - 1];
++	else if (iter->vcpu_id < iter->nr_cpus) {
+ 		vcpu = kvm_get_vcpu(kvm, iter->vcpu_id);
+ 		irq = &vcpu->arch.vgic_cpu.private_irqs[iter->intid];
+ 	} else {
+@@ -230,6 +279,8 @@ static int vgic_debug_show(struct seq_file *s, void *v)
+ 	spin_lock(&irq->irq_lock);
+ 	print_irq_state(s, irq, vcpu);
+ 	spin_unlock(&irq->irq_lock);
++	if (iter->intid >= VGIC_MIN_LPI)
++		vgic_put_irq(kvm, irq);
+ 
+ 	return 0;
  }
 -- 
-2.16.2
+1.8.3.1
