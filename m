@@ -1,196 +1,169 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] KVM: arm/arm64 : add lpi info in vgic-debug
-Date: Fri, 23 Mar 2018 11:20:53 +0000
-Message-ID: <620e27fa-7bf7-ee68-1a76-3f8f0789b4f0@arm.com>
-References: <1521801365-63266-1-git-send-email-peng.hao2@zte.com.cn>
+From: <peng.hao2@zte.com.cn>
+Subject: =?UTF-8?B?UmU6UmU6IFtQQVRDSF0gS1ZNOiBhcm0vYXJtNjQgOiBhZGQgbHBpIGluZm8gaW4gdmdpYy1kZWJ1Zw==?=
+Date: Fri, 23 Mar 2018 21:33:53 +0800 (CST)
+Message-ID: <201803232133538520082@zte.com.cn>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1521801365-63266-1-git-send-email-peng.hao2@zte.com.cn>
-Content-Language: en-GB
-Sender: linux-kernel-owner@vger.kernel.org
-To: Peng Hao <peng.hao2@zte.com.cn>, christoffer.dall@linaro.org
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: multipart/mixed;
+	boundary="=====_001_next====="
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: marc.zyngier@arm.com
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, christoffer.dall@linaro.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 23/03/18 10:36, Peng Hao wrote:
-> Add lpi debug info to vgic-stat.
-> the printed info like this:
->      SPI  287      0 000001        0        0   0 160      -1
->      LPI 8192      2 000100        0        0   0 160      -1
-> 
-> Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
-> ---
->  virt/kvm/arm/vgic/vgic-debug.c | 61 ++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 56 insertions(+), 5 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-debug.c b/virt/kvm/arm/vgic/vgic-debug.c
-> index 10b3817..444115e 100644
-> --- a/virt/kvm/arm/vgic/vgic-debug.c
-> +++ b/virt/kvm/arm/vgic/vgic-debug.c
-> @@ -36,9 +36,12 @@
->  struct vgic_state_iter {
->  	int nr_cpus;
->  	int nr_spis;
-> +	int nr_lpis;
->  	int dist_id;
->  	int vcpu_id;
->  	int intid;
-> +	int lpi_print_count;
-> +	struct vgic_irq **lpi_irqs;
->  };
->  
->  static void iter_next(struct vgic_state_iter *iter)
-> @@ -52,6 +55,40 @@ static void iter_next(struct vgic_state_iter *iter)
->  	if (iter->intid == VGIC_NR_PRIVATE_IRQS &&
->  	    ++iter->vcpu_id < iter->nr_cpus)
->  		iter->intid = 0;
-> +
-> +	if (iter->intid >= VGIC_NR_PRIVATE_IRQS + iter->nr_spis) {
-> +		if (iter->lpi_print_count < iter->nr_lpis)
-> +			iter->intid = iter->lpi_irqs[iter->lpi_print_count]->intid;
-> +		iter->lpi_print_count++;
-> +	}
-> +}
-> +
-> +static void vgic_debug_get_lpis(struct kvm *kvm, struct vgic_state_iter *iter)
-> +{
-> +	struct vgic_dist *dist = &kvm->arch.vgic;
-> +	int i = 0;
-> +	struct vgic_irq *irq = NULL, **lpi_irqs;
-> +
-> +again:
-> +	iter->nr_lpis = dist->lpi_list_count;
-> +	lpi_irqs = kmalloc_array(iter->nr_lpis, sizeof(irq), GFP_KERNEL);
-> +	if (!lpi_irqs) {
-> +		iter->nr_lpis = 0;
-> +		return;
-> +	}
-> +	spin_lock(&dist->lpi_list_lock);
-> +	if (iter->nr_lpis != dist->lpi_list_count) {
-> +		kfree(lpi_irqs);
-> +		spin_unlock(&dist->lpi_list_lock);
-> +		goto again;
-> +	}
 
-Why do we need an exact count? It is fine to have a transient count, and
-the debug code should be able to come with that without performing this
-terrible loop.
 
-We also already have some code that snapshot the the LPIs (see
-vgic_copy_lpi_list), so please consider reusing that instead.
+--=====_001_next=====
+Content-Type: multipart/alternative;
+	boundary="=====_003_next====="
 
-> +
-> +	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
-> +		vgic_get_irq_kref(irq);
-> +		lpi_irqs[i++] = irq;
-> +	}
-> +	spin_unlock(&dist->lpi_list_lock);
-> +	iter->lpi_irqs = lpi_irqs;
 
-Messing with the internals of the refcounts is really a bad idea. Please
-use vgic_get_irq() in conjunction with the above, and allow it to fail
-gracefully.
+--=====_003_next=====
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
 
->  }
->  
->  static void iter_init(struct kvm *kvm, struct vgic_state_iter *iter,
-> @@ -64,6 +101,8 @@ static void iter_init(struct kvm *kvm, struct vgic_state_iter *iter,
->  	iter->nr_cpus = nr_cpus;
->  	iter->nr_spis = kvm->arch.vgic.nr_spis;
->  
-> +	if (vgic_supports_direct_msis(kvm) && !pos)
-> +		vgic_debug_get_lpis(kvm, iter);
->  	/* Fast forward to the right position if needed */
->  	while (pos--)
->  		iter_next(iter);
-> @@ -73,7 +112,9 @@ static bool end_of_vgic(struct vgic_state_iter *iter)
->  {
->  	return iter->dist_id > 0 &&
->  		iter->vcpu_id == iter->nr_cpus &&
-> -		(iter->intid - VGIC_NR_PRIVATE_IRQS) == iter->nr_spis;
-> +		(iter->intid - VGIC_NR_PRIVATE_IRQS) >= iter->nr_spis &&
-> +		((iter->nr_lpis == 0) ||
-> +		(iter->lpi_print_count == iter->nr_lpis + 1));
->  }
->  
->  static void *vgic_debug_start(struct seq_file *s, loff_t *pos)
-> @@ -130,6 +171,7 @@ static void vgic_debug_stop(struct seq_file *s, void *v)
->  
->  	mutex_lock(&kvm->lock);
->  	iter = kvm->arch.vgic.iter;
-> +	kfree(iter->lpi_irqs);
->  	kfree(iter);
->  	kvm->arch.vgic.iter = NULL;
->  	mutex_unlock(&kvm->lock);
-> @@ -154,7 +196,7 @@ static void print_header(struct seq_file *s, struct vgic_irq *irq,
->  			 struct kvm_vcpu *vcpu)
->  {
->  	int id = 0;
-> -	char *hdr = "SPI ";
-> +	char *hdr = "S/LPI ";
->  
->  	if (vcpu) {
->  		hdr = "VCPU";
-> @@ -162,7 +204,10 @@ static void print_header(struct seq_file *s, struct vgic_irq *irq,
->  	}
->  
->  	seq_printf(s, "\n");
-> -	seq_printf(s, "%s%2d TYP   ID TGT_ID PLAEHC     HWID   TARGET SRC PRI VCPU_ID\n", hdr, id);
-> +	if (vcpu)
-> +		seq_printf(s, "%s%2d TYP   ID TGT_ID PLAEHC     HWID   TARGET SRC PRI VCPU_ID\n", hdr, id);
-> +	else
-> +		seq_printf(s, "%s TYP   ID TGT_ID PLAEHC     HWID   TARGET SRC PRI VCPU_ID\n", hdr);
+Pk9uIDIzLzAzLzE4IDEwOjM2LCBQZW5nIEhhbyB3cm90ZToKPj4gQWRkIGxwaSBkZWJ1ZyBpbmZv
+IHRvIHZnaWMtc3RhdC4KPj4gdGhlIHByaW50ZWQgaW5mbyBsaWtlIHRoaXM6Cj4+ICAgICAgU1BJ
+ICAyODcgICAgICAwIDAwMDAwMSAgICAgICAgMCAgICAgICAgMCAgIDAgMTYwICAgICAgLTEKPj4g
+ICAgICBMUEkgODE5MiAgICAgIDIgMDAwMTAwICAgICAgICAwICAgICAgICAwICAgMCAxNjAgICAg
+ICAtMQo+PiAKPj4gU2lnbmVkLW9mZi1ieTogUGVuZyBIYW8gPHBlbmcuaGFvMkB6dGUuY29tLmNu
+Pgo+PiAtLS0KPj4gIHZpcnQva3ZtL2FybS92Z2ljL3ZnaWMtZGVidWcuYyB8IDYxICsrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLQo+PiAgMSBmaWxlIGNoYW5nZWQsIDU2
+IGluc2VydGlvbnMoKyksIDUgZGVsZXRpb25zKC0pCj4+IAo+PiBkaWZmIC0tZ2l0IGEvdmlydC9r
+dm0vYXJtL3ZnaWMvdmdpYy1kZWJ1Zy5jIGIvdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1kZWJ1Zy5j
+Cj4+IGluZGV4IDEwYjM4MTcuLjQ0NDExNWUgMTAwNjQ0Cj4+IC0tLSBhL3ZpcnQva3ZtL2FybS92
+Z2ljL3ZnaWMtZGVidWcuYwo+PiArKysgYi92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLWRlYnVnLmMK
+Pj4gQEAgLTM2LDkgKzM2LDEyIEBACj4+ICBzdHJ1Y3QgdmdpY19zdGF0ZV9pdGVyIHsKPj4gICAg
+ICBpbnQgbnJfY3B1czsKPj4gICAgICBpbnQgbnJfc3BpczsKPj4gKyAgICBpbnQgbnJfbHBpczsK
+Pj4gICAgICBpbnQgZGlzdF9pZDsKPj4gICAgICBpbnQgdmNwdV9pZDsKPj4gICAgICBpbnQgaW50
+aWQ7Cj4+ICsgICAgaW50IGxwaV9wcmludF9jb3VudDsKPj4gKyAgICBzdHJ1Y3QgdmdpY19pcnEg
+KipscGlfaXJxczsKPj4gIH07Cj4+ICAKPj4gIHN0YXRpYyB2b2lkIGl0ZXJfbmV4dChzdHJ1Y3Qg
+dmdpY19zdGF0ZV9pdGVyICppdGVyKQo+PiBAQCAtNTIsNiArNTUsNDAgQEAgc3RhdGljIHZvaWQg
+aXRlcl9uZXh0KHN0cnVjdCB2Z2ljX3N0YXRlX2l0ZXIgKml0ZXIpCj4+ICAgICAgaWYgKGl0ZXIt
+PmludGlkID09IFZHSUNfTlJfUFJJVkFURV9JUlFTICYmCj4+ICAgICAgICAgICsraXRlci0+dmNw
+dV9pZCA8IGl0ZXItPm5yX2NwdXMpCj4+ICAgICAgICAgIGl0ZXItPmludGlkID0gMDsKPj4gKwo+
+PiArICAgIGlmIChpdGVyLT5pbnRpZCA+PSBWR0lDX05SX1BSSVZBVEVfSVJRUyArIGl0ZXItPm5y
+X3NwaXMpIHsKPj4gKyAgICAgICAgaWYgKGl0ZXItPmxwaV9wcmludF9jb3VudCA8IGl0ZXItPm5y
+X2xwaXMpCj4+ICsgICAgICAgICAgICBpdGVyLT5pbnRpZCA9IGl0ZXItPmxwaV9pcnFzW2l0ZXIt
+PmxwaV9wcmludF9jb3VudF0tPmludGlkOwo+PiArICAgICAgICBpdGVyLT5scGlfcHJpbnRfY291
+bnQrKzsKPj4gKyAgICB9Cj4+ICt9Cj4+ICsKPj4gK3N0YXRpYyB2b2lkIHZnaWNfZGVidWdfZ2V0
+X2xwaXMoc3RydWN0IGt2bSAqa3ZtLCBzdHJ1Y3QgdmdpY19zdGF0ZV9pdGVyICppdGVyKQo+PiAr
+ewo+PiArICAgIHN0cnVjdCB2Z2ljX2Rpc3QgKmRpc3QgPSAma3ZtLT5hcmNoLnZnaWM7Cj4+ICsg
+ICAgaW50IGkgPSAwOwo+PiArICAgIHN0cnVjdCB2Z2ljX2lycSAqaXJxID0gTlVMTCwgKipscGlf
+aXJxczsKPj4gKwo+PiArYWdhaW46Cj4+ICsgICAgaXRlci0+bnJfbHBpcyA9IGRpc3QtPmxwaV9s
+aXN0X2NvdW50Owo+PiArICAgIGxwaV9pcnFzID0ga21hbGxvY19hcnJheShpdGVyLT5ucl9scGlz
+LCBzaXplb2YoaXJxKSwgR0ZQX0tFUk5FTCk7Cj4+ICsgICAgaWYgKCFscGlfaXJxcykgewo+PiAr
+ICAgICAgICBpdGVyLT5ucl9scGlzID0gMDsKPj4gKyAgICAgICAgcmV0dXJuOwo+PiArICAgIH0K
+Pj4gKyAgICBzcGluX2xvY2soJmRpc3QtPmxwaV9saXN0X2xvY2spOwo+PiArICAgIGlmIChpdGVy
+LT5ucl9scGlzICE9IGRpc3QtPmxwaV9saXN0X2NvdW50KSB7Cj4+ICsgICAgICAgIGtmcmVlKGxw
+aV9pcnFzKTsKPj4gKyAgICAgICAgc3Bpbl91bmxvY2soJmRpc3QtPmxwaV9saXN0X2xvY2spOwo+
+PiArICAgICAgICBnb3RvIGFnYWluOwo+PiArICAgIH0KCj5XaHkgZG8gd2UgbmVlZCBhbiBleGFj
+dCBjb3VudD8gSXQgaXMgZmluZSB0byBoYXZlIGEgdHJhbnNpZW50IGNvdW50LCBhbmQKPnRoZSBk
+ZWJ1ZyBjb2RlIHNob3VsZCBiZSBhYmxlIHRvIGNvbWUgd2l0aCB0aGF0IHdpdGhvdXQgcGVyZm9y
+bWluZyB0aGlzCj50ZXJyaWJsZSBsb29wLgp5ZWFoLCBpdCBpcyBlbm91Z2ggdG8gaGF2ZSBhIHJv
+dWdoIGNvdW50IGZvciBkZWJ1ZyBjb2RlIC4KPldlIGFsc28gYWxyZWFkeSBoYXZlIHNvbWUgY29k
+ZSB0aGF0IHNuYXBzaG90IHRoZSB0aGUgTFBJcyAoc2VlCj52Z2ljX2NvcHlfbHBpX2xpc3QpLCBz
+byBwbGVhc2UgY29uc2lkZXIgcmV1c2luZyB0aGF0IGluc3RlYWQuCkkgY2FuJ3QgcmV1c2Ugdmdp
+Y19jb3B5X2xwaV9saXN0LiBJdCBzbmFwc2hvdHMgYmFzZWQgb24gTFBJJ3MgdGFyZ2V0IHZjcHUu
+IAo+PiArCj4+ICsgICAgbGlzdF9mb3JfZWFjaF9lbnRyeShpcnEsICZkaXN0LT5scGlfbGlzdF9o
+ZWFkLCBscGlfbGlzdCkgewo+PiArICAgICAgICB2Z2ljX2dldF9pcnFfa3JlZihpcnEpOwo+PiAr
+ICAgICAgICBscGlfaXJxc1tpKytdID0gaXJxOwo+PiArICAgIH0KPj4gKyAgICBzcGluX3VubG9j
+aygmZGlzdC0+bHBpX2xpc3RfbG9jayk7Cj4+ICsgICAgaXRlci0+bHBpX2lycXMgPSBscGlfaXJx
+czsKCj5NZXNzaW5nIHdpdGggdGhlIGludGVybmFscyBvZiB0aGUgcmVmY291bnRzIGlzIHJlYWxs
+eSBhIGJhZCBpZGVhLiBQbGVhc2UKPnVzZSB2Z2ljX2dldF9pcnEoKSBpbiBjb25qdW5jdGlvbiB3
+aXRoIHRoZSBhYm92ZSwgYW5kIGFsbG93IGl0IHRvIGZhaWwKPmdyYWNlZnVsbHkuCiAgdmdpY19n
+ZXRfaXJxIHJlcXVpcmUgaW50aWQgYXMgaW5wdXQgIGFuZCB2Z2ljX2dldF9scGkgdGhhdCB2Z2lj
+X2dldF9pcnEgY2FsbGluZyB3aWxsIHRyYXZlcnNlIHRoZSBscGlfbGlzdCB3aXRoIGhvbGRpbmcg
+bHBpX2xpc3RfbG9jayBhZ2FpbiwKICBidXQgaGVyZSBJIGhhcyBoZWxkIGxwaV9saXN0X2xvY2su
+IFNvIEkgdGhpbmsgY2FsbGluZyB2Z2ljX2dldF9pcnFfa3JlZiBpcyBzYWZlIHdpdGggaG9sZGlu
+ZyB0aGUKIGxwaV9saXN0X2xvY2suIAo+ID4gIH0KPiA+ICAKPj4gIHN0YXRpYyB2b2lkIGl0ZXJf
+aW5pdChzdHJ1Y3Qga3ZtICprdm0sIHN0cnVjdCB2Z2ljX3N0YXRlX2l0ZXIgKml0ZXIsCj4+IEBA
+IC02NCw2ICsxMDEsOCBAQCBzdGF0aWMgdm9pZCBpdGVyX2luaXQoc3RydWN0IGt2bSAqa3ZtLCBz
+dHJ1Y3QgdmdpY19zdGF0ZV9pdGVyICppdGVyLAo+PiAgICAgIGl0ZXItPm5yX2NwdXMgPSBucl9j
+cHVzOwo+PiAgICAgIGl0ZXItPm5yX3NwaXMgPSBrdm0tPmFyY2gudmdpYy5ucl9zcGlzOwo+PiAg
+Cj4+ICsgICAgaWYgKHZnaWNfc3VwcG9ydHNfZGlyZWN0X21zaXMoa3ZtKSAmJiAhcG9zKQo+PiAr
+ICAgICAgICB2Z2ljX2RlYnVnX2dldF9scGlzKGt2bSwgaXRlcik7Cj4+ICAgICAgLyogRmFzdCBm
+b3J3YXJkIHRvIHRoZSByaWdodCBwb3NpdGlvbiBpZiBuZWVkZWQgKi8KPj4gICAgICB3aGlsZSAo
+cG9zLS0pCj4+ICAgICAgICAgIGl0ZXJfbmV4dChpdGVyKTsKPj4gQEAgLTczLDcgKzExMiw5IEBA
+IHN0YXRpYyBib29sIGVuZF9vZl92Z2ljKHN0cnVjdCB2Z2ljX3N0YXRlX2l0ZXIgKml0ZXIpCj4+
+ICB7Cj4+ICAgICAgcmV0dXJuIGl0ZXItPmRpc3RfaWQgPiAwICYmCj4+ICAgICAgICAgIGl0ZXIt
+PnZjcHVfaWQgPT0gaXRlci0+bnJfY3B1cyAmJgo+PiAtICAgICAgICAoaXRlci0+aW50aWQgLSBW
+R0lDX05SX1BSSVZBVEVfSVJRUykgPT0gaXRlci0+bnJfc3BpczsKPj4gKyAgICAgICAgKGl0ZXIt
+PmludGlkIC0gVkdJQ19OUl9QUklWQVRFX0lSUVMpID49IGl0ZXItPm5yX3NwaXMgJiYKPj4gKyAg
+ICAgICAgKChpdGVyLT5ucl9scGlzID09IDApIHx8Cj4+ICsgICAgICAgIChpdGVyLT5scGlfcHJp
+bnRfY291bnQgPT0gaXRlci0+bnJfbHBpcyArIDEpKTsKPj4gIH0KPj4gIAo+PiAgc3RhdGljIHZv
+aWQgKnZnaWNfZGVidWdfc3RhcnQoc3RydWN0IHNlcV9maWxlICpzLCBsb2ZmX3QgKnBvcykKPj4g
+QEAgLTEzMCw2ICsxNzEsNyBAQCBzdGF0aWMgdm9pZCB2Z2ljX2RlYnVnX3N0b3Aoc3RydWN0IHNl
+cV9maWxlICpzLCB2b2lkICp2KQo+PiAgCj4+ICAgICAgbXV0ZXhfbG9jaygma3ZtLT5sb2NrKTsK
+Pj4gICAgICBpdGVyID0ga3ZtLT5hcmNoLnZnaWMuaXRlcjsKPj4gKyAgICBrZnJlZShpdGVyLT5s
+cGlfaXJxcyk7Cj4+ICAgICAga2ZyZWUoaXRlcik7Cj4+ICAgICAga3ZtLT5hcmNoLnZnaWMuaXRl
+ciA9IE5VTEw7Cj4+ICAgICAgbXV0ZXhfdW5sb2NrKCZrdm0tPmxvY2spOwo+PiBAQCAtMTU0LDcg
+KzE5Niw3IEBAIHN0YXRpYyB2b2lkIHByaW50X2hlYWRlcihzdHJ1Y3Qgc2VxX2ZpbGUgKnMsIHN0
+cnVjdCB2Z2ljX2lycSAqaXJxLAo+PiAgICAgICAgICAgICAgIHN0cnVjdCBrdm1fdmNwdSAqdmNw
+dSkKPj4gIHsKPj4gICAgICBpbnQgaWQgPSAwOwo+PiAtICAgIGNoYXIgKmhkciA9ICJTUEkgIjsK
+Pj4gKyAgICBjaGFyICpoZHIgPSAiUy9MUEkgIjsKPj4gIAo+PiAgICAgIGlmICh2Y3B1KSB7Cj4+
+ICAgICAgICAgIGhkciA9ICJWQ1BVIjsKPj4gQEAgLTE2Miw3ICsyMDQsMTAgQEAgc3RhdGljIHZv
+aWQgcHJpbnRfaGVhZGVyKHN0cnVjdCBzZXFfZmlsZSAqcywgc3RydWN0IHZnaWNfaXJxICppcnEs
+Cj4+ICAgICAgfQo+PiAgCj4+ICAgICAgc2VxX3ByaW50ZihzLCAiXG4iKTsKPj4gLSAgICBzZXFf
+cHJpbnRmKHMsICIlcyUyZCBUWVAgICBJRCBUR1RfSUQgUExBRUhDICAgICBIV0lEICAgVEFSR0VU
+IFNSQyBQUkkgVkNQVV9JRFxuIiwgaGRyLCBpZCk7Cj4+ICsgICAgaWYgKHZjcHUpCj4+ICsgICAg
+ICAgIHNlcV9wcmludGYocywgIiVzJTJkIFRZUCAgIElEIFRHVF9JRCBQTEFFSEMgICAgIEhXSUQg
+ICBUQVJHRVQgU1JDIFBSSSBWQ1BVX0lEXG4iLCBoZHIsIGlkKTsKPj4gKyAgICBlbHNlCj4+ICsg
+ICAgICAgIHNlcV9wcmludGYocywgIiVzIFRZUCAgIElEIFRHVF9JRCBQTEFFSEMgICAgIEhXSUQg
+ICBUQVJHRVQgU1JDIFBSSSBWQ1BVX0lEXG4iLCBoZHIpOwoKPlRoaXMgZmVlbHMgbGlrZSBhbiB1
+bm5lY2Vzc2FyeSBjaGFuZ2UuIEJ1dCBpZiB5b3UgcmVhbGx5IHdhbnQgdGhhdCBraW5kCj5vZiBk
+ZXRhaWwsIGNoYW5nZSB5b3VyICJTL0xQSSIgdG8gc2F5IHNvbWV0aGluZyBtb3JlIGdlbmVyaWMs
+IHN1Y2ggYXMKPiJHbG9iYWwiLgogIEkgbW9kaWZ5IHRoaXMganVzdCBmb3IgYWxpZ25lZCBwcmlu
+dCBvdXRwdXQuICJHbG9iYWwiIGlzIGdyZWF0Lgo+PiBzZXFfcHJpbnRmKHMsICItLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1cbiIp
+Oz4gIH0KPj4gIAo+PiBAQCAtMTc0LDggKzIxOSwxMCBAQCBzdGF0aWMgdm9pZCBwcmludF9pcnFf
+c3RhdGUoc3RydWN0IHNlcV9maWxlICpzLCBzdHJ1Y3QgdmdpY19pcnEgKmlycSwKPj4gICAgICAg
+ICAgdHlwZSA9ICJTR0kiOwo+PiAgICAgIGVsc2UgaWYgKGlycS0+aW50aWQgPCBWR0lDX05SX1BS
+SVZBVEVfSVJRUykKPj4gICAgICAgICAgdHlwZSA9ICJQUEkiOwo+PiAtICAgIGVsc2UKPj4gKyAg
+ICBlbHNlIGlmIChpcnEtPmludGlkIDwgVkdJQ19NQVhfU1BJKQo+PiAgICAgICAgICB0eXBlID0g
+IlNQSSI7Cj4+ICsgICAgZWxzZSBpZiAoaXJxLT5pbnRpZCA+PSBWR0lDX01JTl9MUEkpCj4+ICsg
+ICAgICAgIHR5cGUgPSAiTFBJIjsKPj4gIAo+PiAgICAgIGlmIChpcnEtPmludGlkID09MCB8fCBp
+cnEtPmludGlkID09IFZHSUNfTlJfUFJJVkFURV9JUlFTKQo+PiAgICAgICAgICBwcmludF9oZWFk
+ZXIocywgaXJxLCB2Y3B1KTsKPj4gQEAgLTIyMCw3ICsyNjcsOSBAQCBzdGF0aWMgaW50IHZnaWNf
+ZGVidWdfc2hvdyhzdHJ1Y3Qgc2VxX2ZpbGUgKnMsIHZvaWQgKnYpCj4+ICAgICAgaWYgKCFrdm0t
+PmFyY2gudmdpYy5pbml0aWFsaXplZCkKPj4gICAgICAgICAgcmV0dXJuIDA7Cj4+ICAKPj4gLSAg
+ICBpZiAoaXRlci0+dmNwdV9pZCA8IGl0ZXItPm5yX2NwdXMpIHsKPj4gKyAgICBpZiAoaXRlci0+
+aW50aWQgPj0gVkdJQ19NSU5fTFBJKQo+PiArICAgICAgICBpcnEgPSBpdGVyLT5scGlfaXJxc1tp
+dGVyLT5scGlfcHJpbnRfY291bnQgLSAxXTsKPj4gKyAgICBlbHNlIGlmIChpdGVyLT52Y3B1X2lk
+IDwgaXRlci0+bnJfY3B1cykgewo+PiAgICAgICAgICB2Y3B1ID0ga3ZtX2dldF92Y3B1KGt2bSwg
+aXRlci0+dmNwdV9pZCk7Cj4+ICAgICAgICAgIGlycSA9ICZ2Y3B1LT5hcmNoLnZnaWNfY3B1LnBy
+aXZhdGVfaXJxc1tpdGVyLT5pbnRpZF07Cj4+ICAgICAgfSBlbHNlIHsKPj4gQEAgLTIzMCw2ICsy
+NzksOCBAQCBzdGF0aWMgaW50IHZnaWNfZGVidWdfc2hvdyhzdHJ1Y3Qgc2VxX2ZpbGUgKnMsIHZv
+aWQgKnYpCj4+ICAgICAgc3Bpbl9sb2NrKCZpcnEtPmlycV9sb2NrKTsKPj4gICAgICBwcmludF9p
+cnFfc3RhdGUocywgaXJxLCB2Y3B1KTsKPj4gICAgICBzcGluX3VubG9jaygmaXJxLT5pcnFfbG9j
+ayk7Cj4+ICsgICAgaWYgKGl0ZXItPmludGlkID49IFZHSUNfTUlOX0xQSSkKPj4gKyAgICAgICAg
+dmdpY19wdXRfaXJxKGt2bSwgaXJxKTsKCj5JZiB5b3UgYWRvcHQgdGhlIHNjaGVtZSBJIG91dGxp
+bmVkIGFib3ZlLCB5b3UgY2FuIGhhdmUgYSBiYWxhbmNlZAo+Z2V0L3B1dCBiZWhhdmlvdXIsIGly
+cmVzcGVjdGl2ZSBvZiB0aGUgaW50ZXJydXB0IHR5cGUsIGFuZCBhIG11Y2ggbmljZXIKPnJlc3Vs
+dC4KeWVhaCwgImlmIChpdGVyLT5pbnRpZCA+PSBWR0lDX01JTl9MUEkpIiBpcyB1bm5lY2Vzc2Fy
+eS4gIAo+PiAgICAgIHJldHVybiAwOwo+PiAgfQo+PiAKCj5UaGFua3MsCgo+ICAgIE0u
 
-This feels like an unnecessary change. But if you really want that kind
-of detail, change your "S/LPI" to say something more generic, such as
-"Global".
 
->  	seq_printf(s, "---------------------------------------------------------------\n");
->  }
->  
-> @@ -174,8 +219,10 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
->  		type = "SGI";
->  	else if (irq->intid < VGIC_NR_PRIVATE_IRQS)
->  		type = "PPI";
-> -	else
-> +	else if (irq->intid < VGIC_MAX_SPI)
->  		type = "SPI";
-> +	else if (irq->intid >= VGIC_MIN_LPI)
-> +		type = "LPI";
->  
->  	if (irq->intid ==0 || irq->intid == VGIC_NR_PRIVATE_IRQS)
->  		print_header(s, irq, vcpu);
-> @@ -220,7 +267,9 @@ static int vgic_debug_show(struct seq_file *s, void *v)
->  	if (!kvm->arch.vgic.initialized)
->  		return 0;
->  
-> -	if (iter->vcpu_id < iter->nr_cpus) {
-> +	if (iter->intid >= VGIC_MIN_LPI)
-> +		irq = iter->lpi_irqs[iter->lpi_print_count - 1];
-> +	else if (iter->vcpu_id < iter->nr_cpus) {
->  		vcpu = kvm_get_vcpu(kvm, iter->vcpu_id);
->  		irq = &vcpu->arch.vgic_cpu.private_irqs[iter->intid];
->  	} else {
-> @@ -230,6 +279,8 @@ static int vgic_debug_show(struct seq_file *s, void *v)
->  	spin_lock(&irq->irq_lock);
->  	print_irq_state(s, irq, vcpu);
->  	spin_unlock(&irq->irq_lock);
-> +	if (iter->intid >= VGIC_MIN_LPI)
-> +		vgic_put_irq(kvm, irq);
+--=====_003_next=====--
 
-If you adopt the scheme I outlined above, you can have a balanced
-get/put behaviour, irrespective of the interrupt type, and a much nicer
-result.
+--=====_001_next=====
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
->  
->  	return 0;
->  }
-> 
+_______________________________________________
+linux-arm-kernel mailing list
+linux-arm-kernel@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
 
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+--=====_001_next=====--
