@@ -1,77 +1,156 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [RFC 02/12] KVM: arm/arm64: Document KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
-Date: Fri, 23 Mar 2018 14:01:33 +0000
-Message-ID: <CAFEAcA-CY5Q=JRAc1+bqoGJ3WgdHgGGz0=13LW9SK7KpZK866w@mail.gmail.com>
-References: <1521451220-27754-1-git-send-email-eric.auger@redhat.com> <1521451220-27754-3-git-send-email-eric.auger@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+From: Peng Hao <peng.hao2@zte.com.cn>
+Subject: [PATCH v2] KVM: arm/arm64 : add lpi info in vgic-debug
+Date: Sat, 24 Mar 2018 07:01:14 +0800
+Message-ID: <1521846074-66914-1-git-send-email-peng.hao2@zte.com.cn>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1521451220-27754-3-git-send-email-eric.auger@redhat.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Eric Auger <eric.auger@redhat.com>
-Cc: Eric Auger <eric.auger.pro@gmail.com>, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, kvm-devel <kvm@vger.kernel.org>, kvmarm@lists.cs.columbia.edu, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@kernel.org>, Andre Przywara <andre.przywara@arm.com>, Andrew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>
+To: christoffer.dall@linaro.org, marc.zyngier@arm.com
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Peng Hao <peng.hao2@zte.com.cn>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 19 March 2018 at 09:20, Eric Auger <eric.auger@redhat.com> wrote:
-> We introduce a new KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION attribute in
-> KVM_DEV_ARM_VGIC_GRP_ADDR group. It allows userspace to provide the
-> base address and size of a redistributor region
->
-> Compared to KVM_VGIC_V3_ADDR_TYPE_REDIST, this new attribute allows
-> to declare several separate redistributor regions.
->
-> So the whole redist space does not need to be contiguous anymore.
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> ---
->  Documentation/virtual/kvm/devices/arm-vgic-v3.txt | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
->
-> diff --git a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-> index 9293b45..2c0bedf 100644
-> --- a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-> +++ b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-> @@ -27,6 +27,18 @@ Groups:
->        VCPU and all of the redistributor pages are contiguous.
->        Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
->        This address needs to be 64K aligned.
-> +
-> +    KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION (rw, 64-bit)
-> +      The attr field of kvm_device_attr encodes 3 values:
-> +      bits:     | 63   ....  52  |  51   ....   12 |11 - 0
-> +      values:   |     pfns       |       base      | index
-> +      - index encodes the unique redistibutor region index
+Add lpi debug info to vgic-stat.
+the printed info like this:
+    SPI  287      0 000001        0        0   0 160      -1
+    LPI 8192      2 000100        0        0   0 160      -1
 
-"redistributor"
+Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+---
+ virt/kvm/arm/vgic/vgic-debug.c | 56 ++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 51 insertions(+), 5 deletions(-)
 
-> +      - base field encodes bits [51:12] the guest physical base address
-
-"of the guest"
-
-> +        of the first redistributor in the region. There are two 64K pages
-> +        for each VCPU and all of the redistributor pages are contiguous
-> +        within the redistributor region.
-> +      - pfns encodes the size of the region in 64kB pages.
-> +      Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
-
-You should say something here about what happens if userspace
-tries to use both KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION and
-KVM_VGIC_V3_ADDR_TYPE_REDIST. I think this should be an error
-(reported by whichever of the two you try to set second).
-
->    Errors:
->      -E2BIG:  Address outside of addressable IPA range
->      -EINVAL: Incorrectly aligned address
-
-Marc wrote:
-> Why does base have to include bits [15:12] of the IPA? If it is 64kB
-> aligned (as it should), these bits are guaranteed to be 0. This also
-> avoid having to return -EINVAL in case of alignment problems.
-
-If you're not using the bits for anything else you want to
-check they're 0 anyway. Otherwise we can't guarantee to safely
-use them for something else in future, because userspace might
-be handing us garbage in those bits without noticing.
-
-thanks
--- PMM
+diff --git a/virt/kvm/arm/vgic/vgic-debug.c b/virt/kvm/arm/vgic/vgic-debug.c
+index 10b3817..cb85550 100644
+--- a/virt/kvm/arm/vgic/vgic-debug.c
++++ b/virt/kvm/arm/vgic/vgic-debug.c
+@@ -36,9 +36,12 @@
+ struct vgic_state_iter {
+ 	int nr_cpus;
+ 	int nr_spis;
++	int nr_lpis;
+ 	int dist_id;
+ 	int vcpu_id;
+ 	int intid;
++	int lpi_print_count;
++	struct vgic_irq **lpi_irqs;
+ };
+ 
+ static void iter_next(struct vgic_state_iter *iter)
+@@ -52,6 +55,35 @@ static void iter_next(struct vgic_state_iter *iter)
+ 	if (iter->intid == VGIC_NR_PRIVATE_IRQS &&
+ 	    ++iter->vcpu_id < iter->nr_cpus)
+ 		iter->intid = 0;
++
++	if (iter->intid >= VGIC_NR_PRIVATE_IRQS + iter->nr_spis) {
++		if (iter->lpi_print_count < iter->nr_lpis)
++			iter->intid = iter->lpi_irqs[iter->lpi_print_count]->intid;
++		iter->lpi_print_count++;
++	}
++}
++
++static void vgic_debug_get_lpis(struct kvm *kvm, struct vgic_state_iter *iter)
++{
++	struct vgic_dist *dist = &kvm->arch.vgic;
++	int i = 0;
++	struct vgic_irq *irq = NULL, **lpi_irqs;
++
++	iter->nr_lpis = dist->lpi_list_count;
++	lpi_irqs = kmalloc_array(iter->nr_lpis, sizeof(irq), GFP_KERNEL);
++	if (!lpi_irqs) {
++		iter->nr_lpis = 0;
++		return;
++	}
++	spin_lock(&dist->lpi_list_lock);
++	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
++		vgic_get_irq_kref(irq);
++		if (i < iter->nr_lpis)
++			lpi_irqs[i++] = irq;
++	}
++	iter->nr_lpis = i;
++	spin_unlock(&dist->lpi_list_lock);
++	iter->lpi_irqs = lpi_irqs;
+ }
+ 
+ static void iter_init(struct kvm *kvm, struct vgic_state_iter *iter,
+@@ -64,6 +96,8 @@ static void iter_init(struct kvm *kvm, struct vgic_state_iter *iter,
+ 	iter->nr_cpus = nr_cpus;
+ 	iter->nr_spis = kvm->arch.vgic.nr_spis;
+ 
++	if (vgic_supports_direct_msis(kvm) && !pos)
++		vgic_debug_get_lpis(kvm, iter);
+ 	/* Fast forward to the right position if needed */
+ 	while (pos--)
+ 		iter_next(iter);
+@@ -73,7 +107,9 @@ static bool end_of_vgic(struct vgic_state_iter *iter)
+ {
+ 	return iter->dist_id > 0 &&
+ 		iter->vcpu_id == iter->nr_cpus &&
+-		(iter->intid - VGIC_NR_PRIVATE_IRQS) == iter->nr_spis;
++		(iter->intid - VGIC_NR_PRIVATE_IRQS) >= iter->nr_spis &&
++		((iter->nr_lpis == 0) ||
++		(iter->lpi_print_count == iter->nr_lpis + 1));
+ }
+ 
+ static void *vgic_debug_start(struct seq_file *s, loff_t *pos)
+@@ -130,6 +166,7 @@ static void vgic_debug_stop(struct seq_file *s, void *v)
+ 
+ 	mutex_lock(&kvm->lock);
+ 	iter = kvm->arch.vgic.iter;
++	kfree(iter->lpi_irqs);
+ 	kfree(iter);
+ 	kvm->arch.vgic.iter = NULL;
+ 	mutex_unlock(&kvm->lock);
+@@ -154,7 +191,7 @@ static void print_header(struct seq_file *s, struct vgic_irq *irq,
+ 			 struct kvm_vcpu *vcpu)
+ {
+ 	int id = 0;
+-	char *hdr = "SPI ";
++	char *hdr = "Global";
+ 
+ 	if (vcpu) {
+ 		hdr = "VCPU";
+@@ -162,7 +199,10 @@ static void print_header(struct seq_file *s, struct vgic_irq *irq,
+ 	}
+ 
+ 	seq_printf(s, "\n");
+-	seq_printf(s, "%s%2d TYP   ID TGT_ID PLAEHC     HWID   TARGET SRC PRI VCPU_ID\n", hdr, id);
++	if (vcpu)
++		seq_printf(s, "%s%2d TYP   ID TGT_ID PLAEHC     HWID   TARGET SRC PRI VCPU_ID\n", hdr, id);
++	else
++		seq_printf(s, "%s TYP   ID TGT_ID PLAEHC     HWID   TARGET SRC PRI VCPU_ID\n", hdr);
+ 	seq_printf(s, "---------------------------------------------------------------\n");
+ }
+ 
+@@ -174,8 +214,10 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
+ 		type = "SGI";
+ 	else if (irq->intid < VGIC_NR_PRIVATE_IRQS)
+ 		type = "PPI";
+-	else
++	else if (irq->intid < VGIC_MAX_SPI)
+ 		type = "SPI";
++	else if (irq->intid >= VGIC_MIN_LPI)
++		type = "LPI";
+ 
+ 	if (irq->intid ==0 || irq->intid == VGIC_NR_PRIVATE_IRQS)
+ 		print_header(s, irq, vcpu);
+@@ -220,7 +262,9 @@ static int vgic_debug_show(struct seq_file *s, void *v)
+ 	if (!kvm->arch.vgic.initialized)
+ 		return 0;
+ 
+-	if (iter->vcpu_id < iter->nr_cpus) {
++	if (iter->intid >= VGIC_MIN_LPI)
++		irq = iter->lpi_irqs[iter->lpi_print_count - 1];
++	else if (iter->vcpu_id < iter->nr_cpus) {
+ 		vcpu = kvm_get_vcpu(kvm, iter->vcpu_id);
+ 		irq = &vcpu->arch.vgic_cpu.private_irqs[iter->intid];
+ 	} else {
+@@ -230,6 +274,8 @@ static int vgic_debug_show(struct seq_file *s, void *v)
+ 	spin_lock(&irq->irq_lock);
+ 	print_irq_state(s, irq, vcpu);
+ 	spin_unlock(&irq->irq_lock);
++
++	vgic_put_irq(kvm, irq);
+ 
+ 	return 0;
+ }
+-- 
+1.8.3.1
