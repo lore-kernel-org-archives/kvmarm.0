@@ -1,69 +1,55 @@
 From: "Liuwenliang (Abbott Liu)" <liuwenliang@huawei.com>
-Subject: Re: [PATCH v2 0/7] KASan for arm
-Date: Sat, 24 Mar 2018 13:06:00 +0000
-Message-ID: <B8AC3E80E903784988AB3003E3E97330C00774D7@dggemm510-mbs.china.huawei.com>
+Subject: Re: [PATCH 7/7] Enable KASan for arm
+Date: Sat, 24 Mar 2018 13:55:37 +0000
+Message-ID: <B8AC3E80E903784988AB3003E3E97330C007750D@dggemm510-mbs.china.huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 334304A012
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 24 Mar 2018 09:48:12 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id LfubuupulC7e for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 24 Mar 2018 09:47:50 -0400 (EDT)
+Received: from huawei.com (unknown [45.249.212.255])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4A6194A001
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 24 Mar 2018 09:47:50 -0400 (EDT)
 Content-Language: zh-CN
-Sender: linux-kernel-owner@vger.kernel.org
-To: Florian Fainelli <f.fainelli@gmail.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "aryabinin@virtuozzo.com" <aryabinin@virtuozzo.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "kstewart@linuxfoundation.org" <kstewart@linuxfoundation.org>, "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "afzal.mohd.ma@gmail.com" <afzal.mohd.ma@gmail.com>, "alexander.levin@verizon.com" <alexander.levin@verizon.com>
-Cc: "glider@google.com" <glider@google.com>, "dvyukov@google.com" <dvyukov@google.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "linux@rasmusvillemoes.dk" <linux@rasmusvillemoes.dk>, "mawilcox@microsoft.com" <mawilcox@microsoft.com>, "pombredanne@nexb.com" <pombredanne@nexb.com>, "ard.biesheuvel@linaro.org" <ard.biesheuvel@linaro.org>, "vladimir.murzin@arm.com" <vladimir.murzin@arm.com>, "nicolas.pitre@linaro.org" <nicolas.pitre@linaro.org>, "tglx@linutronix.de" <tglx@linutronix.de>, "thgarnie@google.com" <thgarnie@google.com>, "dhowells@redhat.com" <dhowells@redhat.com>, "keescook@chromium.org" <keescook@chromium.org>, "arnd@arndb.de" <arnd@arndb.de>, "geert@linux-m68k.org" <geert@linux-m68k.org>, "tixy@linaro.org" <tixy@linaro.org>, mark.
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kbuild test robot <lkp@intel.com>
+Cc: "kstewart@linuxfoundation.org" <kstewart@linuxfoundation.org>, "nicolas.pitre@linaro.org" <nicolas.pitre@linaro.org>, "grygorii.strashko@linaro.org" <grygorii.strashko@linaro.org>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "tixy@linaro.org" <tixy@linaro.org>, "linux@rasmusvillemoes.dk" <linux@rasmusvillemoes.dk>, "dhowells@redhat.com" <dhowells@redhat.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "glider@google.com" <glider@google.com>, "afzal.mohd.ma@gmail.com" <afzal.mohd.ma@gmail.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "f.fainelli@gmail.com" <f.fainelli@gmail.com>, "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>, "mawilcox@microsoft.com" <mawilcox@microsoft.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "kasan-dev@googlegroups.com" <kasan-dev@googlegroups.com>, "geert@linux-m68k.org" <geert@linu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMDMvMjAvMjAxOCAyOjMwIEFNLCBBYmJvdHQgTGl1IHdyb3RlOg0KPkJUVywgaXQgbG9va3Mg
-bGlrZSB5b3UgaGF2ZSBzb21lIHNlY3Rpb24gbWlzbWF0Y2hlczoNCj4NCj5XQVJOSU5HOiB2bWxp
-bnV4Lm8oLm1lbWluaXQudGV4dCsweDQwKTogU2VjdGlvbiBtaXNtYXRjaCBpbiByZWZlcmVuY2UN
-Cj5mcm9tIHRoZSBmdW5jdGlvbiBrYXNhbl9wdGVfcG9wdWxhdGUoKSB0byB0aGUgZnVuY3Rpb24N
-Cj4uaW5pdC50ZXh0Omthc2FuX2FsbG9jX2Jsb2NrLmNvbnN0cHJvcC41KCkNCj5UaGUgZnVuY3Rp
-b24gX19tZW1pbml0IGthc2FuX3B0ZV9wb3B1bGF0ZSgpIHJlZmVyZW5jZXMNCj5hIGZ1bmN0aW9u
-IF9faW5pdCBrYXNhbl9hbGxvY19ibG9jay5jb25zdHByb3AuNSgpLg0KPklmIGthc2FuX2FsbG9j
-X2Jsb2NrLmNvbnN0cHJvcC41IGlzIG9ubHkgdXNlZCBieSBrYXNhbl9wdGVfcG9wdWxhdGUgdGhl
-bg0KPmFubm90YXRlIGthc2FuX2FsbG9jX2Jsb2NrLmNvbnN0cHJvcC41IHdpdGggYSBtYXRjaGlu
-ZyBhbm5vdGF0aW9uLg0KPg0KPldBUk5JTkc6IHZtbGludXgubygubWVtaW5pdC50ZXh0KzB4MTQ0
-KTogU2VjdGlvbiBtaXNtYXRjaCBpbiByZWZlcmVuY2UNCj5mcm9tIHRoZSBmdW5jdGlvbiBrYXNh
-bl9wbWRfcG9wdWxhdGUoKSB0byB0aGUgZnVuY3Rpb24NCj4uaW5pdC50ZXh0Omthc2FuX2FsbG9j
-X2Jsb2NrLmNvbnN0cHJvcC41KCkNCj5UaGUgZnVuY3Rpb24gX19tZW1pbml0IGthc2FuX3BtZF9w
-b3B1bGF0ZSgpIHJlZmVyZW5jZXMNCj5hIGZ1bmN0aW9uIF9faW5pdCBrYXNhbl9hbGxvY19ibG9j
-ay5jb25zdHByb3AuNSgpLg0KPklmIGthc2FuX2FsbG9jX2Jsb2NrLmNvbnN0cHJvcC41IGlzIG9u
-bHkgdXNlZCBieSBrYXNhbl9wbWRfcG9wdWxhdGUgdGhlbg0KPmFubm90YXRlIGthc2FuX2FsbG9j
-X2Jsb2NrLmNvbnN0cHJvcC41IHdpdGggYSBtYXRjaGluZyBhbm5vdGF0aW9uLg0KPg0KPldBUk5J
-Tkc6IHZtbGludXgubygubWVtaW5pdC50ZXh0KzB4MWE0KTogU2VjdGlvbiBtaXNtYXRjaCBpbiBy
-ZWZlcmVuY2UNCj5mcm9tIHRoZSBmdW5jdGlvbiBrYXNhbl9wdWRfcG9wdWxhdGUoKSB0byB0aGUg
-ZnVuY3Rpb24NCj4uaW5pdC50ZXh0Omthc2FuX2FsbG9jX2Jsb2NrLmNvbnN0cHJvcC41KCkNCj5U
-aGUgZnVuY3Rpb24gX19tZW1pbml0IGthc2FuX3B1ZF9wb3B1bGF0ZSgpIHJlZmVyZW5jZXMNCj5h
-IGZ1bmN0aW9uIF9faW5pdCBrYXNhbl9hbGxvY19ibG9jay5jb25zdHByb3AuNSgpLg0KPklmIGth
-c2FuX2FsbG9jX2Jsb2NrLmNvbnN0cHJvcC41IGlzIG9ubHkgdXNlZCBieSBrYXNhbl9wdWRfcG9w
-dWxhdGUgdGhlbg0KPmFubm90YXRlIGthc2FuX2FsbG9jX2Jsb2NrLmNvbnN0cHJvcC41IHdpdGgg
-YSBtYXRjaGluZyBhbm5vdGF0aW9uLg0KDQpUaGFua3MgZm9yIHlvdXIgdGVzdGluZy4NCkkgZG9u
-J3Qga25vdyB3aHkgdGhlIGNvbXBpbGVyIG9uIG15IG1hY2hpbmUgZG9lc24ndCByZXBvcnQgdGhp
-cyB3YXJpbmcuDQpDb3VsZCB5b3UgdGVzdCBhZ2FpbiB3aXRoIGFkZGluZyB0aGUgZm9sbG93aW5n
-IGNvZGU6DQpsaXV3ZW5saWFuZ0BsaW51eDovaG9tZS9zb2Z0X2Rpc2sveW9jdG8vbGludXgtZ2l0
-L2xpbnV4PiBnaXQgZGlmZg0KZGlmZiAtLWdpdCBhL2FyY2gvYXJtL21tL2thc2FuX2luaXQuYyBi
-L2FyY2gvYXJtL21tL2thc2FuX2luaXQuYw0KaW5kZXggZDMxNmYzNy4uYWUxNGQxOSAxMDA2NDQN
-Ci0tLSBhL2FyY2gvYXJtL21tL2thc2FuX2luaXQuYw0KKysrIGIvYXJjaC9hcm0vbW0va2FzYW5f
-aW5pdC5jDQpAQCAtMTE1LDcgKzExNSw3IEBAIHN0YXRpYyB2b2lkIF9faW5pdCBjbGVhcl9wZ2Rz
-KHVuc2lnbmVkIGxvbmcgc3RhcnQsDQogICAgICAgICAgICAgICAgcG1kX2NsZWFyKHBtZF9vZmZf
-ayhzdGFydCkpOw0KIH0NCg0KLXB0ZV90ICogX19tZW1pbml0IGthc2FuX3B0ZV9wb3B1bGF0ZShw
-bWRfdCAqcG1kLCB1bnNpZ25lZCBsb25nIGFkZHIsIGludCBub2RlKQ0KK3B0ZV90ICogX19pbml0
-IGthc2FuX3B0ZV9wb3B1bGF0ZShwbWRfdCAqcG1kLCB1bnNpZ25lZCBsb25nIGFkZHIsIGludCBu
-b2RlKQ0KIHsNCiAgICAgICAgcHRlX3QgKnB0ZSA9IHB0ZV9vZmZzZXRfa2VybmVsKHBtZCwgYWRk
-cik7DQoNCkBAIC0xMzIsNyArMTMyLDcgQEAgcHRlX3QgKiBfX21lbWluaXQga2FzYW5fcHRlX3Bv
-cHVsYXRlKHBtZF90ICpwbWQsIHVuc2lnbmVkIGxvbmcgYWRkciwgaW50IG5vZGUpDQogICAgICAg
-IHJldHVybiBwdGU7DQogfQ0KDQotcG1kX3QgKiBfX21lbWluaXQga2FzYW5fcG1kX3BvcHVsYXRl
-KHB1ZF90ICpwdWQsIHVuc2lnbmVkIGxvbmcgYWRkciwgaW50IG5vZGUpDQorcG1kX3QgKiBfX2lu
-aXQga2FzYW5fcG1kX3BvcHVsYXRlKHB1ZF90ICpwdWQsIHVuc2lnbmVkIGxvbmcgYWRkciwgaW50
-IG5vZGUpDQogew0KICAgICAgICBwbWRfdCAqcG1kID0gcG1kX29mZnNldChwdWQsIGFkZHIpOw0K
-DQpAQCAtMTQ2LDcgKzE0Niw3IEBAIHBtZF90ICogX19tZW1pbml0IGthc2FuX3BtZF9wb3B1bGF0
-ZShwdWRfdCAqcHVkLCB1bnNpZ25lZCBsb25nIGFkZHIsIGludCBub2RlKQ0KICAgICAgICByZXR1
-cm4gcG1kOw0KIH0NCg0KLXB1ZF90ICogX19tZW1pbml0IGthc2FuX3B1ZF9wb3B1bGF0ZShwZ2Rf
-dCAqcGdkLCB1bnNpZ25lZCBsb25nIGFkZHIsIGludCBub2RlKQ0KK3B1ZF90ICogX19pbml0IGth
-c2FuX3B1ZF9wb3B1bGF0ZShwZ2RfdCAqcGdkLCB1bnNpZ25lZCBsb25nIGFkZHIsIGludCBub2Rl
-KQ0KIHsNCiAgICAgICAgcHVkX3QgKnB1ZCA9IHB1ZF9vZmZzZXQocGdkLCBhZGRyKTsNCg0KQEAg
-LTE2MSw3ICsxNjEsNyBAQCBwdWRfdCAqIF9fbWVtaW5pdCBrYXNhbl9wdWRfcG9wdWxhdGUocGdk
-X3QgKnBnZCwgdW5zaWduZWQgbG9uZyBhZGRyLCBpbnQgbm9kZSkNCiAgICAgICAgcmV0dXJuIHB1
-ZDsNCiB9DQoNCi1wZ2RfdCAqIF9fbWVtaW5pdCBrYXNhbl9wZ2RfcG9wdWxhdGUodW5zaWduZWQg
-bG9uZyBhZGRyLCBpbnQgbm9kZSkNCitwZ2RfdCAqIF9faW5pdCBrYXNhbl9wZ2RfcG9wdWxhdGUo
-dW5zaWduZWQgbG9uZyBhZGRyLCBpbnQgbm9kZSkNCiB7DQogICAgICAgIHBnZF90ICpwZ2QgPSBw
-Z2Rfb2Zmc2V0X2soYWRkcik7DQoNCg==
+On 03/20/2018 2:30 AM, kbuild test robot wrote:
+>All errors (new ones prefixed by >>):
+>
+>   arch/arm/kernel/entry-common.S: Assembler messages:
+>>> arch/arm/kernel/entry-common.S:85: Error: invalid constant (ffffffffb6e00000) after fixup
+
+I'm sorry!
+We need to add the fellowing code to solve the upper error:
+> git diff
+diff --git a/arch/arm/kernel/entry-common.S b/arch/arm/kernel/entry-common.S
+index b7d0c6c..9b728c5 100644
+--- a/arch/arm/kernel/entry-common.S
++++ b/arch/arm/kernel/entry-common.S
+@@ -82,7 +82,8 @@ ret_fast_syscall:
+        str     r0, [sp, #S_R0 + S_OFF]!        @ save returned r0
+        disable_irq_notrace                     @ disable interrupts
+        ldr     r2, [tsk, #TI_ADDR_LIMIT]
+-	cmp     r2, #TASK_SIZE
++	ldr		r1, =TASK_SIZE
++	cmp		r2, r1
+        blne    addr_limit_check_failed
+        ldr     r1, [tsk, #TI_FLAGS]            @ re-check for syscall tracing
+        tst     r1, #_TIF_SYSCALL_WORK | _TIF_WORK_MASK
