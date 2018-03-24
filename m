@@ -1,107 +1,72 @@
-From: <peng.hao2@zte.com.cn>
-Subject: =?UTF-8?B?UmU6UmU6IFtQQVRDSCB2M10gS1ZNOiBhcm0vYXJtNjQgOiBhZGQgbHBpIGluZm8gaW4gdmdpYy1kZWJ1Zw==?=
-Date: Sat, 24 Mar 2018 10:08:54 +0800 (CST)
-Message-ID: <201803241008543904320@zte.com.cn>
+From: Ingo Molnar <mingo@kernel.org>
+Subject: Re: [RFC PATCH v2 03/15] khwasan: add CONFIG_KASAN_CLASSIC and
+ CONFIG_KASAN_TAGS
+Date: Sat, 24 Mar 2018 09:43:32 +0100
+Message-ID: <20180324084332.u6qik7lkdbenqbb2@gmail.com>
+References: <cover.1521828273.git.andreyknvl@google.com>
+ <1fb0a050a84d49f5c3b2210337339412475d1688.1521828273.git.andreyknvl@google.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="=====_001_next====="
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: marc.zyngier@arm.com
-Cc: kvmarm@lists.cs.columbia.edu, cdall@kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A0E564A006
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 24 Mar 2018 04:36:00 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id QJot9DbC5kDV for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 24 Mar 2018 04:35:39 -0400 (EDT)
+Received: from mail-wr0-f195.google.com (mail-wr0-f195.google.com
+ [209.85.128.195])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2289D4A005
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 24 Mar 2018 04:35:38 -0400 (EDT)
+Received: by mail-wr0-f195.google.com with SMTP id s18so14229982wrg.9
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 24 Mar 2018 01:43:38 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1fb0a050a84d49f5c3b2210337339412475d1688.1521828273.git.andreyknvl@google.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrey Konovalov <andreyknvl@google.com>
+Cc: Julien Thierry <julien.thierry@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Christopher Li <sparse@chrisli.org>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Paul Lawrence <paullawrence@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Yury Norov <ynorov@caviumnetworks.com>, Alexander Potapenko <glider@google.com>, Christoph Lameter <cl@linux.com>, Michael Weiser <michael.weiser@gmx.de>, kvmarm@lists.cs.columbia.edu, Kees Cook <keescook@google.com>, Herbert Xu <herbert@gondor.apana.org.au>, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, Mark Brand <markbrand@google.com>, kasan-dev@googlegroups.com, linux-sparse@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>, linux-arm-kernel@lists.infradead.org, David Rientjes <rientjes@google.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Ramana
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
---=====_001_next=====
-Content-Type: multipart/alternative;
-	boundary="=====_003_next====="
-
-
---=====_003_next=====
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
-
-Pk9uIDI0LzAzLzE4IDAwOjQyLCBQZW5nIEhhbyB3cm90ZToKPj4gQWRkIGxwaSBkZWJ1ZyBpbmZv
-IHRvIHZnaWMtc3RhdC4KPj4gVGhlIHByaW50ZWQgaW5mbyBsaWtlIHRoaXM6Cj4+ICAgICBTUEkg
-IDI4NyAgICAgIDAgMDAwMDAxICAgICAgICAwICAgICAgICAwICAgMCAxNjAgICAgICAtMQo+PiAg
-ICAgTFBJIDgxOTIgICAgICAyIDAwMDEwMCAgICAgICAgMCAgICAgICAgMCAgIDAgMTYwICAgICAg
-LTEKPj4gCj4+IFNpZ25lZC1vZmYtYnk6IFBlbmcgSGFvIDxwZW5nLmhhbzJAenRlLmNvbS5jbj4K
-Pj4gLS0tCj4+ICB2aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLWRlYnVnLmMgfCA1OSArKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0KPj4gIHZpcnQva3ZtL2FybS92Z2ljL3Zn
-aWMtaXRzLmMgICB8IDE2ICsrKysrKy0tLS0tLQo+PiAgdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy5o
-ICAgICAgIHwgIDEgKwo+PiAgMyBmaWxlcyBjaGFuZ2VkLCA2MyBpbnNlcnRpb25zKCspLCAxMyBk
-ZWxldGlvbnMoLSkKPj4gCi4uLi4uCj4+ICsgICAgZm9yIChpID0gMDsgaSA8IGlycV9jb3VudDsg
-aSsrKSB7Cj4+ICsgICAgICAgIGlycSA9IHZnaWNfZ2V0X2lycShrdm0sIE5VTEwsIGludGlkc1tp
-XSk7Cj4+ICsgICAgICAgIGlmICghaXJxKQo+PiArICAgICAgICAgICAgY29udGludWU7Cj4+ICsg
-ICAgICAgIGxwaV9pcnFzW2l0ZXItPm5yX2xwaXMrK10gPSBpcnE7Cj4+ICsgICAgfQo+PiArICAg
-IGl0ZXItPmxwaV9pcnFzID0gbHBpX2lycXM7Cj4+ICsgICAga2ZyZWUoaW50aWRzKTsKCj5Zb3Ug
-YXJlIHN0aWxsIGNvbXBsZXRlbHkgbWlzc2luZyB0aGUgcG9pbnQuIFdoeSBhcmUgeW91IGFsbG9j
-YXRpbmcgdGhpcwo+YXJyYXkgb2YgcG9pbnRlcnMgd2hpbGUgeW91IGhhdmUgYSBwZXJmZWN0bHkg
-c2Vuc2libGUgYXJyYXkgb2YgaW50aWRzLAo+YWxsb3dpbmcgeW91IGRvIHRyZWF0IGFsbCB0aGUg
-aXJxcyB1bmlmb3JtbHk/Cgo+PiAgfQo+PiAgCj4+ICBzdGF0aWMgdm9pZCBpdGVyX2luaXQoc3Ry
-dWN0IGt2bSAqa3ZtLCBzdHJ1Y3QgdmdpY19zdGF0ZV9pdGVyICppdGVyLAo+PiBAQCAtNjQsNiAr
-MTAwLDggQEAgc3RhdGljIHZvaWQgaXRlcl9pbml0KHN0cnVjdCBrdm0gKmt2bSwgc3RydWN0IHZn
-aWNfc3RhdGVfaXRlciAqaXRlciwKPj4gICAgICBpdGVyLT5ucl9jcHVzID0gbnJfY3B1czsKPj4g
-ICAgICBpdGVyLT5ucl9zcGlzID0ga3ZtLT5hcmNoLnZnaWMubnJfc3BpczsKPj4gIAo+ICsgICAg
-aWYgKHZnaWNfc3VwcG9ydHNfZGlyZWN0X21zaXMoa3ZtKSAmJiAhcG9zKQo+PiArICAgICAgICB2
-Z2ljX2RlYnVnX2dldF9scGlzKGt2bSwgaXRlcik7Cgo+QWdhaW46IFdoYXQgaXMgdGhlIHBvaW50
-IG9mIHRoaXM/Cgo+PiAgICAgIC8qIEZhc3QgZm9yd2FyZCB0byB0aGUgcmlnaHQgcG9zaXRpb24g
-aWYgbmVlZGVkICovCj4+ICAgICAgd2hpbGUgKHBvcy0tKQo+PiAgICAgICAgICBpdGVyX25leHQo
-aXRlcik7Cj4+IEBAIC03Myw3ICsxMTEsOSBAQCBzdGF0aWMgYm9vbCBlbmRfb2ZfdmdpYyhzdHJ1
-Y3QgdmdpY19zdGF0ZV9pdGVyICppdGVyKQo+PiAgewo+PiAgICAgIHJldHVybiBpdGVyLT5kaXN0
-X2lkID4gMCAmJgo+PiAgICAgICAgICBpdGVyLT52Y3B1X2lkID09IGl0ZXItPm5yX2NwdXMgJiYK
-Pj4gLSAgICAgICAgKGl0ZXItPmludGlkIC0gVkdJQ19OUl9QUklWQVRFX0lSUVMpID09IGl0ZXIt
-Pm5yX3NwaXM7Cj4+ICsgICAgICAgIChpdGVyLT5pbnRpZCAtIFZHSUNfTlJfUFJJVkFURV9JUlFT
-KSA+PSBpdGVyLT5ucl9zcGlzICYmCj4+ICsgICAgICAgICgoaXRlci0+bnJfbHBpcyA9PSAwKSB8
-fAo+PiArICAgICAgICAoaXRlci0+bHBpX3ByaW50X2NvdW50ID09IGl0ZXItPm5yX2xwaXMgKyAx
-KSk7Cj4+ICB9Cj4+ICAKPj4gIHN0YXRpYyB2b2lkICp2Z2ljX2RlYnVnX3N0YXJ0KHN0cnVjdCBz
-ZXFfZmlsZSAqcywgbG9mZl90ICpwb3MpCj4+IEBAIC0xMzAsNiArMTcwLDcgQEAgc3RhdGljIHZv
-aWQgdmdpY19kZWJ1Z19zdG9wKHN0cnVjdCBzZXFfZmlsZSAqcywgdm9pZCAqdikKPj4gIAo+PiAg
-ICAgIG11dGV4X2xvY2soJmt2bS0+bG9jayk7Cj4+ICAgICAgaXRlciA9IGt2bS0+YXJjaC52Z2lj
-Lml0ZXI7Cj4+ICsgICAga2ZyZWUoaXRlci0+bHBpX2lycXMpOwo+PiAgICAgIGtmcmVlKGl0ZXIp
-Owo+PiAgICAgIGt2bS0+YXJjaC52Z2ljLml0ZXIgPSBOVUxMOwo+PiAgICAgIG11dGV4X3VubG9j
-aygma3ZtLT5sb2NrKTsKPj4gQEAgLTE1NCw3ICsxOTUsNyBAQCBzdGF0aWMgdm9pZCBwcmludF9o
-ZWFkZXIoc3RydWN0IHNlcV9maWxlICpzLCBzdHJ1Y3QgdmdpY19pcnEgKmlycSwKPj4gICAgICAg
-ICAgICAgICBzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4+ICB7Cj4+ICAgICAgaW50IGlkID0gMDsK
-Pj4gLSAgICBjaGFyICpoZHIgPSAiU1BJICI7Cj4+ICsgICAgY2hhciAqaGRyID0gIkdsb2JhbCI7
-Cj4+ICAKPj4gICAgICBpZiAodmNwdSkgewo+PiAgICAgICAgICBoZHIgPSAiVkNQVSI7Cj4+IEBA
-IC0xNjIsNyArMjAzLDEwIEBAIHN0YXRpYyB2b2lkIHByaW50X2hlYWRlcihzdHJ1Y3Qgc2VxX2Zp
-bGUgKnMsIHN0cnVjdCB2Z2ljX2lycSAqaXJxLAo+PiAgICAgIH0KPj4gIAo+PiAgICAgIHNlcV9w
-cmludGYocywgIlxuIik7Ci4uLi4KPj4gICAgICBwcmludF9pcnFfc3RhdGUocywgaXJxLCB2Y3B1
-KTsKPj4gICAgICBzcGluX3VubG9jaygmaXJxLT5pcnFfbG9jayk7Cj4+ICsgICAgdmdpY19wdXRf
-aXJxKGt2bSwgaXJxKTsKCj5Eb2Vzbid0IGl0IHNob2NrIHlvdSB0aGF0IHlvdSdyZSBkb2luZyBh
-ICJwdXQiIG9uIHNvbWV0aGluZyB5b3UgaGF2ZW4ndAo+ZG9uZSBhICJnZXQiIG9uPwoKPlsuLi5d
-Cgo+SGVyZSdzIHdoYXQgSSBtZWFuWzFdLiBObyBkb3VibGUgYWxsb2NhdGlvbiwgdW5pZm9ybSBh
-Y2Nlc3MgdG8gdGhlIGlycQo+cG9pbnRlciwgbm8gaW1iYWxhbmNlIGluIHJlZmVyZW5jZSBtYW5h
-Z2VtZW50LgpUaGFua3MgZm9yIHlvdXIgaGVscC4KQnkgdGhlIHdheSwgSSB3YW50IHRvIGtub3cg
-d2hpY2ggZGV2aWNlIHlvdSB1c2UgZm9yIHRlc3RpbmcgdmdpYy12NCBmdW5jdGlvbi4KSSBwYXNz
-dGhyb3VnaCBvbmUgVkYgdG8gVk0sYnV0IGl0IGp1c3Qgc2F5cyAidGltZW91dCIuCj5bMV0KPmh0
-dHBzOi8vZ2l0Lmtlcm5lbC5vcmcvcHViL3NjbS9saW51eC9rZXJuZWwvZ2l0L21hei9hcm0tcGxh
-dGZvcm1zLmdpdC9jb21taXQvP2g9a3ZtLWFybTY0L3ZnaWMtZGVidWcmaWQ9N2FiODZiNjcxNjc2
-OThkMzBhOTNiOWY1MDc5ZWI5ZjQ4Zjg4NWJmNg==
-
-
---=====_003_next=====--
-
---=====_001_next=====
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-linux-arm-kernel mailing list
-linux-arm-kernel@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
-
---=====_001_next=====--
+CiogQW5kcmV5IEtvbm92YWxvdiA8YW5kcmV5a252bEBnb29nbGUuY29tPiB3cm90ZToKCj4gVGhp
+cyBjb21taXQgc3BsaXRzIHRoZSBjdXJyZW50IENPTkZJR19LQVNBTiBjb25maWcgb3B0aW9uIGlu
+dG8gdHdvOgo+IDEuIENPTkZJR19LQVNBTl9DTEFTU0lDLCB0aGF0IGVuYWJsZXMgdGhlIGNsYXNz
+aWMgS0FTQU4gdmVyc2lvbiAodGhlIG9uZQo+ICAgIHRoYXQgZXhpc3RzIG5vdyk7Cj4gMi4gQ09O
+RklHX0tBU0FOX1RBR1MsIHRoYXQgZW5hYmxlcyBLSFdBU0FOLgoKU29ycnksIGJ1dCB0aGlzIGlz
+IHByZXR0eSBvYnNjdXJlIG5hbWluZyBzY2hlbWUgdGhhdCBkb2Vzbid0IGV4cGxhaW4gdGhlIHBy
+aW1hcnkgCmRpZmZlcmVuY2UgYmV0d2VlbiB0aGVzZSBLQVNBTiBtb2RlbHMgdG8gdXNlcnM6IHRo
+YXQgdGhlIGZpcnN0IG9uZSBpcyBhIHB1cmUgCnNvZnR3YXJlIGltcGxlbWVudGF0aW9uIGFuZCB0
+aGUgb3RoZXIgaXMgaGFyZHdhcmUtYXNzaXN0ZWQuCgpSZW1pbmRzIG1lIG9mIHRoZSB0cmFuc3Bh
+cmVuY3kgb2YgZ2FsYWN0aWMgYnVlcm9jcmFjeSBpbiAiVGhlIEhpdGNoaGlrZXIncyBHdWlkZSAK
+dG8gdGhlIEdhbGF4eSI6CgogIOKAnEJ1dCBsb29rLCB5b3UgZm91bmQgdGhlIG5vdGljZSwgZGlk
+buKAmXQgeW91P+KAnQogIOKAnFllcyzigJ0gc2FpZCBBcnRodXIsIOKAnHllcyBJIGRpZC4gSXQg
+d2FzIG9uIGRpc3BsYXkgaW4gdGhlIGJvdHRvbSBvZiBhIGxvY2tlZCBmaWxpbmcgCiAgIGNhYmlu
+ZXQgc3R1Y2sgaW4gYSBkaXN1c2VkIGxhdmF0b3J5IHdpdGggYSBzaWduIG9uIHRoZSBkb29yIHNh
+eWluZyDigJhCZXdhcmUgb2YgdGhlIAogICBMZW9wYXJkLuKAnSAKCkknZCBzdWdnZXN0IHNvbWV0
+aGluZyBtb3JlIGV4cHJlc3NpdmUsIHN1Y2ggYXM6CgoJQ09ORklHX0tBU0FOCgkgIENPTkZJR19L
+QVNBTl9HRU5FUklDCgkgIENPTkZJR19LQVNBTl9IV19BU1NJU1QKCm9yIHNvPwoKVGhlICdnZW5l
+cmljJyB2YXJpYW50IHdpbGwgYmFzaWNhbGx5IHJ1biBvbiBhbnkgQ1BVLiBUaGUgJ2hhcmR3YXJl
+IGFzc2lzdGVkJyBvbmUgCm5lZWRzIHN1cHBvcnQgZnJvbSB0aGUgQ1BVLgoKVGhlIGZvbGxvd2lu
+ZyBvbmVzIG1pZ2h0IGFsc28gd29yazoKCiAgIENPTkZJR19LQVNBTl9IV0FTU0lTVAogICBDT05G
+SUdfS0FTQU5fSFdfVEFHUwogICBDT05GSUdfS0FTQU5fSFdUQUdTCgouLi4gb3Igc2ltcGx5IENP
+TkZJR19LQVNBTl9TVy9DT05GSUdfS0FTQU5fSFcuCgpJZiBvdGhlciB0eXBlcyBvZiBLQVNBTiBo
+YXJkd2FyZSBhY2NlbGVyYXRpb24gYXJlIGltcGxlbWVudGVkIGluIHRoZSBmdXR1cmUgdGhlbiAK
+dGhlIENPTkZJR19LQVNBTl9IVyBuYW1lc3BhY2UgY2FuIGJlIGV4dGVuZGVkOgoKCUNPTkZJR19L
+QVNBTl9IV19UQUdTCglDT05GSUdfS0FTQU5fSFdfS0VZUwoJZXRjLgoKPiBCb3RoIENPTkZJR19L
+QVNBTl9DTEFTU0lDIGFuZCBDT05GSUdfS0FTQU5fQ0xBU1NJQyBzdXBwb3J0IGJvdGgKPiBDT05G
+SUdfS0FTQU5fSU5MSU5FIGFuZCBDT05GSUdfS0FTQU5fT1VUTElORSBpbnN0cnVtZW50YXRpb24g
+bW9kZXMuCgpJdCB3b3VsZCBiZSB2ZXJ5IHN1cnByaXNpbmcgaWYgdGhhdCB3YXNuJ3Qgc28hCgpP
+ciBkaWQgeW91IG1lYW4gJ0JvdGggQ09ORklHX0tBU0FOX0NMQVNTSUMgYW5kIENPTkZJR19LQVNB
+Tl9UQUdTJyEgOy0pCgpUaGFua3MsCgoJSW5nbwpfX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5j
+b2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5m
+by9rdm1hcm0K
