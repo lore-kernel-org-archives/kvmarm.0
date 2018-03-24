@@ -1,186 +1,107 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3] KVM: arm/arm64 : add lpi info in vgic-debug
-Date: Fri, 23 Mar 2018 19:32:41 +0000
-Message-ID: <4a8fd699-7690-9056-d0b0-3e4c30778e69@arm.com>
-References: <1521852161-67603-1-git-send-email-peng.hao2@zte.com.cn>
+From: <peng.hao2@zte.com.cn>
+Subject: =?UTF-8?B?UmU6UmU6IFtQQVRDSCB2M10gS1ZNOiBhcm0vYXJtNjQgOiBhZGQgbHBpIGluZm8gaW4gdmdpYy1kZWJ1Zw==?=
+Date: Sat, 24 Mar 2018 10:08:54 +0800 (CST)
+Message-ID: <201803241008543904320@zte.com.cn>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1521852161-67603-1-git-send-email-peng.hao2@zte.com.cn>
-Content-Language: en-GB
-Sender: linux-kernel-owner@vger.kernel.org
-To: Peng Hao <peng.hao2@zte.com.cn>, cdall@kernel.org
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: multipart/mixed;
+	boundary="=====_001_next====="
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: marc.zyngier@arm.com
+Cc: kvmarm@lists.cs.columbia.edu, cdall@kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 24/03/18 00:42, Peng Hao wrote:
-> Add lpi debug info to vgic-stat.
-> The printed info like this:
->     SPI  287      0 000001        0        0   0 160      -1
->     LPI 8192      2 000100        0        0   0 160      -1
-> 
-> Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
-> ---
->  virt/kvm/arm/vgic/vgic-debug.c | 59 ++++++++++++++++++++++++++++++++++++++----
->  virt/kvm/arm/vgic/vgic-its.c   | 16 ++++++------
->  virt/kvm/arm/vgic/vgic.h       |  1 +
->  3 files changed, 63 insertions(+), 13 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-debug.c b/virt/kvm/arm/vgic/vgic-debug.c
-> index 10b3817..ddac6bd 100644
-> --- a/virt/kvm/arm/vgic/vgic-debug.c
-> +++ b/virt/kvm/arm/vgic/vgic-debug.c
-> @@ -36,9 +36,12 @@
->  struct vgic_state_iter {
->  	int nr_cpus;
->  	int nr_spis;
-> +	int nr_lpis;
->  	int dist_id;
->  	int vcpu_id;
->  	int intid;
-> +	int lpi_print_count;
-> +	struct vgic_irq **lpi_irqs;
->  };
->  
->  static void iter_next(struct vgic_state_iter *iter)
-> @@ -52,6 +55,39 @@ static void iter_next(struct vgic_state_iter *iter)
->  	if (iter->intid == VGIC_NR_PRIVATE_IRQS &&
->  	    ++iter->vcpu_id < iter->nr_cpus)
->  		iter->intid = 0;
-> +
-> +	if (iter->intid >= VGIC_NR_PRIVATE_IRQS + iter->nr_spis) {
-> +		if (iter->lpi_print_count < iter->nr_lpis)
-> +			iter->intid = iter->lpi_irqs[iter->lpi_print_count]->intid;
-> +		iter->lpi_print_count++;
-> +	}
-> +}
-> +
-> +static void vgic_debug_get_lpis(struct kvm *kvm, struct vgic_state_iter *iter)
-> +{
-> +	u32 *intids;
-> +	int i, irq_count;
-> +	struct vgic_irq *irq = NULL, **lpi_irqs;
-> +
-> +	iter->nr_lpis = 0;
-> +	irq_count = vgic_copy_lpi_list(kvm, NULL, &intids);
-> +	if (irq_count < 0)
-> +		return;
-> +
-> +	lpi_irqs = kmalloc_array(irq_count, sizeof(irq), GFP_KERNEL);
-> +	if (!lpi_irqs) {
-> +		kfree(intids);
-> +		return;
-> +	}
-> +
-> +	for (i = 0; i < irq_count; i++) {
-> +		irq = vgic_get_irq(kvm, NULL, intids[i]);
-> +		if (!irq)
-> +			continue;
-> +		lpi_irqs[iter->nr_lpis++] = irq;
-> +	}
-> +	iter->lpi_irqs = lpi_irqs;
-> +	kfree(intids);
 
-You are still completely missing the point. Why are you allocating this
-array of pointers while you have a perfectly sensible array of intids,
-allowing you do treat all the irqs uniformly?
 
->  }
->  
->  static void iter_init(struct kvm *kvm, struct vgic_state_iter *iter,
-> @@ -64,6 +100,8 @@ static void iter_init(struct kvm *kvm, struct vgic_state_iter *iter,
->  	iter->nr_cpus = nr_cpus;
->  	iter->nr_spis = kvm->arch.vgic.nr_spis;
->  
-> +	if (vgic_supports_direct_msis(kvm) && !pos)
-> +		vgic_debug_get_lpis(kvm, iter);
+--=====_001_next=====
+Content-Type: multipart/alternative;
+	boundary="=====_003_next====="
 
-Again: What is the point of this?
 
->  	/* Fast forward to the right position if needed */
->  	while (pos--)
->  		iter_next(iter);
-> @@ -73,7 +111,9 @@ static bool end_of_vgic(struct vgic_state_iter *iter)
->  {
->  	return iter->dist_id > 0 &&
->  		iter->vcpu_id == iter->nr_cpus &&
-> -		(iter->intid - VGIC_NR_PRIVATE_IRQS) == iter->nr_spis;
-> +		(iter->intid - VGIC_NR_PRIVATE_IRQS) >= iter->nr_spis &&
-> +		((iter->nr_lpis == 0) ||
-> +		(iter->lpi_print_count == iter->nr_lpis + 1));
->  }
->  
->  static void *vgic_debug_start(struct seq_file *s, loff_t *pos)
-> @@ -130,6 +170,7 @@ static void vgic_debug_stop(struct seq_file *s, void *v)
->  
->  	mutex_lock(&kvm->lock);
->  	iter = kvm->arch.vgic.iter;
-> +	kfree(iter->lpi_irqs);
->  	kfree(iter);
->  	kvm->arch.vgic.iter = NULL;
->  	mutex_unlock(&kvm->lock);
-> @@ -154,7 +195,7 @@ static void print_header(struct seq_file *s, struct vgic_irq *irq,
->  			 struct kvm_vcpu *vcpu)
->  {
->  	int id = 0;
-> -	char *hdr = "SPI ";
-> +	char *hdr = "Global";
->  
->  	if (vcpu) {
->  		hdr = "VCPU";
-> @@ -162,7 +203,10 @@ static void print_header(struct seq_file *s, struct vgic_irq *irq,
->  	}
->  
->  	seq_printf(s, "\n");
-> -	seq_printf(s, "%s%2d TYP   ID TGT_ID PLAEHC     HWID   TARGET SRC PRI VCPU_ID\n", hdr, id);
-> +	if (vcpu)
-> +		seq_printf(s, "%s%2d TYP   ID TGT_ID PLAEHC     HWID   TARGET SRC PRI VCPU_ID\n", hdr, id);
-> +	else
-> +		seq_printf(s, "%s TYP   ID TGT_ID PLAEHC     HWID   TARGET SRC PRI VCPU_ID\n", hdr);
->  	seq_printf(s, "---------------------------------------------------------------\n");
->  }
->  
-> @@ -174,8 +218,10 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
->  		type = "SGI";
->  	else if (irq->intid < VGIC_NR_PRIVATE_IRQS)
->  		type = "PPI";
-> -	else
-> +	else if (irq->intid < VGIC_MAX_SPI)
->  		type = "SPI";
-> +	else if (irq->intid >= VGIC_MIN_LPI)
-> +		type = "LPI";
->  
->  	if (irq->intid ==0 || irq->intid == VGIC_NR_PRIVATE_IRQS)
->  		print_header(s, irq, vcpu);
-> @@ -220,7 +266,9 @@ static int vgic_debug_show(struct seq_file *s, void *v)
->  	if (!kvm->arch.vgic.initialized)
->  		return 0;
->  
-> -	if (iter->vcpu_id < iter->nr_cpus) {
-> +	if (iter->intid >= VGIC_MIN_LPI)
-> +		irq = iter->lpi_irqs[iter->lpi_print_count - 1];
-> +	else if (iter->vcpu_id < iter->nr_cpus) {
->  		vcpu = kvm_get_vcpu(kvm, iter->vcpu_id);
->  		irq = &vcpu->arch.vgic_cpu.private_irqs[iter->intid];
->  	} else {
-> @@ -230,6 +278,7 @@ static int vgic_debug_show(struct seq_file *s, void *v)
->  	spin_lock(&irq->irq_lock);
->  	print_irq_state(s, irq, vcpu);
->  	spin_unlock(&irq->irq_lock);
-> +	vgic_put_irq(kvm, irq);
+--=====_003_next=====
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
 
-Doesn't it shock you that you're doing a "put" on something you haven't
-done a "get" on?
+Pk9uIDI0LzAzLzE4IDAwOjQyLCBQZW5nIEhhbyB3cm90ZToKPj4gQWRkIGxwaSBkZWJ1ZyBpbmZv
+IHRvIHZnaWMtc3RhdC4KPj4gVGhlIHByaW50ZWQgaW5mbyBsaWtlIHRoaXM6Cj4+ICAgICBTUEkg
+IDI4NyAgICAgIDAgMDAwMDAxICAgICAgICAwICAgICAgICAwICAgMCAxNjAgICAgICAtMQo+PiAg
+ICAgTFBJIDgxOTIgICAgICAyIDAwMDEwMCAgICAgICAgMCAgICAgICAgMCAgIDAgMTYwICAgICAg
+LTEKPj4gCj4+IFNpZ25lZC1vZmYtYnk6IFBlbmcgSGFvIDxwZW5nLmhhbzJAenRlLmNvbS5jbj4K
+Pj4gLS0tCj4+ICB2aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLWRlYnVnLmMgfCA1OSArKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0KPj4gIHZpcnQva3ZtL2FybS92Z2ljL3Zn
+aWMtaXRzLmMgICB8IDE2ICsrKysrKy0tLS0tLQo+PiAgdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy5o
+ICAgICAgIHwgIDEgKwo+PiAgMyBmaWxlcyBjaGFuZ2VkLCA2MyBpbnNlcnRpb25zKCspLCAxMyBk
+ZWxldGlvbnMoLSkKPj4gCi4uLi4uCj4+ICsgICAgZm9yIChpID0gMDsgaSA8IGlycV9jb3VudDsg
+aSsrKSB7Cj4+ICsgICAgICAgIGlycSA9IHZnaWNfZ2V0X2lycShrdm0sIE5VTEwsIGludGlkc1tp
+XSk7Cj4+ICsgICAgICAgIGlmICghaXJxKQo+PiArICAgICAgICAgICAgY29udGludWU7Cj4+ICsg
+ICAgICAgIGxwaV9pcnFzW2l0ZXItPm5yX2xwaXMrK10gPSBpcnE7Cj4+ICsgICAgfQo+PiArICAg
+IGl0ZXItPmxwaV9pcnFzID0gbHBpX2lycXM7Cj4+ICsgICAga2ZyZWUoaW50aWRzKTsKCj5Zb3Ug
+YXJlIHN0aWxsIGNvbXBsZXRlbHkgbWlzc2luZyB0aGUgcG9pbnQuIFdoeSBhcmUgeW91IGFsbG9j
+YXRpbmcgdGhpcwo+YXJyYXkgb2YgcG9pbnRlcnMgd2hpbGUgeW91IGhhdmUgYSBwZXJmZWN0bHkg
+c2Vuc2libGUgYXJyYXkgb2YgaW50aWRzLAo+YWxsb3dpbmcgeW91IGRvIHRyZWF0IGFsbCB0aGUg
+aXJxcyB1bmlmb3JtbHk/Cgo+PiAgfQo+PiAgCj4+ICBzdGF0aWMgdm9pZCBpdGVyX2luaXQoc3Ry
+dWN0IGt2bSAqa3ZtLCBzdHJ1Y3QgdmdpY19zdGF0ZV9pdGVyICppdGVyLAo+PiBAQCAtNjQsNiAr
+MTAwLDggQEAgc3RhdGljIHZvaWQgaXRlcl9pbml0KHN0cnVjdCBrdm0gKmt2bSwgc3RydWN0IHZn
+aWNfc3RhdGVfaXRlciAqaXRlciwKPj4gICAgICBpdGVyLT5ucl9jcHVzID0gbnJfY3B1czsKPj4g
+ICAgICBpdGVyLT5ucl9zcGlzID0ga3ZtLT5hcmNoLnZnaWMubnJfc3BpczsKPj4gIAo+ICsgICAg
+aWYgKHZnaWNfc3VwcG9ydHNfZGlyZWN0X21zaXMoa3ZtKSAmJiAhcG9zKQo+PiArICAgICAgICB2
+Z2ljX2RlYnVnX2dldF9scGlzKGt2bSwgaXRlcik7Cgo+QWdhaW46IFdoYXQgaXMgdGhlIHBvaW50
+IG9mIHRoaXM/Cgo+PiAgICAgIC8qIEZhc3QgZm9yd2FyZCB0byB0aGUgcmlnaHQgcG9zaXRpb24g
+aWYgbmVlZGVkICovCj4+ICAgICAgd2hpbGUgKHBvcy0tKQo+PiAgICAgICAgICBpdGVyX25leHQo
+aXRlcik7Cj4+IEBAIC03Myw3ICsxMTEsOSBAQCBzdGF0aWMgYm9vbCBlbmRfb2ZfdmdpYyhzdHJ1
+Y3QgdmdpY19zdGF0ZV9pdGVyICppdGVyKQo+PiAgewo+PiAgICAgIHJldHVybiBpdGVyLT5kaXN0
+X2lkID4gMCAmJgo+PiAgICAgICAgICBpdGVyLT52Y3B1X2lkID09IGl0ZXItPm5yX2NwdXMgJiYK
+Pj4gLSAgICAgICAgKGl0ZXItPmludGlkIC0gVkdJQ19OUl9QUklWQVRFX0lSUVMpID09IGl0ZXIt
+Pm5yX3NwaXM7Cj4+ICsgICAgICAgIChpdGVyLT5pbnRpZCAtIFZHSUNfTlJfUFJJVkFURV9JUlFT
+KSA+PSBpdGVyLT5ucl9zcGlzICYmCj4+ICsgICAgICAgICgoaXRlci0+bnJfbHBpcyA9PSAwKSB8
+fAo+PiArICAgICAgICAoaXRlci0+bHBpX3ByaW50X2NvdW50ID09IGl0ZXItPm5yX2xwaXMgKyAx
+KSk7Cj4+ICB9Cj4+ICAKPj4gIHN0YXRpYyB2b2lkICp2Z2ljX2RlYnVnX3N0YXJ0KHN0cnVjdCBz
+ZXFfZmlsZSAqcywgbG9mZl90ICpwb3MpCj4+IEBAIC0xMzAsNiArMTcwLDcgQEAgc3RhdGljIHZv
+aWQgdmdpY19kZWJ1Z19zdG9wKHN0cnVjdCBzZXFfZmlsZSAqcywgdm9pZCAqdikKPj4gIAo+PiAg
+ICAgIG11dGV4X2xvY2soJmt2bS0+bG9jayk7Cj4+ICAgICAgaXRlciA9IGt2bS0+YXJjaC52Z2lj
+Lml0ZXI7Cj4+ICsgICAga2ZyZWUoaXRlci0+bHBpX2lycXMpOwo+PiAgICAgIGtmcmVlKGl0ZXIp
+Owo+PiAgICAgIGt2bS0+YXJjaC52Z2ljLml0ZXIgPSBOVUxMOwo+PiAgICAgIG11dGV4X3VubG9j
+aygma3ZtLT5sb2NrKTsKPj4gQEAgLTE1NCw3ICsxOTUsNyBAQCBzdGF0aWMgdm9pZCBwcmludF9o
+ZWFkZXIoc3RydWN0IHNlcV9maWxlICpzLCBzdHJ1Y3QgdmdpY19pcnEgKmlycSwKPj4gICAgICAg
+ICAgICAgICBzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4+ICB7Cj4+ICAgICAgaW50IGlkID0gMDsK
+Pj4gLSAgICBjaGFyICpoZHIgPSAiU1BJICI7Cj4+ICsgICAgY2hhciAqaGRyID0gIkdsb2JhbCI7
+Cj4+ICAKPj4gICAgICBpZiAodmNwdSkgewo+PiAgICAgICAgICBoZHIgPSAiVkNQVSI7Cj4+IEBA
+IC0xNjIsNyArMjAzLDEwIEBAIHN0YXRpYyB2b2lkIHByaW50X2hlYWRlcihzdHJ1Y3Qgc2VxX2Zp
+bGUgKnMsIHN0cnVjdCB2Z2ljX2lycSAqaXJxLAo+PiAgICAgIH0KPj4gIAo+PiAgICAgIHNlcV9w
+cmludGYocywgIlxuIik7Ci4uLi4KPj4gICAgICBwcmludF9pcnFfc3RhdGUocywgaXJxLCB2Y3B1
+KTsKPj4gICAgICBzcGluX3VubG9jaygmaXJxLT5pcnFfbG9jayk7Cj4+ICsgICAgdmdpY19wdXRf
+aXJxKGt2bSwgaXJxKTsKCj5Eb2Vzbid0IGl0IHNob2NrIHlvdSB0aGF0IHlvdSdyZSBkb2luZyBh
+ICJwdXQiIG9uIHNvbWV0aGluZyB5b3UgaGF2ZW4ndAo+ZG9uZSBhICJnZXQiIG9uPwoKPlsuLi5d
+Cgo+SGVyZSdzIHdoYXQgSSBtZWFuWzFdLiBObyBkb3VibGUgYWxsb2NhdGlvbiwgdW5pZm9ybSBh
+Y2Nlc3MgdG8gdGhlIGlycQo+cG9pbnRlciwgbm8gaW1iYWxhbmNlIGluIHJlZmVyZW5jZSBtYW5h
+Z2VtZW50LgpUaGFua3MgZm9yIHlvdXIgaGVscC4KQnkgdGhlIHdheSwgSSB3YW50IHRvIGtub3cg
+d2hpY2ggZGV2aWNlIHlvdSB1c2UgZm9yIHRlc3RpbmcgdmdpYy12NCBmdW5jdGlvbi4KSSBwYXNz
+dGhyb3VnaCBvbmUgVkYgdG8gVk0sYnV0IGl0IGp1c3Qgc2F5cyAidGltZW91dCIuCj5bMV0KPmh0
+dHBzOi8vZ2l0Lmtlcm5lbC5vcmcvcHViL3NjbS9saW51eC9rZXJuZWwvZ2l0L21hei9hcm0tcGxh
+dGZvcm1zLmdpdC9jb21taXQvP2g9a3ZtLWFybTY0L3ZnaWMtZGVidWcmaWQ9N2FiODZiNjcxNjc2
+OThkMzBhOTNiOWY1MDc5ZWI5ZjQ4Zjg4NWJmNg==
 
-[...]
 
-Here's what I mean[1]. No double allocation, uniform access to the irq
-pointer, no imbalance in reference management.
+--=====_003_next=====--
 
-	M.
+--=====_001_next=====
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-[1]
-https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/commit/?h=kvm-arm64/vgic-debug&id=7ab86b67167698d30a93b9f5079eb9f48f885bf6
--- 
-Jazz is not dead. It just smells funny...
+_______________________________________________
+linux-arm-kernel mailing list
+linux-arm-kernel@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+
+--=====_001_next=====--
