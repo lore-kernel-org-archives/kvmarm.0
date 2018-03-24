@@ -1,30 +1,59 @@
 From: "Liuwenliang (Abbott Liu)" <liuwenliang@huawei.com>
-Subject: Re: [PATCH 3/7] Disable instrumentation for some code
-Date: Sat, 24 Mar 2018 11:39:15 +0000
-Message-ID: <B8AC3E80E903784988AB3003E3E97330C007748D@dggemm510-mbs.china.huawei.com>
+Subject: Re: [PATCH v2 0/7] KASan for arm
+Date: Sat, 24 Mar 2018 12:24:22 +0000
+Message-ID: <B8AC3E80E903784988AB3003E3E97330C00774B7@dggemm510-mbs.china.huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BFA0A4A001
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 24 Mar 2018 08:16:56 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id JeUlO7bw1x1c for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 24 Mar 2018 08:16:33 -0400 (EDT)
+Received: from huawei.com (szxga01-in.huawei.com [45.249.212.187])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 67B5349FFF
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 24 Mar 2018 08:16:33 -0400 (EDT)
 Content-Language: zh-CN
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "aryabinin@virtuozzo.com" <aryabinin@virtuozzo.com>, "kstewart@linuxfoundation.org" <kstewart@linuxfoundation.org>, "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>, "f.fainelli@gmail.com" <f.fainelli@gmail.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "afzal.mohd.ma@gmail.com" <afzal.mohd.ma@gmail.com>, "alexander.levin@verizon.com" <alexander.levin@verizon.com>
-Cc: "glider@google.com" <glider@google.com>, "dvyukov@google.com" <dvyukov@google.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "linux@rasmusvillemoes.dk" <linux@rasmusvillemoes.dk>, "mawilcox@microsoft.com" <mawilcox@microsoft.com>, "pombredanne@nexb.com" <pombredanne@nexb.com>, "ard.biesheuvel@linaro.org" <ard.biesheuvel@linaro.org>, "vladimir.murzin@arm.com" <vladimir.murzin@arm.com>, "nicolas.pitre@linaro.org" <nicolas.pitre@linaro.org>, "tglx@linutronix.de" <tglx@linutronix.de>, "thgarnie@google.com" <thgarnie@google.com>, "dhowells@redhat.com" <dhowells@redhat.com>, "keescook@chromium.org" <keescook@chromium.org>, "arnd@arndb.de" <arnd@arndb.de>, "geert@linux-m68k.org" <geert@linux-m68k.org>, "tixy@linaro.org" <tixy@linaro.org>, mark.
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Dmitry Vyukov <dvyukov@google.com>
+Cc: "kstewart@linuxfoundation.org" <kstewart@linuxfoundation.org>, "nicolas.pitre@linaro.org" <nicolas.pitre@linaro.org>, "grygorii.strashko@linaro.org" <grygorii.strashko@linaro.org>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "tixy@linaro.org" <tixy@linaro.org>, "linux@rasmusvillemoes.dk" <linux@rasmusvillemoes.dk>, "dhowells@redhat.com" <dhowells@redhat.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "glider@google.com" <glider@google.com>, "afzal.mohd.ma@gmail.com" <afzal.mohd.ma@gmail.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Florian Fainelli <f.fainelli@gmail.com>, "mawilcox@microsoft.com" <mawilcox@microsoft.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "kasan-dev@googlegroups.com" <kasan-dev@googlegroups.com>, "geert@linux-m68k.org" <geert@linux-m68k.org>, "zhichao.huang@linaro.org" <zhichao.huang@linaro.org>, aryab
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMTkvMDMvMjAxOCAxNjozOCwgTWFyYyBaeW5naWVyIHdyb3RlOg0KPllvdSBuZWVkIHRvIGV4
-dGVuZCB0aGlzIGF0IGxlYXN0IHRvIGFyY2gvYXJtL2t2bS9oeXAvTWFrZWZpbGUsIGFzIHRoZQ0K
-PktBU0FOIHNoYWRvdyByZWdpb24gd29uJ3QgYmUgbWFwcGVkIGluIEhZUC4gU2VlIGNvbW1pdCBh
-NmNkZjFjMDhjYmZlIGZvcg0KPm1vcmUgZGV0YWlscyAoYWxsIHRoZSBhcm02NCBjb21tZW50cyBp
-biB0aGlzIHBhdGNoIGFwcGx5IHRvIDMyYml0IGFzIHdlbGwpLg0KVGhhbmtzIGZvciB5b3VyIHJl
-dmlldy4NCkkgd2lsbCBkaXNhYmxlIHRoZSBpbnN0cnVtZW50YXRpb24gb2YgYXJjaC9hcm0va3Zt
-L2h5cCBpbiB0aGUgbmV4dCB2ZXJzaW9uLiANCkp1c3QgbGlrZSB0aGlzOg0KbGl1d2VubGlhbmdA
-bGludXg6L2hvbWUvc29mdF9kaXNrL3lvY3RvL2xpbnV4LWdpdC9saW51eD4gZ2l0IGRpZmYNCmRp
-ZmYgLS1naXQgYS9hcmNoL2FybS9rdm0vaHlwL01ha2VmaWxlIGIvYXJjaC9hcm0va3ZtL2h5cC9N
-YWtlZmlsZQ0KaW5kZXggNjNkNmI0MC4uMGE4YjUwMCAxMDA2NDQNCi0tLSBhL2FyY2gvYXJtL2t2
-bS9oeXAvTWFrZWZpbGUNCisrKyBiL2FyY2gvYXJtL2t2bS9oeXAvTWFrZWZpbGUNCkBAIC0yNCwz
-ICsyNCw3IEBAIG9iai0kKENPTkZJR19LVk1fQVJNX0hPU1QpICs9IGh5cC1lbnRyeS5vDQogb2Jq
-LSQoQ09ORklHX0tWTV9BUk1fSE9TVCkgKz0gc3dpdGNoLm8NCiBDRkxBR1Nfc3dpdGNoLm8gICAg
-ICAgICAgICAgICAgICAgKz0gJChDRkxBR1NfQVJNVjdWRSkNCiBvYmotJChDT05GSUdfS1ZNX0FS
-TV9IT1NUKSArPSBzMi1zZXR1cC5vDQorDQorR0NPVl9QUk9GSUxFCTo9IG4NCitLQVNBTl9TQU5J
-VElaRQk6PSBuDQorVUJTQU5fU0FOSVRJWkUJOj0gbg0K
+On Mon, Mar 19, 2018 at 16:44 , Dmitry Vyukov wrote:
+>Hi Abbott,
+>
+>I've skimmed through the changes and they generally look good to me. I
+>am not an expect in arm, so I did not look too closely on these parts
+>(which is actually most of the changes).
+>
+>FWIW
+>Acked-by: Dmitry Vyukov <dvyukov@google.com>
+>
+>Please also update set of supported archs at the top of
+>Documentation/dev-tools/kasan.rst
+>
+>Thanks for working on upstreaming this!
+
+Thanks for your review.
+I will update set of supported archs just like this:
+diff --git a/Documentation/dev-tools/kasan.rst b/Documentation/dev-tools/kasan.rst
+index f7a18f2..d92120d 100644
+--- a/Documentation/dev-tools/kasan.rst
++++ b/Documentation/dev-tools/kasan.rst
+@@ -12,7 +12,7 @@ KASAN uses compile-time instrumentation for checking every memory access,
+ therefore you will need a GCC version 4.9.2 or later. GCC 5.0 or later is
+ required for detection of out-of-bounds accesses to stack or global variables.
+
+-Currently KASAN is supported only for the x86_64 and arm64 architectures.
++Currently KASAN is supported only for the x86_64, arm64 and arm architectures.
