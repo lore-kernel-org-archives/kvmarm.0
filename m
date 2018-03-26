@@ -1,32 +1,101 @@
-From: Peng Hao <peng.hao2@zte.com.cn>
-Subject: [PATCH] KVM: arm/armv4 : merge the same case handler
-Date: Tue, 27 Mar 2018 01:07:17 +0800
-Message-ID: <1522084037-85559-1-git-send-email-peng.hao2@zte.com.cn>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-To: cdall@kernel.org, marc.zyngier@arm.com
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Peng Hao <peng.hao2@zte.com.cn>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH] KVM: arm/arm64: vgic-its: Fix potential overrun in
+ vgic_copy_lpi_list
+Date: Mon, 26 Mar 2018 10:53:53 +0200
+Message-ID: <8e067ab9-f1a1-be28-57e1-5bcdc541633e@redhat.com>
+References: <20180323152112.19054-1-marc.zyngier@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20180323152112.19054-1-marc.zyngier@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Andre Przywara <Andre.Przywara@arm.com>, Christoffer Dall <cdall@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The two switch cases have the same handler, so merge them.
+Hi Marc, Andre,
+On 23/03/18 16:21, Marc Zyngier wrote:
+> vgic_copy_lpi_list() parses the LPI list and picks LPIs targetting
+> a given vcpu. We allocate the array containing the intids before taking
+> the lpi_list_lock, which means we can have an array size that is not
+> equal to the number of LPIs.
+> 
+> This is particularily obvious when looking at the path coming from
+> vgic_enable_lpis, which is not a command, and thus can run in parallel
+> with commands:
+> 
+> vcpu 0:                                        vcpu 1:
+> vgic_enable_lpis
+>   its_sync_lpi_pending_table
+>     vgic_copy_lpi_list
+>       intids = kmalloc_array(irq_count)
+>                                                MAPI(lpi targeting vcpu 0)
+>       list_for_each_entry(lpi_list_head)
+>         intids[i++] = irq->intid;
+> 
+> At that stage, we will happily overrun the intids array. Boo. An easy
+> fix is is to break once the array is full. The MAPI command will update
+> the config anyway, and we won't miss a thing. We also make sure that
+> lpi_list_count is read exactly once, so that further updates of that
+> value will not affect the array bound check.
+My bad, sorry. I did not understand the existing check at the time I
+submitted.
 
-Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
----
- virt/kvm/arm/vgic/vgic-its.c | 2 --
- 1 file changed, 2 deletions(-)
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 4650953..aa41b29 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -1242,8 +1242,6 @@ static int vgic_its_handle_command(struct kvm *kvm, struct vgic_its *its,
- 		ret = vgic_its_cmd_handle_mapc(kvm, its, its_cmd);
- 		break;
- 	case GITS_CMD_MAPI:
--		ret = vgic_its_cmd_handle_mapi(kvm, its, its_cmd);
--		break;
- 	case GITS_CMD_MAPTI:
- 		ret = vgic_its_cmd_handle_mapi(kvm, its, its_cmd);
- 		break;
--- 
-1.8.3.1
+Thanks
+
+Eric
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: ccb1d791ab9e ("KVM: arm64: vgic-its: Fix pending table sync")
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  virt/kvm/arm/vgic/vgic-its.c | 15 +++++++++------
+>  1 file changed, 9 insertions(+), 6 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> index 465095355666..44ee2f336440 100644
+> --- a/virt/kvm/arm/vgic/vgic-its.c
+> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> @@ -316,21 +316,24 @@ static int vgic_copy_lpi_list(struct kvm_vcpu *vcpu, u32 **intid_ptr)
+>  	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+>  	struct vgic_irq *irq;
+>  	u32 *intids;
+> -	int irq_count = dist->lpi_list_count, i = 0;
+> +	int irq_count, i = 0;
+>  
+>  	/*
+> -	 * We use the current value of the list length, which may change
+> -	 * after the kmalloc. We don't care, because the guest shouldn't
+> -	 * change anything while the command handling is still running,
+> -	 * and in the worst case we would miss a new IRQ, which one wouldn't
+> -	 * expect to be covered by this command anyway.
+> +	 * There is an obvious race between allocating the array and LPIs
+> +	 * being mapped/unmapped. If we ended up here as a result of a
+> +	 * command, we're safe (locks are held, preventing another
+> +	 * command). If coming from another path (such as enabling LPIs),
+> +	 * we must be carefull not to overrun the array.
+>  	 */
+> +	irq_count = READ_ONCE(dist->lpi_list_count);
+>  	intids = kmalloc_array(irq_count, sizeof(intids[0]), GFP_KERNEL);
+>  	if (!intids)
+>  		return -ENOMEM;
+>  
+>  	spin_lock(&dist->lpi_list_lock);
+>  	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
+> +		if (i == irq_count)
+> +			break;
+>  		/* We don't need to "get" the IRQ, as we hold the list lock. */
+>  		if (irq->target_vcpu != vcpu)
+>  			continue;
+> 
