@@ -1,101 +1,50 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH] KVM: arm/arm64: vgic-its: Fix potential overrun in
- vgic_copy_lpi_list
-Date: Mon, 26 Mar 2018 10:53:53 +0200
-Message-ID: <8e067ab9-f1a1-be28-57e1-5bcdc541633e@redhat.com>
-References: <20180323152112.19054-1-marc.zyngier@arm.com>
+From: "Liuwenliang (Abbott Liu)" <liuwenliang@huawei.com>
+Subject: Re: [PATCH v2 0/7] KASan for arm
+Date: Mon, 26 Mar 2018 01:13:45 +0000
+Message-ID: <B8AC3E80E903784988AB3003E3E97330C0077579@dggemm510-mbs.china.huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180323152112.19054-1-marc.zyngier@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: Andre Przywara <Andre.Przywara@arm.com>, Christoffer Dall <cdall@kernel.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EA9E49F7E
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 25 Mar 2018 21:06:10 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 7tsm3q1x4WWr for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 25 Mar 2018 21:05:48 -0400 (EDT)
+Received: from huawei.com (szxga02-in.huawei.com [45.249.212.188])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1211249EA2
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 25 Mar 2018 21:05:48 -0400 (EDT)
+Content-Language: zh-CN
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Joel Stanley <joel@jms.id.au>
+Cc: "kstewart@linuxfoundation.org" <kstewart@linuxfoundation.org>, "nicolas.pitre@linaro.org" <nicolas.pitre@linaro.org>, "grygorii.strashko@linaro.org" <grygorii.strashko@linaro.org>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "Jon Medhurst (Tixy)" <tixy@linaro.org>, "linux@rasmusvillemoes.dk" <linux@rasmusvillemoes.dk>, "dhowells@redhat.com" <dhowells@redhat.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "glider@google.com" <glider@google.com>, Afzal Mohammed <afzal.mohd.ma@gmail.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Florian Fainelli <f.fainelli@gmail.com>, "mawilcox@microsoft.com" <mawilcox@microsoft.com>, Russell King <linux@armlinux.org.uk>, "kasan-dev@googlegroups.com" <kasan-dev@googlegroups.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, "zhichao.huang@linaro.org" <zhi>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc, Andre,
-On 23/03/18 16:21, Marc Zyngier wrote:
-> vgic_copy_lpi_list() parses the LPI list and picks LPIs targetting
-> a given vcpu. We allocate the array containing the intids before taking
-> the lpi_list_lock, which means we can have an array size that is not
-> equal to the number of LPIs.
-> 
-> This is particularily obvious when looking at the path coming from
-> vgic_enable_lpis, which is not a command, and thus can run in parallel
-> with commands:
-> 
-> vcpu 0:                                        vcpu 1:
-> vgic_enable_lpis
->   its_sync_lpi_pending_table
->     vgic_copy_lpi_list
->       intids = kmalloc_array(irq_count)
->                                                MAPI(lpi targeting vcpu 0)
->       list_for_each_entry(lpi_list_head)
->         intids[i++] = irq->intid;
-> 
-> At that stage, we will happily overrun the intids array. Boo. An easy
-> fix is is to break once the array is full. The MAPI command will update
-> the config anyway, and we won't miss a thing. We also make sure that
-> lpi_list_count is read exactly once, so that further updates of that
-> value will not affect the array bound check.
-My bad, sorry. I did not understand the existing check at the time I
-submitted.
+On 26 March 2018 at 7:59, Joel Stanley  <joel.stan@gmail.com> wrote:
+>On 18 March 2018 at 23:23, Abbott Liu <liuwenliang@huawei.com> wrote:
+>
+>>    These patches add arch specific code for kernel address sanitizer 
+>> (see Documentation/kasan.txt).
+>
+>Thanks for implementing this. I gave the series a spin on an ASPEED
+>ast2500 (ARMv5) system with aspeed_g5_defconfig.
+>
+>It found a bug in the NCSI code (https://github.com/openbmc/linux/issues/146).
+>
+>Tested-by: Joel Stanley <joel@jms.id.au>
+>
+>Cheers,
+>
+>Joel
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Thanks
-
-Eric
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: ccb1d791ab9e ("KVM: arm64: vgic-its: Fix pending table sync")
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  virt/kvm/arm/vgic/vgic-its.c | 15 +++++++++------
->  1 file changed, 9 insertions(+), 6 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index 465095355666..44ee2f336440 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -316,21 +316,24 @@ static int vgic_copy_lpi_list(struct kvm_vcpu *vcpu, u32 **intid_ptr)
->  	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
->  	struct vgic_irq *irq;
->  	u32 *intids;
-> -	int irq_count = dist->lpi_list_count, i = 0;
-> +	int irq_count, i = 0;
->  
->  	/*
-> -	 * We use the current value of the list length, which may change
-> -	 * after the kmalloc. We don't care, because the guest shouldn't
-> -	 * change anything while the command handling is still running,
-> -	 * and in the worst case we would miss a new IRQ, which one wouldn't
-> -	 * expect to be covered by this command anyway.
-> +	 * There is an obvious race between allocating the array and LPIs
-> +	 * being mapped/unmapped. If we ended up here as a result of a
-> +	 * command, we're safe (locks are held, preventing another
-> +	 * command). If coming from another path (such as enabling LPIs),
-> +	 * we must be carefull not to overrun the array.
->  	 */
-> +	irq_count = READ_ONCE(dist->lpi_list_count);
->  	intids = kmalloc_array(irq_count, sizeof(intids[0]), GFP_KERNEL);
->  	if (!intids)
->  		return -ENOMEM;
->  
->  	spin_lock(&dist->lpi_list_lock);
->  	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
-> +		if (i == irq_count)
-> +			break;
->  		/* We don't need to "get" the IRQ, as we hold the list lock. */
->  		if (irq->target_vcpu != vcpu)
->  			continue;
-> 
+Thanks for your test.
