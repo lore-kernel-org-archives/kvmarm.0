@@ -1,50 +1,55 @@
-From: "Liuwenliang (Abbott Liu)" <liuwenliang@huawei.com>
-Subject: Re: [PATCH v2 0/7] KASan for arm
-Date: Mon, 26 Mar 2018 01:13:45 +0000
-Message-ID: <B8AC3E80E903784988AB3003E3E97330C0077579@dggemm510-mbs.china.huawei.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v2 04/11] KVM: arm/arm64: Add kvm_ras.h to collect kvm
+ specific RAS plumbing
+Date: Mon, 26 Mar 2018 16:11:22 +0100
+Message-ID: <790d3e45-26c2-6095-7adf-1d59fda4541e@arm.com>
+References: <20180322181445.23298-1-james.morse@arm.com>
+ <20180322181445.23298-5-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EA9E49F7E
- for <kvmarm@lists.cs.columbia.edu>; Sun, 25 Mar 2018 21:06:10 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7tsm3q1x4WWr for <kvmarm@lists.cs.columbia.edu>;
- Sun, 25 Mar 2018 21:05:48 -0400 (EDT)
-Received: from huawei.com (szxga02-in.huawei.com [45.249.212.188])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1211249EA2
- for <kvmarm@lists.cs.columbia.edu>; Sun, 25 Mar 2018 21:05:48 -0400 (EDT)
-Content-Language: zh-CN
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Joel Stanley <joel@jms.id.au>
-Cc: "kstewart@linuxfoundation.org" <kstewart@linuxfoundation.org>, "nicolas.pitre@linaro.org" <nicolas.pitre@linaro.org>, "grygorii.strashko@linaro.org" <grygorii.strashko@linaro.org>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "Jon Medhurst (Tixy)" <tixy@linaro.org>, "linux@rasmusvillemoes.dk" <linux@rasmusvillemoes.dk>, "dhowells@redhat.com" <dhowells@redhat.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "glider@google.com" <glider@google.com>, Afzal Mohammed <afzal.mohd.ma@gmail.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Florian Fainelli <f.fainelli@gmail.com>, "mawilcox@microsoft.com" <mawilcox@microsoft.com>, Russell King <linux@armlinux.org.uk>, "kasan-dev@googlegroups.com" <kasan-dev@googlegroups.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, "zhichao.huang@linaro.org" <zhi>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20180322181445.23298-5-james.morse@arm.com>
+Content-Language: en-GB
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: James Morse <james.morse@arm.com>, linux-acpi@vger.kernel.org
+Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Christoffer Dall <cdall@kernel.org>, Punit Agrawal <punit.agrawal@arm.com>, Xie XiuQi <xiexiuqi@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 26 March 2018 at 7:59, Joel Stanley  <joel.stan@gmail.com> wrote:
->On 18 March 2018 at 23:23, Abbott Liu <liuwenliang@huawei.com> wrote:
->
->>    These patches add arch specific code for kernel address sanitizer 
->> (see Documentation/kasan.txt).
->
->Thanks for implementing this. I gave the series a spin on an ASPEED
->ast2500 (ARMv5) system with aspeed_g5_defconfig.
->
->It found a bug in the NCSI code (https://github.com/openbmc/linux/issues/146).
->
->Tested-by: Joel Stanley <joel@jms.id.au>
->
->Cheers,
->
->Joel
+On 22/03/18 18:14, James Morse wrote:
+> To split up APEIs in_nmi() path, we need any nmi-like callers to always
+> be in_nmi(). KVM shouldn't have to know about this, pull the RAS plumbing
+> out into a header file.
+> 
+> Currently guest synchronous external aborts are claimed as RAS
+> notifications by handle_guest_sea(), which is hidden in the arch codes
+> mm/fault.c. 32bit gets a dummy declaration in system_misc.h.
+> 
+> There is going to be more of this in the future if/when we support
+> the SError-based firmware-first notification mechanism and/or
+> kernel-first notifications for both synchronous external abort and
+> SError. Each of these will come with some Kconfig symbols and a
+> handful of header files.
+> 
+> Create a header file for all this.
+> 
+> This patch gives handle_guest_sea() a 'kvm_' prefix, and moves the
+> declarations to kvm_ras.h as preparation for a future patch that moves
+> the ACPI-specific RAS code out of mm/fault.c.
+> 
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Reviewed-by: Punit Agrawal <punit.agrawal@arm.com>
 
-Thanks for your test.
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
