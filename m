@@ -1,29 +1,32 @@
-From: Joel Stanley <joel@jms.id.au>
-Subject: Re: [PATCH v2 0/7] KASan for arm
-Date: Mon, 26 Mar 2018 10:28:30 +1030
-Message-ID: <CACPK8XemuC+uACYp=tP1gJ8=9k-S69saebOLmq8nrZtqPxWRjw@mail.gmail.com>
-References: <20180318125342.4278-1-liuwenliang@huawei.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+From: Peng Hao <peng.hao2@zte.com.cn>
+Subject: [PATCH] KVM: arm/armv4 : merge the same case handler
+Date: Tue, 27 Mar 2018 01:07:17 +0800
+Message-ID: <1522084037-85559-1-git-send-email-peng.hao2@zte.com.cn>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180318125342.4278-1-liuwenliang@huawei.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Abbott Liu <liuwenliang@huawei.com>
-Cc: Russell King <linux@armlinux.org.uk>, aryabinin@virtuozzo.com, Marc Zyngier <marc.zyngier@arm.com>, kstewart@linuxfoundation.org, Greg KH <gregkh@linuxfoundation.org>, Florian Fainelli <f.fainelli@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, Afzal Mohammed <afzal.mohd.ma@gmail.com>, alexander.levin@verizon.com, glider@google.com, dvyukov@google.com, Christoffer Dall <christoffer.dall@linaro.org>, linux@rasmusvillemoes.dk, mawilcox@microsoft.com, Philippe Ombredanne <pombredanne@nexb.com>, ard.biesheuvel@linaro.org, vladimir.murzin@arm.com, nicolas.pitre@linaro.org, Thomas Gleixner <tglx@linutronix.de>, thgarnie@google.com, dhowells@redhat.com, Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Geert Uytterhoeven <geert@linux-m68k.org>
+To: cdall@kernel.org, marc.zyngier@arm.com
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Peng Hao <peng.hao2@zte.com.cn>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 18 March 2018 at 23:23, Abbott Liu <liuwenliang@huawei.com> wrote:
+The two switch cases have the same handler, so merge them.
 
->    These patches add arch specific code for kernel address sanitizer
-> (see Documentation/kasan.txt).
+Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+---
+ virt/kvm/arm/vgic/vgic-its.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-Thanks for implementing this. I gave the series a spin on an ASPEED
-ast2500 (ARMv5) system with aspeed_g5_defconfig.
-
-It found a bug in the NCSI code (https://github.com/openbmc/linux/issues/146).
-
-Tested-by: Joel Stanley <joel@jms.id.au>
-
-Cheers,
-
-Joel
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index 4650953..aa41b29 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -1242,8 +1242,6 @@ static int vgic_its_handle_command(struct kvm *kvm, struct vgic_its *its,
+ 		ret = vgic_its_cmd_handle_mapc(kvm, its, its_cmd);
+ 		break;
+ 	case GITS_CMD_MAPI:
+-		ret = vgic_its_cmd_handle_mapi(kvm, its, its_cmd);
+-		break;
+ 	case GITS_CMD_MAPTI:
+ 		ret = vgic_its_cmd_handle_mapi(kvm, its, its_cmd);
+ 		break;
+-- 
+1.8.3.1
