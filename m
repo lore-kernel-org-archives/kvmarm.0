@@ -1,59 +1,87 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH 02/11] ACPI / APEI: Generalise the estatus queue's
- add/remove and notify code
-Date: Tue, 27 Mar 2018 19:25:10 +0200
-Message-ID: <20180327172510.GB32184@pd.tnic>
-References: <20180215185606.26736-1-james.morse@arm.com>
- <20180215185606.26736-3-james.morse@arm.com>
- <20180301150144.GA4215@pd.tnic>
- <87sh9jbrgc.fsf@e105922-lin.cambridge.arm.com>
- <20180301223529.GA28811@pd.tnic> <5AA02C26.10803@arm.com>
- <20180308104408.GB21166@pd.tnic> <5AAFC939.3010309@arm.com>
+From: Ingo Molnar <mingo@kernel.org>
+Subject: Re: [RFC PATCH v2 11/15] khwasan, mm: perform untagged pointers
+ comparison in krealloc
+Date: Tue, 27 Mar 2018 22:01:50 +0200
+Message-ID: <20180327200150.cadizr7wsfjnfta7@gmail.com>
+References: <cover.1521828273.git.andreyknvl@google.com>
+ <6eb08c160ae23eb890bd937ddf8346ba211df09f.1521828274.git.andreyknvl@google.com>
+ <20180324082947.3isostkpsjraefqt@gmail.com>
+ <CAAeHK+xUBOt0hh-r5JhjVFcjYDOOyjUKGeN8OxSfnMpOnaWvFQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D4CA49DAB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Mar 2018 15:54:10 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id WxpBHeLN1Tt9 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 27 Mar 2018 15:53:48 -0400 (EDT)
+Received: from mail-wm0-f67.google.com (mail-wm0-f67.google.com [74.125.82.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 02FCD49EA2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Mar 2018 15:53:47 -0400 (EDT)
+Received: by mail-wm0-f67.google.com with SMTP id l201so987141wmg.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Mar 2018 13:01:56 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <5AAFC939.3010309@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: James Morse <james.morse@arm.com>
-Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Xie XiuQi <xiexiuqi@huawei.com>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, Will Deacon <will.deacon@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>, Len Brown <lenb@kernel.org>
+In-Reply-To: <CAAeHK+xUBOt0hh-r5JhjVFcjYDOOyjUKGeN8OxSfnMpOnaWvFQ@mail.gmail.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrey Konovalov <andreyknvl@google.com>
+Cc: Julien Thierry <julien.thierry@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Christopher Li <sparse@chrisli.org>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Paul Lawrence <paullawrence@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Yury Norov <ynorov@caviumnetworks.com>, Alexander Potapenko <glider@google.com>, Christoph Lameter <cl@linux.com>, Michael Weiser <michael.weiser@gmx.de>, kvmarm@lists.cs.columbia.edu, Herbert Xu <herbert@gondor.apana.org.au>, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, Mark Brand <markbrand@google.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-sparse@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, David Rientjes <rientjes@google.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Ramana Radhakrishnan <Ramana.>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi James,
 
-On Mon, Mar 19, 2018 at 02:29:13PM +0000, James Morse wrote:
-> I don't think the die_lock really helps here, do we really want to wait for a
-> remote CPU to finish printing an OOPs about user-space's bad memory accesses,
-> before we bring the machine down due to this system-wide fatal RAS error? The
-> presence of firmware-first means we know this error, and any other oops are
-> unrelated.
+* Andrey Konovalov <andreyknvl@google.com> wrote:
 
-Hmm, now that you put it this way...
+> On Sat, Mar 24, 2018 at 9:29 AM, Ingo Molnar <mingo@kernel.org> wrote:
+> >
+> > * Andrey Konovalov <andreyknvl@google.com> wrote:
+> >
+> >> The krealloc function checks where the same buffer was reused or a new one
+> >> allocated by comparing kernel pointers. KHWASAN changes memory tag on the
+> >> krealloc'ed chunk of memory and therefore also changes the pointer tag of
+> >> the returned pointer. Therefore we need to perform comparison on untagged
+> >> (with tags reset) pointers to check whether it's the same memory region or
+> >> not.
+> >>
+> >> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+> >> ---
+> >>  mm/slab_common.c | 2 +-
+> >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> >>
+> >> diff --git a/mm/slab_common.c b/mm/slab_common.c
+> >> index a33e61315ca6..5911f2194cf7 100644
+> >> --- a/mm/slab_common.c
+> >> +++ b/mm/slab_common.c
+> >> @@ -1494,7 +1494,7 @@ void *krealloc(const void *p, size_t new_size, gfp_t flags)
+> >>       }
+> >>
+> >>       ret = __do_krealloc(p, new_size, flags);
+> >> -     if (ret && p != ret)
+> >> +     if (ret && khwasan_reset_tag(p) != khwasan_reset_tag(ret))
+> >>               kfree(p);
+> >
+> > Small nit:
+> >
+> > If 'reset' here means an all zeroes tag (upper byte) then khwasan_clear_tag()
+> > might be a slightly easier to read primitive?
+> 
+> 'Reset' means to set the upper byte to the value that is native for
+> kernel pointers, and that is 0xFF. So it sets the tag to all ones, not
+> all zeroes. I can still rename it to khwasan_clear_tag(), if you think
+> that makes sense in this case as well.
 
-> I'd like to leave this under the x86-ifdef for now. For arm64 it would be an
-> APEI specific arch hook to stop the arch code from printing some messages,
+Ok, if it's not 0 then I agree that 'reset' is the better name. 'clear' would in 
+fact be actively confusing.
 
-... I'm thinking we should ignore the whole serializing of oopses and
-really dump that hw error ASAP. If it really is a fatal error, our main
-and only goal is to get it out as fast as possible so that it has the
-highest chance to appear on some screen or logging facility and thus the
-system can be serviced successfully.
+Thanks,
 
-And the other oopses have lower prio.
-
-Hmmm?
-
--- 
-Regards/Gruss,
-    Boris.
-
-Good mailing practices for 400: avoid top-posting and trim the reply.
+	Ingo
