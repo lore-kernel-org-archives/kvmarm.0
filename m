@@ -1,262 +1,140 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 05/11] arm64: KVM/mm: Move SEA handling behind a single
- 'claim' interface
-Date: Mon, 26 Mar 2018 18:49:00 +0100
-Message-ID: <08744114-27c0-dc8c-0943-df3dcb80f4a6@arm.com>
-References: <20180322181445.23298-1-james.morse@arm.com>
- <20180322181445.23298-6-james.morse@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: [PATCH v2 00/17] kvm: arm64: Dynamic & 52bit IPA support
+Date: Tue, 27 Mar 2018 14:15:10 +0100
+Message-ID: <1522156531-28348-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180322181445.23298-6-james.morse@arm.com>
-Content-Language: en-GB
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: James Morse <james.morse@arm.com>, linux-acpi@vger.kernel.org
-Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Christoffer Dall <cdall@kernel.org>, Punit Agrawal <punit.agrawal@arm.com>, Xie XiuQi <xiexiuqi@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, cdall@kernel.org, marc.zyngier@arm.com, punit.agrawal@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, ard.biesheuvel@linaro.org, peter.maydell@linaro.org, kristina.martsenko@arm.com, mark.rutland@arm.com, Suzuki K Poulose <suzuki.poulose@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 22/03/18 18:14, James Morse wrote:
-> To ensure APEI always takes the same locks when processing a notification
-> we need the nmi-like callers to always call APEI in_nmi(). Add a helper
-> to do the work and claim the notification.
-> 
-> When KVM or the arch code takes an exception that might be a RAS
-> notification, it asks the APEI firmware-first code whether it wants
-> to claim the exception. We can then go on to see if (a future)
-> kernel-first mechanism wants to claim the notification, before
-> falling through to the existing default behaviour.
-> 
-> The NOTIFY_SEA code was merged before we had multiple, possibly
-> interacting, NMI-like notifications and the need to consider kernel
-> first in the future. Make the 'claiming' behaviour explicit.
-> 
-> As we're restructuring the APEI code to allow multiple NMI-like
-> notifications, any notification that might interrupt interrupts-masked
-> code must always be wrapped in nmi_enter()/nmi_exit(). This allows APEI
-> to use in_nmi() to choose between the raw/regular spinlock routines.
-> 
-> We mask SError over this window to prevent an asynchronous RAS error
-> arriving and tripping 'nmi_enter()'s BUG_ON(in_nmi()).
-> 
-> Signed-off-by: James Morse <james.morse@arm.com>
-> ---
-> Why does apei_claim_sea() take a pt_regs? This gets used later to take
-> APEI by the hand through NMI->IRQ context, depending on what we
-> interrupted. See patch 11.
-> 
-> Changes since v1:
->  * Tinkered with the commit message
-> 
->  arch/arm64/include/asm/acpi.h      |  3 +++
->  arch/arm64/include/asm/daifflags.h |  1 +
->  arch/arm64/include/asm/kvm_ras.h   | 20 +++++++++++++++++++-
->  arch/arm64/kernel/acpi.c           | 30 ++++++++++++++++++++++++++++++
->  arch/arm64/mm/fault.c              | 31 +++++++------------------------
->  5 files changed, 60 insertions(+), 25 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/acpi.h b/arch/arm64/include/asm/acpi.h
-> index 32f465a80e4e..256811cd4b8b 100644
-> --- a/arch/arm64/include/asm/acpi.h
-> +++ b/arch/arm64/include/asm/acpi.h
-> @@ -16,6 +16,7 @@
->  #include <linux/psci.h>
->  
->  #include <asm/cputype.h>
-> +#include <asm/ptrace.h>
->  #include <asm/smp_plat.h>
->  #include <asm/tlbflush.h>
->  
-> @@ -94,6 +95,8 @@ void __init acpi_init_cpus(void);
->  static inline void acpi_init_cpus(void) { }
->  #endif /* CONFIG_ACPI */
->  
-> +int apei_claim_sea(struct pt_regs *regs);
-> +
->  #ifdef CONFIG_ARM64_ACPI_PARKING_PROTOCOL
->  bool acpi_parking_protocol_valid(int cpu);
->  void __init
-> diff --git a/arch/arm64/include/asm/daifflags.h b/arch/arm64/include/asm/daifflags.h
-> index 22e4c83de5a5..cbd753855bf3 100644
-> --- a/arch/arm64/include/asm/daifflags.h
-> +++ b/arch/arm64/include/asm/daifflags.h
-> @@ -20,6 +20,7 @@
->  
->  #define DAIF_PROCCTX		0
->  #define DAIF_PROCCTX_NOIRQ	PSR_I_BIT
-> +#define DAIF_ERRCTX		(PSR_I_BIT | PSR_A_BIT)
->  
->  /* mask/save/unmask/restore all exceptions, including interrupts. */
->  static inline void local_daif_mask(void)
-> diff --git a/arch/arm64/include/asm/kvm_ras.h b/arch/arm64/include/asm/kvm_ras.h
-> index 5f72b07b7912..9d52bc333110 100644
-> --- a/arch/arm64/include/asm/kvm_ras.h
-> +++ b/arch/arm64/include/asm/kvm_ras.h
-> @@ -4,8 +4,26 @@
->  #ifndef __ARM64_KVM_RAS_H__
->  #define __ARM64_KVM_RAS_H__
->  
-> +#include <linux/acpi.h>
-> +#include <linux/errno.h>
->  #include <linux/types.h>
->  
-> -int kvm_handle_guest_sea(phys_addr_t addr, unsigned int esr);
-> +#include <asm/acpi.h>
-> +
-> +/*
-> + * Was this synchronous external abort a RAS notification?
-> + * Returns '0' for errors handled by some RAS subsystem, or -ENOENT.
-> + *
-> + * Call with irqs unmaksed.
-> + */
-> +static inline int kvm_handle_guest_sea(phys_addr_t addr, unsigned int esr)
-> +{
-> +	int ret = -ENOENT;
-> +
-> +	if (IS_ENABLED(CONFIG_ACPI_APEI_SEA))
-> +		ret = apei_claim_sea(NULL);
+The physical address space size for a VM (IPA size) on arm/arm64 is
+limited to a static limit of 40bits. This series adds support for
+using a limit specific to a VM, allowing to use a limit supported
+by the host (based on the host kernel configuration and CPU support).
+The default and the minimum size is fixed to 40bits. We also add
+support for handling 52bit IPA addresses added by Arm v8.2 extensions.
 
-Nit: it is a bit odd to see this "IS_ENABLED(CONFIG_ACPI_APEI_SEA)"
-check both in this function and in the only other function this calls
-(apei_claim_sea). Could this somehow be improved by having a dummy
-apei_claim_sea if CONFIG_ACPI_APEI doesn't exist?
+As mentioned above, the supported IPA size on a host could be different
+from the system's PARange indicated by the CPUs (e.g, kernel limit
+on the PA size). So we expose the limit via a new system ioctl request
+ - KVM_ARM_GET_MAX_VM_PHYS_SHIFT - on arm/arm64. This can then be
+passed on to the KVM_CREATE_VM ioctl, encoded in the "type" field.
+Bits [7-0] of the type are reserved for the IPA size. This approach
+allows simpler management of the stage2 page table and guest memory
+slots.
 
-> +
-> +	return ret;
-> +}
->  
->  #endif /* __ARM64_KVM_RAS_H__ */
-> diff --git a/arch/arm64/kernel/acpi.c b/arch/arm64/kernel/acpi.c
-> index 7b09487ff8fb..6a4823a3eb5e 100644
-> --- a/arch/arm64/kernel/acpi.c
-> +++ b/arch/arm64/kernel/acpi.c
-> @@ -33,6 +33,8 @@
->  
->  #ifdef CONFIG_ACPI_APEI
->  # include <linux/efi.h>
-> +# include <acpi/ghes.h>
-> +# include <asm/daifflags.h>
->  # include <asm/pgtable.h>
->  #endif
->  
-> @@ -261,4 +263,32 @@ pgprot_t arch_apei_get_mem_attribute(phys_addr_t addr)
->  		return __pgprot(PROT_NORMAL_NC);
->  	return __pgprot(PROT_DEVICE_nGnRnE);
->  }
-> +
-> +
-> +/*
-> + * Claim Synchronous External Aborts as a firmware first notification.
-> + *
-> + * Used by KVM and the arch do_sea handler.
-> + * @regs may be NULL when called from process context.
-> + */
-> +int apei_claim_sea(struct pt_regs *regs)
-> +{
-> +	int err = -ENOENT;
-> +	unsigned long current_flags = arch_local_save_flags();
-> +
-> +	if (!IS_ENABLED(CONFIG_ACPI_APEI_SEA))
-> +		return err;
-> +
-> +	/*
-> +	 * APEI expects an NMI-like notification to always be called
-> +	 * in NMI context.
-> +	 */
-> +	local_daif_restore(DAIF_ERRCTX);
-> +	nmi_enter();
-> +	err = ghes_notify_sea();
-> +	nmi_exit();
-> +	local_daif_restore(current_flags);
-> +
-> +	return err;
-> +}
->  #endif
-> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-> index adac28ce9be3..303c8b425c82 100644
-> --- a/arch/arm64/mm/fault.c
-> +++ b/arch/arm64/mm/fault.c
-> @@ -18,6 +18,7 @@
->   * along with this program.  If not, see <http://www.gnu.org/licenses/>.
->   */
->  
-> +#include <linux/acpi.h>
->  #include <linux/extable.h>
->  #include <linux/signal.h>
->  #include <linux/mm.h>
-> @@ -33,6 +34,7 @@
->  #include <linux/preempt.h>
->  #include <linux/hugetlb.h>
->  
-> +#include <asm/acpi.h>
->  #include <asm/bug.h>
->  #include <asm/cmpxchg.h>
->  #include <asm/cpufeature.h>
-> @@ -44,8 +46,6 @@
->  #include <asm/pgtable.h>
->  #include <asm/tlbflush.h>
->  
-> -#include <acpi/ghes.h>
-> -
->  struct fault_info {
->  	int	(*fn)(unsigned long addr, unsigned int esr,
->  		      struct pt_regs *regs);
-> @@ -579,19 +579,12 @@ static int do_sea(unsigned long addr, unsigned int esr, struct pt_regs *regs)
->  	pr_err("Synchronous External Abort: %s (0x%08x) at 0x%016lx\n",
->  		inf->name, esr, addr);
->  
-> -	/*
-> -	 * Synchronous aborts may interrupt code which had interrupts masked.
-> -	 * Before calling out into the wider kernel tell the interested
-> -	 * subsystems.
-> -	 */
->  	if (IS_ENABLED(CONFIG_ACPI_APEI_SEA)) {
-> -		if (interrupts_enabled(regs))
-> -			nmi_enter();
-> -
-> -		ghes_notify_sea();
-> -
-> -		if (interrupts_enabled(regs))
-> -			nmi_exit();
-> +		/*
-> +		 * Return value ignored as we rely on signal merging.
-> +		 * Future patches will make this more robust.
-> +		 */
-> +		apei_claim_sea(regs);
->  	}
->  
->  	info.si_signo = SIGBUS;
-> @@ -673,16 +666,6 @@ static const struct fault_info fault_info[] = {
->  	{ do_bad,		SIGBUS,  BUS_FIXME,	"unknown 63"			},
->  };
->  
-> -int kvm_handle_guest_sea(phys_addr_t addr, unsigned int esr)
-> -{
-> -	int ret = -ENOENT;
-> -
-> -	if (IS_ENABLED(CONFIG_ACPI_APEI_SEA))
-> -		ret = ghes_notify_sea();
-> -
-> -	return ret;
-> -}
-> -
->  asmlinkage void __exception do_mem_abort(unsigned long addr, unsigned int esr,
->  					 struct pt_regs *regs)
->  {
-> 
+The arm64 page table level helpers are defined based on the page
+table levels used by the host VA. So, the accessors may not work
+if the guest uses more number of levels in stage2 than the stage1
+of the host. In order to provide an independent stage2 page table,
+we refactor the arm64 page table helpers to give us raw accessors
+for each level, which should only used when that level is present.
+And then, based on the VM, we make the decision of the stage2
+page table using the raw accessors.
 
-Otherwise:
+52bit support is added for VGIC (including ITS emulation) and handling
+of PAR, HPFAR registers.
 
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+The series applies on arm64 for-next/core. A tree is available here:
 
-	M.
+	 git://linux-arm.org/linux-skp.git ipa52/v2
+
+Changes since V1:
+ - Change the userspace API for configuring VM to encode the IPA
+   size in the VM type.  (suggested by Christoffer)
+ - Expose the IPA limit on the host via ioctl on /dev/kvm
+ - Handle 52bit addresses in PAR & HPFAR
+ - Drop patch changing the life time of stage2 PGD
+ - Rename macros for 48-to-52 bit conversion for GIC ITS BASER.
+   (suggested by Christoffer)
+ - Split virtio PFN check patches and address comments.
+
+The series also adds :
+ - Support for handling 52bit IPA for vgic ITS.
+ - Cleanup in virtio to handle errors when the PFN used in
+   the virtio transport doesn't fit in 32bit.
+
+Tested with
+  - Modified kvmtool, which can only be used for (patches included in
+    the series for reference / testing):
+    * with virtio-pci upto 44bit PA (Due to 4K page size for virtio-pci
+      legacy implemented by kvmtool)
+    * Upto 48bit PA with virtio-mmio, due to 32bit PFN limitation.
+  - Hacked Qemu (boot loader support for highmem, phys-shift support)
+    * with virtio-pci GIC-v3 ITS & MSI upto 52bit on Foundation model.
+
+Kristina Martsenko (1):
+  vgic: Add support for 52bit guest physical address
+
+Suzuki K Poulose (16):
+  virtio: mmio-v1: Validate queue PFN
+  virtio: pci-legacy: Validate queue pfn
+  arm64: Make page table helpers reusable
+  arm64: Refactor pud_huge for reusability
+  arm64: Helper for parange to PASize
+  kvm: arm/arm64: Fix stage2_flush_memslot for 4 level page table
+  kvm: arm/arm64: Remove spurious WARN_ON
+  kvm: arm/arm64: Prepare for VM specific stage2 translations
+  kvm: arm64: Make stage2 page table layout dynamic
+  kvm: arm64: Dynamic configuration of VTCR and VTTBR mask
+  kvm: arm64: Configure VTCR per VM
+  kvm: arm/arm64: Expose supported physical address limit for VM
+  kvm: arm/arm64: Allow tuning the physical address size for VM
+  kvm: arm64: Switch to per VM IPA limit
+  kvm: arm64: Add support for handling 52bit IPA
+  kvm: arm64: Allow IPA size supported by the system
+
+ Documentation/virtual/kvm/api.txt             |  14 ++
+ arch/arm/include/asm/kvm_arm.h                |   3 +-
+ arch/arm/include/asm/kvm_mmu.h                |  22 ++-
+ arch/arm/include/asm/stage2_pgtable.h         |  42 ++---
+ arch/arm64/include/asm/cpufeature.h           |  16 ++
+ arch/arm64/include/asm/kvm_arm.h              | 119 +++++++++++++--
+ arch/arm64/include/asm/kvm_asm.h              |   2 +-
+ arch/arm64/include/asm/kvm_host.h             |  19 ++-
+ arch/arm64/include/asm/kvm_mmu.h              |  71 +++++++--
+ arch/arm64/include/asm/pgalloc.h              |  34 ++++-
+ arch/arm64/include/asm/pgtable.h              |  63 +++++---
+ arch/arm64/include/asm/stage2_pgtable-nopmd.h |  42 -----
+ arch/arm64/include/asm/stage2_pgtable-nopud.h |  39 -----
+ arch/arm64/include/asm/stage2_pgtable.h       | 211 +++++++++++++++++---------
+ arch/arm64/kvm/hyp/s2-setup.c                 |  34 +----
+ arch/arm64/kvm/hyp/switch.c                   |   7 +-
+ arch/arm64/mm/hugetlbpage.c                   |   2 +-
+ drivers/virtio/virtio_mmio.c                  |  18 ++-
+ drivers/virtio/virtio_pci_legacy.c            |  12 +-
+ include/linux/irqchip/arm-gic-v3.h            |   5 +
+ include/uapi/linux/kvm.h                      |  16 ++
+ virt/kvm/arm/arm.c                            |  32 +++-
+ virt/kvm/arm/mmu.c                            | 124 ++++++++-------
+ virt/kvm/arm/vgic/vgic-its.c                  |  37 ++---
+ virt/kvm/arm/vgic/vgic-kvm-device.c           |   2 +-
+ virt/kvm/arm/vgic/vgic-mmio-v3.c              |   2 -
+ 26 files changed, 626 insertions(+), 362 deletions(-)
+ delete mode 100644 arch/arm64/include/asm/stage2_pgtable-nopmd.h
+ delete mode 100644 arch/arm64/include/asm/stage2_pgtable-nopud.h
+
+kvmtool hack for IPA support :
+
+Suzuki K Poulose (4):
+  kvmtool: Allow backends to run checks on the KVM device fd
+  kvmtool: arm64: Add support for guest physical address size
+  kvmtool: arm64: Switch memory layout
+  kvmtool: arm: Add support for creating VM with PA size
+
+ arm/aarch32/include/kvm/kvm-arch.h        |  1 +
+ arm/aarch64/include/kvm/kvm-arch.h        | 15 ++++++++++++---
+ arm/aarch64/include/kvm/kvm-config-arch.h |  5 ++++-
+ arm/include/arm-common/kvm-arch.h         | 17 +++++++++++------
+ arm/include/arm-common/kvm-config-arch.h  |  1 +
+ arm/kvm.c                                 | 23 ++++++++++++++++++++++-
+ include/kvm/kvm.h                         |  4 ++++
+ kvm.c                                     |  2 ++
+ 8 files changed, 57 insertions(+), 11 deletions(-)
+
 -- 
-Jazz is not dead. It just smells funny...
+2.7.4
