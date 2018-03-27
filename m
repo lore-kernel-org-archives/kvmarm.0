@@ -1,7 +1,7 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [RFC v2 01/12] KVM: arm/arm64: Set dist->spis to NULL after kfree
-Date: Tue, 27 Mar 2018 16:04:05 +0200
-Message-ID: <1522159456-10419-2-git-send-email-eric.auger@redhat.com>
+Subject: [RFC v2 02/12] KVM: arm/arm64: Document KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+Date: Tue, 27 Mar 2018 16:04:06 +0200
+Message-ID: <1522159456-10419-3-git-send-email-eric.auger@redhat.com>
 References: <1522159456-10419-1-git-send-email-eric.auger@redhat.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1522159456-10419-1-git-send-email-eric.auger@redhat.com>
@@ -10,30 +10,48 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.or
 Cc: andre.przywara@arm.com, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-in case kvm_vgic_map_resources() fails, typically if the vgic
-distributor is not defined, __kvm_vgic_destroy will be called
-several times. Indeed kvm_vgic_map_resources() is called on
-first vcpu run. As a result dist->spis is freeed more than once
-and on the second time it causes a "kernel BUG at mm/slub.c:3912!"
+We introduce a new KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION attribute in
+KVM_DEV_ARM_VGIC_GRP_ADDR group. It allows userspace to provide the
+base address and size of a redistributor region
 
-Set dist->spis to NULL to avoid the crash.
+Compared to KVM_VGIC_V3_ADDR_TYPE_REDIST, this new attribute allows
+to declare several separate redistributor regions.
+
+So the whole redist space does not need to be contiguous anymore.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- virt/kvm/arm/vgic/vgic-init.c | 1 +
- 1 file changed, 1 insertion(+)
+ Documentation/virtual/kvm/devices/arm-vgic-v3.txt | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index 743ca5c..3349f2b 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -325,6 +325,7 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
- 	dist->initialized = false;
- 
- 	kfree(dist->spis);
-+	dist->spis = NULL;
- 	dist->nr_spis = 0;
- 
- 	if (vgic_supports_direct_msis(kvm))
+diff --git a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+index 9293b45..0ded904 100644
+--- a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
++++ b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+@@ -27,6 +27,24 @@ Groups:
+       VCPU and all of the redistributor pages are contiguous.
+       Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
+       This address needs to be 64K aligned.
++
++    KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION (rw, 64-bit)
++      The attr field of kvm_device_attr encodes 3 values:
++      bits:     | 63   ....  52  |  51   ....   16 | 15 - 12  |11 - 0
++      values:   |     count      |       base      |  flags   | index
++      - index encodes the unique redistributor region index
++      - flags: reserved for future use, currently 0
++      - base field encodes bits [51:16] of the guest physical base address
++        of the first redistributor in the region. There are two 64K pages
++        for each VCPU and all of the redistributor pages are contiguous
++        within the redistributor region.
++      - count encodes the number of redistributors in the region.
++      Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
++
++  It is invalid to mix calls with KVM_VGIC_V3_ADDR_TYPE_REDIST and
++  KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION attributes. When attempted an
++  -EINVAL error is returned.
++
+   Errors:
+     -E2BIG:  Address outside of addressable IPA range
+     -EINVAL: Incorrectly aligned address
 -- 
 2.5.5
