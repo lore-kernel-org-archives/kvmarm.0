@@ -1,48 +1,69 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v2 07/17] kvm: arm/arm64: Remove spurious WARN_ON
-Date: Tue, 27 Mar 2018 14:15:17 +0100
-Message-ID: <1522156531-28348-8-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH v2 16/17] kvm: arm64: Add support for handling 52bit IPA
+Date: Tue, 27 Mar 2018 14:15:26 +0100
+Message-ID: <1522156531-28348-17-git-send-email-suzuki.poulose@arm.com>
 References: <1522156531-28348-1-git-send-email-suzuki.poulose@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1522156531-28348-1-git-send-email-suzuki.poulose@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Sender: linux-kernel-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org
-Cc: mark.rutland@arm.com, peter.maydell@linaro.org, ard.biesheuvel@linaro.org, cdall@kernel.org, kvm@vger.kernel.org, rkrcmar@redhat.com, marc.zyngier@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, cdall@kernel.org, marc.zyngier@arm.com, punit.agrawal@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, ard.biesheuvel@linaro.org, peter.maydell@linaro.org, kristina.martsenko@arm.com, mark.rutland@arm.com, Suzuki K Poulose <suzuki.poulose@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On a 4-level page table pgd entry can be empty, unlike a 3-level
-page table. Remove the spurious WARN_ON() in stage_get_pud().
+Add support for handling the 52bit IPA. 52bit IPA
+support needs changes to the following :
+
+ 1) Page-table entries - We use kernel page table helpers for setting
+ up the stage2. Hence we don't explicit changes here
+
+ 2) VTTBR:BADDR - This is already supported with :
+   commit 529c4b05a3cb2f324aa ("arm64: handle 52-bit addresses in TTBR")
+
+ 3) VGIC support for 52bit: Supported with a patch in this series.
+
+That leaves us with the handling for PAR and HPAR. This patch adds
+support for handling the 52bit addresses in PAR and HPFAR,
+which are used while handling the permission faults in stage1.
 
 Cc: Marc Zyngier <marc.zyngier@arm.com>
-Acked-by: Christoffer Dall <cdall@kernel.org>
+Cc: Kristina Martsenko <kristina.martsenko@arm.com>
+Cc: Christoffer Dall <cdall@kernel.org>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- virt/kvm/arm/mmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_arm.h | 7 +++++++
+ arch/arm64/kvm/hyp/switch.c      | 2 +-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 16a19fb..9cba334 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -862,7 +862,7 @@ static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
- 	pud_t *pud;
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 2b278dc..e48852c 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -302,6 +302,13 @@
  
- 	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
--	if (WARN_ON(stage2_pgd_none(*pgd))) {
-+	if (stage2_pgd_none(*pgd)) {
- 		if (!cache)
- 			return NULL;
- 		pud = mmu_memory_cache_alloc(cache);
+ /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+ #define HPFAR_MASK	(~UL(0xf))
++/*
++ * We have
++ *	PAR	[PA_Shift - 1	: 12] = PA	[PA_Shift - 1 : 12]
++ *	HPFAR	[PA_Shift - 9	: 4]  = FIPA	[PA_Shift - 1 : 12]
++ */
++#define PAR_TO_HPFAR(par)		\
++	(((par) & GENMASK_ULL(PHYS_MASK_SHIFT - 1, 12)) >> 8)
+ 
+ #define kvm_arm_exception_type	\
+ 	{0, "IRQ" }, 		\
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 794da55..b785853 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -241,7 +241,7 @@ static bool __hyp_text __translate_far_to_hpfar(u64 far, u64 *hpfar)
+ 		return false; /* Translation failed, back to guest */
+ 
+ 	/* Convert PAR to HPFAR format */
+-	*hpfar = ((tmp >> 12) & ((1UL << 36) - 1)) << 4;
++	*hpfar = PAR_TO_HPFAR(tmp);
+ 	return true;
+ }
+ 
 -- 
 2.7.4
