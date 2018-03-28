@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 03/85] arm64/kvm: Prohibit guest LOR accesses
-Date: Wed, 28 Mar 2018 13:51:32 +0100
-Message-ID: <20180328125254.31380-4-marc.zyngier@arm.com>
+Subject: [PATCH 04/85] arm64: KVM: Move CPU ID reg trap setup off the world
+ switch path
+Date: Wed, 28 Mar 2018 13:51:33 +0100
+Message-ID: <20180328125254.31380-5-marc.zyngier@arm.com>
 References: <20180328125254.31380-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 58EB749FD8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:45:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8933F49FDE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:45:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id k70jv0FR0iOL for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Mar 2018 08:45:07 -0400 (EDT)
+ with ESMTP id M+DoJcthgfiq for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Mar 2018 08:45:11 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 48F0B40357
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:45:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 56D7C42121
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:45:11 -0400 (EDT)
 In-Reply-To: <20180328125254.31380-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,155 +32,63 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: Christoffer Dall <cdall@cs.columbia.edu>, Shunyong Yang <shunyong.yang@hxt-semitech.com>, Julien Thierry <julien.thierry@arm.com>, Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Catalin Marinas <catalin.marinas@arm.com>, Dave Martin <Dave.Martin@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Mark Rutland <mark.rutland@arm.com>
+From: Dave Martin <Dave.Martin@arm.com>
 
-We don't currently limit guest accesses to the LOR registers, which we
-neither virtualize nor context-switch. As such, guests are provided with
-unusable information/controls, and are not isolated from each other (or
-the host).
+The HCR_EL2.TID3 flag needs to be set when trapping guest access to
+the CPU ID registers is required.  However, the decision about
+whether to set this bit does not need to be repeated at every
+switch to the guest.
 
-To prevent these issues, we can trap register accesses and present the
-illusion LORegions are unssupported by the CPU. To do this, we mask
-ID_AA64MMFR1.LO, and set HCR_EL2.TLOR to trap accesses to the following
-registers:
+Instead, it's sufficient to make this decision once and record the
+outcome.
 
-* LORC_EL1
-* LOREA_EL1
-* LORID_EL1
-* LORN_EL1
-* LORSA_EL1
+This patch moves the decision to vcpu_reset_hcr() and records the
+choice made in vcpu->arch.hcr_el2.  The world switch code can then
+load this directly when switching to the guest without the need for
+conditional logic on the critical path.
 
-... when trapped, we inject an UNDEFINED exception to EL1, simulating
-their non-existence.
-
-As noted in D7.2.67, when no LORegions are implemented, LoadLOAcquire
-and StoreLORelease must behave as LoadAcquire and StoreRelease
-respectively. We can ensure this by clearing LORC_EL1.EN when a CPU's
-EL2 is first initialized, as the host kernel will not modify this.
-
-Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Cc: Vladimir Murzin <vladimir.murzin@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+Suggested-by: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Will Deacon <will.deacon@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/include/asm/kvm_arm.h |  4 +++-
- arch/arm64/include/asm/sysreg.h  |  6 ++++++
- arch/arm64/kernel/head.S         |  7 +++++++
- arch/arm64/kvm/sys_regs.c        | 20 ++++++++++++++++++++
- 4 files changed, 36 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_emulate.h | 8 ++++++++
+ arch/arm64/kvm/hyp/switch.c          | 4 ----
+ 2 files changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index b0c84171e6a3..1b438c334463 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -25,6 +25,7 @@
- /* Hyp Configuration Register (HCR) bits */
- #define HCR_TEA		(UL(1) << 37)
- #define HCR_TERR	(UL(1) << 36)
-+#define HCR_TLOR	(UL(1) << 35)
- #define HCR_E2H		(UL(1) << 34)
- #define HCR_ID		(UL(1) << 33)
- #define HCR_CD		(UL(1) << 32)
-@@ -64,6 +65,7 @@
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 413dc82b1e89..4610bc818097 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -59,6 +59,14 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
  
- /*
-  * The bits we set in HCR:
-+ * TLOR:	Trap LORegion register accesses
-  * RW:		64bit by default, can be overridden for 32bit VMs
-  * TAC:		Trap ACTLR
-  * TSC:		Trap SMC
-@@ -81,7 +83,7 @@
-  */
- #define HCR_GUEST_FLAGS (HCR_TSC | HCR_TSW | HCR_TWE | HCR_TWI | HCR_VM | \
- 			 HCR_TVM | HCR_BSU_IS | HCR_FB | HCR_TAC | \
--			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW)
-+			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR)
- #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
- #define HCR_INT_OVERRIDE   (HCR_FMO | HCR_IMO)
- #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 0e1960c59197..69a99856461c 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -288,6 +288,12 @@
- #define SYS_MAIR_EL1			sys_reg(3, 0, 10, 2, 0)
- #define SYS_AMAIR_EL1			sys_reg(3, 0, 10, 3, 0)
- 
-+#define SYS_LORSA_EL1			sys_reg(3, 0, 10, 4, 0)
-+#define SYS_LOREA_EL1			sys_reg(3, 0, 10, 4, 1)
-+#define SYS_LORN_EL1			sys_reg(3, 0, 10, 4, 2)
-+#define SYS_LORC_EL1			sys_reg(3, 0, 10, 4, 3)
-+#define SYS_LORID_EL1			sys_reg(3, 0, 10, 4, 7)
+ 	if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features))
+ 		vcpu->arch.hcr_el2 &= ~HCR_RW;
 +
- #define SYS_VBAR_EL1			sys_reg(3, 0, 12, 0, 0)
- #define SYS_DISR_EL1			sys_reg(3, 0, 12, 1, 1)
- 
-diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
-index 2b6b8b24e5ab..b0853069702f 100644
---- a/arch/arm64/kernel/head.S
-+++ b/arch/arm64/kernel/head.S
-@@ -577,6 +577,13 @@ set_hcr:
- 7:
- 	msr	mdcr_el2, x3			// Configure debug traps
- 
-+	/* LORegions */
-+	mrs	x1, id_aa64mmfr1_el1
-+	ubfx	x0, x1, #ID_AA64MMFR1_LOR_SHIFT, 4
-+	cbz	x0, 1f
-+	msr_s	SYS_LORC_EL1, xzr
-+1:
-+
- 	/* Stage-2 translation */
- 	msr	vttbr_el2, xzr
- 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 50a43c7b97ca..55982b565eb2 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -175,6 +175,14 @@ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
- 		return read_zero(vcpu, p);
++	/*
++	 * TID3: trap feature register accesses that we virtualise.
++	 * For now this is conditional, since no AArch32 feature regs
++	 * are currently virtualised.
++	 */
++	if (vcpu->arch.hcr_el2 & HCR_RW)
++		vcpu->arch.hcr_el2 |= HCR_TID3;
  }
  
-+static bool trap_undef(struct kvm_vcpu *vcpu,
-+		       struct sys_reg_params *p,
-+		       const struct sys_reg_desc *r)
-+{
-+	kvm_inject_undefined(vcpu);
-+	return false;
-+}
-+
- static bool trap_oslsr_el1(struct kvm_vcpu *vcpu,
- 			   struct sys_reg_params *p,
- 			   const struct sys_reg_desc *r)
-@@ -893,6 +901,12 @@ static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
- 				    task_pid_nr(current));
- 
- 		val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
-+	} else if (id == SYS_ID_AA64MMFR1_EL1) {
-+		if (val & (0xfUL << ID_AA64MMFR1_LOR_SHIFT))
-+			pr_err_once("kvm [%i]: LORegions unsupported for guests, suppressing\n",
-+				    task_pid_nr(current));
-+
-+		val &= ~(0xfUL << ID_AA64MMFR1_LOR_SHIFT);
+ static inline unsigned long vcpu_get_hcr(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 870f4b1587f9..24f52fedfb9e 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -91,10 +91,6 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+ 		write_sysreg(1 << 30, fpexc32_el2);
+ 		isb();
  	}
+-
+-	if (val & HCR_RW) /* for AArch64 only: */
+-		val |= HCR_TID3; /* TID3: trap feature register accesses */
+-
+ 	write_sysreg(val, hcr_el2);
  
- 	return val;
-@@ -1178,6 +1192,12 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 },
- 	{ SYS_DESC(SYS_AMAIR_EL1), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
- 
-+	{ SYS_DESC(SYS_LORSA_EL1), trap_undef },
-+	{ SYS_DESC(SYS_LOREA_EL1), trap_undef },
-+	{ SYS_DESC(SYS_LORN_EL1), trap_undef },
-+	{ SYS_DESC(SYS_LORC_EL1), trap_undef },
-+	{ SYS_DESC(SYS_LORID_EL1), trap_undef },
-+
- 	{ SYS_DESC(SYS_VBAR_EL1), NULL, reset_val, VBAR_EL1, 0 },
- 	{ SYS_DESC(SYS_DISR_EL1), NULL, reset_val, DISR_EL1, 0 },
- 
+ 	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN) && (val & HCR_VSE))
 -- 
 2.14.2
