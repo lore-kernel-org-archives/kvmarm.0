@@ -1,23 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 29/85] KVM: arm64: Remove noop calls to timer save/restore
- from VHE switch
-Date: Wed, 28 Mar 2018 13:51:58 +0100
-Message-ID: <20180328125254.31380-30-marc.zyngier@arm.com>
+Subject: [PATCH 30/85] KVM: arm64: Move userspace system registers into
+ separate function
+Date: Wed, 28 Mar 2018 13:51:59 +0100
+Message-ID: <20180328125254.31380-31-marc.zyngier@arm.com>
 References: <20180328125254.31380-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DAC184A058
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:49:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 815B24A0E7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:49:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cKP-0doDA3wF for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Mar 2018 08:49:24 -0400 (EDT)
+ with ESMTP id BxLW0jWw2kQf for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Mar 2018 08:49:27 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 764DC40357
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:46:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CE97C49FDF
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:46:59 -0400 (EDT)
 In-Reply-To: <20180328125254.31380-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,101 +34,147 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Christoffer Dall <christoffer.dall@linaro.org>
 
-The VHE switch function calls __timer_enable_traps and
-__timer_disable_traps which don't do anything on VHE systems.
-Therefore, simply remove these calls from the VHE switch function and
-make the functions non-conditional as they are now only called from the
-non-VHE switch path.
+There's a semantic difference between the EL1 registers that control
+operation of a kernel running in EL1 and EL1 registers that only control
+userspace execution in EL0.  Since we can defer saving/restoring the
+latter, move them into their own function.
 
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+The ARMv8 ARM (ARM DDI 0487C.a) Section D10.2.1 recommends that
+ACTLR_EL1 has no effect on the processor when running the VHE host, and
+we can therefore move this register into the EL1 state which is only
+saved/restored on vcpu_put/load for a VHE host.
+
+We also take this chance to rename the function saving/restoring the
+remaining system register to make it clear this function deals with
+the EL1 system registers.
+
 Reviewed-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp/switch.c |  2 --
- virt/kvm/arm/hyp/timer-sr.c | 44 ++++++++++++++++++++++----------------------
- 2 files changed, 22 insertions(+), 24 deletions(-)
+ arch/arm64/kvm/hyp/sysreg-sr.c | 48 ++++++++++++++++++++++++++++++------------
+ 1 file changed, 35 insertions(+), 13 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 9ffd802e775d..307f8c1fcc2f 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -379,7 +379,6 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 	__activate_vm(vcpu->kvm);
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index 99fc60516103..d5a5145b4e7c 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -28,24 +28,33 @@ static void __hyp_text __sysreg_do_nothing(struct kvm_cpu_context *ctxt) { }
+ /*
+  * Non-VHE: Both host and guest must save everything.
+  *
+- * VHE: Host must save tpidr*_el0, actlr_el1, mdscr_el1, sp_el0,
++ * VHE: Host must save tpidr*_el0, mdscr_el1, sp_el0,
+  * and guest must save everything.
+  */
  
- 	__vgic_restore_state(vcpu);
--	__timer_enable_traps(vcpu);
- 
- 	/*
- 	 * We must restore the 32-bit state before the sysregs, thanks
-@@ -400,7 +399,6 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 
- 	__sysreg_save_guest_state(guest_ctxt);
- 	__sysreg32_save_state(vcpu);
--	__timer_disable_traps(vcpu);
- 	__vgic_save_state(vcpu);
- 
- 	__deactivate_traps(vcpu);
-diff --git a/virt/kvm/arm/hyp/timer-sr.c b/virt/kvm/arm/hyp/timer-sr.c
-index f24404b3c8df..77754a62eb0c 100644
---- a/virt/kvm/arm/hyp/timer-sr.c
-+++ b/virt/kvm/arm/hyp/timer-sr.c
-@@ -27,34 +27,34 @@ void __hyp_text __kvm_timer_set_cntvoff(u32 cntvoff_low, u32 cntvoff_high)
- 	write_sysreg(cntvoff, cntvoff_el2);
- }
- 
-+/*
-+ * Should only be called on non-VHE systems.
-+ * VHE systems use EL2 timers and configure EL1 timers in kvm_timer_init_vhe().
-+ */
- void __hyp_text __timer_disable_traps(struct kvm_vcpu *vcpu)
+ static void __hyp_text __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
  {
--	/*
--	 * We don't need to do this for VHE since the host kernel runs in EL2
--	 * with HCR_EL2.TGE ==1, which makes those bits have no impact.
--	 */
--	if (!has_vhe()) {
--		u64 val;
-+	u64 val;
- 
--		/* Allow physical timer/counter access for the host */
--		val = read_sysreg(cnthctl_el2);
--		val |= CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN;
--		write_sysreg(val, cnthctl_el2);
--	}
-+	/* Allow physical timer/counter access for the host */
-+	val = read_sysreg(cnthctl_el2);
-+	val |= CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN;
-+	write_sysreg(val, cnthctl_el2);
- }
- 
-+/*
-+ * Should only be called on non-VHE systems.
-+ * VHE systems use EL2 timers and configure EL1 timers in kvm_timer_init_vhe().
-+ */
- void __hyp_text __timer_enable_traps(struct kvm_vcpu *vcpu)
- {
--	if (!has_vhe()) {
--		u64 val;
-+	u64 val;
- 
--		/*
--		 * Disallow physical timer access for the guest
--		 * Physical counter access is allowed
--		 */
--		val = read_sysreg(cnthctl_el2);
--		val &= ~CNTHCTL_EL1PCEN;
--		val |= CNTHCTL_EL1PCTEN;
--		write_sysreg(val, cnthctl_el2);
--	}
+-	ctxt->sys_regs[ACTLR_EL1]	= read_sysreg(actlr_el1);
+-	ctxt->sys_regs[TPIDR_EL0]	= read_sysreg(tpidr_el0);
+-	ctxt->sys_regs[TPIDRRO_EL0]	= read_sysreg(tpidrro_el0);
+ 	ctxt->sys_regs[MDSCR_EL1]	= read_sysreg(mdscr_el1);
++
 +	/*
-+	 * Disallow physical timer access for the guest
-+	 * Physical counter access is allowed
++	 * The host arm64 Linux uses sp_el0 to point to 'current' and it must
++	 * therefore be saved/restored on every entry/exit to/from the guest.
 +	 */
-+	val = read_sysreg(cnthctl_el2);
-+	val &= ~CNTHCTL_EL1PCEN;
-+	val |= CNTHCTL_EL1PCTEN;
-+	write_sysreg(val, cnthctl_el2);
+ 	ctxt->gp_regs.regs.sp		= read_sysreg(sp_el0);
  }
+ 
+-static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
++static void __hyp_text __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
++{
++	ctxt->sys_regs[TPIDR_EL0]	= read_sysreg(tpidr_el0);
++	ctxt->sys_regs[TPIDRRO_EL0]	= read_sysreg(tpidrro_el0);
++}
++
++static void __hyp_text __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+ {
+ 	ctxt->sys_regs[MPIDR_EL1]	= read_sysreg(vmpidr_el2);
+ 	ctxt->sys_regs[CSSELR_EL1]	= read_sysreg(csselr_el1);
+ 	ctxt->sys_regs[SCTLR_EL1]	= read_sysreg_el1(sctlr);
++	ctxt->sys_regs[ACTLR_EL1]	= read_sysreg(actlr_el1);
+ 	ctxt->sys_regs[CPACR_EL1]	= read_sysreg_el1(cpacr);
+ 	ctxt->sys_regs[TTBR0_EL1]	= read_sysreg_el1(ttbr0);
+ 	ctxt->sys_regs[TTBR1_EL1]	= read_sysreg_el1(ttbr1);
+@@ -73,35 +82,46 @@ static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
+ }
+ 
+ static hyp_alternate_select(__sysreg_call_save_host_state,
+-			    __sysreg_save_state, __sysreg_do_nothing,
++			    __sysreg_save_el1_state, __sysreg_do_nothing,
+ 			    ARM64_HAS_VIRT_HOST_EXTN);
+ 
+ void __hyp_text __sysreg_save_host_state(struct kvm_cpu_context *ctxt)
+ {
+ 	__sysreg_call_save_host_state()(ctxt);
+ 	__sysreg_save_common_state(ctxt);
++	__sysreg_save_user_state(ctxt);
+ }
+ 
+ void __hyp_text __sysreg_save_guest_state(struct kvm_cpu_context *ctxt)
+ {
+-	__sysreg_save_state(ctxt);
++	__sysreg_save_el1_state(ctxt);
+ 	__sysreg_save_common_state(ctxt);
++	__sysreg_save_user_state(ctxt);
+ }
+ 
+ static void __hyp_text __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
+ {
+-	write_sysreg(ctxt->sys_regs[ACTLR_EL1],	  actlr_el1);
+-	write_sysreg(ctxt->sys_regs[TPIDR_EL0],	  tpidr_el0);
+-	write_sysreg(ctxt->sys_regs[TPIDRRO_EL0], tpidrro_el0);
+ 	write_sysreg(ctxt->sys_regs[MDSCR_EL1],	  mdscr_el1);
++
++	/*
++	 * The host arm64 Linux uses sp_el0 to point to 'current' and it must
++	 * therefore be saved/restored on every entry/exit to/from the guest.
++	 */
+ 	write_sysreg(ctxt->gp_regs.regs.sp,	  sp_el0);
+ }
+ 
+-static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
++static void __hyp_text __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
++{
++	write_sysreg(ctxt->sys_regs[TPIDR_EL0],	  	tpidr_el0);
++	write_sysreg(ctxt->sys_regs[TPIDRRO_EL0], 	tpidrro_el0);
++}
++
++static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+ {
+ 	write_sysreg(ctxt->sys_regs[MPIDR_EL1],		vmpidr_el2);
+ 	write_sysreg(ctxt->sys_regs[CSSELR_EL1],	csselr_el1);
+ 	write_sysreg_el1(ctxt->sys_regs[SCTLR_EL1],	sctlr);
++	write_sysreg(ctxt->sys_regs[ACTLR_EL1],	  	actlr_el1);
+ 	write_sysreg_el1(ctxt->sys_regs[CPACR_EL1],	cpacr);
+ 	write_sysreg_el1(ctxt->sys_regs[TTBR0_EL1],	ttbr0);
+ 	write_sysreg_el1(ctxt->sys_regs[TTBR1_EL1],	ttbr1);
+@@ -129,19 +149,21 @@ static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
+ }
+ 
+ static hyp_alternate_select(__sysreg_call_restore_host_state,
+-			    __sysreg_restore_state, __sysreg_do_nothing,
++			    __sysreg_restore_el1_state, __sysreg_do_nothing,
+ 			    ARM64_HAS_VIRT_HOST_EXTN);
+ 
+ void __hyp_text __sysreg_restore_host_state(struct kvm_cpu_context *ctxt)
+ {
+ 	__sysreg_call_restore_host_state()(ctxt);
+ 	__sysreg_restore_common_state(ctxt);
++	__sysreg_restore_user_state(ctxt);
+ }
+ 
+ void __hyp_text __sysreg_restore_guest_state(struct kvm_cpu_context *ctxt)
+ {
+-	__sysreg_restore_state(ctxt);
++	__sysreg_restore_el1_state(ctxt);
+ 	__sysreg_restore_common_state(ctxt);
++	__sysreg_restore_user_state(ctxt);
+ }
+ 
+ void __hyp_text __sysreg32_save_state(struct kvm_vcpu *vcpu)
 -- 
 2.14.2
