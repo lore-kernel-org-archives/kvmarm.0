@@ -1,21 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [GIT PULL] KVM/ARM updates for v4.17
-Date: Wed, 28 Mar 2018 13:51:29 +0100
-Message-ID: <20180328125254.31380-1-marc.zyngier@arm.com>
+Subject: [PATCH 01/85] KVM: arm/arm64: Fix arch timers with userspace irqchips
+Date: Wed, 28 Mar 2018 13:51:30 +0100
+Message-ID: <20180328125254.31380-2-marc.zyngier@arm.com>
+References: <20180328125254.31380-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6686149F8B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:45:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 098A849FBC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:45:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id m1kb5ikOqnaN for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Mar 2018 08:44:55 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 76C454029E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:44:55 -0400 (EDT)
+ with ESMTP id H9ugUesEhgx9 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Mar 2018 08:44:59 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2331D40170
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:44:59 -0400 (EDT)
+In-Reply-To: <20180328125254.31380-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -26,209 +28,258 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Cc: Christoffer Dall <cdall@cs.columbia.edu>, Shunyong Yang <shunyong.yang@hxt-semitech.com>, Julien Thierry <julien.thierry@arm.com>, Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Catalin Marinas <catalin.marinas@arm.com>, Dave Martin <Dave.Martin@arm.com>
+Cc: Christoffer Dall <cdall@cs.columbia.edu>, Christoffer Dall <christoffer.dall@linaro.org>, Shunyong Yang <shunyong.yang@hxt-semitech.com>, Julien Thierry <julien.thierry@arm.com>, Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Catalin Marinas <catalin.marinas@arm.com>, Dave Martin <Dave.Martin@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-UGFvbG8sIFJhZGltLAoKVGhpcyBpcyB0aGUgKHJhdGhlciBiaWcpIHNldCBvZiB1cGRhdGVzIGZv
-ciBLVk0vQVJNIGZvciB2NC4xNy4gVGhlCm1haW4gZmVhdHVyZXMgYXJlIHRoZSBzZXQgb2YgVkhF
-IG9wdGltaXphdGlvbnMgdGFraW5nIGFkdmFudGFnZSBvZgpDUFVzIGltcGxlbWVudGluZyBBUk12
-OC4xLCB0b2dldGhlciB3aXRoIHRoZSBFTDIgcmFuZG9taXphdGlvbiBwYXRjaGVzCnRoYXQgYXJl
-IHRoZSBmb3VuZGF0aW9uIGZvciBtaXRpZ2F0aW5nIHRoZSBzby1jYWxsZWQgdmFyaWFudCAzYQpz
-ZWN1cml0eSBpc3N1ZSAoYWZmZWN0aW5nIENvcnRleC1BNTcgYW5kIEE3MikuCgpUaGUgcmVzdCBp
-cyB0aGUgdXN1YWwgbWl4IG9mIHZnaWMgZml4ZXMgYW5kIG1pbm9yIGltcHJvdmVtZW50cy4KCk5v
-dGUgdGhhdCB0aGUgYnJlYWt1cCBiZWxvdyBpcyBzbGlnaHRseSBtaXNsZWFkaW5nLCBhcyBpdCBp
-bmNsdWRlcwpmaXhlcyB0aGF0IGhhdmUgYWxyZWFkeSBsYW5kZWQgaW4gbWFpbmxpbmUgKEkndmUg
-ZG9uZSBhIGRpcmVjdCBtZXJnZQpvZiB0aGUgZml4ZXMgYnJhbmNoIGluIG9yZGVyIHRvIHNwYXJl
-IGV2ZXJ5b25lIHNvbWUgaG9ycmlibGUKY29uZmxpY3RzKS4KCkFsc28sIHdlJ3ZlIGhhZCB0byBy
-ZXZlcnQgYSBwcmV0dHkgaW1wb3J0YW50IHBhdGNoIGZvciBRdWFsY29tbQpzZXJ2ZXJzIGR1ZSB0
-byBzb21lIG1vcmUgY29uZmxpY3RzIHdpdGggdGhlIGFybTY0IHRyZWUpLiBUaGF0IHBhdGNoCndp
-bGwgYmUgcmVzZW50IG9uY2UgYm90aCB0cmVlcyBoYXZlIGJlZW4gcHVsbGVkIGludG8gTGludXMn
-ICh0aGUKc29vbmVyLCB0aGUgYmV0dGVyKS4KClBsZWFzZSBwdWxsLgoKCU0uCgpUaGUgZm9sbG93
-aW5nIGNoYW5nZXMgc2luY2UgY29tbWl0IDRhMzkyOGM2ZjhhNTNmYTFhZWQyOGNjYmEyMjc3NDI0
-ODZlOGRkY2I6CgogIExpbnV4IDQuMTYtcmMzICgyMDE4LTAyLTI1IDE4OjUwOjQxIC0wODAwKQoK
-YXJlIGF2YWlsYWJsZSBpbiB0aGUgZ2l0IHJlcG9zaXRvcnkgYXQ6CgogIGdpdDovL2dpdC5rZXJu
-ZWwub3JnL3B1Yi9zY20vbGludXgva2VybmVsL2dpdC9rdm1hcm0va3ZtYXJtLmdpdCB0YWdzL2t2
-bS1hcm0tZm9yLXY0LjE3Cgpmb3IgeW91IHRvIGZldGNoIGNoYW5nZXMgdXAgdG8gZGM2ZWQ2MWQy
-ZjgyNGE1OTUwMzM3NDRmYzFmM2JmNGNiOTg3NjhiNToKCiAgYXJtNjQ6IEFkZCB0ZW1wb3Jhcnkg
-RVJSQVRBX01JRFJfQUxMX1ZFUlNJT05TIGNvbXBhdGliaWxpdHkgbWFjcm8gKDIwMTgtMDMtMjgg
-MTI6NTc6MjMgKzAxMDApCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCktWTS9BUk0gdXBkYXRlcyBmb3IgdjQuMTcKCi0gVkhF
-IG9wdGltaXphdGlvbnMKLSBFTDIgYWRkcmVzcyBzcGFjZSByYW5kb21pemF0aW9uCi0gVmFyaWFu
-dCAzYSBtaXRpZ2F0aW9uIGZvciBDb3J0ZXgtQTU3IGFuZCBBNzIKLSBUaGUgdXN1YWwgdmdpYyBm
-aXhlcwotIFZhcmlvdXMgbWlub3IgdGlkeWluZy11cAoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpBbmRyZSBQcnp5d2FyYSAo
-MSk6CiAgICAgIEtWTTogYXJtL2FybTY0OiB2Z2ljOiBBZGQgbWlzc2luZyBpcnFfbG9jayB0byB2
-Z2ljX21taW9fcmVhZF9wZW5kaW5nCgpBcmQgQmllc2hldXZlbCAoMSk6CiAgICAgIEtWTTogYXJt
-L2FybTY0OiBSZWR1Y2UgdmVyYm9zaXR5IG9mIEtWTSBpbml0IGxvZwoKQXJuZCBCZXJnbWFubiAo
-MSk6CiAgICAgIEFSTToga3ZtOiBmaXggYnVpbGRpbmcgd2l0aCBnY2MtOAoKQ2hyaXN0b2ZmZXIg
-RGFsbCAoNDIpOgogICAgICBLVk06IGFybS9hcm02NDogRml4IGFyY2ggdGltZXJzIHdpdGggdXNl
-cnNwYWNlIGlycWNoaXBzCiAgICAgIEtWTTogYXJtL2FybTY0OiBBdm9pZCB2Y3B1X2xvYWQgZm9y
-IG90aGVyIHZjcHUgaW9jdGxzIHRoYW4gS1ZNX1JVTgogICAgICBLVk06IGFybS9hcm02NDogUmVz
-ZXQgbWFwcGVkIElSUXMgb24gVk0gcmVzZXQKICAgICAgS1ZNOiBhcm0vYXJtNjQ6IEF2b2lkIHZj
-cHVfbG9hZCBmb3Igb3RoZXIgdmNwdSBpb2N0bHMgdGhhbiBLVk1fUlVOCiAgICAgIEtWTTogYXJt
-L2FybTY0OiBNb3ZlIHZjcHVfbG9hZCBjYWxsIGFmdGVyIGt2bV92Y3B1X2ZpcnN0X3J1bl9pbml0
-CiAgICAgIEtWTTogYXJtNjQ6IEF2b2lkIHN0b3JpbmcgdGhlIHZjcHUgcG9pbnRlciBvbiB0aGUg
-c3RhY2sKICAgICAgS1ZNOiBhcm02NDogUmV3b3JrIGh5cF9wYW5pYyBmb3IgVkhFIGFuZCBub24t
-VkhFCiAgICAgIEtWTTogYXJtL2FybTY0OiBHZXQgcmlkIG9mIHZjcHUtPmFyY2guaXJxX2xpbmVz
-CiAgICAgIEtWTTogYXJtL2FybTY0OiBBZGQga3ZtX3ZjcHVfbG9hZF9zeXNyZWdzIGFuZCBrdm1f
-dmNwdV9wdXRfc3lzcmVncwogICAgICBLVk06IGFybS9hcm02NDogSW50cm9kdWNlIHZjcHVfZWwx
-X2lzXzMyYml0CiAgICAgIEtWTTogYXJtNjQ6IE1vdmUgZGVidWcgZGlydHkgZmxhZyBjYWxjdWxh
-dGlvbiBvdXQgb2Ygd29ybGQgc3dpdGNoCiAgICAgIEtWTTogYXJtNjQ6IFNsaWdodGx5IGltcHJv
-dmUgZGVidWcgc2F2ZS9yZXN0b3JlIGZ1bmN0aW9ucwogICAgICBLVk06IGFybTY0OiBJbXByb3Zl
-IGRlYnVnIHJlZ2lzdGVyIHNhdmUvcmVzdG9yZSBmbG93CiAgICAgIEtWTTogYXJtNjQ6IEZhY3Rv
-ciBvdXQgZmF1bHQgaW5mbyBwb3B1bGF0aW9uIGFuZCBnaWMgd29ya2Fyb3VuZHMKICAgICAgS1ZN
-OiBhcm02NDogSW50cm9kdWNlIFZIRS1zcGVjaWZpYyBrdm1fdmNwdV9ydW4KICAgICAgS1ZNOiBh
-cm02NDogUmVtb3ZlIGtlcm5faHlwX3ZhKCkgdXNlIGluIFZIRSBzd2l0Y2ggZnVuY3Rpb24KICAg
-ICAgS1ZNOiBhcm02NDogRG9uJ3QgZGVhY3RpdmF0ZSBWTSBvbiBWSEUgc3lzdGVtcwogICAgICBL
-Vk06IGFybTY0OiBSZW1vdmUgbm9vcCBjYWxscyB0byB0aW1lciBzYXZlL3Jlc3RvcmUgZnJvbSBW
-SEUgc3dpdGNoCiAgICAgIEtWTTogYXJtNjQ6IE1vdmUgdXNlcnNwYWNlIHN5c3RlbSByZWdpc3Rl
-cnMgaW50byBzZXBhcmF0ZSBmdW5jdGlvbgogICAgICBLVk06IGFybTY0OiBSZXdyaXRlIHN5c3Jl
-ZyBhbHRlcm5hdGl2ZXMgdG8gc3RhdGljIGtleXMKICAgICAgS1ZNOiBhcm02NDogSW50cm9kdWNl
-IHNlcGFyYXRlIFZIRS9ub24tVkhFIHN5c3JlZyBzYXZlL3Jlc3RvcmUgZnVuY3Rpb25zCiAgICAg
-IEtWTTogYXJtL2FybTY0OiBSZW1vdmUgbGVmdG92ZXIgY29tbWVudCBmcm9tIGt2bV92Y3B1X3J1
-bl92aGUKICAgICAgS1ZNOiBhcm02NDogVW5pZnkgbm9uLVZIRSBob3N0L2d1ZXN0IHN5c3JlZyBz
-YXZlIGFuZCByZXN0b3JlIGZ1bmN0aW9ucwogICAgICBLVk06IGFybTY0OiBEb24ndCBzYXZlIHRo
-ZSBob3N0IEVMUl9FTDIgYW5kIFNQU1JfRUwyIG9uIFZIRSBzeXN0ZW1zCiAgICAgIEtWTTogYXJt
-NjQ6IENoYW5nZSAzMi1iaXQgaGFuZGxpbmcgb2YgVk0gc3lzdGVtIHJlZ2lzdGVycwogICAgICBL
-Vk06IGFybTY0OiBSZXdyaXRlIHN5c3RlbSByZWdpc3RlciBhY2Nlc3NvcnMgdG8gcmVhZC93cml0
-ZSBmdW5jdGlvbnMKICAgICAgS1ZNOiBhcm02NDogSW50cm9kdWNlIGZyYW1ld29yayBmb3IgYWNj
-ZXNzaW5nIGRlZmVycmVkIHN5c3JlZ3MKICAgICAgS1ZNOiBhcm0vYXJtNjQ6IFByZXBhcmUgdG8g
-aGFuZGxlIGRlZmVycmVkIHNhdmUvcmVzdG9yZSBvZiBTUFNSX0VMMQogICAgICBLVk06IGFybTY0
-OiBQcmVwYXJlIHRvIGhhbmRsZSBkZWZlcnJlZCBzYXZlL3Jlc3RvcmUgb2YgRUxSX0VMMQogICAg
-ICBLVk06IGFybTY0OiBEZWZlciBzYXZpbmcvcmVzdG9yaW5nIDY0LWJpdCBzeXNyZWdzIHRvIHZj
-cHUgbG9hZC9wdXQgb24gVkhFCiAgICAgIEtWTTogYXJtNjQ6IFByZXBhcmUgdG8gaGFuZGxlIGRl
-ZmVycmVkIHNhdmUvcmVzdG9yZSBvZiAzMi1iaXQgcmVnaXN0ZXJzCiAgICAgIEtWTTogYXJtNjQ6
-IERlZmVyIHNhdmluZy9yZXN0b3JpbmcgMzItYml0IHN5c3JlZ3MgdG8gdmNwdSBsb2FkL3B1dAog
-ICAgICBLVk06IGFybTY0OiBNb3ZlIGNvbW1vbiBWSEUvbm9uLVZIRSB0cmFwIGNvbmZpZyBpbiBz
-ZXBhcmF0ZSBmdW5jdGlvbnMKICAgICAgS1ZNOiBhcm02NDogRGlyZWN0bHkgY2FsbCBWSEUgYW5k
-IG5vbi1WSEUgRlBTSU1EIGVuYWJsZWQgZnVuY3Rpb25zCiAgICAgIEtWTTogYXJtNjQ6IENvbmZp
-Z3VyZSBjMTUsIFBNVSwgYW5kIGRlYnVnIHJlZ2lzdGVyIHRyYXBzIG9uIGNwdSBsb2FkL3B1dCBm
-b3IgVkhFCiAgICAgIEtWTTogYXJtNjQ6IENsZWFudXAgX19hY3RpdmF0ZV90cmFwcyBhbmQgX19k
-ZWFjdGl2ZV90cmFwcyBmb3IgVkhFIGFuZCBub24tVkhFCiAgICAgIEtWTTogYXJtL2FybTY0OiBH
-ZXQgcmlkIG9mIHZnaWNfZWxyc3IKICAgICAgS1ZNOiBhcm0vYXJtNjQ6IEhhbmRsZSBWR0lDdjIg
-c2F2ZS9yZXN0b3JlIGZyb20gdGhlIG1haW4gVkdJQyBjb2RlCiAgICAgIEtWTTogYXJtL2FybTY0
-OiBNb3ZlIGFybTY0LW9ubHkgdmdpYy12Mi1zci5jIGZpbGUgdG8gYXJtNjQKICAgICAgS1ZNOiBh
-cm0vYXJtNjQ6IEhhbmRsZSBWR0lDdjMgc2F2ZS9yZXN0b3JlIGZyb20gdGhlIG1haW4gVkdJQyBj
-b2RlIG9uIFZIRQogICAgICBLVk06IGFybS9hcm02NDogTW92ZSBWR0lDIEFQUiBzYXZlL3Jlc3Rv
-cmUgdG8gdmdpYyBwdXQvbG9hZAogICAgICBLVk06IGFybS9hcm02NDogQXZvaWQgVkdJQ3YzIHNh
-dmUvcmVzdG9yZSBvbiBWSEUgd2l0aCBubyBJUlFzCgpEYXZlIE1hcnRpbiAoMSk6CiAgICAgIGFy
-bTY0OiBLVk06IE1vdmUgQ1BVIElEIHJlZyB0cmFwIHNldHVwIG9mZiB0aGUgd29ybGQgc3dpdGNo
-IHBhdGgKCkrDqXLDqW15IEZhbmd1w6hkZSAoMik6CiAgICAgIEtWTTogYXJtNjQ6IEVuYWJsZSB0
-aGUgRUwxIHBoeXNpY2FsIHRpbWVyIGZvciBBQXJjaDMyIGd1ZXN0cwogICAgICBLVk06IGFybTog
-RW5hYmxlIGVtdWxhdGlvbiBvZiB0aGUgcGh5c2ljYWwgdGltZXIKCk1hcmMgWnluZ2llciAoMzMp
-OgogICAgICBLVk06IGFybS9hcm02NDogdmdpYzogRG9uJ3QgcG9wdWxhdGUgbXVsdGlwbGUgTFJz
-IHdpdGggdGhlIHNhbWUgdmludGlkCiAgICAgIGt2bTogYXJtL2FybTY0OiB2Z2ljLXYzOiBUaWdo
-dGVuIHN5bmNocm9uaXphdGlvbiBmb3IgZ3Vlc3RzIHVzaW5nIHYyIG9uIHYzCiAgICAgIGFybTY0
-OiBhbHRlcm5hdGl2ZXM6IEFkZCBkeW5hbWljIHBhdGNoaW5nIGZlYXR1cmUKICAgICAgYXJtNjQ6
-IGluc246IEFkZCBOIGltbWVkaWF0ZSBlbmNvZGluZwogICAgICBhcm02NDogaW5zbjogQWRkIGVu
-Y29kZXIgZm9yIGJpdHdpc2Ugb3BlcmF0aW9ucyB1c2luZyBsaXRlcmFscwogICAgICBhcm02NDog
-S1ZNOiBEeW5hbWljYWxseSBwYXRjaCB0aGUga2VybmVsL2h5cCBWQSBtYXNrCiAgICAgIGFybTY0
-OiBjcHVmZWF0dXJlczogRHJvcCB0aGUgQVJNNjRfSFlQX09GRlNFVF9MT1cgZmVhdHVyZSBmbGFn
-CiAgICAgIEtWTTogYXJtL2FybTY0OiBEbyBub3QgdXNlIGtlcm5faHlwX3ZhKCkgd2l0aCBrdm1f
-dmdpY19nbG9iYWxfc3RhdGUKICAgICAgS1ZNOiBhcm0vYXJtNjQ6IERlbW90ZSBIWVAgVkEgcmFu
-Z2UgZGlzcGxheSB0byBiZWluZyBhIGRlYnVnIGZlYXR1cmUKICAgICAgS1ZNOiBhcm0vYXJtNjQ6
-IE1vdmUgaW9yZW1hcCBjYWxscyB0byBjcmVhdGVfaHlwX2lvX21hcHBpbmdzCiAgICAgIEtWTTog
-YXJtL2FybTY0OiBLZWVwIEdJQ3YyIEhZUCBWQXMgaW4ga3ZtX3ZnaWNfZ2xvYmFsX3N0YXRlCiAg
-ICAgIEtWTTogYXJtL2FybTY0OiBGaXggaWRtYXAgc2l6ZSBhbmQgYWxpZ25tZW50CiAgICAgIEtW
-TTogYXJtNjQ6IEZpeCBIWVAgaWRtYXAgdW5tYXAgd2hlbiB1c2luZyA1MmJpdCBQQQogICAgICBL
-Vk06IGFybS9hcm02NDogTW92ZSBIWVAgSU8gVkFzIHRvIHRoZSAiaWRtYXAiIHJhbmdlCiAgICAg
-IGFybTY0OyBpbnNuOiBBZGQgZW5jb2RlciBmb3IgdGhlIEVYVFIgaW5zdHJ1Y3Rpb24KICAgICAg
-YXJtNjQ6IGluc246IEFsbG93IEFERC9TVUIgKGltbWVkaWF0ZSkgd2l0aCBMU0wgIzEyCiAgICAg
-IGFybTY0OiBLVk06IER5bmFtaWNhbGx5IGNvbXB1dGUgdGhlIEhZUCBWQSBtYXNrCiAgICAgIGFy
-bTY0OiBLVk06IEludHJvZHVjZSBFTDIgVkEgcmFuZG9taXNhdGlvbgogICAgICBhcm02NDogVXBk
-YXRlIHRoZSBLVk0gbWVtb3J5IG1hcCBkb2N1bWVudGF0aW9uCiAgICAgIGFybTY0OiBLVk06IE1v
-dmUgdmVjdG9yIG9mZnNldHRpbmcgZnJvbSBoeXAtaW5pdC5TIHRvIGt2bV9nZXRfaHlwX3ZlY3Rv
-cgogICAgICBhcm02NDogS1ZNOiBNb3ZlIHN0YXNoaW5nIG9mIHgwL3gxIGludG8gdGhlIHZlY3Rv
-ciBjb2RlIGl0c2VsZgogICAgICBhcm02NDogS1ZNOiBNb3ZlIEJQIGhhcmRlbmluZyB2ZWN0b3Jz
-IGludG8gLmh5cC50ZXh0IHNlY3Rpb24KICAgICAgYXJtNjQ6IEtWTTogUmVzZXJ2ZSA0IGFkZGl0
-aW9uYWwgaW5zdHJ1Y3Rpb25zIGluIHRoZSBCUEkgdGVtcGxhdGUKICAgICAgYXJtNjQ6IEtWTTog
-QWxsb3cgZmFyIGJyYW5jaGVzIGZyb20gdmVjdG9yIHNsb3RzIHRvIHRoZSBtYWluIHZlY3RvcnMK
-ICAgICAgYXJtL2FybTY0OiBLVk06IEludHJvZHVjZSBFTDItc3BlY2lmaWMgZXhlY3V0YWJsZSBt
-YXBwaW5ncwogICAgICBhcm02NDogTWFrZSBCUCBoYXJkZW5pbmcgc2xvdCBjb3VudGVyIGF2YWls
-YWJsZQogICAgICBhcm02NDogS1ZNOiBBbGxvdyBtYXBwaW5nIG9mIHZlY3RvcnMgb3V0c2lkZSBv
-ZiB0aGUgUkFNIHJlZ2lvbgogICAgICBhcm02NDogRW5hYmxlIEFSTTY0X0hBUkRFTl9FTDJfVkVD
-VE9SUyBvbiBDb3J0ZXgtQTU3IGFuZCBBNzIKICAgICAgTWVyZ2UgdGFnICdrdm0tYXJtLWZpeGVz
-LWZvci12NC4xNi0yJyBpbnRvIEhFQUQKICAgICAgS1ZNOiBhcm0vYXJtNjQ6IHZnaWM6IERpc2Fs
-bG93IEFjdGl2ZStQZW5kaW5nIGZvciBsZXZlbCBpbnRlcnJ1cHRzCiAgICAgIEtWTTogYXJtL2Fy
-bTY0OiB2Z2ljLWl0czogRml4IHBvdGVudGlhbCBvdmVycnVuIGluIHZnaWNfY29weV9scGlfbGlz
-dAogICAgICBSZXZlcnQgImFybTY0OiBLVk06IFVzZSBTTUNDQ19BUkNIX1dPUktBUk9VTkRfMSBm
-b3IgRmFsa29yIEJQIGhhcmRlbmluZyIKICAgICAgYXJtNjQ6IEFkZCB0ZW1wb3JhcnkgRVJSQVRB
-X01JRFJfQUxMX1ZFUlNJT05TIGNvbXBhdGliaWxpdHkgbWFjcm8KCk1hcmsgUnV0bGFuZCAoMSk6
-CiAgICAgIGFybTY0L2t2bTogUHJvaGliaXQgZ3Vlc3QgTE9SIGFjY2Vzc2VzCgpQZXRlciBNYXlk
-ZWxsICgxKToKICAgICAgS1ZNOiBhcm06IFJlc2VydmUgYml0IGluIEtWTV9SRUdfQVJNIGVuY29k
-aW5nIGZvciBzZWN1cmUvbm9uc2VjdXJlCgpTaGFua2VyIERvbnRoaW5lbmkgKDIpOgogICAgICBL
-Vk06IGFybS9hcm02NDogTm8gbmVlZCB0byB6ZXJvIENOVFZPRkYgaW4ga3ZtX3RpbWVyX3ZjcHVf
-cHV0KCkgZm9yIFZIRQogICAgICBhcm02NDogS1ZNOiBVc2UgU01DQ0NfQVJDSF9XT1JLQVJPVU5E
-XzEgZm9yIEZhbGtvciBCUCBoYXJkZW5pbmcKClNoaWgtV2VpIExpICgxKToKICAgICAgS1ZNOiBh
-cm02NDogTW92ZSBIQ1JfSU5UX09WRVJSSURFIHRvIGRlZmF1bHQgSENSX0VMMiBndWVzdCBmbGFn
-CgogRG9jdW1lbnRhdGlvbi9hcm02NC9tZW1vcnkudHh0ICAgICAgICAgICB8ICAgOSArLQogYXJj
-aC9hcm0vaW5jbHVkZS9hc20va3ZtX2FzbS5oICAgICAgICAgICB8ICAgNSArLQogYXJjaC9hcm0v
-aW5jbHVkZS9hc20va3ZtX2VtdWxhdGUuaCAgICAgICB8ICAyMSArLQogYXJjaC9hcm0vaW5jbHVk
-ZS9hc20va3ZtX2hvc3QuaCAgICAgICAgICB8ICAgNiArLQogYXJjaC9hcm0vaW5jbHVkZS9hc20v
-a3ZtX2h5cC5oICAgICAgICAgICB8ICAgNCArCiBhcmNoL2FybS9pbmNsdWRlL2FzbS9rdm1fbW11
-LmggICAgICAgICAgIHwgIDE2ICstCiBhcmNoL2FybS9pbmNsdWRlL3VhcGkvYXNtL2t2bS5oICAg
-ICAgICAgIHwgICA5ICsKIGFyY2gvYXJtL2t2bS9jb3Byb2MuYyAgICAgICAgICAgICAgICAgICAg
-fCAgNjEgKysrKysKIGFyY2gvYXJtL2t2bS9lbXVsYXRlLmMgICAgICAgICAgICAgICAgICAgfCAg
-IDQgKy0KIGFyY2gvYXJtL2t2bS9oeXAvTWFrZWZpbGUgICAgICAgICAgICAgICAgfCAgIDYgKy0K
-IGFyY2gvYXJtL2t2bS9oeXAvYmFua2VkLXNyLmMgICAgICAgICAgICAgfCAgIDQgKwogYXJjaC9h
-cm0va3ZtL2h5cC9zd2l0Y2guYyAgICAgICAgICAgICAgICB8ICAxNiArLQogYXJjaC9hcm02NC9L
-Y29uZmlnICAgICAgICAgICAgICAgICAgICAgICB8ICAxNiArKwogYXJjaC9hcm02NC9pbmNsdWRl
-L2FzbS9hbHRlcm5hdGl2ZS5oICAgICB8ICA0MSArKystCiBhcmNoL2FybTY0L2luY2x1ZGUvYXNt
-L2NwdWNhcHMuaCAgICAgICAgIHwgICAyICstCiBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2luc24u
-aCAgICAgICAgICAgIHwgIDE2ICsrCiBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9hcm0uaCAg
-ICAgICAgIHwgICA2ICstCiBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9hc20uaCAgICAgICAg
-IHwgIDE5ICstCiBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9lbXVsYXRlLmggICAgIHwgIDc4
-ICsrKysrLS0KIGFyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaCAgICAgICAgfCAgNTMg
-KysrKy0KIGFyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2h5cC5oICAgICAgICAgfCAgMjkgKy0t
-CiBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9tbXUuaCAgICAgICAgIHwgMTY1ICsrKysrKysr
-Ky0tLS0KIGFyY2gvYXJtNjQvaW5jbHVkZS9hc20vbW11LmggICAgICAgICAgICAgfCAgIDggKy0K
-IGFyY2gvYXJtNjQvaW5jbHVkZS9hc20vc3lzcmVnLmggICAgICAgICAgfCAgIDYgKwogYXJjaC9h
-cm02NC9rZXJuZWwvTWFrZWZpbGUgICAgICAgICAgICAgICB8ICAgNCArLQogYXJjaC9hcm02NC9r
-ZXJuZWwvYWx0ZXJuYXRpdmUuYyAgICAgICAgICB8ICA0MyArKystCiBhcmNoL2FybTY0L2tlcm5l
-bC9hc20tb2Zmc2V0cy5jICAgICAgICAgIHwgICAxICsKIGFyY2gvYXJtNjQva2VybmVsL2JwaS5T
-ICAgICAgICAgICAgICAgICAgfCAgNjcgKysrKy0tCiBhcmNoL2FybTY0L2tlcm5lbC9jcHVfZXJy
-YXRhLmMgICAgICAgICAgIHwgIDI1ICstCiBhcmNoL2FybTY0L2tlcm5lbC9jcHVmZWF0dXJlLmMg
-ICAgICAgICAgIHwgIDE5IC0tCiBhcmNoL2FybTY0L2tlcm5lbC9oZWFkLlMgICAgICAgICAgICAg
-ICAgIHwgICA3ICsKIGFyY2gvYXJtNjQva2VybmVsL2luc24uYyAgICAgICAgICAgICAgICAgfCAx
-OTAgKysrKysrKysrKysrKystCiBhcmNoL2FybTY0L2t2bS9LY29uZmlnICAgICAgICAgICAgICAg
-ICAgIHwgICAzICsKIGFyY2gvYXJtNjQva3ZtL01ha2VmaWxlICAgICAgICAgICAgICAgICAgfCAg
-IDIgKy0KIGFyY2gvYXJtNjQva3ZtL2RlYnVnLmMgICAgICAgICAgICAgICAgICAgfCAgMjkgKyst
-CiBhcmNoL2FybTY0L2t2bS9ndWVzdC5jICAgICAgICAgICAgICAgICAgIHwgICAzIC0KIGFyY2gv
-YXJtNjQva3ZtL2h5cC1pbml0LlMgICAgICAgICAgICAgICAgfCAgIDEgLQogYXJjaC9hcm02NC9r
-dm0vaHlwL01ha2VmaWxlICAgICAgICAgICAgICB8ICAgMiArLQogYXJjaC9hcm02NC9rdm0vaHlw
-L2RlYnVnLXNyLmMgICAgICAgICAgICB8ICA4OCArKysrLS0tCiBhcmNoL2FybTY0L2t2bS9oeXAv
-ZW50cnkuUyAgICAgICAgICAgICAgIHwgICA2ICstCiBhcmNoL2FybTY0L2t2bS9oeXAvaHlwLWVu
-dHJ5LlMgICAgICAgICAgIHwgIDg2ICsrKy0tLS0KIGFyY2gvYXJtNjQva3ZtL2h5cC9zd2l0Y2gu
-YyAgICAgICAgICAgICAgfCAzODIgKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLQogYXJj
-aC9hcm02NC9rdm0vaHlwL3N5c3JlZy1zci5jICAgICAgICAgICB8IDE3MiArKysrKysrKysrKy0t
-LQogYXJjaC9hcm02NC9rdm0vaHlwL3ZnaWMtdjItY3B1aWYtcHJveHkuYyB8ICA3OCArKysrKysr
-CiBhcmNoL2FybTY0L2t2bS9pbmplY3RfZmF1bHQuYyAgICAgICAgICAgIHwgIDI0ICstCiBhcmNo
-L2FybTY0L2t2bS9yZWdtYXAuYyAgICAgICAgICAgICAgICAgIHwgIDY3ICsrKystLQogYXJjaC9h
-cm02NC9rdm0vc3lzX3JlZ3MuYyAgICAgICAgICAgICAgICB8IDE5OSArKysrKysrKysrKysrLS0t
-CiBhcmNoL2FybTY0L2t2bS9zeXNfcmVncy5oICAgICAgICAgICAgICAgIHwgICA0ICstCiBhcmNo
-L2FybTY0L2t2bS9zeXNfcmVnc19nZW5lcmljX3Y4LmMgICAgIHwgICA0ICstCiBhcmNoL2FybTY0
-L2t2bS92YV9sYXlvdXQuYyAgICAgICAgICAgICAgIHwgMjI3ICsrKysrKysrKysrKysrKysrKwog
-aW5jbHVkZS9rdm0vYXJtX3ZnaWMuaCAgICAgICAgICAgICAgICAgICB8ICAxNSArLQogaW5jbHVk
-ZS9saW51eC9pcnFjaGlwL2FybS1naWMtdjMuaCAgICAgICB8ICAgMSArCiBpbmNsdWRlL2xpbnV4
-L2lycWNoaXAvYXJtLWdpYy5oICAgICAgICAgIHwgICAxICsKIHZpcnQva3ZtL2FybS9hYXJjaDMy
-LmMgICAgICAgICAgICAgICAgICAgfCAgIDIgKy0KIHZpcnQva3ZtL2FybS9hcmNoX3RpbWVyLmMg
-ICAgICAgICAgICAgICAgfCAxMzIgKysrKysrLS0tLS0KIHZpcnQva3ZtL2FybS9hcm0uYyAgICAg
-ICAgICAgICAgICAgICAgICAgfCAgNTcgKystLS0KIHZpcnQva3ZtL2FybS9oeXAvdGltZXItc3Iu
-YyAgICAgICAgICAgICAgfCAgNDQgKystLQogdmlydC9rdm0vYXJtL2h5cC92Z2ljLXYyLXNyLmMg
-ICAgICAgICAgICB8IDE1OSAtLS0tLS0tLS0tLS0tCiB2aXJ0L2t2bS9hcm0vaHlwL3ZnaWMtdjMt
-c3IuYyAgICAgICAgICAgIHwgMjQ2ICsrKysrKysrKysrKy0tLS0tLS0tCiB2aXJ0L2t2bS9hcm0v
-bW11LmMgICAgICAgICAgICAgICAgICAgICAgIHwgMTgwICsrKysrKysrKysrKy0tLQogdmlydC9r
-dm0vYXJtL3BtdS5jICAgICAgICAgICAgICAgICAgICAgICB8ICAzNiArLS0KIHZpcnQva3ZtL2Fy
-bS92Z2ljL3ZnaWMtaW5pdC5jICAgICAgICAgICAgfCAgMTcgLS0KIHZpcnQva3ZtL2FybS92Z2lj
-L3ZnaWMtaXRzLmMgICAgICAgICAgICAgfCAgMTUgKy0KIHZpcnQva3ZtL2FybS92Z2ljL3ZnaWMt
-bW1pby5jICAgICAgICAgICAgfCAgIDMgKwogdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy12Mi5jICAg
-ICAgICAgICAgICB8IDE2MyArKysrKysrKy0tLS0tCiB2aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLXYz
-LmMgICAgICAgICAgICAgIHwgIDc1ICsrKy0tLQogdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy5jICAg
-ICAgICAgICAgICAgICB8IDEyMCArKysrKysrKy0tCiB2aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLmgg
-ICAgICAgICAgICAgICAgIHwgICA2ICsKIDY4IGZpbGVzIGNoYW5nZWQsIDI1MDggaW5zZXJ0aW9u
-cygrKSwgMTA5NyBkZWxldGlvbnMoLSkKIGNyZWF0ZSBtb2RlIDEwMDY0NCBhcmNoL2FybTY0L2t2
-bS9oeXAvdmdpYy12Mi1jcHVpZi1wcm94eS5jCiBjcmVhdGUgbW9kZSAxMDA2NDQgYXJjaC9hcm02
-NC9rdm0vdmFfbGF5b3V0LmMKIGRlbGV0ZSBtb2RlIDEwMDY0NCB2aXJ0L2t2bS9hcm0vaHlwL3Zn
-aWMtdjItc3IuYwpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-Xwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6
-Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+From: Christoffer Dall <christoffer.dall@linaro.org>
+
+When introducing support for irqchip in userspace we needed a way to
+mask the timer signal to prevent the guest continuously exiting due to a
+screaming timer.
+
+We did this by disabling the corresponding percpu interrupt on the
+host interrupt controller, because we cannot rely on the host system
+having a GIC, and therefore cannot make any assumptions about having an
+active state to hide the timer signal.
+
+Unfortunately, when introducing this feature, it became entirely
+possible that a VCPU which belongs to a VM that has a userspace irqchip
+can disable the vtimer irq on the host on some physical CPU, and then go
+away without ever enabling the vtimer irq on that physical CPU again.
+
+This means that using irqchips in userspace on a system that also
+supports running VMs with an in-kernel GIC can prevent forward progress
+from in-kernel GIC VMs.
+
+Later on, when we started taking virtual timer interrupts in the arch
+timer code, we would also leave this timer state active for userspace
+irqchip VMs, because we leave it up to a VGIC-enabled guest to
+deactivate the hardware IRQ using the HW bit in the LR.
+
+Both issues are solved by only using the enable/disable trick on systems
+that do not have a host GIC which supports the active state, because all
+VMs on such systems must use irqchips in userspace.  Systems that have a
+working GIC with support for an active state use the active state to
+mask the timer signal for both userspace and in-kernel irqchips.
+
+Cc: Alexander Graf <agraf@suse.de>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Cc: <stable@vger.kernel.org> # v4.12+
+Fixes: d9e139778376 ("KVM: arm/arm64: Support arch timers with a userspace gic")
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+---
+ virt/kvm/arm/arch_timer.c | 116 +++++++++++++++++++++++++---------------------
+ 1 file changed, 64 insertions(+), 52 deletions(-)
+
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index 70268c0bec79..70f4c30918eb 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -36,6 +36,8 @@ static struct timecounter *timecounter;
+ static unsigned int host_vtimer_irq;
+ static u32 host_vtimer_irq_flags;
+ 
++static DEFINE_STATIC_KEY_FALSE(has_gic_active_state);
++
+ static const struct kvm_irq_level default_ptimer_irq = {
+ 	.irq	= 30,
+ 	.level	= 1,
+@@ -56,6 +58,12 @@ u64 kvm_phys_timer_read(void)
+ 	return timecounter->cc->read(timecounter->cc);
+ }
+ 
++static inline bool userspace_irqchip(struct kvm *kvm)
++{
++	return static_branch_unlikely(&userspace_irqchip_in_use) &&
++		unlikely(!irqchip_in_kernel(kvm));
++}
++
+ static void soft_timer_start(struct hrtimer *hrt, u64 ns)
+ {
+ 	hrtimer_start(hrt, ktime_add_ns(ktime_get(), ns),
+@@ -69,25 +77,6 @@ static void soft_timer_cancel(struct hrtimer *hrt, struct work_struct *work)
+ 		cancel_work_sync(work);
+ }
+ 
+-static void kvm_vtimer_update_mask_user(struct kvm_vcpu *vcpu)
+-{
+-	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+-
+-	/*
+-	 * When using a userspace irqchip with the architected timers, we must
+-	 * prevent continuously exiting from the guest, and therefore mask the
+-	 * physical interrupt by disabling it on the host interrupt controller
+-	 * when the virtual level is high, such that the guest can make
+-	 * forward progress.  Once we detect the output level being
+-	 * de-asserted, we unmask the interrupt again so that we exit from the
+-	 * guest when the timer fires.
+-	 */
+-	if (vtimer->irq.level)
+-		disable_percpu_irq(host_vtimer_irq);
+-	else
+-		enable_percpu_irq(host_vtimer_irq, 0);
+-}
+-
+ static irqreturn_t kvm_arch_timer_handler(int irq, void *dev_id)
+ {
+ 	struct kvm_vcpu *vcpu = *(struct kvm_vcpu **)dev_id;
+@@ -106,9 +95,9 @@ static irqreturn_t kvm_arch_timer_handler(int irq, void *dev_id)
+ 	if (kvm_timer_should_fire(vtimer))
+ 		kvm_timer_update_irq(vcpu, true, vtimer);
+ 
+-	if (static_branch_unlikely(&userspace_irqchip_in_use) &&
+-	    unlikely(!irqchip_in_kernel(vcpu->kvm)))
+-		kvm_vtimer_update_mask_user(vcpu);
++	if (userspace_irqchip(vcpu->kvm) &&
++	    !static_branch_unlikely(&has_gic_active_state))
++		disable_percpu_irq(host_vtimer_irq);
+ 
+ 	return IRQ_HANDLED;
+ }
+@@ -290,8 +279,7 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+ 	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer_ctx->irq.irq,
+ 				   timer_ctx->irq.level);
+ 
+-	if (!static_branch_unlikely(&userspace_irqchip_in_use) ||
+-	    likely(irqchip_in_kernel(vcpu->kvm))) {
++	if (!userspace_irqchip(vcpu->kvm)) {
+ 		ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
+ 					  timer_ctx->irq.irq,
+ 					  timer_ctx->irq.level,
+@@ -350,12 +338,6 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
+ 	phys_timer_emulate(vcpu);
+ }
+ 
+-static void __timer_snapshot_state(struct arch_timer_context *timer)
+-{
+-	timer->cnt_ctl = read_sysreg_el0(cntv_ctl);
+-	timer->cnt_cval = read_sysreg_el0(cntv_cval);
+-}
+-
+ static void vtimer_save_state(struct kvm_vcpu *vcpu)
+ {
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+@@ -367,8 +349,10 @@ static void vtimer_save_state(struct kvm_vcpu *vcpu)
+ 	if (!vtimer->loaded)
+ 		goto out;
+ 
+-	if (timer->enabled)
+-		__timer_snapshot_state(vtimer);
++	if (timer->enabled) {
++		vtimer->cnt_ctl = read_sysreg_el0(cntv_ctl);
++		vtimer->cnt_cval = read_sysreg_el0(cntv_cval);
++	}
+ 
+ 	/* Disable the virtual timer */
+ 	write_sysreg_el0(0, cntv_ctl);
+@@ -460,23 +444,43 @@ static void set_cntvoff(u64 cntvoff)
+ 	kvm_call_hyp(__kvm_timer_set_cntvoff, low, high);
+ }
+ 
+-static void kvm_timer_vcpu_load_vgic(struct kvm_vcpu *vcpu)
++static inline void set_vtimer_irq_phys_active(struct kvm_vcpu *vcpu, bool active)
++{
++	int r;
++	r = irq_set_irqchip_state(host_vtimer_irq, IRQCHIP_STATE_ACTIVE, active);
++	WARN_ON(r);
++}
++
++static void kvm_timer_vcpu_load_gic(struct kvm_vcpu *vcpu)
+ {
+ 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+ 	bool phys_active;
+-	int ret;
+ 
+-	phys_active = kvm_vgic_map_is_active(vcpu, vtimer->irq.irq);
+-
+-	ret = irq_set_irqchip_state(host_vtimer_irq,
+-				    IRQCHIP_STATE_ACTIVE,
+-				    phys_active);
+-	WARN_ON(ret);
++	if (irqchip_in_kernel(vcpu->kvm))
++		phys_active = kvm_vgic_map_is_active(vcpu, vtimer->irq.irq);
++	else
++		phys_active = vtimer->irq.level;
++	set_vtimer_irq_phys_active(vcpu, phys_active);
+ }
+ 
+-static void kvm_timer_vcpu_load_user(struct kvm_vcpu *vcpu)
++static void kvm_timer_vcpu_load_nogic(struct kvm_vcpu *vcpu)
+ {
+-	kvm_vtimer_update_mask_user(vcpu);
++	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
++
++	/*
++	 * When using a userspace irqchip with the architected timers and a
++	 * host interrupt controller that doesn't support an active state, we
++	 * must still prevent continuously exiting from the guest, and
++	 * therefore mask the physical interrupt by disabling it on the host
++	 * interrupt controller when the virtual level is high, such that the
++	 * guest can make forward progress.  Once we detect the output level
++	 * being de-asserted, we unmask the interrupt again so that we exit
++	 * from the guest when the timer fires.
++	 */
++	if (vtimer->irq.level)
++		disable_percpu_irq(host_vtimer_irq);
++	else
++		enable_percpu_irq(host_vtimer_irq, host_vtimer_irq_flags);
+ }
+ 
+ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
+@@ -487,10 +491,10 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
+ 	if (unlikely(!timer->enabled))
+ 		return;
+ 
+-	if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
+-		kvm_timer_vcpu_load_user(vcpu);
++	if (static_branch_likely(&has_gic_active_state))
++		kvm_timer_vcpu_load_gic(vcpu);
+ 	else
+-		kvm_timer_vcpu_load_vgic(vcpu);
++		kvm_timer_vcpu_load_nogic(vcpu);
+ 
+ 	set_cntvoff(vtimer->cntvoff);
+ 
+@@ -555,18 +559,24 @@ static void unmask_vtimer_irq_user(struct kvm_vcpu *vcpu)
+ {
+ 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+ 
+-	if (unlikely(!irqchip_in_kernel(vcpu->kvm))) {
+-		__timer_snapshot_state(vtimer);
+-		if (!kvm_timer_should_fire(vtimer)) {
+-			kvm_timer_update_irq(vcpu, false, vtimer);
+-			kvm_vtimer_update_mask_user(vcpu);
+-		}
++	if (!kvm_timer_should_fire(vtimer)) {
++		kvm_timer_update_irq(vcpu, false, vtimer);
++		if (static_branch_likely(&has_gic_active_state))
++			set_vtimer_irq_phys_active(vcpu, false);
++		else
++			enable_percpu_irq(host_vtimer_irq, host_vtimer_irq_flags);
+ 	}
+ }
+ 
+ void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
+ {
+-	unmask_vtimer_irq_user(vcpu);
++	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
++
++	if (unlikely(!timer->enabled))
++		return;
++
++	if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
++		unmask_vtimer_irq_user(vcpu);
+ }
+ 
+ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
+@@ -753,6 +763,8 @@ int kvm_timer_hyp_init(bool has_gic)
+ 			kvm_err("kvm_arch_timer: error setting vcpu affinity\n");
+ 			goto out_free_irq;
+ 		}
++
++		static_branch_enable(&has_gic_active_state);
+ 	}
+ 
+ 	kvm_info("virtual timer IRQ%d\n", host_vtimer_irq);
+-- 
+2.14.2
