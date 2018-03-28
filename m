@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 09/85] KVM: arm/arm64: Avoid vcpu_load for other vcpu ioctls
- than KVM_RUN
-Date: Wed, 28 Mar 2018 13:51:38 +0100
-Message-ID: <20180328125254.31380-10-marc.zyngier@arm.com>
+Subject: [PATCH 10/85] KVM: arm/arm64: Reset mapped IRQs on VM reset
+Date: Wed, 28 Mar 2018 13:51:39 +0100
+Message-ID: <20180328125254.31380-11-marc.zyngier@arm.com>
 References: <20180328125254.31380-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0161849FEA
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:47:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BECB949FB2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:47:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UGGQy0m+cNrX for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Mar 2018 08:46:47 -0400 (EDT)
+ with ESMTP id UsLZhg8xkw8M for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Mar 2018 08:47:05 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DD4B949FD8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:45:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E7CCC49FDE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:45:35 -0400 (EDT)
 In-Reply-To: <20180328125254.31380-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -29,113 +28,99 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Cc: Christoffer Dall <cdall@cs.columbia.edu>, Christoffer Dall <christoffer.dall@linaro.org>, Shunyong Yang <shunyong.yang@hxt-semitech.com>, Julien Thierry <julien.thierry@arm.com>, Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Catalin Marinas <catalin.marinas@arm.com>, Dave Martin <Dave.Martin@arm.com>
+Cc: Christoffer Dall <cdall@cs.columbia.edu>, Shunyong Yang <shunyong.yang@hxt-semitech.com>, Julien Thierry <julien.thierry@arm.com>, Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Catalin Marinas <catalin.marinas@arm.com>, Dave Martin <Dave.Martin@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+From: Christoffer Dall <cdall@kernel.org>
 
-Calling vcpu_load() registers preempt notifiers for this vcpu and calls
-kvm_arch_vcpu_load().  The latter will soon be doing a lot of heavy
-lifting on arm/arm64 and will try to do things such as enabling the
-virtual timer and setting us up to handle interrupts from the timer
-hardware.
+We currently don't allow resetting mapped IRQs from userspace, because
+their state is controlled by the hardware.  But we do need to reset the
+state when the VM is reset, so we provide a function for the 'owner' of
+the mapped interrupt to reset the interrupt state.
 
-Loading state onto hardware registers and enabling hardware to signal
-interrupts can be problematic when we're not actually about to run the
-VCPU, because it makes it difficult to establish the right context when
-handling interrupts from the timer, and it makes the register access
-code difficult to reason about.
-
-Luckily, now when we call vcpu_load in each ioctl implementation, we can
-simply remove the call from the non-KVM_RUN vcpu ioctls, and our
-kvm_arch_vcpu_load() is only used for loading vcpu content to the
-physical CPU when we're actually going to run the vcpu.
+Currently only the timer uses mapped interrupts, so we call this
+function from the timer reset logic.
 
 Cc: stable@vger.kernel.org
-Fixes: 9b062471e52a ("KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl")
-Reviewed-by: Julien Grall <julien.grall@arm.com>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Fixes: 4c60e360d6df ("KVM: arm/arm64: Provide a get_input_level for the arch timer")
+Signed-off-by: Christoffer Dall <cdall@kernel.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/guest.c | 3 ---
- virt/kvm/arm/arm.c     | 9 ---------
- 2 files changed, 12 deletions(-)
+ include/kvm/arm_vgic.h    |  1 +
+ virt/kvm/arm/arch_timer.c |  4 ++++
+ virt/kvm/arm/vgic/vgic.c  | 26 ++++++++++++++++++++++++++
+ 3 files changed, 31 insertions(+)
 
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index d7e3299a7734..959e50d2588c 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -363,8 +363,6 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index cdbd142ca7f2..02924ae2527e 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -360,6 +360,7 @@ void kvm_vgic_put(struct kvm_vcpu *vcpu);
+ bool kvm_vcpu_has_pending_irqs(struct kvm_vcpu *vcpu);
+ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu);
+ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu);
++void kvm_vgic_reset_mapped_irq(struct kvm_vcpu *vcpu, u32 vintid);
+ 
+ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
+ 
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index 70f4c30918eb..3945021510a9 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -581,6 +581,7 @@ void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
+ 
+ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
  {
- 	int ret = 0;
++	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+ 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+ 	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
  
--	vcpu_load(vcpu);
--
- 	trace_kvm_set_guest_debug(vcpu, dbg->control);
+@@ -594,6 +595,9 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
+ 	ptimer->cnt_ctl = 0;
+ 	kvm_timer_update_state(vcpu);
  
- 	if (dbg->control & ~KVM_GUESTDBG_VALID_MASK) {
-@@ -386,7 +384,6 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
- 	}
- 
- out:
--	vcpu_put(vcpu);
- 	return ret;
- }
- 
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 86941f6181bb..53572304843b 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -384,14 +384,11 @@ static void vcpu_power_off(struct kvm_vcpu *vcpu)
- int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
- 				    struct kvm_mp_state *mp_state)
- {
--	vcpu_load(vcpu);
--
- 	if (vcpu->arch.power_off)
- 		mp_state->mp_state = KVM_MP_STATE_STOPPED;
- 	else
- 		mp_state->mp_state = KVM_MP_STATE_RUNNABLE;
- 
--	vcpu_put(vcpu);
++	if (timer->enabled && irqchip_in_kernel(vcpu->kvm))
++		kvm_vgic_reset_mapped_irq(vcpu, vtimer->irq.irq);
++
  	return 0;
  }
  
-@@ -400,8 +397,6 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
- {
- 	int ret = 0;
- 
--	vcpu_load(vcpu);
--
- 	switch (mp_state->mp_state) {
- 	case KVM_MP_STATE_RUNNABLE:
- 		vcpu->arch.power_off = false;
-@@ -413,7 +408,6 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
- 		ret = -EINVAL;
- 	}
- 
--	vcpu_put(vcpu);
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index c7c5ef190afa..0001858a2c23 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -495,6 +495,32 @@ int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
  	return ret;
  }
  
-@@ -1036,8 +1030,6 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 	struct kvm_device_attr attr;
- 	long r;
- 
--	vcpu_load(vcpu);
--
- 	switch (ioctl) {
- 	case KVM_ARM_VCPU_INIT: {
- 		struct kvm_vcpu_init init;
-@@ -1114,7 +1106,6 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 		r = -EINVAL;
- 	}
- 
--	vcpu_put(vcpu);
- 	return r;
- }
- 
++/**
++ * kvm_vgic_reset_mapped_irq - Reset a mapped IRQ
++ * @vcpu: The VCPU pointer
++ * @vintid: The INTID of the interrupt
++ *
++ * Reset the active and pending states of a mapped interrupt.  Kernel
++ * subsystems injecting mapped interrupts should reset their interrupt lines
++ * when we are doing a reset of the VM.
++ */
++void kvm_vgic_reset_mapped_irq(struct kvm_vcpu *vcpu, u32 vintid)
++{
++	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
++	unsigned long flags;
++
++	if (!irq->hw)
++		goto out;
++
++	spin_lock_irqsave(&irq->irq_lock, flags);
++	irq->active = false;
++	irq->pending_latch = false;
++	irq->line_level = false;
++	spin_unlock_irqrestore(&irq->irq_lock, flags);
++out:
++	vgic_put_irq(vcpu->kvm, irq);
++}
++
+ int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid)
+ {
+ 	struct vgic_irq *irq;
 -- 
 2.14.2
