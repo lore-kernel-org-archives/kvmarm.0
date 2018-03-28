@@ -1,23 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 41/85] KVM: arm64: Defer saving/restoring 64-bit sysregs to
- vcpu load/put on VHE
-Date: Wed, 28 Mar 2018 13:52:10 +0100
-Message-ID: <20180328125254.31380-42-marc.zyngier@arm.com>
+Subject: [PATCH 42/85] KVM: arm64: Prepare to handle deferred save/restore of
+ 32-bit registers
+Date: Wed, 28 Mar 2018 13:52:11 +0100
+Message-ID: <20180328125254.31380-43-marc.zyngier@arm.com>
 References: <20180328125254.31380-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 384014A0FB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:50:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 604BA4A083
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:51:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fpVQ1dTJync5 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Mar 2018 08:50:35 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0820B49FB2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:47:46 -0400 (EDT)
+ with ESMTP id T7wahIAOrrN9 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Mar 2018 08:50:58 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EA534A01E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:47:50 -0400 (EDT)
 In-Reply-To: <20180328125254.31380-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,194 +34,165 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Christoffer Dall <christoffer.dall@linaro.org>
 
-Some system registers do not affect the host kernel's execution and can
-therefore be loaded when we are about to run a VCPU and we don't have to
-restore the host state to the hardware before the time when we are
-actually about to return to userspace or schedule out the VCPU thread.
+32-bit registers are not used by a 64-bit host kernel and can be
+deferred, but we need to rework the accesses to these register to access
+the latest values depending on whether or not guest system registers are
+loaded on the CPU or only reside in memory.
 
-The EL1 system registers and the userspace state registers only
-affecting EL0 execution do not need to be saved and restored on every
-switch between the VM and the host, because they don't affect the host
-kernel's execution.
-
-We mark all registers which are now deffered as such in the
-vcpu_{read,write}_sys_reg accessors in sys-regs.c to ensure the most
-up-to-date copy is always accessed.
-
-Note MPIDR_EL1 (controlled via VMPIDR_EL2) is accessed from other vcpu
-threads, for example via the GIC emulation, and therefore must be
-declared as immediate, which is fine as the guest cannot modify this
-value.
-
-The 32-bit sysregs can also be deferred but we do this in a separate
-patch as it requires a bit more infrastructure.
-
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 Reviewed-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp/sysreg-sr.c | 39 ++++++++++++++++++++++++++-------
- arch/arm64/kvm/sys_regs.c      | 49 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 80 insertions(+), 8 deletions(-)
+ arch/arm64/include/asm/kvm_emulate.h | 32 +++++------------
+ arch/arm64/kvm/regmap.c              | 67 +++++++++++++++++++++++++++---------
+ 2 files changed, 59 insertions(+), 40 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-index 906606dc4e2c..9c60b8062724 100644
---- a/arch/arm64/kvm/hyp/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-@@ -25,8 +25,12 @@
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 6ed18ce0d638..23b33e8ea03a 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -33,7 +33,8 @@
+ #include <asm/virt.h>
+ 
+ unsigned long *vcpu_reg32(const struct kvm_vcpu *vcpu, u8 reg_num);
+-unsigned long *vcpu_spsr32(const struct kvm_vcpu *vcpu);
++unsigned long vcpu_read_spsr32(const struct kvm_vcpu *vcpu);
++void vcpu_write_spsr32(struct kvm_vcpu *vcpu, unsigned long v);
+ 
+ bool kvm_condition_valid32(const struct kvm_vcpu *vcpu);
+ void kvm_skip_instr32(struct kvm_vcpu *vcpu, bool is_wide_instr);
+@@ -162,41 +163,26 @@ static inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
+ 
+ static inline unsigned long vcpu_read_spsr(const struct kvm_vcpu *vcpu)
+ {
+-	unsigned long *p = (unsigned long *)&vcpu_gp_regs(vcpu)->spsr[KVM_SPSR_EL1];
+-
+-	if (vcpu_mode_is_32bit(vcpu)) {
+-		unsigned long *p_32bit = vcpu_spsr32(vcpu);
+-
+-		/* KVM_SPSR_SVC aliases KVM_SPSR_EL1 */
+-		if (p_32bit != p)
+-			return *p_32bit;
+-	}
++	if (vcpu_mode_is_32bit(vcpu))
++		return vcpu_read_spsr32(vcpu);
+ 
+ 	if (vcpu->arch.sysregs_loaded_on_cpu)
+ 		return read_sysreg_el1(spsr);
+ 	else
+-		return *p;
++		return vcpu_gp_regs(vcpu)->spsr[KVM_SPSR_EL1];
+ }
+ 
+-static inline void vcpu_write_spsr(const struct kvm_vcpu *vcpu, unsigned long v)
++static inline void vcpu_write_spsr(struct kvm_vcpu *vcpu, unsigned long v)
+ {
+-	unsigned long *p = (unsigned long *)&vcpu_gp_regs(vcpu)->spsr[KVM_SPSR_EL1];
+-
+-	/* KVM_SPSR_SVC aliases KVM_SPSR_EL1 */
+ 	if (vcpu_mode_is_32bit(vcpu)) {
+-		unsigned long *p_32bit = vcpu_spsr32(vcpu);
+-
+-		/* KVM_SPSR_SVC aliases KVM_SPSR_EL1 */
+-		if (p_32bit != p) {
+-			*p_32bit = v;
+-			return;
+-		}
++		vcpu_write_spsr32(vcpu, v);
++		return;
+ 	}
+ 
+ 	if (vcpu->arch.sysregs_loaded_on_cpu)
+ 		write_sysreg_el1(v, spsr);
+ 	else
+-		*p = v;
++		vcpu_gp_regs(vcpu)->spsr[KVM_SPSR_EL1] = v;
+ }
+ 
+ static inline bool vcpu_mode_priv(const struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/regmap.c b/arch/arm64/kvm/regmap.c
+index bbc6ae32e4af..eefe403a2e63 100644
+--- a/arch/arm64/kvm/regmap.c
++++ b/arch/arm64/kvm/regmap.c
+@@ -141,28 +141,61 @@ unsigned long *vcpu_reg32(const struct kvm_vcpu *vcpu, u8 reg_num)
  /*
-  * Non-VHE: Both host and guest must save everything.
-  *
-- * VHE: Host must save tpidr*_el0, mdscr_el1, sp_el0,
-- * and guest must save everything.
-+ * VHE: Host and guest must save mdscr_el1 and sp_el0 (and the PC and pstate,
-+ * which are handled as part of the el2 return state) on every switch.
-+ * tpidr_el0 and tpidrro_el0 only need to be switched when going
-+ * to host userspace or a different VCPU.  EL1 registers only need to be
-+ * switched when potentially going to run a different VCPU.  The latter two
-+ * classes are handled as part of kvm_arch_vcpu_load and kvm_arch_vcpu_put.
+  * Return the SPSR for the current mode of the virtual CPU.
   */
- 
- static void __hyp_text __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
-@@ -93,14 +97,11 @@ void __hyp_text __sysreg_save_state_nvhe(struct kvm_cpu_context *ctxt)
- void sysreg_save_host_state_vhe(struct kvm_cpu_context *ctxt)
+-unsigned long *vcpu_spsr32(const struct kvm_vcpu *vcpu)
++static int vcpu_spsr32_mode(const struct kvm_vcpu *vcpu)
  {
- 	__sysreg_save_common_state(ctxt);
--	__sysreg_save_user_state(ctxt);
- }
- 
- void sysreg_save_guest_state_vhe(struct kvm_cpu_context *ctxt)
- {
--	__sysreg_save_el1_state(ctxt);
- 	__sysreg_save_common_state(ctxt);
--	__sysreg_save_user_state(ctxt);
- 	__sysreg_save_el2_return_state(ctxt);
- }
- 
-@@ -169,14 +170,11 @@ void __hyp_text __sysreg_restore_state_nvhe(struct kvm_cpu_context *ctxt)
- void sysreg_restore_host_state_vhe(struct kvm_cpu_context *ctxt)
- {
- 	__sysreg_restore_common_state(ctxt);
--	__sysreg_restore_user_state(ctxt);
- }
- 
- void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt)
- {
--	__sysreg_restore_el1_state(ctxt);
- 	__sysreg_restore_common_state(ctxt);
--	__sysreg_restore_user_state(ctxt);
- 	__sysreg_restore_el2_return_state(ctxt);
- }
- 
-@@ -240,6 +238,18 @@ void __hyp_text __sysreg32_restore_state(struct kvm_vcpu *vcpu)
-  */
- void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu)
- {
-+	struct kvm_cpu_context *host_ctxt = vcpu->arch.host_cpu_context;
-+	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
+ 	unsigned long mode = *vcpu_cpsr(vcpu) & COMPAT_PSR_MODE_MASK;
+ 	switch (mode) {
+-	case COMPAT_PSR_MODE_SVC:
+-		mode = KVM_SPSR_SVC;
+-		break;
+-	case COMPAT_PSR_MODE_ABT:
+-		mode = KVM_SPSR_ABT;
+-		break;
+-	case COMPAT_PSR_MODE_UND:
+-		mode = KVM_SPSR_UND;
+-		break;
+-	case COMPAT_PSR_MODE_IRQ:
+-		mode = KVM_SPSR_IRQ;
+-		break;
+-	case COMPAT_PSR_MODE_FIQ:
+-		mode = KVM_SPSR_FIQ;
+-		break;
++	case COMPAT_PSR_MODE_SVC: return KVM_SPSR_SVC;
++	case COMPAT_PSR_MODE_ABT: return KVM_SPSR_ABT;
++	case COMPAT_PSR_MODE_UND: return KVM_SPSR_UND;
++	case COMPAT_PSR_MODE_IRQ: return KVM_SPSR_IRQ;
++	case COMPAT_PSR_MODE_FIQ: return KVM_SPSR_FIQ;
++	default: BUG();
++	}
++}
 +
-+	if (!has_vhe())
-+		return;
++unsigned long vcpu_read_spsr32(const struct kvm_vcpu *vcpu)
++{
++	int spsr_idx = vcpu_spsr32_mode(vcpu);
 +
-+	__sysreg_save_user_state(host_ctxt);
++	if (!vcpu->arch.sysregs_loaded_on_cpu)
++		return vcpu_gp_regs(vcpu)->spsr[spsr_idx];
 +
-+	__sysreg_restore_user_state(guest_ctxt);
-+	__sysreg_restore_el1_state(guest_ctxt);
-+
-+	vcpu->arch.sysregs_loaded_on_cpu = true;
- }
- 
- /**
-@@ -255,6 +265,19 @@ void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu)
-  */
- void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu)
- {
-+	struct kvm_cpu_context *host_ctxt = vcpu->arch.host_cpu_context;
-+	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
-+
-+	if (!has_vhe())
-+		return;
-+
-+	__sysreg_save_el1_state(guest_ctxt);
-+	__sysreg_save_user_state(guest_ctxt);
-+
-+	/* Restore host user state */
-+	__sysreg_restore_user_state(host_ctxt);
-+
-+	vcpu->arch.sysregs_loaded_on_cpu = false;
- }
- 
- void __hyp_text __kvm_set_tpidr_el2(u64 tpidr_el2)
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index c809f0d1a059..17eb7772e059 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -85,8 +85,33 @@ u64 vcpu_read_sys_reg(struct kvm_vcpu *vcpu, int reg)
- 	/*
- 	 * System registers listed in the switch are not saved on every
- 	 * exit from the guest but are only saved on vcpu_put.
-+	 *
-+	 * Note that MPIDR_EL1 for the guest is set by KVM via VMPIDR_EL2 but
-+	 * should never be listed below, because the guest cannot modify its
-+	 * own MPIDR_EL1 and MPIDR_EL1 is accessed for VCPU A from VCPU B's
-+	 * thread when emulating cross-VCPU communication.
- 	 */
- 	switch (reg) {
-+	case CSSELR_EL1:	return read_sysreg_s(SYS_CSSELR_EL1);
-+	case SCTLR_EL1:		return read_sysreg_s(sctlr_EL12);
-+	case ACTLR_EL1:		return read_sysreg_s(SYS_ACTLR_EL1);
-+	case CPACR_EL1:		return read_sysreg_s(cpacr_EL12);
-+	case TTBR0_EL1:		return read_sysreg_s(ttbr0_EL12);
-+	case TTBR1_EL1:		return read_sysreg_s(ttbr1_EL12);
-+	case TCR_EL1:		return read_sysreg_s(tcr_EL12);
-+	case ESR_EL1:		return read_sysreg_s(esr_EL12);
-+	case AFSR0_EL1:		return read_sysreg_s(afsr0_EL12);
-+	case AFSR1_EL1:		return read_sysreg_s(afsr1_EL12);
-+	case FAR_EL1:		return read_sysreg_s(far_EL12);
-+	case MAIR_EL1:		return read_sysreg_s(mair_EL12);
-+	case VBAR_EL1:		return read_sysreg_s(vbar_EL12);
-+	case CONTEXTIDR_EL1:	return read_sysreg_s(contextidr_EL12);
-+	case TPIDR_EL0:		return read_sysreg_s(SYS_TPIDR_EL0);
-+	case TPIDRRO_EL0:	return read_sysreg_s(SYS_TPIDRRO_EL0);
-+	case TPIDR_EL1:		return read_sysreg_s(SYS_TPIDR_EL1);
-+	case AMAIR_EL1:		return read_sysreg_s(amair_EL12);
-+	case CNTKCTL_EL1:	return read_sysreg_s(cntkctl_EL12);
-+	case PAR_EL1:		return read_sysreg_s(SYS_PAR_EL1);
++	switch (spsr_idx) {
++	case KVM_SPSR_SVC:
++		return read_sysreg_el1(spsr);
++	case KVM_SPSR_ABT:
++		return read_sysreg(spsr_abt);
++	case KVM_SPSR_UND:
++		return read_sysreg(spsr_und);
++	case KVM_SPSR_IRQ:
++		return read_sysreg(spsr_irq);
++	case KVM_SPSR_FIQ:
++		return read_sysreg(spsr_fiq);
+ 	default:
+ 		BUG();
  	}
++}
++
++void vcpu_write_spsr32(struct kvm_vcpu *vcpu, unsigned long v)
++{
++	int spsr_idx = vcpu_spsr32_mode(vcpu);
++
++	if (!vcpu->arch.sysregs_loaded_on_cpu) {
++		vcpu_gp_regs(vcpu)->spsr[spsr_idx] = v;
++		return;
++	}
  
- immediate_read:
-@@ -101,8 +126,32 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
- 	/*
- 	 * System registers listed in the switch are not restored on every
- 	 * entry to the guest but are only restored on vcpu_load.
-+	 *
-+	 * Note that MPIDR_EL1 for the guest is set by KVM via VMPIDR_EL2 but
-+	 * should never be listed below, because the the MPIDR should only be
-+	 * set once, before running the VCPU, and never changed later.
- 	 */
- 	switch (reg) {
-+	case CSSELR_EL1:	write_sysreg_s(val, SYS_CSSELR_EL1);	return;
-+	case SCTLR_EL1:		write_sysreg_s(val, sctlr_EL12);	return;
-+	case ACTLR_EL1:		write_sysreg_s(val, SYS_ACTLR_EL1);	return;
-+	case CPACR_EL1:		write_sysreg_s(val, cpacr_EL12);	return;
-+	case TTBR0_EL1:		write_sysreg_s(val, ttbr0_EL12);	return;
-+	case TTBR1_EL1:		write_sysreg_s(val, ttbr1_EL12);	return;
-+	case TCR_EL1:		write_sysreg_s(val, tcr_EL12);		return;
-+	case ESR_EL1:		write_sysreg_s(val, esr_EL12);		return;
-+	case AFSR0_EL1:		write_sysreg_s(val, afsr0_EL12);	return;
-+	case AFSR1_EL1:		write_sysreg_s(val, afsr1_EL12);	return;
-+	case FAR_EL1:		write_sysreg_s(val, far_EL12);		return;
-+	case MAIR_EL1:		write_sysreg_s(val, mair_EL12);		return;
-+	case VBAR_EL1:		write_sysreg_s(val, vbar_EL12);		return;
-+	case CONTEXTIDR_EL1:	write_sysreg_s(val, contextidr_EL12);	return;
-+	case TPIDR_EL0:		write_sysreg_s(val, SYS_TPIDR_EL0);	return;
-+	case TPIDRRO_EL0:	write_sysreg_s(val, SYS_TPIDRRO_EL0);	return;
-+	case TPIDR_EL1:		write_sysreg_s(val, SYS_TPIDR_EL1);	return;
-+	case AMAIR_EL1:		write_sysreg_s(val, amair_EL12);	return;
-+	case CNTKCTL_EL1:	write_sysreg_s(val, cntkctl_EL12);	return;
-+	case PAR_EL1:		write_sysreg_s(val, SYS_PAR_EL1);	return;
- 	}
- 
- immediate_write:
+-	return (unsigned long *)&vcpu_gp_regs(vcpu)->spsr[mode];
++	switch (spsr_idx) {
++	case KVM_SPSR_SVC:
++		write_sysreg_el1(v, spsr);
++	case KVM_SPSR_ABT:
++		write_sysreg(v, spsr_abt);
++	case KVM_SPSR_UND:
++		write_sysreg(v, spsr_und);
++	case KVM_SPSR_IRQ:
++		write_sysreg(v, spsr_irq);
++	case KVM_SPSR_FIQ:
++		write_sysreg(v, spsr_fiq);
++	}
+ }
 -- 
 2.14.2
