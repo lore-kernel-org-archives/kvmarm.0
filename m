@@ -1,23 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 08/85] KVM: arm/arm64: vgic: Add missing irq_lock to
- vgic_mmio_read_pending
-Date: Wed, 28 Mar 2018 13:51:37 +0100
-Message-ID: <20180328125254.31380-9-marc.zyngier@arm.com>
+Subject: [PATCH 09/85] KVM: arm/arm64: Avoid vcpu_load for other vcpu ioctls
+ than KVM_RUN
+Date: Wed, 28 Mar 2018 13:51:38 +0100
+Message-ID: <20180328125254.31380-10-marc.zyngier@arm.com>
 References: <20180328125254.31380-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A96B149FC5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:46:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0161849FEA
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:47:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yEX3v3y6B-QN for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Mar 2018 08:46:28 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 99CDD49FC0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:45:27 -0400 (EDT)
+ with ESMTP id UGGQy0m+cNrX for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Mar 2018 08:46:47 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DD4B949FD8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:45:31 -0400 (EDT)
 In-Reply-To: <20180328125254.31380-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -29,53 +29,113 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Cc: Christoffer Dall <cdall@cs.columbia.edu>, Shunyong Yang <shunyong.yang@hxt-semitech.com>, Julien Thierry <julien.thierry@arm.com>, Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Catalin Marinas <catalin.marinas@arm.com>, Dave Martin <Dave.Martin@arm.com>
+Cc: Christoffer Dall <cdall@cs.columbia.edu>, Christoffer Dall <christoffer.dall@linaro.org>, Shunyong Yang <shunyong.yang@hxt-semitech.com>, Julien Thierry <julien.thierry@arm.com>, Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Catalin Marinas <catalin.marinas@arm.com>, Dave Martin <Dave.Martin@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Andre Przywara <andre.przywara@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
-Our irq_is_pending() helper function accesses multiple members of the
-vgic_irq struct, so we need to hold the lock when calling it.
-Add that requirement as a comment to the definition and take the lock
-around the call in vgic_mmio_read_pending(), where we were missing it
-before.
+Calling vcpu_load() registers preempt notifiers for this vcpu and calls
+kvm_arch_vcpu_load().  The latter will soon be doing a lot of heavy
+lifting on arm/arm64 and will try to do things such as enabling the
+virtual timer and setting us up to handle interrupts from the timer
+hardware.
 
-Fixes: 96b298000db4 ("KVM: arm/arm64: vgic-new: Add PENDING registers handlers")
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Loading state onto hardware registers and enabling hardware to signal
+interrupts can be problematic when we're not actually about to run the
+VCPU, because it makes it difficult to establish the right context when
+handling interrupts from the timer, and it makes the register access
+code difficult to reason about.
+
+Luckily, now when we call vcpu_load in each ioctl implementation, we can
+simply remove the call from the non-KVM_RUN vcpu ioctls, and our
+kvm_arch_vcpu_load() is only used for loading vcpu content to the
+physical CPU when we're actually going to run the vcpu.
+
+Cc: stable@vger.kernel.org
+Fixes: 9b062471e52a ("KVM: Move vcpu_load to arch-specific kvm_arch_vcpu_ioctl")
+Reviewed-by: Julien Grall <julien.grall@arm.com>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-mmio.c | 3 +++
- virt/kvm/arm/vgic/vgic.h      | 1 +
- 2 files changed, 4 insertions(+)
+ arch/arm64/kvm/guest.c | 3 ---
+ virt/kvm/arm/arm.c     | 9 ---------
+ 2 files changed, 12 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index 83d82bd7dc4e..dbe99d635c80 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -113,9 +113,12 @@ unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
- 	/* Loop over all IRQs affected by this read */
- 	for (i = 0; i < len * 8; i++) {
- 		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+		unsigned long flags;
- 
-+		spin_lock_irqsave(&irq->irq_lock, flags);
- 		if (irq_is_pending(irq))
- 			value |= (1U << i);
-+		spin_unlock_irqrestore(&irq->irq_lock, flags);
- 
- 		vgic_put_irq(vcpu->kvm, irq);
- 	}
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index 12c37b89f7a3..5b11859a1a1e 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -96,6 +96,7 @@
- /* we only support 64 kB translation table page size */
- #define KVM_ITS_L1E_ADDR_MASK		GENMASK_ULL(51, 16)
- 
-+/* Requires the irq_lock to be held by the caller. */
- static inline bool irq_is_pending(struct vgic_irq *irq)
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index d7e3299a7734..959e50d2588c 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -363,8 +363,6 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
  {
- 	if (irq->config == VGIC_CONFIG_EDGE)
+ 	int ret = 0;
+ 
+-	vcpu_load(vcpu);
+-
+ 	trace_kvm_set_guest_debug(vcpu, dbg->control);
+ 
+ 	if (dbg->control & ~KVM_GUESTDBG_VALID_MASK) {
+@@ -386,7 +384,6 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+ 	}
+ 
+ out:
+-	vcpu_put(vcpu);
+ 	return ret;
+ }
+ 
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 86941f6181bb..53572304843b 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -384,14 +384,11 @@ static void vcpu_power_off(struct kvm_vcpu *vcpu)
+ int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
+ 				    struct kvm_mp_state *mp_state)
+ {
+-	vcpu_load(vcpu);
+-
+ 	if (vcpu->arch.power_off)
+ 		mp_state->mp_state = KVM_MP_STATE_STOPPED;
+ 	else
+ 		mp_state->mp_state = KVM_MP_STATE_RUNNABLE;
+ 
+-	vcpu_put(vcpu);
+ 	return 0;
+ }
+ 
+@@ -400,8 +397,6 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+ {
+ 	int ret = 0;
+ 
+-	vcpu_load(vcpu);
+-
+ 	switch (mp_state->mp_state) {
+ 	case KVM_MP_STATE_RUNNABLE:
+ 		vcpu->arch.power_off = false;
+@@ -413,7 +408,6 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+ 		ret = -EINVAL;
+ 	}
+ 
+-	vcpu_put(vcpu);
+ 	return ret;
+ }
+ 
+@@ -1036,8 +1030,6 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 	struct kvm_device_attr attr;
+ 	long r;
+ 
+-	vcpu_load(vcpu);
+-
+ 	switch (ioctl) {
+ 	case KVM_ARM_VCPU_INIT: {
+ 		struct kvm_vcpu_init init;
+@@ -1114,7 +1106,6 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 		r = -EINVAL;
+ 	}
+ 
+-	vcpu_put(vcpu);
+ 	return r;
+ }
+ 
 -- 
 2.14.2
