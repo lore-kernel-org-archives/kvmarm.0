@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 01/85] KVM: arm/arm64: Fix arch timers with userspace irqchips
-Date: Wed, 28 Mar 2018 13:51:30 +0100
-Message-ID: <20180328125254.31380-2-marc.zyngier@arm.com>
+Subject: [PATCH 03/85] arm64/kvm: Prohibit guest LOR accesses
+Date: Wed, 28 Mar 2018 13:51:32 +0100
+Message-ID: <20180328125254.31380-4-marc.zyngier@arm.com>
 References: <20180328125254.31380-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 098A849FBC
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:45:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 58EB749FD8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:45:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id H9ugUesEhgx9 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Mar 2018 08:44:59 -0400 (EDT)
+ with ESMTP id k70jv0FR0iOL for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Mar 2018 08:45:07 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2331D40170
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:44:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 48F0B40357
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:45:07 -0400 (EDT)
 In-Reply-To: <20180328125254.31380-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -28,258 +28,158 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Cc: Christoffer Dall <cdall@cs.columbia.edu>, Christoffer Dall <christoffer.dall@linaro.org>, Shunyong Yang <shunyong.yang@hxt-semitech.com>, Julien Thierry <julien.thierry@arm.com>, Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Catalin Marinas <catalin.marinas@arm.com>, Dave Martin <Dave.Martin@arm.com>
+Cc: Christoffer Dall <cdall@cs.columbia.edu>, Shunyong Yang <shunyong.yang@hxt-semitech.com>, Julien Thierry <julien.thierry@arm.com>, Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Catalin Marinas <catalin.marinas@arm.com>, Dave Martin <Dave.Martin@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+From: Mark Rutland <mark.rutland@arm.com>
 
-When introducing support for irqchip in userspace we needed a way to
-mask the timer signal to prevent the guest continuously exiting due to a
-screaming timer.
+We don't currently limit guest accesses to the LOR registers, which we
+neither virtualize nor context-switch. As such, guests are provided with
+unusable information/controls, and are not isolated from each other (or
+the host).
 
-We did this by disabling the corresponding percpu interrupt on the
-host interrupt controller, because we cannot rely on the host system
-having a GIC, and therefore cannot make any assumptions about having an
-active state to hide the timer signal.
+To prevent these issues, we can trap register accesses and present the
+illusion LORegions are unssupported by the CPU. To do this, we mask
+ID_AA64MMFR1.LO, and set HCR_EL2.TLOR to trap accesses to the following
+registers:
 
-Unfortunately, when introducing this feature, it became entirely
-possible that a VCPU which belongs to a VM that has a userspace irqchip
-can disable the vtimer irq on the host on some physical CPU, and then go
-away without ever enabling the vtimer irq on that physical CPU again.
+* LORC_EL1
+* LOREA_EL1
+* LORID_EL1
+* LORN_EL1
+* LORSA_EL1
 
-This means that using irqchips in userspace on a system that also
-supports running VMs with an in-kernel GIC can prevent forward progress
-from in-kernel GIC VMs.
+... when trapped, we inject an UNDEFINED exception to EL1, simulating
+their non-existence.
 
-Later on, when we started taking virtual timer interrupts in the arch
-timer code, we would also leave this timer state active for userspace
-irqchip VMs, because we leave it up to a VGIC-enabled guest to
-deactivate the hardware IRQ using the HW bit in the LR.
+As noted in D7.2.67, when no LORegions are implemented, LoadLOAcquire
+and StoreLORelease must behave as LoadAcquire and StoreRelease
+respectively. We can ensure this by clearing LORC_EL1.EN when a CPU's
+EL2 is first initialized, as the host kernel will not modify this.
 
-Both issues are solved by only using the enable/disable trick on systems
-that do not have a host GIC which supports the active state, because all
-VMs on such systems must use irqchips in userspace.  Systems that have a
-working GIC with support for an active state use the active state to
-mask the timer signal for both userspace and in-kernel irqchips.
-
-Cc: Alexander Graf <agraf@suse.de>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-Cc: <stable@vger.kernel.org> # v4.12+
-Fixes: d9e139778376 ("KVM: arm/arm64: Support arch timers with a userspace gic")
+Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+Cc: Vladimir Murzin <vladimir.murzin@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/arch_timer.c | 116 +++++++++++++++++++++++++---------------------
- 1 file changed, 64 insertions(+), 52 deletions(-)
+ arch/arm64/include/asm/kvm_arm.h |  4 +++-
+ arch/arm64/include/asm/sysreg.h  |  6 ++++++
+ arch/arm64/kernel/head.S         |  7 +++++++
+ arch/arm64/kvm/sys_regs.c        | 20 ++++++++++++++++++++
+ 4 files changed, 36 insertions(+), 1 deletion(-)
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 70268c0bec79..70f4c30918eb 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -36,6 +36,8 @@ static struct timecounter *timecounter;
- static unsigned int host_vtimer_irq;
- static u32 host_vtimer_irq_flags;
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index b0c84171e6a3..1b438c334463 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -25,6 +25,7 @@
+ /* Hyp Configuration Register (HCR) bits */
+ #define HCR_TEA		(UL(1) << 37)
+ #define HCR_TERR	(UL(1) << 36)
++#define HCR_TLOR	(UL(1) << 35)
+ #define HCR_E2H		(UL(1) << 34)
+ #define HCR_ID		(UL(1) << 33)
+ #define HCR_CD		(UL(1) << 32)
+@@ -64,6 +65,7 @@
  
-+static DEFINE_STATIC_KEY_FALSE(has_gic_active_state);
+ /*
+  * The bits we set in HCR:
++ * TLOR:	Trap LORegion register accesses
+  * RW:		64bit by default, can be overridden for 32bit VMs
+  * TAC:		Trap ACTLR
+  * TSC:		Trap SMC
+@@ -81,7 +83,7 @@
+  */
+ #define HCR_GUEST_FLAGS (HCR_TSC | HCR_TSW | HCR_TWE | HCR_TWI | HCR_VM | \
+ 			 HCR_TVM | HCR_BSU_IS | HCR_FB | HCR_TAC | \
+-			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW)
++			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR)
+ #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
+ #define HCR_INT_OVERRIDE   (HCR_FMO | HCR_IMO)
+ #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 0e1960c59197..69a99856461c 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -288,6 +288,12 @@
+ #define SYS_MAIR_EL1			sys_reg(3, 0, 10, 2, 0)
+ #define SYS_AMAIR_EL1			sys_reg(3, 0, 10, 3, 0)
+ 
++#define SYS_LORSA_EL1			sys_reg(3, 0, 10, 4, 0)
++#define SYS_LOREA_EL1			sys_reg(3, 0, 10, 4, 1)
++#define SYS_LORN_EL1			sys_reg(3, 0, 10, 4, 2)
++#define SYS_LORC_EL1			sys_reg(3, 0, 10, 4, 3)
++#define SYS_LORID_EL1			sys_reg(3, 0, 10, 4, 7)
 +
- static const struct kvm_irq_level default_ptimer_irq = {
- 	.irq	= 30,
- 	.level	= 1,
-@@ -56,6 +58,12 @@ u64 kvm_phys_timer_read(void)
- 	return timecounter->cc->read(timecounter->cc);
+ #define SYS_VBAR_EL1			sys_reg(3, 0, 12, 0, 0)
+ #define SYS_DISR_EL1			sys_reg(3, 0, 12, 1, 1)
+ 
+diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+index 2b6b8b24e5ab..b0853069702f 100644
+--- a/arch/arm64/kernel/head.S
++++ b/arch/arm64/kernel/head.S
+@@ -577,6 +577,13 @@ set_hcr:
+ 7:
+ 	msr	mdcr_el2, x3			// Configure debug traps
+ 
++	/* LORegions */
++	mrs	x1, id_aa64mmfr1_el1
++	ubfx	x0, x1, #ID_AA64MMFR1_LOR_SHIFT, 4
++	cbz	x0, 1f
++	msr_s	SYS_LORC_EL1, xzr
++1:
++
+ 	/* Stage-2 translation */
+ 	msr	vttbr_el2, xzr
+ 
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 50a43c7b97ca..55982b565eb2 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -175,6 +175,14 @@ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
+ 		return read_zero(vcpu, p);
  }
  
-+static inline bool userspace_irqchip(struct kvm *kvm)
++static bool trap_undef(struct kvm_vcpu *vcpu,
++		       struct sys_reg_params *p,
++		       const struct sys_reg_desc *r)
 +{
-+	return static_branch_unlikely(&userspace_irqchip_in_use) &&
-+		unlikely(!irqchip_in_kernel(kvm));
++	kvm_inject_undefined(vcpu);
++	return false;
 +}
 +
- static void soft_timer_start(struct hrtimer *hrt, u64 ns)
- {
- 	hrtimer_start(hrt, ktime_add_ns(ktime_get(), ns),
-@@ -69,25 +77,6 @@ static void soft_timer_cancel(struct hrtimer *hrt, struct work_struct *work)
- 		cancel_work_sync(work);
- }
+ static bool trap_oslsr_el1(struct kvm_vcpu *vcpu,
+ 			   struct sys_reg_params *p,
+ 			   const struct sys_reg_desc *r)
+@@ -893,6 +901,12 @@ static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
+ 				    task_pid_nr(current));
  
--static void kvm_vtimer_update_mask_user(struct kvm_vcpu *vcpu)
--{
--	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
--
--	/*
--	 * When using a userspace irqchip with the architected timers, we must
--	 * prevent continuously exiting from the guest, and therefore mask the
--	 * physical interrupt by disabling it on the host interrupt controller
--	 * when the virtual level is high, such that the guest can make
--	 * forward progress.  Once we detect the output level being
--	 * de-asserted, we unmask the interrupt again so that we exit from the
--	 * guest when the timer fires.
--	 */
--	if (vtimer->irq.level)
--		disable_percpu_irq(host_vtimer_irq);
--	else
--		enable_percpu_irq(host_vtimer_irq, 0);
--}
--
- static irqreturn_t kvm_arch_timer_handler(int irq, void *dev_id)
- {
- 	struct kvm_vcpu *vcpu = *(struct kvm_vcpu **)dev_id;
-@@ -106,9 +95,9 @@ static irqreturn_t kvm_arch_timer_handler(int irq, void *dev_id)
- 	if (kvm_timer_should_fire(vtimer))
- 		kvm_timer_update_irq(vcpu, true, vtimer);
- 
--	if (static_branch_unlikely(&userspace_irqchip_in_use) &&
--	    unlikely(!irqchip_in_kernel(vcpu->kvm)))
--		kvm_vtimer_update_mask_user(vcpu);
-+	if (userspace_irqchip(vcpu->kvm) &&
-+	    !static_branch_unlikely(&has_gic_active_state))
-+		disable_percpu_irq(host_vtimer_irq);
- 
- 	return IRQ_HANDLED;
- }
-@@ -290,8 +279,7 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
- 	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer_ctx->irq.irq,
- 				   timer_ctx->irq.level);
- 
--	if (!static_branch_unlikely(&userspace_irqchip_in_use) ||
--	    likely(irqchip_in_kernel(vcpu->kvm))) {
-+	if (!userspace_irqchip(vcpu->kvm)) {
- 		ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
- 					  timer_ctx->irq.irq,
- 					  timer_ctx->irq.level,
-@@ -350,12 +338,6 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
- 	phys_timer_emulate(vcpu);
- }
- 
--static void __timer_snapshot_state(struct arch_timer_context *timer)
--{
--	timer->cnt_ctl = read_sysreg_el0(cntv_ctl);
--	timer->cnt_cval = read_sysreg_el0(cntv_cval);
--}
--
- static void vtimer_save_state(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-@@ -367,8 +349,10 @@ static void vtimer_save_state(struct kvm_vcpu *vcpu)
- 	if (!vtimer->loaded)
- 		goto out;
- 
--	if (timer->enabled)
--		__timer_snapshot_state(vtimer);
-+	if (timer->enabled) {
-+		vtimer->cnt_ctl = read_sysreg_el0(cntv_ctl);
-+		vtimer->cnt_cval = read_sysreg_el0(cntv_cval);
-+	}
- 
- 	/* Disable the virtual timer */
- 	write_sysreg_el0(0, cntv_ctl);
-@@ -460,23 +444,43 @@ static void set_cntvoff(u64 cntvoff)
- 	kvm_call_hyp(__kvm_timer_set_cntvoff, low, high);
- }
- 
--static void kvm_timer_vcpu_load_vgic(struct kvm_vcpu *vcpu)
-+static inline void set_vtimer_irq_phys_active(struct kvm_vcpu *vcpu, bool active)
-+{
-+	int r;
-+	r = irq_set_irqchip_state(host_vtimer_irq, IRQCHIP_STATE_ACTIVE, active);
-+	WARN_ON(r);
-+}
+ 		val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
++	} else if (id == SYS_ID_AA64MMFR1_EL1) {
++		if (val & (0xfUL << ID_AA64MMFR1_LOR_SHIFT))
++			pr_err_once("kvm [%i]: LORegions unsupported for guests, suppressing\n",
++				    task_pid_nr(current));
 +
-+static void kvm_timer_vcpu_load_gic(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 	bool phys_active;
--	int ret;
- 
--	phys_active = kvm_vgic_map_is_active(vcpu, vtimer->irq.irq);
--
--	ret = irq_set_irqchip_state(host_vtimer_irq,
--				    IRQCHIP_STATE_ACTIVE,
--				    phys_active);
--	WARN_ON(ret);
-+	if (irqchip_in_kernel(vcpu->kvm))
-+		phys_active = kvm_vgic_map_is_active(vcpu, vtimer->irq.irq);
-+	else
-+		phys_active = vtimer->irq.level;
-+	set_vtimer_irq_phys_active(vcpu, phys_active);
- }
- 
--static void kvm_timer_vcpu_load_user(struct kvm_vcpu *vcpu)
-+static void kvm_timer_vcpu_load_nogic(struct kvm_vcpu *vcpu)
- {
--	kvm_vtimer_update_mask_user(vcpu);
-+	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
-+
-+	/*
-+	 * When using a userspace irqchip with the architected timers and a
-+	 * host interrupt controller that doesn't support an active state, we
-+	 * must still prevent continuously exiting from the guest, and
-+	 * therefore mask the physical interrupt by disabling it on the host
-+	 * interrupt controller when the virtual level is high, such that the
-+	 * guest can make forward progress.  Once we detect the output level
-+	 * being de-asserted, we unmask the interrupt again so that we exit
-+	 * from the guest when the timer fires.
-+	 */
-+	if (vtimer->irq.level)
-+		disable_percpu_irq(host_vtimer_irq);
-+	else
-+		enable_percpu_irq(host_vtimer_irq, host_vtimer_irq_flags);
- }
- 
- void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
-@@ -487,10 +491,10 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
- 	if (unlikely(!timer->enabled))
- 		return;
- 
--	if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
--		kvm_timer_vcpu_load_user(vcpu);
-+	if (static_branch_likely(&has_gic_active_state))
-+		kvm_timer_vcpu_load_gic(vcpu);
- 	else
--		kvm_timer_vcpu_load_vgic(vcpu);
-+		kvm_timer_vcpu_load_nogic(vcpu);
- 
- 	set_cntvoff(vtimer->cntvoff);
- 
-@@ -555,18 +559,24 @@ static void unmask_vtimer_irq_user(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 
--	if (unlikely(!irqchip_in_kernel(vcpu->kvm))) {
--		__timer_snapshot_state(vtimer);
--		if (!kvm_timer_should_fire(vtimer)) {
--			kvm_timer_update_irq(vcpu, false, vtimer);
--			kvm_vtimer_update_mask_user(vcpu);
--		}
-+	if (!kvm_timer_should_fire(vtimer)) {
-+		kvm_timer_update_irq(vcpu, false, vtimer);
-+		if (static_branch_likely(&has_gic_active_state))
-+			set_vtimer_irq_phys_active(vcpu, false);
-+		else
-+			enable_percpu_irq(host_vtimer_irq, host_vtimer_irq_flags);
- 	}
- }
- 
- void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
- {
--	unmask_vtimer_irq_user(vcpu);
-+	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-+
-+	if (unlikely(!timer->enabled))
-+		return;
-+
-+	if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
-+		unmask_vtimer_irq_user(vcpu);
- }
- 
- int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
-@@ -753,6 +763,8 @@ int kvm_timer_hyp_init(bool has_gic)
- 			kvm_err("kvm_arch_timer: error setting vcpu affinity\n");
- 			goto out_free_irq;
- 		}
-+
-+		static_branch_enable(&has_gic_active_state);
++		val &= ~(0xfUL << ID_AA64MMFR1_LOR_SHIFT);
  	}
  
- 	kvm_info("virtual timer IRQ%d\n", host_vtimer_irq);
+ 	return val;
+@@ -1178,6 +1192,12 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 },
+ 	{ SYS_DESC(SYS_AMAIR_EL1), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
+ 
++	{ SYS_DESC(SYS_LORSA_EL1), trap_undef },
++	{ SYS_DESC(SYS_LOREA_EL1), trap_undef },
++	{ SYS_DESC(SYS_LORN_EL1), trap_undef },
++	{ SYS_DESC(SYS_LORC_EL1), trap_undef },
++	{ SYS_DESC(SYS_LORID_EL1), trap_undef },
++
+ 	{ SYS_DESC(SYS_VBAR_EL1), NULL, reset_val, VBAR_EL1, 0 },
+ 	{ SYS_DESC(SYS_DISR_EL1), NULL, reset_val, DISR_EL1, 0 },
+ 
 -- 
 2.14.2
