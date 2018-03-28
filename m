@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 17/85] KVM: arm64: Rework hyp_panic for VHE and non-VHE
-Date: Wed, 28 Mar 2018 13:51:46 +0100
-Message-ID: <20180328125254.31380-18-marc.zyngier@arm.com>
+Subject: [PATCH 20/85] KVM: arm/arm64: Add kvm_vcpu_load_sysregs and
+ kvm_vcpu_put_sysregs
+Date: Wed, 28 Mar 2018 13:51:49 +0100
+Message-ID: <20180328125254.31380-21-marc.zyngier@arm.com>
 References: <20180328125254.31380-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B88349FFC
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:48:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D17514A03C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:48:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LkenAdAHzKWO for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Mar 2018 08:48:04 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BEE049FAC
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:46:05 -0400 (EDT)
+ with ESMTP id R0a7f-Z9+g2S for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Mar 2018 08:48:29 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D09849FBB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:46:17 -0400 (EDT)
 In-Reply-To: <20180328125254.31380-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,106 +34,101 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Christoffer Dall <christoffer.dall@linaro.org>
 
-VHE actually doesn't rely on clearing the VTTBR when returning to the
-host kernel, and that is the current key mechanism of hyp_panic to
-figure out how to attempt to return to a state good enough to print a
-panic statement.
+As we are about to move a bunch of save/restore logic for VHE kernels to
+the load and put functions, we need some infrastructure to do this.
 
-Therefore, we split the hyp_panic function into two functions, a VHE and
-a non-VHE, keeping the non-VHE version intact, but changing the VHE
-behavior.
-
-The vttbr_el2 check on VHE doesn't really make that much sense, because
-the only situation where we can get here on VHE is when the hypervisor
-assembly code actually called into hyp_panic, which only happens when
-VBAR_EL2 has been set to the KVM exception vectors.  On VHE, we can
-always safely disable the traps and restore the host registers at this
-point, so we simply do that unconditionally and call into the panic
-function directly.
-
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 Reviewed-by: Andrew Jones <drjones@redhat.com>
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp/switch.c | 42 +++++++++++++++++++++++-------------------
- 1 file changed, 23 insertions(+), 19 deletions(-)
+ arch/arm/include/asm/kvm_host.h   |  3 +++
+ arch/arm64/include/asm/kvm_host.h |  3 +++
+ arch/arm64/kvm/hyp/sysreg-sr.c    | 30 ++++++++++++++++++++++++++++++
+ virt/kvm/arm/arm.c                |  2 ++
+ 4 files changed, 38 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 46717da75643..579d9a263853 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -439,10 +439,20 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- static const char __hyp_panic_string[] = "HYP panic:\nPS:%08llx PC:%016llx ESR:%08llx\nFAR:%016llx HPFAR:%016llx PAR:%016llx\nVCPU:%p\n";
- 
- static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par,
--					     struct kvm_vcpu *vcpu)
-+					     struct kvm_cpu_context *__host_ctxt)
- {
-+	struct kvm_vcpu *vcpu;
- 	unsigned long str_va;
- 
-+	vcpu = __host_ctxt->__hyp_running_vcpu;
-+
-+	if (read_sysreg(vttbr_el2)) {
-+		__timer_disable_traps(vcpu);
-+		__deactivate_traps(vcpu);
-+		__deactivate_vm(vcpu);
-+		__sysreg_restore_host_state(__host_ctxt);
-+	}
-+
- 	/*
- 	 * Force the panic string to be loaded from the literal pool,
- 	 * making sure it is a kernel address and not a PC-relative
-@@ -456,37 +466,31 @@ static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par,
- 		       read_sysreg(hpfar_el2), par, vcpu);
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index 6137195ab815..c6a749568dd6 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -312,4 +312,7 @@ static inline bool kvm_arm_harden_branch_predictor(void)
+ 	return false;
  }
  
--static void __hyp_text __hyp_call_panic_vhe(u64 spsr, u64 elr, u64 par,
--					    struct kvm_vcpu *vcpu)
-+static void __hyp_call_panic_vhe(u64 spsr, u64 elr, u64 par,
-+				 struct kvm_cpu_context *host_ctxt)
- {
-+	struct kvm_vcpu *vcpu;
-+	vcpu = host_ctxt->__hyp_running_vcpu;
++static inline void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu) {}
++static inline void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu) {}
 +
-+	__deactivate_traps(vcpu);
-+	__sysreg_restore_host_state(host_ctxt);
-+
- 	panic(__hyp_panic_string,
- 	      spsr,  elr,
- 	      read_sysreg_el2(esr),   read_sysreg_el2(far),
- 	      read_sysreg(hpfar_el2), par, vcpu);
+ #endif /* __ARM_KVM_HOST_H__ */
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index b027a7f025d4..c30fc96992df 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -435,4 +435,7 @@ static inline bool kvm_arm_harden_branch_predictor(void)
+ 	return cpus_have_const_cap(ARM64_HARDEN_BRANCH_PREDICTOR);
  }
  
--static hyp_alternate_select(__hyp_call_panic,
--			    __hyp_call_panic_nvhe, __hyp_call_panic_vhe,
--			    ARM64_HAS_VIRT_HOST_EXTN);
--
- void __hyp_text __noreturn hyp_panic(struct kvm_cpu_context *host_ctxt)
- {
--	struct kvm_vcpu *vcpu = NULL;
--
- 	u64 spsr = read_sysreg_el2(spsr);
- 	u64 elr = read_sysreg_el2(elr);
- 	u64 par = read_sysreg(par_el1);
- 
--	if (read_sysreg(vttbr_el2)) {
--		vcpu = host_ctxt->__hyp_running_vcpu;
--		__timer_disable_traps(vcpu);
--		__deactivate_traps(vcpu);
--		__deactivate_vm(vcpu);
--		__sysreg_restore_host_state(host_ctxt);
--	}
--
--	/* Call panic for real */
--	__hyp_call_panic()(spsr, elr, par, vcpu);
-+	if (!has_vhe())
-+		__hyp_call_panic_nvhe(spsr, elr, par, host_ctxt);
-+	else
-+		__hyp_call_panic_vhe(spsr, elr, par, host_ctxt);
- 
- 	unreachable();
++void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu);
++void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu);
++
+ #endif /* __ARM64_KVM_HOST_H__ */
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index 43b7dd65e3e6..434f0fc9cfb3 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -190,6 +190,36 @@ void __hyp_text __sysreg32_restore_state(struct kvm_vcpu *vcpu)
+ 		write_sysreg(sysreg[DBGVCR32_EL2], dbgvcr32_el2);
  }
+ 
++/**
++ * kvm_vcpu_load_sysregs - Load guest system registers to the physical CPU
++ *
++ * @vcpu: The VCPU pointer
++ *
++ * Load system registers that do not affect the host's execution, for
++ * example EL1 system registers on a VHE system where the host kernel
++ * runs at EL2.  This function is called from KVM's vcpu_load() function
++ * and loading system register state early avoids having to load them on
++ * every entry to the VM.
++ */
++void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu)
++{
++}
++
++/**
++ * kvm_vcpu_put_sysregs - Restore host system registers to the physical CPU
++ *
++ * @vcpu: The VCPU pointer
++ *
++ * Save guest system registers that do not affect the host's execution, for
++ * example EL1 system registers on a VHE system where the host kernel
++ * runs at EL2.  This function is called from KVM's vcpu_put() function
++ * and deferring saving system register state until we're no longer running the
++ * VCPU avoids having to save them on every exit from the VM.
++ */
++void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu)
++{
++}
++
+ void __hyp_text __kvm_set_tpidr_el2(u64 tpidr_el2)
+ {
+ 	asm("msr tpidr_el2, %0": : "r" (tpidr_el2));
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 49d13510e9c2..2062d9357971 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -362,10 +362,12 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	kvm_arm_set_running_vcpu(vcpu);
+ 	kvm_vgic_load(vcpu);
+ 	kvm_timer_vcpu_load(vcpu);
++	kvm_vcpu_load_sysregs(vcpu);
+ }
+ 
+ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+ {
++	kvm_vcpu_put_sysregs(vcpu);
+ 	kvm_timer_vcpu_put(vcpu);
+ 	kvm_vgic_put(vcpu);
+ 
 -- 
 2.14.2
