@@ -1,23 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 35/85] KVM: arm64: Don't save the host ELR_EL2 and SPSR_EL2 on
- VHE systems
-Date: Wed, 28 Mar 2018 13:52:04 +0100
-Message-ID: <20180328125254.31380-36-marc.zyngier@arm.com>
+Subject: [PATCH 36/85] KVM: arm64: Change 32-bit handling of VM system
+ registers
+Date: Wed, 28 Mar 2018 13:52:05 +0100
+Message-ID: <20180328125254.31380-37-marc.zyngier@arm.com>
 References: <20180328125254.31380-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CFE9A40259
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:50:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 29F244A0ED
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:50:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IMCVs1zzkgeB for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id K2GzHWadskjP for <kvmarm@lists.cs.columbia.edu>;
  Wed, 28 Mar 2018 08:50:01 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B5DE34A081
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:47:20 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EDAF14A007
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:47:24 -0400 (EDT)
 In-Reply-To: <20180328125254.31380-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,81 +34,84 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Christoffer Dall <christoffer.dall@linaro.org>
 
-On non-VHE systems we need to save the ELR_EL2 and SPSR_EL2 so that we can
-return to the host in EL1 in the same state and location where we issued a
-hypercall to EL2, but on VHE ELR_EL2 and SPSR_EL2 are not useful because we
-never enter a guest as a result of an exception entry that would be directly
-handled by KVM. The kernel entry code already saves ELR_EL1/SPSR_EL1 on
-exception entry, which is enough.  Therefore, factor out these registers into
-separate save/restore functions, making it easy to exclude them from the VHE
-world-switch path later on.
+We currently handle 32-bit accesses to trapped VM system registers using
+the 32-bit index into the coproc array on the vcpu structure, which is a
+union of the coproc array and the sysreg array.
 
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Since all the 32-bit coproc indices are created to correspond to the
+architectural mapping between 64-bit system registers and 32-bit
+coprocessor registers, and because the AArch64 system registers are the
+double in size of the AArch32 coprocessor registers, we can always find
+the system register entry that we must update by dividing the 32-bit
+coproc index by 2.
+
+This is going to make our lives much easier when we have to start
+accessing system registers that use deferred save/restore and might
+have to be read directly from the physical CPU.
+
 Reviewed-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp/sysreg-sr.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ arch/arm64/include/asm/kvm_host.h |  8 --------
+ arch/arm64/kvm/sys_regs.c         | 20 +++++++++++++++-----
+ 2 files changed, 15 insertions(+), 13 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-index d35b3aa680ab..906606dc4e2c 100644
---- a/arch/arm64/kvm/hyp/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-@@ -71,6 +71,10 @@ static void __hyp_text __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
- 	ctxt->gp_regs.sp_el1		= read_sysreg(sp_el1);
- 	ctxt->gp_regs.elr_el1		= read_sysreg_el1(elr);
- 	ctxt->gp_regs.spsr[KVM_SPSR_EL1]= read_sysreg_el1(spsr);
-+}
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 87abc94fb591..9001fd0890c9 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -295,14 +295,6 @@ struct kvm_vcpu_arch {
+ #define vcpu_cp14(v,r)		((v)->arch.ctxt.copro[(r)])
+ #define vcpu_cp15(v,r)		((v)->arch.ctxt.copro[(r)])
+ 
+-#ifdef CONFIG_CPU_BIG_ENDIAN
+-#define vcpu_cp15_64_high(v,r)	vcpu_cp15((v),(r))
+-#define vcpu_cp15_64_low(v,r)	vcpu_cp15((v),(r) + 1)
+-#else
+-#define vcpu_cp15_64_high(v,r)	vcpu_cp15((v),(r) + 1)
+-#define vcpu_cp15_64_low(v,r)	vcpu_cp15((v),(r))
+-#endif
+-
+ struct kvm_vm_stat {
+ 	ulong remote_tlb_flush;
+ };
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 6feb4a2215cb..691f81c31018 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -121,16 +121,26 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
+ 			  const struct sys_reg_desc *r)
+ {
+ 	bool was_enabled = vcpu_has_cache_enabled(vcpu);
++	u64 val;
++	int reg = r->reg;
+ 
+ 	BUG_ON(!p->is_write);
+ 
+-	if (!p->is_aarch32) {
+-		vcpu_sys_reg(vcpu, r->reg) = p->regval;
++	/* See the 32bit mapping in kvm_host.h */
++	if (p->is_aarch32)
++		reg = r->reg / 2;
 +
-+static void __hyp_text __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
-+{
- 	ctxt->gp_regs.regs.pc		= read_sysreg_el2(elr);
- 	ctxt->gp_regs.regs.pstate	= read_sysreg_el2(spsr);
++	if (!p->is_aarch32 || !p->is_32bit) {
++		val = p->regval;
+ 	} else {
+-		if (!p->is_32bit)
+-			vcpu_cp15_64_high(vcpu, r->reg) = upper_32_bits(p->regval);
+-		vcpu_cp15_64_low(vcpu, r->reg) = lower_32_bits(p->regval);
++		val = vcpu_sys_reg(vcpu, reg);
++		if (r->reg % 2)
++			val = (p->regval << 32) | (u64)lower_32_bits(val);
++		else
++			val = ((u64)upper_32_bits(val) << 32) |
++				lower_32_bits(p->regval);
+ 	}
++	vcpu_sys_reg(vcpu, reg) = val;
  
-@@ -83,6 +87,7 @@ void __hyp_text __sysreg_save_state_nvhe(struct kvm_cpu_context *ctxt)
- 	__sysreg_save_el1_state(ctxt);
- 	__sysreg_save_common_state(ctxt);
- 	__sysreg_save_user_state(ctxt);
-+	__sysreg_save_el2_return_state(ctxt);
- }
- 
- void sysreg_save_host_state_vhe(struct kvm_cpu_context *ctxt)
-@@ -96,6 +101,7 @@ void sysreg_save_guest_state_vhe(struct kvm_cpu_context *ctxt)
- 	__sysreg_save_el1_state(ctxt);
- 	__sysreg_save_common_state(ctxt);
- 	__sysreg_save_user_state(ctxt);
-+	__sysreg_save_el2_return_state(ctxt);
- }
- 
- static void __hyp_text __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
-@@ -140,6 +146,11 @@ static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
- 	write_sysreg(ctxt->gp_regs.sp_el1,		sp_el1);
- 	write_sysreg_el1(ctxt->gp_regs.elr_el1,		elr);
- 	write_sysreg_el1(ctxt->gp_regs.spsr[KVM_SPSR_EL1],spsr);
-+}
-+
-+static void __hyp_text
-+__sysreg_restore_el2_return_state(struct kvm_cpu_context *ctxt)
-+{
- 	write_sysreg_el2(ctxt->gp_regs.regs.pc,		elr);
- 	write_sysreg_el2(ctxt->gp_regs.regs.pstate,	spsr);
- 
-@@ -152,6 +163,7 @@ void __hyp_text __sysreg_restore_state_nvhe(struct kvm_cpu_context *ctxt)
- 	__sysreg_restore_el1_state(ctxt);
- 	__sysreg_restore_common_state(ctxt);
- 	__sysreg_restore_user_state(ctxt);
-+	__sysreg_restore_el2_return_state(ctxt);
- }
- 
- void sysreg_restore_host_state_vhe(struct kvm_cpu_context *ctxt)
-@@ -165,6 +177,7 @@ void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt)
- 	__sysreg_restore_el1_state(ctxt);
- 	__sysreg_restore_common_state(ctxt);
- 	__sysreg_restore_user_state(ctxt);
-+	__sysreg_restore_el2_return_state(ctxt);
- }
- 
- void __hyp_text __sysreg32_save_state(struct kvm_vcpu *vcpu)
+ 	kvm_toggle_cache(vcpu, was_enabled);
+ 	return true;
 -- 
 2.14.2
