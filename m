@@ -1,50 +1,129 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v2 08/11] firmware: arm_sdei: Add ACPI GHES registration
- helper
-Date: Wed, 28 Mar 2018 17:33:30 +0100
-Message-ID: <590e2665-4471-8795-675e-28d103e1a103@arm.com>
-References: <20180322181445.23298-9-james.morse@arm.com>
- <201803250913.XCBc2k7m%fengguang.wu@intel.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [RFC v2 11/12] KVM: arm/arm64: Implement KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+Date: Wed, 28 Mar 2018 19:55:24 +0100
+Message-ID: <CAFEAcA_zXwS6EygjwPO9e-Ouy=seDdZt5i62itGP-W7VHugYTQ@mail.gmail.com>
+References: <1522159456-10419-1-git-send-email-eric.auger@redhat.com> <1522159456-10419-12-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <201803250913.XCBc2k7m%fengguang.wu@intel.com>
-Content-Language: en-US
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: linux-acpi@vger.kernel.org
-Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Christoffer Dall <cdall@kernel.org>, Punit Agrawal <punit.agrawal@arm.com>, Xie XiuQi <xiexiuqi@huawei.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1522159456-10419-12-git-send-email-eric.auger@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: Eric Auger <eric.auger.pro@gmail.com>, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, kvm-devel <kvm@vger.kernel.org>, kvmarm@lists.cs.columbia.edu, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@kernel.org>, Andre Przywara <andre.przywara@arm.com>, Andrew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi kbuild test robot,
+On 27 March 2018 at 15:04, Eric Auger <eric.auger@redhat.com> wrote:
+> Now all the internals are ready to handle multiple redistributor
+> regions, let's allow the userspace to register them.
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  virt/kvm/arm/vgic/vgic-kvm-device.c | 40 +++++++++++++++++++++++++++++++++++--
+>  virt/kvm/arm/vgic/vgic-mmio-v3.c    |  4 ++--
+>  virt/kvm/arm/vgic/vgic.h            |  9 ++++++++-
+>  3 files changed, 48 insertions(+), 5 deletions(-)
+>
+> diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
+> index e7b5a86..a2b99e4 100644
+> --- a/virt/kvm/arm/vgic/vgic-kvm-device.c
+> +++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+> @@ -65,7 +65,8 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
+>  {
+>         int r = 0;
+>         struct vgic_dist *vgic = &kvm->arch.vgic;
+> -       phys_addr_t *addr_ptr, alignment;
+> +       phys_addr_t *addr_ptr = NULL;
+> +       phys_addr_t alignment;
+>         uint64_t undef_value = VGIC_ADDR_UNDEF;
+>
+>         mutex_lock(&kvm->lock);
+> @@ -92,7 +93,7 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
+>                 if (r)
+>                         break;
+>                 if (write) {
+> -                       r = vgic_v3_set_redist_base(kvm, *addr);
+> +                       r = vgic_v3_set_redist_base(kvm, 0, *addr, 0);
+>                         goto out;
+>                 }
+>                 rdreg = list_first_entry(&vgic->rd_regions,
+> @@ -103,6 +104,40 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
+>                         addr_ptr = &rdreg->base;
+>                 break;
+>         }
+> +       case KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION:
+> +       {
+> +               struct vgic_redist_region *rdreg;
+> +               uint8_t index;
+> +
+> +               r = vgic_check_type(kvm, KVM_DEV_TYPE_ARM_VGIC_V3);
+> +               if (r)
+> +                       break;
+> +
+> +               index = *addr & KVM_VGIC_V3_RDIST_INDEX_MASK;
+> +
+> +               if (write) {
+> +                       gpa_t base = *addr & KVM_VGIC_V3_RDIST_BASE_MASK;
+> +                       uint32_t count = (*addr & KVM_VGIC_V3_RDIST_COUNT_MASK)
+> +                                       >> KVM_VGIC_V3_RDIST_COUNT_SHIFT;
+> +                       uint8_t flags = (*addr & KVM_VGIC_V3_RDIST_FLAGS_MASK)
+> +                                       >> KVM_VGIC_V3_RDIST_FLAGS_SHIFT;
+> +
+> +                       if (!count || flags)
+> +                               r = -EINVAL;
+> +                       else
+> +                               r = vgic_v3_set_redist_base(kvm, index,
+> +                                                           base, count);
+> +                       goto out;
+> +               }
+> +
+> +               rdreg = vgic_v3_rdist_region_from_index(kvm, index);
+> +               if (!rdreg)
+> +                       r = -ENODEV;
 
-On 25/03/18 02:41, kbuild test robot wrote:
-> I love your patch! Yet something to improve:
-> 
-> [auto build test ERROR on pm/linux-next]
-> [also build test ERROR on v4.16-rc6]
-> [cannot apply to arm64/for-next/core next-20180323]
+Here you check whether rdreg is NULL...
 
-This is the potential conflict I referred to in v1's cover letter...
+> +
+> +               *addr_ptr = rdreg->base & index &
 
+...but here you dereference it anyway. Missing "goto out"/break/other
+control flow?
 
-> All errors (new ones prefixed by >>):
-> 
->    drivers//firmware/arm_sdei.c: In function 'sdei_register_ghes':
->>> drivers//firmware/arm_sdei.c:921:26: error: 'FIX_APEI_GHES_SDEI_CRITICAL' undeclared (first use in this function)
->       ghes->nmi_fixmap_idx = FIX_APEI_GHES_SDEI_CRITICAL;
+> +                       (uint64_t)rdreg->count << KVM_VGIC_V3_RDIST_COUNT_SHIFT;
+> +               break;
+> +       }
 
-Looks like I forgot to include asm/fixmap.h! I hate header-soup.
+I was looking for the code which checked "EINVAL if you
+already used KVM_VGIC_V3_ADDR_TYPE_REDIST", but couldn't
+see it. Is that handled by one of the helper functions?
 
+>         default:
+>                 r = -ENODEV;
+>         }
+> @@ -674,6 +709,7 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
+>                 switch (attr->attr) {
+>                 case KVM_VGIC_V3_ADDR_TYPE_DIST:
+>                 case KVM_VGIC_V3_ADDR_TYPE_REDIST:
+> +               case KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION:
+>                         return 0;
+>                 }
+>                 break;
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> index 89faadc..45287a0 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> @@ -766,11 +766,11 @@ static int vgic_v3_insert_redist_region(struct kvm *kvm, uint32_t index,
+>         return ret;
+>  }
+>
+> -int vgic_v3_set_redist_base(struct kvm *kvm, u64 addr)
+> +int vgic_v3_set_redist_base(struct kvm *kvm, u32 index, u64 addr, u32 count)
+>  {
+>         int ret;
+>
+> -       ret = vgic_v3_insert_redist_region(kvm, 0, addr, 0);
+> +       ret = vgic_v3_insert_redist_region(kvm, index, addr, count);
+>         if (ret)
+>                 return ret;
 
-Thanks,
-
-James
+thanks
+-- PMM
