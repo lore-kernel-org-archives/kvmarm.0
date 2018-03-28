@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 15/85] KVM: arm/arm64: Move vcpu_load call after
- kvm_vcpu_first_run_init
-Date: Wed, 28 Mar 2018 13:51:44 +0100
-Message-ID: <20180328125254.31380-16-marc.zyngier@arm.com>
+Subject: [PATCH 16/85] KVM: arm64: Avoid storing the vcpu pointer on the stack
+Date: Wed, 28 Mar 2018 13:51:45 +0100
+Message-ID: <20180328125254.31380-17-marc.zyngier@arm.com>
 References: <20180328125254.31380-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 801014A028
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:48:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BA24049FFC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:48:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0rkwMQQ8W3Tn for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Mar 2018 08:47:39 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EE51A49DAB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:45:56 -0400 (EDT)
+ with ESMTP id vwPdE+4JdPCK for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Mar 2018 08:48:02 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DDD754029E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:46:00 -0400 (EDT)
 In-Reply-To: <20180328125254.31380-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,106 +33,253 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Christoffer Dall <christoffer.dall@linaro.org>
 
-Moving the call to vcpu_load() in kvm_arch_vcpu_ioctl_run() to after
-we've called kvm_vcpu_first_run_init() simplifies some of the vgic and
-there is also no need to do vcpu_load() for things such as handling the
-immediate_exit flag.
+We already have the percpu area for the host cpu state, which points to
+the VCPU, so there's no need to store the VCPU pointer on the stack on
+every context switch.  We can be a little more clever and just use
+tpidr_el2 for the percpu offset and load the VCPU pointer from the host
+context.
 
-Reviewed-by: Julien Grall <julien.grall@arm.com>
+This has the benefit of being able to retrieve the host context even
+when our stack is corrupted, and it has a potential performance benefit
+because we trade a store plus a load for an mrs and a load on a round
+trip to the guest.
+
+This does require us to calculate the percpu offset without including
+the offset from the kernel mapping of the percpu array to the linear
+mapping of the array (which is what we store in tpidr_el1), because a
+PC-relative generated address in EL2 is already giving us the hyp alias
+of the linear mapping of a kernel address.  We do this in
+__cpu_init_hyp_mode() by using kvm_ksym_ref().
+
+The code that accesses ESR_EL2 was previously using an alternative to
+use the _EL1 accessor on VHE systems, but this was actually unnecessary
+as the _EL1 accessor aliases the ESR_EL2 register on VHE, and the _EL2
+accessor does the same thing on both systems.
+
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/arch_timer.c     |  4 ----
- virt/kvm/arm/arm.c            | 22 ++++++++--------------
- virt/kvm/arm/vgic/vgic-init.c | 11 -----------
- 3 files changed, 8 insertions(+), 29 deletions(-)
+ arch/arm64/include/asm/kvm_asm.h  | 15 +++++++++++++++
+ arch/arm64/include/asm/kvm_host.h | 15 +++++++++++++++
+ arch/arm64/kernel/asm-offsets.c   |  1 +
+ arch/arm64/kvm/hyp/entry.S        |  6 +-----
+ arch/arm64/kvm/hyp/hyp-entry.S    | 28 ++++++++++------------------
+ arch/arm64/kvm/hyp/switch.c       |  5 +----
+ arch/arm64/kvm/hyp/sysreg-sr.c    |  5 +++++
+ 7 files changed, 48 insertions(+), 27 deletions(-)
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 86eca32474cc..7dd8d9677dc5 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -842,11 +842,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
- 		return ret;
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 24961b732e65..7149f1520382 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -33,6 +33,7 @@
+ #define KVM_ARM64_DEBUG_DIRTY_SHIFT	0
+ #define KVM_ARM64_DEBUG_DIRTY		(1 << KVM_ARM64_DEBUG_DIRTY_SHIFT)
  
- no_vgic:
--	preempt_disable();
- 	timer->enabled = 1;
--	kvm_timer_vcpu_load(vcpu);
--	preempt_enable();
--
- 	return 0;
- }
++/* Translate a kernel address of @sym into its equivalent linear mapping */
+ #define kvm_ksym_ref(sym)						\
+ 	({								\
+ 		void *val = &sym;					\
+@@ -70,6 +71,20 @@ extern u32 __init_stage2_translation(void);
  
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 53572304843b..932e61858c55 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -632,27 +632,22 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	if (unlikely(!kvm_vcpu_initialized(vcpu)))
- 		return -ENOEXEC;
+ extern void __qcom_hyp_sanitize_btac_predictors(void);
  
--	vcpu_load(vcpu);
--
- 	ret = kvm_vcpu_first_run_init(vcpu);
- 	if (ret)
--		goto out;
-+		return ret;
- 
- 	if (run->exit_reason == KVM_EXIT_MMIO) {
- 		ret = kvm_handle_mmio_return(vcpu, vcpu->run);
- 		if (ret)
--			goto out;
--		if (kvm_arm_handle_step_debug(vcpu, vcpu->run)) {
--			ret = 0;
--			goto out;
--		}
--
-+			return ret;
-+		if (kvm_arm_handle_step_debug(vcpu, vcpu->run))
-+			return 0;
- 	}
- 
--	if (run->immediate_exit) {
--		ret = -EINTR;
--		goto out;
--	}
-+	if (run->immediate_exit)
-+		return -EINTR;
++#else /* __ASSEMBLY__ */
 +
-+	vcpu_load(vcpu);
++.macro get_host_ctxt reg, tmp
++	adr_l	\reg, kvm_host_cpu_state
++	mrs	\tmp, tpidr_el2
++	add	\reg, \reg, \tmp
++.endm
++
++.macro get_vcpu_ptr vcpu, ctxt
++	get_host_ctxt \ctxt, \vcpu
++	ldr	\vcpu, [\ctxt, #HOST_CONTEXT_VCPU]
++	kern_hyp_va	\vcpu
++.endm
++
+ #endif
  
- 	kvm_sigset_activate(vcpu);
+ #endif /* __ARM_KVM_ASM_H__ */
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 596f8e414a4c..618cfee7206a 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -358,10 +358,15 @@ int kvm_perf_teardown(void);
  
-@@ -811,7 +806,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
  
- 	kvm_sigset_deactivate(vcpu);
- 
--out:
- 	vcpu_put(vcpu);
- 	return ret;
++void __kvm_set_tpidr_el2(u64 tpidr_el2);
++DECLARE_PER_CPU(kvm_cpu_context_t, kvm_host_cpu_state);
++
+ static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr,
+ 				       unsigned long hyp_stack_ptr,
+ 				       unsigned long vector_ptr)
+ {
++	u64 tpidr_el2;
++
+ 	/*
+ 	 * Call initialization code, and switch to the full blown HYP code.
+ 	 * If the cpucaps haven't been finalized yet, something has gone very
+@@ -370,6 +375,16 @@ static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr,
+ 	 */
+ 	BUG_ON(!static_branch_likely(&arm64_const_caps_ready));
+ 	__kvm_call_hyp((void *)pgd_ptr, hyp_stack_ptr, vector_ptr);
++
++	/*
++	 * Calculate the raw per-cpu offset without a translation from the
++	 * kernel's mapping to the linear mapping, and store it in tpidr_el2
++	 * so that we can use adr_l to access per-cpu variables in EL2.
++	 */
++	tpidr_el2 = (u64)this_cpu_ptr(&kvm_host_cpu_state)
++		- (u64)kvm_ksym_ref(kvm_host_cpu_state);
++
++	kvm_call_hyp(__kvm_set_tpidr_el2, tpidr_el2);
  }
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index 743ca5cb05ef..3e8209a07585 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -302,17 +302,6 @@ int vgic_init(struct kvm *kvm)
  
- 	dist->initialized = true;
+ static inline void kvm_arch_hardware_unsetup(void) {}
+diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
+index 1303e04110cd..78e1b0a70aaf 100644
+--- a/arch/arm64/kernel/asm-offsets.c
++++ b/arch/arm64/kernel/asm-offsets.c
+@@ -138,6 +138,7 @@ int main(void)
+   DEFINE(CPU_FP_REGS,		offsetof(struct kvm_regs, fp_regs));
+   DEFINE(VCPU_FPEXC32_EL2,	offsetof(struct kvm_vcpu, arch.ctxt.sys_regs[FPEXC32_EL2]));
+   DEFINE(VCPU_HOST_CONTEXT,	offsetof(struct kvm_vcpu, arch.host_cpu_context));
++  DEFINE(HOST_CONTEXT_VCPU,	offsetof(struct kvm_cpu_context, __hyp_running_vcpu));
+ #endif
+ #ifdef CONFIG_CPU_PM
+   DEFINE(CPU_SUSPEND_SZ,	sizeof(struct cpu_suspend_ctx));
+diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+index fdd1068ee3a5..1f458f7c3b44 100644
+--- a/arch/arm64/kvm/hyp/entry.S
++++ b/arch/arm64/kvm/hyp/entry.S
+@@ -62,9 +62,6 @@ ENTRY(__guest_enter)
+ 	// Store the host regs
+ 	save_callee_saved_regs x1
  
+-	// Store host_ctxt and vcpu for use at exit time
+-	stp	x1, x0, [sp, #-16]!
+-
+ 	add	x18, x0, #VCPU_CONTEXT
+ 
+ 	// Restore guest regs x0-x17
+@@ -118,8 +115,7 @@ ENTRY(__guest_exit)
+ 	// Store the guest regs x19-x29, lr
+ 	save_callee_saved_regs x1
+ 
+-	// Restore the host_ctxt from the stack
+-	ldr	x2, [sp], #16
++	get_host_ctxt	x2, x3
+ 
+ 	// Now restore the host regs
+ 	restore_callee_saved_regs x2
+diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+index f36464bd57c5..82fbc368f738 100644
+--- a/arch/arm64/kvm/hyp/hyp-entry.S
++++ b/arch/arm64/kvm/hyp/hyp-entry.S
+@@ -57,13 +57,8 @@ ENDPROC(__vhe_hyp_call)
+ el1_sync:				// Guest trapped into EL2
+ 	stp	x0, x1, [sp, #-16]!
+ 
+-alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
+-	mrs	x1, esr_el2
+-alternative_else
+-	mrs	x1, esr_el1
+-alternative_endif
+-	lsr	x0, x1, #ESR_ELx_EC_SHIFT
+-
++	mrs	x0, esr_el2
++	lsr	x0, x0, #ESR_ELx_EC_SHIFT
+ 	cmp	x0, #ESR_ELx_EC_HVC64
+ 	ccmp	x0, #ESR_ELx_EC_HVC32, #4, ne
+ 	b.ne	el1_trap
+@@ -117,10 +112,14 @@ el1_hvc_guest:
+ 	eret
+ 
+ el1_trap:
++	get_vcpu_ptr	x1, x0
++
++	mrs		x0, esr_el2
++	lsr		x0, x0, #ESR_ELx_EC_SHIFT
+ 	/*
+ 	 * x0: ESR_EC
++	 * x1: vcpu pointer
+ 	 */
+-	ldr	x1, [sp, #16 + 8]	// vcpu stored by __guest_enter
+ 
+ 	/*
+ 	 * We trap the first access to the FP/SIMD to save the host context
+@@ -138,13 +137,13 @@ alternative_else_nop_endif
+ 
+ el1_irq:
+ 	stp     x0, x1, [sp, #-16]!
+-	ldr	x1, [sp, #16 + 8]
++	get_vcpu_ptr	x1, x0
+ 	mov	x0, #ARM_EXCEPTION_IRQ
+ 	b	__guest_exit
+ 
+ el1_error:
+ 	stp     x0, x1, [sp, #-16]!
+-	ldr	x1, [sp, #16 + 8]
++	get_vcpu_ptr	x1, x0
+ 	mov	x0, #ARM_EXCEPTION_EL1_SERROR
+ 	b	__guest_exit
+ 
+@@ -180,14 +179,7 @@ ENTRY(__hyp_do_panic)
+ ENDPROC(__hyp_do_panic)
+ 
+ ENTRY(__hyp_panic)
 -	/*
--	 * If we're initializing GICv2 on-demand when first running the VCPU
--	 * then we need to load the VGIC state onto the CPU.  We can detect
--	 * this easily by checking if we are in between vcpu_load and vcpu_put
--	 * when we just initialized the VGIC.
+-	 * '=kvm_host_cpu_state' is a host VA from the constant pool, it may
+-	 * not be accessible by this address from EL2, hyp_panic() converts
+-	 * it with kern_hyp_va() before use.
 -	 */
--	preempt_disable();
--	vcpu = kvm_arm_get_running_vcpu();
--	if (vcpu)
--		kvm_vgic_load(vcpu);
--	preempt_enable();
- out:
- 	return ret;
+-	ldr	x0, =kvm_host_cpu_state
+-	mrs	x1, tpidr_el2
+-	add	x0, x0, x1
++	get_host_ctxt x0, x1
+ 	b	hyp_panic
+ ENDPROC(__hyp_panic)
+ 
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 24f52fedfb9e..46717da75643 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -469,7 +469,7 @@ static hyp_alternate_select(__hyp_call_panic,
+ 			    __hyp_call_panic_nvhe, __hyp_call_panic_vhe,
+ 			    ARM64_HAS_VIRT_HOST_EXTN);
+ 
+-void __hyp_text __noreturn hyp_panic(struct kvm_cpu_context *__host_ctxt)
++void __hyp_text __noreturn hyp_panic(struct kvm_cpu_context *host_ctxt)
+ {
+ 	struct kvm_vcpu *vcpu = NULL;
+ 
+@@ -478,9 +478,6 @@ void __hyp_text __noreturn hyp_panic(struct kvm_cpu_context *__host_ctxt)
+ 	u64 par = read_sysreg(par_el1);
+ 
+ 	if (read_sysreg(vttbr_el2)) {
+-		struct kvm_cpu_context *host_ctxt;
+-
+-		host_ctxt = kern_hyp_va(__host_ctxt);
+ 		vcpu = host_ctxt->__hyp_running_vcpu;
+ 		__timer_disable_traps(vcpu);
+ 		__deactivate_traps(vcpu);
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index 2c17afd2be96..43b7dd65e3e6 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -189,3 +189,8 @@ void __hyp_text __sysreg32_restore_state(struct kvm_vcpu *vcpu)
+ 	if (vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY)
+ 		write_sysreg(sysreg[DBGVCR32_EL2], dbgvcr32_el2);
  }
++
++void __hyp_text __kvm_set_tpidr_el2(u64 tpidr_el2)
++{
++	asm("msr tpidr_el2, %0": : "r" (tpidr_el2));
++}
 -- 
 2.14.2
