@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 57/85] arm64: KVM: Dynamically patch the kernel/hyp VA mask
-Date: Wed, 28 Mar 2018 13:52:26 +0100
-Message-ID: <20180328125254.31380-58-marc.zyngier@arm.com>
+Subject: [PATCH 56/85] arm64: insn: Add encoder for bitwise operations using
+ literals
+Date: Wed, 28 Mar 2018 13:52:25 +0100
+Message-ID: <20180328125254.31380-57-marc.zyngier@arm.com>
 References: <20180328125254.31380-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 118DC40170
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:55:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B4F549FAC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:55:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id csbCwdE7hv2C for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Mar 2018 08:54:51 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C81BB4A03C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:48:52 -0400 (EDT)
+ with ESMTP id tMYAdW0CCAMC for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Mar 2018 08:54:48 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B74514A034
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:48:48 -0400 (EDT)
 In-Reply-To: <20180328125254.31380-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,211 +32,192 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: Christoffer Dall <cdall@cs.columbia.edu>, Shunyong Yang <shunyong.yang@hxt-semitech.com>, Julien Thierry <julien.thierry@arm.com>, Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Catalin Marinas <catalin.marinas@arm.com>, Dave Martin <Dave.Martin@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-So far, we're using a complicated sequence of alternatives to
-patch the kernel/hyp VA mask on non-VHE, and NOP out the
-masking altogether when on VHE.
+We lack a way to encode operations such as AND, ORR, EOR that take
+an immediate value. Doing so is quite involved, and is all about
+reverse engineering the decoding algorithm described in the
+pseudocode function DecodeBitMasks().
 
-The newly introduced dynamic patching gives us the opportunity
-to simplify that code by patching a single instruction with
-the correct mask (instead of the mind bending cumulative masking
-we have at the moment) or even a single NOP on VHE. This also
-adds some initial code that will allow the patching callback
-to switch to a more complex patching.
+This has been tested by feeding it all the possible literal values
+and comparing the output with that of GAS.
 
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-Reviewed-by: James Morse <james.morse@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/kvm_mmu.h | 46 ++++++--------------
- arch/arm64/kvm/Makefile          |  2 +-
- arch/arm64/kvm/va_layout.c       | 91 ++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 105 insertions(+), 34 deletions(-)
- create mode 100644 arch/arm64/kvm/va_layout.c
+ arch/arm64/include/asm/insn.h |   9 +++
+ arch/arm64/kernel/insn.c      | 136 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 145 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index cffa34e23718..0656c79d968f 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -69,9 +69,6 @@
-  * mappings, and none of this applies in that case.
-  */
- 
--#define HYP_PAGE_OFFSET_HIGH_MASK	((UL(1) << VA_BITS) - 1)
--#define HYP_PAGE_OFFSET_LOW_MASK	((UL(1) << (VA_BITS - 1)) - 1)
--
- #ifdef __ASSEMBLY__
- 
- #include <asm/alternative.h>
-@@ -81,28 +78,15 @@
-  * Convert a kernel VA into a HYP VA.
-  * reg: VA to be converted.
-  *
-- * This generates the following sequences:
-- * - High mask:
-- *		and x0, x0, #HYP_PAGE_OFFSET_HIGH_MASK
-- *		nop
-- * - Low mask:
-- *		and x0, x0, #HYP_PAGE_OFFSET_HIGH_MASK
-- *		and x0, x0, #HYP_PAGE_OFFSET_LOW_MASK
-- * - VHE:
-- *		nop
-- *		nop
-- *
-- * The "low mask" version works because the mask is a strict subset of
-- * the "high mask", hence performing the first mask for nothing.
-- * Should be completely invisible on any viable CPU.
-+ * The actual code generation takes place in kvm_update_va_mask, and
-+ * the instructions below are only there to reserve the space and
-+ * perform the register allocation (kvm_update_va_mask uses the
-+ * specific registers encoded in the instructions).
-  */
- .macro kern_hyp_va	reg
--alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
--	and     \reg, \reg, #HYP_PAGE_OFFSET_HIGH_MASK
--alternative_else_nop_endif
--alternative_if ARM64_HYP_OFFSET_LOW
--	and     \reg, \reg, #HYP_PAGE_OFFSET_LOW_MASK
--alternative_else_nop_endif
-+alternative_cb kvm_update_va_mask
-+	and     \reg, \reg, #1
-+alternative_cb_end
- .endm
- 
- #else
-@@ -113,18 +97,14 @@ alternative_else_nop_endif
- #include <asm/mmu_context.h>
- #include <asm/pgtable.h>
- 
-+void kvm_update_va_mask(struct alt_instr *alt,
-+			__le32 *origptr, __le32 *updptr, int nr_inst);
+diff --git a/arch/arm64/include/asm/insn.h b/arch/arm64/include/asm/insn.h
+index 21fffdd290a3..815b35bc53ed 100644
+--- a/arch/arm64/include/asm/insn.h
++++ b/arch/arm64/include/asm/insn.h
+@@ -315,6 +315,10 @@ __AARCH64_INSN_FUNCS(eor,	0x7F200000, 0x4A000000)
+ __AARCH64_INSN_FUNCS(eon,	0x7F200000, 0x4A200000)
+ __AARCH64_INSN_FUNCS(ands,	0x7F200000, 0x6A000000)
+ __AARCH64_INSN_FUNCS(bics,	0x7F200000, 0x6A200000)
++__AARCH64_INSN_FUNCS(and_imm,	0x7F800000, 0x12000000)
++__AARCH64_INSN_FUNCS(orr_imm,	0x7F800000, 0x32000000)
++__AARCH64_INSN_FUNCS(eor_imm,	0x7F800000, 0x52000000)
++__AARCH64_INSN_FUNCS(ands_imm,	0x7F800000, 0x72000000)
+ __AARCH64_INSN_FUNCS(b,		0xFC000000, 0x14000000)
+ __AARCH64_INSN_FUNCS(bl,	0xFC000000, 0x94000000)
+ __AARCH64_INSN_FUNCS(cbz,	0x7F000000, 0x34000000)
+@@ -424,6 +428,11 @@ u32 aarch64_insn_gen_logical_shifted_reg(enum aarch64_insn_register dst,
+ 					 int shift,
+ 					 enum aarch64_insn_variant variant,
+ 					 enum aarch64_insn_logic_type type);
++u32 aarch64_insn_gen_logical_immediate(enum aarch64_insn_logic_type type,
++				       enum aarch64_insn_variant variant,
++				       enum aarch64_insn_register Rn,
++				       enum aarch64_insn_register Rd,
++				       u64 imm);
+ u32 aarch64_insn_gen_prefetch(enum aarch64_insn_register base,
+ 			      enum aarch64_insn_prfm_type type,
+ 			      enum aarch64_insn_prfm_target target,
+diff --git a/arch/arm64/kernel/insn.c b/arch/arm64/kernel/insn.c
+index 7e432662d454..e87d6dcd7c82 100644
+--- a/arch/arm64/kernel/insn.c
++++ b/arch/arm64/kernel/insn.c
+@@ -1485,3 +1485,139 @@ pstate_check_t * const aarch32_opcode_cond_checks[16] = {
+ 	__check_hi, __check_ls, __check_ge, __check_lt,
+ 	__check_gt, __check_le, __check_al, __check_al
+ };
 +
- static inline unsigned long __kern_hyp_va(unsigned long v)
- {
--	asm volatile(ALTERNATIVE("and %0, %0, %1",
--				 "nop",
--				 ARM64_HAS_VIRT_HOST_EXTN)
--		     : "+r" (v)
--		     : "i" (HYP_PAGE_OFFSET_HIGH_MASK));
--	asm volatile(ALTERNATIVE("nop",
--				 "and %0, %0, %1",
--				 ARM64_HYP_OFFSET_LOW)
--		     : "+r" (v)
--		     : "i" (HYP_PAGE_OFFSET_LOW_MASK));
-+	asm volatile(ALTERNATIVE_CB("and %0, %0, #1\n",
-+				    kvm_update_va_mask)
-+		     : "+r" (v));
- 	return v;
- }
- 
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index 87c4f7ae24de..93afff91cb7c 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -16,7 +16,7 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/e
- kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arm.o $(KVM)/arm/mmu.o $(KVM)/arm/mmio.o
- kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/psci.o $(KVM)/arm/perf.o
- 
--kvm-$(CONFIG_KVM_ARM_HOST) += inject_fault.o regmap.o
-+kvm-$(CONFIG_KVM_ARM_HOST) += inject_fault.o regmap.o va_layout.o
- kvm-$(CONFIG_KVM_ARM_HOST) += hyp.o hyp-init.o handle_exit.o
- kvm-$(CONFIG_KVM_ARM_HOST) += guest.o debug.o reset.o sys_regs.o sys_regs_generic_v8.o
- kvm-$(CONFIG_KVM_ARM_HOST) += vgic-sys-reg-v3.o
-diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
-new file mode 100644
-index 000000000000..0d7bf8319894
---- /dev/null
-+++ b/arch/arm64/kvm/va_layout.c
-@@ -0,0 +1,91 @@
-+/*
-+ * Copyright (C) 2017 ARM Ltd.
-+ * Author: Marc Zyngier <marc.zyngier@arm.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include <linux/kvm_host.h>
-+#include <asm/alternative.h>
-+#include <asm/debug-monitors.h>
-+#include <asm/insn.h>
-+#include <asm/kvm_mmu.h>
-+
-+#define HYP_PAGE_OFFSET_HIGH_MASK	((UL(1) << VA_BITS) - 1)
-+#define HYP_PAGE_OFFSET_LOW_MASK	((UL(1) << (VA_BITS - 1)) - 1)
-+
-+static u64 va_mask;
-+
-+static void compute_layout(void)
++static bool range_of_ones(u64 val)
 +{
-+	phys_addr_t idmap_addr = __pa_symbol(__hyp_idmap_text_start);
-+	unsigned long mask = HYP_PAGE_OFFSET_HIGH_MASK;
++	/* Doesn't handle full ones or full zeroes */
++	u64 sval = val >> __ffs64(val);
++
++	/* One of Sean Eron Anderson's bithack tricks */
++	return ((sval + 1) & (sval)) == 0;
++}
++
++static u32 aarch64_encode_immediate(u64 imm,
++				    enum aarch64_insn_variant variant,
++				    u32 insn)
++{
++	unsigned int immr, imms, n, ones, ror, esz, tmp;
++	u64 mask = ~0UL;
++
++	/* Can't encode full zeroes or full ones */
++	if (!imm || !~imm)
++		return AARCH64_BREAK_FAULT;
++
++	switch (variant) {
++	case AARCH64_INSN_VARIANT_32BIT:
++		if (upper_32_bits(imm))
++			return AARCH64_BREAK_FAULT;
++		esz = 32;
++		break;
++	case AARCH64_INSN_VARIANT_64BIT:
++		insn |= AARCH64_INSN_SF_BIT;
++		esz = 64;
++		break;
++	default:
++		pr_err("%s: unknown variant encoding %d\n", __func__, variant);
++		return AARCH64_BREAK_FAULT;
++	}
 +
 +	/*
-+	 * Activate the lower HYP offset only if the idmap doesn't
-+	 * clash with it,
++	 * Inverse of Replicate(). Try to spot a repeating pattern
++	 * with a pow2 stride.
 +	 */
-+	if (idmap_addr > HYP_PAGE_OFFSET_LOW_MASK)
-+		mask = HYP_PAGE_OFFSET_LOW_MASK;
++	for (tmp = esz / 2; tmp >= 2; tmp /= 2) {
++		u64 emask = BIT(tmp) - 1;
 +
-+	va_mask = mask;
-+}
++		if ((imm & emask) != ((imm >> tmp) & emask))
++			break;
 +
-+static u32 compute_instruction(int n, u32 rd, u32 rn)
-+{
-+	u32 insn = AARCH64_BREAK_FAULT;
-+
-+	switch (n) {
-+	case 0:
-+		insn = aarch64_insn_gen_logical_immediate(AARCH64_INSN_LOGIC_AND,
-+							  AARCH64_INSN_VARIANT_64BIT,
-+							  rn, rd, va_mask);
-+		break;
++		esz = tmp;
++		mask = emask;
 +	}
 +
-+	return insn;
-+}
++	/* N is only set if we're encoding a 64bit value */
++	n = esz == 64;
 +
-+void __init kvm_update_va_mask(struct alt_instr *alt,
-+			       __le32 *origptr, __le32 *updptr, int nr_inst)
-+{
-+	int i;
++	/* Trim imm to the element size */
++	imm &= mask;
 +
-+	/* We only expect a single instruction in the alternative sequence */
-+	BUG_ON(nr_inst != 1);
++	/* That's how many ones we need to encode */
++	ones = hweight64(imm);
 +
-+	if (!has_vhe() && !va_mask)
-+		compute_layout();
++	/*
++	 * imms is set to (ones - 1), prefixed with a string of ones
++	 * and a zero if they fit. Cap it to 6 bits.
++	 */
++	imms  = ones - 1;
++	imms |= 0xf << ffs(esz);
++	imms &= BIT(6) - 1;
 +
-+	for (i = 0; i < nr_inst; i++) {
-+		u32 rd, rn, insn, oinsn;
++	/* Compute the rotation */
++	if (range_of_ones(imm)) {
++		/*
++		 * Pattern: 0..01..10..0
++		 *
++		 * Compute how many rotate we need to align it right
++		 */
++		ror = __ffs64(imm);
++	} else {
++		/*
++		 * Pattern: 0..01..10..01..1
++		 *
++		 * Fill the unused top bits with ones, and check if
++		 * the result is a valid immediate (all ones with a
++		 * contiguous ranges of zeroes).
++		 */
++		imm |= ~mask;
++		if (!range_of_ones(~imm))
++			return AARCH64_BREAK_FAULT;
 +
 +		/*
-+		 * VHE doesn't need any address translation, let's NOP
-+		 * everything.
++		 * Compute the rotation to get a continuous set of
++		 * ones, with the first bit set at position 0
 +		 */
-+		if (has_vhe()) {
-+			updptr[i] = cpu_to_le32(aarch64_insn_gen_nop());
-+			continue;
-+		}
-+
-+		oinsn = le32_to_cpu(origptr[i]);
-+		rd = aarch64_insn_decode_register(AARCH64_INSN_REGTYPE_RD, oinsn);
-+		rn = aarch64_insn_decode_register(AARCH64_INSN_REGTYPE_RN, oinsn);
-+
-+		insn = compute_instruction(i, rd, rn);
-+		BUG_ON(insn == AARCH64_BREAK_FAULT);
-+
-+		updptr[i] = cpu_to_le32(insn);
++		ror = fls(~imm);
 +	}
++
++	/*
++	 * immr is the number of bits we need to rotate back to the
++	 * original set of ones. Note that this is relative to the
++	 * element size...
++	 */
++	immr = (esz - ror) % esz;
++
++	insn = aarch64_insn_encode_immediate(AARCH64_INSN_IMM_N, insn, n);
++	insn = aarch64_insn_encode_immediate(AARCH64_INSN_IMM_R, insn, immr);
++	return aarch64_insn_encode_immediate(AARCH64_INSN_IMM_S, insn, imms);
++}
++
++u32 aarch64_insn_gen_logical_immediate(enum aarch64_insn_logic_type type,
++				       enum aarch64_insn_variant variant,
++				       enum aarch64_insn_register Rn,
++				       enum aarch64_insn_register Rd,
++				       u64 imm)
++{
++	u32 insn;
++
++	switch (type) {
++	case AARCH64_INSN_LOGIC_AND:
++		insn = aarch64_insn_get_and_imm_value();
++		break;
++	case AARCH64_INSN_LOGIC_ORR:
++		insn = aarch64_insn_get_orr_imm_value();
++		break;
++	case AARCH64_INSN_LOGIC_EOR:
++		insn = aarch64_insn_get_eor_imm_value();
++		break;
++	case AARCH64_INSN_LOGIC_AND_SETFLAGS:
++		insn = aarch64_insn_get_ands_imm_value();
++		break;
++	default:
++		pr_err("%s: unknown logical encoding %d\n", __func__, type);
++		return AARCH64_BREAK_FAULT;
++	}
++
++	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RD, insn, Rd);
++	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RN, insn, Rn);
++	return aarch64_encode_immediate(imm, variant, insn);
 +}
 -- 
 2.14.2
