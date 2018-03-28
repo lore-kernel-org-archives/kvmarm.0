@@ -1,23 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 12/85] KVM: arm/arm64: vgic: Don't populate multiple LRs with
- the same vintid
-Date: Wed, 28 Mar 2018 13:51:41 +0100
-Message-ID: <20180328125254.31380-13-marc.zyngier@arm.com>
+Subject: [PATCH 14/85] KVM: arm/arm64: Avoid vcpu_load for other vcpu ioctls
+ than KVM_RUN
+Date: Wed, 28 Mar 2018 13:51:43 +0100
+Message-ID: <20180328125254.31380-15-marc.zyngier@arm.com>
 References: <20180328125254.31380-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0AC374A028
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:47:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DFB594A099
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:47:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id p6fAnc-CPhSf for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Mar 2018 08:47:29 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BE9B402D6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:45:44 -0400 (EDT)
+ with ESMTP id fGDo310QYuOX for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Mar 2018 08:47:36 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 77C8E49FC8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:45:52 -0400 (EDT)
 In-Reply-To: <20180328125254.31380-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -29,265 +29,111 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Cc: Christoffer Dall <cdall@cs.columbia.edu>, Shunyong Yang <shunyong.yang@hxt-semitech.com>, Julien Thierry <julien.thierry@arm.com>, Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Catalin Marinas <catalin.marinas@arm.com>, Dave Martin <Dave.Martin@arm.com>
+Cc: Christoffer Dall <cdall@cs.columbia.edu>, Christoffer Dall <christoffer.dall@linaro.org>, Shunyong Yang <shunyong.yang@hxt-semitech.com>, Julien Thierry <julien.thierry@arm.com>, Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Catalin Marinas <catalin.marinas@arm.com>, Dave Martin <Dave.Martin@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The vgic code is trying to be clever when injecting GICv2 SGIs,
-and will happily populate LRs with the same interrupt number if
-they come from multiple vcpus (after all, they are distinct
-interrupt sources).
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
-Unfortunately, this is against the letter of the architecture,
-and the GICv2 architecture spec says "Each valid interrupt stored
-in the List registers must have a unique VirtualID for that
-virtual CPU interface.". GICv3 has similar (although slightly
-ambiguous) restrictions.
+Calling vcpu_load() registers preempt notifiers for this vcpu and calls
+kvm_arch_vcpu_load().  The latter will soon be doing a lot of heavy
+lifting on arm/arm64 and will try to do things such as enabling the
+virtual timer and setting us up to handle interrupts from the timer
+hardware.
 
-This results in guests locking up when using GICv2-on-GICv3, for
-example. The obvious fix is to stop trying so hard, and inject
-a single vcpu per SGI per guest entry. After all, pending SGIs
-with multiple source vcpus are pretty rare, and are mostly seen
-in scenario where the physical CPUs are severely overcomitted.
+Loading state onto hardware registers and enabling hardware to signal
+interrupts can be problematic when we're not actually about to run the
+VCPU, because it makes it difficult to establish the right context when
+handling interrupts from the timer, and it makes the register access
+code difficult to reason about.
 
-But as we now only inject a single instance of a multi-source SGI per
-vcpu entry, we may delay those interrupts for longer than strictly
-necessary, and run the risk of injecting lower priority interrupts
-in the meantime.
+Luckily, now when we call vcpu_load in each ioctl implementation, we can
+simply remove the call from the non-KVM_RUN vcpu ioctls, and our
+kvm_arch_vcpu_load() is only used for loading vcpu content to the
+physical CPU when we're actually going to run the vcpu.
 
-In order to address this, we adopt a three stage strategy:
-- If we encounter a multi-source SGI in the AP list while computing
-  its depth, we force the list to be sorted
-- When populating the LRs, we prevent the injection of any interrupt
-  of lower priority than that of the first multi-source SGI we've
-  injected.
-- Finally, the injection of a multi-source SGI triggers the request
-  of a maintenance interrupt when there will be no pending interrupt
-  in the LRs (HCR_NPIE).
-
-At the point where the last pending interrupt in the LRs switches
-from Pending to Active, the maintenance interrupt will be delivered,
-allowing us to add the remaining SGIs using the same process.
-
-Cc: stable@vger.kernel.org
-Fixes: 0919e84c0fc1 ("KVM: arm/arm64: vgic-new: Add IRQ sync/flush framework")
-Acked-by: Christoffer Dall <cdall@kernel.org>
+Reviewed-by: Julien Grall <julien.grall@arm.com>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- include/linux/irqchip/arm-gic-v3.h |  1 +
- include/linux/irqchip/arm-gic.h    |  1 +
- virt/kvm/arm/vgic/vgic-v2.c        |  9 +++++-
- virt/kvm/arm/vgic/vgic-v3.c        |  9 +++++-
- virt/kvm/arm/vgic/vgic.c           | 61 +++++++++++++++++++++++++++++---------
- virt/kvm/arm/vgic/vgic.h           |  2 ++
- 6 files changed, 67 insertions(+), 16 deletions(-)
+ arch/arm64/kvm/guest.c | 3 ---
+ virt/kvm/arm/arm.c     | 9 ---------
+ 2 files changed, 12 deletions(-)
 
-diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index c00c4c33e432..b26eccc78fb1 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -503,6 +503,7 @@
- 
- #define ICH_HCR_EN			(1 << 0)
- #define ICH_HCR_UIE			(1 << 1)
-+#define ICH_HCR_NPIE			(1 << 3)
- #define ICH_HCR_TC			(1 << 10)
- #define ICH_HCR_TALL0			(1 << 11)
- #define ICH_HCR_TALL1			(1 << 12)
-diff --git a/include/linux/irqchip/arm-gic.h b/include/linux/irqchip/arm-gic.h
-index d3453ee072fc..68d8b1f73682 100644
---- a/include/linux/irqchip/arm-gic.h
-+++ b/include/linux/irqchip/arm-gic.h
-@@ -84,6 +84,7 @@
- 
- #define GICH_HCR_EN			(1 << 0)
- #define GICH_HCR_UIE			(1 << 1)
-+#define GICH_HCR_NPIE			(1 << 3)
- 
- #define GICH_LR_VIRTUALID		(0x3ff << 0)
- #define GICH_LR_PHYSID_CPUID_SHIFT	(10)
-diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-index e9d840a75e7b..29556f71b691 100644
---- a/virt/kvm/arm/vgic/vgic-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-v2.c
-@@ -37,6 +37,13 @@ void vgic_v2_init_lrs(void)
- 		vgic_v2_write_lr(i, 0);
- }
- 
-+void vgic_v2_set_npie(struct kvm_vcpu *vcpu)
-+{
-+	struct vgic_v2_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v2;
-+
-+	cpuif->vgic_hcr |= GICH_HCR_NPIE;
-+}
-+
- void vgic_v2_set_underflow(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index d7e3299a7734..959e50d2588c 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -363,8 +363,6 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
  {
- 	struct vgic_v2_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v2;
-@@ -64,7 +71,7 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
- 	int lr;
- 	unsigned long flags;
+ 	int ret = 0;
  
--	cpuif->vgic_hcr &= ~GICH_HCR_UIE;
-+	cpuif->vgic_hcr &= ~(GICH_HCR_UIE | GICH_HCR_NPIE);
- 
- 	for (lr = 0; lr < vgic_cpu->used_lrs; lr++) {
- 		u32 val = cpuif->vgic_lr[lr];
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index 6b329414e57a..0ff2006f3781 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -26,6 +26,13 @@ static bool group1_trap;
- static bool common_trap;
- static bool gicv4_enable;
- 
-+void vgic_v3_set_npie(struct kvm_vcpu *vcpu)
-+{
-+	struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
-+
-+	cpuif->vgic_hcr |= ICH_HCR_NPIE;
-+}
-+
- void vgic_v3_set_underflow(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
-@@ -47,7 +54,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
- 	int lr;
- 	unsigned long flags;
- 
--	cpuif->vgic_hcr &= ~ICH_HCR_UIE;
-+	cpuif->vgic_hcr &= ~(ICH_HCR_UIE | ICH_HCR_NPIE);
- 
- 	for (lr = 0; lr < vgic_cpu->used_lrs; lr++) {
- 		u64 val = cpuif->vgic_lr[lr];
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index 0001858a2c23..8201899126f6 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -710,22 +710,37 @@ static inline void vgic_set_underflow(struct kvm_vcpu *vcpu)
- 		vgic_v3_set_underflow(vcpu);
- }
- 
-+static inline void vgic_set_npie(struct kvm_vcpu *vcpu)
-+{
-+	if (kvm_vgic_global_state.type == VGIC_V2)
-+		vgic_v2_set_npie(vcpu);
-+	else
-+		vgic_v3_set_npie(vcpu);
-+}
-+
- /* Requires the ap_list_lock to be held. */
--static int compute_ap_list_depth(struct kvm_vcpu *vcpu)
-+static int compute_ap_list_depth(struct kvm_vcpu *vcpu,
-+				 bool *multi_sgi)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
- 	struct vgic_irq *irq;
- 	int count = 0;
- 
-+	*multi_sgi = false;
-+
- 	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&vgic_cpu->ap_list_lock));
- 
- 	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
- 		spin_lock(&irq->irq_lock);
- 		/* GICv2 SGIs can count for more than one... */
--		if (vgic_irq_is_sgi(irq->intid) && irq->source)
--			count += hweight8(irq->source);
--		else
-+		if (vgic_irq_is_sgi(irq->intid) && irq->source) {
-+			int w = hweight8(irq->source);
-+
-+			count += w;
-+			*multi_sgi |= (w > 1);
-+		} else {
- 			count++;
-+		}
- 		spin_unlock(&irq->irq_lock);
- 	}
- 	return count;
-@@ -736,28 +751,43 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
- 	struct vgic_irq *irq;
--	int count = 0;
-+	int count;
-+	bool npie = false;
-+	bool multi_sgi;
-+	u8 prio = 0xff;
- 
- 	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&vgic_cpu->ap_list_lock));
- 
--	if (compute_ap_list_depth(vcpu) > kvm_vgic_global_state.nr_lr)
-+	count = compute_ap_list_depth(vcpu, &multi_sgi);
-+	if (count > kvm_vgic_global_state.nr_lr || multi_sgi)
- 		vgic_sort_ap_list(vcpu);
- 
-+	count = 0;
-+
- 	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
- 		spin_lock(&irq->irq_lock);
- 
--		if (unlikely(vgic_target_oracle(irq) != vcpu))
--			goto next;
+-	vcpu_load(vcpu);
 -
- 		/*
--		 * If we get an SGI with multiple sources, try to get
--		 * them in all at once.
-+		 * If we have multi-SGIs in the pipeline, we need to
-+		 * guarantee that they are all seen before any IRQ of
-+		 * lower priority. In that case, we need to filter out
-+		 * these interrupts by exiting early. This is easy as
-+		 * the AP list has been sorted already.
- 		 */
--		do {
-+		if (multi_sgi && irq->priority > prio) {
-+			spin_unlock(&irq->irq_lock);
-+			break;
-+		}
-+
-+		if (likely(vgic_target_oracle(irq) == vcpu)) {
- 			vgic_populate_lr(vcpu, irq, count++);
--		} while (irq->source && count < kvm_vgic_global_state.nr_lr);
+ 	trace_kvm_set_guest_debug(vcpu, dbg->control);
  
--next:
-+			if (irq->source) {
-+				npie = true;
-+				prio = irq->priority;
-+			}
-+		}
-+
- 		spin_unlock(&irq->irq_lock);
- 
- 		if (count == kvm_vgic_global_state.nr_lr) {
-@@ -768,6 +798,9 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
- 		}
+ 	if (dbg->control & ~KVM_GUESTDBG_VALID_MASK) {
+@@ -386,7 +384,6 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
  	}
  
-+	if (npie)
-+		vgic_set_npie(vcpu);
-+
- 	vcpu->arch.vgic_cpu.used_lrs = count;
+ out:
+-	vcpu_put(vcpu);
+ 	return ret;
+ }
  
- 	/* Nuke remaining LRs */
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index 5b11859a1a1e..f5b8519e5546 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -160,6 +160,7 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu);
- void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
- void vgic_v2_clear_lr(struct kvm_vcpu *vcpu, int lr);
- void vgic_v2_set_underflow(struct kvm_vcpu *vcpu);
-+void vgic_v2_set_npie(struct kvm_vcpu *vcpu);
- int vgic_v2_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr);
- int vgic_v2_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
- 			 int offset, u32 *val);
-@@ -189,6 +190,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu);
- void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
- void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr);
- void vgic_v3_set_underflow(struct kvm_vcpu *vcpu);
-+void vgic_v3_set_npie(struct kvm_vcpu *vcpu);
- void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
- void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
- void vgic_v3_enable(struct kvm_vcpu *vcpu);
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 86941f6181bb..53572304843b 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -384,14 +384,11 @@ static void vcpu_power_off(struct kvm_vcpu *vcpu)
+ int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
+ 				    struct kvm_mp_state *mp_state)
+ {
+-	vcpu_load(vcpu);
+-
+ 	if (vcpu->arch.power_off)
+ 		mp_state->mp_state = KVM_MP_STATE_STOPPED;
+ 	else
+ 		mp_state->mp_state = KVM_MP_STATE_RUNNABLE;
+ 
+-	vcpu_put(vcpu);
+ 	return 0;
+ }
+ 
+@@ -400,8 +397,6 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+ {
+ 	int ret = 0;
+ 
+-	vcpu_load(vcpu);
+-
+ 	switch (mp_state->mp_state) {
+ 	case KVM_MP_STATE_RUNNABLE:
+ 		vcpu->arch.power_off = false;
+@@ -413,7 +408,6 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+ 		ret = -EINVAL;
+ 	}
+ 
+-	vcpu_put(vcpu);
+ 	return ret;
+ }
+ 
+@@ -1036,8 +1030,6 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 	struct kvm_device_attr attr;
+ 	long r;
+ 
+-	vcpu_load(vcpu);
+-
+ 	switch (ioctl) {
+ 	case KVM_ARM_VCPU_INIT: {
+ 		struct kvm_vcpu_init init;
+@@ -1114,7 +1106,6 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 		r = -EINVAL;
+ 	}
+ 
+-	vcpu_put(vcpu);
+ 	return r;
+ }
+ 
 -- 
 2.14.2
