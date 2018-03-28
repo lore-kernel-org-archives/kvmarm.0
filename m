@@ -1,23 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 81/85] arm64: KVM: Use SMCCC_ARCH_WORKAROUND_1 for Falkor BP
- hardening
-Date: Wed, 28 Mar 2018 13:52:50 +0100
-Message-ID: <20180328125254.31380-82-marc.zyngier@arm.com>
+Subject: [PATCH 82/85] KVM: arm/arm64: vgic: Disallow Active+Pending for level
+ interrupts
+Date: Wed, 28 Mar 2018 13:52:51 +0100
+Message-ID: <20180328125254.31380-83-marc.zyngier@arm.com>
 References: <20180328125254.31380-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B9014A0EC
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 09:02:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 86A634A0EC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 09:02:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DFxpgLQkKlYb for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Mar 2018 09:02:27 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 46ABF4A0AB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:50:30 -0400 (EDT)
+ with ESMTP id WkmJhg+gV7QP for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Mar 2018 09:02:29 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4873742121
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Mar 2018 08:50:34 -0400 (EDT)
 In-Reply-To: <20180328125254.31380-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,219 +32,192 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: Christoffer Dall <cdall@cs.columbia.edu>, Shunyong Yang <shunyong.yang@hxt-semitech.com>, Julien Thierry <julien.thierry@arm.com>, Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, Catalin Marinas <catalin.marinas@arm.com>, Dave Martin <Dave.Martin@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Shanker Donthineni <shankerd@codeaurora.org>
+It was recently reported that VFIO mediated devices, and anything
+that VFIO exposes as level interrupts, do no strictly follow the
+expected logic of such interrupts as it only lowers the input
+line when the guest has EOId the interrupt at the GIC level, rather
+than when it Acked the interrupt at the device level.
 
-The function SMCCC_ARCH_WORKAROUND_1 was introduced as part of SMC
-V1.1 Calling Convention to mitigate CVE-2017-5715. This patch uses
-the standard call SMCCC_ARCH_WORKAROUND_1 for Falkor chips instead
-of Silicon provider service ID 0xC2001700.
+THe GIC's Active+Pending state is fundamentally incompatible with
+this behaviour, as it prevents KVM from observing the EOI, and in
+turn results in VFIO never dropping the line. This results in an
+interrupt storm in the guest, which it really never expected.
 
-Cc: <stable@vger.kernel.org> # 4.14+
-Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
+As we cannot really change VFIO to follow the strict rules of level
+signalling, let's forbid the A+P state altogether, as it is in the
+end only an optimization. It ensures that we will transition via
+an invalid state, which we can use to notify VFIO of the EOI.
+
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Tested-by: Eric Auger <eric.auger@redhat.com>
+Tested-by: Shunyong Yang <shunyong.yang@hxt-semitech.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/cpucaps.h |  2 +-
- arch/arm64/include/asm/kvm_asm.h |  2 --
- arch/arm64/kernel/bpi.S          |  8 ------
- arch/arm64/kernel/cpu_errata.c   | 55 ++++++++++++++--------------------------
- arch/arm64/kvm/hyp/entry.S       | 12 ---------
- arch/arm64/kvm/hyp/switch.c      | 10 --------
- 6 files changed, 20 insertions(+), 69 deletions(-)
+ virt/kvm/arm/vgic/vgic-v2.c | 54 +++++++++++++++++++++++++--------------------
+ virt/kvm/arm/vgic/vgic-v3.c | 54 +++++++++++++++++++++++++--------------------
+ 2 files changed, 60 insertions(+), 48 deletions(-)
 
-diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-index d4cc54ed0656..c7dfe68fbcc7 100644
---- a/arch/arm64/include/asm/cpucaps.h
-+++ b/arch/arm64/include/asm/cpucaps.h
-@@ -43,7 +43,7 @@
- #define ARM64_SVE				22
- #define ARM64_UNMAP_KERNEL_AT_EL0		23
- #define ARM64_HARDEN_BRANCH_PREDICTOR		24
--#define ARM64_HARDEN_BP_POST_GUEST_EXIT		25
-+/* #define ARM64_UNUSED_CAP_TO_BE_REMOVED	25 */
- #define ARM64_HAS_RAS_EXTN			26
+diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+index 8327ea932aea..45aa433f018f 100644
+--- a/virt/kvm/arm/vgic/vgic-v2.c
++++ b/virt/kvm/arm/vgic/vgic-v2.c
+@@ -105,12 +105,9 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
  
- #define ARM64_NCAPS				27
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index d53d40704416..f6648a3e4152 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -71,8 +71,6 @@ extern u32 __kvm_get_mdcr_el2(void);
+ 		/*
+ 		 * Clear soft pending state when level irqs have been acked.
+-		 * Always regenerate the pending state.
+ 		 */
+-		if (irq->config == VGIC_CONFIG_LEVEL) {
+-			if (!(val & GICH_LR_PENDING_BIT))
+-				irq->pending_latch = false;
+-		}
++		if (irq->config == VGIC_CONFIG_LEVEL && !(val & GICH_LR_STATE))
++			irq->pending_latch = false;
  
- extern u32 __init_stage2_translation(void);
- 
--extern void __qcom_hyp_sanitize_btac_predictors(void);
--
- #else /* __ASSEMBLY__ */
- 
- .macro get_host_ctxt reg, tmp
-diff --git a/arch/arm64/kernel/bpi.S b/arch/arm64/kernel/bpi.S
-index bb0b67722e86..9404f6aecda7 100644
---- a/arch/arm64/kernel/bpi.S
-+++ b/arch/arm64/kernel/bpi.S
-@@ -74,14 +74,6 @@ ENTRY(__bp_harden_hyp_vecs_end)
- 
- 	.popsection
- 
--ENTRY(__qcom_hyp_sanitize_link_stack_start)
--	stp     x29, x30, [sp, #-16]!
--	.rept	16
--	bl	. + 4
--	.endr
--	ldp	x29, x30, [sp], #16
--ENTRY(__qcom_hyp_sanitize_link_stack_end)
--
- .macro smccc_workaround_1 inst
- 	sub	sp, sp, #(8 * 4)
- 	stp	x2, x3, [sp, #(8 * 0)]
-diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-index aacdc118c4c9..caa73af7d26e 100644
---- a/arch/arm64/kernel/cpu_errata.c
-+++ b/arch/arm64/kernel/cpu_errata.c
-@@ -69,8 +69,6 @@ atomic_t arm64_el2_vector_last_slot = ATOMIC_INIT(-1);
- DEFINE_PER_CPU_READ_MOSTLY(struct bp_hardening_data, bp_hardening_data);
- 
- #ifdef CONFIG_KVM
--extern char __qcom_hyp_sanitize_link_stack_start[];
--extern char __qcom_hyp_sanitize_link_stack_end[];
- extern char __smccc_workaround_1_smc_start[];
- extern char __smccc_workaround_1_smc_end[];
- extern char __smccc_workaround_1_hvc_start[];
-@@ -114,8 +112,6 @@ static void __install_bp_hardening_cb(bp_hardening_cb_t fn,
- 	spin_unlock(&bp_lock);
- }
- #else
--#define __qcom_hyp_sanitize_link_stack_start	NULL
--#define __qcom_hyp_sanitize_link_stack_end	NULL
- #define __smccc_workaround_1_smc_start		NULL
- #define __smccc_workaround_1_smc_end		NULL
- #define __smccc_workaround_1_hvc_start		NULL
-@@ -160,12 +156,25 @@ static void call_hvc_arch_workaround_1(void)
- 	arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_WORKAROUND_1, NULL);
- }
- 
-+static void qcom_link_stack_sanitization(void)
-+{
-+	u64 tmp;
-+
-+	asm volatile("mov	%0, x30		\n"
-+		     ".rept	16		\n"
-+		     "bl	. + 4		\n"
-+		     ".endr			\n"
-+		     "mov	x30, %0		\n"
-+		     : "=&r" (tmp));
-+}
-+
- static int enable_smccc_arch_workaround_1(void *data)
+ 		/*
+ 		 * Level-triggered mapped IRQs are special because we only
+@@ -153,8 +150,35 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+ void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
  {
- 	const struct arm64_cpu_capabilities *entry = data;
- 	bp_hardening_cb_t cb;
- 	void *smccc_start, *smccc_end;
- 	struct arm_smccc_res res;
-+	u32 midr = read_cpuid_id();
+ 	u32 val = irq->intid;
++	bool allow_pending = true;
++
++	if (irq->active)
++		val |= GICH_LR_ACTIVE_BIT;
++
++	if (irq->hw) {
++		val |= GICH_LR_HW;
++		val |= irq->hwintid << GICH_LR_PHYSID_CPUID_SHIFT;
++		/*
++		 * Never set pending+active on a HW interrupt, as the
++		 * pending state is kept at the physical distributor
++		 * level.
++		 */
++		if (irq->active)
++			allow_pending = false;
++	} else {
++		if (irq->config == VGIC_CONFIG_LEVEL) {
++			val |= GICH_LR_EOI;
  
- 	if (!entry->matches(entry, SCOPE_LOCAL_CPU))
- 		return 0;
-@@ -198,33 +207,15 @@ static int enable_smccc_arch_workaround_1(void *data)
- 		return 0;
+-	if (irq_is_pending(irq)) {
++			/*
++			 * Software resampling doesn't work very well
++			 * if we allow P+A, so let's not do that.
++			 */
++			if (irq->active)
++				allow_pending = false;
++		}
++	}
++
++	if (allow_pending && irq_is_pending(irq)) {
+ 		val |= GICH_LR_PENDING_BIT;
+ 
+ 		if (irq->config == VGIC_CONFIG_EDGE)
+@@ -171,24 +195,6 @@ void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
+ 		}
  	}
  
-+	if (((midr & MIDR_CPU_MODEL_MASK) == MIDR_QCOM_FALKOR) ||
-+	    ((midr & MIDR_CPU_MODEL_MASK) == MIDR_QCOM_FALKOR_V1))
-+		cb = qcom_link_stack_sanitization;
-+
- 	install_bp_hardening_cb(entry, cb, smccc_start, smccc_end);
- 
- 	return 0;
- }
- 
--static void qcom_link_stack_sanitization(void)
--{
--	u64 tmp;
+-	if (irq->active)
+-		val |= GICH_LR_ACTIVE_BIT;
 -
--	asm volatile("mov	%0, x30		\n"
--		     ".rept	16		\n"
--		     "bl	. + 4		\n"
--		     ".endr			\n"
--		     "mov	x30, %0		\n"
--		     : "=&r" (tmp));
--}
--
--static int qcom_enable_link_stack_sanitization(void *data)
--{
--	const struct arm64_cpu_capabilities *entry = data;
--
--	install_bp_hardening_cb(entry, qcom_link_stack_sanitization,
--				__qcom_hyp_sanitize_link_stack_start,
--				__qcom_hyp_sanitize_link_stack_end);
--
--	return 0;
--}
- #endif	/* CONFIG_HARDEN_BRANCH_PREDICTOR */
- 
- #define MIDR_RANGE(model, min, max) \
-@@ -399,20 +390,12 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
- 	{
- 		.capability = ARM64_HARDEN_BRANCH_PREDICTOR,
- 		MIDR_ALL_VERSIONS(MIDR_QCOM_FALKOR_V1),
--		.enable = qcom_enable_link_stack_sanitization,
--	},
--	{
--		.capability = ARM64_HARDEN_BP_POST_GUEST_EXIT,
--		MIDR_ALL_VERSIONS(MIDR_QCOM_FALKOR_V1),
-+		.enable = enable_smccc_arch_workaround_1,
- 	},
- 	{
- 		.capability = ARM64_HARDEN_BRANCH_PREDICTOR,
- 		MIDR_ALL_VERSIONS(MIDR_QCOM_FALKOR),
--		.enable = qcom_enable_link_stack_sanitization,
--	},
--	{
--		.capability = ARM64_HARDEN_BP_POST_GUEST_EXIT,
--		MIDR_ALL_VERSIONS(MIDR_QCOM_FALKOR),
-+		.enable = enable_smccc_arch_workaround_1,
- 	},
- 	{
- 		.capability = ARM64_HARDEN_BRANCH_PREDICTOR,
-diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-index 1f458f7c3b44..e41a161d313a 100644
---- a/arch/arm64/kvm/hyp/entry.S
-+++ b/arch/arm64/kvm/hyp/entry.S
-@@ -209,15 +209,3 @@ alternative_endif
- 
- 	eret
- ENDPROC(__fpsimd_guest_restore)
--
--ENTRY(__qcom_hyp_sanitize_btac_predictors)
--	/**
--	 * Call SMC64 with Silicon provider serviceID 23<<8 (0xc2001700)
--	 * 0xC2000000-0xC200FFFF: assigned to SiP Service Calls
--	 * b15-b0: contains SiP functionID
--	 */
--	movz    x0, #0x1700
--	movk    x0, #0xc200, lsl #16
--	smc     #0
--	ret
--ENDPROC(__qcom_hyp_sanitize_btac_predictors)
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 07b572173265..d9645236e474 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -472,16 +472,6 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- 		/* And we're baaack! */
- 	} while (fixup_guest_exit(vcpu, &exit_code));
- 
--	if (cpus_have_const_cap(ARM64_HARDEN_BP_POST_GUEST_EXIT)) {
--		u32 midr = read_cpuid_id();
--
--		/* Apply BTAC predictors mitigation to all Falkor chips */
--		if (((midr & MIDR_CPU_MODEL_MASK) == MIDR_QCOM_FALKOR) ||
--		    ((midr & MIDR_CPU_MODEL_MASK) == MIDR_QCOM_FALKOR_V1)) {
--			__qcom_hyp_sanitize_btac_predictors();
--		}
+-	if (irq->hw) {
+-		val |= GICH_LR_HW;
+-		val |= irq->hwintid << GICH_LR_PHYSID_CPUID_SHIFT;
+-		/*
+-		 * Never set pending+active on a HW interrupt, as the
+-		 * pending state is kept at the physical distributor
+-		 * level.
+-		 */
+-		if (irq->active && irq_is_pending(irq))
+-			val &= ~GICH_LR_PENDING_BIT;
+-	} else {
+-		if (irq->config == VGIC_CONFIG_LEVEL)
+-			val |= GICH_LR_EOI;
 -	}
 -
- 	fp_enabled = __fpsimd_enabled_nvhe();
+ 	/*
+ 	 * Level-triggered mapped IRQs are special because we only observe
+ 	 * rising edges as input to the VGIC.  We therefore lower the line
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index e17f61a434fa..8195f52ae6f0 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -97,12 +97,9 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
  
- 	__sysreg_save_state_nvhe(guest_ctxt);
+ 		/*
+ 		 * Clear soft pending state when level irqs have been acked.
+-		 * Always regenerate the pending state.
+ 		 */
+-		if (irq->config == VGIC_CONFIG_LEVEL) {
+-			if (!(val & ICH_LR_PENDING_BIT))
+-				irq->pending_latch = false;
+-		}
++		if (irq->config == VGIC_CONFIG_LEVEL && !(val & ICH_LR_STATE))
++			irq->pending_latch = false;
+ 
+ 		/*
+ 		 * Level-triggered mapped IRQs are special because we only
+@@ -136,8 +133,35 @@ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
+ {
+ 	u32 model = vcpu->kvm->arch.vgic.vgic_model;
+ 	u64 val = irq->intid;
++	bool allow_pending = true;
++
++	if (irq->active)
++		val |= ICH_LR_ACTIVE_BIT;
++
++	if (irq->hw) {
++		val |= ICH_LR_HW;
++		val |= ((u64)irq->hwintid) << ICH_LR_PHYS_ID_SHIFT;
++		/*
++		 * Never set pending+active on a HW interrupt, as the
++		 * pending state is kept at the physical distributor
++		 * level.
++		 */
++		if (irq->active)
++			allow_pending = false;
++	} else {
++		if (irq->config == VGIC_CONFIG_LEVEL) {
++			val |= ICH_LR_EOI;
+ 
+-	if (irq_is_pending(irq)) {
++			/*
++			 * Software resampling doesn't work very well
++			 * if we allow P+A, so let's not do that.
++			 */
++			if (irq->active)
++				allow_pending = false;
++		}
++	}
++
++	if (allow_pending && irq_is_pending(irq)) {
+ 		val |= ICH_LR_PENDING_BIT;
+ 
+ 		if (irq->config == VGIC_CONFIG_EDGE)
+@@ -155,24 +179,6 @@ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
+ 		}
+ 	}
+ 
+-	if (irq->active)
+-		val |= ICH_LR_ACTIVE_BIT;
+-
+-	if (irq->hw) {
+-		val |= ICH_LR_HW;
+-		val |= ((u64)irq->hwintid) << ICH_LR_PHYS_ID_SHIFT;
+-		/*
+-		 * Never set pending+active on a HW interrupt, as the
+-		 * pending state is kept at the physical distributor
+-		 * level.
+-		 */
+-		if (irq->active && irq_is_pending(irq))
+-			val &= ~ICH_LR_PENDING_BIT;
+-	} else {
+-		if (irq->config == VGIC_CONFIG_LEVEL)
+-			val |= ICH_LR_EOI;
+-	}
+-
+ 	/*
+ 	 * Level-triggered mapped IRQs are special because we only observe
+ 	 * rising edges as input to the VGIC.  We therefore lower the line
 -- 
 2.14.2
