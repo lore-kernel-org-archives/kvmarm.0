@@ -1,25 +1,25 @@
 From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Subject: Re: [RFC PATCH v2 05/15] khwasan: initialize shadow to 0xff
-Date: Fri, 30 Mar 2018 19:07:22 +0300
-Message-ID: <2ab69c9c-6e80-ea79-e72e-012753ed3db0@virtuozzo.com>
+Subject: Re: [RFC PATCH v2 13/15] khwasan: add hooks implementation
+Date: Fri, 30 Mar 2018 20:47:19 +0300
+Message-ID: <805d1e85-2d3c-2327-6e6c-f14a56dc0b67@virtuozzo.com>
 References: <cover.1521828273.git.andreyknvl@google.com>
- <774016f707e494da419a2d0d8a03409e6befcaf8.1521828274.git.andreyknvl@google.com>
+ <ba4a74ba1bc48dd66a3831143c3119d13c291fe3.1521828274.git.andreyknvl@google.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 242214030D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Mar 2018 11:58:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A39C42121
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Mar 2018 13:38:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Y9TIkojVoh2h for <kvmarm@lists.cs.columbia.edu>;
- Fri, 30 Mar 2018 11:58:29 -0400 (EDT)
-Received: from EUR01-VE1-obe.outbound.protection.outlook.com
- (mail-ve1eur01on0129.outbound.protection.outlook.com [104.47.1.129])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 25CD440259
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Mar 2018 11:58:29 -0400 (EDT)
-In-Reply-To: <774016f707e494da419a2d0d8a03409e6befcaf8.1521828274.git.andreyknvl@google.com>
+ with ESMTP id t1u54s4h5dTd for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 30 Mar 2018 13:38:29 -0400 (EDT)
+Received: from EUR01-DB5-obe.outbound.protection.outlook.com
+ (mail-db5eur01on0106.outbound.protection.outlook.com [104.47.2.106])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8494B4059B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Mar 2018 13:38:29 -0400 (EDT)
+In-Reply-To: <ba4a74ba1bc48dd66a3831143c3119d13c291fe3.1521828274.git.andreyknvl@google.com>
 Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -30,134 +30,207 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrey Konovalov <andreyknvl@google.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Jonathan Corbet <corbet@lwn.net>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Christopher Li <sparse@chrisli.org>, Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Andrew Morton <akpm@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Mark Rutland <mark.rutland@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Yury Norov <ynorov@caviumnetworks.com>, Nick Desaulniers <ndesaulniers@google.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Kristina Martsenko <kristina.martsenko@arm.>
+To: Andrey Konovalov <andreyknvl@google.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Jonathan Corbet <corbet@lwn.net>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Christopher Li <sparse@chrisli.org>, Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Andrew Morton <akpm@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Mark Rutland <mark.rutland@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Yury Norov <ynorov@caviumnetworks.com>, Nick Desaulniers <ndesaulniers@google.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, Punit Agrawal <punit.agrawal@arm.com>Dav
 Cc: Kees Cook <keescook@google.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Lee Smith <Lee.Smith@arm.com>, Kostya Serebryany <kcc@google.com>, Mark Brand <markbrand@google.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Evgeniy Stepanov <eugenis@google.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On 03/23/2018 09:05 PM, Andrey Konovalov wrote:
-> A KHWASAN shadow memory cell contains a memory tag, that corresponds to
-> the tag in the top byte of the pointer, that points to that memory. The
-> native top byte value of kernel pointers is 0xff, so with KHWASAN we
-> need to initialize shadow memory to 0xff. This commit does that.
+> This commit adds KHWASAN hooks implementation.
+> 
+> 1. When a new slab cache is created, KHWASAN rounds up the size of the
+>    objects in this cache to KASAN_SHADOW_SCALE_SIZE (== 16).
+> 
+> 2. On each kmalloc KHWASAN generates a random tag, sets the shadow memory,
+>    that corresponds to this object to this tag, and embeds this tag value
+>    into the top byte of the returned pointer.
+> 
+> 3. On each kfree KHWASAN poisons the shadow memory with a random tag to
+>    allow detection of use-after-free bugs.
+> 
+> The rest of the logic of the hook implementation is very much similar to
+> the one provided by KASAN. KHWASAN saves allocation and free stack metadata
+> to the slab object the same was KASAN does this.
 > 
 > Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
 > ---
->  arch/arm64/mm/kasan_init.c | 11 ++++++++++-
->  include/linux/kasan.h      |  8 ++++++++
->  mm/kasan/common.c          |  7 +++++++
->  3 files changed, 25 insertions(+), 1 deletion(-)
+>  mm/kasan/khwasan.c | 200 ++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 197 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/arm64/mm/kasan_init.c b/arch/arm64/mm/kasan_init.c
-> index dabfc1ecda3d..d4bceba60010 100644
-> --- a/arch/arm64/mm/kasan_init.c
-> +++ b/arch/arm64/mm/kasan_init.c
-> @@ -90,6 +90,10 @@ static void __init kasan_pte_populate(pmd_t *pmdp, unsigned long addr,
->  	do {
->  		phys_addr_t page_phys = early ? __pa_symbol(kasan_zero_page)
->  					      : kasan_alloc_zeroed_page(node);
-> +#if KASAN_SHADOW_INIT != 0
-> +		if (!early)
-> +			memset(__va(page_phys), KASAN_SHADOW_INIT, PAGE_SIZE);
-> +#endif
-
-Less ugly way to do the same:
-	if (KASAN_SHADOW_INIT != 0 && !early)
-		memset(__va(page_phys), KASAN_SHADOW_INIT, PAGE_SIZE);
-
-
-But the right approach here would be allocating uninitialized memory (see memblock_virt_alloc_try_nid_raw())
-and do "if (!early) memset(.., KASAN_SHADOW_INIT, ..)" afterwards. 
-
-
->  		next = addr + PAGE_SIZE;
->  		set_pte(ptep, pfn_pte(__phys_to_pfn(page_phys), PAGE_KERNEL));
->  	} while (ptep++, addr = next, addr != end && pte_none(READ_ONCE(*ptep)));
-> @@ -139,6 +143,11 @@ asmlinkage void __init kasan_early_init(void)
->  		KASAN_SHADOW_END - (1UL << (64 - KASAN_SHADOW_SCALE_SHIFT)));
->  	BUILD_BUG_ON(!IS_ALIGNED(KASAN_SHADOW_START, PGDIR_SIZE));
->  	BUILD_BUG_ON(!IS_ALIGNED(KASAN_SHADOW_END, PGDIR_SIZE));
-> +
-> +#if KASAN_SHADOW_INIT != 0
-> +	memset(kasan_zero_page, KASAN_SHADOW_INIT, PAGE_SIZE);
-> +#endif
-> +
-
- if (KASAN_SHADOW_INIT)
-	memset(...)
-
-Note that, if poisoning of stack variables will work in the same fashion as classic
-KASAN (compiler generated code writes to shadow in function prologue) than content
-of this page will be ruined very fast. Which makes this initialization questionable.
-
-
-
->  	kasan_pgd_populate(KASAN_SHADOW_START, KASAN_SHADOW_END, NUMA_NO_NODE,
->  			   true);
+> diff --git a/mm/kasan/khwasan.c b/mm/kasan/khwasan.c
+> index da4b17997c71..e8bed5a078c7 100644
+> --- a/mm/kasan/khwasan.c
+> +++ b/mm/kasan/khwasan.c
+> @@ -90,69 +90,260 @@ void *khwasan_reset_tag(const void *addr)
+>  	return reset_tag(addr);
 >  }
-> @@ -235,7 +244,7 @@ void __init kasan_init(void)
->  		set_pte(&kasan_zero_pte[i],
->  			pfn_pte(sym_to_pfn(kasan_zero_page), PAGE_KERNEL_RO));
 >  
-> -	memset(kasan_zero_page, 0, PAGE_SIZE);
-> +	memset(kasan_zero_page, KASAN_SHADOW_INIT, PAGE_SIZE);
->  	cpu_replace_ttbr1(lm_alias(swapper_pg_dir));
->  
->  	/* At this point kasan is fully initialized. Enable error messages */
-> diff --git a/include/linux/kasan.h b/include/linux/kasan.h
-> index 3c45e273a936..700734dff218 100644
-> --- a/include/linux/kasan.h
-> +++ b/include/linux/kasan.h
-> @@ -139,6 +139,8 @@ static inline size_t kasan_metadata_size(struct kmem_cache *cache) { return 0; }
->  
->  #ifdef CONFIG_KASAN_CLASSIC
->  
-> +#define KASAN_SHADOW_INIT 0
+> +void kasan_poison_shadow(const void *address, size_t size, u8 value)
+> +{
+> +	void *shadow_start, *shadow_end;
 > +
->  void kasan_cache_shrink(struct kmem_cache *cache);
->  void kasan_cache_shutdown(struct kmem_cache *cache);
->  
-> @@ -149,4 +151,10 @@ static inline void kasan_cache_shutdown(struct kmem_cache *cache) {}
->  
->  #endif /* CONFIG_KASAN_CLASSIC */
->  
-> +#ifdef CONFIG_KASAN_TAGS
+> +	/* Perform shadow offset calculation based on untagged address */
+> +	address = reset_tag(address);
 > +
-> +#define KASAN_SHADOW_INIT 0xFF
+> +	shadow_start = kasan_mem_to_shadow(address);
+> +	shadow_end = kasan_mem_to_shadow(address + size);
 > +
-> +#endif /* CONFIG_KASAN_TAGS */
+> +	memset(shadow_start, value, shadow_end - shadow_start);
+> +}
 > +
->  #endif /* LINUX_KASAN_H */
-> diff --git a/mm/kasan/common.c b/mm/kasan/common.c
-> index 08f6c8cb9f84..f4ccb9425655 100644
-> --- a/mm/kasan/common.c
-> +++ b/mm/kasan/common.c
-> @@ -253,6 +253,9 @@ int kasan_module_alloc(void *addr, size_t size)
->  			__builtin_return_address(0));
+>  void kasan_unpoison_shadow(const void *address, size_t size)
+>  {
+> +	/* KHWASAN only allows 16-byte granularity */
+> +	size = round_up(size, KASAN_SHADOW_SCALE_SIZE);
+> +	kasan_poison_shadow(address, size, get_tag(address));
+>  }
 >  
->  	if (ret) {
-> +#if KASAN_SHADOW_INIT != 0
-> +		__memset(ret, KASAN_SHADOW_INIT, shadow_size);
-> +#endif
-
-Drop __GFP_ZERO from above and remove this #if/#endif.
 
 
->  		find_vm_area(addr)->flags |= VM_KASAN;
->  		kmemleak_ignore(ret);
->  		return 0;
-> @@ -297,6 +300,10 @@ static int __meminit kasan_mem_notifier(struct notifier_block *nb,
->  		if (!ret)
->  			return NOTIFY_BAD;
->  
-> +#if KASAN_SHADOW_INIT != 0
-> +		__memset(ret, KASAN_SHADOW_INIT, shadow_end - shadow_start);
-> +#endif
+This is way too much of copy-paste/code duplication. Ideally, you should have only
+check_memory_region() stuff separated, the rest (poisoning/unpoisoning, slabs management) should be
+in common.c code.
+
+So it should be something like this:
+
+in kasan.h
+...
+#ifdef CONFIG_KASAN_CLASSIC
+#define KASAN_FREE_PAGE         0xFF  /* page was freed */
+#define KASAN_PAGE_REDZONE      0xFE  /* redzone for kmalloc_large allocations */
+#define KASAN_KMALLOC_REDZONE   0xFC  /* redzone inside slub object */
+#define KASAN_KMALLOC_FREE      0xFB  /* object was freed (kmem_cache_free/kfree) */
+#else
+#define KASAN_FREE_PAGE         0xFE
+#define KASAN_PAGE_REDZONE      0xFE
+#define KASAN_KMALLOC_REDZONE   0xFE
+#define KASAN_KMALLOC_FREE      0xFE
+#endif
+
+...
+
+#ifdef CONFIG_KASAN_CLASSIC
+static inline void *reset_tag(const void *addr)
+{
+	return (void *)addr;
+}
+static inline u8 get_tag(const void *addr)
+{
+	return 0;
+}
+#else
+static inline u8 get_tag(const void *addr)
+{
+	return (u8)((u64)addr >> KHWASAN_TAG_SHIFT);
+}
+
+static inline void *reset_tag(const void *addr)
+{
+	return set_tag(addr, KHWASAN_TAG_KERNEL);
+}
+#endif
+
+
+in kasan/common.c:
+
+
+void kasan_poison_shadow(const void *address, size_t size, u8 value)
+{
+	void *shadow_start, *shadow_end;
+
+	address = reset_tag(address);
+
+	shadow_start = kasan_mem_to_shadow(address);
+	shadow_end = kasan_mem_to_shadow(address + size);
+
+	memset(shadow_start, value, shadow_end - shadow_start);
+}
+
+void kasan_unpoison_shadow(const void *address, size_t size)
+{
+
+	kasan_poison_shadow(address, size, get_tag(address));
+
+	if (size & KASAN_SHADOW_MASK) {
+		u8 *shadow = (u8 *)kasan_mem_to_shadow(address + size);
+
+		if (IS_ENABLED(CONFIG_KASAN_TAGS)
+			*shadow = get_tag(address);
+		else
+			*shadow = size & KASAN_SHADOW_MASK;
+	}
+}
+
+void kasan_free_pages(struct page *page, unsigned int order)
+{
+	if (likely(!PageHighMem(page)))
+		kasan_poison_shadow(page_address(page),
+				PAGE_SIZE << order,
+				KASAN_FREE_PAGE);
+}
+
+etc.
+
+
+
+>  void check_memory_region(unsigned long addr, size_t size, bool write,
+>  				unsigned long ret_ip)
+>  {
+> +	u8 tag;
+> +	u8 *shadow_first, *shadow_last, *shadow;
+> +	void *untagged_addr;
+> +
+> +	tag = get_tag((const void *)addr);
+> +
+> +	/* Ignore accesses for pointers tagged with 0xff (native kernel
+> +	 * pointer tag) to suppress false positives caused by kmap.
+> +	 *
+> +	 * Some kernel code was written to account for archs that don't keep
+> +	 * high memory mapped all the time, but rather map and unmap particular
+> +	 * pages when needed. Instead of storing a pointer to the kernel memory,
+> +	 * this code saves the address of the page structure and offset within
+> +	 * that page for later use. Those pages are then mapped and unmapped
+> +	 * with kmap/kunmap when necessary and virt_to_page is used to get the
+> +	 * virtual address of the page. For arm64 (that keeps the high memory
+> +	 * mapped all the time), kmap is turned into a page_address call.
+> +
+> +	 * The issue is that with use of the page_address + virt_to_page
+> +	 * sequence the top byte value of the original pointer gets lost (gets
+> +	 * set to 0xff.
+> +	 */
+> +	if (tag == 0xff)
+> +		return;
+
+You can save tag somewhere in page struct and make page_address() return tagged address.
+
+I'm not sure it might be even possible to squeeze the tag into page->flags on some configurations,
+see include/linux/page-flags-layout.h
+
+
+>  void *kasan_slab_alloc(struct kmem_cache *cache, void *object, gfp_t flags)
+>  {
+> +	if (!READ_ONCE(khwasan_enabled))
+> +		return object;
+
+...
+
+>  void *kasan_kmalloc(struct kmem_cache *cache, const void *object,
+>  			size_t size, gfp_t flags)
+>  {
+
+> +	if (!READ_ONCE(khwasan_enabled))
+> +		return (void *)object;
 > +
 
-No need to initialize anything here, kasan_free_pages() will do this later.
+...
 
+>  void *kasan_kmalloc_large(const void *ptr, size_t size, gfp_t flags)
+>  {
 
->  		kmemleak_ignore(ret);
->  		return NOTIFY_OK;
->  	}
-> 
+...
+
+> +
+> +	if (!READ_ONCE(khwasan_enabled))
+> +		return (void *)ptr;
+> +
+
+I don't see any possible way of khwasan_enabled being 0 here.
