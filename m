@@ -1,22 +1,22 @@
 From: Abbott Liu <liuwenliang@huawei.com>
-Subject: [PATCH v3 6/6] Enable KASan for arm
-Date: Mon, 2 Apr 2018 20:04:40 +0800
-Message-ID: <20180402120440.31900-7-liuwenliang__20544.977769214$1522675408$gmane$org@huawei.com>
+Subject: [PATCH v3 4/6] Define the virtual space of KASan's shadow region
+Date: Mon, 2 Apr 2018 20:04:38 +0800
+Message-ID: <20180402120440.31900-5-liuwenliang__43675.8430478678$1522675410$gmane$org@huawei.com>
 References: <20180402120440.31900-1-liuwenliang@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E5E6B402DB
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Apr 2018 08:17:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A909402DB
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Apr 2018 08:17:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id H5o+8KvTdatI for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 Apr 2018 08:16:42 -0400 (EDT)
+ with ESMTP id cm0vCaCzc-4i for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 Apr 2018 08:16:41 -0400 (EDT)
 Received: from huawei.com (unknown [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 33C2240357
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Apr 2018 08:16:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 012A24029E
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Apr 2018 08:16:40 -0400 (EDT)
 In-Reply-To: <20180402120440.31900-1-liuwenliang@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -30,45 +30,258 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: aryabinin@virtuozzo.com, dvyukov@google.com, corbet@lwn.net, linux@armlinux.org.uk, christoffer.dall@linaro.org, marc.zyngier@arm.com, kstewart@linuxfoundation.org, gregkh@linuxfoundation.org, f.fainelli@gmail.com, liuwenliang@huawei.com, akpm@linux-foundation.org, linux@rasmusvillemoes.dk, mawilcox@microsoft.com, pombredanne@nexb.com, ard.biesheuvel@linaro.org, vladimir.murzin@arm.com, alexander.levin@verizon.com, nicolas.pitre@linaro.org, tglx@linutronix.de, thgarnie@google.com, dhowells@redhat.com, keescook@chromium.org, arnd@arndb.de, geert@linux-m68k.org, tixy@linaro.org, julien.thierry@arm.com, mark.rutland@arm.com, james.morse@arm.com, zhichao.huang@linaro.org, jinb.park7@gmail.com, labbott@redhat.com, philip@cog.systems, grygorii.strashko@linaro.org, catalin.marinas@arm.com, opendmb@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Andrey Ryabinin <a.ryabinin@samsung.com>
+Define KASAN_SHADOW_OFFSET,KASAN_SHADOW_START and KASAN_SHADOW_END for arm
+kernel address sanitizer.
 
-This patch enable kernel address sanitizer for arm.
+     +----+ 0xffffffff
+     |    |
+     |    |
+     |    |
+     +----+ CONFIG_PAGE_OFFSET
+     |    |     |    | |->  module virtual address space area.
+     |    |/
+     +----+ MODULE_VADDR = KASAN_SHADOW_END
+     |    |     |    | |-> the shadow area of kernel virtual address.
+     |    |/
+     +----+ TASK_SIZE(start of kernel space) = KASAN_SHADOW_START  the
+     |    |\  shadow address of MODULE_VADDR
+     |    | ---------------------+
+     |    |                      |
+     +    + KASAN_SHADOW_OFFSET  |-> the user space area. Kernel address
+     |    |                      |    sanitizer do not use this space.
+     |    | ---------------------+
+     |    |/
+     ------ 0
+
+1)KASAN_SHADOW_OFFSET:
+  This value is used to map an address to the corresponding shadow
+address by the following formula:
+shadow_addr = (address >> 3) + KASAN_SHADOW_OFFSET;
+
+2)KASAN_SHADOW_START
+  This value is the MODULE_VADDR's shadow address. It is the start
+of kernel virtual space.
+
+3)KASAN_SHADOW_END
+  This value is the 0x100000000's shadow address. It is the end of
+kernel addresssanitizer's shadow area. It is also the start of the
+module area.
+
+When enable kasan, the definition of TASK_SIZE is not an an 8-bit
+rotated constant, so we need to modify the TASK_SIZE access code
+in the *.s file.
 
 Cc: Andrey Ryabinin <a.ryabinin@samsung.com>
-Acked-by: Dmitry Vyukov <dvyukov@google.com>
+Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Reviewed-by: Russell King - ARM Linux <linux@armlinux.org.uk>
 Tested-by: Joel Stanley <joel@jms.id.au>
 Tested-by: Florian Fainelli <f.fainelli@gmail.com>
 Tested-by: Abbott Liu <liuwenliang@huawei.com>
 Signed-off-by: Abbott Liu <liuwenliang@huawei.com>
 ---
- Documentation/dev-tools/kasan.rst | 2 +-
- arch/arm/Kconfig                  | 1 +
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ arch/arm/include/asm/kasan_def.h | 64 ++++++++++++++++++++++++++++++++++++++++
+ arch/arm/include/asm/memory.h    |  5 ++++
+ arch/arm/kernel/entry-armv.S     |  5 ++--
+ arch/arm/kernel/entry-common.S   |  9 ++++--
+ arch/arm/mm/init.c               |  6 ++++
+ arch/arm/mm/mmu.c                |  7 ++++-
+ 6 files changed, 90 insertions(+), 6 deletions(-)
+ create mode 100644 arch/arm/include/asm/kasan_def.h
 
-diff --git a/Documentation/dev-tools/kasan.rst b/Documentation/dev-tools/kasan.rst
-index f7a18f2..d92120d 100644
---- a/Documentation/dev-tools/kasan.rst
-+++ b/Documentation/dev-tools/kasan.rst
-@@ -12,7 +12,7 @@ KASAN uses compile-time instrumentation for checking every memory access,
- therefore you will need a GCC version 4.9.2 or later. GCC 5.0 or later is
- required for detection of out-of-bounds accesses to stack or global variables.
+diff --git a/arch/arm/include/asm/kasan_def.h b/arch/arm/include/asm/kasan_def.h
+new file mode 100644
+index 0000000..7b7f424
+--- /dev/null
++++ b/arch/arm/include/asm/kasan_def.h
+@@ -0,0 +1,64 @@
++/*
++ *  arch/arm/include/asm/kasan_def.h
++ *
++ *  Copyright (c) 2018 Huawei Technologies Co., Ltd.
++ *
++ *  Author: Abbott Liu <liuwenliang@huawei.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#ifndef __ASM_KASAN_DEF_H
++#define __ASM_KASAN_DEF_H
++
++#ifdef CONFIG_KASAN
++
++/*
++ *    +----+ 0xffffffff
++ *    |    |
++ *    |    |
++ *    |    |
++ *    +----+ CONFIG_PAGE_OFFSET
++ *    |    |\
++ *    |    | |->  module virtual address space area.
++ *    |    |/
++ *    +----+ MODULE_VADDR = KASAN_SHADOW_END
++ *    |    |\
++ *    |    | |-> the shadow area of kernel virtual address.
++ *    |    |/
++ *    +----+ TASK_SIZE(start of kernel space) = KASAN_SHADOW_START  the
++ *    |    |\  shadow address of MODULE_VADDR
++ *    |    | ---------------------+
++ *    |    |                      |
++ *    +    + KASAN_SHADOW_OFFSET  |-> the user space area. Kernel address
++ *    |    |                      |    sanitizer do not use this space.
++ *    |    | ---------------------+
++ *    |    |/
++ *    ------ 0
++ *
++ *1)KASAN_SHADOW_OFFSET:
++ *    This value is used to map an address to the corresponding shadow
++ * address by the following formula:
++ * shadow_addr = (address >> 3) + KASAN_SHADOW_OFFSET;
++ *
++ * 2)KASAN_SHADOW_START
++ *     This value is the MODULE_VADDR's shadow address. It is the start
++ * of kernel virtual space.
++ *
++ * 3) KASAN_SHADOW_END
++ *   This value is the 0x100000000's shadow address. It is the end of
++ * kernel addresssanitizer's shadow area. It is also the start of the
++ * module area.
++ *
++ */
++
++#define KASAN_SHADOW_OFFSET     (KASAN_SHADOW_END - (1<<29))
++
++#define KASAN_SHADOW_START      ((KASAN_SHADOW_END >> 3) + KASAN_SHADOW_OFFSET)
++
++#define KASAN_SHADOW_END        (UL(CONFIG_PAGE_OFFSET) - UL(SZ_16M))
++
++#endif
++#endif
+diff --git a/arch/arm/include/asm/memory.h b/arch/arm/include/asm/memory.h
+index 4966677..3ce1a9a 100644
+--- a/arch/arm/include/asm/memory.h
++++ b/arch/arm/include/asm/memory.h
+@@ -21,6 +21,7 @@
+ #ifdef CONFIG_NEED_MACH_MEMORY_H
+ #include <mach/memory.h>
+ #endif
++#include <asm/kasan_def.h>
  
--Currently KASAN is supported only for the x86_64 and arm64 architectures.
-+Currently KASAN is supported only for the x86_64, arm64 and arm architectures.
+ /*
+  * Allow for constants defined here to be used from assembly code
+@@ -37,7 +38,11 @@
+  * TASK_SIZE - the maximum size of a user space task.
+  * TASK_UNMAPPED_BASE - the lower boundary of the mmap VM area
+  */
++#ifndef CONFIG_KASAN
+ #define TASK_SIZE		(UL(CONFIG_PAGE_OFFSET) - UL(SZ_16M))
++#else
++#define TASK_SIZE		(KASAN_SHADOW_START)
++#endif
+ #define TASK_UNMAPPED_BASE	ALIGN(TASK_SIZE / 3, SZ_16M)
  
- Usage
- -----
-diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-index 7e3d535..ac2287b 100644
---- a/arch/arm/Kconfig
-+++ b/arch/arm/Kconfig
-@@ -49,6 +49,7 @@ config ARM
- 	select HAVE_ARCH_BITREVERSE if (CPU_32v7M || CPU_32v7) && !CPU_32v6
- 	select HAVE_ARCH_JUMP_LABEL if !XIP_KERNEL && !CPU_ENDIAN_BE32 && MMU
- 	select HAVE_ARCH_KGDB if !CPU_ENDIAN_BE32 && MMU
-+	select HAVE_ARCH_KASAN if MMU
- 	select HAVE_ARCH_MMAP_RND_BITS if MMU
- 	select HAVE_ARCH_SECCOMP_FILTER if (AEABI && !OABI_COMPAT)
- 	select HAVE_ARCH_THREAD_STRUCT_WHITELIST
+ /*
+diff --git a/arch/arm/kernel/entry-armv.S b/arch/arm/kernel/entry-armv.S
+index 1752033..b4de9e4 100644
+--- a/arch/arm/kernel/entry-armv.S
++++ b/arch/arm/kernel/entry-armv.S
+@@ -183,7 +183,7 @@ ENDPROC(__und_invalid)
+ 
+ 	get_thread_info tsk
+ 	ldr	r0, [tsk, #TI_ADDR_LIMIT]
+-	mov	r1, #TASK_SIZE
++	ldr	r1, =TASK_SIZE
+ 	str	r1, [tsk, #TI_ADDR_LIMIT]
+ 	str	r0, [sp, #SVC_ADDR_LIMIT]
+ 
+@@ -437,7 +437,8 @@ ENDPROC(__fiq_abt)
+ 	@ if it was interrupted in a critical region.  Here we
+ 	@ perform a quick test inline since it should be false
+ 	@ 99.9999% of the time.  The rest is done out of line.
+-	cmp	r4, #TASK_SIZE
++	ldr	r0, =TASK_SIZE
++	cmp	r4, r0
+ 	blhs	kuser_cmpxchg64_fixup
+ #endif
+ #endif
+diff --git a/arch/arm/kernel/entry-common.S b/arch/arm/kernel/entry-common.S
+index 3c4f887..78046de 100644
+--- a/arch/arm/kernel/entry-common.S
++++ b/arch/arm/kernel/entry-common.S
+@@ -51,7 +51,8 @@ ret_fast_syscall:
+  UNWIND(.cantunwind	)
+ 	disable_irq_notrace			@ disable interrupts
+ 	ldr	r2, [tsk, #TI_ADDR_LIMIT]
+-	cmp	r2, #TASK_SIZE
++	ldr	r1, =TASK_SIZE
++	cmp	r2, r1
+ 	blne	addr_limit_check_failed
+ 	ldr	r1, [tsk, #TI_FLAGS]		@ re-check for syscall tracing
+ 	tst	r1, #_TIF_SYSCALL_WORK | _TIF_WORK_MASK
+@@ -81,7 +82,8 @@ ret_fast_syscall:
+ 	str	r0, [sp, #S_R0 + S_OFF]!	@ save returned r0
+ 	disable_irq_notrace			@ disable interrupts
+ 	ldr	r2, [tsk, #TI_ADDR_LIMIT]
+-	cmp	r2, #TASK_SIZE
++	ldr     r1, =TASK_SIZE
++	cmp     r2, r1
+ 	blne	addr_limit_check_failed
+ 	ldr	r1, [tsk, #TI_FLAGS]		@ re-check for syscall tracing
+ 	tst	r1, #_TIF_SYSCALL_WORK | _TIF_WORK_MASK
+@@ -116,7 +118,8 @@ ret_slow_syscall:
+ 	disable_irq_notrace			@ disable interrupts
+ ENTRY(ret_to_user_from_irq)
+ 	ldr	r2, [tsk, #TI_ADDR_LIMIT]
+-	cmp	r2, #TASK_SIZE
++	ldr     r1, =TASK_SIZE
++	cmp	r2, r1
+ 	blne	addr_limit_check_failed
+ 	ldr	r1, [tsk, #TI_FLAGS]
+ 	tst	r1, #_TIF_WORK_MASK
+diff --git a/arch/arm/mm/init.c b/arch/arm/mm/init.c
+index bd6f451..da11f61 100644
+--- a/arch/arm/mm/init.c
++++ b/arch/arm/mm/init.c
+@@ -538,6 +538,9 @@ void __init mem_init(void)
+ #ifdef CONFIG_MODULES
+ 			"    modules : 0x%08lx - 0x%08lx   (%4ld MB)\n"
+ #endif
++#ifdef CONFIG_KASAN
++			"    kasan   : 0x%08lx - 0x%08lx   (%4ld MB)\n"
++#endif
+ 			"      .text : 0x%p" " - 0x%p" "   (%4td kB)\n"
+ 			"      .init : 0x%p" " - 0x%p" "   (%4td kB)\n"
+ 			"      .data : 0x%p" " - 0x%p" "   (%4td kB)\n"
+@@ -558,6 +561,9 @@ void __init mem_init(void)
+ #ifdef CONFIG_MODULES
+ 			MLM(MODULES_VADDR, MODULES_END),
+ #endif
++#ifdef CONFIG_KASAN
++			MLM(KASAN_SHADOW_START, KASAN_SHADOW_END),
++#endif
+ 
+ 			MLK_ROUNDUP(_text, _etext),
+ 			MLK_ROUNDUP(__init_begin, __init_end),
+diff --git a/arch/arm/mm/mmu.c b/arch/arm/mm/mmu.c
+index e46a6a4..f5aa1de 100644
+--- a/arch/arm/mm/mmu.c
++++ b/arch/arm/mm/mmu.c
+@@ -1251,9 +1251,14 @@ static inline void prepare_page_table(void)
+ 	/*
+ 	 * Clear out all the mappings below the kernel image.
+ 	 */
+-	for (addr = 0; addr < MODULES_VADDR; addr += PMD_SIZE)
++	for (addr = 0; addr < TASK_SIZE; addr += PMD_SIZE)
+ 		pmd_clear(pmd_off_k(addr));
+ 
++#ifdef CONFIG_KASAN
++	/*TASK_SIZE ~ MODULES_VADDR is the KASAN's shadow area -- skip over it*/
++	addr = MODULES_VADDR;
++#endif
++
+ #ifdef CONFIG_XIP_KERNEL
+ 	/* The XIP kernel is mapped in the module area -- skip over it */
+ 	addr = ((unsigned long)_exiprom + PMD_SIZE - 1) & PMD_MASK;
 -- 
 2.9.0
