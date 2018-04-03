@@ -1,68 +1,99 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCH v2 11/17] kvm: arm64: Configure VTCR per VM
-Date: Tue, 3 Apr 2018 16:44:07 +0100
-Message-ID: <f3ea2a6c-6c98-1768-0eef-b57b74ab91fa@arm.com>
-References: <1522156531-28348-1-git-send-email-suzuki.poulose@arm.com>
- <1522156531-28348-12-git-send-email-suzuki.poulose@arm.com>
- <be9e8c47-8366-2d8f-8d8d-b8d2f978107b@arm.com>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH] KVM: ARM: updtae the VMID generation logic
+Date: Tue, 3 Apr 2018 17:49:48 +0100
+Message-ID: <20180403164947.n3h5vgtrtd2d3tok@lakrids.cambridge.arm.com>
+References: <1522335624-24332-1-git-send-email-zhaoshenglong@huawei.com>
+ <20180329152758.za6ppojjiw6ea52u@lakrids.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <be9e8c47-8366-2d8f-8d8d-b8d2f978107b@arm.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: James Morse <james.morse@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, cdall@kernel.org, marc.zyngier@arm.com, punit.agrawal@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, ard.biesheuvel@linaro.org, peter.maydell@linaro.org, kristina.martsenko@arm.com, mark.rutland@arm.com
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 562B749F94
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Apr 2018 12:41:47 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id BKooCPYSV3dB for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  3 Apr 2018 12:41:25 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BB1EE401CD
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Apr 2018 12:41:25 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <20180329152758.za6ppojjiw6ea52u@lakrids.cambridge.arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Shannon Zhao <zhaoshenglong@huawei.com>
+Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 03/04/18 15:58, James Morse wrote:
-> Hi Suzuki,
+On Thu, Mar 29, 2018 at 04:27:58PM +0100, Mark Rutland wrote:
+> On Thu, Mar 29, 2018 at 11:00:24PM +0800, Shannon Zhao wrote:
+> > From: zhaoshenglong <zhaoshenglong@huawei.com>
+> > 
+> > Currently the VMID for some VM is allocated during VCPU entry/exit
+> > context and will be updated when kvm_next_vmid inversion. So this will
+> > cause the existing VMs exiting from guest and flush the tlb and icache.
+> > 
+> > Also, while a platform with 8 bit VMID supports 255 VMs, it can create
+> > more than 255 VMs and if we create e.g. 256 VMs, some VMs will occur
+> > page fault since at some moment two VMs have same VMID.
 > 
-> On 27/03/18 14:15, Suzuki K Poulose wrote:
->> We set VTCR_EL2 very early during the stage2 init and don't
->> touch it ever. This is fine as we had a fixed IPA size. This
->> patch changes the behavior to set the VTCR for a given VM,
->> depending on its stage2 table. The common configuration for
->> VTCR is still performed during the early init as we have to
->> retain the hardware access flag update bits (VTCR_EL2_HA)
->> per CPU (as they are only set for the CPUs which are capabile).
+> Have you seen this happen?
 > 
-> (Nit: capable)
-> 
+> I beleive that update_vttbr() should prevent this. We intialize
+> kvm_vmid_gen to 1, and when we init a VM, we set its vmid_gen to 0. So
+> the first time a VM is scheduled, update_vttbr() will allocate a VMID,
+> and by construction we shouldn't be able to allocate the same VMID to
+> multiple active VMs, regardless of whether we overflow several times.
 
-Thanks for spotting, will fix it.
+Having delved a bit deeper, I think there is a case where a vcpu could
+end up using a stale VMID.
 
-> 
->> The bits defining the number of levels in the page table (SL0)
->> and and the size of the Input address to the translation (T0SZ)
->> are programmed for each VM upon entry to the guest.
-> 
->> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
->> index 870f4b1..5ccd3ae 100644
->> --- a/arch/arm64/kvm/hyp/switch.c
->> +++ b/arch/arm64/kvm/hyp/switch.c
->> @@ -164,6 +164,12 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
->>   static void __hyp_text __activate_vm(struct kvm_vcpu *vcpu)
->>   {
->>   	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
->> +	u64 vtcr = read_sysreg(vtcr_el2);
->> +
->> +	vtcr &= ~VTCR_EL2_PRIVATE_MASK;
->> +	vtcr |= VTCR_EL2_SL0(kvm_stage2_levels(kvm)) |
->> +		VTCR_EL2_T0SZ(kvm_phys_shift(kvm));
->> +	write_sysreg(vtcr, vtcr_el2);
->>   	write_sysreg(kvm->arch.vttbr, vttbr_el2);
->>   }
-> 
-> Do we need to set this register for tlb maintenance too?
-> e.g. tlbi for a 3-level-stage2 vm when a 2-level-stage2 vm's vtcr is loaded...
-> 
-> (The ARM-ARM has 'Any of the bits of VTCR_EL2 are permitted to be cached in a TLB'.)
+Say we have two physical CPUs, and we're running a VM with two VCPUs. 
 
-You're right. We need to set the VTCR for the tlb operations. I think
-we can do this by hooking it to the __tlb_switch_to_guest() routine.
-Will address it in the next version.
+We start one vCPU, and in update_vttbr() we find the VM's vmid_gen is
+stale. So we:
 
-Cheers
-Suzuki
+1) Take the vmid lock
+2) Increment kvm_vmid_gen
+3) force_vm_exit(cpu_all_mask)
+4) kvm_call_hyp(__kvm_flush_vm_context)
+5) Update kvm->arch.vmid_gen
+6) Update kvm->arch.vmid
+7) Update kvm->arch.vttbr
+
+... but between steps 5 and 6/7, another CPU can enter update_vttbr(), see that
+kvm->arch.vmid_gen == kvm_vmid_gen, and carry on into hyp. In hyp, it reads the
+stale kvm->arch.vmid or kvm->arch.vttbr, and programs a stale VMID into the
+hardware.
+
+There's a very small window for that to happen, but we might be able to
+exacerbate it with something like the below (untested) hack.
+
+This is a classing TOCTTOU bug, and the best way I'm aware of to sovle this is
+something like the arm64 ASID allocator, where we reserve the active ASID on
+each CPU.
+
+Thanks,
+Mark.
+
+---->8----
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 53572304843b..69d55aa12350 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -506,6 +506,7 @@ static void update_vttbr(struct kvm *kvm)
+        }
+ 
+        kvm->arch.vmid_gen = atomic64_read(&kvm_vmid_gen);
++       udelay(10);
+        kvm->arch.vmid = kvm_next_vmid;
+        kvm_next_vmid++;
+        kvm_next_vmid &= (1 << kvm_vmid_bits) - 1;
