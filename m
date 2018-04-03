@@ -1,50 +1,45 @@
-From: Russell King - ARM Linux <linux@armlinux.org.uk>
-Subject: Re: [PATCH v3 2/6] Disable instrumentation for some code
-Date: Tue, 3 Apr 2018 12:38:37 +0100
-Message-ID: <20180403113837.GK16141@n2100.armlinux.org.uk>
-References: <20180402120440.31900-1-liuwenliang@huawei.com>
- <20180402120440.31900-3-liuwenliang@huawei.com>
- <7837103a-bcf0-6b00-14d6-bd6b80649886@arm.com>
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Subject: Re: [kvmtool PATCH 20/17] kvmtool: arm64: Switch memory layout
+Date: Tue, 3 Apr 2018 13:34:34 +0100
+Message-ID: <f04a9ac7-a555-47e1-0bef-f5ff28b287f8@arm.com>
+References: <1522156531-28348-1-git-send-email-suzuki.poulose@arm.com>
+ <1522156531-28348-21-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <7837103a-bcf0-6b00-14d6-bd6b80649886@arm.com>
+In-Reply-To: <1522156531-28348-21-git-send-email-suzuki.poulose@arm.com>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Abbott Liu <liuwenliang@huawei.com>, aryabinin@virtuozzo.com, dvyukov@google.com, corbet@lwn.net, christoffer.dall@linaro.org, kstewart@linuxfoundation.org, gregkh@linuxfoundation.org, f.fainelli@gmail.com, akpm@linux-foundation.org, linux@rasmusvillemoes.dk, mawilcox@microsoft.com, pombredanne@nexb.com, ard.biesheuvel@linaro.org, vladimir.murzin@arm.com, alexander.levin@verizon.com, nicolas.pitre@linaro.org, tglx@linutronix.de, thgarnie@google.com, dhowells@redhat.com, keescook@chromium.org, arnd@arndb.de, geert@linux-m68k.org, tixy@linaro.org, julien.thierry@arm.com, mark.rutland@arm.com, james.morse@arm.com, zhichao.huang@linaro.org, jinb.park7@gmail.com, labbott@redhat.com, philip@cog.systems, grygorii.strashko@linaro.org, catalin.marinas@arm.com, opendmb@gmail.com, kir
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "cdall@kernel.org" <cdall@kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>, Punit Agrawal <Punit.Agrawal@arm.com>, Will Deacon <Will.Deacon@arm.com>, Catalin Marinas <Catalin.Marinas@arm.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "ard.biesheuvel@linaro.org" <ard.biesheuvel@linaro.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, Kristina Martsenko <Kristina.Martsenko@arm.com>, Mark Rutland <Mark.Rutland@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Apr 03, 2018 at 12:30:42PM +0100, Marc Zyngier wrote:
-> On 02/04/18 13:04, Abbott Liu wrote:
-> > From: Andrey Ryabinin <a.ryabinin@samsung.com>
-> > 
-> > Disable instrumentation for arch/arm/boot/compressed/*
-> > ,arch/arm/kvm/hyp/* and arch/arm/vdso/* because those
-> > code won't linkd with kernel image.
-> > 
-> > Disable kasan check in the function unwind_pop_register
-> > because it doesn't matter that kasan checks failed when
-> > unwind_pop_register read stack memory of task.
-> > 
-> > Reviewed-by: Russell King - ARM Linux <linux@armlinux.org.uk>
-> > Reviewed-by: Florian Fainelli <f.fainelli@gmail.com>
-> > Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-> 
-> Just because I replied to this patch doesn't mean you can stick my
-> Reviewed-by tag on it. Please drop this tag until I explicitly say that
-> you can add it (see Documentation/process/submitting-patches.rst,
-> section 11).
-> 
-> Same goes for patch 1.
+Hi Suzuki,
 
-Same goes for that reviewed-by line for me.  From my records, I never
-even looked at patch 2 from the first posting, and I don't appear to
-have the second posting in my mailbox (it's probably been classed as
-spam by dspam.)  So these reviewed-by lines seem to be totally
-misleading.
+On 27/03/18 14:15, Suzuki K Poulose wrote:
+> If the guest wants to use a larger physical address space place
+> the RAM at upper half of the address space. Otherwise, it uses the
+> default layout.
+> 
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> ---
+>  arm/aarch32/include/kvm/kvm-arch.h |  1 +
+>  arm/aarch64/include/kvm/kvm-arch.h | 15 ++++++++++++---
+>  arm/include/arm-common/kvm-arch.h  | 11 ++++++-----
+>  arm/kvm.c                          |  2 +-
+>  4 files changed, 20 insertions(+), 9 deletions(-)
+> 
+> diff --git a/arm/aarch32/include/kvm/kvm-arch.h b/arm/aarch32/include/kvm/kvm-arch.h
+> index cd31e72..2d62aab 100644
+> --- a/arm/aarch32/include/kvm/kvm-arch.h
+> +++ b/arm/aarch32/include/kvm/kvm-arch.h
+> @@ -4,6 +4,7 @@
+>  #define ARM_KERN_OFFSET(...)	0x8000
+>  
+>  #define ARM_MAX_MEMORY(...)	ARM_LOMAP_MAX_MEMORY
 
--- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
-According to speedtest.net: 8.21Mbps down 510kbps up
+I guess this should now be ARM32_MAX_MEMORY?
+
+Thanks,
+Jean
