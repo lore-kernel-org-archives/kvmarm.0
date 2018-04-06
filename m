@@ -1,32 +1,24 @@
-From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Subject: Re: [RFC PATCH v2 13/15] khwasan: add hooks implementation
-Date: Fri, 6 Apr 2018 15:27:55 +0300
-Message-ID: <0f448799-3a06-a25d-d604-21db3e8577fc@virtuozzo.com>
-References: <cover.1521828273.git.andreyknvl@google.com>
- <ba4a74ba1bc48dd66a3831143c3119d13c291fe3.1521828274.git.andreyknvl@google.com>
- <805d1e85-2d3c-2327-6e6c-f14a56dc0b67@virtuozzo.com>
- <CAAeHK+yg5ODeDy7k9fako5mcCLLnBrO729Zp_-UtDuzh3hZgZA@mail.gmail.com>
- <0c4397da-e231-0044-986f-b8468314be76@virtuozzo.com>
- <CAAeHK+xmCLe85_QNDam_BVTp9wVzjxgvko2+0JapJCzmciGa5g@mail.gmail.com>
- <0857f052-a27a-501e-8923-c6f31510e4fe@virtuozzo.com>
- <CAAeHK+xnHeznZwofNQVDcBCCMnaEQ6fcRxOcrFM-qQFUsZ51Rg@mail.gmail.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: [RFC PATCH v2 1/3] KVM: arm/arm64: Introduce
+ kvm_arch_vcpu_run_pid_change
+Date: Fri,  6 Apr 2018 16:01:02 +0100
+Message-ID: <1523026864-15413-2-git-send-email-Dave.Martin@arm.com>
+References: <1523026864-15413-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 72E5449EA2
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Apr 2018 08:19:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 676FB49F8B
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Apr 2018 10:53:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UFCrmiiXIRZm for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 Apr 2018 08:18:40 -0400 (EDT)
-Received: from EUR03-VE1-obe.outbound.protection.outlook.com
- (mail-eopbgr50091.outbound.protection.outlook.com [40.107.5.91])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 76792400D4
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Apr 2018 08:18:40 -0400 (EDT)
-In-Reply-To: <CAAeHK+xnHeznZwofNQVDcBCCMnaEQ6fcRxOcrFM-qQFUsZ51Rg@mail.gmail.com>
-Content-Language: en-US
+ with ESMTP id bpLO5F4SmnuM for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 Apr 2018 10:52:38 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 59EB2402DB
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Apr 2018 10:52:38 -0400 (EDT)
+In-Reply-To: <1523026864-15413-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,67 +28,128 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrey Konovalov <andreyknvl@google.com>
-Cc: Julien Thierry <julien.thierry@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Christopher Li <sparse@chrisli.org>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Paul Lawrence <paullawrence@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Yury Norov <ynorov@caviumnetworks.com>, Alexander Potapenko <glider@google.com>, Christoph Lameter <cl@linux.com>, Michael Weiser <michael.weiser@gmx.de>, Ingo Molnar <mingo@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, Mark Brand <markbrand@google.com>, kasan-dev <kasan-dev@googlegroups.com>, kvmarm@lists.cs.columbia.edu, linux-sparse@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, David Rientjes <rientjes@google.com>, Ramana Radhakrishnan <Ramana.Radhakrishna>
+To: kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
+KVM/ARM differs from other architectures in having to maintain an
+additional virtual address space from that of the host and the guest,
+because we split the execution of KVM across both EL1 and EL2.
 
-On 04/06/2018 03:14 PM, Andrey Konovalov wrote:
-> On Thu, Apr 5, 2018 at 3:02 PM, Andrey Ryabinin <aryabinin@virtuozzo.com> wrote:
->> On 04/04/2018 08:00 PM, Andrey Konovalov wrote:
->>> On Wed, Apr 4, 2018 at 2:39 PM, Andrey Ryabinin <aryabinin@virtuozzo.com> wrote:
->>>>>>
->>>>>> You can save tag somewhere in page struct and make page_address() return tagged address.
->>>>>>
->>>>>> I'm not sure it might be even possible to squeeze the tag into page->flags on some configurations,
->>>>>> see include/linux/page-flags-layout.h
->>>>>
->>>>> One page can contain multiple objects with different tags, so we would
->>>>> need to save the tag for each of them.
->>>>
->>>> What do you mean? Slab page? The per-page tag is needed only for !PageSlab pages.
->>>> For slab pages we have kmalloc/kmem_cache_alloc() which already return properly tagged address.
->>>>
->>>> But the page allocator returns a pointer to struct page. One has to call page_address(page)
->>>> to use that page. Returning 'ignore-me'-tagged address from page_address() makes the whole
->>>> class of bugs invisible to KHWASAN. This is a serious downside comparing to classic KASAN which can
->>>> detect missuses of page allocator API.
->>>
->>> Yes, slab page. Here's an example:
->>>
->>> 1. do_get_write_access() allocates frozen_buffer with jbd2_alloc,
->>> which calls kmem_cache_alloc, and then saves the result to
->>> jh->b_frozen_data.
->>>
->>> 2. jbd2_journal_write_metadata_buffer() takes the value of
->>> jh_in->b_frozen_data and calls virt_to_page() (and offset_in_page())
->>> on it.
->>>
->>> 3. jbd2_journal_write_metadata_buffer() then calls kmap_atomic(),
->>> which calls page_address(), on the resulting page address.
->>>
->>> The tag gets erased. The page belongs to slab and can contain multiple
->>> objects with different tags.
->>>
->>
->> I see. Ideally that kind of problem should be fixed by reworking/redesigning such code,
->> however jbd2_journal_write_metadata_buffer() is far from the only place which
->> does that trick. Fixing all of them would be a huge task probably, so ignoring such
->> accesses seems to be the only choice we have.
->>
->> Nevertheless, this doesn't mean that we should ignore *all* accesses to !slab memory.
-> 
-> So you mean we need to find a way to ignore accesses via pointers
-> returned by page_address(), but still check accesses through all other
-> pointers tagged with 0xFF? I don't see an obvious way to do this. I'm
-> open to suggestions though.
-> 
+This results in a need to explicitly map data structures into EL2 (hyp)
+which are accessed from the hyp code.  As we are about to be more clever
+with our FPSIMD handling, which stores data on the task struct and uses
+thread_info flags, we have to map the currently executing task struct
+into the EL2 virtual address space.
 
-I'm saying that we need to ignore accesses to slab objects if pointer
-to slab object obtained via page_address() + offset_in_page() trick, but don't ignore
-anything else.
+However, we don't want to do this on every KVM_RUN, because it is a
+fairly expensive operation to walk the page tables, and the common
+execution mode is to map a single thread to a VCPU.  By introducing a
+hook that architectures can select with HAVE_KVM_VCPU_RUN_PID_CHANGE, we
+do not introduce overhead for other architectures, but have a simple way
+to only map the data we need when required for arm64.
 
-So, save tag somewhere in page struct and poison shadow with that tag. Make page_address() to
-return tagged address for all !PageSlab() pages. For PageSlab() pages page_address() should return
-0xff tagged address, so we could ignore such accesses.
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+
+---
+
+Since RFCv1:
+
+Back out setting of hyp_current, which isn't introduced to struct
+vcpu_arch by this patch.  This series takes the approach of only
+mapping current->thread_info instead in a later patch, which is
+sufficient.
+---
+ arch/arm64/kvm/Kconfig   |  1 +
+ include/linux/kvm_host.h |  9 +++++++++
+ virt/kvm/Kconfig         |  3 +++
+ virt/kvm/arm/arm.c       | 10 ++++++++++
+ virt/kvm/kvm_main.c      |  7 ++++++-
+ 5 files changed, 29 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index 2257dfc..5b2c8d8 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -39,6 +39,7 @@ config KVM
+ 	select HAVE_KVM_IRQ_ROUTING
+ 	select IRQ_BYPASS_MANAGER
+ 	select HAVE_KVM_IRQ_BYPASS
++	select HAVE_KVM_VCPU_RUN_PID_CHANGE
+ 	---help---
+ 	  Support hosting virtualized guest machines.
+ 	  We don't support KVM with 16K page tables yet, due to the multiple
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 6930c63..4268ace 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1276,4 +1276,13 @@ static inline long kvm_arch_vcpu_async_ioctl(struct file *filp,
+ void kvm_arch_mmu_notifier_invalidate_range(struct kvm *kvm,
+ 		unsigned long start, unsigned long end);
+ 
++#ifdef CONFIG_HAVE_KVM_VCPU_RUN_PID_CHANGE
++int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu);
++#else
++static inline int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
++{
++	return 0;
++}
++#endif /* CONFIG_HAVE_KVM_VCPU_RUN_PID_CHANGE */
++
+ #endif
+diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+index cca7e06..72143cf 100644
+--- a/virt/kvm/Kconfig
++++ b/virt/kvm/Kconfig
+@@ -54,3 +54,6 @@ config HAVE_KVM_IRQ_BYPASS
+ 
+ config HAVE_KVM_VCPU_ASYNC_IOCTL
+        bool
++
++config HAVE_KVM_VCPU_RUN_PID_CHANGE
++       bool
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 5357230..d3af3f4 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -816,6 +816,16 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	return ret;
+ }
+ 
++#ifdef CONFIG_ARM64
++int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
++{
++	struct task_struct *tsk = current;
++
++	/* Make sure the host task fpsimd state is visible to hyp: */
++	return create_hyp_mappings(tsk, tsk + 1, PAGE_HYP);
++}
++#endif
++
+ static int vcpu_interrupt_line(struct kvm_vcpu *vcpu, int number, bool level)
+ {
+ 	int bit_index;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 65dea3f..de33a32 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2550,8 +2550,13 @@ static long kvm_vcpu_ioctl(struct file *filp,
+ 		oldpid = rcu_access_pointer(vcpu->pid);
+ 		if (unlikely(oldpid != current->pids[PIDTYPE_PID].pid)) {
+ 			/* The thread running this VCPU changed. */
+-			struct pid *newpid = get_task_pid(current, PIDTYPE_PID);
++			struct pid *newpid;
+ 
++			r = kvm_arch_vcpu_run_pid_change(vcpu);
++			if (r)
++				break;
++
++			newpid = get_task_pid(current, PIDTYPE_PID);
+ 			rcu_assign_pointer(vcpu->pid, newpid);
+ 			if (oldpid)
+ 				synchronize_rcu();
+-- 
+2.1.4
