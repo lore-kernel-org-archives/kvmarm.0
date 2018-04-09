@@ -1,171 +1,57 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [REPOST PATCH] arm/arm64: KVM: Add PSCI version selection API
-Date: Mon, 9 Apr 2018 14:20:59 +0100
-Message-ID: <4a9ff593-d689-7228-99cd-f72cc2c8e346@arm.com>
-References: <20180215175803.6870-1-marc.zyngier@arm.com>
- <db215c1e-0ce8-32e4-d131-e790bebf353e@redhat.com>
- <86o9k63f7a.wl-marc.zyngier@arm.com>
- <CAFEAcA8XYV=oSX81ON4CGDt0kfG1cgROqj30OC2Ov=bYhLSYig@mail.gmail.com>
- <20180306092134.4bfbz34yhqfrfdlf@kamzik.brq.redhat.com>
- <8042f946-49bf-5fc1-f513-4b76ccd5f7d6@arm.com>
- <CAFEAcA-t1QvjW6eFQ4U+8odj0p_01F8sktpvN9KrZ1Kc-FhtnQ@mail.gmail.com>
- <86169dc0-b13c-fab9-eaca-363d3873ad10@arm.com> <20180409123042.GD10904@cbox>
- <cf0f94ba-f5b7-79ca-1625-1235a5fec8b5@arm.com> <20180409130512.GF10904@cbox>
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+Subject: [PATCH v11 0/4] set VSESR_EL2 by user space and support NOTIFY_SEI notification
+Date: Tue, 10 Apr 2018 05:36:32 +0800
+Message-ID: <1523309796-36423-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180409130512.GF10904@cbox>
-Content-Language: en-GB
 Sender: linux-kernel-owner@vger.kernel.org
-To: Christoffer Dall <cdall@kernel.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, kvmarm@lists.cs.columbia.edu, Andrew Jones <drjones@redhat.com>
+To: rkrcmar@redhat.com, corbet@lwn.net, christoffer.dall@linaro.org, marc.zyngier@arm.com, james.morse@arm.com, linux@armlinux.org.uk, catalin.marinas@arm.com, rjw@rjwysocki.net, bp@alien8.de, lenb@kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-acpi@vger.kernel.org, devel@acpica.org
+Cc: gengdongjiu@huawei.com, huangshaoyu@huawei.com, zhengxiang9@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 09/04/18 14:05, Christoffer Dall wrote:
-> On Mon, Apr 09, 2018 at 01:47:50PM +0100, Marc Zyngier wrote:
->> +Drew, who's look at the whole save/restore thing extensively
->>
->> On 09/04/18 13:30, Christoffer Dall wrote:
->>> On Thu, Mar 15, 2018 at 07:26:48PM +0000, Marc Zyngier wrote:
->>>> On 15/03/18 19:13, Peter Maydell wrote:
->>>>> On 15 March 2018 at 19:00, Marc Zyngier <marc.zyngier@arm.com> wrote:
->>>>>> On 06/03/18 09:21, Andrew Jones wrote:
->>>>>>> On Mon, Mar 05, 2018 at 04:47:55PM +0000, Peter Maydell wrote:
->>>>>>>> On 2 March 2018 at 11:11, Marc Zyngier <marc.zyngier@arm.com> wrote:
->>>>>>>>> On Fri, 02 Mar 2018 10:44:48 +0000,
->>>>>>>>> Auger Eric wrote:
->>>>>>>>>> I understand the get/set is called as part of the migration process.
->>>>>>>>>> So my understanding is the benefit of this series is migration fails in
->>>>>>>>>> those cases:
->>>>>>>>>>
->>>>>>>>>>> =0.2 source -> 0.1 destination
->>>>>>>>>> 0.1 source -> >=0.2 destination
->>>>>>>>>
->>>>>>>>> It also fails in the case where you migrate a 1.0 guest to something
->>>>>>>>> that cannot support it.
->>>>>>>>
->>>>>>>> I think it would be useful if we could write out the various
->>>>>>>> combinations of source, destination and what we expect/want to
->>>>>>>> have happen. My gut feeling here is that we're sacrificing
->>>>>>>> exact migration compatibility in favour of having the guest
->>>>>>>> automatically get the variant-2 mitigations, but it's not clear
->>>>>>>> to me exactly which migration combinations that's intended to
->>>>>>>> happen for. Marc?
->>>>>>>>
->>>>>>>> If this wasn't a mitigation issue the desired behaviour would be
->>>>>>>> straightforward:
->>>>>>>>  * kernel should default to 0.2 on the basis that
->>>>>>>>    that's what it did before
->>>>>>>>  * new QEMU version should enable 1.0 by default for virt-2.12
->>>>>>>>    and 0.2 for virt-2.11 and earlier
->>>>>>>>  * PSCI version info shouldn't appear in migration stream unless
->>>>>>>>    it's something other than 0.2
->>>>>>>> But that would leave some setups (which?) unnecessarily without the
->>>>>>>> mitigation, so we're not doing that. The question is, exactly
->>>>>>>> what *are* we aiming for?
->>>>>>>
->>>>>>> The reason Marc dropped this patch from the series it was first introduced
->>>>>>> in was because we didn't have the aim 100% understood. We want the
->>>>>>> mitigation by default, but also to have the least chance of migration
->>>>>>> failure, and when we must fail (because we're not doing the
->>>>>>> straightforward approach listed above, which would prevent failures), then
->>>>>>> we want to fail with the least amount of damage to the user.
->>>>>>>
->>>>>>> I experimented with a couple different approaches and provided tables[1]
->>>>>>> with my results. I even recommended an approach, but I may have changed
->>>>>>> my mind after reading Marc's follow-up[2]. The thread continues from
->>>>>>> there as well with follow-ups from Christoffer, Marc, and myself. Anyway,
->>>>>>> Marc did this repost for us to debate it and work out the best approach
->>>>>>> here.
->>>>>> It doesn't look like we've made much progress on this, which makes me
->>>>>> think that we probably don't need anything of the like.
->>>>>
->>>>> I was waiting for a better explanation from you of what we're trying to
->>>>> achieve. If you want to take the "do nothing" approach then a list
->>>>> also of what migrations succeed/fail/break in that case would also
->>>>> be useful.
->>>>>
->>>>> (I am somewhat lazily trying to avoid having to spend time reverse
->>>>> engineering the "what are we trying to do and what effects are
->>>>> we accepting" parts from the patch and the code that's already gone
->>>>> into the kernel.)
->>>>
->>>> OK, let me (re)state the problem:
->>>>
->>>> For a guest that requests PSCI 0.2 (i.e. all guests from the past 4 or 5
->>>> years), we now silently upgrade the PSCI version to 1.0 allowing the new
->>>> SMCCC to be discovered, and the ARCH_WORKAROUND_1 service to be called.
->>>>
->>>> Things get funny, specially with migration (and the way QEMU works).
->>>>
->>>> If we "do nothing":
->>>>
->>>> (1) A guest migrating from an "old" host to a "new" host will silently
->>>> see its PSCI version upgraded. Not a big deal in my opinion, as 1.0 is a
->>>> strict superset of 0.2 (apart from the version number...).
->>>>
->>>> (2) A guest migrating from a "new" host to an "old" host will silently
->>>> loose its Spectre v2 mitigation. That's quite a big deal.
->>>>
->>>> (3, not related to migration) A guest having a hardcoded knowledge of
->>>> PSCI 0.2 will se that we've changed something, and may decide to catch
->>>> fire. Oh well.
->>>>
->>>> If we take this patch:
->>>>
->>>> (1) still exists
->>>
->>> No problem, IMHO.
->>>
->>>>
->>>> (2) will now fail to migrate. I see this as a feature.
->>>
->>> Yes, I agree.  This is actually the most important reason for doing
->>> anything beyond what's already merged.
->>
->> Indeed, and that's the reason I wrote this patch the first place.
->>
->>>
->>>>
->>>> (3) can be worked around by setting the "PSCI version pseudo register"
->>>> to 0.2.
->>>
->>> Nice to have, but we're probably not expecting this to be of major
->>> concern.  I initially thought it was a nice debugging feature as well,
->>> but that may be a ridiculous point.
->>>
->>>>
->>>> These are the main things I can think of at the moment.
->>>
->>> So I think we we should merge this patch.
->>>
->>> If userspace then wants to support "migrate from explicitly set v0.2 new
->>> kernel to old kernel", then it must add specific support to filter out
->>> the register from the register list; not that I think anyone will need
->>> that or bother to implement it.
->>>
->>> In other words, I think you should merge this:
->>>
->>> Reviewed-by: Christoffer Dall <cdall@kernel.org>
->>>
->>
->> Thanks. One issue is that we've now missed the 4.16 train, and that this
->> effectively is an ABI change (a fairly minor one, but still). Would we
->> consider slapping this as a retrospective fix to 4.16-stable, or keep it
->> as a 4.17 feature?
-> 
-> Given that it fixes a potentially dangerous migration, and it's a fairly
-> simple patch, I think it's reasonable to apply as a fix to the next 4.16
-> release.  Would we be violating any hard-set rules in doing so?
+1. Detect whether KVM can set set guest SError syndrome
+2. Support to Set VSESR_EL2 and inject SError by user space.
+3. Support live migration to keep SError pending state and VSESR_EL2 value.
+4. ACPI 6.1 adds support for NOTIFY_SEI as a GHES notification mechanism, so support this
+   notification in software, KVM or kernel ARCH code call handle_guest_sei() to let ACP driver
+   to handle this notification.
 
-I don't think so, but I'd welcome comments on it.
+Change since V10:
 
-If nobody shouts by the end of the week, I'll send it in as a fix for
-4.17, earmarked for 4.16 backport.
+Address James's comments, thanks James
+1. Merge the helper function with the user.
+2. Move the ISS_MASK into pend_guest_serror() to clear top bits
+3. Make kvm_vcpu_events struct align to 4 bytes
+4. Add something check in the kvm_arm_vcpu_set_events()
+5. Check kvm_arm_vcpu_get/set_events()'s return value.
+6. Initialise kvm_vcpu_events to 0 so that padding transferred to user-space doesn't
+    contain kernel stack.
 
-Thanks,
+Dongjiu Geng (4):
+  arm64: KVM: export the capability to set guest SError syndrome
+  arm/arm64: KVM: Add KVM_GET/SET_VCPU_EVENTS
+  ACPI / APEI: Add SEI notification type support for ARMv8
+  arm64: handle NOTIFY_SEI notification by the APEI driver
 
-	M.
+ Documentation/virtual/kvm/api.txt    | 39 ++++++++++++++++++++++++--
+ arch/arm/include/asm/kvm_host.h      |  6 ++++
+ arch/arm/kvm/guest.c                 | 12 ++++++++
+ arch/arm64/include/asm/kvm_emulate.h |  5 ++++
+ arch/arm64/include/asm/kvm_host.h    |  7 +++++
+ arch/arm64/include/asm/system_misc.h |  1 +
+ arch/arm64/include/uapi/asm/kvm.h    | 12 ++++++++
+ arch/arm64/kernel/traps.c            |  4 +++
+ arch/arm64/kvm/guest.c               | 31 +++++++++++++++++++++
+ arch/arm64/kvm/inject_fault.c        |  7 ++++-
+ arch/arm64/kvm/reset.c               |  4 +++
+ arch/arm64/mm/fault.c                | 10 +++++++
+ drivers/acpi/apei/Kconfig            | 15 ++++++++++
+ drivers/acpi/apei/ghes.c             | 53 ++++++++++++++++++++++++++++++++++++
+ include/acpi/ghes.h                  |  1 +
+ include/uapi/linux/kvm.h             |  1 +
+ virt/kvm/arm/arm.c                   | 21 ++++++++++++++
+ 17 files changed, 226 insertions(+), 3 deletions(-)
+
 -- 
-Jazz is not dead. It just smells funny...
+1.9.1
