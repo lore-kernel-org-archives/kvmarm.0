@@ -1,57 +1,150 @@
 From: Dongjiu Geng <gengdongjiu@huawei.com>
-Subject: [PATCH v11 0/4] set VSESR_EL2 by user space and support NOTIFY_SEI notification
-Date: Tue, 10 Apr 2018 05:36:32 +0800
-Message-ID: <1523309796-36423-1-git-send-email-gengdongjiu@huawei.com>
+Subject: [PATCH v11 3/4] ACPI / APEI: Add SEI notification type support for ARMv8
+Date: Tue, 10 Apr 2018 05:36:35 +0800
+Message-ID: <1523309796-36423-4-git-send-email-gengdongjiu@huawei.com>
+References: <1523309796-36423-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1523309796-36423-1-git-send-email-gengdongjiu@huawei.com>
 Sender: linux-kernel-owner@vger.kernel.org
 To: rkrcmar@redhat.com, corbet@lwn.net, christoffer.dall@linaro.org, marc.zyngier@arm.com, james.morse@arm.com, linux@armlinux.org.uk, catalin.marinas@arm.com, rjw@rjwysocki.net, bp@alien8.de, lenb@kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-acpi@vger.kernel.org, devel@acpica.org
 Cc: gengdongjiu@huawei.com, huangshaoyu@huawei.com, zhengxiang9@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-1. Detect whether KVM can set set guest SError syndrome
-2. Support to Set VSESR_EL2 and inject SError by user space.
-3. Support live migration to keep SError pending state and VSESR_EL2 value.
-4. ACPI 6.1 adds support for NOTIFY_SEI as a GHES notification mechanism, so support this
-   notification in software, KVM or kernel ARCH code call handle_guest_sei() to let ACP driver
-   to handle this notification.
+ACPI 6.x adds support for NOTIFY_SEI as a GHES notification
+mechanism, so add new GHES notification handling functions.
+Expose API ghes_notify_sei() to arch code, arch code will call
+this API when it gets this NOTIFY_SEI.
 
-Change since V10:
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+---
+ drivers/acpi/apei/Kconfig | 15 ++++++++++++++
+ drivers/acpi/apei/ghes.c  | 53 +++++++++++++++++++++++++++++++++++++++++++++++
+ include/acpi/ghes.h       |  1 +
+ 3 files changed, 69 insertions(+)
 
-Address James's comments, thanks James
-1. Merge the helper function with the user.
-2. Move the ISS_MASK into pend_guest_serror() to clear top bits
-3. Make kvm_vcpu_events struct align to 4 bytes
-4. Add something check in the kvm_arm_vcpu_set_events()
-5. Check kvm_arm_vcpu_get/set_events()'s return value.
-6. Initialise kvm_vcpu_events to 0 so that padding transferred to user-space doesn't
-    contain kernel stack.
-
-Dongjiu Geng (4):
-  arm64: KVM: export the capability to set guest SError syndrome
-  arm/arm64: KVM: Add KVM_GET/SET_VCPU_EVENTS
-  ACPI / APEI: Add SEI notification type support for ARMv8
-  arm64: handle NOTIFY_SEI notification by the APEI driver
-
- Documentation/virtual/kvm/api.txt    | 39 ++++++++++++++++++++++++--
- arch/arm/include/asm/kvm_host.h      |  6 ++++
- arch/arm/kvm/guest.c                 | 12 ++++++++
- arch/arm64/include/asm/kvm_emulate.h |  5 ++++
- arch/arm64/include/asm/kvm_host.h    |  7 +++++
- arch/arm64/include/asm/system_misc.h |  1 +
- arch/arm64/include/uapi/asm/kvm.h    | 12 ++++++++
- arch/arm64/kernel/traps.c            |  4 +++
- arch/arm64/kvm/guest.c               | 31 +++++++++++++++++++++
- arch/arm64/kvm/inject_fault.c        |  7 ++++-
- arch/arm64/kvm/reset.c               |  4 +++
- arch/arm64/mm/fault.c                | 10 +++++++
- drivers/acpi/apei/Kconfig            | 15 ++++++++++
- drivers/acpi/apei/ghes.c             | 53 ++++++++++++++++++++++++++++++++++++
- include/acpi/ghes.h                  |  1 +
- include/uapi/linux/kvm.h             |  1 +
- virt/kvm/arm/arm.c                   | 21 ++++++++++++++
- 17 files changed, 226 insertions(+), 3 deletions(-)
-
+diff --git a/drivers/acpi/apei/Kconfig b/drivers/acpi/apei/Kconfig
+index 52ae543..ff4afc3 100644
+--- a/drivers/acpi/apei/Kconfig
++++ b/drivers/acpi/apei/Kconfig
+@@ -55,6 +55,21 @@ config ACPI_APEI_SEA
+ 	  option allows the OS to look for such hardware error record, and
+ 	  take appropriate action.
+ 
++config ACPI_APEI_SEI
++	bool "APEI SError(System Error) Interrupt logging/recovering support"
++	depends on ARM64 && ACPI_APEI_GHES
++	default y
++	help
++	  This option should be enabled if the system supports
++	  firmware first handling of SEI (SError interrupt).
++
++	  SEI happens with asynchronous external abort for errors on device
++	  memory reads on ARMv8 systems. If a system supports firmware first
++	  handling of SEI, the platform analyzes and handles hardware error
++	  notifications from SEI, and it may then form a hardware error record for
++	  the OS to parse and handle. This option allows the OS to look for
++	  such hardware error record, and take appropriate action.
++
+ config ACPI_APEI_MEMORY_FAILURE
+ 	bool "APEI memory error recovering support"
+ 	depends on ACPI_APEI && MEMORY_FAILURE
+diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+index 1efefe9..33f77ae 100644
+--- a/drivers/acpi/apei/ghes.c
++++ b/drivers/acpi/apei/ghes.c
+@@ -827,6 +827,46 @@ static inline void ghes_sea_add(struct ghes *ghes) { }
+ static inline void ghes_sea_remove(struct ghes *ghes) { }
+ #endif /* CONFIG_ACPI_APEI_SEA */
+ 
++#ifdef CONFIG_ACPI_APEI_SEI
++static LIST_HEAD(ghes_sei);
++
++/*
++ * Return 0 only if one of the SEI error sources successfully reported an error
++ * record sent from the firmware.
++ */
++int ghes_notify_sei(void)
++{
++	struct ghes *ghes;
++	int ret = -ENOENT;
++
++	rcu_read_lock();
++	list_for_each_entry_rcu(ghes, &ghes_sei, list) {
++		if (!ghes_proc(ghes))
++			ret = 0;
++	}
++	rcu_read_unlock();
++	return ret;
++}
++
++static void ghes_sei_add(struct ghes *ghes)
++{
++	mutex_lock(&ghes_list_mutex);
++	list_add_rcu(&ghes->list, &ghes_sei);
++	mutex_unlock(&ghes_list_mutex);
++}
++
++static void ghes_sei_remove(struct ghes *ghes)
++{
++	mutex_lock(&ghes_list_mutex);
++	list_del_rcu(&ghes->list);
++	mutex_unlock(&ghes_list_mutex);
++	synchronize_rcu();
++}
++#else /* CONFIG_ACPI_APEI_SEI */
++static inline void ghes_sei_add(struct ghes *ghes) { }
++static inline void ghes_sei_remove(struct ghes *ghes) { }
++#endif /* CONFIG_ACPI_APEI_SEI */
++
+ #ifdef CONFIG_HAVE_ACPI_APEI_NMI
+ /*
+  * printk is not safe in NMI context.  So in NMI handler, we allocate
+@@ -1055,6 +1095,13 @@ static int ghes_probe(struct platform_device *ghes_dev)
+ 			goto err;
+ 		}
+ 		break;
++	case ACPI_HEST_NOTIFY_SEI:
++		if (!IS_ENABLED(CONFIG_ACPI_APEI_SEI)) {
++			pr_warn(GHES_PFX "Generic hardware error source: %d notified via SEI is not supported!\n",
++				generic->header.source_id);
++		goto err;
++	}
++	break;
+ 	case ACPI_HEST_NOTIFY_NMI:
+ 		if (!IS_ENABLED(CONFIG_HAVE_ACPI_APEI_NMI)) {
+ 			pr_warn(GHES_PFX "Generic hardware error source: %d notified via NMI interrupt is not supported!\n",
+@@ -1126,6 +1173,9 @@ static int ghes_probe(struct platform_device *ghes_dev)
+ 	case ACPI_HEST_NOTIFY_SEA:
+ 		ghes_sea_add(ghes);
+ 		break;
++	case ACPI_HEST_NOTIFY_SEI:
++		ghes_sei_add(ghes);
++		break;
+ 	case ACPI_HEST_NOTIFY_NMI:
+ 		ghes_nmi_add(ghes);
+ 		break;
+@@ -1179,6 +1229,9 @@ static int ghes_remove(struct platform_device *ghes_dev)
+ 	case ACPI_HEST_NOTIFY_SEA:
+ 		ghes_sea_remove(ghes);
+ 		break;
++	case ACPI_HEST_NOTIFY_SEI:
++		ghes_sei_remove(ghes);
++		break;
+ 	case ACPI_HEST_NOTIFY_NMI:
+ 		ghes_nmi_remove(ghes);
+ 		break;
+diff --git a/include/acpi/ghes.h b/include/acpi/ghes.h
+index 8feb0c8..9ba59e2 100644
+--- a/include/acpi/ghes.h
++++ b/include/acpi/ghes.h
+@@ -120,5 +120,6 @@ static inline void *acpi_hest_get_next(struct acpi_hest_generic_data *gdata)
+ 	     section = acpi_hest_get_next(section))
+ 
+ int ghes_notify_sea(void);
++int ghes_notify_sei(void);
+ 
+ #endif /* GHES_H */
 -- 
 1.9.1
