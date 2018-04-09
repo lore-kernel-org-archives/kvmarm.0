@@ -1,152 +1,78 @@
 From: Christoffer Dall <cdall@kernel.org>
-Subject: Re: [RFC PATCH v3 4/4] KVM: arm64: Optimise FPSIMD handling to
- reduce guest/host thrashing
-Date: Mon, 9 Apr 2018 23:22:43 +0200
-Message-ID: <20180409212243.GI10904@cbox>
-References: <1523271182-22130-1-git-send-email-Dave.Martin@arm.com>
- <1523271182-22130-5-git-send-email-Dave.Martin@arm.com>
+Subject: Re: [RFC v2 02/12] KVM: arm/arm64: Document
+ KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+Date: Mon, 9 Apr 2018 23:38:52 +0200
+Message-ID: <20180409213852.GJ10904@cbox>
+References: <1522159456-10419-1-git-send-email-eric.auger@redhat.com>
+ <1522159456-10419-3-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1523271182-22130-5-git-send-email-Dave.Martin@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+In-Reply-To: <1522159456-10419-3-git-send-email-eric.auger@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, peter.maydell@linaro.org, andre.przywara@arm.com, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Dave,
+Hi Eric,
 
-On Mon, Apr 09, 2018 at 11:53:02AM +0100, Dave Martin wrote:
-> This patch refactors KVM to align the host and guest FPSIMD
-> save/restore logic with each other for arm64.  This reduces the
-> number of redundant save/restore operations that must occur, and
-> reduces the common-case IRQ blackout time during guest exit storms
-> by saving the host state lazily and optimising away the need to
-> restore the host state before returning to the run loop.
+On Tue, Mar 27, 2018 at 04:04:06PM +0200, Eric Auger wrote:
+> We introduce a new KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION attribute in
+> KVM_DEV_ARM_VGIC_GRP_ADDR group. It allows userspace to provide the
+> base address and size of a redistributor region
 > 
-
-[...]
-
-> diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-> index db08a54..74c5a46 100644
-> --- a/arch/arm64/kernel/fpsimd.c
-> +++ b/arch/arm64/kernel/fpsimd.c
-
-[...]
-
-> @@ -1054,15 +1066,20 @@ void fpsimd_update_current_state(struct user_fpsimd_state const *state)
->  	local_bh_enable();
->  }
->  
-> +void fpsimd_flush_state(unsigned int *cpu)
-
-This API looks strange to me, and doesn't seem to be called from
-elsewhere.  Wouldn't it be more clear if it took a struct thread_struct
-pointer instead, or if the logic remained embedded in
-fpsimd_flush_task_state ?
-
-> +{
-> +	*cpu = NR_CPUS;
-> +}
+> Compared to KVM_VGIC_V3_ADDR_TYPE_REDIST, this new attribute allows
+> to declare several separate redistributor regions.
+> 
+> So the whole redist space does not need to be contiguous anymore.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  Documentation/virtual/kvm/devices/arm-vgic-v3.txt | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
+> 
+> diff --git a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+> index 9293b45..0ded904 100644
+> --- a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+> +++ b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+> @@ -27,6 +27,24 @@ Groups:
+>        VCPU and all of the redistributor pages are contiguous.
+>        Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
+>        This address needs to be 64K aligned.
 > +
->  /*
->   * Invalidate live CPU copies of task t's FPSIMD state
->   */
->  void fpsimd_flush_task_state(struct task_struct *t)
->  {
-> -	t->thread.fpsimd_cpu = NR_CPUS;
-> +	fpsimd_flush_state(&t->thread.fpsimd_cpu);
->  }
->  
-> -static inline void fpsimd_flush_cpu_state(void)
-> +void fpsimd_flush_cpu_state(void)
->  {
->  	__this_cpu_write(fpsimd_last_state.st, NULL);
->  }
+> +    KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION (rw, 64-bit)
+> +      The attr field of kvm_device_attr encodes 3 values:
+> +      bits:     | 63   ....  52  |  51   ....   16 | 15 - 12  |11 - 0
+> +      values:   |     count      |       base      |  flags   | index
+> +      - index encodes the unique redistributor region index
+> +      - flags: reserved for future use, currently 0
+> +      - base field encodes bits [51:16] of the guest physical base address
+> +        of the first redistributor in the region. There are two 64K pages
+> +        for each VCPU and all of the redistributor pages are contiguous
 
-[...]
+should this be two 64K pages for the number of redistributors in this
+region as specified by count ?
 
-> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> index 8605e04..797b259 100644
-> --- a/arch/arm64/kvm/hyp/switch.c
-> +++ b/arch/arm64/kvm/hyp/switch.c
-> @@ -27,6 +27,7 @@
->  #include <asm/kvm_mmu.h>
->  #include <asm/fpsimd.h>
->  #include <asm/debug-monitors.h>
-> +#include <asm/thread_info.h>
->  
->  static bool __hyp_text __fpsimd_enabled_nvhe(void)
->  {
-> @@ -47,24 +48,40 @@ bool __hyp_text __fpsimd_enabled(void)
->  	return __fpsimd_is_enabled()();
->  }
->  
-> -static void __hyp_text __activate_traps_vhe(void)
-> +static bool update_fp_enabled(struct kvm_vcpu *vcpu)
+> +        within the redistributor region.
+> +      - count encodes the number of redistributors in the region.
 
-I think this needs a __hyp_text in the unlikely case that this function
-is not inlined in the _nvhe caller by the compiler.
+I assume it's implied that the user must register a total number of
+redistributors across all the regions that matches the number of vcpus,
+and that otherwise something bad happens?
 
-> +{
-> +	if (vcpu->arch.host_thread_info->flags & _TIF_FOREIGN_FPSTATE) {
-> +		vcpu->arch.host_fpsimd_state = NULL;
-> +		vcpu->arch.fp_enabled = false;
-> +	}
-
-I'm not clear why the above logic can't go into kvm_arch_vcpu_load_fp
-and why we can't simply check TIF_FOREIGN_FPSTATE in __hyp_switch_fpsimd
-instead?
-
+> +      Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
 > +
-> +	return vcpu->arch.fp_enabled;
-> +}
+> +  It is invalid to mix calls with KVM_VGIC_V3_ADDR_TYPE_REDIST and
+> +  KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION attributes. When attempted an
+> +  -EINVAL error is returned.
 > +
-> +static void __hyp_text __activate_traps_vhe(struct kvm_vcpu *vcpu)
->  {
->  	u64 val;
->  
->  	val = read_sysreg(cpacr_el1);
->  	val |= CPACR_EL1_TTA;
-> -	val &= ~(CPACR_EL1_FPEN | CPACR_EL1_ZEN);
-> +	val &= ~CPACR_EL1_ZEN;
-> +	if (!update_fp_enabled(vcpu))
-> +		val &= ~CPACR_EL1_FPEN;
-> +
->  	write_sysreg(val, cpacr_el1);
->  
->  	write_sysreg(kvm_get_hyp_vector(), vbar_el1);
->  }
->  
-> -static void __hyp_text __activate_traps_nvhe(void)
-> +static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
->  {
->  	u64 val;
->  
->  	val = CPTR_EL2_DEFAULT;
-> -	val |= CPTR_EL2_TTA | CPTR_EL2_TFP | CPTR_EL2_TZ;
-> +	val |= CPTR_EL2_TTA | CPTR_EL2_TZ;
-> +	if (!update_fp_enabled(vcpu))
-> +		val |= CPTR_EL2_TFP;
-> +
->  	write_sysreg(val, cptr_el2);
->  }
->  
-
-[...]
-
-Otherwise this approach looks quite good to me overall.  Are you
-planning to add SVE support before removing the RFC from this series?
+>    Errors:
+>      -E2BIG:  Address outside of addressable IPA range
+>      -EINVAL: Incorrectly aligned address
+> -- 
+> 2.5.5
+> 
 
 Thanks,
 -Christoffer
