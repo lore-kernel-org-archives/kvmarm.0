@@ -1,14 +1,16 @@
 From: Christoffer Dall <cdall@kernel.org>
-Subject: Re: [PATCH] KVM: arm/arm64: Close VMID generation race
-Date: Mon, 9 Apr 2018 22:51:39 +0200
-Message-ID: <20180409205139.GH10904@cbox>
-References: <20180409170706.23541-1-marc.zyngier@arm.com>
+Subject: Re: [RFC PATCH v3 4/4] KVM: arm64: Optimise FPSIMD handling to
+ reduce guest/host thrashing
+Date: Mon, 9 Apr 2018 23:22:43 +0200
+Message-ID: <20180409212243.GI10904@cbox>
+References: <1523271182-22130-1-git-send-email-Dave.Martin@arm.com>
+ <1523271182-22130-5-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <20180409170706.23541-1-marc.zyngier@arm.com>
+In-Reply-To: <1523271182-22130-5-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -18,132 +20,133 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Mark Rutland <mark.rutland@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Shannon Zhao <zhaoshenglong@huawei.com>
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Apr 09, 2018 at 06:07:06PM +0100, Marc Zyngier wrote:
-> Before entering the guest, we check whether our VMID is still
-> part of the current generation. In order to avoid taking a lock,
-> we start with checking that the generation is still current, and
-> only if not current do we take the lock, recheck, and update the
-> generation and VMID.
+Hi Dave,
+
+On Mon, Apr 09, 2018 at 11:53:02AM +0100, Dave Martin wrote:
+> This patch refactors KVM to align the host and guest FPSIMD
+> save/restore logic with each other for arm64.  This reduces the
+> number of redundant save/restore operations that must occur, and
+> reduces the common-case IRQ blackout time during guest exit storms
+> by saving the host state lazily and optimising away the need to
+> restore the host state before returning to the run loop.
 > 
-> This leaves open a small race: A vcpu can bump up the global
-> generation number as well as the VM's, but has not updated
-> the VMID itself yet.
-> 
-> At that point another vcpu from the same VM comes in, checks
-> the generation (and finds it not needing anything), and jumps
-> into the guest. At this point, we end-up with two vcpus belonging
-> to the same VM running with two different VMIDs. Eventually, the
-> VMID used by the second vcpu will get reassigned, and things will
-> really go wrong...
-> 
-> A simple solution would be to drop this initial check, and always take
-> the lock. This is likely to cause performance issues. A middle ground
-> is to convert the spinlock to a rwlock, and only take the read lock
-> on the fast path. If the check fails at that point, drop it and
-> acquire the write lock, rechecking the condition.
-> 
-> This ensures that the above scenario doesn't occur.
-> 
-> Reported-by: Mark Rutland <mark.rutland@arm.com>
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
-> I haven't seen any reply from Shannon, so reposting this to
-> a slightly wider audience for feedback.
-> 
->  virt/kvm/arm/arm.c | 15 ++++++++++-----
->  1 file changed, 10 insertions(+), 5 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index dba629c5f8ac..a4c1b76240df 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -63,7 +63,7 @@ static DEFINE_PER_CPU(struct kvm_vcpu *, kvm_arm_running_vcpu);
->  static atomic64_t kvm_vmid_gen = ATOMIC64_INIT(1);
->  static u32 kvm_next_vmid;
->  static unsigned int kvm_vmid_bits __read_mostly;
-> -static DEFINE_SPINLOCK(kvm_vmid_lock);
-> +static DEFINE_RWLOCK(kvm_vmid_lock);
->  
->  static bool vgic_present;
->  
-> @@ -473,11 +473,16 @@ static void update_vttbr(struct kvm *kvm)
->  {
->  	phys_addr_t pgd_phys;
->  	u64 vmid;
-> +	bool new_gen;
->  
-> -	if (!need_new_vmid_gen(kvm))
-> +	read_lock(&kvm_vmid_lock);
-> +	new_gen = need_new_vmid_gen(kvm);
-> +	read_unlock(&kvm_vmid_lock);
-> +
-> +	if (!new_gen)
->  		return;
->  
-> -	spin_lock(&kvm_vmid_lock);
-> +	write_lock(&kvm_vmid_lock);
->  
->  	/*
->  	 * We need to re-check the vmid_gen here to ensure that if another vcpu
-> @@ -485,7 +490,7 @@ static void update_vttbr(struct kvm *kvm)
->  	 * use the same vmid.
->  	 */
->  	if (!need_new_vmid_gen(kvm)) {
-> -		spin_unlock(&kvm_vmid_lock);
-> +		write_unlock(&kvm_vmid_lock);
->  		return;
->  	}
->  
-> @@ -519,7 +524,7 @@ static void update_vttbr(struct kvm *kvm)
->  	vmid = ((u64)(kvm->arch.vmid) << VTTBR_VMID_SHIFT) & VTTBR_VMID_MASK(kvm_vmid_bits);
->  	kvm->arch.vttbr = kvm_phys_to_vttbr(pgd_phys) | vmid;
->  
-> -	spin_unlock(&kvm_vmid_lock);
-> +	write_unlock(&kvm_vmid_lock);
+
+[...]
+
+> diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+> index db08a54..74c5a46 100644
+> --- a/arch/arm64/kernel/fpsimd.c
+> +++ b/arch/arm64/kernel/fpsimd.c
+
+[...]
+
+> @@ -1054,15 +1066,20 @@ void fpsimd_update_current_state(struct user_fpsimd_state const *state)
+>  	local_bh_enable();
 >  }
 >  
->  static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
-> -- 
-> 2.14.2
-> 
+> +void fpsimd_flush_state(unsigned int *cpu)
 
-The above looks correct to me.  I am wondering if something like the
-following would also work, which may be slightly more efficient,
-although I doubt the difference can be measured:
+This API looks strange to me, and doesn't seem to be called from
+elsewhere.  Wouldn't it be more clear if it took a struct thread_struct
+pointer instead, or if the logic remained embedded in
+fpsimd_flush_task_state ?
 
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index dba629c5f8ac..7ac869bcad21 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -458,7 +458,9 @@ void force_vm_exit(const cpumask_t *mask)
-  */
- static bool need_new_vmid_gen(struct kvm *kvm)
- {
--	return unlikely(kvm->arch.vmid_gen != atomic64_read(&kvm_vmid_gen));
-+	u64 current_vmid_gen = atomic64_read(&kvm_vmid_gen);
-+	smp_rmb(); /* Orders read of kvm_vmid_gen and kvm->arch.vmid */
-+	return unlikely(kvm->arch.vmid_gen != current_vmid_gen);
- }
- 
- /**
-@@ -508,10 +510,11 @@ static void update_vttbr(struct kvm *kvm)
- 		kvm_call_hyp(__kvm_flush_vm_context);
- 	}
- 
--	kvm->arch.vmid_gen = atomic64_read(&kvm_vmid_gen);
- 	kvm->arch.vmid = kvm_next_vmid;
- 	kvm_next_vmid++;
- 	kvm_next_vmid &= (1 << kvm_vmid_bits) - 1;
-+	smp_wmb();
-+	kvm->arch.vmid_gen = atomic64_read(&kvm_vmid_gen);
- 
- 	/* update vttbr to be used with the new vmid */
- 	pgd_phys = virt_to_phys(kvm->arch.pgd);
+> +{
+> +	*cpu = NR_CPUS;
+> +}
+> +
+>  /*
+>   * Invalidate live CPU copies of task t's FPSIMD state
+>   */
+>  void fpsimd_flush_task_state(struct task_struct *t)
+>  {
+> -	t->thread.fpsimd_cpu = NR_CPUS;
+> +	fpsimd_flush_state(&t->thread.fpsimd_cpu);
+>  }
+>  
+> -static inline void fpsimd_flush_cpu_state(void)
+> +void fpsimd_flush_cpu_state(void)
+>  {
+>  	__this_cpu_write(fpsimd_last_state.st, NULL);
+>  }
 
+[...]
+
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index 8605e04..797b259 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -27,6 +27,7 @@
+>  #include <asm/kvm_mmu.h>
+>  #include <asm/fpsimd.h>
+>  #include <asm/debug-monitors.h>
+> +#include <asm/thread_info.h>
+>  
+>  static bool __hyp_text __fpsimd_enabled_nvhe(void)
+>  {
+> @@ -47,24 +48,40 @@ bool __hyp_text __fpsimd_enabled(void)
+>  	return __fpsimd_is_enabled()();
+>  }
+>  
+> -static void __hyp_text __activate_traps_vhe(void)
+> +static bool update_fp_enabled(struct kvm_vcpu *vcpu)
+
+I think this needs a __hyp_text in the unlikely case that this function
+is not inlined in the _nvhe caller by the compiler.
+
+> +{
+> +	if (vcpu->arch.host_thread_info->flags & _TIF_FOREIGN_FPSTATE) {
+> +		vcpu->arch.host_fpsimd_state = NULL;
+> +		vcpu->arch.fp_enabled = false;
+> +	}
+
+I'm not clear why the above logic can't go into kvm_arch_vcpu_load_fp
+and why we can't simply check TIF_FOREIGN_FPSTATE in __hyp_switch_fpsimd
+instead?
+
+> +
+> +	return vcpu->arch.fp_enabled;
+> +}
+> +
+> +static void __hyp_text __activate_traps_vhe(struct kvm_vcpu *vcpu)
+>  {
+>  	u64 val;
+>  
+>  	val = read_sysreg(cpacr_el1);
+>  	val |= CPACR_EL1_TTA;
+> -	val &= ~(CPACR_EL1_FPEN | CPACR_EL1_ZEN);
+> +	val &= ~CPACR_EL1_ZEN;
+> +	if (!update_fp_enabled(vcpu))
+> +		val &= ~CPACR_EL1_FPEN;
+> +
+>  	write_sysreg(val, cpacr_el1);
+>  
+>  	write_sysreg(kvm_get_hyp_vector(), vbar_el1);
+>  }
+>  
+> -static void __hyp_text __activate_traps_nvhe(void)
+> +static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
+>  {
+>  	u64 val;
+>  
+>  	val = CPTR_EL2_DEFAULT;
+> -	val |= CPTR_EL2_TTA | CPTR_EL2_TFP | CPTR_EL2_TZ;
+> +	val |= CPTR_EL2_TTA | CPTR_EL2_TZ;
+> +	if (!update_fp_enabled(vcpu))
+> +		val |= CPTR_EL2_TFP;
+> +
+>  	write_sysreg(val, cptr_el2);
+>  }
+>  
+
+[...]
+
+Otherwise this approach looks quite good to me overall.  Are you
+planning to add SVE support before removing the RFC from this series?
 
 Thanks,
 -Christoffer
