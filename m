@@ -1,65 +1,145 @@
-From: "Liuwenliang (Abbott Liu)" <liuwenliang@huawei.com>
-Subject: Re: [PATCH v3 2/6] Disable instrumentation for some code
-Date: Sun, 8 Apr 2018 01:38:05 +0000
-Message-ID: <B8AC3E80E903784988AB3003E3E97330C0077F5D@dggemm510-mbs.china.huawei.com>
+From: Christoffer Dall <cdall@kernel.org>
+Subject: Re: [RFC PATCH v2 2/3] KVM: arm64: Convert lazy FPSIMD context
+ switch trap to C
+Date: Mon, 9 Apr 2018 11:44:33 +0200
+Message-ID: <20180409094433.GA10904@cbox>
+References: <1523026864-15413-1-git-send-email-Dave.Martin@arm.com>
+ <1523026864-15413-3-git-send-email-Dave.Martin@arm.com>
+ <5da0c912-8adb-db89-08b1-fb557b461678@arm.com>
+ <20180406155151.GS16308@e103592.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AFFE6402D6
- for <kvmarm@lists.cs.columbia.edu>; Sat,  7 Apr 2018 21:29:58 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id R18fMqOOpGcz for <kvmarm@lists.cs.columbia.edu>;
- Sat,  7 Apr 2018 21:29:37 -0400 (EDT)
-Received: from huawei.com (szxga03-in.huawei.com [45.249.212.189])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CA32D49F87
- for <kvmarm@lists.cs.columbia.edu>; Sat,  7 Apr 2018 21:29:36 -0400 (EDT)
-Content-Language: zh-CN
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Russell King - ARM Linux <linux@armlinux.org.uk>, Marc Zyngier <marc.zyngier@arm.com>
-Cc: "kstewart@linuxfoundation.org" <kstewart@linuxfoundation.org>, "nicolas.pitre@linaro.org" <nicolas.pitre@linaro.org>, "grygorii.strashko@linaro.org" <grygorii.strashko@linaro.org>, "julien.thierry@arm.com" <julien.thierry@arm.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "tixy@linaro.org" <tixy@linaro.org>, "linux@rasmusvillemoes.dk" <linux@rasmusvillemoes.dk>, "dhowells@redhat.com" <dhowells@redhat.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "f.fainelli@gmail.com" <f.fainelli@gmail.com>, "corbet@lwn.net" <corbet@lwn.net>, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, "kasan-dev@googlegroups.com" <kasan-dev@googlegroups.com>, "geert@linux-m68k.org" <geert@linux-m68k.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <20180406155151.GS16308@e103592.cambridge.arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Apr 03, 2018 at 19:39, Russell King - ARM Linux:
->On Tue, Apr 03, 2018 at 12:30:42PM +0100, Marc Zyngier wrote:
->> On 02/04/18 13:04, Abbott Liu wrote:
->> > From: Andrey Ryabinin <a.ryabinin@samsung.com>
->> > 
->> > Disable instrumentation for arch/arm/boot/compressed/*
->> > ,arch/arm/kvm/hyp/* and arch/arm/vdso/* because those
->> > code won't linkd with kernel image.
->> > 
->> > Disable kasan check in the function unwind_pop_register
->> > because it doesn't matter that kasan checks failed when
->> > unwind_pop_register read stack memory of task.
->> > 
->> > Reviewed-by: Russell King - ARM Linux <linux@armlinux.org.uk>
->> > Reviewed-by: Florian Fainelli <f.fainelli@gmail.com>
->> > Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
->> 
->> Just because I replied to this patch doesn't mean you can stick my
->> Reviewed-by tag on it. Please drop this tag until I explicitly say that
->> you can add it (see Documentation/process/submitting-patches.rst,
->> section 11).
->> 
->> Same goes for patch 1.
->
->Same goes for that reviewed-by line for me.  From my records, I never
->even looked at patch 2 from the first posting, and I don't appear to
->have the second posting in my mailbox (it's probably been classed as
->spam by dspam.)  So these reviewed-by lines seem to be totally
->misleading.
+On Fri, Apr 06, 2018 at 04:51:53PM +0100, Dave Martin wrote:
+> On Fri, Apr 06, 2018 at 04:25:57PM +0100, Marc Zyngier wrote:
+> > Hi Dave,
+> > 
+> > On 06/04/18 16:01, Dave Martin wrote:
+> > > To make the lazy FPSIMD context switch trap code easier to hack on,
+> > > this patch converts it to C.
+> > > 
+> > > This is not amazingly efficient, but the trap should typically only
+> > > be taken once per host context switch.
+> > > 
+> > > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> > > 
+> > > ---
+> > > 
+> > > Since RFCv1:
+> > > 
+> > >  * Fix indentation to be consistent with the rest of the file.
+> > >  * Add missing ! to write back to sp with attempting to push regs.
+> > > ---
+> > >  arch/arm64/kvm/hyp/entry.S  | 57 +++++++++++++++++----------------------------
+> > >  arch/arm64/kvm/hyp/switch.c | 24 +++++++++++++++++++
+> > >  2 files changed, 46 insertions(+), 35 deletions(-)
+> > > 
+> > > diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+> > > index fdd1068..47c6a78 100644
+> > > --- a/arch/arm64/kvm/hyp/entry.S
+> > > +++ b/arch/arm64/kvm/hyp/entry.S
+> > > @@ -176,41 +176,28 @@ ENTRY(__fpsimd_guest_restore)
+> > >  	// x1: vcpu
+> > >  	// x2-x29,lr: vcpu regs
+> > >  	// vcpu x0-x1 on the stack
+> > > -	stp	x2, x3, [sp, #-16]!
+> > > -	stp	x4, lr, [sp, #-16]!
+> > > -
+> > > -alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
+> > > -	mrs	x2, cptr_el2
+> > > -	bic	x2, x2, #CPTR_EL2_TFP
+> > > -	msr	cptr_el2, x2
+> > > -alternative_else
+> > > -	mrs	x2, cpacr_el1
+> > > -	orr	x2, x2, #CPACR_EL1_FPEN
+> > > -	msr	cpacr_el1, x2
+> > > -alternative_endif
+> > > -	isb
+> > > -
+> > > -	mov	x3, x1
+> > > -
+> > > -	ldr	x0, [x3, #VCPU_HOST_CONTEXT]
+> > > -	kern_hyp_va x0
+> > > -	add	x0, x0, #CPU_GP_REG_OFFSET(CPU_FP_REGS)
+> > > -	bl	__fpsimd_save_state
+> > > -
+> > > -	add	x2, x3, #VCPU_CONTEXT
+> > > -	add	x0, x2, #CPU_GP_REG_OFFSET(CPU_FP_REGS)
+> > > -	bl	__fpsimd_restore_state
+> > > -
+> > > -	// Skip restoring fpexc32 for AArch64 guests
+> > > -	mrs	x1, hcr_el2
+> > > -	tbnz	x1, #HCR_RW_SHIFT, 1f
+> > > -	ldr	x4, [x3, #VCPU_FPEXC32_EL2]
+> > > -	msr	fpexc32_el2, x4
+> > > -1:
+> > > -	ldp	x4, lr, [sp], #16
+> > > -	ldp	x2, x3, [sp], #16
+> > > -	ldp	x0, x1, [sp], #16
+> > > -
+> > > +	stp	x2, x3, [sp, #-144]!
+> > > +	stp	x4, x5, [sp, #16]
+> > > +	stp	x6, x7, [sp, #32]
+> > > +	stp	x8, x9, [sp, #48]
+> > > +	stp	x10, x11, [sp, #64]
+> > > +	stp	x12, x13, [sp, #80]
+> > > +	stp	x14, x15, [sp, #96]
+> > > +	stp	x16, x17, [sp, #112]
+> > > +	stp	x18, lr, [sp, #128]
+> > > +
+> > > +	bl	__hyp_switch_fpsimd
+> > > +
+> > > +	ldp	x4, x5, [sp, #16]
+> > > +	ldp	x6, x7, [sp, #32]
+> > > +	ldp	x8, x9, [sp, #48]
+> > > +	ldp	x10, x11, [sp, #64]
+> > > +	ldp	x12, x13, [sp, #80]
+> > > +	ldp	x14, x15, [sp, #96]
+> > > +	ldp	x16, x17, [sp, #112]
+> > > +	ldp	x18, lr, [sp, #128]
+> > > +	ldp	x0, x1, [sp, #144]
+> > > +	ldp	x2, x3, [sp], #160
+> > 
+> > I can't say I'm overly thrilled with adding another save/restore 
+> > sequence. How about treating it like a real guest exit instead? Granted, 
+> > there is a bit more overhead to it, but as you pointed out above, this 
+> > should be pretty rare...
+> 
+> I have no objection to handling this after exiting back to
+> __kvm_vcpu_run(), provided the performance is deemed acceptable.
+> 
 
-Thank Marc Zyngier and Russell King.
-I have read Documentation/process/submitting-patches.rst and understand
-it now. I will change it in the next version.
+My guess is that it's going to be visible on non-VHE systems, and given
+that we're doing all of this for performance in the first place, I'm not
+exceited about that approach either.
+
+I thought it was acceptable to do another save/restore, because it was
+only the GPRs (and equivalent to what the compiler would generate for a
+function call?) and thus not susceptible to the complexities of sysreg
+save/restores.
+
+Another alternative would be to go back to Dave's original approach of
+implementing the fpsimd state update to the host's structure in assembly
+directly, but I was having a hard time understanding that.  Perhaps I
+just need to try harder.
+
+Thoughts?
+
+Thanks,
+-Christoffer
