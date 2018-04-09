@@ -1,95 +1,78 @@
-From: Dongjiu Geng <gengdongjiu@huawei.com>
-Subject: [PATCH v11 4/4] arm64: handle NOTIFY_SEI notification by the APEI
- driver
-Date: Tue, 10 Apr 2018 05:36:36 +0800
-Message-ID: <1523309796-36423-5-git-send-email-gengdongjiu@huawei.com>
-References: <1523309796-36423-1-git-send-email-gengdongjiu@huawei.com>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCHv2 10/12] arm64/kvm: context-switch ptrauth registers
+Date: Mon, 9 Apr 2018 15:37:00 +0100
+Message-ID: <20180409143700.w4uynkhdon36purz@lakrids.cambridge.arm.com>
+References: <20171127163806.31435-1-mark.rutland@arm.com>
+ <20171127163806.31435-11-mark.rutland@arm.com>
+ <20180206123847.GY21802@cbox>
+ <20180309142838.uvcv3mhvqqlprktt@lakrids.cambridge.arm.com>
+ <20180409125818.GE10904@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CBB34A058
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Apr 2018 09:22:57 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XJRuwnlC9+JZ for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 Apr 2018 09:22:35 -0400 (EDT)
-Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 799134A060
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Apr 2018 09:22:35 -0400 (EDT)
-In-Reply-To: <1523309796-36423-1-git-send-email-gengdongjiu@huawei.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: rkrcmar@redhat.com, corbet@lwn.net, christoffer.dall@linaro.org, marc.zyngier@arm.com, james.morse@arm.com, linux@armlinux.org.uk, catalin.marinas@arm.com, rjw@rjwysocki.net, bp@alien8.de, lenb@kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-acpi@vger.kernel.org, devel@acpica.org
-Cc: zhengxiang9@huawei.com, huangshaoyu@huawei.com, gengdongjiu@huawei.com
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20180409125818.GE10904@cbox>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Christoffer Dall <cdall@kernel.org>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, linux-arch@vger.kernel.org, cdall@linaro.org, arnd@arndb.de, marc.zyngier@arm.com, catalin.marinas@arm.com, yao.qi@arm.com, kernel-hardening@lists.openwall.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, awallis@codeaurora.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add a helper to handle the NOTIFY_SEI notification, when kernel
-gets the NOTIFY_SEI notification, call this helper and let APEI
-driver to handle this notification.
+On Mon, Apr 09, 2018 at 02:58:18PM +0200, Christoffer Dall wrote:
+> Hi Mark,
+> 
+> [Sorry for late reply]
+> 
+> On Fri, Mar 09, 2018 at 02:28:38PM +0000, Mark Rutland wrote:
+> > On Tue, Feb 06, 2018 at 01:38:47PM +0100, Christoffer Dall wrote:
+> > > On Mon, Nov 27, 2017 at 04:38:04PM +0000, Mark Rutland wrote:
+> > > > When pointer authentication is supported, a guest may wish to use it.
+> > > > This patch adds the necessary KVM infrastructure for this to work, with
+> > > > a semi-lazy context switch of the pointer auth state.
+> > > > 
+> > > > When we schedule a vcpu, 
+> > > 
+> > > That's not quite what the code does, the code only does this when we
+> > > schedule back a preempted or blocked vcpu thread.
+> > 
+> > Does that only leave the case of the vCPU being scheduled for the first
+> > time? Or am I missing something else?
+> > 
+> > [...]
+> 
+> In the current patch, you're only calling kvm_arm_vcpu_ptrauth_disable()
+> from kvm_arch_sched_in() which is only called on the preempt notifier
+> patch, which leaves out every time we enter the guest from userspace and
+> therefore also the initial run of the vCPU (assuming there's no
+> preemption in the kernel prior to running the first time).
+> 
+> vcpu_load() takes care of all the cases.
 
-Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
----
- arch/arm64/include/asm/system_misc.h |  1 +
- arch/arm64/kernel/traps.c            |  4 ++++
- arch/arm64/mm/fault.c                | 10 ++++++++++
- 3 files changed, 15 insertions(+)
+I see.
 
-diff --git a/arch/arm64/include/asm/system_misc.h b/arch/arm64/include/asm/system_misc.h
-index 07aa8e3..9ee13ad 100644
---- a/arch/arm64/include/asm/system_misc.h
-+++ b/arch/arm64/include/asm/system_misc.h
-@@ -57,6 +57,7 @@ void hook_debug_fault_code(int nr, int (*fn)(unsigned long, unsigned int,
- })
- 
- int handle_guest_sea(phys_addr_t addr, unsigned int esr);
-+int handle_guest_sei(void);
- 
- #endif	/* __ASSEMBLY__ */
- 
-diff --git a/arch/arm64/kernel/traps.c b/arch/arm64/kernel/traps.c
-index bbb0fde..d888eb2 100644
---- a/arch/arm64/kernel/traps.c
-+++ b/arch/arm64/kernel/traps.c
-@@ -681,6 +681,10 @@ bool arm64_is_fatal_ras_serror(struct pt_regs *regs, unsigned int esr)
- {
- 	u32 aet = arm64_ras_serror_get_severity(esr);
- 
-+	/* The APEI driver may handle this RAS error. */
-+	if (!handle_guest_sei())
-+		return false;
-+
- 	switch (aet) {
- 	case ESR_ELx_AET_CE:	/* corrected error */
- 	case ESR_ELx_AET_UEO:	/* restartable, not yet consumed */
-diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-index f76bb2c..8f29bd8 100644
---- a/arch/arm64/mm/fault.c
-+++ b/arch/arm64/mm/fault.c
-@@ -683,6 +683,16 @@ int handle_guest_sea(phys_addr_t addr, unsigned int esr)
- 	return ret;
- }
- 
-+int handle_guest_sei(void)
-+{
-+	int ret = -ENOENT;
-+
-+	if (IS_ENABLED(CONFIG_ACPI_APEI_SEI))
-+		ret = ghes_notify_sei();
-+
-+	return ret;
-+}
-+
- asmlinkage void __exception do_mem_abort(unsigned long addr, unsigned int esr,
- 					 struct pt_regs *regs)
- {
--- 
-1.9.1
+> > > I still find this decision to begin trapping again quite arbitrary, and
+> > > would at least prefer this to be in vcpu_load (which would make the
+> > > behavior match the commit text as well).
+> > 
+> > Sure, done.
+> > 
+> > > My expectation would be that if a guest is running software with pointer
+> > > authentication enabled, then it's likely to either keep using the
+> > > feature, or not use it at all, so I would make this a one-time flag.
+> > 
+> > I think it's likely that some applications will use ptrauth while others
+> > do not. Even if the gust OS supports ptrauth, KVM may repeatedly preempt
+> > an application that doesn't use it, and we'd win in that case.
+> > 
+> > There are also some rarer cases, like kexec in a guest from a
+> > ptrauth-aware kernel to a ptrauth-oblivious one.
+> > 
+> > I don't have strong feelings either way, and I have no data.
+> 
+> I think your intuition sounds sane, and let's reset the flag on every
+> vcpu_load, and we can always revisit when we have hardware and data if
+> someone reports a performance issue.
+
+Cool. I've switched to vcpu_load() locally, and will use that in v3.
+
+Thanks,
+Mark.
