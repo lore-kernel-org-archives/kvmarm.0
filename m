@@ -1,57 +1,217 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: Compiling KVM/ARM as a separate kernel module.
-Date: Tue, 10 Apr 2018 10:48:51 +0100
-Message-ID: <3503fcbb-5e80-0421-ec46-8f765c195243@arm.com>
-References: <CAE3G1Z_HJqkWeGEESTVg+5yarWND7KR-QLOL1sRu_ey-xGZdKw@mail.gmail.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [RFC PATCH v3 4/4] KVM: arm64: Optimise FPSIMD handling to
+ reduce guest/host thrashing
+Date: Tue, 10 Apr 2018 11:32:50 +0100
+Message-ID: <20180410103250.GW16308@e103592.cambridge.arm.com>
+References: <1523271182-22130-1-git-send-email-Dave.Martin@arm.com>
+ <1523271182-22130-5-git-send-email-Dave.Martin@arm.com>
+ <20180409212243.GI10904@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 67DA949FD3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Apr 2018 05:43:18 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id c2OFCpekcinw for <kvmarm@lists.cs.columbia.edu>;
- Tue, 10 Apr 2018 05:42:56 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C1D0D49FD2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Apr 2018 05:42:56 -0400 (EDT)
-In-Reply-To: <CAE3G1Z_HJqkWeGEESTVg+5yarWND7KR-QLOL1sRu_ey-xGZdKw@mail.gmail.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Mike Bazov <mike@perception-point.io>, kvmarm@lists.cs.columbia.edu
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <20180409212243.GI10904@cbox>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Christoffer Dall <cdall@kernel.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Mike,
+On Mon, Apr 09, 2018 at 11:22:43PM +0200, Christoffer Dall wrote:
+> Hi Dave,
+> 
+> On Mon, Apr 09, 2018 at 11:53:02AM +0100, Dave Martin wrote:
+> > This patch refactors KVM to align the host and guest FPSIMD
+> > save/restore logic with each other for arm64.  This reduces the
+> > number of redundant save/restore operations that must occur, and
+> > reduces the common-case IRQ blackout time during guest exit storms
+> > by saving the host state lazily and optimising away the need to
+> > restore the host state before returning to the run loop.
+> > 
+> 
+> [...]
+> 
+> > diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+> > index db08a54..74c5a46 100644
+> > --- a/arch/arm64/kernel/fpsimd.c
+> > +++ b/arch/arm64/kernel/fpsimd.c
+> 
+> [...]
+> 
+> > @@ -1054,15 +1066,20 @@ void fpsimd_update_current_state(struct user_fpsimd_state const *state)
+> >  	local_bh_enable();
+> >  }
+> >  
+> > +void fpsimd_flush_state(unsigned int *cpu)
+> 
+> This API looks strange to me, and doesn't seem to be called from
+> elsewhere.  Wouldn't it be more clear if it took a struct thread_struct
+> pointer instead, or if the logic remained embedded in
+> fpsimd_flush_task_state ?
 
-On 10/04/18 09:23, Mike Bazov wrote:
-> I'm trying to compile the KVM/ARM as a separate kernel module, just like
-> the x86 modules. When i compile the x86 modules, i get the "kvm.ko" and
-> "kvm-intel.ko" as an output. Is there any way of compiling the KVM/ARM as
-> modules as well?
+Hmmm, thanks for spotting this -- it's a throwback to my previous
+approach.
 
-Not today. KVM has to map its code to run in a different CPU mode, the code that
-does this assumes its physically contiguous and part of the kernel text.
+I had intended to align KVM fully with the way host tasks' context is
+tracked, and this would involve a "most recent cpu FPSIMD loaded on"
+field in struct vcpu_arch: for ABI reasons this can't easily be tacked
+onto the end of struct user_fpsimd_state, so it would be necessary for
+it to be a separate field and passed to the relevant maintenance
+functions as a separate parameter.
+
+This approach would allow the vcpu FPSIMD state to remain in the regs
+across a context switch without the need to reload it, but this also
+means that some flushing/invalidation of this cached view of the state
+would be needed around KVM_GET_ONE_REG etc. and at vcpu destruction
+time.  This function would be part of such a maintenance API.
+
+For now though, this seemed like extra complexity for dubious benefit.
+
+Unless you think it's worth pursuing this optimisation I should
+probably get rid of this function.  We can always bring this back
+later if we choose.
+
+> > +{
+> > +	*cpu = NR_CPUS;
+> > +}
+> > +
+> >  /*
+> >   * Invalidate live CPU copies of task t's FPSIMD state
+> >   */
+> >  void fpsimd_flush_task_state(struct task_struct *t)
+> >  {
+> > -	t->thread.fpsimd_cpu = NR_CPUS;
+> > +	fpsimd_flush_state(&t->thread.fpsimd_cpu);
+> >  }
+> >  
+> > -static inline void fpsimd_flush_cpu_state(void)
+> > +void fpsimd_flush_cpu_state(void)
+> >  {
+> >  	__this_cpu_write(fpsimd_last_state.st, NULL);
+> >  }
+> 
+> [...]
+> 
+> > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> > index 8605e04..797b259 100644
+> > --- a/arch/arm64/kvm/hyp/switch.c
+> > +++ b/arch/arm64/kvm/hyp/switch.c
+> > @@ -27,6 +27,7 @@
+> >  #include <asm/kvm_mmu.h>
+> >  #include <asm/fpsimd.h>
+> >  #include <asm/debug-monitors.h>
+> > +#include <asm/thread_info.h>
+> >  
+> >  static bool __hyp_text __fpsimd_enabled_nvhe(void)
+> >  {
+> > @@ -47,24 +48,40 @@ bool __hyp_text __fpsimd_enabled(void)
+> >  	return __fpsimd_is_enabled()();
+> >  }
+> >  
+> > -static void __hyp_text __activate_traps_vhe(void)
+> > +static bool update_fp_enabled(struct kvm_vcpu *vcpu)
+> 
+> I think this needs a __hyp_text in the unlikely case that this function
+> is not inlined in the _nvhe caller by the compiler.
+
+You're right.  I'll add it.
+
+> > +{
+> > +	if (vcpu->arch.host_thread_info->flags & _TIF_FOREIGN_FPSTATE) {
+> > +		vcpu->arch.host_fpsimd_state = NULL;
+> > +		vcpu->arch.fp_enabled = false;
+> > +	}
+> 
+> I'm not clear why the above logic can't go into kvm_arch_vcpu_load_fp
+> and why we can't simply check TIF_FOREIGN_FPSTATE in __hyp_switch_fpsimd
+> instead?
+
+The situation can change in between _load_fp() and here, because of
+kernel-mode NEON.
+
+Also, we can't defer this check to __hyp_switch_fpsimd() because this is
+the logic for deciding whether to re-enable the Hyp FPSIMD trap in the
+first place.
 
 
-> There is also no option for specifying "M" (modular) in the menuconfig when
-> choosing the virtualization and KVM option, like in x86.
+Here's a scenario:
 
-No, because its not supported. On arm/arm64 KVM is either built as part of the
-kernel, or not.
+ * We're on a second iteration of the run loop, with the vcpu state loaded:
+ * fp_enabled = true, TIF_FOREIGN_FPSTATE is clear,
+   executing in the host with irqs enabled.
 
-Why do you need KVM as a loadable module?
+ * A softirq uses kernel-mode NEON:
+ * vcpu FPSIMD state is saved back to memory
+ * TIF_FOREIGN_FPSTATE now set
+ * CPU FPSIMD regs now contain garbage
+
+ * local_irq_disable(), and enter guest
+
+ * fp_enabled == true, but out of date:
+ * update_fp_enabled detects this condition by observing that
+   TIF_FOREIGN_FPSTATE is set and clearing fp_enabled.
+ * the (updated) value of fp_enabled determines that the FPSIMD trap
+   should be enabled
+
+ * __hyp_switch_fpsimd() saves no host state (because it was already
+   saved and anyway host_fpsimd_state is NULL)
+ * __hyp_switch_fpsimd() loads the guest state
 
 
-Thanks,
+Is there a way to simplify the code that doesn't break this?
 
-James
+> 
+> > +
+> > +	return vcpu->arch.fp_enabled;
+> > +}
+> > +
+> > +static void __hyp_text __activate_traps_vhe(struct kvm_vcpu *vcpu)
+> >  {
+> >  	u64 val;
+> >  
+> >  	val = read_sysreg(cpacr_el1);
+> >  	val |= CPACR_EL1_TTA;
+> > -	val &= ~(CPACR_EL1_FPEN | CPACR_EL1_ZEN);
+> > +	val &= ~CPACR_EL1_ZEN;
+> > +	if (!update_fp_enabled(vcpu))
+> > +		val &= ~CPACR_EL1_FPEN;
+> > +
+> >  	write_sysreg(val, cpacr_el1);
+> >  
+> >  	write_sysreg(kvm_get_hyp_vector(), vbar_el1);
+> >  }
+> >  
+> > -static void __hyp_text __activate_traps_nvhe(void)
+> > +static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
+> >  {
+> >  	u64 val;
+> >  
+> >  	val = CPTR_EL2_DEFAULT;
+> > -	val |= CPTR_EL2_TTA | CPTR_EL2_TFP | CPTR_EL2_TZ;
+> > +	val |= CPTR_EL2_TTA | CPTR_EL2_TZ;
+> > +	if (!update_fp_enabled(vcpu))
+> > +		val |= CPTR_EL2_TFP;
+> > +
+> >  	write_sysreg(val, cptr_el2);
+> >  }
+> >  
+> 
+> [...]
+> 
+> Otherwise this approach looks quite good to me overall.  Are you
+> planning to add SVE support before removing the RFC from this series?
+
+Yes :)
+
+(I've been delaying that while we get the basic approach sorted out.)
+
+Cheers
+---Dave
