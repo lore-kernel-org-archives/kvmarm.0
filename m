@@ -1,274 +1,66 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [RFC PATCH v3 4/4] KVM: arm64: Optimise FPSIMD handling to
- reduce guest/host thrashing
-Date: Tue, 10 Apr 2018 16:51:08 +0100
-Message-ID: <20180410155108.GX16308@e103592.cambridge.arm.com>
-References: <1523271182-22130-1-git-send-email-Dave.Martin@arm.com>
- <1523271182-22130-5-git-send-email-Dave.Martin@arm.com>
- <20180409212243.GI10904@cbox>
- <20180410103250.GW16308@e103592.cambridge.arm.com>
- <20180410152951.GL10904@cbox>
+From: Andrey Konovalov <andreyknvl@google.com>
+Subject: Re: [RFC PATCH v2 13/15] khwasan: add hooks implementation
+Date: Tue, 10 Apr 2018 18:07:39 +0200
+Message-ID: <CAAeHK+wWN=phNZgC_g5SMf61sCAVM7SGX9GdF1X4v+P3mK=uZA@mail.gmail.com>
+References: <cover.1521828273.git.andreyknvl@google.com>
+ <ba4a74ba1bc48dd66a3831143c3119d13c291fe3.1521828274.git.andreyknvl@google.com>
+ <805d1e85-2d3c-2327-6e6c-f14a56dc0b67@virtuozzo.com>
+ <CAAeHK+yg5ODeDy7k9fako5mcCLLnBrO729Zp_-UtDuzh3hZgZA@mail.gmail.com>
+ <0c4397da-e231-0044-986f-b8468314be76@virtuozzo.com>
+ <CAAeHK+xmCLe85_QNDam_BVTp9wVzjxgvko2+0JapJCzmciGa5g@mail.gmail.com>
+ <0857f052-a27a-501e-8923-c6f31510e4fe@virtuozzo.com>
+ <CAAeHK+xnHeznZwofNQVDcBCCMnaEQ6fcRxOcrFM-qQFUsZ51Rg@mail.gmail.com>
+ <0f448799-3a06-a25d-d604-21db3e8577fc@virtuozzo.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <20180410152951.GL10904@cbox>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Christoffer Dall <cdall@kernel.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9132B49FD2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Apr 2018 11:59:22 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id MPwPjP6kfupL for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 10 Apr 2018 11:58:56 -0400 (EDT)
+Received: from mail-it0-f44.google.com (mail-it0-f44.google.com
+ [209.85.214.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 20A5D49EAD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Apr 2018 11:58:56 -0400 (EDT)
+Received: by mail-it0-f44.google.com with SMTP id 19-v6so15482933itw.3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Apr 2018 09:07:41 -0700 (PDT)
+In-Reply-To: <0f448799-3a06-a25d-d604-21db3e8577fc@virtuozzo.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrey Ryabinin <aryabinin@virtuozzo.com>
+Cc: Julien Thierry <julien.thierry@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Christopher Li <sparse@chrisli.org>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Paul Lawrence <paullawrence@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Yury Norov <ynorov@caviumnetworks.com>, Alexander Potapenko <glider@google.com>, Christoph Lameter <cl@linux.com>, Michael Weiser <michael.weiser@gmx.de>, Ingo Molnar <mingo@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, Mark Brand <markbrand@google.com>, kasan-dev <kasan-dev@googlegroups.com>, kvmarm@lists.cs.columbia.edu, linux-sparse@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, David Rientjes <rientjes@google.com>, Ramana Radhakrishnan <Ramana.Radhakrishna>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Apr 10, 2018 at 05:29:51PM +0200, Christoffer Dall wrote:
-> On Tue, Apr 10, 2018 at 11:32:50AM +0100, Dave Martin wrote:
-> > On Mon, Apr 09, 2018 at 11:22:43PM +0200, Christoffer Dall wrote:
-> > > Hi Dave,
-> > > 
-> > > On Mon, Apr 09, 2018 at 11:53:02AM +0100, Dave Martin wrote:
-> > > > This patch refactors KVM to align the host and guest FPSIMD
-> > > > save/restore logic with each other for arm64.  This reduces the
-> > > > number of redundant save/restore operations that must occur, and
-> > > > reduces the common-case IRQ blackout time during guest exit storms
-> > > > by saving the host state lazily and optimising away the need to
-> > > > restore the host state before returning to the run loop.
-> > > > 
-> > > 
-> > > [...]
-> > > 
-> > > > diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-> > > > index db08a54..74c5a46 100644
-> > > > --- a/arch/arm64/kernel/fpsimd.c
-> > > > +++ b/arch/arm64/kernel/fpsimd.c
-> > > 
-> > > [...]
-> > > 
-> > > > @@ -1054,15 +1066,20 @@ void fpsimd_update_current_state(struct user_fpsimd_state const *state)
-> > > >  	local_bh_enable();
-> > > >  }
-> > > >  
-> > > > +void fpsimd_flush_state(unsigned int *cpu)
-> > > 
-> > > This API looks strange to me, and doesn't seem to be called from
-> > > elsewhere.  Wouldn't it be more clear if it took a struct thread_struct
-> > > pointer instead, or if the logic remained embedded in
-> > > fpsimd_flush_task_state ?
-> > 
-> > Hmmm, thanks for spotting this -- it's a throwback to my previous
-> > approach.
-> > 
-> > I had intended to align KVM fully with the way host tasks' context is
-> > tracked, and this would involve a "most recent cpu FPSIMD loaded on"
-> > field in struct vcpu_arch: for ABI reasons this can't easily be tacked
-> > onto the end of struct user_fpsimd_state, so it would be necessary for
-> > it to be a separate field and passed to the relevant maintenance
-> > functions as a separate parameter.
-> > 
-> > This approach would allow the vcpu FPSIMD state to remain in the regs
-> > across a context switch without the need to reload it, but this also
-> > means that some flushing/invalidation of this cached view of the state
-> > would be needed around KVM_GET_ONE_REG etc. and at vcpu destruction
-> > time.  This function would be part of such a maintenance API.
-> > 
-> > For now though, this seemed like extra complexity for dubious benefit.
-> > 
-> > Unless you think it's worth pursuing this optimisation I should
-> > probably get rid of this function.  We can always bring this back
-> > later if we choose.
-> > 
-> 
-> Agreed, not need to pursue further optimizations at this time (ie.
-> before we have data that indicates it's worth it).
-> 
-> 
-> > > > +{
-> > > > +	*cpu = NR_CPUS;
-> > > > +}
-> > > > +
-> > > >  /*
-> > > >   * Invalidate live CPU copies of task t's FPSIMD state
-> > > >   */
-> > > >  void fpsimd_flush_task_state(struct task_struct *t)
-> > > >  {
-> > > > -	t->thread.fpsimd_cpu = NR_CPUS;
-> > > > +	fpsimd_flush_state(&t->thread.fpsimd_cpu);
-> > > >  }
-> > > >  
-> > > > -static inline void fpsimd_flush_cpu_state(void)
-> > > > +void fpsimd_flush_cpu_state(void)
-> > > >  {
-> > > >  	__this_cpu_write(fpsimd_last_state.st, NULL);
-> > > >  }
-> > > 
-> > > [...]
-> > > 
-> > > > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> > > > index 8605e04..797b259 100644
-> > > > --- a/arch/arm64/kvm/hyp/switch.c
-> > > > +++ b/arch/arm64/kvm/hyp/switch.c
-> > > > @@ -27,6 +27,7 @@
-> > > >  #include <asm/kvm_mmu.h>
-> > > >  #include <asm/fpsimd.h>
-> > > >  #include <asm/debug-monitors.h>
-> > > > +#include <asm/thread_info.h>
-> > > >  
-> > > >  static bool __hyp_text __fpsimd_enabled_nvhe(void)
-> > > >  {
-> > > > @@ -47,24 +48,40 @@ bool __hyp_text __fpsimd_enabled(void)
-> > > >  	return __fpsimd_is_enabled()();
-> > > >  }
-> > > >  
-> > > > -static void __hyp_text __activate_traps_vhe(void)
-> > > > +static bool update_fp_enabled(struct kvm_vcpu *vcpu)
-> > > 
-> > > I think this needs a __hyp_text in the unlikely case that this function
-> > > is not inlined in the _nvhe caller by the compiler.
-> > 
-> > You're right.  I'll add it.
-> > 
-> > > > +{
-> > > > +	if (vcpu->arch.host_thread_info->flags & _TIF_FOREIGN_FPSTATE) {
-> > > > +		vcpu->arch.host_fpsimd_state = NULL;
-> > > > +		vcpu->arch.fp_enabled = false;
-> > > > +	}
-> > > 
-> > > I'm not clear why the above logic can't go into kvm_arch_vcpu_load_fp
-> > > and why we can't simply check TIF_FOREIGN_FPSTATE in __hyp_switch_fpsimd
-> > > instead?
-> > 
-> > The situation can change in between _load_fp() and here, because of
-> > kernel-mode NEON.
-> > 
-> > Also, we can't defer this check to __hyp_switch_fpsimd() because this is
-> > the logic for deciding whether to re-enable the Hyp FPSIMD trap in the
-> > first place.
-> > 
-> > 
-> > Here's a scenario:
-> > 
-> >  * We're on a second iteration of the run loop, with the vcpu state loaded:
-> >  * fp_enabled = true, TIF_FOREIGN_FPSTATE is clear,
-> >    executing in the host with irqs enabled.
-> > 
-> >  * A softirq uses kernel-mode NEON:
-> >  * vcpu FPSIMD state is saved back to memory
-> >  * TIF_FOREIGN_FPSTATE now set
-> >  * CPU FPSIMD regs now contain garbage
-> > 
-> >  * local_irq_disable(), and enter guest
-> > 
-> >  * fp_enabled == true, but out of date:
-> >  * update_fp_enabled detects this condition by observing that
-> >    TIF_FOREIGN_FPSTATE is set and clearing fp_enabled.
-> >  * the (updated) value of fp_enabled determines that the FPSIMD trap
-> >    should be enabled
-> > 
-> >  * __hyp_switch_fpsimd() saves no host state (because it was already
-> >    saved and anyway host_fpsimd_state is NULL)
-> >  * __hyp_switch_fpsimd() loads the guest state
-> > 
-> > 
-> > Is there a way to simplify the code that doesn't break this?
-> > 
-> 
-> Hmmm, maybe not.  At first glance I thought that TIF_FOREIGN_FPSTATE was
-> tied to the host_fpsimd_state being NULL or not, but it appears we can
-> have host_fpsimd_state be NULL while still not have TIF_FOREIGN_FPSTATE.
-> 
-> That in turn means that we have three boolean values to decribe our
-> state:
-> 
-> TIF_FOREIGN_PSTATE  |  host_fpsimd_state  |  fp_enabled  |  VFP Regs
-> -----------------------------------------------------------------------
->         0           |         0           |      0       |  Not allowed?
->         0           |         0           |      1       |  vcpu state
->         0           |         1           |      0       |  user state
->         0           |         1           |      1       |  Not allowed?
->         1           |         x           |      x       |  Garbage
-> 
-> If I got this vaguely correct, then indeed there doesn't seem to be any
-> way to simplify this.
+On Fri, Apr 6, 2018 at 2:27 PM, Andrey Ryabinin <aryabinin@virtuozzo.com> wrote:
+> On 04/06/2018 03:14 PM, Andrey Konovalov wrote:
+>> On Thu, Apr 5, 2018 at 3:02 PM, Andrey Ryabinin <aryabinin@virtuozzo.com> wrote:
+>>> Nevertheless, this doesn't mean that we should ignore *all* accesses to !slab memory.
+>>
+>> So you mean we need to find a way to ignore accesses via pointers
+>> returned by page_address(), but still check accesses through all other
+>> pointers tagged with 0xFF? I don't see an obvious way to do this. I'm
+>> open to suggestions though.
+>>
+>
+> I'm saying that we need to ignore accesses to slab objects if pointer
+> to slab object obtained via page_address() + offset_in_page() trick, but don't ignore
+> anything else.
+>
+> So, save tag somewhere in page struct and poison shadow with that tag. Make page_address() to
+> return tagged address for all !PageSlab() pages. For PageSlab() pages page_address() should return
+> 0xff tagged address, so we could ignore such accesses.
 
-Basically yes, I think.
-
-This way of summarising it makes it look like we don't really need three
-variables and maybe that's the case.  The current code may be a bit
-clearer than the alternative though.
-
-I've preferred to keep TIF_FOREIGN_FPSTATE written by the host only and
-fp_enabled written by the guest only to demarcate responsibility a bit,
-but this does mean that these flags have overlapping meanings and lag
-one another some of the time.
-
-> > > 
-> > > > +
-> > > > +	return vcpu->arch.fp_enabled;
-> > > > +}
-> > > > +
-> > > > +static void __hyp_text __activate_traps_vhe(struct kvm_vcpu *vcpu)
-> > > >  {
-> > > >  	u64 val;
-> > > >  
-> > > >  	val = read_sysreg(cpacr_el1);
-> > > >  	val |= CPACR_EL1_TTA;
-> > > > -	val &= ~(CPACR_EL1_FPEN | CPACR_EL1_ZEN);
-> > > > +	val &= ~CPACR_EL1_ZEN;
-> > > > +	if (!update_fp_enabled(vcpu))
-> > > > +		val &= ~CPACR_EL1_FPEN;
-> > > > +
-> > > >  	write_sysreg(val, cpacr_el1);
-> > > >  
-> > > >  	write_sysreg(kvm_get_hyp_vector(), vbar_el1);
-> > > >  }
-> > > >  
-> > > > -static void __hyp_text __activate_traps_nvhe(void)
-> > > > +static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
-> > > >  {
-> > > >  	u64 val;
-> > > >  
-> > > >  	val = CPTR_EL2_DEFAULT;
-> > > > -	val |= CPTR_EL2_TTA | CPTR_EL2_TFP | CPTR_EL2_TZ;
-> > > > +	val |= CPTR_EL2_TTA | CPTR_EL2_TZ;
-> > > > +	if (!update_fp_enabled(vcpu))
-> > > > +		val |= CPTR_EL2_TFP;
-> > > > +
-> > > >  	write_sysreg(val, cptr_el2);
-> > > >  }
-> > > >  
-> > > 
-> > > [...]
-> > > 
-> > > Otherwise this approach looks quite good to me overall.  Are you
-> > > planning to add SVE support before removing the RFC from this series?
-> > 
-> > Yes :)
-> > 
-> > (I've been delaying that while we get the basic approach sorted out.)
-> > 
-> 
-> Makes sense, was just trying to understand if this could somehow
-> actually work without adding SVE support.
-
-We could temprorarily disable CONFIG_ARM64_SVE, but that would be a
-bodge.  I don't think the necessary changes for supporting host SVE
-will be complex, so I would prefer not to merge without them.  I don't
-anticipate it taking more than a day or two to post an update to the
-series.
-
-Cheers
----Dave
-> 
-> Thanks,
-> -Christoffer
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+Which pages do you mean by !PageSlab()? The ones that are allocated
+and freed by pagealloc, but mot managed by the slab allocator? Perhaps
+we should then add tagging to the pagealloc hook instead?
