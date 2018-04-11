@@ -1,66 +1,105 @@
-From: Andrey Konovalov <andreyknvl@google.com>
-Subject: Re: [RFC PATCH v2 13/15] khwasan: add hooks implementation
-Date: Tue, 10 Apr 2018 18:07:39 +0200
-Message-ID: <CAAeHK+wWN=phNZgC_g5SMf61sCAVM7SGX9GdF1X4v+P3mK=uZA@mail.gmail.com>
-References: <cover.1521828273.git.andreyknvl@google.com>
- <ba4a74ba1bc48dd66a3831143c3119d13c291fe3.1521828274.git.andreyknvl@google.com>
- <805d1e85-2d3c-2327-6e6c-f14a56dc0b67@virtuozzo.com>
- <CAAeHK+yg5ODeDy7k9fako5mcCLLnBrO729Zp_-UtDuzh3hZgZA@mail.gmail.com>
- <0c4397da-e231-0044-986f-b8468314be76@virtuozzo.com>
- <CAAeHK+xmCLe85_QNDam_BVTp9wVzjxgvko2+0JapJCzmciGa5g@mail.gmail.com>
- <0857f052-a27a-501e-8923-c6f31510e4fe@virtuozzo.com>
- <CAAeHK+xnHeznZwofNQVDcBCCMnaEQ6fcRxOcrFM-qQFUsZ51Rg@mail.gmail.com>
- <0f448799-3a06-a25d-d604-21db3e8577fc@virtuozzo.com>
+From: Shannon Zhao <zhaoshenglong@huawei.com>
+Subject: Re: [PATCH] KVM: arm/arm64: Close VMID generation race
+Date: Wed, 11 Apr 2018 09:30:09 +0800
+Message-ID: <5ACD6521.5090500@huawei.com>
+References: <20180409170706.23541-1-marc.zyngier@arm.com>
+ <20180409205139.GH10904@cbox>
+ <20180410105119.yzzzd4lyvlsvtbfy@lakrids.cambridge.arm.com>
+ <20180410150540.GK10904@cbox>
+ <20180410152419.inzprhuqhx26keuq@lakrids.cambridge.arm.com>
+ <f90f8486-10c7-ce42-94a8-abaabd80ebb7@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9132B49FD2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Apr 2018 11:59:22 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MPwPjP6kfupL for <kvmarm@lists.cs.columbia.edu>;
- Tue, 10 Apr 2018 11:58:56 -0400 (EDT)
-Received: from mail-it0-f44.google.com (mail-it0-f44.google.com
- [209.85.214.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 20A5D49EAD
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Apr 2018 11:58:56 -0400 (EDT)
-Received: by mail-it0-f44.google.com with SMTP id 19-v6so15482933itw.3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Apr 2018 09:07:41 -0700 (PDT)
-In-Reply-To: <0f448799-3a06-a25d-d604-21db3e8577fc@virtuozzo.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Cc: Julien Thierry <julien.thierry@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Christopher Li <sparse@chrisli.org>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Paul Lawrence <paullawrence@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Yury Norov <ynorov@caviumnetworks.com>, Alexander Potapenko <glider@google.com>, Christoph Lameter <cl@linux.com>, Michael Weiser <michael.weiser@gmx.de>, Ingo Molnar <mingo@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, Mark Brand <markbrand@google.com>, kasan-dev <kasan-dev@googlegroups.com>, kvmarm@lists.cs.columbia.edu, linux-sparse@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, David Rientjes <rientjes@google.com>, Ramana Radhakrishnan <Ramana.Radhakrishna>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <f90f8486-10c7-ce42-94a8-abaabd80ebb7@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>, Mark Rutland <mark.rutland@arm.com>, Christoffer Dall <cdall@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Apr 6, 2018 at 2:27 PM, Andrey Ryabinin <aryabinin@virtuozzo.com> wrote:
-> On 04/06/2018 03:14 PM, Andrey Konovalov wrote:
->> On Thu, Apr 5, 2018 at 3:02 PM, Andrey Ryabinin <aryabinin@virtuozzo.com> wrote:
->>> Nevertheless, this doesn't mean that we should ignore *all* accesses to !slab memory.
->>
->> So you mean we need to find a way to ignore accesses via pointers
->> returned by page_address(), but still check accesses through all other
->> pointers tagged with 0xFF? I don't see an obvious way to do this. I'm
->> open to suggestions though.
->>
->
-> I'm saying that we need to ignore accesses to slab objects if pointer
-> to slab object obtained via page_address() + offset_in_page() trick, but don't ignore
-> anything else.
->
-> So, save tag somewhere in page struct and poison shadow with that tag. Make page_address() to
-> return tagged address for all !PageSlab() pages. For PageSlab() pages page_address() should return
-> 0xff tagged address, so we could ignore such accesses.
 
-Which pages do you mean by !PageSlab()? The ones that are allocated
-and freed by pagealloc, but mot managed by the slab allocator? Perhaps
-we should then add tagging to the pagealloc hook instead?
+
+On 2018/4/10 23:37, Marc Zyngier wrote:
+> On 10/04/18 16:24, Mark Rutland wrote:
+>> On Tue, Apr 10, 2018 at 05:05:40PM +0200, Christoffer Dall wrote:
+>>> On Tue, Apr 10, 2018 at 11:51:19AM +0100, Mark Rutland wrote:
+>>>> I think we also need to update kvm->arch.vttbr before updating
+>>>> kvm->arch.vmid_gen, otherwise another CPU can come in, see that the
+>>>> vmid_gen is up-to-date, jump to hyp, and program a stale VTTBR (with the
+>>>> old VMID).
+>>>>
+>>>> With the smp_wmb() and update of kvm->arch.vmid_gen moved to the end of
+>>>> the critical section, I think that works, modulo using READ_ONCE() and
+>>>> WRITE_ONCE() to ensure single-copy-atomicity of the fields we access
+>>>> locklessly.
+>>>
+>>> Indeed, you're right.  I would look something like this, then:
+>>>
+>>> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+>>> index 2e43f9d42bd5..6cb08995e7ff 100644
+>>> --- a/virt/kvm/arm/arm.c
+>>> +++ b/virt/kvm/arm/arm.c
+>>> @@ -450,7 +450,9 @@ void force_vm_exit(const cpumask_t *mask)
+>>>   */
+>>>  static bool need_new_vmid_gen(struct kvm *kvm)
+>>>  {
+>>> -	return unlikely(kvm->arch.vmid_gen != atomic64_read(&kvm_vmid_gen));
+>>> +	u64 current_vmid_gen = atomic64_read(&kvm_vmid_gen);
+>>> +	smp_rmb(); /* Orders read of kvm_vmid_gen and kvm->arch.vmid */
+>>> +	return unlikely(READ_ONCE(kvm->arch.vmid_gen) != current_vmid_gen);
+>>>  }
+>>>  
+>>>  /**
+>>> @@ -500,7 +502,6 @@ static void update_vttbr(struct kvm *kvm)
+>>>  		kvm_call_hyp(__kvm_flush_vm_context);
+>>>  	}
+>>>  
+>>> -	kvm->arch.vmid_gen = atomic64_read(&kvm_vmid_gen);
+>>>  	kvm->arch.vmid = kvm_next_vmid;
+>>>  	kvm_next_vmid++;
+>>>  	kvm_next_vmid &= (1 << kvm_vmid_bits) - 1;
+>>> @@ -509,7 +510,10 @@ static void update_vttbr(struct kvm *kvm)
+>>>  	pgd_phys = virt_to_phys(kvm->arch.pgd);
+>>>  	BUG_ON(pgd_phys & ~VTTBR_BADDR_MASK);
+>>>  	vmid = ((u64)(kvm->arch.vmid) << VTTBR_VMID_SHIFT) & VTTBR_VMID_MASK(kvm_vmid_bits);
+>>> -	kvm->arch.vttbr = pgd_phys | vmid;
+>>> +	WRITE_ONCE(kvm->arch.vttbr, pgd_phys | vmid);
+>>> +
+>>> +	smp_wmb(); /* Ensure vttbr update is observed before vmid_gen update */
+>>> +	kvm->arch.vmid_gen = atomic64_read(&kvm_vmid_gen);
+>>>  
+>>>  	spin_unlock(&kvm_vmid_lock);
+>>>  }
+>>
+>> I think that's right, yes.
+>>
+>> We could replace the smp_{r,w}mb() barriers with an acquire of the
+>> kvm_vmid_gen and a release of kvm->arch.vmid_gen, but if we're really
+>> trying to optimize things there are larger algorithmic changes necessary
+>> anyhow.
+>>
+>>> It's probably easier to convince ourselves about the correctness of
+>>> Marc's code using a rwlock instead, though.  Thoughts?
+>>
+>> I believe that Marc's preference was the rwlock; I have no preference
+>> either way.
+> 
+> I don't mind either way. If you can be bothered to write a proper commit
+> log for this, I'll take it. What I'd really want is Shannon to indicate
+> whether or not this solves the issue he was seeing.
+> 
+I'll test Marc's patch. This will take about 3 days since it's not 100%
+reproducible.
+
+Thanks,
+-- 
+Shannon
