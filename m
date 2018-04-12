@@ -1,86 +1,101 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v11 0/4] set VSESR_EL2 by user space and support
- NOTIFY_SEI notification
-Date: Thu, 12 Apr 2018 17:14:48 +0100
-Message-ID: <eb65baf4-abb0-570f-f3af-61f505c9de10@arm.com>
-References: <1523309796-36423-1-git-send-email-gengdongjiu@huawei.com>
- <d94439b6-9b9a-9bd0-ddec-3bb63ede9461@arm.com>
- <5161fb31-e5bb-872c-3e12-d7d38326aaca@huawei.com>
+From: Andrey Konovalov <andreyknvl@google.com>
+Subject: Re: [RFC PATCH v2 13/15] khwasan: add hooks implementation
+Date: Thu, 12 Apr 2018 18:45:35 +0200
+Message-ID: <CAAeHK+wzwXnJh1bbhUN6bm788q52BA2EfC+Q3dMS=peP7Px4Rg@mail.gmail.com>
+References: <cover.1521828273.git.andreyknvl@google.com>
+ <ba4a74ba1bc48dd66a3831143c3119d13c291fe3.1521828274.git.andreyknvl@google.com>
+ <805d1e85-2d3c-2327-6e6c-f14a56dc0b67@virtuozzo.com>
+ <CAAeHK+yg5ODeDy7k9fako5mcCLLnBrO729Zp_-UtDuzh3hZgZA@mail.gmail.com>
+ <0c4397da-e231-0044-986f-b8468314be76@virtuozzo.com>
+ <CAAeHK+xmCLe85_QNDam_BVTp9wVzjxgvko2+0JapJCzmciGa5g@mail.gmail.com>
+ <0857f052-a27a-501e-8923-c6f31510e4fe@virtuozzo.com>
+ <CAAeHK+xnHeznZwofNQVDcBCCMnaEQ6fcRxOcrFM-qQFUsZ51Rg@mail.gmail.com>
+ <0f448799-3a06-a25d-d604-21db3e8577fc@virtuozzo.com>
+ <CAAeHK+wWN=phNZgC_g5SMf61sCAVM7SGX9GdF1X4v+P3mK=uZA@mail.gmail.com>
+ <bfc3da50-66df-c6ed-ad6a-a285efe617ec@virtuozzo.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <5161fb31-e5bb-872c-3e12-d7d38326aaca@huawei.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: gengdongjiu <gengdongjiu@huawei.com>
-Cc: rkrcmar@redhat.com, corbet@lwn.net, christoffer.dall@linaro.org, marc.zyngier@arm.com, linux@armlinux.org.uk, catalin.marinas@arm.com, rjw@rjwysocki.net, bp@alien8.de, lenb@kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-acpi@vger.kernel.org, devel@acpica.org, huangshaoyu@huawei.com, zhengxiang9@huawei.com
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C32604A01E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Apr 2018 12:37:08 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Q1GeRH56lfQP for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Apr 2018 12:36:47 -0400 (EDT)
+Received: from mail-it0-f42.google.com (mail-it0-f42.google.com
+ [209.85.214.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 11FD749FDF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Apr 2018 12:36:47 -0400 (EDT)
+Received: by mail-it0-f42.google.com with SMTP id 142-v6so8153499itl.5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Apr 2018 09:45:37 -0700 (PDT)
+In-Reply-To: <bfc3da50-66df-c6ed-ad6a-a285efe617ec@virtuozzo.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrey Ryabinin <aryabinin@virtuozzo.com>
+Cc: Julien Thierry <julien.thierry@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Christopher Li <sparse@chrisli.org>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Paul Lawrence <paullawrence@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Yury Norov <ynorov@caviumnetworks.com>, Alexander Potapenko <glider@google.com>, Christoph Lameter <cl@linux.com>, Michael Weiser <michael.weiser@gmx.de>, Ingo Molnar <mingo@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, Mark Brand <markbrand@google.com>, kasan-dev <kasan-dev@googlegroups.com>, kvmarm@lists.cs.columbia.edu, linux-sparse@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, David Rientjes <rientjes@google.com>, Ramana Radhakrishnan <Ramana.Radhakrishna>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi gengdongjiu,
-
-On 12/04/18 07:09, gengdongjiu wrote:
-> On 2018/4/10 22:15, James Morse wrote:
->> On 09/04/18 22:36, Dongjiu Geng wrote:
->>> 1. Detect whether KVM can set set guest SError syndrome
->>> 2. Support to Set VSESR_EL2 and inject SError by user space.
->>> 3. Support live migration to keep SError pending state and VSESR_EL2 value.
->>> 4. ACPI 6.1 adds support for NOTIFY_SEI as a GHES notification mechanism, so support this
->>>    notification in software, KVM or kernel ARCH code call handle_guest_sei() to let ACP driver
->>>    to handle this notification.
+On Tue, Apr 10, 2018 at 6:31 PM, Andrey Ryabinin
+<aryabinin@virtuozzo.com> wrote:
+>
+>
+> On 04/10/2018 07:07 PM, Andrey Konovalov wrote:
+>> On Fri, Apr 6, 2018 at 2:27 PM, Andrey Ryabinin <aryabinin@virtuozzo.com> wrote:
+>>> On 04/06/2018 03:14 PM, Andrey Konovalov wrote:
+>>>> On Thu, Apr 5, 2018 at 3:02 PM, Andrey Ryabinin <aryabinin@virtuozzo.com> wrote:
+>>>>> Nevertheless, this doesn't mean that we should ignore *all* accesses to !slab memory.
+>>>>
+>>>> So you mean we need to find a way to ignore accesses via pointers
+>>>> returned by page_address(), but still check accesses through all other
+>>>> pointers tagged with 0xFF? I don't see an obvious way to do this. I'm
+>>>> open to suggestions though.
+>>>>
+>>>
+>>> I'm saying that we need to ignore accesses to slab objects if pointer
+>>> to slab object obtained via page_address() + offset_in_page() trick, but don't ignore
+>>> anything else.
+>>>
+>>> So, save tag somewhere in page struct and poison shadow with that tag. Make page_address() to
+>>> return tagged address for all !PageSlab() pages. For PageSlab() pages page_address() should return
+>>> 0xff tagged address, so we could ignore such accesses.
 >>
->> Please don't post code during the merge-window, will this apply to v4.17-rc1? We
->> can't know until its tagged.
-
-Posting code during the merge-window isn't helpful as the kernel is a moving
-target, its better to wait for an 'rc' to base it on.
-
-> I do not know when it is merge-window. About the apply version, it does not have limited.
-
-'git fetch' Linus' tree and look at the tags. 'v4.16' lost its '-rc' suffixes,
-and there isn't a 'v4.17-rc1' yet, so we are still in the merge window.
-
-Linus sends a message to LKML. eg:
-https://lkml.org/lkml/2018/4/1/175
-
-net-next closes shortly before the merge window, and re-opens afterwards. There
-is a handy web page:
-http://vger.kernel.org/~davem/net-next.html
-
-
->> This series is doing two separate things, please split it into two series.
-> OK, thanks!
-> 
+>> Which pages do you mean by !PageSlab()?
+>
+> Literally the "PageSlab(page) == false" pages.
+>
+>> The ones that are allocated and freed by pagealloc, but mot managed by the slab allocator?
+>
+> Yes.
+>
+>> Perhaps we should then add tagging to the pagealloc hook instead?
 >>
->> But on the ACPI front: I don't see how any OS can support your NOTIFY_SEI when
->> firmware is ignoring the normal world's PSTATE.A.
->>
->> The latest lobe of that discussion was on the list here:
->> https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1611496.html
-> I have replied the mail.
-> I still have some questions that need to clarify with you.
-> After clarification, we will follow that.
-> The question is in the reply of this mail "https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1611496.html"
+>
+> Of course the tagging would be in kasan_alloc_pages(), where else that could be? And instead of what?
 
-Lets keep that discussion on v9 then.
+I think I misunderstood your suggestion twice already :)
 
+To make it clear, you're suggesting:
 
->> As it is, we would need to spot SError being delivered while SError is masked,
->> spray nasty messages about firmware being horrifically buggy, then panic(). For
->> a corrected error, this looks bad, but its preferable to letting firmware
->> silently overwrite the exception registers, causing linux to spin through the
->> vectors 'eret' with all exceptions masked.
->> I still think its best to wait for firmware that does the right thing.
+1. Tag memory with a random tag in kasan_alloc_pages() and returned a
+tagged pointer from pagealloc.
 
-> Let us  discuss that in another mail.
-> In a summary, I think firmware follow below rule can be OK, right?
-> 1. The exception came from the EL that SError should be routed to(according to hcr_EL2.{AMO, TGE}),but PSTATE.A was set, EL3 firmware can't deliver SError;
+2. Restore the tag for the pointers returned from page_address for
+!PageSlab() pages.
 
-> 2. The exception came from the EL that SError should not be routed to(according to hcr_EL2.{AMO, TGE}),even though the PSTATE.A was set,EL3 firmware still deliver SError
+3. Set the tag to 0xff for the pointers returned from page_address for
+PageSlab() pages.
 
-Problem here, more on v9.
+Is this correct?
 
-
-Thanks,
-
-James
+In 2 instead of storing the tag in page_struct, we can just recover it
+from the shadow memory that corresponds to that page. What do you
+think about this?
