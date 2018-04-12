@@ -1,200 +1,328 @@
-From: Abbott Liu <liuwenliang@huawei.com>
-Subject: [PATCH 0/6] KASan for arm
-Date: Thu, 12 Apr 2018 20:54:05 +0800
-Message-ID: <20180412125411.326-1-liuwenliang__19815.0654127405$1523538954$gmane$org@huawei.com>
+From: gengdongjiu <gengdj.1984@gmail.com>
+Subject: Re: [PATCH v11 2/4] arm/arm64: KVM: Add KVM_GET/SET_VCPU_EVENTS
+Date: Thu, 12 Apr 2018 23:11:42 +0800
+Message-ID: <CAMj-D2DR2H+6CW5QtZmT0HRptD1hxruNtq=cRpxD7ytqzQij9w@mail.gmail.com>
+References: <1523309796-36423-1-git-send-email-gengdongjiu@huawei.com>
+ <1523309796-36423-3-git-send-email-gengdongjiu@huawei.com> <d1d1c262-41ae-1725-7ae0-16d63ac3d372@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F0A2F4A0B4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Apr 2018 09:06:40 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id G1wI1rDumbG7 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Apr 2018 09:06:18 -0400 (EDT)
-Received: from huawei.com (unknown [45.249.212.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6C1CE4A092
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Apr 2018 09:06:02 -0400 (EDT)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: aryabinin@virtuozzo.com, glider@google.com, dvyukov@google.com, corbet@lwn.net, linux@armlinux.org.uk, cdall@kernel.org, marc.zyngier@arm.com, arnd@arndb.de, nicolas.pitre@linaro.org, vladimir.murzin@arm.com, mingo@kernel.org, viro@zeniv.linux.org.uk, alexandre.belloni@bootlin.com, ard.biesheuvel@linaro.org, daniel.lezcano@linaro.org, pombredanne@nexb.com, kstewart@linuxfoundation.org, liuwenliang@huawei.com, gregkh@linuxfoundation.org, f.fainelli@gmail.com, mawilcox@microsoft.com, akpm@linux-foundation.org, mark.rutland@arm.com, afzal.mohd.ma@gmail.com, alexander.levin@verizon.com, tglx@linutronix.de, thgarnie@google.com, dhowells@redhat.com, keescook@chromium.org, geert@linux-m68k.org, tixy@linaro.org, julien.thierry@arm.com, james.morse@arm.com, zhichao.huang@linaro.org, jinb.park7@gmail.com, labbo
+Content-Type: text/plain; charset="UTF-8"
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <d1d1c262-41ae-1725-7ae0-16d63ac3d372@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: James Morse <james.morse@arm.com>, cdall@kernel.org
+Cc: Dongjiu Geng <gengdongjiu@huawei.com>, devel@acpica.org, linux-doc@vger.kernel.org, kvm@vger.kernel.org, corbet@lwn.net, marc.zyngier@arm.com, catalin.marinas@arm.com, rjw@rjwysocki.net, linux@armlinux.org.uk, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, zhengxiang9@huawei.com, bp@alien8.de, linux-arm-kernel@lists.infradead.org, huangshaoyu@huawei.com, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, lenb@kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Andrey Ryabinin <a.ryabinin@samsung.com>
+Hi James,
+  Thanks for the comments.
 
-Changelog:
-v4 - v3
-- Remove the fix of type conversion in kasan_cache_create because it has
-  been fix in the latest version in:
-  git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
-- Change some Reviewed-by tag into Reported-by tag to avoid misleading.
-  ---Reported by: Marc Zyngier <marc.zyngier@arm.com>
-                  Russell King - ARM Linux <linux@armlinux.org.uk>
-- Disable instrumentation for arch/arm/mm/physaddr.c
+2018-04-10 22:15 GMT+08:00, James Morse <james.morse@arm.com>:
+> Hi Dongjiu Geng,
+>
+> On 09/04/18 22:36, Dongjiu Geng wrote:
+>> This new IOCTL exports user-invisible states related to SError.
+>> Together with appropriate user space changes, it can inject
+>> SError with specified syndrome to guest by setup kvm_vcpu_events
+>> value.
+>
+>> Also it can support live migration.
+>
+> Could you explain what user-space is expected to do for this?
+> (this is also relevant for snapshot-ing/suspending VMs)
+Ok.
 
-v3 - v2
-- Remove this patch: 2 1-byte checks more safer for memory_is_poisoned_16
-  because a unaligned load/store of 16 bytes is rare on arm, and this
-  patch is very likely to affect the performance of modern CPUs.
-  ---Acked by: Russell King - ARM Linux <linux@armlinux.org.uk>
-- Fixed some link error which kasan_pmd_populate,kasan_pte_populate and
-  kasan_pud_populate are in section .meminit.text but the function
-  kasan_alloc_block which is called by kasan_pmd_populate,
-  kasan_pte_populate and kasan_pud_populate is in section .init.text. So
-  we need change kasan_pmd_populate,kasan_pte_populate and
-  kasan_pud_populate into the section .init.text.
-  ---Reported by: Florian Fainelli <f.fainelli@gmail.com>
-- Fixed some compile error which caused by the wrong access instruction in
-  arch/arm/kernel/entry-common.S.
-  ---Reported by: kbuild test robot <lkp@intel.com>
-- Disable instrumentation for arch/arm/kvm/hyp/*.
-  ---Acked by: Marc Zyngier <marc.zyngier@arm.com>
-- Update the set of supported architectures in
-  Documentation/dev-tools/kasan.rst.
-  ---Acked by:Dmitry Vyukov <dvyukov@google.com>
-- The version 2 is tested by:
-  Florian Fainelli <f.fainelli@gmail.com> (compile test)
-  kbuild test robot <lkp@intel.com>       (compile test)
-  Joel Stanley <joel@jms.id.au>           (on ASPEED ast2500(ARMv5))
+>
+> It's probably worth noting that this solves an existing problem: KVM may
+> make an
+> SError pending, but user-space has no way to discover/migrate this.
 
-v2 - v1
-- Fixed some compiling error which happens on changing kernel compression
-  mode to lzma/xz/lzo/lz4.
-  ---Reported by: Florian Fainelli <f.fainelli@gmail.com>,
-             Russell King - ARM Linux <linux@armlinux.org.uk>
-- Fixed a compiling error cause by some older arm instruction set(armv4t)
-  don't suppory movw/movt which is reported by kbuild.
-- Changed the pte flag from _L_PTE_DEFAULT | L_PTE_DIRTY | L_PTE_XN to
-  pgprot_val(PAGE_KERNEL).
-  ---Reported by: Russell King - ARM Linux <linux@armlinux.org.uk>
-- Moved Enable KASan patch as the last one.
-  ---Reported by: Florian Fainelli <f.fainelli@gmail.com>,
-     Russell King - ARM Linux <linux@armlinux.org.uk>
-- Moved the definitions of cp15 registers from
-  arch/arm/include/asm/kvm_hyp.h to arch/arm/include/asm/cp15.h.
-  ---Asked by: Mark Rutland <mark.rutland@arm.com>
-- Merge the following commits into the commit
-  Define the virtual space of KASan's shadow region:
-  1) Define the virtual space of KASan's shadow region;
-  2) Avoid cleaning the KASan shadow area's mapping table;
-  3) Add KASan layout;
-- Merge the following commits into the commit
-  Initialize the mapping of KASan shadow memory:
-  1) Initialize the mapping of KASan shadow memory;
-  2) Add support arm LPAE;
-  3) Don't need to map the shadow of KASan's shadow memory;
-     ---Reported by: Russell King - ARM Linux <linux@armlinux.org.uk>
-  4) Change mapping of kasan_zero_page int readonly.
-- The version 1 is tested by Florian Fainelli <f.fainelli@gmail.com>
-  on a Cortex-A5 (no LPAE).
+if KVM make an SError pending, when user-space do migration, it get the
+kvm_vcpu_events through KVM_GET_VCPU_EVENTS, then can find that pending status.
+What are the things you're worried about?
 
-Hi,all:
-   These patches add arch specific code for kernel address sanitizer
-(see Documentation/kasan.txt).
+>
+>
+>> diff --git a/Documentation/virtual/kvm/api.txt
+>> b/Documentation/virtual/kvm/api.txt
+>> index 8a3d708..45719b4 100644
+>> --- a/Documentation/virtual/kvm/api.txt
+>> +++ b/Documentation/virtual/kvm/api.txt
+>> @@ -819,11 +819,13 @@ struct kvm_clock_data {
+>>
+>>  Capability: KVM_CAP_VCPU_EVENTS
+>>  Extended by: KVM_CAP_INTR_SHADOW
+>> -Architectures: x86
+>> +Architectures: x86, arm, arm64
+>>  Type: vm ioctl
+>>  Parameters: struct kvm_vcpu_event (out)
+>>  Returns: 0 on success, -1 on error
+>>
+>> +X86:
+>> +
+>>  Gets currently pending exceptions, interrupts, and NMIs as well as
+>> related
+>>  states of the vcpu.
+>>
+>> @@ -865,15 +867,31 @@ Only two fields are defined in the flags field:
+>>  - KVM_VCPUEVENT_VALID_SMM may be set in the flags field to signal that
+>>    smi contains a valid state.
+>>
+>> +ARM, ARM64:
+>> +
+>> +Gets currently pending SError exceptions as well as related states of the
+>> vcpu.
+>> +
+>> +struct kvm_vcpu_events {
+>> +	struct {
+>> +		__u8 serror_pending;
+>> +		__u8 serror_has_esr;
+>> +		/* Align it to 4 bytes */
+>> +		__u8 pad[2];
+>> +		__u64 serror_esr;
+>> +	} exception;
+>> +};
+>> +
+>
+> I'm not convinced we should change this struct from the layout/size x86 has.
+> Its
+> confusing for the documentation, is this API call really the same on all
+> architectures?
+>
+> What if we want to add some future interrupt, NMI or related state? We've
+> found
+> ourselves needing to add this API, it seems odd to remove its other uses on
+> x86.
+> We can't put them back in the future.
+>
+> Having a different layout would force user-space to ifdef/duplicate any
+> code
+> that accesses this between architectures.
+ In x86 and arm64 user space code, the handling logic of
+KVM_GET/SET_VCPU_EVENTS is in different ARCH folder,  maybe it is not
+necessary to share the handling code in the user space.
 
-   1/8 of kernel addresses reserved for shadow memory. There was no
-big enough hole for this, so virtual addresses for shadow were
-stolen from user space.
+>
+>
+>
+> The compiler will want that __u64 to be naturally aligned to 8-bytes, so
+> your
+> 4-byte padding still causes some secret compiler-padding to be inserted.
+> Different versions of the compiler may put it in different places.
+>
+>
+>>  4.32 KVM_SET_VCPU_EVENTS
+>>
+>>  Capability: KVM_CAP_VCPU_EVENTS
+>>  Extended by: KVM_CAP_INTR_SHADOW
+>> -Architectures: x86
+>> +Architectures: x86, arm, arm64
+>>  Type: vm ioctl
+>>  Parameters: struct kvm_vcpu_event (in)
+>>  Returns: 0 on success, -1 on error
+>>
+>> +X86:
+>> +
+>>  Set pending exceptions, interrupts, and NMIs as well as related states of
+>> the
+>>  vcpu.
+>>
+>> @@ -894,6 +912,12 @@ shall be written into the VCPU.
+>>
+>>  KVM_VCPUEVENT_VALID_SMM can only be set if KVM_CAP_X86_SMM is available.
+>>
+>> +ARM, ARM64:
+>> +
+>> +Set pending SError exceptions as well as related states of the vcpu.
+>> +
+>> +See KVM_GET_VCPU_EVENTS for the data structure.
+>> +
+>>
+>>  4.33 KVM_GET_DEBUGREGS
+>>
+>
+>
+>> diff --git a/arch/arm64/include/uapi/asm/kvm.h
+>> b/arch/arm64/include/uapi/asm/kvm.h
+>> index 9abbf30..855cc9a 100644
+>> --- a/arch/arm64/include/uapi/asm/kvm.h
+>> +++ b/arch/arm64/include/uapi/asm/kvm.h
+>> @@ -39,6 +39,7 @@
+>>  #define __KVM_HAVE_GUEST_DEBUG
+>>  #define __KVM_HAVE_IRQ_LINE
+>>  #define __KVM_HAVE_READONLY_MEM
+>> +#define __KVM_HAVE_VCPU_EVENTS
+>>
+>>  #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+>>
+>> @@ -153,6 +154,17 @@ struct kvm_sync_regs {
+>>  struct kvm_arch_memory_slot {
+>>  };
+>>
+>> +/* for KVM_GET/SET_VCPU_EVENTS */
+>> +struct kvm_vcpu_events {
+>> +	struct {
+>> +		__u8 serror_pending;
+>> +		__u8 serror_has_esr;
+>
+>> +		/* Align it to 4 bytes */
+>> +		__u8 pad[2];
+>
+> (padding noted above)
+>
+>
+>> +		__u64 serror_esr;
+>> +	} exception;
+>> +};
+>> +
+>>  /* If you need to interpret the index values, here is the key: */
+>>  #define KVM_REG_ARM_COPROC_MASK		0x000000000FFF0000
+>>  #define KVM_REG_ARM_COPROC_SHIFT	16
+>
+>
+>> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+>> index 5c7f657..42e1222 100644
+>> --- a/arch/arm64/kvm/guest.c
+>> +++ b/arch/arm64/kvm/guest.c
+>> @@ -277,6 +277,37 @@ int kvm_arch_vcpu_ioctl_set_sregs(struct kvm_vcpu
+>> *vcpu,
+>>  	return -EINVAL;
+>>  }
+>>
+>> +int kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
+>> +			struct kvm_vcpu_events *events)
+>> +{
+>> +	events->exception.serror_pending = (vcpu_get_hcr(vcpu) & HCR_VSE);
+>> +	events->exception.serror_has_esr =
+>> +			cpus_have_const_cap(ARM64_HAS_RAS_EXTN) &&
+>> +					(!!vcpu_get_vsesr(vcpu));
+>
+>> +	events->exception.serror_esr = vcpu_get_vsesr(vcpu);
+>
+> This will return a stale ESR even if nothing is pending. On systems without
+> the
+> RAS extensions it will return 'ESR_ELx_ISV' if kvm_inject_vabt() has ever
+> been
+> called for this CPU.
+>
+> Could we hide this behind (pending && has_esr), setting it to 0 otherwise.
+> This
+> is just to avoid exposing the stale value.
+Exactly, it is indeed.
 
-   At early boot stage the whole shadow region populated with just
-one physical page (kasan_zero_page). Later, this page reused
-as readonly zero shadow for some memory that KASan currently
-don't track (vmalloc).
+>
+>
+>> +
+>> +	return 0;
+>> +}
+>
+>> +int kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+>> +			struct kvm_vcpu_events *events)
+>> +{
+>> +	bool injected = events->exception.serror_pending;
+>> +	bool has_esr = events->exception.serror_has_esr;
+>> +
+>> +	if (injected && has_esr) {
+>> +		if (!cpus_have_const_cap(ARM64_HAS_RAS_EXTN))
+>> +			return -EINVAL;
+>> +
+>> +		kvm_set_sei_esr(vcpu, events->exception.serror_esr);
+>> +
+>> +	} else if (injected) {
+>> +		kvm_inject_vabt(vcpu);
+>
+> Nit: looks like 'injected' is misnamed.
 
-  After mapping the physical memory, pages for shadow memory are
-allocated and mapped.
+"injected" change to "pending"?
 
-  KASan's stack instrumentation significantly increases stack's
-consumption, so CONFIG_KASAN doubles THREAD_SIZE.
+>
+>
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+>> +
+>>  int __attribute_const__ kvm_target_cpu(void)
+>>  {
+>>  	unsigned long implementor = read_cpuid_implementor();
+>
+>
+>> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+>> index 38c8a64..20e919a 100644
+>> --- a/arch/arm64/kvm/reset.c
+>> +++ b/arch/arm64/kvm/reset.c
+>> @@ -82,6 +82,7 @@ int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm,
+>> long ext)
+>>  		break;
+>>  	case KVM_CAP_SET_GUEST_DEBUG:
+>>  	case KVM_CAP_VCPU_ATTRIBUTES:
+>> +	case KVM_CAP_VCPU_EVENTS:
+>>  		r = 1;
+>>  		break;
+>>  	default:
+>
+>> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+>> index 7e3941f..945655d 100644
+>> --- a/virt/kvm/arm/arm.c
+>> +++ b/virt/kvm/arm/arm.c
+>> @@ -1051,6 +1051,27 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>>  			return -EFAULT;
+>>  		return kvm_arm_vcpu_has_attr(vcpu, &attr);
+>>  	}
+>> +	case KVM_GET_VCPU_EVENTS: {
+>> +		struct kvm_vcpu_events events;
+>> +
+>> +		memset(&events, 0, sizeof(struct kvm_vcpu_events));
+>
+> sizeof(events) is the normal style here, it means if someone changes
+> event's
+> type we don't get any surprises...
 
-  Functions like memset/memmove/memcpy do a lot of memory accesses.
-If bad pointer passed to one of these function it is important
-to catch this. Compiler's instrumentation cannot do this since
-these functions are written in assembly.
+Ok, thanks
 
-  KASan replaces memory functions with manually instrumented variants.
-Original functions declared as weak symbols so strong definitions
-in mm/kasan/kasan.c could replace them. Original functions have aliases
-with '__' prefix in name, so we could call non-instrumented variant
-if needed.
+>
+>
+>> +		if (kvm_arm_vcpu_get_events(vcpu, &events))
+>> +			return -EINVAL;
+>> +
+>> +		if (copy_to_user(argp, &events, sizeof(struct kvm_vcpu_events)))
+>
+> sizeof(events)
+thanks
 
-  Some files built without kasan instrumentation (e.g. mm/slub.c).
-Original mem* function replaced (via #define) with prefixed variants
-to disable memory access checks for such files.
+>
+>
+>> +			return -EFAULT;
+>> +
+>> +		return 0;
+>> +	}
+>> +	case KVM_SET_VCPU_EVENTS: {
+>> +		struct kvm_vcpu_events events;
+>> +
+>> +		if (copy_from_user(&events, argp,
+>> +				sizeof(struct kvm_vcpu_events)))
+>> +			return -EFAULT;
+>> +
+>> +		return kvm_arm_vcpu_set_events(vcpu, &events);
+>> +	}
+>>  	default:
+>>  		return -EINVAL;
+>>  	}
+>>
+>
+> Despite KVM_CAP_VCPU_EVENTS not being advertised on 32bit, any attempt to
+> call
+> it will still end up in here, but will always fail as the {g,s}et_events()
+> calls
+> always return -EINVAL. I don't think this will cause us any problems.
+What are the things you're worried about?
 
-  On arm LPAE architecture,  the mapping table of KASan shadow memory(if
-PAGE_OFFSET is 0xc0000000, the KASan shadow memory's virtual space is
-0xb6e000000~0xbf000000) can't be filled in do_translation_fault function,
-because kasan instrumentation maybe cause do_translation_fault function
-accessing KASan shadow memory. The accessing of KASan shadow memory in
-do_translation_fault function maybe cause dead circle. So the mapping table
-of KASan shadow memory need be copyed in pgd_alloc function.
-
-
-Most of the code comes from:
-https://github.com/aryabinin/linux/commit/0b54f17e70ff50a902c4af05bb92716eb95acefe
-
-These patches are tested on vexpress-ca15, vexpress-ca9
-
-
-Cc: Andrey Ryabinin <a.ryabinin@samsung.com>
-Tested-by: Florian Fainelli <f.fainelli@gmail.com>
-Tested-by: Joel Stanley <joel@jms.id.au>
-Tested-by: Abbott Liu <liuwenliang@huawei.com>
-Signed-off-by: Abbott Liu <liuwenliang@huawei.com>
-
-Abbott Liu (2):
-  Add TTBR operator for kasan_init
-  Define the virtual space of KASan's shadow region
-
-Andrey Ryabinin (4):
-  Disable instrumentation for some code
-  Replace memory function for kasan
-  Initialize the mapping of KASan shadow memory
-  Enable KASan for arm
-
- Documentation/dev-tools/kasan.rst     |   2 +-
- arch/arm/Kconfig                      |   1 +
- arch/arm/boot/compressed/Makefile     |   1 +
- arch/arm/boot/compressed/decompress.c |   2 +
- arch/arm/boot/compressed/libfdt_env.h |   2 +
- arch/arm/include/asm/cp15.h           | 104 ++++++++++++
- arch/arm/include/asm/kasan.h          |  35 ++++
- arch/arm/include/asm/kasan_def.h      |  64 +++++++
- arch/arm/include/asm/kvm_hyp.h        |  52 ------
- arch/arm/include/asm/memory.h         |   5 +
- arch/arm/include/asm/pgalloc.h        |   7 +-
- arch/arm/include/asm/string.h         |  17 ++
- arch/arm/include/asm/thread_info.h    |   4 +
- arch/arm/kernel/entry-armv.S          |   5 +-
- arch/arm/kernel/entry-common.S        |   9 +-
- arch/arm/kernel/head-common.S         |   7 +-
- arch/arm/kernel/setup.c               |   2 +
- arch/arm/kernel/unwind.c              |   3 +-
- arch/arm/kvm/hyp/Makefile             |   4 +
- arch/arm/kvm/hyp/cp15-sr.c            |  12 +-
- arch/arm/kvm/hyp/switch.c             |   6 +-
- arch/arm/lib/memcpy.S                 |   3 +
- arch/arm/lib/memmove.S                |   5 +-
- arch/arm/lib/memset.S                 |   3 +
- arch/arm/mm/Makefile                  |   4 +
- arch/arm/mm/init.c                    |   6 +
- arch/arm/mm/kasan_init.c              | 302 ++++++++++++++++++++++++++++++++++
- arch/arm/mm/mmu.c                     |   7 +-
- arch/arm/mm/pgd.c                     |  14 ++
- arch/arm/vdso/Makefile                |   2 +
- 30 files changed, 616 insertions(+), 74 deletions(-)
- create mode 100644 arch/arm/include/asm/kasan.h
- create mode 100644 arch/arm/include/asm/kasan_def.h
- create mode 100644 arch/arm/mm/kasan_init.c
-
--- 
-2.9.0
+>
+>
+> Thanks,
+>
+> James
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+>
