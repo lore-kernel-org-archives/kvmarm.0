@@ -1,7 +1,7 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v3 05/12] KVM: arm/arm64: Revisit Redistributor TYPER last bit computation
-Date: Fri, 13 Apr 2018 10:20:51 +0200
-Message-ID: <1523607658-9166-6-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v3 09/12] KVM: arm/arm64: Check all vcpu redistributors are set on map_resources
+Date: Fri, 13 Apr 2018 10:20:55 +0200
+Message-ID: <1523607658-9166-10-git-send-email-eric.auger@redhat.com>
 References: <1523607658-9166-1-git-send-email-eric.auger@redhat.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1523607658-9166-1-git-send-email-eric.auger@redhat.com>
@@ -10,38 +10,50 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.or
 Cc: andre.przywara@arm.com, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The TYPER of an redistributor reflects whether the rdist is
-the last one of the redistributor region. Let's compare the TYPER
-GPA against the address of the last occupied slot within the
-redistributor region.
+On vcpu first run, we eventually know the actual number of vcpus.
+This is a synchronization point to check all redistributors regions
+were assigned. On kvm_vgic_map_resources() we check both dist and
+redist were set, eventually check potential base address inconsistencies.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- virt/kvm/arm/vgic/vgic-mmio-v3.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ virt/kvm/arm/vgic/vgic-v3.c | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index 49ca176..ce5c927 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -184,12 +184,17 @@ static unsigned long vgic_mmio_read_v3r_typer(struct kvm_vcpu *vcpu,
- 					      gpa_t addr, unsigned int len)
- {
- 	unsigned long mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
-+	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-+	struct vgic_redist_region *rdreg = vgic_cpu->rdreg;
- 	int target_vcpu_id = vcpu->vcpu_id;
-+	gpa_t last_rdist_typer = rdreg->base + GICR_TYPER +
-+			(rdreg->free_index - 1) * KVM_VGIC_V3_REDIST_SIZE;
- 	u64 value;
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index b80f650..feabc24 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -484,16 +484,25 @@ struct vgic_redist_region *vgic_v3_rdist_region_from_index(struct kvm *kvm,
  
- 	value = (u64)(mpidr & GENMASK(23, 0)) << 32;
- 	value |= ((target_vcpu_id & 0xffff) << 8);
--	if (target_vcpu_id == atomic_read(&vcpu->kvm->online_vcpus) - 1)
+ int vgic_v3_map_resources(struct kvm *kvm)
+ {
+-	int ret = 0;
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+-	struct vgic_redist_region *rdreg =
+-		list_first_entry(&dist->rd_regions,
+-				 struct vgic_redist_region, list);
++	struct kvm_vcpu *vcpu;
++	int ret = 0;
++	int c;
+ 
+ 	if (vgic_ready(kvm))
+ 		goto out;
+ 
+-	if (IS_VGIC_ADDR_UNDEF(dist->vgic_dist_base) || !rdreg) {
++	kvm_for_each_vcpu(c, vcpu, kvm) {
++		struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
 +
-+	if (addr == last_rdist_typer)
- 		value |= GICR_TYPER_LAST;
- 	if (vgic_has_its(vcpu->kvm))
- 		value |= GICR_TYPER_PLPIS;
++		if (IS_VGIC_ADDR_UNDEF(vgic_cpu->rd_iodev.base_addr)) {
++			kvm_err("vcpu %d redistributor base not set\n", c);
++			ret = -ENXIO;
++			goto out;
++		}
++	}
++
++	if (IS_VGIC_ADDR_UNDEF(dist->vgic_dist_base)) {
+ 		kvm_err("Need to set vgic distributor addresses first\n");
+ 		ret = -ENXIO;
+ 		goto out;
 -- 
 2.5.5
