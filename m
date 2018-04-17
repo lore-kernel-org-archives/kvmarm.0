@@ -1,82 +1,148 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH 02/11] ACPI / APEI: Generalise the estatus queue's
- add/remove and notify code
-Date: Tue, 17 Apr 2018 17:10:18 +0200
-Message-ID: <20180417151018.GE20840@pd.tnic>
-References: <20180215185606.26736-1-james.morse@arm.com>
- <20180215185606.26736-3-james.morse@arm.com>
- <20180301150144.GA4215@pd.tnic>
- <87sh9jbrgc.fsf@e105922-lin.cambridge.arm.com>
- <20180301223529.GA28811@pd.tnic> <5AA02C26.10803@arm.com>
- <20180308104408.GB21166@pd.tnic> <5AAFC939.3010309@arm.com>
- <20180327172510.GB32184@pd.tnic>
- <d15ba145-479c-ffde-14ad-ab7170d0f06e@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <d15ba145-479c-ffde-14ad-ab7170d0f06e@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: James Morse <james.morse@arm.com>
-Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Xie XiuQi <xiexiuqi@huawei.com>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, Will Deacon <will.deacon@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>, Len Brown <lenb@kernel.org>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: [PATCHv3 00/11] ARMv8.3 pointer authentication userspace support
+Date: Tue, 17 Apr 2018 19:37:24 +0100
+Message-ID: <20180417183735.56985-1-mark.rutland@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org
+Cc: arnd@arndb.de, catalin.marinas@arm.com, cdall@kernel.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arch@vger.kernel.org, marc.zyngier@arm.com, mark.rutland@arm.com, ramana.radhakrishnan@arm.com, suzuki.poulose@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, awallis@codeaurora.org, kernel-hardening@lists.openwall.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Mar 28, 2018 at 05:30:55PM +0100, James Morse wrote:
-> -----------------%<-----------------
->     ACPI / APEI: don't wait to serialise with oops messages when panic()ing
-> 
->     oops_begin() exists to group printk() messages with the oops message
->     printed by die(). To reach this caller we know that platform firmware
->     took this error first, then notified the OS via NMI with a 'panic'
->     severity.
-> 
->     Don't wait for another CPU to release the die-lock before we can
->     panic(), our only goal is to print this fatal error and panic().
-> 
->     This code is always called in_nmi(), and since 42a0bb3f7138 ("printk/nmi:
->     generic solution for safe printk in NMI"), it has been safe to call
->     printk() from this context. Messages are batched in a per-cpu buffer
->     and printed via irq-work, or a call back from panic().
-> 
->     Signed-off-by: James Morse <james.morse@arm.com>
-> 
-> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-> index 22f6ea5b9ad5..f348e6540960 100644
-> --- a/drivers/acpi/apei/ghes.c
-> +++ b/drivers/acpi/apei/ghes.c
-> @@ -34,7 +34,6 @@
->  #include <linux/interrupt.h>
->  #include <linux/timer.h>
->  #include <linux/cper.h>
-> -#include <linux/kdebug.h>
->  #include <linux/platform_device.h>
->  #include <linux/mutex.h>
->  #include <linux/ratelimit.h>
-> @@ -736,9 +735,6 @@ static int _in_nmi_notify_one(struct ghes *ghes)
-> 
->         sev = ghes_severity(ghes->estatus->error_severity);
->         if (sev >= GHES_SEV_PANIC) {
-> -#ifdef CONFIG_X86
-> -               oops_begin();
-> -#endif
->                 ghes_print_queued_estatus();
->                 __ghes_panic(ghes);
->         }
-> -----------------%<-----------------
+This series adds support for the ARMv8.3 pointer authentication extension,
+enabling userspace return address protection with recent versions of GCC.
 
-Acked-by: Borislav Petkov <bp@suse.de>
+Since RFC [1]:
+* Make the KVM context switch (semi-lazy)
+* Rebase to v4.13-rc1
+* Improve pointer authentication documentation
+* Add hwcap documentation
+* Various minor cleanups
+
+Since v1 [2]:
+* Rebase to v4.15-rc1
+* Settle on per-process keys
+* Strip PACs when unwinding userspace
+* Don't expose an XPAC hwcap (this is implied by ID registers)
+* Leave APIB, ABPDA, APDB, and APGA keys unsupported for now
+* Support IMP DEF algorithms
+* Rely on KVM ID register emulation
+* Various cleanups
+
+Since v2 [3]:
+* Unify HCR_EL2 initialization
+* s/POINTER_AUTHENTICATION/PTR_AUTH/
+* Drop KVM support (for now)
+* Drop detection of generic authentication
+
+While there are use-cases for keys other than APIAKey, the only software that
+I'm aware of with pointer authentication support is GCC, which only makes use
+of APIAKey. I'm happy to add support for other keys as users appear.
+
+I've pushed the series to the arm64/pointer-auth branch [4] of my linux tree.
+I've also pushed out a necessary bootwrapper patch to the pointer-auth branch
+[5] of my bootwrapper repo.
+
+
+Extension Overview 
+==================
+
+The ARMv8.3 pointer authentication extension adds functionality to detect
+modification of pointer values, mitigating certain classes of attack such as
+stack smashing, and making return oriented programming attacks harder
+
+The extension introduces the concept of a pointer authentication code (PAC),
+which is stored in some upper bits of pointers. Each PAC is derived from the
+original pointer, another 64-bit value (e.g. the stack pointer), and a secret
+128-bit key.
+
+New instructions are added which can be used to:
+
+* Insert a PAC into a pointer
+* Strip a PAC from a pointer
+* Authenticate strip a PAC from a pointer
+
+If authentication succeeds, the code is removed, yielding the original pointer.
+If authentication fails, bits are set in the pointer such that it is guaranteed
+to cause a fault if used.
+
+These instructions can make use of four keys:
+
+* APIAKey (A.K.A. Instruction A key)
+* APIBKey (A.K.A. Instruction B key)
+* APDAKey (A.K.A. Data A key)
+* APDBKey (A.K.A. Data B Key)
+
+A subset of these instruction encodings have been allocated from the HINT
+space, and will operate as NOPs on any ARMv8-A parts which do not feature the
+extension (or if purposefully disabled by the kernel). Software using only this
+subset of the instructions should function correctly on all ARMv8-A parts.
+
+Additionally, instructions are added to authenticate small blocks of memory in
+similar fashion, using APGAKey (A.K.A. Generic key).
+
+
+This Series
+===========
+
+This series enables the use of instructions using APIAKey, which is initialised
+and maintained per-process (shared by all threads). This series does not add
+support for APIBKey, APDAKey, APDBKey, nor APGAKey.
+
+I've given this some basic testing with a homebrew test suite. More ideally,
+we'd add some tests to the kernel source tree.
+
+For the time being, pointer authentication functionality is hidden from
+guests via ID register trapping.
+
+Thanks,
+Mark.
+
+[1] http://lists.infradead.org/pipermail/linux-arm-kernel/2017-April/498941.html
+[2] https://lkml.kernel.org/r/1500480092-28480-1-git-send-email-mark.rutland@arm.com
+[3] https://lkml.kernel.org/r/20171127163806.31435-1-mark.rutland@arm.com
+[4] git://git.kernel.org/pub/scm/linux/kernel/git/mark/linux.git arm64/pointer-auth
+[5] git://git.kernel.org/pub/scm/linux/kernel/git/mark/boot-wrapper-aarch64.git pointer-auth
+
+
+Mark Rutland (11):
+  arm64: add pointer authentication register bits
+  arm64/kvm: consistently handle host HCR_EL2 flags
+  arm64/kvm: hide ptrauth from guests
+  arm64: Don't trap host pointer auth use to EL2
+  arm64/cpufeature: detect pointer authentication
+  asm-generic: mm_hooks: allow hooks to be overridden individually
+  arm64: add basic pointer authentication support
+  arm64: expose user PAC bit positions via ptrace
+  arm64: perf: strip PAC when unwinding userspace
+  arm64: enable pointer authentication
+  arm64: docs: document pointer authentication
+
+ Documentation/arm64/booting.txt                |   8 ++
+ Documentation/arm64/elf_hwcaps.txt             |   6 ++
+ Documentation/arm64/pointer-authentication.txt |  84 ++++++++++++++++++++
+ arch/arm64/Kconfig                             |  23 ++++++
+ arch/arm64/include/asm/cpucaps.h               |   5 +-
+ arch/arm64/include/asm/esr.h                   |   3 +-
+ arch/arm64/include/asm/kvm_arm.h               |   3 +
+ arch/arm64/include/asm/mmu.h                   |   5 ++
+ arch/arm64/include/asm/mmu_context.h           |  25 +++++-
+ arch/arm64/include/asm/pointer_auth.h          | 104 +++++++++++++++++++++++++
+ arch/arm64/include/asm/sysreg.h                |  30 +++++++
+ arch/arm64/include/uapi/asm/hwcap.h            |   1 +
+ arch/arm64/include/uapi/asm/ptrace.h           |   7 ++
+ arch/arm64/kernel/cpufeature.c                 |  56 +++++++++++++
+ arch/arm64/kernel/cpuinfo.c                    |   1 +
+ arch/arm64/kernel/head.S                       |   5 +-
+ arch/arm64/kernel/perf_callchain.c             |   5 +-
+ arch/arm64/kernel/ptrace.c                     |  38 +++++++++
+ arch/arm64/kvm/handle_exit.c                   |  18 +++++
+ arch/arm64/kvm/hyp/switch.c                    |   2 +-
+ arch/arm64/kvm/sys_regs.c                      |   9 +++
+ include/asm-generic/mm_hooks.h                 |  11 +++
+ include/uapi/linux/elf.h                       |   1 +
+ 23 files changed, 441 insertions(+), 9 deletions(-)
+ create mode 100644 Documentation/arm64/pointer-authentication.txt
+ create mode 100644 arch/arm64/include/asm/pointer_auth.h
 
 -- 
-Regards/Gruss,
-    Boris.
-
-Good mailing practices for 400: avoid top-posting and trim the reply.
+2.11.0
