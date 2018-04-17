@@ -1,7 +1,7 @@
 From: Mark Rutland <mark.rutland@arm.com>
-Subject: [PATCHv3 05/11] arm64/cpufeature: detect pointer authentication
-Date: Tue, 17 Apr 2018 19:37:29 +0100
-Message-ID: <20180417183735.56985-6-mark.rutland@arm.com>
+Subject: [PATCHv3 07/11] arm64: add basic pointer authentication support
+Date: Tue, 17 Apr 2018 19:37:31 +0100
+Message-ID: <20180417183735.56985-8-mark.rutland@arm.com>
 References: <20180417183735.56985-1-mark.rutland@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20180417183735.56985-1-mark.rutland@arm.com>
@@ -10,120 +10,264 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: arnd@arndb.de, catalin.marinas@arm.com, cdall@kernel.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arch@vger.kernel.org, marc.zyngier@arm.com, mark.rutland@arm.com, ramana.radhakrishnan@arm.com, suzuki.poulose@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, awallis@codeaurora.org, kernel-hardening@lists.openwall.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-So that we can dynamically handle the presence of pointer authentication
-functionality, wire up probing code in cpufeature.c.
+This patch adds basic support for pointer authentication, allowing
+userspace to make use of APIAKey. The kernel maintains an APIAKey value
+for each process (shared by all threads within), which is initialised to
+a random value at exec() time.
 
->From ARMv8.3 onwards, ID_AA64ISAR1 is no longer entirely RES0, and now
-has four fields describing the presence of pointer authentication
-functionality:
+To describe that address authentication instructions are available, the
+ID_AA64ISAR0.{APA,API} fields are exposed to userspace. A new hwcap,
+APIA, is added to describe that the kernel manages APIAKey.
 
-* APA - address authentication present, using an architected algorithm
-* API - address authentication present, using an IMP DEF algorithm
-* GPA - generic authentication present, using an architected algorithm
-* GPI - generic authentication present, using an IMP DEF algorithm
+Instructions using other keys (APIBKey, APDAKey, APDBKey) are disabled,
+and will behave as NOPs. These may be made use of in future patches.
 
-For the moment we only care about address authentication, so we only
-need to check APA and API. It is assumed that if all CPUs support an IMP
-DEF algorithm, the same algorithm is used across all CPUs.
-
-Note that when we implement KVM support, we will also need to ensure
-that CPUs have uniform support for GPA and GPI.
+No support is added for the generic key (APGAKey), though this cannot be
+trapped or made to behave as a NOP. Its presence is not advertised with
+a hwcap.
 
 Signed-off-by: Mark Rutland <mark.rutland@arm.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>
 Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
 Cc: Will Deacon <will.deacon@arm.com>
 ---
- arch/arm64/include/asm/cpucaps.h |  5 ++++-
- arch/arm64/kernel/cpufeature.c   | 47 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 51 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/mmu.h          |  5 ++
+ arch/arm64/include/asm/mmu_context.h  | 25 +++++++++-
+ arch/arm64/include/asm/pointer_auth.h | 89 +++++++++++++++++++++++++++++++++++
+ arch/arm64/include/uapi/asm/hwcap.h   |  1 +
+ arch/arm64/kernel/cpufeature.c        |  9 ++++
+ arch/arm64/kernel/cpuinfo.c           |  1 +
+ 6 files changed, 128 insertions(+), 2 deletions(-)
+ create mode 100644 arch/arm64/include/asm/pointer_auth.h
 
-diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-index bc51b72fafd4..9dcb4d1b14f5 100644
---- a/arch/arm64/include/asm/cpucaps.h
-+++ b/arch/arm64/include/asm/cpucaps.h
-@@ -48,7 +48,10 @@
- #define ARM64_HAS_CACHE_IDC			27
- #define ARM64_HAS_CACHE_DIC			28
- #define ARM64_HW_DBM				29
-+#define ARM64_HAS_ADDRESS_AUTH_ARCH		30
-+#define ARM64_HAS_ADDRESS_AUTH_IMP_DEF		31
-+#define ARM64_HAS_ADDRESS_AUTH			32
+diff --git a/arch/arm64/include/asm/mmu.h b/arch/arm64/include/asm/mmu.h
+index dd320df0d026..f6480ea7b0d5 100644
+--- a/arch/arm64/include/asm/mmu.h
++++ b/arch/arm64/include/asm/mmu.h
+@@ -25,10 +25,15 @@
  
--#define ARM64_NCAPS				30
-+#define ARM64_NCAPS				33
+ #ifndef __ASSEMBLY__
  
- #endif /* __ASM_CPUCAPS_H */
++#include <asm/pointer_auth.h>
++
+ typedef struct {
+ 	atomic64_t	id;
+ 	void		*vdso;
+ 	unsigned long	flags;
++#ifdef CONFIG_ARM64_PTR_AUTH
++	struct ptrauth_keys	ptrauth_keys;
++#endif
+ } mm_context_t;
+ 
+ /*
+diff --git a/arch/arm64/include/asm/mmu_context.h b/arch/arm64/include/asm/mmu_context.h
+index 39ec0b8a689e..caf0d3010112 100644
+--- a/arch/arm64/include/asm/mmu_context.h
++++ b/arch/arm64/include/asm/mmu_context.h
+@@ -29,7 +29,6 @@
+ #include <asm/cacheflush.h>
+ #include <asm/cpufeature.h>
+ #include <asm/proc-fns.h>
+-#include <asm-generic/mm_hooks.h>
+ #include <asm/cputype.h>
+ #include <asm/pgtable.h>
+ #include <asm/sysreg.h>
+@@ -168,7 +167,14 @@ static inline void cpu_replace_ttbr1(pgd_t *pgdp)
+ #define destroy_context(mm)		do { } while(0)
+ void check_and_switch_context(struct mm_struct *mm, unsigned int cpu);
+ 
+-#define init_new_context(tsk,mm)	({ atomic64_set(&(mm)->context.id, 0); 0; })
++static inline int init_new_context(struct task_struct *tsk,
++			struct mm_struct *mm)
++{
++	atomic64_set(&mm->context.id, 0);
++	mm_ctx_ptrauth_init(&mm->context);
++
++	return 0;
++}
+ 
+ #ifdef CONFIG_ARM64_SW_TTBR0_PAN
+ static inline void update_saved_ttbr0(struct task_struct *tsk,
+@@ -216,6 +222,8 @@ static inline void __switch_mm(struct mm_struct *next)
+ 		return;
+ 	}
+ 
++	mm_ctx_ptrauth_switch(&next->context);
++
+ 	check_and_switch_context(next, cpu);
+ }
+ 
+@@ -241,6 +249,19 @@ switch_mm(struct mm_struct *prev, struct mm_struct *next,
+ void verify_cpu_asid_bits(void);
+ void post_ttbr_update_workaround(void);
+ 
++static inline void arch_dup_mmap(struct mm_struct *oldmm,
++				 struct mm_struct *mm)
++{
++	mm_ctx_ptrauth_dup(&oldmm->context, &mm->context);
++}
++#define arch_dup_mmap arch_dup_mmap
++
++/*
++ * We need to override arch_dup_mmap before including the generic hooks, which
++ * are otherwise sufficient for us.
++ */
++#include <asm-generic/mm_hooks.h>
++
+ #endif /* !__ASSEMBLY__ */
+ 
+ #endif /* !__ASM_MMU_CONTEXT_H */
+diff --git a/arch/arm64/include/asm/pointer_auth.h b/arch/arm64/include/asm/pointer_auth.h
+new file mode 100644
+index 000000000000..a2e8fb91fdee
+--- /dev/null
++++ b/arch/arm64/include/asm/pointer_auth.h
+@@ -0,0 +1,89 @@
++/*
++ * Copyright (C) 2016 ARM Ltd.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++#ifndef __ASM_POINTER_AUTH_H
++#define __ASM_POINTER_AUTH_H
++
++#include <linux/random.h>
++
++#include <asm/cpufeature.h>
++#include <asm/sysreg.h>
++
++#ifdef CONFIG_ARM64_PTR_AUTH
++/*
++ * Each key is a 128-bit quantity which is split accross a pair of 64-bit
++ * registers (Lo and Hi).
++ */
++struct ptrauth_key {
++	unsigned long lo, hi;
++};
++
++/*
++ * We give each process its own instruction A key (APIAKey), which is shared by
++ * all threads. This is inherited upon fork(), and reinitialised upon exec*().
++ * All other keys are currently unused, with APIBKey, APDAKey, and APBAKey
++ * instructions behaving as NOPs.
++ */
++struct ptrauth_keys {
++	struct ptrauth_key apia;
++};
++
++static inline void ptrauth_keys_init(struct ptrauth_keys *keys)
++{
++	if (!cpus_have_const_cap(ARM64_HAS_ADDRESS_AUTH))
++		return;
++
++	get_random_bytes(keys, sizeof(*keys));
++}
++
++#define __ptrauth_key_install(k, v)			\
++do {							\
++	write_sysreg_s(v.lo, SYS_ ## k ## KEYLO_EL1);	\
++	write_sysreg_s(v.hi, SYS_ ## k ## KEYHI_EL1);	\
++} while (0)
++
++static inline void ptrauth_keys_switch(struct ptrauth_keys *keys)
++{
++	if (!cpus_have_const_cap(ARM64_HAS_ADDRESS_AUTH))
++		return;
++
++	__ptrauth_key_install(APIA, keys->apia);
++}
++
++static inline void ptrauth_keys_dup(struct ptrauth_keys *old,
++				    struct ptrauth_keys *new)
++{
++	if (!cpus_have_const_cap(ARM64_HAS_ADDRESS_AUTH))
++		return;
++
++	*new = *old;
++}
++
++#define mm_ctx_ptrauth_init(ctx) \
++	ptrauth_keys_init(&(ctx)->ptrauth_keys)
++
++#define mm_ctx_ptrauth_switch(ctx) \
++	ptrauth_keys_switch(&(ctx)->ptrauth_keys)
++
++#define mm_ctx_ptrauth_dup(oldctx, newctx) \
++	ptrauth_keys_dup(&(oldctx)->ptrauth_keys, &(newctx)->ptrauth_keys)
++
++#else
++#define mm_ctx_ptrauth_init(ctx)
++#define mm_ctx_ptrauth_switch(ctx)
++#define mm_ctx_ptrauth_dup(oldctx, newctx)
++#endif
++
++#endif /* __ASM_POINTER_AUTH_H */
+diff --git a/arch/arm64/include/uapi/asm/hwcap.h b/arch/arm64/include/uapi/asm/hwcap.h
+index 17c65c8f33cb..01f02ac500ae 100644
+--- a/arch/arm64/include/uapi/asm/hwcap.h
++++ b/arch/arm64/include/uapi/asm/hwcap.h
+@@ -48,5 +48,6 @@
+ #define HWCAP_USCAT		(1 << 25)
+ #define HWCAP_ILRCPC		(1 << 26)
+ #define HWCAP_FLAGM		(1 << 27)
++#define HWCAP_APIA		(1 << 28)
+ 
+ #endif /* _UAPI__ASM_HWCAP_H */
 diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 536d572e5596..01b1a7e7d70f 100644
+index 01b1a7e7d70f..f418d4cb6691 100644
 --- a/arch/arm64/kernel/cpufeature.c
 +++ b/arch/arm64/kernel/cpufeature.c
-@@ -142,6 +142,10 @@ static const struct arm64_ftr_bits ftr_id_aa64isar1[] = {
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_LRCPC_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_FCMA_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_JSCVT_SHIFT, 4, 0),
-+	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
-+		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_API_SHIFT, 4, 0),
-+	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
-+		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_APA_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_DPB_SHIFT, 4, 0),
- 	ARM64_FTR_END,
- };
-@@ -1025,6 +1029,22 @@ static void cpu_copy_el2regs(const struct arm64_cpu_capabilities *__unused)
- }
+@@ -1030,6 +1030,11 @@ static void cpu_copy_el2regs(const struct arm64_cpu_capabilities *__unused)
  #endif
  
-+#ifdef CONFIG_ARM64_PTR_AUTH
-+static bool has_address_auth(const struct arm64_cpu_capabilities *entry,
-+			     int __unused)
+ #ifdef CONFIG_ARM64_PTR_AUTH
++static void cpu_enable_address_auth(struct arm64_cpu_capabilities const *cap)
 +{
-+	u64 isar1 = read_sanitised_ftr_reg(SYS_ID_AA64ISAR1_EL1);
-+	bool api, apa;
-+
-+	apa = cpuid_feature_extract_unsigned_field(isar1,
-+					ID_AA64ISAR1_APA_SHIFT) > 0;
-+	api = cpuid_feature_extract_unsigned_field(isar1,
-+					ID_AA64ISAR1_API_SHIFT) > 0;
-+
-+	return apa || api;
++	config_sctlr_el1(0, SCTLR_ELx_ENIA);
 +}
-+#endif /* CONFIG_ARM64_PTR_AUTH */
 +
- static const struct arm64_cpu_capabilities arm64_features[] = {
- 	{
- 		.desc = "GIC system register CPU interface",
-@@ -1201,6 +1221,33 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.cpu_enable = cpu_enable_hw_dbm,
+ static bool has_address_auth(const struct arm64_cpu_capabilities *entry,
+ 			     int __unused)
+ {
+@@ -1246,6 +1251,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.capability = ARM64_HAS_ADDRESS_AUTH,
+ 		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+ 		.matches = has_address_auth,
++		.cpu_enable = cpu_enable_address_auth,
  	},
- #endif
-+#ifdef CONFIG_ARM64_PTR_AUTH
-+	{
-+		.desc = "Address authentication (architected algorithm)",
-+		.capability = ARM64_HAS_ADDRESS_AUTH_ARCH,
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.sys_reg = SYS_ID_AA64ISAR1_EL1,
-+		.sign = FTR_UNSIGNED,
-+		.field_pos = ID_AA64ISAR1_APA_SHIFT,
-+		.min_field_value = ID_AA64ISAR1_APA_ARCHITECTED,
-+		.matches = has_cpuid_feature,
-+	},
-+	{
-+		.desc = "Address authentication (IMP DEF algorithm)",
-+		.capability = ARM64_HAS_ADDRESS_AUTH_IMP_DEF,
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.sys_reg = SYS_ID_AA64ISAR1_EL1,
-+		.sign = FTR_UNSIGNED,
-+		.field_pos = ID_AA64ISAR1_API_SHIFT,
-+		.min_field_value = ID_AA64ISAR1_API_IMP_DEF,
-+		.matches = has_cpuid_feature,
-+	},
-+	{
-+		.capability = ARM64_HAS_ADDRESS_AUTH,
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.matches = has_address_auth,
-+	},
-+#endif /* CONFIG_ARM64_PTR_AUTH */
+ #endif /* CONFIG_ARM64_PTR_AUTH */
  	{},
+@@ -1293,6 +1299,9 @@ static const struct arm64_cpu_capabilities arm64_elf_hwcaps[] = {
+ #ifdef CONFIG_ARM64_SVE
+ 	HWCAP_CAP(SYS_ID_AA64PFR0_EL1, ID_AA64PFR0_SVE_SHIFT, FTR_UNSIGNED, ID_AA64PFR0_SVE, CAP_HWCAP, HWCAP_SVE),
+ #endif
++#ifdef CONFIG_ARM64_PNTR_AUTH
++	HWCAP_CAP(SYS_ID_AA64ISAR1_EL1, ID_AA64ISAR1_APA_SHIFT, FTR_UNSIGNED, 1, CAP_HWCAP, HWCAP_APIA),
++#endif
+ 	{},
+ };
+ 
+diff --git a/arch/arm64/kernel/cpuinfo.c b/arch/arm64/kernel/cpuinfo.c
+index e9ab7b3ed317..608411e3aaff 100644
+--- a/arch/arm64/kernel/cpuinfo.c
++++ b/arch/arm64/kernel/cpuinfo.c
+@@ -81,6 +81,7 @@ static const char *const hwcap_str[] = {
+ 	"uscat",
+ 	"ilrcpc",
+ 	"flagm",
++	"apia",
+ 	NULL
  };
  
 -- 
