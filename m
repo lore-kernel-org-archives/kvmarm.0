@@ -1,55 +1,57 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] MAINTAINERS: Update e-mail address for Christoffer Dall
-Date: Tue, 17 Apr 2018 08:32:56 +0100
-Message-ID: <6bb15fe7-cf20-c4e2-d596-fd9e243659e4@arm.com>
-References: <20180416182831.4035-1-christoffer.dall@arm.com>
+Subject: [PATCH] arm64: KVM: Demote SVE and LORegion warnings to debug only
+Date: Tue, 17 Apr 2018 09:23:56 +0100
+Message-ID: <20180417082356.19492-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180416182831.4035-1-christoffer.dall@arm.com>
-Content-Language: en-GB
-Sender: linux-kernel-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@arm.com>, linux-kernel@vger.kernel.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Christoffer Dall <christoffer.dall@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 16/04/18 19:28, Christoffer Dall wrote:
-> Update my e-mail address to a working address.
-> 
-> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> ---
->  MAINTAINERS | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 0a1410d5a621..3e9c99d2620b 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -7738,7 +7738,7 @@ F:	arch/x86/include/asm/svm.h
->  F:	arch/x86/kvm/svm.c
->  
->  KERNEL VIRTUAL MACHINE FOR ARM (KVM/arm)
-> -M:	Christoffer Dall <christoffer.dall@linaro.org>
-> +M:	Christoffer Dall <christoffer.dall@arm.com>
->  M:	Marc Zyngier <marc.zyngier@arm.com>
->  L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
->  L:	kvmarm@lists.cs.columbia.edu
-> @@ -7752,7 +7752,7 @@ F:	virt/kvm/arm/
->  F:	include/kvm/arm_*
->  
->  KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)
-> -M:	Christoffer Dall <christoffer.dall@linaro.org>
-> +M:	Christoffer Dall <christoffer.dall@arm.com>
->  M:	Marc Zyngier <marc.zyngier@arm.com>
->  L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
->  L:	kvmarm@lists.cs.columbia.edu
-> 
+While generating a message about guests probing for SVE/LORegions
+is a useful debugging tool, considering it an error is slightly
+over the top, as this is the only way the guest can find out
+about the presence of the feature.
 
-I'll queue this as a fix for the next -rc.
+Let's turn these message into kvm_debug so that they can only
+be seen if CONFIG_DYNAMIC_DEBUG, and kept quiet otherwise.
 
-Thanks,
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm64/kvm/sys_regs.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-	M.
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 806b0b126a64..6e3b969391fd 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -996,14 +996,12 @@ static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
+ 
+ 	if (id == SYS_ID_AA64PFR0_EL1) {
+ 		if (val & (0xfUL << ID_AA64PFR0_SVE_SHIFT))
+-			pr_err_once("kvm [%i]: SVE unsupported for guests, suppressing\n",
+-				    task_pid_nr(current));
++			kvm_debug("SVE unsupported for guests, suppressing\n");
+ 
+ 		val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
+ 	} else if (id == SYS_ID_AA64MMFR1_EL1) {
+ 		if (val & (0xfUL << ID_AA64MMFR1_LOR_SHIFT))
+-			pr_err_once("kvm [%i]: LORegions unsupported for guests, suppressing\n",
+-				    task_pid_nr(current));
++			kvm_debug("LORegions unsupported for guests, suppressing\n");
+ 
+ 		val &= ~(0xfUL << ID_AA64MMFR1_LOR_SHIFT);
+ 	}
 -- 
-Jazz is not dead. It just smells funny...
+2.14.2
