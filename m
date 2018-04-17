@@ -1,7 +1,7 @@
 From: Mark Rutland <mark.rutland@arm.com>
-Subject: [PATCHv3 08/11] arm64: expose user PAC bit positions via ptrace
-Date: Tue, 17 Apr 2018 19:37:32 +0100
-Message-ID: <20180417183735.56985-9-mark.rutland@arm.com>
+Subject: [PATCHv3 10/11] arm64: enable pointer authentication
+Date: Tue, 17 Apr 2018 19:37:34 +0100
+Message-ID: <20180417183735.56985-11-mark.rutland@arm.com>
 References: <20180417183735.56985-1-mark.rutland@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20180417183735.56985-1-mark.rutland@arm.com>
@@ -10,165 +10,49 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: arnd@arndb.de, catalin.marinas@arm.com, cdall@kernel.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arch@vger.kernel.org, marc.zyngier@arm.com, mark.rutland@arm.com, ramana.radhakrishnan@arm.com, suzuki.poulose@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, awallis@codeaurora.org, kernel-hardening@lists.openwall.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When pointer authentication is in use, data/instruction pointers have a
-number of PAC bits inserted into them. The number and position of these
-bits depends on the configured TCR_ELx.TxSZ and whether tagging is
-enabled. ARMv8.3 allows tagging to differ for instruction and data
-pointers.
-
-For userspace debuggers to unwind the stack and/or to follow pointer
-chains, they need to be able to remove the PAC bits before attempting to
-use a pointer.
-
-This patch adds a new structure with masks describing the location of
-the PAC bits in userspace instruction and data pointers (i.e. those
-addressable via TTBR0), which userspace can query via PTRACE_GETREGSET.
-By clearing these bits from pointers, userspace can acquire the PAC-less
-versions.
-
-This new regset is exposed when the kernel is built with (user) pointer
-authentication support, and the feature is enabled. Otherwise, it is
-hidden.
+Now that all the necessary bits are in place for userspace, add the
+necessary Kconfig logic to allow this to be enabled.
 
 Signed-off-by: Mark Rutland <mark.rutland@arm.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>
 Cc: Will Deacon <will.deacon@arm.com>
 ---
- arch/arm64/include/asm/pointer_auth.h |  8 ++++++++
- arch/arm64/include/uapi/asm/ptrace.h  |  7 +++++++
- arch/arm64/kernel/ptrace.c            | 38 +++++++++++++++++++++++++++++++++++
- include/uapi/linux/elf.h              |  1 +
- 4 files changed, 54 insertions(+)
+ arch/arm64/Kconfig | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-diff --git a/arch/arm64/include/asm/pointer_auth.h b/arch/arm64/include/asm/pointer_auth.h
-index a2e8fb91fdee..5ff141245633 100644
---- a/arch/arm64/include/asm/pointer_auth.h
-+++ b/arch/arm64/include/asm/pointer_auth.h
-@@ -16,9 +16,11 @@
- #ifndef __ASM_POINTER_AUTH_H
- #define __ASM_POINTER_AUTH_H
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index eb2cf4938f6d..d6ce16b1ee47 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -1127,6 +1127,29 @@ config ARM64_RAS_EXTN
  
-+#include <linux/bitops.h>
- #include <linux/random.h>
+ endmenu
  
- #include <asm/cpufeature.h>
-+#include <asm/memory.h>
- #include <asm/sysreg.h>
- 
- #ifdef CONFIG_ARM64_PTR_AUTH
-@@ -71,6 +73,12 @@ static inline void ptrauth_keys_dup(struct ptrauth_keys *old,
- 	*new = *old;
- }
- 
-+/*
-+ * The EL0 pointer bits used by a pointer authentication code.
-+ * This is dependent on TBI0 being enabled, or bits 63:56 would also apply.
-+ */
-+#define ptrauth_pac_mask() 	GENMASK(54, VA_BITS)
++menu "ARMv8.3 architectural features"
 +
- #define mm_ctx_ptrauth_init(ctx) \
- 	ptrauth_keys_init(&(ctx)->ptrauth_keys)
- 
-diff --git a/arch/arm64/include/uapi/asm/ptrace.h b/arch/arm64/include/uapi/asm/ptrace.h
-index 98c4ce55d9c3..4994d718771a 100644
---- a/arch/arm64/include/uapi/asm/ptrace.h
-+++ b/arch/arm64/include/uapi/asm/ptrace.h
-@@ -228,6 +228,13 @@ struct user_sve_header {
- 		  SVE_PT_SVE_OFFSET + SVE_PT_SVE_SIZE(vq, flags)	\
- 		: SVE_PT_FPSIMD_OFFSET + SVE_PT_FPSIMD_SIZE(vq, flags))
- 
-+/* pointer authentication masks (NT_ARM_PAC_MASK) */
++config ARM64_PTR_AUTH
++	bool "Enable support for pointer authentication"
++	default y
++	help
++	  Pointer authentication (part of the ARMv8.3 Extensions) provides
++	  instructions for signing and authenticating pointers against secret
++	  keys, which can be used to mitigate Return Oriented Programming (ROP)
++	  and other attacks.
 +
-+struct user_pac_mask {
-+	__u64		data_mask;
-+	__u64		insn_mask;
-+};
++	  This option enables these instructions at EL0 (i.e. for userspace).
 +
- #endif /* __ASSEMBLY__ */
- 
- #endif /* _UAPI__ASM_PTRACE_H */
-diff --git a/arch/arm64/kernel/ptrace.c b/arch/arm64/kernel/ptrace.c
-index 71d99af24ef2..f395649f755e 100644
---- a/arch/arm64/kernel/ptrace.c
-+++ b/arch/arm64/kernel/ptrace.c
-@@ -44,6 +44,7 @@
- #include <asm/cpufeature.h>
- #include <asm/debug-monitors.h>
- #include <asm/pgtable.h>
-+#include <asm/pointer_auth.h>
- #include <asm/stacktrace.h>
- #include <asm/syscall.h>
- #include <asm/traps.h>
-@@ -951,6 +952,30 @@ static int sve_set(struct task_struct *target,
- 
- #endif /* CONFIG_ARM64_SVE */
- 
-+#ifdef CONFIG_ARM64_PTR_AUTH
-+static int pac_mask_get(struct task_struct *target,
-+			const struct user_regset *regset,
-+			unsigned int pos, unsigned int count,
-+			void *kbuf, void __user *ubuf)
-+{
-+	/*
-+	 * The PAC bits can differ across data and instruction pointers
-+	 * depending on TCR_EL1.TBID*, which we may make use of in future, so
-+	 * we expose separate masks.
-+	 */
-+	unsigned long mask = ptrauth_pac_mask();
-+	struct user_pac_mask uregs = {
-+		.data_mask = mask,
-+		.insn_mask = mask,
-+	};
++	  Choosing this option will cause the kernel to initialise secret keys
++	  for each process at exec() time, with these keys being
++	  context-switched along with the process.
 +
-+	if (!cpus_have_cap(ARM64_HAS_ADDRESS_AUTH))
-+		return -EINVAL;
++	  The feature is detected at runtime. If the feature is not present in
++	  hardware it will not be advertised to userspace nor will it be
++	  enabled.
 +
-+	return user_regset_copyout(&pos, &count, &kbuf, &ubuf, &uregs, 0, -1);
-+}
-+#endif /* CONFIG_ARM64_PTR_AUTH */
++endmenu
 +
- enum aarch64_regset {
- 	REGSET_GPR,
- 	REGSET_FPR,
-@@ -963,6 +988,9 @@ enum aarch64_regset {
- #ifdef CONFIG_ARM64_SVE
- 	REGSET_SVE,
- #endif
-+#ifdef CONFIG_ARM64_PTR_AUTH
-+	REGSET_PAC_MASK,
-+#endif
- };
- 
- static const struct user_regset aarch64_regsets[] = {
-@@ -1032,6 +1060,16 @@ static const struct user_regset aarch64_regsets[] = {
- 		.get_size = sve_get_size,
- 	},
- #endif
-+#ifdef CONFIG_ARM64_PTR_AUTH
-+	[REGSET_PAC_MASK] = {
-+		.core_note_type = NT_ARM_PAC_MASK,
-+		.n = sizeof(struct user_pac_mask) / sizeof(u64),
-+		.size = sizeof(u64),
-+		.align = sizeof(u64),
-+		.get = pac_mask_get,
-+		/* this cannot be set dynamically */
-+	},
-+#endif
- };
- 
- static const struct user_regset_view user_aarch64_view = {
-diff --git a/include/uapi/linux/elf.h b/include/uapi/linux/elf.h
-index e2535d6dcec7..070c28121979 100644
---- a/include/uapi/linux/elf.h
-+++ b/include/uapi/linux/elf.h
-@@ -420,6 +420,7 @@ typedef struct elf64_shdr {
- #define NT_ARM_HW_WATCH	0x403		/* ARM hardware watchpoint registers */
- #define NT_ARM_SYSTEM_CALL	0x404	/* ARM system call number */
- #define NT_ARM_SVE	0x405		/* ARM Scalable Vector Extension registers */
-+#define NT_ARM_PAC_MASK		0x406	/* ARM pointer authentication code masks */
- #define NT_ARC_V2	0x600		/* ARCv2 accumulator/extra registers */
- 
- /* Note header in a PT_NOTE section */
+ config ARM64_SVE
+ 	bool "ARM Scalable Vector Extension support"
+ 	default y
 -- 
 2.11.0
