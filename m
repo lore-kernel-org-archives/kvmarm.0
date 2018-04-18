@@ -1,52 +1,125 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCHv3 03/11] arm64/kvm: hide ptrauth from guests
-Date: Wed, 18 Apr 2018 14:47:30 +0100
-Message-ID: <20180418134729.fzu4r7rvgdzlckw7@lakrids.cambridge.arm.com>
-References: <20180417183735.56985-1-mark.rutland@arm.com>
- <20180417183735.56985-4-mark.rutland@arm.com>
- <20180418131926.pbjlbcjspg7azq2j@kamzik.brq.redhat.com>
+From: Souptick Joarder <jrdr.linux@gmail.com>
+Subject: [PATCH] kvm: Change return type to vm_fault_t
+Date: Thu, 19 Apr 2018 00:49:58 +0530
+Message-ID: <20180418191958.GA25806@jordon-HP-15-Notebook-PC>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180418131926.pbjlbcjspg7azq2j@kamzik.brq.redhat.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Andrew Jones <drjones@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, arnd@arndb.de, catalin.marinas@arm.com, cdall@kernel.org, kvmarm@lists.cs.columbia.edu, linux-arch@vger.kernel.org, marc.zyngier@arm.com, ramana.radhakrishnan@arm.com, suzuki.poulose@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, awallis@codeaurora.org, kernel-hardening@lists.openwall.com
+To: jhogan@kernel.org, ralf@linux-mips.org, paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au, borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, david@redhat.com, cohuck@redhat.com, schwidefsky@de.ibm.com, pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, christoffer.dall@linaro.org, marc.zyngier@arm.com
+Cc: linux-mips@linux-mips.org, linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, willy@infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Apr 18, 2018 at 03:19:26PM +0200, Andrew Jones wrote:
-> On Tue, Apr 17, 2018 at 07:37:27PM +0100, Mark Rutland wrote:
-> > @@ -1000,6 +1000,15 @@ static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
-> >  				    task_pid_nr(current));
-> >  
-> >  		val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
-> > +	} else if (id == SYS_ID_AA64ISAR1_EL1) {
-> > +		const u64 ptrauth_mask = (0xfUL << ID_AA64ISAR1_APA_SHIFT) |
-> > +					 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
-> > +					 (0xfUL << ID_AA64ISAR1_GPA_SHIFT) |
-> > +					 (0xfUL << ID_AA64ISAR1_GPI_SHIFT);
-> > +		if (val & ptrauth_mask)
-> > +			pr_err_once("kvm [%i]: ptrauth unsupported for guests, suppressing\n",
-> > +					task_pid_nr(current));
-> 
-> Marc just changed the equivalent SVE pr_err_once() to kvm_debug().
-> So we probably want to do the same here.
+Use new return type vm_fault_t for fault handler. For
+now, this is just documenting that the function returns
+a VM_FAULT value rather than an errno. Once all instances
+are converted, vm_fault_t will become a distinct type.
 
-Good point. Done.
+commit 1c8f422059ae ("mm: change return type to vm_fault_t")
 
-> > +		val &= ~ptrauth_mask;
-> >  	} else if (id == SYS_ID_AA64MMFR1_EL1) {
-> >  		if (val & (0xfUL << ID_AA64MMFR1_LOR_SHIFT))
-> >  			pr_err_once("kvm [%i]: LORegions unsupported for guests, suppressing\n",
-> > -- 
-> > 2.11.0
-> >
-> 
-> Otherwise
->  
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
+Signed-off-by: Souptick Joarder <jrdr.linux@gmail.com>
+Reviewed-by: Matthew Wilcox <mawilcox@microsoft.com>
+---
+ arch/mips/kvm/mips.c       | 2 +-
+ arch/powerpc/kvm/powerpc.c | 2 +-
+ arch/s390/kvm/kvm-s390.c   | 2 +-
+ arch/x86/kvm/x86.c         | 2 +-
+ include/linux/kvm_host.h   | 2 +-
+ virt/kvm/arm/arm.c         | 2 +-
+ virt/kvm/kvm_main.c        | 2 +-
+ 7 files changed, 7 insertions(+), 7 deletions(-)
 
-Cheers!
+diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+index 2549fdd..03e0e0f 100644
+--- a/arch/mips/kvm/mips.c
++++ b/arch/mips/kvm/mips.c
+@@ -1076,7 +1076,7 @@ int kvm_arch_vcpu_ioctl_set_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
+ 	return -ENOIOCTLCMD;
+ }
 
-Mark.
+-int kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
++vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
+ {
+ 	return VM_FAULT_SIGBUS;
+ }
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index 403e642..3099dee 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -1825,7 +1825,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 	return r;
+ }
+
+-int kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
++vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
+ {
+ 	return VM_FAULT_SIGBUS;
+ }
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index ba4c709..24af487 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -3941,7 +3941,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 	return r;
+ }
+
+-int kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
++vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
+ {
+ #ifdef CONFIG_KVM_S390_UCONTROL
+ 	if ((vmf->pgoff == KVM_S390_SIE_PAGE_OFFSET)
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c8a0b54..95d8102 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3827,7 +3827,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 	return r;
+ }
+
+-int kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
++vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
+ {
+ 	return VM_FAULT_SIGBUS;
+ }
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index ac0062b..8eeb062 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -736,7 +736,7 @@ long kvm_arch_dev_ioctl(struct file *filp,
+ 			unsigned int ioctl, unsigned long arg);
+ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 			 unsigned int ioctl, unsigned long arg);
+-int kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf);
++vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf);
+
+ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext);
+
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 86941f6..6c8cc31 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -163,7 +163,7 @@ int kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vcpu)
+ 	return 0;
+ }
+
+-int kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
++vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
+ {
+ 	return VM_FAULT_SIGBUS;
+ }
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 4501e65..45eb54b 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2341,7 +2341,7 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
+ }
+ EXPORT_SYMBOL_GPL(kvm_vcpu_on_spin);
+
+-static int kvm_vcpu_fault(struct vm_fault *vmf)
++static vm_fault_t kvm_vcpu_fault(struct vm_fault *vmf)
+ {
+ 	struct kvm_vcpu *vcpu = vmf->vma->vm_file->private_data;
+ 	struct page *page;
+--
+1.9.1
