@@ -1,49 +1,45 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: Clang arm64 build is broken
-Date: Fri, 20 Apr 2018 09:13:34 +0100
-Message-ID: <c61336a2-7c66-ea48-3daa-e644403d7a6e@arm.com>
-References: <CAAeHK+wDMH_G=3UuGOda2t0g4TH4TmDAeyG-ydJwg9vmThd3eQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+From: Punit Agrawal <punit.agrawal@arm.com>
+Subject: [PATCH 0/4] KVM: Support PUD hugepages at stage 2
+Date: Fri, 20 Apr 2018 15:54:05 +0100
+Message-ID: <20180420145409.24485-1-punit.agrawal@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAAeHK+wDMH_G=3UuGOda2t0g4TH4TmDAeyG-ydJwg9vmThd3eQ@mail.gmail.com>
-Content-Language: en-GB
 Sender: linux-kernel-owner@vger.kernel.org
-To: Andrey Konovalov <andreyknvl@google.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Linux ARM <linux-arm-kernel@lists.infradead.org>, kvmarm@lists.cs.columbia.edu, LKML <linux-kernel@vger.kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, Kostya Serebryany <kcc@google.com>, Dmitry Vyukov <dvyukov@google.com>, Alexander Potapenko <glider@google.com>
+To: kvmarm@lists.cs.columbia.edu
+Cc: Punit Agrawal <punit.agrawal@arm.com>, linux-arm-kernel@lists.infradead.org, marc.zyngier@arm.com, christoffer.dall@arm.com, linux-kernel@vger.kernel.org, suzuki.poulose@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Andrey.
+Hi,
 
-On 19/04/18 18:06, Andrey Konovalov wrote:
-> Hi Marc!
-> 
-> Your recent commit [1] broke clang build on arm64.
+This patchset adds support for PUD hugepages at stage 2. This feature
+is useful on cores that have support for large sized TLB mappings
+(e.g., 1GB for 4K granule). Previous posting[0].
 
-Or rather, it has uncovered yet another missing feature in clang! ;-)
+Support is added to code that is shared between arm and arm64. Dummy
+helpers for arm are provided as the port does not support PUD hugepage
+sizes.
 
-> The issue is that
-> clang doesn't know about the "S" asm constraint. I reported this to
-> clang [2], and hopefully this will get fixed. In the meantime, would
-> it possible to work around using the "S" constraint in the kernel?
-
-I have no idea, I've never used clang to build the kernel. Clang isn't
-really supported to build the arm64 kernel anyway (as you mention
-below), and working around clang deficiencies would mean that we leave
-with the workaround forever. I'd rather enable clang once it is at
-feature parity with GCC.
-
-> While we're here, regarding the other issue with kvm [3], I didn't
-> receive any comments as to whether it makes sense to send the fix that
-> adds -fno-jump-tables flag when building kvm with clang.
-
-Is that the only thing missing? Are you sure that there is no other way
-for clang to generate absolute addresses that will then lead to a crash?
-Again, I'd rather make sure we have the full picture.
+There is a small conflict with the series to add support for 52 bit
+IPA[1]. The patches have been functionally tested on an A57 based
+system. The patchset is based on v4.17-rc1.
 
 Thanks,
+Punit
 
-	M.
+[0] https://www.spinics.net/lists/arm-kernel/msg628053.html
+[1] https://lwn.net/Articles/750176/
+
+Punit Agrawal (4):
+  KVM: arm/arm64: Share common code in user_mem_abort()
+  KVM: arm/arm64: Introduce helpers to manupulate page table entries
+  KVM: arm64: Support dirty page tracking for PUD hugepages
+  KVM: arm64: Add support for PUD hugepages at stage 2
+
+ arch/arm/include/asm/kvm_mmu.h         | 40 ++++++++++++
+ arch/arm64/include/asm/kvm_mmu.h       | 30 +++++++++
+ arch/arm64/include/asm/pgtable-hwdef.h |  4 ++
+ arch/arm64/include/asm/pgtable.h       |  2 +
+ virt/kvm/arm/mmu.c                     | 84 +++++++++++++++++++-------
+ 5 files changed, 139 insertions(+), 21 deletions(-)
+
 -- 
-Jazz is not dead. It just smells funny...
+2.17.0
