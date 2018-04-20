@@ -1,66 +1,57 @@
-From: Andrey Konovalov <andreyknvl@google.com>
-Subject: [RFC PATCH v3 09/15] khwasan,
- mm: perform untagged pointers comparison in krealloc
-Date: Fri, 20 Apr 2018 16:46:47 +0200
-Message-ID: <c39de2d3dac5ff6f2aeb6519c144fb170c673b1a.1524235387.git.andreyknvl@google.com>
-References: <cover.1524235387.git.andreyknvl@google.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH 2/5] MAINTAINERS: Update e-mail address for Christoffer Dall
+Date: Fri, 20 Apr 2018 17:07:10 +0100
+Message-ID: <20180420160713.17884-3-marc.zyngier@arm.com>
+References: <20180420160713.17884-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 715B849FD6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Apr 2018 10:38:37 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GDTt7blJhD8k for <kvmarm@lists.cs.columbia.edu>;
- Fri, 20 Apr 2018 10:38:13 -0400 (EDT)
-Received: from mail-wr0-f195.google.com (mail-wr0-f195.google.com
- [209.85.128.195])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B50E54A084
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Apr 2018 10:38:05 -0400 (EDT)
-Received: by mail-wr0-f195.google.com with SMTP id m26-v6so5845071wrb.3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Apr 2018 07:47:17 -0700 (PDT)
-In-Reply-To: <cover.1524235387.git.andreyknvl@google.com>
-In-Reply-To: <cover.1524235387.git.andreyknvl@google.com>
-References: <cover.1524235387.git.andreyknvl@google.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Jonathan Corbet <corbet@lwn.net>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Christopher Li <sparse@chrisli.org>, Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Andrew Morton <akpm@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, "GitAuthor : Andrey Konovalov" <andreyknvl@google.com>, Mark Rutland <mark.rutland@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Yury Norov <ynorov@caviumnetworks.com>, Nick Desaulniers <ndesaulniers@google.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Kristina Martsenko <kristina.mar>
-Cc: Kees Cook <keescook@google.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Lee Smith <Lee.Smith@arm.com>, Kostya Serebryany <kcc@google.com>, Mark Brand <markbrand@google.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Evgeniy Stepanov <eugenis@google.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20180420160713.17884-1-marc.zyngier@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc: Mark Rutland <mark.rutland@arm.com>, Stefano Stabellini <sstabellini@kernel.org>, Christoffer Dall <cdall@kernel.org>, kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Shannon Zhao <zhaoshenglong@huawei.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The krealloc function checks where the same buffer was reused or a new one
-allocated by comparing kernel pointers. KHWASAN changes memory tag on the
-krealloc'ed chunk of memory and therefore also changes the pointer tag of
-the returned pointer. Therefore we need to perform comparison on untagged
-(with tags reset) pointers to check whether it's the same memory region or
-not.
+From: Christoffer Dall <christoffer.dall@arm.com>
 
-Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+Update my e-mail address to a working address.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- mm/slab_common.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ MAINTAINERS | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/mm/slab_common.c b/mm/slab_common.c
-index 0582004351c4..451b094b8c5b 100644
---- a/mm/slab_common.c
-+++ b/mm/slab_common.c
-@@ -1478,7 +1478,7 @@ void *krealloc(const void *p, size_t new_size, gfp_t flags)
- 	}
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 0a1410d5a621..3e9c99d2620b 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -7738,7 +7738,7 @@ F:	arch/x86/include/asm/svm.h
+ F:	arch/x86/kvm/svm.c
  
- 	ret = __do_krealloc(p, new_size, flags);
--	if (ret && p != ret)
-+	if (ret && khwasan_reset_tag(p) != khwasan_reset_tag(ret))
- 		kfree(p);
+ KERNEL VIRTUAL MACHINE FOR ARM (KVM/arm)
+-M:	Christoffer Dall <christoffer.dall@linaro.org>
++M:	Christoffer Dall <christoffer.dall@arm.com>
+ M:	Marc Zyngier <marc.zyngier@arm.com>
+ L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
+ L:	kvmarm@lists.cs.columbia.edu
+@@ -7752,7 +7752,7 @@ F:	virt/kvm/arm/
+ F:	include/kvm/arm_*
  
- 	return ret;
+ KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)
+-M:	Christoffer Dall <christoffer.dall@linaro.org>
++M:	Christoffer Dall <christoffer.dall@arm.com>
+ M:	Marc Zyngier <marc.zyngier@arm.com>
+ L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
+ L:	kvmarm@lists.cs.columbia.edu
 -- 
-2.17.0.484.g0c8726318c-goog
+2.14.2
