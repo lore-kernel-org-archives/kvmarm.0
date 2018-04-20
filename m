@@ -1,25 +1,29 @@
 From: Andrey Konovalov <andreyknvl@google.com>
-Subject: [RFC PATCH v3 00/15] khwasan: kernel hardware assisted address
- sanitizer
-Date: Fri, 20 Apr 2018 16:46:38 +0200
-Message-ID: <cover.1524235387.git.andreyknvl@google.com>
+Subject: [RFC PATCH v3 01/15] khwasan: move common kasan and khwasan code to
+ common.c
+Date: Fri, 20 Apr 2018 16:46:39 +0200
+Message-ID: <7352695daf7db78551bdd741936326da20e883ab.1524235387.git.andreyknvl@google.com>
+References: <cover.1524235387.git.andreyknvl@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 72A974A087
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Apr 2018 10:38:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5012B4A08D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Apr 2018 10:38:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dLYDDIYIetDu for <kvmarm@lists.cs.columbia.edu>;
- Fri, 20 Apr 2018 10:37:47 -0400 (EDT)
-Received: from mail-wr0-f194.google.com (mail-wr0-f194.google.com
- [209.85.128.194])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6AFC449FD8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Apr 2018 10:37:47 -0400 (EDT)
-Received: by mail-wr0-f194.google.com with SMTP id o15-v6so23685701wro.11
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Apr 2018 07:46:59 -0700 (PDT)
+ with ESMTP id 2SETkrSBo8vY for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 20 Apr 2018 10:37:50 -0400 (EDT)
+Received: from mail-wr0-f196.google.com (mail-wr0-f196.google.com
+ [209.85.128.196])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 02C0949FE0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Apr 2018 10:37:50 -0400 (EDT)
+Received: by mail-wr0-f196.google.com with SMTP id m26-v6so5843015wrb.3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Apr 2018 07:47:01 -0700 (PDT)
+In-Reply-To: <cover.1524235387.git.andreyknvl@google.com>
+In-Reply-To: <cover.1524235387.git.andreyknvl@google.com>
+References: <cover.1524235387.git.andreyknvl@google.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,150 +37,1134 @@ To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@googl
 Cc: Kees Cook <keescook@google.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Lee Smith <Lee.Smith@arm.com>, Kostya Serebryany <kcc@google.com>, Mark Brand <markbrand@google.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Evgeniy Stepanov <eugenis@google.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGkhIFRoaXMgaXMgdGhlIDNyZCBSRkMgdmVyc2lvbiBvZiB0aGUgcGF0Y2hzZXQuCgpUaGlzIHBh
-dGNoc2V0IGFkZHMgYSBuZXcgbW9kZSB0byBLQVNBTiBbMV0sIHdoaWNoIGlzIGNhbGxlZCBLSFdB
-U0FOCihLZXJuZWwgSGFyZFdhcmUgYXNzaXN0ZWQgQWRkcmVzcyBTQU5pdGl6ZXIpLiBUaGVyZSdz
-IHN0aWxsIHNvbWUgd29yayB0bwpkbyBhbmQgdGhlcmUgYXJlIGEgZmV3IFRPRE9zIGluIHRoZSBj
-b2RlLCBzbyBJJ20gcHVibGlzaGluZyB0aGlzIGFzIGFuIFJGQwp0byBjb2xsZWN0IHNvbWUgaW5p
-dGlhbCBmZWVkYmFjay4KClRoZSBwbGFuIGlzIHRvIGltcGxlbWVudCBIV0FTYW4gWzJdIGZvciB0
-aGUga2VybmVsIHdpdGggdGhlIGluY2VudGl2ZSwKdGhhdCBpdCdzIGdvaW5nIHRvIGhhdmUgY29t
-cGFyYWJsZSB0byBLQVNBTiBwZXJmb3JtYW5jZSwgYnV0IGluIHRoZSBzYW1lCnRpbWUgY29uc3Vt
-ZSBtdWNoIGxlc3MgbWVtb3J5LCB0cmFkaW5nIHRoYXQgb2ZmIGZvciBzb21ld2hhdCBpbXByZWNp
-c2UKYnVnIGRldGVjdGlvbiBhbmQgYmVpbmcgc3VwcG9ydGVkIG9ubHkgZm9yIGFybTY0LgoKVGhl
-IG92ZXJhbGwgaWRlYSBvZiB0aGUgYXBwcm9hY2ggdXNlZCBieSBLSFdBU0FOIGlzIHRoZSBmb2xs
-b3dpbmc6CgoxLiBCeSB1c2luZyB0aGUgVG9wIEJ5dGUgSWdub3JlIGFybTY0IENQVSBmZWF0dXJl
-LCB3ZSBjYW4gc3RvcmUgcG9pbnRlcgogICB0YWdzIGluIHRoZSB0b3AgYnl0ZSBvZiBlYWNoIGtl
-cm5lbCBwb2ludGVyLgoKMi4gVXNpbmcgc2hhZG93IG1lbW9yeSwgd2UgY2FuIHN0b3JlIG1lbW9y
-eSB0YWdzIGZvciBlYWNoIGNodW5rIG9mIGtlcm5lbAogICBtZW1vcnkuCgozLiBPbiBlYWNoIG1l
-bW9yeSBhbGxvY2F0aW9uLCB3ZSBjYW4gZ2VuZXJhdGUgYSByYW5kb20gdGFnLCBlbWJlZCBpdCBp
-bnRvCiAgIHRoZSByZXR1cm5lZCBwb2ludGVyIGFuZCBzZXQgdGhlIG1lbW9yeSB0YWdzIHRoYXQg
-Y29ycmVzcG9uZCB0byB0aGlzCiAgIGNodW5rIG9mIG1lbW9yeSB0byB0aGUgc2FtZSB2YWx1ZS4K
-CjQuIEJ5IHVzaW5nIGNvbXBpbGVyIGluc3RydW1lbnRhdGlvbiwgYmVmb3JlIGVhY2ggbWVtb3J5
-IGFjY2VzcyB3ZSBjYW4gYWRkCiAgIGEgY2hlY2sgdGhhdCB0aGUgcG9pbnRlciB0YWcgbWF0Y2hl
-cyB0aGUgdGFnIG9mIHRoZSBtZW1vcnkgdGhhdCBpcyBiZWluZwogICBhY2Nlc3NlZC4KCjUuIE9u
-IGEgdGFnIG1pc21hdGNoIHdlIHJlcG9ydCBhbiBlcnJvci4KClsxXSBodHRwczovL3d3dy5rZXJu
-ZWwub3JnL2RvYy9odG1sL2xhdGVzdC9kZXYtdG9vbHMva2FzYW4uaHRtbAoKWzJdIGh0dHA6Ly9j
-bGFuZy5sbHZtLm9yZy9kb2NzL0hhcmR3YXJlQXNzaXN0ZWRBZGRyZXNzU2FuaXRpemVyRGVzaWdu
-Lmh0bWwKCgo9PT09PT0gVGVjaG5pY2FsIGRldGFpbHMKCktIV0FTQU4gaXMgaW1wbGVtZW50ZWQg
-aW4gYSB2ZXJ5IHNpbWlsYXIgd2F5IHRvIEtBU0FOLiBUaGlzIHBhdGNoc2V0CmVzc2VudGlhbGx5
-IGRvZXMgdGhlIGZvbGxvd2luZzoKCjEuIFRDUl9UQkkxIGlzIHNldCB0byBlbmFibGUgVG9wIEJ5
-dGUgSWdub3JlLgoKMi4gU2hhZG93IG1lbW9yeSBpcyB1c2VkICh3aXRoIGEgZGlmZmVyZW50IHNj
-YWxlLCAxOjE2LCBzbyBlYWNoIHNoYWRvdwogICBieXRlIGNvcnJlc3BvbmRzIHRvIDE2IGJ5dGVz
-IG9mIGtlcm5lbCBtZW1vcnkpIHRvIHN0b3JlIG1lbW9yeSB0YWdzLgoKMy4gQWxsIHNsYWIgb2Jq
-ZWN0cyBhcmUgYWxpZ25lZCB0byBzaGFkb3cgc2NhbGUsIHdoaWNoIGlzIDE2IGJ5dGVzLgoKNC4g
-QWxsIHBvaW50ZXJzIHJldHVybmVkIGZyb20gdGhlIHNsYWIgYWxsb2NhdG9yIGFyZSB0YWdnZWQg
-d2l0aCBhIHJhbmRvbQogICB0YWcgYW5kIHRoZSBjb3JyZXNwb25kaW5nIHNoYWRvdyBtZW1vcnkg
-aXMgcG9pc29uZWQgd2l0aCB0aGUgc2FtZSB2YWx1ZS4KCjUuIENvbXBpbGVyIGluc3RydW1lbnRh
-dGlvbiBpcyB1c2VkIHRvIGluc2VydCB0YWcgY2hlY2tzLiBFaXRoZXIgYnkKICAgY2FsbGluZyBj
-YWxsYmFja3Mgb3IgYnkgaW5saW5pbmcgdGhlbSAoQ09ORklHX0tBU0FOX09VVExJTkUgYW5kCiAg
-IENPTkZJR19LQVNBTl9JTkxJTkUgZmxhZ3MgYXJlIHJldXNlZCkuCgo2LiBXaGVuIGEgdGFnIG1p
-c21hdGNoIGlzIGRldGVjdGVkIGluIGNhbGxiYWNrIGluc3RydW1lbnRhdGlvbiBtb2RlCiAgIEtI
-V0FTQU4gc2ltcGx5IHByaW50cyBhIGJ1ZyByZXBvcnQuIEluIGNhc2Ugb2YgaW5saW5lIGluc3Ry
-dW1lbnRhdGlvbiwKICAgY2xhbmcgaW5zZXJ0cyBhIGJyayBpbnN0cnVjdGlvbiwgYW5kIEtIV0FT
-QU4gaGFzIGl0J3Mgb3duIGJyayBoYW5kbGVyLAogICB3aGljaCByZXBvcnRzIHRoZSBidWcuCgo3
-LiBUaGUgbWVtb3J5IGluIGJldHdlZW4gc2xhYiBvYmplY3RzIGlzIG1hcmtlZCB3aXRoIGEgcmVz
-ZXJ2ZWQgdGFnLCBhbmQKICAgYWN0cyBhcyBhIHJlZHpvbmUuCgo4LiBXaGVuIGEgc2xhYiBvYmpl
-Y3QgaXMgZnJlZWQgaXQncyBtYXJrZWQgd2l0aCBhIHJlc2VydmVkIHRhZy4KCkJ1ZyBkZXRlY3Rp
-b24gaXMgaW1wcmVjaXNlIGZvciB0d28gcmVhc29uczoKCjEuIFdlIHdvbid0IGNhdGNoIHNvbWUg
-c21hbGwgb3V0LW9mLWJvdW5kcyBhY2Nlc3NlcywgdGhhdCBmYWxsIGludG8gdGhlCiAgIHNhbWUg
-c2hhZG93IGNlbGwsIGFzIHRoZSBsYXN0IGJ5dGUgb2YgYSBzbGFiIG9iamVjdC4KCjIuIFdlIG9u
-bHkgaGF2ZSAxIGJ5dGUgdG8gc3RvcmUgdGFncywgd2hpY2ggbWVhbnMgd2UgaGF2ZSBhIDEvMjU2
-CiAgIHByb2JhYmlsaXR5IG9mIGEgdGFnIG1hdGNoIGZvciBhbiBpbmNvcnJlY3QgYWNjZXNzIChh
-Y3R1YWxseSBldmVuCiAgIHNsaWdodGx5IGxlc3MgZHVlIHRvIHJlc2VydmVkIHRhZyB2YWx1ZXMp
-LgoKCj09PT09PSBCZW5jaG1hcmtzCgpUaGUgZm9sbG93aW5nIG51bWJlcnMgd2VyZSBjb2xsZWN0
-ZWQgb24gT2Ryb2lkIEMyIGJvYXJkLiBCb3RoIEtBU0FOIGFuZApLSFdBU0FOIHdlcmUgdXNlZCBp
-biBpbmxpbmUgaW5zdHJ1bWVudGF0aW9uIG1vZGUuIFRoZXNlIGFyZSB0aGUgbnVtYmVycwpJIGdv
-dCB3aXRoIHRoZSBjdXJyZW50IHByb3RvdHlwZSBhbmQgdGhleSBtaWdodCBjaGFuZ2UuCgpCb290
-IHRpbWUgWzFdOgoqIH40LjUgc2VjIGZvciBjbGVhbiBrZXJuZWwKKiB+NS4wIHNlYyBmb3IgS0FT
-QU4KKiB+NS4xIHNlYyBmb3IgS0hXQVNBTgoKU2xhYiBtZW1vcnkgdXNhZ2UgYWZ0ZXIgYm9vdCBb
-Ml06CiogfjMyIGtiIGZvciBjbGVhbiBrZXJuZWwKKiB+OTUga2IgKyAxLzh0aCBzaGFkb3cgfj0g
-MTA3IGtiIGZvciBLQVNBTgoqIH4zOCBrYiArIDEvMTZ0aCBzaGFkb3cgfj0gNDAga2IgZm9yIEtI
-V0FTQU4KCk5ldHdvcmsgcGVyZm9ybWFuY2UgWzNdOgoqIDExLjkgR2JpdHMvc2VjIGZvciBjbGVh
-biBrZXJuZWwKKiAzLjA4IEdiaXRzL3NlYyBmb3IgS0FTQU4KKiAzLjAyIEdiaXRzL3NlYyBmb3Ig
-S0hXQVNBTgoKTm90ZSwgdGhhdCBLSFdBU0FOIChjb21wYXJlZCB0byBLQVNBTikgZG9lc24ndCBy
-ZXF1aXJlIHF1YXJhbnRpbmUuCgpbMV0gVGltZSBiZWZvcmUgdGhlIGV4dDQgZHJpdmVyIGlzIGlu
-aXRpYWxpemVkLgpbMl0gTWVhc3VyZWQgYXMgYGNhdCAvcHJvYy9tZW1pbmZvIHwgZ3JlcCBTbGFi
-YC4KWzNdIE1lYXN1cmVkIGFzIGBpcGVyZiAtcyAmIGlwZXJmIC1jIDEyNy4wLjAuMSAtdCAzMGAu
-CgoKPT09PT09IFNvbWUgbm90ZXMKCkEgZmV3IG5vdGVzOgoKMS4gVGhlIHBhdGNoc2V0IGNhbiBi
-ZSBmb3VuZCBoZXJlOgogICBodHRwczovL2dpdGh1Yi5jb20veGFpcnkva2FzYW4tcHJvdG90eXBl
-L3RyZWUva2h3YXNhbgoKMi4gQnVpbGRpbmcgcmVxdWlyZXMgYSByZWNlbnQgTExWTSB2ZXJzaW9u
-IChyMzMwMDQ0IG9yIGxhdGVyKS4KCjMuIFN0YWNrIGluc3RydW1lbnRhdGlvbiBpcyBub3Qgc3Vw
-cG9ydGVkIHlldCAoaW4gcHJvZ3Jlc3MpLgoKNC4gVGhlcmUgYXJlIHN0aWxsIGEgZmV3IFRPRE9z
-IGluIHRoZSBjb2RlLCB0aGF0IG5lZWQgdG8gYmUgYWRkcmVzc2VkLgoKCj09PT09PSBDaGFuZ2Vz
-CgpDaGFuZ2VzIGluIFJGQyB2MzoKLSBSZW5hbWVkIENPTkZJR19LQVNBTl9DTEFTU0lDIGFuZCBD
-T05GSUdfS0FTQU5fVEFHUyB0bwogIENPTkZJR19LQVNBTl9HRU5FUklDIGFuZCBDT05GSUdfS0FT
-QU5fSFcgcmVzcGVjdGl2ZWx5LgotIFN3aXRjaCB0byAtZnNhbml0aXplPWtlcm5lbC1od2FkZHJl
-c3MgaW5zdGVhZCBvZiAtZnNhbml0aXplPWh3YWRkcmVzcy4KLSBSZW1vdmVkIHVubmVjZXNzYXJ5
-IGV4Y2Vzc2l2ZSBzaGFkb3cgaW5pdGlhbGl6YXRpb24uCi0gUmVtb3ZlZCBraHdhc2FuX2VuYWJs
-ZWQgZmxhZyAoaXTigJlzIG5vdCBuZWVkZWQgc2luY2UgS0hXQVNBTiBpcwogIGluaXRpYWxpemVk
-IGJlZm9yZSBhbnkgc2xhYiBjYWNoZXMgYXJlIHVzZWQpLgotIFNwbGl0IG91dCBrYXNhbl9yZXBv
-cnQuYyBhbmQga2h3YXNhbl9yZXBvcnQuYyBmcm9tIHJlcG9ydC5jLgotIE1vdmVkIG1vcmUgY29t
-bW9uIEtBU0FOIGFuZCBLSFdBU0FOIGZ1bmN0aW9ucyB0byBjb21tb24uYy4KLSBBZGRlZCB0YWdn
-aW5nIHRvIHBhZ2VhbGxvYy4KLSBSZWJhc2VkIG9udG8gNC4xNy1yYzEuCi0gVGVtcG9yYXJpbHkg
-ZHJvcHBlZCBwYXRjaCB0aGF0IGFkZHMga3ZtIHN1cHBvcnQgKGFybTY0ICsga3ZtICsgY2xhbmcK
-ICBjb21ibyBpcyBicm9rZW4gcmlnaHQgbm93IChodHRwczovL2xrbWwub3JnL2xrbWwvMjAxOC80
-LzE5Lzc3NSkpLgoKQ2hhbmdlcyBpbiBSRkMgdjI6Ci0gUmVtb3ZlZCBleHBsaWNpdCBjYXN0cyB0
-byB1OCAqIGZvciBrYXNhbl9tZW1fdG9fc2hhZG93KCkgY2FsbHMuCi0gSW50cm9kdWNlZCBLQVNB
-Tl9UQ1JfRkxBR1MgZm9yIHNldHRpbmcgdGhlIFRDUl9UQkkxIGZsYWcuCi0gQWRkZWQgYSBjb21t
-ZW50IHJlZ2FyZGluZyB0aGUgbm9uLWF0b21pYyBSTVcgc2VxdWVuY2UgaW4KICBraHdhc2FuX3Jh
-bmRvbV90YWcoKS4KLSBNYWRlIGFsbCB0YWcgcmVsYXRlZCBmdW5jdGlvbnMgYWNjZXB0IGNvbnN0
-IHZvaWQgKi4KLSBVbnRhZ2dlZCBwb2ludGVycyBpbiBfX2tpbWdfdG9fcGh5cywgd2hpY2ggaXMg
-dXNlZCBieSB2aXJ0X3RvX3BoeXMuCi0gVW50YWdnZWQgcG9pbnRlcnMgaW4gc2hvd19wdHIgaW4g
-ZmF1bHQgaGFuZGxpbmcgbG9naWMuCi0gVW50YWdnZWQgcG9pbnRlcnMgcGFzc2VkIHRvIEtWTS4K
-LSBBZGRlZCB0d28gcmVzZXJ2ZWQgdGFnIHZhbHVlczogMHhGRiBhbmQgMHhGRS4KLSBVc2VkIHRo
-ZSByZXNlcnZlZCB0YWcgMHhGRiB0byBkaXNhYmxlIHZhbGlkaXR5IGNoZWNraW5nICh0byByZXNv
-bHZlIHRoZQogIGlzc3VlIHdpdGggcG9pbnRlciB0YWcgYmVpbmcgbG9zdCBhZnRlciBwYWdlX2Fk
-ZHJlc3MgKyBrbWFwIHVzYWdlKS4KLSBVc2VkIHRoZSByZXNlcnZlZCB0YWcgMHhGRSB0byBtYXJr
-IHJlZHpvbmVzIGFuZCBmcmVlZCBvYmplY3RzLgotIEFkZGVkIG1uZW1vbmljcyBmb3IgZXNyIG1h
-bmlwdWxhdGlvbiBpbiBLSFdBU0FOIGJyayBoYW5kbGVyLgotIEFkZGVkIGEgY29tbWVudCBhYm91
-dCB0aGUgLXJlY292ZXIgZmxhZy4KLSBTb21lIG1pbm9yIGNsZWFudXBzIGFuZCBmaXhlcy4KLSBS
-ZWJhc2VkIG9udG8gMzIxNWI5ZDUgKDQuMTYtcmM2KykuCi0gVGVzdGVkIG9uIHJlYWwgaGFyZHdh
-cmUgKE9kcm9pZCBDMiBib2FyZCkuCi0gQWRkZWQgYmV0dGVyIGJlbmNobWFya3MuCgpBbmRyZXkg
-S29ub3ZhbG92ICgxNSk6CiAga2h3YXNhbjogbW92ZSBjb21tb24ga2FzYW4gYW5kIGtod2FzYW4g
-Y29kZSB0byBjb21tb24uYwogIGtod2FzYW46IGFkZCBDT05GSUdfS0FTQU5fR0VORVJJQyBhbmQg
-Q09ORklHX0tBU0FOX0hXCiAga2h3YXNhbiwgYXJtNjQ6IGFkanVzdCBzaGFkb3cgc2l6ZSBmb3Ig
-Q09ORklHX0tBU0FOX0hXCiAga2h3YXNhbjogaW5pdGlhbGl6ZSBzaGFkb3cgdG8gMHhmZgogIGto
-d2FzYW4sIGFybTY0OiB1bnRhZyB2aXJ0IGFkZHJlc3MgaW4gX19raW1nX3RvX3BoeXMKICBraHdh
-c2FuLCBhcm02NDogZml4IHVwIGZhdWx0IGhhbmRsaW5nIGxvZ2ljCiAga2h3YXNhbjogYWRkIHRh
-ZyByZWxhdGVkIGhlbHBlciBmdW5jdGlvbnMKICBraHdhc2FuLCBhcm02NDogZW5hYmxlIHRvcCBi
-eXRlIGlnbm9yZSBmb3IgdGhlIGtlcm5lbAogIGtod2FzYW4sIG1tOiBwZXJmb3JtIHVudGFnZ2Vk
-IHBvaW50ZXJzIGNvbXBhcmlzb24gaW4ga3JlYWxsb2MKICBraHdhc2FuOiBzcGxpdCBvdXQga2Fz
-YW5fcmVwb3J0LmMgZnJvbSByZXBvcnQuYwogIGtod2FzYW46IGFkZCBidWcgcmVwb3J0aW5nIHJv
-dXRpbmVzCiAga2h3YXNhbjogYWRkIGhvb2tzIGltcGxlbWVudGF0aW9uCiAga2h3YXNhbiwgYXJt
-NjQ6IGFkZCBicmsgaGFuZGxlciBmb3IgaW5saW5lIGluc3RydW1lbnRhdGlvbgogIGtod2FzYW4s
-IG1tLCBhcm02NDogdGFnIG5vbiBzbGFiIG1lbW9yeSBhbGxvY2F0ZWQgdmlhIHBhZ2VhbGxvYwog
-IGtod2FzYW46IHVwZGF0ZSBrYXNhbiBkb2N1bWVudGF0aW9uCgogRG9jdW1lbnRhdGlvbi9kZXYt
-dG9vbHMva2FzYW4ucnN0ICAgICAgfCAyMTIgKysrKystLS0tCiBhcmNoL2FybTY0L0tjb25maWcg
-ICAgICAgICAgICAgICAgICAgICB8ICAgMSArCiBhcmNoL2FybTY0L01ha2VmaWxlICAgICAgICAg
-ICAgICAgICAgICB8ICAgMiArLQogYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9icmstaW1tLmggICAg
-ICAgfCAgIDIgKwogYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9tZW1vcnkuaCAgICAgICAgfCAgMzUg
-Ky0KIGFyY2gvYXJtNjQvaW5jbHVkZS9hc20vcGd0YWJsZS1od2RlZi5oIHwgICAxICsKIGFyY2gv
-YXJtNjQva2VybmVsL3RyYXBzLmMgICAgICAgICAgICAgIHwgIDY5ICsrLQogYXJjaC9hcm02NC9t
-bS9mYXVsdC5jICAgICAgICAgICAgICAgICAgfCAgIDMgKwogYXJjaC9hcm02NC9tbS9rYXNhbl9p
-bml0LmMgICAgICAgICAgICAgfCAgMTggKy0KIGFyY2gvYXJtNjQvbW0vcHJvYy5TICAgICAgICAg
-ICAgICAgICAgIHwgICA4ICstCiBpbmNsdWRlL2xpbnV4L2NvbXBpbGVyLWNsYW5nLmggICAgICAg
-ICB8ICAgNSArLQogaW5jbHVkZS9saW51eC9jb21waWxlci1nY2MuaCAgICAgICAgICAgfCAgIDQg
-KwogaW5jbHVkZS9saW51eC9jb21waWxlci5oICAgICAgICAgICAgICAgfCAgIDMgKy0KIGluY2x1
-ZGUvbGludXgva2FzYW4uaCAgICAgICAgICAgICAgICAgIHwgIDUwICsrLQogaW5jbHVkZS9saW51
-eC9tbS5oICAgICAgICAgICAgICAgICAgICAgfCAgMjkgKysKIGluY2x1ZGUvbGludXgvcGFnZS1m
-bGFncy1sYXlvdXQuaCAgICAgIHwgIDEwICsKIGxpYi9LY29uZmlnLmthc2FuICAgICAgICAgICAg
-ICAgICAgICAgIHwgIDY4ICsrLQogbW0vY21hLmMgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgfCAgIDEgKwogbW0va2FzYW4vTWFrZWZpbGUgICAgICAgICAgICAgICAgICAgICAgfCAgIDkg
-Ky0KIG1tL2thc2FuL2NvbW1vbi5jICAgICAgICAgICAgICAgICAgICAgIHwgNTc2ICsrKysrKysr
-KysrKysrKysrKysrKysrKysKIG1tL2thc2FuL2thc2FuLmMgICAgICAgICAgICAgICAgICAgICAg
-IHwgNDkzICstLS0tLS0tLS0tLS0tLS0tLS0tLQogbW0va2FzYW4va2FzYW4uaCAgICAgICAgICAg
-ICAgICAgICAgICAgfCAgOTQgKysrLQogbW0va2FzYW4va2FzYW5fcmVwb3J0LmMgICAgICAgICAg
-ICAgICAgfCAxNTUgKysrKysrKwogbW0va2FzYW4va2h3YXNhbi5jICAgICAgICAgICAgICAgICAg
-ICAgfCAxNjMgKysrKysrKwogbW0va2FzYW4va2h3YXNhbl9yZXBvcnQuYyAgICAgICAgICAgICAg
-fCAgNjAgKysrCiBtbS9rYXNhbi9yZXBvcnQuYyAgICAgICAgICAgICAgICAgICAgICB8IDI3MSAr
-KysrLS0tLS0tLS0KIG1tL3BhZ2VfYWxsb2MuYyAgICAgICAgICAgICAgICAgICAgICAgIHwgICAx
-ICsKIG1tL3NsYWJfY29tbW9uLmMgICAgICAgICAgICAgICAgICAgICAgIHwgICAyICstCiBtbS9z
-bHViLmMgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAgMiArLQogc2NyaXB0cy9NYWtl
-ZmlsZS5rYXNhbiAgICAgICAgICAgICAgICAgfCAgMjcgKy0KIDMwIGZpbGVzIGNoYW5nZWQsIDE1
-NTggaW5zZXJ0aW9ucygrKSwgODE2IGRlbGV0aW9ucygtKQogY3JlYXRlIG1vZGUgMTAwNjQ0IG1t
-L2thc2FuL2NvbW1vbi5jCiBjcmVhdGUgbW9kZSAxMDA2NDQgbW0va2FzYW4va2FzYW5fcmVwb3J0
-LmMKIGNyZWF0ZSBtb2RlIDEwMDY0NCBtbS9rYXNhbi9raHdhc2FuLmMKIGNyZWF0ZSBtb2RlIDEw
-MDY0NCBtbS9rYXNhbi9raHdhc2FuX3JlcG9ydC5jCgotLSAKMi4xNy4wLjQ4NC5nMGM4NzI2MzE4
-Yy1nb29nCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpr
-dm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9s
-aXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+KHWASAN will reuse a significant part of KASAN code, so move the common
+parts to common.c without any functional changes.
+
+Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+---
+ mm/kasan/Makefile |   5 +-
+ mm/kasan/common.c | 524 ++++++++++++++++++++++++++++++++++++++++++++++
+ mm/kasan/kasan.c  | 493 +------------------------------------------
+ mm/kasan/kasan.h  |   6 +
+ 4 files changed, 537 insertions(+), 491 deletions(-)
+ create mode 100644 mm/kasan/common.c
+
+diff --git a/mm/kasan/Makefile b/mm/kasan/Makefile
+index 3289db38bc87..a6df14bffb6b 100644
+--- a/mm/kasan/Makefile
++++ b/mm/kasan/Makefile
+@@ -1,11 +1,14 @@
+ # SPDX-License-Identifier: GPL-2.0
+ KASAN_SANITIZE := n
++UBSAN_SANITIZE_common.o := n
+ UBSAN_SANITIZE_kasan.o := n
+ KCOV_INSTRUMENT := n
+ 
+ CFLAGS_REMOVE_kasan.o = -pg
+ # Function splitter causes unnecessary splits in __asan_load1/__asan_store1
+ # see: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=63533
++
++CFLAGS_common.o := $(call cc-option, -fno-conserve-stack -fno-stack-protector)
+ CFLAGS_kasan.o := $(call cc-option, -fno-conserve-stack -fno-stack-protector)
+ 
+-obj-y := kasan.o report.o kasan_init.o quarantine.o
++obj-y := common.o kasan.o report.o kasan_init.o quarantine.o
+diff --git a/mm/kasan/common.c b/mm/kasan/common.c
+new file mode 100644
+index 000000000000..ebb48415e4cf
+--- /dev/null
++++ b/mm/kasan/common.c
+@@ -0,0 +1,524 @@
++/*
++ * This file contains common KASAN and KHWASAN code.
++ *
++ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
++ * Author: Andrey Ryabinin <ryabinin.a.a@gmail.com>
++ *
++ * Some code borrowed from https://github.com/xairy/kasan-prototype by
++ *        Andrey Konovalov <andreyknvl@gmail.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ */
++
++#include <linux/export.h>
++#include <linux/interrupt.h>
++#include <linux/init.h>
++#include <linux/kasan.h>
++#include <linux/kernel.h>
++#include <linux/kmemleak.h>
++#include <linux/linkage.h>
++#include <linux/memblock.h>
++#include <linux/memory.h>
++#include <linux/mm.h>
++#include <linux/module.h>
++#include <linux/printk.h>
++#include <linux/sched.h>
++#include <linux/sched/task_stack.h>
++#include <linux/slab.h>
++#include <linux/stacktrace.h>
++#include <linux/string.h>
++#include <linux/types.h>
++#include <linux/vmalloc.h>
++#include <linux/bug.h>
++
++#include "kasan.h"
++#include "../slab.h"
++
++static inline int in_irqentry_text(unsigned long ptr)
++{
++	return (ptr >= (unsigned long)&__irqentry_text_start &&
++		ptr < (unsigned long)&__irqentry_text_end) ||
++		(ptr >= (unsigned long)&__softirqentry_text_start &&
++		 ptr < (unsigned long)&__softirqentry_text_end);
++}
++
++static inline void filter_irq_stacks(struct stack_trace *trace)
++{
++	int i;
++
++	if (!trace->nr_entries)
++		return;
++	for (i = 0; i < trace->nr_entries; i++)
++		if (in_irqentry_text(trace->entries[i])) {
++			/* Include the irqentry function into the stack. */
++			trace->nr_entries = i + 1;
++			break;
++		}
++}
++
++static inline depot_stack_handle_t save_stack(gfp_t flags)
++{
++	unsigned long entries[KASAN_STACK_DEPTH];
++	struct stack_trace trace = {
++		.nr_entries = 0,
++		.entries = entries,
++		.max_entries = KASAN_STACK_DEPTH,
++		.skip = 0
++	};
++
++	save_stack_trace(&trace);
++	filter_irq_stacks(&trace);
++	if (trace.nr_entries != 0 &&
++	    trace.entries[trace.nr_entries-1] == ULONG_MAX)
++		trace.nr_entries--;
++
++	return depot_save_stack(&trace, flags);
++}
++
++void set_track(struct kasan_track *track, gfp_t flags)
++{
++	track->pid = current->pid;
++	track->stack = save_stack(flags);
++}
++
++void kasan_enable_current(void)
++{
++	current->kasan_depth++;
++}
++
++void kasan_disable_current(void)
++{
++	current->kasan_depth--;
++}
++
++void kasan_check_read(const volatile void *p, unsigned int size)
++{
++	check_memory_region((unsigned long)p, size, false, _RET_IP_);
++}
++EXPORT_SYMBOL(kasan_check_read);
++
++void kasan_check_write(const volatile void *p, unsigned int size)
++{
++	check_memory_region((unsigned long)p, size, true, _RET_IP_);
++}
++EXPORT_SYMBOL(kasan_check_write);
++
++#undef memset
++void *memset(void *addr, int c, size_t len)
++{
++	check_memory_region((unsigned long)addr, len, true, _RET_IP_);
++
++	return __memset(addr, c, len);
++}
++
++#undef memmove
++void *memmove(void *dest, const void *src, size_t len)
++{
++	check_memory_region((unsigned long)src, len, false, _RET_IP_);
++	check_memory_region((unsigned long)dest, len, true, _RET_IP_);
++
++	return __memmove(dest, src, len);
++}
++
++#undef memcpy
++void *memcpy(void *dest, const void *src, size_t len)
++{
++	check_memory_region((unsigned long)src, len, false, _RET_IP_);
++	check_memory_region((unsigned long)dest, len, true, _RET_IP_);
++
++	return __memcpy(dest, src, len);
++}
++
++/*
++ * Poisons the shadow memory for 'size' bytes starting from 'addr'.
++ * Memory addresses should be aligned to KASAN_SHADOW_SCALE_SIZE.
++ */
++void kasan_poison_shadow(const void *address, size_t size, u8 value)
++{
++	void *shadow_start, *shadow_end;
++
++	shadow_start = kasan_mem_to_shadow(address);
++	shadow_end = kasan_mem_to_shadow(address + size);
++
++	__memset(shadow_start, value, shadow_end - shadow_start);
++}
++
++void kasan_unpoison_shadow(const void *address, size_t size)
++{
++	kasan_poison_shadow(address, size, 0);
++
++	if (size & KASAN_SHADOW_MASK) {
++		u8 *shadow = (u8 *)kasan_mem_to_shadow(address + size);
++		*shadow = size & KASAN_SHADOW_MASK;
++	}
++}
++
++static void __kasan_unpoison_stack(struct task_struct *task, const void *sp)
++{
++	void *base = task_stack_page(task);
++	size_t size = sp - base;
++
++	kasan_unpoison_shadow(base, size);
++}
++
++/* Unpoison the entire stack for a task. */
++void kasan_unpoison_task_stack(struct task_struct *task)
++{
++	__kasan_unpoison_stack(task, task_stack_page(task) + THREAD_SIZE);
++}
++
++/* Unpoison the stack for the current task beyond a watermark sp value. */
++asmlinkage void kasan_unpoison_task_stack_below(const void *watermark)
++{
++	/*
++	 * Calculate the task stack base address.  Avoid using 'current'
++	 * because this function is called by early resume code which hasn't
++	 * yet set up the percpu register (%gs).
++	 */
++	void *base = (void *)((unsigned long)watermark & ~(THREAD_SIZE - 1));
++
++	kasan_unpoison_shadow(base, watermark - base);
++}
++
++/*
++ * Clear all poison for the region between the current SP and a provided
++ * watermark value, as is sometimes required prior to hand-crafted asm function
++ * returns in the middle of functions.
++ */
++void kasan_unpoison_stack_above_sp_to(const void *watermark)
++{
++	const void *sp = __builtin_frame_address(0);
++	size_t size = watermark - sp;
++
++	if (WARN_ON(sp > watermark))
++		return;
++	kasan_unpoison_shadow(sp, size);
++}
++
++void kasan_alloc_pages(struct page *page, unsigned int order)
++{
++	if (likely(!PageHighMem(page)))
++		kasan_unpoison_shadow(page_address(page), PAGE_SIZE << order);
++}
++
++void kasan_free_pages(struct page *page, unsigned int order)
++{
++	if (likely(!PageHighMem(page)))
++		kasan_poison_shadow(page_address(page),
++				PAGE_SIZE << order,
++				KASAN_FREE_PAGE);
++}
++
++void kasan_cache_create(struct kmem_cache *cache, unsigned int *size,
++			slab_flags_t *flags)
++{
++	unsigned int orig_size = *size;
++	int redzone_adjust;
++
++	/* Add alloc meta. */
++	cache->kasan_info.alloc_meta_offset = *size;
++	*size += sizeof(struct kasan_alloc_meta);
++
++	/* Add free meta. */
++	if (cache->flags & SLAB_TYPESAFE_BY_RCU || cache->ctor ||
++	    cache->object_size < sizeof(struct kasan_free_meta)) {
++		cache->kasan_info.free_meta_offset = *size;
++		*size += sizeof(struct kasan_free_meta);
++	}
++	redzone_adjust = optimal_redzone(cache->object_size) -
++		(*size - cache->object_size);
++
++	if (redzone_adjust > 0)
++		*size += redzone_adjust;
++
++	*size = min_t(unsigned int, KMALLOC_MAX_SIZE,
++			max(*size, cache->object_size +
++					optimal_redzone(cache->object_size)));
++
++	/*
++	 * If the metadata doesn't fit, don't enable KASAN at all.
++	 */
++	if (*size <= cache->kasan_info.alloc_meta_offset ||
++			*size <= cache->kasan_info.free_meta_offset) {
++		cache->kasan_info.alloc_meta_offset = 0;
++		cache->kasan_info.free_meta_offset = 0;
++		*size = orig_size;
++		return;
++	}
++
++	*flags |= SLAB_KASAN;
++}
++
++size_t kasan_metadata_size(struct kmem_cache *cache)
++{
++	return (cache->kasan_info.alloc_meta_offset ?
++		sizeof(struct kasan_alloc_meta) : 0) +
++		(cache->kasan_info.free_meta_offset ?
++		sizeof(struct kasan_free_meta) : 0);
++}
++
++struct kasan_alloc_meta *get_alloc_info(struct kmem_cache *cache,
++					const void *object)
++{
++	BUILD_BUG_ON(sizeof(struct kasan_alloc_meta) > 32);
++	return (void *)object + cache->kasan_info.alloc_meta_offset;
++}
++
++struct kasan_free_meta *get_free_info(struct kmem_cache *cache,
++				      const void *object)
++{
++	BUILD_BUG_ON(sizeof(struct kasan_free_meta) > 32);
++	return (void *)object + cache->kasan_info.free_meta_offset;
++}
++
++void kasan_poison_slab(struct page *page)
++{
++	kasan_poison_shadow(page_address(page),
++			PAGE_SIZE << compound_order(page),
++			KASAN_KMALLOC_REDZONE);
++}
++
++void kasan_unpoison_object_data(struct kmem_cache *cache, void *object)
++{
++	kasan_unpoison_shadow(object, cache->object_size);
++}
++
++void kasan_poison_object_data(struct kmem_cache *cache, void *object)
++{
++	kasan_poison_shadow(object,
++			round_up(cache->object_size, KASAN_SHADOW_SCALE_SIZE),
++			KASAN_KMALLOC_REDZONE);
++}
++
++void kasan_init_slab_obj(struct kmem_cache *cache, const void *object)
++{
++	struct kasan_alloc_meta *alloc_info;
++
++	if (!(cache->flags & SLAB_KASAN))
++		return;
++
++	alloc_info = get_alloc_info(cache, object);
++	__memset(alloc_info, 0, sizeof(*alloc_info));
++}
++
++void *kasan_slab_alloc(struct kmem_cache *cache, void *object, gfp_t flags)
++{
++	return kasan_kmalloc(cache, object, cache->object_size, flags);
++}
++
++static bool __kasan_slab_free(struct kmem_cache *cache, void *object,
++			      unsigned long ip, bool quarantine)
++{
++	s8 shadow_byte;
++	unsigned long rounded_up_size;
++
++	if (unlikely(nearest_obj(cache, virt_to_head_page(object), object) !=
++	    object)) {
++		kasan_report_invalid_free(object, ip);
++		return true;
++	}
++
++	/* RCU slabs could be legally used after free within the RCU period */
++	if (unlikely(cache->flags & SLAB_TYPESAFE_BY_RCU))
++		return false;
++
++	shadow_byte = READ_ONCE(*(s8 *)kasan_mem_to_shadow(object));
++	if (shadow_byte < 0 || shadow_byte >= KASAN_SHADOW_SCALE_SIZE) {
++		kasan_report_invalid_free(object, ip);
++		return true;
++	}
++
++	rounded_up_size = round_up(cache->object_size, KASAN_SHADOW_SCALE_SIZE);
++	kasan_poison_shadow(object, rounded_up_size, KASAN_KMALLOC_FREE);
++
++	if (!quarantine || unlikely(!(cache->flags & SLAB_KASAN)))
++		return false;
++
++	set_track(&get_alloc_info(cache, object)->free_track, GFP_NOWAIT);
++	quarantine_put(get_free_info(cache, object), cache);
++	return true;
++}
++
++bool kasan_slab_free(struct kmem_cache *cache, void *object, unsigned long ip)
++{
++	return __kasan_slab_free(cache, object, ip, true);
++}
++
++void *kasan_kmalloc(struct kmem_cache *cache, const void *object, size_t size,
++		   gfp_t flags)
++{
++	unsigned long redzone_start;
++	unsigned long redzone_end;
++
++	if (gfpflags_allow_blocking(flags))
++		quarantine_reduce();
++
++	if (unlikely(object == NULL))
++		return NULL;
++
++	redzone_start = round_up((unsigned long)(object + size),
++				KASAN_SHADOW_SCALE_SIZE);
++	redzone_end = round_up((unsigned long)object + cache->object_size,
++				KASAN_SHADOW_SCALE_SIZE);
++
++	kasan_unpoison_shadow(object, size);
++	kasan_poison_shadow((void *)redzone_start, redzone_end - redzone_start,
++		KASAN_KMALLOC_REDZONE);
++
++	if (cache->flags & SLAB_KASAN)
++		set_track(&get_alloc_info(cache, object)->alloc_track, flags);
++
++	return (void *)object;
++}
++EXPORT_SYMBOL(kasan_kmalloc);
++
++void *kasan_kmalloc_large(const void *ptr, size_t size, gfp_t flags)
++{
++	struct page *page;
++	unsigned long redzone_start;
++	unsigned long redzone_end;
++
++	if (gfpflags_allow_blocking(flags))
++		quarantine_reduce();
++
++	if (unlikely(ptr == NULL))
++		return NULL;
++
++	page = virt_to_page(ptr);
++	redzone_start = round_up((unsigned long)(ptr + size),
++				KASAN_SHADOW_SCALE_SIZE);
++	redzone_end = (unsigned long)ptr + (PAGE_SIZE << compound_order(page));
++
++	kasan_unpoison_shadow(ptr, size);
++	kasan_poison_shadow((void *)redzone_start, redzone_end - redzone_start,
++		KASAN_PAGE_REDZONE);
++
++	return (void *)ptr;
++}
++
++void *kasan_krealloc(const void *object, size_t size, gfp_t flags)
++{
++	struct page *page;
++
++	if (unlikely(object == ZERO_SIZE_PTR))
++		return (void *)object;
++
++	page = virt_to_head_page(object);
++
++	if (unlikely(!PageSlab(page)))
++		return kasan_kmalloc_large(object, size, flags);
++	else
++		return kasan_kmalloc(page->slab_cache, object, size, flags);
++}
++
++void kasan_poison_kfree(void *ptr, unsigned long ip)
++{
++	struct page *page;
++
++	page = virt_to_head_page(ptr);
++
++	if (unlikely(!PageSlab(page))) {
++		if (ptr != page_address(page)) {
++			kasan_report_invalid_free(ptr, ip);
++			return;
++		}
++		kasan_poison_shadow(ptr, PAGE_SIZE << compound_order(page),
++				KASAN_FREE_PAGE);
++	} else {
++		__kasan_slab_free(page->slab_cache, ptr, ip, false);
++	}
++}
++
++void kasan_kfree_large(void *ptr, unsigned long ip)
++{
++	if (ptr != page_address(virt_to_head_page(ptr)))
++		kasan_report_invalid_free(ptr, ip);
++	/* The object will be poisoned by page_alloc. */
++}
++
++int kasan_module_alloc(void *addr, size_t size)
++{
++	void *ret;
++	size_t shadow_size;
++	unsigned long shadow_start;
++
++	shadow_start = (unsigned long)kasan_mem_to_shadow(addr);
++	shadow_size = round_up(size >> KASAN_SHADOW_SCALE_SHIFT,
++			PAGE_SIZE);
++
++	if (WARN_ON(!PAGE_ALIGNED(shadow_start)))
++		return -EINVAL;
++
++	ret = __vmalloc_node_range(shadow_size, 1, shadow_start,
++			shadow_start + shadow_size,
++			GFP_KERNEL | __GFP_ZERO,
++			PAGE_KERNEL, VM_NO_GUARD, NUMA_NO_NODE,
++			__builtin_return_address(0));
++
++	if (ret) {
++		find_vm_area(addr)->flags |= VM_KASAN;
++		kmemleak_ignore(ret);
++		return 0;
++	}
++
++	return -ENOMEM;
++}
++
++void kasan_free_shadow(const struct vm_struct *vm)
++{
++	if (vm->flags & VM_KASAN)
++		vfree(kasan_mem_to_shadow(vm->addr));
++}
++
++#ifdef CONFIG_MEMORY_HOTPLUG
++static int __meminit kasan_mem_notifier(struct notifier_block *nb,
++			unsigned long action, void *data)
++{
++	struct memory_notify *mem_data = data;
++	unsigned long nr_shadow_pages, start_kaddr, shadow_start;
++	unsigned long shadow_end, shadow_size;
++
++	nr_shadow_pages = mem_data->nr_pages >> KASAN_SHADOW_SCALE_SHIFT;
++	start_kaddr = (unsigned long)pfn_to_kaddr(mem_data->start_pfn);
++	shadow_start = (unsigned long)kasan_mem_to_shadow((void *)start_kaddr);
++	shadow_size = nr_shadow_pages << PAGE_SHIFT;
++	shadow_end = shadow_start + shadow_size;
++
++	if (WARN_ON(mem_data->nr_pages % KASAN_SHADOW_SCALE_SIZE) ||
++		WARN_ON(start_kaddr % (KASAN_SHADOW_SCALE_SIZE << PAGE_SHIFT)))
++		return NOTIFY_BAD;
++
++	switch (action) {
++	case MEM_GOING_ONLINE: {
++		void *ret;
++
++		ret = __vmalloc_node_range(shadow_size, PAGE_SIZE, shadow_start,
++					shadow_end, GFP_KERNEL,
++					PAGE_KERNEL, VM_NO_GUARD,
++					pfn_to_nid(mem_data->start_pfn),
++					__builtin_return_address(0));
++		if (!ret)
++			return NOTIFY_BAD;
++
++		kmemleak_ignore(ret);
++		return NOTIFY_OK;
++	}
++	case MEM_OFFLINE:
++		vfree((void *)shadow_start);
++	}
++
++	return NOTIFY_OK;
++}
++
++static int __init kasan_memhotplug_init(void)
++{
++	hotplug_memory_notifier(kasan_mem_notifier, 0);
++
++	return 0;
++}
++
++module_init(kasan_memhotplug_init);
++#endif
+diff --git a/mm/kasan/kasan.c b/mm/kasan/kasan.c
+index 2f5e52d72c2b..13151e437bef 100644
+--- a/mm/kasan/kasan.c
++++ b/mm/kasan/kasan.c
+@@ -1,5 +1,5 @@
+ /*
+- * This file contains shadow memory manipulation code.
++ * This file contains core KASAN code.
+  *
+  * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+  * Author: Andrey Ryabinin <ryabinin.a.a@gmail.com>
+@@ -40,82 +40,6 @@
+ #include "kasan.h"
+ #include "../slab.h"
+ 
+-void kasan_enable_current(void)
+-{
+-	current->kasan_depth++;
+-}
+-
+-void kasan_disable_current(void)
+-{
+-	current->kasan_depth--;
+-}
+-
+-/*
+- * Poisons the shadow memory for 'size' bytes starting from 'addr'.
+- * Memory addresses should be aligned to KASAN_SHADOW_SCALE_SIZE.
+- */
+-static void kasan_poison_shadow(const void *address, size_t size, u8 value)
+-{
+-	void *shadow_start, *shadow_end;
+-
+-	shadow_start = kasan_mem_to_shadow(address);
+-	shadow_end = kasan_mem_to_shadow(address + size);
+-
+-	memset(shadow_start, value, shadow_end - shadow_start);
+-}
+-
+-void kasan_unpoison_shadow(const void *address, size_t size)
+-{
+-	kasan_poison_shadow(address, size, 0);
+-
+-	if (size & KASAN_SHADOW_MASK) {
+-		u8 *shadow = (u8 *)kasan_mem_to_shadow(address + size);
+-		*shadow = size & KASAN_SHADOW_MASK;
+-	}
+-}
+-
+-static void __kasan_unpoison_stack(struct task_struct *task, const void *sp)
+-{
+-	void *base = task_stack_page(task);
+-	size_t size = sp - base;
+-
+-	kasan_unpoison_shadow(base, size);
+-}
+-
+-/* Unpoison the entire stack for a task. */
+-void kasan_unpoison_task_stack(struct task_struct *task)
+-{
+-	__kasan_unpoison_stack(task, task_stack_page(task) + THREAD_SIZE);
+-}
+-
+-/* Unpoison the stack for the current task beyond a watermark sp value. */
+-asmlinkage void kasan_unpoison_task_stack_below(const void *watermark)
+-{
+-	/*
+-	 * Calculate the task stack base address.  Avoid using 'current'
+-	 * because this function is called by early resume code which hasn't
+-	 * yet set up the percpu register (%gs).
+-	 */
+-	void *base = (void *)((unsigned long)watermark & ~(THREAD_SIZE - 1));
+-
+-	kasan_unpoison_shadow(base, watermark - base);
+-}
+-
+-/*
+- * Clear all poison for the region between the current SP and a provided
+- * watermark value, as is sometimes required prior to hand-crafted asm function
+- * returns in the middle of functions.
+- */
+-void kasan_unpoison_stack_above_sp_to(const void *watermark)
+-{
+-	const void *sp = __builtin_frame_address(0);
+-	size_t size = watermark - sp;
+-
+-	if (WARN_ON(sp > watermark))
+-		return;
+-	kasan_unpoison_shadow(sp, size);
+-}
+-
+ /*
+  * All functions below always inlined so compiler could
+  * perform better optimizations in each of __asan_loadX/__assn_storeX
+@@ -260,70 +184,17 @@ static __always_inline void check_memory_region_inline(unsigned long addr,
+ 	kasan_report(addr, size, write, ret_ip);
+ }
+ 
+-static void check_memory_region(unsigned long addr,
+-				size_t size, bool write,
++void check_memory_region(unsigned long addr, size_t size, bool write,
+ 				unsigned long ret_ip)
+ {
+ 	check_memory_region_inline(addr, size, write, ret_ip);
+ }
+ 
+-void kasan_check_read(const volatile void *p, unsigned int size)
+-{
+-	check_memory_region((unsigned long)p, size, false, _RET_IP_);
+-}
+-EXPORT_SYMBOL(kasan_check_read);
+-
+-void kasan_check_write(const volatile void *p, unsigned int size)
+-{
+-	check_memory_region((unsigned long)p, size, true, _RET_IP_);
+-}
+-EXPORT_SYMBOL(kasan_check_write);
+-
+-#undef memset
+-void *memset(void *addr, int c, size_t len)
+-{
+-	check_memory_region((unsigned long)addr, len, true, _RET_IP_);
+-
+-	return __memset(addr, c, len);
+-}
+-
+-#undef memmove
+-void *memmove(void *dest, const void *src, size_t len)
+-{
+-	check_memory_region((unsigned long)src, len, false, _RET_IP_);
+-	check_memory_region((unsigned long)dest, len, true, _RET_IP_);
+-
+-	return __memmove(dest, src, len);
+-}
+-
+-#undef memcpy
+-void *memcpy(void *dest, const void *src, size_t len)
+-{
+-	check_memory_region((unsigned long)src, len, false, _RET_IP_);
+-	check_memory_region((unsigned long)dest, len, true, _RET_IP_);
+-
+-	return __memcpy(dest, src, len);
+-}
+-
+-void kasan_alloc_pages(struct page *page, unsigned int order)
+-{
+-	if (likely(!PageHighMem(page)))
+-		kasan_unpoison_shadow(page_address(page), PAGE_SIZE << order);
+-}
+-
+-void kasan_free_pages(struct page *page, unsigned int order)
+-{
+-	if (likely(!PageHighMem(page)))
+-		kasan_poison_shadow(page_address(page),
+-				PAGE_SIZE << order,
+-				KASAN_FREE_PAGE);
+-}
+-
+ /*
+  * Adaptive redzone policy taken from the userspace AddressSanitizer runtime.
+  * For larger allocations larger redzones are used.
+  */
+-static unsigned int optimal_redzone(unsigned int object_size)
++unsigned int optimal_redzone(unsigned int object_size)
+ {
+ 	return
+ 		object_size <= 64        - 16   ? 16 :
+@@ -335,46 +206,6 @@ static unsigned int optimal_redzone(unsigned int object_size)
+ 		object_size <= (1 << 16) - 1024 ? 1024 : 2048;
+ }
+ 
+-void kasan_cache_create(struct kmem_cache *cache, unsigned int *size,
+-			slab_flags_t *flags)
+-{
+-	unsigned int orig_size = *size;
+-	int redzone_adjust;
+-
+-	/* Add alloc meta. */
+-	cache->kasan_info.alloc_meta_offset = *size;
+-	*size += sizeof(struct kasan_alloc_meta);
+-
+-	/* Add free meta. */
+-	if (cache->flags & SLAB_TYPESAFE_BY_RCU || cache->ctor ||
+-	    cache->object_size < sizeof(struct kasan_free_meta)) {
+-		cache->kasan_info.free_meta_offset = *size;
+-		*size += sizeof(struct kasan_free_meta);
+-	}
+-	redzone_adjust = optimal_redzone(cache->object_size) -
+-		(*size - cache->object_size);
+-
+-	if (redzone_adjust > 0)
+-		*size += redzone_adjust;
+-
+-	*size = min_t(unsigned int, KMALLOC_MAX_SIZE,
+-			max(*size, cache->object_size +
+-					optimal_redzone(cache->object_size)));
+-
+-	/*
+-	 * If the metadata doesn't fit, don't enable KASAN at all.
+-	 */
+-	if (*size <= cache->kasan_info.alloc_meta_offset ||
+-			*size <= cache->kasan_info.free_meta_offset) {
+-		cache->kasan_info.alloc_meta_offset = 0;
+-		cache->kasan_info.free_meta_offset = 0;
+-		*size = orig_size;
+-		return;
+-	}
+-
+-	*flags |= SLAB_KASAN;
+-}
+-
+ void kasan_cache_shrink(struct kmem_cache *cache)
+ {
+ 	quarantine_remove_cache(cache);
+@@ -386,274 +217,6 @@ void kasan_cache_shutdown(struct kmem_cache *cache)
+ 		quarantine_remove_cache(cache);
+ }
+ 
+-size_t kasan_metadata_size(struct kmem_cache *cache)
+-{
+-	return (cache->kasan_info.alloc_meta_offset ?
+-		sizeof(struct kasan_alloc_meta) : 0) +
+-		(cache->kasan_info.free_meta_offset ?
+-		sizeof(struct kasan_free_meta) : 0);
+-}
+-
+-void kasan_poison_slab(struct page *page)
+-{
+-	kasan_poison_shadow(page_address(page),
+-			PAGE_SIZE << compound_order(page),
+-			KASAN_KMALLOC_REDZONE);
+-}
+-
+-void kasan_unpoison_object_data(struct kmem_cache *cache, void *object)
+-{
+-	kasan_unpoison_shadow(object, cache->object_size);
+-}
+-
+-void kasan_poison_object_data(struct kmem_cache *cache, void *object)
+-{
+-	kasan_poison_shadow(object,
+-			round_up(cache->object_size, KASAN_SHADOW_SCALE_SIZE),
+-			KASAN_KMALLOC_REDZONE);
+-}
+-
+-static inline int in_irqentry_text(unsigned long ptr)
+-{
+-	return (ptr >= (unsigned long)&__irqentry_text_start &&
+-		ptr < (unsigned long)&__irqentry_text_end) ||
+-		(ptr >= (unsigned long)&__softirqentry_text_start &&
+-		 ptr < (unsigned long)&__softirqentry_text_end);
+-}
+-
+-static inline void filter_irq_stacks(struct stack_trace *trace)
+-{
+-	int i;
+-
+-	if (!trace->nr_entries)
+-		return;
+-	for (i = 0; i < trace->nr_entries; i++)
+-		if (in_irqentry_text(trace->entries[i])) {
+-			/* Include the irqentry function into the stack. */
+-			trace->nr_entries = i + 1;
+-			break;
+-		}
+-}
+-
+-static inline depot_stack_handle_t save_stack(gfp_t flags)
+-{
+-	unsigned long entries[KASAN_STACK_DEPTH];
+-	struct stack_trace trace = {
+-		.nr_entries = 0,
+-		.entries = entries,
+-		.max_entries = KASAN_STACK_DEPTH,
+-		.skip = 0
+-	};
+-
+-	save_stack_trace(&trace);
+-	filter_irq_stacks(&trace);
+-	if (trace.nr_entries != 0 &&
+-	    trace.entries[trace.nr_entries-1] == ULONG_MAX)
+-		trace.nr_entries--;
+-
+-	return depot_save_stack(&trace, flags);
+-}
+-
+-static inline void set_track(struct kasan_track *track, gfp_t flags)
+-{
+-	track->pid = current->pid;
+-	track->stack = save_stack(flags);
+-}
+-
+-struct kasan_alloc_meta *get_alloc_info(struct kmem_cache *cache,
+-					const void *object)
+-{
+-	BUILD_BUG_ON(sizeof(struct kasan_alloc_meta) > 32);
+-	return (void *)object + cache->kasan_info.alloc_meta_offset;
+-}
+-
+-struct kasan_free_meta *get_free_info(struct kmem_cache *cache,
+-				      const void *object)
+-{
+-	BUILD_BUG_ON(sizeof(struct kasan_free_meta) > 32);
+-	return (void *)object + cache->kasan_info.free_meta_offset;
+-}
+-
+-void kasan_init_slab_obj(struct kmem_cache *cache, const void *object)
+-{
+-	struct kasan_alloc_meta *alloc_info;
+-
+-	if (!(cache->flags & SLAB_KASAN))
+-		return;
+-
+-	alloc_info = get_alloc_info(cache, object);
+-	__memset(alloc_info, 0, sizeof(*alloc_info));
+-}
+-
+-void *kasan_slab_alloc(struct kmem_cache *cache, void *object, gfp_t flags)
+-{
+-	return kasan_kmalloc(cache, object, cache->object_size, flags);
+-}
+-
+-static bool __kasan_slab_free(struct kmem_cache *cache, void *object,
+-			      unsigned long ip, bool quarantine)
+-{
+-	s8 shadow_byte;
+-	unsigned long rounded_up_size;
+-
+-	if (unlikely(nearest_obj(cache, virt_to_head_page(object), object) !=
+-	    object)) {
+-		kasan_report_invalid_free(object, ip);
+-		return true;
+-	}
+-
+-	/* RCU slabs could be legally used after free within the RCU period */
+-	if (unlikely(cache->flags & SLAB_TYPESAFE_BY_RCU))
+-		return false;
+-
+-	shadow_byte = READ_ONCE(*(s8 *)kasan_mem_to_shadow(object));
+-	if (shadow_byte < 0 || shadow_byte >= KASAN_SHADOW_SCALE_SIZE) {
+-		kasan_report_invalid_free(object, ip);
+-		return true;
+-	}
+-
+-	rounded_up_size = round_up(cache->object_size, KASAN_SHADOW_SCALE_SIZE);
+-	kasan_poison_shadow(object, rounded_up_size, KASAN_KMALLOC_FREE);
+-
+-	if (!quarantine || unlikely(!(cache->flags & SLAB_KASAN)))
+-		return false;
+-
+-	set_track(&get_alloc_info(cache, object)->free_track, GFP_NOWAIT);
+-	quarantine_put(get_free_info(cache, object), cache);
+-	return true;
+-}
+-
+-bool kasan_slab_free(struct kmem_cache *cache, void *object, unsigned long ip)
+-{
+-	return __kasan_slab_free(cache, object, ip, true);
+-}
+-
+-void *kasan_kmalloc(struct kmem_cache *cache, const void *object, size_t size,
+-		   gfp_t flags)
+-{
+-	unsigned long redzone_start;
+-	unsigned long redzone_end;
+-
+-	if (gfpflags_allow_blocking(flags))
+-		quarantine_reduce();
+-
+-	if (unlikely(object == NULL))
+-		return NULL;
+-
+-	redzone_start = round_up((unsigned long)(object + size),
+-				KASAN_SHADOW_SCALE_SIZE);
+-	redzone_end = round_up((unsigned long)object + cache->object_size,
+-				KASAN_SHADOW_SCALE_SIZE);
+-
+-	kasan_unpoison_shadow(object, size);
+-	kasan_poison_shadow((void *)redzone_start, redzone_end - redzone_start,
+-		KASAN_KMALLOC_REDZONE);
+-
+-	if (cache->flags & SLAB_KASAN)
+-		set_track(&get_alloc_info(cache, object)->alloc_track, flags);
+-
+-	return (void *)object;
+-}
+-EXPORT_SYMBOL(kasan_kmalloc);
+-
+-void *kasan_kmalloc_large(const void *ptr, size_t size, gfp_t flags)
+-{
+-	struct page *page;
+-	unsigned long redzone_start;
+-	unsigned long redzone_end;
+-
+-	if (gfpflags_allow_blocking(flags))
+-		quarantine_reduce();
+-
+-	if (unlikely(ptr == NULL))
+-		return NULL;
+-
+-	page = virt_to_page(ptr);
+-	redzone_start = round_up((unsigned long)(ptr + size),
+-				KASAN_SHADOW_SCALE_SIZE);
+-	redzone_end = (unsigned long)ptr + (PAGE_SIZE << compound_order(page));
+-
+-	kasan_unpoison_shadow(ptr, size);
+-	kasan_poison_shadow((void *)redzone_start, redzone_end - redzone_start,
+-		KASAN_PAGE_REDZONE);
+-
+-	return (void *)ptr;
+-}
+-
+-void *kasan_krealloc(const void *object, size_t size, gfp_t flags)
+-{
+-	struct page *page;
+-
+-	if (unlikely(object == ZERO_SIZE_PTR))
+-		return ZERO_SIZE_PTR;
+-
+-	page = virt_to_head_page(object);
+-
+-	if (unlikely(!PageSlab(page)))
+-		return kasan_kmalloc_large(object, size, flags);
+-	else
+-		return kasan_kmalloc(page->slab_cache, object, size, flags);
+-}
+-
+-void kasan_poison_kfree(void *ptr, unsigned long ip)
+-{
+-	struct page *page;
+-
+-	page = virt_to_head_page(ptr);
+-
+-	if (unlikely(!PageSlab(page))) {
+-		if (ptr != page_address(page)) {
+-			kasan_report_invalid_free(ptr, ip);
+-			return;
+-		}
+-		kasan_poison_shadow(ptr, PAGE_SIZE << compound_order(page),
+-				KASAN_FREE_PAGE);
+-	} else {
+-		__kasan_slab_free(page->slab_cache, ptr, ip, false);
+-	}
+-}
+-
+-void kasan_kfree_large(void *ptr, unsigned long ip)
+-{
+-	if (ptr != page_address(virt_to_head_page(ptr)))
+-		kasan_report_invalid_free(ptr, ip);
+-	/* The object will be poisoned by page_alloc. */
+-}
+-
+-int kasan_module_alloc(void *addr, size_t size)
+-{
+-	void *ret;
+-	size_t shadow_size;
+-	unsigned long shadow_start;
+-
+-	shadow_start = (unsigned long)kasan_mem_to_shadow(addr);
+-	shadow_size = round_up(size >> KASAN_SHADOW_SCALE_SHIFT,
+-			PAGE_SIZE);
+-
+-	if (WARN_ON(!PAGE_ALIGNED(shadow_start)))
+-		return -EINVAL;
+-
+-	ret = __vmalloc_node_range(shadow_size, 1, shadow_start,
+-			shadow_start + shadow_size,
+-			GFP_KERNEL | __GFP_ZERO,
+-			PAGE_KERNEL, VM_NO_GUARD, NUMA_NO_NODE,
+-			__builtin_return_address(0));
+-
+-	if (ret) {
+-		find_vm_area(addr)->flags |= VM_KASAN;
+-		kmemleak_ignore(ret);
+-		return 0;
+-	}
+-
+-	return -ENOMEM;
+-}
+-
+-void kasan_free_shadow(const struct vm_struct *vm)
+-{
+-	if (vm->flags & VM_KASAN)
+-		vfree(kasan_mem_to_shadow(vm->addr));
+-}
+-
+ static void register_global(struct kasan_global *global)
+ {
+ 	size_t aligned_size = round_up(global->size, KASAN_SHADOW_SCALE_SIZE);
+@@ -794,53 +357,3 @@ DEFINE_ASAN_SET_SHADOW(f2);
+ DEFINE_ASAN_SET_SHADOW(f3);
+ DEFINE_ASAN_SET_SHADOW(f5);
+ DEFINE_ASAN_SET_SHADOW(f8);
+-
+-#ifdef CONFIG_MEMORY_HOTPLUG
+-static int __meminit kasan_mem_notifier(struct notifier_block *nb,
+-			unsigned long action, void *data)
+-{
+-	struct memory_notify *mem_data = data;
+-	unsigned long nr_shadow_pages, start_kaddr, shadow_start;
+-	unsigned long shadow_end, shadow_size;
+-
+-	nr_shadow_pages = mem_data->nr_pages >> KASAN_SHADOW_SCALE_SHIFT;
+-	start_kaddr = (unsigned long)pfn_to_kaddr(mem_data->start_pfn);
+-	shadow_start = (unsigned long)kasan_mem_to_shadow((void *)start_kaddr);
+-	shadow_size = nr_shadow_pages << PAGE_SHIFT;
+-	shadow_end = shadow_start + shadow_size;
+-
+-	if (WARN_ON(mem_data->nr_pages % KASAN_SHADOW_SCALE_SIZE) ||
+-		WARN_ON(start_kaddr % (KASAN_SHADOW_SCALE_SIZE << PAGE_SHIFT)))
+-		return NOTIFY_BAD;
+-
+-	switch (action) {
+-	case MEM_GOING_ONLINE: {
+-		void *ret;
+-
+-		ret = __vmalloc_node_range(shadow_size, PAGE_SIZE, shadow_start,
+-					shadow_end, GFP_KERNEL,
+-					PAGE_KERNEL, VM_NO_GUARD,
+-					pfn_to_nid(mem_data->start_pfn),
+-					__builtin_return_address(0));
+-		if (!ret)
+-			return NOTIFY_BAD;
+-
+-		kmemleak_ignore(ret);
+-		return NOTIFY_OK;
+-	}
+-	case MEM_OFFLINE:
+-		vfree((void *)shadow_start);
+-	}
+-
+-	return NOTIFY_OK;
+-}
+-
+-static int __init kasan_memhotplug_init(void)
+-{
+-	hotplug_memory_notifier(kasan_mem_notifier, 0);
+-
+-	return 0;
+-}
+-
+-module_init(kasan_memhotplug_init);
+-#endif
+diff --git a/mm/kasan/kasan.h b/mm/kasan/kasan.h
+index c12dcfde2ebd..c39039308b98 100644
+--- a/mm/kasan/kasan.h
++++ b/mm/kasan/kasan.h
+@@ -98,6 +98,7 @@ struct kasan_alloc_meta *get_alloc_info(struct kmem_cache *cache,
+ 					const void *object);
+ struct kasan_free_meta *get_free_info(struct kmem_cache *cache,
+ 					const void *object);
++unsigned int optimal_redzone(unsigned int object_size);
+ 
+ static inline const void *kasan_shadow_to_mem(const void *shadow_addr)
+ {
+@@ -105,6 +106,11 @@ static inline const void *kasan_shadow_to_mem(const void *shadow_addr)
+ 		<< KASAN_SHADOW_SCALE_SHIFT);
+ }
+ 
++void kasan_poison_shadow(const void *address, size_t size, u8 value);
++
++void check_memory_region(unsigned long addr, size_t size, bool write,
++				unsigned long ret_ip);
++
+ void kasan_report(unsigned long addr, size_t size,
+ 		bool is_write, unsigned long ip);
+ void kasan_report_invalid_free(void *object, unsigned long ip);
+-- 
+2.17.0.484.g0c8726318c-goog
