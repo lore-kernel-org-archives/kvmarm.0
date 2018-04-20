@@ -1,60 +1,70 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 3/5] arm64: KVM: Demote SVE and LORegion warnings to debug only
-Date: Fri, 20 Apr 2018 17:07:11 +0100
-Message-ID: <20180420160713.17884-4-marc.zyngier@arm.com>
-References: <20180420160713.17884-1-marc.zyngier@arm.com>
+From: Andrey Konovalov <andreyknvl@google.com>
+Subject: [RFC PATCH v3 06/15] khwasan, arm64: fix up fault handling logic
+Date: Fri, 20 Apr 2018 16:46:44 +0200
+Message-ID: <4aaaba7c1788004c1cb654787f005efbe47eca6a.1524235387.git.andreyknvl@google.com>
+References: <cover.1524235387.git.andreyknvl@google.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180420160713.17884-1-marc.zyngier@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Mark Rutland <mark.rutland@arm.com>, Stefano Stabellini <sstabellini@kernel.org>, Christoffer Dall <cdall@kernel.org>, kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Shannon Zhao <zhaoshenglong@huawei.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B50C4A007
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Apr 2018 10:38:31 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 2O+6lMLvLoDc for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 20 Apr 2018 10:38:09 -0400 (EDT)
+Received: from mail-wr0-f194.google.com (mail-wr0-f194.google.com
+ [209.85.128.194])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CE8954A079
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Apr 2018 10:37:59 -0400 (EDT)
+Received: by mail-wr0-f194.google.com with SMTP id s18-v6so23695881wrg.9
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Apr 2018 07:47:11 -0700 (PDT)
+In-Reply-To: <cover.1524235387.git.andreyknvl@google.com>
+In-Reply-To: <cover.1524235387.git.andreyknvl@google.com>
+References: <cover.1524235387.git.andreyknvl@google.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Jonathan Corbet <corbet@lwn.net>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Christopher Li <sparse@chrisli.org>, Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Andrew Morton <akpm@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, "GitAuthor : Andrey Konovalov" <andreyknvl@google.com>, Mark Rutland <mark.rutland@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Yury Norov <ynorov@caviumnetworks.com>, Nick Desaulniers <ndesaulniers@google.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Kristina Martsenko <kristina.mar>
+Cc: Kees Cook <keescook@google.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Lee Smith <Lee.Smith@arm.com>, Kostya Serebryany <kcc@google.com>, Mark Brand <markbrand@google.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Evgeniy Stepanov <eugenis@google.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-While generating a message about guests probing for SVE/LORegions
-is a useful debugging tool, considering it an error is slightly
-over the top, as this is the only way the guest can find out
-about the presence of the feature.
+show_pte in arm64 fault handling relies on the fact that the top byte of
+a kernel pointer is 0xff, which isn't always the case with KHWASAN enabled.
+Reset the top byte.
 
-Let's turn these message into kvm_debug so that they can only
-be seen if CONFIG_DYNAMIC_DEBUG, and kept quiet otherwise.
-
-Acked-by: Christoffer Dall <christoffer.dall@arm.com>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ arch/arm64/mm/fault.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 806b0b126a64..6e3b969391fd 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -996,14 +996,12 @@ static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
+diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+index 4165485e8b6e..e834fe76f5d2 100644
+--- a/arch/arm64/mm/fault.c
++++ b/arch/arm64/mm/fault.c
+@@ -32,6 +32,7 @@
+ #include <linux/perf_event.h>
+ #include <linux/preempt.h>
+ #include <linux/hugetlb.h>
++#include <linux/kasan.h>
  
- 	if (id == SYS_ID_AA64PFR0_EL1) {
- 		if (val & (0xfUL << ID_AA64PFR0_SVE_SHIFT))
--			pr_err_once("kvm [%i]: SVE unsupported for guests, suppressing\n",
--				    task_pid_nr(current));
-+			kvm_debug("SVE unsupported for guests, suppressing\n");
+ #include <asm/bug.h>
+ #include <asm/cmpxchg.h>
+@@ -134,6 +135,8 @@ void show_pte(unsigned long addr)
+ 	pgd_t *pgdp;
+ 	pgd_t pgd;
  
- 		val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
- 	} else if (id == SYS_ID_AA64MMFR1_EL1) {
- 		if (val & (0xfUL << ID_AA64MMFR1_LOR_SHIFT))
--			pr_err_once("kvm [%i]: LORegions unsupported for guests, suppressing\n",
--				    task_pid_nr(current));
-+			kvm_debug("LORegions unsupported for guests, suppressing\n");
- 
- 		val &= ~(0xfUL << ID_AA64MMFR1_LOR_SHIFT);
- 	}
++	addr = (unsigned long)khwasan_reset_tag((void *)addr);
++
+ 	if (addr < TASK_SIZE) {
+ 		/* TTBR0 */
+ 		mm = current->active_mm;
 -- 
-2.14.2
+2.17.0.484.g0c8726318c-goog
