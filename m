@@ -1,40 +1,147 @@
-From: Nick Desaulniers <ndesaulniers@google.com>
-Subject: Re: Clang arm64 build is broken
-Date: Fri, 20 Apr 2018 16:43:05 +0000
-Message-ID: <CAKwvOdmhNH4PYNwH+tsZc4uQQJVhOOHSph2YdDCHcyWNyFMxyA@mail.gmail.com>
-References: <CAAeHK+wDMH_G=3UuGOda2t0g4TH4TmDAeyG-ydJwg9vmThd3eQ@mail.gmail.com>
- <c61336a2-7c66-ea48-3daa-e644403d7a6e@arm.com> <CAKwvOdnKuFuqoWKpVJqVa1u8A0z2+vQp9j7+TsNh9qz3Yitk-Q@mail.gmail.com>
- <8b3e95df-a429-2f84-565c-3caed8e30e28@arm.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: [RFC PATCH 2/8] KVM: arm64: Convert lazy FPSIMD context switch trap
+ to C
+Date: Fri, 20 Apr 2018 17:46:36 +0100
+Message-ID: <1524242802-21163-3-git-send-email-Dave.Martin@arm.com>
+References: <1524242802-21163-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <8b3e95df-a429-2f84-565c-3caed8e30e28@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: marc.zyngier@arm.com
-Cc: Andrey Konovalov <andreyknvl@google.com>, Christoffer Dall <christoffer.dall@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, LKML <linux-kernel@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Dmitry Vyukov <dvyukov@google.com>, Alexander Potapenko <glider@google.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <1524242802-21163-1-git-send-email-Dave.Martin@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@kernel.org>, linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Apr 20, 2018 at 9:36 AM Marc Zyngier <marc.zyngier@arm.com> wrote:
+To make the lazy FPSIMD context switch trap code easier to hack on,
+this patch converts it to C.
 
-> On 20/04/18 17:30, Nick Desaulniers wrote:
-> > On Fri, Apr 20, 2018 at 1:13 AM Marc Zyngier <marc.zyngier@arm.com>
-wrote:
-> >> Clang isn't
-> >> really supported to build the arm64 kernel anyway
-> >
-> > Can you expand on this?  There are millions of arm64 devices shipping
-with
-> > Clang built Linux kernels.
+This is not amazingly efficient, but the trap should typically only
+be taken once per host context switch.
 
-> How many of these devices run a full-featured mainline kernel?
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 
-> Sure, Android is building the kernel with clang, but that's with a pile
-> of out of tree patches. At that point, I'm not sure we're talking about
-> the same arm64 kernel.
+---
 
-Do you recommend that we only work with ARM licensed SoC vendors with no
-out of tree patches?
+Since RFCv1:
 
---
-Thanks,
-~Nick Desaulniers
+ * Fix indentation to be consistent with the rest of the file.
+ * Add missing ! to write back to sp with attempting to push regs.
+---
+ arch/arm64/kvm/hyp/entry.S  | 57 +++++++++++++++++----------------------------
+ arch/arm64/kvm/hyp/switch.c | 24 +++++++++++++++++++
+ 2 files changed, 46 insertions(+), 35 deletions(-)
+
+diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+index e41a161..40f349b 100644
+--- a/arch/arm64/kvm/hyp/entry.S
++++ b/arch/arm64/kvm/hyp/entry.S
+@@ -172,40 +172,27 @@ ENTRY(__fpsimd_guest_restore)
+ 	// x1: vcpu
+ 	// x2-x29,lr: vcpu regs
+ 	// vcpu x0-x1 on the stack
+-	stp	x2, x3, [sp, #-16]!
+-	stp	x4, lr, [sp, #-16]!
+-
+-alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
+-	mrs	x2, cptr_el2
+-	bic	x2, x2, #CPTR_EL2_TFP
+-	msr	cptr_el2, x2
+-alternative_else
+-	mrs	x2, cpacr_el1
+-	orr	x2, x2, #CPACR_EL1_FPEN
+-	msr	cpacr_el1, x2
+-alternative_endif
+-	isb
+-
+-	mov	x3, x1
+-
+-	ldr	x0, [x3, #VCPU_HOST_CONTEXT]
+-	kern_hyp_va x0
+-	add	x0, x0, #CPU_GP_REG_OFFSET(CPU_FP_REGS)
+-	bl	__fpsimd_save_state
+-
+-	add	x2, x3, #VCPU_CONTEXT
+-	add	x0, x2, #CPU_GP_REG_OFFSET(CPU_FP_REGS)
+-	bl	__fpsimd_restore_state
+-
+-	// Skip restoring fpexc32 for AArch64 guests
+-	mrs	x1, hcr_el2
+-	tbnz	x1, #HCR_RW_SHIFT, 1f
+-	ldr	x4, [x3, #VCPU_FPEXC32_EL2]
+-	msr	fpexc32_el2, x4
+-1:
+-	ldp	x4, lr, [sp], #16
+-	ldp	x2, x3, [sp], #16
+-	ldp	x0, x1, [sp], #16
+-
++	stp	x2, x3, [sp, #-144]!
++	stp	x4, x5, [sp, #16]
++	stp	x6, x7, [sp, #32]
++	stp	x8, x9, [sp, #48]
++	stp	x10, x11, [sp, #64]
++	stp	x12, x13, [sp, #80]
++	stp	x14, x15, [sp, #96]
++	stp	x16, x17, [sp, #112]
++	stp	x18, lr, [sp, #128]
++
++	bl	__hyp_switch_fpsimd
++
++	ldp	x4, x5, [sp, #16]
++	ldp	x6, x7, [sp, #32]
++	ldp	x8, x9, [sp, #48]
++	ldp	x10, x11, [sp, #64]
++	ldp	x12, x13, [sp, #80]
++	ldp	x14, x15, [sp, #96]
++	ldp	x16, x17, [sp, #112]
++	ldp	x18, lr, [sp, #128]
++	ldp	x0, x1, [sp, #144]
++	ldp	x2, x3, [sp], #160
+ 	eret
+ ENDPROC(__fpsimd_guest_restore)
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index d964523..c438ad8 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -499,6 +499,30 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 	return exit_code;
+ }
+ 
++void __hyp_text __hyp_switch_fpsimd(u64 esr __always_unused,
++				    struct kvm_vcpu *vcpu)
++{
++	kvm_cpu_context_t *host_ctxt;
++
++	if (has_vhe())
++		write_sysreg(read_sysreg(cpacr_el1) | CPACR_EL1_FPEN,
++			     cpacr_el1);
++	else
++		write_sysreg(read_sysreg(cptr_el2) & ~(u64)CPTR_EL2_TFP,
++			     cptr_el2);
++
++	isb();
++
++	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
++	__fpsimd_save_state(&host_ctxt->gp_regs.fp_regs);
++	__fpsimd_restore_state(&vcpu->arch.ctxt.gp_regs.fp_regs);
++
++	/* Skip restoring fpexc32 for AArch64 guests */
++	if (!(read_sysreg(hcr_el2) & HCR_RW))
++		write_sysreg(vcpu->arch.ctxt.sys_regs[FPEXC32_EL2],
++			     fpexc32_el2);
++}
++
+ static const char __hyp_panic_string[] = "HYP panic:\nPS:%08llx PC:%016llx ESR:%08llx\nFAR:%016llx HPFAR:%016llx PAR:%016llx\nVCPU:%p\n";
+ 
+ static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par,
+-- 
+2.1.4
