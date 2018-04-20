@@ -1,26 +1,26 @@
 From: Andrey Konovalov <andreyknvl@google.com>
-Subject: [RFC PATCH v3 03/15] khwasan,
- arm64: adjust shadow size for CONFIG_KASAN_HW
-Date: Fri, 20 Apr 2018 16:46:41 +0200
-Message-ID: <12a1cdde7c35ccb62c71f9f3e8847fc782d2e8bf.1524235387.git.andreyknvl@google.com>
+Subject: [RFC PATCH v3 05/15] khwasan,
+ arm64: untag virt address in __kimg_to_phys
+Date: Fri, 20 Apr 2018 16:46:43 +0200
+Message-ID: <6f8133fa9e0c4adb15bb36a540cd7f923d000f3c.1524235387.git.andreyknvl@google.com>
 References: <cover.1524235387.git.andreyknvl@google.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BB634A093
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Apr 2018 10:38:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5ED6F4A09B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Apr 2018 10:38:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HSA0vEBXR2tx for <kvmarm@lists.cs.columbia.edu>;
- Fri, 20 Apr 2018 10:37:54 -0400 (EDT)
+ with ESMTP id tXj18buRMpXm for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 20 Apr 2018 10:38:02 -0400 (EDT)
 Received: from mail-wr0-f196.google.com (mail-wr0-f196.google.com
  [209.85.128.196])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2292E4A054
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Apr 2018 10:37:54 -0400 (EDT)
-Received: by mail-wr0-f196.google.com with SMTP id v60-v6so23685322wrc.7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Apr 2018 07:47:05 -0700 (PDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9D91B4A069
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Apr 2018 10:37:57 -0400 (EDT)
+Received: by mail-wr0-f196.google.com with SMTP id u11-v6so23675342wri.12
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Apr 2018 07:47:09 -0700 (PDT)
 In-Reply-To: <cover.1524235387.git.andreyknvl@google.com>
 In-Reply-To: <cover.1524235387.git.andreyknvl@google.com>
 References: <cover.1524235387.git.andreyknvl@google.com>
@@ -37,55 +37,47 @@ To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@googl
 Cc: Kees Cook <keescook@google.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Lee Smith <Lee.Smith@arm.com>, Kostya Serebryany <kcc@google.com>, Mark Brand <markbrand@google.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Evgeniy Stepanov <eugenis@google.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-KWHASAN uses 1 shadow byte for 16 bytes of kernel memory, so it requires
-1/16th of the kernel virtual address space for the shadow memory.
+__kimg_to_phys (which is used by virt_to_phys) assumes that the top byte
+of the address is 0xff, which isn't always the case with KHWASAN enabled.
+The solution is to reset the tag in __kimg_to_phys.
 
-This commit sets KASAN_SHADOW_SCALE_SHIFT to 4 when KHWASAN is enabled.
+__lm_to_phys doesn't require any fixups, as it zeroes out the top byte
+with the current implementation.
 
 Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
 ---
- arch/arm64/Makefile             |  2 +-
- arch/arm64/include/asm/memory.h | 13 +++++++++----
- 2 files changed, 10 insertions(+), 5 deletions(-)
+ arch/arm64/include/asm/memory.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
-index 15402861bb59..49092d763673 100644
---- a/arch/arm64/Makefile
-+++ b/arch/arm64/Makefile
-@@ -95,7 +95,7 @@ endif
- # KASAN_SHADOW_OFFSET = VA_START + (1 << (VA_BITS - KASAN_SHADOW_SCALE_SHIFT))
- #				 - (1 << (64 - KASAN_SHADOW_SCALE_SHIFT))
- # in 32-bit arithmetic
--KASAN_SHADOW_SCALE_SHIFT := 3
-+KASAN_SHADOW_SCALE_SHIFT := $(if $(CONFIG_KASAN_HW), 4, 3)
- KASAN_SHADOW_OFFSET := $(shell printf "0x%08x00000000\n" $$(( \
- 	(0xffffffff & (-1 << ($(CONFIG_ARM64_VA_BITS) - 32))) \
- 	+ (1 << ($(CONFIG_ARM64_VA_BITS) - 32 - $(KASAN_SHADOW_SCALE_SHIFT))) \
 diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
-index 49d99214f43c..6d084431b7f7 100644
+index 6d084431b7f7..f206273469b5 100644
 --- a/arch/arm64/include/asm/memory.h
 +++ b/arch/arm64/include/asm/memory.h
-@@ -74,12 +74,17 @@
- #define KERNEL_END        _end
+@@ -92,6 +92,12 @@
+ #define KASAN_THREAD_SHIFT	0
+ #endif
+ 
++#ifdef CONFIG_KASAN_HW
++#define KASAN_TAG_SHIFTED(tag)		((unsigned long)(tag) << 56)
++#define KASAN_SET_TAG(addr, tag)	(((addr) & ~KASAN_TAG_SHIFTED(0xff)) | \
++						KASAN_TAG_SHIFTED(tag))
++#endif
++
+ #define MIN_THREAD_SHIFT	(14 + KASAN_THREAD_SHIFT)
  
  /*
-- * KASAN requires 1/8th of the kernel virtual address space for the shadow
-- * region. KASAN can bloat the stack significantly, so double the (minimum)
-- * stack size when KASAN is in use.
-+ * KASAN and KHWASAN require 1/8th and 1/16th of the kernel virtual address
-+ * space for the shadow region respectively. They can bloat the stack
-+ * significantly, so double the (minimum) stack size when they are in use.
-  */
--#ifdef CONFIG_KASAN
-+#ifdef CONFIG_KASAN_GENERIC
- #define KASAN_SHADOW_SCALE_SHIFT 3
-+#endif
+@@ -225,7 +231,12 @@ static inline unsigned long kaslr_offset(void)
+ #define __is_lm_address(addr)	(!!((addr) & BIT(VA_BITS - 1)))
+ 
+ #define __lm_to_phys(addr)	(((addr) & ~PAGE_OFFSET) + PHYS_OFFSET)
++
 +#ifdef CONFIG_KASAN_HW
-+#define KASAN_SHADOW_SCALE_SHIFT 4
++#define __kimg_to_phys(addr)	(KASAN_SET_TAG((addr), 0xff) - kimage_voffset)
++#else
+ #define __kimg_to_phys(addr)	((addr) - kimage_voffset)
 +#endif
-+#ifdef CONFIG_KASAN
- #define KASAN_SHADOW_SIZE	(UL(1) << (VA_BITS - KASAN_SHADOW_SCALE_SHIFT))
- #define KASAN_THREAD_SHIFT	1
- #else
+ 
+ #define __virt_to_phys_nodebug(x) ({					\
+ 	phys_addr_t __x = (phys_addr_t)(x);				\
 -- 
 2.17.0.484.g0c8726318c-goog
