@@ -1,133 +1,60 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: [RFC PATCH 6/8] arm64/sve: Move sve_pffr() to fpsimd.h and make inline
-Date: Fri, 20 Apr 2018 17:46:40 +0100
-Message-ID: <1524242802-21163-7-git-send-email-Dave.Martin@arm.com>
-References: <1524242802-21163-1-git-send-email-Dave.Martin@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: Clang arm64 build is broken
+Date: Fri, 20 Apr 2018 17:57:16 +0100
+Message-ID: <ad937bae-ea95-2758-acf6-6170c4d94d07@arm.com>
+References: <CAAeHK+wDMH_G=3UuGOda2t0g4TH4TmDAeyG-ydJwg9vmThd3eQ@mail.gmail.com>
+ <c61336a2-7c66-ea48-3daa-e644403d7a6e@arm.com>
+ <CAKwvOdnKuFuqoWKpVJqVa1u8A0z2+vQp9j7+TsNh9qz3Yitk-Q@mail.gmail.com>
+ <8b3e95df-a429-2f84-565c-3caed8e30e28@arm.com>
+ <CAKwvOdmhNH4PYNwH+tsZc4uQQJVhOOHSph2YdDCHcyWNyFMxyA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 71A6049FC6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Apr 2018 12:38:24 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rtDjTt5-C9NP for <kvmarm@lists.cs.columbia.edu>;
- Fri, 20 Apr 2018 12:37:58 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B8D74A07E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Apr 2018 12:37:43 -0400 (EDT)
-In-Reply-To: <1524242802-21163-1-git-send-email-Dave.Martin@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@kernel.org>, linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CAKwvOdmhNH4PYNwH+tsZc4uQQJVhOOHSph2YdDCHcyWNyFMxyA@mail.gmail.com>
+Content-Language: en-GB
+Sender: linux-kernel-owner@vger.kernel.org
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Andrey Konovalov <andreyknvl@google.com>, Christoffer Dall <christoffer.dall@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, LKML <linux-kernel@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Dmitry Vyukov <dvyukov@google.com>, Alexander Potapenko <glider@google.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In order to make sve_save_state()/sve_load_state() more easily
-reusable and to get rid of a potential branch on context switch
-critical paths, this patch makes sve_pffr() inline and moves it to
-fpsimd.h.
+On 20/04/18 17:43, Nick Desaulniers wrote:
+> On Fri, Apr 20, 2018 at 9:36 AM Marc Zyngier <marc.zyngier@arm.com> wrote:
+> 
+>> On 20/04/18 17:30, Nick Desaulniers wrote:
+>>> On Fri, Apr 20, 2018 at 1:13 AM Marc Zyngier <marc.zyngier@arm.com>
+> wrote:
+>>>> Clang isn't
+>>>> really supported to build the arm64 kernel anyway
+>>>
+>>> Can you expand on this?  There are millions of arm64 devices shipping
+> with
+>>> Clang built Linux kernels.
+> 
+>> How many of these devices run a full-featured mainline kernel?
+> 
+>> Sure, Android is building the kernel with clang, but that's with a pile
+>> of out of tree patches. At that point, I'm not sure we're talking about
+>> the same arm64 kernel.
+> 
+> Do you recommend that we only work with ARM licensed SoC vendors with no
+> out of tree patches?
 
-<asm/processor.h> must be included in fpsimd.h in order to make
-this work, and this creates an #include cycle that is tricky to
-avoid without modifying core code, due to the way the PR_SVE_*()
-prctl helpers are included in the core prctl implementation.
+I mean the clang-related patches which are not upstream. We can ignore
+SoC support code for this discussion.
 
-Instead of breaking the cycle, this patch defers inclusion of
-<asm/fpsimd.h> in <asm/processor.h> until the point where it is
-actually needed: i.e., immediately before the prctl definitions.
+The android clang patches try to create the illusion that clang is
+usable for the kernel. It is not. It misses fundamental functionality
+that either leads to performance degradation (lack of asm goto) or
+prevents the implementation of security fixes (see the recent discussion
+about SMCCC 1.1 and the top of this very thread).
 
-No functional change.
+I'd rather recommend that clang is brought up to the level of GCC so
+that we don't have to continuously have that discussion. Give us that
+compiler, and we'll make sure the arm64 doesn't break.
 
-Signed-off-by: Dave Martin <Dave.Martin@arm.com>
----
- arch/arm64/include/asm/fpsimd.h    | 13 +++++++++++++
- arch/arm64/include/asm/processor.h |  3 ++-
- arch/arm64/kernel/fpsimd.c         | 12 ------------
- 3 files changed, 15 insertions(+), 13 deletions(-)
+Thanks,
 
-diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
-index 995d597..b84c4b5 100644
---- a/arch/arm64/include/asm/fpsimd.h
-+++ b/arch/arm64/include/asm/fpsimd.h
-@@ -18,6 +18,8 @@
- 
- #include <asm/ptrace.h>
- #include <asm/errno.h>
-+#include <asm/processor.h>
-+#include <asm/sigcontext.h>
- 
- #ifndef __ASSEMBLY__
- 
-@@ -60,6 +62,17 @@ extern void sve_flush_cpu_state(void);
- /* Maximum VL that SVE VL-agnostic software can transparently support */
- #define SVE_VL_ARCH_MAX 0x100
- 
-+/* Offset of FFR in the SVE register dump */
-+static inline size_t sve_ffr_offset(int vl)
-+{
-+	return SVE_SIG_FFR_OFFSET(sve_vq_from_vl(vl)) - SVE_SIG_REGS_OFFSET;
-+}
-+
-+static inline void *sve_pffr(struct thread_struct *thread)
-+{
-+	return (char *)thread->sve_state + sve_ffr_offset(thread->sve_vl);
-+}
-+
- extern void sve_save_state(void *state, u32 *pfpsr);
- extern void sve_load_state(void const *state, u32 const *pfpsr,
- 			   unsigned long vq_minus_1);
-diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
-index f902b6d..ebaadb1 100644
---- a/arch/arm64/include/asm/processor.h
-+++ b/arch/arm64/include/asm/processor.h
-@@ -40,7 +40,6 @@
- 
- #include <asm/alternative.h>
- #include <asm/cpufeature.h>
--#include <asm/fpsimd.h>
- #include <asm/hw_breakpoint.h>
- #include <asm/lse.h>
- #include <asm/pgtable-hwdef.h>
-@@ -245,6 +244,8 @@ void cpu_enable_pan(const struct arm64_cpu_capabilities *__unused);
- void cpu_enable_cache_maint_trap(const struct arm64_cpu_capabilities *__unused);
- void cpu_clear_disr(const struct arm64_cpu_capabilities *__unused);
- 
-+#include <asm/fpsimd.h>
-+
- /* Userspace interface for PR_SVE_{SET,GET}_VL prctl()s: */
- #define SVE_SET_VL(arg)	sve_set_current_vl(arg)
- #define SVE_GET_VL()	sve_get_current_vl()
-diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index 168a51e..fa4f6e2 100644
---- a/arch/arm64/kernel/fpsimd.c
-+++ b/arch/arm64/kernel/fpsimd.c
-@@ -161,18 +161,6 @@ static void sve_free(struct task_struct *task)
- 	__sve_free(task);
- }
- 
--
--/* Offset of FFR in the SVE register dump */
--static size_t sve_ffr_offset(int vl)
--{
--	return SVE_SIG_FFR_OFFSET(sve_vq_from_vl(vl)) - SVE_SIG_REGS_OFFSET;
--}
--
--static void *sve_pffr(struct thread_struct *thread)
--{
--	return (char *)thread->sve_state + sve_ffr_offset(thread->sve_vl);
--}
--
- static void change_cpacr(u64 val, u64 mask)
- {
- 	u64 cpacr = read_sysreg(CPACR_EL1);
+	M.
 -- 
-2.1.4
+Jazz is not dead. It just smells funny...
