@@ -1,235 +1,48 @@
-From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: [PATCH 4/4] KVM: arm64: Add support for PUD hugepages at stage 2
-Date: Fri, 20 Apr 2018 15:54:09 +0100
-Message-ID: <20180420145409.24485-5-punit.agrawal@arm.com>
-References: <20180420145409.24485-1-punit.agrawal@arm.com>
+From: Andrey Konovalov <andreyknvl@google.com>
+Subject: Re: Clang arm64 build is broken
+Date: Fri, 20 Apr 2018 16:59:35 +0200
+Message-ID: <CAAeHK+zpAnC3Ppjq2W=r-5fYh+ceEwYymER0iLTan7+pcFDiJg@mail.gmail.com>
+References: <CAAeHK+wDMH_G=3UuGOda2t0g4TH4TmDAeyG-ydJwg9vmThd3eQ@mail.gmail.com>
+ <c61336a2-7c66-ea48-3daa-e644403d7a6e@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180420145409.24485-1-punit.agrawal@arm.com>
+In-Reply-To: <c61336a2-7c66-ea48-3daa-e644403d7a6e@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: kvmarm@lists.cs.columbia.edu
-Cc: Punit Agrawal <punit.agrawal@arm.com>, linux-arm-kernel@lists.infradead.org, marc.zyngier@arm.com, christoffer.dall@arm.com, linux-kernel@vger.kernel.org, suzuki.poulose@arm.com, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Linux ARM <linux-arm-kernel@lists.infradead.org>, kvmarm@lists.cs.columbia.edu, LKML <linux-kernel@vger.kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, Kostya Serebryany <kcc@google.com>, Dmitry Vyukov <dvyukov@google.com>, Alexander Potapenko <glider@google.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-KVM only supports PMD hugepages at stage 2. Extend the stage 2 fault
-handling to add support for PUD hugepages.
+On Fri, Apr 20, 2018 at 10:13 AM, Marc Zyngier <marc.zyngier@arm.com> wrote:
+>> The issue is that
+>> clang doesn't know about the "S" asm constraint. I reported this to
+>> clang [2], and hopefully this will get fixed. In the meantime, would
+>> it possible to work around using the "S" constraint in the kernel?
+>
+> I have no idea, I've never used clang to build the kernel. Clang isn't
+> really supported to build the arm64 kernel anyway (as you mention
+> below), and working around clang deficiencies would mean that we leave
+> with the workaround forever. I'd rather enable clang once it is at
+> feature parity with GCC.
 
-Addition of pud hugepage support enables additional hugepage
-sizes (e.g., 1G with 4K granule) which can be useful on cores that
-support mapping larger block sizes in the TLB entries.
+The fact that there are some existing issues with building arm64
+kernel with clang doesn't sound like a good justification for adding
+new issues :)
 
-Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
-Cc: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Russell King <linux@armlinux.org.uk>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will.deacon@arm.com>
----
- arch/arm/include/asm/kvm_mmu.h         | 19 +++++++++
- arch/arm64/include/asm/kvm_mmu.h       | 15 +++++++
- arch/arm64/include/asm/pgtable-hwdef.h |  4 ++
- arch/arm64/include/asm/pgtable.h       |  2 +
- virt/kvm/arm/mmu.c                     | 54 ++++++++++++++++++++------
- 5 files changed, 83 insertions(+), 11 deletions(-)
+However in this case I do believe that this is more of a bug in clang
+that should be fixed.
 
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index 224c22c0a69c..155916dbdd7e 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -77,8 +77,11 @@ void kvm_clear_hyp_idmap(void);
- 
- #define kvm_pfn_pte(pfn, prot)	pfn_pte(pfn, prot)
- #define kvm_pfn_pmd(pfn, prot)	pfn_pmd(pfn, prot)
-+#define kvm_pfn_pud(pfn, prot)	(__pud(0))
- 
- #define kvm_pmd_mkhuge(pmd)	pmd_mkhuge(pmd)
-+/* No support for pud hugepages */
-+#define kvm_pud_mkhuge(pud)	(pud)
- 
- /*
-  * The following kvm_*pud*() functionas are provided strictly to allow
-@@ -95,6 +98,22 @@ static inline bool kvm_s2pud_readonly(pud_t *pud)
- 	return false;
- }
- 
-+static inline void kvm_set_pud(pud_t *pud, pud_t new_pud)
-+{
-+	BUG();
-+}
-+
-+static inline pud_t kvm_s2pud_mkwrite(pud_t pud)
-+{
-+	BUG();
-+	return pud;
-+}
-+
-+static inline pud_t kvm_s2pud_mkexec(pud_t pud)
-+{
-+	BUG();
-+	return pud;
-+}
- 
- static inline void kvm_set_pmd(pmd_t *pmd, pmd_t new_pmd)
- {
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index f440cf216a23..f49a68fcbf26 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -172,11 +172,14 @@ void kvm_clear_hyp_idmap(void);
- 
- #define	kvm_set_pte(ptep, pte)		set_pte(ptep, pte)
- #define	kvm_set_pmd(pmdp, pmd)		set_pmd(pmdp, pmd)
-+#define kvm_set_pud(pudp, pud)		set_pud(pudp, pud)
- 
- #define kvm_pfn_pte(pfn, prot)		pfn_pte(pfn, prot)
- #define kvm_pfn_pmd(pfn, prot)		pfn_pmd(pfn, prot)
-+#define kvm_pfn_pud(pfn, prot)		pfn_pud(pfn, prot)
- 
- #define kvm_pmd_mkhuge(pmd)		pmd_mkhuge(pmd)
-+#define kvm_pud_mkhuge(pud)		pud_mkhuge(pud)
- 
- static inline pte_t kvm_s2pte_mkwrite(pte_t pte)
- {
-@@ -190,6 +193,12 @@ static inline pmd_t kvm_s2pmd_mkwrite(pmd_t pmd)
- 	return pmd;
- }
- 
-+static inline pud_t kvm_s2pud_mkwrite(pud_t pud)
-+{
-+	pud_val(pud) |= PUD_S2_RDWR;
-+	return pud;
-+}
-+
- static inline pte_t kvm_s2pte_mkexec(pte_t pte)
- {
- 	pte_val(pte) &= ~PTE_S2_XN;
-@@ -202,6 +211,12 @@ static inline pmd_t kvm_s2pmd_mkexec(pmd_t pmd)
- 	return pmd;
- }
- 
-+static inline pud_t kvm_s2pud_mkexec(pud_t pud)
-+{
-+	pud_val(pud) &= ~PUD_S2_XN;
-+	return pud;
-+}
-+
- static inline void kvm_set_s2pte_readonly(pte_t *ptep)
- {
- 	pteval_t old_pteval, pteval;
-diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-index fd208eac9f2a..e327665e94d1 100644
---- a/arch/arm64/include/asm/pgtable-hwdef.h
-+++ b/arch/arm64/include/asm/pgtable-hwdef.h
-@@ -193,6 +193,10 @@
- #define PMD_S2_RDWR		(_AT(pmdval_t, 3) << 6)   /* HAP[2:1] */
- #define PMD_S2_XN		(_AT(pmdval_t, 2) << 53)  /* XN[1:0] */
- 
-+#define PUD_S2_RDONLY		(_AT(pudval_t, 1) << 6)   /* HAP[2:1] */
-+#define PUD_S2_RDWR		(_AT(pudval_t, 3) << 6)   /* HAP[2:1] */
-+#define PUD_S2_XN		(_AT(pudval_t, 2) << 53)  /* XN[1:0] */
-+
- /*
-  * Memory Attribute override for Stage-2 (MemAttr[3:0])
-  */
-diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-index 7e2c27e63cd8..5efb4585c879 100644
---- a/arch/arm64/include/asm/pgtable.h
-+++ b/arch/arm64/include/asm/pgtable.h
-@@ -386,6 +386,8 @@ static inline int pmd_protnone(pmd_t pmd)
- 
- #define pud_write(pud)		pte_write(pud_pte(pud))
- 
-+#define pud_mkhuge(pud)		(__pud(pud_val(pud) & ~PUD_TABLE_BIT))
-+
- #define __pud_to_phys(pud)	__pte_to_phys(pud_pte(pud))
- #define __phys_to_pud_val(phys)	__phys_to_pte_val(phys)
- #define pud_pfn(pud)		((__pud_to_phys(pud) & PUD_MASK) >> PAGE_SHIFT)
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 5f53909da90e..7fb58dca0a83 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -1036,6 +1036,26 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
- 	return 0;
- }
- 
-+static int stage2_set_pud_huge(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
-+			       phys_addr_t addr, const pud_t *new_pud)
-+{
-+	pud_t *pud, old_pud;
-+
-+	pud = stage2_get_pud(kvm, cache, addr);
-+	VM_BUG_ON(!pud);
-+
-+	old_pud = *pud;
-+	if (pud_present(old_pud)) {
-+		pud_clear(pud);
-+		kvm_tlb_flush_vmid_ipa(kvm, addr);
-+	} else {
-+		get_page(virt_to_page(pud));
-+	}
-+
-+	kvm_set_pud(pud, *new_pud);
-+	return 0;
-+}
-+
- static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr)
- {
- 	pmd_t *pmdp;
-@@ -1452,9 +1472,12 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	}
- 
- 	vma_pagesize = vma_kernel_pagesize(vma);
--	if (vma_pagesize == PMD_SIZE && !logging_active) {
-+	if ((vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE) &&
-+	    !logging_active) {
-+		struct hstate *h = hstate_vma(vma);
-+
- 		hugetlb = true;
--		gfn = (fault_ipa & PMD_MASK) >> PAGE_SHIFT;
-+		gfn = (fault_ipa & huge_page_mask(h)) >> PAGE_SHIFT;
- 	} else {
- 		/*
- 		 * Pages belonging to memslots that don't have the same
-@@ -1521,15 +1544,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (mmu_notifier_retry(kvm, mmu_seq))
- 		goto out_unlock;
- 
--	if (!hugetlb && !force_pte) {
--		/*
--		 * Only PMD_SIZE transparent hugepages(THP) are
--		 * currently supported. This code will need to be
--		 * updated if other THP sizes are supported.
--		 */
-+	if (!hugetlb && !force_pte)
- 		hugetlb = transparent_hugepage_adjust(&pfn, &fault_ipa);
--		vma_pagesize = PMD_SIZE;
--	}
- 
- 	if (writable)
- 		kvm_set_pfn_dirty(pfn);
-@@ -1540,7 +1556,23 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (exec_fault)
- 		invalidate_icache_guest_page(pfn, vma_pagesize);
- 
--	if (hugetlb) {
-+	if (vma_pagesize == PUD_SIZE) {
-+		pud_t new_pud = kvm_pfn_pud(pfn, mem_type);
-+
-+		new_pud = kvm_pud_mkhuge(new_pud);
-+		if (writable)
-+			new_pud = kvm_s2pud_mkwrite(new_pud);
-+
-+		if (exec_fault) {
-+			new_pud = kvm_s2pud_mkexec(new_pud);
-+		} else if (fault_status == FSC_PERM) {
-+			/* Preserve execute if XN was already cleared */
-+			if (stage2_is_exec(kvm, fault_ipa))
-+				new_pud = kvm_s2pud_mkexec(new_pud);
-+		}
-+
-+		ret = stage2_set_pud_huge(kvm, memcache, fault_ipa, &new_pud);
-+	} else if (vma_pagesize == PMD_SIZE) {
- 		pmd_t new_pmd = kvm_pfn_pmd(pfn, mem_type);
- 
- 		new_pmd = kvm_pmd_mkhuge(new_pmd);
--- 
-2.17.0
+>> While we're here, regarding the other issue with kvm [3], I didn't
+>> receive any comments as to whether it makes sense to send the fix that
+>> adds -fno-jump-tables flag when building kvm with clang.
+>
+> Is that the only thing missing? Are you sure that there is no other way
+> for clang to generate absolute addresses that will then lead to a crash?
+> Again, I'd rather make sure we have the full picture.
+
+Well, I have tried applying that patch and running kvm tests that I
+could find [1], and they passed (actually I think there was an issue
+with one of them, but I saw the same thing when I tried running them
+on a kernel built with GCC).
+
+[1] https://www.linux-kvm.org/page/KVM-unit-tests
