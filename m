@@ -1,56 +1,107 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH v3 05/12] KVM: arm/arm64: Revisit Redistributor TYPER
- last bit computation
-Date: Tue, 24 Apr 2018 23:06:55 +0200
-Message-ID: <20180424210655.GF4533@C02W217FHV2R.local>
+Subject: Re: [PATCH v3 04/12] KVM: arm/arm64: Helper to locate free rdist
+ index
+Date: Tue, 24 Apr 2018 23:07:04 +0200
+Message-ID: <20180424210704.GG4533@C02W217FHV2R.local>
 References: <1523607658-9166-1-git-send-email-eric.auger@redhat.com>
- <1523607658-9166-6-git-send-email-eric.auger@redhat.com>
+ <1523607658-9166-5-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1523607658-9166-6-git-send-email-eric.auger@redhat.com>
+In-Reply-To: <1523607658-9166-5-git-send-email-eric.auger@redhat.com>
 Sender: linux-kernel-owner@vger.kernel.org
 To: Eric Auger <eric.auger@redhat.com>
 Cc: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, cdall@kernel.org, peter.maydell@linaro.org, andre.przywara@arm.com, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Apr 13, 2018 at 10:20:51AM +0200, Eric Auger wrote:
-> The TYPER of an redistributor reflects whether the rdist is
-> the last one of the redistributor region. Let's compare the TYPER
-> GPA against the address of the last occupied slot within the
-> redistributor region.
+On Fri, Apr 13, 2018 at 10:20:50AM +0200, Eric Auger wrote:
+> We introduce vgic_v3_rdist_free_slot to help identifying
+> where we can place a new 2x64KB redistributor.
 > 
 > Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > ---
->  virt/kvm/arm/vgic/vgic-mmio-v3.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+>  virt/kvm/arm/vgic/vgic-mmio-v3.c |  3 +--
+>  virt/kvm/arm/vgic/vgic-v3.c      | 17 +++++++++++++++++
+>  virt/kvm/arm/vgic/vgic.h         | 11 +++++++++++
+>  3 files changed, 29 insertions(+), 2 deletions(-)
 > 
 > diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> index 49ca176..ce5c927 100644
+> index d1aab18..49ca176 100644
 > --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
 > +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> @@ -184,12 +184,17 @@ static unsigned long vgic_mmio_read_v3r_typer(struct kvm_vcpu *vcpu,
->  					      gpa_t addr, unsigned int len)
->  {
->  	unsigned long mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
-> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-> +	struct vgic_redist_region *rdreg = vgic_cpu->rdreg;
->  	int target_vcpu_id = vcpu->vcpu_id;
-> +	gpa_t last_rdist_typer = rdreg->base + GICR_TYPER +
-> +			(rdreg->free_index - 1) * KVM_VGIC_V3_REDIST_SIZE;
->  	u64 value;
+> @@ -593,8 +593,7 @@ int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
+>  	 * function for all VCPUs when the base address is set.  Just return
+>  	 * without doing any work for now.
+>  	 */
+> -	rdreg = list_first_entry(&vgic->rd_regions,
+> -				 struct vgic_redist_region, list);
+> +	rdreg = vgic_v3_rdist_free_slot(&vgic->rd_regions);
+>  	if (!rdreg)
+>  		return 0;
 >  
->  	value = (u64)(mpidr & GENMASK(23, 0)) << 32;
->  	value |= ((target_vcpu_id & 0xffff) << 8);
-> -	if (target_vcpu_id == atomic_read(&vcpu->kvm->online_vcpus) - 1)
+> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+> index 94de6cd..820012a 100644
+> --- a/virt/kvm/arm/vgic/vgic-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-v3.c
+> @@ -444,6 +444,23 @@ bool vgic_v3_check_base(struct kvm *kvm)
+>  	return false;
+>  }
+>  
+> +/**
+> + * vgic_v3_rdist_free_slot - Look up registered rdist regions and identify one
+> + * which has free space to put a new rdist regions
+
+Can this structure ever be sparse or do we always find the first empty
+one, as we fill them consecutively ?
+
+I assume there is some mapping between the regions and the VCPUs'
+redistributors, so perhaps the wording in this comment can be more
+precise.
+
+> + *
+> + * If any, return this redist region handle, otherwise returns NULL.
+> + */
+> +struct vgic_redist_region *vgic_v3_rdist_free_slot(struct list_head *rd_regions)
+> +{
+> +	struct vgic_redist_region *rdreg;
 > +
-> +	if (addr == last_rdist_typer)
->  		value |= GICR_TYPER_LAST;
->  	if (vgic_has_its(vcpu->kvm))
->  		value |= GICR_TYPER_PLPIS;
+> +	list_for_each_entry(rdreg, rd_regions, list) {
+> +		if (!vgic_v3_redist_region_full(rdreg))
+> +			return rdreg;
+> +	}
+> +	return NULL;
+> +}
+> +
+>  int vgic_v3_map_resources(struct kvm *kvm)
+>  {
+>  	int ret = 0;
+> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+> index 830e815..fea32cb 100644
+> --- a/virt/kvm/arm/vgic/vgic.h
+> +++ b/virt/kvm/arm/vgic/vgic.h
+> @@ -251,6 +251,17 @@ static inline int vgic_v3_max_apr_idx(struct kvm_vcpu *vcpu)
+>  	}
+>  }
+>  
+> +static inline bool
+> +vgic_v3_redist_region_full(struct vgic_redist_region *region)
+> +{
+> +	if (!region->count)
+> +		return false;
+> +
+> +	return (region->free_index >= region->count);
+> +}
+> +
+> +struct vgic_redist_region *vgic_v3_rdist_free_slot(struct list_head *rdregs);
+> +
+>  int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
+>  			 u32 devid, u32 eventid, struct vgic_irq **irq);
+>  struct vgic_its *vgic_msi_to_its(struct kvm *kvm, struct kvm_msi *msi);
 > -- 
 > 2.5.5
 > 
+
+Asides from the above:
 
 Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
