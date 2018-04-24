@@ -1,44 +1,50 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v3 02/12] KVM: arm/arm64: Document KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
-Date: Tue, 24 Apr 2018 17:50:37 +0100
-Message-ID: <CAFEAcA_EKuW6DWaHCvAftbL6QUSo6WY0cQmHrZhhbP5HoN_NqQ@mail.gmail.com>
-References: <1523607658-9166-1-git-send-email-eric.auger@redhat.com>
- <1523607658-9166-3-git-send-email-eric.auger@redhat.com> <20180424164649.GA4533@C02W217FHV2R.local>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: Migration with directly assigned devices is possible?
+Date: Tue, 24 Apr 2018 19:13:56 +0200
+Message-ID: <b0271fcf-283d-c4a3-5864-d8c03fd41702@redhat.com>
+References: <CAHyh4xjW9P2N9Dw6AasuX7=dcdJeiW2be1nZsZRWMxnpp6Xhmw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180424164649.GA4533@C02W217FHV2R.local>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Eric Auger <eric.auger@redhat.com>, Eric Auger <eric.auger.pro@gmail.com>, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, kvm-devel <kvm@vger.kernel.org>, kvmarm@lists.cs.columbia.edu, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@kernel.org>, Andre Przywara <andre.przywara@arm.com>, Andrew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D4C2F49F8B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Apr 2018 13:05:07 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id N6zD793ui15X for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Apr 2018 13:04:46 -0400 (EDT)
+Received: from mail-wr0-f172.google.com (mail-wr0-f172.google.com
+ [209.85.128.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BC40249F7E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Apr 2018 13:04:37 -0400 (EDT)
+Received: by mail-wr0-f172.google.com with SMTP id c14-v6so10593990wrd.4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Apr 2018 10:14:00 -0700 (PDT)
+In-Reply-To: <CAHyh4xjW9P2N9Dw6AasuX7=dcdJeiW2be1nZsZRWMxnpp6Xhmw@mail.gmail.com>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Jintack Lim <jintack@cs.columbia.edu>, KVM General <kvm@vger.kernel.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 24 April 2018 at 17:46, Christoffer Dall <christoffer.dall@arm.com> wrote:
-> On Fri, Apr 13, 2018 at 10:20:48AM +0200, Eric Auger wrote:
->> --- a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
->> +++ b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
->> @@ -27,9 +27,32 @@ Groups:
->>        VCPU and all of the redistributor pages are contiguous.
->>        Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
->>        This address needs to be 64K aligned.
->> +
->> +    KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION (rw, 64-bit)
->> +      The attr field of kvm_device_attr encodes 3 values:
->> +      bits:     | 63   ....  52  |  51   ....   16 | 15 - 12  |11 - 0
->> +      values:   |     count      |       base      |  flags   | index
->> +      - index encodes the unique redistributor region index
->
-> I'm not entirely sure I understand the purpose of the index field.
-> Isn't a redistributor region identified uniquely by its base address?
+On 24/04/2018 16:56, Jintack Lim wrote:
+> Hi,
+> 
+> I wonder if we can do migration with directly assigned devices (i.e.
+> pass-through devices)? I looked at the KVM migration page[1], but
+> couldn't find information. Can somebody let me now if it's possible or
+> point me the related documents?
 
-You need a way to tell the difference beween:
- (1) redistributors for CPUs 0..63 at 0x40000000, redistributors
-     for 64..127 at 0x80000000
- (2) redistributors for CPUs 0..63 at 0x80000000, redistributors
-     for 64..127 at 0x40000000
+No, it's not possible.  Various device-specific methods have been
+proposed, but none has ever been included into either VFIO or QEMU.
 
-The index field tells you which order the redistributor
-regions go in.
+Thanks,
 
-thanks
--- PMM
+Paolo
