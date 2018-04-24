@@ -1,66 +1,83 @@
-From: Jintack Lim <jintack@cs.columbia.edu>
-Subject: Migration with directly assigned devices is possible?
-Date: Tue, 24 Apr 2018 10:56:16 -0400
-Message-ID: <CAHyh4xjW9P2N9Dw6AasuX7=dcdJeiW2be1nZsZRWMxnpp6Xhmw@mail.gmail.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH v3 02/12] KVM: arm/arm64: Document
+ KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+Date: Tue, 24 Apr 2018 18:46:49 +0200
+Message-ID: <20180424164649.GA4533@C02W217FHV2R.local>
+References: <1523607658-9166-1-git-send-email-eric.auger@redhat.com>
+ <1523607658-9166-3-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CE94249F7F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Apr 2018 10:47:24 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vzM+ChhOZ-om for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 Apr 2018 10:47:03 -0400 (EDT)
-Received: from outprodmail02.cc.columbia.edu (outprodmail02.cc.columbia.edu
- [128.59.72.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4582A49EA4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Apr 2018 10:47:03 -0400 (EDT)
-Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
- by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id w3OEuPp3024294
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Apr 2018 10:56:25 -0400
-Received: from hazelnut (localhost.localdomain [127.0.0.1])
- by hazelnut (Postfix) with ESMTP id 172EFDB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Apr 2018 10:56:25 -0400 (EDT)
-Received: from sendprodmail04.cc.columbia.edu (sendprodmail04.cc.columbia.edu
- [128.59.72.16]) by hazelnut (Postfix) with ESMTP id 170EE81
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Apr 2018 10:56:20 -0400 (EDT)
-Received: from mail-wm0-f70.google.com (mail-wm0-f70.google.com [74.125.82.70])
- by sendprodmail04.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id w3OEuJfF026426
- (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Apr 2018 10:56:19 -0400
-Received: by mail-wm0-f70.google.com with SMTP id i131so330062wmf.6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Apr 2018 07:56:19 -0700 (PDT)
-Received: from mail-wm0-f41.google.com (mail-wm0-f41.google.com.
- [74.125.82.41])
- by smtp.gmail.com with ESMTPSA id d9sm9191327edm.74.2018.04.24.07.56.17
- for <kvmarm@lists.cs.columbia.edu>
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 24 Apr 2018 07:56:17 -0700 (PDT)
-Received: by mail-wm0-f41.google.com with SMTP id l16so1401323wmh.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Apr 2018 07:56:17 -0700 (PDT)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: KVM General <kvm@vger.kernel.org>, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1523607658-9166-3-git-send-email-eric.auger@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, cdall@kernel.org, peter.maydell@linaro.org, andre.przywara@arm.com, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+On Fri, Apr 13, 2018 at 10:20:48AM +0200, Eric Auger wrote:
+> We introduce a new KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION attribute in
+> KVM_DEV_ARM_VGIC_GRP_ADDR group. It allows userspace to provide the
+> base address and size of a redistributor region
+> 
+> Compared to KVM_VGIC_V3_ADDR_TYPE_REDIST, this new attribute allows
+> to declare several separate redistributor regions.
+> 
+> So the whole redist space does not need to be contiguous anymore.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  Documentation/virtual/kvm/devices/arm-vgic-v3.txt | 25 ++++++++++++++++++++++-
+>  1 file changed, 24 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+> index 9293b45..cbc4328 100644
+> --- a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+> +++ b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+> @@ -27,9 +27,32 @@ Groups:
+>        VCPU and all of the redistributor pages are contiguous.
+>        Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
+>        This address needs to be 64K aligned.
+> +
+> +    KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION (rw, 64-bit)
+> +      The attr field of kvm_device_attr encodes 3 values:
+> +      bits:     | 63   ....  52  |  51   ....   16 | 15 - 12  |11 - 0
+> +      values:   |     count      |       base      |  flags   | index
+> +      - index encodes the unique redistributor region index
 
-I wonder if we can do migration with directly assigned devices (i.e.
-pass-through devices)? I looked at the KVM migration page[1], but
-couldn't find information. Can somebody let me now if it's possible or
-point me the related documents?
+I'm not entirely sure I understand the purpose of the index field.
+Isn't a redistributor region identified uniquely by its base address?
+
+Otherwise this looks good.
 
 Thanks,
-Jintack
+-Christoffer
 
 
-[1] https://www.linux-kvm.org/page/Migration
+> +      - flags: reserved for future use, currently 0
+> +      - base field encodes bits [51:16] of the guest physical base address
+> +        of the first redistributor in the region.
+> +      - count encodes the number of redistributors in the region. Must be
+> +        greater than 0.
+> +      There are two 64K pages for each redistributor in the region and
+> +      redistributors are laid out contiguously within the region. Regions
+> +      are filled with redistributors in the index order. The sum of all
+> +      region count fields must be greater than or equal to the number of
+> +      VCPUs. Redistributor regions must be registered in the incremental
+> +      index order, starting from index 0.
+> +      Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
+> +
+> +  It is invalid to mix calls with KVM_VGIC_V3_ADDR_TYPE_REDIST and
+> +  KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION attributes.
+> +
+>    Errors:
+>      -E2BIG:  Address outside of addressable IPA range
+> -    -EINVAL: Incorrectly aligned address
+> +    -EINVAL: Incorrectly aligned address, bad redistributor region
+> +             count/index, mixed redistributor region attribute usage
+>      -EEXIST: Address already configured
+>      -ENXIO:  The group or attribute is unknown/unsupported for this device
+>               or hardware support is missing.
+> -- 
+> 2.5.5
+> 
