@@ -1,90 +1,63 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCH v2 13/17] kvm: arm/arm64: Allow tuning the physical
- address size for VM
-Date: Wed, 25 Apr 2018 17:22:33 +0100
-Message-ID: <ff0cf970-fd2e-faf7-42cd-5b097158276b@arm.com>
+From: Julien Grall <julien.grall@arm.com>
+Subject: Re: [PATCH v2 09/17] kvm: arm64: Make stage2 page table layout
+ dynamic
+Date: Wed, 25 Apr 2018 17:35:48 +0100
+Message-ID: <2359e848-8068-ea25-e44e-e8cfcbc9b467@arm.com>
 References: <1522156531-28348-1-git-send-email-suzuki.poulose@arm.com>
- <1522156531-28348-14-git-send-email-suzuki.poulose@arm.com>
- <81e98b32-8c13-3688-209f-2d51b2237748@arm.com>
+ <1522156531-28348-10-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <81e98b32-8c13-3688-209f-2d51b2237748@arm.com>
+In-Reply-To: <1522156531-28348-10-git-send-email-suzuki.poulose@arm.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
-To: Julien Grall <julien.grall@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: mark.rutland@arm.com, peter.maydell@linaro.org, ard.biesheuvel@linaro.org, cdall@kernel.org, kvm@vger.kernel.org, rkrcmar@redhat.com, marc.zyngier@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: ard.biesheuvel@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 25/04/18 17:10, Julien Grall wrote:
-> Hi Suzuki,
-> 
-> On 27/03/18 14:15, Suzuki K Poulose wrote:
->> Allow specifying the physical address size for a new VM via
->> the kvm_type argument for KVM_CREATE_VM ioctl. This allows
->> us to finalise the stage2 page table format as early as possible
->> and hence perform the right checks on the memory slots without
->> complication. The size is encoded as Log2(PA_Siz) in the bits[7:0]
-> 
-> s/PA_Siz/PA_Size/.
-> 
+Hi Suzuki,
 
->> --- a/include/uapi/linux/kvm.h
->> +++ b/include/uapi/linux/kvm.h
->> @@ -740,6 +740,16 @@ struct kvm_ppc_resize_hpt {
->>   #define KVM_S390_SIE_PAGE_OFFSET 1
->>   /*
->> + * On arm/arm64, machine type can be used to request the physical
->> + * address size for the VM. Bits [7-0] have been reserved for the
->> + * PA size shift (i.e, log2(PA-Size)). For backward compatibility,
+On 27/03/18 14:15, Suzuki K Poulose wrote:
+> So far we had a static stage2 page table handling code, based on a
+> fixed IPA of 40bits. As we prepare for a configurable IPA size per
+> VM, make the our stage2 page table code dynamic to do the right thing
+> for a given VM.
 > 
-> I would s/PA-Size/PA_Size/ to avoid the impression that it is a substraction.
+> Support for the IPA size configuration needs other changes in the way
+> we configure the EL2 registers (VTTBR and VTCR). So, the IPA is still
+> fixed to 40bits. The patch also moves the kvm_page_empty() in asm/kvm_mmu.h
+> to the top, before including the asm/stage2_pgtable.h to avoid a forward
+> declaration.
 > 
-
-Agree.
-
->> + * value 0 implies the default IPA size, which is 40bits.
->> + */
->> +#define KVM_VM_TYPE_ARM_PHYS_SHIFT_MASK    0xff
->> +#define KVM_VM_TYPE_ARM_PHYS_SHIFT(x)        \
->> +    ((x) & KVM_VM_TYPE_ARM_PHYS_SHIFT_MASK)
->> +
->> +/*
->>    * ioctls for /dev/kvm fds:
->>    */
->>   #define KVM_GET_API_VERSION       _IO(KVMIO,   0x00)
->> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
->> index 53bb05c..13eb66f 100644
->> --- a/virt/kvm/arm/arm.c
->> +++ b/virt/kvm/arm/arm.c
->> @@ -110,6 +110,25 @@ void kvm_arch_check_processor_compat(void *rtn)
->>   }
->> +static int kvm_arch_config_vm(struct kvm *kvm, unsigned long type)
->> +{
->> +    u32 ipa_shift = (u32)type & KVM_VM_TYPE_ARM_PHYS_SHIFT_MASK;
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Christoffer Dall <cdall@kernel.org>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> ---
+>   arch/arm64/include/asm/kvm_mmu.h              |  16 +-
+>   arch/arm64/include/asm/stage2_pgtable-nopmd.h |  42 ------
+>   arch/arm64/include/asm/stage2_pgtable-nopud.h |  39 -----
+>   arch/arm64/include/asm/stage2_pgtable.h       | 203 +++++++++++++++++---------
+>   4 files changed, 145 insertions(+), 155 deletions(-)
+>   delete mode 100644 arch/arm64/include/asm/stage2_pgtable-nopmd.h
+>   delete mode 100644 arch/arm64/include/asm/stage2_pgtable-nopud.h
 > 
-> How about using KVM_VM_TYPE_ARM_PHYS_SHIFT(type) directly here?
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index 594c4e6..bc133ce 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -18,9 +18,10 @@
+>   #ifndef __ARM64_KVM_MMU_H__
+>   #define __ARM64_KVM_MMU_H__
+>   
+> +#include <asm/cpufeature.h>
+>   #include <asm/page.h>
+>   #include <asm/memory.h>
+> -#include <asm/cpufeature.h>
 
-Thanks for that, I have this already fixed in for v3.
+OOI, why was the include of cpufeature.h moved earlier?
 
->>   /**
->>    * kvm_arch_init_vm - initializes a VM data structure
->>    * @kvm:    pointer to the KVM struct
->> @@ -118,8 +137,9 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->>   {
->>       int ret, cpu;
->> -    if (type)
->> -        return -EINVAL;
->> +    ret = kvm_arch_config_vm(kvm, type);
->> +    if (ret)
->> +        return ret;
->>       kvm->arch.last_vcpu_ran = alloc_percpu(typeof(*kvm->arch.last_vcpu_ran));
->>       if (!kvm->arch.last_vcpu_ran)
->>
-> 
-> Cheers,
+Cheers,
 
-Thanks for the review.
-
-Cheers.
+-- 
+Julien Grall
