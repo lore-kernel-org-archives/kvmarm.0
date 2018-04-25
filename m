@@ -1,56 +1,52 @@
 From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [RFC PATCH 4/8] arm64/sve: Move read_zcr_features() out of
- cpufeature.h
-Date: Wed, 25 Apr 2018 19:06:38 +0100
-Message-ID: <20180425180637.qw5llrrjdnh7gnei@armageddon.cambridge.arm.com>
+Subject: Re: [RFC PATCH 5/8] arm64/sve: Switch sve_pffr() argument from task
+ to thread
+Date: Wed, 25 Apr 2018 19:06:57 +0100
+Message-ID: <20180425180657.uz7xnz36gjqikqep@armageddon.cambridge.arm.com>
 References: <1524242802-21163-1-git-send-email-Dave.Martin@arm.com>
- <1524242802-21163-5-git-send-email-Dave.Martin@arm.com>
+ <1524242802-21163-6-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C231749FDE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Apr 2018 13:57:58 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id fZMuffWpqLxE for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 25 Apr 2018 13:57:36 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B2E749FD3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Apr 2018 13:57:36 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <1524242802-21163-5-git-send-email-Dave.Martin@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+In-Reply-To: <1524242802-21163-6-git-send-email-Dave.Martin@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Dave Martin <Dave.Martin@arm.com>
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Christoffer Dall <cdall@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Apr 20, 2018 at 05:46:38PM +0100, Dave P Martin wrote:
-> Having read_zcr_features() inline in cpufeature.h results in that
-> header requiring #includes which make it hard to include
-> <asm/fpsimd.h> elsewhere without triggering header inclusion
-> cycles.
+On Fri, Apr 20, 2018 at 05:46:39PM +0100, Dave P Martin wrote:
+> sve_pffr(), which is used to derive the base address used for
+> low-level SVE save/restore routines, currently takes the relevant
+> task_struct as an argument.
 > 
-> This is not a hot-path function and arguably should not be in
-> cpufeature.h in the first place, so this patch moves it to
-> fpsimd.c, compiled conditionally if CONFIG_ARM64_SVE=y.
-> 
-> This allows some SVE-related #includes to be dropped from
-> cpufeature.h, which will ease future maintenance.
-> 
-> A couple of missing #includes of <asm/fpsimd.h> are exposed by this
-> change under arch/arm64/.  This patch adds the missing #includes as
-> necessary.
+> The only accessed fields are actually part of thread_struct, so
+> this patch changes the argument type accordingly.  This is done in
+> preparation for moving this function to a header, where we do not
+> want to have to include <linux/sched.h> due to the consequent
+> circular #include problems.
 > 
 > No functional change.
 > 
 > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 
-I guess when you eventually drop the RFC, these patches would be merged
-through the KVM tree. For the core arm64 parts:
-
 Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-
-The KVM changes also look fine to me but I'm not a KVM expert.
-
--- 
-Catalin
