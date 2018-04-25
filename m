@@ -1,74 +1,34 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCHv3 11/11] arm64: docs: document pointer authentication
-Date: Wed, 25 Apr 2018 13:27:50 +0100
-Message-ID: <20180425122749.4eqhd2uiofoc7jyv@armageddon.cambridge.arm.com>
-References: <20180417183735.56985-1-mark.rutland@arm.com>
- <20180417183735.56985-12-mark.rutland@arm.com>
+From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Subject: Re: [PATCH 0/5] KVM/arm fixes for 4.17-rc2
+Date: Wed, 25 Apr 2018 15:08:05 +0200
+Message-ID: <20180425130805.GA23874@flask>
+References: <20180420160713.17884-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <20180417183735.56985-12-mark.rutland@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, drjones@redhat.com, cdall@kernel.org, arnd@arndb.de, suzuki.poulose@arm.com, marc.zyngier@arm.com, awallis@codeaurora.org, kernel-hardening@lists.openwall.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, ramana.radhakrishnan@arm.com, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20180420160713.17884-1-marc.zyngier@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>, Stefano Stabellini <sstabellini@kernel.org>, Christoffer Dall <cdall@kernel.org>, kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Apr 17, 2018 at 07:37:35PM +0100, Mark Rutland wrote:
-> +Basic support
-> +-------------
-> +
-> +When CONFIG_ARM64_PTR_AUTH is selected, and relevant HW support is
-> +present, the kernel will assign a random APIAKey value to each process
-> +at exec*() time. This key is shared by all threads within the process,
-> +and the key is preserved across fork(). Presence of functionality using
-> +APIAKey is advertised via HWCAP_APIA.
-> +
-> +Recent versions of GCC can compile code with APIAKey-based return
-> +address protection when passed the -msign-return-address option. This
-> +uses instructions in the HINT space, and such code can run on systems
-> +without the pointer authentication extension.
-> +
-> +The remaining instruction and data keys (APIBKey, APDAKey, APDBKey) are
-> +reserved for future use, and instructions using these keys must not be
-> +used by software until a purpose and scope for their use has been
-> +decided. To enable future software using these keys to function on
-> +contemporary kernels, where possible, instructions using these keys are
-> +made to behave as NOPs.
-> +
-> +The generic key (APGAKey) is currently unsupported. Instructions using
-> +the generic key must not be used by software.
-> +
-> +
-> +Debugging
-> +---------
-> +
-> +When CONFIG_ARM64_PTR_AUTH is selected, and relevant HW support is
-> +present, the kernel will expose the position of TTBR0 PAC bits in the
-> +NT_ARM_PAC_MASK regset (struct user_pac_mask), which userspace can
-> +acqure via PTRACE_GETREGSET.
-> +
-> +Separate masks are exposed for data pointers and instruction pointers,
-> +as the set of PAC bits can vary between the two. Debuggers should not
-> +expect that HWCAP_APIA implies the presence (or non-presence) of this
-> +regset -- in future the kernel may support the use of APIBKey, APDAKey,
-> +and/or APBAKey, even in the absence of APIAKey.
-> +
-> +Note that the masks apply to TTBR0 addresses, and are not valid to apply
-> +to TTBR1 addresses (e.g. kernel pointers).
+2018-04-20 17:07+0100, Marc Zyngier:
+> Radim, Paolo,
+> 
+> Here is the first batch of KVM/arm fixes post 4.17 merge window. Not a
+> lot to report, apart from the slightly scary VMID allocation race that
+> has been sitting there from day 1.
+> 
+> Please pull.
 
-I'm fine with the rest of the series but I'd like the toolchain guys to
-ack the ABI we are exposing (just this document is fine).
-
-> +Virtualization
-> +--------------
-> +
-> +Pointer authentication is not currently supported in KVM guests. KVM
-> +will mask the feature bits from ID_AA64ISAR1_EL1, and attempted use of
-> +the feature will result in an UNDEFINED exception being injected into
-> +the guest.
-
-I suspect at some point we'll see patches for KVM?
-
--- 
-Catalin
+Pulled, thanks.
