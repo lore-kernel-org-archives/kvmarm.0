@@ -1,11 +1,14 @@
 From: Mark Rutland <mark.rutland@arm.com>
-Subject: [PATCH 0/3] arm64/kvm spectre-v1 fixes
-Date: Wed, 25 Apr 2018 17:13:39 +0100
-Message-ID: <20180425161342.38133-1-mark.rutland@arm.com>
+Subject: [PATCH 3/3] KVM: arm/arm64: vgic: fix possible spectre-v1 in
+ vgic_mmio_read_apr()
+Date: Wed, 25 Apr 2018 17:13:42 +0100
+Message-ID: <20180425161342.38133-4-mark.rutland@arm.com>
+References: <20180425161342.38133-1-mark.rutland@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20180425161342.38133-1-mark.rutland@arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -19,26 +22,47 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: mark.rutland@arm.com, cdall@kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-These patches fix arm64-specific potential spectre-v1 gadgets found by
-smatch when run over v4.17-rc2.
+It's possible for userspace to control n. Sanitize n when using it as an
+array index.
 
-I'm still building up my smatch database, so it's possible that there are
-further gadgets to be found.
+Note that while it appears that n must be bound to the interval [0,3]
+due to the way it is extracted from addr, we cannot guarantee that
+compiler transformations (and/or future refactoring) will ensure this is
+the case, and given this is a slow path it's better to always perform
+the masking.
 
-For the moment I've ignored issues which appear to be cross-architecture.
+Found by smatch.
 
-Thanks,
-Mark.
+Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+Cc: Christoffer Dall <cdall@kernel.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu
+---
+ virt/kvm/arm/vgic/vgic-mmio-v2.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-Mark Rutland (3):
-  arm64: fix possible spectre-v1 in ptrace_hbp_get_event()
-  KVM: arm/arm64: vgic: fix possible spectre-v1 in vgic_get_irq()
-  KVM: arm/arm64: vgic: fix possible spectre-v1 in vgic_mmio_read_apr()
-
- arch/arm64/kernel/ptrace.c       | 14 ++++++++++----
- virt/kvm/arm/vgic/vgic-mmio-v2.c |  5 +++++
- virt/kvm/arm/vgic/vgic.c         | 14 ++++++++++----
- 3 files changed, 25 insertions(+), 8 deletions(-)
-
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+index e21e2f49b005..ffc587bf4742 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+@@ -14,6 +14,8 @@
+ #include <linux/irqchip/arm-gic.h>
+ #include <linux/kvm.h>
+ #include <linux/kvm_host.h>
++#include <linux/nospec.h>
++
+ #include <kvm/iodev.h>
+ #include <kvm/arm_vgic.h>
+ 
+@@ -324,6 +326,9 @@ static unsigned long vgic_mmio_read_apr(struct kvm_vcpu *vcpu,
+ 
+ 		if (n > vgic_v3_max_apr_idx(vcpu))
+ 			return 0;
++
++		n = array_index_nospec(n, 4);
++
+ 		/* GICv3 only uses ICH_AP1Rn for memory mapped (GICv2) guests */
+ 		return vgicv3->vgic_ap1r[n];
+ 	}
 -- 
 2.11.0
