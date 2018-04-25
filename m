@@ -1,87 +1,100 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH kvmtool 3/3] arm/gic: move GICv2M gadget size into private
- header
-Date: Wed, 25 Apr 2018 11:09:45 +0100
-Message-ID: <20180425100945.19171-4-andre.przywara@arm.com>
-References: <20180425100945.19171-1-andre.przywara@arm.com>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCHv3 07/11] arm64: add basic pointer authentication support
+Date: Wed, 25 Apr 2018 12:23:32 +0100
+Message-ID: <20180425112331.hke7afxnslyrwf3h@armageddon.cambridge.arm.com>
+References: <20180417183735.56985-1-mark.rutland@arm.com>
+ <20180417183735.56985-8-mark.rutland@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8ADD54070F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Apr 2018 06:01:05 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1phGBx8cfyc7 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 25 Apr 2018 06:00:43 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 85F174A047
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Apr 2018 06:00:43 -0400 (EDT)
-In-Reply-To: <20180425100945.19171-1-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20180417183735.56985-8-mark.rutland@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, drjones@redhat.com, cdall@kernel.org, arnd@arndb.de, suzuki.poulose@arm.com, marc.zyngier@arm.com, awallis@codeaurora.org, kernel-hardening@lists.openwall.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, ramana.radhakrishnan@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The header files in arm/aarch*/include/asm/ are directly copied from
-Linux, so we can't just put our own definitions in there.
-Move the GICv2M MMIO frame size into a more private header, to avoid
-breaking the build once the header files are synced from Linux.
+Hi Mark,
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
- arm/aarch32/include/asm/kvm.h | 2 --
- arm/aarch64/include/asm/kvm.h | 2 --
- arm/include/arm-common/gic.h  | 2 ++
- 3 files changed, 2 insertions(+), 4 deletions(-)
+On Tue, Apr 17, 2018 at 07:37:31PM +0100, Mark Rutland wrote:
+> diff --git a/arch/arm64/include/asm/mmu_context.h b/arch/arm64/include/asm/mmu_context.h
+> index 39ec0b8a689e..caf0d3010112 100644
+> --- a/arch/arm64/include/asm/mmu_context.h
+> +++ b/arch/arm64/include/asm/mmu_context.h
+> @@ -29,7 +29,6 @@
+>  #include <asm/cacheflush.h>
+>  #include <asm/cpufeature.h>
+>  #include <asm/proc-fns.h>
+> -#include <asm-generic/mm_hooks.h>
+>  #include <asm/cputype.h>
+>  #include <asm/pgtable.h>
+>  #include <asm/sysreg.h>
+> @@ -168,7 +167,14 @@ static inline void cpu_replace_ttbr1(pgd_t *pgdp)
+>  #define destroy_context(mm)		do { } while(0)
+>  void check_and_switch_context(struct mm_struct *mm, unsigned int cpu);
+>  
+> -#define init_new_context(tsk,mm)	({ atomic64_set(&(mm)->context.id, 0); 0; })
+> +static inline int init_new_context(struct task_struct *tsk,
+> +			struct mm_struct *mm)
+> +{
+> +	atomic64_set(&mm->context.id, 0);
+> +	mm_ctx_ptrauth_init(&mm->context);
+> +
+> +	return 0;
+> +}
+>  
+>  #ifdef CONFIG_ARM64_SW_TTBR0_PAN
+>  static inline void update_saved_ttbr0(struct task_struct *tsk,
+> @@ -216,6 +222,8 @@ static inline void __switch_mm(struct mm_struct *next)
+>  		return;
+>  	}
+>  
+> +	mm_ctx_ptrauth_switch(&next->context);
+> +
+>  	check_and_switch_context(next, cpu);
+>  }
+>  
+> @@ -241,6 +249,19 @@ switch_mm(struct mm_struct *prev, struct mm_struct *next,
+>  void verify_cpu_asid_bits(void);
+>  void post_ttbr_update_workaround(void);
+>  
+> +static inline void arch_dup_mmap(struct mm_struct *oldmm,
+> +				 struct mm_struct *mm)
+> +{
+> +	mm_ctx_ptrauth_dup(&oldmm->context, &mm->context);
+> +}
+> +#define arch_dup_mmap arch_dup_mmap
 
-diff --git a/arm/aarch32/include/asm/kvm.h b/arm/aarch32/include/asm/kvm.h
-index 02206673..6ebd3e6a 100644
---- a/arm/aarch32/include/asm/kvm.h
-+++ b/arm/aarch32/include/asm/kvm.h
-@@ -84,8 +84,6 @@ struct kvm_regs {
- #define KVM_VGIC_V2_DIST_SIZE		0x1000
- #define KVM_VGIC_V2_CPU_SIZE		0x2000
- 
--#define KVM_VGIC_V2M_SIZE		0x1000
--
- /* Supported VGICv3 address types  */
- #define KVM_VGIC_V3_ADDR_TYPE_DIST	2
- #define KVM_VGIC_V3_ADDR_TYPE_REDIST	3
-diff --git a/arm/aarch64/include/asm/kvm.h b/arm/aarch64/include/asm/kvm.h
-index 7d14507b..c2860358 100644
---- a/arm/aarch64/include/asm/kvm.h
-+++ b/arm/aarch64/include/asm/kvm.h
-@@ -84,8 +84,6 @@ struct kvm_regs {
- #define KVM_VGIC_V2_DIST_SIZE		0x1000
- #define KVM_VGIC_V2_CPU_SIZE		0x2000
- 
--#define KVM_VGIC_V2M_SIZE		0x1000
--
- /* Supported VGICv3 address types  */
- #define KVM_VGIC_V3_ADDR_TYPE_DIST	2
- #define KVM_VGIC_V3_ADDR_TYPE_REDIST	3
-diff --git a/arm/include/arm-common/gic.h b/arm/include/arm-common/gic.h
-index 687effc6..ae253c05 100644
---- a/arm/include/arm-common/gic.h
-+++ b/arm/include/arm-common/gic.h
-@@ -21,6 +21,8 @@
- #define GIC_MAX_CPUS			8
- #define GIC_MAX_IRQ			255
- 
-+#define KVM_VGIC_V2M_SIZE		0x1000
-+
- enum irqchip_type {
- 	IRQCHIP_GICV2,
- 	IRQCHIP_GICV2M,
+IIUC, we could skip the arch_dup_mmap() and init_new_context() here for
+the fork() case since the ptrauth_keys would be copied as part of the
+dup_mm(). There is another situation where init_new_context() is called
+bprm_mm_init() -> mm_alloc() -> mm_init() -> init_new_context().
+However, in this case the core code also calls arch_bprm_mm_init(). So I
+think we only need to update the latter to get a new random key.
+
+> diff --git a/arch/arm64/include/asm/pointer_auth.h b/arch/arm64/include/asm/pointer_auth.h
+> new file mode 100644
+> index 000000000000..a2e8fb91fdee
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/pointer_auth.h
+> @@ -0,0 +1,89 @@
+> +/*
+> + * Copyright (C) 2016 ARM Ltd.
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+
+Nitpick: 2018. You could also use the SPDX header, save some lines.
+
 -- 
-2.14.1
+Catalin
