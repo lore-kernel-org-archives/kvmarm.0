@@ -1,65 +1,56 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCH v2 09/17] kvm: arm64: Make stage2 page table layout
- dynamic
-Date: Wed, 25 Apr 2018 17:37:45 +0100
-Message-ID: <47e8d106-524b-67d3-9220-69569d5e7195@arm.com>
-References: <1522156531-28348-1-git-send-email-suzuki.poulose@arm.com>
- <1522156531-28348-10-git-send-email-suzuki.poulose@arm.com>
- <2359e848-8068-ea25-e44e-e8cfcbc9b467@arm.com>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [RFC PATCH 4/8] arm64/sve: Move read_zcr_features() out of
+ cpufeature.h
+Date: Wed, 25 Apr 2018 19:06:38 +0100
+Message-ID: <20180425180637.qw5llrrjdnh7gnei@armageddon.cambridge.arm.com>
+References: <1524242802-21163-1-git-send-email-Dave.Martin@arm.com>
+ <1524242802-21163-5-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <2359e848-8068-ea25-e44e-e8cfcbc9b467@arm.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Julien Grall <julien.grall@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: ard.biesheuvel@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <1524242802-21163-5-git-send-email-Dave.Martin@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Christoffer Dall <cdall@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 25/04/18 17:35, Julien Grall wrote:
-> Hi Suzuki,
+On Fri, Apr 20, 2018 at 05:46:38PM +0100, Dave P Martin wrote:
+> Having read_zcr_features() inline in cpufeature.h results in that
+> header requiring #includes which make it hard to include
+> <asm/fpsimd.h> elsewhere without triggering header inclusion
+> cycles.
 > 
-> On 27/03/18 14:15, Suzuki K Poulose wrote:
->> So far we had a static stage2 page table handling code, based on a
->> fixed IPA of 40bits. As we prepare for a configurable IPA size per
->> VM, make the our stage2 page table code dynamic to do the right thing
->> for a given VM.
->>
->> Support for the IPA size configuration needs other changes in the way
->> we configure the EL2 registers (VTTBR and VTCR). So, the IPA is still
->> fixed to 40bits. The patch also moves the kvm_page_empty() in asm/kvm_mmu.h
->> to the top, before including the asm/stage2_pgtable.h to avoid a forward
->> declaration.
->>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Christoffer Dall <cdall@kernel.org>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> ---
->>   arch/arm64/include/asm/kvm_mmu.h              |  16 +-
->>   arch/arm64/include/asm/stage2_pgtable-nopmd.h |  42 ------
->>   arch/arm64/include/asm/stage2_pgtable-nopud.h |  39 -----
->>   arch/arm64/include/asm/stage2_pgtable.h       | 203 +++++++++++++++++---------
->>   4 files changed, 145 insertions(+), 155 deletions(-)
->>   delete mode 100644 arch/arm64/include/asm/stage2_pgtable-nopmd.h
->>   delete mode 100644 arch/arm64/include/asm/stage2_pgtable-nopud.h
->>
->> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
->> index 594c4e6..bc133ce 100644
->> --- a/arch/arm64/include/asm/kvm_mmu.h
->> +++ b/arch/arm64/include/asm/kvm_mmu.h
->> @@ -18,9 +18,10 @@
->>   #ifndef __ARM64_KVM_MMU_H__
->>   #define __ARM64_KVM_MMU_H__
->> +#include <asm/cpufeature.h>
->>   #include <asm/page.h>
->>   #include <asm/memory.h>
->> -#include <asm/cpufeature.h>
+> This is not a hot-path function and arguably should not be in
+> cpufeature.h in the first place, so this patch moves it to
+> fpsimd.c, compiled conditionally if CONFIG_ARM64_SVE=y.
 > 
-> OOI, why was the include of cpufeature.h moved earlier?
+> This allows some SVE-related #includes to be dropped from
+> cpufeature.h, which will ease future maintenance.
+> 
+> A couple of missing #includes of <asm/fpsimd.h> are exposed by this
+> change under arch/arm64/.  This patch adds the missing #includes as
+> necessary.
+> 
+> No functional change.
+> 
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 
-I think it was a minor cleanup to keep the includes in order. I will either
-mention it or drop it from the hunk altogether.
+I guess when you eventually drop the RFC, these patches would be merged
+through the KVM tree. For the core arm64 parts:
 
-Cheers
-Suzuki
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+
+The KVM changes also look fine to me but I'm not a KVM expert.
+
+-- 
+Catalin
