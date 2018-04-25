@@ -1,53 +1,54 @@
-From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH v3 02/12] KVM: arm/arm64: Document
- KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
-Date: Tue, 24 Apr 2018 23:12:03 +0200
-Message-ID: <20180424211203.GA10555@C02W217FHV2R.local>
-References: <1523607658-9166-1-git-send-email-eric.auger@redhat.com>
- <1523607658-9166-3-git-send-email-eric.auger@redhat.com>
- <20180424164649.GA4533@C02W217FHV2R.local>
- <CAFEAcA_EKuW6DWaHCvAftbL6QUSo6WY0cQmHrZhhbP5HoN_NqQ@mail.gmail.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: [PATCH kvmtool 0/3] arm/gic: minor fixes to ITS and GICv2m
+Date: Wed, 25 Apr 2018 11:09:42 +0100
+Message-ID: <20180425100945.19171-1-andre.przywara@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_EKuW6DWaHCvAftbL6QUSo6WY0cQmHrZhhbP5HoN_NqQ@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Eric Auger <eric.auger@redhat.com>, Eric Auger <eric.auger.pro@gmail.com>, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, kvm-devel <kvm@vger.kernel.org>, kvmarm@lists.cs.columbia.edu, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@kernel.org>, Andre Przywara <andre.przywara@arm.com>, Andrew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BAB594070F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Apr 2018 06:01:01 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id TKU-1wxNfgzA for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 25 Apr 2018 06:00:39 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CC5040170
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Apr 2018 06:00:39 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Apr 24, 2018 at 05:50:37PM +0100, Peter Maydell wrote:
-> On 24 April 2018 at 17:46, Christoffer Dall <christoffer.dall@arm.com> wrote:
-> > On Fri, Apr 13, 2018 at 10:20:48AM +0200, Eric Auger wrote:
-> >> --- a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-> >> +++ b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-> >> @@ -27,9 +27,32 @@ Groups:
-> >>        VCPU and all of the redistributor pages are contiguous.
-> >>        Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
-> >>        This address needs to be 64K aligned.
-> >> +
-> >> +    KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION (rw, 64-bit)
-> >> +      The attr field of kvm_device_attr encodes 3 values:
-> >> +      bits:     | 63   ....  52  |  51   ....   16 | 15 - 12  |11 - 0
-> >> +      values:   |     count      |       base      |  flags   | index
-> >> +      - index encodes the unique redistributor region index
-> >
-> > I'm not entirely sure I understand the purpose of the index field.
-> > Isn't a redistributor region identified uniquely by its base address?
-> 
-> You need a way to tell the difference beween:
->  (1) redistributors for CPUs 0..63 at 0x40000000, redistributors
->      for 64..127 at 0x80000000
->  (2) redistributors for CPUs 0..63 at 0x80000000, redistributors
->      for 64..127 at 0x40000000
-> 
-> The index field tells you which order the redistributor
-> regions go in.
+Three minor fixes I stumbled upon when hacking around in kvmtool.
+Not sure how the v2m support actually worked at the moment.
+We might want to look at some MMIO space allocation algorithm to use for
+the GIC as well, possibly merging it with the virtio MMIO allocation we
+already have in place (virtio_mmio_get_io_space_block()). Not sure what
+the reason was to put the GIC at a different place.
 
-ah, right.  This could be implied by the order creating the regions
-though, but ok, in that case it's nicer for userspace to state it
-explicitly.
+Cheers,
+Andre.
 
-Thanks,
--Christoffer
+Andre Przywara (3):
+  arm/gic: remove extra 64K from ITS allocation
+  arm/gic: avoid GICv2m MMIO frame overlap
+  arm/gic: move GICv2M gadget size into private header
+
+ arm/aarch32/include/asm/kvm.h | 2 --
+ arm/aarch64/include/asm/kvm.h | 2 --
+ arm/gic.c                     | 6 +++---
+ arm/include/arm-common/gic.h  | 2 ++
+ 4 files changed, 5 insertions(+), 7 deletions(-)
+
+-- 
+2.14.1
