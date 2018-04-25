@@ -1,90 +1,90 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: [PATCH 2/3] KVM: arm/arm64: vgic: fix possible spectre-v1 in
- vgic_get_irq()
-Date: Wed, 25 Apr 2018 17:13:41 +0100
-Message-ID: <20180425161342.38133-3-mark.rutland@arm.com>
-References: <20180425161342.38133-1-mark.rutland@arm.com>
+From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Subject: Re: [PATCH v2 13/17] kvm: arm/arm64: Allow tuning the physical
+ address size for VM
+Date: Wed, 25 Apr 2018 17:22:33 +0100
+Message-ID: <ff0cf970-fd2e-faf7-42cd-5b097158276b@arm.com>
+References: <1522156531-28348-1-git-send-email-suzuki.poulose@arm.com>
+ <1522156531-28348-14-git-send-email-suzuki.poulose@arm.com>
+ <81e98b32-8c13-3688-209f-2d51b2237748@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 828B949FD1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Apr 2018 12:04:57 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QA7o+p5MiIMW for <kvmarm@lists.cs.columbia.edu>;
- Wed, 25 Apr 2018 12:04:35 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 065D949FDF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Apr 2018 12:04:35 -0400 (EDT)
-In-Reply-To: <20180425161342.38133-1-mark.rutland@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org
-Cc: cdall@kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <81e98b32-8c13-3688-209f-2d51b2237748@arm.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Julien Grall <julien.grall@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: mark.rutland@arm.com, peter.maydell@linaro.org, ard.biesheuvel@linaro.org, cdall@kernel.org, kvm@vger.kernel.org, rkrcmar@redhat.com, marc.zyngier@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-It's possible for userspace to control intid. Sanitize intid when using
-it as an array index.
+On 25/04/18 17:10, Julien Grall wrote:
+> Hi Suzuki,
+> 
+> On 27/03/18 14:15, Suzuki K Poulose wrote:
+>> Allow specifying the physical address size for a new VM via
+>> the kvm_type argument for KVM_CREATE_VM ioctl. This allows
+>> us to finalise the stage2 page table format as early as possible
+>> and hence perform the right checks on the memory slots without
+>> complication. The size is encoded as Log2(PA_Siz) in the bits[7:0]
+> 
+> s/PA_Siz/PA_Size/.
+> 
 
-At the same time, sort the includes when adding <linux/nospec.h>.
+>> --- a/include/uapi/linux/kvm.h
+>> +++ b/include/uapi/linux/kvm.h
+>> @@ -740,6 +740,16 @@ struct kvm_ppc_resize_hpt {
+>>   #define KVM_S390_SIE_PAGE_OFFSET 1
+>>   /*
+>> + * On arm/arm64, machine type can be used to request the physical
+>> + * address size for the VM. Bits [7-0] have been reserved for the
+>> + * PA size shift (i.e, log2(PA-Size)). For backward compatibility,
+> 
+> I would s/PA-Size/PA_Size/ to avoid the impression that it is a substraction.
+> 
 
-Found by smatch.
+Agree.
 
-Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Cc: Christoffer Dall <cdall@kernel.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu
----
- virt/kvm/arm/vgic/vgic.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+>> + * value 0 implies the default IPA size, which is 40bits.
+>> + */
+>> +#define KVM_VM_TYPE_ARM_PHYS_SHIFT_MASK    0xff
+>> +#define KVM_VM_TYPE_ARM_PHYS_SHIFT(x)        \
+>> +    ((x) & KVM_VM_TYPE_ARM_PHYS_SHIFT_MASK)
+>> +
+>> +/*
+>>    * ioctls for /dev/kvm fds:
+>>    */
+>>   #define KVM_GET_API_VERSION       _IO(KVMIO,   0x00)
+>> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+>> index 53bb05c..13eb66f 100644
+>> --- a/virt/kvm/arm/arm.c
+>> +++ b/virt/kvm/arm/arm.c
+>> @@ -110,6 +110,25 @@ void kvm_arch_check_processor_compat(void *rtn)
+>>   }
+>> +static int kvm_arch_config_vm(struct kvm *kvm, unsigned long type)
+>> +{
+>> +    u32 ipa_shift = (u32)type & KVM_VM_TYPE_ARM_PHYS_SHIFT_MASK;
+> 
+> How about using KVM_VM_TYPE_ARM_PHYS_SHIFT(type) directly here?
 
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index e74baec76361..bd125563b15b 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -14,11 +14,13 @@
-  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  */
- 
-+#include <linux/interrupt.h>
-+#include <linux/irq.h>
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
- #include <linux/list_sort.h>
--#include <linux/interrupt.h>
--#include <linux/irq.h>
-+#include <linux/nospec.h>
-+
- #include <asm/kvm_hyp.h>
- 
- #include "vgic.h"
-@@ -101,12 +103,16 @@ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
- 			      u32 intid)
- {
- 	/* SGIs and PPIs */
--	if (intid <= VGIC_MAX_PRIVATE)
-+	if (intid <= VGIC_MAX_PRIVATE) {
-+		intid = array_index_nospec(intid, VGIC_MAX_PRIVATE);
- 		return &vcpu->arch.vgic_cpu.private_irqs[intid];
-+	}
- 
- 	/* SPIs */
--	if (intid <= VGIC_MAX_SPI)
-+	if (intid <= VGIC_MAX_SPI) {
-+		intid = array_index_nospec(intid, VGIC_MAX_SPI);
- 		return &kvm->arch.vgic.spis[intid - VGIC_NR_PRIVATE_IRQS];
-+	}
- 
- 	/* LPIs */
- 	if (intid >= VGIC_MIN_LPI)
--- 
-2.11.0
+Thanks for that, I have this already fixed in for v3.
+
+>>   /**
+>>    * kvm_arch_init_vm - initializes a VM data structure
+>>    * @kvm:    pointer to the KVM struct
+>> @@ -118,8 +137,9 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>>   {
+>>       int ret, cpu;
+>> -    if (type)
+>> -        return -EINVAL;
+>> +    ret = kvm_arch_config_vm(kvm, type);
+>> +    if (ret)
+>> +        return ret;
+>>       kvm->arch.last_vcpu_ran = alloc_percpu(typeof(*kvm->arch.last_vcpu_ran));
+>>       if (!kvm->arch.last_vcpu_ran)
+>>
+> 
+> Cheers,
+
+Thanks for the review.
+
+Cheers.
