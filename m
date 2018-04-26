@@ -1,14 +1,14 @@
 From: Julien Grall <julien.grall@arm.com>
-Subject: Re: [PATCH v2 04/17] arm64: Refactor pud_huge for reusability
-Date: Thu, 26 Apr 2018 11:55:46 +0100
-Message-ID: <388557a3-f387-4c6c-b19f-88c958476f93@arm.com>
+Subject: Re: [PATCH v2 05/17] arm64: Helper for parange to PASize
+Date: Thu, 26 Apr 2018 11:58:19 +0100
+Message-ID: <2910d406-315f-6f0f-7456-df9d80a08087@arm.com>
 References: <1522156531-28348-1-git-send-email-suzuki.poulose@arm.com>
- <1522156531-28348-5-git-send-email-suzuki.poulose@arm.com>
+ <1522156531-28348-6-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1522156531-28348-5-git-send-email-suzuki.poulose@arm.com>
+In-Reply-To: <1522156531-28348-6-git-send-email-suzuki.poulose@arm.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
@@ -18,54 +18,118 @@ List-Id: kvmarm@lists.cs.columbia.edu
 Hi Suzuki,
 
 On 27/03/18 14:15, Suzuki K Poulose wrote:
-> Make pud_huge reusable for stage2 tables, independent
-> of the stage1 levels.
-> 
-> Cc: Steve Capper <steve.capper@arm.com>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: Will Deacon <will.deacon@arm.com>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Christoffer Dall <cdall@kernel.org>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Add a helper to convert ID_AA64MMFR0_EL1:PARange to they physical
+> size shift. Limit the size to the maximum supported by the kernel.
+> We are about to move the user of this code and this helps to
+> keep the changes cleaner.
 
-Reviewed-by: Julien Grall <julien.grall@arm.com>
+It is probably worth to mention that you are also adding 52-bit support 
+in the patch.
 
 Cheers,
 
-> ---
->   arch/arm64/include/asm/pgtable.h | 5 +++++
->   arch/arm64/mm/hugetlbpage.c      | 2 +-
->   2 files changed, 6 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-> index 5e22503..4a16c11 100644
-> --- a/arch/arm64/include/asm/pgtable.h
-> +++ b/arch/arm64/include/asm/pgtable.h
-> @@ -479,6 +479,11 @@ static inline phys_addr_t pmd_page_paddr(pmd_t pmd)
->   #define __raw_pud_bad(pud)	(!(pud_val(pud) & PUD_TABLE_BIT))
->   #define __raw_pud_present(pud)	pte_present(pud_pte(pud))
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will.deacon@arm.com>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Christoffer Dall <cdall@kernel.org>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> ---
+>   arch/arm64/include/asm/cpufeature.h | 16 ++++++++++++++++
+>   arch/arm64/kvm/hyp/s2-setup.c       | 28 +++++-----------------------
+>   2 files changed, 21 insertions(+), 23 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> index fbf0aab..1f2a5dd 100644
+> --- a/arch/arm64/include/asm/cpufeature.h
+> +++ b/arch/arm64/include/asm/cpufeature.h
+> @@ -311,6 +311,22 @@ static inline u64 read_zcr_features(void)
+>   	return zcr;
+>   }
 >   
-> +static inline int __raw_pud_huge(pud_t pud)
+> +static inline u32 id_aa64mmfr0_parange_to_phys_shift(int parange)
 > +{
-> +	return pud_val(pud) && !(pud_val(pud) & PUD_TABLE_BIT);
+> +	switch (parange) {
+> +	case 0: return 32;
+> +	case 1: return 36;
+> +	case 2: return 40;
+> +	case 3: return 42;
+> +	case 4: return 44;
+> +	/* Report 48 bit if the kernel doesn't support 52bit */
+> +	default:
+> +	case 5: return 48;
+> +#ifdef CONFIG_ARM64_PA_BITS_52
+> +	case 6: return 52;
+> +#endif
+> +	}
 > +}
-> +
->   static inline void __raw_set_pud(pud_t *pudp, pud_t pud)
->   {
->   	WRITE_ONCE(*pudp, pud);
-> diff --git a/arch/arm64/mm/hugetlbpage.c b/arch/arm64/mm/hugetlbpage.c
-> index ecc6818..3f4bb43 100644
-> --- a/arch/arm64/mm/hugetlbpage.c
-> +++ b/arch/arm64/mm/hugetlbpage.c
-> @@ -35,7 +35,7 @@ int pmd_huge(pmd_t pmd)
->   int pud_huge(pud_t pud)
->   {
->   #ifndef __PAGETABLE_PMD_FOLDED
-> -	return pud_val(pud) && !(pud_val(pud) & PUD_TABLE_BIT);
-> +	return __raw_pud_huge(pud);
->   #else
->   	return 0;
+>   #endif /* __ASSEMBLY__ */
+>   
 >   #endif
+> diff --git a/arch/arm64/kvm/hyp/s2-setup.c b/arch/arm64/kvm/hyp/s2-setup.c
+> index 603e1ee..b1129c8 100644
+> --- a/arch/arm64/kvm/hyp/s2-setup.c
+> +++ b/arch/arm64/kvm/hyp/s2-setup.c
+> @@ -19,11 +19,13 @@
+>   #include <asm/kvm_arm.h>
+>   #include <asm/kvm_asm.h>
+>   #include <asm/kvm_hyp.h>
+> +#include <asm/cpufeature.h>
+>   
+>   u32 __hyp_text __init_stage2_translation(void)
+>   {
+>   	u64 val = VTCR_EL2_FLAGS;
+>   	u64 parange;
+> +	u32 phys_shift;
+>   	u64 tmp;
+>   
+>   	/*
+> @@ -37,27 +39,7 @@ u32 __hyp_text __init_stage2_translation(void)
+>   	val |= parange << 16;
+>   
+>   	/* Compute the actual PARange... */
+> -	switch (parange) {
+> -	case 0:
+> -		parange = 32;
+> -		break;
+> -	case 1:
+> -		parange = 36;
+> -		break;
+> -	case 2:
+> -		parange = 40;
+> -		break;
+> -	case 3:
+> -		parange = 42;
+> -		break;
+> -	case 4:
+> -		parange = 44;
+> -		break;
+> -	case 5:
+> -	default:
+> -		parange = 48;
+> -		break;
+> -	}
+> +	phys_shift = id_aa64mmfr0_parange_to_phys_shift(parange);
+>   
+>   	/*
+>   	 * ... and clamp it to 40 bits, unless we have some braindead
+> @@ -65,7 +47,7 @@ u32 __hyp_text __init_stage2_translation(void)
+>   	 * return that value for the rest of the kernel to decide what
+>   	 * to do.
+>   	 */
+> -	val |= 64 - (parange > 40 ? 40 : parange);
+> +	val |= 64 - (phys_shift > 40 ? 40 : phys_shift);
+>   
+>   	/*
+>   	 * Check the availability of Hardware Access Flag / Dirty Bit
+> @@ -86,5 +68,5 @@ u32 __hyp_text __init_stage2_translation(void)
+>   
+>   	write_sysreg(val, vtcr_el2);
+>   
+> -	return parange;
+> +	return phys_shift;
+>   }
 > 
 
 -- 
