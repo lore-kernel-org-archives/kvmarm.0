@@ -1,111 +1,91 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v3 07/12] KVM: arm/arm64: Adapt vgic_v3_check_base to
- multiple rdist regions
-Date: Thu, 26 Apr 2018 10:29:35 +0200
-Message-ID: <557b2aaf-3f6f-ea11-55e2-5667b651922b@redhat.com>
+Subject: Re: [PATCH v3 08/12] KVM: arm/arm64: Check vcpu redist base before
+ registering an iodev
+Date: Thu, 26 Apr 2018 11:25:06 +0200
+Message-ID: <73b8e64b-3c14-b937-487a-78f3cc73fde5@redhat.com>
 References: <1523607658-9166-1-git-send-email-eric.auger@redhat.com>
- <1523607658-9166-8-git-send-email-eric.auger@redhat.com>
- <20180424210748.GH4533@C02W217FHV2R.local>
+ <1523607658-9166-9-git-send-email-eric.auger@redhat.com>
+ <20180424210759.GI4533@C02W217FHV2R.local>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180424210748.GH4533@C02W217FHV2R.local>
+In-Reply-To: <20180424210759.GI4533@C02W217FHV2R.local>
 Sender: linux-kernel-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@arm.com>
 Cc: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, cdall@kernel.org, peter.maydell@linaro.org, andre.przywara@arm.com, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi Christoffer,
+
 On 04/24/2018 11:07 PM, Christoffer Dall wrote:
-> On Fri, Apr 13, 2018 at 10:20:53AM +0200, Eric Auger wrote:
->> We introduce a new helper to check there is no overlap between
->> dist region (if set) and registered rdist regions. This both
->> handles the case of legacy single rdist region (implicitly sized
->> with the number of online vcpus) and the new case of multiple
->> explicitly sized rdist regions.
+> On Fri, Apr 13, 2018 at 10:20:54AM +0200, Eric Auger wrote:
+>> As we are going to register several redist regions,
+>> vgic_register_all_redist_iodevs() may be called several times. We need
+>> to register a redist_iodev for a given vcpu only once. 
 > 
-> I don't understand this change, really.  Is this just a cleanup, or
-> changing some functionality (why?).
-> 
-> I think this could have come with the introduction of
-> vgic_v3_rdist_overlap() before patch 6, and then patch 6 could have been
-> simplified (hopefully) to just call this "check that nothing in the
-> world ever collides withi itself" function.
-I have merged this patch and vgic_v3_rd_region_size +
-vgic_v3_rdist_overlap and put it before this patch.
+> Wouldn't it be more natural to change that caller to only register the
+> iodevs for that region?
 
-Also I reworked the commit message which was unclear I acknowledge.
+vgic_register_redist_iodev() is the place where we decide where we map a
+given vcpu redist into a given redist region.
 
-With respect to using the adapted  vgic_v3_check_base() in
-vgic_v3_insert_redist_region(), it is less obvious to me.
+Calling vgic_register_redist_iodev for only the vcpus mapping to the
+redist region would force to inverse the logic. I think it would bring
+more upheavals in the code than bringing benefit?
 
-In vgic_v3_insert_redist_region we do the checks *before* inserting the
-new rdist region in the list of redist regions. While
-vgic_v3_check_base() does the checks on already registered rdist and
-dist regions. So I would be tempted to leave
-vgic_v3_insert_redist_region() implementation as it is.
+This new check somehow corresponds to what we had before:
+"
+if (IS_VGIC_ADDR_UNDEF(vgic->vgic_redist_base))
+                return 0;
+"
 
 Thanks
 
 Eric
 > 
+> Thanks,
+> -Christoffer
+> 
+>> So let's
+>> check if the base address has already been set. Initialize this latter
+>> in kvm_vgic_vcpu_early_init().
 >>
 >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 >> ---
->>  virt/kvm/arm/vgic/vgic-v3.c | 26 +++++++++-----------------
->>  1 file changed, 9 insertions(+), 17 deletions(-)
+>>  virt/kvm/arm/vgic/vgic-init.c    | 3 +++
+>>  virt/kvm/arm/vgic/vgic-mmio-v3.c | 3 +++
+>>  2 files changed, 6 insertions(+)
 >>
->> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
->> index dbcba5f..b80f650 100644
->> --- a/virt/kvm/arm/vgic/vgic-v3.c
->> +++ b/virt/kvm/arm/vgic/vgic-v3.c
->> @@ -432,31 +432,23 @@ bool vgic_v3_rdist_overlap(struct kvm *kvm, gpa_t base, size_t size)
->>  bool vgic_v3_check_base(struct kvm *kvm)
->>  {
->>  	struct vgic_dist *d = &kvm->arch.vgic;
->> -	gpa_t redist_size = KVM_VGIC_V3_REDIST_SIZE;
->> -	struct vgic_redist_region *rdreg =
->> -		list_first_entry(&d->rd_regions,
->> -				 struct vgic_redist_region, list);
->> -
->> -	redist_size *= atomic_read(&kvm->online_vcpus);
->> +	struct vgic_redist_region *rdreg;
+>> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+>> index 6456371..7e040e7 100644
+>> --- a/virt/kvm/arm/vgic/vgic-init.c
+>> +++ b/virt/kvm/arm/vgic/vgic-init.c
+>> @@ -82,6 +82,9 @@ void kvm_vgic_vcpu_early_init(struct kvm_vcpu *vcpu)
+>>  	INIT_LIST_HEAD(&vgic_cpu->ap_list_head);
+>>  	spin_lock_init(&vgic_cpu->ap_list_lock);
 >>  
->>  	if (!IS_VGIC_ADDR_UNDEF(d->vgic_dist_base) &&
->>  	    d->vgic_dist_base + KVM_VGIC_V3_DIST_SIZE < d->vgic_dist_base)
->>  		return false;
+>> +	vgic_cpu->rd_iodev.base_addr = VGIC_ADDR_UNDEF;
+>> +	vgic_cpu->sgi_iodev.base_addr = VGIC_ADDR_UNDEF;
+>> +
+>>  	/*
+>>  	 * Enable and configure all SGIs to be edge-triggered and
+>>  	 * configure all PPIs as level-triggered.
+>> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>> index 5273fb8..df23e66 100644
+>> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>> @@ -592,6 +592,9 @@ int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
+>>  	gpa_t rd_base, sgi_base;
+>>  	int ret;
 >>  
->> -	if (rdreg && (rdreg->base + redist_size < rdreg->base))
->> -		return false;
->> +	list_for_each_entry(rdreg, &d->rd_regions, list) {
->> +		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) <
->> +			rdreg->base)
->> +			return false;
->> +	}
->>  
->> -	/* Both base addresses must be set to check if they overlap */
->> -	if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base) || !rdreg)
->> +	if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base))
->>  		return true;
->>  
->> -	if (d->vgic_dist_base + KVM_VGIC_V3_DIST_SIZE <= rdreg->base)
->> -		return true;
->> -
->> -	if (rdreg->base + redist_size <= d->vgic_dist_base)
->> -		return true;
->> -
->> -	return false;
->> +	return !vgic_v3_rdist_overlap(kvm, d->vgic_dist_base,
->> +				      KVM_VGIC_V3_DIST_SIZE);
->>  }
->>  
->>  /**
+>> +	if (!IS_VGIC_ADDR_UNDEF(vgic_cpu->rd_iodev.base_addr))
+>> +		return 0;
+>> +
+>>  	/*
+>>  	 * We may be creating VCPUs before having set the base address for the
+>>  	 * redistributor region, in which case we will come back to this
 >> -- 
 >> 2.5.5
 >>
-> Otherwise this patch looks correct to me.
-> 
-> Thanks,
-> -Christoffer
 > 
