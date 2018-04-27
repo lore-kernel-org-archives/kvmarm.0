@@ -1,107 +1,157 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v4 00/12] KVM: arm/arm64: Allow multiple GICv3
- redistributor regions
-Date: Fri, 27 Apr 2018 16:18:19 +0200
-Message-ID: <7a4742d7-cae3-0e90-42a9-42d469ffddb2@redhat.com>
-References: <1524837993-23396-1-git-send-email-eric.auger@redhat.com>
+From: Punit Agrawal <punit.agrawal@arm.com>
+Subject: Re: [PATCH 1/4] KVM: arm/arm64: Share common code in user_mem_abort()
+Date: Fri, 27 Apr 2018 15:21:23 +0100
+Message-ID: <87bme4zq58.fsf@e105922-lin.cambridge.arm.com>
+References: <20180420145409.24485-1-punit.agrawal@arm.com>
+        <20180420145409.24485-2-punit.agrawal@arm.com>
+        <20180427111429.GL13249@C02W217FHV2R.local>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1524837993-23396-1-git-send-email-eric.auger@redhat.com>
+In-Reply-To: <20180427111429.GL13249@C02W217FHV2R.local> (Christoffer Dall's
+        message of "Fri, 27 Apr 2018 13:14:29 +0200")
 Sender: linux-kernel-owner@vger.kernel.org
-To: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, cdall@kernel.org, peter.maydell@linaro.org
-Cc: andre.przywara@arm.com, drjones@redhat.com, wei@redhat.com
+To: Christoffer Dall <christoffer.dall@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, suzuki.poulose@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+Christoffer Dall <christoffer.dall@arm.com> writes:
 
-On 04/27/2018 04:06 PM, Eric Auger wrote:
-> At the moment the KVM VGICv3 only supports a single redistributor
-> region (whose base address is set through the GICv3 kvm device
-> KVM_DEV_ARM_VGIC_GRP_ADDR/KVM_VGIC_V3_ADDR_TYPE_REDIST). There,
-> all the redistributors are laid out contiguously. The size of this
-> single redistributor region is not set explicitly but instead
-> induced at a late stage by the number of online vcpus.
-> 
-> The GIC specification does not mandate all redistributors to be
-> contiguous. Moreover DT and ACPI were specified so that multiple
-> redistributors regions can be defined.
-> 
-> The current interface brings a limitation on QEMU where ARM
-> virt machine available GPA holes only allowed to assign a
-> redistributor region fitting a max of 123 vcpus. Overcoming this
-> limitation would force either to create a new machine or relocate
-> the single rdist region or allow the allocation of multiple rdist
-> regions.
-> 
-> This series enables this last alternative. A new GICv3 KVM device
-> KVM_DEV_ARM_VGIC_GRP_ADDR/KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION allows
-> to register individual redistributor regions whose size is defined
-> explicitly. Those rdist regions then are filled by vcpu rdist frames
-> according to the need. The vgic init and related base address checks
-> are impacted.
+> On Fri, Apr 20, 2018 at 03:54:06PM +0100, Punit Agrawal wrote:
+>> The code for operations such as marking the pfn as dirty, and
+>> dcache/icache maintenance during stage 2 fault handling is duplicated
+>> between normal pages and PMD hugepages.
+>> 
+>> Instead of creating another copy of the operations when we introduce
+>> PUD hugepages, let's share them across the different pagesizes.
+>> 
+>> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
+>> Cc: Christoffer Dall <christoffer.dall@arm.com>
+>> Cc: Marc Zyngier <marc.zyngier@arm.com>
+>> ---
+>>  virt/kvm/arm/mmu.c | 36 +++++++++++++++++++++---------------
+>>  1 file changed, 21 insertions(+), 15 deletions(-)
+>> 
+>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+>> index 7f6a944db23d..db382c7c7cd7 100644
+>> --- a/virt/kvm/arm/mmu.c
+>> +++ b/virt/kvm/arm/mmu.c
+>> @@ -1428,7 +1428,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>  	kvm_pfn_t pfn;
+>>  	pgprot_t mem_type = PAGE_S2;
+>>  	bool logging_active = memslot_is_logging(memslot);
+>> -	unsigned long flags = 0;
+>> +	unsigned long vma_pagesize, flags = 0;
+>>  
+>>  	write_fault = kvm_is_write_fault(vcpu);
+>>  	exec_fault = kvm_vcpu_trap_is_iabt(vcpu);
+>> @@ -1448,7 +1448,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>  		return -EFAULT;
+>>  	}
+>>  
+>> -	if (vma_kernel_pagesize(vma) == PMD_SIZE && !logging_active) {
+>> +	vma_pagesize = vma_kernel_pagesize(vma);
+>> +	if (vma_pagesize == PMD_SIZE && !logging_active) {
+>>  		hugetlb = true;
+>>  		gfn = (fault_ipa & PMD_MASK) >> PAGE_SHIFT;
+>>  	} else {
+>> @@ -1517,23 +1518,33 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>  	if (mmu_notifier_retry(kvm, mmu_seq))
+>>  		goto out_unlock;
+>>  
+>> -	if (!hugetlb && !force_pte)
+>> +	if (!hugetlb && !force_pte) {
+>> +		/*
+>> +		 * Only PMD_SIZE transparent hugepages(THP) are
+>> +		 * currently supported. This code will need to be
+>> +		 * updated if other THP sizes are supported.
+>> +		 */
+>>  		hugetlb = transparent_hugepage_adjust(&pfn, &fault_ipa);
+>> +		vma_pagesize = PMD_SIZE;
+>> +	}
+>> +
+>> +	if (writable)
+>> +		kvm_set_pfn_dirty(pfn);
+>> +
+>> +	if (fault_status != FSC_PERM)
+>> +		clean_dcache_guest_page(pfn, vma_pagesize);
+>> +
+>> +	if (exec_fault)
+>> +		invalidate_icache_guest_page(pfn, vma_pagesize);
+>>  
+>>  	if (hugetlb) {
+>>  		pmd_t new_pmd = pfn_pmd(pfn, mem_type);
+>>  		new_pmd = pmd_mkhuge(new_pmd);
+>> -		if (writable) {
+>> +		if (writable)
+>>  			new_pmd = kvm_s2pmd_mkwrite(new_pmd);
+>> -			kvm_set_pfn_dirty(pfn);
+>> -		}
+>> -
+>> -		if (fault_status != FSC_PERM)
+>> -			clean_dcache_guest_page(pfn, PMD_SIZE);
+>>  
+>>  		if (exec_fault) {
+>>  			new_pmd = kvm_s2pmd_mkexec(new_pmd);
+>> -			invalidate_icache_guest_page(pfn, PMD_SIZE);
+>>  		} else if (fault_status == FSC_PERM) {
+>
+> This could now be rewritten to:
+>
+> 		if (exec_fault ||
+> 		    (fault_status == FSC_PERM && stage2_is_exec(kvm, fault_ipa)))
+> 			new_pmd = kvm_s2pmd_mkexec(new_pmd);
+>
+> which we could even consider making
+>
+> static bool stage2_should_exec(struct kvm *kvm, phys_addr_t addr,
+> 			       bool exec_fault, unsigned long fault_status)
+> {
+> 	/*
+> 	 * If we took an execution fault we will have made the
+> 	 * icache/dcache coherent and should now let the s2 mapping be
+> 	 * executable.
+> 	 *
+> 	 * Write faults (!exec_fault && FSC_PERM) are orthogonal to
+> 	 * execute permissions, and we preserve whatever we have.
+> 	 */
+> 	return exec_fault ||
+> 	       (fault_status == FSC_PERM && stage2_is_exec(kvm, fault_ipa));
+> }
+>
+> The benefit would be to have this documentation in a single place and
+> slightly simply both the hugetlb and !hugetlb blocks.
 
-For some unknown reason I got a timeout on the git send-email command,
-hence this isolated cover letter. The series was fully resent. Sorry for
-the inconvenience.
+Makes sense. And saves another copy when we introduce PUD handling in a
+latter patch. I've rolled this in with minor changes.
+>
+>
+>>  			/* Preserve execute if XN was already cleared */
+>>  			if (stage2_is_exec(kvm, fault_ipa))
+>> @@ -1546,16 +1557,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>  
+>>  		if (writable) {
+>>  			new_pte = kvm_s2pte_mkwrite(new_pte);
+>> -			kvm_set_pfn_dirty(pfn);
+>>  			mark_page_dirty(kvm, gfn);
+>>  		}
+>>  
+>> -		if (fault_status != FSC_PERM)
+>> -			clean_dcache_guest_page(pfn, PAGE_SIZE);
+>> -
+>>  		if (exec_fault) {
+>>  			new_pte = kvm_s2pte_mkexec(new_pte);
+>> -			invalidate_icache_guest_page(pfn, PAGE_SIZE);
+>>  		} else if (fault_status == FSC_PERM) {
+>>  			/* Preserve execute if XN was already cleared */
+>>  			if (stage2_is_exec(kvm, fault_ipa))
+>> -- 
+>> 2.17.0
+>> 
+>
+> Notwithstanding my suggestion above:
+>
+> Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
 
-Thanks
-
-Eric
-> 
-> Best Regards
-> 
-> Eric
-> 
-> Git: complete series available at
-> https://github.com/eauger/linux/tree/v4.17-rc2-rdist-regions-v4
-> Previous version:
-> https://github.com/eauger/linux/tree/v4.16-rdist-regions-v3
-> 
-> History:
-> 
-> v3 -> v4:
-> - Collected Christoffer's R-b
-> - reworked vgic_v3_rdist_overlap and introduced vgic_dist_overlap
-> - vgic_v3_insert_redist_region cleanup
-> - inverse order for patches 6 and 7
-> 
-> v2 -> v3:
-> - Add details to the user API documentation
-> - early exit if vgic_v3_rdist_region_from_index() fails
-> - return -EINVAL if legacy and new redist region API are mixed
-> 
-> v1 -> v2:
-> - Rework the uapi. Only bits [51:16] of the redist region are
->   exposed. Also a new flags field was introduced
-> - Do not store the last bit in the vgic_cpu struct anymore
-> - remove dist->spis check in 1st patch
-> - add last patch to bump VGIC_V3_MAX_CPUS to 512
-> - advertise the new attribute
-> 
-> Eric Auger (12):
->   KVM: arm/arm64: Set dist->spis to NULL after kfree
->   KVM: arm/arm64: Document KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
->   KVM: arm/arm64: Replace the single rdist region by a list
->   KVM: arm/arm64: Helper to locate free rdist index
->   KVM: arm/arm64: Revisit Redistributor TYPER last bit computation
->   KVM: arm/arm64: Adapt vgic_v3_check_base to multiple rdist regions
->   KVM: arm/arm64: Helper to register a new redistributor region
->   KVM: arm/arm64: Check vcpu redist base before registering an iodev
->   KVM: arm/arm64: Check all vcpu redistributors are set on map_resources
->   KVM: arm/arm64: Add KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
->   KVM: arm/arm64: Implement KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
->   KVM: arm/arm64: Bump VGIC_V3_MAX_CPUS to 512
-> 
->  Documentation/virtual/kvm/devices/arm-vgic-v3.txt |  25 ++++-
->  arch/arm/include/uapi/asm/kvm.h                   |   1 +
->  arch/arm64/include/uapi/asm/kvm.h                 |   1 +
->  include/kvm/arm_vgic.h                            |  16 ++-
->  virt/kvm/arm/vgic/vgic-init.c                     |  20 +++-
->  virt/kvm/arm/vgic/vgic-kvm-device.c               |  55 ++++++++++-
->  virt/kvm/arm/vgic/vgic-mmio-v3.c                  | 114 +++++++++++++++++++---
->  virt/kvm/arm/vgic/vgic-v3.c                       | 101 +++++++++++++++----
->  virt/kvm/arm/vgic/vgic.h                          |  42 +++++++-
->  9 files changed, 330 insertions(+), 45 deletions(-)
-> 
+Thanks,
+Punit
