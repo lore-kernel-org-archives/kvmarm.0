@@ -1,33 +1,11 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v4 00/12] KVM: arm/arm64: Allow multiple GICv3 redistributor
- regions
-Date: Fri, 27 Apr 2018 16:06:21 +0200
-Message-ID: <1524837993-23396-1-git-send-email-eric.auger@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 170F74A07A
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Apr 2018 09:58:01 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id REzcE2-kdtsu for <kvmarm@lists.cs.columbia.edu>;
- Fri, 27 Apr 2018 09:57:39 -0400 (EDT)
-Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3ED1D49FB1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Apr 2018 09:57:39 -0400 (EDT)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Subject: [PATCH v4 00/12] KVM: arm/arm64: Allow multiple GICv3 redistributor regions
+Date: Fri, 27 Apr 2018 16:14:53 +0200
+Message-ID: <1524838505-3823-1-git-send-email-eric.auger@redhat.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, cdall@kernel.org, peter.maydell@linaro.org
-Cc: andre.przywara@arm.com
+Cc: andre.przywara@arm.com, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
 At the moment the KVM VGICv3 only supports a single redistributor
@@ -84,6 +62,7 @@ v1 -> v2:
 - remove dist->spis check in 1st patch
 - add last patch to bump VGIC_V3_MAX_CPUS to 512
 - advertise the new attribute
+
 
 Eric Auger (12):
   KVM: arm/arm64: Set dist->spis to NULL after kfree
