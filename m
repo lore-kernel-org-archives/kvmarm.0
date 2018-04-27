@@ -1,135 +1,107 @@
-From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v4 06/12] KVM: arm/arm64: Adapt vgic_v3_check_base to multiple rdist regions
-Date: Fri, 27 Apr 2018 16:14:59 +0200
-Message-ID: <1524838505-3823-7-git-send-email-eric.auger@redhat.com>
-References: <1524838505-3823-1-git-send-email-eric.auger@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v4 00/12] KVM: arm/arm64: Allow multiple GICv3
+ redistributor regions
+Date: Fri, 27 Apr 2018 16:18:19 +0200
+Message-ID: <7a4742d7-cae3-0e90-42a9-42d469ffddb2@redhat.com>
+References: <1524837993-23396-1-git-send-email-eric.auger@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1524838505-3823-1-git-send-email-eric.auger@redhat.com>
+In-Reply-To: <1524837993-23396-1-git-send-email-eric.auger@redhat.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, cdall@kernel.org, peter.maydell@linaro.org
+To: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, cdall@kernel.org, peter.maydell@linaro.org
 Cc: andre.przywara@arm.com, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-vgic_v3_check_base() currently only handles the case of a unique
-legacy redistributor region whose size is not explicitly set but
-infered, instead, from the number of online vcpus.
+Hi,
 
-We adapt it to handle the case of multiple redistributor regions
-with explicitly defined size. We rely on two new helpers:
-- vgic_v3_rdist_overlap() is used to detect overlap with the dist
-  region if defined
-- vgic_v3_rd_region_size computes the size of the redist region,
-  would it be a legacy unique region or a new explicitly sized
-  region.
+On 04/27/2018 04:06 PM, Eric Auger wrote:
+> At the moment the KVM VGICv3 only supports a single redistributor
+> region (whose base address is set through the GICv3 kvm device
+> KVM_DEV_ARM_VGIC_GRP_ADDR/KVM_VGIC_V3_ADDR_TYPE_REDIST). There,
+> all the redistributors are laid out contiguously. The size of this
+> single redistributor region is not set explicitly but instead
+> induced at a late stage by the number of online vcpus.
+> 
+> The GIC specification does not mandate all redistributors to be
+> contiguous. Moreover DT and ACPI were specified so that multiple
+> redistributors regions can be defined.
+> 
+> The current interface brings a limitation on QEMU where ARM
+> virt machine available GPA holes only allowed to assign a
+> redistributor region fitting a max of 123 vcpus. Overcoming this
+> limitation would force either to create a new machine or relocate
+> the single rdist region or allow the allocation of multiple rdist
+> regions.
+> 
+> This series enables this last alternative. A new GICv3 KVM device
+> KVM_DEV_ARM_VGIC_GRP_ADDR/KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION allows
+> to register individual redistributor regions whose size is defined
+> explicitly. Those rdist regions then are filled by vcpu rdist frames
+> according to the need. The vgic init and related base address checks
+> are impacted.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+For some unknown reason I got a timeout on the git send-email command,
+hence this isolated cover letter. The series was fully resent. Sorry for
+the inconvenience.
 
----
+Thanks
 
-v3 -> v4:
-- squash vgic_v3_check_base adaptation and vgic_v3_rdist_overlap
-  + vgic_v3_rd_region_size introduction  and put this patch
-  before v3 patch 6
----
- virt/kvm/arm/vgic/vgic-v3.c | 49 +++++++++++++++++++++++++++++----------------
- virt/kvm/arm/vgic/vgic.h    | 10 +++++++++
- 2 files changed, 42 insertions(+), 17 deletions(-)
-
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index f81a63a..c4a2a46 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -410,6 +410,29 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
- 	return 0;
- }
- 
-+/**
-+ * vgic_v3_rdist_overlap - check if a region overlaps with any
-+ * existing redistributor region
-+ *
-+ * @kvm: kvm handle
-+ * @base: base of the region
-+ * @size: size of region
-+ *
-+ * Return: true if there is an overlap
-+ */
-+bool vgic_v3_rdist_overlap(struct kvm *kvm, gpa_t base, size_t size)
-+{
-+	struct vgic_dist *d = &kvm->arch.vgic;
-+	struct vgic_redist_region *rdreg;
-+
-+	list_for_each_entry(rdreg, &d->rd_regions, list) {
-+		if ((base + size > rdreg->base) &&
-+			(base < rdreg->base + vgic_v3_rd_region_size(kvm, rdreg)))
-+			return true;
-+	}
-+	return false;
-+}
-+
- /*
-  * Check for overlapping regions and for regions crossing the end of memory
-  * for base addresses which have already been set.
-@@ -417,31 +440,23 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
- bool vgic_v3_check_base(struct kvm *kvm)
- {
- 	struct vgic_dist *d = &kvm->arch.vgic;
--	gpa_t redist_size = KVM_VGIC_V3_REDIST_SIZE;
--	struct vgic_redist_region *rdreg =
--		list_first_entry(&d->rd_regions,
--				 struct vgic_redist_region, list);
--
--	redist_size *= atomic_read(&kvm->online_vcpus);
-+	struct vgic_redist_region *rdreg;
- 
- 	if (!IS_VGIC_ADDR_UNDEF(d->vgic_dist_base) &&
- 	    d->vgic_dist_base + KVM_VGIC_V3_DIST_SIZE < d->vgic_dist_base)
- 		return false;
- 
--	if (rdreg && (rdreg->base + redist_size < rdreg->base))
--		return false;
-+	list_for_each_entry(rdreg, &d->rd_regions, list) {
-+		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) <
-+			rdreg->base)
-+			return false;
-+	}
- 
--	/* Both base addresses must be set to check if they overlap */
--	if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base) || !rdreg)
-+	if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base))
- 		return true;
- 
--	if (d->vgic_dist_base + KVM_VGIC_V3_DIST_SIZE <= rdreg->base)
--		return true;
--
--	if (rdreg->base + redist_size <= d->vgic_dist_base)
--		return true;
--
--	return false;
-+	return !vgic_v3_rdist_overlap(kvm, d->vgic_dist_base,
-+				      KVM_VGIC_V3_DIST_SIZE);
- }
- 
- /**
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index fea32cb..e6e3ae9 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -262,6 +262,16 @@ vgic_v3_redist_region_full(struct vgic_redist_region *region)
- 
- struct vgic_redist_region *vgic_v3_rdist_free_slot(struct list_head *rdregs);
- 
-+static inline size_t
-+vgic_v3_rd_region_size(struct kvm *kvm, struct vgic_redist_region *rdreg)
-+{
-+	if (!rdreg->count)
-+		return atomic_read(&kvm->online_vcpus) * KVM_VGIC_V3_REDIST_SIZE;
-+	else
-+		return rdreg->count * KVM_VGIC_V3_REDIST_SIZE;
-+}
-+bool vgic_v3_rdist_overlap(struct kvm *kvm, gpa_t base, size_t size);
-+
- int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
- 			 u32 devid, u32 eventid, struct vgic_irq **irq);
- struct vgic_its *vgic_msi_to_its(struct kvm *kvm, struct kvm_msi *msi);
--- 
-2.5.5
+Eric
+> 
+> Best Regards
+> 
+> Eric
+> 
+> Git: complete series available at
+> https://github.com/eauger/linux/tree/v4.17-rc2-rdist-regions-v4
+> Previous version:
+> https://github.com/eauger/linux/tree/v4.16-rdist-regions-v3
+> 
+> History:
+> 
+> v3 -> v4:
+> - Collected Christoffer's R-b
+> - reworked vgic_v3_rdist_overlap and introduced vgic_dist_overlap
+> - vgic_v3_insert_redist_region cleanup
+> - inverse order for patches 6 and 7
+> 
+> v2 -> v3:
+> - Add details to the user API documentation
+> - early exit if vgic_v3_rdist_region_from_index() fails
+> - return -EINVAL if legacy and new redist region API are mixed
+> 
+> v1 -> v2:
+> - Rework the uapi. Only bits [51:16] of the redist region are
+>   exposed. Also a new flags field was introduced
+> - Do not store the last bit in the vgic_cpu struct anymore
+> - remove dist->spis check in 1st patch
+> - add last patch to bump VGIC_V3_MAX_CPUS to 512
+> - advertise the new attribute
+> 
+> Eric Auger (12):
+>   KVM: arm/arm64: Set dist->spis to NULL after kfree
+>   KVM: arm/arm64: Document KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+>   KVM: arm/arm64: Replace the single rdist region by a list
+>   KVM: arm/arm64: Helper to locate free rdist index
+>   KVM: arm/arm64: Revisit Redistributor TYPER last bit computation
+>   KVM: arm/arm64: Adapt vgic_v3_check_base to multiple rdist regions
+>   KVM: arm/arm64: Helper to register a new redistributor region
+>   KVM: arm/arm64: Check vcpu redist base before registering an iodev
+>   KVM: arm/arm64: Check all vcpu redistributors are set on map_resources
+>   KVM: arm/arm64: Add KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+>   KVM: arm/arm64: Implement KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+>   KVM: arm/arm64: Bump VGIC_V3_MAX_CPUS to 512
+> 
+>  Documentation/virtual/kvm/devices/arm-vgic-v3.txt |  25 ++++-
+>  arch/arm/include/uapi/asm/kvm.h                   |   1 +
+>  arch/arm64/include/uapi/asm/kvm.h                 |   1 +
+>  include/kvm/arm_vgic.h                            |  16 ++-
+>  virt/kvm/arm/vgic/vgic-init.c                     |  20 +++-
+>  virt/kvm/arm/vgic/vgic-kvm-device.c               |  55 ++++++++++-
+>  virt/kvm/arm/vgic/vgic-mmio-v3.c                  | 114 +++++++++++++++++++---
+>  virt/kvm/arm/vgic/vgic-v3.c                       | 101 +++++++++++++++----
+>  virt/kvm/arm/vgic/vgic.h                          |  42 +++++++-
+>  9 files changed, 330 insertions(+), 45 deletions(-)
+> 
