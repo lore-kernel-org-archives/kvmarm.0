@@ -1,111 +1,253 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCHv3 07/11] arm64: add basic pointer authentication support
-Date: Fri, 27 Apr 2018 11:27:03 +0100
-Message-ID: <20180427102703.7azck754cnjm232p@lakrids.cambridge.arm.com>
-References: <20180417183735.56985-1-mark.rutland@arm.com>
- <20180417183735.56985-8-mark.rutland@arm.com>
- <20180425112331.hke7afxnslyrwf3h@armageddon.cambridge.arm.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH 4/4] KVM: arm64: Add support for PUD hugepages at stage 2
+Date: Fri, 27 Apr 2018 13:14:22 +0200
+Message-ID: <20180427111422.GK13249@C02W217FHV2R.local>
+References: <20180420145409.24485-1-punit.agrawal@arm.com>
+ <20180420145409.24485-5-punit.agrawal@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180425112331.hke7afxnslyrwf3h@armageddon.cambridge.arm.com>
+In-Reply-To: <20180420145409.24485-5-punit.agrawal@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, drjones@redhat.com, cdall@kernel.org, arnd@arndb.de, suzuki.poulose@arm.com, marc.zyngier@arm.com, awallis@codeaurora.org, kernel-hardening@lists.openwall.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, ramana.radhakrishnan@arm.com, kvmarm@lists.cs.columbia.edu
+To: Punit Agrawal <punit.agrawal@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, suzuki.poulose@arm.com, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Apr 25, 2018 at 12:23:32PM +0100, Catalin Marinas wrote:
-> Hi Mark,
+On Fri, Apr 20, 2018 at 03:54:09PM +0100, Punit Agrawal wrote:
+> KVM only supports PMD hugepages at stage 2. Extend the stage 2 fault
+> handling to add support for PUD hugepages.
 > 
-> On Tue, Apr 17, 2018 at 07:37:31PM +0100, Mark Rutland wrote:
-> > diff --git a/arch/arm64/include/asm/mmu_context.h b/arch/arm64/include/asm/mmu_context.h
-> > index 39ec0b8a689e..caf0d3010112 100644
-> > --- a/arch/arm64/include/asm/mmu_context.h
-> > +++ b/arch/arm64/include/asm/mmu_context.h
-> > @@ -29,7 +29,6 @@
-> >  #include <asm/cacheflush.h>
-> >  #include <asm/cpufeature.h>
-> >  #include <asm/proc-fns.h>
-> > -#include <asm-generic/mm_hooks.h>
-> >  #include <asm/cputype.h>
-> >  #include <asm/pgtable.h>
-> >  #include <asm/sysreg.h>
-> > @@ -168,7 +167,14 @@ static inline void cpu_replace_ttbr1(pgd_t *pgdp)
-> >  #define destroy_context(mm)		do { } while(0)
-> >  void check_and_switch_context(struct mm_struct *mm, unsigned int cpu);
-> >  
-> > -#define init_new_context(tsk,mm)	({ atomic64_set(&(mm)->context.id, 0); 0; })
-> > +static inline int init_new_context(struct task_struct *tsk,
-> > +			struct mm_struct *mm)
-> > +{
-> > +	atomic64_set(&mm->context.id, 0);
-> > +	mm_ctx_ptrauth_init(&mm->context);
-> > +
-> > +	return 0;
-> > +}
-> >  
-> >  #ifdef CONFIG_ARM64_SW_TTBR0_PAN
-> >  static inline void update_saved_ttbr0(struct task_struct *tsk,
-> > @@ -216,6 +222,8 @@ static inline void __switch_mm(struct mm_struct *next)
-> >  		return;
-> >  	}
-> >  
-> > +	mm_ctx_ptrauth_switch(&next->context);
-> > +
-> >  	check_and_switch_context(next, cpu);
-> >  }
-> >  
-> > @@ -241,6 +249,19 @@ switch_mm(struct mm_struct *prev, struct mm_struct *next,
-> >  void verify_cpu_asid_bits(void);
-> >  void post_ttbr_update_workaround(void);
-> >  
-> > +static inline void arch_dup_mmap(struct mm_struct *oldmm,
-> > +				 struct mm_struct *mm)
-> > +{
-> > +	mm_ctx_ptrauth_dup(&oldmm->context, &mm->context);
-> > +}
-> > +#define arch_dup_mmap arch_dup_mmap
+> Addition of pud hugepage support enables additional hugepage
+> sizes (e.g., 1G with 4K granule) which can be useful on cores that
+> support mapping larger block sizes in the TLB entries.
 > 
-> IIUC, we could skip the arch_dup_mmap() and init_new_context() here for
-> the fork() case since the ptrauth_keys would be copied as part of the
-> dup_mm().
-
-If we can hook into the exec*() path to init the keys, then I agree we
-can do this...
-
-> There is another situation where init_new_context() is called
-> bprm_mm_init() -> mm_alloc() -> mm_init() -> init_new_context().
-> However, in this case the core code also calls arch_bprm_mm_init(). So I
-> think we only need to update the latter to get a new random key.
-
-... and this seems to be the right place to do it, so I'll have a go.
-
-> > diff --git a/arch/arm64/include/asm/pointer_auth.h b/arch/arm64/include/asm/pointer_auth.h
-> > new file mode 100644
-> > index 000000000000..a2e8fb91fdee
-> > --- /dev/null
-> > +++ b/arch/arm64/include/asm/pointer_auth.h
-> > @@ -0,0 +1,89 @@
-> > +/*
-> > + * Copyright (C) 2016 ARM Ltd.
-> > + *
-> > + * This program is free software; you can redistribute it and/or modify
-> > + * it under the terms of the GNU General Public License version 2 as
-> > + * published by the Free Software Foundation.
-> > + *
-> > + * This program is distributed in the hope that it will be useful,
-> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> > + * GNU General Public License for more details.
-> > + *
-> > + * You should have received a copy of the GNU General Public License
-> > + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> > + */
+> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
+> Cc: Christoffer Dall <christoffer.dall@arm.com>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Russell King <linux@armlinux.org.uk>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will.deacon@arm.com>
+> ---
+>  arch/arm/include/asm/kvm_mmu.h         | 19 +++++++++
+>  arch/arm64/include/asm/kvm_mmu.h       | 15 +++++++
+>  arch/arm64/include/asm/pgtable-hwdef.h |  4 ++
+>  arch/arm64/include/asm/pgtable.h       |  2 +
+>  virt/kvm/arm/mmu.c                     | 54 ++++++++++++++++++++------
+>  5 files changed, 83 insertions(+), 11 deletions(-)
 > 
-> Nitpick: 2018. You could also use the SPDX header, save some lines.
+> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+> index 224c22c0a69c..155916dbdd7e 100644
+> --- a/arch/arm/include/asm/kvm_mmu.h
+> +++ b/arch/arm/include/asm/kvm_mmu.h
+> @@ -77,8 +77,11 @@ void kvm_clear_hyp_idmap(void);
+>  
+>  #define kvm_pfn_pte(pfn, prot)	pfn_pte(pfn, prot)
+>  #define kvm_pfn_pmd(pfn, prot)	pfn_pmd(pfn, prot)
+> +#define kvm_pfn_pud(pfn, prot)	(__pud(0))
+>  
+>  #define kvm_pmd_mkhuge(pmd)	pmd_mkhuge(pmd)
+> +/* No support for pud hugepages */
+> +#define kvm_pud_mkhuge(pud)	(pud)
+>  
+>  /*
+>   * The following kvm_*pud*() functionas are provided strictly to allow
+> @@ -95,6 +98,22 @@ static inline bool kvm_s2pud_readonly(pud_t *pud)
+>  	return false;
+>  }
+>  
+> +static inline void kvm_set_pud(pud_t *pud, pud_t new_pud)
+> +{
+> +	BUG();
+> +}
+> +
+> +static inline pud_t kvm_s2pud_mkwrite(pud_t pud)
+> +{
+> +	BUG();
+> +	return pud;
+> +}
+> +
+> +static inline pud_t kvm_s2pud_mkexec(pud_t pud)
+> +{
+> +	BUG();
+> +	return pud;
+> +}
+>  
+>  static inline void kvm_set_pmd(pmd_t *pmd, pmd_t new_pmd)
+>  {
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index f440cf216a23..f49a68fcbf26 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -172,11 +172,14 @@ void kvm_clear_hyp_idmap(void);
+>  
+>  #define	kvm_set_pte(ptep, pte)		set_pte(ptep, pte)
+>  #define	kvm_set_pmd(pmdp, pmd)		set_pmd(pmdp, pmd)
+> +#define kvm_set_pud(pudp, pud)		set_pud(pudp, pud)
+>  
+>  #define kvm_pfn_pte(pfn, prot)		pfn_pte(pfn, prot)
+>  #define kvm_pfn_pmd(pfn, prot)		pfn_pmd(pfn, prot)
+> +#define kvm_pfn_pud(pfn, prot)		pfn_pud(pfn, prot)
+>  
+>  #define kvm_pmd_mkhuge(pmd)		pmd_mkhuge(pmd)
+> +#define kvm_pud_mkhuge(pud)		pud_mkhuge(pud)
+>  
+>  static inline pte_t kvm_s2pte_mkwrite(pte_t pte)
+>  {
+> @@ -190,6 +193,12 @@ static inline pmd_t kvm_s2pmd_mkwrite(pmd_t pmd)
+>  	return pmd;
+>  }
+>  
+> +static inline pud_t kvm_s2pud_mkwrite(pud_t pud)
+> +{
+> +	pud_val(pud) |= PUD_S2_RDWR;
+> +	return pud;
+> +}
+> +
+>  static inline pte_t kvm_s2pte_mkexec(pte_t pte)
+>  {
+>  	pte_val(pte) &= ~PTE_S2_XN;
+> @@ -202,6 +211,12 @@ static inline pmd_t kvm_s2pmd_mkexec(pmd_t pmd)
+>  	return pmd;
+>  }
+>  
+> +static inline pud_t kvm_s2pud_mkexec(pud_t pud)
+> +{
+> +	pud_val(pud) &= ~PUD_S2_XN;
+> +	return pud;
+> +}
+> +
+>  static inline void kvm_set_s2pte_readonly(pte_t *ptep)
+>  {
+>  	pteval_t old_pteval, pteval;
+> diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
+> index fd208eac9f2a..e327665e94d1 100644
+> --- a/arch/arm64/include/asm/pgtable-hwdef.h
+> +++ b/arch/arm64/include/asm/pgtable-hwdef.h
+> @@ -193,6 +193,10 @@
+>  #define PMD_S2_RDWR		(_AT(pmdval_t, 3) << 6)   /* HAP[2:1] */
+>  #define PMD_S2_XN		(_AT(pmdval_t, 2) << 53)  /* XN[1:0] */
+>  
+> +#define PUD_S2_RDONLY		(_AT(pudval_t, 1) << 6)   /* HAP[2:1] */
+> +#define PUD_S2_RDWR		(_AT(pudval_t, 3) << 6)   /* HAP[2:1] */
+> +#define PUD_S2_XN		(_AT(pudval_t, 2) << 53)  /* XN[1:0] */
+> +
+>  /*
+>   * Memory Attribute override for Stage-2 (MemAttr[3:0])
+>   */
+> diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+> index 7e2c27e63cd8..5efb4585c879 100644
+> --- a/arch/arm64/include/asm/pgtable.h
+> +++ b/arch/arm64/include/asm/pgtable.h
+> @@ -386,6 +386,8 @@ static inline int pmd_protnone(pmd_t pmd)
+>  
+>  #define pud_write(pud)		pte_write(pud_pte(pud))
+>  
+> +#define pud_mkhuge(pud)		(__pud(pud_val(pud) & ~PUD_TABLE_BIT))
+> +
+>  #define __pud_to_phys(pud)	__pte_to_phys(pud_pte(pud))
+>  #define __phys_to_pud_val(phys)	__phys_to_pte_val(phys)
+>  #define pud_pfn(pud)		((__pud_to_phys(pud) & PUD_MASK) >> PAGE_SHIFT)
+> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> index 5f53909da90e..7fb58dca0a83 100644
+> --- a/virt/kvm/arm/mmu.c
+> +++ b/virt/kvm/arm/mmu.c
+> @@ -1036,6 +1036,26 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
+>  	return 0;
+>  }
+>  
+> +static int stage2_set_pud_huge(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
+> +			       phys_addr_t addr, const pud_t *new_pud)
+> +{
+> +	pud_t *pud, old_pud;
+> +
+> +	pud = stage2_get_pud(kvm, cache, addr);
+> +	VM_BUG_ON(!pud);
+> +
+> +	old_pud = *pud;
+> +	if (pud_present(old_pud)) {
+> +		pud_clear(pud);
+> +		kvm_tlb_flush_vmid_ipa(kvm, addr);
+> +	} else {
+> +		get_page(virt_to_page(pud));
+> +	}
+> +
+> +	kvm_set_pud(pud, *new_pud);
+> +	return 0;
+> +}
+> +
+>  static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr)
+>  {
+>  	pmd_t *pmdp;
+> @@ -1452,9 +1472,12 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	}
+>  
+>  	vma_pagesize = vma_kernel_pagesize(vma);
+> -	if (vma_pagesize == PMD_SIZE && !logging_active) {
+> +	if ((vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE) &&
+> +	    !logging_active) {
+> +		struct hstate *h = hstate_vma(vma);
+> +
+>  		hugetlb = true;
+> -		gfn = (fault_ipa & PMD_MASK) >> PAGE_SHIFT;
+> +		gfn = (fault_ipa & huge_page_mask(h)) >> PAGE_SHIFT;
+>  	} else {
+>  		/*
+>  		 * Pages belonging to memslots that don't have the same
+> @@ -1521,15 +1544,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	if (mmu_notifier_retry(kvm, mmu_seq))
+>  		goto out_unlock;
+>  
+> -	if (!hugetlb && !force_pte) {
+> -		/*
+> -		 * Only PMD_SIZE transparent hugepages(THP) are
+> -		 * currently supported. This code will need to be
+> -		 * updated if other THP sizes are supported.
+> -		 */
+> +	if (!hugetlb && !force_pte)
+>  		hugetlb = transparent_hugepage_adjust(&pfn, &fault_ipa);
+> -		vma_pagesize = PMD_SIZE;
 
-Sure, I'll replace this with a SPDX GPL-2.0 line.
+Why this change?  Won't you end up trying to map THPs as individual
+pages now?
+
+> -	}
+>  
+>  	if (writable)
+>  		kvm_set_pfn_dirty(pfn);
+> @@ -1540,7 +1556,23 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	if (exec_fault)
+>  		invalidate_icache_guest_page(pfn, vma_pagesize);
+>  
+> -	if (hugetlb) {
+> +	if (vma_pagesize == PUD_SIZE) {
+> +		pud_t new_pud = kvm_pfn_pud(pfn, mem_type);
+> +
+> +		new_pud = kvm_pud_mkhuge(new_pud);
+> +		if (writable)
+> +			new_pud = kvm_s2pud_mkwrite(new_pud);
+> +
+> +		if (exec_fault) {
+> +			new_pud = kvm_s2pud_mkexec(new_pud);
+> +		} else if (fault_status == FSC_PERM) {
+> +			/* Preserve execute if XN was already cleared */
+> +			if (stage2_is_exec(kvm, fault_ipa))
+> +				new_pud = kvm_s2pud_mkexec(new_pud);
+> +		}
+
+aha, another reason for my suggestion in the other patch.
+
+> +
+> +		ret = stage2_set_pud_huge(kvm, memcache, fault_ipa, &new_pud);
+> +	} else if (vma_pagesize == PMD_SIZE) {
+>  		pmd_t new_pmd = kvm_pfn_pmd(pfn, mem_type);
+>  
+>  		new_pmd = kvm_pmd_mkhuge(new_pmd);
+> -- 
+> 2.17.0
+> 
+
+Otherwise, this patch looks fine.
 
 Thanks,
-Mark.
+-Christoffer
