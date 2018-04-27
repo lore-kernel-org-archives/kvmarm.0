@@ -1,23 +1,23 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH v3 10/12] ACPI / APEI: Add support for the SDEI GHES
- Notification type
-Date: Fri, 27 Apr 2018 16:35:08 +0100
-Message-ID: <20180427153510.5799-11-james.morse@arm.com>
+Subject: [PATCH v3 11/12] mm/memory-failure: increase queued recovery work's
+ priority
+Date: Fri, 27 Apr 2018 16:35:09 +0100
+Message-ID: <20180427153510.5799-12-james.morse@arm.com>
 References: <20180427153510.5799-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CE504A07F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Apr 2018 11:31:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E7F14A082
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Apr 2018 11:31:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id E+MrLpfx0AjE for <kvmarm@lists.cs.columbia.edu>;
- Fri, 27 Apr 2018 11:30:42 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E63314A082
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Apr 2018 11:29:26 -0400 (EDT)
+ with ESMTP id zWrXOt7l17rW for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 Apr 2018 11:31:05 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CA9134A0AB
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Apr 2018 11:29:30 -0400 (EDT)
 In-Reply-To: <20180427153510.5799-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,156 +32,66 @@ To: linux-acpi@vger.kernel.org
 Cc: jonathan.zhang@cavium.com, Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Christoffer Dall <cdall@kernel.org>, Punit Agrawal <punit.agrawal@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-If the GHES notification type is SDEI, register the provided event
-number and point the callback at ghes_sdei_callback().
+arm64 can take an NMI-like error notification when user-space steps in
+some corrupt memory. APEI's GHES code will call memory_failure_queue()
+to schedule the recovery work. We then return to user-space, possibly
+taking the fault again.
 
+Currently the arch code unconditionally signals user-space from this
+path, so we don't get stuck in this loop, but the affected process
+never benefits from memory_failure()s recovery work. To fix this we
+need to know the recovery work will run before we get back to user-space.
+
+Increase the priority of the recovery work by scheduling it on the
+system_highpri_wq, then try to bump the current task off this CPU
+so that the recover work starts immediately.
+
+Reported-by: Xie XiuQi <xiexiuqi@huawei.com>
 Signed-off-by: James Morse <james.morse@arm.com>
 Reviewed-by: Punit Agrawal <punit.agrawal@arm.com>
+CC: Xie XiuQi <xiexiuqi@huawei.com>
+CC: gengdongjiu <gengdongjiu@huawei.com>
 ---
- drivers/acpi/apei/ghes.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++--
- include/linux/arm_sdei.h |  3 +++
- 2 files changed, 67 insertions(+), 2 deletions(-)
+ mm/memory-failure.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-index 3ddccd170240..f348e6540960 100644
---- a/drivers/acpi/apei/ghes.c
-+++ b/drivers/acpi/apei/ghes.c
-@@ -25,6 +25,7 @@
-  * GNU General Public License for more details.
+diff --git a/mm/memory-failure.c b/mm/memory-failure.c
+index 9d142b9b86dc..f0e69d7ac406 100644
+--- a/mm/memory-failure.c
++++ b/mm/memory-failure.c
+@@ -55,6 +55,7 @@
+ #include <linux/hugetlb.h>
+ #include <linux/memory_hotplug.h>
+ #include <linux/mm_inline.h>
++#include <linux/preempt.h>
+ #include <linux/kfifo.h>
+ #include <linux/ratelimit.h>
+ #include "internal.h"
+@@ -1333,6 +1334,7 @@ static DEFINE_PER_CPU(struct memory_failure_cpu, memory_failure_cpu);
   */
+ void memory_failure_queue(unsigned long pfn, int flags)
+ {
++	int cpu = smp_processor_id();
+ 	struct memory_failure_cpu *mf_cpu;
+ 	unsigned long proc_flags;
+ 	struct memory_failure_entry entry = {
+@@ -1342,11 +1344,14 @@ void memory_failure_queue(unsigned long pfn, int flags)
  
-+#include <linux/arm_sdei.h>
- #include <linux/kernel.h>
- #include <linux/moduleparam.h>
- #include <linux/init.h>
-@@ -58,7 +59,7 @@
- 
- #define GHES_PFX	"GHES: "
- 
--#if defined(CONFIG_HAVE_ACPI_APEI_NMI) || defined(CONFIG_ACPI_APEI_SEA)
-+#if defined(CONFIG_HAVE_ACPI_APEI_NMI) || defined(CONFIG_ACPI_APEI_SEA) || defined(CONFIG_ARM_SDE_INTERFACE)
- #define WANT_NMI_ESTATUS_QUEUE	1
- #endif
- 
-@@ -747,7 +748,7 @@ static int _in_nmi_notify_one(struct ghes *ghes)
- 	return 0;
+ 	mf_cpu = &get_cpu_var(memory_failure_cpu);
+ 	spin_lock_irqsave(&mf_cpu->lock, proc_flags);
+-	if (kfifo_put(&mf_cpu->fifo, entry))
+-		schedule_work_on(smp_processor_id(), &mf_cpu->work);
+-	else
++	if (kfifo_put(&mf_cpu->fifo, entry)) {
++		queue_work_on(cpu, system_highpri_wq, &mf_cpu->work);
++		set_tsk_need_resched(current);
++		preempt_set_need_resched();
++	} else {
+ 		pr_err("Memory failure: buffer overflow when queuing memory failure at %#lx\n",
+ 		       pfn);
++	}
+ 	spin_unlock_irqrestore(&mf_cpu->lock, proc_flags);
+ 	put_cpu_var(memory_failure_cpu);
  }
- 
--static int ghes_estatus_queue_notified(struct list_head *rcu_list)
-+static int __maybe_unused ghes_estatus_queue_notified(struct list_head *rcu_list)
- {
- 	int ret = -ENOENT;
- 	struct ghes *ghes;
-@@ -1041,6 +1042,49 @@ static inline void ghes_nmi_add(struct ghes *ghes) { }
- static inline void ghes_nmi_remove(struct ghes *ghes) { }
- #endif /* CONFIG_HAVE_ACPI_APEI_NMI */
- 
-+static int ghes_sdei_callback(u32 event_num, struct pt_regs *regs, void *arg)
-+{
-+	struct ghes *ghes = arg;
-+
-+	if (!_in_nmi_notify_one(ghes)) {
-+		if (IS_ENABLED(CONFIG_ARCH_HAVE_NMI_SAFE_CMPXCHG))
-+			irq_work_queue(&ghes_proc_irq_work);
-+
-+		return 0;
-+	}
-+
-+	return -ENOENT;
-+}
-+
-+static int apei_sdei_register_ghes(struct ghes *ghes)
-+{
-+	int err = -EINVAL;
-+
-+	if (IS_ENABLED(CONFIG_ARM_SDE_INTERFACE)) {
-+		ghes_estatus_queue_grow_pool(ghes);
-+
-+		err = sdei_register_ghes(ghes, ghes_sdei_callback);
-+		if (err)
-+			ghes_estatus_queue_shrink_pool(ghes);
-+	}
-+
-+	return err;
-+}
-+
-+static int apei_sdei_unregister_ghes(struct ghes *ghes)
-+{
-+	int err = -EINVAL;
-+
-+	if (IS_ENABLED(CONFIG_ARM_SDE_INTERFACE)) {
-+		err = sdei_unregister_ghes(ghes);
-+
-+		if (!err)
-+			ghes_estatus_queue_shrink_pool(ghes);
-+	}
-+
-+	return err;
-+}
-+
- static int ghes_probe(struct platform_device *ghes_dev)
- {
- 	struct acpi_hest_generic *generic;
-@@ -1075,6 +1119,13 @@ static int ghes_probe(struct platform_device *ghes_dev)
- 			goto err;
- 		}
- 		break;
-+	case ACPI_HEST_NOTIFY_SOFTWARE_DELEGATED:
-+		if (!IS_ENABLED(CONFIG_ARM_SDE_INTERFACE)) {
-+			pr_warn(GHES_PFX "Generic hardware error source: %d notified via SDE Interface is not supported!\n",
-+				generic->header.source_id);
-+			goto err;
-+		}
-+		break;
- 	case ACPI_HEST_NOTIFY_LOCAL:
- 		pr_warning(GHES_PFX "Generic hardware error source: %d notified via local interrupt is not supported!\n",
- 			   generic->header.source_id);
-@@ -1142,6 +1193,11 @@ static int ghes_probe(struct platform_device *ghes_dev)
- 	case ACPI_HEST_NOTIFY_NMI:
- 		ghes_nmi_add(ghes);
- 		break;
-+	case ACPI_HEST_NOTIFY_SOFTWARE_DELEGATED:
-+		rc = apei_sdei_register_ghes(ghes);
-+		if (rc)
-+			goto err_edac_unreg;
-+		break;
- 	default:
- 		BUG();
- 	}
-@@ -1163,6 +1219,7 @@ err:
- 
- static int ghes_remove(struct platform_device *ghes_dev)
- {
-+	int rc;
- 	struct ghes *ghes;
- 	struct acpi_hest_generic *generic;
- 
-@@ -1195,6 +1252,11 @@ static int ghes_remove(struct platform_device *ghes_dev)
- 	case ACPI_HEST_NOTIFY_NMI:
- 		ghes_nmi_remove(ghes);
- 		break;
-+	case ACPI_HEST_NOTIFY_SOFTWARE_DELEGATED:
-+		rc = apei_sdei_unregister_ghes(ghes);
-+		if (rc)
-+			return rc;
-+		break;
- 	default:
- 		BUG();
- 		break;
-diff --git a/include/linux/arm_sdei.h b/include/linux/arm_sdei.h
-index 5fdf799be026..f49063ca206d 100644
---- a/include/linux/arm_sdei.h
-+++ b/include/linux/arm_sdei.h
-@@ -12,7 +12,10 @@ enum sdei_conduit_types {
- };
- 
- #include <acpi/ghes.h>
-+
-+#ifdef CONFIG_ARM_SDE_INTERFACE
- #include <asm/sdei.h>
-+#endif
- 
- /* Arch code should override this to set the entry point from firmware... */
- #ifndef sdei_arch_get_entry_point
 -- 
 2.16.2
