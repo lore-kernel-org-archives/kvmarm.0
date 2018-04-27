@@ -1,190 +1,94 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [RFC PATCH 7/8] KVM: arm64: Save host SVE context as appropriate
-Date: Thu, 26 Apr 2018 21:02:39 +0200
-Message-ID: <20180426190239.GG13249@C02W217FHV2R.local>
-References: <1524242802-21163-1-git-send-email-Dave.Martin@arm.com>
- <1524242802-21163-8-git-send-email-Dave.Martin@arm.com>
+Subject: Re: [PATCHv3 02/11] arm64/kvm: consistently handle host HCR_EL2 flags
+Date: Fri, 27 Apr 2018 11:51:39 +0200
+Message-ID: <20180427095139.GH13249@C02W217FHV2R.local>
+References: <20180417183735.56985-1-mark.rutland@arm.com>
+ <20180417183735.56985-3-mark.rutland@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1524242802-21163-8-git-send-email-Dave.Martin@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Christoffer Dall <cdall@kernel.org>
+In-Reply-To: <20180417183735.56985-3-mark.rutland@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, drjones@redhat.com, arnd@arndb.de, suzuki.poulose@arm.com, marc.zyngier@arm.com, catalin.marinas@arm.com, awallis@codeaurora.org, kernel-hardening@lists.openwall.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, ramana.radhakrishnan@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Apr 20, 2018 at 05:46:41PM +0100, Dave Martin wrote:
-> This patch adds SVE context saving to the hyp FPSIMD context switch
-> path.  This means that it is no longer necessary to save the host
-> SVE state in advance of entering the guest, when in use.
+On Tue, Apr 17, 2018 at 07:37:26PM +0100, Mark Rutland wrote:
+> In KVM we define the configuration of HCR_EL2 for a VHE HOST in
+> HCR_HOST_VHE_FLAGS, but we don't ahve a similar definition for the
+
+nit: have
+
+> non-VHE host flags, and open-code HCR_RW. Further, in head.S we
+> open-code the flags for VHE and non-VHE configurations.
 > 
-> In order to avoid adding pointless complexity to the code, VHE is
-> assumed if SVE is in use.  VHE is an architectural prerequisite for
-> SVE, so there is no good reason to turn CONFIG_ARM64_VHE off in
-> kernels that support both SVE and KVM.
+> In future, we're going to want to configure more flags for the host, so
+> lets add a HCR_HOST_NVHE_FLAGS defintion, adn consistently use both
+
+nit: and
+
+> HCR_HOST_VHE_FLAGS and HCR_HOST_NVHE_FLAGS in the kvm code and head.S.
 > 
-> Historically, software models exist that can expose the
-> architecturally invalid configuration of SVE without VHE, so if
-> this situation is detected this patch warns and refuses to create a
-> VM.  Doing this check at VM creation time avoids race issues
-> between KVM and SVE initialisation.
+> We now use mov_q to generate the HCR_EL2 value, as we use when
+> configuring other registers in head.S.
 > 
-> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Christoffer Dall <cdall@kernel.org>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Will Deacon <will.deacon@arm.com>
+> Cc: kvmarm@lists.cs.columbia.edu
 > ---
->  arch/arm64/Kconfig          |  7 +++++++
->  arch/arm64/kvm/fpsimd.c     |  1 -
->  arch/arm64/kvm/hyp/switch.c | 21 +++++++++++++++++++--
->  virt/kvm/arm/arm.c          | 18 ++++++++++++++++++
->  4 files changed, 44 insertions(+), 3 deletions(-)
+>  arch/arm64/include/asm/kvm_arm.h | 1 +
+>  arch/arm64/kernel/head.S         | 5 ++---
+>  arch/arm64/kvm/hyp/switch.c      | 2 +-
+>  3 files changed, 4 insertions(+), 4 deletions(-)
 > 
-> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> index eb2cf49..b0d3820 100644
-> --- a/arch/arm64/Kconfig
-> +++ b/arch/arm64/Kconfig
-> @@ -1130,6 +1130,7 @@ endmenu
->  config ARM64_SVE
->  	bool "ARM Scalable Vector Extension support"
->  	default y
-> +	depends on !KVM || ARM64_VHE
->  	help
->  	  The Scalable Vector Extension (SVE) is an extension to the AArch64
->  	  execution state which complements and extends the SIMD functionality
-> @@ -1155,6 +1156,12 @@ config ARM64_SVE
->  	  booting the kernel.  If unsure and you are not observing these
->  	  symptoms, you should assume that it is safe to say Y.
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index 6dd285e979c9..89b3dda7e3cb 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -86,6 +86,7 @@
+>  			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
+>  			 HCR_FMO | HCR_IMO)
+>  #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
+> +#define HCR_HOST_NVHE_FLAGS (HCR_RW)
+>  #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
 >  
-> +	  CPUs that support SVE are architecturally required to support the
-> +	  Virtualization Host Extensions (VHE), so the kernel makes no
-> +	  provision for supporting SVE alongside KVM without VHE enabled.
-> +	  Thus, you will need to enable CONFIG_ARM64_VHE if you want to support
-> +	  KVM in the same kernel image.
-> +
->  config ARM64_MODULE_PLTS
->  	bool
->  	select HAVE_MOD_ARCH_SPECIFIC
-> diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-> index cc7a068..c166954 100644
-> --- a/arch/arm64/kvm/fpsimd.c
-> +++ b/arch/arm64/kvm/fpsimd.c
-> @@ -59,7 +59,6 @@ int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu)
->   */
->  void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
->  {
-> -	BUG_ON(system_supports_sve());
->  	BUG_ON(!current->mm);
+>  /* TCR_EL2 Registers bits */
+> diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+> index b0853069702f..651a06b1980f 100644
+> --- a/arch/arm64/kernel/head.S
+> +++ b/arch/arm64/kernel/head.S
+> @@ -494,10 +494,9 @@ ENTRY(el2_setup)
+>  #endif
 >  
->  	vcpu->arch.fp_enabled = false;
+>  	/* Hyp configuration. */
+> -	mov	x0, #HCR_RW			// 64-bit EL1
+> +	mov_q	x0, HCR_HOST_NVHE_FLAGS
+>  	cbz	x2, set_hcr
+> -	orr	x0, x0, #HCR_TGE		// Enable Host Extensions
+> -	orr	x0, x0, #HCR_E2H
+> +	mov_q	x0, HCR_HOST_VHE_FLAGS
+>  set_hcr:
+>  	msr	hcr_el2, x0
+>  	isb
 > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> index 0900c2a..959d634 100644
+> index d9645236e474..cdae330e15e9 100644
 > --- a/arch/arm64/kvm/hyp/switch.c
 > +++ b/arch/arm64/kvm/hyp/switch.c
-> @@ -21,12 +21,14 @@
+> @@ -143,7 +143,7 @@ static void __hyp_text __deactivate_traps_nvhe(void)
+>  	mdcr_el2 |= MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT;
 >  
->  #include <kvm/arm_psci.h>
+>  	write_sysreg(mdcr_el2, mdcr_el2);
+> -	write_sysreg(HCR_RW, hcr_el2);
+> +	write_sysreg(HCR_HOST_NVHE_FLAGS, hcr_el2);
+>  	write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
+>  }
 >  
-> +#include <asm/cpufeature.h>
->  #include <asm/kvm_asm.h>
->  #include <asm/kvm_emulate.h>
->  #include <asm/kvm_hyp.h>
->  #include <asm/kvm_mmu.h>
->  #include <asm/fpsimd.h>
->  #include <asm/debug-monitors.h>
-> +#include <asm/processor.h>
->  #include <asm/thread_info.h>
->  
->  static bool __hyp_text update_fp_enabled(struct kvm_vcpu *vcpu)
-> @@ -497,6 +499,8 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
->  void __hyp_text __hyp_switch_fpsimd(u64 esr __always_unused,
->  				    struct kvm_vcpu *vcpu)
->  {
-> +	struct user_fpsimd_state *host_fpsimd = vcpu->arch.host_fpsimd_state;
-> +
->  	if (has_vhe())
->  		write_sysreg(read_sysreg(cpacr_el1) | CPACR_EL1_FPEN,
->  			     cpacr_el1);
-> @@ -506,8 +510,21 @@ void __hyp_text __hyp_switch_fpsimd(u64 esr __always_unused,
->  
->  	isb();
->  
-> -	if (vcpu->arch.host_fpsimd_state) {
-> -		__fpsimd_save_state(vcpu->arch.host_fpsimd_state);
-> +	if (host_fpsimd) {
-> +		/*
-> +		 * In the SVE case, VHE is assumed: it is enforced by
-> +		 * Kconfig and kvm_arch_init_vm().
-> +		 */
-> +		if (system_supports_sve() && vcpu->arch.host_sve_in_use) {
-> +			struct thread_struct *thread = container_of(
-> +				host_fpsimd,
-> +				struct thread_struct, uw.fpsimd_state);
-> +
-> +			sve_save_state(sve_pffr(thread), &host_fpsimd->fpsr);
-> +		} else {
-> +			__fpsimd_save_state(vcpu->arch.host_fpsimd_state);
-> +		}
-> +
->  		vcpu->arch.host_fpsimd_state = NULL;
->  	}
->  
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index 4fcf6fe..147d9d9 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -16,6 +16,7 @@
->   * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
->   */
->  
-> +#include <linux/bug.h>
->  #include <linux/cpu_pm.h>
->  #include <linux/errno.h>
->  #include <linux/err.h>
-> @@ -41,6 +42,7 @@
->  #include <asm/mman.h>
->  #include <asm/tlbflush.h>
->  #include <asm/cacheflush.h>
-> +#include <asm/cpufeature.h>
->  #include <asm/virt.h>
->  #include <asm/kvm_arm.h>
->  #include <asm/kvm_asm.h>
-> @@ -120,6 +122,22 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  	if (type)
->  		return -EINVAL;
->  
-> +	/*
-> +	 * VHE is a prerequisite for SVE in the Arm architecture, and
-> +	 * Kconfig ensures that if system_supports_sve() here then
-> +	 * CONFIG_ARM64_VHE is enabled, so if VHE support wasn't already
-> +	 * detected and enabled, the CPU is architecturally
-> +	 * noncompliant.
-> +	 *
-> +	 * Just in case this mismatch is seen, detect it, warn and give
-> +	 * up.  Supporting this forbidden configuration in Hyp would be
-> +	 * pointless.
-> +	 */
-> +	if (system_supports_sve() && !has_vhe()) {
-> +		kvm_pr_unimpl("Cannot create VMs on SVE system without VHE.  Broken cpu?");
-> +		return -ENXIO;
-> +	}
-> +
->  	kvm->arch.last_vcpu_ran = alloc_percpu(typeof(*kvm->arch.last_vcpu_ran));
->  	if (!kvm->arch.last_vcpu_ran)
->  		return -ENOMEM;
 > -- 
-> 2.1.4
+> 2.11.0
 > 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
+> 
 Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
