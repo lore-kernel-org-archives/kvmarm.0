@@ -1,157 +1,391 @@
-From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: Re: [PATCH 1/4] KVM: arm/arm64: Share common code in user_mem_abort()
-Date: Fri, 27 Apr 2018 15:21:23 +0100
-Message-ID: <87bme4zq58.fsf@e105922-lin.cambridge.arm.com>
-References: <20180420145409.24485-1-punit.agrawal@arm.com>
-        <20180420145409.24485-2-punit.agrawal@arm.com>
-        <20180427111429.GL13249@C02W217FHV2R.local>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH] KVM: arm/arm64: vgic: Fix source vcpu issues for GICv2 SGI
+Date: Fri, 27 Apr 2018 15:49:17 +0100
+Message-ID: <20180427144917.5493-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180427111429.GL13249@C02W217FHV2R.local> (Christoffer Dall's
-        message of "Fri, 27 Apr 2018 13:14:29 +0200")
-Sender: linux-kernel-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, suzuki.poulose@arm.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: Mark Rutland <mark.rutland@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Christoffer Dall <christoffer.dall@arm.com> writes:
+Now that we make sure we don't inject multiple instances of the
+same GICv2 SGI at the same time, we've made another bug more
+obvious:
 
-> On Fri, Apr 20, 2018 at 03:54:06PM +0100, Punit Agrawal wrote:
->> The code for operations such as marking the pfn as dirty, and
->> dcache/icache maintenance during stage 2 fault handling is duplicated
->> between normal pages and PMD hugepages.
->> 
->> Instead of creating another copy of the operations when we introduce
->> PUD hugepages, let's share them across the different pagesizes.
->> 
->> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
->> Cc: Christoffer Dall <christoffer.dall@arm.com>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  virt/kvm/arm/mmu.c | 36 +++++++++++++++++++++---------------
->>  1 file changed, 21 insertions(+), 15 deletions(-)
->> 
->> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->> index 7f6a944db23d..db382c7c7cd7 100644
->> --- a/virt/kvm/arm/mmu.c
->> +++ b/virt/kvm/arm/mmu.c
->> @@ -1428,7 +1428,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->>  	kvm_pfn_t pfn;
->>  	pgprot_t mem_type = PAGE_S2;
->>  	bool logging_active = memslot_is_logging(memslot);
->> -	unsigned long flags = 0;
->> +	unsigned long vma_pagesize, flags = 0;
->>  
->>  	write_fault = kvm_is_write_fault(vcpu);
->>  	exec_fault = kvm_vcpu_trap_is_iabt(vcpu);
->> @@ -1448,7 +1448,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->>  		return -EFAULT;
->>  	}
->>  
->> -	if (vma_kernel_pagesize(vma) == PMD_SIZE && !logging_active) {
->> +	vma_pagesize = vma_kernel_pagesize(vma);
->> +	if (vma_pagesize == PMD_SIZE && !logging_active) {
->>  		hugetlb = true;
->>  		gfn = (fault_ipa & PMD_MASK) >> PAGE_SHIFT;
->>  	} else {
->> @@ -1517,23 +1518,33 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->>  	if (mmu_notifier_retry(kvm, mmu_seq))
->>  		goto out_unlock;
->>  
->> -	if (!hugetlb && !force_pte)
->> +	if (!hugetlb && !force_pte) {
->> +		/*
->> +		 * Only PMD_SIZE transparent hugepages(THP) are
->> +		 * currently supported. This code will need to be
->> +		 * updated if other THP sizes are supported.
->> +		 */
->>  		hugetlb = transparent_hugepage_adjust(&pfn, &fault_ipa);
->> +		vma_pagesize = PMD_SIZE;
->> +	}
->> +
->> +	if (writable)
->> +		kvm_set_pfn_dirty(pfn);
->> +
->> +	if (fault_status != FSC_PERM)
->> +		clean_dcache_guest_page(pfn, vma_pagesize);
->> +
->> +	if (exec_fault)
->> +		invalidate_icache_guest_page(pfn, vma_pagesize);
->>  
->>  	if (hugetlb) {
->>  		pmd_t new_pmd = pfn_pmd(pfn, mem_type);
->>  		new_pmd = pmd_mkhuge(new_pmd);
->> -		if (writable) {
->> +		if (writable)
->>  			new_pmd = kvm_s2pmd_mkwrite(new_pmd);
->> -			kvm_set_pfn_dirty(pfn);
->> -		}
->> -
->> -		if (fault_status != FSC_PERM)
->> -			clean_dcache_guest_page(pfn, PMD_SIZE);
->>  
->>  		if (exec_fault) {
->>  			new_pmd = kvm_s2pmd_mkexec(new_pmd);
->> -			invalidate_icache_guest_page(pfn, PMD_SIZE);
->>  		} else if (fault_status == FSC_PERM) {
->
-> This could now be rewritten to:
->
-> 		if (exec_fault ||
-> 		    (fault_status == FSC_PERM && stage2_is_exec(kvm, fault_ipa)))
-> 			new_pmd = kvm_s2pmd_mkexec(new_pmd);
->
-> which we could even consider making
->
-> static bool stage2_should_exec(struct kvm *kvm, phys_addr_t addr,
-> 			       bool exec_fault, unsigned long fault_status)
-> {
-> 	/*
-> 	 * If we took an execution fault we will have made the
-> 	 * icache/dcache coherent and should now let the s2 mapping be
-> 	 * executable.
-> 	 *
-> 	 * Write faults (!exec_fault && FSC_PERM) are orthogonal to
-> 	 * execute permissions, and we preserve whatever we have.
-> 	 */
-> 	return exec_fault ||
-> 	       (fault_status == FSC_PERM && stage2_is_exec(kvm, fault_ipa));
-> }
->
-> The benefit would be to have this documentation in a single place and
-> slightly simply both the hugetlb and !hugetlb blocks.
+If we exit with an active SGI, we completely lose track of which
+vcpu it came from. On the next entry, we restore it with 0 as a
+source, and if that wasn't the right one, too bad. While this
+doesn't seem to trouble GIC-400, the architectural model gets
+offended and doesn't deactivate the interrupt on EOI.
 
-Makes sense. And saves another copy when we introduce PUD handling in a
-latter patch. I've rolled this in with minor changes.
->
->
->>  			/* Preserve execute if XN was already cleared */
->>  			if (stage2_is_exec(kvm, fault_ipa))
->> @@ -1546,16 +1557,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->>  
->>  		if (writable) {
->>  			new_pte = kvm_s2pte_mkwrite(new_pte);
->> -			kvm_set_pfn_dirty(pfn);
->>  			mark_page_dirty(kvm, gfn);
->>  		}
->>  
->> -		if (fault_status != FSC_PERM)
->> -			clean_dcache_guest_page(pfn, PAGE_SIZE);
->> -
->>  		if (exec_fault) {
->>  			new_pte = kvm_s2pte_mkexec(new_pte);
->> -			invalidate_icache_guest_page(pfn, PAGE_SIZE);
->>  		} else if (fault_status == FSC_PERM) {
->>  			/* Preserve execute if XN was already cleared */
->>  			if (stage2_is_exec(kvm, fault_ipa))
->> -- 
->> 2.17.0
->> 
->
-> Notwithstanding my suggestion above:
->
-> Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+Another connected issue is that we will happilly make pending
+an interrupt from another vcpu, overriding the above zero with
+something that is just as inconsistent. Don't do that.
 
-Thanks,
-Punit
+The final issue is that we signal a maintenance interrupt when
+no pending interrupts are present in the LR. Assuming we've fixed
+the two issues above, we end-up in a situation where we keep
+exiting as soon as we've reached the active state, and not be
+able to inject the following pending.
+
+The fix comes in 3 parts:
+- GICv2 SGIs have their source vcpu saved if they are active on
+  exit, and restored on entry
+- Multi-SGIs cannot go via the Pending+Active state, as this would
+  corrupt the source field
+- Multi-SGIs are converted to using MI on EOI instead of NPIE
+
+Fixes: 16ca6a607d84bef0 ("KVM: arm/arm64: vgic: Don't populate multiple LRs with the same vintid")
+Reported-by: Mark Rutland <mark.rutland@arm.com>
+Tested-by: Mark Rutland <mark.rutland@arm.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ include/kvm/arm_vgic.h        |  1 +
+ virt/kvm/arm/vgic/vgic-mmio.c | 10 +++++++--
+ virt/kvm/arm/vgic/vgic-v2.c   | 38 +++++++++++++++++++--------------
+ virt/kvm/arm/vgic/vgic-v3.c   | 49 +++++++++++++++++++++++++------------------
+ virt/kvm/arm/vgic/vgic.c      | 30 +++++++-------------------
+ virt/kvm/arm/vgic/vgic.h      | 14 +++++++++++++
+ 6 files changed, 81 insertions(+), 61 deletions(-)
+
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 24f03941ada8..e7efe12a81bd 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -131,6 +131,7 @@ struct vgic_irq {
+ 		u32 mpidr;			/* GICv3 target VCPU */
+ 	};
+ 	u8 source;			/* GICv2 SGIs only */
++	u8 active_source;		/* GICv2 SGIs only */
+ 	u8 priority;
+ 	enum vgic_irq_config config;	/* Level or edge */
+ 
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+index dbe99d635c80..ff9655cfeb2f 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.c
++++ b/virt/kvm/arm/vgic/vgic-mmio.c
+@@ -289,10 +289,16 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+ 	       irq->vcpu->cpu != -1) /* VCPU thread is running */
+ 		cond_resched_lock(&irq->irq_lock);
+ 
+-	if (irq->hw)
++	if (irq->hw) {
+ 		vgic_hw_irq_change_active(vcpu, irq, active, !requester_vcpu);
+-	else
++	} else {
++		u32 model = vcpu->kvm->arch.vgic.vgic_model;
++
+ 		irq->active = active;
++		if (model == KVM_DEV_TYPE_ARM_VGIC_V2 &&
++		    active && vgic_irq_is_sgi(irq->intid))
++			irq->active_source = requester_vcpu->vcpu_id;
++	}
+ 
+ 	if (irq->active)
+ 		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
+diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+index 45aa433f018f..a5f2e44f1c33 100644
+--- a/virt/kvm/arm/vgic/vgic-v2.c
++++ b/virt/kvm/arm/vgic/vgic-v2.c
+@@ -37,13 +37,6 @@ void vgic_v2_init_lrs(void)
+ 		vgic_v2_write_lr(i, 0);
+ }
+ 
+-void vgic_v2_set_npie(struct kvm_vcpu *vcpu)
+-{
+-	struct vgic_v2_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v2;
+-
+-	cpuif->vgic_hcr |= GICH_HCR_NPIE;
+-}
+-
+ void vgic_v2_set_underflow(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_v2_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v2;
+@@ -71,13 +64,18 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+ 	int lr;
+ 	unsigned long flags;
+ 
+-	cpuif->vgic_hcr &= ~(GICH_HCR_UIE | GICH_HCR_NPIE);
++	cpuif->vgic_hcr &= ~GICH_HCR_UIE;
+ 
+ 	for (lr = 0; lr < vgic_cpu->used_lrs; lr++) {
+ 		u32 val = cpuif->vgic_lr[lr];
+-		u32 intid = val & GICH_LR_VIRTUALID;
++		u32 cpuid, intid = val & GICH_LR_VIRTUALID;
+ 		struct vgic_irq *irq;
+ 
++		/* Extract the source vCPU id from the LR */
++		cpuid = val & GICH_LR_PHYSID_CPUID;
++		cpuid >>= GICH_LR_PHYSID_CPUID_SHIFT;
++		cpuid &= 7;
++
+ 		/* Notify fds when the guest EOI'ed a level-triggered SPI */
+ 		if (lr_signals_eoi_mi(val) && vgic_valid_spi(vcpu->kvm, intid))
+ 			kvm_notify_acked_irq(vcpu->kvm, 0,
+@@ -90,17 +88,16 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+ 		/* Always preserve the active bit */
+ 		irq->active = !!(val & GICH_LR_ACTIVE_BIT);
+ 
++		if (irq->active && vgic_irq_is_sgi(intid))
++			irq->active_source = cpuid;
++
+ 		/* Edge is the only case where we preserve the pending bit */
+ 		if (irq->config == VGIC_CONFIG_EDGE &&
+ 		    (val & GICH_LR_PENDING_BIT)) {
+ 			irq->pending_latch = true;
+ 
+-			if (vgic_irq_is_sgi(intid)) {
+-				u32 cpuid = val & GICH_LR_PHYSID_CPUID;
+-
+-				cpuid >>= GICH_LR_PHYSID_CPUID_SHIFT;
++			if (vgic_irq_is_sgi(intid))
+ 				irq->source |= (1 << cpuid);
+-			}
+ 		}
+ 
+ 		/*
+@@ -152,8 +149,15 @@ void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
+ 	u32 val = irq->intid;
+ 	bool allow_pending = true;
+ 
+-	if (irq->active)
++	if (irq->active) {
+ 		val |= GICH_LR_ACTIVE_BIT;
++		if (vgic_irq_is_sgi(irq->intid))
++			val |= irq->active_source << GICH_LR_PHYSID_CPUID_SHIFT;
++		if (vgic_irq_is_multi_sgi(irq)) {
++			allow_pending = false;
++			val |= GICH_LR_EOI;
++		}
++	}
+ 
+ 	if (irq->hw) {
+ 		val |= GICH_LR_HW;
+@@ -190,8 +194,10 @@ void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
+ 			BUG_ON(!src);
+ 			val |= (src - 1) << GICH_LR_PHYSID_CPUID_SHIFT;
+ 			irq->source &= ~(1 << (src - 1));
+-			if (irq->source)
++			if (irq->source) {
+ 				irq->pending_latch = true;
++				val |= GICH_LR_EOI;
++			}
+ 		}
+ 	}
+ 
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index 8195f52ae6f0..c7423f3768e5 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -27,13 +27,6 @@ static bool group1_trap;
+ static bool common_trap;
+ static bool gicv4_enable;
+ 
+-void vgic_v3_set_npie(struct kvm_vcpu *vcpu)
+-{
+-	struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
+-
+-	cpuif->vgic_hcr |= ICH_HCR_NPIE;
+-}
+-
+ void vgic_v3_set_underflow(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
+@@ -55,17 +48,23 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ 	int lr;
+ 	unsigned long flags;
+ 
+-	cpuif->vgic_hcr &= ~(ICH_HCR_UIE | ICH_HCR_NPIE);
++	cpuif->vgic_hcr &= ~ICH_HCR_UIE;
+ 
+ 	for (lr = 0; lr < vgic_cpu->used_lrs; lr++) {
+ 		u64 val = cpuif->vgic_lr[lr];
+-		u32 intid;
++		u32 intid, cpuid;
+ 		struct vgic_irq *irq;
++		bool is_v2_sgi = false;
+ 
+-		if (model == KVM_DEV_TYPE_ARM_VGIC_V3)
++		cpuid = val & GICH_LR_PHYSID_CPUID;
++		cpuid >>= GICH_LR_PHYSID_CPUID_SHIFT;
++
++		if (model == KVM_DEV_TYPE_ARM_VGIC_V3) {
+ 			intid = val & ICH_LR_VIRTUAL_ID_MASK;
+-		else
++		} else {
+ 			intid = val & GICH_LR_VIRTUALID;
++			is_v2_sgi = vgic_irq_is_sgi(intid);
++		}
+ 
+ 		/* Notify fds when the guest EOI'ed a level-triggered IRQ */
+ 		if (lr_signals_eoi_mi(val) && vgic_valid_spi(vcpu->kvm, intid))
+@@ -81,18 +80,16 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ 		/* Always preserve the active bit */
+ 		irq->active = !!(val & ICH_LR_ACTIVE_BIT);
+ 
++		if (irq->active && is_v2_sgi)
++			irq->active_source = cpuid;
++
+ 		/* Edge is the only case where we preserve the pending bit */
+ 		if (irq->config == VGIC_CONFIG_EDGE &&
+ 		    (val & ICH_LR_PENDING_BIT)) {
+ 			irq->pending_latch = true;
+ 
+-			if (vgic_irq_is_sgi(intid) &&
+-			    model == KVM_DEV_TYPE_ARM_VGIC_V2) {
+-				u32 cpuid = val & GICH_LR_PHYSID_CPUID;
+-
+-				cpuid >>= GICH_LR_PHYSID_CPUID_SHIFT;
++			if (is_v2_sgi)
+ 				irq->source |= (1 << cpuid);
+-			}
+ 		}
+ 
+ 		/*
+@@ -133,10 +130,20 @@ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
+ {
+ 	u32 model = vcpu->kvm->arch.vgic.vgic_model;
+ 	u64 val = irq->intid;
+-	bool allow_pending = true;
++	bool allow_pending = true, is_v2_sgi;
+ 
+-	if (irq->active)
++	is_v2_sgi = (vgic_irq_is_sgi(irq->intid) &&
++		     model == KVM_DEV_TYPE_ARM_VGIC_V2);
++
++	if (irq->active) {
+ 		val |= ICH_LR_ACTIVE_BIT;
++		if (is_v2_sgi)
++			val |= irq->active_source << GICH_LR_PHYSID_CPUID_SHIFT;
++		if (vgic_irq_is_multi_sgi(irq)) {
++			allow_pending = false;
++			val |= ICH_LR_EOI;
++		}
++	}
+ 
+ 	if (irq->hw) {
+ 		val |= ICH_LR_HW;
+@@ -174,8 +181,10 @@ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
+ 			BUG_ON(!src);
+ 			val |= (src - 1) << GICH_LR_PHYSID_CPUID_SHIFT;
+ 			irq->source &= ~(1 << (src - 1));
+-			if (irq->source)
++			if (irq->source) {
+ 				irq->pending_latch = true;
++				val |= ICH_LR_EOI;
++			}
+ 		}
+ 	}
+ 
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 4b6d72939c42..568c65f852e1 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -719,14 +719,6 @@ static inline void vgic_set_underflow(struct kvm_vcpu *vcpu)
+ 		vgic_v3_set_underflow(vcpu);
+ }
+ 
+-static inline void vgic_set_npie(struct kvm_vcpu *vcpu)
+-{
+-	if (kvm_vgic_global_state.type == VGIC_V2)
+-		vgic_v2_set_npie(vcpu);
+-	else
+-		vgic_v3_set_npie(vcpu);
+-}
+-
+ /* Requires the ap_list_lock to be held. */
+ static int compute_ap_list_depth(struct kvm_vcpu *vcpu,
+ 				 bool *multi_sgi)
+@@ -740,17 +732,15 @@ static int compute_ap_list_depth(struct kvm_vcpu *vcpu,
+ 	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&vgic_cpu->ap_list_lock));
+ 
+ 	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
++		int w;
++
+ 		spin_lock(&irq->irq_lock);
+ 		/* GICv2 SGIs can count for more than one... */
+-		if (vgic_irq_is_sgi(irq->intid) && irq->source) {
+-			int w = hweight8(irq->source);
+-
+-			count += w;
+-			*multi_sgi |= (w > 1);
+-		} else {
+-			count++;
+-		}
++		w = vgic_irq_get_lr_count(irq);
+ 		spin_unlock(&irq->irq_lock);
++
++		count += w;
++		*multi_sgi |= (w > 1);
+ 	}
+ 	return count;
+ }
+@@ -761,7 +751,6 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+ 	struct vgic_irq *irq;
+ 	int count;
+-	bool npie = false;
+ 	bool multi_sgi;
+ 	u8 prio = 0xff;
+ 
+@@ -791,10 +780,8 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+ 		if (likely(vgic_target_oracle(irq) == vcpu)) {
+ 			vgic_populate_lr(vcpu, irq, count++);
+ 
+-			if (irq->source) {
+-				npie = true;
++			if (irq->source)
+ 				prio = irq->priority;
+-			}
+ 		}
+ 
+ 		spin_unlock(&irq->irq_lock);
+@@ -807,9 +794,6 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+ 		}
+ 	}
+ 
+-	if (npie)
+-		vgic_set_npie(vcpu);
+-
+ 	vcpu->arch.vgic_cpu.used_lrs = count;
+ 
+ 	/* Nuke remaining LRs */
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index 830e815748a0..32c25d42c93f 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -110,6 +110,20 @@ static inline bool vgic_irq_is_mapped_level(struct vgic_irq *irq)
+ 	return irq->config == VGIC_CONFIG_LEVEL && irq->hw;
+ }
+ 
++static inline int vgic_irq_get_lr_count(struct vgic_irq *irq)
++{
++	/* Account for the active state as an interrupt */
++	if (vgic_irq_is_sgi(irq->intid) && irq->source)
++		return hweight8(irq->source) + irq->active;
++
++	return irq_is_pending(irq) || irq->active;
++}
++
++static inline bool vgic_irq_is_multi_sgi(struct vgic_irq *irq)
++{
++	return vgic_irq_get_lr_count(irq) > 1;
++}
++
+ /*
+  * This struct provides an intermediate representation of the fields contained
+  * in the GICH_VMCR and ICH_VMCR registers, such that code exporting the GIC
+-- 
+2.14.2
