@@ -1,213 +1,161 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH v3 02/12] ACPI / APEI: Generalise the estatus queue's
- add/remove and notify code
-Date: Fri, 27 Apr 2018 16:35:00 +0100
-Message-ID: <20180427153510.5799-3-james.morse@arm.com>
-References: <20180427153510.5799-1-james.morse@arm.com>
+Subject: [PATCH v3 00/12] APEI in_nmi() rework and arm64 SDEI wire-up
+Date: Fri, 27 Apr 2018 16:34:58 +0100
+Message-ID: <20180427153510.5799-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180427153510.5799-1-james.morse@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 71E5C4A08D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Apr 2018 11:29:09 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id HPYpFcAkdrv1 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 Apr 2018 11:28:47 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F8E149F86
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Apr 2018 11:28:47 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-acpi@vger.kernel.org
-Cc: jonathan.zhang@cavium.com, Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Christoffer Dall <cdall@kernel.org>, Punit Agrawal <punit.agrawal@arm.com>, Xie XiuQi <xiexiuqi@huawei.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, Borislav Petkov <bp@alien8.de>, James Morse <james.morse@arm.com>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
+Cc: jonathan.zhang@cavium.com, Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Christoffer Dall <cdall@kernel.org>, Punit Agrawal <punit.agrawal@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-To support asynchronous NMI-like notifications on arm64 we need to use
-the estatus-queue. These patches refactor it to allow multiple APEI
-notification types to use it.
+The aim of this series is to wire arm64's SDEI into APEI.
 
-Refactor the estatus queue's pool grow/shrink code and notification
-routine from NOTIFY_NMI's handlers. This will allow another notification
-method to use the estatus queue without duplicating this code.
+Nothing much has changed since v2, patch 3 is new and the KVM IS_ENABLED()
+stuff has been cleaned up. Otherwise things are noted in each patch.
 
-This patch adds rcu_read_lock()/rcu_read_unlock() around the list
-list_for_each_entry_rcu() walker. These aren't strictly necessary as
-the whole nmi_enter/nmi_exit() window is a spooky RCU read-side
-critical section.
+This touches a few trees, so I'm not sure how best it should be merged.
+Patches 11 and 12 are reducing a race that is made worse by patch 4, I'd
+like them to arrive together, even though patch 11 doesn't depend on anything
+else in the series. (patches 11&12 could be moved to after 8 if that makes
+things easier)
 
-Keep the oops_begin() call for x86, arm64 doesn't have one of these,
-and APEI is the only thing outside arch code calling this..
 
-The existing ghes_estatus_pool_shrink() is folded into the new
-ghes_estatus_queue_shrink_pool() as only the queue uses it.
+The earlier boiler-plate:
 
-_in_nmi_notify_one() is separate from the rcu-list walker for a later
-caller that doesn't need to walk a list.
+What's SDEI? Its ARM's "Software Delegated Exception Interface" [0]. It's
+used by firmware to tell the OS about firmware-first RAS events.
 
-Signed-off-by: James Morse <james.morse@arm.com>
-Reviewed-by: Punit Agrawal <punit.agrawal@arm.com>
+These Software exceptions can interrupt anything, so I describe them as
+NMI-like. They aren't the only NMI-like way to notify the OS about
+firmware-first RAS events, the ACPI spec also defines 'NOTFIY_SEA' and
+'NOTIFY_SEI'.
 
----
-Changes since v1:
- * Tidied up _in_nmi_notify_one().
+(Acronyms: SEA, Synchronous External Abort. The CPU requested some memory,
+but the owner of that memory said no. These are always synchronous with the
+instruction that caused them. SEI, System-Error Interrupt, commonly called
+SError. This is an asynchronous external abort, the memory-owner didn't say no
+at the right point. Collectively these things are called external-aborts
+How is firmware involved? It traps these and re-injects them into the kernel
+once its written the CPER records).
 
- drivers/acpi/apei/ghes.c | 100 ++++++++++++++++++++++++++++++-----------------
- 1 file changed, 65 insertions(+), 35 deletions(-)
 
-diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-index e2af91c92135..c8a6c5b0516e 100644
---- a/drivers/acpi/apei/ghes.c
-+++ b/drivers/acpi/apei/ghes.c
-@@ -747,6 +747,51 @@ static void __process_error(struct ghes *ghes)
- #endif
- }
- 
-+static int _in_nmi_notify_one(struct ghes *ghes)
-+{
-+	int sev;
-+
-+	if (ghes_read_estatus(ghes, 1)) {
-+		ghes_clear_estatus(ghes);
-+		return -ENOENT;
-+	}
-+
-+	sev = ghes_severity(ghes->estatus->error_severity);
-+	if (sev >= GHES_SEV_PANIC) {
-+#ifdef CONFIG_X86
-+		oops_begin();
-+#endif
-+		ghes_print_queued_estatus();
-+		__ghes_panic(ghes);
-+	}
-+
-+	if (!(ghes->flags & GHES_TO_CLEAR))
-+		return 0;
-+
-+	__process_error(ghes);
-+	ghes_clear_estatus(ghes);
-+
-+	return 0;
-+}
-+
-+static int ghes_estatus_queue_notified(struct list_head *rcu_list)
-+{
-+	int ret = -ENOENT;
-+	struct ghes *ghes;
-+
-+	rcu_read_lock();
-+	list_for_each_entry_rcu(ghes, rcu_list, list) {
-+		if (!_in_nmi_notify_one(ghes))
-+			ret = 0;
-+	}
-+	rcu_read_unlock();
-+
-+	if (IS_ENABLED(CONFIG_ARCH_HAVE_NMI_SAFE_CMPXCHG) && ret == 0)
-+		irq_work_queue(&ghes_proc_irq_work);
-+
-+	return ret;
-+}
-+
- static unsigned long ghes_esource_prealloc_size(
- 	const struct acpi_hest_generic *generic)
- {
-@@ -762,11 +807,24 @@ static unsigned long ghes_esource_prealloc_size(
- 	return prealloc_size;
- }
- 
--static void ghes_estatus_pool_shrink(unsigned long len)
-+/* After removing a queue user, we can shrink the pool */
-+static void ghes_estatus_queue_shrink_pool(struct ghes *ghes)
- {
-+	unsigned long len;
-+
-+	len = ghes_esource_prealloc_size(ghes->generic);
- 	ghes_estatus_pool_size_request -= PAGE_ALIGN(len);
- }
- 
-+/* Before adding a queue user, grow the pool */
-+static void ghes_estatus_queue_grow_pool(struct ghes *ghes)
-+{
-+	unsigned long len;
-+
-+	len = ghes_esource_prealloc_size(ghes->generic);
-+	ghes_estatus_pool_expand(len);
-+}
-+
- static void ghes_proc_in_irq(struct irq_work *irq_work)
- {
- 	struct llist_node *llnode, *next;
-@@ -965,48 +1023,22 @@ static LIST_HEAD(ghes_nmi);
- 
- static int ghes_notify_nmi(unsigned int cmd, struct pt_regs *regs)
- {
--	struct ghes *ghes;
--	int sev, ret = NMI_DONE;
-+	int ret = NMI_DONE;
- 
- 	if (!atomic_add_unless(&ghes_in_nmi, 1, 1))
- 		return ret;
- 
--	list_for_each_entry_rcu(ghes, &ghes_nmi, list) {
--		if (ghes_read_estatus(ghes, 1)) {
--			ghes_clear_estatus(ghes);
--			continue;
--		} else {
--			ret = NMI_HANDLED;
--		}
--
--		sev = ghes_severity(ghes->estatus->error_severity);
--		if (sev >= GHES_SEV_PANIC) {
--			oops_begin();
--			ghes_print_queued_estatus();
--			__ghes_panic(ghes);
--		}
-+	if (!ghes_estatus_queue_notified(&ghes_nmi))
-+		ret = NMI_HANDLED;
- 
--		if (!(ghes->flags & GHES_TO_CLEAR))
--			continue;
--
--		__process_error(ghes);
--		ghes_clear_estatus(ghes);
--	}
--
--#ifdef CONFIG_ARCH_HAVE_NMI_SAFE_CMPXCHG
--	if (ret == NMI_HANDLED)
--		irq_work_queue(&ghes_proc_irq_work);
--#endif
- 	atomic_dec(&ghes_in_nmi);
- 	return ret;
- }
- 
- static void ghes_nmi_add(struct ghes *ghes)
- {
--	unsigned long len;
-+	ghes_estatus_queue_grow_pool(ghes);
- 
--	len = ghes_esource_prealloc_size(ghes->generic);
--	ghes_estatus_pool_expand(len);
- 	mutex_lock(&ghes_list_mutex);
- 	if (list_empty(&ghes_nmi))
- 		register_nmi_handler(NMI_LOCAL, ghes_notify_nmi, 0, "ghes");
-@@ -1016,8 +1048,6 @@ static void ghes_nmi_add(struct ghes *ghes)
- 
- static void ghes_nmi_remove(struct ghes *ghes)
- {
--	unsigned long len;
--
- 	mutex_lock(&ghes_list_mutex);
- 	list_del_rcu(&ghes->list);
- 	if (list_empty(&ghes_nmi))
-@@ -1028,8 +1058,8 @@ static void ghes_nmi_remove(struct ghes *ghes)
- 	 * freed after NMI handler finishes.
- 	 */
- 	synchronize_rcu();
--	len = ghes_esource_prealloc_size(ghes->generic);
--	ghes_estatus_pool_shrink(len);
-+
-+	ghes_estatus_queue_shrink_pool(ghes);
- }
- 
- #else /* CONFIG_HAVE_ACPI_APEI_NMI */
+APEI's GHES code only expects one source of NMI. If a platform implements
+more than one of these mechanisms, APEI needs to handle the interaction.
+'SEA' and 'SEI' can interact as 'SEI' is asynchronous. SDEI can interact
+with itself: its exceptions can be 'normal' or 'critical', and firmware
+could use both types for RAS. (errors using normal, 'panic-now' using
+critical).
+
+What does this series do?
+Patches 1-4 refactor APEIs 'estatus queue' so it can be used for all
+NMI-like notifications. This defers the NMI work to irq_work, which will
+happen when we next unmask interrupts.
+
+Patches 5&6 move the arch and KVM code around so that NMI-like notifications
+are always called in_nmi().
+
+Patch 7 changes the 'irq or nmi?' path through ghes_copy_tofrom_phys()
+to be per-ghes. When called in_nmi(), the struct ghes is expected to
+provide a fixmap slot and lock that is safe to use. NMI-like notifications
+that mask each other can share these resources. Those that interact should
+have their own fixmap slot and lock.
+
+Patch 8 renames NOTIFY_SEA's use of NOTIFY_NMI's infrastructure, as we're
+about to have multiple NMI-like users that can't share resources.
+
+Pathes 9&10 add the SDEI helper, and notify methods for APEI.
+
+After this, adding further firmware-first pieces for arm64 is simple
+(and safe), and all our NMI-like notifications behave the same as x86's
+NOTIFY_NMI.
+
+All of this makes the race between memory_failure_queue() and
+ret_to_user worse, as there is now always irq_work involved.
+
+Patch 11 makes the reschedule to memory_failure() run as soon as possible.
+Patch 12 makes sure the arch code knows whether the irq_work has run by
+the time do_sea() returns. We can skip the signalling step if it has as
+APEI has done its work.
+
+
+ghes.c became clearer to me when I worked out that it has three sets of
+functions with 'estatus' in the name. One is a pool of memory that can be
+allocated-from atomically. This is grown/shrunk when new NMI users are
+allocated.
+The second is the estatus-cache, which holds recent notifications so it
+can suppress notifications we've already handled.
+The last it the estatus-queue, which holds data from NMI-like notifications
+(in pool memory) to be processed from irq_work.
+
+
+Testing?
+Tested with the SDEI FVP based software model and a mocked up NOTFIY_SEA using
+KVM. I've added a case where 'corrected errors' are discovered at probe time
+to exercise ghes_probe() during boot. I've only build tested this on x86.
+
+
+Thanks,
+
+James
+
+[0] http://infocenter.arm.com/help/topic/com.arm.doc.den0054a/ARM_DEN0054A_Software_Delegated_Exception_Interface.pdf
+
+
+James Morse (12):
+  ACPI / APEI: Move the estatus queue code up, and under its own ifdef
+  ACPI / APEI: Generalise the estatus queue's add/remove and notify code
+  ACPI / APEI: don't wait to serialise with oops messages when
+    panic()ing
+  ACPI / APEI: Switch NOTIFY_SEA to use the estatus queue
+  KVM: arm/arm64: Add kvm_ras.h to collect kvm specific RAS plumbing
+  arm64: KVM/mm: Move SEA handling behind a single 'claim' interface
+  ACPI / APEI: Make the nmi_fixmap_idx per-ghes to allow multiple
+    in_nmi() users
+  ACPI / APEI: Split fixmap pages for arm64 NMI-like notifications
+  firmware: arm_sdei: Add ACPI GHES registration helper
+  ACPI / APEI: Add support for the SDEI GHES Notification type
+  mm/memory-failure: increase queued recovery work's priority
+  arm64: acpi: Make apei_claim_sea() synchronise with APEI's irq work
+
+ arch/arm/include/asm/kvm_ras.h       |  14 +
+ arch/arm/include/asm/system_misc.h   |   5 -
+ arch/arm64/include/asm/acpi.h        |   5 +-
+ arch/arm64/include/asm/daifflags.h   |   1 +
+ arch/arm64/include/asm/fixmap.h      |   8 +-
+ arch/arm64/include/asm/kvm_ras.h     |  24 ++
+ arch/arm64/include/asm/system_misc.h |   2 -
+ arch/arm64/kernel/acpi.c             |  49 ++++
+ arch/arm64/mm/fault.c                |  30 +-
+ drivers/acpi/apei/ghes.c             | 517 ++++++++++++++++++++---------------
+ drivers/firmware/arm_sdei.c          |  77 ++++++
+ include/acpi/ghes.h                  |   4 +
+ include/linux/arm_sdei.h             |   8 +
+ mm/memory-failure.c                  |  11 +-
+ virt/kvm/arm/mmu.c                   |   4 +-
+ 15 files changed, 499 insertions(+), 260 deletions(-)
+ create mode 100644 arch/arm/include/asm/kvm_ras.h
+ create mode 100644 arch/arm64/include/asm/kvm_ras.h
+
 -- 
 2.16.2
