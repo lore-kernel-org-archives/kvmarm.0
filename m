@@ -1,111 +1,114 @@
-From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH 3/4] KVM: arm64: Support dirty page tracking for PUD
- hugepages
-Date: Fri, 27 Apr 2018 13:14:50 +0200
-Message-ID: <20180427111450.GN13249@C02W217FHV2R.local>
-References: <20180420145409.24485-1-punit.agrawal@arm.com>
- <20180420145409.24485-4-punit.agrawal@arm.com>
+From: Eric Auger <eric.auger@redhat.com>
+Subject: [PATCH v4 00/12] KVM: arm/arm64: Allow multiple GICv3 redistributor
+ regions
+Date: Fri, 27 Apr 2018 16:06:21 +0200
+Message-ID: <1524837993-23396-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180420145409.24485-4-punit.agrawal@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Punit Agrawal <punit.agrawal@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, suzuki.poulose@arm.com, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 170F74A07A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Apr 2018 09:58:01 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id REzcE2-kdtsu for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 Apr 2018 09:57:39 -0400 (EDT)
+Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3ED1D49FB1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Apr 2018 09:57:39 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, cdall@kernel.org, peter.maydell@linaro.org
+Cc: andre.przywara@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Apr 20, 2018 at 03:54:08PM +0100, Punit Agrawal wrote:
-> In preparation for creating PUD hugepages at stage 2, add support for
-> write protecting PUD hugepages when they are encountered. Write
-> protecting guest tables is used to track dirty pages when migrating
-> VMs.
-> 
-> Also, provide trivial implementations of required kvm_s2pud_* helpers
-> to allow sharing of code with arm32.
-> 
-> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
-> Cc: Christoffer Dall <christoffer.dall@arm.com>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Russell King <linux@armlinux.org.uk>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will.deacon@arm.com>
-> ---
->  arch/arm/include/asm/kvm_mmu.h   | 16 ++++++++++++++++
->  arch/arm64/include/asm/kvm_mmu.h | 10 ++++++++++
->  virt/kvm/arm/mmu.c               |  9 ++++++---
->  3 files changed, 32 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-> index 5907a81ad5c1..224c22c0a69c 100644
-> --- a/arch/arm/include/asm/kvm_mmu.h
-> +++ b/arch/arm/include/asm/kvm_mmu.h
-> @@ -80,6 +80,22 @@ void kvm_clear_hyp_idmap(void);
->  
->  #define kvm_pmd_mkhuge(pmd)	pmd_mkhuge(pmd)
->  
-> +/*
-> + * The following kvm_*pud*() functionas are provided strictly to allow
-> + * sharing code with arm64. They should never be called in practice.
-> + */
-> +static inline void kvm_set_s2pud_readonly(pud_t *pud)
-> +{
-> +	BUG();
-> +}
-> +
-> +static inline bool kvm_s2pud_readonly(pud_t *pud)
-> +{
-> +	BUG();
-> +	return false;
-> +}
-> +
-> +
->  static inline void kvm_set_pmd(pmd_t *pmd, pmd_t new_pmd)
->  {
->  	*pmd = new_pmd;
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index d962508ce4b3..f440cf216a23 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -240,6 +240,16 @@ static inline bool kvm_s2pmd_exec(pmd_t *pmdp)
->  	return !(READ_ONCE(pmd_val(*pmdp)) & PMD_S2_XN);
->  }
->  
-> +static inline void kvm_set_s2pud_readonly(pud_t *pudp)
-> +{
-> +	kvm_set_s2pte_readonly((pte_t *)pudp);
-> +}
-> +
-> +static inline bool kvm_s2pud_readonly(pud_t *pudp)
-> +{
-> +	return kvm_s2pte_readonly((pte_t *)pudp);
-> +}
-> +
->  static inline bool kvm_page_empty(void *ptr)
->  {
->  	struct page *ptr_page = virt_to_page(ptr);
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index f72ae7a6dea0..5f53909da90e 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -1286,9 +1286,12 @@ static void  stage2_wp_puds(pgd_t *pgd, phys_addr_t addr, phys_addr_t end)
->  	do {
->  		next = stage2_pud_addr_end(addr, end);
->  		if (!stage2_pud_none(*pud)) {
-> -			/* TODO:PUD not supported, revisit later if supported */
-> -			BUG_ON(stage2_pud_huge(*pud));
-> -			stage2_wp_pmds(pud, addr, next);
-> +			if (stage2_pud_huge(*pud)) {
-> +				if (!kvm_s2pud_readonly(pud))
-> +					kvm_set_s2pud_readonly(pud);
-> +			} else {
-> +				stage2_wp_pmds(pud, addr, next);
-> +			}
->  		}
->  	} while (pud++, addr = next, addr != end);
->  }
-> -- 
-> 2.17.0
-> 
+At the moment the KVM VGICv3 only supports a single redistributor
+region (whose base address is set through the GICv3 kvm device
+KVM_DEV_ARM_VGIC_GRP_ADDR/KVM_VGIC_V3_ADDR_TYPE_REDIST). There,
+all the redistributors are laid out contiguously. The size of this
+single redistributor region is not set explicitly but instead
+induced at a late stage by the number of online vcpus.
 
-Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+The GIC specification does not mandate all redistributors to be
+contiguous. Moreover DT and ACPI were specified so that multiple
+redistributors regions can be defined.
+
+The current interface brings a limitation on QEMU where ARM
+virt machine available GPA holes only allowed to assign a
+redistributor region fitting a max of 123 vcpus. Overcoming this
+limitation would force either to create a new machine or relocate
+the single rdist region or allow the allocation of multiple rdist
+regions.
+
+This series enables this last alternative. A new GICv3 KVM device
+KVM_DEV_ARM_VGIC_GRP_ADDR/KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION allows
+to register individual redistributor regions whose size is defined
+explicitly. Those rdist regions then are filled by vcpu rdist frames
+according to the need. The vgic init and related base address checks
+are impacted.
+
+Best Regards
+
+Eric
+
+Git: complete series available at
+https://github.com/eauger/linux/tree/v4.17-rc2-rdist-regions-v4
+Previous version:
+https://github.com/eauger/linux/tree/v4.16-rdist-regions-v3
+
+History:
+
+v3 -> v4:
+- Collected Christoffer's R-b
+- reworked vgic_v3_rdist_overlap and introduced vgic_dist_overlap
+- vgic_v3_insert_redist_region cleanup
+- inverse order for patches 6 and 7
+
+v2 -> v3:
+- Add details to the user API documentation
+- early exit if vgic_v3_rdist_region_from_index() fails
+- return -EINVAL if legacy and new redist region API are mixed
+
+v1 -> v2:
+- Rework the uapi. Only bits [51:16] of the redist region are
+  exposed. Also a new flags field was introduced
+- Do not store the last bit in the vgic_cpu struct anymore
+- remove dist->spis check in 1st patch
+- add last patch to bump VGIC_V3_MAX_CPUS to 512
+- advertise the new attribute
+
+Eric Auger (12):
+  KVM: arm/arm64: Set dist->spis to NULL after kfree
+  KVM: arm/arm64: Document KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+  KVM: arm/arm64: Replace the single rdist region by a list
+  KVM: arm/arm64: Helper to locate free rdist index
+  KVM: arm/arm64: Revisit Redistributor TYPER last bit computation
+  KVM: arm/arm64: Adapt vgic_v3_check_base to multiple rdist regions
+  KVM: arm/arm64: Helper to register a new redistributor region
+  KVM: arm/arm64: Check vcpu redist base before registering an iodev
+  KVM: arm/arm64: Check all vcpu redistributors are set on map_resources
+  KVM: arm/arm64: Add KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+  KVM: arm/arm64: Implement KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+  KVM: arm/arm64: Bump VGIC_V3_MAX_CPUS to 512
+
+ Documentation/virtual/kvm/devices/arm-vgic-v3.txt |  25 ++++-
+ arch/arm/include/uapi/asm/kvm.h                   |   1 +
+ arch/arm64/include/uapi/asm/kvm.h                 |   1 +
+ include/kvm/arm_vgic.h                            |  16 ++-
+ virt/kvm/arm/vgic/vgic-init.c                     |  20 +++-
+ virt/kvm/arm/vgic/vgic-kvm-device.c               |  55 ++++++++++-
+ virt/kvm/arm/vgic/vgic-mmio-v3.c                  | 114 +++++++++++++++++++---
+ virt/kvm/arm/vgic/vgic-v3.c                       | 101 +++++++++++++++----
+ virt/kvm/arm/vgic/vgic.h                          |  42 +++++++-
+ 9 files changed, 330 insertions(+), 45 deletions(-)
+
+-- 
+2.5.5
