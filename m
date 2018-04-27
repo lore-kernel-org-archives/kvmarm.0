@@ -1,73 +1,213 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCH v2 08/17] kvm: arm/arm64: Prepare for VM specific stage2
- translations
-Date: Fri, 27 Apr 2018 16:22:12 +0100
-Message-ID: <59fc0fe3-2c7e-b5ae-702b-0c21f0051c6b@arm.com>
-References: <1522156531-28348-1-git-send-email-suzuki.poulose@arm.com>
- <1522156531-28348-9-git-send-email-suzuki.poulose@arm.com>
- <7f67fca2-b936-25d9-0fe8-aece1fadafdc@arm.com>
+From: James Morse <james.morse@arm.com>
+Subject: [PATCH v3 02/12] ACPI / APEI: Generalise the estatus queue's
+ add/remove and notify code
+Date: Fri, 27 Apr 2018 16:35:00 +0100
+Message-ID: <20180427153510.5799-3-james.morse@arm.com>
+References: <20180427153510.5799-1-james.morse@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <7f67fca2-b936-25d9-0fe8-aece1fadafdc@arm.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Julien Grall <julien.grall@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: ard.biesheuvel@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20180427153510.5799-1-james.morse@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: linux-acpi@vger.kernel.org
+Cc: jonathan.zhang@cavium.com, Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Christoffer Dall <cdall@kernel.org>, Punit Agrawal <punit.agrawal@arm.com>, Xie XiuQi <xiexiuqi@huawei.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, Borislav Petkov <bp@alien8.de>, James Morse <james.morse@arm.com>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 26/04/18 14:35, Julien Grall wrote:
-> Hi Suzuki,
-> 
-> On 27/03/18 14:15, Suzuki K Poulose wrote:
->> Right now the stage2 page table for a VM is hard coded, assuming
->> an IPA of 40bits. As we are about to add support for per VM IPA,
->> prepare the stage2 page table helpers to accept the kvm instance
->> to make the right decision for the VM. No functional changes.
+To support asynchronous NMI-like notifications on arm64 we need to use
+the estatus-queue. These patches refactor it to allow multiple APEI
+notification types to use it.
 
+Refactor the estatus queue's pool grow/shrink code and notification
+routine from NOTIFY_NMI's handlers. This will allow another notification
+method to use the estatus queue without duplicating this code.
 
->> diff --git a/arch/arm/include/asm/kvm_arm.h b/arch/arm/include/asm/kvm_arm.h
->> index 3ab8b37..c3f1f9b 100644
->> --- a/arch/arm/include/asm/kvm_arm.h
->> +++ b/arch/arm/include/asm/kvm_arm.h
->> @@ -133,8 +133,7 @@
->>    * space.
->>    */
->>   #define KVM_PHYS_SHIFT    (40)
->> -#define KVM_PHYS_SIZE    (_AC(1, ULL) << KVM_PHYS_SHIFT)
->> -#define KVM_PHYS_MASK    (KVM_PHYS_SIZE - _AC(1, ULL))
-> 
-> I assume you are moving them to kvm_mmu.h in order to match the arm64 side, right? If so, would not it make sense to make KVM_PHYS_SHIFT with it?
-> 
-> [...]
+This patch adds rcu_read_lock()/rcu_read_unlock() around the list
+list_for_each_entry_rcu() walker. These aren't strictly necessary as
+the whole nmi_enter/nmi_exit() window is a spooky RCU read-side
+critical section.
 
-I am moving all the macros that depend on the "kvm" instance to kvm_mmu.h.
-I will see if I can move the KVM_PHYS_SHIFT without much trouble.
+Keep the oops_begin() call for x86, arm64 doesn't have one of these,
+and APEI is the only thing outside arch code calling this..
 
-> 
->> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
->> index 7faed6e..594c4e6 100644
->> --- a/arch/arm64/include/asm/kvm_mmu.h
->> +++ b/arch/arm64/include/asm/kvm_mmu.h
->> @@ -134,8 +134,11 @@ static inline unsigned long __kern_hyp_va(unsigned long v)
->>    * We currently only support a 40bit IPA.
->>    */
->>   #define KVM_PHYS_SHIFT    (40)
->> -#define KVM_PHYS_SIZE    (1UL << KVM_PHYS_SHIFT)
->> -#define KVM_PHYS_MASK    (KVM_PHYS_SIZE - 1UL)
->> +
->> +#define kvm_phys_shift(kvm)        KVM_PHYS_SHIFT
->> +#define kvm_phys_size(kvm)        (_AC(1, ULL) << kvm_phys_shift(kvm))
-> 
-> NIT: is the _AC(...) necessary? It does not look like this function is going to be usable in assembly.
-> 
->> +#define kvm_phys_mask(kvm)        (kvm_phys_size(kvm) - _AC(1, ULL))
-> 
-> Same here.
-> 
+The existing ghes_estatus_pool_shrink() is folded into the new
+ghes_estatus_queue_shrink_pool() as only the queue uses it.
 
-Ok, will drop them.
+_in_nmi_notify_one() is separate from the rcu-list walker for a later
+caller that doesn't need to walk a list.
 
-Cheers
-Suzuki
+Signed-off-by: James Morse <james.morse@arm.com>
+Reviewed-by: Punit Agrawal <punit.agrawal@arm.com>
+
+---
+Changes since v1:
+ * Tidied up _in_nmi_notify_one().
+
+ drivers/acpi/apei/ghes.c | 100 ++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 65 insertions(+), 35 deletions(-)
+
+diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+index e2af91c92135..c8a6c5b0516e 100644
+--- a/drivers/acpi/apei/ghes.c
++++ b/drivers/acpi/apei/ghes.c
+@@ -747,6 +747,51 @@ static void __process_error(struct ghes *ghes)
+ #endif
+ }
+ 
++static int _in_nmi_notify_one(struct ghes *ghes)
++{
++	int sev;
++
++	if (ghes_read_estatus(ghes, 1)) {
++		ghes_clear_estatus(ghes);
++		return -ENOENT;
++	}
++
++	sev = ghes_severity(ghes->estatus->error_severity);
++	if (sev >= GHES_SEV_PANIC) {
++#ifdef CONFIG_X86
++		oops_begin();
++#endif
++		ghes_print_queued_estatus();
++		__ghes_panic(ghes);
++	}
++
++	if (!(ghes->flags & GHES_TO_CLEAR))
++		return 0;
++
++	__process_error(ghes);
++	ghes_clear_estatus(ghes);
++
++	return 0;
++}
++
++static int ghes_estatus_queue_notified(struct list_head *rcu_list)
++{
++	int ret = -ENOENT;
++	struct ghes *ghes;
++
++	rcu_read_lock();
++	list_for_each_entry_rcu(ghes, rcu_list, list) {
++		if (!_in_nmi_notify_one(ghes))
++			ret = 0;
++	}
++	rcu_read_unlock();
++
++	if (IS_ENABLED(CONFIG_ARCH_HAVE_NMI_SAFE_CMPXCHG) && ret == 0)
++		irq_work_queue(&ghes_proc_irq_work);
++
++	return ret;
++}
++
+ static unsigned long ghes_esource_prealloc_size(
+ 	const struct acpi_hest_generic *generic)
+ {
+@@ -762,11 +807,24 @@ static unsigned long ghes_esource_prealloc_size(
+ 	return prealloc_size;
+ }
+ 
+-static void ghes_estatus_pool_shrink(unsigned long len)
++/* After removing a queue user, we can shrink the pool */
++static void ghes_estatus_queue_shrink_pool(struct ghes *ghes)
+ {
++	unsigned long len;
++
++	len = ghes_esource_prealloc_size(ghes->generic);
+ 	ghes_estatus_pool_size_request -= PAGE_ALIGN(len);
+ }
+ 
++/* Before adding a queue user, grow the pool */
++static void ghes_estatus_queue_grow_pool(struct ghes *ghes)
++{
++	unsigned long len;
++
++	len = ghes_esource_prealloc_size(ghes->generic);
++	ghes_estatus_pool_expand(len);
++}
++
+ static void ghes_proc_in_irq(struct irq_work *irq_work)
+ {
+ 	struct llist_node *llnode, *next;
+@@ -965,48 +1023,22 @@ static LIST_HEAD(ghes_nmi);
+ 
+ static int ghes_notify_nmi(unsigned int cmd, struct pt_regs *regs)
+ {
+-	struct ghes *ghes;
+-	int sev, ret = NMI_DONE;
++	int ret = NMI_DONE;
+ 
+ 	if (!atomic_add_unless(&ghes_in_nmi, 1, 1))
+ 		return ret;
+ 
+-	list_for_each_entry_rcu(ghes, &ghes_nmi, list) {
+-		if (ghes_read_estatus(ghes, 1)) {
+-			ghes_clear_estatus(ghes);
+-			continue;
+-		} else {
+-			ret = NMI_HANDLED;
+-		}
+-
+-		sev = ghes_severity(ghes->estatus->error_severity);
+-		if (sev >= GHES_SEV_PANIC) {
+-			oops_begin();
+-			ghes_print_queued_estatus();
+-			__ghes_panic(ghes);
+-		}
++	if (!ghes_estatus_queue_notified(&ghes_nmi))
++		ret = NMI_HANDLED;
+ 
+-		if (!(ghes->flags & GHES_TO_CLEAR))
+-			continue;
+-
+-		__process_error(ghes);
+-		ghes_clear_estatus(ghes);
+-	}
+-
+-#ifdef CONFIG_ARCH_HAVE_NMI_SAFE_CMPXCHG
+-	if (ret == NMI_HANDLED)
+-		irq_work_queue(&ghes_proc_irq_work);
+-#endif
+ 	atomic_dec(&ghes_in_nmi);
+ 	return ret;
+ }
+ 
+ static void ghes_nmi_add(struct ghes *ghes)
+ {
+-	unsigned long len;
++	ghes_estatus_queue_grow_pool(ghes);
+ 
+-	len = ghes_esource_prealloc_size(ghes->generic);
+-	ghes_estatus_pool_expand(len);
+ 	mutex_lock(&ghes_list_mutex);
+ 	if (list_empty(&ghes_nmi))
+ 		register_nmi_handler(NMI_LOCAL, ghes_notify_nmi, 0, "ghes");
+@@ -1016,8 +1048,6 @@ static void ghes_nmi_add(struct ghes *ghes)
+ 
+ static void ghes_nmi_remove(struct ghes *ghes)
+ {
+-	unsigned long len;
+-
+ 	mutex_lock(&ghes_list_mutex);
+ 	list_del_rcu(&ghes->list);
+ 	if (list_empty(&ghes_nmi))
+@@ -1028,8 +1058,8 @@ static void ghes_nmi_remove(struct ghes *ghes)
+ 	 * freed after NMI handler finishes.
+ 	 */
+ 	synchronize_rcu();
+-	len = ghes_esource_prealloc_size(ghes->generic);
+-	ghes_estatus_pool_shrink(len);
++
++	ghes_estatus_queue_shrink_pool(ghes);
+ }
+ 
+ #else /* CONFIG_HAVE_ACPI_APEI_NMI */
+-- 
+2.16.2
