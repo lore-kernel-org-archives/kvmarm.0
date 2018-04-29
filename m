@@ -1,48 +1,71 @@
-From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH v4 12/12] KVM: arm/arm64: Bump VGIC_V3_MAX_CPUS to 512
-Date: Sun, 29 Apr 2018 14:35:45 +0200
-Message-ID: <20180429123545.GF7512@C02W217FHV2R.local>
-References: <1524838505-3823-1-git-send-email-eric.auger@redhat.com>
- <1524838505-3823-13-git-send-email-eric.auger@redhat.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH] arm64: vgic-v2: Fix proxying of cpuif access
+Date: Sun, 29 Apr 2018 14:05:07 +0100
+Message-ID: <20180429140507.60bfe2dc@why.wild-wind.fr.eu.org>
+References: <20180427145102.5645-1-marc.zyngier@arm.com>
+ <20180429123432.GA7512@C02W217FHV2R.local>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1524838505-3823-13-git-send-email-eric.auger@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, peter.maydell@linaro.org, andre.przywara@arm.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20180429123432.GA7512@C02W217FHV2R.local>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Apr 27, 2018 at 04:15:05PM +0200, Eric Auger wrote:
-> Let's raise the number of supported vcpus along with
-> vgic v3 now that HW is looming with more physical CPUs.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+On Sun, 29 Apr 2018 14:34:32 +0200
+Christoffer Dall <christoffer.dall@arm.com> wrote:
 
-Acked-by: Christoffer Dall <christoffer.dall@arm.com>
+> On Fri, Apr 27, 2018 at 03:51:02PM +0100, Marc Zyngier wrote:
+> > Proxying the cpuif accesses at EL2 makes use of vcpu_data_guest_to_host
+> > and co, which check the endianness, which call into vcpu_read_sys_reg...
+> > which isn't mapped at EL2 (it was inlined before, and got moved OoL
+> > with the VHE optimizations).  
+> 
+> I thought we relied on static inline functions to always be inlined, but
+> apparently not?  Does this mean we have potential other bugs looming
+> depending on the mood of the compiler, or was there something special
+> that went wrong here?
 
-> ---
->  include/kvm/arm_vgic.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+We do rely on that behaviour. And that was the case until you moved
+vcpu_read_sys_reg() to be entirely out of line (see d47533dab9f5).
+
+At that point, kvm_vcpu_is_be() becomes a death trap.
+
+We missed it for two reasons:
+- It was only indirectly called, making it quite hard to notice the
+  potential breakage
+- Nobody gives a damn about 64k pages, specially on something like Juno
+
+What we'd need is a way to find cross-section calls (text -> hyp-text
+should allowed, but not the reverse). We already have similar things in
+the kernel, it is probably only a matter of reusing the infrastructure
+for our own purpose.
+
+> > The result is of course a nice panic. Let's add some specialized
+> > cruft to keep the broken platforms that require this hack alive.
+> > I'd rather kill BE support, but hey, just in case...
+> > 
+> > Fixes: d47533dab9f5 ("KVM: arm64: Introduce framework for accessing deferred sysregs")
+> > Reported-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > Tested-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>  
 > 
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index e5c16d1..a9a9f4a 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -28,7 +28,7 @@
->  
->  #include <linux/irqchip/arm-gic-v4.h>
->  
-> -#define VGIC_V3_MAX_CPUS	255
-> +#define VGIC_V3_MAX_CPUS	512
->  #define VGIC_V2_MAX_CPUS	8
->  #define VGIC_NR_IRQS_LEGACY     256
->  #define VGIC_NR_SGIS		16
-> -- 
-> 2.5.5
+> Otherwise:
 > 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+
+Thanks,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
