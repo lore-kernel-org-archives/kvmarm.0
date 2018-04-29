@@ -1,109 +1,147 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH] arm64: vgic-v2: Fix proxying of cpuif access
-Date: Sun, 29 Apr 2018 14:34:32 +0200
-Message-ID: <20180429123432.GA7512@C02W217FHV2R.local>
-References: <20180427145102.5645-1-marc.zyngier@arm.com>
+Subject: Re: [PATCH v4 06/12] KVM: arm/arm64: Adapt vgic_v3_check_base to
+ multiple rdist regions
+Date: Sun, 29 Apr 2018 14:35:01 +0200
+Message-ID: <20180429123500.GC7512@C02W217FHV2R.local>
+References: <1524838505-3823-1-git-send-email-eric.auger@redhat.com>
+ <1524838505-3823-7-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180427145102.5645-1-marc.zyngier@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+In-Reply-To: <1524838505-3823-7-git-send-email-eric.auger@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, cdall@kernel.org, peter.maydell@linaro.org, andre.przywara@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Apr 27, 2018 at 03:51:02PM +0100, Marc Zyngier wrote:
-> Proxying the cpuif accesses at EL2 makes use of vcpu_data_guest_to_host
-> and co, which check the endianness, which call into vcpu_read_sys_reg...
-> which isn't mapped at EL2 (it was inlined before, and got moved OoL
-> with the VHE optimizations).
+On Fri, Apr 27, 2018 at 04:14:59PM +0200, Eric Auger wrote:
+> vgic_v3_check_base() currently only handles the case of a unique
+> legacy redistributor region whose size is not explicitly set but
+> infered, instead, from the number of online vcpus.
 
-I thought we relied on static inline functions to always be inlined, but
-apparently not?  Does this mean we have potential other bugs looming
-depending on the mood of the compiler, or was there something special
-that went wrong here?
+nit: inferred
 
 > 
-> The result is of course a nice panic. Let's add some specialized
-> cruft to keep the broken platforms that require this hack alive.
-> I'd rather kill BE support, but hey, just in case...
+> We adapt it to handle the case of multiple redistributor regions
+> with explicitly defined size. We rely on two new helpers:
+> - vgic_v3_rdist_overlap() is used to detect overlap with the dist
+>   region if defined
+> - vgic_v3_rd_region_size computes the size of the redist region,
+>   would it be a legacy unique region or a new explicitly sized
+>   region.
 > 
-> Fixes: d47533dab9f5 ("KVM: arm64: Introduce framework for accessing deferred sysregs")
-> Reported-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Tested-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-
-Otherwise:
-
-Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
-
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
 > ---
->  arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c | 33 ++++++++++++++++++++++++++------
->  1 file changed, 27 insertions(+), 6 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-> index 86801b6055d6..b83a669b26ac 100644
-> --- a/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-> +++ b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-> @@ -23,6 +23,30 @@
->  #include <asm/kvm_hyp.h>
->  #include <asm/kvm_mmu.h>
+> v3 -> v4:
+> - squash vgic_v3_check_base adaptation and vgic_v3_rdist_overlap
+>   + vgic_v3_rd_region_size introduction  and put this patch
+>   before v3 patch 6
+> ---
+>  virt/kvm/arm/vgic/vgic-v3.c | 49 +++++++++++++++++++++++++++++----------------
+>  virt/kvm/arm/vgic/vgic.h    | 10 +++++++++
+>  2 files changed, 42 insertions(+), 17 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+> index f81a63a..c4a2a46 100644
+> --- a/virt/kvm/arm/vgic/vgic-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-v3.c
+> @@ -410,6 +410,29 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
+>  	return 0;
+>  }
 >  
-> +static bool __hyp_text __is_be(struct kvm_vcpu *vcpu)
+> +/**
+> + * vgic_v3_rdist_overlap - check if a region overlaps with any
+> + * existing redistributor region
+> + *
+> + * @kvm: kvm handle
+> + * @base: base of the region
+> + * @size: size of region
+> + *
+> + * Return: true if there is an overlap
+> + */
+> +bool vgic_v3_rdist_overlap(struct kvm *kvm, gpa_t base, size_t size)
 > +{
-> +	if (vcpu_mode_is_32bit(vcpu))
-> +		return !!(read_sysreg_el2(spsr) & COMPAT_PSR_E_BIT);
+> +	struct vgic_dist *d = &kvm->arch.vgic;
+> +	struct vgic_redist_region *rdreg;
 > +
-> +	return !!(read_sysreg(SCTLR_EL1) & SCTLR_ELx_EE);
-> +}
-> +
-> +static u32 __hyp_text __host_to_guest_u32(struct kvm_vcpu *vcpu, u32 data)
-> +{
-> +	if (__is_be(vcpu))
-> +		return cpu_to_be32(data);
-> +
-> +	return cpu_to_le32(data);
-> +}
-> +
-> +static u32 __hyp_text __guest_to_host_u32(struct kvm_vcpu *vcpu, u32 data)
-> +{
-> +	if (__is_be(vcpu))
-> +		return be32_to_cpu(data);
-> +
-> +	return le32_to_cpu(data);
+> +	list_for_each_entry(rdreg, &d->rd_regions, list) {
+> +		if ((base + size > rdreg->base) &&
+> +			(base < rdreg->base + vgic_v3_rd_region_size(kvm, rdreg)))
+> +			return true;
+> +	}
+> +	return false;
 > +}
 > +
 >  /*
->   * __vgic_v2_perform_cpuif_access -- perform a GICV access on behalf of the
->   *				     guest.
-> @@ -64,14 +88,11 @@ int __hyp_text __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
->  	addr += fault_ipa - vgic->vgic_cpu_base;
+>   * Check for overlapping regions and for regions crossing the end of memory
+>   * for base addresses which have already been set.
+> @@ -417,31 +440,23 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
+>  bool vgic_v3_check_base(struct kvm *kvm)
+>  {
+>  	struct vgic_dist *d = &kvm->arch.vgic;
+> -	gpa_t redist_size = KVM_VGIC_V3_REDIST_SIZE;
+> -	struct vgic_redist_region *rdreg =
+> -		list_first_entry(&d->rd_regions,
+> -				 struct vgic_redist_region, list);
+> -
+> -	redist_size *= atomic_read(&kvm->online_vcpus);
+> +	struct vgic_redist_region *rdreg;
 >  
->  	if (kvm_vcpu_dabt_iswrite(vcpu)) {
-> -		u32 data = vcpu_data_guest_to_host(vcpu,
-> -						   vcpu_get_reg(vcpu, rd),
-> -						   sizeof(u32));
-> +		u32 data = __guest_to_host_u32(vcpu, vcpu_get_reg(vcpu, rd));
->  		writel_relaxed(data, addr);
->  	} else {
-> -		u32 data = readl_relaxed(addr);
-> -		vcpu_set_reg(vcpu, rd, vcpu_data_host_to_guest(vcpu, data,
-> -							       sizeof(u32)));
-> +		u32 data = __host_to_guest_u32(vcpu, readl_relaxed(addr));
-> +		vcpu_set_reg(vcpu, rd, data);
->  	}
+>  	if (!IS_VGIC_ADDR_UNDEF(d->vgic_dist_base) &&
+>  	    d->vgic_dist_base + KVM_VGIC_V3_DIST_SIZE < d->vgic_dist_base)
+>  		return false;
 >  
->  	return 1;
+> -	if (rdreg && (rdreg->base + redist_size < rdreg->base))
+> -		return false;
+> +	list_for_each_entry(rdreg, &d->rd_regions, list) {
+> +		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) <
+> +			rdreg->base)
+> +			return false;
+> +	}
+>  
+> -	/* Both base addresses must be set to check if they overlap */
+> -	if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base) || !rdreg)
+> +	if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base))
+>  		return true;
+>  
+> -	if (d->vgic_dist_base + KVM_VGIC_V3_DIST_SIZE <= rdreg->base)
+> -		return true;
+> -
+> -	if (rdreg->base + redist_size <= d->vgic_dist_base)
+> -		return true;
+> -
+> -	return false;
+> +	return !vgic_v3_rdist_overlap(kvm, d->vgic_dist_base,
+> +				      KVM_VGIC_V3_DIST_SIZE);
+>  }
+>  
+>  /**
+> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+> index fea32cb..e6e3ae9 100644
+> --- a/virt/kvm/arm/vgic/vgic.h
+> +++ b/virt/kvm/arm/vgic/vgic.h
+> @@ -262,6 +262,16 @@ vgic_v3_redist_region_full(struct vgic_redist_region *region)
+>  
+>  struct vgic_redist_region *vgic_v3_rdist_free_slot(struct list_head *rdregs);
+>  
+> +static inline size_t
+> +vgic_v3_rd_region_size(struct kvm *kvm, struct vgic_redist_region *rdreg)
+> +{
+> +	if (!rdreg->count)
+> +		return atomic_read(&kvm->online_vcpus) * KVM_VGIC_V3_REDIST_SIZE;
+> +	else
+> +		return rdreg->count * KVM_VGIC_V3_REDIST_SIZE;
+> +}
+> +bool vgic_v3_rdist_overlap(struct kvm *kvm, gpa_t base, size_t size);
+> +
+>  int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
+>  			 u32 devid, u32 eventid, struct vgic_irq **irq);
+>  struct vgic_its *vgic_msi_to_its(struct kvm *kvm, struct kvm_msi *msi);
 > -- 
-> 2.14.2
+> 2.5.5
 > 
+
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
