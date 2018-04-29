@@ -1,104 +1,109 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH v4 11/12] KVM: arm/arm64: Implement
- KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
-Date: Fri, 27 Apr 2018 21:17:58 +0200
-Message-ID: <20180427191758.GQ13249@C02W217FHV2R.local>
-References: <1524838505-3823-1-git-send-email-eric.auger@redhat.com>
- <1524838505-3823-12-git-send-email-eric.auger@redhat.com>
+Subject: Re: [PATCH] arm64: vgic-v2: Fix proxying of cpuif access
+Date: Sun, 29 Apr 2018 14:34:32 +0200
+Message-ID: <20180429123432.GA7512@C02W217FHV2R.local>
+References: <20180427145102.5645-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <1524838505-3823-12-git-send-email-eric.auger@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, peter.maydell@linaro.org, andre.przywara@arm.com
+In-Reply-To: <20180427145102.5645-1-marc.zyngier@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Eric,
+On Fri, Apr 27, 2018 at 03:51:02PM +0100, Marc Zyngier wrote:
+> Proxying the cpuif accesses at EL2 makes use of vcpu_data_guest_to_host
+> and co, which check the endianness, which call into vcpu_read_sys_reg...
+> which isn't mapped at EL2 (it was inlined before, and got moved OoL
+> with the VHE optimizations).
 
-On Fri, Apr 27, 2018 at 04:15:04PM +0200, Eric Auger wrote:
-> Now all the internals are ready to handle multiple redistributor
-> regions, let's allow the userspace to register them.
+I thought we relied on static inline functions to always be inlined, but
+apparently not?  Does this mean we have potential other bugs looming
+depending on the mood of the compiler, or was there something special
+that went wrong here?
+
 > 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> The result is of course a nice panic. Let's add some specialized
+> cruft to keep the broken platforms that require this hack alive.
+> I'd rather kill BE support, but hey, just in case...
 > 
+> Fixes: d47533dab9f5 ("KVM: arm64: Introduce framework for accessing deferred sysregs")
+> Reported-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Tested-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+
+Otherwise:
+
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+
 > ---
-> v3 -> v4:
-> - vgic_v3_rdist_region_from_index is introduced in this patch
+>  arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c | 33 ++++++++++++++++++++++++++------
+>  1 file changed, 27 insertions(+), 6 deletions(-)
 > 
-> v2 -> v3:
-> - early exit if vgic_v3_rdist_region_from_index() fails
-> ---
->  virt/kvm/arm/vgic/vgic-kvm-device.c | 42 +++++++++++++++++++++++++++++++++++--
->  virt/kvm/arm/vgic/vgic-mmio-v3.c    |  4 ++--
->  virt/kvm/arm/vgic/vgic-v3.c         | 14 +++++++++++++
->  virt/kvm/arm/vgic/vgic.h            | 13 +++++++++++-
->  4 files changed, 68 insertions(+), 5 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
-> index e7b5a86..00e03d3 100644
-> --- a/virt/kvm/arm/vgic/vgic-kvm-device.c
-> +++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
-> @@ -65,7 +65,8 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
->  {
->  	int r = 0;
->  	struct vgic_dist *vgic = &kvm->arch.vgic;
-> -	phys_addr_t *addr_ptr, alignment;
-> +	phys_addr_t *addr_ptr = NULL;
-> +	phys_addr_t alignment;
->  	uint64_t undef_value = VGIC_ADDR_UNDEF;
+> diff --git a/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
+> index 86801b6055d6..b83a669b26ac 100644
+> --- a/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
+> +++ b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
+> @@ -23,6 +23,30 @@
+>  #include <asm/kvm_hyp.h>
+>  #include <asm/kvm_mmu.h>
 >  
->  	mutex_lock(&kvm->lock);
-> @@ -92,7 +93,7 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
->  		if (r)
->  			break;
->  		if (write) {
-> -			r = vgic_v3_set_redist_base(kvm, *addr);
-> +			r = vgic_v3_set_redist_base(kvm, 0, *addr, 0);
->  			goto out;
->  		}
->  		rdreg = list_first_entry(&vgic->rd_regions,
-> @@ -103,6 +104,42 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
->  			addr_ptr = &rdreg->base;
->  		break;
+> +static bool __hyp_text __is_be(struct kvm_vcpu *vcpu)
+> +{
+> +	if (vcpu_mode_is_32bit(vcpu))
+> +		return !!(read_sysreg_el2(spsr) & COMPAT_PSR_E_BIT);
+> +
+> +	return !!(read_sysreg(SCTLR_EL1) & SCTLR_ELx_EE);
+> +}
+> +
+> +static u32 __hyp_text __host_to_guest_u32(struct kvm_vcpu *vcpu, u32 data)
+> +{
+> +	if (__is_be(vcpu))
+> +		return cpu_to_be32(data);
+> +
+> +	return cpu_to_le32(data);
+> +}
+> +
+> +static u32 __hyp_text __guest_to_host_u32(struct kvm_vcpu *vcpu, u32 data)
+> +{
+> +	if (__is_be(vcpu))
+> +		return be32_to_cpu(data);
+> +
+> +	return le32_to_cpu(data);
+> +}
+> +
+>  /*
+>   * __vgic_v2_perform_cpuif_access -- perform a GICV access on behalf of the
+>   *				     guest.
+> @@ -64,14 +88,11 @@ int __hyp_text __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
+>  	addr += fault_ipa - vgic->vgic_cpu_base;
+>  
+>  	if (kvm_vcpu_dabt_iswrite(vcpu)) {
+> -		u32 data = vcpu_data_guest_to_host(vcpu,
+> -						   vcpu_get_reg(vcpu, rd),
+> -						   sizeof(u32));
+> +		u32 data = __guest_to_host_u32(vcpu, vcpu_get_reg(vcpu, rd));
+>  		writel_relaxed(data, addr);
+>  	} else {
+> -		u32 data = readl_relaxed(addr);
+> -		vcpu_set_reg(vcpu, rd, vcpu_data_host_to_guest(vcpu, data,
+> -							       sizeof(u32)));
+> +		u32 data = __host_to_guest_u32(vcpu, readl_relaxed(addr));
+> +		vcpu_set_reg(vcpu, rd, data);
 >  	}
-> +	case KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION:
-> +	{
-> +		struct vgic_redist_region *rdreg;
-> +		uint8_t index;
-> +
-> +		r = vgic_check_type(kvm, KVM_DEV_TYPE_ARM_VGIC_V3);
-> +		if (r)
-> +			break;
-> +
-> +		index = *addr & KVM_VGIC_V3_RDIST_INDEX_MASK;
-> +
-> +		if (write) {
-> +			gpa_t base = *addr & KVM_VGIC_V3_RDIST_BASE_MASK;
-> +			uint32_t count = (*addr & KVM_VGIC_V3_RDIST_COUNT_MASK)
-> +					>> KVM_VGIC_V3_RDIST_COUNT_SHIFT;
-> +			uint8_t flags = (*addr & KVM_VGIC_V3_RDIST_FLAGS_MASK)
-> +					>> KVM_VGIC_V3_RDIST_FLAGS_SHIFT;
-> +
-> +			if (!count || flags)
-> +				r = -EINVAL;
-> +			else
-> +				r = vgic_v3_set_redist_base(kvm, index,
-> +							    base, count);
-> +			goto out;
-> +		}
-> +
-> +		rdreg = vgic_v3_rdist_region_from_index(kvm, index);
-> +		if (!rdreg) {
-> +			r = -ENODEV;
-> +			goto out;
-> +		}
-> +
-> +		*addr_ptr = rdreg->base & index &
-> +			(uint64_t)rdreg->count << KVM_VGIC_V3_RDIST_COUNT_SHIFT;
-
-This still looks wrong, please see my reply to v3.
-
-Thanks,
--Christoffer
+>  
+>  	return 1;
+> -- 
+> 2.14.2
+> 
