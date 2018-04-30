@@ -1,199 +1,78 @@
-From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH v5 11/12] KVM: arm/arm64: Implement
- KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
-Date: Mon, 30 Apr 2018 11:44:17 +0200
-Message-ID: <20180430094417.GC12204@C02W217FHV2R.local>
-References: <1525079264-25533-1-git-send-email-eric.auger@redhat.com>
- <1525079264-25533-12-git-send-email-eric.auger@redhat.com>
+From: Julien Grall <julien.grall@arm.com>
+Subject: Re: [PATCH v2 10/17] kvm: arm64: Dynamic configuration of VTCR and
+ VTTBR mask
+Date: Mon, 30 Apr 2018 12:14:04 +0100
+Message-ID: <1c7cca39-ab37-711a-85af-7bd2162ae8ec@arm.com>
+References: <1522156531-28348-1-git-send-email-suzuki.poulose@arm.com>
+ <1522156531-28348-11-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1525079264-25533-12-git-send-email-eric.auger@redhat.com>
+In-Reply-To: <1522156531-28348-11-git-send-email-suzuki.poulose@arm.com>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, cdall@kernel.org, peter.maydell@linaro.org, andre.przywara@arm.com
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: ard.biesheuvel@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Apr 30, 2018 at 11:07:43AM +0200, Eric Auger wrote:
-> Now all the internals are ready to handle multiple redistributor
-> regions, let's allow the userspace to register them.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Hi Suzuki,
 
-Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+The algos in this patch looks good to me. A couple of NIT below.
 
-> 
-> ---
-> v4 -> v5:
-> - s/uint<n>_t/u<n>
-> - fix KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION read
-> - fix read path
-> - return -ENOENT instead of -ENODEV when reading the
->   attributes of a region that does not exist
-> 
-> v3 -> v4:
-> - vgic_v3_rdist_region_from_index is introduced in this patch
-> 
-> v2 -> v3:
-> - early exit if vgic_v3_rdist_region_from_index() fails
-> ---
->  virt/kvm/arm/vgic/vgic-kvm-device.c | 40 ++++++++++++++++++++++++++++++++++++-
->  virt/kvm/arm/vgic/vgic-mmio-v3.c    |  4 ++--
->  virt/kvm/arm/vgic/vgic-v3.c         | 14 +++++++++++++
->  virt/kvm/arm/vgic/vgic.h            | 13 +++++++++++-
->  4 files changed, 67 insertions(+), 4 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
-> index 76ab369..6ada243 100644
-> --- a/virt/kvm/arm/vgic/vgic-kvm-device.c
-> +++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
-> @@ -92,7 +92,7 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
->  		if (r)
->  			break;
->  		if (write) {
-> -			r = vgic_v3_set_redist_base(kvm, *addr);
-> +			r = vgic_v3_set_redist_base(kvm, 0, *addr, 0);
->  			goto out;
->  		}
->  		rdreg = list_first_entry(&vgic->rd_regions,
-> @@ -103,6 +103,43 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
->  			addr_ptr = &rdreg->base;
->  		break;
->  	}
-> +	case KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION:
-> +	{
-> +		struct vgic_redist_region *rdreg;
-> +		u8 index;
-> +
-> +		r = vgic_check_type(kvm, KVM_DEV_TYPE_ARM_VGIC_V3);
-> +		if (r)
-> +			break;
-> +
-> +		index = *addr & KVM_VGIC_V3_RDIST_INDEX_MASK;
-> +
-> +		if (write) {
-> +			gpa_t base = *addr & KVM_VGIC_V3_RDIST_BASE_MASK;
-> +			u32 count = (*addr & KVM_VGIC_V3_RDIST_COUNT_MASK)
-> +					>> KVM_VGIC_V3_RDIST_COUNT_SHIFT;
-> +			u8 flags = (*addr & KVM_VGIC_V3_RDIST_FLAGS_MASK)
-> +					>> KVM_VGIC_V3_RDIST_FLAGS_SHIFT;
-> +
-> +			if (!count || flags)
-> +				r = -EINVAL;
-> +			else
-> +				r = vgic_v3_set_redist_base(kvm, index,
-> +							    base, count);
-> +			goto out;
-> +		}
-> +
-> +		rdreg = vgic_v3_rdist_region_from_index(kvm, index);
-> +		if (!rdreg) {
-> +			r = -ENOENT;
-> +			goto out;
-> +		}
-> +
-> +		*addr = index;
-> +		*addr |= rdreg->base;
-> +		*addr |= (u64)rdreg->count << KVM_VGIC_V3_RDIST_COUNT_SHIFT;
-> +		goto out;
-> +	}
->  	default:
->  		r = -ENODEV;
->  	}
-> @@ -674,6 +711,7 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
->  		switch (attr->attr) {
->  		case KVM_VGIC_V3_ADDR_TYPE_DIST:
->  		case KVM_VGIC_V3_ADDR_TYPE_REDIST:
-> +		case KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION:
->  			return 0;
->  		}
->  		break;
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> index 1b1e07f..fcebd42 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> @@ -764,11 +764,11 @@ static int vgic_v3_insert_redist_region(struct kvm *kvm, uint32_t index,
->  	return ret;
->  }
->  
-> -int vgic_v3_set_redist_base(struct kvm *kvm, u64 addr)
-> +int vgic_v3_set_redist_base(struct kvm *kvm, u32 index, u64 addr, u32 count)
->  {
->  	int ret;
->  
-> -	ret = vgic_v3_insert_redist_region(kvm, 0, addr, 0);
-> +	ret = vgic_v3_insert_redist_region(kvm, index, addr, count);
->  	if (ret)
->  		return ret;
->  
-> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> index 5563671..70d5ba1 100644
-> --- a/virt/kvm/arm/vgic/vgic-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> @@ -482,6 +482,20 @@ struct vgic_redist_region *vgic_v3_rdist_free_slot(struct list_head *rd_regions)
->  	return NULL;
->  }
->  
-> +struct vgic_redist_region *vgic_v3_rdist_region_from_index(struct kvm *kvm,
-> +							   u32 index)
-> +{
-> +	struct list_head *rd_regions = &kvm->arch.vgic.rd_regions;
-> +	struct vgic_redist_region *rdreg;
-> +
-> +	list_for_each_entry(rdreg, rd_regions, list) {
-> +		if (rdreg->index == index)
-> +			return rdreg;
-> +	}
-> +	return NULL;
-> +}
-> +
-> +
->  int vgic_v3_map_resources(struct kvm *kvm)
->  {
->  	struct vgic_dist *dist = &kvm->arch.vgic;
-> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-> index 6af7d8a..375aa66 100644
-> --- a/virt/kvm/arm/vgic/vgic.h
-> +++ b/virt/kvm/arm/vgic/vgic.h
-> @@ -96,6 +96,13 @@
->  /* we only support 64 kB translation table page size */
->  #define KVM_ITS_L1E_ADDR_MASK		GENMASK_ULL(51, 16)
->  
-> +#define KVM_VGIC_V3_RDIST_INDEX_MASK	GENMASK_ULL(11, 0)
-> +#define KVM_VGIC_V3_RDIST_FLAGS_MASK	GENMASK_ULL(15, 12)
-> +#define KVM_VGIC_V3_RDIST_FLAGS_SHIFT	12
-> +#define KVM_VGIC_V3_RDIST_BASE_MASK	GENMASK_ULL(51, 16)
-> +#define KVM_VGIC_V3_RDIST_COUNT_MASK	GENMASK_ULL(63, 52)
-> +#define KVM_VGIC_V3_RDIST_COUNT_SHIFT	52
-> +
->  /* Requires the irq_lock to be held by the caller. */
->  static inline bool irq_is_pending(struct vgic_irq *irq)
->  {
-> @@ -201,7 +208,7 @@ int vgic_v3_probe(const struct gic_kvm_info *info);
->  int vgic_v3_map_resources(struct kvm *kvm);
->  int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq);
->  int vgic_v3_save_pending_tables(struct kvm *kvm);
-> -int vgic_v3_set_redist_base(struct kvm *kvm, u64 addr);
-> +int vgic_v3_set_redist_base(struct kvm *kvm, u32 index, u64 addr, u32 count);
->  int vgic_register_redist_iodev(struct kvm_vcpu *vcpu);
->  bool vgic_v3_check_base(struct kvm *kvm);
->  
-> @@ -270,6 +277,10 @@ vgic_v3_rd_region_size(struct kvm *kvm, struct vgic_redist_region *rdreg)
->  	else
->  		return rdreg->count * KVM_VGIC_V3_REDIST_SIZE;
->  }
-> +
-> +struct vgic_redist_region *vgic_v3_rdist_region_from_index(struct kvm *kvm,
-> +							   u32 index);
-> +
->  bool vgic_v3_rdist_overlap(struct kvm *kvm, gpa_t base, size_t size);
->  
->  static inline bool vgic_dist_overlap(struct kvm *kvm, gpa_t base, size_t size)
-> -- 
-> 2.5.5
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+On 27/03/18 14:15, Suzuki K Poulose wrote:
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index b0c8417..176551c 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -124,6 +124,8 @@
+>   #define VTCR_EL2_VS_8BIT	(0 << VTCR_EL2_VS_SHIFT)
+>   #define VTCR_EL2_VS_16BIT	(1 << VTCR_EL2_VS_SHIFT)
+>   
+> +#define VTCR_EL2_T0SZ(x)	TCR_T0SZ((x))
+
+NIT: The inner parentheses should not be necessary.
+
+[...]
+
+> +/*
+> + * VTCR_EL2:SL0 indicates the entry level for Stage2 translation.
+> + * Interestingly, it depends on the page size.
+> + * See D.10.2.110, VTCR_EL2, in ARM DDI 0487B.b
+> + *
+> + *	-----------------------------------------
+> + *	| Entry level		|  4K  | 16K/64K |
+> + *	------------------------------------------
+> + *	| Level: 0		|  2   |   -     |
+> + *	------------------------------------------
+> + *	| Level: 1		|  1   |   2     |
+> + *	------------------------------------------
+> + *	| Level: 2		|  0   |   1     |
+> + *	------------------------------------------
+> + *	| Level: 3		|  -   |   0     |
+> + *	------------------------------------------
+> + *
+> + * That table roughly translates to :
+> + *
+> + *	SL0(PAGE_SIZE, Entry_level) = SL0_BASE(PAGE_SIZE) - Entry_Level
+> + *
+> + * Where SL0_BASE(4K) = 2 and SL0_BASE(16K) = 3, SL0_BASE(64K) = 3, provided
+> + * we take care of ruling out the unsupported cases and
+> + * Entry_Level = 4 - Number_of_levels.
+> + *
+> + */
+> +#define VTCR_EL2_SL0(levels) \
+> +	((VTCR_EL2_TGRAN_SL0_BASE - (4 - (levels))) << VTCR_EL2_SL0_SHIFT)
+> +/*
+> + * ARM VMSAv8-64 defines an algorithm for finding the translation table
+> + * descriptors in section D4.2.8 in ARM DDI 0487B.b.
+> + *
+> + * The algorithm defines the expectaions on the BaseAddress (for the page
+
+NIT: s/expectaions/expectations/
+
+Cheers,
+
+
+-- 
+Julien Grall
