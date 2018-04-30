@@ -1,78 +1,103 @@
-From: Julien Grall <julien.grall@arm.com>
-Subject: Re: [PATCH v2 10/17] kvm: arm64: Dynamic configuration of VTCR and
- VTTBR mask
-Date: Mon, 30 Apr 2018 12:14:04 +0100
-Message-ID: <1c7cca39-ab37-711a-85af-7bd2162ae8ec@arm.com>
-References: <1522156531-28348-1-git-send-email-suzuki.poulose@arm.com>
- <1522156531-28348-11-git-send-email-suzuki.poulose@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Eric Auger <eric.auger@redhat.com>
+Subject: [PATCH v6 00/12] KVM: arm/arm64: Allow multiple GICv3 redistributor regions
+Date: Mon, 30 Apr 2018 13:48:26 +0200
+Message-ID: <1525088918-8600-1-git-send-email-eric.auger@redhat.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1522156531-28348-11-git-send-email-suzuki.poulose@arm.com>
-Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: ard.biesheuvel@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, cdall@kernel.org, peter.maydell@linaro.org
+Cc: andre.przywara@arm.com, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Suzuki,
+At the moment the KVM VGICv3 only supports a single redistributor
+region (whose base address is set through the GICv3 kvm device
+KVM_DEV_ARM_VGIC_GRP_ADDR/KVM_VGIC_V3_ADDR_TYPE_REDIST). There,
+all the redistributors are laid out contiguously. The size of this
+single redistributor region is not set explicitly but instead
+induced at a late stage by the number of online vcpus.
 
-The algos in this patch looks good to me. A couple of NIT below.
+The GIC specification does not mandate all redistributors to be
+contiguous. Moreover DT and ACPI were specified so that multiple
+redistributors regions can be defined.
 
-On 27/03/18 14:15, Suzuki K Poulose wrote:
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index b0c8417..176551c 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -124,6 +124,8 @@
->   #define VTCR_EL2_VS_8BIT	(0 << VTCR_EL2_VS_SHIFT)
->   #define VTCR_EL2_VS_16BIT	(1 << VTCR_EL2_VS_SHIFT)
->   
-> +#define VTCR_EL2_T0SZ(x)	TCR_T0SZ((x))
+The current interface brings a limitation on QEMU where ARM
+virt machine available GPA holes only allowed to assign a
+redistributor region fitting a max of 123 vcpus. Overcoming this
+limitation would force either to create a new machine or relocate
+the single rdist region or allow the allocation of multiple rdist
+regions.
 
-NIT: The inner parentheses should not be necessary.
+This series enables this last alternative. A new GICv3 KVM device
+KVM_DEV_ARM_VGIC_GRP_ADDR/KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION allows
+to register individual redistributor regions whose size is defined
+explicitly. Those rdist regions then are filled by vcpu rdist frames
+according to the need. The vgic init and related base address checks
+are impacted.
 
-[...]
+Best Regards
 
-> +/*
-> + * VTCR_EL2:SL0 indicates the entry level for Stage2 translation.
-> + * Interestingly, it depends on the page size.
-> + * See D.10.2.110, VTCR_EL2, in ARM DDI 0487B.b
-> + *
-> + *	-----------------------------------------
-> + *	| Entry level		|  4K  | 16K/64K |
-> + *	------------------------------------------
-> + *	| Level: 0		|  2   |   -     |
-> + *	------------------------------------------
-> + *	| Level: 1		|  1   |   2     |
-> + *	------------------------------------------
-> + *	| Level: 2		|  0   |   1     |
-> + *	------------------------------------------
-> + *	| Level: 3		|  -   |   0     |
-> + *	------------------------------------------
-> + *
-> + * That table roughly translates to :
-> + *
-> + *	SL0(PAGE_SIZE, Entry_level) = SL0_BASE(PAGE_SIZE) - Entry_Level
-> + *
-> + * Where SL0_BASE(4K) = 2 and SL0_BASE(16K) = 3, SL0_BASE(64K) = 3, provided
-> + * we take care of ruling out the unsupported cases and
-> + * Entry_Level = 4 - Number_of_levels.
-> + *
-> + */
-> +#define VTCR_EL2_SL0(levels) \
-> +	((VTCR_EL2_TGRAN_SL0_BASE - (4 - (levels))) << VTCR_EL2_SL0_SHIFT)
-> +/*
-> + * ARM VMSAv8-64 defines an algorithm for finding the translation table
-> + * descriptors in section D4.2.8 in ARM DDI 0487B.b.
-> + *
-> + * The algorithm defines the expectaions on the BaseAddress (for the page
+Eric
 
-NIT: s/expectaions/expectations/
+Git: complete series available at
+https://github.com/eauger/linux/tree/v4.17-rc2-rdist-regions-v6
+Previous version:
+https://github.com/eauger/linux/tree/v4.17-rc2-rdist-regions-v5
 
-Cheers,
+History:
+v5 -> v6:
+- truly use list_last_entry in vgic_v3_insert_redist_region
+- s/pointed by/pointed to by in API doc
+- collected last R-b/A-b
 
+v4 -> v5:
+- fix KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION read path and update
+  the documentation accordingly (removed Peter's and
+  Christoffer's A-b)
+- use u<n> instead of uint<n>_t
+- collected additional R-b/A-b
+
+v3 -> v4:
+- Collected Christoffer's R-b
+- reworked vgic_v3_rdist_overlap and introduced vgic_dist_overlap
+- vgic_v3_insert_redist_region cleanup
+- inverse order for patches 6 and 7
+
+v2 -> v3:
+- Add details to the user API documentation
+- early exit if vgic_v3_rdist_region_from_index() fails
+- return -EINVAL if legacy and new redist region API are mixed
+
+v1 -> v2:
+- Rework the uapi. Only bits [51:16] of the redist region are
+  exposed. Also a new flags field was introduced
+- Do not store the last bit in the vgic_cpu struct anymore
+- remove dist->spis check in 1st patch
+- add last patch to bump VGIC_V3_MAX_CPUS to 512
+- advertise the new attribute
+
+Eric Auger (12):
+  KVM: arm/arm64: Set dist->spis to NULL after kfree
+  KVM: arm/arm64: Document KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+  KVM: arm/arm64: Replace the single rdist region by a list
+  KVM: arm/arm64: Helper to locate free rdist index
+  KVM: arm/arm64: Revisit Redistributor TYPER last bit computation
+  KVM: arm/arm64: Adapt vgic_v3_check_base to multiple rdist regions
+  KVM: arm/arm64: Helper to register a new redistributor region
+  KVM: arm/arm64: Check vcpu redist base before registering an iodev
+  KVM: arm/arm64: Check all vcpu redistributors are set on map_resources
+  KVM: arm/arm64: Add KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+  KVM: arm/arm64: Implement KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+  KVM: arm/arm64: Bump VGIC_V3_MAX_CPUS to 512
+
+ Documentation/virtual/kvm/devices/arm-vgic-v3.txt |  30 +++++-
+ arch/arm/include/uapi/asm/kvm.h                   |   1 +
+ arch/arm64/include/uapi/asm/kvm.h                 |   1 +
+ include/kvm/arm_vgic.h                            |  16 ++-
+ virt/kvm/arm/vgic/vgic-init.c                     |  20 +++-
+ virt/kvm/arm/vgic/vgic-kvm-device.c               |  53 +++++++++-
+ virt/kvm/arm/vgic/vgic-mmio-v3.c                  | 114 +++++++++++++++++++---
+ virt/kvm/arm/vgic/vgic-v3.c                       | 101 +++++++++++++++----
+ virt/kvm/arm/vgic/vgic.h                          |  42 +++++++-
+ 9 files changed, 333 insertions(+), 45 deletions(-)
 
 -- 
-Julien Grall
+2.5.5
