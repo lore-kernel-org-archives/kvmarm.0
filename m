@@ -1,7 +1,7 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v5 08/12] KVM: arm/arm64: Check vcpu redist base before registering an iodev
-Date: Mon, 30 Apr 2018 11:07:40 +0200
-Message-ID: <1525079264-25533-9-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v5 10/12] KVM: arm/arm64: Add KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+Date: Mon, 30 Apr 2018 11:07:42 +0200
+Message-ID: <1525079264-25533-11-git-send-email-eric.auger@redhat.com>
 References: <1525079264-25533-1-git-send-email-eric.auger@redhat.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1525079264-25533-1-git-send-email-eric.auger@redhat.com>
@@ -10,51 +10,46 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.or
 Cc: andre.przywara@arm.com, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As we are going to register several redist regions,
-vgic_register_all_redist_iodevs() may be called several times. We need
-to register a redist_iodev for a given vcpu only once. So let's
-check if the base address has already been set. Initialize this latter
-in kvm_vgic_vcpu_early_init().
+This new attribute allows the userspace to set the base address
+of a reditributor region, relaxing the constraint of having all
+consecutive redistibutor frames contiguous.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 
 ---
 
-v4 -> v5:
+v3 -> v4:
+- keep previous indentation for existing attributes
 - added Christoffer's A-b
 ---
- virt/kvm/arm/vgic/vgic-init.c    | 3 +++
- virt/kvm/arm/vgic/vgic-mmio-v3.c | 3 +++
- 2 files changed, 6 insertions(+)
+ arch/arm/include/uapi/asm/kvm.h   | 1 +
+ arch/arm64/include/uapi/asm/kvm.h | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index 6456371..7e040e7 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -82,6 +82,9 @@ void kvm_vgic_vcpu_early_init(struct kvm_vcpu *vcpu)
- 	INIT_LIST_HEAD(&vgic_cpu->ap_list_head);
- 	spin_lock_init(&vgic_cpu->ap_list_lock);
+diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+index caae484..16e006f 100644
+--- a/arch/arm/include/uapi/asm/kvm.h
++++ b/arch/arm/include/uapi/asm/kvm.h
+@@ -91,6 +91,7 @@ struct kvm_regs {
+ #define KVM_VGIC_V3_ADDR_TYPE_DIST	2
+ #define KVM_VGIC_V3_ADDR_TYPE_REDIST	3
+ #define KVM_VGIC_ITS_ADDR_TYPE		4
++#define KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION	5
  
-+	vgic_cpu->rd_iodev.base_addr = VGIC_ADDR_UNDEF;
-+	vgic_cpu->sgi_iodev.base_addr = VGIC_ADDR_UNDEF;
-+
- 	/*
- 	 * Enable and configure all SGIs to be edge-triggered and
- 	 * configure all PPIs as level-triggered.
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index cbf8f4e..1b1e07f 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -592,6 +592,9 @@ int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
- 	gpa_t rd_base, sgi_base;
- 	int ret;
+ #define KVM_VGIC_V3_DIST_SIZE		SZ_64K
+ #define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index 04b3256..4e76630 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -91,6 +91,7 @@ struct kvm_regs {
+ #define KVM_VGIC_V3_ADDR_TYPE_DIST	2
+ #define KVM_VGIC_V3_ADDR_TYPE_REDIST	3
+ #define KVM_VGIC_ITS_ADDR_TYPE		4
++#define KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION	5
  
-+	if (!IS_VGIC_ADDR_UNDEF(vgic_cpu->rd_iodev.base_addr))
-+		return 0;
-+
- 	/*
- 	 * We may be creating VCPUs before having set the base address for the
- 	 * redistributor region, in which case we will come back to this
+ #define KVM_VGIC_V3_DIST_SIZE		SZ_64K
+ #define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
 -- 
 2.5.5
