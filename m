@@ -1,213 +1,100 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v3 11/12] KVM: arm/arm64: Implement
- KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
-Date: Mon, 30 Apr 2018 09:25:03 +0200
-Message-ID: <1203ac02-b3c2-1bad-440d-b933ff284abc@redhat.com>
-References: <1523607658-9166-1-git-send-email-eric.auger@redhat.com>
- <1523607658-9166-12-git-send-email-eric.auger@redhat.com>
- <20180424210625.GC4533@C02W217FHV2R.local>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+From: Eric Auger <eric.auger@redhat.com>
+Subject: [PATCH v5 00/12] KVM: arm/arm64: Allow multiple GICv3 redistributor regions
+Date: Mon, 30 Apr 2018 11:07:32 +0200
+Message-ID: <1525079264-25533-1-git-send-email-eric.auger@redhat.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180424210625.GC4533@C02W217FHV2R.local>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, cdall@kernel.org, peter.maydell@linaro.org, andre.przywara@arm.com, drjones@redhat.com, wei@redhat.com
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, cdall@kernel.org, peter.maydell@linaro.org
+Cc: andre.przywara@arm.com, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
+At the moment the KVM VGICv3 only supports a single redistributor
+region (whose base address is set through the GICv3 kvm device
+KVM_DEV_ARM_VGIC_GRP_ADDR/KVM_VGIC_V3_ADDR_TYPE_REDIST). There,
+all the redistributors are laid out contiguously. The size of this
+single redistributor region is not set explicitly but instead
+induced at a late stage by the number of online vcpus.
 
-On 04/24/2018 11:06 PM, Christoffer Dall wrote:
-> On Fri, Apr 13, 2018 at 10:20:57AM +0200, Eric Auger wrote:
->> Now all the internals are ready to handle multiple redistributor
->> regions, let's allow the userspace to register them.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->>
->> v2 -> v3:
->> - early exit if vgic_v3_rdist_region_from_index() fails
->> ---
->>  virt/kvm/arm/vgic/vgic-kvm-device.c | 42 +++++++++++++++++++++++++++++++++++--
->>  virt/kvm/arm/vgic/vgic-mmio-v3.c    |  4 ++--
->>  virt/kvm/arm/vgic/vgic.h            |  9 +++++++-
->>  3 files changed, 50 insertions(+), 5 deletions(-)
->>
->> diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
->> index e7b5a86..00e03d3 100644
->> --- a/virt/kvm/arm/vgic/vgic-kvm-device.c
->> +++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
->> @@ -65,7 +65,8 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
->>  {
->>  	int r = 0;
->>  	struct vgic_dist *vgic = &kvm->arch.vgic;
->> -	phys_addr_t *addr_ptr, alignment;
->> +	phys_addr_t *addr_ptr = NULL;
->> +	phys_addr_t alignment;
->>  	uint64_t undef_value = VGIC_ADDR_UNDEF;
-> 
-> nit: mussed this one before, type should be u64
-> 
->>  
->>  	mutex_lock(&kvm->lock);
->> @@ -92,7 +93,7 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
->>  		if (r)
->>  			break;
->>  		if (write) {
->> -			r = vgic_v3_set_redist_base(kvm, *addr);
->> +			r = vgic_v3_set_redist_base(kvm, 0, *addr, 0);
->>  			goto out;
->>  		}
->>  		rdreg = list_first_entry(&vgic->rd_regions,
->> @@ -103,6 +104,42 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
->>  			addr_ptr = &rdreg->base;
->>  		break;
->>  	}
->> +	case KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION:
->> +	{
->> +		struct vgic_redist_region *rdreg;
->> +		uint8_t index;
->> +
-> 
-> we tend to use u8, u32, etc. in the kernel.
-> 
->> +		r = vgic_check_type(kvm, KVM_DEV_TYPE_ARM_VGIC_V3);
->> +		if (r)
->> +			break;
->> +
->> +		index = *addr & KVM_VGIC_V3_RDIST_INDEX_MASK;
->> +
->> +		if (write) {
->> +			gpa_t base = *addr & KVM_VGIC_V3_RDIST_BASE_MASK;
->> +			uint32_t count = (*addr & KVM_VGIC_V3_RDIST_COUNT_MASK)
->> +					>> KVM_VGIC_V3_RDIST_COUNT_SHIFT;
->> +			uint8_t flags = (*addr & KVM_VGIC_V3_RDIST_FLAGS_MASK)
->> +					>> KVM_VGIC_V3_RDIST_FLAGS_SHIFT;
->> +
->> +			if (!count || flags)
->> +				r = -EINVAL;
->> +			else
->> +				r = vgic_v3_set_redist_base(kvm, index,
->> +							    base, count);
->> +			goto out;
->> +		}
->> +
->> +		rdreg = vgic_v3_rdist_region_from_index(kvm, index);
->> +		if (!rdreg) {
->> +			r = -ENODEV;
->> +			goto out;
->> +		}
->> +
->> +		*addr_ptr = rdreg->base & index &
->> +			(uint64_t)rdreg->count << KVM_VGIC_V3_RDIST_COUNT_SHIFT;
-> 
-> This looks fairly broken, isn't this a clear null pointer dereference?
-> 
-> (If we're making this ioctl read-only using the parameter as both in/out
-> for set/get, that should also be documented in the API text, then you
-> should consider writing a small test along with your userspace
-> implementation to actually test that functionality - otherwise we should
-> just make this write-only and omit the index part.  It could be said
-> that retrieving what the kernel actually has is a reasonable debug
-> feature.)
-> 
-> I think you want (notice the | instead of & as well):
-> 
-> 		*addr = index;
-> 		*addr |= rdreg->base;
-> 		*addr |= (u64)rdreg->count << KVM_VGIC_V3_RDIST_COUNT_SHIFT;
-> 		goto out;
-> 
-> It is then debatable if the addr_ptr construct gets too convoluted when
-> not used in every case, and if the logic should be embedded into each
-> case, and the addr_ptr variable dropped.  Meh, I don't mind leaving it
-> for now.
+The GIC specification does not mandate all redistributors to be
+contiguous. Moreover DT and ACPI were specified so that multiple
+redistributors regions can be defined.
 
-Please apologize, I skipped this email while respinning into v4. Those
-are definitively 2 bugs and I fixed them as you suggested above. As for
-the documentation, I added:
+The current interface brings a limitation on QEMU where ARM
+virt machine available GPA holes only allowed to assign a
+redistributor region fitting a max of 123 vcpus. Overcoming this
+limitation would force either to create a new machine or relocate
+the single rdist region or allow the allocation of multiple rdist
+regions.
 
-"
-      The characteristics of a specific redistributor region can be read
-      by presetting the index field in the attr data.
+This series enables this last alternative. A new GICv3 KVM device
+KVM_DEV_ARM_VGIC_GRP_ADDR/KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION allows
+to register individual redistributor regions whose size is defined
+explicitly. Those rdist regions then are filled by vcpu rdist frames
+according to the need. The vgic init and related base address checks
+are impacted.
 
-  Errors:
-../..
-    -ENOENT: Attempt to read the characteristics of a non existing
-             redistributor region
-"
-
-Currently testing the read path with a hacked qemu ;-)
-
-Thanks
+Best Regards
 
 Eric
-> 
-> 
->> +		break;
->> +	}
->>  	default:
->>  		r = -ENODEV;
->>  	}
->> @@ -674,6 +711,7 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
->>  		switch (attr->attr) {
->>  		case KVM_VGIC_V3_ADDR_TYPE_DIST:
->>  		case KVM_VGIC_V3_ADDR_TYPE_REDIST:
->> +		case KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION:
->>  			return 0;
->>  		}
->>  		break;
->> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
->> index df23e66..f603fdf 100644
->> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
->> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
->> @@ -770,11 +770,11 @@ static int vgic_v3_insert_redist_region(struct kvm *kvm, uint32_t index,
->>  	return ret;
->>  }
->>  
->> -int vgic_v3_set_redist_base(struct kvm *kvm, u64 addr)
->> +int vgic_v3_set_redist_base(struct kvm *kvm, u32 index, u64 addr, u32 count)
->>  {
->>  	int ret;
->>  
->> -	ret = vgic_v3_insert_redist_region(kvm, 0, addr, 0);
->> +	ret = vgic_v3_insert_redist_region(kvm, index, addr, count);
->>  	if (ret)
->>  		return ret;
->>  
->> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
->> index 95b8345..0a95b43 100644
->> --- a/virt/kvm/arm/vgic/vgic.h
->> +++ b/virt/kvm/arm/vgic/vgic.h
->> @@ -96,6 +96,13 @@
->>  /* we only support 64 kB translation table page size */
->>  #define KVM_ITS_L1E_ADDR_MASK		GENMASK_ULL(51, 16)
->>  
->> +#define KVM_VGIC_V3_RDIST_INDEX_MASK	GENMASK_ULL(11, 0)
->> +#define KVM_VGIC_V3_RDIST_FLAGS_MASK	GENMASK_ULL(15, 12)
->> +#define KVM_VGIC_V3_RDIST_FLAGS_SHIFT	12
->> +#define KVM_VGIC_V3_RDIST_BASE_MASK	GENMASK_ULL(51, 16)
->> +#define KVM_VGIC_V3_RDIST_COUNT_MASK	GENMASK_ULL(63, 52)
->> +#define KVM_VGIC_V3_RDIST_COUNT_SHIFT	52
->> +
->>  /* Requires the irq_lock to be held by the caller. */
->>  static inline bool irq_is_pending(struct vgic_irq *irq)
->>  {
->> @@ -201,7 +208,7 @@ int vgic_v3_probe(const struct gic_kvm_info *info);
->>  int vgic_v3_map_resources(struct kvm *kvm);
->>  int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq);
->>  int vgic_v3_save_pending_tables(struct kvm *kvm);
->> -int vgic_v3_set_redist_base(struct kvm *kvm, u64 addr);
->> +int vgic_v3_set_redist_base(struct kvm *kvm, u32 index, u64 addr, u32 count);
->>  int vgic_register_redist_iodev(struct kvm_vcpu *vcpu);
->>  bool vgic_v3_check_base(struct kvm *kvm);
->>  
->> -- 
->> 2.5.5
->>
-> 
-> Thanks,
-> -Christoffer
-> 
+
+Git: complete series available at
+https://github.com/eauger/linux/tree/v4.17-rc2-rdist-regions-v5
+Previous version:
+https://github.com/eauger/linux/tree/v4.17-rc2-rdist-regions-v4
+
+History:
+
+v4 -> v5:
+- fix KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION read path and update
+  the documentation accordingly (removed Peter's and
+  Christoffer's A-b)
+- use u<n> instead of uint<n>_t
+- collected additional R-b/A-b
+
+v3 -> v4:
+- Collected Christoffer's R-b
+- reworked vgic_v3_rdist_overlap and introduced vgic_dist_overlap
+- vgic_v3_insert_redist_region cleanup
+- inverse order for patches 6 and 7
+
+v2 -> v3:
+- Add details to the user API documentation
+- early exit if vgic_v3_rdist_region_from_index() fails
+- return -EINVAL if legacy and new redist region API are mixed
+
+v1 -> v2:
+- Rework the uapi. Only bits [51:16] of the redist region are
+  exposed. Also a new flags field was introduced
+- Do not store the last bit in the vgic_cpu struct anymore
+- remove dist->spis check in 1st patch
+- add last patch to bump VGIC_V3_MAX_CPUS to 512
+- advertise the new attribute
+
+
+Eric Auger (12):
+  KVM: arm/arm64: Set dist->spis to NULL after kfree
+  KVM: arm/arm64: Document KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+  KVM: arm/arm64: Replace the single rdist region by a list
+  KVM: arm/arm64: Helper to locate free rdist index
+  KVM: arm/arm64: Revisit Redistributor TYPER last bit computation
+  KVM: arm/arm64: Adapt vgic_v3_check_base to multiple rdist regions
+  KVM: arm/arm64: Helper to register a new redistributor region
+  KVM: arm/arm64: Check vcpu redist base before registering an iodev
+  KVM: arm/arm64: Check all vcpu redistributors are set on map_resources
+  KVM: arm/arm64: Add KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+  KVM: arm/arm64: Implement KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+  KVM: arm/arm64: Bump VGIC_V3_MAX_CPUS to 512
+
+ Documentation/virtual/kvm/devices/arm-vgic-v3.txt |  30 +++++-
+ arch/arm/include/uapi/asm/kvm.h                   |   1 +
+ arch/arm64/include/uapi/asm/kvm.h                 |   1 +
+ include/kvm/arm_vgic.h                            |  16 ++-
+ virt/kvm/arm/vgic/vgic-init.c                     |  20 +++-
+ virt/kvm/arm/vgic/vgic-kvm-device.c               |  53 +++++++++-
+ virt/kvm/arm/vgic/vgic-mmio-v3.c                  | 114 +++++++++++++++++++---
+ virt/kvm/arm/vgic/vgic-v3.c                       | 101 +++++++++++++++----
+ virt/kvm/arm/vgic/vgic.h                          |  42 +++++++-
+ 9 files changed, 333 insertions(+), 45 deletions(-)
+
+-- 
+2.5.5
