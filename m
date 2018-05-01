@@ -1,52 +1,145 @@
 From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: [PATCH v2 0/4] KVM: Support PUD hugepages at stage 2
-Date: Tue,  1 May 2018 11:26:55 +0100
-Message-ID: <20180501102659.13188-1-punit.agrawal@arm.com>
+Subject: [PATCH v2 1/4] KVM: arm/arm64: Share common code in user_mem_abort()
+Date: Tue,  1 May 2018 11:26:56 +0100
+Message-ID: <20180501102659.13188-2-punit.agrawal@arm.com>
+References: <20180501102659.13188-1-punit.agrawal@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180501102659.13188-1-punit.agrawal@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
 To: kvmarm@lists.cs.columbia.edu
 Cc: Punit Agrawal <punit.agrawal@arm.com>, linux-arm-kernel@lists.infradead.org, marc.zyngier@arm.com, christoffer.dall@arm.com, linux-kernel@vger.kernel.org, suzuki.poulose@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+The code for operations such as marking the pfn as dirty, and
+dcache/icache maintenance during stage 2 fault handling is duplicated
+between normal pages and PMD hugepages.
 
-This patchset adds support for PUD hugepages at stage 2. This feature
-is useful on cores that have support for large sized TLB mappings
-(e.g., 1GB for 4K granule). Previous postings can be found at [0][1].
+Instead of creating another copy of the operations when we introduce
+PUD hugepages, let's share them across the different pagesizes.
 
-Support is added to code that is shared between arm and arm64. Dummy
-helpers for arm are provided as the port does not support PUD hugepage
-sizes.
+Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+---
+ virt/kvm/arm/mmu.c | 66 +++++++++++++++++++++++++++-------------------
+ 1 file changed, 39 insertions(+), 27 deletions(-)
 
-There is a small conflict with the series to add support for 52 bit
-IPA[2]. The patches have been functionally tested on an A57 based
-system. The patchset is based on v4.17-rc3 and incorporates feedback
-received on the previous version.
-
-Thanks,
-Punit
-
-Changes v2:
-* Create helper to check if the page should have exec permission [1/4]
-* Fix broken condition to detect THP hugepage [1/4]
-* Fix in-correct hunk resulting from a rebase [4/4]
-
-[0] https://www.spinics.net/lists/arm-kernel/msg628053.html
-[1] https://lkml.org/lkml/2018/4/20/566
-[2] https://lwn.net/Articles/750176/
-
-Punit Agrawal (4):
-  KVM: arm/arm64: Share common code in user_mem_abort()
-  KVM: arm/arm64: Introduce helpers to manupulate page table entries
-  KVM: arm64: Support dirty page tracking for PUD hugepages
-  KVM: arm64: Add support for PUD hugepages at stage 2
-
- arch/arm/include/asm/kvm_mmu.h         |  40 +++++++++
- arch/arm64/include/asm/kvm_mmu.h       |  30 +++++++
- arch/arm64/include/asm/pgtable-hwdef.h |   4 +
- arch/arm64/include/asm/pgtable.h       |   2 +
- virt/kvm/arm/mmu.c                     | 120 +++++++++++++++++--------
- 5 files changed, 161 insertions(+), 35 deletions(-)
-
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 7f6a944db23d..686fc6a4b866 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -1396,6 +1396,21 @@ static void invalidate_icache_guest_page(kvm_pfn_t pfn, unsigned long size)
+ 	__invalidate_icache_guest_page(pfn, size);
+ }
+ 
++static bool stage2_should_exec(struct kvm *kvm, phys_addr_t addr,
++			       bool exec_fault, unsigned long fault_status)
++{
++	/*
++	 * If we took an execution fault we will have made the
++	 * icache/dcache coherent and should now let the s2 mapping be
++	 * executable.
++	 *
++	 * Write faults (!exec_fault && FSC_PERM) are orthogonal to
++	 * execute permissions, and we preserve whatever we have.
++	 */
++	return exec_fault ||
++		(fault_status == FSC_PERM && stage2_is_exec(kvm, addr));
++}
++
+ static void kvm_send_hwpoison_signal(unsigned long address,
+ 				     struct vm_area_struct *vma)
+ {
+@@ -1428,7 +1443,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	kvm_pfn_t pfn;
+ 	pgprot_t mem_type = PAGE_S2;
+ 	bool logging_active = memslot_is_logging(memslot);
+-	unsigned long flags = 0;
++	unsigned long vma_pagesize, flags = 0;
+ 
+ 	write_fault = kvm_is_write_fault(vcpu);
+ 	exec_fault = kvm_vcpu_trap_is_iabt(vcpu);
+@@ -1448,7 +1463,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		return -EFAULT;
+ 	}
+ 
+-	if (vma_kernel_pagesize(vma) == PMD_SIZE && !logging_active) {
++	vma_pagesize = vma_kernel_pagesize(vma);
++	if (vma_pagesize == PMD_SIZE && !logging_active) {
+ 		hugetlb = true;
+ 		gfn = (fault_ipa & PMD_MASK) >> PAGE_SHIFT;
+ 	} else {
+@@ -1517,28 +1533,34 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	if (mmu_notifier_retry(kvm, mmu_seq))
+ 		goto out_unlock;
+ 
+-	if (!hugetlb && !force_pte)
++	if (!hugetlb && !force_pte) {
+ 		hugetlb = transparent_hugepage_adjust(&pfn, &fault_ipa);
++		/*
++		 * Only PMD_SIZE transparent hugepages(THP) are
++		 * currently supported. This code will need to be
++		 * updated to support other THP sizes.
++		 */
++		if (hugetlb)
++			vma_pagesize = PMD_SIZE;
++	}
++
++	if (writable)
++		kvm_set_pfn_dirty(pfn);
++
++	if (fault_status != FSC_PERM)
++		clean_dcache_guest_page(pfn, vma_pagesize);
++
++	if (exec_fault)
++		invalidate_icache_guest_page(pfn, vma_pagesize);
+ 
+ 	if (hugetlb) {
+ 		pmd_t new_pmd = pfn_pmd(pfn, mem_type);
+ 		new_pmd = pmd_mkhuge(new_pmd);
+-		if (writable) {
++		if (writable)
+ 			new_pmd = kvm_s2pmd_mkwrite(new_pmd);
+-			kvm_set_pfn_dirty(pfn);
+-		}
+ 
+-		if (fault_status != FSC_PERM)
+-			clean_dcache_guest_page(pfn, PMD_SIZE);
+-
+-		if (exec_fault) {
++		if (stage2_should_exec(kvm, fault_ipa, exec_fault, fault_status))
+ 			new_pmd = kvm_s2pmd_mkexec(new_pmd);
+-			invalidate_icache_guest_page(pfn, PMD_SIZE);
+-		} else if (fault_status == FSC_PERM) {
+-			/* Preserve execute if XN was already cleared */
+-			if (stage2_is_exec(kvm, fault_ipa))
+-				new_pmd = kvm_s2pmd_mkexec(new_pmd);
+-		}
+ 
+ 		ret = stage2_set_pmd_huge(kvm, memcache, fault_ipa, &new_pmd);
+ 	} else {
+@@ -1546,21 +1568,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 
+ 		if (writable) {
+ 			new_pte = kvm_s2pte_mkwrite(new_pte);
+-			kvm_set_pfn_dirty(pfn);
+ 			mark_page_dirty(kvm, gfn);
+ 		}
+ 
+-		if (fault_status != FSC_PERM)
+-			clean_dcache_guest_page(pfn, PAGE_SIZE);
+-
+-		if (exec_fault) {
++		if (stage2_should_exec(kvm, fault_ipa, exec_fault, fault_status))
+ 			new_pte = kvm_s2pte_mkexec(new_pte);
+-			invalidate_icache_guest_page(pfn, PAGE_SIZE);
+-		} else if (fault_status == FSC_PERM) {
+-			/* Preserve execute if XN was already cleared */
+-			if (stage2_is_exec(kvm, fault_ipa))
+-				new_pte = kvm_s2pte_mkexec(new_pte);
+-		}
+ 
+ 		ret = stage2_set_pte(kvm, memcache, fault_ipa, &new_pte, flags);
+ 	}
 -- 
 2.17.0
