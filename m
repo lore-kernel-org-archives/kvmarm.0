@@ -1,120 +1,172 @@
-From: "Kalra, Ashish" <Ashish.Kalra@cavium.com>
-Subject: Re: [kvm-unit-tests PATCH] arm64: add micro test
-Date: Tue, 1 May 2018 20:27:56 +0530
-Message-ID: <61a11d00-cc9c-bc17-eec0-0296085026e7@cavium.com>
-References: <1513372539-10180-1-git-send-email-shihwei@cs.columbia.edu>
- <1513372539-10180-2-git-send-email-shihwei@cs.columbia.edu>
- <20171218191037.wjocr7jbf5ua2duj@hawk.localdomain>
- <20171220170030.zvz3oounirnlhcfi@hawk.localdomain>
+From: Tyler Baicar <tbaicar@codeaurora.org>
+Subject: Re: [PATCH v3 00/12] APEI in_nmi() rework and arm64 SDEI wire-up
+Date: Tue, 1 May 2018 16:15:39 -0400
+Message-ID: <6d047f8a-e8e9-7751-f8b1-e132511d590c@codeaurora.org>
+References: <20180427153510.5799-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 404B040192
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 May 2018 10:48:56 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WHmduG4orHZa for <kvmarm@lists.cs.columbia.edu>;
- Tue,  1 May 2018 10:48:34 -0400 (EDT)
-Received: from NAM01-SN1-obe.outbound.protection.outlook.com
- (mail-sn1nam01on0078.outbound.protection.outlook.com [104.47.32.78])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1DFCB402C7
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 May 2018 10:48:34 -0400 (EDT)
-In-Reply-To: <20171220170030.zvz3oounirnlhcfi@hawk.localdomain>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20180427153510.5799-1-james.morse@arm.com>
 Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
-Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, pbonzini@redhat.com
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: James Morse <james.morse@arm.com>, linux-acpi@vger.kernel.org
+Cc: jonathan.zhang@cavium.com, Tony Luck <tony.luck@intel.com>, Christoffer Dall <cdall@kernel.org>, Xie XiuQi <xiexiuqi@huawei.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, Rafael Wysocki <rjw@rjwysocki.net>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hello Shih-Wei,
+Hi James,
 
-This exception is probably due to a bug in the hvc_test (hvc call) code,
-and there is a generic bug in the hvc test code.
-In the function hvc_test(), local variables c1, c2 get mapped to 
-registers (typically x1 & x2) and those are "clobbered" across the hvc 
-call, hence, c1 gets clobbered and we get a large cycle count for 
-hvc_test (c2 - 0), which messes-up the hvc test measurements.
+I tested this and verified that the NULL pointer issue that I reported on the 
+initial version is fixed.
 
-As per SMC64/HVC64 ABI definitions, x0-x18 can be clobbered across
-HVC/SMC calls.
+I don't currently have a way to test the SDEI parts of this, but for all other 
+patches:
 
-Currently, i am using your micro-benchmark code with the following
-hack applied ...
+Tested-by: Tyler Baicar <tbaicar@codeaurora.org>
 
-+register unsigned long c1_hvc asm ("x19"); 
- 
+Thanks!
+Tyler
 
-static unsigned long hvc_test(void) 
- 
 
-{
-+     unsigned long c2;
--     unsigned long c1, c2;
- 
- 
- 
- 
- 
-
-+     c1_hvc = read_cc();
--     c1 = read_cc();
-      asm volatile("mov w0, #0x4b000000; hvc #0" ::: "w0"); 
- 
-
-      c2 = read_cc();
-+     return CYCLE_COUNT(c1_hvc, c2);
--     return CYCLE_COUNT(c1, c2); 
- 
-
-}
-
-Thanks,
-Ashish
-
-On 12/20/2017 10:30 PM, Andrew Jones wrote:
-> On Mon, Dec 18, 2017 at 08:10:37PM +0100, Andrew Jones wrote:
->> I just tried on TCG now. It doesn't run. It gets
->>
->> Timer Frequency 62500000 Hz (Output in timer count)
->> Unhandled exception ec=0 (UNKNOWN)
->> Vector: 4 (el1h_sync)
->> ESR_EL1:         02000000, ec=0 (UNKNOWN)
->> FAR_EL1: 0000000000000000 (not valid)
->> Exception frame registers:
->> pc : [<0000000040080088>] lr : [<00000000400803e8>] pstate: 800003c5
->> sp : 00000000400aff90
->> x29: 0000000000000000 x28: 0000000000000000
->> x27: 0000000040090000 x26: 0000000040090c60
->> x25: 0000000040090000 x24: 000000001fffffff
->> x23: 0000000000000000 x22: 0000000000000000
->> x21: 0000000000000040 x20: 0000000000000000
->> x19: 0000000000000000 x18: 00000000400b0000
->> x17: 0000000000000000 x16: 0000000000000000
->> x15: 00000000400afe8c x14: 00000000400b0000
->> x13: 00000000400afecc x12: 0000000000001680
->> x11: 0000000000000000 x10: 6666666666666667
->> x9 : 0000000000000030 x8 : 0000000000000030
->> x7 : 00000000400af670 x6 : 00000000400af673
->> x5 : 00000000400af678 x4 : 00000000000007b7
->> x3 : 00000000400af6ec x2 : 0000000040090000
->> x1 : 000000000015909e x0 : 000000004b000000
->>
-> 
-> I looked into this. It's due to the hvc call. The exception goes away if
-> you add '-machine virtualization=yes' to the qemu command line. But as
-> there's no point in running it, and it's way too slow, then the
-> 'accel = kvm' added in v2 of the patch is the right thing to do.
-> 
+On 4/27/2018 11:34 AM, James Morse wrote:
+> The aim of this series is to wire arm64's SDEI into APEI.
+>
+> Nothing much has changed since v2, patch 3 is new and the KVM IS_ENABLED()
+> stuff has been cleaned up. Otherwise things are noted in each patch.
+>
+> This touches a few trees, so I'm not sure how best it should be merged.
+> Patches 11 and 12 are reducing a race that is made worse by patch 4, I'd
+> like them to arrive together, even though patch 11 doesn't depend on anything
+> else in the series. (patches 11&12 could be moved to after 8 if that makes
+> things easier)
+>
+>
+> The earlier boiler-plate:
+>
+> What's SDEI? Its ARM's "Software Delegated Exception Interface" [0]. It's
+> used by firmware to tell the OS about firmware-first RAS events.
+>
+> These Software exceptions can interrupt anything, so I describe them as
+> NMI-like. They aren't the only NMI-like way to notify the OS about
+> firmware-first RAS events, the ACPI spec also defines 'NOTFIY_SEA' and
+> 'NOTIFY_SEI'.
+>
+> (Acronyms: SEA, Synchronous External Abort. The CPU requested some memory,
+> but the owner of that memory said no. These are always synchronous with the
+> instruction that caused them. SEI, System-Error Interrupt, commonly called
+> SError. This is an asynchronous external abort, the memory-owner didn't say no
+> at the right point. Collectively these things are called external-aborts
+> How is firmware involved? It traps these and re-injects them into the kernel
+> once its written the CPER records).
+>
+>
+> APEI's GHES code only expects one source of NMI. If a platform implements
+> more than one of these mechanisms, APEI needs to handle the interaction.
+> 'SEA' and 'SEI' can interact as 'SEI' is asynchronous. SDEI can interact
+> with itself: its exceptions can be 'normal' or 'critical', and firmware
+> could use both types for RAS. (errors using normal, 'panic-now' using
+> critical).
+>
+> What does this series do?
+> Patches 1-4 refactor APEIs 'estatus queue' so it can be used for all
+> NMI-like notifications. This defers the NMI work to irq_work, which will
+> happen when we next unmask interrupts.
+>
+> Patches 5&6 move the arch and KVM code around so that NMI-like notifications
+> are always called in_nmi().
+>
+> Patch 7 changes the 'irq or nmi?' path through ghes_copy_tofrom_phys()
+> to be per-ghes. When called in_nmi(), the struct ghes is expected to
+> provide a fixmap slot and lock that is safe to use. NMI-like notifications
+> that mask each other can share these resources. Those that interact should
+> have their own fixmap slot and lock.
+>
+> Patch 8 renames NOTIFY_SEA's use of NOTIFY_NMI's infrastructure, as we're
+> about to have multiple NMI-like users that can't share resources.
+>
+> Pathes 9&10 add the SDEI helper, and notify methods for APEI.
+>
+> After this, adding further firmware-first pieces for arm64 is simple
+> (and safe), and all our NMI-like notifications behave the same as x86's
+> NOTIFY_NMI.
+>
+> All of this makes the race between memory_failure_queue() and
+> ret_to_user worse, as there is now always irq_work involved.
+>
+> Patch 11 makes the reschedule to memory_failure() run as soon as possible.
+> Patch 12 makes sure the arch code knows whether the irq_work has run by
+> the time do_sea() returns. We can skip the signalling step if it has as
+> APEI has done its work.
+>
+>
+> ghes.c became clearer to me when I worked out that it has three sets of
+> functions with 'estatus' in the name. One is a pool of memory that can be
+> allocated-from atomically. This is grown/shrunk when new NMI users are
+> allocated.
+> The second is the estatus-cache, which holds recent notifications so it
+> can suppress notifications we've already handled.
+> The last it the estatus-queue, which holds data from NMI-like notifications
+> (in pool memory) to be processed from irq_work.
+>
+>
+> Testing?
+> Tested with the SDEI FVP based software model and a mocked up NOTFIY_SEA using
+> KVM. I've added a case where 'corrected errors' are discovered at probe time
+> to exercise ghes_probe() during boot. I've only build tested this on x86.
+>
+>
 > Thanks,
-> drew
-> 
+>
+> James
+>
+> [0] http://infocenter.arm.com/help/topic/com.arm.doc.den0054a/ARM_DEN0054A_Software_Delegated_Exception_Interface.pdf
+>
+>
+> James Morse (12):
+>    ACPI / APEI: Move the estatus queue code up, and under its own ifdef
+>    ACPI / APEI: Generalise the estatus queue's add/remove and notify code
+>    ACPI / APEI: don't wait to serialise with oops messages when
+>      panic()ing
+>    ACPI / APEI: Switch NOTIFY_SEA to use the estatus queue
+>    KVM: arm/arm64: Add kvm_ras.h to collect kvm specific RAS plumbing
+>    arm64: KVM/mm: Move SEA handling behind a single 'claim' interface
+>    ACPI / APEI: Make the nmi_fixmap_idx per-ghes to allow multiple
+>      in_nmi() users
+>    ACPI / APEI: Split fixmap pages for arm64 NMI-like notifications
+>    firmware: arm_sdei: Add ACPI GHES registration helper
+>    ACPI / APEI: Add support for the SDEI GHES Notification type
+>    mm/memory-failure: increase queued recovery work's priority
+>    arm64: acpi: Make apei_claim_sea() synchronise with APEI's irq work
+>
+>   arch/arm/include/asm/kvm_ras.h       |  14 +
+>   arch/arm/include/asm/system_misc.h   |   5 -
+>   arch/arm64/include/asm/acpi.h        |   5 +-
+>   arch/arm64/include/asm/daifflags.h   |   1 +
+>   arch/arm64/include/asm/fixmap.h      |   8 +-
+>   arch/arm64/include/asm/kvm_ras.h     |  24 ++
+>   arch/arm64/include/asm/system_misc.h |   2 -
+>   arch/arm64/kernel/acpi.c             |  49 ++++
+>   arch/arm64/mm/fault.c                |  30 +-
+>   drivers/acpi/apei/ghes.c             | 517 ++++++++++++++++++++---------------
+>   drivers/firmware/arm_sdei.c          |  77 ++++++
+>   include/acpi/ghes.h                  |   4 +
+>   include/linux/arm_sdei.h             |   8 +
+>   mm/memory-failure.c                  |  11 +-
+>   virt/kvm/arm/mmu.c                   |   4 +-
+>   15 files changed, 499 insertions(+), 260 deletions(-)
+>   create mode 100644 arch/arm/include/asm/kvm_ras.h
+>   create mode 100644 arch/arm64/include/asm/kvm_ras.h
+>
+
+-- 
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project.
