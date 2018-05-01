@@ -1,122 +1,120 @@
-From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: Re: [PATCH v2 2/4] KVM: arm/arm64: Introduce helpers to manupulate page table entries
-Date: Tue, 01 May 2018 14:00:43 +0100
-Message-ID: <871sevr0n8.fsf@e105922-lin.cambridge.arm.com>
-References: <20180501102659.13188-1-punit.agrawal@arm.com>
-        <20180501102659.13188-3-punit.agrawal@arm.com>
-        <3eab5997-30b2-c51a-ca8e-5545bbadffc0@arm.com>
+From: "Kalra, Ashish" <Ashish.Kalra@cavium.com>
+Subject: Re: [kvm-unit-tests PATCH] arm64: add micro test
+Date: Tue, 1 May 2018 20:27:56 +0530
+Message-ID: <61a11d00-cc9c-bc17-eec0-0296085026e7@cavium.com>
+References: <1513372539-10180-1-git-send-email-shihwei@cs.columbia.edu>
+ <1513372539-10180-2-git-send-email-shihwei@cs.columbia.edu>
+ <20171218191037.wjocr7jbf5ua2duj@hawk.localdomain>
+ <20171220170030.zvz3oounirnlhcfi@hawk.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <3eab5997-30b2-c51a-ca8e-5545bbadffc0@arm.com> (Suzuki
-        K. Poulose's message of "Tue, 1 May 2018 11:36:26 +0100")
-Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, marc.zyngier@arm.com, christoffer.dall@arm.com, linux-kernel@vger.kernel.org, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 404B040192
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 May 2018 10:48:56 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id WHmduG4orHZa for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  1 May 2018 10:48:34 -0400 (EDT)
+Received: from NAM01-SN1-obe.outbound.protection.outlook.com
+ (mail-sn1nam01on0078.outbound.protection.outlook.com [104.47.32.78])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1DFCB402C7
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 May 2018 10:48:34 -0400 (EDT)
+In-Reply-To: <20171220170030.zvz3oounirnlhcfi@hawk.localdomain>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
+Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Suzuki,
+Hello Shih-Wei,
 
-Thanks for having a look.
+This exception is probably due to a bug in the hvc_test (hvc call) code,
+and there is a generic bug in the hvc test code.
+In the function hvc_test(), local variables c1, c2 get mapped to 
+registers (typically x1 & x2) and those are "clobbered" across the hvc 
+call, hence, c1 gets clobbered and we get a large cycle count for 
+hvc_test (c2 - 0), which messes-up the hvc test measurements.
 
-Suzuki K Poulose <Suzuki.Poulose@arm.com> writes:
+As per SMC64/HVC64 ABI definitions, x0-x18 can be clobbered across
+HVC/SMC calls.
 
-> On 01/05/18 11:26, Punit Agrawal wrote:
->> Introduce helpers to abstract architectural handling of the conversion
->> of pfn to page table entries and marking a PMD page table entry as a
->> block entry.
->>
->> The helpers are introduced in preparation for supporting PUD hugepages
->> at stage 2 - which are supported on arm64 but do not exist on arm.
->
-> Punit,
->
-> The change are fine by me. However, we usually do not define kvm_*
-> accessors for something which we know matches with the host variant.
-> i.e, PMD and PTE helpers, which are always present and we make use
-> of them directly. (see unmap_stage2_pmds for e.g)
+Currently, i am using your micro-benchmark code with the following
+hack applied ...
 
-In general, I agree - it makes sense to avoid duplication.
++register unsigned long c1_hvc asm ("x19"); 
+ 
 
-Having said that, the helpers here allow following a common pattern for
-handling the various page sizes - pte, pmd and pud - during stage 2
-fault handling (see patch 4).
+static unsigned long hvc_test(void) 
+ 
 
-As you've said you're OK with this change, I'd prefer to keep this patch
-but will drop it if any others reviewers are concerned about the
-duplication as well.
+{
++     unsigned long c2;
+-     unsigned long c1, c2;
+ 
+ 
+ 
+ 
+ 
+
++     c1_hvc = read_cc();
+-     c1 = read_cc();
+      asm volatile("mov w0, #0x4b000000; hvc #0" ::: "w0"); 
+ 
+
+      c2 = read_cc();
++     return CYCLE_COUNT(c1_hvc, c2);
+-     return CYCLE_COUNT(c1, c2); 
+ 
+
+}
 
 Thanks,
-Punit
+Ashish
 
->
-> Cheers
-> Suzuki
->
+On 12/20/2017 10:30 PM, Andrew Jones wrote:
+> On Mon, Dec 18, 2017 at 08:10:37PM +0100, Andrew Jones wrote:
+>> I just tried on TCG now. It doesn't run. It gets
 >>
->> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
->> Acked-by: Christoffer Dall <christoffer.dall@arm.com>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Russell King <linux@armlinux.org.uk>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: Will Deacon <will.deacon@arm.com>
->> ---
->>   arch/arm/include/asm/kvm_mmu.h   | 5 +++++
->>   arch/arm64/include/asm/kvm_mmu.h | 5 +++++
->>   virt/kvm/arm/mmu.c               | 7 ++++---
->>   3 files changed, 14 insertions(+), 3 deletions(-)
+>> Timer Frequency 62500000 Hz (Output in timer count)
+>> Unhandled exception ec=0 (UNKNOWN)
+>> Vector: 4 (el1h_sync)
+>> ESR_EL1:         02000000, ec=0 (UNKNOWN)
+>> FAR_EL1: 0000000000000000 (not valid)
+>> Exception frame registers:
+>> pc : [<0000000040080088>] lr : [<00000000400803e8>] pstate: 800003c5
+>> sp : 00000000400aff90
+>> x29: 0000000000000000 x28: 0000000000000000
+>> x27: 0000000040090000 x26: 0000000040090c60
+>> x25: 0000000040090000 x24: 000000001fffffff
+>> x23: 0000000000000000 x22: 0000000000000000
+>> x21: 0000000000000040 x20: 0000000000000000
+>> x19: 0000000000000000 x18: 00000000400b0000
+>> x17: 0000000000000000 x16: 0000000000000000
+>> x15: 00000000400afe8c x14: 00000000400b0000
+>> x13: 00000000400afecc x12: 0000000000001680
+>> x11: 0000000000000000 x10: 6666666666666667
+>> x9 : 0000000000000030 x8 : 0000000000000030
+>> x7 : 00000000400af670 x6 : 00000000400af673
+>> x5 : 00000000400af678 x4 : 00000000000007b7
+>> x3 : 00000000400af6ec x2 : 0000000040090000
+>> x1 : 000000000015909e x0 : 000000004b000000
 >>
->> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
->> index 707a1f06dc5d..5907a81ad5c1 100644
->> --- a/arch/arm/include/asm/kvm_mmu.h
->> +++ b/arch/arm/include/asm/kvm_mmu.h
->> @@ -75,6 +75,11 @@ phys_addr_t kvm_get_idmap_vector(void);
->>   int kvm_mmu_init(void);
->>   void kvm_clear_hyp_idmap(void);
->>   +#define kvm_pfn_pte(pfn, prot)	pfn_pte(pfn, prot)
->> +#define kvm_pfn_pmd(pfn, prot)	pfn_pmd(pfn, prot)
->> +
->> +#define kvm_pmd_mkhuge(pmd)	pmd_mkhuge(pmd)
->> +
->>   static inline void kvm_set_pmd(pmd_t *pmd, pmd_t new_pmd)
->>   {
->>   	*pmd = new_pmd;
->> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
->> index 082110993647..d962508ce4b3 100644
->> --- a/arch/arm64/include/asm/kvm_mmu.h
->> +++ b/arch/arm64/include/asm/kvm_mmu.h
->> @@ -173,6 +173,11 @@ void kvm_clear_hyp_idmap(void);
->>   #define	kvm_set_pte(ptep, pte)		set_pte(ptep, pte)
->>   #define	kvm_set_pmd(pmdp, pmd)		set_pmd(pmdp, pmd)
->>   +#define kvm_pfn_pte(pfn, prot)		pfn_pte(pfn, prot)
->> +#define kvm_pfn_pmd(pfn, prot)		pfn_pmd(pfn, prot)
->> +
->> +#define kvm_pmd_mkhuge(pmd)		pmd_mkhuge(pmd)
->> +
->>   static inline pte_t kvm_s2pte_mkwrite(pte_t pte)
->>   {
->>   	pte_val(pte) |= PTE_S2_RDWR;
->> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->> index 686fc6a4b866..74750236f445 100644
->> --- a/virt/kvm/arm/mmu.c
->> +++ b/virt/kvm/arm/mmu.c
->> @@ -1554,8 +1554,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->>   		invalidate_icache_guest_page(pfn, vma_pagesize);
->>     	if (hugetlb) {
->> -		pmd_t new_pmd = pfn_pmd(pfn, mem_type);
->> -		new_pmd = pmd_mkhuge(new_pmd);
->> +		pmd_t new_pmd = kvm_pfn_pmd(pfn, mem_type);
->> +
->> +		new_pmd = kvm_pmd_mkhuge(new_pmd);
->>   		if (writable)
->>   			new_pmd = kvm_s2pmd_mkwrite(new_pmd);
->>   @@ -1564,7 +1565,7 @@ static int user_mem_abort(struct kvm_vcpu
->> *vcpu, phys_addr_t fault_ipa,
->>     		ret = stage2_set_pmd_huge(kvm, memcache, fault_ipa,
->> &new_pmd);
->>   	} else {
->> -		pte_t new_pte = pfn_pte(pfn, mem_type);
->> +		pte_t new_pte = kvm_pfn_pte(pfn, mem_type);
->>     		if (writable) {
->>   			new_pte = kvm_s2pte_mkwrite(new_pte);
->>
+> 
+> I looked into this. It's due to the hvc call. The exception goes away if
+> you add '-machine virtualization=yes' to the qemu command line. But as
+> there's no point in running it, and it's way too slow, then the
+> 'accel = kvm' added in v2 of the patch is the right thing to do.
+> 
+> Thanks,
+> drew
+> 
