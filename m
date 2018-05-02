@@ -1,21 +1,24 @@
-From: James Morse <james.morse@arm.com>
-Subject: [PATCH] KVM: arm64: Fix order of vcpu_write_sys_reg() arguments
-Date: Wed,  2 May 2018 14:14:41 +0100
-Message-ID: <20180502131441.28955-1-james.morse@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH] KVM: arm64: Fix order of vcpu_write_sys_reg() arguments
+Date: Wed, 2 May 2018 14:32:45 +0100
+Message-ID: <c32af6bc-2fe9-bba0-9820-f66c84a880c4@arm.com>
+References: <20180502131441.28955-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D747540357
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 May 2018 09:08:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B949349F8C
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 May 2018 09:23:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wbdREzraGw1B for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 May 2018 09:08:00 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0221840192
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 May 2018 09:07:59 -0400 (EDT)
+ with ESMTP id PjjBMkdzEsO5 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 May 2018 09:23:04 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D6C684028A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 May 2018 09:23:04 -0400 (EDT)
+In-Reply-To: <20180502131441.28955-1-james.morse@arm.com>
+Content-Language: en-GB
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -25,76 +28,84 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
-Cc: Marc Zyngier <marc.zyngier@arm.com>
+To: James Morse <james.morse@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-A typo in kvm_vcpu_set_be()'s call:
-| vcpu_write_sys_reg(vcpu, SCTLR_EL1, sctlr)
-causes us to use the 32bit register value as an index into the sys_reg[]
-array, and sail off the end of the linear map when we try to bring up
-big-endian secondaries.
+On 02/05/18 14:14, James Morse wrote:
+> A typo in kvm_vcpu_set_be()'s call:
+> | vcpu_write_sys_reg(vcpu, SCTLR_EL1, sctlr)
+> causes us to use the 32bit register value as an index into the sys_reg[]
+> array, and sail off the end of the linear map when we try to bring up
+> big-endian secondaries.
+> 
+> | Unable to handle kernel paging request at virtual address ffff80098b982c00
+> | Mem abort info:
+> |  ESR = 0x96000045
+> |  Exception class = DABT (current EL), IL = 32 bits
+> |   SET = 0, FnV = 0
+> |   EA = 0, S1PTW = 0
+> | Data abort info:
+> |   ISV = 0, ISS = 0x00000045
+> |   CM = 0, WnR = 1
+> | swapper pgtable: 4k pages, 48-bit VAs, pgdp = 000000002ea0571a
+> | [ffff80098b982c00] pgd=00000009ffff8803, pud=0000000000000000
+> | Internal error: Oops: 96000045 [#1] PREEMPT SMP
+> | Modules linked in:
+> | CPU: 2 PID: 1561 Comm: kvm-vcpu-0 Not tainted 4.17.0-rc3-00001-ga912e2261ca6-dirty #1323
+> | Hardware name: ARM Juno development board (r1) (DT)
+> | pstate: 60000005 (nZCv daif -PAN -UAO)
+> | pc : vcpu_write_sys_reg+0x50/0x134
+> | lr : vcpu_write_sys_reg+0x50/0x134
+> 
+> | Process kvm-vcpu-0 (pid: 1561, stack limit = 0x000000006df4728b)
+> | Call trace:
+> |  vcpu_write_sys_reg+0x50/0x134
+> |  kvm_psci_vcpu_on+0x14c/0x150
+> |  kvm_psci_0_2_call+0x244/0x2a4
+> |  kvm_hvc_call_handler+0x1cc/0x258
+> |  handle_hvc+0x20/0x3c
+> |  handle_exit+0x130/0x1ec
+> |  kvm_arch_vcpu_ioctl_run+0x340/0x614
+> |  kvm_vcpu_ioctl+0x4d0/0x840
+> |  do_vfs_ioctl+0xc8/0x8d0
+> |  ksys_ioctl+0x78/0xa8
+> |  sys_ioctl+0xc/0x18
+> |  el0_svc_naked+0x30/0x34
+> | Code: 73620291 604d00b0 00201891 1ab10194 (957a33f8)
+> |---[ end trace 4b4a4f9628596602 ]---
+> 
+> Fix the order of the arguments.
+> 
+> Fixes: 8d404c4c24613 ("KVM: arm64: Rewrite system register accessors to read/write functions")
+> Signed-off-by: James Morse <james.morse@arm.com>
+> ---
+> I tried switching vcpu_write_sys_reg() to use the enum to catch this, but the
+> compiler doesn't care, looks like its a c++ ism. (and I can't get sparse to
+> run over virt/kvm/arm as there is no Makefile in there).
+> 
+>  arch/arm64/include/asm/kvm_emulate.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 23b33e8ea03a..1dab3a984608 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -333,7 +333,7 @@ static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
+>  	} else {
+>  		u64 sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
+>  		sctlr |= (1 << 25);
+> -		vcpu_write_sys_reg(vcpu, SCTLR_EL1, sctlr);
+> +		vcpu_write_sys_reg(vcpu, sctlr, SCTLR_EL1);
+>  	}
+>  }
+>  
+> 
 
-| Unable to handle kernel paging request at virtual address ffff80098b982c00
-| Mem abort info:
-|  ESR = 0x96000045
-|  Exception class = DABT (current EL), IL = 32 bits
-|   SET = 0, FnV = 0
-|   EA = 0, S1PTW = 0
-| Data abort info:
-|   ISV = 0, ISS = 0x00000045
-|   CM = 0, WnR = 1
-| swapper pgtable: 4k pages, 48-bit VAs, pgdp = 000000002ea0571a
-| [ffff80098b982c00] pgd=00000009ffff8803, pud=0000000000000000
-| Internal error: Oops: 96000045 [#1] PREEMPT SMP
-| Modules linked in:
-| CPU: 2 PID: 1561 Comm: kvm-vcpu-0 Not tainted 4.17.0-rc3-00001-ga912e2261ca6-dirty #1323
-| Hardware name: ARM Juno development board (r1) (DT)
-| pstate: 60000005 (nZCv daif -PAN -UAO)
-| pc : vcpu_write_sys_reg+0x50/0x134
-| lr : vcpu_write_sys_reg+0x50/0x134
+Nice catch. I've queued it with a number of other things. It'd be good
+to have a way to catch that at compile time, but that's for another day.
 
-| Process kvm-vcpu-0 (pid: 1561, stack limit = 0x000000006df4728b)
-| Call trace:
-|  vcpu_write_sys_reg+0x50/0x134
-|  kvm_psci_vcpu_on+0x14c/0x150
-|  kvm_psci_0_2_call+0x244/0x2a4
-|  kvm_hvc_call_handler+0x1cc/0x258
-|  handle_hvc+0x20/0x3c
-|  handle_exit+0x130/0x1ec
-|  kvm_arch_vcpu_ioctl_run+0x340/0x614
-|  kvm_vcpu_ioctl+0x4d0/0x840
-|  do_vfs_ioctl+0xc8/0x8d0
-|  ksys_ioctl+0x78/0xa8
-|  sys_ioctl+0xc/0x18
-|  el0_svc_naked+0x30/0x34
-| Code: 73620291 604d00b0 00201891 1ab10194 (957a33f8)
-|---[ end trace 4b4a4f9628596602 ]---
+Thanks,
 
-Fix the order of the arguments.
-
-Fixes: 8d404c4c24613 ("KVM: arm64: Rewrite system register accessors to read/write functions")
-Signed-off-by: James Morse <james.morse@arm.com>
----
-I tried switching vcpu_write_sys_reg() to use the enum to catch this, but the
-compiler doesn't care, looks like its a c++ ism. (and I can't get sparse to
-run over virt/kvm/arm as there is no Makefile in there).
-
- arch/arm64/include/asm/kvm_emulate.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 23b33e8ea03a..1dab3a984608 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -333,7 +333,7 @@ static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
- 	} else {
- 		u64 sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
- 		sctlr |= (1 << 25);
--		vcpu_write_sys_reg(vcpu, SCTLR_EL1, sctlr);
-+		vcpu_write_sys_reg(vcpu, sctlr, SCTLR_EL1);
- 	}
- }
- 
+	M.
 -- 
-2.16.2
+Jazz is not dead. It just smells funny...
