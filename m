@@ -1,116 +1,38 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [kvm-unit-tests PATCH] arm64: add micro test
-Date: Wed, 2 May 2018 10:23:01 +0100
-Message-ID: <0ee505ca-9022-0ec9-6008-9e49fb723d88@arm.com>
-References: <1513372539-10180-1-git-send-email-shihwei@cs.columbia.edu>
- <1513372539-10180-2-git-send-email-shihwei@cs.columbia.edu>
- <20171218191037.wjocr7jbf5ua2duj@hawk.localdomain>
- <20171220170030.zvz3oounirnlhcfi@hawk.localdomain>
- <61a11d00-cc9c-bc17-eec0-0296085026e7@cavium.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DC4F49D6B
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 May 2018 05:13:43 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id D9dTsU23rwCe for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 May 2018 05:13:21 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9731F4029E
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 May 2018 05:13:21 -0400 (EDT)
-In-Reply-To: <61a11d00-cc9c-bc17-eec0-0296085026e7@cavium.com>
-Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: "Kalra, Ashish" <Ashish.Kalra@cavium.com>, Andrew Jones <drjones@redhat.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
-Cc: christoffer.dall@linaro.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+From: Valentin Schneider <valentin.schneider@arm.com>
+Subject: [PATCH 1/1] KVM: arm/arm64: vgic_init: Cleanup reference to process_maintenance
+Date: Wed,  2 May 2018 11:53:03 +0100
+Message-ID: <1525258383-14178-1-git-send-email-valentin.schneider@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Cc: kvmarm@lists.cs.columbia.edu, trivial@kernel.org, christoffer.dall@arm.com, marc.zyngier@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 01/05/18 15:57, Kalra, Ashish wrote:
-> Hello Shih-Wei,
-> 
-> This exception is probably due to a bug in the hvc_test (hvc call) code,
-> and there is a generic bug in the hvc test code.
-> In the function hvc_test(), local variables c1, c2 get mapped to 
-> registers (typically x1 & x2) and those are "clobbered" across the hvc 
-> call, hence, c1 gets clobbered and we get a large cycle count for 
-> hvc_test (c2 - 0), which messes-up the hvc test measurements.
-> 
-> As per SMC64/HVC64 ABI definitions, x0-x18 can be clobbered across
-> HVC/SMC calls.
+One comment still mentioned process_maintenance operations after
+commit af0614991ab6 ("KVM: arm/arm64: vgic: Get rid of unnecessary
+process_maintenance operation") 
 
-I have two issues with this statement:
+Update the comment to point to vgic_fold_lr_state instead, which
+is where maintenance interrupts are taken care of.
 
-- Version 1.1 of the SMCCC actually says that only x0-x3 will be
-potentially clobbered
+Acked-by: Christoffer Dall <christoffer.dall@arm.com>
+Signed-off-by: Valentin Schneider <valentin.schneider@arm.com>
+---
+ virt/kvm/arm/vgic/vgic-init.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-- KVM makes a point in not clobbering any register, except for those
-functions implemented by SMCCC 1.1.
-
-That being said...
-
-> 
-> Currently, i am using your micro-benchmark code with the following
-> hack applied ...
-> 
-> +register unsigned long c1_hvc asm ("x19"); 
->  
-> 
-> static unsigned long hvc_test(void) 
->  
-> 
-> {
-> +     unsigned long c2;
-> -     unsigned long c1, c2;
->  
->  
->  
->  
->  
-> 
-> +     c1_hvc = read_cc();
-> -     c1 = read_cc();
->       asm volatile("mov w0, #0x4b000000; hvc #0" ::: "w0"); 
->  
-> 
->       c2 = read_cc();
-
-The reason for the problem you're seeing is probably that the
-constraints are not quite right. Here, x0 is not simply clobbered, but
-is actively written to in the middle of the sequence (it is at least an
-early clobber). It is also, I assume, a result from the hypercall, so it
-cannot simply be discarded.
-
-It would help to get a disassembly of the function, but I'd tend to
-rewrite the code as such:
-
-extern int bar(void);
-
-int foo(void)
-{
-	register int w0 asm("w0");
-	int a, b;
-
-	a = bar();
-	w0 = 0x4b000000;
-	asm volatile("hvc #0" : "+r" (w0) :: );
-	b = bar();
-
-	return a - b;
-}
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index 743ca5c..7f1a467 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -440,7 +440,7 @@ static irqreturn_t vgic_maintenance_handler(int irq, void *data)
+ 	 * We cannot rely on the vgic maintenance interrupt to be
+ 	 * delivered synchronously. This means we can only use it to
+ 	 * exit the VM, and we perform the handling of EOIed
+-	 * interrupts on the exit path (see vgic_process_maintenance).
++	 * interrupts on the exit path (see vgic_fold_lr_state).
+ 	 */
+ 	return IRQ_HANDLED;
+ }
+--
+2.7.4
