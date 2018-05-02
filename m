@@ -1,172 +1,136 @@
-From: Tyler Baicar <tbaicar@codeaurora.org>
-Subject: Re: [PATCH v3 00/12] APEI in_nmi() rework and arm64 SDEI wire-up
-Date: Tue, 1 May 2018 16:15:39 -0400
-Message-ID: <6d047f8a-e8e9-7751-f8b1-e132511d590c@codeaurora.org>
-References: <20180427153510.5799-1-james.morse@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180427153510.5799-1-james.morse@arm.com>
-Content-Language: en-US
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: James Morse <james.morse@arm.com>, linux-acpi@vger.kernel.org
-Cc: jonathan.zhang@cavium.com, Tony Luck <tony.luck@intel.com>, Christoffer Dall <cdall@kernel.org>, Xie XiuQi <xiexiuqi@huawei.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, Rafael Wysocki <rjw@rjwysocki.net>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
+From: Jia He <hejianet@gmail.com>
+Subject: [PATCH] KVM: arm/arm64: fix unaligned hva start and end in handle_hva_to_gpa
+Date: Wed,  2 May 2018 15:08:31 +0800
+Message-ID: <1525244911-5519-1-git-send-email-hejianet@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: linux-kernel@vger.kernel.org, Jia He <jia.he@hxt-semitech.com>, li.zhang@hxt-semitech.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi James,
+From: Jia He <jia.he@hxt-semitech.com>
 
-I tested this and verified that the NULL pointer issue that I reported on the 
-initial version is fixed.
+In our armv8a server (QDF2400), I noticed a WARN_ON as follows:
 
-I don't currently have a way to test the SDEI parts of this, but for all other 
-patches:
+[  800.202850] WARNING: CPU: 33 PID: 255 at arch/arm64/kvm/../../../virt/kvm/arm/mmu.c:1670 kvm_age_hva_handler+0xcc/0xd4
+[  800.213535] Modules linked in: vhost_net vhost tap xt_CHECKSUM ipt_MASQUERADE nf_nat_masquerade_ipv4 ip6t_rpfilter ipt_REJECT nf_reject_ipv4 ip6t_REJECT nf_reject_ipv6 xt_conntrack ip_set nfnetlink ebtable_nat ebtable_broute bridge stp llc ip6table_nat nf_conntrack_ipv6 nf_defrag_ipv6 nf_nat_ipv6 ip6table_mangle ip6table_security ip6table_raw iptable_nat nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat_ipv4 nf_nat nf_conntrack iptable_mangle iptable_security iptable_raw ebtable_filter ebtables ip6table_filter ip6_tables iptable_filter rpcrdma ib_isert iscsi_target_mod ib_iser libiscsi scsi_transport_iscsi ib_srpt target_core_mod ib_srp scsi_transport_srp ib_ipoib rdma_ucm ib_ucm ib_uverbs ib_umad rdma_cm ib_cm vfat fat iw_cm mlx5_ib ib_core dm_mirror dm_region_hash dm_log dm_mod crc32_ce ipmi_ss
+ if sg nfsd
+[  800.284115]  auth_rpcgss nfs_acl lockd grace sunrpc ip_tables xfs libcrc32c mlx5_core ixgbe mlxfw devlink mdio ahci_platform libahci_platform qcom_emac libahci hdma hdma_mgmt i2c_qup
+[  800.300382] CPU: 33 PID: 255 Comm: khugepaged Tainted: G        W       4.14.36+ #6
+[  800.308030] Hardware name: <snip for confidential issues>
+[  800.318717] task: ffff8017c949c000 task.stack: ffff8017c9498000
+[  800.324629] PC is at kvm_age_hva_handler+0xcc/0xd4
+[  800.329412] LR is at handle_hva_to_gpa+0xec/0x15c
+[  800.334109] pc : [<ffff0000080b4f2c>] lr : [<ffff0000080b4838>] pstate: 20400145
+[  800.341496] sp : ffff8017c949b260
+[  800.344804] x29: ffff8017c949b260 x28: ffff801663e25008
+[  800.350110] x27: 0000000000020000 x26: 00000001fb1a0000
+[  800.355416] x25: 0000ffff605b0200 x24: 0000ffff605a0200
+[  800.360722] x23: 0000000000000000 x22: 000000000000ffff
+[  800.366028] x21: 00000001fb1a0000 x20: ffff8017c085a000
+[  800.371334] x19: ffff801663e20008 x18: 0000000000000000
+[  800.376641] x17: 0000000000000000 x16: 0000000000000000
+[  800.381947] x15: 0000000000000000 x14: 3d646e655f617668
+[  800.387254] x13: 2c30303230623530 x12: 36666666663d646e
+[  800.392560] x11: 652c303032306135 x10: 3036666666663d74
+[  800.397867] x9 : 0000000000003796 x8 : 655f6e66672c3030
+[  800.403173] x7 : ffff00000859434c x6 : ffff8017f9c30cb8
+[  800.408479] x5 : ffff8017f9c30cb8 x4 : ffff0000080b4e60
+[  800.413786] x3 : 0000000000000000 x2 : 0000000000020000
+[  800.419092] x1 : 00000001fb1a0000 x0 : 0000000020000000
+[  800.424398] Call trace:
+[  800.426838] Exception stack(0xffff8017c949b120 to 0xffff8017c949b260)
+[  800.433272] b120: 0000000020000000 00000001fb1a0000 0000000000020000 0000000000000000
+[  800.441095] b140: ffff0000080b4e60 ffff8017f9c30cb8 ffff8017f9c30cb8 ffff00000859434c
+[  800.448918] b160: 655f6e66672c3030 0000000000003796 3036666666663d74 652c303032306135
+[  800.456740] b180: 36666666663d646e 2c30303230623530 3d646e655f617668 0000000000000000
+[  800.464563] b1a0: 0000000000000000 0000000000000000 0000000000000000 ffff801663e20008
+[  800.472385] b1c0: ffff8017c085a000 00000001fb1a0000 000000000000ffff 0000000000000000
+[  800.480208] b1e0: 0000ffff605a0200 0000ffff605b0200 00000001fb1a0000 0000000000020000
+[  800.488030] b200: ffff801663e25008 ffff8017c949b260 ffff0000080b4838 ffff8017c949b260
+[  800.495853] b220: ffff0000080b4f2c 0000000020400145 0000000000000001 ffff8017c949b2a0
+[  800.503676] b240: ffffffffffffffff ffff8017c949b260 ffff8017c949b260 ffff0000080b4f2c
+[  800.511498] [<ffff0000080b4f2c>] kvm_age_hva_handler+0xcc/0xd4
+[  800.517324] [<ffff0000080b4838>] handle_hva_to_gpa+0xec/0x15c
+[  800.523063] [<ffff0000080b6c5c>] kvm_age_hva+0x5c/0xcc
+[  800.528194] [<ffff0000080a7c3c>] kvm_mmu_notifier_clear_flush_young+0x54/0x90
+[  800.535324] [<ffff00000827a0e8>] __mmu_notifier_clear_flush_young+0x6c/0xa8
+[  800.542279] [<ffff00000825a644>] page_referenced_one+0x1e0/0x1fc
+[  800.548279] [<ffff00000827e8f8>] rmap_walk_ksm+0x124/0x1a0
+[  800.553759] [<ffff00000825c974>] rmap_walk+0x94/0x98
+[  800.558717] [<ffff00000825ca98>] page_referenced+0x120/0x180
+[  800.564369] [<ffff000008228c58>] shrink_active_list+0x218/0x4a4
+[  800.570281] [<ffff000008229470>] shrink_node_memcg+0x58c/0x6fc
+[  800.576107] [<ffff0000082296c4>] shrink_node+0xe4/0x328
+[  800.581325] [<ffff000008229c9c>] do_try_to_free_pages+0xe4/0x3b8
+[  800.587324] [<ffff00000822a094>] try_to_free_pages+0x124/0x234
+[  800.593150] [<ffff000008216aa0>] __alloc_pages_nodemask+0x564/0xf7c
+[  800.599412] [<ffff000008292814>] khugepaged_alloc_page+0x38/0xb8
+[  800.605411] [<ffff0000082933bc>] collapse_huge_page+0x74/0xd70
+[  800.611238] [<ffff00000829470c>] khugepaged_scan_mm_slot+0x654/0xa98
+[  800.617585] [<ffff000008294e0c>] khugepaged+0x2bc/0x49c
+[  800.622803] [<ffff0000080ffb70>] kthread+0x124/0x150
+[  800.627762] [<ffff0000080849f0>] ret_from_fork+0x10/0x1c
+[  800.633066] ---[ end trace 944c130b5252fb01 ]---
+-------------------------------------------------------------------------
 
-Tested-by: Tyler Baicar <tbaicar@codeaurora.org>
+The root cause might be: we can't guarantee that the parameter start and end
+in handle_hva_to_gpa is PAGE_SIZE aligned, let alone hva_start and hva_end.
 
-Thanks!
-Tyler
+This bug is introduced by commit 056aad67f836 ("kvm: arm/arm64: Rework gpa
+callback handlers")
 
+It fixes the bug by use pfn size converted.
 
-On 4/27/2018 11:34 AM, James Morse wrote:
-> The aim of this series is to wire arm64's SDEI into APEI.
->
-> Nothing much has changed since v2, patch 3 is new and the KVM IS_ENABLED()
-> stuff has been cleaned up. Otherwise things are noted in each patch.
->
-> This touches a few trees, so I'm not sure how best it should be merged.
-> Patches 11 and 12 are reducing a race that is made worse by patch 4, I'd
-> like them to arrive together, even though patch 11 doesn't depend on anything
-> else in the series. (patches 11&12 could be moved to after 8 if that makes
-> things easier)
->
->
-> The earlier boiler-plate:
->
-> What's SDEI? Its ARM's "Software Delegated Exception Interface" [0]. It's
-> used by firmware to tell the OS about firmware-first RAS events.
->
-> These Software exceptions can interrupt anything, so I describe them as
-> NMI-like. They aren't the only NMI-like way to notify the OS about
-> firmware-first RAS events, the ACPI spec also defines 'NOTFIY_SEA' and
-> 'NOTIFY_SEI'.
->
-> (Acronyms: SEA, Synchronous External Abort. The CPU requested some memory,
-> but the owner of that memory said no. These are always synchronous with the
-> instruction that caused them. SEI, System-Error Interrupt, commonly called
-> SError. This is an asynchronous external abort, the memory-owner didn't say no
-> at the right point. Collectively these things are called external-aborts
-> How is firmware involved? It traps these and re-injects them into the kernel
-> once its written the CPER records).
->
->
-> APEI's GHES code only expects one source of NMI. If a platform implements
-> more than one of these mechanisms, APEI needs to handle the interaction.
-> 'SEA' and 'SEI' can interact as 'SEI' is asynchronous. SDEI can interact
-> with itself: its exceptions can be 'normal' or 'critical', and firmware
-> could use both types for RAS. (errors using normal, 'panic-now' using
-> critical).
->
-> What does this series do?
-> Patches 1-4 refactor APEIs 'estatus queue' so it can be used for all
-> NMI-like notifications. This defers the NMI work to irq_work, which will
-> happen when we next unmask interrupts.
->
-> Patches 5&6 move the arch and KVM code around so that NMI-like notifications
-> are always called in_nmi().
->
-> Patch 7 changes the 'irq or nmi?' path through ghes_copy_tofrom_phys()
-> to be per-ghes. When called in_nmi(), the struct ghes is expected to
-> provide a fixmap slot and lock that is safe to use. NMI-like notifications
-> that mask each other can share these resources. Those that interact should
-> have their own fixmap slot and lock.
->
-> Patch 8 renames NOTIFY_SEA's use of NOTIFY_NMI's infrastructure, as we're
-> about to have multiple NMI-like users that can't share resources.
->
-> Pathes 9&10 add the SDEI helper, and notify methods for APEI.
->
-> After this, adding further firmware-first pieces for arm64 is simple
-> (and safe), and all our NMI-like notifications behave the same as x86's
-> NOTIFY_NMI.
->
-> All of this makes the race between memory_failure_queue() and
-> ret_to_user worse, as there is now always irq_work involved.
->
-> Patch 11 makes the reschedule to memory_failure() run as soon as possible.
-> Patch 12 makes sure the arch code knows whether the irq_work has run by
-> the time do_sea() returns. We can skip the signalling step if it has as
-> APEI has done its work.
->
->
-> ghes.c became clearer to me when I worked out that it has three sets of
-> functions with 'estatus' in the name. One is a pool of memory that can be
-> allocated-from atomically. This is grown/shrunk when new NMI users are
-> allocated.
-> The second is the estatus-cache, which holds recent notifications so it
-> can suppress notifications we've already handled.
-> The last it the estatus-queue, which holds data from NMI-like notifications
-> (in pool memory) to be processed from irq_work.
->
->
-> Testing?
-> Tested with the SDEI FVP based software model and a mocked up NOTFIY_SEA using
-> KVM. I've added a case where 'corrected errors' are discovered at probe time
-> to exercise ghes_probe() during boot. I've only build tested this on x86.
->
->
-> Thanks,
->
-> James
->
-> [0] http://infocenter.arm.com/help/topic/com.arm.doc.den0054a/ARM_DEN0054A_Software_Delegated_Exception_Interface.pdf
->
->
-> James Morse (12):
->    ACPI / APEI: Move the estatus queue code up, and under its own ifdef
->    ACPI / APEI: Generalise the estatus queue's add/remove and notify code
->    ACPI / APEI: don't wait to serialise with oops messages when
->      panic()ing
->    ACPI / APEI: Switch NOTIFY_SEA to use the estatus queue
->    KVM: arm/arm64: Add kvm_ras.h to collect kvm specific RAS plumbing
->    arm64: KVM/mm: Move SEA handling behind a single 'claim' interface
->    ACPI / APEI: Make the nmi_fixmap_idx per-ghes to allow multiple
->      in_nmi() users
->    ACPI / APEI: Split fixmap pages for arm64 NMI-like notifications
->    firmware: arm_sdei: Add ACPI GHES registration helper
->    ACPI / APEI: Add support for the SDEI GHES Notification type
->    mm/memory-failure: increase queued recovery work's priority
->    arm64: acpi: Make apei_claim_sea() synchronise with APEI's irq work
->
->   arch/arm/include/asm/kvm_ras.h       |  14 +
->   arch/arm/include/asm/system_misc.h   |   5 -
->   arch/arm64/include/asm/acpi.h        |   5 +-
->   arch/arm64/include/asm/daifflags.h   |   1 +
->   arch/arm64/include/asm/fixmap.h      |   8 +-
->   arch/arm64/include/asm/kvm_ras.h     |  24 ++
->   arch/arm64/include/asm/system_misc.h |   2 -
->   arch/arm64/kernel/acpi.c             |  49 ++++
->   arch/arm64/mm/fault.c                |  30 +-
->   drivers/acpi/apei/ghes.c             | 517 ++++++++++++++++++++---------------
->   drivers/firmware/arm_sdei.c          |  77 ++++++
->   include/acpi/ghes.h                  |   4 +
->   include/linux/arm_sdei.h             |   8 +
->   mm/memory-failure.c                  |  11 +-
->   virt/kvm/arm/mmu.c                   |   4 +-
->   15 files changed, 499 insertions(+), 260 deletions(-)
->   create mode 100644 arch/arm/include/asm/kvm_ras.h
->   create mode 100644 arch/arm64/include/asm/kvm_ras.h
->
+Fixes: 056aad67f836 ("kvm: arm/arm64: Rework gpa callback handlers")
 
+Signed-off-by: jia.he@hxt-semitech.com
+Signed-off-by: li.zhang@hxt-semitech.com
+---
+ virt/kvm/arm/mmu.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 7f6a944..9dd7ae4 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -1744,7 +1744,7 @@ static int handle_hva_to_gpa(struct kvm *kvm,
+ 	/* we only care about the pages that the guest sees */
+ 	kvm_for_each_memslot(memslot, slots) {
+ 		unsigned long hva_start, hva_end;
+-		gfn_t gpa;
++		gpa_t gpa, gpa_end;
+ 
+ 		hva_start = max(start, memslot->userspace_addr);
+ 		hva_end = min(end, memslot->userspace_addr +
+@@ -1753,7 +1753,9 @@ static int handle_hva_to_gpa(struct kvm *kvm,
+ 			continue;
+ 
+ 		gpa = hva_to_gfn_memslot(hva_start, memslot) << PAGE_SHIFT;
+-		ret |= handler(kvm, gpa, (u64)(hva_end - hva_start), data);
++		gpa_end = hva_to_gfn_memslot(hva_end + PAGE_SIZE - 1, memslot)
++							 << PAGE_SHIFT;
++		ret |= handler(kvm, gpa, (u64)(gpa_end - gpa), data);
+ 	}
+ 
+ 	return ret;
+@@ -1823,7 +1825,7 @@ static int kvm_age_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *data)
+ 	pmd_t *pmd;
+ 	pte_t *pte;
+ 
+-	WARN_ON(size != PAGE_SIZE && size != PMD_SIZE);
++	WARN_ON((size & ~PAGE_MASK) != 0);
+ 	pmd = stage2_get_pmd(kvm, NULL, gpa);
+ 	if (!pmd || pmd_none(*pmd))	/* Nothing there */
+ 		return 0;
+@@ -1843,7 +1845,7 @@ static int kvm_test_age_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *
+ 	pmd_t *pmd;
+ 	pte_t *pte;
+ 
+-	WARN_ON(size != PAGE_SIZE && size != PMD_SIZE);
++	WARN_ON((size & ~PAGE_MASK) != 0);
+ 	pmd = stage2_get_pmd(kvm, NULL, gpa);
+ 	if (!pmd || pmd_none(*pmd))	/* Nothing there */
+ 		return 0;
 -- 
-Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project.
+1.8.3.1
