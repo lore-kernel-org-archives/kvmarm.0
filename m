@@ -1,108 +1,167 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] KVM: arm64: Fix order of vcpu_write_sys_reg() arguments
-Date: Wed, 2 May 2018 14:32:45 +0100
-Message-ID: <c32af6bc-2fe9-bba0-9820-f66c84a880c4@arm.com>
-References: <20180502131441.28955-1-james.morse@arm.com>
+Subject: Re: [PATCH] KVM: arm/arm64: fix unaligned hva start and end in
+ handle_hva_to_gpa
+Date: Wed, 2 May 2018 15:26:19 +0100
+Message-ID: <04e6109f-cbbd-24b0-03bb-9247b930d42c@arm.com>
+References: <1525244911-5519-1-git-send-email-hejianet@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B949349F8C
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 May 2018 09:23:26 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PjjBMkdzEsO5 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 May 2018 09:23:04 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D6C684028A
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 May 2018 09:23:04 -0400 (EDT)
-In-Reply-To: <20180502131441.28955-1-james.morse@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1525244911-5519-1-git-send-email-hejianet@gmail.com>
 Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>, kvmarm@lists.cs.columbia.edu
+Sender: linux-kernel-owner@vger.kernel.org
+To: Jia He <hejianet@gmail.com>, Christoffer Dall <christoffer.dall@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: linux-kernel@vger.kernel.org, Jia He <jia.he@hxt-semitech.com>, li.zhang@hxt-semitech.com, Suzuki Poulose <Suzuki.Poulose@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 02/05/18 14:14, James Morse wrote:
-> A typo in kvm_vcpu_set_be()'s call:
-> | vcpu_write_sys_reg(vcpu, SCTLR_EL1, sctlr)
-> causes us to use the 32bit register value as an index into the sys_reg[]
-> array, and sail off the end of the linear map when we try to bring up
-> big-endian secondaries.
+[+ Suzuki]
+
+On 02/05/18 08:08, Jia He wrote:
+> From: Jia He <jia.he@hxt-semitech.com>
 > 
-> | Unable to handle kernel paging request at virtual address ffff80098b982c00
-> | Mem abort info:
-> |  ESR = 0x96000045
-> |  Exception class = DABT (current EL), IL = 32 bits
-> |   SET = 0, FnV = 0
-> |   EA = 0, S1PTW = 0
-> | Data abort info:
-> |   ISV = 0, ISS = 0x00000045
-> |   CM = 0, WnR = 1
-> | swapper pgtable: 4k pages, 48-bit VAs, pgdp = 000000002ea0571a
-> | [ffff80098b982c00] pgd=00000009ffff8803, pud=0000000000000000
-> | Internal error: Oops: 96000045 [#1] PREEMPT SMP
-> | Modules linked in:
-> | CPU: 2 PID: 1561 Comm: kvm-vcpu-0 Not tainted 4.17.0-rc3-00001-ga912e2261ca6-dirty #1323
-> | Hardware name: ARM Juno development board (r1) (DT)
-> | pstate: 60000005 (nZCv daif -PAN -UAO)
-> | pc : vcpu_write_sys_reg+0x50/0x134
-> | lr : vcpu_write_sys_reg+0x50/0x134
+> In our armv8a server (QDF2400), I noticed a WARN_ON as follows:
 > 
-> | Process kvm-vcpu-0 (pid: 1561, stack limit = 0x000000006df4728b)
-> | Call trace:
-> |  vcpu_write_sys_reg+0x50/0x134
-> |  kvm_psci_vcpu_on+0x14c/0x150
-> |  kvm_psci_0_2_call+0x244/0x2a4
-> |  kvm_hvc_call_handler+0x1cc/0x258
-> |  handle_hvc+0x20/0x3c
-> |  handle_exit+0x130/0x1ec
-> |  kvm_arch_vcpu_ioctl_run+0x340/0x614
-> |  kvm_vcpu_ioctl+0x4d0/0x840
-> |  do_vfs_ioctl+0xc8/0x8d0
-> |  ksys_ioctl+0x78/0xa8
-> |  sys_ioctl+0xc/0x18
-> |  el0_svc_naked+0x30/0x34
-> | Code: 73620291 604d00b0 00201891 1ab10194 (957a33f8)
-> |---[ end trace 4b4a4f9628596602 ]---
+> [  800.202850] WARNING: CPU: 33 PID: 255 at arch/arm64/kvm/../../../virt/kvm/arm/mmu.c:1670 kvm_age_hva_handler+0xcc/0xd4
+
+Which kernel version is that? I don't have a WARN_ON() at this line in
+4.17. Do you have a reproducer?
+
+> [  800.213535] Modules linked in: vhost_net vhost tap xt_CHECKSUM ipt_MASQUERADE nf_nat_masquerade_ipv4 ip6t_rpfilter ipt_REJECT nf_reject_ipv4 ip6t_REJECT nf_reject_ipv6 xt_conntrack ip_set nfnetlink ebtable_nat ebtable_broute bridge stp llc ip6table_nat nf_conntrack_ipv6 nf_defrag_ipv6 nf_nat_ipv6 ip6table_mangle ip6table_security ip6table_raw iptable_nat nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat_ipv4 nf_nat nf_conntrack iptable_mangle iptable_security iptable_raw ebtable_filter ebtables ip6table_filter ip6_tables iptable_filter rpcrdma ib_isert iscsi_target_mod ib_iser libiscsi scsi_transport_iscsi ib_srpt target_core_mod ib_srp scsi_transport_srp ib_ipoib rdma_ucm ib_ucm ib_uverbs ib_umad rdma_cm ib_cm vfat fat iw_cm mlx5_ib ib_core dm_mirror dm_region_hash dm_log dm_mod crc32_ce ipmi_
+ ssif sg nfsd
+> [  800.284115]  auth_rpcgss nfs_acl lockd grace sunrpc ip_tables xfs libcrc32c mlx5_core ixgbe mlxfw devlink mdio ahci_platform libahci_platform qcom_emac libahci hdma hdma_mgmt i2c_qup
+> [  800.300382] CPU: 33 PID: 255 Comm: khugepaged Tainted: G        W       4.14.36+ #6
+> [  800.308030] Hardware name: <snip for confidential issues>
+
+Well, that's QDF2400, right? ;-)
+
+> [  800.318717] task: ffff8017c949c000 task.stack: ffff8017c9498000
+> [  800.324629] PC is at kvm_age_hva_handler+0xcc/0xd4
+> [  800.329412] LR is at handle_hva_to_gpa+0xec/0x15c
+> [  800.334109] pc : [<ffff0000080b4f2c>] lr : [<ffff0000080b4838>] pstate: 20400145
+> [  800.341496] sp : ffff8017c949b260
+> [  800.344804] x29: ffff8017c949b260 x28: ffff801663e25008
+> [  800.350110] x27: 0000000000020000 x26: 00000001fb1a0000
+> [  800.355416] x25: 0000ffff605b0200 x24: 0000ffff605a0200
+> [  800.360722] x23: 0000000000000000 x22: 000000000000ffff
+> [  800.366028] x21: 00000001fb1a0000 x20: ffff8017c085a000
+> [  800.371334] x19: ffff801663e20008 x18: 0000000000000000
+> [  800.376641] x17: 0000000000000000 x16: 0000000000000000
+> [  800.381947] x15: 0000000000000000 x14: 3d646e655f617668
+> [  800.387254] x13: 2c30303230623530 x12: 36666666663d646e
+> [  800.392560] x11: 652c303032306135 x10: 3036666666663d74
+> [  800.397867] x9 : 0000000000003796 x8 : 655f6e66672c3030
+> [  800.403173] x7 : ffff00000859434c x6 : ffff8017f9c30cb8
+> [  800.408479] x5 : ffff8017f9c30cb8 x4 : ffff0000080b4e60
+> [  800.413786] x3 : 0000000000000000 x2 : 0000000000020000
+> [  800.419092] x1 : 00000001fb1a0000 x0 : 0000000020000000
+> [  800.424398] Call trace:
+> [  800.426838] Exception stack(0xffff8017c949b120 to 0xffff8017c949b260)
+> [  800.433272] b120: 0000000020000000 00000001fb1a0000 0000000000020000 0000000000000000
+> [  800.441095] b140: ffff0000080b4e60 ffff8017f9c30cb8 ffff8017f9c30cb8 ffff00000859434c
+> [  800.448918] b160: 655f6e66672c3030 0000000000003796 3036666666663d74 652c303032306135
+> [  800.456740] b180: 36666666663d646e 2c30303230623530 3d646e655f617668 0000000000000000
+> [  800.464563] b1a0: 0000000000000000 0000000000000000 0000000000000000 ffff801663e20008
+> [  800.472385] b1c0: ffff8017c085a000 00000001fb1a0000 000000000000ffff 0000000000000000
+> [  800.480208] b1e0: 0000ffff605a0200 0000ffff605b0200 00000001fb1a0000 0000000000020000
+> [  800.488030] b200: ffff801663e25008 ffff8017c949b260 ffff0000080b4838 ffff8017c949b260
+> [  800.495853] b220: ffff0000080b4f2c 0000000020400145 0000000000000001 ffff8017c949b2a0
+> [  800.503676] b240: ffffffffffffffff ffff8017c949b260 ffff8017c949b260 ffff0000080b4f2c
+> [  800.511498] [<ffff0000080b4f2c>] kvm_age_hva_handler+0xcc/0xd4
+> [  800.517324] [<ffff0000080b4838>] handle_hva_to_gpa+0xec/0x15c
+> [  800.523063] [<ffff0000080b6c5c>] kvm_age_hva+0x5c/0xcc
+> [  800.528194] [<ffff0000080a7c3c>] kvm_mmu_notifier_clear_flush_young+0x54/0x90
+> [  800.535324] [<ffff00000827a0e8>] __mmu_notifier_clear_flush_young+0x6c/0xa8
+> [  800.542279] [<ffff00000825a644>] page_referenced_one+0x1e0/0x1fc
+> [  800.548279] [<ffff00000827e8f8>] rmap_walk_ksm+0x124/0x1a0
+> [  800.553759] [<ffff00000825c974>] rmap_walk+0x94/0x98
+> [  800.558717] [<ffff00000825ca98>] page_referenced+0x120/0x180
+> [  800.564369] [<ffff000008228c58>] shrink_active_list+0x218/0x4a4
+> [  800.570281] [<ffff000008229470>] shrink_node_memcg+0x58c/0x6fc
+> [  800.576107] [<ffff0000082296c4>] shrink_node+0xe4/0x328
+> [  800.581325] [<ffff000008229c9c>] do_try_to_free_pages+0xe4/0x3b8
+> [  800.587324] [<ffff00000822a094>] try_to_free_pages+0x124/0x234
+> [  800.593150] [<ffff000008216aa0>] __alloc_pages_nodemask+0x564/0xf7c
+> [  800.599412] [<ffff000008292814>] khugepaged_alloc_page+0x38/0xb8
+> [  800.605411] [<ffff0000082933bc>] collapse_huge_page+0x74/0xd70
+> [  800.611238] [<ffff00000829470c>] khugepaged_scan_mm_slot+0x654/0xa98
+> [  800.617585] [<ffff000008294e0c>] khugepaged+0x2bc/0x49c
+> [  800.622803] [<ffff0000080ffb70>] kthread+0x124/0x150
+> [  800.627762] [<ffff0000080849f0>] ret_from_fork+0x10/0x1c
+> [  800.633066] ---[ end trace 944c130b5252fb01 ]---
+> -------------------------------------------------------------------------
 > 
-> Fix the order of the arguments.
+> The root cause might be: we can't guarantee that the parameter start and end
+> in handle_hva_to_gpa is PAGE_SIZE aligned, let alone hva_start and hva_end.
+
+So why not aligning them the first place?
+
 > 
-> Fixes: 8d404c4c24613 ("KVM: arm64: Rewrite system register accessors to read/write functions")
-> Signed-off-by: James Morse <james.morse@arm.com>
+> This bug is introduced by commit 056aad67f836 ("kvm: arm/arm64: Rework gpa
+> callback handlers")
+> 
+> It fixes the bug by use pfn size converted.
+> 
+> Fixes: 056aad67f836 ("kvm: arm/arm64: Rework gpa callback handlers")
+> 
+> Signed-off-by: jia.he@hxt-semitech.com
+> Signed-off-by: li.zhang@hxt-semitech.com
 > ---
-> I tried switching vcpu_write_sys_reg() to use the enum to catch this, but the
-> compiler doesn't care, looks like its a c++ ism. (and I can't get sparse to
-> run over virt/kvm/arm as there is no Makefile in there).
+>  virt/kvm/arm/mmu.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
 > 
->  arch/arm64/include/asm/kvm_emulate.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 23b33e8ea03a..1dab3a984608 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -333,7 +333,7 @@ static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
->  	} else {
->  		u64 sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
->  		sctlr |= (1 << 25);
-> -		vcpu_write_sys_reg(vcpu, SCTLR_EL1, sctlr);
-> +		vcpu_write_sys_reg(vcpu, sctlr, SCTLR_EL1);
->  	}
->  }
+> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> index 7f6a944..9dd7ae4 100644
+> --- a/virt/kvm/arm/mmu.c
+> +++ b/virt/kvm/arm/mmu.c
+> @@ -1744,7 +1744,7 @@ static int handle_hva_to_gpa(struct kvm *kvm,
+>  	/* we only care about the pages that the guest sees */
+>  	kvm_for_each_memslot(memslot, slots) {
+>  		unsigned long hva_start, hva_end;
+> -		gfn_t gpa;
+> +		gpa_t gpa, gpa_end;
 >  
+>  		hva_start = max(start, memslot->userspace_addr);
+>  		hva_end = min(end, memslot->userspace_addr +
+> @@ -1753,7 +1753,9 @@ static int handle_hva_to_gpa(struct kvm *kvm,
+>  			continue;
+>  
+>  		gpa = hva_to_gfn_memslot(hva_start, memslot) << PAGE_SHIFT;
+> -		ret |= handler(kvm, gpa, (u64)(hva_end - hva_start), data);
+> +		gpa_end = hva_to_gfn_memslot(hva_end + PAGE_SIZE - 1, memslot)
+> +							 << PAGE_SHIFT;
+> +		ret |= handler(kvm, gpa, (u64)(gpa_end - gpa), data);
+
+But we're looking for the mapping in the same memslot, so the distance
+between hva and hva_end is the same as the one between gpa and gpa_end
+if you didn't align it.
+
+So why not align both start and end and skip the double lookup?
+
+>  	}
+>  
+>  	return ret;
+> @@ -1823,7 +1825,7 @@ static int kvm_age_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *data)
+>  	pmd_t *pmd;
+>  	pte_t *pte;
+>  
+> -	WARN_ON(size != PAGE_SIZE && size != PMD_SIZE);
+> +	WARN_ON((size & ~PAGE_MASK) != 0);
+>  	pmd = stage2_get_pmd(kvm, NULL, gpa);
+>  	if (!pmd || pmd_none(*pmd))	/* Nothing there */
+>  		return 0;
+> @@ -1843,7 +1845,7 @@ static int kvm_test_age_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *
+>  	pmd_t *pmd;
+>  	pte_t *pte;
+>  
+> -	WARN_ON(size != PAGE_SIZE && size != PMD_SIZE);
+> +	WARN_ON((size & ~PAGE_MASK) != 0);
+>  	pmd = stage2_get_pmd(kvm, NULL, gpa);
+>  	if (!pmd || pmd_none(*pmd))	/* Nothing there */
+>  		return 0;
 > 
 
-Nice catch. I've queued it with a number of other things. It'd be good
-to have a way to catch that at compile time, but that's for another day.
+I'll let Suzuki comment on this, but I'm a bit suspicious of this patch.
 
 Thanks,
 
