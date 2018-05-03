@@ -1,7 +1,7 @@
 From: Mark Rutland <mark.rutland@arm.com>
-Subject: [PATCHv4 03/10] arm64/kvm: hide ptrauth from guests
-Date: Thu,  3 May 2018 14:20:24 +0100
-Message-ID: <20180503132031.25705-4-mark.rutland@arm.com>
+Subject: [PATCHv4 05/10] arm64/cpufeature: detect pointer authentication
+Date: Thu,  3 May 2018 14:20:26 +0100
+Message-ID: <20180503132031.25705-6-mark.rutland@arm.com>
 References: <20180503132031.25705-1-mark.rutland@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20180503132031.25705-1-mark.rutland@arm.com>
@@ -10,80 +10,121 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, catalin.marinas@arm.com, christoffer.dall@arm.com, drjones@redhat.com, marc.zyngier@arm.com, mark.rutland@arm.com, ramana.radhakrishnan@arm.com, suzuki.poulose@arm.com, will.deacon@arm.com, awallis@codeaurora.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In subsequent patches we're going to expose ptrauth to the host kernel
-and userspace, but things are a bit trickier for guest kernels. For the
-time being, let's hide ptrauth from KVM guests.
+So that we can dynamically handle the presence of pointer authentication
+functionality, wire up probing code in cpufeature.c.
 
-Regardless of how well-behaved the guest kernel is, guest userspace
-could attempt to use ptrauth instructions, triggering a trap to EL2,
-resulting in noise from kvm_handle_unknown_ec(). So let's write up a
-handler for the PAC trap, which silently injects an UNDEF into the
-guest, as if the feature were really missing.
+>From ARMv8.3 onwards, ID_AA64ISAR1 is no longer entirely RES0, and now
+has four fields describing the presence of pointer authentication
+functionality:
+
+* APA - address authentication present, using an architected algorithm
+* API - address authentication present, using an IMP DEF algorithm
+* GPA - generic authentication present, using an architected algorithm
+* GPI - generic authentication present, using an IMP DEF algorithm
+
+For the moment we only care about address authentication, so we only
+need to check APA and API. It is assumed that if all CPUs support an IMP
+DEF algorithm, the same algorithm is used across all CPUs.
+
+Note that when we implement KVM support, we will also need to ensure
+that CPUs have uniform support for GPA and GPI.
 
 Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
 ---
- arch/arm64/kvm/handle_exit.c | 18 ++++++++++++++++++
- arch/arm64/kvm/sys_regs.c    |  8 ++++++++
- 2 files changed, 26 insertions(+)
+ arch/arm64/include/asm/cpucaps.h |  5 ++++-
+ arch/arm64/kernel/cpufeature.c   | 47 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 51 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index e5e741bfffe1..5114ad691eae 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -173,6 +173,23 @@ static int handle_sve(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	return 1;
- }
+diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+index bc51b72fafd4..9dcb4d1b14f5 100644
+--- a/arch/arm64/include/asm/cpucaps.h
++++ b/arch/arm64/include/asm/cpucaps.h
+@@ -48,7 +48,10 @@
+ #define ARM64_HAS_CACHE_IDC			27
+ #define ARM64_HAS_CACHE_DIC			28
+ #define ARM64_HW_DBM				29
++#define ARM64_HAS_ADDRESS_AUTH_ARCH		30
++#define ARM64_HAS_ADDRESS_AUTH_IMP_DEF		31
++#define ARM64_HAS_ADDRESS_AUTH			32
  
-+/*
-+ * Guest usage of a ptrauth instruction (which the guest EL1 did not turn into
-+ * a NOP), or guest EL1 access to a ptrauth register.
-+ */
-+static int kvm_handle_ptrauth(struct kvm_vcpu *vcpu, struct kvm_run *run)
+-#define ARM64_NCAPS				30
++#define ARM64_NCAPS				33
+ 
+ #endif /* __ASM_CPUCAPS_H */
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 536d572e5596..01b1a7e7d70f 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -142,6 +142,10 @@ static const struct arm64_ftr_bits ftr_id_aa64isar1[] = {
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_LRCPC_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_FCMA_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_JSCVT_SHIFT, 4, 0),
++	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
++		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_API_SHIFT, 4, 0),
++	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
++		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_APA_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_DPB_SHIFT, 4, 0),
+ 	ARM64_FTR_END,
+ };
+@@ -1025,6 +1029,22 @@ static void cpu_copy_el2regs(const struct arm64_cpu_capabilities *__unused)
+ }
+ #endif
+ 
++#ifdef CONFIG_ARM64_PTR_AUTH
++static bool has_address_auth(const struct arm64_cpu_capabilities *entry,
++			     int __unused)
 +{
-+	/*
-+	 * We don't currently suport ptrauth in a guest, and we mask the ID
-+	 * registers to prevent well-behaved guests from trying to make use of
-+	 * it.
-+	 *
-+	 * Inject an UNDEF, as if the feature really isn't present.
-+	 */
-+	kvm_inject_undefined(vcpu);
-+	return 1;
-+}
++	u64 isar1 = read_sanitised_ftr_reg(SYS_ID_AA64ISAR1_EL1);
++	bool api, apa;
 +
- static exit_handle_fn arm_exit_handlers[] = {
- 	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
- 	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
-@@ -195,6 +212,7 @@ static exit_handle_fn arm_exit_handlers[] = {
- 	[ESR_ELx_EC_BKPT32]	= kvm_handle_guest_debug,
- 	[ESR_ELx_EC_BRK64]	= kvm_handle_guest_debug,
- 	[ESR_ELx_EC_FP_ASIMD]	= handle_no_fpsimd,
-+	[ESR_ELx_EC_PAC]	= kvm_handle_ptrauth,
++	apa = cpuid_feature_extract_unsigned_field(isar1,
++					ID_AA64ISAR1_APA_SHIFT) > 0;
++	api = cpuid_feature_extract_unsigned_field(isar1,
++					ID_AA64ISAR1_API_SHIFT) > 0;
++
++	return apa || api;
++}
++#endif /* CONFIG_ARM64_PTR_AUTH */
++
+ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 	{
+ 		.desc = "GIC system register CPU interface",
+@@ -1201,6 +1221,33 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.cpu_enable = cpu_enable_hw_dbm,
+ 	},
+ #endif
++#ifdef CONFIG_ARM64_PTR_AUTH
++	{
++		.desc = "Address authentication (architected algorithm)",
++		.capability = ARM64_HAS_ADDRESS_AUTH_ARCH,
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.sys_reg = SYS_ID_AA64ISAR1_EL1,
++		.sign = FTR_UNSIGNED,
++		.field_pos = ID_AA64ISAR1_APA_SHIFT,
++		.min_field_value = ID_AA64ISAR1_APA_ARCHITECTED,
++		.matches = has_cpuid_feature,
++	},
++	{
++		.desc = "Address authentication (IMP DEF algorithm)",
++		.capability = ARM64_HAS_ADDRESS_AUTH_IMP_DEF,
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.sys_reg = SYS_ID_AA64ISAR1_EL1,
++		.sign = FTR_UNSIGNED,
++		.field_pos = ID_AA64ISAR1_API_SHIFT,
++		.min_field_value = ID_AA64ISAR1_API_IMP_DEF,
++		.matches = has_cpuid_feature,
++	},
++	{
++		.capability = ARM64_HAS_ADDRESS_AUTH,
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.matches = has_address_auth,
++	},
++#endif /* CONFIG_ARM64_PTR_AUTH */
+ 	{},
  };
  
- static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 806b0b126a64..8b0dfc00bf5e 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1000,6 +1000,14 @@ static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
- 				    task_pid_nr(current));
- 
- 		val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
-+	} else if (id == SYS_ID_AA64ISAR1_EL1) {
-+		const u64 ptrauth_mask = (0xfUL << ID_AA64ISAR1_APA_SHIFT) |
-+					 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
-+					 (0xfUL << ID_AA64ISAR1_GPA_SHIFT) |
-+					 (0xfUL << ID_AA64ISAR1_GPI_SHIFT);
-+		if (val & ptrauth_mask)
-+			kvm_debug("ptrauth unsupported for guests, suppressing\n");
-+		val &= ~ptrauth_mask;
- 	} else if (id == SYS_ID_AA64MMFR1_EL1) {
- 		if (val & (0xfUL << ID_AA64MMFR1_LOR_SHIFT))
- 			pr_err_once("kvm [%i]: LORegions unsupported for guests, suppressing\n",
 -- 
 2.11.0
