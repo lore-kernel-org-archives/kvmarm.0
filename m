@@ -1,75 +1,153 @@
-From: "Kalra, Ashish" <Ashish.Kalra@cavium.com>
-Subject: Re: [kvm-unit-tests PATCH] arm64: add micro test
-Date: Thu, 3 May 2018 16:42:45 +0530
-Message-ID: <ff987fdf-4394-4058-9246-32d5be858290@cavium.com>
-References: <1513372539-10180-1-git-send-email-shihwei@cs.columbia.edu>
- <1513372539-10180-2-git-send-email-shihwei@cs.columbia.edu>
- <20171218191037.wjocr7jbf5ua2duj@hawk.localdomain>
- <20171220170030.zvz3oounirnlhcfi@hawk.localdomain>
- <61a11d00-cc9c-bc17-eec0-0296085026e7@cavium.com>
- <0ee505ca-9022-0ec9-6008-9e49fb723d88@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 869EF49FEA
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 May 2018 07:03:38 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hnXGFxAAyEZ4 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 May 2018 07:03:14 -0400 (EDT)
-Received: from NAM03-DM3-obe.outbound.protection.outlook.com
- (mail-dm3nam03on0078.outbound.protection.outlook.com [104.47.41.78])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 61961401CD
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 May 2018 07:03:14 -0400 (EDT)
-In-Reply-To: <0ee505ca-9022-0ec9-6008-9e49fb723d88@arm.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Andrew Jones <drjones@redhat.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
-Cc: pbonzini@redhat.com, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, kvm@vger.kernel.org, Christoffer Dall <cdall@kernel.org>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: [PATCHv4 00/10] ARMv8.3 pointer authentication userspace support
+Date: Thu,  3 May 2018 14:20:21 +0100
+Message-ID: <20180503132031.25705-1-mark.rutland@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, catalin.marinas@arm.com, christoffer.dall@arm.com, drjones@redhat.com, marc.zyngier@arm.com, mark.rutland@arm.com, ramana.radhakrishnan@arm.com, suzuki.poulose@arm.com, will.deacon@arm.com, awallis@codeaurora.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+This series adds support for the ARMv8.3 pointer authentication extension,
+enabling userspace return address protection with recent versions of GCC.
 
->> 
->> The reason for the problem you're seeing is probably that the
->> constraints are not quite right. Here, x0 is not simply clobbered, but
->> is actively written to in the middle of the sequence (it is at least an
->> early clobber). It is also, I assume, a result from the hypercall, so it
->> cannot simply be discarded.
->> 
->> It would help to get a disassembly of the function, but I'd tend to
->> rewrite the code as such:
->> 
->> extern int bar(void);
->> 
->> int foo(void)
->> {
->> 	register int w0 asm("w0");
->> 	int a, b;
->> 
->> 	a = bar();
->> 	w0 = 0x4b000000;
->> 	asm volatile("hvc #0" : "+r" (w0) :: );
->> 	b = bar();
->> 
->> 	return a - b;
->> }
+Since RFC [1]:
+* Make the KVM context switch (semi-lazy)
+* Rebase to v4.13-rc1
+* Improve pointer authentication documentation
+* Add hwcap documentation
+* Various minor cleanups
 
-There still is the issue of x1-x3 registers being used for local 
-variables and clobbering of the same across the "hvc" call.
+Since v1 [2]:
+* Rebase to v4.15-rc1
+* Settle on per-process keys
+* Strip PACs when unwinding userspace
+* Don't expose an XPAC hwcap (this is implied by ID registers)
+* Leave APIB, ABPDA, APDB, and APGA keys unsupported for now
+* Support IMP DEF algorithms
+* Rely on KVM ID register emulation
+* Various cleanups
 
-Comparatively, the fix below works more reliably :
+Since v2 [3]:
+* Unify HCR_EL2 initialization
+* s/POINTER_AUTHENTICATION/PTR_AUTH/
+* Drop KVM support (for now)
+* Drop detection of generic authentication
 
-asm volatile("hvc #0" : "+r" (w0) :: "x1","x2","x3");
+Since v3 [4]:
+* Drop KVM logging to kvm_debug()
+* Init keys in init_new_context()
+* Drop mm_hooks changes
+* Commit message cleanups
+* Minor formatting fixups
+* Fold in acks and other tags
+
+While there are use-cases for keys other than APIAKey, the only software that
+I'm aware of with pointer authentication support is GCC, which only makes use
+of APIAKey. I'm happy to add support for other keys as users appear.
+
+I've pushed the series to the arm64/pointer-auth branch [5] of my linux tree.
+The aarch64 bootwrapper [6] does the necessary EL3 setup.
+
+
+Extension Overview 
+==================
+
+The ARMv8.3 pointer authentication extension adds functionality to detect
+modification of pointer values, mitigating certain classes of attack such as
+stack smashing, and making return oriented programming attacks harder
+
+The extension introduces the concept of a pointer authentication code (PAC),
+which is stored in some upper bits of pointers. Each PAC is derived from the
+original pointer, another 64-bit value (e.g. the stack pointer), and a secret
+128-bit key.
+
+New instructions are added which can be used to:
+
+* Insert a PAC into a pointer
+* Strip a PAC from a pointer
+* Authenticate strip a PAC from a pointer
+
+If authentication succeeds, the code is removed, yielding the original pointer.
+If authentication fails, bits are set in the pointer such that it is guaranteed
+to cause a fault if used.
+
+These instructions can make use of four keys:
+
+* APIAKey (A.K.A. Instruction A key)
+* APIBKey (A.K.A. Instruction B key)
+* APDAKey (A.K.A. Data A key)
+* APDBKey (A.K.A. Data B Key)
+
+A subset of these instruction encodings have been allocated from the HINT
+space, and will operate as NOPs on any ARMv8-A parts which do not feature the
+extension (or if purposefully disabled by the kernel). Software using only this
+subset of the instructions should function correctly on all ARMv8-A parts.
+
+Additionally, instructions are added to authenticate small blocks of memory in
+similar fashion, using APGAKey (A.K.A. Generic key).
+
+
+This Series
+===========
+
+This series enables the use of instructions using APIAKey, which is initialised
+and maintained per-process (shared by all threads). This series does not add
+support for APIBKey, APDAKey, APDBKey, nor APGAKey.
+
+I've given this some basic testing with a homebrew test suite. More ideally,
+we'd add some tests to the kernel source tree.
+
+For the time being, pointer authentication functionality is hidden from
+guests via ID register trapping.
 
 Thanks,
-Ashish
+Mark.
+
+[1] http://lists.infradead.org/pipermail/linux-arm-kernel/2017-April/498941.html
+[2] https://lkml.kernel.org/r/1500480092-28480-1-git-send-email-mark.rutland@arm.com
+[3] https://lkml.kernel.org/r/20171127163806.31435-1-mark.rutland@arm.com
+[4] https://lkml.kernel.org/r/20180417183735.56985-1-mark.rutland@arm.com
+[5] git://git.kernel.org/pub/scm/linux/kernel/git/mark/linux.git arm64/pointer-auth
+[6] git://git.kernel.org/pub/scm/linux/kernel/git/mark/boot-wrapper-aarch64.git
+
+Mark Rutland (10):
+  arm64: add pointer authentication register bits
+  arm64/kvm: consistently handle host HCR_EL2 flags
+  arm64/kvm: hide ptrauth from guests
+  arm64: Don't trap host pointer auth use to EL2
+  arm64/cpufeature: detect pointer authentication
+  arm64: add basic pointer authentication support
+  arm64: expose user PAC bit positions via ptrace
+  arm64: perf: strip PAC when unwinding userspace
+  arm64: enable pointer authentication
+  arm64: docs: document pointer authentication
+
+ Documentation/arm64/booting.txt                |  8 +++
+ Documentation/arm64/elf_hwcaps.txt             |  6 ++
+ Documentation/arm64/pointer-authentication.txt | 84 ++++++++++++++++++++++++
+ arch/arm64/Kconfig                             | 23 +++++++
+ arch/arm64/include/asm/cpucaps.h               |  5 +-
+ arch/arm64/include/asm/esr.h                   |  3 +-
+ arch/arm64/include/asm/kvm_arm.h               |  3 +
+ arch/arm64/include/asm/mmu.h                   |  5 ++
+ arch/arm64/include/asm/mmu_context.h           | 11 +++-
+ arch/arm64/include/asm/pointer_auth.h          | 90 ++++++++++++++++++++++++++
+ arch/arm64/include/asm/sysreg.h                | 30 +++++++++
+ arch/arm64/include/uapi/asm/hwcap.h            |  1 +
+ arch/arm64/include/uapi/asm/ptrace.h           |  7 ++
+ arch/arm64/kernel/cpufeature.c                 | 56 ++++++++++++++++
+ arch/arm64/kernel/cpuinfo.c                    |  1 +
+ arch/arm64/kernel/head.S                       |  5 +-
+ arch/arm64/kernel/perf_callchain.c             |  5 +-
+ arch/arm64/kernel/ptrace.c                     | 38 +++++++++++
+ arch/arm64/kvm/handle_exit.c                   | 18 ++++++
+ arch/arm64/kvm/hyp/switch.c                    |  2 +-
+ arch/arm64/kvm/sys_regs.c                      |  8 +++
+ include/uapi/linux/elf.h                       |  1 +
+ 22 files changed, 402 insertions(+), 8 deletions(-)
+ create mode 100644 Documentation/arm64/pointer-authentication.txt
+ create mode 100644 arch/arm64/include/asm/pointer_auth.h
+
+-- 
+2.11.0
