@@ -1,174 +1,101 @@
 From: Mark Rutland <mark.rutland@arm.com>
-Subject: [PATCHv4 07/10] arm64: expose user PAC bit positions via ptrace
-Date: Thu,  3 May 2018 14:20:28 +0100
-Message-ID: <20180503132031.25705-8-mark.rutland@arm.com>
+Subject: [PATCHv4 02/10] arm64/kvm: consistently handle host HCR_EL2 flags
+Date: Thu,  3 May 2018 14:20:23 +0100
+Message-ID: <20180503132031.25705-3-mark.rutland@arm.com>
 References: <20180503132031.25705-1-mark.rutland@arm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E310B4A048
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 May 2018 09:11:20 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 5-WX9ZHsU2qi for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 May 2018 09:10:58 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F81E49F8C
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 May 2018 09:10:58 -0400 (EDT)
 In-Reply-To: <20180503132031.25705-1-mark.rutland@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, catalin.marinas@arm.com, christoffer.dall@arm.com, drjones@redhat.com, marc.zyngier@arm.com, mark.rutland@arm.com, ramana.radhakrishnan@arm.com, suzuki.poulose@arm.com, will.deacon@arm.com, awallis@codeaurora.org
+Cc: marc.zyngier@arm.com, catalin.marinas@arm.com, awallis@codeaurora.org, will.deacon@arm.com, linux-kernel@vger.kernel.org, ramana.radhakrishnan@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When pointer authentication is in use, data/instruction pointers have a
-number of PAC bits inserted into them. The number and position of these
-bits depends on the configured TCR_ELx.TxSZ and whether tagging is
-enabled. ARMv8.3 allows tagging to differ for instruction and data
-pointers.
+In KVM we define the configuration of HCR_EL2 for a VHE HOST in
+HCR_HOST_VHE_FLAGS, but we don't have a similar definition for the
+non-VHE host flags, and open-code HCR_RW. Further, in head.S we
+open-code the flags for VHE and non-VHE configurations.
 
-For userspace debuggers to unwind the stack and/or to follow pointer
-chains, they need to be able to remove the PAC bits before attempting to
-use a pointer.
+In future, we're going to want to configure more flags for the host, so
+lets add a HCR_HOST_NVHE_FLAGS defintion, and consistently use both
+HCR_HOST_VHE_FLAGS and HCR_HOST_NVHE_FLAGS in the kvm code and head.S.
 
-This patch adds a new structure with masks describing the location of
-the PAC bits in userspace instruction and data pointers (i.e. those
-addressable via TTBR0), which userspace can query via PTRACE_GETREGSET.
-By clearing these bits from pointers (and replacing them with the value
-of bit 55), userspace can acquire the PAC-less versions.
-
-This new regset is exposed when the kernel is built with (user) pointer
-authentication support, and the feature is enabled. Otherwise, it is
-hidden.
+We now use mov_q to generate the HCR_EL2 value, as we use when
+configuring other registers in head.S.
 
 Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Will Deacon <will.deacon@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu
 ---
- arch/arm64/include/asm/pointer_auth.h |  8 ++++++++
- arch/arm64/include/uapi/asm/ptrace.h  |  7 +++++++
- arch/arm64/kernel/ptrace.c            | 38 +++++++++++++++++++++++++++++++++++
- include/uapi/linux/elf.h              |  1 +
- 4 files changed, 54 insertions(+)
+ arch/arm64/include/asm/kvm_arm.h | 1 +
+ arch/arm64/kernel/head.S         | 5 ++---
+ arch/arm64/kvm/hyp/switch.c      | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/include/asm/pointer_auth.h b/arch/arm64/include/asm/pointer_auth.h
-index 034877ee28bc..0263b87f95f7 100644
---- a/arch/arm64/include/asm/pointer_auth.h
-+++ b/arch/arm64/include/asm/pointer_auth.h
-@@ -2,9 +2,11 @@
- #ifndef __ASM_POINTER_AUTH_H
- #define __ASM_POINTER_AUTH_H
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 6dd285e979c9..89b3dda7e3cb 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -86,6 +86,7 @@
+ 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
+ 			 HCR_FMO | HCR_IMO)
+ #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
++#define HCR_HOST_NVHE_FLAGS (HCR_RW)
+ #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
  
-+#include <linux/bitops.h>
- #include <linux/random.h>
+ /* TCR_EL2 Registers bits */
+diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+index b0853069702f..651a06b1980f 100644
+--- a/arch/arm64/kernel/head.S
++++ b/arch/arm64/kernel/head.S
+@@ -494,10 +494,9 @@ ENTRY(el2_setup)
+ #endif
  
- #include <asm/cpufeature.h>
-+#include <asm/memory.h>
- #include <asm/sysreg.h>
+ 	/* Hyp configuration. */
+-	mov	x0, #HCR_RW			// 64-bit EL1
++	mov_q	x0, HCR_HOST_NVHE_FLAGS
+ 	cbz	x2, set_hcr
+-	orr	x0, x0, #HCR_TGE		// Enable Host Extensions
+-	orr	x0, x0, #HCR_E2H
++	mov_q	x0, HCR_HOST_VHE_FLAGS
+ set_hcr:
+ 	msr	hcr_el2, x0
+ 	isb
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index d9645236e474..cdae330e15e9 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -143,7 +143,7 @@ static void __hyp_text __deactivate_traps_nvhe(void)
+ 	mdcr_el2 |= MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT;
  
- #ifdef CONFIG_ARM64_PTR_AUTH
-@@ -57,6 +59,12 @@ static inline void ptrauth_keys_dup(struct ptrauth_keys *old,
- 	*new = *old;
+ 	write_sysreg(mdcr_el2, mdcr_el2);
+-	write_sysreg(HCR_RW, hcr_el2);
++	write_sysreg(HCR_HOST_NVHE_FLAGS, hcr_el2);
+ 	write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
  }
  
-+/*
-+ * The EL0 pointer bits used by a pointer authentication code.
-+ * This is dependent on TBI0 being enabled, or bits 63:56 would also apply.
-+ */
-+#define ptrauth_pac_mask() 	GENMASK(54, VA_BITS)
-+
- #define mm_ctx_ptrauth_init(ctx) \
- 	ptrauth_keys_init(&(ctx)->ptrauth_keys)
- 
-diff --git a/arch/arm64/include/uapi/asm/ptrace.h b/arch/arm64/include/uapi/asm/ptrace.h
-index 98c4ce55d9c3..4994d718771a 100644
---- a/arch/arm64/include/uapi/asm/ptrace.h
-+++ b/arch/arm64/include/uapi/asm/ptrace.h
-@@ -228,6 +228,13 @@ struct user_sve_header {
- 		  SVE_PT_SVE_OFFSET + SVE_PT_SVE_SIZE(vq, flags)	\
- 		: SVE_PT_FPSIMD_OFFSET + SVE_PT_FPSIMD_SIZE(vq, flags))
- 
-+/* pointer authentication masks (NT_ARM_PAC_MASK) */
-+
-+struct user_pac_mask {
-+	__u64		data_mask;
-+	__u64		insn_mask;
-+};
-+
- #endif /* __ASSEMBLY__ */
- 
- #endif /* _UAPI__ASM_PTRACE_H */
-diff --git a/arch/arm64/kernel/ptrace.c b/arch/arm64/kernel/ptrace.c
-index 71d99af24ef2..f395649f755e 100644
---- a/arch/arm64/kernel/ptrace.c
-+++ b/arch/arm64/kernel/ptrace.c
-@@ -44,6 +44,7 @@
- #include <asm/cpufeature.h>
- #include <asm/debug-monitors.h>
- #include <asm/pgtable.h>
-+#include <asm/pointer_auth.h>
- #include <asm/stacktrace.h>
- #include <asm/syscall.h>
- #include <asm/traps.h>
-@@ -951,6 +952,30 @@ static int sve_set(struct task_struct *target,
- 
- #endif /* CONFIG_ARM64_SVE */
- 
-+#ifdef CONFIG_ARM64_PTR_AUTH
-+static int pac_mask_get(struct task_struct *target,
-+			const struct user_regset *regset,
-+			unsigned int pos, unsigned int count,
-+			void *kbuf, void __user *ubuf)
-+{
-+	/*
-+	 * The PAC bits can differ across data and instruction pointers
-+	 * depending on TCR_EL1.TBID*, which we may make use of in future, so
-+	 * we expose separate masks.
-+	 */
-+	unsigned long mask = ptrauth_pac_mask();
-+	struct user_pac_mask uregs = {
-+		.data_mask = mask,
-+		.insn_mask = mask,
-+	};
-+
-+	if (!cpus_have_cap(ARM64_HAS_ADDRESS_AUTH))
-+		return -EINVAL;
-+
-+	return user_regset_copyout(&pos, &count, &kbuf, &ubuf, &uregs, 0, -1);
-+}
-+#endif /* CONFIG_ARM64_PTR_AUTH */
-+
- enum aarch64_regset {
- 	REGSET_GPR,
- 	REGSET_FPR,
-@@ -963,6 +988,9 @@ enum aarch64_regset {
- #ifdef CONFIG_ARM64_SVE
- 	REGSET_SVE,
- #endif
-+#ifdef CONFIG_ARM64_PTR_AUTH
-+	REGSET_PAC_MASK,
-+#endif
- };
- 
- static const struct user_regset aarch64_regsets[] = {
-@@ -1032,6 +1060,16 @@ static const struct user_regset aarch64_regsets[] = {
- 		.get_size = sve_get_size,
- 	},
- #endif
-+#ifdef CONFIG_ARM64_PTR_AUTH
-+	[REGSET_PAC_MASK] = {
-+		.core_note_type = NT_ARM_PAC_MASK,
-+		.n = sizeof(struct user_pac_mask) / sizeof(u64),
-+		.size = sizeof(u64),
-+		.align = sizeof(u64),
-+		.get = pac_mask_get,
-+		/* this cannot be set dynamically */
-+	},
-+#endif
- };
- 
- static const struct user_regset_view user_aarch64_view = {
-diff --git a/include/uapi/linux/elf.h b/include/uapi/linux/elf.h
-index e2535d6dcec7..070c28121979 100644
---- a/include/uapi/linux/elf.h
-+++ b/include/uapi/linux/elf.h
-@@ -420,6 +420,7 @@ typedef struct elf64_shdr {
- #define NT_ARM_HW_WATCH	0x403		/* ARM hardware watchpoint registers */
- #define NT_ARM_SYSTEM_CALL	0x404	/* ARM system call number */
- #define NT_ARM_SVE	0x405		/* ARM Scalable Vector Extension registers */
-+#define NT_ARM_PAC_MASK		0x406	/* ARM pointer authentication code masks */
- #define NT_ARC_V2	0x600		/* ARCv2 accumulator/extra registers */
- 
- /* Note header in a PT_NOTE section */
 -- 
 2.11.0
