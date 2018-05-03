@@ -1,7 +1,7 @@
 From: Mark Rutland <mark.rutland@arm.com>
-Subject: [PATCHv4 01/10] arm64: add pointer authentication register bits
-Date: Thu,  3 May 2018 14:20:22 +0100
-Message-ID: <20180503132031.25705-2-mark.rutland@arm.com>
+Subject: [PATCHv4 03/10] arm64/kvm: hide ptrauth from guests
+Date: Thu,  3 May 2018 14:20:24 +0100
+Message-ID: <20180503132031.25705-4-mark.rutland@arm.com>
 References: <20180503132031.25705-1-mark.rutland@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20180503132031.25705-1-mark.rutland@arm.com>
@@ -10,108 +10,80 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, catalin.marinas@arm.com, christoffer.dall@arm.com, drjones@redhat.com, marc.zyngier@arm.com, mark.rutland@arm.com, ramana.radhakrishnan@arm.com, suzuki.poulose@arm.com, will.deacon@arm.com, awallis@codeaurora.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The ARMv8.3 pointer authentication extension adds:
+In subsequent patches we're going to expose ptrauth to the host kernel
+and userspace, but things are a bit trickier for guest kernels. For the
+time being, let's hide ptrauth from KVM guests.
 
-* New fields in ID_AA64ISAR1 to report the presence of pointer
-  authentication functionality.
-
-* New control bits in SCTLR_ELx to enable this functionality.
-
-* New system registers to hold the keys necessary for this
-  functionality.
-
-* A new ESR_ELx.EC code used when the new instructions are affected by
-  configurable traps
-
-This patch adds the relevant definitions to <asm/sysreg.h> and
-<asm/esr.h> for these, to be used by subsequent patches.
+Regardless of how well-behaved the guest kernel is, guest userspace
+could attempt to use ptrauth instructions, triggering a trap to EL2,
+resulting in noise from kvm_handle_unknown_ec(). So let's write up a
+handler for the PAC trap, which silently injects an UNDEF into the
+guest, as if the feature were really missing.
 
 Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
 Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Will Deacon <will.deacon@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu
 ---
- arch/arm64/include/asm/esr.h    |  3 ++-
- arch/arm64/include/asm/sysreg.h | 30 ++++++++++++++++++++++++++++++
- 2 files changed, 32 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/handle_exit.c | 18 ++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c    |  8 ++++++++
+ 2 files changed, 26 insertions(+)
 
-diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-index ce70c3ffb993..022785162281 100644
---- a/arch/arm64/include/asm/esr.h
-+++ b/arch/arm64/include/asm/esr.h
-@@ -30,7 +30,8 @@
- #define ESR_ELx_EC_CP14_LS	(0x06)
- #define ESR_ELx_EC_FP_ASIMD	(0x07)
- #define ESR_ELx_EC_CP10_ID	(0x08)
--/* Unallocated EC: 0x09 - 0x0B */
-+#define ESR_ELx_EC_PAC		(0x09)
-+/* Unallocated EC: 0x0A - 0x0B */
- #define ESR_ELx_EC_CP14_64	(0x0C)
- /* Unallocated EC: 0x0d */
- #define ESR_ELx_EC_ILL		(0x0E)
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 6171178075dc..426f0eb90101 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -171,6 +171,19 @@
- #define SYS_TTBR1_EL1			sys_reg(3, 0, 2, 0, 1)
- #define SYS_TCR_EL1			sys_reg(3, 0, 2, 0, 2)
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index e5e741bfffe1..5114ad691eae 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -173,6 +173,23 @@ static int handle_sve(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	return 1;
+ }
  
-+#define SYS_APIAKEYLO_EL1		sys_reg(3, 0, 2, 1, 0)
-+#define SYS_APIAKEYHI_EL1		sys_reg(3, 0, 2, 1, 1)
-+#define SYS_APIBKEYLO_EL1		sys_reg(3, 0, 2, 1, 2)
-+#define SYS_APIBKEYHI_EL1		sys_reg(3, 0, 2, 1, 3)
++/*
++ * Guest usage of a ptrauth instruction (which the guest EL1 did not turn into
++ * a NOP), or guest EL1 access to a ptrauth register.
++ */
++static int kvm_handle_ptrauth(struct kvm_vcpu *vcpu, struct kvm_run *run)
++{
++	/*
++	 * We don't currently suport ptrauth in a guest, and we mask the ID
++	 * registers to prevent well-behaved guests from trying to make use of
++	 * it.
++	 *
++	 * Inject an UNDEF, as if the feature really isn't present.
++	 */
++	kvm_inject_undefined(vcpu);
++	return 1;
++}
 +
-+#define SYS_APDAKEYLO_EL1		sys_reg(3, 0, 2, 2, 0)
-+#define SYS_APDAKEYHI_EL1		sys_reg(3, 0, 2, 2, 1)
-+#define SYS_APDBKEYLO_EL1		sys_reg(3, 0, 2, 2, 2)
-+#define SYS_APDBKEYHI_EL1		sys_reg(3, 0, 2, 2, 3)
-+
-+#define SYS_APGAKEYLO_EL1		sys_reg(3, 0, 2, 3, 0)
-+#define SYS_APGAKEYHI_EL1		sys_reg(3, 0, 2, 3, 1)
-+
- #define SYS_ICC_PMR_EL1			sys_reg(3, 0, 4, 6, 0)
+ static exit_handle_fn arm_exit_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
+ 	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
+@@ -195,6 +212,7 @@ static exit_handle_fn arm_exit_handlers[] = {
+ 	[ESR_ELx_EC_BKPT32]	= kvm_handle_guest_debug,
+ 	[ESR_ELx_EC_BRK64]	= kvm_handle_guest_debug,
+ 	[ESR_ELx_EC_FP_ASIMD]	= handle_no_fpsimd,
++	[ESR_ELx_EC_PAC]	= kvm_handle_ptrauth,
+ };
  
- #define SYS_AFSR0_EL1			sys_reg(3, 0, 5, 1, 0)
-@@ -417,9 +430,13 @@
- #define SYS_ICH_LR15_EL2		__SYS__LR8_EL2(7)
+ static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 806b0b126a64..8b0dfc00bf5e 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1000,6 +1000,14 @@ static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
+ 				    task_pid_nr(current));
  
- /* Common SCTLR_ELx flags. */
-+#define SCTLR_ELx_ENIA	(1 << 31)
-+#define SCTLR_ELx_ENIB	(1 << 30)
-+#define SCTLR_ELx_ENDA	(1 << 27)
- #define SCTLR_ELx_EE    (1 << 25)
- #define SCTLR_ELx_IESB	(1 << 21)
- #define SCTLR_ELx_WXN	(1 << 19)
-+#define SCTLR_ELx_ENDB	(1 << 13)
- #define SCTLR_ELx_I	(1 << 12)
- #define SCTLR_ELx_SA	(1 << 3)
- #define SCTLR_ELx_C	(1 << 2)
-@@ -510,11 +527,24 @@
- #define ID_AA64ISAR0_AES_SHIFT		4
- 
- /* id_aa64isar1 */
-+#define ID_AA64ISAR1_GPI_SHIFT		28
-+#define ID_AA64ISAR1_GPA_SHIFT		24
- #define ID_AA64ISAR1_LRCPC_SHIFT	20
- #define ID_AA64ISAR1_FCMA_SHIFT		16
- #define ID_AA64ISAR1_JSCVT_SHIFT	12
-+#define ID_AA64ISAR1_API_SHIFT		8
-+#define ID_AA64ISAR1_APA_SHIFT		4
- #define ID_AA64ISAR1_DPB_SHIFT		0
- 
-+#define ID_AA64ISAR1_APA_NI		0x0
-+#define ID_AA64ISAR1_APA_ARCHITECTED	0x1
-+#define ID_AA64ISAR1_API_NI		0x0
-+#define ID_AA64ISAR1_API_IMP_DEF	0x1
-+#define ID_AA64ISAR1_GPA_NI		0x0
-+#define ID_AA64ISAR1_GPA_ARCHITECTED	0x1
-+#define ID_AA64ISAR1_GPI_NI		0x0
-+#define ID_AA64ISAR1_GPI_IMP_DEF	0x1
-+
- /* id_aa64pfr0 */
- #define ID_AA64PFR0_CSV3_SHIFT		60
- #define ID_AA64PFR0_CSV2_SHIFT		56
+ 		val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
++	} else if (id == SYS_ID_AA64ISAR1_EL1) {
++		const u64 ptrauth_mask = (0xfUL << ID_AA64ISAR1_APA_SHIFT) |
++					 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
++					 (0xfUL << ID_AA64ISAR1_GPA_SHIFT) |
++					 (0xfUL << ID_AA64ISAR1_GPI_SHIFT);
++		if (val & ptrauth_mask)
++			kvm_debug("ptrauth unsupported for guests, suppressing\n");
++		val &= ~ptrauth_mask;
+ 	} else if (id == SYS_ID_AA64MMFR1_EL1) {
+ 		if (val & (0xfUL << ID_AA64MMFR1_LOR_SHIFT))
+ 			pr_err_once("kvm [%i]: LORegions unsupported for guests, suppressing\n",
 -- 
 2.11.0
