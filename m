@@ -1,60 +1,86 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: [PATCHv4 04/10] arm64: Don't trap host pointer auth use to EL2
-Date: Thu,  3 May 2018 14:20:25 +0100
-Message-ID: <20180503132031.25705-5-mark.rutland@arm.com>
-References: <20180503132031.25705-1-mark.rutland@arm.com>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v2 05/17] arm64: Helper for parange to PASize
+Date: Thu, 3 May 2018 15:39:20 +0100
+Message-ID: <b44930d9-b25d-acd4-9676-6f779e2c590a@arm.com>
+References: <1522156531-28348-1-git-send-email-suzuki.poulose@arm.com>
+ <1522156531-28348-6-git-send-email-suzuki.poulose@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180503132031.25705-1-mark.rutland@arm.com>
+In-Reply-To: <1522156531-28348-6-git-send-email-suzuki.poulose@arm.com>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
-To: linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, catalin.marinas@arm.com, christoffer.dall@arm.com, drjones@redhat.com, marc.zyngier@arm.com, mark.rutland@arm.com, ramana.radhakrishnan@arm.com, suzuki.poulose@arm.com, will.deacon@arm.com, awallis@codeaurora.org
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, ard.biesheuvel@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-To allow EL0 (and/or EL1) to use pointer authentication functionality,
-we must ensure that pointer authentication instructions and accesses to
-pointer authentication keys are not trapped to EL2.
+Hi Suzuki,
 
-This patch ensures that HCR_EL2 is configured appropriately when the
-kernel is booted at EL2. For non-VHE kernels we set HCR_EL2.{API,APK},
-ensuring that EL1 can access keys and permit EL0 use of instructions.
-For VHE kernels host EL0 (TGE && E2H) is unaffected by these settings,
-and it doesn't matter how we configure HCR_EL2.{API,APK}, so we don't
-bother setting them.
+Nit: KVM in the subject line?
 
-This does not enable support for KVM guests, since KVM manages HCR_EL2
-itself when running VMs.
+On 27/03/18 14:15, Suzuki K Poulose wrote:
+> Add a helper to convert ID_AA64MMFR0_EL1:PARange to they physical
+> size shift. Limit the size to the maximum supported by the kernel.
+> We are about to move the user of this code and this helps to
+> keep the changes cleaner.
 
-Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Acked-by: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Will Deacon <will.deacon@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu
----
- arch/arm64/include/asm/kvm_arm.h | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> index fbf0aab..1f2a5dd 100644
+> --- a/arch/arm64/include/asm/cpufeature.h
+> +++ b/arch/arm64/include/asm/cpufeature.h
+> @@ -311,6 +311,22 @@ static inline u64 read_zcr_features(void)
+>  	return zcr;
+>  }
+>  
+> +static inline u32 id_aa64mmfr0_parange_to_phys_shift(int parange)
+> +{
+> +	switch (parange) {
+> +	case 0: return 32;
+> +	case 1: return 36;
+> +	case 2: return 40;
+> +	case 3: return 42;
+> +	case 4: return 44;
+> +	/* Report 48 bit if the kernel doesn't support 52bit */
+> +	default:
+> +	case 5: return 48;
+> +#ifdef CONFIG_ARM64_PA_BITS_52
+> +	case 6: return 52;
+> +#endif
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 89b3dda7e3cb..4d57e1e58323 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -23,6 +23,8 @@
- #include <asm/types.h>
- 
- /* Hyp Configuration Register (HCR) bits */
-+#define HCR_API		(UL(1) << 41)
-+#define HCR_APK		(UL(1) << 40)
- #define HCR_TEA		(UL(1) << 37)
- #define HCR_TERR	(UL(1) << 36)
- #define HCR_TLOR	(UL(1) << 35)
-@@ -86,7 +88,7 @@
- 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
- 			 HCR_FMO | HCR_IMO)
- #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
--#define HCR_HOST_NVHE_FLAGS (HCR_RW)
-+#define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK)
- #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
- 
- /* TCR_EL2 Registers bits */
--- 
-2.11.0
+Eeew. I thought 'default' had to appear at the end of the list, but evidently
+not! If the last three bit value ever gets used this is going to look really weird.
+
+Can't we have a helper that just does the mapping, then apply the clamping with
+something like:
+| parange = min(CONFIG_ARM64_PA_BITS, parange);
+
+
+Its odd that the helper has the id-register in the name, but expects you do the
+shift and mask for it...
+
+(and for this patch, KVM has already done the 52bit clamping with:
+| 	if (parange > ID_AA64MMFR0_PARANGE_MAX)
+|		parange = ID_AA64MMFR0_PARANGE_MAX;
+)
+
+
+> diff --git a/arch/arm64/kvm/hyp/s2-setup.c b/arch/arm64/kvm/hyp/s2-setup.c
+> index 603e1ee..b1129c8 100644
+> --- a/arch/arm64/kvm/hyp/s2-setup.c
+> +++ b/arch/arm64/kvm/hyp/s2-setup.c
+> @@ -19,11 +19,13 @@
+>  #include <asm/kvm_arm.h>
+>  #include <asm/kvm_asm.h>
+>  #include <asm/kvm_hyp.h>
+> +#include <asm/cpufeature.h>
+>  
+>  u32 __hyp_text __init_stage2_translation(void)
+>  {
+
+Nit: Why change the variable you put this in, if its all removed again in patch 11?
+
+
+Thanks,
+
+James
