@@ -1,86 +1,117 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v5 01/14] thread_info: Add update_thread_flag() helpers
-Date: Fri,  4 May 2018 17:05:22 +0100
-Message-ID: <1525449935-31424-2-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v5 03/14] KVM: arm/arm64: Introduce
+ kvm_arch_vcpu_run_pid_change
+Date: Fri,  4 May 2018 17:05:24 +0100
+Message-ID: <1525449935-31424-4-git-send-email-Dave.Martin@arm.com>
 References: <1525449935-31424-1-git-send-email-Dave.Martin@arm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <1525449935-31424-1-git-send-email-Dave.Martin@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: kvmarm@lists.cs.columbia.edu
-Cc: linux-arm-kernel@lists.infradead.org, Christoffer Dall <cdall@kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Steven Rostedt <rostedt@goodmis.org>, Oleg Nesterov <oleg@redhat.com>
+Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel@lists.infradead.org, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-There are a number of bits of code sprinkled around the kernel to
-set a thread flag if a certain condition is true, and clear it
-otherwise.
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
-To help make those call sites terser and less cumbersome, this
-patch adds a new family of thread flag manipulators
+KVM/ARM differs from other architectures in having to maintain an
+additional virtual address space from that of the host and the
+guest, because we split the execution of KVM across both EL1 and
+EL2.
 
-	update*_thread_flag([...,] flag, cond)
+This results in a need to explicitly map data structures into EL2
+(hyp) which are accessed from the hyp code.  As we are about to be
+more clever with our FPSIMD handling on arm64, which stores data in
+the task struct and uses thread_info flags, we will have to map
+parts of the currently executing task struct into the EL2 virtual
+address space.
 
-which do the equivalent of:
+However, we don't want to do this on every KVM_RUN, because it is a
+fairly expensive operation to walk the page tables, and the common
+execution mode is to map a single thread to a VCPU.  By introducing
+a hook that architectures can select with
+HAVE_KVM_VCPU_RUN_PID_CHANGE, we do not introduce overhead for
+other architectures, but have a simple way to only map the data we
+need when required for arm64.
 
-	if (cond)
-		set*_thread_flag([...,] flag);
-	else
-		clear*_thread_flag([...,] flag);
+This patch introduces the framework only, and wires it up in the
+arm/arm64 KVM common code.
 
+No functional change.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Cc: Steven Rostedt <rostedt@goodmis.org>
-Cc: Oleg Nesterov <oleg@redhat.com>
----
- include/linux/sched.h       |  6 ++++++
- include/linux/thread_info.h | 11 +++++++++++
- 2 files changed, 17 insertions(+)
 
-diff --git a/include/linux/sched.h b/include/linux/sched.h
-index b3d697f..c2c3051 100644
---- a/include/linux/sched.h
-+++ b/include/linux/sched.h
-@@ -1578,6 +1578,12 @@ static inline void clear_tsk_thread_flag(struct task_struct *tsk, int flag)
- 	clear_ti_thread_flag(task_thread_info(tsk), flag);
- }
+---
+
+Changes since RFCv4:
+
+Back out the arm64 implementation of the new hook, which is
+replaced by a subsequent patch (and not useful before that patch).
+
+---
+ include/linux/kvm_host.h | 9 +++++++++
+ virt/kvm/Kconfig         | 3 +++
+ virt/kvm/kvm_main.c      | 7 ++++++-
+ 3 files changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 6930c63..4268ace 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1276,4 +1276,13 @@ static inline long kvm_arch_vcpu_async_ioctl(struct file *filp,
+ void kvm_arch_mmu_notifier_invalidate_range(struct kvm *kvm,
+ 		unsigned long start, unsigned long end);
  
-+static inline void update_tsk_thread_flag(struct task_struct *tsk, int flag,
-+					  bool value)
++#ifdef CONFIG_HAVE_KVM_VCPU_RUN_PID_CHANGE
++int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu);
++#else
++static inline int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
 +{
-+	update_ti_thread_flag(task_thread_info(tsk), flag, value);
++	return 0;
 +}
++#endif /* CONFIG_HAVE_KVM_VCPU_RUN_PID_CHANGE */
 +
- static inline int test_and_set_tsk_thread_flag(struct task_struct *tsk, int flag)
- {
- 	return test_and_set_ti_thread_flag(task_thread_info(tsk), flag);
-diff --git a/include/linux/thread_info.h b/include/linux/thread_info.h
-index cf2862b..8d8821b 100644
---- a/include/linux/thread_info.h
-+++ b/include/linux/thread_info.h
-@@ -60,6 +60,15 @@ static inline void clear_ti_thread_flag(struct thread_info *ti, int flag)
- 	clear_bit(flag, (unsigned long *)&ti->flags);
- }
+ #endif
+diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+index cca7e06..72143cf 100644
+--- a/virt/kvm/Kconfig
++++ b/virt/kvm/Kconfig
+@@ -54,3 +54,6 @@ config HAVE_KVM_IRQ_BYPASS
  
-+static inline void update_ti_thread_flag(struct thread_info *ti, int flag,
-+					 bool value)
-+{
-+	if (value)
-+		set_ti_thread_flag(ti, flag);
-+	else
-+		clear_ti_thread_flag(ti, flag);
-+}
+ config HAVE_KVM_VCPU_ASYNC_IOCTL
+        bool
 +
- static inline int test_and_set_ti_thread_flag(struct thread_info *ti, int flag)
- {
- 	return test_and_set_bit(flag, (unsigned long *)&ti->flags);
-@@ -79,6 +88,8 @@ static inline int test_ti_thread_flag(struct thread_info *ti, int flag)
- 	set_ti_thread_flag(current_thread_info(), flag)
- #define clear_thread_flag(flag) \
- 	clear_ti_thread_flag(current_thread_info(), flag)
-+#define update_thread_flag(flag, value) \
-+	update_ti_thread_flag(current_thread_info(), flag, value)
- #define test_and_set_thread_flag(flag) \
- 	test_and_set_ti_thread_flag(current_thread_info(), flag)
- #define test_and_clear_thread_flag(flag) \
++config HAVE_KVM_VCPU_RUN_PID_CHANGE
++       bool
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index c7b2e92..c32e240 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2550,8 +2550,13 @@ static long kvm_vcpu_ioctl(struct file *filp,
+ 		oldpid = rcu_access_pointer(vcpu->pid);
+ 		if (unlikely(oldpid != current->pids[PIDTYPE_PID].pid)) {
+ 			/* The thread running this VCPU changed. */
+-			struct pid *newpid = get_task_pid(current, PIDTYPE_PID);
++			struct pid *newpid;
+ 
++			r = kvm_arch_vcpu_run_pid_change(vcpu);
++			if (r)
++				break;
++
++			newpid = get_task_pid(current, PIDTYPE_PID);
+ 			rcu_assign_pointer(vcpu->pid, newpid);
+ 			if (oldpid)
+ 				synchronize_rcu();
 -- 
 2.1.4
