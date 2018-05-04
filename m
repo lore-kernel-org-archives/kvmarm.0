@@ -1,22 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v5 11/14] KVM: arm64: Remove eager host SVE state saving
-Date: Fri,  4 May 2018 17:05:32 +0100
-Message-ID: <1525449935-31424-12-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v5 13/14] KVM: arm64: Fold redundant exit code checks out of
+ fixup_guest_exit()
+Date: Fri,  4 May 2018 17:05:34 +0100
+Message-ID: <1525449935-31424-14-git-send-email-Dave.Martin@arm.com>
 References: <1525449935-31424-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1AFFF49FEB
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 May 2018 11:56:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F24B649FC0
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 May 2018 11:56:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Dd0qGsIUFzdA for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 May 2018 11:56:20 -0400 (EDT)
+ with ESMTP id DCjM9eQn2ZQt for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 May 2018 11:56:21 -0400 (EDT)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C12A49FEA
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 May 2018 11:56:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1370749FF3
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 May 2018 11:56:11 -0400 (EDT)
 In-Reply-To: <1525449935-31424-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,126 +32,69 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <cdall@kernel.org>, linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now that the host SVE context can be saved on demand from Hyp,
-there is no longer any need to save this state in advance before
-entering the guest.
+The entire tail of fixup_guest_exit() is contained in if statements
+of the form if (x && *exit_code == ARM_EXCEPTION_TRAP).  As a result,
+we can check just once and bail out of the function early, allowing
+the remaining if conditions to be simplified.
 
-This patch removes the relevant call to
-kvm_fpsimd_flush_cpu_state().
+The only awkward case is where *exit_code is changed to
+ARM_EXCEPTION_EL1_SERROR in the case of an illegal GICv2 CPU
+interface access: in that case, the GICv3 trap handling code is
+skipped using a goto.  This avoids pointlessly evaluating the
+static branch check for the GICv3 case, even though we can't have
+vgic_v2_cpuif_trap and vgic_v3_cpuif_trap true simultaneously
+unless we have a GICv3 and GICv2 on the host: that sounds stupid,
+but I haven't satisfied myself that it can't happen.
 
-Since the problem that function was intended to solve now no longer
-exists, the function and its dependencies are also deleted.
+No functional change.
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 ---
- arch/arm/include/asm/kvm_host.h   |  3 ---
- arch/arm64/include/asm/kvm_host.h | 10 ----------
- arch/arm64/kernel/fpsimd.c        | 21 ---------------------
- virt/kvm/arm/arm.c                |  3 ---
- 4 files changed, 37 deletions(-)
+ arch/arm64/kvm/hyp/switch.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 4cac8d1..39f051f 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -311,9 +311,6 @@ static inline void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arch_vcpu_park_fp(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu) {}
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 39e9166..be09c52 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -385,11 +385,13 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	 * same PC once the SError has been injected, and replay the
+ 	 * trapping instruction.
+ 	 */
+-	if (*exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
++	if (*exit_code != ARM_EXCEPTION_TRAP)
++		goto exit;
++
++	if (!__populate_fault_info(vcpu))
+ 		return true;
  
--/* All host FP/SIMD state is restored on guest exit, so nothing to save: */
--static inline void kvm_fpsimd_flush_cpu_state(void) {}
--
- static inline void kvm_arm_vhe_guest_enter(void) {}
- static inline void kvm_arm_vhe_guest_exit(void) {}
+-	if (static_branch_unlikely(&vgic_v2_cpuif_trap) &&
+-	    *exit_code == ARM_EXCEPTION_TRAP) {
++	if (static_branch_unlikely(&vgic_v2_cpuif_trap)) {
+ 		bool valid;
  
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 811097e..85ae6ab 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -438,16 +438,6 @@ static inline int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
- 	return kvm_arch_vcpu_run_map_fp(vcpu);
+ 		valid = kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_DABT_LOW &&
+@@ -414,12 +416,12 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 				if (!__skip_instr(vcpu))
+ 					*vcpu_cpsr(vcpu) &= ~DBG_SPSR_SS;
+ 				*exit_code = ARM_EXCEPTION_EL1_SERROR;
++				goto exit;
+ 			}
+ 		}
+ 	}
+ 
+ 	if (static_branch_unlikely(&vgic_v3_cpuif_trap) &&
+-	    *exit_code == ARM_EXCEPTION_TRAP &&
+ 	    (kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_SYS64 ||
+ 	     kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_CP15_32)) {
+ 		int ret = __vgic_v3_perform_cpuif_access(vcpu);
+@@ -428,6 +430,7 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 			return true;
+ 	}
+ 
++exit:
+ 	/* Return to the host kernel and handle the exit */
+ 	return false;
  }
- 
--/*
-- * All host FP/SIMD state is restored on guest exit, so nothing needs
-- * doing here except in the SVE case:
--*/
--static inline void kvm_fpsimd_flush_cpu_state(void)
--{
--	if (system_supports_sve())
--		sve_flush_cpu_state();
--}
--
- static inline void kvm_arm_vhe_guest_enter(void)
- {
- 	local_daif_mask();
-diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index 152d834..3fc3449 100644
---- a/arch/arm64/kernel/fpsimd.c
-+++ b/arch/arm64/kernel/fpsimd.c
-@@ -120,7 +120,6 @@
-  */
- struct fpsimd_last_state_struct {
- 	struct user_fpsimd_state *st;
--	bool sve_in_use;
- };
- 
- static DEFINE_PER_CPU(struct fpsimd_last_state_struct, fpsimd_last_state);
-@@ -1020,7 +1019,6 @@ static void fpsimd_bind_to_cpu(void)
- 		this_cpu_ptr(&fpsimd_last_state);
- 
- 	last->st = &current->thread.uw.fpsimd_state;
--	last->sve_in_use = test_thread_flag(TIF_SVE);
- 	current->thread.fpsimd_cpu = smp_processor_id();
- }
- 
-@@ -1032,7 +1030,6 @@ void fpsimd_bind_state_to_cpu(struct user_fpsimd_state *st)
- 	WARN_ON(!in_softirq() && !irqs_disabled());
- 
- 	last->st = st;
--	last->sve_in_use = false;
- }
- 
- /*
-@@ -1092,24 +1089,6 @@ void fpsimd_flush_cpu_state(void)
- 	__this_cpu_write(fpsimd_last_state.st, NULL);
- }
- 
--/*
-- * Invalidate any task SVE state currently held in this CPU's regs.
-- *
-- * This is used to prevent the kernel from trying to reuse SVE register data
-- * that is detroyed by KVM guest enter/exit.  This function should go away when
-- * KVM SVE support is implemented.  Don't use it for anything else.
-- */
--#ifdef CONFIG_ARM64_SVE
--void sve_flush_cpu_state(void)
--{
--	struct fpsimd_last_state_struct const *last =
--		this_cpu_ptr(&fpsimd_last_state);
--
--	if (last->st && last->sve_in_use)
--		fpsimd_flush_cpu_state();
--}
--#endif /* CONFIG_ARM64_SVE */
--
- #ifdef CONFIG_KERNEL_MODE_NEON
- 
- DEFINE_PER_CPU(bool, kernel_neon_busy);
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index a7be7bf..8bede26 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -698,9 +698,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		 */
- 		preempt_disable();
- 
--		/* Flush FP/SIMD state that can't survive guest entry/exit */
--		kvm_fpsimd_flush_cpu_state();
--
- 		kvm_pmu_flush_hwstate(vcpu);
- 
- 		local_irq_disable();
 -- 
 2.1.4
