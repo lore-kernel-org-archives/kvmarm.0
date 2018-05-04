@@ -1,75 +1,101 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2] arm64: vgic-v2: Fix proxying of cpuif access
-Date: Fri, 4 May 2018 16:43:27 +0100
-Message-ID: <f8392800-2fe5-910c-bc27-a2478f0c5c42@arm.com>
-References: <20180504151924.13696-1-james.morse@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180504151924.13696-1-james.morse@arm.com>
-Content-Language: en-GB
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: James Morse <james.morse@arm.com>, kvmarm@lists.cs.columbia.edu
-Cc: kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@arm.com>, linux-arm-kernel@lists.infradead.org, Suzuki K Poulose <suzuki.poulose@arm.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: [PATCH v5 00/14] KVM: arm64: Optimise FPSIMD context switching
+Date: Fri,  4 May 2018 17:05:21 +0100
+Message-ID: <1525449935-31424-1-git-send-email-Dave.Martin@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu
+Cc: linux-arm-kernel@lists.infradead.org, Christoffer Dall <cdall@kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Steven Rostedt <rostedt@goodmis.org>, Oleg Nesterov <oleg@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 04/05/18 16:19, James Morse wrote:
-> Proxying the cpuif accesses at EL2 makes use of vcpu_data_guest_to_host
-> and co, which check the endianness, which call into vcpu_read_sys_reg...
-> which isn't mapped at EL2 (it was inlined before, and got moved OoL
-> with the VHE optimizations).
-> 
-> The result is of course a nice panic. Let's add some specialized
-> cruft to keep the broken platforms that require this hack alive.
-> 
-> But, this code used vcpu_data_guest_to_host(), which expected us to
-> write the value to host memory, instead we have trapped the guest's
-> read or write to an mmio-device, and are about to replay it using the
-> host's readl()/writel() which also perform swabbing based on the host
-> endianness. This goes wrong when both host and guest are big-endian,
-> as readl()/writel() will undo the guest's swabbing, causing the
-> big-endian value to be written to device-memory.
-> 
-> What needs doing?
-> A big-endian guest will have pre-swabbed data before storing, undo this.
-> If its necessary for the host, writel() will re-swab it.
-> 
-> For a read a big-endian guest expects to swab the data after the load.
-> The hosts's readl() will correct for host endianness, giving us the
-> device-memory's value in the register. For a big-endian guest, swab it
-> as if we'd only done the load.
-> 
-> For a little-endian guest, nothing needs doing as readl()/writel() leave
-> the correct device-memory value in registers.
-> 
-> Tested on Juno with that rarest of things: a big-endian 64K host.
+Note: Most of these patches are Arm-specific.  People not Cc'd on the
+whole series can find it in the linux-arm-kernel archive [3].
 
-<song>
-The Thing That Should Not Be
-</song>
+This series aims to improve the way FPSIMD context is handled by KVM,
+building on the previous RFC v4 [1].
 
-> Based on a patch from Marc Zyngier.
-> 
-> Reported-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Fixes: bf8feb39642b ("arm64: KVM: vgic-v2: Add GICV access from HYP")
-> CC: Marc Zyngier <marc.zyngier@arm.com>
-> Signed-off-by: James Morse <james.morse@arm.com>
+Patches 1-2 are picked from a separate RFC series [2] since they
+introduce a helper I wanted to use here.
 
-Awesome, thanks a lot for picking this up and fixing it the right way!
 
-I'll queue it right away.
+The main changes since RFC v4 are:
 
-Thanks,
+ * Rebased to -rc3.
 
-	M.
+ * Patches 1-2 pulled into series from [2], and other patches modified
+   to use it.
+
+ * Redundant additions by patch 3 that were reverted by other patches
+   are now gone.
+
+ * New patches 12-14 move the call to __hyp_switch_fpsimd() out of asm
+   completely, moving it to the fixup_guest_exit() path instead.  This
+   should significantly cleaner, but does add a bit of overhead to
+   FPSIMD trapping.
+
+   This is presented as an independent change in case people want to
+   benchmark with/without.
+
+
+Other minor changes as noted.
+
+
+Some testing done on Juno and the Arm fast model (arm64), including
+combinations of (non-)SVE and (non-)VHE configurations.
+
+Cheers
+---Dave
+
+[1] [RFC PATCH 0/8] KVM: arm64: Optimise FPSIMD context switching
+http://lists.infradead.org/pipermail/linux-arm-kernel/2018-April/572781.html
+
+[2] [RFC PATCH 0/6] Simplify setting thread flags to a particular value
+https://lkml.org/lkml/2018/4/19/225
+
+[3] linux-arm-kernel archive
+http://lists.infradead.org/pipermail/linux-arm-kernel/2018-May/thread.html
+
+
+Christoffer Dall (1):
+  KVM: arm/arm64: Introduce kvm_arch_vcpu_run_pid_change
+
+Dave Martin (13):
+  thread_info: Add update_thread_flag() helpers
+  arm64: Use update{,_tsk}_thread_flag()
+  KVM: arm64: Convert lazy FPSIMD context switch trap to C
+  arm64: fpsimd: Generalise context saving for non-task contexts
+  KVM: arm64: Optimise FPSIMD handling to reduce guest/host thrashing
+  arm64/sve: Move read_zcr_features() out of cpufeature.h
+  arm64/sve: Switch sve_pffr() argument from task to thread
+  arm64/sve: Move sve_pffr() to fpsimd.h and make inline
+  KVM: arm64: Save host SVE context as appropriate
+  KVM: arm64: Remove eager host SVE state saving
+  KVM: arm64: Remove redundant *exit_code changes in fpsimd_guest_exit()
+  KVM: arm64: Fold redundant exit code checks out of fixup_guest_exit()
+  KVM: arm64: Invoke FPSIMD context switch trap from C
+
+ arch/arm/include/asm/kvm_host.h     |   9 ++-
+ arch/arm64/Kconfig                  |   7 +++
+ arch/arm64/include/asm/cpufeature.h |  29 ---------
+ arch/arm64/include/asm/fpsimd.h     |  20 ++++++
+ arch/arm64/include/asm/kvm_host.h   |  22 ++++---
+ arch/arm64/include/asm/processor.h  |   2 +
+ arch/arm64/kernel/fpsimd.c          | 120 +++++++++++++++++------------------
+ arch/arm64/kernel/ptrace.c          |   1 +
+ arch/arm64/kvm/Kconfig              |   1 +
+ arch/arm64/kvm/Makefile             |   2 +-
+ arch/arm64/kvm/fpsimd.c             | 105 +++++++++++++++++++++++++++++++
+ arch/arm64/kvm/hyp/entry.S          |  43 -------------
+ arch/arm64/kvm/hyp/hyp-entry.S      |  19 ------
+ arch/arm64/kvm/hyp/switch.c         | 121 +++++++++++++++++++++++++-----------
+ include/linux/kvm_host.h            |   9 +++
+ include/linux/sched.h               |   6 ++
+ include/linux/thread_info.h         |  11 ++++
+ virt/kvm/Kconfig                    |   3 +
+ virt/kvm/arm/arm.c                  |  25 +++++++-
+ virt/kvm/kvm_main.c                 |   7 ++-
+ 20 files changed, 360 insertions(+), 202 deletions(-)
+ create mode 100644 arch/arm64/kvm/fpsimd.c
+
 -- 
-Jazz is not dead. It just smells funny...
+2.1.4
