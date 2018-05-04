@@ -1,98 +1,53 @@
-From: "Kalra, Ashish" <Ashish.Kalra@cavium.com>
-Subject: Re: [kvm-unit-tests PATCH] arm64: add micro test
-Date: Thu, 3 May 2018 23:38:30 +0530
-Message-ID: <3d605c68-2b5d-5529-9531-e1aeb2c653d2@cavium.com>
-References: <1513372539-10180-1-git-send-email-shihwei@cs.columbia.edu>
- <1513372539-10180-2-git-send-email-shihwei@cs.columbia.edu>
- <20171218191037.wjocr7jbf5ua2duj@hawk.localdomain>
- <20171220170030.zvz3oounirnlhcfi@hawk.localdomain>
- <61a11d00-cc9c-bc17-eec0-0296085026e7@cavium.com>
- <0ee505ca-9022-0ec9-6008-9e49fb723d88@arm.com>
- <ff987fdf-4394-4058-9246-32d5be858290@cavium.com>
- <6667183c-6a89-f6c8-e630-efa2faf5b003@arm.com>
+From: Jan Glauber <jan.glauber@caviumnetworks.com>
+Subject: Potential deadlock in vgic
+Date: Fri, 4 May 2018 13:03:44 +0200
+Message-ID: <20180504110343.GA10968@hc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A649B49F7F
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 May 2018 13:59:17 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AIyTFau6zTzo for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 May 2018 13:58:55 -0400 (EDT)
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com
- (mail-sn1nam02on0059.outbound.protection.outlook.com [104.47.36.59])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BD41A402B8
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 May 2018 13:58:54 -0400 (EDT)
-In-Reply-To: <6667183c-6a89-f6c8-e630-efa2faf5b003@arm.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Andrew Jones <drjones@redhat.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
-Cc: pbonzini@redhat.com, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, kvm@vger.kernel.org, Christoffer Dall <cdall@kernel.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+Hi all,
 
- >>On 5/3/2018 9:54 PM, Marc Zyngier wrote:
->> On 03/05/18 12:12, Kalra, Ashish wrote:
->>>
->>>>>
->>>> The reason for the problem you're seeing is probably that the
->>>>> constraints are not quite right. Here, x0 is not simply clobbered, but
->>>>> is actively written to in the middle of the sequence (it is at least an
->>>>> early clobber). It is also, I assume, a result from the hypercall, so it
->>>>> cannot simply be discarded.
->>>>>
->>>>> It would help to get a disassembly of the function, but I'd tend to
->>>>> rewrite the code as such:
->>>>>
->>>>> extern int bar(void);
->>>>>
->>>>> int foo(void)
->>>>> {
->>>>> 	register int w0 asm("w0");
->>>>> 	int a, b;
->>>>>
->>>>> 	a = bar();
->>>>> 	w0 = 0x4b000000;
->>>>> 	asm volatile("hvc #0" : "+r" (w0) :: );
->>>>> 	b = bar();
->>>>>
->>>>> 	return a - b;
->>>>> }
->>>
->>> There still is the issue of x1-x3 registers being used for local
->>> variables and clobbering of the same across the "hvc" call.
->>>
->>> Comparatively, the fix below works more reliably :
->>>
->>>> asm volatile("hvc #0" : "+r" (w0) :: "x1","x2","x3");
->> 
->> Is that because this hypercall is explicitly clobbering these registers?
->> or because KVM is corrupting them? If the former, fine. If the latter,
->> that'd be a KVM bug.
->> 
->> So which one is it?
->> 
+enabling lockdep I see the following reported in the host when I start a kvm guest:
 
-It is being explicitly done by the hypercall handler:
+[12399.954245]        CPU0                    CPU1
+[12399.958762]        ----                    ----
+[12399.963279]   lock(&(&dist->lpi_list_lock)->rlock);
+[12399.968146]                                local_irq_disable();
+[12399.974052]                                lock(&(&vgic_cpu->ap_list_lock)->rlock);
+[12399.981696]                                lock(&(&dist->lpi_list_lock)->rlock);
+[12399.989081]   <Interrupt>
+[12399.991688]     lock(&(&vgic_cpu->ap_list_lock)->rlock);
+[12399.996989]
+                *** DEADLOCK ***
 
-int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
-{
-	u32 func_id = smccc_get_function(vcpu);
-         u32 val = PSCI_RET_NOT_SUPPORTED;
-         ..
-         ..
-         smccc_set_retval(vcpu, val, 0, 0, 0);
-}
+[12400.002897] 2 locks held by qemu-system-aar/5597:
+[12400.007587]  #0: 0000000042beb9dc (&vcpu->mutex){+.+.}, at: kvm_vcpu_ioctl+0x7c/0xa68
+[12400.015411]  #1: 00000000c45d644a (&(&vgic_cpu->ap_list_lock)->rlock){-.-.}, at: kvm_vgic_sync_hwstate+0x8c/0x328
 
-Thanks,
-Ashish
+
+There is nothing unusual in my config or qemu parameters, I can upload these
+if needed. I see this on ThunderX and ThunderX2 and also with older kernels
+(4.13+ distribution kernel).
+
+I tried making the lpi_list_lock irq safe but that just leads to different
+warnings. The locking here seems to be quite sophisticated and I'm not familiar
+with it.
+
+Full dmesg: https://paste.ubuntu.com/p/BZ5QTg62Ym/
+
+--Jan
