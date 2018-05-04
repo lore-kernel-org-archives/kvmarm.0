@@ -1,166 +1,223 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH v2 1/4] KVM: arm/arm64: Share common code in
- user_mem_abort()
-Date: Fri, 4 May 2018 13:38:13 +0200
-Message-ID: <20180504113813.GD10191@C02W217FHV2R.local>
+Subject: Re: [PATCH v2 4/4] KVM: arm64: Add support for PUD hugepages at
+ stage 2
+Date: Fri, 4 May 2018 13:39:04 +0200
+Message-ID: <20180504113904.GE10191@C02W217FHV2R.local>
 References: <20180501102659.13188-1-punit.agrawal@arm.com>
- <20180501102659.13188-2-punit.agrawal@arm.com>
+ <20180501102659.13188-5-punit.agrawal@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180501102659.13188-2-punit.agrawal@arm.com>
+In-Reply-To: <20180501102659.13188-5-punit.agrawal@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
 To: Punit Agrawal <punit.agrawal@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, suzuki.poulose@arm.com
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, suzuki.poulose@arm.com, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, May 01, 2018 at 11:26:56AM +0100, Punit Agrawal wrote:
-> The code for operations such as marking the pfn as dirty, and
-> dcache/icache maintenance during stage 2 fault handling is duplicated
-> between normal pages and PMD hugepages.
+On Tue, May 01, 2018 at 11:26:59AM +0100, Punit Agrawal wrote:
+> KVM currently supports PMD hugepages at stage 2. Extend the stage 2
+> fault handling to add support for PUD hugepages.
 > 
-> Instead of creating another copy of the operations when we introduce
-> PUD hugepages, let's share them across the different pagesizes.
+> Addition of pud hugepage support enables additional hugepage
+> sizes (e.g., 1G with 4K granule) which can be useful on cores that
+> support mapping larger block sizes in the TLB entries.
 > 
 > Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
-> Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+> Cc: Christoffer Dall <christoffer.dall@arm.com>
 > Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Russell King <linux@armlinux.org.uk>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will.deacon@arm.com>
+
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+
 > ---
->  virt/kvm/arm/mmu.c | 66 +++++++++++++++++++++++++++-------------------
->  1 file changed, 39 insertions(+), 27 deletions(-)
+>  arch/arm/include/asm/kvm_mmu.h         | 19 ++++++++++++
+>  arch/arm64/include/asm/kvm_mmu.h       | 15 ++++++++++
+>  arch/arm64/include/asm/pgtable-hwdef.h |  4 +++
+>  arch/arm64/include/asm/pgtable.h       |  2 ++
+>  virt/kvm/arm/mmu.c                     | 40 ++++++++++++++++++++++++--
+>  5 files changed, 77 insertions(+), 3 deletions(-)
 > 
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 7f6a944db23d..686fc6a4b866 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -1396,6 +1396,21 @@ static void invalidate_icache_guest_page(kvm_pfn_t pfn, unsigned long size)
->  	__invalidate_icache_guest_page(pfn, size);
+> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+> index 224c22c0a69c..155916dbdd7e 100644
+> --- a/arch/arm/include/asm/kvm_mmu.h
+> +++ b/arch/arm/include/asm/kvm_mmu.h
+> @@ -77,8 +77,11 @@ void kvm_clear_hyp_idmap(void);
+>  
+>  #define kvm_pfn_pte(pfn, prot)	pfn_pte(pfn, prot)
+>  #define kvm_pfn_pmd(pfn, prot)	pfn_pmd(pfn, prot)
+> +#define kvm_pfn_pud(pfn, prot)	(__pud(0))
+>  
+>  #define kvm_pmd_mkhuge(pmd)	pmd_mkhuge(pmd)
+> +/* No support for pud hugepages */
+> +#define kvm_pud_mkhuge(pud)	(pud)
+>  
+>  /*
+>   * The following kvm_*pud*() functionas are provided strictly to allow
+> @@ -95,6 +98,22 @@ static inline bool kvm_s2pud_readonly(pud_t *pud)
+>  	return false;
 >  }
 >  
-> +static bool stage2_should_exec(struct kvm *kvm, phys_addr_t addr,
-> +			       bool exec_fault, unsigned long fault_status)
+> +static inline void kvm_set_pud(pud_t *pud, pud_t new_pud)
 > +{
-> +	/*
-> +	 * If we took an execution fault we will have made the
-> +	 * icache/dcache coherent and should now let the s2 mapping be
-> +	 * executable.
-> +	 *
-> +	 * Write faults (!exec_fault && FSC_PERM) are orthogonal to
-> +	 * execute permissions, and we preserve whatever we have.
-> +	 */
-> +	return exec_fault ||
-> +		(fault_status == FSC_PERM && stage2_is_exec(kvm, addr));
+> +	BUG();
 > +}
 > +
->  static void kvm_send_hwpoison_signal(unsigned long address,
->  				     struct vm_area_struct *vma)
+> +static inline pud_t kvm_s2pud_mkwrite(pud_t pud)
+> +{
+> +	BUG();
+> +	return pud;
+> +}
+> +
+> +static inline pud_t kvm_s2pud_mkexec(pud_t pud)
+> +{
+> +	BUG();
+> +	return pud;
+> +}
+>  
+>  static inline void kvm_set_pmd(pmd_t *pmd, pmd_t new_pmd)
 >  {
-> @@ -1428,7 +1443,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	kvm_pfn_t pfn;
->  	pgprot_t mem_type = PAGE_S2;
->  	bool logging_active = memslot_is_logging(memslot);
-> -	unsigned long flags = 0;
-> +	unsigned long vma_pagesize, flags = 0;
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index f440cf216a23..f49a68fcbf26 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -172,11 +172,14 @@ void kvm_clear_hyp_idmap(void);
 >  
->  	write_fault = kvm_is_write_fault(vcpu);
->  	exec_fault = kvm_vcpu_trap_is_iabt(vcpu);
-> @@ -1448,7 +1463,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  		return -EFAULT;
->  	}
+>  #define	kvm_set_pte(ptep, pte)		set_pte(ptep, pte)
+>  #define	kvm_set_pmd(pmdp, pmd)		set_pmd(pmdp, pmd)
+> +#define kvm_set_pud(pudp, pud)		set_pud(pudp, pud)
 >  
-> -	if (vma_kernel_pagesize(vma) == PMD_SIZE && !logging_active) {
-> +	vma_pagesize = vma_kernel_pagesize(vma);
-> +	if (vma_pagesize == PMD_SIZE && !logging_active) {
->  		hugetlb = true;
->  		gfn = (fault_ipa & PMD_MASK) >> PAGE_SHIFT;
->  	} else {
-> @@ -1517,28 +1533,34 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	if (mmu_notifier_retry(kvm, mmu_seq))
->  		goto out_unlock;
+>  #define kvm_pfn_pte(pfn, prot)		pfn_pte(pfn, prot)
+>  #define kvm_pfn_pmd(pfn, prot)		pfn_pmd(pfn, prot)
+> +#define kvm_pfn_pud(pfn, prot)		pfn_pud(pfn, prot)
 >  
-> -	if (!hugetlb && !force_pte)
-> +	if (!hugetlb && !force_pte) {
->  		hugetlb = transparent_hugepage_adjust(&pfn, &fault_ipa);
-> +		/*
-> +		 * Only PMD_SIZE transparent hugepages(THP) are
-> +		 * currently supported. This code will need to be
-> +		 * updated to support other THP sizes.
-> +		 */
-> +		if (hugetlb)
-> +			vma_pagesize = PMD_SIZE;
-
-nit: this is a bit of a trap waiting to happen, as the suggested
-semantics of hugetlb is now hugetlbfs and not THP.
-
-It may be slightly nicer to do do:
-
-		if (transparent_hugepage_adjust(&pfn, &fault_ipa))
-			vma_pagesize = PMD_SIZE;
-
+>  #define kvm_pmd_mkhuge(pmd)		pmd_mkhuge(pmd)
+> +#define kvm_pud_mkhuge(pud)		pud_mkhuge(pud)
+>  
+>  static inline pte_t kvm_s2pte_mkwrite(pte_t pte)
+>  {
+> @@ -190,6 +193,12 @@ static inline pmd_t kvm_s2pmd_mkwrite(pmd_t pmd)
+>  	return pmd;
+>  }
+>  
+> +static inline pud_t kvm_s2pud_mkwrite(pud_t pud)
+> +{
+> +	pud_val(pud) |= PUD_S2_RDWR;
+> +	return pud;
+> +}
+> +
+>  static inline pte_t kvm_s2pte_mkexec(pte_t pte)
+>  {
+>  	pte_val(pte) &= ~PTE_S2_XN;
+> @@ -202,6 +211,12 @@ static inline pmd_t kvm_s2pmd_mkexec(pmd_t pmd)
+>  	return pmd;
+>  }
+>  
+> +static inline pud_t kvm_s2pud_mkexec(pud_t pud)
+> +{
+> +	pud_val(pud) &= ~PUD_S2_XN;
+> +	return pud;
+> +}
+> +
+>  static inline void kvm_set_s2pte_readonly(pte_t *ptep)
+>  {
+>  	pteval_t old_pteval, pteval;
+> diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
+> index fd208eac9f2a..e327665e94d1 100644
+> --- a/arch/arm64/include/asm/pgtable-hwdef.h
+> +++ b/arch/arm64/include/asm/pgtable-hwdef.h
+> @@ -193,6 +193,10 @@
+>  #define PMD_S2_RDWR		(_AT(pmdval_t, 3) << 6)   /* HAP[2:1] */
+>  #define PMD_S2_XN		(_AT(pmdval_t, 2) << 53)  /* XN[1:0] */
+>  
+> +#define PUD_S2_RDONLY		(_AT(pudval_t, 1) << 6)   /* HAP[2:1] */
+> +#define PUD_S2_RDWR		(_AT(pudval_t, 3) << 6)   /* HAP[2:1] */
+> +#define PUD_S2_XN		(_AT(pudval_t, 2) << 53)  /* XN[1:0] */
+> +
+>  /*
+>   * Memory Attribute override for Stage-2 (MemAttr[3:0])
+>   */
+> diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+> index 7c4c8f318ba9..31ea9fda07e3 100644
+> --- a/arch/arm64/include/asm/pgtable.h
+> +++ b/arch/arm64/include/asm/pgtable.h
+> @@ -386,6 +386,8 @@ static inline int pmd_protnone(pmd_t pmd)
+>  
+>  #define pud_write(pud)		pte_write(pud_pte(pud))
+>  
+> +#define pud_mkhuge(pud)		(__pud(pud_val(pud) & ~PUD_TABLE_BIT))
+> +
+>  #define __pud_to_phys(pud)	__pte_to_phys(pud_pte(pud))
+>  #define __phys_to_pud_val(phys)	__phys_to_pte_val(phys)
+>  #define pud_pfn(pud)		((__pud_to_phys(pud) & PUD_MASK) >> PAGE_SHIFT)
+> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> index 3afbf693e045..1fb108d47dbd 100644
+> --- a/virt/kvm/arm/mmu.c
+> +++ b/virt/kvm/arm/mmu.c
+> @@ -1036,6 +1036,26 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
+>  	return 0;
+>  }
+>  
+> +static int stage2_set_pud_huge(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
+> +			       phys_addr_t addr, const pud_t *new_pud)
+> +{
+> +	pud_t *pud, old_pud;
+> +
+> +	pud = stage2_get_pud(kvm, cache, addr);
+> +	VM_BUG_ON(!pud);
+> +
+> +	old_pud = *pud;
+> +	if (pud_present(old_pud)) {
+> +		pud_clear(pud);
+> +		kvm_tlb_flush_vmid_ipa(kvm, addr);
+> +	} else {
+> +		get_page(virt_to_page(pud));
 > +	}
 > +
-> +	if (writable)
-> +		kvm_set_pfn_dirty(pfn);
+> +	kvm_set_pud(pud, *new_pud);
+> +	return 0;
+> +}
 > +
-> +	if (fault_status != FSC_PERM)
-> +		clean_dcache_guest_page(pfn, vma_pagesize);
-> +
-> +	if (exec_fault)
-> +		invalidate_icache_guest_page(pfn, vma_pagesize);
->  
->  	if (hugetlb) {
->  		pmd_t new_pmd = pfn_pmd(pfn, mem_type);
->  		new_pmd = pmd_mkhuge(new_pmd);
-> -		if (writable) {
-> +		if (writable)
->  			new_pmd = kvm_s2pmd_mkwrite(new_pmd);
-> -			kvm_set_pfn_dirty(pfn);
-> -		}
->  
-> -		if (fault_status != FSC_PERM)
-> -			clean_dcache_guest_page(pfn, PMD_SIZE);
-> -
-> -		if (exec_fault) {
-> +		if (stage2_should_exec(kvm, fault_ipa, exec_fault, fault_status))
->  			new_pmd = kvm_s2pmd_mkexec(new_pmd);
-> -			invalidate_icache_guest_page(pfn, PMD_SIZE);
-> -		} else if (fault_status == FSC_PERM) {
-> -			/* Preserve execute if XN was already cleared */
-> -			if (stage2_is_exec(kvm, fault_ipa))
-> -				new_pmd = kvm_s2pmd_mkexec(new_pmd);
-> -		}
->  
->  		ret = stage2_set_pmd_huge(kvm, memcache, fault_ipa, &new_pmd);
->  	} else {
-> @@ -1546,21 +1568,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  
->  		if (writable) {
->  			new_pte = kvm_s2pte_mkwrite(new_pte);
-> -			kvm_set_pfn_dirty(pfn);
->  			mark_page_dirty(kvm, gfn);
->  		}
->  
-> -		if (fault_status != FSC_PERM)
-> -			clean_dcache_guest_page(pfn, PAGE_SIZE);
-> -
-> -		if (exec_fault) {
-> +		if (stage2_should_exec(kvm, fault_ipa, exec_fault, fault_status))
->  			new_pte = kvm_s2pte_mkexec(new_pte);
-> -			invalidate_icache_guest_page(pfn, PAGE_SIZE);
-> -		} else if (fault_status == FSC_PERM) {
-> -			/* Preserve execute if XN was already cleared */
-> -			if (stage2_is_exec(kvm, fault_ipa))
-> -				new_pte = kvm_s2pte_mkexec(new_pte);
-> -		}
->  
->  		ret = stage2_set_pte(kvm, memcache, fault_ipa, &new_pte, flags);
+>  static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr)
+>  {
+>  	pmd_t *pmdp;
+> @@ -1467,9 +1487,12 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
 >  	}
+>  
+>  	vma_pagesize = vma_kernel_pagesize(vma);
+> -	if (vma_pagesize == PMD_SIZE && !logging_active) {
+> +	if ((vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE) &&
+> +	    !logging_active) {
+> +		struct hstate *h = hstate_vma(vma);
+> +
+>  		hugetlb = true;
+> -		gfn = (fault_ipa & PMD_MASK) >> PAGE_SHIFT;
+> +		gfn = (fault_ipa & huge_page_mask(h)) >> PAGE_SHIFT;
+>  	} else {
+>  		/*
+>  		 * Pages belonging to memslots that don't have the same
+> @@ -1556,7 +1579,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	if (exec_fault)
+>  		invalidate_icache_guest_page(pfn, vma_pagesize);
+>  
+> -	if (hugetlb) {
+> +	if (vma_pagesize == PUD_SIZE) {
+> +		pud_t new_pud = kvm_pfn_pud(pfn, mem_type);
+> +
+> +		new_pud = kvm_pud_mkhuge(new_pud);
+> +		if (writable)
+> +			new_pud = kvm_s2pud_mkwrite(new_pud);
+> +
+> +		if (stage2_should_exec(kvm, fault_ipa, exec_fault, fault_status))
+> +			new_pud = kvm_s2pud_mkexec(new_pud);
+> +
+> +		ret = stage2_set_pud_huge(kvm, memcache, fault_ipa, &new_pud);
+> +	} else if (vma_pagesize == PMD_SIZE) {
+>  		pmd_t new_pmd = kvm_pfn_pmd(pfn, mem_type);
+>  
+>  		new_pmd = kvm_pmd_mkhuge(new_pmd);
 > -- 
 > 2.17.0
 > 
-
-Otherwise looks good.
-
-Thanks,
--Christoffer
