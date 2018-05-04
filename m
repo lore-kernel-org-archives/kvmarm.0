@@ -1,15 +1,13 @@
 From: Andre Przywara <andre.przywara@arm.com>
 Subject: Re: Potential deadlock in vgic
-Date: Fri, 4 May 2018 15:51:20 +0100
-Message-ID: <1f343d54-03a2-10b4-1413-c0fa4a84bb7e@arm.com>
-References: <20180504110343.GA10968@hc>
- <20180504124742.GG10191@C02W217FHV2R.local> <20180504130854.GA14663@hc>
+Date: Fri,  4 May 2018 16:17:40 +0100
+Message-ID: <20180504151740.12165-1-andre.przywara@arm.com>
+References: <20180504130854.GA14663@hc>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <20180504130854.GA14663@hc>
-Content-Language: en-GB
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -19,108 +17,166 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Jan Glauber <jan.glauber@caviumnetworks.com>, Christoffer Dall <christoffer.dall@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Jan Glauber <jan.glauber@caviumnetworks.com>, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+Hi Jan,
 
-On 04/05/18 14:08, Jan Glauber wrote:
-> On Fri, May 04, 2018 at 02:47:42PM +0200, Christoffer Dall wrote:
->> Hi Jan,
->>
->> On Fri, May 04, 2018 at 01:03:44PM +0200, Jan Glauber wrote:
->>> Hi all,
->>>
->>> enabling lockdep I see the following reported in the host when I start a kvm guest:
->>>
->>> [12399.954245]        CPU0                    CPU1
->>> [12399.958762]        ----                    ----
->>> [12399.963279]   lock(&(&dist->lpi_list_lock)->rlock);
->>> [12399.968146]                                local_irq_disable();
->>> [12399.974052]                                lock(&(&vgic_cpu->ap_list_lock)->rlock);
->>> [12399.981696]                                lock(&(&dist->lpi_list_lock)->rlock);
->>> [12399.989081]   <Interrupt>
->>> [12399.991688]     lock(&(&vgic_cpu->ap_list_lock)->rlock);
->>> [12399.996989]
->>>                 *** DEADLOCK ***
->>>
->>> [12400.002897] 2 locks held by qemu-system-aar/5597:
->>> [12400.007587]  #0: 0000000042beb9dc (&vcpu->mutex){+.+.}, at: kvm_vcpu_ioctl+0x7c/0xa68
->>> [12400.015411]  #1: 00000000c45d644a (&(&vgic_cpu->ap_list_lock)->rlock){-.-.}, at: kvm_vgic_sync_hwstate+0x8c/0x328
->>>
->>>
->>> There is nothing unusual in my config or qemu parameters, I can upload these
->>> if needed. I see this on ThunderX and ThunderX2 and also with older kernels
->>> (4.13+ distribution kernel).
->>>
->>> I tried making the lpi_list_lock irq safe but that just leads to different
->>> warnings. The locking here seems to be quite sophisticated and I'm not familiar
->>> with it.
->>
->> That's unfortunate.  The problem here is that we end up violating our
->> locking order, which stipulates that ap_list_lock must be taken before
->> the lpi_list_lock.
->>
->> Give that we can take the ap_list_lock from interrupt context (timers
->> firing), the only solution I can easily think of is to change
->> lpi_list_lock takers to disable interrupts as well.
->>
->> Which warnings did you encounter with that approach?
-> 
-> Hi Christoffer,
-> 
-> making lpi_list_lock irq safe I get:
-> 
-> [  394.239174] ========================================================
-> [  394.245515] WARNING: possible irq lock inversion dependency detected
-> [  394.251857] 4.17.0-rc3-jang+ #72 Not tainted
-> [  394.256114] --------------------------------------------------------
-> [  394.262454] qemu-system-aar/5596 just changed the state of lock:
-> [  394.268448] 00000000da3f09ef (&(&irq->irq_lock)->rlock#3){+...}, at: update_affinity+0x3c/0xa8
-> [  394.277066] but this lock was taken by another, HARDIRQ-safe lock in the past:
-> [  394.284274]  (&(&vgic_cpu->ap_list_lock)->rlock){-.-.}
-> [  394.284278] 
->                
->                and interrupts could create inverse lock ordering between them.
-> 
-> [  394.300777] 
->                other info that might help us debug this:
-> [  394.307292]  Possible interrupt unsafe locking scenario:
-> 
-> [  394.314066]        CPU0                    CPU1
-> [  394.318584]        ----                    ----
-> [  394.323101]   lock(&(&irq->irq_lock)->rlock#3);
-> [  394.327622]                                local_irq_disable();
-> [  394.333528]                                lock(&(&vgic_cpu->ap_list_lock)->rlock);
-> [  394.341172]                                lock(&(&irq->irq_lock)->rlock#3);
-> [  394.348210]   <Interrupt>
-> [  394.350817]     lock(&(&vgic_cpu->ap_list_lock)->rlock);
-> [  394.356118] 
-
-That's weird, as that shouldn't happen anymore. IIRC we switched *both*
-ap_list_lock and irq_lock over to be IRQ safe, so the first lock on CPU0
-would disable IRQs, making the interrupt afterwards impossible.
-Did we actually forget some irq_lock's to convert over and lockdep is
-picking those up?
-
-So if this is the case, we should be fine by making the missing ones
-irqsave as well, then adding _irqsave to the lpi_list_lock, which has
-just a few users and guards only short critical sections contained
-within a function.
+can you please test this patch with your setup, to see if it still
+screams? That converts two forgotten irq_lock's over to be irqsafe,
+plus lets lpi_list_lock join them (which you already did, IIUC).
+That should appease lockdep, hopefully.
 
 Cheers,
 Andre.
+---
+ virt/kvm/arm/vgic/vgic-debug.c |  5 +++--
+ virt/kvm/arm/vgic/vgic-its.c   | 15 +++++++++------
+ virt/kvm/arm/vgic/vgic.c       | 12 +++++++-----
+ 3 files changed, 19 insertions(+), 13 deletions(-)
 
->                 *** DEADLOCK ***
-> 
-> [  394.362025] 4 locks held by qemu-system-aar/5596:
-> [  394.366716]  #0: 00000000719c7423 (&vcpu->mutex){+.+.}, at: kvm_vcpu_ioctl+0x7c/0xa68
-> [  394.374545]  #1: 0000000060090841 (&kvm->srcu){....}, at: kvm_handle_guest_abort+0x11c/0xb70
-> [  394.382984]  #2: 0000000064647766 (&its->cmd_lock){+.+.}, at: vgic_mmio_write_its_cwriter+0x44/0xa8
-> [  394.392022]  #3: 0000000075f90a8a (&its->its_lock){+.+.}, at: vgic_its_process_commands.part.11+0xac/0x780
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-> 
+diff --git a/virt/kvm/arm/vgic/vgic-debug.c b/virt/kvm/arm/vgic/vgic-debug.c
+index 10b38178cff2..4ffc0b5e6105 100644
+--- a/virt/kvm/arm/vgic/vgic-debug.c
++++ b/virt/kvm/arm/vgic/vgic-debug.c
+@@ -211,6 +211,7 @@ static int vgic_debug_show(struct seq_file *s, void *v)
+ 	struct vgic_state_iter *iter = (struct vgic_state_iter *)v;
+ 	struct vgic_irq *irq;
+ 	struct kvm_vcpu *vcpu = NULL;
++	unsigned long flags;
+ 
+ 	if (iter->dist_id == 0) {
+ 		print_dist_state(s, &kvm->arch.vgic);
+@@ -227,9 +228,9 @@ static int vgic_debug_show(struct seq_file *s, void *v)
+ 		irq = &kvm->arch.vgic.spis[iter->intid - VGIC_NR_PRIVATE_IRQS];
+ 	}
+ 
+-	spin_lock(&irq->irq_lock);
++	spin_lock_irqsave(&irq->irq_lock, flags);
+ 	print_irq_state(s, irq, vcpu);
+-	spin_unlock(&irq->irq_lock);
++	spin_unlock_irqrestore(&irq->irq_lock, flags);
+ 
+ 	return 0;
+ }
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index a8f07243aa9f..51a80b600632 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -52,6 +52,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+ {
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+ 	struct vgic_irq *irq = vgic_get_irq(kvm, NULL, intid), *oldirq;
++	unsigned long flags;
+ 	int ret;
+ 
+ 	/* In this case there is no put, since we keep the reference. */
+@@ -71,7 +72,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+ 	irq->intid = intid;
+ 	irq->target_vcpu = vcpu;
+ 
+-	spin_lock(&dist->lpi_list_lock);
++	spin_lock_irqsave(&dist->lpi_list_lock, flags);
+ 
+ 	/*
+ 	 * There could be a race with another vgic_add_lpi(), so we need to
+@@ -99,7 +100,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+ 	dist->lpi_list_count++;
+ 
+ out_unlock:
+-	spin_unlock(&dist->lpi_list_lock);
++	spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+ 
+ 	/*
+ 	 * We "cache" the configuration table entries in our struct vgic_irq's.
+@@ -315,6 +316,7 @@ static int vgic_copy_lpi_list(struct kvm_vcpu *vcpu, u32 **intid_ptr)
+ {
+ 	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+ 	struct vgic_irq *irq;
++	unsigned long flags;
+ 	u32 *intids;
+ 	int irq_count, i = 0;
+ 
+@@ -330,7 +332,7 @@ static int vgic_copy_lpi_list(struct kvm_vcpu *vcpu, u32 **intid_ptr)
+ 	if (!intids)
+ 		return -ENOMEM;
+ 
+-	spin_lock(&dist->lpi_list_lock);
++	spin_lock_irqsave(&dist->lpi_list_lock, flags);
+ 	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
+ 		if (i == irq_count)
+ 			break;
+@@ -339,7 +341,7 @@ static int vgic_copy_lpi_list(struct kvm_vcpu *vcpu, u32 **intid_ptr)
+ 			continue;
+ 		intids[i++] = irq->intid;
+ 	}
+-	spin_unlock(&dist->lpi_list_lock);
++	spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+ 
+ 	*intid_ptr = intids;
+ 	return i;
+@@ -348,10 +350,11 @@ static int vgic_copy_lpi_list(struct kvm_vcpu *vcpu, u32 **intid_ptr)
+ static int update_affinity(struct vgic_irq *irq, struct kvm_vcpu *vcpu)
+ {
+ 	int ret = 0;
++	unsigned long flags;
+ 
+-	spin_lock(&irq->irq_lock);
++	spin_lock_irqsave(&irq->irq_lock, flags);
+ 	irq->target_vcpu = vcpu;
+-	spin_unlock(&irq->irq_lock);
++	spin_unlock_irqrestore(&irq->irq_lock, flags);
+ 
+ 	if (irq->hw) {
+ 		struct its_vlpi_map map;
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 5f52a2bca36f..6efcddfb5167 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -75,8 +75,9 @@ static struct vgic_irq *vgic_get_lpi(struct kvm *kvm, u32 intid)
+ {
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+ 	struct vgic_irq *irq = NULL;
++	unsigned long flags;
+ 
+-	spin_lock(&dist->lpi_list_lock);
++	spin_lock_irqsave(&dist->lpi_list_lock, flags);
+ 
+ 	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
+ 		if (irq->intid != intid)
+@@ -92,7 +93,7 @@ static struct vgic_irq *vgic_get_lpi(struct kvm *kvm, u32 intid)
+ 	irq = NULL;
+ 
+ out_unlock:
+-	spin_unlock(&dist->lpi_list_lock);
++	spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+ 
+ 	return irq;
+ }
+@@ -137,19 +138,20 @@ static void vgic_irq_release(struct kref *ref)
+ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
+ {
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
++	unsigned long flags;
+ 
+ 	if (irq->intid < VGIC_MIN_LPI)
+ 		return;
+ 
+-	spin_lock(&dist->lpi_list_lock);
++	spin_lock_irqsave(&dist->lpi_list_lock, flags);
+ 	if (!kref_put(&irq->refcount, vgic_irq_release)) {
+-		spin_unlock(&dist->lpi_list_lock);
++		spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+ 		return;
+ 	};
+ 
+ 	list_del(&irq->lpi_list);
+ 	dist->lpi_list_count--;
+-	spin_unlock(&dist->lpi_list_lock);
++	spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+ 
+ 	kfree(irq);
+ }
+-- 
+2.14.1
