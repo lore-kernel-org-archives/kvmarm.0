@@ -1,7 +1,7 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
+From: Andre Przywara <andre.przywara@arm.com>
 Subject: Re: Potential deadlock in vgic
-Date: Fri, 4 May 2018 14:41:36 +0100
-Message-ID: <da1fefae-fec4-aa3a-4fb6-fae9f85f4f61@arm.com>
+Date: Fri, 4 May 2018 15:51:20 +0100
+Message-ID: <1f343d54-03a2-10b4-1413-c0fa4a84bb7e@arm.com>
 References: <20180504110343.GA10968@hc>
  <20180504124742.GG10191@C02W217FHV2R.local> <20180504130854.GA14663@hc>
 Mime-Version: 1.0
@@ -20,8 +20,10 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: Jan Glauber <jan.glauber@caviumnetworks.com>, Christoffer Dall <christoffer.dall@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
+
+Hi,
 
 On 04/05/18 14:08, Jan Glauber wrote:
 > On Fri, May 04, 2018 at 02:47:42PM +0200, Christoffer Dall wrote:
@@ -95,6 +97,21 @@ On 04/05/18 14:08, Jan Glauber wrote:
 > [  394.348210]   <Interrupt>
 > [  394.350817]     lock(&(&vgic_cpu->ap_list_lock)->rlock);
 > [  394.356118] 
+
+That's weird, as that shouldn't happen anymore. IIRC we switched *both*
+ap_list_lock and irq_lock over to be IRQ safe, so the first lock on CPU0
+would disable IRQs, making the interrupt afterwards impossible.
+Did we actually forget some irq_lock's to convert over and lockdep is
+picking those up?
+
+So if this is the case, we should be fine by making the missing ones
+irqsave as well, then adding _irqsave to the lpi_list_lock, which has
+just a few users and guards only short critical sections contained
+within a function.
+
+Cheers,
+Andre.
+
 >                 *** DEADLOCK ***
 > 
 > [  394.362025] 4 locks held by qemu-system-aar/5596:
@@ -102,16 +119,8 @@ On 04/05/18 14:08, Jan Glauber wrote:
 > [  394.374545]  #1: 0000000060090841 (&kvm->srcu){....}, at: kvm_handle_guest_abort+0x11c/0xb70
 > [  394.382984]  #2: 0000000064647766 (&its->cmd_lock){+.+.}, at: vgic_mmio_write_its_cwriter+0x44/0xa8
 > [  394.392022]  #3: 0000000075f90a8a (&its->its_lock){+.+.}, at: vgic_its_process_commands.part.11+0xac/0x780
-
-Right, that's conceptually the same problem (the ap_list_lock being
-always taken with interrupt disabled creates a point where all the
-subsequent locks must also be with interrupts disabled.
-
-Another possibility would be to ensure that we always take the ap_list
-lock before taking the lpi_list_lock, disabling interrupts in the process.
-
-I need to convince myself that this is correct though...
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> 
