@@ -1,46 +1,61 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH 2/2] KVM: ARM: VGIC/ITS: Promote irq_lock() in update_affinity
-Date: Fri,  4 May 2018 18:19:45 +0100
-Message-ID: <20180504171945.22118-2-andre.przywara@arm.com>
-References: <20180504171945.22118-1-andre.przywara@arm.com>
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <20180504171945.22118-1-andre.przywara@arm.com>
-Sender: stable-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org, Jan Glauber <jan.glauber@caviumnetworks.com>
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH v3 01/12] ACPI / APEI: Move the estatus queue code up,
+ and under its own ifdef
+Date: Sat, 5 May 2018 11:58:05 +0200
+Message-ID: <20180505095805.GB3708@pd.tnic>
+References: <20180427153510.5799-1-james.morse@arm.com>
+ <20180427153510.5799-2-james.morse@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <20180427153510.5799-2-james.morse@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: James Morse <james.morse@arm.com>
+Cc: jonathan.zhang@cavium.com, Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Christoffer Dall <cdall@kernel.org>, Xie XiuQi <xiexiuqi@huawei.com>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Punit Agrawal <punit.agrawal@arm.com>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Apparently the development of update_affinity() overlapped with the
-promotion of irq_lock to be _irqsave, so the patch didn't convert this
-lock over. This will make lockdep complain.
+On Fri, Apr 27, 2018 at 04:34:59PM +0100, James Morse wrote:
+> To support asynchronous NMI-like notifications on arm64 we need to use
+> the estatus-queue. These patches refactor it to allow multiple APEI
+> notification types to use it.
+> 
+> First we move the estatus-queue code higher in the file so that any
+> notify_foo() handler can make use of it.
+> 
+> This patch moves code around ... and makes the following trivial change:
+> Freshen the dated comment above ghes_estatus_llist. printk() is no
+> longer the issue, its the helpers like memory_failure_queue() that
+> still aren't nmi safe.
+> 
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Reviewed-by: Punit Agrawal <punit.agrawal@arm.com>
+> 
+> Notes for cover letter:
+> ghes.c has three things all called 'estatus'. One is a pool of memory
+> that has a static size, and is grown/shrunk when new NMI users are
+> allocated.
+> The second is the cache, this holds recent notifications so we can
+> suppress notifications we've already handled.
+> The last is the queue, which hold data from NMI notifications (in pool
+> memory) that can't be handled immediatly.
+> ---
+>  drivers/acpi/apei/ghes.c | 265 ++++++++++++++++++++++++-----------------------
+>  1 file changed, 137 insertions(+), 128 deletions(-)
 
-Fix this disabling IRQs around the lock.
+Reviewed-by: Borislav Petkov <bp@suse.de>
 
-Cc: stable@vger.kernel.org
-Fixes: 08c9fd042117 ("KVM: arm/arm64: vITS: Add a helper to update the affinity of an LPI")
-Reported-by: Jan Glauber <jan.glauber@caviumnetworks.com>
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
- virt/kvm/arm/vgic/vgic-its.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 41abf92f2699..51a80b600632 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -350,10 +350,11 @@ static int vgic_copy_lpi_list(struct kvm_vcpu *vcpu, u32 **intid_ptr)
- static int update_affinity(struct vgic_irq *irq, struct kvm_vcpu *vcpu)
- {
- 	int ret = 0;
-+	unsigned long flags;
- 
--	spin_lock(&irq->irq_lock);
-+	spin_lock_irqsave(&irq->irq_lock, flags);
- 	irq->target_vcpu = vcpu;
--	spin_unlock(&irq->irq_lock);
-+	spin_unlock_irqrestore(&irq->irq_lock, flags);
- 
- 	if (irq->hw) {
- 		struct its_vlpi_map map;
 -- 
-2.14.1
+Regards/Gruss,
+    Boris.
+
+Good mailing practices for 400: avoid top-posting and trim the reply.
