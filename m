@@ -1,16 +1,17 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v5 10/14] KVM: arm64: Save host SVE context as appropriate
-Date: Tue, 8 May 2018 12:25:14 +0100
-Message-ID: <20180508112514.GE7753@e103592.cambridge.arm.com>
+Subject: Re: [PATCH v5 13/14] KVM: arm64: Fold redundant exit code checks out
+ of fixup_guest_exit()
+Date: Tue, 8 May 2018 12:30:39 +0100
+Message-ID: <20180508113039.GF7753@e103592.cambridge.arm.com>
 References: <1525449935-31424-1-git-send-email-Dave.Martin@arm.com>
- <1525449935-31424-11-git-send-email-Dave.Martin@arm.com>
- <0c616c43-3bff-1c93-0463-fae1c53c0e51@arm.com>
+ <1525449935-31424-14-git-send-email-Dave.Martin@arm.com>
+ <eddc101f-6f6c-a37b-ae48-e80a24f60815@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <0c616c43-3bff-1c93-0463-fae1c53c0e51@arm.com>
+In-Reply-To: <eddc101f-6f6c-a37b-ae48-e80a24f60815@arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -24,121 +25,78 @@ To: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Christoffer Dall <cdall@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, May 08, 2018 at 11:38:05AM +0100, Marc Zyngier wrote:
+On Tue, May 08, 2018 at 11:59:25AM +0100, Marc Zyngier wrote:
 > On 04/05/18 17:05, Dave Martin wrote:
-> > This patch adds SVE context saving to the hyp FPSIMD context switch
-> > path.  This means that it is no longer necessary to save the host
-> > SVE state in advance of entering the guest, when in use.
+> > The entire tail of fixup_guest_exit() is contained in if statements
+> > of the form if (x && *exit_code == ARM_EXCEPTION_TRAP).  As a result,
+> > we can check just once and bail out of the function early, allowing
+> > the remaining if conditions to be simplified.
 > > 
-> > In order to avoid adding pointless complexity to the code, VHE is
-> > assumed if SVE is in use.  VHE is an architectural prerequisite for
-> > SVE, so there is no good reason to turn CONFIG_ARM64_VHE off in
-> > kernels that support both SVE and KVM.
+> > The only awkward case is where *exit_code is changed to
+> > ARM_EXCEPTION_EL1_SERROR in the case of an illegal GICv2 CPU
+> > interface access: in that case, the GICv3 trap handling code is
+> > skipped using a goto.  This avoids pointlessly evaluating the
+> > static branch check for the GICv3 case, even though we can't have
+> > vgic_v2_cpuif_trap and vgic_v3_cpuif_trap true simultaneously
+> > unless we have a GICv3 and GICv2 on the host: that sounds stupid,
+> > but I haven't satisfied myself that it can't happen.
+> 
+> Indeed, this cannot happen, unless we decided to trap access to the
+> memory-mapped interface of a GICv3 implementation. We don't do that.
+> 
+> But I guess the goto also serves a visual clue that the two cases are
+> mutually exclusives. Small nit below though:
+> 
 > > 
-> > Historically, software models exist that can expose the
-> > architecturally invalid configuration of SVE without VHE, so if
-> > this situation is detected this patch warns and refuses to create a
-> > VM.  Doing this check at VM creation time avoids race issues
-> > between KVM and SVE initialisation.
+> > No functional change.
 > > 
 > > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> > Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
 > > ---
-> >  arch/arm64/Kconfig          |  7 +++++++
-> >  arch/arm64/kvm/fpsimd.c     |  1 -
-> >  arch/arm64/kvm/hyp/switch.c | 21 +++++++++++++++++++--
-> >  virt/kvm/arm/arm.c          | 18 ++++++++++++++++++
-> >  4 files changed, 44 insertions(+), 3 deletions(-)
+> >  arch/arm64/kvm/hyp/switch.c | 11 +++++++----
+> >  1 file changed, 7 insertions(+), 4 deletions(-)
 > > 
-> > diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> > index eb2cf49..b0d3820 100644
-> > --- a/arch/arm64/Kconfig
-> > +++ b/arch/arm64/Kconfig
-> > @@ -1130,6 +1130,7 @@ endmenu
-> >  config ARM64_SVE
-> >  	bool "ARM Scalable Vector Extension support"
-> >  	default y
-> > +	depends on !KVM || ARM64_VHE
-> 
-> In that case, should we consider making ARM64_VHE "default y" as well,
-> as KVM is "default y" too?
-
-Surely ARM64_VHE has always been default y?
-
-1f364c8c48a0 ("arm64: VHE: Add support for running Linux in EL2 mode")
-
-> Otherwise, I fear we end-up regressing existing configurations. Also,
-> you still have to check for the configuration at run time, so I'm not
-> immediately getting the point of this particular change.
-
-We check for the configuration, but the penalty is severe (i.e., can't
-create VMs) and it doesn't appear to make sense to put effort into
-working around that: the user has an easy fix in the form of setting
-ARM64_VHE=y.
-
-Is there some value to supporting this configuration that I'm missing?
-SVE and VHE are both default y.
-
-
-[...]
-
-> > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> > index 6cf499b..a7be7bf 100644
-> > --- a/virt/kvm/arm/arm.c
-> > +++ b/virt/kvm/arm/arm.c
-> > @@ -16,6 +16,7 @@
-> >   * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-> >   */
+> > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> > index 39e9166..be09c52 100644
+> > --- a/arch/arm64/kvm/hyp/switch.c
+> > +++ b/arch/arm64/kvm/hyp/switch.c
+> > @@ -385,11 +385,13 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+> >  	 * same PC once the SError has been injected, and replay the
+> >  	 * trapping instruction.
+> >  	 */
+> > -	if (*exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
+> > +	if (*exit_code != ARM_EXCEPTION_TRAP)
+> > +		goto exit;
+> > +
+> > +	if (!__populate_fault_info(vcpu))
+> >  		return true;
 > >  
-> > +#include <linux/bug.h>
-> >  #include <linux/cpu_pm.h>
-> >  #include <linux/errno.h>
-> >  #include <linux/err.h>
-> > @@ -41,6 +42,7 @@
-> >  #include <asm/mman.h>
-> >  #include <asm/tlbflush.h>
-> >  #include <asm/cacheflush.h>
-> > +#include <asm/cpufeature.h>
-> >  #include <asm/virt.h>
-> >  #include <asm/kvm_arm.h>
-> >  #include <asm/kvm_asm.h>
-> > @@ -120,6 +122,22 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
-> >  	if (type)
-> >  		return -EINVAL;
+> > -	if (static_branch_unlikely(&vgic_v2_cpuif_trap) &&
+> > -	    *exit_code == ARM_EXCEPTION_TRAP) {
+> > +	if (static_branch_unlikely(&vgic_v2_cpuif_trap)) {
+> >  		bool valid;
 > >  
-> > +	/*
-> > +	 * VHE is a prerequisite for SVE in the Arm architecture, and
-> > +	 * Kconfig ensures that if system_supports_sve() here then
-> > +	 * CONFIG_ARM64_VHE is enabled, so if VHE support wasn't already
-> > +	 * detected and enabled, the CPU is architecturally
-> > +	 * noncompliant.
-> > +	 *
-> > +	 * Just in case this mismatch is seen, detect it, warn and give
-> > +	 * up.  Supporting this forbidden configuration in Hyp would be
-> > +	 * pointless.
-> > +	 */
-> > +	if (system_supports_sve() && !has_vhe()) {
-> > +		kvm_pr_unimpl("Cannot create VMs on SVE system without VHE.  Broken cpu?");
-> > +		return -ENXIO;
-> > +	}
+> >  		valid = kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_DABT_LOW &&
+> > @@ -414,12 +416,12 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+> >  				if (!__skip_instr(vcpu))
+> >  					*vcpu_cpsr(vcpu) &= ~DBG_SPSR_SS;
+> >  				*exit_code = ARM_EXCEPTION_EL1_SERROR;
+> > +				goto exit;
 > 
-> You might as well fail the boot KVM initialization altogether, and not
-> wait for a VM to be created.
+> This goto...
+> 
+> >  			}
+> 
+> ... should be placed here. If this was a data abort, it cannot be a
+> system register trap, and the below conditions cannot possibly apply.
 
-I was concerned that the SVE and KVM initialisation might happen in
-an unpredictable order.
+That sounds logically sensible, but to be clear, this would be a
+semantic change to this function, right?
 
-KVM is initialised via module_init(), which I'm guessing is later than
-cpufeatures (?)  If so then yes, kvm_arch_init() would be a reasonable
-place to do this.
+(i.e., it forces skipping of the GICv3 handling code in a case where
+it previously wasn't forced -- at least not within this function.  The
+arguments about whether vgic_v2_cpuif_trap and vgic_v3_cpuif_trap can
+ever be true simultaneously still apply.)
 
-> But I'm more concerned with the fact that we're now have a configuration
-> that drops functionalities on the floor, one way or another.
-
-Is this still a problem if that configuration is forbidden by Kconfig?
-
-Can you describe a scenario in which the problem config (KVM=y, VHE=n,
-SVE=y) would be wanted?
 
 Cheers
 ---Dave
