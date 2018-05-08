@@ -1,138 +1,107 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v6 05/15] arm64: fpsimd: Generalise context saving for
- non-task contexts
-Date: Tue,  8 May 2018 17:44:50 +0100
-Message-ID: <1525797900-5548-6-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v6 01/15] thread_info: Add update_thread_flag() helpers
+Date: Tue,  8 May 2018 17:44:46 +0100
+Message-ID: <1525797900-5548-2-git-send-email-Dave.Martin@arm.com>
 References: <1525797900-5548-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 41FF242121
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 May 2018 12:36:16 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id qUkAhnFfo2Oq for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 May 2018 12:35:53 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 618AC4A0D2
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 May 2018 12:35:49 -0400 (EDT)
 In-Reply-To: <1525797900-5548-1-git-send-email-Dave.Martin@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <cdall@kernel.org>, linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Oleg Nesterov <oleg@redhat.com>, Steven Rostedt <rostedt@goodmis.org>, Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In preparation for allowing non-task (i.e., KVM vcpu) FPSIMD
-contexts to be handled by the fpsimd common code, this patch adapts
-task_fpsimd_save() to save back the currently loaded context,
-removing the explicit dependency on current.
+There are a number of bits of code sprinkled around the kernel to
+set a thread flag if a certain condition is true, and clear it
+otherwise.
 
-The relevant storage to write back to in memory is now found by
-examining the fpsimd_last_state percpu struct.
+To help make those call sites terser and less cumbersome, this
+patch adds a new family of thread flag manipulators
 
-fpsimd_save() does nothing unless TIF_FOREIGN_FPSTATE is clear, and
-fpsimd_last_state is updated under local_bh_disable() or
-local_irq_disable() everywhere that TIF_FOREIGN_FPSTATE is cleared:
-thus, fpsimd_save() will write back to the correct storage for the
-loaded context.
+	update*_thread_flag([...,] flag, cond)
 
-No functional change.
+which do the equivalent of:
+
+	if (cond)
+		set*_thread_flag([...,] flag);
+	else
+		clear*_thread_flag([...,] flag);
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Steven Rostedt <rostedt@goodmis.org>
+Cc: Oleg Nesterov <oleg@redhat.com>
 ---
- arch/arm64/kernel/fpsimd.c | 25 +++++++++++++------------
- 1 file changed, 13 insertions(+), 12 deletions(-)
+ include/linux/sched.h       |  6 ++++++
+ include/linux/thread_info.h | 11 +++++++++++
+ 2 files changed, 17 insertions(+)
 
-diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index 0c4e7e0..5fc0595 100644
---- a/arch/arm64/kernel/fpsimd.c
-+++ b/arch/arm64/kernel/fpsimd.c
-@@ -270,13 +270,15 @@ static void task_fpsimd_load(void)
+diff --git a/include/linux/sched.h b/include/linux/sched.h
+index b3d697f..c2c3051 100644
+--- a/include/linux/sched.h
++++ b/include/linux/sched.h
+@@ -1578,6 +1578,12 @@ static inline void clear_tsk_thread_flag(struct task_struct *tsk, int flag)
+ 	clear_ti_thread_flag(task_thread_info(tsk), flag);
  }
  
- /*
-- * Ensure current's FPSIMD/SVE storage in thread_struct is up to date
-- * with respect to the CPU registers.
-+ * Ensure FPSIMD/SVE storage in memory for the loaded context is up to
-+ * date with respect to the CPU registers.
-  *
-  * Softirqs (and preemption) must be disabled.
-  */
--static void task_fpsimd_save(void)
-+static void fpsimd_save(void)
- {
-+	struct user_fpsimd_state *st = __this_cpu_read(fpsimd_last_state.st);
++static inline void update_tsk_thread_flag(struct task_struct *tsk, int flag,
++					  bool value)
++{
++	update_ti_thread_flag(task_thread_info(tsk), flag, value);
++}
 +
- 	WARN_ON(!in_softirq() && !irqs_disabled());
- 
- 	if (!test_thread_flag(TIF_FOREIGN_FPSTATE)) {
-@@ -291,10 +293,9 @@ static void task_fpsimd_save(void)
- 				return;
- 			}
- 
--			sve_save_state(sve_pffr(current),
--				       &current->thread.uw.fpsimd_state.fpsr);
-+			sve_save_state(sve_pffr(current), &st->fpsr);
- 		} else
--			fpsimd_save_state(&current->thread.uw.fpsimd_state);
-+			fpsimd_save_state(st);
- 	}
+ static inline int test_and_set_tsk_thread_flag(struct task_struct *tsk, int flag)
+ {
+ 	return test_and_set_ti_thread_flag(task_thread_info(tsk), flag);
+diff --git a/include/linux/thread_info.h b/include/linux/thread_info.h
+index cf2862b..8d8821b 100644
+--- a/include/linux/thread_info.h
++++ b/include/linux/thread_info.h
+@@ -60,6 +60,15 @@ static inline void clear_ti_thread_flag(struct thread_info *ti, int flag)
+ 	clear_bit(flag, (unsigned long *)&ti->flags);
  }
  
-@@ -598,7 +599,7 @@ int sve_set_vector_length(struct task_struct *task,
- 	if (task == current) {
- 		local_bh_disable();
- 
--		task_fpsimd_save();
-+		fpsimd_save();
- 		set_thread_flag(TIF_FOREIGN_FPSTATE);
- 	}
- 
-@@ -837,7 +838,7 @@ asmlinkage void do_sve_acc(unsigned int esr, struct pt_regs *regs)
- 
- 	local_bh_disable();
- 
--	task_fpsimd_save();
-+	fpsimd_save();
- 	fpsimd_to_sve(current);
- 
- 	/* Force ret_to_user to reload the registers: */
-@@ -898,7 +899,7 @@ void fpsimd_thread_switch(struct task_struct *next)
- 	 * 'current'.
- 	 */
- 	if (current->mm)
--		task_fpsimd_save();
-+		fpsimd_save();
- 
- 	if (next->mm)
- 		/*
-@@ -977,7 +978,7 @@ void fpsimd_preserve_current_state(void)
- 		return;
- 
- 	local_bh_disable();
--	task_fpsimd_save();
-+	fpsimd_save();
- 	local_bh_enable();
- }
- 
-@@ -1117,7 +1118,7 @@ void kernel_neon_begin(void)
- 
- 	/* Save unsaved task fpsimd state, if any: */
- 	if (current->mm) {
--		task_fpsimd_save();
-+		fpsimd_save();
- 		set_thread_flag(TIF_FOREIGN_FPSTATE);
- 	}
- 
-@@ -1242,7 +1243,7 @@ static int fpsimd_cpu_pm_notifier(struct notifier_block *self,
- 	switch (cmd) {
- 	case CPU_PM_ENTER:
- 		if (current->mm)
--			task_fpsimd_save();
-+			fpsimd_save();
- 		fpsimd_flush_cpu_state();
- 		break;
- 	case CPU_PM_EXIT:
++static inline void update_ti_thread_flag(struct thread_info *ti, int flag,
++					 bool value)
++{
++	if (value)
++		set_ti_thread_flag(ti, flag);
++	else
++		clear_ti_thread_flag(ti, flag);
++}
++
+ static inline int test_and_set_ti_thread_flag(struct thread_info *ti, int flag)
+ {
+ 	return test_and_set_bit(flag, (unsigned long *)&ti->flags);
+@@ -79,6 +88,8 @@ static inline int test_ti_thread_flag(struct thread_info *ti, int flag)
+ 	set_ti_thread_flag(current_thread_info(), flag)
+ #define clear_thread_flag(flag) \
+ 	clear_ti_thread_flag(current_thread_info(), flag)
++#define update_thread_flag(flag, value) \
++	update_ti_thread_flag(current_thread_info(), flag, value)
+ #define test_and_set_thread_flag(flag) \
+ 	test_and_set_ti_thread_flag(current_thread_info(), flag)
+ #define test_and_clear_thread_flag(flag) \
 -- 
 2.1.4
