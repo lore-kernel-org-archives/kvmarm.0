@@ -1,90 +1,138 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v6 00/15] KVM: arm64: Optimise FPSIMD context switching
-Date: Tue,  8 May 2018 17:44:45 +0100
-Message-ID: <1525797900-5548-1-git-send-email-Dave.Martin@arm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Subject: [PATCH v6 05/15] arm64: fpsimd: Generalise context saving for
+ non-task contexts
+Date: Tue,  8 May 2018 17:44:50 +0100
+Message-ID: <1525797900-5548-6-git-send-email-Dave.Martin@arm.com>
+References: <1525797900-5548-1-git-send-email-Dave.Martin@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <1525797900-5548-1-git-send-email-Dave.Martin@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: kvmarm@lists.cs.columbia.edu
-Cc: linux-arm-kernel@lists.infradead.org, Christoffer Dall <cdall@kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Steven Rostedt <rostedt@goodmis.org>, Oleg Nesterov <oleg@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <cdall@kernel.org>, linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Note: Most of these patches are Arm-specific.  People not Cc'd on the
-whole series can find it in the linux-arm-kernel archive [3].
+In preparation for allowing non-task (i.e., KVM vcpu) FPSIMD
+contexts to be handled by the fpsimd common code, this patch adapts
+task_fpsimd_save() to save back the currently loaded context,
+removing the explicit dependency on current.
 
-This series aims to improve the way FPSIMD context is handled by KVM.
-Only minor changes have been made since the previous v5 [1].
-The changes are summarised in the individual patches.
+The relevant storage to write back to in memory is now found by
+examining the fpsimd_last_state percpu struct.
 
-Patch 6 is new, and does some simple refactoring to enable new bits to
-be added to an existing vcpu_arch flags field.
+fpsimd_save() does nothing unless TIF_FOREIGN_FPSTATE is clear, and
+fpsimd_last_state is updated under local_bh_disable() or
+local_irq_disable() everywhere that TIF_FOREIGN_FPSTATE is cleared:
+thus, fpsimd_save() will write back to the correct storage for the
+loaded context.
 
-Patches 1, 2, 6, 7 and 14 are still missing Reviewed-bys/Acked-bys, so
-reviewer attention on these patches would be much appreciated.
+No functional change.
 
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm64/kernel/fpsimd.c | 25 +++++++++++++------------
+ 1 file changed, 13 insertions(+), 12 deletions(-)
 
-Some testing done on Juno and the Arm fast model (arm64), including
-(on earlier versions of the patches) combinations of (non-)SVE and
-(non-)VHE configurations.
-
-Cheers
----Dave
-
-[1] [PATCH v5 00/14] KVM: arm64: Optimise FPSIMD context switching
-http://lists.infradead.org/pipermail/linux-arm-kernel/2018-May/575805.html
-
-[2] [RFC PATCH 0/6] Simplify setting thread flags to a particular value
-https://lkml.org/lkml/2018/4/19/225
-
-[3] linux-arm-kernel archive
-http://lists.infradead.org/pipermail/linux-arm-kernel/2018-May/thread.html
-
-
-Christoffer Dall (1):
-  KVM: arm/arm64: Introduce kvm_arch_vcpu_run_pid_change
-
-Dave Martin (14):
-  thread_info: Add update_thread_flag() helpers
-  arm64: Use update{,_tsk}_thread_flag()
-  KVM: arm64: Convert lazy FPSIMD context switch trap to C
-  arm64: fpsimd: Generalise context saving for non-task contexts
-  KVM: arm64: Repurpose vcpu_arch.debug_flags for general-purpose flags
-  KVM: arm64: Optimise FPSIMD handling to reduce guest/host thrashing
-  arm64/sve: Move read_zcr_features() out of cpufeature.h
-  arm64/sve: Switch sve_pffr() argument from task to thread
-  arm64/sve: Move sve_pffr() to fpsimd.h and make inline
-  KVM: arm64: Save host SVE context as appropriate
-  KVM: arm64: Remove eager host SVE state saving
-  KVM: arm64: Remove redundant *exit_code changes in fpsimd_guest_exit()
-  KVM: arm64: Fold redundant exit code checks out of fixup_guest_exit()
-  KVM: arm64: Invoke FPSIMD context switch trap from C
-
- arch/arm/include/asm/kvm_host.h     |   9 ++-
- arch/arm64/Kconfig                  |   7 ++
- arch/arm64/include/asm/cpufeature.h |  29 ---------
- arch/arm64/include/asm/fpsimd.h     |  20 ++++++
- arch/arm64/include/asm/kvm_asm.h    |   3 +
- arch/arm64/include/asm/kvm_host.h   |  24 ++++---
- arch/arm64/include/asm/processor.h  |   2 +
- arch/arm64/kernel/fpsimd.c          | 120 ++++++++++++++++++-----------------
- arch/arm64/kernel/ptrace.c          |   1 +
- arch/arm64/kvm/Kconfig              |   1 +
- arch/arm64/kvm/Makefile             |   2 +-
- arch/arm64/kvm/debug.c              |   8 +--
- arch/arm64/kvm/fpsimd.c             | 110 ++++++++++++++++++++++++++++++++
- arch/arm64/kvm/hyp/debug-sr.c       |   6 +-
- arch/arm64/kvm/hyp/entry.S          |  43 -------------
- arch/arm64/kvm/hyp/hyp-entry.S      |  19 ------
- arch/arm64/kvm/hyp/switch.c         | 123 +++++++++++++++++++++++++-----------
- arch/arm64/kvm/hyp/sysreg-sr.c      |   4 +-
- arch/arm64/kvm/sys_regs.c           |   8 +--
- include/linux/kvm_host.h            |   9 +++
- include/linux/sched.h               |   6 ++
- include/linux/thread_info.h         |  11 ++++
- virt/kvm/Kconfig                    |   3 +
- virt/kvm/arm/arm.c                  |  25 +++++++-
- virt/kvm/kvm_main.c                 |   7 +-
- 25 files changed, 383 insertions(+), 217 deletions(-)
- create mode 100644 arch/arm64/kvm/fpsimd.c
-
+diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+index 0c4e7e0..5fc0595 100644
+--- a/arch/arm64/kernel/fpsimd.c
++++ b/arch/arm64/kernel/fpsimd.c
+@@ -270,13 +270,15 @@ static void task_fpsimd_load(void)
+ }
+ 
+ /*
+- * Ensure current's FPSIMD/SVE storage in thread_struct is up to date
+- * with respect to the CPU registers.
++ * Ensure FPSIMD/SVE storage in memory for the loaded context is up to
++ * date with respect to the CPU registers.
+  *
+  * Softirqs (and preemption) must be disabled.
+  */
+-static void task_fpsimd_save(void)
++static void fpsimd_save(void)
+ {
++	struct user_fpsimd_state *st = __this_cpu_read(fpsimd_last_state.st);
++
+ 	WARN_ON(!in_softirq() && !irqs_disabled());
+ 
+ 	if (!test_thread_flag(TIF_FOREIGN_FPSTATE)) {
+@@ -291,10 +293,9 @@ static void task_fpsimd_save(void)
+ 				return;
+ 			}
+ 
+-			sve_save_state(sve_pffr(current),
+-				       &current->thread.uw.fpsimd_state.fpsr);
++			sve_save_state(sve_pffr(current), &st->fpsr);
+ 		} else
+-			fpsimd_save_state(&current->thread.uw.fpsimd_state);
++			fpsimd_save_state(st);
+ 	}
+ }
+ 
+@@ -598,7 +599,7 @@ int sve_set_vector_length(struct task_struct *task,
+ 	if (task == current) {
+ 		local_bh_disable();
+ 
+-		task_fpsimd_save();
++		fpsimd_save();
+ 		set_thread_flag(TIF_FOREIGN_FPSTATE);
+ 	}
+ 
+@@ -837,7 +838,7 @@ asmlinkage void do_sve_acc(unsigned int esr, struct pt_regs *regs)
+ 
+ 	local_bh_disable();
+ 
+-	task_fpsimd_save();
++	fpsimd_save();
+ 	fpsimd_to_sve(current);
+ 
+ 	/* Force ret_to_user to reload the registers: */
+@@ -898,7 +899,7 @@ void fpsimd_thread_switch(struct task_struct *next)
+ 	 * 'current'.
+ 	 */
+ 	if (current->mm)
+-		task_fpsimd_save();
++		fpsimd_save();
+ 
+ 	if (next->mm)
+ 		/*
+@@ -977,7 +978,7 @@ void fpsimd_preserve_current_state(void)
+ 		return;
+ 
+ 	local_bh_disable();
+-	task_fpsimd_save();
++	fpsimd_save();
+ 	local_bh_enable();
+ }
+ 
+@@ -1117,7 +1118,7 @@ void kernel_neon_begin(void)
+ 
+ 	/* Save unsaved task fpsimd state, if any: */
+ 	if (current->mm) {
+-		task_fpsimd_save();
++		fpsimd_save();
+ 		set_thread_flag(TIF_FOREIGN_FPSTATE);
+ 	}
+ 
+@@ -1242,7 +1243,7 @@ static int fpsimd_cpu_pm_notifier(struct notifier_block *self,
+ 	switch (cmd) {
+ 	case CPU_PM_ENTER:
+ 		if (current->mm)
+-			task_fpsimd_save();
++			fpsimd_save();
+ 		fpsimd_flush_cpu_state();
+ 		break;
+ 	case CPU_PM_EXIT:
 -- 
 2.1.4
