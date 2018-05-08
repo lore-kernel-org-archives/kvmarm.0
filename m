@@ -1,111 +1,90 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCH v2 05/17] arm64: Helper for parange to PASize
-Date: Tue, 8 May 2018 14:47:03 +0100
-Message-ID: <89d5f41c-56e1-9195-ec08-05a708bf15f0@arm.com>
-References: <1522156531-28348-1-git-send-email-suzuki.poulose@arm.com>
- <1522156531-28348-6-git-send-email-suzuki.poulose@arm.com>
- <b44930d9-b25d-acd4-9676-6f779e2c590a@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: [PATCH v6 00/15] KVM: arm64: Optimise FPSIMD context switching
+Date: Tue,  8 May 2018 17:44:45 +0100
+Message-ID: <1525797900-5548-1-git-send-email-Dave.Martin@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <b44930d9-b25d-acd4-9676-6f779e2c590a@arm.com>
-Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
-To: James Morse <james.morse@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, ard.biesheuvel@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
+Cc: linux-arm-kernel@lists.infradead.org, Christoffer Dall <cdall@kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Steven Rostedt <rostedt@goodmis.org>, Oleg Nesterov <oleg@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 03/05/18 15:39, James Morse wrote:
-> Hi Suzuki,
-> 
-> Nit: KVM in the subject line?
+Note: Most of these patches are Arm-specific.  People not Cc'd on the
+whole series can find it in the linux-arm-kernel archive [3].
 
-Well, the helper is generic and its just that KVM makes use of it.
+This series aims to improve the way FPSIMD context is handled by KVM.
+Only minor changes have been made since the previous v5 [1].
+The changes are summarised in the individual patches.
 
-> 
-> On 27/03/18 14:15, Suzuki K Poulose wrote:
->> Add a helper to convert ID_AA64MMFR0_EL1:PARange to they physical
->> size shift. Limit the size to the maximum supported by the kernel.
->> We are about to move the user of this code and this helps to
->> keep the changes cleaner.
-> 
->> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
->> index fbf0aab..1f2a5dd 100644
->> --- a/arch/arm64/include/asm/cpufeature.h
->> +++ b/arch/arm64/include/asm/cpufeature.h
->> @@ -311,6 +311,22 @@ static inline u64 read_zcr_features(void)
->>   	return zcr;
->>   }
->>   
->> +static inline u32 id_aa64mmfr0_parange_to_phys_shift(int parange)
->> +{
->> +	switch (parange) {
->> +	case 0: return 32;
->> +	case 1: return 36;
->> +	case 2: return 40;
->> +	case 3: return 42;
->> +	case 4: return 44;
->> +	/* Report 48 bit if the kernel doesn't support 52bit */
->> +	default:
->> +	case 5: return 48;
->> +#ifdef CONFIG_ARM64_PA_BITS_52
->> +	case 6: return 52;
->> +#endif
-> 
-> Eeew. I thought 'default' had to appear at the end of the list, but evidently
-> not! If the last three bit value ever gets used this is going to look really weird.
+Patch 6 is new, and does some simple refactoring to enable new bits to
+be added to an existing vcpu_arch flags field.
 
-I could rearrange them a bit to :
+Patches 1, 2, 6, 7 and 14 are still missing Reviewed-bys/Acked-bys, so
+reviewer attention on these patches would be much appreciated.
 
-	case 4: ..
-#ifdef CONFIG_ARM64_PA_BITS_52
-	case 6: ...
-#endif
-	case 5:
-	/* Report 48 bit if the kernel doesn't support 52bit */
-	default: return 48;
 
-> 
-> Can't we have a helper that just does the mapping, then apply the clamping with
-> something like:
-> | parange = min(CONFIG_ARM64_PA_BITS, parange);
-
-Yes, I think that might be a bit cleaner.
-
-> 
-> 
-> Its odd that the helper has the id-register in the name, but expects you do the
-> shift and mask for it...
-> 
-> (and for this patch, KVM has already done the 52bit clamping with:
-> | 	if (parange > ID_AA64MMFR0_PARANGE_MAX)
-> |		parange = ID_AA64MMFR0_PARANGE_MAX;
-> )
-> 
-
-As mentioned in the other thread, I will change the name of the helper.
-
-> 
->> diff --git a/arch/arm64/kvm/hyp/s2-setup.c b/arch/arm64/kvm/hyp/s2-setup.c
->> index 603e1ee..b1129c8 100644
->> --- a/arch/arm64/kvm/hyp/s2-setup.c
->> +++ b/arch/arm64/kvm/hyp/s2-setup.c
->> @@ -19,11 +19,13 @@
->>   #include <asm/kvm_arm.h>
->>   #include <asm/kvm_asm.h>
->>   #include <asm/kvm_hyp.h>
->> +#include <asm/cpufeature.h>
->>   
->>   u32 __hyp_text __init_stage2_translation(void)
->>   {
-> 
-> Nit: Why change the variable you put this in, if its all removed again in patch 11?
-
-The parange holds the PARange initially, used to set the VTCR.IPS and is then
-overloaded with the converted "phys-shift". The change is a minor cleanup to
-make that clear, even though we remove it later as we don't deal with the
-phys-shifts anymore. I would prefer to keep it as it is.
+Some testing done on Juno and the Arm fast model (arm64), including
+(on earlier versions of the patches) combinations of (non-)SVE and
+(non-)VHE configurations.
 
 Cheers
-Suzuki
+---Dave
+
+[1] [PATCH v5 00/14] KVM: arm64: Optimise FPSIMD context switching
+http://lists.infradead.org/pipermail/linux-arm-kernel/2018-May/575805.html
+
+[2] [RFC PATCH 0/6] Simplify setting thread flags to a particular value
+https://lkml.org/lkml/2018/4/19/225
+
+[3] linux-arm-kernel archive
+http://lists.infradead.org/pipermail/linux-arm-kernel/2018-May/thread.html
+
+
+Christoffer Dall (1):
+  KVM: arm/arm64: Introduce kvm_arch_vcpu_run_pid_change
+
+Dave Martin (14):
+  thread_info: Add update_thread_flag() helpers
+  arm64: Use update{,_tsk}_thread_flag()
+  KVM: arm64: Convert lazy FPSIMD context switch trap to C
+  arm64: fpsimd: Generalise context saving for non-task contexts
+  KVM: arm64: Repurpose vcpu_arch.debug_flags for general-purpose flags
+  KVM: arm64: Optimise FPSIMD handling to reduce guest/host thrashing
+  arm64/sve: Move read_zcr_features() out of cpufeature.h
+  arm64/sve: Switch sve_pffr() argument from task to thread
+  arm64/sve: Move sve_pffr() to fpsimd.h and make inline
+  KVM: arm64: Save host SVE context as appropriate
+  KVM: arm64: Remove eager host SVE state saving
+  KVM: arm64: Remove redundant *exit_code changes in fpsimd_guest_exit()
+  KVM: arm64: Fold redundant exit code checks out of fixup_guest_exit()
+  KVM: arm64: Invoke FPSIMD context switch trap from C
+
+ arch/arm/include/asm/kvm_host.h     |   9 ++-
+ arch/arm64/Kconfig                  |   7 ++
+ arch/arm64/include/asm/cpufeature.h |  29 ---------
+ arch/arm64/include/asm/fpsimd.h     |  20 ++++++
+ arch/arm64/include/asm/kvm_asm.h    |   3 +
+ arch/arm64/include/asm/kvm_host.h   |  24 ++++---
+ arch/arm64/include/asm/processor.h  |   2 +
+ arch/arm64/kernel/fpsimd.c          | 120 ++++++++++++++++++-----------------
+ arch/arm64/kernel/ptrace.c          |   1 +
+ arch/arm64/kvm/Kconfig              |   1 +
+ arch/arm64/kvm/Makefile             |   2 +-
+ arch/arm64/kvm/debug.c              |   8 +--
+ arch/arm64/kvm/fpsimd.c             | 110 ++++++++++++++++++++++++++++++++
+ arch/arm64/kvm/hyp/debug-sr.c       |   6 +-
+ arch/arm64/kvm/hyp/entry.S          |  43 -------------
+ arch/arm64/kvm/hyp/hyp-entry.S      |  19 ------
+ arch/arm64/kvm/hyp/switch.c         | 123 +++++++++++++++++++++++++-----------
+ arch/arm64/kvm/hyp/sysreg-sr.c      |   4 +-
+ arch/arm64/kvm/sys_regs.c           |   8 +--
+ include/linux/kvm_host.h            |   9 +++
+ include/linux/sched.h               |   6 ++
+ include/linux/thread_info.h         |  11 ++++
+ virt/kvm/Kconfig                    |   3 +
+ virt/kvm/arm/arm.c                  |  25 +++++++-
+ virt/kvm/kvm_main.c                 |   7 +-
+ 25 files changed, 383 insertions(+), 217 deletions(-)
+ create mode 100644 arch/arm64/kvm/fpsimd.c
+
+-- 
+2.1.4
