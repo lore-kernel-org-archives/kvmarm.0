@@ -1,206 +1,157 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v6 11/15] KVM: arm64: Save host SVE context as appropriate
-Date: Tue,  8 May 2018 17:44:56 +0100
-Message-ID: <1525797900-5548-12-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v6 15/15] KVM: arm64: Invoke FPSIMD context switch trap from C
+Date: Tue,  8 May 2018 17:45:00 +0100
+Message-ID: <1525797900-5548-16-git-send-email-Dave.Martin@arm.com>
 References: <1525797900-5548-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BE24A400D4
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 May 2018 12:36:38 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qM8D7T7-3UbM for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 May 2018 12:36:16 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F2684A0DF
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 May 2018 12:36:03 -0400 (EDT)
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <1525797900-5548-1-git-send-email-Dave.Martin@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: kvmarm@lists.cs.columbia.edu
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <cdall@kernel.org>, linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch adds SVE context saving to the hyp FPSIMD context switch
-path.  This means that it is no longer necessary to save the host
-SVE state in advance of entering the guest, when in use.
+The conversion of the FPSIMD context switch trap code to C has added
+some overhead to calling it, due to the need to save registers that
+the procedure call standard defines as caller-saved.
 
-In order to avoid adding pointless complexity to the code, VHE is
-assumed if SVE is in use.  VHE is an architectural prerequisite for
-SVE, so there is no good reason to turn CONFIG_ARM64_VHE off in
-kernels that support both SVE and KVM.
+So, perhaps it is no longer worth invoking this trap handler quite
+so early.
 
-Historically, software models exist that can expose the
-architecturally invalid configuration of SVE without VHE, so if
-this situation is detected this patch warns and refuses to create a
-VM.  Doing this check at VM creation time avoids race issues
-between KVM and SVE initialisation.
+Instead, we can invoke it from fixup_guest_exit(), with little
+likelihood of increasing the overhead much further.
+
+As a convenience, this patch gives __hyp_switch_fpsimd() the same
+return semantics fixup_guest_exit().  For now there is no
+possibility of a spurious FPSIMD trap, so the function always
+returns true, but this allows it to be tail-called with a single
+return statement.
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
-
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
+ arch/arm64/kvm/hyp/entry.S     | 30 ------------------------------
+ arch/arm64/kvm/hyp/hyp-entry.S | 19 -------------------
+ arch/arm64/kvm/hyp/switch.c    | 15 +++++++++++++--
+ 3 files changed, 13 insertions(+), 51 deletions(-)
 
-Changes since v5:
-
-Requested by Marc Zyngier:
-
- * Migrate to flag bits in vcpu_arch.flags instead of adding bools in
-   vcpu_arch.
-
- * Move system_supports_sve() && !has_vhe() sanity check to
-   kvm_arch_init() instead of doing it each time a VM is created.
-   cpufeatures initialisation should be complete by the time any
-   before module_init() call runs.
----
- arch/arm64/Kconfig          |  7 +++++++
- arch/arm64/kvm/fpsimd.c     |  1 -
- arch/arm64/kvm/hyp/switch.c | 22 ++++++++++++++++++++--
- virt/kvm/arm/arm.c          | 18 ++++++++++++++++++
- 4 files changed, 45 insertions(+), 3 deletions(-)
-
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index eb2cf49..b0d3820 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -1130,6 +1130,7 @@ endmenu
- config ARM64_SVE
- 	bool "ARM Scalable Vector Extension support"
- 	default y
-+	depends on !KVM || ARM64_VHE
- 	help
- 	  The Scalable Vector Extension (SVE) is an extension to the AArch64
- 	  execution state which complements and extends the SIMD functionality
-@@ -1155,6 +1156,12 @@ config ARM64_SVE
- 	  booting the kernel.  If unsure and you are not observing these
- 	  symptoms, you should assume that it is safe to say Y.
+diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+index 40f349b..fad1e16 100644
+--- a/arch/arm64/kvm/hyp/entry.S
++++ b/arch/arm64/kvm/hyp/entry.S
+@@ -166,33 +166,3 @@ abort_guest_exit_end:
+ 	orr	x0, x0, x5
+ 1:	ret
+ ENDPROC(__guest_exit)
+-
+-ENTRY(__fpsimd_guest_restore)
+-	// x0: esr
+-	// x1: vcpu
+-	// x2-x29,lr: vcpu regs
+-	// vcpu x0-x1 on the stack
+-	stp	x2, x3, [sp, #-144]!
+-	stp	x4, x5, [sp, #16]
+-	stp	x6, x7, [sp, #32]
+-	stp	x8, x9, [sp, #48]
+-	stp	x10, x11, [sp, #64]
+-	stp	x12, x13, [sp, #80]
+-	stp	x14, x15, [sp, #96]
+-	stp	x16, x17, [sp, #112]
+-	stp	x18, lr, [sp, #128]
+-
+-	bl	__hyp_switch_fpsimd
+-
+-	ldp	x4, x5, [sp, #16]
+-	ldp	x6, x7, [sp, #32]
+-	ldp	x8, x9, [sp, #48]
+-	ldp	x10, x11, [sp, #64]
+-	ldp	x12, x13, [sp, #80]
+-	ldp	x14, x15, [sp, #96]
+-	ldp	x16, x17, [sp, #112]
+-	ldp	x18, lr, [sp, #128]
+-	ldp	x0, x1, [sp, #144]
+-	ldp	x2, x3, [sp], #160
+-	eret
+-ENDPROC(__fpsimd_guest_restore)
+diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+index bffece2..753b9d2 100644
+--- a/arch/arm64/kvm/hyp/hyp-entry.S
++++ b/arch/arm64/kvm/hyp/hyp-entry.S
+@@ -113,25 +113,6 @@ el1_hvc_guest:
  
-+	  CPUs that support SVE are architecturally required to support the
-+	  Virtualization Host Extensions (VHE), so the kernel makes no
-+	  provision for supporting SVE alongside KVM without VHE enabled.
-+	  Thus, you will need to enable CONFIG_ARM64_VHE if you want to support
-+	  KVM in the same kernel image.
-+
- config ARM64_MODULE_PLTS
- 	bool
- 	select HAVE_MOD_ARCH_SPECIFIC
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index 7059275..4c47b55 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -60,7 +60,6 @@ int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu)
-  */
- void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
- {
--	BUG_ON(system_supports_sve());
- 	BUG_ON(!current->mm);
+ el1_trap:
+ 	get_vcpu_ptr	x1, x0
+-
+-	mrs		x0, esr_el2
+-	lsr		x0, x0, #ESR_ELx_EC_SHIFT
+-	/*
+-	 * x0: ESR_EC
+-	 * x1: vcpu pointer
+-	 */
+-
+-	/*
+-	 * We trap the first access to the FP/SIMD to save the host context
+-	 * and restore the guest context lazily.
+-	 * If FP/SIMD is not implemented, handle the trap and inject an
+-	 * undefined instruction exception to the guest.
+-	 */
+-alternative_if_not ARM64_HAS_NO_FPSIMD
+-	cmp	x0, #ESR_ELx_EC_FP_ASIMD
+-	b.eq	__fpsimd_guest_restore
+-alternative_else_nop_endif
+-
+ 	mov	x0, #ARM_EXCEPTION_TRAP
+ 	b	__guest_exit
  
- 	vcpu->arch.flags &= ~(KVM_ARM64_FP_ENABLED | KVM_ARM64_HOST_SVE_IN_USE);
 diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 75c3b65..6826f2d 100644
+index 5be472d..6eeda72 100644
 --- a/arch/arm64/kvm/hyp/switch.c
 +++ b/arch/arm64/kvm/hyp/switch.c
-@@ -21,12 +21,14 @@
+@@ -327,8 +327,7 @@ static bool __hyp_text __skip_instr(struct kvm_vcpu *vcpu)
+ 	}
+ }
  
- #include <kvm/arm_psci.h>
- 
-+#include <asm/cpufeature.h>
- #include <asm/kvm_asm.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_hyp.h>
- #include <asm/kvm_mmu.h>
- #include <asm/fpsimd.h>
- #include <asm/debug-monitors.h>
-+#include <asm/processor.h>
- #include <asm/thread_info.h>
- 
- static bool __hyp_text update_fp_enabled(struct kvm_vcpu *vcpu)
-@@ -328,6 +330,8 @@ static bool __hyp_text __skip_instr(struct kvm_vcpu *vcpu)
- void __hyp_text __hyp_switch_fpsimd(u64 esr __always_unused,
- 				    struct kvm_vcpu *vcpu)
+-void __hyp_text __hyp_switch_fpsimd(u64 esr __always_unused,
+-				    struct kvm_vcpu *vcpu)
++static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
  {
-+	struct user_fpsimd_state *host_fpsimd = vcpu->arch.host_fpsimd_state;
+ 	struct user_fpsimd_state *host_fpsimd = vcpu->arch.host_fpsimd_state;
+ 
+@@ -368,6 +367,8 @@ void __hyp_text __hyp_switch_fpsimd(u64 esr __always_unused,
+ 			     fpexc32_el2);
+ 
+ 	vcpu->arch.flags |= KVM_ARM64_FP_ENABLED;
 +
- 	if (has_vhe())
- 		write_sysreg(read_sysreg(cpacr_el1) | CPACR_EL1_FPEN,
- 			     cpacr_el1);
-@@ -337,8 +341,22 @@ void __hyp_text __hyp_switch_fpsimd(u64 esr __always_unused,
++	return true;
+ }
  
- 	isb();
- 
--	if (vcpu->arch.host_fpsimd_state) {
--		__fpsimd_save_state(vcpu->arch.host_fpsimd_state);
-+	if (host_fpsimd) {
-+		/*
-+		 * In the SVE case, VHE is assumed: it is enforced by
-+		 * Kconfig and kvm_arch_init_vm().
-+		 */
-+		if (system_supports_sve() &&
-+		    (vcpu->arch.flags & KVM_ARM64_HOST_SVE_IN_USE)) {
-+			struct thread_struct *thread = container_of(
-+				host_fpsimd,
-+				struct thread_struct, uw.fpsimd_state);
-+
-+			sve_save_state(sve_pffr(thread), &host_fpsimd->fpsr);
-+		} else {
-+			__fpsimd_save_state(vcpu->arch.host_fpsimd_state);
-+		}
-+
- 		vcpu->arch.host_fpsimd_state = NULL;
- 	}
- 
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index bee226c..379e8a9 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -16,6 +16,7 @@
-  * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-  */
- 
-+#include <linux/bug.h>
- #include <linux/cpu_pm.h>
- #include <linux/errno.h>
- #include <linux/err.h>
-@@ -41,6 +42,7 @@
- #include <asm/mman.h>
- #include <asm/tlbflush.h>
- #include <asm/cacheflush.h>
-+#include <asm/cpufeature.h>
- #include <asm/virt.h>
- #include <asm/kvm_arm.h>
- #include <asm/kvm_asm.h>
-@@ -1582,6 +1584,22 @@ int kvm_arch_init(void *opaque)
- 		}
- 	}
+ /*
+@@ -389,6 +390,16 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	if (*exit_code != ARM_EXCEPTION_TRAP)
+ 		goto exit;
  
 +	/*
-+	 * VHE is a prerequisite for SVE in the Arm architecture, and
-+	 * Kconfig ensures that if system_supports_sve() here then
-+	 * CONFIG_ARM64_VHE is enabled, so if VHE support wasn't already
-+	 * detected and enabled, the CPU is architecturally
-+	 * noncompliant.
-+	 *
-+	 * Just in case this mismatch is seen, detect it, warn and give
-+	 * up.  Supporting this forbidden configuration in Hyp would be
-+	 * pointless.
++	 * We trap the first access to the FP/SIMD to save the host context
++	 * and restore the guest context lazily.
++	 * If FP/SIMD is not implemented, handle the trap and inject an
++	 * undefined instruction exception to the guest.
 +	 */
-+	if (system_supports_sve() && !has_vhe()) {
-+		kvm_pr_unimpl("SVE system without VHE unsupported.  Broken cpu?");
-+		return -ENODEV;
-+	}
++	if (system_supports_fpsimd() &&
++	    kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_FP_ASIMD)
++		return __hyp_switch_fpsimd(vcpu);
 +
- 	err = init_common_resources();
- 	if (err)
- 		return err;
+ 	if (!__populate_fault_info(vcpu))
+ 		return true;
+ 
 -- 
 2.1.4
