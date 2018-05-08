@@ -1,165 +1,111 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v5 10/14] KVM: arm64: Save host SVE context as appropriate
-Date: Tue, 8 May 2018 13:40:15 +0100
-Message-ID: <20180508124015.GJ7753@e103592.cambridge.arm.com>
-References: <1525449935-31424-1-git-send-email-Dave.Martin@arm.com>
- <1525449935-31424-11-git-send-email-Dave.Martin@arm.com>
- <0c616c43-3bff-1c93-0463-fae1c53c0e51@arm.com>
- <20180508112514.GE7753@e103592.cambridge.arm.com>
- <ab34071f-1808-f33a-e9a0-3067afa815af@arm.com>
+From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Subject: Re: [PATCH v2 05/17] arm64: Helper for parange to PASize
+Date: Tue, 8 May 2018 14:47:03 +0100
+Message-ID: <89d5f41c-56e1-9195-ec08-05a708bf15f0@arm.com>
+References: <1522156531-28348-1-git-send-email-suzuki.poulose@arm.com>
+ <1522156531-28348-6-git-send-email-suzuki.poulose@arm.com>
+ <b44930d9-b25d-acd4-9676-6f779e2c590a@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <ab34071f-1808-f33a-e9a0-3067afa815af@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <cdall@kernel.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <b44930d9-b25d-acd4-9676-6f779e2c590a@arm.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: James Morse <james.morse@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, ard.biesheuvel@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, May 08, 2018 at 12:57:56PM +0100, Marc Zyngier wrote:
-> On 08/05/18 12:25, Dave Martin wrote:
-> > On Tue, May 08, 2018 at 11:38:05AM +0100, Marc Zyngier wrote:
-> >> On 04/05/18 17:05, Dave Martin wrote:
-> >>> This patch adds SVE context saving to the hyp FPSIMD context switch
-> >>> path.  This means that it is no longer necessary to save the host
-> >>> SVE state in advance of entering the guest, when in use.
-> >>>
-> >>> In order to avoid adding pointless complexity to the code, VHE is
-> >>> assumed if SVE is in use.  VHE is an architectural prerequisite for
-> >>> SVE, so there is no good reason to turn CONFIG_ARM64_VHE off in
-> >>> kernels that support both SVE and KVM.
-> >>>
-> >>> Historically, software models exist that can expose the
-> >>> architecturally invalid configuration of SVE without VHE, so if
-> >>> this situation is detected this patch warns and refuses to create a
-> >>> VM.  Doing this check at VM creation time avoids race issues
-> >>> between KVM and SVE initialisation.
-> >>>
-> >>> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> >>> Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
-> >>> ---
-> >>>  arch/arm64/Kconfig          |  7 +++++++
-> >>>  arch/arm64/kvm/fpsimd.c     |  1 -
-> >>>  arch/arm64/kvm/hyp/switch.c | 21 +++++++++++++++++++--
-> >>>  virt/kvm/arm/arm.c          | 18 ++++++++++++++++++
-> >>>  4 files changed, 44 insertions(+), 3 deletions(-)
-> >>>
-> >>> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> >>> index eb2cf49..b0d3820 100644
-> >>> --- a/arch/arm64/Kconfig
-> >>> +++ b/arch/arm64/Kconfig
-> >>> @@ -1130,6 +1130,7 @@ endmenu
-> >>>  config ARM64_SVE
-> >>>  	bool "ARM Scalable Vector Extension support"
-> >>>  	default y
-> >>> +	depends on !KVM || ARM64_VHE
-> >>
-> >> In that case, should we consider making ARM64_VHE "default y" as well,
-> >> as KVM is "default y" too?
-> > 
-> > Surely ARM64_VHE has always been default y?
-> > 
-> > 1f364c8c48a0 ("arm64: VHE: Add support for running Linux in EL2 mode")
+On 03/05/18 15:39, James Morse wrote:
+> Hi Suzuki,
 > 
-> Hmmm. I have no idea who this Zyngier guy from 2014 is. Oh well.
+> Nit: KVM in the subject line?
+
+Well, the helper is generic and its just that KVM makes use of it.
+
 > 
-> >> Otherwise, I fear we end-up regressing existing configurations. Also,
-> >> you still have to check for the configuration at run time, so I'm not
-> >> immediately getting the point of this particular change.
-> > 
-> > We check for the configuration, but the penalty is severe (i.e., can't
-> > create VMs) and it doesn't appear to make sense to put effort into
-> > working around that: the user has an easy fix in the form of setting
-> > ARM64_VHE=y.
-> > 
-> > Is there some value to supporting this configuration that I'm missing?
-> > SVE and VHE are both default y.
+> On 27/03/18 14:15, Suzuki K Poulose wrote:
+>> Add a helper to convert ID_AA64MMFR0_EL1:PARange to they physical
+>> size shift. Limit the size to the maximum supported by the kernel.
+>> We are about to move the user of this code and this helps to
+>> keep the changes cleaner.
 > 
-> I had the (obviously wrong) idea that VHE didn't default to y.
-
-Fair enough.
-
-[...]
-
-> >>> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> >>> index 6cf499b..a7be7bf 100644
-> >>> --- a/virt/kvm/arm/arm.c
-> >>> +++ b/virt/kvm/arm/arm.c
-> >>> @@ -16,6 +16,7 @@
-> >>>   * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-> >>>   */
-> >>>  
-> >>> +#include <linux/bug.h>
-> >>>  #include <linux/cpu_pm.h>
-> >>>  #include <linux/errno.h>
-> >>>  #include <linux/err.h>
-> >>> @@ -41,6 +42,7 @@
-> >>>  #include <asm/mman.h>
-> >>>  #include <asm/tlbflush.h>
-> >>>  #include <asm/cacheflush.h>
-> >>> +#include <asm/cpufeature.h>
-> >>>  #include <asm/virt.h>
-> >>>  #include <asm/kvm_arm.h>
-> >>>  #include <asm/kvm_asm.h>
-> >>> @@ -120,6 +122,22 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
-> >>>  	if (type)
-> >>>  		return -EINVAL;
-> >>>  
-> >>> +	/*
-> >>> +	 * VHE is a prerequisite for SVE in the Arm architecture, and
-> >>> +	 * Kconfig ensures that if system_supports_sve() here then
-> >>> +	 * CONFIG_ARM64_VHE is enabled, so if VHE support wasn't already
-> >>> +	 * detected and enabled, the CPU is architecturally
-> >>> +	 * noncompliant.
-> >>> +	 *
-> >>> +	 * Just in case this mismatch is seen, detect it, warn and give
-> >>> +	 * up.  Supporting this forbidden configuration in Hyp would be
-> >>> +	 * pointless.
-> >>> +	 */
-> >>> +	if (system_supports_sve() && !has_vhe()) {
-> >>> +		kvm_pr_unimpl("Cannot create VMs on SVE system without VHE.  Broken cpu?");
-> >>> +		return -ENXIO;
-> >>> +	}
-> >>
-> >> You might as well fail the boot KVM initialization altogether, and not
-> >> wait for a VM to be created.
-> > 
-> > I was concerned that the SVE and KVM initialisation might happen in
-> > an unpredictable order.
-> > 
-> > KVM is initialised via module_init(), which I'm guessing is later than
-> > cpufeatures (?)  If so then yes, kvm_arch_init() would be a reasonable
-> > place to do this.
+>> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+>> index fbf0aab..1f2a5dd 100644
+>> --- a/arch/arm64/include/asm/cpufeature.h
+>> +++ b/arch/arm64/include/asm/cpufeature.h
+>> @@ -311,6 +311,22 @@ static inline u64 read_zcr_features(void)
+>>   	return zcr;
+>>   }
+>>   
+>> +static inline u32 id_aa64mmfr0_parange_to_phys_shift(int parange)
+>> +{
+>> +	switch (parange) {
+>> +	case 0: return 32;
+>> +	case 1: return 36;
+>> +	case 2: return 40;
+>> +	case 3: return 42;
+>> +	case 4: return 44;
+>> +	/* Report 48 bit if the kernel doesn't support 52bit */
+>> +	default:
+>> +	case 5: return 48;
+>> +#ifdef CONFIG_ARM64_PA_BITS_52
+>> +	case 6: return 52;
+>> +#endif
 > 
-> CPU features are set in stone very early, right after we've booted all
-> the CPUs that can be discovered before running userspace. KVM itself
-> relies on that, so you should be able to move that check pretty early.
+> Eeew. I thought 'default' had to appear at the end of the list, but evidently
+> not! If the last three bit value ever gets used this is going to look really weird.
 
-OK, I'll have a go.
+I could rearrange them a bit to :
 
-> >> But I'm more concerned with the fact that we're now have a configuration
-> >> that drops functionalities on the floor, one way or another.
-> > 
-> > Is this still a problem if that configuration is forbidden by Kconfig?
-> > 
-> > Can you describe a scenario in which the problem config (KVM=y, VHE=n,
-> > SVE=y) would be wanted?
+	case 4: ..
+#ifdef CONFIG_ARM64_PA_BITS_52
+	case 6: ...
+#endif
+	case 5:
+	/* Report 48 bit if the kernel doesn't support 52bit */
+	default: return 48;
+
 > 
-> Not really. I guess it is just me being paranoid and not realising we
-> had VHE on by default already.
+> Can't we have a helper that just does the mapping, then apply the clamping with
+> something like:
+> | parange = min(CONFIG_ARM64_PA_BITS, parange);
 
-OK, I'll leave it as-is for now, but give me a shout if you have further
-concerns.
+Yes, I think that might be a bit cleaner.
+
+> 
+> 
+> Its odd that the helper has the id-register in the name, but expects you do the
+> shift and mask for it...
+> 
+> (and for this patch, KVM has already done the 52bit clamping with:
+> | 	if (parange > ID_AA64MMFR0_PARANGE_MAX)
+> |		parange = ID_AA64MMFR0_PARANGE_MAX;
+> )
+> 
+
+As mentioned in the other thread, I will change the name of the helper.
+
+> 
+>> diff --git a/arch/arm64/kvm/hyp/s2-setup.c b/arch/arm64/kvm/hyp/s2-setup.c
+>> index 603e1ee..b1129c8 100644
+>> --- a/arch/arm64/kvm/hyp/s2-setup.c
+>> +++ b/arch/arm64/kvm/hyp/s2-setup.c
+>> @@ -19,11 +19,13 @@
+>>   #include <asm/kvm_arm.h>
+>>   #include <asm/kvm_asm.h>
+>>   #include <asm/kvm_hyp.h>
+>> +#include <asm/cpufeature.h>
+>>   
+>>   u32 __hyp_text __init_stage2_translation(void)
+>>   {
+> 
+> Nit: Why change the variable you put this in, if its all removed again in patch 11?
+
+The parange holds the PARange initially, used to set the VTCR.IPS and is then
+overloaded with the converted "phys-shift". The change is a minor cleanup to
+make that clear, even though we remove it later as we don't deal with the
+phys-shifts anymore. I would prefer to keep it as it is.
 
 Cheers
----Dave
+Suzuki
