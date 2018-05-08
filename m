@@ -1,17 +1,15 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v5 06/14] KVM: arm64: Optimise FPSIMD handling to reduce
- guest/host thrashing
-Date: Tue, 8 May 2018 11:14:07 +0100
-Message-ID: <20180508101404.GD7753@e103592.cambridge.arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v5 10/14] KVM: arm64: Save host SVE context as appropriate
+Date: Tue, 8 May 2018 11:38:05 +0100
+Message-ID: <0c616c43-3bff-1c93-0463-fae1c53c0e51@arm.com>
 References: <1525449935-31424-1-git-send-email-Dave.Martin@arm.com>
- <1525449935-31424-7-git-send-email-Dave.Martin@arm.com>
- <e87c6940-1c79-ccd4-c6ad-2d87790b2e00@arm.com>
+ <1525449935-31424-11-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <e87c6940-1c79-ccd4-c6ad-2d87790b2e00@arm.com>
+In-Reply-To: <1525449935-31424-11-git-send-email-Dave.Martin@arm.com>
+Content-Language: en-GB
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -21,112 +19,186 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Christoffer Dall <cdall@kernel.org>
+To: Dave Martin <Dave.Martin@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <cdall@kernel.org>, linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, May 08, 2018 at 10:58:04AM +0100, Marc Zyngier wrote:
-> On 04/05/18 17:05, Dave Martin wrote:
-> > This patch refactors KVM to align the host and guest FPSIMD
-> > save/restore logic with each other for arm64.  This reduces the
-> > number of redundant save/restore operations that must occur, and
-> > reduces the common-case IRQ blackout time during guest exit storms
-> > by saving the host state lazily and optimising away the need to
-> > restore the host state before returning to the run loop.
-> > 
-> > Four hooks are defined in order to enable this:
-> > 
-> >  * kvm_arch_vcpu_run_map_fp():
-> >    Called on PID change to map necessary bits of current to Hyp.
-> > 
-> >  * kvm_arch_vcpu_load_fp():
-> >    Set up FP/SIMD for entering the KVM run loop (parse as
-> >    "vcpu_load fp").
-> > 
-> >  * kvm_arch_vcpu_park_fp():
-> >    Get FP/SIMD into a safe state for re-enabling interrupts after a
-> >    guest exit back to the run loop.
-> > 
-> >    For arm64 specifically, this involves updating the host kernel's
-> >    FPSIMD context tracking metadata so that kernel-mode NEON use
-> >    will cause the vcpu's FPSIMD state to be saved back correctly
-> >    into the vcpu struct.  This must be done before re-enabling
-> >    interrupts because kernel-mode NEON may be used my softirqs.
+On 04/05/18 17:05, Dave Martin wrote:
+> This patch adds SVE context saving to the hyp FPSIMD context switch
+> path.  This means that it is no longer necessary to save the host
+> SVE state in advance of entering the guest, when in use.
 > 
-> s/my/by/
+> In order to avoid adding pointless complexity to the code, VHE is
+> assumed if SVE is in use.  VHE is an architectural prerequisite for
+> SVE, so there is no good reason to turn CONFIG_ARM64_VHE off in
+> kernels that support both SVE and KVM.
 > 
-> I must admit being slightly confused by the word "park". I tend to read
-> "park" as "stash away for later use", while it really is "update the
-> kernel's view of who is actually in control of the FP registers".
-
-I was thinking park as in parking disk heads, i.e., get things so we can
-kick FPSIMD without doing damage.
-
-(Or indeed, applying the handbrake so your car doesn't roll away
-downhill while you're gone.)
-
-But of a strained analogy though, I'll admit.
-
-> No, I don't have a better name for it... ;-) But maybe something along
-> the lines of "hwsync_fp", in order to be consistent with the rest of the
-> code that deals with shared resources?
-
-To me, "hw" carries too much of a suggestion that we would be flushing
-the registers back to memory.  In fact, we don't touch the hardware
-here, only kernel bookkeeping data.
-
-Trying to come up with an intuitive name for this may be futile; how
-about
-
- * _sync_ (which is suitably vague), or
- * _ctxsync_ (which will avoid fooling people into thinking they know
-	what it does without looking at the code)
-
-?
-
-[...]
-
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 469de8a..811097e 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -30,6 +30,7 @@
-> >  #include <asm/kvm.h>
-> >  #include <asm/kvm_asm.h>
-> >  #include <asm/kvm_mmio.h>
-> > +#include <asm/thread_info.h>
-> >  
-> >  #define __KVM_HAVE_ARCH_INTC_INITIALIZED
-> >  
-> > @@ -238,6 +239,12 @@ struct kvm_vcpu_arch {
-> >  
-> >  	/* Pointer to host CPU context */
-> >  	kvm_cpu_context_t *host_cpu_context;
-> > +
-> > +	struct thread_info *host_thread_info;	/* hyp VA */
-> > +	struct user_fpsimd_state *host_fpsimd_state;	/* hyp VA */
-> > +	bool host_sve_in_use;	/* backup for host TIF_SVE while in guest */
-> > +	bool fp_enabled;
+> Historically, software models exist that can expose the
+> architecturally invalid configuration of SVE without VHE, so if
+> this situation is detected this patch warns and refuses to create a
+> VM.  Doing this check at VM creation time avoids race issues
+> between KVM and SVE initialisation.
 > 
-> Could we consider merging these two fields together with debug_flags?
-> Overall, they share a common purpose (tracking the use of a resource
-> shared between host and guest). Not necessarily something to do
-> immediately though.
-
-I expect so.  I added these as bools partly for simplicity and partly
-because there was no general-purpose flags field already.
-
-We could make debug_flags into a general-purpose flags field, though.
-
-Once we've agreed about the park_fp renaming, I'll consider reworking
-this also -- but I'll punt it to a separate patch if it turns out to be
-non-trivial.
-
-[...]
-
-> Other than the couple of minor nits above,
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+> ---
+>  arch/arm64/Kconfig          |  7 +++++++
+>  arch/arm64/kvm/fpsimd.c     |  1 -
+>  arch/arm64/kvm/hyp/switch.c | 21 +++++++++++++++++++--
+>  virt/kvm/arm/arm.c          | 18 ++++++++++++++++++
+>  4 files changed, 44 insertions(+), 3 deletions(-)
 > 
-> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+> index eb2cf49..b0d3820 100644
+> --- a/arch/arm64/Kconfig
+> +++ b/arch/arm64/Kconfig
+> @@ -1130,6 +1130,7 @@ endmenu
+>  config ARM64_SVE
+>  	bool "ARM Scalable Vector Extension support"
+>  	default y
+> +	depends on !KVM || ARM64_VHE
 
-Thanks
----Dave
+In that case, should we consider making ARM64_VHE "default y" as well,
+as KVM is "default y" too?
+
+Otherwise, I fear we end-up regressing existing configurations. Also,
+you still have to check for the configuration at run time, so I'm not
+immediately getting the point of this particular change.
+
+>  	help
+>  	  The Scalable Vector Extension (SVE) is an extension to the AArch64
+>  	  execution state which complements and extends the SIMD functionality
+> @@ -1155,6 +1156,12 @@ config ARM64_SVE
+>  	  booting the kernel.  If unsure and you are not observing these
+>  	  symptoms, you should assume that it is safe to say Y.
+>  
+> +	  CPUs that support SVE are architecturally required to support the
+> +	  Virtualization Host Extensions (VHE), so the kernel makes no
+> +	  provision for supporting SVE alongside KVM without VHE enabled.
+> +	  Thus, you will need to enable CONFIG_ARM64_VHE if you want to support
+> +	  KVM in the same kernel image.
+> +
+>  config ARM64_MODULE_PLTS
+>  	bool
+>  	select HAVE_MOD_ARCH_SPECIFIC
+> diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+> index bbc6889..91ad01f 100644
+> --- a/arch/arm64/kvm/fpsimd.c
+> +++ b/arch/arm64/kvm/fpsimd.c
+> @@ -59,7 +59,6 @@ int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu)
+>   */
+>  void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
+>  {
+> -	BUG_ON(system_supports_sve());
+>  	BUG_ON(!current->mm);
+>  
+>  	vcpu->arch.fp_enabled = false;
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index 10f55d3..8009126 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -21,12 +21,14 @@
+>  
+>  #include <kvm/arm_psci.h>
+>  
+> +#include <asm/cpufeature.h>
+>  #include <asm/kvm_asm.h>
+>  #include <asm/kvm_emulate.h>
+>  #include <asm/kvm_hyp.h>
+>  #include <asm/kvm_mmu.h>
+>  #include <asm/fpsimd.h>
+>  #include <asm/debug-monitors.h>
+> +#include <asm/processor.h>
+>  #include <asm/thread_info.h>
+>  
+>  static bool __hyp_text update_fp_enabled(struct kvm_vcpu *vcpu)
+> @@ -328,6 +330,8 @@ static bool __hyp_text __skip_instr(struct kvm_vcpu *vcpu)
+>  void __hyp_text __hyp_switch_fpsimd(u64 esr __always_unused,
+>  				    struct kvm_vcpu *vcpu)
+>  {
+> +	struct user_fpsimd_state *host_fpsimd = vcpu->arch.host_fpsimd_state;
+> +
+>  	if (has_vhe())
+>  		write_sysreg(read_sysreg(cpacr_el1) | CPACR_EL1_FPEN,
+>  			     cpacr_el1);
+> @@ -337,8 +341,21 @@ void __hyp_text __hyp_switch_fpsimd(u64 esr __always_unused,
+>  
+>  	isb();
+>  
+> -	if (vcpu->arch.host_fpsimd_state) {
+> -		__fpsimd_save_state(vcpu->arch.host_fpsimd_state);
+> +	if (host_fpsimd) {
+> +		/*
+> +		 * In the SVE case, VHE is assumed: it is enforced by
+> +		 * Kconfig and kvm_arch_init_vm().
+> +		 */
+> +		if (system_supports_sve() && vcpu->arch.host_sve_in_use) {
+> +			struct thread_struct *thread = container_of(
+> +				host_fpsimd,
+> +				struct thread_struct, uw.fpsimd_state);
+> +
+> +			sve_save_state(sve_pffr(thread), &host_fpsimd->fpsr);
+> +		} else {
+> +			__fpsimd_save_state(vcpu->arch.host_fpsimd_state);
+> +		}
+> +
+>  		vcpu->arch.host_fpsimd_state = NULL;
+>  	}
+>  
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index 6cf499b..a7be7bf 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -16,6 +16,7 @@
+>   * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+>   */
+>  
+> +#include <linux/bug.h>
+>  #include <linux/cpu_pm.h>
+>  #include <linux/errno.h>
+>  #include <linux/err.h>
+> @@ -41,6 +42,7 @@
+>  #include <asm/mman.h>
+>  #include <asm/tlbflush.h>
+>  #include <asm/cacheflush.h>
+> +#include <asm/cpufeature.h>
+>  #include <asm/virt.h>
+>  #include <asm/kvm_arm.h>
+>  #include <asm/kvm_asm.h>
+> @@ -120,6 +122,22 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  	if (type)
+>  		return -EINVAL;
+>  
+> +	/*
+> +	 * VHE is a prerequisite for SVE in the Arm architecture, and
+> +	 * Kconfig ensures that if system_supports_sve() here then
+> +	 * CONFIG_ARM64_VHE is enabled, so if VHE support wasn't already
+> +	 * detected and enabled, the CPU is architecturally
+> +	 * noncompliant.
+> +	 *
+> +	 * Just in case this mismatch is seen, detect it, warn and give
+> +	 * up.  Supporting this forbidden configuration in Hyp would be
+> +	 * pointless.
+> +	 */
+> +	if (system_supports_sve() && !has_vhe()) {
+> +		kvm_pr_unimpl("Cannot create VMs on SVE system without VHE.  Broken cpu?");
+> +		return -ENXIO;
+> +	}
+
+You might as well fail the boot KVM initialization altogether, and not
+wait for a VM to be created.
+
+But I'm more concerned with the fact that we're now have a configuration
+that drops functionalities on the floor, one way or another.
+
+> +
+>  	kvm->arch.last_vcpu_ran = alloc_percpu(typeof(*kvm->arch.last_vcpu_ran));
+>  	if (!kvm->arch.last_vcpu_ran)
+>  		return -ENOMEM;
+> 
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
