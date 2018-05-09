@@ -1,23 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v7 03/16] KVM: arm/arm64: Introduce
- kvm_arch_vcpu_run_pid_change
-Date: Wed,  9 May 2018 17:12:52 +0100
-Message-ID: <1525882385-29181-4-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v7 05/16] arm64: fpsimd: Generalise context saving for
+ non-task contexts
+Date: Wed,  9 May 2018 17:12:54 +0100
+Message-ID: <1525882385-29181-6-git-send-email-Dave.Martin@arm.com>
 References: <1525882385-29181-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 638C54A0DA
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FB9A4A0D1
  for <kvmarm@lists.cs.columbia.edu>; Wed,  9 May 2018 12:04:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TLs0P5LjVX4K for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 May 2018 12:03:56 -0400 (EDT)
+ with ESMTP id j-JiS6-meVWY for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 May 2018 12:03:57 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CAF344A0D0
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 May 2018 12:03:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8459B4A0CA
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 May 2018 12:03:57 -0400 (EDT)
 In-Reply-To: <1525882385-29181-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -29,92 +29,120 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu
-Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel@lists.infradead.org, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <cdall@kernel.org>, linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+In preparation for allowing non-task (i.e., KVM vcpu) FPSIMD
+contexts to be handled by the fpsimd common code, this patch adapts
+task_fpsimd_save() to save back the currently loaded context,
+removing the explicit dependency on current.
 
-KVM/ARM differs from other architectures in having to maintain an
-additional virtual address space from that of the host and the
-guest, because we split the execution of KVM across both EL1 and
-EL2.
+The relevant storage to write back to in memory is now found by
+examining the fpsimd_last_state percpu struct.
 
-This results in a need to explicitly map data structures into EL2
-(hyp) which are accessed from the hyp code.  As we are about to be
-more clever with our FPSIMD handling on arm64, which stores data in
-the task struct and uses thread_info flags, we will have to map
-parts of the currently executing task struct into the EL2 virtual
-address space.
-
-However, we don't want to do this on every KVM_RUN, because it is a
-fairly expensive operation to walk the page tables, and the common
-execution mode is to map a single thread to a VCPU.  By introducing
-a hook that architectures can select with
-HAVE_KVM_VCPU_RUN_PID_CHANGE, we do not introduce overhead for
-other architectures, but have a simple way to only map the data we
-need when required for arm64.
-
-This patch introduces the framework only, and wires it up in the
-arm/arm64 KVM common code.
+fpsimd_save() does nothing unless TIF_FOREIGN_FPSTATE is clear, and
+fpsimd_last_state is updated under local_bh_disable() or
+local_irq_disable() everywhere that TIF_FOREIGN_FPSTATE is cleared:
+thus, fpsimd_save() will write back to the correct storage for the
+loaded context.
 
 No functional change.
 
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- include/linux/kvm_host.h | 9 +++++++++
- virt/kvm/Kconfig         | 3 +++
- virt/kvm/kvm_main.c      | 7 ++++++-
- 3 files changed, 18 insertions(+), 1 deletion(-)
+ arch/arm64/kernel/fpsimd.c | 25 +++++++++++++------------
+ 1 file changed, 13 insertions(+), 12 deletions(-)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 6930c63..4268ace 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1276,4 +1276,13 @@ static inline long kvm_arch_vcpu_async_ioctl(struct file *filp,
- void kvm_arch_mmu_notifier_invalidate_range(struct kvm *kvm,
- 		unsigned long start, unsigned long end);
+diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+index 0c4e7e0..5fc0595 100644
+--- a/arch/arm64/kernel/fpsimd.c
++++ b/arch/arm64/kernel/fpsimd.c
+@@ -270,13 +270,15 @@ static void task_fpsimd_load(void)
+ }
  
-+#ifdef CONFIG_HAVE_KVM_VCPU_RUN_PID_CHANGE
-+int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu);
-+#else
-+static inline int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
-+{
-+	return 0;
-+}
-+#endif /* CONFIG_HAVE_KVM_VCPU_RUN_PID_CHANGE */
+ /*
+- * Ensure current's FPSIMD/SVE storage in thread_struct is up to date
+- * with respect to the CPU registers.
++ * Ensure FPSIMD/SVE storage in memory for the loaded context is up to
++ * date with respect to the CPU registers.
+  *
+  * Softirqs (and preemption) must be disabled.
+  */
+-static void task_fpsimd_save(void)
++static void fpsimd_save(void)
+ {
++	struct user_fpsimd_state *st = __this_cpu_read(fpsimd_last_state.st);
 +
- #endif
-diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-index cca7e06..72143cf 100644
---- a/virt/kvm/Kconfig
-+++ b/virt/kvm/Kconfig
-@@ -54,3 +54,6 @@ config HAVE_KVM_IRQ_BYPASS
+ 	WARN_ON(!in_softirq() && !irqs_disabled());
  
- config HAVE_KVM_VCPU_ASYNC_IOCTL
-        bool
-+
-+config HAVE_KVM_VCPU_RUN_PID_CHANGE
-+       bool
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index c7b2e92..c32e240 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -2550,8 +2550,13 @@ static long kvm_vcpu_ioctl(struct file *filp,
- 		oldpid = rcu_access_pointer(vcpu->pid);
- 		if (unlikely(oldpid != current->pids[PIDTYPE_PID].pid)) {
- 			/* The thread running this VCPU changed. */
--			struct pid *newpid = get_task_pid(current, PIDTYPE_PID);
-+			struct pid *newpid;
+ 	if (!test_thread_flag(TIF_FOREIGN_FPSTATE)) {
+@@ -291,10 +293,9 @@ static void task_fpsimd_save(void)
+ 				return;
+ 			}
  
-+			r = kvm_arch_vcpu_run_pid_change(vcpu);
-+			if (r)
-+				break;
-+
-+			newpid = get_task_pid(current, PIDTYPE_PID);
- 			rcu_assign_pointer(vcpu->pid, newpid);
- 			if (oldpid)
- 				synchronize_rcu();
+-			sve_save_state(sve_pffr(current),
+-				       &current->thread.uw.fpsimd_state.fpsr);
++			sve_save_state(sve_pffr(current), &st->fpsr);
+ 		} else
+-			fpsimd_save_state(&current->thread.uw.fpsimd_state);
++			fpsimd_save_state(st);
+ 	}
+ }
+ 
+@@ -598,7 +599,7 @@ int sve_set_vector_length(struct task_struct *task,
+ 	if (task == current) {
+ 		local_bh_disable();
+ 
+-		task_fpsimd_save();
++		fpsimd_save();
+ 		set_thread_flag(TIF_FOREIGN_FPSTATE);
+ 	}
+ 
+@@ -837,7 +838,7 @@ asmlinkage void do_sve_acc(unsigned int esr, struct pt_regs *regs)
+ 
+ 	local_bh_disable();
+ 
+-	task_fpsimd_save();
++	fpsimd_save();
+ 	fpsimd_to_sve(current);
+ 
+ 	/* Force ret_to_user to reload the registers: */
+@@ -898,7 +899,7 @@ void fpsimd_thread_switch(struct task_struct *next)
+ 	 * 'current'.
+ 	 */
+ 	if (current->mm)
+-		task_fpsimd_save();
++		fpsimd_save();
+ 
+ 	if (next->mm)
+ 		/*
+@@ -977,7 +978,7 @@ void fpsimd_preserve_current_state(void)
+ 		return;
+ 
+ 	local_bh_disable();
+-	task_fpsimd_save();
++	fpsimd_save();
+ 	local_bh_enable();
+ }
+ 
+@@ -1117,7 +1118,7 @@ void kernel_neon_begin(void)
+ 
+ 	/* Save unsaved task fpsimd state, if any: */
+ 	if (current->mm) {
+-		task_fpsimd_save();
++		fpsimd_save();
+ 		set_thread_flag(TIF_FOREIGN_FPSTATE);
+ 	}
+ 
+@@ -1242,7 +1243,7 @@ static int fpsimd_cpu_pm_notifier(struct notifier_block *self,
+ 	switch (cmd) {
+ 	case CPU_PM_ENTER:
+ 		if (current->mm)
+-			task_fpsimd_save();
++			fpsimd_save();
+ 		fpsimd_flush_cpu_state();
+ 		break;
+ 	case CPU_PM_EXIT:
 -- 
 2.1.4
