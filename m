@@ -1,14 +1,15 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v6 12/15] KVM: arm64: Remove eager host SVE state saving
-Date: Wed, 9 May 2018 09:56:52 +0100
-Message-ID: <34f4b9d4-9699-eb42-d451-39077e8f8dcd@arm.com>
+Subject: Re: [PATCH v6 14/15] KVM: arm64: Fold redundant exit code checks out
+ of fixup_guest_exit()
+Date: Wed, 9 May 2018 10:05:43 +0100
+Message-ID: <b418f004-6c1c-fc97-5600-7ccbb07e9f08@arm.com>
 References: <1525797900-5548-1-git-send-email-Dave.Martin@arm.com>
- <1525797900-5548-13-git-send-email-Dave.Martin@arm.com>
+ <1525797900-5548-15-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1525797900-5548-13-git-send-email-Dave.Martin@arm.com>
+In-Reply-To: <1525797900-5548-15-git-send-email-Dave.Martin@arm.com>
 Content-Language: en-GB
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
@@ -24,20 +25,25 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <cdall@kernel.or
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On 08/05/18 17:44, Dave Martin wrote:
-> Now that the host SVE context can be saved on demand from Hyp,
-> there is no longer any need to save this state in advance before
-> entering the guest.
+> The entire tail of fixup_guest_exit() is contained in if statements
+> of the form if (x && *exit_code == ARM_EXCEPTION_TRAP).  As a result,
+> we can check just once and bail out of the function early, allowing
+> the remaining if conditions to be simplified.
 > 
-> This patch removes the relevant call to
-> kvm_fpsimd_flush_cpu_state().
+> The only awkward case is where *exit_code is changed to
+> ARM_EXCEPTION_EL1_SERROR in the case of an illegal GICv2 CPU
+> interface access: in that case, the GICv3 trap handling code is
+> skipped using a goto.  This avoids pointlessly evaluating the
+> static branch check for the GICv3 case, even though we can't have
+> vgic_v2_cpuif_trap and vgic_v3_cpuif_trap true simultaneously
+> unless we have a GICv3 and GICv2 on the host: that sounds stupid,
+> but I haven't satisfied myself that it can't happen.
 > 
-> Since the problem that function was intended to solve now no longer
-> exists, the function and its dependencies are also deleted.
+> No functional change.
 > 
 > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 
 	M.
 -- 
