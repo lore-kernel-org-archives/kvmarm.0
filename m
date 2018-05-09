@@ -1,15 +1,15 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v6 06/15] KVM: arm64: Repurpose vcpu_arch.debug_flags for
- general-purpose flags
-Date: Wed, 9 May 2018 09:27:10 +0100
-Message-ID: <1e3b403f-6ec0-e8d1-0137-739469dd6900@arm.com>
+Subject: Re: [PATCH v6 08/15] arm64/sve: Move read_zcr_features() out of
+ cpufeature.h
+Date: Wed, 9 May 2018 09:28:50 +0100
+Message-ID: <2d335ebd-a17e-cf0f-5d59-398f721ce43e@arm.com>
 References: <1525797900-5548-1-git-send-email-Dave.Martin@arm.com>
- <1525797900-5548-7-git-send-email-Dave.Martin@arm.com>
+ <1525797900-5548-9-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1525797900-5548-7-git-send-email-Dave.Martin@arm.com>
+In-Reply-To: <1525797900-5548-9-git-send-email-Dave.Martin@arm.com>
 Content-Language: en-GB
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
@@ -25,23 +25,27 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <cdall@kernel.or
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On 08/05/18 17:44, Dave Martin wrote:
-> In struct vcpu_arch, the debug_flags field is used to store debug-
-> related flags about the vcpu state.
+> Having read_zcr_features() inline in cpufeature.h results in that
+> header requiring #includes which make it hard to include
+> <asm/fpsimd.h> elsewhere without triggering header inclusion
+> cycles.
 > 
-> Since we are about to add some more flags related to FPSIMD and
-> SVE, it makes sense to add them to the existing flags field rather
-> than adding new fields.  Since there is only one debug_flags flag
-> defined so far, there is plenty of free space for expansion.
+> This is not a hot-path function and arguably should not be in
+> cpufeature.h in the first place, so this patch moves it to
+> fpsimd.c, compiled conditionally if CONFIG_ARM64_SVE=y.
 > 
-> In preparation for adding more flags, this patch renames the
-> debug_flags field to simply "flags", and updates comments
-> appropriately.
+> This allows some SVE-related #includes to be dropped from
+> cpufeature.h, which will ease future maintenance.
+> 
+> A couple of missing #includes of <asm/fpsimd.h> are exposed by this
+> change under arch/arm64/.  This patch adds the missing #includes as
+> necessary.
 > 
 > No functional change.
 > 
 > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 
 	M.
 -- 
