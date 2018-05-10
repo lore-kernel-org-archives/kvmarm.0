@@ -1,134 +1,94 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] kvm: Change return type to vm_fault_t
-Date: Thu, 10 May 2018 18:42:17 +0200
-Message-ID: <4fb6e990-080b-0612-3fcd-f2082185f8ff@redhat.com>
-References: <20180418191958.GA25806@jordon-HP-15-Notebook-PC>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v7 08/16] KVM: arm64: Optimise FPSIMD handling to reduce
+ guest/host thrashing
+Date: Thu, 10 May 2018 17:44:30 +0100
+Message-ID: <20180510164430.ura3th2fxwwot6be@armageddon.cambridge.arm.com>
+References: <1525882385-29181-1-git-send-email-Dave.Martin@arm.com>
+ <1525882385-29181-9-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180418191958.GA25806@jordon-HP-15-Notebook-PC>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Souptick Joarder <jrdr.linux@gmail.com>, jhogan@kernel.org, ralf@linux-mips.org, paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au, borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, david@redhat.com, cohuck@redhat.com, schwidefsky@de.ibm.com, tglx@linutronix.de, mingo@redhat.com, christoffer.dall@linaro.org, marc.zyngier@arm.com
-Cc: linux-mips@linux-mips.org, linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, willy@infradead.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <1525882385-29181-9-git-send-email-Dave.Martin@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Christoffer Dall <cdall@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 18/04/2018 21:19, Souptick Joarder wrote:
-> Use new return type vm_fault_t for fault handler. For
-> now, this is just documenting that the function returns
-> a VM_FAULT value rather than an errno. Once all instances
-> are converted, vm_fault_t will become a distinct type.
+On Wed, May 09, 2018 at 05:12:57PM +0100, Dave P Martin wrote:
+> This patch refactors KVM to align the host and guest FPSIMD
+> save/restore logic with each other for arm64.  This reduces the
+> number of redundant save/restore operations that must occur, and
+> reduces the common-case IRQ blackout time during guest exit storms
+> by saving the host state lazily and optimising away the need to
+> restore the host state before returning to the run loop.
 > 
-> commit 1c8f422059ae ("mm: change return type to vm_fault_t")
+> Four hooks are defined in order to enable this:
 > 
-> Signed-off-by: Souptick Joarder <jrdr.linux@gmail.com>
-> Reviewed-by: Matthew Wilcox <mawilcox@microsoft.com>
-> ---
->  arch/mips/kvm/mips.c       | 2 +-
->  arch/powerpc/kvm/powerpc.c | 2 +-
->  arch/s390/kvm/kvm-s390.c   | 2 +-
->  arch/x86/kvm/x86.c         | 2 +-
->  include/linux/kvm_host.h   | 2 +-
->  virt/kvm/arm/arm.c         | 2 +-
->  virt/kvm/kvm_main.c        | 2 +-
->  7 files changed, 7 insertions(+), 7 deletions(-)
+>  * kvm_arch_vcpu_run_map_fp():
+>    Called on PID change to map necessary bits of current to Hyp.
 > 
-> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-> index 2549fdd..03e0e0f 100644
-> --- a/arch/mips/kvm/mips.c
-> +++ b/arch/mips/kvm/mips.c
-> @@ -1076,7 +1076,7 @@ int kvm_arch_vcpu_ioctl_set_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
->  	return -ENOIOCTLCMD;
->  }
+>  * kvm_arch_vcpu_load_fp():
+>    Set up FP/SIMD for entering the KVM run loop (parse as
+>    "vcpu_load fp").
 > 
-> -int kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
-> +vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
->  {
->  	return VM_FAULT_SIGBUS;
->  }
-> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-> index 403e642..3099dee 100644
-> --- a/arch/powerpc/kvm/powerpc.c
-> +++ b/arch/powerpc/kvm/powerpc.c
-> @@ -1825,7 +1825,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->  	return r;
->  }
+>  * kvm_arch_vcpu_ctxsync_fp():
+>    Get FP/SIMD into a safe state for re-enabling interrupts after a
+>    guest exit back to the run loop.
 > 
-> -int kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
-> +vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
->  {
->  	return VM_FAULT_SIGBUS;
->  }
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index ba4c709..24af487 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -3941,7 +3941,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->  	return r;
->  }
+>    For arm64 specifically, this involves updating the host kernel's
+>    FPSIMD context tracking metadata so that kernel-mode NEON use
+>    will cause the vcpu's FPSIMD state to be saved back correctly
+>    into the vcpu struct.  This must be done before re-enabling
+>    interrupts because kernel-mode NEON may be used by softirqs.
 > 
-> -int kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
-> +vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
->  {
->  #ifdef CONFIG_KVM_S390_UCONTROL
->  	if ((vmf->pgoff == KVM_S390_SIE_PAGE_OFFSET)
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index c8a0b54..95d8102 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -3827,7 +3827,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->  	return r;
->  }
+>  * kvm_arch_vcpu_put_fp():
+>    Save guest FP/SIMD state back to memory and dissociate from the
+>    CPU ("vcpu_put fp").
 > 
-> -int kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
-> +vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
->  {
->  	return VM_FAULT_SIGBUS;
->  }
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index ac0062b..8eeb062 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -736,7 +736,7 @@ long kvm_arch_dev_ioctl(struct file *filp,
->  			unsigned int ioctl, unsigned long arg);
->  long kvm_arch_vcpu_ioctl(struct file *filp,
->  			 unsigned int ioctl, unsigned long arg);
-> -int kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf);
-> +vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf);
+> Also, the arm64 FPSIMD context switch code is updated to enable it
+> to save back FPSIMD state for a vcpu, not just current.  A few
+> helpers drive this:
 > 
->  int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext);
+>  * fpsimd_bind_state_to_cpu(struct user_fpsimd_state *fp):
+>    mark this CPU as having context fp (which may belong to a vcpu)
+>    currently loaded in its registers.  This is the non-task
+>    equivalent of the static function fpsimd_bind_to_cpu() in
+>    fpsimd.c.
 > 
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index 86941f6..6c8cc31 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -163,7 +163,7 @@ int kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vcpu)
->  	return 0;
->  }
+>  * task_fpsimd_save():
+>    exported to allow KVM to save the guest's FPSIMD state back to
+>    memory on exit from the run loop.
 > 
-> -int kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
-> +vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
->  {
->  	return VM_FAULT_SIGBUS;
->  }
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 4501e65..45eb54b 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2341,7 +2341,7 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
->  }
->  EXPORT_SYMBOL_GPL(kvm_vcpu_on_spin);
+>  * fpsimd_flush_state():
+>    invalidate any context's FPSIMD state that is currently loaded.
+>    Used to disassociate the vcpu from the CPU regs on run loop exit.
 > 
-> -static int kvm_vcpu_fault(struct vm_fault *vmf)
-> +static vm_fault_t kvm_vcpu_fault(struct vm_fault *vmf)
->  {
->  	struct kvm_vcpu *vcpu = vmf->vma->vm_file->private_data;
->  	struct page *page;
-> --
-> 1.9.1
+> These changes allow the run loop to enable interrupts (and thus
+> softirqs that may use kernel-mode NEON) without having to save the
+> guest's FPSIMD state eagerly.
 > 
+> Some new vcpu_arch fields are added to make all this work.  Because
+> host FPSIMD state can now be saved back directly into current's
+> thread_struct as appropriate, host_cpu_context is no longer used
+> for preserving the FPSIMD state.  However, it is still needed for
+> preserving other things such as the host's system registers.  To
+> avoid ABI churn, the redundant storage space in host_cpu_context is
+> not removed for now.
+> 
+> arch/arm is not addressed by this patch and continues to use its
+> current save/restore logic.  It could provide implementations of
+> the helpers later if desired.
+> 
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 
-Applied, thanks.
-
-Paolo
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
