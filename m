@@ -1,18 +1,11 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v7 02/16] arm64: Use update{,_tsk}_thread_flag()
-Date: Wed, 9 May 2018 18:08:33 +0100
-Message-ID: <20180509170833.GS7753@e103592.cambridge.arm.com>
-References: <1525882385-29181-1-git-send-email-Dave.Martin@arm.com>
- <1525882385-29181-3-git-send-email-Dave.Martin@arm.com>
- <20180509161728.GC26671@arm.com>
- <20180509162753.GP7753@e103592.cambridge.arm.com>
- <f444acee-b558-7dbb-97bd-bbf716b20ebd@arm.com>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: [PATCHv2] ARM64: KVM: use lm_alias() for kvm_ksym_ref()
+Date: Thu, 10 May 2018 12:13:47 +0100
+Message-ID: <20180510111347.32253-1-mark.rutland@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <f444acee-b558-7dbb-97bd-bbf716b20ebd@arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -22,114 +15,59 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: linux-arm-kernel@lists.infradead.org
+Cc: Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, May 09, 2018 at 05:55:51PM +0100, Marc Zyngier wrote:
-> On 09/05/18 17:27, Dave Martin wrote:
-> > On Wed, May 09, 2018 at 05:17:28PM +0100, Will Deacon wrote:
-> >> Hi Dave,
-> >>
-> >> On Wed, May 09, 2018 at 05:12:51PM +0100, Dave Martin wrote:
-> >>> This patch uses the new update_thread_flag() helpers to simplify a
-> >>> couple of if () set; else clear; constructs.
-> >>>
-> >>> No functional change.
-> >>>
-> >>> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> >>> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-> >>> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> >>> Cc: Will Deacon <will.deacon@arm.com>
-> >>> ---
-> >>>  arch/arm64/kernel/fpsimd.c | 19 +++++++------------
-> >>>  1 file changed, 7 insertions(+), 12 deletions(-)
-> >>>
-> >>> diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-> >>> index 87a3536..0c4e7e0 100644
-> >>> --- a/arch/arm64/kernel/fpsimd.c
-> >>> +++ b/arch/arm64/kernel/fpsimd.c
-> > 
-> > [...]
-> > 
-> >>> @@ -902,7 +900,7 @@ void fpsimd_thread_switch(struct task_struct *next)
-> >>>  	if (current->mm)
-> >>>  		task_fpsimd_save();
-> >>>  
-> >>> -	if (next->mm) {
-> >>> +	if (next->mm)
-> >>>  		/*
-> >>>  		 * If we are switching to a task whose most recent userland
-> >>>  		 * FPSIMD state is already in the registers of *this* cpu,
-> >>> @@ -910,13 +908,10 @@ void fpsimd_thread_switch(struct task_struct *next)
-> >>>  		 * the TIF_FOREIGN_FPSTATE flag so the state will be loaded
-> >>>  		 * upon the next return to userland.
-> >>>  		 */
-> >>> -		if (__this_cpu_read(fpsimd_last_state.st) ==
-> >>> -			&next->thread.uw.fpsimd_state
-> >>> -		    && next->thread.fpsimd_cpu == smp_processor_id())
-> >>> -			clear_tsk_thread_flag(next, TIF_FOREIGN_FPSTATE);
-> >>> -		else
-> >>> -			set_tsk_thread_flag(next, TIF_FOREIGN_FPSTATE);
-> >>> -	}
-> >>> +		update_tsk_thread_flag(next, TIF_FOREIGN_FPSTATE,
-> >>> +			__this_cpu_read(fpsimd_last_state.st) !=
-> >>> +				&next->thread.uw.fpsimd_state ||
-> >>> +			next->thread.fpsimd_cpu != smp_processor_id());
-> >>
-> >> Given the multi-line comment and this multi-line call, I'd be inclined to
-> >> leave the curlies in place and then use a local bool for the complex
-> >> condition.
-> > 
-> > Hey, curlies cost money, you know.
-> > 
-> >> With that:
-> >>
-> >> Acked-by: Will Deacon <will.deacon@arm.com>
-> > 
-> > Are you content to see this merged without the change?  It doesn't seem
-> > worth a respin of the whole series just for this.  I agree the code
-> > would be clearer, but this patch doesn't actually make it worse IMHO.
-> > 
-> > If I respin for some reason though, I can address this and add your Ack.
-> 
-> I'm happy to perform the change myself when applying the series if there
-> is no additional comment that would lead to a respin.
+For historical reasons, we open-code lm_alias() in kvm_ksym_ref().
 
-OK, feel free to apply the following if it looks good for you.
+Let's use lm_alias() to avoid duplication and make things clearer.
 
-Cheers
----Dave
+As we have to pull this from <linux/mm.h> (which is not safe for
+inclusion in assembly), we may as well move the kvm_ksym_ref()
+definition into the existing !__ASSEMBLY__ block.
 
---8<--
+Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+Cc: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu
+---
+ arch/arm64/include/asm/kvm_asm.h | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index 32898a8..b0d29b7 100644
---- a/arch/arm64/kernel/fpsimd.c
-+++ b/arch/arm64/kernel/fpsimd.c
-@@ -906,7 +906,7 @@ void fpsimd_thread_switch(struct task_struct *next)
- 	if (current->mm)
- 		fpsimd_save();
+Since v1 [1]:
+* Rebase to v4.17-rc4
+* Fix typo in commit message
+
+Mark.
+
+[1] https://lkml.kernel.org/r/20180406151909.57197-1-mark.rutland@arm.com
+
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index f6648a3e4152..a9ceeec5a76f 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -33,16 +33,19 @@
+ #define KVM_ARM64_DEBUG_DIRTY_SHIFT	0
+ #define KVM_ARM64_DEBUG_DIRTY		(1 << KVM_ARM64_DEBUG_DIRTY_SHIFT)
  
--	if (next->mm)
-+	if (next->mm) {
- 		/*
- 		 * If we are switching to a task whose most recent userland
- 		 * FPSIMD state is already in the registers of *this* cpu,
-@@ -914,10 +914,13 @@ void fpsimd_thread_switch(struct task_struct *next)
- 		 * the TIF_FOREIGN_FPSTATE flag so the state will be loaded
- 		 * upon the next return to userland.
- 		 */
-+		bool wrong_task = __this_cpu_read(fpsimd_last_state.st) !=
-+					&next->thread.uw.fpsimd_state;
-+		bool wrong_cpu = next->thread.fpsimd_cpu != smp_processor_id();
++#ifndef __ASSEMBLY__
 +
- 		update_tsk_thread_flag(next, TIF_FOREIGN_FPSTATE,
--			__this_cpu_read(fpsimd_last_state.st) !=
--				&next->thread.uw.fpsimd_state ||
--			next->thread.fpsimd_cpu != smp_processor_id());
-+				       wrong_task || wrong_cpu);
-+	}
- }
++#include <linux/mm.h>
++
+ /* Translate a kernel address of @sym into its equivalent linear mapping */
+ #define kvm_ksym_ref(sym)						\
+ 	({								\
+ 		void *val = &sym;					\
+ 		if (!is_kernel_in_hyp_mode())				\
+-			val = phys_to_virt((u64)&sym - kimage_voffset);	\
++			val = lm_alias(&sym);				\
+ 		val;							\
+ 	 })
  
- void fpsimd_flush_thread(void)
+-#ifndef __ASSEMBLY__
+ struct kvm;
+ struct kvm_vcpu;
+ 
+-- 
+2.11.0
