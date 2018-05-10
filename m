@@ -1,41 +1,52 @@
-From: Souptick Joarder <jrdr.linux@gmail.com>
-Subject: Re: [PATCH] kvm: Change return type to vm_fault_t
-Date: Thu, 10 May 2018 20:44:12 +0530
-Message-ID: <CAFqt6zYUpKOibZn-e42LnzkXc6a4bu35PZcOAsDwDZV5RzaUXg@mail.gmail.com>
-References: <20180418191958.GA25806@jordon-HP-15-Notebook-PC> <20180419155606.45a85009.cohuck@redhat.com>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v7 01/16] thread_info: Add update_thread_flag() helpers
+Date: Thu, 10 May 2018 17:15:26 +0100
+Message-ID: <20180510161525.l3hmxmtssk2s5xov@armageddon.cambridge.arm.com>
+References: <1525882385-29181-1-git-send-email-Dave.Martin@arm.com>
+ <1525882385-29181-2-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180419155606.45a85009.cohuck@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: jhogan@kernel.org, ralf@linux-mips.org, paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au, borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, david@redhat.com, schwidefsky@de.ibm.com, pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, christoffer.dall@linaro.org, marc.zyngier@arm.com, linux-mips@linux-mips.org, linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Matthew Wilcox <willy@infradead.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <1525882385-29181-2-git-send-email-Dave.Martin@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Oleg Nesterov <oleg@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Apr 19, 2018 at 7:26 PM, Cornelia Huck <cohuck@redhat.com> wrote:
-> On Thu, 19 Apr 2018 00:49:58 +0530
-> Souptick Joarder <jrdr.linux@gmail.com> wrote:
->
->> Use new return type vm_fault_t for fault handler. For
->> now, this is just documenting that the function returns
->> a VM_FAULT value rather than an errno. Once all instances
->> are converted, vm_fault_t will become a distinct type.
->>
->> commit 1c8f422059ae ("mm: change return type to vm_fault_t")
->>
->> Signed-off-by: Souptick Joarder <jrdr.linux@gmail.com>
->> Reviewed-by: Matthew Wilcox <mawilcox@microsoft.com>
->> ---
->>  arch/mips/kvm/mips.c       | 2 +-
->>  arch/powerpc/kvm/powerpc.c | 2 +-
->>  arch/s390/kvm/kvm-s390.c   | 2 +-
->>  arch/x86/kvm/x86.c         | 2 +-
->>  include/linux/kvm_host.h   | 2 +-
->>  virt/kvm/arm/arm.c         | 2 +-
->>  virt/kvm/kvm_main.c        | 2 +-
->>  7 files changed, 7 insertions(+), 7 deletions(-)
->
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+On Wed, May 09, 2018 at 05:12:50PM +0100, Dave P Martin wrote:
+> There are a number of bits of code sprinkled around the kernel to
+> set a thread flag if a certain condition is true, and clear it
+> otherwise.
+> 
+> To help make those call sites terser and less cumbersome, this
+> patch adds a new family of thread flag manipulators
+> 
+> 	update*_thread_flag([...,] flag, cond)
+> 
+> which do the equivalent of:
+> 
+> 	if (cond)
+> 		set*_thread_flag([...,] flag);
+> 	else
+> 		clear*_thread_flag([...,] flag);
+> 
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
+> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: Peter Zijlstra <peterz@infradead.org>
+> Cc: Oleg Nesterov <oleg@redhat.com>
 
-If no further comment, We would like to get this
-patch in queue for 4.18.
+FWIW,
+
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
