@@ -1,16 +1,15 @@
 From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v7 08/16] KVM: arm64: Optimise FPSIMD handling to reduce
- guest/host thrashing
-Date: Thu, 10 May 2018 17:44:30 +0100
-Message-ID: <20180510164430.ura3th2fxwwot6be@armageddon.cambridge.arm.com>
+Subject: Re: [PATCH v7 12/16] KVM: arm64: Save host SVE context as appropriate
+Date: Thu, 10 May 2018 17:52:35 +0100
+Message-ID: <20180510165235.ctqttfheu7nfcrlf@armageddon.cambridge.arm.com>
 References: <1525882385-29181-1-git-send-email-Dave.Martin@arm.com>
- <1525882385-29181-9-git-send-email-Dave.Martin@arm.com>
+ <1525882385-29181-13-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <1525882385-29181-9-git-send-email-Dave.Martin@arm.com>
+In-Reply-To: <1525882385-29181-13-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -24,71 +23,51 @@ To: Dave Martin <Dave.Martin@arm.com>
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Christoffer Dall <cdall@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, May 09, 2018 at 05:12:57PM +0100, Dave P Martin wrote:
-> This patch refactors KVM to align the host and guest FPSIMD
-> save/restore logic with each other for arm64.  This reduces the
-> number of redundant save/restore operations that must occur, and
-> reduces the common-case IRQ blackout time during guest exit storms
-> by saving the host state lazily and optimising away the need to
-> restore the host state before returning to the run loop.
+On Wed, May 09, 2018 at 05:13:01PM +0100, Dave P Martin wrote:
+> This patch adds SVE context saving to the hyp FPSIMD context switch
+> path.  This means that it is no longer necessary to save the host
+> SVE state in advance of entering the guest, when in use.
 > 
-> Four hooks are defined in order to enable this:
+> In order to avoid adding pointless complexity to the code, VHE is
+> assumed if SVE is in use.  VHE is an architectural prerequisite for
+> SVE, so there is no good reason to turn CONFIG_ARM64_VHE off in
+> kernels that support both SVE and KVM.
 > 
->  * kvm_arch_vcpu_run_map_fp():
->    Called on PID change to map necessary bits of current to Hyp.
-> 
->  * kvm_arch_vcpu_load_fp():
->    Set up FP/SIMD for entering the KVM run loop (parse as
->    "vcpu_load fp").
-> 
->  * kvm_arch_vcpu_ctxsync_fp():
->    Get FP/SIMD into a safe state for re-enabling interrupts after a
->    guest exit back to the run loop.
-> 
->    For arm64 specifically, this involves updating the host kernel's
->    FPSIMD context tracking metadata so that kernel-mode NEON use
->    will cause the vcpu's FPSIMD state to be saved back correctly
->    into the vcpu struct.  This must be done before re-enabling
->    interrupts because kernel-mode NEON may be used by softirqs.
-> 
->  * kvm_arch_vcpu_put_fp():
->    Save guest FP/SIMD state back to memory and dissociate from the
->    CPU ("vcpu_put fp").
-> 
-> Also, the arm64 FPSIMD context switch code is updated to enable it
-> to save back FPSIMD state for a vcpu, not just current.  A few
-> helpers drive this:
-> 
->  * fpsimd_bind_state_to_cpu(struct user_fpsimd_state *fp):
->    mark this CPU as having context fp (which may belong to a vcpu)
->    currently loaded in its registers.  This is the non-task
->    equivalent of the static function fpsimd_bind_to_cpu() in
->    fpsimd.c.
-> 
->  * task_fpsimd_save():
->    exported to allow KVM to save the guest's FPSIMD state back to
->    memory on exit from the run loop.
-> 
->  * fpsimd_flush_state():
->    invalidate any context's FPSIMD state that is currently loaded.
->    Used to disassociate the vcpu from the CPU regs on run loop exit.
-> 
-> These changes allow the run loop to enable interrupts (and thus
-> softirqs that may use kernel-mode NEON) without having to save the
-> guest's FPSIMD state eagerly.
-> 
-> Some new vcpu_arch fields are added to make all this work.  Because
-> host FPSIMD state can now be saved back directly into current's
-> thread_struct as appropriate, host_cpu_context is no longer used
-> for preserving the FPSIMD state.  However, it is still needed for
-> preserving other things such as the host's system registers.  To
-> avoid ABI churn, the redundant storage space in host_cpu_context is
-> not removed for now.
-> 
-> arch/arm is not addressed by this patch and continues to use its
-> current save/restore logic.  It could provide implementations of
-> the helpers later if desired.
+> Historically, software models exist that can expose the
+> architecturally invalid configuration of SVE without VHE, so if
+> this situation is detected at kvm_init() time then KVM will be
+> disabled.
 > 
 > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm64/Kconfig          |  7 +++++++
+>  arch/arm64/kvm/fpsimd.c     |  1 -
+>  arch/arm64/kvm/hyp/switch.c | 20 +++++++++++++++++++-
+>  virt/kvm/arm/arm.c          | 18 ++++++++++++++++++
+>  4 files changed, 44 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+> index eb2cf49..b0d3820 100644
+> --- a/arch/arm64/Kconfig
+> +++ b/arch/arm64/Kconfig
+> @@ -1130,6 +1130,7 @@ endmenu
+>  config ARM64_SVE
+>  	bool "ARM Scalable Vector Extension support"
+>  	default y
+> +	depends on !KVM || ARM64_VHE
+>  	help
+>  	  The Scalable Vector Extension (SVE) is an extension to the AArch64
+>  	  execution state which complements and extends the SIMD functionality
+> @@ -1155,6 +1156,12 @@ config ARM64_SVE
+>  	  booting the kernel.  If unsure and you are not observing these
+>  	  symptoms, you should assume that it is safe to say Y.
+>  
+> +	  CPUs that support SVE are architecturally required to support the
+> +	  Virtualization Host Extensions (VHE), so the kernel makes no
+> +	  provision for supporting SVE alongside KVM without VHE enabled.
+> +	  Thus, you will need to enable CONFIG_ARM64_VHE if you want to support
+> +	  KVM in the same kernel image.
 
 Acked-by: Catalin Marinas <catalin.marinas@arm.com>
