@@ -1,24 +1,25 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
+From: Andre Przywara <andre.przywara@arm.com>
 Subject: Re: kvm_read_guest_page() missing kvm->srcu read lock?
-Date: Thu, 10 May 2018 19:43:33 +0200
-Message-ID: <6a60301f-1fb7-a60a-d47a-85f7ea79b1a7@redhat.com>
+Date: Fri, 11 May 2018 12:02:00 +0100
+Message-ID: <e7683868-2174-b3a6-9487-9d8892af5f39@arm.com>
 References: <32913bee-6ccc-cab7-65fb-fb6896c3d19c@arm.com>
+ <6a60301f-1fb7-a60a-d47a-85f7ea79b1a7@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 413B4402AA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 May 2018 13:33:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D9FE40192
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 May 2018 06:52:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZGZHH8nkLUSE for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 May 2018 13:33:32 -0400 (EDT)
-Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8804640196
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 May 2018 13:33:32 -0400 (EDT)
-In-Reply-To: <32913bee-6ccc-cab7-65fb-fb6896c3d19c@arm.com>
-Content-Language: en-US
+ with ESMTP id jdcY39OxIJXB for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 11 May 2018 06:52:12 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 36630400D4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 May 2018 06:52:12 -0400 (EDT)
+In-Reply-To: <6a60301f-1fb7-a60a-d47a-85f7ea79b1a7@redhat.com>
+Content-Language: en-GB
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,49 +29,55 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Jan Glauber <jan.glauber@caviumnetworks.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 10/05/2018 19:41, Andre Przywara wrote:
-> Hi,
-> 
-> Jan posted an lockdep splat complaining about a suspicious
-> rcu_dereference_check:
-> https://lists.cs.columbia.edu/pipermail/kvmarm/2018-May/031116.html
-> 
-> The gist of that is:
-> ...
-> [ 1025.695517]  dump_stack+0x9c/0xd4
-> [ 1025.695524]  lockdep_rcu_suspicious+0xcc/0x118
-> [ 1025.695537]  gfn_to_memslot+0x174/0x190
-> [ 1025.695546]  kvm_read_guest+0x50/0xb0
-> [ 1025.695553]  vgic_its_check_id.isra.0+0x114/0x148
-> ...
-> I chased that down and wonder if kvm_read_guest{,_page} is supposed to
-> be called inside a kvm->srcu critical section?
-> 
-> We have a check that suggests that eventually someone needs to enter the
-> SRCU criticial section:
-> static inline struct kvm_memslots *__kvm_memslots(struct kvm *kvm,
-> 						  int as_id)
-> {
->         return srcu_dereference_check(kvm->memslots[as_id], &kvm->srcu,
->                         lockdep_is_held(&kvm->slots_lock) ||
->                         !refcount_read(&kvm->users_count));
-> }
-> 
-> If I get this correctly this mean for accessing kvm->memslots we either
-> need to be inside an srcu critical section or hold the kvm->slots_lock
-> (for updates only).
-> 
-> If I am not mistaken, it is not necessary for *callers* of
-> kvm_read_guest_page() to do this, as this could be entirely contained
-> inside this function - since we only use the reference to the memslot
-> entry while doing the copy_from_user(), and the data is safe afterwards
-> from an RCU point of view because it has been *copied*.
-
-Yes, it's the caller's responsibility.  srcu_read_lock/unlock is pretty
-expensive so KVM assumes that the topmost callers do it.
-
-Paolo
+SGkgUGFvbG8sCgp0aGFua3MgZm9yIHRoZSBhbnN3ZXIhClRvb2sgbWUgYSBiaXQsIGJ1dCBJIHRo
+aW5rIHlvdSBhcmUgcmlnaHQgKHNlZSBiZWxvdykuCgpPbiAxMC8wNS8xOCAxODo0MywgUGFvbG8g
+Qm9uemluaSB3cm90ZToKPiBPbiAxMC8wNS8yMDE4IDE5OjQxLCBBbmRyZSBQcnp5d2FyYSB3cm90
+ZToKPj4gSGksCj4+Cj4+IEphbiBwb3N0ZWQgYW4gbG9ja2RlcCBzcGxhdCBjb21wbGFpbmluZyBh
+Ym91dCBhIHN1c3BpY2lvdXMKPj4gcmN1X2RlcmVmZXJlbmNlX2NoZWNrOgo+PiBodHRwczovL2xp
+c3RzLmNzLmNvbHVtYmlhLmVkdS9waXBlcm1haWwva3ZtYXJtLzIwMTgtTWF5LzAzMTExNi5odG1s
+Cj4+Cj4+IFRoZSBnaXN0IG9mIHRoYXQgaXM6Cj4+IC4uLgo+PiBbIDEwMjUuNjk1NTE3XSAgZHVt
+cF9zdGFjaysweDljLzB4ZDQKPj4gWyAxMDI1LjY5NTUyNF0gIGxvY2tkZXBfcmN1X3N1c3BpY2lv
+dXMrMHhjYy8weDExOAo+PiBbIDEwMjUuNjk1NTM3XSAgZ2ZuX3RvX21lbXNsb3QrMHgxNzQvMHgx
+OTAKPj4gWyAxMDI1LjY5NTU0Nl0gIGt2bV9yZWFkX2d1ZXN0KzB4NTAvMHhiMAo+PiBbIDEwMjUu
+Njk1NTUzXSAgdmdpY19pdHNfY2hlY2tfaWQuaXNyYS4wKzB4MTE0LzB4MTQ4Cj4+IC4uLgo+PiBJ
+IGNoYXNlZCB0aGF0IGRvd24gYW5kIHdvbmRlciBpZiBrdm1fcmVhZF9ndWVzdHssX3BhZ2V9IGlz
+IHN1cHBvc2VkIHRvCj4+IGJlIGNhbGxlZCBpbnNpZGUgYSBrdm0tPnNyY3UgY3JpdGljYWwgc2Vj
+dGlvbj8KPj4KPj4gV2UgaGF2ZSBhIGNoZWNrIHRoYXQgc3VnZ2VzdHMgdGhhdCBldmVudHVhbGx5
+IHNvbWVvbmUgbmVlZHMgdG8gZW50ZXIgdGhlCj4+IFNSQ1UgY3JpdGljaWFsIHNlY3Rpb246Cj4+
+IHN0YXRpYyBpbmxpbmUgc3RydWN0IGt2bV9tZW1zbG90cyAqX19rdm1fbWVtc2xvdHMoc3RydWN0
+IGt2bSAqa3ZtLAo+PiAJCQkJCQkgIGludCBhc19pZCkKPj4gewo+PiAgICAgICAgIHJldHVybiBz
+cmN1X2RlcmVmZXJlbmNlX2NoZWNrKGt2bS0+bWVtc2xvdHNbYXNfaWRdLCAma3ZtLT5zcmN1LAo+
+PiAgICAgICAgICAgICAgICAgICAgICAgICBsb2NrZGVwX2lzX2hlbGQoJmt2bS0+c2xvdHNfbG9j
+aykgfHwKPj4gICAgICAgICAgICAgICAgICAgICAgICAgIXJlZmNvdW50X3JlYWQoJmt2bS0+dXNl
+cnNfY291bnQpKTsKPj4gfQo+Pgo+PiBJZiBJIGdldCB0aGlzIGNvcnJlY3RseSB0aGlzIG1lYW4g
+Zm9yIGFjY2Vzc2luZyBrdm0tPm1lbXNsb3RzIHdlIGVpdGhlcgo+PiBuZWVkIHRvIGJlIGluc2lk
+ZSBhbiBzcmN1IGNyaXRpY2FsIHNlY3Rpb24gb3IgaG9sZCB0aGUga3ZtLT5zbG90c19sb2NrCj4+
+IChmb3IgdXBkYXRlcyBvbmx5KS4KPj4KPj4gSWYgSSBhbSBub3QgbWlzdGFrZW4sIGl0IGlzIG5v
+dCBuZWNlc3NhcnkgZm9yICpjYWxsZXJzKiBvZgo+PiBrdm1fcmVhZF9ndWVzdF9wYWdlKCkgdG8g
+ZG8gdGhpcywgYXMgdGhpcyBjb3VsZCBiZSBlbnRpcmVseSBjb250YWluZWQKPj4gaW5zaWRlIHRo
+aXMgZnVuY3Rpb24gLSBzaW5jZSB3ZSBvbmx5IHVzZSB0aGUgcmVmZXJlbmNlIHRvIHRoZSBtZW1z
+bG90Cj4+IGVudHJ5IHdoaWxlIGRvaW5nIHRoZSBjb3B5X2Zyb21fdXNlcigpLCBhbmQgdGhlIGRh
+dGEgaXMgc2FmZSBhZnRlcndhcmRzCj4+IGZyb20gYW4gUkNVIHBvaW50IG9mIHZpZXcgYmVjYXVz
+ZSBpdCBoYXMgYmVlbiAqY29waWVkKi4KPiAKPiBZZXMsIGl0J3MgdGhlIGNhbGxlcidzIHJlc3Bv
+bnNpYmlsaXR5LiAgc3JjdV9yZWFkX2xvY2svdW5sb2NrIGlzIHByZXR0eQo+IGV4cGVuc2l2ZQoK
+SXMgdGhhdCBzbz8gSSB3YXMgdW5kZXIgdGhlIGltcHJlc3Npb24gdGhhdCBkZWNsYXJpbmcgUkNV
+IGNyaXRpY2FsCnNlY3Rpb25zIGlzIHZlcnkgY2hlYXAsIGlzIHRoYXQgZGlmZmVyZW50IHdpdGgg
+U1JDVT8KCj4gc28gS1ZNIGFzc3VtZXMgdGhhdCB0aGUgdG9wbW9zdCBjYWxsZXJzIGRvIGl0LgoK
+T0ssIGZhaXIgZW5vdWdoLiBBbmQgd2l0aCBzb21lIGhpbnRzIGZyb20gSsO2cmcgSSB1bmRlcnN0
+YW5kIG5vdyB0aGF0IHg4NgphbmQgczM5MCBkbyBhICJzcmN1X3JlYWRfbG9jaygma3ZtLT5zcmN1
+KTsiIHJpZ2h0IGFmdGVyIGxlYXZpbmcgdGhlCmd1ZXN0IGFuZCB1bmxvY2sgaXQgb25seSBzaG9y
+dGx5IGJlZm9yZSBlbnRlcmluZyBhZ2Fpbiwgc28gdGhhdCBhbnkKaW50ZXJtZWRpYXRlIGNhbGxz
+IGFyZSBwcm90ZWN0ZWQuIFRoYXQgbGVhdmVzIHRoZSBsb2NraW5nIGR1dHkgb25seSB1cAp0byBj
+YWxscyBvcmlnaW5hdGluZyBmcm9tIHVzZXJzcGFjZS4KQnV0IEFGQUlDVCBuZWl0aGVyIG1pcHMs
+IHBvd2VycGMgb3IgYXJtL2FybTY0IGFyZSBkb2luZyB0aGlzLiBJIGFtCmNoZWNraW5nIG5vdyB3
+aGV0aGVyIHRoaXMgaXMgYW4gb21pc3Npb24gb3Igd2hldGhlciB0aGV5IGFyZSByZWFsbHkKZG9p
+bmcgZmluZSBncmFpbmVkIGxvY2tpbmcgZm9yIGFsbCBtZW1zbG90cyBhY2Nlc3Nlcy4KCkRlZmlu
+aXRlbHkgd2UgYXJlIG1pc3NpbmcgaXQgYXJvdW5kIGt2bV9yZWFkX2d1ZXN0X3BhZ2UsIHNvIEkg
+bmVlZCB0bwplaXRoZXIgYWRkIGl0IHRoZXJlIGFyZSBkbyBpdCBsaWtlIHg4Ni9zMzkwLgoKVGhh
+bmtzIQpBbmRyZS4KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBz
+Oi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
