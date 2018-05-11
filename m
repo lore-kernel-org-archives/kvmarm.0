@@ -1,136 +1,184 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH 3/4] KVM: arm/arm64: VGIC/ITS: protect kvm_read_guest() calls with SRCU lock
-Date: Fri, 11 May 2018 15:20:14 +0100
-Message-ID: <20180511142015.21953-4-andre.przywara@arm.com>
+Subject: [PATCH 1/4] KVM: arm/arm64: Properly protect VGIC locks from IRQs
+Date: Fri, 11 May 2018 15:20:12 +0100
+Message-ID: <20180511142015.21953-2-andre.przywara@arm.com>
 References: <20180511142015.21953-1-andre.przywara@arm.com>
 Return-path: <stable-owner@vger.kernel.org>
 In-Reply-To: <20180511142015.21953-1-andre.przywara@arm.com>
 Sender: stable-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stable <stable@vger.kernel.org>, Andre Przywara <andre.przywara@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, stable@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-kvm_read_guest() will eventually look up in kvm_memslots(), which requires
-either to hold the kvm->slots_lock or to be inside a kvm->srcu critical
-section.
-In contrast to x86 and s390 we don't take the SRCU lock on every guest
-exit, so we have to do it individually for each kvm_read_guest() call.
+As Jan reported [1], lockdep complains about the VGIC not being bullet
+proof. This seems to be due to two issues:
+- When commit 006df0f34930 ("KVM: arm/arm64: Support calling
+  vgic_update_irq_pending from irq context") promoted irq_lock and
+  ap_list_lock to _irqsave, we forgot two instances of irq_lock.
+  lockdeps seems to pick those up.
+- If a lock is _irqsave, any other locks we take inside them should be
+  _irqsafe as well. So the lpi_list_lock needs to be promoted also.
 
-Provide a wrapper which does that and use that everywhere.
+This fixes both issues by simply making the remaining instances of those
+locks _irqsave.
+One irq_lock is addressed in a separate patch, to simplify backporting.
 
-Note that ending the SRCU critical section before returning from the
-kvm_read_guest() wrapper is safe, because the data has been *copied*, so
-we don't need to rely on valid references to the memslot anymore.
-
-Cc: Stable <stable@vger.kernel.org> # 4.8+
+Cc: stable@vger.kernel.org
+Fixes: 006df0f34930 ("KVM: arm/arm64: Support calling vgic_update_irq_pending from irq context")
 Reported-by: Jan Glauber <jan.glauber@caviumnetworks.com>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
- arch/arm/include/asm/kvm_mmu.h   | 16 ++++++++++++++++
- arch/arm64/include/asm/kvm_mmu.h | 16 ++++++++++++++++
- virt/kvm/arm/vgic/vgic-its.c     | 15 ++++++++-------
- 3 files changed, 40 insertions(+), 7 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index 707a1f06dc5d..f675162663f0 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -309,6 +309,22 @@ static inline unsigned int kvm_get_vmid_bits(void)
- 	return 8;
- }
+[1] http://lists.infradead.org/pipermail/linux-arm-kernel/2018-May/575718.html
+---
+ virt/kvm/arm/vgic/vgic-debug.c |  5 +++--
+ virt/kvm/arm/vgic/vgic-its.c   | 10 ++++++----
+ virt/kvm/arm/vgic/vgic.c       | 22 ++++++++++++++--------
+ 3 files changed, 23 insertions(+), 14 deletions(-)
+
+diff --git a/virt/kvm/arm/vgic/vgic-debug.c b/virt/kvm/arm/vgic/vgic-debug.c
+index 10b38178cff2..4ffc0b5e6105 100644
+--- a/virt/kvm/arm/vgic/vgic-debug.c
++++ b/virt/kvm/arm/vgic/vgic-debug.c
+@@ -211,6 +211,7 @@ static int vgic_debug_show(struct seq_file *s, void *v)
+ 	struct vgic_state_iter *iter = (struct vgic_state_iter *)v;
+ 	struct vgic_irq *irq;
+ 	struct kvm_vcpu *vcpu = NULL;
++	unsigned long flags;
  
-+/*
-+ * We are not in the kvm->srcu critical section most of the time, so we take
-+ * the SRCU read lock here. Since we copy the data from the user page, we
-+ * can immediately drop the lock again.
-+ */
-+static inline int kvm_read_guest_lock(struct kvm *kvm,
-+				      gpa_t gpa, void *data, unsigned long len)
-+{
-+	int srcu_idx = srcu_read_lock(&kvm->srcu);
-+	int ret = kvm_read_guest(kvm, gpa, data, len);
-+
-+	srcu_read_unlock(&kvm->srcu, srcu_idx);
-+
-+	return ret;
-+}
-+
- static inline void *kvm_get_hyp_vector(void)
- {
- 	return kvm_ksym_ref(__kvm_hyp_vector);
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 082110993647..6128992c2ded 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -360,6 +360,22 @@ static inline unsigned int kvm_get_vmid_bits(void)
- 	return (cpuid_feature_extract_unsigned_field(reg, ID_AA64MMFR1_VMIDBITS_SHIFT) == 2) ? 16 : 8;
- }
+ 	if (iter->dist_id == 0) {
+ 		print_dist_state(s, &kvm->arch.vgic);
+@@ -227,9 +228,9 @@ static int vgic_debug_show(struct seq_file *s, void *v)
+ 		irq = &kvm->arch.vgic.spis[iter->intid - VGIC_NR_PRIVATE_IRQS];
+ 	}
  
-+/*
-+ * We are not in the kvm->srcu critical section most of the time, so we take
-+ * the SRCU read lock here. Since we copy the data from the user page, we
-+ * can immediately drop the lock again.
-+ */
-+static inline int kvm_read_guest_lock(struct kvm *kvm,
-+				      gpa_t gpa, void *data, unsigned long len)
-+{
-+	int srcu_idx = srcu_read_lock(&kvm->srcu);
-+	int ret = kvm_read_guest(kvm, gpa, data, len);
-+
-+	srcu_read_unlock(&kvm->srcu, srcu_idx);
-+
-+	return ret;
-+}
-+
- #ifdef CONFIG_KVM_INDIRECT_VECTORS
- /*
-  * EL2 vectors can be mapped and rerouted in a number of ways,
+-	spin_lock(&irq->irq_lock);
++	spin_lock_irqsave(&irq->irq_lock, flags);
+ 	print_irq_state(s, irq, vcpu);
+-	spin_unlock(&irq->irq_lock);
++	spin_unlock_irqrestore(&irq->irq_lock, flags);
+ 
+ 	return 0;
+ }
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 51a80b600632..7cb060e01a76 100644
+index a8f07243aa9f..41abf92f2699 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -281,8 +281,8 @@ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
+@@ -52,6 +52,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+ {
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+ 	struct vgic_irq *irq = vgic_get_irq(kvm, NULL, intid), *oldirq;
++	unsigned long flags;
  	int ret;
- 	unsigned long flags;
  
--	ret = kvm_read_guest(kvm, propbase + irq->intid - GIC_LPI_OFFSET,
--			     &prop, 1);
-+	ret = kvm_read_guest_lock(kvm, propbase + irq->intid - GIC_LPI_OFFSET,
-+				  &prop, 1);
+ 	/* In this case there is no put, since we keep the reference. */
+@@ -71,7 +72,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+ 	irq->intid = intid;
+ 	irq->target_vcpu = vcpu;
  
- 	if (ret)
- 		return ret;
-@@ -444,8 +444,9 @@ static int its_sync_lpi_pending_table(struct kvm_vcpu *vcpu)
- 		 * this very same byte in the last iteration. Reuse that.
- 		 */
- 		if (byte_offset != last_byte_offset) {
--			ret = kvm_read_guest(vcpu->kvm, pendbase + byte_offset,
--					     &pendmask, 1);
-+			ret = kvm_read_guest_lock(vcpu->kvm,
-+						  pendbase + byte_offset,
-+						  &pendmask, 1);
- 			if (ret) {
- 				kfree(intids);
- 				return ret;
-@@ -789,7 +790,7 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
- 		return false;
+-	spin_lock(&dist->lpi_list_lock);
++	spin_lock_irqsave(&dist->lpi_list_lock, flags);
  
- 	/* Each 1st level entry is represented by a 64-bit value. */
--	if (kvm_read_guest(its->dev->kvm,
-+	if (kvm_read_guest_lock(its->dev->kvm,
- 			   BASER_ADDRESS(baser) + index * sizeof(indirect_ptr),
- 			   &indirect_ptr, sizeof(indirect_ptr)))
- 		return false;
-@@ -1370,8 +1371,8 @@ static void vgic_its_process_commands(struct kvm *kvm, struct vgic_its *its)
- 	cbaser = CBASER_ADDRESS(its->cbaser);
+ 	/*
+ 	 * There could be a race with another vgic_add_lpi(), so we need to
+@@ -99,7 +100,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+ 	dist->lpi_list_count++;
  
- 	while (its->cwriter != its->creadr) {
--		int ret = kvm_read_guest(kvm, cbaser + its->creadr,
--					 cmd_buf, ITS_CMD_SIZE);
-+		int ret = kvm_read_guest_lock(kvm, cbaser + its->creadr,
-+					      cmd_buf, ITS_CMD_SIZE);
- 		/*
- 		 * If kvm_read_guest() fails, this could be due to the guest
- 		 * programming a bogus value in CBASER or something else going
+ out_unlock:
+-	spin_unlock(&dist->lpi_list_lock);
++	spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+ 
+ 	/*
+ 	 * We "cache" the configuration table entries in our struct vgic_irq's.
+@@ -315,6 +316,7 @@ static int vgic_copy_lpi_list(struct kvm_vcpu *vcpu, u32 **intid_ptr)
+ {
+ 	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+ 	struct vgic_irq *irq;
++	unsigned long flags;
+ 	u32 *intids;
+ 	int irq_count, i = 0;
+ 
+@@ -330,7 +332,7 @@ static int vgic_copy_lpi_list(struct kvm_vcpu *vcpu, u32 **intid_ptr)
+ 	if (!intids)
+ 		return -ENOMEM;
+ 
+-	spin_lock(&dist->lpi_list_lock);
++	spin_lock_irqsave(&dist->lpi_list_lock, flags);
+ 	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
+ 		if (i == irq_count)
+ 			break;
+@@ -339,7 +341,7 @@ static int vgic_copy_lpi_list(struct kvm_vcpu *vcpu, u32 **intid_ptr)
+ 			continue;
+ 		intids[i++] = irq->intid;
+ 	}
+-	spin_unlock(&dist->lpi_list_lock);
++	spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+ 
+ 	*intid_ptr = intids;
+ 	return i;
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 27219313a406..1dfb5b2f1b12 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -43,9 +43,13 @@ struct vgic_global kvm_vgic_global_state __ro_after_init = {
+  * kvm->lock (mutex)
+  *   its->cmd_lock (mutex)
+  *     its->its_lock (mutex)
+- *       vgic_cpu->ap_list_lock
+- *         kvm->lpi_list_lock
+- *           vgic_irq->irq_lock
++ *       vgic_cpu->ap_list_lock		must be taken with IRQs disabled
++ *         kvm->lpi_list_lock		must be taken with IRQs disabled
++ *           vgic_irq->irq_lock		must be taken with IRQs disabled
++ *
++ * As the ap_list_lock might be taken from the timer interrupt handler,
++ * we have to disable IRQs before taking this lock and everything lower
++ * than it.
+  *
+  * If you need to take multiple locks, always take the upper lock first,
+  * then the lower ones, e.g. first take the its_lock, then the irq_lock.
+@@ -72,8 +76,9 @@ static struct vgic_irq *vgic_get_lpi(struct kvm *kvm, u32 intid)
+ {
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+ 	struct vgic_irq *irq = NULL;
++	unsigned long flags;
+ 
+-	spin_lock(&dist->lpi_list_lock);
++	spin_lock_irqsave(&dist->lpi_list_lock, flags);
+ 
+ 	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
+ 		if (irq->intid != intid)
+@@ -89,7 +94,7 @@ static struct vgic_irq *vgic_get_lpi(struct kvm *kvm, u32 intid)
+ 	irq = NULL;
+ 
+ out_unlock:
+-	spin_unlock(&dist->lpi_list_lock);
++	spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+ 
+ 	return irq;
+ }
+@@ -134,19 +139,20 @@ static void vgic_irq_release(struct kref *ref)
+ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
+ {
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
++	unsigned long flags;
+ 
+ 	if (irq->intid < VGIC_MIN_LPI)
+ 		return;
+ 
+-	spin_lock(&dist->lpi_list_lock);
++	spin_lock_irqsave(&dist->lpi_list_lock, flags);
+ 	if (!kref_put(&irq->refcount, vgic_irq_release)) {
+-		spin_unlock(&dist->lpi_list_lock);
++		spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+ 		return;
+ 	};
+ 
+ 	list_del(&irq->lpi_list);
+ 	dist->lpi_list_count--;
+-	spin_unlock(&dist->lpi_list_lock);
++	spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+ 
+ 	kfree(irq);
+ }
 -- 
 2.14.1
