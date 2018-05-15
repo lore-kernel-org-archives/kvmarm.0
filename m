@@ -1,17 +1,16 @@
-From: Jan Glauber <jan.glauber@caviumnetworks.com>
-Subject: Re: Potential deadlock in vgic
-Date: Tue, 15 May 2018 13:54:05 +0200
-Message-ID: <20180515115405.GA14459@hc>
-References: <20180504130854.GA14663@hc>
- <20180504151740.12165-1-andre.przywara@arm.com>
- <20180504163142.GC14663@hc>
- <c243af13-a9c3-6808-6937-f1b882ce7a58@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 0/4] KVM: arm/arm64: Fix locking issues
+Date: Tue, 15 May 2018 12:54:54 +0100
+Message-ID: <b8aae9d6-1413-157d-52c2-e06511975e11@arm.com>
+References: <20180511142015.21953-1-andre.przywara@arm.com>
+ <20180515102659.GA38551@C02W217FHV2R.local>
+ <da25660f-7d57-34be-fe99-f42c10d81845@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <c243af13-a9c3-6808-6937-f1b882ce7a58@arm.com>
+In-Reply-To: <da25660f-7d57-34be-fe99-f42c10d81845@redhat.com>
+Content-Language: en-GB
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -21,130 +20,49 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+To: Paolo Bonzini <pbonzini@redhat.com>, Christoffer Dall <christoffer.dall@arm.com>, Andre Przywara <andre.przywara@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, Eric Auger <eric.auger@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, May 11, 2018 at 03:29:43PM +0100, Andre Przywara wrote:
-> Hi Jan,
-> =
+On 15/05/18 12:35, Paolo Bonzini wrote:
+> On 15/05/2018 12:26, Christoffer Dall wrote:
+>> On Fri, May 11, 2018 at 03:20:11PM +0100, Andre Przywara wrote:
+>>> Jan recently reported lockdep complaints regarding various locks in our
+>>> VGIC emulation [1][2].
+>>> This boiled down to two separate issues:
+>>> - When promoting the vgic_irq->irq_lock to require IRQs being disabled,
+>>>   we forgot to amend some instances of this lock on the way. Also this
+>>>   needs to be applied to dependent locks as well. The first two patches
+>>>   fix that. The patch split is designed to simplify backporting.
+>>>   Those patches have been posted before, I am resending them as part
+>>>   of this series.
+>>> - Calling kvm_read_guest() requires us to be inside an SRCU critical
+>>>   section. On some architectures we are always in it when handling VCPU
+>>>   exits, but on ARM we need to lock it individually. Patches 3 and 4
+>>>   fix that, the split is again made to ease backporting.
+>>>   Each of the hunks fix an indiviual commit, but I refrained from
+>>>   splitting this down into eight patches just to put proper Fixes: tags
+>>>   on it. Eventually those commits are part of one out of two series, I put
+>>>   the respective kernel release version as a tag to the Cc: stable line.
+>>>
+>>> I couldn't reproduce the full lockdep splat on my setup, but at least
+>>> could show one instance and prove that these patches fixes that.
+>>>
+>>>
+>> For the series:
+>>
+>> Acked-by: Christoffer Dall <christoffer.dall@arm.com>
+> 
+> Shall I put the patches on their route to Linus?
+If you're about to send something, yes please (saves me having to send
+you a pull request). In that case, please add my
 
-> On 04/05/18 17:31, Jan Glauber wrote:
-> > On Fri, May 04, 2018 at 04:17:40PM +0100, Andre Przywara wrote:
-> >> Hi Jan,
-> >>
-> >> can you please test this patch with your setup, to see if it still
-> >> screams? That converts two forgotten irq_lock's over to be irqsafe,
-> >> plus lets lpi_list_lock join them (which you already did, IIUC).
-> >> That should appease lockdep, hopefully.
-> > =
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 
-> > Hit send too soon, on halting the guest I get:
-> =
+to the whole series.
 
-> So I managed to finally wrap my head around this one.
-> I sent out a series [1], and failed Cc:ing you under the assumption that
-> Reported-by: would be picked up by git send-email. Apologies for that,
-> but you should be able to pick it from one of the lists.
-> =
+Thanks,
 
-> Can you please confirm that the last two patches fix the splat below for
-> you?
-
-Sorry for the late response, I was offline. With all 4 patches applied
-both the locking and the RCU warnings are gone.
-
-Thanks for fixing this!
-
-Gr=FC=DFe,
-Jan
-
-> Thanks for testing and reporting!
-> Andre.
-> =
-
-> [1]
-> http://lists.infradead.org/pipermail/linux-arm-kernel/2018-May/577054.html
-> =
-
-> > =
-
-> > [ 1025.694857] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > [ 1025.694862] WARNING: suspicious RCU usage
-> > [ 1025.694868] 4.17.0-rc3-jang+ #73 Not tainted
-> > [ 1025.694873] -----------------------------
-> > [ 1025.694880] ./include/linux/kvm_host.h:575 suspicious rcu_dereferenc=
-e_check() usage!
-> > [ 1025.694884] =
-
-> >                other info that might help us debug this:
-> > =
-
-> > [ 1025.694890] =
-
-> >                rcu_scheduler_active =3D 2, debug_locks =3D 1
-> > [ 1025.694896] 18 locks held by qemu-system-aar/5540:
-> > [ 1025.694901]  #0: 000000005e03488a (&kvm->lock){+.+.}, at: vgic_its_s=
-et_attr+0x230/0x388
-> > [ 1025.694937]  #1: 000000004b1a3bb5 (&its->its_lock){+.+.}, at: vgic_i=
-ts_set_attr+0x23c/0x388
-> > [ 1025.694965]  #2: 000000003ca8213c (&vcpu->mutex){+.+.}, at: lock_all=
-_vcpus+0x64/0xc0
-> > [ 1025.694993]  #3: 00000000adb6ae51 (&vcpu->mutex){+.+.}, at: lock_all=
-_vcpus+0x64/0xc0
-> > [ 1025.695021]  #4: 0000000000563df7 (&vcpu->mutex){+.+.}, at: lock_all=
-_vcpus+0x64/0xc0
-> > [ 1025.695048]  #5: 00000000da16277a (&vcpu->mutex){+.+.}, at: lock_all=
-_vcpus+0x64/0xc0
-> > [ 1025.695076]  #6: 00000000bf36d9aa (&vcpu->mutex){+.+.}, at: lock_all=
-_vcpus+0x64/0xc0
-> > [ 1025.695103]  #7: 00000000607eaa4f (&vcpu->mutex){+.+.}, at: lock_all=
-_vcpus+0x64/0xc0
-> > [ 1025.695130]  #8: 0000000046dadf65 (&vcpu->mutex){+.+.}, at: lock_all=
-_vcpus+0x64/0xc0
-> > [ 1025.695157]  #9: 00000000197747b2 (&vcpu->mutex){+.+.}, at: lock_all=
-_vcpus+0x64/0xc0
-> > [ 1025.695184]  #10: 00000000e4f1282c (&vcpu->mutex){+.+.}, at: lock_al=
-l_vcpus+0x64/0xc0
-> > [ 1025.695211]  #11: 000000007471b896 (&vcpu->mutex){+.+.}, at: lock_al=
-l_vcpus+0x64/0xc0
-> > [ 1025.695239]  #12: 000000005be54486 (&vcpu->mutex){+.+.}, at: lock_al=
-l_vcpus+0x64/0xc0
-> > [ 1025.695266]  #13: 000000000f1fa184 (&vcpu->mutex){+.+.}, at: lock_al=
-l_vcpus+0x64/0xc0
-> > [ 1025.695293]  #14: 0000000093fdb28b (&vcpu->mutex){+.+.}, at: lock_al=
-l_vcpus+0x64/0xc0
-> > [ 1025.695396]  #15: 0000000097cc103c (&vcpu->mutex){+.+.}, at: lock_al=
-l_vcpus+0x64/0xc0
-> > [ 1025.695426]  #16: 00000000d24dd32e (&vcpu->mutex){+.+.}, at: lock_al=
-l_vcpus+0x64/0xc0
-> > [ 1025.695453]  #17: 000000002606c3a7 (&vcpu->mutex){+.+.}, at: lock_al=
-l_vcpus+0x64/0xc0
-> > [ 1025.695482] =
-
-> >                stack backtrace:
-> > [ 1025.695489] CPU: 29 PID: 5540 Comm: qemu-system-aar Not tainted 4.17=
-.0-rc3-jang+ #73
-> > [ 1025.695494] Hardware name: To be filled by O.E.M. Saber/To be filled=
- by O.E.M., BIOS 0ACKL018 03/30/2018
-> > [ 1025.695499] Call trace:
-> > [ 1025.695505]  dump_backtrace+0x0/0x160
-> > [ 1025.695510]  show_stack+0x24/0x30
-> > [ 1025.695517]  dump_stack+0x9c/0xd4
-> > [ 1025.695524]  lockdep_rcu_suspicious+0xcc/0x118
-> > [ 1025.695537]  gfn_to_memslot+0x174/0x190
-> > [ 1025.695546]  kvm_read_guest+0x50/0xb0
-> > [ 1025.695553]  vgic_its_check_id.isra.0+0x114/0x148
-> > [ 1025.695560]  vgic_its_save_tables_v0+0x1a0/0x320
-> > [ 1025.695567]  vgic_its_set_attr+0x330/0x388
-> > [ 1025.695573]  kvm_device_ioctl_attr+0x9c/0xd8
-> > [ 1025.695579]  kvm_device_ioctl+0x8c/0xf8
-> > [ 1025.695587]  do_vfs_ioctl+0xc4/0x938
-> > [ 1025.695594]  ksys_ioctl+0x8c/0x98
-> > [ 1025.695601]  sys_ioctl+0x34/0x48
-> > [ 1025.695609]  el0_svc_naked+0x44/0x48
-> > =
-
-> > --Jan
-> > =
+	M.
+-- 
+Jazz is not dead. It just smells funny...
