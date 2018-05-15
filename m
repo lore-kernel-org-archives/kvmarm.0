@@ -1,154 +1,175 @@
-From: Dongjiu Geng <gengdongjiu@huawei.com>
-Subject: [PATCH v12 3/4] ACPI / APEI: Add SEI notification type support for ARMv8
-Date: Wed, 16 May 2018 04:58:06 +0800
-Message-ID: <1526417887-25843-4-git-send-email-gengdongjiu@huawei.com>
-References: <1526417887-25843-1-git-send-email-gengdongjiu@huawei.com>
+From: Jia He <hejianet@gmail.com>
+Subject: Re: [PATCH] KVM: arm/arm64: fix unaligned hva start and end in
+ handle_hva_to_gpa
+Date: Tue, 15 May 2018 21:15:29 +0800
+Message-ID: <5efb2da1-fed8-443b-d06b-cc03152b2c2e@gmail.com>
+References: <1525244911-5519-1-git-send-email-hejianet@gmail.com>
+ <04e6109f-cbbd-24b0-03bb-9247b930d42c@arm.com>
+ <85e04362-05dd-c697-e9c4-ad5824e63819@gmail.com>
+ <0f134188-12d5-7184-3fbd-0ec8204cf649@arm.com>
+ <aa5b37dc-7ac3-2999-fa67-848cd693977f@gmail.com>
+ <695beacb-ff51-bb2c-72ef-d268f7d4e59d@arm.com>
+ <1e065e9b-4dad-611d-fc5b-26fe6c031507@gmail.com>
+ <14954b3a-6a2a-fe05-47b7-1890375ab8a4@arm.com>
+ <b9e28c64-78cd-042e-0add-e06b0f57fc36@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1526417887-25843-1-git-send-email-gengdongjiu@huawei.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: rkrcmar@redhat.com, corbet@lwn.net, christoffer.dall@arm.com, marc.zyngier@arm.com, james.morse@arm.com, linux@armlinux.org.uk, catalin.marinas@arm.com, rjw@rjwysocki.net, bp@alien8.de, lenb@kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-acpi@vger.kernel.org, devel@acpica.org
-Cc: gengdongjiu@huawei.com, huangshaoyu@huawei.com, zhengxiang9@huawei.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 311DC49EA2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 May 2018 09:05:47 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id FzACSpJ05LE0 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 May 2018 09:05:23 -0400 (EDT)
+Received: from mail-pl0-f51.google.com (mail-pl0-f51.google.com
+ [209.85.160.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A11C94043C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 May 2018 09:05:23 -0400 (EDT)
+Received: by mail-pl0-f51.google.com with SMTP id bi12-v6so31556plb.12
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 May 2018 06:15:41 -0700 (PDT)
+In-Reply-To: <b9e28c64-78cd-042e-0add-e06b0f57fc36@gmail.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: li.zhang@hxt-semitech.com, hughd@google.com, linux-kernel@vger.kernel.org, Jia He <jia.he@hxt-semitech.com>, "Andrea Arcangeli <aarcange@redhat.com>;
+ Minchan Kim <minchan@kernel.org>;
+ Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>;
+ Arvind Yadav <arvind.yadav.cs@gmail.com>;
+ Mike Rapoport" <rppt@linux.vnet.ibm.com>, akpm@linux-foundation.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-ACPI 6.x adds support for NOTIFY_SEI as a GHES notification
-mechanism, so add new GHES notification handling functions.
-Expose API ghes_notify_sei() to arch code, arch code will call
-this API when it gets this NOTIFY_SEI.
-
-Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-
-Note:
-Firmware will follow the SError mask rule, if the SError is masked,
-the firmware will not deliver NOTIFY_SEI notification.
----
- drivers/acpi/apei/Kconfig | 15 ++++++++++++++
- drivers/acpi/apei/ghes.c  | 53 +++++++++++++++++++++++++++++++++++++++++++++++
- include/acpi/ghes.h       |  1 +
- 3 files changed, 69 insertions(+)
-
-diff --git a/drivers/acpi/apei/Kconfig b/drivers/acpi/apei/Kconfig
-index 52ae543..ff4afc3 100644
---- a/drivers/acpi/apei/Kconfig
-+++ b/drivers/acpi/apei/Kconfig
-@@ -55,6 +55,21 @@ config ACPI_APEI_SEA
- 	  option allows the OS to look for such hardware error record, and
- 	  take appropriate action.
- 
-+config ACPI_APEI_SEI
-+	bool "APEI SError(System Error) Interrupt logging/recovering support"
-+	depends on ARM64 && ACPI_APEI_GHES
-+	default y
-+	help
-+	  This option should be enabled if the system supports
-+	  firmware first handling of SEI (SError interrupt).
-+
-+	  SEI happens with asynchronous external abort for errors on device
-+	  memory reads on ARMv8 systems. If a system supports firmware first
-+	  handling of SEI, the platform analyzes and handles hardware error
-+	  notifications from SEI, and it may then form a hardware error record for
-+	  the OS to parse and handle. This option allows the OS to look for
-+	  such hardware error record, and take appropriate action.
-+
- config ACPI_APEI_MEMORY_FAILURE
- 	bool "APEI memory error recovering support"
- 	depends on ACPI_APEI && MEMORY_FAILURE
-diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-index 1efefe9..33f77ae 100644
---- a/drivers/acpi/apei/ghes.c
-+++ b/drivers/acpi/apei/ghes.c
-@@ -827,6 +827,46 @@ static inline void ghes_sea_add(struct ghes *ghes) { }
- static inline void ghes_sea_remove(struct ghes *ghes) { }
- #endif /* CONFIG_ACPI_APEI_SEA */
- 
-+#ifdef CONFIG_ACPI_APEI_SEI
-+static LIST_HEAD(ghes_sei);
-+
-+/*
-+ * Return 0 only if one of the SEI error sources successfully reported an error
-+ * record sent from the firmware.
-+ */
-+int ghes_notify_sei(void)
-+{
-+	struct ghes *ghes;
-+	int ret = -ENOENT;
-+
-+	rcu_read_lock();
-+	list_for_each_entry_rcu(ghes, &ghes_sei, list) {
-+		if (!ghes_proc(ghes))
-+			ret = 0;
-+	}
-+	rcu_read_unlock();
-+	return ret;
-+}
-+
-+static void ghes_sei_add(struct ghes *ghes)
-+{
-+	mutex_lock(&ghes_list_mutex);
-+	list_add_rcu(&ghes->list, &ghes_sei);
-+	mutex_unlock(&ghes_list_mutex);
-+}
-+
-+static void ghes_sei_remove(struct ghes *ghes)
-+{
-+	mutex_lock(&ghes_list_mutex);
-+	list_del_rcu(&ghes->list);
-+	mutex_unlock(&ghes_list_mutex);
-+	synchronize_rcu();
-+}
-+#else /* CONFIG_ACPI_APEI_SEI */
-+static inline void ghes_sei_add(struct ghes *ghes) { }
-+static inline void ghes_sei_remove(struct ghes *ghes) { }
-+#endif /* CONFIG_ACPI_APEI_SEI */
-+
- #ifdef CONFIG_HAVE_ACPI_APEI_NMI
- /*
-  * printk is not safe in NMI context.  So in NMI handler, we allocate
-@@ -1055,6 +1095,13 @@ static int ghes_probe(struct platform_device *ghes_dev)
- 			goto err;
- 		}
- 		break;
-+	case ACPI_HEST_NOTIFY_SEI:
-+		if (!IS_ENABLED(CONFIG_ACPI_APEI_SEI)) {
-+			pr_warn(GHES_PFX "Generic hardware error source: %d notified via SEI is not supported!\n",
-+				generic->header.source_id);
-+		goto err;
-+	}
-+	break;
- 	case ACPI_HEST_NOTIFY_NMI:
- 		if (!IS_ENABLED(CONFIG_HAVE_ACPI_APEI_NMI)) {
- 			pr_warn(GHES_PFX "Generic hardware error source: %d notified via NMI interrupt is not supported!\n",
-@@ -1126,6 +1173,9 @@ static int ghes_probe(struct platform_device *ghes_dev)
- 	case ACPI_HEST_NOTIFY_SEA:
- 		ghes_sea_add(ghes);
- 		break;
-+	case ACPI_HEST_NOTIFY_SEI:
-+		ghes_sei_add(ghes);
-+		break;
- 	case ACPI_HEST_NOTIFY_NMI:
- 		ghes_nmi_add(ghes);
- 		break;
-@@ -1179,6 +1229,9 @@ static int ghes_remove(struct platform_device *ghes_dev)
- 	case ACPI_HEST_NOTIFY_SEA:
- 		ghes_sea_remove(ghes);
- 		break;
-+	case ACPI_HEST_NOTIFY_SEI:
-+		ghes_sei_remove(ghes);
-+		break;
- 	case ACPI_HEST_NOTIFY_NMI:
- 		ghes_nmi_remove(ghes);
- 		break;
-diff --git a/include/acpi/ghes.h b/include/acpi/ghes.h
-index 8feb0c8..9ba59e2 100644
---- a/include/acpi/ghes.h
-+++ b/include/acpi/ghes.h
-@@ -120,5 +120,6 @@ static inline void *acpi_hest_get_next(struct acpi_hest_generic_data *gdata)
- 	     section = acpi_hest_get_next(section))
- 
- int ghes_notify_sea(void);
-+int ghes_notify_sei(void);
- 
- #endif /* GHES_H */
--- 
-1.9.1
+CgpPbiA1LzE1LzIwMTggODozOCBQTSwgSmlhIEhlIFdyb3RlOgo+IEhpIFN1enVraQo+IAo+IE9u
+IDUvMTUvMjAxOCA0OjM2IFBNLCBTdXp1a2kgSyBQb3Vsb3NlIFdyb3RlOgo+Pgo+PiBIaSBKaWEK
+Pj4KPj4gT24gMDUvMTUvMjAxOCAwMzowMyBBTSwgSmlhIEhlIHdyb3RlOgo+Pj4gSGkgU3V6dWtp
+Cj4+Pgo+Pj4gSSB3aWxsIG1lcmdlIHRoZSBvdGhlciB0aHJlYWQgaW50byB0aGlzLCBhbmQgYWRk
+IHRoZSBuZWNlc3NhcnkgQ0MgbGlzdAo+Pj4KPj4+IFRoYXQgV0FSTl9PTiBjYWxsIHRyYWNlIGlz
+IHZlcnkgZWFzeSB0byByZXByb2R1Y2UgaW4gbXkgYXJtdjhhIHNlcnZlciBhZnRlciBJCj4+PiBz
+dGFydCAyMCBndWVzdHMKPj4+Cj4+PiBhbmQgcnVuIG1lbWhvZyBpbiB0aGUgaG9zdC4gT2YgY291
+cnNlLCBrc20gc2hvdWxkIGJlIGVuYWJsZWQKPj4+Cj4+PiBGb3IgeW91IHF1ZXN0aW9uIGFib3V0
+IG15IGluamVjdCBmYXVsdCBkZWJ1ZyBwYXRjaDoKPj4KPj4KPj4gVGhhbmtzIGZvciB0aGUgcGF0
+Y2gsIGNvbW1lbnRzIGJlbG93Lgo+Pgo+Pj4KPj4KPj4gLi4uCj4+Cj4+PiBpbmRleCA3ZjZhOTQ0
+Li5hYjg1NDVlIDEwMDY0NAo+Pj4gLS0tIGEvdmlydC9rdm0vYXJtL21tdS5jCj4+PiArKysgYi92
+aXJ0L2t2bS9hcm0vbW11LmMKPj4+IEBAIC0yOTAsMTIgKzI5MCwxNyBAQCBzdGF0aWMgdm9pZCB1
+bm1hcF9zdGFnZTJfcHVkcyhzdHJ1Y3Qga3ZtICprdm0sIHBnZF90ICpwZ2QsCj4+PiDCoMKgICog
+ZGVzdHJveWluZyB0aGUgVk0pLCBvdGhlcndpc2UgYW5vdGhlciBmYXVsdGluZyBWQ1BVIG1heSBj
+b21lIGluIGFuZCBtZXNzCj4+PiDCoMKgICogd2l0aCB0aGluZ3MgYmVoaW5kIG91ciBiYWNrcy4K
+Pj4+IMKgwqAgKi8KPj4+ICtleHRlcm4gaW50IHRyaWdnZXJfYnlfa3NtOwo+Pj4gwqDCoHN0YXRp
+YyB2b2lkIHVubWFwX3N0YWdlMl9yYW5nZShzdHJ1Y3Qga3ZtICprdm0sIHBoeXNfYWRkcl90IHN0
+YXJ0LCB1NjQgc2l6ZSkKPj4+IMKgwqB7Cj4+PiDCoMKgwqDCoMKgwqDCoMKgIHBnZF90ICpwZ2Q7
+Cj4+PiDCoMKgwqDCoMKgwqDCoMKgIHBoeXNfYWRkcl90IGFkZHIgPSBzdGFydCwgZW5kID0gc3Rh
+cnQgKyBzaXplOwo+Pj4gwqDCoMKgwqDCoMKgwqDCoCBwaHlzX2FkZHJfdCBuZXh0Owo+Pj4KPj4+
+ICvCoMKgwqDCoMKgwqAgaWYodHJpZ2dlcl9ieV9rc20pIHsKPj4+ICvCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgIGVuZCAtPSAweDIwMDsKPj4+ICvCoMKgwqDCoMKgwqAgfQo+Pj4gKwo+Pj4g
+wqDCoMKgwqDCoMKgwqDCoCBhc3NlcnRfc3Bpbl9sb2NrZWQoJmt2bS0+bW11X2xvY2spOwo+Pj4g
+wqDCoMKgwqDCoMKgwqDCoCBwZ2QgPSBrdm0tPmFyY2gucGdkICsgc3RhZ2UyX3BnZF9pbmRleChh
+ZGRyKTsKPj4+IMKgwqDCoMKgwqDCoMKgwqAgZG8gewo+Pj4KPj4+IEkgbmVlZCB0byBwb2ludCBv
+dXQgdGhhdCBJIG5ldmVyIHJlcHJvZHVjZWQgaXQgd2l0aG91dCB0aGlzIGRlYnVnZ2luZyBwYXRj
+aC4KPj4KPj4gVGhhdCBjb3VsZCB0cmlnZ2VyIHRoZSBwYW5pYyBpZmYgeW91ciAic2l6ZSIgPD0g
+MHgyMDAsIGxlYWRpbmcgdG8gdGhlCj4+IGNvbmRpdGlvbiAoZW5kIDwgc3RhcnQpLCB3aGljaCBj
+YW4gbWFrZSB0aGUgbG9vcCBnbyBmb3JldmVyLCBhcyB3ZQo+PiBkbyB3aGlsZShhZGRyIDwgZW5k
+KSBhbmQgZW5kIHVwIGFjY2Vzc2luZyBzb21ldGhpbmcgd2hpY2ggbWF5IG5vdCBiZSBQR0QgZW50
+cnkKPj4gYW5kIHRodXMgZ2V0IGEgYmFkIHBhZ2Ugd2l0aCBiYWQgbnVtYmVycyBhbGwgYXJvdW5k
+LiBUaGlzIGNhc2UgY291bGQgYmUgaGl0IG9ubHkKPj4gd2l0aCB5b3VyIGNoYW5nZSBhbmQgdGhl
+IGJ1ZyBpbiB0aGUgS1NNIHdoaWNoIGdpdmVzIHVzIGFuIGFkZHJlc3MgbmVhciB0aGUgcGFnZQo+
+PiBib3VuZGFyeS4KPiBObywgSSBpbmplY3RlZCB0aGUgZmF1bHQgb24gcHVycG9zZSB0byBzaW11
+bGF0ZSB0aGUgY2FzZSB3aGVuIHNpemUgaXMgbGVzcyB0aGFuCj4gUEFHRV9TSVpFKGVnLiBQQUdF
+X1NJWkUtMHgyMDA9NjUwMjQpCj4gSSBldmVyIGdvdCB0aGUgcGFuaWMgaW5mbyBbMV0gKndpdGhv
+dXQqIHRoZSBkZWJ1Z2dpbmcgcGF0Y2ggb25seSBvbmNlCj4gCj4gWzFdIGh0dHBzOi8vbGttbC5v
+cmcvbGttbC8yMDE4LzUvOS85OTIKPj4KPj4gU28sIEkgdGhpbmsgd2UgY2FuIHNhZmVseSBpZ25v
+cmUgdGhlIFBBTklDKCkuCj4+IE1vcmUgYmVsb3cuCj4+Cj4+Cj4+Pj4+IFN1enVraSwgdGhhbmtz
+IGZvciB0aGUgY29tbWVudHMuCj4+Pj4+Cj4+Pj4+IEkgcHJvcG9zZWQgYW5vdGhlciBrc20gcGF0
+Y2ggaHR0cHM6Ly9sa21sLm9yZy9sa21sLzIwMTgvNS8zLzEwNDIKPj4+Pj4gVGhlIHJvb3QgY2F1
+c2UgaXMga3NtIHdpbGwgYWRkIHNvbWUgZXh0cmEgZmxhZ3MgdG8gaW5kaWNhdGUgdGhhdCB0aGUg
+cGFnZQo+Pj4+PiBpcyBpbi9ub3RfaW4gdGhlIHN0YWJsZSB0cmVlLiBUaGlzIG1ha2VzIGFkZHJl
+c3Mgbm90IGJlIGFsaWduZWQgd2l0aCBQQUdFX1NJWkUuCj4+Pj4gVGhhbmtzIGZvciB0aGUgcG9p
+bnRlci4gSW4gdGhlIGZ1dHVyZSwgcGxlYXNlIENjIHRoZSBwZW9wbGUgcmVsZXZhbnQgdG8gdGhl
+Cj4+Pj4gZGlzY3Vzc2lvbiBpbiB0aGUgcGF0Y2hlcy4KPj4+Pgo+Pj4+PiDCoCBGcm9tIGFybSBr
+dm0gbW11IHBvaW50IG9mIHZpZXcsIGRvIHlvdSB0aGluayBoYW5kbGVfaHZhX3RvX2dwYSBzdGls
+bCBuZWVkCj4+Pj4+IHRvIGhhbmRsZQo+Pj4+PiB0aGUgdW5hbGlnbm1lbnQgY2FzZT8KPj4+PiBJ
+IGRvbid0IHRoaW5rIHdlIHNob3VsZCBkbyB0aGF0LiBIYWQgd2UgZG9uZSB0aGlzLCB3ZSB3b3Vs
+ZCBuZXZlciBoYXZlIGNhdWdodAo+Pj4+IHRoaXMgYnVnCj4+Pj4gaW4gS1NNLiBFdmVudHVhbGx5
+IGlmIHNvbWUgb3RoZXIgbmV3IGltcGxlbWVudGF0aW9uIGNvbWVzIHVwIHdpdGggdGhlIGEgbmV3
+Cj4+Pj4gbm90aWZpZXIKPj4+PiBjb25zdW1lciB3aGljaCBkb2Vzbid0IGNoZWNrIGFsaWdubWVu
+dCBhbmQgZG9lc24ndCBXQVJOLCBpdCBjb3VsZCBzaW1wbHkgZG8KPj4+PiB0aGUgd3JvbmcKPj4+
+PiB0aGluZy4gU28gSSBiZWxpZXZlIHdoYXQgd2UgaGF2ZSBpcyBhIGdvb2QgbWVhc3VyZSB0byBt
+YWtlIHN1cmUgdGhhdCB0aGluZ3MgYXJlCj4+Pj4gaW4gdGhlIHJpZ2h0IG9yZGVyLgo+Pj4+Cj4+
+Pj4+IElNTywgdGhlIFBBR0VfU0laRSBhbGlnbm1lbnQgaXMgc3RpbGwgbmVlZGVkIGJlY2F1c2Ug
+d2Ugc2hvdWxkIG5vdCBsZXQgdGhlCj4+Pj4+IGJvdHRvbSBmdW5jdGlvbgo+Pj4+PiBrdm1fYWdl
+X2h2YV9oYW5kbGVyIHRvIGhhbmRsZSB0aGUgZXhjZXB0aW9uLiBQbGVhc2UgcmVmZXIgdG8gdGhl
+Cj4+Pj4+IGltcGxlbWVudGF0aW9uIGluIFg4NiBhbmQKPj4+Pj4gcG93ZXJwYyBrdm1faGFuZGxl
+X2h2YV9yYW5nZSgpLiBUaGV5IGJvdGggYWxpZ25lZCB0aGUgaHZhIHdpdGgKPj4+Pj4gaHZhX3Rv
+X2dmbl9tZW1zbG90Lgo+Pj4+Pgo+Pj4+IMKgIEZyb20gYW4gQVBJIHBlcnNwZWN0aXZlLCB5b3Ug
+YXJlIHBhc3NlZCBvbiBhICJzdGFydCIgYW5kICJlbmQiIGFkZHJlc3MuIFNvLAo+Pj4+IHlvdSBj
+b3VsZCBwb3RlbnRpYWxseQo+Pj4+IGRvIHRoZSB3cm9uZyB0aGluZyBpZiB5b3UgYWxpZ24gdGhl
+ICJzdGFydCIgYW5kICJlbmQiLiBNYXkgYmUgdGhvc2UgaGFuZGxlcnMKPj4+PiBzaG91bGQgYWxz
+byBkbyB0aGUKPj4+PiBzYW1lIHRoaW5nIGFzIHdlIGRvLgo+Pgo+Pj4gQnV0IGhhbmRsZV9odmFf
+dG9fZ3BhIGhhcyBwYXJ0aWFsbHkgYWRqdXN0ZWQgdGhlIGFsaWdubWVudCBwb3NzaWJseToKPj4+
+IMKgwqDCoCAxNzUwwqDCoMKgwqDCoMKgwqDCoCBrdm1fZm9yX2VhY2hfbWVtc2xvdChtZW1zbG90
+LCBzbG90cykgewo+Pj4gwqDCoMKgIDE3NTHCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oCB1bnNpZ25lZCBsb25nIGh2YV9zdGFydCwgaHZhX2VuZDsKPj4+IMKgwqDCoCAxNzUywqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgZ2ZuX3QgZ3BhOwo+Pj4gwqDCoMKgIDE3NTMKPj4+
+IMKgwqDCoCAxNzU0wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgaHZhX3N0YXJ0ID0g
+bWF4KHN0YXJ0LCBtZW1zbG90LT51c2Vyc3BhY2VfYWRkcik7Cj4+PiDCoMKgwqAgMTc1NcKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGh2YV9lbmQgPSBtaW4oZW5kLCBtZW1zbG90LT51
+c2Vyc3BhY2VfYWRkciArCj4+PiDCoMKgwqAgMTc1NsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIChtZW1zbG90LT5ucGFnZXMgPDwgUEFHRV9T
+SElGVCkpOwo+Pj4KPj4+IGF0IGxpbmUgMTc1NSwgbGV0IHVzIGFzc3VtZSB0aGF0IGVuZD0weDEy
+MzQwMjAwIGFuZAo+Pj4gbWVtc2xvdC0+dXNlcnNwYWNlX2FkZHIgKyAobWVtc2xvdC0+bnBhZ2Vz
+IDw8IFBBR0VfU0hJRlQpPTB4MTIzNDAwMDAKPj4+IFRoZW4sIGh2YV9zdGFydCBpcyBub3QgcGFn
+ZV9zaXplIGFsaWduZWQgYW5kIGh2YV9lbmQgaXMgYWxpZ25lZCwgYW5kIHRoZSBzaXplCj4+PiB3
+aWxsIGJlIFBBR0VfU0laRS0weDIwMCwKPj4+IGp1c3QgYXMgd2hhdCBJIGhhZCBkb25lIGluIHRo
+ZSBpbmplY3QgZmF1bHQgZGVidWdnaW5nIHBhdGNoLgo+Pgo+PiBUaGF0cyBiZWNhdXNlIHdlIHdh
+bnQgdG8gbGltaXQgdGhlIGhhbmRsaW5nIG9mIHRoZSBodmEvZ3BhIHJhbmdlIGJ5IG1lbXNsb3Qu
+IFNvLAo+PiB3ZSBtYWtlIHN1cmUgd2UgcGFzcyBvbiB0aGUgcmFuZ2Ugd2l0aGluIHRoZSBnaXZl
+biBtZW1zbG90Cj4+IHRvIGh2YV90b19nZm5fbWVtc2xvdCgpLiBCdXQgd2UgZG8gaXRlcmF0ZSBv
+dmVyIHRoZSBuZXh0IG1lbXNsb3QgaWYgdGhlCj4+IG9yaWdpbmFsIHJhbmdlIGZhbGxzIGluIHRv
+IHRoZSBuZXh0IHNsb3QuIFNvLCBpbiBwcmFjdGljZSwgdGhlcmUgaXMgbm8KPj4gYWxpZ25tZW50
+L3RyaW1taW5nIG9mIHRoZSByYW5nZS4gSXRzIGp1c3QgdGhhdCB3ZSBwYXNzIG9uIHRoZSBhcHBy
+b3ByaWF0ZSByYW5nZQo+PiBmb3IgZWFjaCBzbG90Lgo+Pgo+IFllcywgSSB1bmRlcnN0YW5kIHdo
+YXQgdGhlIGNvZGVzIGRpZCBpbiBodmFfdG9fZ2ZuX21lbXNsb3QoKS4gV2hhdCBJIG1lYW4gaXMK
+PiBodmFfZW5kIG1heSBiZSBjaGFuZ2VkIGFuZCAoaHZhX2VuZCAtIGh2YV9zdGFydCkgd2lsbCBu
+b3QgYmUgc2FtZSBhcyB0aGUKPiBwYXJhbWV0ZXIgX3NpemVfID8KPiAKPj4gcmV0IHw9IGhhbmRs
+ZXIoa3ZtLCBncGEsICh1NjQpKGh2YV9lbmQgLSBodmFfc3RhcnQpLCBkYXRhKTsKPiAKPiBBbnl3
+YXksIEkgaGF2ZSB0byBhZG1pdCB0aGF0IGFsbCB0aGUgZXhjZXB0aW9ucyBhcmUgb3JpZ2luYWxs
+eSBjYXVzZWQgYnkgdGhlCj4gU1RBQkxFX0ZMQUcgaW4ga3NtIGNvZGUuIFdoYXQgSSB3YW50IHRv
+IGRpc2N1c3MgaGVyZSBpcyBob3cgdG8gbWFrZSBhcm0ga3ZtCj4gaGFuZGxlIHRoZSBleGNlcHRp
+b24gbW9yZSBncmFjZWZ1bGx5Lgo+IApIaSBTdXp1a2kKSG93IGFib3V0IHRoaXMgcGF0Y2ggKGJh
+bGFuY2Ugb2YgYXZvaWRpbmcgdGhlIFdBUk5fT04gc3Rvcm0gYW5kIGRlYnVnZ2luZwpjb252ZW5p
+ZW5jZSk6CmRpZmYgLS1naXQgYS92aXJ0L2t2bS9hcm0vbW11LmMgYi92aXJ0L2t2bS9hcm0vbW11
+LmMKaW5kZXggN2Y2YTk0NC4uNDAzMzk0NiAxMDA2NDQKLS0tIGEvdmlydC9rdm0vYXJtL21tdS5j
+CisrKyBiL3ZpcnQva3ZtL2FybS9tbXUuYwpAQCAtMjk3LDYgKzI5Nyw4IEBAIHN0YXRpYyB2b2lk
+IHVubWFwX3N0YWdlMl9yYW5nZShzdHJ1Y3Qga3ZtICprdm0sIHBoeXNfYWRkcl90CnN0YXJ0LCB1
+NjQgc2l6ZSkKIAlwaHlzX2FkZHJfdCBuZXh0OwoKIAlhc3NlcnRfc3Bpbl9sb2NrZWQoJmt2bS0+
+bW11X2xvY2spOworCisJV0FSTl9PTl9PTkNFKHNpemUgJiB+UEFHRV9NQVNLKTsKIAlwZ2QgPSBr
+dm0tPmFyY2gucGdkICsgc3RhZ2UyX3BnZF9pbmRleChhZGRyKTsKIAlkbyB7CiAJCS8qCkBAIC0x
+NzkyLDcgKzE3OTQsNyBAQCBzdGF0aWMgaW50IGt2bV9zZXRfc3B0ZV9oYW5kbGVyKHN0cnVjdCBr
+dm0gKmt2bSwgZ3BhX3QKZ3BhLCB1NjQgc2l6ZSwgdm9pZCAqZGF0YQogewogCXB0ZV90ICpwdGUg
+PSAocHRlX3QgKilkYXRhOwoKLQlXQVJOX09OKHNpemUgIT0gUEFHRV9TSVpFKTsKKwlXQVJOX09O
+X09OQ0Uoc2l6ZSAhPSBQQUdFX1NJWkUpOwogCS8qCiAJICogV2UgY2FuIGFsd2F5cyBjYWxsIHN0
+YWdlMl9zZXRfcHRlIHdpdGggS1ZNX1MyUFRFX0ZMQUdfTE9HR0lOR19BQ1RJVkUKIAkgKiBmbGFn
+IGNsZWFyIGJlY2F1c2UgTU1VIG5vdGlmaWVycyB3aWxsIGhhdmUgdW5tYXBwZWQgYSBodWdlIFBN
+RCBiZWZvcmUKQEAgLTE4MjMsNyArMTgyNSw3IEBAIHN0YXRpYyBpbnQga3ZtX2FnZV9odmFfaGFu
+ZGxlcihzdHJ1Y3Qga3ZtICprdm0sIGdwYV90IGdwYSwKdTY0IHNpemUsIHZvaWQgKmRhdGEpCiAJ
+cG1kX3QgKnBtZDsKIAlwdGVfdCAqcHRlOwoKLQlXQVJOX09OKHNpemUgIT0gUEFHRV9TSVpFICYm
+IHNpemUgIT0gUE1EX1NJWkUpOworCVdBUk5fT05fT05DRShzaXplICE9IFBBR0VfU0laRSAmJiBz
+aXplICE9IFBNRF9TSVpFKTsKIAlwbWQgPSBzdGFnZTJfZ2V0X3BtZChrdm0sIE5VTEwsIGdwYSk7
+CiAJaWYgKCFwbWQgfHwgcG1kX25vbmUoKnBtZCkpCS8qIE5vdGhpbmcgdGhlcmUgKi8KIAkJcmV0
+dXJuIDA7CkBAIC0xODQzLDcgKzE4NDUsNyBAQCBzdGF0aWMgaW50IGt2bV90ZXN0X2FnZV9odmFf
+aGFuZGxlcihzdHJ1Y3Qga3ZtICprdm0sIGdwYV90CmdwYSwgdTY0IHNpemUsIHZvaWQgKgogCXBt
+ZF90ICpwbWQ7CiAJcHRlX3QgKnB0ZTsKCi0JV0FSTl9PTihzaXplICE9IFBBR0VfU0laRSAmJiBz
+aXplICE9IFBNRF9TSVpFKTsKKwlXQVJOX09OX09OQ0Uoc2l6ZSAhPSBQQUdFX1NJWkUgJiYgc2l6
+ZSAhPSBQTURfU0laRSk7CiAJcG1kID0gc3RhZ2UyX2dldF9wbWQoa3ZtLCBOVUxMLCBncGEpOwog
+CWlmICghcG1kIHx8IHBtZF9ub25lKCpwbWQpKQkvKiBOb3RoaW5nIHRoZXJlICovCiAJCXJldHVy
+biAwOwoKLS0gCkNoZWVycywKSmlhCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlh
+LmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFy
+bQo=
