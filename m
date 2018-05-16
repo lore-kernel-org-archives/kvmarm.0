@@ -1,98 +1,98 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PULL v8] KVM: arm64: Optimise FPSIMD context switching
-Date: Wed, 16 May 2018 11:49:42 +0100
-Message-ID: <20180516104942.GS7753@e103592.cambridge.arm.com>
+From: Russell King - ARM Linux <linux@armlinux.org.uk>
+Subject: [PATCH 0/14] ARM Spectre variant 2 fixes
+Date: Wed, 16 May 2018 11:59:49 +0100
+Message-ID: <20180516105949.GJ16141@n2100.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AD1EA49EA2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 May 2018 06:50:04 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id t5IiI6XXLybU for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 May 2018 06:49:41 -0400 (EDT)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 38A5942121
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 May 2018 06:49:41 -0400 (EDT)
 Content-Disposition: inline
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <cdall@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
+This series addresses the Spectre variant 2 issues on ARM Cortex and
+Broadcom Brahma B15 CPUs.  Due to the complexity of the bug, it is not
+possible to verify that this series fixes any of the bugs, since it
+has not been able to reproduce these exact scenarios using test
+programs.
 
-This is a trivial update to the previously posted v7 [1].  The only
-changes are a couple of minor cosmetic changes requested by reviewers,
-on-list and the addition of Acked-by/Reviewed-by tags received since the
-series was posted.
+I believe that this covers the entire extent of the Spectre variant 2
+issues, with the exception of Cortex A53 and Cortex A72 processors as
+these require a substantially more complex solution (except where the
+workaround is implemented in PSCI firmware.)
 
-Let me know if you need anything else on this.
+Spectre variant 1 is not covered by this series.
 
-Cheers
----Dave
+The patch series is based partly on Marc Zyngier's work from February -
+two of the KVM patches are from Marc's work.
 
-[1] [PATCH v7 00/16] KVM: arm64: Optimise FPSIMD context switching
-http://lists.infradead.org/pipermail/linux-arm-kernel/2018-May/576595.html
+The main differences are:
+- Inclusion of more processors as per current ARM Ltd security update
+  documentation.
+- Extension of "bugs" infrastructure to detect Cortex A8 and Cortex A15
+  CPUs missing out on the IBE bit being set on (re-)entry to the kernel
+  through all paths.
+- Handle all suspect userspace-touching-kernelspace aborts irrespective
+  of mapping type.
 
+The first patch will trivially conflict with the Broadcom Brahma
+updates already in arm-soc - it has been necessary to independently
+add the ID definitions for the B15 CPU.
 
-The following changes since commit 6da6c0db5316275015e8cc2959f12a17584aeb64:
+Having worked through this series, I'm of the opinion that the
+define_processor_functions macro in proc-v7 are probably  more hassle
+than they're worth - here, we don't need the global equivalent symbols,
+because we never refer to them from the kernel code for any V7
+processor (MULTI_CPU is always defined.)
 
-  Linux v4.17-rc3 (2018-04-29 14:17:42 -0700)
+This series is currently in my "spectre" branch (along with some
+Spectre variant 1 patches.)
 
-are available in the git repository at:
+Please carefully review.
 
-  git://linux-arm.org/linux-dm.git 
+ arch/arm/include/asm/bugs.h        |   6 +-
+ arch/arm/include/asm/cp15.h        |   3 +
+ arch/arm/include/asm/cputype.h     |   5 ++
+ arch/arm/include/asm/kvm_asm.h     |   2 -
+ arch/arm/include/asm/kvm_host.h    |  14 +++-
+ arch/arm/include/asm/kvm_mmu.h     |  23 +++++-
+ arch/arm/include/asm/proc-fns.h    |   4 +
+ arch/arm/include/asm/system_misc.h |   8 ++
+ arch/arm/kernel/Makefile           |   1 +
+ arch/arm/kernel/bugs.c             |  18 +++++
+ arch/arm/kernel/smp.c              |   4 +
+ arch/arm/kernel/suspend.c          |   2 +
+ arch/arm/kvm/hyp/hyp-entry.S       | 108 ++++++++++++++++++++++++-
+ arch/arm/mm/Kconfig                |  23 ++++++
+ arch/arm/mm/Makefile               |   2 +-
+ arch/arm/mm/fault.c                |   3 +
+ arch/arm/mm/proc-macros.S          |   3 +-
+ arch/arm/mm/proc-v7-2level.S       |   6 --
+ arch/arm/mm/proc-v7-bugs.c         | 130 ++++++++++++++++++++++++++++++
+ arch/arm/mm/proc-v7.S              | 158 +++++++++++++++++++++++++++++--------
+ 20 files changed, 471 insertions(+), 52 deletions(-)
 
-for you to fetch changes up to 90255dd95fe71a9bd1c4ce728abad4b0eec240d9:
-
-  KVM: arm64: Invoke FPSIMD context switch trap from C (2018-05-16 10:44:00 +0100)
-
-----------------------------------------------------------------
-Christoffer Dall (1):
-      KVM: arm/arm64: Introduce kvm_arch_vcpu_run_pid_change
-
-Dave Martin (15):
-      thread_info: Add update_thread_flag() helpers
-      arm64: Use update{,_tsk}_thread_flag()
-      KVM: arm64: Convert lazy FPSIMD context switch trap to C
-      arm64: fpsimd: Generalise context saving for non-task contexts
-      arm64/sve: Refactor user SVE trap maintenance for external use
-      KVM: arm64: Repurpose vcpu_arch.debug_flags for general-purpose flags
-      KVM: arm64: Optimise FPSIMD handling to reduce guest/host thrashing
-      arm64/sve: Move read_zcr_features() out of cpufeature.h
-      arm64/sve: Switch sve_pffr() argument from task to thread
-      arm64/sve: Move sve_pffr() to fpsimd.h and make inline
-      KVM: arm64: Save host SVE context as appropriate
-      KVM: arm64: Remove eager host SVE state saving
-      KVM: arm64: Remove redundant *exit_code changes in fpsimd_guest_exit()
-      KVM: arm64: Fold redundant exit code checks out of fixup_guest_exit()
-      KVM: arm64: Invoke FPSIMD context switch trap from C
-
- arch/arm/include/asm/kvm_host.h     |   9 ++-
- arch/arm64/Kconfig                  |   7 ++
- arch/arm64/include/asm/cpufeature.h |  29 -------
- arch/arm64/include/asm/fpsimd.h     |  21 ++++++
- arch/arm64/include/asm/kvm_asm.h    |   3 -
- arch/arm64/include/asm/kvm_host.h   |  32 +++++---
- arch/arm64/include/asm/processor.h  |   2 +
- arch/arm64/kernel/fpsimd.c          | 147 +++++++++++++++++++-----------------
- arch/arm64/kernel/ptrace.c          |   1 +
- arch/arm64/kvm/Kconfig              |   1 +
- arch/arm64/kvm/Makefile             |   2 +-
- arch/arm64/kvm/debug.c              |   8 +-
- arch/arm64/kvm/fpsimd.c             | 111 +++++++++++++++++++++++++++
- arch/arm64/kvm/hyp/debug-sr.c       |   6 +-
- arch/arm64/kvm/hyp/entry.S          |  43 -----------
- arch/arm64/kvm/hyp/hyp-entry.S      |  19 -----
- arch/arm64/kvm/hyp/switch.c         | 124 ++++++++++++++++++++----------
- arch/arm64/kvm/hyp/sysreg-sr.c      |   4 +-
- arch/arm64/kvm/sys_regs.c           |   9 +--
- include/linux/kvm_host.h            |   9 +++
- include/linux/sched.h               |   6 ++
- include/linux/thread_info.h         |  11 +++
- virt/kvm/Kconfig                    |   3 +
- virt/kvm/arm/arm.c                  |  25 +++++-
- virt/kvm/kvm_main.c                 |   7 +-
- 25 files changed, 406 insertions(+), 233 deletions(-)
- create mode 100644 arch/arm64/kvm/fpsimd.c
+-- 
+RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
+According to speedtest.net: 8.21Mbps down 510kbps up
