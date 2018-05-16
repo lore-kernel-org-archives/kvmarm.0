@@ -1,24 +1,22 @@
-From: Laszlo Ersek <lersek@redhat.com>
-Subject: Re: use vnc in arm-kvm
-Date: Wed, 16 May 2018 11:16:16 +0200
-Message-ID: <031a488d-2c26-0742-e7e5-51439b3faffe@redhat.com>
-References: <AHwADAAHAYrOX6gNq*WMHKrQ.1.1526437495977.Hmail.lizhuoyao@hikdata.com>
+From: Shannon Zhao <zhaoshenglong@huawei.com>
+Subject: [PATCH] kvm: Delete the slot only when KVM_MEM_READONLY flag is
+ changed
+Date: Wed, 16 May 2018 17:18:34 +0800
+Message-ID: <1526462314-19720-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D966940196
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 May 2018 05:06:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A291240196
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 May 2018 05:10:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rXM-1X9rtUHE for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 May 2018 05:06:00 -0400 (EDT)
-Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 206FD400D4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 May 2018 05:06:00 -0400 (EDT)
-In-Reply-To: <AHwADAAHAYrOX6gNq*WMHKrQ.1.1526437495977.Hmail.lizhuoyao@hikdata.com>
-Content-Language: en-US
+ with ESMTP id VoDJ6ssvgzL1 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 May 2018 05:09:59 -0400 (EDT)
+Received: from huawei.com (unknown [45.249.212.35])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9C77E400D4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 May 2018 05:09:57 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,22 +26,66 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: lizhuoyao <lizhuoyao@hikdata.com>, kvmarm@lists.cs.columbia.edu
+To: qemu-devel@nongnu.org, pbonzini@redhat.com, guangrong.xiao@gmail.com
+Cc: shannon.zhaosl@gmail.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 05/16/18 04:24, lizhuoyao wrote:
-> hi everyone:
->   currently, I meet a problem about qemu.Use virt-install order to create a domain, return a failed:
->   order: virt-install -n centos-gg -r 1024 --disk centos-gg.img,format=qcow2,size=10 --cdrom /home/Centos-7-aarch64-Everything.iso --graphics vnc, listen=0.0.0.0
->     failed: this QEMU does not support 'cirrus' video device
->    This issue only happen in arm,and it's ok in x86. I get some message in the internet that VGA is a (more or less) x86-specific standard, not available on ARM. Right?
-> tool: qemu-2.12.0 libvirt-3.2.0
+According to KVM commit 75d61fbc, it needs to delete the slot before
+changing the KVM_MEM_READONLY flag. But QEMU commit 235e8982 only check
+whether KVM_MEM_READONLY flag is set instead of changing. It doesn't
+need to delete the slot if the KVM_MEM_READONLY flag is not changed.
 
-Please select the "virtio" video device model.
+This fixes a issue that migrating a VM at the OVMF startup stage and
+VM is executing the codes in rom. Between the deleting and adding the
+slot in kvm_set_user_memory_region, there is a chance that guest access
+rom and trap to KVM, then KVM can't find the corresponding memslot.
+While KVM (on ARM) injects an abort to guest due to the broken hva, then
+guest will get stuck.
 
-(Also, the kvmarm list is not appropriate for discussing this; please
-use <https://www.redhat.com/mailman/listinfo/virt-tools-list> or
-<https://www.redhat.com/mailman/listinfo/libvirt-users> instead.)
+Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
+---
+ include/sysemu/kvm_int.h | 1 +
+ kvm-all.c                | 6 +++---
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
-Thanks
-Laszlo
+diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
+index 888557a..f838412 100644
+--- a/include/sysemu/kvm_int.h
++++ b/include/sysemu/kvm_int.h
+@@ -20,6 +20,7 @@ typedef struct KVMSlot
+     void *ram;
+     int slot;
+     int flags;
++    int old_flags;
+ } KVMSlot;
+ 
+ typedef struct KVMMemoryListener {
+diff --git a/kvm-all.c b/kvm-all.c
+index 2515a23..de8250e 100644
+--- a/kvm-all.c
++++ b/kvm-all.c
+@@ -252,7 +252,7 @@ static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot)
+     mem.userspace_addr = (unsigned long)slot->ram;
+     mem.flags = slot->flags;
+ 
+-    if (slot->memory_size && mem.flags & KVM_MEM_READONLY) {
++    if (slot->memory_size && (mem.flags ^ slot->old_flags) & KVM_MEM_READONLY) {
+         /* Set the slot size to 0 before setting the slot to the desired
+          * value. This is needed based on KVM commit 75d61fbc. */
+         mem.memory_size = 0;
+@@ -376,11 +376,11 @@ static int kvm_slot_update_flags(KVMMemoryListener *kml, KVMSlot *mem,
+ {
+     int old_flags;
+ 
+-    old_flags = mem->flags;
++    mem->old_flags = mem->flags;
+     mem->flags = kvm_mem_flags(mr);
+ 
+     /* If nothing changed effectively, no need to issue ioctl */
+-    if (mem->flags == old_flags) {
++    if (mem->flags == mem->old_flags) {
+         return 0;
+     }
+ 
+-- 
+2.0.4
