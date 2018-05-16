@@ -1,22 +1,22 @@
 From: Russell King <rmk+kernel@armlinux.org.uk>
-Subject: [PATCH 08/14] ARM: spectre-v2: harden user aborts in kernel space
-Date: Wed, 16 May 2018 12:01:18 +0100
-Message-ID: <E1fIuBK-0003q7-9n@rmk-PC.armlinux.org.uk>
+Subject: [PATCH 09/14] ARM: spectre-v2: add PSCI based hardening
+Date: Wed, 16 May 2018 12:01:23 +0100
+Message-ID: <E1fIuBP-0003qE-DZ@rmk-PC.armlinux.org.uk>
 References: <20180516105949.GJ16141@n2100.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CFD749F88
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 May 2018 06:52:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 78E1049F88
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 May 2018 06:52:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GaNl+bv3U41j for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 May 2018 06:52:12 -0400 (EDT)
+ with ESMTP id Cdy1uUYndZOk for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 May 2018 06:52:22 -0400 (EDT)
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CE1784A0E9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 May 2018 06:51:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CA9F84A0FA
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 May 2018 06:51:38 -0400 (EDT)
 In-Reply-To: <20180516105949.GJ16141@n2100.armlinux.org.uk>
 Content-Disposition: inline
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
@@ -32,175 +32,138 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In order to prevent aliasing attacks on the branch predictor,
-invalidate the BTB or instruction cache on CPUs that are known to be
-affected when taking an abort on a address that is outside of a user
-task limit:
-
-Cortex A8, A9, A12, A17, A73, A75: flush BTB.
-Cortex A15, Brahma B15: invalidate icache.
+Add PSCI based hardening for cores that require more complex handling in
+firmware.
 
 Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
 ---
- arch/arm/include/asm/cp15.h        |  3 +++
- arch/arm/include/asm/system_misc.h |  8 ++++++
- arch/arm/mm/fault.c                |  3 +++
- arch/arm/mm/proc-v7-bugs.c         | 51 ++++++++++++++++++++++++++++++++++++++
- arch/arm/mm/proc-v7.S              |  8 +++---
- 5 files changed, 70 insertions(+), 3 deletions(-)
+ arch/arm/mm/proc-v7-bugs.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++
+ arch/arm/mm/proc-v7.S      | 21 +++++++++++++++++++
+ 2 files changed, 71 insertions(+)
 
-diff --git a/arch/arm/include/asm/cp15.h b/arch/arm/include/asm/cp15.h
-index 4c9fa72b59f5..07e27f212dc7 100644
---- a/arch/arm/include/asm/cp15.h
-+++ b/arch/arm/include/asm/cp15.h
-@@ -65,6 +65,9 @@
- #define __write_sysreg(v, r, w, c, t)	asm volatile(w " " c : : "r" ((t)(v)))
- #define write_sysreg(v, ...)		__write_sysreg(v, __VA_ARGS__)
- 
-+#define BPIALL				__ACCESS_CP15(c7, 0, c5, 6)
-+#define ICIALLU				__ACCESS_CP15(c7, 0, c5, 0)
-+
- extern unsigned long cr_alignment;	/* defined in entry-armv.S */
- 
- static inline unsigned long get_cr(void)
-diff --git a/arch/arm/include/asm/system_misc.h b/arch/arm/include/asm/system_misc.h
-index 78f6db114faf..3cfe010c5734 100644
---- a/arch/arm/include/asm/system_misc.h
-+++ b/arch/arm/include/asm/system_misc.h
-@@ -15,6 +15,14 @@ void soft_restart(unsigned long);
- extern void (*arm_pm_restart)(enum reboot_mode reboot_mode, const char *cmd);
- extern void (*arm_pm_idle)(void);
- 
-+#ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
-+extern void (*harden_branch_predictor)(void);
-+#define harden_branch_predictor() \
-+	do { if (harden_branch_predictor) harden_branch_predictor(); } while (0)
-+#else
-+#define harden_branch_predictor() do { } while (0)
-+#endif
-+
- #define UDBG_UNDEFINED	(1 << 0)
- #define UDBG_SYSCALL	(1 << 1)
- #define UDBG_BADABORT	(1 << 2)
-diff --git a/arch/arm/mm/fault.c b/arch/arm/mm/fault.c
-index b75eada23d0a..3b1ba003c4f9 100644
---- a/arch/arm/mm/fault.c
-+++ b/arch/arm/mm/fault.c
-@@ -163,6 +163,9 @@ __do_user_fault(struct task_struct *tsk, unsigned long addr,
- {
- 	struct siginfo si;
- 
-+	if (addr > TASK_SIZE)
-+		harden_branch_predictor();
-+
- #ifdef CONFIG_DEBUG_USER
- 	if (((user_debug & UDBG_SEGV) && (sig == SIGSEGV)) ||
- 	    ((user_debug & UDBG_BUS)  && (sig == SIGBUS))) {
 diff --git a/arch/arm/mm/proc-v7-bugs.c b/arch/arm/mm/proc-v7-bugs.c
-index a32ce13479d9..65a9b8141f86 100644
+index 65a9b8141f86..81de4a8e74c6 100644
 --- a/arch/arm/mm/proc-v7-bugs.c
 +++ b/arch/arm/mm/proc-v7-bugs.c
-@@ -2,6 +2,12 @@
+@@ -1,9 +1,12 @@
+ // SPDX-License-Identifier: GPL-2.0
++#include <linux/arm-smccc.h>
  #include <linux/kernel.h>
++#include <linux/psci.h>
  #include <linux/smp.h>
  
-+#include <asm/cp15.h>
-+#include <asm/cputype.h>
-+#include <asm/system_misc.h>
+ #include <asm/cp15.h>
+ #include <asm/cputype.h>
++#include <asm/proc-fns.h>
+ #include <asm/system_misc.h>
+ 
+ void cpu_v7_bugs_init(void);
+@@ -39,6 +42,9 @@ void cpu_v7_ca15_ibe(void)
+ #ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
+ void (*harden_branch_predictor)(void);
+ 
++extern void cpu_v7_smc_switch_mm(phys_addr_t pgd_phys, struct mm_struct *mm);
++extern void cpu_v7_hvc_switch_mm(phys_addr_t pgd_phys, struct mm_struct *mm);
 +
-+void cpu_v7_bugs_init(void);
-+
- static __maybe_unused void cpu_v7_check_auxcr_set(u32 mask, const char *msg)
+ static void harden_branch_predictor_bpiall(void)
  {
- 	u32 aux_cr;
-@@ -21,9 +27,54 @@ static void check_spectre_auxcr(u32 bit)
- void cpu_v7_ca8_ibe(void)
- {
- 	check_spectre_auxcr(BIT(6));
-+	cpu_v7_bugs_init();
+ 	write_sysreg(0, BPIALL);
+@@ -49,6 +55,18 @@ static void harden_branch_predictor_iciallu(void)
+ 	write_sysreg(0, ICIALLU);
  }
  
- void cpu_v7_ca15_ibe(void)
- {
- 	check_spectre_auxcr(BIT(0));
-+	cpu_v7_bugs_init();
++#ifdef CONFIG_ARM_PSCI
++static void call_smc_arch_workaround_1(void)
++{
++	arm_smccc_1_1_smc(ARM_SMCCC_ARCH_WORKAROUND_1, NULL);
 +}
 +
-+#ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
-+void (*harden_branch_predictor)(void);
-+
-+static void harden_branch_predictor_bpiall(void)
++static void call_hvc_arch_workaround_1(void)
 +{
-+	write_sysreg(0, BPIALL);
++	arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_WORKAROUND_1, NULL);
 +}
-+
-+static void harden_branch_predictor_iciallu(void)
-+{
-+	write_sysreg(0, ICIALLU);
-+}
-+
-+void cpu_v7_bugs_init(void)
-+{
-+	const char *spectre_v2_method = NULL;
-+
-+	if (harden_branch_predictor)
-+		return;
-+
-+	switch (read_cpuid_part()) {
-+	case ARM_CPU_PART_CORTEX_A8:
-+	case ARM_CPU_PART_CORTEX_A9:
-+	case ARM_CPU_PART_CORTEX_A12:
-+	case ARM_CPU_PART_CORTEX_A17:
-+	case ARM_CPU_PART_CORTEX_A73:
-+	case ARM_CPU_PART_CORTEX_A75:
-+		harden_branch_predictor = harden_branch_predictor_bpiall;
-+		spectre_v2_method = "BPIALL";
-+		break;
-+
-+	case ARM_CPU_PART_CORTEX_A15:
-+	case ARM_CPU_PART_BRAHMA_B15:
-+		harden_branch_predictor = harden_branch_predictor_iciallu;
-+		spectre_v2_method = "ICIALLU";
-+		break;
-+	}
-+	if (spectre_v2_method)
-+		pr_info("CPU: Spectre v2: using %s workaround\n",
-+			spectre_v2_method);
- }
 +#endif
++
+ void cpu_v7_bugs_init(void)
+ {
+ 	const char *spectre_v2_method = NULL;
+@@ -73,6 +91,38 @@ void cpu_v7_bugs_init(void)
+ 		spectre_v2_method = "ICIALLU";
+ 		break;
+ 	}
++
++#ifdef CONFIG_ARM_PSCI
++	if (psci_ops.smccc_version != SMCCC_VERSION_1_0) {
++		struct arm_smccc_res res;
++
++		switch (psci_ops.conduit) {
++		case PSCI_CONDUIT_HVC:
++			arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
++					  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
++			if ((int)res.a0 < 0)
++				break;
++			harden_branch_predictor = call_hvc_arch_workaround_1;
++			processor.switch_mm = cpu_v7_hvc_switch_mm;
++			spectre_v2_method = "hypervisor PSCI";
++			break;
++
++		case PSCI_CONDUIT_SMC:
++			arm_smccc_1_1_smc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
++					  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
++			if ((int)res.a0 < 0)
++				break;
++			harden_branch_predictor = call_smc_arch_workaround_1;
++			processor.switch_mm = cpu_v7_smc_switch_mm;
++			spectre_v2_method = "firmware PSCI";
++			break;
++
++		default:
++			break;
++		}
++	}
++#endif
++
+ 	if (spectre_v2_method)
+ 		pr_info("CPU: Spectre v2: using %s workaround\n",
+ 			spectre_v2_method);
 diff --git a/arch/arm/mm/proc-v7.S b/arch/arm/mm/proc-v7.S
-index 5cfed34fd1af..989864676f8b 100644
+index 989864676f8b..7e6719a0eada 100644
 --- a/arch/arm/mm/proc-v7.S
 +++ b/arch/arm/mm/proc-v7.S
-@@ -533,8 +533,10 @@ ENDPROC(__v7_setup)
+@@ -9,6 +9,7 @@
+  *
+  *  This is the "shell" of the ARMv7 processor support.
+  */
++#include <linux/arm-smccc.h>
+ #include <linux/init.h>
+ #include <linux/linkage.h>
+ #include <asm/assembler.h>
+@@ -93,6 +94,26 @@ ENTRY(cpu_v7_dcache_clean_area)
+ 	ret	lr
+ ENDPROC(cpu_v7_dcache_clean_area)
  
- 	__INITDATA
- 
-+	.weak cpu_v7_bugs_init
-+
- 	@ define struct processor (see <asm/proc-fns.h> and proc-macros.S)
--	define_processor_functions v7, dabort=v7_early_abort, pabort=v7_pabort, suspend=1
-+	define_processor_functions v7, dabort=v7_early_abort, pabort=v7_pabort, suspend=1, bugs=cpu_v7_bugs_init
- 
- #ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
- 	@ generic v7 bpiall on context switch
-@@ -549,7 +551,7 @@ ENDPROC(__v7_setup)
- 	globl_equ	cpu_v7_bpiall_do_suspend,	cpu_v7_do_suspend
- 	globl_equ	cpu_v7_bpiall_do_resume,	cpu_v7_do_resume
- #endif
--	define_processor_functions v7_bpiall, dabort=v7_early_abort, pabort=v7_pabort, suspend=1
-+	define_processor_functions v7_bpiall, dabort=v7_early_abort, pabort=v7_pabort, suspend=1, bugs=cpu_v7_bugs_init
- 
- #define HARDENED_BPIALL_PROCESSOR_FUNCTIONS v7_bpiall_processor_functions
- #else
-@@ -585,7 +587,7 @@ ENDPROC(__v7_setup)
- 	globl_equ	cpu_ca9mp_switch_mm,	cpu_v7_switch_mm
- #endif
- 	globl_equ	cpu_ca9mp_set_pte_ext,	cpu_v7_set_pte_ext
--	define_processor_functions ca9mp, dabort=v7_early_abort, pabort=v7_pabort, suspend=1
-+	define_processor_functions ca9mp, dabort=v7_early_abort, pabort=v7_pabort, suspend=1, bugs=cpu_v7_bugs_init
- #endif
- 
- 	@ Cortex-A15 - needs iciallu switch_mm for hardening
++#ifdef CONFIG_ARM_PSCI
++	.arch_extension sec
++ENTRY(cpu_v7_smc_switch_mm)
++	stmfd	sp!, {r0 - r3}
++	movw	r0, #:lower16:ARM_SMCCC_ARCH_WORKAROUND_1
++	movt	r0, #:upper16:ARM_SMCCC_ARCH_WORKAROUND_1
++	smc	#0
++	ldmfd	sp!, {r0 - r3}
++	b	cpu_v7_switch_mm
++ENDPROC(cpu_v7_smc_switch_mm)
++	.arch_extension virt
++ENTRY(cpu_v7_hvc_switch_mm)
++	stmfd	sp!, {r0 - r3}
++	movw	r0, #:lower16:ARM_SMCCC_ARCH_WORKAROUND_1
++	movt	r0, #:upper16:ARM_SMCCC_ARCH_WORKAROUND_1
++	hvc	#0
++	ldmfd	sp!, {r0 - r3}
++	b	cpu_v7_switch_mm
++ENDPROC(cpu_v7_smc_switch_mm)
++#endif
+ ENTRY(cpu_v7_iciallu_switch_mm)
+ 	mov	r3, #0
+ 	mcr	p15, 0, r3, c7, c5, 0		@ ICIALLU
 -- 
 2.7.4
