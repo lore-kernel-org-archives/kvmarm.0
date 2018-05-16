@@ -1,22 +1,23 @@
 From: Russell King <rmk+kernel@armlinux.org.uk>
-Subject: [PATCH 04/14] ARM: bugs: add support for per-processor bug checking
-Date: Wed, 16 May 2018 12:00:57 +0100
-Message-ID: <E1fIuAz-0003k5-OP@rmk-PC.armlinux.org.uk>
+Subject: [PATCH 05/14] ARM: spectre: add Kconfig symbol for CPUs vulnerable to
+ Spectre
+Date: Wed, 16 May 2018 12:01:02 +0100
+Message-ID: <E1fIuB4-0003pm-SW@rmk-PC.armlinux.org.uk>
 References: <20180516105949.GJ16141@n2100.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 368C94A0E9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 May 2018 06:51:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1ED9D42121
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 May 2018 06:52:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id j735hdDbvFYC for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 May 2018 06:51:13 -0400 (EDT)
+ with ESMTP id cKC2CxAe80qg for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 May 2018 06:51:35 -0400 (EDT)
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 21C0B4A0F1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 May 2018 06:50:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5C43349EA2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 May 2018 06:51:08 -0400 (EDT)
 In-Reply-To: <20180516105949.GJ16141@n2100.armlinux.org.uk>
 Content-Disposition: inline
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
@@ -32,71 +33,35 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add support for per-processor bug checking - each processor function
-descriptor gains a function pointer for this check, which must not be
-an __init function.  If non-NULL, this will be called whenever a CPU
-enters the kernel via which ever path (boot CPU, secondary CPU startup,
-CPU resuming, etc.)
-
-This allows processor specific bug checks to validate that workaround
-bits are properly enabled by firmware via all entry paths to the kernel.
+Add a Kconfig symbol for CPUs which are vulnerable to the Spectre
+attacks.
 
 Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
 ---
- arch/arm/include/asm/proc-fns.h | 4 ++++
- arch/arm/kernel/bugs.c          | 4 ++++
- arch/arm/mm/proc-macros.S       | 3 ++-
- 3 files changed, 10 insertions(+), 1 deletion(-)
+ arch/arm/mm/Kconfig | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/arch/arm/include/asm/proc-fns.h b/arch/arm/include/asm/proc-fns.h
-index f2e1af45bd6f..e25f4392e1b2 100644
---- a/arch/arm/include/asm/proc-fns.h
-+++ b/arch/arm/include/asm/proc-fns.h
-@@ -37,6 +37,10 @@ extern struct processor {
- 	 */
- 	void (*_proc_init)(void);
- 	/*
-+	 * Check for processor bugs
-+	 */
-+	void (*check_bugs)(void);
-+	/*
- 	 * Disable any processor specifics
- 	 */
- 	void (*_proc_fin)(void);
-diff --git a/arch/arm/kernel/bugs.c b/arch/arm/kernel/bugs.c
-index 16e7ba2a9cc4..7be511310191 100644
---- a/arch/arm/kernel/bugs.c
-+++ b/arch/arm/kernel/bugs.c
-@@ -5,6 +5,10 @@
+diff --git a/arch/arm/mm/Kconfig b/arch/arm/mm/Kconfig
+index 7f14acf67caf..8a5a1bb415c4 100644
+--- a/arch/arm/mm/Kconfig
++++ b/arch/arm/mm/Kconfig
+@@ -415,6 +415,7 @@ config CPU_V7
+ 	select CPU_CP15_MPU if !MMU
+ 	select CPU_HAS_ASID if MMU
+ 	select CPU_PABRT_V7
++	select CPU_SPECTRE
+ 	select CPU_THUMB_CAPABLE
+ 	select CPU_TLB_V7 if MMU
  
- void check_other_bugs(void)
- {
-+#ifdef MULTI_CPU
-+	if (processor.check_bugs)
-+		processor.check_bugs();
-+#endif
- }
+@@ -826,6 +827,9 @@ config CPU_BPREDICT_DISABLE
+ 	help
+ 	  Say Y here to disable branch prediction.  If unsure, say N.
  
- void __init check_bugs(void)
-diff --git a/arch/arm/mm/proc-macros.S b/arch/arm/mm/proc-macros.S
-index f10e31d0730a..81d0efb055c6 100644
---- a/arch/arm/mm/proc-macros.S
-+++ b/arch/arm/mm/proc-macros.S
-@@ -273,13 +273,14 @@
- 	mcr	p15, 0, ip, c7, c10, 4		@ data write barrier
- 	.endm
- 
--.macro define_processor_functions name:req, dabort:req, pabort:req, nommu=0, suspend=0
-+.macro define_processor_functions name:req, dabort:req, pabort:req, nommu=0, suspend=0, bugs=0
- 	.type	\name\()_processor_functions, #object
- 	.align 2
- ENTRY(\name\()_processor_functions)
- 	.word	\dabort
- 	.word	\pabort
- 	.word	cpu_\name\()_proc_init
-+	.word	\bugs
- 	.word	cpu_\name\()_proc_fin
- 	.word	cpu_\name\()_reset
- 	.word	cpu_\name\()_do_idle
++config CPU_SPECTRE
++	bool
++
+ config TLS_REG_EMUL
+ 	bool
+ 	select NEED_KUSER_HELPERS
 -- 
 2.7.4
