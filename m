@@ -1,204 +1,138 @@
-From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH] arm64: KVM: reduce guest fpsimd trap
-Date: Wed, 16 May 2018 14:46:21 +0200
-Message-ID: <20180516124621.GB55598@C02W217FHV2R.local>
-References: <1526460738-11157-1-git-send-email-zhangshaokun@hisilicon.com>
- <F348A9E21A573744858FF7E5D32E29D81BDF52AC@dggemi509-mbs.china.huawei.com>
- <4a812440-b5c6-8a11-a89d-0bad0e7d5150@arm.com>
- <20180516103216.GR7753@e103592.cambridge.arm.com>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v3 07/12] ACPI / APEI: Make the nmi_fixmap_idx per-ghes to
+ allow multiple in_nmi() users
+Date: Wed, 16 May 2018 15:51:14 +0100
+Message-ID: <7c871e15-689c-226d-760d-dd92614de2e9@arm.com>
+References: <20180427153510.5799-1-james.morse@arm.com>
+ <20180427153510.5799-8-james.morse@arm.com> <20180505122719.GE3708@pd.tnic>
+ <1511cfcc-dcd1-b3c5-01c7-6b6b8fb65b05@arm.com>
+ <20180516110348.GA17092@pd.tnic>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <20180516103216.GR7753@e103592.cambridge.arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Zhangshaokun <zhangshaokun@hisilicon.com>, "Tangnianyao (ICT)" <tangnianyao@huawei.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BCF0842121
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 May 2018 10:44:24 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id j8V+jzGRVRhU for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 May 2018 10:44:02 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CA6984043C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 May 2018 10:44:02 -0400 (EDT)
+In-Reply-To: <20180516110348.GA17092@pd.tnic>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Borislav Petkov <bp@alien8.de>, Tyler Baicar <tbaicar@codeaurora.org>
+Cc: jonathan.zhang@cavium.com, Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Christoffer Dall <cdall@kernel.org>, Punit Agrawal <punit.agrawal@arm.com>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, May 16, 2018 at 11:32:17AM +0100, Dave Martin wrote:
-> On Wed, May 16, 2018 at 10:25:40AM +0100, Marc Zyngier wrote:
-> > [+Dave]
-> > 
-> > Hi Nianyao,
-> > 
-> > On 16/05/18 10:08, Tangnianyao (ICT) wrote:
-> > > Add last_fpsimd_trap to notify if guest last exit reason is handling fpsimd. If guest is using fpsimd frequently, save host's fpsimd state and restore guest's fpsimd state and deactive fpsimd trap before returning to guest. It can avoid guest fpsimd trap soon to improve performance.
-> 
-> So, the purpose of this patch is to context switch the FPSIMD state on
-> initial entry to the guest, instead of enabling the trap and context
-> switching the FPSIMD state lazily?
-> 
-> And you decide whether to do this or not, based on whether the guest
-> triggered a lazy FPSIMD switch previously?
-> 
-> > > 
-> > > Signed-off-by: Nianyao Tang <tangnianyao@huawei.com>
-> > > ---
-> > >  arch/arm64/kernel/asm-offsets.c |  1 +
-> > >  arch/arm64/kvm/hyp/entry.S      |  5 +++++
-> > >  arch/arm64/kvm/hyp/switch.c     | 38 ++++++++++++++++++++++++++++++++++++--
-> > >  include/linux/kvm_host.h        |  1 +
-> > >  4 files changed, 43 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c index 5bdda65..35a9c5c 100644
-> > > --- a/arch/arm64/kernel/asm-offsets.c
-> > > +++ b/arch/arm64/kernel/asm-offsets.c
-> > > @@ -136,6 +136,7 @@ int main(void)
-> > >  #ifdef CONFIG_KVM_ARM_HOST
-> > >    DEFINE(VCPU_CONTEXT,		offsetof(struct kvm_vcpu, arch.ctxt));
-> > >    DEFINE(VCPU_FAULT_DISR,	offsetof(struct kvm_vcpu, arch.fault.disr_el1));
-> > > +  DEFINE(VCPU_LAST_FPSIMD_TRAP, offsetof(struct kvm_vcpu, 
-> > > + last_fpsimd_trap));
-> > >    DEFINE(CPU_GP_REGS,		offsetof(struct kvm_cpu_context, gp_regs));
-> > >    DEFINE(CPU_USER_PT_REGS,	offsetof(struct kvm_regs, regs));
-> > >    DEFINE(CPU_FP_REGS,		offsetof(struct kvm_regs, fp_regs));
-> > > diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S index e41a161..956e042 100644
-> > > --- a/arch/arm64/kvm/hyp/entry.S
-> > > +++ b/arch/arm64/kvm/hyp/entry.S
-> > > @@ -197,6 +197,11 @@ alternative_endif
-> > >  	add	x0, x2, #CPU_GP_REG_OFFSET(CPU_FP_REGS)
-> > >  	bl	__fpsimd_restore_state
-> > >  
-> > > +	// Mark guest using fpsimd now
-> > > +	ldr x0, [x3, #VCPU_LAST_FPSIMD_TRAP]
-> > > +	add x0, x0, #1
-> 
-> Can this overflow?
-> 
-> > > +	str x0, [x3, #VCPU_LAST_FPSIMD_TRAP]
-> > > +
-> > >  	// Skip restoring fpexc32 for AArch64 guests
-> > >  	mrs	x1, hcr_el2
-> > >  	tbnz	x1, #HCR_RW_SHIFT, 1f
-> > > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c index d964523..86eea1b 100644
-> > > --- a/arch/arm64/kvm/hyp/switch.c
-> > > +++ b/arch/arm64/kvm/hyp/switch.c
-> > > @@ -92,7 +92,13 @@ static void activate_traps_vhe(struct kvm_vcpu *vcpu)
-> > >  
-> > >  	val = read_sysreg(cpacr_el1);
-> > >  	val |= CPACR_EL1_TTA;
-> > > -	val &= ~(CPACR_EL1_FPEN | CPACR_EL1_ZEN);
-> > > +	val &= ~CPACR_EL1_ZEN;
-> > > +
-> > > +	if (vcpu->last_fpsimd_trap)
-> > > +		val |= CPACR_EL1_FPEN;
-> > > +	else
-> > > +		val &= ~CPACR_EL1_FPEN;
-> > > +
-> > >  	write_sysreg(val, cpacr_el1);
-> > >  
-> > >  	write_sysreg(kvm_get_hyp_vector(), vbar_el1); @@ -105,7 +111,13 @@ static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
-> > >  	__activate_traps_common(vcpu);
-> > >  
-> > >  	val = CPTR_EL2_DEFAULT;
-> > > -	val |= CPTR_EL2_TTA | CPTR_EL2_TFP | CPTR_EL2_TZ;
-> > > +	val |= CPTR_EL2_TTA | CPTR_EL2_TZ;
-> > > +
-> > > +	if (vcpu->last_fpsimd_trap)
-> > > +		val &= ~CPTR_EL2_TFP;
-> > > +	else
-> > > +		val |= CPTR_EL2_TFP;
-> > > +
-> > >  	write_sysreg(val, cptr_el2);
-> > >  }
-> > >  
-> > > @@ -406,6 +418,17 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
-> > >  	__activate_traps(vcpu);
-> > >  	__activate_vm(vcpu->kvm);
-> > >  
-> > > +	/*
-> > > +	 * If guest last trap to host for handling fpsimd, last_fpsimd_trap
-> > > +	 * is set. Restore guest's fpsimd state and deactivate fpsimd trap
-> > > +	 * to avoid guest traping soon.
-> > > +	 */
-> > > +	if (vcpu->last_fpsimd_trap) {
-> > > +		__fpsimd_save_state(&host_ctxt->gp_regs.fp_regs);
-> > > +		__fpsimd_restore_state(&guest_ctxt->gp_regs.fp_regs);
-> > > +		vcpu->last_fpsimd_trap = 0;
-> > > +	}
-> > > +
-> > >  	sysreg_restore_guest_state_vhe(guest_ctxt);
-> > >  	__debug_switch_to_guest(vcpu);
-> > >  
-> > > @@ -454,6 +477,17 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
-> > >  	__activate_traps(vcpu);
-> > >  	__activate_vm(kern_hyp_va(vcpu->kvm));
-> > >  
-> > > +	/*
-> > > +	 * If guest last trap to host for handling fpsimd, last_fpsimd_trap
-> > > +	 * is set. Restore guest's fpsimd state and deactivate fpsimd trap
-> > > +	 * to avoid guest traping soon.
-> > > +	 */
-> > > +	if (vcpu->last_fpsimd_trap) {
-> > > +		__fpsimd_save_state(&host_ctxt->gp_regs.fp_regs);
-> > > +		__fpsimd_restore_state(&guest_ctxt->gp_regs.fp_regs);
-> > > +		vcpu->last_fpsimd_trap = 0;
-> > > +	}
-> > > +
-> > >  	__hyp_vgic_restore_state(vcpu);
-> > >  	__timer_enable_traps(vcpu);
-> > >  
-> > > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h index 6930c63..46bdf0d 100644
-> > > --- a/include/linux/kvm_host.h
-> > > +++ b/include/linux/kvm_host.h
-> > > @@ -274,6 +274,7 @@ struct kvm_vcpu {
-> > >  	bool preempted;
-> > >  	struct kvm_vcpu_arch arch;
-> > >  	struct dentry *debugfs_dentry;
-> > > +	unsigned int last_fpsimd_trap;
-> > >  };
-> > >  
-> > >  static inline int kvm_vcpu_exiting_guest_mode(struct kvm_vcpu *vcpu)
-> > > --
-> > > 2.7.4
-> > > 
-> > 
-> > This doesn't seem to be the 100% correct. I can't see how this works
-> > when being preempted, for example... I suggest you look at Dave Martin's
-> > series[1], which does this correctly.
-> 
-> If I've understood correctly, this chooses between eager and lazy
-> switching, which is addressing a different issue from [1].
-> 
-> In effect, this code is attempting to predict whether the guest will
-> use FPSIMD before the next exit.  If the prediction is correct and the
-> guest does use FPSIMD, then the overhead of the lazy FPSIMD trap
-> disappears.  This is probably a good thing, though it may increase
-> interrupt latency a little.  However, if the prediction is wrong and
-> the guest doesn't use FPSIMD before the next exit, then the overhead of
-> guest entry increases for no benefit, because FPSIMD was switched
-> unnecessarily.
-> 
-> Do you have any benchmarks or metrics on the accuracy of the
-> prediction and the overall impact on performance?
-> 
-> The changes in [1] should reduce the number of FPSIMD context switches
-> overall, so may reduce the benefit of this patch.
-> 
+Hi Borislav,
 
-Based on previous measurements [2], I found that only in 29% of the
-times when we return to userspace or are preempted, has the VCPU touched
-the FPSIMD registers, and therefore a significant majority of the times
-we enter the guest, the guest doesn't touch the FPSIMD state, even if it
-has touched it before.
+On 16/05/18 12:05, Borislav Petkov wrote:
+> On Tue, May 08, 2018 at 09:45:01AM +0100, James Morse wrote:
+>> NOTIFY_NMI is x86's NMI, arm doesn't have anything that behaves in the same way,
+>> so doesn't use it. The equivalent notifications with NMI-like behaviour are:
+>> * SEA (synchronous external abort)
+>> * SEI (SError Interrupt)
+>> * SDEI (software delegated exception interface)
+> > Oh wow, three! :)
 
-As Dave suggests, if there is data that shows that an immediately
-following entry from an exit that had VFP enabled implies with a very
-high probablity that the guest will touch VFP again, then something like
-this might make sense, but I'd like to see some data to back up this
-hypothesis before adding additional complexity to the code.
+The first two overload existing architectural behavior, the third improves all
+this with a third standard option. Its the standard story!
 
-[2]: https://lists.cs.columbia.edu/pipermail/kvmarm/2018-February/029835.html
+
+>> Alternatively, I can put the fixmap-page and spinlock in some 'struct
+>> ghes_notification' that only the NMI-like struct-ghes need. This is just moving
+>> the indirection up a level, but it does pair the lock with the thing it locks,
+>> and gets rid of assigning spinlock pointers.
+> 
+> Keeping the lock and what it protects in one place certainly sounds
+> better.
+
+Yup, I was about to post a v4...
+
+
+> I guess you could so something like this:
+> 
+> struct ghes_fixmap {
+>  union {
+>   raw_spinlock_t nmi_lock;
+>    spinlock_t lock;
+>  };
+
+(heh, spinlock_t already contains a raw_spinlock_t)
+
+>  void __iomem *(map)(struct ghes_fixmap *);
+> };
+> 
+> and assign the proper ghes_ioremap function to ->map.
+
+The function pointer is a problem because SDEI is effectively two notification
+methods. Critical can interrupt normal. I'd really like to keep the differences
+buried in the SDEI driver.
+
+v4 has a separate structure for the fixmap-entry and lock, which
+ghes_copy_tofrom_phys() reaches into if in_nmi().
+
+
+> The spin_lock_irqsave() call in ghes_copy_tofrom_phys() is kinda
+> questionable. Because we should have disabled interrupts so that you can
+> do
+> 
+> spin_lock(map->lock);
+
+I thought this was for the polled driver, but that must be backed by an
+interrupt too...
+
+linux/timer.h has:
+|  * An irqsafe timer is executed with IRQ disabled and it's safe to wait for
+|  * the completion of the running instance from IRQ handlers, for example,
+|  * by calling del_timer_sync().
+|  *
+|  * Note: The irq disabled callback execution is a special case for
+|  * workqueue locking issues. It's not meant for executing random crap
+|  * with interrupts disabled. Abuse is monitored!
+
+This irq-disable behaviour is controlled by the flags field:
+| #define TIMER_DEFERRABLE	0x00080000
+| #define TIMER_IRQSAFE		0x00200000
+
+and ghes_probe() does this:
+| timer_setup(&ghes->timer, ghes_poll_func, TIMER_DEFERRABLE);
+
+So I think the ghes_poll_func() can be called with IRQs unmasked, hence the
+spin_lock_irqsave().
+
+
+> Except that we do get called with IRQs on and looking at that call of
+> ghes_proc() at the end of ghes_probe(), that's a deadlock waiting to
+> happen.
+> 
+> And that comes from:
+> 
+>   77b246b32b2c ("acpi: apei: check for pending errors when probing GHES entries")
+> 
+> Tyler, this can't work in any context: imagine the GHES NMI or IRQ or
+> the timer fires while that ghes_proc() runs...
+
+I thought this was safe because its just ghes_copy_tofrom_phys()s access to the
+fixmap slots that needs mutual exclusion.
+
+Polled and all the IRQ flavours are kept apart by the spin_lock_irqsave(), and
+the NMIs have their own fixmap entry. (This is fine until there is more than
+once source of NMI)
+
 
 Thanks,
--Christoffer
+
+James
