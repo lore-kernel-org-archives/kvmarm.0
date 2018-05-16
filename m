@@ -1,25 +1,28 @@
-From: Russell King <rmk+kernel@armlinux.org.uk>
-Subject: [PATCH 10/14] ARM: KVM: invalidate BTB on guest exit for
- Cortex-A12/A17
-Date: Wed, 16 May 2018 12:01:28 +0100
-Message-ID: <E1fIuBU-0003qL-HH@rmk-PC.armlinux.org.uk>
-References: <20180516105949.GJ16141@n2100.armlinux.org.uk>
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH v3 07/12] ACPI / APEI: Make the nmi_fixmap_idx per-ghes
+ to allow multiple in_nmi() users
+Date: Wed, 16 May 2018 13:05:43 +0200
+Message-ID: <20180516110348.GA17092@pd.tnic>
+References: <20180427153510.5799-1-james.morse@arm.com>
+ <20180427153510.5799-8-james.morse@arm.com>
+ <20180505122719.GE3708@pd.tnic>
+ <1511cfcc-dcd1-b3c5-01c7-6b6b8fb65b05@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 85D5942121
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 May 2018 06:56:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5619442121
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 May 2018 06:56:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 111k2hdHJhmp for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 May 2018 06:56:14 -0400 (EDT)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6F5544A0D9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 May 2018 06:55:32 -0400 (EDT)
-In-Reply-To: <20180516105949.GJ16141@n2100.armlinux.org.uk>
+ with ESMTP id rKZvzeGEjoI0 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 May 2018 06:56:17 -0400 (EDT)
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AC5F049EA2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 May 2018 06:55:55 -0400 (EDT)
 Content-Disposition: inline
+In-Reply-To: <1511cfcc-dcd1-b3c5-01c7-6b6b8fb65b05@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,164 +32,58 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>
+To: James Morse <james.morse@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>
+Cc: jonathan.zhang@cavium.com, Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Christoffer Dall <cdall@kernel.org>, Punit Agrawal <punit.agrawal@arm.com>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Marc Zyngier <marc.zyngier@arm.com>
+On Tue, May 08, 2018 at 09:45:01AM +0100, James Morse wrote:
+> NOTIFY_NMI is x86's NMI, arm doesn't have anything that behaves in the same way,
+> so doesn't use it. The equivalent notifications with NMI-like behaviour are:
+> * SEA (synchronous external abort)
+> * SEI (SError Interrupt)
+> * SDEI (software delegated exception interface)
 
-In order to avoid aliasing attacks against the branch predictor,
-let's invalidate the BTB on guest exit. This is made complicated
-by the fact that we cannot take a branch before invalidating the
-BTB.
+Oh wow, three! :)
 
-We only apply this to A12 and A17, which are the only two ARM
-cores on which this useful.
+> Alternatively, I can put the fixmap-page and spinlock in some 'struct
+> ghes_notification' that only the NMI-like struct-ghes need. This is just moving
+> the indirection up a level, but it does pair the lock with the thing it locks,
+> and gets rid of assigning spinlock pointers.
 
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
----
- arch/arm/include/asm/kvm_asm.h |  2 --
- arch/arm/include/asm/kvm_mmu.h | 17 +++++++++-
- arch/arm/kvm/hyp/hyp-entry.S   | 71 ++++++++++++++++++++++++++++++++++++++++--
- 3 files changed, 85 insertions(+), 5 deletions(-)
+Keeping the lock and what it protects in one place certainly sounds
+better. I guess you could so something like this:
 
-diff --git a/arch/arm/include/asm/kvm_asm.h b/arch/arm/include/asm/kvm_asm.h
-index 36dd2962a42d..df24ed48977d 100644
---- a/arch/arm/include/asm/kvm_asm.h
-+++ b/arch/arm/include/asm/kvm_asm.h
-@@ -61,8 +61,6 @@ struct kvm_vcpu;
- extern char __kvm_hyp_init[];
- extern char __kvm_hyp_init_end[];
- 
--extern char __kvm_hyp_vector[];
--
- extern void __kvm_flush_vm_context(void);
- extern void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
- extern void __kvm_tlb_flush_vmid(struct kvm *kvm);
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index de1b919404e4..d08ce9c41df4 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -297,7 +297,22 @@ static inline unsigned int kvm_get_vmid_bits(void)
- 
- static inline void *kvm_get_hyp_vector(void)
- {
--	return kvm_ksym_ref(__kvm_hyp_vector);
-+	switch(read_cpuid_part()) {
-+#ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
-+	case ARM_CPU_PART_CORTEX_A12:
-+	case ARM_CPU_PART_CORTEX_A17:
-+	{
-+		extern char __kvm_hyp_vector_bp_inv[];
-+		return kvm_ksym_ref(__kvm_hyp_vector_bp_inv);
-+	}
-+
-+#endif
-+	default:
-+	{
-+		extern char __kvm_hyp_vector[];
-+		return kvm_ksym_ref(__kvm_hyp_vector);
-+	}
-+	}
- }
- 
- static inline int kvm_map_vectors(void)
-diff --git a/arch/arm/kvm/hyp/hyp-entry.S b/arch/arm/kvm/hyp/hyp-entry.S
-index 95a2faefc070..e789f52a5129 100644
---- a/arch/arm/kvm/hyp/hyp-entry.S
-+++ b/arch/arm/kvm/hyp/hyp-entry.S
-@@ -71,6 +71,66 @@
- 	W(b)	hyp_irq
- 	W(b)	hyp_fiq
- 
-+#ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
-+	.align 5
-+__kvm_hyp_vector_bp_inv:
-+	.global __kvm_hyp_vector_bp_inv
-+
-+	/*
-+	 * We encode the exception entry in the bottom 3 bits of
-+	 * SP, and we have to guarantee to be 8 bytes aligned.
-+	 */
-+	W(add)	sp, sp, #1	/* Reset 	  7 */
-+	W(add)	sp, sp, #1	/* Undef	  6 */
-+	W(add)	sp, sp, #1	/* Syscall	  5 */
-+	W(add)	sp, sp, #1	/* Prefetch abort 4 */
-+	W(add)	sp, sp, #1	/* Data abort	  3 */
-+	W(add)	sp, sp, #1	/* HVC		  2 */
-+	W(add)	sp, sp, #1	/* IRQ		  1 */
-+	W(nop)			/* FIQ		  0 */
-+
-+	mcr	p15, 0, r0, c7, c5, 6	/* BPIALL */
-+	isb
-+
-+#ifdef CONFIG_THUMB2_KERNEL
-+	/*
-+	 * Yet another silly hack: Use VPIDR as a temp register.
-+	 * Thumb2 is really a pain, as SP cannot be used with most
-+	 * of the bitwise instructions. The vect_br macro ensures
-+	 * things gets cleaned-up.
-+	 */
-+	mcr	p15, 4, r0, c0, c0, 0	/* VPIDR */
-+	mov	r0, sp
-+	and	r0, r0, #7
-+	sub	sp, sp, r0
-+	push	{r1, r2}
-+	mov	r1, r0
-+	mrc	p15, 4, r0, c0, c0, 0	/* VPIDR */
-+	mrc	p15, 0, r2, c0, c0, 0	/* MIDR  */
-+	mcr	p15, 4, r2, c0, c0, 0	/* VPIDR */
-+#endif
-+
-+.macro vect_br val, targ
-+ARM(	eor	sp, sp, #\val	)
-+ARM(	tst	sp, #7		)
-+ARM(	eorne	sp, sp, #\val	)
-+
-+THUMB(	cmp	r1, #\val	)
-+THUMB(	popeq	{r1, r2}	)
-+
-+	beq	\targ
-+.endm
-+
-+	vect_br	0, hyp_fiq
-+	vect_br	1, hyp_irq
-+	vect_br	2, hyp_hvc
-+	vect_br	3, hyp_dabt
-+	vect_br	4, hyp_pabt
-+	vect_br	5, hyp_svc
-+	vect_br	6, hyp_undef
-+	vect_br	7, hyp_reset
-+#endif
-+
- .macro invalid_vector label, cause
- 	.align
- \label:	mov	r0, #\cause
-@@ -149,7 +209,14 @@ ENDPROC(__hyp_do_panic)
- 	bx	ip
- 
- 1:
--	push	{lr}
-+	/*
-+	 * Pushing r2 here is just a way of keeping the stack aligned to
-+	 * 8 bytes on any path that can trigger a HYP exception. Here,
-+	 * we may well be about to jump into the guest, and the guest
-+	 * exit would otherwise be badly decoded by our fancy
-+	 * "decode-exception-without-a-branch" code...
-+	 */
-+	push	{r2, lr}
- 
- 	mov	lr, r0
- 	mov	r0, r1
-@@ -159,7 +226,7 @@ ENDPROC(__hyp_do_panic)
- THUMB(	orr	lr, #1)
- 	blx	lr			@ Call the HYP function
- 
--	pop	{lr}
-+	pop	{r2, lr}
- 	eret
- 
- guest_trap:
+struct ghes_fixmap {
+ union {
+  raw_spinlock_t nmi_lock;
+   spinlock_t lock;
+ };
+ void __iomem *(map)(struct ghes_fixmap *);
+};
+
+and assign the proper ghes_ioremap function to ->map.
+
+The spin_lock_irqsave() call in ghes_copy_tofrom_phys() is kinda
+questionable. Because we should have disabled interrupts so that you can
+do
+
+spin_lock(map->lock);
+
+Except that we do get called with IRQs on and looking at that call of
+ghes_proc() at the end of ghes_probe(), that's a deadlock waiting to
+happen.
+
+And that comes from:
+
+  77b246b32b2c ("acpi: apei: check for pending errors when probing GHES entries")
+
+Tyler, this can't work in any context: imagine the GHES NMI or IRQ or
+the timer fires while that ghes_proc() runs...
+
+What's up?
+
 -- 
-2.7.4
+Regards/Gruss,
+    Boris.
+
+Good mailing practices for 400: avoid top-posting and trim the reply.
