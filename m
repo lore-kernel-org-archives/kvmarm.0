@@ -1,16 +1,12 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH] arm64: KVM: reduce guest fpsimd trap
-Date: Wed, 16 May 2018 11:32:17 +0100
-Message-ID: <20180516103216.GR7753@e103592.cambridge.arm.com>
-References: <1526460738-11157-1-git-send-email-zhangshaokun@hisilicon.com>
- <F348A9E21A573744858FF7E5D32E29D81BDF52AC@dggemi509-mbs.china.huawei.com>
- <4a812440-b5c6-8a11-a89d-0bad0e7d5150@arm.com>
+Subject: [PULL v8] KVM: arm64: Optimise FPSIMD context switching
+Date: Wed, 16 May 2018 11:49:42 +0100
+Message-ID: <20180516104942.GS7753@e103592.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <4a812440-b5c6-8a11-a89d-0bad0e7d5150@arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -20,168 +16,83 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: "Tangnianyao (ICT)" <tangnianyao@huawei.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Zhangshaokun <zhangshaokun@hisilicon.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Christoffer Dall <cdall@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, May 16, 2018 at 10:25:40AM +0100, Marc Zyngier wrote:
-> [+Dave]
-> 
-> Hi Nianyao,
-> 
-> On 16/05/18 10:08, Tangnianyao (ICT) wrote:
-> > Add last_fpsimd_trap to notify if guest last exit reason is handling fpsimd. If guest is using fpsimd frequently, save host's fpsimd state and restore guest's fpsimd state and deactive fpsimd trap before returning to guest. It can avoid guest fpsimd trap soon to improve performance.
+Hi Marc,
 
-So, the purpose of this patch is to context switch the FPSIMD state on
-initial entry to the guest, instead of enabling the trap and context
-switching the FPSIMD state lazily?
+This is a trivial update to the previously posted v7 [1].  The only
+changes are a couple of minor cosmetic changes requested by reviewers,
+on-list and the addition of Acked-by/Reviewed-by tags received since the
+series was posted.
 
-And you decide whether to do this or not, based on whether the guest
-triggered a lazy FPSIMD switch previously?
-
-> > 
-> > Signed-off-by: Nianyao Tang <tangnianyao@huawei.com>
-> > ---
-> >  arch/arm64/kernel/asm-offsets.c |  1 +
-> >  arch/arm64/kvm/hyp/entry.S      |  5 +++++
-> >  arch/arm64/kvm/hyp/switch.c     | 38 ++++++++++++++++++++++++++++++++++++--
-> >  include/linux/kvm_host.h        |  1 +
-> >  4 files changed, 43 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c index 5bdda65..35a9c5c 100644
-> > --- a/arch/arm64/kernel/asm-offsets.c
-> > +++ b/arch/arm64/kernel/asm-offsets.c
-> > @@ -136,6 +136,7 @@ int main(void)
-> >  #ifdef CONFIG_KVM_ARM_HOST
-> >    DEFINE(VCPU_CONTEXT,		offsetof(struct kvm_vcpu, arch.ctxt));
-> >    DEFINE(VCPU_FAULT_DISR,	offsetof(struct kvm_vcpu, arch.fault.disr_el1));
-> > +  DEFINE(VCPU_LAST_FPSIMD_TRAP, offsetof(struct kvm_vcpu, 
-> > + last_fpsimd_trap));
-> >    DEFINE(CPU_GP_REGS,		offsetof(struct kvm_cpu_context, gp_regs));
-> >    DEFINE(CPU_USER_PT_REGS,	offsetof(struct kvm_regs, regs));
-> >    DEFINE(CPU_FP_REGS,		offsetof(struct kvm_regs, fp_regs));
-> > diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S index e41a161..956e042 100644
-> > --- a/arch/arm64/kvm/hyp/entry.S
-> > +++ b/arch/arm64/kvm/hyp/entry.S
-> > @@ -197,6 +197,11 @@ alternative_endif
-> >  	add	x0, x2, #CPU_GP_REG_OFFSET(CPU_FP_REGS)
-> >  	bl	__fpsimd_restore_state
-> >  
-> > +	// Mark guest using fpsimd now
-> > +	ldr x0, [x3, #VCPU_LAST_FPSIMD_TRAP]
-> > +	add x0, x0, #1
-
-Can this overflow?
-
-> > +	str x0, [x3, #VCPU_LAST_FPSIMD_TRAP]
-> > +
-> >  	// Skip restoring fpexc32 for AArch64 guests
-> >  	mrs	x1, hcr_el2
-> >  	tbnz	x1, #HCR_RW_SHIFT, 1f
-> > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c index d964523..86eea1b 100644
-> > --- a/arch/arm64/kvm/hyp/switch.c
-> > +++ b/arch/arm64/kvm/hyp/switch.c
-> > @@ -92,7 +92,13 @@ static void activate_traps_vhe(struct kvm_vcpu *vcpu)
-> >  
-> >  	val = read_sysreg(cpacr_el1);
-> >  	val |= CPACR_EL1_TTA;
-> > -	val &= ~(CPACR_EL1_FPEN | CPACR_EL1_ZEN);
-> > +	val &= ~CPACR_EL1_ZEN;
-> > +
-> > +	if (vcpu->last_fpsimd_trap)
-> > +		val |= CPACR_EL1_FPEN;
-> > +	else
-> > +		val &= ~CPACR_EL1_FPEN;
-> > +
-> >  	write_sysreg(val, cpacr_el1);
-> >  
-> >  	write_sysreg(kvm_get_hyp_vector(), vbar_el1); @@ -105,7 +111,13 @@ static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
-> >  	__activate_traps_common(vcpu);
-> >  
-> >  	val = CPTR_EL2_DEFAULT;
-> > -	val |= CPTR_EL2_TTA | CPTR_EL2_TFP | CPTR_EL2_TZ;
-> > +	val |= CPTR_EL2_TTA | CPTR_EL2_TZ;
-> > +
-> > +	if (vcpu->last_fpsimd_trap)
-> > +		val &= ~CPTR_EL2_TFP;
-> > +	else
-> > +		val |= CPTR_EL2_TFP;
-> > +
-> >  	write_sysreg(val, cptr_el2);
-> >  }
-> >  
-> > @@ -406,6 +418,17 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
-> >  	__activate_traps(vcpu);
-> >  	__activate_vm(vcpu->kvm);
-> >  
-> > +	/*
-> > +	 * If guest last trap to host for handling fpsimd, last_fpsimd_trap
-> > +	 * is set. Restore guest's fpsimd state and deactivate fpsimd trap
-> > +	 * to avoid guest traping soon.
-> > +	 */
-> > +	if (vcpu->last_fpsimd_trap) {
-> > +		__fpsimd_save_state(&host_ctxt->gp_regs.fp_regs);
-> > +		__fpsimd_restore_state(&guest_ctxt->gp_regs.fp_regs);
-> > +		vcpu->last_fpsimd_trap = 0;
-> > +	}
-> > +
-> >  	sysreg_restore_guest_state_vhe(guest_ctxt);
-> >  	__debug_switch_to_guest(vcpu);
-> >  
-> > @@ -454,6 +477,17 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
-> >  	__activate_traps(vcpu);
-> >  	__activate_vm(kern_hyp_va(vcpu->kvm));
-> >  
-> > +	/*
-> > +	 * If guest last trap to host for handling fpsimd, last_fpsimd_trap
-> > +	 * is set. Restore guest's fpsimd state and deactivate fpsimd trap
-> > +	 * to avoid guest traping soon.
-> > +	 */
-> > +	if (vcpu->last_fpsimd_trap) {
-> > +		__fpsimd_save_state(&host_ctxt->gp_regs.fp_regs);
-> > +		__fpsimd_restore_state(&guest_ctxt->gp_regs.fp_regs);
-> > +		vcpu->last_fpsimd_trap = 0;
-> > +	}
-> > +
-> >  	__hyp_vgic_restore_state(vcpu);
-> >  	__timer_enable_traps(vcpu);
-> >  
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h index 6930c63..46bdf0d 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -274,6 +274,7 @@ struct kvm_vcpu {
-> >  	bool preempted;
-> >  	struct kvm_vcpu_arch arch;
-> >  	struct dentry *debugfs_dentry;
-> > +	unsigned int last_fpsimd_trap;
-> >  };
-> >  
-> >  static inline int kvm_vcpu_exiting_guest_mode(struct kvm_vcpu *vcpu)
-> > --
-> > 2.7.4
-> > 
-> 
-> This doesn't seem to be the 100% correct. I can't see how this works
-> when being preempted, for example... I suggest you look at Dave Martin's
-> series[1], which does this correctly.
-
-If I've understood correctly, this chooses between eager and lazy
-switching, which is addressing a different issue from [1].
-
-In effect, this code is attempting to predict whether the guest will
-use FPSIMD before the next exit.  If the prediction is correct and the
-guest does use FPSIMD, then the overhead of the lazy FPSIMD trap
-disappears.  This is probably a good thing, though it may increase
-interrupt latency a little.  However, if the prediction is wrong and
-the guest doesn't use FPSIMD before the next exit, then the overhead of
-guest entry increases for no benefit, because FPSIMD was switched
-unnecessarily.
-
-Do you have any benchmarks or metrics on the accuracy of the
-prediction and the overall impact on performance?
-
-The changes in [1] should reduce the number of FPSIMD context switches
-overall, so may reduce the benefit of this patch.
+Let me know if you need anything else on this.
 
 Cheers
 ---Dave
+
+[1] [PATCH v7 00/16] KVM: arm64: Optimise FPSIMD context switching
+http://lists.infradead.org/pipermail/linux-arm-kernel/2018-May/576595.html
+
+
+The following changes since commit 6da6c0db5316275015e8cc2959f12a17584aeb64:
+
+  Linux v4.17-rc3 (2018-04-29 14:17:42 -0700)
+
+are available in the git repository at:
+
+  git://linux-arm.org/linux-dm.git 
+
+for you to fetch changes up to 90255dd95fe71a9bd1c4ce728abad4b0eec240d9:
+
+  KVM: arm64: Invoke FPSIMD context switch trap from C (2018-05-16 10:44:00 +0100)
+
+----------------------------------------------------------------
+Christoffer Dall (1):
+      KVM: arm/arm64: Introduce kvm_arch_vcpu_run_pid_change
+
+Dave Martin (15):
+      thread_info: Add update_thread_flag() helpers
+      arm64: Use update{,_tsk}_thread_flag()
+      KVM: arm64: Convert lazy FPSIMD context switch trap to C
+      arm64: fpsimd: Generalise context saving for non-task contexts
+      arm64/sve: Refactor user SVE trap maintenance for external use
+      KVM: arm64: Repurpose vcpu_arch.debug_flags for general-purpose flags
+      KVM: arm64: Optimise FPSIMD handling to reduce guest/host thrashing
+      arm64/sve: Move read_zcr_features() out of cpufeature.h
+      arm64/sve: Switch sve_pffr() argument from task to thread
+      arm64/sve: Move sve_pffr() to fpsimd.h and make inline
+      KVM: arm64: Save host SVE context as appropriate
+      KVM: arm64: Remove eager host SVE state saving
+      KVM: arm64: Remove redundant *exit_code changes in fpsimd_guest_exit()
+      KVM: arm64: Fold redundant exit code checks out of fixup_guest_exit()
+      KVM: arm64: Invoke FPSIMD context switch trap from C
+
+ arch/arm/include/asm/kvm_host.h     |   9 ++-
+ arch/arm64/Kconfig                  |   7 ++
+ arch/arm64/include/asm/cpufeature.h |  29 -------
+ arch/arm64/include/asm/fpsimd.h     |  21 ++++++
+ arch/arm64/include/asm/kvm_asm.h    |   3 -
+ arch/arm64/include/asm/kvm_host.h   |  32 +++++---
+ arch/arm64/include/asm/processor.h  |   2 +
+ arch/arm64/kernel/fpsimd.c          | 147 +++++++++++++++++++-----------------
+ arch/arm64/kernel/ptrace.c          |   1 +
+ arch/arm64/kvm/Kconfig              |   1 +
+ arch/arm64/kvm/Makefile             |   2 +-
+ arch/arm64/kvm/debug.c              |   8 +-
+ arch/arm64/kvm/fpsimd.c             | 111 +++++++++++++++++++++++++++
+ arch/arm64/kvm/hyp/debug-sr.c       |   6 +-
+ arch/arm64/kvm/hyp/entry.S          |  43 -----------
+ arch/arm64/kvm/hyp/hyp-entry.S      |  19 -----
+ arch/arm64/kvm/hyp/switch.c         | 124 ++++++++++++++++++++----------
+ arch/arm64/kvm/hyp/sysreg-sr.c      |   4 +-
+ arch/arm64/kvm/sys_regs.c           |   9 +--
+ include/linux/kvm_host.h            |   9 +++
+ include/linux/sched.h               |   6 ++
+ include/linux/thread_info.h         |  11 +++
+ virt/kvm/Kconfig                    |   3 +
+ virt/kvm/arm/arm.c                  |  25 +++++-
+ virt/kvm/kvm_main.c                 |   7 +-
+ 25 files changed, 406 insertions(+), 233 deletions(-)
+ create mode 100644 arch/arm64/kvm/fpsimd.c
