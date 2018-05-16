@@ -1,91 +1,161 @@
-From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH] kvm: Delete the slot only when KVM_MEM_READONLY flag is
- changed
-Date: Wed, 16 May 2018 17:18:34 +0800
-Message-ID: <1526462314-19720-1-git-send-email-zhaoshenglong@huawei.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH] arm64: KVM: reduce guest fpsimd trap
+Date: Wed, 16 May 2018 10:25:40 +0100
+Message-ID: <4a812440-b5c6-8a11-a89d-0bad0e7d5150@arm.com>
+References: <1526460738-11157-1-git-send-email-zhangshaokun@hisilicon.com>
+ <F348A9E21A573744858FF7E5D32E29D81BDF52AC@dggemi509-mbs.china.huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A291240196
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 May 2018 05:10:20 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VoDJ6ssvgzL1 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 May 2018 05:09:59 -0400 (EDT)
-Received: from huawei.com (unknown [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9C77E400D4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 May 2018 05:09:57 -0400 (EDT)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: qemu-devel@nongnu.org, pbonzini@redhat.com, guangrong.xiao@gmail.com
-Cc: shannon.zhaosl@gmail.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <F348A9E21A573744858FF7E5D32E29D81BDF52AC@dggemi509-mbs.china.huawei.com>
+Content-Language: en-GB
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: "Tangnianyao (ICT)" <tangnianyao@huawei.com>, Christoffer Dall <christoffer.dall@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc: Zhangshaokun <zhangshaokun@hisilicon.com>, Dave Martin <Dave.Martin@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-According to KVM commit 75d61fbc, it needs to delete the slot before
-changing the KVM_MEM_READONLY flag. But QEMU commit 235e8982 only check
-whether KVM_MEM_READONLY flag is set instead of changing. It doesn't
-need to delete the slot if the KVM_MEM_READONLY flag is not changed.
+[+Dave]
 
-This fixes a issue that migrating a VM at the OVMF startup stage and
-VM is executing the codes in rom. Between the deleting and adding the
-slot in kvm_set_user_memory_region, there is a chance that guest access
-rom and trap to KVM, then KVM can't find the corresponding memslot.
-While KVM (on ARM) injects an abort to guest due to the broken hva, then
-guest will get stuck.
+Hi Nianyao,
 
-Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
----
- include/sysemu/kvm_int.h | 1 +
- kvm-all.c                | 6 +++---
- 2 files changed, 4 insertions(+), 3 deletions(-)
+On 16/05/18 10:08, Tangnianyao (ICT) wrote:
+> Add last_fpsimd_trap to notify if guest last exit reason is handling fpsimd. If guest is using fpsimd frequently, save host's fpsimd state and restore guest's fpsimd state and deactive fpsimd trap before returning to guest. It can avoid guest fpsimd trap soon to improve performance.
+> 
+> Signed-off-by: Nianyao Tang <tangnianyao@huawei.com>
+> ---
+>  arch/arm64/kernel/asm-offsets.c |  1 +
+>  arch/arm64/kvm/hyp/entry.S      |  5 +++++
+>  arch/arm64/kvm/hyp/switch.c     | 38 ++++++++++++++++++++++++++++++++++++--
+>  include/linux/kvm_host.h        |  1 +
+>  4 files changed, 43 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c index 5bdda65..35a9c5c 100644
+> --- a/arch/arm64/kernel/asm-offsets.c
+> +++ b/arch/arm64/kernel/asm-offsets.c
+> @@ -136,6 +136,7 @@ int main(void)
+>  #ifdef CONFIG_KVM_ARM_HOST
+>    DEFINE(VCPU_CONTEXT,		offsetof(struct kvm_vcpu, arch.ctxt));
+>    DEFINE(VCPU_FAULT_DISR,	offsetof(struct kvm_vcpu, arch.fault.disr_el1));
+> +  DEFINE(VCPU_LAST_FPSIMD_TRAP, offsetof(struct kvm_vcpu, 
+> + last_fpsimd_trap));
+>    DEFINE(CPU_GP_REGS,		offsetof(struct kvm_cpu_context, gp_regs));
+>    DEFINE(CPU_USER_PT_REGS,	offsetof(struct kvm_regs, regs));
+>    DEFINE(CPU_FP_REGS,		offsetof(struct kvm_regs, fp_regs));
+> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S index e41a161..956e042 100644
+> --- a/arch/arm64/kvm/hyp/entry.S
+> +++ b/arch/arm64/kvm/hyp/entry.S
+> @@ -197,6 +197,11 @@ alternative_endif
+>  	add	x0, x2, #CPU_GP_REG_OFFSET(CPU_FP_REGS)
+>  	bl	__fpsimd_restore_state
+>  
+> +	// Mark guest using fpsimd now
+> +	ldr x0, [x3, #VCPU_LAST_FPSIMD_TRAP]
+> +	add x0, x0, #1
+> +	str x0, [x3, #VCPU_LAST_FPSIMD_TRAP]
+> +
+>  	// Skip restoring fpexc32 for AArch64 guests
+>  	mrs	x1, hcr_el2
+>  	tbnz	x1, #HCR_RW_SHIFT, 1f
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c index d964523..86eea1b 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -92,7 +92,13 @@ static void activate_traps_vhe(struct kvm_vcpu *vcpu)
+>  
+>  	val = read_sysreg(cpacr_el1);
+>  	val |= CPACR_EL1_TTA;
+> -	val &= ~(CPACR_EL1_FPEN | CPACR_EL1_ZEN);
+> +	val &= ~CPACR_EL1_ZEN;
+> +
+> +	if (vcpu->last_fpsimd_trap)
+> +		val |= CPACR_EL1_FPEN;
+> +	else
+> +		val &= ~CPACR_EL1_FPEN;
+> +
+>  	write_sysreg(val, cpacr_el1);
+>  
+>  	write_sysreg(kvm_get_hyp_vector(), vbar_el1); @@ -105,7 +111,13 @@ static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
+>  	__activate_traps_common(vcpu);
+>  
+>  	val = CPTR_EL2_DEFAULT;
+> -	val |= CPTR_EL2_TTA | CPTR_EL2_TFP | CPTR_EL2_TZ;
+> +	val |= CPTR_EL2_TTA | CPTR_EL2_TZ;
+> +
+> +	if (vcpu->last_fpsimd_trap)
+> +		val &= ~CPTR_EL2_TFP;
+> +	else
+> +		val |= CPTR_EL2_TFP;
+> +
+>  	write_sysreg(val, cptr_el2);
+>  }
+>  
+> @@ -406,6 +418,17 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+>  	__activate_traps(vcpu);
+>  	__activate_vm(vcpu->kvm);
+>  
+> +	/*
+> +	 * If guest last trap to host for handling fpsimd, last_fpsimd_trap
+> +	 * is set. Restore guest's fpsimd state and deactivate fpsimd trap
+> +	 * to avoid guest traping soon.
+> +	 */
+> +	if (vcpu->last_fpsimd_trap) {
+> +		__fpsimd_save_state(&host_ctxt->gp_regs.fp_regs);
+> +		__fpsimd_restore_state(&guest_ctxt->gp_regs.fp_regs);
+> +		vcpu->last_fpsimd_trap = 0;
+> +	}
+> +
+>  	sysreg_restore_guest_state_vhe(guest_ctxt);
+>  	__debug_switch_to_guest(vcpu);
+>  
+> @@ -454,6 +477,17 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+>  	__activate_traps(vcpu);
+>  	__activate_vm(kern_hyp_va(vcpu->kvm));
+>  
+> +	/*
+> +	 * If guest last trap to host for handling fpsimd, last_fpsimd_trap
+> +	 * is set. Restore guest's fpsimd state and deactivate fpsimd trap
+> +	 * to avoid guest traping soon.
+> +	 */
+> +	if (vcpu->last_fpsimd_trap) {
+> +		__fpsimd_save_state(&host_ctxt->gp_regs.fp_regs);
+> +		__fpsimd_restore_state(&guest_ctxt->gp_regs.fp_regs);
+> +		vcpu->last_fpsimd_trap = 0;
+> +	}
+> +
+>  	__hyp_vgic_restore_state(vcpu);
+>  	__timer_enable_traps(vcpu);
+>  
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h index 6930c63..46bdf0d 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -274,6 +274,7 @@ struct kvm_vcpu {
+>  	bool preempted;
+>  	struct kvm_vcpu_arch arch;
+>  	struct dentry *debugfs_dentry;
+> +	unsigned int last_fpsimd_trap;
+>  };
+>  
+>  static inline int kvm_vcpu_exiting_guest_mode(struct kvm_vcpu *vcpu)
+> --
+> 2.7.4
+> 
 
-diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
-index 888557a..f838412 100644
---- a/include/sysemu/kvm_int.h
-+++ b/include/sysemu/kvm_int.h
-@@ -20,6 +20,7 @@ typedef struct KVMSlot
-     void *ram;
-     int slot;
-     int flags;
-+    int old_flags;
- } KVMSlot;
- 
- typedef struct KVMMemoryListener {
-diff --git a/kvm-all.c b/kvm-all.c
-index 2515a23..de8250e 100644
---- a/kvm-all.c
-+++ b/kvm-all.c
-@@ -252,7 +252,7 @@ static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot)
-     mem.userspace_addr = (unsigned long)slot->ram;
-     mem.flags = slot->flags;
- 
--    if (slot->memory_size && mem.flags & KVM_MEM_READONLY) {
-+    if (slot->memory_size && (mem.flags ^ slot->old_flags) & KVM_MEM_READONLY) {
-         /* Set the slot size to 0 before setting the slot to the desired
-          * value. This is needed based on KVM commit 75d61fbc. */
-         mem.memory_size = 0;
-@@ -376,11 +376,11 @@ static int kvm_slot_update_flags(KVMMemoryListener *kml, KVMSlot *mem,
- {
-     int old_flags;
- 
--    old_flags = mem->flags;
-+    mem->old_flags = mem->flags;
-     mem->flags = kvm_mem_flags(mr);
- 
-     /* If nothing changed effectively, no need to issue ioctl */
--    if (mem->flags == old_flags) {
-+    if (mem->flags == mem->old_flags) {
-         return 0;
-     }
- 
+This doesn't seem to be the 100% correct. I can't see how this works
+when being preempted, for example... I suggest you look at Dave Martin's
+series[1], which does this correctly.
+
+Thanks,
+
+	M.
+
+[1] https://www.mail-archive.com/kvmarm@lists.cs.columbia.edu/msg17563.html
 -- 
-2.0.4
+Jazz is not dead. It just smells funny...
