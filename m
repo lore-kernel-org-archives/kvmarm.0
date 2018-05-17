@@ -1,91 +1,98 @@
-From: Jia He <hejianet@gmail.com>
-Subject: Re: [PATCH] KVM: arm/arm64: add WARN_ON if size is not PAGE_SIZE
- aligned in unmap_stage2_range
-Date: Thu, 17 May 2018 20:46:50 +0800
-Message-ID: <fbb269c0-e915-a9f2-da3b-5ae3a2b31396@gmail.com>
-References: <1526537487-14804-1-git-send-email-hejianet@gmail.com>
- <698b0355-d430-86b8-cd09-83c6d9e566f8@arm.com>
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH v3 07/12] ACPI / APEI: Make the nmi_fixmap_idx per-ghes
+ to allow multiple in_nmi() users
+Date: Thu, 17 May 2018 15:36:53 +0200
+Message-ID: <20180517133653.GA27738@pd.tnic>
+References: <20180427153510.5799-1-james.morse@arm.com>
+ <20180427153510.5799-8-james.morse@arm.com>
+ <20180505122719.GE3708@pd.tnic>
+ <1511cfcc-dcd1-b3c5-01c7-6b6b8fb65b05@arm.com>
+ <20180516110348.GA17092@pd.tnic>
+ <7c871e15-689c-226d-760d-dd92614de2e9@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <698b0355-d430-86b8-cd09-83c6d9e566f8@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <Suzuki.Poulose@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc: Andrew Morton <akpm@linux-foundation.org>, Andrea Arcangeli <aarcange@redhat.com>, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Arvind Yadav <arvind.yadav.cs@gmail.com>, "David S. Miller" <davem@davemloft.net>, Minchan Kim <minchan@kernel.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, Hugh Dickins <hughd@google.com>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, linux-mm@kvack.org, linux-kernel@vger.kernel.org, jia.he@hxt-semitech.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <7c871e15-689c-226d-760d-dd92614de2e9@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: James Morse <james.morse@arm.com>
+Cc: jonathan.zhang@cavium.com, Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Christoffer Dall <cdall@kernel.org>, Xie XiuQi <xiexiuqi@huawei.com>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Punit Agrawal <punit.agrawal@arm.com>, Thomas Gleixner <tglx@linutronix.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Suzuki
+On Wed, May 16, 2018 at 03:51:14PM +0100, James Morse wrote:
+> The first two overload existing architectural behavior, the third improves all
+> this with a third standard option. Its the standard story!
 
-On 5/17/2018 4:17 PM, Suzuki K Poulose Wrote:
-> 
-> Hi Jia,
-> 
-> On 17/05/18 07:11, Jia He wrote:
->> I ever met a panic under memory pressure tests(start 20 guests and run
->> memhog in the host).
-> 
-> Please avoid using "I" in the commit description and preferably stick to
-> an objective description.
+:-)
 
-Thanks for the pointing
+> I thought this was safe because its just ghes_copy_tofrom_phys()s access to the
+> fixmap slots that needs mutual exclusion.
+>
+> Polled and all the IRQ flavours are kept apart by the spin_lock_irqsave(), and
+> the NMIs have their own fixmap entry. (This is fine until there is more than
+> once source of NMI)
 
-> 
->>
->> The root cause might be what I fixed at [1]. But from arm kvm points of
->> view, it would be better we caught the exception earlier and clearer.
->>
->> If the size is not PAGE_SIZE aligned, unmap_stage2_range might unmap the
->> wrong(more or less) page range. Hence it caused the "BUG: Bad page
->> state"
-> 
-> I don't see why we should ever panic with a "positive" size value. Anyways,
-> the unmap requests must be in units of pages. So this check might be useful.
-> 
-> 
+For example:
 
-good question,
+ghes_probe()
 
-After further digging, maybe we need to harden the break condition as below?
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 7f6a944..dac9b2e 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -217,7 +217,7 @@ static void unmap_stage2_ptes(struct kvm *kvm, pmd_t *pmd,
+	switch (generic->notify.type) {
 
-                        put_page(virt_to_page(pte));
-                }
--       } while (pte++, addr += PAGE_SIZE, addr != end);
-+       } while (pte++, addr += PAGE_SIZE, addr < end);
+	...
 
-basically verified in my armv8a server
+        case ACPI_HEST_NOTIFY_NMI:
+		ghes_nmi_add(ghes);
+	}
+
+	...
+
+	ghes_proc();
+	  ghes_read_estatus();
+		 spin_lock_irqsave(&ghes_ioremap_lock_irq, flags);
+
+		 memcpy...
+
+	-> NMI
+
+		ghes_notify_nmi();
+		 ghes_read_estatus();
+		 ..
+		   if (in_nmi) {
+			   raw_spin_lock(&ghes_ioremap_lock_nmi);
+
+		...
+	<- NMI
+
+ghes->estatus from above, before the NMI fired, has gotten some nice
+scribbling over. AFAICT.
+
+Now, I don't know whether this can happen with the ARM facilities but if
+they're NMI-like, I don't see why not.
+
+Which means, that this code is not really reentrant and if should be
+fixed to be callable from different contexts, then it should use private
+buffers and be careful about locking.
+
+Oh, and that
+
+	if (in_nmi)
+		lock()
+	else
+		lock_irqsave()
+
+pattern is really yucky. And it is an explosion waiting to happen.
 
 -- 
-Cheers,
-Jia
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> 
->>
->> [1] https://lkml.org/lkml/2018/5/3/1042
->>
->> Signed-off-by: jia.he@hxt-semitech.com
->> ---
->>   virt/kvm/arm/mmu.c | 2 ++
->>   1 file changed, 2 insertions(+)
->>
->> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->> index 7f6a944..8dac311 100644
->> --- a/virt/kvm/arm/mmu.c
->> +++ b/virt/kvm/arm/mmu.c
->> @@ -297,6 +297,8 @@ static void unmap_stage2_range(struct kvm *kvm,
->> phys_addr_t start, u64 size)
->>       phys_addr_t next;
->>         assert_spin_locked(&kvm->mmu_lock);
->> +    WARN_ON(size & ~PAGE_MASK);
->> +
->>       pgd = kvm->arch.pgd + stage2_pgd_index(addr);
->>       do {
->>           /*
->>
-> 
-> 
+Regards/Gruss,
+    Boris.
+
+Good mailing practices for 400: avoid top-posting and trim the reply.
