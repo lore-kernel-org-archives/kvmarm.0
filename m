@@ -1,48 +1,67 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH v3 07/12] ACPI / APEI: Make the nmi_fixmap_idx per-ghes
- to allow multiple in_nmi() users
-Date: Thu, 17 May 2018 15:39:24 +0200
-Message-ID: <20180517133924.GB27738@pd.tnic>
-References: <20180427153510.5799-1-james.morse@arm.com>
- <20180427153510.5799-8-james.morse@arm.com>
- <20180505122719.GE3708@pd.tnic>
- <1511cfcc-dcd1-b3c5-01c7-6b6b8fb65b05@arm.com>
- <20180516110348.GA17092@pd.tnic>
- <39bde8c5-4dfb-c1b9-02a4-ba467539ea24@codeaurora.org>
+From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Subject: Re: [PATCH] KVM: arm/arm64: add WARN_ON if size is not PAGE_SIZE
+ aligned in unmap_stage2_range
+Date: Thu, 17 May 2018 16:03:15 +0100
+Message-ID: <25dbb8c1-631f-c810-4d75-349a0b291cf8@arm.com>
+References: <1526537487-14804-1-git-send-email-hejianet@gmail.com>
+ <698b0355-d430-86b8-cd09-83c6d9e566f8@arm.com>
+ <fbb269c0-e915-a9f2-da3b-5ae3a2b31396@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <39bde8c5-4dfb-c1b9-02a4-ba467539ea24@codeaurora.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Tyler Baicar <tbaicar@codeaurora.org>
-Cc: jonathan.zhang@cavium.com, Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Thomas Gleixner <tglx@linutronix.de>, Christoffer Dall <cdall@kernel.org>, Punit Agrawal <punit.agrawal@arm.com>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Xie XiuQi <xiexiuqi@huawei.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, James Morse <james.morse@arm.com>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <fbb269c0-e915-a9f2-da3b-5ae3a2b31396@gmail.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Jia He <hejianet@gmail.com>, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: Andrew Morton <akpm@linux-foundation.org>, Andrea Arcangeli <aarcange@redhat.com>, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Arvind Yadav <arvind.yadav.cs@gmail.com>, "David S. Miller" <davem@davemloft.net>, Minchan Kim <minchan@kernel.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, Hugh Dickins <hughd@google.com>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, linux-mm@kvack.org, linux-kernel@vger.kernel.org, jia.he@hxt-semitech.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, May 16, 2018 at 11:38:16AM -0400, Tyler Baicar wrote:
-> I haven't seen a deadlock from that, but it looks possible. What if
-> the ghes_proc() call in ghes_probe() is moved before the second switch
-> statement? That way it is before the NMI/IRQ/poll is setup. At quick
-> glance I think that should avoid the deadlock and still provide the
-> functionality that call was added for. I can test that out if you all
-> agree.
+On 17/05/18 13:46, Jia He wrote:
+> Hi Suzuki
+> 
+> On 5/17/2018 4:17 PM, Suzuki K Poulose Wrote:
+>>
+>> Hi Jia,
+>>
+>> On 17/05/18 07:11, Jia He wrote:
+>>> I ever met a panic under memory pressure tests(start 20 guests and run
+>>> memhog in the host).
+>>
+>> Please avoid using "I" in the commit description and preferably stick to
+>> an objective description.
+> 
+> Thanks for the pointing
+> 
+>>
+>>>
+>>> The root cause might be what I fixed at [1]. But from arm kvm points of
+>>> view, it would be better we caught the exception earlier and clearer.
+>>>
+>>> If the size is not PAGE_SIZE aligned, unmap_stage2_range might unmap the
+>>> wrong(more or less) page range. Hence it caused the "BUG: Bad page
+>>> state"
+>>
+>> I don't see why we should ever panic with a "positive" size value. Anyways,
+>> the unmap requests must be in units of pages. So this check might be useful.
+>>
+>>
+> 
+> good question,
+> 
+> After further digging, maybe we need to harden the break condition as below?
+> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> index 7f6a944..dac9b2e 100644
+> --- a/virt/kvm/arm/mmu.c
+> +++ b/virt/kvm/arm/mmu.c
+> @@ -217,7 +217,7 @@ static void unmap_stage2_ptes(struct kvm *kvm, pmd_t *pmd,
+> 
+>                          put_page(virt_to_page(pte));
+>                  }
+> -       } while (pte++, addr += PAGE_SIZE, addr != end);
+> +       } while (pte++, addr += PAGE_SIZE, addr < end);
 
-Makes sense but please audit it properly before doing the change. That
-code is full of landmines and could use a proper scrubbing first.
+I don't think this change is need as stage2_pgd_addr_end(addr, end) must return
+the smaller of the next entry or end. Thus we can't miss "addr" == "end".
 
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-Good mailing practices for 400: avoid top-posting and trim the reply.
+Suzuki
