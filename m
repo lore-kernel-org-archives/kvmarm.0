@@ -1,22 +1,24 @@
-From: lizhuoyao <lizhuoyao@hikdata.com>
-Subject: =?UTF-8?B?UmU6UmU6IHVzZSB2bmMgaW4gYXJtLWt2bQ==?=
-Date: Thu, 17 May 2018 08:58:28 +0800 (GMT+08:00)
-Message-ID: <ADcAHQC3AeXOwvscMuFdTao0.3.1526518708101.Hmail.lizhuoyao@hikdata.com>
-References: <493cf6d2-8804-1ffb-06a9-617188c44677@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: use vnc in arm-kvm
+Date: Thu, 17 May 2018 08:41:48 +0100
+Message-ID: <f2b07625-5ede-4a95-2e62-ba5c64c2d3db@arm.com>
+References: <ADcAHQC3AeXOwvscMuFdTao0.3.1526518708101.Hmail.lizhuoyao@hikdata.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============4768097710579531925=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2CFE24A0DF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 May 2018 20:48:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B2C244A0DD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 May 2018 03:31:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id htoA1HB0XXTZ for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 May 2018 20:48:09 -0400 (EDT)
-Received: from m17726.ym.163.com (m17726.ym.163.com [123.58.177.26])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 23A9949EA2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 May 2018 20:48:09 -0400 (EDT)
-In-Reply-To: <493cf6d2-8804-1ffb-06a9-617188c44677@arm.com>
+ with ESMTP id 7b93FqE0KRi3 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 May 2018 03:31:29 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C92149EA2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 May 2018 03:31:29 -0400 (EDT)
+In-Reply-To: <ADcAHQC3AeXOwvscMuFdTao0.3.1526518708101.Hmail.lizhuoyao@hikdata.com>
+Content-Language: en-GB
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -26,110 +28,32 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
+To: lizhuoyao <lizhuoyao@hikdata.com>
 Cc: kvmarm@lists.cs.columbia.edu, shengyizju <shengyizju@163.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
---===============4768097710579531925==
-Content-Type: multipart/alternative; BOUNDARY="=_Part_3781192_1490202622.1526518708101"
+On 17/05/18 01:58, lizhuoyao wrote:
+> you said VGA cannot be realistically supported on ARM at the moment,then
+> wrote it's ok checked with VNC.Did you experiment in x86 or arm?
 
---=_Part_3781192_1490202622.1526518708101
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+What would be the point in trying an x86 box, as we both know that it
+works? I checked using virtio-gpu, on an arm64 machine (rk3399 based
+chromebook). Not x86, not VGA.
 
-eW91IHNhaWQgVkdBIGNhbm5vdCBiZSByZWFsaXN0aWNhbGx5IHN1cHBvcnRlZCBvbiBBUk0gYXQg
-dGhlIG1vbWVudCx0aGVuIHdyb3RlIGl0J3Mgb2sgY2hlY2tlZCB3aXRoIFZOQy5EaWQgeW91IGV4
-cGVyaW1lbnQgaW4geDg2IG9yIGFybT8KClRoZXJlIGlzIGxpa2VseSBubyAtZGV2aWNlKC0tZGV2
-aWNlKSBwYXJhbWV0ZXIgaW4gInZpcnQtaW5zdGFsbCAtaCIuIFNvcnJ5LCBJJ20gbm90IGZhbWls
-aWFyIHdpdGggdmlydC1pbnN0YWxsIG11Y2guIENhbiB5b3Ugc2hvdyB0aGUgb3JkZXIgeW91IHVz
-ZT8KVGhhbmtzIQoKCi0tCiBIYXZlIGEgZ29vZCBkYXkKCgoKID4gLS0tLS3ljp/lp4vpgq7ku7Yt
-LS0tLQ0KPiDlj5Hku7bkuro6IE1hcmMgWnluZ2llciA8bWFyYy56eW5naWVyQGFybS5jb20+DQo+
-IOWPkemAgeaXtumXtDogMjAxOOW5tDXmnIgxNuaXpSDmmJ/mnJ/kuIkNCj4g5pS25Lu25Lq6OiBs
-aXpodW95YW8gPGxpemh1b3lhb0BoaWtkYXRhLmNvbT4sIGt2bWFybUBsaXN0cy5jcy5jb2x1bWJp
-YS5lZHUNCj4g5oqE6YCBOiANCj4g5Li76aKYOiBSZTogdXNlIHZuYyBpbiBhcm0ta3ZtDQo+IA0K
-PiBPbiAxNi8wNS8xOCAwMzoyNCwgbGl6aHVveWFvIHdyb3RlOg0KPiA+IGhpIGV2ZXJ5b25lOg0K
-PiA+ICAgY3VycmVudGx5LCBJIG1lZXQgYSBwcm9ibGVtIGFib3V0IHFlbXUuVXNlIHZpcnQtaW5z
-dGFsbCBvcmRlciB0bw0KPiA+IGNyZWF0ZSBhIGRvbWFpbiwgcmV0dXJuIGEgZmFpbGVkOg0KPiA+
-ICAgb3JkZXI6X3ZpcnQtaW5zdGFsbCAtbiBjZW50b3MtZ2cgLXIgMTAyNCAtLWRpc2sNCj4gPiBj
-ZW50b3MtZ2cuaW1nLGZvcm1hdD1xY293MixzaXplPTEwIC0tY2Ryb20NCj4gPiAvaG9tZS9DZW50
-b3MtNy1hYXJjaDY0LUV2ZXJ5dGhpbmcuaXNvIC0tZ3JhcGhpY3Mgdm5jLCBsaXN0ZW49MC4wLjAu
-MA0KPiA+IF8gICBmYWlsZWQ6X3RoaXMgUUVNVSBkb2VzIG5vdCBzdXBwb3J0ICdjaXJydXMnIHZp
-ZGVvIGRldmljZV9fDQo+ID4gXyAgIFRoaXMgaXNzdWUgb25seSBoYXBwZW4gaW4gYXJtLGFuZCBp
-dCdzIG9rIGluIHg4Ni4gSSBnZXQgc29tZSBtZXNzYWdlDQo+ID4gaW4gdGhlIGludGVybmV0IHRo
-YXQgVkdBIGlzIGEgKG1vcmUgb3IgbGVzcykgeDg2LXNwZWNpZmljIHN0YW5kYXJkLCBub3QNCj4g
-PiBhdmFpbGFibGUgb24gQVJNLiBSaWdodD8NCj4gPiB0b29sOiBxZW11LTIuMTIuMCBsaWJ2aXJ0
-LTMuMi4wX18NCj4gDQo+IFZHQSwgb3IgcmF0aGVyIHRoZSB3YXkgaXQgaXMgdXNlZCBpbiB0aGUg
-TGludXgga2VybmVsIGNhbm5vdCBiZQ0KPiByZWFsaXN0aWNhbGx5IHN1cHBvcnRlZCBvbiBBUk0g
-YXQgdGhlIG1vbWVudC4gQnV0IGlmIHlvdSB3YW50IGENCj4gZ3JhcGhpY2FsIGRpc3BsYXksIHdo
-eSBub3QgdXNpbmcgdmlydGlvLWdwdT8NCj4gDQo+IEl0IHdvcmtzIHdlbGwgZW5vdWdoIGZvciBt
-ZSwgYWx0aG91Z2ggSSBkbyBub3QgdXNlIGxpYnZpcnQsIGFuZCBzdGljaw0KPiB0byBqdXN0IHFl
-bXUuIEZvciB0aGUgcmVjb3JkLCB0aGlzIGlzIHRoZSByZWxldmFudCBzZWN0aW9uIG9mIG15IGNv
-bW1hbmQNCj4gbGluZToNCj4gDQo+IC1kZXZpY2UgdmlydGlvLWdwdS1wY2kgLWRpc3BsYXkgc2Rs
-IC1kZXZpY2UgdmlydGlvLXRhYmxldC1wY2kgLWRldmljZQ0KPiB1c2ItZWhjaSxpZD1laGNpIC1k
-ZXZpY2UgdXNiLWtiZA0KPiANCj4gSSd2ZSBqdXN0IGNoZWNrZWQgd2l0aCBWTkM6DQo+IA0KPiAt
-ZGV2aWNlIHZpcnRpby1ncHUtcGNpIC1kaXNwbGF5IHZuYz0xMjcuMC4wLjE6MCx0bz0xMDAgLWRl
-dmljZQ0KPiB2aXJ0aW8tdGFibGV0LXBjaSAtZGV2aWNlIHVzYi1laGNpLGlkPWVoY2kgLWRldmlj
-ZSB1c2Ita2JkDQo+IA0KPiBhbmQgYWx0aG91Z2ggaXQgaXMgbXVjaCBzbG93ZXIgKG5vdCBzdXJw
-cmlzaW5nKSwgaXQgc2VlbXMgdG8gd29yayBqdXN0DQo+IGFzIHdlbGwuDQo+IA0KPiBIb3BlIHRo
-aXMgaGVscHMsDQo+IA0KPiAJTS4NCj4gLS0gDQo+IEphenogaXMgbm90IGRlYWQuIEl0IGp1c3Qg
-c21lbGxzIGZ1bm55Li4uDQoKDQoNCg==
---=_Part_3781192_1490202622.1526518708101
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: base64
+> There is likely no -device(--device) parameter in "virt-install -h".
+> Sorry, I'm not familiar with virt-install much. Can you show the order
+> you use?
 
-PGRpdj55b3Ugc2FpZCBWR0EgY2Fubm90IGJlIHJlYWxpc3RpY2FsbHkgc3VwcG9ydGVkIG9uIEFS
-TSBhdCB0aGUgbW9tZW50LHRoZW4gd3JvdGUgaXQncyBvayBjaGVja2VkIHdpdGggVk5DLkRpZCB5
-b3UgZXhwZXJpbWVudCBpbiB4ODYgb3IgYXJtPzxicj48YnI+VGhlcmUgaXMgbGlrZWx5IG5vIC1k
-ZXZpY2UoLS1kZXZpY2UpIHBhcmFtZXRlciBpbiAidmlydC1pbnN0YWxsIC1oIi4gU29ycnksIEkn
-bSBub3QgZmFtaWxpYXIgd2l0aCB2aXJ0LWluc3RhbGwgbXVjaC4gQ2FuIHlvdSBzaG93IHRoZSBv
-cmRlciB5b3UgdXNlPzxicj5UaGFua3MhPGJyPjxicj48L2Rpdj4tLTxicj48c3BhbiA+DQogICAg
-ICA8Zm9udCBzaXplPSIyIiBmYWNlPSLpu5HkvZMiPkhhdmUgYSBnb29kIGRheTxicj48c3BhbiBz
-dHlsZT0iY29sb3I6IGJsYWNrOyI+PC9zcGFuPjwvZm9udD48YnI+PGJyPg0KICAgIDwvc3Bhbj48
-YnI+PHByZT4mZ3Q7IC0tLS0t5Y6f5aeL6YKu5Lu2LS0tLS0NCiZndDsg5Y+R5Lu25Lq6OiBNYXJj
-IFp5bmdpZXIgJmx0O21hcmMuenluZ2llckBhcm0uY29tJmd0Ow0KJmd0OyDlj5HpgIHml7bpl7Q6
-IDIwMTjlubQ15pyIMTbml6Ug5pif5pyf5LiJDQomZ3Q7IOaUtuS7tuS6ujogbGl6aHVveWFvICZs
-dDtsaXpodW95YW9AaGlrZGF0YS5jb20mZ3Q7LCBrdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1
-DQomZ3Q7IOaKhOmAgTogDQomZ3Q7IOS4u+mimDogUmU6IHVzZSB2bmMgaW4gYXJtLWt2bQ0KJmd0
-OyANCiZndDsgT24gMTYvMDUvMTggMDM6MjQsIGxpemh1b3lhbyB3cm90ZToNCiZndDsgJmd0OyBo
-aSBldmVyeW9uZToNCiZndDsgJmd0OyAmbmJzcDsgY3VycmVudGx5LCBJIG1lZXQgYSBwcm9ibGVt
-IGFib3V0IHFlbXUuVXNlIHZpcnQtaW5zdGFsbCBvcmRlciB0bw0KJmd0OyAmZ3Q7IGNyZWF0ZSBh
-IGRvbWFpbiwgcmV0dXJuIGEgZmFpbGVkOg0KJmd0OyAmZ3Q7ICZuYnNwOyBvcmRlcjpfdmlydC1p
-bnN0YWxsIC1uIGNlbnRvcy1nZyAtciAxMDI0IC0tZGlzaw0KJmd0OyAmZ3Q7IGNlbnRvcy1nZy5p
-bWcsZm9ybWF0PXFjb3cyLHNpemU9MTAgLS1jZHJvbQ0KJmd0OyAmZ3Q7IC9ob21lL0NlbnRvcy03
-LWFhcmNoNjQtRXZlcnl0aGluZy5pc28gLS1ncmFwaGljcyB2bmMsIGxpc3Rlbj0wLjAuMC4wDQom
-Z3Q7ICZndDsgXyZuYnNwOyZuYnNwOyBmYWlsZWQ6X3RoaXMgUUVNVSBkb2VzIG5vdCBzdXBwb3J0
-ICdjaXJydXMnIHZpZGVvIGRldmljZV9fDQomZ3Q7ICZndDsgXyZuYnNwOyZuYnNwOyBUaGlzIGlz
-c3VlIG9ubHkgaGFwcGVuIGluIGFybSxhbmQgaXQncyBvayBpbiB4ODYuIEkgZ2V0IHNvbWUgbWVz
-c2FnZQ0KJmd0OyAmZ3Q7IGluIHRoZSBpbnRlcm5ldCB0aGF0IFZHQSBpcyBhIChtb3JlIG9yIGxl
-c3MpIHg4Ni1zcGVjaWZpYyBzdGFuZGFyZCwgbm90DQomZ3Q7ICZndDsgYXZhaWxhYmxlIG9uIEFS
-TS4gUmlnaHQ/DQomZ3Q7ICZndDsgdG9vbDogcWVtdS0yLjEyLjAgbGlidmlydC0zLjIuMF9fDQom
-Z3Q7IA0KJmd0OyBWR0EsIG9yIHJhdGhlciB0aGUgd2F5IGl0IGlzIHVzZWQgaW4gdGhlIExpbnV4
-IGtlcm5lbCBjYW5ub3QgYmUNCiZndDsgcmVhbGlzdGljYWxseSBzdXBwb3J0ZWQgb24gQVJNIGF0
-IHRoZSBtb21lbnQuIEJ1dCBpZiB5b3Ugd2FudCBhDQomZ3Q7IGdyYXBoaWNhbCBkaXNwbGF5LCB3
-aHkgbm90IHVzaW5nIHZpcnRpby1ncHU/DQomZ3Q7IA0KJmd0OyBJdCB3b3JrcyB3ZWxsIGVub3Vn
-aCBmb3IgbWUsIGFsdGhvdWdoIEkgZG8gbm90IHVzZSBsaWJ2aXJ0LCBhbmQgc3RpY2sNCiZndDsg
-dG8ganVzdCBxZW11LiBGb3IgdGhlIHJlY29yZCwgdGhpcyBpcyB0aGUgcmVsZXZhbnQgc2VjdGlv
-biBvZiBteSBjb21tYW5kDQomZ3Q7IGxpbmU6DQomZ3Q7IA0KJmd0OyAtZGV2aWNlIHZpcnRpby1n
-cHUtcGNpIC1kaXNwbGF5IHNkbCAtZGV2aWNlIHZpcnRpby10YWJsZXQtcGNpIC1kZXZpY2UNCiZn
-dDsgdXNiLWVoY2ksaWQ9ZWhjaSAtZGV2aWNlIHVzYi1rYmQNCiZndDsgDQomZ3Q7IEkndmUganVz
-dCBjaGVja2VkIHdpdGggVk5DOg0KJmd0OyANCiZndDsgLWRldmljZSB2aXJ0aW8tZ3B1LXBjaSAt
-ZGlzcGxheSB2bmM9MTI3LjAuMC4xOjAsdG89MTAwIC1kZXZpY2UNCiZndDsgdmlydGlvLXRhYmxl
-dC1wY2kgLWRldmljZSB1c2ItZWhjaSxpZD1laGNpIC1kZXZpY2UgdXNiLWtiZA0KJmd0OyANCiZn
-dDsgYW5kIGFsdGhvdWdoIGl0IGlzIG11Y2ggc2xvd2VyIChub3Qgc3VycHJpc2luZyksIGl0IHNl
-ZW1zIHRvIHdvcmsganVzdA0KJmd0OyBhcyB3ZWxsLg0KJmd0OyANCiZndDsgSG9wZSB0aGlzIGhl
-bHBzLA0KJmd0OyANCiZndDsgCU0uDQomZ3Q7IC0tIA0KJmd0OyBKYXp6IGlzIG5vdCBkZWFkLiBJ
-dCBqdXN0IHNtZWxscyBmdW5ueS4uLg0KPC9wcmU+PGJyPg==
---=_Part_3781192_1490202622.1526518708101--
+OK, you simply haven't read my email. I said:
 
---===============4768097710579531925==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+>> It works well enough for me, although I do not use libvirt, and
+>> stick to just qemu. For the record, this is the relevant section of
+>> my command line:
 
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+To repeat: I don't use libvirt, but QEMU directly. If you have libvirt
+questions, please do as Laszlo suggested and ask the question on the
+libvirt mailing list.
 
---===============4768097710579531925==--
+	M.
+-- 
+Jazz is not dead. It just smells funny...
