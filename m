@@ -1,58 +1,75 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 0/4] KVM/arm64: Cache maintenance relaxations
-Date: Thu, 17 May 2018 11:35:44 +0100
-Message-ID: <20180517103548.5622-1-marc.zyngier@arm.com>
+Subject: [PATCH 2/4] arm64: KVM: Avoid marking pages as XN in Stage-2 if
+ CTR_EL0.DIC is set
+Date: Thu, 17 May 2018 11:35:46 +0100
+Message-ID: <20180517103548.5622-3-marc.zyngier@arm.com>
+References: <20180517103548.5622-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4156D4A0F3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 May 2018 06:26:11 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 6V-oyH0Xt4Ii for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 May 2018 06:25:48 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A85F14A0EB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 May 2018 06:25:48 -0400 (EDT)
+In-Reply-To: <20180517103548.5622-1-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This small series makes use of features recently introduced in the
-ARMv8 architecture to relax the cache maintenance operations on CPUs
-that implement these features.
+On systems where CTR_EL0.DIC is set, we don't need to perform
+icache invalidation to guarantee that we'll fetch the right
+instruction stream.
 
-FWB is the most important one. It allows stage-2 to enforce the
-cacheability of memory, no matter what the guest says. It also
-mandates that the whole machine is cache coherent (no non-coherent
-I/O), meaning we can drop a whole class of cache maintenance
-operations.
+This also means that taking a permission fault to invalidate the
+icache is an unnecessary overhead.
 
-FWB, when combined with CTL_EL0.{IDC,DIC} allows the removal of all
-cache maintenance and tracking of pages being executed.
+On such systems, we can safely leave the page as being executable.
 
-We also take the opportunity to drop a few useless CMOs that were
-applied to the HYP page tables, but that were never necessary.
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm64/include/asm/pgtable-prot.h | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
-Marc Zyngier (4):
-  arm64: KVM: Add support for Stage-2 control of memory types and
-    cacheability
-  arm64: KVM: Avoid marking pages as XN in Stage-2 if CTR_EL0.DIC is set
-  KVM: arm/arm64: Remove unnecessary CMOs when creating HYP page tables
-  arm64: KVM: Handle Set/Way CMOs as NOPs if FWB is present
-
- arch/arm64/include/asm/cpucaps.h      |  3 ++-
- arch/arm64/include/asm/kvm_arm.h      |  1 +
- arch/arm64/include/asm/kvm_emulate.h  |  2 ++
- arch/arm64/include/asm/kvm_mmu.h      | 24 +++++++++++++++++-------
- arch/arm64/include/asm/memory.h       |  7 +++++++
- arch/arm64/include/asm/pgtable-prot.h | 24 ++++++++++++++++++++++--
- arch/arm64/include/asm/sysreg.h       |  1 +
- arch/arm64/kernel/cpufeature.c        | 20 ++++++++++++++++++++
- arch/arm64/kvm/sys_regs.c             |  8 +++++++-
- virt/kvm/arm/mmu.c                    |  9 +++++----
- 10 files changed, 84 insertions(+), 15 deletions(-)
-
+diff --git a/arch/arm64/include/asm/pgtable-prot.h b/arch/arm64/include/asm/pgtable-prot.h
+index c66c3047400e..78b942c1bea4 100644
+--- a/arch/arm64/include/asm/pgtable-prot.h
++++ b/arch/arm64/include/asm/pgtable-prot.h
+@@ -77,8 +77,18 @@
+ 		__val;							\
+ 	 })
+ 
+-#define PAGE_S2			__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(NORMAL) | PTE_S2_RDONLY | PTE_S2_XN)
+-#define PAGE_S2_DEVICE		__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(DEVICE_nGnRE) | PTE_S2_RDONLY | PTE_S2_XN)
++#define PAGE_S2_XN							\
++	({								\
++		u64 __val;						\
++		if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))		\
++			__val = 0;					\
++		else							\
++			__val = PTE_S2_XN;				\
++		__val;							\
++	})
++
++#define PAGE_S2			__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(NORMAL) | PTE_S2_RDONLY | PAGE_S2_XN)
++#define PAGE_S2_DEVICE		__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(DEVICE_nGnRE) | PTE_S2_RDONLY | PAGE_S2_XN)
+ 
+ #define PAGE_NONE		__pgprot(((_PAGE_DEFAULT) & ~PTE_VALID) | PTE_PROT_NONE | PTE_RDONLY | PTE_NG | PTE_PXN | PTE_UXN)
+ #define PAGE_SHARED		__pgprot(_PAGE_DEFAULT | PTE_USER | PTE_NG | PTE_PXN | PTE_UXN | PTE_WRITE)
 -- 
 2.14.2
