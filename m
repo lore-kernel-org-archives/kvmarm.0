@@ -1,63 +1,58 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCH] KVM: arm/arm64: add WARN_ON if size is not PAGE_SIZE
- aligned in unmap_stage2_range
-Date: Thu, 17 May 2018 09:17:44 +0100
-Message-ID: <698b0355-d430-86b8-cd09-83c6d9e566f8@arm.com>
-References: <1526537487-14804-1-git-send-email-hejianet@gmail.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH 0/4] KVM/arm64: Cache maintenance relaxations
+Date: Thu, 17 May 2018 11:35:44 +0100
+Message-ID: <20180517103548.5622-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1526537487-14804-1-git-send-email-hejianet@gmail.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Jia He <hejianet@gmail.com>, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc: Andrew Morton <akpm@linux-foundation.org>, Andrea Arcangeli <aarcange@redhat.com>, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Arvind Yadav <arvind.yadav.cs@gmail.com>, "David S. Miller" <davem@davemloft.net>, Minchan Kim <minchan@kernel.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, Hugh Dickins <hughd@google.com>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, linux-mm@kvack.org, linux-kernel@vger.kernel.org, jia.he@hxt-semitech.com
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+This small series makes use of features recently introduced in the
+ARMv8 architecture to relax the cache maintenance operations on CPUs
+that implement these features.
 
-Hi Jia,
+FWB is the most important one. It allows stage-2 to enforce the
+cacheability of memory, no matter what the guest says. It also
+mandates that the whole machine is cache coherent (no non-coherent
+I/O), meaning we can drop a whole class of cache maintenance
+operations.
 
-On 17/05/18 07:11, Jia He wrote:
-> I ever met a panic under memory pressure tests(start 20 guests and run
-> memhog in the host).
+FWB, when combined with CTL_EL0.{IDC,DIC} allows the removal of all
+cache maintenance and tracking of pages being executed.
 
-Please avoid using "I" in the commit description and preferably stick to
-an objective description.
+We also take the opportunity to drop a few useless CMOs that were
+applied to the HYP page tables, but that were never necessary.
 
-> 
-> The root cause might be what I fixed at [1]. But from arm kvm points of
-> view, it would be better we caught the exception earlier and clearer.
-> 
-> If the size is not PAGE_SIZE aligned, unmap_stage2_range might unmap the
-> wrong(more or less) page range. Hence it caused the "BUG: Bad page
-> state"
+Marc Zyngier (4):
+  arm64: KVM: Add support for Stage-2 control of memory types and
+    cacheability
+  arm64: KVM: Avoid marking pages as XN in Stage-2 if CTR_EL0.DIC is set
+  KVM: arm/arm64: Remove unnecessary CMOs when creating HYP page tables
+  arm64: KVM: Handle Set/Way CMOs as NOPs if FWB is present
 
-I don't see why we should ever panic with a "positive" size value. Anyways,
-the unmap requests must be in units of pages. So this check might be useful.
+ arch/arm64/include/asm/cpucaps.h      |  3 ++-
+ arch/arm64/include/asm/kvm_arm.h      |  1 +
+ arch/arm64/include/asm/kvm_emulate.h  |  2 ++
+ arch/arm64/include/asm/kvm_mmu.h      | 24 +++++++++++++++++-------
+ arch/arm64/include/asm/memory.h       |  7 +++++++
+ arch/arm64/include/asm/pgtable-prot.h | 24 ++++++++++++++++++++++--
+ arch/arm64/include/asm/sysreg.h       |  1 +
+ arch/arm64/kernel/cpufeature.c        | 20 ++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c             |  8 +++++++-
+ virt/kvm/arm/mmu.c                    |  9 +++++----
+ 10 files changed, 84 insertions(+), 15 deletions(-)
 
-
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-
-> 
-> [1] https://lkml.org/lkml/2018/5/3/1042
-> 
-> Signed-off-by: jia.he@hxt-semitech.com
-> ---
->   virt/kvm/arm/mmu.c | 2 ++
->   1 file changed, 2 insertions(+)
-> 
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 7f6a944..8dac311 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -297,6 +297,8 @@ static void unmap_stage2_range(struct kvm *kvm, phys_addr_t start, u64 size)
->   	phys_addr_t next;
->   
->   	assert_spin_locked(&kvm->mmu_lock);
-> +	WARN_ON(size & ~PAGE_MASK);
-> +
->   	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
->   	do {
->   		/*
-> 
+-- 
+2.14.2
