@@ -1,76 +1,63 @@
-From: Jia He <hejianet@gmail.com>
-Subject: Re: [PATCH v2 2/2] KVM: arm/arm64: harden unmap_stage2_ptes in case
- end is not PAGE_SIZE aligned
-Date: Fri, 18 May 2018 21:04:40 +0800
-Message-ID: <50c98169-1606-48bf-0489-124adefd2a54@gmail.com>
-References: <1526635630-18917-1-git-send-email-hejianet@gmail.com>
- <1526635630-18917-2-git-send-email-hejianet@gmail.com>
- <2185a61e-c157-e177-9bad-83b6f27fd784@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <2185a61e-c157-e177-9bad-83b6f27fd784@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc: jia.he@hxt-semitech.com, linux-kernel@vger.kernel.org, Suzuki.Poulose@arm.com
+From: Sami Tolvanen <samitolvanen@google.com>
+Subject: [PATCH] arm64: kvm: use -fno-jump-tables with clang
+Date: Fri, 18 May 2018 10:02:02 -0700
+Message-ID: <20180518170202.11458-1-samitolvanen@google.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
+Cc: AKASHI Takahiro <takahiro.akashi@linaro.org>, Nick Desaulniers <ndesaulniers@google.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, Sami Tolvanen <samitolvanen@google.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+Starting with LLVM r308050, clang generates a jump table with EL1
+virtual addresses in __init_stage2_translation, which results in a
+kernel panic when booting at EL2:
 
+  Kernel panic - not syncing: HYP panic:
+  PS:800003c9 PC:ffff0000089e6fd8 ESR:86000004
+  FAR:ffff0000089e6fd8 HPFAR:0000000009825000 PAR:0000000000000000
+  VCPU:000804fc20001221
 
-On 5/18/2018 5:48 PM, Marc Zyngier Wrote:
-> On 18/05/18 10:27, Jia He wrote:
->> If it passes addr=0x202920000,size=0xfe00 to unmap_stage2_range->
->> ...->unmap_stage2_ptes, unmap_stage2_ptes will get addr=0x202920000,
->> end=0x20292fe00. After first while loop addr=0x202930000, end=0x20292fe00,
->> then addr!=end. Thus it will touch another pages by put_pages() in the
->> 2nd loop.
->>
->> This patch fixes it by hardening the break condition of while loop.
->>
->> Signed-off-by: jia.he@hxt-semitech.com
->> ---
->> v2: newly added
->>
->>  virt/kvm/arm/mmu.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->> index 8dac311..45cd040 100644
->> --- a/virt/kvm/arm/mmu.c
->> +++ b/virt/kvm/arm/mmu.c
->> @@ -217,7 +217,7 @@ static void unmap_stage2_ptes(struct kvm *kvm, pmd_t *pmd,
->>  
->>  			put_page(virt_to_page(pte));
->>  		}
->> -	} while (pte++, addr += PAGE_SIZE, addr != end);
->> +	} while (pte++, addr += PAGE_SIZE, addr < end);
->>  
->>  	if (stage2_pte_table_empty(start_pte))
->>  		clear_stage2_pmd_entry(kvm, pmd, start_addr);
->>
-> 
-> I don't think this change is the right thing to do. You get that failure
-> because you're being passed a size that is not a multiple of PAGE_SIZE.
-> That's the mistake.
-> 
-> You should ensure that this never happens, rather than changing the page
-> table walkers (which are consistent with the way this kind of code is
-> written in other places of the kernel). As you mentioned in your first
-> patch, the real issue is that KSM is broken, and this is what should be
-> fixed.
-> 
-Got it, thanks
-Should I resend the patch 1/2 without any changes after droping patch 2/2?
+  CPU: 0 PID: 0 Comm: swapper/0 Not tainted 4.14.0-rc7-dirty #3
+  Hardware name: ARM Juno development board (r1) (DT)
+  Call trace:
+  [<ffff000008088ea4>] dump_backtrace+0x0/0x34c
+  [<ffff000008089208>] show_stack+0x18/0x20
+  [<ffff0000089c73ec>] dump_stack+0xc4/0xfc
+  [<ffff0000080c8e1c>] panic+0x138/0x2b4
+  [<ffff0000080c8ce4>] panic+0x0/0x2b4
+  SMP: stopping secondary CPUs
+  SMP: failed to stop secondary CPUs 0-3,5
+  Kernel Offset: disabled
+  CPU features: 0x002086
+  Memory Limit: none
+  ---[ end Kernel panic - not syncing: HYP panic:
+  PS:800003c9 PC:ffff0000089e6fd8 ESR:86000004
+  FAR:ffff0000089e6fd8 HPFAR:0000000009825000 PAR:0000000000000000
+  VCPU:000804fc20001221
 
+This change adds -fno-jump-tables to arm64/hyp to work around the
+bug.
+
+Suggested-by: AKASHI Takahiro <takahiro.akashi@linaro.org>
+Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
+---
+ arch/arm64/kvm/hyp/Makefile | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+index 4313f74753332..745b3255e7832 100644
+--- a/arch/arm64/kvm/hyp/Makefile
++++ b/arch/arm64/kvm/hyp/Makefile
+@@ -5,6 +5,10 @@
+ 
+ ccflags-y += -fno-stack-protector -DDISABLE_BRANCH_PROFILING
+ 
++ifeq ($(cc-name),clang)
++ccflags-y += -fno-jump-tables
++endif
++
+ KVM=../../../../virt/kvm
+ 
+ obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v3-sr.o
 -- 
-Cheers,
-Jia
+2.17.0.441.gb46fe60e1d-goog
