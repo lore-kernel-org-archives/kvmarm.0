@@ -1,13 +1,13 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] arm64: KVM: reduce guest fpsimd trap
-Date: Sun, 20 May 2018 12:03:50 +0100
-Message-ID: <20180520120350.212b4b4d@why.wild-wind.fr.eu.org>
-References: <F348A9E21A573744858FF7E5D32E29D81BDF6C92@dggemi509-mbs.china.huawei.com>
+Subject: Re: [PULL v8] KVM: arm64: Optimise FPSIMD context switching
+Date: Sun, 20 May 2018 14:14:41 +0100
+Message-ID: <20180520141441.3d999f16@why.wild-wind.fr.eu.org>
+References: <20180516104942.GS7753@e103592.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <F348A9E21A573744858FF7E5D32E29D81BDF6C92@dggemi509-mbs.china.huawei.com>
+In-Reply-To: <20180516104942.GS7753@e103592.cambridge.arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -17,225 +17,90 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: "Tangnianyao (ICT)" <tangnianyao@huawei.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Christoffer Dall <christoffer.dall@arm.com>, Dave Martin <Dave.Martin@arm.com>, Zhangshaokun <zhangshaokun@hisilicon.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Christoffer Dall <cdall@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sat, 19 May 2018 02:38:33 +0000
-"Tangnianyao (ICT)" <tangnianyao@huawei.com> wrote:
+On Wed, 16 May 2018 11:49:42 +0100
+Dave Martin <Dave.Martin@arm.com> wrote:
 
-> On Wed, May 16, 2018 at 20:46 PM GST+8, Christoffer Dall wrote:
-> > On Wed, May 16, 2018 at 11:32:17AM +0100, Dave Martin wrote:  
-> > > On Wed, May 16, 2018 at 10:25:40AM +0100, Marc Zyngier wrote:  
-> > > > [+Dave]
-> > > > 
-> > > > Hi Nianyao,
-> > > > 
-> > > > On 16/05/18 10:08, Tangnianyao (ICT) wrote:  
-> > > > > Add last_fpsimd_trap to notify if guest last exit reason is handling fpsimd. If guest is using fpsimd frequently, save host's fpsimd state and restore guest's fpsimd state and deactive fpsimd trap before returning to guest. It can avoid guest fpsimd trap soon to improve performance.  
-> > > 
-> > > So, the purpose of this patch is to context switch the FPSIMD state on 
-> > > initial entry to the guest, instead of enabling the trap and context 
-> > > switching the FPSIMD state lazily?
-> > > 
-> > > And you decide whether to do this or not, based on whether the guest   
-> > triggered a lazy FPSIMD switch previously?  
-> 
-> I try to detect guest using fpsimd , but not overtraining which may 
-> include more complexity and not suitable for common cases. Therefore I 
-> just decide whether guest have triggerd a lazy fpsimd switch last time.
-> 
-> > >   
-> > > > > 
-> > > > > Signed-off-by: Nianyao Tang <tangnianyao@huawei.com>
-> > > > > ---
-> > > > >  arch/arm64/kernel/asm-offsets.c |  1 +
-> > > > >  arch/arm64/kvm/hyp/entry.S      |  5 +++++
-> > > > >  arch/arm64/kvm/hyp/switch.c     | 38 ++++++++++++++++++++++++++++++++++++--
-> > > > >  include/linux/kvm_host.h        |  1 +
-> > > > >  4 files changed, 43 insertions(+), 2 deletions(-)
-> > > > > 
-> > > > > diff --git a/arch/arm64/kernel/asm-offsets.c 
-> > > > > b/arch/arm64/kernel/asm-offsets.c index 5bdda65..35a9c5c 100644
-> > > > > --- a/arch/arm64/kernel/asm-offsets.c
-> > > > > +++ b/arch/arm64/kernel/asm-offsets.c
-> > > > > @@ -136,6 +136,7 @@ int main(void)  #ifdef CONFIG_KVM_ARM_HOST
-> > > > >    DEFINE(VCPU_CONTEXT,		offsetof(struct kvm_vcpu, arch.ctxt));
-> > > > >    DEFINE(VCPU_FAULT_DISR,	offsetof(struct kvm_vcpu, arch.fault.disr_el1));
-> > > > > +  DEFINE(VCPU_LAST_FPSIMD_TRAP, offsetof(struct kvm_vcpu, 
-> > > > > + last_fpsimd_trap));
-> > > > >    DEFINE(CPU_GP_REGS,		offsetof(struct kvm_cpu_context, gp_regs));
-> > > > >    DEFINE(CPU_USER_PT_REGS,	offsetof(struct kvm_regs, regs));
-> > > > >    DEFINE(CPU_FP_REGS,		offsetof(struct kvm_regs, fp_regs));
-> > > > > diff --git a/arch/arm64/kvm/hyp/entry.S 
-> > > > > b/arch/arm64/kvm/hyp/entry.S index e41a161..956e042 100644
-> > > > > --- a/arch/arm64/kvm/hyp/entry.S
-> > > > > +++ b/arch/arm64/kvm/hyp/entry.S
-> > > > > @@ -197,6 +197,11 @@ alternative_endif
-> > > > >  	add	x0, x2, #CPU_GP_REG_OFFSET(CPU_FP_REGS)
-> > > > >  	bl	__fpsimd_restore_state
-> > > > >  
-> > > > > +	// Mark guest using fpsimd now
-> > > > > +	ldr x0, [x3, #VCPU_LAST_FPSIMD_TRAP]
-> > > > > +	add x0, x0, #1  
-> > > 
-> > > Can this overflow?  
-> 
-> It won't overflow. It only trigger one fpsimd trap and restore guest's fpsimd
-> state and deactivate fpsimd trap. When next non-fpsimd trap comes, it will be clear unconditionally.
-> 
-> > >   
-> > > > > +	str x0, [x3, #VCPU_LAST_FPSIMD_TRAP]
-> > > > > +
-> > > > >  	// Skip restoring fpexc32 for AArch64 guests
-> > > > >  	mrs	x1, hcr_el2
-> > > > >  	tbnz	x1, #HCR_RW_SHIFT, 1f
-> > > > > diff --git a/arch/arm64/kvm/hyp/switch.c 
-> > > > > b/arch/arm64/kvm/hyp/switch.c index d964523..86eea1b 100644
-> > > > > --- a/arch/arm64/kvm/hyp/switch.c
-> > > > > +++ b/arch/arm64/kvm/hyp/switch.c
-> > > > > @@ -92,7 +92,13 @@ static void activate_traps_vhe(struct kvm_vcpu 
-> > > > > *vcpu)
-> > > > >  
-> > > > >  	val = read_sysreg(cpacr_el1);
-> > > > >  	val |= CPACR_EL1_TTA;
-> > > > > -	val &= ~(CPACR_EL1_FPEN | CPACR_EL1_ZEN);
-> > > > > +	val &= ~CPACR_EL1_ZEN;
-> > > > > +
-> > > > > +	if (vcpu->last_fpsimd_trap)
-> > > > > +		val |= CPACR_EL1_FPEN;
-> > > > > +	else
-> > > > > +		val &= ~CPACR_EL1_FPEN;
-> > > > > +
-> > > > >  	write_sysreg(val, cpacr_el1);
-> > > > >  
-> > > > >  	write_sysreg(kvm_get_hyp_vector(), vbar_el1); @@ -105,7 +111,13 @@ static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
-> > > > >  	__activate_traps_common(vcpu);
-> > > > >  
-> > > > >  	val = CPTR_EL2_DEFAULT;
-> > > > > -	val |= CPTR_EL2_TTA | CPTR_EL2_TFP | CPTR_EL2_TZ;
-> > > > > +	val |= CPTR_EL2_TTA | CPTR_EL2_TZ;
-> > > > > +
-> > > > > +	if (vcpu->last_fpsimd_trap)
-> > > > > +		val &= ~CPTR_EL2_TFP;
-> > > > > +	else
-> > > > > +		val |= CPTR_EL2_TFP;
-> > > > > +
-> > > > >  	write_sysreg(val, cptr_el2);
-> > > > >  }
-> > > > >  
-> > > > > @@ -406,6 +418,17 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
-> > > > >  	__activate_traps(vcpu);
-> > > > >  	__activate_vm(vcpu->kvm);
-> > > > >  
-> > > > > +	/*
-> > > > > +	 * If guest last trap to host for handling fpsimd, last_fpsimd_trap
-> > > > > +	 * is set. Restore guest's fpsimd state and deactivate fpsimd trap
-> > > > > +	 * to avoid guest traping soon.
-> > > > > +	 */
-> > > > > +	if (vcpu->last_fpsimd_trap) {
-> > > > > +		__fpsimd_save_state(&host_ctxt->gp_regs.fp_regs);
-> > > > > +		__fpsimd_restore_state(&guest_ctxt->gp_regs.fp_regs);
-> > > > > +		vcpu->last_fpsimd_trap = 0;
-> > > > > +	}
-> > > > > +
-> > > > >  	sysreg_restore_guest_state_vhe(guest_ctxt);
-> > > > >  	__debug_switch_to_guest(vcpu);
-> > > > >  
-> > > > > @@ -454,6 +477,17 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
-> > > > >  	__activate_traps(vcpu);
-> > > > >  	__activate_vm(kern_hyp_va(vcpu->kvm));
-> > > > >  
-> > > > > +	/*
-> > > > > +	 * If guest last trap to host for handling fpsimd, last_fpsimd_trap
-> > > > > +	 * is set. Restore guest's fpsimd state and deactivate fpsimd trap
-> > > > > +	 * to avoid guest traping soon.
-> > > > > +	 */
-> > > > > +	if (vcpu->last_fpsimd_trap) {
-> > > > > +		__fpsimd_save_state(&host_ctxt->gp_regs.fp_regs);
-> > > > > +		__fpsimd_restore_state(&guest_ctxt->gp_regs.fp_regs);
-> > > > > +		vcpu->last_fpsimd_trap = 0;
-> > > > > +	}
-> > > > > +
-> > > > >  	__hyp_vgic_restore_state(vcpu);
-> > > > >  	__timer_enable_traps(vcpu);
-> > > > >  
-> > > > > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h 
-> > > > > index 6930c63..46bdf0d 100644
-> > > > > --- a/include/linux/kvm_host.h
-> > > > > +++ b/include/linux/kvm_host.h
-> > > > > @@ -274,6 +274,7 @@ struct kvm_vcpu {
-> > > > >  	bool preempted;
-> > > > >  	struct kvm_vcpu_arch arch;
-> > > > >  	struct dentry *debugfs_dentry;
-> > > > > +	unsigned int last_fpsimd_trap;
-> > > > >  };
-> > > > >  
-> > > > >  static inline int kvm_vcpu_exiting_guest_mode(struct kvm_vcpu 
-> > > > > *vcpu)
-> > > > > --
-> > > > > 2.7.4
-> > > > >   
-> > > > 
-> > > > This doesn't seem to be the 100% correct. I can't see how this works 
-> > > > when being preempted, for example... I suggest you look at Dave 
-> > > > Martin's series[1], which does this correctly.  
-> > > 
-> > > If I've understood correctly, this chooses between eager and lazy 
-> > > switching, which is addressing a different issue from [1].
-> > > 
-> > > In effect, this code is attempting to predict whether the guest will 
-> > > use FPSIMD before the next exit.  If the prediction is correct and the 
-> > > guest does use FPSIMD, then the overhead of the lazy FPSIMD trap 
-> > > disappears.  This is probably a good thing, though it may increase 
-> > > interrupt latency a little.  However, if the prediction is wrong and 
-> > > the guest doesn't use FPSIMD before the next exit, then the overhead 
-> > > of guest entry increases for no benefit, because FPSIMD was switched 
-> > > unnecessarily.
-> > > 
-> > > Do you have any benchmarks or metrics on the accuracy of the 
-> > > prediction and the overall impact on performance?
-> > > 
-> > > The changes in [1] should reduce the number of FPSIMD context switches 
-> > > overall, so may reduce the benefit of this patch.
-> > >   
-> 
-> This idea may be different. It tries to detect guest using fpsimd, do eager 
-> switching ,and reduce guest trap. [1] reduces fpsimd context switches in host when
-> it has already trapped.
-> 
-> > 
-> > 
-> > Based on previous measurements [2], I found that only in 29% of the times when we return to userspace or are preempted, has the VCPU touched the FPSIMD registers, and therefore a significant majority of the times we enter the guest, the guest doesn't touch the FPSIMD state, even if it has touched it before.
-> > 
-> > As Dave suggests, if there is data that shows that an immediately following entry from an exit that had VFP enabled implies with a very high probablity that the guest will touch VFP again, then something like this might make sense, but I'd like to see some data to back up this hypothesis before adding additional complexity to the code.
-> > 
-> > [2]: https://lists.cs.columbia.edu/pipermail/kvmarm/2018-February/029835.html  
-> 
-> I try to detect guest using fpsimd, and choose eager switching to avoid trapping to hyp soon.
-> The reason is, in some micro architecture, vmid switch will flush all L1 TLB entry which doesn't
-> contain vmid. It will result in extra 2-stage table walk when returning to guest, which could be
-> avoid if not trap to el2. As I know, Maia has this issue.
+Hi Dave,
 
-This looks extremely microarchitectural. Have you tested how this
-behaves on other implementations?
-
-> I have done some benchmark test on guest and find that, frequent context switch , which
-> save and restore fpsimd frequently, resulted in extra cost compared to host context switch
-> because of fpsimd trap. In some benchmarks, like lat_ctx and lat_udp, one asid usually got stuck
-> and scheduled to another, where context switch and handling fpsimd happened very frequently.
-> In my performance test, lat_ctx with 4 asid switch. In comparison between guest and host, 
-> without this, guest is 10% worse than host. With this, guest is only 8% worse than host.
+> Hi Marc,
 > 
-> Detect guest using fpsimd based on lazy fpsimd switch may be not 100% correct. 
-> I think accurate detection may be overtraining and is not suitable for common cases.
-> Therefore I just do it in simply way to reduce some fpsimd traps.
+> This is a trivial update to the previously posted v7 [1].  The only
+> changes are a couple of minor cosmetic changes requested by reviewers,
+> on-list and the addition of Acked-by/Reviewed-by tags received since the
+> series was posted.
+> 
+> Let me know if you need anything else on this.
 
-Can you please with Dave's series (which I have now merged for 4.18)
-and let us know if you're still seeing this overhead? If you're still
-seeing it, we can then look into it.
+So I've taken this, merged in Linus' top of tree, started a guest on a
+dual A53 board, and immediately hit the following:
 
-Thanks,
+root@sy-borg:~# [  287.226184] Unable to handle kernel NULL pointer dereference at virtual address 00000000
+[  287.231672] Mem abort info:
+[  287.234537]   ESR = 0x96000044
+[  287.237674]   Exception class = DABT (current EL), IL = 32 bits
+[  287.243765]   SET = 0, FnV = 0
+[  287.246900]   EA = 0, S1PTW = 0
+[  287.250126] Data abort info:
+[  287.253083]   ISV = 0, ISS = 0x00000044
+[  287.257025]   CM = 0, WnR = 1
+[  287.260076] user pgtable: 4k pages, 48-bit VAs, pgdp = 00000000b8483f75
+[  287.266882] [0000000000000000] pgd=0000000000000000
+[  287.271903] Internal error: Oops: 96000044 [#1] PREEMPT SMP
+[  287.277636] Modules linked in:
+[  287.280776] CPU: 1 PID: 3098 Comm: kworker/u4:3 Not tainted 4.17.0-rc5-00166-gd84e81cca249 #136
+[  287.289730] Hardware name: Globalscale Marvell ESPRESSOBin Board (DT)
+[  287.296364] pstate: 40000085 (nZcv daIf -PAN -UAO)
+[  287.301301] pc : fpsimd_save_state+0x0/0x54
+[  287.305595] lr : fpsimd_save+0x50/0x100
+[  287.309531] sp : ffff00000dde3af0
+[  287.312936] x29: ffff00000dde3af0 x28: ffff000008cd565c 
+[  287.318401] x27: ffff800078ee9c80 x26: ffff80007b207628 
+[  287.323867] x25: ffff0000093f9000 x24: 0000000000000001 
+[  287.329333] x23: ffff0000093d4000 x22: ffff80007b207000 
+[  287.334798] x21: ffff80007efd7d80 x20: ffff80007b207000 
+[  287.340264] x19: 0000000000000000 x18: 0000000000040f0b 
+[  287.345729] x17: 0000ffffb70752b8 x16: 0000ffffb708e008 
+[  287.351195] x15: 0000000000000000 x14: 0000000000000400 
+[  287.356661] x13: 0000000000000001 x12: 0000000000000001 
+[  287.362127] x11: 0000000000000001 x10: 0000000000000000 
+[  287.367592] x9 : 0000000000000253 x8 : ffff80007b207200 
+[  287.373057] x7 : ffff80007b207100 x6 : ffff80007c378f18 
+[  287.378523] x5 : 00000042c2094c00 x4 : 0000000000000000 
+[  287.383990] x3 : 00000042e0033450 x2 : 0000000000000000 
+[  287.389454] x1 : 0000800075bf6000 x0 : 0000000000000000 
+[  287.394922] Process kworker/u4:3 (pid: 3098, stack limit = 0x00000000ca0dd8c6)
+[  287.402358] Call trace:
+[  287.404873]  fpsimd_save_state+0x0/0x54
+[  287.408813]  fpsimd_thread_switch+0x28/0xa0
+[  287.413114]  __switch_to+0x1c/0xd0
+[  287.416609]  __schedule+0x1b8/0x730
+[  287.420191]  preempt_schedule_common+0x24/0x48
+[  287.424760]  preempt_schedule.part.23+0x1c/0x28
+[  287.429419]  preempt_schedule+0x1c/0x28
+[  287.433363]  _raw_spin_unlock+0x34/0x48
+[  287.437308]  flush_old_exec+0x45c/0x6a0
+[  287.441250]  load_elf_binary+0x324/0x1198
+[  287.445372]  search_binary_handler+0xac/0x230
+[  287.449851]  do_execveat_common.isra.14+0x508/0x6e0
+[  287.454867]  do_execve+0x28/0x30
+[  287.458185]  call_usermodehelper_exec_async+0xdc/0x140
+[  287.463468]  ret_from_fork+0x10/0x18
+[  287.467143] Code: a9425bf5 a8c37bfd d65f03c0 d65f03c0 (ad000400) 
+[  287.473414] ---[ end trace c4346b99cc877f8e ]---
+
+It happened just after having loaded the guest kernel, so I presume
+we're missing some kind of initialization. I couldn't subsequently
+reproduce it  on the same machine, and the same kernel is doing
+absolutely fine on a Seattle box.
+
+I can't immediately see how st would be NULL, unless we somehow are
+missing some state tracking somewhere...
+
+Any idea?
 
 	M.
 -- 
