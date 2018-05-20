@@ -1,77 +1,112 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v6 00/12] KVM: arm/arm64: Allow multiple GICv3
- redistributor regions
-Date: Sun, 20 May 2018 14:43:10 +0100
-Message-ID: <20180520144310.378a1712@why.wild-wind.fr.eu.org>
-References: <1525088918-8600-1-git-send-email-eric.auger@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+From: Eric Auger <eric.auger@redhat.com>
+Subject: [PATCH v7 00/13] KVM: arm/arm64: Allow multiple GICv3 redistributor regions
+Date: Sun, 20 May 2018 23:22:39 +0200
+Message-ID: <1526851372-13009-1-git-send-email-eric.auger@redhat.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1525088918-8600-1-git-send-email-eric.auger@redhat.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, cdall@kernel.org, peter.maydell@linaro.org, andre.przywara@arm.com, drjones@redhat.com, wei@redhat.com
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org
+Cc: andre.przywara@arm.com, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Eric,
+At the moment the KVM VGICv3 only supports a single redistributor
+region (whose base address is set through the GICv3 kvm device
+KVM_DEV_ARM_VGIC_GRP_ADDR/KVM_VGIC_V3_ADDR_TYPE_REDIST). There,
+all the redistributors are laid out contiguously. The size of this
+single redistributor region is not set explicitly but instead
+induced at a late stage by the number of online vcpus.
 
-On Mon, 30 Apr 2018 13:48:26 +0200
-Eric Auger <eric.auger@redhat.com> wrote:
+The GIC specification does not mandate all redistributors to be
+contiguous. Moreover DT and ACPI were specified so that multiple
+redistributors regions can be defined.
 
-> At the moment the KVM VGICv3 only supports a single redistributor
-> region (whose base address is set through the GICv3 kvm device
-> KVM_DEV_ARM_VGIC_GRP_ADDR/KVM_VGIC_V3_ADDR_TYPE_REDIST). There,
-> all the redistributors are laid out contiguously. The size of this
-> single redistributor region is not set explicitly but instead
-> induced at a late stage by the number of online vcpus.
-> 
-> The GIC specification does not mandate all redistributors to be
-> contiguous. Moreover DT and ACPI were specified so that multiple
-> redistributors regions can be defined.
-> 
-> The current interface brings a limitation on QEMU where ARM
-> virt machine available GPA holes only allowed to assign a
-> redistributor region fitting a max of 123 vcpus. Overcoming this
-> limitation would force either to create a new machine or relocate
-> the single rdist region or allow the allocation of multiple rdist
-> regions.
-> 
-> This series enables this last alternative. A new GICv3 KVM device
-> KVM_DEV_ARM_VGIC_GRP_ADDR/KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION allows
-> to register individual redistributor regions whose size is defined
-> explicitly. Those rdist regions then are filled by vcpu rdist frames
-> according to the need. The vgic init and related base address checks
-> are impacted.
+The current interface brings a limitation on QEMU where ARM
+virt machine available GPA holes only allowed to assign a
+redistributor region fitting a max of 123 vcpus. Overcoming this
+limitation would force either to create a new machine or relocate
+the single rdist region or allow the allocation of multiple rdist
+regions.
 
-I've taken this series for a test run, and noticed that it breaks
-kvmtool:
+This series enables this last alternative. A new GICv3 KVM device
+KVM_DEV_ARM_VGIC_GRP_ADDR/KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION allows
+to register individual redistributor regions whose size is defined
+explicitly. Those rdist regions then are filled by vcpu rdist frames
+according to the need. The vgic init and related base address checks
+are impacted.
 
-<quote>
-maz@sy-borg:~$ ./kvmtool/lkvm run -c 1 -k Image --irqchip=gicv3
-  # lkvm run -k Image -m 256 -c 1 --name guest-4929
-  Info: Loaded kernel to 0x80080000 (20126208 bytes)
-  Info: Placing fdt at 0x8fe00000 - 0x8fffffff
-  Info: virtio-mmio.devices=0x200@0x10000:36
+Best Regards
 
-  Info: virtio-mmio.devices=0x200@0x10200:37
+Eric
 
-  Info: virtio-mmio.devices=0x200@0x10400:38
+Git: complete series available at
+https://github.com/eauger/linux/tree/v4.17-rc5-rdist-regions-v7
+Previous version:
+https://github.com/eauger/linux/tree/v4.17-rc2-rdist-regions-v6
 
-KVM_RUN failed: No such device or address
-</quote>
+History:
+v6 -> v7:
+- fix bug reported by Marc with kvmtool caused by rd_iodev.base_addr
+  and sgi_iodev.base_addr being initialized too late:
+  in kvm_vgic_vcpu_early_init instead of kvm_vgic_vcpu_init
+- removed kvm_vgic_vcpu_early_init()
 
-Backing out the series results in a working setup.
+v5 -> v6:
+- truly use list_last_entry in vgic_v3_insert_redist_region
+- s/pointed by/pointed to by in API doc
+- collected last R-b/A-b
 
-I presume that the changes in the init has resulted in a stricter
-initialization order that matches the QEMU flow, but that kvmtool
-doesn't follow.
+v4 -> v5:
+- fix KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION read path and update
+  the documentation accordingly (removed Peter's and
+  Christoffer's A-b)
+- use u<n> instead of uint<n>_t
+- collected additional R-b/A-b
 
-Could you please have a look at this? I'd like to have it in for 4.18,
-just without regressions... ;-)
+v3 -> v4:
+- Collected Christoffer's R-b
+- reworked vgic_v3_rdist_overlap and introduced vgic_dist_overlap
+- vgic_v3_insert_redist_region cleanup
+- inverse order for patches 6 and 7
 
-Thanks,
+v2 -> v3:
+- Add details to the user API documentation
+- early exit if vgic_v3_rdist_region_from_index() fails
+- return -EINVAL if legacy and new redist region API are mixed
 
-	M.
+v1 -> v2:
+- Rework the uapi. Only bits [51:16] of the redist region are
+  exposed. Also a new flags field was introduced
+- Do not store the last bit in the vgic_cpu struct anymore
+- remove dist->spis check in 1st patch
+- add last patch to bump VGIC_V3_MAX_CPUS to 512
+- advertise the new attribute
+
+
+Eric Auger (13):
+  KVM: arm/arm64: Set dist->spis to NULL after kfree
+  KVM: arm/arm64: Document KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+  KVM: arm/arm64: Replace the single rdist region by a list
+  KVM: arm/arm64: Helper to locate free rdist index
+  KVM: arm/arm64: Revisit Redistributor TYPER last bit computation
+  KVM: arm/arm64: Adapt vgic_v3_check_base to multiple rdist regions
+  KVM: arm/arm64: Helper to register a new redistributor region
+  KVM: arm/arm64: Remove kvm_vgic_vcpu_early_init
+  KVM: arm/arm64: Check vcpu redist base before registering an iodev
+  KVM: arm/arm64: Check all vcpu redistributors are set on map_resources
+  KVM: arm/arm64: Add KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+  KVM: arm/arm64: Implement KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+  KVM: arm/arm64: Bump VGIC_V3_MAX_CPUS to 512
+
+ Documentation/virtual/kvm/devices/arm-vgic-v3.txt |  30 +++++-
+ arch/arm/include/uapi/asm/kvm.h                   |   1 +
+ arch/arm64/include/uapi/asm/kvm.h                 |   1 +
+ include/kvm/arm_vgic.h                            |  17 ++--
+ virt/kvm/arm/arm.c                                |   1 -
+ virt/kvm/arm/vgic/vgic-init.c                     |  99 ++++++++++---------
+ virt/kvm/arm/vgic/vgic-kvm-device.c               |  53 +++++++++-
+ virt/kvm/arm/vgic/vgic-mmio-v3.c                  | 114 +++++++++++++++++++---
+ virt/kvm/arm/vgic/vgic-v3.c                       | 101 +++++++++++++++----
+ virt/kvm/arm/vgic/vgic.h                          |  42 +++++++-
+ 10 files changed, 369 insertions(+), 90 deletions(-)
+
 -- 
-Without deviation from the norm, progress is not possible.
+2.5.5
