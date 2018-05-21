@@ -1,7 +1,7 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v9 13/16] KVM: arm64: Remove eager host SVE state saving
-Date: Mon, 21 May 2018 15:17:14 +0100
-Message-ID: <1526912237-25308-14-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v9 16/16] KVM: arm64: Invoke FPSIMD context switch trap from C
+Date: Mon, 21 May 2018 15:17:17 +0100
+Message-ID: <1526912237-25308-17-git-send-email-Dave.Martin@arm.com>
 References: <1526912237-25308-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -21,128 +21,138 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <cdall@kernel.org>, linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now that the host SVE context can be saved on demand from Hyp,
-there is no longer any need to save this state in advance before
-entering the guest.
+The conversion of the FPSIMD context switch trap code to C has added
+some overhead to calling it, due to the need to save registers that
+the procedure call standard defines as caller-saved.
 
-This patch removes the relevant call to
-kvm_fpsimd_flush_cpu_state().
+So, perhaps it is no longer worth invoking this trap handler quite
+so early.
 
-Since the problem that function was intended to solve now no longer
-exists, the function and its dependencies are also deleted.
+Instead, we can invoke it from fixup_guest_exit(), with little
+likelihood of increasing the overhead much further.
+
+As a convenience, this patch gives __hyp_switch_fpsimd() the same
+return semantics fixup_guest_exit().  For now there is no
+possibility of a spurious FPSIMD trap, so the function always
+returns true, but this allows it to be tail-called with a single
+return statement.
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-Acked-by: Christoffer Dall <christoffer.dall@arm.com>
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
 ---
- arch/arm/include/asm/kvm_host.h   |  3 ---
- arch/arm64/include/asm/kvm_host.h | 10 ----------
- arch/arm64/kernel/fpsimd.c        | 21 ---------------------
- virt/kvm/arm/arm.c                |  3 ---
- 4 files changed, 37 deletions(-)
+ arch/arm64/kvm/hyp/entry.S     | 30 ------------------------------
+ arch/arm64/kvm/hyp/hyp-entry.S | 19 -------------------
+ arch/arm64/kvm/hyp/switch.c    | 15 +++++++++++++--
+ 3 files changed, 13 insertions(+), 51 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index e627ef8..fa0d9e1 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -312,9 +312,6 @@ static inline void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu) {}
- 
--/* All host FP/SIMD state is restored on guest exit, so nothing to save: */
--static inline void kvm_fpsimd_flush_cpu_state(void) {}
+diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+index 40f349b..fad1e16 100644
+--- a/arch/arm64/kvm/hyp/entry.S
++++ b/arch/arm64/kvm/hyp/entry.S
+@@ -166,33 +166,3 @@ abort_guest_exit_end:
+ 	orr	x0, x0, x5
+ 1:	ret
+ ENDPROC(__guest_exit)
 -
- static inline void kvm_arm_vhe_guest_enter(void) {}
- static inline void kvm_arm_vhe_guest_exit(void) {}
+-ENTRY(__fpsimd_guest_restore)
+-	// x0: esr
+-	// x1: vcpu
+-	// x2-x29,lr: vcpu regs
+-	// vcpu x0-x1 on the stack
+-	stp	x2, x3, [sp, #-144]!
+-	stp	x4, x5, [sp, #16]
+-	stp	x6, x7, [sp, #32]
+-	stp	x8, x9, [sp, #48]
+-	stp	x10, x11, [sp, #64]
+-	stp	x12, x13, [sp, #80]
+-	stp	x14, x15, [sp, #96]
+-	stp	x16, x17, [sp, #112]
+-	stp	x18, lr, [sp, #128]
+-
+-	bl	__hyp_switch_fpsimd
+-
+-	ldp	x4, x5, [sp, #16]
+-	ldp	x6, x7, [sp, #32]
+-	ldp	x8, x9, [sp, #48]
+-	ldp	x10, x11, [sp, #64]
+-	ldp	x12, x13, [sp, #80]
+-	ldp	x14, x15, [sp, #96]
+-	ldp	x16, x17, [sp, #112]
+-	ldp	x18, lr, [sp, #128]
+-	ldp	x0, x1, [sp, #144]
+-	ldp	x2, x3, [sp], #160
+-	eret
+-ENDPROC(__fpsimd_guest_restore)
+diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+index bffece2..753b9d2 100644
+--- a/arch/arm64/kvm/hyp/hyp-entry.S
++++ b/arch/arm64/kvm/hyp/hyp-entry.S
+@@ -113,25 +113,6 @@ el1_hvc_guest:
  
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 80f3985..556067c 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -445,16 +445,6 @@ static inline int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+ el1_trap:
+ 	get_vcpu_ptr	x1, x0
+-
+-	mrs		x0, esr_el2
+-	lsr		x0, x0, #ESR_ELx_EC_SHIFT
+-	/*
+-	 * x0: ESR_EC
+-	 * x1: vcpu pointer
+-	 */
+-
+-	/*
+-	 * We trap the first access to the FP/SIMD to save the host context
+-	 * and restore the guest context lazily.
+-	 * If FP/SIMD is not implemented, handle the trap and inject an
+-	 * undefined instruction exception to the guest.
+-	 */
+-alternative_if_not ARM64_HAS_NO_FPSIMD
+-	cmp	x0, #ESR_ELx_EC_FP_ASIMD
+-	b.eq	__fpsimd_guest_restore
+-alternative_else_nop_endif
+-
+ 	mov	x0, #ARM_EXCEPTION_TRAP
+ 	b	__guest_exit
+ 
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 4fbee95..2d45bd7 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -328,8 +328,7 @@ static bool __hyp_text __skip_instr(struct kvm_vcpu *vcpu)
+ 	}
  }
- #endif
  
--/*
-- * All host FP/SIMD state is restored on guest exit, so nothing needs
-- * doing here except in the SVE case:
--*/
--static inline void kvm_fpsimd_flush_cpu_state(void)
--{
--	if (system_supports_sve())
--		sve_flush_cpu_state();
--}
--
- static inline void kvm_arm_vhe_guest_enter(void)
+-void __hyp_text __hyp_switch_fpsimd(u64 esr __always_unused,
+-				    struct kvm_vcpu *vcpu)
++static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
  {
- 	local_daif_mask();
-diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index bf7ce9b..b0d29b7 100644
---- a/arch/arm64/kernel/fpsimd.c
-+++ b/arch/arm64/kernel/fpsimd.c
-@@ -120,7 +120,6 @@
-  */
- struct fpsimd_last_state_struct {
- 	struct user_fpsimd_state *st;
--	bool sve_in_use;
- };
+ 	struct user_fpsimd_state *host_fpsimd = vcpu->arch.host_fpsimd_state;
  
- static DEFINE_PER_CPU(struct fpsimd_last_state_struct, fpsimd_last_state);
-@@ -1013,7 +1012,6 @@ void fpsimd_bind_task_to_cpu(void)
- 		this_cpu_ptr(&fpsimd_last_state);
+@@ -369,6 +368,8 @@ void __hyp_text __hyp_switch_fpsimd(u64 esr __always_unused,
+ 			     fpexc32_el2);
  
- 	last->st = &current->thread.uw.fpsimd_state;
--	last->sve_in_use = test_thread_flag(TIF_SVE);
- 	current->thread.fpsimd_cpu = smp_processor_id();
- 
- 	if (system_supports_sve()) {
-@@ -1035,7 +1033,6 @@ void fpsimd_bind_state_to_cpu(struct user_fpsimd_state *st)
- 	WARN_ON(!in_softirq() && !irqs_disabled());
- 
- 	last->st = st;
--	last->sve_in_use = false;
+ 	vcpu->arch.flags |= KVM_ARM64_FP_ENABLED;
++
++	return true;
  }
  
  /*
-@@ -1095,24 +1092,6 @@ void fpsimd_flush_cpu_state(void)
- 	__this_cpu_write(fpsimd_last_state.st, NULL);
- }
+@@ -390,6 +391,16 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	if (*exit_code != ARM_EXCEPTION_TRAP)
+ 		goto exit;
  
--/*
-- * Invalidate any task SVE state currently held in this CPU's regs.
-- *
-- * This is used to prevent the kernel from trying to reuse SVE register data
-- * that is detroyed by KVM guest enter/exit.  This function should go away when
-- * KVM SVE support is implemented.  Don't use it for anything else.
-- */
--#ifdef CONFIG_ARM64_SVE
--void sve_flush_cpu_state(void)
--{
--	struct fpsimd_last_state_struct const *last =
--		this_cpu_ptr(&fpsimd_last_state);
--
--	if (last->st && last->sve_in_use)
--		fpsimd_flush_cpu_state();
--}
--#endif /* CONFIG_ARM64_SVE */
--
- #ifdef CONFIG_KERNEL_MODE_NEON
++	/*
++	 * We trap the first access to the FP/SIMD to save the host context
++	 * and restore the guest context lazily.
++	 * If FP/SIMD is not implemented, handle the trap and inject an
++	 * undefined instruction exception to the guest.
++	 */
++	if (system_supports_fpsimd() &&
++	    kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_FP_ASIMD)
++		return __hyp_switch_fpsimd(vcpu);
++
+ 	if (!__populate_fault_info(vcpu))
+ 		return true;
  
- DEFINE_PER_CPU(bool, kernel_neon_busy);
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 8518df0..16e852e 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -682,9 +682,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		 */
- 		preempt_disable();
- 
--		/* Flush FP/SIMD state that can't survive guest entry/exit */
--		kvm_fpsimd_flush_cpu_state();
--
- 		kvm_pmu_flush_hwstate(vcpu);
- 
- 		local_irq_disable();
 -- 
 2.1.4
