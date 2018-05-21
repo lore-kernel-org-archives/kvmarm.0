@@ -1,140 +1,117 @@
-From: Jia He <hejianet@gmail.com>
-Subject: [PATCH v3] KVM: arm/arm64: add WARN_ON if size is not PAGE_SIZE aligned in unmap_stage2_range
-Date: Mon, 21 May 2018 11:05:30 +0800
-Message-ID: <1526871930-1231-1-git-send-email-hejianet@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc: Suzuki.Poulose@arm.com, linux-kernel@vger.kernel.org, Jia He <hejianet@gmail.com>, jia.he@hxt-semitech.com
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PULL v8] KVM: arm64: Optimise FPSIMD context switching
+Date: Mon, 21 May 2018 11:02:29 +0100
+Message-ID: <20180521100229.GB13470@e103592.cambridge.arm.com>
+References: <20180516104942.GS7753@e103592.cambridge.arm.com>
+ <20180520141441.3d999f16@why.wild-wind.fr.eu.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <20180520141441.3d999f16@why.wild-wind.fr.eu.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Christoffer Dall <cdall@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-There is a panic in armv8a server(QDF2400) under memory pressure tests
-(start 20 guests and run memhog in the host).
+On Sun, May 20, 2018 at 02:14:41PM +0100, Marc Zyngier wrote:
+> On Wed, 16 May 2018 11:49:42 +0100
+> Dave Martin <Dave.Martin@arm.com> wrote:
+> 
+> Hi Dave,
+> 
+> > Hi Marc,
+> > 
+> > This is a trivial update to the previously posted v7 [1].  The only
+> > changes are a couple of minor cosmetic changes requested by reviewers,
+> > on-list and the addition of Acked-by/Reviewed-by tags received since the
+> > series was posted.
+> > 
+> > Let me know if you need anything else on this.
+> 
+> So I've taken this, merged in Linus' top of tree, started a guest on a
+> dual A53 board, and immediately hit the following:
+> 
+> root@sy-borg:~# [  287.226184] Unable to handle kernel NULL pointer dereference at virtual address 00000000
+> [  287.231672] Mem abort info:
+> [  287.234537]   ESR = 0x96000044
+> [  287.237674]   Exception class = DABT (current EL), IL = 32 bits
+> [  287.243765]   SET = 0, FnV = 0
+> [  287.246900]   EA = 0, S1PTW = 0
+> [  287.250126] Data abort info:
+> [  287.253083]   ISV = 0, ISS = 0x00000044
+> [  287.257025]   CM = 0, WnR = 1
+> [  287.260076] user pgtable: 4k pages, 48-bit VAs, pgdp = 00000000b8483f75
+> [  287.266882] [0000000000000000] pgd=0000000000000000
+> [  287.271903] Internal error: Oops: 96000044 [#1] PREEMPT SMP
+> [  287.277636] Modules linked in:
+> [  287.280776] CPU: 1 PID: 3098 Comm: kworker/u4:3 Not tainted 4.17.0-rc5-00166-gd84e81cca249 #136
+> [  287.289730] Hardware name: Globalscale Marvell ESPRESSOBin Board (DT)
+> [  287.296364] pstate: 40000085 (nZcv daIf -PAN -UAO)
+> [  287.301301] pc : fpsimd_save_state+0x0/0x54
+> [  287.305595] lr : fpsimd_save+0x50/0x100
+> [  287.309531] sp : ffff00000dde3af0
+> [  287.312936] x29: ffff00000dde3af0 x28: ffff000008cd565c 
+> [  287.318401] x27: ffff800078ee9c80 x26: ffff80007b207628 
+> [  287.323867] x25: ffff0000093f9000 x24: 0000000000000001 
+> [  287.329333] x23: ffff0000093d4000 x22: ffff80007b207000 
+> [  287.334798] x21: ffff80007efd7d80 x20: ffff80007b207000 
+> [  287.340264] x19: 0000000000000000 x18: 0000000000040f0b 
+> [  287.345729] x17: 0000ffffb70752b8 x16: 0000ffffb708e008 
+> [  287.351195] x15: 0000000000000000 x14: 0000000000000400 
+> [  287.356661] x13: 0000000000000001 x12: 0000000000000001 
+> [  287.362127] x11: 0000000000000001 x10: 0000000000000000 
+> [  287.367592] x9 : 0000000000000253 x8 : ffff80007b207200 
+> [  287.373057] x7 : ffff80007b207100 x6 : ffff80007c378f18 
+> [  287.378523] x5 : 00000042c2094c00 x4 : 0000000000000000 
+> [  287.383990] x3 : 00000042e0033450 x2 : 0000000000000000 
+> [  287.389454] x1 : 0000800075bf6000 x0 : 0000000000000000 
+> [  287.394922] Process kworker/u4:3 (pid: 3098, stack limit = 0x00000000ca0dd8c6)
+> [  287.402358] Call trace:
+> [  287.404873]  fpsimd_save_state+0x0/0x54
+> [  287.408813]  fpsimd_thread_switch+0x28/0xa0
+> [  287.413114]  __switch_to+0x1c/0xd0
+> [  287.416609]  __schedule+0x1b8/0x730
+> [  287.420191]  preempt_schedule_common+0x24/0x48
+> [  287.424760]  preempt_schedule.part.23+0x1c/0x28
+> [  287.429419]  preempt_schedule+0x1c/0x28
+> [  287.433363]  _raw_spin_unlock+0x34/0x48
+> [  287.437308]  flush_old_exec+0x45c/0x6a0
+> [  287.441250]  load_elf_binary+0x324/0x1198
+> [  287.445372]  search_binary_handler+0xac/0x230
+> [  287.449851]  do_execveat_common.isra.14+0x508/0x6e0
+> [  287.454867]  do_execve+0x28/0x30
+> [  287.458185]  call_usermodehelper_exec_async+0xdc/0x140
+> [  287.463468]  ret_from_fork+0x10/0x18
+> [  287.467143] Code: a9425bf5 a8c37bfd d65f03c0 d65f03c0 (ad000400) 
+> [  287.473414] ---[ end trace c4346b99cc877f8e ]---
+> 
+> It happened just after having loaded the guest kernel, so I presume
+> we're missing some kind of initialization. I couldn't subsequently
+> reproduce it  on the same machine, and the same kernel is doing
+> absolutely fine on a Seattle box.
 
----------------------------------begin--------------------------------
-[35380.800950] BUG: Bad page state in process qemu-kvm  pfn:dd0b6
-[35380.805825] page:ffff7fe003742d80 count:-4871 mapcount:-2126053375
-mapping:          (null) index:0x0
-[35380.815024] flags: 0x1fffc00000000000()
-[35380.818845] raw: 1fffc00000000000 0000000000000000 0000000000000000
-ffffecf981470000
-[35380.826569] raw: dead000000000100 dead000000000200 ffff8017c001c000
-0000000000000000
-[35380.805825] page:ffff7fe003742d80 count:-4871 mapcount:-2126053375
-mapping:          (null) index:0x0
-[35380.815024] flags: 0x1fffc00000000000()
-[35380.818845] raw: 1fffc00000000000 0000000000000000 0000000000000000
-ffffecf981470000
-[35380.826569] raw: dead000000000100 dead000000000200 ffff8017c001c000
-0000000000000000
-[35380.834294] page dumped because: nonzero _refcount
-[35380.839069] Modules linked in: vhost_net vhost tap ebtable_filter
-ebtables ip6table_filter ip6_tables iptable_filter fcoe libfcoe libfc
-8021q garp mrp stp llc scsi_transport_fc openvswitch nf_conntrack_ipv6
-nf_nat_ipv6 nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat_ipv4 nf_defrag_ipv6
-nf_nat nf_conntrack vfat fat rpcrdma ib_isert iscsi_target_mod ib_iser
-libiscsi scsi_transport_iscsi ib_srpt target_core_mod ib_srp
-scsi_transport_srp ib_ipoib rdma_ucm ib_ucm ib_uverbs ib_umad rdma_cm
-ib_cm iw_cm mlx5_ib ib_core crc32_ce ipmi_ssif tpm_tis tpm_tis_core sg
-nfsd auth_rpcgss nfs_acl lockd grace sunrpc dm_multipath ip_tables xfs
-libcrc32c mlx5_core mlxfw devlink ahci_platform libahci_platform libahci
-qcom_emac sdhci_acpi sdhci hdma mmc_core hdma_mgmt i2c_qup dm_mirror
-dm_region_hash dm_log dm_mod
-[35380.908341] CPU: 29 PID: 18323 Comm: qemu-kvm Tainted: G W
-4.14.15-5.hxt.aarch64 #1
-[35380.917107] Hardware name: <snip for confidential issues>
-[35380.930909] Call trace:
-[35380.933345] [<ffff000008088f00>] dump_backtrace+0x0/0x22c
-[35380.938723] [<ffff000008089150>] show_stack+0x24/0x2c
-[35380.943759] [<ffff00000893c078>] dump_stack+0x8c/0xb0
-[35380.948794] [<ffff00000820ab50>] bad_page+0xf4/0x154
-[35380.953740] [<ffff000008211ce8>] free_pages_check_bad+0x90/0x9c
-[35380.959642] [<ffff00000820c430>] free_pcppages_bulk+0x464/0x518
-[35380.965545] [<ffff00000820db98>] free_hot_cold_page+0x22c/0x300
-[35380.971448] [<ffff0000082176fc>] __put_page+0x54/0x60
-[35380.976484] [<ffff0000080b1164>] unmap_stage2_range+0x170/0x2b4
-[35380.982385] [<ffff0000080b12d8>] kvm_unmap_hva_handler+0x30/0x40
-[35380.988375] [<ffff0000080b0104>] handle_hva_to_gpa+0xb0/0xec
-[35380.994016] [<ffff0000080b2644>] kvm_unmap_hva_range+0x5c/0xd0
-[35380.999833] [<ffff0000080a8054>]
-kvm_mmu_notifier_invalidate_range_start+0x60/0xb0
-[35381.007387] [<ffff000008271f44>]
-__mmu_notifier_invalidate_range_start+0x64/0x8c
-[35381.014765] [<ffff0000082547c8>] try_to_unmap_one+0x78c/0x7a4
-[35381.020493] [<ffff000008276d04>] rmap_walk_ksm+0x124/0x1a0
-[35381.025961] [<ffff0000082551b4>] rmap_walk+0x94/0x98
-[35381.030909] [<ffff0000082555e4>] try_to_unmap+0x100/0x124
-[35381.036293] [<ffff00000828243c>] unmap_and_move+0x480/0x6fc
-[35381.041847] [<ffff000008282b6c>] migrate_pages+0x10c/0x288
-[35381.047318] [<ffff00000823c164>] compact_zone+0x238/0x954
-[35381.052697] [<ffff00000823c944>] compact_zone_order+0xc4/0xe8
-[35381.058427] [<ffff00000823d25c>] try_to_compact_pages+0x160/0x294
-[35381.064503] [<ffff00000820f074>]
-__alloc_pages_direct_compact+0x68/0x194
-[35381.071187] [<ffff000008210138>] __alloc_pages_nodemask+0xc20/0xf7c
-[35381.077437] [<ffff0000082709e4>] alloc_pages_vma+0x1a4/0x1c0
-[35381.083080] [<ffff000008285b68>]
-do_huge_pmd_anonymous_page+0x128/0x324
-[35381.089677] [<ffff000008248a24>] __handle_mm_fault+0x71c/0x7e8
-[35381.095492] [<ffff000008248be8>] handle_mm_fault+0xf8/0x194
-[35381.101049] [<ffff000008240dcc>] __get_user_pages+0x124/0x34c
-[35381.106777] [<ffff000008241870>] populate_vma_page_range+0x90/0x9c
-[35381.112941] [<ffff000008241940>] __mm_populate+0xc4/0x15c
-[35381.118322] [<ffff00000824b294>] SyS_mlockall+0x100/0x164
-[35381.123705] Exception stack(0xffff800dce5f3ec0 to 0xffff800dce5f4000)
-[35381.130128] 3ec0: 0000000000000003 d6e6024cc9b87e00 0000aaaabe94f000
-0000000000000000
-[35381.137940] 3ee0: 0000000000000002 0000000000000000 0000000000000000
-0000aaaacf6fc3c0
-[35381.145753] 3f00: 00000000000000e6 0000aaaacf6fc490 0000ffffeeeab0f0
-d6e6024cc9b87e00
-[35381.153565] 3f20: 0000000000000000 0000aaaabe81b3c0 0000000000000020
-00009e53eff806b5
-[35381.161379] 3f40: 0000aaaabe94de48 0000ffffa7c269b0 0000000000000011
-0000ffffeeeabf68
-[35381.169190] 3f60: 0000aaaaceacfe60 0000aaaabe94f000 0000aaaabe9ba358
-0000aaaabe7ffb80
-[35381.177003] 3f80: 0000aaaabe9ba000 0000aaaabe959f64 0000000000000000
-0000aaaabe94f000
-[35381.184815] 3fa0: 0000000000000000 0000ffffeeeabdb0 0000aaaabe5f3bf8
-0000ffffeeeabdb0
-[35381.192628] 3fc0: 0000ffffa7c269b8 0000000060000000 0000000000000003
-00000000000000e6
-[35381.200440] 3fe0: 0000000000000000 0000000000000000 0000000000000000
-0000000000000000
-[35381.208254] [<ffff00000808339c>] __sys_trace_return+0x0/0x4
-[35381.213809] Disabling lock debugging due to kernel taint
---------------------------------end--------------------------------------
+Curious, this is a kernel thread, which shouldn't have any fpsimd state
+of its own.  It would be interesting to know what ran before, but tricky
+to find that out now unless we can find a way to repoduce...
 
-The root cause might be what I fixed at [1]. But from arm kvm points of
-view, it would be better we caught the exception earlier and clearer.
+Maybe a thread flag has ended up in the wrong state.
 
-If the size is not PAGE_SIZE aligned, unmap_stage2_range might unmap the
-wrong(more or less) page range. Hence it caused the "BUG: Bad page
-state"
+> I can't immediately see how st would be NULL, unless we somehow are
+> missing some state tracking somewhere...
 
-[1] https://lkml.org/lkml/2018/5/3/1042
+This might be a race, or a missing piece of logic somewhere... I'll
+take a look.
 
-Signed-off-by: jia.he@hxt-semitech.com
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
----
-v3: resend after dropping patch 2/2 of the series
 
- virt/kvm/arm/mmu.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 7f6a944..8dac311 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -297,6 +297,8 @@ static void unmap_stage2_range(struct kvm *kvm, phys_addr_t start, u64 size)
- 	phys_addr_t next;
- 
- 	assert_spin_locked(&kvm->mmu_lock);
-+	WARN_ON(size & ~PAGE_MASK);
-+
- 	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
- 	do {
- 		/*
--- 
-1.8.3.1
+Cheers
+---Dave
