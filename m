@@ -1,63 +1,115 @@
 From: Russell King <rmk+kernel@armlinux.org.uk>
-Subject: [PATCH 01/14] ARM: add CPU part numbers for Cortex A73, A75 and
- Brahma B15
-Date: Mon, 21 May 2018 12:44:24 +0100
-Message-ID: <E1fKjEm-00063K-Ua@rmk-PC.armlinux.org.uk>
+Subject: [PATCH 03/14] ARM: bugs: hook processor bug checking into SMP and
+ suspend paths
+Date: Mon, 21 May 2018 12:44:35 +0100
+Message-ID: <E1fKjEx-00063Y-N5@rmk-PC.armlinux.org.uk>
 References: <20180521114238.GN17671@n2100.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E210E4A0D8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 May 2018 07:34:19 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vXsfZh3EF9T3 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 21 May 2018 07:33:58 -0400 (EDT)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 35FF340192
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 May 2018 07:33:58 -0400 (EDT)
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <20180521114238.GN17671@n2100.armlinux.org.uk>
 Content-Disposition: inline
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add CPU part numbers for the above mentioned CPUs
+Check for CPU bugs when secondary processors are being brought online,
+and also when CPUs are resuming from a low power mode.  This gives an
+opportunity to check that processor specific bug workarounds are
+correctly enabled for all paths that a CPU re-enters the kernel.
 
 Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
-Acked-by: Florian Fainelli <f.fainelli@gmail.com>
+Reviewed-by: Florian Fainelli <f.fainelli@gmail.com>
 ---
- arch/arm/include/asm/cputype.h | 5 +++++
- 1 file changed, 5 insertions(+)
+ arch/arm/include/asm/bugs.h | 2 ++
+ arch/arm/kernel/bugs.c      | 5 +++++
+ arch/arm/kernel/smp.c       | 4 ++++
+ arch/arm/kernel/suspend.c   | 2 ++
+ 4 files changed, 13 insertions(+)
 
-diff --git a/arch/arm/include/asm/cputype.h b/arch/arm/include/asm/cputype.h
-index cb546425da8a..adc4a3eef815 100644
---- a/arch/arm/include/asm/cputype.h
-+++ b/arch/arm/include/asm/cputype.h
-@@ -77,8 +77,13 @@
- #define ARM_CPU_PART_CORTEX_A12		0x4100c0d0
- #define ARM_CPU_PART_CORTEX_A17		0x4100c0e0
- #define ARM_CPU_PART_CORTEX_A15		0x4100c0f0
-+#define ARM_CPU_PART_CORTEX_A73		0x4100d090
-+#define ARM_CPU_PART_CORTEX_A75		0x4100d0a0
- #define ARM_CPU_PART_MASK		0xff00fff0
+diff --git a/arch/arm/include/asm/bugs.h b/arch/arm/include/asm/bugs.h
+index ed122d294f3f..73a99c72a930 100644
+--- a/arch/arm/include/asm/bugs.h
++++ b/arch/arm/include/asm/bugs.h
+@@ -14,8 +14,10 @@ extern void check_writebuffer_bugs(void);
  
-+/* Broadcom cores */
-+#define ARM_CPU_PART_BRAHMA_B15		0x420000f0
+ #ifdef CONFIG_MMU
+ extern void check_bugs(void);
++extern void check_other_bugs(void);
+ #else
+ #define check_bugs() do { } while (0)
++#define check_other_bugs() do { } while (0)
+ #endif
+ 
+ #endif
+diff --git a/arch/arm/kernel/bugs.c b/arch/arm/kernel/bugs.c
+index 88024028bb70..16e7ba2a9cc4 100644
+--- a/arch/arm/kernel/bugs.c
++++ b/arch/arm/kernel/bugs.c
+@@ -3,7 +3,12 @@
+ #include <asm/bugs.h>
+ #include <asm/proc-fns.h>
+ 
++void check_other_bugs(void)
++{
++}
 +
- /* DEC implemented cores */
- #define ARM_CPU_PART_SA1100		0x4400a110
+ void __init check_bugs(void)
+ {
+ 	check_writebuffer_bugs();
++	check_other_bugs();
+ }
+diff --git a/arch/arm/kernel/smp.c b/arch/arm/kernel/smp.c
+index 2da087926ebe..5ad0b67b9e33 100644
+--- a/arch/arm/kernel/smp.c
++++ b/arch/arm/kernel/smp.c
+@@ -31,6 +31,7 @@
+ #include <linux/irq_work.h>
  
+ #include <linux/atomic.h>
++#include <asm/bugs.h>
+ #include <asm/smp.h>
+ #include <asm/cacheflush.h>
+ #include <asm/cpu.h>
+@@ -405,6 +406,9 @@ asmlinkage void secondary_start_kernel(void)
+ 	 * before we continue - which happens after __cpu_up returns.
+ 	 */
+ 	set_cpu_online(cpu, true);
++
++	check_other_bugs();
++
+ 	complete(&cpu_running);
+ 
+ 	local_irq_enable();
+diff --git a/arch/arm/kernel/suspend.c b/arch/arm/kernel/suspend.c
+index a40ebb7c0896..d08099269e35 100644
+--- a/arch/arm/kernel/suspend.c
++++ b/arch/arm/kernel/suspend.c
+@@ -3,6 +3,7 @@
+ #include <linux/slab.h>
+ #include <linux/mm_types.h>
+ 
++#include <asm/bugs.h>
+ #include <asm/cacheflush.h>
+ #include <asm/idmap.h>
+ #include <asm/pgalloc.h>
+@@ -36,6 +37,7 @@ int cpu_suspend(unsigned long arg, int (*fn)(unsigned long))
+ 		cpu_switch_mm(mm->pgd, mm);
+ 		local_flush_bp_all();
+ 		local_flush_tlb_all();
++		check_other_bugs();
+ 	}
+ 
+ 	return ret;
 -- 
 2.7.4
