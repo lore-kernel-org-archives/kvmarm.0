@@ -1,115 +1,103 @@
 From: Russell King <rmk+kernel@armlinux.org.uk>
-Subject: [PATCH 03/14] ARM: bugs: hook processor bug checking into SMP and
- suspend paths
-Date: Mon, 21 May 2018 12:44:35 +0100
-Message-ID: <E1fKjEx-00063Y-N5@rmk-PC.armlinux.org.uk>
+Subject: [PATCH 04/14] ARM: bugs: add support for per-processor bug checking
+Date: Mon, 21 May 2018 12:44:41 +0100
+Message-ID: <E1fKjF3-00063g-2e@rmk-PC.armlinux.org.uk>
 References: <20180521114238.GN17671@n2100.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FBE74A0F0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 May 2018 07:34:39 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id nzYA0CDWXkHb for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 21 May 2018 07:34:17 -0400 (EDT)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6B1124A0CB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 May 2018 07:34:17 -0400 (EDT)
 In-Reply-To: <20180521114238.GN17671@n2100.armlinux.org.uk>
 Content-Disposition: inline
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Check for CPU bugs when secondary processors are being brought online,
-and also when CPUs are resuming from a low power mode.  This gives an
-opportunity to check that processor specific bug workarounds are
-correctly enabled for all paths that a CPU re-enters the kernel.
+Add support for per-processor bug checking - each processor function
+descriptor gains a function pointer for this check, which must not be
+an __init function.  If non-NULL, this will be called whenever a CPU
+enters the kernel via which ever path (boot CPU, secondary CPU startup,
+CPU resuming, etc.)
+
+This allows processor specific bug checks to validate that workaround
+bits are properly enabled by firmware via all entry paths to the kernel.
 
 Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
 Reviewed-by: Florian Fainelli <f.fainelli@gmail.com>
 ---
- arch/arm/include/asm/bugs.h | 2 ++
- arch/arm/kernel/bugs.c      | 5 +++++
- arch/arm/kernel/smp.c       | 4 ++++
- arch/arm/kernel/suspend.c   | 2 ++
- 4 files changed, 13 insertions(+)
+ arch/arm/include/asm/proc-fns.h | 4 ++++
+ arch/arm/kernel/bugs.c          | 4 ++++
+ arch/arm/mm/proc-macros.S       | 3 ++-
+ 3 files changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm/include/asm/bugs.h b/arch/arm/include/asm/bugs.h
-index ed122d294f3f..73a99c72a930 100644
---- a/arch/arm/include/asm/bugs.h
-+++ b/arch/arm/include/asm/bugs.h
-@@ -14,8 +14,10 @@ extern void check_writebuffer_bugs(void);
- 
- #ifdef CONFIG_MMU
- extern void check_bugs(void);
-+extern void check_other_bugs(void);
- #else
- #define check_bugs() do { } while (0)
-+#define check_other_bugs() do { } while (0)
- #endif
- 
- #endif
+diff --git a/arch/arm/include/asm/proc-fns.h b/arch/arm/include/asm/proc-fns.h
+index f2e1af45bd6f..e25f4392e1b2 100644
+--- a/arch/arm/include/asm/proc-fns.h
++++ b/arch/arm/include/asm/proc-fns.h
+@@ -37,6 +37,10 @@ extern struct processor {
+ 	 */
+ 	void (*_proc_init)(void);
+ 	/*
++	 * Check for processor bugs
++	 */
++	void (*check_bugs)(void);
++	/*
+ 	 * Disable any processor specifics
+ 	 */
+ 	void (*_proc_fin)(void);
 diff --git a/arch/arm/kernel/bugs.c b/arch/arm/kernel/bugs.c
-index 88024028bb70..16e7ba2a9cc4 100644
+index 16e7ba2a9cc4..7be511310191 100644
 --- a/arch/arm/kernel/bugs.c
 +++ b/arch/arm/kernel/bugs.c
-@@ -3,7 +3,12 @@
- #include <asm/bugs.h>
- #include <asm/proc-fns.h>
+@@ -5,6 +5,10 @@
  
-+void check_other_bugs(void)
-+{
-+}
-+
- void __init check_bugs(void)
+ void check_other_bugs(void)
  {
- 	check_writebuffer_bugs();
-+	check_other_bugs();
++#ifdef MULTI_CPU
++	if (processor.check_bugs)
++		processor.check_bugs();
++#endif
  }
-diff --git a/arch/arm/kernel/smp.c b/arch/arm/kernel/smp.c
-index 2da087926ebe..5ad0b67b9e33 100644
---- a/arch/arm/kernel/smp.c
-+++ b/arch/arm/kernel/smp.c
-@@ -31,6 +31,7 @@
- #include <linux/irq_work.h>
  
- #include <linux/atomic.h>
-+#include <asm/bugs.h>
- #include <asm/smp.h>
- #include <asm/cacheflush.h>
- #include <asm/cpu.h>
-@@ -405,6 +406,9 @@ asmlinkage void secondary_start_kernel(void)
- 	 * before we continue - which happens after __cpu_up returns.
- 	 */
- 	set_cpu_online(cpu, true);
-+
-+	check_other_bugs();
-+
- 	complete(&cpu_running);
+ void __init check_bugs(void)
+diff --git a/arch/arm/mm/proc-macros.S b/arch/arm/mm/proc-macros.S
+index f10e31d0730a..81d0efb055c6 100644
+--- a/arch/arm/mm/proc-macros.S
++++ b/arch/arm/mm/proc-macros.S
+@@ -273,13 +273,14 @@
+ 	mcr	p15, 0, ip, c7, c10, 4		@ data write barrier
+ 	.endm
  
- 	local_irq_enable();
-diff --git a/arch/arm/kernel/suspend.c b/arch/arm/kernel/suspend.c
-index a40ebb7c0896..d08099269e35 100644
---- a/arch/arm/kernel/suspend.c
-+++ b/arch/arm/kernel/suspend.c
-@@ -3,6 +3,7 @@
- #include <linux/slab.h>
- #include <linux/mm_types.h>
- 
-+#include <asm/bugs.h>
- #include <asm/cacheflush.h>
- #include <asm/idmap.h>
- #include <asm/pgalloc.h>
-@@ -36,6 +37,7 @@ int cpu_suspend(unsigned long arg, int (*fn)(unsigned long))
- 		cpu_switch_mm(mm->pgd, mm);
- 		local_flush_bp_all();
- 		local_flush_tlb_all();
-+		check_other_bugs();
- 	}
- 
- 	return ret;
+-.macro define_processor_functions name:req, dabort:req, pabort:req, nommu=0, suspend=0
++.macro define_processor_functions name:req, dabort:req, pabort:req, nommu=0, suspend=0, bugs=0
+ 	.type	\name\()_processor_functions, #object
+ 	.align 2
+ ENTRY(\name\()_processor_functions)
+ 	.word	\dabort
+ 	.word	\pabort
+ 	.word	cpu_\name\()_proc_init
++	.word	\bugs
+ 	.word	cpu_\name\()_proc_fin
+ 	.word	cpu_\name\()_reset
+ 	.word	cpu_\name\()_do_idle
 -- 
 2.7.4
