@@ -1,14 +1,15 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 09/14] arm64: ssbd: Introduce thread flag to control userspace
- mitigation
-Date: Tue, 22 May 2018 16:06:43 +0100
-Message-ID: <20180522150648.28297-10-marc.zyngier@arm.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Subject: Re: [PATCH 05/14] arm64: Add 'ssbd' command-line option
+Date: Tue, 22 May 2018 08:29:24 -0700
+Message-ID: <77a402ab-d119-cc71-518c-a6d4755b7889@infradead.org>
 References: <20180522150648.28297-1-marc.zyngier@arm.com>
+ <20180522150648.28297-6-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180522150648.28297-1-marc.zyngier@arm.com>
+In-Reply-To: <20180522150648.28297-6-marc.zyngier@arm.com>
+Content-Language: en-US
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -18,49 +19,62 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc: Kees Cook <keescook@chromium.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Andy Lutomirski <luto@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In order to allow userspace to be mitigated on demand, let's
-introduce a new thread flag that prevents the mitigation from
-being turned off when exiting to userspace, and doesn't turn
-it on on entry into the kernel (with the assumtion that the
-mitigation is always enabled in the kernel itself).
+On 05/22/2018 08:06 AM, Marc Zyngier wrote:
+> On a system where the firmware implements ARCH_WORKAROUND_2,
+> it may be useful to either permanently enable or disable the
+> workaround for cases where the user decides that they'd rather
+> not get a trap overhead, and keep the mitigation permanently
+> on or off instead of switching it on exception entry/exit.
+> 
+> In any case, default to the mitigation being enabled.
+> 
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  Documentation/admin-guide/kernel-parameters.txt |  17 ++++
+>  arch/arm64/include/asm/cpufeature.h             |   6 ++
+>  arch/arm64/kernel/cpu_errata.c                  | 102 ++++++++++++++++++++----
+>  3 files changed, 109 insertions(+), 16 deletions(-)
+> 
+> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> index f2040d46f095..646e112c6f63 100644
+> --- a/Documentation/admin-guide/kernel-parameters.txt
+> +++ b/Documentation/admin-guide/kernel-parameters.txt
+> @@ -4092,6 +4092,23 @@
+>  			expediting.  Set to zero to disable automatic
+>  			expediting.
+>  
+> +	ssbd=		[ARM64,HW]
+> +			Speculative Store Bypass Disable control
+> +
+> +			On CPUs that are vulnerable to the Speculative
+> +			Store Bypass vulnerability and offer a
+> +			firmware based mitigation, this parameter
+> +			indicates how the mitigation should be used:
+> +
+> +			force-on:  Unconditionnaly enable mitigation for
 
-This will be used by a prctl interface introduced in a later
-patch.
+			           Unconditionally
 
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm64/include/asm/thread_info.h | 1 +
- arch/arm64/kernel/entry.S            | 2 ++
- 2 files changed, 3 insertions(+)
+> +				   for both kernel and userspace
+> +			force-off: Unconditionnaly disable mitigation for
 
-diff --git a/arch/arm64/include/asm/thread_info.h b/arch/arm64/include/asm/thread_info.h
-index 740aa03c5f0d..cbcf11b5e637 100644
---- a/arch/arm64/include/asm/thread_info.h
-+++ b/arch/arm64/include/asm/thread_info.h
-@@ -94,6 +94,7 @@ void arch_release_task_struct(struct task_struct *tsk);
- #define TIF_32BIT		22	/* 32bit process */
- #define TIF_SVE			23	/* Scalable Vector Extension in use */
- #define TIF_SVE_VL_INHERIT	24	/* Inherit sve_vl_onexec across exec */
-+#define TIF_SSBD		25	/* Wants SSB mitigation */
- 
- #define _TIF_SIGPENDING		(1 << TIF_SIGPENDING)
- #define _TIF_NEED_RESCHED	(1 << TIF_NEED_RESCHED)
-diff --git a/arch/arm64/kernel/entry.S b/arch/arm64/kernel/entry.S
-index e6f6e2339b22..28ad8799406f 100644
---- a/arch/arm64/kernel/entry.S
-+++ b/arch/arm64/kernel/entry.S
-@@ -147,6 +147,8 @@ alternative_cb	arm64_enable_wa2_handling
- alternative_cb_end
- 	ldr_this_cpu	\tmp2, arm64_ssbd_callback_required, \tmp1
- 	cbz	\tmp2, \targ
-+	ldr	\tmp2, [tsk, #TSK_TI_FLAGS]
-+	tbnz	\tmp2, #TIF_SSBD, \targ
- 	mov	w0, #ARM_SMCCC_ARCH_WORKAROUND_2
- 	mov	w1, #\state
- alternative_cb	arm64_update_smccc_conduit
+			           Unconditionally
+
+> +				   for both kernel and userspace
+> +			kernel:    Always enable mitigation in the
+> +				   kernel, and offer a prctl interface
+> +				   to allow userspace to register its
+> +				   interest in being mitigated too.
+> +
+>  	stack_guard_gap=	[MM]
+>  			override the default stack gap protection. The value
+>  			is in page units and it defines how many pages prior
+
+
+
 -- 
-2.14.2
+~Randy
