@@ -1,7 +1,8 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v10 02/18] thread_info: Add update_thread_flag() helpers
-Date: Tue, 22 May 2018 17:05:03 +0100
-Message-ID: <1527005119-6842-3-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v10 05/18] KVM: arm64: Convert lazy FPSIMD context switch trap
+ to C
+Date: Tue, 22 May 2018 17:05:06 +0100
+Message-ID: <1527005119-6842-6-git-send-email-Dave.Martin@arm.com>
 References: <1527005119-6842-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -18,82 +19,123 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: kvmarm@lists.cs.columbia.edu
-Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Oleg Nesterov <oleg@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, linux-arm-kernel@lists.infradead.org
+Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-There are a number of bits of code sprinkled around the kernel to
-set a thread flag if a certain condition is true, and clear it
-otherwise.
+To make the lazy FPSIMD context switch trap code easier to hack on,
+this patch converts it to C.
 
-To help make those call sites terser and less cumbersome, this
-patch adds a new family of thread flag manipulators
-
-	update*_thread_flag([...,] flag, cond)
-
-which do the equivalent of:
-
-	if (cond)
-		set*_thread_flag([...,] flag);
-	else
-		clear*_thread_flag([...,] flag);
+This is not amazingly efficient, but the trap should typically only
+be taken once per host context switch.
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Cc: Oleg Nesterov <oleg@redhat.com>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- include/linux/sched.h       |  6 ++++++
- include/linux/thread_info.h | 11 +++++++++++
- 2 files changed, 17 insertions(+)
+ arch/arm64/kvm/hyp/entry.S  | 57 +++++++++++++++++----------------------------
+ arch/arm64/kvm/hyp/switch.c | 24 +++++++++++++++++++
+ 2 files changed, 46 insertions(+), 35 deletions(-)
 
-diff --git a/include/linux/sched.h b/include/linux/sched.h
-index b3d697f..c2c3051 100644
---- a/include/linux/sched.h
-+++ b/include/linux/sched.h
-@@ -1578,6 +1578,12 @@ static inline void clear_tsk_thread_flag(struct task_struct *tsk, int flag)
- 	clear_ti_thread_flag(task_thread_info(tsk), flag);
- }
- 
-+static inline void update_tsk_thread_flag(struct task_struct *tsk, int flag,
-+					  bool value)
-+{
-+	update_ti_thread_flag(task_thread_info(tsk), flag, value);
-+}
+diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+index e41a161..40f349b 100644
+--- a/arch/arm64/kvm/hyp/entry.S
++++ b/arch/arm64/kvm/hyp/entry.S
+@@ -172,40 +172,27 @@ ENTRY(__fpsimd_guest_restore)
+ 	// x1: vcpu
+ 	// x2-x29,lr: vcpu regs
+ 	// vcpu x0-x1 on the stack
+-	stp	x2, x3, [sp, #-16]!
+-	stp	x4, lr, [sp, #-16]!
+-
+-alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
+-	mrs	x2, cptr_el2
+-	bic	x2, x2, #CPTR_EL2_TFP
+-	msr	cptr_el2, x2
+-alternative_else
+-	mrs	x2, cpacr_el1
+-	orr	x2, x2, #CPACR_EL1_FPEN
+-	msr	cpacr_el1, x2
+-alternative_endif
+-	isb
+-
+-	mov	x3, x1
+-
+-	ldr	x0, [x3, #VCPU_HOST_CONTEXT]
+-	kern_hyp_va x0
+-	add	x0, x0, #CPU_GP_REG_OFFSET(CPU_FP_REGS)
+-	bl	__fpsimd_save_state
+-
+-	add	x2, x3, #VCPU_CONTEXT
+-	add	x0, x2, #CPU_GP_REG_OFFSET(CPU_FP_REGS)
+-	bl	__fpsimd_restore_state
+-
+-	// Skip restoring fpexc32 for AArch64 guests
+-	mrs	x1, hcr_el2
+-	tbnz	x1, #HCR_RW_SHIFT, 1f
+-	ldr	x4, [x3, #VCPU_FPEXC32_EL2]
+-	msr	fpexc32_el2, x4
+-1:
+-	ldp	x4, lr, [sp], #16
+-	ldp	x2, x3, [sp], #16
+-	ldp	x0, x1, [sp], #16
+-
++	stp	x2, x3, [sp, #-144]!
++	stp	x4, x5, [sp, #16]
++	stp	x6, x7, [sp, #32]
++	stp	x8, x9, [sp, #48]
++	stp	x10, x11, [sp, #64]
++	stp	x12, x13, [sp, #80]
++	stp	x14, x15, [sp, #96]
++	stp	x16, x17, [sp, #112]
++	stp	x18, lr, [sp, #128]
 +
- static inline int test_and_set_tsk_thread_flag(struct task_struct *tsk, int flag)
- {
- 	return test_and_set_ti_thread_flag(task_thread_info(tsk), flag);
-diff --git a/include/linux/thread_info.h b/include/linux/thread_info.h
-index cf2862b..8d8821b 100644
---- a/include/linux/thread_info.h
-+++ b/include/linux/thread_info.h
-@@ -60,6 +60,15 @@ static inline void clear_ti_thread_flag(struct thread_info *ti, int flag)
- 	clear_bit(flag, (unsigned long *)&ti->flags);
++	bl	__hyp_switch_fpsimd
++
++	ldp	x4, x5, [sp, #16]
++	ldp	x6, x7, [sp, #32]
++	ldp	x8, x9, [sp, #48]
++	ldp	x10, x11, [sp, #64]
++	ldp	x12, x13, [sp, #80]
++	ldp	x14, x15, [sp, #96]
++	ldp	x16, x17, [sp, #112]
++	ldp	x18, lr, [sp, #128]
++	ldp	x0, x1, [sp, #144]
++	ldp	x2, x3, [sp], #160
+ 	eret
+ ENDPROC(__fpsimd_guest_restore)
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index d964523..c0796c4 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -318,6 +318,30 @@ static bool __hyp_text __skip_instr(struct kvm_vcpu *vcpu)
+ 	}
  }
  
-+static inline void update_ti_thread_flag(struct thread_info *ti, int flag,
-+					 bool value)
++void __hyp_text __hyp_switch_fpsimd(u64 esr __always_unused,
++				    struct kvm_vcpu *vcpu)
 +{
-+	if (value)
-+		set_ti_thread_flag(ti, flag);
++	kvm_cpu_context_t *host_ctxt;
++
++	if (has_vhe())
++		write_sysreg(read_sysreg(cpacr_el1) | CPACR_EL1_FPEN,
++			     cpacr_el1);
 +	else
-+		clear_ti_thread_flag(ti, flag);
++		write_sysreg(read_sysreg(cptr_el2) & ~(u64)CPTR_EL2_TFP,
++			     cptr_el2);
++
++	isb();
++
++	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
++	__fpsimd_save_state(&host_ctxt->gp_regs.fp_regs);
++	__fpsimd_restore_state(&vcpu->arch.ctxt.gp_regs.fp_regs);
++
++	/* Skip restoring fpexc32 for AArch64 guests */
++	if (!(read_sysreg(hcr_el2) & HCR_RW))
++		write_sysreg(vcpu->arch.ctxt.sys_regs[FPEXC32_EL2],
++			     fpexc32_el2);
 +}
 +
- static inline int test_and_set_ti_thread_flag(struct thread_info *ti, int flag)
- {
- 	return test_and_set_bit(flag, (unsigned long *)&ti->flags);
-@@ -79,6 +88,8 @@ static inline int test_ti_thread_flag(struct thread_info *ti, int flag)
- 	set_ti_thread_flag(current_thread_info(), flag)
- #define clear_thread_flag(flag) \
- 	clear_ti_thread_flag(current_thread_info(), flag)
-+#define update_thread_flag(flag, value) \
-+	update_ti_thread_flag(current_thread_info(), flag, value)
- #define test_and_set_thread_flag(flag) \
- 	test_and_set_ti_thread_flag(current_thread_info(), flag)
- #define test_and_clear_thread_flag(flag) \
+ /*
+  * Return true when we were able to fixup the guest exit and should return to
+  * the guest, false when we should restore the host state and return to the
 -- 
 2.1.4
