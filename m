@@ -1,189 +1,75 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v8 12/13] KVM: arm/arm64: Implement KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
-Date: Tue, 22 May 2018 09:55:17 +0200
-Message-ID: <1526975718-18567-13-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v8 05/13] KVM: arm/arm64: Revisit Redistributor TYPER last bit
+ computation
+Date: Tue, 22 May 2018 09:55:10 +0200
+Message-ID: <1526975718-18567-6-git-send-email-eric.auger@redhat.com>
 References: <1526975718-18567-1-git-send-email-eric.auger@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CB9A4A11D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 May 2018 03:45:41 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id sKd7i37RP7Nk for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 May 2018 03:45:18 -0400 (EDT)
+Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 46D8D4A106
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 May 2018 03:45:06 -0400 (EDT)
 In-Reply-To: <1526975718-18567-1-git-send-email-eric.auger@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org
-Cc: andre.przywara@arm.com, drjones@redhat.com, wei@redhat.com
+Cc: andre.przywara@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now all the internals are ready to handle multiple redistributor
-regions, let's allow the userspace to register them.
+The TYPER of an redistributor reflects whether the rdist is
+the last one of the redistributor region. Let's compare the TYPER
+GPA against the address of the last occupied slot within the
+redistributor region.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
 
 ---
-v5 -> v6:
-- added Christoffer's R-b
-
-v4 -> v5:
-- s/uint<n>_t/u<n>
-- fix KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION read
-- fix read path
-- return -ENOENT instead of -ENODEV when reading the
-  attributes of a region that does not exist
 
 v3 -> v4:
-- vgic_v3_rdist_region_from_index is introduced in this patch
-
-v2 -> v3:
-- early exit if vgic_v3_rdist_region_from_index() fails
+- added Christoffer's R-b
 ---
- virt/kvm/arm/vgic/vgic-kvm-device.c | 40 ++++++++++++++++++++++++++++++++++++-
- virt/kvm/arm/vgic/vgic-mmio-v3.c    |  4 ++--
- virt/kvm/arm/vgic/vgic-v3.c         | 14 +++++++++++++
- virt/kvm/arm/vgic/vgic.h            | 13 +++++++++++-
- 4 files changed, 67 insertions(+), 4 deletions(-)
+ virt/kvm/arm/vgic/vgic-mmio-v3.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
-index 76ab369..6ada243 100644
---- a/virt/kvm/arm/vgic/vgic-kvm-device.c
-+++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
-@@ -92,7 +92,7 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
- 		if (r)
- 			break;
- 		if (write) {
--			r = vgic_v3_set_redist_base(kvm, *addr);
-+			r = vgic_v3_set_redist_base(kvm, 0, *addr, 0);
- 			goto out;
- 		}
- 		rdreg = list_first_entry(&vgic->rd_regions,
-@@ -103,6 +103,43 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
- 			addr_ptr = &rdreg->base;
- 		break;
- 	}
-+	case KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION:
-+	{
-+		struct vgic_redist_region *rdreg;
-+		u8 index;
-+
-+		r = vgic_check_type(kvm, KVM_DEV_TYPE_ARM_VGIC_V3);
-+		if (r)
-+			break;
-+
-+		index = *addr & KVM_VGIC_V3_RDIST_INDEX_MASK;
-+
-+		if (write) {
-+			gpa_t base = *addr & KVM_VGIC_V3_RDIST_BASE_MASK;
-+			u32 count = (*addr & KVM_VGIC_V3_RDIST_COUNT_MASK)
-+					>> KVM_VGIC_V3_RDIST_COUNT_SHIFT;
-+			u8 flags = (*addr & KVM_VGIC_V3_RDIST_FLAGS_MASK)
-+					>> KVM_VGIC_V3_RDIST_FLAGS_SHIFT;
-+
-+			if (!count || flags)
-+				r = -EINVAL;
-+			else
-+				r = vgic_v3_set_redist_base(kvm, index,
-+							    base, count);
-+			goto out;
-+		}
-+
-+		rdreg = vgic_v3_rdist_region_from_index(kvm, index);
-+		if (!rdreg) {
-+			r = -ENOENT;
-+			goto out;
-+		}
-+
-+		*addr = index;
-+		*addr |= rdreg->base;
-+		*addr |= (u64)rdreg->count << KVM_VGIC_V3_RDIST_COUNT_SHIFT;
-+		goto out;
-+	}
- 	default:
- 		r = -ENODEV;
- 	}
-@@ -674,6 +711,7 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
- 		switch (attr->attr) {
- 		case KVM_VGIC_V3_ADDR_TYPE_DIST:
- 		case KVM_VGIC_V3_ADDR_TYPE_REDIST:
-+		case KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION:
- 			return 0;
- 		}
- 		break;
 diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index 1c6c535..2877840 100644
+index 49ca176..ce5c927 100644
 --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
 +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -764,11 +764,11 @@ static int vgic_v3_insert_redist_region(struct kvm *kvm, uint32_t index,
- 	return ret;
- }
- 
--int vgic_v3_set_redist_base(struct kvm *kvm, u64 addr)
-+int vgic_v3_set_redist_base(struct kvm *kvm, u32 index, u64 addr, u32 count)
+@@ -184,12 +184,17 @@ static unsigned long vgic_mmio_read_v3r_typer(struct kvm_vcpu *vcpu,
+ 					      gpa_t addr, unsigned int len)
  {
- 	int ret;
+ 	unsigned long mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
++	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
++	struct vgic_redist_region *rdreg = vgic_cpu->rdreg;
+ 	int target_vcpu_id = vcpu->vcpu_id;
++	gpa_t last_rdist_typer = rdreg->base + GICR_TYPER +
++			(rdreg->free_index - 1) * KVM_VGIC_V3_REDIST_SIZE;
+ 	u64 value;
  
--	ret = vgic_v3_insert_redist_region(kvm, 0, addr, 0);
-+	ret = vgic_v3_insert_redist_region(kvm, index, addr, count);
- 	if (ret)
- 		return ret;
- 
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index 8892821..ff7dc89 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -491,6 +491,20 @@ struct vgic_redist_region *vgic_v3_rdist_free_slot(struct list_head *rd_regions)
- 	return NULL;
- }
- 
-+struct vgic_redist_region *vgic_v3_rdist_region_from_index(struct kvm *kvm,
-+							   u32 index)
-+{
-+	struct list_head *rd_regions = &kvm->arch.vgic.rd_regions;
-+	struct vgic_redist_region *rdreg;
+ 	value = (u64)(mpidr & GENMASK(23, 0)) << 32;
+ 	value |= ((target_vcpu_id & 0xffff) << 8);
+-	if (target_vcpu_id == atomic_read(&vcpu->kvm->online_vcpus) - 1)
 +
-+	list_for_each_entry(rdreg, rd_regions, list) {
-+		if (rdreg->index == index)
-+			return rdreg;
-+	}
-+	return NULL;
-+}
-+
-+
- int vgic_v3_map_resources(struct kvm *kvm)
- {
- 	struct vgic_dist *dist = &kvm->arch.vgic;
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index 1c8af4e..6879cf4 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -96,6 +96,13 @@
- /* we only support 64 kB translation table page size */
- #define KVM_ITS_L1E_ADDR_MASK		GENMASK_ULL(51, 16)
- 
-+#define KVM_VGIC_V3_RDIST_INDEX_MASK	GENMASK_ULL(11, 0)
-+#define KVM_VGIC_V3_RDIST_FLAGS_MASK	GENMASK_ULL(15, 12)
-+#define KVM_VGIC_V3_RDIST_FLAGS_SHIFT	12
-+#define KVM_VGIC_V3_RDIST_BASE_MASK	GENMASK_ULL(51, 16)
-+#define KVM_VGIC_V3_RDIST_COUNT_MASK	GENMASK_ULL(63, 52)
-+#define KVM_VGIC_V3_RDIST_COUNT_SHIFT	52
-+
- /* Requires the irq_lock to be held by the caller. */
- static inline bool irq_is_pending(struct vgic_irq *irq)
- {
-@@ -215,7 +222,7 @@ int vgic_v3_probe(const struct gic_kvm_info *info);
- int vgic_v3_map_resources(struct kvm *kvm);
- int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq);
- int vgic_v3_save_pending_tables(struct kvm *kvm);
--int vgic_v3_set_redist_base(struct kvm *kvm, u64 addr);
-+int vgic_v3_set_redist_base(struct kvm *kvm, u32 index, u64 addr, u32 count);
- int vgic_register_redist_iodev(struct kvm_vcpu *vcpu);
- bool vgic_v3_check_base(struct kvm *kvm);
- 
-@@ -284,6 +291,10 @@ vgic_v3_rd_region_size(struct kvm *kvm, struct vgic_redist_region *rdreg)
- 	else
- 		return rdreg->count * KVM_VGIC_V3_REDIST_SIZE;
- }
-+
-+struct vgic_redist_region *vgic_v3_rdist_region_from_index(struct kvm *kvm,
-+							   u32 index);
-+
- bool vgic_v3_rdist_overlap(struct kvm *kvm, gpa_t base, size_t size);
- 
- static inline bool vgic_dist_overlap(struct kvm *kvm, gpa_t base, size_t size)
++	if (addr == last_rdist_typer)
+ 		value |= GICR_TYPER_LAST;
+ 	if (vgic_has_its(vcpu->kvm))
+ 		value |= GICR_TYPER_PLPIS;
 -- 
 2.5.5
