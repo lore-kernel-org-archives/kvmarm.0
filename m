@@ -1,229 +1,130 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 08/14] ARM: spectre-v2: harden user aborts in kernel space
-Date: Tue, 22 May 2018 18:15:02 +0100
-Message-ID: <e52b3541-7106-a6dc-5851-01b091bec38f@arm.com>
+Subject: Re: [PATCH 09/14] ARM: spectre-v2: add PSCI based hardening
+Date: Tue, 22 May 2018 18:24:13 +0100
+Message-ID: <35edb3df-fed4-b6e6-be0c-ee758618c92e@arm.com>
 References: <20180521114238.GN17671@n2100.armlinux.org.uk>
- <E1fKjFO-000648-8d@rmk-PC.armlinux.org.uk>
+ <E1fKjFT-00064F-Bs@rmk-PC.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6261B49F93
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 May 2018 13:04:51 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lhXGkwACro+w for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 May 2018 13:04:29 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F0AFB402DB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 May 2018 13:04:28 -0400 (EDT)
-In-Reply-To: <E1fKjFO-000648-8d@rmk-PC.armlinux.org.uk>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <E1fKjFT-00064F-Bs@rmk-PC.armlinux.org.uk>
 Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: Russell King <rmk+kernel@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org
-Cc: Florian Fainelli <f.fainelli@gmail.com>, kvmarm@lists.cs.columbia.edu
+Cc: Florian Fainelli <f.fainelli@gmail.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On 21/05/18 12:45, Russell King wrote:
-> In order to prevent aliasing attacks on the branch predictor,
-> invalidate the BTB or instruction cache on CPUs that are known to be
-> affected when taking an abort on a address that is outside of a user
-> task limit:
-> 
-> Cortex A8, A9, A12, A17, A73, A75: flush BTB.
-> Cortex A15, Brahma B15: invalidate icache.
+> Add PSCI based hardening for cores that require more complex handling in
+> firmware.
 > 
 > Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
-> Reviewed-by: Florian Fainelli <f.fainelli@gmail.com>
+> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
->  arch/arm/include/asm/cp15.h        |  3 +++
->  arch/arm/include/asm/system_misc.h |  8 ++++++
->  arch/arm/mm/fault.c                |  3 +++
->  arch/arm/mm/proc-v7-bugs.c         | 51 ++++++++++++++++++++++++++++++++++++++
->  arch/arm/mm/proc-v7.S              |  8 +++---
->  5 files changed, 70 insertions(+), 3 deletions(-)
+>  arch/arm/mm/proc-v7-bugs.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++
+>  arch/arm/mm/proc-v7.S      | 21 +++++++++++++++++++
+>  2 files changed, 71 insertions(+)
 > 
-> diff --git a/arch/arm/include/asm/cp15.h b/arch/arm/include/asm/cp15.h
-> index 4c9fa72b59f5..07e27f212dc7 100644
-> --- a/arch/arm/include/asm/cp15.h
-> +++ b/arch/arm/include/asm/cp15.h
-> @@ -65,6 +65,9 @@
->  #define __write_sysreg(v, r, w, c, t)	asm volatile(w " " c : : "r" ((t)(v)))
->  #define write_sysreg(v, ...)		__write_sysreg(v, __VA_ARGS__)
->  
-> +#define BPIALL				__ACCESS_CP15(c7, 0, c5, 6)
-> +#define ICIALLU				__ACCESS_CP15(c7, 0, c5, 0)
-> +
->  extern unsigned long cr_alignment;	/* defined in entry-armv.S */
->  
->  static inline unsigned long get_cr(void)
-> diff --git a/arch/arm/include/asm/system_misc.h b/arch/arm/include/asm/system_misc.h
-> index 78f6db114faf..3cfe010c5734 100644
-> --- a/arch/arm/include/asm/system_misc.h
-> +++ b/arch/arm/include/asm/system_misc.h
-> @@ -15,6 +15,14 @@ void soft_restart(unsigned long);
->  extern void (*arm_pm_restart)(enum reboot_mode reboot_mode, const char *cmd);
->  extern void (*arm_pm_idle)(void);
->  
-> +#ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
-> +extern void (*harden_branch_predictor)(void);
-> +#define harden_branch_predictor() \
-> +	do { if (harden_branch_predictor) harden_branch_predictor(); } while (0)
-> +#else
-> +#define harden_branch_predictor() do { } while (0)
-> +#endif
-> +
->  #define UDBG_UNDEFINED	(1 << 0)
->  #define UDBG_SYSCALL	(1 << 1)
->  #define UDBG_BADABORT	(1 << 2)
-> diff --git a/arch/arm/mm/fault.c b/arch/arm/mm/fault.c
-> index b75eada23d0a..3b1ba003c4f9 100644
-> --- a/arch/arm/mm/fault.c
-> +++ b/arch/arm/mm/fault.c
-> @@ -163,6 +163,9 @@ __do_user_fault(struct task_struct *tsk, unsigned long addr,
->  {
->  	struct siginfo si;
->  
-> +	if (addr > TASK_SIZE)
-> +		harden_branch_predictor();
-> +
->  #ifdef CONFIG_DEBUG_USER
->  	if (((user_debug & UDBG_SEGV) && (sig == SIGSEGV)) ||
->  	    ((user_debug & UDBG_BUS)  && (sig == SIGBUS))) {
 > diff --git a/arch/arm/mm/proc-v7-bugs.c b/arch/arm/mm/proc-v7-bugs.c
-> index a32ce13479d9..65a9b8141f86 100644
+> index 65a9b8141f86..0c37e6a2830d 100644
 > --- a/arch/arm/mm/proc-v7-bugs.c
 > +++ b/arch/arm/mm/proc-v7-bugs.c
-> @@ -2,6 +2,12 @@
+> @@ -1,9 +1,12 @@
+>  // SPDX-License-Identifier: GPL-2.0
+> +#include <linux/arm-smccc.h>
 >  #include <linux/kernel.h>
+> +#include <linux/psci.h>
 >  #include <linux/smp.h>
 >  
-> +#include <asm/cp15.h>
-> +#include <asm/cputype.h>
-> +#include <asm/system_misc.h>
-> +
-> +void cpu_v7_bugs_init(void);
-> +
->  static __maybe_unused void cpu_v7_check_auxcr_set(u32 mask, const char *msg)
->  {
->  	u32 aux_cr;
-> @@ -21,9 +27,54 @@ static void check_spectre_auxcr(u32 bit)
->  void cpu_v7_ca8_ibe(void)
->  {
->  	check_spectre_auxcr(BIT(6));
-> +	cpu_v7_bugs_init();
->  }
+>  #include <asm/cp15.h>
+>  #include <asm/cputype.h>
+> +#include <asm/proc-fns.h>
+>  #include <asm/system_misc.h>
 >  
->  void cpu_v7_ca15_ibe(void)
->  {
->  	check_spectre_auxcr(BIT(0));
-> +	cpu_v7_bugs_init();
-> +}
-> +
-> +#ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
-> +void (*harden_branch_predictor)(void);
-> +
-> +static void harden_branch_predictor_bpiall(void)
-> +{
-> +	write_sysreg(0, BPIALL);
-> +}
-> +
-> +static void harden_branch_predictor_iciallu(void)
-> +{
-> +	write_sysreg(0, ICIALLU);
-> +}
-> +
-> +void cpu_v7_bugs_init(void)
-> +{
-> +	const char *spectre_v2_method = NULL;
-> +
-> +	if (harden_branch_predictor)
-> +		return;
-
-How does it work on a big-little systems where two CPUs have diverging
-mitigation methods? Let's say an hypothetical A15/A17 system? Or even a
-more common A15/A7 system, where the small core doesn't require the
-mitigation?
-
-> +
-> +	switch (read_cpuid_part()) {
-> +	case ARM_CPU_PART_CORTEX_A8:
-> +	case ARM_CPU_PART_CORTEX_A9:
-> +	case ARM_CPU_PART_CORTEX_A12:
-> +	case ARM_CPU_PART_CORTEX_A17:
-> +	case ARM_CPU_PART_CORTEX_A73:
-> +	case ARM_CPU_PART_CORTEX_A75:
-> +		harden_branch_predictor = harden_branch_predictor_bpiall;
-> +		spectre_v2_method = "BPIALL";
-> +		break;
-
-You don't seem to take into account the PFR0.CSV2 field which indicates
-that the CPU has a branch predictor that is immune to Spectre-v2.
-
-See for example the Cortex-A75 r3p0 TRM[1].
-
-> +
-> +	case ARM_CPU_PART_CORTEX_A15:
-> +	case ARM_CPU_PART_BRAHMA_B15:
-> +		harden_branch_predictor = harden_branch_predictor_iciallu;
-> +		spectre_v2_method = "ICIALLU";
-> +		break;
-> +	}
-> +	if (spectre_v2_method)
-> +		pr_info("CPU: Spectre v2: using %s workaround\n",
-> +			spectre_v2_method);
->  }
-> +#endif
-> diff --git a/arch/arm/mm/proc-v7.S b/arch/arm/mm/proc-v7.S
-> index fa9214036fb3..79510011e7eb 100644
-> --- a/arch/arm/mm/proc-v7.S
-> +++ b/arch/arm/mm/proc-v7.S
-> @@ -532,8 +532,10 @@ ENDPROC(__v7_setup)
->  
->  	__INITDATA
->  
-> +	.weak cpu_v7_bugs_init
-> +
->  	@ define struct processor (see <asm/proc-fns.h> and proc-macros.S)
-> -	define_processor_functions v7, dabort=v7_early_abort, pabort=v7_pabort, suspend=1
-> +	define_processor_functions v7, dabort=v7_early_abort, pabort=v7_pabort, suspend=1, bugs=cpu_v7_bugs_init
->  
+>  void cpu_v7_bugs_init(void);
+> @@ -39,6 +42,9 @@ void cpu_v7_ca15_ibe(void)
 >  #ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
->  	@ generic v7 bpiall on context switch
-> @@ -548,7 +550,7 @@ ENDPROC(__v7_setup)
->  	globl_equ	cpu_v7_bpiall_do_suspend,	cpu_v7_do_suspend
->  	globl_equ	cpu_v7_bpiall_do_resume,	cpu_v7_do_resume
->  #endif
-> -	define_processor_functions v7_bpiall, dabort=v7_early_abort, pabort=v7_pabort, suspend=1
-> +	define_processor_functions v7_bpiall, dabort=v7_early_abort, pabort=v7_pabort, suspend=1, bugs=cpu_v7_bugs_init
+>  void (*harden_branch_predictor)(void);
 >  
->  #define HARDENED_BPIALL_PROCESSOR_FUNCTIONS v7_bpiall_processor_functions
->  #else
-> @@ -584,7 +586,7 @@ ENDPROC(__v7_setup)
->  	globl_equ	cpu_ca9mp_switch_mm,	cpu_v7_switch_mm
->  #endif
->  	globl_equ	cpu_ca9mp_set_pte_ext,	cpu_v7_set_pte_ext
-> -	define_processor_functions ca9mp, dabort=v7_early_abort, pabort=v7_pabort, suspend=1
-> +	define_processor_functions ca9mp, dabort=v7_early_abort, pabort=v7_pabort, suspend=1, bugs=cpu_v7_bugs_init
->  #endif
+> +extern void cpu_v7_smc_switch_mm(phys_addr_t pgd_phys, struct mm_struct *mm);
+> +extern void cpu_v7_hvc_switch_mm(phys_addr_t pgd_phys, struct mm_struct *mm);
+> +
+>  static void harden_branch_predictor_bpiall(void)
+>  {
+>  	write_sysreg(0, BPIALL);
+> @@ -49,6 +55,18 @@ static void harden_branch_predictor_iciallu(void)
+>  	write_sysreg(0, ICIALLU);
+>  }
 >  
->  	@ Cortex-A15 - needs iciallu switch_mm for hardening
-> 
+> +#ifdef CONFIG_ARM_PSCI
+> +static void call_smc_arch_workaround_1(void)
+> +{
+> +	arm_smccc_1_1_smc(ARM_SMCCC_ARCH_WORKAROUND_1, NULL);
+> +}
+> +
+> +static void call_hvc_arch_workaround_1(void)
+> +{
+> +	arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_WORKAROUND_1, NULL);
+> +}
+> +#endif
+> +
+>  void cpu_v7_bugs_init(void)
+>  {
+>  	const char *spectre_v2_method = NULL;
+> @@ -73,6 +91,38 @@ void cpu_v7_bugs_init(void)
+>  		spectre_v2_method = "ICIALLU";
+>  		break;
+>  	}
+> +
+> +#ifdef CONFIG_ARM_PSCI
+> +	if (psci_ops.smccc_version != SMCCC_VERSION_1_0) {
+> +		struct arm_smccc_res res;
+> +
+> +		switch (psci_ops.conduit) {
+> +		case PSCI_CONDUIT_HVC:
+> +			arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
+> +					  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
+> +			if ((int)res.a0 < 0)
+> +				break;
+
+I just realised that there is a small, but significant difference
+between this and the arm64 version: On arm64, we have a table of
+vulnerable implementations, and we try the mitigation on a per-cpu
+basis. Here, you entirely rely on the firmware to discover whether the
+CPU needs mitigation or not. You then need to check for a return value
+of 1, which indicates that although the mitigation is implemented, it is
+not required on this particular CPU.
+
+But that's probably moot if you don't support BL systems.
+
+> +			harden_branch_predictor = call_hvc_arch_workaround_1;
+> +			processor.switch_mm = cpu_v7_hvc_switch_mm;
+> +			spectre_v2_method = "hypervisor";
+> +			break;
+> +
+> +		case PSCI_CONDUIT_SMC:
+> +			arm_smccc_1_1_smc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
+> +					  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
+> +			if ((int)res.a0 < 0)
+> +				break;
+> +			harden_branch_predictor = call_smc_arch_workaround_1;
+> +			processor.switch_mm = cpu_v7_smc_switch_mm;
+> +			spectre_v2_method = "firmware PSCI";
+
+My previous remark still stands: this is not really PSCI.
 
 Thanks,
 
 	M.
-
-[1]
-http://infocenter.arm.com/help/topic/com.arm.doc.100403_0300_00_en/axa1518783469631.html
 -- 
 Jazz is not dead. It just smells funny...
+-
