@@ -1,58 +1,56 @@
-From: Adam Wallis <awallis@codeaurora.org>
-Subject: Re: [PATCHv4 06/10] arm64: add basic pointer authentication support
-Date: Tue, 22 May 2018 15:08:42 -0400
-Message-ID: <4b394038-ffd7-ef28-faaf-00f91febf54a@codeaurora.org>
-References: <20180503132031.25705-1-mark.rutland@arm.com>
- <20180503132031.25705-7-mark.rutland@arm.com>
+From: Russell King - ARM Linux <linux@armlinux.org.uk>
+Subject: Re: [PATCH 08/14] ARM: spectre-v2: harden user aborts in kernel space
+Date: Wed, 23 May 2018 00:25:20 +0100
+Message-ID: <20180522232519.GV17671@n2100.armlinux.org.uk>
+References: <20180521114238.GN17671@n2100.armlinux.org.uk>
+ <E1fKjFO-000648-8d@rmk-PC.armlinux.org.uk>
+ <e52b3541-7106-a6dc-5851-01b091bec38f@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180503132031.25705-7-mark.rutland@arm.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Mark Rutland <mark.rutland@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, catalin.marinas@arm.com, christoffer.dall@arm.com, drjones@redhat.com, marc.zyngier@arm.com, ramana.radhakrishnan@arm.com, suzuki.poulose@arm.com, will.deacon@arm.com
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <e52b3541-7106-a6dc-5851-01b091bec38f@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>, Christoffer Dall <christoffer.dall@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 5/3/2018 9:20 AM, Mark Rutland wrote:
-> This patch adds basic support for pointer authentication, allowing
-> userspace to make use of APIAKey. The kernel maintains an APIAKey value
-> for each process (shared by all threads within), which is initialised to
-> a random value at exec() time.
+On Tue, May 22, 2018 at 06:15:02PM +0100, Marc Zyngier wrote:
+> On 21/05/18 12:45, Russell King wrote:
+> > +	switch (read_cpuid_part()) {
+> > +	case ARM_CPU_PART_CORTEX_A8:
+> > +	case ARM_CPU_PART_CORTEX_A9:
+> > +	case ARM_CPU_PART_CORTEX_A12:
+> > +	case ARM_CPU_PART_CORTEX_A17:
+> > +	case ARM_CPU_PART_CORTEX_A73:
+> > +	case ARM_CPU_PART_CORTEX_A75:
+> > +		harden_branch_predictor = harden_branch_predictor_bpiall;
+> > +		spectre_v2_method = "BPIALL";
+> > +		break;
 > 
-> To describe that address authentication instructions are available, the
-> ID_AA64ISAR0.{APA,API} fields are exposed to userspace. A new hwcap,
-> APIA, is added to describe that the kernel manages APIAKey.
-> 
-> Instructions using other keys (APIBKey, APDAKey, APDBKey) are disabled,
-> and will behave as NOPs. These may be made use of in future patches.
-> 
-> No support is added for the generic key (APGAKey), though this cannot be
-> trapped or made to behave as a NOP. Its presence is not advertised with
-> a hwcap.
-> 
-> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>
-> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Cc: Will Deacon <will.deacon@arm.com>
-> ---
+> You don't seem to take into account the PFR0.CSV2 field which indicates
+> that the CPU has a branch predictor that is immune to Spectre-v2.
 
+That information is not covered in the description of the vulnerability
+- the published information on the security-updates site states that
+BPIALL is required without stating any conditions.
 
-Mark, I was able to verify that a buffer overflow exploit results in a segfault
-with these PAC patches. When I compile the same binary without
-"-msign-return-address=none", I am able to successfully overflow the stack and
-execute malicious code.
+> See for example the Cortex-A75 r3p0 TRM[1].
 
-Thanks
-Adam
-
-Tested-by: Adam Wallis <awallis@codeaurora.org>
-
+So which cores should such a test be applied to?  As I mention,
+the support site doesn't give this detail.  That brings up the
+obvious question: what else does the web page miss out on?
 
 -- 
-Adam Wallis
-Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project.
+RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
+According to speedtest.net: 8.21Mbps down 510kbps up
