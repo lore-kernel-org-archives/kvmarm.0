@@ -1,70 +1,190 @@
-From: Andrey Konovalov <andreyknvl@google.com>
-Subject: Re: [PATCH] arm64: kvm: use -fno-jump-tables with clang
-Date: Tue, 22 May 2018 19:58:31 +0200
-Message-ID: <CAAeHK+z2LmMYasYtRTt2U=QF8Pe_i10RA3-SkLzGXXByZqLh1w@mail.gmail.com>
-References: <20180518170202.11458-1-samitolvanen@google.com>
- <05d14ac7-0feb-63a3-e7ef-b8ca1ae2fd1d@arm.com> <CAKwvOdm1kYedukCq=g74AvqJHp6KC03oNoouQy2nkvfo4idoEw@mail.gmail.com>
- <8c7be44f-086d-65e3-9969-8182261ce82f@arm.com> <CAKwvOd=XZqg5=mkXZb-cxq3i_AGoJGAbmF=Fwc7Q98oi0tbN9g@mail.gmail.com>
- <3fd89842-86cd-ee01-0c2c-5438dd2d5f2a@arm.com> <CAKwvOdk+=JKcQP1ieLEkZftRGf-pqCTTzEuYvT_45YNMkEw_wA@mail.gmail.com>
- <86k1rzc4ba.wl-marc.zyngier@arm.com>
+From: Russell King - ARM Linux <linux@armlinux.org.uk>
+Subject: Re: [PATCH 08/14] ARM: spectre-v2: harden user aborts in kernel space
+Date: Tue, 22 May 2018 19:12:46 +0100
+Message-ID: <20180522181246.GU17671@n2100.armlinux.org.uk>
+References: <20180521114238.GN17671@n2100.armlinux.org.uk>
+ <E1fKjFO-000648-8d@rmk-PC.armlinux.org.uk>
+ <e52b3541-7106-a6dc-5851-01b091bec38f@arm.com>
+ <20180522175603.GS17671@n2100.armlinux.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <86k1rzc4ba.wl-marc.zyngier@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 25ED149F87
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 May 2018 14:02:43 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id mpCaJ51VyEo5 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 May 2018 14:02:19 -0400 (EDT)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A60DB49DC8
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 May 2018 14:02:19 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <20180522175603.GS17671@n2100.armlinux.org.uk>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Nick Desaulniers <ndesaulniers@google.com>, Sami Tolvanen <samitolvanen@google.com>, christoffer.dall@arm.com, Takahiro Akashi <takahiro.akashi@linaro.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, kvmarm@lists.cs.columbia.edu, LKML <linux-kernel@vger.kernel.org>
+Cc: Florian Fainelli <f.fainelli@gmail.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sat, May 19, 2018 at 12:44 PM, Marc Zyngier <marc.zyngier@arm.com> wrote:
-> That would definitely be the right thing to do. Make sure you (or
-> Andrey tests with the latest released mainline kernel (4.16 for now)
-> or (even better) the tip of Linus' tree.
+On Tue, May 22, 2018 at 06:56:03PM +0100, Russell King - ARM Linux wrote:
+> On Tue, May 22, 2018 at 06:15:02PM +0100, Marc Zyngier wrote:
+> > On 21/05/18 12:45, Russell King wrote:
+> > > In order to prevent aliasing attacks on the branch predictor,
+> > > invalidate the BTB or instruction cache on CPUs that are known to be
+> > > affected when taking an abort on a address that is outside of a user
+> > > task limit:
+> > > 
+> > > Cortex A8, A9, A12, A17, A73, A75: flush BTB.
+> > > Cortex A15, Brahma B15: invalidate icache.
+> > > 
+> > > Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
+> > > Reviewed-by: Florian Fainelli <f.fainelli@gmail.com>
+> > > ---
+> > >  arch/arm/include/asm/cp15.h        |  3 +++
+> > >  arch/arm/include/asm/system_misc.h |  8 ++++++
+> > >  arch/arm/mm/fault.c                |  3 +++
+> > >  arch/arm/mm/proc-v7-bugs.c         | 51 ++++++++++++++++++++++++++++++++++++++
+> > >  arch/arm/mm/proc-v7.S              |  8 +++---
+> > >  5 files changed, 70 insertions(+), 3 deletions(-)
+> > > 
+> > > diff --git a/arch/arm/include/asm/cp15.h b/arch/arm/include/asm/cp15.h
+> > > index 4c9fa72b59f5..07e27f212dc7 100644
+> > > --- a/arch/arm/include/asm/cp15.h
+> > > +++ b/arch/arm/include/asm/cp15.h
+> > > @@ -65,6 +65,9 @@
+> > >  #define __write_sysreg(v, r, w, c, t)	asm volatile(w " " c : : "r" ((t)(v)))
+> > >  #define write_sysreg(v, ...)		__write_sysreg(v, __VA_ARGS__)
+> > >  
+> > > +#define BPIALL				__ACCESS_CP15(c7, 0, c5, 6)
+> > > +#define ICIALLU				__ACCESS_CP15(c7, 0, c5, 0)
+> > > +
+> > >  extern unsigned long cr_alignment;	/* defined in entry-armv.S */
+> > >  
+> > >  static inline unsigned long get_cr(void)
+> > > diff --git a/arch/arm/include/asm/system_misc.h b/arch/arm/include/asm/system_misc.h
+> > > index 78f6db114faf..3cfe010c5734 100644
+> > > --- a/arch/arm/include/asm/system_misc.h
+> > > +++ b/arch/arm/include/asm/system_misc.h
+> > > @@ -15,6 +15,14 @@ void soft_restart(unsigned long);
+> > >  extern void (*arm_pm_restart)(enum reboot_mode reboot_mode, const char *cmd);
+> > >  extern void (*arm_pm_idle)(void);
+> > >  
+> > > +#ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
+> > > +extern void (*harden_branch_predictor)(void);
+> > > +#define harden_branch_predictor() \
+> > > +	do { if (harden_branch_predictor) harden_branch_predictor(); } while (0)
+> > > +#else
+> > > +#define harden_branch_predictor() do { } while (0)
+> > > +#endif
+> > > +
+> > >  #define UDBG_UNDEFINED	(1 << 0)
+> > >  #define UDBG_SYSCALL	(1 << 1)
+> > >  #define UDBG_BADABORT	(1 << 2)
+> > > diff --git a/arch/arm/mm/fault.c b/arch/arm/mm/fault.c
+> > > index b75eada23d0a..3b1ba003c4f9 100644
+> > > --- a/arch/arm/mm/fault.c
+> > > +++ b/arch/arm/mm/fault.c
+> > > @@ -163,6 +163,9 @@ __do_user_fault(struct task_struct *tsk, unsigned long addr,
+> > >  {
+> > >  	struct siginfo si;
+> > >  
+> > > +	if (addr > TASK_SIZE)
+> > > +		harden_branch_predictor();
+> > > +
+> > >  #ifdef CONFIG_DEBUG_USER
+> > >  	if (((user_debug & UDBG_SEGV) && (sig == SIGSEGV)) ||
+> > >  	    ((user_debug & UDBG_BUS)  && (sig == SIGBUS))) {
+> > > diff --git a/arch/arm/mm/proc-v7-bugs.c b/arch/arm/mm/proc-v7-bugs.c
+> > > index a32ce13479d9..65a9b8141f86 100644
+> > > --- a/arch/arm/mm/proc-v7-bugs.c
+> > > +++ b/arch/arm/mm/proc-v7-bugs.c
+> > > @@ -2,6 +2,12 @@
+> > >  #include <linux/kernel.h>
+> > >  #include <linux/smp.h>
+> > >  
+> > > +#include <asm/cp15.h>
+> > > +#include <asm/cputype.h>
+> > > +#include <asm/system_misc.h>
+> > > +
+> > > +void cpu_v7_bugs_init(void);
+> > > +
+> > >  static __maybe_unused void cpu_v7_check_auxcr_set(u32 mask, const char *msg)
+> > >  {
+> > >  	u32 aux_cr;
+> > > @@ -21,9 +27,54 @@ static void check_spectre_auxcr(u32 bit)
+> > >  void cpu_v7_ca8_ibe(void)
+> > >  {
+> > >  	check_spectre_auxcr(BIT(6));
+> > > +	cpu_v7_bugs_init();
+> > >  }
+> > >  
+> > >  void cpu_v7_ca15_ibe(void)
+> > >  {
+> > >  	check_spectre_auxcr(BIT(0));
+> > > +	cpu_v7_bugs_init();
+> > > +}
+> > > +
+> > > +#ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
+> > > +void (*harden_branch_predictor)(void);
+> > > +
+> > > +static void harden_branch_predictor_bpiall(void)
+> > > +{
+> > > +	write_sysreg(0, BPIALL);
+> > > +}
+> > > +
+> > > +static void harden_branch_predictor_iciallu(void)
+> > > +{
+> > > +	write_sysreg(0, ICIALLU);
+> > > +}
+> > > +
+> > > +void cpu_v7_bugs_init(void)
+> > > +{
+> > > +	const char *spectre_v2_method = NULL;
+> > > +
+> > > +	if (harden_branch_predictor)
+> > > +		return;
+> > 
+> > How does it work on a big-little systems where two CPUs have diverging
+> > mitigation methods? Let's say an hypothetical A15/A17 system? Or even a
+> > more common A15/A7 system, where the small core doesn't require the
+> > mitigation?
+> 
+> Hmm, I'd forgotten about those, because I don't have them.
+> 
+> We don't have the ability to mitigate this on such systems at all at
+> present, it would require a per-CPU cpu_switch_mm() implementation, and
+> the code has no structure to support that at present without considerable
+> rewrite of the CPU glue support.
+> 
+> I'm not even sure it could without checking deeper - I think there's some
+> situations where we call this before we're sufficiently setup.
 
-Hi!
+Confirmed.  We can't access per_cpu variables via cpu_switch_mm()
+because it is used prior to the per_cpu offset being initialised in
+the CPU.  Eg,
 
-I can confirm that after applying this patch onto 4.17-rc4 kernel the
-Odroid C2 board that I have boots (it doesn't without the patch).
+secondary_start_kernel
+{
+...
+	cpu_switch_mm(mm->pgd, mm);
+...
+        cpu_init(); /* <== per cpu setup */
+}
 
-This is the result of running KVM tests that I was able to find [1]:
+However, we can change harden_branch_predictor() to be a per-cpu
+function pointer to solve some of your concern, but it's still
+insufficient.
 
-root@odroid64:/home/odroid/kvm-unit-tests# ./run_tests.sh
-PASS selftest-setup (2 tests)
-PASS selftest-vectors-kernel (2 tests)
-PASS selftest-vectors-user (2 tests)
-PASS selftest-smp (5 tests)
-PASS pci-test (1 tests)
-FAIL pmu (3 tests, 3 unexpected failures)
-PASS gicv2-ipi (3 tests)
-SKIP gicv3-ipi (qemu-system-aarch64: Initialization of device
-kvm-arm-gicv3 failed: error creating in-kernel VGIC: No such device)
-PASS gicv2-active (1 tests)
-SKIP gicv3-active (qemu-system-aarch64: Initialization of device
-kvm-arm-gicv3 failed: error creating in-kernel VGIC: No such device)
-PASS psci (4 tests)
-PASS timer (8 tests)
-
-Here is the result of running the same tests on GCC compiled kernel
-(looks the same):
-
-root@odroid64:/home/odroid/kvm-unit-tests# ./run_tests.sh
-PASS selftest-setup (2 tests)
-PASS selftest-vectors-kernel (2 tests)
-PASS selftest-vectors-user (2 tests)
-PASS selftest-smp (5 tests)
-PASS pci-test (1 tests)
-FAIL pmu (3 tests, 3 unexpected failures)
-PASS gicv2-ipi (3 tests)
-SKIP gicv3-ipi (qemu-system-aarch64: Initialization of device
-kvm-arm-gicv3 failed: error creating in-kernel VGIC: No such device)
-PASS gicv2-active (1 tests)
-SKIP gicv3-active (qemu-system-aarch64: Initialization of device
-kvm-arm-gicv3 failed: error creating in-kernel VGIC: No such device)
-PASS psci (4 tests)
-PASS timer (8 tests)
-
-Tested-by: Andrey Konovalov <andreyknvl@google.com>
-
-Thanks!
-
-[1] https://www.linux-kvm.org/page/KVM-unit-tests
+-- 
+RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
+According to speedtest.net: 8.21Mbps down 510kbps up
