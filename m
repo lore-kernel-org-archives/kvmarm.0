@@ -1,7 +1,7 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 14/14] arm64: KVM: Add ARCH_WORKAROUND_2 discovery through ARCH_FEATURES_FUNC_ID
-Date: Tue, 22 May 2018 16:06:48 +0100
-Message-ID: <20180522150648.28297-15-marc.zyngier@arm.com>
+Subject: [PATCH 13/14] arm64: KVM: Handle guest's ARCH_WORKAROUND_2 requests
+Date: Tue, 22 May 2018 16:06:47 +0100
+Message-ID: <20180522150648.28297-14-marc.zyngier@arm.com>
 References: <20180522150648.28297-1-marc.zyngier@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20180522150648.28297-1-marc.zyngier@arm.com>
@@ -10,126 +10,82 @@ To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@l
 Cc: Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Thomas Gleixner <tglx@linutronix.de>, Andy Lutomirski <luto@kernel.org>, Kees Cook <keescook@chromium.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Christoffer Dall <christoffer.dall@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now that all our infrastructure is in place, let's expose the
-availability of ARCH_WORKAROUND_2 to guests. We take this opportunity
-to tidy up a couple of SMCCC constants.
+In order to forward the guest's ARCH_WORKAROUND_2 calls to EL3,
+add a small(-ish) sequence to handle it at EL2. Special care must
+be taken to track the state of the guest itself by updating the
+workaround flags. We also rely on patching to enable calls into
+the firmware.
 
-Acked-by: Christoffer Dall <christoffer.dall@arm.com>
+Note that since we need to execute branches, this always executes
+after the Spectre-v2 mitigation has been applied.
+
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/kvm_host.h   | 12 ++++++++++++
- arch/arm64/include/asm/kvm_host.h | 23 +++++++++++++++++++++++
- arch/arm64/kvm/reset.c            |  4 ++++
- virt/kvm/arm/psci.c               | 18 ++++++++++++++++--
- 4 files changed, 55 insertions(+), 2 deletions(-)
+ arch/arm64/kernel/asm-offsets.c |  1 +
+ arch/arm64/kvm/hyp/hyp-entry.S  | 38 +++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 38 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index c7c28c885a19..d478766b56c1 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -315,6 +315,18 @@ static inline bool kvm_arm_harden_branch_predictor(void)
- 	return false;
- }
- 
-+#define KVM_SSBD_UNKNOWN		-1
-+#define KVM_SSBD_FORCE_DISABLE		0
-+#define KVM_SSBD_EL1_ENTRY		1
-+#define KVM_SSBD_FORCE_ENABLE		2
-+#define KVM_SSBD_MITIGATED		3
+diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
+index 5bdda651bd05..323aeb5f2fe6 100644
+--- a/arch/arm64/kernel/asm-offsets.c
++++ b/arch/arm64/kernel/asm-offsets.c
+@@ -136,6 +136,7 @@ int main(void)
+ #ifdef CONFIG_KVM_ARM_HOST
+   DEFINE(VCPU_CONTEXT,		offsetof(struct kvm_vcpu, arch.ctxt));
+   DEFINE(VCPU_FAULT_DISR,	offsetof(struct kvm_vcpu, arch.fault.disr_el1));
++  DEFINE(VCPU_WORKAROUND_FLAGS,	offsetof(struct kvm_vcpu, arch.workaround_flags));
+   DEFINE(CPU_GP_REGS,		offsetof(struct kvm_cpu_context, gp_regs));
+   DEFINE(CPU_USER_PT_REGS,	offsetof(struct kvm_regs, regs));
+   DEFINE(CPU_FP_REGS,		offsetof(struct kvm_regs, fp_regs));
+diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+index bffece27b5c1..5b1fa37ca1f4 100644
+--- a/arch/arm64/kvm/hyp/hyp-entry.S
++++ b/arch/arm64/kvm/hyp/hyp-entry.S
+@@ -106,8 +106,44 @@ el1_hvc_guest:
+ 	 */
+ 	ldr	x1, [sp]				// Guest's x0
+ 	eor	w1, w1, #ARM_SMCCC_ARCH_WORKAROUND_1
++	cbz	w1, wa_epilogue
 +
-+static inline int kvm_arm_have_ssbd(void)
-+{
-+	/* No way to detect it yet, pretend it is not there. */
-+	return KVM_SSBD_UNKNOWN;
-+}
++	/* ARM_SMCCC_ARCH_WORKAROUND_2 handling */
++	eor	w1, w1, #(ARM_SMCCC_ARCH_WORKAROUND_1 ^ \
++			  ARM_SMCCC_ARCH_WORKAROUND_2)
+ 	cbnz	w1, el1_trap
+-	mov	x0, x1
 +
- static inline void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu) {}
- static inline void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu) {}
- 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 9bef3f69bdcd..082b0dbb85c6 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -455,6 +455,29 @@ static inline bool kvm_arm_harden_branch_predictor(void)
- 	return cpus_have_const_cap(ARM64_HARDEN_BRANCH_PREDICTOR);
- }
- 
-+#define KVM_SSBD_UNKNOWN		-1
-+#define KVM_SSBD_FORCE_DISABLE		0
-+#define KVM_SSBD_EL1_ENTRY		1
-+#define KVM_SSBD_FORCE_ENABLE		2
-+#define KVM_SSBD_MITIGATED		3
++#ifdef CONFIG_ARM64_SSBD
++alternative_cb	arm64_enable_wa2_handling
++	b	wa2_end
++alternative_cb_end
++	get_vcpu_ptr	x2, x0
++	ldr	x0, [x2, #VCPU_WORKAROUND_FLAGS]
 +
-+static inline int kvm_arm_have_ssbd(void)
-+{
-+	switch (arm64_get_ssbd_state()) {
-+	case ARM64_SSBD_FORCE_DISABLE:
-+		return KVM_SSBD_FORCE_DISABLE;
-+	case ARM64_SSBD_EL1_ENTRY:
-+		return KVM_SSBD_EL1_ENTRY;
-+	case ARM64_SSBD_FORCE_ENABLE:
-+		return KVM_SSBD_FORCE_ENABLE;
-+	case ARM64_SSBD_MITIGATED:
-+		return KVM_SSBD_MITIGATED;
-+	case ARM64_SSBD_UNKNOWN:
-+	default:
-+		return KVM_SSBD_UNKNOWN;
-+	}
-+}
++	/* Sanitize the argument and update the guest flags*/
++	ldr	x1, [sp, #8]			// Guest's x1
++	clz	w1, w1				// Murphy's device:
++	lsr	w1, w1, #5			// w1 = !!w1 without using
++	eor	w1, w1, #1			// the flags...
++	bfi	x0, x1, #VCPU_WORKAROUND_2_FLAG_SHIFT, #1
++	str	x0, [x2, #VCPU_WORKAROUND_FLAGS]
 +
- void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu);
- void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu);
- 
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 3256b9228e75..20a7dfee8494 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -122,6 +122,10 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 	/* Reset PMU */
- 	kvm_pmu_vcpu_reset(vcpu);
- 
-+	/* Default workaround setup is enabled (if supported) */
-+	if (kvm_arm_have_ssbd() == KVM_SSBD_EL1_ENTRY)
-+		vcpu->arch.workaround_flags |= VCPU_WORKAROUND_2_FLAG;
++	/* Check that we actually need to perform the call */
++	hyp_ldr_this_cpu x0, arm64_ssbd_callback_required, x2
++	cbz	x0, wa2_end
 +
- 	/* Reset timer */
- 	return kvm_timer_vcpu_reset(vcpu);
- }
-diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
-index c4762bef13c6..4843bfa1f986 100644
---- a/virt/kvm/arm/psci.c
-+++ b/virt/kvm/arm/psci.c
-@@ -405,7 +405,7 @@ static int kvm_psci_call(struct kvm_vcpu *vcpu)
- int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
- {
- 	u32 func_id = smccc_get_function(vcpu);
--	u32 val = PSCI_RET_NOT_SUPPORTED;
-+	u32 val = SMCCC_RET_NOT_SUPPORTED;
- 	u32 feature;
++	mov	w0, #ARM_SMCCC_ARCH_WORKAROUND_2
++	smc	#0
++
++	/* Don't leak data from the SMC call */
++	mov	x3, xzr
++wa2_end:
++	mov	x2, xzr
++	mov	x1, xzr
++#endif
++
++wa_epilogue:
++	mov	x0, xzr
+ 	add	sp, sp, #16
+ 	eret
  
- 	switch (func_id) {
-@@ -417,7 +417,21 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
- 		switch(feature) {
- 		case ARM_SMCCC_ARCH_WORKAROUND_1:
- 			if (kvm_arm_harden_branch_predictor())
--				val = 0;
-+				val = SMCCC_RET_SUCCESS;
-+			break;
-+		case ARM_SMCCC_ARCH_WORKAROUND_2:
-+			switch (kvm_arm_have_ssbd()) {
-+			case KVM_SSBD_FORCE_DISABLE:
-+			case KVM_SSBD_UNKNOWN:
-+				break;
-+			case KVM_SSBD_EL1_ENTRY:
-+				val = SMCCC_RET_SUCCESS;
-+				break;
-+			case KVM_SSBD_FORCE_ENABLE:
-+			case KVM_SSBD_MITIGATED:
-+				val = SMCCC_RET_NOT_REQUIRED;
-+				break;
-+			}
- 			break;
- 		}
- 		break;
 -- 
 2.14.2
