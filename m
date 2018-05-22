@@ -1,49 +1,115 @@
-From: Florian Fainelli <f.fainelli@gmail.com>
-Subject: Re: [PATCH 12/14] ARM: spectre-v2: KVM: invalidate icache on guest
- exit for Brahma B15
-Date: Mon, 21 May 2018 20:22:37 -0700
-Message-ID: <f6a2cbbd-0c76-cb8c-5394-df6d910474dd@gmail.com>
-References: <20180521114238.GN17671@n2100.armlinux.org.uk>
- <E1fKjFj-00064b-62@rmk-PC.armlinux.org.uk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AF3004A0DD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 May 2018 23:12:33 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uTxGQX1vZ55D for <kvmarm@lists.cs.columbia.edu>;
- Mon, 21 May 2018 23:12:12 -0400 (EDT)
-Received: from mail-oi0-f66.google.com (mail-oi0-f66.google.com
- [209.85.218.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CF9F34A0E1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 May 2018 23:12:04 -0400 (EDT)
-Received: by mail-oi0-f66.google.com with SMTP id c203-v6so14915408oib.7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 May 2018 20:22:40 -0700 (PDT)
-In-Reply-To: <E1fKjFj-00064b-62@rmk-PC.armlinux.org.uk>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Russell King <rmk+kernel@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu
+From: Eric Auger <eric.auger@redhat.com>
+Subject: [PATCH v8 00/13] KVM: arm/arm64: Allow multiple GICv3 redistributor regions
+Date: Tue, 22 May 2018 09:55:05 +0200
+Message-ID: <1526975718-18567-1-git-send-email-eric.auger@redhat.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org
+Cc: andre.przywara@arm.com, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
+At the moment the KVM VGICv3 only supports a single redistributor
+region (whose base address is set through the GICv3 kvm device
+KVM_DEV_ARM_VGIC_GRP_ADDR/KVM_VGIC_V3_ADDR_TYPE_REDIST). There,
+all the redistributors are laid out contiguously. The size of this
+single redistributor region is not set explicitly but instead
+induced at a late stage by the number of online vcpus.
+
+The GIC specification does not mandate all redistributors to be
+contiguous. Moreover DT and ACPI were specified so that multiple
+redistributors regions can be defined.
+
+The current interface brings a limitation on QEMU where ARM
+virt machine available GPA holes only allowed to assign a
+redistributor region fitting a max of 123 vcpus. Overcoming this
+limitation would force either to create a new machine or relocate
+the single rdist region or allow the allocation of multiple rdist
+regions.
+
+This series enables this last alternative. A new GICv3 KVM device
+KVM_DEV_ARM_VGIC_GRP_ADDR/KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION allows
+to register individual redistributor regions whose size is defined
+explicitly. Those rdist regions then are filled by vcpu rdist frames
+according to the need. The vgic init and related base address checks
+are impacted.
+
+Best Regards
+
+Eric
+
+Git: complete series available at
+https://github.com/eauger/linux/tree/v4.17-rc6-rdist-regions-v8
+Previous version:
+https://github.com/eauger/linux/tree/v4.17-rc5-rdist-regions-v7
+
+History:
+v7 -> v8:
+- fix missing ret initialization in patch kvm_vgic_vcpu_init()
+
+v6 -> v7:
+- fix bug reported by Marc with kvmtool caused by rd_iodev.base_addr
+  and sgi_iodev.base_addr being initialized too late:
+  in kvm_vgic_vcpu_early_init instead of kvm_vgic_vcpu_init
+- removed kvm_vgic_vcpu_early_init()
+
+v5 -> v6:
+- truly use list_last_entry in vgic_v3_insert_redist_region
+- s/pointed by/pointed to by in API doc
+- collected last R-b/A-b
+
+v4 -> v5:
+- fix KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION read path and update
+  the documentation accordingly (removed Peter's and
+  Christoffer's A-b)
+- use u<n> instead of uint<n>_t
+- collected additional R-b/A-b
+
+v3 -> v4:
+- Collected Christoffer's R-b
+- reworked vgic_v3_rdist_overlap and introduced vgic_dist_overlap
+- vgic_v3_insert_redist_region cleanup
+- inverse order for patches 6 and 7
+
+v2 -> v3:
+- Add details to the user API documentation
+- early exit if vgic_v3_rdist_region_from_index() fails
+- return -EINVAL if legacy and new redist region API are mixed
+
+v1 -> v2:
+- Rework the uapi. Only bits [51:16] of the redist region are
+  exposed. Also a new flags field was introduced
+- Do not store the last bit in the vgic_cpu struct anymore
+- remove dist->spis check in 1st patch
+- add last patch to bump VGIC_V3_MAX_CPUS to 512
+- advertise the new attribute
 
 
-On 05/21/2018 04:45 AM, Russell King wrote:
-> Include Brahma B15 in the Spectre v2 KVM workarounds.
-> 
-> Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
+Eric Auger (13):
+  KVM: arm/arm64: Set dist->spis to NULL after kfree
+  KVM: arm/arm64: Document KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+  KVM: arm/arm64: Replace the single rdist region by a list
+  KVM: arm/arm64: Helper to locate free rdist index
+  KVM: arm/arm64: Revisit Redistributor TYPER last bit computation
+  KVM: arm/arm64: Adapt vgic_v3_check_base to multiple rdist regions
+  KVM: arm/arm64: Helper to register a new redistributor region
+  KVM: arm/arm64: Remove kvm_vgic_vcpu_early_init
+  KVM: arm/arm64: Check vcpu redist base before registering an iodev
+  KVM: arm/arm64: Check all vcpu redistributors are set on map_resources
+  KVM: arm/arm64: Add KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+  KVM: arm/arm64: Implement KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+  KVM: arm/arm64: Bump VGIC_V3_MAX_CPUS to 512
 
-Acked-by: Florian Fainelli <f.fainelli@gmail.com>
+ Documentation/virtual/kvm/devices/arm-vgic-v3.txt |  30 +++++-
+ arch/arm/include/uapi/asm/kvm.h                   |   1 +
+ arch/arm64/include/uapi/asm/kvm.h                 |   1 +
+ include/kvm/arm_vgic.h                            |  17 ++--
+ virt/kvm/arm/arm.c                                |   1 -
+ virt/kvm/arm/vgic/vgic-init.c                     | 100 ++++++++++---------
+ virt/kvm/arm/vgic/vgic-kvm-device.c               |  53 +++++++++-
+ virt/kvm/arm/vgic/vgic-mmio-v3.c                  | 114 +++++++++++++++++++---
+ virt/kvm/arm/vgic/vgic-v3.c                       | 101 +++++++++++++++----
+ virt/kvm/arm/vgic/vgic.h                          |  42 +++++++-
+ 10 files changed, 370 insertions(+), 90 deletions(-)
+
 -- 
-Florian
+2.5.5
