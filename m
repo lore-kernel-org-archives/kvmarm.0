@@ -1,23 +1,22 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v10 17/18] KVM: arm64: Fold redundant exit code checks out of
- fixup_guest_exit()
-Date: Tue, 22 May 2018 17:05:18 +0100
-Message-ID: <1527005119-6842-18-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v10 18/18] KVM: arm64: Invoke FPSIMD context switch trap from C
+Date: Tue, 22 May 2018 17:05:19 +0100
+Message-ID: <1527005119-6842-19-git-send-email-Dave.Martin@arm.com>
 References: <1527005119-6842-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 55D024A119
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F1174A119
  for <kvmarm@lists.cs.columbia.edu>; Tue, 22 May 2018 11:56:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zTSR4XH4wdUp for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 May 2018 11:56:30 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B5C134A117
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 May 2018 11:55:57 -0400 (EDT)
+ with ESMTP id EKhJqFCq9UVB for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 May 2018 11:56:31 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B04E4A118
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 May 2018 11:55:59 -0400 (EDT)
 In-Reply-To: <1527005119-6842-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,70 +31,138 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The entire tail of fixup_guest_exit() is contained in if statements
-of the form if (x && *exit_code == ARM_EXCEPTION_TRAP).  As a result,
-we can check just once and bail out of the function early, allowing
-the remaining if conditions to be simplified.
+The conversion of the FPSIMD context switch trap code to C has added
+some overhead to calling it, due to the need to save registers that
+the procedure call standard defines as caller-saved.
 
-The only awkward case is where *exit_code is changed to
-ARM_EXCEPTION_EL1_SERROR in the case of an illegal GICv2 CPU
-interface access: in that case, the GICv3 trap handling code is
-skipped using a goto.  This avoids pointlessly evaluating the
-static branch check for the GICv3 case, even though we can't have
-vgic_v2_cpuif_trap and vgic_v3_cpuif_trap true simultaneously
-unless we have a GICv3 and GICv2 on the host: that sounds stupid,
-but I haven't satisfied myself that it can't happen.
+So, perhaps it is no longer worth invoking this trap handler quite
+so early.
 
-No functional change.
+Instead, we can invoke it from fixup_guest_exit(), with little
+likelihood of increasing the overhead much further.
+
+As a convenience, this patch gives __hyp_switch_fpsimd() the same
+return semantics fixup_guest_exit().  For now there is no
+possibility of a spurious FPSIMD trap, so the function always
+returns true, but this allows it to be tail-called with a single
+return statement.
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
 ---
- arch/arm64/kvm/hyp/switch.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/hyp/entry.S     | 30 ------------------------------
+ arch/arm64/kvm/hyp/hyp-entry.S | 19 -------------------
+ arch/arm64/kvm/hyp/switch.c    | 15 +++++++++++++--
+ 3 files changed, 13 insertions(+), 51 deletions(-)
 
+diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+index 40f349b..fad1e16 100644
+--- a/arch/arm64/kvm/hyp/entry.S
++++ b/arch/arm64/kvm/hyp/entry.S
+@@ -166,33 +166,3 @@ abort_guest_exit_end:
+ 	orr	x0, x0, x5
+ 1:	ret
+ ENDPROC(__guest_exit)
+-
+-ENTRY(__fpsimd_guest_restore)
+-	// x0: esr
+-	// x1: vcpu
+-	// x2-x29,lr: vcpu regs
+-	// vcpu x0-x1 on the stack
+-	stp	x2, x3, [sp, #-144]!
+-	stp	x4, x5, [sp, #16]
+-	stp	x6, x7, [sp, #32]
+-	stp	x8, x9, [sp, #48]
+-	stp	x10, x11, [sp, #64]
+-	stp	x12, x13, [sp, #80]
+-	stp	x14, x15, [sp, #96]
+-	stp	x16, x17, [sp, #112]
+-	stp	x18, lr, [sp, #128]
+-
+-	bl	__hyp_switch_fpsimd
+-
+-	ldp	x4, x5, [sp, #16]
+-	ldp	x6, x7, [sp, #32]
+-	ldp	x8, x9, [sp, #48]
+-	ldp	x10, x11, [sp, #64]
+-	ldp	x12, x13, [sp, #80]
+-	ldp	x14, x15, [sp, #96]
+-	ldp	x16, x17, [sp, #112]
+-	ldp	x18, lr, [sp, #128]
+-	ldp	x0, x1, [sp, #144]
+-	ldp	x2, x3, [sp], #160
+-	eret
+-ENDPROC(__fpsimd_guest_restore)
+diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+index bffece2..753b9d2 100644
+--- a/arch/arm64/kvm/hyp/hyp-entry.S
++++ b/arch/arm64/kvm/hyp/hyp-entry.S
+@@ -113,25 +113,6 @@ el1_hvc_guest:
+ 
+ el1_trap:
+ 	get_vcpu_ptr	x1, x0
+-
+-	mrs		x0, esr_el2
+-	lsr		x0, x0, #ESR_ELx_EC_SHIFT
+-	/*
+-	 * x0: ESR_EC
+-	 * x1: vcpu pointer
+-	 */
+-
+-	/*
+-	 * We trap the first access to the FP/SIMD to save the host context
+-	 * and restore the guest context lazily.
+-	 * If FP/SIMD is not implemented, handle the trap and inject an
+-	 * undefined instruction exception to the guest.
+-	 */
+-alternative_if_not ARM64_HAS_NO_FPSIMD
+-	cmp	x0, #ESR_ELx_EC_FP_ASIMD
+-	b.eq	__fpsimd_guest_restore
+-alternative_else_nop_endif
+-
+ 	mov	x0, #ARM_EXCEPTION_TRAP
+ 	b	__guest_exit
+ 
 diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 18d0faa..4fbee95 100644
+index 4fbee95..2d45bd7 100644
 --- a/arch/arm64/kvm/hyp/switch.c
 +++ b/arch/arm64/kvm/hyp/switch.c
-@@ -387,11 +387,13 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
- 	 * same PC once the SError has been injected, and replay the
- 	 * trapping instruction.
- 	 */
--	if (*exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
-+	if (*exit_code != ARM_EXCEPTION_TRAP)
-+		goto exit;
+@@ -328,8 +328,7 @@ static bool __hyp_text __skip_instr(struct kvm_vcpu *vcpu)
+ 	}
+ }
+ 
+-void __hyp_text __hyp_switch_fpsimd(u64 esr __always_unused,
+-				    struct kvm_vcpu *vcpu)
++static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
+ {
+ 	struct user_fpsimd_state *host_fpsimd = vcpu->arch.host_fpsimd_state;
+ 
+@@ -369,6 +368,8 @@ void __hyp_text __hyp_switch_fpsimd(u64 esr __always_unused,
+ 			     fpexc32_el2);
+ 
+ 	vcpu->arch.flags |= KVM_ARM64_FP_ENABLED;
 +
-+	if (!__populate_fault_info(vcpu))
++	return true;
+ }
+ 
+ /*
+@@ -390,6 +391,16 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	if (*exit_code != ARM_EXCEPTION_TRAP)
+ 		goto exit;
+ 
++	/*
++	 * We trap the first access to the FP/SIMD to save the host context
++	 * and restore the guest context lazily.
++	 * If FP/SIMD is not implemented, handle the trap and inject an
++	 * undefined instruction exception to the guest.
++	 */
++	if (system_supports_fpsimd() &&
++	    kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_FP_ASIMD)
++		return __hyp_switch_fpsimd(vcpu);
++
+ 	if (!__populate_fault_info(vcpu))
  		return true;
  
--	if (static_branch_unlikely(&vgic_v2_cpuif_trap) &&
--	    *exit_code == ARM_EXCEPTION_TRAP) {
-+	if (static_branch_unlikely(&vgic_v2_cpuif_trap)) {
- 		bool valid;
- 
- 		valid = kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_DABT_LOW &&
-@@ -417,11 +419,12 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
- 					*vcpu_cpsr(vcpu) &= ~DBG_SPSR_SS;
- 				*exit_code = ARM_EXCEPTION_EL1_SERROR;
- 			}
-+
-+			goto exit;
- 		}
- 	}
- 
- 	if (static_branch_unlikely(&vgic_v3_cpuif_trap) &&
--	    *exit_code == ARM_EXCEPTION_TRAP &&
- 	    (kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_SYS64 ||
- 	     kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_CP15_32)) {
- 		int ret = __vgic_v3_perform_cpuif_access(vcpu);
-@@ -430,6 +433,7 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
- 			return true;
- 	}
- 
-+exit:
- 	/* Return to the host kernel and handle the exit */
- 	return false;
- }
 -- 
 2.1.4
