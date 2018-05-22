@@ -1,143 +1,70 @@
-From: Russell King - ARM Linux <linux@armlinux.org.uk>
-Subject: Re: [PATCH 09/14] ARM: spectre-v2: add PSCI based hardening
-Date: Tue, 22 May 2018 18:57:18 +0100
-Message-ID: <20180522175717.GT17671@n2100.armlinux.org.uk>
-References: <20180521114238.GN17671@n2100.armlinux.org.uk>
- <E1fKjFT-00064F-Bs@rmk-PC.armlinux.org.uk>
- <35edb3df-fed4-b6e6-be0c-ee758618c92e@arm.com>
+From: Andrey Konovalov <andreyknvl@google.com>
+Subject: Re: [PATCH] arm64: kvm: use -fno-jump-tables with clang
+Date: Tue, 22 May 2018 19:58:31 +0200
+Message-ID: <CAAeHK+z2LmMYasYtRTt2U=QF8Pe_i10RA3-SkLzGXXByZqLh1w@mail.gmail.com>
+References: <20180518170202.11458-1-samitolvanen@google.com>
+ <05d14ac7-0feb-63a3-e7ef-b8ca1ae2fd1d@arm.com> <CAKwvOdm1kYedukCq=g74AvqJHp6KC03oNoouQy2nkvfo4idoEw@mail.gmail.com>
+ <8c7be44f-086d-65e3-9969-8182261ce82f@arm.com> <CAKwvOd=XZqg5=mkXZb-cxq3i_AGoJGAbmF=Fwc7Q98oi0tbN9g@mail.gmail.com>
+ <3fd89842-86cd-ee01-0c2c-5438dd2d5f2a@arm.com> <CAKwvOdk+=JKcQP1ieLEkZftRGf-pqCTTzEuYvT_45YNMkEw_wA@mail.gmail.com>
+ <86k1rzc4ba.wl-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B0AF849F93
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 May 2018 13:47:12 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id m9YdLkil0m5A for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 May 2018 13:46:50 -0400 (EDT)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B465F49F94
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 May 2018 13:46:50 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <35edb3df-fed4-b6e6-be0c-ee758618c92e@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Content-Type: text/plain; charset="UTF-8"
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <86k1rzc4ba.wl-marc.zyngier@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: Nick Desaulniers <ndesaulniers@google.com>, Sami Tolvanen <samitolvanen@google.com>, christoffer.dall@arm.com, Takahiro Akashi <takahiro.akashi@linaro.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, kvmarm@lists.cs.columbia.edu, LKML <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, May 22, 2018 at 06:24:13PM +0100, Marc Zyngier wrote:
-> On 21/05/18 12:45, Russell King wrote:
-> > Add PSCI based hardening for cores that require more complex handling in
-> > firmware.
-> > 
-> > Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
-> > Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-> > ---
-> >  arch/arm/mm/proc-v7-bugs.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++
-> >  arch/arm/mm/proc-v7.S      | 21 +++++++++++++++++++
-> >  2 files changed, 71 insertions(+)
-> > 
-> > diff --git a/arch/arm/mm/proc-v7-bugs.c b/arch/arm/mm/proc-v7-bugs.c
-> > index 65a9b8141f86..0c37e6a2830d 100644
-> > --- a/arch/arm/mm/proc-v7-bugs.c
-> > +++ b/arch/arm/mm/proc-v7-bugs.c
-> > @@ -1,9 +1,12 @@
-> >  // SPDX-License-Identifier: GPL-2.0
-> > +#include <linux/arm-smccc.h>
-> >  #include <linux/kernel.h>
-> > +#include <linux/psci.h>
-> >  #include <linux/smp.h>
-> >  
-> >  #include <asm/cp15.h>
-> >  #include <asm/cputype.h>
-> > +#include <asm/proc-fns.h>
-> >  #include <asm/system_misc.h>
-> >  
-> >  void cpu_v7_bugs_init(void);
-> > @@ -39,6 +42,9 @@ void cpu_v7_ca15_ibe(void)
-> >  #ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
-> >  void (*harden_branch_predictor)(void);
-> >  
-> > +extern void cpu_v7_smc_switch_mm(phys_addr_t pgd_phys, struct mm_struct *mm);
-> > +extern void cpu_v7_hvc_switch_mm(phys_addr_t pgd_phys, struct mm_struct *mm);
-> > +
-> >  static void harden_branch_predictor_bpiall(void)
-> >  {
-> >  	write_sysreg(0, BPIALL);
-> > @@ -49,6 +55,18 @@ static void harden_branch_predictor_iciallu(void)
-> >  	write_sysreg(0, ICIALLU);
-> >  }
-> >  
-> > +#ifdef CONFIG_ARM_PSCI
-> > +static void call_smc_arch_workaround_1(void)
-> > +{
-> > +	arm_smccc_1_1_smc(ARM_SMCCC_ARCH_WORKAROUND_1, NULL);
-> > +}
-> > +
-> > +static void call_hvc_arch_workaround_1(void)
-> > +{
-> > +	arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_WORKAROUND_1, NULL);
-> > +}
-> > +#endif
-> > +
-> >  void cpu_v7_bugs_init(void)
-> >  {
-> >  	const char *spectre_v2_method = NULL;
-> > @@ -73,6 +91,38 @@ void cpu_v7_bugs_init(void)
-> >  		spectre_v2_method = "ICIALLU";
-> >  		break;
-> >  	}
-> > +
-> > +#ifdef CONFIG_ARM_PSCI
-> > +	if (psci_ops.smccc_version != SMCCC_VERSION_1_0) {
-> > +		struct arm_smccc_res res;
-> > +
-> > +		switch (psci_ops.conduit) {
-> > +		case PSCI_CONDUIT_HVC:
-> > +			arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
-> > +					  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
-> > +			if ((int)res.a0 < 0)
-> > +				break;
-> 
-> I just realised that there is a small, but significant difference
-> between this and the arm64 version: On arm64, we have a table of
-> vulnerable implementations, and we try the mitigation on a per-cpu
-> basis. Here, you entirely rely on the firmware to discover whether the
-> CPU needs mitigation or not. You then need to check for a return value
-> of 1, which indicates that although the mitigation is implemented, it is
-> not required on this particular CPU.
-> 
-> But that's probably moot if you don't support BL systems.
-> 
-> > +			harden_branch_predictor = call_hvc_arch_workaround_1;
-> > +			processor.switch_mm = cpu_v7_hvc_switch_mm;
-> > +			spectre_v2_method = "hypervisor";
-> > +			break;
-> > +
-> > +		case PSCI_CONDUIT_SMC:
-> > +			arm_smccc_1_1_smc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
-> > +					  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
-> > +			if ((int)res.a0 < 0)
-> > +				break;
-> > +			harden_branch_predictor = call_smc_arch_workaround_1;
-> > +			processor.switch_mm = cpu_v7_smc_switch_mm;
-> > +			spectre_v2_method = "firmware PSCI";
-> 
-> My previous remark still stands: this is not really PSCI.
+On Sat, May 19, 2018 at 12:44 PM, Marc Zyngier <marc.zyngier@arm.com> wrote:
+> That would definitely be the right thing to do. Make sure you (or
+> Andrey tests with the latest released mainline kernel (4.16 for now)
+> or (even better) the tip of Linus' tree.
 
-Sorry, no.  Your comment was for the HVC call, not the SMC.  You said
-nothing about this one.
+Hi!
 
--- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
-According to speedtest.net: 8.21Mbps down 510kbps up
+I can confirm that after applying this patch onto 4.17-rc4 kernel the
+Odroid C2 board that I have boots (it doesn't without the patch).
+
+This is the result of running KVM tests that I was able to find [1]:
+
+root@odroid64:/home/odroid/kvm-unit-tests# ./run_tests.sh
+PASS selftest-setup (2 tests)
+PASS selftest-vectors-kernel (2 tests)
+PASS selftest-vectors-user (2 tests)
+PASS selftest-smp (5 tests)
+PASS pci-test (1 tests)
+FAIL pmu (3 tests, 3 unexpected failures)
+PASS gicv2-ipi (3 tests)
+SKIP gicv3-ipi (qemu-system-aarch64: Initialization of device
+kvm-arm-gicv3 failed: error creating in-kernel VGIC: No such device)
+PASS gicv2-active (1 tests)
+SKIP gicv3-active (qemu-system-aarch64: Initialization of device
+kvm-arm-gicv3 failed: error creating in-kernel VGIC: No such device)
+PASS psci (4 tests)
+PASS timer (8 tests)
+
+Here is the result of running the same tests on GCC compiled kernel
+(looks the same):
+
+root@odroid64:/home/odroid/kvm-unit-tests# ./run_tests.sh
+PASS selftest-setup (2 tests)
+PASS selftest-vectors-kernel (2 tests)
+PASS selftest-vectors-user (2 tests)
+PASS selftest-smp (5 tests)
+PASS pci-test (1 tests)
+FAIL pmu (3 tests, 3 unexpected failures)
+PASS gicv2-ipi (3 tests)
+SKIP gicv3-ipi (qemu-system-aarch64: Initialization of device
+kvm-arm-gicv3 failed: error creating in-kernel VGIC: No such device)
+PASS gicv2-active (1 tests)
+SKIP gicv3-active (qemu-system-aarch64: Initialization of device
+kvm-arm-gicv3 failed: error creating in-kernel VGIC: No such device)
+PASS psci (4 tests)
+PASS timer (8 tests)
+
+Tested-by: Andrey Konovalov <andreyknvl@google.com>
+
+Thanks!
+
+[1] https://www.linux-kvm.org/page/KVM-unit-tests
