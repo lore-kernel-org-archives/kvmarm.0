@@ -1,24 +1,27 @@
-From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v8 07/13] KVM: arm/arm64: Helper to register a new
- redistributor region
-Date: Tue, 22 May 2018 09:55:12 +0200
-Message-ID: <1526975718-18567-8-git-send-email-eric.auger@redhat.com>
-References: <1526975718-18567-1-git-send-email-eric.auger@redhat.com>
+From: Russell King - ARM Linux <linux@armlinux.org.uk>
+Subject: Re: [PATCH 06/14] ARM: spectre-v2: harden branch predictor on
+ context switches
+Date: Tue, 22 May 2018 10:55:06 +0100
+Message-ID: <20180522095506.GQ17671@n2100.armlinux.org.uk>
+References: <20180521114238.GN17671@n2100.armlinux.org.uk>
+ <E1fKjFD-00063u-Q5@rmk-PC.armlinux.org.uk>
+ <61e24c59-9905-8524-92ba-98cdbadb3011@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 362F54A11D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 May 2018 03:45:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D68A84A0C4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 May 2018 05:45:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fhOMBR0b7Ggn for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 May 2018 03:45:19 -0400 (EDT)
-Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EEF6D4A10D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 May 2018 03:45:14 -0400 (EDT)
-In-Reply-To: <1526975718-18567-1-git-send-email-eric.auger@redhat.com>
+ with ESMTP id 6VPCSN8KqPim for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 May 2018 05:45:22 -0400 (EDT)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 02E684A054
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 May 2018 05:45:22 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <61e24c59-9905-8524-92ba-98cdbadb3011@gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,183 +31,48 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org
-Cc: andre.przywara@arm.com
+To: Florian Fainelli <f.fainelli@gmail.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We introduce a new helper that creates and inserts a new redistributor
-region into the rdist region list. This helper both handles the case
-where the redistributor region size is known at registration time
-and the legacy case where it is not (eventually depending on the number
-of online vcpus). Depending on pfns, we perform all the possible checks
-that we can do:
+On Mon, May 21, 2018 at 08:21:58PM -0700, Florian Fainelli wrote:
+> 
+> 
+> On 05/21/2018 04:44 AM, Russell King wrote:
+> > Harden the branch predictor against Spectre v2 attacks on context
+> > switches for ARMv7 and later CPUs.  We do this by:
+> > 
+> > Cortex A9, A12, A17, A73, A75: invalidating the BTB.
+> > Cortex A15, Brahma B15: invalidating the instruction cache.
+> > 
+> > Cortex A57 and Cortex A72 are not addressed in this patch.
+> > 
+> > Cortex R7 and Cortex R8 are also not addressed as we do not enforce
+> > memory protection on these cores.
+> > 
+> > Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
+> 
+> Reviewed-by: Florian Fainelli <f.fainelli@gmail.com>
 
-- end of memory crossing
-- incorrect alignment of the base address
-- collision with distributor region if already defined
-- collision with already registered rdist regions
-- check of the new index
+It does need this additional patch to avoid some build errors - I'm
+surprised that my autobuilder found it before the 0-day builder...
 
-Rdist regions must be inserted by increasing order of indices. Indices
-must be contiguous.
-
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
-
----
-v5 -> v6:
-- truly use list_last_entry in vgic_v3_insert_redist_region (?)
-- Added Christoffer's R-b
-
-v3 -> v4:
-- inversed check in vgic_v3_rdist_overlap
-- use list_last_entry in vgic_v3_insert_redist_region
-- improve comment in vgic_v3_insert_redist_region
-- introduce vgic_dist_overlap
----
- virt/kvm/arm/vgic/vgic-mmio-v3.c | 89 ++++++++++++++++++++++++++++++++--------
- virt/kvm/arm/vgic/vgic.h         |  8 ++++
- 2 files changed, 81 insertions(+), 16 deletions(-)
-
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index ce5c927..3dbc057 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -680,14 +680,63 @@ static int vgic_register_all_redist_iodevs(struct kvm *kvm)
- 	return ret;
+diff --git a/arch/arm/mm/proc-v7-bugs.c b/arch/arm/mm/proc-v7-bugs.c
+index 0c37e6a2830d..526d07ab6b7a 100644
+--- a/arch/arm/mm/proc-v7-bugs.c
++++ b/arch/arm/mm/proc-v7-bugs.c
+@@ -127,4 +127,8 @@ void cpu_v7_bugs_init(void)
+ 		pr_info("CPU: Spectre v2: using %s workaround\n",
+ 			spectre_v2_method);
  }
- 
--int vgic_v3_set_redist_base(struct kvm *kvm, u64 addr)
-+/**
-+ * vgic_v3_insert_redist_region - Insert a new redistributor region
-+ *
-+ * Performs various checks before inserting the rdist region in the list.
-+ * Those tests depend on whether the size of the rdist region is known
-+ * (ie. count != 0). The list is sorted by rdist region index.
-+ *
-+ * @kvm: kvm handle
-+ * @index: redist region index
-+ * @base: base of the new rdist region
-+ * @count: number of redistributors the region is made of (0 in the old style
-+ * single region, whose size is induced from the number of vcpus)
-+ *
-+ * Return 0 on success, < 0 otherwise
-+ */
-+static int vgic_v3_insert_redist_region(struct kvm *kvm, uint32_t index,
-+					gpa_t base, uint32_t count)
- {
--	struct vgic_dist *vgic = &kvm->arch.vgic;
-+	struct vgic_dist *d = &kvm->arch.vgic;
- 	struct vgic_redist_region *rdreg;
-+	struct list_head *rd_regions = &d->rd_regions;
-+	size_t size = count * KVM_VGIC_V3_REDIST_SIZE;
- 	int ret;
- 
--	/* vgic_check_ioaddr makes sure we don't do this twice */
--	if (!list_empty(&vgic->rd_regions))
-+	/* single rdist region already set ?*/
-+	if (!count && !list_empty(rd_regions))
-+		return -EINVAL;
-+
-+	/* cross the end of memory ? */
-+	if (base + size < base)
-+		return -EINVAL;
-+
-+	if (list_empty(rd_regions)) {
-+		if (index != 0)
-+			return -EINVAL;
-+	} else {
-+		rdreg = list_last_entry(rd_regions,
-+					struct vgic_redist_region, list);
-+		if (index != rdreg->index + 1)
-+			return -EINVAL;
-+
-+		/* Cannot add an explicitly sized regions after legacy region */
-+		if (!rdreg->count)
-+			return -EINVAL;
-+	}
-+
-+	/*
-+	 * For legacy single-region redistributor regions (!count),
-+	 * check that the redistributor region does not overlap with the
-+	 * distributor's address space.
-+	 */
-+	if (!count && !IS_VGIC_ADDR_UNDEF(d->vgic_dist_base) &&
-+		vgic_dist_overlap(kvm, base, size))
-+		return -EINVAL;
-+
-+	/* collision with any other rdist region? */
-+	if (vgic_v3_rdist_overlap(kvm, base, size))
- 		return -EINVAL;
- 
- 	rdreg = kzalloc(sizeof(*rdreg), GFP_KERNEL);
-@@ -696,17 +745,29 @@ int vgic_v3_set_redist_base(struct kvm *kvm, u64 addr)
- 
- 	rdreg->base = VGIC_ADDR_UNDEF;
- 
--	ret = vgic_check_ioaddr(kvm, &rdreg->base, addr, SZ_64K);
-+	ret = vgic_check_ioaddr(kvm, &rdreg->base, base, SZ_64K);
- 	if (ret)
--		goto out;
-+		goto free;
- 
--	rdreg->base = addr;
--	if (!vgic_v3_check_base(kvm)) {
--		ret = -EINVAL;
--		goto out;
--	}
-+	rdreg->base = base;
-+	rdreg->count = count;
-+	rdreg->free_index = 0;
-+	rdreg->index = index;
- 
--	list_add(&rdreg->list, &vgic->rd_regions);
-+	list_add_tail(&rdreg->list, rd_regions);
-+	return 0;
-+free:
-+	kfree(rdreg);
-+	return ret;
-+}
-+
-+int vgic_v3_set_redist_base(struct kvm *kvm, u64 addr)
++#else
++void cpu_v7_bugs_init(void)
 +{
-+	int ret;
-+
-+	ret = vgic_v3_insert_redist_region(kvm, 0, addr, 0);
-+	if (ret)
-+		return ret;
- 
- 	/*
- 	 * Register iodevs for each existing VCPU.  Adding more VCPUs
-@@ -717,10 +778,6 @@ int vgic_v3_set_redist_base(struct kvm *kvm, u64 addr)
- 		return ret;
- 
- 	return 0;
--
--out:
--	kfree(rdreg);
--	return ret;
- }
- 
- int vgic_v3_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr)
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index e9f1926..1c8af4e 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -286,6 +286,14 @@ vgic_v3_rd_region_size(struct kvm *kvm, struct vgic_redist_region *rdreg)
- }
- bool vgic_v3_rdist_overlap(struct kvm *kvm, gpa_t base, size_t size);
- 
-+static inline bool vgic_dist_overlap(struct kvm *kvm, gpa_t base, size_t size)
-+{
-+	struct vgic_dist *d = &kvm->arch.vgic;
-+
-+	return (base + size > d->vgic_dist_base) &&
-+		(base < d->vgic_dist_base + KVM_VGIC_V3_DIST_SIZE);
 +}
-+
- int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
- 			 u32 devid, u32 eventid, struct vgic_irq **irq);
- struct vgic_its *vgic_msi_to_its(struct kvm *kvm, struct kvm_msi *msi);
+ #endif
+
+
 -- 
-2.5.5
+RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
+According to speedtest.net: 8.21Mbps down 510kbps up
