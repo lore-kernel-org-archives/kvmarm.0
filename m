@@ -1,115 +1,101 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v8 00/13] KVM: arm/arm64: Allow multiple GICv3 redistributor regions
-Date: Tue, 22 May 2018 09:55:05 +0200
-Message-ID: <1526975718-18567-1-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v8 04/13] KVM: arm/arm64: Helper to locate free rdist index
+Date: Tue, 22 May 2018 09:55:09 +0200
+Message-ID: <1526975718-18567-5-git-send-email-eric.auger@redhat.com>
+References: <1526975718-18567-1-git-send-email-eric.auger@redhat.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1526975718-18567-1-git-send-email-eric.auger@redhat.com>
 Sender: linux-kernel-owner@vger.kernel.org
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org
 Cc: andre.przywara@arm.com, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-At the moment the KVM VGICv3 only supports a single redistributor
-region (whose base address is set through the GICv3 kvm device
-KVM_DEV_ARM_VGIC_GRP_ADDR/KVM_VGIC_V3_ADDR_TYPE_REDIST). There,
-all the redistributors are laid out contiguously. The size of this
-single redistributor region is not set explicitly but instead
-induced at a late stage by the number of online vcpus.
+We introduce vgic_v3_rdist_free_slot to help identifying
+where we can place a new 2x64KB redistributor.
 
-The GIC specification does not mandate all redistributors to be
-contiguous. Moreover DT and ACPI were specified so that multiple
-redistributors regions can be defined.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
 
-The current interface brings a limitation on QEMU where ARM
-virt machine available GPA holes only allowed to assign a
-redistributor region fitting a max of 123 vcpus. Overcoming this
-limitation would force either to create a new machine or relocate
-the single rdist region or allow the allocation of multiple rdist
-regions.
-
-This series enables this last alternative. A new GICv3 KVM device
-KVM_DEV_ARM_VGIC_GRP_ADDR/KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION allows
-to register individual redistributor regions whose size is defined
-explicitly. Those rdist regions then are filled by vcpu rdist frames
-according to the need. The vgic init and related base address checks
-are impacted.
-
-Best Regards
-
-Eric
-
-Git: complete series available at
-https://github.com/eauger/linux/tree/v4.17-rc6-rdist-regions-v8
-Previous version:
-https://github.com/eauger/linux/tree/v4.17-rc5-rdist-regions-v7
-
-History:
-v7 -> v8:
-- fix missing ret initialization in patch kvm_vgic_vcpu_init()
-
-v6 -> v7:
-- fix bug reported by Marc with kvmtool caused by rd_iodev.base_addr
-  and sgi_iodev.base_addr being initialized too late:
-  in kvm_vgic_vcpu_early_init instead of kvm_vgic_vcpu_init
-- removed kvm_vgic_vcpu_early_init()
-
-v5 -> v6:
-- truly use list_last_entry in vgic_v3_insert_redist_region
-- s/pointed by/pointed to by in API doc
-- collected last R-b/A-b
-
-v4 -> v5:
-- fix KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION read path and update
-  the documentation accordingly (removed Peter's and
-  Christoffer's A-b)
-- use u<n> instead of uint<n>_t
-- collected additional R-b/A-b
+---
 
 v3 -> v4:
-- Collected Christoffer's R-b
-- reworked vgic_v3_rdist_overlap and introduced vgic_dist_overlap
-- vgic_v3_insert_redist_region cleanup
-- inverse order for patches 6 and 7
+- add details to vgic_v3_rdist_free_slot kernel doc comment
+- Added Christoffer's R-b
+---
+ virt/kvm/arm/vgic/vgic-mmio-v3.c |  3 +--
+ virt/kvm/arm/vgic/vgic-v3.c      | 23 +++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic.h         | 11 +++++++++++
+ 3 files changed, 35 insertions(+), 2 deletions(-)
 
-v2 -> v3:
-- Add details to the user API documentation
-- early exit if vgic_v3_rdist_region_from_index() fails
-- return -EINVAL if legacy and new redist region API are mixed
-
-v1 -> v2:
-- Rework the uapi. Only bits [51:16] of the redist region are
-  exposed. Also a new flags field was introduced
-- Do not store the last bit in the vgic_cpu struct anymore
-- remove dist->spis check in 1st patch
-- add last patch to bump VGIC_V3_MAX_CPUS to 512
-- advertise the new attribute
-
-
-Eric Auger (13):
-  KVM: arm/arm64: Set dist->spis to NULL after kfree
-  KVM: arm/arm64: Document KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
-  KVM: arm/arm64: Replace the single rdist region by a list
-  KVM: arm/arm64: Helper to locate free rdist index
-  KVM: arm/arm64: Revisit Redistributor TYPER last bit computation
-  KVM: arm/arm64: Adapt vgic_v3_check_base to multiple rdist regions
-  KVM: arm/arm64: Helper to register a new redistributor region
-  KVM: arm/arm64: Remove kvm_vgic_vcpu_early_init
-  KVM: arm/arm64: Check vcpu redist base before registering an iodev
-  KVM: arm/arm64: Check all vcpu redistributors are set on map_resources
-  KVM: arm/arm64: Add KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
-  KVM: arm/arm64: Implement KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
-  KVM: arm/arm64: Bump VGIC_V3_MAX_CPUS to 512
-
- Documentation/virtual/kvm/devices/arm-vgic-v3.txt |  30 +++++-
- arch/arm/include/uapi/asm/kvm.h                   |   1 +
- arch/arm64/include/uapi/asm/kvm.h                 |   1 +
- include/kvm/arm_vgic.h                            |  17 ++--
- virt/kvm/arm/arm.c                                |   1 -
- virt/kvm/arm/vgic/vgic-init.c                     | 100 ++++++++++---------
- virt/kvm/arm/vgic/vgic-kvm-device.c               |  53 +++++++++-
- virt/kvm/arm/vgic/vgic-mmio-v3.c                  | 114 +++++++++++++++++++---
- virt/kvm/arm/vgic/vgic-v3.c                       | 101 +++++++++++++++----
- virt/kvm/arm/vgic/vgic.h                          |  42 +++++++-
- 10 files changed, 370 insertions(+), 90 deletions(-)
-
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index d1aab18..49ca176 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -593,8 +593,7 @@ int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
+ 	 * function for all VCPUs when the base address is set.  Just return
+ 	 * without doing any work for now.
+ 	 */
+-	rdreg = list_first_entry(&vgic->rd_regions,
+-				 struct vgic_redist_region, list);
++	rdreg = vgic_v3_rdist_free_slot(&vgic->rd_regions);
+ 	if (!rdreg)
+ 		return 0;
+ 
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index 0bb019f..6a1c932 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -453,6 +453,29 @@ bool vgic_v3_check_base(struct kvm *kvm)
+ 	return false;
+ }
+ 
++/**
++ * vgic_v3_rdist_free_slot - Look up registered rdist regions and identify one
++ * which has free space to put a new rdist region.
++ *
++ * @rd_regions: redistributor region list head
++ *
++ * A redistributor regions maps n redistributors, n = region size / (2 x 64kB).
++ * Stride between redistributors is 0 and regions are filled in the index order.
++ *
++ * Return: the redist region handle, if any, that has space to map a new rdist
++ * region.
++ */
++struct vgic_redist_region *vgic_v3_rdist_free_slot(struct list_head *rd_regions)
++{
++	struct vgic_redist_region *rdreg;
++
++	list_for_each_entry(rdreg, rd_regions, list) {
++		if (!vgic_v3_redist_region_full(rdreg))
++			return rdreg;
++	}
++	return NULL;
++}
++
+ int vgic_v3_map_resources(struct kvm *kvm)
+ {
+ 	int ret = 0;
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index 32c25d4..fddd57f 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -265,6 +265,17 @@ static inline int vgic_v3_max_apr_idx(struct kvm_vcpu *vcpu)
+ 	}
+ }
+ 
++static inline bool
++vgic_v3_redist_region_full(struct vgic_redist_region *region)
++{
++	if (!region->count)
++		return false;
++
++	return (region->free_index >= region->count);
++}
++
++struct vgic_redist_region *vgic_v3_rdist_free_slot(struct list_head *rdregs);
++
+ int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
+ 			 u32 devid, u32 eventid, struct vgic_irq **irq);
+ struct vgic_its *vgic_msi_to_its(struct kvm *kvm, struct kvm_msi *msi);
 -- 
 2.5.5
