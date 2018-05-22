@@ -1,21 +1,21 @@
 From: Adam Wallis <awallis@codeaurora.org>
-Subject: Re: [PATCHv2 06/12] arm64: add basic pointer authentication support
-Date: Tue, 22 May 2018 15:06:21 -0400
-Message-ID: <daefeb1f-9553-c26d-0b35-2c4da328aeff@codeaurora.org>
-References: <20171127163806.31435-1-mark.rutland@arm.com>
- <20171127163806.31435-7-mark.rutland@arm.com>
+Subject: Re: [PATCHv4 06/10] arm64: add basic pointer authentication support
+Date: Tue, 22 May 2018 15:08:42 -0400
+Message-ID: <4b394038-ffd7-ef28-faaf-00f91febf54a@codeaurora.org>
+References: <20180503132031.25705-1-mark.rutland@arm.com>
+ <20180503132031.25705-7-mark.rutland@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20171127163806.31435-7-mark.rutland@arm.com>
+In-Reply-To: <20180503132031.25705-7-mark.rutland@arm.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 To: Mark Rutland <mark.rutland@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: arnd@arndb.de, catalin.marinas@arm.com, cdall@linaro.org, kvmarm@lists.cs.columbia.edu, linux-arch@vger.kernel.org, marc.zyngier@arm.com, suzuki.poulose@arm.com, will.deacon@arm.com, yao.qi@arm.com, kernel-hardening@lists.openwall.com, linux-kernel@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, catalin.marinas@arm.com, christoffer.dall@arm.com, drjones@redhat.com, marc.zyngier@arm.com, ramana.radhakrishnan@arm.com, suzuki.poulose@arm.com, will.deacon@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 11/27/2017 11:38 AM, Mark Rutland wrote:
+On 5/3/2018 9:20 AM, Mark Rutland wrote:
 > This patch adds basic support for pointer authentication, allowing
 > userspace to make use of APIAKey. The kernel maintains an APIAKey value
 > for each process (shared by all threads within), which is initialised to
@@ -34,17 +34,11 @@ On 11/27/2017 11:38 AM, Mark Rutland wrote:
 > 
 > Signed-off-by: Mark Rutland <mark.rutland@arm.com>
 > Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>
 > Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
 > Cc: Will Deacon <will.deacon@arm.com>
 > ---
->  arch/arm64/include/asm/mmu.h          |  5 ++
->  arch/arm64/include/asm/mmu_context.h  | 25 +++++++++-
->  arch/arm64/include/asm/pointer_auth.h | 89 +++++++++++++++++++++++++++++++++++
->  arch/arm64/include/uapi/asm/hwcap.h   |  1 +
->  arch/arm64/kernel/cpufeature.c        | 17 ++++++-
->  arch/arm64/kernel/cpuinfo.c           |  1 +
->  6 files changed, 134 insertions(+), 4 deletions(-)
->  create mode 100644 arch/arm64/include/asm/pointer_auth.h
+
 
 Mark, I was able to verify that a buffer overflow exploit results in a segfault
 with these PAC patches. When I compile the same binary without
