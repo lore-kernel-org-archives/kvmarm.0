@@ -1,32 +1,40 @@
-From: Nick Desaulniers <ndesaulniers@google.com>
-Subject: Re: [PATCH] arm64: kvm: use -fno-jump-tables with clang
-Date: Tue, 22 May 2018 11:28:13 -0700
-Message-ID: <CAKwvOdmWg8o9yoZ+3dCwL8vYB8gzE+AatCbXENN-+Gge9Q6gtA@mail.gmail.com>
-References: <20180518170202.11458-1-samitolvanen@google.com>
- <05d14ac7-0feb-63a3-e7ef-b8ca1ae2fd1d@arm.com> <CAKwvOdm1kYedukCq=g74AvqJHp6KC03oNoouQy2nkvfo4idoEw@mail.gmail.com>
- <8c7be44f-086d-65e3-9969-8182261ce82f@arm.com> <CAKwvOd=XZqg5=mkXZb-cxq3i_AGoJGAbmF=Fwc7Q98oi0tbN9g@mail.gmail.com>
- <3fd89842-86cd-ee01-0c2c-5438dd2d5f2a@arm.com> <CAKwvOdk+=JKcQP1ieLEkZftRGf-pqCTTzEuYvT_45YNMkEw_wA@mail.gmail.com>
- <86k1rzc4ba.wl-marc.zyngier@arm.com> <CAAeHK+z2LmMYasYtRTt2U=QF8Pe_i10RA3-SkLzGXXByZqLh1w@mail.gmail.com>
+From: Tony Lindgren <tony@atomide.com>
+Subject: Re: [PATCH 07/14] ARM: spectre-v2: add Cortex A8 and A15 validation
+ of the IBE bit
+Date: Tue, 22 May 2018 11:28:12 -0700
+Message-ID: <20180522182811.GM98604@atomide.com>
+References: <20180521114238.GN17671@n2100.armlinux.org.uk>
+ <E1fKjFJ-000641-5N@rmk-PC.armlinux.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAAeHK+z2LmMYasYtRTt2U=QF8Pe_i10RA3-SkLzGXXByZqLh1w@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Andrey Konovalov <andreyknvl@google.com>
-Cc: marc.zyngier@arm.com, Sami Tolvanen <samitolvanen@google.com>, christoffer.dall@arm.com, Takahiro Akashi <takahiro.akashi@linaro.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <E1fKjFJ-000641-5N@rmk-PC.armlinux.org.uk>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Russell King <rmk+kernel@armlinux.org.uk>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, Christoffer Dall <christoffer.dall@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, May 18, 2018 at 11:13 AM Marc Zyngier <marc.zyngier@arm.com> wrote:
-> > - you have checked that with a released version of the compiler, you
+* Russell King <rmk+kernel@armlinux.org.uk> [180521 12:09]:
+> When the branch predictor hardening is enabled, firmware must have set
+> the IBE bit in the auxiliary control register.  If this bit has not
+> been set, the Spectre workarounds will not be functional.
+> 
+> Add validation that this bit is set, and print a warning at alert level
+> if this is not the case.
+> 
+> Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
+> Reviewed-by: Florian Fainelli <f.fainelli@gmail.com>
 
-On Tue, May 22, 2018 at 10:58 AM Andrey Konovalov <andreyknvl@google.com>
-wrote:
-> Tested-by: Andrey Konovalov <andreyknvl@google.com>
+Yup the alert is working:
 
-Hi Andrey,
-Thank you very much for this report.  Can you confirm as well the version
-of Clang that you were using? If it's not a binary release (built from
-source), would you be able to re-confirm with a released version?
--- 
-Thanks,
-~Nick Desaulniers
+Tested-by: Tony Lindgren <tony@atomide.com>
