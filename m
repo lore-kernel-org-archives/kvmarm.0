@@ -1,22 +1,23 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v8 01/13] KVM: arm/arm64: Set dist->spis to NULL after kfree
-Date: Tue, 22 May 2018 09:55:06 +0200
-Message-ID: <1526975718-18567-2-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v8 02/13] KVM: arm/arm64: Document
+ KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+Date: Tue, 22 May 2018 09:55:07 +0200
+Message-ID: <1526975718-18567-3-git-send-email-eric.auger@redhat.com>
 References: <1526975718-18567-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 95D964A10F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 May 2018 03:45:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D9EAF4A115
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 May 2018 03:45:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xetC4I00iZLK for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 May 2018 03:44:58 -0400 (EDT)
+ with ESMTP id l-9KM979lYH2 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 May 2018 03:45:00 -0400 (EDT)
 Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 280FA4A0E4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 May 2018 03:44:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 09E844A0F1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 May 2018 03:45:00 -0400 (EDT)
 In-Reply-To: <1526975718-18567-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,40 +32,82 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.or
 Cc: andre.przywara@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-in case kvm_vgic_map_resources() fails, typically if the vgic
-distributor is not defined, __kvm_vgic_destroy will be called
-several times. Indeed kvm_vgic_map_resources() is called on
-first vcpu run. As a result dist->spis is freeed more than once
-and on the second time it causes a "kernel BUG at mm/slub.c:3912!"
+We introduce a new KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION attribute in
+KVM_DEV_ARM_VGIC_GRP_ADDR group. It allows userspace to provide the
+base address and size of a redistributor region
 
-Set dist->spis to NULL to avoid the crash.
+Compared to KVM_VGIC_V3_ADDR_TYPE_REDIST, this new attribute allows
+to declare several separate redistributor regions.
 
-Fixes: ad275b8bb1e6 ("KVM: arm/arm64: vgic-new: vgic_init: implement
-vgic_init")
+So the whole redist space does not need to be contiguous anymore.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 
 ---
+v5 -> v6:
+- s/pointed by/pointed to by
+- add Peter's R-b and Christoffer's A-b
 
-v2 -> v3:
-- added Marc's R-b and Fixed commit
+v4 -> v5:
+- Document read access
+- removed Peter's R-b
+
+v3 -> v4:
+- Added Peter's R-b
 ---
- virt/kvm/arm/vgic/vgic-init.c | 1 +
- 1 file changed, 1 insertion(+)
+ Documentation/virtual/kvm/devices/arm-vgic-v3.txt | 30 +++++++++++++++++++++--
+ 1 file changed, 28 insertions(+), 2 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index e07156c..9a5aed7 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -308,6 +308,7 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
- 	dist->initialized = false;
+diff --git a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+index 9293b45..2408ab7 100644
+--- a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
++++ b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+@@ -27,16 +27,42 @@ Groups:
+       VCPU and all of the redistributor pages are contiguous.
+       Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
+       This address needs to be 64K aligned.
++
++    KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION (rw, 64-bit)
++      The attribute data pointed to by kvm_device_attr.addr is a __u64 value:
++      bits:     | 63   ....  52  |  51   ....   16 | 15 - 12  |11 - 0
++      values:   |     count      |       base      |  flags   | index
++      - index encodes the unique redistributor region index
++      - flags: reserved for future use, currently 0
++      - base field encodes bits [51:16] of the guest physical base address
++        of the first redistributor in the region.
++      - count encodes the number of redistributors in the region. Must be
++        greater than 0.
++      There are two 64K pages for each redistributor in the region and
++      redistributors are laid out contiguously within the region. Regions
++      are filled with redistributors in the index order. The sum of all
++      region count fields must be greater than or equal to the number of
++      VCPUs. Redistributor regions must be registered in the incremental
++      index order, starting from index 0.
++      The characteristics of a specific redistributor region can be read
++      by presetting the index field in the attr data.
++      Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
++
++  It is invalid to mix calls with KVM_VGIC_V3_ADDR_TYPE_REDIST and
++  KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION attributes.
++
+   Errors:
+     -E2BIG:  Address outside of addressable IPA range
+-    -EINVAL: Incorrectly aligned address
++    -EINVAL: Incorrectly aligned address, bad redistributor region
++             count/index, mixed redistributor region attribute usage
+     -EEXIST: Address already configured
++    -ENOENT: Attempt to read the characteristics of a non existing
++             redistributor region
+     -ENXIO:  The group or attribute is unknown/unsupported for this device
+              or hardware support is missing.
+     -EFAULT: Invalid user pointer for attr->addr.
  
- 	kfree(dist->spis);
-+	dist->spis = NULL;
- 	dist->nr_spis = 0;
  
- 	if (vgic_supports_direct_msis(kvm))
+-
+   KVM_DEV_ARM_VGIC_GRP_DIST_REGS
+   KVM_DEV_ARM_VGIC_GRP_REDIST_REGS
+   Attributes:
 -- 
 2.5.5
