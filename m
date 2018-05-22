@@ -1,7 +1,7 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v8 11/13] KVM: arm/arm64: Add KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
-Date: Tue, 22 May 2018 09:55:16 +0200
-Message-ID: <1526975718-18567-12-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v8 10/13] KVM: arm/arm64: Check all vcpu redistributors are set on map_resources
+Date: Tue, 22 May 2018 09:55:15 +0200
+Message-ID: <1526975718-18567-11-git-send-email-eric.auger@redhat.com>
 References: <1526975718-18567-1-git-send-email-eric.auger@redhat.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1526975718-18567-1-git-send-email-eric.auger@redhat.com>
@@ -10,46 +10,59 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.or
 Cc: andre.przywara@arm.com, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This new attribute allows the userspace to set the base address
-of a reditributor region, relaxing the constraint of having all
-consecutive redistibutor frames contiguous.
+On vcpu first run, we eventually know the actual number of vcpus.
+This is a synchronization point to check all redistributors
+were assigned. On kvm_vgic_map_resources() we check both dist and
+redist were set, eventually check potential base address inconsistencies.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Acked-by: Christoffer Dall <christoffer.dall@arm.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
 
 ---
+
+v4 -> v5:
+- added Christoffer's R-b
 
 v3 -> v4:
-- keep previous indentation for existing attributes
-- added Christoffer's A-b
+- use kvm_debug
 ---
- arch/arm/include/uapi/asm/kvm.h   | 1 +
- arch/arm64/include/uapi/asm/kvm.h | 1 +
- 2 files changed, 2 insertions(+)
+ virt/kvm/arm/vgic/vgic-v3.c | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
-index caae484..16e006f 100644
---- a/arch/arm/include/uapi/asm/kvm.h
-+++ b/arch/arm/include/uapi/asm/kvm.h
-@@ -91,6 +91,7 @@ struct kvm_regs {
- #define KVM_VGIC_V3_ADDR_TYPE_DIST	2
- #define KVM_VGIC_V3_ADDR_TYPE_REDIST	3
- #define KVM_VGIC_ITS_ADDR_TYPE		4
-+#define KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION	5
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index a006914..8892821 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -493,16 +493,25 @@ struct vgic_redist_region *vgic_v3_rdist_free_slot(struct list_head *rd_regions)
  
- #define KVM_VGIC_V3_DIST_SIZE		SZ_64K
- #define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 04b3256..4e76630 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -91,6 +91,7 @@ struct kvm_regs {
- #define KVM_VGIC_V3_ADDR_TYPE_DIST	2
- #define KVM_VGIC_V3_ADDR_TYPE_REDIST	3
- #define KVM_VGIC_ITS_ADDR_TYPE		4
-+#define KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION	5
+ int vgic_v3_map_resources(struct kvm *kvm)
+ {
+-	int ret = 0;
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+-	struct vgic_redist_region *rdreg =
+-		list_first_entry(&dist->rd_regions,
+-				 struct vgic_redist_region, list);
++	struct kvm_vcpu *vcpu;
++	int ret = 0;
++	int c;
  
- #define KVM_VGIC_V3_DIST_SIZE		SZ_64K
- #define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
+ 	if (vgic_ready(kvm))
+ 		goto out;
+ 
+-	if (IS_VGIC_ADDR_UNDEF(dist->vgic_dist_base) || !rdreg) {
++	kvm_for_each_vcpu(c, vcpu, kvm) {
++		struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
++
++		if (IS_VGIC_ADDR_UNDEF(vgic_cpu->rd_iodev.base_addr)) {
++			kvm_debug("vcpu %d redistributor base not set\n", c);
++			ret = -ENXIO;
++			goto out;
++		}
++	}
++
++	if (IS_VGIC_ADDR_UNDEF(dist->vgic_dist_base)) {
+ 		kvm_err("Need to set vgic distributor addresses first\n");
+ 		ret = -ENXIO;
+ 		goto out;
 -- 
 2.5.5
