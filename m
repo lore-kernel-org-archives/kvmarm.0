@@ -1,110 +1,99 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v10 00/18] KVM: arm64: Optimise FPSIMD context switching
-Date: Tue, 22 May 2018 17:05:01 +0100
-Message-ID: <1527005119-6842-1-git-send-email-Dave.Martin@arm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Subject: [PATCH v10 02/18] thread_info: Add update_thread_flag() helpers
+Date: Tue, 22 May 2018 17:05:03 +0100
+Message-ID: <1527005119-6842-3-git-send-email-Dave.Martin@arm.com>
+References: <1527005119-6842-1-git-send-email-Dave.Martin@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <1527005119-6842-1-git-send-email-Dave.Martin@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: kvmarm@lists.cs.columbia.edu
-Cc: linux-arm-kernel@lists.infradead.org, Christoffer Dall <cdall@kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Steven Rostedt <rostedt@goodmis.org>, Oleg Nesterov <oleg@redhat.com>
+Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Oleg Nesterov <oleg@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Note: Most of these patches are Arm-specific.  People not Cc'd on the
-whole series can find it in the linux-arm-kernel archive [2].
+There are a number of bits of code sprinkled around the kernel to
+set a thread flag if a certain condition is true, and clear it
+otherwise.
 
-This series aims to improve the way FPSIMD context is handled by KVM.
-Changes since the previous v9 [1] are mostly minor, but there are some
-fixes worthy of closer attention.
+To help make those call sites terser and less cumbersome, this
+patch adds a new family of thread flag manipulators
 
-In addition to addressing a review comment by Marc on the changes in v9,
-this series attempts to fix a NULL-dereference bug observed by Marc on
-ESPRESSOBin [5].  A reproducer for a similar bug is documented in [6],
-and this series fixes the observed bug (in patches 1 and 7).  At the
-moment, this is my best hypothesis for the ESPRESSOBin failure, though
-the relationship is unproven and we have no reproducer for the latter.
+	update*_thread_flag([...,] flag, cond)
 
-The changes are summarised in the individual patches.
+which do the equivalent of:
 
-Reviewers please note:
+	if (cond)
+		set*_thread_flag([...,] flag);
+	else
+		clear*_thread_flag([...,] flag);
 
- * Since v8, patches 10 and 14 have changed.  Reviewer tags have been
-   stripped from patch 14, due to non-trivial changes in v9 of the
-   series: see the patch for details.
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Oleg Nesterov <oleg@redhat.com>
+---
+ include/linux/sched.h       |  6 ++++++
+ include/linux/thread_info.h | 11 +++++++++++
+ 2 files changed, 17 insertions(+)
 
- * Since v9, patches 1 and 7 are also new, and correct a latent bug in
-   FPSIMD context handling which is exposed by this series.
-
-If people could take a close look at the above patches, that would be
-much appreciated.
-
-Cheers
----Dave
-
-[1] [PATCH v9 00/16] KVM: arm64: Optimise FPSIMD context switching
-http://lists.infradead.org/pipermail/linux-arm-kernel/2018-May/579569.html
-
-[2] linux-arm-kernel archive
-http://lists.infradead.org/pipermail/linux-arm-kernel/2018-May/thread.html
-
-[3] [kvmarm:queue 9/29] arch/arm/kvm/../../../virt/kvm/arm/arm.c:783:3: error: implicit declaration of function 'kvm_arch_vcpu_ctxsync_fp'; did you mean 'kvm_arch_vcpu_put_fp'?
-http://lists.infradead.org/pipermail/linux-arm-kernel/2018-May/579400.html
-
-[4] [kvmarm:queue 13/29] arch/arm/kvm/../../../virt/kvm/arm/arm.c:1598:6: error: implicit declaration of function 'system_supports_sve'
-http://lists.infradead.org/pipermail/linux-arm-kernel/2018-May/579399.html
-
-[5] [PULL v8] KVM: arm64: Optimise FPSIMD context switching
-http://lists.infradead.org/pipermail/linux-arm-kernel/2018-May/579353.html
-
-
-Christoffer Dall (1):
-  KVM: arm/arm64: Introduce kvm_arch_vcpu_run_pid_change
-
-Dave Martin (17):
-  arm64: fpsimd: Fix TIF_FOREIGN_FPSTATE after invalidating cpu regs
-  thread_info: Add update_thread_flag() helpers
-  arm64: Use update{,_tsk}_thread_flag()
-  KVM: arm64: Convert lazy FPSIMD context switch trap to C
-  arm64: fpsimd: Generalise context saving for non-task contexts
-  arm64: fpsimd: Eliminate task->mm checks
-  arm64/sve: Refactor user SVE trap maintenance for external use
-  KVM: arm64: Repurpose vcpu_arch.debug_flags for general-purpose flags
-  KVM: arm64: Optimise FPSIMD handling to reduce guest/host thrashing
-  arm64/sve: Move read_zcr_features() out of cpufeature.h
-  arm64/sve: Switch sve_pffr() argument from task to thread
-  arm64/sve: Move sve_pffr() to fpsimd.h and make inline
-  KVM: arm64: Save host SVE context as appropriate
-  KVM: arm64: Remove eager host SVE state saving
-  KVM: arm64: Remove redundant *exit_code changes in fpsimd_guest_exit()
-  KVM: arm64: Fold redundant exit code checks out of fixup_guest_exit()
-  KVM: arm64: Invoke FPSIMD context switch trap from C
-
- arch/arm/include/asm/kvm_host.h      |  10 +-
- arch/arm64/Kconfig                   |   7 ++
- arch/arm64/include/asm/cpufeature.h  |  29 ------
- arch/arm64/include/asm/fpsimd.h      |  21 +++++
- arch/arm64/include/asm/kvm_asm.h     |   3 -
- arch/arm64/include/asm/kvm_host.h    |  45 +++++++--
- arch/arm64/include/asm/processor.h   |   2 +
- arch/arm64/include/asm/thread_info.h |   1 +
- arch/arm64/kernel/fpsimd.c           | 176 +++++++++++++++++------------------
- arch/arm64/kernel/ptrace.c           |   1 +
- arch/arm64/kvm/Kconfig               |   1 +
- arch/arm64/kvm/Makefile              |   2 +-
- arch/arm64/kvm/debug.c               |   8 +-
- arch/arm64/kvm/fpsimd.c              | 110 ++++++++++++++++++++++
- arch/arm64/kvm/hyp/debug-sr.c        |   6 +-
- arch/arm64/kvm/hyp/entry.S           |  43 ---------
- arch/arm64/kvm/hyp/hyp-entry.S       |  19 ----
- arch/arm64/kvm/hyp/switch.c          | 124 ++++++++++++++++--------
- arch/arm64/kvm/hyp/sysreg-sr.c       |   4 +-
- arch/arm64/kvm/sys_regs.c            |   9 +-
- include/linux/kvm_host.h             |   9 ++
- include/linux/sched.h                |   6 ++
- include/linux/thread_info.h          |  11 +++
- virt/kvm/Kconfig                     |   3 +
- virt/kvm/arm/arm.c                   |  14 ++-
- virt/kvm/kvm_main.c                  |   7 +-
- 26 files changed, 416 insertions(+), 255 deletions(-)
- create mode 100644 arch/arm64/kvm/fpsimd.c
-
+diff --git a/include/linux/sched.h b/include/linux/sched.h
+index b3d697f..c2c3051 100644
+--- a/include/linux/sched.h
++++ b/include/linux/sched.h
+@@ -1578,6 +1578,12 @@ static inline void clear_tsk_thread_flag(struct task_struct *tsk, int flag)
+ 	clear_ti_thread_flag(task_thread_info(tsk), flag);
+ }
+ 
++static inline void update_tsk_thread_flag(struct task_struct *tsk, int flag,
++					  bool value)
++{
++	update_ti_thread_flag(task_thread_info(tsk), flag, value);
++}
++
+ static inline int test_and_set_tsk_thread_flag(struct task_struct *tsk, int flag)
+ {
+ 	return test_and_set_ti_thread_flag(task_thread_info(tsk), flag);
+diff --git a/include/linux/thread_info.h b/include/linux/thread_info.h
+index cf2862b..8d8821b 100644
+--- a/include/linux/thread_info.h
++++ b/include/linux/thread_info.h
+@@ -60,6 +60,15 @@ static inline void clear_ti_thread_flag(struct thread_info *ti, int flag)
+ 	clear_bit(flag, (unsigned long *)&ti->flags);
+ }
+ 
++static inline void update_ti_thread_flag(struct thread_info *ti, int flag,
++					 bool value)
++{
++	if (value)
++		set_ti_thread_flag(ti, flag);
++	else
++		clear_ti_thread_flag(ti, flag);
++}
++
+ static inline int test_and_set_ti_thread_flag(struct thread_info *ti, int flag)
+ {
+ 	return test_and_set_bit(flag, (unsigned long *)&ti->flags);
+@@ -79,6 +88,8 @@ static inline int test_ti_thread_flag(struct thread_info *ti, int flag)
+ 	set_ti_thread_flag(current_thread_info(), flag)
+ #define clear_thread_flag(flag) \
+ 	clear_ti_thread_flag(current_thread_info(), flag)
++#define update_thread_flag(flag, value) \
++	update_ti_thread_flag(current_thread_info(), flag, value)
+ #define test_and_set_thread_flag(flag) \
+ 	test_and_set_ti_thread_flag(current_thread_info(), flag)
+ #define test_and_clear_thread_flag(flag) \
 -- 
 2.1.4
