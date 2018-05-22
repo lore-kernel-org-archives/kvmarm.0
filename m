@@ -1,141 +1,120 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v10 05/18] KVM: arm64: Convert lazy FPSIMD context switch trap
- to C
-Date: Tue, 22 May 2018 17:05:06 +0100
-Message-ID: <1527005119-6842-6-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v10 04/18] KVM: arm/arm64: Introduce
+ kvm_arch_vcpu_run_pid_change
+Date: Tue, 22 May 2018 17:05:05 +0100
+Message-ID: <1527005119-6842-5-git-send-email-Dave.Martin@arm.com>
 References: <1527005119-6842-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BB8F4A0E9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 May 2018 11:56:06 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id vsyENwReA7jt for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 May 2018 11:55:43 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7BD934A107
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 May 2018 11:55:38 -0400 (EDT)
 In-Reply-To: <1527005119-6842-1-git-send-email-Dave.Martin@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu
-Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-To make the lazy FPSIMD context switch trap code easier to hack on,
-this patch converts it to C.
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
-This is not amazingly efficient, but the trap should typically only
-be taken once per host context switch.
+KVM/ARM differs from other architectures in having to maintain an
+additional virtual address space from that of the host and the
+guest, because we split the execution of KVM across both EL1 and
+EL2.
 
+This results in a need to explicitly map data structures into EL2
+(hyp) which are accessed from the hyp code.  As we are about to be
+more clever with our FPSIMD handling on arm64, which stores data in
+the task struct and uses thread_info flags, we will have to map
+parts of the currently executing task struct into the EL2 virtual
+address space.
+
+However, we don't want to do this on every KVM_RUN, because it is a
+fairly expensive operation to walk the page tables, and the common
+execution mode is to map a single thread to a VCPU.  By introducing
+a hook that architectures can select with
+HAVE_KVM_VCPU_RUN_PID_CHANGE, we do not introduce overhead for
+other architectures, but have a simple way to only map the data we
+need when required for arm64.
+
+This patch introduces the framework only, and wires it up in the
+arm/arm64 KVM common code.
+
+No functional change.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp/entry.S  | 57 +++++++++++++++++----------------------------
- arch/arm64/kvm/hyp/switch.c | 24 +++++++++++++++++++
- 2 files changed, 46 insertions(+), 35 deletions(-)
+ include/linux/kvm_host.h | 9 +++++++++
+ virt/kvm/Kconfig         | 3 +++
+ virt/kvm/kvm_main.c      | 7 ++++++-
+ 3 files changed, 18 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-index e41a161..40f349b 100644
---- a/arch/arm64/kvm/hyp/entry.S
-+++ b/arch/arm64/kvm/hyp/entry.S
-@@ -172,40 +172,27 @@ ENTRY(__fpsimd_guest_restore)
- 	// x1: vcpu
- 	// x2-x29,lr: vcpu regs
- 	// vcpu x0-x1 on the stack
--	stp	x2, x3, [sp, #-16]!
--	stp	x4, lr, [sp, #-16]!
--
--alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
--	mrs	x2, cptr_el2
--	bic	x2, x2, #CPTR_EL2_TFP
--	msr	cptr_el2, x2
--alternative_else
--	mrs	x2, cpacr_el1
--	orr	x2, x2, #CPACR_EL1_FPEN
--	msr	cpacr_el1, x2
--alternative_endif
--	isb
--
--	mov	x3, x1
--
--	ldr	x0, [x3, #VCPU_HOST_CONTEXT]
--	kern_hyp_va x0
--	add	x0, x0, #CPU_GP_REG_OFFSET(CPU_FP_REGS)
--	bl	__fpsimd_save_state
--
--	add	x2, x3, #VCPU_CONTEXT
--	add	x0, x2, #CPU_GP_REG_OFFSET(CPU_FP_REGS)
--	bl	__fpsimd_restore_state
--
--	// Skip restoring fpexc32 for AArch64 guests
--	mrs	x1, hcr_el2
--	tbnz	x1, #HCR_RW_SHIFT, 1f
--	ldr	x4, [x3, #VCPU_FPEXC32_EL2]
--	msr	fpexc32_el2, x4
--1:
--	ldp	x4, lr, [sp], #16
--	ldp	x2, x3, [sp], #16
--	ldp	x0, x1, [sp], #16
--
-+	stp	x2, x3, [sp, #-144]!
-+	stp	x4, x5, [sp, #16]
-+	stp	x6, x7, [sp, #32]
-+	stp	x8, x9, [sp, #48]
-+	stp	x10, x11, [sp, #64]
-+	stp	x12, x13, [sp, #80]
-+	stp	x14, x15, [sp, #96]
-+	stp	x16, x17, [sp, #112]
-+	stp	x18, lr, [sp, #128]
-+
-+	bl	__hyp_switch_fpsimd
-+
-+	ldp	x4, x5, [sp, #16]
-+	ldp	x6, x7, [sp, #32]
-+	ldp	x8, x9, [sp, #48]
-+	ldp	x10, x11, [sp, #64]
-+	ldp	x12, x13, [sp, #80]
-+	ldp	x14, x15, [sp, #96]
-+	ldp	x16, x17, [sp, #112]
-+	ldp	x18, lr, [sp, #128]
-+	ldp	x0, x1, [sp, #144]
-+	ldp	x2, x3, [sp], #160
- 	eret
- ENDPROC(__fpsimd_guest_restore)
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index d964523..c0796c4 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -318,6 +318,30 @@ static bool __hyp_text __skip_instr(struct kvm_vcpu *vcpu)
- 	}
- }
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 6930c63..4268ace 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1276,4 +1276,13 @@ static inline long kvm_arch_vcpu_async_ioctl(struct file *filp,
+ void kvm_arch_mmu_notifier_invalidate_range(struct kvm *kvm,
+ 		unsigned long start, unsigned long end);
  
-+void __hyp_text __hyp_switch_fpsimd(u64 esr __always_unused,
-+				    struct kvm_vcpu *vcpu)
++#ifdef CONFIG_HAVE_KVM_VCPU_RUN_PID_CHANGE
++int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu);
++#else
++static inline int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
 +{
-+	kvm_cpu_context_t *host_ctxt;
-+
-+	if (has_vhe())
-+		write_sysreg(read_sysreg(cpacr_el1) | CPACR_EL1_FPEN,
-+			     cpacr_el1);
-+	else
-+		write_sysreg(read_sysreg(cptr_el2) & ~(u64)CPTR_EL2_TFP,
-+			     cptr_el2);
-+
-+	isb();
-+
-+	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-+	__fpsimd_save_state(&host_ctxt->gp_regs.fp_regs);
-+	__fpsimd_restore_state(&vcpu->arch.ctxt.gp_regs.fp_regs);
-+
-+	/* Skip restoring fpexc32 for AArch64 guests */
-+	if (!(read_sysreg(hcr_el2) & HCR_RW))
-+		write_sysreg(vcpu->arch.ctxt.sys_regs[FPEXC32_EL2],
-+			     fpexc32_el2);
++	return 0;
 +}
++#endif /* CONFIG_HAVE_KVM_VCPU_RUN_PID_CHANGE */
 +
- /*
-  * Return true when we were able to fixup the guest exit and should return to
-  * the guest, false when we should restore the host state and return to the
+ #endif
+diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+index cca7e06..72143cf 100644
+--- a/virt/kvm/Kconfig
++++ b/virt/kvm/Kconfig
+@@ -54,3 +54,6 @@ config HAVE_KVM_IRQ_BYPASS
+ 
+ config HAVE_KVM_VCPU_ASYNC_IOCTL
+        bool
++
++config HAVE_KVM_VCPU_RUN_PID_CHANGE
++       bool
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index c7b2e92..c32e240 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2550,8 +2550,13 @@ static long kvm_vcpu_ioctl(struct file *filp,
+ 		oldpid = rcu_access_pointer(vcpu->pid);
+ 		if (unlikely(oldpid != current->pids[PIDTYPE_PID].pid)) {
+ 			/* The thread running this VCPU changed. */
+-			struct pid *newpid = get_task_pid(current, PIDTYPE_PID);
++			struct pid *newpid;
+ 
++			r = kvm_arch_vcpu_run_pid_change(vcpu);
++			if (r)
++				break;
++
++			newpid = get_task_pid(current, PIDTYPE_PID);
+ 			rcu_assign_pointer(vcpu->pid, newpid);
+ 			if (oldpid)
+ 				synchronize_rcu();
 -- 
 2.1.4
