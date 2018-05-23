@@ -1,14 +1,14 @@
 From: Julien Grall <julien.grall@arm.com>
-Subject: Re: [PATCH 04/14] arm64: Add ARCH_WORKAROUND_2 probing
-Date: Wed, 23 May 2018 11:06:08 +0100
-Message-ID: <0f980dce-170e-1d43-5927-c5d508839001@arm.com>
+Subject: Re: [PATCH 05/14] arm64: Add 'ssbd' command-line option
+Date: Wed, 23 May 2018 11:08:46 +0100
+Message-ID: <74e7c9f0-5eb4-904c-a6d8-2972e10a5729@arm.com>
 References: <20180522150648.28297-1-marc.zyngier@arm.com>
- <20180522150648.28297-5-marc.zyngier@arm.com>
+ <20180522150648.28297-6-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180522150648.28297-5-marc.zyngier@arm.com>
+In-Reply-To: <20180522150648.28297-6-marc.zyngier@arm.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
@@ -18,54 +18,214 @@ List-Id: kvmarm@lists.cs.columbia.edu
 Hi Marc,
 
 On 05/22/2018 04:06 PM, Marc Zyngier wrote:
-> As for Spectre variant-2, we rely on SMCCC 1.1 to provide the
-> discovery mechanism for detecting the SSBD mitigation.
+> On a system where the firmware implements ARCH_WORKAROUND_2,
+> it may be useful to either permanently enable or disable the
+> workaround for cases where the user decides that they'd rather
+> not get a trap overhead, and keep the mitigation permanently
+> on or off instead of switching it on exception entry/exit.
 > 
-> A new capability is also allocated for that purpose, and a
-> config option.
+> In any case, default to the mitigation being enabled.
 > 
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->   arch/arm64/Kconfig               |  9 ++++++
->   arch/arm64/include/asm/cpucaps.h |  3 +-
->   arch/arm64/kernel/cpu_errata.c   | 69 ++++++++++++++++++++++++++++++++++++++++
->   3 files changed, 80 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> index eb2cf4938f6d..b2103b4df467 100644
-> --- a/arch/arm64/Kconfig
-> +++ b/arch/arm64/Kconfig
-> @@ -938,6 +938,15 @@ config HARDEN_EL2_VECTORS
->   
->   	  If unsure, say Y.
->   
-> +config ARM64_SSBD
-> +	bool "Speculative Store Bypass Disable" if EXPERT
-> +	default y
-> +	help
-> +	  This enables mitigation of the bypassing of previous stores
-> +	  by speculative loads.
-> +
-> +	  If unsure, say Y.
-> +
->   menuconfig ARMV8_DEPRECATED
->   	bool "Emulate deprecated/obsolete ARMv8 instructions"
->   	depends on COMPAT
-> diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-> index bc51b72fafd4..5b2facf786ba 100644
-> --- a/arch/arm64/include/asm/cpucaps.h
-> +++ b/arch/arm64/include/asm/cpucaps.h
-> @@ -48,7 +48,8 @@
->   #define ARM64_HAS_CACHE_IDC			27
->   #define ARM64_HAS_CACHE_DIC			28
->   #define ARM64_HW_DBM				29
-> +#define ARM64_SSBD			30
-
-NIT: Could you indent 30 the same way as the other number?
 
 Reviewed-by: Julien Grall <julien.grall@arm.com>
 
 Cheers,
+
+> ---
+>   Documentation/admin-guide/kernel-parameters.txt |  17 ++++
+>   arch/arm64/include/asm/cpufeature.h             |   6 ++
+>   arch/arm64/kernel/cpu_errata.c                  | 102 ++++++++++++++++++++----
+>   3 files changed, 109 insertions(+), 16 deletions(-)
+> 
+> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> index f2040d46f095..646e112c6f63 100644
+> --- a/Documentation/admin-guide/kernel-parameters.txt
+> +++ b/Documentation/admin-guide/kernel-parameters.txt
+> @@ -4092,6 +4092,23 @@
+>   			expediting.  Set to zero to disable automatic
+>   			expediting.
+>   
+> +	ssbd=		[ARM64,HW]
+> +			Speculative Store Bypass Disable control
+> +
+> +			On CPUs that are vulnerable to the Speculative
+> +			Store Bypass vulnerability and offer a
+> +			firmware based mitigation, this parameter
+> +			indicates how the mitigation should be used:
+> +
+> +			force-on:  Unconditionnaly enable mitigation for
+> +				   for both kernel and userspace
+> +			force-off: Unconditionnaly disable mitigation for
+> +				   for both kernel and userspace
+> +			kernel:    Always enable mitigation in the
+> +				   kernel, and offer a prctl interface
+> +				   to allow userspace to register its
+> +				   interest in being mitigated too.
+> +
+>   	stack_guard_gap=	[MM]
+>   			override the default stack gap protection. The value
+>   			is in page units and it defines how many pages prior
+> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> index 09b0f2a80c8f..9bc548e22784 100644
+> --- a/arch/arm64/include/asm/cpufeature.h
+> +++ b/arch/arm64/include/asm/cpufeature.h
+> @@ -537,6 +537,12 @@ static inline u64 read_zcr_features(void)
+>   	return zcr;
+>   }
+>   
+> +#define ARM64_SSBD_UNKNOWN		-1
+> +#define ARM64_SSBD_FORCE_DISABLE	0
+> +#define ARM64_SSBD_EL1_ENTRY		1
+> +#define ARM64_SSBD_FORCE_ENABLE		2
+> +#define ARM64_SSBD_MITIGATED		3
+> +
+>   #endif /* __ASSEMBLY__ */
+>   
+>   #endif
+> diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
+> index 7fd6d5b001f5..f1d4e75b0ddd 100644
+> --- a/arch/arm64/kernel/cpu_errata.c
+> +++ b/arch/arm64/kernel/cpu_errata.c
+> @@ -235,6 +235,38 @@ enable_smccc_arch_workaround_1(const struct arm64_cpu_capabilities *entry)
+>   #ifdef CONFIG_ARM64_SSBD
+>   DEFINE_PER_CPU_READ_MOSTLY(u64, arm64_ssbd_callback_required);
+>   
+> +int ssbd_state __read_mostly = ARM64_SSBD_EL1_ENTRY;
+> +
+> +static const struct ssbd_options {
+> +	const char	*str;
+> +	int		state;
+> +} ssbd_options[] = {
+> +	{ "force-on",	ARM64_SSBD_FORCE_ENABLE, },
+> +	{ "force-off",	ARM64_SSBD_FORCE_DISABLE, },
+> +	{ "kernel",	ARM64_SSBD_EL1_ENTRY, },
+> +};
+> +
+> +static int __init ssbd_cfg(char *buf)
+> +{
+> +	int i;
+> +
+> +	if (!buf || !buf[0])
+> +		return -EINVAL;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(ssbd_options); i++) {
+> +		int len = strlen(ssbd_options[i].str);
+> +
+> +		if (strncmp(buf, ssbd_options[i].str, len))
+> +			continue;
+> +
+> +		ssbd_state = ssbd_options[i].state;
+> +		return 0;
+> +	}
+> +
+> +	return -EINVAL;
+> +}
+> +early_param("ssbd", ssbd_cfg);
+> +
+>   void __init arm64_update_smccc_conduit(struct alt_instr *alt,
+>   				       __le32 *origptr, __le32 *updptr,
+>   				       int nr_inst)
+> @@ -272,44 +304,82 @@ static bool has_ssbd_mitigation(const struct arm64_cpu_capabilities *entry,
+>   				    int scope)
+>   {
+>   	struct arm_smccc_res res;
+> -	bool supported = true;
+> +	bool required = true;
+> +	s32 val;
+>   
+>   	WARN_ON(scope != SCOPE_LOCAL_CPU || preemptible());
+>   
+> -	if (psci_ops.smccc_version == SMCCC_VERSION_1_0)
+> +	if (psci_ops.smccc_version == SMCCC_VERSION_1_0) {
+> +		ssbd_state = ARM64_SSBD_UNKNOWN;
+>   		return false;
+> +	}
+>   
+> -	/*
+> -	 * The probe function return value is either negative
+> -	 * (unsupported or mitigated), positive (unaffected), or zero
+> -	 * (requires mitigation). We only need to do anything in the
+> -	 * last case.
+> -	 */
+>   	switch (psci_ops.conduit) {
+>   	case PSCI_CONDUIT_HVC:
+>   		arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
+>   				  ARM_SMCCC_ARCH_WORKAROUND_2, &res);
+> -		if ((int)res.a0 != 0)
+> -			supported = false;
+>   		break;
+>   
+>   	case PSCI_CONDUIT_SMC:
+>   		arm_smccc_1_1_smc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
+>   				  ARM_SMCCC_ARCH_WORKAROUND_2, &res);
+> -		if ((int)res.a0 != 0)
+> -			supported = false;
+>   		break;
+>   
+>   	default:
+> -		supported = false;
+> +		ssbd_state = ARM64_SSBD_UNKNOWN;
+> +		return false;
+>   	}
+>   
+> -	if (supported) {
+> -		__this_cpu_write(arm64_ssbd_callback_required, 1);
+> +	val = (s32)res.a0;
+> +
+> +	switch (val) {
+> +	case SMCCC_RET_NOT_SUPPORTED:
+> +		ssbd_state = ARM64_SSBD_UNKNOWN;
+> +		return false;
+> +
+> +	case SMCCC_RET_NOT_REQUIRED:
+> +		ssbd_state = ARM64_SSBD_MITIGATED;
+> +		return false;
+> +
+> +	case SMCCC_RET_SUCCESS:
+> +		required = true;
+> +		break;
+> +
+> +	case 1:	/* Mitigation not required on this CPU */
+> +		required = false;
+> +		break;
+> +
+> +	default:
+> +		WARN_ON(1);
+> +		return false;
+> +	}
+> +
+> +	switch (ssbd_state) {
+> +	case ARM64_SSBD_FORCE_DISABLE:
+> +		pr_info_once("%s disabled from command-line\n", entry->desc);
+> +		do_ssbd(false);
+> +		required = false;
+> +		break;
+> +
+> +	case ARM64_SSBD_EL1_ENTRY:
+> +		if (required) {
+> +			__this_cpu_write(arm64_ssbd_callback_required, 1);
+> +			do_ssbd(true);
+> +		}
+> +		break;
+> +
+> +	case ARM64_SSBD_FORCE_ENABLE:
+> +		pr_info_once("%s forced from command-line\n", entry->desc);
+>   		do_ssbd(true);
+> +		required = true;
+> +		break;
+> +
+> +	default:
+> +		WARN_ON(1);
+> +		break;
+>   	}
+>   
+> -	return supported;
+> +	return required;
+>   }
+>   #endif	/* CONFIG_ARM64_SSBD */
+>   
+> 
 
 -- 
 Julien Grall
