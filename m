@@ -1,117 +1,136 @@
-From: Julien Grall <julien.grall@arm.com>
-Subject: Re: [PATCH 08/14] arm64: ssbd: Disable mitigation on CPU resume if
- required by user
-Date: Wed, 23 May 2018 11:52:56 +0100
-Message-ID: <7c3b914e-53d7-e600-2632-a05e1cb3e0cd@arm.com>
-References: <20180522150648.28297-1-marc.zyngier@arm.com>
- <20180522150648.28297-9-marc.zyngier@arm.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH v10 01/18] arm64: fpsimd: Fix TIF_FOREIGN_FPSTATE after
+ invalidating cpu regs
+Date: Wed, 23 May 2018 13:33:38 +0200
+Message-ID: <20180523113338.GG55598@C02W217FHV2R.local>
+References: <1527005119-6842-1-git-send-email-Dave.Martin@arm.com>
+ <1527005119-6842-2-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180522150648.28297-9-marc.zyngier@arm.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: Kees Cook <keescook@chromium.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Andy Lutomirski <luto@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Thomas Gleixner <tglx@linutronix.de>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <1527005119-6842-2-git-send-email-Dave.Martin@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
-
-On 05/22/2018 04:06 PM, Marc Zyngier wrote:
-> On a system where firmware can dynamically change the state of the
-> mitigation, the CPU will always come up with the mitigation enabled,
-> including when coming back from suspend.
+On Tue, May 22, 2018 at 05:05:02PM +0100, Dave Martin wrote:
+> fpsimd_last_state.st is set to NULL as a way of indicating that
+> current's FPSIMD registers are no longer loaded in the cpu.  In
+> particular, this is done when the kernel temporarily uses or
+> clobbers the FPSIMD registers for its own purposes, as in CPU PM or
+> kernel-mode NEON, resulting in them being populated with garbage
+> data not belonging to a task.
 > 
-> If the user has requested "no mitigation" via a command line option,
-> let's enforce it by calling into the firmware again to disable it.
+> Commit 17eed27b02da ("arm64/sve: KVM: Prevent guests from using
+> SVE") factors this operation out as a new helper
+> fpsimd_flush_cpu_state() to make it clearer what is being done
+> here, and on SVE systems this helper is now used, via
+> kvm_fpsimd_flush_cpu_state(), to invalidate the registers after KVM
+> has run a vcpu.  The reason for this is that KVM does not yet
+> understand how to restore the full host SVE registers itself after
+> loading the guest FPSIMD context into them.
 > 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> This exposes a particular problem: if fpsimd_last_state.st is set
+> to NULL without also setting TIF_FOREIGN_FPSTATE, the kernel may
+> continue to think that current's FPSIMD registers are live even
+> though they have actually been clobbered.
+> 
+> Prior to the aforementioned commit, the only path where
+> fpsimd_last_state.st is set to NULL without setting
+> TIF_FOREIGN_FPSTATE is when kernel_neon_begin() is called by a
+> kernel thread (where current->mm can be NULL).  This does not
+> matter, because the only harm is that at context-switch time
+> fpsimd_thread_switch() may unnecessarily save the FPSIMD registers
+> back to current's thread_struct (even though kernel threads are not
+> considered to have any FPSIMD context of their own and the
+> registers will never be reloaded).
+> 
+> Note that although CPU_PM_ENTER lacks the TIF_FOREIGN_FPSTATE
+> setting, every CPU passing through that path must subsequently pass
+> through CPU_PM_EXIT before it can re-enter the kernel proper.
+> CPU_PM_EXIT sets the flag.
+> 
+> The sve_flush_cpu_state() function added by commit 17eed27b02da
+> also lacks the proper maintenance of TIF_FOREIGN_FPSTATE.  This may
+> cause the bits of a host task's SVE registers that do not alias the
+> FPSIMD register file to spontaneously appear zeroed if a KVM vcpu
+> runs in the same task in the meantime.  Although this effect is
+> hidden by the fact that the non-FPSIMD bits of the SVE registers
+> are zeroed by a syscall anyway, it is doubtless a bad idea to rely
+> on these different code paths interacting correctly under future
+> maintenance.
+> 
+> This patch makes TIF_FOREIGN_FPSTATE an unconditional side-effect
+> of fpsimd_flush_cpu_state(), and removes the set_thread_flag()
+> calls that become redunant as a result.  This ensures that
 
-Reviewed-by: Julien Grall <julien.grall@arm.com>
+nit: redundant
 
-Cheers,
+> TIF_FOREIGN_FPSTATE cannot remain clear if the FPSIMD state in the
+> FPSIMD registers is invalid.
+> 
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will.deacon@arm.com>
+> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> 
+
 
 > ---
->   arch/arm64/include/asm/cpufeature.h | 6 ++++++
->   arch/arm64/kernel/cpu_errata.c      | 8 ++++----
->   arch/arm64/kernel/suspend.c         | 8 ++++++++
->   3 files changed, 18 insertions(+), 4 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-> index 1bacdf57f0af..d9dcb683259e 100644
-> --- a/arch/arm64/include/asm/cpufeature.h
-> +++ b/arch/arm64/include/asm/cpufeature.h
-> @@ -553,6 +553,12 @@ static inline int arm64_get_ssbd_state(void)
->   #endif
->   }
->   
-> +#ifdef CONFIG_ARM64_SSBD
-> +void arm64_set_ssbd_mitigation(bool state);
-> +#else
-> +static inline void arm64_set_ssbd_mitigation(bool state) {}
-> +#endif
-> +
->   #endif /* __ASSEMBLY__ */
->   
->   #endif
-> diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-> index 8f686f39b9c1..b4c12e9140f0 100644
-> --- a/arch/arm64/kernel/cpu_errata.c
-> +++ b/arch/arm64/kernel/cpu_errata.c
-> @@ -297,7 +297,7 @@ void __init arm64_enable_wa2_handling(struct alt_instr *alt,
->   		*updptr = cpu_to_le32(aarch64_insn_gen_nop());
->   }
->   
-> -static void do_ssbd(bool state)
-> +void arm64_set_ssbd_mitigation(bool state)
->   {
->   	switch (psci_ops.conduit) {
->   	case PSCI_CONDUIT_HVC:
-> @@ -371,20 +371,20 @@ static bool has_ssbd_mitigation(const struct arm64_cpu_capabilities *entry,
->   	switch (ssbd_state) {
->   	case ARM64_SSBD_FORCE_DISABLE:
->   		pr_info_once("%s disabled from command-line\n", entry->desc);
-> -		do_ssbd(false);
-> +		arm64_set_ssbd_mitigation(false);
->   		required = false;
->   		break;
->   
->   	case ARM64_SSBD_EL1_ENTRY:
->   		if (required) {
->   			__this_cpu_write(arm64_ssbd_callback_required, 1);
-> -			do_ssbd(true);
-> +			arm64_set_ssbd_mitigation(true);
->   		}
->   		break;
->   
->   	case ARM64_SSBD_FORCE_ENABLE:
->   		pr_info_once("%s forced from command-line\n", entry->desc);
-> -		do_ssbd(true);
-> +		arm64_set_ssbd_mitigation(true);
->   		required = true;
->   		break;
->   
-> diff --git a/arch/arm64/kernel/suspend.c b/arch/arm64/kernel/suspend.c
-> index a307b9e13392..70c283368b64 100644
-> --- a/arch/arm64/kernel/suspend.c
-> +++ b/arch/arm64/kernel/suspend.c
-> @@ -62,6 +62,14 @@ void notrace __cpu_suspend_exit(void)
->   	 */
->   	if (hw_breakpoint_restore)
->   		hw_breakpoint_restore(cpu);
-> +
-> +	/*
-> +	 * On resume, firmware implementing dynamic mitigation will
-> +	 * have turned the mitigation on. If the user has forcefully
-> +	 * disabled it, make sure their wishes are obeyed.
-> +	 */
-> +	if (arm64_get_ssbd_state() == ARM64_SSBD_FORCE_DISABLE)
-> +		arm64_set_ssbd_mitigation(false);
->   }
->   
->   /*
+> Changes since v9:
+> 
+>  * New patch (bugfix to subsequent commits).
+> ---
+>  arch/arm64/kernel/fpsimd.c | 7 ++-----
+>  1 file changed, 2 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+> index 87a3536..12e1c96 100644
+> --- a/arch/arm64/kernel/fpsimd.c
+> +++ b/arch/arm64/kernel/fpsimd.c
+> @@ -1067,6 +1067,7 @@ void fpsimd_flush_task_state(struct task_struct *t)
+>  static inline void fpsimd_flush_cpu_state(void)
+>  {
+>  	__this_cpu_write(fpsimd_last_state.st, NULL);
+> +	set_thread_flag(TIF_FOREIGN_FPSTATE);
+>  }
+>  
+>  /*
+> @@ -1121,10 +1122,8 @@ void kernel_neon_begin(void)
+>  	__this_cpu_write(kernel_neon_busy, true);
+>  
+>  	/* Save unsaved task fpsimd state, if any: */
+> -	if (current->mm) {
+> +	if (current->mm)
+>  		task_fpsimd_save();
+> -		set_thread_flag(TIF_FOREIGN_FPSTATE);
+> -	}
+>  
+>  	/* Invalidate any task state remaining in the fpsimd regs: */
+>  	fpsimd_flush_cpu_state();
+> @@ -1251,8 +1250,6 @@ static int fpsimd_cpu_pm_notifier(struct notifier_block *self,
+>  		fpsimd_flush_cpu_state();
+>  		break;
+>  	case CPU_PM_EXIT:
+> -		if (current->mm)
+> -			set_thread_flag(TIF_FOREIGN_FPSTATE);
+>  		break;
+>  	case CPU_PM_ENTER_FAILED:
+>  	default:
+> -- 
+> 2.1.4
 > 
 
--- 
-Julien Grall
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
