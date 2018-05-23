@@ -1,83 +1,107 @@
-From: Julien Grall <julien.grall@arm.com>
-Subject: Re: [PATCH 07/14] arm64: ssbd: Skip apply_ssbd if not using dynamic
- mitigation
-Date: Wed, 23 May 2018 11:13:53 +0100
-Message-ID: <6fa3a0e9-a4eb-be1d-eab9-f225641a0d3e@arm.com>
-References: <20180522150648.28297-1-marc.zyngier@arm.com>
- <20180522150648.28297-8-marc.zyngier@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 13/14] ARM: KVM: Add SMCCC_ARCH_WORKAROUND_1 fast handling
+Date: Wed, 23 May 2018 11:50:50 +0100
+Message-ID: <4187699a-fe7b-3807-4ffa-809bb918d6a2@arm.com>
+References: <20180521114238.GN17671@n2100.armlinux.org.uk>
+ <E1fKjFo-00064i-Hc@rmk-PC.armlinux.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180522150648.28297-8-marc.zyngier@arm.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: Kees Cook <keescook@chromium.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andy Lutomirski <luto@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Thomas Gleixner <tglx@linutronix.de>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A96074A0D6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 May 2018 06:40:37 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Iig4nB4ZRuYu for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 23 May 2018 06:40:15 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C5BB49F93
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 May 2018 06:40:15 -0400 (EDT)
+In-Reply-To: <E1fKjFo-00064i-Hc@rmk-PC.armlinux.org.uk>
+Content-Language: en-GB
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Russell King <rmk+kernel@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org
+Cc: Florian Fainelli <f.fainelli@gmail.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
-
-On 05/22/2018 04:06 PM, Marc Zyngier wrote:
-> In order to avoid checking arm64_ssbd_callback_required on each
-> kernel entry/exit even if no mitigation is required, let's
-> add yet another alternative that by default jumps over the mitigation,
-> and that gets nop'ed out if we're doing dynamic mitigation.
+On 21/05/18 12:45, Russell King wrote:
+> We want SMCCC_ARCH_WORKAROUND_1 to be fast. As fast as possible.
+> So let's intercept it as early as we can by testing for the
+> function call number as soon as we've identified a HVC call
+> coming from the guest.
 > 
-> Think of it as a poor man's static key...
-> 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-
-Reviewed-by: Julien Grall <julien.grall@arm.com>
-
-Cheers,
-
-
+> Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
 > ---
->   arch/arm64/kernel/cpu_errata.c | 14 ++++++++++++++
->   arch/arm64/kernel/entry.S      |  3 +++
->   2 files changed, 17 insertions(+)
+>  arch/arm/kvm/hyp/hyp-entry.S | 13 ++++++++++++-
+>  1 file changed, 12 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-> index f1d4e75b0ddd..8f686f39b9c1 100644
-> --- a/arch/arm64/kernel/cpu_errata.c
-> +++ b/arch/arm64/kernel/cpu_errata.c
-> @@ -283,6 +283,20 @@ void __init arm64_update_smccc_conduit(struct alt_instr *alt,
->   	*updptr = cpu_to_le32(insn);
->   }
->   
-> +void __init arm64_enable_wa2_handling(struct alt_instr *alt,
-> +				      __le32 *origptr, __le32 *updptr,
-> +				      int nr_inst)
-> +{
-> +	BUG_ON(nr_inst != 1);
-> +	/*
-> +	 * Only allow mitigation on EL1 entry/exit and guest
-> +	 * ARCH_WORKAROUND_2 handling if the SSBD state allows it to
-> +	 * be flipped.
-> +	 */
-> +	if (arm64_get_ssbd_state() == ARM64_SSBD_EL1_ENTRY)
-> +		*updptr = cpu_to_le32(aarch64_insn_gen_nop());
-> +}
+> diff --git a/arch/arm/kvm/hyp/hyp-entry.S b/arch/arm/kvm/hyp/hyp-entry.S
+> index 918a05dd2d63..67de45685e29 100644
+> --- a/arch/arm/kvm/hyp/hyp-entry.S
+> +++ b/arch/arm/kvm/hyp/hyp-entry.S
+> @@ -16,6 +16,7 @@
+>   * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+>   */
+>  
+> +#include <linux/arm-smccc.h>
+>  #include <linux/linkage.h>
+>  #include <asm/kvm_arm.h>
+>  #include <asm/kvm_asm.h>
+> @@ -202,7 +203,7 @@ ENDPROC(__hyp_do_panic)
+>  	lsr     r2, r2, #16
+>  	and     r2, r2, #0xff
+>  	cmp     r2, #0
+> -	bne	guest_trap		@ Guest called HVC
+> +	bne	guest_hvc_trap		@ Guest called HVC
+>  
+>  	/*
+>  	 * Getting here means host called HVC, we shift parameters and branch
+> @@ -253,6 +254,16 @@ THUMB(	orr	lr, #1)
+>  	pop	{r2, lr}
+>  	eret
+>  
+> +guest_hvc_trap:
+> +	movw	ip, #:lower16:ARM_SMCCC_ARCH_WORKAROUND_1
+> +	movt	ip, #:upper16:ARM_SMCCC_ARCH_WORKAROUND_1
+
+r12 is a live guest register, and only r0-r2 are saved at that stage.
+You could additionally corrupt r3 though, once you've identified that
+you're in the context of an SMCCC 1.1 call.
+
+You should be able to replace r12 with r2.
+
+> +	ldr	r0, [sp]		@ Guest's r0
+> +	teq	r0, ip
+> +	bne	guest_trap
+> +	pop	{r0, r1, r2}
+
+You could replace this slightly more efficient
+
+	add	sp, sp, #12
+
+since we don't need to restore those registers to the guest. r2 would be
+left containing ARM_SMCCC_ARCH_WORKAROUND_1 (harmless), and r1 has the
+HSR value (perfectly predictable).
+
+> +	mov	r0, #0
+> +	eret
 > +
->   static void do_ssbd(bool state)
->   {
->   	switch (psci_ops.conduit) {
-> diff --git a/arch/arm64/kernel/entry.S b/arch/arm64/kernel/entry.S
-> index 29ad672a6abd..e6f6e2339b22 100644
-> --- a/arch/arm64/kernel/entry.S
-> +++ b/arch/arm64/kernel/entry.S
-> @@ -142,6 +142,9 @@ alternative_else_nop_endif
->   	// to save/restore them if required.
->   	.macro	apply_ssbd, state, targ, tmp1, tmp2
->   #ifdef CONFIG_ARM64_SSBD
-> +alternative_cb	arm64_enable_wa2_handling
-> +	b	\targ
-> +alternative_cb_end
->   	ldr_this_cpu	\tmp2, arm64_ssbd_callback_required, \tmp1
->   	cbz	\tmp2, \targ
->   	mov	w0, #ARM_SMCCC_ARCH_WORKAROUND_2
+>  guest_trap:
+>  	load_vcpu r0			@ Load VCPU pointer to r0
+>  
 > 
 
+Thanks,
+
+	M.
 -- 
-Julien Grall
+Jazz is not dead. It just smells funny...
