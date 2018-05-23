@@ -1,89 +1,65 @@
 From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCHv4 06/10] arm64: add basic pointer authentication support
-Date: Wed, 23 May 2018 09:42:56 +0100
-Message-ID: <114d65a8-ffa5-7061-864a-a32aa3baa5c5@arm.com>
+Subject: Re: [PATCHv4 05/10] arm64/cpufeature: detect pointer authentication
+Date: Wed, 23 May 2018 09:48:28 +0100
+Message-ID: <4c057e99-61a9-7f75-664d-1f16f2631766@arm.com>
 References: <20180503132031.25705-1-mark.rutland@arm.com>
- <20180503132031.25705-7-mark.rutland@arm.com>
+ <20180503132031.25705-6-mark.rutland@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180503132031.25705-7-mark.rutland@arm.com>
+In-Reply-To: <20180503132031.25705-6-mark.rutland@arm.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 To: Mark Rutland <mark.rutland@arm.com>, linux-arm-kernel@lists.infradead.org
 Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, catalin.marinas@arm.com, christoffer.dall@arm.com, drjones@redhat.com, marc.zyngier@arm.com, ramana.radhakrishnan@arm.com, will.deacon@arm.com, awallis@codeaurora.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Mark,
 
+Mark,
 
 On 03/05/18 14:20, Mark Rutland wrote:
-> This patch adds basic support for pointer authentication, allowing
-> userspace to make use of APIAKey. The kernel maintains an APIAKey value
-> for each process (shared by all threads within), which is initialised to
-> a random value at exec() time.
+> So that we can dynamically handle the presence of pointer authentication
+> functionality, wire up probing code in cpufeature.c.
 > 
-> To describe that address authentication instructions are available, the
-> ID_AA64ISAR0.{APA,API} fields are exposed to userspace. A new hwcap,
-> APIA, is added to describe that the kernel manages APIAKey.
+>  From ARMv8.3 onwards, ID_AA64ISAR1 is no longer entirely RES0, and now
+> has four fields describing the presence of pointer authentication
+> functionality:
 > 
-> Instructions using other keys (APIBKey, APDAKey, APDBKey) are disabled,
-> and will behave as NOPs. These may be made use of in future patches.
+> * APA - address authentication present, using an architected algorithm
+> * API - address authentication present, using an IMP DEF algorithm
+> * GPA - generic authentication present, using an architected algorithm
+> * GPI - generic authentication present, using an IMP DEF algorithm
 > 
-> No support is added for the generic key (APGAKey), though this cannot be
-> trapped or made to behave as a NOP. Its presence is not advertised with
-> a hwcap.
+> For the moment we only care about address authentication, so we only
+> need to check APA and API. It is assumed that if all CPUs support an IMP
+> DEF algorithm, the same algorithm is used across all CPUs.
+> 
+> Note that when we implement KVM support, we will also need to ensure
+> that CPUs have uniform support for GPA and GPI.
 > 
 > Signed-off-by: Mark Rutland <mark.rutland@arm.com>
 > Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>
 > Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
 > Cc: Will Deacon <will.deacon@arm.com>
+> ---
+>   arch/arm64/include/asm/cpucaps.h |  5 ++++-
+>   arch/arm64/kernel/cpufeature.c   | 47 ++++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 51 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+> index bc51b72fafd4..9dcb4d1b14f5 100644
+> --- a/arch/arm64/include/asm/cpucaps.h
+> +++ b/arch/arm64/include/asm/cpucaps.h
+> @@ -48,7 +48,10 @@
+>   #define ARM64_HAS_CACHE_IDC			27
+>   #define ARM64_HAS_CACHE_DIC			28
+>   #define ARM64_HW_DBM				29
+> +#define ARM64_HAS_ADDRESS_AUTH_ARCH		30
+> +#define ARM64_HAS_ADDRESS_AUTH_IMP_DEF		31
 
-
-> diff --git a/arch/arm64/include/asm/pointer_auth.h b/arch/arm64/include/asm/pointer_auth.h
-> new file mode 100644
-> index 000000000000..034877ee28bc
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/pointer_auth.h
-
-...
-
-> +
-> +#define __ptrauth_key_install(k, v)			\
-> +do {							\
-> +	write_sysreg_s(v.lo, SYS_ ## k ## KEYLO_EL1);	\
-> +	write_sysreg_s(v.hi, SYS_ ## k ## KEYHI_EL1);	\
-> +} while (0)
-
-I think it might be safer to have parentheses around v, to prevent
-something like __ptrauth_key_install(APIA, *key_val) work fine.
-
-> diff --git a/arch/arm64/include/uapi/asm/hwcap.h b/arch/arm64/include/uapi/asm/hwcap.h
-> index 17c65c8f33cb..01f02ac500ae 100644
-> --- a/arch/arm64/include/uapi/asm/hwcap.h
-> +++ b/arch/arm64/include/uapi/asm/hwcap.h
-> @@ -48,5 +48,6 @@
->   #define HWCAP_USCAT		(1 << 25)
->   #define HWCAP_ILRCPC		(1 << 26)
->   #define HWCAP_FLAGM		(1 << 27)
-> +#define HWCAP_APIA		(1 << 28)
->   
->   #endif /* _UAPI__ASM_HWCAP_H */
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 01b1a7e7d70f..f418d4cb6691 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -1030,6 +1030,11 @@ static void cpu_copy_el2regs(const struct arm64_cpu_capabilities *__unused)
->   #endif
-...
-
-> +#ifdef CONFIG_ARM64_PNTR_AUTH
-> +	HWCAP_CAP(SYS_ID_AA64ISAR1_EL1, ID_AA64ISAR1_APA_SHIFT, FTR_UNSIGNED, 1, CAP_HWCAP, HWCAP_APIA),
-> +#endif
-
-Did you mean CONFIG_ARM64_PTR_AUTH here ?
+Where are these caps used ? I couldn't find anything in the series
+that uses them. Otherwise looks good to me.
 
 Cheers
 
