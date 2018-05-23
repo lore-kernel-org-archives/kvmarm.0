@@ -1,88 +1,92 @@
-From: Andrey Konovalov <andreyknvl@google.com>
-Subject: Re: [PATCH] arm64: kvm: use -fno-jump-tables with clang
-Date: Wed, 23 May 2018 20:57:32 +0200
-Message-ID: <CAAeHK+xNKhSLSa+w+gWJUosLUvK9P5OJfQDOw7+Emipo199HYg@mail.gmail.com>
-References: <20180518170202.11458-1-samitolvanen@google.com>
- <05d14ac7-0feb-63a3-e7ef-b8ca1ae2fd1d@arm.com> <CAKwvOdm1kYedukCq=g74AvqJHp6KC03oNoouQy2nkvfo4idoEw@mail.gmail.com>
- <8c7be44f-086d-65e3-9969-8182261ce82f@arm.com> <CAKwvOd=XZqg5=mkXZb-cxq3i_AGoJGAbmF=Fwc7Q98oi0tbN9g@mail.gmail.com>
- <3fd89842-86cd-ee01-0c2c-5438dd2d5f2a@arm.com> <CAKwvOdk+=JKcQP1ieLEkZftRGf-pqCTTzEuYvT_45YNMkEw_wA@mail.gmail.com>
- <86k1rzc4ba.wl-marc.zyngier@arm.com> <CAAeHK+z2LmMYasYtRTt2U=QF8Pe_i10RA3-SkLzGXXByZqLh1w@mail.gmail.com>
- <CAKwvOdmWg8o9yoZ+3dCwL8vYB8gzE+AatCbXENN-+Gge9Q6gtA@mail.gmail.com>
- <CAAeHK+wk0hSH6iQcsLzrpjvsGocev-UZ6=z95ysecdFnAcHVSQ@mail.gmail.com> <CAKwvOd=fqk2bQSiPBsUmVSQLGUEGYSUev3iWvico6HOpYs5YJA@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v10 05/18] KVM: arm64: Convert lazy FPSIMD context switch
+ trap to C
+Date: Wed, 23 May 2018 20:35:13 +0100
+Message-ID: <87k1rutbbi.fsf@linaro.org>
+References: <1527005119-6842-1-git-send-email-Dave.Martin@arm.com>
+ <1527005119-6842-6-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAKwvOd=fqk2bQSiPBsUmVSQLGUEGYSUev3iWvico6HOpYs5YJA@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Sami Tolvanen <samitolvanen@google.com>, christoffer.dall@arm.com, Takahiro Akashi <takahiro.akashi@linaro.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, kvmarm@lists.cs.columbia.edu, LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-reply-to: <1527005119-6842-6-git-send-email-Dave.Martin@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, May 23, 2018 at 7:47 PM, Nick Desaulniers
-<ndesaulniers@google.com> wrote:
-> On Wed, May 23, 2018 at 4:54 AM Andrey Konovalov <andreyknvl@google.com>
-> wrote:
->> On Tue, May 22, 2018 at 8:28 PM, Nick Desaulniers
->> <ndesaulniers@google.com> wrote:
->> > On Fri, May 18, 2018 at 11:13 AM Marc Zyngier <marc.zyngier@arm.com>
-> wrote:
->> >> > - you have checked that with a released version of the compiler, you
->> >
->> > On Tue, May 22, 2018 at 10:58 AM Andrey Konovalov <andreyknvl@google.com
->
->> > wrote:
->> >> Tested-by: Andrey Konovalov <andreyknvl@google.com>
->> >
->> > Hi Andrey,
->> > Thank you very much for this report.  Can you confirm as well the
-> version
->> > of Clang that you were using?
->
->> I'm on 86852a40 ("[InstCombine] Calloc-ed strings optimizations").
->
->> > If it's not a binary release (built from
->> > source), would you be able to re-confirm with a released version?
->
->> Sure. Which release should I try and how do I get it?
->
-> Maybe clang-6.0 as the latest release (though I suspect you may run into
-> the recently-fixed-in-clang-7.0 "S" constraint bug that you reported).
-
-Yes, and also into the "support for "r" prefixed variables in ARM
-inline assembly" issue.
-
-Tested on upstream commit ded4c39e (before both issues were
-introduced) with -fno-jump-tables patch applied using clang 6.0.
-
-Same result, the patch helps.
-
->
-> I've had luck on debian based distributions installing from:
-> http://apt.llvm.org/
->
-> (These can be added to your /etc/apt/sources.list, then a `sudo apt update`
-> and `sudo apt install clang-6.0`)
->
-> If you're not able to add remote repositories (some employers block this ;)
-> ), then you can find releases for download for a few different platforms:
-> https://releases.llvm.org/
->
-> For example, a quick:
-> $ mkdir llvm-6.0
-> $ cd !$
-> $ wget
-> https://releases.llvm.org/6.0.0/clang+llvm-6.0.0-x86_64-linux-gnu-debian8.tar.xz
-> $ tar xvf clang+llvm-6.0.0-x86_64-linux-gnu-debian8.tar.xz
-> $ ./clang+llvm-6.0.0-x86_64-linux-gnu-debian8/bin/clang-6.0 -v
-> clang version 6.0.0 (tags/RELEASE_600/final)
-> Target: x86_64-unknown-linux-gnu
-> Thread model: posix
-> InstalledDir: .../llvm-6.0/./clang+llvm-6.0.0-x86_64-linux-gnu-debian8/bin
-> Found candidate GCC installation: ...
-> Candidate multilib: .;@m64
-> Selected multilib: .;@m64
->
-> Seems to work.
-> --
-> Thanks,
-> ~Nick Desaulniers
+CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo+IFRvIG1ha2UgdGhl
+IGxhenkgRlBTSU1EIGNvbnRleHQgc3dpdGNoIHRyYXAgY29kZSBlYXNpZXIgdG8gaGFjayBvbiwK
+PiB0aGlzIHBhdGNoIGNvbnZlcnRzIGl0IHRvIEMuCj4KPiBUaGlzIGlzIG5vdCBhbWF6aW5nbHkg
+ZWZmaWNpZW50LCBidXQgdGhlIHRyYXAgc2hvdWxkIHR5cGljYWxseSBvbmx5Cj4gYmUgdGFrZW4g
+b25jZSBwZXIgaG9zdCBjb250ZXh0IHN3aXRjaC4KPgo+IFNpZ25lZC1vZmYtYnk6IERhdmUgTWFy
+dGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPgo+IFJldmlld2VkLWJ5OiBNYXJjIFp5bmdpZXIgPG1h
+cmMuenluZ2llckBhcm0uY29tPgo+IC0tLQo+ICBhcmNoL2FybTY0L2t2bS9oeXAvZW50cnkuUyAg
+fCA1NyArKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPiAgYXJj
+aC9hcm02NC9rdm0vaHlwL3N3aXRjaC5jIHwgMjQgKysrKysrKysrKysrKysrKysrKwo+ICAyIGZp
+bGVzIGNoYW5nZWQsIDQ2IGluc2VydGlvbnMoKyksIDM1IGRlbGV0aW9ucygtKQo+Cj4gZGlmZiAt
+LWdpdCBhL2FyY2gvYXJtNjQva3ZtL2h5cC9lbnRyeS5TIGIvYXJjaC9hcm02NC9rdm0vaHlwL2Vu
+dHJ5LlMKPiBpbmRleCBlNDFhMTYxLi40MGYzNDliIDEwMDY0NAo+IC0tLSBhL2FyY2gvYXJtNjQv
+a3ZtL2h5cC9lbnRyeS5TCj4gKysrIGIvYXJjaC9hcm02NC9rdm0vaHlwL2VudHJ5LlMKPiBAQCAt
+MTcyLDQwICsxNzIsMjcgQEAgRU5UUlkoX19mcHNpbWRfZ3Vlc3RfcmVzdG9yZSkKPiAgCS8vIHgx
+OiB2Y3B1Cj4gIAkvLyB4Mi14MjksbHI6IHZjcHUgcmVncwo+ICAJLy8gdmNwdSB4MC14MSBvbiB0
+aGUgc3RhY2sKPiAtCXN0cAl4MiwgeDMsIFtzcCwgIy0xNl0hCj4gLQlzdHAJeDQsIGxyLCBbc3As
+ICMtMTZdIQo+IC0KPiAtYWx0ZXJuYXRpdmVfaWZfbm90IEFSTTY0X0hBU19WSVJUX0hPU1RfRVhU
+Tgo+IC0JbXJzCXgyLCBjcHRyX2VsMgo+IC0JYmljCXgyLCB4MiwgI0NQVFJfRUwyX1RGUAo+IC0J
+bXNyCWNwdHJfZWwyLCB4Mgo+IC1hbHRlcm5hdGl2ZV9lbHNlCj4gLQltcnMJeDIsIGNwYWNyX2Vs
+MQo+IC0Jb3JyCXgyLCB4MiwgI0NQQUNSX0VMMV9GUEVOCj4gLQltc3IJY3BhY3JfZWwxLCB4Mgo+
+IC1hbHRlcm5hdGl2ZV9lbmRpZgo+IC0JaXNiCj4gLQo+IC0JbW92CXgzLCB4MQo+IC0KPiAtCWxk
+cgl4MCwgW3gzLCAjVkNQVV9IT1NUX0NPTlRFWFRdCj4gLQlrZXJuX2h5cF92YSB4MAo+IC0JYWRk
+CXgwLCB4MCwgI0NQVV9HUF9SRUdfT0ZGU0VUKENQVV9GUF9SRUdTKQo+IC0JYmwJX19mcHNpbWRf
+c2F2ZV9zdGF0ZQo+IC0KPiAtCWFkZAl4MiwgeDMsICNWQ1BVX0NPTlRFWFQKPiAtCWFkZAl4MCwg
+eDIsICNDUFVfR1BfUkVHX09GRlNFVChDUFVfRlBfUkVHUykKPiAtCWJsCV9fZnBzaW1kX3Jlc3Rv
+cmVfc3RhdGUKPiAtCj4gLQkvLyBTa2lwIHJlc3RvcmluZyBmcGV4YzMyIGZvciBBQXJjaDY0IGd1
+ZXN0cwo+IC0JbXJzCXgxLCBoY3JfZWwyCj4gLQl0Ym56CXgxLCAjSENSX1JXX1NISUZULCAxZgo+
+IC0JbGRyCXg0LCBbeDMsICNWQ1BVX0ZQRVhDMzJfRUwyXQo+IC0JbXNyCWZwZXhjMzJfZWwyLCB4
+NAo+IC0xOgo+IC0JbGRwCXg0LCBsciwgW3NwXSwgIzE2Cj4gLQlsZHAJeDIsIHgzLCBbc3BdLCAj
+MTYKPiAtCWxkcAl4MCwgeDEsIFtzcF0sICMxNgo+IC0KPiArCXN0cAl4MiwgeDMsIFtzcCwgIy0x
+NDRdIQo+ICsJc3RwCXg0LCB4NSwgW3NwLCAjMTZdCj4gKwlzdHAJeDYsIHg3LCBbc3AsICMzMl0K
+PiArCXN0cAl4OCwgeDksIFtzcCwgIzQ4XQo+ICsJc3RwCXgxMCwgeDExLCBbc3AsICM2NF0KPiAr
+CXN0cAl4MTIsIHgxMywgW3NwLCAjODBdCj4gKwlzdHAJeDE0LCB4MTUsIFtzcCwgIzk2XQo+ICsJ
+c3RwCXgxNiwgeDE3LCBbc3AsICMxMTJdCj4gKwlzdHAJeDE4LCBsciwgW3NwLCAjMTI4XQo+ICsK
+PiArCWJsCV9faHlwX3N3aXRjaF9mcHNpbWQKPiArCj4gKwlsZHAJeDQsIHg1LCBbc3AsICMxNl0K
+PiArCWxkcAl4NiwgeDcsIFtzcCwgIzMyXQo+ICsJbGRwCXg4LCB4OSwgW3NwLCAjNDhdCj4gKwls
+ZHAJeDEwLCB4MTEsIFtzcCwgIzY0XQo+ICsJbGRwCXgxMiwgeDEzLCBbc3AsICM4MF0KPiArCWxk
+cAl4MTQsIHgxNSwgW3NwLCAjOTZdCj4gKwlsZHAJeDE2LCB4MTcsIFtzcCwgIzExMl0KPiArCWxk
+cAl4MTgsIGxyLCBbc3AsICMxMjhdCj4gKwlsZHAJeDAsIHgxLCBbc3AsICMxNDRdCj4gKwlsZHAJ
+eDIsIHgzLCBbc3BdLCAjMTYwCj4gIAllcmV0Cj4gIEVORFBST0MoX19mcHNpbWRfZ3Vlc3RfcmVz
+dG9yZSkKPiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vaHlwL3N3aXRjaC5jIGIvYXJjaC9h
+cm02NC9rdm0vaHlwL3N3aXRjaC5jCj4gaW5kZXggZDk2NDUyMy4uYzA3OTZjNCAxMDA2NDQKPiAt
+LS0gYS9hcmNoL2FybTY0L2t2bS9oeXAvc3dpdGNoLmMKPiArKysgYi9hcmNoL2FybTY0L2t2bS9o
+eXAvc3dpdGNoLmMKPiBAQCAtMzE4LDYgKzMxOCwzMCBAQCBzdGF0aWMgYm9vbCBfX2h5cF90ZXh0
+IF9fc2tpcF9pbnN0cihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4gIAl9Cj4gIH0KPgo+ICt2b2lk
+IF9faHlwX3RleHQgX19oeXBfc3dpdGNoX2Zwc2ltZCh1NjQgZXNyIF9fYWx3YXlzX3VudXNlZCwK
+PiArCQkJCSAgICBzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4gK3sKPiArCWt2bV9jcHVfY29udGV4
+dF90ICpob3N0X2N0eHQ7Cj4gKwo+ICsJaWYgKGhhc192aGUoKSkKPiArCQl3cml0ZV9zeXNyZWco
+cmVhZF9zeXNyZWcoY3BhY3JfZWwxKSB8IENQQUNSX0VMMV9GUEVOLAo+ICsJCQkgICAgIGNwYWNy
+X2VsMSk7Cj4gKwllbHNlCj4gKwkJd3JpdGVfc3lzcmVnKHJlYWRfc3lzcmVnKGNwdHJfZWwyKSAm
+IH4odTY0KUNQVFJfRUwyX1RGUCwKPiArCQkJICAgICBjcHRyX2VsMik7CgpJcyB0aGVyZSBubyB3
+YXkgdG8gZG8gYWx0ZXJuYXRpdmUoKSBpbiBDIG9yIGRvZXMgaXQgYWx3YXlzIGNvbWUgZG93biB0
+bwpkaWZmZXJlbnQgaW5saW5lIGFzbXM/CgpBbnl3YXk6CgpSZXZpZXdlZC1ieTogQWxleCBCZW5u
+w6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgoKCj4gKwo+ICsJaXNiKCk7Cj4gKwo+ICsJaG9z
+dF9jdHh0ID0ga2Vybl9oeXBfdmEodmNwdS0+YXJjaC5ob3N0X2NwdV9jb250ZXh0KTsKPiArCV9f
+ZnBzaW1kX3NhdmVfc3RhdGUoJmhvc3RfY3R4dC0+Z3BfcmVncy5mcF9yZWdzKTsKPiArCV9fZnBz
+aW1kX3Jlc3RvcmVfc3RhdGUoJnZjcHUtPmFyY2guY3R4dC5ncF9yZWdzLmZwX3JlZ3MpOwo+ICsK
+PiArCS8qIFNraXAgcmVzdG9yaW5nIGZwZXhjMzIgZm9yIEFBcmNoNjQgZ3Vlc3RzICovCj4gKwlp
+ZiAoIShyZWFkX3N5c3JlZyhoY3JfZWwyKSAmIEhDUl9SVykpCj4gKwkJd3JpdGVfc3lzcmVnKHZj
+cHUtPmFyY2guY3R4dC5zeXNfcmVnc1tGUEVYQzMyX0VMMl0sCj4gKwkJCSAgICAgZnBleGMzMl9l
+bDIpOwo+ICt9Cj4gKwo+ICAvKgo+ICAgKiBSZXR1cm4gdHJ1ZSB3aGVuIHdlIHdlcmUgYWJsZSB0
+byBmaXh1cCB0aGUgZ3Vlc3QgZXhpdCBhbmQgc2hvdWxkIHJldHVybiB0bwo+ICAgKiB0aGUgZ3Vl
+c3QsIGZhbHNlIHdoZW4gd2Ugc2hvdWxkIHJlc3RvcmUgdGhlIGhvc3Qgc3RhdGUgYW5kIHJldHVy
+biB0byB0aGUKCgotLQpBbGV4IEJlbm7DqWUKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fCmxpbnV4LWFybS1rZXJuZWwgbWFpbGluZyBsaXN0CmxpbnV4LWFy
+bS1rZXJuZWxAbGlzdHMuaW5mcmFkZWFkLm9yZwpodHRwOi8vbGlzdHMuaW5mcmFkZWFkLm9yZy9t
+YWlsbWFuL2xpc3RpbmZvL2xpbnV4LWFybS1rZXJuZWwK
