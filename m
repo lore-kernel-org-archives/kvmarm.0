@@ -1,90 +1,76 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v10 07/18] arm64: fpsimd: Eliminate task->mm checks
-Date: Wed, 23 May 2018 17:42:47 +0100
-Message-ID: <20180523164246.47c2umln7xq5nf2w@armageddon.cambridge.arm.com>
-References: <1527005119-6842-1-git-send-email-Dave.Martin@arm.com>
- <1527005119-6842-8-git-send-email-Dave.Martin@arm.com>
- <20180523114812.GH55598@C02W217FHV2R.local>
- <20180523133158.GJ13470@e103592.cambridge.arm.com>
- <20180523145657.g7b6v2q2vxfqpoc4@armageddon.cambridge.arm.com>
- <20180523150337.GO13470@e103592.cambridge.arm.com>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Subject: Re: [PATCH] arm64: kvm: use -fno-jump-tables with clang
+Date: Wed, 23 May 2018 10:47:43 -0700
+Message-ID: <CAKwvOd=fqk2bQSiPBsUmVSQLGUEGYSUev3iWvico6HOpYs5YJA@mail.gmail.com>
+References: <20180518170202.11458-1-samitolvanen@google.com>
+ <05d14ac7-0feb-63a3-e7ef-b8ca1ae2fd1d@arm.com> <CAKwvOdm1kYedukCq=g74AvqJHp6KC03oNoouQy2nkvfo4idoEw@mail.gmail.com>
+ <8c7be44f-086d-65e3-9969-8182261ce82f@arm.com> <CAKwvOd=XZqg5=mkXZb-cxq3i_AGoJGAbmF=Fwc7Q98oi0tbN9g@mail.gmail.com>
+ <3fd89842-86cd-ee01-0c2c-5438dd2d5f2a@arm.com> <CAKwvOdk+=JKcQP1ieLEkZftRGf-pqCTTzEuYvT_45YNMkEw_wA@mail.gmail.com>
+ <86k1rzc4ba.wl-marc.zyngier@arm.com> <CAAeHK+z2LmMYasYtRTt2U=QF8Pe_i10RA3-SkLzGXXByZqLh1w@mail.gmail.com>
+ <CAKwvOdmWg8o9yoZ+3dCwL8vYB8gzE+AatCbXENN-+Gge9Q6gtA@mail.gmail.com> <CAAeHK+wk0hSH6iQcsLzrpjvsGocev-UZ6=z95ysecdFnAcHVSQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <20180523150337.GO13470@e103592.cambridge.arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CAAeHK+wk0hSH6iQcsLzrpjvsGocev-UZ6=z95ysecdFnAcHVSQ@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Andrey Konovalov <andreyknvl@google.com>
+Cc: marc.zyngier@arm.com, Sami Tolvanen <samitolvanen@google.com>, christoffer.dall@arm.com, Takahiro Akashi <takahiro.akashi@linaro.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, LKML <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, May 23, 2018 at 04:03:37PM +0100, Dave P Martin wrote:
-> On Wed, May 23, 2018 at 03:56:57PM +0100, Catalin Marinas wrote:
-> > On Wed, May 23, 2018 at 02:31:59PM +0100, Dave P Martin wrote:
-> > > On Wed, May 23, 2018 at 01:48:12PM +0200, Christoffer Dall wrote:
-> > > > On Tue, May 22, 2018 at 05:05:08PM +0100, Dave Martin wrote:
-> > > > > This is true by construction however: TIF_FOREIGN_FPSTATE is never
-> > > > > cleared except when returning to userspace or returning from a
-> > > > > signal: thus, for a true kernel thread no FPSIMD context is ever
-> > > > > loaded, TIF_FOREIGN_FPSTATE will remain set and no context will
-> > > > > ever be saved.
-> > > > 
-> > > > I don't understand this construction proof; from looking at the patch
-> > > > below it is not obvious to me why fpsimd_thread_switch() can never have
-> > > > !wrong_task && !wrong_cpu and therefore clear TIF_FOREIGN_FPSTATE for a
-> > > > kernel thread?
-> > > 
-> > > Looking at this again, I think it is poorly worded.  This patch aims to
-> > > make it true by construction, but it isn't prior to the patch.
-> > > 
-> > > I'm tempted to delete the paragraph: the assertion of both untrue and
-> > > not the best way to justify that this patch works.
-> > > 
-> > > 
-> > > How about:
-> > > 
-> > > -8<-
-> > > 
-> > > The context switch logic already isolates user threads from each other.
-> > > This, it is sufficient for isolating user threads from the kernel,
-> > > since the goal either way is to ensure that code executing in userspace
-> > > cannot see any FPSIMD state except its own.  Thus, there is no special
-> > > property of kernel threads that we care about except that it is
-> > > pointless to save or load FPSIMD register state for them.
-> > > 
-> > > At worst, the removal of all the kernel thread special cases by this
-> > > patch would thus spuriously load and save state for kernel threads when
-> > > unnecessary.
-> > > 
-> > > But the context switch logic is already deliberately optimised to defer
-> > > reloads of the regs until ret_to_user (or sigreturn as a special case),
-> > > which kernel threads by definition never reach.
-> > > 
-> > > ->8-
-> > 
-> > The "at worst" paragraph makes it look like it could happen (at least
-> > until you reach the last paragraph). Maybe you can just say that
-> > wrong_task and wrong_cpu (with the fpsimd_cpu = NR_CPUS addition) are
-> > always true for kernel threads. You should probably mention this in a
-> > comment in the code as well.
-> 
-> What if I just delete the second paragraph, and remove the "But" from
-> the start of the third, and append:
-> 
-> "As a result, the wrong_task and wrong_cpu tests in
-> fpsimd_thread_switch() will always yield false for kernel threads."
-> 
-> ...with a similar comment in the code?
+On Wed, May 23, 2018 at 4:54 AM Andrey Konovalov <andreyknvl@google.com>
+wrote:
+> On Tue, May 22, 2018 at 8:28 PM, Nick Desaulniers
+> <ndesaulniers@google.com> wrote:
+> > On Fri, May 18, 2018 at 11:13 AM Marc Zyngier <marc.zyngier@arm.com>
+wrote:
+> >> > - you have checked that with a released version of the compiler, you
+> >
+> > On Tue, May 22, 2018 at 10:58 AM Andrey Konovalov <andreyknvl@google.com
 
-Sounds fine. With that, feel free to add:
+> > wrote:
+> >> Tested-by: Andrey Konovalov <andreyknvl@google.com>
+> >
+> > Hi Andrey,
+> > Thank you very much for this report.  Can you confirm as well the
+version
+> > of Clang that you were using?
 
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> I'm on 86852a40 ("[InstCombine] Calloc-ed strings optimizations").
+
+> > If it's not a binary release (built from
+> > source), would you be able to re-confirm with a released version?
+
+> Sure. Which release should I try and how do I get it?
+
+Maybe clang-6.0 as the latest release (though I suspect you may run into
+the recently-fixed-in-clang-7.0 "S" constraint bug that you reported).
+
+I've had luck on debian based distributions installing from:
+http://apt.llvm.org/
+
+(These can be added to your /etc/apt/sources.list, then a `sudo apt update`
+and `sudo apt install clang-6.0`)
+
+If you're not able to add remote repositories (some employers block this ;)
+), then you can find releases for download for a few different platforms:
+https://releases.llvm.org/
+
+For example, a quick:
+$ mkdir llvm-6.0
+$ cd !$
+$ wget
+https://releases.llvm.org/6.0.0/clang+llvm-6.0.0-x86_64-linux-gnu-debian8.tar.xz
+$ tar xvf clang+llvm-6.0.0-x86_64-linux-gnu-debian8.tar.xz
+$ ./clang+llvm-6.0.0-x86_64-linux-gnu-debian8/bin/clang-6.0 -v
+clang version 6.0.0 (tags/RELEASE_600/final)
+Target: x86_64-unknown-linux-gnu
+Thread model: posix
+InstalledDir: .../llvm-6.0/./clang+llvm-6.0.0-x86_64-linux-gnu-debian8/bin
+Found candidate GCC installation: ...
+Candidate multilib: .;@m64
+Selected multilib: .;@m64
+
+Seems to work.
+-- 
+Thanks,
+~Nick Desaulniers
