@@ -1,17 +1,15 @@
 From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v10 07/18] arm64: fpsimd: Eliminate task->mm checks
-Date: Wed, 23 May 2018 15:56:57 +0100
-Message-ID: <20180523145657.g7b6v2q2vxfqpoc4@armageddon.cambridge.arm.com>
+Subject: Re: [PATCH v10 14/18] KVM: arm64: Save host SVE context as appropriate
+Date: Wed, 23 May 2018 15:59:36 +0100
+Message-ID: <20180523145935.ibbrnzgpmftan5t6@armageddon.cambridge.arm.com>
 References: <1527005119-6842-1-git-send-email-Dave.Martin@arm.com>
- <1527005119-6842-8-git-send-email-Dave.Martin@arm.com>
- <20180523114812.GH55598@C02W217FHV2R.local>
- <20180523133158.GJ13470@e103592.cambridge.arm.com>
+ <1527005119-6842-15-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <20180523133158.GJ13470@e103592.cambridge.arm.com>
+In-Reply-To: <1527005119-6842-15-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -22,56 +20,24 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: Dave Martin <Dave.Martin@arm.com>
-Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, May 23, 2018 at 02:31:59PM +0100, Dave P Martin wrote:
-> On Wed, May 23, 2018 at 01:48:12PM +0200, Christoffer Dall wrote:
-> > On Tue, May 22, 2018 at 05:05:08PM +0100, Dave Martin wrote:
-> > > This is true by construction however: TIF_FOREIGN_FPSTATE is never
-> > > cleared except when returning to userspace or returning from a
-> > > signal: thus, for a true kernel thread no FPSIMD context is ever
-> > > loaded, TIF_FOREIGN_FPSTATE will remain set and no context will
-> > > ever be saved.
-> > 
-> > I don't understand this construction proof; from looking at the patch
-> > below it is not obvious to me why fpsimd_thread_switch() can never have
-> > !wrong_task && !wrong_cpu and therefore clear TIF_FOREIGN_FPSTATE for a
-> > kernel thread?
+On Tue, May 22, 2018 at 05:05:15PM +0100, Dave P Martin wrote:
+> This patch adds SVE context saving to the hyp FPSIMD context switch
+> path.  This means that it is no longer necessary to save the host
+> SVE state in advance of entering the guest, when in use.
 > 
-> Looking at this again, I think it is poorly worded.  This patch aims to
-> make it true by construction, but it isn't prior to the patch.
+> In order to avoid adding pointless complexity to the code, VHE is
+> assumed if SVE is in use.  VHE is an architectural prerequisite for
+> SVE, so there is no good reason to turn CONFIG_ARM64_VHE off in
+> kernels that support both SVE and KVM.
 > 
-> I'm tempted to delete the paragraph: the assertion of both untrue and
-> not the best way to justify that this patch works.
+> Historically, software models exist that can expose the
+> architecturally invalid configuration of SVE without VHE, so if
+> this situation is detected at kvm_init() time then KVM will be
+> disabled.
 > 
-> 
-> How about:
-> 
-> -8<-
-> 
-> The context switch logic already isolates user threads from each other.
-> This, it is sufficient for isolating user threads from the kernel,
-> since the goal either way is to ensure that code executing in userspace
-> cannot see any FPSIMD state except its own.  Thus, there is no special
-> property of kernel threads that we care about except that it is
-> pointless to save or load FPSIMD register state for them.
-> 
-> At worst, the removal of all the kernel thread special cases by this
-> patch would thus spuriously load and save state for kernel threads when
-> unnecessary.
-> 
-> But the context switch logic is already deliberately optimised to defer
-> reloads of the regs until ret_to_user (or sigreturn as a special case),
-> which kernel threads by definition never reach.
-> 
-> ->8-
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 
-The "at worst" paragraph makes it look like it could happen (at least
-until you reach the last paragraph). Maybe you can just say that
-wrong_task and wrong_cpu (with the fpsimd_cpu = NR_CPUS addition) are
-always true for kernel threads. You should probably mention this in a
-comment in the code as well.
-
--- 
-Catalin
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
