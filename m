@@ -1,14 +1,16 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH v10 03/18] arm64: Use update{,_tsk}_thread_flag()
-Date: Wed, 23 May 2018 14:48:56 +0100
-Message-ID: <87o9h6trcn.fsf@linaro.org>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH v10 02/18] thread_info: Add update_thread_flag() helpers
+Date: Wed, 23 May 2018 14:57:32 +0100
+Message-ID: <20180523135732.GK13470@e103592.cambridge.arm.com>
 References: <1527005119-6842-1-git-send-email-Dave.Martin@arm.com>
- <1527005119-6842-4-git-send-email-Dave.Martin@arm.com>
+ <1527005119-6842-3-git-send-email-Dave.Martin@arm.com>
+ <87po1mtrg3.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-reply-to: <1527005119-6842-4-git-send-email-Dave.Martin@arm.com>
+Content-Disposition: inline
+In-Reply-To: <87po1mtrg3.fsf@linaro.org>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -18,43 +20,77 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Oleg Nesterov <oleg@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo+IFRoaXMgcGF0Y2gg
-dXNlcyB0aGUgbmV3IHVwZGF0ZV90aHJlYWRfZmxhZygpIGhlbHBlcnMgdG8gc2ltcGxpZnkgYQo+
-IGNvdXBsZSBvZiBpZiAoKSBzZXQ7IGVsc2UgY2xlYXI7IGNvbnN0cnVjdHMuCj4KPiBObyBmdW5j
-dGlvbmFsIGNoYW5nZS4KPgo+IFNpZ25lZC1vZmYtYnk6IERhdmUgTWFydGluIDxEYXZlLk1hcnRp
-bkBhcm0uY29tPgo+IEFja2VkLWJ5OiBNYXJjIFp5bmdpZXIgPG1hcmMuenluZ2llckBhcm0uY29t
-Pgo+IEFja2VkLWJ5OiBDYXRhbGluIE1hcmluYXMgPGNhdGFsaW4ubWFyaW5hc0Bhcm0uY29tPgo+
-IENjOiBXaWxsIERlYWNvbiA8d2lsbC5kZWFjb25AYXJtLmNvbT4KClJldmlld2VkLWJ5OiBBbGV4
-IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+Cgo+IC0tLQo+ICBhcmNoL2FybTY0L2tl
-cm5lbC9mcHNpbWQuYyB8IDE4ICsrKysrKysrLS0tLS0tLS0tLQo+ICAxIGZpbGUgY2hhbmdlZCwg
-OCBpbnNlcnRpb25zKCspLCAxMCBkZWxldGlvbnMoLSkKPgo+IGRpZmYgLS1naXQgYS9hcmNoL2Fy
-bTY0L2tlcm5lbC9mcHNpbWQuYyBiL2FyY2gvYXJtNjQva2VybmVsL2Zwc2ltZC5jCj4gaW5kZXgg
-MTJlMWM5Ni4uOWQ4NTM3MyAxMDA2NDQKPiAtLS0gYS9hcmNoL2FybTY0L2tlcm5lbC9mcHNpbWQu
-Ywo+ICsrKyBiL2FyY2gvYXJtNjQva2VybmVsL2Zwc2ltZC5jCj4gQEAgLTYxOCwxMCArNjE4LDgg
-QEAgaW50IHN2ZV9zZXRfdmVjdG9yX2xlbmd0aChzdHJ1Y3QgdGFza19zdHJ1Y3QgKnRhc2ssCj4g
-IAl0YXNrLT50aHJlYWQuc3ZlX3ZsID0gdmw7Cj4KPiAgb3V0Ogo+IC0JaWYgKGZsYWdzICYgUFJf
-U1ZFX1ZMX0lOSEVSSVQpCj4gLQkJc2V0X3Rza190aHJlYWRfZmxhZyh0YXNrLCBUSUZfU1ZFX1ZM
-X0lOSEVSSVQpOwo+IC0JZWxzZQo+IC0JCWNsZWFyX3Rza190aHJlYWRfZmxhZyh0YXNrLCBUSUZf
-U1ZFX1ZMX0lOSEVSSVQpOwo+ICsJdXBkYXRlX3Rza190aHJlYWRfZmxhZyh0YXNrLCBUSUZfU1ZF
-X1ZMX0lOSEVSSVQsCj4gKwkJCSAgICAgICBmbGFncyAmIFBSX1NWRV9WTF9JTkhFUklUKTsKPgo+
-ICAJcmV0dXJuIDA7Cj4gIH0KPiBAQCAtOTEwLDEyICs5MDgsMTIgQEAgdm9pZCBmcHNpbWRfdGhy
-ZWFkX3N3aXRjaChzdHJ1Y3QgdGFza19zdHJ1Y3QgKm5leHQpCj4gIAkJICogdGhlIFRJRl9GT1JF
-SUdOX0ZQU1RBVEUgZmxhZyBzbyB0aGUgc3RhdGUgd2lsbCBiZSBsb2FkZWQKPiAgCQkgKiB1cG9u
-IHRoZSBuZXh0IHJldHVybiB0byB1c2VybGFuZC4KPiAgCQkgKi8KPiAtCQlpZiAoX190aGlzX2Nw
-dV9yZWFkKGZwc2ltZF9sYXN0X3N0YXRlLnN0KSA9PQo+IC0JCQkmbmV4dC0+dGhyZWFkLnV3LmZw
-c2ltZF9zdGF0ZQo+IC0JCSAgICAmJiBuZXh0LT50aHJlYWQuZnBzaW1kX2NwdSA9PSBzbXBfcHJv
-Y2Vzc29yX2lkKCkpCj4gLQkJCWNsZWFyX3Rza190aHJlYWRfZmxhZyhuZXh0LCBUSUZfRk9SRUlH
-Tl9GUFNUQVRFKTsKPiAtCQllbHNlCj4gLQkJCXNldF90c2tfdGhyZWFkX2ZsYWcobmV4dCwgVElG
-X0ZPUkVJR05fRlBTVEFURSk7Cj4gKwkJYm9vbCB3cm9uZ190YXNrID0gX190aGlzX2NwdV9yZWFk
-KGZwc2ltZF9sYXN0X3N0YXRlLnN0KSAhPQo+ICsJCQkJCSZuZXh0LT50aHJlYWQudXcuZnBzaW1k
-X3N0YXRlOwo+ICsJCWJvb2wgd3JvbmdfY3B1ID0gbmV4dC0+dGhyZWFkLmZwc2ltZF9jcHUgIT0g
-c21wX3Byb2Nlc3Nvcl9pZCgpOwo+ICsKPiArCQl1cGRhdGVfdHNrX3RocmVhZF9mbGFnKG5leHQs
-IFRJRl9GT1JFSUdOX0ZQU1RBVEUsCj4gKwkJCQkgICAgICAgd3JvbmdfdGFzayB8fCB3cm9uZ19j
-cHUpOwo+ICAJfQo+ICB9CgoKLS0KQWxleCBCZW5uw6llCgpfX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fXwpsaW51eC1hcm0ta2VybmVsIG1haWxpbmcgbGlzdAps
-aW51eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5vcmcKaHR0cDovL2xpc3RzLmluZnJhZGVh
-ZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1hcm0ta2VybmVsCg==
+On Wed, May 23, 2018 at 02:46:52PM +0100, Alex Benn=E9e wrote:
+> =
+
+> Dave Martin <Dave.Martin@arm.com> writes:
+> =
+
+> > There are a number of bits of code sprinkled around the kernel to
+> > set a thread flag if a certain condition is true, and clear it
+> > otherwise.
+> >
+> > To help make those call sites terser and less cumbersome, this
+> > patch adds a new family of thread flag manipulators
+> >
+> > 	update*_thread_flag([...,] flag, cond)
+> >
+> > which do the equivalent of:
+> >
+> > 	if (cond)
+> > 		set*_thread_flag([...,] flag);
+> > 	else
+> > 		clear*_thread_flag([...,] flag);
+> >
+> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> > Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
+> > Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+> > Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+> > Cc: Ingo Molnar <mingo@redhat.com>
+> > Cc: Peter Zijlstra <peterz@infradead.org>
+> > Cc: Oleg Nesterov <oleg@redhat.com>
+> > ---
+> >  include/linux/sched.h       |  6 ++++++
+> >  include/linux/thread_info.h | 11 +++++++++++
+> >  2 files changed, 17 insertions(+)
+> >
+
+[...]
+
+> > diff --git a/include/linux/thread_info.h b/include/linux/thread_info.h
+> > index cf2862b..8d8821b 100644
+> > --- a/include/linux/thread_info.h
+> > +++ b/include/linux/thread_info.h
+> > @@ -60,6 +60,15 @@ static inline void clear_ti_thread_flag(struct threa=
+d_info *ti, int flag)
+> >  	clear_bit(flag, (unsigned long *)&ti->flags);
+> >  }
+> >
+> > +static inline void update_ti_thread_flag(struct thread_info *ti, int f=
+lag,
+> > +					 bool value)
+> > +{
+> > +	if (value)
+> > +		set_ti_thread_flag(ti, flag);
+> > +	else
+> > +		clear_ti_thread_flag(ti, flag);
+> > +}
+> > +
+> =
+
+> value does seem a bit of vanilla non-informative name for a condition
+> flag but whatever:
+> =
+
+> Reviewed-by: Alex Benn=E9e <alex.bennee@linaro.org>
+
+I guess, though I couldn't some up with an obviously better name.
+
+I support "condition" would have worked, but it's more verbose.
+
+Thanks for the review
+---Dave
