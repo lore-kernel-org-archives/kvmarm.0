@@ -1,107 +1,117 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 13/14] ARM: KVM: Add SMCCC_ARCH_WORKAROUND_1 fast handling
-Date: Wed, 23 May 2018 11:50:50 +0100
-Message-ID: <4187699a-fe7b-3807-4ffa-809bb918d6a2@arm.com>
-References: <20180521114238.GN17671@n2100.armlinux.org.uk>
- <E1fKjFo-00064i-Hc@rmk-PC.armlinux.org.uk>
+From: Julien Grall <julien.grall@arm.com>
+Subject: Re: [PATCH 08/14] arm64: ssbd: Disable mitigation on CPU resume if
+ required by user
+Date: Wed, 23 May 2018 11:52:56 +0100
+Message-ID: <7c3b914e-53d7-e600-2632-a05e1cb3e0cd@arm.com>
+References: <20180522150648.28297-1-marc.zyngier@arm.com>
+ <20180522150648.28297-9-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A96074A0D6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 May 2018 06:40:37 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Iig4nB4ZRuYu for <kvmarm@lists.cs.columbia.edu>;
- Wed, 23 May 2018 06:40:15 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C5BB49F93
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 May 2018 06:40:15 -0400 (EDT)
-In-Reply-To: <E1fKjFo-00064i-Hc@rmk-PC.armlinux.org.uk>
-Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Russell King <rmk+kernel@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org
-Cc: Florian Fainelli <f.fainelli@gmail.com>, kvmarm@lists.cs.columbia.edu
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180522150648.28297-9-marc.zyngier@arm.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: Kees Cook <keescook@chromium.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Andy Lutomirski <luto@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 21/05/18 12:45, Russell King wrote:
-> We want SMCCC_ARCH_WORKAROUND_1 to be fast. As fast as possible.
-> So let's intercept it as early as we can by testing for the
-> function call number as soon as we've identified a HVC call
-> coming from the guest.
+Hi,
+
+On 05/22/2018 04:06 PM, Marc Zyngier wrote:
+> On a system where firmware can dynamically change the state of the
+> mitigation, the CPU will always come up with the mitigation enabled,
+> including when coming back from suspend.
 > 
-> Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
+> If the user has requested "no mitigation" via a command line option,
+> let's enforce it by calling into the firmware again to disable it.
+> 
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+
+Reviewed-by: Julien Grall <julien.grall@arm.com>
+
+Cheers,
+
 > ---
->  arch/arm/kvm/hyp/hyp-entry.S | 13 ++++++++++++-
->  1 file changed, 12 insertions(+), 1 deletion(-)
+>   arch/arm64/include/asm/cpufeature.h | 6 ++++++
+>   arch/arm64/kernel/cpu_errata.c      | 8 ++++----
+>   arch/arm64/kernel/suspend.c         | 8 ++++++++
+>   3 files changed, 18 insertions(+), 4 deletions(-)
 > 
-> diff --git a/arch/arm/kvm/hyp/hyp-entry.S b/arch/arm/kvm/hyp/hyp-entry.S
-> index 918a05dd2d63..67de45685e29 100644
-> --- a/arch/arm/kvm/hyp/hyp-entry.S
-> +++ b/arch/arm/kvm/hyp/hyp-entry.S
-> @@ -16,6 +16,7 @@
->   * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
->   */
->  
-> +#include <linux/arm-smccc.h>
->  #include <linux/linkage.h>
->  #include <asm/kvm_arm.h>
->  #include <asm/kvm_asm.h>
-> @@ -202,7 +203,7 @@ ENDPROC(__hyp_do_panic)
->  	lsr     r2, r2, #16
->  	and     r2, r2, #0xff
->  	cmp     r2, #0
-> -	bne	guest_trap		@ Guest called HVC
-> +	bne	guest_hvc_trap		@ Guest called HVC
->  
->  	/*
->  	 * Getting here means host called HVC, we shift parameters and branch
-> @@ -253,6 +254,16 @@ THUMB(	orr	lr, #1)
->  	pop	{r2, lr}
->  	eret
->  
-> +guest_hvc_trap:
-> +	movw	ip, #:lower16:ARM_SMCCC_ARCH_WORKAROUND_1
-> +	movt	ip, #:upper16:ARM_SMCCC_ARCH_WORKAROUND_1
-
-r12 is a live guest register, and only r0-r2 are saved at that stage.
-You could additionally corrupt r3 though, once you've identified that
-you're in the context of an SMCCC 1.1 call.
-
-You should be able to replace r12 with r2.
-
-> +	ldr	r0, [sp]		@ Guest's r0
-> +	teq	r0, ip
-> +	bne	guest_trap
-> +	pop	{r0, r1, r2}
-
-You could replace this slightly more efficient
-
-	add	sp, sp, #12
-
-since we don't need to restore those registers to the guest. r2 would be
-left containing ARM_SMCCC_ARCH_WORKAROUND_1 (harmless), and r1 has the
-HSR value (perfectly predictable).
-
-> +	mov	r0, #0
-> +	eret
+> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> index 1bacdf57f0af..d9dcb683259e 100644
+> --- a/arch/arm64/include/asm/cpufeature.h
+> +++ b/arch/arm64/include/asm/cpufeature.h
+> @@ -553,6 +553,12 @@ static inline int arm64_get_ssbd_state(void)
+>   #endif
+>   }
+>   
+> +#ifdef CONFIG_ARM64_SSBD
+> +void arm64_set_ssbd_mitigation(bool state);
+> +#else
+> +static inline void arm64_set_ssbd_mitigation(bool state) {}
+> +#endif
 > +
->  guest_trap:
->  	load_vcpu r0			@ Load VCPU pointer to r0
->  
+>   #endif /* __ASSEMBLY__ */
+>   
+>   #endif
+> diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
+> index 8f686f39b9c1..b4c12e9140f0 100644
+> --- a/arch/arm64/kernel/cpu_errata.c
+> +++ b/arch/arm64/kernel/cpu_errata.c
+> @@ -297,7 +297,7 @@ void __init arm64_enable_wa2_handling(struct alt_instr *alt,
+>   		*updptr = cpu_to_le32(aarch64_insn_gen_nop());
+>   }
+>   
+> -static void do_ssbd(bool state)
+> +void arm64_set_ssbd_mitigation(bool state)
+>   {
+>   	switch (psci_ops.conduit) {
+>   	case PSCI_CONDUIT_HVC:
+> @@ -371,20 +371,20 @@ static bool has_ssbd_mitigation(const struct arm64_cpu_capabilities *entry,
+>   	switch (ssbd_state) {
+>   	case ARM64_SSBD_FORCE_DISABLE:
+>   		pr_info_once("%s disabled from command-line\n", entry->desc);
+> -		do_ssbd(false);
+> +		arm64_set_ssbd_mitigation(false);
+>   		required = false;
+>   		break;
+>   
+>   	case ARM64_SSBD_EL1_ENTRY:
+>   		if (required) {
+>   			__this_cpu_write(arm64_ssbd_callback_required, 1);
+> -			do_ssbd(true);
+> +			arm64_set_ssbd_mitigation(true);
+>   		}
+>   		break;
+>   
+>   	case ARM64_SSBD_FORCE_ENABLE:
+>   		pr_info_once("%s forced from command-line\n", entry->desc);
+> -		do_ssbd(true);
+> +		arm64_set_ssbd_mitigation(true);
+>   		required = true;
+>   		break;
+>   
+> diff --git a/arch/arm64/kernel/suspend.c b/arch/arm64/kernel/suspend.c
+> index a307b9e13392..70c283368b64 100644
+> --- a/arch/arm64/kernel/suspend.c
+> +++ b/arch/arm64/kernel/suspend.c
+> @@ -62,6 +62,14 @@ void notrace __cpu_suspend_exit(void)
+>   	 */
+>   	if (hw_breakpoint_restore)
+>   		hw_breakpoint_restore(cpu);
+> +
+> +	/*
+> +	 * On resume, firmware implementing dynamic mitigation will
+> +	 * have turned the mitigation on. If the user has forcefully
+> +	 * disabled it, make sure their wishes are obeyed.
+> +	 */
+> +	if (arm64_get_ssbd_state() == ARM64_SSBD_FORCE_DISABLE)
+> +		arm64_set_ssbd_mitigation(false);
+>   }
+>   
+>   /*
 > 
 
-Thanks,
-
-	M.
 -- 
-Jazz is not dead. It just smells funny...
+Julien Grall
