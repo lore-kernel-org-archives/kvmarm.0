@@ -1,92 +1,76 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH v10 05/18] KVM: arm64: Convert lazy FPSIMD context switch
- trap to C
-Date: Wed, 23 May 2018 20:35:13 +0100
-Message-ID: <87k1rutbbi.fsf@linaro.org>
-References: <1527005119-6842-1-git-send-email-Dave.Martin@arm.com>
- <1527005119-6842-6-git-send-email-Dave.Martin@arm.com>
+From: Russell King - ARM Linux <linux@armlinux.org.uk>
+Subject: Re: [PATCH 09/14] ARM: spectre-v2: add PSCI based hardening
+Date: Wed, 23 May 2018 20:45:04 +0100
+Message-ID: <20180523194503.GX17671@n2100.armlinux.org.uk>
+References: <20180521114238.GN17671@n2100.armlinux.org.uk>
+ <E1fKjFT-00064F-Bs@rmk-PC.armlinux.org.uk>
+ <35edb3df-fed4-b6e6-be0c-ee758618c92e@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-reply-to: <1527005119-6842-6-git-send-email-Dave.Martin@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BE8254A0C5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 May 2018 15:35:07 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id OhdOIH4N0Ts7 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 23 May 2018 15:34:44 -0400 (EDT)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7496A4A0C4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 May 2018 15:34:44 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <35edb3df-fed4-b6e6-be0c-ee758618c92e@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo+IFRvIG1ha2UgdGhl
-IGxhenkgRlBTSU1EIGNvbnRleHQgc3dpdGNoIHRyYXAgY29kZSBlYXNpZXIgdG8gaGFjayBvbiwK
-PiB0aGlzIHBhdGNoIGNvbnZlcnRzIGl0IHRvIEMuCj4KPiBUaGlzIGlzIG5vdCBhbWF6aW5nbHkg
-ZWZmaWNpZW50LCBidXQgdGhlIHRyYXAgc2hvdWxkIHR5cGljYWxseSBvbmx5Cj4gYmUgdGFrZW4g
-b25jZSBwZXIgaG9zdCBjb250ZXh0IHN3aXRjaC4KPgo+IFNpZ25lZC1vZmYtYnk6IERhdmUgTWFy
-dGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPgo+IFJldmlld2VkLWJ5OiBNYXJjIFp5bmdpZXIgPG1h
-cmMuenluZ2llckBhcm0uY29tPgo+IC0tLQo+ICBhcmNoL2FybTY0L2t2bS9oeXAvZW50cnkuUyAg
-fCA1NyArKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPiAgYXJj
-aC9hcm02NC9rdm0vaHlwL3N3aXRjaC5jIHwgMjQgKysrKysrKysrKysrKysrKysrKwo+ICAyIGZp
-bGVzIGNoYW5nZWQsIDQ2IGluc2VydGlvbnMoKyksIDM1IGRlbGV0aW9ucygtKQo+Cj4gZGlmZiAt
-LWdpdCBhL2FyY2gvYXJtNjQva3ZtL2h5cC9lbnRyeS5TIGIvYXJjaC9hcm02NC9rdm0vaHlwL2Vu
-dHJ5LlMKPiBpbmRleCBlNDFhMTYxLi40MGYzNDliIDEwMDY0NAo+IC0tLSBhL2FyY2gvYXJtNjQv
-a3ZtL2h5cC9lbnRyeS5TCj4gKysrIGIvYXJjaC9hcm02NC9rdm0vaHlwL2VudHJ5LlMKPiBAQCAt
-MTcyLDQwICsxNzIsMjcgQEAgRU5UUlkoX19mcHNpbWRfZ3Vlc3RfcmVzdG9yZSkKPiAgCS8vIHgx
-OiB2Y3B1Cj4gIAkvLyB4Mi14MjksbHI6IHZjcHUgcmVncwo+ICAJLy8gdmNwdSB4MC14MSBvbiB0
-aGUgc3RhY2sKPiAtCXN0cAl4MiwgeDMsIFtzcCwgIy0xNl0hCj4gLQlzdHAJeDQsIGxyLCBbc3As
-ICMtMTZdIQo+IC0KPiAtYWx0ZXJuYXRpdmVfaWZfbm90IEFSTTY0X0hBU19WSVJUX0hPU1RfRVhU
-Tgo+IC0JbXJzCXgyLCBjcHRyX2VsMgo+IC0JYmljCXgyLCB4MiwgI0NQVFJfRUwyX1RGUAo+IC0J
-bXNyCWNwdHJfZWwyLCB4Mgo+IC1hbHRlcm5hdGl2ZV9lbHNlCj4gLQltcnMJeDIsIGNwYWNyX2Vs
-MQo+IC0Jb3JyCXgyLCB4MiwgI0NQQUNSX0VMMV9GUEVOCj4gLQltc3IJY3BhY3JfZWwxLCB4Mgo+
-IC1hbHRlcm5hdGl2ZV9lbmRpZgo+IC0JaXNiCj4gLQo+IC0JbW92CXgzLCB4MQo+IC0KPiAtCWxk
-cgl4MCwgW3gzLCAjVkNQVV9IT1NUX0NPTlRFWFRdCj4gLQlrZXJuX2h5cF92YSB4MAo+IC0JYWRk
-CXgwLCB4MCwgI0NQVV9HUF9SRUdfT0ZGU0VUKENQVV9GUF9SRUdTKQo+IC0JYmwJX19mcHNpbWRf
-c2F2ZV9zdGF0ZQo+IC0KPiAtCWFkZAl4MiwgeDMsICNWQ1BVX0NPTlRFWFQKPiAtCWFkZAl4MCwg
-eDIsICNDUFVfR1BfUkVHX09GRlNFVChDUFVfRlBfUkVHUykKPiAtCWJsCV9fZnBzaW1kX3Jlc3Rv
-cmVfc3RhdGUKPiAtCj4gLQkvLyBTa2lwIHJlc3RvcmluZyBmcGV4YzMyIGZvciBBQXJjaDY0IGd1
-ZXN0cwo+IC0JbXJzCXgxLCBoY3JfZWwyCj4gLQl0Ym56CXgxLCAjSENSX1JXX1NISUZULCAxZgo+
-IC0JbGRyCXg0LCBbeDMsICNWQ1BVX0ZQRVhDMzJfRUwyXQo+IC0JbXNyCWZwZXhjMzJfZWwyLCB4
-NAo+IC0xOgo+IC0JbGRwCXg0LCBsciwgW3NwXSwgIzE2Cj4gLQlsZHAJeDIsIHgzLCBbc3BdLCAj
-MTYKPiAtCWxkcAl4MCwgeDEsIFtzcF0sICMxNgo+IC0KPiArCXN0cAl4MiwgeDMsIFtzcCwgIy0x
-NDRdIQo+ICsJc3RwCXg0LCB4NSwgW3NwLCAjMTZdCj4gKwlzdHAJeDYsIHg3LCBbc3AsICMzMl0K
-PiArCXN0cAl4OCwgeDksIFtzcCwgIzQ4XQo+ICsJc3RwCXgxMCwgeDExLCBbc3AsICM2NF0KPiAr
-CXN0cAl4MTIsIHgxMywgW3NwLCAjODBdCj4gKwlzdHAJeDE0LCB4MTUsIFtzcCwgIzk2XQo+ICsJ
-c3RwCXgxNiwgeDE3LCBbc3AsICMxMTJdCj4gKwlzdHAJeDE4LCBsciwgW3NwLCAjMTI4XQo+ICsK
-PiArCWJsCV9faHlwX3N3aXRjaF9mcHNpbWQKPiArCj4gKwlsZHAJeDQsIHg1LCBbc3AsICMxNl0K
-PiArCWxkcAl4NiwgeDcsIFtzcCwgIzMyXQo+ICsJbGRwCXg4LCB4OSwgW3NwLCAjNDhdCj4gKwls
-ZHAJeDEwLCB4MTEsIFtzcCwgIzY0XQo+ICsJbGRwCXgxMiwgeDEzLCBbc3AsICM4MF0KPiArCWxk
-cAl4MTQsIHgxNSwgW3NwLCAjOTZdCj4gKwlsZHAJeDE2LCB4MTcsIFtzcCwgIzExMl0KPiArCWxk
-cAl4MTgsIGxyLCBbc3AsICMxMjhdCj4gKwlsZHAJeDAsIHgxLCBbc3AsICMxNDRdCj4gKwlsZHAJ
-eDIsIHgzLCBbc3BdLCAjMTYwCj4gIAllcmV0Cj4gIEVORFBST0MoX19mcHNpbWRfZ3Vlc3RfcmVz
-dG9yZSkKPiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vaHlwL3N3aXRjaC5jIGIvYXJjaC9h
-cm02NC9rdm0vaHlwL3N3aXRjaC5jCj4gaW5kZXggZDk2NDUyMy4uYzA3OTZjNCAxMDA2NDQKPiAt
-LS0gYS9hcmNoL2FybTY0L2t2bS9oeXAvc3dpdGNoLmMKPiArKysgYi9hcmNoL2FybTY0L2t2bS9o
-eXAvc3dpdGNoLmMKPiBAQCAtMzE4LDYgKzMxOCwzMCBAQCBzdGF0aWMgYm9vbCBfX2h5cF90ZXh0
-IF9fc2tpcF9pbnN0cihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4gIAl9Cj4gIH0KPgo+ICt2b2lk
-IF9faHlwX3RleHQgX19oeXBfc3dpdGNoX2Zwc2ltZCh1NjQgZXNyIF9fYWx3YXlzX3VudXNlZCwK
-PiArCQkJCSAgICBzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4gK3sKPiArCWt2bV9jcHVfY29udGV4
-dF90ICpob3N0X2N0eHQ7Cj4gKwo+ICsJaWYgKGhhc192aGUoKSkKPiArCQl3cml0ZV9zeXNyZWco
-cmVhZF9zeXNyZWcoY3BhY3JfZWwxKSB8IENQQUNSX0VMMV9GUEVOLAo+ICsJCQkgICAgIGNwYWNy
-X2VsMSk7Cj4gKwllbHNlCj4gKwkJd3JpdGVfc3lzcmVnKHJlYWRfc3lzcmVnKGNwdHJfZWwyKSAm
-IH4odTY0KUNQVFJfRUwyX1RGUCwKPiArCQkJICAgICBjcHRyX2VsMik7CgpJcyB0aGVyZSBubyB3
-YXkgdG8gZG8gYWx0ZXJuYXRpdmUoKSBpbiBDIG9yIGRvZXMgaXQgYWx3YXlzIGNvbWUgZG93biB0
-bwpkaWZmZXJlbnQgaW5saW5lIGFzbXM/CgpBbnl3YXk6CgpSZXZpZXdlZC1ieTogQWxleCBCZW5u
-w6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgoKCj4gKwo+ICsJaXNiKCk7Cj4gKwo+ICsJaG9z
-dF9jdHh0ID0ga2Vybl9oeXBfdmEodmNwdS0+YXJjaC5ob3N0X2NwdV9jb250ZXh0KTsKPiArCV9f
-ZnBzaW1kX3NhdmVfc3RhdGUoJmhvc3RfY3R4dC0+Z3BfcmVncy5mcF9yZWdzKTsKPiArCV9fZnBz
-aW1kX3Jlc3RvcmVfc3RhdGUoJnZjcHUtPmFyY2guY3R4dC5ncF9yZWdzLmZwX3JlZ3MpOwo+ICsK
-PiArCS8qIFNraXAgcmVzdG9yaW5nIGZwZXhjMzIgZm9yIEFBcmNoNjQgZ3Vlc3RzICovCj4gKwlp
-ZiAoIShyZWFkX3N5c3JlZyhoY3JfZWwyKSAmIEhDUl9SVykpCj4gKwkJd3JpdGVfc3lzcmVnKHZj
-cHUtPmFyY2guY3R4dC5zeXNfcmVnc1tGUEVYQzMyX0VMMl0sCj4gKwkJCSAgICAgZnBleGMzMl9l
-bDIpOwo+ICt9Cj4gKwo+ICAvKgo+ICAgKiBSZXR1cm4gdHJ1ZSB3aGVuIHdlIHdlcmUgYWJsZSB0
-byBmaXh1cCB0aGUgZ3Vlc3QgZXhpdCBhbmQgc2hvdWxkIHJldHVybiB0bwo+ICAgKiB0aGUgZ3Vl
-c3QsIGZhbHNlIHdoZW4gd2Ugc2hvdWxkIHJlc3RvcmUgdGhlIGhvc3Qgc3RhdGUgYW5kIHJldHVy
-biB0byB0aGUKCgotLQpBbGV4IEJlbm7DqWUKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fCmxpbnV4LWFybS1rZXJuZWwgbWFpbGluZyBsaXN0CmxpbnV4LWFy
-bS1rZXJuZWxAbGlzdHMuaW5mcmFkZWFkLm9yZwpodHRwOi8vbGlzdHMuaW5mcmFkZWFkLm9yZy9t
-YWlsbWFuL2xpc3RpbmZvL2xpbnV4LWFybS1rZXJuZWwK
+On Tue, May 22, 2018 at 06:24:13PM +0100, Marc Zyngier wrote:
+> On 21/05/18 12:45, Russell King wrote:
+> > +#ifdef CONFIG_ARM_PSCI
+> > +	if (psci_ops.smccc_version != SMCCC_VERSION_1_0) {
+> > +		struct arm_smccc_res res;
+> > +
+> > +		switch (psci_ops.conduit) {
+> > +		case PSCI_CONDUIT_HVC:
+> > +			arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
+> > +					  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
+> > +			if ((int)res.a0 < 0)
+> > +				break;
+> 
+> I just realised that there is a small, but significant difference
+> between this and the arm64 version: On arm64, we have a table of
+> vulnerable implementations, and we try the mitigation on a per-cpu
+> basis. Here, you entirely rely on the firmware to discover whether the
+> CPU needs mitigation or not. You then need to check for a return value
+> of 1, which indicates that although the mitigation is implemented, it is
+> not required on this particular CPU.
+
+Okay, so digging further into the documentation seems to suggest that we
+only need to check the firmware for A72 and A57 CPUs, and given this
+statement:
+
+"Arm recommends that the caller only call this on PEs for which a
+ firmware based mitigation of CVE-2017-5715 is required, or where
+ a local workaround is infeasible."
+
+it seems that the right answer is to ignore the PSCI based methods when
+we have anything but these CPUs.  Do you agree?
+
+> But that's probably moot if you don't support BL systems.
+
+Any bL systems with A72 or A57?
+
+-- 
+RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
+According to speedtest.net: 8.21Mbps down 510kbps up
