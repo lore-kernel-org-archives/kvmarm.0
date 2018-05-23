@@ -1,76 +1,99 @@
-From: Russell King - ARM Linux <linux@armlinux.org.uk>
-Subject: Re: [PATCH 09/14] ARM: spectre-v2: add PSCI based hardening
-Date: Wed, 23 May 2018 20:45:04 +0100
-Message-ID: <20180523194503.GX17671@n2100.armlinux.org.uk>
-References: <20180521114238.GN17671@n2100.armlinux.org.uk>
- <E1fKjFT-00064F-Bs@rmk-PC.armlinux.org.uk>
- <35edb3df-fed4-b6e6-be0c-ee758618c92e@arm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v10 06/18] arm64: fpsimd: Generalise context saving for
+ non-task contexts
+Date: Wed, 23 May 2018 21:15:11 +0100
+Message-ID: <87in7et9gw.fsf@linaro.org>
+References: <1527005119-6842-1-git-send-email-Dave.Martin@arm.com>
+ <1527005119-6842-7-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BE8254A0C5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 May 2018 15:35:07 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OhdOIH4N0Ts7 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 23 May 2018 15:34:44 -0400 (EDT)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7496A4A0C4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 May 2018 15:34:44 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <35edb3df-fed4-b6e6-be0c-ee758618c92e@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-reply-to: <1527005119-6842-7-git-send-email-Dave.Martin@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, May 22, 2018 at 06:24:13PM +0100, Marc Zyngier wrote:
-> On 21/05/18 12:45, Russell King wrote:
-> > +#ifdef CONFIG_ARM_PSCI
-> > +	if (psci_ops.smccc_version != SMCCC_VERSION_1_0) {
-> > +		struct arm_smccc_res res;
-> > +
-> > +		switch (psci_ops.conduit) {
-> > +		case PSCI_CONDUIT_HVC:
-> > +			arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
-> > +					  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
-> > +			if ((int)res.a0 < 0)
-> > +				break;
-> 
-> I just realised that there is a small, but significant difference
-> between this and the arm64 version: On arm64, we have a table of
-> vulnerable implementations, and we try the mitigation on a per-cpu
-> basis. Here, you entirely rely on the firmware to discover whether the
-> CPU needs mitigation or not. You then need to check for a return value
-> of 1, which indicates that although the mitigation is implemented, it is
-> not required on this particular CPU.
-
-Okay, so digging further into the documentation seems to suggest that we
-only need to check the firmware for A72 and A57 CPUs, and given this
-statement:
-
-"Arm recommends that the caller only call this on PEs for which a
- firmware based mitigation of CVE-2017-5715 is required, or where
- a local workaround is infeasible."
-
-it seems that the right answer is to ignore the PSCI based methods when
-we have anything but these CPUs.  Do you agree?
-
-> But that's probably moot if you don't support BL systems.
-
-Any bL systems with A72 or A57?
-
--- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
-According to speedtest.net: 8.21Mbps down 510kbps up
+CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo+IEluIHByZXBhcmF0
+aW9uIGZvciBhbGxvd2luZyBub24tdGFzayAoaS5lLiwgS1ZNIHZjcHUpIEZQU0lNRAo+IGNvbnRl
+eHRzIHRvIGJlIGhhbmRsZWQgYnkgdGhlIGZwc2ltZCBjb21tb24gY29kZSwgdGhpcyBwYXRjaCBh
+ZGFwdHMKPiB0YXNrX2Zwc2ltZF9zYXZlKCkgdG8gc2F2ZSBiYWNrIHRoZSBjdXJyZW50bHkgbG9h
+ZGVkIGNvbnRleHQsCj4gcmVtb3ZpbmcgdGhlIGV4cGxpY2l0IGRlcGVuZGVuY3kgb24gY3VycmVu
+dC4KPgo+IFRoZSByZWxldmFudCBzdG9yYWdlIHRvIHdyaXRlIGJhY2sgdG8gaW4gbWVtb3J5IGlz
+IG5vdyBmb3VuZCBieQo+IGV4YW1pbmluZyB0aGUgZnBzaW1kX2xhc3Rfc3RhdGUgcGVyY3B1IHN0
+cnVjdC4KPgo+IGZwc2ltZF9zYXZlKCkgZG9lcyBub3RoaW5nIHVubGVzcyBUSUZfRk9SRUlHTl9G
+UFNUQVRFIGlzIGNsZWFyLCBhbmQKPiBmcHNpbWRfbGFzdF9zdGF0ZSBpcyB1cGRhdGVkIHVuZGVy
+IGxvY2FsX2JoX2Rpc2FibGUoKSBvcgo+IGxvY2FsX2lycV9kaXNhYmxlKCkgZXZlcnl3aGVyZSB0
+aGF0IFRJRl9GT1JFSUdOX0ZQU1RBVEUgaXMgY2xlYXJlZDoKPiB0aHVzLCBmcHNpbWRfc2F2ZSgp
+IHdpbGwgd3JpdGUgYmFjayB0byB0aGUgY29ycmVjdCBzdG9yYWdlIGZvciB0aGUKPiBsb2FkZWQg
+Y29udGV4dC4KPgo+IE5vIGZ1bmN0aW9uYWwgY2hhbmdlLgo+Cj4gU2lnbmVkLW9mZi1ieTogRGF2
+ZSBNYXJ0aW4gPERhdmUuTWFydGluQGFybS5jb20+Cj4gQWNrZWQtYnk6IE1hcmMgWnluZ2llciA8
+bWFyYy56eW5naWVyQGFybS5jb20+Cj4gQWNrZWQtYnk6IENhdGFsaW4gTWFyaW5hcyA8Y2F0YWxp
+bi5tYXJpbmFzQGFybS5jb20+Cj4gLS0tCj4gIGFyY2gvYXJtNjQva2VybmVsL2Zwc2ltZC5jIHwg
+MjUgKysrKysrKysrKysrKy0tLS0tLS0tLS0tLQo+ICAxIGZpbGUgY2hhbmdlZCwgMTMgaW5zZXJ0
+aW9ucygrKSwgMTIgZGVsZXRpb25zKC0pCj4KPiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rZXJu
+ZWwvZnBzaW1kLmMgYi9hcmNoL2FybTY0L2tlcm5lbC9mcHNpbWQuYwo+IGluZGV4IDlkODUzNzMu
+LjNhYTEwMGEgMTAwNjQ0Cj4gLS0tIGEvYXJjaC9hcm02NC9rZXJuZWwvZnBzaW1kLmMKPiArKysg
+Yi9hcmNoL2FybTY0L2tlcm5lbC9mcHNpbWQuYwo+IEBAIC0yNzAsMTMgKzI3MCwxNSBAQCBzdGF0
+aWMgdm9pZCB0YXNrX2Zwc2ltZF9sb2FkKHZvaWQpCj4gIH0KPgo+ICAvKgo+IC0gKiBFbnN1cmUg
+Y3VycmVudCdzIEZQU0lNRC9TVkUgc3RvcmFnZSBpbiB0aHJlYWRfc3RydWN0IGlzIHVwIHRvIGRh
+dGUKPiAtICogd2l0aCByZXNwZWN0IHRvIHRoZSBDUFUgcmVnaXN0ZXJzLgo+ICsgKiBFbnN1cmUg
+RlBTSU1EL1NWRSBzdG9yYWdlIGluIG1lbW9yeSBmb3IgdGhlIGxvYWRlZCBjb250ZXh0IGlzIHVw
+IHRvCj4gKyAqIGRhdGUgd2l0aCByZXNwZWN0IHRvIHRoZSBDUFUgcmVnaXN0ZXJzLgo+ICAgKgo+
+ICAgKiBTb2Z0aXJxcyAoYW5kIHByZWVtcHRpb24pIG11c3QgYmUgZGlzYWJsZWQuCj4gICAqLwo+
+IC1zdGF0aWMgdm9pZCB0YXNrX2Zwc2ltZF9zYXZlKHZvaWQpCj4gK3N0YXRpYyB2b2lkIGZwc2lt
+ZF9zYXZlKHZvaWQpCj4gIHsKPiArCXN0cnVjdCB1c2VyX2Zwc2ltZF9zdGF0ZSAqc3QgPSBfX3Ro
+aXNfY3B1X3JlYWQoZnBzaW1kX2xhc3Rfc3RhdGUuc3QpOwo+ICsKCkkgdGhvdWdodCBJIHdhcyBt
+aXNzaW5nIHNvbWV0aGluZyBidXQgdGhlIG9ubHkgd3JpdGUgSSBzYXcgb2YgdGhpcyB3YXM6Cgog
+IF9fdGhpc19jcHVfd3JpdGUoZnBzaW1kX2xhc3Rfc3RhdGUuc3QsIE5VTEwpOwoKd2hpY2ggaW1w
+bGllZCB0byBtZSBpdCBpcyBwb3NzaWJsZSB0byBoYXZlIGFuIGludmFsaWQgZGUtcmVmZXJlbmNl
+LiBJCmRpZCBmaWd1cmUgaXQgb3V0IGV2ZW50dWFsbHkgYXMgZnBzaW1kX2JpbmRfc3RhdGVfdG9f
+Y3B1IHVzZXMgYSBtb3JlCmluZGlyZWN0IHRoaXNfY3B1X3B0ciBpZGlvbSBmb3IgdHdlYWtpbmcg
+dGhpcy4gSSBndWVzcyBhIHJlZmVyZW5jZSB0bwpmcHNpbWRfYmluZF9bdGFza3xzdGF0ZV1fdG9f
+Y3B1IGluIHRoZSBjb21tZW50IHdvdWxkIGhhdmUgaGVscGVkIG15CmNvbmZ1c2lvbi4KCkFueXdh
+eToKClJldmlld2VkLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+CgoK
+PiAgCVdBUk5fT04oIWluX3NvZnRpcnEoKSAmJiAhaXJxc19kaXNhYmxlZCgpKTsKPgo+ICAJaWYg
+KCF0ZXN0X3RocmVhZF9mbGFnKFRJRl9GT1JFSUdOX0ZQU1RBVEUpKSB7Cj4gQEAgLTI5MSwxMCAr
+MjkzLDkgQEAgc3RhdGljIHZvaWQgdGFza19mcHNpbWRfc2F2ZSh2b2lkKQo+ICAJCQkJcmV0dXJu
+Owo+ICAJCQl9Cj4KPiAtCQkJc3ZlX3NhdmVfc3RhdGUoc3ZlX3BmZnIoY3VycmVudCksCj4gLQkJ
+CQkgICAgICAgJmN1cnJlbnQtPnRocmVhZC51dy5mcHNpbWRfc3RhdGUuZnBzcik7Cj4gKwkJCXN2
+ZV9zYXZlX3N0YXRlKHN2ZV9wZmZyKGN1cnJlbnQpLCAmc3QtPmZwc3IpOwo+ICAJCX0gZWxzZQo+
+IC0JCQlmcHNpbWRfc2F2ZV9zdGF0ZSgmY3VycmVudC0+dGhyZWFkLnV3LmZwc2ltZF9zdGF0ZSk7
+Cj4gKwkJCWZwc2ltZF9zYXZlX3N0YXRlKHN0KTsKPiAgCX0KPiAgfQo+Cj4gQEAgLTU5OCw3ICs1
+OTksNyBAQCBpbnQgc3ZlX3NldF92ZWN0b3JfbGVuZ3RoKHN0cnVjdCB0YXNrX3N0cnVjdCAqdGFz
+aywKPiAgCWlmICh0YXNrID09IGN1cnJlbnQpIHsKPiAgCQlsb2NhbF9iaF9kaXNhYmxlKCk7Cj4K
+PiAtCQl0YXNrX2Zwc2ltZF9zYXZlKCk7Cj4gKwkJZnBzaW1kX3NhdmUoKTsKPiAgCQlzZXRfdGhy
+ZWFkX2ZsYWcoVElGX0ZPUkVJR05fRlBTVEFURSk7Cj4gIAl9Cj4KPiBAQCAtODM3LDcgKzgzOCw3
+IEBAIGFzbWxpbmthZ2Ugdm9pZCBkb19zdmVfYWNjKHVuc2lnbmVkIGludCBlc3IsIHN0cnVjdCBw
+dF9yZWdzICpyZWdzKQo+Cj4gIAlsb2NhbF9iaF9kaXNhYmxlKCk7Cj4KPiAtCXRhc2tfZnBzaW1k
+X3NhdmUoKTsKPiArCWZwc2ltZF9zYXZlKCk7Cj4gIAlmcHNpbWRfdG9fc3ZlKGN1cnJlbnQpOwo+
+Cj4gIAkvKiBGb3JjZSByZXRfdG9fdXNlciB0byByZWxvYWQgdGhlIHJlZ2lzdGVyczogKi8KPiBA
+QCAtODk4LDcgKzg5OSw3IEBAIHZvaWQgZnBzaW1kX3RocmVhZF9zd2l0Y2goc3RydWN0IHRhc2tf
+c3RydWN0ICpuZXh0KQo+ICAJICogJ2N1cnJlbnQnLgo+ICAJICovCj4gIAlpZiAoY3VycmVudC0+
+bW0pCj4gLQkJdGFza19mcHNpbWRfc2F2ZSgpOwo+ICsJCWZwc2ltZF9zYXZlKCk7Cj4KPiAgCWlm
+IChuZXh0LT5tbSkgewo+ICAJCS8qCj4gQEAgLTk4MCw3ICs5ODEsNyBAQCB2b2lkIGZwc2ltZF9w
+cmVzZXJ2ZV9jdXJyZW50X3N0YXRlKHZvaWQpCj4gIAkJcmV0dXJuOwo+Cj4gIAlsb2NhbF9iaF9k
+aXNhYmxlKCk7Cj4gLQl0YXNrX2Zwc2ltZF9zYXZlKCk7Cj4gKwlmcHNpbWRfc2F2ZSgpOwo+ICAJ
+bG9jYWxfYmhfZW5hYmxlKCk7Cj4gIH0KPgo+IEBAIC0xMTIxLDcgKzExMjIsNyBAQCB2b2lkIGtl
+cm5lbF9uZW9uX2JlZ2luKHZvaWQpCj4KPiAgCS8qIFNhdmUgdW5zYXZlZCB0YXNrIGZwc2ltZCBz
+dGF0ZSwgaWYgYW55OiAqLwo+ICAJaWYgKGN1cnJlbnQtPm1tKQo+IC0JCXRhc2tfZnBzaW1kX3Nh
+dmUoKTsKPiArCQlmcHNpbWRfc2F2ZSgpOwo+Cj4gIAkvKiBJbnZhbGlkYXRlIGFueSB0YXNrIHN0
+YXRlIHJlbWFpbmluZyBpbiB0aGUgZnBzaW1kIHJlZ3M6ICovCj4gIAlmcHNpbWRfZmx1c2hfY3B1
+X3N0YXRlKCk7Cj4gQEAgLTEyNDQsNyArMTI0NSw3IEBAIHN0YXRpYyBpbnQgZnBzaW1kX2NwdV9w
+bV9ub3RpZmllcihzdHJ1Y3Qgbm90aWZpZXJfYmxvY2sgKnNlbGYsCj4gIAlzd2l0Y2ggKGNtZCkg
+ewo+ICAJY2FzZSBDUFVfUE1fRU5URVI6Cj4gIAkJaWYgKGN1cnJlbnQtPm1tKQo+IC0JCQl0YXNr
+X2Zwc2ltZF9zYXZlKCk7Cj4gKwkJCWZwc2ltZF9zYXZlKCk7Cj4gIAkJZnBzaW1kX2ZsdXNoX2Nw
+dV9zdGF0ZSgpOwo+ICAJCWJyZWFrOwo+ICAJY2FzZSBDUFVfUE1fRVhJVDoKCgotLQpBbGV4IEJl
+bm7DqWUKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmxp
+bnV4LWFybS1rZXJuZWwgbWFpbGluZyBsaXN0CmxpbnV4LWFybS1rZXJuZWxAbGlzdHMuaW5mcmFk
+ZWFkLm9yZwpodHRwOi8vbGlzdHMuaW5mcmFkZWFkLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2xpbnV4
+LWFybS1rZXJuZWwK
