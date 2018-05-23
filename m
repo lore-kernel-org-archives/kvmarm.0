@@ -1,16 +1,14 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v10 01/18] arm64: fpsimd: Fix TIF_FOREIGN_FPSTATE after
- invalidating cpu regs
-Date: Wed, 23 May 2018 14:46:42 +0100
-Message-ID: <20180523134642.tr4vvlvgpjbzxcwo@armageddon.cambridge.arm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v10 02/18] thread_info: Add update_thread_flag() helpers
+Date: Wed, 23 May 2018 14:46:52 +0100
+Message-ID: <87po1mtrg3.fsf@linaro.org>
 References: <1527005119-6842-1-git-send-email-Dave.Martin@arm.com>
- <1527005119-6842-2-git-send-email-Dave.Martin@arm.com>
+ <1527005119-6842-3-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <1527005119-6842-2-git-send-email-Dave.Martin@arm.com>
+In-reply-to: <1527005119-6842-3-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -21,65 +19,61 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: Dave Martin <Dave.Martin@arm.com>
-Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Oleg Nesterov <oleg@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, May 22, 2018 at 05:05:02PM +0100, Dave P Martin wrote:
-> fpsimd_last_state.st is set to NULL as a way of indicating that
-> current's FPSIMD registers are no longer loaded in the cpu.  In
-> particular, this is done when the kernel temporarily uses or
-> clobbers the FPSIMD registers for its own purposes, as in CPU PM or
-> kernel-mode NEON, resulting in them being populated with garbage
-> data not belonging to a task.
-> 
-> Commit 17eed27b02da ("arm64/sve: KVM: Prevent guests from using
-> SVE") factors this operation out as a new helper
-> fpsimd_flush_cpu_state() to make it clearer what is being done
-> here, and on SVE systems this helper is now used, via
-> kvm_fpsimd_flush_cpu_state(), to invalidate the registers after KVM
-> has run a vcpu.  The reason for this is that KVM does not yet
-> understand how to restore the full host SVE registers itself after
-> loading the guest FPSIMD context into them.
-> 
-> This exposes a particular problem: if fpsimd_last_state.st is set
-> to NULL without also setting TIF_FOREIGN_FPSTATE, the kernel may
-> continue to think that current's FPSIMD registers are live even
-> though they have actually been clobbered.
-> 
-> Prior to the aforementioned commit, the only path where
-> fpsimd_last_state.st is set to NULL without setting
-> TIF_FOREIGN_FPSTATE is when kernel_neon_begin() is called by a
-> kernel thread (where current->mm can be NULL).  This does not
-> matter, because the only harm is that at context-switch time
-> fpsimd_thread_switch() may unnecessarily save the FPSIMD registers
-> back to current's thread_struct (even though kernel threads are not
-> considered to have any FPSIMD context of their own and the
-> registers will never be reloaded).
-> 
-> Note that although CPU_PM_ENTER lacks the TIF_FOREIGN_FPSTATE
-> setting, every CPU passing through that path must subsequently pass
-> through CPU_PM_EXIT before it can re-enter the kernel proper.
-> CPU_PM_EXIT sets the flag.
-> 
-> The sve_flush_cpu_state() function added by commit 17eed27b02da
-> also lacks the proper maintenance of TIF_FOREIGN_FPSTATE.  This may
-> cause the bits of a host task's SVE registers that do not alias the
-> FPSIMD register file to spontaneously appear zeroed if a KVM vcpu
-> runs in the same task in the meantime.  Although this effect is
-> hidden by the fact that the non-FPSIMD bits of the SVE registers
-> are zeroed by a syscall anyway, it is doubtless a bad idea to rely
-> on these different code paths interacting correctly under future
-> maintenance.
-> 
-> This patch makes TIF_FOREIGN_FPSTATE an unconditional side-effect
-> of fpsimd_flush_cpu_state(), and removes the set_thread_flag()
-> calls that become redunant as a result.  This ensures that
-> TIF_FOREIGN_FPSTATE cannot remain clear if the FPSIMD state in the
-> FPSIMD registers is invalid.
-> 
-> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will.deacon@arm.com>
-> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo+IFRoZXJlIGFyZSBh
+IG51bWJlciBvZiBiaXRzIG9mIGNvZGUgc3ByaW5rbGVkIGFyb3VuZCB0aGUga2VybmVsIHRvCj4g
+c2V0IGEgdGhyZWFkIGZsYWcgaWYgYSBjZXJ0YWluIGNvbmRpdGlvbiBpcyB0cnVlLCBhbmQgY2xl
+YXIgaXQKPiBvdGhlcndpc2UuCj4KPiBUbyBoZWxwIG1ha2UgdGhvc2UgY2FsbCBzaXRlcyB0ZXJz
+ZXIgYW5kIGxlc3MgY3VtYmVyc29tZSwgdGhpcwo+IHBhdGNoIGFkZHMgYSBuZXcgZmFtaWx5IG9m
+IHRocmVhZCBmbGFnIG1hbmlwdWxhdG9ycwo+Cj4gCXVwZGF0ZSpfdGhyZWFkX2ZsYWcoWy4uLixd
+IGZsYWcsIGNvbmQpCj4KPiB3aGljaCBkbyB0aGUgZXF1aXZhbGVudCBvZjoKPgo+IAlpZiAoY29u
+ZCkKPiAJCXNldCpfdGhyZWFkX2ZsYWcoWy4uLixdIGZsYWcpOwo+IAllbHNlCj4gCQljbGVhcipf
+dGhyZWFkX2ZsYWcoWy4uLixdIGZsYWcpOwo+Cj4gU2lnbmVkLW9mZi1ieTogRGF2ZSBNYXJ0aW4g
+PERhdmUuTWFydGluQGFybS5jb20+Cj4gQWNrZWQtYnk6IFN0ZXZlbiBSb3N0ZWR0IChWTXdhcmUp
+IDxyb3N0ZWR0QGdvb2RtaXMub3JnPgo+IEFja2VkLWJ5OiBNYXJjIFp5bmdpZXIgPG1hcmMuenlu
+Z2llckBhcm0uY29tPgo+IEFja2VkLWJ5OiBDYXRhbGluIE1hcmluYXMgPGNhdGFsaW4ubWFyaW5h
+c0Bhcm0uY29tPgo+IENjOiBJbmdvIE1vbG5hciA8bWluZ29AcmVkaGF0LmNvbT4KPiBDYzogUGV0
+ZXIgWmlqbHN0cmEgPHBldGVyekBpbmZyYWRlYWQub3JnPgo+IENjOiBPbGVnIE5lc3Rlcm92IDxv
+bGVnQHJlZGhhdC5jb20+Cj4gLS0tCj4gIGluY2x1ZGUvbGludXgvc2NoZWQuaCAgICAgICB8ICA2
+ICsrKysrKwo+ICBpbmNsdWRlL2xpbnV4L3RocmVhZF9pbmZvLmggfCAxMSArKysrKysrKysrKwo+
+ICAyIGZpbGVzIGNoYW5nZWQsIDE3IGluc2VydGlvbnMoKykKPgo+IGRpZmYgLS1naXQgYS9pbmNs
+dWRlL2xpbnV4L3NjaGVkLmggYi9pbmNsdWRlL2xpbnV4L3NjaGVkLmgKPiBpbmRleCBiM2Q2OTdm
+Li5jMmMzMDUxIDEwMDY0NAo+IC0tLSBhL2luY2x1ZGUvbGludXgvc2NoZWQuaAo+ICsrKyBiL2lu
+Y2x1ZGUvbGludXgvc2NoZWQuaAo+IEBAIC0xNTc4LDYgKzE1NzgsMTIgQEAgc3RhdGljIGlubGlu
+ZSB2b2lkIGNsZWFyX3Rza190aHJlYWRfZmxhZyhzdHJ1Y3QgdGFza19zdHJ1Y3QgKnRzaywgaW50
+IGZsYWcpCj4gIAljbGVhcl90aV90aHJlYWRfZmxhZyh0YXNrX3RocmVhZF9pbmZvKHRzayksIGZs
+YWcpOwo+ICB9Cj4KPiArc3RhdGljIGlubGluZSB2b2lkIHVwZGF0ZV90c2tfdGhyZWFkX2ZsYWco
+c3RydWN0IHRhc2tfc3RydWN0ICp0c2ssIGludCBmbGFnLAo+ICsJCQkJCSAgYm9vbCB2YWx1ZSkK
+PiArewo+ICsJdXBkYXRlX3RpX3RocmVhZF9mbGFnKHRhc2tfdGhyZWFkX2luZm8odHNrKSwgZmxh
+ZywgdmFsdWUpOwo+ICt9Cj4gKwo+ICBzdGF0aWMgaW5saW5lIGludCB0ZXN0X2FuZF9zZXRfdHNr
+X3RocmVhZF9mbGFnKHN0cnVjdCB0YXNrX3N0cnVjdCAqdHNrLCBpbnQgZmxhZykKPiAgewo+ICAJ
+cmV0dXJuIHRlc3RfYW5kX3NldF90aV90aHJlYWRfZmxhZyh0YXNrX3RocmVhZF9pbmZvKHRzayks
+IGZsYWcpOwo+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2xpbnV4L3RocmVhZF9pbmZvLmggYi9pbmNs
+dWRlL2xpbnV4L3RocmVhZF9pbmZvLmgKPiBpbmRleCBjZjI4NjJiLi44ZDg4MjFiIDEwMDY0NAo+
+IC0tLSBhL2luY2x1ZGUvbGludXgvdGhyZWFkX2luZm8uaAo+ICsrKyBiL2luY2x1ZGUvbGludXgv
+dGhyZWFkX2luZm8uaAo+IEBAIC02MCw2ICs2MCwxNSBAQCBzdGF0aWMgaW5saW5lIHZvaWQgY2xl
+YXJfdGlfdGhyZWFkX2ZsYWcoc3RydWN0IHRocmVhZF9pbmZvICp0aSwgaW50IGZsYWcpCj4gIAlj
+bGVhcl9iaXQoZmxhZywgKHVuc2lnbmVkIGxvbmcgKikmdGktPmZsYWdzKTsKPiAgfQo+Cj4gK3N0
+YXRpYyBpbmxpbmUgdm9pZCB1cGRhdGVfdGlfdGhyZWFkX2ZsYWcoc3RydWN0IHRocmVhZF9pbmZv
+ICp0aSwgaW50IGZsYWcsCj4gKwkJCQkJIGJvb2wgdmFsdWUpCj4gK3sKPiArCWlmICh2YWx1ZSkK
+PiArCQlzZXRfdGlfdGhyZWFkX2ZsYWcodGksIGZsYWcpOwo+ICsJZWxzZQo+ICsJCWNsZWFyX3Rp
+X3RocmVhZF9mbGFnKHRpLCBmbGFnKTsKPiArfQo+ICsKCnZhbHVlIGRvZXMgc2VlbSBhIGJpdCBv
+ZiB2YW5pbGxhIG5vbi1pbmZvcm1hdGl2ZSBuYW1lIGZvciBhIGNvbmRpdGlvbgpmbGFnIGJ1dCB3
+aGF0ZXZlcjoKClJldmlld2VkLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5v
+cmc+CgoKPiAgc3RhdGljIGlubGluZSBpbnQgdGVzdF9hbmRfc2V0X3RpX3RocmVhZF9mbGFnKHN0
+cnVjdCB0aHJlYWRfaW5mbyAqdGksIGludCBmbGFnKQo+ICB7Cj4gIAlyZXR1cm4gdGVzdF9hbmRf
+c2V0X2JpdChmbGFnLCAodW5zaWduZWQgbG9uZyAqKSZ0aS0+ZmxhZ3MpOwo+IEBAIC03OSw2ICs4
+OCw4IEBAIHN0YXRpYyBpbmxpbmUgaW50IHRlc3RfdGlfdGhyZWFkX2ZsYWcoc3RydWN0IHRocmVh
+ZF9pbmZvICp0aSwgaW50IGZsYWcpCj4gIAlzZXRfdGlfdGhyZWFkX2ZsYWcoY3VycmVudF90aHJl
+YWRfaW5mbygpLCBmbGFnKQo+ICAjZGVmaW5lIGNsZWFyX3RocmVhZF9mbGFnKGZsYWcpIFwKPiAg
+CWNsZWFyX3RpX3RocmVhZF9mbGFnKGN1cnJlbnRfdGhyZWFkX2luZm8oKSwgZmxhZykKPiArI2Rl
+ZmluZSB1cGRhdGVfdGhyZWFkX2ZsYWcoZmxhZywgdmFsdWUpIFwKPiArCXVwZGF0ZV90aV90aHJl
+YWRfZmxhZyhjdXJyZW50X3RocmVhZF9pbmZvKCksIGZsYWcsIHZhbHVlKQo+ICAjZGVmaW5lIHRl
+c3RfYW5kX3NldF90aHJlYWRfZmxhZyhmbGFnKSBcCj4gIAl0ZXN0X2FuZF9zZXRfdGlfdGhyZWFk
+X2ZsYWcoY3VycmVudF90aHJlYWRfaW5mbygpLCBmbGFnKQo+ICAjZGVmaW5lIHRlc3RfYW5kX2Ns
+ZWFyX3RocmVhZF9mbGFnKGZsYWcpIFwKCgotLQpBbGV4IEJlbm7DqWUKCl9fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmxpbnV4LWFybS1rZXJuZWwgbWFpbGlu
+ZyBsaXN0CmxpbnV4LWFybS1rZXJuZWxAbGlzdHMuaW5mcmFkZWFkLm9yZwpodHRwOi8vbGlzdHMu
+aW5mcmFkZWFkLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2xpbnV4LWFybS1rZXJuZWwK
