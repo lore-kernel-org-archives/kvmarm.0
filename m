@@ -1,76 +1,189 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH v10 06/18] arm64: fpsimd: Generalise context saving for
- non-task contexts
-Date: Thu, 24 May 2018 10:41:40 +0100
-Message-ID: <878t89tmp7.fsf@linaro.org>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH v10 07/18] arm64: fpsimd: Eliminate task->mm checks
+Date: Thu, 24 May 2018 10:50:56 +0100
+Message-ID: <20180524095056.GR13470@e103592.cambridge.arm.com>
 References: <1527005119-6842-1-git-send-email-Dave.Martin@arm.com>
- <1527005119-6842-7-git-send-email-Dave.Martin@arm.com>
- <87in7et9gw.fsf@linaro.org>
- <20180524090322.GQ13470@e103592.cambridge.arm.com>
+ <1527005119-6842-8-git-send-email-Dave.Martin@arm.com>
+ <20180523114812.GH55598@C02W217FHV2R.local>
+ <20180523133158.GJ13470@e103592.cambridge.arm.com>
+ <20180523145657.g7b6v2q2vxfqpoc4@armageddon.cambridge.arm.com>
+ <20180523150337.GO13470@e103592.cambridge.arm.com>
+ <20180524083350.GK55598@C02W217FHV2R.local>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-reply-to: <20180524090322.GQ13470@e103592.cambridge.arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Dave Martin <Dave.Martin@arm.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E78C24A0C5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 May 2018 05:40:41 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id eO1NYn5a+lcr for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 May 2018 05:40:20 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DA8B649F8B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 May 2018 05:40:19 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <20180524083350.GK55598@C02W217FHV2R.local>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@arm.com>
 Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo+IE9uIFdlZCwgTWF5
-IDIzLCAyMDE4IGF0IDA5OjE1OjExUE0gKzAxMDAsIEFsZXggQmVubsOpZSB3cm90ZToKPj4KPj4g
-RGF2ZSBNYXJ0aW4gPERhdmUuTWFydGluQGFybS5jb20+IHdyaXRlczoKPj4KPj4gPiBJbiBwcmVw
-YXJhdGlvbiBmb3IgYWxsb3dpbmcgbm9uLXRhc2sgKGkuZS4sIEtWTSB2Y3B1KSBGUFNJTUQKPj4g
-PiBjb250ZXh0cyB0byBiZSBoYW5kbGVkIGJ5IHRoZSBmcHNpbWQgY29tbW9uIGNvZGUsIHRoaXMg
-cGF0Y2ggYWRhcHRzCj4+ID4gdGFza19mcHNpbWRfc2F2ZSgpIHRvIHNhdmUgYmFjayB0aGUgY3Vy
-cmVudGx5IGxvYWRlZCBjb250ZXh0LAo+PiA+IHJlbW92aW5nIHRoZSBleHBsaWNpdCBkZXBlbmRl
-bmN5IG9uIGN1cnJlbnQuCj4+ID4KPj4gPiBUaGUgcmVsZXZhbnQgc3RvcmFnZSB0byB3cml0ZSBi
-YWNrIHRvIGluIG1lbW9yeSBpcyBub3cgZm91bmQgYnkKPj4gPiBleGFtaW5pbmcgdGhlIGZwc2lt
-ZF9sYXN0X3N0YXRlIHBlcmNwdSBzdHJ1Y3QuCj4+ID4KPj4gPiBmcHNpbWRfc2F2ZSgpIGRvZXMg
-bm90aGluZyB1bmxlc3MgVElGX0ZPUkVJR05fRlBTVEFURSBpcyBjbGVhciwgYW5kCj4+ID4gZnBz
-aW1kX2xhc3Rfc3RhdGUgaXMgdXBkYXRlZCB1bmRlciBsb2NhbF9iaF9kaXNhYmxlKCkgb3IKPj4g
-PiBsb2NhbF9pcnFfZGlzYWJsZSgpIGV2ZXJ5d2hlcmUgdGhhdCBUSUZfRk9SRUlHTl9GUFNUQVRF
-IGlzIGNsZWFyZWQ6Cj4+ID4gdGh1cywgZnBzaW1kX3NhdmUoKSB3aWxsIHdyaXRlIGJhY2sgdG8g
-dGhlIGNvcnJlY3Qgc3RvcmFnZSBmb3IgdGhlCj4+ID4gbG9hZGVkIGNvbnRleHQuCj4+ID4KPj4g
-PiBObyBmdW5jdGlvbmFsIGNoYW5nZS4KPj4gPgo+PiA+IFNpZ25lZC1vZmYtYnk6IERhdmUgTWFy
-dGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPgo+PiA+IEFja2VkLWJ5OiBNYXJjIFp5bmdpZXIgPG1h
-cmMuenluZ2llckBhcm0uY29tPgo+PiA+IEFja2VkLWJ5OiBDYXRhbGluIE1hcmluYXMgPGNhdGFs
-aW4ubWFyaW5hc0Bhcm0uY29tPgo+PiA+IC0tLQo+PiA+ICBhcmNoL2FybTY0L2tlcm5lbC9mcHNp
-bWQuYyB8IDI1ICsrKysrKysrKysrKystLS0tLS0tLS0tLS0KPj4gPiAgMSBmaWxlIGNoYW5nZWQs
-IDEzIGluc2VydGlvbnMoKyksIDEyIGRlbGV0aW9ucygtKQo+PiA+Cj4+ID4gZGlmZiAtLWdpdCBh
-L2FyY2gvYXJtNjQva2VybmVsL2Zwc2ltZC5jIGIvYXJjaC9hcm02NC9rZXJuZWwvZnBzaW1kLmMK
-Pj4gPiBpbmRleCA5ZDg1MzczLi4zYWExMDBhIDEwMDY0NAo+PiA+IC0tLSBhL2FyY2gvYXJtNjQv
-a2VybmVsL2Zwc2ltZC5jCj4+ID4gKysrIGIvYXJjaC9hcm02NC9rZXJuZWwvZnBzaW1kLmMKPj4g
-PiBAQCAtMjcwLDEzICsyNzAsMTUgQEAgc3RhdGljIHZvaWQgdGFza19mcHNpbWRfbG9hZCh2b2lk
-KQo+PiA+ICB9Cj4+ID4KPj4gPiAgLyoKPj4gPiAtICogRW5zdXJlIGN1cnJlbnQncyBGUFNJTUQv
-U1ZFIHN0b3JhZ2UgaW4gdGhyZWFkX3N0cnVjdCBpcyB1cCB0byBkYXRlCj4+ID4gLSAqIHdpdGgg
-cmVzcGVjdCB0byB0aGUgQ1BVIHJlZ2lzdGVycy4KPj4gPiArICogRW5zdXJlIEZQU0lNRC9TVkUg
-c3RvcmFnZSBpbiBtZW1vcnkgZm9yIHRoZSBsb2FkZWQgY29udGV4dCBpcyB1cCB0bwo+PiA+ICsg
-KiBkYXRlIHdpdGggcmVzcGVjdCB0byB0aGUgQ1BVIHJlZ2lzdGVycy4KPj4gPiAgICoKPj4gPiAg
-ICogU29mdGlycXMgKGFuZCBwcmVlbXB0aW9uKSBtdXN0IGJlIGRpc2FibGVkLgo+PiA+ICAgKi8K
-Pj4gPiAtc3RhdGljIHZvaWQgdGFza19mcHNpbWRfc2F2ZSh2b2lkKQo+PiA+ICtzdGF0aWMgdm9p
-ZCBmcHNpbWRfc2F2ZSh2b2lkKQo+PiA+ICB7Cj4+ID4gKwlzdHJ1Y3QgdXNlcl9mcHNpbWRfc3Rh
-dGUgKnN0ID0gX190aGlzX2NwdV9yZWFkKGZwc2ltZF9sYXN0X3N0YXRlLnN0KTsKPj4gPiArCj4+
-Cj4+IEkgdGhvdWdodCBJIHdhcyBtaXNzaW5nIHNvbWV0aGluZyBidXQgdGhlIG9ubHkgd3JpdGUg
-SSBzYXcgb2YgdGhpcyB3YXM6Cj4+Cj4+ICAgX190aGlzX2NwdV93cml0ZShmcHNpbWRfbGFzdF9z
-dGF0ZS5zdCwgTlVMTCk7Cj4+Cj4+IHdoaWNoIGltcGxpZWQgdG8gbWUgaXQgaXMgcG9zc2libGUg
-dG8gaGF2ZSBhbiBpbnZhbGlkIGRlLXJlZmVyZW5jZS4gSQo+PiBkaWQgZmlndXJlIGl0IG91dCBl
-dmVudHVhbGx5IGFzIGZwc2ltZF9iaW5kX3N0YXRlX3RvX2NwdSB1c2VzIGEgbW9yZQo+PiBpbmRp
-cmVjdCB0aGlzX2NwdV9wdHIgaWRpb20gZm9yIHR3ZWFraW5nIHRoaXMuIEkgZ3Vlc3MgYSByZWZl
-cmVuY2UgdG8KPj4gZnBzaW1kX2JpbmRfW3Rhc2t8c3RhdGVdX3RvX2NwdSBpbiB0aGUgY29tbWVu
-dCB3b3VsZCBoYXZlIGhlbHBlZCBteQo+PiBjb25mdXNpb24uCj4KPiBIb3cgYWJvdXQ6Cj4KPiAg
-c3RhdGljIHZvaWQgZnBzaW1kX3NhdmUodm9pZCkKPiAgewo+ICAJc3RydWN0IHVzZXJfZnBzaW1k
-X3N0YXRlICpzdCA9IF9fdGhpc19jcHVfcmVhZChmcHNpbWRfbGFzdF9zdGF0ZS5zdCk7Cj4gKwkv
-KiBzZXQgYnkgZnBzaW1kX2JpbmRfdG9fY3B1KCkgKi8KCkdyZWF0LCB0aGFua3MgOy0pCgotLQpB
-bGV4IEJlbm7DqWUKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fCmxpbnV4LWFybS1rZXJuZWwgbWFpbGluZyBsaXN0CmxpbnV4LWFybS1rZXJuZWxAbGlzdHMu
-aW5mcmFkZWFkLm9yZwpodHRwOi8vbGlzdHMuaW5mcmFkZWFkLm9yZy9tYWlsbWFuL2xpc3RpbmZv
-L2xpbnV4LWFybS1rZXJuZWwK
+On Thu, May 24, 2018 at 10:33:50AM +0200, Christoffer Dall wrote:
+> On Wed, May 23, 2018 at 04:03:37PM +0100, Dave Martin wrote:
+> > On Wed, May 23, 2018 at 03:56:57PM +0100, Catalin Marinas wrote:
+> > > On Wed, May 23, 2018 at 02:31:59PM +0100, Dave P Martin wrote:
+> > > > On Wed, May 23, 2018 at 01:48:12PM +0200, Christoffer Dall wrote:
+> > > > > On Tue, May 22, 2018 at 05:05:08PM +0100, Dave Martin wrote:
+> > > > > > This is true by construction however: TIF_FOREIGN_FPSTATE is never
+> > > > > > cleared except when returning to userspace or returning from a
+> > > > > > signal: thus, for a true kernel thread no FPSIMD context is ever
+> > > > > > loaded, TIF_FOREIGN_FPSTATE will remain set and no context will
+> > > > > > ever be saved.
+> > > > > 
+> > > > > I don't understand this construction proof; from looking at the patch
+> > > > > below it is not obvious to me why fpsimd_thread_switch() can never have
+> > > > > !wrong_task && !wrong_cpu and therefore clear TIF_FOREIGN_FPSTATE for a
+> > > > > kernel thread?
+> > > > 
+> > > > Looking at this again, I think it is poorly worded.  This patch aims to
+> > > > make it true by construction, but it isn't prior to the patch.
+> > > > 
+> > > > I'm tempted to delete the paragraph: the assertion of both untrue and
+> > > > not the best way to justify that this patch works.
+> > > > 
+> > > > 
+> > > > How about:
+> > > > 
+> > > > -8<-
+> > > > 
+> > > > The context switch logic already isolates user threads from each other.
+> > > > This, it is sufficient for isolating user threads from the kernel,
+> 
+> s/This/Thus/ ?
+> 
+> I don't understand what 'it' refers to here?
+> 
+> > > > since the goal either way is to ensure that code executing in userspace
+> > > > cannot see any FPSIMD state except its own.  Thus, there is no special
+> > > > property of kernel threads that we care about except that it is
+> > > > pointless to save or load FPSIMD register state for them.
+> 
+> Actually, I'm not really sure what this paragraph is getting at.
+
+Reading this again, I don't think the paragraph adds much useful.
+
+So I propose deleting that too.
+
+> > > > 
+> > > > At worst, the removal of all the kernel thread special cases by this
+> > > > patch would thus spuriously load and save state for kernel threads when
+> > > > unnecessary.
+> > > > 
+> > > > But the context switch logic is already deliberately optimised to defer
+> > > > reloads of the regs until ret_to_user (or sigreturn as a special case),
+> > > > which kernel threads by definition never reach.
+> > > > 
+> > > > ->8-
+> > > 
+> > > The "at worst" paragraph makes it look like it could happen (at least
+> > > until you reach the last paragraph). Maybe you can just say that
+> > > wrong_task and wrong_cpu (with the fpsimd_cpu = NR_CPUS addition) are
+> > > always true for kernel threads. You should probably mention this in a
+> > > comment in the code as well.
+> > 
+> > What if I just delete the second paragraph, and remove the "But" from
+> > the start of the third, and append:
+> > 
+> > "As a result, the wrong_task and wrong_cpu tests in
+> > fpsimd_thread_switch() will always yield false for kernel threads."
+> > 
+> > ...with a similar comment in the code?
+> 
+> ...with a risk of being a bit over-pedantic and annoying, may I suggest
+> the following complete commit text:
+> 
+> ------8<------
+> Currently the FPSIMD handling code uses the condition task->mm ==
+> NULL as a hint that task has no FPSIMD register context.
+> 
+> The ->mm check is only there to filter out tasks that cannot
+> possibly have FPSIMD context loaded, for optimisation purposes.
+> However, TIF_FOREIGN_FPSTATE must always be checked anyway before
+> saving FPSIMD context back to memory.  For this reason, the ->mm
+> checks are not useful, providing that that TIF_FOREIGN_FPSTATE is
+> maintained properly for kernel threads.
+> 
+> FPSIMD context is never preserved for kernel threads across a context
+> switch and therefore TIF_FOREIGN_FPSTATE should always be true for
+
+(This refactoring opens up the interesting possibility of making
+kernel-mode NEON in task context preemptible for kernel threads so
+that we actually do preserve state... but that's a discussion for
+another day.  There may be code around that relies on
+kernel_neon_begin() disabling preemption for real.)
+
+> kernel threads.  This is indeed the case, as the wrong_task and
+
+This suggests that TIF_FOREIGN_FPSTATE is always true for kernel
+threads today.  This is not quite because use_mm() can make mm non-
+NULL.
+
+> wrong_cpu tests in fpsimd_thread_switch() will always yield false for
+> kernel threads.
+
+("false" -> "true".  My bad.)
+
+> Further, the context switch logic is already deliberately optimised to
+> defer reloads of the FPSIMD context until ret_to_user (or sigreturn as a
+> special case), which kernel threads by definition never reach, and
+> therefore this change introduces no additional work in the critical
+> path.
+> 
+> This patch removes the redundant checks and special-case code.
+> ------8<------
+
+Looking at my existing text, I rather reworded it like this.
+Does this work any better for you?
+
+--8<--
+
+Currently the FPSIMD handling code uses the condition task->mm ==
+NULL as a hint that task has no FPSIMD register context.
+
+The ->mm check is only there to filter out tasks that cannot
+possibly have FPSIMD context loaded, for optimisation purposes.
+Also, TIF_FOREIGN_FPSTATE must always be checked anyway before
+saving FPSIMD context back to memory.  For these reasons, the ->mm
+checks are not useful, providing that TIF_FOREIGN_FPSTATE is
+maintained in a consistent way for kernel threads.
+
+The context switch logic is already deliberately optimised to defer
+reloads of the regs until ret_to_user (or sigreturn as a special
+case), and save them only if they have been previously loaded.
+Kernel threads by definition never reach these paths.  As a result,
+the wrong_task and wrong_cpu tests in fpsimd_thread_switch() will
+always yield true for kernel threads.
+
+This patch removes the redundant checks and special-case code,                  ensuring that TIF_FOREIGN_FPSTATE is set whenever a kernel thread               is scheduled in, and ensures that this flag is set for the init
+task.  The fpsimd_flush_task_state() call already present in                    copy_thread() ensures the same for any new task.
+
+With TIF_FOREIGN_FPSTATE always set for kernel threads, this patch
+ensures that no extra context save work is added for kernel
+threads, and eliminates the redundant context saving that may
+currently occur for kernel threads that have acquired an mm via
+use_mm().
+
+-->8--
+
+Cheers
+---Dave
