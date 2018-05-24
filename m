@@ -1,15 +1,20 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCH 04/14] arm64: Add ARCH_WORKAROUND_2 probing
-Date: Thu, 24 May 2018 10:58:43 +0100
-Message-ID: <6c3e7b31-0bb6-353b-1b82-7ebdf3be1323@arm.com>
-References: <20180522150648.28297-1-marc.zyngier@arm.com>
- <20180522150648.28297-5-marc.zyngier@arm.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH v10 04/18] KVM: arm/arm64: Introduce
+ kvm_arch_vcpu_run_pid_change
+Date: Thu, 24 May 2018 11:04:41 +0100
+Message-ID: <20180524100441.GS13470@e103592.cambridge.arm.com>
+References: <1527005119-6842-1-git-send-email-Dave.Martin@arm.com>
+ <1527005119-6842-5-git-send-email-Dave.Martin@arm.com>
+ <87muwqtp8z.fsf@linaro.org>
+ <20180523144026.GM13470@e103592.cambridge.arm.com>
+ <20180524081110.GI55598@C02W217FHV2R.local>
+ <87d0xltnrk.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180522150648.28297-5-marc.zyngier@arm.com>
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <87d0xltnrk.fsf@linaro.org>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -19,81 +24,60 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: Kees Cook <keescook@chromium.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andy Lutomirski <luto@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Thomas Gleixner <tglx@linutronix.de>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 22/05/18 16:06, Marc Zyngier wrote:
-> As for Spectre variant-2, we rely on SMCCC 1.1 to provide the
-> discovery mechanism for detecting the SSBD mitigation.
-> 
-> A new capability is also allocated for that purpose, and a
-> config option.
-> 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+On Thu, May 24, 2018 at 10:18:39AM +0100, Alex Benn=E9e wrote:
+> =
 
+> Christoffer Dall <christoffer.dall@arm.com> writes:
+> =
 
-> +static bool has_ssbd_mitigation(const struct arm64_cpu_capabilities *entry,
-> +				    int scope)
-> +{
-> +	struct arm_smccc_res res;
-> +	bool supported = true;
-> +
-> +	WARN_ON(scope != SCOPE_LOCAL_CPU || preemptible());
-> +
-> +	if (psci_ops.smccc_version == SMCCC_VERSION_1_0)
-> +		return false;
-> +
-> +	/*
-> +	 * The probe function return value is either negative
-> +	 * (unsupported or mitigated), positive (unaffected), or zero
-> +	 * (requires mitigation). We only need to do anything in the
-> +	 * last case.
-> +	 */
-> +	switch (psci_ops.conduit) {
-> +	case PSCI_CONDUIT_HVC:
-> +		arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
-> +				  ARM_SMCCC_ARCH_WORKAROUND_2, &res);
-> +		if ((int)res.a0 != 0)
-> +			supported = false;
-> +		break;
-> +
-> +	case PSCI_CONDUIT_SMC:
-> +		arm_smccc_1_1_smc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
-> +				  ARM_SMCCC_ARCH_WORKAROUND_2, &res);
-> +		if ((int)res.a0 != 0)
-> +			supported = false;
-> +		break;
-> +
-> +	default:
-> +		supported = false;
-> +	}
-> +
-> +	if (supported) {
-> +		__this_cpu_write(arm64_ssbd_callback_required, 1);
-> +		do_ssbd(true);
-> +	}
+> > On Wed, May 23, 2018 at 03:40:26PM +0100, Dave Martin wrote:
+> >> On Wed, May 23, 2018 at 03:34:20PM +0100, Alex Benn=E9e wrote:
+> >> >
+> >> > Dave Martin <Dave.Martin@arm.com> writes:
 
+[...]
 
-Marc,
+> >> > > diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> >> > > index cca7e06..72143cf 100644
+> >> > > --- a/virt/kvm/Kconfig
+> >> > > +++ b/virt/kvm/Kconfig
+> >> > > @@ -54,3 +54,6 @@ config HAVE_KVM_IRQ_BYPASS
+> >> > >
+> >> > >  config HAVE_KVM_VCPU_ASYNC_IOCTL
+> >> > >         bool
+> >> > > +
+> >> > > +config HAVE_KVM_VCPU_RUN_PID_CHANGE
+> >> > > +       bool
+> >> >
+> >> > This almost threw me as I thought you might be able to enable this a=
+nd
+> >> > break the build, but apparently not:
+> >> >
+> >> > Reviewed-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> >>
+> >> Without a "help", the option seems non-interactive and cannot be true
+> >> unless something selects it.  It seems a bit weird to me too, but the
+> >> idiom appears widely used...
+> >>
+> > Indeed, I've copied this idiom from other things before and nobody has
+> > complained, so I think it works (without any further deep insights into
+> > the inner workings of Kconfig).
+> =
 
-As discussed, we have minor issue with the "corner case". If a CPU
-is hotplugged in which requires the mitigation, after the system has
-finalised the cap to "not available", the CPU could go ahead and
-do the "work around" as above, while not effectively doing anything
-about it at runtime for KVM guests (as thats the only place where
-we rely on the CAP being set).
+> It's fine. My main worry was breaking bisection with the normal "make
+> olddefconfig" approach. I tested it and found it to be fine and I don't
+> think we need to worry about people adding the symbol to .config
+> manually - they get to keep both pieces ;-)
 
-But, yes this is real corner case. There is no easy way to solve it
-other than
+I wasted a fair amount of time at some point in the past trying to work
+out why I couldn't set one of these options by
+echo CONFIG_FOO=3Dy >>.config ...
 
-1) Allow late modifications to CPU hwcaps
+That was fun ;)
 
-OR
-
-2) Penalise the fastpath to always check per-cpu setting.
-
-
-Regardless,
-
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cheers
+---Dave
