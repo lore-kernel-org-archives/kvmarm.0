@@ -1,16 +1,17 @@
-From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH v10 17/18] KVM: arm64: Fold redundant exit code checks
- out of fixup_guest_exit()
-Date: Thu, 24 May 2018 11:12:42 +0200
-Message-ID: <20180524091242.GN55598@C02W217FHV2R.local>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v10 05/18] KVM: arm64: Convert lazy FPSIMD context switch
+ trap to C
+Date: Thu, 24 May 2018 10:14:46 +0100
+Message-ID: <87fu2htny1.fsf@linaro.org>
 References: <1527005119-6842-1-git-send-email-Dave.Martin@arm.com>
- <1527005119-6842-18-git-send-email-Dave.Martin@arm.com>
+ <1527005119-6842-6-git-send-email-Dave.Martin@arm.com>
+ <87k1rutbbi.fsf@linaro.org> <20180524081220.GJ55598@C02W217FHV2R.local>
+ <20180524085445.GP13470@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <1527005119-6842-18-git-send-email-Dave.Martin@arm.com>
+In-reply-to: <20180524085445.GP13470@e103592.cambridge.arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -21,82 +22,52 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: Dave Martin <Dave.Martin@arm.com>
-Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, May 22, 2018 at 05:05:18PM +0100, Dave Martin wrote:
-> The entire tail of fixup_guest_exit() is contained in if statements
-> of the form if (x && *exit_code == ARM_EXCEPTION_TRAP).  As a result,
-> we can check just once and bail out of the function early, allowing
-> the remaining if conditions to be simplified.
-> 
-> The only awkward case is where *exit_code is changed to
-> ARM_EXCEPTION_EL1_SERROR in the case of an illegal GICv2 CPU
-> interface access: in that case, the GICv3 trap handling code is
-> skipped using a goto.  This avoids pointlessly evaluating the
-> static branch check for the GICv3 case, even though we can't have
-> vgic_v2_cpuif_trap and vgic_v3_cpuif_trap true simultaneously
-> unless we have a GICv3 and GICv2 on the host: that sounds stupid,
-> but I haven't satisfied myself that it can't happen.
-> 
-> No functional change.
-
-Acked-by: Christoffer Dall <christoffer.dall@arm.com>
-
-> 
-> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  arch/arm64/kvm/hyp/switch.c | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> index 18d0faa..4fbee95 100644
-> --- a/arch/arm64/kvm/hyp/switch.c
-> +++ b/arch/arm64/kvm/hyp/switch.c
-> @@ -387,11 +387,13 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
->  	 * same PC once the SError has been injected, and replay the
->  	 * trapping instruction.
->  	 */
-> -	if (*exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
-> +	if (*exit_code != ARM_EXCEPTION_TRAP)
-> +		goto exit;
-> +
-> +	if (!__populate_fault_info(vcpu))
->  		return true;
->  
-> -	if (static_branch_unlikely(&vgic_v2_cpuif_trap) &&
-> -	    *exit_code == ARM_EXCEPTION_TRAP) {
-> +	if (static_branch_unlikely(&vgic_v2_cpuif_trap)) {
->  		bool valid;
->  
->  		valid = kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_DABT_LOW &&
-> @@ -417,11 +419,12 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
->  					*vcpu_cpsr(vcpu) &= ~DBG_SPSR_SS;
->  				*exit_code = ARM_EXCEPTION_EL1_SERROR;
->  			}
-> +
-> +			goto exit;
->  		}
->  	}
->  
->  	if (static_branch_unlikely(&vgic_v3_cpuif_trap) &&
-> -	    *exit_code == ARM_EXCEPTION_TRAP &&
->  	    (kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_SYS64 ||
->  	     kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_CP15_32)) {
->  		int ret = __vgic_v3_perform_cpuif_access(vcpu);
-> @@ -430,6 +433,7 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
->  			return true;
->  	}
->  
-> +exit:
->  	/* Return to the host kernel and handle the exit */
->  	return false;
->  }
-> -- 
-> 2.1.4
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo+IE9uIFRodSwgTWF5
+IDI0LCAyMDE4IGF0IDEwOjEyOjIwQU0gKzAyMDAsIENocmlzdG9mZmVyIERhbGwgd3JvdGU6Cj4+
+IE9uIFdlZCwgTWF5IDIzLCAyMDE4IGF0IDA4OjM1OjEzUE0gKzAxMDAsIEFsZXggQmVubsOpZSB3
+cm90ZToKPj4gPgo+PiA+IERhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6
+Cj4+ID4KPj4gPiA+IFRvIG1ha2UgdGhlIGxhenkgRlBTSU1EIGNvbnRleHQgc3dpdGNoIHRyYXAg
+Y29kZSBlYXNpZXIgdG8gaGFjayBvbiwKPj4gPiA+IHRoaXMgcGF0Y2ggY29udmVydHMgaXQgdG8g
+Qy4KPj4gPiA+Cj4+ID4gPiBUaGlzIGlzIG5vdCBhbWF6aW5nbHkgZWZmaWNpZW50LCBidXQgdGhl
+IHRyYXAgc2hvdWxkIHR5cGljYWxseSBvbmx5Cj4+ID4gPiBiZSB0YWtlbiBvbmNlIHBlciBob3N0
+IGNvbnRleHQgc3dpdGNoLgo+PiA+ID4KPj4gPiA+IFNpZ25lZC1vZmYtYnk6IERhdmUgTWFydGlu
+IDxEYXZlLk1hcnRpbkBhcm0uY29tPgo+PiA+ID4gUmV2aWV3ZWQtYnk6IE1hcmMgWnluZ2llciA8
+bWFyYy56eW5naWVyQGFybS5jb20+Cj4+ID4gPiAtLS0KPj4gPiA+ICBhcmNoL2FybTY0L2t2bS9o
+eXAvZW50cnkuUyAgfCA1NyArKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0KPj4gPiA+ICBhcmNoL2FybTY0L2t2bS9oeXAvc3dpdGNoLmMgfCAyNCArKysrKysrKysr
+KysrKysrKysrCj4+ID4gPiAgMiBmaWxlcyBjaGFuZ2VkLCA0NiBpbnNlcnRpb25zKCspLCAzNSBk
+ZWxldGlvbnMoLSkKPgo+IFsuLi5dCj4KPj4gPiA+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2
+bS9oeXAvc3dpdGNoLmMgYi9hcmNoL2FybTY0L2t2bS9oeXAvc3dpdGNoLmMKPj4gPiA+IGluZGV4
+IGQ5NjQ1MjMuLmMwNzk2YzQgMTAwNjQ0Cj4+ID4gPiAtLS0gYS9hcmNoL2FybTY0L2t2bS9oeXAv
+c3dpdGNoLmMKPj4gPiA+ICsrKyBiL2FyY2gvYXJtNjQva3ZtL2h5cC9zd2l0Y2guYwo+PiA+ID4g
+QEAgLTMxOCw2ICszMTgsMzAgQEAgc3RhdGljIGJvb2wgX19oeXBfdGV4dCBfX3NraXBfaW5zdHIo
+c3RydWN0IGt2bV92Y3B1ICp2Y3B1KQo+PiA+ID4gIAl9Cj4+ID4gPiAgfQo+PiA+ID4KPj4gPiA+
+ICt2b2lkIF9faHlwX3RleHQgX19oeXBfc3dpdGNoX2Zwc2ltZCh1NjQgZXNyIF9fYWx3YXlzX3Vu
+dXNlZCwKPj4gPiA+ICsJCQkJICAgIHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKPj4gPiA+ICt7Cj4+
+ID4gPiArCWt2bV9jcHVfY29udGV4dF90ICpob3N0X2N0eHQ7Cj4+ID4gPiArCj4+ID4gPiArCWlm
+IChoYXNfdmhlKCkpCj4+ID4gPiArCQl3cml0ZV9zeXNyZWcocmVhZF9zeXNyZWcoY3BhY3JfZWwx
+KSB8IENQQUNSX0VMMV9GUEVOLAo+PiA+ID4gKwkJCSAgICAgY3BhY3JfZWwxKTsKPj4gPiA+ICsJ
+ZWxzZQo+PiA+ID4gKwkJd3JpdGVfc3lzcmVnKHJlYWRfc3lzcmVnKGNwdHJfZWwyKSAmIH4odTY0
+KUNQVFJfRUwyX1RGUCwKPj4gPiA+ICsJCQkgICAgIGNwdHJfZWwyKTsKPj4gPgo+PiA+IElzIHRo
+ZXJlIG5vIHdheSB0byBkbyBhbHRlcm5hdGl2ZSgpIGluIEMgb3IgZG9lcyBpdCBhbHdheXMgY29t
+ZSBkb3duIHRvCj4+ID4gZGlmZmVyZW50IGlubGluZSBhc21zPwo+PiA+Cj4+Cj4+IGhhc192aGUo
+KSBzaG91bGQgcmVzb2x2ZSB0byBhIHN0YXRpYyBrZXksIGFuZCBJIHByZWZlciB0aGlzIG92ZXIg
+dGhlCj4+IHByZXZpb3VzIGFsdGVybmF0aXZlIGNvbnN0cnVjdCB3ZSBoYWQgZm9yIHNlbGVjdGlu
+ZyBmdW5jdGlvbiBjYWxscyBpbiBDLAo+PiBhcyB0aGF0IHJlc3VsdGV0IGluIGhhdmluZyB0byBm
+b2xsb3cgdG9vIG1hbnkgbGV2ZWxzIG9mIGluZGlyZWN0aW9uLgo+Cj4gSSdsbCBkZWZlciB0byBD
+aHJpc3RvZmZlciBvbiB0aGF0IC0tIEkgd2FzIGp1c3QgZm9sbG93aW5nIHByZWNlZGVudCA6KQo+
+Cj4gVGhlIGlmIChoYXNfdmhlKCkpIGFwcHJvYWNoIGhhcyB0aGUgYmVuZWZpdCBvZiBiZWluZyBt
+dWNoIG1vcmUKPiByZWFkYWJsZSwgYW5kIHRoZSBzdGF0aWMgYnJhbmNoIHByZWRpY3RvciBpbiBt
+YW55IENQVXMgd2lsbCBzdWNjZWVkIGluCj4gZm9sZGluZyBhIHNob3J0LXJhbmdlIHVuY29uZGl0
+aW9uYWwgYnJhbmNoIG91dCBlbnRpcmVseS4gIFRoZXJlIHdpbGwgYmUKPiBhIHNtYWxsIGluY3Jl
+YXNlIGluIEktY2FjaGUgcHJlc3N1cmUgZHVlIHRvIHRoZSBsYXJnZXIgaW5saW5lIGNvZGUKPiBz
+aXplLCBidXQgcHJvYmFibHkgbm90IG11Y2ggYmV5b25kIHRoYXQuCgpGYWlyIGVub3VnaCAtIGl0
+IHdhcyBtb3N0bHkgYSBjdXJpb3NpdHkuIEl0IHNlZW1zIG1vc3Qgb2YgdGhlIHVzZSBvZgphbHRl
+cm5hdGl2ZSgpIGFyZSBtb3N0bHkgYXQgdGhlIGxvdyBsZXZlbCBpbnN0cnVjdGlvbiBsZXZlbCBh
+bnl3YXkuCgotLQpBbGV4IEJlbm7DqWUKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fCmxpbnV4LWFybS1rZXJuZWwgbWFpbGluZyBsaXN0CmxpbnV4LWFybS1r
+ZXJuZWxAbGlzdHMuaW5mcmFkZWFkLm9yZwpodHRwOi8vbGlzdHMuaW5mcmFkZWFkLm9yZy9tYWls
+bWFuL2xpc3RpbmZvL2xpbnV4LWFybS1rZXJuZWwK
