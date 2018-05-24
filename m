@@ -1,75 +1,71 @@
-From: Russell King - ARM Linux <linux@armlinux.org.uk>
-Subject: Re: [PATCH 09/14] ARM: spectre-v2: add PSCI based hardening
-Date: Thu, 24 May 2018 13:30:49 +0100
-Message-ID: <20180524123049.GY17671@n2100.armlinux.org.uk>
-References: <20180521114238.GN17671@n2100.armlinux.org.uk>
- <E1fKjFT-00064F-Bs@rmk-PC.armlinux.org.uk>
- <35edb3df-fed4-b6e6-be0c-ee758618c92e@arm.com>
- <20180523194503.GX17671@n2100.armlinux.org.uk>
- <ffeddbce-2cf7-c1d9-573b-dc4c38d1cbd7@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 09/14] arm64: ssbd: Introduce thread flag to control
+ userspace mitigation
+Date: Thu, 24 May 2018 13:36:11 +0100
+Message-ID: <bc285971-70fb-b3ec-43a1-8721b9067c42@arm.com>
+References: <20180522150648.28297-1-marc.zyngier@arm.com>
+ <20180522150648.28297-10-marc.zyngier@arm.com>
+ <20180524120121.pjdw7qaybcsbf4fl@lakrids.cambridge.arm.com>
+ <833776ac-2b8c-b0f7-dcff-9c55afd67c65@arm.com>
+ <20180524121944.GC8689@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <ffeddbce-2cf7-c1d9-573b-dc4c38d1cbd7@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>, Christoffer Dall <christoffer.dall@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180524121944.GC8689@arm.com>
+Content-Language: en-GB
+Sender: linux-kernel-owner@vger.kernel.org
+To: Will Deacon <will.deacon@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Kees Cook <keescook@chromium.org>, Catalin Marinas <catalin.marinas@arm.com>, Andy Lutomirski <luto@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, May 24, 2018 at 01:03:50PM +0100, Marc Zyngier wrote:
-> On 23/05/18 20:45, Russell King - ARM Linux wrote:
-> > On Tue, May 22, 2018 at 06:24:13PM +0100, Marc Zyngier wrote:
-> >> On 21/05/18 12:45, Russell King wrote:
-> >>> +#ifdef CONFIG_ARM_PSCI
-> >>> +	if (psci_ops.smccc_version != SMCCC_VERSION_1_0) {
-> >>> +		struct arm_smccc_res res;
-> >>> +
-> >>> +		switch (psci_ops.conduit) {
-> >>> +		case PSCI_CONDUIT_HVC:
-> >>> +			arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
-> >>> +					  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
-> >>> +			if ((int)res.a0 < 0)
-> >>> +				break;
-> >>
-> >> I just realised that there is a small, but significant difference
-> >> between this and the arm64 version: On arm64, we have a table of
-> >> vulnerable implementations, and we try the mitigation on a per-cpu
-> >> basis. Here, you entirely rely on the firmware to discover whether the
-> >> CPU needs mitigation or not. You then need to check for a return value
-> >> of 1, which indicates that although the mitigation is implemented, it is
-> >> not required on this particular CPU.
-> > 
-> > Okay, so digging further into the documentation seems to suggest that we
-> > only need to check the firmware for A72 and A57 CPUs, and given this
-> > statement:
-> > 
-> > "Arm recommends that the caller only call this on PEs for which a
-> >  firmware based mitigation of CVE-2017-5715 is required, or where
-> >  a local workaround is infeasible."
-> > 
-> > it seems that the right answer is to ignore the PSCI based methods when
-> > we have anything but these CPUs.  Do you agree?
+On 24/05/18 13:19, Will Deacon wrote:
+> On Thu, May 24, 2018 at 01:16:38PM +0100, Marc Zyngier wrote:
+>> On 24/05/18 13:01, Mark Rutland wrote:
+>>> On Tue, May 22, 2018 at 04:06:43PM +0100, Marc Zyngier wrote:
+>>>> In order to allow userspace to be mitigated on demand, let's
+>>>> introduce a new thread flag that prevents the mitigation from
+>>>> being turned off when exiting to userspace, and doesn't turn
+>>>> it on on entry into the kernel (with the assumtion that the
+>>>
+>>> Nit: s/assumtion/assumption/
+>>>
+>>>> mitigation is always enabled in the kernel itself).
+>>>>
+>>>> This will be used by a prctl interface introduced in a later
+>>>> patch.
+>>>>
+>>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>>>
+>>> On the assumption that this flag cannot be flipped while a task is in
+>>> userspace:
+>>
+>> Well, that's the case unless you get into the seccomp thing, which does
+>> change TIF_SSBD on all threads of the task, without taking it to the
+>> kernel first. That nicely breaks the state machine, and you end-up
+>> running non-mitigated in the kernel. Oops.
+>>
+>> I have a couple of patches fixing that, using a second flag
+>> (TIF_SSBD_PENDING) that gets turned into the real thing on exit to
+>> userspace. It's pretty ugly though.
 > 
-> For CPUs that are produced by ARM, I agree. I don't know about CPUs
-> produced by ARM licensees though, so I'd rather use the opposite logic:
-> Use the firmware unless the CPU is one of those that can be easily
-> mitigated at EL1 (or isn't affected).
+> ... which introduces the need for atomics on the entry path too :(
 
-The "or isn't affected" is the difficult bit - I guess we could match
-on the CPU vendor field though, and just reject all ARM CPUs that
-aren't explicitly listed as having a problem.
+Oh, I'm not saying it is nice. It would hit us on the exception return
+to userspace for all tasks (and not only the mitigated ones). I'd rather
+not have this at all.
 
+> I would /much/ rather kill the seccomp implicit enabling of the mitigation,
+> or at least have a way to opt-out per arch since it doesn't seem to be
+> technically justified imo.
+I agree. The semantics are really odd (the thread still runs unmitigated
+until it traps into the kernel), and I don't really get why seccomp
+tasks should get a special treatment compared to the rest of the userspace.
+
+But 4.17 is only something like 10 days away, so whatever we decide,
+we'd better decide it soon.
+
+
+	M.
 -- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
-According to speedtest.net: 8.21Mbps down 510kbps up
+Jazz is not dead. It just smells funny...
