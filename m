@@ -1,85 +1,44 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH v10 13/18] arm64/sve: Move sve_pffr() to fpsimd.h and make
- inline
-Date: Thu, 24 May 2018 11:20:59 +0100
-Message-ID: <8736yhtkvo.fsf@linaro.org>
-References: <1527005119-6842-1-git-send-email-Dave.Martin@arm.com>
- <1527005119-6842-14-git-send-email-Dave.Martin@arm.com>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH 02/14] arm64: Call ARCH_WORKAROUND_2 on transitions
+ between EL0 and EL1
+Date: Thu, 24 May 2018 11:52:06 +0100
+Message-ID: <20180524105205.rq25srimaceo3ov4@lakrids.cambridge.arm.com>
+References: <20180522150648.28297-1-marc.zyngier@arm.com>
+ <20180522150648.28297-3-marc.zyngier@arm.com>
+ <0b03ce12-510e-464b-63de-cd481d7cb1c5@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-reply-to: <1527005119-6842-14-git-send-email-Dave.Martin@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <0b03ce12-510e-464b-63de-cd481d7cb1c5@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Julien Grall <julien.grall@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Kees Cook <keescook@chromium.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andy Lutomirski <luto@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo+IEluIG9yZGVyIHRv
-IG1ha2Ugc3ZlX3NhdmVfc3RhdGUoKS9zdmVfbG9hZF9zdGF0ZSgpIG1vcmUgZWFzaWx5Cj4gcmV1
-c2FibGUgYW5kIHRvIGdldCByaWQgb2YgYSBwb3RlbnRpYWwgYnJhbmNoIG9uIGNvbnRleHQgc3dp
-dGNoCj4gY3JpdGljYWwgcGF0aHMsIHRoaXMgcGF0Y2ggbWFrZXMgc3ZlX3BmZnIoKSBpbmxpbmUg
-YW5kIG1vdmVzIGl0IHRvCj4gZnBzaW1kLmguCj4KPiA8YXNtL3Byb2Nlc3Nvci5oPiBtdXN0IGJl
-IGluY2x1ZGVkIGluIGZwc2ltZC5oIGluIG9yZGVyIHRvIG1ha2UKPiB0aGlzIHdvcmssIGFuZCB0
-aGlzIGNyZWF0ZXMgYW4gI2luY2x1ZGUgY3ljbGUgdGhhdCBpcyB0cmlja3kgdG8KPiBhdm9pZCB3
-aXRob3V0IG1vZGlmeWluZyBjb3JlIGNvZGUsIGR1ZSB0byB0aGUgd2F5IHRoZSBQUl9TVkVfKigp
-Cj4gcHJjdGwgaGVscGVycyBhcmUgaW5jbHVkZWQgaW4gdGhlIGNvcmUgcHJjdGwgaW1wbGVtZW50
-YXRpb24uCj4KPiBJbnN0ZWFkIG9mIGJyZWFraW5nIHRoZSBjeWNsZSwgdGhpcyBwYXRjaCBkZWZl
-cnMgaW5jbHVzaW9uIG9mCj4gPGFzbS9mcHNpbWQuaD4gaW4gPGFzbS9wcm9jZXNzb3IuaD4gdW50
-aWwgdGhlIHBvaW50IHdoZXJlIGl0IGlzCj4gYWN0dWFsbHkgbmVlZGVkOiBpLmUuLCBpbW1lZGlh
-dGVseSBiZWZvcmUgdGhlIHByY3RsIGRlZmluaXRpb25zLgo+Cj4gTm8gZnVuY3Rpb25hbCBjaGFu
-Z2UuCj4KPiBTaWduZWQtb2ZmLWJ5OiBEYXZlIE1hcnRpbiA8RGF2ZS5NYXJ0aW5AYXJtLmNvbT4K
-PiBBY2tlZC1ieTogQ2F0YWxpbiBNYXJpbmFzIDxjYXRhbGluLm1hcmluYXNAYXJtLmNvbT4KPiBB
-Y2tlZC1ieTogTWFyYyBaeW5naWVyIDxtYXJjLnp5bmdpZXJAYXJtLmNvbT4KPiAtLS0KPiAgYXJj
-aC9hcm02NC9pbmNsdWRlL2FzbS9mcHNpbWQuaCAgICB8IDEzICsrKysrKysrKysrKysKPiAgYXJj
-aC9hcm02NC9pbmNsdWRlL2FzbS9wcm9jZXNzb3IuaCB8ICAzICsrLQo+ICBhcmNoL2FybTY0L2tl
-cm5lbC9mcHNpbWQuYyAgICAgICAgIHwgMTIgLS0tLS0tLS0tLS0tCj4gIDMgZmlsZXMgY2hhbmdl
-ZCwgMTUgaW5zZXJ0aW9ucygrKSwgMTMgZGVsZXRpb25zKC0pCj4KPiBkaWZmIC0tZ2l0IGEvYXJj
-aC9hcm02NC9pbmNsdWRlL2FzbS9mcHNpbWQuaCBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vZnBz
-aW1kLmgKPiBpbmRleCBmYjYwYjIyLi5mYTkyNzQ3IDEwMDY0NAo+IC0tLSBhL2FyY2gvYXJtNjQv
-aW5jbHVkZS9hc20vZnBzaW1kLmgKPiArKysgYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2Zwc2lt
-ZC5oCj4gQEAgLTE4LDYgKzE4LDggQEAKPgo+ICAjaW5jbHVkZSA8YXNtL3B0cmFjZS5oPgo+ICAj
-aW5jbHVkZSA8YXNtL2Vycm5vLmg+Cj4gKyNpbmNsdWRlIDxhc20vcHJvY2Vzc29yLmg+Cj4gKyNp
-bmNsdWRlIDxhc20vc2lnY29udGV4dC5oPgo+Cj4gICNpZm5kZWYgX19BU1NFTUJMWV9fCj4KPiBA
-QCAtNjEsNiArNjMsMTcgQEAgZXh0ZXJuIHZvaWQgc3ZlX2ZsdXNoX2NwdV9zdGF0ZSh2b2lkKTsK
-PiAgLyogTWF4aW11bSBWTCB0aGF0IFNWRSBWTC1hZ25vc3RpYyBzb2Z0d2FyZSBjYW4gdHJhbnNw
-YXJlbnRseSBzdXBwb3J0ICovCj4gICNkZWZpbmUgU1ZFX1ZMX0FSQ0hfTUFYIDB4MTAwCj4KPiAr
-LyogT2Zmc2V0IG9mIEZGUiBpbiB0aGUgU1ZFIHJlZ2lzdGVyIGR1bXAgKi8KPiArc3RhdGljIGlu
-bGluZSBzaXplX3Qgc3ZlX2Zmcl9vZmZzZXQoaW50IHZsKQo+ICt7Cj4gKwlyZXR1cm4gU1ZFX1NJ
-R19GRlJfT0ZGU0VUKHN2ZV92cV9mcm9tX3ZsKHZsKSkgLSBTVkVfU0lHX1JFR1NfT0ZGU0VUOwo+
-ICt9Cj4gKwo+ICtzdGF0aWMgaW5saW5lIHZvaWQgKnN2ZV9wZmZyKHN0cnVjdCB0aHJlYWRfc3Ry
-dWN0ICp0aHJlYWQpCj4gK3sKPiArCXJldHVybiAoY2hhciAqKXRocmVhZC0+c3ZlX3N0YXRlICsg
-c3ZlX2Zmcl9vZmZzZXQodGhyZWFkLT5zdmVfdmwpOwo+ICt9Cj4gKwo+ICBleHRlcm4gdm9pZCBz
-dmVfc2F2ZV9zdGF0ZSh2b2lkICpzdGF0ZSwgdTMyICpwZnBzcik7Cj4gIGV4dGVybiB2b2lkIHN2
-ZV9sb2FkX3N0YXRlKHZvaWQgY29uc3QgKnN0YXRlLCB1MzIgY29uc3QgKnBmcHNyLAo+ICAJCQkg
-ICB1bnNpZ25lZCBsb25nIHZxX21pbnVzXzEpOwo+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2lu
-Y2x1ZGUvYXNtL3Byb2Nlc3Nvci5oIGIvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9wcm9jZXNzb3Iu
-aAo+IGluZGV4IGY5MDJiNmQuLmViYWFkYjEgMTAwNjQ0Cj4gLS0tIGEvYXJjaC9hcm02NC9pbmNs
-dWRlL2FzbS9wcm9jZXNzb3IuaAo+ICsrKyBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vcHJvY2Vz
-c29yLmgKPiBAQCAtNDAsNyArNDAsNiBAQAo+Cj4gICNpbmNsdWRlIDxhc20vYWx0ZXJuYXRpdmUu
-aD4KPiAgI2luY2x1ZGUgPGFzbS9jcHVmZWF0dXJlLmg+Cj4gLSNpbmNsdWRlIDxhc20vZnBzaW1k
-Lmg+Cj4gICNpbmNsdWRlIDxhc20vaHdfYnJlYWtwb2ludC5oPgo+ICAjaW5jbHVkZSA8YXNtL2xz
-ZS5oPgo+ICAjaW5jbHVkZSA8YXNtL3BndGFibGUtaHdkZWYuaD4KPiBAQCAtMjQ1LDYgKzI0NCw4
-IEBAIHZvaWQgY3B1X2VuYWJsZV9wYW4oY29uc3Qgc3RydWN0IGFybTY0X2NwdV9jYXBhYmlsaXRp
-ZXMgKl9fdW51c2VkKTsKPiAgdm9pZCBjcHVfZW5hYmxlX2NhY2hlX21haW50X3RyYXAoY29uc3Qg
-c3RydWN0IGFybTY0X2NwdV9jYXBhYmlsaXRpZXMgKl9fdW51c2VkKTsKPiAgdm9pZCBjcHVfY2xl
-YXJfZGlzcihjb25zdCBzdHJ1Y3QgYXJtNjRfY3B1X2NhcGFiaWxpdGllcyAqX191bnVzZWQpOwo+
-Cj4gKyNpbmNsdWRlIDxhc20vZnBzaW1kLmg+Cj4gKwoKWW91IHJlYWxseSBuZWVkIGEgb25lLWxp
-bmVyIGNvbW1lbnQgdG8gbm90ZSB3aHkgdGhlIGluY2x1ZGUgaXMgaW4gYQpmdW5ueSBwbGFjZSB0
-byBzYXZlIHNvbWVvbmUganVzdCBtb3ZpbmcgaXQgYmFjayBhbmQgdGhlbiBnZXR0aW5nIHJlYWxs
-eQpjb25mdXNlZC4gTWF5YmU6CgogIC8qIGluY2x1ZGVkIGp1c3QgaW4gdGltZSB0byBhdm9pZCBj
-aXJjdWxhciBpbmNsdXNpb24gaXNzdWVzICovCiAgI2luY2x1ZGUgPGFzbS9mcHNpbWQuaD4KCkl0
-IHN0aWxsIHNlZW1zIHdlaXJkIHRvIG1lIHRob3VnaCA6LS8KCk90aGVyd2lzZToKClJldmlld2Vk
-LWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+CgotLQpBbGV4IEJlbm7D
-qWUKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmxpbnV4
-LWFybS1rZXJuZWwgbWFpbGluZyBsaXN0CmxpbnV4LWFybS1rZXJuZWxAbGlzdHMuaW5mcmFkZWFk
-Lm9yZwpodHRwOi8vbGlzdHMuaW5mcmFkZWFkLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2xpbnV4LWFy
-bS1rZXJuZWwK
+On Wed, May 23, 2018 at 10:23:20AM +0100, Julien Grall wrote:
+> Hi Marc,
+> 
+> On 05/22/2018 04:06 PM, Marc Zyngier wrote:
+> > diff --git a/arch/arm64/kernel/entry.S b/arch/arm64/kernel/entry.S
+> > index ec2ee720e33e..f33e6aed3037 100644
+> > --- a/arch/arm64/kernel/entry.S
+> > +++ b/arch/arm64/kernel/entry.S
+> > @@ -18,6 +18,7 @@
+> >    * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> >    */
+> > +#include <linux/arm-smccc.h>
+> >   #include <linux/init.h>
+> >   #include <linux/linkage.h>
+> > @@ -137,6 +138,18 @@ alternative_else_nop_endif
+> >   	add	\dst, \dst, #(\sym - .entry.tramp.text)
+> >   	.endm
+> > +	// This macro corrupts x0-x3. It is the caller's duty
+> > +	// to save/restore them if required.
+> 
+> NIT: Shouldn't you use /* ... */ for multi-line comments?
+
+There's no requirement to do so, and IIRC even Torvalds prefers '//'
+comments for multi-line things these days.
+
+Mark.
