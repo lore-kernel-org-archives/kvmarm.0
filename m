@@ -1,22 +1,14 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v10 07/18] arm64: fpsimd: Eliminate task->mm checks
-Date: Thu, 24 May 2018 15:37:15 +0100
-Message-ID: <20180524143714.GV13470@e103592.cambridge.arm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v10 14/18] KVM: arm64: Save host SVE context as appropriate
+Date: Thu, 24 May 2018 15:49:51 +0100
+Message-ID: <871se1t8fk.fsf@linaro.org>
 References: <1527005119-6842-1-git-send-email-Dave.Martin@arm.com>
- <1527005119-6842-8-git-send-email-Dave.Martin@arm.com>
- <20180523114812.GH55598@C02W217FHV2R.local>
- <20180523133158.GJ13470@e103592.cambridge.arm.com>
- <20180523145657.g7b6v2q2vxfqpoc4@armageddon.cambridge.arm.com>
- <20180523150337.GO13470@e103592.cambridge.arm.com>
- <20180524083350.GK55598@C02W217FHV2R.local>
- <20180524095056.GR13470@e103592.cambridge.arm.com>
- <20180524100659.GO55598@C02W217FHV2R.local>
+ <1527005119-6842-15-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <20180524100659.GO55598@C02W217FHV2R.local>
+In-reply-to: <1527005119-6842-15-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -26,314 +18,151 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Christoffer Dall <christoffer.dall@arm.com>
+To: Dave Martin <Dave.Martin@arm.com>
 Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, May 24, 2018 at 12:06:59PM +0200, Christoffer Dall wrote:
-> On Thu, May 24, 2018 at 10:50:56AM +0100, Dave Martin wrote:
-> > On Thu, May 24, 2018 at 10:33:50AM +0200, Christoffer Dall wrote:
-
-[...]
-
-> > > ...with a risk of being a bit over-pedantic and annoying, may I suggest
-> > > the following complete commit text:
-> > > 
-> > > ------8<------
-> > > Currently the FPSIMD handling code uses the condition task->mm ==
-> > > NULL as a hint that task has no FPSIMD register context.
-> > > 
-> > > The ->mm check is only there to filter out tasks that cannot
-> > > possibly have FPSIMD context loaded, for optimisation purposes.
-> > > However, TIF_FOREIGN_FPSTATE must always be checked anyway before
-> > > saving FPSIMD context back to memory.  For this reason, the ->mm
-> > > checks are not useful, providing that that TIF_FOREIGN_FPSTATE is
-> > > maintained properly for kernel threads.
-> > > 
-> > > FPSIMD context is never preserved for kernel threads across a context
-> > > switch and therefore TIF_FOREIGN_FPSTATE should always be true for
-> > 
-> > (This refactoring opens up the interesting possibility of making
-> > kernel-mode NEON in task context preemptible for kernel threads so
-> > that we actually do preserve state... but that's a discussion for
-> > another day.  There may be code around that relies on
-> > kernel_neon_begin() disabling preemption for real.)
-> > 
-> > > kernel threads.  This is indeed the case, as the wrong_task and
-> > 
-> > This suggests that TIF_FOREIGN_FPSTATE is always true for kernel
-> > threads today.  This is not quite because use_mm() can make mm non-
-> > NULL.
-> > 
-> 
-> I was suggesting that it's always true after this patch.
-
-I tend to read the present tense as describing the situation before the
-patch, but this convention isn't followed universally.
-
-This was part of the problem with my "true by construction" weasel
-words: the described property wasn't true by construction prior to the
-patch, and there wasn't sufficient explanation to convince people it's
-true afterwards.  If people are bring rigorous, it takes a _lot_ of
-explanation...
-
-> 
-> > > wrong_cpu tests in fpsimd_thread_switch() will always yield false for
-> > > kernel threads.
-> > 
-> > ("false" -> "true".  My bad.)
-> > 
-> > > Further, the context switch logic is already deliberately optimised to
-> > > defer reloads of the FPSIMD context until ret_to_user (or sigreturn as a
-> > > special case), which kernel threads by definition never reach, and
-> > > therefore this change introduces no additional work in the critical
-> > > path.
-> > > 
-> > > This patch removes the redundant checks and special-case code.
-> > > ------8<------
-> > 
-> > Looking at my existing text, I rather reworded it like this.
-> > Does this work any better for you?
-> > 
-> > --8<--
-> > 
-> > Currently the FPSIMD handling code uses the condition task->mm ==
-> > NULL as a hint that task has no FPSIMD register context.
-> > 
-> > The ->mm check is only there to filter out tasks that cannot
-> > possibly have FPSIMD context loaded, for optimisation purposes.
-> > Also, TIF_FOREIGN_FPSTATE must always be checked anyway before
-> > saving FPSIMD context back to memory.  For these reasons, the ->mm
-> > checks are not useful, providing that TIF_FOREIGN_FPSTATE is
-> > maintained in a consistent way for kernel threads.
-> 
-> Consistent with what?  Without more context or explanation,
-
-Consistent with the handling of user threads (though I admit it's not
-explicit in the text.)
-
-> I'm not sure what the reader is to make of that.  Do you not mean the
-> TIF_FOREIGN_FPSTATE is always true for kernel threads?
-
-Again, this is probably a red herring.  TIF_FOREIGN_FPSTATE is always
-true for kernel threads prior to the patch, except (randomly) for the
-init task.
-
-This change is not really about TIF_FOREIGN_FPSTATE at all, rather
-that there is nothing to justify handling kernel threads differently,
-or even distinguishing kernel threads from user threads at all in this
-code.
-
-Part of the confusion (and I had confused myself) comes from the fact
-that TIF_FOREIGN_FPSTATE is really a per-cpu property and doesn't make
-sense as a per-task property -- i.e., the flag is meaningless for
-scheduled-out tasks and we must explicitly "repair" it when scheduling
-a task in anyway.  I think it's a thread flag primarily so that it's
-convenient to check alongside other thread flags in the ret_to_user
-work loop.  This is somewhat less of a justification now that loop was
-ported to C.
-
-> > 
-> > The context switch logic is already deliberately optimised to defer
-> > reloads of the regs until ret_to_user (or sigreturn as a special
-> > case), and save them only if they have been previously loaded.
-
-Does it help to insert the following here?
-
-"These paths are the only places where the wrong_task and wrong_cpu
-conditions can be made false, by calling fpsimd_bind_task_to_cpu()."
-
-> > Kernel threads by definition never reach these paths.  As a result,
-> 
-> I'm struggling with the "As a result," here.  Is this because reloads of
-> regs in ret_to_user (or sigreturn) are the only places that can make
-> wrong_cpu or wrong_task be false?
-
-See the proposed clarification above.  Is that sufficient?
-
-> (I'm actually wanting to understand this, not just bikeshedding the
-> commit message, as new corner cases keep coming up on this logic.)
-
-That's a good thing, and I would really like to explain it in a
-concise manner.  See [*] below for the "concise" explanation -- it may
-demonstrate why I've been evasive...
-
-> > the wrong_task and wrong_cpu tests in fpsimd_thread_switch() will
-> > always yield true for kernel threads.
-> > 
-> > This patch removes the redundant checks and special-case code,                  ensuring that TIF_FOREIGN_FPSTATE is set whenever a kernel thread               is scheduled in, and ensures that this flag is set for the init
-> > task.  The fpsimd_flush_task_state() call already present in                    copy_thread() ensures the same for any new task.
-> 
-> nit: funny formatting
-
-Dang, I was repeatedly pasing between Mutt and git commit terminals,
-which doesn't always work as I'd like...
-
-> nit: ensuring that TIF_FOREIGN_FPSTATE *remains* set whenever a kernel
-> thread is scheduled in?
-
-Er, yes.
-
-> > With TIF_FOREIGN_FPSTATE always set for kernel threads, this patch
-> > ensures that no extra context save work is added for kernel
-> > threads, and eliminates the redundant context saving that may
-> > currently occur for kernel threads that have acquired an mm via
-> > use_mm().
-> > 
-> > -->8--
-> 
-> If you can slightly connect the dots with the "As a result" above, I'm
-> fine with your version of the text.
-
-
-As an aside, the big wall of text before the definition of struct
-fpsimd_last_state_struct is looking out of date and could use an
-update to cover at least some of what is explained in [*] better.
-
-I'm currently considering that out of scope for this series, but I will
-keep it in mind to refresh it in the not too distant future.
-
-
-Cheers
----Dave
-
---8<--
-
-[*] The bigger picture:
-
-* Consider a relation (C,T) between cpus C and tasks T, such that
-  (C,T) means "T's FPSIMD regs are loaded on cpu C".
-
-  At a given point of execution of some cpu C, there is at most one task
-  T for which (C,T) holds.
- 
-  At a given point of execution of some task T, there is at most one
-  cpu C for which (C,T) holds.
-
-* (C,T) becomes true whenever T's registers are loaded into cpu C.
-
-* At sched-out, we must ensure that the registers of current are
-  loaded before writing them to current's thread_struct.  Thus, we
-  must save the registers if and only if (smp_processor_id(), current)
-  holds at this time.
-
-* Before entering userspace, we must ensure that current's regs
-  are loaded, and we must only load the regs if they are not loaded
-  already (since if so, they might have been dirtied by current in
-  userspace since last loaded).
-
-  Thus, when entering userspace, we must load the regs from memory
-  if and only if (smp_processor_id(), current) does not hold.
-
-* Checking this relation involves per-CPU access and inspection of
-  current->thread, and was presumably considered too cumbersome for
-  implemenation an entry.S, particluarly in the ret_to_user work
-  pending loop (which is where the FPSIMD regs are finally loaded
-  before entering userspace, if they weren't loaded already).
-
-  To mitigate this, the status of the check is cached in a thread flag
-  TIF_FOREIGN_FPSTATE: with softirqs disabled, (smp_processor_id(),
-  current) holds if and only if TIF_FOREIGN_FPSTATE is false.
-  TIF_FOREIGN_FPSTATE is corrected on sched-in by the code in
-  fpsimd_thread_switch().
-
-[2] Anything that changes the state of the relation for current
-  requires its TIF_FOREIGN_FPSTATE to be changed to match.
-
-* (smp_processor_id(), current) is established in
-  fpsimd_bind_task_to_cpu().  This is the only way the relation can be
-  made to hold between a task and a CPU.
-
-* (C,T) is broken whenever
-
-[1] T is created;
-
-  * T's regs are loaded onto a different cpu C2, so (C2,T) becomes
-    true and (C,T) necessarily becomes false;
-
-  * another task's regs are loaded into C, so (C,T2) becomes true
-    and (C,T) necessarily becomes false;
-
-  * the kernel clobbers the regs on C for its own purposes, so
-    (C,T) becomes false but there is no T2 for which (C,T2) becomes
-    true as a result.  Examples are kernel-mode NEON and loading
-    the regs for a KVM vcpu;
-
-  * T's register context changes via a thread_struct update instead
-    of running instructions in userspace, requiring the contents of
-    the hardware regs to be thrown away.  Examples are exec() (which
-    requires the registers to be zeroed), sigreturn (which populates the
-    regs from the user signal frame) and modification of the registers
-    via PTRACE_SETREGSET;
-
-    As a (probably unnecesary) optimisation, sigreturn immediately
-    loads the registers and reestablishes (smp_processor_id(), current)
-    in anticipation of the return to userspace which is likely to
-    occur soon.  This allows the relation breaking logic to be omitted
-    in fpsimd_update_current_state() which does the work.
-
-* In general, these relation breakings involve an unknown: knowing
-  either C or T but *not* both, we want to break (C,T).  If the
-  relation were recorded in task_struct only, we would need to scan all
-  tasks in the "T unknown" case.  If the relation were recorded in a
-  percpu variable only, we would need to scan all CPUs in the "C
-  unknown" case.  As well as having gnarly synchronisation
-  requirements, these would get expensive in many-tasks or many-cpus
-  situations.
-
-  This is why the relation is recorded in both places, and is only
-  deemed to hold if the two records match up.  This is what
-  fpsimd_thread_switch() is checking for the task being scheduled in.
-
-  The invalidation (breaking) operations are now factored as
-
-  fpsimd_flush_task_state(): falsify (C,current) for every cpu C.
-  This is done by zapping current->thread.fpsimd_cpu with NR_CPUS
-  (chosen because it cannot match smp_processor_id()).
-
-  fpsumd_flush_cpu_state(): falsify (smp_processor_id(),T) for every
-  task T.  This is done by zapping this_cpu(fpsimd_last_state.st)
-  with NULL (chosen because it cannot match &T->thread.uw.fpsimd_state
-  for any task).
-
-  By [2] above, it is necessary to ensure that TIF_FOREIGN_FPSTATE is
-  set after calling either of the above functions.  Of the two,
-  fpsimd_flush_cpu_state() now does this implicitly but
-  fpsimd_flush_task_state() does not: but the caller must do it
-  instead.  I have a vague memory of some refactoring obstacle that
-  dissuaded me from pulling the set_thread_flag in, but I can't
-  remember it now.  I may review this later.
-
-* Because the (C,T) relation may need to be manipulated by
-  kernel_neon_{begin,end}() in softirq context, examining or
-  manipulating for current or the running CPU must be done under
-  local_bh_disable().  The same goes for TIF_FOREIGN_FPSTATE which is
-  supposed to represent the same condition but may spontaneously become
-  stale if softirqs are not masked.  (The rule is not quite as strict
-  as this, but in order to make the code easier to reason about, I skip
-  the local_bh_disable() only where absolutely necessary --
-  restore_sve_fpsimd_context() is the only example today.)
-
-Now, imagine that T is a kernel thread, and consider what needs to
-be done differently.  The observation of this patch is that nothing
-needs to be done differently at all.
-
-There is a single anomaly relating to [1] above, in the form of a task
-that can run without ever being scheduled in: the init task.  Beyond
-that, kernel_neon_begin() before the first reschedule would spuriously
-save the FPSIMD regs into the init_task's thread struct, even though it
-is pointless to do so.  This patch fixes those anomalies by updating
-INIT_THREAD and INIT_THREAD_INFO to set up the init task so that it
-looks the same as some other kernel thread that has been scheduled in.
-
-There is a strong design motivation to avoid unnecessary loads and
-saves of the state, so if removing the special-casing of kernel threads
-were to add cost it would imply that the code were _already_ suboptimal
-for user tasks.  This patch does not attempt to address that at all,
-but by assuming that the code is already well-optimised, "unnecessary"
-save/restore work will not be added.  If this were not the case, it
-could in any case be fixed independently.
-
-The observation of this _series_ is that we don't need to do very
-much in order to be able to generalise the logic to accept KVM vcpus
-in place of T.
+CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo+IFRoaXMgcGF0Y2gg
+YWRkcyBTVkUgY29udGV4dCBzYXZpbmcgdG8gdGhlIGh5cCBGUFNJTUQgY29udGV4dCBzd2l0Y2gK
+PiBwYXRoLiAgVGhpcyBtZWFucyB0aGF0IGl0IGlzIG5vIGxvbmdlciBuZWNlc3NhcnkgdG8gc2F2
+ZSB0aGUgaG9zdAo+IFNWRSBzdGF0ZSBpbiBhZHZhbmNlIG9mIGVudGVyaW5nIHRoZSBndWVzdCwg
+d2hlbiBpbiB1c2UuCj4KPiBJbiBvcmRlciB0byBhdm9pZCBhZGRpbmcgcG9pbnRsZXNzIGNvbXBs
+ZXhpdHkgdG8gdGhlIGNvZGUsIFZIRSBpcwo+IGFzc3VtZWQgaWYgU1ZFIGlzIGluIHVzZS4gIFZI
+RSBpcyBhbiBhcmNoaXRlY3R1cmFsIHByZXJlcXVpc2l0ZSBmb3IKPiBTVkUsIHNvIHRoZXJlIGlz
+IG5vIGdvb2QgcmVhc29uIHRvIHR1cm4gQ09ORklHX0FSTTY0X1ZIRSBvZmYgaW4KPiBrZXJuZWxz
+IHRoYXQgc3VwcG9ydCBib3RoIFNWRSBhbmQgS1ZNLgo+Cj4gSGlzdG9yaWNhbGx5LCBzb2Z0d2Fy
+ZSBtb2RlbHMgZXhpc3QgdGhhdCBjYW4gZXhwb3NlIHRoZQo+IGFyY2hpdGVjdHVyYWxseSBpbnZh
+bGlkIGNvbmZpZ3VyYXRpb24gb2YgU1ZFIHdpdGhvdXQgVkhFLCBzbyBpZgo+IHRoaXMgc2l0dWF0
+aW9uIGlzIGRldGVjdGVkIGF0IGt2bV9pbml0KCkgdGltZSB0aGVuIEtWTSB3aWxsIGJlCj4gZGlz
+YWJsZWQuCj4KPiBTaWduZWQtb2ZmLWJ5OiBEYXZlIE1hcnRpbiA8RGF2ZS5NYXJ0aW5AYXJtLmNv
+bT4KPgo+IC0tLQo+Cj4gICogVGFncyBzdHJpcHBlZCBzaW5jZSB2OCwgcGxlYXNlIHJlY29uZmly
+bSBpZiBwb3NzaWJsZToKPgo+IEZvcm1lcmx5LVJldmlld2VkLWJ5OiBDaHJpc3RvZmZlciBEYWxs
+IDxjaHJpc3RvZmZlci5kYWxsIGF0IGFybS5jb20+Cj4gRm9ybWVybHktQWNrZWQtYnk6IE1hcmMg
+WnluZ2llciA8bWFyYy56eW5naWVyIGF0IGFybS5jb20+Cj4gRm9ybWVybHktQWNrZWQtYnk6IENh
+dGFsaW4gTWFyaW5hcyA8Y2F0YWxpbi5tYXJpbmFzIGF0IGFybS5jb20+Cj4KPiBDaGFuZ2VzIHNp
+bmNlIHY5Ogo+Cj4gUmVxdWVzdGVkIGJ5IE1hcmMgWnluZ2llcjoKPgo+ICAqIElubGluZSBjaGVj
+ayBmb3IgVkhFIGlmIFNWRSBpcyBwcmVzZW50IGludG8ga3ZtX2hvc3QuaC4KPgo+ICAgIFRoZSBj
+aGVjayBoYXMgYmVlbiByZW5hbWVkIHRvIHRoZSBtb3JlIHNwZWNpZmljCj4gICAga3ZtX2FyY2hf
+Y2hlY2tfc3ZlX2hhc192aGUoKSwgYW5kIHRoZSBrdm1fcHJfdW5pbXBsKCkgbW92ZWQgYmFjayB0
+bwo+ICAgIGFybS5jICh0byBhdm9pZCBjaXJjdWxhciBpbmNsdWRlIGlzc3VlcykuCj4KPiAgICBh
+cm0uYyBpcyBub3Qgc2luZ2xlLWFyY2ggY29kZSwgYnV0IGl0IGlzIGFsbCBBcm0tc3BlY2lmaWMs
+IHNvCj4gICAgYWRkaW5nIGEgaG9vayBsaWtlIHRoaXMgZG9lc24ndCBzZWVtIHRvbyB1bnJlYXNv
+bmFibGUuCj4KPiBDaGFuZ2VzIHNpbmNlIHY4Ogo+Cj4gICogQWRkIGt2bV9hcmNoX2NoZWNrX3N1
+cHBvcnRlZCgpIGhvb2ssIGFuZCBtb3ZlIGFybTY0LXNwZWNpZmljIGNoZWNrCj4gICAgZm9yIFNW
+RS1pbXBsaWVzLVZIRSBpbnRvIGFyY2gvYXJtNjQvLgo+Cj4gICAgRHVlIHRvIGNpcmN1bGFyIGhl
+YWRlciBkZXBlbmRlbmN5IHByb2JsZW1zLCBpdCBpcyBkaWZmaWN1bHQgdG8gZ2V0Cj4gICAgdGhl
+IHByb3RvdHlwZSBmb3Iga3ZtX3ByXyooKSBmdW5jdGlvbnMgaW4gPGFzbS9rdm1faG9zdC5oPiwg
+c28gdGhpcwo+ICAgIHBhdGNoIHB1dHMgYXJtNjQncyBrdm1fYXJjaF9jaGVja19zdXBwb3J0ZWQo
+KSBob29rIG91dCBvZiBsaW5lLgo+ICAgIFRoaXMgaXMgbm90IGEgaG90IGZ1bmN0aW9uLgo+IC0t
+LQo+ICBhcmNoL2FybS9pbmNsdWRlL2FzbS9rdm1faG9zdC5oICAgfCAgMSArCj4gIGFyY2gvYXJt
+NjQvS2NvbmZpZyAgICAgICAgICAgICAgICB8ICA3ICsrKysrKysKPiAgYXJjaC9hcm02NC9pbmNs
+dWRlL2FzbS9rdm1faG9zdC5oIHwgMTMgKysrKysrKysrKysrKwo+ICBhcmNoL2FybTY0L2t2bS9m
+cHNpbWQuYyAgICAgICAgICAgfCAgMSAtCj4gIGFyY2gvYXJtNjQva3ZtL2h5cC9zd2l0Y2guYyAg
+ICAgICB8IDIwICsrKysrKysrKysrKysrKysrKystCj4gIHZpcnQva3ZtL2FybS9hcm0uYyAgICAg
+ICAgICAgICAgICB8ICA3ICsrKysrKysKPiAgNiBmaWxlcyBjaGFuZ2VkLCA0NyBpbnNlcnRpb25z
+KCspLCAyIGRlbGV0aW9ucygtKQo+Cj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtL2luY2x1ZGUvYXNt
+L2t2bV9ob3N0LmggYi9hcmNoL2FybS9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCj4gaW5kZXggYWM4
+NzBiMi4uM2I4NWJiYiAxMDA2NDQKPiAtLS0gYS9hcmNoL2FybS9pbmNsdWRlL2FzbS9rdm1faG9z
+dC5oCj4gKysrIGIvYXJjaC9hcm0vaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+IEBAIC0yODAsNiAr
+MjgwLDcgQEAgdm9pZCBrdm1fbW11X3dwX21lbW9yeV9yZWdpb24oc3RydWN0IGt2bSAqa3ZtLCBp
+bnQgc2xvdCk7Cj4KPiAgc3RydWN0IGt2bV92Y3B1ICprdm1fbXBpZHJfdG9fdmNwdShzdHJ1Y3Qg
+a3ZtICprdm0sIHVuc2lnbmVkIGxvbmcgbXBpZHIpOwo+Cj4gK3N0YXRpYyBpbmxpbmUgYm9vbCBr
+dm1fYXJjaF9jaGVja19zdmVfaGFzX3ZoZSh2b2lkKSB7IHJldHVybiB0cnVlOyB9Cj4gIHN0YXRp
+YyBpbmxpbmUgdm9pZCBrdm1fYXJjaF9oYXJkd2FyZV91bnNldHVwKHZvaWQpIHt9Cj4gIHN0YXRp
+YyBpbmxpbmUgdm9pZCBrdm1fYXJjaF9zeW5jX2V2ZW50cyhzdHJ1Y3Qga3ZtICprdm0pIHt9Cj4g
+IHN0YXRpYyBpbmxpbmUgdm9pZCBrdm1fYXJjaF92Y3B1X3VuaW5pdChzdHJ1Y3Qga3ZtX3ZjcHUg
+KnZjcHUpIHt9Cj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQvS2NvbmZpZyBiL2FyY2gvYXJtNjQv
+S2NvbmZpZwo+IGluZGV4IGViMmNmNDkuLmIwZDM4MjAgMTAwNjQ0Cj4gLS0tIGEvYXJjaC9hcm02
+NC9LY29uZmlnCj4gKysrIGIvYXJjaC9hcm02NC9LY29uZmlnCj4gQEAgLTExMzAsNiArMTEzMCw3
+IEBAIGVuZG1lbnUKPiAgY29uZmlnIEFSTTY0X1NWRQo+ICAJYm9vbCAiQVJNIFNjYWxhYmxlIFZl
+Y3RvciBFeHRlbnNpb24gc3VwcG9ydCIKPiAgCWRlZmF1bHQgeQo+ICsJZGVwZW5kcyBvbiAhS1ZN
+IHx8IEFSTTY0X1ZIRQo+ICAJaGVscAo+ICAJICBUaGUgU2NhbGFibGUgVmVjdG9yIEV4dGVuc2lv
+biAoU1ZFKSBpcyBhbiBleHRlbnNpb24gdG8gdGhlIEFBcmNoNjQKPiAgCSAgZXhlY3V0aW9uIHN0
+YXRlIHdoaWNoIGNvbXBsZW1lbnRzIGFuZCBleHRlbmRzIHRoZSBTSU1EIGZ1bmN0aW9uYWxpdHkK
+PiBAQCAtMTE1NSw2ICsxMTU2LDEyIEBAIGNvbmZpZyBBUk02NF9TVkUKPiAgCSAgYm9vdGluZyB0
+aGUga2VybmVsLiAgSWYgdW5zdXJlIGFuZCB5b3UgYXJlIG5vdCBvYnNlcnZpbmcgdGhlc2UKPiAg
+CSAgc3ltcHRvbXMsIHlvdSBzaG91bGQgYXNzdW1lIHRoYXQgaXQgaXMgc2FmZSB0byBzYXkgWS4K
+Pgo+ICsJICBDUFVzIHRoYXQgc3VwcG9ydCBTVkUgYXJlIGFyY2hpdGVjdHVyYWxseSByZXF1aXJl
+ZCB0byBzdXBwb3J0IHRoZQo+ICsJICBWaXJ0dWFsaXphdGlvbiBIb3N0IEV4dGVuc2lvbnMgKFZI
+RSksIHNvIHRoZSBrZXJuZWwgbWFrZXMgbm8KPiArCSAgcHJvdmlzaW9uIGZvciBzdXBwb3J0aW5n
+IFNWRSBhbG9uZ3NpZGUgS1ZNIHdpdGhvdXQgVkhFIGVuYWJsZWQuCj4gKwkgIFRodXMsIHlvdSB3
+aWxsIG5lZWQgdG8gZW5hYmxlIENPTkZJR19BUk02NF9WSEUgaWYgeW91IHdhbnQgdG8gc3VwcG9y
+dAo+ICsJICBLVk0gaW4gdGhlIHNhbWUga2VybmVsIGltYWdlLgo+ICsKPiAgY29uZmlnIEFSTTY0
+X01PRFVMRV9QTFRTCj4gIAlib29sCj4gIAlzZWxlY3QgSEFWRV9NT0RfQVJDSF9TUEVDSUZJQwo+
+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggYi9hcmNoL2Fy
+bTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKPiBpbmRleCBiM2ZlNzMwLi4wNmQ1YTYxIDEwMDY0
+NAo+IC0tLSBhL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+ICsrKyBiL2FyY2gv
+YXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+IEBAIC00MDUsNiArNDA1LDE5IEBAIHN0YXRp
+YyBpbmxpbmUgdm9pZCBfX2NwdV9pbml0X2h5cF9tb2RlKHBoeXNfYWRkcl90IHBnZF9wdHIsCj4g
+IAlrdm1fY2FsbF9oeXAoX19rdm1fc2V0X3RwaWRyX2VsMiwgdHBpZHJfZWwyKTsKPiAgfQo+Cj4g
+K3N0YXRpYyBpbmxpbmUgYm9vbCBrdm1fYXJjaF9jaGVja19zdmVfaGFzX3ZoZSh2b2lkKQo+ICt7
+Cj4gKwkvKgo+ICsJICogVGhlIEFybSBhcmNoaXRlY3R1cmUgc3BlY2lmaWVzIHRoYXQgaW1scGVt
+ZW50YXRpb24gb2YgU1ZFCj4gKwkgKiByZXF1aXJlcyBWSEUgYWxzbyB0byBiZSBpbXBsZW1lbnRl
+ZC4gIFRoZSBLVk0gY29kZSBmb3IgYXJtNjQKPiArCSAqIHJlbGllcyBvbiB0aGlzIHdoZW4gU1ZF
+IGlzIHByZXNlbnQ6Cj4gKwkgKi8KPiArCWlmIChzeXN0ZW1fc3VwcG9ydHNfc3ZlKCkpCj4gKwkJ
+cmV0dXJuIGhhc192aGUoKTsKPiArCWVsc2UKPiArCQlyZXR1cm4gdHJ1ZTsKPiArfQo+ICsKPiAg
+c3RhdGljIGlubGluZSB2b2lkIGt2bV9hcmNoX2hhcmR3YXJlX3Vuc2V0dXAodm9pZCkge30KPiAg
+c3RhdGljIGlubGluZSB2b2lkIGt2bV9hcmNoX3N5bmNfZXZlbnRzKHN0cnVjdCBrdm0gKmt2bSkg
+e30KPiAgc3RhdGljIGlubGluZSB2b2lkIGt2bV9hcmNoX3ZjcHVfdW5pbml0KHN0cnVjdCBrdm1f
+dmNwdSAqdmNwdSkge30KPiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vZnBzaW1kLmMgYi9h
+cmNoL2FybTY0L2t2bS9mcHNpbWQuYwo+IGluZGV4IDM2NTkzM2EuLmRjNmVjZmEgMTAwNjQ0Cj4g
+LS0tIGEvYXJjaC9hcm02NC9rdm0vZnBzaW1kLmMKPiArKysgYi9hcmNoL2FybTY0L2t2bS9mcHNp
+bWQuYwo+IEBAIC01OSw3ICs1OSw2IEBAIGludCBrdm1fYXJjaF92Y3B1X3J1bl9tYXBfZnAoc3Ry
+dWN0IGt2bV92Y3B1ICp2Y3B1KQo+ICAgKi8KPiAgdm9pZCBrdm1fYXJjaF92Y3B1X2xvYWRfZnAo
+c3RydWN0IGt2bV92Y3B1ICp2Y3B1KQo+ICB7Cj4gLQlCVUdfT04oc3lzdGVtX3N1cHBvcnRzX3N2
+ZSgpKTsKPiAgCUJVR19PTighY3VycmVudC0+bW0pOwo+Cj4gIAl2Y3B1LT5hcmNoLmZsYWdzICY9
+IH4oS1ZNX0FSTTY0X0ZQX0VOQUJMRUQgfCBLVk1fQVJNNjRfSE9TVF9TVkVfSU5fVVNFKTsKPiBk
+aWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vaHlwL3N3aXRjaC5jIGIvYXJjaC9hcm02NC9rdm0v
+aHlwL3N3aXRjaC5jCj4gaW5kZXggMTE4ZjMwMC4uYTZhOGM3ZCAxMDA2NDQKPiAtLS0gYS9hcmNo
+L2FybTY0L2t2bS9oeXAvc3dpdGNoLmMKPiArKysgYi9hcmNoL2FybTY0L2t2bS9oeXAvc3dpdGNo
+LmMKPiBAQCAtMjEsNiArMjEsNyBAQAo+Cj4gICNpbmNsdWRlIDxrdm0vYXJtX3BzY2kuaD4KPgo+
+ICsjaW5jbHVkZSA8YXNtL2NwdWZlYXR1cmUuaD4KPiAgI2luY2x1ZGUgPGFzbS9rdm1fYXNtLmg+
+Cj4gICNpbmNsdWRlIDxhc20va3ZtX2VtdWxhdGUuaD4KPiAgI2luY2x1ZGUgPGFzbS9rdm1faG9z
+dC5oPgo+IEBAIC0yOCw2ICsyOSw3IEBACj4gICNpbmNsdWRlIDxhc20va3ZtX21tdS5oPgo+ICAj
+aW5jbHVkZSA8YXNtL2Zwc2ltZC5oPgo+ICAjaW5jbHVkZSA8YXNtL2RlYnVnLW1vbml0b3JzLmg+
+Cj4gKyNpbmNsdWRlIDxhc20vcHJvY2Vzc29yLmg+Cj4gICNpbmNsdWRlIDxhc20vdGhyZWFkX2lu
+Zm8uaD4KPgo+ICAvKiBDaGVjayB3aGV0aGVyIHRoZSBGUCByZWdzIHdlcmUgZGlydGllZCB3aGls
+ZSBpbiB0aGUgaG9zdC1zaWRlIHJ1biBsb29wOiAqLwo+IEBAIC0zMjksNiArMzMxLDggQEAgc3Rh
+dGljIGJvb2wgX19oeXBfdGV4dCBfX3NraXBfaW5zdHIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQo+
+ICB2b2lkIF9faHlwX3RleHQgX19oeXBfc3dpdGNoX2Zwc2ltZCh1NjQgZXNyIF9fYWx3YXlzX3Vu
+dXNlZCwKPiAgCQkJCSAgICBzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4gIHsKPiArCXN0cnVjdCB1
+c2VyX2Zwc2ltZF9zdGF0ZSAqaG9zdF9mcHNpbWQgPSB2Y3B1LT5hcmNoLmhvc3RfZnBzaW1kX3N0
+YXRlOwo+ICsKPiAgCWlmIChoYXNfdmhlKCkpCj4gIAkJd3JpdGVfc3lzcmVnKHJlYWRfc3lzcmVn
+KGNwYWNyX2VsMSkgfCBDUEFDUl9FTDFfRlBFTiwKPiAgCQkJICAgICBjcGFjcl9lbDEpOwo+IEBA
+IC0zMzksNyArMzQzLDIxIEBAIHZvaWQgX19oeXBfdGV4dCBfX2h5cF9zd2l0Y2hfZnBzaW1kKHU2
+NCBlc3IgX19hbHdheXNfdW51c2VkLAo+ICAJaXNiKCk7Cj4KPiAgCWlmICh2Y3B1LT5hcmNoLmZs
+YWdzICYgS1ZNX0FSTTY0X0ZQX0hPU1QpIHsKPiAtCQlfX2Zwc2ltZF9zYXZlX3N0YXRlKHZjcHUt
+PmFyY2guaG9zdF9mcHNpbWRfc3RhdGUpOwo+ICsJCS8qCj4gKwkJICogSW4gdGhlIFNWRSBjYXNl
+LCBWSEUgaXMgYXNzdW1lZDogaXQgaXMgZW5mb3JjZWQgYnkKPiArCQkgKiBLY29uZmlnIGFuZCBr
+dm1fYXJjaF9pbml0KCkuCj4gKwkJICovCj4gKwkJaWYgKHN5c3RlbV9zdXBwb3J0c19zdmUoKSAm
+Jgo+ICsJCSAgICAodmNwdS0+YXJjaC5mbGFncyAmIEtWTV9BUk02NF9IT1NUX1NWRV9JTl9VU0Up
+KSB7Cj4gKwkJCXN0cnVjdCB0aHJlYWRfc3RydWN0ICp0aHJlYWQgPSBjb250YWluZXJfb2YoCj4g
+KwkJCQlob3N0X2Zwc2ltZCwKPiArCQkJCXN0cnVjdCB0aHJlYWRfc3RydWN0LCB1dy5mcHNpbWRf
+c3RhdGUpOwo+ICsKPiArCQkJc3ZlX3NhdmVfc3RhdGUoc3ZlX3BmZnIodGhyZWFkKSwgJmhvc3Rf
+ZnBzaW1kLT5mcHNyKTsKPiArCQl9IGVsc2Ugewo+ICsJCQlfX2Zwc2ltZF9zYXZlX3N0YXRlKGhv
+c3RfZnBzaW1kKTsKPiArCQl9Cj4gKwo+ICAJCXZjcHUtPmFyY2guZmxhZ3MgJj0gfktWTV9BUk02
+NF9GUF9IT1NUOwo+ICAJfQo+Cj4gZGlmZiAtLWdpdCBhL3ZpcnQva3ZtL2FybS9hcm0uYyBiL3Zp
+cnQva3ZtL2FybS9hcm0uYwo+IGluZGV4IGJlZTIyNmMuLmNlN2M2ZjMgMTAwNjQ0Cj4gLS0tIGEv
+dmlydC9rdm0vYXJtL2FybS5jCj4gKysrIGIvdmlydC9rdm0vYXJtL2FybS5jCj4gQEAgLTE2LDYg
+KzE2LDcgQEAKPiAgICogRm91bmRhdGlvbiwgNTEgRnJhbmtsaW4gU3RyZWV0LCBGaWZ0aCBGbG9v
+ciwgQm9zdG9uLCBNQSAgMDIxMTAtMTMwMSwgVVNBLgo+ICAgKi8KPgo+ICsjaW5jbHVkZSA8bGlu
+dXgvYnVnLmg+Cj4gICNpbmNsdWRlIDxsaW51eC9jcHVfcG0uaD4KPiAgI2luY2x1ZGUgPGxpbnV4
+L2Vycm5vLmg+Cj4gICNpbmNsdWRlIDxsaW51eC9lcnIuaD4KPiBAQCAtNDEsNiArNDIsNyBAQAo+
+ICAjaW5jbHVkZSA8YXNtL21tYW4uaD4KPiAgI2luY2x1ZGUgPGFzbS90bGJmbHVzaC5oPgo+ICAj
+aW5jbHVkZSA8YXNtL2NhY2hlZmx1c2guaD4KPiArI2luY2x1ZGUgPGFzbS9jcHVmZWF0dXJlLmg+
+Cj4gICNpbmNsdWRlIDxhc20vdmlydC5oPgo+ICAjaW5jbHVkZSA8YXNtL2t2bV9hcm0uaD4KPiAg
+I2luY2x1ZGUgPGFzbS9rdm1fYXNtLmg+Cj4gQEAgLTE1NzQsNiArMTU3NiwxMSBAQCBpbnQga3Zt
+X2FyY2hfaW5pdCh2b2lkICpvcGFxdWUpCj4gIAkJcmV0dXJuIC1FTk9ERVY7Cj4gIAl9Cj4KPiAr
+CWlmICgha3ZtX2FyY2hfY2hlY2tfc3ZlX2hhc192aGUoKSkgewo+ICsJCWt2bV9wcl91bmltcGwo
+IlNWRSBzeXN0ZW0gd2l0aG91dCBWSEUgdW5zdXBwb3J0ZWQuICBCcm9rZW4gY3B1PyIpOwo+ICsJ
+CXJldHVybiAtRU5PREVWOwo+ICsJfQo+ICsKCkFoaCB0aGlzIGlzIGdvaW5nIHRvIGJlIGEgcGFp
+biB3aGVuIHBlb3BsZSB3YW50IHRvIGVuYWJsZSBzeXN0ZW0KZW11bGF0aW9uIGZvciBTVkUgaW4g
+UUVNVSBnaXZlbiBvdXIgcGF0Y2h5IGZlYXR1cmUgaW1wbGVtZW50YXRpb24gKGkuZS4Kd2UgaGF2
+ZW4ndCBkb25lIFZIRSB5ZXQpLiBIb3dldmVyIHRoYXQncyB0b3RhbGx5IG91ciBwcm9ibGVtIG5v
+dCB5b3Vycwo7LSkKClJldmlld2VkLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFy
+by5vcmc+CgoKPiAgCWZvcl9lYWNoX29ubGluZV9jcHUoY3B1KSB7Cj4gIAkJc21wX2NhbGxfZnVu
+Y3Rpb25fc2luZ2xlKGNwdSwgY2hlY2tfa3ZtX3RhcmdldF9jcHUsICZyZXQsIDEpOwo+ICAJCWlm
+IChyZXQgPCAwKSB7CgoKLS0KQWxleCBCZW5uw6llCgpfX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fXwpsaW51eC1hcm0ta2VybmVsIG1haWxpbmcgbGlzdApsaW51
+eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5vcmcKaHR0cDovL2xpc3RzLmluZnJhZGVhZC5v
+cmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1hcm0ta2VybmVsCg==
