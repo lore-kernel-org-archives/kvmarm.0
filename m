@@ -1,16 +1,16 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH v10 16/18] KVM: arm64: Remove redundant *exit_code
- changes in fpsimd_guest_exit()
-Date: Thu, 24 May 2018 11:11:45 +0200
-Message-ID: <20180524091145.GM55598@C02W217FHV2R.local>
+Subject: Re: [PATCH v10 17/18] KVM: arm64: Fold redundant exit code checks
+ out of fixup_guest_exit()
+Date: Thu, 24 May 2018 11:12:42 +0200
+Message-ID: <20180524091242.GN55598@C02W217FHV2R.local>
 References: <1527005119-6842-1-git-send-email-Dave.Martin@arm.com>
- <1527005119-6842-17-git-send-email-Dave.Martin@arm.com>
+ <1527005119-6842-18-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <1527005119-6842-17-git-send-email-Dave.Martin@arm.com>
+In-Reply-To: <1527005119-6842-18-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -24,67 +24,79 @@ To: Dave Martin <Dave.Martin@arm.com>
 Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, May 22, 2018 at 05:05:17PM +0100, Dave Martin wrote:
-> In fixup_guest_exit(), there are a couple of cases where after
-> checking what the exit code was, we assign it explicitly with the
-> value it already had.
+On Tue, May 22, 2018 at 05:05:18PM +0100, Dave Martin wrote:
+> The entire tail of fixup_guest_exit() is contained in if statements
+> of the form if (x && *exit_code == ARM_EXCEPTION_TRAP).  As a result,
+> we can check just once and bail out of the function early, allowing
+> the remaining if conditions to be simplified.
 > 
-> Assuming this is not indicative of a bug, these assignments are not
-> needed.
-> 
-> This patch removes the redundant assignments, and simplifies some
-> if-nesting that becomes trivial as a result.
+> The only awkward case is where *exit_code is changed to
+> ARM_EXCEPTION_EL1_SERROR in the case of an illegal GICv2 CPU
+> interface access: in that case, the GICv3 trap handling code is
+> skipped using a goto.  This avoids pointlessly evaluating the
+> static branch check for the GICv3 case, even though we can't have
+> vgic_v2_cpuif_trap and vgic_v3_cpuif_trap true simultaneously
+> unless we have a GICv3 and GICv2 on the host: that sounds stupid,
+> but I haven't satisfied myself that it can't happen.
 > 
 > No functional change.
-> 
-> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 
 Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 
+> 
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
->  arch/arm64/kvm/hyp/switch.c | 16 ++++------------
->  1 file changed, 4 insertions(+), 12 deletions(-)
+>  arch/arm64/kvm/hyp/switch.c | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
 > 
 > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> index a6a8c7d..18d0faa 100644
+> index 18d0faa..4fbee95 100644
 > --- a/arch/arm64/kvm/hyp/switch.c
 > +++ b/arch/arm64/kvm/hyp/switch.c
-> @@ -403,12 +403,8 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
->  		if (valid) {
->  			int ret = __vgic_v2_perform_cpuif_access(vcpu);
+> @@ -387,11 +387,13 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  	 * same PC once the SError has been injected, and replay the
+>  	 * trapping instruction.
+>  	 */
+> -	if (*exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
+> +	if (*exit_code != ARM_EXCEPTION_TRAP)
+> +		goto exit;
+> +
+> +	if (!__populate_fault_info(vcpu))
+>  		return true;
 >  
-> -			if (ret == 1) {
-> -				if (__skip_instr(vcpu))
-> -					return true;
-> -				else
-> -					*exit_code = ARM_EXCEPTION_TRAP;
-> -			}
-> +			if (ret ==  1 && __skip_instr(vcpu))
-> +				return true;
+> -	if (static_branch_unlikely(&vgic_v2_cpuif_trap) &&
+> -	    *exit_code == ARM_EXCEPTION_TRAP) {
+> +	if (static_branch_unlikely(&vgic_v2_cpuif_trap)) {
+>  		bool valid;
 >  
->  			if (ret == -1) {
->  				/* Promote an illegal access to an
-> @@ -430,12 +426,8 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
->  	     kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_CP15_32)) {
->  		int ret = __vgic_v3_perform_cpuif_access(vcpu);
->  
-> -		if (ret == 1) {
-> -			if (__skip_instr(vcpu))
-> -				return true;
-> -			else
-> -				*exit_code = ARM_EXCEPTION_TRAP;
-> -		}
-> +		if (ret == 1 && __skip_instr(vcpu))
-> +			return true;
+>  		valid = kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_DABT_LOW &&
+> @@ -417,11 +419,12 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  					*vcpu_cpsr(vcpu) &= ~DBG_SPSR_SS;
+>  				*exit_code = ARM_EXCEPTION_EL1_SERROR;
+>  			}
+> +
+> +			goto exit;
+>  		}
 >  	}
 >  
+>  	if (static_branch_unlikely(&vgic_v3_cpuif_trap) &&
+> -	    *exit_code == ARM_EXCEPTION_TRAP &&
+>  	    (kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_SYS64 ||
+>  	     kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_CP15_32)) {
+>  		int ret = __vgic_v3_perform_cpuif_access(vcpu);
+> @@ -430,6 +433,7 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  			return true;
+>  	}
+>  
+> +exit:
 >  	/* Return to the host kernel and handle the exit */
+>  	return false;
+>  }
 > -- 
 > 2.1.4
 > 
-> 
 > _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
