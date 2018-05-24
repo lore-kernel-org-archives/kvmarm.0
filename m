@@ -1,164 +1,145 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v10 13/18] arm64/sve: Move sve_pffr() to fpsimd.h and
- make inline
-Date: Thu, 24 May 2018 12:22:42 +0100
-Message-ID: <20180524112242.GU13470@e103592.cambridge.arm.com>
-References: <1527005119-6842-1-git-send-email-Dave.Martin@arm.com>
- <1527005119-6842-14-git-send-email-Dave.Martin@arm.com>
- <8736yhtkvo.fsf@linaro.org>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH 02/14] arm64: Call ARCH_WORKAROUND_2 on transitions
+ between EL0 and EL1
+Date: Thu, 24 May 2018 12:23:06 +0100
+Message-ID: <20180524112305.ld3jghzmb6a35h73@lakrids.cambridge.arm.com>
+References: <20180522150648.28297-1-marc.zyngier@arm.com>
+ <20180522150648.28297-3-marc.zyngier@arm.com>
+ <20180524110058.mrkwc3rx5l3v6wad@lakrids.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <8736yhtkvo.fsf@linaro.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20180524110058.mrkwc3rx5l3v6wad@lakrids.cambridge.arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Kees Cook <keescook@chromium.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andy Lutomirski <luto@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, May 24, 2018 at 11:20:59AM +0100, Alex Benn=E9e wrote:
-> =
-
-> Dave Martin <Dave.Martin@arm.com> writes:
-> =
-
-> > In order to make sve_save_state()/sve_load_state() more easily
-> > reusable and to get rid of a potential branch on context switch
-> > critical paths, this patch makes sve_pffr() inline and moves it to
-> > fpsimd.h.
-> >
-> > <asm/processor.h> must be included in fpsimd.h in order to make
-> > this work, and this creates an #include cycle that is tricky to
-> > avoid without modifying core code, due to the way the PR_SVE_*()
-> > prctl helpers are included in the core prctl implementation.
-> >
-> > Instead of breaking the cycle, this patch defers inclusion of
-> > <asm/fpsimd.h> in <asm/processor.h> until the point where it is
-> > actually needed: i.e., immediately before the prctl definitions.
-> >
-> > No functional change.
-> >
-> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> > Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-> > Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+On Thu, May 24, 2018 at 12:00:58PM +0100, Mark Rutland wrote:
+> On Tue, May 22, 2018 at 04:06:36PM +0100, Marc Zyngier wrote:
+> > In order for the kernel to protect itself, let's call the SSBD mitigation
+> > implemented by the higher exception level (either hypervisor or firmware)
+> > on each transition between userspace and kernel.
+> > 
+> > We must take the PSCI conduit into account in order to target the
+> > right exception level, hence the introduction of a runtime patching
+> > callback.
+> > 
+> > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > > ---
-> >  arch/arm64/include/asm/fpsimd.h    | 13 +++++++++++++
-> >  arch/arm64/include/asm/processor.h |  3 ++-
-> >  arch/arm64/kernel/fpsimd.c         | 12 ------------
-> >  3 files changed, 15 insertions(+), 13 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/f=
-psimd.h
-> > index fb60b22..fa92747 100644
-> > --- a/arch/arm64/include/asm/fpsimd.h
-> > +++ b/arch/arm64/include/asm/fpsimd.h
-> > @@ -18,6 +18,8 @@
-> >
-> >  #include <asm/ptrace.h>
-> >  #include <asm/errno.h>
-> > +#include <asm/processor.h>
-> > +#include <asm/sigcontext.h>
-> >
-> >  #ifndef __ASSEMBLY__
-> >
-> > @@ -61,6 +63,17 @@ extern void sve_flush_cpu_state(void);
-> >  /* Maximum VL that SVE VL-agnostic software can transparently support =
-*/
-> >  #define SVE_VL_ARCH_MAX 0x100
-> >
-> > +/* Offset of FFR in the SVE register dump */
-> > +static inline size_t sve_ffr_offset(int vl)
+> >  arch/arm64/kernel/cpu_errata.c | 18 ++++++++++++++++++
+> >  arch/arm64/kernel/entry.S      | 22 ++++++++++++++++++++++
+> >  include/linux/arm-smccc.h      |  5 +++++
+> >  3 files changed, 45 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
+> > index a900befadfe8..46b3aafb631a 100644
+> > --- a/arch/arm64/kernel/cpu_errata.c
+> > +++ b/arch/arm64/kernel/cpu_errata.c
+> > @@ -232,6 +232,24 @@ enable_smccc_arch_workaround_1(const struct arm64_cpu_capabilities *entry)
+> >  }
+> >  #endif	/* CONFIG_HARDEN_BRANCH_PREDICTOR */
+> >  
+> > +#ifdef CONFIG_ARM64_SSBD
+> > +void __init arm64_update_smccc_conduit(struct alt_instr *alt,
+> > +				       __le32 *origptr, __le32 *updptr,
+> > +				       int nr_inst)
 > > +{
-> > +	return SVE_SIG_FFR_OFFSET(sve_vq_from_vl(vl)) - SVE_SIG_REGS_OFFSET;
+> > +	u32 insn;
+> > +
+> > +	BUG_ON(nr_inst != 1);
+> > +
+> > +	if (psci_ops.conduit == PSCI_CONDUIT_HVC)
+> > +		insn = aarch64_insn_get_hvc_value();
+> > +	else
+> > +		insn = aarch64_insn_get_smc_value();
+> 
+> Shouldn't this also handle the case where there is no conduit?
+
+Due to the config symbol not being defined yet, and various other fixups
+in later patches, this is actually benign.
+
+However, if you make this:
+
+	switch (psci_ops.conduit) {
+	case PSCI_CONDUIT_NONE:
+		return;
+	case PSCI_CONDUIT_HVC:
+		insn = aarch64_insn_get_hvc_value();
+		break;
+	case PSCI_CONDUIT_SMC:
+		insn = aarch64_insn_get_smc_value();
+		break;
+	}
+
+... then we won't even bother patching the nop in the default case
+regardless, which is nicer, IMO.
+
+With that:
+
+Reviewed-by: Mark Rutland <mark.rutland@arm.com>
+
+Thanks,
+Mark.
+
+> 
+> See below comment in apply_ssbd for rationale.
+> 
+> > +
+> > +	*updptr = cpu_to_le32(insn);
 > > +}
+> > +#endif	/* CONFIG_ARM64_SSBD */
 > > +
-> > +static inline void *sve_pffr(struct thread_struct *thread)
-> > +{
-> > +	return (char *)thread->sve_state + sve_ffr_offset(thread->sve_vl);
-> > +}
+> >  #define CAP_MIDR_RANGE(model, v_min, r_min, v_max, r_max)	\
+> >  	.matches = is_affected_midr_range,			\
+> >  	.midr_range = MIDR_RANGE(model, v_min, r_min, v_max, r_max)
+> > diff --git a/arch/arm64/kernel/entry.S b/arch/arm64/kernel/entry.S
+> > index ec2ee720e33e..f33e6aed3037 100644
+> > --- a/arch/arm64/kernel/entry.S
+> > +++ b/arch/arm64/kernel/entry.S
+> > @@ -18,6 +18,7 @@
+> >   * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> >   */
+> >  
+> > +#include <linux/arm-smccc.h>
+> >  #include <linux/init.h>
+> >  #include <linux/linkage.h>
+> >  
+> > @@ -137,6 +138,18 @@ alternative_else_nop_endif
+> >  	add	\dst, \dst, #(\sym - .entry.tramp.text)
+> >  	.endm
+> >  
+> > +	// This macro corrupts x0-x3. It is the caller's duty
+> > +	// to save/restore them if required.
+> > +	.macro	apply_ssbd, state
+> > +#ifdef CONFIG_ARM64_SSBD
+> > +	mov	w0, #ARM_SMCCC_ARCH_WORKAROUND_2
+> > +	mov	w1, #\state
+> > +alternative_cb	arm64_update_smccc_conduit
+> > +	nop					// Patched to SMC/HVC #0
+> > +alternative_cb_end
+> > +#endif
+> > +	.endm
+> 
+> If my system doesn't have SMCCC1.1, or the FW doesn't have an
+> implementation of ARCH_WORKAROUND_2, does this stay as a NOP?
+> 
+> It looks like this would be patched to an SMC, which would be fatal on
+> systems without EL3 FW.
+> 
 > > +
-> >  extern void sve_save_state(void *state, u32 *pfpsr);
-> >  extern void sve_load_state(void const *state, u32 const *pfpsr,
-> >  			   unsigned long vq_minus_1);
-> > diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/as=
-m/processor.h
-> > index f902b6d..ebaadb1 100644
-> > --- a/arch/arm64/include/asm/processor.h
-> > +++ b/arch/arm64/include/asm/processor.h
-> > @@ -40,7 +40,6 @@
-> >
-> >  #include <asm/alternative.h>
-> >  #include <asm/cpufeature.h>
-> > -#include <asm/fpsimd.h>
-> >  #include <asm/hw_breakpoint.h>
-> >  #include <asm/lse.h>
-> >  #include <asm/pgtable-hwdef.h>
-> > @@ -245,6 +244,8 @@ void cpu_enable_pan(const struct arm64_cpu_capabili=
-ties *__unused);
-> >  void cpu_enable_cache_maint_trap(const struct arm64_cpu_capabilities *=
-__unused);
-> >  void cpu_clear_disr(const struct arm64_cpu_capabilities *__unused);
-> >
-> > +#include <asm/fpsimd.h>
-> > +
-> =
-
-> You really need a one-liner comment to note why the include is in a
-> funny place to save someone just moving it back and then getting really
-> confused. Maybe:
-> =
-
->   /* included just in time to avoid circular inclusion issues */
->   #include <asm/fpsimd.h>
-> =
-
-> It still seems weird to me though :-/
-
-How about
-
-/*                                                                         =
-     =
-
- * Not at the top of the file due to a direct #include cycle between       =
-     =
-
- * <asm/fpsimd.h> and <asm/processor.h>.  Deferring this #include          =
-     =
-
- * ensures that contents of processor.h are visible to fpsimd.h even if    =
-     =
-
- * processor.h is included first.                                          =
-     =
-
- *                                                                         =
-     =
-
- * These prctl helpers are the only things in this file that require       =
-     =
-
- * fpsimd.h.  The core code expects them to be in this header.             =
-     =
-
- */
-
-?
-
-Cheers
----Dave
-
-> =
-
-> Otherwise:
-> =
-
-> Reviewed-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> >  	.macro	kernel_entry, el, regsize = 64
+> >  	.if	\regsize == 32
+> >  	mov	w0, w0				// zero upper 32 bits of x0
+> > @@ -163,6 +176,13 @@ alternative_else_nop_endif
+> >  	ldr	x19, [tsk, #TSK_TI_FLAGS]	// since we can unmask debug
+> >  	disable_step_tsk x19, x20		// exceptions when scheduling.
+> >  
+> > +	apply_ssbd 1
+> 
+> 
+> ... and thus kernel_entry would be fatal.
+> 
+> Thanks,
+> Mark.
