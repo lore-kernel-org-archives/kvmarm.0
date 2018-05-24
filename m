@@ -1,79 +1,147 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH 10/14] arm64: ssbd: Add prctl interface for per-thread
- mitigation
-Date: Thu, 24 May 2018 13:24:14 +0100
-Message-ID: <20180524122413.GD8689@arm.com>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH 14/14] arm64: KVM: Add ARCH_WORKAROUND_2 discovery
+ through ARCH_FEATURES_FUNC_ID
+Date: Thu, 24 May 2018 13:25:37 +0100
+Message-ID: <20180524122537.er2oate3oiybchze@lakrids.cambridge.arm.com>
 References: <20180522150648.28297-1-marc.zyngier@arm.com>
- <20180522150648.28297-11-marc.zyngier@arm.com>
+ <20180522150648.28297-15-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180522150648.28297-11-marc.zyngier@arm.com>
+In-Reply-To: <20180522150648.28297-15-marc.zyngier@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Catalin Marinas <catalin.marinas@arm.com>, Thomas Gleixner <tglx@linutronix.de>, Andy Lutomirski <luto@kernel.org>, Kees Cook <keescook@chromium.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Christoffer Dall <christoffer.dall@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Thomas Gleixner <tglx@linutronix.de>, Andy Lutomirski <luto@kernel.org>, Kees Cook <keescook@chromium.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Christoffer Dall <christoffer.dall@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, May 22, 2018 at 04:06:44PM +0100, Marc Zyngier wrote:
-> If running on a system that performs dynamic SSBD mitigation, allow
-> userspace to request the mitigation for itself. This is implemented
-> as a prctl call, allowing the mitigation to be enabled or disabled at
-> will for this particular thread.
+On Tue, May 22, 2018 at 04:06:48PM +0100, Marc Zyngier wrote:
+> Now that all our infrastructure is in place, let's expose the
+> availability of ARCH_WORKAROUND_2 to guests. We take this opportunity
+> to tidy up a couple of SMCCC constants.
 > 
+> Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+
+Reviewed-by: Mark Rutland <mark.rutland@arm.com>
+
+Mark.
+
 > ---
->  arch/arm64/kernel/Makefile |   1 +
->  arch/arm64/kernel/ssbd.c   | 107 +++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 108 insertions(+)
->  create mode 100644 arch/arm64/kernel/ssbd.c
+>  arch/arm/include/asm/kvm_host.h   | 12 ++++++++++++
+>  arch/arm64/include/asm/kvm_host.h | 23 +++++++++++++++++++++++
+>  arch/arm64/kvm/reset.c            |  4 ++++
+>  virt/kvm/arm/psci.c               | 18 ++++++++++++++++--
+>  4 files changed, 55 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
-> index bf825f38d206..0025f8691046 100644
-> --- a/arch/arm64/kernel/Makefile
-> +++ b/arch/arm64/kernel/Makefile
-> @@ -54,6 +54,7 @@ arm64-obj-$(CONFIG_ARM64_RELOC_TEST)	+= arm64-reloc-test.o
->  arm64-reloc-test-y := reloc_test_core.o reloc_test_syms.o
->  arm64-obj-$(CONFIG_CRASH_DUMP)		+= crash_dump.o
->  arm64-obj-$(CONFIG_ARM_SDE_INTERFACE)	+= sdei.o
-> +arm64-obj-$(CONFIG_ARM64_SSBD)		+= ssbd.o
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index c7c28c885a19..d478766b56c1 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -315,6 +315,18 @@ static inline bool kvm_arm_harden_branch_predictor(void)
+>  	return false;
+>  }
 >  
->  obj-y					+= $(arm64-obj-y) vdso/ probes/
->  obj-m					+= $(arm64-obj-m)
-> diff --git a/arch/arm64/kernel/ssbd.c b/arch/arm64/kernel/ssbd.c
-> new file mode 100644
-> index 000000000000..34e3c430176b
-> --- /dev/null
-> +++ b/arch/arm64/kernel/ssbd.c
-> @@ -0,0 +1,107 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (C) 2018 ARM Ltd, All Rights Reserved.
-> + */
+> +#define KVM_SSBD_UNKNOWN		-1
+> +#define KVM_SSBD_FORCE_DISABLE		0
+> +#define KVM_SSBD_EL1_ENTRY		1
+> +#define KVM_SSBD_FORCE_ENABLE		2
+> +#define KVM_SSBD_MITIGATED		3
 > +
-> +#include <linux/sched.h>
-> +#include <linux/thread_info.h>
-> +
-> +#include <asm/cpufeature.h>
-> +
-> +/*
-> + * prctl interface for SSBD
-> + * FIXME: Drop the below ifdefery once the common interface has been merged.
-> + */
-> +#ifdef PR_SPEC_STORE_BYPASS
-> +static int ssbd_prctl_set(struct task_struct *task, unsigned long ctrl)
+> +static inline int kvm_arm_have_ssbd(void)
 > +{
-> +	int state = arm64_get_ssbd_state();
+> +	/* No way to detect it yet, pretend it is not there. */
+> +	return KVM_SSBD_UNKNOWN;
+> +}
 > +
-> +	/* Unsupported or already mitigated */
-> +	if (state == ARM64_SSBD_UNKNOWN)
-> +		return -EINVAL;
-> +	if (state == ARM64_SSBD_MITIGATED)
-> +		return -EPERM;
-
-I'm not sure this is the best thing to do. If the firmware says that the
-CPU is mitigated, we should probably return 0 for PR_SPEC_DISABLE but
--EPERM for PR_SPEC_ENABLE (i.e. the part that doesn't work is disabling
-the mitigation).
-
-Will
+>  static inline void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu) {}
+>  
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 9bef3f69bdcd..082b0dbb85c6 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -455,6 +455,29 @@ static inline bool kvm_arm_harden_branch_predictor(void)
+>  	return cpus_have_const_cap(ARM64_HARDEN_BRANCH_PREDICTOR);
+>  }
+>  
+> +#define KVM_SSBD_UNKNOWN		-1
+> +#define KVM_SSBD_FORCE_DISABLE		0
+> +#define KVM_SSBD_EL1_ENTRY		1
+> +#define KVM_SSBD_FORCE_ENABLE		2
+> +#define KVM_SSBD_MITIGATED		3
+> +
+> +static inline int kvm_arm_have_ssbd(void)
+> +{
+> +	switch (arm64_get_ssbd_state()) {
+> +	case ARM64_SSBD_FORCE_DISABLE:
+> +		return KVM_SSBD_FORCE_DISABLE;
+> +	case ARM64_SSBD_EL1_ENTRY:
+> +		return KVM_SSBD_EL1_ENTRY;
+> +	case ARM64_SSBD_FORCE_ENABLE:
+> +		return KVM_SSBD_FORCE_ENABLE;
+> +	case ARM64_SSBD_MITIGATED:
+> +		return KVM_SSBD_MITIGATED;
+> +	case ARM64_SSBD_UNKNOWN:
+> +	default:
+> +		return KVM_SSBD_UNKNOWN;
+> +	}
+> +}
+> +
+>  void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu);
+>  void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu);
+>  
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index 3256b9228e75..20a7dfee8494 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -122,6 +122,10 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>  	/* Reset PMU */
+>  	kvm_pmu_vcpu_reset(vcpu);
+>  
+> +	/* Default workaround setup is enabled (if supported) */
+> +	if (kvm_arm_have_ssbd() == KVM_SSBD_EL1_ENTRY)
+> +		vcpu->arch.workaround_flags |= VCPU_WORKAROUND_2_FLAG;
+> +
+>  	/* Reset timer */
+>  	return kvm_timer_vcpu_reset(vcpu);
+>  }
+> diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
+> index c4762bef13c6..4843bfa1f986 100644
+> --- a/virt/kvm/arm/psci.c
+> +++ b/virt/kvm/arm/psci.c
+> @@ -405,7 +405,7 @@ static int kvm_psci_call(struct kvm_vcpu *vcpu)
+>  int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>  {
+>  	u32 func_id = smccc_get_function(vcpu);
+> -	u32 val = PSCI_RET_NOT_SUPPORTED;
+> +	u32 val = SMCCC_RET_NOT_SUPPORTED;
+>  	u32 feature;
+>  
+>  	switch (func_id) {
+> @@ -417,7 +417,21 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>  		switch(feature) {
+>  		case ARM_SMCCC_ARCH_WORKAROUND_1:
+>  			if (kvm_arm_harden_branch_predictor())
+> -				val = 0;
+> +				val = SMCCC_RET_SUCCESS;
+> +			break;
+> +		case ARM_SMCCC_ARCH_WORKAROUND_2:
+> +			switch (kvm_arm_have_ssbd()) {
+> +			case KVM_SSBD_FORCE_DISABLE:
+> +			case KVM_SSBD_UNKNOWN:
+> +				break;
+> +			case KVM_SSBD_EL1_ENTRY:
+> +				val = SMCCC_RET_SUCCESS;
+> +				break;
+> +			case KVM_SSBD_FORCE_ENABLE:
+> +			case KVM_SSBD_MITIGATED:
+> +				val = SMCCC_RET_NOT_REQUIRED;
+> +				break;
+> +			}
+>  			break;
+>  		}
+>  		break;
+> -- 
+> 2.14.2
+> 
