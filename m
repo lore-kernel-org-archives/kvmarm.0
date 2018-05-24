@@ -1,189 +1,99 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v10 07/18] arm64: fpsimd: Eliminate task->mm checks
-Date: Thu, 24 May 2018 10:50:56 +0100
-Message-ID: <20180524095056.GR13470@e103592.cambridge.arm.com>
-References: <1527005119-6842-1-git-send-email-Dave.Martin@arm.com>
- <1527005119-6842-8-git-send-email-Dave.Martin@arm.com>
- <20180523114812.GH55598@C02W217FHV2R.local>
- <20180523133158.GJ13470@e103592.cambridge.arm.com>
- <20180523145657.g7b6v2q2vxfqpoc4@armageddon.cambridge.arm.com>
- <20180523150337.GO13470@e103592.cambridge.arm.com>
- <20180524083350.GK55598@C02W217FHV2R.local>
+From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Subject: Re: [PATCH 04/14] arm64: Add ARCH_WORKAROUND_2 probing
+Date: Thu, 24 May 2018 10:58:43 +0100
+Message-ID: <6c3e7b31-0bb6-353b-1b82-7ebdf3be1323@arm.com>
+References: <20180522150648.28297-1-marc.zyngier@arm.com>
+ <20180522150648.28297-5-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E78C24A0C5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 May 2018 05:40:41 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eO1NYn5a+lcr for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 May 2018 05:40:20 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DA8B649F8B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 May 2018 05:40:19 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20180524083350.GK55598@C02W217FHV2R.local>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20180522150648.28297-5-marc.zyngier@arm.com>
+Content-Language: en-US
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: Kees Cook <keescook@chromium.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andy Lutomirski <luto@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, May 24, 2018 at 10:33:50AM +0200, Christoffer Dall wrote:
-> On Wed, May 23, 2018 at 04:03:37PM +0100, Dave Martin wrote:
-> > On Wed, May 23, 2018 at 03:56:57PM +0100, Catalin Marinas wrote:
-> > > On Wed, May 23, 2018 at 02:31:59PM +0100, Dave P Martin wrote:
-> > > > On Wed, May 23, 2018 at 01:48:12PM +0200, Christoffer Dall wrote:
-> > > > > On Tue, May 22, 2018 at 05:05:08PM +0100, Dave Martin wrote:
-> > > > > > This is true by construction however: TIF_FOREIGN_FPSTATE is never
-> > > > > > cleared except when returning to userspace or returning from a
-> > > > > > signal: thus, for a true kernel thread no FPSIMD context is ever
-> > > > > > loaded, TIF_FOREIGN_FPSTATE will remain set and no context will
-> > > > > > ever be saved.
-> > > > > 
-> > > > > I don't understand this construction proof; from looking at the patch
-> > > > > below it is not obvious to me why fpsimd_thread_switch() can never have
-> > > > > !wrong_task && !wrong_cpu and therefore clear TIF_FOREIGN_FPSTATE for a
-> > > > > kernel thread?
-> > > > 
-> > > > Looking at this again, I think it is poorly worded.  This patch aims to
-> > > > make it true by construction, but it isn't prior to the patch.
-> > > > 
-> > > > I'm tempted to delete the paragraph: the assertion of both untrue and
-> > > > not the best way to justify that this patch works.
-> > > > 
-> > > > 
-> > > > How about:
-> > > > 
-> > > > -8<-
-> > > > 
-> > > > The context switch logic already isolates user threads from each other.
-> > > > This, it is sufficient for isolating user threads from the kernel,
+On 22/05/18 16:06, Marc Zyngier wrote:
+> As for Spectre variant-2, we rely on SMCCC 1.1 to provide the
+> discovery mechanism for detecting the SSBD mitigation.
 > 
-> s/This/Thus/ ?
+> A new capability is also allocated for that purpose, and a
+> config option.
 > 
-> I don't understand what 'it' refers to here?
-> 
-> > > > since the goal either way is to ensure that code executing in userspace
-> > > > cannot see any FPSIMD state except its own.  Thus, there is no special
-> > > > property of kernel threads that we care about except that it is
-> > > > pointless to save or load FPSIMD register state for them.
-> 
-> Actually, I'm not really sure what this paragraph is getting at.
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 
-Reading this again, I don't think the paragraph adds much useful.
 
-So I propose deleting that too.
+> +static bool has_ssbd_mitigation(const struct arm64_cpu_capabilities *entry,
+> +				    int scope)
+> +{
+> +	struct arm_smccc_res res;
+> +	bool supported = true;
+> +
+> +	WARN_ON(scope != SCOPE_LOCAL_CPU || preemptible());
+> +
+> +	if (psci_ops.smccc_version == SMCCC_VERSION_1_0)
+> +		return false;
+> +
+> +	/*
+> +	 * The probe function return value is either negative
+> +	 * (unsupported or mitigated), positive (unaffected), or zero
+> +	 * (requires mitigation). We only need to do anything in the
+> +	 * last case.
+> +	 */
+> +	switch (psci_ops.conduit) {
+> +	case PSCI_CONDUIT_HVC:
+> +		arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
+> +				  ARM_SMCCC_ARCH_WORKAROUND_2, &res);
+> +		if ((int)res.a0 != 0)
+> +			supported = false;
+> +		break;
+> +
+> +	case PSCI_CONDUIT_SMC:
+> +		arm_smccc_1_1_smc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
+> +				  ARM_SMCCC_ARCH_WORKAROUND_2, &res);
+> +		if ((int)res.a0 != 0)
+> +			supported = false;
+> +		break;
+> +
+> +	default:
+> +		supported = false;
+> +	}
+> +
+> +	if (supported) {
+> +		__this_cpu_write(arm64_ssbd_callback_required, 1);
+> +		do_ssbd(true);
+> +	}
 
-> > > > 
-> > > > At worst, the removal of all the kernel thread special cases by this
-> > > > patch would thus spuriously load and save state for kernel threads when
-> > > > unnecessary.
-> > > > 
-> > > > But the context switch logic is already deliberately optimised to defer
-> > > > reloads of the regs until ret_to_user (or sigreturn as a special case),
-> > > > which kernel threads by definition never reach.
-> > > > 
-> > > > ->8-
-> > > 
-> > > The "at worst" paragraph makes it look like it could happen (at least
-> > > until you reach the last paragraph). Maybe you can just say that
-> > > wrong_task and wrong_cpu (with the fpsimd_cpu = NR_CPUS addition) are
-> > > always true for kernel threads. You should probably mention this in a
-> > > comment in the code as well.
-> > 
-> > What if I just delete the second paragraph, and remove the "But" from
-> > the start of the third, and append:
-> > 
-> > "As a result, the wrong_task and wrong_cpu tests in
-> > fpsimd_thread_switch() will always yield false for kernel threads."
-> > 
-> > ...with a similar comment in the code?
-> 
-> ...with a risk of being a bit over-pedantic and annoying, may I suggest
-> the following complete commit text:
-> 
-> ------8<------
-> Currently the FPSIMD handling code uses the condition task->mm ==
-> NULL as a hint that task has no FPSIMD register context.
-> 
-> The ->mm check is only there to filter out tasks that cannot
-> possibly have FPSIMD context loaded, for optimisation purposes.
-> However, TIF_FOREIGN_FPSTATE must always be checked anyway before
-> saving FPSIMD context back to memory.  For this reason, the ->mm
-> checks are not useful, providing that that TIF_FOREIGN_FPSTATE is
-> maintained properly for kernel threads.
-> 
-> FPSIMD context is never preserved for kernel threads across a context
-> switch and therefore TIF_FOREIGN_FPSTATE should always be true for
 
-(This refactoring opens up the interesting possibility of making
-kernel-mode NEON in task context preemptible for kernel threads so
-that we actually do preserve state... but that's a discussion for
-another day.  There may be code around that relies on
-kernel_neon_begin() disabling preemption for real.)
+Marc,
 
-> kernel threads.  This is indeed the case, as the wrong_task and
+As discussed, we have minor issue with the "corner case". If a CPU
+is hotplugged in which requires the mitigation, after the system has
+finalised the cap to "not available", the CPU could go ahead and
+do the "work around" as above, while not effectively doing anything
+about it at runtime for KVM guests (as thats the only place where
+we rely on the CAP being set).
 
-This suggests that TIF_FOREIGN_FPSTATE is always true for kernel
-threads today.  This is not quite because use_mm() can make mm non-
-NULL.
+But, yes this is real corner case. There is no easy way to solve it
+other than
 
-> wrong_cpu tests in fpsimd_thread_switch() will always yield false for
-> kernel threads.
+1) Allow late modifications to CPU hwcaps
 
-("false" -> "true".  My bad.)
+OR
 
-> Further, the context switch logic is already deliberately optimised to
-> defer reloads of the FPSIMD context until ret_to_user (or sigreturn as a
-> special case), which kernel threads by definition never reach, and
-> therefore this change introduces no additional work in the critical
-> path.
-> 
-> This patch removes the redundant checks and special-case code.
-> ------8<------
+2) Penalise the fastpath to always check per-cpu setting.
 
-Looking at my existing text, I rather reworded it like this.
-Does this work any better for you?
 
---8<--
+Regardless,
 
-Currently the FPSIMD handling code uses the condition task->mm ==
-NULL as a hint that task has no FPSIMD register context.
-
-The ->mm check is only there to filter out tasks that cannot
-possibly have FPSIMD context loaded, for optimisation purposes.
-Also, TIF_FOREIGN_FPSTATE must always be checked anyway before
-saving FPSIMD context back to memory.  For these reasons, the ->mm
-checks are not useful, providing that TIF_FOREIGN_FPSTATE is
-maintained in a consistent way for kernel threads.
-
-The context switch logic is already deliberately optimised to defer
-reloads of the regs until ret_to_user (or sigreturn as a special
-case), and save them only if they have been previously loaded.
-Kernel threads by definition never reach these paths.  As a result,
-the wrong_task and wrong_cpu tests in fpsimd_thread_switch() will
-always yield true for kernel threads.
-
-This patch removes the redundant checks and special-case code,                  ensuring that TIF_FOREIGN_FPSTATE is set whenever a kernel thread               is scheduled in, and ensures that this flag is set for the init
-task.  The fpsimd_flush_task_state() call already present in                    copy_thread() ensures the same for any new task.
-
-With TIF_FOREIGN_FPSTATE always set for kernel threads, this patch
-ensures that no extra context save work is added for kernel
-threads, and eliminates the redundant context saving that may
-currently occur for kernel threads that have acquired an mm via
-use_mm().
-
--->8--
-
-Cheers
----Dave
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
