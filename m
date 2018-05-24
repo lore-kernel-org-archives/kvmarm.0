@@ -1,27 +1,29 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH v10 05/18] KVM: arm64: Convert lazy FPSIMD context switch
- trap to C
-Date: Thu, 24 May 2018 10:12:20 +0200
-Message-ID: <20180524081220.GJ55598@C02W217FHV2R.local>
+Subject: Re: [PATCH v10 07/18] arm64: fpsimd: Eliminate task->mm checks
+Date: Thu, 24 May 2018 10:33:50 +0200
+Message-ID: <20180524083350.GK55598@C02W217FHV2R.local>
 References: <1527005119-6842-1-git-send-email-Dave.Martin@arm.com>
- <1527005119-6842-6-git-send-email-Dave.Martin@arm.com>
- <87k1rutbbi.fsf@linaro.org>
+ <1527005119-6842-8-git-send-email-Dave.Martin@arm.com>
+ <20180523114812.GH55598@C02W217FHV2R.local>
+ <20180523133158.GJ13470@e103592.cambridge.arm.com>
+ <20180523145657.g7b6v2q2vxfqpoc4@armageddon.cambridge.arm.com>
+ <20180523150337.GO13470@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EF89449F94
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 May 2018 04:02:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 16D114A0E2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 May 2018 04:23:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xssAn2siHS7x for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 May 2018 04:01:42 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1338749FAC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 May 2018 04:01:41 -0400 (EDT)
+ with ESMTP id ZKPKDR4CI9sR for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 May 2018 04:23:12 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7433A49F94
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 May 2018 04:23:12 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <87k1rutbbi.fsf@linaro.org>
+In-Reply-To: <20180523150337.GO13470@e103592.cambridge.arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,72 +33,104 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gV2VkLCBNYXkgMjMsIDIwMTggYXQgMDg6MzU6MTNQTSArMDEwMCwgQWxleCBCZW5uw6llIHdy
-b3RlOgo+IAo+IERhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cj4gCj4g
-PiBUbyBtYWtlIHRoZSBsYXp5IEZQU0lNRCBjb250ZXh0IHN3aXRjaCB0cmFwIGNvZGUgZWFzaWVy
-IHRvIGhhY2sgb24sCj4gPiB0aGlzIHBhdGNoIGNvbnZlcnRzIGl0IHRvIEMuCj4gPgo+ID4gVGhp
-cyBpcyBub3QgYW1hemluZ2x5IGVmZmljaWVudCwgYnV0IHRoZSB0cmFwIHNob3VsZCB0eXBpY2Fs
-bHkgb25seQo+ID4gYmUgdGFrZW4gb25jZSBwZXIgaG9zdCBjb250ZXh0IHN3aXRjaC4KPiA+Cj4g
-PiBTaWduZWQtb2ZmLWJ5OiBEYXZlIE1hcnRpbiA8RGF2ZS5NYXJ0aW5AYXJtLmNvbT4KPiA+IFJl
-dmlld2VkLWJ5OiBNYXJjIFp5bmdpZXIgPG1hcmMuenluZ2llckBhcm0uY29tPgo+ID4gLS0tCj4g
-PiAgYXJjaC9hcm02NC9rdm0vaHlwL2VudHJ5LlMgIHwgNTcgKysrKysrKysrKysrKysrKystLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4gPiAgYXJjaC9hcm02NC9rdm0vaHlwL3N3aXRjaC5j
-IHwgMjQgKysrKysrKysrKysrKysrKysrKwo+ID4gIDIgZmlsZXMgY2hhbmdlZCwgNDYgaW5zZXJ0
-aW9ucygrKSwgMzUgZGVsZXRpb25zKC0pCj4gPgo+ID4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQv
-a3ZtL2h5cC9lbnRyeS5TIGIvYXJjaC9hcm02NC9rdm0vaHlwL2VudHJ5LlMKPiA+IGluZGV4IGU0
-MWExNjEuLjQwZjM0OWIgMTAwNjQ0Cj4gPiAtLS0gYS9hcmNoL2FybTY0L2t2bS9oeXAvZW50cnku
-Uwo+ID4gKysrIGIvYXJjaC9hcm02NC9rdm0vaHlwL2VudHJ5LlMKPiA+IEBAIC0xNzIsNDAgKzE3
-MiwyNyBAQCBFTlRSWShfX2Zwc2ltZF9ndWVzdF9yZXN0b3JlKQo+ID4gIAkvLyB4MTogdmNwdQo+
-ID4gIAkvLyB4Mi14MjksbHI6IHZjcHUgcmVncwo+ID4gIAkvLyB2Y3B1IHgwLXgxIG9uIHRoZSBz
-dGFjawo+ID4gLQlzdHAJeDIsIHgzLCBbc3AsICMtMTZdIQo+ID4gLQlzdHAJeDQsIGxyLCBbc3As
-ICMtMTZdIQo+ID4gLQo+ID4gLWFsdGVybmF0aXZlX2lmX25vdCBBUk02NF9IQVNfVklSVF9IT1NU
-X0VYVE4KPiA+IC0JbXJzCXgyLCBjcHRyX2VsMgo+ID4gLQliaWMJeDIsIHgyLCAjQ1BUUl9FTDJf
-VEZQCj4gPiAtCW1zcgljcHRyX2VsMiwgeDIKPiA+IC1hbHRlcm5hdGl2ZV9lbHNlCj4gPiAtCW1y
-cwl4MiwgY3BhY3JfZWwxCj4gPiAtCW9ycgl4MiwgeDIsICNDUEFDUl9FTDFfRlBFTgo+ID4gLQlt
-c3IJY3BhY3JfZWwxLCB4Mgo+ID4gLWFsdGVybmF0aXZlX2VuZGlmCj4gPiAtCWlzYgo+ID4gLQo+
-ID4gLQltb3YJeDMsIHgxCj4gPiAtCj4gPiAtCWxkcgl4MCwgW3gzLCAjVkNQVV9IT1NUX0NPTlRF
-WFRdCj4gPiAtCWtlcm5faHlwX3ZhIHgwCj4gPiAtCWFkZAl4MCwgeDAsICNDUFVfR1BfUkVHX09G
-RlNFVChDUFVfRlBfUkVHUykKPiA+IC0JYmwJX19mcHNpbWRfc2F2ZV9zdGF0ZQo+ID4gLQo+ID4g
-LQlhZGQJeDIsIHgzLCAjVkNQVV9DT05URVhUCj4gPiAtCWFkZAl4MCwgeDIsICNDUFVfR1BfUkVH
-X09GRlNFVChDUFVfRlBfUkVHUykKPiA+IC0JYmwJX19mcHNpbWRfcmVzdG9yZV9zdGF0ZQo+ID4g
-LQo+ID4gLQkvLyBTa2lwIHJlc3RvcmluZyBmcGV4YzMyIGZvciBBQXJjaDY0IGd1ZXN0cwo+ID4g
-LQltcnMJeDEsIGhjcl9lbDIKPiA+IC0JdGJuegl4MSwgI0hDUl9SV19TSElGVCwgMWYKPiA+IC0J
-bGRyCXg0LCBbeDMsICNWQ1BVX0ZQRVhDMzJfRUwyXQo+ID4gLQltc3IJZnBleGMzMl9lbDIsIHg0
-Cj4gPiAtMToKPiA+IC0JbGRwCXg0LCBsciwgW3NwXSwgIzE2Cj4gPiAtCWxkcAl4MiwgeDMsIFtz
-cF0sICMxNgo+ID4gLQlsZHAJeDAsIHgxLCBbc3BdLCAjMTYKPiA+IC0KPiA+ICsJc3RwCXgyLCB4
-MywgW3NwLCAjLTE0NF0hCj4gPiArCXN0cAl4NCwgeDUsIFtzcCwgIzE2XQo+ID4gKwlzdHAJeDYs
-IHg3LCBbc3AsICMzMl0KPiA+ICsJc3RwCXg4LCB4OSwgW3NwLCAjNDhdCj4gPiArCXN0cAl4MTAs
-IHgxMSwgW3NwLCAjNjRdCj4gPiArCXN0cAl4MTIsIHgxMywgW3NwLCAjODBdCj4gPiArCXN0cAl4
-MTQsIHgxNSwgW3NwLCAjOTZdCj4gPiArCXN0cAl4MTYsIHgxNywgW3NwLCAjMTEyXQo+ID4gKwlz
-dHAJeDE4LCBsciwgW3NwLCAjMTI4XQo+ID4gKwo+ID4gKwlibAlfX2h5cF9zd2l0Y2hfZnBzaW1k
-Cj4gPiArCj4gPiArCWxkcAl4NCwgeDUsIFtzcCwgIzE2XQo+ID4gKwlsZHAJeDYsIHg3LCBbc3As
-ICMzMl0KPiA+ICsJbGRwCXg4LCB4OSwgW3NwLCAjNDhdCj4gPiArCWxkcAl4MTAsIHgxMSwgW3Nw
-LCAjNjRdCj4gPiArCWxkcAl4MTIsIHgxMywgW3NwLCAjODBdCj4gPiArCWxkcAl4MTQsIHgxNSwg
-W3NwLCAjOTZdCj4gPiArCWxkcAl4MTYsIHgxNywgW3NwLCAjMTEyXQo+ID4gKwlsZHAJeDE4LCBs
-ciwgW3NwLCAjMTI4XQo+ID4gKwlsZHAJeDAsIHgxLCBbc3AsICMxNDRdCj4gPiArCWxkcAl4Miwg
-eDMsIFtzcF0sICMxNjAKPiA+ICAJZXJldAo+ID4gIEVORFBST0MoX19mcHNpbWRfZ3Vlc3RfcmVz
-dG9yZSkKPiA+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS9oeXAvc3dpdGNoLmMgYi9hcmNo
-L2FybTY0L2t2bS9oeXAvc3dpdGNoLmMKPiA+IGluZGV4IGQ5NjQ1MjMuLmMwNzk2YzQgMTAwNjQ0
-Cj4gPiAtLS0gYS9hcmNoL2FybTY0L2t2bS9oeXAvc3dpdGNoLmMKPiA+ICsrKyBiL2FyY2gvYXJt
-NjQva3ZtL2h5cC9zd2l0Y2guYwo+ID4gQEAgLTMxOCw2ICszMTgsMzAgQEAgc3RhdGljIGJvb2wg
-X19oeXBfdGV4dCBfX3NraXBfaW5zdHIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQo+ID4gIAl9Cj4g
-PiAgfQo+ID4KPiA+ICt2b2lkIF9faHlwX3RleHQgX19oeXBfc3dpdGNoX2Zwc2ltZCh1NjQgZXNy
-IF9fYWx3YXlzX3VudXNlZCwKPiA+ICsJCQkJICAgIHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKPiA+
-ICt7Cj4gPiArCWt2bV9jcHVfY29udGV4dF90ICpob3N0X2N0eHQ7Cj4gPiArCj4gPiArCWlmICho
-YXNfdmhlKCkpCj4gPiArCQl3cml0ZV9zeXNyZWcocmVhZF9zeXNyZWcoY3BhY3JfZWwxKSB8IENQ
-QUNSX0VMMV9GUEVOLAo+ID4gKwkJCSAgICAgY3BhY3JfZWwxKTsKPiA+ICsJZWxzZQo+ID4gKwkJ
-d3JpdGVfc3lzcmVnKHJlYWRfc3lzcmVnKGNwdHJfZWwyKSAmIH4odTY0KUNQVFJfRUwyX1RGUCwK
-PiA+ICsJCQkgICAgIGNwdHJfZWwyKTsKPiAKPiBJcyB0aGVyZSBubyB3YXkgdG8gZG8gYWx0ZXJu
-YXRpdmUoKSBpbiBDIG9yIGRvZXMgaXQgYWx3YXlzIGNvbWUgZG93biB0bwo+IGRpZmZlcmVudCBp
-bmxpbmUgYXNtcz8KPiAKCmhhc192aGUoKSBzaG91bGQgcmVzb2x2ZSB0byBhIHN0YXRpYyBrZXks
-IGFuZCBJIHByZWZlciB0aGlzIG92ZXIgdGhlCnByZXZpb3VzIGFsdGVybmF0aXZlIGNvbnN0cnVj
-dCB3ZSBoYWQgZm9yIHNlbGVjdGluZyBmdW5jdGlvbiBjYWxscyBpbiBDLAphcyB0aGF0IHJlc3Vs
-dGV0IGluIGhhdmluZyB0byBmb2xsb3cgdG9vIG1hbnkgbGV2ZWxzIG9mIGluZGlyZWN0aW9uLgoK
-VGhhbmtzLAotQ2hyaXN0b2ZmZXIKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEu
-ZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJt
-Cg==
+On Wed, May 23, 2018 at 04:03:37PM +0100, Dave Martin wrote:
+> On Wed, May 23, 2018 at 03:56:57PM +0100, Catalin Marinas wrote:
+> > On Wed, May 23, 2018 at 02:31:59PM +0100, Dave P Martin wrote:
+> > > On Wed, May 23, 2018 at 01:48:12PM +0200, Christoffer Dall wrote:
+> > > > On Tue, May 22, 2018 at 05:05:08PM +0100, Dave Martin wrote:
+> > > > > This is true by construction however: TIF_FOREIGN_FPSTATE is never
+> > > > > cleared except when returning to userspace or returning from a
+> > > > > signal: thus, for a true kernel thread no FPSIMD context is ever
+> > > > > loaded, TIF_FOREIGN_FPSTATE will remain set and no context will
+> > > > > ever be saved.
+> > > > 
+> > > > I don't understand this construction proof; from looking at the patch
+> > > > below it is not obvious to me why fpsimd_thread_switch() can never have
+> > > > !wrong_task && !wrong_cpu and therefore clear TIF_FOREIGN_FPSTATE for a
+> > > > kernel thread?
+> > > 
+> > > Looking at this again, I think it is poorly worded.  This patch aims to
+> > > make it true by construction, but it isn't prior to the patch.
+> > > 
+> > > I'm tempted to delete the paragraph: the assertion of both untrue and
+> > > not the best way to justify that this patch works.
+> > > 
+> > > 
+> > > How about:
+> > > 
+> > > -8<-
+> > > 
+> > > The context switch logic already isolates user threads from each other.
+> > > This, it is sufficient for isolating user threads from the kernel,
+
+s/This/Thus/ ?
+
+I don't understand what 'it' refers to here?
+
+> > > since the goal either way is to ensure that code executing in userspace
+> > > cannot see any FPSIMD state except its own.  Thus, there is no special
+> > > property of kernel threads that we care about except that it is
+> > > pointless to save or load FPSIMD register state for them.
+
+Actually, I'm not really sure what this paragraph is getting at.
+
+> > > 
+> > > At worst, the removal of all the kernel thread special cases by this
+> > > patch would thus spuriously load and save state for kernel threads when
+> > > unnecessary.
+> > > 
+> > > But the context switch logic is already deliberately optimised to defer
+> > > reloads of the regs until ret_to_user (or sigreturn as a special case),
+> > > which kernel threads by definition never reach.
+> > > 
+> > > ->8-
+> > 
+> > The "at worst" paragraph makes it look like it could happen (at least
+> > until you reach the last paragraph). Maybe you can just say that
+> > wrong_task and wrong_cpu (with the fpsimd_cpu = NR_CPUS addition) are
+> > always true for kernel threads. You should probably mention this in a
+> > comment in the code as well.
+> 
+> What if I just delete the second paragraph, and remove the "But" from
+> the start of the third, and append:
+> 
+> "As a result, the wrong_task and wrong_cpu tests in
+> fpsimd_thread_switch() will always yield false for kernel threads."
+> 
+> ...with a similar comment in the code?
+
+...with a risk of being a bit over-pedantic and annoying, may I suggest
+the following complete commit text:
+
+------8<------
+Currently the FPSIMD handling code uses the condition task->mm ==
+NULL as a hint that task has no FPSIMD register context.
+
+The ->mm check is only there to filter out tasks that cannot
+possibly have FPSIMD context loaded, for optimisation purposes.
+However, TIF_FOREIGN_FPSTATE must always be checked anyway before
+saving FPSIMD context back to memory.  For this reason, the ->mm
+checks are not useful, providing that that TIF_FOREIGN_FPSTATE is
+maintained properly for kernel threads.
+
+FPSIMD context is never preserved for kernel threads across a context
+switch and therefore TIF_FOREIGN_FPSTATE should always be true for
+kernel threads.  This is indeed the case, as the wrong_task and
+wrong_cpu tests in fpsimd_thread_switch() will always yield false for
+kernel threads.
+
+Further, the context switch logic is already deliberately optimised to
+defer reloads of the FPSIMD context until ret_to_user (or sigreturn as a
+special case), which kernel threads by definition never reach, and
+therefore this change introduces no additional work in the critical
+path.
+
+This patch removes the redundant checks and special-case code.
+------8<------
+
+Thanks,
+-Christoffer
