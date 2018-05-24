@@ -1,77 +1,116 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 09/14] ARM: spectre-v2: add PSCI based hardening
-Date: Thu, 24 May 2018 13:03:50 +0100
-Message-ID: <ffeddbce-2cf7-c1d9-573b-dc4c38d1cbd7@arm.com>
-References: <20180521114238.GN17671@n2100.armlinux.org.uk>
- <E1fKjFT-00064F-Bs@rmk-PC.armlinux.org.uk>
- <35edb3df-fed4-b6e6-be0c-ee758618c92e@arm.com>
- <20180523194503.GX17671@n2100.armlinux.org.uk>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH 10/14] arm64: ssbd: Add prctl interface for per-thread
+ mitigation
+Date: Thu, 24 May 2018 13:10:05 +0100
+Message-ID: <20180524121004.u7v6lr44jbq4xh7t@lakrids.cambridge.arm.com>
+References: <20180522150648.28297-1-marc.zyngier@arm.com>
+ <20180522150648.28297-11-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180523194503.GX17671@n2100.armlinux.org.uk>
-Content-Language: en-GB
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Russell King - ARM Linux <linux@armlinux.org.uk>
-Cc: Florian Fainelli <f.fainelli@gmail.com>, Christoffer Dall <christoffer.dall@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20180522150648.28297-11-marc.zyngier@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Thomas Gleixner <tglx@linutronix.de>, Andy Lutomirski <luto@kernel.org>, Kees Cook <keescook@chromium.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Christoffer Dall <christoffer.dall@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 23/05/18 20:45, Russell King - ARM Linux wrote:
-> On Tue, May 22, 2018 at 06:24:13PM +0100, Marc Zyngier wrote:
->> On 21/05/18 12:45, Russell King wrote:
->>> +#ifdef CONFIG_ARM_PSCI
->>> +	if (psci_ops.smccc_version != SMCCC_VERSION_1_0) {
->>> +		struct arm_smccc_res res;
->>> +
->>> +		switch (psci_ops.conduit) {
->>> +		case PSCI_CONDUIT_HVC:
->>> +			arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
->>> +					  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
->>> +			if ((int)res.a0 < 0)
->>> +				break;
->>
->> I just realised that there is a small, but significant difference
->> between this and the arm64 version: On arm64, we have a table of
->> vulnerable implementations, and we try the mitigation on a per-cpu
->> basis. Here, you entirely rely on the firmware to discover whether the
->> CPU needs mitigation or not. You then need to check for a return value
->> of 1, which indicates that although the mitigation is implemented, it is
->> not required on this particular CPU.
+On Tue, May 22, 2018 at 04:06:44PM +0100, Marc Zyngier wrote:
+> If running on a system that performs dynamic SSBD mitigation, allow
+> userspace to request the mitigation for itself. This is implemented
+> as a prctl call, allowing the mitigation to be enabled or disabled at
+> will for this particular thread.
 > 
-> Okay, so digging further into the documentation seems to suggest that we
-> only need to check the firmware for A72 and A57 CPUs, and given this
-> statement:
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm64/kernel/Makefile |   1 +
+>  arch/arm64/kernel/ssbd.c   | 107 +++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 108 insertions(+)
+>  create mode 100644 arch/arm64/kernel/ssbd.c
 > 
-> "Arm recommends that the caller only call this on PEs for which a
->  firmware based mitigation of CVE-2017-5715 is required, or where
->  a local workaround is infeasible."
-> 
-> it seems that the right answer is to ignore the PSCI based methods when
-> we have anything but these CPUs.  Do you agree?
+> diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
+> index bf825f38d206..0025f8691046 100644
+> --- a/arch/arm64/kernel/Makefile
+> +++ b/arch/arm64/kernel/Makefile
+> @@ -54,6 +54,7 @@ arm64-obj-$(CONFIG_ARM64_RELOC_TEST)	+= arm64-reloc-test.o
+>  arm64-reloc-test-y := reloc_test_core.o reloc_test_syms.o
+>  arm64-obj-$(CONFIG_CRASH_DUMP)		+= crash_dump.o
+>  arm64-obj-$(CONFIG_ARM_SDE_INTERFACE)	+= sdei.o
+> +arm64-obj-$(CONFIG_ARM64_SSBD)		+= ssbd.o
+>  
+>  obj-y					+= $(arm64-obj-y) vdso/ probes/
+>  obj-m					+= $(arm64-obj-m)
+> diff --git a/arch/arm64/kernel/ssbd.c b/arch/arm64/kernel/ssbd.c
+> new file mode 100644
+> index 000000000000..34e3c430176b
+> --- /dev/null
+> +++ b/arch/arm64/kernel/ssbd.c
+> @@ -0,0 +1,107 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (C) 2018 ARM Ltd, All Rights Reserved.
+> + */
+> +
 
-For CPUs that are produced by ARM, I agree. I don't know about CPUs
-produced by ARM licensees though, so I'd rather use the opposite logic:
-Use the firmware unless the CPU is one of those that can be easily
-mitigated at EL1 (or isn't affected).
+#include <linux/errno.h>
 
->> But that's probably moot if you don't support BL systems.
-> 
-> Any bL systems with A72 or A57?
+... for the error numbers you return below.
 
-Juno is a canonical example of such a system (either 2xA57+4xA53, or
-2xA72+4xA53), and there is plenty of partner's silicon in the wild.
+> +#include <linux/sched.h>
+> +#include <linux/thread_info.h>
+> +
+> +#include <asm/cpufeature.h>
+> +
+> +/*
+> + * prctl interface for SSBD
+> + * FIXME: Drop the below ifdefery once the common interface has been merged.
+> + */
+> +#ifdef PR_SPEC_STORE_BYPASS
+> +static int ssbd_prctl_set(struct task_struct *task, unsigned long ctrl)
+> +{
+> +	int state = arm64_get_ssbd_state();
+> +
+> +	/* Unsupported or already mitigated */
+> +	if (state == ARM64_SSBD_UNKNOWN)
+> +		return -EINVAL;
+> +	if (state == ARM64_SSBD_MITIGATED)
+> +		return -EPERM;
+> +
+> +	/*
+> +	 * Things are a bit backward here: the arm64 internal API
+> +	 * *enables the mitigation* when the userspace API *disables
+> +	 * speculation*. So much fun.
+> +	 */
+> +	switch (ctrl) {
+> +	case PR_SPEC_ENABLE:
+> +		/* If speculation is force disabled, enable is not allowed */
+> +		if (state == ARM64_SSBD_FORCE_ENABLE ||
+> +		    task_spec_ssb_force_disable(task))
+> +			return -EPERM;
+> +		task_clear_spec_ssb_disable(task);
+> +		clear_tsk_thread_flag(task, TIF_SSBD);
+> +		break;
+> +	case PR_SPEC_DISABLE:
+> +		if (state == ARM64_SSBD_FORCE_DISABLE)
+> +			return -EPERM;
+> +		task_set_spec_ssb_disable(task);
+> +		set_tsk_thread_flag(task, TIF_SSBD);
+> +		break;
+> +	case PR_SPEC_FORCE_DISABLE:
+> +		if (state == ARM64_SSBD_FORCE_DISABLE)
+> +			return -EPERM;
+> +		task_set_spec_ssb_disable(task);
+> +		task_set_spec_ssb_force_disable(task);
+> +		set_tsk_thread_flag(task, TIF_SSBD);
+> +		break;
+> +	default:
+> +		return -ERANGE;
+> +	}
+> +
+> +	return 0;
+> +}
 
-Thanks,
+I'll have to take a look at the core implementation to make sense of
+the rest.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Mark.
