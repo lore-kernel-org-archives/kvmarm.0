@@ -1,76 +1,77 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH 09/14] arm64: ssbd: Introduce thread flag to control
- userspace mitigation
-Date: Thu, 24 May 2018 13:01:22 +0100
-Message-ID: <20180524120121.pjdw7qaybcsbf4fl@lakrids.cambridge.arm.com>
-References: <20180522150648.28297-1-marc.zyngier@arm.com>
- <20180522150648.28297-10-marc.zyngier@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 09/14] ARM: spectre-v2: add PSCI based hardening
+Date: Thu, 24 May 2018 13:03:50 +0100
+Message-ID: <ffeddbce-2cf7-c1d9-573b-dc4c38d1cbd7@arm.com>
+References: <20180521114238.GN17671@n2100.armlinux.org.uk>
+ <E1fKjFT-00064F-Bs@rmk-PC.armlinux.org.uk>
+ <35edb3df-fed4-b6e6-be0c-ee758618c92e@arm.com>
+ <20180523194503.GX17671@n2100.armlinux.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180522150648.28297-10-marc.zyngier@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Kees Cook <keescook@chromium.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andy Lutomirski <luto@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Thomas Gleixner <tglx@linutronix.de>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20180523194503.GX17671@n2100.armlinux.org.uk>
+Content-Language: en-GB
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Russell King - ARM Linux <linux@armlinux.org.uk>
+Cc: Florian Fainelli <f.fainelli@gmail.com>, Christoffer Dall <christoffer.dall@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, May 22, 2018 at 04:06:43PM +0100, Marc Zyngier wrote:
-> In order to allow userspace to be mitigated on demand, let's
-> introduce a new thread flag that prevents the mitigation from
-> being turned off when exiting to userspace, and doesn't turn
-> it on on entry into the kernel (with the assumtion that the
-
-Nit: s/assumtion/assumption/
-
-> mitigation is always enabled in the kernel itself).
+On 23/05/18 20:45, Russell King - ARM Linux wrote:
+> On Tue, May 22, 2018 at 06:24:13PM +0100, Marc Zyngier wrote:
+>> On 21/05/18 12:45, Russell King wrote:
+>>> +#ifdef CONFIG_ARM_PSCI
+>>> +	if (psci_ops.smccc_version != SMCCC_VERSION_1_0) {
+>>> +		struct arm_smccc_res res;
+>>> +
+>>> +		switch (psci_ops.conduit) {
+>>> +		case PSCI_CONDUIT_HVC:
+>>> +			arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
+>>> +					  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
+>>> +			if ((int)res.a0 < 0)
+>>> +				break;
+>>
+>> I just realised that there is a small, but significant difference
+>> between this and the arm64 version: On arm64, we have a table of
+>> vulnerable implementations, and we try the mitigation on a per-cpu
+>> basis. Here, you entirely rely on the firmware to discover whether the
+>> CPU needs mitigation or not. You then need to check for a return value
+>> of 1, which indicates that although the mitigation is implemented, it is
+>> not required on this particular CPU.
 > 
-> This will be used by a prctl interface introduced in a later
-> patch.
+> Okay, so digging further into the documentation seems to suggest that we
+> only need to check the firmware for A72 and A57 CPUs, and given this
+> statement:
 > 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-
-On the assumption that this flag cannot be flipped while a task is in
-userspace:
-
-Reviewed-by: Mark Rutland <mark.rutland@arm.com>
-
-Mark.
-
-> ---
->  arch/arm64/include/asm/thread_info.h | 1 +
->  arch/arm64/kernel/entry.S            | 2 ++
->  2 files changed, 3 insertions(+)
+> "Arm recommends that the caller only call this on PEs for which a
+>  firmware based mitigation of CVE-2017-5715 is required, or where
+>  a local workaround is infeasible."
 > 
-> diff --git a/arch/arm64/include/asm/thread_info.h b/arch/arm64/include/asm/thread_info.h
-> index 740aa03c5f0d..cbcf11b5e637 100644
-> --- a/arch/arm64/include/asm/thread_info.h
-> +++ b/arch/arm64/include/asm/thread_info.h
-> @@ -94,6 +94,7 @@ void arch_release_task_struct(struct task_struct *tsk);
->  #define TIF_32BIT		22	/* 32bit process */
->  #define TIF_SVE			23	/* Scalable Vector Extension in use */
->  #define TIF_SVE_VL_INHERIT	24	/* Inherit sve_vl_onexec across exec */
-> +#define TIF_SSBD		25	/* Wants SSB mitigation */
->  
->  #define _TIF_SIGPENDING		(1 << TIF_SIGPENDING)
->  #define _TIF_NEED_RESCHED	(1 << TIF_NEED_RESCHED)
-> diff --git a/arch/arm64/kernel/entry.S b/arch/arm64/kernel/entry.S
-> index e6f6e2339b22..28ad8799406f 100644
-> --- a/arch/arm64/kernel/entry.S
-> +++ b/arch/arm64/kernel/entry.S
-> @@ -147,6 +147,8 @@ alternative_cb	arm64_enable_wa2_handling
->  alternative_cb_end
->  	ldr_this_cpu	\tmp2, arm64_ssbd_callback_required, \tmp1
->  	cbz	\tmp2, \targ
-> +	ldr	\tmp2, [tsk, #TSK_TI_FLAGS]
-> +	tbnz	\tmp2, #TIF_SSBD, \targ
->  	mov	w0, #ARM_SMCCC_ARCH_WORKAROUND_2
->  	mov	w1, #\state
->  alternative_cb	arm64_update_smccc_conduit
-> -- 
-> 2.14.2
+> it seems that the right answer is to ignore the PSCI based methods when
+> we have anything but these CPUs.  Do you agree?
+
+For CPUs that are produced by ARM, I agree. I don't know about CPUs
+produced by ARM licensees though, so I'd rather use the opposite logic:
+Use the firmware unless the CPU is one of those that can be easily
+mitigated at EL1 (or isn't affected).
+
+>> But that's probably moot if you don't support BL systems.
 > 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> Any bL systems with A72 or A57?
+
+Juno is a canonical example of such a system (either 2xA57+4xA53, or
+2xA72+4xA53), and there is plenty of partner's silicon in the wild.
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
