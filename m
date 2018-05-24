@@ -1,110 +1,79 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH 13/14] arm64: KVM: Handle guest's ARCH_WORKAROUND_2
- requests
-Date: Thu, 24 May 2018 13:22:53 +0100
-Message-ID: <20180524122253.nl4nrxu3f7pd6mrb@lakrids.cambridge.arm.com>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH 10/14] arm64: ssbd: Add prctl interface for per-thread
+ mitigation
+Date: Thu, 24 May 2018 13:24:14 +0100
+Message-ID: <20180524122413.GD8689@arm.com>
 References: <20180522150648.28297-1-marc.zyngier@arm.com>
- <20180522150648.28297-14-marc.zyngier@arm.com>
+ <20180522150648.28297-11-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180522150648.28297-14-marc.zyngier@arm.com>
+In-Reply-To: <20180522150648.28297-11-marc.zyngier@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Thomas Gleixner <tglx@linutronix.de>, Andy Lutomirski <luto@kernel.org>, Kees Cook <keescook@chromium.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Christoffer Dall <christoffer.dall@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Catalin Marinas <catalin.marinas@arm.com>, Thomas Gleixner <tglx@linutronix.de>, Andy Lutomirski <luto@kernel.org>, Kees Cook <keescook@chromium.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Christoffer Dall <christoffer.dall@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, May 22, 2018 at 04:06:47PM +0100, Marc Zyngier wrote:
-> In order to forward the guest's ARCH_WORKAROUND_2 calls to EL3,
-> add a small(-ish) sequence to handle it at EL2. Special care must
-> be taken to track the state of the guest itself by updating the
-> workaround flags. We also rely on patching to enable calls into
-> the firmware.
-> 
-> Note that since we need to execute branches, this always executes
-> after the Spectre-v2 mitigation has been applied.
+On Tue, May 22, 2018 at 04:06:44PM +0100, Marc Zyngier wrote:
+> If running on a system that performs dynamic SSBD mitigation, allow
+> userspace to request the mitigation for itself. This is implemented
+> as a prctl call, allowing the mitigation to be enabled or disabled at
+> will for this particular thread.
 > 
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
->  arch/arm64/kernel/asm-offsets.c |  1 +
->  arch/arm64/kvm/hyp/hyp-entry.S  | 38 +++++++++++++++++++++++++++++++++++++-
->  2 files changed, 38 insertions(+), 1 deletion(-)
+>  arch/arm64/kernel/Makefile |   1 +
+>  arch/arm64/kernel/ssbd.c   | 107 +++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 108 insertions(+)
+>  create mode 100644 arch/arm64/kernel/ssbd.c
 > 
-> diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
-> index 5bdda651bd05..323aeb5f2fe6 100644
-> --- a/arch/arm64/kernel/asm-offsets.c
-> +++ b/arch/arm64/kernel/asm-offsets.c
-> @@ -136,6 +136,7 @@ int main(void)
->  #ifdef CONFIG_KVM_ARM_HOST
->    DEFINE(VCPU_CONTEXT,		offsetof(struct kvm_vcpu, arch.ctxt));
->    DEFINE(VCPU_FAULT_DISR,	offsetof(struct kvm_vcpu, arch.fault.disr_el1));
-> +  DEFINE(VCPU_WORKAROUND_FLAGS,	offsetof(struct kvm_vcpu, arch.workaround_flags));
->    DEFINE(CPU_GP_REGS,		offsetof(struct kvm_cpu_context, gp_regs));
->    DEFINE(CPU_USER_PT_REGS,	offsetof(struct kvm_regs, regs));
->    DEFINE(CPU_FP_REGS,		offsetof(struct kvm_regs, fp_regs));
-> diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-> index bffece27b5c1..5b1fa37ca1f4 100644
-> --- a/arch/arm64/kvm/hyp/hyp-entry.S
-> +++ b/arch/arm64/kvm/hyp/hyp-entry.S
-> @@ -106,8 +106,44 @@ el1_hvc_guest:
->  	 */
->  	ldr	x1, [sp]				// Guest's x0
->  	eor	w1, w1, #ARM_SMCCC_ARCH_WORKAROUND_1
-> +	cbz	w1, wa_epilogue
-> +
-> +	/* ARM_SMCCC_ARCH_WORKAROUND_2 handling */
-> +	eor	w1, w1, #(ARM_SMCCC_ARCH_WORKAROUND_1 ^ \
-> +			  ARM_SMCCC_ARCH_WORKAROUND_2)
-
-... that took me a second. Lovely. :)
-
->  	cbnz	w1, el1_trap
-> -	mov	x0, x1
-> +
-> +#ifdef CONFIG_ARM64_SSBD
-> +alternative_cb	arm64_enable_wa2_handling
-> +	b	wa2_end
-> +alternative_cb_end
-> +	get_vcpu_ptr	x2, x0
-> +	ldr	x0, [x2, #VCPU_WORKAROUND_FLAGS]
-> +
-> +	/* Sanitize the argument and update the guest flags*/
-
-Nit: space before the trailing '*/'. Either that or use a '//' comment.
-
-Otherwise, this looks fine, so with that fixed:
-
-Reviewed-by: Mark Rutland <mark.rutland@arm.com>
-
-Mark.
-
-> +	ldr	x1, [sp, #8]			// Guest's x1
-> +	clz	w1, w1				// Murphy's device:
-> +	lsr	w1, w1, #5			// w1 = !!w1 without using
-> +	eor	w1, w1, #1			// the flags...
-> +	bfi	x0, x1, #VCPU_WORKAROUND_2_FLAG_SHIFT, #1
-> +	str	x0, [x2, #VCPU_WORKAROUND_FLAGS]
-> +
-> +	/* Check that we actually need to perform the call */
-> +	hyp_ldr_this_cpu x0, arm64_ssbd_callback_required, x2
-> +	cbz	x0, wa2_end
-> +
-> +	mov	w0, #ARM_SMCCC_ARCH_WORKAROUND_2
-> +	smc	#0
-> +
-> +	/* Don't leak data from the SMC call */
-> +	mov	x3, xzr
-> +wa2_end:
-> +	mov	x2, xzr
-> +	mov	x1, xzr
-> +#endif
-> +
-> +wa_epilogue:
-> +	mov	x0, xzr
->  	add	sp, sp, #16
->  	eret
+> diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
+> index bf825f38d206..0025f8691046 100644
+> --- a/arch/arm64/kernel/Makefile
+> +++ b/arch/arm64/kernel/Makefile
+> @@ -54,6 +54,7 @@ arm64-obj-$(CONFIG_ARM64_RELOC_TEST)	+= arm64-reloc-test.o
+>  arm64-reloc-test-y := reloc_test_core.o reloc_test_syms.o
+>  arm64-obj-$(CONFIG_CRASH_DUMP)		+= crash_dump.o
+>  arm64-obj-$(CONFIG_ARM_SDE_INTERFACE)	+= sdei.o
+> +arm64-obj-$(CONFIG_ARM64_SSBD)		+= ssbd.o
 >  
-> -- 
-> 2.14.2
-> 
+>  obj-y					+= $(arm64-obj-y) vdso/ probes/
+>  obj-m					+= $(arm64-obj-m)
+> diff --git a/arch/arm64/kernel/ssbd.c b/arch/arm64/kernel/ssbd.c
+> new file mode 100644
+> index 000000000000..34e3c430176b
+> --- /dev/null
+> +++ b/arch/arm64/kernel/ssbd.c
+> @@ -0,0 +1,107 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (C) 2018 ARM Ltd, All Rights Reserved.
+> + */
+> +
+> +#include <linux/sched.h>
+> +#include <linux/thread_info.h>
+> +
+> +#include <asm/cpufeature.h>
+> +
+> +/*
+> + * prctl interface for SSBD
+> + * FIXME: Drop the below ifdefery once the common interface has been merged.
+> + */
+> +#ifdef PR_SPEC_STORE_BYPASS
+> +static int ssbd_prctl_set(struct task_struct *task, unsigned long ctrl)
+> +{
+> +	int state = arm64_get_ssbd_state();
+> +
+> +	/* Unsupported or already mitigated */
+> +	if (state == ARM64_SSBD_UNKNOWN)
+> +		return -EINVAL;
+> +	if (state == ARM64_SSBD_MITIGATED)
+> +		return -EPERM;
+
+I'm not sure this is the best thing to do. If the firmware says that the
+CPU is mitigated, we should probably return 0 for PR_SPEC_DISABLE but
+-EPERM for PR_SPEC_ENABLE (i.e. the part that doesn't work is disabling
+the mitigation).
+
+Will
