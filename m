@@ -1,107 +1,95 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v11 19/19] KVM: arm64: Invoke FPSIMD context switch trap from C
-Date: Thu, 24 May 2018 17:56:48 +0100
-Message-ID: <1527181008-13549-20-git-send-email-Dave.Martin@arm.com>
-References: <1527181008-13549-1-git-send-email-Dave.Martin@arm.com>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH 3/4] KVM: arm/arm64: Remove unnecessary CMOs when
+ creating HYP page tables
+Date: Thu, 24 May 2018 18:12:38 +0100
+Message-ID: <20180524171238.ni2hclcmhcfv7dpb@lakrids.cambridge.arm.com>
+References: <20180517103548.5622-1-marc.zyngier@arm.com>
+ <20180517103548.5622-4-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C0E0C4A10D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 May 2018 12:48:09 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QLqw+uXBvABl for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 May 2018 12:47:46 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CBD694A0D6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 May 2018 12:47:23 -0400 (EDT)
-In-Reply-To: <1527181008-13549-1-git-send-email-Dave.Martin@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
-Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <20180517103548.5622-4-marc.zyngier@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VGhlIGNvbnZlcnNpb24gb2YgdGhlIEZQU0lNRCBjb250ZXh0IHN3aXRjaCB0cmFwIGNvZGUgdG8g
-QyBoYXMgYWRkZWQKc29tZSBvdmVyaGVhZCB0byBjYWxsaW5nIGl0LCBkdWUgdG8gdGhlIG5lZWQg
-dG8gc2F2ZSByZWdpc3RlcnMgdGhhdAp0aGUgcHJvY2VkdXJlIGNhbGwgc3RhbmRhcmQgZGVmaW5l
-cyBhcyBjYWxsZXItc2F2ZWQuCgpTbywgcGVyaGFwcyBpdCBpcyBubyBsb25nZXIgd29ydGggaW52
-b2tpbmcgdGhpcyB0cmFwIGhhbmRsZXIgcXVpdGUKc28gZWFybHkuCgpJbnN0ZWFkLCB3ZSBjYW4g
-aW52b2tlIGl0IGZyb20gZml4dXBfZ3Vlc3RfZXhpdCgpLCB3aXRoIGxpdHRsZQpsaWtlbGlob29k
-IG9mIGluY3JlYXNpbmcgdGhlIG92ZXJoZWFkIG11Y2ggZnVydGhlci4KCkFzIGEgY29udmVuaWVu
-Y2UsIHRoaXMgcGF0Y2ggZ2l2ZXMgX19oeXBfc3dpdGNoX2Zwc2ltZCgpIHRoZSBzYW1lCnJldHVy
-biBzZW1hbnRpY3MgZml4dXBfZ3Vlc3RfZXhpdCgpLiAgRm9yIG5vdyB0aGVyZSBpcyBubwpwb3Nz
-aWJpbGl0eSBvZiBhIHNwdXJpb3VzIEZQU0lNRCB0cmFwLCBzbyB0aGUgZnVuY3Rpb24gYWx3YXlz
-CnJldHVybnMgdHJ1ZSwgYnV0IHRoaXMgYWxsb3dzIGl0IHRvIGJlIHRhaWwtY2FsbGVkIHdpdGgg
-YSBzaW5nbGUKcmV0dXJuIHN0YXRlbWVudC4KClNpZ25lZC1vZmYtYnk6IERhdmUgTWFydGluIDxE
-YXZlLk1hcnRpbkBhcm0uY29tPgpSZXZpZXdlZC1ieTogTWFyYyBaeW5naWVyIDxtYXJjLnp5bmdp
-ZXJAYXJtLmNvbT4KUmV2aWV3ZWQtYnk6IENocmlzdG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRh
-bGxAYXJtLmNvbT4KUmV2aWV3ZWQtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJv
-Lm9yZz4KLS0tCiBhcmNoL2FybTY0L2t2bS9oeXAvZW50cnkuUyAgICAgfCAzMCAtLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0KIGFyY2gvYXJtNjQva3ZtL2h5cC9oeXAtZW50cnkuUyB8IDE5
-IC0tLS0tLS0tLS0tLS0tLS0tLS0KIGFyY2gvYXJtNjQva3ZtL2h5cC9zd2l0Y2guYyAgICB8IDE1
-ICsrKysrKysrKysrKystLQogMyBmaWxlcyBjaGFuZ2VkLCAxMyBpbnNlcnRpb25zKCspLCA1MSBk
-ZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS9oeXAvZW50cnkuUyBiL2Fy
-Y2gvYXJtNjQva3ZtL2h5cC9lbnRyeS5TCmluZGV4IDQwZjM0OWIuLmZhZDFlMTYgMTAwNjQ0Ci0t
-LSBhL2FyY2gvYXJtNjQva3ZtL2h5cC9lbnRyeS5TCisrKyBiL2FyY2gvYXJtNjQva3ZtL2h5cC9l
-bnRyeS5TCkBAIC0xNjYsMzMgKzE2NiwzIEBAIGFib3J0X2d1ZXN0X2V4aXRfZW5kOgogCW9ycgl4
-MCwgeDAsIHg1CiAxOglyZXQKIEVORFBST0MoX19ndWVzdF9leGl0KQotCi1FTlRSWShfX2Zwc2lt
-ZF9ndWVzdF9yZXN0b3JlKQotCS8vIHgwOiBlc3IKLQkvLyB4MTogdmNwdQotCS8vIHgyLXgyOSxs
-cjogdmNwdSByZWdzCi0JLy8gdmNwdSB4MC14MSBvbiB0aGUgc3RhY2sKLQlzdHAJeDIsIHgzLCBb
-c3AsICMtMTQ0XSEKLQlzdHAJeDQsIHg1LCBbc3AsICMxNl0KLQlzdHAJeDYsIHg3LCBbc3AsICMz
-Ml0KLQlzdHAJeDgsIHg5LCBbc3AsICM0OF0KLQlzdHAJeDEwLCB4MTEsIFtzcCwgIzY0XQotCXN0
-cAl4MTIsIHgxMywgW3NwLCAjODBdCi0Jc3RwCXgxNCwgeDE1LCBbc3AsICM5Nl0KLQlzdHAJeDE2
-LCB4MTcsIFtzcCwgIzExMl0KLQlzdHAJeDE4LCBsciwgW3NwLCAjMTI4XQotCi0JYmwJX19oeXBf
-c3dpdGNoX2Zwc2ltZAotCi0JbGRwCXg0LCB4NSwgW3NwLCAjMTZdCi0JbGRwCXg2LCB4NywgW3Nw
-LCAjMzJdCi0JbGRwCXg4LCB4OSwgW3NwLCAjNDhdCi0JbGRwCXgxMCwgeDExLCBbc3AsICM2NF0K
-LQlsZHAJeDEyLCB4MTMsIFtzcCwgIzgwXQotCWxkcAl4MTQsIHgxNSwgW3NwLCAjOTZdCi0JbGRw
-CXgxNiwgeDE3LCBbc3AsICMxMTJdCi0JbGRwCXgxOCwgbHIsIFtzcCwgIzEyOF0KLQlsZHAJeDAs
-IHgxLCBbc3AsICMxNDRdCi0JbGRwCXgyLCB4MywgW3NwXSwgIzE2MAotCWVyZXQKLUVORFBST0Mo
-X19mcHNpbWRfZ3Vlc3RfcmVzdG9yZSkKZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL2h5cC9o
-eXAtZW50cnkuUyBiL2FyY2gvYXJtNjQva3ZtL2h5cC9oeXAtZW50cnkuUwppbmRleCBiZmZlY2Uy
-Li43NTNiOWQyIDEwMDY0NAotLS0gYS9hcmNoL2FybTY0L2t2bS9oeXAvaHlwLWVudHJ5LlMKKysr
-IGIvYXJjaC9hcm02NC9rdm0vaHlwL2h5cC1lbnRyeS5TCkBAIC0xMTMsMjUgKzExMyw2IEBAIGVs
-MV9odmNfZ3Vlc3Q6CiAKIGVsMV90cmFwOgogCWdldF92Y3B1X3B0cgl4MSwgeDAKLQotCW1ycwkJ
-eDAsIGVzcl9lbDIKLQlsc3IJCXgwLCB4MCwgI0VTUl9FTHhfRUNfU0hJRlQKLQkvKgotCSAqIHgw
-OiBFU1JfRUMKLQkgKiB4MTogdmNwdSBwb2ludGVyCi0JICovCi0KLQkvKgotCSAqIFdlIHRyYXAg
-dGhlIGZpcnN0IGFjY2VzcyB0byB0aGUgRlAvU0lNRCB0byBzYXZlIHRoZSBob3N0IGNvbnRleHQK
-LQkgKiBhbmQgcmVzdG9yZSB0aGUgZ3Vlc3QgY29udGV4dCBsYXppbHkuCi0JICogSWYgRlAvU0lN
-RCBpcyBub3QgaW1wbGVtZW50ZWQsIGhhbmRsZSB0aGUgdHJhcCBhbmQgaW5qZWN0IGFuCi0JICog
-dW5kZWZpbmVkIGluc3RydWN0aW9uIGV4Y2VwdGlvbiB0byB0aGUgZ3Vlc3QuCi0JICovCi1hbHRl
-cm5hdGl2ZV9pZl9ub3QgQVJNNjRfSEFTX05PX0ZQU0lNRAotCWNtcAl4MCwgI0VTUl9FTHhfRUNf
-RlBfQVNJTUQKLQliLmVxCV9fZnBzaW1kX2d1ZXN0X3Jlc3RvcmUKLWFsdGVybmF0aXZlX2Vsc2Vf
-bm9wX2VuZGlmCi0KIAltb3YJeDAsICNBUk1fRVhDRVBUSU9OX1RSQVAKIAliCV9fZ3Vlc3RfZXhp
-dAogCmRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS9oeXAvc3dpdGNoLmMgYi9hcmNoL2FybTY0
-L2t2bS9oeXAvc3dpdGNoLmMKaW5kZXggNGZiZWU5NS4uMmQ0NWJkNyAxMDA2NDQKLS0tIGEvYXJj
-aC9hcm02NC9rdm0vaHlwL3N3aXRjaC5jCisrKyBiL2FyY2gvYXJtNjQva3ZtL2h5cC9zd2l0Y2gu
-YwpAQCAtMzI4LDggKzMyOCw3IEBAIHN0YXRpYyBib29sIF9faHlwX3RleHQgX19za2lwX2luc3Ry
-KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKIAl9CiB9CiAKLXZvaWQgX19oeXBfdGV4dCBfX2h5cF9z
-d2l0Y2hfZnBzaW1kKHU2NCBlc3IgX19hbHdheXNfdW51c2VkLAotCQkJCSAgICBzdHJ1Y3Qga3Zt
-X3ZjcHUgKnZjcHUpCitzdGF0aWMgYm9vbCBfX2h5cF90ZXh0IF9faHlwX3N3aXRjaF9mcHNpbWQo
-c3RydWN0IGt2bV92Y3B1ICp2Y3B1KQogewogCXN0cnVjdCB1c2VyX2Zwc2ltZF9zdGF0ZSAqaG9z
-dF9mcHNpbWQgPSB2Y3B1LT5hcmNoLmhvc3RfZnBzaW1kX3N0YXRlOwogCkBAIC0zNjksNiArMzY4
-LDggQEAgdm9pZCBfX2h5cF90ZXh0IF9faHlwX3N3aXRjaF9mcHNpbWQodTY0IGVzciBfX2Fsd2F5
-c191bnVzZWQsCiAJCQkgICAgIGZwZXhjMzJfZWwyKTsKIAogCXZjcHUtPmFyY2guZmxhZ3MgfD0g
-S1ZNX0FSTTY0X0ZQX0VOQUJMRUQ7CisKKwlyZXR1cm4gdHJ1ZTsKIH0KIAogLyoKQEAgLTM5MCw2
-ICszOTEsMTYgQEAgc3RhdGljIGJvb2wgX19oeXBfdGV4dCBmaXh1cF9ndWVzdF9leGl0KHN0cnVj
-dCBrdm1fdmNwdSAqdmNwdSwgdTY0ICpleGl0X2NvZGUpCiAJaWYgKCpleGl0X2NvZGUgIT0gQVJN
-X0VYQ0VQVElPTl9UUkFQKQogCQlnb3RvIGV4aXQ7CiAKKwkvKgorCSAqIFdlIHRyYXAgdGhlIGZp
-cnN0IGFjY2VzcyB0byB0aGUgRlAvU0lNRCB0byBzYXZlIHRoZSBob3N0IGNvbnRleHQKKwkgKiBh
-bmQgcmVzdG9yZSB0aGUgZ3Vlc3QgY29udGV4dCBsYXppbHkuCisJICogSWYgRlAvU0lNRCBpcyBu
-b3QgaW1wbGVtZW50ZWQsIGhhbmRsZSB0aGUgdHJhcCBhbmQgaW5qZWN0IGFuCisJICogdW5kZWZp
-bmVkIGluc3RydWN0aW9uIGV4Y2VwdGlvbiB0byB0aGUgZ3Vlc3QuCisJICovCisJaWYgKHN5c3Rl
-bV9zdXBwb3J0c19mcHNpbWQoKSAmJgorCSAgICBrdm1fdmNwdV90cmFwX2dldF9jbGFzcyh2Y3B1
-KSA9PSBFU1JfRUx4X0VDX0ZQX0FTSU1EKQorCQlyZXR1cm4gX19oeXBfc3dpdGNoX2Zwc2ltZCh2
-Y3B1KTsKKwogCWlmICghX19wb3B1bGF0ZV9mYXVsdF9pbmZvKHZjcHUpKQogCQlyZXR1cm4gdHJ1
-ZTsKIAotLSAKMi4xLjQKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpo
-dHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+On Thu, May 17, 2018 at 11:35:47AM +0100, Marc Zyngier wrote:
+> There is no need to perform cache maintenance operations when
+> creating the HYP page tables if we have the multiprocessing
+> extensions. ARMv7 mandates them with the virtualization support,
+> and ARMv8 just mandates them unconditionally.
+> 
+> Let's remove these operations.
+> 
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  virt/kvm/arm/mmu.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> index ba66bf7ae299..acbfea09578c 100644
+> --- a/virt/kvm/arm/mmu.c
+> +++ b/virt/kvm/arm/mmu.c
+> @@ -578,7 +578,6 @@ static void create_hyp_pte_mappings(pmd_t *pmd, unsigned long start,
+>  		pte = pte_offset_kernel(pmd, addr);
+>  		kvm_set_pte(pte, pfn_pte(pfn, prot));
+>  		get_page(virt_to_page(pte));
+> -		kvm_flush_dcache_to_poc(pte, sizeof(*pte));
+>  		pfn++;
+>  	} while (addr += PAGE_SIZE, addr != end);
+>  }
+> @@ -605,7 +604,6 @@ static int create_hyp_pmd_mappings(pud_t *pud, unsigned long start,
+>  			}
+>  			pmd_populate_kernel(NULL, pmd, pte);
+>  			get_page(virt_to_page(pmd));
+> -			kvm_flush_dcache_to_poc(pmd, sizeof(*pmd));
+>  		}
+>  
+>  		next = pmd_addr_end(addr, end);
+> @@ -638,7 +636,6 @@ static int create_hyp_pud_mappings(pgd_t *pgd, unsigned long start,
+>  			}
+>  			pud_populate(NULL, pud, pmd);
+>  			get_page(virt_to_page(pud));
+> -			kvm_flush_dcache_to_poc(pud, sizeof(*pud));
+>  		}
+>  
+>  		next = pud_addr_end(addr, end);
+> @@ -675,7 +672,6 @@ static int __create_hyp_mappings(pgd_t *pgdp, unsigned long ptrs_per_pgd,
+>  			}
+>  			pgd_populate(NULL, pgd, pud);
+>  			get_page(virt_to_page(pgd));
+> -			kvm_flush_dcache_to_poc(pgd, sizeof(*pgd));
+>  		}
+>  
+>  		next = pgd_addr_end(addr, end);
+> @@ -685,6 +681,7 @@ static int __create_hyp_mappings(pgd_t *pgdp, unsigned long ptrs_per_pgd,
+>  		pfn += (next - addr) >> PAGE_SHIFT;
+>  	} while (addr = next, addr != end);
+>  out:
+> +	dsb(ishst);
+
+I think you need a dsb(ishst) wherever you had a
+kvm_flush_dcache_to_poc() previously.
+
+Otherwise, the page table walker could see stale values. e.g. after you
+update a bunch of PTE entries and point a PMD entry at those, the PTW
+could see the updated PMD entry, but see stale PTE entries, which could
+be garbage.
+
+That said, I think for ensuring the *order* those become visible in, you
+only need a dmb(ishst), and the ensure they *are visible* you need a
+DSB(ISHST) at the end.
+
+Thanks,
+Mark.
