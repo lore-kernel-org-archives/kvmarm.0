@@ -1,96 +1,121 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 05/14] arm64: Add 'ssbd' command-line option
-Date: Thu, 24 May 2018 12:52:48 +0100
-Message-ID: <c5d4566b-d1de-d16b-a21a-d20ff8224620@arm.com>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH 08/14] arm64: ssbd: Disable mitigation on CPU resume if
+ required by user
+Date: Thu, 24 May 2018 12:55:38 +0100
+Message-ID: <20180524115538.iq2rfntxyfqmskom@lakrids.cambridge.arm.com>
 References: <20180522150648.28297-1-marc.zyngier@arm.com>
- <20180522150648.28297-6-marc.zyngier@arm.com>
- <20180524114031.ehtumruiyuu4z2oo@lakrids.cambridge.arm.com>
+ <20180522150648.28297-9-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180524114031.ehtumruiyuu4z2oo@lakrids.cambridge.arm.com>
-Content-Language: en-GB
+Content-Disposition: inline
+In-Reply-To: <20180522150648.28297-9-marc.zyngier@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Thomas Gleixner <tglx@linutronix.de>, Andy Lutomirski <luto@kernel.org>, Kees Cook <keescook@chromium.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Christoffer Dall <christoffer.dall@arm.com>
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Kees Cook <keescook@chromium.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Andy Lutomirski <luto@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 24/05/18 12:40, Mark Rutland wrote:
-> On Tue, May 22, 2018 at 04:06:39PM +0100, Marc Zyngier wrote:
->> On a system where the firmware implements ARCH_WORKAROUND_2,
->> it may be useful to either permanently enable or disable the
->> workaround for cases where the user decides that they'd rather
->> not get a trap overhead, and keep the mitigation permanently
->> on or off instead of switching it on exception entry/exit.
->>
->> In any case, default to the mitigation being enabled.
->>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  Documentation/admin-guide/kernel-parameters.txt |  17 ++++
->>  arch/arm64/include/asm/cpufeature.h             |   6 ++
->>  arch/arm64/kernel/cpu_errata.c                  | 102 ++++++++++++++++++++----
->>  3 files changed, 109 insertions(+), 16 deletions(-)
->>
->> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
->> index f2040d46f095..646e112c6f63 100644
->> --- a/Documentation/admin-guide/kernel-parameters.txt
->> +++ b/Documentation/admin-guide/kernel-parameters.txt
->> @@ -4092,6 +4092,23 @@
->>  			expediting.  Set to zero to disable automatic
->>  			expediting.
->>  
->> +	ssbd=		[ARM64,HW]
->> +			Speculative Store Bypass Disable control
->> +
->> +			On CPUs that are vulnerable to the Speculative
->> +			Store Bypass vulnerability and offer a
->> +			firmware based mitigation, this parameter
->> +			indicates how the mitigation should be used:
->> +
->> +			force-on:  Unconditionnaly enable mitigation for
->> +				   for both kernel and userspace
->> +			force-off: Unconditionnaly disable mitigation for
->> +				   for both kernel and userspace
->> +			kernel:    Always enable mitigation in the
->> +				   kernel, and offer a prctl interface
->> +				   to allow userspace to register its
->> +				   interest in being mitigated too.
->> +
->>  	stack_guard_gap=	[MM]
->>  			override the default stack gap protection. The value
->>  			is in page units and it defines how many pages prior
->> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
->> index 09b0f2a80c8f..9bc548e22784 100644
->> --- a/arch/arm64/include/asm/cpufeature.h
->> +++ b/arch/arm64/include/asm/cpufeature.h
->> @@ -537,6 +537,12 @@ static inline u64 read_zcr_features(void)
->>  	return zcr;
->>  }
->>  
->> +#define ARM64_SSBD_UNKNOWN		-1
->> +#define ARM64_SSBD_FORCE_DISABLE	0
->> +#define ARM64_SSBD_EL1_ENTRY		1
+On Tue, May 22, 2018 at 04:06:42PM +0100, Marc Zyngier wrote:
+> On a system where firmware can dynamically change the state of the
+> mitigation, the CPU will always come up with the mitigation enabled,
+> including when coming back from suspend.
 > 
-> The EL1_ENTRY part of the name is a bit misleading, since this doesn't
-> apply to EL1->EL1 exceptions (and as with many other bits of the arm64
-> code, it's arguably misleading in the VHE case).
+> If the user has requested "no mitigation" via a command line option,
+> let's enforce it by calling into the firmware again to disable it.
 > 
-> Perhaps ARM64_SSBD_KERNEL, which would align with the parameter name?
-
-I was just waiting for someone to sort out the naming for me, thanks for
-falling into that trap! ;-)
-
-I'll update that.
-
-> Not a big deal either way, and otherwise this looks good to me.
-> Regardless:
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm64/include/asm/cpufeature.h | 6 ++++++
+>  arch/arm64/kernel/cpu_errata.c      | 8 ++++----
+>  arch/arm64/kernel/suspend.c         | 8 ++++++++
+>  3 files changed, 18 insertions(+), 4 deletions(-)
 > 
-> Reviewed-by: Mark Rutland <mark.rutland@arm.com>
+> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> index 1bacdf57f0af..d9dcb683259e 100644
+> --- a/arch/arm64/include/asm/cpufeature.h
+> +++ b/arch/arm64/include/asm/cpufeature.h
+> @@ -553,6 +553,12 @@ static inline int arm64_get_ssbd_state(void)
+>  #endif
+>  }
+>  
+> +#ifdef CONFIG_ARM64_SSBD
+> +void arm64_set_ssbd_mitigation(bool state);
+> +#else
+> +static inline void arm64_set_ssbd_mitigation(bool state) {}
+> +#endif
+> +
+>  #endif /* __ASSEMBLY__ */
+>  
+>  #endif
+> diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
+> index 8f686f39b9c1..b4c12e9140f0 100644
+> --- a/arch/arm64/kernel/cpu_errata.c
+> +++ b/arch/arm64/kernel/cpu_errata.c
+> @@ -297,7 +297,7 @@ void __init arm64_enable_wa2_handling(struct alt_instr *alt,
+>  		*updptr = cpu_to_le32(aarch64_insn_gen_nop());
+>  }
+>  
+> -static void do_ssbd(bool state)
+> +void arm64_set_ssbd_mitigation(bool state)
+
+Using this name from the outset would be nice, if you're happy to fold
+that earlier in the seires. Not a big deal either way.
+
+>  {
+>  	switch (psci_ops.conduit) {
+>  	case PSCI_CONDUIT_HVC:
+> @@ -371,20 +371,20 @@ static bool has_ssbd_mitigation(const struct arm64_cpu_capabilities *entry,
+>  	switch (ssbd_state) {
+>  	case ARM64_SSBD_FORCE_DISABLE:
+>  		pr_info_once("%s disabled from command-line\n", entry->desc);
+> -		do_ssbd(false);
+> +		arm64_set_ssbd_mitigation(false);
+>  		required = false;
+>  		break;
+>  
+>  	case ARM64_SSBD_EL1_ENTRY:
+>  		if (required) {
+>  			__this_cpu_write(arm64_ssbd_callback_required, 1);
+> -			do_ssbd(true);
+> +			arm64_set_ssbd_mitigation(true);
+>  		}
+>  		break;
+>  
+>  	case ARM64_SSBD_FORCE_ENABLE:
+>  		pr_info_once("%s forced from command-line\n", entry->desc);
+> -		do_ssbd(true);
+> +		arm64_set_ssbd_mitigation(true);
+>  		required = true;
+>  		break;
+>  
+> diff --git a/arch/arm64/kernel/suspend.c b/arch/arm64/kernel/suspend.c
+> index a307b9e13392..70c283368b64 100644
+> --- a/arch/arm64/kernel/suspend.c
+> +++ b/arch/arm64/kernel/suspend.c
+> @@ -62,6 +62,14 @@ void notrace __cpu_suspend_exit(void)
+>  	 */
+>  	if (hw_breakpoint_restore)
+>  		hw_breakpoint_restore(cpu);
+> +
+> +	/*
+> +	 * On resume, firmware implementing dynamic mitigation will
+> +	 * have turned the mitigation on. If the user has forcefully
+> +	 * disabled it, make sure their wishes are obeyed.
+> +	 */
+> +	if (arm64_get_ssbd_state() == ARM64_SSBD_FORCE_DISABLE)
+> +		arm64_set_ssbd_mitigation(false);
+>  }
+
+This looks fine for idle and suspend-to-ram, so:
+
+Reviewed-by: Mark Rutland <mark.rutland@arm.com>
+
+However, for suspend-to-disk (i.e hibernate), the kernel doing the
+resume might have SSBD force-disabled, while this kernel (which has just
+been resumed) wants it enabled.
+
+I think we also need something in swsusp_arch_suspend(), right after the
+call to __cpu_suspend_exit() to re-enable that.
 
 Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Mark.
