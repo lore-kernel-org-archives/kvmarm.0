@@ -1,18 +1,12 @@
 From: Russell King - ARM Linux <linux@armlinux.org.uk>
-Subject: Re: [PATCH 03/14] ARM: bugs: hook processor bug checking into SMP
- and suspend paths
-Date: Fri, 25 May 2018 12:31:39 +0100
-Message-ID: <20180525113139.GD17671@n2100.armlinux.org.uk>
-References: <20180521114238.GN17671@n2100.armlinux.org.uk>
- <E1fKjEx-00063Y-N5@rmk-PC.armlinux.org.uk>
- <b454e37c-52a8-387f-3649-8ce72c9a5b18@gmail.com>
- <20180525100359.GC17671@n2100.armlinux.org.uk>
+Subject: [PATCH v3 00/15] ARM Spectre variant 2 fixes
+Date: Fri, 25 May 2018 14:59:39 +0100
+Message-ID: <20180525135938.GE17671@n2100.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <20180525100359.GC17671@n2100.armlinux.org.uk>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -22,61 +16,154 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Florian Fainelli <f.fainelli@gmail.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+To: linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, May 25, 2018 at 11:03:59AM +0100, Russell King - ARM Linux wrote:
-> On Thu, May 24, 2018 at 04:30:40PM -0700, Florian Fainelli wrote:
-> > On 05/21/2018 04:44 AM, Russell King wrote:
-> > > Check for CPU bugs when secondary processors are being brought online,
-> > > and also when CPUs are resuming from a low power mode.  This gives an
-> > > opportunity to check that processor specific bug workarounds are
-> > > correctly enabled for all paths that a CPU re-enters the kernel.
-> > > 
-> > > Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
-> > > Reviewed-by: Florian Fainelli <f.fainelli@gmail.com>
-> > 
-> > Something I missed, is that this correctly warns about e.g: missing the
-> > IBE bit for secondary cores, but it seems to be missing it for the boot CPU:
+Third version:
+- Remove "PSCI" from the SMC version of the workaround as well.
+- Avoid reporting active workaround if the IBE bit is not set.
+- Only probe for workaround_1 on Cortex A57 and A72, or non-ARM CPUs.
+- Require features probe for workaround_1 to return zero.
+- Validation that all CPUs in the system have the same workaround status.
+- Avoid corrupting r12 in workaround_1 KVM hypervisor implementation.
+
+ arch/arm/include/asm/bugs.h        |   6 +-
+ arch/arm/include/asm/cp15.h        |   3 +
+ arch/arm/include/asm/cputype.h     |   8 ++
+ arch/arm/include/asm/kvm_asm.h     |   2 -
+ arch/arm/include/asm/kvm_host.h    |  14 ++-
+ arch/arm/include/asm/kvm_mmu.h     |  23 ++++-
+ arch/arm/include/asm/proc-fns.h    |   4 +
+ arch/arm/include/asm/system_misc.h |  15 ++++
+ arch/arm/kernel/Makefile           |   1 +
+ arch/arm/kernel/bugs.c             |  18 ++++
+ arch/arm/kernel/smp.c              |   4 +
+ arch/arm/kernel/suspend.c          |   2 +
+ arch/arm/kvm/hyp/hyp-entry.S       | 112 +++++++++++++++++++++++-
+ arch/arm/mm/Kconfig                |  23 +++++
+ arch/arm/mm/Makefile               |   2 +-
+ arch/arm/mm/fault.c                |   3 +
+ arch/arm/mm/proc-macros.S          |   3 +-
+ arch/arm/mm/proc-v7-2level.S       |   6 --
+ arch/arm/mm/proc-v7-bugs.c         | 170 +++++++++++++++++++++++++++++++++++++
+ arch/arm/mm/proc-v7.S              | 154 ++++++++++++++++++++++++++-------
+ 20 files changed, 523 insertions(+), 50 deletions(-)
+ create mode 100644 arch/arm/kernel/bugs.c
+ create mode 100644 arch/arm/mm/proc-v7-bugs.c
+
+On Mon, May 21, 2018 at 12:42:38PM +0100, Russell King - ARM Linux wrote:
+> This is the second posting - the original cover note is below.  Comments
+> from previous series addresesd:
+> - Drop R7 and R8 changes.
+> - Remove "PSCI" from the hypervisor version of the workaround.
 > 
-> Are you sure that the boot CPU has the IBE bit clear?
-
-Here's what I get on TI Keystone 2, which doesn't set the IBE bit for
-any CPU:
-
-CPU: Testing write buffer coherency: ok
-CPU0: Spectre v2: firmware did not set auxiliary control register IBE bit, system vulnerable
-CPU0: Spectre v2: using ICIALLU workaround
-/cpus/cpu@0 missing clock-frequency property
-/cpus/cpu@1 missing clock-frequency property
-/cpus/cpu@2 missing clock-frequency property
-/cpus/cpu@3 missing clock-frequency property
-CPU0: thread -1, cpu 0, socket 0, mpidr 80000000
-Setting up static identity map for 0x80008300 - 0x80008438
-Hierarchical SRCU implementation.
-smp: Bringing up secondary CPUs ...
-CPU1: thread -1, cpu 1, socket 0, mpidr 80000001
-CPU1: Spectre v2: firmware did not set auxiliary control register IBE bit, system vulnerable
-CPU1: Spectre v2: using ICIALLU workaround
-CPU2: thread -1, cpu 2, socket 0, mpidr 80000002
-CPU2: Spectre v2: firmware did not set auxiliary control register IBE bit, system vulnerable
-CPU2: Spectre v2: using ICIALLU workaround
-CPU3: thread -1, cpu 3, socket 0, mpidr 80000003
-CPU3: Spectre v2: firmware did not set auxiliary control register IBE bit, system vulnerable
-CPU3: Spectre v2: using ICIALLU workaround
-
-It should be noted that, if we implement a "bugs" bit exported to
-userspace (as I think someone requested) that booting on a system
-where only the boot CPU initially comes up (which has the IBE bit
-set) and then bringing the secondary CPUs online after userspace
-has started (where those CPUs don't have the IBE bit set) will
-result in the system initially not being vulnerable, but then
-becoming vulnerable when running on those other CPUs.
-
-If the bugs bit had already been checked by userspace, then it would
-think that there's no system level vulnerability.  Userspace would
-need to check the status each time a CPU comes online.
+>  arch/arm/include/asm/bugs.h        |   6 +-
+>  arch/arm/include/asm/cp15.h        |   3 +
+>  arch/arm/include/asm/cputype.h     |   5 ++
+>  arch/arm/include/asm/kvm_asm.h     |   2 -
+>  arch/arm/include/asm/kvm_host.h    |  14 +++-
+>  arch/arm/include/asm/kvm_mmu.h     |  23 +++++-
+>  arch/arm/include/asm/proc-fns.h    |   4 +
+>  arch/arm/include/asm/system_misc.h |   8 ++
+>  arch/arm/kernel/Makefile           |   1 +
+>  arch/arm/kernel/bugs.c             |  18 +++++
+>  arch/arm/kernel/smp.c              |   4 +
+>  arch/arm/kernel/suspend.c          |   2 +
+>  arch/arm/kvm/hyp/hyp-entry.S       | 108 +++++++++++++++++++++++++-
+>  arch/arm/mm/Kconfig                |  23 ++++++
+>  arch/arm/mm/Makefile               |   2 +-
+>  arch/arm/mm/fault.c                |   3 +
+>  arch/arm/mm/proc-macros.S          |   3 +-
+>  arch/arm/mm/proc-v7-2level.S       |   6 --
+>  arch/arm/mm/proc-v7-bugs.c         | 130 +++++++++++++++++++++++++++++++
+>  arch/arm/mm/proc-v7.S              | 154 +++++++++++++++++++++++++++++--------
+>  20 files changed, 469 insertions(+), 50 deletions(-)
+>  create mode 100644 arch/arm/kernel/bugs.c
+>  create mode 100644 arch/arm/mm/proc-v7-bugs.c
+> 
+> On Wed, May 16, 2018 at 11:59:49AM +0100, Russell King - ARM Linux wrote:
+> > This series addresses the Spectre variant 2 issues on ARM Cortex and
+> > Broadcom Brahma B15 CPUs.  Due to the complexity of the bug, it is not
+> > possible to verify that this series fixes any of the bugs, since it
+> > has not been able to reproduce these exact scenarios using test
+> > programs.
+> > 
+> > I believe that this covers the entire extent of the Spectre variant 2
+> > issues, with the exception of Cortex A53 and Cortex A72 processors as
+> > these require a substantially more complex solution (except where the
+> > workaround is implemented in PSCI firmware.)
+> > 
+> > Spectre variant 1 is not covered by this series.
+> > 
+> > The patch series is based partly on Marc Zyngier's work from February -
+> > two of the KVM patches are from Marc's work.
+> > 
+> > The main differences are:
+> > - Inclusion of more processors as per current ARM Ltd security update
+> >   documentation.
+> > - Extension of "bugs" infrastructure to detect Cortex A8 and Cortex A15
+> >   CPUs missing out on the IBE bit being set on (re-)entry to the kernel
+> >   through all paths.
+> > - Handle all suspect userspace-touching-kernelspace aborts irrespective
+> >   of mapping type.
+> > 
+> > The first patch will trivially conflict with the Broadcom Brahma
+> > updates already in arm-soc - it has been necessary to independently
+> > add the ID definitions for the B15 CPU.
+> > 
+> > Having worked through this series, I'm of the opinion that the
+> > define_processor_functions macro in proc-v7 are probably  more hassle
+> > than they're worth - here, we don't need the global equivalent symbols,
+> > because we never refer to them from the kernel code for any V7
+> > processor (MULTI_CPU is always defined.)
+> > 
+> > This series is currently in my "spectre" branch (along with some
+> > Spectre variant 1 patches.)
+> > 
+> > Please carefully review.
+> > 
+> >  arch/arm/include/asm/bugs.h        |   6 +-
+> >  arch/arm/include/asm/cp15.h        |   3 +
+> >  arch/arm/include/asm/cputype.h     |   5 ++
+> >  arch/arm/include/asm/kvm_asm.h     |   2 -
+> >  arch/arm/include/asm/kvm_host.h    |  14 +++-
+> >  arch/arm/include/asm/kvm_mmu.h     |  23 +++++-
+> >  arch/arm/include/asm/proc-fns.h    |   4 +
+> >  arch/arm/include/asm/system_misc.h |   8 ++
+> >  arch/arm/kernel/Makefile           |   1 +
+> >  arch/arm/kernel/bugs.c             |  18 +++++
+> >  arch/arm/kernel/smp.c              |   4 +
+> >  arch/arm/kernel/suspend.c          |   2 +
+> >  arch/arm/kvm/hyp/hyp-entry.S       | 108 ++++++++++++++++++++++++-
+> >  arch/arm/mm/Kconfig                |  23 ++++++
+> >  arch/arm/mm/Makefile               |   2 +-
+> >  arch/arm/mm/fault.c                |   3 +
+> >  arch/arm/mm/proc-macros.S          |   3 +-
+> >  arch/arm/mm/proc-v7-2level.S       |   6 --
+> >  arch/arm/mm/proc-v7-bugs.c         | 130 ++++++++++++++++++++++++++++++
+> >  arch/arm/mm/proc-v7.S              | 158 +++++++++++++++++++++++++++++--------
+> >  20 files changed, 471 insertions(+), 52 deletions(-)
+> > 
+> > -- 
+> > RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+> > FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
+> > According to speedtest.net: 8.21Mbps down 510kbps up
+> > 
+> > _______________________________________________
+> > linux-arm-kernel mailing list
+> > linux-arm-kernel@lists.infradead.org
+> > http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+> 
+> -- 
+> RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+> FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
+> According to speedtest.net: 8.21Mbps down 510kbps up
+> 
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
 
 -- 
 RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
