@@ -1,59 +1,48 @@
 From: Tony Lindgren <tony@atomide.com>
-Subject: Re: [PATCH v3 08/15] ARM: spectre-v2: harden user aborts in kernel
- space
-Date: Fri, 25 May 2018 09:15:55 -0700
-Message-ID: <20180525161555.GD98604@atomide.com>
+Subject: Re: [PATCH v3 00/15] ARM Spectre variant 2 fixes
+Date: Fri, 25 May 2018 09:25:34 -0700
+Message-ID: <20180525162534.GE98604@atomide.com>
 References: <20180525135938.GE17671@n2100.armlinux.org.uk>
- <E1fMDHD-00073Q-Ob@rmk-PC.armlinux.org.uk>
- <20180525154742.GA77025@atomide.com>
- <20180525155207.GF17671@n2100.armlinux.org.uk>
- <20180525160119.GC98604@atomide.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 473BF49F8C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 May 2018 12:15:14 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id dxt4KR06SzUn for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 25 May 2018 12:14:52 -0400 (EDT)
+Received: from muru.com (muru.com [72.249.23.125])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6658849F8B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 May 2018 12:14:52 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <20180525160119.GC98604@atomide.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+In-Reply-To: <20180525135938.GE17671@n2100.armlinux.org.uk>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Russell King - ARM Linux <linux@armlinux.org.uk>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, Christoffer Dall <christoffer.dall@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-* Tony Lindgren <tony@atomide.com> [180525 16:04]:
-> * Russell King - ARM Linux <linux@armlinux.org.uk> [180525 15:54]:
-> > On Fri, May 25, 2018 at 08:47:42AM -0700, Tony Lindgren wrote:
-> > > We can now get this with the whole series applied:
-> > > 
-> > > CPU0: Spectre v2: firmware did not set auxiliary control register
-> > > IBE bit, system vulnerable
-> > > CPU: Spectre v2: using ICIALLU workaround
-> > > 
-> > > So maybe change the wording from "using %s workaround" to
-> > > "chosen workaround %s"?
-> > > 
-> > > Or I guess disabling the pr_info when not functional can
-> > > be done in the later patches based on some variable set
-> > > by check_spectre_auxcr() would be doable too.
-> > 
-> > You should not be getting both messages.  It looks like you're using
-> > an older series - I assumed you pulled my git tree rather than the
-> > patches?  The public git tree isn't up to date with these changes.
-> 
-> Yes I just fetched your git tree because it allows using
-> git mergetool because of the conflicts with next. I'll apply
-> manually and test again.
+* Russell King - ARM Linux <linux@armlinux.org.uk> [180525 07:02]:
+> Third version:
+> - Remove "PSCI" from the SMC version of the workaround as well.
+> - Avoid reporting active workaround if the IBE bit is not set.
+> - Only probe for workaround_1 on Cortex A57 and A72, or non-ARM CPUs.
+> - Require features probe for workaround_1 to return zero.
+> - Validation that all CPUs in the system have the same workaround status.
+> - Avoid corrupting r12 in workaround_1 KVM hypervisor implementation.
 
-And testing with the correct patches in the $subject series
-makes the issue go away.
+Looks good to me and things still work for me. I don't really
+want to count that as Tested-by though :) But feel free to add:
 
-Regards,
-
-Tony
+Boot-tested-by: Tony Lindgren <tony@atomide.com>
+Reviewed-by: Tony Lindgren <tony@atomide.com>
