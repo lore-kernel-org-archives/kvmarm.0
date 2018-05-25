@@ -1,23 +1,18 @@
-From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH v10 07/18] arm64: fpsimd: Eliminate task->mm checks
-Date: Fri, 25 May 2018 13:28:49 +0200
-Message-ID: <20180525112849.GA56636@C02W217FHV2R.local>
-References: <20180523114812.GH55598@C02W217FHV2R.local>
- <20180523133158.GJ13470@e103592.cambridge.arm.com>
- <20180523145657.g7b6v2q2vxfqpoc4@armageddon.cambridge.arm.com>
- <20180523150337.GO13470@e103592.cambridge.arm.com>
- <20180524083350.GK55598@C02W217FHV2R.local>
- <20180524095056.GR13470@e103592.cambridge.arm.com>
- <20180524100659.GO55598@C02W217FHV2R.local>
- <20180524143714.GV13470@e103592.cambridge.arm.com>
- <20180525090020.GA54529@C02W217FHV2R.local>
- <20180525094515.GA13470@e103592.cambridge.arm.com>
+From: Russell King - ARM Linux <linux@armlinux.org.uk>
+Subject: Re: [PATCH 03/14] ARM: bugs: hook processor bug checking into SMP
+ and suspend paths
+Date: Fri, 25 May 2018 12:31:39 +0100
+Message-ID: <20180525113139.GD17671@n2100.armlinux.org.uk>
+References: <20180521114238.GN17671@n2100.armlinux.org.uk>
+ <E1fKjEx-00063Y-N5@rmk-PC.armlinux.org.uk>
+ <b454e37c-52a8-387f-3649-8ce72c9a5b18@gmail.com>
+ <20180525100359.GC17671@n2100.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <20180525094515.GA13470@e103592.cambridge.arm.com>
+In-Reply-To: <20180525100359.GC17671@n2100.armlinux.org.uk>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -27,142 +22,63 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Florian Fainelli <f.fainelli@gmail.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, May 25, 2018 at 10:45:17AM +0100, Dave Martin wrote:
-> On Fri, May 25, 2018 at 11:00:20AM +0200, Christoffer Dall wrote:
-> > On Thu, May 24, 2018 at 03:37:15PM +0100, Dave Martin wrote:
-> > > On Thu, May 24, 2018 at 12:06:59PM +0200, Christoffer Dall wrote:
-> > > > On Thu, May 24, 2018 at 10:50:56AM +0100, Dave Martin wrote:
-> 
-> [...]
-> 
-> > > > I'm not sure what the reader is to make of that.  Do you not mean the
-> > > > TIF_FOREIGN_FPSTATE is always true for kernel threads?
+On Fri, May 25, 2018 at 11:03:59AM +0100, Russell King - ARM Linux wrote:
+> On Thu, May 24, 2018 at 04:30:40PM -0700, Florian Fainelli wrote:
+> > On 05/21/2018 04:44 AM, Russell King wrote:
+> > > Check for CPU bugs when secondary processors are being brought online,
+> > > and also when CPUs are resuming from a low power mode.  This gives an
+> > > opportunity to check that processor specific bug workarounds are
+> > > correctly enabled for all paths that a CPU re-enters the kernel.
 > > > 
-> > > Again, this is probably a red herring.  TIF_FOREIGN_FPSTATE is always
-> > > true for kernel threads prior to the patch, except (randomly) for the
-> > > init task.
+> > > Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
+> > > Reviewed-by: Florian Fainelli <f.fainelli@gmail.com>
 > > 
-> > That was really what my initial question was about, and what I thought
-> > the commit message should make abundantly clear, because that ties the
-> > message together with the code.
-> > 
-> > > 
-> > > This change is not really about TIF_FOREIGN_FPSTATE at all, rather
-> > > that there is nothing to justify handling kernel threads differently,
-> > > or even distinguishing kernel threads from user threads at all in this
-> > > code.
-> > 
-> > Understood.
+> > Something I missed, is that this correctly warns about e.g: missing the
+> > IBE bit for secondary cores, but it seems to be missing it for the boot CPU:
 > 
-> And my bad was that I hadn't gone to the effort of understanding my own
-> argument -- I'd glad to be called out on that.
-> 
-> > > Part of the confusion (and I had confused myself) comes from the fact
-> > > that TIF_FOREIGN_FPSTATE is really a per-cpu property and doesn't make
-> > > sense as a per-task property -- i.e., the flag is meaningless for
-> > > scheduled-out tasks and we must explicitly "repair" it when scheduling
-> > > a task in anyway.  I think it's a thread flag primarily so that it's
-> > > convenient to check alongside other thread flags in the ret_to_user
-> > > work loop.  This is somewhat less of a justification now that loop was
-> > > ported to C.
-> > > 
-> > > > > 
-> > > > > The context switch logic is already deliberately optimised to defer
-> > > > > reloads of the regs until ret_to_user (or sigreturn as a special
-> > > > > case), and save them only if they have been previously loaded.
-> > > 
-> > > Does it help to insert the following here?
-> > > 
-> > > "These paths are the only places where the wrong_task and wrong_cpu
-> > > conditions can be made false, by calling fpsimd_bind_task_to_cpu()."
-> > > 
-> > 
-> > yes it does.
-> > 
-> > > > > Kernel threads by definition never reach these paths.  As a result,
-> > > > 
-> > > > I'm struggling with the "As a result," here.  Is this because reloads of
-> > > > regs in ret_to_user (or sigreturn) are the only places that can make
-> > > > wrong_cpu or wrong_task be false?
-> > > 
-> > > See the proposed clarification above.  Is that sufficient?
-> > > 
-> > 
-> > yes.
-> > 
-> > > > (I'm actually wanting to understand this, not just bikeshedding the
-> > > > commit message, as new corner cases keep coming up on this logic.)
-> > > 
-> > > That's a good thing, and I would really like to explain it in a
-> > > concise manner.  See [*] below for the "concise" explanation -- it may
-> > > demonstrate why I've been evasive...
-> > > 
-> > 
-> > I don't think you've been evasive at all, I just think we reason about
-> > this in slightly different ways, and I was trying to convince myself why
-> > this change is safe and summarize that concisely.  I think we've
-> > accomplished both :)
-> 
-> OK, good.  I reposted speculatively on this basis :)
-> 
-> The commit message is in better shape now, and I very much appreciate
-> you kicking the tyres on my reasoning!
-> 
-> [...]
-> 
-> > > As an aside, the big wall of text before the definition of struct
-> > > fpsimd_last_state_struct is looking out of date and could use an
-> > > update to cover at least some of what is explained in [*] better.
-> > > 
-> > > I'm currently considering that out of scope for this series, but I will
-> > > keep it in mind to refresh it in the not too distant future.
-> > > 
-> > 
-> > Fine with me.
-> 
-> OK, good.
-> 
-> [...]
-> 
-> > > [*] The bigger picture:
-> > > 
-> > > * Consider a relation (C,T) between cpus C and tasks T, such that
-> 
-> [...]
-> 
-> > > but by assuming that the code is already well-optimised, "unnecessary"
-> > > save/restore work will not be added.  If this were not the case, it
-> > > could in any case be fixed independently.
-> > > 
-> > > The observation of this _series_ is that we don't need to do very
-> > > much in order to be able to generalise the logic to accept KVM vcpus
-> > > in place of T.
-> > > 
-> > 
-> > Thanks for the explanation.
-> > -Christoffer
-> 
-> Was this reasonably understandable?  If so I could use it as a basis for
-> improving the comment block in fpsimd.c, but I'd want to squash it down
-> to the essentials.  It's pretty verbose as it stands.
+> Are you sure that the boot CPU has the IBE bit clear?
 
-Yes, I think that's a resonable way forward.  The thing that I hadn't
-fully appreciated before is that you may have a valid relation (C,T)
-which you wish to invalidate whilst T may not be running on C at that
-particular time.
+Here's what I get on TI Keystone 2, which doesn't set the IBE bit for
+any CPU:
 
-> 
-> (What I'd really like to do it take an axe to the logic so that we
-> end up with something that doesn't require anything like this amount
-> of explanation ... but that's more of an aspiration right now.)
-> 
+CPU: Testing write buffer coherency: ok
+CPU0: Spectre v2: firmware did not set auxiliary control register IBE bit, system vulnerable
+CPU0: Spectre v2: using ICIALLU workaround
+/cpus/cpu@0 missing clock-frequency property
+/cpus/cpu@1 missing clock-frequency property
+/cpus/cpu@2 missing clock-frequency property
+/cpus/cpu@3 missing clock-frequency property
+CPU0: thread -1, cpu 0, socket 0, mpidr 80000000
+Setting up static identity map for 0x80008300 - 0x80008438
+Hierarchical SRCU implementation.
+smp: Bringing up secondary CPUs ...
+CPU1: thread -1, cpu 1, socket 0, mpidr 80000001
+CPU1: Spectre v2: firmware did not set auxiliary control register IBE bit, system vulnerable
+CPU1: Spectre v2: using ICIALLU workaround
+CPU2: thread -1, cpu 2, socket 0, mpidr 80000002
+CPU2: Spectre v2: firmware did not set auxiliary control register IBE bit, system vulnerable
+CPU2: Spectre v2: using ICIALLU workaround
+CPU3: thread -1, cpu 3, socket 0, mpidr 80000003
+CPU3: Spectre v2: firmware did not set auxiliary control register IBE bit, system vulnerable
+CPU3: Spectre v2: using ICIALLU workaround
 
-I'll be happy to review a potentially simplified design, should you come
-up with one at some point in the future.
+It should be noted that, if we implement a "bugs" bit exported to
+userspace (as I think someone requested) that booting on a system
+where only the boot CPU initially comes up (which has the IBE bit
+set) and then bringing the secondary CPUs online after userspace
+has started (where those CPUs don't have the IBE bit set) will
+result in the system initially not being vulnerable, but then
+becoming vulnerable when running on those other CPUs.
 
-Thanks,
--Christoffer
+If the bugs bit had already been checked by userspace, then it would
+think that there's no system level vulnerability.  Userspace would
+need to check the status each time a CPU comes online.
+
+-- 
+RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
+According to speedtest.net: 8.21Mbps down 510kbps up
