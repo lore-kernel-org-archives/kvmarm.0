@@ -1,23 +1,22 @@
 From: Russell King <rmk+kernel@armlinux.org.uk>
-Subject: [PATCH v3 07/15] ARM: spectre-v2: add Cortex A8 and A15 validation of
- the IBE bit
-Date: Fri, 25 May 2018 15:00:58 +0100
-Message-ID: <E1fMDH8-0006z0-K8@rmk-PC.armlinux.org.uk>
+Subject: [PATCH v3 09/15] ARM: spectre-v2: add firmware based hardening
+Date: Fri, 25 May 2018 15:01:08 +0100
+Message-ID: <E1fMDHI-00073X-Sa@rmk-PC.armlinux.org.uk>
 References: <20180525135938.GE17671@n2100.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C6234A103
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 May 2018 09:51:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 828B94A0FD
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 May 2018 09:52:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id W6b86U4zyQzh for <kvmarm@lists.cs.columbia.edu>;
- Fri, 25 May 2018 09:51:18 -0400 (EDT)
+ with ESMTP id kJ2EAO+L1LWb for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 25 May 2018 09:52:04 -0400 (EDT)
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 68BD54A108
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 May 2018 09:50:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 72DE04A0ED
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 May 2018 09:50:54 -0400 (EDT)
 In-Reply-To: <20180525135938.GE17671@n2100.armlinux.org.uk>
 Content-Disposition: inline
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
@@ -33,91 +32,159 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When the branch predictor hardening is enabled, firmware must have set
-the IBE bit in the auxiliary control register.  If this bit has not
-been set, the Spectre workarounds will not be functional.
-
-Add validation that this bit is set, and print a warning at alert level
-if this is not the case.
+Add firmware based hardening for cores that require more complex
+handling in firmware.
 
 Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
-Reviewed-by: Florian Fainelli <f.fainelli@gmail.com>
 ---
- arch/arm/mm/Makefile       |  2 +-
- arch/arm/mm/proc-v7-bugs.c | 29 +++++++++++++++++++++++++++++
- arch/arm/mm/proc-v7.S      |  4 ++--
- 3 files changed, 32 insertions(+), 3 deletions(-)
- create mode 100644 arch/arm/mm/proc-v7-bugs.c
+ arch/arm/mm/proc-v7-bugs.c | 64 +++++++++++++++++++++++++++++++++++++++++++++-
+ arch/arm/mm/proc-v7.S      | 21 +++++++++++++++
+ 2 files changed, 84 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm/mm/Makefile b/arch/arm/mm/Makefile
-index 9dbb84923e12..a0c40610210c 100644
---- a/arch/arm/mm/Makefile
-+++ b/arch/arm/mm/Makefile
-@@ -97,7 +97,7 @@ obj-$(CONFIG_CPU_MOHAWK)	+= proc-mohawk.o
- obj-$(CONFIG_CPU_FEROCEON)	+= proc-feroceon.o
- obj-$(CONFIG_CPU_V6)		+= proc-v6.o
- obj-$(CONFIG_CPU_V6K)		+= proc-v6.o
--obj-$(CONFIG_CPU_V7)		+= proc-v7.o
-+obj-$(CONFIG_CPU_V7)		+= proc-v7.o proc-v7-bugs.o
- obj-$(CONFIG_CPU_V7M)		+= proc-v7m.o
- 
- AFLAGS_proc-v6.o	:=-Wa,-march=armv6
 diff --git a/arch/arm/mm/proc-v7-bugs.c b/arch/arm/mm/proc-v7-bugs.c
-new file mode 100644
-index 000000000000..a32ce13479d9
---- /dev/null
+index 585b2b61d7d3..5e50b0d9354c 100644
+--- a/arch/arm/mm/proc-v7-bugs.c
 +++ b/arch/arm/mm/proc-v7-bugs.c
-@@ -0,0 +1,29 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <linux/kernel.h>
-+#include <linux/smp.h>
+@@ -1,14 +1,20 @@
+ // SPDX-License-Identifier: GPL-2.0
++#include <linux/arm-smccc.h>
+ #include <linux/kernel.h>
++#include <linux/psci.h>
+ #include <linux/smp.h>
+ 
+ #include <asm/cp15.h>
+ #include <asm/cputype.h>
++#include <asm/proc-fns.h>
+ #include <asm/system_misc.h>
+ 
+ #ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
+ DEFINE_PER_CPU(harden_branch_predictor_fn_t, harden_branch_predictor_fn);
+ 
++extern void cpu_v7_smc_switch_mm(phys_addr_t pgd_phys, struct mm_struct *mm);
++extern void cpu_v7_hvc_switch_mm(phys_addr_t pgd_phys, struct mm_struct *mm);
 +
-+static __maybe_unused void cpu_v7_check_auxcr_set(u32 mask, const char *msg)
+ static void harden_branch_predictor_bpiall(void)
+ {
+ 	write_sysreg(0, BPIALL);
+@@ -19,15 +25,27 @@ static void harden_branch_predictor_iciallu(void)
+ 	write_sysreg(0, ICIALLU);
+ }
+ 
++static void __maybe_unused call_smc_arch_workaround_1(void)
 +{
-+	u32 aux_cr;
-+
-+	asm("mrc p15, 0, %0, c1, c0, 1" : "=r" (aux_cr));
-+
-+	if ((aux_cr & mask) != mask)
-+		pr_err("CPU%u: %s", smp_processor_id(), msg);
++	arm_smccc_1_1_smc(ARM_SMCCC_ARCH_WORKAROUND_1, NULL);
 +}
 +
-+static void check_spectre_auxcr(u32 bit)
++static void __maybe_unused call_hvc_arch_workaround_1(void)
 +{
-+	if (IS_ENABLED(CONFIG_HARDEN_BRANCH_PREDICTOR))
-+		cpu_v7_check_auxcr_set(bit, "Spectre v2: firmware did not set auxiliary control register IBE bit, system vulnerable\n");
++	arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_WORKAROUND_1, NULL);
 +}
 +
-+void cpu_v7_ca8_ibe(void)
-+{
-+	check_spectre_auxcr(BIT(6));
-+}
+ static void cpu_v7_spectre_init(void)
+ {
+ 	const char *spectre_v2_method = NULL;
+ 	int cpu = smp_processor_id();
++	u32 cpuid;
+ 
+ 	if (per_cpu(harden_branch_predictor_fn, cpu))
+ 		return;
+ 
+-	switch (read_cpuid_part()) {
++	cpuid = read_cpuid_part();
++	switch (cpuid) {
+ 	case ARM_CPU_PART_CORTEX_A8:
+ 	case ARM_CPU_PART_CORTEX_A9:
+ 	case ARM_CPU_PART_CORTEX_A12:
+@@ -45,7 +63,51 @@ static void cpu_v7_spectre_init(void)
+ 			harden_branch_predictor_iciallu;
+ 		spectre_v2_method = "ICIALLU";
+ 		break;
 +
-+void cpu_v7_ca15_ibe(void)
-+{
-+	check_spectre_auxcr(BIT(0));
-+}
++#ifdef CONFIG_ARM_PSCI
++	default:
++		/* Other ARM CPUs require no workaround */
++		if (cpuid >> 24 == ARM_CPU_IMP_ARM)
++			break;
++		/* fallthrough */
++		/* Cortex A57/A72 require firmware workaround */
++	case ARM_CPU_PART_CORTEX_A57:
++	case ARM_CPU_PART_CORTEX_A72: {
++		struct arm_smccc_res res;
++
++		if (psci_ops.smccc_version == SMCCC_VERSION_1_0)
++			break;
++
++		switch (psci_ops.conduit) {
++		case PSCI_CONDUIT_HVC:
++			arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
++					  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
++			if ((int)res.a0 != 0)
++				break;
++			per_cpu(harden_branch_predictor_fn, cpu) =
++				call_hvc_arch_workaround_1;
++			processor.switch_mm = cpu_v7_hvc_switch_mm;
++			spectre_v2_method = "hypervisor";
++			break;
++
++		case PSCI_CONDUIT_SMC:
++			arm_smccc_1_1_smc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
++					  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
++			if ((int)res.a0 != 0)
++				break;
++			per_cpu(harden_branch_predictor_fn, cpu) =
++				call_smc_arch_workaround_1;
++			processor.switch_mm = cpu_v7_smc_switch_mm;
++			spectre_v2_method = "firmware";
++			break;
++
++		default:
++			break;
++		}
+ 	}
++#endif
++	}
++
+ 	if (spectre_v2_method)
+ 		pr_info("CPU%u: Spectre v2: using %s workaround\n",
+ 			smp_processor_id(), spectre_v2_method);
 diff --git a/arch/arm/mm/proc-v7.S b/arch/arm/mm/proc-v7.S
-index a2d433d59848..fa9214036fb3 100644
+index 79510011e7eb..b78d59a1cc05 100644
 --- a/arch/arm/mm/proc-v7.S
 +++ b/arch/arm/mm/proc-v7.S
-@@ -569,7 +569,7 @@ ENDPROC(__v7_setup)
- 	globl_equ	cpu_ca8_do_suspend,	cpu_v7_do_suspend
- 	globl_equ	cpu_ca8_do_resume,	cpu_v7_do_resume
- #endif
--	define_processor_functions ca8, dabort=v7_early_abort, pabort=v7_pabort, suspend=1
-+	define_processor_functions ca8, dabort=v7_early_abort, pabort=v7_pabort, suspend=1, bugs=cpu_v7_ca8_ibe
+@@ -9,6 +9,7 @@
+  *
+  *  This is the "shell" of the ARMv7 processor support.
+  */
++#include <linux/arm-smccc.h>
+ #include <linux/init.h>
+ #include <linux/linkage.h>
+ #include <asm/assembler.h>
+@@ -93,6 +94,26 @@ ENTRY(cpu_v7_dcache_clean_area)
+ 	ret	lr
+ ENDPROC(cpu_v7_dcache_clean_area)
  
- 	@ Cortex-A9 - needs more registers preserved across suspend/resume
- 	@ and bpiall switch_mm for hardening
-@@ -602,7 +602,7 @@ ENDPROC(__v7_setup)
- 	globl_equ	cpu_ca15_suspend_size,	cpu_v7_suspend_size
- 	globl_equ	cpu_ca15_do_suspend,	cpu_v7_do_suspend
- 	globl_equ	cpu_ca15_do_resume,	cpu_v7_do_resume
--	define_processor_functions ca15, dabort=v7_early_abort, pabort=v7_pabort, suspend=1
-+	define_processor_functions ca15, dabort=v7_early_abort, pabort=v7_pabort, suspend=1, bugs=cpu_v7_ca15_ibe
- #ifdef CONFIG_CPU_PJ4B
- 	define_processor_functions pj4b, dabort=v7_early_abort, pabort=v7_pabort, suspend=1
- #endif
++#ifdef CONFIG_ARM_PSCI
++	.arch_extension sec
++ENTRY(cpu_v7_smc_switch_mm)
++	stmfd	sp!, {r0 - r3}
++	movw	r0, #:lower16:ARM_SMCCC_ARCH_WORKAROUND_1
++	movt	r0, #:upper16:ARM_SMCCC_ARCH_WORKAROUND_1
++	smc	#0
++	ldmfd	sp!, {r0 - r3}
++	b	cpu_v7_switch_mm
++ENDPROC(cpu_v7_smc_switch_mm)
++	.arch_extension virt
++ENTRY(cpu_v7_hvc_switch_mm)
++	stmfd	sp!, {r0 - r3}
++	movw	r0, #:lower16:ARM_SMCCC_ARCH_WORKAROUND_1
++	movt	r0, #:upper16:ARM_SMCCC_ARCH_WORKAROUND_1
++	hvc	#0
++	ldmfd	sp!, {r0 - r3}
++	b	cpu_v7_switch_mm
++ENDPROC(cpu_v7_smc_switch_mm)
++#endif
+ ENTRY(cpu_v7_iciallu_switch_mm)
+ 	mov	r3, #0
+ 	mcr	p15, 0, r3, c7, c5, 0		@ ICIALLU
 -- 
 2.7.4
