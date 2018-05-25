@@ -1,8 +1,8 @@
 From: Russell King <rmk+kernel@armlinux.org.uk>
-Subject: [PATCH v3 10/15] ARM: spectre-v2: warn about incorrect context
- switching functions
-Date: Fri, 25 May 2018 15:01:13 +0100
-Message-ID: <E1fMDHN-00073e-W9@rmk-PC.armlinux.org.uk>
+Subject: [PATCH v3 13/15] ARM: spectre-v2: KVM: invalidate icache on guest
+ exit for Brahma B15
+Date: Fri, 25 May 2018 15:01:29 +0100
+Message-ID: <E1fMDHd-00073z-Bg@rmk-PC.armlinux.org.uk>
 References: <20180525135938.GE17671@n2100.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -23,75 +23,25 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Warn at error level if the context switching function is not what we
-are expecting.  This can happen with big.Little systems, which we
-currently do not support.
+Include Brahma B15 in the Spectre v2 KVM workarounds.
 
 Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
+Acked-by: Florian Fainelli <f.fainelli@gmail.com>
 ---
- arch/arm/mm/proc-v7-bugs.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ arch/arm/include/asm/kvm_mmu.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/arm/mm/proc-v7-bugs.c b/arch/arm/mm/proc-v7-bugs.c
-index 5e50b0d9354c..615ff233641d 100644
---- a/arch/arm/mm/proc-v7-bugs.c
-+++ b/arch/arm/mm/proc-v7-bugs.c
-@@ -12,6 +12,8 @@
- #ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
- DEFINE_PER_CPU(harden_branch_predictor_fn_t, harden_branch_predictor_fn);
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index 48edb1f4ced4..fea770f78144 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -306,6 +306,7 @@ static inline void *kvm_get_hyp_vector(void)
+ 		return kvm_ksym_ref(__kvm_hyp_vector_bp_inv);
+ 	}
  
-+extern void cpu_v7_iciallu_switch_mm(phys_addr_t pgd_phys, struct mm_struct *mm);
-+extern void cpu_v7_bpiall_switch_mm(phys_addr_t pgd_phys, struct mm_struct *mm);
- extern void cpu_v7_smc_switch_mm(phys_addr_t pgd_phys, struct mm_struct *mm);
- extern void cpu_v7_hvc_switch_mm(phys_addr_t pgd_phys, struct mm_struct *mm);
- 
-@@ -52,6 +54,8 @@ static void cpu_v7_spectre_init(void)
- 	case ARM_CPU_PART_CORTEX_A17:
- 	case ARM_CPU_PART_CORTEX_A73:
- 	case ARM_CPU_PART_CORTEX_A75:
-+		if (processor.switch_mm != cpu_v7_bpiall_switch_mm)
-+			goto bl_error;
- 		per_cpu(harden_branch_predictor_fn, cpu) =
- 			harden_branch_predictor_bpiall;
- 		spectre_v2_method = "BPIALL";
-@@ -59,6 +63,8 @@ static void cpu_v7_spectre_init(void)
- 
++	case ARM_CPU_PART_BRAHMA_B15:
  	case ARM_CPU_PART_CORTEX_A15:
- 	case ARM_CPU_PART_BRAHMA_B15:
-+		if (processor.switch_mm != cpu_v7_iciallu_switch_mm)
-+			goto bl_error;
- 		per_cpu(harden_branch_predictor_fn, cpu) =
- 			harden_branch_predictor_iciallu;
- 		spectre_v2_method = "ICIALLU";
-@@ -84,6 +90,8 @@ static void cpu_v7_spectre_init(void)
- 					  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
- 			if ((int)res.a0 != 0)
- 				break;
-+			if (processor.switch_mm != cpu_v7_hvc_switch_mm && cpu)
-+				goto bl_error;
- 			per_cpu(harden_branch_predictor_fn, cpu) =
- 				call_hvc_arch_workaround_1;
- 			processor.switch_mm = cpu_v7_hvc_switch_mm;
-@@ -95,6 +103,8 @@ static void cpu_v7_spectre_init(void)
- 					  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
- 			if ((int)res.a0 != 0)
- 				break;
-+			if (processor.switch_mm != cpu_v7_smc_switch_mm && cpu)
-+				goto bl_error;
- 			per_cpu(harden_branch_predictor_fn, cpu) =
- 				call_smc_arch_workaround_1;
- 			processor.switch_mm = cpu_v7_smc_switch_mm;
-@@ -111,6 +121,11 @@ static void cpu_v7_spectre_init(void)
- 	if (spectre_v2_method)
- 		pr_info("CPU%u: Spectre v2: using %s workaround\n",
- 			smp_processor_id(), spectre_v2_method);
-+	return;
-+
-+bl_error:
-+	pr_err("CPU%u: Spectre v2: incorrect context switching function, system vulnerable\n",
-+		cpu);
- }
- #else
- static void cpu_v7_spectre_init(void)
+ 	{
+ 		extern char __kvm_hyp_vector_ic_inv[];
 -- 
 2.7.4
