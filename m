@@ -1,26 +1,27 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH v11 08/19] arm64: fpsimd: Eliminate task->mm checks
-Date: Fri, 25 May 2018 11:04:03 +0100
-Message-ID: <87r2m0rqzw.fsf@linaro.org>
-References: <1527181008-13549-1-git-send-email-Dave.Martin@arm.com>
- <1527181008-13549-9-git-send-email-Dave.Martin@arm.com>
+From: Russell King - ARM Linux <linux@armlinux.org.uk>
+Subject: Re: [PATCH 03/14] ARM: bugs: hook processor bug checking into SMP
+ and suspend paths
+Date: Fri, 25 May 2018 11:03:59 +0100
+Message-ID: <20180525100359.GC17671@n2100.armlinux.org.uk>
+References: <20180521114238.GN17671@n2100.armlinux.org.uk>
+ <E1fKjEx-00063Y-N5@rmk-PC.armlinux.org.uk>
+ <b454e37c-52a8-387f-3649-8ce72c9a5b18@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 83A4A4A0C7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 May 2018 05:53:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 775A749F8B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 May 2018 05:53:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oKhIOAYXz2Ro for <kvmarm@lists.cs.columbia.edu>;
- Fri, 25 May 2018 05:53:22 -0400 (EDT)
-Received: from mail-wm0-f65.google.com (mail-wm0-f65.google.com [74.125.82.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E737549F7E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 May 2018 05:53:21 -0400 (EDT)
-Received: by mail-wm0-f65.google.com with SMTP id n10-v6so13025474wmc.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 May 2018 03:04:05 -0700 (PDT)
-In-reply-to: <1527181008-13549-9-git-send-email-Dave.Martin@arm.com>
+ with ESMTP id PeLPOcGqOU4V for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 25 May 2018 05:53:34 -0400 (EDT)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 994FB49F7F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 May 2018 05:53:34 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <b454e37c-52a8-387f-3649-8ce72c9a5b18@gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,117 +31,26 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Florian Fainelli <f.fainelli@gmail.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo+IEN1cnJlbnRseSB0
-aGUgRlBTSU1EIGhhbmRsaW5nIGNvZGUgdXNlcyB0aGUgY29uZGl0aW9uIHRhc2stPm1tID09Cj4g
-TlVMTCBhcyBhIGhpbnQgdGhhdCB0YXNrIGhhcyBubyBGUFNJTUQgcmVnaXN0ZXIgY29udGV4dC4K
-Pgo+IFRoZSAtPm1tIGNoZWNrIGlzIG9ubHkgdGhlcmUgdG8gZmlsdGVyIG91dCB0YXNrcyB0aGF0
-IGNhbm5vdAo+IHBvc3NpYmx5IGhhdmUgRlBTSU1EIGNvbnRleHQgbG9hZGVkLCBmb3Igb3B0aW1p
-c2F0aW9uIHB1cnBvc2VzLgo+IEFsc28sIFRJRl9GT1JFSUdOX0ZQU1RBVEUgbXVzdCBhbHdheXMg
-YmUgY2hlY2tlZCBhbnl3YXkgYmVmb3JlCj4gc2F2aW5nIEZQU0lNRCBjb250ZXh0IGJhY2sgdG8g
-bWVtb3J5LiAgRm9yIHRoZXNlIHJlYXNvbnMsIHRoZSAtPm1tCj4gY2hlY2tzIGFyZSBub3QgdXNl
-ZnVsLCBwcm92aWRpbmcgdGhhdCBUSUZfRk9SRUlHTl9GUFNUQVRFIGlzCj4gbWFpbnRhaW5lZCBp
-biBhIGNvbnNpc3RlbnQgd2F5IGZvciBhbGwgdGhyZWFkcy4KPgo+IFRoZSBjb250ZXh0IHN3aXRj
-aCBsb2dpYyBpcyBhbHJlYWR5IGRlbGliZXJhdGVseSBvcHRpbWlzZWQgdG8gZGVmZXIKPiByZWxv
-YWRzIG9mIHRoZSByZWdzIHVudGlsIHJldF90b191c2VyIChvciBzaWdyZXR1cm4gYXMgYSBzcGVj
-aWFsCj4gY2FzZSksIGFuZCBzYXZlIHRoZW0gb25seSBpZiB0aGV5IGhhdmUgYmVlbiBwcmV2aW91
-c2x5IGxvYWRlZC4KPiBUaGVzZSBwYXRocyBhcmUgdGhlIG9ubHkgcGxhY2VzIHdoZXJlIHRoZSB3
-cm9uZ190YXNrIGFuZCB3cm9uZ19jcHUKPiBjb25kaXRpb25zIGNhbiBiZSBtYWRlIGZhbHNlLCBi
-eSBjYWxsaW5nIGZwc2ltZF9iaW5kX3Rhc2tfdG9fY3B1KCkuCj4gS2VybmVsIHRocmVhZHMgYnkg
-ZGVmaW5pdGlvbiBuZXZlciByZWFjaCB0aGVzZSBwYXRocy4gIEFzIGEgcmVzdWx0LAo+IHRoZSB3
-cm9uZ190YXNrIGFuZCB3cm9uZ19jcHUgdGVzdHMgaW4gZnBzaW1kX3RocmVhZF9zd2l0Y2goKSB3
-aWxsCj4gYWx3YXlzIHlpZWxkIHRydWUgZm9yIGtlcm5lbCB0aHJlYWRzLgo+Cj4gVGhpcyBwYXRj
-aCByZW1vdmVzIHRoZSByZWR1bmRhbnQgY2hlY2tzIGFuZCBzcGVjaWFsLWNhc2UgY29kZSwgICAg
-ICAgICAgICAgICAgICBlbnN1cmluZyB0aGF0IFRJRl9GT1JFSUdOX0ZQU1RBVEUgaXMgc2V0IHdo
-ZW5ldmVyIGEga2VybmVsIHRocmVhZCAgICAgICAgICAgICAgIGlzIHNjaGVkdWxlZCBpbiwgYW5k
-IGVuc3VyZXMgdGhhdCB0aGlzIGZsYWcgaXMgc2V0IGZvciB0aGUgaW5pdAo+IHRhc2suICBUaGUg
-ZnBzaW1kX2ZsdXNoX3Rhc2tfc3RhdGUoKSBjYWxsIGFscmVhZHkgcHJlc2VudCBpbgo+IGNvcHlf
-dGhyZWFkKCkgZW5zdXJlcyB0aGUgc2FtZSBmb3IgYW55IG5ldyB0YXNrLgo+Cj4gV2l0aCBUSUZf
-Rk9SRUlHTl9GUFNUQVRFIGFsd2F5cyBzZXQgZm9yIGtlcm5lbCB0aHJlYWRzLCB0aGlzIHBhdGNo
-Cj4gZW5zdXJlcyB0aGF0IG5vIGV4dHJhIGNvbnRleHQgc2F2ZSB3b3JrIGlzIGFkZGVkIGZvciBr
-ZXJuZWwKPiB0aHJlYWRzLCBhbmQgZWxpbWluYXRlcyB0aGUgcmVkdW5kYW50IGNvbnRleHQgc2F2
-aW5nIHRoYXQgbWF5Cj4gY3VycmVudGx5IG9jY3VyIGZvciBrZXJuZWwgdGhyZWFkcyB0aGF0IGhh
-dmUgYWNxdWlyZWQgYW4gbW0gdmlhCj4gdXNlX21tKCkuCj4KPiBTaWduZWQtb2ZmLWJ5OiBEYXZl
-IE1hcnRpbiA8RGF2ZS5NYXJ0aW5AYXJtLmNvbT4KPiBSZXZpZXdlZC1ieTogQ2F0YWxpbiBNYXJp
-bmFzIDxjYXRhbGluLm1hcmluYXNAYXJtLmNvbT4KPiBSZXZpZXdlZC1ieTogQWxleCBCZW5uw6ll
-IDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgoKU3RpbGwgZ29vZCAoYWx0aG91Z2ggb2J2aW91c2x5
-IHdpdGhvdXQgdGhlIHdzIGRhbWFnZSBpbiB0aGUgY29tbWl0KS4KCj4gQ2M6IENhdGFsaW4gTWFy
-aW5hcyA8Y2F0YWxpbi5tYXJpbmFzQGFybS5jb20+Cj4gQ2M6IFdpbGwgRGVhY29uIDx3aWxsLmRl
-YWNvbkBhcm0uY29tPgo+IENjOiBBcmQgQmllc2hldXZlbCA8YXJkLmJpZXNoZXV2ZWxAbGluYXJv
-Lm9yZz4KPgo+IC0tLQo+Cj4gQ2hhbmdlcyBzaW5jZSB2MTA6Cj4KPiAgKiBUaGUgSU5JVF9USFJF
-QUQgZmxhZyBjaGFuZ2UgaXMgc3BsaXQgb3V0IGludG8gdGhlIHByaW9yCj4gICAgcGF0Y2gsIHNp
-bmNlIGl0IGlzIGluIHByaW5jaXBsZSBhIGZpeCByYXRoZXIgdGhhbiBzaW1wbHkgYQo+ICAgIHRp
-ZHktdXAuCj4KPiBSZXF1ZXN0ZWQgYnkgQ2hyaXN0b2ZmZXIgRGFsbCAvIENhdGFsaW4gTWFyaW5h
-czoKPgo+ICAqIFJld29yZGVkIGNvbW1pdCBtZXNzYWdlIHRvIGV4cGxhaW4gdGhlIGNoYW5nZSBt
-b3JlIGNsZWFybHksCj4gICAgYW5kIHJlbW92ZSBjb25mdXNpbmcgY2xhaW1zIGFib3V0IHRoaW5n
-cyBiZWluZyB0cnVlIGJ5Cj4gICAgY29uc3RydWN0aW9uLgo+Cj4gICogQWRkZWQgYSBjb21tZW50
-IHRvIHRoZSBjb2RlIGV4cGxhaW5pbmcgdGhhdCB3cm9uZ19jcHUgYW5kCj4gICAgd3JvbmdfdGFz
-ayB3aWxsIGFsd2F5cyBiZSB0cnVlIGZvciBrZXJuZWwgdGhyZWFkcy4KPgo+ICAqIEVuc3VyZSAu
-ZnBzaW1kX2NwdSA9IE5SX0NQVVMgZm9yIHRoZSBpbml0IHRhc2suCj4KPiAgICBUaGlzIGRvZXMg
-bm90IHNlZW0gdG8gYmUgYSBidWcsIGJlY2F1c2UgdGhlIHdyb25nX3Rhc2sgY2hlY2sgaW4KPiAg
-ICBmcHNpbWRfdGhyZWFkX3N3aXRjaCgpIHNob3VsZCBzdGlsbCBhbHdheXMgYmUgdHJ1ZSBmb3Ig
-dGhlIGluaXQKPiAgICB0YXNrOyBidXQgaXQgaXMgbm9uZXRoZWxlc3MgYW4gaW5jb25zaXN0ZW5j
-eSBjb21wYXJlZCB3aXRoIHdoYXQKPiAgICBjb3B5X3RocmVhZCgpIGRvZXMuCj4KPiAgICBTbyBm
-aXggaXQgdG8gYXZvaWQgZnV0dXJlIHN1cnByaXNlcy4KPiAtLS0KPiAgYXJjaC9hcm02NC9pbmNs
-dWRlL2FzbS9wcm9jZXNzb3IuaCB8ICA0ICsrKy0KPiAgYXJjaC9hcm02NC9rZXJuZWwvZnBzaW1k
-LmMgICAgICAgICB8IDQwICsrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4g
-IDIgZmlsZXMgY2hhbmdlZCwgMTkgaW5zZXJ0aW9ucygrKSwgMjUgZGVsZXRpb25zKC0pCj4KPiBk
-aWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9wcm9jZXNzb3IuaCBiL2FyY2gvYXJt
-NjQvaW5jbHVkZS9hc20vcHJvY2Vzc29yLmgKPiBpbmRleCA3Njc1OTg5Li4zNmQ2NGY4IDEwMDY0
-NAo+IC0tLSBhL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vcHJvY2Vzc29yLmgKPiArKysgYi9hcmNo
-L2FybTY0L2luY2x1ZGUvYXNtL3Byb2Nlc3Nvci5oCj4gQEAgLTE1Niw3ICsxNTYsOSBAQCBzdGF0
-aWMgaW5saW5lIHZvaWQgYXJjaF90aHJlYWRfc3RydWN0X3doaXRlbGlzdCh1bnNpZ25lZCBsb25n
-ICpvZmZzZXQsCj4gIC8qIFN5bmMgVFBJRFJfRUwwIGJhY2sgdG8gdGhyZWFkX3N0cnVjdCBmb3Ig
-Y3VycmVudCAqLwo+ICB2b2lkIHRsc19wcmVzZXJ2ZV9jdXJyZW50X3N0YXRlKHZvaWQpOwo+Cj4g
-LSNkZWZpbmUgSU5JVF9USFJFQUQgIHsJfQo+ICsjZGVmaW5lIElOSVRfVEhSRUFEIHsJCQkJXAo+
-ICsJLmZwc2ltZF9jcHUgPSBOUl9DUFVTLAkJCVwKPiArfQo+Cj4gIHN0YXRpYyBpbmxpbmUgdm9p
-ZCBzdGFydF90aHJlYWRfY29tbW9uKHN0cnVjdCBwdF9yZWdzICpyZWdzLCB1bnNpZ25lZCBsb25n
-IHBjKQo+ICB7Cj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva2VybmVsL2Zwc2ltZC5jIGIvYXJj
-aC9hcm02NC9rZXJuZWwvZnBzaW1kLmMKPiBpbmRleCAyZDlhOWU4Li5kNzM2YjZjIDEwMDY0NAo+
-IC0tLSBhL2FyY2gvYXJtNjQva2VybmVsL2Zwc2ltZC5jCj4gKysrIGIvYXJjaC9hcm02NC9rZXJu
-ZWwvZnBzaW1kLmMKPiBAQCAtODkyLDMxICs4OTIsMjUgQEAgYXNtbGlua2FnZSB2b2lkIGRvX2Zw
-c2ltZF9leGModW5zaWduZWQgaW50IGVzciwgc3RydWN0IHB0X3JlZ3MgKnJlZ3MpCj4KPiAgdm9p
-ZCBmcHNpbWRfdGhyZWFkX3N3aXRjaChzdHJ1Y3QgdGFza19zdHJ1Y3QgKm5leHQpCj4gIHsKPiAr
-CWJvb2wgd3JvbmdfdGFzaywgd3JvbmdfY3B1Owo+ICsKPiAgCWlmICghc3lzdGVtX3N1cHBvcnRz
-X2Zwc2ltZCgpKQo+ICAJCXJldHVybjsKPiArCj4gKwkvKiBTYXZlIHVuc2F2ZWQgZnBzaW1kIHN0
-YXRlLCBpZiBhbnk6ICovCj4gKwlmcHNpbWRfc2F2ZSgpOwo+ICsKPiAgCS8qCj4gLQkgKiBTYXZl
-IHRoZSBjdXJyZW50IEZQU0lNRCBzdGF0ZSB0byBtZW1vcnksIGJ1dCBvbmx5IGlmIHdoYXRldmVy
-IGlzIGluCj4gLQkgKiB0aGUgcmVnaXN0ZXJzIGlzIGluIGZhY3QgdGhlIG1vc3QgcmVjZW50IHVz
-ZXJsYW5kIEZQU0lNRCBzdGF0ZSBvZgo+IC0JICogJ2N1cnJlbnQnLgo+ICsJICogRml4IHVwIFRJ
-Rl9GT1JFSUdOX0ZQU1RBVEUgdG8gY29ycmVjdGx5IGRlc2NyaWJlIG5leHQncwo+ICsJICogc3Rh
-dGUuICBGb3Iga2VybmVsIHRocmVhZHMsIEZQU0lNRCByZWdpc3RlcnMgYXJlIG5ldmVyIGxvYWRl
-ZAo+ICsJICogYW5kIHdyb25nX3Rhc2sgYW5kIHdyb25nX2NwdSB3aWxsIGFsd2F5cyBiZSB0cnVl
-Lgo+ICAJICovCj4gLQlpZiAoY3VycmVudC0+bW0pCj4gLQkJZnBzaW1kX3NhdmUoKTsKPiAtCj4g
-LQlpZiAobmV4dC0+bW0pIHsKPiAtCQkvKgo+IC0JCSAqIElmIHdlIGFyZSBzd2l0Y2hpbmcgdG8g
-YSB0YXNrIHdob3NlIG1vc3QgcmVjZW50IHVzZXJsYW5kCj4gLQkJICogRlBTSU1EIHN0YXRlIGlz
-IGFscmVhZHkgaW4gdGhlIHJlZ2lzdGVycyBvZiAqdGhpcyogY3B1LAo+IC0JCSAqIHdlIGNhbiBz
-a2lwIGxvYWRpbmcgdGhlIHN0YXRlIGZyb20gbWVtb3J5LiBPdGhlcndpc2UsIHNldAo+IC0JCSAq
-IHRoZSBUSUZfRk9SRUlHTl9GUFNUQVRFIGZsYWcgc28gdGhlIHN0YXRlIHdpbGwgYmUgbG9hZGVk
-Cj4gLQkJICogdXBvbiB0aGUgbmV4dCByZXR1cm4gdG8gdXNlcmxhbmQuCj4gLQkJICovCj4gLQkJ
-Ym9vbCB3cm9uZ190YXNrID0gX190aGlzX2NwdV9yZWFkKGZwc2ltZF9sYXN0X3N0YXRlLnN0KSAh
-PQo+ICsJd3JvbmdfdGFzayA9IF9fdGhpc19jcHVfcmVhZChmcHNpbWRfbGFzdF9zdGF0ZS5zdCkg
-IT0KPiAgCQkJCQkmbmV4dC0+dGhyZWFkLnV3LmZwc2ltZF9zdGF0ZTsKPiAtCQlib29sIHdyb25n
-X2NwdSA9IG5leHQtPnRocmVhZC5mcHNpbWRfY3B1ICE9IHNtcF9wcm9jZXNzb3JfaWQoKTsKPiAr
-CXdyb25nX2NwdSA9IG5leHQtPnRocmVhZC5mcHNpbWRfY3B1ICE9IHNtcF9wcm9jZXNzb3JfaWQo
-KTsKPgo+IC0JCXVwZGF0ZV90c2tfdGhyZWFkX2ZsYWcobmV4dCwgVElGX0ZPUkVJR05fRlBTVEFU
-RSwKPiAtCQkJCSAgICAgICB3cm9uZ190YXNrIHx8IHdyb25nX2NwdSk7Cj4gLQl9Cj4gKwl1cGRh
-dGVfdHNrX3RocmVhZF9mbGFnKG5leHQsIFRJRl9GT1JFSUdOX0ZQU1RBVEUsCj4gKwkJCSAgICAg
-ICB3cm9uZ190YXNrIHx8IHdyb25nX2NwdSk7Cj4gIH0KPgo+ICB2b2lkIGZwc2ltZF9mbHVzaF90
-aHJlYWQodm9pZCkKPiBAQCAtMTEyMSw5ICsxMTE1LDggQEAgdm9pZCBrZXJuZWxfbmVvbl9iZWdp
-bih2b2lkKQo+Cj4gIAlfX3RoaXNfY3B1X3dyaXRlKGtlcm5lbF9uZW9uX2J1c3ksIHRydWUpOwo+
-Cj4gLQkvKiBTYXZlIHVuc2F2ZWQgdGFzayBmcHNpbWQgc3RhdGUsIGlmIGFueTogKi8KPiAtCWlm
-IChjdXJyZW50LT5tbSkKPiAtCQlmcHNpbWRfc2F2ZSgpOwo+ICsJLyogU2F2ZSB1bnNhdmVkIGZw
-c2ltZCBzdGF0ZSwgaWYgYW55OiAqLwo+ICsJZnBzaW1kX3NhdmUoKTsKPgo+ICAJLyogSW52YWxp
-ZGF0ZSBhbnkgdGFzayBzdGF0ZSByZW1haW5pbmcgaW4gdGhlIGZwc2ltZCByZWdzOiAqLwo+ICAJ
-ZnBzaW1kX2ZsdXNoX2NwdV9zdGF0ZSgpOwo+IEBAIC0xMjQ1LDggKzEyMzgsNyBAQCBzdGF0aWMg
-aW50IGZwc2ltZF9jcHVfcG1fbm90aWZpZXIoc3RydWN0IG5vdGlmaWVyX2Jsb2NrICpzZWxmLAo+
-ICB7Cj4gIAlzd2l0Y2ggKGNtZCkgewo+ICAJY2FzZSBDUFVfUE1fRU5URVI6Cj4gLQkJaWYgKGN1
-cnJlbnQtPm1tKQo+IC0JCQlmcHNpbWRfc2F2ZSgpOwo+ICsJCWZwc2ltZF9zYXZlKCk7Cj4gIAkJ
-ZnBzaW1kX2ZsdXNoX2NwdV9zdGF0ZSgpOwo+ICAJCWJyZWFrOwo+ICAJY2FzZSBDUFVfUE1fRVhJ
-VDoKCgotLQpBbGV4IEJlbm7DqWUKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEu
-ZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJt
-Cg==
+On Thu, May 24, 2018 at 04:30:40PM -0700, Florian Fainelli wrote:
+> On 05/21/2018 04:44 AM, Russell King wrote:
+> > Check for CPU bugs when secondary processors are being brought online,
+> > and also when CPUs are resuming from a low power mode.  This gives an
+> > opportunity to check that processor specific bug workarounds are
+> > correctly enabled for all paths that a CPU re-enters the kernel.
+> > 
+> > Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
+> > Reviewed-by: Florian Fainelli <f.fainelli@gmail.com>
+> 
+> Something I missed, is that this correctly warns about e.g: missing the
+> IBE bit for secondary cores, but it seems to be missing it for the boot CPU:
+
+Are you sure that the boot CPU has the IBE bit clear?
+
+-- 
+RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
+According to speedtest.net: 8.21Mbps down 510kbps up
