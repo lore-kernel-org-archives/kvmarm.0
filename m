@@ -1,15 +1,23 @@
-From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH v11 08/19] arm64: fpsimd: Eliminate task->mm checks
-Date: Fri, 25 May 2018 11:02:57 +0200
-Message-ID: <20180525090257.GB54529@C02W217FHV2R.local>
-References: <1527181008-13549-1-git-send-email-Dave.Martin@arm.com>
- <1527181008-13549-9-git-send-email-Dave.Martin@arm.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH v10 07/18] arm64: fpsimd: Eliminate task->mm checks
+Date: Fri, 25 May 2018 10:45:17 +0100
+Message-ID: <20180525094515.GA13470@e103592.cambridge.arm.com>
+References: <1527005119-6842-8-git-send-email-Dave.Martin@arm.com>
+ <20180523114812.GH55598@C02W217FHV2R.local>
+ <20180523133158.GJ13470@e103592.cambridge.arm.com>
+ <20180523145657.g7b6v2q2vxfqpoc4@armageddon.cambridge.arm.com>
+ <20180523150337.GO13470@e103592.cambridge.arm.com>
+ <20180524083350.GK55598@C02W217FHV2R.local>
+ <20180524095056.GR13470@e103592.cambridge.arm.com>
+ <20180524100659.GO55598@C02W217FHV2R.local>
+ <20180524143714.GV13470@e103592.cambridge.arm.com>
+ <20180525090020.GA54529@C02W217FHV2R.local>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <1527181008-13549-9-git-send-email-Dave.Martin@arm.com>
+In-Reply-To: <20180525090020.GA54529@C02W217FHV2R.local>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -19,122 +27,131 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Dave Martin <Dave.Martin@arm.com>
+To: Christoffer Dall <christoffer.dall@arm.com>
 Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gVGh1LCBNYXkgMjQsIDIwMTggYXQgMDU6NTY6MzdQTSArMDEwMCwgRGF2ZSBNYXJ0aW4gd3Jv
-dGU6Cj4gQ3VycmVudGx5IHRoZSBGUFNJTUQgaGFuZGxpbmcgY29kZSB1c2VzIHRoZSBjb25kaXRp
-b24gdGFzay0+bW0gPT0KPiBOVUxMIGFzIGEgaGludCB0aGF0IHRhc2sgaGFzIG5vIEZQU0lNRCBy
-ZWdpc3RlciBjb250ZXh0Lgo+IAo+IFRoZSAtPm1tIGNoZWNrIGlzIG9ubHkgdGhlcmUgdG8gZmls
-dGVyIG91dCB0YXNrcyB0aGF0IGNhbm5vdAo+IHBvc3NpYmx5IGhhdmUgRlBTSU1EIGNvbnRleHQg
-bG9hZGVkLCBmb3Igb3B0aW1pc2F0aW9uIHB1cnBvc2VzLgo+IEFsc28sIFRJRl9GT1JFSUdOX0ZQ
-U1RBVEUgbXVzdCBhbHdheXMgYmUgY2hlY2tlZCBhbnl3YXkgYmVmb3JlCj4gc2F2aW5nIEZQU0lN
-RCBjb250ZXh0IGJhY2sgdG8gbWVtb3J5LiAgRm9yIHRoZXNlIHJlYXNvbnMsIHRoZSAtPm1tCj4g
-Y2hlY2tzIGFyZSBub3QgdXNlZnVsLCBwcm92aWRpbmcgdGhhdCBUSUZfRk9SRUlHTl9GUFNUQVRF
-IGlzCj4gbWFpbnRhaW5lZCBpbiBhIGNvbnNpc3RlbnQgd2F5IGZvciBhbGwgdGhyZWFkcy4KPiAK
-PiBUaGUgY29udGV4dCBzd2l0Y2ggbG9naWMgaXMgYWxyZWFkeSBkZWxpYmVyYXRlbHkgb3B0aW1p
-c2VkIHRvIGRlZmVyCj4gcmVsb2FkcyBvZiB0aGUgcmVncyB1bnRpbCByZXRfdG9fdXNlciAob3Ig
-c2lncmV0dXJuIGFzIGEgc3BlY2lhbAo+IGNhc2UpLCBhbmQgc2F2ZSB0aGVtIG9ubHkgaWYgdGhl
-eSBoYXZlIGJlZW4gcHJldmlvdXNseSBsb2FkZWQuCj4gVGhlc2UgcGF0aHMgYXJlIHRoZSBvbmx5
-IHBsYWNlcyB3aGVyZSB0aGUgd3JvbmdfdGFzayBhbmQgd3JvbmdfY3B1Cj4gY29uZGl0aW9ucyBj
-YW4gYmUgbWFkZSBmYWxzZSwgYnkgY2FsbGluZyBmcHNpbWRfYmluZF90YXNrX3RvX2NwdSgpLgo+
-IEtlcm5lbCB0aHJlYWRzIGJ5IGRlZmluaXRpb24gbmV2ZXIgcmVhY2ggdGhlc2UgcGF0aHMuICBB
-cyBhIHJlc3VsdCwKPiB0aGUgd3JvbmdfdGFzayBhbmQgd3JvbmdfY3B1IHRlc3RzIGluIGZwc2lt
-ZF90aHJlYWRfc3dpdGNoKCkgd2lsbAo+IGFsd2F5cyB5aWVsZCB0cnVlIGZvciBrZXJuZWwgdGhy
-ZWFkcy4KPiAKPiBUaGlzIHBhdGNoIHJlbW92ZXMgdGhlIHJlZHVuZGFudCBjaGVja3MgYW5kIHNw
-ZWNpYWwtY2FzZSBjb2RlLCAgICAgICAgICAgICAgICAgIGVuc3VyaW5nIHRoYXQgVElGX0ZPUkVJ
-R05fRlBTVEFURSBpcyBzZXQgd2hlbmV2ZXIgYSBrZXJuZWwgdGhyZWFkICAgICAgICAgICAgICAg
-aXMgc2NoZWR1bGVkIGluLCBhbmQgZW5zdXJlcyB0aGF0IHRoaXMgZmxhZyBpcyBzZXQgZm9yIHRo
-ZSBpbml0Cj4gdGFzay4gIFRoZSBmcHNpbWRfZmx1c2hfdGFza19zdGF0ZSgpIGNhbGwgYWxyZWFk
-eSBwcmVzZW50IGluCj4gY29weV90aHJlYWQoKSBlbnN1cmVzIHRoZSBzYW1lIGZvciBhbnkgbmV3
-IHRhc2suCgpuaXQ6IGZvcm1hdHRpbmcgc3RpbGwgZnVubnksIGJ1dCB5b3Ugc2hvdWxkbid0IHJl
-c3BpbiBqdXN0IGZvciB0aGF0LgoKPiAKPiBXaXRoIFRJRl9GT1JFSUdOX0ZQU1RBVEUgYWx3YXlz
-IHNldCBmb3Iga2VybmVsIHRocmVhZHMsIHRoaXMgcGF0Y2gKPiBlbnN1cmVzIHRoYXQgbm8gZXh0
-cmEgY29udGV4dCBzYXZlIHdvcmsgaXMgYWRkZWQgZm9yIGtlcm5lbAo+IHRocmVhZHMsIGFuZCBl
-bGltaW5hdGVzIHRoZSByZWR1bmRhbnQgY29udGV4dCBzYXZpbmcgdGhhdCBtYXkKPiBjdXJyZW50
-bHkgb2NjdXIgZm9yIGtlcm5lbCB0aHJlYWRzIHRoYXQgaGF2ZSBhY3F1aXJlZCBhbiBtbSB2aWEK
-PiB1c2VfbW0oKS4KClJldmlld2VkLWJ5OiBDaHJpc3RvZmZlciBEYWxsIDxjaHJpc3RvZmZlci5k
-YWxsQGFybS5jb20+Cgo+IAo+IFNpZ25lZC1vZmYtYnk6IERhdmUgTWFydGluIDxEYXZlLk1hcnRp
-bkBhcm0uY29tPgo+IFJldmlld2VkLWJ5OiBDYXRhbGluIE1hcmluYXMgPGNhdGFsaW4ubWFyaW5h
-c0Bhcm0uY29tPgo+IFJldmlld2VkLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFy
-by5vcmc+Cj4gQ2M6IENhdGFsaW4gTWFyaW5hcyA8Y2F0YWxpbi5tYXJpbmFzQGFybS5jb20+Cj4g
-Q2M6IFdpbGwgRGVhY29uIDx3aWxsLmRlYWNvbkBhcm0uY29tPgo+IENjOiBBcmQgQmllc2hldXZl
-bCA8YXJkLmJpZXNoZXV2ZWxAbGluYXJvLm9yZz4KPiAKPiAtLS0KPiAKPiBDaGFuZ2VzIHNpbmNl
-IHYxMDoKPiAKPiAgKiBUaGUgSU5JVF9USFJFQUQgZmxhZyBjaGFuZ2UgaXMgc3BsaXQgb3V0IGlu
-dG8gdGhlIHByaW9yCj4gICAgcGF0Y2gsIHNpbmNlIGl0IGlzIGluIHByaW5jaXBsZSBhIGZpeCBy
-YXRoZXIgdGhhbiBzaW1wbHkgYQo+ICAgIHRpZHktdXAuCj4gCj4gUmVxdWVzdGVkIGJ5IENocmlz
-dG9mZmVyIERhbGwgLyBDYXRhbGluIE1hcmluYXM6Cj4gCj4gICogUmV3b3JkZWQgY29tbWl0IG1l
-c3NhZ2UgdG8gZXhwbGFpbiB0aGUgY2hhbmdlIG1vcmUgY2xlYXJseSwKPiAgICBhbmQgcmVtb3Zl
-IGNvbmZ1c2luZyBjbGFpbXMgYWJvdXQgdGhpbmdzIGJlaW5nIHRydWUgYnkKPiAgICBjb25zdHJ1
-Y3Rpb24uCj4gCj4gICogQWRkZWQgYSBjb21tZW50IHRvIHRoZSBjb2RlIGV4cGxhaW5pbmcgdGhh
-dCB3cm9uZ19jcHUgYW5kCj4gICAgd3JvbmdfdGFzayB3aWxsIGFsd2F5cyBiZSB0cnVlIGZvciBr
-ZXJuZWwgdGhyZWFkcy4KPiAKPiAgKiBFbnN1cmUgLmZwc2ltZF9jcHUgPSBOUl9DUFVTIGZvciB0
-aGUgaW5pdCB0YXNrLgo+IAo+ICAgIFRoaXMgZG9lcyBub3Qgc2VlbSB0byBiZSBhIGJ1ZywgYmVj
-YXVzZSB0aGUgd3JvbmdfdGFzayBjaGVjayBpbgo+ICAgIGZwc2ltZF90aHJlYWRfc3dpdGNoKCkg
-c2hvdWxkIHN0aWxsIGFsd2F5cyBiZSB0cnVlIGZvciB0aGUgaW5pdAo+ICAgIHRhc2s7IGJ1dCBp
-dCBpcyBub25ldGhlbGVzcyBhbiBpbmNvbnNpc3RlbmN5IGNvbXBhcmVkIHdpdGggd2hhdAo+ICAg
-IGNvcHlfdGhyZWFkKCkgZG9lcy4KPiAKPiAgICBTbyBmaXggaXQgdG8gYXZvaWQgZnV0dXJlIHN1
-cnByaXNlcy4KPiAtLS0KPiAgYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9wcm9jZXNzb3IuaCB8ICA0
-ICsrKy0KPiAgYXJjaC9hcm02NC9rZXJuZWwvZnBzaW1kLmMgICAgICAgICB8IDQwICsrKysrKysr
-KysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4gIDIgZmlsZXMgY2hhbmdlZCwgMTkgaW5z
-ZXJ0aW9ucygrKSwgMjUgZGVsZXRpb25zKC0pCj4gCj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQv
-aW5jbHVkZS9hc20vcHJvY2Vzc29yLmggYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL3Byb2Nlc3Nv
-ci5oCj4gaW5kZXggNzY3NTk4OS4uMzZkNjRmOCAxMDA2NDQKPiAtLS0gYS9hcmNoL2FybTY0L2lu
-Y2x1ZGUvYXNtL3Byb2Nlc3Nvci5oCj4gKysrIGIvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9wcm9j
-ZXNzb3IuaAo+IEBAIC0xNTYsNyArMTU2LDkgQEAgc3RhdGljIGlubGluZSB2b2lkIGFyY2hfdGhy
-ZWFkX3N0cnVjdF93aGl0ZWxpc3QodW5zaWduZWQgbG9uZyAqb2Zmc2V0LAo+ICAvKiBTeW5jIFRQ
-SURSX0VMMCBiYWNrIHRvIHRocmVhZF9zdHJ1Y3QgZm9yIGN1cnJlbnQgKi8KPiAgdm9pZCB0bHNf
-cHJlc2VydmVfY3VycmVudF9zdGF0ZSh2b2lkKTsKPiAgCj4gLSNkZWZpbmUgSU5JVF9USFJFQUQg
-IHsJfQo+ICsjZGVmaW5lIElOSVRfVEhSRUFEIHsJCQkJXAo+ICsJLmZwc2ltZF9jcHUgPSBOUl9D
-UFVTLAkJCVwKPiArfQo+ICAKPiAgc3RhdGljIGlubGluZSB2b2lkIHN0YXJ0X3RocmVhZF9jb21t
-b24oc3RydWN0IHB0X3JlZ3MgKnJlZ3MsIHVuc2lnbmVkIGxvbmcgcGMpCj4gIHsKPiBkaWZmIC0t
-Z2l0IGEvYXJjaC9hcm02NC9rZXJuZWwvZnBzaW1kLmMgYi9hcmNoL2FybTY0L2tlcm5lbC9mcHNp
-bWQuYwo+IGluZGV4IDJkOWE5ZTguLmQ3MzZiNmMgMTAwNjQ0Cj4gLS0tIGEvYXJjaC9hcm02NC9r
-ZXJuZWwvZnBzaW1kLmMKPiArKysgYi9hcmNoL2FybTY0L2tlcm5lbC9mcHNpbWQuYwo+IEBAIC04
-OTIsMzEgKzg5MiwyNSBAQCBhc21saW5rYWdlIHZvaWQgZG9fZnBzaW1kX2V4Yyh1bnNpZ25lZCBp
-bnQgZXNyLCBzdHJ1Y3QgcHRfcmVncyAqcmVncykKPiAgCj4gIHZvaWQgZnBzaW1kX3RocmVhZF9z
-d2l0Y2goc3RydWN0IHRhc2tfc3RydWN0ICpuZXh0KQo+ICB7Cj4gKwlib29sIHdyb25nX3Rhc2ss
-IHdyb25nX2NwdTsKPiArCj4gIAlpZiAoIXN5c3RlbV9zdXBwb3J0c19mcHNpbWQoKSkKPiAgCQly
-ZXR1cm47Cj4gKwo+ICsJLyogU2F2ZSB1bnNhdmVkIGZwc2ltZCBzdGF0ZSwgaWYgYW55OiAqLwo+
-ICsJZnBzaW1kX3NhdmUoKTsKPiArCj4gIAkvKgo+IC0JICogU2F2ZSB0aGUgY3VycmVudCBGUFNJ
-TUQgc3RhdGUgdG8gbWVtb3J5LCBidXQgb25seSBpZiB3aGF0ZXZlciBpcyBpbgo+IC0JICogdGhl
-IHJlZ2lzdGVycyBpcyBpbiBmYWN0IHRoZSBtb3N0IHJlY2VudCB1c2VybGFuZCBGUFNJTUQgc3Rh
-dGUgb2YKPiAtCSAqICdjdXJyZW50Jy4KPiArCSAqIEZpeCB1cCBUSUZfRk9SRUlHTl9GUFNUQVRF
-IHRvIGNvcnJlY3RseSBkZXNjcmliZSBuZXh0J3MKPiArCSAqIHN0YXRlLiAgRm9yIGtlcm5lbCB0
-aHJlYWRzLCBGUFNJTUQgcmVnaXN0ZXJzIGFyZSBuZXZlciBsb2FkZWQKPiArCSAqIGFuZCB3cm9u
-Z190YXNrIGFuZCB3cm9uZ19jcHUgd2lsbCBhbHdheXMgYmUgdHJ1ZS4KPiAgCSAqLwo+IC0JaWYg
-KGN1cnJlbnQtPm1tKQo+IC0JCWZwc2ltZF9zYXZlKCk7Cj4gLQo+IC0JaWYgKG5leHQtPm1tKSB7
-Cj4gLQkJLyoKPiAtCQkgKiBJZiB3ZSBhcmUgc3dpdGNoaW5nIHRvIGEgdGFzayB3aG9zZSBtb3N0
-IHJlY2VudCB1c2VybGFuZAo+IC0JCSAqIEZQU0lNRCBzdGF0ZSBpcyBhbHJlYWR5IGluIHRoZSBy
-ZWdpc3RlcnMgb2YgKnRoaXMqIGNwdSwKPiAtCQkgKiB3ZSBjYW4gc2tpcCBsb2FkaW5nIHRoZSBz
-dGF0ZSBmcm9tIG1lbW9yeS4gT3RoZXJ3aXNlLCBzZXQKPiAtCQkgKiB0aGUgVElGX0ZPUkVJR05f
-RlBTVEFURSBmbGFnIHNvIHRoZSBzdGF0ZSB3aWxsIGJlIGxvYWRlZAo+IC0JCSAqIHVwb24gdGhl
-IG5leHQgcmV0dXJuIHRvIHVzZXJsYW5kLgo+IC0JCSAqLwo+IC0JCWJvb2wgd3JvbmdfdGFzayA9
-IF9fdGhpc19jcHVfcmVhZChmcHNpbWRfbGFzdF9zdGF0ZS5zdCkgIT0KPiArCXdyb25nX3Rhc2sg
-PSBfX3RoaXNfY3B1X3JlYWQoZnBzaW1kX2xhc3Rfc3RhdGUuc3QpICE9Cj4gIAkJCQkJJm5leHQt
-PnRocmVhZC51dy5mcHNpbWRfc3RhdGU7Cj4gLQkJYm9vbCB3cm9uZ19jcHUgPSBuZXh0LT50aHJl
-YWQuZnBzaW1kX2NwdSAhPSBzbXBfcHJvY2Vzc29yX2lkKCk7Cj4gKwl3cm9uZ19jcHUgPSBuZXh0
-LT50aHJlYWQuZnBzaW1kX2NwdSAhPSBzbXBfcHJvY2Vzc29yX2lkKCk7Cj4gIAo+IC0JCXVwZGF0
-ZV90c2tfdGhyZWFkX2ZsYWcobmV4dCwgVElGX0ZPUkVJR05fRlBTVEFURSwKPiAtCQkJCSAgICAg
-ICB3cm9uZ190YXNrIHx8IHdyb25nX2NwdSk7Cj4gLQl9Cj4gKwl1cGRhdGVfdHNrX3RocmVhZF9m
-bGFnKG5leHQsIFRJRl9GT1JFSUdOX0ZQU1RBVEUsCj4gKwkJCSAgICAgICB3cm9uZ190YXNrIHx8
-IHdyb25nX2NwdSk7Cj4gIH0KPiAgCj4gIHZvaWQgZnBzaW1kX2ZsdXNoX3RocmVhZCh2b2lkKQo+
-IEBAIC0xMTIxLDkgKzExMTUsOCBAQCB2b2lkIGtlcm5lbF9uZW9uX2JlZ2luKHZvaWQpCj4gIAo+
-ICAJX190aGlzX2NwdV93cml0ZShrZXJuZWxfbmVvbl9idXN5LCB0cnVlKTsKPiAgCj4gLQkvKiBT
-YXZlIHVuc2F2ZWQgdGFzayBmcHNpbWQgc3RhdGUsIGlmIGFueTogKi8KPiAtCWlmIChjdXJyZW50
-LT5tbSkKPiAtCQlmcHNpbWRfc2F2ZSgpOwo+ICsJLyogU2F2ZSB1bnNhdmVkIGZwc2ltZCBzdGF0
-ZSwgaWYgYW55OiAqLwo+ICsJZnBzaW1kX3NhdmUoKTsKPiAgCj4gIAkvKiBJbnZhbGlkYXRlIGFu
-eSB0YXNrIHN0YXRlIHJlbWFpbmluZyBpbiB0aGUgZnBzaW1kIHJlZ3M6ICovCj4gIAlmcHNpbWRf
-Zmx1c2hfY3B1X3N0YXRlKCk7Cj4gQEAgLTEyNDUsOCArMTIzOCw3IEBAIHN0YXRpYyBpbnQgZnBz
-aW1kX2NwdV9wbV9ub3RpZmllcihzdHJ1Y3Qgbm90aWZpZXJfYmxvY2sgKnNlbGYsCj4gIHsKPiAg
-CXN3aXRjaCAoY21kKSB7Cj4gIAljYXNlIENQVV9QTV9FTlRFUjoKPiAtCQlpZiAoY3VycmVudC0+
-bW0pCj4gLQkJCWZwc2ltZF9zYXZlKCk7Cj4gKwkJZnBzaW1kX3NhdmUoKTsKPiAgCQlmcHNpbWRf
-Zmx1c2hfY3B1X3N0YXRlKCk7Cj4gIAkJYnJlYWs7Cj4gIAljYXNlIENQVV9QTV9FWElUOgo+IC0t
-IAo+IDIuMS40Cj4gCj4gCj4gX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX18KPiBsaW51eC1hcm0ta2VybmVsIG1haWxpbmcgbGlzdAo+IGxpbnV4LWFybS1rZXJu
-ZWxAbGlzdHMuaW5mcmFkZWFkLm9yZwo+IGh0dHA6Ly9saXN0cy5pbmZyYWRlYWQub3JnL21haWxt
-YW4vbGlzdGluZm8vbGludXgtYXJtLWtlcm5lbAoKX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX18KbGludXgtYXJtLWtlcm5lbCBtYWlsaW5nIGxpc3QKbGludXgt
-YXJtLWtlcm5lbEBsaXN0cy5pbmZyYWRlYWQub3JnCmh0dHA6Ly9saXN0cy5pbmZyYWRlYWQub3Jn
-L21haWxtYW4vbGlzdGluZm8vbGludXgtYXJtLWtlcm5lbAo=
+On Fri, May 25, 2018 at 11:00:20AM +0200, Christoffer Dall wrote:
+> On Thu, May 24, 2018 at 03:37:15PM +0100, Dave Martin wrote:
+> > On Thu, May 24, 2018 at 12:06:59PM +0200, Christoffer Dall wrote:
+> > > On Thu, May 24, 2018 at 10:50:56AM +0100, Dave Martin wrote:
+
+[...]
+
+> > > I'm not sure what the reader is to make of that.  Do you not mean the
+> > > TIF_FOREIGN_FPSTATE is always true for kernel threads?
+> > 
+> > Again, this is probably a red herring.  TIF_FOREIGN_FPSTATE is always
+> > true for kernel threads prior to the patch, except (randomly) for the
+> > init task.
+> 
+> That was really what my initial question was about, and what I thought
+> the commit message should make abundantly clear, because that ties the
+> message together with the code.
+> 
+> > 
+> > This change is not really about TIF_FOREIGN_FPSTATE at all, rather
+> > that there is nothing to justify handling kernel threads differently,
+> > or even distinguishing kernel threads from user threads at all in this
+> > code.
+> 
+> Understood.
+
+And my bad was that I hadn't gone to the effort of understanding my own
+argument -- I'd glad to be called out on that.
+
+> > Part of the confusion (and I had confused myself) comes from the fact
+> > that TIF_FOREIGN_FPSTATE is really a per-cpu property and doesn't make
+> > sense as a per-task property -- i.e., the flag is meaningless for
+> > scheduled-out tasks and we must explicitly "repair" it when scheduling
+> > a task in anyway.  I think it's a thread flag primarily so that it's
+> > convenient to check alongside other thread flags in the ret_to_user
+> > work loop.  This is somewhat less of a justification now that loop was
+> > ported to C.
+> > 
+> > > > 
+> > > > The context switch logic is already deliberately optimised to defer
+> > > > reloads of the regs until ret_to_user (or sigreturn as a special
+> > > > case), and save them only if they have been previously loaded.
+> > 
+> > Does it help to insert the following here?
+> > 
+> > "These paths are the only places where the wrong_task and wrong_cpu
+> > conditions can be made false, by calling fpsimd_bind_task_to_cpu()."
+> > 
+> 
+> yes it does.
+> 
+> > > > Kernel threads by definition never reach these paths.  As a result,
+> > > 
+> > > I'm struggling with the "As a result," here.  Is this because reloads of
+> > > regs in ret_to_user (or sigreturn) are the only places that can make
+> > > wrong_cpu or wrong_task be false?
+> > 
+> > See the proposed clarification above.  Is that sufficient?
+> > 
+> 
+> yes.
+> 
+> > > (I'm actually wanting to understand this, not just bikeshedding the
+> > > commit message, as new corner cases keep coming up on this logic.)
+> > 
+> > That's a good thing, and I would really like to explain it in a
+> > concise manner.  See [*] below for the "concise" explanation -- it may
+> > demonstrate why I've been evasive...
+> > 
+> 
+> I don't think you've been evasive at all, I just think we reason about
+> this in slightly different ways, and I was trying to convince myself why
+> this change is safe and summarize that concisely.  I think we've
+> accomplished both :)
+
+OK, good.  I reposted speculatively on this basis :)
+
+The commit message is in better shape now, and I very much appreciate
+you kicking the tyres on my reasoning!
+
+[...]
+
+> > As an aside, the big wall of text before the definition of struct
+> > fpsimd_last_state_struct is looking out of date and could use an
+> > update to cover at least some of what is explained in [*] better.
+> > 
+> > I'm currently considering that out of scope for this series, but I will
+> > keep it in mind to refresh it in the not too distant future.
+> > 
+> 
+> Fine with me.
+
+OK, good.
+
+[...]
+
+> > [*] The bigger picture:
+> > 
+> > * Consider a relation (C,T) between cpus C and tasks T, such that
+
+[...]
+
+> > but by assuming that the code is already well-optimised, "unnecessary"
+> > save/restore work will not be added.  If this were not the case, it
+> > could in any case be fixed independently.
+> > 
+> > The observation of this _series_ is that we don't need to do very
+> > much in order to be able to generalise the logic to accept KVM vcpus
+> > in place of T.
+> > 
+> 
+> Thanks for the explanation.
+> -Christoffer
+
+Was this reasonably understandable?  If so I could use it as a basis for
+improving the comment block in fpsimd.c, but I'd want to squash it down
+to the essentials.  It's pretty verbose as it stands.
+
+(What I'd really like to do it take an axe to the logic so that we
+end up with something that doesn't require anything like this amount
+of explanation ... but that's more of an aspiration right now.)
+
+Cheers
+---Dave
