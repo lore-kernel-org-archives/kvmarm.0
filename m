@@ -1,79 +1,92 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v11 08/19] arm64: fpsimd: Eliminate task->mm checks
-Date: Fri, 25 May 2018 11:48:04 +0100
-Message-ID: <20180525104803.GC13470@e103592.cambridge.arm.com>
-References: <1527181008-13549-1-git-send-email-Dave.Martin@arm.com>
- <1527181008-13549-9-git-send-email-Dave.Martin@arm.com>
- <87r2m0rqzw.fsf@linaro.org>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCHv2] ARM64: KVM: use lm_alias() for kvm_ksym_ref()
+Date: Fri, 25 May 2018 11:50:10 +0100
+Message-ID: <20180525105010.qswcppfkybznmzka@lakrids.cambridge.arm.com>
+References: <20180510111347.32253-1-mark.rutland@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 039014070F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 May 2018 06:39:55 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id wlOqs47h9omz for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 25 May 2018 06:39:32 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CCA340683
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 May 2018 06:39:32 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <87r2m0rqzw.fsf@linaro.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20180510111347.32253-1-mark.rutland@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, May 25, 2018 at 11:04:03AM +0100, Alex Benn=E9e wrote:
-> =
+On Thu, May 10, 2018 at 12:13:47PM +0100, Mark Rutland wrote:
+> For historical reasons, we open-code lm_alias() in kvm_ksym_ref().
+> 
+> Let's use lm_alias() to avoid duplication and make things clearer.
+> 
+> As we have to pull this from <linux/mm.h> (which is not safe for
+> inclusion in assembly), we may as well move the kvm_ksym_ref()
+> definition into the existing !__ASSEMBLY__ block.
+> 
+> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+> Cc: Christoffer Dall <christoffer.dall@arm.com>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: kvmarm@lists.cs.columbia.edu
+> ---
+>  arch/arm64/include/asm/kvm_asm.h | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
 
-> Dave Martin <Dave.Martin@arm.com> writes:
-> =
+Marc, Christoffer, are you happy to pick this up?
 
-> > Currently the FPSIMD handling code uses the condition task->mm =3D=3D
-> > NULL as a hint that task has no FPSIMD register context.
-> >
-> > The ->mm check is only there to filter out tasks that cannot
-> > possibly have FPSIMD context loaded, for optimisation purposes.
-> > Also, TIF_FOREIGN_FPSTATE must always be checked anyway before
-> > saving FPSIMD context back to memory.  For these reasons, the ->mm
-> > checks are not useful, providing that TIF_FOREIGN_FPSTATE is
-> > maintained in a consistent way for all threads.
-> >
-> > The context switch logic is already deliberately optimised to defer
-> > reloads of the regs until ret_to_user (or sigreturn as a special
-> > case), and save them only if they have been previously loaded.
-> > These paths are the only places where the wrong_task and wrong_cpu
-> > conditions can be made false, by calling fpsimd_bind_task_to_cpu().
-> > Kernel threads by definition never reach these paths.  As a result,
-> > the wrong_task and wrong_cpu tests in fpsimd_thread_switch() will
-> > always yield true for kernel threads.
-> >
-> > This patch removes the redundant checks and special-case code,         =
-         ensuring that TIF_FOREIGN_FPSTATE is set whenever a kernel thread =
-              is scheduled in, and ensures that this flag is set for the in=
-it
-> > task.  The fpsimd_flush_task_state() call already present in
-> > copy_thread() ensures the same for any new task.
-> >
-> > With TIF_FOREIGN_FPSTATE always set for kernel threads, this patch
-> > ensures that no extra context save work is added for kernel
-> > threads, and eliminates the redundant context saving that may
-> > currently occur for kernel threads that have acquired an mm via
-> > use_mm().
-> >
-> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> > Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-> > Reviewed-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> =
+Mark.
 
-> Still good (although obviously without the ws damage in the commit).
-
-Agreed -- I'll coordinate with Marc to make sure that gets fixed.
-
-Thanks for the review.
-
-[...]
-
-Cheers
----Dave
+> Since v1 [1]:
+> * Rebase to v4.17-rc4
+> * Fix typo in commit message
+> 
+> Mark.
+> 
+> [1] https://lkml.kernel.org/r/20180406151909.57197-1-mark.rutland@arm.com
+> 
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index f6648a3e4152..a9ceeec5a76f 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -33,16 +33,19 @@
+>  #define KVM_ARM64_DEBUG_DIRTY_SHIFT	0
+>  #define KVM_ARM64_DEBUG_DIRTY		(1 << KVM_ARM64_DEBUG_DIRTY_SHIFT)
+>  
+> +#ifndef __ASSEMBLY__
+> +
+> +#include <linux/mm.h>
+> +
+>  /* Translate a kernel address of @sym into its equivalent linear mapping */
+>  #define kvm_ksym_ref(sym)						\
+>  	({								\
+>  		void *val = &sym;					\
+>  		if (!is_kernel_in_hyp_mode())				\
+> -			val = phys_to_virt((u64)&sym - kimage_voffset);	\
+> +			val = lm_alias(&sym);				\
+>  		val;							\
+>  	 })
+>  
+> -#ifndef __ASSEMBLY__
+>  struct kvm;
+>  struct kvm_vcpu;
+>  
+> -- 
+> 2.11.0
+> 
