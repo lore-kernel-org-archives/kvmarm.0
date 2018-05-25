@@ -1,103 +1,81 @@
-From: Julien Thierry <julien.thierry@arm.com>
-Subject: [PATCH v4 14/26] arm64: kvm: Unmask PMR before entering guest
-Date: Fri, 25 May 2018 10:49:20 +0100
-Message-ID: <1527241772-48007-15-git-send-email-julien.thierry@arm.com>
-References: <1527241772-48007-1-git-send-email-julien.thierry@arm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1527241772-48007-1-git-send-email-julien.thierry@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org, daniel.thompson@linaro.org, joel@joelfernandes.org, marc.zyngier@arm.com, mark.rutland@arm.com, christoffer.dall@arm.com, james.morse@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, Julien Thierry <julien.thierry@arm.com>, kvmarm@lists.cs.columbia.edu
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH v11 08/19] arm64: fpsimd: Eliminate task->mm checks
+Date: Fri, 25 May 2018 10:52:12 +0100
+Message-ID: <20180525095211.GB13470@e103592.cambridge.arm.com>
+References: <1527181008-13549-1-git-send-email-Dave.Martin@arm.com>
+ <1527181008-13549-9-git-send-email-Dave.Martin@arm.com>
+ <20180525090257.GB54529@C02W217FHV2R.local>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 01DD849F7F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 May 2018 05:41:55 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id uM0s7SwqhD5W for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 25 May 2018 05:41:32 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AD5C949F7E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 May 2018 05:41:32 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <20180525090257.GB54529@C02W217FHV2R.local>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Interrupts masked by ICC_PMR_EL1 will not be signaled to the CPU. This
-means that hypervisor will not receive masked interrupts while running a
-guest.
+On Fri, May 25, 2018 at 11:02:57AM +0200, Christoffer Dall wrote:
+> On Thu, May 24, 2018 at 05:56:37PM +0100, Dave Martin wrote:
+> > Currently the FPSIMD handling code uses the condition task->mm ==
+> > NULL as a hint that task has no FPSIMD register context.
+> > 
+> > The ->mm check is only there to filter out tasks that cannot
+> > possibly have FPSIMD context loaded, for optimisation purposes.
+> > Also, TIF_FOREIGN_FPSTATE must always be checked anyway before
+> > saving FPSIMD context back to memory.  For these reasons, the ->mm
+> > checks are not useful, providing that TIF_FOREIGN_FPSTATE is
+> > maintained in a consistent way for all threads.
+> > 
+> > The context switch logic is already deliberately optimised to defer
+> > reloads of the regs until ret_to_user (or sigreturn as a special
+> > case), and save them only if they have been previously loaded.
+> > These paths are the only places where the wrong_task and wrong_cpu
+> > conditions can be made false, by calling fpsimd_bind_task_to_cpu().
+> > Kernel threads by definition never reach these paths.  As a result,
+> > the wrong_task and wrong_cpu tests in fpsimd_thread_switch() will
+> > always yield true for kernel threads.
+> > 
+> > This patch removes the redundant checks and special-case code,                  ensuring that TIF_FOREIGN_FPSTATE is set whenever a kernel thread               is scheduled in, and ensures that this flag is set for the init
+> > task.  The fpsimd_flush_task_state() call already present in
+> > copy_thread() ensures the same for any new task.
+> 
+> nit: formatting still funny, but you shouldn't respin just for that.
 
-Avoid this by making sure ICC_PMR_EL1 is unmasked when we enter a guest.
+Ah jeez... it was a long day.
 
-Signed-off-by: Julien Thierry <julien.thierry@arm.com>
-Cc: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will.deacon@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu
----
- arch/arm64/include/asm/kvm_host.h | 12 ++++++++++++
- arch/arm64/kvm/hyp/switch.c       | 17 +++++++++++++++++
- 2 files changed, 29 insertions(+)
+I guess this isn't the end of the world, but I'll fix this in my branch
+and point Marc at it.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 469de8a..bfd9e5b 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -24,6 +24,7 @@
- 
- #include <linux/types.h>
- #include <linux/kvm_types.h>
-+#include <asm/arch_gicv3.h>
- #include <asm/cpufeature.h>
- #include <asm/daifflags.h>
- #include <asm/fpsimd.h>
-@@ -433,6 +434,17 @@ static inline void kvm_fpsimd_flush_cpu_state(void)
- static inline void kvm_arm_vhe_guest_enter(void)
- {
- 	local_daif_mask();
-+
-+	/*
-+	 * Having IRQs masked via PMR when entering the guest means the GIC
-+	 * will not signal the CPU of interrupts of lower priority, and the
-+	 * only way to get out will be via guest exceptions.
-+	 * Naturally, we want to avoid this.
-+	 */
-+	if (gic_prio_masking_enabled()) {
-+		gic_write_pmr(ICC_PMR_EL1_UNMASKED);
-+		dsb(sy);
-+	}
- }
- 
- static inline void kvm_arm_vhe_guest_exit(void)
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index d964523..f00a04c 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -21,6 +21,7 @@
- 
- #include <kvm/arm_psci.h>
- 
-+#include <asm/arch_gicv3.h>
- #include <asm/kvm_asm.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_hyp.h>
-@@ -442,6 +443,19 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- 	struct kvm_cpu_context *guest_ctxt;
- 	bool fp_enabled;
- 	u64 exit_code;
-+	u32 host_pmr = ICC_PMR_EL1_UNMASKED;
-+
-+	/*
-+	 * Having IRQs masked via PMR when entering the guest means the GIC
-+	 * will not signal the CPU of interrupts of lower priority, and the
-+	 * only way to get out will be via guest exceptions.
-+	 * Naturally, we want to avoid this.
-+	 */
-+	if (gic_prio_masking_enabled()) {
-+		host_pmr = gic_read_pmr();
-+		gic_write_pmr(ICC_PMR_EL1_UNMASKED);
-+		dsb(sy);
-+	}
- 
- 	vcpu = kern_hyp_va(vcpu);
- 
-@@ -496,6 +510,9 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- 	 */
- 	__debug_switch_to_host(vcpu);
- 
-+	if (gic_prio_masking_enabled())
-+		gic_write_pmr(host_pmr);
-+
- 	return exit_code;
- }
- 
--- 
-1.9.1
+> > 
+> > With TIF_FOREIGN_FPSTATE always set for kernel threads, this patch
+> > ensures that no extra context save work is added for kernel
+> > threads, and eliminates the redundant context saving that may
+> > currently occur for kernel threads that have acquired an mm via
+> > use_mm().
+> 
+> Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+
+[...]
+
+Thanks
+---Dave
