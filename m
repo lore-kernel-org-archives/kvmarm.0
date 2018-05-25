@@ -1,8 +1,8 @@
 From: Russell King <rmk+kernel@armlinux.org.uk>
-Subject: [PATCH v3 01/15] ARM: add more CPU part numbers for Cortex and Brahma
- B15 CPUs
-Date: Fri, 25 May 2018 15:00:27 +0100
-Message-ID: <E1fMDGd-0006yK-SB@rmk-PC.armlinux.org.uk>
+Subject: [PATCH v3 05/15] ARM: spectre: add Kconfig symbol for CPUs vulnerable
+ to Spectre
+Date: Fri, 25 May 2018 15:00:48 +0100
+Message-ID: <E1fMDGy-0006ym-CZ@rmk-PC.armlinux.org.uk>
 References: <20180525135938.GE17671@n2100.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -23,35 +23,36 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add CPU part numbers for Cortex A53, A57, A72, A73, A75 and the
-Broadcom Brahma B15 CPU.
+Add a Kconfig symbol for CPUs which are vulnerable to the Spectre
+attacks.
 
 Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
-Acked-by: Florian Fainelli <f.fainelli@gmail.com>
+Reviewed-by: Florian Fainelli <f.fainelli@gmail.com>
 ---
- arch/arm/include/asm/cputype.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ arch/arm/mm/Kconfig | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/arch/arm/include/asm/cputype.h b/arch/arm/include/asm/cputype.h
-index cb546425da8a..26021980504d 100644
---- a/arch/arm/include/asm/cputype.h
-+++ b/arch/arm/include/asm/cputype.h
-@@ -77,8 +77,16 @@
- #define ARM_CPU_PART_CORTEX_A12		0x4100c0d0
- #define ARM_CPU_PART_CORTEX_A17		0x4100c0e0
- #define ARM_CPU_PART_CORTEX_A15		0x4100c0f0
-+#define ARM_CPU_PART_CORTEX_A53		0x4100d030
-+#define ARM_CPU_PART_CORTEX_A57		0x4100d070
-+#define ARM_CPU_PART_CORTEX_A72		0x4100d080
-+#define ARM_CPU_PART_CORTEX_A73		0x4100d090
-+#define ARM_CPU_PART_CORTEX_A75		0x4100d0a0
- #define ARM_CPU_PART_MASK		0xff00fff0
+diff --git a/arch/arm/mm/Kconfig b/arch/arm/mm/Kconfig
+index 7f14acf67caf..6f3ef86b4cb7 100644
+--- a/arch/arm/mm/Kconfig
++++ b/arch/arm/mm/Kconfig
+@@ -415,6 +415,7 @@ config CPU_V7
+ 	select CPU_CP15_MPU if !MMU
+ 	select CPU_HAS_ASID if MMU
+ 	select CPU_PABRT_V7
++	select CPU_SPECTRE if MMU
+ 	select CPU_THUMB_CAPABLE
+ 	select CPU_TLB_V7 if MMU
  
-+/* Broadcom cores */
-+#define ARM_CPU_PART_BRAHMA_B15		0x420000f0
+@@ -826,6 +827,9 @@ config CPU_BPREDICT_DISABLE
+ 	help
+ 	  Say Y here to disable branch prediction.  If unsure, say N.
+ 
++config CPU_SPECTRE
++	bool
 +
- /* DEC implemented cores */
- #define ARM_CPU_PART_SA1100		0x4400a110
- 
+ config TLS_REG_EMUL
+ 	bool
+ 	select NEED_KUSER_HELPERS
 -- 
 2.7.4
