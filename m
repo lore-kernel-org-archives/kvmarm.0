@@ -1,7 +1,8 @@
 From: Russell King <rmk+kernel@armlinux.org.uk>
-Subject: [PATCH v3 04/15] ARM: bugs: add support for per-processor bug checking
-Date: Fri, 25 May 2018 15:00:43 +0100
-Message-ID: <E1fMDGt-0006yf-8k@rmk-PC.armlinux.org.uk>
+Subject: [PATCH v3 12/15] ARM: KVM: invalidate icache on guest exit for
+ Cortex-A15
+Date: Fri, 25 May 2018 15:01:24 +0100
+Message-ID: <E1fMDHY-00073s-7i@rmk-PC.armlinux.org.uk>
 References: <20180525135938.GE17671@n2100.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -22,72 +23,78 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add support for per-processor bug checking - each processor function
-descriptor gains a function pointer for this check, which must not be
-an __init function.  If non-NULL, this will be called whenever a CPU
-enters the kernel via which ever path (boot CPU, secondary CPU startup,
-CPU resuming, etc.)
+From: Marc Zyngier <marc.zyngier@arm.com>
 
-This allows processor specific bug checks to validate that workaround
-bits are properly enabled by firmware via all entry paths to the kernel.
+In order to avoid aliasing attacks against the branch predictor
+on Cortex-A15, let's invalidate the BTB on guest exit, which can
+only be done by invalidating the icache (with ACTLR[0] being set).
 
+We use the same hack as for A12/A17 to perform the vector decoding.
+
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
-Reviewed-by: Florian Fainelli <f.fainelli@gmail.com>
 ---
- arch/arm/include/asm/proc-fns.h | 4 ++++
- arch/arm/kernel/bugs.c          | 4 ++++
- arch/arm/mm/proc-macros.S       | 3 ++-
- 3 files changed, 10 insertions(+), 1 deletion(-)
+ arch/arm/include/asm/kvm_mmu.h |  5 +++++
+ arch/arm/kvm/hyp/hyp-entry.S   | 24 ++++++++++++++++++++++++
+ 2 files changed, 29 insertions(+)
 
-diff --git a/arch/arm/include/asm/proc-fns.h b/arch/arm/include/asm/proc-fns.h
-index f2e1af45bd6f..e25f4392e1b2 100644
---- a/arch/arm/include/asm/proc-fns.h
-+++ b/arch/arm/include/asm/proc-fns.h
-@@ -37,6 +37,10 @@ extern struct processor {
- 	 */
- 	void (*_proc_init)(void);
- 	/*
-+	 * Check for processor bugs
-+	 */
-+	void (*check_bugs)(void);
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index d08ce9c41df4..48edb1f4ced4 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -306,6 +306,11 @@ static inline void *kvm_get_hyp_vector(void)
+ 		return kvm_ksym_ref(__kvm_hyp_vector_bp_inv);
+ 	}
+ 
++	case ARM_CPU_PART_CORTEX_A15:
++	{
++		extern char __kvm_hyp_vector_ic_inv[];
++		return kvm_ksym_ref(__kvm_hyp_vector_ic_inv);
++	}
+ #endif
+ 	default:
+ 	{
+diff --git a/arch/arm/kvm/hyp/hyp-entry.S b/arch/arm/kvm/hyp/hyp-entry.S
+index e789f52a5129..918a05dd2d63 100644
+--- a/arch/arm/kvm/hyp/hyp-entry.S
++++ b/arch/arm/kvm/hyp/hyp-entry.S
+@@ -73,6 +73,28 @@
+ 
+ #ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
+ 	.align 5
++__kvm_hyp_vector_ic_inv:
++	.global __kvm_hyp_vector_ic_inv
++
 +	/*
- 	 * Disable any processor specifics
- 	 */
- 	void (*_proc_fin)(void);
-diff --git a/arch/arm/kernel/bugs.c b/arch/arm/kernel/bugs.c
-index 16e7ba2a9cc4..7be511310191 100644
---- a/arch/arm/kernel/bugs.c
-+++ b/arch/arm/kernel/bugs.c
-@@ -5,6 +5,10 @@
++	 * We encode the exception entry in the bottom 3 bits of
++	 * SP, and we have to guarantee to be 8 bytes aligned.
++	 */
++	W(add)	sp, sp, #1	/* Reset 	  7 */
++	W(add)	sp, sp, #1	/* Undef	  6 */
++	W(add)	sp, sp, #1	/* Syscall	  5 */
++	W(add)	sp, sp, #1	/* Prefetch abort 4 */
++	W(add)	sp, sp, #1	/* Data abort	  3 */
++	W(add)	sp, sp, #1	/* HVC		  2 */
++	W(add)	sp, sp, #1	/* IRQ		  1 */
++	W(nop)			/* FIQ		  0 */
++
++	mcr	p15, 0, r0, c7, c5, 0	/* ICIALLU */
++	isb
++
++	b	decode_vectors
++
++	.align 5
+ __kvm_hyp_vector_bp_inv:
+ 	.global __kvm_hyp_vector_bp_inv
  
- void check_other_bugs(void)
- {
-+#ifdef MULTI_CPU
-+	if (processor.check_bugs)
-+		processor.check_bugs();
-+#endif
- }
+@@ -92,6 +114,8 @@
+ 	mcr	p15, 0, r0, c7, c5, 6	/* BPIALL */
+ 	isb
  
- void __init check_bugs(void)
-diff --git a/arch/arm/mm/proc-macros.S b/arch/arm/mm/proc-macros.S
-index f10e31d0730a..81d0efb055c6 100644
---- a/arch/arm/mm/proc-macros.S
-+++ b/arch/arm/mm/proc-macros.S
-@@ -273,13 +273,14 @@
- 	mcr	p15, 0, ip, c7, c10, 4		@ data write barrier
- 	.endm
- 
--.macro define_processor_functions name:req, dabort:req, pabort:req, nommu=0, suspend=0
-+.macro define_processor_functions name:req, dabort:req, pabort:req, nommu=0, suspend=0, bugs=0
- 	.type	\name\()_processor_functions, #object
- 	.align 2
- ENTRY(\name\()_processor_functions)
- 	.word	\dabort
- 	.word	\pabort
- 	.word	cpu_\name\()_proc_init
-+	.word	\bugs
- 	.word	cpu_\name\()_proc_fin
- 	.word	cpu_\name\()_reset
- 	.word	cpu_\name\()_do_idle
++decode_vectors:
++
+ #ifdef CONFIG_THUMB2_KERNEL
+ 	/*
+ 	 * Yet another silly hack: Use VPIDR as a temp register.
 -- 
 2.7.4
