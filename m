@@ -1,157 +1,103 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v10 07/18] arm64: fpsimd: Eliminate task->mm checks
-Date: Fri, 25 May 2018 10:45:17 +0100
-Message-ID: <20180525094515.GA13470@e103592.cambridge.arm.com>
-References: <1527005119-6842-8-git-send-email-Dave.Martin@arm.com>
- <20180523114812.GH55598@C02W217FHV2R.local>
- <20180523133158.GJ13470@e103592.cambridge.arm.com>
- <20180523145657.g7b6v2q2vxfqpoc4@armageddon.cambridge.arm.com>
- <20180523150337.GO13470@e103592.cambridge.arm.com>
- <20180524083350.GK55598@C02W217FHV2R.local>
- <20180524095056.GR13470@e103592.cambridge.arm.com>
- <20180524100659.GO55598@C02W217FHV2R.local>
- <20180524143714.GV13470@e103592.cambridge.arm.com>
- <20180525090020.GA54529@C02W217FHV2R.local>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <20180525090020.GA54529@C02W217FHV2R.local>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+From: Julien Thierry <julien.thierry@arm.com>
+Subject: [PATCH v4 14/26] arm64: kvm: Unmask PMR before entering guest
+Date: Fri, 25 May 2018 10:49:20 +0100
+Message-ID: <1527241772-48007-15-git-send-email-julien.thierry@arm.com>
+References: <1527241772-48007-1-git-send-email-julien.thierry@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1527241772-48007-1-git-send-email-julien.thierry@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org, daniel.thompson@linaro.org, joel@joelfernandes.org, marc.zyngier@arm.com, mark.rutland@arm.com, christoffer.dall@arm.com, james.morse@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, Julien Thierry <julien.thierry@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, May 25, 2018 at 11:00:20AM +0200, Christoffer Dall wrote:
-> On Thu, May 24, 2018 at 03:37:15PM +0100, Dave Martin wrote:
-> > On Thu, May 24, 2018 at 12:06:59PM +0200, Christoffer Dall wrote:
-> > > On Thu, May 24, 2018 at 10:50:56AM +0100, Dave Martin wrote:
+Interrupts masked by ICC_PMR_EL1 will not be signaled to the CPU. This
+means that hypervisor will not receive masked interrupts while running a
+guest.
 
-[...]
+Avoid this by making sure ICC_PMR_EL1 is unmasked when we enter a guest.
 
-> > > I'm not sure what the reader is to make of that.  Do you not mean the
-> > > TIF_FOREIGN_FPSTATE is always true for kernel threads?
-> > 
-> > Again, this is probably a red herring.  TIF_FOREIGN_FPSTATE is always
-> > true for kernel threads prior to the patch, except (randomly) for the
-> > init task.
-> 
-> That was really what my initial question was about, and what I thought
-> the commit message should make abundantly clear, because that ties the
-> message together with the code.
-> 
-> > 
-> > This change is not really about TIF_FOREIGN_FPSTATE at all, rather
-> > that there is nothing to justify handling kernel threads differently,
-> > or even distinguishing kernel threads from user threads at all in this
-> > code.
-> 
-> Understood.
+Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+Cc: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu
+---
+ arch/arm64/include/asm/kvm_host.h | 12 ++++++++++++
+ arch/arm64/kvm/hyp/switch.c       | 17 +++++++++++++++++
+ 2 files changed, 29 insertions(+)
 
-And my bad was that I hadn't gone to the effort of understanding my own
-argument -- I'd glad to be called out on that.
-
-> > Part of the confusion (and I had confused myself) comes from the fact
-> > that TIF_FOREIGN_FPSTATE is really a per-cpu property and doesn't make
-> > sense as a per-task property -- i.e., the flag is meaningless for
-> > scheduled-out tasks and we must explicitly "repair" it when scheduling
-> > a task in anyway.  I think it's a thread flag primarily so that it's
-> > convenient to check alongside other thread flags in the ret_to_user
-> > work loop.  This is somewhat less of a justification now that loop was
-> > ported to C.
-> > 
-> > > > 
-> > > > The context switch logic is already deliberately optimised to defer
-> > > > reloads of the regs until ret_to_user (or sigreturn as a special
-> > > > case), and save them only if they have been previously loaded.
-> > 
-> > Does it help to insert the following here?
-> > 
-> > "These paths are the only places where the wrong_task and wrong_cpu
-> > conditions can be made false, by calling fpsimd_bind_task_to_cpu()."
-> > 
-> 
-> yes it does.
-> 
-> > > > Kernel threads by definition never reach these paths.  As a result,
-> > > 
-> > > I'm struggling with the "As a result," here.  Is this because reloads of
-> > > regs in ret_to_user (or sigreturn) are the only places that can make
-> > > wrong_cpu or wrong_task be false?
-> > 
-> > See the proposed clarification above.  Is that sufficient?
-> > 
-> 
-> yes.
-> 
-> > > (I'm actually wanting to understand this, not just bikeshedding the
-> > > commit message, as new corner cases keep coming up on this logic.)
-> > 
-> > That's a good thing, and I would really like to explain it in a
-> > concise manner.  See [*] below for the "concise" explanation -- it may
-> > demonstrate why I've been evasive...
-> > 
-> 
-> I don't think you've been evasive at all, I just think we reason about
-> this in slightly different ways, and I was trying to convince myself why
-> this change is safe and summarize that concisely.  I think we've
-> accomplished both :)
-
-OK, good.  I reposted speculatively on this basis :)
-
-The commit message is in better shape now, and I very much appreciate
-you kicking the tyres on my reasoning!
-
-[...]
-
-> > As an aside, the big wall of text before the definition of struct
-> > fpsimd_last_state_struct is looking out of date and could use an
-> > update to cover at least some of what is explained in [*] better.
-> > 
-> > I'm currently considering that out of scope for this series, but I will
-> > keep it in mind to refresh it in the not too distant future.
-> > 
-> 
-> Fine with me.
-
-OK, good.
-
-[...]
-
-> > [*] The bigger picture:
-> > 
-> > * Consider a relation (C,T) between cpus C and tasks T, such that
-
-[...]
-
-> > but by assuming that the code is already well-optimised, "unnecessary"
-> > save/restore work will not be added.  If this were not the case, it
-> > could in any case be fixed independently.
-> > 
-> > The observation of this _series_ is that we don't need to do very
-> > much in order to be able to generalise the logic to accept KVM vcpus
-> > in place of T.
-> > 
-> 
-> Thanks for the explanation.
-> -Christoffer
-
-Was this reasonably understandable?  If so I could use it as a basis for
-improving the comment block in fpsimd.c, but I'd want to squash it down
-to the essentials.  It's pretty verbose as it stands.
-
-(What I'd really like to do it take an axe to the logic so that we
-end up with something that doesn't require anything like this amount
-of explanation ... but that's more of an aspiration right now.)
-
-Cheers
----Dave
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 469de8a..bfd9e5b 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -24,6 +24,7 @@
+ 
+ #include <linux/types.h>
+ #include <linux/kvm_types.h>
++#include <asm/arch_gicv3.h>
+ #include <asm/cpufeature.h>
+ #include <asm/daifflags.h>
+ #include <asm/fpsimd.h>
+@@ -433,6 +434,17 @@ static inline void kvm_fpsimd_flush_cpu_state(void)
+ static inline void kvm_arm_vhe_guest_enter(void)
+ {
+ 	local_daif_mask();
++
++	/*
++	 * Having IRQs masked via PMR when entering the guest means the GIC
++	 * will not signal the CPU of interrupts of lower priority, and the
++	 * only way to get out will be via guest exceptions.
++	 * Naturally, we want to avoid this.
++	 */
++	if (gic_prio_masking_enabled()) {
++		gic_write_pmr(ICC_PMR_EL1_UNMASKED);
++		dsb(sy);
++	}
+ }
+ 
+ static inline void kvm_arm_vhe_guest_exit(void)
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index d964523..f00a04c 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -21,6 +21,7 @@
+ 
+ #include <kvm/arm_psci.h>
+ 
++#include <asm/arch_gicv3.h>
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_hyp.h>
+@@ -442,6 +443,19 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 	struct kvm_cpu_context *guest_ctxt;
+ 	bool fp_enabled;
+ 	u64 exit_code;
++	u32 host_pmr = ICC_PMR_EL1_UNMASKED;
++
++	/*
++	 * Having IRQs masked via PMR when entering the guest means the GIC
++	 * will not signal the CPU of interrupts of lower priority, and the
++	 * only way to get out will be via guest exceptions.
++	 * Naturally, we want to avoid this.
++	 */
++	if (gic_prio_masking_enabled()) {
++		host_pmr = gic_read_pmr();
++		gic_write_pmr(ICC_PMR_EL1_UNMASKED);
++		dsb(sy);
++	}
+ 
+ 	vcpu = kern_hyp_va(vcpu);
+ 
+@@ -496,6 +510,9 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 	 */
+ 	__debug_switch_to_host(vcpu);
+ 
++	if (gic_prio_masking_enabled())
++		gic_write_pmr(host_pmr);
++
+ 	return exit_code;
+ }
+ 
+-- 
+1.9.1
