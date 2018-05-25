@@ -1,56 +1,52 @@
-From: Russell King - ARM Linux <linux@armlinux.org.uk>
-Subject: Re: [PATCH 03/14] ARM: bugs: hook processor bug checking into SMP
- and suspend paths
-Date: Fri, 25 May 2018 11:03:59 +0100
-Message-ID: <20180525100359.GC17671@n2100.armlinux.org.uk>
-References: <20180521114238.GN17671@n2100.armlinux.org.uk>
- <E1fKjEx-00063Y-N5@rmk-PC.armlinux.org.uk>
- <b454e37c-52a8-387f-3649-8ce72c9a5b18@gmail.com>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCHv4 06/10] arm64: add basic pointer authentication support
+Date: Fri, 25 May 2018 11:18:55 +0100
+Message-ID: <20180525101855.szjk4zfavi4omm55@lakrids.cambridge.arm.com>
+References: <20180503132031.25705-1-mark.rutland@arm.com>
+ <20180503132031.25705-7-mark.rutland@arm.com>
+ <114d65a8-ffa5-7061-864a-a32aa3baa5c5@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 775A749F8B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 May 2018 05:53:57 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PeLPOcGqOU4V for <kvmarm@lists.cs.columbia.edu>;
- Fri, 25 May 2018 05:53:34 -0400 (EDT)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 994FB49F7F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 May 2018 05:53:34 -0400 (EDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <b454e37c-52a8-387f-3649-8ce72c9a5b18@gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Florian Fainelli <f.fainelli@gmail.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <114d65a8-ffa5-7061-864a-a32aa3baa5c5@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, catalin.marinas@arm.com, christoffer.dall@arm.com, drjones@redhat.com, marc.zyngier@arm.com, ramana.radhakrishnan@arm.com, will.deacon@arm.com, awallis@codeaurora.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, May 24, 2018 at 04:30:40PM -0700, Florian Fainelli wrote:
-> On 05/21/2018 04:44 AM, Russell King wrote:
-> > Check for CPU bugs when secondary processors are being brought online,
-> > and also when CPUs are resuming from a low power mode.  This gives an
-> > opportunity to check that processor specific bug workarounds are
-> > correctly enabled for all paths that a CPU re-enters the kernel.
-> > 
-> > Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
-> > Reviewed-by: Florian Fainelli <f.fainelli@gmail.com>
+On Wed, May 23, 2018 at 09:42:56AM +0100, Suzuki K Poulose wrote:
+> On 03/05/18 14:20, Mark Rutland wrote:
+> > +#define __ptrauth_key_install(k, v)			\
+> > +do {							\
+> > +	write_sysreg_s(v.lo, SYS_ ## k ## KEYLO_EL1);	\
+> > +	write_sysreg_s(v.hi, SYS_ ## k ## KEYHI_EL1);	\
+> > +} while (0)
 > 
-> Something I missed, is that this correctly warns about e.g: missing the
-> IBE bit for secondary cores, but it seems to be missing it for the boot CPU:
+> I think it might be safer to have parentheses around v, to prevent
+> something like __ptrauth_key_install(APIA, *key_val) work fine.
 
-Are you sure that the boot CPU has the IBE bit clear?
+In case v is ever an expression with side-effects, I've made this:
 
--- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
-According to speedtest.net: 8.21Mbps down 510kbps up
+#define __ptrauth_key_install(k, v)				\
+do {								\
+	struct ptrauth_key __pki_v = (v);			\
+	write_sysreg_s(__pki_v.lo, SYS_ ## k ## KEYLO_EL1);	\
+	write_sysreg_s(__pki_v.hi, SYS_ ## k ## KEYHI_EL1);	\
+} while (0)
+
+... though I could just move the raw sysreg accesses into
+ptrauth_keys_switch() for now.
+
+[...]
+
+> > +#ifdef CONFIG_ARM64_PNTR_AUTH
+> > +	HWCAP_CAP(SYS_ID_AA64ISAR1_EL1, ID_AA64ISAR1_APA_SHIFT, FTR_UNSIGNED, 1, CAP_HWCAP, HWCAP_APIA),
+> > +#endif
+> 
+> Did you mean CONFIG_ARM64_PTR_AUTH here ?
+
+Yes; fixed now.
+
+Thanks,
+Mark.
