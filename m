@@ -1,293 +1,182 @@
 From: Russell King <rmk+kernel@armlinux.org.uk>
-Subject: [PATCH v3 06/15] ARM: spectre-v2: harden branch predictor on context
- switches
-Date: Fri, 25 May 2018 15:00:53 +0100
-Message-ID: <E1fMDH3-0006yt-Fn@rmk-PC.armlinux.org.uk>
+Subject: [PATCH v3 11/15] ARM: KVM: invalidate BTB on guest exit for
+ Cortex-A12/A17
+Date: Fri, 25 May 2018 15:01:19 +0100
+Message-ID: <E1fMDHT-00073l-3b@rmk-PC.armlinux.org.uk>
 References: <20180525135938.GE17671@n2100.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 93FE54A0E8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 May 2018 09:51:19 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qiZY4F+ISm08 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 25 May 2018 09:50:50 -0400 (EDT)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3E0D54A0CF
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 May 2018 09:50:36 -0400 (EDT)
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <20180525135938.GE17671@n2100.armlinux.org.uk>
 Content-Disposition: inline
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Harden the branch predictor against Spectre v2 attacks on context
-switches for ARMv7 and later CPUs.  We do this by:
+From: Marc Zyngier <marc.zyngier@arm.com>
 
-Cortex A9, A12, A17, A73, A75: invalidating the BTB.
-Cortex A15, Brahma B15: invalidating the instruction cache.
+In order to avoid aliasing attacks against the branch predictor,
+let's invalidate the BTB on guest exit. This is made complicated
+by the fact that we cannot take a branch before invalidating the
+BTB.
 
-Cortex A57 and Cortex A72 are not addressed in this patch.
+We only apply this to A12 and A17, which are the only two ARM
+cores on which this useful.
 
-Cortex R7 and Cortex R8 are also not addressed as we do not enforce
-memory protection on these cores.
-
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
 ---
- arch/arm/mm/Kconfig          |  19 +++++++
- arch/arm/mm/proc-v7-2level.S |   6 ---
- arch/arm/mm/proc-v7.S        | 125 +++++++++++++++++++++++++++++++++----------
- 3 files changed, 115 insertions(+), 35 deletions(-)
+ arch/arm/include/asm/kvm_asm.h |  2 --
+ arch/arm/include/asm/kvm_mmu.h | 17 +++++++++-
+ arch/arm/kvm/hyp/hyp-entry.S   | 71 ++++++++++++++++++++++++++++++++++++++++--
+ 3 files changed, 85 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm/mm/Kconfig b/arch/arm/mm/Kconfig
-index 6f3ef86b4cb7..9357ff52c221 100644
---- a/arch/arm/mm/Kconfig
-+++ b/arch/arm/mm/Kconfig
-@@ -830,6 +830,25 @@ config CPU_BPREDICT_DISABLE
- config CPU_SPECTRE
- 	bool
+diff --git a/arch/arm/include/asm/kvm_asm.h b/arch/arm/include/asm/kvm_asm.h
+index 36dd2962a42d..df24ed48977d 100644
+--- a/arch/arm/include/asm/kvm_asm.h
++++ b/arch/arm/include/asm/kvm_asm.h
+@@ -61,8 +61,6 @@ struct kvm_vcpu;
+ extern char __kvm_hyp_init[];
+ extern char __kvm_hyp_init_end[];
  
-+config HARDEN_BRANCH_PREDICTOR
-+	bool "Harden the branch predictor against aliasing attacks" if EXPERT
-+	depends on CPU_SPECTRE
-+	default y
-+	help
-+	   Speculation attacks against some high-performance processors rely
-+	   on being able to manipulate the branch predictor for a victim
-+	   context by executing aliasing branches in the attacker context.
-+	   Such attacks can be partially mitigated against by clearing
-+	   internal branch predictor state and limiting the prediction
-+	   logic in some situations.
-+
-+	   This config option will take CPU-specific actions to harden
-+	   the branch predictor against aliasing attacks and may rely on
-+	   specific instruction sequences or control bits being set by
-+	   the system firmware.
-+
-+	   If unsure, say Y.
-+
- config TLS_REG_EMUL
- 	bool
- 	select NEED_KUSER_HELPERS
-diff --git a/arch/arm/mm/proc-v7-2level.S b/arch/arm/mm/proc-v7-2level.S
-index c6141a5435c3..f8d45ad2a515 100644
---- a/arch/arm/mm/proc-v7-2level.S
-+++ b/arch/arm/mm/proc-v7-2level.S
-@@ -41,11 +41,6 @@
-  *	even on Cortex-A8 revisions not affected by 430973.
-  *	If IBE is not set, the flush BTAC/BTB won't do anything.
-  */
--ENTRY(cpu_ca8_switch_mm)
--#ifdef CONFIG_MMU
--	mov	r2, #0
--	mcr	p15, 0, r2, c7, c5, 6		@ flush BTAC/BTB
--#endif
- ENTRY(cpu_v7_switch_mm)
- #ifdef CONFIG_MMU
- 	mmid	r1, r1				@ get mm->context.id
-@@ -66,7 +61,6 @@ ENTRY(cpu_v7_switch_mm)
- #endif
- 	bx	lr
- ENDPROC(cpu_v7_switch_mm)
--ENDPROC(cpu_ca8_switch_mm)
- 
- /*
-  *	cpu_v7_set_pte_ext(ptep, pte)
-diff --git a/arch/arm/mm/proc-v7.S b/arch/arm/mm/proc-v7.S
-index d55d493f9a1e..a2d433d59848 100644
---- a/arch/arm/mm/proc-v7.S
-+++ b/arch/arm/mm/proc-v7.S
-@@ -93,6 +93,17 @@ ENTRY(cpu_v7_dcache_clean_area)
- 	ret	lr
- ENDPROC(cpu_v7_dcache_clean_area)
- 
-+ENTRY(cpu_v7_iciallu_switch_mm)
-+	mov	r3, #0
-+	mcr	p15, 0, r3, c7, c5, 0		@ ICIALLU
-+	b	cpu_v7_switch_mm
-+ENDPROC(cpu_v7_iciallu_switch_mm)
-+ENTRY(cpu_v7_bpiall_switch_mm)
-+	mov	r3, #0
-+	mcr	p15, 0, r3, c7, c5, 6		@ flush BTAC/BTB
-+	b	cpu_v7_switch_mm
-+ENDPROC(cpu_v7_bpiall_switch_mm)
-+
- 	string	cpu_v7_name, "ARMv7 Processor"
- 	.align
- 
-@@ -158,31 +169,6 @@ ENTRY(cpu_v7_do_resume)
- ENDPROC(cpu_v7_do_resume)
- #endif
- 
--/*
-- * Cortex-A8
-- */
--	globl_equ	cpu_ca8_proc_init,	cpu_v7_proc_init
--	globl_equ	cpu_ca8_proc_fin,	cpu_v7_proc_fin
--	globl_equ	cpu_ca8_reset,		cpu_v7_reset
--	globl_equ	cpu_ca8_do_idle,	cpu_v7_do_idle
--	globl_equ	cpu_ca8_dcache_clean_area, cpu_v7_dcache_clean_area
--	globl_equ	cpu_ca8_set_pte_ext,	cpu_v7_set_pte_ext
--	globl_equ	cpu_ca8_suspend_size,	cpu_v7_suspend_size
--#ifdef CONFIG_ARM_CPU_SUSPEND
--	globl_equ	cpu_ca8_do_suspend,	cpu_v7_do_suspend
--	globl_equ	cpu_ca8_do_resume,	cpu_v7_do_resume
--#endif
+-extern char __kvm_hyp_vector[];
 -
--/*
-- * Cortex-A9 processor functions
-- */
--	globl_equ	cpu_ca9mp_proc_init,	cpu_v7_proc_init
--	globl_equ	cpu_ca9mp_proc_fin,	cpu_v7_proc_fin
--	globl_equ	cpu_ca9mp_reset,	cpu_v7_reset
--	globl_equ	cpu_ca9mp_do_idle,	cpu_v7_do_idle
--	globl_equ	cpu_ca9mp_dcache_clean_area, cpu_v7_dcache_clean_area
--	globl_equ	cpu_ca9mp_switch_mm,	cpu_v7_switch_mm
--	globl_equ	cpu_ca9mp_set_pte_ext,	cpu_v7_set_pte_ext
- .globl	cpu_ca9mp_suspend_size
- .equ	cpu_ca9mp_suspend_size, cpu_v7_suspend_size + 4 * 2
- #ifdef CONFIG_ARM_CPU_SUSPEND
-@@ -548,10 +534,75 @@ ENDPROC(__v7_setup)
+ extern void __kvm_flush_vm_context(void);
+ extern void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
+ extern void __kvm_tlb_flush_vmid(struct kvm *kvm);
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index de1b919404e4..d08ce9c41df4 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -297,7 +297,22 @@ static inline unsigned int kvm_get_vmid_bits(void)
  
- 	@ define struct processor (see <asm/proc-fns.h> and proc-macros.S)
- 	define_processor_functions v7, dabort=v7_early_abort, pabort=v7_pabort, suspend=1
-+
+ static inline void *kvm_get_hyp_vector(void)
+ {
+-	return kvm_ksym_ref(__kvm_hyp_vector);
++	switch(read_cpuid_part()) {
 +#ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
-+	@ generic v7 bpiall on context switch
-+	globl_equ	cpu_v7_bpiall_proc_init,	cpu_v7_proc_init
-+	globl_equ	cpu_v7_bpiall_proc_fin,		cpu_v7_proc_fin
-+	globl_equ	cpu_v7_bpiall_reset,		cpu_v7_reset
-+	globl_equ	cpu_v7_bpiall_do_idle,		cpu_v7_do_idle
-+	globl_equ	cpu_v7_bpiall_dcache_clean_area, cpu_v7_dcache_clean_area
-+	globl_equ	cpu_v7_bpiall_set_pte_ext,	cpu_v7_set_pte_ext
-+	globl_equ	cpu_v7_bpiall_suspend_size,	cpu_v7_suspend_size
-+#ifdef CONFIG_ARM_CPU_SUSPEND
-+	globl_equ	cpu_v7_bpiall_do_suspend,	cpu_v7_do_suspend
-+	globl_equ	cpu_v7_bpiall_do_resume,	cpu_v7_do_resume
-+#endif
-+	define_processor_functions v7_bpiall, dabort=v7_early_abort, pabort=v7_pabort, suspend=1
++	case ARM_CPU_PART_CORTEX_A12:
++	case ARM_CPU_PART_CORTEX_A17:
++	{
++		extern char __kvm_hyp_vector_bp_inv[];
++		return kvm_ksym_ref(__kvm_hyp_vector_bp_inv);
++	}
 +
-+#define HARDENED_BPIALL_PROCESSOR_FUNCTIONS v7_bpiall_processor_functions
-+#else
-+#define HARDENED_BPIALL_PROCESSOR_FUNCTIONS v7_processor_functions
 +#endif
-+
- #ifndef CONFIG_ARM_LPAE
-+	@ Cortex-A8 - always needs bpiall switch_mm implementation
-+	globl_equ	cpu_ca8_proc_init,	cpu_v7_proc_init
-+	globl_equ	cpu_ca8_proc_fin,	cpu_v7_proc_fin
-+	globl_equ	cpu_ca8_reset,		cpu_v7_reset
-+	globl_equ	cpu_ca8_do_idle,	cpu_v7_do_idle
-+	globl_equ	cpu_ca8_dcache_clean_area, cpu_v7_dcache_clean_area
-+	globl_equ	cpu_ca8_set_pte_ext,	cpu_v7_set_pte_ext
-+	globl_equ	cpu_ca8_switch_mm,	cpu_v7_bpiall_switch_mm
-+	globl_equ	cpu_ca8_suspend_size,	cpu_v7_suspend_size
-+#ifdef CONFIG_ARM_CPU_SUSPEND
-+	globl_equ	cpu_ca8_do_suspend,	cpu_v7_do_suspend
-+	globl_equ	cpu_ca8_do_resume,	cpu_v7_do_resume
-+#endif
- 	define_processor_functions ca8, dabort=v7_early_abort, pabort=v7_pabort, suspend=1
-+
-+	@ Cortex-A9 - needs more registers preserved across suspend/resume
-+	@ and bpiall switch_mm for hardening
-+	globl_equ	cpu_ca9mp_proc_init,	cpu_v7_proc_init
-+	globl_equ	cpu_ca9mp_proc_fin,	cpu_v7_proc_fin
-+	globl_equ	cpu_ca9mp_reset,	cpu_v7_reset
-+	globl_equ	cpu_ca9mp_do_idle,	cpu_v7_do_idle
-+	globl_equ	cpu_ca9mp_dcache_clean_area, cpu_v7_dcache_clean_area
++	default:
++	{
++		extern char __kvm_hyp_vector[];
++		return kvm_ksym_ref(__kvm_hyp_vector);
++	}
++	}
+ }
+ 
+ static inline int kvm_map_vectors(void)
+diff --git a/arch/arm/kvm/hyp/hyp-entry.S b/arch/arm/kvm/hyp/hyp-entry.S
+index 95a2faefc070..e789f52a5129 100644
+--- a/arch/arm/kvm/hyp/hyp-entry.S
++++ b/arch/arm/kvm/hyp/hyp-entry.S
+@@ -71,6 +71,66 @@
+ 	W(b)	hyp_irq
+ 	W(b)	hyp_fiq
+ 
 +#ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
-+	globl_equ	cpu_ca9mp_switch_mm,	cpu_v7_bpiall_switch_mm
-+#else
-+	globl_equ	cpu_ca9mp_switch_mm,	cpu_v7_switch_mm
++	.align 5
++__kvm_hyp_vector_bp_inv:
++	.global __kvm_hyp_vector_bp_inv
++
++	/*
++	 * We encode the exception entry in the bottom 3 bits of
++	 * SP, and we have to guarantee to be 8 bytes aligned.
++	 */
++	W(add)	sp, sp, #1	/* Reset 	  7 */
++	W(add)	sp, sp, #1	/* Undef	  6 */
++	W(add)	sp, sp, #1	/* Syscall	  5 */
++	W(add)	sp, sp, #1	/* Prefetch abort 4 */
++	W(add)	sp, sp, #1	/* Data abort	  3 */
++	W(add)	sp, sp, #1	/* HVC		  2 */
++	W(add)	sp, sp, #1	/* IRQ		  1 */
++	W(nop)			/* FIQ		  0 */
++
++	mcr	p15, 0, r0, c7, c5, 6	/* BPIALL */
++	isb
++
++#ifdef CONFIG_THUMB2_KERNEL
++	/*
++	 * Yet another silly hack: Use VPIDR as a temp register.
++	 * Thumb2 is really a pain, as SP cannot be used with most
++	 * of the bitwise instructions. The vect_br macro ensures
++	 * things gets cleaned-up.
++	 */
++	mcr	p15, 4, r0, c0, c0, 0	/* VPIDR */
++	mov	r0, sp
++	and	r0, r0, #7
++	sub	sp, sp, r0
++	push	{r1, r2}
++	mov	r1, r0
++	mrc	p15, 4, r0, c0, c0, 0	/* VPIDR */
++	mrc	p15, 0, r2, c0, c0, 0	/* MIDR  */
++	mcr	p15, 4, r2, c0, c0, 0	/* VPIDR */
 +#endif
-+	globl_equ	cpu_ca9mp_set_pte_ext,	cpu_v7_set_pte_ext
- 	define_processor_functions ca9mp, dabort=v7_early_abort, pabort=v7_pabort, suspend=1
- #endif
 +
-+	@ Cortex-A15 - needs iciallu switch_mm for hardening
-+	globl_equ	cpu_ca15_proc_init,	cpu_v7_proc_init
-+	globl_equ	cpu_ca15_proc_fin,	cpu_v7_proc_fin
-+	globl_equ	cpu_ca15_reset,		cpu_v7_reset
-+	globl_equ	cpu_ca15_do_idle,	cpu_v7_do_idle
-+	globl_equ	cpu_ca15_dcache_clean_area, cpu_v7_dcache_clean_area
-+#ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
-+	globl_equ	cpu_ca15_switch_mm,	cpu_v7_iciallu_switch_mm
-+#else
-+	globl_equ	cpu_ca15_switch_mm,	cpu_v7_switch_mm
++.macro vect_br val, targ
++ARM(	eor	sp, sp, #\val	)
++ARM(	tst	sp, #7		)
++ARM(	eorne	sp, sp, #\val	)
++
++THUMB(	cmp	r1, #\val	)
++THUMB(	popeq	{r1, r2}	)
++
++	beq	\targ
++.endm
++
++	vect_br	0, hyp_fiq
++	vect_br	1, hyp_irq
++	vect_br	2, hyp_hvc
++	vect_br	3, hyp_dabt
++	vect_br	4, hyp_pabt
++	vect_br	5, hyp_svc
++	vect_br	6, hyp_undef
++	vect_br	7, hyp_reset
 +#endif
-+	globl_equ	cpu_ca15_set_pte_ext,	cpu_v7_set_pte_ext
-+	globl_equ	cpu_ca15_suspend_size,	cpu_v7_suspend_size
-+	globl_equ	cpu_ca15_do_suspend,	cpu_v7_do_suspend
-+	globl_equ	cpu_ca15_do_resume,	cpu_v7_do_resume
-+	define_processor_functions ca15, dabort=v7_early_abort, pabort=v7_pabort, suspend=1
- #ifdef CONFIG_CPU_PJ4B
- 	define_processor_functions pj4b, dabort=v7_early_abort, pabort=v7_pabort, suspend=1
- #endif
-@@ -658,7 +709,7 @@ ENDPROC(__v7_setup)
- __v7_ca12mp_proc_info:
- 	.long	0x410fc0d0
- 	.long	0xff0ffff0
--	__v7_proc __v7_ca12mp_proc_info, __v7_ca12mp_setup
-+	__v7_proc __v7_ca12mp_proc_info, __v7_ca12mp_setup, proc_fns = HARDENED_BPIALL_PROCESSOR_FUNCTIONS
- 	.size	__v7_ca12mp_proc_info, . - __v7_ca12mp_proc_info
- 
- 	/*
-@@ -668,7 +719,7 @@ ENDPROC(__v7_setup)
- __v7_ca15mp_proc_info:
- 	.long	0x410fc0f0
- 	.long	0xff0ffff0
--	__v7_proc __v7_ca15mp_proc_info, __v7_ca15mp_setup
-+	__v7_proc __v7_ca15mp_proc_info, __v7_ca15mp_setup, proc_fns = ca15_processor_functions
- 	.size	__v7_ca15mp_proc_info, . - __v7_ca15mp_proc_info
- 
- 	/*
-@@ -678,7 +729,7 @@ ENDPROC(__v7_setup)
- __v7_b15mp_proc_info:
- 	.long	0x420f00f0
- 	.long	0xff0ffff0
--	__v7_proc __v7_b15mp_proc_info, __v7_b15mp_setup, cache_fns = b15_cache_fns
-+	__v7_proc __v7_b15mp_proc_info, __v7_b15mp_setup, proc_fns = ca15_processor_functions, cache_fns = b15_cache_fns
- 	.size	__v7_b15mp_proc_info, . - __v7_b15mp_proc_info
- 
- 	/*
-@@ -688,9 +739,25 @@ ENDPROC(__v7_setup)
- __v7_ca17mp_proc_info:
- 	.long	0x410fc0e0
- 	.long	0xff0ffff0
--	__v7_proc __v7_ca17mp_proc_info, __v7_ca17mp_setup
-+	__v7_proc __v7_ca17mp_proc_info, __v7_ca17mp_setup, proc_fns = HARDENED_BPIALL_PROCESSOR_FUNCTIONS
- 	.size	__v7_ca17mp_proc_info, . - __v7_ca17mp_proc_info
- 
-+	/* ARM Ltd. Cortex A73 processor */
-+	.type	__v7_ca73_proc_info, #object
-+__v7_ca73_proc_info:
-+	.long	0x410fd090
-+	.long	0xff0ffff0
-+	__v7_proc __v7_ca73_proc_info, __v7_setup, proc_fns = HARDENED_BPIALL_PROCESSOR_FUNCTIONS
-+	.size	__v7_ca73_proc_info, . - __v7_ca73_proc_info
 +
-+	/* ARM Ltd. Cortex A75 processor */
-+	.type	__v7_ca75_proc_info, #object
-+__v7_ca75_proc_info:
-+	.long	0x410fd0a0
-+	.long	0xff0ffff0
-+	__v7_proc __v7_ca75_proc_info, __v7_setup, proc_fns = HARDENED_BPIALL_PROCESSOR_FUNCTIONS
-+	.size	__v7_ca75_proc_info, . - __v7_ca75_proc_info
-+
- 	/*
- 	 * Qualcomm Inc. Krait processors.
- 	 */
+ .macro invalid_vector label, cause
+ 	.align
+ \label:	mov	r0, #\cause
+@@ -149,7 +209,14 @@ ENDPROC(__hyp_do_panic)
+ 	bx	ip
+ 
+ 1:
+-	push	{lr}
++	/*
++	 * Pushing r2 here is just a way of keeping the stack aligned to
++	 * 8 bytes on any path that can trigger a HYP exception. Here,
++	 * we may well be about to jump into the guest, and the guest
++	 * exit would otherwise be badly decoded by our fancy
++	 * "decode-exception-without-a-branch" code...
++	 */
++	push	{r2, lr}
+ 
+ 	mov	lr, r0
+ 	mov	r0, r1
+@@ -159,7 +226,7 @@ ENDPROC(__hyp_do_panic)
+ THUMB(	orr	lr, #1)
+ 	blx	lr			@ Call the HYP function
+ 
+-	pop	{lr}
++	pop	{r2, lr}
+ 	eret
+ 
+ guest_trap:
 -- 
 2.7.4
