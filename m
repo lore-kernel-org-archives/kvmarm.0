@@ -1,177 +1,107 @@
-From: Florian Fainelli <f.fainelli@gmail.com>
-Subject: Re: [PATCH 03/14] ARM: bugs: hook processor bug checking into SMP and
- suspend paths
-Date: Thu, 24 May 2018 16:30:40 -0700
-Message-ID: <b454e37c-52a8-387f-3649-8ce72c9a5b18@gmail.com>
-References: <20180521114238.GN17671@n2100.armlinux.org.uk>
- <E1fKjEx-00063Y-N5@rmk-PC.armlinux.org.uk>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 3/4] KVM: arm/arm64: Remove unnecessary CMOs when creating
+ HYP page tables
+Date: Fri, 25 May 2018 09:23:36 +0100
+Message-ID: <bf7472a8-6ec0-4846-bd9a-4e273778c73d@arm.com>
+References: <20180517103548.5622-1-marc.zyngier@arm.com>
+ <20180517103548.5622-4-marc.zyngier@arm.com>
+ <20180524171238.ni2hclcmhcfv7dpb@lakrids.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F0694A0C5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 May 2018 19:20:32 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2WG5ajSsp4rW for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 May 2018 19:20:10 -0400 (EDT)
-Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3BB1F49F94
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 May 2018 19:20:09 -0400 (EDT)
-Received: by mail-wm0-f68.google.com with SMTP id f6-v6so9540687wmc.4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 May 2018 16:30:51 -0700 (PDT)
-In-Reply-To: <E1fKjEx-00063Y-N5@rmk-PC.armlinux.org.uk>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Russell King <rmk+kernel@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20180524171238.ni2hclcmhcfv7dpb@lakrids.cambridge.arm.com>
+Content-Language: en-GB
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 05/21/2018 04:44 AM, Russell King wrote:
-> Check for CPU bugs when secondary processors are being brought online,
-> and also when CPUs are resuming from a low power mode.  This gives an
-> opportunity to check that processor specific bug workarounds are
-> correctly enabled for all paths that a CPU re-enters the kernel.
+On 24/05/18 18:12, Mark Rutland wrote:
+> On Thu, May 17, 2018 at 11:35:47AM +0100, Marc Zyngier wrote:
+>> There is no need to perform cache maintenance operations when
+>> creating the HYP page tables if we have the multiprocessing
+>> extensions. ARMv7 mandates them with the virtualization support,
+>> and ARMv8 just mandates them unconditionally.
+>>
+>> Let's remove these operations.
+>>
+>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>> ---
+>>  virt/kvm/arm/mmu.c | 5 +----
+>>  1 file changed, 1 insertion(+), 4 deletions(-)
+>>
+>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+>> index ba66bf7ae299..acbfea09578c 100644
+>> --- a/virt/kvm/arm/mmu.c
+>> +++ b/virt/kvm/arm/mmu.c
+>> @@ -578,7 +578,6 @@ static void create_hyp_pte_mappings(pmd_t *pmd, unsigned long start,
+>>  		pte = pte_offset_kernel(pmd, addr);
+>>  		kvm_set_pte(pte, pfn_pte(pfn, prot));
+>>  		get_page(virt_to_page(pte));
+>> -		kvm_flush_dcache_to_poc(pte, sizeof(*pte));
+>>  		pfn++;
+>>  	} while (addr += PAGE_SIZE, addr != end);
+>>  }
+>> @@ -605,7 +604,6 @@ static int create_hyp_pmd_mappings(pud_t *pud, unsigned long start,
+>>  			}
+>>  			pmd_populate_kernel(NULL, pmd, pte);
+>>  			get_page(virt_to_page(pmd));
+>> -			kvm_flush_dcache_to_poc(pmd, sizeof(*pmd));
+>>  		}
+>>  
+>>  		next = pmd_addr_end(addr, end);
+>> @@ -638,7 +636,6 @@ static int create_hyp_pud_mappings(pgd_t *pgd, unsigned long start,
+>>  			}
+>>  			pud_populate(NULL, pud, pmd);
+>>  			get_page(virt_to_page(pud));
+>> -			kvm_flush_dcache_to_poc(pud, sizeof(*pud));
+>>  		}
+>>  
+>>  		next = pud_addr_end(addr, end);
+>> @@ -675,7 +672,6 @@ static int __create_hyp_mappings(pgd_t *pgdp, unsigned long ptrs_per_pgd,
+>>  			}
+>>  			pgd_populate(NULL, pgd, pud);
+>>  			get_page(virt_to_page(pgd));
+>> -			kvm_flush_dcache_to_poc(pgd, sizeof(*pgd));
+>>  		}
+>>  
+>>  		next = pgd_addr_end(addr, end);
+>> @@ -685,6 +681,7 @@ static int __create_hyp_mappings(pgd_t *pgdp, unsigned long ptrs_per_pgd,
+>>  		pfn += (next - addr) >> PAGE_SHIFT;
+>>  	} while (addr = next, addr != end);
+>>  out:
+>> +	dsb(ishst);
 > 
-> Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
-> Reviewed-by: Florian Fainelli <f.fainelli@gmail.com>
-
-Something I missed, is that this correctly warns about e.g: missing the
-IBE bit for secondary cores, but it seems to be missing it for the boot CPU:
-
-[    0.001053] CPU: Testing write buffer coherency: ok
-[    0.001086] CPU: Spectre v2: using ICIALLU workaround
-[    0.001304] CPU0: update cpu_capacity 1024
-[    0.001316] CPU0: thread -1, cpu 0, socket 0, mpidr 80000000
-[    0.001693] Setting up static identity map for 0x200000 - 0x200060
-[    0.001769] Hierarchical SRCU implementation.
-[    0.003951] brcmstb: biuctrl: MCP: Write pairing already disabled
-[    0.004224] smp: Bringing up secondary CPUs ...
-[    0.004874] CPU1: update cpu_capacity 1024
-[    0.004877] CPU1: thread -1, cpu 1, socket 0, mpidr 80000001
-[    0.004881] CPU1: Spectre v2: firmware did not set auxiliary control
-register IBE bit, system vulnerable
-[    0.005604] CPU2: update cpu_capacity 1024
-[    0.005607] CPU2: thread -1, cpu 2, socket 0, mpidr 80000002
-[    0.005610] CPU2: Spectre v2: firmware did not set auxiliary control
-register IBE bit, system vulnerable
-[    0.006295] CPU3: update cpu_capacity 1024
-[    0.006299] CPU3: thread -1, cpu 3, socket 0, mpidr 80000003
-[    0.006302] CPU3: Spectre v2: firmware did not set auxiliary control
-register IBE bit, system vulnerable
-[    0.006377] smp: Brought up 1 node, 4 CPUs
-[    0.006389] SMP: Total of 4 processors activated (216.00 BogoMIPS).
-[    0.006398] CPU: All CPU(s) started in SVC mode.
-
-Which could be confusing if you intentionally restricted a SMP system to
-UP with maxcpus=1 or smp=off:
-
-[    0.001043] CPU: Testing write buffer coherency: ok
-[    0.001077] CPU: Spectre v2: using ICIALLU workaround
-[    0.001291] CPU0: update cpu_capacity 1024
-[    0.001302] CPU0: thread -1, cpu 0, socket 0, mpidr 80000000
-[    0.001516] Setting up static identity map for 0x200000 - 0x200060
-[    0.001593] Hierarchical SRCU implementation.
-[    0.003829] brcmstb: biuctrl: MCP: Write pairing already disabled
-[    0.004097] smp: Bringing up secondary CPUs ...
-[    0.004108] smp: Brought up 1 node, 1 CPU
-[    0.004117] SMP: Total of 1 processors activated (54.00 BogoMIPS).
-[    0.004126] CPU: All CPU(s) started in SVC mode.
-
-
-
-> ---
->  arch/arm/include/asm/bugs.h | 2 ++
->  arch/arm/kernel/bugs.c      | 5 +++++
->  arch/arm/kernel/smp.c       | 4 ++++
->  arch/arm/kernel/suspend.c   | 2 ++
->  4 files changed, 13 insertions(+)
+> I think you need a dsb(ishst) wherever you had a
+> kvm_flush_dcache_to_poc() previously.
 > 
-> diff --git a/arch/arm/include/asm/bugs.h b/arch/arm/include/asm/bugs.h
-> index ed122d294f3f..73a99c72a930 100644
-> --- a/arch/arm/include/asm/bugs.h
-> +++ b/arch/arm/include/asm/bugs.h
-> @@ -14,8 +14,10 @@ extern void check_writebuffer_bugs(void);
->  
->  #ifdef CONFIG_MMU
->  extern void check_bugs(void);
-> +extern void check_other_bugs(void);
->  #else
->  #define check_bugs() do { } while (0)
-> +#define check_other_bugs() do { } while (0)
->  #endif
->  
->  #endif
-> diff --git a/arch/arm/kernel/bugs.c b/arch/arm/kernel/bugs.c
-> index 88024028bb70..16e7ba2a9cc4 100644
-> --- a/arch/arm/kernel/bugs.c
-> +++ b/arch/arm/kernel/bugs.c
-> @@ -3,7 +3,12 @@
->  #include <asm/bugs.h>
->  #include <asm/proc-fns.h>
->  
-> +void check_other_bugs(void)
-> +{
-> +}
-> +
->  void __init check_bugs(void)
->  {
->  	check_writebuffer_bugs();
-> +	check_other_bugs();
->  }
-> diff --git a/arch/arm/kernel/smp.c b/arch/arm/kernel/smp.c
-> index 2da087926ebe..5ad0b67b9e33 100644
-> --- a/arch/arm/kernel/smp.c
-> +++ b/arch/arm/kernel/smp.c
-> @@ -31,6 +31,7 @@
->  #include <linux/irq_work.h>
->  
->  #include <linux/atomic.h>
-> +#include <asm/bugs.h>
->  #include <asm/smp.h>
->  #include <asm/cacheflush.h>
->  #include <asm/cpu.h>
-> @@ -405,6 +406,9 @@ asmlinkage void secondary_start_kernel(void)
->  	 * before we continue - which happens after __cpu_up returns.
->  	 */
->  	set_cpu_online(cpu, true);
-> +
-> +	check_other_bugs();
-> +
->  	complete(&cpu_running);
->  
->  	local_irq_enable();
-> diff --git a/arch/arm/kernel/suspend.c b/arch/arm/kernel/suspend.c
-> index a40ebb7c0896..d08099269e35 100644
-> --- a/arch/arm/kernel/suspend.c
-> +++ b/arch/arm/kernel/suspend.c
-> @@ -3,6 +3,7 @@
->  #include <linux/slab.h>
->  #include <linux/mm_types.h>
->  
-> +#include <asm/bugs.h>
->  #include <asm/cacheflush.h>
->  #include <asm/idmap.h>
->  #include <asm/pgalloc.h>
-> @@ -36,6 +37,7 @@ int cpu_suspend(unsigned long arg, int (*fn)(unsigned long))
->  		cpu_switch_mm(mm->pgd, mm);
->  		local_flush_bp_all();
->  		local_flush_tlb_all();
-> +		check_other_bugs();
->  	}
->  
->  	return ret;
-> 
+> Otherwise, the page table walker could see stale values. e.g. after you
+> update a bunch of PTE entries and point a PMD entry at those, the PTW
+> could see the updated PMD entry, but see stale PTE entries, which could
+> be garbage.
 
+That's a very good point. I initially only considered the EL2
+initialisation (the EL2 MMU is not live yet), but failed to consider the
+additional mappings at runtime (each time we instantiate a VM).
 
+> That said, I think for ensuring the *order* those become visible in, you
+> only need a dmb(ishst), and the ensure they *are visible* you need a
+> DSB(ISHST) at the end.
+And we definitely want the latter.
+
+I'll respin this shortly.
+
+Thanks,
+
+	M.
 -- 
-Florian
+Jazz is not dead. It just smells funny...
