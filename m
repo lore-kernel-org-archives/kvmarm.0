@@ -1,182 +1,123 @@
 From: Russell King <rmk+kernel@armlinux.org.uk>
-Subject: [PATCH v3 11/15] ARM: KVM: invalidate BTB on guest exit for
- Cortex-A12/A17
-Date: Fri, 25 May 2018 15:01:19 +0100
-Message-ID: <E1fMDHT-00073l-3b@rmk-PC.armlinux.org.uk>
+Subject: [PATCH v3 07/15] ARM: spectre-v2: add Cortex A8 and A15 validation of
+ the IBE bit
+Date: Fri, 25 May 2018 15:00:58 +0100
+Message-ID: <E1fMDH8-0006z0-K8@rmk-PC.armlinux.org.uk>
 References: <20180525135938.GE17671@n2100.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C6234A103
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 May 2018 09:51:41 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id W6b86U4zyQzh for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 25 May 2018 09:51:18 -0400 (EDT)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 68BD54A108
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 May 2018 09:50:43 -0400 (EDT)
 In-Reply-To: <20180525135938.GE17671@n2100.armlinux.org.uk>
 Content-Disposition: inline
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Marc Zyngier <marc.zyngier@arm.com>
+When the branch predictor hardening is enabled, firmware must have set
+the IBE bit in the auxiliary control register.  If this bit has not
+been set, the Spectre workarounds will not be functional.
 
-In order to avoid aliasing attacks against the branch predictor,
-let's invalidate the BTB on guest exit. This is made complicated
-by the fact that we cannot take a branch before invalidating the
-BTB.
+Add validation that this bit is set, and print a warning at alert level
+if this is not the case.
 
-We only apply this to A12 and A17, which are the only two ARM
-cores on which this useful.
-
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
+Reviewed-by: Florian Fainelli <f.fainelli@gmail.com>
 ---
- arch/arm/include/asm/kvm_asm.h |  2 --
- arch/arm/include/asm/kvm_mmu.h | 17 +++++++++-
- arch/arm/kvm/hyp/hyp-entry.S   | 71 ++++++++++++++++++++++++++++++++++++++++--
- 3 files changed, 85 insertions(+), 5 deletions(-)
+ arch/arm/mm/Makefile       |  2 +-
+ arch/arm/mm/proc-v7-bugs.c | 29 +++++++++++++++++++++++++++++
+ arch/arm/mm/proc-v7.S      |  4 ++--
+ 3 files changed, 32 insertions(+), 3 deletions(-)
+ create mode 100644 arch/arm/mm/proc-v7-bugs.c
 
-diff --git a/arch/arm/include/asm/kvm_asm.h b/arch/arm/include/asm/kvm_asm.h
-index 36dd2962a42d..df24ed48977d 100644
---- a/arch/arm/include/asm/kvm_asm.h
-+++ b/arch/arm/include/asm/kvm_asm.h
-@@ -61,8 +61,6 @@ struct kvm_vcpu;
- extern char __kvm_hyp_init[];
- extern char __kvm_hyp_init_end[];
+diff --git a/arch/arm/mm/Makefile b/arch/arm/mm/Makefile
+index 9dbb84923e12..a0c40610210c 100644
+--- a/arch/arm/mm/Makefile
++++ b/arch/arm/mm/Makefile
+@@ -97,7 +97,7 @@ obj-$(CONFIG_CPU_MOHAWK)	+= proc-mohawk.o
+ obj-$(CONFIG_CPU_FEROCEON)	+= proc-feroceon.o
+ obj-$(CONFIG_CPU_V6)		+= proc-v6.o
+ obj-$(CONFIG_CPU_V6K)		+= proc-v6.o
+-obj-$(CONFIG_CPU_V7)		+= proc-v7.o
++obj-$(CONFIG_CPU_V7)		+= proc-v7.o proc-v7-bugs.o
+ obj-$(CONFIG_CPU_V7M)		+= proc-v7m.o
  
--extern char __kvm_hyp_vector[];
--
- extern void __kvm_flush_vm_context(void);
- extern void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
- extern void __kvm_tlb_flush_vmid(struct kvm *kvm);
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index de1b919404e4..d08ce9c41df4 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -297,7 +297,22 @@ static inline unsigned int kvm_get_vmid_bits(void)
+ AFLAGS_proc-v6.o	:=-Wa,-march=armv6
+diff --git a/arch/arm/mm/proc-v7-bugs.c b/arch/arm/mm/proc-v7-bugs.c
+new file mode 100644
+index 000000000000..a32ce13479d9
+--- /dev/null
++++ b/arch/arm/mm/proc-v7-bugs.c
+@@ -0,0 +1,29 @@
++// SPDX-License-Identifier: GPL-2.0
++#include <linux/kernel.h>
++#include <linux/smp.h>
++
++static __maybe_unused void cpu_v7_check_auxcr_set(u32 mask, const char *msg)
++{
++	u32 aux_cr;
++
++	asm("mrc p15, 0, %0, c1, c0, 1" : "=r" (aux_cr));
++
++	if ((aux_cr & mask) != mask)
++		pr_err("CPU%u: %s", smp_processor_id(), msg);
++}
++
++static void check_spectre_auxcr(u32 bit)
++{
++	if (IS_ENABLED(CONFIG_HARDEN_BRANCH_PREDICTOR))
++		cpu_v7_check_auxcr_set(bit, "Spectre v2: firmware did not set auxiliary control register IBE bit, system vulnerable\n");
++}
++
++void cpu_v7_ca8_ibe(void)
++{
++	check_spectre_auxcr(BIT(6));
++}
++
++void cpu_v7_ca15_ibe(void)
++{
++	check_spectre_auxcr(BIT(0));
++}
+diff --git a/arch/arm/mm/proc-v7.S b/arch/arm/mm/proc-v7.S
+index a2d433d59848..fa9214036fb3 100644
+--- a/arch/arm/mm/proc-v7.S
++++ b/arch/arm/mm/proc-v7.S
+@@ -569,7 +569,7 @@ ENDPROC(__v7_setup)
+ 	globl_equ	cpu_ca8_do_suspend,	cpu_v7_do_suspend
+ 	globl_equ	cpu_ca8_do_resume,	cpu_v7_do_resume
+ #endif
+-	define_processor_functions ca8, dabort=v7_early_abort, pabort=v7_pabort, suspend=1
++	define_processor_functions ca8, dabort=v7_early_abort, pabort=v7_pabort, suspend=1, bugs=cpu_v7_ca8_ibe
  
- static inline void *kvm_get_hyp_vector(void)
- {
--	return kvm_ksym_ref(__kvm_hyp_vector);
-+	switch(read_cpuid_part()) {
-+#ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
-+	case ARM_CPU_PART_CORTEX_A12:
-+	case ARM_CPU_PART_CORTEX_A17:
-+	{
-+		extern char __kvm_hyp_vector_bp_inv[];
-+		return kvm_ksym_ref(__kvm_hyp_vector_bp_inv);
-+	}
-+
-+#endif
-+	default:
-+	{
-+		extern char __kvm_hyp_vector[];
-+		return kvm_ksym_ref(__kvm_hyp_vector);
-+	}
-+	}
- }
- 
- static inline int kvm_map_vectors(void)
-diff --git a/arch/arm/kvm/hyp/hyp-entry.S b/arch/arm/kvm/hyp/hyp-entry.S
-index 95a2faefc070..e789f52a5129 100644
---- a/arch/arm/kvm/hyp/hyp-entry.S
-+++ b/arch/arm/kvm/hyp/hyp-entry.S
-@@ -71,6 +71,66 @@
- 	W(b)	hyp_irq
- 	W(b)	hyp_fiq
- 
-+#ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
-+	.align 5
-+__kvm_hyp_vector_bp_inv:
-+	.global __kvm_hyp_vector_bp_inv
-+
-+	/*
-+	 * We encode the exception entry in the bottom 3 bits of
-+	 * SP, and we have to guarantee to be 8 bytes aligned.
-+	 */
-+	W(add)	sp, sp, #1	/* Reset 	  7 */
-+	W(add)	sp, sp, #1	/* Undef	  6 */
-+	W(add)	sp, sp, #1	/* Syscall	  5 */
-+	W(add)	sp, sp, #1	/* Prefetch abort 4 */
-+	W(add)	sp, sp, #1	/* Data abort	  3 */
-+	W(add)	sp, sp, #1	/* HVC		  2 */
-+	W(add)	sp, sp, #1	/* IRQ		  1 */
-+	W(nop)			/* FIQ		  0 */
-+
-+	mcr	p15, 0, r0, c7, c5, 6	/* BPIALL */
-+	isb
-+
-+#ifdef CONFIG_THUMB2_KERNEL
-+	/*
-+	 * Yet another silly hack: Use VPIDR as a temp register.
-+	 * Thumb2 is really a pain, as SP cannot be used with most
-+	 * of the bitwise instructions. The vect_br macro ensures
-+	 * things gets cleaned-up.
-+	 */
-+	mcr	p15, 4, r0, c0, c0, 0	/* VPIDR */
-+	mov	r0, sp
-+	and	r0, r0, #7
-+	sub	sp, sp, r0
-+	push	{r1, r2}
-+	mov	r1, r0
-+	mrc	p15, 4, r0, c0, c0, 0	/* VPIDR */
-+	mrc	p15, 0, r2, c0, c0, 0	/* MIDR  */
-+	mcr	p15, 4, r2, c0, c0, 0	/* VPIDR */
-+#endif
-+
-+.macro vect_br val, targ
-+ARM(	eor	sp, sp, #\val	)
-+ARM(	tst	sp, #7		)
-+ARM(	eorne	sp, sp, #\val	)
-+
-+THUMB(	cmp	r1, #\val	)
-+THUMB(	popeq	{r1, r2}	)
-+
-+	beq	\targ
-+.endm
-+
-+	vect_br	0, hyp_fiq
-+	vect_br	1, hyp_irq
-+	vect_br	2, hyp_hvc
-+	vect_br	3, hyp_dabt
-+	vect_br	4, hyp_pabt
-+	vect_br	5, hyp_svc
-+	vect_br	6, hyp_undef
-+	vect_br	7, hyp_reset
-+#endif
-+
- .macro invalid_vector label, cause
- 	.align
- \label:	mov	r0, #\cause
-@@ -149,7 +209,14 @@ ENDPROC(__hyp_do_panic)
- 	bx	ip
- 
- 1:
--	push	{lr}
-+	/*
-+	 * Pushing r2 here is just a way of keeping the stack aligned to
-+	 * 8 bytes on any path that can trigger a HYP exception. Here,
-+	 * we may well be about to jump into the guest, and the guest
-+	 * exit would otherwise be badly decoded by our fancy
-+	 * "decode-exception-without-a-branch" code...
-+	 */
-+	push	{r2, lr}
- 
- 	mov	lr, r0
- 	mov	r0, r1
-@@ -159,7 +226,7 @@ ENDPROC(__hyp_do_panic)
- THUMB(	orr	lr, #1)
- 	blx	lr			@ Call the HYP function
- 
--	pop	{lr}
-+	pop	{r2, lr}
- 	eret
- 
- guest_trap:
+ 	@ Cortex-A9 - needs more registers preserved across suspend/resume
+ 	@ and bpiall switch_mm for hardening
+@@ -602,7 +602,7 @@ ENDPROC(__v7_setup)
+ 	globl_equ	cpu_ca15_suspend_size,	cpu_v7_suspend_size
+ 	globl_equ	cpu_ca15_do_suspend,	cpu_v7_do_suspend
+ 	globl_equ	cpu_ca15_do_resume,	cpu_v7_do_resume
+-	define_processor_functions ca15, dabort=v7_early_abort, pabort=v7_pabort, suspend=1
++	define_processor_functions ca15, dabort=v7_early_abort, pabort=v7_pabort, suspend=1, bugs=cpu_v7_ca15_ibe
+ #ifdef CONFIG_CPU_PJ4B
+ 	define_processor_functions pj4b, dabort=v7_early_abort, pabort=v7_pabort, suspend=1
+ #endif
 -- 
 2.7.4
