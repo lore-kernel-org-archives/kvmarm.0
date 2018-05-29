@@ -1,7 +1,7 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 07/17] arm64: ssbd: Skip apply_ssbd if not using dynamic mitigation
-Date: Tue, 29 May 2018 13:11:11 +0100
-Message-ID: <20180529121121.24927-8-marc.zyngier@arm.com>
+Subject: [PATCH v2 08/17] arm64: ssbd: Restore mitigation status on CPU resume
+Date: Tue, 29 May 2018 13:11:12 +0100
+Message-ID: <20180529121121.24927-9-marc.zyngier@arm.com>
 References: <20180529121121.24927-1-marc.zyngier@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20180529121121.24927-1-marc.zyngier@arm.com>
@@ -10,59 +10,95 @@ To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@l
 Cc: Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Thomas Gleixner <tglx@linutronix.de>, Andy Lutomirski <luto@kernel.org>, Kees Cook <keescook@chromium.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Christoffer Dall <christoffer.dall@arm.com>, Randy Dunlap <rdunlap@infradead.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Julien Grall <julien.grall@arm.com>, Mark Rutland <mark.rutland@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In order to avoid checking arm64_ssbd_callback_required on each
-kernel entry/exit even if no mitigation is required, let's
-add yet another alternative that by default jumps over the mitigation,
-and that gets nop'ed out if we're doing dynamic mitigation.
+On a system where firmware can dynamically change the state of the
+mitigation, the CPU will always come up with the mitigation enabled,
+including when coming back from suspend.
 
-Think of it as a poor man's static key...
+If the user has requested "no mitigation" via a command line option,
+let's enforce it by calling into the firmware again to disable it.
 
-Reviewed-by: Julien Grall <julien.grall@arm.com>
-Reviewed-by: Mark Rutland <mark.rutland@arm.com>
+Similarily, for a resume from hibernate, the mitigation could have
+been disabled by the boot kernel. Let's ensure that it is set
+back on in that case.
+
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kernel/cpu_errata.c | 14 ++++++++++++++
- arch/arm64/kernel/entry.S      |  3 +++
- 2 files changed, 17 insertions(+)
+ arch/arm64/include/asm/cpufeature.h |  6 ++++++
+ arch/arm64/kernel/cpu_errata.c      |  2 +-
+ arch/arm64/kernel/hibernate.c       | 11 +++++++++++
+ arch/arm64/kernel/suspend.c         |  8 ++++++++
+ 4 files changed, 26 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-index a838a3043d4e..2fef634e6953 100644
---- a/arch/arm64/kernel/cpu_errata.c
-+++ b/arch/arm64/kernel/cpu_errata.c
-@@ -289,6 +289,20 @@ void __init arm64_update_smccc_conduit(struct alt_instr *alt,
- 	*updptr = cpu_to_le32(insn);
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index b0fc3224ce8a..55bc1f073bfb 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -553,6 +553,12 @@ static inline int arm64_get_ssbd_state(void)
+ #endif
  }
  
-+void __init arm64_enable_wa2_handling(struct alt_instr *alt,
-+				      __le32 *origptr, __le32 *updptr,
-+				      int nr_inst)
-+{
-+	BUG_ON(nr_inst != 1);
-+	/*
-+	 * Only allow mitigation on EL1 entry/exit and guest
-+	 * ARCH_WORKAROUND_2 handling if the SSBD state allows it to
-+	 * be flipped.
-+	 */
-+	if (arm64_get_ssbd_state() == ARM64_SSBD_KERNEL)
-+		*updptr = cpu_to_le32(aarch64_insn_gen_nop());
-+}
++#ifdef CONFIG_ARM64_SSBD
++void arm64_set_ssbd_mitigation(bool state);
++#else
++static inline void arm64_set_ssbd_mitigation(bool state) {}
++#endif
 +
- static void arm64_set_ssbd_mitigation(bool state)
+ #endif /* __ASSEMBLY__ */
+ 
+ #endif
+diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
+index 2fef634e6953..2b9a31a6a16a 100644
+--- a/arch/arm64/kernel/cpu_errata.c
++++ b/arch/arm64/kernel/cpu_errata.c
+@@ -303,7 +303,7 @@ void __init arm64_enable_wa2_handling(struct alt_instr *alt,
+ 		*updptr = cpu_to_le32(aarch64_insn_gen_nop());
+ }
+ 
+-static void arm64_set_ssbd_mitigation(bool state)
++void arm64_set_ssbd_mitigation(bool state)
  {
  	switch (psci_ops.conduit) {
-diff --git a/arch/arm64/kernel/entry.S b/arch/arm64/kernel/entry.S
-index 29ad672a6abd..e6f6e2339b22 100644
---- a/arch/arm64/kernel/entry.S
-+++ b/arch/arm64/kernel/entry.S
-@@ -142,6 +142,9 @@ alternative_else_nop_endif
- 	// to save/restore them if required.
- 	.macro	apply_ssbd, state, targ, tmp1, tmp2
- #ifdef CONFIG_ARM64_SSBD
-+alternative_cb	arm64_enable_wa2_handling
-+	b	\targ
-+alternative_cb_end
- 	ldr_this_cpu	\tmp2, arm64_ssbd_callback_required, \tmp1
- 	cbz	\tmp2, \targ
- 	mov	w0, #ARM_SMCCC_ARCH_WORKAROUND_2
+ 	case PSCI_CONDUIT_HVC:
+diff --git a/arch/arm64/kernel/hibernate.c b/arch/arm64/kernel/hibernate.c
+index 1ec5f28c39fc..6b2686d54411 100644
+--- a/arch/arm64/kernel/hibernate.c
++++ b/arch/arm64/kernel/hibernate.c
+@@ -313,6 +313,17 @@ int swsusp_arch_suspend(void)
+ 
+ 		sleep_cpu = -EINVAL;
+ 		__cpu_suspend_exit();
++
++		/*
++		 * Just in case the boot kernel did turn the SSBD
++		 * mitigation off behind our back, let's set the state
++		 * to what we expect it to be.
++		 */
++		switch (arm64_get_ssbd_state()) {
++		case ARM64_SSBD_FORCE_ENABLE:
++		case ARM64_SSBD_KERNEL:
++			arm64_set_ssbd_mitigation(true);
++		}
+ 	}
+ 
+ 	local_daif_restore(flags);
+diff --git a/arch/arm64/kernel/suspend.c b/arch/arm64/kernel/suspend.c
+index a307b9e13392..70c283368b64 100644
+--- a/arch/arm64/kernel/suspend.c
++++ b/arch/arm64/kernel/suspend.c
+@@ -62,6 +62,14 @@ void notrace __cpu_suspend_exit(void)
+ 	 */
+ 	if (hw_breakpoint_restore)
+ 		hw_breakpoint_restore(cpu);
++
++	/*
++	 * On resume, firmware implementing dynamic mitigation will
++	 * have turned the mitigation on. If the user has forcefully
++	 * disabled it, make sure their wishes are obeyed.
++	 */
++	if (arm64_get_ssbd_state() == ARM64_SSBD_FORCE_DISABLE)
++		arm64_set_ssbd_mitigation(false);
+ }
+ 
+ /*
 -- 
 2.14.2
