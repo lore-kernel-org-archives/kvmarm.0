@@ -1,22 +1,22 @@
 From: Russell King <rmk+kernel@armlinux.org.uk>
-Subject: [PATCH v5 14/15] ARM: KVM: Add SMCCC_ARCH_WORKAROUND_1 fast handling
-Date: Tue, 29 May 2018 15:55:23 +0100
-Message-ID: <E1fNg1z-0005C1-92@rmk-PC.armlinux.org.uk>
+Subject: [PATCH v5 15/15] ARM: KVM: report support for SMCCC_ARCH_WORKAROUND_1
+Date: Tue, 29 May 2018 15:55:28 +0100
+Message-ID: <E1fNg24-0005CC-DF@rmk-PC.armlinux.org.uk>
 References: <20180529145320.GJ17671@n2100.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BE1A74A0DB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 May 2018 10:46:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1415849EA2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 May 2018 10:46:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id H3dO7M-F7X3X for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id aWJeVo7FBTEV for <kvmarm@lists.cs.columbia.edu>;
  Tue, 29 May 2018 10:46:15 -0400 (EDT)
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 49DD54A0EF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 May 2018 10:44:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EE1B449EA4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 May 2018 10:44:56 -0400 (EDT)
 In-Reply-To: <20180529145320.GJ17671@n2100.armlinux.org.uk>
 Content-Disposition: inline
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
@@ -32,59 +32,47 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We want SMCCC_ARCH_WORKAROUND_1 to be fast. As fast as possible.
-So let's intercept it as early as we can by testing for the
-function call number as soon as we've identified a HVC call
-coming from the guest.
+Report support for SMCCC_ARCH_WORKAROUND_1 to KVM guests for affected
+CPUs.
 
 Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
 Boot-tested-by: Tony Lindgren <tony@atomide.com>
 Reviewed-by: Tony Lindgren <tony@atomide.com>
 ---
- arch/arm/kvm/hyp/hyp-entry.S | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+ arch/arm/include/asm/kvm_host.h | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm/kvm/hyp/hyp-entry.S b/arch/arm/kvm/hyp/hyp-entry.S
-index 918a05dd2d63..aa3f9a9837ac 100644
---- a/arch/arm/kvm/hyp/hyp-entry.S
-+++ b/arch/arm/kvm/hyp/hyp-entry.S
-@@ -16,6 +16,7 @@
-  * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-  */
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index 248b930563e5..11f91744ffb0 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -21,6 +21,7 @@
  
-+#include <linux/arm-smccc.h>
- #include <linux/linkage.h>
- #include <asm/kvm_arm.h>
+ #include <linux/types.h>
+ #include <linux/kvm_types.h>
++#include <asm/cputype.h>
+ #include <asm/kvm.h>
  #include <asm/kvm_asm.h>
-@@ -202,7 +203,7 @@ ENDPROC(__hyp_do_panic)
- 	lsr     r2, r2, #16
- 	and     r2, r2, #0xff
- 	cmp     r2, #0
--	bne	guest_trap		@ Guest called HVC
-+	bne	guest_hvc_trap		@ Guest called HVC
+ #include <asm/kvm_mmio.h>
+@@ -311,8 +312,17 @@ static inline void kvm_arm_vhe_guest_exit(void) {}
  
- 	/*
- 	 * Getting here means host called HVC, we shift parameters and branch
-@@ -253,6 +254,20 @@ THUMB(	orr	lr, #1)
- 	pop	{r2, lr}
- 	eret
+ static inline bool kvm_arm_harden_branch_predictor(void)
+ {
+-	/* No way to detect it yet, pretend it is not there. */
+-	return false;
++	switch(read_cpuid_part()) {
++#ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
++	case ARM_CPU_PART_BRAHMA_B15:
++	case ARM_CPU_PART_CORTEX_A12:
++	case ARM_CPU_PART_CORTEX_A15:
++	case ARM_CPU_PART_CORTEX_A17:
++		return true;
++#endif
++	default:
++		return false;
++	}
+ }
  
-+guest_hvc_trap:
-+	movw	r2, #:lower16:ARM_SMCCC_ARCH_WORKAROUND_1
-+	movt	r2, #:upper16:ARM_SMCCC_ARCH_WORKAROUND_1
-+	ldr	r0, [sp]		@ Guest's r0
-+	teq	r0, r2
-+	bne	guest_trap
-+	add	sp, sp, #12
-+	@ Returns:
-+	@ r0 = 0
-+	@ r1 = HSR value (perfectly predictable)
-+	@ r2 = ARM_SMCCC_ARCH_WORKAROUND_1
-+	mov	r0, #0
-+	eret
-+
- guest_trap:
- 	load_vcpu r0			@ Load VCPU pointer to r0
- 
+ #endif /* __ARM_KVM_HOST_H__ */
 -- 
 2.7.4
