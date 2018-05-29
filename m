@@ -1,23 +1,23 @@
 From: Russell King <rmk+kernel@armlinux.org.uk>
-Subject: [PATCH v5 12/15] ARM: KVM: invalidate icache on guest exit for
- Cortex-A15
-Date: Tue, 29 May 2018 15:55:12 +0100
-Message-ID: <E1fNg1o-0005AH-Kb@rmk-PC.armlinux.org.uk>
+Subject: [PATCH v5 13/15] ARM: spectre-v2: KVM: invalidate icache on guest
+ exit for Brahma B15
+Date: Tue, 29 May 2018 15:55:18 +0100
+Message-ID: <E1fNg1u-0005BA-3z@rmk-PC.armlinux.org.uk>
 References: <20180529145320.GJ17671@n2100.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7EDB849F86
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 May 2018 10:46:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 27A584A0DB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 May 2018 10:46:36 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BmIjh0p3OLfh for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 May 2018 10:45:50 -0400 (EDT)
+ with ESMTP id 1GediGJoES0b for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 May 2018 10:46:13 -0400 (EDT)
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4170940458
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 May 2018 10:44:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B3B2E4A0D4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 May 2018 10:44:52 -0400 (EDT)
 In-Reply-To: <20180529145320.GJ17671@n2100.armlinux.org.uk>
 Content-Disposition: inline
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
@@ -33,80 +33,27 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Marc Zyngier <marc.zyngier@arm.com>
+Include Brahma B15 in the Spectre v2 KVM workarounds.
 
-In order to avoid aliasing attacks against the branch predictor
-on Cortex-A15, let's invalidate the BTB on guest exit, which can
-only be done by invalidating the icache (with ACTLR[0] being set).
-
-We use the same hack as for A12/A17 to perform the vector decoding.
-
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
+Acked-by: Florian Fainelli <f.fainelli@gmail.com>
 Boot-tested-by: Tony Lindgren <tony@atomide.com>
 Reviewed-by: Tony Lindgren <tony@atomide.com>
 ---
- arch/arm/include/asm/kvm_mmu.h |  5 +++++
- arch/arm/kvm/hyp/hyp-entry.S   | 24 ++++++++++++++++++++++++
- 2 files changed, 29 insertions(+)
+ arch/arm/include/asm/kvm_mmu.h | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index d08ce9c41df4..48edb1f4ced4 100644
+index 48edb1f4ced4..fea770f78144 100644
 --- a/arch/arm/include/asm/kvm_mmu.h
 +++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -306,6 +306,11 @@ static inline void *kvm_get_hyp_vector(void)
+@@ -306,6 +306,7 @@ static inline void *kvm_get_hyp_vector(void)
  		return kvm_ksym_ref(__kvm_hyp_vector_bp_inv);
  	}
  
-+	case ARM_CPU_PART_CORTEX_A15:
-+	{
-+		extern char __kvm_hyp_vector_ic_inv[];
-+		return kvm_ksym_ref(__kvm_hyp_vector_ic_inv);
-+	}
- #endif
- 	default:
++	case ARM_CPU_PART_BRAHMA_B15:
+ 	case ARM_CPU_PART_CORTEX_A15:
  	{
-diff --git a/arch/arm/kvm/hyp/hyp-entry.S b/arch/arm/kvm/hyp/hyp-entry.S
-index e789f52a5129..918a05dd2d63 100644
---- a/arch/arm/kvm/hyp/hyp-entry.S
-+++ b/arch/arm/kvm/hyp/hyp-entry.S
-@@ -73,6 +73,28 @@
- 
- #ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
- 	.align 5
-+__kvm_hyp_vector_ic_inv:
-+	.global __kvm_hyp_vector_ic_inv
-+
-+	/*
-+	 * We encode the exception entry in the bottom 3 bits of
-+	 * SP, and we have to guarantee to be 8 bytes aligned.
-+	 */
-+	W(add)	sp, sp, #1	/* Reset 	  7 */
-+	W(add)	sp, sp, #1	/* Undef	  6 */
-+	W(add)	sp, sp, #1	/* Syscall	  5 */
-+	W(add)	sp, sp, #1	/* Prefetch abort 4 */
-+	W(add)	sp, sp, #1	/* Data abort	  3 */
-+	W(add)	sp, sp, #1	/* HVC		  2 */
-+	W(add)	sp, sp, #1	/* IRQ		  1 */
-+	W(nop)			/* FIQ		  0 */
-+
-+	mcr	p15, 0, r0, c7, c5, 0	/* ICIALLU */
-+	isb
-+
-+	b	decode_vectors
-+
-+	.align 5
- __kvm_hyp_vector_bp_inv:
- 	.global __kvm_hyp_vector_bp_inv
- 
-@@ -92,6 +114,8 @@
- 	mcr	p15, 0, r0, c7, c5, 6	/* BPIALL */
- 	isb
- 
-+decode_vectors:
-+
- #ifdef CONFIG_THUMB2_KERNEL
- 	/*
- 	 * Yet another silly hack: Use VPIDR as a temp register.
+ 		extern char __kvm_hyp_vector_ic_inv[];
 -- 
 2.7.4
