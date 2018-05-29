@@ -1,94 +1,117 @@
 From: Russell King <rmk+kernel@armlinux.org.uk>
-Subject: [PATCH v4 02/15] ARM: bugs: prepare processor bug infrastructure
-Date: Tue, 29 May 2018 10:09:06 +0100
-Message-ID: <E1fNacs-0000fQ-Pe@rmk-PC.armlinux.org.uk>
+Subject: [PATCH v4 03/15] ARM: bugs: hook processor bug checking into SMP and
+ suspend paths
+Date: Tue, 29 May 2018 10:09:11 +0100
+Message-ID: <E1fNacx-0000fc-UT@rmk-PC.armlinux.org.uk>
 References: <20180529090756.GG17671@n2100.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 439A54A0D5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 May 2018 04:58:45 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HPVeMTIIYj4W for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 May 2018 04:58:23 -0400 (EDT)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 072CC4A0CB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 May 2018 04:58:23 -0400 (EDT)
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <20180529090756.GG17671@n2100.armlinux.org.uk>
 Content-Disposition: inline
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Prepare the processor bug infrastructure so that it can be expanded to
-check for per-processor bugs.
+Check for CPU bugs when secondary processors are being brought online,
+and also when CPUs are resuming from a low power mode.  This gives an
+opportunity to check that processor specific bug workarounds are
+correctly enabled for all paths that a CPU re-enters the kernel.
 
 Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
 Reviewed-by: Florian Fainelli <f.fainelli@gmail.com>
 Boot-tested-by: Tony Lindgren <tony@atomide.com>
 Reviewed-by: Tony Lindgren <tony@atomide.com>
 ---
- arch/arm/include/asm/bugs.h | 4 ++--
- arch/arm/kernel/Makefile    | 1 +
- arch/arm/kernel/bugs.c      | 9 +++++++++
- 3 files changed, 12 insertions(+), 2 deletions(-)
- create mode 100644 arch/arm/kernel/bugs.c
+ arch/arm/include/asm/bugs.h | 2 ++
+ arch/arm/kernel/bugs.c      | 5 +++++
+ arch/arm/kernel/smp.c       | 4 ++++
+ arch/arm/kernel/suspend.c   | 2 ++
+ 4 files changed, 13 insertions(+)
 
 diff --git a/arch/arm/include/asm/bugs.h b/arch/arm/include/asm/bugs.h
-index a97f1ea708d1..ed122d294f3f 100644
+index ed122d294f3f..73a99c72a930 100644
 --- a/arch/arm/include/asm/bugs.h
 +++ b/arch/arm/include/asm/bugs.h
-@@ -10,10 +10,10 @@
- #ifndef __ASM_BUGS_H
- #define __ASM_BUGS_H
+@@ -14,8 +14,10 @@ extern void check_writebuffer_bugs(void);
  
--#ifdef CONFIG_MMU
- extern void check_writebuffer_bugs(void);
- 
--#define check_bugs() check_writebuffer_bugs()
-+#ifdef CONFIG_MMU
-+extern void check_bugs(void);
+ #ifdef CONFIG_MMU
+ extern void check_bugs(void);
++extern void check_other_bugs(void);
  #else
  #define check_bugs() do { } while (0)
++#define check_other_bugs() do { } while (0)
  #endif
-diff --git a/arch/arm/kernel/Makefile b/arch/arm/kernel/Makefile
-index b59ac4bf82b8..8cad59465af3 100644
---- a/arch/arm/kernel/Makefile
-+++ b/arch/arm/kernel/Makefile
-@@ -31,6 +31,7 @@ else
- obj-y		+= entry-armv.o
- endif
  
-+obj-$(CONFIG_MMU)		+= bugs.o
- obj-$(CONFIG_CPU_IDLE)		+= cpuidle.o
- obj-$(CONFIG_ISA_DMA_API)	+= dma.o
- obj-$(CONFIG_FIQ)		+= fiq.o fiqasm.o
+ #endif
 diff --git a/arch/arm/kernel/bugs.c b/arch/arm/kernel/bugs.c
-new file mode 100644
-index 000000000000..88024028bb70
---- /dev/null
+index 88024028bb70..16e7ba2a9cc4 100644
+--- a/arch/arm/kernel/bugs.c
 +++ b/arch/arm/kernel/bugs.c
-@@ -0,0 +1,9 @@
-+// SPDX-Identifier: GPL-2.0
-+#include <linux/init.h>
-+#include <asm/bugs.h>
-+#include <asm/proc-fns.h>
-+
-+void __init check_bugs(void)
+@@ -3,7 +3,12 @@
+ #include <asm/bugs.h>
+ #include <asm/proc-fns.h>
+ 
++void check_other_bugs(void)
 +{
-+	check_writebuffer_bugs();
 +}
++
+ void __init check_bugs(void)
+ {
+ 	check_writebuffer_bugs();
++	check_other_bugs();
+ }
+diff --git a/arch/arm/kernel/smp.c b/arch/arm/kernel/smp.c
+index 2da087926ebe..5ad0b67b9e33 100644
+--- a/arch/arm/kernel/smp.c
++++ b/arch/arm/kernel/smp.c
+@@ -31,6 +31,7 @@
+ #include <linux/irq_work.h>
+ 
+ #include <linux/atomic.h>
++#include <asm/bugs.h>
+ #include <asm/smp.h>
+ #include <asm/cacheflush.h>
+ #include <asm/cpu.h>
+@@ -405,6 +406,9 @@ asmlinkage void secondary_start_kernel(void)
+ 	 * before we continue - which happens after __cpu_up returns.
+ 	 */
+ 	set_cpu_online(cpu, true);
++
++	check_other_bugs();
++
+ 	complete(&cpu_running);
+ 
+ 	local_irq_enable();
+diff --git a/arch/arm/kernel/suspend.c b/arch/arm/kernel/suspend.c
+index a40ebb7c0896..d08099269e35 100644
+--- a/arch/arm/kernel/suspend.c
++++ b/arch/arm/kernel/suspend.c
+@@ -3,6 +3,7 @@
+ #include <linux/slab.h>
+ #include <linux/mm_types.h>
+ 
++#include <asm/bugs.h>
+ #include <asm/cacheflush.h>
+ #include <asm/idmap.h>
+ #include <asm/pgalloc.h>
+@@ -36,6 +37,7 @@ int cpu_suspend(unsigned long arg, int (*fn)(unsigned long))
+ 		cpu_switch_mm(mm->pgd, mm);
+ 		local_flush_bp_all();
+ 		local_flush_tlb_all();
++		check_other_bugs();
+ 	}
+ 
+ 	return ret;
 -- 
 2.7.4
