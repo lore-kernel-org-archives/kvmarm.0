@@ -1,23 +1,22 @@
 From: Russell King <rmk+kernel@armlinux.org.uk>
-Subject: [PATCH v5 01/15] ARM: add more CPU part numbers for Cortex and Brahma
- B15 CPUs
-Date: Tue, 29 May 2018 15:54:13 +0100
-Message-ID: <E1fNg0r-00054X-MC@rmk-PC.armlinux.org.uk>
+Subject: [PATCH v5 02/15] ARM: bugs: prepare processor bug infrastructure
+Date: Tue, 29 May 2018 15:54:18 +0100
+Message-ID: <E1fNg0w-00054e-W3@rmk-PC.armlinux.org.uk>
 References: <20180529145320.GJ17671@n2100.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EE394A0CF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 May 2018 10:43:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A32E34A0EB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 May 2018 10:43:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JDIr2beehtLg for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 May 2018 10:43:26 -0400 (EDT)
+ with ESMTP id SgRERIXyehRv for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 May 2018 10:43:32 -0400 (EDT)
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 32F6249EA4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 May 2018 10:43:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B0A6D40458
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 May 2018 10:43:32 -0400 (EDT)
 In-Reply-To: <20180529145320.GJ17671@n2100.armlinux.org.uk>
 Content-Disposition: inline
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
@@ -33,37 +32,63 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add CPU part numbers for Cortex A53, A57, A72, A73, A75 and the
-Broadcom Brahma B15 CPU.
+Prepare the processor bug infrastructure so that it can be expanded to
+check for per-processor bugs.
 
 Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
-Acked-by: Florian Fainelli <f.fainelli@gmail.com>
+Reviewed-by: Florian Fainelli <f.fainelli@gmail.com>
 Boot-tested-by: Tony Lindgren <tony@atomide.com>
 Reviewed-by: Tony Lindgren <tony@atomide.com>
 ---
- arch/arm/include/asm/cputype.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ arch/arm/include/asm/bugs.h | 4 ++--
+ arch/arm/kernel/Makefile    | 1 +
+ arch/arm/kernel/bugs.c      | 9 +++++++++
+ 3 files changed, 12 insertions(+), 2 deletions(-)
+ create mode 100644 arch/arm/kernel/bugs.c
 
-diff --git a/arch/arm/include/asm/cputype.h b/arch/arm/include/asm/cputype.h
-index cb546425da8a..26021980504d 100644
---- a/arch/arm/include/asm/cputype.h
-+++ b/arch/arm/include/asm/cputype.h
-@@ -77,8 +77,16 @@
- #define ARM_CPU_PART_CORTEX_A12		0x4100c0d0
- #define ARM_CPU_PART_CORTEX_A17		0x4100c0e0
- #define ARM_CPU_PART_CORTEX_A15		0x4100c0f0
-+#define ARM_CPU_PART_CORTEX_A53		0x4100d030
-+#define ARM_CPU_PART_CORTEX_A57		0x4100d070
-+#define ARM_CPU_PART_CORTEX_A72		0x4100d080
-+#define ARM_CPU_PART_CORTEX_A73		0x4100d090
-+#define ARM_CPU_PART_CORTEX_A75		0x4100d0a0
- #define ARM_CPU_PART_MASK		0xff00fff0
+diff --git a/arch/arm/include/asm/bugs.h b/arch/arm/include/asm/bugs.h
+index a97f1ea708d1..ed122d294f3f 100644
+--- a/arch/arm/include/asm/bugs.h
++++ b/arch/arm/include/asm/bugs.h
+@@ -10,10 +10,10 @@
+ #ifndef __ASM_BUGS_H
+ #define __ASM_BUGS_H
  
-+/* Broadcom cores */
-+#define ARM_CPU_PART_BRAHMA_B15		0x420000f0
+-#ifdef CONFIG_MMU
+ extern void check_writebuffer_bugs(void);
+ 
+-#define check_bugs() check_writebuffer_bugs()
++#ifdef CONFIG_MMU
++extern void check_bugs(void);
+ #else
+ #define check_bugs() do { } while (0)
+ #endif
+diff --git a/arch/arm/kernel/Makefile b/arch/arm/kernel/Makefile
+index b59ac4bf82b8..8cad59465af3 100644
+--- a/arch/arm/kernel/Makefile
++++ b/arch/arm/kernel/Makefile
+@@ -31,6 +31,7 @@ else
+ obj-y		+= entry-armv.o
+ endif
+ 
++obj-$(CONFIG_MMU)		+= bugs.o
+ obj-$(CONFIG_CPU_IDLE)		+= cpuidle.o
+ obj-$(CONFIG_ISA_DMA_API)	+= dma.o
+ obj-$(CONFIG_FIQ)		+= fiq.o fiqasm.o
+diff --git a/arch/arm/kernel/bugs.c b/arch/arm/kernel/bugs.c
+new file mode 100644
+index 000000000000..88024028bb70
+--- /dev/null
++++ b/arch/arm/kernel/bugs.c
+@@ -0,0 +1,9 @@
++// SPDX-Identifier: GPL-2.0
++#include <linux/init.h>
++#include <asm/bugs.h>
++#include <asm/proc-fns.h>
 +
- /* DEC implemented cores */
- #define ARM_CPU_PART_SA1100		0x4400a110
- 
++void __init check_bugs(void)
++{
++	check_writebuffer_bugs();
++}
 -- 
 2.7.4
