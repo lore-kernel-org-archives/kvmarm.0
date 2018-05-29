@@ -1,158 +1,136 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 02/17] arm64: Call ARCH_WORKAROUND_2 on transitions between
- EL0 and EL1
-Date: Tue, 29 May 2018 13:11:06 +0100
-Message-ID: <20180529121121.24927-3-marc.zyngier@arm.com>
+Subject: [PATCH v2 14/17] arm64: KVM: Add ARCH_WORKAROUND_2 discovery through ARCH_FEATURES_FUNC_ID
+Date: Tue, 29 May 2018 13:11:18 +0100
+Message-ID: <20180529121121.24927-15-marc.zyngier@arm.com>
 References: <20180529121121.24927-1-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 90C304A0DC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 May 2018 08:01:03 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 21UGSRuwHbwi for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 May 2018 08:00:41 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E5BE4A0CC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 May 2018 08:00:41 -0400 (EDT)
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20180529121121.24927-1-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: linux-kernel-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: Kees Cook <keescook@chromium.org>, Catalin Marinas <catalin.marinas@arm.com>, Randy Dunlap <rdunlap@infradead.org>, Will Deacon <will.deacon@arm.com>, Dominik Brodowski <linux@dominikbrodowski.net>, Andy Lutomirski <luto@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Thomas Gleixner <tglx@linutronix.de>
+Cc: Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Thomas Gleixner <tglx@linutronix.de>, Andy Lutomirski <luto@kernel.org>, Kees Cook <keescook@chromium.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Christoffer Dall <christoffer.dall@arm.com>, Randy Dunlap <rdunlap@infradead.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Julien Grall <julien.grall@arm.com>, Mark Rutland <mark.rutland@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In order for the kernel to protect itself, let's call the SSBD mitigation
-implemented by the higher exception level (either hypervisor or firmware)
-on each transition between userspace and kernel.
+Now that all our infrastructure is in place, let's expose the
+availability of ARCH_WORKAROUND_2 to guests. We take this opportunity
+to tidy up a couple of SMCCC constants.
 
-We must take the PSCI conduit into account in order to target the
-right exception level, hence the introduction of a runtime patching
-callback.
-
+Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 Reviewed-by: Mark Rutland <mark.rutland@arm.com>
-Reviewed-by: Julien Grall <julien.grall@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kernel/cpu_errata.c | 24 ++++++++++++++++++++++++
- arch/arm64/kernel/entry.S      | 22 ++++++++++++++++++++++
- include/linux/arm-smccc.h      |  5 +++++
- 3 files changed, 51 insertions(+)
+ arch/arm/include/asm/kvm_host.h   | 12 ++++++++++++
+ arch/arm64/include/asm/kvm_host.h | 23 +++++++++++++++++++++++
+ arch/arm64/kvm/reset.c            |  4 ++++
+ virt/kvm/arm/psci.c               | 18 ++++++++++++++++--
+ 4 files changed, 55 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-index e4a1182deff7..d98d8ce29533 100644
---- a/arch/arm64/kernel/cpu_errata.c
-+++ b/arch/arm64/kernel/cpu_errata.c
-@@ -232,6 +232,30 @@ enable_smccc_arch_workaround_1(const struct arm64_cpu_capabilities *entry)
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index c7c28c885a19..7001fb871429 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -315,6 +315,18 @@ static inline bool kvm_arm_harden_branch_predictor(void)
+ 	return false;
  }
- #endif	/* CONFIG_HARDEN_BRANCH_PREDICTOR */
  
-+#ifdef CONFIG_ARM64_SSBD
-+void __init arm64_update_smccc_conduit(struct alt_instr *alt,
-+				       __le32 *origptr, __le32 *updptr,
-+				       int nr_inst)
++#define KVM_SSBD_UNKNOWN		-1
++#define KVM_SSBD_FORCE_DISABLE		0
++#define KVM_SSBD_KERNEL		1
++#define KVM_SSBD_FORCE_ENABLE		2
++#define KVM_SSBD_MITIGATED		3
++
++static inline int kvm_arm_have_ssbd(void)
 +{
-+	u32 insn;
-+
-+	BUG_ON(nr_inst != 1);
-+
-+	switch (psci_ops.conduit) {
-+	case PSCI_CONDUIT_HVC:
-+		insn = aarch64_insn_get_hvc_value();
-+		break;
-+	case PSCI_CONDUIT_SMC:
-+		insn = aarch64_insn_get_smc_value();
-+		break;
-+	default:
-+		return;
-+	}
-+
-+	*updptr = cpu_to_le32(insn);
++	/* No way to detect it yet, pretend it is not there. */
++	return KVM_SSBD_UNKNOWN;
 +}
-+#endif	/* CONFIG_ARM64_SSBD */
 +
- #define CAP_MIDR_RANGE(model, v_min, r_min, v_max, r_max)	\
- 	.matches = is_affected_midr_range,			\
- 	.midr_range = MIDR_RANGE(model, v_min, r_min, v_max, r_max)
-diff --git a/arch/arm64/kernel/entry.S b/arch/arm64/kernel/entry.S
-index ec2ee720e33e..f33e6aed3037 100644
---- a/arch/arm64/kernel/entry.S
-+++ b/arch/arm64/kernel/entry.S
-@@ -18,6 +18,7 @@
-  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  */
+ static inline void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu) {}
+ static inline void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu) {}
  
-+#include <linux/arm-smccc.h>
- #include <linux/init.h>
- #include <linux/linkage.h>
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 9bef3f69bdcd..95d8a0e15b5f 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -455,6 +455,29 @@ static inline bool kvm_arm_harden_branch_predictor(void)
+ 	return cpus_have_const_cap(ARM64_HARDEN_BRANCH_PREDICTOR);
+ }
  
-@@ -137,6 +138,18 @@ alternative_else_nop_endif
- 	add	\dst, \dst, #(\sym - .entry.tramp.text)
- 	.endm
- 
-+	// This macro corrupts x0-x3. It is the caller's duty
-+	// to save/restore them if required.
-+	.macro	apply_ssbd, state
-+#ifdef CONFIG_ARM64_SSBD
-+	mov	w0, #ARM_SMCCC_ARCH_WORKAROUND_2
-+	mov	w1, #\state
-+alternative_cb	arm64_update_smccc_conduit
-+	nop					// Patched to SMC/HVC #0
-+alternative_cb_end
-+#endif
-+	.endm
++#define KVM_SSBD_UNKNOWN		-1
++#define KVM_SSBD_FORCE_DISABLE		0
++#define KVM_SSBD_KERNEL		1
++#define KVM_SSBD_FORCE_ENABLE		2
++#define KVM_SSBD_MITIGATED		3
 +
- 	.macro	kernel_entry, el, regsize = 64
- 	.if	\regsize == 32
- 	mov	w0, w0				// zero upper 32 bits of x0
-@@ -163,6 +176,13 @@ alternative_else_nop_endif
- 	ldr	x19, [tsk, #TSK_TI_FLAGS]	// since we can unmask debug
- 	disable_step_tsk x19, x20		// exceptions when scheduling.
- 
-+	apply_ssbd 1
++static inline int kvm_arm_have_ssbd(void)
++{
++	switch (arm64_get_ssbd_state()) {
++	case ARM64_SSBD_FORCE_DISABLE:
++		return KVM_SSBD_FORCE_DISABLE;
++	case ARM64_SSBD_KERNEL:
++		return KVM_SSBD_KERNEL;
++	case ARM64_SSBD_FORCE_ENABLE:
++		return KVM_SSBD_FORCE_ENABLE;
++	case ARM64_SSBD_MITIGATED:
++		return KVM_SSBD_MITIGATED;
++	case ARM64_SSBD_UNKNOWN:
++	default:
++		return KVM_SSBD_UNKNOWN;
++	}
++}
 +
-+#ifdef CONFIG_ARM64_SSBD
-+	ldp	x0, x1, [sp, #16 * 0]
-+	ldp	x2, x3, [sp, #16 * 1]
-+#endif
-+
- 	mov	x29, xzr			// fp pointed to user-space
- 	.else
- 	add	x21, sp, #S_FRAME_SIZE
-@@ -303,6 +323,8 @@ alternative_if ARM64_WORKAROUND_845719
- alternative_else_nop_endif
- #endif
- 3:
-+	apply_ssbd 0
-+
- 	.endif
+ void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu);
+ void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu);
  
- 	msr	elr_el1, x21			// set up the return data
-diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
-index c89da86de99f..ca1d2cc2cdfa 100644
---- a/include/linux/arm-smccc.h
-+++ b/include/linux/arm-smccc.h
-@@ -80,6 +80,11 @@
- 			   ARM_SMCCC_SMC_32,				\
- 			   0, 0x8000)
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 3256b9228e75..a74311beda35 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -122,6 +122,10 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 	/* Reset PMU */
+ 	kvm_pmu_vcpu_reset(vcpu);
  
-+#define ARM_SMCCC_ARCH_WORKAROUND_2					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-+			   ARM_SMCCC_SMC_32,				\
-+			   0, 0x7fff)
++	/* Default workaround setup is enabled (if supported) */
++	if (kvm_arm_have_ssbd() == KVM_SSBD_KERNEL)
++		vcpu->arch.workaround_flags |= VCPU_WORKAROUND_2_FLAG;
 +
- #ifndef __ASSEMBLY__
+ 	/* Reset timer */
+ 	return kvm_timer_vcpu_reset(vcpu);
+ }
+diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
+index c4762bef13c6..c95ab4c5a475 100644
+--- a/virt/kvm/arm/psci.c
++++ b/virt/kvm/arm/psci.c
+@@ -405,7 +405,7 @@ static int kvm_psci_call(struct kvm_vcpu *vcpu)
+ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+ {
+ 	u32 func_id = smccc_get_function(vcpu);
+-	u32 val = PSCI_RET_NOT_SUPPORTED;
++	u32 val = SMCCC_RET_NOT_SUPPORTED;
+ 	u32 feature;
  
- #include <linux/linkage.h>
+ 	switch (func_id) {
+@@ -417,7 +417,21 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+ 		switch(feature) {
+ 		case ARM_SMCCC_ARCH_WORKAROUND_1:
+ 			if (kvm_arm_harden_branch_predictor())
+-				val = 0;
++				val = SMCCC_RET_SUCCESS;
++			break;
++		case ARM_SMCCC_ARCH_WORKAROUND_2:
++			switch (kvm_arm_have_ssbd()) {
++			case KVM_SSBD_FORCE_DISABLE:
++			case KVM_SSBD_UNKNOWN:
++				break;
++			case KVM_SSBD_KERNEL:
++				val = SMCCC_RET_SUCCESS;
++				break;
++			case KVM_SSBD_FORCE_ENABLE:
++			case KVM_SSBD_MITIGATED:
++				val = SMCCC_RET_NOT_REQUIRED;
++				break;
++			}
+ 			break;
+ 		}
+ 		break;
 -- 
 2.14.2
