@@ -1,7 +1,7 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 13/17] arm64: KVM: Handle guest's ARCH_WORKAROUND_2 requests
-Date: Tue, 29 May 2018 13:11:17 +0100
-Message-ID: <20180529121121.24927-14-marc.zyngier@arm.com>
+Subject: [PATCH v2 12/17] arm64: KVM: Add ARCH_WORKAROUND_2 support for guests
+Date: Tue, 29 May 2018 13:11:16 +0100
+Message-ID: <20180529121121.24927-13-marc.zyngier@arm.com>
 References: <20180529121121.24927-1-marc.zyngier@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20180529121121.24927-1-marc.zyngier@arm.com>
@@ -10,83 +10,207 @@ To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@l
 Cc: Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Thomas Gleixner <tglx@linutronix.de>, Andy Lutomirski <luto@kernel.org>, Kees Cook <keescook@chromium.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Christoffer Dall <christoffer.dall@arm.com>, Randy Dunlap <rdunlap@infradead.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Julien Grall <julien.grall@arm.com>, Mark Rutland <mark.rutland@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In order to forward the guest's ARCH_WORKAROUND_2 calls to EL3,
-add a small(-ish) sequence to handle it at EL2. Special care must
-be taken to track the state of the guest itself by updating the
-workaround flags. We also rely on patching to enable calls into
-the firmware.
+In order to offer ARCH_WORKAROUND_2 support to guests, we need
+a bit of infrastructure.
 
-Note that since we need to execute branches, this always executes
-after the Spectre-v2 mitigation has been applied.
+Let's add a flag indicating whether or not the guest uses
+SSBD mitigation. Depending on the state of this flag, allow
+KVM to disable ARCH_WORKAROUND_2 before entering the guest,
+and enable it when exiting it.
 
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
 Reviewed-by: Mark Rutland <mark.rutland@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kernel/asm-offsets.c |  1 +
- arch/arm64/kvm/hyp/hyp-entry.S  | 38 +++++++++++++++++++++++++++++++++++++-
- 2 files changed, 38 insertions(+), 1 deletion(-)
+ arch/arm/include/asm/kvm_mmu.h    |  5 +++++
+ arch/arm64/include/asm/kvm_asm.h  |  3 +++
+ arch/arm64/include/asm/kvm_host.h |  3 +++
+ arch/arm64/include/asm/kvm_mmu.h  | 24 ++++++++++++++++++++++
+ arch/arm64/kvm/hyp/switch.c       | 42 +++++++++++++++++++++++++++++++++++++++
+ virt/kvm/arm/arm.c                |  4 ++++
+ 6 files changed, 81 insertions(+)
 
-diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
-index 5bdda651bd05..323aeb5f2fe6 100644
---- a/arch/arm64/kernel/asm-offsets.c
-+++ b/arch/arm64/kernel/asm-offsets.c
-@@ -136,6 +136,7 @@ int main(void)
- #ifdef CONFIG_KVM_ARM_HOST
-   DEFINE(VCPU_CONTEXT,		offsetof(struct kvm_vcpu, arch.ctxt));
-   DEFINE(VCPU_FAULT_DISR,	offsetof(struct kvm_vcpu, arch.fault.disr_el1));
-+  DEFINE(VCPU_WORKAROUND_FLAGS,	offsetof(struct kvm_vcpu, arch.workaround_flags));
-   DEFINE(CPU_GP_REGS,		offsetof(struct kvm_cpu_context, gp_regs));
-   DEFINE(CPU_USER_PT_REGS,	offsetof(struct kvm_regs, regs));
-   DEFINE(CPU_FP_REGS,		offsetof(struct kvm_regs, fp_regs));
-diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index bffece27b5c1..05d836979032 100644
---- a/arch/arm64/kvm/hyp/hyp-entry.S
-+++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -106,8 +106,44 @@ el1_hvc_guest:
- 	 */
- 	ldr	x1, [sp]				// Guest's x0
- 	eor	w1, w1, #ARM_SMCCC_ARCH_WORKAROUND_1
-+	cbz	w1, wa_epilogue
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index f675162663f0..d2eb24eccf8f 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -335,6 +335,11 @@ static inline int kvm_map_vectors(void)
+ 	return 0;
+ }
+ 
++static inline int hyp_map_aux_data(void)
++{
++	return 0;
++}
 +
-+	/* ARM_SMCCC_ARCH_WORKAROUND_2 handling */
-+	eor	w1, w1, #(ARM_SMCCC_ARCH_WORKAROUND_1 ^ \
-+			  ARM_SMCCC_ARCH_WORKAROUND_2)
- 	cbnz	w1, el1_trap
--	mov	x0, x1
+ #define kvm_phys_to_vttbr(addr)		(addr)
+ 
+ #endif	/* !__ASSEMBLY__ */
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index fefd8cf42c35..d4fbb1356c4c 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -33,6 +33,9 @@
+ #define KVM_ARM64_DEBUG_DIRTY_SHIFT	0
+ #define KVM_ARM64_DEBUG_DIRTY		(1 << KVM_ARM64_DEBUG_DIRTY_SHIFT)
+ 
++#define	VCPU_WORKAROUND_2_FLAG_SHIFT	0
++#define	VCPU_WORKAROUND_2_FLAG		(_AC(1, UL) << VCPU_WORKAROUND_2_FLAG_SHIFT)
 +
+ /* Translate a kernel address of @sym into its equivalent linear mapping */
+ #define kvm_ksym_ref(sym)						\
+ 	({								\
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 469de8acd06f..9bef3f69bdcd 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -216,6 +216,9 @@ struct kvm_vcpu_arch {
+ 	/* Exception Information */
+ 	struct kvm_vcpu_fault_info fault;
+ 
++	/* State of various workarounds, see kvm_asm.h for bit assignment */
++	u64 workaround_flags;
++
+ 	/* Guest debug state */
+ 	u64 debug_flags;
+ 
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 6128992c2ded..e3b2ad7dd40a 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -473,6 +473,30 @@ static inline int kvm_map_vectors(void)
+ }
+ #endif
+ 
 +#ifdef CONFIG_ARM64_SSBD
-+alternative_cb	arm64_enable_wa2_handling
-+	b	wa2_end
-+alternative_cb_end
-+	get_vcpu_ptr	x2, x0
-+	ldr	x0, [x2, #VCPU_WORKAROUND_FLAGS]
++DECLARE_PER_CPU_READ_MOSTLY(u64, arm64_ssbd_callback_required);
 +
-+	// Sanitize the argument and update the guest flags
-+	ldr	x1, [sp, #8]			// Guest's x1
-+	clz	w1, w1				// Murphy's device:
-+	lsr	w1, w1, #5			// w1 = !!w1 without using
-+	eor	w1, w1, #1			// the flags...
-+	bfi	x0, x1, #VCPU_WORKAROUND_2_FLAG_SHIFT, #1
-+	str	x0, [x2, #VCPU_WORKAROUND_FLAGS]
++static inline int hyp_map_aux_data(void)
++{
++	int cpu, err;
 +
-+	/* Check that we actually need to perform the call */
-+	hyp_ldr_this_cpu x0, arm64_ssbd_callback_required, x2
-+	cbz	x0, wa2_end
++	for_each_possible_cpu(cpu) {
++		u64 *ptr;
 +
-+	mov	w0, #ARM_SMCCC_ARCH_WORKAROUND_2
-+	smc	#0
-+
-+	/* Don't leak data from the SMC call */
-+	mov	x3, xzr
-+wa2_end:
-+	mov	x2, xzr
-+	mov	x1, xzr
++		ptr = per_cpu_ptr(&arm64_ssbd_callback_required, cpu);
++		err = create_hyp_mappings(ptr, ptr + 1, PAGE_HYP);
++		if (err)
++			return err;
++	}
++	return 0;
++}
++#else
++static inline int hyp_map_aux_data(void)
++{
++	return 0;
++}
 +#endif
 +
-+wa_epilogue:
-+	mov	x0, xzr
- 	add	sp, sp, #16
- 	eret
+ #define kvm_phys_to_vttbr(addr)		phys_to_ttbr(addr)
  
+ #endif /* __ASSEMBLY__ */
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index d9645236e474..c50cedc447f1 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -15,6 +15,7 @@
+  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  */
+ 
++#include <linux/arm-smccc.h>
+ #include <linux/types.h>
+ #include <linux/jump_label.h>
+ #include <uapi/linux/psci.h>
+@@ -389,6 +390,39 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	return false;
+ }
+ 
++static inline bool __hyp_text __needs_ssbd_off(struct kvm_vcpu *vcpu)
++{
++	if (!cpus_have_const_cap(ARM64_SSBD))
++		return false;
++
++	return !(vcpu->arch.workaround_flags & VCPU_WORKAROUND_2_FLAG);
++}
++
++static void __hyp_text __set_guest_arch_workaround_state(struct kvm_vcpu *vcpu)
++{
++#ifdef CONFIG_ARM64_SSBD
++	/*
++	 * The host runs with the workaround always present. If the
++	 * guest wants it disabled, so be it...
++	 */
++	if (__needs_ssbd_off(vcpu) &&
++	    __hyp_this_cpu_read(arm64_ssbd_callback_required))
++		arm_smccc_1_1_smc(ARM_SMCCC_ARCH_WORKAROUND_2, 0, NULL);
++#endif
++}
++
++static void __hyp_text __set_host_arch_workaround_state(struct kvm_vcpu *vcpu)
++{
++#ifdef CONFIG_ARM64_SSBD
++	/*
++	 * If the guest has disabled the workaround, bring it back on.
++	 */
++	if (__needs_ssbd_off(vcpu) &&
++	    __hyp_this_cpu_read(arm64_ssbd_callback_required))
++		arm_smccc_1_1_smc(ARM_SMCCC_ARCH_WORKAROUND_2, 1, NULL);
++#endif
++}
++
+ /* Switch to the guest for VHE systems running in EL2 */
+ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ {
+@@ -409,6 +443,8 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ 	sysreg_restore_guest_state_vhe(guest_ctxt);
+ 	__debug_switch_to_guest(vcpu);
+ 
++	__set_guest_arch_workaround_state(vcpu);
++
+ 	do {
+ 		/* Jump in the fire! */
+ 		exit_code = __guest_enter(vcpu, host_ctxt);
+@@ -416,6 +452,8 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ 		/* And we're baaack! */
+ 	} while (fixup_guest_exit(vcpu, &exit_code));
+ 
++	__set_host_arch_workaround_state(vcpu);
++
+ 	fp_enabled = fpsimd_enabled_vhe();
+ 
+ 	sysreg_save_guest_state_vhe(guest_ctxt);
+@@ -465,6 +503,8 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 	__sysreg_restore_state_nvhe(guest_ctxt);
+ 	__debug_switch_to_guest(vcpu);
+ 
++	__set_guest_arch_workaround_state(vcpu);
++
+ 	do {
+ 		/* Jump in the fire! */
+ 		exit_code = __guest_enter(vcpu, host_ctxt);
+@@ -472,6 +512,8 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 		/* And we're baaack! */
+ 	} while (fixup_guest_exit(vcpu, &exit_code));
+ 
++	__set_host_arch_workaround_state(vcpu);
++
+ 	fp_enabled = __fpsimd_enabled_nvhe();
+ 
+ 	__sysreg_save_state_nvhe(guest_ctxt);
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index a4c1b76240df..2d9b4795edb2 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -1490,6 +1490,10 @@ static int init_hyp_mode(void)
+ 		}
+ 	}
+ 
++	err = hyp_map_aux_data();
++	if (err)
++		kvm_err("Cannot map host auxilary data: %d\n", err);
++
+ 	return 0;
+ 
+ out_err:
 -- 
 2.14.2
