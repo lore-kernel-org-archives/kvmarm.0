@@ -1,90 +1,129 @@
-From: Russell King <rmk+kernel@armlinux.org.uk>
-Subject: [PATCH v4 14/15] ARM: KVM: Add SMCCC_ARCH_WORKAROUND_1 fast handling
-Date: Tue, 29 May 2018 10:10:10 +0100
-Message-ID: <E1fNadu-0000hX-3S@rmk-PC.armlinux.org.uk>
-References: <20180529090756.GG17671@n2100.armlinux.org.uk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 492BA4A0E2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 May 2018 05:01:12 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RxFwHtZ9StTx for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 May 2018 05:00:47 -0400 (EDT)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 066E94A0E7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 May 2018 04:59:41 -0400 (EDT)
-In-Reply-To: <20180529090756.GG17671@n2100.armlinux.org.uk>
-Content-Disposition: inline
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, kvmarm@lists.cs.columbia.edu
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH v2 00/17] arm64 SSBD (aka Spectre-v4) mitigation
+Date: Tue, 29 May 2018 13:11:04 +0100
+Message-ID: <20180529121121.24927-1-marc.zyngier@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Thomas Gleixner <tglx@linutronix.de>, Andy Lutomirski <luto@kernel.org>, Kees Cook <keescook@chromium.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Christoffer Dall <christoffer.dall@arm.com>, Randy Dunlap <rdunlap@infradead.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Julien Grall <julien.grall@arm.com>, Mark Rutland <mark.rutland@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We want SMCCC_ARCH_WORKAROUND_1 to be fast. As fast as possible.
-So let's intercept it as early as we can by testing for the
-function call number as soon as we've identified a HVC call
-coming from the guest.
+Hi all,
 
-Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
-Boot-tested-by: Tony Lindgren <tony@atomide.com>
-Reviewed-by: Tony Lindgren <tony@atomide.com>
----
- arch/arm/kvm/hyp/hyp-entry.S | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+This patch series implements the Linux kernel side of the "Spectre-v4"
+(CVE-2018-3639) mitigation known as "Speculative Store Bypass Disable"
+(SSBD).
 
-diff --git a/arch/arm/kvm/hyp/hyp-entry.S b/arch/arm/kvm/hyp/hyp-entry.S
-index 918a05dd2d63..aa3f9a9837ac 100644
---- a/arch/arm/kvm/hyp/hyp-entry.S
-+++ b/arch/arm/kvm/hyp/hyp-entry.S
-@@ -16,6 +16,7 @@
-  * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-  */
- 
-+#include <linux/arm-smccc.h>
- #include <linux/linkage.h>
- #include <asm/kvm_arm.h>
- #include <asm/kvm_asm.h>
-@@ -202,7 +203,7 @@ ENDPROC(__hyp_do_panic)
- 	lsr     r2, r2, #16
- 	and     r2, r2, #0xff
- 	cmp     r2, #0
--	bne	guest_trap		@ Guest called HVC
-+	bne	guest_hvc_trap		@ Guest called HVC
- 
- 	/*
- 	 * Getting here means host called HVC, we shift parameters and branch
-@@ -253,6 +254,20 @@ THUMB(	orr	lr, #1)
- 	pop	{r2, lr}
- 	eret
- 
-+guest_hvc_trap:
-+	movw	r2, #:lower16:ARM_SMCCC_ARCH_WORKAROUND_1
-+	movt	r2, #:upper16:ARM_SMCCC_ARCH_WORKAROUND_1
-+	ldr	r0, [sp]		@ Guest's r0
-+	teq	r0, r2
-+	bne	guest_trap
-+	add	sp, sp, #12
-+	@ Returns:
-+	@ r0 = 0
-+	@ r1 = HSR value (perfectly predictable)
-+	@ r2 = ARM_SMCCC_ARCH_WORKAROUND_1
-+	mov	r0, #0
-+	eret
-+
- guest_trap:
- 	load_vcpu r0			@ Load VCPU pointer to r0
- 
+More information can be found at:
+
+  https://bugs.chromium.org/p/project-zero/issues/detail?id=1528
+  https://developer.arm.com/support/arm-security-updates/speculative-processor-vulnerability
+
+For all released Arm Cortex-A CPUs that are affected by this issue, then
+the preferred mitigation is simply to set a chicken bit in the firmware
+during CPU initialisation and therefore no change to Linux is required.
+Other CPUs may require the chicken bit to be toggled dynamically (for
+example, when switching between user-mode and kernel-mode) and this is
+achieved by calling into EL3 via an SMC which has been published as part
+of the latest SMCCC specification:
+
+  https://developer.arm.com/cache-speculation-vulnerability-firmware-specification
+
+as well as an ATF update for the released ARM cores affected by SSBD:
+
+  https://github.com/ARM-software/arm-trusted-firmware/pull/1392
+
+These patches provide the following:
+
+  1. Safe probing of firmware to establish which CPUs in the system
+     require calling into EL3 as part of the mitigation.
+
+  2. For CPUs that require it, call into EL3 on exception entry/exit
+     from EL0 to apply the SSBD mitigation when running at EL1.
+
+  3. A command-line option to force the SSBD mitigation to be always on,
+     always off, or dymamically toggled (default) for CPUs that require
+     the EL3 call.
+
+  4. An initial implementation of a prctl() backend for arm64 that allows
+     userspace tasks to opt-in to the mitigation explicitly. This is
+     intended to match the interface provided by x86, and so we rely on
+     their core changes here. The seccomp interface is provided as an
+     extra set of patches, which I'd like *not* to see merged. The main
+     reason is that it is invasive, has ugly/unclear semantics, and could
+     probably be left to the existing prctl interface.
+
+  5. An initial implementation of the call via KVM, which exposes the
+     mitigation to the guest via an HVC interface. This isn't yet
+     complete and doesn't include save/restore functionality for the
+     workaround state.
+
+All comments welcome,
+
+	M.
+
+* From v1 [1]:
+
+  - New TIF_SSBD_PENDING flag to enable the mitigation, atomically
+    converted to TIF_SSBD on exit to userspace. Moved the seccomp thing to
+    its own patch.
+  - Renamed do_ssbd() to arm64_set_ssbd_mitigation() early in the series
+  - Some spelling fixes
+  - Dropped the now unnecessary #ifdef in ssbd.c
+  - SSBD handling in entry.S default to NOP until patching comes in, which
+    itself got tiddied up
+  - Renamed ARM64_SSBD_EL1_ENTRY to ARM64_SSBD_KERNEL
+  - Collected RBs
+
+[1] https://lwn.net/ml/linux-kernel/20180522150648.28297-1-marc.zyngier@arm.com/
+
+Marc Zyngier (17):
+  arm/arm64: smccc: Add SMCCC-specific return codes
+  arm64: Call ARCH_WORKAROUND_2 on transitions between EL0 and EL1
+  arm64: Add per-cpu infrastructure to call ARCH_WORKAROUND_2
+  arm64: Add ARCH_WORKAROUND_2 probing
+  arm64: Add 'ssbd' command-line option
+  arm64: ssbd: Add global mitigation state accessor
+  arm64: ssbd: Skip apply_ssbd if not using dynamic mitigation
+  arm64: ssbd: Restore mitigation status on CPU resume
+  arm64: ssbd: Introduce thread flag to control userspace mitigation
+  arm64: ssbd: Add prctl interface for per-thread mitigation
+  arm64: KVM: Add HYP per-cpu accessors
+  arm64: KVM: Add ARCH_WORKAROUND_2 support for guests
+  arm64: KVM: Handle guest's ARCH_WORKAROUND_2 requests
+  arm64: KVM: Add ARCH_WORKAROUND_2 discovery through
+    ARCH_FEATURES_FUNC_ID
+  arm64: Add test_and_clear_flag and set_flag atomic assembler
+    primitives
+  arm64: ssbd: Enable delayed setting of TIF_SSBD
+  arm64: ssbd: Implement arch_seccomp_spec_mitigate
+
+ Documentation/admin-guide/kernel-parameters.txt |  17 +++
+ arch/arm/include/asm/kvm_host.h                 |  12 ++
+ arch/arm/include/asm/kvm_mmu.h                  |   5 +
+ arch/arm64/Kconfig                              |   9 ++
+ arch/arm64/include/asm/assembler.h              |  37 +++++
+ arch/arm64/include/asm/cpucaps.h                |   3 +-
+ arch/arm64/include/asm/cpufeature.h             |  22 +++
+ arch/arm64/include/asm/kvm_asm.h                |  30 +++-
+ arch/arm64/include/asm/kvm_host.h               |  26 ++++
+ arch/arm64/include/asm/kvm_mmu.h                |  24 ++++
+ arch/arm64/include/asm/thread_info.h            |   2 +
+ arch/arm64/kernel/Makefile                      |   1 +
+ arch/arm64/kernel/asm-offsets.c                 |   1 +
+ arch/arm64/kernel/cpu_errata.c                  | 180 ++++++++++++++++++++++++
+ arch/arm64/kernel/entry.S                       |  46 ++++++
+ arch/arm64/kernel/hibernate.c                   |  11 ++
+ arch/arm64/kernel/ssbd.c                        | 115 +++++++++++++++
+ arch/arm64/kernel/suspend.c                     |   8 ++
+ arch/arm64/kvm/hyp/hyp-entry.S                  |  38 ++++-
+ arch/arm64/kvm/hyp/switch.c                     |  42 ++++++
+ arch/arm64/kvm/reset.c                          |   4 +
+ include/linux/arm-smccc.h                       |  10 ++
+ virt/kvm/arm/arm.c                              |   4 +
+ virt/kvm/arm/psci.c                             |  18 ++-
+ 24 files changed, 659 insertions(+), 6 deletions(-)
+ create mode 100644 arch/arm64/kernel/ssbd.c
+
 -- 
-2.7.4
+2.14.2
