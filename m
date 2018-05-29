@@ -1,295 +1,182 @@
 From: Russell King <rmk+kernel@armlinux.org.uk>
-Subject: [PATCH v4 06/15] ARM: spectre-v2: harden branch predictor on context
- switches
-Date: Tue, 29 May 2018 10:09:27 +0100
-Message-ID: <E1fNadD-0000fz-9r@rmk-PC.armlinux.org.uk>
+Subject: [PATCH v4 09/15] ARM: spectre-v2: add firmware based hardening
+Date: Tue, 29 May 2018 10:09:42 +0100
+Message-ID: <E1fNadS-0000gg-M6@rmk-PC.armlinux.org.uk>
 References: <20180529090756.GG17671@n2100.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DF794A0D5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 May 2018 04:59:42 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Axi+-RkX2sX0 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 May 2018 04:59:16 -0400 (EDT)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 07C8C4A0C8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 May 2018 04:58:48 -0400 (EDT)
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <20180529090756.GG17671@n2100.armlinux.org.uk>
 Content-Disposition: inline
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Harden the branch predictor against Spectre v2 attacks on context
-switches for ARMv7 and later CPUs.  We do this by:
-
-Cortex A9, A12, A17, A73, A75: invalidating the BTB.
-Cortex A15, Brahma B15: invalidating the instruction cache.
-
-Cortex A57 and Cortex A72 are not addressed in this patch.
-
-Cortex R7 and Cortex R8 are also not addressed as we do not enforce
-memory protection on these cores.
+Add firmware based hardening for cores that require more complex
+handling in firmware.
 
 Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
 Boot-tested-by: Tony Lindgren <tony@atomide.com>
 Reviewed-by: Tony Lindgren <tony@atomide.com>
 ---
- arch/arm/mm/Kconfig          |  19 +++++++
- arch/arm/mm/proc-v7-2level.S |   6 ---
- arch/arm/mm/proc-v7.S        | 125 +++++++++++++++++++++++++++++++++----------
- 3 files changed, 115 insertions(+), 35 deletions(-)
+ arch/arm/mm/proc-v7-bugs.c | 64 +++++++++++++++++++++++++++++++++++++++++++++-
+ arch/arm/mm/proc-v7.S      | 21 +++++++++++++++
+ 2 files changed, 84 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm/mm/Kconfig b/arch/arm/mm/Kconfig
-index 6f3ef86b4cb7..9357ff52c221 100644
---- a/arch/arm/mm/Kconfig
-+++ b/arch/arm/mm/Kconfig
-@@ -830,6 +830,25 @@ config CPU_BPREDICT_DISABLE
- config CPU_SPECTRE
- 	bool
+diff --git a/arch/arm/mm/proc-v7-bugs.c b/arch/arm/mm/proc-v7-bugs.c
+index 0b48270b7318..62fa822abd3d 100644
+--- a/arch/arm/mm/proc-v7-bugs.c
++++ b/arch/arm/mm/proc-v7-bugs.c
+@@ -1,14 +1,20 @@
+ // SPDX-License-Identifier: GPL-2.0
++#include <linux/arm-smccc.h>
+ #include <linux/kernel.h>
++#include <linux/psci.h>
+ #include <linux/smp.h>
  
-+config HARDEN_BRANCH_PREDICTOR
-+	bool "Harden the branch predictor against aliasing attacks" if EXPERT
-+	depends on CPU_SPECTRE
-+	default y
-+	help
-+	   Speculation attacks against some high-performance processors rely
-+	   on being able to manipulate the branch predictor for a victim
-+	   context by executing aliasing branches in the attacker context.
-+	   Such attacks can be partially mitigated against by clearing
-+	   internal branch predictor state and limiting the prediction
-+	   logic in some situations.
-+
-+	   This config option will take CPU-specific actions to harden
-+	   the branch predictor against aliasing attacks and may rely on
-+	   specific instruction sequences or control bits being set by
-+	   the system firmware.
-+
-+	   If unsure, say Y.
-+
- config TLS_REG_EMUL
- 	bool
- 	select NEED_KUSER_HELPERS
-diff --git a/arch/arm/mm/proc-v7-2level.S b/arch/arm/mm/proc-v7-2level.S
-index c6141a5435c3..f8d45ad2a515 100644
---- a/arch/arm/mm/proc-v7-2level.S
-+++ b/arch/arm/mm/proc-v7-2level.S
-@@ -41,11 +41,6 @@
-  *	even on Cortex-A8 revisions not affected by 430973.
-  *	If IBE is not set, the flush BTAC/BTB won't do anything.
-  */
--ENTRY(cpu_ca8_switch_mm)
--#ifdef CONFIG_MMU
--	mov	r2, #0
--	mcr	p15, 0, r2, c7, c5, 6		@ flush BTAC/BTB
--#endif
- ENTRY(cpu_v7_switch_mm)
- #ifdef CONFIG_MMU
- 	mmid	r1, r1				@ get mm->context.id
-@@ -66,7 +61,6 @@ ENTRY(cpu_v7_switch_mm)
- #endif
- 	bx	lr
- ENDPROC(cpu_v7_switch_mm)
--ENDPROC(cpu_ca8_switch_mm)
+ #include <asm/cp15.h>
+ #include <asm/cputype.h>
++#include <asm/proc-fns.h>
+ #include <asm/system_misc.h>
  
- /*
-  *	cpu_v7_set_pte_ext(ptep, pte)
+ #ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
+ DEFINE_PER_CPU(harden_branch_predictor_fn_t, harden_branch_predictor_fn);
+ 
++extern void cpu_v7_smc_switch_mm(phys_addr_t pgd_phys, struct mm_struct *mm);
++extern void cpu_v7_hvc_switch_mm(phys_addr_t pgd_phys, struct mm_struct *mm);
++
+ static void harden_branch_predictor_bpiall(void)
+ {
+ 	write_sysreg(0, BPIALL);
+@@ -19,15 +25,27 @@ static void harden_branch_predictor_iciallu(void)
+ 	write_sysreg(0, ICIALLU);
+ }
+ 
++static void __maybe_unused call_smc_arch_workaround_1(void)
++{
++	arm_smccc_1_1_smc(ARM_SMCCC_ARCH_WORKAROUND_1, NULL);
++}
++
++static void __maybe_unused call_hvc_arch_workaround_1(void)
++{
++	arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_WORKAROUND_1, NULL);
++}
++
+ static void cpu_v7_spectre_init(void)
+ {
+ 	const char *spectre_v2_method = NULL;
+ 	int cpu = smp_processor_id();
++	u32 cpuid;
+ 
+ 	if (per_cpu(harden_branch_predictor_fn, cpu))
+ 		return;
+ 
+-	switch (read_cpuid_part()) {
++	cpuid = read_cpuid_part();
++	switch (cpuid) {
+ 	case ARM_CPU_PART_CORTEX_A8:
+ 	case ARM_CPU_PART_CORTEX_A9:
+ 	case ARM_CPU_PART_CORTEX_A12:
+@@ -45,7 +63,51 @@ static void cpu_v7_spectre_init(void)
+ 			harden_branch_predictor_iciallu;
+ 		spectre_v2_method = "ICIALLU";
+ 		break;
++
++#ifdef CONFIG_ARM_PSCI
++	default:
++		/* Other ARM CPUs require no workaround */
++		if (cpuid >> 24 == ARM_CPU_IMP_ARM)
++			break;
++		/* fallthrough */
++		/* Cortex A57/A72 require firmware workaround */
++	case ARM_CPU_PART_CORTEX_A57:
++	case ARM_CPU_PART_CORTEX_A72: {
++		struct arm_smccc_res res;
++
++		if (psci_ops.smccc_version == SMCCC_VERSION_1_0)
++			break;
++
++		switch (psci_ops.conduit) {
++		case PSCI_CONDUIT_HVC:
++			arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
++					  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
++			if ((int)res.a0 != 0)
++				break;
++			per_cpu(harden_branch_predictor_fn, cpu) =
++				call_hvc_arch_workaround_1;
++			processor.switch_mm = cpu_v7_hvc_switch_mm;
++			spectre_v2_method = "hypervisor";
++			break;
++
++		case PSCI_CONDUIT_SMC:
++			arm_smccc_1_1_smc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
++					  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
++			if ((int)res.a0 != 0)
++				break;
++			per_cpu(harden_branch_predictor_fn, cpu) =
++				call_smc_arch_workaround_1;
++			processor.switch_mm = cpu_v7_smc_switch_mm;
++			spectre_v2_method = "firmware";
++			break;
++
++		default:
++			break;
++		}
+ 	}
++#endif
++	}
++
+ 	if (spectre_v2_method)
+ 		pr_info("CPU%u: Spectre v2: using %s workaround\n",
+ 			smp_processor_id(), spectre_v2_method);
 diff --git a/arch/arm/mm/proc-v7.S b/arch/arm/mm/proc-v7.S
-index d55d493f9a1e..a2d433d59848 100644
+index 79510011e7eb..b78d59a1cc05 100644
 --- a/arch/arm/mm/proc-v7.S
 +++ b/arch/arm/mm/proc-v7.S
-@@ -93,6 +93,17 @@ ENTRY(cpu_v7_dcache_clean_area)
+@@ -9,6 +9,7 @@
+  *
+  *  This is the "shell" of the ARMv7 processor support.
+  */
++#include <linux/arm-smccc.h>
+ #include <linux/init.h>
+ #include <linux/linkage.h>
+ #include <asm/assembler.h>
+@@ -93,6 +94,26 @@ ENTRY(cpu_v7_dcache_clean_area)
  	ret	lr
  ENDPROC(cpu_v7_dcache_clean_area)
  
-+ENTRY(cpu_v7_iciallu_switch_mm)
-+	mov	r3, #0
-+	mcr	p15, 0, r3, c7, c5, 0		@ ICIALLU
++#ifdef CONFIG_ARM_PSCI
++	.arch_extension sec
++ENTRY(cpu_v7_smc_switch_mm)
++	stmfd	sp!, {r0 - r3}
++	movw	r0, #:lower16:ARM_SMCCC_ARCH_WORKAROUND_1
++	movt	r0, #:upper16:ARM_SMCCC_ARCH_WORKAROUND_1
++	smc	#0
++	ldmfd	sp!, {r0 - r3}
 +	b	cpu_v7_switch_mm
-+ENDPROC(cpu_v7_iciallu_switch_mm)
-+ENTRY(cpu_v7_bpiall_switch_mm)
-+	mov	r3, #0
-+	mcr	p15, 0, r3, c7, c5, 6		@ flush BTAC/BTB
++ENDPROC(cpu_v7_smc_switch_mm)
++	.arch_extension virt
++ENTRY(cpu_v7_hvc_switch_mm)
++	stmfd	sp!, {r0 - r3}
++	movw	r0, #:lower16:ARM_SMCCC_ARCH_WORKAROUND_1
++	movt	r0, #:upper16:ARM_SMCCC_ARCH_WORKAROUND_1
++	hvc	#0
++	ldmfd	sp!, {r0 - r3}
 +	b	cpu_v7_switch_mm
-+ENDPROC(cpu_v7_bpiall_switch_mm)
-+
- 	string	cpu_v7_name, "ARMv7 Processor"
- 	.align
- 
-@@ -158,31 +169,6 @@ ENTRY(cpu_v7_do_resume)
- ENDPROC(cpu_v7_do_resume)
- #endif
- 
--/*
-- * Cortex-A8
-- */
--	globl_equ	cpu_ca8_proc_init,	cpu_v7_proc_init
--	globl_equ	cpu_ca8_proc_fin,	cpu_v7_proc_fin
--	globl_equ	cpu_ca8_reset,		cpu_v7_reset
--	globl_equ	cpu_ca8_do_idle,	cpu_v7_do_idle
--	globl_equ	cpu_ca8_dcache_clean_area, cpu_v7_dcache_clean_area
--	globl_equ	cpu_ca8_set_pte_ext,	cpu_v7_set_pte_ext
--	globl_equ	cpu_ca8_suspend_size,	cpu_v7_suspend_size
--#ifdef CONFIG_ARM_CPU_SUSPEND
--	globl_equ	cpu_ca8_do_suspend,	cpu_v7_do_suspend
--	globl_equ	cpu_ca8_do_resume,	cpu_v7_do_resume
--#endif
--
--/*
-- * Cortex-A9 processor functions
-- */
--	globl_equ	cpu_ca9mp_proc_init,	cpu_v7_proc_init
--	globl_equ	cpu_ca9mp_proc_fin,	cpu_v7_proc_fin
--	globl_equ	cpu_ca9mp_reset,	cpu_v7_reset
--	globl_equ	cpu_ca9mp_do_idle,	cpu_v7_do_idle
--	globl_equ	cpu_ca9mp_dcache_clean_area, cpu_v7_dcache_clean_area
--	globl_equ	cpu_ca9mp_switch_mm,	cpu_v7_switch_mm
--	globl_equ	cpu_ca9mp_set_pte_ext,	cpu_v7_set_pte_ext
- .globl	cpu_ca9mp_suspend_size
- .equ	cpu_ca9mp_suspend_size, cpu_v7_suspend_size + 4 * 2
- #ifdef CONFIG_ARM_CPU_SUSPEND
-@@ -548,10 +534,75 @@ ENDPROC(__v7_setup)
- 
- 	@ define struct processor (see <asm/proc-fns.h> and proc-macros.S)
- 	define_processor_functions v7, dabort=v7_early_abort, pabort=v7_pabort, suspend=1
-+
-+#ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
-+	@ generic v7 bpiall on context switch
-+	globl_equ	cpu_v7_bpiall_proc_init,	cpu_v7_proc_init
-+	globl_equ	cpu_v7_bpiall_proc_fin,		cpu_v7_proc_fin
-+	globl_equ	cpu_v7_bpiall_reset,		cpu_v7_reset
-+	globl_equ	cpu_v7_bpiall_do_idle,		cpu_v7_do_idle
-+	globl_equ	cpu_v7_bpiall_dcache_clean_area, cpu_v7_dcache_clean_area
-+	globl_equ	cpu_v7_bpiall_set_pte_ext,	cpu_v7_set_pte_ext
-+	globl_equ	cpu_v7_bpiall_suspend_size,	cpu_v7_suspend_size
-+#ifdef CONFIG_ARM_CPU_SUSPEND
-+	globl_equ	cpu_v7_bpiall_do_suspend,	cpu_v7_do_suspend
-+	globl_equ	cpu_v7_bpiall_do_resume,	cpu_v7_do_resume
++ENDPROC(cpu_v7_smc_switch_mm)
 +#endif
-+	define_processor_functions v7_bpiall, dabort=v7_early_abort, pabort=v7_pabort, suspend=1
-+
-+#define HARDENED_BPIALL_PROCESSOR_FUNCTIONS v7_bpiall_processor_functions
-+#else
-+#define HARDENED_BPIALL_PROCESSOR_FUNCTIONS v7_processor_functions
-+#endif
-+
- #ifndef CONFIG_ARM_LPAE
-+	@ Cortex-A8 - always needs bpiall switch_mm implementation
-+	globl_equ	cpu_ca8_proc_init,	cpu_v7_proc_init
-+	globl_equ	cpu_ca8_proc_fin,	cpu_v7_proc_fin
-+	globl_equ	cpu_ca8_reset,		cpu_v7_reset
-+	globl_equ	cpu_ca8_do_idle,	cpu_v7_do_idle
-+	globl_equ	cpu_ca8_dcache_clean_area, cpu_v7_dcache_clean_area
-+	globl_equ	cpu_ca8_set_pte_ext,	cpu_v7_set_pte_ext
-+	globl_equ	cpu_ca8_switch_mm,	cpu_v7_bpiall_switch_mm
-+	globl_equ	cpu_ca8_suspend_size,	cpu_v7_suspend_size
-+#ifdef CONFIG_ARM_CPU_SUSPEND
-+	globl_equ	cpu_ca8_do_suspend,	cpu_v7_do_suspend
-+	globl_equ	cpu_ca8_do_resume,	cpu_v7_do_resume
-+#endif
- 	define_processor_functions ca8, dabort=v7_early_abort, pabort=v7_pabort, suspend=1
-+
-+	@ Cortex-A9 - needs more registers preserved across suspend/resume
-+	@ and bpiall switch_mm for hardening
-+	globl_equ	cpu_ca9mp_proc_init,	cpu_v7_proc_init
-+	globl_equ	cpu_ca9mp_proc_fin,	cpu_v7_proc_fin
-+	globl_equ	cpu_ca9mp_reset,	cpu_v7_reset
-+	globl_equ	cpu_ca9mp_do_idle,	cpu_v7_do_idle
-+	globl_equ	cpu_ca9mp_dcache_clean_area, cpu_v7_dcache_clean_area
-+#ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
-+	globl_equ	cpu_ca9mp_switch_mm,	cpu_v7_bpiall_switch_mm
-+#else
-+	globl_equ	cpu_ca9mp_switch_mm,	cpu_v7_switch_mm
-+#endif
-+	globl_equ	cpu_ca9mp_set_pte_ext,	cpu_v7_set_pte_ext
- 	define_processor_functions ca9mp, dabort=v7_early_abort, pabort=v7_pabort, suspend=1
- #endif
-+
-+	@ Cortex-A15 - needs iciallu switch_mm for hardening
-+	globl_equ	cpu_ca15_proc_init,	cpu_v7_proc_init
-+	globl_equ	cpu_ca15_proc_fin,	cpu_v7_proc_fin
-+	globl_equ	cpu_ca15_reset,		cpu_v7_reset
-+	globl_equ	cpu_ca15_do_idle,	cpu_v7_do_idle
-+	globl_equ	cpu_ca15_dcache_clean_area, cpu_v7_dcache_clean_area
-+#ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
-+	globl_equ	cpu_ca15_switch_mm,	cpu_v7_iciallu_switch_mm
-+#else
-+	globl_equ	cpu_ca15_switch_mm,	cpu_v7_switch_mm
-+#endif
-+	globl_equ	cpu_ca15_set_pte_ext,	cpu_v7_set_pte_ext
-+	globl_equ	cpu_ca15_suspend_size,	cpu_v7_suspend_size
-+	globl_equ	cpu_ca15_do_suspend,	cpu_v7_do_suspend
-+	globl_equ	cpu_ca15_do_resume,	cpu_v7_do_resume
-+	define_processor_functions ca15, dabort=v7_early_abort, pabort=v7_pabort, suspend=1
- #ifdef CONFIG_CPU_PJ4B
- 	define_processor_functions pj4b, dabort=v7_early_abort, pabort=v7_pabort, suspend=1
- #endif
-@@ -658,7 +709,7 @@ ENDPROC(__v7_setup)
- __v7_ca12mp_proc_info:
- 	.long	0x410fc0d0
- 	.long	0xff0ffff0
--	__v7_proc __v7_ca12mp_proc_info, __v7_ca12mp_setup
-+	__v7_proc __v7_ca12mp_proc_info, __v7_ca12mp_setup, proc_fns = HARDENED_BPIALL_PROCESSOR_FUNCTIONS
- 	.size	__v7_ca12mp_proc_info, . - __v7_ca12mp_proc_info
- 
- 	/*
-@@ -668,7 +719,7 @@ ENDPROC(__v7_setup)
- __v7_ca15mp_proc_info:
- 	.long	0x410fc0f0
- 	.long	0xff0ffff0
--	__v7_proc __v7_ca15mp_proc_info, __v7_ca15mp_setup
-+	__v7_proc __v7_ca15mp_proc_info, __v7_ca15mp_setup, proc_fns = ca15_processor_functions
- 	.size	__v7_ca15mp_proc_info, . - __v7_ca15mp_proc_info
- 
- 	/*
-@@ -678,7 +729,7 @@ ENDPROC(__v7_setup)
- __v7_b15mp_proc_info:
- 	.long	0x420f00f0
- 	.long	0xff0ffff0
--	__v7_proc __v7_b15mp_proc_info, __v7_b15mp_setup, cache_fns = b15_cache_fns
-+	__v7_proc __v7_b15mp_proc_info, __v7_b15mp_setup, proc_fns = ca15_processor_functions, cache_fns = b15_cache_fns
- 	.size	__v7_b15mp_proc_info, . - __v7_b15mp_proc_info
- 
- 	/*
-@@ -688,9 +739,25 @@ ENDPROC(__v7_setup)
- __v7_ca17mp_proc_info:
- 	.long	0x410fc0e0
- 	.long	0xff0ffff0
--	__v7_proc __v7_ca17mp_proc_info, __v7_ca17mp_setup
-+	__v7_proc __v7_ca17mp_proc_info, __v7_ca17mp_setup, proc_fns = HARDENED_BPIALL_PROCESSOR_FUNCTIONS
- 	.size	__v7_ca17mp_proc_info, . - __v7_ca17mp_proc_info
- 
-+	/* ARM Ltd. Cortex A73 processor */
-+	.type	__v7_ca73_proc_info, #object
-+__v7_ca73_proc_info:
-+	.long	0x410fd090
-+	.long	0xff0ffff0
-+	__v7_proc __v7_ca73_proc_info, __v7_setup, proc_fns = HARDENED_BPIALL_PROCESSOR_FUNCTIONS
-+	.size	__v7_ca73_proc_info, . - __v7_ca73_proc_info
-+
-+	/* ARM Ltd. Cortex A75 processor */
-+	.type	__v7_ca75_proc_info, #object
-+__v7_ca75_proc_info:
-+	.long	0x410fd0a0
-+	.long	0xff0ffff0
-+	__v7_proc __v7_ca75_proc_info, __v7_setup, proc_fns = HARDENED_BPIALL_PROCESSOR_FUNCTIONS
-+	.size	__v7_ca75_proc_info, . - __v7_ca75_proc_info
-+
- 	/*
- 	 * Qualcomm Inc. Krait processors.
- 	 */
+ ENTRY(cpu_v7_iciallu_switch_mm)
+ 	mov	r3, #0
+ 	mcr	p15, 0, r3, c7, c5, 0		@ ICIALLU
 -- 
 2.7.4
