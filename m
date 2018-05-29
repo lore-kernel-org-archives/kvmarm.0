@@ -1,279 +1,191 @@
-From: Russell King - ARM Linux <linux@armlinux.org.uk>
-Subject: Re: [PATCH v5 00/15] ARM Spectre variant 2 fixes
-Date: Tue, 29 May 2018 16:02:57 +0100
-Message-ID: <20180529150257.GK17671@n2100.armlinux.org.uk>
-References: <20180529145320.GJ17671@n2100.armlinux.org.uk>
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [PATCH] kvm: no need to check return value of debugfs_create functions
+Date: Tue, 29 May 2018 18:22:04 +0200
+Message-ID: <20180529162204.11757-1-gregkh@linuxfoundation.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B724B402DB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 May 2018 10:52:45 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vVU+GvFUNKwx for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 May 2018 10:52:18 -0400 (EDT)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EE93D49EA2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 May 2018 10:52:17 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20180529145320.GJ17671@n2100.armlinux.org.uk>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Florian Fainelli <f.fainelli@gmail.com>, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: kvm@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Paul Mackerras <paulus@ozlabs.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Michael Ellerman <mpe@ellerman.id.au>, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, Arvind Yadav <arvind.yadav.cs@gmail.com>, Eric Auger <eric.auger@redhat.com>, Andre Przywara <andre.przywara@arm.com>, kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-FFS, yes, there's a build error in this.  It's an obvious fix.  I
-won't be re-posting it for a third time today for such a trivial
-change, but I'll fix up my local version.
+When calling debugfs functions, there is no need to ever check the
+return value.  The function can work or not, but the code logic should
+never do something different based on this.
 
-On Tue, May 29, 2018 at 03:53:21PM +0100, Russell King - ARM Linux wrote:
-> Sorry for another version so soon after the previous.
-> 
-> Fifth version:
-> - Really warn on the first discovery of an incorrect IBE bit, rather than
->   only checking the first time around.
-> 
->  arch/arm/include/asm/bugs.h        |   6 +-
->  arch/arm/include/asm/cp15.h        |   3 +
->  arch/arm/include/asm/cputype.h     |   8 ++
->  arch/arm/include/asm/kvm_asm.h     |   2 -
->  arch/arm/include/asm/kvm_host.h    |  14 ++-
->  arch/arm/include/asm/kvm_mmu.h     |  23 ++++-
->  arch/arm/include/asm/proc-fns.h    |   4 +
->  arch/arm/include/asm/system_misc.h |  15 ++++
->  arch/arm/kernel/Makefile           |   1 +
->  arch/arm/kernel/bugs.c             |  18 ++++
->  arch/arm/kernel/smp.c              |   4 +
->  arch/arm/kernel/suspend.c          |   2 +
->  arch/arm/kvm/hyp/hyp-entry.S       | 112 ++++++++++++++++++++++-
->  arch/arm/mm/Kconfig                |  23 +++++
->  arch/arm/mm/Makefile               |   2 +-
->  arch/arm/mm/fault.c                |   3 +
->  arch/arm/mm/proc-macros.S          |   3 +-
->  arch/arm/mm/proc-v7-2level.S       |   6 --
->  arch/arm/mm/proc-v7-bugs.c         | 176 +++++++++++++++++++++++++++++++++++++
->  arch/arm/mm/proc-v7.S              | 154 +++++++++++++++++++++++++-------
->  20 files changed, 529 insertions(+), 50 deletions(-)
->  create mode 100644 arch/arm/kernel/bugs.c
->  create mode 100644 arch/arm/mm/proc-v7-bugs.c
-> 
-> On Tue, May 29, 2018 at 10:07:57AM +0100, Russell King - ARM Linux wrote:
-> > Fourth version:
-> > - Only warn once per CPU about incorrect IBE bit
-> >   (this avoids spamming the kernel log on cpuidle implementations that
-> >    use cpu_suspend() - spotted by Mark Brown.)
-> > 
-> >  arch/arm/include/asm/bugs.h        |   6 +-
-> >  arch/arm/include/asm/cp15.h        |   3 +
-> >  arch/arm/include/asm/cputype.h     |   8 ++
-> >  arch/arm/include/asm/kvm_asm.h     |   2 -
-> >  arch/arm/include/asm/kvm_host.h    |  14 ++-
-> >  arch/arm/include/asm/kvm_mmu.h     |  23 ++++-
-> >  arch/arm/include/asm/proc-fns.h    |   4 +
-> >  arch/arm/include/asm/system_misc.h |  15 ++++
-> >  arch/arm/kernel/Makefile           |   1 +
-> >  arch/arm/kernel/bugs.c             |  18 ++++
-> >  arch/arm/kernel/smp.c              |   4 +
-> >  arch/arm/kernel/suspend.c          |   2 +
-> >  arch/arm/kvm/hyp/hyp-entry.S       | 112 +++++++++++++++++++++++-
-> >  arch/arm/mm/Kconfig                |  23 +++++
-> >  arch/arm/mm/Makefile               |   2 +-
-> >  arch/arm/mm/fault.c                |   3 +
-> >  arch/arm/mm/proc-macros.S          |   3 +-
-> >  arch/arm/mm/proc-v7-2level.S       |   6 --
-> >  arch/arm/mm/proc-v7-bugs.c         | 173 +++++++++++++++++++++++++++++++++++++
-> >  arch/arm/mm/proc-v7.S              | 154 ++++++++++++++++++++++++++-------
-> >  20 files changed, 526 insertions(+), 50 deletions(-)
-> >  create mode 100644 arch/arm/kernel/bugs.c
-> >  create mode 100644 arch/arm/mm/proc-v7-bugs.c
-> > 
-> > On Fri, May 25, 2018 at 02:59:39PM +0100, Russell King - ARM Linux wrote:
-> > > Third version:
-> > > - Remove "PSCI" from the SMC version of the workaround as well.
-> > > - Avoid reporting active workaround if the IBE bit is not set.
-> > > - Only probe for workaround_1 on Cortex A57 and A72, or non-ARM CPUs.
-> > > - Require features probe for workaround_1 to return zero.
-> > > - Validation that all CPUs in the system have the same workaround status.
-> > > - Avoid corrupting r12 in workaround_1 KVM hypervisor implementation.
-> > > 
-> > >  arch/arm/include/asm/bugs.h        |   6 +-
-> > >  arch/arm/include/asm/cp15.h        |   3 +
-> > >  arch/arm/include/asm/cputype.h     |   8 ++
-> > >  arch/arm/include/asm/kvm_asm.h     |   2 -
-> > >  arch/arm/include/asm/kvm_host.h    |  14 ++-
-> > >  arch/arm/include/asm/kvm_mmu.h     |  23 ++++-
-> > >  arch/arm/include/asm/proc-fns.h    |   4 +
-> > >  arch/arm/include/asm/system_misc.h |  15 ++++
-> > >  arch/arm/kernel/Makefile           |   1 +
-> > >  arch/arm/kernel/bugs.c             |  18 ++++
-> > >  arch/arm/kernel/smp.c              |   4 +
-> > >  arch/arm/kernel/suspend.c          |   2 +
-> > >  arch/arm/kvm/hyp/hyp-entry.S       | 112 +++++++++++++++++++++++-
-> > >  arch/arm/mm/Kconfig                |  23 +++++
-> > >  arch/arm/mm/Makefile               |   2 +-
-> > >  arch/arm/mm/fault.c                |   3 +
-> > >  arch/arm/mm/proc-macros.S          |   3 +-
-> > >  arch/arm/mm/proc-v7-2level.S       |   6 --
-> > >  arch/arm/mm/proc-v7-bugs.c         | 170 +++++++++++++++++++++++++++++++++++++
-> > >  arch/arm/mm/proc-v7.S              | 154 ++++++++++++++++++++++++++-------
-> > >  20 files changed, 523 insertions(+), 50 deletions(-)
-> > >  create mode 100644 arch/arm/kernel/bugs.c
-> > >  create mode 100644 arch/arm/mm/proc-v7-bugs.c
-> > > 
-> > > On Mon, May 21, 2018 at 12:42:38PM +0100, Russell King - ARM Linux wrote:
-> > > > This is the second posting - the original cover note is below.  Comments
-> > > > from previous series addresesd:
-> > > > - Drop R7 and R8 changes.
-> > > > - Remove "PSCI" from the hypervisor version of the workaround.
-> > > > 
-> > > >  arch/arm/include/asm/bugs.h        |   6 +-
-> > > >  arch/arm/include/asm/cp15.h        |   3 +
-> > > >  arch/arm/include/asm/cputype.h     |   5 ++
-> > > >  arch/arm/include/asm/kvm_asm.h     |   2 -
-> > > >  arch/arm/include/asm/kvm_host.h    |  14 +++-
-> > > >  arch/arm/include/asm/kvm_mmu.h     |  23 +++++-
-> > > >  arch/arm/include/asm/proc-fns.h    |   4 +
-> > > >  arch/arm/include/asm/system_misc.h |   8 ++
-> > > >  arch/arm/kernel/Makefile           |   1 +
-> > > >  arch/arm/kernel/bugs.c             |  18 +++++
-> > > >  arch/arm/kernel/smp.c              |   4 +
-> > > >  arch/arm/kernel/suspend.c          |   2 +
-> > > >  arch/arm/kvm/hyp/hyp-entry.S       | 108 +++++++++++++++++++++++++-
-> > > >  arch/arm/mm/Kconfig                |  23 ++++++
-> > > >  arch/arm/mm/Makefile               |   2 +-
-> > > >  arch/arm/mm/fault.c                |   3 +
-> > > >  arch/arm/mm/proc-macros.S          |   3 +-
-> > > >  arch/arm/mm/proc-v7-2level.S       |   6 --
-> > > >  arch/arm/mm/proc-v7-bugs.c         | 130 +++++++++++++++++++++++++++++++
-> > > >  arch/arm/mm/proc-v7.S              | 154 +++++++++++++++++++++++++++++--------
-> > > >  20 files changed, 469 insertions(+), 50 deletions(-)
-> > > >  create mode 100644 arch/arm/kernel/bugs.c
-> > > >  create mode 100644 arch/arm/mm/proc-v7-bugs.c
-> > > > 
-> > > > On Wed, May 16, 2018 at 11:59:49AM +0100, Russell King - ARM Linux wrote:
-> > > > > This series addresses the Spectre variant 2 issues on ARM Cortex and
-> > > > > Broadcom Brahma B15 CPUs.  Due to the complexity of the bug, it is not
-> > > > > possible to verify that this series fixes any of the bugs, since it
-> > > > > has not been able to reproduce these exact scenarios using test
-> > > > > programs.
-> > > > > 
-> > > > > I believe that this covers the entire extent of the Spectre variant 2
-> > > > > issues, with the exception of Cortex A53 and Cortex A72 processors as
-> > > > > these require a substantially more complex solution (except where the
-> > > > > workaround is implemented in PSCI firmware.)
-> > > > > 
-> > > > > Spectre variant 1 is not covered by this series.
-> > > > > 
-> > > > > The patch series is based partly on Marc Zyngier's work from February -
-> > > > > two of the KVM patches are from Marc's work.
-> > > > > 
-> > > > > The main differences are:
-> > > > > - Inclusion of more processors as per current ARM Ltd security update
-> > > > >   documentation.
-> > > > > - Extension of "bugs" infrastructure to detect Cortex A8 and Cortex A15
-> > > > >   CPUs missing out on the IBE bit being set on (re-)entry to the kernel
-> > > > >   through all paths.
-> > > > > - Handle all suspect userspace-touching-kernelspace aborts irrespective
-> > > > >   of mapping type.
-> > > > > 
-> > > > > The first patch will trivially conflict with the Broadcom Brahma
-> > > > > updates already in arm-soc - it has been necessary to independently
-> > > > > add the ID definitions for the B15 CPU.
-> > > > > 
-> > > > > Having worked through this series, I'm of the opinion that the
-> > > > > define_processor_functions macro in proc-v7 are probably  more hassle
-> > > > > than they're worth - here, we don't need the global equivalent symbols,
-> > > > > because we never refer to them from the kernel code for any V7
-> > > > > processor (MULTI_CPU is always defined.)
-> > > > > 
-> > > > > This series is currently in my "spectre" branch (along with some
-> > > > > Spectre variant 1 patches.)
-> > > > > 
-> > > > > Please carefully review.
-> > > > > 
-> > > > >  arch/arm/include/asm/bugs.h        |   6 +-
-> > > > >  arch/arm/include/asm/cp15.h        |   3 +
-> > > > >  arch/arm/include/asm/cputype.h     |   5 ++
-> > > > >  arch/arm/include/asm/kvm_asm.h     |   2 -
-> > > > >  arch/arm/include/asm/kvm_host.h    |  14 +++-
-> > > > >  arch/arm/include/asm/kvm_mmu.h     |  23 +++++-
-> > > > >  arch/arm/include/asm/proc-fns.h    |   4 +
-> > > > >  arch/arm/include/asm/system_misc.h |   8 ++
-> > > > >  arch/arm/kernel/Makefile           |   1 +
-> > > > >  arch/arm/kernel/bugs.c             |  18 +++++
-> > > > >  arch/arm/kernel/smp.c              |   4 +
-> > > > >  arch/arm/kernel/suspend.c          |   2 +
-> > > > >  arch/arm/kvm/hyp/hyp-entry.S       | 108 ++++++++++++++++++++++++-
-> > > > >  arch/arm/mm/Kconfig                |  23 ++++++
-> > > > >  arch/arm/mm/Makefile               |   2 +-
-> > > > >  arch/arm/mm/fault.c                |   3 +
-> > > > >  arch/arm/mm/proc-macros.S          |   3 +-
-> > > > >  arch/arm/mm/proc-v7-2level.S       |   6 --
-> > > > >  arch/arm/mm/proc-v7-bugs.c         | 130 ++++++++++++++++++++++++++++++
-> > > > >  arch/arm/mm/proc-v7.S              | 158 +++++++++++++++++++++++++++++--------
-> > > > >  20 files changed, 471 insertions(+), 52 deletions(-)
-> > > > > 
-> > > > > -- 
-> > > > > RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-> > > > > FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
-> > > > > According to speedtest.net: 8.21Mbps down 510kbps up
-> > > > > 
-> > > > > _______________________________________________
-> > > > > linux-arm-kernel mailing list
-> > > > > linux-arm-kernel@lists.infradead.org
-> > > > > http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
-> > > > 
-> > > > -- 
-> > > > RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-> > > > FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
-> > > > According to speedtest.net: 8.21Mbps down 510kbps up
-> > > > 
-> > > > _______________________________________________
-> > > > linux-arm-kernel mailing list
-> > > > linux-arm-kernel@lists.infradead.org
-> > > > http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
-> > > 
-> > > -- 
-> > > RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-> > > FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
-> > > According to speedtest.net: 8.21Mbps down 510kbps up
-> > > 
-> > > _______________________________________________
-> > > linux-arm-kernel mailing list
-> > > linux-arm-kernel@lists.infradead.org
-> > > http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
-> > 
-> > -- 
-> > RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-> > FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
-> > According to speedtest.net: 8.21Mbps down 510kbps up
-> > 
-> > _______________________________________________
-> > linux-arm-kernel mailing list
-> > linux-arm-kernel@lists.infradead.org
-> > http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
-> 
-> -- 
-> RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-> FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
-> According to speedtest.net: 8.21Mbps down 510kbps up
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+This cleans up the error handling a lot, as this code will never get
+hit.
 
+Cc: Paul Mackerras <paulus@ozlabs.org>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: Michael Ellerman <mpe@ellerman.id.au>
+Cc: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+Cc: Arvind Yadav <arvind.yadav.cs@gmail.com>
+Cc: Eric Auger <eric.auger@redhat.com>
+Cc: Andre Przywara <andre.przywara@arm.com>
+Cc: kvm-ppc@vger.kernel.org
+Cc: linuxppc-dev@lists.ozlabs.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ arch/powerpc/kvm/book3s_hv.c   |  3 +--
+ virt/kvm/arm/vgic/vgic-debug.c | 17 ++++-----------
+ virt/kvm/arm/vgic/vgic.h       |  4 ++--
+ virt/kvm/kvm_main.c            | 40 +++++++---------------------------
+ 4 files changed, 15 insertions(+), 49 deletions(-)
+
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index 4d07fca5121c..67d7de1470cc 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -3950,8 +3950,7 @@ static int kvmppc_core_init_vm_hv(struct kvm *kvm)
+ 	 */
+ 	snprintf(buf, sizeof(buf), "vm%d", current->pid);
+ 	kvm->arch.debugfs_dir = debugfs_create_dir(buf, kvm_debugfs_dir);
+-	if (!IS_ERR_OR_NULL(kvm->arch.debugfs_dir))
+-		kvmppc_mmu_debugfs_init(kvm);
++	kvmppc_mmu_debugfs_init(kvm);
+ 
+ 	return 0;
+ }
+diff --git a/virt/kvm/arm/vgic/vgic-debug.c b/virt/kvm/arm/vgic/vgic-debug.c
+index 10b38178cff2..0140b29079b6 100644
+--- a/virt/kvm/arm/vgic/vgic-debug.c
++++ b/virt/kvm/arm/vgic/vgic-debug.c
+@@ -263,21 +263,12 @@ static const struct file_operations vgic_debug_fops = {
+ 	.release = seq_release
+ };
+ 
+-int vgic_debug_init(struct kvm *kvm)
++void vgic_debug_init(struct kvm *kvm)
+ {
+-	if (!kvm->debugfs_dentry)
+-		return -ENOENT;
+-
+-	if (!debugfs_create_file("vgic-state", 0444,
+-				 kvm->debugfs_dentry,
+-				 kvm,
+-				 &vgic_debug_fops))
+-		return -ENOMEM;
+-
+-	return 0;
++	debugfs_create_file("vgic-state", 0444, kvm->debugfs_dentry, kvm,
++			    &vgic_debug_fops);
+ }
+ 
+-int vgic_debug_destroy(struct kvm *kvm)
++void vgic_debug_destroy(struct kvm *kvm)
+ {
+-	return 0;
+ }
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index 830e815748a0..3c38c5349953 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -229,8 +229,8 @@ void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+ int vgic_lazy_init(struct kvm *kvm);
+ int vgic_init(struct kvm *kvm);
+ 
+-int vgic_debug_init(struct kvm *kvm);
+-int vgic_debug_destroy(struct kvm *kvm);
++void vgic_debug_init(struct kvm *kvm);
++void vgic_debug_destroy(struct kvm *kvm);
+ 
+ bool lock_all_vcpus(struct kvm *kvm);
+ void unlock_all_vcpus(struct kvm *kvm);
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index c7b2e927f699..0ad400f353fc 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -572,10 +572,7 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, int fd)
+ 		return 0;
+ 
+ 	snprintf(dir_name, sizeof(dir_name), "%d-%d", task_pid_nr(current), fd);
+-	kvm->debugfs_dentry = debugfs_create_dir(dir_name,
+-						 kvm_debugfs_dir);
+-	if (!kvm->debugfs_dentry)
+-		return -ENOMEM;
++	kvm->debugfs_dentry = debugfs_create_dir(dir_name, kvm_debugfs_dir);
+ 
+ 	kvm->debugfs_stat_data = kcalloc(kvm_debugfs_num_entries,
+ 					 sizeof(*kvm->debugfs_stat_data),
+@@ -591,11 +588,8 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, int fd)
+ 		stat_data->kvm = kvm;
+ 		stat_data->offset = p->offset;
+ 		kvm->debugfs_stat_data[p - debugfs_entries] = stat_data;
+-		if (!debugfs_create_file(p->name, 0644,
+-					 kvm->debugfs_dentry,
+-					 stat_data,
+-					 stat_fops_per_vm[p->kind]))
+-			return -ENOMEM;
++		debugfs_create_file(p->name, 0644, kvm->debugfs_dentry,
++				    stat_data, stat_fops_per_vm[p->kind]);
+ 	}
+ 	return 0;
+ }
+@@ -3896,29 +3890,18 @@ static void kvm_uevent_notify_change(unsigned int type, struct kvm *kvm)
+ 	kfree(env);
+ }
+ 
+-static int kvm_init_debug(void)
++static void kvm_init_debug(void)
+ {
+-	int r = -EEXIST;
+ 	struct kvm_stats_debugfs_item *p;
+ 
+ 	kvm_debugfs_dir = debugfs_create_dir("kvm", NULL);
+-	if (kvm_debugfs_dir == NULL)
+-		goto out;
+ 
+ 	kvm_debugfs_num_entries = 0;
+ 	for (p = debugfs_entries; p->name; ++p, kvm_debugfs_num_entries++) {
+-		if (!debugfs_create_file(p->name, 0644, kvm_debugfs_dir,
+-					 (void *)(long)p->offset,
+-					 stat_fops[p->kind]))
+-			goto out_dir;
++		debugfs_create_file(p->name, 0644, kvm_debugfs_dir,
++				    (void *)(long)p->offset,
++				    stat_fops[p->kind]);
+ 	}
+-
+-	return 0;
+-
+-out_dir:
+-	debugfs_remove_recursive(kvm_debugfs_dir);
+-out:
+-	return r;
+ }
+ 
+ static int kvm_suspend(void)
+@@ -4046,20 +4029,13 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
+ 	kvm_preempt_ops.sched_in = kvm_sched_in;
+ 	kvm_preempt_ops.sched_out = kvm_sched_out;
+ 
+-	r = kvm_init_debug();
+-	if (r) {
+-		pr_err("kvm: create debugfs files failed\n");
+-		goto out_undebugfs;
+-	}
++	kvm_init_debug();
+ 
+ 	r = kvm_vfio_ops_init();
+ 	WARN_ON(r);
+ 
+ 	return 0;
+ 
+-out_undebugfs:
+-	unregister_syscore_ops(&kvm_syscore_ops);
+-	misc_deregister(&kvm_dev);
+ out_unreg:
+ 	kvm_async_pf_deinit();
+ out_free:
 -- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
-According to speedtest.net: 8.21Mbps down 510kbps up
+2.17.0
