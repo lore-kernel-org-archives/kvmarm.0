@@ -1,8 +1,7 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 2/6] arm64: KVM: Handle Set/Way CMOs as NOPs if FWB is
- present
-Date: Wed, 30 May 2018 13:47:02 +0100
-Message-ID: <20180530124706.25284-3-marc.zyngier@arm.com>
+Subject: [PATCH v2 4/6] KVM: arm/arm64: Consolidate page-table accessors
+Date: Wed, 30 May 2018 13:47:04 +0100
+Message-ID: <20180530124706.25284-5-marc.zyngier@arm.com>
 References: <20180530124706.25284-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -22,39 +21,129 @@ To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.in
 Cc: Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Set/Way handling is one of the ugliest corners of KVM. We shouldn't
-have to handle that, but better safe than sorry.
+The arm and arm64 KVM page tables accessors are pointlessly different
+between the two architectures, and likely both wrong one way or another:
+arm64 lacks a dsb(), and arm doesn't use WRITE_ONCE.
 
-Thankfully, FWB fixes this for us by not requiering any maintenance
-whatsoever, which means we don't have to emulate S/W CMOs, and don't
-have to track VM ops either.
-
-We still have to trap S/W though, if only to prevent the guest from
-doing something bad.
+Let's unify them.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/sys_regs.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ arch/arm/include/asm/kvm_mmu.h   | 12 -----------
+ arch/arm64/include/asm/kvm_mmu.h |  3 ---
+ virt/kvm/arm/mmu.c               | 35 ++++++++++++++++++++++++++++----
+ 3 files changed, 31 insertions(+), 19 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 6e3b969391fd..9a740f159245 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -195,7 +195,13 @@ static bool access_dcsw(struct kvm_vcpu *vcpu,
- 	if (!p->is_write)
- 		return read_from_write_only(vcpu, p, r);
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index 707a1f06dc5d..468ff945efa0 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -75,18 +75,6 @@ phys_addr_t kvm_get_idmap_vector(void);
+ int kvm_mmu_init(void);
+ void kvm_clear_hyp_idmap(void);
  
--	kvm_set_way_flush(vcpu);
-+	/*
-+	 * Only track S/W ops if we don't have FWB. It still indicates
-+	 * that the guest is a bit broken...
-+	 */
-+	if (!cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
-+		kvm_set_way_flush(vcpu);
-+
- 	return true;
+-static inline void kvm_set_pmd(pmd_t *pmd, pmd_t new_pmd)
+-{
+-	*pmd = new_pmd;
+-	dsb(ishst);
+-}
+-
+-static inline void kvm_set_pte(pte_t *pte, pte_t new_pte)
+-{
+-	*pte = new_pte;
+-	dsb(ishst);
+-}
+-
+ static inline pte_t kvm_s2pte_mkwrite(pte_t pte)
+ {
+ 	pte_val(pte) |= L_PTE_S2_RDWR;
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 9dbca5355029..26c89b63f604 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -170,9 +170,6 @@ phys_addr_t kvm_get_idmap_vector(void);
+ int kvm_mmu_init(void);
+ void kvm_clear_hyp_idmap(void);
+ 
+-#define	kvm_set_pte(ptep, pte)		set_pte(ptep, pte)
+-#define	kvm_set_pmd(pmdp, pmd)		set_pmd(pmdp, pmd)
+-
+ static inline pte_t kvm_s2pte_mkwrite(pte_t pte)
+ {
+ 	pte_val(pte) |= PTE_S2_RDWR;
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index ba66bf7ae299..c9ed239c0840 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -177,6 +177,33 @@ static void clear_stage2_pmd_entry(struct kvm *kvm, pmd_t *pmd, phys_addr_t addr
+ 	put_page(virt_to_page(pmd));
  }
+ 
++static inline void kvm_set_pte(pte_t *ptep, pte_t new_pte)
++{
++	WRITE_ONCE(*ptep, new_pte);
++	dsb(ishst);
++}
++
++static inline void kvm_set_pmd(pmd_t *pmdp, pmd_t new_pmd)
++{
++	WRITE_ONCE(*pmdp, new_pmd);
++	dsb(ishst);
++}
++
++static inline void kvm_pmd_populate(pmd_t *pmdp, pte_t *ptep)
++{
++	pmd_populate_kernel(NULL, pmdp, ptep);
++}
++
++static inline void kvm_pud_populate(pud_t *pudp, pmd_t *pmdp)
++{
++	pud_populate(NULL, pudp, pmdp);
++}
++
++static inline void kvm_pgd_populate(pgd_t *pgdp, pud_t *pudp)
++{
++	pgd_populate(NULL, pgdp, pudp);
++}
++
+ /*
+  * Unmapping vs dcache management:
+  *
+@@ -603,7 +630,7 @@ static int create_hyp_pmd_mappings(pud_t *pud, unsigned long start,
+ 				kvm_err("Cannot allocate Hyp pte\n");
+ 				return -ENOMEM;
+ 			}
+-			pmd_populate_kernel(NULL, pmd, pte);
++			kvm_pmd_populate(pmd, pte);
+ 			get_page(virt_to_page(pmd));
+ 			kvm_flush_dcache_to_poc(pmd, sizeof(*pmd));
+ 		}
+@@ -636,7 +663,7 @@ static int create_hyp_pud_mappings(pgd_t *pgd, unsigned long start,
+ 				kvm_err("Cannot allocate Hyp pmd\n");
+ 				return -ENOMEM;
+ 			}
+-			pud_populate(NULL, pud, pmd);
++			kvm_pud_populate(pud, pmd);
+ 			get_page(virt_to_page(pud));
+ 			kvm_flush_dcache_to_poc(pud, sizeof(*pud));
+ 		}
+@@ -673,7 +700,7 @@ static int __create_hyp_mappings(pgd_t *pgdp, unsigned long ptrs_per_pgd,
+ 				err = -ENOMEM;
+ 				goto out;
+ 			}
+-			pgd_populate(NULL, pgd, pud);
++			kvm_pgd_populate(pgd, pud);
+ 			get_page(virt_to_page(pgd));
+ 			kvm_flush_dcache_to_poc(pgd, sizeof(*pgd));
+ 		}
+@@ -1092,7 +1119,7 @@ static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
+ 		if (!cache)
+ 			return 0; /* ignore calls from kvm_set_spte_hva */
+ 		pte = mmu_memory_cache_alloc(cache);
+-		pmd_populate_kernel(NULL, pmd, pte);
++		kvm_pmd_populate(pmd, pte);
+ 		get_page(virt_to_page(pmd));
+ 	}
  
 -- 
 2.17.1
