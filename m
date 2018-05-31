@@ -1,70 +1,71 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH v2 00/17] arm64 SSBD (aka Spectre-v4) mitigation
-Date: Wed, 30 May 2018 16:58:55 +0100
-Message-ID: <20180530155854.GA4122@arm.com>
-References: <20180529121121.24927-1-marc.zyngier@arm.com>
+From: Russell King - ARM Linux <linux@armlinux.org.uk>
+Subject: Re: [PATCH v5 10/15] ARM: spectre-v2: warn about incorrect context
+ switching functions
+Date: Thu, 31 May 2018 10:49:22 +0100
+Message-ID: <20180531094922.GQ17671@n2100.armlinux.org.uk>
+References: <20180529145320.GJ17671@n2100.armlinux.org.uk>
+ <E1fNg1d-00059d-NR@rmk-PC.armlinux.org.uk>
+ <86r2lu9yzf.wl-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E6404A0F2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 31 May 2018 05:38:59 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id cgBUXNyryRrV for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 31 May 2018 05:38:37 -0400 (EDT)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D7A4E4A0EA
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 31 May 2018 05:38:36 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <20180529121121.24927-1-marc.zyngier@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <86r2lu9yzf.wl-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Catalin Marinas <catalin.marinas@arm.com>, Thomas Gleixner <tglx@linutronix.de>, Andy Lutomirski <luto@kernel.org>, Kees Cook <keescook@chromium.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Christoffer Dall <christoffer.dall@arm.com>, Randy Dunlap <rdunlap@infradead.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Julien Grall <julien.grall@arm.com>, Mark Rutland <mark.rutland@arm.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
+On Tue, May 29, 2018 at 06:02:28PM +0100, Marc Zyngier wrote:
+> On Tue, 29 May 2018 15:55:01 +0100,
+> Russell King wrote:
+> > 
+> > Warn at error level if the context switching function is not what we
+> > are expecting.  This can happen with big.Little systems, which we
+> > currently do not support.
+> > 
+> > Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
+> > Boot-tested-by: Tony Lindgren <tony@atomide.com>
+> > Reviewed-by: Tony Lindgren <tony@atomide.com>
+> 
+> I assume this is a temporary situation until the ARM port grows the
+> necessary infrastructure to support this mitigation on heterogeneous
+> systems.
 
-On Tue, May 29, 2018 at 01:11:04PM +0100, Marc Zyngier wrote:
-> This patch series implements the Linux kernel side of the "Spectre-v4"
-> (CVE-2018-3639) mitigation known as "Speculative Store Bypass Disable"
-> (SSBD).
-> 
-> More information can be found at:
-> 
->   https://bugs.chromium.org/p/project-zero/issues/detail?id=1528
->   https://developer.arm.com/support/arm-security-updates/speculative-processor-vulnerability
-> 
-> For all released Arm Cortex-A CPUs that are affected by this issue, then
-> the preferred mitigation is simply to set a chicken bit in the firmware
-> during CPU initialisation and therefore no change to Linux is required.
-> Other CPUs may require the chicken bit to be toggled dynamically (for
-> example, when switching between user-mode and kernel-mode) and this is
-> achieved by calling into EL3 via an SMC which has been published as part
-> of the latest SMCCC specification:
-> 
->   https://developer.arm.com/cache-speculation-vulnerability-firmware-specification
-> 
-> as well as an ATF update for the released ARM cores affected by SSBD:
-> 
->   https://github.com/ARM-software/arm-trusted-firmware/pull/1392
-> 
-> These patches provide the following:
-> 
->   1. Safe probing of firmware to establish which CPUs in the system
->      require calling into EL3 as part of the mitigation.
-> 
->   2. For CPUs that require it, call into EL3 on exception entry/exit
->      from EL0 to apply the SSBD mitigation when running at EL1.
-> 
->   3. A command-line option to force the SSBD mitigation to be always on,
->      always off, or dymamically toggled (default) for CPUs that require
->      the EL3 call.
-> 
->   4. An initial implementation of a prctl() backend for arm64 that allows
->      userspace tasks to opt-in to the mitigation explicitly. This is
->      intended to match the interface provided by x86, and so we rely on
->      their core changes here. The seccomp interface is provided as an
->      extra set of patches, which I'd like *not* to see merged. The main
->      reason is that it is invasive, has ugly/unclear semantics, and could
->      probably be left to the existing prctl interface.
+As I've said, I think that is going to be a very difficult problem to
+resolve.  I detailed why in previous emails, but it seems each time I
+do that, no one bothers to respond (presumably because no one has any
+ideas how to sort that problem either.)
 
-I agree with you here. For patches 1-10, then:
+I believe that it's better to get some of the mitigations in the kernel
+and warn about non-supported setups than it is to hold it back.
 
-Acked-by: Will Deacon <will.deacon@arm.com>
+I notice that you haven't replied to some of the patches (7 and 8),
+which makes me think that you have an issue with them - and as tonight
+is likely the last linux-next before the merge window, we're basically
+out of time to do another respin if there's something you don't like
+there and if we want to get them in during the next merge window.
 
-but I'd prefer to leave the seccomp stuff alone for the moment because I
-don't think the implicit enabling is necessarily the right thing to do
-there and supporting it comes at a cost.
-
-Will
+-- 
+RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
+According to speedtest.net: 8.21Mbps down 510kbps up
