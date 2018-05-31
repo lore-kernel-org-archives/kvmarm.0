@@ -1,56 +1,44 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH v2 2/6] arm64: KVM: Handle Set/Way CMOs as NOPs if FWB is
- present
-Date: Thu, 31 May 2018 17:00:33 +0100
-Message-ID: <20180531160032.24xw2m7oquer6tgz@lakrids.cambridge.arm.com>
-References: <20180530124706.25284-1-marc.zyngier@arm.com>
- <20180530124706.25284-3-marc.zyngier@arm.com>
- <20180531115127.2ymmtlwemz6g5qzj@lakrids.cambridge.arm.com>
- <83a4edd3-abea-b6c4-9513-3705cc92b52b@arm.com>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v2 00/17] arm64 SSBD (aka Spectre-v4) mitigation
+Date: Thu, 31 May 2018 17:41:34 +0100
+Message-ID: <20180531164133.6z6py7nl55ty473e@armageddon.cambridge.arm.com>
+References: <20180529121121.24927-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <83a4edd3-abea-b6c4-9513-3705cc92b52b@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+In-Reply-To: <20180529121121.24927-1-marc.zyngier@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Mark Rutland <mark.rutland@arm.com>, Kees Cook <keescook@chromium.org>, Randy Dunlap <rdunlap@infradead.org>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Dominik Brodowski <linux@dominikbrodowski.net>, Julien Grall <julien.grall@arm.com>, Andy Lutomirski <luto@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, May 31, 2018 at 02:00:11PM +0100, Marc Zyngier wrote:
-> On 31/05/18 12:51, Mark Rutland wrote:
-> > On Wed, May 30, 2018 at 01:47:02PM +0100, Marc Zyngier wrote:
-> >> Set/Way handling is one of the ugliest corners of KVM. We shouldn't
-> >> have to handle that, but better safe than sorry.
-> >>
-> >> Thankfully, FWB fixes this for us by not requiering any maintenance
-> >> whatsoever, which means we don't have to emulate S/W CMOs, and don't
-> >> have to track VM ops either.
-> >>
-> >> We still have to trap S/W though, if only to prevent the guest from
-> >> doing something bad.
-> > 
-> > S/W ops *also* do I-cache maintenance, so we'd still need to emulate
-> > that. Though it looks like we're missing that today...
-> 
-> This doesn't look right: CSSELR_EL1 does indeed have an InD bit, but
-> that's only for the purpose of reading CSSIDR_EL1. DC CSW and co
-> directly take a level *without* the InD bit, and seem to be limited to
-> "data and unified cache".
-> 
-> Am I missing something?
+On Tue, May 29, 2018 at 01:11:04PM +0100, Marc Zyngier wrote:
+> Marc Zyngier (17):
+>   arm/arm64: smccc: Add SMCCC-specific return codes
+>   arm64: Call ARCH_WORKAROUND_2 on transitions between EL0 and EL1
+>   arm64: Add per-cpu infrastructure to call ARCH_WORKAROUND_2
+>   arm64: Add ARCH_WORKAROUND_2 probing
+>   arm64: Add 'ssbd' command-line option
+>   arm64: ssbd: Add global mitigation state accessor
+>   arm64: ssbd: Skip apply_ssbd if not using dynamic mitigation
+>   arm64: ssbd: Restore mitigation status on CPU resume
+>   arm64: ssbd: Introduce thread flag to control userspace mitigation
+>   arm64: ssbd: Add prctl interface for per-thread mitigation
+>   arm64: KVM: Add HYP per-cpu accessors
+>   arm64: KVM: Add ARCH_WORKAROUND_2 support for guests
+>   arm64: KVM: Handle guest's ARCH_WORKAROUND_2 requests
+>   arm64: KVM: Add ARCH_WORKAROUND_2 discovery through
+>     ARCH_FEATURES_FUNC_ID
 
-No; I was mistaken.
+I queued the 14 patches above for 4.18.
 
-Sorry for the noise!
+>   arm64: Add test_and_clear_flag and set_flag atomic assembler
+>     primitives
+>   arm64: ssbd: Enable delayed setting of TIF_SSBD
+>   arm64: ssbd: Implement arch_seccomp_spec_mitigate
 
-Mark.
+Thanks.
+
+-- 
+Catalin
