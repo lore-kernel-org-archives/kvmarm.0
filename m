@@ -1,80 +1,89 @@
 From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH v2 1/6] arm64: KVM: Add support for Stage-2 control of
- memory types and cacheability
-Date: Thu, 31 May 2018 12:49:38 +0100
-Message-ID: <20180531114938.2w4sbi2nkvqyc3jt@lakrids.cambridge.arm.com>
+Subject: Re: [PATCH v2 2/6] arm64: KVM: Handle Set/Way CMOs as NOPs if FWB is
+ present
+Date: Thu, 31 May 2018 12:51:27 +0100
+Message-ID: <20180531115127.2ymmtlwemz6g5qzj@lakrids.cambridge.arm.com>
 References: <20180530124706.25284-1-marc.zyngier@arm.com>
- <20180530124706.25284-2-marc.zyngier@arm.com>
+ <20180530124706.25284-3-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 92E224A0ED
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 31 May 2018 07:40:53 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id iHKTnG-C39Oj for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 31 May 2018 07:40:31 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BC17A49EA2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 31 May 2018 07:40:31 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <20180530124706.25284-2-marc.zyngier@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+In-Reply-To: <20180530124706.25284-3-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, May 30, 2018 at 01:47:01PM +0100, Marc Zyngier wrote:
-> Up to ARMv8.3, the combinaison of Stage-1 and Stage-2 attributes
-> results in the strongest attribute of the two stages.  This means
-> that the hypervisor has to perform quite a lot of cache maintenance
-> just in case the guest has some non-cacheable mappings around.
+On Wed, May 30, 2018 at 01:47:02PM +0100, Marc Zyngier wrote:
+> Set/Way handling is one of the ugliest corners of KVM. We shouldn't
+> have to handle that, but better safe than sorry.
 > 
-> ARMv8.4 solves this problem by offering a different mode (FWB) where
-> Stage-2 has total control over the memory attribute (this is limited
-> to systems where both I/O and instruction caches are coherent with
-
-s/caches/fetches/ -- the I-caches themselves aren't coherent with the
-D-caches (or we could omit I-cache maintenance).
-
-i.e. this implies IDC, but not DIC.
-
-> the dcache). This is achieved by having a different set of memory
-> attributes in the page tables, and a new bit set in HCR_EL2.
+> Thankfully, FWB fixes this for us by not requiering any maintenance
+> whatsoever, which means we don't have to emulate S/W CMOs, and don't
+> have to track VM ops either.
 > 
-> On such a system, we can then safely sidestep any form of dcache
-> management.
+> We still have to trap S/W though, if only to prevent the guest from
+> doing something bad.
+
+S/W ops *also* do I-cache maintenance, so we'd still need to emulate
+that. Though it looks like we're missing that today...
+
 > 
-> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
-
->  static inline bool vcpu_has_cache_enabled(struct kvm_vcpu *vcpu)
->  {
-> @@ -268,7 +269,10 @@ static inline void __clean_dcache_guest_page(kvm_pfn_t pfn, unsigned long size)
->  {
->  	void *va = page_address(pfn_to_page(pfn));
+>  arch/arm64/kvm/sys_regs.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 6e3b969391fd..9a740f159245 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -195,7 +195,13 @@ static bool access_dcsw(struct kvm_vcpu *vcpu,
+>  	if (!p->is_write)
+>  		return read_from_write_only(vcpu, p, r);
 >  
-> -	kvm_flush_dcache_to_poc(va, size);
+> -	kvm_set_way_flush(vcpu);
+> +	/*
+> +	 * Only track S/W ops if we don't have FWB. It still indicates
+> +	 * that the guest is a bit broken...
+> +	 */
 > +	if (!cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
-> +		kvm_flush_dcache_to_poc(va, size);
-> +	else
-> +		kvm_flush_dcache_to_pou(va, size);
->  }
-
-Te commit message said instruction fetches were coherent, and that no
-D-cache maintenance was necessary, so why do we need maintenance to the
-PoU?
-
-> +static void cpu_has_fwb(const struct arm64_cpu_capabilities *__unused)
-> +{
-> +	u64 val = read_sysreg_s(SYS_CLIDR_EL1);
+> +		kvm_set_way_flush(vcpu);
 > +
-> +	/* Check that CLIDR_EL1.LOU{U,IS} are both 0 */
-> +	WARN_ON(val & (7 << 27 | 7 << 21));
-> +}
 
-What about CTR_EL0.IDC?
+Assuming we implement I-cache maintenance, we can have something like:
+
+	if (!cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
+		kvm_set_way_flush_dcache(vcpu);
+
+	kvm_set_way_flush_icache(vcpu);
 
 Thanks,
 Mark.
+
+>  	return true;
+>  }
+>  
+> -- 
+> 2.17.1
+> 
