@@ -1,23 +1,21 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH] KVM: arm/arm64: drop resource size check for GICV window
-Date: Fri,  1 Jun 2018 17:06:28 +0200
-Message-ID: <20180601150628.10111-1-ard.biesheuvel@linaro.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [GIT PULL] KVM/ARM updates for 4.18
+Date: Fri,  1 Jun 2018 16:27:14 +0100
+Message-ID: <20180601152747.23613-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BAFD4A10E
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Jun 2018 10:55:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B8F9E4A12F
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Jun 2018 11:17:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id B7GXLRbFoDGN for <kvmarm@lists.cs.columbia.edu>;
- Fri,  1 Jun 2018 10:55:36 -0400 (EDT)
-Received: from mail-wm0-f66.google.com (mail-wm0-f66.google.com [74.125.82.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A80D44A0E8
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Jun 2018 10:55:36 -0400 (EDT)
-Received: by mail-wm0-f66.google.com with SMTP id v131-v6so3200773wma.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 01 Jun 2018 08:06:39 -0700 (PDT)
+ with ESMTP id fHJEjWa2kLzZ for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  1 Jun 2018 11:17:07 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2719F4A0FE
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Jun 2018 11:17:07 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,51 +25,119 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
-Cc: marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When booting a 64 KB pages kernel on a ACPI GICv3 system that
-implements support for v2 emulation, the following warning is
-produced
+Paolo, Radim,
 
-  GICV size 0x2000 not a multiple of page size 0x10000
+This is the set of updates for KVM/ARM for v4.18. This time, lazy
+context switching of the floating point registers for arm64, and the
+ability to deal with multiple redistributor ranges (which allows for
+larger numbers of vcpu).
 
-and support for v2 emulation is disabled, preventing GICv2 VMs
-from being able to run on such hosts.
+Note that some additional KVM/ARM updates will come via the arm64 tree
+with the SSBD patches. This will generate three conflicts that are
+pretty simple to resolve (-next has a good example of the resolution).
 
-The reason is that vgic_v3_probe() performs a sanity check on the
-size of the window (it should be a multiple of the page size),
-while the ACPI MADT parsing code hardcodes the size of the window
-to 8 KB. This makes sense, considering that ACPI does not bother
-to describe the size in the first place, under the assumption that
-platforms implementing ACPI will follow the architecture and not
-put anything else in the same 64 KB window.
+Please pull,
 
-So let's just drop the sanity check altogether, and assume that
-the window is at least 64 KB in size.
+	M.
 
-Fixes: 909777324588 ("KVM: arm/arm64: vgic-new: vgic_init: implement kvm_vgic_hyp_init")
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- virt/kvm/arm/vgic/vgic-v3.c | 5 -----
- 1 file changed, 5 deletions(-)
+The following changes since commit 75bc37fefc4471e718ba8e651aa74673d4e0a9eb:
 
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index bdcf8e7a6161..72fc688c3e9d 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -552,11 +552,6 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
- 		pr_warn("GICV physical address 0x%llx not page aligned\n",
- 			(unsigned long long)info->vcpu.start);
- 		kvm_vgic_global_state.vcpu_base = 0;
--	} else if (!PAGE_ALIGNED(resource_size(&info->vcpu))) {
--		pr_warn("GICV size 0x%llx not a multiple of page size 0x%lx\n",
--			(unsigned long long)resource_size(&info->vcpu),
--			PAGE_SIZE);
--		kvm_vgic_global_state.vcpu_base = 0;
- 	} else {
- 		kvm_vgic_global_state.vcpu_base = info->vcpu.start;
- 		kvm_vgic_global_state.can_emulate_gicv2 = true;
--- 
-2.17.0
+  Linux 4.17-rc4 (2018-05-06 16:57:38 -1000)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-for-v4.18
+
+for you to fetch changes up to e25028c8ded011d19f9a11164807507c94febc01:
+
+  KVM: arm/arm64: Bump VGIC_V3_MAX_CPUS to 512 (2018-05-25 12:29:27 +0100)
+
+----------------------------------------------------------------
+KVM/ARM updates for 4.18
+
+- Lazy context-switching of FPSIMD registers on arm64
+- Allow virtual redistributors to be part of two or more MMIO ranges
+
+----------------------------------------------------------------
+Christoffer Dall (1):
+      KVM: arm/arm64: Introduce kvm_arch_vcpu_run_pid_change
+
+Dave Martin (18):
+      arm64: fpsimd: Fix TIF_FOREIGN_FPSTATE after invalidating cpu regs
+      thread_info: Add update_thread_flag() helpers
+      arm64: Use update{,_tsk}_thread_flag()
+      KVM: arm64: Convert lazy FPSIMD context switch trap to C
+      arm64: fpsimd: Generalise context saving for non-task contexts
+      arm64: fpsimd: Avoid FPSIMD context leakage for the init task
+      arm64: fpsimd: Eliminate task->mm checks
+      arm64/sve: Refactor user SVE trap maintenance for external use
+      KVM: arm64: Repurpose vcpu_arch.debug_flags for general-purpose flags
+      KVM: arm64: Optimise FPSIMD handling to reduce guest/host thrashing
+      arm64/sve: Move read_zcr_features() out of cpufeature.h
+      arm64/sve: Switch sve_pffr() argument from task to thread
+      arm64/sve: Move sve_pffr() to fpsimd.h and make inline
+      KVM: arm64: Save host SVE context as appropriate
+      KVM: arm64: Remove eager host SVE state saving
+      KVM: arm64: Remove redundant *exit_code changes in fpsimd_guest_exit()
+      KVM: arm64: Fold redundant exit code checks out of fixup_guest_exit()
+      KVM: arm64: Invoke FPSIMD context switch trap from C
+
+Eric Auger (13):
+      KVM: arm/arm64: Set dist->spis to NULL after kfree
+      KVM: arm/arm64: Document KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+      KVM: arm/arm64: Replace the single rdist region by a list
+      KVM: arm/arm64: Helper to locate free rdist index
+      KVM: arm/arm64: Revisit Redistributor TYPER last bit computation
+      KVM: arm/arm64: Adapt vgic_v3_check_base to multiple rdist regions
+      KVM: arm/arm64: Helper to register a new redistributor region
+      KVM: arm/arm64: Remove kvm_vgic_vcpu_early_init
+      KVM: arm/arm64: Check vcpu redist base before registering an iodev
+      KVM: arm/arm64: Check all vcpu redistributors are set on map_resources
+      KVM: arm/arm64: Add KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+      KVM: arm/arm64: Implement KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+      KVM: arm/arm64: Bump VGIC_V3_MAX_CPUS to 512
+
+Mark Rutland (1):
+      arm64: KVM: Use lm_alias() for kvm_ksym_ref()
+
+ Documentation/virtual/kvm/devices/arm-vgic-v3.txt |  30 +++-
+ arch/arm/include/asm/kvm_host.h                   |  10 +-
+ arch/arm/include/uapi/asm/kvm.h                   |   1 +
+ arch/arm64/Kconfig                                |   7 +
+ arch/arm64/include/asm/cpufeature.h               |  29 ----
+ arch/arm64/include/asm/fpsimd.h                   |  21 +++
+ arch/arm64/include/asm/kvm_asm.h                  |   8 +-
+ arch/arm64/include/asm/kvm_host.h                 |  45 ++++--
+ arch/arm64/include/asm/processor.h                |  15 +-
+ arch/arm64/include/asm/thread_info.h              |  13 +-
+ arch/arm64/include/uapi/asm/kvm.h                 |   1 +
+ arch/arm64/kernel/fpsimd.c                        | 177 +++++++++++-----------
+ arch/arm64/kernel/ptrace.c                        |   1 +
+ arch/arm64/kvm/Kconfig                            |   1 +
+ arch/arm64/kvm/Makefile                           |   2 +-
+ arch/arm64/kvm/debug.c                            |   8 +-
+ arch/arm64/kvm/fpsimd.c                           | 110 ++++++++++++++
+ arch/arm64/kvm/hyp/debug-sr.c                     |   6 +-
+ arch/arm64/kvm/hyp/entry.S                        |  43 ------
+ arch/arm64/kvm/hyp/hyp-entry.S                    |  19 ---
+ arch/arm64/kvm/hyp/switch.c                       | 124 ++++++++++-----
+ arch/arm64/kvm/hyp/sysreg-sr.c                    |   4 +-
+ arch/arm64/kvm/sys_regs.c                         |   9 +-
+ include/kvm/arm_vgic.h                            |  17 ++-
+ include/linux/kvm_host.h                          |   9 ++
+ include/linux/sched.h                             |   6 +
+ include/linux/thread_info.h                       |  11 ++
+ virt/kvm/Kconfig                                  |   3 +
+ virt/kvm/arm/arm.c                                |  15 +-
+ virt/kvm/arm/vgic/vgic-init.c                     | 100 ++++++------
+ virt/kvm/arm/vgic/vgic-kvm-device.c               |  53 ++++++-
+ virt/kvm/arm/vgic/vgic-mmio-v3.c                  | 112 ++++++++++++--
+ virt/kvm/arm/vgic/vgic-v3.c                       |  99 +++++++++---
+ virt/kvm/arm/vgic/vgic.h                          |  42 ++++-
+ virt/kvm/kvm_main.c                               |   7 +-
+ 35 files changed, 809 insertions(+), 349 deletions(-)
+ create mode 100644 arch/arm64/kvm/fpsimd.c
