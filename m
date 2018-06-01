@@ -1,84 +1,144 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 19/33] KVM: arm64: Fold redundant exit code checks out of
- fixup_guest_exit()
-Date: Fri,  1 Jun 2018 16:27:33 +0100
-Message-ID: <20180601152747.23613-20-marc.zyngier@arm.com>
+Subject: [PATCH 26/33] KVM: arm/arm64: Adapt vgic_v3_check_base to multiple
+ rdist regions
+Date: Fri,  1 Jun 2018 16:27:40 +0100
+Message-ID: <20180601152747.23613-27-marc.zyngier@arm.com>
 References: <20180601152747.23613-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AFC9C4A17C
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Jun 2018 11:20:03 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id w79MsBBpT5II for <kvmarm@lists.cs.columbia.edu>;
- Fri,  1 Jun 2018 11:19:40 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 57D2F4A15A
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Jun 2018 11:17:51 -0400 (EDT)
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <20180601152747.23613-1-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: Mark Rutland <mark.rutland@arm.com>, Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu, Eric Auger <eric.auger@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-RnJvbTogRGF2ZSBNYXJ0aW4gPERhdmUuTWFydGluQGFybS5jb20+CgpUaGUgZW50aXJlIHRhaWwg
-b2YgZml4dXBfZ3Vlc3RfZXhpdCgpIGlzIGNvbnRhaW5lZCBpbiBpZiBzdGF0ZW1lbnRzCm9mIHRo
-ZSBmb3JtIGlmICh4ICYmICpleGl0X2NvZGUgPT0gQVJNX0VYQ0VQVElPTl9UUkFQKS4gIEFzIGEg
-cmVzdWx0LAp3ZSBjYW4gY2hlY2sganVzdCBvbmNlIGFuZCBiYWlsIG91dCBvZiB0aGUgZnVuY3Rp
-b24gZWFybHksIGFsbG93aW5nCnRoZSByZW1haW5pbmcgaWYgY29uZGl0aW9ucyB0byBiZSBzaW1w
-bGlmaWVkLgoKVGhlIG9ubHkgYXdrd2FyZCBjYXNlIGlzIHdoZXJlICpleGl0X2NvZGUgaXMgY2hh
-bmdlZCB0bwpBUk1fRVhDRVBUSU9OX0VMMV9TRVJST1IgaW4gdGhlIGNhc2Ugb2YgYW4gaWxsZWdh
-bCBHSUN2MiBDUFUKaW50ZXJmYWNlIGFjY2VzczogaW4gdGhhdCBjYXNlLCB0aGUgR0lDdjMgdHJh
-cCBoYW5kbGluZyBjb2RlIGlzCnNraXBwZWQgdXNpbmcgYSBnb3RvLiAgVGhpcyBhdm9pZHMgcG9p
-bnRsZXNzbHkgZXZhbHVhdGluZyB0aGUKc3RhdGljIGJyYW5jaCBjaGVjayBmb3IgdGhlIEdJQ3Yz
-IGNhc2UsIGV2ZW4gdGhvdWdoIHdlIGNhbid0IGhhdmUKdmdpY192Ml9jcHVpZl90cmFwIGFuZCB2
-Z2ljX3YzX2NwdWlmX3RyYXAgdHJ1ZSBzaW11bHRhbmVvdXNseQp1bmxlc3Mgd2UgaGF2ZSBhIEdJ
-Q3YzIGFuZCBHSUN2MiBvbiB0aGUgaG9zdDogdGhhdCBzb3VuZHMgc3R1cGlkLApidXQgSSBoYXZl
-bid0IHNhdGlzZmllZCBteXNlbGYgdGhhdCBpdCBjYW4ndCBoYXBwZW4uCgpObyBmdW5jdGlvbmFs
-IGNoYW5nZS4KClNpZ25lZC1vZmYtYnk6IERhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29t
-PgpSZXZpZXdlZC1ieTogTWFyYyBaeW5naWVyIDxtYXJjLnp5bmdpZXJAYXJtLmNvbT4KUmV2aWV3
-ZWQtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KQWNrZWQtYnk6IENo
-cmlzdG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRhbGxAYXJtLmNvbT4KU2lnbmVkLW9mZi1ieTog
-TWFyYyBaeW5naWVyIDxtYXJjLnp5bmdpZXJAYXJtLmNvbT4KLS0tCiBhcmNoL2FybTY0L2t2bS9o
-eXAvc3dpdGNoLmMgfCAxMiArKysrKysrKy0tLS0KIDEgZmlsZSBjaGFuZ2VkLCA4IGluc2VydGlv
-bnMoKyksIDQgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vaHlwL3N3
-aXRjaC5jIGIvYXJjaC9hcm02NC9rdm0vaHlwL3N3aXRjaC5jCmluZGV4IDE4ZDBmYWE4YzgwNi4u
-NGZiZWU5NTAyMTYyIDEwMDY0NAotLS0gYS9hcmNoL2FybTY0L2t2bS9oeXAvc3dpdGNoLmMKKysr
-IGIvYXJjaC9hcm02NC9rdm0vaHlwL3N3aXRjaC5jCkBAIC0zODcsMTEgKzM4NywxMyBAQCBzdGF0
-aWMgYm9vbCBfX2h5cF90ZXh0IGZpeHVwX2d1ZXN0X2V4aXQoc3RydWN0IGt2bV92Y3B1ICp2Y3B1
-LCB1NjQgKmV4aXRfY29kZSkKIAkgKiBzYW1lIFBDIG9uY2UgdGhlIFNFcnJvciBoYXMgYmVlbiBp
-bmplY3RlZCwgYW5kIHJlcGxheSB0aGUKIAkgKiB0cmFwcGluZyBpbnN0cnVjdGlvbi4KIAkgKi8K
-LQlpZiAoKmV4aXRfY29kZSA9PSBBUk1fRVhDRVBUSU9OX1RSQVAgJiYgIV9fcG9wdWxhdGVfZmF1
-bHRfaW5mbyh2Y3B1KSkKKwlpZiAoKmV4aXRfY29kZSAhPSBBUk1fRVhDRVBUSU9OX1RSQVApCisJ
-CWdvdG8gZXhpdDsKKworCWlmICghX19wb3B1bGF0ZV9mYXVsdF9pbmZvKHZjcHUpKQogCQlyZXR1
-cm4gdHJ1ZTsKIAotCWlmIChzdGF0aWNfYnJhbmNoX3VubGlrZWx5KCZ2Z2ljX3YyX2NwdWlmX3Ry
-YXApICYmCi0JICAgICpleGl0X2NvZGUgPT0gQVJNX0VYQ0VQVElPTl9UUkFQKSB7CisJaWYgKHN0
-YXRpY19icmFuY2hfdW5saWtlbHkoJnZnaWNfdjJfY3B1aWZfdHJhcCkpIHsKIAkJYm9vbCB2YWxp
-ZDsKIAogCQl2YWxpZCA9IGt2bV92Y3B1X3RyYXBfZ2V0X2NsYXNzKHZjcHUpID09IEVTUl9FTHhf
-RUNfREFCVF9MT1cgJiYKQEAgLTQxNywxMSArNDE5LDEyIEBAIHN0YXRpYyBib29sIF9faHlwX3Rl
-eHQgZml4dXBfZ3Vlc3RfZXhpdChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHU2NCAqZXhpdF9jb2Rl
-KQogCQkJCQkqdmNwdV9jcHNyKHZjcHUpICY9IH5EQkdfU1BTUl9TUzsKIAkJCQkqZXhpdF9jb2Rl
-ID0gQVJNX0VYQ0VQVElPTl9FTDFfU0VSUk9SOwogCQkJfQorCisJCQlnb3RvIGV4aXQ7CiAJCX0K
-IAl9CiAKIAlpZiAoc3RhdGljX2JyYW5jaF91bmxpa2VseSgmdmdpY192M19jcHVpZl90cmFwKSAm
-JgotCSAgICAqZXhpdF9jb2RlID09IEFSTV9FWENFUFRJT05fVFJBUCAmJgogCSAgICAoa3ZtX3Zj
-cHVfdHJhcF9nZXRfY2xhc3ModmNwdSkgPT0gRVNSX0VMeF9FQ19TWVM2NCB8fAogCSAgICAga3Zt
-X3ZjcHVfdHJhcF9nZXRfY2xhc3ModmNwdSkgPT0gRVNSX0VMeF9FQ19DUDE1XzMyKSkgewogCQlp
-bnQgcmV0ID0gX192Z2ljX3YzX3BlcmZvcm1fY3B1aWZfYWNjZXNzKHZjcHUpOwpAQCAtNDMwLDYg
-KzQzMyw3IEBAIHN0YXRpYyBib29sIF9faHlwX3RleHQgZml4dXBfZ3Vlc3RfZXhpdChzdHJ1Y3Qg
-a3ZtX3ZjcHUgKnZjcHUsIHU2NCAqZXhpdF9jb2RlKQogCQkJcmV0dXJuIHRydWU7CiAJfQogCitl
-eGl0OgogCS8qIFJldHVybiB0byB0aGUgaG9zdCBrZXJuZWwgYW5kIGhhbmRsZSB0aGUgZXhpdCAq
-LwogCXJldHVybiBmYWxzZTsKIH0KLS0gCjIuMTcuMQoKX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMu
-Y3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlz
-dGluZm8va3ZtYXJtCg==
+From: Eric Auger <eric.auger@redhat.com>
+
+vgic_v3_check_base() currently only handles the case of a unique
+legacy redistributor region whose size is not explicitly set but
+inferred, instead, from the number of online vcpus.
+
+We adapt it to handle the case of multiple redistributor regions
+with explicitly defined size. We rely on two new helpers:
+- vgic_v3_rdist_overlap() is used to detect overlap with the dist
+  region if defined
+- vgic_v3_rd_region_size computes the size of the redist region,
+  would it be a legacy unique region or a new explicitly sized
+  region.
+
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ virt/kvm/arm/vgic/vgic-v3.c | 49 ++++++++++++++++++++++++-------------
+ virt/kvm/arm/vgic/vgic.h    | 10 ++++++++
+ 2 files changed, 42 insertions(+), 17 deletions(-)
+
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index 2a11fe89943a..ce4476a08f5b 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -419,6 +419,29 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
+ 	return 0;
+ }
+ 
++/**
++ * vgic_v3_rdist_overlap - check if a region overlaps with any
++ * existing redistributor region
++ *
++ * @kvm: kvm handle
++ * @base: base of the region
++ * @size: size of region
++ *
++ * Return: true if there is an overlap
++ */
++bool vgic_v3_rdist_overlap(struct kvm *kvm, gpa_t base, size_t size)
++{
++	struct vgic_dist *d = &kvm->arch.vgic;
++	struct vgic_redist_region *rdreg;
++
++	list_for_each_entry(rdreg, &d->rd_regions, list) {
++		if ((base + size > rdreg->base) &&
++			(base < rdreg->base + vgic_v3_rd_region_size(kvm, rdreg)))
++			return true;
++	}
++	return false;
++}
++
+ /*
+  * Check for overlapping regions and for regions crossing the end of memory
+  * for base addresses which have already been set.
+@@ -426,31 +449,23 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
+ bool vgic_v3_check_base(struct kvm *kvm)
+ {
+ 	struct vgic_dist *d = &kvm->arch.vgic;
+-	gpa_t redist_size = KVM_VGIC_V3_REDIST_SIZE;
+-	struct vgic_redist_region *rdreg =
+-		list_first_entry(&d->rd_regions,
+-				 struct vgic_redist_region, list);
+-
+-	redist_size *= atomic_read(&kvm->online_vcpus);
++	struct vgic_redist_region *rdreg;
+ 
+ 	if (!IS_VGIC_ADDR_UNDEF(d->vgic_dist_base) &&
+ 	    d->vgic_dist_base + KVM_VGIC_V3_DIST_SIZE < d->vgic_dist_base)
+ 		return false;
+ 
+-	if (rdreg && (rdreg->base + redist_size < rdreg->base))
+-		return false;
+-
+-	/* Both base addresses must be set to check if they overlap */
+-	if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base) || !rdreg)
+-		return true;
+-
+-	if (d->vgic_dist_base + KVM_VGIC_V3_DIST_SIZE <= rdreg->base)
+-		return true;
++	list_for_each_entry(rdreg, &d->rd_regions, list) {
++		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) <
++			rdreg->base)
++			return false;
++	}
+ 
+-	if (rdreg->base + redist_size <= d->vgic_dist_base)
++	if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base))
+ 		return true;
+ 
+-	return false;
++	return !vgic_v3_rdist_overlap(kvm, d->vgic_dist_base,
++				      KVM_VGIC_V3_DIST_SIZE);
+ }
+ 
+ /**
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index fddd57ff6529..e9f192660097 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -276,6 +276,16 @@ vgic_v3_redist_region_full(struct vgic_redist_region *region)
+ 
+ struct vgic_redist_region *vgic_v3_rdist_free_slot(struct list_head *rdregs);
+ 
++static inline size_t
++vgic_v3_rd_region_size(struct kvm *kvm, struct vgic_redist_region *rdreg)
++{
++	if (!rdreg->count)
++		return atomic_read(&kvm->online_vcpus) * KVM_VGIC_V3_REDIST_SIZE;
++	else
++		return rdreg->count * KVM_VGIC_V3_REDIST_SIZE;
++}
++bool vgic_v3_rdist_overlap(struct kvm *kvm, gpa_t base, size_t size);
++
+ int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
+ 			 u32 devid, u32 eventid, struct vgic_irq **irq);
+ struct vgic_its *vgic_msi_to_its(struct kvm *kvm, struct kvm_msi *msi);
+-- 
+2.17.1
