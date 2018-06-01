@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 24/33] KVM: arm/arm64: Helper to locate free rdist index
-Date: Fri,  1 Jun 2018 16:27:38 +0100
-Message-ID: <20180601152747.23613-25-marc.zyngier@arm.com>
+Subject: [PATCH 23/33] KVM: arm/arm64: Replace the single rdist region by a
+ list
+Date: Fri,  1 Jun 2018 16:27:37 +0100
+Message-ID: <20180601152747.23613-24-marc.zyngier@arm.com>
 References: <20180601152747.23613-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F07444A140
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Jun 2018 11:22:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D23044A148
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Jun 2018 11:22:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 018MvZokSvAN for <kvmarm@lists.cs.columbia.edu>;
- Fri,  1 Jun 2018 11:21:58 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ECCF94A12F
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Jun 2018 11:18:02 -0400 (EDT)
+ with ESMTP id ZMk8htpiLT0G for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  1 Jun 2018 11:21:56 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D9B24A0FE
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Jun 2018 11:18:00 -0400 (EDT)
 In-Reply-To: <20180601152747.23613-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,87 +34,292 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Eric Auger <eric.auger@redhat.com>
 
-We introduce vgic_v3_rdist_free_slot to help identifying
-where we can place a new 2x64KB redistributor.
+At the moment KVM supports a single rdist region. We want to
+support several separate rdist regions so let's introduce a list
+of them. This patch currently only cares about a single
+entry in this list as the functionality to register several redist
+regions is not yet there. So this only translates the existing code
+into something functionally similar using that new data struct.
+
+The redistributor region handle is stored in the vgic_cpu structure
+to allow later computation of the TYPER last bit.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-mmio-v3.c |  3 +--
- virt/kvm/arm/vgic/vgic-v3.c      | 23 +++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic.h         | 11 +++++++++++
- 3 files changed, 35 insertions(+), 2 deletions(-)
+ include/kvm/arm_vgic.h              | 14 ++++++++---
+ virt/kvm/arm/vgic/vgic-init.c       | 16 ++++++++++--
+ virt/kvm/arm/vgic/vgic-kvm-device.c | 13 ++++++++--
+ virt/kvm/arm/vgic/vgic-mmio-v3.c    | 38 +++++++++++++++++++++++------
+ virt/kvm/arm/vgic/vgic-v3.c         | 20 +++++++++------
+ 5 files changed, 77 insertions(+), 24 deletions(-)
 
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index e7efe12a81bd..90e489f685ae 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -201,6 +201,14 @@ struct vgic_its {
+ 
+ struct vgic_state_iter;
+ 
++struct vgic_redist_region {
++	u32 index;
++	gpa_t base;
++	u32 count; /* number of redistributors or 0 if single region */
++	u32 free_index; /* index of the next free redistributor */
++	struct list_head list;
++};
++
+ struct vgic_dist {
+ 	bool			in_kernel;
+ 	bool			ready;
+@@ -220,10 +228,7 @@ struct vgic_dist {
+ 		/* either a GICv2 CPU interface */
+ 		gpa_t			vgic_cpu_base;
+ 		/* or a number of GICv3 redistributor regions */
+-		struct {
+-			gpa_t		vgic_redist_base;
+-			gpa_t		vgic_redist_free_offset;
+-		};
++		struct list_head rd_regions;
+ 	};
+ 
+ 	/* distributor enabled */
+@@ -311,6 +316,7 @@ struct vgic_cpu {
+ 	 */
+ 	struct vgic_io_device	rd_iodev;
+ 	struct vgic_io_device	sgi_iodev;
++	struct vgic_redist_region *rdreg;
+ 
+ 	/* Contains the attributes and gpa of the LPI pending tables. */
+ 	u64 pendbaser;
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index 9a5aed7eecfd..8901b2d8fca1 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -167,8 +167,11 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+ 	kvm->arch.vgic.vgic_model = type;
+ 
+ 	kvm->arch.vgic.vgic_dist_base = VGIC_ADDR_UNDEF;
+-	kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
+-	kvm->arch.vgic.vgic_redist_base = VGIC_ADDR_UNDEF;
++
++	if (type == KVM_DEV_TYPE_ARM_VGIC_V2)
++		kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
++	else
++		INIT_LIST_HEAD(&kvm->arch.vgic.rd_regions);
+ 
+ out_unlock:
+ 	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
+@@ -303,6 +306,7 @@ int vgic_init(struct kvm *kvm)
+ static void kvm_vgic_dist_destroy(struct kvm *kvm)
+ {
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
++	struct vgic_redist_region *rdreg, *next;
+ 
+ 	dist->ready = false;
+ 	dist->initialized = false;
+@@ -311,6 +315,14 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
+ 	dist->spis = NULL;
+ 	dist->nr_spis = 0;
+ 
++	if (kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
++		list_for_each_entry_safe(rdreg, next, &dist->rd_regions, list) {
++			list_del(&rdreg->list);
++			kfree(rdreg);
++		}
++		INIT_LIST_HEAD(&dist->rd_regions);
++	}
++
+ 	if (vgic_supports_direct_msis(kvm))
+ 		vgic_v4_teardown(kvm);
+ }
+diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
+index 10ae6f394b71..76ab3691f7fe 100644
+--- a/virt/kvm/arm/vgic/vgic-kvm-device.c
++++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+@@ -66,6 +66,7 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
+ 	int r = 0;
+ 	struct vgic_dist *vgic = &kvm->arch.vgic;
+ 	phys_addr_t *addr_ptr, alignment;
++	u64 undef_value = VGIC_ADDR_UNDEF;
+ 
+ 	mutex_lock(&kvm->lock);
+ 	switch (type) {
+@@ -84,7 +85,9 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
+ 		addr_ptr = &vgic->vgic_dist_base;
+ 		alignment = SZ_64K;
+ 		break;
+-	case KVM_VGIC_V3_ADDR_TYPE_REDIST:
++	case KVM_VGIC_V3_ADDR_TYPE_REDIST: {
++		struct vgic_redist_region *rdreg;
++
+ 		r = vgic_check_type(kvm, KVM_DEV_TYPE_ARM_VGIC_V3);
+ 		if (r)
+ 			break;
+@@ -92,8 +95,14 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
+ 			r = vgic_v3_set_redist_base(kvm, *addr);
+ 			goto out;
+ 		}
+-		addr_ptr = &vgic->vgic_redist_base;
++		rdreg = list_first_entry(&vgic->rd_regions,
++					 struct vgic_redist_region, list);
++		if (!rdreg)
++			addr_ptr = &undef_value;
++		else
++			addr_ptr = &rdreg->base;
+ 		break;
++	}
+ 	default:
+ 		r = -ENODEV;
+ 	}
 diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index d1aab183a1cc..49ca176e2e08 100644
+index 671fe81f8e1d..d1aab183a1cc 100644
 --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
 +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -593,8 +593,7 @@ int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
+@@ -580,8 +580,10 @@ int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm *kvm = vcpu->kvm;
+ 	struct vgic_dist *vgic = &kvm->arch.vgic;
++	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+ 	struct vgic_io_device *rd_dev = &vcpu->arch.vgic_cpu.rd_iodev;
+ 	struct vgic_io_device *sgi_dev = &vcpu->arch.vgic_cpu.sgi_iodev;
++	struct vgic_redist_region *rdreg;
+ 	gpa_t rd_base, sgi_base;
+ 	int ret;
+ 
+@@ -591,13 +593,17 @@ int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
  	 * function for all VCPUs when the base address is set.  Just return
  	 * without doing any work for now.
  	 */
--	rdreg = list_first_entry(&vgic->rd_regions,
--				 struct vgic_redist_region, list);
-+	rdreg = vgic_v3_rdist_free_slot(&vgic->rd_regions);
- 	if (!rdreg)
+-	if (IS_VGIC_ADDR_UNDEF(vgic->vgic_redist_base))
++	rdreg = list_first_entry(&vgic->rd_regions,
++				 struct vgic_redist_region, list);
++	if (!rdreg)
  		return 0;
  
+ 	if (!vgic_v3_check_base(kvm))
+ 		return -EINVAL;
+ 
+-	rd_base = vgic->vgic_redist_base + vgic->vgic_redist_free_offset;
++	vgic_cpu->rdreg = rdreg;
++
++	rd_base = rdreg->base + rdreg->free_index * KVM_VGIC_V3_REDIST_SIZE;
+ 	sgi_base = rd_base + SZ_64K;
+ 
+ 	kvm_iodevice_init(&rd_dev->dev, &kvm_io_gic_ops);
+@@ -631,7 +637,7 @@ int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
+ 		goto out;
+ 	}
+ 
+-	vgic->vgic_redist_free_offset += 2 * SZ_64K;
++	rdreg->free_index++;
+ out:
+ 	mutex_unlock(&kvm->slots_lock);
+ 	return ret;
+@@ -673,19 +679,31 @@ static int vgic_register_all_redist_iodevs(struct kvm *kvm)
+ int vgic_v3_set_redist_base(struct kvm *kvm, u64 addr)
+ {
+ 	struct vgic_dist *vgic = &kvm->arch.vgic;
++	struct vgic_redist_region *rdreg;
+ 	int ret;
+ 
+ 	/* vgic_check_ioaddr makes sure we don't do this twice */
+-	ret = vgic_check_ioaddr(kvm, &vgic->vgic_redist_base, addr, SZ_64K);
++	if (!list_empty(&vgic->rd_regions))
++		return -EINVAL;
++
++	rdreg = kzalloc(sizeof(*rdreg), GFP_KERNEL);
++	if (!rdreg)
++		return -ENOMEM;
++
++	rdreg->base = VGIC_ADDR_UNDEF;
++
++	ret = vgic_check_ioaddr(kvm, &rdreg->base, addr, SZ_64K);
+ 	if (ret)
+-		return ret;
++		goto out;
+ 
+-	vgic->vgic_redist_base = addr;
++	rdreg->base = addr;
+ 	if (!vgic_v3_check_base(kvm)) {
+-		vgic->vgic_redist_base = VGIC_ADDR_UNDEF;
+-		return -EINVAL;
++		ret = -EINVAL;
++		goto out;
+ 	}
+ 
++	list_add(&rdreg->list, &vgic->rd_regions);
++
+ 	/*
+ 	 * Register iodevs for each existing VCPU.  Adding more VCPUs
+ 	 * afterwards will register the iodevs when needed.
+@@ -695,6 +713,10 @@ int vgic_v3_set_redist_base(struct kvm *kvm, u64 addr)
+ 		return ret;
+ 
+ 	return 0;
++
++out:
++	kfree(rdreg);
++	return ret;
+ }
+ 
+ int vgic_v3_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr)
 diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index 56e6e903d998..2a11fe89943a 100644
+index c7423f3768e5..56e6e903d998 100644
 --- a/virt/kvm/arm/vgic/vgic-v3.c
 +++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -453,6 +453,29 @@ bool vgic_v3_check_base(struct kvm *kvm)
- 	return false;
- }
+@@ -427,6 +427,9 @@ bool vgic_v3_check_base(struct kvm *kvm)
+ {
+ 	struct vgic_dist *d = &kvm->arch.vgic;
+ 	gpa_t redist_size = KVM_VGIC_V3_REDIST_SIZE;
++	struct vgic_redist_region *rdreg =
++		list_first_entry(&d->rd_regions,
++				 struct vgic_redist_region, list);
  
-+/**
-+ * vgic_v3_rdist_free_slot - Look up registered rdist regions and identify one
-+ * which has free space to put a new rdist region.
-+ *
-+ * @rd_regions: redistributor region list head
-+ *
-+ * A redistributor regions maps n redistributors, n = region size / (2 x 64kB).
-+ * Stride between redistributors is 0 and regions are filled in the index order.
-+ *
-+ * Return: the redist region handle, if any, that has space to map a new rdist
-+ * region.
-+ */
-+struct vgic_redist_region *vgic_v3_rdist_free_slot(struct list_head *rd_regions)
-+{
-+	struct vgic_redist_region *rdreg;
+ 	redist_size *= atomic_read(&kvm->online_vcpus);
+ 
+@@ -434,18 +437,17 @@ bool vgic_v3_check_base(struct kvm *kvm)
+ 	    d->vgic_dist_base + KVM_VGIC_V3_DIST_SIZE < d->vgic_dist_base)
+ 		return false;
+ 
+-	if (!IS_VGIC_ADDR_UNDEF(d->vgic_redist_base) &&
+-	    d->vgic_redist_base + redist_size < d->vgic_redist_base)
++	if (rdreg && (rdreg->base + redist_size < rdreg->base))
+ 		return false;
+ 
+ 	/* Both base addresses must be set to check if they overlap */
+-	if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base) ||
+-	    IS_VGIC_ADDR_UNDEF(d->vgic_redist_base))
++	if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base) || !rdreg)
+ 		return true;
+ 
+-	if (d->vgic_dist_base + KVM_VGIC_V3_DIST_SIZE <= d->vgic_redist_base)
++	if (d->vgic_dist_base + KVM_VGIC_V3_DIST_SIZE <= rdreg->base)
+ 		return true;
+-	if (d->vgic_redist_base + redist_size <= d->vgic_dist_base)
 +
-+	list_for_each_entry(rdreg, rd_regions, list) {
-+		if (!vgic_v3_redist_region_full(rdreg))
-+			return rdreg;
-+	}
-+	return NULL;
-+}
-+
- int vgic_v3_map_resources(struct kvm *kvm)
++	if (rdreg->base + redist_size <= d->vgic_dist_base)
+ 		return true;
+ 
+ 	return false;
+@@ -455,12 +457,14 @@ int vgic_v3_map_resources(struct kvm *kvm)
  {
  	int ret = 0;
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index 32c25d42c93f..fddd57ff6529 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -265,6 +265,17 @@ static inline int vgic_v3_max_apr_idx(struct kvm_vcpu *vcpu)
- 	}
- }
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
++	struct vgic_redist_region *rdreg =
++		list_first_entry(&dist->rd_regions,
++				 struct vgic_redist_region, list);
  
-+static inline bool
-+vgic_v3_redist_region_full(struct vgic_redist_region *region)
-+{
-+	if (!region->count)
-+		return false;
-+
-+	return (region->free_index >= region->count);
-+}
-+
-+struct vgic_redist_region *vgic_v3_rdist_free_slot(struct list_head *rdregs);
-+
- int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
- 			 u32 devid, u32 eventid, struct vgic_irq **irq);
- struct vgic_its *vgic_msi_to_its(struct kvm *kvm, struct kvm_msi *msi);
+ 	if (vgic_ready(kvm))
+ 		goto out;
+ 
+-	if (IS_VGIC_ADDR_UNDEF(dist->vgic_dist_base) ||
+-	    IS_VGIC_ADDR_UNDEF(dist->vgic_redist_base)) {
++	if (IS_VGIC_ADDR_UNDEF(dist->vgic_dist_base) || !rdreg) {
+ 		kvm_err("Need to set vgic distributor addresses first\n");
+ 		ret = -ENXIO;
+ 		goto out;
 -- 
 2.17.1
