@@ -1,76 +1,80 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 03/33] thread_info: Add update_thread_flag() helpers
-Date: Fri,  1 Jun 2018 16:27:17 +0100
-Message-ID: <20180601152747.23613-4-marc.zyngier@arm.com>
+Subject: [PATCH 01/33] arm64: KVM: Use lm_alias() for kvm_ksym_ref()
+Date: Fri,  1 Jun 2018 16:27:15 +0100
+Message-ID: <20180601152747.23613-2-marc.zyngier@arm.com>
 References: <20180601152747.23613-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F6A44A133
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Jun 2018 11:17:31 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 3jsZDGjfU6hp for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  1 Jun 2018 11:17:09 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2786B4A10E
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Jun 2018 11:17:09 -0400 (EDT)
 In-Reply-To: <20180601152747.23613-1-marc.zyngier@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Mark Rutland <mark.rutland@arm.com>, Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu, Eric Auger <eric.auger@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-RnJvbTogRGF2ZSBNYXJ0aW4gPERhdmUuTWFydGluQGFybS5jb20+CgpUaGVyZSBhcmUgYSBudW1i
-ZXIgb2YgYml0cyBvZiBjb2RlIHNwcmlua2xlZCBhcm91bmQgdGhlIGtlcm5lbCB0bwpzZXQgYSB0
-aHJlYWQgZmxhZyBpZiBhIGNlcnRhaW4gY29uZGl0aW9uIGlzIHRydWUsIGFuZCBjbGVhciBpdApv
-dGhlcndpc2UuCgpUbyBoZWxwIG1ha2UgdGhvc2UgY2FsbCBzaXRlcyB0ZXJzZXIgYW5kIGxlc3Mg
-Y3VtYmVyc29tZSwgdGhpcwpwYXRjaCBhZGRzIGEgbmV3IGZhbWlseSBvZiB0aHJlYWQgZmxhZyBt
-YW5pcHVsYXRvcnMKCgl1cGRhdGUqX3RocmVhZF9mbGFnKFsuLi4sXSBmbGFnLCBjb25kKQoKd2hp
-Y2ggZG8gdGhlIGVxdWl2YWxlbnQgb2Y6CgoJaWYgKGNvbmQpCgkJc2V0Kl90aHJlYWRfZmxhZyhb
-Li4uLF0gZmxhZyk7CgllbHNlCgkJY2xlYXIqX3RocmVhZF9mbGFnKFsuLi4sXSBmbGFnKTsKClNp
-Z25lZC1vZmYtYnk6IERhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPgpSZXZpZXdlZC1i
-eTogQWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgpBY2tlZC1ieTogU3RldmVu
-IFJvc3RlZHQgKFZNd2FyZSkgPHJvc3RlZHRAZ29vZG1pcy5vcmc+CkFja2VkLWJ5OiBNYXJjIFp5
-bmdpZXIgPG1hcmMuenluZ2llckBhcm0uY29tPgpBY2tlZC1ieTogQ2F0YWxpbiBNYXJpbmFzIDxj
-YXRhbGluLm1hcmluYXNAYXJtLmNvbT4KQWNrZWQtYnk6IFBldGVyIFppamxzdHJhIChJbnRlbCkg
-PHBldGVyekBpbmZyYWRlYWQub3JnPgpDYzogSW5nbyBNb2xuYXIgPG1pbmdvQHJlZGhhdC5jb20+
-CkNjOiBPbGVnIE5lc3Rlcm92IDxvbGVnQHJlZGhhdC5jb20+ClNpZ25lZC1vZmYtYnk6IE1hcmMg
-WnluZ2llciA8bWFyYy56eW5naWVyQGFybS5jb20+Ci0tLQogaW5jbHVkZS9saW51eC9zY2hlZC5o
-ICAgICAgIHwgIDYgKysrKysrCiBpbmNsdWRlL2xpbnV4L3RocmVhZF9pbmZvLmggfCAxMSArKysr
-KysrKysrKwogMiBmaWxlcyBjaGFuZ2VkLCAxNyBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEv
-aW5jbHVkZS9saW51eC9zY2hlZC5oIGIvaW5jbHVkZS9saW51eC9zY2hlZC5oCmluZGV4IGIzZDY5
-N2YzYjU3My4uYzJjMzA1MTk5NzIxIDEwMDY0NAotLS0gYS9pbmNsdWRlL2xpbnV4L3NjaGVkLmgK
-KysrIGIvaW5jbHVkZS9saW51eC9zY2hlZC5oCkBAIC0xNTc4LDYgKzE1NzgsMTIgQEAgc3RhdGlj
-IGlubGluZSB2b2lkIGNsZWFyX3Rza190aHJlYWRfZmxhZyhzdHJ1Y3QgdGFza19zdHJ1Y3QgKnRz
-aywgaW50IGZsYWcpCiAJY2xlYXJfdGlfdGhyZWFkX2ZsYWcodGFza190aHJlYWRfaW5mbyh0c2sp
-LCBmbGFnKTsKIH0KIAorc3RhdGljIGlubGluZSB2b2lkIHVwZGF0ZV90c2tfdGhyZWFkX2ZsYWco
-c3RydWN0IHRhc2tfc3RydWN0ICp0c2ssIGludCBmbGFnLAorCQkJCQkgIGJvb2wgdmFsdWUpCit7
-CisJdXBkYXRlX3RpX3RocmVhZF9mbGFnKHRhc2tfdGhyZWFkX2luZm8odHNrKSwgZmxhZywgdmFs
-dWUpOworfQorCiBzdGF0aWMgaW5saW5lIGludCB0ZXN0X2FuZF9zZXRfdHNrX3RocmVhZF9mbGFn
-KHN0cnVjdCB0YXNrX3N0cnVjdCAqdHNrLCBpbnQgZmxhZykKIHsKIAlyZXR1cm4gdGVzdF9hbmRf
-c2V0X3RpX3RocmVhZF9mbGFnKHRhc2tfdGhyZWFkX2luZm8odHNrKSwgZmxhZyk7CmRpZmYgLS1n
-aXQgYS9pbmNsdWRlL2xpbnV4L3RocmVhZF9pbmZvLmggYi9pbmNsdWRlL2xpbnV4L3RocmVhZF9p
-bmZvLmgKaW5kZXggY2YyODYyYmQxMzRhLi44ZDg4MjFiMzY4OWEgMTAwNjQ0Ci0tLSBhL2luY2x1
-ZGUvbGludXgvdGhyZWFkX2luZm8uaAorKysgYi9pbmNsdWRlL2xpbnV4L3RocmVhZF9pbmZvLmgK
-QEAgLTYwLDYgKzYwLDE1IEBAIHN0YXRpYyBpbmxpbmUgdm9pZCBjbGVhcl90aV90aHJlYWRfZmxh
-ZyhzdHJ1Y3QgdGhyZWFkX2luZm8gKnRpLCBpbnQgZmxhZykKIAljbGVhcl9iaXQoZmxhZywgKHVu
-c2lnbmVkIGxvbmcgKikmdGktPmZsYWdzKTsKIH0KIAorc3RhdGljIGlubGluZSB2b2lkIHVwZGF0
-ZV90aV90aHJlYWRfZmxhZyhzdHJ1Y3QgdGhyZWFkX2luZm8gKnRpLCBpbnQgZmxhZywKKwkJCQkJ
-IGJvb2wgdmFsdWUpCit7CisJaWYgKHZhbHVlKQorCQlzZXRfdGlfdGhyZWFkX2ZsYWcodGksIGZs
-YWcpOworCWVsc2UKKwkJY2xlYXJfdGlfdGhyZWFkX2ZsYWcodGksIGZsYWcpOworfQorCiBzdGF0
-aWMgaW5saW5lIGludCB0ZXN0X2FuZF9zZXRfdGlfdGhyZWFkX2ZsYWcoc3RydWN0IHRocmVhZF9p
-bmZvICp0aSwgaW50IGZsYWcpCiB7CiAJcmV0dXJuIHRlc3RfYW5kX3NldF9iaXQoZmxhZywgKHVu
-c2lnbmVkIGxvbmcgKikmdGktPmZsYWdzKTsKQEAgLTc5LDYgKzg4LDggQEAgc3RhdGljIGlubGlu
-ZSBpbnQgdGVzdF90aV90aHJlYWRfZmxhZyhzdHJ1Y3QgdGhyZWFkX2luZm8gKnRpLCBpbnQgZmxh
-ZykKIAlzZXRfdGlfdGhyZWFkX2ZsYWcoY3VycmVudF90aHJlYWRfaW5mbygpLCBmbGFnKQogI2Rl
-ZmluZSBjbGVhcl90aHJlYWRfZmxhZyhmbGFnKSBcCiAJY2xlYXJfdGlfdGhyZWFkX2ZsYWcoY3Vy
-cmVudF90aHJlYWRfaW5mbygpLCBmbGFnKQorI2RlZmluZSB1cGRhdGVfdGhyZWFkX2ZsYWcoZmxh
-ZywgdmFsdWUpIFwKKwl1cGRhdGVfdGlfdGhyZWFkX2ZsYWcoY3VycmVudF90aHJlYWRfaW5mbygp
-LCBmbGFnLCB2YWx1ZSkKICNkZWZpbmUgdGVzdF9hbmRfc2V0X3RocmVhZF9mbGFnKGZsYWcpIFwK
-IAl0ZXN0X2FuZF9zZXRfdGlfdGhyZWFkX2ZsYWcoY3VycmVudF90aHJlYWRfaW5mbygpLCBmbGFn
-KQogI2RlZmluZSB0ZXN0X2FuZF9jbGVhcl90aHJlYWRfZmxhZyhmbGFnKSBcCi0tIAoyLjE3LjEK
-CgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpsaW51eC1h
-cm0ta2VybmVsIG1haWxpbmcgbGlzdApsaW51eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5v
-cmcKaHR0cDovL2xpc3RzLmluZnJhZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1hcm0t
-a2VybmVsCg==
+From: Mark Rutland <mark.rutland@arm.com>
+
+For historical reasons, we open-code lm_alias() in kvm_ksym_ref().
+
+Let's use lm_alias() to avoid duplication and make things clearer.
+
+As we have to pull this from <linux/mm.h> (which is not safe for
+inclusion in assembly), we may as well move the kvm_ksym_ref()
+definition into the existing !__ASSEMBLY__ block.
+
+Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+Cc: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm64/include/asm/kvm_asm.h | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index f6648a3e4152..a9ceeec5a76f 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -33,16 +33,19 @@
+ #define KVM_ARM64_DEBUG_DIRTY_SHIFT	0
+ #define KVM_ARM64_DEBUG_DIRTY		(1 << KVM_ARM64_DEBUG_DIRTY_SHIFT)
+ 
++#ifndef __ASSEMBLY__
++
++#include <linux/mm.h>
++
+ /* Translate a kernel address of @sym into its equivalent linear mapping */
+ #define kvm_ksym_ref(sym)						\
+ 	({								\
+ 		void *val = &sym;					\
+ 		if (!is_kernel_in_hyp_mode())				\
+-			val = phys_to_virt((u64)&sym - kimage_voffset);	\
++			val = lm_alias(&sym);				\
+ 		val;							\
+ 	 })
+ 
+-#ifndef __ASSEMBLY__
+ struct kvm;
+ struct kvm_vcpu;
+ 
+-- 
+2.17.1
