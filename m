@@ -1,144 +1,151 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 26/33] KVM: arm/arm64: Adapt vgic_v3_check_base to multiple
- rdist regions
-Date: Fri,  1 Jun 2018 16:27:40 +0100
-Message-ID: <20180601152747.23613-27-marc.zyngier@arm.com>
+Subject: [PATCH 16/33] KVM: arm64: Save host SVE context as appropriate
+Date: Fri,  1 Jun 2018 16:27:30 +0100
+Message-ID: <20180601152747.23613-17-marc.zyngier@arm.com>
 References: <20180601152747.23613-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 141794A137
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Jun 2018 11:20:04 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id fXcP8M0gkb8C for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  1 Jun 2018 11:19:35 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 606D54A157
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Jun 2018 11:17:44 -0400 (EDT)
 In-Reply-To: <20180601152747.23613-1-marc.zyngier@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Mark Rutland <mark.rutland@arm.com>, Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu, Eric Auger <eric.auger@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Eric Auger <eric.auger@redhat.com>
-
-vgic_v3_check_base() currently only handles the case of a unique
-legacy redistributor region whose size is not explicitly set but
-inferred, instead, from the number of online vcpus.
-
-We adapt it to handle the case of multiple redistributor regions
-with explicitly defined size. We rely on two new helpers:
-- vgic_v3_rdist_overlap() is used to detect overlap with the dist
-  region if defined
-- vgic_v3_rd_region_size computes the size of the redist region,
-  would it be a legacy unique region or a new explicitly sized
-  region.
-
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- virt/kvm/arm/vgic/vgic-v3.c | 49 ++++++++++++++++++++++++-------------
- virt/kvm/arm/vgic/vgic.h    | 10 ++++++++
- 2 files changed, 42 insertions(+), 17 deletions(-)
-
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index 2a11fe89943a..ce4476a08f5b 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -419,6 +419,29 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
- 	return 0;
- }
- 
-+/**
-+ * vgic_v3_rdist_overlap - check if a region overlaps with any
-+ * existing redistributor region
-+ *
-+ * @kvm: kvm handle
-+ * @base: base of the region
-+ * @size: size of region
-+ *
-+ * Return: true if there is an overlap
-+ */
-+bool vgic_v3_rdist_overlap(struct kvm *kvm, gpa_t base, size_t size)
-+{
-+	struct vgic_dist *d = &kvm->arch.vgic;
-+	struct vgic_redist_region *rdreg;
-+
-+	list_for_each_entry(rdreg, &d->rd_regions, list) {
-+		if ((base + size > rdreg->base) &&
-+			(base < rdreg->base + vgic_v3_rd_region_size(kvm, rdreg)))
-+			return true;
-+	}
-+	return false;
-+}
-+
- /*
-  * Check for overlapping regions and for regions crossing the end of memory
-  * for base addresses which have already been set.
-@@ -426,31 +449,23 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
- bool vgic_v3_check_base(struct kvm *kvm)
- {
- 	struct vgic_dist *d = &kvm->arch.vgic;
--	gpa_t redist_size = KVM_VGIC_V3_REDIST_SIZE;
--	struct vgic_redist_region *rdreg =
--		list_first_entry(&d->rd_regions,
--				 struct vgic_redist_region, list);
--
--	redist_size *= atomic_read(&kvm->online_vcpus);
-+	struct vgic_redist_region *rdreg;
- 
- 	if (!IS_VGIC_ADDR_UNDEF(d->vgic_dist_base) &&
- 	    d->vgic_dist_base + KVM_VGIC_V3_DIST_SIZE < d->vgic_dist_base)
- 		return false;
- 
--	if (rdreg && (rdreg->base + redist_size < rdreg->base))
--		return false;
--
--	/* Both base addresses must be set to check if they overlap */
--	if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base) || !rdreg)
--		return true;
--
--	if (d->vgic_dist_base + KVM_VGIC_V3_DIST_SIZE <= rdreg->base)
--		return true;
-+	list_for_each_entry(rdreg, &d->rd_regions, list) {
-+		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) <
-+			rdreg->base)
-+			return false;
-+	}
- 
--	if (rdreg->base + redist_size <= d->vgic_dist_base)
-+	if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base))
- 		return true;
- 
--	return false;
-+	return !vgic_v3_rdist_overlap(kvm, d->vgic_dist_base,
-+				      KVM_VGIC_V3_DIST_SIZE);
- }
- 
- /**
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index fddd57ff6529..e9f192660097 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -276,6 +276,16 @@ vgic_v3_redist_region_full(struct vgic_redist_region *region)
- 
- struct vgic_redist_region *vgic_v3_rdist_free_slot(struct list_head *rdregs);
- 
-+static inline size_t
-+vgic_v3_rd_region_size(struct kvm *kvm, struct vgic_redist_region *rdreg)
-+{
-+	if (!rdreg->count)
-+		return atomic_read(&kvm->online_vcpus) * KVM_VGIC_V3_REDIST_SIZE;
-+	else
-+		return rdreg->count * KVM_VGIC_V3_REDIST_SIZE;
-+}
-+bool vgic_v3_rdist_overlap(struct kvm *kvm, gpa_t base, size_t size);
-+
- int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
- 			 u32 devid, u32 eventid, struct vgic_irq **irq);
- struct vgic_its *vgic_msi_to_its(struct kvm *kvm, struct kvm_msi *msi);
--- 
-2.17.1
+RnJvbTogRGF2ZSBNYXJ0aW4gPERhdmUuTWFydGluQGFybS5jb20+CgpUaGlzIHBhdGNoIGFkZHMg
+U1ZFIGNvbnRleHQgc2F2aW5nIHRvIHRoZSBoeXAgRlBTSU1EIGNvbnRleHQgc3dpdGNoCnBhdGgu
+ICBUaGlzIG1lYW5zIHRoYXQgaXQgaXMgbm8gbG9uZ2VyIG5lY2Vzc2FyeSB0byBzYXZlIHRoZSBo
+b3N0ClNWRSBzdGF0ZSBpbiBhZHZhbmNlIG9mIGVudGVyaW5nIHRoZSBndWVzdCwgd2hlbiBpbiB1
+c2UuCgpJbiBvcmRlciB0byBhdm9pZCBhZGRpbmcgcG9pbnRsZXNzIGNvbXBsZXhpdHkgdG8gdGhl
+IGNvZGUsIFZIRSBpcwphc3N1bWVkIGlmIFNWRSBpcyBpbiB1c2UuICBWSEUgaXMgYW4gYXJjaGl0
+ZWN0dXJhbCBwcmVyZXF1aXNpdGUgZm9yClNWRSwgc28gdGhlcmUgaXMgbm8gZ29vZCByZWFzb24g
+dG8gdHVybiBDT05GSUdfQVJNNjRfVkhFIG9mZiBpbgprZXJuZWxzIHRoYXQgc3VwcG9ydCBib3Ro
+IFNWRSBhbmQgS1ZNLgoKSGlzdG9yaWNhbGx5LCBzb2Z0d2FyZSBtb2RlbHMgZXhpc3QgdGhhdCBj
+YW4gZXhwb3NlIHRoZQphcmNoaXRlY3R1cmFsbHkgaW52YWxpZCBjb25maWd1cmF0aW9uIG9mIFNW
+RSB3aXRob3V0IFZIRSwgc28gaWYKdGhpcyBzaXR1YXRpb24gaXMgZGV0ZWN0ZWQgYXQga3ZtX2lu
+aXQoKSB0aW1lIHRoZW4gS1ZNIHdpbGwgYmUKZGlzYWJsZWQuCgpTaWduZWQtb2ZmLWJ5OiBEYXZl
+IE1hcnRpbiA8RGF2ZS5NYXJ0aW5AYXJtLmNvbT4KUmV2aWV3ZWQtYnk6IEFsZXggQmVubsOpZSA8
+YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KQWNrZWQtYnk6IENhdGFsaW4gTWFyaW5hcyA8Y2F0YWxp
+bi5tYXJpbmFzQGFybS5jb20+ClNpZ25lZC1vZmYtYnk6IE1hcmMgWnluZ2llciA8bWFyYy56eW5n
+aWVyQGFybS5jb20+Ci0tLQogYXJjaC9hcm0vaW5jbHVkZS9hc20va3ZtX2hvc3QuaCAgIHwgIDEg
+KwogYXJjaC9hcm02NC9LY29uZmlnICAgICAgICAgICAgICAgIHwgIDcgKysrKysrKwogYXJjaC9h
+cm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oIHwgMTMgKysrKysrKysrKysrKwogYXJjaC9hcm02
+NC9rdm0vZnBzaW1kLmMgICAgICAgICAgIHwgIDEgLQogYXJjaC9hcm02NC9rdm0vaHlwL3N3aXRj
+aC5jICAgICAgIHwgMjAgKysrKysrKysrKysrKysrKysrKy0KIHZpcnQva3ZtL2FybS9hcm0uYyAg
+ICAgICAgICAgICAgICB8ICA3ICsrKysrKysKIDYgZmlsZXMgY2hhbmdlZCwgNDcgaW5zZXJ0aW9u
+cygrKSwgMiBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9hcmNoL2FybS9pbmNsdWRlL2FzbS9r
+dm1faG9zdC5oIGIvYXJjaC9hcm0vaW5jbHVkZS9hc20va3ZtX2hvc3QuaAppbmRleCBhYzg3MGIy
+Y2Q1ZDEuLjNiODViYmI0YjIzZSAxMDA2NDQKLS0tIGEvYXJjaC9hcm0vaW5jbHVkZS9hc20va3Zt
+X2hvc3QuaAorKysgYi9hcmNoL2FybS9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCkBAIC0yODAsNiAr
+MjgwLDcgQEAgdm9pZCBrdm1fbW11X3dwX21lbW9yeV9yZWdpb24oc3RydWN0IGt2bSAqa3ZtLCBp
+bnQgc2xvdCk7CiAKIHN0cnVjdCBrdm1fdmNwdSAqa3ZtX21waWRyX3RvX3ZjcHUoc3RydWN0IGt2
+bSAqa3ZtLCB1bnNpZ25lZCBsb25nIG1waWRyKTsKIAorc3RhdGljIGlubGluZSBib29sIGt2bV9h
+cmNoX2NoZWNrX3N2ZV9oYXNfdmhlKHZvaWQpIHsgcmV0dXJuIHRydWU7IH0KIHN0YXRpYyBpbmxp
+bmUgdm9pZCBrdm1fYXJjaF9oYXJkd2FyZV91bnNldHVwKHZvaWQpIHt9CiBzdGF0aWMgaW5saW5l
+IHZvaWQga3ZtX2FyY2hfc3luY19ldmVudHMoc3RydWN0IGt2bSAqa3ZtKSB7fQogc3RhdGljIGlu
+bGluZSB2b2lkIGt2bV9hcmNoX3ZjcHVfdW5pbml0KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkge30K
+ZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQvS2NvbmZpZyBiL2FyY2gvYXJtNjQvS2NvbmZpZwppbmRl
+eCBlYjJjZjQ5MzhmNmQuLmIwZDM4MjAwODFjOCAxMDA2NDQKLS0tIGEvYXJjaC9hcm02NC9LY29u
+ZmlnCisrKyBiL2FyY2gvYXJtNjQvS2NvbmZpZwpAQCAtMTEzMCw2ICsxMTMwLDcgQEAgZW5kbWVu
+dQogY29uZmlnIEFSTTY0X1NWRQogCWJvb2wgIkFSTSBTY2FsYWJsZSBWZWN0b3IgRXh0ZW5zaW9u
+IHN1cHBvcnQiCiAJZGVmYXVsdCB5CisJZGVwZW5kcyBvbiAhS1ZNIHx8IEFSTTY0X1ZIRQogCWhl
+bHAKIAkgIFRoZSBTY2FsYWJsZSBWZWN0b3IgRXh0ZW5zaW9uIChTVkUpIGlzIGFuIGV4dGVuc2lv
+biB0byB0aGUgQUFyY2g2NAogCSAgZXhlY3V0aW9uIHN0YXRlIHdoaWNoIGNvbXBsZW1lbnRzIGFu
+ZCBleHRlbmRzIHRoZSBTSU1EIGZ1bmN0aW9uYWxpdHkKQEAgLTExNTUsNiArMTE1NiwxMiBAQCBj
+b25maWcgQVJNNjRfU1ZFCiAJICBib290aW5nIHRoZSBrZXJuZWwuICBJZiB1bnN1cmUgYW5kIHlv
+dSBhcmUgbm90IG9ic2VydmluZyB0aGVzZQogCSAgc3ltcHRvbXMsIHlvdSBzaG91bGQgYXNzdW1l
+IHRoYXQgaXQgaXMgc2FmZSB0byBzYXkgWS4KIAorCSAgQ1BVcyB0aGF0IHN1cHBvcnQgU1ZFIGFy
+ZSBhcmNoaXRlY3R1cmFsbHkgcmVxdWlyZWQgdG8gc3VwcG9ydCB0aGUKKwkgIFZpcnR1YWxpemF0
+aW9uIEhvc3QgRXh0ZW5zaW9ucyAoVkhFKSwgc28gdGhlIGtlcm5lbCBtYWtlcyBubworCSAgcHJv
+dmlzaW9uIGZvciBzdXBwb3J0aW5nIFNWRSBhbG9uZ3NpZGUgS1ZNIHdpdGhvdXQgVkhFIGVuYWJs
+ZWQuCisJICBUaHVzLCB5b3Ugd2lsbCBuZWVkIHRvIGVuYWJsZSBDT05GSUdfQVJNNjRfVkhFIGlm
+IHlvdSB3YW50IHRvIHN1cHBvcnQKKwkgIEtWTSBpbiB0aGUgc2FtZSBrZXJuZWwgaW1hZ2UuCisK
+IGNvbmZpZyBBUk02NF9NT0RVTEVfUExUUwogCWJvb2wKIAlzZWxlY3QgSEFWRV9NT0RfQVJDSF9T
+UEVDSUZJQwpkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oIGIv
+YXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCmluZGV4IGIzZmU3MzAxYmRiZS4uZmRh
+OTI4OWYzYjljIDEwMDY0NAotLS0gYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgK
+KysrIGIvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCkBAIC00MDUsNiArNDA1LDE5
+IEBAIHN0YXRpYyBpbmxpbmUgdm9pZCBfX2NwdV9pbml0X2h5cF9tb2RlKHBoeXNfYWRkcl90IHBn
+ZF9wdHIsCiAJa3ZtX2NhbGxfaHlwKF9fa3ZtX3NldF90cGlkcl9lbDIsIHRwaWRyX2VsMik7CiB9
+CiAKK3N0YXRpYyBpbmxpbmUgYm9vbCBrdm1fYXJjaF9jaGVja19zdmVfaGFzX3ZoZSh2b2lkKQor
+eworCS8qCisJICogVGhlIEFybSBhcmNoaXRlY3R1cmUgc3BlY2lmaWVzIHRoYXQgaW1wbGVtZW50
+YXRpb24gb2YgU1ZFCisJICogcmVxdWlyZXMgVkhFIGFsc28gdG8gYmUgaW1wbGVtZW50ZWQuICBU
+aGUgS1ZNIGNvZGUgZm9yIGFybTY0CisJICogcmVsaWVzIG9uIHRoaXMgd2hlbiBTVkUgaXMgcHJl
+c2VudDoKKwkgKi8KKwlpZiAoc3lzdGVtX3N1cHBvcnRzX3N2ZSgpKQorCQlyZXR1cm4gaGFzX3Zo
+ZSgpOworCWVsc2UKKwkJcmV0dXJuIHRydWU7Cit9CisKIHN0YXRpYyBpbmxpbmUgdm9pZCBrdm1f
+YXJjaF9oYXJkd2FyZV91bnNldHVwKHZvaWQpIHt9CiBzdGF0aWMgaW5saW5lIHZvaWQga3ZtX2Fy
+Y2hfc3luY19ldmVudHMoc3RydWN0IGt2bSAqa3ZtKSB7fQogc3RhdGljIGlubGluZSB2b2lkIGt2
+bV9hcmNoX3ZjcHVfdW5pbml0KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkge30KZGlmZiAtLWdpdCBh
+L2FyY2gvYXJtNjQva3ZtL2Zwc2ltZC5jIGIvYXJjaC9hcm02NC9rdm0vZnBzaW1kLmMKaW5kZXgg
+MzY1OTMzYTk4YTdjLi5kYzZlY2ZhNWEyZDIgMTAwNjQ0Ci0tLSBhL2FyY2gvYXJtNjQva3ZtL2Zw
+c2ltZC5jCisrKyBiL2FyY2gvYXJtNjQva3ZtL2Zwc2ltZC5jCkBAIC01OSw3ICs1OSw2IEBAIGlu
+dCBrdm1fYXJjaF92Y3B1X3J1bl9tYXBfZnAoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQogICovCiB2
+b2lkIGt2bV9hcmNoX3ZjcHVfbG9hZF9mcChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCiB7Ci0JQlVH
+X09OKHN5c3RlbV9zdXBwb3J0c19zdmUoKSk7CiAJQlVHX09OKCFjdXJyZW50LT5tbSk7CiAKIAl2
+Y3B1LT5hcmNoLmZsYWdzICY9IH4oS1ZNX0FSTTY0X0ZQX0VOQUJMRUQgfCBLVk1fQVJNNjRfSE9T
+VF9TVkVfSU5fVVNFKTsKZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL2h5cC9zd2l0Y2guYyBi
+L2FyY2gvYXJtNjQva3ZtL2h5cC9zd2l0Y2guYwppbmRleCAxMThmMzAwMmI5Y2UuLmE2YThjN2Q5
+MTU3ZCAxMDA2NDQKLS0tIGEvYXJjaC9hcm02NC9rdm0vaHlwL3N3aXRjaC5jCisrKyBiL2FyY2gv
+YXJtNjQva3ZtL2h5cC9zd2l0Y2guYwpAQCAtMjEsNiArMjEsNyBAQAogCiAjaW5jbHVkZSA8a3Zt
+L2FybV9wc2NpLmg+CiAKKyNpbmNsdWRlIDxhc20vY3B1ZmVhdHVyZS5oPgogI2luY2x1ZGUgPGFz
+bS9rdm1fYXNtLmg+CiAjaW5jbHVkZSA8YXNtL2t2bV9lbXVsYXRlLmg+CiAjaW5jbHVkZSA8YXNt
+L2t2bV9ob3N0Lmg+CkBAIC0yOCw2ICsyOSw3IEBACiAjaW5jbHVkZSA8YXNtL2t2bV9tbXUuaD4K
+ICNpbmNsdWRlIDxhc20vZnBzaW1kLmg+CiAjaW5jbHVkZSA8YXNtL2RlYnVnLW1vbml0b3JzLmg+
+CisjaW5jbHVkZSA8YXNtL3Byb2Nlc3Nvci5oPgogI2luY2x1ZGUgPGFzbS90aHJlYWRfaW5mby5o
+PgogCiAvKiBDaGVjayB3aGV0aGVyIHRoZSBGUCByZWdzIHdlcmUgZGlydGllZCB3aGlsZSBpbiB0
+aGUgaG9zdC1zaWRlIHJ1biBsb29wOiAqLwpAQCAtMzI5LDYgKzMzMSw4IEBAIHN0YXRpYyBib29s
+IF9faHlwX3RleHQgX19za2lwX2luc3RyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKIHZvaWQgX19o
+eXBfdGV4dCBfX2h5cF9zd2l0Y2hfZnBzaW1kKHU2NCBlc3IgX19hbHdheXNfdW51c2VkLAogCQkJ
+CSAgICBzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCiB7CisJc3RydWN0IHVzZXJfZnBzaW1kX3N0YXRl
+ICpob3N0X2Zwc2ltZCA9IHZjcHUtPmFyY2guaG9zdF9mcHNpbWRfc3RhdGU7CisKIAlpZiAoaGFz
+X3ZoZSgpKQogCQl3cml0ZV9zeXNyZWcocmVhZF9zeXNyZWcoY3BhY3JfZWwxKSB8IENQQUNSX0VM
+MV9GUEVOLAogCQkJICAgICBjcGFjcl9lbDEpOwpAQCAtMzM5LDcgKzM0MywyMSBAQCB2b2lkIF9f
+aHlwX3RleHQgX19oeXBfc3dpdGNoX2Zwc2ltZCh1NjQgZXNyIF9fYWx3YXlzX3VudXNlZCwKIAlp
+c2IoKTsKIAogCWlmICh2Y3B1LT5hcmNoLmZsYWdzICYgS1ZNX0FSTTY0X0ZQX0hPU1QpIHsKLQkJ
+X19mcHNpbWRfc2F2ZV9zdGF0ZSh2Y3B1LT5hcmNoLmhvc3RfZnBzaW1kX3N0YXRlKTsKKwkJLyoK
+KwkJICogSW4gdGhlIFNWRSBjYXNlLCBWSEUgaXMgYXNzdW1lZDogaXQgaXMgZW5mb3JjZWQgYnkK
+KwkJICogS2NvbmZpZyBhbmQga3ZtX2FyY2hfaW5pdCgpLgorCQkgKi8KKwkJaWYgKHN5c3RlbV9z
+dXBwb3J0c19zdmUoKSAmJgorCQkgICAgKHZjcHUtPmFyY2guZmxhZ3MgJiBLVk1fQVJNNjRfSE9T
+VF9TVkVfSU5fVVNFKSkgeworCQkJc3RydWN0IHRocmVhZF9zdHJ1Y3QgKnRocmVhZCA9IGNvbnRh
+aW5lcl9vZigKKwkJCQlob3N0X2Zwc2ltZCwKKwkJCQlzdHJ1Y3QgdGhyZWFkX3N0cnVjdCwgdXcu
+ZnBzaW1kX3N0YXRlKTsKKworCQkJc3ZlX3NhdmVfc3RhdGUoc3ZlX3BmZnIodGhyZWFkKSwgJmhv
+c3RfZnBzaW1kLT5mcHNyKTsKKwkJfSBlbHNlIHsKKwkJCV9fZnBzaW1kX3NhdmVfc3RhdGUoaG9z
+dF9mcHNpbWQpOworCQl9CisKIAkJdmNwdS0+YXJjaC5mbGFncyAmPSB+S1ZNX0FSTTY0X0ZQX0hP
+U1Q7CiAJfQogCmRpZmYgLS1naXQgYS92aXJ0L2t2bS9hcm0vYXJtLmMgYi92aXJ0L2t2bS9hcm0v
+YXJtLmMKaW5kZXggYmVlMjI2Y2VjNDBiLi5jZTdjNmYzNjQ3MWIgMTAwNjQ0Ci0tLSBhL3ZpcnQv
+a3ZtL2FybS9hcm0uYworKysgYi92aXJ0L2t2bS9hcm0vYXJtLmMKQEAgLTE2LDYgKzE2LDcgQEAK
+ICAqIEZvdW5kYXRpb24sIDUxIEZyYW5rbGluIFN0cmVldCwgRmlmdGggRmxvb3IsIEJvc3Rvbiwg
+TUEgIDAyMTEwLTEzMDEsIFVTQS4KICAqLwogCisjaW5jbHVkZSA8bGludXgvYnVnLmg+CiAjaW5j
+bHVkZSA8bGludXgvY3B1X3BtLmg+CiAjaW5jbHVkZSA8bGludXgvZXJybm8uaD4KICNpbmNsdWRl
+IDxsaW51eC9lcnIuaD4KQEAgLTQxLDYgKzQyLDcgQEAKICNpbmNsdWRlIDxhc20vbW1hbi5oPgog
+I2luY2x1ZGUgPGFzbS90bGJmbHVzaC5oPgogI2luY2x1ZGUgPGFzbS9jYWNoZWZsdXNoLmg+Cisj
+aW5jbHVkZSA8YXNtL2NwdWZlYXR1cmUuaD4KICNpbmNsdWRlIDxhc20vdmlydC5oPgogI2luY2x1
+ZGUgPGFzbS9rdm1fYXJtLmg+CiAjaW5jbHVkZSA8YXNtL2t2bV9hc20uaD4KQEAgLTE1NzQsNiAr
+MTU3NiwxMSBAQCBpbnQga3ZtX2FyY2hfaW5pdCh2b2lkICpvcGFxdWUpCiAJCXJldHVybiAtRU5P
+REVWOwogCX0KIAorCWlmICgha3ZtX2FyY2hfY2hlY2tfc3ZlX2hhc192aGUoKSkgeworCQlrdm1f
+cHJfdW5pbXBsKCJTVkUgc3lzdGVtIHdpdGhvdXQgVkhFIHVuc3VwcG9ydGVkLiAgQnJva2VuIGNw
+dT8iKTsKKwkJcmV0dXJuIC1FTk9ERVY7CisJfQorCiAJZm9yX2VhY2hfb25saW5lX2NwdShjcHUp
+IHsKIAkJc21wX2NhbGxfZnVuY3Rpb25fc2luZ2xlKGNwdSwgY2hlY2tfa3ZtX3RhcmdldF9jcHUs
+ICZyZXQsIDEpOwogCQlpZiAocmV0IDwgMCkgewotLSAKMi4xNy4xCgpfX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFy
+bUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFp
+bG1hbi9saXN0aW5mby9rdm1hcm0K
