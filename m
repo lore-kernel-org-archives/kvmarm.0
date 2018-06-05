@@ -1,21 +1,23 @@
 From: Abbott Liu <liuwenliang@huawei.com>
-Subject: [PATCH v5 0/6] KASan for arm
-Date: Tue, 5 Jun 2018 14:14:10 +0800
-Message-ID: <20180605061416.18690-1-liuwenliang__28626.1433306665$1528180500$gmane$org@huawei.com>
+Subject: [PATCH v5 3/6] Replace memory function for kasan
+Date: Tue, 5 Jun 2018 14:14:13 +0800
+Message-ID: <20180605061416.18690-4-liuwenliang__38621.5515005917$1528180523$gmane$org@huawei.com>
+References: <20180605061416.18690-1-liuwenliang@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B967049F87
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jun 2018 02:25:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 37C7A49F7F
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jun 2018 02:25:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id v6-XI-BI7dcu for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 Jun 2018 02:24:41 -0400 (EDT)
+ with ESMTP id 52zzxXsUJ74A for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 Jun 2018 02:24:43 -0400 (EDT)
 Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2DD6B49F7F
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jun 2018 02:24:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1E7D44A0E6
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jun 2018 02:24:43 -0400 (EDT)
+In-Reply-To: <20180605061416.18690-1-liuwenliang@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,173 +31,192 @@ To: aryabinin@virtuozzo.com, glider@google.com, dvyukov@google.com, corbet@lwn.n
 Cc: a.ryabinin@samsung.com, ryabinin.a.a@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Changelog:
-v5 - v4
-- Modify Andrey Ryabinin's email address.
+From: Andrey Ryabinin <aryabinin@virtuozzo.com>
 
-v4 - v3
-- Remove the fix of type conversion in kasan_cache_create because it has
-  been fix in the latest version in:
-  git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
-- Change some Reviewed-by tag into Reported-by tag to avoid misleading.
-  ---Reported by: Marc Zyngier <marc.zyngier@arm.com>
-                  Russell King - ARM Linux <linux@armlinux.org.uk>
-- Disable instrumentation for arch/arm/mm/physaddr.c
-
-v3 - v2
-- Remove this patch: 2 1-byte checks more safer for memory_is_poisoned_16
-  because a unaligned load/store of 16 bytes is rare on arm, and this
-  patch is very likely to affect the performance of modern CPUs.
-  ---Acked by: Russell King - ARM Linux <linux@armlinux.org.uk>
-- Fixed some link error which kasan_pmd_populate,kasan_pte_populate and
-  kasan_pud_populate are in section .meminit.text but the function
-  kasan_alloc_block which is called by kasan_pmd_populate,
-  kasan_pte_populate and kasan_pud_populate is in section .init.text. So
-  we need change kasan_pmd_populate,kasan_pte_populate and
-  kasan_pud_populate into the section .init.text.
-  ---Reported by: Florian Fainelli <f.fainelli@gmail.com>
-- Fixed some compile error which caused by the wrong access instruction in
-  arch/arm/kernel/entry-common.S.
-  ---Reported by: kbuild test robot <lkp@intel.com>
-- Disable instrumentation for arch/arm/kvm/hyp/*.
-  ---Acked by: Marc Zyngier <marc.zyngier@arm.com>
-- Update the set of supported architectures in
-  Documentation/dev-tools/kasan.rst.
-  ---Acked by:Dmitry Vyukov <dvyukov@google.com>
-- The version 2 is tested by:
-  Florian Fainelli <f.fainelli@gmail.com> (compile test)
-  kbuild test robot <lkp@intel.com>       (compile test)
-  Joel Stanley <joel@jms.id.au>           (on ASPEED ast2500(ARMv5))
-
-v2 - v1
-- Fixed some compiling error which happens on changing kernel compression
-  mode to lzma/xz/lzo/lz4.
-  ---Reported by: Florian Fainelli <f.fainelli@gmail.com>,
-             Russell King - ARM Linux <linux@armlinux.org.uk>
-- Fixed a compiling error cause by some older arm instruction set(armv4t)
-  don't suppory movw/movt which is reported by kbuild.
-- Changed the pte flag from _L_PTE_DEFAULT | L_PTE_DIRTY | L_PTE_XN to
-  pgprot_val(PAGE_KERNEL).
-  ---Reported by: Russell King - ARM Linux <linux@armlinux.org.uk>
-- Moved Enable KASan patch as the last one.
-  ---Reported by: Florian Fainelli <f.fainelli@gmail.com>,
-     Russell King - ARM Linux <linux@armlinux.org.uk>
-- Moved the definitions of cp15 registers from
-  arch/arm/include/asm/kvm_hyp.h to arch/arm/include/asm/cp15.h.
-  ---Asked by: Mark Rutland <mark.rutland@arm.com>
-- Merge the following commits into the commit
-  Define the virtual space of KASan's shadow region:
-  1) Define the virtual space of KASan's shadow region;
-  2) Avoid cleaning the KASan shadow area's mapping table;
-  3) Add KASan layout;
-- Merge the following commits into the commit
-  Initialize the mapping of KASan shadow memory:
-  1) Initialize the mapping of KASan shadow memory;
-  2) Add support arm LPAE;
-  3) Don't need to map the shadow of KASan's shadow memory;
-     ---Reported by: Russell King - ARM Linux <linux@armlinux.org.uk>
-  4) Change mapping of kasan_zero_page int readonly.
-- The version 1 is tested by Florian Fainelli <f.fainelli@gmail.com>
-  on a Cortex-A5 (no LPAE).
-
-Hi,all:
-   These patches add arch specific code for kernel address sanitizer
-(see Documentation/kasan.txt).
-
-   1/8 of kernel addresses reserved for shadow memory. There was no
-big enough hole for this, so virtual addresses for shadow were
-stolen from user space.
-
-   At early boot stage the whole shadow region populated with just
-one physical page (kasan_zero_page). Later, this page reused
-as readonly zero shadow for some memory that KASan currently
-don't track (vmalloc).
-
-  After mapping the physical memory, pages for shadow memory are
-allocated and mapped.
-
-  KASan's stack instrumentation significantly increases stack's
-consumption, so CONFIG_KASAN doubles THREAD_SIZE.
-
-  Functions like memset/memmove/memcpy do a lot of memory accesses.
+Functions like memset/memmove/memcpy do a lot of memory accesses.
 If bad pointer passed to one of these function it is important
 to catch this. Compiler's instrumentation cannot do this since
 these functions are written in assembly.
 
-  KASan replaces memory functions with manually instrumented variants.
+KASan replaces memory functions with manually instrumented variants.
 Original functions declared as weak symbols so strong definitions
 in mm/kasan/kasan.c could replace them. Original functions have aliases
 with '__' prefix in name, so we could call non-instrumented variant
 if needed.
 
-  Some files built without kasan instrumentation (e.g. mm/slub.c).
-Original mem* function replaced (via #define) with prefixed variants
-to disable memory access checks for such files.
+We must use __memcpy/__memset to replace memcpy/memset when we copy
+.data to RAM and when we clear .bss, because kasan_early_init can't
+be called before the initialization of .data and .bss.
 
-  On arm LPAE architecture,  the mapping table of KASan shadow memory(if
-PAGE_OFFSET is 0xc0000000, the KASan shadow memory's virtual space is
-0xb6e000000~0xbf000000) can't be filled in do_translation_fault function,
-because kasan instrumentation maybe cause do_translation_fault function
-accessing KASan shadow memory. The accessing of KASan shadow memory in
-do_translation_fault function maybe cause dead circle. So the mapping table
-of KASan shadow memory need be copyed in pgd_alloc function.
-
-
-Most of the code comes from:
-https://github.com/aryabinin/linux/commit/0b54f17e70ff50a902c4af05bb92716eb95acefe
-
-These patches are tested on vexpress-ca15, vexpress-ca9
-
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>
+Reported-by: Russell King - ARM Linux <linux@armlinux.org.uk>
+Acked-by: Florian Fainelli <f.fainelli@gmail.com>
 Tested-by: Florian Fainelli <f.fainelli@gmail.com>
 Tested-by: Joel Stanley <joel@jms.id.au>
 Tested-by: Abbott Liu <liuwenliang@huawei.com>
 Signed-off-by: Abbott Liu <liuwenliang@huawei.com>
+---
+ arch/arm/boot/compressed/decompress.c |  2 ++
+ arch/arm/boot/compressed/libfdt_env.h |  2 ++
+ arch/arm/include/asm/string.h         | 17 +++++++++++++++++
+ arch/arm/kernel/head-common.S         |  4 ++--
+ arch/arm/lib/memcpy.S                 |  3 +++
+ arch/arm/lib/memmove.S                |  5 ++++-
+ arch/arm/lib/memset.S                 |  3 +++
+ 7 files changed, 33 insertions(+), 3 deletions(-)
 
-Abbott Liu (2):
-  Add TTBR operator for kasan_init
-  Define the virtual space of KASan's shadow region
-
-Andrey Ryabinin (4):
-  Disable instrumentation for some code
-  Replace memory function for kasan
-  Initialize the mapping of KASan shadow memory
-  Enable KASan for arm
-
- Documentation/dev-tools/kasan.rst     |   2 +-
- arch/arm/Kconfig                      |   1 +
- arch/arm/boot/compressed/Makefile     |   1 +
- arch/arm/boot/compressed/decompress.c |   2 +
- arch/arm/boot/compressed/libfdt_env.h |   2 +
- arch/arm/include/asm/cp15.h           | 104 ++++++++++++
- arch/arm/include/asm/kasan.h          |  35 ++++
- arch/arm/include/asm/kasan_def.h      |  64 +++++++
- arch/arm/include/asm/kvm_hyp.h        |  52 ------
- arch/arm/include/asm/memory.h         |   5 +
- arch/arm/include/asm/pgalloc.h        |   7 +-
- arch/arm/include/asm/string.h         |  17 ++
- arch/arm/include/asm/thread_info.h    |   4 +
- arch/arm/kernel/entry-armv.S          |   5 +-
- arch/arm/kernel/entry-common.S        |   9 +-
- arch/arm/kernel/head-common.S         |   7 +-
- arch/arm/kernel/setup.c               |   2 +
- arch/arm/kernel/unwind.c              |   3 +-
- arch/arm/kvm/hyp/Makefile             |   4 +
- arch/arm/kvm/hyp/cp15-sr.c            |  12 +-
- arch/arm/kvm/hyp/switch.c             |   6 +-
- arch/arm/lib/memcpy.S                 |   3 +
- arch/arm/lib/memmove.S                |   5 +-
- arch/arm/lib/memset.S                 |   3 +
- arch/arm/mm/Makefile                  |   4 +
- arch/arm/mm/init.c                    |   6 +
- arch/arm/mm/kasan_init.c              | 302 ++++++++++++++++++++++++++++++++++
- arch/arm/mm/mmu.c                     |   7 +-
- arch/arm/mm/pgd.c                     |  14 ++
- arch/arm/vdso/Makefile                |   2 +
- 30 files changed, 616 insertions(+), 74 deletions(-)
- create mode 100644 arch/arm/include/asm/kasan.h
- create mode 100644 arch/arm/include/asm/kasan_def.h
- create mode 100644 arch/arm/mm/kasan_init.c
-
+diff --git a/arch/arm/boot/compressed/decompress.c b/arch/arm/boot/compressed/decompress.c
+index c16c182..c10c35b 100644
+--- a/arch/arm/boot/compressed/decompress.c
++++ b/arch/arm/boot/compressed/decompress.c
+@@ -46,8 +46,10 @@ extern int memcmp(const void *cs, const void *ct, size_t count);
+ #endif
+ 
+ #ifdef CONFIG_KERNEL_XZ
++#ifndef CONFIG_KASAN
+ #define memmove memmove
+ #define memcpy memcpy
++#endif
+ #include "../../../../lib/decompress_unxz.c"
+ #endif
+ 
+diff --git a/arch/arm/boot/compressed/libfdt_env.h b/arch/arm/boot/compressed/libfdt_env.h
+index 0743781..736ed36 100644
+--- a/arch/arm/boot/compressed/libfdt_env.h
++++ b/arch/arm/boot/compressed/libfdt_env.h
+@@ -17,4 +17,6 @@ typedef __be64 fdt64_t;
+ #define fdt64_to_cpu(x)		be64_to_cpu(x)
+ #define cpu_to_fdt64(x)		cpu_to_be64(x)
+ 
++#undef memset
++
+ #endif
+diff --git a/arch/arm/include/asm/string.h b/arch/arm/include/asm/string.h
+index 111a1d8..1f9016b 100644
+--- a/arch/arm/include/asm/string.h
++++ b/arch/arm/include/asm/string.h
+@@ -15,15 +15,18 @@ extern char * strchr(const char * s, int c);
+ 
+ #define __HAVE_ARCH_MEMCPY
+ extern void * memcpy(void *, const void *, __kernel_size_t);
++extern void *__memcpy(void *dest, const void *src, __kernel_size_t n);
+ 
+ #define __HAVE_ARCH_MEMMOVE
+ extern void * memmove(void *, const void *, __kernel_size_t);
++extern void *__memmove(void *dest, const void *src, __kernel_size_t n);
+ 
+ #define __HAVE_ARCH_MEMCHR
+ extern void * memchr(const void *, int, __kernel_size_t);
+ 
+ #define __HAVE_ARCH_MEMSET
+ extern void * memset(void *, int, __kernel_size_t);
++extern void *__memset(void *s, int c, __kernel_size_t n);
+ 
+ #define __HAVE_ARCH_MEMSET32
+ extern void *__memset32(uint32_t *, uint32_t v, __kernel_size_t);
+@@ -39,4 +42,18 @@ static inline void *memset64(uint64_t *p, uint64_t v, __kernel_size_t n)
+ 	return __memset64(p, v, n * 8, v >> 32);
+ }
+ 
++
++
++#if defined(CONFIG_KASAN) && !defined(__SANITIZE_ADDRESS__)
++
++/*
++ * For files that not instrumented (e.g. mm/slub.c) we
++ * should use not instrumented version of mem* functions.
++ */
++
++#define memcpy(dst, src, len) __memcpy(dst, src, len)
++#define memmove(dst, src, len) __memmove(dst, src, len)
++#define memset(s, c, n) __memset(s, c, n)
++#endif
++
+ #endif
+diff --git a/arch/arm/kernel/head-common.S b/arch/arm/kernel/head-common.S
+index 6e0375e..c79b829 100644
+--- a/arch/arm/kernel/head-common.S
++++ b/arch/arm/kernel/head-common.S
+@@ -99,7 +99,7 @@ __mmap_switched:
+  THUMB(	ldmia	r4!, {r0, r1, r2, r3} )
+  THUMB(	mov	sp, r3 )
+ 	sub	r2, r2, r1
+-	bl	memcpy				@ copy .data to RAM
++	bl	__memcpy			@ copy .data to RAM
+ #endif
+ 
+    ARM(	ldmia	r4!, {r0, r1, sp} )
+@@ -107,7 +107,7 @@ __mmap_switched:
+  THUMB(	mov	sp, r3 )
+ 	sub	r2, r1, r0
+ 	mov	r1, #0
+-	bl	memset				@ clear .bss
++	bl	__memset			@ clear .bss
+ 
+ 	ldmia	r4, {r0, r1, r2, r3}
+ 	str	r9, [r0]			@ Save processor ID
+diff --git a/arch/arm/lib/memcpy.S b/arch/arm/lib/memcpy.S
+index 64111bd..79a83f8 100644
+--- a/arch/arm/lib/memcpy.S
++++ b/arch/arm/lib/memcpy.S
+@@ -61,6 +61,8 @@
+ 
+ /* Prototype: void *memcpy(void *dest, const void *src, size_t n); */
+ 
++.weak memcpy
++ENTRY(__memcpy)
+ ENTRY(mmiocpy)
+ ENTRY(memcpy)
+ 
+@@ -68,3 +70,4 @@ ENTRY(memcpy)
+ 
+ ENDPROC(memcpy)
+ ENDPROC(mmiocpy)
++ENDPROC(__memcpy)
+diff --git a/arch/arm/lib/memmove.S b/arch/arm/lib/memmove.S
+index 69a9d47..313db6c 100644
+--- a/arch/arm/lib/memmove.S
++++ b/arch/arm/lib/memmove.S
+@@ -27,12 +27,14 @@
+  * occurring in the opposite direction.
+  */
+ 
++.weak memmove
++ENTRY(__memmove)
+ ENTRY(memmove)
+ 	UNWIND(	.fnstart			)
+ 
+ 		subs	ip, r0, r1
+ 		cmphi	r2, ip
+-		bls	memcpy
++		bls	__memcpy
+ 
+ 		stmfd	sp!, {r0, r4, lr}
+ 	UNWIND(	.fnend				)
+@@ -225,3 +227,4 @@ ENTRY(memmove)
+ 18:		backward_copy_shift	push=24	pull=8
+ 
+ ENDPROC(memmove)
++ENDPROC(__memmove)
+diff --git a/arch/arm/lib/memset.S b/arch/arm/lib/memset.S
+index ed6d35d..64aa06a 100644
+--- a/arch/arm/lib/memset.S
++++ b/arch/arm/lib/memset.S
+@@ -16,6 +16,8 @@
+ 	.text
+ 	.align	5
+ 
++.weak memset
++ENTRY(__memset)
+ ENTRY(mmioset)
+ ENTRY(memset)
+ UNWIND( .fnstart         )
+@@ -135,6 +137,7 @@ UNWIND( .fnstart            )
+ UNWIND( .fnend   )
+ ENDPROC(memset)
+ ENDPROC(mmioset)
++ENDPROC(__memset)
+ 
+ ENTRY(__memset32)
+ UNWIND( .fnstart         )
 -- 
 2.9.0
