@@ -1,77 +1,75 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH] KVM: arm64: VHE: Migrate _elx sysreg accessors to
- msr_s/mrs_s
-Date: Mon, 4 Jun 2018 11:07:01 +0100
-Message-ID: <20180604100659.GG22983@e103592.cambridge.arm.com>
-References: <1527603647-24787-1-git-send-email-Dave.Martin@arm.com>
- <20180601094224.ctyvafybcnzys6f4@salmiak>
+From: Abbott Liu <liuwenliang@huawei.com>
+Subject: [PATCH v5 6/6] Enable KASan for arm
+Date: Tue, 5 Jun 2018 14:14:16 +0800
+Message-ID: <20180605061416.18690-7-liuwenliang__21675.4301953644$1528180479$gmane$org@huawei.com>
+References: <20180605061416.18690-1-liuwenliang@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <20180601094224.ctyvafybcnzys6f4@salmiak>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 818DB4A0F5
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jun 2018 02:25:04 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id jDCuaB0L770c for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 Jun 2018 02:24:41 -0400 (EDT)
+Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 48E9649F87
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jun 2018 02:24:41 -0400 (EDT)
+In-Reply-To: <20180605061416.18690-1-liuwenliang@huawei.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: aryabinin@virtuozzo.com, glider@google.com, dvyukov@google.com, corbet@lwn.net, linux@armlinux.org.uk, christoffer.dall@arm.com, marc.zyngier@arm.com, arnd@arndb.de, nicolas.pitre@linaro.org, vladimir.murzin@arm.com, keescook@chromium.org, jinb.park7@gmail.com, alexandre.belloni@bootlin.com, ard.biesheuvel@linaro.org, daniel.lezcano@linaro.org, pombredanne@nexb.com, kstewart@linuxfoundation.org, liuwenliang@huawei.com, rob@landley.net, gregkh@linuxfoundation.org, f.fainelli@gmail.com, mawilcox@microsoft.com, akpm@linux-foundation.org, mark.rutland@arm.com, catalin.marinas@arm.com, yamada.masahiro@socionext.com, alexander.levin@verizon.com, tglx@linutronix.de, thgarnie@google.com, dhowells@redhat.com, geert@linux-m68k.org, andre.przywara@arm.com, julien.thierry@arm.com, drjones@redhat.com, philip@cog.sys
+Cc: a.ryabinin@samsung.com, ryabinin.a.a@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jun 01, 2018 at 10:42:24AM +0100, Mark Rutland wrote:
-> Hi,
-> 
-> On Tue, May 29, 2018 at 03:20:47PM +0100, Dave Martin wrote:
-> > Currently, the {read,write}_sysreg_el*() accessors for accessing
-> > particular ELs' sysregs in the presence of VHE rely on some local
-> > hacks and define their system register encodings in a way that is
-> > inconsistent with the core definitions in <asm/sysreg.h>.
-> > 
-> > As a result, it is necessary to add duplicate definitions for any
-> > system register that already needs a definition in sysreg.h for
-> > other reasons.
-> > 
-> > This is a bit of a maintenance headache, and the reasons for the
-> > _el*() accessors working the way they do is a bit historical.
-> > 
-> > This patch gets rid of the shadow sysreg definitions in
-> > <asm/kvm_hyp.h>, converts the _el*() accessors to use the core
-> > msr_s/mrs_s interface, and converts all call sites to use the
-> > standard sysreg #define names (i.e., upper case, with SYS_ prefix).
-> 
-> Nice!
-> 
-> [...]
-> 
-> >  static inline unsigned long vcpu_read_elr_el1(const struct kvm_vcpu *vcpu)
-> >  {
-> >  	if (vcpu->arch.sysregs_loaded_on_cpu)
-> > -		return read_sysreg_el1(elr);
-> > +		return read_sysreg_el1(SYS_ELR);
-> 
-> Could we have the macro implicitly handle the SYS_ prefix?
-> 
-> A further bit of cleanup that I'd like to do is make {read,write}_sysreg() use
-> {mrs,msr}_s, implicitly handling the SYS_ prefix, so that we can kill off
-> {read,write}_sysreg_s(), and always use a {read,write}_sysreg().
-> 
-> A minor pain point is that we'd have to convert callers to pass the sysreg name
-> in upper-case, but that conversion can be scripted fairly easily.
-> 
-> e.g. for the above, read_sysreg() would take ELR_EL1, and read_sysreg_el1()
-> would take ELR.
+From: Andrey Ryabinin <ryabinin@virtuozzo.com>
 
-Ideally yes.
+This patch enable kernel address sanitizer for arm.
 
-I will bear that in mind for the next iteration, but I hadn't figured
-out how to solve the whole problem yet.  I'll see if I can push a bit
-further in that direction.
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>
+Acked-by: Dmitry Vyukov <dvyukov@google.com>
+Tested-by: Joel Stanley <joel@jms.id.au>
+Tested-by: Florian Fainelli <f.fainelli@gmail.com>
+Tested-by: Abbott Liu <liuwenliang@huawei.com>
+Signed-off-by: Abbott Liu <liuwenliang@huawei.com>
+---
+ Documentation/dev-tools/kasan.rst | 2 +-
+ arch/arm/Kconfig                  | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-Cheers
----Dave
+diff --git a/Documentation/dev-tools/kasan.rst b/Documentation/dev-tools/kasan.rst
+index f7a18f2..d92120d 100644
+--- a/Documentation/dev-tools/kasan.rst
++++ b/Documentation/dev-tools/kasan.rst
+@@ -12,7 +12,7 @@ KASAN uses compile-time instrumentation for checking every memory access,
+ therefore you will need a GCC version 4.9.2 or later. GCC 5.0 or later is
+ required for detection of out-of-bounds accesses to stack or global variables.
+ 
+-Currently KASAN is supported only for the x86_64 and arm64 architectures.
++Currently KASAN is supported only for the x86_64, arm64 and arm architectures.
+ 
+ Usage
+ -----
+diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
+index a7f8e7f..a43a746 100644
+--- a/arch/arm/Kconfig
++++ b/arch/arm/Kconfig
+@@ -50,6 +50,7 @@ config ARM
+ 	select HAVE_ARCH_BITREVERSE if (CPU_32v7M || CPU_32v7) && !CPU_32v6
+ 	select HAVE_ARCH_JUMP_LABEL if !XIP_KERNEL && !CPU_ENDIAN_BE32 && MMU
+ 	select HAVE_ARCH_KGDB if !CPU_ENDIAN_BE32 && MMU
++	select HAVE_ARCH_KASAN if MMU
+ 	select HAVE_ARCH_MMAP_RND_BITS if MMU
+ 	select HAVE_ARCH_SECCOMP_FILTER if (AEABI && !OABI_COMPAT)
+ 	select HAVE_ARCH_THREAD_STRUCT_WHITELIST
+-- 
+2.9.0
