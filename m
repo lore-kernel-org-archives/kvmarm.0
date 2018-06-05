@@ -1,22 +1,22 @@
 From: Abbott Liu <liuwenliang@huawei.com>
-Subject: [PATCH v5 2/6] Disable instrumentation for some code
-Date: Tue, 5 Jun 2018 14:14:12 +0800
-Message-ID: <20180605061416.18690-3-liuwenliang__5764.84728740088$1528180551$gmane$org@huawei.com>
+Subject: [PATCH v5 1/6] Add TTBR operator for kasan_init
+Date: Tue, 5 Jun 2018 14:14:11 +0800
+Message-ID: <20180605061416.18690-2-liuwenliang__48749.0194653676$1528180576$gmane$org@huawei.com>
 References: <20180605061416.18690-1-liuwenliang@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C02764A0C8
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jun 2018 02:25:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F8D049F87
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jun 2018 02:25:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SQDRZdWrZAwl for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 Jun 2018 02:24:43 -0400 (EDT)
+ with ESMTP id cWb0jj-AYzYb for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 Jun 2018 02:25:04 -0400 (EDT)
 Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 521E04A0E8
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jun 2018 02:24:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 30E754A0F4
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jun 2018 02:24:44 -0400 (EDT)
 In-Reply-To: <20180605061416.18690-1-liuwenliang@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,100 +31,275 @@ To: aryabinin@virtuozzo.com, glider@google.com, dvyukov@google.com, corbet@lwn.n
 Cc: a.ryabinin@samsung.com, ryabinin.a.a@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Andrey Ryabinin <aryabinin@virtuozzo.com>
+The purpose of this patch is to provide set_ttbr0/get_ttbr0
+to kasan_init function. The definitions of cp15 registers
+should be in arch/arm/include/asm/cp15.h rather than
+arch/arm/include/asm/kvm_hyp.h, so move them.
 
-Disable instrumentation for arch/arm/boot/compressed/*
-and arch/arm/vdso/* because those code won't linkd with
-kernel image.
-
-Disable instrumentation for arch/arm/kvm/hyp/*. See commit a6cdf1c08cbf
-("kvm: arm64: Disable compiler instrumentation for hypervisor code")
-for more details.
-
-Disable instrumentation for arch/arm/mm/physaddr.c. See
-commit ec6d06efb0ba ("arm64: Add support for CONFIG_DEBUG_VIRTUAL")
-for more details.
-
-Disable kasan check in the function unwind_pop_register
-because it doesn't matter that kasan checks failed when
-unwind_pop_register read stack memory of task.
-
-Reported-by: Florian Fainelli <f.fainelli@gmail.com>
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>
 Reported-by: Marc Zyngier <marc.zyngier@arm.com>
-Tested-by: Joel Stanley <joel@jms.id.au>
+Acked-by: Mark Rutland <mark.rutland@arm.com>
 Tested-by: Florian Fainelli <f.fainelli@gmail.com>
+Tested-by: Joel Stanley <joel@jms.id.au>
 Tested-by: Abbott Liu <liuwenliang@huawei.com>
 Signed-off-by: Abbott Liu <liuwenliang@huawei.com>
 ---
- arch/arm/boot/compressed/Makefile | 1 +
- arch/arm/kernel/unwind.c          | 3 ++-
- arch/arm/kvm/hyp/Makefile         | 4 ++++
- arch/arm/mm/Makefile              | 1 +
- arch/arm/vdso/Makefile            | 2 ++
- 5 files changed, 10 insertions(+), 1 deletion(-)
+ arch/arm/include/asm/cp15.h    | 104 +++++++++++++++++++++++++++++++++++++++++
+ arch/arm/include/asm/kvm_hyp.h |  52 ---------------------
+ arch/arm/kvm/hyp/cp15-sr.c     |  12 ++---
+ arch/arm/kvm/hyp/switch.c      |   6 +--
+ 4 files changed, 113 insertions(+), 61 deletions(-)
 
-diff --git a/arch/arm/boot/compressed/Makefile b/arch/arm/boot/compressed/Makefile
-index 6a4e734..b29e0a3 100644
---- a/arch/arm/boot/compressed/Makefile
-+++ b/arch/arm/boot/compressed/Makefile
-@@ -24,6 +24,7 @@ OBJS		+= hyp-stub.o
- endif
+diff --git a/arch/arm/include/asm/cp15.h b/arch/arm/include/asm/cp15.h
+index 4c9fa72..99ebb31 100644
+--- a/arch/arm/include/asm/cp15.h
++++ b/arch/arm/include/asm/cp15.h
+@@ -3,6 +3,7 @@
+ #define __ASM_ARM_CP15_H
  
- GCOV_PROFILE		:= n
-+KASAN_SANITIZE		:= n
+ #include <asm/barrier.h>
++#include <linux/stringify.h>
  
- #
- # Architecture dependencies
-diff --git a/arch/arm/kernel/unwind.c b/arch/arm/kernel/unwind.c
-index 0bee233..2e55c7d 100644
---- a/arch/arm/kernel/unwind.c
-+++ b/arch/arm/kernel/unwind.c
-@@ -249,7 +249,8 @@ static int unwind_pop_register(struct unwind_ctrl_block *ctrl,
- 		if (*vsp >= (unsigned long *)ctrl->sp_high)
- 			return -URC_FAILURE;
+ /*
+  * CR1 bits (CP#15 CR1)
+@@ -65,8 +66,111 @@
+ #define __write_sysreg(v, r, w, c, t)	asm volatile(w " " c : : "r" ((t)(v)))
+ #define write_sysreg(v, ...)		__write_sysreg(v, __VA_ARGS__)
  
--	ctrl->vrs[reg] = *(*vsp)++;
-+	ctrl->vrs[reg] = READ_ONCE_NOCHECK(*(*vsp));
-+	(*vsp)++;
- 	return URC_OK;
- }
- 
-diff --git a/arch/arm/kvm/hyp/Makefile b/arch/arm/kvm/hyp/Makefile
-index 7fc0638..1bd89ed 100644
---- a/arch/arm/kvm/hyp/Makefile
-+++ b/arch/arm/kvm/hyp/Makefile
-@@ -23,3 +23,7 @@ obj-$(CONFIG_KVM_ARM_HOST) += hyp-entry.o
- obj-$(CONFIG_KVM_ARM_HOST) += switch.o
- CFLAGS_switch.o		   += $(CFLAGS_ARMV7VE)
- obj-$(CONFIG_KVM_ARM_HOST) += s2-setup.o
++#define TTBR0_32	__ACCESS_CP15(c2, 0, c0, 0)
++#define TTBR1_32	__ACCESS_CP15(c2, 0, c0, 1)
++#define PAR_32		__ACCESS_CP15(c7, 0, c4, 0)
++#define TTBR0_64	__ACCESS_CP15_64(0, c2)
++#define TTBR1_64	__ACCESS_CP15_64(1, c2)
++#define PAR_64		__ACCESS_CP15_64(0, c7)
++#define VTTBR		__ACCESS_CP15_64(6, c2)
++#define CNTV_CVAL	__ACCESS_CP15_64(3, c14)
++#define CNTVOFF		__ACCESS_CP15_64(4, c14)
 +
-+GCOV_PROFILE	:= n
-+KASAN_SANITIZE	:= n
-+UBSAN_SANITIZE	:= n
-diff --git a/arch/arm/mm/Makefile b/arch/arm/mm/Makefile
-index 9dbb849..c056e17 100644
---- a/arch/arm/mm/Makefile
-+++ b/arch/arm/mm/Makefile
-@@ -16,6 +16,7 @@ endif
- obj-$(CONFIG_ARM_PTDUMP_CORE)	+= dump.o
- obj-$(CONFIG_ARM_PTDUMP_DEBUGFS)	+= ptdump_debugfs.o
- obj-$(CONFIG_MODULES)		+= proc-syms.o
-+KASAN_SANITIZE_physaddr.o	:= n
- obj-$(CONFIG_DEBUG_VIRTUAL)	+= physaddr.o
- 
- obj-$(CONFIG_ALIGNMENT_TRAP)	+= alignment.o
-diff --git a/arch/arm/vdso/Makefile b/arch/arm/vdso/Makefile
-index bb411821..87abbb7 100644
---- a/arch/arm/vdso/Makefile
-+++ b/arch/arm/vdso/Makefile
-@@ -30,6 +30,8 @@ CFLAGS_vgettimeofday.o = -O2
- # Disable gcov profiling for VDSO code
- GCOV_PROFILE := n
- 
-+KASAN_SANITIZE := n
++#define MIDR		__ACCESS_CP15(c0, 0, c0, 0)
++#define CSSELR		__ACCESS_CP15(c0, 2, c0, 0)
++#define VPIDR		__ACCESS_CP15(c0, 4, c0, 0)
++#define VMPIDR		__ACCESS_CP15(c0, 4, c0, 5)
++#define SCTLR		__ACCESS_CP15(c1, 0, c0, 0)
++#define CPACR		__ACCESS_CP15(c1, 0, c0, 2)
++#define HCR		__ACCESS_CP15(c1, 4, c1, 0)
++#define HDCR		__ACCESS_CP15(c1, 4, c1, 1)
++#define HCPTR		__ACCESS_CP15(c1, 4, c1, 2)
++#define HSTR		__ACCESS_CP15(c1, 4, c1, 3)
++#define TTBCR		__ACCESS_CP15(c2, 0, c0, 2)
++#define HTCR		__ACCESS_CP15(c2, 4, c0, 2)
++#define VTCR		__ACCESS_CP15(c2, 4, c1, 2)
++#define DACR		__ACCESS_CP15(c3, 0, c0, 0)
++#define DFSR		__ACCESS_CP15(c5, 0, c0, 0)
++#define IFSR		__ACCESS_CP15(c5, 0, c0, 1)
++#define ADFSR		__ACCESS_CP15(c5, 0, c1, 0)
++#define AIFSR		__ACCESS_CP15(c5, 0, c1, 1)
++#define HSR		__ACCESS_CP15(c5, 4, c2, 0)
++#define DFAR		__ACCESS_CP15(c6, 0, c0, 0)
++#define IFAR		__ACCESS_CP15(c6, 0, c0, 2)
++#define HDFAR		__ACCESS_CP15(c6, 4, c0, 0)
++#define HIFAR		__ACCESS_CP15(c6, 4, c0, 2)
++#define HPFAR		__ACCESS_CP15(c6, 4, c0, 4)
++#define ICIALLUIS	__ACCESS_CP15(c7, 0, c1, 0)
++#define BPIALLIS	__ACCESS_CP15(c7, 0, c1, 6)
++#define ICIMVAU		__ACCESS_CP15(c7, 0, c5, 1)
++#define ATS1CPR		__ACCESS_CP15(c7, 0, c8, 0)
++#define TLBIALLIS	__ACCESS_CP15(c8, 0, c3, 0)
++#define TLBIALL		__ACCESS_CP15(c8, 0, c7, 0)
++#define TLBIALLNSNHIS	__ACCESS_CP15(c8, 4, c3, 4)
++#define PRRR		__ACCESS_CP15(c10, 0, c2, 0)
++#define NMRR		__ACCESS_CP15(c10, 0, c2, 1)
++#define AMAIR0		__ACCESS_CP15(c10, 0, c3, 0)
++#define AMAIR1		__ACCESS_CP15(c10, 0, c3, 1)
++#define VBAR		__ACCESS_CP15(c12, 0, c0, 0)
++#define CID		__ACCESS_CP15(c13, 0, c0, 1)
++#define TID_URW		__ACCESS_CP15(c13, 0, c0, 2)
++#define TID_URO		__ACCESS_CP15(c13, 0, c0, 3)
++#define TID_PRIV	__ACCESS_CP15(c13, 0, c0, 4)
++#define HTPIDR		__ACCESS_CP15(c13, 4, c0, 2)
++#define CNTKCTL		__ACCESS_CP15(c14, 0, c1, 0)
++#define CNTV_CTL	__ACCESS_CP15(c14, 0, c3, 1)
++#define CNTHCTL		__ACCESS_CP15(c14, 4, c1, 0)
 +
- # Force dependency
- $(obj)/vdso.o : $(obj)/vdso.so
+ extern unsigned long cr_alignment;	/* defined in entry-armv.S */
  
++static inline void set_par(u64 val)
++{
++	if (IS_ENABLED(CONFIG_ARM_LPAE))
++		write_sysreg(val, PAR_64);
++	else
++		write_sysreg(val, PAR_32);
++}
++
++static inline u64 get_par(void)
++{
++	if (IS_ENABLED(CONFIG_ARM_LPAE))
++		return read_sysreg(PAR_64);
++	else
++		return read_sysreg(PAR_32);
++}
++
++static inline void set_ttbr0(u64 val)
++{
++	if (IS_ENABLED(CONFIG_ARM_LPAE))
++		write_sysreg(val, TTBR0_64);
++	else
++		write_sysreg(val, TTBR0_32);
++}
++
++static inline u64 get_ttbr0(void)
++{
++	if (IS_ENABLED(CONFIG_ARM_LPAE))
++		return read_sysreg(TTBR0_64);
++	else
++		return read_sysreg(TTBR0_32);
++}
++
++static inline void set_ttbr1(u64 val)
++{
++	if (IS_ENABLED(CONFIG_ARM_LPAE))
++		write_sysreg(val, TTBR1_64);
++	else
++		write_sysreg(val, TTBR1_32);
++}
++
++static inline u64 get_ttbr1(void)
++{
++	if (IS_ENABLED(CONFIG_ARM_LPAE))
++		return read_sysreg(TTBR1_64);
++	else
++		return read_sysreg(TTBR1_32);
++}
++
+ static inline unsigned long get_cr(void)
+ {
+ 	unsigned long val;
+diff --git a/arch/arm/include/asm/kvm_hyp.h b/arch/arm/include/asm/kvm_hyp.h
+index e93a0ca..6e7541a 100644
+--- a/arch/arm/include/asm/kvm_hyp.h
++++ b/arch/arm/include/asm/kvm_hyp.h
+@@ -36,58 +36,6 @@
+ 	__val;							\
+ })
+ 
+-#define TTBR0		__ACCESS_CP15_64(0, c2)
+-#define TTBR1		__ACCESS_CP15_64(1, c2)
+-#define VTTBR		__ACCESS_CP15_64(6, c2)
+-#define PAR		__ACCESS_CP15_64(0, c7)
+-#define CNTV_CVAL	__ACCESS_CP15_64(3, c14)
+-#define CNTVOFF		__ACCESS_CP15_64(4, c14)
+-
+-#define MIDR		__ACCESS_CP15(c0, 0, c0, 0)
+-#define CSSELR		__ACCESS_CP15(c0, 2, c0, 0)
+-#define VPIDR		__ACCESS_CP15(c0, 4, c0, 0)
+-#define VMPIDR		__ACCESS_CP15(c0, 4, c0, 5)
+-#define SCTLR		__ACCESS_CP15(c1, 0, c0, 0)
+-#define CPACR		__ACCESS_CP15(c1, 0, c0, 2)
+-#define HCR		__ACCESS_CP15(c1, 4, c1, 0)
+-#define HDCR		__ACCESS_CP15(c1, 4, c1, 1)
+-#define HCPTR		__ACCESS_CP15(c1, 4, c1, 2)
+-#define HSTR		__ACCESS_CP15(c1, 4, c1, 3)
+-#define TTBCR		__ACCESS_CP15(c2, 0, c0, 2)
+-#define HTCR		__ACCESS_CP15(c2, 4, c0, 2)
+-#define VTCR		__ACCESS_CP15(c2, 4, c1, 2)
+-#define DACR		__ACCESS_CP15(c3, 0, c0, 0)
+-#define DFSR		__ACCESS_CP15(c5, 0, c0, 0)
+-#define IFSR		__ACCESS_CP15(c5, 0, c0, 1)
+-#define ADFSR		__ACCESS_CP15(c5, 0, c1, 0)
+-#define AIFSR		__ACCESS_CP15(c5, 0, c1, 1)
+-#define HSR		__ACCESS_CP15(c5, 4, c2, 0)
+-#define DFAR		__ACCESS_CP15(c6, 0, c0, 0)
+-#define IFAR		__ACCESS_CP15(c6, 0, c0, 2)
+-#define HDFAR		__ACCESS_CP15(c6, 4, c0, 0)
+-#define HIFAR		__ACCESS_CP15(c6, 4, c0, 2)
+-#define HPFAR		__ACCESS_CP15(c6, 4, c0, 4)
+-#define ICIALLUIS	__ACCESS_CP15(c7, 0, c1, 0)
+-#define BPIALLIS	__ACCESS_CP15(c7, 0, c1, 6)
+-#define ICIMVAU		__ACCESS_CP15(c7, 0, c5, 1)
+-#define ATS1CPR		__ACCESS_CP15(c7, 0, c8, 0)
+-#define TLBIALLIS	__ACCESS_CP15(c8, 0, c3, 0)
+-#define TLBIALL		__ACCESS_CP15(c8, 0, c7, 0)
+-#define TLBIALLNSNHIS	__ACCESS_CP15(c8, 4, c3, 4)
+-#define PRRR		__ACCESS_CP15(c10, 0, c2, 0)
+-#define NMRR		__ACCESS_CP15(c10, 0, c2, 1)
+-#define AMAIR0		__ACCESS_CP15(c10, 0, c3, 0)
+-#define AMAIR1		__ACCESS_CP15(c10, 0, c3, 1)
+-#define VBAR		__ACCESS_CP15(c12, 0, c0, 0)
+-#define CID		__ACCESS_CP15(c13, 0, c0, 1)
+-#define TID_URW		__ACCESS_CP15(c13, 0, c0, 2)
+-#define TID_URO		__ACCESS_CP15(c13, 0, c0, 3)
+-#define TID_PRIV	__ACCESS_CP15(c13, 0, c0, 4)
+-#define HTPIDR		__ACCESS_CP15(c13, 4, c0, 2)
+-#define CNTKCTL		__ACCESS_CP15(c14, 0, c1, 0)
+-#define CNTV_CTL	__ACCESS_CP15(c14, 0, c3, 1)
+-#define CNTHCTL		__ACCESS_CP15(c14, 4, c1, 0)
+-
+ #define VFP_FPEXC	__ACCESS_VFP(FPEXC)
+ 
+ /* AArch64 compatibility macros, only for the timer so far */
+diff --git a/arch/arm/kvm/hyp/cp15-sr.c b/arch/arm/kvm/hyp/cp15-sr.c
+index c478281..d365e3c 100644
+--- a/arch/arm/kvm/hyp/cp15-sr.c
++++ b/arch/arm/kvm/hyp/cp15-sr.c
+@@ -31,8 +31,8 @@ void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
+ 	ctxt->cp15[c0_CSSELR]		= read_sysreg(CSSELR);
+ 	ctxt->cp15[c1_SCTLR]		= read_sysreg(SCTLR);
+ 	ctxt->cp15[c1_CPACR]		= read_sysreg(CPACR);
+-	*cp15_64(ctxt, c2_TTBR0)	= read_sysreg(TTBR0);
+-	*cp15_64(ctxt, c2_TTBR1)	= read_sysreg(TTBR1);
++	*cp15_64(ctxt, c2_TTBR0)	= read_sysreg(TTBR0_64);
++	*cp15_64(ctxt, c2_TTBR1)	= read_sysreg(TTBR1_64);
+ 	ctxt->cp15[c2_TTBCR]		= read_sysreg(TTBCR);
+ 	ctxt->cp15[c3_DACR]		= read_sysreg(DACR);
+ 	ctxt->cp15[c5_DFSR]		= read_sysreg(DFSR);
+@@ -41,7 +41,7 @@ void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
+ 	ctxt->cp15[c5_AIFSR]		= read_sysreg(AIFSR);
+ 	ctxt->cp15[c6_DFAR]		= read_sysreg(DFAR);
+ 	ctxt->cp15[c6_IFAR]		= read_sysreg(IFAR);
+-	*cp15_64(ctxt, c7_PAR)		= read_sysreg(PAR);
++	*cp15_64(ctxt, c7_PAR)		= read_sysreg(PAR_64);
+ 	ctxt->cp15[c10_PRRR]		= read_sysreg(PRRR);
+ 	ctxt->cp15[c10_NMRR]		= read_sysreg(NMRR);
+ 	ctxt->cp15[c10_AMAIR0]		= read_sysreg(AMAIR0);
+@@ -60,8 +60,8 @@ void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
+ 	write_sysreg(ctxt->cp15[c0_CSSELR],	CSSELR);
+ 	write_sysreg(ctxt->cp15[c1_SCTLR],	SCTLR);
+ 	write_sysreg(ctxt->cp15[c1_CPACR],	CPACR);
+-	write_sysreg(*cp15_64(ctxt, c2_TTBR0),	TTBR0);
+-	write_sysreg(*cp15_64(ctxt, c2_TTBR1),	TTBR1);
++	write_sysreg(*cp15_64(ctxt, c2_TTBR0),	TTBR0_64);
++	write_sysreg(*cp15_64(ctxt, c2_TTBR1),	TTBR1_64);
+ 	write_sysreg(ctxt->cp15[c2_TTBCR],	TTBCR);
+ 	write_sysreg(ctxt->cp15[c3_DACR],	DACR);
+ 	write_sysreg(ctxt->cp15[c5_DFSR],	DFSR);
+@@ -70,7 +70,7 @@ void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
+ 	write_sysreg(ctxt->cp15[c5_AIFSR],	AIFSR);
+ 	write_sysreg(ctxt->cp15[c6_DFAR],	DFAR);
+ 	write_sysreg(ctxt->cp15[c6_IFAR],	IFAR);
+-	write_sysreg(*cp15_64(ctxt, c7_PAR),	PAR);
++	write_sysreg(*cp15_64(ctxt, c7_PAR),	PAR_64);
+ 	write_sysreg(ctxt->cp15[c10_PRRR],	PRRR);
+ 	write_sysreg(ctxt->cp15[c10_NMRR],	NMRR);
+ 	write_sysreg(ctxt->cp15[c10_AMAIR0],	AMAIR0);
+diff --git a/arch/arm/kvm/hyp/switch.c b/arch/arm/kvm/hyp/switch.c
+index acf1c37..4cf8732 100644
+--- a/arch/arm/kvm/hyp/switch.c
++++ b/arch/arm/kvm/hyp/switch.c
+@@ -134,12 +134,12 @@ static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
+ 	if (!(hsr & HSR_DABT_S1PTW) && (hsr & HSR_FSC_TYPE) == FSC_PERM) {
+ 		u64 par, tmp;
+ 
+-		par = read_sysreg(PAR);
++		par = read_sysreg(PAR_64);
+ 		write_sysreg(far, ATS1CPR);
+ 		isb();
+ 
+-		tmp = read_sysreg(PAR);
+-		write_sysreg(par, PAR);
++		tmp = read_sysreg(PAR_64);
++		write_sysreg(par, PAR_64);
+ 
+ 		if (unlikely(tmp & 1))
+ 			return false; /* Translation failed, back to guest */
 -- 
 2.9.0
