@@ -1,14 +1,14 @@
-From: Christoffer Dall <christoffer.dall@arm.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Subject: Re: [PATCH] KVM: arm/arm64: drop resource size check for GICV window
-Date: Sat, 9 Jun 2018 12:06:57 +0200
-Message-ID: <20180609100657.GI5097@C02W217FHV2R.local>
+Date: Sat, 9 Jun 2018 12:30:14 +0200
+Message-ID: <1559C9EA-DE8B-4F96-8406-CCBEB0DFD093@linaro.org>
 References: <20180601150628.10111-1-ard.biesheuvel@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+ <20180609100657.GI5097@C02W217FHV2R.local>
+Mime-Version: 1.0 (1.0)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <20180601150628.10111-1-ard.biesheuvel@linaro.org>
+In-Reply-To: <20180609100657.GI5097@C02W217FHV2R.local>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -18,68 +18,58 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: Christoffer Dall <christoffer.dall@arm.com>
 Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jun 01, 2018 at 05:06:28PM +0200, Ard Biesheuvel wrote:
-> When booting a 64 KB pages kernel on a ACPI GICv3 system that
-> implements support for v2 emulation, the following warning is
-> produced
-> 
->   GICV size 0x2000 not a multiple of page size 0x10000
-> 
-> and support for v2 emulation is disabled, preventing GICv2 VMs
-> from being able to run on such hosts.
-> 
-> The reason is that vgic_v3_probe() performs a sanity check on the
-> size of the window (it should be a multiple of the page size),
-> while the ACPI MADT parsing code hardcodes the size of the window
-> to 8 KB. This makes sense, considering that ACPI does not bother
-> to describe the size in the first place, under the assumption that
-> platforms implementing ACPI will follow the architecture and not
-> put anything else in the same 64 KB window.
-
-Does the architecture actually say that anywhere?
-
-> 
-> So let's just drop the sanity check altogether, and assume that
-> the window is at least 64 KB in size.
-
-This could obviously be dangerous if broken systems actually exist.
-Marc may know more about that than me.  An alternative would be to
-modify the ACPI code to assume max(8 KB, page size) instead, and/or a
-command line parameter to override this check.
-
-That said, I'm not directly opposed to this patch, but I'll let Marc
-have a look as well.
-
-Thanks,
--Christoffer
-
-> 
-> Fixes: 909777324588 ("KVM: arm/arm64: vgic-new: vgic_init: implement kvm_vgic_hyp_init")
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> ---
->  virt/kvm/arm/vgic/vgic-v3.c | 5 -----
->  1 file changed, 5 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> index bdcf8e7a6161..72fc688c3e9d 100644
-> --- a/virt/kvm/arm/vgic/vgic-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> @@ -552,11 +552,6 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
->  		pr_warn("GICV physical address 0x%llx not page aligned\n",
->  			(unsigned long long)info->vcpu.start);
->  		kvm_vgic_global_state.vcpu_base = 0;
-> -	} else if (!PAGE_ALIGNED(resource_size(&info->vcpu))) {
-> -		pr_warn("GICV size 0x%llx not a multiple of page size 0x%lx\n",
-> -			(unsigned long long)resource_size(&info->vcpu),
-> -			PAGE_SIZE);
-> -		kvm_vgic_global_state.vcpu_base = 0;
->  	} else {
->  		kvm_vgic_global_state.vcpu_base = info->vcpu.start;
->  		kvm_vgic_global_state.can_emulate_gicv2 = true;
-> -- 
-> 2.17.0
-> 
+Cgo+IE9uIDkgSnVuIDIwMTgsIGF0IDEyOjA2LCBDaHJpc3RvZmZlciBEYWxsIDxjaHJpc3RvZmZl
+ci5kYWxsQGFybS5jb20+IHdyb3RlOgo+IAo+PiBPbiBGcmksIEp1biAwMSwgMjAxOCBhdCAwNTow
+NjoyOFBNICswMjAwLCBBcmQgQmllc2hldXZlbCB3cm90ZToKPj4gV2hlbiBib290aW5nIGEgNjQg
+S0IgcGFnZXMga2VybmVsIG9uIGEgQUNQSSBHSUN2MyBzeXN0ZW0gdGhhdAo+PiBpbXBsZW1lbnRz
+IHN1cHBvcnQgZm9yIHYyIGVtdWxhdGlvbiwgdGhlIGZvbGxvd2luZyB3YXJuaW5nIGlzCj4+IHBy
+b2R1Y2VkCj4+IAo+PiAgR0lDViBzaXplIDB4MjAwMCBub3QgYSBtdWx0aXBsZSBvZiBwYWdlIHNp
+emUgMHgxMDAwMAo+PiAKPj4gYW5kIHN1cHBvcnQgZm9yIHYyIGVtdWxhdGlvbiBpcyBkaXNhYmxl
+ZCwgcHJldmVudGluZyBHSUN2MiBWTXMKPj4gZnJvbSBiZWluZyBhYmxlIHRvIHJ1biBvbiBzdWNo
+IGhvc3RzLgo+PiAKPj4gVGhlIHJlYXNvbiBpcyB0aGF0IHZnaWNfdjNfcHJvYmUoKSBwZXJmb3Jt
+cyBhIHNhbml0eSBjaGVjayBvbiB0aGUKPj4gc2l6ZSBvZiB0aGUgd2luZG93IChpdCBzaG91bGQg
+YmUgYSBtdWx0aXBsZSBvZiB0aGUgcGFnZSBzaXplKSwKPj4gd2hpbGUgdGhlIEFDUEkgTUFEVCBw
+YXJzaW5nIGNvZGUgaGFyZGNvZGVzIHRoZSBzaXplIG9mIHRoZSB3aW5kb3cKPj4gdG8gOCBLQi4g
+VGhpcyBtYWtlcyBzZW5zZSwgY29uc2lkZXJpbmcgdGhhdCBBQ1BJIGRvZXMgbm90IGJvdGhlcgo+
+PiB0byBkZXNjcmliZSB0aGUgc2l6ZSBpbiB0aGUgZmlyc3QgcGxhY2UsIHVuZGVyIHRoZSBhc3N1
+bXB0aW9uIHRoYXQKPj4gcGxhdGZvcm1zIGltcGxlbWVudGluZyBBQ1BJIHdpbGwgZm9sbG93IHRo
+ZSBhcmNoaXRlY3R1cmUgYW5kIG5vdAo+PiBwdXQgYW55dGhpbmcgZWxzZSBpbiB0aGUgc2FtZSA2
+NCBLQiB3aW5kb3cuCj4gCj4gRG9lcyB0aGUgYXJjaGl0ZWN0dXJlIGFjdHVhbGx5IHNheSB0aGF0
+IGFueXdoZXJlPwo+IAo+PiAKPj4gU28gbGV0J3MganVzdCBkcm9wIHRoZSBzYW5pdHkgY2hlY2sg
+YWx0b2dldGhlciwgYW5kIGFzc3VtZSB0aGF0Cj4+IHRoZSB3aW5kb3cgaXMgYXQgbGVhc3QgNjQg
+S0IgaW4gc2l6ZS4KPiAKPiBUaGlzIGNvdWxkIG9idmlvdXNseSBiZSBkYW5nZXJvdXMgaWYgYnJv
+a2VuIHN5c3RlbXMgYWN0dWFsbHkgZXhpc3QuCj4gTWFyYyBtYXkga25vdyBtb3JlIGFib3V0IHRo
+YXQgdGhhbiBtZS4gIEFuIGFsdGVybmF0aXZlIHdvdWxkIGJlIHRvCj4gbW9kaWZ5IHRoZSBBQ1BJ
+IGNvZGUgdG8gYXNzdW1lIG1heCg4IEtCLCBwYWdlIHNpemUpIGluc3RlYWQsIGFuZC9vciBhCj4g
+Y29tbWFuZCBsaW5lIHBhcmFtZXRlciB0byBvdmVycmlkZSB0aGlzIGNoZWNrLgo+IAo+IFRoYXQg
+c2FpZCwgSSdtIG5vdCBkaXJlY3RseSBvcHBvc2VkIHRvIHRoaXMgcGF0Y2gsIGJ1dCBJJ2xsIGxl
+dCBNYXJjCj4gaGF2ZSBhIGxvb2sgYXMgd2VsbC4KPiAKClRoaXMgYXBwcm9hY2ggd2FzIGFjdHVh
+bGx5IE1hcmPigJlzIGlkZWEsIGFuZCBoZSBhbHJlYWR5IGFwcGxpZWQgdGhlIHBhdGNoIHRvIHRo
+ZSBxdWV1ZSBicmFuY2ggYWZhaWsuCgoKPiAKPj4gCj4+IEZpeGVzOiA5MDk3NzczMjQ1ODggKCJL
+Vk06IGFybS9hcm02NDogdmdpYy1uZXc6IHZnaWNfaW5pdDogaW1wbGVtZW50IGt2bV92Z2ljX2h5
+cF9pbml0IikKPj4gU2lnbmVkLW9mZi1ieTogQXJkIEJpZXNoZXV2ZWwgPGFyZC5iaWVzaGV1dmVs
+QGxpbmFyby5vcmc+Cj4+IC0tLQo+PiB2aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLXYzLmMgfCA1IC0t
+LS0tCj4+IDEgZmlsZSBjaGFuZ2VkLCA1IGRlbGV0aW9ucygtKQo+PiAKPj4gZGlmZiAtLWdpdCBh
+L3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMtdjMuYyBiL3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMtdjMu
+Ywo+PiBpbmRleCBiZGNmOGU3YTYxNjEuLjcyZmM2ODhjM2U5ZCAxMDA2NDQKPj4gLS0tIGEvdmly
+dC9rdm0vYXJtL3ZnaWMvdmdpYy12My5jCj4+ICsrKyBiL3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMt
+djMuYwo+PiBAQCAtNTUyLDExICs1NTIsNiBAQCBpbnQgdmdpY192M19wcm9iZShjb25zdCBzdHJ1
+Y3QgZ2ljX2t2bV9pbmZvICppbmZvKQo+PiAgICAgICAgcHJfd2FybigiR0lDViBwaHlzaWNhbCBh
+ZGRyZXNzIDB4JWxseCBub3QgcGFnZSBhbGlnbmVkXG4iLAo+PiAgICAgICAgICAgICh1bnNpZ25l
+ZCBsb25nIGxvbmcpaW5mby0+dmNwdS5zdGFydCk7Cj4+ICAgICAgICBrdm1fdmdpY19nbG9iYWxf
+c3RhdGUudmNwdV9iYXNlID0gMDsKPj4gLSAgICB9IGVsc2UgaWYgKCFQQUdFX0FMSUdORUQocmVz
+b3VyY2Vfc2l6ZSgmaW5mby0+dmNwdSkpKSB7Cj4+IC0gICAgICAgIHByX3dhcm4oIkdJQ1Ygc2l6
+ZSAweCVsbHggbm90IGEgbXVsdGlwbGUgb2YgcGFnZSBzaXplIDB4JWx4XG4iLAo+PiAtICAgICAg
+ICAgICAgKHVuc2lnbmVkIGxvbmcgbG9uZylyZXNvdXJjZV9zaXplKCZpbmZvLT52Y3B1KSwKPj4g
+LSAgICAgICAgICAgIFBBR0VfU0laRSk7Cj4+IC0gICAgICAgIGt2bV92Z2ljX2dsb2JhbF9zdGF0
+ZS52Y3B1X2Jhc2UgPSAwOwo+PiAgICB9IGVsc2Ugewo+PiAgICAgICAga3ZtX3ZnaWNfZ2xvYmFs
+X3N0YXRlLnZjcHVfYmFzZSA9IGluZm8tPnZjcHUuc3RhcnQ7Cj4+ICAgICAgICBrdm1fdmdpY19n
+bG9iYWxfc3RhdGUuY2FuX2VtdWxhdGVfZ2ljdjIgPSB0cnVlOwo+PiAtLSAKPj4gMi4xNy4wCj4+
+IAoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KbGludXgt
+YXJtLWtlcm5lbCBtYWlsaW5nIGxpc3QKbGludXgtYXJtLWtlcm5lbEBsaXN0cy5pbmZyYWRlYWQu
+b3JnCmh0dHA6Ly9saXN0cy5pbmZyYWRlYWQub3JnL21haWxtYW4vbGlzdGluZm8vbGludXgtYXJt
+LWtlcm5lbAo=
