@@ -1,15 +1,15 @@
 From: Jon Masters <jcm@jonmasters.org>
-Subject: Re: [PATCH v2 07/17] arm64: ssbd: Skip apply_ssbd if not using
- dynamic mitigation
-Date: Sat, 9 Jun 2018 09:03:51 -0400
-Message-ID: <9bd005f5-60e3-510d-24f6-235e98487ced@jonmasters.org>
+Subject: Re: [PATCH v2 12/17] arm64: KVM: Add ARCH_WORKAROUND_2 support for
+ guests
+Date: Sat, 9 Jun 2018 09:09:35 -0400
+Message-ID: <98318e6c-adcd-ddb8-ad92-e7c1fa771c84@jonmasters.org>
 References: <20180529121121.24927-1-marc.zyngier@arm.com>
- <20180529121121.24927-8-marc.zyngier@arm.com>
+ <20180529121121.24927-13-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180529121121.24927-8-marc.zyngier@arm.com>
+In-Reply-To: <20180529121121.24927-13-marc.zyngier@arm.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
@@ -17,11 +17,14 @@ Cc: Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On 05/29/2018 08:11 AM, Marc Zyngier wrote:
+> In order to offer ARCH_WORKAROUND_2 support to guests, we need
+> a bit of infrastructure.
+> 
+> Let's add a flag indicating whether or not the guest uses
+> SSBD mitigation. Depending on the state of this flag, allow
+> KVM to disable ARCH_WORKAROUND_2 before entering the guest,
+> and enable it when exiting it.
 
-> +void __init arm64_enable_wa2_handling(struct alt_instr *alt,
-> +				      __le32 *origptr, __le32 *updptr,
-> +				      int nr_inst)
-
-Where does the name "wa2" come from here?
+...Live migration?
 
 Jon.
