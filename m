@@ -1,16 +1,14 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH v2 6/6] KVM: arm/arm64: Remove unnecessary CMOs when
- creating HYP page tables
-Date: Sat, 9 Jun 2018 11:58:06 +0200
-Message-ID: <20180609095806.GH5097@C02W217FHV2R.local>
-References: <20180530124706.25284-1-marc.zyngier@arm.com>
- <20180530124706.25284-7-marc.zyngier@arm.com>
+Subject: Re: [PATCH] KVM: arm/arm64: drop resource size check for GICV window
+Date: Sat, 9 Jun 2018 12:06:57 +0200
+Message-ID: <20180609100657.GI5097@C02W217FHV2R.local>
+References: <20180601150628.10111-1-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <20180530124706.25284-7-marc.zyngier@arm.com>
+In-Reply-To: <20180601150628.10111-1-ard.biesheuvel@linaro.org>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -20,62 +18,68 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Catalin Marinas <catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, May 30, 2018 at 01:47:06PM +0100, Marc Zyngier wrote:
-> There is no need to perform cache maintenance operations when
-> creating the HYP page tables if we have the multiprocessing
-> extensions. ARMv7 mandates them with the virtualization support,
-> and ARMv8 just mandates them unconditionally.
+On Fri, Jun 01, 2018 at 05:06:28PM +0200, Ard Biesheuvel wrote:
+> When booting a 64 KB pages kernel on a ACPI GICv3 system that
+> implements support for v2 emulation, the following warning is
+> produced
 > 
-> Let's remove these operations.
+>   GICV size 0x2000 not a multiple of page size 0x10000
 > 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> and support for v2 emulation is disabled, preventing GICv2 VMs
+> from being able to run on such hosts.
+> 
+> The reason is that vgic_v3_probe() performs a sanity check on the
+> size of the window (it should be a multiple of the page size),
+> while the ACPI MADT parsing code hardcodes the size of the window
+> to 8 KB. This makes sense, considering that ACPI does not bother
+> to describe the size in the first place, under the assumption that
+> platforms implementing ACPI will follow the architecture and not
+> put anything else in the same 64 KB window.
 
-Acked-by: Christoffer Dall <christoffer.dall@arm.com>
+Does the architecture actually say that anywhere?
 
+> 
+> So let's just drop the sanity check altogether, and assume that
+> the window is at least 64 KB in size.
+
+This could obviously be dangerous if broken systems actually exist.
+Marc may know more about that than me.  An alternative would be to
+modify the ACPI code to assume max(8 KB, page size) instead, and/or a
+command line parameter to override this check.
+
+That said, I'm not directly opposed to this patch, but I'll let Marc
+have a look as well.
+
+Thanks,
+-Christoffer
+
+> 
+> Fixes: 909777324588 ("KVM: arm/arm64: vgic-new: vgic_init: implement kvm_vgic_hyp_init")
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 > ---
->  virt/kvm/arm/mmu.c | 4 ----
->  1 file changed, 4 deletions(-)
+>  virt/kvm/arm/vgic/vgic-v3.c | 5 -----
+>  1 file changed, 5 deletions(-)
 > 
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index ad1980d2118a..ccdf544d44c0 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -607,7 +607,6 @@ static void create_hyp_pte_mappings(pmd_t *pmd, unsigned long start,
->  		pte = pte_offset_kernel(pmd, addr);
->  		kvm_set_pte(pte, pfn_pte(pfn, prot));
->  		get_page(virt_to_page(pte));
-> -		kvm_flush_dcache_to_poc(pte, sizeof(*pte));
->  		pfn++;
->  	} while (addr += PAGE_SIZE, addr != end);
->  }
-> @@ -634,7 +633,6 @@ static int create_hyp_pmd_mappings(pud_t *pud, unsigned long start,
->  			}
->  			kvm_pmd_populate(pmd, pte);
->  			get_page(virt_to_page(pmd));
-> -			kvm_flush_dcache_to_poc(pmd, sizeof(*pmd));
->  		}
->  
->  		next = pmd_addr_end(addr, end);
-> @@ -667,7 +665,6 @@ static int create_hyp_pud_mappings(pgd_t *pgd, unsigned long start,
->  			}
->  			kvm_pud_populate(pud, pmd);
->  			get_page(virt_to_page(pud));
-> -			kvm_flush_dcache_to_poc(pud, sizeof(*pud));
->  		}
->  
->  		next = pud_addr_end(addr, end);
-> @@ -704,7 +701,6 @@ static int __create_hyp_mappings(pgd_t *pgdp, unsigned long ptrs_per_pgd,
->  			}
->  			kvm_pgd_populate(pgd, pud);
->  			get_page(virt_to_page(pgd));
-> -			kvm_flush_dcache_to_poc(pgd, sizeof(*pgd));
->  		}
->  
->  		next = pgd_addr_end(addr, end);
+> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+> index bdcf8e7a6161..72fc688c3e9d 100644
+> --- a/virt/kvm/arm/vgic/vgic-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-v3.c
+> @@ -552,11 +552,6 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
+>  		pr_warn("GICV physical address 0x%llx not page aligned\n",
+>  			(unsigned long long)info->vcpu.start);
+>  		kvm_vgic_global_state.vcpu_base = 0;
+> -	} else if (!PAGE_ALIGNED(resource_size(&info->vcpu))) {
+> -		pr_warn("GICV size 0x%llx not a multiple of page size 0x%lx\n",
+> -			(unsigned long long)resource_size(&info->vcpu),
+> -			PAGE_SIZE);
+> -		kvm_vgic_global_state.vcpu_base = 0;
+>  	} else {
+>  		kvm_vgic_global_state.vcpu_base = info->vcpu.start;
+>  		kvm_vgic_global_state.can_emulate_gicv2 = true;
 > -- 
-> 2.17.1
+> 2.17.0
 > 
