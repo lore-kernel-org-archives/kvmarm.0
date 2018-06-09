@@ -1,16 +1,16 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH v2 2/6] arm64: KVM: Handle Set/Way CMOs as NOPs if FWB is
- present
-Date: Sat, 9 Jun 2018 11:26:40 +0200
-Message-ID: <20180609092640.GD5097@C02W217FHV2R.local>
+Subject: Re: [PATCH v2 3/6] arm64: KVM: Avoid marking pages as XN in Stage-2
+ if CTR_EL0.DIC is set
+Date: Sat, 9 Jun 2018 11:29:05 +0200
+Message-ID: <20180609092905.GE5097@C02W217FHV2R.local>
 References: <20180530124706.25284-1-marc.zyngier@arm.com>
- <20180530124706.25284-3-marc.zyngier@arm.com>
+ <20180530124706.25284-4-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <20180530124706.25284-3-marc.zyngier@arm.com>
+In-Reply-To: <20180530124706.25284-4-marc.zyngier@arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -24,61 +24,50 @@ To: Marc Zyngier <marc.zyngier@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org, Catalin Marinas <catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, May 30, 2018 at 01:47:02PM +0100, Marc Zyngier wrote:
-> Set/Way handling is one of the ugliest corners of KVM. We shouldn't
-> have to handle that, but better safe than sorry.
+On Wed, May 30, 2018 at 01:47:03PM +0100, Marc Zyngier wrote:
+> On systems where CTR_EL0.DIC is set, we don't need to perform
+> icache invalidation to guarantee that we'll fetch the right
+> instruction stream.
 > 
-> Thankfully, FWB fixes this for us by not requiering any maintenance
-> whatsoever, which means we don't have to emulate S/W CMOs, and don't
-> have to track VM ops either.
+> This also means that taking a permission fault to invalidate the
+> icache is an unnecessary overhead.
+> 
+> On such systems, we can safely leave the page as being executable.
+> 
+> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 
-I tiny bit of rationale here would have been nice.  As I understand it,
-if we're presenting the guest with a fully coherent system, there should
-never be a need to invalidate anything, because the guest will always
-see the most recent value no matter how it sings and dances, right?
+Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 
-> 
-> We still have to trap S/W though, if only to prevent the guest from
-> doing something bad.
-> 
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
->  arch/arm64/kvm/sys_regs.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
+>  arch/arm64/include/asm/pgtable-prot.h | 14 ++++++++++++--
+>  1 file changed, 12 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 6e3b969391fd..9a740f159245 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -195,7 +195,13 @@ static bool access_dcsw(struct kvm_vcpu *vcpu,
->  	if (!p->is_write)
->  		return read_from_write_only(vcpu, p, r);
+> diff --git a/arch/arm64/include/asm/pgtable-prot.h b/arch/arm64/include/asm/pgtable-prot.h
+> index c66c3047400e..78b942c1bea4 100644
+> --- a/arch/arm64/include/asm/pgtable-prot.h
+> +++ b/arch/arm64/include/asm/pgtable-prot.h
+> @@ -77,8 +77,18 @@
+>  		__val;							\
+>  	 })
 >  
-> -	kvm_set_way_flush(vcpu);
-> +	/*
-> +	 * Only track S/W ops if we don't have FWB. It still indicates
-> +	 * that the guest is a bit broken...
-> +	 */
-
-Is it strictly true that the guest is broken if it does any form of S/W
-ops?  Does the guest actually know that it's running on a fully coherent
-system, or is the argument that no software, ever, should do S/W, even
-for reboot etc.?
-
-I think this should have slightly more info, or that part of the comment
-should just be dropped, to avoid misleading future readers who don't
-have the full picture.
-
-> +	if (!cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
-> +		kvm_set_way_flush(vcpu);
+> -#define PAGE_S2			__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(NORMAL) | PTE_S2_RDONLY | PTE_S2_XN)
+> -#define PAGE_S2_DEVICE		__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(DEVICE_nGnRE) | PTE_S2_RDONLY | PTE_S2_XN)
+> +#define PAGE_S2_XN							\
+> +	({								\
+> +		u64 __val;						\
+> +		if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))		\
+> +			__val = 0;					\
+> +		else							\
+> +			__val = PTE_S2_XN;				\
+> +		__val;							\
+> +	})
 > +
->  	return true;
->  }
+> +#define PAGE_S2			__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(NORMAL) | PTE_S2_RDONLY | PAGE_S2_XN)
+> +#define PAGE_S2_DEVICE		__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(DEVICE_nGnRE) | PTE_S2_RDONLY | PAGE_S2_XN)
 >  
+>  #define PAGE_NONE		__pgprot(((_PAGE_DEFAULT) & ~PTE_VALID) | PTE_PROT_NONE | PTE_RDONLY | PTE_NG | PTE_PXN | PTE_UXN)
+>  #define PAGE_SHARED		__pgprot(_PAGE_DEFAULT | PTE_USER | PTE_NG | PTE_PXN | PTE_UXN | PTE_WRITE)
 > -- 
 > 2.17.1
 > 
-
-Besides the usual nits on commentary:
-
-Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
