@@ -1,129 +1,108 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] kvm: Delete the slot only when KVM_MEM_READONLY flag is
- changed
-Date: Tue, 12 Jun 2018 14:17:27 +0200
-Message-ID: <25094a6a-df4e-3dbb-ef69-e478edb46ff3@redhat.com>
-References: <1526462314-19720-1-git-send-email-zhaoshenglong@huawei.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v2 1/6] arm64: KVM: Add support for Stage-2 control of
+ memory types and cacheability
+Date: Tue, 12 Jun 2018 13:55:29 +0100
+Message-ID: <f58e92f9-0c4c-0ca0-32a4-0fc7e8bae2ea@arm.com>
+References: <20180530124706.25284-1-marc.zyngier@arm.com>
+ <20180530124706.25284-2-marc.zyngier@arm.com>
+ <20180531114938.2w4sbi2nkvqyc3jt@lakrids.cambridge.arm.com>
+ <6675e8b0-7c34-ce1f-99e2-1f63566b3426@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D6434043C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jun 2018 08:06:22 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cb8lTJSVngZr for <kvmarm@lists.cs.columbia.edu>;
- Tue, 12 Jun 2018 08:06:00 -0400 (EDT)
-Received: from mail-wr0-f194.google.com (mail-wr0-f194.google.com
- [209.85.128.194])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4A4B840192
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jun 2018 08:06:00 -0400 (EDT)
-Received: by mail-wr0-f194.google.com with SMTP id f16-v6so23858664wrm.3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jun 2018 05:17:31 -0700 (PDT)
-In-Reply-To: <1526462314-19720-1-git-send-email-zhaoshenglong@huawei.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Shannon Zhao <zhaoshenglong@huawei.com>, qemu-devel@nongnu.org, guangrong.xiao@gmail.com
-Cc: shannon.zhaosl@gmail.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <6675e8b0-7c34-ce1f-99e2-1f63566b3426@arm.com>
+Content-Language: en-GB
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 16/05/2018 11:18, Shannon Zhao wrote:
-> According to KVM commit 75d61fbc, it needs to delete the slot before
-> changing the KVM_MEM_READONLY flag. But QEMU commit 235e8982 only check
-> whether KVM_MEM_READONLY flag is set instead of changing. It doesn't
-> need to delete the slot if the KVM_MEM_READONLY flag is not changed.
+On 31/05/18 13:38, Marc Zyngier wrote:
+> On 31/05/18 12:49, Mark Rutland wrote:
+>> On Wed, May 30, 2018 at 01:47:01PM +0100, Marc Zyngier wrote:
+>>> Up to ARMv8.3, the combinaison of Stage-1 and Stage-2 attributes
+>>> results in the strongest attribute of the two stages.  This means
+>>> that the hypervisor has to perform quite a lot of cache maintenance
+>>> just in case the guest has some non-cacheable mappings around.
+>>>
+>>> ARMv8.4 solves this problem by offering a different mode (FWB) where
+>>> Stage-2 has total control over the memory attribute (this is limited
+>>> to systems where both I/O and instruction caches are coherent with
+>>
+>> s/caches/fetches/ -- the I-caches themselves aren't coherent with the
+>> D-caches (or we could omit I-cache maintenance).
+>>
+>> i.e. this implies IDC, but not DIC.
 > 
-> This fixes a issue that migrating a VM at the OVMF startup stage and
-> VM is executing the codes in rom. Between the deleting and adding the
-> slot in kvm_set_user_memory_region, there is a chance that guest access
-> rom and trap to KVM, then KVM can't find the corresponding memslot.
-> While KVM (on ARM) injects an abort to guest due to the broken hva, then
-> guest will get stuck.
-> 
-> Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
+> It may imply IDC behaviour, but not quite IDC itself. I agree, this
+> looks dodgy. I've asked for clarification on the spec.
 
-I'm a bit worried about old_flags not being set on all paths to
-kvm_set_user_memory_region.  This would lead to extra
-KVM_SET_USER_MEMORY_REGION calls.  It should not be a problem but
-it is ugly.  Does something like the additional changes below work for you?
+I've now received confirmation that FWB implies the IDC behaviour. It
+doesn't guarantee that CTR_EL0.IDC will be set though, only that
+CLIDR_EL1.LOU{U,IS} are both 0.
+
+> 
+>>
+>>> the dcache). This is achieved by having a different set of memory
+>>> attributes in the page tables, and a new bit set in HCR_EL2.
+>>>
+>>> On such a system, we can then safely sidestep any form of dcache
+>>> management.
+>>>
+>>> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>>> ---
+>>
+>>>  static inline bool vcpu_has_cache_enabled(struct kvm_vcpu *vcpu)
+>>>  {
+>>> @@ -268,7 +269,10 @@ static inline void __clean_dcache_guest_page(kvm_pfn_t pfn, unsigned long size)
+>>>  {
+>>>  	void *va = page_address(pfn_to_page(pfn));
+>>>  
+>>> -	kvm_flush_dcache_to_poc(va, size);
+>>> +	if (!cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
+>>> +		kvm_flush_dcache_to_poc(va, size);
+>>> +	else
+>>> +		kvm_flush_dcache_to_pou(va, size);
+>>>  }
+>>
+>> Te commit message said instruction fetches were coherent, and that no
+>> D-cache maintenance was necessary, so why do we need maintenance to the
+>> PoU?
+> 
+> That maintenance will be elided if we actually have IDC set. I'm happy
+> to drop it once I have confirmation that we have an identical behaviour.
+
+Given the above, I'll drop the clean to PoU.
+
+> 
+>>
+>>> +static void cpu_has_fwb(const struct arm64_cpu_capabilities *__unused)
+>>> +{
+>>> +	u64 val = read_sysreg_s(SYS_CLIDR_EL1);
+>>> +
+>>> +	/* Check that CLIDR_EL1.LOU{U,IS} are both 0 */
+>>> +	WARN_ON(val & (7 << 27 | 7 << 21));
+>>> +}
+>>
+>> What about CTR_EL0.IDC?
+> 
+> Again, that depends on whether FWB implies IDC or not.
+
+The spec doesn't seem to guarantee IDC, but does mandate that
+CLIDR_EL1.LOU{U,IS} are set 0.
 
 Thanks,
 
-Paolo
-
-
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index b04f193a76..e318bcfb78 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -257,7 +257,7 @@ int kvm_physical_memory_addr_from_host(KVMState *s, void *ram,
-     return 0;
- }
- 
--static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot)
-+static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot, bool new)
- {
-     KVMState *s = kvm_state;
-     struct kvm_userspace_memory_region mem;
-@@ -268,7 +268,7 @@ static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot)
-     mem.userspace_addr = (unsigned long)slot->ram;
-     mem.flags = slot->flags;
- 
--    if (slot->memory_size && (mem.flags ^ slot->old_flags) & KVM_MEM_READONLY) {
-+    if (slot->memory_size && !new && (mem.flags ^ slot->old_flags) & KVM_MEM_READONLY) {
-         /* Set the slot size to 0 before setting the slot to the desired
-          * value. This is needed based on KVM commit 75d61fbc. */
-         mem.memory_size = 0;
-@@ -276,6 +276,7 @@ static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot)
-     }
-     mem.memory_size = slot->memory_size;
-     ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
-+    slot->old_flags = mem.flags;
-     trace_kvm_set_user_memory(mem.slot, mem.flags, mem.guest_phys_addr,
-                               mem.memory_size, mem.userspace_addr, ret);
-     return ret;
-@@ -394,7 +395,6 @@ static int kvm_slot_update_flags(KVMMemoryListener *kml, KVMSlot *mem,
- {
-     int old_flags;
- 
--    mem->old_flags = mem->flags;
-     mem->flags = kvm_mem_flags(mr);
- 
-     /* If nothing changed effectively, no need to issue ioctl */
-@@ -402,7 +402,7 @@ static int kvm_slot_update_flags(KVMMemoryListener *kml, KVMSlot *mem,
-         return 0;
-     }
- 
--    return kvm_set_user_memory_region(kml, mem);
-+    return kvm_set_user_memory_region(kml, mem, false);
- }
- 
- static int kvm_section_update_flags(KVMMemoryListener *kml,
-@@ -756,7 +756,8 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
- 
-         /* unregister the slot */
-         mem->memory_size = 0;
--        err = kvm_set_user_memory_region(kml, mem);
-+        mem->flags = 0;
-+        err = kvm_set_user_memory_region(kml, mem, false);
-         if (err) {
-             fprintf(stderr, "%s: error unregistering slot: %s\n",
-                     __func__, strerror(-err));
-@@ -772,7 +773,7 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
-     mem->ram = ram;
-     mem->flags = kvm_mem_flags(mr);
- 
--    err = kvm_set_user_memory_region(kml, mem);
-+    err = kvm_set_user_memory_region(kml, mem, true);
-     if (err) {
-         fprintf(stderr, "%s: error registering slot: %s\n", __func__,
-                 strerror(-err));
+	M.
+-- 
+Jazz is not dead. It just smells funny...
