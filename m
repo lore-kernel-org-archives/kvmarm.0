@@ -1,18 +1,11 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH 4/4] KVM: arm64: Avoid mistaken attempts to save SVE
- state for vcpus
-Date: Fri, 15 Jun 2018 10:27:10 +0100
-Message-ID: <20180615092708.GO22983@e103592.cambridge.arm.com>
-References: <1528976039-25826-1-git-send-email-Dave.Martin@arm.com>
- <1528976546-25999-1-git-send-email-Dave.Martin@arm.com>
- <1528976546-25999-4-git-send-email-Dave.Martin@arm.com>
- <87po0szb4h.fsf@linaro.org>
+Subject: [PATCH v2 0/4] KVM: arm64: FPSIMD/SVE fixes for 4.17
+Date: Fri, 15 Jun 2018 16:47:22 +0100
+Message-ID: <1529077646-2848-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <87po0szb4h.fsf@linaro.org>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -22,24 +15,38 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: kvmarm@lists.cs.columbia.edu
+Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jun 15, 2018 at 09:50:54AM +0100, Alex Benn=E9e wrote:
-> =
+This series contains fixes for some issues observed since the KVM arm64
+pull request for 4.17.
 
-> Dave Martin <Dave.Martin@arm.com> writes:
-> > This patch ensures this my delaying restoration of current's
-> > TIF_SVE until after the call to fpsimd_save().
-> =
+It supersedes the previous v1 [1].
 
-> this *by* delaying
+The first patch (from Mark Rutland) adds a straightforward helper to
+modify particular bits in a system register conditionally.  This is used
+by patch 3 (though obviously it could be coded round and patch 1
+dropped, if preferred).
 
-No Reviewed-my? ;)
+See other patches for details of the individual fixes and changes from
+the previous posting.
 
-I'll repost for the bh_disable/irqsave changes anyway, so I can fix
-typos at low effort.
+[1] [PATCH 0/4] KVM: arm64: FPSIMD/SVE fixes for 4.17
+http://lists.infradead.org/pipermail/linux-arm-kernel/2018-June/584107.html
 
-Cheers
----Dave
+Dave Martin (3):
+  KVM: arm64: Don't mask softirq with IRQs disabled in vcpu_put()
+  KVM: arm64/sve: Fix SVE trap restoration for non-current tasks
+  KVM: arm64: Avoid mistaken attempts to save SVE state for vcpus
+
+Mark Rutland (1):
+  arm64: introduce sysreg_clear_set()
+
+ arch/arm64/include/asm/kvm_host.h |  1 +
+ arch/arm64/include/asm/sysreg.h   | 11 +++++++++++
+ arch/arm64/kvm/fpsimd.c           | 36 +++++++++++++++++++++++++++---------
+ 3 files changed, 39 insertions(+), 9 deletions(-)
+
+-- 
+2.1.4
