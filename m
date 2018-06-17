@@ -1,22 +1,22 @@
 From: <gregkh@linuxfoundation.org>
 Subject: Patch "KVM: arm/arm64: vgic: fix possible spectre-v1 in
- vgic_mmio_read_apr()" has been added to the 4.14-stable tree
-Date: Sun, 17 Jun 2018 13:23:24 +0200
-Message-ID: <1529234604169245@kroah.com>
+ vgic_mmio_read_apr()" has been added to the 4.16-stable tree
+Date: Sun, 17 Jun 2018 13:23:43 +0200
+Message-ID: <1529234623567@kroah.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BB0FF4070F
- for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Jun 2018 07:20:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B0C049F93
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Jun 2018 07:32:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qQOnIufzhE01 for <kvmarm@lists.cs.columbia.edu>;
- Sun, 17 Jun 2018 07:20:35 -0400 (EDT)
+ with ESMTP id WqzdDBNbgNhV for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 17 Jun 2018 07:31:50 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C3456402B8
- for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Jun 2018 07:20:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CDB8349F8C
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Jun 2018 07:31:49 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,18 +35,18 @@ This is a note to let you know that I've just added the patch titled
 
     KVM: arm/arm64: vgic: fix possible spectre-v1 in vgic_mmio_read_apr()
 
-to the 4.14-stable tree which can be found at:
+to the 4.16-stable tree which can be found at:
     http://www.kernel.org/git/?p=linux/kernel/git/stable/stable-queue.git;a=summary
 
 The filename of the patch is:
      kvm-arm-arm64-vgic-fix-possible-spectre-v1-in-vgic_mmio_read_apr.patch
-and it can be found in the queue-4.14 subdirectory.
+and it can be found in the queue-4.16 subdirectory.
 
 If you, or anyone else, feels it should not be added to the stable tree,
 please let <stable@vger.kernel.org> know about it.
 
 
->From foo@baz Sun Jun 17 12:13:49 CEST 2018
+>From foo@baz Sun Jun 17 12:07:33 CEST 2018
 From: Mark Rutland <mark.rutland@arm.com>
 Date: Wed, 25 Apr 2018 17:13:42 +0100
 Subject: KVM: arm/arm64: vgic: fix possible spectre-v1 in vgic_mmio_read_apr()
@@ -88,7 +88,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  #include <kvm/iodev.h>
  #include <kvm/arm_vgic.h>
  
-@@ -320,6 +322,9 @@ static unsigned long vgic_mmio_read_apr(
+@@ -324,6 +326,9 @@ static unsigned long vgic_mmio_read_apr(
  
  		if (n > vgic_v3_max_apr_idx(vcpu))
  			return 0;
@@ -102,9 +102,13 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 Patches currently in stable-queue which might be from mark.rutland@arm.com are
 
-queue-4.14/init-fix-false-positives-in-w-x-checking.patch
-queue-4.14/mips-dts-boston-fix-pci-bus-dtc-warnings.patch
-queue-4.14/kvm-arm-arm64-vgic-fix-possible-spectre-v1-in-vgic_mmio_read_apr.patch
-queue-4.14/arm64-ptrace-remove-addr_limit-manipulation.patch
-queue-4.14/arm64-fix-possible-spectre-v1-in-ptrace_hbp_get_event.patch
-queue-4.14/efi-libstub-arm64-handle-randomized-text_offset.patch
+queue-4.16/init-fix-false-positives-in-w-x-checking.patch
+queue-4.16/mips-dts-boston-fix-pci-bus-dtc-warnings.patch
+queue-4.16/kvm-arm-arm64-vgic-fix-possible-spectre-v1-in-vgic_mmio_read_apr.patch
+queue-4.16/arm64-ptrace-remove-addr_limit-manipulation.patch
+queue-4.16/bpf-fix-possible-spectre-v1-in-find_and_alloc_map.patch
+queue-4.16/bpf-use-array_index_nospec-in-find_prog_type.patch
+queue-4.16/arm64-kasan-avoid-pfn_to_nid-before-page-array-is-initialized.patch
+queue-4.16/arm64-fix-possible-spectre-v1-in-ptrace_hbp_get_event.patch
+queue-4.16/efi-libstub-arm64-handle-randomized-text_offset.patch
+queue-4.16/arm64-only-advance-singlestep-for-user-instruction-traps.patch
