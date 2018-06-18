@@ -1,22 +1,22 @@
 From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Subject: [PATCH v6 kvmtool 05/13] pci: add capability helpers
-Date: Mon, 18 Jun 2018 19:42:03 +0100
-Message-ID: <20180618184211.43904-6-jean-philippe.brucker@arm.com>
+Subject: [PATCH v6 kvmtool 07/13] Add fls_long and roundup_pow_of_two helpers
+Date: Mon, 18 Jun 2018 19:42:05 +0100
+Message-ID: <20180618184211.43904-8-jean-philippe.brucker@arm.com>
 References: <20180618184211.43904-1-jean-philippe.brucker@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A54F4A0EC
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jun 2018 14:32:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 965394A0D4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jun 2018 14:32:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qgnniWOI64IN for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Jun 2018 14:31:46 -0400 (EDT)
+ with ESMTP id nic2WDCz6piy for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Jun 2018 14:31:47 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 73A3B4A0DB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jun 2018 14:31:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 21F454A0DE
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jun 2018 14:31:36 -0400 (EDT)
 In-Reply-To: <20180618184211.43904-1-jean-philippe.brucker@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,76 +31,40 @@ To: kvm@vger.kernel.org
 Cc: lorenzo.pieralisi@arm.com, marc.zyngier@arm.com, punit.agrawal@arm.com, will.deacon@arm.com, alex.williamson@redhat.com, robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add a way to iterate over all capabilities in a config space. Add a search
-function for getting a specific capability.
+It's always nice to have a log2 handy, and the vfio-pci code will need to
+perform power of two allocation from an arbitrary size. Add fls_long and
+roundup_pow_of_two, based on the GCC builtin.
 
 Reviewed-by: Punit Agrawal <punit.agrawal@arm.com>
 Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 ---
- include/kvm/pci.h | 14 ++++++++++++++
- pci.c             | 13 +++++++++++++
- 2 files changed, 27 insertions(+)
+ include/kvm/util.h | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/include/kvm/pci.h b/include/kvm/pci.h
-index 5d9c0f3b0..01c244bcf 100644
---- a/include/kvm/pci.h
-+++ b/include/kvm/pci.h
-@@ -58,6 +58,11 @@ struct msix_cap {
- 	u32 pba_offset;
- };
- 
-+struct pci_cap_hdr {
-+	u8	type;
-+	u8	next;
-+};
-+
- #define PCI_BAR_OFFSET(b)	(offsetof(struct pci_device_header, bar[b]))
- #define PCI_DEV_CFG_SIZE	256
- #define PCI_DEV_CFG_MASK	(PCI_DEV_CFG_SIZE - 1)
-@@ -113,6 +118,13 @@ struct pci_device_header {
- 	enum irq_type	irq_type;
- };
- 
-+#define PCI_CAP(pci_hdr, pos) ((void *)(pci_hdr) + (pos))
-+
-+#define pci_for_each_cap(pos, cap, hdr)				\
-+	for ((pos) = (hdr)->capabilities & ~3;			\
-+	     (cap) = PCI_CAP(hdr, pos), (pos) != 0;		\
-+	     (pos) = ((struct pci_cap_hdr *)(cap))->next & ~3)
-+
- int pci__init(struct kvm *kvm);
- int pci__exit(struct kvm *kvm);
- struct pci_device_header *pci__find_dev(u8 dev_num);
-@@ -121,4 +133,6 @@ void pci__assign_irq(struct device_header *dev_hdr);
- void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data, int size);
- void pci__config_rd(struct kvm *kvm, union pci_config_address addr, void *data, int size);
- 
-+void *pci_find_cap(struct pci_device_header *hdr, u8 cap_type);
-+
- #endif /* KVM__PCI_H */
-diff --git a/pci.c b/pci.c
-index 5a8c2ef41..689869cb7 100644
---- a/pci.c
-+++ b/pci.c
-@@ -27,6 +27,19 @@ u32 pci_get_io_space_block(u32 size)
- 	return block;
+diff --git a/include/kvm/util.h b/include/kvm/util.h
+index 0df9f0dfd..4ca7aa939 100644
+--- a/include/kvm/util.h
++++ b/include/kvm/util.h
+@@ -90,6 +90,20 @@ static inline void msleep(unsigned int msecs)
+ 	usleep(MSECS_TO_USECS(msecs));
  }
  
-+void *pci_find_cap(struct pci_device_header *hdr, u8 cap_type)
++/*
++ * Find last (most significant) bit set. Same implementation as Linux:
++ * fls(0) = 0, fls(1) = 1, fls(1UL << 63) = 64
++ */
++static inline int fls_long(unsigned long x)
 +{
-+	u8 pos;
-+	struct pci_cap_hdr *cap;
-+
-+	pci_for_each_cap(pos, cap, hdr) {
-+		if (cap->type == cap_type)
-+			return cap;
-+	}
-+
-+	return NULL;
++	return x ? sizeof(x) * 8 - __builtin_clzl(x) : 0;
 +}
 +
- void pci__assign_irq(struct device_header *dev_hdr)
- {
- 	struct pci_device_header *pci_hdr = dev_hdr->data;
++static inline unsigned long roundup_pow_of_two(unsigned long x)
++{
++	return x ? 1UL << fls_long(x - 1) : 0;
++}
++
+ struct kvm;
+ void *mmap_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size);
+ void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *hugetlbfs_path, u64 size);
 -- 
 2.17.0
